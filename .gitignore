@@ -1,0 +1,18 @@
+# Godot editor cache
+.godot/
+
+# Generated exports other than the verified static web deployment. Vercel
+# serves build/web directly; build/.gdignore keeps it out of Godot imports.
+build/*
+!build/.gdignore
+!build/web/
+!build/web/**
+
+# Local work-in-progress source kits and Blender scratch files
+wip/
+
+# Local tool and operating-system state
+.claude/
+.codex/
+.DS_Store
+**/.DS_Store

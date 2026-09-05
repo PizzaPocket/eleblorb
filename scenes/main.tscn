@@ -1,0 +1,277 @@
+[gd_scene format=3 uid="uid://i3xw88q6g01s"]
+
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1"]
+[ext_resource type="Script" uid="uid://bbdskxav0q6vx" path="res://scripts/wilderness_scatter.gd" id="2"]
+[ext_resource type="Script" uid="uid://66bumou634yd" path="res://scripts/terrain_generator.gd" id="3"]
+[ext_resource type="Script" uid="uid://ch2y0j143b7e" path="res://scripts/town_generator.gd" id="4"]
+[ext_resource type="Script" uid="uid://crwtjc5tcecax" path="res://scripts/cloud_scatter.gd" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/blorb.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/tokoin.tscn" id="7"]
+[ext_resource type="Script" uid="uid://b2xru43bdi30j" path="res://scripts/building_marker.gd" id="8"]
+[ext_resource type="Script" uid="uid://cu1ibnydrnllf" path="res://scripts/stall_marker.gd" id="9"]
+[ext_resource type="Script" uid="uid://bsbtgk7qxvvmo" path="res://scripts/distant_mountains.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/day_night_cycle.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/city_generator.gd" id="12"]
+[ext_resource type="Script" path="res://scripts/main.gd" id="13"]
+[ext_resource type="Script" path="res://scripts/floating_village.gd" id="14"]
+[ext_resource type="Script" path="res://scripts/skeleton_spawner.gd" id="15"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
+sky_top_color = Color(0.12, 0.52, 0.96, 1)
+sky_horizon_color = Color(0.48, 0.76, 0.98, 1)
+sky_curve = 0.2
+ground_bottom_color = Color(0.3, 0.28, 0.22, 1)
+ground_horizon_color = Color(0.48, 0.76, 0.98, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("ProceduralSkyMaterial_1")
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+fog_enabled = true
+fog_light_color = Color(0.78, 0.89, 0.98, 1)
+fog_density = 0.0025
+# 0.0, not the old 0.15 -- per a further direct correction, even that
+# reduced amount still visibly muted the sky. Fog now only ever fades
+# distant geometry (its actual intended job), never blends over the sky
+# itself. day_night_cycle.gd sets this explicitly at runtime too (belt and
+# suspenders); this static value is just what a designer opening the scene
+# sees before the cycle script's first frame runs.
+fog_sky_affect = 0.0
+
+[node name="Main" type="Node3D" unique_id=1359619256]
+script = ExtResource("13")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=351316317]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=428974637]
+transform = Transform3D(0.81915206, 0.51983684, -0.24240386, 0, 0.42261824, 0.9063078, 0.57357645, -0.7424039, 0.3461886, 0, 20, 0)
+light_energy = 1.0
+shadow_enabled = true
+# Defaults to 0 (perfectly parallel rays), which is what made the clouds'
+# shadows on the ground razor-sharp regardless of how far away they are --
+# a real sun has a small but nonzero angular size, which is what actually
+# produces the soft, distance-dependent penumbra (contact-hardening)
+# real shadows have. 1.5 is a stylized exaggeration of the real sun's
+# ~0.53 degrees, chosen for a visibly soft edge rather than a physically
+# exact one.
+light_angular_distance = 1.5
+
+[node name="DayNightCycle" type="Node" parent="."]
+script = ExtResource("11")
+
+[node name="Terrain" type="StaticBody3D" parent="." unique_id=193527827]
+collision_mask = 0
+script = ExtResource("3")
+
+[node name="Town" type="Node3D" parent="." unique_id=237348816]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 150, 0, 70)
+script = ExtResource("4")
+
+[node name="WesternCity" type="Node3D" parent="."]
+script = ExtResource("12")
+
+[node name="FloatingWaterVillage" type="Node3D" parent="."]
+script = ExtResource("14")
+
+[node name="Buildings" type="Node3D" parent="Town" unique_id=1744102569]
+
+[node name="Building1" type="Marker3D" parent="Town/Buildings" unique_id=819228046]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.7, 0, -17.1)
+script = ExtResource("8")
+size = Vector2(5, 2)
+floors = 2
+
+[node name="Building2" type="Marker3D" parent="Town/Buildings" unique_id=1817075240]
+transform = Transform3D(0.9396926, 0, 0.34202012, 0, 1, 0, -0.34202012, 0, 0.9396926, 20.9, 0, -20.9)
+script = ExtResource("8")
+size = Vector2(3, 2)
+roof_style = "low"
+
+[node name="Building3" type="Marker3D" parent="Town/Buildings" unique_id=733170094]
+transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, -28.5, 0, 17.1)
+script = ExtResource("8")
+floors = 2
+
+[node name="Building4" type="Marker3D" parent="Town/Buildings" unique_id=744013607]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.6, 0, 19)
+script = ExtResource("8")
+size = Vector2(6, 2)
+
+[node name="Building5" type="Marker3D" parent="Town/Buildings" unique_id=1670962624]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -34.2)
+script = ExtResource("8")
+size = Vector2(3, 2)
+roof_style = "low"
+
+[node name="Building6" type="Marker3D" parent="Town/Buildings"]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 34, 0, 0)
+script = ExtResource("8")
+size = Vector2(4, 2)
+floors = 2
+roof_style = "low"
+
+[node name="Building7" type="Marker3D" parent="Town/Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 36)
+script = ExtResource("8")
+size = Vector2(5, 2)
+
+[node name="Building8" type="Marker3D" parent="Town/Buildings"]
+transform = Transform3D(0.9396926, 0, 0.34202012, 0, 1, 0, -0.34202012, 0, 0.9396926, 16, 0, 40)
+script = ExtResource("8")
+size = Vector2(3, 2)
+floors = 2
+roof_style = "low"
+
+[node name="Building9" type="Marker3D" parent="Town/Buildings"]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -38, 0, 3)
+script = ExtResource("8")
+size = Vector2(6, 2)
+
+[node name="Building10" type="Marker3D" parent="Town/Buildings"]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -12, 0, -40)
+script = ExtResource("8")
+size = Vector2(3, 2)
+roof_style = "low"
+
+[node name="Windmill" type="Marker3D" parent="Town"]
+transform = Transform3D(0.76604444, 0, 0.6427876, 0, 1, 0, -0.6427876, 0, 0.76604444, -46, 0, -6)
+
+[node name="Watermill" type="Marker3D" parent="Town"]
+transform = Transform3D(-0.34202006, 0, -0.9396927, 0, 1, 0, 0.9396927, 0, -0.34202006, 44, 0, -8)
+
+[node name="FenceSpots" type="Node3D" parent="Town"]
+
+[node name="FenceSpot1" type="Marker3D" parent="Town/FenceSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, 0, -7.9)
+
+[node name="FenceSpot2" type="Marker3D" parent="Town/FenceSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, 0, -6)
+
+[node name="FenceSpot3" type="Marker3D" parent="Town/FenceSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, 0, -4.1)
+
+[node name="FenceSpot4" type="Marker3D" parent="Town/FenceSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, -9.9)
+
+[node name="FenceSpot5" type="Marker3D" parent="Town/FenceSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, -8)
+
+[node name="FenceSpot6" type="Marker3D" parent="Town/FenceSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, -6.1)
+
+[node name="NPCSpots" type="Node3D" parent="Town" unique_id=687278585]
+
+[node name="NPCSpot1" type="Marker3D" parent="Town/NPCSpots" unique_id=1176273725]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0, 3.8)
+
+[node name="NPCSpot2" type="Marker3D" parent="Town/NPCSpots" unique_id=1051349784]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.4, 0, -3.8)
+
+[node name="NPCSmallSpots" type="Node3D" parent="Town" unique_id=1714149626]
+
+[node name="NPCSmallSpot1" type="Marker3D" parent="Town/NPCSmallSpots" unique_id=1397093370]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.4, 0, -11.4)
+
+[node name="NPCSmallSpot2" type="Marker3D" parent="Town/NPCSmallSpots" unique_id=333397108]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7, 0, 9.5)
+
+[node name="NPCSmallSpot3" type="Marker3D" parent="Town/NPCSmallSpots" unique_id=1704433021]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0, -5.7)
+
+[node name="NPCSmallSpot4" type="Marker3D" parent="Town/NPCSmallSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.2, 0, 15.2)
+
+[node name="NPCSmallSpot5" type="Marker3D" parent="Town/NPCSmallSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.2, 0, 7.6)
+
+[node name="NPCSmallSpot6" type="Marker3D" parent="Town/NPCSmallSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 0, -13.3)
+
+[node name="NPCSmallSpot7" type="Marker3D" parent="Town/NPCSmallSpots"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15.2)
+
+[node name="LanternSpots" type="Node3D" parent="Town" unique_id=849783528]
+
+[node name="LanternSpot1" type="Marker3D" parent="Town/LanternSpots" unique_id=2003824222]
+transform = Transform3D(0.76604444, 0, 0.6427876, 0, 1, 0, -0.6427876, 0, 0.76604444, -11.4, 0, -5.7)
+
+[node name="LanternSpot2" type="Marker3D" parent="Town/LanternSpots" unique_id=1060405963]
+transform = Transform3D(-0.9396926, 0, 0.3420202, 0, 1, 0, -0.3420202, 0, -0.9396926, 11.4, 0, -5.7)
+
+[node name="LanternSpot3" type="Marker3D" parent="Town/LanternSpots" unique_id=138378584]
+transform = Transform3D(-0.34202006, 0, -0.9396927, 0, 1, 0, 0.9396927, 0, -0.34202006, -11.4, 0, 7.6)
+
+[node name="LanternSpot4" type="Marker3D" parent="Town/LanternSpots" unique_id=351355800]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 11.4, 0, 7.6)
+
+[node name="LanternSpot5" type="Marker3D" parent="Town/LanternSpots" unique_id=634140333]
+transform = Transform3D(0.4999999, 0, -0.86602545, 0, 1, 0, 0.86602545, 0, 0.4999999, 0, 0, 15.2)
+
+[node name="Stalls" type="Node3D" parent="Town" unique_id=968968044]
+
+[node name="Stall3" type="Marker3D" parent="Town/Stalls" unique_id=1659306061]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -17.1, 0, 1.9)
+script = ExtResource("9")
+stall_scene = "stall-bench"
+
+[node name="Stall4" type="Marker3D" parent="Town/Stalls" unique_id=972876178]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 3.8, 0, 17.1)
+script = ExtResource("9")
+
+[node name="GemStallSpot" type="Marker3D" parent="Town" unique_id=28374964]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 17.1, 0, 1.9)
+
+[node name="RedShopSpot" type="Marker3D" parent="Town"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0, -26.6)
+
+[node name="GreenShopSpot" type="Marker3D" parent="Town"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6, 0, -26.6)
+
+[node name="Scatter" type="Node3D" parent="." unique_id=1122210399]
+script = ExtResource("2")
+
+[node name="SkeletonSpawner" type="Node3D" parent="."]
+script = ExtResource("15")
+
+[node name="Clouds" type="Node3D" parent="." unique_id=1607483160]
+script = ExtResource("5")
+
+[node name="DistantMountains" type="Node3D" parent="." unique_id=1365119547]
+script = ExtResource("10")
+
+[node name="Player" parent="." unique_id=652642935 instance=ExtResource("1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+move_speed = null
+sprint_multiplier = null
+jump_velocity = null
+rotation_speed = null
+mouse_sensitivity = null
+joy_look_sensitivity = null
+joy_deadzone = null
+
+[node name="Blorb1" parent="." unique_id=1235925229 instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0, 1.4)
+body_color = Color(0.95, 0.96, 0.93, 0.85)
+is_starter_trio = true
+
+[node name="Blorb2" parent="." unique_id=1824871773 instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0, 1.4)
+body_color = Color(0.92, 0.95, 0.97, 0.85)
+is_starter_trio = true
+
+[node name="Blorb3" parent="." unique_id=81285306 instance=ExtResource("6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.6)
+body_color = Color(0.97, 0.94, 0.9, 0.85)
+is_starter_trio = true
+
+[node name="Tokoin1" parent="." unique_id=568189072 instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1.5)
+
+[node name="Tokoin2" parent="." unique_id=2058946056 instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0, -0.5)
+
+[node name="Tokoin3" parent="." unique_id=1651064258 instance=ExtResource("7")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 2.3)
