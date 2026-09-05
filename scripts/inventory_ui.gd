@@ -47,11 +47,16 @@ const SLOT_SIZE := Vector2(252, 228)
 ## ScrollContainer clips its children at its viewport edge. Reserve enough
 ## space for the slot focus ring's outward outset plus stroke on every side.
 const SLOT_FOCUS_INSET := 12
-## Large enough to read as an actual portrait of a party member, not just a
-## bigger version of an ordinary item icon -- per direct instruction. Scaled
-## 1.5x again (140 -> 210) alongside the whole-UI type-scale pass.
-const BLORB_PORTRAIT_SIZE := 210.0
+## Large enough to read as a party portrait while still sharing the Blorbs
+## tab's half-width column with identity at the default/mobile layout. The
+## former 210px portrait alone consumed over half the card's usable width and
+## forced every stat behind the neighboring paper doll.
+const BLORB_PORTRAIT_SIZE := 144.0
 const BOUND_ITEM_SLOT_SIZE := Vector2(168, 156)
+## Per direct correction -- 120/210 clipped labels like "MP: 100/120" once a
+## blorb's stats grew past a couple of digits each.
+const BLORB_METER_LABEL_WIDTH := 170.0
+const BLORB_METER_BAR_WIDTH := 260.0
 
 var _panel: PanelContainer
 var _coin_readout: PanelContainer
@@ -66,6 +71,7 @@ var _portrait_button: Button
 var _portrait_remove_button: Button
 var _release_button: Button
 var _portrait_slot_label: Label
+var _portrait_player_id: int = 0
 var _focused_body_slot: String = "head"
 var _portrait_stick_latched: bool = false
 var _focus_restore_item_name: String = ""
@@ -597,8 +603,15 @@ func _refresh_portrait() -> void:
 	var player := get_tree().get_first_node_in_group("player")
 	if player == null:
 		return
-	if _portrait_container.get_child_count() > 0:
+	var player_id := player.get_instance_id()
+	if _portrait_player_id == player_id and _portrait_container.get_child_count() > 0:
 		return
+	# InventoryUI survives scene changes; Player and its SubViewport do not.
+	# Replace the old world's dead ViewportTexture rather than retaining a
+	# blank TextureRect in the doll area.
+	for child in _portrait_container.get_children():
+		child.free()
+	_portrait_player_id = player_id
 	var rect := TextureRect.new()
 	rect.texture = player.get_portrait_texture()
 	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -655,7 +668,11 @@ func _process(_delta: float) -> void:
 		UIKit.ensure_modal_focus(_release_confirm_panel, _release_confirm_buttons)
 		return
 	if Input.is_action_just_pressed("inventory"):
-		_toggle()
+		# This autoload keeps processing while paused so its own open menu stays
+		# usable. Explicitly reject an open request owned by PauseMenu/another
+		# modal instead of stacking Inventory on top of it.
+		if _open or (not get_tree().paused and not UIState.modal_open):
+			_toggle()
 	elif _open and Input.is_action_just_pressed("ui_cancel"):
 		_back()
 	elif _open and Input.is_action_just_pressed("menu_tab_previous"):
@@ -729,6 +746,8 @@ func _toggle() -> void:
 
 
 func _open_inventory() -> void:
+	if get_tree().paused or UIState.modal_open:
+		return
 	_open = true
 	# _items_scroll's real width is already known by the time the panel can
 	# actually be opened (it went through its first layout pass back when
@@ -923,7 +942,7 @@ func _restore_blorb_focus() -> void:
 func _build_blorb_row(blorb: Blorb) -> Control:
 	var is_selected := blorb == _selected_blorb
 	var row_panel := PanelContainer.new()
-	row_panel.custom_minimum_size = Vector2(0, BLORB_PORTRAIT_SIZE + UITheme.SPACE_MD * 2)
+	row_panel.custom_minimum_size = Vector2(0, 0)
 	row_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row_panel.add_theme_stylebox_override("panel", UITheme.slot_stylebox())
 
@@ -936,10 +955,19 @@ func _build_blorb_row(blorb: Blorb) -> Control:
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	row_panel.add_child(margin)
 
-	var row := HBoxContainer.new()
+	var row := VBoxContainer.new()
 	row.add_theme_constant_override("separation", UITheme.SPACE_MD)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	margin.add_child(row)
+
+	# Portrait, identity, and the stat meters all share this one row -- per
+	# direct correction, an earlier version put the meters on their own row
+	# underneath instead, which stretched every card downward for no reason
+	# and left the meters unaligned with the portrait sitting above them.
+	var identity_row := HBoxContainer.new()
+	identity_row.add_theme_constant_override("separation", UITheme.SPACE_MD)
+	identity_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(identity_row)
 
 	var portrait_button := Button.new()
 	portrait_button.custom_minimum_size = Vector2(BLORB_PORTRAIT_SIZE, BLORB_PORTRAIT_SIZE)
@@ -959,7 +987,7 @@ func _build_blorb_row(blorb: Blorb) -> Control:
 	portrait_button.add_theme_stylebox_override("hover", portrait_box)
 	portrait_button.add_theme_stylebox_override("pressed", portrait_box)
 	portrait_button.add_theme_stylebox_override("focus", UITheme.slot_focus_ring_stylebox())
-	row.add_child(portrait_button)
+	identity_row.add_child(portrait_button)
 
 	var portrait := UIKit.portrait_slot(BLORB_PORTRAIT_SIZE)
 	portrait.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -974,13 +1002,17 @@ func _build_blorb_row(blorb: Blorb) -> Control:
 	info.add_theme_constant_override("separation", UITheme.SPACE_MD)
 	info.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	info.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(info)
+	identity_row.add_child(info)
 
 	# Naming remains in the data model, but editing is intentionally dormant
 	# until that interaction has a dedicated flow.
 	var name_label := UIKit.body_label(blorb.display_name())
 	name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
 	info.add_child(name_label)
+	# Level sits with identity rather than among the resource meters: it is a
+	# durable state of this party member, while the XP row at right answers the
+	# separate moment-to-moment question of progress toward the next level.
+	info.add_child(UIKit.inline_caption("Level %d" % blorb.level, UITheme.TEXT_SECONDARY))
 
 	# A melted blorb (skeleton_nme.gd combat -- see blorb.gd's melt()) shows
 	# core-only above (the portrait call already passed is_melted through)
@@ -1011,23 +1043,49 @@ func _build_blorb_row(blorb: Blorb) -> Control:
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(spacer)
+	identity_row.add_child(spacer)
 
 	var meters := VBoxContainer.new()
 	# SPACE_SM, not SPACE_XS -- per direct instruction, more vertical
 	# breathing room between meters now that each bar itself is shorter.
 	meters.add_theme_constant_override("separation", UITheme.SPACE_SM)
 	meters.size_flags_horizontal = Control.SIZE_SHRINK_END
-	meters.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	# SHRINK_BEGIN, not SHRINK_CENTER -- per direct correction, this stack
+	# was a sibling of identity_row (a whole separate row underneath it,
+	# with nothing above it there to explain the gap) rather than living
+	# INSIDE identity_row beside the portrait, which both pushed every row
+	# downward and stretched the card for no reason. Now that it's a real
+	# identity_row child (added below), SHRINK_BEGIN top-aligns it flush
+	# with the portrait's own top instead of centering it against the
+	# row's full height.
+	meters.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	meters.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(meters)
-	meters.add_child(UIKit.stat_meter("STR", blorb.strength, Blorb.STAT_MAX))
-	meters.add_child(UIKit.stat_meter("DEF", blorb.defense, Blorb.STAT_MAX))
+	identity_row.add_child(meters)
+	var next_level_xp := blorb.xp_to_next_level()
+	if next_level_xp > 0:
+		meters.add_child(UIKit.stat_meter(
+			"XP", blorb.experience, next_level_xp, true, -1,
+			BLORB_METER_LABEL_WIDTH, BLORB_METER_BAR_WIDTH
+		))
+	else:
+		var max_level_label := UIKit.inline_caption("XP: MAX", UITheme.TEXT_PRIMARY)
+		max_level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		meters.add_child(max_level_label)
 	meters.add_child(UIKit.stat_meter(
-		"HP", roundi(blorb.current_hp), blorb.max_hp, true, Blorb.STAT_MAX * 4
+		"STR", blorb.strength, maxi(Blorb.STAT_MAX, blorb.strength), false, -1,
+		BLORB_METER_LABEL_WIDTH, BLORB_METER_BAR_WIDTH
 	))
 	meters.add_child(UIKit.stat_meter(
-		"MP", roundi(blorb.current_mp), blorb.max_mp, true, Blorb.STAT_MAX * 2
+		"DEF", blorb.defense, maxi(Blorb.STAT_MAX, blorb.defense), false, -1,
+		BLORB_METER_LABEL_WIDTH, BLORB_METER_BAR_WIDTH
+	))
+	meters.add_child(UIKit.stat_meter(
+		"HP", roundi(blorb.current_hp), blorb.max_hp, true, maxi(Blorb.STAT_MAX * 4, blorb.max_hp),
+		BLORB_METER_LABEL_WIDTH, BLORB_METER_BAR_WIDTH
+	))
+	meters.add_child(UIKit.stat_meter(
+		"MP", roundi(blorb.current_mp), blorb.max_mp, true, maxi(Blorb.STAT_MAX * 2, blorb.max_mp),
+		BLORB_METER_LABEL_WIDTH, BLORB_METER_BAR_WIDTH
 	))
 
 	return row_panel

@@ -3,6 +3,11 @@ extends StaticBody3D
 
 ## Standalone start-screen/debug instance for evaluating the cat template.
 @export var coat_color: Color = CatFigure.COAT_COLORS[0]
+## Per direct instruction -- Yogi is the Primate Kingdom's canonical cat
+## (docs/world_bible.md's own Creatures/Cats entry), so his coat/markings
+## always come from CatFigure's own YOGI_* consts rather than this
+## instance's own coat_color/marking exports, which this flag overrides.
+@export var is_yogi: bool = false
 @export var resting: bool = false
 @export var sitting: bool = false
 @export_range(-1.0, 1.0, 2.0) var curl_side: float = 1.0
@@ -151,7 +156,14 @@ func _rebuild_figure() -> void:
 		old_rig.queue_free()
 	# Always construct the canonical standing skeleton. Resting is a live
 	# interpolation over these same pivots, never a replacement rig.
-	_pivots = CatFigure.build(self, coat_color, false, curl_side)
+	if is_yogi:
+		_pivots = CatFigure.build(
+			self, CatFigure.YOGI_COAT_COLOR, false, curl_side,
+			CatFigure.YOGI_MARKING_COLOR, CatFigure.YOGI_MARKED_EAR_SIDE,
+			CatFigure.YOGI_FULL_LEG_SIDE, CatFigure.YOGI_LOWER_SOCK_SIDE, true
+		)
+	else:
+		_pivots = CatFigure.build(self, coat_color, false, curl_side)
 	_tail_stand_points = ((_pivots["_tail"] as Dictionary)["base_points"] as Array[Vector3]).duplicate()
 	_leg_rest.clear()
 	for leg_name in ["front_left", "front_right", "hind_left", "hind_right"]:

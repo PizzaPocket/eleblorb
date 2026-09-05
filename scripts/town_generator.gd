@@ -698,6 +698,42 @@ const PLATFORM_MAX_RADIUS := 46.0
 const PLATFORM_CLEARANCE := 10.0
 const PLATFORM_SPACING := 11.0
 
+# The real ceiling on how much a single step can rise and still be
+# reachable by an ordinary standing jump -- player.gd's jump reaches height
+# v^2 / (2*g*s), v = jump_velocity (11.3), g = ProjectSettings' physics/3d/
+# default_gravity (9.8, unmodified in this project), s = player.gd's own
+# JUMP_GRAVITY_SCALE (4.8): 11.3^2 / (2*9.8*4.8) =~ 1.36m. Capped noticeably
+# below that absolute theoretical ceiling, not right up against it, since
+# reaching it at all requires landing at the exact peak of the arc -- real
+# input isn't frame-perfect, and covering a step's own horizontal gap in the
+# same jump leaves less room for that timing to land short. Per direct
+# correction that an earlier 1.0-1.6 range let some steps land above even
+# the theoretical ceiling (unreachable no matter how a jump is timed).
+const MAX_STEP_RISE := 1.2
+
+# One dedicated, much taller staircase (see _build_sky_stairs()) rather than
+# another entry in the small scattered clusters above -- placed further out
+# so its base has room to clear both the town markers and every ordinary
+# cluster.
+const SKY_STAIRS_MIN_RADIUS := 55.0
+const SKY_STAIRS_MAX_RADIUS := 85.0
+const SKY_STAIRS_CLEARANCE := 8.0
+# Fixed per-step turn (not random drift) -- over the ~45-50 steps needed to
+# reach cloud altitude, unbounded random drift would wander the tower far
+# from its own base; a constant turn instead winds it into a tight spiral
+# (see _build_sky_stairs()'s own comment for the resulting radius).
+const SKY_STAIRS_TURN := 0.35
+# How far below CloudScatter's own altitude_min the crate spiral stops,
+# handing off to build_sky_course()'s puff-based continuation -- enough
+# clearance that the last crate doesn't visually poke through the ambient
+# cloud layer's own lowest puffs.
+const SKY_STAIRS_CLOUD_MARGIN := 6.0
+# Same grass tone terrain_generator.gd's own ground uses (its "grass" var in
+# _height_color()) -- per direct instruction to cap each step in green grass,
+# matching the rest of the world's grass rather than inventing a new shade.
+const SKY_STAIRS_GRASS_COLOR := Color(0.07451, 0.63922, 0.40392)
+const SKY_STAIRS_GRASS_MOUND_HEIGHT := 0.3
+
 
 ## Scatters small parkour clusters -- crate staircases -- around the open
 ## ground between buildings, and (separately, see _build_roof_ramps())
@@ -736,6 +772,8 @@ func _scatter_platforming(parent: Node3D) -> void:
 			continue
 		placed.append(candidate)
 		_build_crate_stack_cluster(parent, candidate, rng, occupied)
+
+	_build_sky_stairs(parent, occupied, placed, rng)
 
 
 func _far_enough(candidate: Vector2, points: Array[Vector2], min_dist: float) -> bool:
@@ -821,11 +859,9 @@ func _rotate_building_offset(local: Vector2, yaw: float) -> Vector2:
 
 ## A zigzagging sequence of freestanding crates climbing away from the
 ## ground -- pure jump-to-jump parkour, no ramp, so (unlike
-## _build_roof_ramps()'s ramps) this one's player-only. Each step rises at most
-## 1.6m and each gap is at most 2.6m -- comfortably inside the player's own
-## jump: jump_velocity=8.0 against this project's default gravity gives a
-## max jump height around 3.3m (v^2 / (2*g)), so every individual step here
-## has real margin to spare even combined with the horizontal gap.
+## _build_roof_ramps()'s ramps) this one's player-only. Each step rises at
+## most MAX_STEP_RISE (see that constant's own comment for the real jump-
+## height derivation this is capped against) and each gap is at most 2.6m.
 ##
 ## occupied is re-checked per step (not just once for the cluster's own
 ## center) -- up to 5 steps of drift at 2.6m each can wander over 10m away
@@ -842,7 +878,7 @@ func _build_crate_stack_cluster(
 	var height := 0.0
 
 	for i in step_count:
-		var step_height := rng.randf_range(1.0, 1.6)
+		var step_height := rng.randf_range(0.9, MAX_STEP_RISE)
 		var gap := rng.randf_range(1.8, 2.6)
 		heading += rng.randf_range(-0.6, 0.6)
 		var next_pos := pos + Vector2(sin(heading), cos(heading)) * gap
@@ -856,6 +892,97 @@ func _build_crate_stack_cluster(
 		crate.position = Vector3(pos.x, base_y + height, pos.y)
 		crate.rotation.y = rng.randf_range(0.0, TAU)
 		parent.add_child(crate)
+
+
+## One dedicated, much taller version of the crate staircase above -- climbs
+## from the ground all the way up into CloudScatter's own ambient layer, then
+## hands off to that script's build_sky_course() for a hand-placed run of
+## walkable cloud puffs finishing on one landing puff holding the Air Gem.
+## Per direct instruction: "the kind of floaty stairs areas around the
+## town... make those be parkour all the way up to the clouds, making sure
+## the clouds above are a nice parkour course too, and have an air gem be up
+## there."
+##
+## Same per-step rise/gap range _build_crate_stack_cluster() already uses
+## (capped at MAX_STEP_RISE, see that constant's own comment) -- only the
+## step COUNT differs, since this climbs roughly 15x the vertical distance.
+## A constant per-step turn (SKY_STAIRS_TURN), not random drift, winds the
+## ~55-65 steps that now takes into a tight spiral instead of a kilometers-
+## long wandering line: turning `SKY_STAIRS_TURN` radians every ~2.2m-gap
+## step traces a helix of radius roughly
+## gap / (2*sin(turn/2)) =~ 2.2 / (2*sin(0.175)) =~ 6m, small enough to read
+## as one coherent tower rather than sprawling across the field.
+func _build_sky_stairs(
+	parent: Node3D, occupied: Array[Vector2], placed: Array[Vector2], rng: RandomNumberGenerator
+) -> void:
+	var clouds := get_node_or_null("../Clouds") as CloudScatter
+	if clouds == null:
+		return
+
+	var anchor := Vector2.INF
+	for attempt in 60:
+		var angle := rng.randf_range(0.0, TAU)
+		var r := rng.randf_range(SKY_STAIRS_MIN_RADIUS, SKY_STAIRS_MAX_RADIUS)
+		var candidate := Vector2(cos(angle), sin(angle)) * r
+		if _far_enough(candidate, occupied, SKY_STAIRS_CLEARANCE) and _far_enough(candidate, placed, SKY_STAIRS_CLEARANCE):
+			anchor = candidate
+			break
+	if anchor == Vector2.INF:
+		return
+
+	var pos := Vector3(town_center.x + anchor.x, _ground_y(anchor), town_center.y + anchor.y)
+	var heading := rng.randf_range(0.0, TAU)
+	var target_y := clouds.altitude_min - SKY_STAIRS_CLOUD_MARGIN
+	var crate_colors: Array[Color] = [TownProps.TRIM_WOOD, TownProps.WALL_WOOD, Color(0.52, 0.4, 0.24)]
+	var step_index := 0
+	# The safety cap only guards against a future altitude_min/margin change
+	# making this loop unreasonably long -- at the established rise range it
+	# never comes close in practice (~55-65 steps to reach a typical ~65m
+	# climb).
+	while pos.y < target_y and step_index < 200:
+		var rise := rng.randf_range(0.9, MAX_STEP_RISE)
+		var gap := rng.randf_range(1.8, 2.6)
+		heading += SKY_STAIRS_TURN + rng.randf_range(-0.05, 0.05)
+		pos += Vector3(sin(heading) * gap, rise, cos(heading) * gap)
+		var size := Vector3(rng.randf_range(1.8, 2.4), rng.randf_range(0.4, 0.55), rng.randf_range(1.8, 2.4))
+		var crate := TownProps.build_crate(size, crate_colors[step_index % crate_colors.size()])
+		crate.rotation.y = rng.randf_range(0.0, TAU)
+		parent.add_child(crate)
+		crate.global_position = pos
+		# A grass mound on top of every step, per direct instruction. Per
+		# direct correction, an earlier flat slab merely balanced on top read
+		# as "perched on the convex top... not smoothly emerging," and had no
+		# collision of its own, so the player visibly sank into it (its
+		# collision stayed at the bare crate's own height, well below the
+		# slab's own visible top). This version is its own small SuperEgg
+		# mound (a rounded top, not a flat disc) sunk partway INTO the
+		# crate's own top volume -- the same overlap-a-flat-seam trick this
+		# project's joints already use (see e.g. NECK_OVERLAP in procedural_
+		# figure.gd) -- so it reads as emerging from the crate regardless of
+		# exactly how the crate's own "flat" superellipsoid top curves,
+		# rather than needing to match that curvature exactly. A matching
+		# second collision box, stacked on top of build_crate()'s own,
+		# extends solid ground up to the mound's real visible top.
+		var mound_half_extent := Vector3(size.x * 0.4, SKY_STAIRS_GRASS_MOUND_HEIGHT * 0.5, size.z * 0.4)
+		var mound_embed := mound_half_extent.y * 0.7
+		var mound_center_y := size.y - mound_embed + mound_half_extent.y
+		var grass_mound := SuperEgg.build_part(
+			mound_half_extent, SKY_STAIRS_GRASS_COLOR, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
+		)
+		grass_mound.position = Vector3(0, mound_center_y, 0)
+		crate.add_child(grass_mound)
+		# Same center and full height as the mound mesh itself -- covers
+		# exactly its own visible span, from its embedded base up to its
+		# real peak.
+		var mound_collision := CollisionShape3D.new()
+		var mound_shape := BoxShape3D.new()
+		mound_shape.size = Vector3(mound_half_extent.x * 1.6, mound_half_extent.y * 2.0, mound_half_extent.z * 1.6)
+		mound_collision.shape = mound_shape
+		mound_collision.position = Vector3(0, mound_center_y, 0)
+		crate.add_child(mound_collision)
+		step_index += 1
+
+	clouds.build_sky_course(pos)
 
 
 ## One dedicated Marker3D per functional shop (see main.tscn's

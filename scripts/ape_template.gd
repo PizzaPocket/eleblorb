@@ -340,6 +340,15 @@ const SPINE_TILT_SHARES: Array[float] = [0.25, 0.25, 0.25, 0.25]
 ##   TAIL_REACH_FRACTION's own doc comment)
 ## - "tail_length_scale": float, multiplies TAIL_REACH_FRACTION (only
 ##   meaningful when "has_tail" is true)
+## - "skeleton_mode": bool, default false -- a bony variant for an undead
+##   primate NME: the abdomen becomes a visible spine column (same
+##   ProceduralFigure.build_spine_column() technique the human skeleton_nme.
+##   gd rig already uses for its own abdomen, applied here to this rig's
+##   equivalent torso segment) and ears are skipped. Everything else
+##   (chest, limbs, muzzle, face marking, eyes, tail) is unchanged in shape
+##   -- only recolored, same as the human skeleton, by the caller passing a
+##   bone-white fur_color/marking_color rather than this flag changing any
+##   color itself.
 static func build(
 	parent: Node3D, fur_color: Color = MonkeyFigure.MONKEY_FUR_COLOR, scale: float = 1.0, variant: Dictionary = {}
 ) -> Dictionary:
@@ -351,6 +360,7 @@ static func build(
 	# exactly 1.0 each) for monkeys, enforced here structurally rather than
 	# left to callers to remember not to pass a body_type for one.
 	var has_tail: bool = variant.get("has_tail", false)
+	var skeleton_mode: bool = variant.get("skeleton_mode", false)
 	var body_type: float = 0.5 if has_tail else variant.get("body_type", 0.5)
 	var chest_build_scale := _lerp_body_type(CHEST_BUILD_SCALE_ECTOMORPH, CHEST_BUILD_SCALE_MESOMORPH, body_type)
 	var abdomen_width_scale := _lerp_body_type(
@@ -395,6 +405,14 @@ static func build(
 	lean_pivot.position = Vector3(0, hip_y, 0)
 	rig.add_child(lean_pivot)
 	var hips := pivots["hips"] as Node3D
+	# A reusable anatomical mount point at the actual bottom of the pelvis.
+	# Unlike ProceduralFigure.HIP_PIVOT_Y, this remains correct after this
+	# template's scale, ground-clearance, and hip-inclusive lean changes.
+	var hip_bottom := Node3D.new()
+	hip_bottom.name = "HipBottomMount"
+	hip_bottom.position = Vector3(0, -ProceduralFigure.HIP_SIZE.y, 0)
+	hips.add_child(hip_bottom)
+	pivots["hip_bottom"] = hip_bottom
 	_reparent_keep_local(hips, lean_pivot, lean_pivot.position)
 	_reparent_keep_local(spine_pivot, lean_pivot, lean_pivot.position)
 	lean_pivot.rotation.x = spine_forward_bend
@@ -433,14 +451,35 @@ static func build(
 	var abdomen_pivot := Node3D.new()
 	abdomen_pivot.name = "AbdomenPivot"
 	spine_pivot.add_child(abdomen_pivot)
-	_reparent_keep_local(abdomen, abdomen_pivot, Vector3.ZERO)
-	# abdomen's own mesh sits with its base flush at abdomen_pivot's local
+	# Captured before the skeleton_mode branch below might free the mesh --
+	# chest_pivot's own placement further down depends on this regardless of
+	# which branch runs.
+	var abdomen_local_y := abdomen.position.y
+	if skeleton_mode:
+		# Same technique procedural_figure.gd's own skeleton_mode already
+		# uses for its abdomen (see that file's build_spine_column()) --
+		# reading this rig's own actual built abdomen size/offset back out,
+		# rather than re-deriving CHEST_BUILD_SCALE_*/ABDOMEN_WIDTH_SCALE_*
+		# math independently, keeps this correct even if that math changes
+		# later. abdomen_pivot sits at abdomen's own undisplaced local origin
+		# (the same zero-offset reparent the non-skeleton branch uses below),
+		# so building the spine column directly as its child, using
+		# abdomen's own already-known local geometry, occupies exactly the
+		# same space the solid mesh would have.
+		var abdomen_semi_axes := abdomen.mesh.get_aabb().size * 0.5
+		var abdomen_z_offset := abdomen.position.z
+		abdomen.free()
+		ProceduralFigure.build_spine_column(abdomen_pivot, abdomen_semi_axes, fur_color, abdomen_z_offset)
+	else:
+		_reparent_keep_local(abdomen, abdomen_pivot, Vector3.ZERO)
+	# abdomen's own mesh sits (or, in skeleton_mode, its spine column
+	# occupies the same span) with its base flush at abdomen_pivot's local
 	# origin (position.y == its own half-height, see ProceduralFigure.
 	# build()'s own abdomen.position line) -- so its TOP edge, i.e. the
 	# thorax-abdomen joint, is exactly twice that.
 	var chest_pivot := Node3D.new()
 	chest_pivot.name = "ChestPivot"
-	chest_pivot.position = Vector3(0, abdomen.position.y * 2.0, 0)
+	chest_pivot.position = Vector3(0, abdomen_local_y * 2.0, 0)
 	abdomen_pivot.add_child(chest_pivot)
 	# The shoulders attach to the chest (both were originally direct,
 	# un-rotated siblings under spine_pivot, so their relative offsets held
@@ -667,7 +706,14 @@ static func build(
 	# excluded -- those already got their own intentional "skin," not fur,
 	# material earlier (see that section's own comment). ---
 	var body_fur_material := MonkeyFigure._build_fur_material(fur_color)
-	var fur_material_parts: Array[MeshInstance3D] = [hips as MeshInstance3D, chest, abdomen, neck]
+	# abdomen is a freed, dangling reference in skeleton_mode (replaced by a
+	# spine column above, which keeps its own plain material -- same as the
+	# human skeleton's own spine segments, see build_spine_column()) --
+	# matching it into the fur-material list here would call a method on a
+	# freed Object.
+	var fur_material_parts: Array[MeshInstance3D] = [hips as MeshInstance3D, chest, neck]
+	if not skeleton_mode:
+		fur_material_parts.append(abdomen)
 	for leg_pivot_node in [leg_left, leg_right]:
 		var leg_tilt := leg_pivot_node.get_child(0) as Node3D
 		var knee_pivot := leg_tilt.get_child(1) as Node3D
@@ -882,8 +928,11 @@ static func build(
 	# upwards on the head by 12%"). pad_color=marking_color per further
 	# direct instruction: an inset skin-colored ear pad, the same "skin" as
 	# the face mask/hands/feet. head_size_base (not head_size) per the
-	# no-stretch-for-features correction above.
-	FigureEars.add_ears(head_mesh, head_size_base, fur_color, true, 0.12, marking_color)
+	# no-stretch-for-features correction above. Skipped entirely in
+	# skeleton_mode, per direct instruction ("no ears") -- a bare skull has
+	# no external ear at all, not just a recolored one.
+	if not skeleton_mode:
+		FigureEars.add_ears(head_mesh, head_size_base, fur_color, true, 0.12, marking_color)
 	pivots["eyes"] = eyes
 
 	# --- Tail, opt-in via "has_tail" (default false) -- per direct

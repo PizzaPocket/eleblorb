@@ -30,8 +30,21 @@ extends Node3D
 const RADIUS := 420.0
 const CLEAR_CENTER := Vector2.ZERO
 const CLEAR_RADIUS := 24.0
-const TREE_COUNT := 1200
-const DECOR_COUNT := 3000
+## Cut roughly in half (was 1200/3000) -- per direct report ("the primate
+## kingdom is extremely laggy and takes forever to load"). This is the
+## actual dominant cost of that: every one of these 4200 (now ~2000) props
+## is a real SurfaceTool-built mesh constructed synchronously at scene load,
+## well before the LOD system below (visibility_range_end/collision sleep)
+## can do anything -- that system only ever helps steady-state RENDER cost
+## once the props already exist, not how long building them all takes in
+## the first place. Reducing the villager/ape population elsewhere in this
+## kingdom (see jungle_kingdom_village.gd's own recent cuts) addressed a
+## real but much smaller cost next to this; this is the one actually worth
+## cutting hard. Still a meaningfully dense canopy at these counts, just not
+## "equal to the crossroads jungle biome" dense any more -- see this file's
+## own class doc comment for that original density target.
+const TREE_COUNT := 600
+const DECOR_COUNT := 1200
 
 ## Circular clearings -- open ground (grass/flowers only, no trees) breaking
 ## up the canopy, per direct feedback. Fixed hand-placed spots rather than

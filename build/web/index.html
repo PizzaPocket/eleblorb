@@ -149,6 +149,19 @@ body {
 .loader-control { display: flex; min-width: 150px; flex-direction: column; align-items: center; gap: 12px; }
 .loader-copy { color: #ccbaa0; font-size: 16px; line-height: 1.35; }
 .keys { display: flex; align-items: center; gap: 6px; }
+.loader-wasd {
+	display: grid;
+	grid-template-columns: repeat(3, 38px);
+	grid-template-rows: repeat(2, 38px);
+	gap: 6px;
+}
+.loader-wasd .key:first-child {
+	grid-column: 2;
+	grid-row: 1;
+}
+.loader-wasd .key:nth-child(2) { grid-column: 1; grid-row: 2; }
+.loader-wasd .key:nth-child(3) { grid-column: 2; grid-row: 2; }
+.loader-wasd .key:nth-child(4) { grid-column: 3; grid-row: 2; }
 .key, .mouse {
 	display: grid;
 	box-sizing: border-box;
@@ -257,7 +270,7 @@ body.gamepad-connected .loader-controller { display: flex; }
 				<h1 id="loading-title">Eleblorb</h1>
 				<div id="loading-controls" aria-label="Controls">
 					<div class="loader-desktop">
-						<div class="loader-control"><div class="keys" aria-hidden="true"><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span></div><span class="loader-copy">Move</span></div>
+						<div class="loader-control"><div class="keys loader-wasd" aria-hidden="true"><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span></div><span class="loader-copy">Move</span></div>
 						<div class="loader-control"><div class="mouse" aria-hidden="true"></div><span class="loader-copy">Look around</span></div>
 						<div class="loader-control"><div class="key wide" aria-hidden="true">SPACE</div><span class="loader-copy">Jump</span></div>
 					</div>
@@ -273,7 +286,7 @@ body.gamepad-connected .loader-controller { display: flex; }
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":3732832,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":3801380,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 

@@ -6,6 +6,18 @@ extends Node3D
 ## spaced vertically up and down the trunk, per direct instruction. Kept
 ## inside jungle_kingdom_foliage.gd's own CLEAR_RADIUS (24.0 around the
 ## origin) so ordinary canopy trees never clip through these.
+##
+## Per direct correction ("populate the primate kingdom's village... using a
+## variety of the monkeys, apes, and stuffed animal monkeys types") -- the
+## treehouse/ground population above was entirely JungleVillager (the
+## "stuffed animal monkey" class); _build_ground_primates() below adds a
+## further, smaller set of named ApeTemplatePreview instances (both apes,
+## has_tail=false, and "primate template" monkeys, has_tail=true -- see
+## docs/world_bible.md's own Primate taxonomy note for why these are
+## distinct species from JungleVillager's own) roaming the same ground
+## clearing, so all three of this project's primate classes are actually
+## represented here. Also spawns Manchego and the quest-giving ape seen
+## riding him -- see _build_manchego_and_quest_ape()'s own doc comment.
 
 const TREE_LOCAL_POSITIONS := [
 	Vector2(14.0, 12.0),
@@ -19,8 +31,111 @@ const VILLAGER_SCENE: PackedScene = preload("res://scenes/jungle_villager.tscn")
 ## Ground-level villagers roaming the village clearing itself -- see
 ## jungle_kingdom_foliage.gd's own CLEAR_RADIUS (24.0), the same footprint
 ## this stays inside.
-const GROUND_VILLAGER_COUNT := 5
-const GROUND_ROAM_RADIUS := 22.0
+## Cut from 5 -- per direct report ("the primate kingdom is extremely laggy
+## and takes forever to load... we don't need so many primates to be walking
+## around on the village floor at once"). Combined with the same report's
+## own spacing ask, GROUND_ROAM_RADIUS below is also widened so the (now
+## fewer) roamers still cover a comparable-or-larger area instead of just
+## bunching up more tightly in the old footprint.
+const GROUND_VILLAGER_COUNT := 3
+const GROUND_ROAM_RADIUS := 32.0
+
+const APE_TEMPLATE_SCENE := "res://scenes/ape_template_preview.tscn"
+## One entry per ApeTemplatePreview NPC _build_ground_primates() spawns --
+## same "own name and own lines, not a shared pool" reasoning
+## JUNGLE_VILLAGER_IDENTITIES' own comment gives, kept as its own separate
+## roster (not merged into that one) since these are a different species
+## with a different rig/scale, spawned by a separate function below.
+## has_tail=true is ApeTemplate's own "primate template" monkey variant, NOT
+## JungleVillager's stuffed-animal-monkey class -- see this file's own class
+## doc comment.
+const PRIMATE_TEMPLATE_IDENTITIES := [
+	{
+		"name": "Torvin Oakjaw",
+		"has_tail": false,
+		"lines": [
+			"The training dummies out past the clearing used to get more use. Whoever's running that business isn't telling anyone how.",
+			"Elders say a curse doesn't care how careful you are. I try not to think about it before breakfast.",
+		],
+	},
+	{
+		"name": "Maddox Cindertusk",
+		"has_tail": false,
+		"lines": [
+			"Kova Kong's out past the tree line, if you're brave enough to go looking. Hard to miss him, honestly.",
+			"I keep my distance from the big one. Doesn't seem to mind either way.",
+		],
+	},
+	{
+		"name": "Perrin Vale",
+		"has_tail": false,
+		"lines": [
+			"Xiao Hou Zi used to pass through here before he took up with travelers. Good company, when he sat still.",
+			"You get used to the size difference after a while. Mostly.",
+		],
+	},
+	{
+		"name": "Wick Thistledown",
+		"has_tail": true,
+		"lines": [
+			"The canopy villagers look down on us, and I mean that literally -- they're all up in the trees.",
+			"Something's coming for this world, the vines say. I've stopped asking which vines.",
+		],
+	},
+	{
+		"name": "Fable Quickpaw",
+		"has_tail": true,
+		"lines": [
+			"That ape on the horse showed up a few days back. Hasn't said much to the rest of us.",
+			"I like the ground just fine. Let the tree-folk have the view.",
+		],
+	},
+	{
+		"name": "Doran Mossback",
+		"has_tail": true,
+		"lines": [
+			"Watch where you step near the old roots. They trip up more outsiders than the ramps do.",
+			"We don't get many visitors down here on the clearing floor. Fewer still who stick around to talk.",
+		],
+	},
+]
+## Same display_scale ranges main.gd's own now-removed debug spawn used to
+## pick from at random -- see that file's git history for the full
+## APE_DEBUG_SCALE_MIN/MAX and PRIMATE_TEMPLATE_MONKEY_SCALE_MIN/MAX doc
+## comments this reproduces, just per-species now rather than per-parity-of-
+## index.
+const APE_SCALE_MIN := 0.85
+const APE_SCALE_MAX := 1.25
+const PRIMATE_TEMPLATE_MONKEY_SCALE_MIN := 0.5
+const PRIMATE_TEMPLATE_MONKEY_SCALE_MAX := 0.7
+## How many of PRIMATE_TEMPLATE_IDENTITIES' own 6 entries actually get
+## spawned -- see _build_ground_primates()'s own comment.
+const GROUND_PRIMATE_SPAWN_COUNT := 3
+
+const MANCHEGO_SCENE := "res://scenes/manchego.tscn"
+## Where the player first sees Manchego and the quest ape -- close enough to
+## the village's own spawn/clearing to be seen on arrival (per direct
+## instruction, "when entering the primate village, we will see Manchego
+## there idling around"), off to one side of the three treehouse giants
+## rather than under any of them. First-draft placement, adjustable on
+## report.
+const MANCHEGO_LOCAL_XZ := Vector2(6.0, -4.0)
+## Per direct instruction: "ridden by one ape who is a reddish color."
+const QUEST_APE_NAME := "Ossian Redbrow"
+const QUEST_APE_FUR_COLOR := Color(0.62, 0.22, 0.14)
+## Flavor lines shown every time, regardless of quest progress -- the actual
+## quest state (whether the "Give the Special Banana" action appears) is
+## handled by _quest_ape_dialog_actions() instead, appended on top by
+## ApeTemplatePreview's own dialog_actions_provider hook. Kept deliberately
+## generic/placeholder, per direct instruction ("I don't know what the quest
+## will be... for now placeholder").
+const QUEST_APE_TALK_LINES := [
+	"Bring me something special from the top of Kova Kong's head, out past the clearing, and Manchego's yours to ride.",
+	"Manchego's a good horse, but he's not going anywhere until I've got what I asked for.",
+]
+## Must match primate_kingdom_gorilla.gd's own Fruit.fruit_name exactly --
+## that's the Inventory item name this quest checks for.
+const SPECIAL_BANANA_ITEM_NAME := "Special Banana"
 
 # One entry per villager this file ever spawns (13 anchored on treehouse
 # decks -- 4 + 5 + 4 across the three trees' every-third-landing houses, see
@@ -175,6 +290,21 @@ func _ready() -> void:
 	for i in TREE_LOCAL_POSITIONS.size():
 		_build_tree_and_houses(TREE_LOCAL_POSITIONS[i], TREE_HEIGHTS[i], _terrain, i)
 	_build_ground_villagers()
+	# Deferred, unlike the two calls above -- these two add their spawned
+	# nodes to get_parent() (the kingdom root), not to `self` (see each
+	# function's own doc comment for why). Calling that add_child() straight
+	# from _ready() crashed hard on arrival ("Parent node is busy setting up
+	# children... Condition data.blocked > 0"): the kingdom root is still
+	# mid-setup, iterating its OWN children's _ready() calls (this node,
+	# "JungleVillage," is one of them) at the exact moment this runs, and
+	# Godot locks a node against add_child() for the duration of that
+	# cascade. _build_ground_villagers()/_build_tree_and_houses() above never
+	# hit this because they add_child() onto `self`, not onto a node that's
+	# itself still being set up. Deferring runs these once that whole initial
+	# cascade has finished, the same fix the engine's own error message
+	# suggests.
+	_build_ground_primates.call_deferred()
+	_build_manchego_and_quest_ape.call_deferred()
 
 
 func _build_tree_and_houses(local_pos: Vector2, height: float, terrain: Node, tree_index: int) -> void:
@@ -194,8 +324,15 @@ func _build_tree_and_houses(local_pos: Vector2, height: float, terrain: Node, tr
 		# build_emergent_tree()'s own golden-angle spiral (each landing lands
 		# at a very different azimuth from its neighbors, not the old ~100
 		# deg step that nearly re-aligned every few branches), keeps a
-		# treehouse's footprint clear of the ramp climbing past it.
-		if i % 3 != 0:
+		# treehouse's footprint clear of the ramp climbing past it. Widened
+		# to every FOURTH landing (was third) per direct report ("[space
+		# primates out] in the treehouses too" -- part of the same lag/load-
+		# time report GROUND_VILLAGER_COUNT's own comment addresses) -- fewer
+		# treehouses (and so fewer anchored villagers, since
+		# _build_treehouse() spawns one per call) spaced further apart
+		# vertically, and each tree's own emergent-spiral azimuth step means
+		# further apart around the trunk too.
+		if i % 4 != 0:
 			continue
 		var platform_local: Vector3 = platforms[i]
 		var world_platform := trunk_pos + platform_local
@@ -253,6 +390,134 @@ func _build_ground_villagers() -> void:
 		var local := Vector2(cos(angle) * r, sin(angle) * r)
 		villager.position = Vector3(local.x, _terrain.get_mesh_height(local.x, local.y), local.y)
 		add_child(villager)
+
+
+## One ApeTemplatePreview NPC per PRIMATE_TEMPLATE_IDENTITIES entry, roaming
+## the same ground clearing _build_ground_villagers() uses -- see this file's
+## own class doc comment for why this exists alongside that function rather
+## than replacing it. Added via get_parent().add_child(), NOT add_child()
+## (unlike every JungleVillager spawn above) -- ApeTemplatePreview's own
+## _ready() resolves terrain through a plain get_node_or_null("../Terrain"),
+## which only finds it one level under the kingdom root; parented here under
+## "JungleVillage" instead, that lookup would silently return null and this
+## NPC would never re-settle its own Y as it wanders the clearing's
+## undulating ground. See primate_kingdom_gorilla.gd's own identical
+## reasoning for its gorilla spawn. Called deferred from _ready() (see that
+## function's own comment) -- get_parent().add_child() below would otherwise
+## crash on arrival, since the kingdom root is still mid-setup at that point.
+func _build_ground_primates() -> void:
+	var packed := load(APE_TEMPLATE_SCENE) as PackedScene
+	if packed == null:
+		return
+	var parent := get_parent()
+	# Spawns only the first GROUND_PRIMATE_SPAWN_COUNT of PRIMATE_TEMPLATE_
+	# IDENTITIES, not the full roster -- per direct report ("we don't need so
+	# many primates to be walking around on the village floor at once"). The
+	# roster itself stays at its full 6 entries (the written names/dialogue
+	# are still worth keeping around for whenever population is raised again
+	# later); only how many actually get spawned is cut.
+	for i in mini(GROUND_PRIMATE_SPAWN_COUNT, PRIMATE_TEMPLATE_IDENTITIES.size()):
+		var identity: Dictionary = PRIMATE_TEMPLATE_IDENTITIES[i]
+		var preview := packed.instantiate() as ApeTemplatePreview
+		preview.has_tail = identity["has_tail"]
+		var lines: Array[String] = []
+		lines.assign(identity["lines"])
+		preview.display_name = identity["name"]
+		preview.talk_lines = lines
+		# Same "dark charcoal to grey to light grey to shades of brown" range
+		# jungle_villager.gd's own FUR_COLORS already establishes for this
+		# project's primates generally -- reused directly rather than
+		# duplicated, so a new palette doesn't have to be kept in sync by hand.
+		preview.fur_color = JungleVillager.FUR_COLORS[_rng.randi() % JungleVillager.FUR_COLORS.size()]
+		preview.marking_color = MonkeyFigure.MARKING_COLOR_PALETTE[
+			_rng.randi() % MonkeyFigure.MARKING_COLOR_PALETTE.size()
+		]
+		if identity["has_tail"]:
+			preview.display_scale = _rng.randf_range(
+				PRIMATE_TEMPLATE_MONKEY_SCALE_MIN, PRIMATE_TEMPLATE_MONKEY_SCALE_MAX
+			)
+		else:
+			preview.display_scale = _rng.randf_range(APE_SCALE_MIN, APE_SCALE_MAX)
+		var angle := _rng.randf_range(0.0, TAU)
+		var r := GROUND_ROAM_RADIUS * sqrt(_rng.randf())
+		var local := Vector2(cos(angle) * r, sin(angle) * r)
+		var spawn_pos := Vector3(local.x, _terrain.get_mesh_height(local.x, local.y), local.y)
+		parent.add_child(preview)
+		preview.global_position = spawn_pos
+
+
+## Manchego and the ape seen riding him -- per direct instruction: "when
+## entering the primate village, we will see Manchego there idling around,
+## not following the player, and being ridden by one ape who is a reddish
+## color, and that ape will give you the prompt to do a quest." Both added
+## via get_parent().add_child() -- Manchego's own _ready() does a HARD
+## get_node("../Player")/get_node("../Terrain") (not the soft get_node_or_
+## null ApeTemplatePreview uses), which would throw outright if he ended up
+## nested one level too deep under "JungleVillage" instead of directly under
+## the kingdom root alongside Player/Terrain. Called deferred from _ready()
+## (see that function's own comment) -- get_parent().add_child() below would
+## otherwise crash on arrival, since the kingdom root is still mid-setup at
+## that point.
+func _build_manchego_and_quest_ape() -> void:
+	var packed_manchego := load(MANCHEGO_SCENE) as PackedScene
+	var packed_ape := load(APE_TEMPLATE_SCENE) as PackedScene
+	if packed_manchego == null or packed_ape == null:
+		return
+	var parent := get_parent()
+
+	var manchego := packed_manchego.instantiate() as Manchego
+	# Idling in place, not chasing the player, and not yet rideable -- both
+	# flip true once the ape below hands him over. See both vars' own doc
+	# comments in manchego.gd.
+	manchego.follows_player = false
+	manchego.available_to_player = false
+	parent.add_child(manchego)
+	var manchego_pos := Vector3(MANCHEGO_LOCAL_XZ.x, 0, MANCHEGO_LOCAL_XZ.y)
+	manchego_pos.y = _terrain.get_mesh_height(manchego_pos.x, manchego_pos.y)
+	manchego.global_position = manchego_pos
+
+	var ape := packed_ape.instantiate() as ApeTemplatePreview
+	ape.fur_color = QUEST_APE_FUR_COLOR
+	ape.has_tail = false
+	ape.display_name = QUEST_APE_NAME
+	var talk_lines: Array[String] = []
+	talk_lines.assign(QUEST_APE_TALK_LINES)
+	ape.talk_lines = talk_lines
+	# Matches the player's own established riding-pose lean, same reasoning
+	# main.gd's own now-removed debug mount review used (see this file's own
+	# git history) -- an ape seated on Manchego for real, not just facing
+	# forward on foot, needs the same forward torso intent baked in before
+	# ApeTemplate.build() runs.
+	ape.spine_forward_bend = Player.RIDE_SPINE_LEAN
+	ape.arm_forward_relax_factor = 0.0
+	ape.dialog_actions_provider = func() -> Array[Dictionary]:
+		return _quest_ape_dialog_actions(ape, manchego)
+	parent.add_child(ape)
+	ape.mount_on(manchego)
+
+
+## Returns the "Give the Special Banana" DialogUI action (see npc.gd's own
+## {"label", "callback"} shape) only once the player actually has the item --
+## otherwise no extra action at all, just QUEST_APE_TALK_LINES' own flavor
+## line. Handing it over removes the item, unmounts the ape (see
+## ApeTemplatePreview.unmount()'s own doc comment -- he becomes an ordinary
+## roaming NPC afterward rather than vanishing), and hands Manchego to the
+## player as a real party mount.
+func _quest_ape_dialog_actions(ape: ApeTemplatePreview, manchego: Manchego) -> Array[Dictionary]:
+	var actions: Array[Dictionary] = []
+	if not Inventory.has(SPECIAL_BANANA_ITEM_NAME):
+		return actions
+	actions.append({
+		"label": "Give %s the Special Banana." % ape.display_name,
+		"callback": func() -> void:
+			Inventory.remove(SPECIAL_BANANA_ITEM_NAME)
+			DialogUI.hide_dialog()
+			ape.unmount()
+			manchego.follows_player = true
+			manchego.set_available_to_player(true)
+			Hud.show_message("%s hops down. Manchego is yours now." % ape.display_name),
+	})
+	return actions
 
 
 ## Assigns the next unused entry from JUNGLE_VILLAGER_IDENTITIES, in order --

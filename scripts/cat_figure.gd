@@ -19,6 +19,28 @@ const COAT_COLORS := [
 ]
 const NOSE_COLOR := Color(0.38, 0.20, 0.21)
 
+## Yogi -- the Primate Kingdom's canonical cat (see docs/world_bible.md's
+## own Creatures/Cats entry), per direct instruction: white coat, an
+## orangish-brown marking on one ear, both front paws, an uneven pair of
+## hind legs (one with every segment marked, the other just its paw and the
+## segment right above it), and a ringed tail tip capped in the same marking
+## color. YOGI_MARKED_EAR_SIDE/YOGI_FULL_LEG_SIDE/YOGI_LOWER_SOCK_SIDE reuse
+## this file's own side=-1.0/1.0 convention (see _build_leg()'s own `side`
+## param) -- picked arbitrarily (left ear, left hind leg fully marked, right
+## hind leg the shorter sock) since the direct instruction didn't specify
+## which physical side, adjustable on report like any other unspecified
+## left/right pick in this project.
+const YOGI_COAT_COLOR := Color(0.96, 0.95, 0.92)
+const YOGI_MARKING_COLOR := Color(0.72, 0.45, 0.22)
+const YOGI_MARKED_EAR_SIDE := -1.0
+## The hind leg with every segment marked -- root, middle, distal, and paw.
+const YOGI_FULL_LEG_SIDE := -1.0
+## The other hind leg: per direct correction ("the other just the paw and
+## lower segment"), only its distal bone (the segment right above the paw)
+## and the paw itself -- NOT the whole leg the way YOGI_FULL_LEG_SIDE's own
+## side is.
+const YOGI_LOWER_SOCK_SIDE := 1.0
+
 ## All three trunk segments share one deliberately slender cross-section.
 ## Only depth varies: the pelvis is especially short front-to-back, while
 ## abdomen and thorax provide most of the cat's trunk length.
@@ -62,7 +84,24 @@ const REST_FRONT_ANGLES := [deg_to_rad(76.0), deg_to_rad(-118.0), deg_to_rad(54.
 const REST_HIND_ANGLES := [deg_to_rad(-88.0), deg_to_rad(126.0), deg_to_rad(-70.0)]
 
 
-static func build(parent: Node3D, coat_color: Color, resting: bool = false, curl_side: float = 1.0) -> Dictionary:
+## marking_color (default null) plus marked_ear_side/full_leg_side/
+## lower_sock_side/mark_front_paws (default 0.0/false == no marking on that
+## feature) add optional cosmetic markings on top of the plain single-coat-
+## color cat this file already built -- see YOGI_COAT_COLOR's own comment
+## for the canonical values. full_leg_side marks that ENTIRE hind leg (root,
+## middle, distal, and paw); lower_sock_side marks just that hind leg's paw
+## and the distal segment right above it ("the other just the paw and lower
+## segment," per direct correction) -- so the two hind legs read as an
+## uneven pair, one fully marked, one a short sock. mark_front_paws marks
+## BOTH front paws (no side -- per direct instruction, "give both the front
+## paws color"), nothing else on the front legs. Every side param uses this
+## file's own side=-1.0/1.0 convention. Every default reproduces the exact
+## prior single-color behavior, so no existing caller needs to change.
+static func build(
+	parent: Node3D, coat_color: Color, resting: bool = false, curl_side: float = 1.0,
+	marking_color: Variant = null, marked_ear_side: float = 0.0,
+	full_leg_side: float = 0.0, lower_sock_side: float = 0.0, mark_front_paws: bool = false
+) -> Dictionary:
 	var rig := Node3D.new()
 	rig.name = "CatFigure"
 	rig.position.y = RESTING_BODY_Y if resting else STANDING_BODY_Y
@@ -83,20 +122,38 @@ static func build(parent: Node3D, coat_color: Color, resting: bool = false, curl
 	if resting:
 		thorax.rotation.y = curl_side * deg_to_rad(28.0)
 
-	var head_parts := _build_neck_head(thorax, coat_color, resting, curl_side)
+	var head_parts := _build_neck_head(thorax, coat_color, resting, curl_side, marking_color, marked_ear_side)
 	var leg_angles_front: Array = REST_FRONT_ANGLES if resting else STAND_FRONT_ANGLES
 	var leg_angles_hind: Array = REST_HIND_ANGLES if resting else STAND_HIND_ANGLES
+	# full_leg_side/lower_sock_side only ever apply to the HIND legs -- per
+	# direct instruction, that uneven pair is specifically a hind thing, not
+	# a front one -- so the front _build_leg() calls below use their own
+	# separate mark_front_paws flag instead (paw only, both sides, no leg-
+	# segment marking at all).
 	var legs := {
-		"front_left": _build_leg(thorax, 1.0, true, coat_color, leg_angles_front, resting),
-		"front_right": _build_leg(thorax, -1.0, true, coat_color, leg_angles_front, resting),
-		"hind_left": _build_leg(hips, 1.0, false, coat_color, leg_angles_hind, resting),
-		"hind_right": _build_leg(hips, -1.0, false, coat_color, leg_angles_hind, resting),
+		"front_left": _build_leg(
+			thorax, 1.0, true, coat_color, leg_angles_front, resting, marking_color, mark_front_paws
+		),
+		"front_right": _build_leg(
+			thorax, -1.0, true, coat_color, leg_angles_front, resting, marking_color, mark_front_paws
+		),
+		"hind_left": _build_leg(
+			hips, 1.0, false, coat_color, leg_angles_hind, resting,
+			marking_color, false, 1.0 == lower_sock_side, 1.0 == full_leg_side
+		),
+		"hind_right": _build_leg(
+			hips, -1.0, false, coat_color, leg_angles_hind, resting,
+			marking_color, false, -1.0 == lower_sock_side, -1.0 == full_leg_side
+		),
 	}
 
 	# Reuse the primate tail builder/animation outright, but supply cat-scale
 	# body dimensions, length and radius. It remains a flexible appendage;
 	# the independent-SuperEgg requirement applies to the articulated bones.
-	var tail := MonkeyFigure._build_tail(hips, coat_color, 1.55, HIP_SIZE.y * 2.0, HIP_SIZE.z, 3.0)
+	# marking_color also rides along as MonkeyFigure._build_tail()'s own
+	# tip_marking_color -- see that param's own comment for the ringed-tip
+	# treatment this puts on Yogi's tail specifically.
+	var tail := MonkeyFigure._build_tail(hips, coat_color, 1.55, HIP_SIZE.y * 2.0, HIP_SIZE.z, 3.0, marking_color)
 	if resting:
 		var points: Array[Vector3] = tail["base_points"]
 		var anchor := points[0]
@@ -126,7 +183,10 @@ static func _body_segment(parent: Node3D, part_name: String, size: Vector3, colo
 	return pivot
 
 
-static func _build_neck_head(thorax: Node3D, color: Color, resting: bool, curl_side: float) -> Dictionary:
+static func _build_neck_head(
+	thorax: Node3D, color: Color, resting: bool, curl_side: float,
+	marking_color: Variant = null, marked_ear_side: float = 0.0
+) -> Dictionary:
 	var neck := Node3D.new()
 	neck.name = "CatNeckPivot"
 	# Pull the resting neck's base down the front of the chest. Combined with
@@ -173,7 +233,10 @@ static func _build_neck_head(thorax: Node3D, color: Color, resting: bool, curl_s
 		ear.name = "CatEar"
 		ear.mesh = _build_cat_ear_mesh()
 		var ear_material := StandardMaterial3D.new()
-		ear_material.albedo_color = color
+		# One ear, not both, per direct instruction ("an orangish brown
+		# marking on one ear") -- marking_color only wins for the one side
+		# matching marked_ear_side; the other ear stays plain coat color.
+		ear_material.albedo_color = marking_color if (marking_color != null and side == marked_ear_side) else color
 		ear_material.roughness = 0.8
 		ear.set_surface_override_material(0, ear_material)
 		ear.position = Vector3(side * 0.065, 0.05, 0.035)
@@ -268,9 +331,25 @@ static func _add_triangle(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -
 	st.add_vertex(c)
 
 
+## mark_paw/mark_distal/mark_full (all default false, reproducing the prior
+## single-color leg exactly) apply marking_color in three cascading levels:
+## mark_paw colors just the paw; mark_distal ALSO colors the distal bone
+## above it (Metacarpals/Metatarsals, down to the hock/carpus); mark_full
+## ALSO colors the middle (RadiusUlna/TibiaFibula) and root (Humerus/Femur)
+## bones, the entire limb. Each level is a strict superset of the one below
+## it -- a caller only ever needs to set the HIGHEST level it wants (see
+## build()'s own call sites), not every level individually.
 static func _build_leg(
-	body: Node3D, side: float, front: bool, color: Color, angles: Array, resting: bool
+	body: Node3D, side: float, front: bool, color: Color, angles: Array, resting: bool,
+	marking_color: Variant = null, mark_paw: bool = false, mark_distal: bool = false,
+	mark_full: bool = false
 ) -> Dictionary:
+	# Cascade: mark_full implies mark_distal implies mark_paw, so a caller
+	# asking for "the whole leg" doesn't also have to separately ask for
+	# "and its paw too."
+	mark_distal = mark_distal or mark_full
+	mark_paw = mark_paw or mark_distal
+	var has_marking_color := marking_color != null
 	var upper_len := FRONT_UPPER_LEN if front else HIND_UPPER_LEN
 	var lower_len := FRONT_LOWER_LEN if front else HIND_LOWER_LEN
 	var distal_len := FRONT_METAPODIAL_LEN if front else HIND_METAPODIAL_LEN
@@ -291,21 +370,24 @@ static func _build_leg(
 	if resting:
 		root.rotation.z = side * deg_to_rad(-38.0)
 	body.add_child(root)
-	_add_bone(root, "Humerus" if front else "Femur", upper_len, BONE_RADIUS, color)
+	var root_color: Color = marking_color if (mark_full and has_marking_color) else color
+	_add_bone(root, "Humerus" if front else "Femur", upper_len, BONE_RADIUS, root_color)
 
 	var middle := Node3D.new()
 	middle.name = "CatElbowPivot" if front else "CatStiflePivot"
 	middle.position.y = -upper_len
 	middle.rotation.x = angles[1]
 	root.add_child(middle)
-	_add_bone(middle, "RadiusUlna" if front else "TibiaFibula", lower_len, BONE_RADIUS, color)
+	var middle_color: Color = marking_color if (mark_full and has_marking_color) else color
+	_add_bone(middle, "RadiusUlna" if front else "TibiaFibula", lower_len, BONE_RADIUS, middle_color)
 
 	var distal := Node3D.new()
 	distal.name = "CatCarpusPivot" if front else "CatHockPivot"
 	distal.position.y = -lower_len
 	distal.rotation.x = angles[2]
 	middle.add_child(distal)
-	_add_bone(distal, "Metacarpals" if front else "Metatarsals", distal_len, BONE_RADIUS, color)
+	var distal_color: Color = marking_color if (mark_distal and has_marking_color) else color
+	_add_bone(distal, "Metacarpals" if front else "Metatarsals", distal_len, BONE_RADIUS, distal_color)
 
 	var paw_pivot := Node3D.new()
 	paw_pivot.name = "CatPawPivot"
@@ -317,8 +399,9 @@ static func _build_leg(
 	# Halve the established front and hind paw depths independently; the
 	# hind paw keeps its existing 1 cm shorter half-depth before halving.
 	var paw_depth := (PAW_LEN if front else PAW_LEN - 0.01) * 0.5
+	var paw_color: Color = marking_color if (mark_paw and has_marking_color) else color
 	var paw := SuperEgg.build_part(
-		Vector3(BONE_RADIUS, 0.022 * BODY_SCALE, paw_depth), color, 3.4, 3.4
+		Vector3(BONE_RADIUS, 0.022 * BODY_SCALE, paw_depth), paw_color, 3.4, 3.4
 	)
 	paw.name = "CatPaw"
 	# Both front paws move 2 cm toward the head. Hind paws retain their own

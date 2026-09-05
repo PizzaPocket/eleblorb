@@ -221,6 +221,8 @@ const AERIAL_HEAD_PITCH_LIMIT := deg_to_rad(85.0)
 const AERIAL_HEAD_TURN_SPEED := 6.0
 
 const CAMERA_GROUND_MARGIN := 0.4
+const LAVA_CONTACT_TOLERANCE := 0.45
+const LAVA_WARNING_COOLDOWN := 1.25
 const WATER_STREAM_SPEED := 15.0
 const WATER_STREAM_LIFETIME := 0.42
 
@@ -271,6 +273,8 @@ var _monkey_pivots: Dictionary = {}
 ## toggles) without needing to rebuild the whole visible rig from scratch.
 var _visuals_pivots: Dictionary = {}
 var _head: Node3D
+var _head_look_yaw: float = 0.0
+var _head_look_pitch: float = 0.0
 ## Only ProceduralFigure's own build() returns a "neck" pivot (see that
 ## file's own NeckPivot comment) -- MonkeyFigure's dict has no equivalent
 ## key, so this is null while piloting Xiao Hou Zi (see _apply_pivots()'s
@@ -511,6 +515,12 @@ const LAKE_DIVE_FLOOR_CLEARANCE := 0.5
 const AIR_FLIGHT_SPEED := 6.0
 const AIR_FLIGHT_HOVER_HEIGHT := 0.5
 const AIR_FLIGHT_EXIT_RECOVERY_DURATION := 0.45
+const POWERED_HOVER_HEIGHT := 1.15
+const POWERED_HOVER_LIFT_SPEED := 5.0
+const POWERED_HOVER_SETTLE_SPEED := 9.0
+## Each actively firing Fire foot compounds this multiplier while a chest
+## Air blorb is already supplying flight: one leg = 1.35x, two = 1.8225x.
+const FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER := 1.35
 const AERIAL_FAST_SPEED_MULTIPLIER := 1.8
 ## Flying sprint is intentionally twice its previous fast-flight rate;
 ## swimming retains AERIAL_FAST_SPEED_MULTIPLIER unchanged.
@@ -613,7 +623,28 @@ var _lake_diving_active: bool = false
 var _lake_water_walk_active: bool = false
 var _air_flight_active: bool = false
 var _was_air_flight_active: bool = false
+var _was_suit_flight_active: bool = false
 var _air_flight_exit_recovery := 0.0
+## World-space heading captured on the exact frame chest-air flight ends.
+## Flight can leave Visuals heavily pitched/rolled, where reading rotation.y
+## back from Euler angles is ambiguous and can choose the opposite-facing
+## solution. The recovery pass instead stands the body upright around this
+## explicitly preserved heading.
+var _air_flight_exit_yaw := 0.0
+var _left_arm_water_active := false
+var _right_arm_water_active := false
+var _left_arm_fire_active := false
+var _right_arm_fire_active := false
+var _left_leg_water_active := false
+var _right_leg_water_active := false
+var _left_leg_fire_active := false
+var _right_leg_fire_active := false
+var _water_leg_hover_active := false
+var _fire_hand_hover_active := false
+var _fire_limb_flight_active := false
+var _air_foot_hover_active := false
+var _was_powered_hover_active := false
+var _powered_hover_target_y := 0.0
 ## World-space swim heading, retained for the visual-only aerial anchor pass
 ## after move_and_slide() has placed the collision body this frame.
 var _aerial_motion_direction := Vector3.ZERO
@@ -635,16 +666,23 @@ var _giant_anchor_yaw: float = 0.0
 ## ordinary (non-super) blorb bounce; a jump press before it hits zero
 ## upgrades that bounce to a super jump after the fact.
 var _blorb_super_jump_grace: float = 0.0
+var _lava_warning_cooldown: float = 0.0
 
 var _held_visual: Node3D = null
 var _hand_right: Node3D
 var _hand_left: Node3D
 var _palm_right: Node3D
 var _palm_left: Node3D
+var _toe_right: Node3D
+var _toe_left: Node3D
 var _water_stream_left: GPUParticles3D
 var _water_stream_right: GPUParticles3D
 var _fire_stream_left: GPUParticles3D
 var _fire_stream_right: GPUParticles3D
+var _water_leg_stream_left: GPUParticles3D
+var _water_leg_stream_right: GPUParticles3D
+var _fire_leg_stream_left: GPUParticles3D
+var _fire_leg_stream_right: GPUParticles3D
 var _prev_throw_pressed: bool = false
 
 ## Blorb suit -- see blorb_suit_controller.gd's own module docstring for
@@ -692,6 +730,9 @@ const PLAYER_FOLLOW_ARRIVE_DISTANCE := 3.0
 ## (see start_riding_manchego() below).
 var _controlled_manchego: Manchego = null
 var _player_following_manchego := false
+## Prevents the Interact press that mounted Manchego from immediately being
+## read again as a dismount. Armed after the player releases the control.
+var _manchego_dismount_armed := false
 
 ## ---- Manchego seated rider pose ---- Per direct correction ("add the
 ## player riding the horse... instead of leaving him where he is, he should
@@ -889,6 +930,8 @@ func _apply_pivots(pivots: Dictionary) -> void:
 	# (used while piloting Xiao Hou Zi) has no "neck" key at all.
 	_neck = pivots.get("neck")
 	_head = pivots["head"]
+	_head_look_yaw = 0.0
+	_head_look_pitch = 0.0
 	_eyes = pivots["eyes"]
 	_hips = pivots["hips"]
 	_hips_rest_y = _hips.position.y
@@ -896,6 +939,8 @@ func _apply_pivots(pivots: Dictionary) -> void:
 	_hand_left = pivots["hand_left"]
 	_palm_right = pivots["palm_right"]
 	_palm_left = pivots["palm_left"]
+	_toe_right = pivots["toe_right"]
+	_toe_left = pivots["toe_left"]
 
 
 ## The pivot-name map BlorbSuitController.setup() expects, built from
@@ -1084,8 +1129,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_lava_warning_cooldown = maxf(_lava_warning_cooldown - delta, 0.0)
 	_apply_gamepad_look(delta)
-	if Input.is_action_just_pressed("switch_blorbus") and not UIState.modal_open:
+	if Input.is_action_just_pressed("switch_blorbus") and not UIState.modal_open and not _player_following_manchego:
 		_toggle_blorbus_control()
 	if _player_following_manchego:
 		_update_manchego_control(delta)
@@ -1117,7 +1163,11 @@ func _physics_process(delta: float) -> void:
 	_update_giant_goo_state(delta)
 	_update_lake_buoyancy(delta)
 	_update_air_flight()
-	var buoyant := _giant_goo_active or _lake_buoyancy_active or _air_flight_active
+	_update_limb_power_state(delta)
+	_update_suit_flight_transition()
+	var powered_hover := _is_powered_hover_active()
+	var suit_flight := _is_suit_flight_active()
+	var buoyant := _giant_goo_active or _lake_buoyancy_active or suit_flight or powered_hover
 	var surface_walking := _lake_water_walk_active
 	var giant_jump_ready := _giant_surface_grounded or _is_on_giant_mesh_surface()
 
@@ -1162,7 +1212,17 @@ func _physics_process(delta: float) -> void:
 	# ledges, which makes a continuous slope look like repeated tiny jumps.
 	var on_climbable_ramp := _is_on_climbable_ramp()
 	var cloud_stand_height: Variant = _cloud_stand_height_at(global_position.x, global_position.z, global_position.y - FOOT_OFFSET + 0.2)
-	var on_cloud := cloud_stand_height != null and absf(global_position.y - (cloud_stand_height as float)) < 0.25 and velocity.y <= 0.1
+	# 0.6, not the tighter 0.25 on_canopy uses right below -- a cloud top is
+	# several overlapping puffs (see cloud_scatter.gd's own get_support_
+	# height_at()), so its real walkable height can shift noticeably from
+	# one step to the next near a puff's edge or where two puffs hand off to
+	# each other, unlike a single solid canopy/terrain surface. Per direct
+	# correction ("not really able to reliably stand on top of the
+	# clouds... hopping onto the top surface often just makes you totally
+	# fall through") -- see _snap_to_cloud() below for the other half of
+	# this fix (actively re-anchoring to that shifting height every frame,
+	# the same way _snap_to_terrain() already does for solid ground).
+	var on_cloud := cloud_stand_height != null and absf(global_position.y - (cloud_stand_height as float)) < 0.6 and velocity.y <= 0.1
 	# Same pattern as on_cloud immediately above, just against tree-canopy
 	# support instead. Without this, standing on a canopy never counted as
 	# grounded -- the one-way Y catch further down (see
@@ -1177,7 +1237,7 @@ func _physics_process(delta: float) -> void:
 	var grounded := (_giant_surface_grounded or surface_walking or on_climbable_ramp or (
 		is_on_floor() or _is_near_ground() or (_is_touching_terrain() and _grounded_grace_timer > 0.0)
 	) or on_cloud or on_canopy) and not _jumping
-	if _air_flight_active:
+	if suit_flight or powered_hover:
 		grounded = false
 	# grounded is fixed at the top of the frame, before the jump decision
 	# below -- so on the exact frame a jump starts, it's still stale-true
@@ -1210,10 +1270,10 @@ func _physics_process(delta: float) -> void:
 	# On land movement stays yaw-only. Inside a head-blorb dive, use the
 	# pitched camera basis so looking up/down and swimming forward controls
 	# ascent/descent naturally.
-	var aerial_active := _lake_diving_active or _air_flight_active
+	var aerial_active := _lake_diving_active or suit_flight
 	# Surface swimming keeps ordinary horizontal controls, but its body still
 	# needs the same neck-led travel lean as diving.
-	var neck_led_travel := _lake_buoyancy_active or _air_flight_active
+	var neck_led_travel := _lake_buoyancy_active or suit_flight
 	var cam_basis := camera.global_transform.basis if aerial_active else camera_rig.global_transform.basis
 	var direction := cam_basis.x * input_dir.x + cam_basis.z * input_dir.y
 	if not aerial_active:
@@ -1221,12 +1281,22 @@ func _physics_process(delta: float) -> void:
 
 	var skating := _is_blorb_skating()
 	var ground_move_speed := TEMP_MONKEY_MOVE_SPEED if _piloting_xiao_hou_zi else move_speed
-	var current_speed := (
-		LAKE_DIVE_SPEED if _lake_diving_active else (AIR_FLIGHT_SPEED if _air_flight_active else ground_move_speed * (sprint_multiplier if _is_sprinting() else 1.0))
-	)
+	var current_speed := ground_move_speed * (sprint_multiplier if _is_sprinting() else 1.0)
+	if _lake_diving_active:
+		current_speed = LAKE_DIVE_SPEED
+	elif _air_flight_active or _fire_limb_flight_active:
+		current_speed = AIR_FLIGHT_SPEED
+	# Air feet retain ordinary walk/run traversal speed and animation even
+	# though their direction includes camera pitch (see _animate_walk()).
 	if aerial_active and _is_sprinting():
-		current_speed *= FLIGHT_SPRINT_SPEED_MULTIPLIER if _air_flight_active else AERIAL_FAST_SPEED_MULTIPLIER
-	if skating and not aerial_active:
+		if _air_flight_active or _fire_limb_flight_active:
+			current_speed *= FLIGHT_SPRINT_SPEED_MULTIPLIER
+		elif _lake_diving_active:
+			current_speed *= AERIAL_FAST_SPEED_MULTIPLIER
+	if _air_flight_active:
+		var active_fire_feet := int(_left_leg_fire_active) + int(_right_leg_fire_active)
+		current_speed *= pow(FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER, active_fire_feet)
+	if skating and not aerial_active and not powered_hover:
 		current_speed *= BLORB_SKATE_SPEED_MULTIPLIER
 
 	if direction.length() > 0.001:
@@ -1251,7 +1321,13 @@ func _physics_process(delta: float) -> void:
 		if aerial_active:
 			velocity.y = move_toward(velocity.y, 0.0, current_speed)
 
-	_animate_walk(delta, grounded, BLORB_SKATE_SPEED_MULTIPLIER if skating else 1.0)
+	# Water-leg and dual-hand Fire hover are level traversal modes: their
+	# camera-relative direction has no Y component, so the jets own vertical
+	# lift. Air feet and four-limb Fire flight instead use camera-pitched
+	# direction above; with no input they hold the last elevation here.
+	_apply_powered_hover_vertical(delta, direction.length() > 0.001 and aerial_active)
+
+	_animate_walk(delta, grounded, BLORB_SKATE_SPEED_MULTIPLIER if skating and not powered_hover else 1.0)
 	# Flight aiming is applied after the base pose but before the dedicated
 	# shoulder-button power layer, so a held arm power still has precedence.
 	_apply_flight_aim_pose(delta)
@@ -1265,6 +1341,7 @@ func _physics_process(delta: float) -> void:
 	# collapses that gap to zero, so there's no ordering assumption left to
 	# get wrong.
 	_apply_arm_power_poses(delta)
+	_apply_fire_jet_pose(delta)
 	_update_water_streams(delta)
 
 	if grounded and not surface_walking and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and _is_touching_terrain():
@@ -1279,6 +1356,7 @@ func _physics_process(delta: float) -> void:
 		_try_step_onto_prop()
 	var pre_move_feet_y := global_position.y - FOOT_OFFSET
 	move_and_slide()
+	_enforce_lava_access()
 	# Clouds are intentionally one-way: only a descending body that started
 	# above a puff top is caught. Rising flight/jumps pass straight through
 	# the underside, then a fall settles 10cm into the cloud.
@@ -1324,6 +1402,14 @@ func _physics_process(delta: float) -> void:
 		_check_creature_bounce(grounded, pre_move_feet_y)
 	if grounded and not surface_walking and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and _is_touching_terrain():
 		_snap_to_terrain(delta)
+	# Same active re-anchoring _snap_to_terrain() does for solid ground,
+	# applied to a cloud top instead -- see on_cloud's own comment above for
+	# why a cloud's own bumpy, multi-puff surface needs this (a loose
+	# proximity tolerance alone let the player's foothold height and the
+	# cloud's own real height under them drift apart while walking, reading
+	# as falling through).
+	if grounded and on_cloud and not surface_walking and not jumped_this_frame and not buoyant and not _giant_surface_grounded:
+		_snap_to_cloud(delta)
 	_store_giant_attachment()
 
 	# _is_near_ground() alone only ever fires near the analytic terrain
@@ -1349,6 +1435,35 @@ func _physics_process(delta: float) -> void:
 		_landing_timer = LANDING_DURATION
 		_walk_cycle_recovery = 0.0
 	_prev_grounded = grounded
+
+
+## Lava is traversable terrain only with two fully worn fire blorbs on the
+## legs. A high jump/flight may pass over it; contact without the complete
+## pair returns the player to the nearest solid edge. The same rule catches
+## removing either leg while already standing out in the pool.
+func _enforce_lava_access() -> void:
+	if (
+		terrain == null
+		or not terrain.has_method("is_lava_area")
+		or not terrain.has_method("get_lava_surface_height")
+		or not terrain.has_method("get_lava_escape_position")
+	):
+		return
+	var xz := Vector2(global_position.x, global_position.z)
+	if not terrain.is_lava_area(xz) or _blorb_suit.has_lava_safe_legs():
+		return
+	var lava_surface: float = terrain.get_lava_surface_height(xz)
+	if global_position.y - FOOT_OFFSET > lava_surface + LAVA_CONTACT_TOLERANCE:
+		return
+	var safe_position: Vector3 = terrain.get_lava_escape_position(xz)
+	global_position = safe_position + Vector3.UP * FOOT_OFFSET
+	velocity = Vector3.ZERO
+	_jumping = false
+	if _lava_warning_cooldown <= 0.0:
+		# Plain reaction, not an explanation of the requirement -- see
+		# CLAUDE.md's "In-game text and player guidance" rule.
+		Hud.show_message("The heat drives you back.")
+		_lava_warning_cooldown = LAVA_WARNING_COOLDOWN
 
 
 ## Detects landing on top of a blorb via this frame's move_and_slide()
@@ -1410,7 +1525,7 @@ func _check_creature_bounce(was_grounded: bool, pre_move_feet_y: float) -> void:
 ## slide collision; detect that narrow top-contact case geometrically so the
 ## player visibly meets the crown and enters the normal trampoline bounce.
 func _check_rising_air_blorb_bounce(was_grounded: bool) -> bool:
-	if was_grounded or velocity.y > 0.1 or _air_flight_active:
+	if was_grounded or velocity.y > 0.1 or _is_suit_flight_active() or _is_powered_hover_active():
 		return false
 	for candidate in get_tree().get_nodes_in_group("blorbs"):
 		if not candidate is Blorb:
@@ -1470,7 +1585,7 @@ func is_airborne() -> bool:
 
 
 func is_air_flight_active() -> bool:
-	return _air_flight_active
+	return _is_suit_flight_active()
 
 
 ## _piloting_xiao_hou_zi early-return: per direct instruction, Xiao Hou Zi
@@ -1525,13 +1640,6 @@ func _process(delta: float) -> void:
 
 
 func _toggle_blorbus_control() -> void:
-	if _player_following_manchego:
-		# Dismounting only ever returns straight to the human -- Manchego
-		# doesn't participate in the Blorbus/Xiao Hou Zi cycle at all, since
-		# mounting him only ever starts from his own "Ride Manchego" prompt
-		# (see start_riding_manchego()), not this key.
-		_end_manchego_control()
-		return
 	if _piloting_xiao_hou_zi:
 		# Xiao Hou Zi is the last stop in the cycle -- one more press returns
 		# control to the human player.
@@ -1690,6 +1798,7 @@ func start_riding_manchego(manchego: Manchego) -> void:
 	_controlled_manchego = manchego
 	_controlled_manchego.begin_ride()
 	_player_following_manchego = true
+	_manchego_dismount_armed = false
 	camera_rig.top_level = true
 	# Same top_level idiom camera_rig itself uses right above -- lets
 	# _apply_manchego_seated_pose() drive `visuals` off Manchego's own live
@@ -1698,7 +1807,11 @@ func start_riding_manchego(manchego: Manchego) -> void:
 	# see _update_manchego_control()'s own comment for why that's still kept
 	# moving underneath).
 	visuals.top_level = true
-	Hud.show_message("You are now riding Manchego.")
+	# Plain state confirmation, matching every other control-switch message
+	# in this file (e.g. "You are now controlling Blorbus.") -- none of them
+	# spell out the control used to switch back; see CLAUDE.md's "In-game
+	# text and player guidance" rule.
+	Hud.show_message("Riding Manchego.")
 
 
 func _end_manchego_control() -> void:
@@ -1706,6 +1819,7 @@ func _end_manchego_control() -> void:
 		_controlled_manchego.end_ride()
 	_controlled_manchego = null
 	_player_following_manchego = false
+	_manchego_dismount_armed = false
 	if camera_rig.top_level:
 		camera_rig.top_level = false
 		camera_rig.position = Vector3.ZERO
@@ -1743,6 +1857,11 @@ func _end_manchego_control() -> void:
 ## doc comment).
 func _update_manchego_control(delta: float) -> void:
 	if not is_instance_valid(_controlled_manchego):
+		_end_manchego_control()
+		return
+	if not Input.is_action_pressed("interact"):
+		_manchego_dismount_armed = true
+	if _manchego_dismount_armed and Input.is_action_just_pressed("interact") and not UIState.modal_open:
 		_end_manchego_control()
 		return
 	var input := _get_move_input()
@@ -2058,14 +2177,28 @@ const ARM_POWER_POSE_SETTLE_SPEED := 10.0
 ## new value -- adjust directly against what's actually seen in-game
 ## rather than re-deriving the geometry.
 const HAND_PALM_ROLL := deg_to_rad(60.0)
+const FIRE_JET_ARM_BACK_ANGLE := deg_to_rad(8.0)
+const FIRE_JET_ARM_OUTWARD_ANGLE := deg_to_rad(16.0)
+const FIRE_JET_ELBOW_BEND := deg_to_rad(10.0)
+const FIRE_JET_POSE_SETTLE_SPEED := 11.0
 
 
 func _apply_arm_power_poses(delta: float) -> void:
 	if UIState.modal_open:
 		return
 	var t := ARM_POWER_POSE_SETTLE_SPEED * delta
-	var left_power := Input.is_action_pressed("left_arm_power")
-	var right_power := Input.is_action_pressed("right_arm_power")
+	# Excluded while _fire_hand_hover_active -- both arm-power buttons are
+	# still physically held then (that's what makes both hands Fire and
+	# triggers hovering in the first place), but _apply_fire_jet_pose()
+	# (called right after this function, see its own call site) is what
+	# should own the arms' pose in that case, not this extended-forward
+	# raise. Per direct correction: with both fire competing against that
+	# hover pose every frame -- this function pulling toward the raised
+	# angle, then the jet pose pulling back toward the hips -- the two
+	# lerps never fully resolved, settling the arm at a permanent halfway
+	# compromise instead of cleanly canceling the raise.
+	var left_power := Input.is_action_pressed("left_arm_power") and not _fire_hand_hover_active
+	var right_power := Input.is_action_pressed("right_arm_power") and not _fire_hand_hover_active
 	var holding_power := left_power or right_power
 	if holding_power:
 		_arm_power_recovery = 0.0
@@ -2122,6 +2255,45 @@ func _rest_hand_roll(hand: Node3D, side: float, t: float) -> void:
 	hand.rotation.y = lerp_angle(hand.rotation.y, rest_twist, t)
 
 
+## Two active Fire hands become downward lift jets rather than two forward
+## flamethrowers. Arms stay fixed beside the hips, slightly spread so the
+## raised fingertips angle outward, with both palms rolled toward the floor.
+## When both Fire feet join them, the legs lock into a straight jet-flight
+## silhouette as well; ordinary walk/jump animation continues underneath but
+## this final layer wins while all four controls remain powered.
+func _apply_fire_jet_pose(delta: float) -> void:
+	if not _fire_hand_hover_active:
+		return
+	var t := minf(FIRE_JET_POSE_SETTLE_SPEED * delta, 1.0)
+	_pose_fire_jet_arm(_arm_left, _elbow_left, _hand_left, 1.0, t)
+	_pose_fire_jet_arm(_arm_right, _elbow_right, _hand_right, -1.0, t)
+	if not _fire_limb_flight_active:
+		return
+	_leg_left.rotation.x = lerp_angle(_leg_left.rotation.x, 0.0, t)
+	_leg_right.rotation.x = lerp_angle(_leg_right.rotation.x, 0.0, t)
+	_leg_left.rotation.y = lerp_angle(_leg_left.rotation.y, 0.0, t)
+	_leg_right.rotation.y = lerp_angle(_leg_right.rotation.y, 0.0, t)
+	_leg_left.rotation.z = lerp_angle(_leg_left.rotation.z, 0.0, t)
+	_leg_right.rotation.z = lerp_angle(_leg_right.rotation.z, 0.0, t)
+	_knee_left.rotation.x = lerp_angle(_knee_left.rotation.x, 0.0, t)
+	_knee_right.rotation.x = lerp_angle(_knee_right.rotation.x, 0.0, t)
+	_ankle_left.rotation.x = lerp_angle(_ankle_left.rotation.x, 0.0, t)
+	_ankle_right.rotation.x = lerp_angle(_ankle_right.rotation.x, 0.0, t)
+
+
+func _pose_fire_jet_arm(
+	arm_pivot: Node3D, elbow_pivot: Node3D, hand: Node3D, side: float, t: float
+) -> void:
+	arm_pivot.rotation.x = lerp_angle(arm_pivot.rotation.x, FIRE_JET_ARM_BACK_ANGLE, t)
+	arm_pivot.rotation.y = lerp_angle(arm_pivot.rotation.y, 0.0, t)
+	arm_pivot.rotation.z = lerp_angle(arm_pivot.rotation.z, side * FIRE_JET_ARM_OUTWARD_ANGLE, t)
+	elbow_pivot.rotation.x = lerp_angle(elbow_pivot.rotation.x, -FIRE_JET_ELBOW_BEND, t)
+	elbow_pivot.rotation.y = lerp_angle(elbow_pivot.rotation.y, 0.0, t)
+	elbow_pivot.rotation.z = lerp_angle(elbow_pivot.rotation.z, 0.0, t)
+	var rest_twist := -side * (PI * 0.5 + ProceduralFigure.WRIST_INWARD_ANGLE)
+	hand.rotation.y = lerp_angle(hand.rotation.y, rest_twist - side * FLIGHT_PALM_DOWN_ROLL, t)
+
+
 ## Holding the run/sprint button while chest-air flight is active becomes a
 ## Superman-like aiming gesture. The body already turns toward the left
 ## stick's camera-relative flight direction, so the right arm's local
@@ -2156,6 +2328,22 @@ func _build_water_streams() -> void:
 	_water_stream_right = _make_water_stream("RightWaterHose")
 	_fire_stream_left = _make_fire_stream("LeftFlamethrower")
 	_fire_stream_right = _make_fire_stream("RightFlamethrower")
+	_water_leg_stream_left = _make_water_stream("LeftWaterFootJet")
+	_water_leg_stream_right = _make_water_stream("RightWaterFootJet")
+	_fire_leg_stream_left = _make_fire_stream("LeftFireFootJet")
+	_fire_leg_stream_right = _make_fire_stream("RightFireFootJet")
+
+
+## Soft particle texture/ramp tuning -- see particle_fx.gd's own class doc
+## comment for the general technique this and _make_fire_stream() both use.
+const WATER_PARTICLE_SOFTNESS := 2.2
+const FIRE_PARTICLE_SOFTNESS := 1.7
+## Lower than it might otherwise be -- with angle_min/max now a narrow
+## range instead of a full 0-360 spin (see _make_fire_stream()'s own
+## comment on particle_flag_align_y), each particle's own rotation varies
+## far less, so a strong wobble would read as the same asymmetric shape
+## repeating lick to lick rather than organic variety.
+const FIRE_PARTICLE_WOBBLE := 0.2
 
 
 func _make_water_stream(stream_name: String) -> GPUParticles3D:
@@ -2165,20 +2353,14 @@ func _make_water_stream(stream_name: String) -> GPUParticles3D:
 	stream.lifetime = WATER_STREAM_LIFETIME
 	stream.randomness = 0.12
 	stream.visibility_aabb = AABB(Vector3(-0.6, -0.6, -7.0), Vector3(1.2, 1.2, 7.4))
-	var water_material := StandardMaterial3D.new()
-	# Use the exact rich-blue material color shared by fountain water and
-	# standard water blorbs, rather than a separate pale particle blue.
-	water_material.albedo_color = TownProps.WATER_COLOR
-	water_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	water_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	water_material.emission_enabled = true
-	water_material.emission = TownProps.WATER_COLOR
-	water_material.emission_energy_multiplier = 0.55
-	var droplet := SphereMesh.new()
-	droplet.radius = 0.04
-	droplet.height = 0.08
-	droplet.radial_segments = 8
-	droplet.rings = 4
+	# A soft, alpha-blended billboard instead of a solid-colored SphereMesh
+	# -- per direct report, the old sphere read as a hard uniform ball
+	# regardless of color, not water.
+	var texture := ParticleFX.build_soft_gradient_texture(24, WATER_PARTICLE_SOFTNESS)
+	var water_material := ParticleFX.build_billboard_material(texture, Color.WHITE, false, 0.35)
+	water_material.vertex_color_use_as_albedo = true
+	var droplet := QuadMesh.new()
+	droplet.size = Vector2(0.16, 0.16)
 	droplet.material = water_material
 	var process := ParticleProcessMaterial.new()
 	# look_at() below aims local -Z down the character's +Z forward axis.
@@ -2189,8 +2371,18 @@ func _make_water_stream(stream_name: String) -> GPUParticles3D:
 	process.initial_velocity_min = WATER_STREAM_SPEED * 0.9
 	process.initial_velocity_max = WATER_STREAM_SPEED * 1.1
 	process.scale_min = 0.85
-	process.scale_max = 1.2
-	process.color = TownProps.WATER_COLOR
+	process.scale_max = 1.3
+	# A bright near-white highlight right at the nozzle, settling into the
+	# same rich blue every fountain/water blorb already uses, fading to
+	# transparent as each droplet reaches the end of its short life -- a
+	# flat single color (the earlier approach) read as one uniform, opaque
+	# ball; this reads as an actual spray of individual droplets catching
+	# the light.
+	process.color_ramp = ParticleFX.build_color_ramp([
+		{"offset": 0.0, "color": Color(0.85, 0.95, 1.0, 0.95)},
+		{"offset": 0.35, "color": TownProps.WATER_COLOR},
+		{"offset": 1.0, "color": Color(TownProps.WATER_COLOR.r, TownProps.WATER_COLOR.g, TownProps.WATER_COLOR.b, 0.0)},
+	])
 	stream.process_material = process
 	stream.draw_pass_1 = droplet
 	stream.emitting = false
@@ -2208,29 +2400,67 @@ func _make_fire_stream(stream_name: String) -> GPUParticles3D:
 	stream.lifetime = 0.34
 	stream.randomness = 0.35
 	stream.visibility_aabb = AABB(Vector3(-1.5, -1.5, -7.0), Vector3(3.0, 3.0, 7.4))
-	var flame_material := StandardMaterial3D.new()
-	# Exact fire-blorb body/emission palette (see Blorb._apply_element_visuals).
-	flame_material.albedo_color = Color(0.85, 0.25, 0.05, 0.95)
-	flame_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	flame_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	flame_material.emission_enabled = true
-	flame_material.emission = Color(0.9, 0.35, 0.05)
-	flame_material.emission_energy_multiplier = 1.4
-	var flame := SphereMesh.new()
-	flame.radius = 0.055
-	flame.height = 0.13
-	flame.radial_segments = 8
-	flame.rings = 5
+	# Soft, additively-blended billboards instead of a solid-colored
+	# SphereMesh -- per direct report ("look like orange bubbles"). See
+	# particle_fx.gd's own class doc comment: overlapping additive
+	# particles build up glowing brightness the way real flame does,
+	# rather than each one just occluding what's behind it like a solid
+	# object would.
+	var texture := ParticleFX.build_soft_gradient_texture(24, FIRE_PARTICLE_SOFTNESS, FIRE_PARTICLE_WOBBLE)
+	var flame_material := ParticleFX.build_billboard_material(texture, Color.WHITE, true, 0.0)
+	flame_material.vertex_color_use_as_albedo = true
+	# Elongated (taller than wide), not square -- paired with
+	# particle_flag_align_y below, this reads as a streak pointed along
+	# each particle's own direction of travel rather than a round puff, so
+	# the whole spray reads as a directional jet again. Per direct
+	# correction: the earlier square, freely-spinning (angle_min/max 0-360)
+	# blob looked like fire, but no longer like it was going anywhere in
+	# particular.
+	var flame := QuadMesh.new()
+	flame.size = Vector2(0.22, 0.5)
 	flame.material = flame_material
 	var process := ParticleProcessMaterial.new()
 	process.direction = Vector3(0.0, 0.0, -1.0)
-	process.spread = 8.0
+	process.spread = 6.0
 	process.gravity = Vector3(0.0, -1.4, 0.0)
 	process.initial_velocity_min = 9.0
 	process.initial_velocity_max = 14.0
-	process.scale_min = 0.4
-	process.scale_max = 0.85
-	process.color = Color(0.85, 0.25, 0.05, 0.95)
+	process.scale_min = 0.5
+	process.scale_max = 1.05
+	# Aligns each particle's own local Y (the quad's long axis, see
+	# flame.size above) to its own velocity direction while still
+	# billboarding around that axis to face the camera -- Godot's own
+	# standard technique for a directional streak (rain, sparks, jets),
+	# rather than a billboard that only ever reads as a flat round puff
+	# regardless of how fast or which way it's actually moving.
+	process.particle_flag_align_y = true
+	# A small range, not a full random spin -- enough per-particle variety
+	# that the reused wobble texture (see build_soft_gradient_texture()'s
+	# own comment) doesn't look identical lick to lick, without undoing the
+	# velocity alignment just set above.
+	process.angle_min = -12.0
+	process.angle_max = 12.0
+	# A real flame cools as it travels outward: bright pale heat at the
+	# nozzle, through orange, settling into the same deep red-orange every
+	# fire blorb/Fire Gem already uses, fading to transparent as it dies.
+	process.color_ramp = ParticleFX.build_color_ramp([
+		{"offset": 0.0, "color": Color(1.0, 0.95, 0.75, 1.0)},
+		{"offset": 0.25, "color": Color(1.0, 0.55, 0.1, 1.0)},
+		{"offset": 0.6, "color": Color(0.85, 0.25, 0.05, 0.9)},
+		{"offset": 1.0, "color": Color(0.35, 0.06, 0.02, 0.0)},
+	])
+	# Visibly forms just past the nozzle, then dissipates -- not a fixed
+	# size the whole time.
+	process.scale_curve = ParticleFX.build_scale_curve(0.6, 1.15, 0.3, 0.7)
+	# Organic flicker, but modest -- per direct correction, the original
+	# turbulence strength scattered particles enough sideways motion that
+	# the spray stopped reading as a coherent jet at all. Kept low enough
+	# now to still flicker without visibly dispersing the cone.
+	process.turbulence_enabled = true
+	process.turbulence_noise_strength = 1.0
+	process.turbulence_noise_scale = 2.0
+	process.turbulence_influence_min = 0.04
+	process.turbulence_influence_max = 0.15
 	stream.process_material = process
 	stream.draw_pass_1 = flame
 	stream.emitting = false
@@ -2243,15 +2473,80 @@ const WATER_POWER_MP_PER_SECOND := 3.0
 const FIRE_POWER_MP_PER_SECOND := 4.5
 
 ## Player-arm-stream combat tuning -- a separate, parallel constant set from
-## blorb.gd's own STREAM_RANGE/STREAM_DAMAGE_PER_SECOND (see that file's
-## _update_elemental_stream()) rather than shared ones, since the two code
-## paths aim differently: a blorb's combat stream is locked onto a specific
-## _combat_target, while the player's stream just points wherever the player
-## is facing, so hitting a skeleton needs an actual facing-cone check
-## (STREAM_HALF_ANGLE_COS) that the blorb side has no equivalent of.
+## blorb.gd's own STREAM_RANGE/STREAM_BASE_DAMAGE_PER_SECOND (see that
+## file's _update_elemental_stream()) rather than shared ones, since the two
+## code paths aim differently: a blorb's combat stream is locked onto a
+## specific _combat_target, while the player's stream just points wherever
+## the player is facing, so hitting a skeleton needs an actual facing-cone
+## check (STREAM_HALF_ANGLE_COS) that the blorb side has no equivalent of.
+## Boosted by the worn arm blorb(s)' own Strength via combat_math.gd's
+## rolled_stream_rate(), same as blorb.gd's own stream -- see
+## _damage_skeletons_in_stream().
 const STREAM_DAMAGE_RANGE := 6.0
-const STREAM_DAMAGE_PER_SECOND := 6.0
+const STREAM_BASE_DAMAGE_PER_SECOND := 6.0
 const STREAM_HALF_ANGLE_COS := 0.85  # roughly a 32-degree half-angle cone
+
+
+func _update_limb_power_state(delta: float) -> void:
+	_left_arm_water_active = _consume_limb_power("arm_left", "left_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
+	_right_arm_water_active = _consume_limb_power("arm_right", "right_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
+	_left_arm_fire_active = _consume_limb_power("arm_left", "left_arm_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
+	_right_arm_fire_active = _consume_limb_power("arm_right", "right_arm_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
+	_left_leg_water_active = _consume_limb_power("leg_left", "left_leg_power", "water", WATER_POWER_MP_PER_SECOND, delta)
+	_right_leg_water_active = _consume_limb_power("leg_right", "right_leg_power", "water", WATER_POWER_MP_PER_SECOND, delta)
+	_left_leg_fire_active = _consume_limb_power("leg_left", "left_leg_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
+	_right_leg_fire_active = _consume_limb_power("leg_right", "right_leg_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
+
+	_water_leg_hover_active = _left_leg_water_active and _right_leg_water_active
+	_fire_hand_hover_active = _left_arm_fire_active and _right_arm_fire_active
+	_fire_limb_flight_active = (
+		_fire_hand_hover_active and _left_leg_fire_active and _right_leg_fire_active
+	)
+	_air_foot_hover_active = _blorb_suit.has_air_hover_legs()
+
+	var hovering := _is_powered_hover_active()
+	if hovering and not _was_powered_hover_active:
+		var ground_height: float = terrain.get_mesh_height(global_position.x, global_position.z)
+		_powered_hover_target_y = maxf(
+			global_position.y, ground_height + FOOT_OFFSET + POWERED_HOVER_HEIGHT
+		)
+	_was_powered_hover_active = hovering
+
+
+func _consume_limb_power(
+	slot: String, action: String, element: String, rate: float, delta: float
+) -> bool:
+	if UIState.modal_open or not Input.is_action_pressed(action):
+		return false
+	var blorb := _blorb_suit.worn_blorb_in_slot(slot)
+	if blorb == null or blorb.element_state != element:
+		return false
+	return blorb.consume_mp(rate * delta)
+
+
+func _is_powered_hover_active() -> bool:
+	return _water_leg_hover_active or _fire_hand_hover_active or _air_foot_hover_active
+
+
+func _is_suit_flight_active() -> bool:
+	return _air_flight_active or _fire_limb_flight_active or _air_foot_hover_active
+
+
+func _apply_powered_hover_vertical(delta: float, directional_flight: bool) -> void:
+	if not _is_powered_hover_active():
+		return
+	if directional_flight:
+		# Camera-pitched traversal owns elevation while moving. Holding still
+		# captures the new level on the next frame instead of drifting back to
+		# the activation height.
+		_powered_hover_target_y = global_position.y + velocity.y * delta
+		return
+	var height_error := _powered_hover_target_y - global_position.y
+	var target_velocity := clampf(
+		height_error * POWERED_HOVER_SETTLE_SPEED,
+		-POWERED_HOVER_LIFT_SPEED, POWERED_HOVER_LIFT_SPEED
+	)
+	velocity.y = move_toward(velocity.y, target_velocity, POWERED_HOVER_SETTLE_SPEED * delta)
 
 
 func _update_water_streams(delta: float) -> void:
@@ -2260,27 +2555,43 @@ func _update_water_streams(delta: float) -> void:
 		forward = Vector3.FORWARD
 	else:
 		forward = forward.normalized()
-	var left_water := _consume_arm_power("arm_left", "water", WATER_POWER_MP_PER_SECOND, delta)
-	var right_water := _consume_arm_power("arm_right", "water", WATER_POWER_MP_PER_SECOND, delta)
-	var left_fire := _consume_arm_power("arm_left", "fire", FIRE_POWER_MP_PER_SECOND, delta)
-	var right_fire := _consume_arm_power("arm_right", "fire", FIRE_POWER_MP_PER_SECOND, delta)
+	var downward := Vector3.DOWN
+	var fire_hand_jet_direction := downward
+	if _fire_limb_flight_active:
+		var combined_foot_direction := _foot_jet_direction(_ankle_left) + _foot_jet_direction(_ankle_right)
+		if combined_foot_direction.length_squared() > 0.001:
+			fire_hand_jet_direction = combined_foot_direction.normalized()
+	var left_hand_direction := fire_hand_jet_direction if _fire_hand_hover_active else forward
+	var right_hand_direction := fire_hand_jet_direction if _fire_hand_hover_active else forward
 	_update_water_stream(
 		_water_stream_left, _palm_left, forward,
-		left_water
+		_left_arm_water_active
 	)
 	_update_water_stream(
 		_water_stream_right, _palm_right, forward,
-		right_water
+		_right_arm_water_active
 	)
 	_update_water_stream(
-		_fire_stream_left, _palm_left, forward,
-		left_fire
+		_fire_stream_left, _palm_left, left_hand_direction,
+		_left_arm_fire_active
 	)
 	_update_water_stream(
-		_fire_stream_right, _palm_right, forward,
-		right_fire
+		_fire_stream_right, _palm_right, right_hand_direction,
+		_right_arm_fire_active
 	)
-	if left_water or right_water or left_fire or right_fire:
+	_update_water_stream(_water_leg_stream_left, _toe_left, downward, _left_leg_water_active)
+	_update_water_stream(_water_leg_stream_right, _toe_right, downward, _right_leg_water_active)
+	_update_water_stream(
+		_fire_leg_stream_left, _toe_left, _foot_jet_direction(_ankle_left), _left_leg_fire_active
+	)
+	_update_water_stream(
+		_fire_leg_stream_right, _toe_right, _foot_jet_direction(_ankle_right), _right_leg_fire_active
+	)
+	var forward_stream_active := (
+		_left_arm_water_active or _right_arm_water_active
+		or ((_left_arm_fire_active or _right_arm_fire_active) and not _fire_hand_hover_active)
+	)
+	if forward_stream_active:
 		_damage_skeletons_in_stream(forward, delta)
 
 
@@ -2293,6 +2604,15 @@ func _update_water_streams(delta: float) -> void:
 ## _find_nearest_skeleton()).
 func _damage_skeletons_in_stream(forward: Vector3, delta: float) -> void:
 	var origin := global_position
+	var participants := _active_forward_stream_blorbs()
+	# The stream's own damage doesn't stack per active arm (one flat rate
+	# whether one or two arms are streaming, same as before) -- Strength
+	# scaling picks the strongest contributing arm blorb rather than
+	# averaging it down against a weaker second one.
+	var strength := 0
+	for blorb in participants:
+		strength = maxi(strength, blorb.strength)
+	var damage_rate := CombatMath.rolled_stream_rate(STREAM_BASE_DAMAGE_PER_SECOND, strength)
 	for node in get_tree().get_nodes_in_group("skeletons"):
 		var skeleton := node as Node3D
 		if skeleton == null or not skeleton.has_method("take_damage"):
@@ -2303,17 +2623,43 @@ func _damage_skeletons_in_stream(forward: Vector3, delta: float) -> void:
 			continue
 		if forward.dot(to_skeleton / dist) < STREAM_HALF_ANGLE_COS:
 			continue
-		skeleton.take_damage(STREAM_DAMAGE_PER_SECOND * delta)
+		if skeleton.has_method("register_xp_participant"):
+			for blorb in participants:
+				skeleton.register_xp_participant(blorb)
+		skeleton.take_damage(damage_rate * delta)
 
 
-func _consume_arm_power(slot: String, element: String, rate: float, delta: float) -> bool:
-	var action := "left_arm_power" if slot == "arm_left" else "right_arm_power"
-	if not Input.is_action_pressed(action):
-		return false
-	var blorb := _blorb_suit.worn_blorb_in_slot(slot)
-	if blorb == null or blorb.element_state != element:
-		return false
-	return blorb.consume_mp(rate * delta)
+func _active_forward_stream_blorbs() -> Array[Blorb]:
+	var participants: Array[Blorb] = []
+	var active_slots := {
+		"arm_left": _left_arm_water_active or (_left_arm_fire_active and not _fire_hand_hover_active),
+		"arm_right": _right_arm_water_active or (_right_arm_fire_active and not _fire_hand_hover_active),
+	}
+	for slot in active_slots:
+		if not active_slots[slot]:
+			continue
+		var blorb := _blorb_suit.worn_blorb_in_slot(slot)
+		if blorb != null:
+			participants.append(blorb)
+	return participants
+
+
+func _foot_jet_direction(ankle: Node3D) -> Vector3:
+	if ankle == null:
+		return Vector3.DOWN
+	var out_of_sole := -ankle.global_transform.basis.y
+	return out_of_sole.normalized() if out_of_sole.length_squared() > 0.001 else Vector3.DOWN
+
+
+## Angle/speed of the small organic waver applied to a stream's own AIM
+## below -- distinct from _make_fire_stream()'s per-particle turbulence
+## (which randomizes each particle's own motion once already emitted).
+## Following a flamethrower VFX tutorial's own core technique of also
+## randomizing the EMITTER's own aim (there, noise-modulated keyframes on
+## the held prop's rotation), a real held hose/flamethrower never points
+## perfectly still either.
+const STREAM_AIM_WOBBLE_ANGLE := deg_to_rad(2.5)
+const STREAM_AIM_WOBBLE_SPEED := 3.2
 
 
 func _update_water_stream(stream: GPUParticles3D, hand: Node3D, forward: Vector3, active: bool) -> void:
@@ -2324,7 +2670,17 @@ func _update_water_stream(stream: GPUParticles3D, hand: Node3D, forward: Vector3
 		return
 	var origin := hand.global_position
 	stream.global_position = origin
-	stream.look_at(origin + forward, Vector3.UP)
+	# Looking exactly down with world-up as the secondary axis is singular.
+	# The body's forward supplies a stable roll reference for vertical jets.
+	var up_reference := Vector3.UP
+	if absf(forward.normalized().dot(up_reference)) > 0.98:
+		up_reference = visuals.global_transform.basis.z.normalized()
+	# Phased off the stream's own instance ID so the two hands/feet don't
+	# wobble in an obviously mirrored, synced way.
+	var phase := float(stream.get_instance_id() % 1000) * 0.01
+	var t := Time.get_ticks_msec() * 0.001 * STREAM_AIM_WOBBLE_SPEED + phase
+	var wobble := Basis(Vector3.UP, sin(t) * STREAM_AIM_WOBBLE_ANGLE) * Basis(Vector3.RIGHT, cos(t * 1.3) * STREAM_AIM_WOBBLE_ANGLE)
+	stream.look_at(origin + wobble * forward, up_reference)
 
 
 ## CheatCodes.toggled's handler -- see the _ready() connection above. Only
@@ -2410,7 +2766,7 @@ func _update_head_look(delta: float) -> void:
 	# is a single concept covering both, not just a left/right one. The
 	# snap in the targets here still eases visually since they're
 	# lerp_angle'd below, not applied instantly.
-	var aerial_head_tracking := _lake_diving_active or _air_flight_active
+	var aerial_head_tracking := _lake_diving_active or _is_suit_flight_active()
 	var yaw_limit := AERIAL_HEAD_YAW_LIMIT if aerial_head_tracking else HEAD_YAW_LIMIT
 	var pitch_min := -AERIAL_HEAD_PITCH_LIMIT if aerial_head_tracking else -HEAD_PITCH_UP_LIMIT
 	var pitch_max := AERIAL_HEAD_PITCH_LIMIT if aerial_head_tracking else HEAD_PITCH_DOWN_LIMIT
@@ -2449,17 +2805,18 @@ func _update_head_look(delta: float) -> void:
 			# manufacture a new head target.
 			travel_direction = visuals.global_transform.basis.z
 		var local_travel := visuals.global_transform.basis.inverse() * travel_direction.normalized()
-		target_yaw = clampf(atan2(local_travel.x, local_travel.z), -HEAD_YAW_LIMIT, HEAD_YAW_LIMIT)
+		target_yaw = clampf(atan2(local_travel.x, local_travel.z), -yaw_limit, yaw_limit)
 		target_elevation = clampf(-asin(clampf(local_travel.y, -1.0, 1.0)), pitch_min, pitch_max)
 		# Travel always leads. The camera is merely an optional offset, and it
 		# is fully disabled once the camera is physically in front of the face.
 		# Test against the head's real world-facing axis, not a pitched/rolled
 		# visual-root basis or the camera's own look vector.
 		var camera_from_head := camera.global_position - _head.global_position
-		var camera_in_front := camera_from_head.dot(_head.global_transform.basis.z) > 0.0
-		if _aerial_motion_direction.length_squared() > 0.001 and not camera_in_front:
+		var body_forward := visuals.global_transform.basis.z.normalized()
+		var camera_behind := camera_from_head.normalized().dot(body_forward) < -0.05
+		if _aerial_motion_direction.length_squared() > 0.001 and camera_behind:
 			var yaw_offset := wrapf(relative_yaw - target_yaw, -PI, PI)
-			target_yaw = clampf(target_yaw + clampf(yaw_offset, -yaw_limit, yaw_limit), -HEAD_YAW_LIMIT, HEAD_YAW_LIMIT)
+			target_yaw = clampf(target_yaw + clampf(yaw_offset, -yaw_limit, yaw_limit), -yaw_limit, yaw_limit)
 			var camera_elevation := -asin(clampf(local_camera_forward.y, -1.0, 1.0))
 			target_elevation = clampf(
 				target_elevation + clampf(camera_elevation - target_elevation, -deg_to_rad(45.0), deg_to_rad(45.0)),
@@ -2474,8 +2831,69 @@ func _update_head_look(delta: float) -> void:
 	# the ordinary look-around range that clamp is meant to limit.
 	if _player_following_manchego:
 		target_elevation -= RIDE_SPINE_LEAN * (1.0 - MANCHEGO_HEAD_UPRIGHT_NECK_SHARE)
-	_head.rotation.y = lerp_angle(_head.rotation.y, target_yaw, turn_speed * delta)
-	_head.rotation.x = lerp_angle(_head.rotation.x, target_elevation, turn_speed * delta)
+	_head_look_yaw = lerp_angle(_head_look_yaw, target_yaw, turn_speed * delta)
+	_head_look_pitch = lerp_angle(_head_look_pitch, target_elevation, turn_speed * delta)
+	if aerial_head_tracking:
+		# In flight/swimming the body's local Y axis can be almost horizontal.
+		# A local Euler yaw therefore swivels around the neck shaft, which
+		# reads as a corkscrew/loll rather than a level side-to-side turn.
+		#
+		# Per direct correction: an earlier fix for that composed the gaze
+		# directly as rotations of the rest orientation around the CAMERA
+		# frame's own up/right axes (Basis(camera_up, yaw) * Basis(camera_
+		# right, pitch) * rest_basis). That fixed the loll, but broke the
+		# more fundamental behavior this whole branch exists for -- facing
+		# the HEAD (not its crown) toward the travel direction while
+		# climbing/diving steeply -- because rotating a rest orientation by
+		# a yaw/pitch AMOUNT around external axes doesn't actually aim any
+		# particular local axis of the result at a specific target; for a
+		# large pitch (a steep climb) that can visibly end up aiming the
+		# head's own up/crown axis toward the target instead of its face.
+		#
+		# This instead rebuilds the exact same body-relative gaze direction
+		# _head_look_yaw/_head_look_pitch already describe (the same
+		# spherical-to-Cartesian inverse of the atan2()/asin() used to
+		# derive target_yaw/target_elevation above) as a WORLD vector, then
+		# uses Basis.looking_at() to build the head's orientation directly
+		# from it. looking_at() defines its own forward axis as EXACTLY the
+		# target direction by construction, so the face -- never the crown
+		# -- points there regardless of how steep the angle is, while
+		# re-deriving "up" from the camera's own stable up each frame (not
+		# the pitched body's) is what actually removes the corkscrew/loll,
+		# since the camera's up never itself rotates out of level.
+		var local_gaze := Vector3(
+			cos(_head_look_pitch) * sin(_head_look_yaw),
+			-sin(_head_look_pitch),
+			cos(_head_look_pitch) * cos(_head_look_yaw)
+		)
+		var world_gaze := (visuals.global_transform.basis * local_gaze).normalized()
+		var camera_up := camera.global_transform.basis.y.normalized()
+		# Looking nearly straight up/down the camera's own up axis is
+		# singular for looking_at() (same issue _update_water_stream()
+		# already guards against elsewhere in this file, for the same
+		# reason) -- the body's own forward is a stable fallback reference
+		# in that case.
+		if absf(world_gaze.dot(camera_up)) > 0.98:
+			camera_up = visuals.global_transform.basis.z.normalized()
+		var head_transform := _head.global_transform
+		# looking_at()'s own -Z-is-forward convention negated to match this
+		# rig's own +Z-forward one (see this file's various "forward = +Z"
+		# notes elsewhere).
+		head_transform.basis = Basis.looking_at(-world_gaze, camera_up)
+		_head.global_transform = head_transform
+	else:
+		_head.rotation.y = _head_look_yaw
+		_head.rotation.x = _head_look_pitch
+		# The aerial branch above writes _head's full basis directly (see
+		# its own comment -- derived from the CAMERA's own up vector, not
+		# the body's), which can leave a real Z roll baked in whenever the
+		# camera wasn't exactly level with the body -- practically always,
+		# mid-flight. This branch only ever set X/Y, so that roll had
+		# nothing to ever clear it once grounded, leaving the head visibly
+		# tilted indefinitely after landing/dismounting. Per direct report
+		# -- eased back to level here rather than snapped, matching every
+		# other head-look transition's own lerp_angle smoothing.
+		_head.rotation.z = lerp_angle(_head.rotation.z, 0.0, turn_speed * delta)
 
 
 func _clamp_camera_above_ground() -> void:
@@ -2512,11 +2930,16 @@ func _animate_walk(delta: float, grounded: bool, traversal_speed_multiplier: flo
 	if _lake_buoyancy_active:
 		_animate_swimming(delta)
 		return
-	if _air_flight_active:
+	if _air_flight_active or _fire_limb_flight_active or _water_leg_hover_active or _fire_hand_hover_active:
 		# Flight shares the relaxed floating silhouette but intentionally does
-		# not inherit water's flipper-kick layer.
+		# not inherit water's flipper-kick layer. Water jets and hand-fire hover
+		# also stay out of the walk cycle; their thrust carries the body.
 		_animate_relaxed_floating(delta)
 		return
+	# Paired Air feet are deliberately different: they suspend the collision
+	# body but traversal retains the ordinary walk/run cycle.
+	if _air_foot_hover_active:
+		grounded = true
 	# Landing takes priority over everything else for a brief window --
 	# even if the character starts walking again immediately, the impact
 	# crouch still plays out first (LANDING_DURATION is short enough that
@@ -2931,7 +3354,27 @@ func _apply_airborne_pose(delta: float, apex_fraction: float) -> void:
 ## water while the torso and legs trail naturally behind it. It is deliberately
 ## named for aerial movement so flying can reuse this exact mechanic later.
 func _update_aerial_body_anchor(delta: float) -> void:
-	if _lake_buoyancy_active or _air_flight_active:
+	# Air-foot hover travels in the camera's full 3D direction but retains a
+	# normal upright walk/run silhouette. Turn its planar facing toward travel
+	# without applying the pitched, trailing-body flight anchor below.
+	if _air_foot_hover_active and not _air_flight_active and not _fire_limb_flight_active and not _lake_buoyancy_active:
+		if _aerial_motion_direction.length_squared() > 0.001:
+			var planar_direction := _aerial_motion_direction
+			planar_direction.y = 0.0
+			if planar_direction.length_squared() > 0.001:
+				var target_yaw := atan2(planar_direction.x, planar_direction.z)
+				var target_basis := Basis(Vector3.UP, target_yaw)
+				var body_transform := visuals.global_transform
+				var t := minf(rotation_speed * delta, 1.0)
+				body_transform.basis = Basis(
+					body_transform.basis.get_rotation_quaternion().slerp(
+						target_basis.get_rotation_quaternion(), t
+					)
+				)
+				visuals.global_transform = body_transform
+		visuals.position = visuals.position.lerp(Vector3(0.0, -FOOT_OFFSET, 0.0), minf(AERIAL_BODY_LEAN_SPEED * delta, 1.0))
+		_aerial_rest_heading_initialized = false
+	elif _lake_buoyancy_active or _air_flight_active or _fire_limb_flight_active:
 		var skull_anchor := _head.global_position
 		if _aerial_motion_direction.length_squared() > 0.001:
 			_aerial_was_moving = true
@@ -2942,7 +3385,7 @@ func _update_aerial_body_anchor(delta: float) -> void:
 			# At the surface, movement is deliberately yaw-only, so use the
 			# camera rig's level basis. Diving and flight retain the camera's
 			# full pitch for true 3D travel.
-			var travel_camera_basis := camera.global_transform.basis if (_lake_diving_active or _air_flight_active) else camera_rig.global_transform.basis
+			var travel_camera_basis := camera.global_transform.basis if (_lake_diving_active or _air_flight_active or _fire_limb_flight_active) else camera_rig.global_transform.basis
 			var camera_body_basis := travel_camera_basis * Basis(Vector3.UP, PI)
 			# The left stick still chooses the travel-facing direction IN camera
 			# space: forward=0, right=+90, back=180, left=-90. Previously the
@@ -2989,15 +3432,24 @@ func _update_aerial_body_anchor(delta: float) -> void:
 		_aerial_rest_heading_initialized = false
 		# Leaving water is a hard transition back to gravity: do not retain the
 		# deliberately slow buoyant unwind once the body has emerged. Wing-suit
-		# removal in midair retains its own short physical recovery instead.
+		# removal in midair retains its own short physical recovery instead. That
+		# recovery must slerp toward an explicitly upright WORLD basis; clearing
+		# local Euler X/Z independently can make a steep flight basis decompose to
+		# the opposite Y solution and turn the character around toward the camera.
 		if _air_flight_exit_recovery <= 0.0:
 			visuals.rotation.x = 0.0
 			visuals.rotation.z = 0.0
 			visuals.position = Vector3(0.0, -FOOT_OFFSET, 0.0)
 		else:
 			var t := minf(AERIAL_BODY_LEAN_SPEED * delta, 1.0)
-			visuals.rotation.x = lerp_angle(visuals.rotation.x, 0.0, t)
-			visuals.rotation.z = lerp_angle(visuals.rotation.z, 0.0, t)
+			var upright_basis := Basis(Vector3.UP, _air_flight_exit_yaw)
+			var body_transform := visuals.global_transform
+			body_transform.basis = Basis(
+				body_transform.basis.get_rotation_quaternion().slerp(
+					upright_basis.get_rotation_quaternion(), t
+				)
+			)
+			visuals.global_transform = body_transform
 			visuals.position = visuals.position.lerp(Vector3(0.0, -FOOT_OFFSET, 0.0), t)
 			_air_flight_exit_recovery = maxf(_air_flight_exit_recovery - delta, 0.0)
 
@@ -3134,9 +3586,25 @@ func _update_air_flight() -> void:
 		if not _was_air_flight_active and not _lake_diving_active:
 			var ground_height: float = terrain.get_mesh_height(global_position.x, global_position.z)
 			global_position.y = maxf(global_position.y, ground_height + FOOT_OFFSET + AIR_FLIGHT_HOVER_HEIGHT)
-	if _was_air_flight_active and not _air_flight_active:
-		_air_flight_exit_recovery = AIR_FLIGHT_EXIT_RECOVERY_DURATION
 	_was_air_flight_active = _air_flight_active
+
+
+func _update_suit_flight_transition() -> void:
+	var suit_flight := _is_suit_flight_active()
+	if _was_suit_flight_active and not suit_flight:
+		# Capture the rendered body's real world-space forward vector BEFORE the
+		# aerial anchor is released. Do not use visuals.rotation.y here: flight
+		# permits near-vertical pitch and roll, for which the equivalent Euler
+		# representation can be 180 degrees away from the visible heading.
+		var planar_forward := visuals.global_transform.basis.z
+		planar_forward.y = 0.0
+		_air_flight_exit_yaw = (
+			atan2(planar_forward.x, planar_forward.z)
+			if planar_forward.length_squared() > 0.001
+			else _aerial_target_yaw
+		)
+		_air_flight_exit_recovery = AIR_FLIGHT_EXIT_RECOVERY_DURATION
+	_was_suit_flight_active = suit_flight
 
 
 ## Finds the sole Size blorb and moves the player through its true
@@ -3404,6 +3872,28 @@ func _snap_to_terrain(delta: float) -> void:
 	if absf(rise) / run > GROUND_SNAP_MAX_SLOPE:
 		return
 	global_position.y = target_h + FOOT_OFFSET
+	velocity.y = 0.0
+
+
+## Same active re-anchoring _snap_to_terrain() does against the analytic
+## ground height, but against a cloud's own real support height at the
+## player's current (post-move) XZ instead -- called only while already
+## grounded on a cloud this frame (see on_cloud's own comment on why a
+## multi-puff cloud top needs this: its walkable height can shift from step
+## to step near a puff's edge or hand-off, more than a loose proximity
+## tolerance alone can track). Returns (falls through to ordinary gravity)
+## rather than snapping if there's no cloud directly underneath any more --
+## that's a real edge, not a bug to paper over.
+func _snap_to_cloud(delta: float) -> void:
+	var stand_height: Variant = _cloud_stand_height_at(global_position.x, global_position.z, global_position.y - FOOT_OFFSET + 0.6)
+	if stand_height == null:
+		return
+	var target_h := (stand_height as float) - FOOT_OFFSET
+	var rise := target_h - (global_position.y - FOOT_OFFSET)
+	var run := maxf(Vector2(velocity.x, velocity.z).length() * delta, 0.001)
+	if absf(rise) / run > GROUND_SNAP_MAX_SLOPE:
+		return
+	global_position.y = stand_height as float
 	velocity.y = 0.0
 
 

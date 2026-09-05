@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/kingdom_bootstrap.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
@@ -10,6 +10,8 @@
 [ext_resource type="Script" path="res://scripts/day_night_cycle.gd" id="8"]
 [ext_resource type="Script" path="res://scripts/cloud_scatter.gd" id="9"]
 [ext_resource type="Script" path="res://scripts/jungle_kingdom_blorbs.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/primate_kingdom_gorilla.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/jungle_kingdom_ape_skeleton_spawner.gd" id="12"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.35, 0.55, 0.65, 1)
@@ -59,6 +61,12 @@ script = ExtResource("7")
 
 [node name="JungleKingdomBlorbs" type="Node3D" parent="."]
 script = ExtResource("10")
+
+[node name="GiantGorilla" type="Node3D" parent="."]
+script = ExtResource("11")
+
+[node name="ApeSkeletonSpawner" type="Node3D" parent="."]
+script = ExtResource("12")
 
 [node name="Clouds" type="Node3D" parent="."]
 script = ExtResource("9")

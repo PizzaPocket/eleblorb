@@ -228,6 +228,16 @@ const TAIL_RADIUS := 0.007
 ## still linearly interpolated both in position and radius between its
 ## neighbors, so too few would facet the dome into visible flats).
 const TAIL_DOME_STEPS := 4
+## Optional tip marking (see _build_tail()'s own `tip_marking_color` param,
+## added for Yogi -- docs/world_bible.md's own Creatures/Cats entry): how
+## many alternating marking/fur colinear sub-segments the final real tail
+## segment gets divided into, purely for coloring (same "insert a colinear
+## point, which doesn't bend a Catmull-Rom curve" trick _rebuild_leg_tube()
+## already uses in horse_figure.gd for its own sock cut). Odd count so the
+## pattern starts AND ends on a marking band -- the last one flows straight
+## into the fully-marking-colored dome cap appended after it, reading as "a
+## few rings... with that color as the cap of the tail."
+const TAIL_TIP_RING_BANDS := 5
 
 ## Idle tail life: droop/perk/sway is a rigid bend applied on top of the
 ## rest-pose points above, weighted by TAIL_BEND_EXPONENT so the base (the
@@ -557,9 +567,16 @@ static func _build_arm(
 ## idle-animation state, all handed back for the caller to fold into the
 ## pivots dict under the "_tail_*" internal keys -- see _rebuild_tail() for
 ## the per-frame bend that reads these back out and animates them.
+## tip_marking_color (default null == no markings, every existing caller's
+## behavior unchanged) paints the tail's own tip with a marking color
+## instead of the plain fur_color used everywhere else on it -- a few rings
+## near the end, then a solid cap right at the tip -- see TAIL_TIP_RING_
+## BANDS's own comment for the banding scheme and _rebuild_tail()'s own for
+## where it's actually built each frame.
 static func _build_tail(
 	spine_pivot: Node3D, fur_color: Color, length_scale: float = 1.0,
-	body_height: float = BODY_HEIGHT, body_radius: float = BODY_RADIUS, radius_scale: float = 1.0
+	body_height: float = BODY_HEIGHT, body_radius: float = BODY_RADIUS, radius_scale: float = 1.0,
+	tip_marking_color: Variant = null
 ) -> Dictionary:
 	# Every point scaled outward from the first (the base embedded in the
 	# body, which stays put) so length_scale stretches/shrinks the tail's
@@ -596,7 +613,15 @@ static func _build_tail(
 	# now moves points off x=0 too, but TAIL_SWAY_YAW_RANGE stays small
 	# enough that this fixed-axis flatten still reads as intended.
 	mesh_instance.scale.x = TAIL_FLATTEN_X
-	_apply_fur_material(mesh_instance, fur_color)
+	# A plain fur material sets albedo_color directly and ignores vertex
+	# colors entirely -- see horse_figure.gd's own _build_leg_fur_material()
+	# comment for the full reasoning this mirrors. Only swapped for the
+	# vertex-color-aware variant when a marking is actually requested, so
+	# every existing (unmarked) tail renders exactly as before.
+	if tip_marking_color != null:
+		mesh_instance.material_override = _build_marked_fur_material()
+	else:
+		_apply_fur_material(mesh_instance, fur_color)
 	spine_pivot.add_child(mesh_instance)
 
 	var state := {
@@ -604,6 +629,8 @@ static func _build_tail(
 		"base_points": base_points,
 		"radii": radii,
 		"radius_scale": radius_scale,
+		"fur_color": fur_color,
+		"tip_marking_color": tip_marking_color,
 		"pitch_current": 0.0, "pitch_target": 0.0, "pitch_timer": 0.0,
 		"yaw_current": 0.0, "yaw_target": 0.0, "yaw_timer": 0.0,
 	}
@@ -647,6 +674,35 @@ static func _rebuild_tail(state: Dictionary, delta: float) -> void:
 		points.append(anchor + rot * (base_points[i] - anchor))
 	var radii: Array[float] = (state["radii"] as Array[float]).duplicate()
 
+	var tip_marking_color: Variant = state.get("tip_marking_color")
+	var colors: Array[Color] = []
+	if tip_marking_color != null:
+		var fur_color: Color = state["fur_color"]
+		colors.resize(points.size())
+		colors.fill(fur_color)
+		# See TAIL_TIP_RING_BANDS's own comment for the banding scheme.
+		# Subdivides the tail's final real segment (seg_start->tip) into
+		# TAIL_TIP_RING_BANDS colinear sub-segments purely as coloring
+		# boundaries -- inserting a point that lies exactly on the existing
+		# line between two control points doesn't bend the Catmull-Rom curve
+		# through them at all, so this only affects color, never shape.
+		var seg_start := points[points.size() - 2]
+		var seg_end := points[points.size() - 1]
+		var radius_start := radii[radii.size() - 2]
+		var radius_end := radii[radii.size() - 1]
+		# seg_start's own color becomes the first band -- set directly since
+		# that point already exists (no insert needed for band 0).
+		colors[colors.size() - 2] = tip_marking_color
+		var insert_at := points.size() - 1
+		for step in range(1, TAIL_TIP_RING_BANDS):
+			var t := float(step) / float(TAIL_TIP_RING_BANDS)
+			points.insert(insert_at, seg_start.lerp(seg_end, t))
+			radii.insert(insert_at, lerpf(radius_start, radius_end, t))
+			# Alternates fur/marking per band; TAIL_TIP_RING_BANDS is odd so
+			# this naturally ends on a marking band right at the tip.
+			colors.insert(insert_at, fur_color if step % 2 == 1 else tip_marking_color)
+			insert_at += 1
+
 	# The rounded tip is a few extra points appended to this SAME point/
 	# radius list, continuing past the real (now-bent) tail geometry along
 	# its own last heading, so build_limb_tube lofts the cap as part of one
@@ -670,11 +726,21 @@ static func _rebuild_tail(state: Dictionary, delta: float) -> void:
 		var theta := (float(step) / TAIL_DOME_STEPS) * (PI * 0.5)
 		points.append(tip + tail_heading * (dome_radius * sin(theta)))
 		radii.append(dome_radius * cos(theta))
+		# The dome cap itself is the solid "cap of the tail" -- entirely
+		# marking-colored, continuing on from the last (marking) ring band
+		# built above with no fur gap in between.
+		if tip_marking_color != null:
+			colors.append(tip_marking_color)
 
 	var mesh_instance := state["mesh"] as MeshInstance3D
-	mesh_instance.mesh = BlorbSuit.build_limb_tube(
-		points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, TAIL_CAP_FRACTION
-	)
+	if tip_marking_color != null:
+		mesh_instance.mesh = BlorbSuit.build_limb_tube(
+			points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, TAIL_CAP_FRACTION, colors
+		)
+	else:
+		mesh_instance.mesh = BlorbSuit.build_limb_tube(
+			points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, TAIL_CAP_FRACTION
+		)
 
 
 ## Eyes bigger and rounder than figure_eyes.gd's own subtle marks, and
@@ -1171,6 +1237,21 @@ static func _build_fur_material(fur_color: Color) -> StandardMaterial3D:
 
 static func _build_marking_material(marking_color: Color = MARKING_COLOR) -> StandardMaterial3D:
 	return _build_fur_material(marking_color)
+
+
+## Per-vertex-colored variant -- see horse_figure.gd's own
+## _build_leg_fur_material() for the full reasoning this mirrors exactly:
+## albedo_color left WHITE with vertex_color_use_as_albedo on so the
+## rendered color comes from each vertex's own baked color, and
+## vertex_color_is_srgb on so that baked color matches a plain _build_
+## fur_material() albedo_color using the same raw numbers (Godot otherwise
+## reads a mesh's own vertex COLOR array as already-linear, rendering it
+## visibly darker/duller than an albedo_color built from identical values).
+static func _build_marked_fur_material() -> StandardMaterial3D:
+	var material := _build_fur_material(Color.WHITE)
+	material.vertex_color_use_as_albedo = true
+	material.vertex_color_is_srgb = true
+	return material
 
 
 static func _build_sole_material() -> StandardMaterial3D:

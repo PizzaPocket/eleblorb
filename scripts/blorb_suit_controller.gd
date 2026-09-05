@@ -165,6 +165,17 @@ func assignment_snapshot() -> Dictionary:
 	return _assignments.duplicate()
 
 
+## Rebinds a portal-carried slot map to the newly instantiated Blorb nodes in
+## the destination world. Party owns serialization; this controller validates
+## and consumes the live references.
+func restore_assignments(assignments: Dictionary) -> void:
+	_assignments.clear()
+	for slot in assignments:
+		var blorb := assignments[slot] as Blorb
+		if slot in BlorbSuit.SLOT_ORDER and is_instance_valid(blorb) and blorb.in_party:
+			_assignments[slot] = blorb
+
+
 ## Applies paper-doll edits to an already-worn suit without disturbing any
 ## blorb whose live slot still matches its assignment. Inventory calls this
 ## as it closes; if an older hop is still resolving, update() safely defers
@@ -199,6 +210,19 @@ func has_blorb_skates() -> bool:
 ## spread the player's weight across the lake surface.
 func has_water_walking_legs() -> bool:
 	return has_worn_element("leg_left", "water") and has_worn_element("leg_right", "water")
+
+
+## Lava traversal requires a complete, visibly landed fire pair. Assignment
+## alone is not protection, and losing either leg removes it immediately.
+func has_lava_safe_legs() -> bool:
+	return has_worn_element("leg_left", "fire") and has_worn_element("leg_right", "fire")
+
+
+## A complete pair of visibly worn Air feet provides passive hover. Unlike
+## Water/Fire leg powers, this does not consume either leg's active control;
+## those buttons are deliberately inert for Air feet for now.
+func has_air_hover_legs() -> bool:
+	return has_worn_element("leg_left", "air") and has_worn_element("leg_right", "air")
 
 
 ## A head blorb is a real, landed suit piece, not merely an assignment in

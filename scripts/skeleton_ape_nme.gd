@@ -1,56 +1,78 @@
 extends StaticBody3D
 
-## The first "NME" (enemy) type -- a minion manifesting from the Demon
-## King's mirror world (see docs/world_bible.md's Aggros section), rising
-## out of the ground in the open wasteland and attacking the player and
-## any free-roaming party blorbs with punches. Blorbs are what actually
-## fight it off (see blorb.gd's State.COMBAT) -- this script never damages
-## a blorb/player back except through its own punch.
+## A second "NME" (enemy) type -- a skeletal primate manifesting from the
+## Demon King's mirror world (see docs/world_bible.md's Aggros section), the
+## Primate Kingdom's own counterpart to the outskirts' human skeleton_nme.gd.
+## Same rise-from-the-ground/chase/punch state machine and XP-participant
+## contract as that file (see its own class doc comment for the full
+## rationale), built on ApeTemplate's shared rig instead of ProceduralFigure's
+## human one -- per direct instruction: "skeleton versions of the primates,
+## based on their rig... colored like the human skeletons, and with no ears,
+## and the thorax... replaced by spinal column in the same way."
 ##
-## Reuses ProceduralFigure.build()'s shared rig (skeleton_mode=true, see
-## that file) and npc.gd's walk-cycle animation approach, swapping npc.gd's
-## wander target for a live chase target.
+## Scoped to the ape variant only (variant "has_tail" = false) -- the same
+## ApeTemplate rig also builds the tailed "primate template" monkey variant,
+## but a skeletal tail isn't part of this request and would need its own
+## bespoke bone-chain treatment (MonkeyFigure._build_tail()'s tail is a
+## single soft-tissue mesh, not a chain of vertebrae) rather than reusing
+## anything already built here.
+##
+## Deliberately a separate script/scene from skeleton_nme.gd rather than one
+## script branching on rig type: the two rigs' pivot dictionaries mostly
+## share key names (see ape_template.gd's own doc comment on its returned
+## dict), but the ape rig's permanent crouch/lean rest pose means its walk
+## cycle has to animate RELATIVE to each pivot's own rest rotation (same
+## technique ape_template_preview.gd's own _animate_walk() already uses),
+## unlike skeleton_nme.gd's simpler zero-based swing -- different enough
+## animation math that sharing one script would need its own rig-type
+## branches throughout anyway.
+##
+## Per direct instruction ("relatively stronger... and should give more XP"):
+## every combat number below is a deliberate step up from skeleton_nme.gd's
+## own (MAX_HP 40->70, ATTACK_BASE_DAMAGE 6->10, xp_reward 24->40) --
+## first-pass multipliers (~1.7x), adjustable on report like every other
+## fresh balance number in this project.
+##
+## Added to BOTH "skeletons" (so blorb.gd's own melee-aggro scan/melt-
+## cleanup and player.gd's own elemental-stream damage treat this exactly
+## like the human skeleton, matching it purely by group membership and
+## take_damage()/register_xp_participant() method contract, not node type --
+## no changes needed to any of that shared combat code) and "ape_skeletons"
+## (a separate group so jungle_kingdom_ape_skeleton_spawner.gd's own
+## population cap counts only its own spawns, not the unrelated -- and, in
+## practice, never simultaneously loaded anyway -- outskirts skeleton count).
 
 const BONE_COLOR := Color(0.92, 0.90, 0.84)
 
-@export var body_scale: float = 1.0
-## Per-NME tuning point for the progression system. Future, harder NME
-## scenes raise this value without changing the shared participation logic.
-@export var xp_reward: int = 24
+@export var body_scale: float = 1.4
+## Per-NME tuning point for the progression system, same convention as
+## skeleton_nme.gd's own xp_reward -- higher here since this NME is meant to
+## read as a tougher encounter.
+@export var xp_reward: int = 40
 
-const MAX_HP := 40.0
-const MOVE_SPEED := 2.1
+const MAX_HP := 70.0
+const MOVE_SPEED := 2.3
 const ROTATION_SPEED := 5.0
 const WALK_SWING_SPEED := 6.0
 const WALK_SWING_AMOUNT := 0.55
-const ATTACK_RANGE := 1.6
-const ATTACK_COOLDOWN := 1.4
+const ATTACK_RANGE := 1.9
+const ATTACK_COOLDOWN := 1.3
 ## Base damage before combat_math.gd's own variance/crit roll -- see
-## _process_attacking(). Renamed from ATTACK_DAMAGE now that it's a base
-## rather than the literal dealt amount. Skeletons have no Strength stat, so
-## unlike a blorb's own attacks this rolls with strength=0 -- flat damage,
+## _process_attacking(). Like skeleton_nme.gd's own ATTACK_BASE_DAMAGE, this
+## NME has no Strength stat, so it rolls with strength=0 -- flat damage,
 ## just randomized and occasionally critical.
-const ATTACK_BASE_DAMAGE := 6.0
-## How long the punch pose holds before returning to the chase -- long enough
-## to read as a deliberate swing rather than an instant snap.
+const ATTACK_BASE_DAMAGE := 10.0
 const ATTACK_POSE_DURATION := 0.5
 const RISE_DURATION := 1.0
 const SINK_DURATION := 0.8
-## How far below its own rest height this figure starts (RISING) / ends up
-## (SINKING) -- tall enough that the whole body is hidden underground.
 const BURIAL_DEPTH := 2.2
-## How far this skeleton will look for the player/a party blorb to chase.
-## Generous -- once risen, a skeleton commits to the encounter that spawned
-## it rather than needing the target to stay within a tight leash.
-const DETECTION_RADIUS := 30.0
+const DETECTION_RADIUS := 34.0
 
 enum State { RISING, HUNTING, ATTACKING, SINKING }
 
 var terrain_ref: Node = null
-## For combat_math.gd's own damage-variance/crit rolls -- this project's
-## established convention (see blorb.gd's own _rng) over the global
-## randf()/randi(), so this NME's rolls don't share/consume state with any
-## unrelated system's own random draws.
+## For combat_math.gd's own damage-variance/crit rolls -- see
+## skeleton_nme.gd's own identically-purposed _rng.
 var _rng := RandomNumberGenerator.new()
 
 
@@ -84,10 +106,20 @@ var _elbow_left: Node3D
 var _elbow_right: Node3D
 var _spine: Node3D
 var _hips: Node3D
+## The ape rig's own permanent crouch/lean rest rotations (see ape_template.
+## gd's own class doc comment) -- captured once right after the rig is
+## built, then animated AROUND rather than replaced, the same technique
+## ape_template_preview.gd's own _animate_walk() already uses for this rig.
+## Zero for the human rig (skeleton_nme.gd has no equivalent of these), but
+## real, nonzero angles here.
+var _leg_rest_x := 0.0
+var _knee_rest_x := 0.0
+var _arm_rest_x := 0.0
 
 
 func _ready() -> void:
 	add_to_group("skeletons")
+	add_to_group("ape_skeletons")
 	_rng.randomize()
 	if terrain_ref == null:
 		terrain_ref = get_node("../../Terrain")
@@ -97,13 +129,15 @@ func _ready() -> void:
 
 
 func _build_figure() -> void:
-	var pivots := ProceduralFigure.build(
-		visuals, BONE_COLOR, BONE_COLOR, BONE_COLOR, ProceduralFigure.SLEEVE_STYLE_NONE,
-		body_scale, 0.55, 0.55, 1.0,
-		Color(0.0, 0.0, 0.0, 0.0),  # chest_emblem_color -- none
-		BONE_COLOR, FigureHair.STYLE_BUZZCUT, 0.0, BONE_COLOR,
-		true  # skeleton_mode
-	)
+	var variant := {
+		"has_tail": false,
+		"skeleton_mode": true,
+		# Uniform bone coloring -- marking_color would otherwise tint the
+		# muzzle/hand/foot "skin" and (were it not skipped) the ear pads a
+		# separate color from the rest of the body.
+		"marking_color": BONE_COLOR,
+	}
+	var pivots := ApeTemplate.build(visuals, BONE_COLOR, body_scale, variant)
 	_leg_left = pivots["leg_left"]
 	_leg_right = pivots["leg_right"]
 	_arm_left = pivots["arm_left"]
@@ -114,6 +148,9 @@ func _build_figure() -> void:
 	_elbow_right = pivots["elbow_right"]
 	_spine = pivots["spine"]
 	_hips = pivots["hips"]
+	_leg_rest_x = _leg_left.rotation.x
+	_knee_rest_x = _knee_left.rotation.x
+	_arm_rest_x = _arm_left.rotation.x
 
 
 func is_defeated() -> bool:
@@ -136,9 +173,6 @@ func register_xp_participant(blorb: Blorb) -> void:
 	_xp_participants[blorb.get_instance_id()] = blorb
 
 
-## Melting invalidates the whole encounter contribution, even if the Blorb
-## reforms before this NME is eventually defeated. A fresh post-reform hit
-## can register it again as a new contribution.
 func unregister_xp_participant(blorb: Blorb) -> void:
 	if blorb == null:
 		return
@@ -153,9 +187,6 @@ func _award_defeat_xp() -> void:
 			participants.append(blorb)
 	if participants.is_empty() or xp_reward <= 0:
 		return
-	# Divide the NME's pool among everyone who contributed. Any indivisible
-	# remainder is distributed deterministically, and a very small reward
-	# still grants every participant at least one XP for their contribution.
 	participants.sort_custom(func(a: Blorb, b: Blorb): return a.get_instance_id() < b.get_instance_id())
 	var base_share := maxi(1, floori(float(xp_reward) / float(participants.size())))
 	var remainder := maxi(0, xp_reward - base_share * participants.size())
@@ -167,6 +198,7 @@ func _start_sinking() -> void:
 	_state = State.SINKING
 	_sink_elapsed = 0.0
 	remove_from_group("skeletons")
+	remove_from_group("ape_skeletons")
 
 
 func _process(delta: float) -> void:
@@ -197,12 +229,6 @@ func _process_sinking(delta: float) -> void:
 		queue_free()
 
 
-## Nearest of the player or an eligible free-roaming party blorb (in_party,
-## not worn in the blorb suit, not already melted -- see blorb.gd's own
-## is_worn/is_melted) within DETECTION_RADIUS. Re-scanned continuously
-## rather than cached, matching this codebase's existing convention of
-## proximity checks over event callbacks (see blorb.gd's own
-## _find_nearest_skeleton()).
 func _find_target() -> Node3D:
 	var here := Vector2(global_position.x, global_position.z)
 	var best: Node3D = null
@@ -234,13 +260,10 @@ func _process_hunting(delta: float) -> void:
 	var target_here := Vector2(_target.global_position.x, _target.global_position.z)
 	var to_target := target_here - here
 
-	# True 3D distance, not just horizontal -- per direct correction, a
-	# skeleton standing on the ground shouldn't be able to start (or land)
-	# an attack on a target floating far above or below it just because
-	# their ground positions happen to line up. Movement/facing below still
-	# use the horizontal-only `to_target` -- this is a ground-bound
-	# creature steering across the ground plane, only the attack gate needs
-	# the real 3D check.
+	# True 3D distance, not just horizontal -- see skeleton_nme.gd's own
+	# identical comment. Movement/facing below still use the horizontal-only
+	# `to_target` -- this is a ground-bound creature steering across the
+	# ground plane, only the attack gate needs the real 3D check.
 	if global_position.distance_to(_target.global_position) <= ATTACK_RANGE:
 		_state = State.ATTACKING
 		_attack_pose_elapsed = 0.0
@@ -256,22 +279,22 @@ func _process_hunting(delta: float) -> void:
 	var target_angle := atan2(dir.x, dir.y)
 	visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, ROTATION_SPEED * delta)
 
+	# Animated relative to each pivot's own permanent rest rotation (see
+	# _leg_rest_x's own comment) -- an absolute zero-based swing, like
+	# skeleton_nme.gd's human rig uses, would erase this rig's own crouch.
 	_walk_phase += delta * WALK_SWING_SPEED
 	var swing := sin(_walk_phase) * WALK_SWING_AMOUNT
-	_leg_left.rotation.x = swing
-	_leg_right.rotation.x = -swing
-	_arm_left.rotation.x = -swing
-	_arm_right.rotation.x = swing
-	_knee_left.rotation.x = maxf(0.0, cos(_walk_phase + PI)) * ProceduralFigure.KNEE_BEND_AMOUNT
-	_knee_right.rotation.x = maxf(0.0, cos(_walk_phase)) * ProceduralFigure.KNEE_BEND_AMOUNT
+	_leg_left.rotation.x = _leg_rest_x + swing
+	_leg_right.rotation.x = _leg_rest_x - swing
+	_arm_left.rotation.x = _arm_rest_x - swing
+	_arm_right.rotation.x = _arm_rest_x + swing
+	_knee_left.rotation.x = _knee_rest_x + maxf(0.0, cos(_walk_phase + PI)) * ProceduralFigure.KNEE_BEND_AMOUNT
+	_knee_right.rotation.x = _knee_rest_x + maxf(0.0, cos(_walk_phase)) * ProceduralFigure.KNEE_BEND_AMOUNT
 
 	if _attack_cooldown > 0.0:
 		_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
 
 
-## True once a previously-picked target has left the party/melted/been worn
-## mid-chase -- re-picking immediately rather than continuing to chase a
-## target that's no longer a valid combatant.
 func _target_invalid() -> bool:
 	if _target is Blorb:
 		var blorb := _target as Blorb
@@ -298,17 +321,17 @@ func _process_attacking(delta: float) -> void:
 
 	if _attack_cooldown > 0.0:
 		_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
-		# Ease the swinging arm back to rest between punches.
-		_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, 0.0, 6.0 * delta)
+		# Ease back toward REST, not zero (see _leg_rest_x's own comment) --
+		# skeleton_nme.gd's human rig eases to 0.0 here since its own arm
+		# rest already is 0.0, so this reads identically there and only
+		# actually differs on this rig.
+		_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, _arm_rest_x, 6.0 * delta)
 		_elbow_right.rotation.x = lerp_angle(_elbow_right.rotation.x, 0.0, 6.0 * delta)
 		return
 
 	_attack_pose_elapsed += delta
 	var t := clampf(_attack_pose_elapsed / ATTACK_POSE_DURATION, 0.0, 1.0)
-	# A quick forward arm swing -- positive rotation.x on this rig's arm
-	# pivot is backward (see procedural_figure.gd's own note on that sign),
-	# so the punch itself is negative.
-	_arm_right.rotation.x = -sin(t * PI) * 2.0
+	_arm_right.rotation.x = _arm_rest_x - sin(t * PI) * 2.0
 	_elbow_right.rotation.x = -sin(t * PI) * 1.0
 	if t >= 1.0:
 		if _target.has_method("take_damage"):

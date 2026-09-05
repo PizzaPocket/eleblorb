@@ -2,10 +2,12 @@ class_name Manchego
 extends StaticBody3D
 
 ## Manchego, the Primate Kingdom's horse mount (see docs/world_bible.md's
-## own Mounts section) -- currently spawned as a DEBUG placement near the
-## player at boot (see main.gd's own DEBUG_SPAWN_MANCHEGO_NEAR_PLAYER) so
-## his shape/coloring/joints can be reviewed before the real Primate
-## Kingdom curse-quest reward that will actually grant him exists.
+## own Mounts section) -- spawned in the Primate Kingdom's own village (see
+## jungle_kingdom_village.gd's own _build_manchego_and_quest_ape()), idling
+## in place (follows_player starts false) and ridden by a quest-giving ape
+## until the placeholder "special banana" quest hands him over to the player
+## (follows_player/available_to_player both flip true; see those vars' own
+## doc comments).
 ##
 ## Built as a standalone StaticBody3D mirroring blorb.gd's/xiao_hou_zi.gd's
 ## own architecture (manual XZ position updates every frame, no
@@ -25,8 +27,8 @@ extends StaticBody3D
 ## like _update_blorbus_control() already does for Blorbus/the giant.
 ## Mounting happens via a "Ride Manchego" Interactable prompt (per direct
 ## instruction) rather than the B-key cycle Blorbus/Xiao Hou Zi share;
-## dismounting reuses that same B key (see player.gd's
-## _toggle_blorbus_control()).
+## pressing that same contextual Interact control again dismounts; the
+## separate Blorbus-switch control remains dedicated to psychic possession.
 
 const INTERACT_RADIUS := 2.5
 const HEAD_YAW_LIMIT := deg_to_rad(50.0)
@@ -41,6 +43,16 @@ const ARRIVE_DISTANCE := 3.0
 const FOLLOW_MOVE_SPEED := 2.6
 const ROTATION_SPEED := 5.0
 const GROUND_SETTLE_SPEED := 8.0
+
+## Ambient "grazing" wander for follows_player == false -- see that var's own
+## doc comment. A slower amble around a fixed anchor point, not the loyal-
+## companion follow above; deliberately gentle/first-draft, adjustable on
+## report like every other unspecified magnitude in this rig.
+const IDLE_WANDER_RADIUS := 4.0
+const IDLE_WANDER_MOVE_SPEED := 0.9
+const IDLE_PAUSE_MIN := 3.0
+const IDLE_PAUSE_MAX := 7.0
+const IDLE_ARRIVE_DISTANCE := 0.3
 
 ## "Faster ground movement," per docs/world_bible.md's own Mounts entry --
 ## multiplies the human player's own move_speed while ridden, the same
@@ -80,6 +92,28 @@ const JUMP_GRAVITY := 24.0
 const LANDING_DURATION := 0.18
 
 var is_player_controlled: bool = false
+## True (the original/default behavior) once he's a party mount: walks to
+## keep up with the player, per this file's own class doc comment. False for
+## an instance planted somewhere as a scene fixture rather than a companion
+## -- see jungle_kingdom_village.gd's own quest-ape spawn, where Manchego
+## starts out idling in place in the village (per direct instruction, "we
+## will see Manchego there idling around, not following the player") rather
+## than immediately chasing after them the way a bonded mount would. Flipped
+## to true once the "special banana" quest hands him over.
+var follows_player: bool = true
+## Gates the "Ride Manchego" Interactable prompt itself, independent of
+## is_player_controlled -- per direct instruction, before the quest above
+## resolves he's already "occupied" (ridden by the quest-giving ape) and
+## should not be rideable by the player yet. See set_available_to_player().
+var available_to_player: bool = true
+## Small ambient wander anchor for the not-following-yet state above -- see
+## _update_idle()'s own doc comment. Captured once in _ready() rather than
+## always "wherever he currently is," so a slow drift over many idle cycles
+## can't walk him away from his intended spot.
+var _idle_anchor: Vector2 = Vector2.ZERO
+var _idle_wander_target: Vector2 = Vector2.ZERO
+var _idle_has_target: bool = false
+var _idle_pause_timer: float = 0.0
 
 var _player: Node3D
 var terrain: Node
@@ -124,6 +158,7 @@ func _ready() -> void:
 	_player = get_node("../Player")
 	terrain = get_node("../Terrain")
 	global_position.y = terrain.get_mesh_height(global_position.x, global_position.z)
+	_idle_anchor = Vector2(global_position.x, global_position.z)
 
 	var collision_shape := CollisionShape3D.new()
 	var collider := BoxShape3D.new()
@@ -141,10 +176,20 @@ func _ready() -> void:
 			if _look_target == body:
 				_look_target = null
 	)
+	_interact_area.monitoring = available_to_player
+
+
+## See available_to_player's own doc comment -- toggles both the flag _on_ride()
+## checks and the Interactable prompt's own monitoring, so an unavailable
+## Manchego shows no "Ride Manchego" prompt at all rather than showing one
+## that then silently does nothing on activate.
+func set_available_to_player(value: bool) -> void:
+	available_to_player = value
+	_interact_area.monitoring = value
 
 
 func _on_ride() -> void:
-	if is_player_controlled:
+	if is_player_controlled or not available_to_player:
 		return
 	(_player as Player).start_riding_manchego(self)
 
@@ -152,6 +197,7 @@ func _on_ride() -> void:
 func begin_ride() -> void:
 	is_player_controlled = true
 	_interact_area.monitoring = false
+	InteractionManager.exit(_interact_area)
 	_look_target = null
 	# _update_head_look() stops being called entirely once is_player_controlled
 	# is true, so without this the head/neck just freeze wherever they last
@@ -171,7 +217,7 @@ func begin_ride() -> void:
 
 func end_ride() -> void:
 	is_player_controlled = false
-	_interact_area.monitoring = true
+	_interact_area.monitoring = available_to_player
 
 
 ## Live world transform of HorseFigure.SEAT_Y/SEAT_Z's own marker node --
@@ -188,7 +234,10 @@ func _process(delta: float) -> void:
 	_update_head_look(delta)
 	if is_player_controlled:
 		return
-	_update_follow(delta)
+	if follows_player:
+		_update_follow(delta)
+	else:
+		_update_idle(delta)
 
 
 ## How much of the total look-yaw the NECK takes, pivoting from its own
@@ -274,6 +323,40 @@ func _update_follow(delta: float) -> void:
 	_animate_gait(delta, moving)
 
 
+## See follows_player's own doc comment -- a gentle amble around _idle_anchor
+## instead of chasing the player, same pick-a-nearby-point-and-pause shape as
+## jungle_villager.gd's/xiao_hou_zi.gd's own wander AI, just built directly
+## here rather than shared, since Manchego's gait dispatch (_animate_gait())
+## is specific to this file's own HorseFigure pivots.
+func _update_idle(delta: float) -> void:
+	var here := Vector2(global_position.x, global_position.z)
+	var moving := false
+	if _idle_has_target and here.distance_to(_idle_wander_target) > IDLE_ARRIVE_DISTANCE:
+		moving = true
+	elif _idle_has_target:
+		_idle_has_target = false
+		_idle_pause_timer = _rng.randf_range(IDLE_PAUSE_MIN, IDLE_PAUSE_MAX)
+	else:
+		_idle_pause_timer -= delta
+		if _idle_pause_timer <= 0.0:
+			var angle := _rng.randf_range(0.0, TAU)
+			var r := IDLE_WANDER_RADIUS * sqrt(_rng.randf())
+			_idle_wander_target = _idle_anchor + Vector2(cos(angle), sin(angle)) * r
+			_idle_has_target = true
+
+	if moving:
+		var to_target := _idle_wander_target - here
+		var step := to_target.limit_length(IDLE_WANDER_MOVE_SPEED * delta)
+		var next := here + step
+		global_position.x = next.x
+		global_position.z = next.y
+		if to_target.length() > 0.01:
+			rotation.y = lerp_angle(rotation.y, atan2(to_target.x, to_target.y), ROTATION_SPEED * delta)
+	var idle_ground_h: float = terrain.get_mesh_height(global_position.x, global_position.z)
+	global_position.y = move_toward(global_position.y, idle_ground_h, GROUND_SETTLE_SPEED * delta)
+	_animate_gait(delta, moving)
+
+
 ## Dispatches to whichever leg animation applies this frame -- ordinary gait,
 ## the airborne jump tuck, or the brief post-landing impact pose -- then
 ## always re-lofts the tubes/tail regardless of which one ran. _is_airborne/
@@ -287,13 +370,18 @@ func _animate_gait(delta: float, moving: bool, running: bool = false) -> void:
 		# toward 0 again on the way down (using a gentler reference speed on
 		# the descent side, same reasoning player.gd's own comment gives --
 		# the full tuck should release before touchdown, not hold all the
-		# way to the ground).
+		# way to the ground). `rising` is also passed through on its own --
+		# see HorseFigure.animate_airborne()'s own comment for why the body
+		# pitch needs it (nose-up on the way up, nose-down on the way down),
+		# something apex_fraction alone can't distinguish since it's the same
+		# shape on both halves of the arc.
+		var rising := _vertical_velocity >= 0.0
 		var apex_fraction: float
-		if _vertical_velocity >= 0.0:
+		if rising:
 			apex_fraction = 1.0 - smoothstep(0.0, _jump_takeoff_speed, _vertical_velocity)
 		else:
 			apex_fraction = 1.0 - smoothstep(0.0, _jump_takeoff_speed * 0.75, -_vertical_velocity)
-		HorseFigure.animate_airborne(_pivots, delta, apex_fraction)
+		HorseFigure.animate_airborne(_pivots, delta, apex_fraction, rising)
 	elif _landing_timer > 0.0:
 		_landing_timer -= delta
 		HorseFigure.animate_landing(_pivots, delta)

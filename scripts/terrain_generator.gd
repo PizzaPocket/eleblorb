@@ -84,6 +84,106 @@ const JUNGLE_EDGE_NOISE_SAMPLE_RADIUS := 60.0
 const JUNGLE_RISE_DISTANCE := 70.0
 const JUNGLE_PLATEAU_HEIGHT := -25.0  # top height, well above the -60 gorge floor
 
+# A volcano out in the open wasteland, per direct instruction. CORRECTED
+# per a direct follow-up report: the first-draft placement (-100, 260) put
+# the volcano's own CENTER barely 14 units past the main plateau's own
+# maximum possible edge radius (PLATEAU_RADIUS 245 + EDGE_VARIATION 20 =
+# 265) -- since the volcano's own footprint then extends a further
+# VOLCANO_RADIUS back TOWARD the origin from its center, most of that
+# footprint was actually landing back inside/against the plateau's own rim
+# instead of "way out in the wasteland." Distance from the origin now has to
+# clear PLATEAU_RADIUS+EDGE_VARIATION (265) by the volcano's own FULL outer
+# reach (VOLCANO_RADIUS + EDGE_VARIATION + RISE_DISTANCE, not just its bare
+# radius), with real margin, not a token few units. (300, 450) sits 541 units
+# out (541 - 265 - the new, larger outer reach below still clears with
+# ~130 units to spare), reasonably far from both the lake (x>220's own
+# footprint stays well under z=450 at this x, see lake_coverage()'s own
+# shore-width math) and the jungle plateau (800+ units away) without being
+# precisely on the straight line between them any more -- "way out in the
+# wasteland" wins over exact betweenness here. First-draft placement,
+# adjustable on report like every other unspecified position in this file.
+const VOLCANO_CENTER := Vector2(300.0, 450.0)
+# CORRECTED per the same report ("too steep to even walk up") -- grown well
+# past JUNGLE_PLATEAU_RADIUS (70) rather than literally matching it, because
+# a walkable volcano cone genuinely needs more lateral room than a flat-
+# topped plateau does: the plateau only needs a walkable grade across its
+# own RISE_DISTANCE (a simple blend into the wasteland), while the volcano
+# needs one across its ENTIRE outer flank (wasteland floor all the way up to
+# the crater rim, a much bigger total height change -- see VOLCANO_BASE_
+# HEIGHT/VOLCANO_RIM_HEIGHT below). Keeping the old 70 and just capping the
+# rim height low enough to stay walkable made it read as a barely-raised
+# bump, not a volcano; this is the actual tradeoff, not an oversight -- see
+# VOLCANO_RIM_HEIGHT's own comment for the walkable-grade math this size
+# was chosen to satisfy.
+const VOLCANO_RADIUS := 180.0
+const VOLCANO_EDGE_VARIATION := 20.0
+const VOLCANO_EDGE_NOISE_SAMPLE_RADIUS := 70.0
+const VOLCANO_RISE_DISTANCE := 60.0
+# Radial shape, expressed as fractions of the (organically-varied) per-angle
+# edge radius so every ring below stays concentric with the outer footprint
+# at every angle rather than being independently centered circles. Four
+# concentric zones outside-in, per a direct follow-up report asking for a
+# genuinely walkable crater with a level floor, not a steep bowl:
+#   1. r >= edge_radius: open wasteland (unchanged, see volcano_coverage()).
+#   2. VOLCANO_RIM_RADIUS_FRACTION..1.0: the outer cone's own flank, climbing
+#      from the wasteland up to the crater rim -- see VOLCANO_RIM_HEIGHT's
+#      own comment for why this needs to be a LONG run, not a short one.
+#   3. VOLCANO_FLOOR_OUTER_RADIUS_FRACTION..VOLCANO_RIM_RADIUS_FRACTION: the
+#      crater's own inner wall, a shorter, steeper (but still climbable, not
+#      a cliff) drop from the rim down to the crater floor -- descending
+#      INTO the crater is expected to involve some real slope, just not an
+#      impassable one.
+#   4. VOLCANO_LAVA_RADIUS_FRACTION..VOLCANO_FLOOR_OUTER_RADIUS_FRACTION: the
+#      level walkable floor around the lava pool itself, per direct
+#      instruction ("the area of solid ground around it to be a more level
+#      area which can be walked around on") -- see _volcano_height()'s own
+#      floor branch for how "level" is actually enforced (a much smaller
+#      height change across this ring than any other zone, and zero rock-
+#      roughness noise, see VOLCANO_ROCK_AMPLITUDE's own comment).
+#   5. < VOLCANO_LAVA_RADIUS_FRACTION: the flat lava pool floor (see
+#      _build_volcano_lava()). Grown from 0.24 to 0.42, per direct
+#      instruction ("the pool of lava... to be organically round and
+#      larger").
+const VOLCANO_RIM_RADIUS_FRACTION := 0.68
+const VOLCANO_FLOOR_OUTER_RADIUS_FRACTION := 0.55
+const VOLCANO_LAVA_RADIUS_FRACTION := 0.42
+# Height profile, low to high: BASE (the outer cone's own foot, close to the
+# wasteland floor -- GORGE_DEPTH is -60) -> RIM (the crater's own lip) ->
+# CRATER_FLOOR (the level walkable ring around the lava, only barely above
+# LAVA itself) -> LAVA (the pool's own surface height).
+#
+# Chosen backward from two separate walkable-grade targets, not picked as
+# round numbers first: the outer flank (zone 2 above) spans edge_radius *
+# (1 - VOLCANO_RIM_RADIUS_FRACTION) = 180 * 0.32 = ~58 horizontal units at
+# the nominal (noise-free) radius -- targeting roughly JUNGLE_RISE_DISTANCE's
+# own already-walkable ~0.5 grade (35 units of rise over 70) caps this
+# zone's own rise at about 0.5 * 58 =~ 29 units. The inner wall (zone 3)
+# spans edge_radius * (VOLCANO_RIM_RADIUS_FRACTION -
+# VOLCANO_FLOOR_OUTER_RADIUS_FRACTION) = 180 * 0.13 = ~23 units; allowed a
+# steeper (but still climbable, not cliff-face) ~0.8 grade for "descending
+# into a crater," capping ITS rise at about 0.8 * 23 =~ 18 units. Level floor
+# (zone 4) gets only a token ~2-unit step, deliberately near-flat rather
+# than grade-targeted. Stacking those from a BASE just above the wasteland
+# floor: BASE -27, RIM -27+29=2, CRATER_FLOOR 2-18=-16, LAVA -16-2=-18-ish,
+# rounded to the values below. First-draft magnitudes derived from real
+# grade targets, not just picked to look dramatic -- adjustable on report,
+# but changing them should keep those same target grades in mind rather
+# than reintroducing the original too-steep problem.
+const VOLCANO_BASE_HEIGHT := -27.0
+const VOLCANO_RIM_HEIGHT := 2.0
+const VOLCANO_CRATER_FLOOR_HEIGHT := -16.0
+const VOLCANO_LAVA_HEIGHT := -18.0
+# Per-vertex rock roughness on the cone's flank and the crater's inner wall,
+# so both read as broken volcanic rock rather than a smooth ramp -- per a
+# direct follow-up report ("the mouth is jagged with jutting peaks when we
+# would want it to be organically round"), lowered from 5.0 (which, combined
+# with the ORIGINAL much-too-steep slope, read as aliased spikes rather than
+# gentle roughness) and now explicitly EXCLUDED from the level floor zone
+# entirely (see _volcano_height()'s own floor branch) rather than just
+# fading out approaching it, so "a more level area" actually reads as level
+# underfoot, not bumpy-but-on-average-flat.
+const VOLCANO_ROCK_AMPLITUDE := 2.5
+
 # Eastern lake: the existing gorge floor is the waterline, which makes the
 # lake feel like the eastern wasteland has been pressed down and flooded,
 # rather than like a raised water prop dropped into the world. The basin
@@ -169,6 +269,8 @@ var _edge_noise := FastNoiseLite.new()
 var _lake_noise := FastNoiseLite.new()
 var _jungle_edge_noise := FastNoiseLite.new()
 var _wasteland_noise := FastNoiseLite.new()
+var _volcano_edge_noise := FastNoiseLite.new()
+var _volcano_rock_noise := FastNoiseLite.new()
 
 
 func _init() -> void:
@@ -195,6 +297,14 @@ func _init() -> void:
 	_wasteland_noise.seed = 1920260822
 	_wasteland_noise.frequency = 0.009
 	_wasteland_noise.fractal_octaves = 3
+
+	_volcano_edge_noise.seed = 55120260905
+	_volcano_edge_noise.frequency = 0.05
+	_volcano_edge_noise.fractal_octaves = 2
+
+	_volcano_rock_noise.seed = 77320260905
+	_volcano_rock_noise.frequency = 0.06
+	_volcano_rock_noise.fractal_octaves = 3
 
 
 func get_height(x: float, z: float) -> float:
@@ -239,7 +349,11 @@ func get_height(x: float, z: float) -> float:
 				var jungle_height := JUNGLE_PLATEAU_HEIGHT + hills
 				height = lerpf(_wasteland_height(x, z), jungle_height, jungle_amount)
 			else:
-				height = _wasteland_height(x, z)
+				var volcano_amount := volcano_coverage(x, z)
+				if volcano_amount > 0.0:
+					height = lerpf(_wasteland_height(x, z), _volcano_height(x, z), volcano_amount)
+				else:
+					height = _wasteland_height(x, z)
 
 	return height
 
@@ -360,6 +474,135 @@ func get_jungle_plateau_radius() -> float:
 	return JUNGLE_PLATEAU_RADIUS
 
 
+## The volcano's boundary radius at a given angle around its own center --
+## same organic-wobble technique as _jungle_edge_radius(), just centered on
+## VOLCANO_CENTER and using its own dedicated noise field.
+func _volcano_edge_radius(angle: float) -> float:
+	var sample := _volcano_edge_noise.get_noise_2d(
+		cos(angle) * VOLCANO_EDGE_NOISE_SAMPLE_RADIUS, sin(angle) * VOLCANO_EDGE_NOISE_SAMPLE_RADIUS
+	)
+	return VOLCANO_RADIUS + sample * VOLCANO_EDGE_VARIATION
+
+
+## 1.0 well inside the volcano's own footprint, fading to 0.0 over
+## VOLCANO_RISE_DISTANCE past its organic edge -- same "coverage" contract as
+## jungle_coverage()/lake_coverage(), shared by get_height() (the shape),
+## _height_color() (the rock/ash tint), and wilderness_scatter.gd (placement
+## exclusion for ordinary props/blorbs).
+func volcano_coverage(x: float, z: float) -> float:
+	var rel := Vector2(x, z) - VOLCANO_CENTER
+	var edge_radius := _volcano_edge_radius(atan2(rel.y, rel.x))
+	return 1.0 - smoothstep(edge_radius, edge_radius + VOLCANO_RISE_DISTANCE, rel.length())
+
+
+## The volcano's own radial profile, four concentric zones outside-in -- see
+## VOLCANO_RIM_RADIUS_FRACTION's own comment for what each one is and
+## VOLCANO_BASE_HEIGHT's own comment for the height targets/grade math
+## behind each transition. Blended into the surrounding wasteland by
+## volcano_coverage() itself, in get_height() -- this function only has to
+## be well-defined inside the volcano's own footprint, not worry about
+## matching the wasteland floor's exact height at its own edge.
+func _volcano_height(x: float, z: float) -> float:
+	var rel := Vector2(x, z) - VOLCANO_CENTER
+	var r := rel.length()
+	var edge_radius := _volcano_edge_radius(atan2(rel.y, rel.x))
+	var rim_radius := edge_radius * VOLCANO_RIM_RADIUS_FRACTION
+	var floor_outer_radius := edge_radius * VOLCANO_FLOOR_OUTER_RADIUS_FRACTION
+	var lava_radius := edge_radius * VOLCANO_LAVA_RADIUS_FRACTION
+	var rock := _volcano_rock_noise.get_noise_2d(x, z) * VOLCANO_ROCK_AMPLITUDE
+
+	if r >= rim_radius:
+		# Outer cone: BASE at the footprint's own edge, rising to RIM at the
+		# crater's own lip, over the widest of the three spans -- this is the
+		# zone that actually has to stay walkable, see VOLCANO_BASE_HEIGHT's
+		# own grade-math comment. `shape_t` (0 at the rim, 1 at the outer
+		# edge) drives the HEIGHT lerp only -- the rock-roughness term uses
+		# its own inverse (1 at the rim, 0 at the outer edge), so roughness
+		# peaks at the rim and fades to smooth at the wasteland blend,
+		# matching the inner-wall branch below (which ALSO peaks at the rim)
+		# rather than the two meeting at opposite roughness levels there.
+		var shape_t := smoothstep(rim_radius, edge_radius, r)
+		return lerpf(VOLCANO_RIM_HEIGHT, VOLCANO_BASE_HEIGHT, shape_t) + rock * (1.0 - shape_t)
+	elif r >= floor_outer_radius:
+		# Crater inner wall: a shorter, steeper (but still climbable) drop
+		# from RIM down to CRATER_FLOOR. Rock roughness grades from 0 at the
+		# floor's own outer edge (a clean transition onto the level ground
+		# below, not a jagged one) up to full at the rim, continuing the
+		# outer cone's own roughness across that shared boundary.
+		var shape_t := smoothstep(floor_outer_radius, rim_radius, r)
+		return lerpf(VOLCANO_CRATER_FLOOR_HEIGHT, VOLCANO_RIM_HEIGHT, shape_t) + rock * shape_t
+	elif r >= lava_radius:
+		# The level walkable ring around the lava pool itself -- per direct
+		# instruction, "a more level area which can be walked around on."
+		# Only a token height change across this whole ring (CRATER_FLOOR at
+		# its outer edge easing toward LAVA's own height at the pool's edge,
+		# never actually reaching a slope worth mentioning), and -- unlike
+		# every other zone -- NO rock-roughness noise at all, not even a
+		# faded-out trace of it, so "level" reads as genuinely flat underfoot
+		# rather than gently bumpy-on-average.
+		var shape_t := smoothstep(lava_radius, floor_outer_radius, r)
+		return lerpf(VOLCANO_LAVA_HEIGHT, VOLCANO_CRATER_FLOOR_HEIGHT, shape_t)
+	else:
+		# Flat lava pool floor -- see _build_volcano_lava()'s own surface
+		# plane, which sits at/near this same height.
+		return VOLCANO_LAVA_HEIGHT
+
+
+func get_volcano_center() -> Vector2:
+	return VOLCANO_CENTER
+
+
+func get_volcano_radius() -> float:
+	return VOLCANO_RADIUS
+
+
+## Nominal (edge-noise-free) radii for the crater rim and the lava pool --
+## good enough for wilderness_scatter.gd's own scatter/placement math, which
+## already re-checks exact placement against is_lava_area()/get_mesh_height()
+## rather than needing per-angle precision up front.
+func get_volcano_crater_rim_radius() -> float:
+	return VOLCANO_RADIUS * VOLCANO_RIM_RADIUS_FRACTION
+
+
+## The level walkable ring's own OUTER edge (where the crater's inner wall
+## bottoms out) -- distinct from get_volcano_crater_rim_radius() (the rim
+## itself, at the TOP of that wall) now that the crater has a genuinely flat
+## intermediate zone between the wall and the lava pool (see VOLCANO_RIM_
+## RADIUS_FRACTION's own comment for the four-zone breakdown).
+func get_volcano_floor_outer_radius() -> float:
+	return VOLCANO_RADIUS * VOLCANO_FLOOR_OUTER_RADIUS_FRACTION
+
+
+func get_volcano_lava_radius() -> float:
+	return VOLCANO_RADIUS * VOLCANO_LAVA_RADIUS_FRACTION
+
+
+## Public so wilderness_scatter.gd/player.gd can treat the lava pool the way
+## is_lake_area() treats the lake -- a footprint to exclude ordinary ground
+## props/placement from, without needing its own duplicate copy of the
+## lava pool's own (organically-varied) radius.
+func is_lava_area(world_pos: Vector2) -> bool:
+	var rel := world_pos - VOLCANO_CENTER
+	var lava_radius := _volcano_edge_radius(atan2(rel.y, rel.x)) * VOLCANO_LAVA_RADIUS_FRACTION
+	return rel.length() < lava_radius
+
+
+func get_lava_surface_height(_world_pos: Vector2) -> float:
+	return VOLCANO_LAVA_HEIGHT + LAVA_SURFACE_Y_OFFSET
+
+
+## Closest safe point just beyond the pool's organic edge, used when an
+## unprotected player steps in or removes a fire-leg suit while over lava.
+func get_lava_escape_position(world_pos: Vector2) -> Vector3:
+	var rel := world_pos - VOLCANO_CENTER
+	if rel.length_squared() < 0.001:
+		rel = Vector2.DOWN
+	var angle := atan2(rel.y, rel.x)
+	var safe_radius := _volcano_edge_radius(angle) * VOLCANO_LAVA_RADIUS_FRACTION + 1.0
+	var edge := VOLCANO_CENTER + rel.normalized() * safe_radius
+	return Vector3(edge.x, get_mesh_height(edge.x, edge.y), edge.y)
+
+
 ## Cliff dressing must follow the same noise-wobbled perimeter as the
 ## jungle heightfield rather than assuming its nominal radius is circular.
 func get_jungle_plateau_edge_radius(angle: float) -> float:
@@ -405,6 +648,7 @@ func _rebuild() -> void:
 		c.free()
 	_build_mesh()
 	_build_eastern_lake()
+	_build_volcano_lava()
 	_build_far_skirt()
 	_build_terrain_collision()
 
@@ -440,6 +684,12 @@ func _height_color(h: float, past_edge: bool, world_pos: Vector2 = Vector2.INF) 
 	# A deep, rich canopy-floor green -- distinct from the ordinary grass
 	# color above so the jungle plateau reads as its own lush biome.
 	var jungle_green := Color(0.05098, 0.36078, 0.14902)
+	# Near-black basalt for the volcano's outer cone; a warmer scorched-ash
+	# tone for the crater's own inner slope (see the world_pos blend below),
+	# reading as ground actually heated by the lava it surrounds rather than
+	# a copy of the outer flank's color.
+	var volcano_basalt := Color(0.10, 0.09, 0.09)
+	var volcano_scorched := Color(0.30, 0.14, 0.08)
 	# HILL_AMPLITUDE is only 3.0, so grass held pure well past that (to 10.0)
 	# covers the entire hill/spawn/town range with zero dirt blend -- dirt,
 	# rock, and snow are pushed out to only appear well up into the
@@ -465,6 +715,20 @@ func _height_color(h: float, past_edge: bool, world_pos: Vector2 = Vector2.INF) 
 			var jungle_amount := jungle_coverage(world_pos.x, world_pos.y)
 			if jungle_amount > 0.0:
 				return wasteland.lerp(jungle_green, jungle_amount)
+			var volcano_amount := volcano_coverage(world_pos.x, world_pos.y)
+			if volcano_amount > 0.0:
+				# Blend basalt toward the scorched tone as a point sits closer
+				# to the crater's own center (the lava) than to the rim --
+				# same per-angle edge_radius/rim_radius/lava_radius geometry
+				# _volcano_height() uses, so the color transition lines up
+				# exactly with the crater bowl's own shape.
+				var rel := world_pos - VOLCANO_CENTER
+				var edge_radius := _volcano_edge_radius(atan2(rel.y, rel.x))
+				var rim_radius := edge_radius * VOLCANO_RIM_RADIUS_FRACTION
+				var lava_radius := edge_radius * VOLCANO_LAVA_RADIUS_FRACTION
+				var heat := 1.0 - smoothstep(lava_radius, rim_radius, rel.length())
+				var volcano_color := volcano_basalt.lerp(volcano_scorched, heat)
+				return wasteland.lerp(volcano_color, volcano_amount)
 		return wasteland
 
 	# The canyon biome's own ground color: a second blend, by horizontal
@@ -604,6 +868,58 @@ func _build_eastern_lake() -> void:
 	lake.mesh = st.commit()
 	lake.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(lake)
+
+
+## A simple triangle-fan disc rather than a grid (see _build_eastern_lake()'s
+## own much larger grid) -- the lava pool is genuinely circular (VOLCANO_
+## LAVA_RADIUS_FRACTION's own per-angle radius), so a fan is both simpler
+## and cheaper here regardless of its actual size. Sampled at LAVA_FAN_SEGMENTS angles around
+## VOLCANO_CENTER using the exact same per-angle _volcano_edge_radius() the
+## terrain height/color both use, so the pool's own edge lines up with the
+## crater floor's flat VOLCANO_LAVA_HEIGHT ring with no visible gap or
+## overlap. No collision, same reasoning the lake's own water sheet gives --
+## the real crater floor underneath already provides the walkable surface
+## right up to (not under) the pool.
+const LAVA_FAN_SEGMENTS := 48
+const LAVA_SURFACE_Y_OFFSET := 0.25
+
+
+func _build_volcano_lava() -> void:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var y := VOLCANO_LAVA_HEIGHT + LAVA_SURFACE_Y_OFFSET
+	var center := Vector3(VOLCANO_CENTER.x, y, VOLCANO_CENTER.y)
+	for i in LAVA_FAN_SEGMENTS:
+		var angle0 := (float(i) / LAVA_FAN_SEGMENTS) * TAU
+		var angle1 := (float(i + 1) / LAVA_FAN_SEGMENTS) * TAU
+		var r0 := _volcano_edge_radius(angle0) * VOLCANO_LAVA_RADIUS_FRACTION
+		var r1 := _volcano_edge_radius(angle1) * VOLCANO_LAVA_RADIUS_FRACTION
+		var p0 := center + Vector3(cos(angle0) * r0, 0.0, sin(angle0) * r0)
+		var p1 := center + Vector3(cos(angle1) * r1, 0.0, sin(angle1) * r1)
+		st.set_normal(Vector3.UP)
+		st.add_vertex(center)
+		st.set_normal(Vector3.UP)
+		st.add_vertex(p1)
+		st.set_normal(Vector3.UP)
+		st.add_vertex(p0)
+
+	st.set_material(NatureProps.build_lava_material())
+	var lava := MeshInstance3D.new()
+	lava.name = "VolcanoLava"
+	lava.mesh = st.commit()
+	# The lava itself is the light source down in the crater -- no
+	# DirectionalLight reaches the bowl's own shadowed interior the same way
+	# open ground does, and a real point light sells "glowing molten rock"
+	# far better than emission alone, which only lights the lava's own
+	# surface, not the rock around it.
+	add_child(lava)
+	var glow := OmniLight3D.new()
+	glow.name = "VolcanoLavaGlow"
+	glow.position = Vector3(VOLCANO_CENTER.x, y + 1.0, VOLCANO_CENTER.y)
+	glow.light_color = Color(1.0, 0.5, 0.15)
+	glow.light_energy = 2.5
+	glow.omni_range = VOLCANO_RADIUS * VOLCANO_RIM_RADIUS_FRACTION * 1.4
+	add_child(glow)
 
 
 ## Flat annulus from SKIRT_INNER_RADIUS out to SKIRT_OUTER_RADIUS, at a

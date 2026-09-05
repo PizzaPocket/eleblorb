@@ -452,7 +452,7 @@ static func build(
 	rig.add_child(spine_pivot)
 
 	if skeleton_mode:
-		_build_spine_column(spine_pivot, abdomen_size, shirt_color, abdomen_z_offset)
+		build_spine_column(spine_pivot, abdomen_size, shirt_color, abdomen_z_offset)
 	else:
 		var abdomen := SuperEgg.build_part(abdomen_size, shirt_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 		abdomen.position = Vector3(0, abdomen_size.y, abdomen_z_offset)
@@ -657,7 +657,17 @@ static func build(
 ## the same vertical span the abdomen would otherwise occupy but offset
 ## toward the back (-Z) and each tilted back slightly, since a real spine
 ## runs along the back of the torso rather than through its center.
-static func _build_spine_column(
+##
+## Public (not "_"-prefixed) since ape_template.gd's own skeleton_mode
+## support (see that file's "skeleton_mode" variant key) reuses this
+## directly rather than re-deriving the same geometry independently --
+## ApeTemplate.build() can't safely pass skeleton_mode down into its own
+## inner build() call here (doing so would replace the single abdomen mesh
+## its own reparenting logic indexes by child position, breaking that
+## indexing), so it instead builds its ordinary single-mesh abdomen first,
+## reads that mesh's own real size/offset back out, frees it, and calls
+## this directly in its place -- see that file's own comment where it does.
+static func build_spine_column(
 	spine_pivot: Node3D, abdomen_size: Vector3, bone_color: Color, abdomen_z_offset: float
 ) -> void:
 	var segment_count := 5

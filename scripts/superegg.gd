@@ -176,8 +176,23 @@ static func build_inset_pad_mesh(
 	var flush_coord := proximal_sign * proximal_size
 	var tip_coord := -proximal_sign * proximal_size * (1.0 - tip_inset)
 
-	const SIDE_SEGS := 5
-	const PROX_SEGS := 5
+	# Raised from 4 -- per direct report the hand/foot fur pad "doesn't scale
+	# up proportionally" at the giant gorilla's own 16x display_scale. The
+	# actual scale MATH here is sound (part_size/dome_height/back_embed are
+	# all plain values baked into a mesh that's a normal descendant of the
+	# rig root, so Godot's own transform composition already scales the
+	# whole thing uniformly and proportionally, same as every other part of
+	# the figure -- there's no separate scale-dependent term anywhere in
+	# this function to get wrong). What DOESN'T scale is polygon COUNT: at
+	# ordinary ape size the dome's rounded falloff reads fine through a
+	# coarse 5x5 grid, but blown up 16x larger in absolute terms, the exact
+	# same facet count becomes individually large and visible, reading as a
+	# faceted/blocky shape rather than a smoothly domed one -- plausibly
+	# what "doesn't look proportionally right" is actually describing.
+	# Raising the resolution here benefits every pad at every scale, not
+	# just the giant's; adjustable further on report if this isn't it.
+	const SIDE_SEGS := 8
+	const PROX_SEGS := 8
 	var front_grid: Array = []
 	var back_grid: Array = []
 	for pi in range(PROX_SEGS + 1):

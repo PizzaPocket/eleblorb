@@ -10,10 +10,9 @@ extends Node
 ## so spawned members are added as children of that same parent).
 ##
 ## Deliberately a flat data snapshot, not live node references: a currently-
-## worn (blorb suit) or melted (0 HP) blorb still gets carried across, just
-## respawned in its ordinary unworn/full-HP form on arrival -- simpler than
-## reconstructing blorb_suit_controller's own equip state across a scene
-## boundary, and not something a player is likely to notice or mind.
+## worn (blorb suit) or melted (0 HP) blorb still gets carried across. Its
+## level, XP, and grown stats persist, while the destination still reforms it
+## unworn at full HP/MP; live suit assignments are rebound separately below.
 
 const BLORB_SCENE: PackedScene = preload("res://scenes/blorb.tscn")
 const XIAO_HOU_ZI_SCENE: PackedScene = preload("res://scenes/xiao_hou_zi.tscn")
@@ -27,6 +26,8 @@ var _roster: Array[Dictionary] = []
 
 func capture_from_tree(tree: SceneTree) -> void:
 	_roster.clear()
+	var player := tree.get_first_node_in_group("player") as Player
+	var suit: BlorbSuitController = player.get_blorb_suit() if player != null else null
 	for node in tree.get_nodes_in_group("blorbs"):
 		var blorb := node as Blorb
 		if blorb == null or not blorb.in_party or blorb.blorb_type == "size":
@@ -38,6 +39,8 @@ func capture_from_tree(tree: SceneTree) -> void:
 			"is_blorbus": blorb.is_blorbus,
 			"blorb_name": blorb.blorb_name,
 			"core_items": blorb.core_items.duplicate(),
+			"progression": blorb.progression_snapshot(),
+			"assigned_slot": suit.slot_for_assigned_blorb(blorb) if suit != null else "",
 		})
 	for node in tree.get_nodes_in_group("xiao_hou_zi"):
 		var monkey := node as XiaoHouZi
@@ -50,23 +53,39 @@ func capture_from_tree(tree: SceneTree) -> void:
 ## "Terrain" hang off of). `near_position`/`facing` place the roster just
 ## behind wherever the player is arriving, facing the same way they are.
 func spawn_into(parent: Node, near_position: Vector3, facing: Vector3) -> void:
+	# The outskirts scene contains its starter trio as baked boot content. On
+	# a return trip, replace those defaults with the captured party rather
+	# than duplicating the same companions beside them.
+	if not _roster.is_empty():
+		for existing in parent.get_tree().get_nodes_in_group("blorbs"):
+			var existing_blorb := existing as Blorb
+			if existing_blorb != null and existing_blorb.in_party and existing_blorb.get_parent() == parent:
+				existing_blorb.free()
 	var flat_facing := Vector3(facing.x, 0.0, facing.z)
 	if flat_facing.length() < 0.01:
 		flat_facing = Vector3.BACK
 	flat_facing = flat_facing.normalized()
 	var index := 0
+	var restored_assignments: Dictionary = {}
 	for entry in _roster:
 		var lateral := flat_facing.rotated(Vector3.UP, PI * 0.5) * (float(index) - float(_roster.size() - 1) * 0.5)
 		var spawn_pos := near_position - flat_facing * 2.0 + lateral * SPAWN_SPACING
 		match entry.get("kind", ""):
 			"blorb":
-				_spawn_blorb(entry, parent, spawn_pos)
+				var spawned := _spawn_blorb(entry, parent, spawn_pos)
+				var assigned_slot := entry.get("assigned_slot", "") as String
+				if assigned_slot != "" and spawned != null:
+					restored_assignments[assigned_slot] = spawned
 			"xiao_hou_zi":
 				_spawn_xiao_hou_zi(parent, spawn_pos)
 		index += 1
+	var player := parent.get_tree().get_first_node_in_group("player") as Player
+	if player != null:
+		player.get_blorb_suit().restore_assignments(restored_assignments)
+		player.get_blorb_suit().auto_assign_new_members.call_deferred()
 
 
-func _spawn_blorb(entry: Dictionary, parent: Node, spawn_pos: Vector3) -> void:
+func _spawn_blorb(entry: Dictionary, parent: Node, spawn_pos: Vector3) -> Blorb:
 	var blorb: Blorb = BLORB_SCENE.instantiate()
 	blorb.in_party = true
 	blorb.is_starter_trio = false
@@ -78,8 +97,10 @@ func _spawn_blorb(entry: Dictionary, parent: Node, spawn_pos: Vector3) -> void:
 	blorb.initial_element = entry.get("element", "")
 	blorb.position = spawn_pos
 	parent.add_child(blorb)
+	blorb.restore_progression(entry.get("progression", {}))
 	if entry.get("is_blorbus", false):
 		blorb.become_blorbus()
+	return blorb
 
 
 func _spawn_xiao_hou_zi(parent: Node, spawn_pos: Vector3) -> void:

@@ -28,6 +28,16 @@ func _ready() -> void:
 	_terrain = get_node_or_null("../Terrain")
 	if _terrain == null or not _terrain.has_method("get_mesh_height"):
 		return
+	# Deferred -- see jungle_kingdom_village.gd's own _ready() comment for the
+	# full reasoning: _place() below reaches up to get_parent().add_child(),
+	# which crashes ("Parent node is busy setting up children") if called
+	# straight from _ready(), since the kingdom root is still mid-setup,
+	# iterating its own children's _ready() calls (this node included) at
+	# that exact moment.
+	_spawn_all.call_deferred()
+
+
+func _spawn_all() -> void:
 	for i in NORMAL_COUNT:
 		_place("", false)
 	for element in OTHER_ELEMENTS:

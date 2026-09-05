@@ -52,6 +52,22 @@ const WILD_BLORB_AIR_COUNT := 3
 ## Dedicated lake residents use the deep eastern basin rather than the
 ## ordinary field sampler, whose exploration bounds end before the lake.
 const LAKE_WATER_BLORB_COUNT := 4
+## A few naturally-elemental fire wild blorbs live on and inside the
+## volcano's own crater (see docs/world_bible.md's Volcano entry), per direct
+## instruction -- same "own dedicated biome-scoped spawn" pattern
+## WILD_BLORB_PLANT_COUNT's own comment describes for the jungle plateau,
+## just for fire/the volcano instead. Split roughly evenly between the outer
+## cone ("on... the volcano") and the crater's own rocky skirt ("inside" it)
+## by _spawn_volcano_fire_blorbs() itself.
+const WILD_BLORB_VOLCANO_FIRE_COUNT := 4
+## A handful of rock outcroppings around the crater's lava pool -- "rock
+## outcropping around the skirts of the lava pool which you can walk on,"
+## per direct instruction. The terrain itself already slopes down into the
+## crater bowl there (see terrain_generator.gd's own _volcano_height()); these
+## are freestanding NatureProps.build_rock() boulders on top of that ground,
+## for visual texture the same way _scatter_wasteland_rocks() adds to the
+## open desert floor.
+const VOLCANO_ROCK_COUNT := 14
 ## How many fresh wild blorbs appear once the player's found every one
 ## currently out in the field -- see spawn_replenishment_wave(), called by
 ## hud.gd instead of just letting the compass hint vanish. Small relative
@@ -265,9 +281,9 @@ func _ready() -> void:
 	# beeline toward to climb.
 	_scatter_wanderers(5, _rock_spire_builders)
 	_scatter_fruit_trees()
-	_place_air_gem_near_town()
 	_build_canyon_biome()
 	_build_jungle_biome()
+	_build_volcano_rocks()
 	_build_plateau_side_ledges()
 	_scatter_wasteland_rocks()
 	_scatter_lake_gatherables()
@@ -283,6 +299,7 @@ func _finish_dynamic_initialization() -> void:
 	_spawn_wilderness_npcs()
 	_spawn_wild_blorbs()
 	_spawn_jungle_plant_blorbs()
+	_spawn_volcano_fire_blorbs()
 	_spawn_wasteland_giant_blorb()
 	_spawn_xiao_hou_zi()
 	_register_wilderness_lod_nodes(self)
@@ -321,6 +338,8 @@ func _scatter_wasteland_rocks() -> void:
 			if pos.length() < terrain.get_plateau_edge_radius(angle) + 22.0:
 				continue
 			if terrain.is_lake_area(pos) or terrain.jungle_coverage(pos.x, pos.y) > 0.02:
+				continue
+			if terrain.volcano_coverage(pos.x, pos.y) > 0.02:
 				continue
 			if pos.distance_to(terrain.get_city_center()) < 105.0:
 				continue
@@ -616,52 +635,6 @@ func _spawn_wilderness_npcs() -> void:
 		add_child(inst)
 
 
-## Finds a genuine local high point just outside town's built/flattened
-## district.  Sampling the terrain mesh itself, rather than assuming a fixed
-## coordinate is elevated, keeps the Air Gem on the visible hill crest even
-## if the terrain resolution or town layout changes later.
-func _place_air_gem_near_town() -> void:
-	const MIN_TOWN_DISTANCE := 82.0
-	const MAX_TOWN_DISTANCE := 118.0
-	const MAX_ORIGIN_DISTANCE := 225.0
-	const SAMPLE_STEP := 5.0
-	const PEAK_NEIGHBOR_DISTANCE := 5.0
-	var best_pos := Vector2.INF
-	var best_height := -INF
-
-	for x in range(-225, 226, int(SAMPLE_STEP)):
-		for z in range(-180, 181, int(SAMPLE_STEP)):
-			var pos := town_center + Vector2(float(x), float(z))
-			var town_distance := pos.distance_to(town_center)
-			if town_distance < MIN_TOWN_DISTANCE or town_distance > MAX_TOWN_DISTANCE:
-				continue
-			if pos.length() > MAX_ORIGIN_DISTANCE:
-				continue
-			var height: float = terrain.get_mesh_height(pos.x, pos.y)
-			var is_local_peak := true
-			for offset in [
-				Vector2(PEAK_NEIGHBOR_DISTANCE, 0.0), Vector2(-PEAK_NEIGHBOR_DISTANCE, 0.0),
-				Vector2(0.0, PEAK_NEIGHBOR_DISTANCE), Vector2(0.0, -PEAK_NEIGHBOR_DISTANCE),
-			]:
-				if terrain.get_mesh_height(pos.x + offset.x, pos.y + offset.y) > height:
-					is_local_peak = false
-					break
-			if is_local_peak and height > best_height:
-				best_height = height
-				best_pos = pos
-
-	# The terrain always has a local crest in this search annulus, but retaining
-	# a highest-sample fallback prevents a missing collectible if its noise ever
-	# becomes a monotonic slope.
-	if best_pos == Vector2.INF:
-		best_pos = town_center + Vector2(-MIN_TOWN_DISTANCE, 0.0)
-		best_height = terrain.get_mesh_height(best_pos.x, best_pos.y)
-	_place_gem(
-		self, Vector3(best_pos.x, best_height + 0.34, best_pos.y),
-		ShopCatalog.AIR_COLOR, "Air Gem", true, true
-	)
-
-
 ## Scatters the field's initial wild blorb population -- lots of plain
 ## (unmerged) ones, a few rare shiny ones, and a couple already-elemental
 ## finds -- each at its own random spot (same exclusion rules as every other
@@ -701,6 +674,77 @@ func _spawn_jungle_plant_blorbs() -> void:
 		inst.initial_element = "plant"
 		inst.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
 		get_parent().add_child(inst)
+
+
+## The volcano's own naturally-elemental find -- see WILD_BLORB_VOLCANO_
+## FIRE_COUNT's own doc comment. Half spawn on the outer cone ("on... the
+## volcano"), half inside the crater's own rocky skirt ("inside" it, between
+## the lava pool and the rim) -- rejecting any point is_lava_area() itself
+## rejects, so none of them end up floating in/under the molten pool.
+## Parented to Main the same way _place_wild_blorb()/_spawn_jungle_plant_
+## blorbs() are, for the same sibling-lookup reason.
+func _spawn_volcano_fire_blorbs() -> void:
+	var packed: PackedScene = load(BLORB_SCENE)
+	if packed == null:
+		push_warning("Missing blorb scene: " + BLORB_SCENE)
+		return
+	var center: Vector2 = terrain.get_volcano_center()
+	var outer_radius: float = terrain.get_volcano_radius()
+	var rim_radius: float = terrain.get_volcano_crater_rim_radius()
+	var lava_radius: float = terrain.get_volcano_lava_radius()
+	for i in WILD_BLORB_VOLCANO_FIRE_COUNT:
+		var inside_crater := i % 2 == 0
+		var pos: Variant = null
+		for attempt in 8:
+			var candidate: Vector2
+			if inside_crater:
+				# Inside the crater's rocky skirt, between the lava and the rim.
+				var r := _rng.randf_range(lava_radius * 1.3, rim_radius * 0.9)
+				var angle := _rng.randf_range(0.0, TAU)
+				candidate = center + Vector2(cos(angle), sin(angle)) * r
+			else:
+				# On the outer cone's own open flank.
+				candidate = _point_in_jungle_disk(center, outer_radius * 0.95, 1.0)
+				if candidate.distance_to(center) < rim_radius * 1.05:
+					continue
+			if terrain.is_lava_area(candidate):
+				continue
+			pos = candidate
+			break
+		if pos == null:
+			continue
+		var placed: Vector2 = pos
+		var inst = packed.instantiate()
+		inst.in_party = false
+		inst.initial_element = "fire"
+		inst.position = Vector3(placed.x, terrain.get_mesh_height(placed.x, placed.y), placed.y)
+		get_parent().add_child(inst)
+
+
+## Freestanding boulders around the crater's own lava pool -- see
+## VOLCANO_ROCK_COUNT's own doc comment. Added to `self`, not get_parent()
+## (unlike the fire blorbs above) -- these are ordinary static props, not
+## Terrain/Player-sibling-dependent actors, so they follow the same "add to
+## self" rule _scatter_wasteland_rocks() and every other prop scatter in this
+## file already uses; called from _ready() rather than the deferred actor
+## phase, same as _build_jungle_biome()'s own prop-only half.
+func _build_volcano_rocks() -> void:
+	var center: Vector2 = terrain.get_volcano_center()
+	var rim_radius: float = terrain.get_volcano_crater_rim_radius()
+	var lava_radius: float = terrain.get_volcano_lava_radius()
+	for i in VOLCANO_ROCK_COUNT:
+		for attempt in 8:
+			var r := _rng.randf_range(lava_radius * 1.1, rim_radius * 0.98)
+			var angle := _rng.randf_range(0.0, TAU)
+			var pos := center + Vector2(cos(angle), sin(angle)) * r
+			if terrain.is_lava_area(pos):
+				continue
+			var rock := NatureProps.build_rock(_rng.randf_range(0.35, 1.1), true)
+			rock.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
+			rock.rotation.y = _rng.randf_range(0.0, TAU)
+			rock.scale.y = _rng.randf_range(0.6, 1.3)
+			add_child(rock)
+			break
 
 
 ## Called by hud.gd once every wild blorb currently in the field has been

@@ -92,6 +92,19 @@ LOADER_CSS = r"""
 .loader-control { display: flex; min-width: 150px; flex-direction: column; align-items: center; gap: 12px; }
 .loader-copy { color: #ccbaa0; font-size: 16px; line-height: 1.35; }
 .keys { display: flex; align-items: center; gap: 6px; }
+.loader-wasd {
+	display: grid;
+	grid-template-columns: repeat(3, 38px);
+	grid-template-rows: repeat(2, 38px);
+	gap: 6px;
+}
+.loader-wasd .key:first-child {
+	grid-column: 2;
+	grid-row: 1;
+}
+.loader-wasd .key:nth-child(2) { grid-column: 1; grid-row: 2; }
+.loader-wasd .key:nth-child(3) { grid-column: 2; grid-row: 2; }
+.loader-wasd .key:nth-child(4) { grid-column: 3; grid-row: 2; }
 .key, .mouse {
 	display: grid;
 	box-sizing: border-box;
@@ -187,7 +200,7 @@ LOADER_HTML = """\t\t\t<div id="loading-content">
 \t\t\t\t<h1 id="loading-title">Eleblorb</h1>
 \t\t\t\t<div id="loading-controls" aria-label="Controls">
 \t\t\t\t\t<div class="loader-desktop">
-\t\t\t\t\t\t<div class="loader-control"><div class="keys" aria-hidden="true"><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span></div><span class="loader-copy">Move</span></div>
+\t\t\t\t\t\t<div class="loader-control"><div class="keys loader-wasd" aria-hidden="true"><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span></div><span class="loader-copy">Move</span></div>
 \t\t\t\t\t\t<div class="loader-control"><div class="mouse" aria-hidden="true"></div><span class="loader-copy">Look around</span></div>
 \t\t\t\t\t\t<div class="loader-control"><div class="key wide" aria-hidden="true">SPACE</div><span class="loader-copy">Jump</span></div>
 \t\t\t\t\t</div>

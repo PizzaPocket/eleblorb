@@ -1,6 +1,8 @@
 class_name Blorb
 extends StaticBody3D
 
+signal progression_changed
+
 ## Size blorbs stay non-solid to the player but remain detectable by thrown
 ## items. Layer 9 is dedicated to that distinction; ordinary blorbs remain
 ## on world layer 1 as before.
@@ -141,6 +143,14 @@ const FOLLOW_DISTANCE := 7.0
 const ARRIVE_DISTANCE := 3.0
 const IDLE_WANDER_RADIUS := 1.2
 
+## How far a not-yet-joined wild blorb (whether currently FOLLOWING,
+## declined moments ago, or just discovered) will chase before giving up
+## and returning to ordinary local wandering, per direct instruction --
+## well beyond FOLLOW_DISTANCE/DISCOVERY_RADIUS so a brief obstruction or
+## slow catch-up isn't punished, but not infinite. Doesn't apply once
+## in_party -- a real party member has no leash.
+const DROP_OFF_DISTANCE := 35.0
+
 ## How close the player has to get to a not-yet-discovered wild blorb
 ## (in_party == false, _discovered == false) before it notices them and
 ## starts tagging along -- the Hud's own compass hint (see hud.gd) is what's
@@ -237,14 +247,20 @@ const MELEE_RANGE := 1.3
 ## Approach distance for a water/fire blorb's stream attack -- kept further
 ## back than melee range since the stream itself covers the gap.
 const STREAM_RANGE := 5.0
-const JUMP_ATTACK_DAMAGE := 8.0
+## Base damage before combat_math.gd's own Strength scaling/variance/crit
+## roll -- see _try_jump_attack(). Renamed from JUMP_ATTACK_DAMAGE now that
+## it's a base rather than the literal dealt amount.
+const JUMP_ATTACK_BASE_DAMAGE := 8.0
 const JUMP_ATTACK_COOLDOWN := 1.2
 ## Matches player.gd's own WATER_POWER_MP_PER_SECOND/FIRE_POWER_MP_PER_SECOND
 ## exactly, so a blorb's arm-power drain rate and its combat-stream drain
 ## rate feel the same regardless of which context it's using the power in.
 const WATER_STREAM_MP_PER_SECOND := 3.0
 const FIRE_STREAM_MP_PER_SECOND := 4.5
-const STREAM_DAMAGE_PER_SECOND := 6.0
+## Base rate before combat_math.gd's own Strength scaling -- see
+## _update_elemental_stream(). Renamed from STREAM_DAMAGE_PER_SECOND now
+## that it's a base rather than the literal per-second rate.
+const STREAM_BASE_DAMAGE_PER_SECOND := 6.0
 
 @onready var terrain: Node = get_node("../Terrain")
 @onready var body: Node3D = $Body
@@ -317,21 +333,26 @@ var _air_wing_flap_speed := 1.0
 ## name is immutable and takes precedence over this field.
 @export var blorb_name: String = ""
 
-## Basic stats system: first pass, no combat exists yet to actually consume
-## these -- rolled once per instance in _ready() (see STAT_MIN/STAT_MAX)
-## within a modest fixed range so different blorbs read as individuals
-## rather than clones, not derived from element/level/anything deeper yet.
-## HP/MP are scaled up from the same roll rather than drawn from their own
-## separate range, just so they read as the "bigger" stats a JRPG player
-## expects at a glance.
+## Level-one stats are rolled once per instance so different blorbs begin as
+## individuals rather than clones. Progression then grows those same stats
+## deterministically (see _level_up()) instead of rerolling them, preserving
+## each blorb's original strengths across the campaign.
 const STAT_MIN := 5
 const STAT_MAX := 15
+const MAX_LEVEL := 99
+const XP_THRESHOLD_BASE := 20.0
+const XP_THRESHOLD_EXPONENT := 1.35
 var strength: int = 0
 var defense: int = 0
 var max_hp: int = 0
 var max_mp: int = 0
 var current_hp: float = 0.0
 var current_mp: float = 0.0
+var level: int = 1
+## XP earned inside the current level, not lifetime cumulative XP. Keeping
+## this local to the current threshold makes the menu's filled-until-next-
+## level bar direct and avoids precision loss at high cumulative totals.
+var experience: int = 0
 var _hp_regen_delay: float = 0.0
 var _mp_regen_delay: float = 0.0
 
@@ -582,6 +603,17 @@ func _decline_join_request() -> void:
 	_discovered = false
 	_bond_time = 0.0
 	_join_decline_cooldown = JOIN_DECLINE_COOLDOWN
+	# Per direct instruction: a declined blorb shouldn't keep tagging along.
+	# Clearing _discovered alone isn't enough on its own -- if _state was
+	# already FOLLOWING (reaching the prompt at all requires having been
+	# within FOLLOW_DISTANCE, so this is a real, not just theoretical, case),
+	# nothing else would otherwise break it out of that state; the
+	# movement code further down in _process() acts on _state directly, not
+	# on _discovered.
+	if _state == State.FOLLOWING:
+		_state = State.IDLE
+		_home = Vector2(global_position.x, global_position.z)
+		_has_wander_target = false
 
 
 ## Counterpart to _accept_join_request() -- restores a party member to
@@ -596,6 +628,14 @@ func release_to_wild() -> void:
 	_discovered = false
 	_bond_time = 0.0
 	_join_decline_cooldown = JOIN_DECLINE_COOLDOWN
+	# Same reasoning as _decline_join_request()'s own identical reset -- a
+	# released blorb mid-FOLLOWING would otherwise keep closing on the party
+	# forever, since the movement code acts on _state directly, not in_party
+	# or _discovered.
+	if _state == State.FOLLOWING:
+		_state = State.IDLE
+		_home = Vector2(global_position.x, global_position.z)
+		_has_wander_target = false
 
 
 ## Continuous elemental powers consume MP. Attempting to use an empty pool
@@ -609,13 +649,91 @@ func consume_mp(amount: float) -> bool:
 	return true
 
 
-## Used by skeleton NMEs' punches and by combat-defending blorbs' own
-## jump-attacks/elemental streams (see _process's State.COMBAT handling).
+## A familiar rising RPG curve: early levels arrive quickly enough to teach
+## the system, while each successive level asks for meaningfully more XP.
+func xp_to_next_level() -> int:
+	if level >= MAX_LEVEL:
+		return 0
+	return maxi(1, roundi(XP_THRESHOLD_BASE * pow(float(level), XP_THRESHOLD_EXPONENT)))
+
+
+func gain_experience(amount: int) -> void:
+	if amount <= 0 or level >= MAX_LEVEL:
+		return
+	experience += amount
+	while level < MAX_LEVEL:
+		var threshold := xp_to_next_level()
+		if experience < threshold:
+			break
+		experience -= threshold
+		_level_up()
+	if level >= MAX_LEVEL:
+		experience = 0
+	progression_changed.emit()
+
+
+func _level_up() -> void:
+	level += 1
+	# Every level advances both core combat stats. Periodic extra points keep
+	# milestones noticeable without random level-up rolls obscuring a blorb's
+	# established identity. Strength and Defense now drive combat directly
+	# (see combat_math.gd -- Strength scales an attack's own damage, Defense
+	# mitigates incoming damage) rather than HP/MP growth, per direct
+	# correction; HP and MP instead grow with level itself below.
+	strength += 1 + (1 if level % 4 == 0 else 0)
+	defense += 1 + (1 if level % 5 == 0 else 0)
+	var hp_growth := 4 + ceili(float(level) / 5.0)
+	var mp_growth := 2 + ceili(float(level) / 8.0)
+	max_hp += hp_growth
+	max_mp += mp_growth
+	if not is_melted:
+		current_hp = minf(current_hp + hp_growth, float(max_hp))
+	current_mp = minf(current_mp + mp_growth, float(max_mp))
+	Hud.show_passive_message("%s reached Level %d!" % [display_name(), level], 3.0)
+
+
+func progression_snapshot() -> Dictionary:
+	return {
+		"level": level,
+		"experience": experience,
+		"strength": strength,
+		"defense": defense,
+		"max_hp": max_hp,
+		"max_mp": max_mp,
+	}
+
+
+## Applied after a portal-created Blorb has run _ready() and generated its
+## throwaway level-one roll. Older snapshots without progression data simply
+## keep that fresh roll, preserving compatibility with an in-progress game.
+func restore_progression(snapshot: Dictionary) -> void:
+	if snapshot.is_empty():
+		return
+	level = clampi(int(snapshot.get("level", 1)), 1, MAX_LEVEL)
+	experience = maxi(0, int(snapshot.get("experience", 0)))
+	strength = maxi(1, int(snapshot.get("strength", strength)))
+	defense = maxi(1, int(snapshot.get("defense", defense)))
+	max_hp = maxi(1, int(snapshot.get("max_hp", max_hp)))
+	max_mp = maxi(1, int(snapshot.get("max_mp", max_mp)))
+	# World travel has always reformed carried blorbs at full resources. Keep
+	# that established transition behavior while retaining their progression.
+	current_hp = max_hp
+	current_mp = max_mp
+	is_melted = false
+	if level >= MAX_LEVEL:
+		experience = 0
+	else:
+		experience = mini(experience, xp_to_next_level() - 1)
+	progression_changed.emit()
+
+
+## Used by skeleton NMEs' punches (this blorb's own Defense mitigates the
+## raw incoming amount -- see combat_math.gd's mitigated_damage()).
 ## Depleting current_hp fully melts the blorb -- see melt().
 func take_damage(amount: float) -> void:
 	if amount <= 0.0 or is_melted:
 		return
-	current_hp = maxf(current_hp - amount, 0.0)
+	current_hp = maxf(current_hp - CombatMath.mitigated_damage(amount, defense), 0.0)
 	_hp_regen_delay = HP_REGEN_DELAY
 	if current_hp <= 0.0:
 		melt()
@@ -655,6 +773,12 @@ func melt() -> void:
 	if is_melted:
 		return
 	is_melted = true
+	# Melting is a combat reset, not merely a temporary visual state. Remove
+	# every hit this Blorb registered against every live NME so reforming
+	# before one of those enemies dies cannot restore stale XP eligibility.
+	for nme in get_tree().get_nodes_in_group("skeletons"):
+		if nme.has_method("unregister_xp_participant"):
+			nme.unregister_xp_participant(self)
 	body.visible = false
 	if _collision_shape != null:
 		_collision_shape.disabled = true
@@ -924,6 +1048,16 @@ func set_visual_scale(scale_factor: float) -> void:
 func begin_worn() -> void:
 	is_worn = true
 	collision_layer = 0
+	# A blorb hopping onto the suit mid-attack shouldn't keep visibly
+	# streaming at whatever it was targeting -- it's about to become a
+	# stationary suit piece, not an independent combatant any more. Per
+	# direct report: this used to keep emitting on its own indefinitely,
+	# since _process()'s own "if is_worn: return" guard right below skips
+	# the ordinary combat-state code that would otherwise have stopped it,
+	# and nothing else ever freed the particle node itself.
+	if _stream_particles != null:
+		_stream_particles.queue_free()
+		_stream_particles = null
 
 
 ## Called once an equip hop's landing animation completes -- hides the
@@ -1057,6 +1191,22 @@ func _process(delta: float) -> void:
 	var follow_pt := _follow_target()
 	var dist_follow := here.distance_to(follow_pt)
 
+	# A not-yet-joined wild blorb gives up tagging along entirely once it's
+	# fallen this far behind -- whether it was actively FOLLOWING, had just
+	# been _discovered, or (per direct instruction) had just declined the
+	# join prompt moments ago, none of those should chase indefinitely if
+	# the party keeps moving away or it gets stuck behind terrain. Checked
+	# before the FOLLOWING transition right below so a drop-off this frame
+	# can't immediately re-enter it in the same tick. A joined party member
+	# (in_party) has no such ceiling -- this only bounds the pre-join
+	# tag-along.
+	if not in_party and _discovered and dist_follow > DROP_OFF_DISTANCE:
+		_discovered = false
+		_state = State.IDLE
+		_home = here
+		_has_wander_target = false
+		_bond_time = 0.0
+
 	if _state != State.COMBAT:
 		if (in_party or _discovered) and dist_follow > FOLLOW_DISTANCE:
 			_state = State.FOLLOWING
@@ -1089,7 +1239,14 @@ func _process(delta: float) -> void:
 		var to_skeleton := skeleton_here - here
 		var is_elemental := element_state == "water" or element_state == "fire"
 		var engage_range := STREAM_RANGE if is_elemental else MELEE_RANGE
-		if to_skeleton.length() > engage_range:
+		# True 3D distance decides whether an attack can actually land -- a
+		# blorb standing at the base of a cliff/tower shouldn't be able to
+		# hit a skeleton floating far above or below it just because their
+		# ground (XZ) positions happen to line up. Per direct correction.
+		# The approach-target math right below still uses the horizontal-
+		# only `to_skeleton` -- this blorb steers across the ground plane
+		# regardless, only the attack gate needs the real 3D check.
+		if global_position.distance_to(_combat_target.global_position) > engage_range:
 			target = skeleton_here - to_skeleton.normalized() * engage_range
 			glide_speed = _follow_glide_speed
 			moving = true
@@ -1594,10 +1751,11 @@ func _exit_combat(here: Vector2) -> void:
 
 
 ## Non-elemental blorbs' combat response: a melee bounce dealing
-## JUMP_ATTACK_DAMAGE, on a per-target cooldown so a single approach can't
-## multi-hit. Reuses the same ambient hop animation (_hop_active/_hop_elapsed,
-## see _process's hop-offset/squash handling below) rather than a separate
-## attack animation.
+## JUMP_ATTACK_BASE_DAMAGE (boosted by this blorb's own Strength, then
+## randomized and occasionally critical -- see combat_math.gd), on a
+## per-target cooldown so a single approach can't multi-hit. Reuses the same
+## ambient hop animation (_hop_active/_hop_elapsed, see _process's hop-offset/
+## squash handling below) rather than a separate attack animation.
 func _try_jump_attack() -> void:
 	if _attack_cooldown > 0.0 or _combat_target == null or not is_instance_valid(_combat_target):
 		return
@@ -1605,19 +1763,23 @@ func _try_jump_attack() -> void:
 		_hop_active = true
 		_hop_elapsed = 0.0
 	if _combat_target.has_method("take_damage"):
-		_combat_target.take_damage(JUMP_ATTACK_DAMAGE)
+		var roll := CombatMath.rolled_attack(JUMP_ATTACK_BASE_DAMAGE, strength, _rng)
+		_combat_target.take_damage(roll["amount"], self)
 	_attack_cooldown = JUMP_ATTACK_COOLDOWN
 
 
 ## Water/fire blorbs' combat response: streams their element from the core
 ## at the skeleton, draining MP at the same per-second rate player.gd uses
-## for the equivalent arm power, and dealing damage while actively streaming.
+## for the equivalent arm power, and dealing damage (at a rate boosted by
+## this blorb's own Strength -- see combat_math.gd's rolled_stream_rate())
+## while actively streaming.
 func _update_elemental_stream(delta: float) -> void:
 	var rate := WATER_STREAM_MP_PER_SECOND if element_state == "water" else FIRE_STREAM_MP_PER_SECOND
 	var draining := consume_mp(rate * delta)
 	_set_combat_stream_active(draining)
 	if draining and _combat_target != null and is_instance_valid(_combat_target) and _combat_target.has_method("take_damage"):
-		_combat_target.take_damage(STREAM_DAMAGE_PER_SECOND * delta)
+		var damage_rate := CombatMath.rolled_stream_rate(STREAM_BASE_DAMAGE_PER_SECOND, strength)
+		_combat_target.take_damage(damage_rate * delta, self)
 
 
 func _set_combat_stream_active(active: bool) -> void:
@@ -1633,11 +1795,18 @@ func _set_combat_stream_active(active: bool) -> void:
 		_stream_particles.global_position = origin
 		var aim := _combat_target.global_position - origin
 		if aim.length() > 0.01:
-			_stream_particles.look_at(origin + aim, Vector3.UP)
+			# A small organic waver in the aim itself, matching player.gd's
+			# own _update_water_stream()'s identical technique/comment --
+			# a real stream of fire/water never points perfectly still.
+			var phase := float(get_instance_id() % 1000) * 0.01
+			var t := Time.get_ticks_msec() * 0.001 * 3.2 + phase
+			var wobble := Basis(Vector3.UP, sin(t) * deg_to_rad(2.5)) * Basis(Vector3.RIGHT, cos(t * 1.3) * deg_to_rad(2.5))
+			_stream_particles.look_at(origin + wobble * aim, Vector3.UP)
 
 
 ## Visually matches player.gd's own _make_water_stream()/_make_fire_stream()
-## (same colors/rates) but isn't shared code with that file -- the aiming
+## (same soft-billboard/color-ramp technique -- see particle_fx.gd's own
+## class doc comment) but isn't shared code with that file -- the aiming
 ## here comes from the core's world position toward a live combat target
 ## rather than a hand's position along the character's facing, different
 ## enough that extracting a shared abstraction isn't worth touching that
@@ -1650,30 +1819,53 @@ func _make_combat_stream() -> GPUParticles3D:
 	stream.lifetime = 0.5 if is_water else 0.34
 	stream.randomness = 0.12 if is_water else 0.35
 	stream.visibility_aabb = AABB(Vector3(-1.5, -1.5, -6.0), Vector3(3.0, 3.0, 6.4))
-	var particle_color := TownProps.WATER_COLOR if is_water else Color(0.85, 0.25, 0.05, 0.95)
-	var material := StandardMaterial3D.new()
-	material.albedo_color = particle_color
-	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	material.emission_enabled = true
-	material.emission = particle_color if is_water else Color(0.9, 0.35, 0.05)
-	material.emission_energy_multiplier = 0.55 if is_water else 1.4
-	var droplet := SphereMesh.new()
-	droplet.radius = 0.045 if is_water else 0.055
-	droplet.height = droplet.radius * 2.0
-	droplet.radial_segments = 8
-	droplet.rings = 4
+	# fire's wobble is lower (0.2, not player.gd's own original 0.35) and
+	# its quad is elongated, not square -- see _make_fire_stream()'s own
+	# comment on particle_flag_align_y for why (a narrow angle_min/max
+	# range replacing a full 0-360 spin, to keep each streak aligned with
+	# its own velocity instead of pointing every which way).
+	var texture := ParticleFX.build_soft_gradient_texture(24, 2.2 if is_water else 1.7, 0.0 if is_water else 0.2)
+	var material := ParticleFX.build_billboard_material(texture, Color.WHITE, not is_water, 0.35 if is_water else 0.0)
+	material.vertex_color_use_as_albedo = true
+	var droplet := QuadMesh.new()
+	droplet.size = Vector2(0.16, 0.16) if is_water else Vector2(0.22, 0.5)
 	droplet.material = material
 	var process := ParticleProcessMaterial.new()
 	process.direction = Vector3(0.0, 0.0, -1.0)
-	process.spread = 1.0 if is_water else 8.0
+	process.spread = 1.0 if is_water else 6.0
 	process.gravity = Vector3(0.0, -1.2 if is_water else -1.4, 0.0)
 	var speed := 8.0 if is_water else 11.0
 	process.initial_velocity_min = speed * 0.9
 	process.initial_velocity_max = speed * 1.15
-	process.scale_min = 0.6 if is_water else 0.4
-	process.scale_max = 1.1 if is_water else 0.85
-	process.color = particle_color
+	process.scale_min = 0.85 if is_water else 0.5
+	process.scale_max = 1.3 if is_water else 1.05
+	if is_water:
+		process.color_ramp = ParticleFX.build_color_ramp([
+			{"offset": 0.0, "color": Color(0.85, 0.95, 1.0, 0.95)},
+			{"offset": 0.35, "color": TownProps.WATER_COLOR},
+			{"offset": 1.0, "color": Color(TownProps.WATER_COLOR.r, TownProps.WATER_COLOR.g, TownProps.WATER_COLOR.b, 0.0)},
+		])
+	else:
+		# See player.gd's own _make_fire_stream() for the full reasoning --
+		# aligns each streak to its own velocity (paired with the elongated
+		# quad above) so the stream reads as a directional jet rather than
+		# a round puff, and keeps turbulence modest so it flickers without
+		# visibly scattering the cone apart.
+		process.particle_flag_align_y = true
+		process.angle_min = -12.0
+		process.angle_max = 12.0
+		process.color_ramp = ParticleFX.build_color_ramp([
+			{"offset": 0.0, "color": Color(1.0, 0.95, 0.75, 1.0)},
+			{"offset": 0.25, "color": Color(1.0, 0.55, 0.1, 1.0)},
+			{"offset": 0.6, "color": Color(0.85, 0.25, 0.05, 0.9)},
+			{"offset": 1.0, "color": Color(0.35, 0.06, 0.02, 0.0)},
+		])
+		process.scale_curve = ParticleFX.build_scale_curve(0.6, 1.15, 0.3, 0.7)
+		process.turbulence_enabled = true
+		process.turbulence_noise_strength = 1.0
+		process.turbulence_noise_scale = 2.0
+		process.turbulence_influence_min = 0.04
+		process.turbulence_influence_max = 0.15
 	stream.process_material = process
 	stream.draw_pass_1 = droplet
 	stream.emitting = false

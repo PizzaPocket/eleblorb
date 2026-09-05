@@ -510,7 +510,9 @@ const STAT_METER_COLOR := UITheme.TEXT_PRIMARY
 ## regardless of how wide any one value happens to print.
 static func stat_meter(
 	stat_label: String, value: int, max_value: int,
-	show_track: bool = false, comparison_max: int = -1
+	show_track: bool = false, comparison_max: int = -1,
+	label_width: float = STAT_METER_LABEL_WIDTH,
+	bar_width: float = STAT_METER_BAR_WIDTH
 ) -> Control:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", UITheme.SPACE_SM)
@@ -535,7 +537,7 @@ static func stat_meter(
 
 	var value_text := "%d/%d" % [value, max_value] if show_track else str(value)
 	var label_ctrl := inline_caption("%s: %s" % [stat_label, value_text], UITheme.TEXT_PRIMARY)
-	label_ctrl.custom_minimum_size.x = STAT_METER_LABEL_WIDTH
+	label_ctrl.custom_minimum_size.x = label_width
 	label_ctrl.clip_text = true
 	label_ctrl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	label_ctrl.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
@@ -543,7 +545,7 @@ static func stat_meter(
 
 	var scale_max := comparison_max if comparison_max > 0 else max_value
 	var bar := StatMeterBar.new(value, max_value, scale_max, STAT_METER_COLOR, show_track)
-	bar.custom_minimum_size = Vector2(STAT_METER_BAR_WIDTH, STAT_METER_HEIGHT)
+	bar.custom_minimum_size = Vector2(bar_width, STAT_METER_HEIGHT)
 	row.add_child(bar)
 
 	return row

@@ -125,36 +125,83 @@ static func add_ears(
 			# right.z = -sin(tilt_omega) = -side*sin(side_angle+back_tilt),
 			# so local +X's own world Z-component has the SAME sign as
 			# -side. That means which local X sign actually faces +Z
-			# (forward, i.e. "front") flips between the two ears -- build_
-			# inset_pad_mesh() always builds on the +outward_axis side, so
-			# for the ear where that's the WRONG (backward-facing) sign,
-			# pad_flip below rotates the whole pad 180 around Y (swapping
-			# +X/-X, leaving Y untouched, so the flush-at-the-bottom edge
-			# stays flush) to land it on the correct side instead.
+			# (forward, i.e. "front") flips between the two ears -- the pad
+			# below is always BUILT on the +X side, so for the ear where
+			# that's the WRONG (backward-facing) sign, pad_flip further down
+			# rotates the whole pad 180 around Y (swapping +X/-X, leaving Y
+			# untouched, so the flush-at-the-bottom edge stays flush) to land
+			# it on the correct side instead.
 			#
-			# Flush edge = local -Y (the ear's own bottom, where it roots
-			# into the skull); inset everywhere else (the sides, now local
-			# Z, and the tip, local +Y) -- per direct instruction. Sized as
-			# fractions of the ear's OWN dimensions rather than ape_
-			# template.gd's fixed hand/foot pad constants, which are tuned
-			# for a much bigger absolute part and would read as wildly
-			# oversized here. Deep insets (a small centered patch, not most
-			# of the face), a shallow dome (a thin marking, not a raised
-			# pad), and a rounder falloff exponent (1.0, not the flat-
-			# plateau shape the hand/foot pads use) so what height it does
-			# have tapers gently -- per earlier direct correction the first
-			# pass read as bigger than the ear itself.
+			# CORRECTED per direct instruction ("the skin colored pads...
+			# doesn't look right especially at this scale -- ideally the
+			# ears should be modeled so that they're superellipsoid shapes
+			# similar to the body of the ears themselves, just smaller and
+			# inset on all sides but for the side where attached to the
+			# head, and just shifted forward... enough to emerge visibly as
+			# a thin pad") -- this used to be a carved-IN dimple via
+			# SuperEgg.build_inset_pad_mesh() (a technique built for the
+			# hand/foot fur pads' much flatter, plateau-shaped marking, not
+			# a genuinely separate rounded volume). Rebuilt instead as its
+			# own small SuperEgg.build_mesh() superellipsoid -- the same
+			# construction the ear itself uses just above, at a smaller
+			# scale -- positioned as its own child of `ear` so it inherits
+			# the exact same basis/flip handling.
+			#
+			# CORRECTED again per a direct follow-up report ("the giant
+			# gorilla's skin ear part was weighted toward the bottom of the
+			# base ear part instead of vertically centred and proportionally
+			# tall") -- the PREVIOUS version deliberately sat flush against
+			# the ear's own root (-Y) and inset everywhere else, reading
+			# this instruction's own "inset on all sides but for the side
+			# where attached" as an asymmetric exception at the root. Worked
+			# through the actual numbers that produces: with a 0.55-height
+			# pad flush-plus-a-hair-past the root, the pad spans roughly
+			# -1.05*ear_axes.y to +0.05*ear_axes.y -- 95% of it sitting below
+			# the ear's own vertical center, which is exactly the "weighted
+			# toward the bottom" this report describes, not a bug in that
+			# earlier math, just the direct (and, per this report, wrong)
+			# consequence of that asymmetric design choice. Simplified to a
+			# fully symmetric inset instead: centered on the ear's own
+			# vertical middle, tall enough to still read as a real "pad"
+			# rather than a token dot. (Confirmed separately, per this same
+			# report's own alternate theory, that this ISN'T caused by
+			# head_height_scale: add_ears() is always called with head_size_
+			# base, which this file's own caller -- ape_template.gd -- builds
+			# specifically excluding head_height_scale from the ratio, so
+			# the ear's own proportions here don't vary with it at all; the
+			# giant gorilla in particular never even sets that variant key,
+			# leaving it at its own default 1.0.)
+			var pad_height := ear_axes.y * 0.75
+			var pad_width := ear_axes.z * 0.55
+			var pad_thickness := ear_axes.x * 0.35
+			var pad_axes := Vector3(pad_thickness, pad_height, pad_width)
+			var pad_center_y := 0.0
+			# Center X magnitude chosen so the pad's own front edge (center +
+			# pad_thickness) lands 20% of the ear's own thickness PAST its
+			# front surface (ear_axes.x) -- the visible "emerging" amount --
+			# while its back edge (center - pad_thickness) still lands well
+			# short of the ear's own back surface, staying embedded.
+			#
+			# Sign is where the actual left/right correction happens: unlike
+			# the OLD carved-in pad (an asymmetric dome baked into one
+			# specific face of its own mesh, which a 180-degree basis flip
+			# could correctly mirror onto the opposite face), THIS pad is a
+			# plain symmetric ellipsoid centered at its own position -- a
+			# basis rotation alone cannot move that position, and a
+			# symmetric ellipsoid's own shape is unchanged by exactly this
+			# 180-degree-about-Y rotation anyway (it would visibly do
+			# nothing). The side-dependent sign directly on `.position.x`
+			# instead is what actually lands the pad on local -X for the ear
+			# where that's the forward-facing sign, matching this file's own
+			# already-confirmed "which local X sign faces +Z flips between
+			# the two ears" fact.
+			var pad_center_x := (ear_axes.x * 1.2 - pad_thickness) * (-1.0 if side > 0.0 else 1.0)
 			var pad := MeshInstance3D.new()
 			pad.name = "EarPad"
-			pad.mesh = SuperEgg.build_inset_pad_mesh(
-				ear_axes, ear_epsilon, 0, 1, -1.0,
-				0.45, 0.5, ear_axes.x * 0.4, 1.0, ear_axes.x * 0.2
-			)
+			pad.mesh = SuperEgg.build_mesh(pad_axes, ear_epsilon, ear_epsilon)
+			pad.position = Vector3(pad_center_x, pad_center_y, 0.0)
 			var pad_material := StandardMaterial3D.new()
 			pad_material.albedo_color = pad_color
 			pad_material.roughness = 0.6
-			pad_material.cull_mode = BaseMaterial3D.CULL_DISABLED
 			pad.material_override = pad_material
-			if side > 0.0:
-				pad.basis = Basis(Vector3(-1, 0, 0), Vector3.UP, Vector3(0, 0, -1))
 			ear.add_child(pad)

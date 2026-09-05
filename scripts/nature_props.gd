@@ -244,6 +244,26 @@ static func build_fruit_visual(fruit_color: Color, radius: float, item_scale: fl
 	return root
 
 
+## Shared molten-lava look, "similar texture to the fire blorbs" per direct
+## instruction -- deliberately the SAME albedo/emission recipe blorb.gd's own
+## _apply_element_visuals() uses for its "fire" body material (not just a
+## similar hand-picked color), so the volcano's lava pool and a fire blorb's
+## own body read as visibly the same molten substance. Used by both
+## terrain_generator.gd's own volcano lava pool and fire_kingdom_terrain.gd's
+## lava floor, so the two share one definition instead of two hand-copied
+## ones drifting apart later.
+static func build_lava_material() -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(0.85, 0.25, 0.05, 0.95)
+	material.roughness = 0.35
+	material.metallic = 0.0
+	material.emission_enabled = true
+	material.emission = Color(0.9, 0.35, 0.05)
+	material.emission_energy_multiplier = 1.4
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	return material
+
+
 ## A boulder -- two overlapping boxy-ish lobes so it doesn't read as one
 ## perfectly round rock. collidable=false for small decorative pebbles
 ## that shouldn't block movement.

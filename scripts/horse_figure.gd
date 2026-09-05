@@ -552,11 +552,11 @@ const RUN_BEND_MULTIPLIER := 1.4
 ## Sign reuse, not new guesses, for the KNEE/hock terms: the front knee
 ## reuses KNEE_FLEX_AMOUNT's own already-confirmed "positive knee
 ## rotation.x = lifting the foot" direction (a jump tuck IS an exaggerated
-## foot-lift), and the hind tuck reuses the gait's own confirmed "negative
-## hip rotation.x = forward/up" swing direction plus HOCK_FLEX_AMOUNT's own
-## confirmed positive lift direction -- see KNEE_FLEX_AMOUNT's/
-## HOCK_FLEX_AMOUNT's own comments and _animate_hind_leg()'s own swing
-## formula for where each of those was established.
+## foot-lift), and the hock reuses HOCK_FLEX_AMOUNT's own confirmed positive
+## lift direction -- see KNEE_FLEX_AMOUNT's/HOCK_FLEX_AMOUNT's own comments
+## and _animate_hind_leg()'s own swing formula for where each of those was
+## established. The hip/femur pivot, unlike the shoulder, has no dynamic
+## jump term at all any more -- see JUMP_HOCK_TUCK's own comment.
 ##
 ## The SHOULDER term (JUMP_SHOULDER_TUCK, below) is applied as a FORWARD
 ## bend now (see _apply_front_tuck()'s own comment), per direct correction
@@ -564,16 +564,74 @@ const RUN_BEND_MULTIPLIER := 1.4
 ## end of the forelegs") -- reuses FRONT_RADIUS_REST_ANGLE's own confirmed
 ## "negative rotation.x = forward" sign for this same pivot chain, not a
 ## fresh guess either, even though the ORIGINAL first-draft direction here
-## (backward) was.
-const JUMP_SHOULDER_TUCK := deg_to_rad(35.0)
-const JUMP_KNEE_TUCK := deg_to_rad(70.0)
-const JUMP_HIP_TUCK := deg_to_rad(30.0)
-const JUMP_HOCK_TUCK := deg_to_rad(70.0)
+## (backward) was. Pushed much further per a later direct correction ("the
+## front legs should swing forward a lot at the joint that connects them to
+## the body") -- 35 -> 80 degrees, since that instruction singled out
+## exactly this pivot (the shoulder is the front leg's own body attachment).
+## Pushed further still per a later direct correction ("his forelegs should
+## swing forward more at the point where they meet the body") -- 80 -> 105.
+const JUMP_SHOULDER_TUCK := deg_to_rad(105.0)
+## Per the same later direct correction's second half ("the joints bending
+## should be much more extreme") -- roughly doubled from the first draft.
+## Increased again per a later direct correction ("all the foreleg joints
+## should bend even more") -- 100 -> 125.
+const JUMP_KNEE_TUCK := deg_to_rad(125.0)
+## The hind legs now sweep slightly toward the tail during the jump. Positive
+## hip X is this rig's established backward direction; keep this much quieter
+## than the foreleg shoulder tuck so the rear still reads as following through.
+const JUMP_HIND_BACK_SWING := deg_to_rad(18.0)
+const JUMP_HOCK_TUCK := deg_to_rad(100.0)
+## Per direct correction ("the joint inversion should take place on one
+## joint, which is the lowest joint of the front legs") -- the front
+## fetlock (bone 4, otherwise a FIXED pose per FRONT_HOOF_REST_ANGLE's own
+## comment, untouched by animate_gait()) gets its own dynamic jump term.
+## CORRECTED per a direct follow-up report ("the lowest joints on Manchego's
+## front legs aren't yet reversing direction on the jump... they should be
+## bending backwards a lot on the jump, toward his rear") -- an initial
+## guess applied this with the OPPOSITE sign from the knee immediately above
+## it (an S-curve, cannon back/up and hoof the other way), which is what
+## read as "not reversing" and not backward at all. The actual "inversion"
+## is against this joint's OWN rest bias instead: FRONT_HOOF_REST_ANGLE
+## already leans forward (-15 degrees, negative = forward per this rig's own
+## convention) at rest, same as every other fixed-pose joint; the jump term
+## now REVERSES that all the way to a strong backward bend (positive, same
+## sign as the knee's own `+ apex_fraction * JUMP_KNEE_TUCK` term, not
+## opposite), confirmed by this same report's own "toward his rear."
+## Increased per a later direct correction ("all the foreleg joints should
+## bend even more") -- 60 -> 80, same instruction that bumped JUMP_KNEE_TUCK.
+const JUMP_FETLOCK_TUCK := deg_to_rad(80.0)
 ## How fast the tuck itself eases toward its current apex_fraction-scaled
 ## target -- deliberately slower than LEG_SETTLE_SPEED (which is for
 ## snapping OUT of a stride back to rest) so the tuck reads as a gradual
 ## fold through the flight, matching "bends... gradually," not a snap.
 const JUMP_POSE_SETTLE_SPEED := 6.0
+
+## Per direct correction ("horses start a jump with the forward part of
+## their body lifting off more first, and the back catching up; and the
+## front legs land first, and the back catch up after... the body actually
+## pitching back at first at the start of the jump and then pitching
+## forward toward the end of the jump before landing") -- rotates
+## spine_pivot itself (and everything hanging off it: torso/neck/head/tail,
+## NOT the legs, which are parented straight to `rig` -- see this file's
+## own class doc) around its own rest orientation, on top of the legs'
+## independent tuck.
+##
+## DERIVED, not guessed, per the figure-rig skill's rule 2 (no in-engine
+## check was available): spine_pivot is "a plain Node3D, forward=+Z" like
+## every other pivot in this project (FRONT_LEG_Z/NECK_ATTACH_Z are
+## positive, HIND_LEG_Z is negative, confirming the front/head side of this
+## rig really is +Z locally). Applying Godot's own X-rotation matrix
+## (y' = y*cos(theta) - z*sin(theta)) to that +Z front-reference direction
+## gives y' = -sin(theta) for positive theta -- i.e. a POSITIVE
+## spine_pivot.rotation.x drops the front end (nose-down, "pitching
+## forward"), NEGATIVE raises it (nose-up, "pitching back"). This is the
+## same matrix that produces the already-confirmed "positive rotation.x =
+## backward" leg convention elsewhere in this file, just applied to a
+## forward-pointing reference instead of a downward-hanging one, so it's
+## trustworthy math -- but the VISUAL read of this specific pivot has not
+## been seen move in-engine, so flag to the user if it reads backwards.
+const BODY_PITCH_TAKEOFF_AMOUNT := deg_to_rad(14.0)
+const BODY_PITCH_LANDING_AMOUNT := deg_to_rad(14.0)
 
 ## Landing impact -- a brief echo of the same tuck direction (shock
 ## absorption reads the same way a jump lift does on these joints, just
@@ -1453,34 +1511,57 @@ static func animate_gait(pivots: Dictionary, delta: float, moving: bool, phase: 
 	_animate_front_leg(legs["front_right"], delta, moving, phase + PI * 1.5, running)
 	_animate_hind_leg(legs["hind_left"], delta, moving, phase, running)
 	_animate_hind_leg(legs["hind_right"], delta, moving, phase + PI, running)
-	_ease_body_height_to_rest(pivots["spine"], delta)
+	var spine_pivot: Node3D = pivots["spine"]
+	# Releases whatever takeoff/landing pitch animate_airborne() left behind
+	# -- see BODY_PITCH_TAKEOFF_AMOUNT's own comment. Harmless no-op once
+	# already level, same reasoning _ease_body_height_to_rest() gives for its
+	# own unconditional every-frame call.
+	spine_pivot.rotation.x = lerp_angle(spine_pivot.rotation.x, 0.0, LEG_SETTLE_SPEED * delta)
+	_ease_body_height_to_rest(spine_pivot, delta)
 
 
 const LEG_SETTLE_SPEED := 8.0
 
 
 ## Airborne jump tuck -- see JUMP_SHOULDER_TUCK's own comment for the full
-## reasoning. apex_fraction is 0 at takeoff/landing and 1 at the jump's
-## apex; manchego.gd computes it every frame from its own vertical velocity
-## (mirroring player.gd's own _animate_airborne()) and passes it straight
-## through here. All four legs tuck together -- no gait phase offset.
-static func animate_airborne(pivots: Dictionary, delta: float, apex_fraction: float) -> void:
+## leg-tuck reasoning, and BODY_PITCH_TAKEOFF_AMOUNT's own comment for the
+## body-pitch reasoning. apex_fraction is 0 at takeoff/landing and 1 at the
+## jump's apex; manchego.gd computes it every frame from its own vertical
+## velocity (mirroring player.gd's own _animate_airborne()) and passes it
+## straight through here, along with `rising` (true for the whole ascent,
+## false for the whole descent -- manchego.gd's own vertical_velocity >= 0.0)
+## so this function can tell which half of the arc it's in: the pitch target
+## needs to be nose-up while rising and nose-down while falling, which
+## apex_fraction alone (symmetric across both halves) can't express. All
+## four legs tuck together -- no gait phase offset.
+static func animate_airborne(pivots: Dictionary, delta: float, apex_fraction: float, rising: bool) -> void:
 	var legs: Dictionary = pivots["legs"]
 	_apply_front_tuck(legs["front_left"], delta, apex_fraction)
 	_apply_front_tuck(legs["front_right"], delta, apex_fraction)
 	_apply_hind_tuck(legs["hind_left"], delta, apex_fraction)
 	_apply_hind_tuck(legs["hind_right"], delta, apex_fraction)
+	var spine_pivot: Node3D = pivots["spine"]
+	# (1.0 - apex_fraction) is 0 at the apex and 1 at either end of the
+	# flight -- exactly backwards from apex_fraction itself, which is what a
+	# pitch that peaks at takeoff/landing and relaxes through the apex needs
+	# (the leg tuck above wants the opposite shape, peaking AT the apex, so
+	# it uses apex_fraction directly instead).
+	var pitch_amount := BODY_PITCH_TAKEOFF_AMOUNT if rising else BODY_PITCH_LANDING_AMOUNT
+	var pitch_sign := -1.0 if rising else 1.0
+	var pitch_target := pitch_sign * pitch_amount * (1.0 - apex_fraction)
+	spine_pivot.rotation.x = lerp_angle(spine_pivot.rotation.x, pitch_target, JUMP_POSE_SETTLE_SPEED * delta)
 	# No body-height dip mid-flight -- only the landing impact itself dips
 	# the body (see animate_landing()) -- this just cleans up any dip still
 	# decaying from a landing that happened right before takeoff again (a
 	# quick re-jump), same reasoning player.gd's own _apply_airborne_pose()
 	# gives for its identical no-op-unless-already-displaced spine/hips ease.
-	_ease_body_height_to_rest(pivots["spine"], delta)
+	_ease_body_height_to_rest(spine_pivot, delta)
 
 
 static func _apply_front_tuck(leg: Dictionary, delta: float, apex_fraction: float) -> void:
 	var shoulder: Node3D = leg["shoulder"]
 	var knee: Node3D = leg["knee"]
+	var fetlock: Node3D = leg["fetlock"]
 	var t := JUMP_POSE_SETTLE_SPEED * delta
 	# CORRECTED per direct correction ("the bend in the legs should also
 	# include a forward bend at the upper end of the forelegs") -- was
@@ -1493,13 +1574,22 @@ static func _apply_front_tuck(leg: Dictionary, delta: float, apex_fraction: floa
 	# toward the chest, not backward.
 	shoulder.rotation.x = lerp_angle(shoulder.rotation.x, FRONT_HUMERUS_REST_ANGLE - apex_fraction * JUMP_SHOULDER_TUCK, t)
 	knee.rotation.x = lerp_angle(knee.rotation.x, FRONT_CANNON_REST_ANGLE + apex_fraction * JUMP_KNEE_TUCK, t)
+	# See JUMP_FETLOCK_TUCK's own comment -- CORRECTED to the SAME sign as
+	# the knee term directly above (`+` here, matching `+` there) per direct
+	# report that an earlier opposite-sign version wasn't bending backward at
+	# all. The "inversion" is against this joint's own forward-leaning
+	# FRONT_HOOF_REST_ANGLE rest bias, not against the knee. Otherwise fixed
+	# at FRONT_HOOF_REST_ANGLE (see _build_front_leg()'s own comment) -- this
+	# is the only place bone 4 ever animates.
+	fetlock.rotation.x = lerp_angle(fetlock.rotation.x, FRONT_HOOF_REST_ANGLE + apex_fraction * JUMP_FETLOCK_TUCK, t)
 
 
 static func _apply_hind_tuck(leg: Dictionary, delta: float, apex_fraction: float) -> void:
 	var hip: Node3D = leg["hip"]
 	var hock: Node3D = leg["hock"]
 	var t := JUMP_POSE_SETTLE_SPEED * delta
-	hip.rotation.x = lerp_angle(hip.rotation.x, HIND_FEMUR_REST_ANGLE - apex_fraction * JUMP_HIP_TUCK, t)
+	# A restrained rearward sweep toward the tail, peaking with the tuck.
+	hip.rotation.x = lerp_angle(hip.rotation.x, HIND_FEMUR_REST_ANGLE + apex_fraction * JUMP_HIND_BACK_SWING, t)
 	hock.rotation.x = lerp_angle(hock.rotation.x, HIND_CANNON_REST_ANGLE + apex_fraction * JUMP_HOCK_TUCK, t)
 
 
@@ -1515,8 +1605,13 @@ static func animate_landing(pivots: Dictionary, delta: float) -> void:
 		var leg: Dictionary = legs[key]
 		var shoulder: Node3D = leg["shoulder"]
 		var knee: Node3D = leg["knee"]
+		var fetlock: Node3D = leg["fetlock"]
 		shoulder.rotation.x = lerp_angle(shoulder.rotation.x, FRONT_HUMERUS_REST_ANGLE + LANDING_SHOULDER_BEND, t)
 		knee.rotation.x = lerp_angle(knee.rotation.x, FRONT_CANNON_REST_ANGLE + LANDING_KNEE_BEND, t)
+		# Releases the jump's fetlock inversion (see JUMP_FETLOCK_TUCK's own
+		# comment) back to its ordinary fixed rest pose over the same impact
+		# window as the other front-leg joints above.
+		fetlock.rotation.x = lerp_angle(fetlock.rotation.x, FRONT_HOOF_REST_ANGLE, t)
 	for key in ["hind_left", "hind_right"]:
 		var leg: Dictionary = legs[key]
 		var hip: Node3D = leg["hip"]
@@ -1525,6 +1620,10 @@ static func animate_landing(pivots: Dictionary, delta: float) -> void:
 		hock.rotation.x = lerp_angle(hock.rotation.x, HIND_CANNON_REST_ANGLE + LANDING_HOCK_BEND, t)
 	var spine_pivot: Node3D = pivots["spine"]
 	spine_pivot.position.y = lerp(spine_pivot.position.y, (HIP_Y - SPINE_DROP_FROM_HIP) - LANDING_BODY_DIP_AMOUNT, t)
+	# Relaxes the nose-down pitch animate_airborne() was building up through
+	# the descent (see BODY_PITCH_LANDING_AMOUNT's own comment) back to
+	# level over the same impact window the leg bends above ease through.
+	spine_pivot.rotation.x = lerp_angle(spine_pivot.rotation.x, 0.0, t)
 
 
 ## Shared by animate_gait()/animate_airborne() -- eases spine_pivot (and
@@ -1536,14 +1635,19 @@ static func _ease_body_height_to_rest(spine_pivot: Node3D, delta: float) -> void
 	spine_pivot.position.y = lerp(spine_pivot.position.y, HIP_Y - SPINE_DROP_FROM_HIP, LEG_SETTLE_SPEED * delta)
 
 
-## elbow/fetlock are deliberately NOT touched here -- both are fixed poses
-## baked once in _build_front_leg() (see FRONT_RADIUS_REST_ANGLE's and
-## FRONT_HOOF_REST_ANGLE's own comments for why bones 2 and 4 have no
-## dynamic gait component). Only bone 1 (shoulder) and bone 3 (knee) animate,
-## each swinging/flexing around its own REST_ANGLE rather than around zero.
+## elbow is deliberately NOT touched here -- it's a fixed pose baked once in
+## _build_front_leg() (see FRONT_RADIUS_REST_ANGLE's own comment for why bone
+## 2 has no dynamic gait component). Bone 1 (shoulder) and bone 3 (knee)
+## animate every frame, each swinging/flexing around its own REST_ANGLE
+## rather than around zero. Bone 4 (fetlock) has no GAIT component either
+## (it only animates during a jump tuck, see JUMP_FETLOCK_TUCK's own
+## comment), but unlike the elbow it DOES need easing back to its own rest
+## angle here -- otherwise a jump would leave it tucked indefinitely once
+## grounded again.
 static func _animate_front_leg(leg: Dictionary, delta: float, moving: bool, phase: float, running: bool = false) -> void:
 	var shoulder: Node3D = leg["shoulder"]
 	var knee: Node3D = leg["knee"]
+	var fetlock: Node3D = leg["fetlock"]
 	if moving:
 		var bend_scale := RUN_BEND_MULTIPLIER if running else 1.0
 		var swing := sin(phase)
@@ -1562,6 +1666,7 @@ static func _animate_front_leg(leg: Dictionary, delta: float, moving: bool, phas
 	else:
 		shoulder.rotation.x = lerp_angle(shoulder.rotation.x, FRONT_HUMERUS_REST_ANGLE, LEG_SETTLE_SPEED * delta)
 		knee.rotation.x = lerp_angle(knee.rotation.x, FRONT_CANNON_REST_ANGLE, LEG_SETTLE_SPEED * delta)
+	fetlock.rotation.x = lerp_angle(fetlock.rotation.x, FRONT_HOOF_REST_ANGLE, LEG_SETTLE_SPEED * delta)
 
 
 ## stifle/fetlock are deliberately NOT touched here -- both are fixed poses

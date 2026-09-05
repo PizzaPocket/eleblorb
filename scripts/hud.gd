@@ -62,6 +62,10 @@ var _coin_readout_tween: Tween
 var _prompt_readout: PanelContainer
 var _message_readout: PanelContainer
 var _message_timer: float = 0.0
+## Level-up notices are passive and can arrive several at once when multiple
+## participating blorbs share one NME reward. Queue them instead of letting
+## the last level-up overwrite the others in the single message readout.
+var _passive_message_queue: Array[Dictionary] = []
 
 ## Player HP readout -- fades in on damage/heal/regen, holds, fades out,
 ## same as the Tokoins readout (see design language rule 5/20 in
@@ -157,7 +161,10 @@ func _process(delta: float) -> void:
 	if _message_timer > 0.0:
 		_message_timer -= delta
 		if _message_timer <= 0.0:
-			_message_readout.visible = false
+			if _passive_message_queue.is_empty():
+				_message_readout.visible = false
+			else:
+				_show_next_passive_message()
 
 	_ensure_player_hp_connected()
 	_update_wild_hint()
@@ -223,6 +230,19 @@ func show_message(text: String, duration: float = 2.5) -> void:
 	UIKit.set_readout_text(_message_readout, text)
 	_message_readout.visible = true
 	_message_timer = duration
+
+
+func show_passive_message(text: String, duration: float = 2.5) -> void:
+	_passive_message_queue.append({"text": text, "duration": duration})
+	if not _message_readout.visible or _message_timer <= 0.0:
+		_show_next_passive_message()
+
+
+func _show_next_passive_message() -> void:
+	if _passive_message_queue.is_empty():
+		return
+	var message: Dictionary = _passive_message_queue.pop_front()
+	show_message(message["text"] as String, message["duration"] as float)
 
 
 ## Ties the hint to actually owning the Corroded Pocket Compass, per direct
