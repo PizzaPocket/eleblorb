@@ -1,5 +1,13 @@
 # Eleblorb — Project Instructions
 
+## Publishing and attribution
+
+Follow the complete publishing contract in `AGENTS.md`. In particular, every
+push must regenerate and validate the committed `build/web` deployment first.
+Use the human owner’s configured Git identity and never credit Claude, Codex,
+another AI system, or an AI vendor as an author, committer, co-author,
+contributor, or generated-by credit.
+
 ## World bible
 
 This project keeps a lore/world-building knowledge base at `docs/world_bible.md` — narrative and setting facts (characters, creatures, currencies, locations, plot elements), not implementation details.

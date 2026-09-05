@@ -7,6 +7,8 @@ import argparse
 from pathlib import Path
 import subprocess
 
+from web_build import write_manifest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 HTML = ROOT / "build" / "web" / "index.html"
@@ -320,6 +322,7 @@ def main() -> None:
     if not HTML.exists():
         raise FileNotFoundError(f"No exported HTML at {HTML}")
     patch_html()
+    write_manifest()
     print(f"Exported one continuous Eleblorb loader: {HTML}")
 
 
