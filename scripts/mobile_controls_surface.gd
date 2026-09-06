@@ -1,129 +1,292 @@
 class_name MobileControlsSurface
 extends Control
 
-const STICK_RADIUS := 86.0
-const KNOB_RADIUS := 38.0
-const LOOK_SENSITIVITY := 0.0042
-const BUTTON_RADIUS := 42.0
-const BUTTONS := [
-	{"label": "JUMP", "action": "jump", "offset": Vector2(-78, -118)},
-	{"label": "USE", "action": "interact", "offset": Vector2(-172, -68)},
-	{"label": "L ARM", "action": "left_arm_power", "offset": Vector2(-254, -150)},
-	{"label": "R ARM", "action": "right_arm_power", "offset": Vector2(-145, -184)},
-	{"label": "L LEG", "action": "left_leg_power", "offset": Vector2(-260, -250)},
-	{"label": "R LEG", "action": "right_leg_power", "offset": Vector2(-150, -282)},
-	{"label": "FORM", "action": "transform", "offset": Vector2(-268, -354)},
-	{"label": "BAG", "action": "inventory", "offset": Vector2(-158, -386)},
-	{"label": "Ⅱ", "action": "pause", "offset": Vector2(-58, -350)},
+## Kueh Machine's proven touch architecture adapted to Eleblorbs: fixed,
+## density-normalized Controls; explicit per-finger ownership; canvas-aware
+## hit testing; absolute-position camera deltas; and exhaustive release when
+## a modal takes control.
+
+const JOYSTICK_NO_TOUCH := -2
+const JOYSTICK_OUTER_SIZE := 292.0
+const JOYSTICK_KNOB_SIZE := 128.0
+const ACTION_SIZE := 138.0
+const CONTROL_MARGIN := 54.0
+const ACTION_GAP := 18.0
+const TABLET_SCALE := 1.25
+const TABLET_MARGIN_SCALE := 2.0
+const LOOK_SENSITIVITY := 0.0024
+
+const ACTION_LAYOUT := [
+	["FORM", "transform"], ["SWAP", "switch_blorbus"], ["BAG", "inventory"],
+	["L ARM", "left_arm_power"], ["JUMP", "jump"], ["R ARM", "right_arm_power"],
+	["L LEG", "left_leg_power"], ["USE", "interact"], ["R LEG", "right_leg_power"],
+	["RUN", "run"], ["Ⅱ", "pause"],
 ]
 
-var _move_touch := -1
+var _joystick_outer: PanelContainer
+var _joystick_knob: PanelContainer
+var _joystick_touch := JOYSTICK_NO_TOUCH
+var _joystick_outer_size := JOYSTICK_OUTER_SIZE
+var _joystick_knob_size := JOYSTICK_KNOB_SIZE
+var _action_controls: Dictionary = {}
+var _active_action_touches: Dictionary = {}
 var _look_touch := -1
-var _move_origin := Vector2.ZERO
-var _move_knob := Vector2.ZERO
-var _pressed_actions: Dictionary = {}
+var _look_position := Vector2.ZERO
+var _input_enabled := true
 
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	queue_redraw()
+	_build_controls()
 
 
 func _process(_delta: float) -> void:
-	# Once a menu/dialog opens, its own touch-sized controls own the screen.
-	# Hiding this layer prevents invisible gameplay buttons intercepting taps.
-	visible = not UIState.modal_open
+	var should_enable := not UIState.modal_open
+	if should_enable == _input_enabled:
+		return
+	_input_enabled = should_enable
+	visible = should_enable
+	if not should_enable:
+		_release_all_input()
 
 
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_RESIZED:
-		queue_redraw()
+func _build_controls() -> void:
+	var scale_factor := TABLET_SCALE if UIKit.is_tablet_touch_viewport() else 1.0
+	var margin := CONTROL_MARGIN * (TABLET_MARGIN_SCALE if UIKit.is_tablet_touch_viewport() else 1.0)
+	_joystick_outer_size = JOYSTICK_OUTER_SIZE * scale_factor
+	_joystick_knob_size = JOYSTICK_KNOB_SIZE * scale_factor
+
+	_joystick_outer = PanelContainer.new()
+	_joystick_outer.name = "MovementJoystickOuter"
+	_joystick_outer.custom_minimum_size = Vector2.ONE * _joystick_outer_size
+	_joystick_outer.mouse_filter = Control.MOUSE_FILTER_STOP
+	_joystick_outer.add_theme_stylebox_override("panel", _joystick_ring_style(_joystick_outer_size))
+	UIKit.anchor_to_edge(_joystick_outer, 0.0, 1.0, margin, margin)
+	add_child(_joystick_outer)
+
+	_joystick_knob = PanelContainer.new()
+	_joystick_knob.name = "MovementJoystickKnob"
+	_joystick_knob.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_joystick_knob.anchor_left = 0.5
+	_joystick_knob.anchor_right = 0.5
+	_joystick_knob.anchor_top = 0.5
+	_joystick_knob.anchor_bottom = 0.5
+	_joystick_knob.add_theme_stylebox_override("panel", _joystick_knob_style(_joystick_knob_size))
+	_set_joystick_knob(Vector2.ZERO)
+	_joystick_outer.add_child(_joystick_knob)
+
+	var grid := GridContainer.new()
+	grid.name = "MobileActionButtons"
+	grid.columns = 3
+	grid.add_theme_constant_override("h_separation", int(ACTION_GAP * scale_factor))
+	grid.add_theme_constant_override("v_separation", int(ACTION_GAP * scale_factor))
+	grid.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	UIKit.anchor_to_edge(grid, 1.0, 1.0, margin, margin)
+	add_child(grid)
+	for definition in ACTION_LAYOUT:
+		var control := _action_control(String(definition[0]), ACTION_SIZE * scale_factor)
+		_action_controls[control] = StringName(definition[1])
+		grid.add_child(control)
+
+
+func _action_control(label_text: String, control_size: float) -> PanelContainer:
+	var control := PanelContainer.new()
+	control.custom_minimum_size = Vector2.ONE * control_size
+	control.mouse_filter = Control.MOUSE_FILTER_STOP
+	control.add_theme_stylebox_override("panel", _action_style(control_size))
+	var label := Label.new()
+	label.text = label_text
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", UITheme.FONT_BUTTON)
+	label.add_theme_color_override("font_color", UITheme.TEXT_PRIMARY)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	control.add_child(label)
+	return control
 
 
 func _input(event: InputEvent) -> void:
+	if not _input_enabled:
+		return
 	if event is InputEventScreenTouch:
 		var touch := event as InputEventScreenTouch
 		if touch.pressed:
-			if _press_button(touch.index, touch.position):
+			if _canvas_point_inside(_joystick_outer, touch.position):
+				_begin_joystick(touch.index, touch.position)
 				get_viewport().set_input_as_handled()
 				return
-			if touch.position.x < size.x * 0.45 and touch.position.y > size.y * 0.42 and _move_touch < 0:
-				_move_touch = touch.index
-				_move_origin = touch.position
-				_move_knob = touch.position
-				_apply_move(Vector2.ZERO)
-				queue_redraw()
+			var action_control := _action_at(touch.position)
+			if action_control != null:
+				_press_action_touch(touch.index, action_control)
 				get_viewport().set_input_as_handled()
-			elif _look_touch < 0 and not UIState.modal_open:
+				return
+			if _look_touch < 0:
 				_look_touch = touch.index
-		else:
-			if touch.index == _move_touch:
-				_move_touch = -1
-				_apply_move(Vector2.ZERO)
-				queue_redraw()
-			if touch.index == _look_touch:
-				_look_touch = -1
-			_release_button(touch.index)
+				_look_position = touch.position
+		elif touch.index == _joystick_touch:
+			_end_joystick()
+			get_viewport().set_input_as_handled()
+		elif _active_action_touches.has(touch.index):
+			_release_action_touch(touch.index)
+			get_viewport().set_input_as_handled()
+		elif touch.index == _look_touch:
+			_cancel_look()
 	elif event is InputEventScreenDrag:
 		var drag := event as InputEventScreenDrag
-		if drag.index == _move_touch:
-			var delta := drag.position - _move_origin
-			var limited := delta.limit_length(STICK_RADIUS)
-			_move_knob = _move_origin + limited
-			_apply_move(limited / STICK_RADIUS)
-			queue_redraw()
+		if drag.index == _joystick_touch:
+			_update_joystick(drag.position)
 			get_viewport().set_input_as_handled()
-		elif drag.index == _look_touch and not UIState.modal_open:
+		elif _active_action_touches.has(drag.index):
+			_update_action_touch(drag.index, drag.position)
+			get_viewport().set_input_as_handled()
+		elif drag.index == _look_touch:
+			# Absolute positions avoid the web backend's shared relative stream,
+			# which can jump when the joystick finger moves simultaneously.
+			var delta := drag.position - _look_position
+			_look_position = drag.position
 			var player := get_tree().get_first_node_in_group("player") as Player
 			if player != null:
-				player._rotate_camera(-drag.relative.x * LOOK_SENSITIVITY, -drag.relative.y * LOOK_SENSITIVITY)
-			get_viewport().set_input_as_handled()
+				player.rotate_camera_from_touch(
+					-delta.x * LOOK_SENSITIVITY, -delta.y * LOOK_SENSITIVITY
+				)
 
 
-func _apply_move(value: Vector2) -> void:
-	_set_strength("move_left", maxf(-value.x, 0.0))
-	_set_strength("move_right", maxf(value.x, 0.0))
-	_set_strength("move_forward", maxf(-value.y, 0.0))
-	_set_strength("move_back", maxf(value.y, 0.0))
+func _begin_joystick(index: int, position: Vector2) -> void:
+	if _joystick_touch != JOYSTICK_NO_TOUCH:
+		return
+	_joystick_touch = index
+	_update_joystick(position)
 
 
-func _set_strength(action: String, strength: float) -> void:
-	if strength > 0.02:
+func _update_joystick(position: Vector2) -> void:
+	var local := _joystick_outer.get_global_transform_with_canvas().affine_inverse() * position
+	var center := _joystick_outer.size * 0.5
+	var radius := (_joystick_outer_size - _joystick_knob_size) * 0.5
+	var offset := (local - center).limit_length(radius)
+	_set_joystick_knob(offset)
+	var direction := offset / radius
+	if direction.length() < 0.12:
+		direction = Vector2.ZERO
+	_set_strength("move_left", maxf(-direction.x, 0.0))
+	_set_strength("move_right", maxf(direction.x, 0.0))
+	_set_strength("move_forward", maxf(-direction.y, 0.0))
+	_set_strength("move_back", maxf(direction.y, 0.0))
+
+
+func _end_joystick() -> void:
+	_joystick_touch = JOYSTICK_NO_TOUCH
+	_set_joystick_knob(Vector2.ZERO)
+	for action in ["move_left", "move_right", "move_forward", "move_back"]:
+		Input.action_release(action)
+
+
+func _set_strength(action: StringName, strength: float) -> void:
+	if strength > 0.0:
 		Input.action_press(action, strength)
 	else:
 		Input.action_release(action)
 
 
-func _press_button(touch_id: int, point: Vector2) -> bool:
-	for spec in BUTTONS:
-		if point.distance_to(size + spec.offset) <= BUTTON_RADIUS * 1.25:
-			var action := String(spec.action)
-			_pressed_actions[touch_id] = action
-			Input.action_press(action)
-			return true
-	return false
+func _set_joystick_knob(offset: Vector2) -> void:
+	var half := _joystick_knob_size * 0.5
+	_joystick_knob.offset_left = -half + offset.x
+	_joystick_knob.offset_right = half + offset.x
+	_joystick_knob.offset_top = -half + offset.y
+	_joystick_knob.offset_bottom = half + offset.y
 
 
-func _release_button(touch_id: int) -> void:
-	if not _pressed_actions.has(touch_id):
+func _action_at(position: Vector2) -> Control:
+	for control in _action_controls:
+		if _canvas_point_inside(control as Control, position):
+			return control
+	return null
+
+
+func _press_action_touch(index: int, control: Control) -> void:
+	_active_action_touches[index] = control
+	control.modulate = Color(1.12, 1.12, 1.12, 1.0)
+	_emit_action(_action_controls[control], true)
+
+
+func _release_action_touch(index: int) -> void:
+	var control := _active_action_touches[index] as Control
+	control.modulate = Color.WHITE
+	_emit_action(_action_controls[control], false)
+	_active_action_touches.erase(index)
+
+
+func _update_action_touch(index: int, position: Vector2) -> void:
+	var current := _active_action_touches[index] as Control
+	if _canvas_point_inside(current, position):
 		return
-	Input.action_release(String(_pressed_actions[touch_id]))
-	_pressed_actions.erase(touch_id)
+	current.modulate = Color.WHITE
+	_emit_action(_action_controls[current], false)
+	var next := _action_at(position)
+	if next != null:
+		_press_action_touch(index, next)
+	else:
+		_active_action_touches.erase(index)
 
 
-func _draw() -> void:
-	var base := _move_origin if _move_touch >= 0 else Vector2(120, size.y - 130)
-	var knob := _move_knob if _move_touch >= 0 else base
-	draw_circle(base, STICK_RADIUS, Color(0.04, 0.04, 0.05, 0.46))
-	draw_arc(base, STICK_RADIUS, 0, TAU, 48, Color.WHITE * Color(1, 1, 1, 0.72), 4.0)
-	draw_circle(knob, KNOB_RADIUS, Color(0.82, 0.60, 0.62, 0.82))
-	var font := ThemeDB.fallback_font
-	for spec in BUTTONS:
-		var center: Vector2 = size + spec.offset
-		draw_circle(center, BUTTON_RADIUS, Color(0.12, 0.08, 0.1, 0.72))
-		draw_arc(center, BUTTON_RADIUS, 0, TAU, 32, Color(1, 1, 1, 0.75), 3.0)
-		var label := String(spec.label)
-		var text_size := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 18)
-		draw_string(font, center - text_size * 0.5 + Vector2(0, text_size.y * 0.76), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Color.WHITE)
+func _emit_action(action: StringName, pressed: bool) -> void:
+	# Parsing a real event supports both polled actions and event-driven
+	# owners such as PauseMenu; Input.action_press alone does not.
+	var action_event := InputEventAction.new()
+	action_event.action = action
+	action_event.pressed = pressed
+	Input.parse_input_event(action_event)
+
+
+func _release_all_input() -> void:
+	if _joystick_touch != JOYSTICK_NO_TOUCH:
+		_end_joystick()
+	for index in _active_action_touches.keys():
+		_release_action_touch(int(index))
+	_cancel_look()
+
+
+func _cancel_look() -> void:
+	_look_touch = -1
+	_look_position = Vector2.ZERO
+
+
+func _canvas_point_inside(control: Control, point: Vector2) -> bool:
+	var local := control.get_global_transform_with_canvas().affine_inverse() * point
+	return Rect2(Vector2.ZERO, control.size).has_point(local)
+
+
+func _joystick_ring_style(control_size: float) -> SuperellipseStyleBox:
+	var style := SuperellipseStyleBox.new()
+	style.bg_color = Color.TRANSPARENT
+	style.border_color = Color(1, 1, 1, 0.42)
+	style.border_width = control_size * 0.0513
+	style.corner_radius = control_size
+	style.corner_ratio = 0.34
+	style.exponent = 2.0
+	return style
+
+
+func _joystick_knob_style(control_size: float) -> SuperellipseStyleBox:
+	var style := SuperellipseStyleBox.new()
+	style.bg_color = Color(UITheme.TEXT_PRIMARY, 0.90)
+	style.corner_radius = control_size
+	style.corner_ratio = 0.34
+	style.exponent = 2.0
+	style.shadow_size = 5
+	style.shadow_color = Color(0, 0, 0, 0.22)
+	return style
+
+
+func _action_style(control_size: float) -> SuperellipseStyleBox:
+	var style := SuperellipseStyleBox.new()
+	style.bg_color = Color(UITheme.BLORBUS_PANEL, 0.82)
+	style.border_color = Color(UITheme.BUTTON_BORDER, 0.68)
+	style.border_width = 3.0
+	style.corner_radius = control_size
+	style.corner_ratio = 0.34
+	style.exponent = 4.0
+	style.shadow_size = 5
+	style.shadow_color = Color(0, 0, 0, 0.22)
+	return style

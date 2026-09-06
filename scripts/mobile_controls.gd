@@ -9,7 +9,7 @@ func _ready() -> void:
 		return
 	layer = 80
 	var surface := MobileControlsSurface.new()
-	add_child(surface)
+	UIKit.density_root(self).add_child(surface)
 
 
 func _touch_capable() -> bool:

@@ -1,6 +1,63 @@
 class_name UIKit
 extends RefCounted
 
+const MOBILE_BREAKPOINT_WIDTH := 700.0
+const DESKTOP_REFERENCE_PIXEL_RATIO := 2.0
+const MOBILE_REFERENCE_PIXEL_RATIO := 3.0
+const TABLET_MIN_SHORT_SIDE_CSS := 600.0
+
+
+static func is_mobile_viewport(node: Node) -> bool:
+	if OS.has_feature("web"):
+		var window := JavaScriptBridge.get_interface("window")
+		if window != null:
+			return (
+				float(window.innerWidth) < MOBILE_BREAKPOINT_WIDTH
+				or DisplayServer.is_touchscreen_available()
+				or int(window.navigator.maxTouchPoints) > 0
+			)
+	return node.get_viewport().get_visible_rect().size.x < MOBILE_BREAKPOINT_WIDTH or DisplayServer.is_touchscreen_available()
+
+
+static func is_tablet_touch_viewport() -> bool:
+	if not OS.has_feature("web"):
+		return false
+	var window := JavaScriptBridge.get_interface("window")
+	if window == null or int(window.navigator.maxTouchPoints) <= 0:
+		return false
+	return minf(float(window.innerWidth), float(window.innerHeight)) >= TABLET_MIN_SHORT_SIDE_CSS
+
+
+static func ui_density_scale(node: Node) -> float:
+	if not OS.has_feature("web"):
+		return 1.0
+	var window := JavaScriptBridge.get_interface("window")
+	if window == null:
+		return 1.0
+	var ratio := float(window.devicePixelRatio)
+	var touch := DisplayServer.is_touchscreen_available() or int(window.navigator.maxTouchPoints) > 0
+	var reference := MOBILE_REFERENCE_PIXEL_RATIO if touch else DESKTOP_REFERENCE_PIXEL_RATIO
+	return clampf(ratio / reference, 1.0 / 3.0, 2.0)
+
+
+static func density_root(layer: CanvasLayer) -> Control:
+	var root := Control.new()
+	root.name = "UIDensityRoot"
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.theme = UITheme.get_theme()
+	layer.add_child(root)
+	var update := func() -> void:
+		var density := ui_density_scale(layer)
+		root.scale = Vector2.ONE * density
+		root.size = layer.get_viewport().get_visible_rect().size / density
+	update.call()
+	layer.get_viewport().size_changed.connect(update)
+	return root
+
+
+static func logical_viewport_size(node: Node) -> Vector2:
+	return node.get_viewport().get_visible_rect().size / ui_density_scale(node)
+
 ## Reusable UI builder functions consuming UITheme's tokens -- every new UI
 ## surface (Hud, DialogUI, ShopUI, InventoryUI) should build through these
 ## rather than hand-rolling Control.new() + ad hoc theme overrides inline,

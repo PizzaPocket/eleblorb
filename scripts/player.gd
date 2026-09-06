@@ -4746,3 +4746,9 @@ func _rotate_camera(yaw_delta: float, pitch_delta: float) -> void:
 	var pitch_min := AERIAL_CAMERA_PITCH_MIN if _lake_diving_active else PITCH_MIN
 	var pitch_max := AERIAL_CAMERA_PITCH_MAX if _lake_diving_active else PITCH_MAX
 	camera_pivot.rotation.x = clampf(camera_pivot.rotation.x + pitch_delta, pitch_min, pitch_max)
+
+
+func rotate_camera_from_touch(yaw_delta: float, pitch_delta: float) -> void:
+	if UIState.modal_open:
+		return
+	_rotate_camera(yaw_delta, pitch_delta)

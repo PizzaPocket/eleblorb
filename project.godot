@@ -36,3 +36,9 @@ LoadingScreen="*res://scripts/loading_screen.gd"
 WorldState="*res://scripts/world_state.gd"
 Party="*res://scripts/party.gd"
 KingdomTravel="*res://scripts/kingdom_travel.gd"
+
+[input_devices]
+
+# Touch is handled explicitly per finger. Synthesized mouse events otherwise
+# duplicate the same gesture and destabilize simultaneous move/look/action.
+pointing/emulate_mouse_from_touch=false
