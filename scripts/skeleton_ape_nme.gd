@@ -67,6 +67,10 @@ const RISE_DURATION := 1.0
 const SINK_DURATION := 0.8
 const BURIAL_DEPTH := 2.2
 const DETECTION_RADIUS := 34.0
+## Wider than the human skeleton's radius to match this rig's larger capsule
+## and silhouette. See skeleton_nme.gd's matching separation contract.
+const SEPARATION_RADIUS := 0.95
+const SEPARATION_PUSH_SPEED := 4.1
 
 enum State { RISING, HUNTING, ATTACKING, SINKING }
 
@@ -95,6 +99,12 @@ var _target: Node3D = null
 ## Keyed by instance ID so repeated stream ticks remain one participation
 ## entry rather than increasing that Blorb's share.
 var _xp_participants: Dictionary = {}
+
+## Electric's own stun / City's own haste-weaken -- see skeleton_nme.gd's
+## identical fields for the full reasoning (same combat_math.gd tuning,
+## same refresh-to-max semantics).
+var _stun_remaining: float = 0.0
+var _haste_weaken_remaining: float = 0.0
 
 var _leg_left: Node3D
 var _leg_right: Node3D
@@ -173,6 +183,14 @@ func register_xp_participant(blorb: Blorb) -> void:
 	_xp_participants[blorb.get_instance_id()] = blorb
 
 
+func apply_stun(duration: float) -> void:
+	_stun_remaining = maxf(_stun_remaining, duration)
+
+
+func apply_haste_weaken(duration: float) -> void:
+	_haste_weaken_remaining = maxf(_haste_weaken_remaining, duration)
+
+
 func unregister_xp_participant(blorb: Blorb) -> void:
 	if blorb == null:
 		return
@@ -202,6 +220,8 @@ func _start_sinking() -> void:
 
 
 func _process(delta: float) -> void:
+	_stun_remaining = maxf(_stun_remaining - delta, 0.0)
+	_haste_weaken_remaining = maxf(_haste_weaken_remaining - delta, 0.0)
 	match _state:
 		State.RISING:
 			_process_rising(delta)
@@ -211,6 +231,42 @@ func _process(delta: float) -> void:
 			_process_attacking(delta)
 		State.SINKING:
 			_process_sinking(delta)
+	if _state == State.HUNTING or _state == State.ATTACKING:
+		_apply_nme_separation(delta)
+
+
+func nme_separation_radius() -> float:
+	return SEPARATION_RADIUS * body_scale / 1.4
+
+
+func _apply_nme_separation(delta: float) -> void:
+	var here := Vector2(global_position.x, global_position.z)
+	var correction := Vector2.ZERO
+	for node in get_tree().get_nodes_in_group("skeletons"):
+		var other := node as Node3D
+		if other == null or other == self or not is_instance_valid(other):
+			continue
+		if other.has_method("is_defeated") and bool(other.call("is_defeated")):
+			continue
+		var other_radius := SEPARATION_RADIUS
+		if other.has_method("nme_separation_radius"):
+			other_radius = float(other.call("nme_separation_radius"))
+		var away := here - Vector2(other.global_position.x, other.global_position.z)
+		var minimum_distance := nme_separation_radius() + other_radius
+		var distance := away.length()
+		if distance >= minimum_distance:
+			continue
+		var direction := away / distance if distance > 0.001 else (
+			Vector2.RIGHT if get_instance_id() < other.get_instance_id() else Vector2.LEFT
+		)
+		correction += direction * (minimum_distance - distance)
+	if correction.length_squared() <= 0.000001:
+		return
+	var shift := correction.limit_length(SEPARATION_PUSH_SPEED * delta)
+	var separated := here + shift
+	global_position.x = separated.x
+	global_position.z = separated.y
+	global_position.y = terrain_ref.get_mesh_height(separated.x, separated.y)
 
 
 func _process_rising(delta: float) -> void:
@@ -268,9 +324,14 @@ func _process_hunting(delta: float) -> void:
 		_state = State.ATTACKING
 		_attack_pose_elapsed = 0.0
 		return
+	# Electric's own stun -- see skeleton_nme.gd's own identical comment.
+	if _stun_remaining > 0.0:
+		return
 
 	var dir := to_target.normalized()
-	var step := dir * MOVE_SPEED * delta
+	# City's own haste -- see combat_math.gd's own HASTE_SPEED_MULTIPLIER.
+	var speed := MOVE_SPEED * (CombatMath.HASTE_SPEED_MULTIPLIER if _haste_weaken_remaining > 0.0 else 1.0)
+	var step := dir * speed * delta
 	var new_here := here + step
 	global_position.x = new_here.x
 	global_position.z = new_here.y
@@ -335,7 +396,12 @@ func _process_attacking(delta: float) -> void:
 	_elbow_right.rotation.x = -sin(t * PI) * 1.0
 	if t >= 1.0:
 		if _target.has_method("take_damage"):
-			var roll := CombatMath.rolled_attack(ATTACK_BASE_DAMAGE, 0, _rng)
+			# City's own weaken -- see combat_math.gd's own
+			# WEAKEN_DAMAGE_MULTIPLIER comment.
+			var base_damage := ATTACK_BASE_DAMAGE
+			if _haste_weaken_remaining > 0.0:
+				base_damage *= CombatMath.WEAKEN_DAMAGE_MULTIPLIER
+			var roll := CombatMath.rolled_attack(base_damage, 0, _rng)
 			_target.take_damage(roll["amount"])
 		_attack_cooldown = ATTACK_COOLDOWN
 		_attack_pose_elapsed = 0.0

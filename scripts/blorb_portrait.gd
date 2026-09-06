@@ -17,6 +17,10 @@ extends RefCounted
 ## there's no reason to re-shoot the same portrait per row per refresh.
 
 const RESOLUTION := 256
+## TransformationUI enlarges the same shot to the whole viewport. Keep that
+## one-off presentation crisp without making every inventory row pay for a
+## four-times-larger render target.
+const FULLSCREEN_RESOLUTION := 1024
 
 ## Bumped whenever the capture rig itself changes (camera distance/angle,
 ## pose, lighting) OR the rendered subject's own look changes (e.g.
@@ -71,16 +75,34 @@ static func apply_portrait(
 	container: Control, tree: SceneTree, element_state: String, body_color: Color,
 	melted: bool = false
 ) -> void:
-	_apply_async(container, tree, element_state, body_color, melted)
+	_apply_async(container, tree, element_state, body_color, melted, false)
+
+
+## Awaitable access to the same cached three-quarter portrait used by the
+## Blorbs tab. The transformation cut sequence uses this to preserve exact
+## visual continuity before and after the whiteout instead of maintaining a
+## second capture rig with subtly different framing or lighting.
+static func get_portrait_texture(
+	tree: SceneTree, element_state: String, body_color: Color,
+	melted: bool = false, blorbus: bool = false
+) -> Texture2D:
+	var key := _cache_key(
+		element_state, body_color, melted, blorbus, FULLSCREEN_RESOLUTION
+	)
+	if not _cache.has(key):
+		await _capture(
+			tree, key, element_state, body_color, melted, blorbus, FULLSCREEN_RESOLUTION
+		)
+	return _cache.get(key) as Texture2D
 
 
 static func _apply_async(
 	container: Control, tree: SceneTree, element_state: String, body_color: Color,
-	melted: bool = false
+	melted: bool = false, blorbus: bool = false
 ) -> void:
-	var key := _cache_key(element_state, body_color, melted)
+	var key := _cache_key(element_state, body_color, melted, blorbus, RESOLUTION)
 	if not _cache.has(key):
-		await _capture(tree, key, element_state, body_color, melted)
+		await _capture(tree, key, element_state, body_color, melted, blorbus, RESOLUTION)
 
 	if not is_instance_valid(container):
 		return
@@ -104,7 +126,10 @@ static func _apply_async(
 	container.add_child(rect)
 
 
-static func _cache_key(element_state: String, body_color: Color, melted: bool = false) -> String:
+static func _cache_key(
+	element_state: String, body_color: Color, melted: bool = false,
+	blorbus: bool = false, resolution: int = RESOLUTION
+) -> String:
 	# An elemental blorb's look is fully determined by its element (see
 	# blorb.gd's _apply_element_visuals()) -- body_color only matters for
 	# the still-unmerged "Normal" case, where it's the one thing that
@@ -114,14 +139,16 @@ static func _cache_key(element_state: String, body_color: Color, melted: bool = 
 	# folded in the same way -- a core-only capture is a visually distinct
 	# look from the same blorb's normal one, not a re-skin of it.
 	var look_key := element_state if element_state != "" else "normal:%s" % body_color
+	if blorbus:
+		look_key = "blorbus"
 	if melted:
 		look_key = "melted:%s" % look_key
-	return "%d:%s" % [CAPTURE_VERSION, look_key]
+	return "%d:%d:%s" % [CAPTURE_VERSION, resolution, look_key]
 
 
 static func _capture(
 	tree: SceneTree, key: String, element_state: String, body_color: Color,
-	melted: bool = false
+	melted: bool = false, blorbus: bool = false, resolution: int = RESOLUTION
 ) -> void:
 	if _pending.has(key):
 		while _pending.has(key):
@@ -142,7 +169,7 @@ static func _capture(
 	# uses, meaning the capture would show the entire live 3D scene (town,
 	# terrain, everything) behind the blorb instead of an isolated shot.
 	var viewport := SubViewport.new()
-	viewport.size = Vector2i(RESOLUTION, RESOLUTION)
+	viewport.size = Vector2i(resolution, resolution)
 	viewport.transparent_bg = true
 	viewport.own_world_3d = true
 	# MSAA, not left off (Godot's own default) -- per direct correction,
@@ -168,6 +195,7 @@ static func _capture(
 	var blorb = packed.instantiate()
 	blorb.body_color = body_color
 	blorb.portrait_mode = true
+	blorb.portrait_blorbus = blorbus
 	blorb.initial_element = element_state
 	# Set before add_child() below, same as body_color/initial_element above --
 	# _build_visuals() (called from _ready(), which fires once this enters the

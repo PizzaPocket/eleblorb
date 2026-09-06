@@ -1,6 +1,6 @@
-# Eleblorb
+# Eleblorbs
 
-Eleblorb is a Godot 4.7 game about exploring the world with a party of Blorbs.
+Eleblorbs is a Godot 4.7 game about exploring the world with a party of Blorbs.
 
 ## Run locally
 
@@ -14,7 +14,7 @@ Run:
 python3 tools/export_web.py
 ```
 
-This creates the deployable static game in `build/web` and applies Eleblorb's
+This creates the deployable static game in `build/web` and applies Eleblorbs'
 single continuous loading screen across download, engine startup, and world
 construction.
 

@@ -18,6 +18,7 @@ const AIR_COLOR := Color(0.55, 0.9, 1.0)
 const ROCK_COLOR := Color(0.55, 0.4, 0.24)
 const GROUND_COLOR := Color(0.35, 0.24, 0.1)
 const PLANT_COLOR := Color(0.35, 0.8, 0.3)
+const CITY_COLOR := Color(0.2, 0.65, 0.95)
 
 static var _items: Array[Dictionary] = []
 
@@ -87,6 +88,11 @@ static func _ensure_items() -> void:
 			"name": "Plant Gem", "color": PLANT_COLOR, "price": 0, "sell_price": 6,
 			"purchasable": false, "element": "plant", "description": "Found atop a jungle tree, not sold here.",
 			"build_visual": Callable(ShopCatalog, "_build_gem_visual").bind(PLANT_COLOR),
+		},
+		{
+			"name": "City Gem", "color": CITY_COLOR, "price": 0, "sell_price": 7,
+			"purchasable": false, "element": "city", "description": "Found somewhere in the city streets, not sold here.",
+			"build_visual": Callable(ShopCatalog, "_build_gem_visual").bind(CITY_COLOR),
 		},
 		{
 			"name": "Diving Helmet", "color": Color(0.18, 0.58, 0.82), "price": 25, "sell_price": 12,

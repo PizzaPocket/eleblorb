@@ -19,8 +19,8 @@ const COAT_COLORS := [
 ]
 const NOSE_COLOR := Color(0.38, 0.20, 0.21)
 
-## Yogi -- the Primate Kingdom's canonical cat (see docs/world_bible.md's
-## own Creatures/Cats entry), per direct instruction: white coat, an
+## Yogi -- the first town's canonical cat (see docs/world_bible.md's own
+## Domestic cats entry), per direct instruction: white coat, an
 ## orangish-brown marking on one ear, both front paws, an uneven pair of
 ## hind legs (one with every segment marked, the other just its paw and the
 ## segment right above it), and a ringed tail tip capped in the same marking
@@ -31,7 +31,7 @@ const NOSE_COLOR := Color(0.38, 0.20, 0.21)
 ## which physical side, adjustable on report like any other unspecified
 ## left/right pick in this project.
 const YOGI_COAT_COLOR := Color(0.96, 0.95, 0.92)
-const YOGI_MARKING_COLOR := Color(0.72, 0.45, 0.22)
+const YOGI_MARKING_COLOR := Color(0.84, 0.67, 0.48)
 const YOGI_MARKED_EAR_SIDE := -1.0
 ## The hind leg with every segment marked -- root, middle, distal, and paw.
 const YOGI_FULL_LEG_SIDE := -1.0

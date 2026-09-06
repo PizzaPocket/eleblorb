@@ -42,10 +42,10 @@ const BLORBUS_BODY_COLOR := Color(0.82, 0.60, 0.62, 0.85)
 ## Wild blorbs found out in the world (see wilderness_scatter.gd's
 ## _spawn_wild_blorbs()) leave this false at spawn -- but unlike an NPC, a
 ## wild blorb doesn't stay put
-## forever once found: see _discovered/_bond_time below, which flips this
-## to true on its own after the player's spent enough time with it. Default
-## true so the original starter trio (Blorb1-3) keep their existing party
-## behavior without needing every scene edited.
+## forever once found after Blorbus has awakened: see _discovered/_bond_time
+## below and WorldState.blorbus_unlocked. Default true so the original
+## starter trio (Blorb1-3) keep their existing party behavior without
+## needing every scene edited.
 @export var in_party: bool = true
 ## Some wild blorbs are found already naturally elemental -- encountered
 ## out in the world already merged, rather than merged by hand with a
@@ -59,6 +59,9 @@ const BLORBUS_BODY_COLOR := Color(0.82, 0.60, 0.62, 0.85)
 ## capture rig, while still building the exact same visual body a real
 ## gameplay blorb uses.
 @export var portrait_mode: bool = false
+## Lets BlorbPortrait render the awakened psychic look without calling the
+## gameplay-facing become_blorbus() path. Only used with portrait_mode.
+@export var portrait_blorbus: bool = false
 ## True for a rare wild "shiny blorb" variant -- see _build_visuals()'s
 ## shiny-color override. Not an element: a shiny blorb has no gem merged
 ## into it and can never accept one (see can_merge()), and carries no
@@ -197,6 +200,23 @@ const HOP_CHANCE_PER_SEC := 0.35
 const HOP_HEIGHT := 0.16
 const HOP_DURATION := 0.35
 const WOBBLE_AMOUNT := 0.3
+## A melee jump-attack (see _try_jump_attack()) rides the exact same hop
+## pipeline as an ordinary ambient hop (_hop_active/_hop_elapsed below), just
+## with these bigger/sharper numbers instead -- so a hit reads as a real
+## attack rather than the same idle wander-bounce. Per direct report that a
+## "bodily attack" wasn't physically obvious. Deliberately NOT a horizontal
+## lunge toward the target: global_position.x/z is recomputed unconditionally
+## every frame a bit further down in _process() (from `new_pos`, itself
+## derived from `here`), which would silently erase any horizontal offset
+## applied from here -- only the vertical hop_offset/body.scale channel is
+## safe to drive from this function, same as the ambient hop already does.
+const ATTACK_LUNGE_HEIGHT := 0.3
+const ATTACK_LUNGE_DURATION := 0.3
+const ATTACK_LUNGE_WOBBLE_AMOUNT := 0.55
+## Fraction of the way through the arc where the hit actually lands --
+## roughly the top of the arc, so the damage reads as synced to a real
+## impact instead of applying instantly the moment the attack triggers.
+const ATTACK_LUNGE_IMPACT_FRACTION := 0.55
 ## Direct-control jump at ordinary scale. Size variants multiply the height
 ## by their body scale and divide the playback rate by their movement-speed
 ## multiplier, preserving distance proportions while moving more slowly.
@@ -217,6 +237,10 @@ const SURFACE_TILT_SPEED := 6.0
 ## matches the player's approximate ordinary jump reach and, crucially,
 ## keeps the support ray local instead of selecting arbitrary roofs above.
 const SUPPORT_ACQUIRE_HEIGHT := 1.5
+## A solid support must visibly clear the molten sheet to count as safe.
+## This is intentionally much smaller than the player's tolerance: blorbs
+## use an exact downward support probe rather than a capsule/contact test.
+const LAVA_SUPPORT_CLEARANCE := 0.08
 # Free companions float partially immersed instead of obeying the terrain
 # snap below a deep lake. This is deliberately separate from the giant,
 # whose special goo traversal is handled by Player.
@@ -261,6 +285,32 @@ const FIRE_STREAM_MP_PER_SECOND := 4.5
 ## _update_elemental_stream(). Renamed from STREAM_DAMAGE_PER_SECOND now
 ## that it's a base rather than the literal per-second rate.
 const STREAM_BASE_DAMAGE_PER_SECOND := 6.0
+## Matches player.gd's own ELECTRIC_POWER_MP_PER_SECOND -- see
+## WATER_STREAM_MP_PER_SECOND's own comment for why these mirror the arm-
+## power drain rates.
+const ELECTRIC_STREAM_MP_PER_SECOND := 4.0
+## Matches player.gd's own CITY_POWER_MP_PER_SECOND.
+const CITY_STREAM_MP_PER_SECOND := 4.0
+
+## Approach distance for a rock blorb's crag-eruption attack -- a bit past
+## MELEE_RANGE since the crag erupts at the target's own position rather
+## than needing direct contact.
+const ROCK_ATTACK_RANGE := 2.6
+const ROCK_ATTACK_COOLDOWN := 1.1
+## Base damage before Strength scaling/variance/crit -- a single eruption
+## fires far less often than a continuous stream ticks, so this sits well
+## above JUMP_ATTACK_BASE_DAMAGE/STREAM_BASE_DAMAGE_PER_SECOND to compensate.
+const ROCK_CRAG_DAMAGE_BASE := 18.0
+const ROCK_CRAG_RADIUS := 1.6
+
+## Ranged, like the elemental streams -- matches STREAM_RANGE exactly.
+const PLANT_ATTACK_RANGE := STREAM_RANGE
+## Moderate, "not too fast" automatic-weapon cadence -- see player.gd's own
+## PLANT_PELLET_COOLDOWN, matched here so a worn plant blorb and a free-
+## roaming one fire at the same pace.
+const PLANT_ATTACK_COOLDOWN := 0.4
+const PLANT_PELLET_DAMAGE_BASE := 6.0
+const PLANT_PELLET_SPEED := 14.0
 
 @onready var terrain: Node = get_node("../Terrain")
 @onready var body: Node3D = $Body
@@ -277,6 +327,12 @@ var _idle_pause_timer: float = 0.0
 
 var _hop_active: bool = false
 var _hop_elapsed: float = 0.0
+## True for the duration of a melee jump-attack's hop (see ATTACK_LUNGE_*'s
+## own comment) rather than an ambient one -- selects the bigger height/
+## duration/wobble and the deferred-damage impact check in _process()'s own
+## hop-offset block.
+var _hop_is_attack: bool = false
+var _attack_damage_applied: bool = false
 var _control_jump_elapsed := 0.0
 var _control_jump_active := false
 var _control_jump_base_offset := 0.0
@@ -344,6 +400,7 @@ const XP_THRESHOLD_BASE := 20.0
 const XP_THRESHOLD_EXPONENT := 1.35
 var strength: int = 0
 var defense: int = 0
+var speed: int = 0
 var max_hp: int = 0
 var max_mp: int = 0
 var current_hp: float = 0.0
@@ -389,6 +446,10 @@ var _attack_cooldown: float = 0.0
 ## Lazily built the first time a water/fire blorb streams at a skeleton --
 ## see _update_elemental_stream()/_make_combat_stream().
 var _stream_particles: GPUParticles3D = null
+## Lazily built the first time an electric/city blorb streams at a skeleton
+## -- see _set_lightning_bolt_active(). A real jagged LightningBolt, not a
+## GPUParticles3D spray (see lightning_fx.gd's own class doc comment).
+var _lightning_bolt: LightningBolt = null
 
 ## True once this blorb has awoken as Blorbus -- see become_blorbus().
 ## Permanently locks out can_merge() and adds a talk prompt. Never set
@@ -407,12 +468,17 @@ func _ready() -> void:
 	scale = Vector3(size_multiplier, size_multiplier * vertical_scale, size_multiplier)
 	strength = _rng.randi_range(STAT_MIN, STAT_MAX)
 	defense = _rng.randi_range(STAT_MIN, STAT_MAX)
+	speed = _rng.randi_range(STAT_MIN, STAT_MAX)
 	max_hp = _rng.randi_range(STAT_MIN, STAT_MAX) * 4
 	max_mp = _rng.randi_range(STAT_MIN, STAT_MAX) * 2
 	current_hp = max_hp
 	current_mp = max_mp
 	_build_visuals()
-	if initial_element != "":
+	if portrait_mode and portrait_blorbus:
+		is_blorbus = true
+		blorb_name = "Blorbus"
+		_apply_blorbus_visuals()
+	elif initial_element != "":
 		merge_element(initial_element)
 	if portrait_mode:
 		return
@@ -431,7 +497,7 @@ func _ready() -> void:
 	# (sprint_multiplier on top of that) is intentionally faster than this,
 	# so a blorb falls behind while you sprint and closes the gap once you
 	# slow back down.
-	_follow_glide_speed = _player.move_speed * movement_speed_multiplier
+	_follow_glide_speed = _player.move_speed * motion_speed_scale()
 	_home = Vector2(global_position.x, global_position.z)
 	# _ground_height_at(), not terrain.get_mesh_height() directly -- see
 	# that function's own doc comment.
@@ -577,7 +643,12 @@ func _prompt_join_request() -> void:
 			DialogUI.hide_dialog()
 			_accept_join_request(),
 	}]
-	DialogUI.show_line("Wild Blorb", line, actions, "No thanks.", _decline_join_request)
+	# Unlike ordinary action dialogs, this decision freezes simulation: it can
+	# surface during combat, and UIState's control lock alone would leave the
+	# player helpless while enemies and companions continued acting.
+	DialogUI.show_line(
+		"Wild Blorb", line, actions, "No thanks.", _decline_join_request, true
+	)
 
 
 func _accept_join_request() -> void:
@@ -682,6 +753,7 @@ func _level_up() -> void:
 	# correction; HP and MP instead grow with level itself below.
 	strength += 1 + (1 if level % 4 == 0 else 0)
 	defense += 1 + (1 if level % 5 == 0 else 0)
+	speed += 1 + (1 if level % 6 == 0 else 0)
 	var hp_growth := 4 + ceili(float(level) / 5.0)
 	var mp_growth := 2 + ceili(float(level) / 8.0)
 	max_hp += hp_growth
@@ -698,6 +770,7 @@ func progression_snapshot() -> Dictionary:
 		"experience": experience,
 		"strength": strength,
 		"defense": defense,
+		"speed": speed,
 		"max_hp": max_hp,
 		"max_mp": max_mp,
 	}
@@ -713,6 +786,7 @@ func restore_progression(snapshot: Dictionary) -> void:
 	experience = maxi(0, int(snapshot.get("experience", 0)))
 	strength = maxi(1, int(snapshot.get("strength", strength)))
 	defense = maxi(1, int(snapshot.get("defense", defense)))
+	speed = maxi(1, int(snapshot.get("speed", speed)))
 	max_hp = maxi(1, int(snapshot.get("max_hp", max_hp)))
 	max_mp = maxi(1, int(snapshot.get("max_mp", max_mp)))
 	# World travel has always reformed carried blorbs at full resources. Keep
@@ -725,6 +799,16 @@ func restore_progression(snapshot: Dictionary) -> void:
 	else:
 		experience = mini(experience, xp_to_next_level() - 1)
 	progression_changed.emit()
+
+
+func speed_factor() -> float:
+	# Ten is neutral. Starting rolls remain modest personal traits, while
+	# levels steadily improve traversal and attack cadence.
+	return maxf(0.5, 1.0 + (float(speed) - 10.0) * 0.025)
+
+
+func motion_speed_scale() -> float:
+	return movement_speed_multiplier * speed_factor()
 
 
 ## Used by skeleton NMEs' punches (this blorb's own Defense mitigates the
@@ -821,6 +905,8 @@ func _element_glow_color() -> Color:
 			return Color(0.72, 0.9, 1.0)
 		"plant":
 			return Color(0.4, 0.85, 0.35)
+		"city":
+			return Color(0.25, 0.7, 0.95)
 		_:
 			return Color(1.0, 0.88, 0.55)
 
@@ -927,6 +1013,41 @@ func _apply_element_visuals() -> void:
 			core_material.emission_enabled = true
 			core_material.emission = Color(0.35, 0.8, 0.3)
 			core_material.emission_energy_multiplier = 0.8
+		"psychic":
+			# A cooler violet-purple, deliberately distinct from Blorbus's
+			# own unique "brain pink" awakening color (see
+			# _apply_blorbus_visuals()) -- Psychic is a real element here,
+			# not just Blorbus's own personal identity, so a second
+			# Psychic-type individual (e.g. False Hero's own Blorbaka)
+			# needs its own distinguishable look rather than reading as
+			# another Blorbus.
+			_body_material.albedo_color = Color(0.45, 0.28, 0.62, 0.9)
+			_body_material.roughness = 0.15
+			_body_material.metallic = 0.05
+			_body_material.emission_enabled = true
+			_body_material.emission = Color(0.5, 0.3, 0.7)
+			_body_material.emission_energy_multiplier = 0.6
+			core_material.albedo_color = Color(0.65, 0.45, 0.85)
+			core_material.emission_enabled = true
+			core_material.emission = Color(0.6, 0.35, 0.8)
+			core_material.emission_energy_multiplier = 1.2
+		"city":
+			# A saturated, glassy azure -- deliberately more saturated and
+			# reflective than Air's own pale, low-alpha, wispy sky-blue (see
+			# that case above) so the two don't read as reskins of each
+			# other; City is meant to feel electrified/urban (a lit-up
+			# core, same as Electric/Fire), not airy.
+			_body_material.albedo_color = Color(0.15, 0.5, 0.75, 0.9)
+			_body_material.roughness = 0.1
+			_body_material.metallic = 0.2
+			_body_material.emission_enabled = true
+			_body_material.emission = Color(0.3, 0.7, 1.0)
+			_body_material.emission_energy_multiplier = 0.7
+			core_material.albedo_color = Color(0.4, 0.8, 1.0)
+			core_material.emission_enabled = true
+			core_material.emission = Color(0.35, 0.75, 1.0)
+			core_material.emission_energy_multiplier = 1.5
+			_add_core_light(Color(0.35, 0.75, 1.0))
 
 
 ## Checked after every successful gem merge on a starter-trio member (see
@@ -948,7 +1069,9 @@ func _check_blorbus_awakening() -> void:
 		else:
 			gemmed_count += 1
 	if gemmed_count == 2 and ungemmed.size() == 1:
-		ungemmed[0].become_blorbus()
+		# Let the elemental transformation finish and announce itself before
+		# the remaining starter begins the surprise awakening sequence.
+		BlorbTransformationUI.queue_blorbus_transformation(ungemmed[0])
 
 
 ## The third starter blorb -- whichever of the trio is still ungemmed once
@@ -965,6 +1088,12 @@ func become_blorbus() -> void:
 		return
 	is_blorbus = true
 	blorb_name = "Blorbus"
+	_apply_blorbus_visuals()
+	WorldState.blorbus_unlocked = true
+	Interactable.attach(self, "Talk", TALK_RADIUS, _on_talk)
+
+
+func _apply_blorbus_visuals() -> void:
 	# A duller, greyish "brain pink" per direct instruction -- not a bright
 	# bubblegum pink, closer to the muted pinkish-grey of an actual brain.
 	body_color = BLORBUS_BODY_COLOR
@@ -976,8 +1105,6 @@ func become_blorbus() -> void:
 	core_material.emission_enabled = true
 	core_material.emission = Color(0.85, 0.62, 0.65)
 	core_material.emission_energy_multiplier = 0.7
-	Hud.show_message("One of your blorbs turns pink... and starts talking?")
-	Interactable.attach(self, "Talk", TALK_RADIUS, _on_talk)
 
 
 const TALK_RADIUS := 2.5
@@ -1183,7 +1310,13 @@ func _process(delta: float) -> void:
 	if _join_decline_cooldown > 0.0:
 		_join_decline_cooldown = maxf(_join_decline_cooldown - delta, 0.0)
 
-	if can_join_party and not in_party and not _discovered and _join_decline_cooldown <= 0.0:
+	if (
+		can_join_party
+		and WorldState.blorbus_unlocked
+		and not in_party
+		and not _discovered
+		and _join_decline_cooldown <= 0.0
+	):
 		var dist_to_player := here.distance_to(Vector2(_player.global_position.x, _player.global_position.z))
 		if dist_to_player < DISCOVERY_RADIUS:
 			_discovered = true
@@ -1224,7 +1357,13 @@ func _process(delta: float) -> void:
 	# rather than joining outright -- guarded by _join_prompt_open so the
 	# still-true bond_time >= JOIN_BOND_DURATION condition doesn't re-open it
 	# every subsequent frame while the player is deciding.
-	if can_join_party and _discovered and not in_party and not _join_prompt_open:
+	if (
+		can_join_party
+		and WorldState.blorbus_unlocked
+		and _discovered
+		and not in_party
+		and not _join_prompt_open
+	):
 		if dist_follow < FOLLOW_DISTANCE:
 			_bond_time += delta
 			if _bond_time >= JOIN_BOND_DURATION:
@@ -1232,13 +1371,29 @@ func _process(delta: float) -> void:
 
 	var moving := false
 	var target := here
-	var glide_speed := IDLE_GLIDE_SPEED * movement_speed_multiplier
+	var glide_speed := IDLE_GLIDE_SPEED * motion_speed_scale()
 
 	if _state == State.COMBAT and _combat_target != null and is_instance_valid(_combat_target):
 		var skeleton_here := Vector2(_combat_target.global_position.x, _combat_target.global_position.z)
 		var to_skeleton := skeleton_here - here
-		var is_elemental := element_state == "water" or element_state == "fire"
-		var engage_range := STREAM_RANGE if is_elemental else MELEE_RANGE
+		# Per-element engage range/attack dispatch -- water/fire/electric are
+		# all continuous streams (same range/function, electric folded in
+		# alongside the original two); rock erupts a crag near the target
+		# from just past melee range; plant fires ranged seed pellets; every
+		# other element (ground/air/psychic/none) falls through to the plain
+		# melee lunge. See _try_rock_attack()/_try_plant_attack()/
+		# _try_jump_attack() below.
+		var is_stream := element_state in ["water", "fire", "electric", "city"]
+		var engage_range: float
+		match element_state:
+			"water", "fire", "electric", "city":
+				engage_range = STREAM_RANGE
+			"rock":
+				engage_range = ROCK_ATTACK_RANGE
+			"plant":
+				engage_range = PLANT_ATTACK_RANGE
+			_:
+				engage_range = MELEE_RANGE
 		# True 3D distance decides whether an attack can actually land -- a
 		# blorb standing at the base of a cliff/tower shouldn't be able to
 		# hit a skeleton floating far above or below it just because their
@@ -1257,11 +1412,17 @@ func _process(delta: float) -> void:
 			# otherwise walk a jump-attacker straight into the skeleton.
 			if to_skeleton.length() > 0.01:
 				var face_angle := atan2(to_skeleton.x, to_skeleton.y) + PI
-				rotation.y = lerp_angle(rotation.y, face_angle, ROTATION_SPEED * movement_speed_multiplier * delta)
-			if is_elemental:
+				rotation.y = lerp_angle(rotation.y, face_angle, ROTATION_SPEED * motion_speed_scale() * delta)
+			if is_stream:
 				_update_elemental_stream(delta)
 			else:
-				_try_jump_attack()
+				match element_state:
+					"rock":
+						_try_rock_attack()
+					"plant":
+						_try_plant_attack()
+					_:
+						_try_jump_attack()
 	elif _state == State.FOLLOWING:
 		target = follow_pt
 		glide_speed = _follow_glide_speed
@@ -1273,7 +1434,7 @@ func _process(delta: float) -> void:
 		_has_wander_target = false
 		_idle_pause_timer = _rng.randf_range(IDLE_PAUSE_MIN, IDLE_PAUSE_MAX)
 	else:
-		_idle_pause_timer -= delta * movement_speed_multiplier
+		_idle_pause_timer -= delta * motion_speed_scale()
 		if _idle_pause_timer <= 0.0:
 			var angle := _rng.randf_range(0.0, TAU)
 			var r := _rng.randf_range(0.3, IDLE_WANDER_RADIUS)
@@ -1291,7 +1452,7 @@ func _process(delta: float) -> void:
 			# used by direct Blorbus control. Without it, ordinary followers and
 			# wanderers visually glide backward toward their targets.
 			var target_angle := atan2(to_target.x, to_target.y) + PI
-			rotation.y = lerp_angle(rotation.y, target_angle, ROTATION_SPEED * movement_speed_multiplier * delta)
+			rotation.y = lerp_angle(rotation.y, target_angle, ROTATION_SPEED * motion_speed_scale() * delta)
 
 		if allow_movement_hops and not _hop_active and _rng.randf() < HOP_CHANCE_PER_SEC * delta:
 			_hop_active = true
@@ -1306,6 +1467,14 @@ func _process(delta: float) -> void:
 	# done by hand here.
 	new_pos = _apply_separation(new_pos)
 	new_pos = _apply_player_push(new_pos, delta)
+	var unconstrained_pos := new_pos
+	new_pos = _constrain_lava_destination(here, new_pos)
+	if not new_pos.is_equal_approx(unconstrained_pos) and _state == State.IDLE:
+		# Do not let an idle wander target across molten ground pin a wild blorb
+		# against the edge forever. Following/combat targets remain live so they
+		# can resume naturally when their target returns to reachable ground.
+		_has_wander_target = false
+		_idle_pause_timer = _rng.randf_range(IDLE_PAUSE_MIN, IDLE_PAUSE_MAX)
 	global_position.x = new_pos.x
 	global_position.z = new_pos.y
 
@@ -1325,7 +1494,7 @@ func _process(delta: float) -> void:
 	if element_state == "air" and not _falling_after_dismount:
 		_hop_active = false
 		_climbing = false
-		body.scale = body.scale.lerp(Vector3.ONE, SETTLE_SPEED * movement_speed_multiplier * delta)
+		body.scale = body.scale.lerp(Vector3.ONE, SETTLE_SPEED * motion_speed_scale() * delta)
 		var hover_y := ground_h + _ground_embed_offset() + AIR_HOVER_HEIGHT
 		if in_party or _discovered:
 			# Chase until the visible crown reaches the player's feet, never by
@@ -1346,7 +1515,7 @@ func _process(delta: float) -> void:
 		if lake_float:
 			_hop_active = false
 			_climbing = false
-			body.scale = body.scale.lerp(Vector3.ONE, SETTLE_SPEED * movement_speed_multiplier * delta)
+			body.scale = body.scale.lerp(Vector3.ONE, SETTLE_SPEED * motion_speed_scale() * delta)
 			var visible_height := BODY_HEIGHT * size_multiplier * vertical_scale
 			var float_y := water_level - visible_height * LAKE_FLOAT_SUBMERGENCE_FRACTION
 			global_position.y = move_toward(global_position.y, float_y, LAKE_FLOAT_SETTLE_SPEED * delta)
@@ -1374,15 +1543,22 @@ func _process(delta: float) -> void:
 	var hop_offset := 0.0
 	if _hop_active:
 		_hop_elapsed += delta
-		var t: float = clampf(_hop_elapsed / HOP_DURATION, 0.0, 1.0)
-		hop_offset = sin(t * PI) * HOP_HEIGHT
-		var stretch := sin(t * PI) * WOBBLE_AMOUNT
+		var duration := ATTACK_LUNGE_DURATION if _hop_is_attack else HOP_DURATION
+		var height := ATTACK_LUNGE_HEIGHT if _hop_is_attack else HOP_HEIGHT
+		var wobble := ATTACK_LUNGE_WOBBLE_AMOUNT if _hop_is_attack else WOBBLE_AMOUNT
+		var t: float = clampf(_hop_elapsed / duration, 0.0, 1.0)
+		hop_offset = sin(t * PI) * height
+		var stretch := sin(t * PI) * wobble
 		body.scale = Vector3(1.0 - stretch * 0.5, 1.0 + stretch, 1.0 - stretch * 0.5)
+		if _hop_is_attack and not _attack_damage_applied and t >= ATTACK_LUNGE_IMPACT_FRACTION:
+			_attack_damage_applied = true
+			_apply_jump_attack_damage()
 		if t >= 1.0:
 			_hop_active = false
+			_hop_is_attack = false
 			_climbing = false
 	else:
-		body.scale = body.scale.lerp(Vector3.ONE, SETTLE_SPEED * movement_speed_multiplier * delta)
+		body.scale = body.scale.lerp(Vector3.ONE, SETTLE_SPEED * motion_speed_scale() * delta)
 
 	if _climbing:
 		# Re-reads ground_h (queried fresh at the top of this frame) as the
@@ -1427,7 +1603,7 @@ func _update_surface_tilt(delta: float, world_normal: Vector3) -> void:
 	local_forward = local_forward.normalized()
 	var local_right := local_up.cross(local_forward).normalized()
 	var target := Basis(local_right, local_up, local_forward).orthonormalized().get_rotation_quaternion()
-	var weight := 1.0 - exp(-SURFACE_TILT_SPEED * maxf(movement_speed_multiplier, 0.25) * delta)
+	var weight := 1.0 - exp(-SURFACE_TILT_SPEED * maxf(motion_speed_scale(), 0.25) * delta)
 	body.quaternion = body.quaternion.slerp(target, weight)
 
 
@@ -1474,6 +1650,20 @@ func _ground_height_at(x: float, z: float) -> float:
 	# file's @onready var), so GDScript can't infer get_mesh_height()'s
 	# return type through type inference alone.
 	var terrain_h: float = terrain.get_mesh_height(x, z)
+	var ground_xz := Vector2(x, z)
+	# Fire blorbs alone can rest directly on molten lava. Raise their
+	# effective support to the visible sheet; without this, the underlying
+	# terrain floor would leave them walking submerged beneath it. Raised
+	# solid supports still win through the max() probes below.
+	if (
+		element_state == "fire"
+		and _terrain_has_lava_rules()
+		and terrain.is_lava_area(ground_xz)
+	):
+		terrain_h = maxf(
+			terrain_h,
+			terrain.get_lava_surface_height(ground_xz) - _ground_embed_offset()
+		)
 	# Free blorbs use the same one-way cloud tops as Player. Their ordinary
 	# direct Y-following means they can only acquire a cloud when already at
 	# or above it (for example after being released in the air), never snap
@@ -1531,6 +1721,39 @@ func _ground_height_at(x: float, z: float) -> float:
 	if result:
 		return maxf(terrain_h, result.position.y)
 	return terrain_h
+
+
+## Prevents every non-Fire free blorb and directly controlled Blorbus from
+## selecting bare lava as ground. A collidable rock/platform inside the lava
+## remains safe when the local support probe places its top above the molten
+## sheet. If a blorb is already in lava (spawn, teleport, or external move),
+## recover it to the terrain-provided nearest edge rather than freezing it.
+func _constrain_lava_destination(current: Vector2, proposed: Vector2) -> Vector2:
+	if element_state == "fire" or not _terrain_has_lava_rules():
+		return proposed
+	if not terrain.is_lava_area(proposed):
+		return proposed
+	var proposed_ground := _ground_height_at(proposed.x, proposed.y)
+	var proposed_lava: float = terrain.get_lava_surface_height(proposed)
+	if proposed_ground > proposed_lava + LAVA_SUPPORT_CLEARANCE:
+		return proposed
+	if terrain.is_lava_area(current):
+		var current_ground := _ground_height_at(current.x, current.y)
+		var current_lava: float = terrain.get_lava_surface_height(current)
+		if current_ground > current_lava + LAVA_SUPPORT_CLEARANCE:
+			return current
+		var escape: Vector3 = terrain.get_lava_escape_position(current)
+		return Vector2(escape.x, escape.z)
+	return current
+
+
+func _terrain_has_lava_rules() -> bool:
+	return (
+		terrain != null
+		and terrain.has_method("is_lava_area")
+		and terrain.has_method("get_lava_surface_height")
+		and terrain.has_method("get_lava_escape_position")
+	)
 
 
 ## Blorbs are trampoline creatures, not stackable terrain. Excluding every
@@ -1634,10 +1857,12 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		# tiny ordinary-blorb increments, which read as barely moving at all.
 		# It remains slow in body-lengths per second, but now crosses enough
 		# ground for direct control to feel responsive at its actual scale.
-		speed = (_player as Player).move_speed * movement_speed_multiplier * size_multiplier
+		speed = (_player as Player).move_speed * motion_speed_scale() * size_multiplier
 		if sprinting:
 			speed *= (_player as Player).sprint_multiplier
-	var next := Vector2(global_position.x, global_position.z) + planar * speed * delta
+	var current := Vector2(global_position.x, global_position.z)
+	var next := current + planar * speed * delta
+	next = _constrain_lava_destination(current, next)
 	global_position.x = next.x
 	global_position.z = next.y
 	var ground_h := _ground_height_at(next.x, next.y)
@@ -1664,7 +1889,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		var previous_y := global_position.y
 		# Advancing scaled time instead of scaling only velocity ensures every
 		# part of a giant jump—takeoff, apex, and landing—is slowed uniformly.
-		_control_jump_elapsed += delta * movement_speed_multiplier
+		_control_jump_elapsed += delta * motion_speed_scale()
 		var jump_t := clampf(_control_jump_elapsed / CONTROL_JUMP_DURATION, 0.0, 1.0)
 		# The giant is intentionally vertically flattened. Include that scale
 		# so its jump remains the same number of body-heights as Blorbus's,
@@ -1691,7 +1916,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		global_position.y = rest_y
 		body.scale = body.scale.lerp(Vector3.ONE, SETTLE_SPEED * delta)
 	if planar.length() > 0.01:
-		rotation.y = lerp_angle(rotation.y, atan2(planar.x, planar.y) + PI, ROTATION_SPEED * movement_speed_multiplier * delta)
+		rotation.y = lerp_angle(rotation.y, atan2(planar.x, planar.y) + PI, ROTATION_SPEED * motion_speed_scale() * delta)
 
 
 ## Detects a descending direct-control body crossing a blorb surface or an
@@ -1753,19 +1978,75 @@ func _exit_combat(here: Vector2) -> void:
 ## Non-elemental blorbs' combat response: a melee bounce dealing
 ## JUMP_ATTACK_BASE_DAMAGE (boosted by this blorb's own Strength, then
 ## randomized and occasionally critical -- see combat_math.gd), on a
-## per-target cooldown so a single approach can't multi-hit. Reuses the same
-## ambient hop animation (_hop_active/_hop_elapsed, see _process's hop-offset/
-## squash handling below) rather than a separate attack animation.
+## per-target cooldown so a single approach can't multi-hit. Triggers the
+## same hop pipeline an ambient wander-hop uses (_hop_active/_hop_elapsed,
+## see _process()'s own hop-offset block), but with the bigger ATTACK_
+## LUNGE_* numbers and with damage deferred to that block's own impact-
+## fraction check (_apply_jump_attack_damage()) instead of applying it
+## instantly here -- see ATTACK_LUNGE_HEIGHT's own comment for why this
+## can't also lunge horizontally toward the target.
 func _try_jump_attack() -> void:
 	if _attack_cooldown > 0.0 or _combat_target == null or not is_instance_valid(_combat_target):
 		return
-	if not _hop_active:
-		_hop_active = true
-		_hop_elapsed = 0.0
-	if _combat_target.has_method("take_damage"):
+	_hop_active = true
+	_hop_elapsed = 0.0
+	_hop_is_attack = true
+	_attack_damage_applied = false
+	_attack_cooldown = JUMP_ATTACK_COOLDOWN
+
+
+func _apply_jump_attack_damage() -> void:
+	if _combat_target != null and is_instance_valid(_combat_target) and _combat_target.has_method("take_damage"):
 		var roll := CombatMath.rolled_attack(JUMP_ATTACK_BASE_DAMAGE, strength, _rng)
 		_combat_target.take_damage(roll["amount"], self)
-	_attack_cooldown = JUMP_ATTACK_COOLDOWN
+
+
+## Rock blorbs' combat response: erupts a cosmetic RockCrag at the target's
+## own position (see that script's own class doc comment -- it deals no
+## damage itself) and, in the same instant, resolves a plain radius check
+## against the "skeletons" group for the actual hit -- an eruption is
+## immediate/local rather than an aimed beam, so a simple radius check fits
+## better here than the streams' forward-cone check.
+func _try_rock_attack() -> void:
+	if _attack_cooldown > 0.0 or _combat_target == null or not is_instance_valid(_combat_target):
+		return
+	var origin: Vector3 = _combat_target.global_position
+	RockCrag.spawn(get_tree().current_scene, origin, _rng)
+	var roll := CombatMath.rolled_attack(ROCK_CRAG_DAMAGE_BASE, strength, _rng)
+	for node in get_tree().get_nodes_in_group("skeletons"):
+		var skeleton := node as Node3D
+		if skeleton == null or not skeleton.has_method("take_damage"):
+			continue
+		if skeleton.global_position.distance_to(origin) > ROCK_CRAG_RADIUS:
+			continue
+		var defender_element: String = (
+			skeleton.current_combat_element() if skeleton.has_method("current_combat_element") else ""
+		)
+		var final_damage: float = roll["amount"] * CombatMath.type_multiplier("rock", defender_element)
+		skeleton.take_damage(final_damage, self)
+	_attack_cooldown = ROCK_ATTACK_COOLDOWN
+
+
+## Plant blorbs' combat response: fires a single SeedPellet at the target's
+## current position (plain straight-line aim, no lead/prediction -- matches
+## this codebase's existing proximity/aim-over-physics-accuracy convention),
+## which resolves its own hit asynchronously once it actually connects (see
+## that script's own class doc comment).
+func _try_plant_attack() -> void:
+	if _attack_cooldown > 0.0 or _combat_target == null or not is_instance_valid(_combat_target):
+		return
+	var origin: Vector3 = _core_mesh_instance.global_position
+	var aim := _combat_target.global_position - origin
+	if aim.length() < 0.01:
+		return
+	var pellet := SeedPellet.new()
+	pellet.velocity = aim.normalized() * PLANT_PELLET_SPEED
+	pellet.damage = CombatMath.rolled_attack(PLANT_PELLET_DAMAGE_BASE, strength, _rng)["amount"]
+	pellet.attacker_element = "plant"
+	pellet.attacker_blorb = self
+	get_tree().current_scene.add_child(pellet)
+	pellet.global_position = origin
+	_attack_cooldown = PLANT_ATTACK_COOLDOWN
 
 
 ## Water/fire blorbs' combat response: streams their element from the core
@@ -1774,15 +2055,46 @@ func _try_jump_attack() -> void:
 ## this blorb's own Strength -- see combat_math.gd's rolled_stream_rate())
 ## while actively streaming.
 func _update_elemental_stream(delta: float) -> void:
-	var rate := WATER_STREAM_MP_PER_SECOND if element_state == "water" else FIRE_STREAM_MP_PER_SECOND
+	var rate := WATER_STREAM_MP_PER_SECOND
+	match element_state:
+		"fire":
+			rate = FIRE_STREAM_MP_PER_SECOND
+		"electric":
+			rate = ELECTRIC_STREAM_MP_PER_SECOND
+		"city":
+			rate = CITY_STREAM_MP_PER_SECOND
 	var draining := consume_mp(rate * delta)
 	_set_combat_stream_active(draining)
 	if draining and _combat_target != null and is_instance_valid(_combat_target) and _combat_target.has_method("take_damage"):
 		var damage_rate := CombatMath.rolled_stream_rate(STREAM_BASE_DAMAGE_PER_SECOND, strength)
+		# Type effectiveness (see combat_math.gd's own doc comment) --
+		# neutral (1.0x) against an ordinary skeleton (no element); a
+		# target that exposes its own current_combat_element() (e.g. an
+		# elementally-phased boss) makes this live.
+		var defender_element: String = (
+			_combat_target.current_combat_element() if _combat_target.has_method("current_combat_element") else ""
+		)
+		damage_rate *= CombatMath.type_multiplier(element_state, defender_element)
 		_combat_target.take_damage(damage_rate * delta, self)
+		# Electric's own stun / City's own haste-weaken -- see combat_math.gd's
+		# own STUN_DURATION/HASTE_WEAKEN_DURATION comment.
+		match element_state:
+			"electric":
+				if _combat_target.has_method("apply_stun"):
+					_combat_target.apply_stun(CombatMath.STUN_DURATION)
+			"city":
+				if _combat_target.has_method("apply_haste_weaken"):
+					_combat_target.apply_haste_weaken(CombatMath.HASTE_WEAKEN_DURATION)
 
 
 func _set_combat_stream_active(active: bool) -> void:
+	# Electric/City are real jagged lightning bolts (see lightning_fx.gd's
+	# own class doc comment), not the GPUParticles3D spray water/fire use --
+	# a separate cached node/aiming path, toggled here instead of
+	# _stream_particles.
+	if element_state == "electric" or element_state == "city":
+		_set_lightning_bolt_active(active)
+		return
 	if not active:
 		if _stream_particles != null:
 			_stream_particles.emitting = false
@@ -1790,18 +2102,39 @@ func _set_combat_stream_active(active: bool) -> void:
 	if _stream_particles == null:
 		_stream_particles = _make_combat_stream()
 	_stream_particles.emitting = true
-	if _combat_target != null and is_instance_valid(_combat_target):
-		var origin: Vector3 = _core_mesh_instance.global_position
-		_stream_particles.global_position = origin
-		var aim := _combat_target.global_position - origin
-		if aim.length() > 0.01:
-			# A small organic waver in the aim itself, matching player.gd's
-			# own _update_water_stream()'s identical technique/comment --
-			# a real stream of fire/water never points perfectly still.
-			var phase := float(get_instance_id() % 1000) * 0.01
-			var t := Time.get_ticks_msec() * 0.001 * 3.2 + phase
-			var wobble := Basis(Vector3.UP, sin(t) * deg_to_rad(2.5)) * Basis(Vector3.RIGHT, cos(t * 1.3) * deg_to_rad(2.5))
-			_stream_particles.look_at(origin + wobble * aim, Vector3.UP)
+	_aim_combat_stream(_stream_particles)
+
+
+func _set_lightning_bolt_active(active: bool) -> void:
+	if not active:
+		if _lightning_bolt != null:
+			_lightning_bolt.emitting = false
+		return
+	if _lightning_bolt == null:
+		var tint := LightningBolt.ELECTRIC_LIGHTNING_COLOR if element_state == "electric" else LightningBolt.CITY_LIGHTNING_COLOR
+		_lightning_bolt = LightningBolt.spawn(self, tint)
+	_lightning_bolt.emitting = true
+	_aim_combat_stream(_lightning_bolt)
+
+
+## Shared aiming step for both the GPUParticles3D combat stream and the
+## LightningBolt one -- both are plain Node3D-derived and only need
+## `.global_position`/`.look_at()`, so this works for either without needing
+## a common declared type.
+func _aim_combat_stream(stream: Node3D) -> void:
+	if _combat_target == null or not is_instance_valid(_combat_target):
+		return
+	var origin: Vector3 = _core_mesh_instance.global_position
+	stream.global_position = origin
+	var aim := _combat_target.global_position - origin
+	if aim.length() > 0.01:
+		# A small organic waver in the aim itself, matching player.gd's
+		# own _update_water_stream()'s identical technique/comment --
+		# a real stream of fire/water never points perfectly still.
+		var phase := float(get_instance_id() % 1000) * 0.01
+		var t := Time.get_ticks_msec() * 0.001 * 3.2 + phase
+		var wobble := Basis(Vector3.UP, sin(t) * deg_to_rad(2.5)) * Basis(Vector3.RIGHT, cos(t * 1.3) * deg_to_rad(2.5))
+		stream.look_at(origin + wobble * aim, Vector3.UP)
 
 
 ## Visually matches player.gd's own _make_water_stream()/_make_fire_stream()
@@ -1810,7 +2143,8 @@ func _set_combat_stream_active(active: bool) -> void:
 ## here comes from the core's world position toward a live combat target
 ## rather than a hand's position along the character's facing, different
 ## enough that extracting a shared abstraction isn't worth touching that
-## large, heavily-annotated file for.
+## large, heavily-annotated file for. Water/fire only now -- electric/city
+## are real LightningBolt bolts instead (see _set_lightning_bolt_active()).
 func _make_combat_stream() -> GPUParticles3D:
 	var stream := GPUParticles3D.new()
 	stream.name = "CombatStream"
@@ -1925,5 +2259,5 @@ func _apply_player_push(pos: Vector2, delta: float) -> Vector2:
 	if dist < PLAYER_PUSH_RADIUS and dist > 0.001:
 		var push_scale := AIRBORNE_PLAYER_PUSH_SCALE if _player.is_airborne() else 1.0
 		var needed := offset.normalized() * (PLAYER_PUSH_RADIUS - dist)
-		return pos + needed.limit_length(PLAYER_PUSH_SPEED * movement_speed_multiplier * push_scale * delta)
+		return pos + needed.limit_length(PLAYER_PUSH_SPEED * motion_speed_scale() * push_scale * delta)
 	return pos

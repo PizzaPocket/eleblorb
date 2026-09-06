@@ -3,8 +3,8 @@ extends StaticBody3D
 
 ## Standalone start-screen/debug instance for evaluating the cat template.
 @export var coat_color: Color = CatFigure.COAT_COLORS[0]
-## Per direct instruction -- Yogi is the Primate Kingdom's canonical cat
-## (docs/world_bible.md's own Creatures/Cats entry), so his coat/markings
+## Per direct instruction -- Yogi is the first town's canonical cat
+## (docs/world_bible.md's own Domestic cats entry), so her coat/markings
 ## always come from CatFigure's own YOGI_* consts rather than this
 ## instance's own coat_color/marking exports, which this flag overrides.
 @export var is_yogi: bool = false

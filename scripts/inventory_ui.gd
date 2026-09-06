@@ -57,6 +57,7 @@ const BOUND_ITEM_SLOT_SIZE := Vector2(168, 156)
 ## blorb's stats grew past a couple of digits each.
 const BLORB_METER_LABEL_WIDTH := 170.0
 const BLORB_METER_BAR_WIDTH := 260.0
+const ITEM_HELD_FEEDBACK_DURATION := 1.6
 
 var _panel: PanelContainer
 var _coin_readout: PanelContainer
@@ -64,6 +65,7 @@ var _grid: GridContainer
 var _items_scroll: ScrollContainer
 var _items_tab: Control
 var _blorbs_tab: Control
+var _player_tab: Control
 var _blorb_scroll: ScrollContainer
 var _blorb_list: VBoxContainer
 var _portrait_container: Control
@@ -80,6 +82,11 @@ var _focus_restore_blorb_attempts: int = 0
 var _last_blorb_focus_id: int = 0
 var _items_tab_button: Button
 var _blorbs_tab_button: Button
+var _player_tab_button: Button
+var _player_stats: VBoxContainer
+var _player_portrait_container: Control
+var _item_held_feedback: PanelContainer
+var _item_held_feedback_timer: float = 0.0
 var _active_tab: String = "items"
 var _open: bool = false
 ## The blorb currently selected in the left-hand party list -- clicking a
@@ -165,8 +172,10 @@ func _build_ui() -> void:
 	left_header.add_child(title)
 	_items_tab_button = UIKit.tab_button("Items", true, func(): _switch_tab("items"))
 	_blorbs_tab_button = UIKit.tab_button("Blorbs", false, func(): _switch_tab("blorbs"))
+	_player_tab_button = UIKit.tab_button("Player", false, func(): _switch_tab("player"))
 	left_header.add_child(_items_tab_button)
 	left_header.add_child(_blorbs_tab_button)
+	left_header.add_child(_player_tab_button)
 
 	var eyes_cell := CenterContainer.new()
 	eyes_cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -229,12 +238,18 @@ func _build_ui() -> void:
 	content_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_blorbs_tab.add_child(content_row)
 
+	var blorb_scroll_panel := UIKit.scroll_panel()
+	blorb_scroll_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	blorb_scroll_panel.size_flags_stretch_ratio = 1.0
+	blorb_scroll_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	content_row.add_child(blorb_scroll_panel)
 	_blorb_scroll = ScrollContainer.new()
 	_blorb_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_blorb_scroll.size_flags_stretch_ratio = 1.0
 	_blorb_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_blorb_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	content_row.add_child(_blorb_scroll)
+	_blorb_scroll.follow_focus = true
+	blorb_scroll_panel.add_child(_blorb_scroll)
 	# A ScrollContainer clips at its viewport edge. Give rows a real gutter
 	# larger than the outside-offset focus ring so neither their squircle
 	# sides nor highlight can be cut off while scrolling.
@@ -252,7 +267,25 @@ func _build_ui() -> void:
 	blorb_scroll_margin.add_child(_blorb_list)
 
 	_build_portrait_area(content_row)
+	_build_player_tab(vbox)
 	_build_release_confirm_ui(shared_theme)
+	_build_item_held_feedback(shared_theme)
+
+
+## A single transient confirmation above the inventory panel. Reusing this
+## one readout means changing items replaces the previous message and resets
+## its lifetime instead of creating a queue or stacking multiple notices.
+func _build_item_held_feedback(shared_theme: Theme) -> void:
+	_item_held_feedback = UIKit.backed_readout(
+		"", UITheme.TEXT_PRIMARY, UITheme.FONT_BODY
+	)
+	_item_held_feedback.theme = shared_theme
+	_item_held_feedback.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	UIKit.anchor_to_edge(
+		_item_held_feedback, 0.5, 1.0, 0.0, UITheme.SPACE_XL * 2.0
+	)
+	_item_held_feedback.visible = false
+	add_child(_item_held_feedback)
 
 
 ## Modal panels use a translucent background with no border stroke (a soft
@@ -345,6 +378,33 @@ func _build_portrait_area(parent: Control) -> void:
 	_release_button.offset_bottom += UITheme.BUTTON_MIN_HEIGHT + UITheme.SPACE_LG
 	shell.add_child(_release_button)
 	_update_release_action()
+
+
+func _build_player_tab(parent: Control) -> void:
+	_player_tab = HBoxContainer.new()
+	(_player_tab as HBoxContainer).add_theme_constant_override("separation", UITheme.SPACE_LG)
+	_player_tab.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_player_tab.visible = false
+	parent.add_child(_player_tab)
+
+	var info_panel := UIKit.scroll_panel()
+	info_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_player_tab.add_child(info_panel)
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", UITheme.SPACE_LG)
+	margin.add_theme_constant_override("margin_right", UITheme.SPACE_LG)
+	margin.add_theme_constant_override("margin_top", UITheme.SPACE_LG)
+	margin.add_theme_constant_override("margin_bottom", UITheme.SPACE_LG)
+	info_panel.add_child(margin)
+	_player_stats = VBoxContainer.new()
+	_player_stats.add_theme_constant_override("separation", UITheme.SPACE_MD)
+	margin.add_child(_player_stats)
+
+	_player_portrait_container = Control.new()
+	_player_portrait_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_player_portrait_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_player_tab.add_child(_player_portrait_container)
 
 
 func _on_portrait_focus_changed(active: bool) -> void:
@@ -622,6 +682,48 @@ func _refresh_portrait() -> void:
 	player.refresh_portrait_assignments()
 
 
+func _refresh_player() -> void:
+	for child in _player_stats.get_children():
+		child.free()
+	var player := get_tree().get_first_node_in_group("player") as Player
+	if player == null:
+		return
+	_player_stats.add_child(UIKit.section_header("Stats"))
+	_player_stats.add_child(UIKit.stat_meter(
+		"HP", roundi(player.current_hp), Player.MAX_HP, true, Player.MAX_HP,
+		BLORB_METER_LABEL_WIDTH, BLORB_METER_BAR_WIDTH
+	))
+	_player_stats.add_child(UIKit.inline_caption(
+		"DEF  %d (base %d)" % [player.current_defense(), Player.BASE_DEFENSE],
+		UITheme.TEXT_PRIMARY
+	))
+	_player_stats.add_child(UIKit.inline_caption(
+		"Ground speed  %d%%" % roundi(player.worn_leg_speed_multiplier() * 100.0),
+		UITheme.TEXT_PRIMARY
+	))
+	_player_stats.add_child(UIKit.inline_caption(
+		"Flight speed  %d%%" % roundi(player.worn_flight_speed_multiplier() * 100.0),
+		UITheme.TEXT_PRIMARY
+	))
+	_player_stats.add_child(UIKit.section_header("Attire"))
+	for line in [
+		"Hair  Buzz cut", "Top  Blue short-sleeve shirt",
+		"Bottom  Dark trousers", "Shoes  Red shoes",
+	]:
+		_player_stats.add_child(UIKit.inline_caption(line, UITheme.TEXT_PRIMARY))
+
+	for child in _player_portrait_container.get_children():
+		child.free()
+	var rect := TextureRect.new()
+	rect.texture = player.get_portrait_texture()
+	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_player_portrait_container.add_child(rect)
+	player.refresh_portrait_assignments()
+
+
 func _on_slot_clicked(slot: String) -> void:
 	var player := get_tree().get_first_node_in_group("player")
 	if player == null:
@@ -657,7 +759,11 @@ func _on_outside_clicked() -> void:
 	pass
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	if _item_held_feedback_timer > 0.0:
+		_item_held_feedback_timer = maxf(_item_held_feedback_timer - delta, 0.0)
+		if _item_held_feedback_timer <= 0.0:
+			_item_held_feedback.visible = false
 	# The confirmation overlay locks input to itself while up, same shape as
 	# DialogUI's own modal focus lock -- ui_cancel backs out of the confirm
 	# alone (Never mind.) rather than falling through to _back()'s ordinary
@@ -676,11 +782,13 @@ func _process(_delta: float) -> void:
 	elif _open and Input.is_action_just_pressed("ui_cancel"):
 		_back()
 	elif _open and Input.is_action_just_pressed("menu_tab_previous"):
-		_switch_tab("items")
-		_items_tab_button.grab_focus()
+		_cycle_tab(-1)
 	elif _open and Input.is_action_just_pressed("menu_tab_next"):
-		_switch_tab("blorbs")
-		_blorbs_tab_button.grab_focus()
+		_cycle_tab(1)
+	if _open and _active_tab == "blorbs":
+		var scroll_axis := Input.get_axis("look_up", "look_down")
+		if absf(scroll_axis) > 0.18:
+			_blorb_scroll.scroll_vertical += roundi(scroll_axis * 720.0 * delta)
 	if _open:
 		_ensure_inventory_focus()
 
@@ -721,7 +829,10 @@ func _ensure_inventory_focus() -> void:
 		if button != null and not button.is_queued_for_deletion() and not button.disabled:
 			button.grab_focus()
 			return
-	_blorbs_tab_button.grab_focus()
+	if _active_tab == "player":
+		_player_tab_button.grab_focus()
+	else:
+		_blorbs_tab_button.grab_focus()
 
 
 func _back() -> void:
@@ -749,6 +860,7 @@ func _open_inventory() -> void:
 	if get_tree().paused or UIState.modal_open:
 		return
 	_open = true
+	_clear_item_held_feedback()
 	# _items_scroll's real width is already known by the time the panel can
 	# actually be opened (it went through its first layout pass back when
 	# the (invisible) panel first entered the tree) -- recomputed here
@@ -764,6 +876,8 @@ func _open_inventory() -> void:
 	# reopen on that same tab instead of always implying Items is selected.
 	if _active_tab == "blorbs":
 		_blorbs_tab_button.grab_focus()
+	elif _active_tab == "player":
+		_player_tab_button.grab_focus()
 	else:
 		_items_tab_button.grab_focus()
 
@@ -773,6 +887,7 @@ func _close() -> void:
 		return
 	_open = false
 	_panel.visible = false
+	_clear_item_held_feedback()
 	var player := get_tree().get_first_node_in_group("player")
 	if player != null:
 		player.get_blorb_suit().apply_assignment_changes()
@@ -787,11 +902,22 @@ func _on_wallet_changed(new_value: int) -> void:
 
 func _switch_tab(tab: String) -> void:
 	_active_tab = tab
+	_clear_item_held_feedback()
 	_items_tab.visible = tab == "items"
 	_blorbs_tab.visible = tab == "blorbs"
+	_player_tab.visible = tab == "player"
 	UIKit.set_tab_button_active(_items_tab_button, tab == "items")
 	UIKit.set_tab_button_active(_blorbs_tab_button, tab == "blorbs")
+	UIKit.set_tab_button_active(_player_tab_button, tab == "player")
 	_refresh()
+
+
+func _cycle_tab(direction: int) -> void:
+	var tabs := ["items", "blorbs", "player"]
+	var index := wrapi(tabs.find(_active_tab) + direction, 0, tabs.size())
+	_switch_tab(tabs[index])
+	var buttons := [_items_tab_button, _blorbs_tab_button, _player_tab_button]
+	(buttons[index] as Button).grab_focus()
 
 
 func _refresh() -> void:
@@ -799,9 +925,11 @@ func _refresh() -> void:
 		return
 	if _active_tab == "items":
 		_refresh_items()
-	else:
+	elif _active_tab == "blorbs":
 		_refresh_blorbs()
-	_set_portrait_active(_active_tab == "blorbs")
+	else:
+		_refresh_player()
+	_set_portrait_active(_active_tab == "blorbs" or _active_tab == "player")
 
 
 ## The isolated paper-doll camera (see player_portrait.gd) only actually
@@ -1071,14 +1199,12 @@ func _build_blorb_row(blorb: Blorb) -> Control:
 		var max_level_label := UIKit.inline_caption("XP: MAX", UITheme.TEXT_PRIMARY)
 		max_level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		meters.add_child(max_level_label)
-	meters.add_child(UIKit.stat_meter(
-		"STR", blorb.strength, maxi(Blorb.STAT_MAX, blorb.strength), false, -1,
-		BLORB_METER_LABEL_WIDTH, BLORB_METER_BAR_WIDTH
-	))
-	meters.add_child(UIKit.stat_meter(
-		"DEF", blorb.defense, maxi(Blorb.STAT_MAX, blorb.defense), false, -1,
-		BLORB_METER_LABEL_WIDTH, BLORB_METER_BAR_WIDTH
-	))
+	var stat_values := UIKit.inline_caption(
+		"STR  %d    DEF  %d    SPD  %d" % [blorb.strength, blorb.defense, blorb.speed],
+		UITheme.TEXT_PRIMARY
+	)
+	stat_values.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	meters.add_child(stat_values)
 	meters.add_child(UIKit.stat_meter(
 		"HP", roundi(blorb.current_hp), blorb.max_hp, true, maxi(Blorb.STAT_MAX * 4, blorb.max_hp),
 		BLORB_METER_LABEL_WIDTH, BLORB_METER_BAR_WIDTH
@@ -1227,8 +1353,22 @@ func _on_item_slot_pressed(item: Dictionary, is_held: bool) -> void:
 	_focus_restore_item_name = str(item.get("name", ""))
 	if is_held:
 		HeldItem.clear()
+		_clear_item_held_feedback()
 	else:
 		HeldItem.equip(item)
+		_show_item_held_feedback(str(item.get("name", "Item")))
+
+
+func _show_item_held_feedback(item_name: String) -> void:
+	UIKit.set_readout_text(_item_held_feedback, "%s held in hand." % item_name)
+	_item_held_feedback.visible = true
+	_item_held_feedback_timer = ITEM_HELD_FEEDBACK_DURATION
+
+
+func _clear_item_held_feedback() -> void:
+	_item_held_feedback_timer = 0.0
+	if _item_held_feedback != null:
+		_item_held_feedback.visible = false
 
 
 ## An inert placeholder cell -- same footprint as a real slot, an inset

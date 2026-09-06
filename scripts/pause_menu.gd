@@ -85,6 +85,12 @@ func _process(_delta: float) -> void:
 
 
 func _open_menu() -> void:
+	# A pause press is also an unambiguous request to leave a prepared throw;
+	# clear that gameplay state before freezing the player process so its
+	# reticle/camera cannot remain stuck over the pause surface.
+	var player := get_tree().get_first_node_in_group("player")
+	if player != null and player.has_method("cancel_throw_preparation"):
+		player.cancel_throw_preparation()
 	_open = true
 	_panel.visible = true
 	UIState.push_modal()

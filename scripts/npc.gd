@@ -138,7 +138,9 @@ var _elbow_left: Node3D
 var _elbow_right: Node3D
 var _spine: Node3D
 var _head: Node3D
-var _hips: Node3D
+var _hips: MeshInstance3D
+var _skirt: MeshInstance3D
+var _skirt_pivot: Node3D
 var _eyes: Array = []
 var _eye_blink := EyeBlink.new_state()
 var _look_target: Node3D = null
@@ -243,7 +245,10 @@ func _build_figure() -> void:
 		Color(0.0, 0.0, 0.0, 0.0),  # chest_emblem_color -- NPCs don't get one, only the hero does
 		hair_color, hair_style, hair_length_variance, shoe_color,
 		false,  # skeleton_mode
-		has_glasses
+		has_glasses,
+		# Bare legs under a skirt don't carry the trouser silhouette's usual
+		# thickness -- see ProceduralFigure._build_leg()'s own comment.
+		0.72 if wears_dress else 1.0
 	)
 	_leg_left = pivots["leg_left"]
 	_leg_right = pivots["leg_right"]
@@ -261,7 +266,11 @@ func _build_figure() -> void:
 	_hips_rest_y = _hips.position.y
 	if wears_dress:
 		var resolved_dress_color: Color = pants_color if is_zero_approx(dress_color.a) else dress_color
-		FigureDress.add_to_figure(pivots["root"] if pivots.has("root") else visuals, _hips, resolved_dress_color, hip_build_scale)
+		var dress_parts := FigureDress.add_to_figure(
+			pivots["root"] if pivots.has("root") else visuals, _hips, resolved_dress_color, hip_build_scale
+		)
+		_skirt = dress_parts["skirt"]
+		_skirt_pivot = dress_parts["pivot"]
 
 
 func _on_talk() -> void:
@@ -361,6 +370,7 @@ func _path_clear(from: Vector2, to: Vector2) -> bool:
 
 
 func _physics_process(delta: float) -> void:
+	_settle_dress_pose(delta)
 	if stationary:
 		# Per direct instruction: a stationary NPC (the vendor) should still
 		# settle into the idle contrapposto pose rolled once at _ready()'s
@@ -379,6 +389,28 @@ func _physics_process(delta: float) -> void:
 				_enter_walk()
 		State.WALK:
 			_process_walk(delta)
+
+
+## Eases the worn hip shell and skirt back to their resting shape every
+## frame -- _process_walk() below overrides this with a live stride fit
+## whenever this NPC is actually walking. This has to run as a continuous
+## per-frame lerp rather than a one-time "on stop" reset because the fit
+## itself is a continuous function of the live leg pose (see
+## FigureDress.stride_envelope()'s own doc comment).
+func _settle_dress_pose(delta: float) -> void:
+	if _skirt == null:
+		return
+	var t := POSE_SETTLE_SPEED * delta
+	_hips.scale.x = lerpf(_hips.scale.x, 1.0, t)
+	_hips.scale.z = lerpf(_hips.scale.z, 1.0, t)
+	_hips.rotation.y = lerp_angle(_hips.rotation.y, 0.0, t)
+	_skirt.scale.x = lerpf(_skirt.scale.x, 1.0, t)
+	_skirt.scale.z = lerpf(_skirt.scale.z, 1.0, t)
+	_skirt.rotation.y = lerp_angle(_skirt.rotation.y, 0.0, t)
+	if _skirt_pivot != null:
+		_skirt_pivot.rotation.y = lerp_angle(_skirt_pivot.rotation.y, 0.0, t)
+		_skirt_pivot.scale.x = lerpf(_skirt_pivot.scale.x, 1.0, t)
+		_skirt_pivot.scale.z = lerpf(_skirt_pivot.scale.z, 1.0, t)
 
 
 func _process_walk(delta: float) -> void:
@@ -456,6 +488,24 @@ func _process_walk(delta: float) -> void:
 	var body_dip := -ProceduralFigure.WALK_BODY_DIP_AMOUNT * pow(sin(_walk_phase), 2)
 	_spine.position.y = _spine_rest_y + body_dip
 	_hips.position.y = _hips_rest_y + body_dip
+
+	if _skirt != null:
+		# Fit the dress-coloured hip shell to the live leg pose first, then the
+		# lower skirt shell -- see FigureDress.upper_skirt_envelope()/
+		# stride_envelope()'s own doc comments for the two-point stride-box
+		# derivation. _skirt_pivot cancels the hip shell's own just-applied
+		# rotation/scale back out so the skirt's fit is solved and applied
+		# independently rather than compounding with the hip shell's.
+		var upper_envelope := FigureDress.upper_skirt_envelope(_hips, _leg_left, _leg_right, _knee_left, _knee_right)
+		_hips.rotation.y = float(upper_envelope["yaw"])
+		_hips.scale.x = float(upper_envelope["scale_x"])
+		_hips.scale.z = float(upper_envelope["scale_z"])
+		var envelope := FigureDress.stride_envelope(_skirt, _hips, _knee_left, _knee_right)
+		_skirt.rotation.y = float(envelope["yaw"])
+		_skirt.scale.x = float(envelope["scale_x"])
+		_skirt.scale.z = float(envelope["scale_z"])
+		if _skirt_pivot != null:
+			_skirt_pivot.basis = _hips.basis.inverse()
 
 
 func _settle_pose(delta: float) -> void:

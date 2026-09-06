@@ -28,19 +28,31 @@ const START_HOUR := 15.0
 ## 24 hours later. Azimuth (which way the sun currently is, compass-wise)
 ## isn't a keyframe value -- it sweeps continuously at a constant rate
 ## across the whole cycle, independent of these.
+## Per direct report, night both lasted too long and read as far too dark.
+## Two independent fixes: sunset/sunrise moved from 18:00/6:00 to 20:00/5:00
+## -- since elevation only ever dips below the horizon between those two
+## keyframes, shifting them closer together shrinks true night (sun below
+## the horizon) from a full 12 hours down to 9, with day correspondingly
+## longer (15 hours). Separately, the deepest-night keyframe's own
+## brightness values (sun_energy, sky/fog colors) are all raised well off
+## their old near-black values -- still clearly darker than day, but no
+## longer reading as pitch black. The environment's ambient light is sky-
+## sourced (see main.tscn's WorldEnvironment, which sets no explicit
+## ambient_light_* override), so brightening the night sky colors here also
+## raises the scene's overall ambient floor, not just the direct sun light.
 const KEYFRAMES := [
 	{
 		"hour": 0.5,  # deepest point of the night (halfway between sunset and sunrise)
-		"sky_top": Color(0.02, 0.03, 0.09),
-		"sky_horizon": Color(0.05, 0.07, 0.15),
-		"sun_color": Color(0.4, 0.45, 0.62),
-		"sun_energy": 0.05,
-		"fog_color": Color(0.03, 0.04, 0.09),
+		"sky_top": Color(0.06, 0.08, 0.17),
+		"sky_horizon": Color(0.1, 0.12, 0.22),
+		"sun_color": Color(0.45, 0.5, 0.66),
+		"sun_energy": 0.18,
+		"fog_color": Color(0.08, 0.09, 0.18),
 		"elevation": deg_to_rad(-35.0),
 		"night": 1.0,
 	},
 	{
-		"hour": 6.0,  # sunrise in the east (+X)
+		"hour": 5.0,  # sunrise in the east (+X)
 		"sky_top": Color(0.35, 0.45, 0.75),
 		"sky_horizon": Color(0.95, 0.62, 0.42),
 		"sun_color": Color(1.0, 0.75, 0.5),
@@ -60,7 +72,7 @@ const KEYFRAMES := [
 		"night": 0.0,
 	},
 	{
-		"hour": 18.0,  # sunset in the west (-X)
+		"hour": 20.0,  # sunset in the west (-X)
 		"sky_top": Color(0.3, 0.25, 0.55),
 		"sky_horizon": Color(0.95, 0.45, 0.26),
 		"sun_color": Color(1.0, 0.55, 0.3),

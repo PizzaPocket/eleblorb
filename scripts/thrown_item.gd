@@ -71,6 +71,16 @@ func _ready() -> void:
 		add_child(_visual)
 
 
+## Reuses the exact prop that was visible in the player's palm, preserving
+## its live world transform at release. This removes the one-frame visual
+## discontinuity that rebuilding a fresh copy at a camera-offset spawn point
+## caused in the old instant-throw path.
+func adopt_visual(carried_visual: Node3D) -> void:
+	if _visual != null and _visual != carried_visual:
+		_visual.queue_free()
+	_visual = carried_visual
+
+
 func _physics_process(delta: float) -> void:
 	if _landed:
 		return
@@ -128,8 +138,10 @@ func _resolve_hit(body: Node3D, hit_position: Variant = null, hit_normal: Varian
 		var core_item: String = entry.get("core_item", "") if not entry.is_empty() else ""
 		if element != "" and body.has_method("can_merge") and body.can_merge(element):
 			_resolved = true
-			body.merge_element(element)
-			Hud.show_message("The %s merges into the blorb's core!" % item_name)
+			# The transformation overlay owns the actual state mutation at its
+			# whiteout midpoint, so the world never exposes a recolored Blorb before
+			# the cut sequence has presented the change.
+			BlorbTransformationUI.play_elemental_transformation(body as Blorb, element)
 			queue_free()
 			return
 		if core_item != "" and body.has_method("add_core_item") and body.add_core_item(core_item):

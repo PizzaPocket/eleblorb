@@ -230,6 +230,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0, -26.6)
 [node name="GreenShopSpot" type="Marker3D" parent="Town"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6, 0, -26.6)
 
+[node name="FalseHeroSpot" type="Marker3D" parent="Town"]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 10)
+
 [node name="Scatter" type="Node3D" parent="." unique_id=1122210399]
 script = ExtResource("2")
 
@@ -253,17 +256,17 @@ joy_look_sensitivity = null
 joy_deadzone = null
 
 [node name="Blorb1" parent="." unique_id=1235925229 instance=ExtResource("6")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 0, 1.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, 2.2)
 body_color = Color(0.95, 0.96, 0.93, 0.85)
 is_starter_trio = true
 
 [node name="Blorb2" parent="." unique_id=1824871773 instance=ExtResource("6")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 0, 1.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6, 0, 2.2)
 body_color = Color(0.92, 0.95, 0.97, 0.85)
 is_starter_trio = true
 
 [node name="Blorb3" parent="." unique_id=81285306 instance=ExtResource("6")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3.4)
 body_color = Color(0.97, 0.94, 0.9, 0.85)
 is_starter_trio = true
 

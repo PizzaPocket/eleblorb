@@ -87,3 +87,49 @@ static func rolled_stream_rate(base_per_second: float, strength: int) -> float:
 static func mitigated_damage(raw_amount: float, defense: int) -> float:
 	var mitigation := minf(float(defense) / (float(defense) + DEFENSE_MITIGATION_K), MAX_MITIGATION)
 	return maxf(raw_amount * (1.0 - mitigation), MIN_DAMAGE)
+
+
+## Per direct instruction: Fire beats Plant, Plant beats Water, Water beats
+## Fire -- a closed three-way loop, each pairing handicapped in reverse.
+## Every other element (Electric, Rock, Ground, Air, Psychic, and Normal/
+## "") stays neutral against everything, including each other, until a
+## future matchup is established -- see type_multiplier()'s own doc comment.
+const TYPE_EFFECTIVE_MULTIPLIER := 1.5
+const TYPE_HANDICAPPED_MULTIPLIER := 1.0 / 1.5
+const TYPE_ADVANTAGES := {
+	"fire": "plant",
+	"plant": "water",
+	"water": "fire",
+}
+
+
+## The damage multiplier `attacker_element` deals against `defender_element`
+## -- TYPE_EFFECTIVE_MULTIPLIER (1.5x) if the attacker counters the
+## defender, TYPE_HANDICAPPED_MULTIPLIER (1/1.5x) if the reverse is true,
+## or 1.0 (neutral) if either element is "" (no element -- most attackers/
+## defenders in this project, e.g. the player themself or an ordinary
+## skeleton, have none) or the two simply aren't in a counter relationship
+## yet. Callers multiply this straight into whatever raw damage/rate they
+## already compute -- it composes with rolled_attack()/rolled_stream_rate()
+## rather than replacing them.
+static func type_multiplier(attacker_element: String, defender_element: String) -> float:
+	if attacker_element == "" or defender_element == "":
+		return 1.0
+	if TYPE_ADVANTAGES.get(attacker_element, "") == defender_element:
+		return TYPE_EFFECTIVE_MULTIPLIER
+	if TYPE_ADVANTAGES.get(defender_element, "") == attacker_element:
+		return TYPE_HANDICAPPED_MULTIPLIER
+	return 1.0
+
+
+## Shared status-effect tuning -- every NME (skeleton_nme.gd, skeleton_ape_
+## nme.gd, false_hero_nme.gd) reads these rather than each hardcoding its
+## own copy, so an Electric stun or a City haste-weaken feels the same
+## regardless of which enemy it lands on. Per direct instruction: Electric's
+## own power should stun (stop movement) rather than just damage, and
+## City's own power should instead haste-and-weaken its target (faster, but
+## hits softer) -- two distinct status effects, not stacked on each other.
+const STUN_DURATION := 1.0
+const HASTE_WEAKEN_DURATION := 3.0
+const HASTE_SPEED_MULTIPLIER := 1.6
+const WEAKEN_DAMAGE_MULTIPLIER := 0.6

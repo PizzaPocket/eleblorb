@@ -43,7 +43,7 @@ var _finishing := false
 var _completion_requested := false
 var _initial_boot := true
 var _web_loader_active := false
-var _phase := "Preparing Eleblorb…"
+var _phase := "Preparing Eleblorbs…"
 var _progress := 0.0
 var _owns_modal_lock := false
 
@@ -164,7 +164,7 @@ func _build_ui() -> void:
 	center.add_child(_content)
 
 	var title := Label.new()
-	title.text = "Eleblorb"
+	title.text = "Eleblorbs"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", UITheme.FONT_DISPLAY)
 	title.add_theme_color_override("font_color", UITheme.TEXT_PRIMARY)

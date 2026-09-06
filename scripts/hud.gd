@@ -27,18 +27,13 @@ extends CanvasLayer
 ## than floating bare over the 3D scene -- see UITheme's docstring for why
 ## that's structurally required for WCAG AA, not just a font-size fix.
 ##
-## No crosshair and no inventory row here: the crosshair only ever landed on
-## the character's own head/shoulder in third person (there's no fixed aim
-## point to mark), and the inventory row duplicated what InventoryUI (opened
-## with I) already shows properly. Left out rather than deleted outright --
-## see git history / the retired Crosshair inner class this replaced if this
-## ever moves to a first-person or aimed-throw view where a reticle would
-## actually mean something.
+## No permanent crosshair or inventory row here: the inventory row duplicated
+## what InventoryUI already shows properly, while the reticle is contextual
+## and appears only during the player's aimed-throw preparation state.
 
 ## Small ring+dot reticle with its own dark-outline/light-fill pairing so it
 ## stays legible over any background, drawn directly rather than built from
-## Controls since a circle isn't expressible as a stylebox. Kept, unused, for
-## a future first-person/aimed view -- see the module docstring above.
+## Controls since a circle isn't expressible as a stylebox.
 class Crosshair extends Control:
 	const RING_RADIUS := 15.0
 	const RING_WIDTH := 4.5
@@ -83,6 +78,7 @@ var _hp_readout_tween: Tween
 ## the player instance doesn't exist yet on Hud's own _ready()).
 var _wild_hint: PanelContainer
 var _player: Node3D
+var _throw_reticle: Crosshair
 
 
 func _ready() -> void:
@@ -139,6 +135,14 @@ func _build_ui() -> void:
 	_wild_hint.visible = false
 	add_child(_wild_hint)
 
+	# Full-viewport drawing surface: Crosshair draws at its own center, which
+	# remains the exact camera aim point across every screen size/aspect ratio.
+	_throw_reticle = Crosshair.new()
+	_throw_reticle.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_throw_reticle.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_throw_reticle.visible = false
+	add_child(_throw_reticle)
+
 	# Top-left (the corner the module docstring notes Tokoins deliberately
 	# leaves free for something more actionable) -- fades in on damage/heal/
 	# regen same as the Tokoins badge, per design language rule 5/20.
@@ -148,6 +152,11 @@ func _build_ui() -> void:
 	_hp_readout.modulate.a = 0.0
 	UIKit.anchor_to_edge(_hp_readout, 0.0, 0.0, UITheme.SPACE_LG, UITheme.SPACE_LG)
 	add_child(_hp_readout)
+
+
+func set_throw_aiming(active: bool) -> void:
+	if _throw_reticle != null:
+		_throw_reticle.visible = active
 
 
 func _process(delta: float) -> void:
@@ -260,7 +269,10 @@ const COMPASS_ITEM_NAME := "Corroded Pocket Compass"
 ## same as at every not-yet-discovered wild blorb -- there's nothing wrong
 ## with that state, just nothing to point at yet.
 func _update_wild_hint() -> void:
-	if not Inventory.has(COMPASS_ITEM_NAME):
+	# Before Blorbus awakens, wild blorbs cannot yet notice or join the
+	# party. Keep the compass hunt dormant too, rather than directing the
+	# player toward an encounter that cannot progress.
+	if not WorldState.blorbus_unlocked or not Inventory.has(COMPASS_ITEM_NAME):
 		_wild_hint.visible = false
 		return
 	if _player == null:

@@ -363,7 +363,8 @@ static func build(
 	hair_length_variance: float = 0.0,
 	shoe_color: Color = Color(0.0, 0.0, 0.0, 0.0),
 	skeleton_mode: bool = false,
-	has_glasses: bool = false
+	has_glasses: bool = false,
+	leg_thickness_scale: float = 1.0
 ) -> Dictionary:
 	var arm_color := shirt_color if sleeve_style == SLEEVE_STYLE_LONG else skin_color
 	var resolved_shoe_color := pants_color if is_zero_approx(shoe_color.a) else shoe_color
@@ -618,8 +619,8 @@ static func build(
 	# that skill exists to flag for future rig work.
 	var arm_right := _build_arm(spine_pivot, chest_size, shoulder_y - abdomen_y, -1.0, arm_color, skin_color, arm_build_scale, sleeve_style, shirt_color)
 	var arm_left := _build_arm(spine_pivot, chest_size, shoulder_y - abdomen_y, 1.0, arm_color, skin_color, arm_build_scale, sleeve_style, shirt_color)
-	var leg_right := _build_leg(rig, hip_size, hip_y, -1.0, pants_color, resolved_shoe_color, leg_build_scale)
-	var leg_left := _build_leg(rig, hip_size, hip_y, 1.0, pants_color, resolved_shoe_color, leg_build_scale)
+	var leg_right := _build_leg(rig, hip_size, hip_y, -1.0, pants_color, resolved_shoe_color, leg_build_scale, leg_thickness_scale)
+	var leg_left := _build_leg(rig, hip_size, hip_y, 1.0, pants_color, resolved_shoe_color, leg_build_scale, leg_thickness_scale)
 
 	return {
 		"spine": spine_pivot,
@@ -919,10 +920,15 @@ static func _scaled_xz(size: Vector3, factor: float) -> Vector3:
 
 
 static func _build_leg(
-	rig: Node3D, hip_size: Vector3, hip_y: float, side: float, pants_color: Color, shoe_color: Color, build_scale: float
+	rig: Node3D, hip_size: Vector3, hip_y: float, side: float, pants_color: Color, shoe_color: Color,
+	build_scale: float, leg_thickness_scale: float = 1.0
 ) -> Dictionary:
-	var upper_leg_size := _scaled_xz(UPPER_LEG_SIZE, build_scale)
-	var lower_leg_size := _scaled_xz(LOWER_LEG_SIZE, build_scale)
+	# Bare legs beneath a skirt do not carry the extra silhouette thickness
+	# that the standard trouser geometry implies. Shoes retain their normal
+	# scale so this changes anatomy/clothing read without shrinking footwear.
+	var limb_scale := build_scale * leg_thickness_scale
+	var upper_leg_size := _scaled_xz(UPPER_LEG_SIZE, limb_scale)
+	var lower_leg_size := _scaled_xz(LOWER_LEG_SIZE, limb_scale)
 	var foot_size := _scaled_xz(FOOT_SIZE, build_scale)
 
 	var hip_x := side * (hip_size.x * 0.55 + HIP_OUTWARD_SHIFT)

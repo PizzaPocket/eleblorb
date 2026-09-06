@@ -318,7 +318,19 @@ const GREEN_STALL_POSITIONS := {
 
 @onready var terrain: Node = get_node("../Terrain")
 
+## How often (real ms, matching skeleton_spawner.gd's own CHECK_INTERVAL_MS
+## convention) _process() re-checks WorldState.false_hero_should_appear().
+## _rebuild() itself only ever runs once per scene load (or from the editor
+## rebuild_now toggle) -- the outskirts town is a single persistent area the
+## player walks in and out of, not something reloaded per visit, so a
+## one-shot check at _ready() would only ever see the party as it existed at
+## boot and could never notice Blorbus getting unlocked or the suit filling
+## out later in the same session.
+const FALSE_HERO_CHECK_INTERVAL_MS := 4000
+
 var town_center: Vector2
+var _generated: Node3D
+var _next_false_hero_check_ms: int = 0
 var _rng := RandomNumberGenerator.new()
 var _next_villager_identity: int = 0
 ## Independently-random picks per attribute (the original approach) collide
@@ -370,6 +382,19 @@ func _ready() -> void:
 	_rebuild()
 
 
+## Mirrors skeleton_spawner.gd's own throttled _process() re-check rather
+## than a per-frame one -- this only ever needs to notice a slow-moving
+## state change (the party's own makeup), not react within a frame.
+func _process(_delta: float) -> void:
+	if Engine.is_editor_hint() or _generated == null:
+		return
+	var now := Time.get_ticks_msec()
+	if now < _next_false_hero_check_ms:
+		return
+	_next_false_hero_check_ms = now + FALSE_HERO_CHECK_INTERVAL_MS
+	_build_false_hero(_generated)
+
+
 func _rebuild() -> void:
 	if terrain == null:
 		terrain = get_node("../Terrain")
@@ -382,6 +407,8 @@ func _rebuild() -> void:
 	var generated := Node3D.new()
 	generated.name = "Generated"
 	add_child(generated)
+	_generated = generated
+	_next_false_hero_check_ms = 0
 
 	_rng.seed = 42
 	_next_villager_identity = 0
@@ -437,6 +464,67 @@ func _spawn_npcs(parent: Node3D) -> void:
 		_spawn_npc_group(parent, $NPCSpots)
 	if has_node("NPCSmallSpots"):
 		_spawn_npc_group(parent, $NPCSmallSpots)
+	_spawn_yogi.call_deferred()
+	_build_false_hero(parent)
+
+
+## False Hero only ever appears once WorldState.false_hero_should_appear()
+## is true (see that function's own doc comment: Blorbus awakened AND
+## enough in-party blorbs to fill a real suit) and he hasn't already been
+## defeated -- before that, or after, this is simply a no-op and villagers
+## keep their own ordinary, unrelated dialogue, per direct instruction.
+## Rebuilt fresh into `generated` each _rebuild() (unlike Yogi's own
+## create-once placement) specifically so this gate is re-checked every
+## time the outskirts scene reloads, in case the party's own makeup
+## changed in the meantime.
+func _build_false_hero(parent: Node3D) -> void:
+	if not has_node("FalseHeroSpot"):
+		return
+	if not get_tree().get_nodes_in_group("false_hero").is_empty():
+		return
+	if not WorldState.false_hero_should_appear(get_tree()):
+		return
+	var spot: Node3D = get_node("FalseHeroSpot")
+	var packed: PackedScene = load("res://scenes/false_hero_nme.tscn")
+	if packed == null:
+		push_warning("Missing False Hero scene: res://scenes/false_hero_nme.tscn")
+		return
+	var false_hero = packed.instantiate()
+	false_hero.set_terrain_reference(terrain)
+	var offset := Vector2(spot.position.x, spot.position.z)
+	false_hero.position = Vector3(offset.x, _ground_y(offset), offset.y)
+	parent.add_child(false_hero)
+	# Every facing/movement write in false_hero_nme.gd targets its own
+	# `visuals` child directly (world-space atan2 math, matching player.gd/
+	# npc.gd's own convention of a never-rotated root) -- rotating the ROOT
+	# from the marker instead (the original approach here) silently added a
+	# second, compounding rotation on top of that world-space math, which is
+	# exactly what made him walk backwards. `visuals` only resolves once
+	# _ready() has run, so this has to happen after add_child(), not before.
+	false_hero.visuals.rotation.y = spot.rotation.y
+
+
+## Yogi lives in the first town now rather than appearing beside the player
+## at startup. She is parented beside Town under Main because the reusable
+## cat controller resolves Main's Terrain and Player as siblings; her roam
+## center is seeded at the quiet west edge of the plaza before _ready().
+func _spawn_yogi() -> void:
+	var world := get_parent()
+	if world == null or world.has_node("Yogi"):
+		return
+	var packed := load("res://scenes/cat_template_preview.tscn") as PackedScene
+	if packed == null:
+		push_warning("Missing Yogi scene: res://scenes/cat_template_preview.tscn")
+		return
+	var yogi := packed.instantiate() as CatTemplatePreview
+	yogi.name = "Yogi"
+	yogi.is_yogi = true
+	var local_offset := Vector2(-12.0, 8.0)
+	var world_xz := town_center + local_offset
+	yogi.position = Vector3(
+		world_xz.x, terrain.get_mesh_height(world_xz.x, world_xz.y), world_xz.y
+	)
+	world.add_child(yogi)
 
 
 func _spawn_npc_group(parent: Node3D, spots: Node3D) -> void:
@@ -749,7 +837,7 @@ func _scatter_platforming(parent: Node3D) -> void:
 		if has_node(group_name):
 			for marker in get_node(group_name).get_children():
 				occupied.append(Vector2(marker.position.x, marker.position.z))
-	for single_name in ["Windmill", "Watermill", "GemStallSpot", "RedShopSpot", "GreenShopSpot"]:
+	for single_name in ["Windmill", "Watermill", "GemStallSpot", "RedShopSpot", "GreenShopSpot", "FalseHeroSpot"]:
 		if has_node(single_name):
 			var marker: Node3D = get_node(single_name)
 			occupied.append(Vector2(marker.position.x, marker.position.z))

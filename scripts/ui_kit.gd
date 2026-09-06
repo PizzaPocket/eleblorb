@@ -800,3 +800,10 @@ static func section_header(text: String) -> Control:
 	row.add_child(divider())
 
 	return row
+
+
+## Recessed content well for scrolling collections inside a larger modal.
+static func scroll_panel() -> PanelContainer:
+	var result := PanelContainer.new()
+	result.add_theme_stylebox_override("panel", UITheme.slot_stylebox())
+	return result

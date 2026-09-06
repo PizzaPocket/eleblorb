@@ -197,7 +197,7 @@ body.gamepad-connected .loader-controller { display: flex; }
 """
 
 LOADER_HTML = """\t\t\t<div id="loading-content">
-\t\t\t\t<h1 id="loading-title">Eleblorb</h1>
+\t\t\t\t<h1 id="loading-title">Eleblorbs</h1>
 \t\t\t\t<div id="loading-controls" aria-label="Controls">
 \t\t\t\t\t<div class="loader-desktop">
 \t\t\t\t\t\t<div class="loader-control"><div class="keys loader-wasd" aria-hidden="true"><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span></div><span class="loader-copy">Move</span></div>
@@ -208,7 +208,7 @@ LOADER_HTML = """\t\t\t<div id="loading-content">
 \t\t\t\t\t<div class="loader-mobile"><div class="joystick" aria-hidden="true"></div><span class="loader-copy">Drag to move · Drag the world to look</span></div>
 \t\t\t\t</div>
 \t\t\t\t<p id="loading-tip">Press F near people, objects, and Blorbs to interact.</p>
-\t\t\t\t<div id="status-phase" role="status" aria-live="polite">Preparing Eleblorb…</div>
+\t\t\t\t<div id="status-phase" role="status" aria-live="polite">Preparing Eleblorbs…</div>
 \t\t\t\t<progress id="status-progress" max="1" value="0" aria-label="Loading progress"></progress>
 \t\t\t</div>"""
 
@@ -289,10 +289,10 @@ PROGRESS_AND_LOADER_VISIBILITY = """\t\tstatusProgress.style.display = mode === 
 WHOLE_LAUNCH_PROGRESS = """\t\t\t'onProgress': function (current, total) {
 \t\t\t\tif (current > 0 && total > 0) {
 \t\t\t\t\tconst ratio = Math.min(current / total, 1);
-\t\t\t\t\twindow.eleblorbLoadingPhase(ratio >= 1 ? 'Starting Eleblorb…' : 'Downloading Eleblorb…', ratio * 0.9);
+\t\t\t\t\twindow.eleblorbLoadingPhase(ratio >= 1 ? 'Starting Eleblorbs…' : 'Downloading Eleblorbs…', ratio * 0.9);
 \t\t\t\t} else {
 \t\t\t\t\tstatusProgress.removeAttribute('value');
-\t\t\t\t\tstatusPhase.textContent = 'Preparing Eleblorb…';
+\t\t\t\t\tstatusPhase.textContent = 'Preparing Eleblorbs…';
 \t\t\t\t}
 \t\t\t},"""
 
@@ -309,7 +309,7 @@ def replace_once(source: str, old: str, new: str, label: str) -> str:
 
 def patch_html() -> None:
     html = HTML.read_text(encoding="utf-8")
-    html = replace_once(html, "<title>Eleblorb</title>", "<title>Eleblorb</title>", "title")
+    html = replace_once(html, "<title>Eleblorbs</title>", "<title>Eleblorbs</title>", "title")
     html = replace_once(html, STYLE_END, LOADER_CSS + STYLE_END, "style end")
     html = replace_once(html, SPLASH_IMAGE, "", "unused splash image")
     html = replace_once(html, PROGRESS_ELEMENT, LOADER_HTML, "progress element")

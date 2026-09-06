@@ -13,7 +13,8 @@ class_name SkeletonSpawner
 ## structured the same way: @onready terrain/town_center off the shared
 ## Terrain node, an _is_excluded()-style guard reusing the same town-
 ## exclusion-radius idea plus a city-center exclusion and terrain.
-## is_lake_area() so skeletons never rise in town, the city, or the lake.
+## is_lake_area() so skeletons never rise in town, the city, the starting
+## clearing, or the lake.
 ## Spawned instances are parented to self (not get_parent()/Main) and given
 ## their Terrain reference via set_terrain_reference(), the same injected-
 ## setter pattern WildernessScatter uses for NPCs -- skeleton_nme.gd's own
@@ -50,6 +51,12 @@ const TOWN_EXCLUSION_RADIUS := 85.0
 ## the city's own flattened foundation edge.
 const CITY_CENTER := Vector2(-540, 0)
 const CITY_EXCLUSION_RADIUS := 110.0
+## The player's arrival clearing is a settlement-like safe space even though
+## it has no buildings. Check both the player and candidate positions so an
+## encounter cannot rise just inside the boundary while the player stands
+## immediately outside it.
+const START_CENTER := Vector2.ZERO
+const START_EXCLUSION_RADIUS := 55.0
 
 @onready var terrain: Node = get_node("../Terrain")
 @onready var town_center: Vector2 = terrain.town_center
@@ -86,19 +93,18 @@ func _process(_delta: float) -> void:
 	_spawn_skeleton(spawn_pos)
 
 
-## True for town, city, or lake -- everywhere a skeleton should never rise,
-## per docs/world_bible.md's Aggros section. Only the player's own position
-## is checked (not the candidate spawn point too) since SPAWN_DISTANCE_MAX
-## is short enough that "the player is in valid wasteland" already implies
-## the ring around them is too; matches the proximity-triggered framing
-## (this is about where the *encounter* happens, not an independent
-## placement roll).
+## True for the starting clearing, town, city, or lake -- everywhere a
+## skeleton should never rise, per docs/world_bible.md's Aggros section.
+## Both the player's position and candidate position pass through this same
+## function, so encounters cannot straddle a protected boundary.
 func _is_excluded(pos: Vector2) -> bool:
 	if terrain.is_lake_area(pos):
 		return true
 	if pos.distance_to(town_center) < TOWN_EXCLUSION_RADIUS:
 		return true
 	if pos.distance_to(CITY_CENTER) < CITY_EXCLUSION_RADIUS:
+		return true
+	if pos.distance_to(START_CENTER) < START_EXCLUSION_RADIUS:
 		return true
 	return false
 

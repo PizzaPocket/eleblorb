@@ -453,6 +453,17 @@ static func loading_progress_stylebox(color: Color) -> SuperellipseStyleBox:
 ##     not briefly replace it. Native boot and later portal travel use the
 ##     matching UIKit surface. Loading hints follow actual input capability
 ##     (touch, controller, or keyboard/mouse), never viewport width alone.
+## 22. A modal Back/cancel action that semantically chooses a visible decline
+##     response must briefly move focus to that response before dismissal.
+##     The established response arrow and focused text provide confirmation;
+##     the panel remains visible for a fraction of a second so cancel never
+##     feels like an unacknowledged disappearance or an ambiguous selection.
+## 23. A creature transformation is a full-screen, input-locked presentation,
+##     not a transient HUD toast over live danger. It reuses the creature's
+##     real three-quarter portrait, makes the whiteout the hidden state-change
+##     boundary, and keeps status copy in the standard passive panel language.
+##     The backdrop and light plane may fill the rectangular viewport because
+##     they represent the replaced world/frame, not bounded interface shapes.
 
 
 ## An inset, recessed-looking cell for an inventory grid slot -- darker

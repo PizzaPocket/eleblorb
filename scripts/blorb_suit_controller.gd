@@ -165,6 +165,22 @@ func assignment_snapshot() -> Dictionary:
 	return _assignments.duplicate()
 
 
+func worn_blorbs() -> Array[Blorb]:
+	var result: Array[Blorb] = []
+	for entry in _worn:
+		var blorb := entry.get("blorb") as Blorb
+		if is_instance_valid(blorb):
+			result.append(blorb)
+	return result
+
+
+func worn_blorb_for_slot(slot: String) -> Blorb:
+	for entry in _worn:
+		if String(entry.get("slot", "")) == slot:
+			return entry.get("blorb") as Blorb
+	return null
+
+
 ## Rebinds a portal-carried slot map to the newly instantiated Blorb nodes in
 ## the destination world. Party owns serialization; this controller validates
 ## and consumes the live references.

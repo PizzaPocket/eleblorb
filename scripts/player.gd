@@ -203,6 +203,25 @@ const SPRINT_STRIDE_EASE := 0.35
 const SPRINT_ELBOW_EXTRA_BEND := 1.3
 const POSE_SETTLE_SPEED := 8.0
 
+# One-shot opening tableau: the hero wakes from the coma described in the
+# world bible already lying face-up in the starting field, takes a moment to
+# orient, then rises before ordinary control unlocks. The visual rig rotates
+# around its feet-on-ground origin while the collision body remains safely
+# upright and stationary.
+const WAKE_INTRO_REST_DURATION := 0.9
+const WAKE_INTRO_RISE_DURATION := 1.65
+const WAKE_INTRO_SETTLE_DURATION := 0.65
+const WAKE_INTRO_LYING_ANGLE := deg_to_rad(-90.0)
+const WAKE_INTRO_VISUAL_HEIGHT := 0.18
+const WAKE_INTRO_CAMERA_PITCH := deg_to_rad(-82.0)
+const WAKE_INTRO_CAMERA_DISTANCE := 0.48
+const WAKE_INTRO_HIP_BEND := deg_to_rad(38.0)
+const WAKE_INTRO_KNEE_BEND := deg_to_rad(72.0)
+const WAKE_INTRO_SPINE_CURL := deg_to_rad(22.0)
+const WAKE_INTRO_LEFT_ARM_REACH := deg_to_rad(52.0)
+const WAKE_INTRO_RIGHT_ARM_REACH := deg_to_rad(68.0)
+const WAKE_INTRO_ELBOW_BEND := deg_to_rad(48.0)
+
 # Human cervical range of motion: roughly 80 deg of axial rotation (turning
 # to look over a shoulder) each way, ~50 deg of extension (looking up) and
 # ~60 deg of flexion (looking down) -- looking straight back or folding the
@@ -335,6 +354,13 @@ var _spine_rest_y: float = 0.0
 ## (leg_pivot isn't touched by this) since they're what's actually
 ## contacting the ground.
 var _hips_rest_y: float = 0.0
+
+var _wake_intro_active: bool = false
+var _wake_intro_elapsed: float = 0.0
+var _wake_intro_owns_modal_lock: bool = false
+var _wake_intro_camera_position_rest: Vector3 = Vector3(0.0, 1.6, 0.0)
+var _wake_intro_camera_pitch_rest: float = 0.0
+var _wake_intro_camera_distance_rest: float = 3.5
 
 const SHIRT_COLOR := Color(0.15, 0.35, 0.72)
 const PANTS_COLOR := Color(0.1, 0.1, 0.13)
@@ -480,7 +506,7 @@ const LANDING_BODY_DIP_AMOUNT := 0.15
 const RUN_BODY_BOB_AMOUNT := 0.025
 
 # Trampoline bounce off a blorb -- landing on top of one (see
-# _check_blorb_bounce()) launches the player straight back into the jump arc
+# _try_predictive_blorb_bounce()) launches the player straight back into the jump arc
 # instead of coming to rest, reusing jump_velocity/_jumping/_landing_timer
 # rather than a separate mechanic, so it gets the ordinary landing-crouch and
 # airborne poses for free. Height scales with velocity squared under
@@ -557,6 +583,13 @@ const SWIM_KICK_ANKLE_AMOUNT := deg_to_rad(10.0)
 # than CharacterBody3D's own (~45-degree) floor_max_angle, so the bounce can
 # trigger even where a genuine is_on_floor() landing wouldn't.
 const BLORB_BOUNCE_NORMAL_MIN := 0.5
+## Predict contact from this frame's downward travel before move_and_slide()
+## can settle the CharacterBody against the blorb. The small precontact band
+## absorbs moving-blorb/physics-tick disagreement; recovery depth catches a
+## contact that began a frame earlier without turning side-brushes into jumps.
+const BLORB_BOUNCE_PRECONTACT_MARGIN := 0.10
+const BLORB_BOUNCE_RECOVERY_DEPTH := 0.22
+const BLORB_BOUNCE_RELEASE_CLEARANCE := 0.035
 # A forgiveness window for "hit the jump button right as you bounce" --
 # demanding a press on the exact physics frame contact resolves would be
 # unreasonably precise. The "jump" action gets buffered for this long; if a blorb
@@ -568,13 +601,14 @@ const BLORB_SUPER_JUMP_BUFFER := 0.25
 # arguably the more natural way to "time" a reaction to something you only
 # see/feel once it's already happened (the blorb's squash is itself a
 # post-impact cue). A press landing within this window of an ordinary bounce
-# retroactively upgrades it: velocity.y just gets overwritten to the super-
-# jump launch value, same as a same-frame press would give, rather than
-# something added on top -- not perfectly energy-consistent if the press
-# lands right at the end of the window (a little height is "lost" versus a
-# same-frame super jump), but the window's short enough that it isn't
-# noticeable, and it reads as a satisfying last-instant save either way.
+# retroactively upgrades it. The remaining launch impulse is blended across
+# BLORB_SUPER_JUMP_BOOST_DURATION rather than replacing velocity in one frame,
+# so the forgiving input window does not introduce a visible pop in the arc.
 const BLORB_SUPER_JUMP_GRACE_WINDOW := 0.18
+## A post-impact jump press adds the remaining super-jump impulse over a few
+## frames. This preserves the forgiving grace window without the old visible
+## one-frame velocity jump.
+const BLORB_SUPER_JUMP_BOOST_DURATION := 0.09
 
 # Idle-pose variety, per direct instruction -- standing still shouldn't
 # read as a perfectly symmetric, rigid mannequin. Elbows always get a very
@@ -639,6 +673,29 @@ var _left_leg_water_active := false
 var _right_leg_water_active := false
 var _left_leg_fire_active := false
 var _right_leg_fire_active := false
+## Electric is arms-only (no leg/hover variant -- there's no analogous
+## mechanic the way fire/water legs already grant a jet hover), so unlike
+## the water/fire flag sets above there's no _left_leg_electric_active.
+var _left_arm_electric_active := false
+var _right_arm_electric_active := false
+## City is arms-only too, same as electric -- see CITY_POWER_MP_PER_SECOND's
+## own comment.
+var _left_arm_city_active := false
+var _right_arm_city_active := false
+## Rock/plant are discrete, cooldown-gated attacks rather than a continuous
+## per-frame drain (see ROCK_POWER_COOLDOWN/PLANT_PELLET_COOLDOWN's own
+## comments) -- these flags mean "button held with that element worn"
+## regardless of cooldown state, matching the water/fire flags' own
+## semantics for pose/XP-crediting purposes; the cooldown timers below
+## separately gate when a shot/eruption actually fires.
+var _left_arm_rock_active := false
+var _right_arm_rock_active := false
+var _left_arm_rock_cooldown := 0.0
+var _right_arm_rock_cooldown := 0.0
+var _left_arm_plant_active := false
+var _right_arm_plant_active := false
+var _left_arm_plant_cooldown := 0.0
+var _right_arm_plant_cooldown := 0.0
 var _water_leg_hover_active := false
 var _fire_hand_hover_active := false
 var _fire_limb_flight_active := false
@@ -666,11 +723,22 @@ var _giant_anchor_yaw: float = 0.0
 ## ordinary (non-super) blorb bounce; a jump press before it hits zero
 ## upgrades that bounce to a super jump after the fact.
 var _blorb_super_jump_grace: float = 0.0
+var _blorb_super_jump_boost_time: float = 0.0
+var _blorb_super_jump_boost_impulse: float = 0.0
 var _lava_warning_cooldown: float = 0.0
+## Own RandomNumberGenerator instance for combat_math.gd's rolled_attack()
+## rolls (rock/plant arm powers) -- this project's established convention
+## (see blorb.gd's own _rng) over the global randf()/randi(), so a roll
+## never shares/consumes state with an unrelated system's own random draws.
+var _rng := RandomNumberGenerator.new()
 
 var _held_visual: Node3D = null
 var _hand_right: Node3D
 var _hand_left: Node3D
+var _wrist_right: Node3D
+var _wrist_left: Node3D
+var _hand_wrist_anchors: Dictionary = {}
+var _hand_wrist_offsets: Dictionary = {}
 var _palm_right: Node3D
 var _palm_left: Node3D
 var _toe_right: Node3D
@@ -683,7 +751,21 @@ var _water_leg_stream_left: GPUParticles3D
 var _water_leg_stream_right: GPUParticles3D
 var _fire_leg_stream_left: GPUParticles3D
 var _fire_leg_stream_right: GPUParticles3D
-var _prev_throw_pressed: bool = false
+## LightningBolt, not GPUParticles3D -- see lightning_fx.gd's own class doc
+## comment for why electric/city need a genuinely different rendering
+## technique from the water/fire particle-spray streams above.
+var _electric_stream_left: LightningBolt
+var _electric_stream_right: LightningBolt
+var _city_stream_left: LightningBolt
+var _city_stream_right: LightningBolt
+var _throw_aim_active: bool = false
+var _throw_camera_recovering: bool = false
+var _throw_camera_base_length: float = 3.5
+var _throw_spring_arm_base_position: Vector3 = Vector3.ZERO
+var _throw_pose_blend: float = 0.0
+var _throw_arm_start_rotation: Vector3 = Vector3.ZERO
+var _throw_elbow_start_rotation: Vector3 = Vector3.ZERO
+var _throw_hand_start_rotation: Vector3 = Vector3.ZERO
 
 ## Blorb suit -- see blorb_suit_controller.gd's own module docstring for
 ## the full equip/unequip animation design, and blorb_suit.gd for the
@@ -937,6 +1019,12 @@ func _apply_pivots(pivots: Dictionary) -> void:
 	_hips_rest_y = _hips.position.y
 	_hand_right = pivots["hand_right"]
 	_hand_left = pivots["hand_left"]
+	_wrist_right = pivots["wrist_right"]
+	_wrist_left = pivots["wrist_left"]
+	_hand_wrist_anchors.clear()
+	_hand_wrist_offsets.clear()
+	_cache_hand_wrist(_hand_right, _wrist_right)
+	_cache_hand_wrist(_hand_left, _wrist_left)
 	_palm_right = pivots["palm_right"]
 	_palm_left = pivots["palm_left"]
 	_toe_right = pivots["toe_right"]
@@ -1041,11 +1129,24 @@ const HELD_ITEM_SCALE := 0.6
 # gd for how +Z was confirmed, not guessed, as that direction).
 const HELD_ITEM_LOCAL_OFFSET := Vector3(0, 0, 0.02)
 const THROW_SPEED := 14.0
-const THROW_LOFT := 2.0
-const THROW_SPAWN_DISTANCE := 0.6
+const THROW_MAX_AIM_DISTANCE := 45.0
+const THROW_CAMERA_DISTANCE_SCALE := 0.60
+## Per direct report, 1.05 shifted the camera over the shoulder far enough
+## that his own head blocked the reticle rather than clearing it -- reduced
+## to only clear the head's own width beside the spring arm's centerline,
+## not visually verified in-engine (see the figure-rig skill's guidance on
+## flagging unverified placement), tunable on report.
+const THROW_CAMERA_RIGHT_OFFSET := 0.45
+const THROW_CAMERA_BLEND_SPEED := 7.0
+const THROW_POSE_SETTLE_SPEED := 11.0
+const THROW_ARM_BACK_ANGLE := deg_to_rad(142.0)
+const THROW_ARM_OUTWARD_ANGLE := deg_to_rad(24.0)
+const THROW_ELBOW_BEND := deg_to_rad(104.0)
+const THROW_HAND_COCK := deg_to_rad(18.0)
 
 
 func _ready() -> void:
+	_rng.randomize()
 	# Hud (an autoload, not a scene sibling like blorb.gd's own "../Player")
 	# has no relative path to reach this node -- the wild-blorb direction
 	# hint looks it up by group instead (see hud.gd's _find_player()).
@@ -1112,6 +1213,10 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _throw_aim_active and event.is_action_pressed("ui_cancel"):
+		cancel_throw_preparation()
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		# The OS warps the cursor to center on capture, which can report as one
 		# large spurious motion event; skip it so the camera doesn't snap.
@@ -1131,6 +1236,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	_lava_warning_cooldown = maxf(_lava_warning_cooldown - delta, 0.0)
 	_apply_gamepad_look(delta)
+	_update_throw_input()
 	if Input.is_action_just_pressed("switch_blorbus") and not UIState.modal_open and not _player_following_manchego:
 		_toggle_blorbus_control()
 	if _player_following_manchego:
@@ -1155,7 +1261,7 @@ func _physics_process(delta: float) -> void:
 	# BLORB_SUPER_JUMP_GRACE_WINDOW's own comment.
 	if _blorb_super_jump_grace > 0.0:
 		if jump_pressed:
-			_apply_blorb_bounce_velocity(true)
+			_begin_blorb_super_jump_boost()
 			_blorb_super_jump_grace = 0.0
 		else:
 			_blorb_super_jump_grace = maxf(_blorb_super_jump_grace - delta, 0.0)
@@ -1263,6 +1369,7 @@ func _physics_process(delta: float) -> void:
 		_giant_surface_jump_in_progress = giant_jump_ready
 		_jumping = true
 		jumped_this_frame = true
+	_update_blorb_super_jump_boost(delta)
 
 	var input_dir := _get_move_input()
 	_aerial_motion_direction = Vector3.ZERO
@@ -1282,10 +1389,12 @@ func _physics_process(delta: float) -> void:
 	var skating := _is_blorb_skating()
 	var ground_move_speed := TEMP_MONKEY_MOVE_SPEED if _piloting_xiao_hou_zi else move_speed
 	var current_speed := ground_move_speed * (sprint_multiplier if _is_sprinting() else 1.0)
+	if not aerial_active:
+		current_speed *= worn_leg_speed_multiplier()
 	if _lake_diving_active:
 		current_speed = LAKE_DIVE_SPEED
 	elif _air_flight_active or _fire_limb_flight_active:
-		current_speed = AIR_FLIGHT_SPEED
+		current_speed = AIR_FLIGHT_SPEED * worn_flight_speed_multiplier()
 	# Air feet retain ordinary walk/run traversal speed and animation even
 	# though their direction includes camera pitch (see _animate_walk()).
 	if aerial_active and _is_sprinting():
@@ -1296,8 +1405,8 @@ func _physics_process(delta: float) -> void:
 	if _air_flight_active:
 		var active_fire_feet := int(_left_leg_fire_active) + int(_right_leg_fire_active)
 		current_speed *= pow(FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER, active_fire_feet)
-	if skating and not aerial_active and not powered_hover:
-		current_speed *= BLORB_SKATE_SPEED_MULTIPLIER
+	# Leg Speed replaces the old fixed skate multiplier. High-Speed legs reach
+	# and surpass that former very-fast reference through progression itself.
 
 	if direction.length() > 0.001:
 		direction = direction.normalized()
@@ -1326,6 +1435,11 @@ func _physics_process(delta: float) -> void:
 	# lift. Air feet and four-limb Fire flight instead use camera-pitched
 	# direction above; with no input they hold the last elevation here.
 	_apply_powered_hover_vertical(delta, direction.length() > 0.001 and aerial_active)
+	# Resolve a normal blorb landing before physics can convert it into a
+	# stationary floor contact. This also lets the launch velocity influence
+	# the pose and the very same move_and_slide() call, eliminating the old
+	# one-frame stick/hover between impact and takeoff.
+	var bounced_before_move := _try_predictive_blorb_bounce(delta, grounded)
 
 	_animate_walk(delta, grounded, BLORB_SKATE_SPEED_MULTIPLIER if skating and not powered_hover else 1.0)
 	# Flight aiming is applied after the base pose but before the dedicated
@@ -1342,6 +1456,8 @@ func _physics_process(delta: float) -> void:
 	# get wrong.
 	_apply_arm_power_poses(delta)
 	_apply_fire_jet_pose(delta)
+	_apply_throw_aim_pose(delta)
+	_apply_throw_facing(delta)
 	_update_water_streams(delta)
 
 	if grounded and not surface_walking and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and _is_touching_terrain():
@@ -1398,7 +1514,7 @@ func _physics_process(delta: float) -> void:
 	# landing was resolved), same as the terrain step-up/snap calls around
 	# it -- so this only ever fires while the frame started airborne, not on
 	# every ground-level bump into a blorb's side.
-	if not _check_rising_air_blorb_bounce(grounded):
+	if not bounced_before_move and not _check_rising_air_blorb_bounce(grounded):
 		_check_creature_bounce(grounded, pre_move_feet_y)
 	if grounded and not surface_walking and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and _is_touching_terrain():
 		_snap_to_terrain(delta)
@@ -1466,10 +1582,52 @@ func _enforce_lava_access() -> void:
 		_lava_warning_cooldown = LAVA_WARNING_COOLDOWN
 
 
-## Detects landing on top of a blorb via this frame's move_and_slide()
-## collisions, rather than a distance/height check like the terrain snap
-## uses -- a blorb can be standing (or gliding) anywhere, so there's no
-## single fixed spot to test against the way terrain height works.
+## Predicts whether this frame's motion will cross a blorb's rendered crown.
+## Resolving the contact before move_and_slide() prevents the character body
+## from being settled into a floor contact for a frame before the launch.
+func _try_predictive_blorb_bounce(delta: float, was_grounded: bool) -> bool:
+	if (
+		was_grounded
+		or velocity.y > 0.1
+		or _giant_goo_active
+		or _lake_buoyancy_active
+		or _is_suit_flight_active()
+		or _is_powered_hover_active()
+	):
+		return false
+	var current_feet_y := global_position.y - FOOT_OFFSET
+	var projected_xz := Vector2(
+		global_position.x + velocity.x * delta,
+		global_position.z + velocity.z * delta
+	)
+	var projected_feet_y := current_feet_y + velocity.y * delta
+	var best_blorb: Blorb = null
+	var best_surface_y := -INF
+	for candidate in get_tree().get_nodes_in_group("blorbs"):
+		if not candidate is Blorb:
+			continue
+		var blorb := candidate as Blorb
+		var surface: Variant = blorb.bounce_surface_height_at(projected_xz.x, projected_xz.y)
+		if surface == null:
+			continue
+		var surface_y := surface as float
+		if current_feet_y < surface_y - BLORB_BOUNCE_RECOVERY_DEPTH:
+			continue
+		if projected_feet_y > surface_y + BLORB_BOUNCE_PRECONTACT_MARGIN:
+			continue
+		if surface_y > best_surface_y:
+			best_surface_y = surface_y
+			best_blorb = blorb
+	if best_blorb == null:
+		return false
+	global_position.y = best_surface_y + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
+	_bounce_off_blorb(best_blorb)
+	return true
+
+
+## Post-movement recovery path for NPC heads and any blorb contact whose
+## surface moved unexpectedly during this physics tick. Ordinary blorb
+## landings should normally be resolved by the predictive pass above.
 func _check_creature_bounce(was_grounded: bool, pre_move_feet_y: float) -> void:
 	if was_grounded:
 		return
@@ -1483,7 +1641,9 @@ func _check_creature_bounce(was_grounded: bool, pre_move_feet_y: float) -> void:
 			var blorb := creature as Blorb
 			var blorb_surface: Variant = blorb.bounce_surface_height_at(global_position.x, global_position.z)
 			if blorb_surface != null:
-				global_position.y = (blorb_surface as float) + FOOT_OFFSET
+				global_position.y = (
+					(blorb_surface as float) + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
+				)
 				_bounce_off_blorb(blorb)
 				return
 		elif creature.is_in_group("npcs") and creature.has_method("head_bounce_surface_height_at"):
@@ -1515,7 +1675,7 @@ func _check_creature_bounce(was_grounded: bool, pre_move_feet_y: float) -> void:
 			continue
 		var surface_y := blorb_surface as float
 		if pre_move_feet_y >= surface_y and global_position.y - FOOT_OFFSET <= surface_y:
-			global_position.y = surface_y + FOOT_OFFSET
+			global_position.y = surface_y + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
 			_bounce_off_blorb(blorb)
 			return
 
@@ -1537,11 +1697,11 @@ func _check_rising_air_blorb_bounce(was_grounded: bool) -> bool:
 		if surface == null:
 			continue
 		var contact_y := surface as float
-		var feet_gap := global_position.y - contact_y
+		var feet_gap := global_position.y - FOOT_OFFSET - contact_y
 		if feet_gap >= -0.04 and feet_gap <= 0.08:
 			# Resolve the visual contact before launching. This removes the old
 			# hovering gap while retaining the existing squash/bounce response.
-			global_position.y = contact_y + FOOT_OFFSET
+			global_position.y = contact_y + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
 			_bounce_off_blorb(blorb)
 			return true
 	return false
@@ -1556,6 +1716,8 @@ func _check_rising_air_blorb_bounce(was_grounded: bool) -> bool:
 func _bounce_off_blorb(blorb: Node) -> void:
 	var super_jump := _jump_buffer_timer > 0.0
 	_jump_buffer_timer = 0.0
+	_blorb_super_jump_boost_time = 0.0
+	_blorb_super_jump_boost_impulse = 0.0
 	_apply_blorb_bounce_velocity(super_jump)
 	_jumping = true
 	_landing_timer = LANDING_DURATION
@@ -1569,10 +1731,42 @@ func _bounce_off_blorb(blorb: Node) -> void:
 
 
 func _apply_blorb_bounce_velocity(super_jump: bool) -> void:
+	velocity.y = _blorb_bounce_launch_speed(super_jump)
+	_jump_takeoff_speed = absf(velocity.y)
+
+
+func _blorb_bounce_launch_speed(super_jump: bool) -> float:
 	var height_multiplier := SUPER_JUMP_HEIGHT_MULTIPLIER if super_jump else 1.0
 	var jump_speed_scale := TEMP_MONKEY_JUMP_MULTIPLIER if _piloting_xiao_hou_zi else 1.0
-	velocity.y = jump_velocity * jump_speed_scale * sqrt(height_multiplier)
-	_jump_takeoff_speed = absf(velocity.y)
+	return jump_velocity * jump_speed_scale * sqrt(height_multiplier)
+
+
+func _begin_blorb_super_jump_boost() -> void:
+	if not _jumping:
+		return
+	var target_speed := _blorb_bounce_launch_speed(true)
+	_blorb_super_jump_boost_impulse = maxf(target_speed - velocity.y, 0.0)
+	_blorb_super_jump_boost_time = (
+		BLORB_SUPER_JUMP_BOOST_DURATION
+		if _blorb_super_jump_boost_impulse > 0.0
+		else 0.0
+	)
+
+
+func _update_blorb_super_jump_boost(delta: float) -> void:
+	if _blorb_super_jump_boost_time <= 0.0:
+		return
+	if not _jumping:
+		_blorb_super_jump_boost_time = 0.0
+		_blorb_super_jump_boost_impulse = 0.0
+		return
+	var fraction := minf(delta / _blorb_super_jump_boost_time, 1.0)
+	var impulse := _blorb_super_jump_boost_impulse * fraction
+	velocity.y += impulse
+	_blorb_super_jump_boost_impulse -= impulse
+	_blorb_super_jump_boost_time = maxf(_blorb_super_jump_boost_time - delta, 0.0)
+	if _blorb_super_jump_boost_time <= 0.0:
+		_jump_takeoff_speed = maxf(_jump_takeoff_speed, _blorb_bounce_launch_speed(true))
 
 
 ## Whether the player is currently airborne (jumping or falling) rather than
@@ -1596,9 +1790,46 @@ func is_air_flight_active() -> bool:
 func take_damage(amount: float) -> void:
 	if amount <= 0.0 or _piloting_xiao_hou_zi:
 		return
-	current_hp = maxf(current_hp - amount, 0.0)
+	current_hp = maxf(current_hp - CombatMath.mitigated_damage(amount, current_defense()), 0.0)
 	_hp_regen_delay = HP_REGEN_DELAY
 	hp_changed.emit(current_hp, MAX_HP)
+
+
+const BASE_DEFENSE := 5
+const WORN_LEG_SPEED_PER_POINT := 0.012
+const AIR_CHEST_SPEED_FLOOR := 0.72
+const AIR_CHEST_SPEED_PER_POINT := 0.025
+
+
+func current_defense() -> int:
+	var total := BASE_DEFENSE
+	if _blorb_suit == null:
+		return total
+	for blorb in _blorb_suit.worn_blorbs():
+		total += blorb.defense
+	return total
+
+
+func worn_leg_speed_multiplier() -> float:
+	if _blorb_suit == null:
+		return 1.0
+	var points := 0
+	for slot in ["leg_left", "leg_right"]:
+		var blorb := _blorb_suit.worn_blorb_for_slot(slot)
+		if blorb != null:
+			points += blorb.speed
+	return 1.0 + float(points) * WORN_LEG_SPEED_PER_POINT
+
+
+func worn_flight_speed_multiplier() -> float:
+	if _blorb_suit == null:
+		return 1.0
+	var chest := _blorb_suit.worn_blorb_for_slot("torso")
+	if chest == null or chest.element_state != "air":
+		return 1.0
+	# Starting air chests sit below the original fixed flight speed. Around
+	# Speed 11 they reach that familiar pace; progression can carry beyond it.
+	return AIR_CHEST_SPEED_FLOOR + float(chest.speed) * AIR_CHEST_SPEED_PER_POINT
 
 
 func heal(amount: float) -> void:
@@ -1624,10 +1855,11 @@ func _process(delta: float) -> void:
 	# physics processing for the frame, right before rendering, so this is
 	# the last word on camera position each frame.
 	_update_possession_camera()
+	_update_throw_camera(delta)
+	_update_wake_intro(delta)
 	_clamp_camera_above_ground()
-	_update_head_look(delta)
-	if not _player_following_blorbus and not _player_following_manchego:
-		_update_throw_input()
+	if not _wake_intro_active:
+		_update_head_look(delta)
 	_update_suit_input(delta)
 	_update_hp_regen(delta)
 	EyeBlink.apply(_eye_blink, delta, _eyes)
@@ -1637,6 +1869,118 @@ func _process(delta: float) -> void:
 	# blorb limbs -- see monkey_figure.gd's own rebuild_limbs().
 	if _piloting_xiao_hou_zi:
 		MonkeyFigure.rebuild_limbs(_monkey_pivots, visuals, delta)
+
+
+## Called by main.gd only for the first, non-portal arrival. Acquiring a
+## separate modal lock before LoadingScreen releases its own makes the fade
+## hand off seamlessly to this animation with no frame of live controls.
+func begin_wake_intro() -> void:
+	if _wake_intro_active or WorldState.opening_wake_completed:
+		return
+	_wake_intro_active = true
+	_wake_intro_elapsed = 0.0
+	_wake_intro_camera_position_rest = camera_rig.position
+	_wake_intro_camera_pitch_rest = camera_pivot.rotation.x
+	_wake_intro_camera_distance_rest = camera_spring_arm.spring_length
+	UIState.push_modal()
+	_wake_intro_owns_modal_lock = true
+	_apply_wake_intro_pose(0.0)
+
+
+func _update_wake_intro(delta: float) -> void:
+	if not _wake_intro_active:
+		return
+	_wake_intro_elapsed += delta
+	var rise_time := _wake_intro_elapsed - WAKE_INTRO_REST_DURATION
+	var rise_linear := clampf(rise_time / WAKE_INTRO_RISE_DURATION, 0.0, 1.0)
+	var rise := smoothstep(0.0, 1.0, rise_linear)
+	_apply_wake_intro_pose(rise)
+	var total_duration := (
+		WAKE_INTRO_REST_DURATION
+		+ WAKE_INTRO_RISE_DURATION
+		+ WAKE_INTRO_SETTLE_DURATION
+	)
+	if _wake_intro_elapsed >= total_duration:
+		_finish_wake_intro()
+
+
+func _apply_wake_intro_pose(rise: float) -> void:
+	# Root motion supplies the readable lie-to-stand arc. A temporary curl at
+	# the middle of the rise breaks the rigid-plank silhouette: knees draw in,
+	# the torso folds, and the two arms reach by slightly different amounts.
+	var brace := sin(rise * PI)
+	visuals.rotation.x = lerp_angle(WAKE_INTRO_LYING_ANGLE, 0.0, rise)
+	visuals.rotation.z = 0.0
+	visuals.position.y = lerpf(WAKE_INTRO_VISUAL_HEIGHT, -FOOT_OFFSET, rise)
+	_leg_left.rotation.x = -WAKE_INTRO_HIP_BEND * brace
+	_leg_right.rotation.x = -WAKE_INTRO_HIP_BEND * brace
+	_knee_left.rotation.x = WAKE_INTRO_KNEE_BEND * brace
+	_knee_right.rotation.x = WAKE_INTRO_KNEE_BEND * brace
+	_ankle_left.rotation.x = -deg_to_rad(10.0) * brace
+	_ankle_right.rotation.x = -deg_to_rad(10.0) * brace
+	_arm_left.rotation.x = -WAKE_INTRO_LEFT_ARM_REACH * brace
+	_arm_right.rotation.x = -WAKE_INTRO_RIGHT_ARM_REACH * brace
+	_arm_left.rotation.y = 0.0
+	_arm_right.rotation.y = 0.0
+	_arm_left.rotation.z = ProceduralFigure.ARM_OUTWARD_ANGLE
+	_arm_right.rotation.z = -ProceduralFigure.ARM_OUTWARD_ANGLE
+	_elbow_left.rotation.x = -WAKE_INTRO_ELBOW_BEND * brace
+	_elbow_right.rotation.x = -WAKE_INTRO_ELBOW_BEND * brace
+	_elbow_left.rotation.y = 0.0
+	_elbow_right.rotation.y = 0.0
+	_elbow_left.rotation.z = 0.0
+	_elbow_right.rotation.z = 0.0
+	_spine.rotation.x = WAKE_INTRO_SPINE_CURL * brace
+	_spine.position.y = _spine_rest_y
+	_hips.rotation.z = 0.0
+	_hips.position.y = _hips_rest_y
+	_head.rotation.x = 0.0
+	_head.rotation.y = 0.0
+	_head_look_pitch = 0.0
+	_head_look_yaw = 0.0
+
+	# Track the centre of the face throughout the whole get-up motion. The
+	# camera orientation follows the body's lie-to-stand angle, keeping the
+	# close-up face-on rather than leaving the head to travel out of frame.
+	var face_world := _head.to_global(Vector3(0.0, ProceduralFigure.HEAD_SIZE.y, 0.0))
+	var face_target := to_local(face_world)
+	var close_pitch := lerp_angle(WAKE_INTRO_CAMERA_PITCH, 0.0, rise)
+	var settle_time := (
+		_wake_intro_elapsed - WAKE_INTRO_REST_DURATION - WAKE_INTRO_RISE_DURATION
+	)
+	var settle_linear := clampf(
+		settle_time / WAKE_INTRO_SETTLE_DURATION, 0.0, 1.0
+	)
+	var camera_settle := smoothstep(0.0, 1.0, settle_linear)
+	camera_rig.position = face_target.lerp(_wake_intro_camera_position_rest, camera_settle)
+	camera_pivot.rotation.x = lerp_angle(
+		close_pitch, _wake_intro_camera_pitch_rest, camera_settle
+	)
+	camera_spring_arm.spring_length = lerpf(
+		WAKE_INTRO_CAMERA_DISTANCE, _wake_intro_camera_distance_rest, camera_settle
+	)
+
+
+func _finish_wake_intro() -> void:
+	visuals.rotation.x = 0.0
+	visuals.rotation.z = 0.0
+	visuals.position.y = -FOOT_OFFSET
+	camera_rig.position = _wake_intro_camera_position_rest
+	camera_pivot.rotation.x = _wake_intro_camera_pitch_rest
+	camera_spring_arm.spring_length = _wake_intro_camera_distance_rest
+	_wake_intro_active = false
+	WorldState.opening_wake_completed = true
+	if _wake_intro_owns_modal_lock:
+		UIState.pop_modal()
+		_wake_intro_owns_modal_lock = false
+
+
+func _exit_tree() -> void:
+	# Defensive cleanup if the scene is ever replaced externally during the
+	# opening; an autoloaded modal counter must not retain this player's lock.
+	if _wake_intro_owns_modal_lock:
+		UIState.pop_modal()
+		_wake_intro_owns_modal_lock = false
 
 
 func _toggle_blorbus_control() -> void:
@@ -2127,9 +2471,9 @@ func _update_suit_input(delta: float) -> void:
 ## own lerp keeps running underneath every frame regardless, so it just
 ## resumes easing from wherever this override last left the value the
 ## instant this stops overriding it. The hand's own roll (see
-## HAND_PALM_ROLL) doesn't get that for free -- nothing else in this
-## file ever touches hand.rotation.y -- so _rest_hand_roll() below
-## explicitly eases it back to its normal static wrist-twist value
+## wrist flex/twist doesn't get that for free -- nothing else in this
+## file normally restores the hand rotations -- so _rest_hand_roll() below
+## explicitly eases them back to the normal static wrist orientation
 ## whenever that arm isn't posing.
 ##
 ## Q ("left_arm_power") drives _arm_left/_hand_left, and E
@@ -2153,30 +2497,6 @@ const FLIGHT_PALM_DOWN_ROLL := PI * 0.5
 const FLIGHT_REAR_ARM_BACK_ANGLE := deg_to_rad(68.0)
 const FLIGHT_REAR_ELBOW_BEND := deg_to_rad(122.0)
 const ARM_POWER_POSE_SETTLE_SPEED := 10.0
-## Rolls the hand around its own wrist-to-fingers axis (rotation.y, ON TOP
-## of the static WRIST_INWARD_ANGLE twist already baked in at build time --
-## see procedural_figure.gd's own _build_arm), per direct instruction, so
-## the palm ends up angled once the arm is extended forward. Applied as
-## `rest_twist - side * HAND_PALM_ROLL` at its one use site in
-## _pose_extended_arm below -- two rounds of direct-observation correction
-## originally landed this at a full 90-degree roll (flat palm-down): a flat
-## (non-side-dependent) `+HAND_PALM_ROLL` had the right arm correctly
-## rolling palm-down but the left rolling the SAME direction instead of
-## mirrored (palm-up); making it `side * HAND_PALM_ROLL` fixed the
-## mirroring but flipped BOTH arms to palm-up; negating the whole term is
-## what actually landed both palms down, confirmed at 90 degrees.
-##
-## Reduced from that confirmed 90 down to 60 per a further direct
-## instruction ("angled in a bit" instead of flat down) -- since
-## rest_twist above already faces the palm inward (toward the body's own
-## centerline) before this roll is added on top in the SAME rotational
-## direction, a SMALLER roll than the old full 90 lands partway between
-## that inward-facing rest orientation and flat-down, i.e. angled in
-## rather than either extreme. The exact amount (60, not some other
-## partial value) is an ESTIMATE, not reconfirmed by observation at this
-## new value -- adjust directly against what's actually seen in-game
-## rather than re-deriving the geometry.
-const HAND_PALM_ROLL := deg_to_rad(60.0)
 const FIRE_JET_ARM_BACK_ANGLE := deg_to_rad(8.0)
 const FIRE_JET_ARM_OUTWARD_ANGLE := deg_to_rad(16.0)
 const FIRE_JET_ELBOW_BEND := deg_to_rad(10.0)
@@ -2198,7 +2518,11 @@ func _apply_arm_power_poses(delta: float) -> void:
 	# lerps never fully resolved, settling the arm at a permanent halfway
 	# compromise instead of cleanly canceling the raise.
 	var left_power := Input.is_action_pressed("left_arm_power") and not _fire_hand_hover_active
-	var right_power := Input.is_action_pressed("right_arm_power") and not _fire_hand_hover_active
+	var right_power := (
+		Input.is_action_pressed("right_arm_power")
+		and not _fire_hand_hover_active
+		and not _throw_aim_active
+	)
 	var holding_power := left_power or right_power
 	if holding_power:
 		_arm_power_recovery = 0.0
@@ -2227,7 +2551,7 @@ func _apply_arm_power_poses(delta: float) -> void:
 		_rest_hand_roll(_hand_right, -1.0, t)
 
 
-## `side` is the ARM being posed (+1 right, -1 left -- ProceduralFigure's
+## `side` is the ARM being posed (+1 left, -1 right -- ProceduralFigure's
 ## own convention, matching _build_arm's own parameter), not the input
 ## action -- see this function's own call sites above for how those two
 ## get mapped.
@@ -2246,13 +2570,54 @@ func _pose_extended_arm(arm_pivot: Node3D, elbow_pivot: Node3D, hand: Node3D, si
 	elbow_pivot.rotation.x = lerp_angle(elbow_pivot.rotation.x, 0.0, weight)
 	elbow_pivot.rotation.y = lerp_angle(elbow_pivot.rotation.y, 0.0, weight)
 	elbow_pivot.rotation.z = lerp_angle(elbow_pivot.rotation.z, 0.0, weight)
-	var rest_twist := -side * (PI * 0.5 + ProceduralFigure.WRIST_INWARD_ANGLE)
-	hand.rotation.y = lerp_angle(hand.rotation.y, rest_twist - side * HAND_PALM_ROLL, weight)
+	# Use the exact quarter-turn while raised. Keeping the relaxed wrist's
+	# additional inward angle here tilts the supposedly vertical fingertips
+	# back toward the body's centre line.
+	var hand_parent := hand.get_parent() as Node3D
+	if hand_parent != null:
+		# ProceduralFigure's hand uses local +Z as its palm normal and local
+		# -Y from wrist to fingertips. Build the anatomical target explicitly:
+		# palm toward the hero's front, fingertips vertically skyward.
+		var body_basis := visuals.global_transform.basis.orthonormalized()
+		var desired_world_basis := Basis(-body_basis.x, -body_basis.y, body_basis.z)
+		var desired_local_basis := (
+			hand_parent.global_transform.basis.orthonormalized().inverse()
+			* desired_world_basis
+		).orthonormalized()
+		hand.quaternion = hand.quaternion.slerp(
+			desired_local_basis.get_rotation_quaternion(), clampf(weight, 0.0, 1.0)
+		)
+	_anchor_hand_to_wrist(hand)
 
 
 func _rest_hand_roll(hand: Node3D, side: float, t: float) -> void:
 	var rest_twist := -side * (PI * 0.5 + ProceduralFigure.WRIST_INWARD_ANGLE)
+	hand.rotation.x = lerp_angle(hand.rotation.x, 0.0, t)
 	hand.rotation.y = lerp_angle(hand.rotation.y, rest_twist, t)
+	hand.rotation.z = lerp_angle(hand.rotation.z, 0.0, t)
+	_anchor_hand_to_wrist(hand)
+
+
+## ProceduralFigure's visible hand node is centred within the hand mesh, not
+## located at the wrist. Preserve the authored WristAttach point while the
+## hand flexes so a 90-degree palm-forward pose bends cleanly at the joint
+## instead of rotating the mesh around its middle and pulling it loose from
+## the forearm. MonkeyFigure already returns its endpoint as both hand and
+## wrist, so that rig correctly needs no compensation.
+func _cache_hand_wrist(hand: Node3D, wrist: Node3D) -> void:
+	if hand == null or wrist == null or hand == wrist:
+		return
+	var key := hand.get_instance_id()
+	_hand_wrist_offsets[key] = wrist.position
+	_hand_wrist_anchors[key] = hand.position + hand.basis * wrist.position
+
+
+func _anchor_hand_to_wrist(hand: Node3D) -> void:
+	var key := hand.get_instance_id()
+	if not _hand_wrist_anchors.has(key):
+		return
+	var wrist_offset: Vector3 = _hand_wrist_offsets[key]
+	hand.position = (_hand_wrist_anchors[key] as Vector3) - hand.basis * wrist_offset
 
 
 ## Two active Fire hands become downward lift jets rather than two forward
@@ -2332,6 +2697,10 @@ func _build_water_streams() -> void:
 	_water_leg_stream_right = _make_water_stream("RightWaterFootJet")
 	_fire_leg_stream_left = _make_fire_stream("LeftFireFootJet")
 	_fire_leg_stream_right = _make_fire_stream("RightFireFootJet")
+	_electric_stream_left = LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR)
+	_electric_stream_right = LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR)
+	_city_stream_left = LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR)
+	_city_stream_right = LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR)
 
 
 ## Soft particle texture/ramp tuning -- see particle_fx.gd's own class doc
@@ -2469,8 +2838,53 @@ func _make_fire_stream(stream_name: String) -> GPUParticles3D:
 	return stream
 
 
+
+
+## Same position/look_at()/wobble aiming _update_water_stream() applies to a
+## GPUParticles3D stream, just typed for LightningBolt instead -- GDScript
+## has no structural typing, so a plain Node3D-typed LightningBolt can't be
+## passed into that function's GPUParticles3D-typed parameter, and this
+## small duplicate is simpler than forcing an artificial shared base type
+## across two otherwise-unrelated node kinds.
+func _update_lightning_bolt(bolt: LightningBolt, hand: Node3D, forward: Vector3, active: bool) -> void:
+	if bolt == null or hand == null:
+		return
+	bolt.emitting = active
+	if not active:
+		return
+	var origin := hand.global_position
+	bolt.global_position = origin
+	var up_reference := Vector3.UP
+	if absf(forward.normalized().dot(up_reference)) > 0.98:
+		up_reference = visuals.global_transform.basis.z.normalized()
+	var phase := float(bolt.get_instance_id() % 1000) * 0.01
+	var t := Time.get_ticks_msec() * 0.001 * STREAM_AIM_WOBBLE_SPEED + phase
+	var wobble := Basis(Vector3.UP, sin(t) * STREAM_AIM_WOBBLE_ANGLE) * Basis(Vector3.RIGHT, cos(t * 1.3) * STREAM_AIM_WOBBLE_ANGLE)
+	bolt.look_at(origin + wobble * forward, up_reference)
+
+
 const WATER_POWER_MP_PER_SECOND := 3.0
 const FIRE_POWER_MP_PER_SECOND := 4.5
+const ELECTRIC_POWER_MP_PER_SECOND := 4.0
+## City is arms-only too, folding into the same forward-stream damage
+## pipeline as electric -- see combat_math.gd's own HASTE_WEAKEN_DURATION
+## comment for the status effect its own damage tick also applies.
+const CITY_POWER_MP_PER_SECOND := 4.0
+
+## Rock/plant are discrete, cooldown-gated attacks (see the flag/cooldown
+## fields' own comment) rather than a continuous per-second drain, so their
+## cost is per-shot rather than a rate.
+const ROCK_POWER_MP_PER_SHOT := 8.0
+const ROCK_POWER_COOLDOWN := 1.1
+const ROCK_CRAG_DAMAGE_BASE := 18.0
+const ROCK_CRAG_RADIUS := 1.6
+const ROCK_CRAG_SPAWN_DISTANCE := 3.0
+
+const PLANT_POWER_MP_PER_SHOT := 2.0
+## ~2.5 shots/sec -- "not too fast," per direct instruction.
+const PLANT_PELLET_COOLDOWN := 0.4
+const PLANT_PELLET_DAMAGE_BASE := 6.0
+const PLANT_PELLET_SPEED := 14.0
 
 ## Player-arm-stream combat tuning -- a separate, parallel constant set from
 ## blorb.gd's own STREAM_RANGE/STREAM_BASE_DAMAGE_PER_SECOND (see that
@@ -2489,9 +2903,13 @@ const STREAM_HALF_ANGLE_COS := 0.85  # roughly a 32-degree half-angle cone
 
 func _update_limb_power_state(delta: float) -> void:
 	_left_arm_water_active = _consume_limb_power("arm_left", "left_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
-	_right_arm_water_active = _consume_limb_power("arm_right", "right_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
+	_right_arm_water_active = false if _throw_aim_active else _consume_limb_power("arm_right", "right_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
 	_left_arm_fire_active = _consume_limb_power("arm_left", "left_arm_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
-	_right_arm_fire_active = _consume_limb_power("arm_right", "right_arm_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
+	_right_arm_fire_active = false if _throw_aim_active else _consume_limb_power("arm_right", "right_arm_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
+	_left_arm_electric_active = _consume_limb_power("arm_left", "left_arm_power", "electric", ELECTRIC_POWER_MP_PER_SECOND, delta)
+	_right_arm_electric_active = false if _throw_aim_active else _consume_limb_power("arm_right", "right_arm_power", "electric", ELECTRIC_POWER_MP_PER_SECOND, delta)
+	_left_arm_city_active = _consume_limb_power("arm_left", "left_arm_power", "city", CITY_POWER_MP_PER_SECOND, delta)
+	_right_arm_city_active = false if _throw_aim_active else _consume_limb_power("arm_right", "right_arm_power", "city", CITY_POWER_MP_PER_SECOND, delta)
 	_left_leg_water_active = _consume_limb_power("leg_left", "left_leg_power", "water", WATER_POWER_MP_PER_SECOND, delta)
 	_right_leg_water_active = _consume_limb_power("leg_right", "right_leg_power", "water", WATER_POWER_MP_PER_SECOND, delta)
 	_left_leg_fire_active = _consume_limb_power("leg_left", "left_leg_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
@@ -2512,6 +2930,8 @@ func _update_limb_power_state(delta: float) -> void:
 		)
 	_was_powered_hover_active = hovering
 
+	_update_discrete_arm_powers(delta)
+
 
 func _consume_limb_power(
 	slot: String, action: String, element: String, rate: float, delta: float
@@ -2526,6 +2946,116 @@ func _consume_limb_power(
 
 func _is_powered_hover_active() -> bool:
 	return _water_leg_hover_active or _fire_hand_hover_active or _air_foot_hover_active
+
+
+## Rock/plant share the same "held + correct element worn, gated by a
+## per-shot cooldown rather than a per-second drain" shape (see their flag/
+## cooldown fields' own comment) -- handled together here rather than
+## folded into _consume_limb_power(), whose per-second rate model doesn't
+## fit a per-shot cost.
+func _update_discrete_arm_powers(delta: float) -> void:
+	var left_rock := _update_discrete_power("arm_left", "left_arm_power", "rock", _left_arm_rock_cooldown, delta)
+	_left_arm_rock_active = left_rock["active"]
+	_left_arm_rock_cooldown = left_rock["cooldown"]
+	if left_rock["active"] and _left_arm_rock_cooldown <= 0.0 and _fire_rock_power("arm_left", _palm_left):
+		_left_arm_rock_cooldown = ROCK_POWER_COOLDOWN
+
+	var right_rock := (
+		{"active": false, "cooldown": _right_arm_rock_cooldown} if _throw_aim_active
+		else _update_discrete_power("arm_right", "right_arm_power", "rock", _right_arm_rock_cooldown, delta)
+	)
+	_right_arm_rock_active = right_rock["active"]
+	_right_arm_rock_cooldown = right_rock["cooldown"]
+	if right_rock["active"] and _right_arm_rock_cooldown <= 0.0 and _fire_rock_power("arm_right", _palm_right):
+		_right_arm_rock_cooldown = ROCK_POWER_COOLDOWN
+
+	var left_plant := _update_discrete_power("arm_left", "left_arm_power", "plant", _left_arm_plant_cooldown, delta)
+	_left_arm_plant_active = left_plant["active"]
+	_left_arm_plant_cooldown = left_plant["cooldown"]
+	if left_plant["active"] and _left_arm_plant_cooldown <= 0.0 and _fire_plant_power("arm_left", _palm_left):
+		_left_arm_plant_cooldown = PLANT_PELLET_COOLDOWN
+
+	var right_plant := (
+		{"active": false, "cooldown": _right_arm_plant_cooldown} if _throw_aim_active
+		else _update_discrete_power("arm_right", "right_arm_power", "plant", _right_arm_plant_cooldown, delta)
+	)
+	_right_arm_plant_active = right_plant["active"]
+	_right_arm_plant_cooldown = right_plant["cooldown"]
+	if right_plant["active"] and _right_arm_plant_cooldown <= 0.0 and _fire_plant_power("arm_right", _palm_right):
+		_right_arm_plant_cooldown = PLANT_PELLET_COOLDOWN
+
+
+## Whether `action` is held with `element` worn in `slot` right now
+## (regardless of cooldown -- see the rock/plant flag fields' own comment),
+## plus that slot's cooldown ticked down by `delta`. Returns a Dictionary
+## rather than mutating a passed-in field directly since GDScript has no
+## by-reference float parameters.
+func _update_discrete_power(
+	slot: String, action: String, element: String, cooldown: float, delta: float
+) -> Dictionary:
+	var active := false
+	if not UIState.modal_open and Input.is_action_pressed(action):
+		var blorb := _blorb_suit.worn_blorb_in_slot(slot)
+		active = blorb != null and blorb.element_state == element
+	return {"active": active, "cooldown": maxf(cooldown - delta, 0.0)}
+
+
+## Erupts a cosmetic RockCrag (see that script's own class doc comment -- it
+## deals no damage itself) a short distance ahead of the player, then
+## immediately resolves a plain radius check against the "skeletons" group
+## for the actual hit -- an eruption is immediate/local rather than an aimed
+## beam, so a simple radius check fits better here than the streams' own
+## forward-cone check. Returns false (and spends no MP/cooldown) if the worn
+## blorb can't afford ROCK_POWER_MP_PER_SHOT.
+func _fire_rock_power(slot: String, hand: Node3D) -> bool:
+	var blorb := _blorb_suit.worn_blorb_in_slot(slot)
+	if blorb == null or not blorb.consume_mp(ROCK_POWER_MP_PER_SHOT):
+		return false
+	var forward := visuals.global_transform.basis * Vector3(0.0, 0.0, 1.0)
+	forward = forward.normalized() if forward.length_squared() > 0.001 else Vector3.FORWARD
+	var spawn_xz := Vector2(hand.global_position.x, hand.global_position.z) + Vector2(forward.x, forward.z) * ROCK_CRAG_SPAWN_DISTANCE
+	var spawn_point := Vector3(spawn_xz.x, terrain.get_mesh_height(spawn_xz.x, spawn_xz.y), spawn_xz.y)
+	RockCrag.spawn(get_tree().current_scene, spawn_point, _rng)
+	var roll := CombatMath.rolled_attack(ROCK_CRAG_DAMAGE_BASE, blorb.strength, _rng)
+	var credit_blorbs := _active_powered_blorbs()
+	for node in get_tree().get_nodes_in_group("skeletons"):
+		var skeleton := node as Node3D
+		if skeleton == null or not skeleton.has_method("take_damage"):
+			continue
+		if skeleton.global_position.distance_to(spawn_point) > ROCK_CRAG_RADIUS:
+			continue
+		if skeleton.has_method("register_xp_participant"):
+			for participant in credit_blorbs:
+				skeleton.register_xp_participant(participant)
+		var defender_element: String = (
+			skeleton.current_combat_element() if skeleton.has_method("current_combat_element") else ""
+		)
+		var final_damage: float = roll["amount"] * CombatMath.type_multiplier("rock", defender_element)
+		skeleton.take_damage(final_damage)
+	return true
+
+
+## Fires a single SeedPellet forward from `hand` -- see that script's own
+## class doc comment for how it resolves its own hit asynchronously once it
+## actually connects. Returns false (and spends no MP/cooldown) if the worn
+## blorb can't afford PLANT_POWER_MP_PER_SHOT.
+func _fire_plant_power(slot: String, hand: Node3D) -> bool:
+	var blorb := _blorb_suit.worn_blorb_in_slot(slot)
+	if blorb == null or not blorb.consume_mp(PLANT_POWER_MP_PER_SHOT):
+		return false
+	var forward := visuals.global_transform.basis * Vector3(0.0, 0.0, 1.0)
+	forward = forward.normalized() if forward.length_squared() > 0.001 else Vector3.FORWARD
+	var pellet := SeedPellet.new()
+	pellet.velocity = forward * PLANT_PELLET_SPEED
+	pellet.damage = CombatMath.rolled_attack(PLANT_PELLET_DAMAGE_BASE, blorb.strength, _rng)["amount"]
+	pellet.attacker_element = "plant"
+	# Snapshotted at fire time, not read back at hit time -- a pellet in
+	# flight still credits whoever was contributing when it launched even if
+	# that arm stops holding its power before the pellet lands.
+	pellet.credit_blorbs = _active_powered_blorbs()
+	get_tree().current_scene.add_child(pellet)
+	pellet.global_position = hand.global_position
+	return true
 
 
 func _is_suit_flight_active() -> bool:
@@ -2587,12 +3117,22 @@ func _update_water_streams(delta: float) -> void:
 	_update_water_stream(
 		_fire_leg_stream_right, _toe_right, _foot_jet_direction(_ankle_right), _right_leg_fire_active
 	)
+	_update_lightning_bolt(_electric_stream_left, _palm_left, forward, _left_arm_electric_active)
+	_update_lightning_bolt(_electric_stream_right, _palm_right, forward, _right_arm_electric_active)
+	_update_lightning_bolt(_city_stream_left, _palm_left, forward, _left_arm_city_active)
+	_update_lightning_bolt(_city_stream_right, _palm_right, forward, _right_arm_city_active)
 	var forward_stream_active := (
 		_left_arm_water_active or _right_arm_water_active
+		or _left_arm_electric_active or _right_arm_electric_active
+		or _left_arm_city_active or _right_arm_city_active
 		or ((_left_arm_fire_active or _right_arm_fire_active) and not _fire_hand_hover_active)
 	)
-	if forward_stream_active:
-		_damage_skeletons_in_stream(forward, delta)
+	# Runs on a hover-only frame too (no forward stream at all) so a purely
+	# hovering worn blorb still gets an XP-participation chance -- see
+	# _damage_skeletons_in_stream()'s own `dealing_damage` param, which
+	# keeps actual damage-dealing gated on forward_stream_active alone.
+	if forward_stream_active or _is_powered_hover_active():
+		_damage_skeletons_in_stream(forward, delta, forward_stream_active)
 
 
 ## Per direct bug report, the player's own arm-mounted water/fire streams
@@ -2602,16 +3142,21 @@ func _update_water_streams(delta: float) -> void:
 ## this codebase's existing convention of proximity checks over physics
 ## callbacks (see skeleton_nme.gd's own _find_target(), blorb.gd's
 ## _find_nearest_skeleton()).
-func _damage_skeletons_in_stream(forward: Vector3, delta: float) -> void:
+func _damage_skeletons_in_stream(forward: Vector3, delta: float, dealing_damage: bool) -> void:
 	var origin := global_position
-	var participants := _active_forward_stream_blorbs()
+	var damage_participants := _active_forward_stream_blorbs()
+	var powered_participants := _active_powered_blorbs()
 	# The stream's own damage doesn't stack per active arm (one flat rate
 	# whether one or two arms are streaming, same as before) -- Strength
-	# scaling picks the strongest contributing arm blorb rather than
+	# scaling (and, per direct instruction, the type-effectiveness element
+	# used below) picks the strongest contributing arm blorb rather than
 	# averaging it down against a weaker second one.
 	var strength := 0
-	for blorb in participants:
-		strength = maxi(strength, blorb.strength)
+	var attacker_element := ""
+	for blorb in damage_participants:
+		if blorb.strength >= strength:
+			strength = blorb.strength
+			attacker_element = blorb.element_state
 	var damage_rate := CombatMath.rolled_stream_rate(STREAM_BASE_DAMAGE_PER_SECOND, strength)
 	for node in get_tree().get_nodes_in_group("skeletons"):
 		var skeleton := node as Node3D
@@ -2621,19 +3166,86 @@ func _damage_skeletons_in_stream(forward: Vector3, delta: float) -> void:
 		var dist := to_skeleton.length()
 		if dist < 0.001 or dist > STREAM_DAMAGE_RANGE:
 			continue
+		# Registration is broader than damage-dealing -- any nearby enemy
+		# credits every actively-powered worn blorb (see _active_powered_
+		# blorbs()' own comment), not just whichever arm happens to be
+		# forward-streaming at this exact moment. Hovering isn't "aimed"
+		# the way a stream is, so it doesn't need the same forward-cone
+		# check damage itself still does right below.
+		if skeleton.has_method("register_xp_participant"):
+			for blorb in powered_participants:
+				skeleton.register_xp_participant(blorb)
+		if not dealing_damage:
+			continue
 		if forward.dot(to_skeleton / dist) < STREAM_HALF_ANGLE_COS:
 			continue
-		if skeleton.has_method("register_xp_participant"):
-			for blorb in participants:
-				skeleton.register_xp_participant(blorb)
-		skeleton.take_damage(damage_rate * delta)
+		# Type effectiveness (see combat_math.gd's own doc comment) --
+		# neutral (1.0x) whenever either side has no element, which covers
+		# every ordinary skeleton today; a target that exposes its own
+		# current_combat_element() (e.g. an elementally-phased boss) makes
+		# this live.
+		# Explicit : String, not := -- skeleton is a loosely-typed Node3D, so
+		# the dynamic current_combat_element() call has no static return
+		# type for := to infer from (same pitfall this project has already
+		# hit with Dictionary/Array dynamic access elsewhere).
+		var defender_element: String = skeleton.current_combat_element() if skeleton.has_method("current_combat_element") else ""
+		var final_rate := damage_rate * CombatMath.type_multiplier(attacker_element, defender_element)
+		skeleton.take_damage(final_rate * delta)
+		# Electric's own stun / City's own haste-weaken -- see combat_math.gd's
+		# own STUN_DURATION/HASTE_WEAKEN_DURATION comment. Re-applied every
+		# frame the stream keeps hitting (refresh-to-max, not additive -- see
+		# each NME's own apply_stun()/apply_haste_weaken()), so the effect
+		# simply persists for its own duration past the last tick rather than
+		# stacking into something permanent.
+		match attacker_element:
+			"electric":
+				if skeleton.has_method("apply_stun"):
+					skeleton.apply_stun(CombatMath.STUN_DURATION)
+			"city":
+				if skeleton.has_method("apply_haste_weaken"):
+					skeleton.apply_haste_weaken(CombatMath.HASTE_WEAKEN_DURATION)
 
 
 func _active_forward_stream_blorbs() -> Array[Blorb]:
 	var participants: Array[Blorb] = []
 	var active_slots := {
-		"arm_left": _left_arm_water_active or (_left_arm_fire_active and not _fire_hand_hover_active),
-		"arm_right": _right_arm_water_active or (_right_arm_fire_active and not _fire_hand_hover_active),
+		"arm_left": _left_arm_water_active or _left_arm_electric_active or _left_arm_city_active or (_left_arm_fire_active and not _fire_hand_hover_active),
+		"arm_right": _right_arm_water_active or _right_arm_electric_active or _right_arm_city_active or (_right_arm_fire_active and not _fire_hand_hover_active),
+	}
+	for slot in active_slots:
+		if not active_slots[slot]:
+			continue
+		var blorb := _blorb_suit.worn_blorb_in_slot(slot)
+		if blorb != null:
+			participants.append(blorb)
+	return participants
+
+
+## Every currently-worn blorb whose own power is actively engaged right
+## now -- broader than _active_forward_stream_blorbs() above (which stays
+## narrow since only those two slots actually deal stream damage), so XP
+## participation also credits a blorb that spent the fight hovering
+## (either leg, or a fire-hand-hover arm) instead of only ever crediting
+## whichever blorb happened to be forward-streaming at the exact moment of
+## a kill. Per direct instruction: "any blorbs you wore on your body during
+## a fight which you physically contributed to" -- actively drawing on its
+## own power counts as contributing. Head/torso blorbs are left out: no
+## combat-relevant power exists for either slot today (has_head_blorb()/
+## has_chest_air_blorb() gate diving/flight only), so crediting them would
+## invent a rule with no real gameplay basis behind it.
+func _active_powered_blorbs() -> Array[Blorb]:
+	var participants: Array[Blorb] = []
+	var active_slots := {
+		"arm_left": (
+			_left_arm_water_active or _left_arm_fire_active or _left_arm_electric_active
+			or _left_arm_city_active or _left_arm_rock_active or _left_arm_plant_active
+		),
+		"arm_right": (
+			_right_arm_water_active or _right_arm_fire_active or _right_arm_electric_active
+			or _right_arm_city_active or _right_arm_rock_active or _right_arm_plant_active
+		),
+		"leg_left": _left_leg_water_active or _left_leg_fire_active,
+		"leg_right": _right_leg_water_active or _right_leg_fire_active,
 	}
 	for slot in active_slots:
 		if not active_slots[slot]:
@@ -2693,6 +3305,8 @@ func _on_cheats_toggled(_is_enabled: bool) -> void:
 
 
 func _on_held_item_changed() -> void:
+	if _throw_aim_active:
+		cancel_throw_preparation()
 	if _held_visual != null:
 		_held_visual.queue_free()
 		_held_visual = null
@@ -2724,28 +3338,177 @@ func _on_held_item_changed() -> void:
 	# "swinging held item" effect, not worth damping.
 
 
+## An equipped item claims the ordinary right-hand control: hold E/right
+## shoulder to enter the prepared pose, aim with the existing camera, and
+## release to throw. With no held item the exact same input continues to be
+## the right-arm blorb power/ordinary arm raise. ui_cancel backs out without
+## consuming the item.
 func _update_throw_input() -> void:
-	var pressed := Input.is_action_pressed("throw")
+	var right_hand_pressed := Input.is_action_pressed("right_arm_power")
+	if _throw_aim_active:
+		if (
+			UIState.modal_open
+			or HeldItem.current.is_empty()
+			or _player_following_blorbus
+			or _player_following_manchego
+		):
+			cancel_throw_preparation()
+		elif not right_hand_pressed:
+			_throw_held_item()
+		return
 	if (
-		pressed and not _prev_throw_pressed
+		Input.is_action_just_pressed("right_arm_power")
 		and not HeldItem.current.is_empty()
 		and not UIState.modal_open
+		and not _player_following_blorbus
+		and not _player_following_manchego
 		and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
 	):
-		_throw_held_item()
-	_prev_throw_pressed = pressed
+		_begin_throw_preparation()
+
+
+func _begin_throw_preparation() -> void:
+	if _throw_camera_recovering == false:
+		_throw_camera_base_length = camera_spring_arm.spring_length
+		_throw_spring_arm_base_position = camera_spring_arm.position
+	_throw_camera_recovering = false
+	_throw_aim_active = true
+	# Capture once, before any walk/run pose can be applied this frame. The
+	# throw layer interpolates from these fixed rotations instead of from the
+	# newly animated arm every frame, which prevents gait motion leaking into
+	# the held prop as a persistent jitter.
+	_throw_pose_blend = 0.0
+	_throw_arm_start_rotation = _arm_right.rotation
+	_throw_elbow_start_rotation = _elbow_right.rotation
+	_throw_hand_start_rotation = _hand_right.rotation
+	_right_arm_water_active = false
+	_right_arm_fire_active = false
+	Hud.set_throw_aiming(true)
+
+
+func cancel_throw_preparation() -> void:
+	if not _throw_aim_active:
+		return
+	_finish_throw_preparation()
+
+
+func _finish_throw_preparation() -> void:
+	_throw_aim_active = false
+	_throw_camera_recovering = true
+	Hud.set_throw_aiming(false)
+
+
+func _update_throw_camera(delta: float) -> void:
+	if not _throw_aim_active and not _throw_camera_recovering:
+		return
+	var target_length := _throw_camera_base_length
+	var target_position := _throw_spring_arm_base_position
+	if _throw_aim_active:
+		target_length *= THROW_CAMERA_DISTANCE_SCALE
+		target_position.x += THROW_CAMERA_RIGHT_OFFSET
+	var step := THROW_CAMERA_BLEND_SPEED * delta
+	var weight := clampf(step, 0.0, 1.0)
+	camera_spring_arm.spring_length = lerpf(
+		camera_spring_arm.spring_length, target_length, weight
+	)
+	# SpringArm3D owns its Camera3D child's local position and rewrites it as
+	# collision length resolves. Offset the arm's own stable frame instead of
+	# fighting that engine update on the child camera every render frame.
+	camera_spring_arm.position = camera_spring_arm.position.lerp(target_position, weight)
+	if (
+		_throw_camera_recovering
+		and absf(camera_spring_arm.spring_length - target_length) < 0.005
+		and camera_spring_arm.position.distance_to(target_position) < 0.005
+	):
+		camera_spring_arm.spring_length = target_length
+		camera_spring_arm.position = target_position
+		_throw_camera_recovering = false
+
+
+## Highest-priority right-arm animation layer. It is applied after walk,
+## jump, flight and fire-jet poses, so none of those can move the arm or the
+## equipped prop while the player adjusts their aim.
+func _apply_throw_aim_pose(delta: float) -> void:
+	if not _throw_aim_active:
+		return
+	_throw_pose_blend = minf(_throw_pose_blend + THROW_POSE_SETTLE_SPEED * delta, 1.0)
+	var weight := smoothstep(0.0, 1.0, _throw_pose_blend)
+	# These assignments deliberately start from the captured pose, not the
+	# current one: _animate_walk() may still calculate the rest of the gait,
+	# but it can no longer move this shoulder/elbow/hand chain while aiming.
+	_arm_right.rotation.x = lerp_angle(_throw_arm_start_rotation.x, -THROW_ARM_BACK_ANGLE, weight)
+	_arm_right.rotation.y = lerp_angle(_throw_arm_start_rotation.y, 0.0, weight)
+	_arm_right.rotation.z = lerp_angle(_throw_arm_start_rotation.z, -THROW_ARM_OUTWARD_ANGLE, weight)
+	_elbow_right.rotation.x = lerp_angle(_throw_elbow_start_rotation.x, -THROW_ELBOW_BEND, weight)
+	_elbow_right.rotation.y = lerp_angle(_throw_elbow_start_rotation.y, 0.0, weight)
+	_elbow_right.rotation.z = lerp_angle(_throw_elbow_start_rotation.z, 0.0, weight)
+	_hand_right.rotation.x = lerp_angle(_throw_hand_start_rotation.x, THROW_HAND_COCK, weight)
+	var rest_twist := PI * 0.5 + ProceduralFigure.WRIST_INWARD_ANGLE
+	_hand_right.rotation.y = lerp_angle(_throw_hand_start_rotation.y, rest_twist, weight)
+	_hand_right.rotation.z = lerp_angle(_throw_hand_start_rotation.z, 0.0, weight)
+	_anchor_hand_to_wrist(_hand_right)
+
+
+## While aiming a throw, the camera's own yaw drives the body's facing
+## directly. The ordinary movement-direction turn above only runs while
+## direction.length() > 0.001, so standing still and aiming (the common
+## case for lining up a throw) would otherwise leave the body facing
+## wherever it last walked while the camera swings freely around it.
+## Called after _apply_throw_aim_pose() so it overrides that stale facing
+## unconditionally, matching the same lerp_angle/rotation_speed pairing the
+## movement branch above uses for every other body-yaw turn.
+func _apply_throw_facing(delta: float) -> void:
+	if not _throw_aim_active:
+		return
+	var forward := -camera.global_transform.basis.z
+	forward.y = 0.0
+	if forward.length_squared() < 0.0001:
+		return
+	var target_angle := atan2(forward.x, forward.z)
+	visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, rotation_speed * delta)
 
 
 func _throw_held_item() -> void:
 	var item: Dictionary = HeldItem.current
-	var forward := -camera.global_transform.basis.z
+	if item.is_empty():
+		cancel_throw_preparation()
+		return
+
+	# Aim from the actual centre-screen ray, but launch from the prop's live
+	# hand position. A ballistic solution makes that hand-origin arc intersect
+	# the reticle point instead of merely flying parallel to the camera ray.
+	var ray_origin := camera.global_position
+	var ray_end := ray_origin - camera.global_transform.basis.z * THROW_MAX_AIM_DISTANCE
+	var query := PhysicsRayQueryParameters3D.create(ray_origin, ray_end)
+	query.collision_mask = 1 | Blorb.GIANT_THROWABLE_LAYER
+	query.exclude = [get_rid()]
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	var target: Vector3 = hit["position"] if not hit.is_empty() else ray_end
+	var launch_origin := _palm_right.global_position
+	var carried_visual := _held_visual
+	if carried_visual != null:
+		launch_origin = carried_visual.global_position
 
 	var thrown := ThrownItem.new()
 	thrown.item_name = item["name"]
 	get_tree().current_scene.add_child(thrown)
-	thrown.global_position = camera.global_position + forward * THROW_SPAWN_DISTANCE
-	thrown.velocity = forward * THROW_SPEED + Vector3.UP * THROW_LOFT
+	thrown.global_position = launch_origin
+	if carried_visual != null:
+		var carried_transform := carried_visual.global_transform
+		_held_visual = null
+		carried_visual.reparent(thrown)
+		carried_visual.global_transform = carried_transform
+		thrown.adopt_visual(carried_visual)
 
+	var displacement := target - launch_origin
+	var horizontal := Vector3(displacement.x, 0.0, displacement.z)
+	var travel_time := maxf(horizontal.length() / THROW_SPEED, 0.15)
+	thrown.velocity = horizontal / travel_time
+	thrown.velocity.y = (
+		displacement.y + 0.5 * ThrownItem.GRAVITY * travel_time * travel_time
+	) / travel_time
+
+	_finish_throw_preparation()
 	Inventory.remove(item["name"])
 	HeldItem.clear()
 
@@ -2766,7 +3529,9 @@ func _update_head_look(delta: float) -> void:
 	# is a single concept covering both, not just a left/right one. The
 	# snap in the targets here still eases visually since they're
 	# lerp_angle'd below, not applied instantly.
-	var aerial_head_tracking := _lake_diving_active or _is_suit_flight_active()
+	# Air-foot hovering deliberately keeps the ordinary walking head behavior.
+	var aerial_head_tracking := _lake_diving_active or _air_flight_active or _fire_limb_flight_active
+	var surface_swimming := _lake_buoyancy_active and not _lake_diving_active and not _lake_water_walk_active
 	var yaw_limit := AERIAL_HEAD_YAW_LIMIT if aerial_head_tracking else HEAD_YAW_LIMIT
 	var pitch_min := -AERIAL_HEAD_PITCH_LIMIT if aerial_head_tracking else -HEAD_PITCH_UP_LIMIT
 	var pitch_max := AERIAL_HEAD_PITCH_LIMIT if aerial_head_tracking else HEAD_PITCH_DOWN_LIMIT
@@ -2795,7 +3560,16 @@ func _update_head_look(delta: float) -> void:
 		# Positive head X looks down in the procedural rig, hence the negated
 		# local camera Y component. The clamp is the natural neck constraint.
 		target_elevation = clampf(-asin(clampf(local_camera_forward.y, -1.0, 1.0)), pitch_min, pitch_max)
-	if aerial_head_tracking:
+	if surface_swimming:
+		# Counter the swimming lean so the face aims along travel and remains
+		# clear of the surface rather than nodding into the water.
+		var travel_direction := _aerial_motion_direction
+		if travel_direction.length_squared() <= 0.001:
+			travel_direction = visuals.global_transform.basis.z
+		var local_travel := visuals.global_transform.basis.inverse() * travel_direction.normalized()
+		target_yaw = clampf(atan2(local_travel.x, local_travel.z), -yaw_limit, yaw_limit)
+		target_elevation = -deg_to_rad(32.0)
+	elif aerial_head_tracking:
 		# Flight/swim direction is the primary head target. Crucially, this is
 		# solved in the same local neck frame as grounded head tracking, never
 		# by writing a competing world-space transform.
@@ -2813,7 +3587,7 @@ func _update_head_look(delta: float) -> void:
 		# visual-root basis or the camera's own look vector.
 		var camera_from_head := camera.global_position - _head.global_position
 		var body_forward := visuals.global_transform.basis.z.normalized()
-		var camera_behind := camera_from_head.normalized().dot(body_forward) < -0.05
+		var camera_behind := camera_from_head.normalized().dot(body_forward) < -0.65
 		if _aerial_motion_direction.length_squared() > 0.001 and camera_behind:
 			var yaw_offset := wrapf(relative_yaw - target_yaw, -PI, PI)
 			target_yaw = clampf(target_yaw + clampf(yaw_offset, -yaw_limit, yaw_limit), -yaw_limit, yaw_limit)
@@ -3552,7 +4326,11 @@ func _update_lake_buoyancy(delta: float) -> void:
 		_lake_buoyancy_active = true
 		_lake_diving_active = true
 		var dive_floor := floor_height + LAKE_DIVE_FLOOR_CLEARANCE
-		var dive_surface := water_level - LAKE_SWIM_FOOT_DEPTH
+		var dive_surface := (
+			water_level + FOOT_OFFSET
+			if _blorb_suit.has_chest_air_blorb() and velocity.y > 0.0
+			else water_level - LAKE_SWIM_FOOT_DEPTH
+		)
 		global_position.y = clampf(global_position.y, dive_floor, dive_surface)
 		return
 	var swim_y := water_level - LAKE_SWIM_FOOT_DEPTH
@@ -3580,7 +4358,7 @@ func _update_lake_buoyancy(delta: float) -> void:
 ## chest blorb underwater doesn't yank the player straight up out of the
 ## lake; swimming still wins until they actually surface on their own.
 func _update_air_flight() -> void:
-	_air_flight_active = _blorb_suit.has_chest_air_blorb()
+	_air_flight_active = _blorb_suit.has_chest_air_blorb() and not _lake_diving_active
 	if _air_flight_active:
 		_jumping = false
 		if not _was_air_flight_active and not _lake_diving_active:

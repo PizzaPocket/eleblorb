@@ -13,7 +13,10 @@ class_name WildernessScatter
 ## (deterministically, via rng_seed) every time the game runs.
 
 @export var field_half_size: float = 190.0
-@export var spawn_exclusion_radius: float = 20.0
+## The origin is the player's singular arrival clearing, not ordinary
+## wilderness. Keep the same broad, uncluttered buffer settlements receive
+## so the first moments are calm and readable before exploration begins.
+@export var spawn_exclusion_radius: float = 55.0
 @export var town_exclusion_radius: float = 85.0
 @export var rng_seed: int = 20260815
 
@@ -31,21 +34,30 @@ const WILD_BLORB_NORMAL_COUNT := 16
 ## few," per direct instruction, deliberately much rarer than the plain
 ## wild population above.
 const WILD_BLORB_SHINY_COUNT := 3
-## A couple of already-elemental wild finds beyond water, same flavor the
-## old hand-placed WildBlorb3/WildBlorb4 nodes used to provide (see
-## docs/world_bible.md's "naturally elemental" wild-blorb mention) --
-## folded into this procedural spawn instead of living as fixed scene
-## nodes, so they scatter to a fresh spot each run like everything else
-## here.
-const WILD_BLORB_OTHER_ELEMENTS := ["electric", "rock"]
+## Already-elemental wild finds beyond water, same flavor the old hand-
+## placed WildBlorb3/WildBlorb4 nodes used to provide (see docs/world_bible.
+## md's "naturally elemental" wild-blorb mention) -- folded into this
+## procedural spawn instead of living as fixed scene nodes, so it scatters
+## to a fresh spot each run like everything else here. Rock moved out to
+## its own dedicated canyon-scoped spawn (_spawn_canyon_rock_blorbs(), same
+## pattern as WILD_BLORB_PLANT_COUNT's own jungle-scoped one below) since a
+## Rock Gem already lives there too -- only Electric stays scattered
+## anywhere in the open field.
+const WILD_BLORB_OTHER_ELEMENTS := ["electric"]
 ## A few naturally-elemental plant wild blorbs live within the jungle
 ## plateau itself (see docs/world_bible.md's plant-type entry) -- the
 ## jungle's own counterpart to WILD_BLORB_OTHER_ELEMENTS/the lake's water
 ## blorbs above, just scoped to the jungle plateau's own footprint (see
 ## _spawn_jungle_plant_blorbs()) rather than the whole field, since a plant
-## blorb found out in open desert wouldn't fit the way an electric or rock
-## one does.
+## blorb found out in open desert wouldn't fit the way an electric one does.
 const WILD_BLORB_PLANT_COUNT := 4
+## The canyon biome's own naturally-elemental find -- see WILD_BLORB_OTHER_
+## ELEMENTS' own comment for why Rock moved here instead of the open field.
+const WILD_BLORB_CANYON_ROCK_COUNT := 4
+## The outskirts city's own naturally-elemental find -- same "own dedicated
+## biome-scoped spawn" pattern as the canyon/jungle/volcano ones, just for
+## City/the city itself.
+const WILD_BLORB_CITY_COUNT := 4
 ## A few naturally hovering air blorbs make the sky platforms feel inhabited
 ## and provide real-world flight-suit finds beyond the temporary starter.
 const WILD_BLORB_AIR_COUNT := 3
@@ -93,6 +105,13 @@ const PROP_LOD_UPDATE_INTERVAL := 0.4
 ## western half reaches comfortably beyond the noisy 225-265m cliff line.
 const CANYON_BIOME_CENTER := Vector2(-215.0, 0.0)
 const CANYON_ZONE_RADIUS := 72.0
+## Duplicated from city_generator.gd's/terrain_generator.gd's own CITY_CENTER
+## and terrain_generator.gd's own CITY_FLAT_RADIUS, matching this file's own
+## established convention of keeping its biome-center consts local rather
+## than reaching into those other generator scripts (see CANYON_BIOME_CENTER
+## above, defined the same standalone way).
+const CITY_CENTER := Vector2(-540.0, 0.0)
+const CITY_ZONE_RADIUS := 78.0
 ## Two wandering NPCs out in the wilderness, per direct instruction --
 ## "no backstory yet, just make it up for now as placeholder." Hand-set
 ## appearance (not drawn from town_generator.gd's shuffled pools, which
@@ -300,6 +319,8 @@ func _finish_dynamic_initialization() -> void:
 	_spawn_wild_blorbs()
 	_spawn_jungle_plant_blorbs()
 	_spawn_volcano_fire_blorbs()
+	_spawn_canyon_rock_blorbs()
+	_spawn_city_blorbs()
 	_spawn_wasteland_giant_blorb()
 	_spawn_xiao_hou_zi()
 	_register_wilderness_lod_nodes(self)
@@ -674,6 +695,62 @@ func _spawn_jungle_plant_blorbs() -> void:
 		inst.initial_element = "plant"
 		inst.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
 		get_parent().add_child(inst)
+
+
+## The canyon biome's own naturally-elemental find -- mirrors
+## _spawn_jungle_plant_blorbs() immediately above, just scoped to the
+## canyon zone's own disk sampler instead of the jungle plateau's.
+func _spawn_canyon_rock_blorbs() -> void:
+	var packed: PackedScene = load(BLORB_SCENE)
+	if packed == null:
+		push_warning("Missing blorb scene: " + BLORB_SCENE)
+		return
+	for i in WILD_BLORB_CANYON_ROCK_COUNT:
+		var pos := _point_in_canyon_disk(CANYON_BIOME_CENTER, CANYON_ZONE_RADIUS * 0.85, 1.1)
+		if pos == Vector2.INF:
+			continue
+		var inst = packed.instantiate()
+		inst.in_party = false
+		inst.initial_element = "rock"
+		inst.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
+		get_parent().add_child(inst)
+
+
+## The outskirts city's own naturally-elemental find -- mirrors
+## _spawn_canyon_rock_blorbs() immediately above, just scoped to the city's
+## own disk sampler instead of the canyon's. Also drops one physical City
+## Gem pickup somewhere in the same area, matching how the Rock Gem is
+## placed directly inside _build_canyon_biome() rather than a separate
+## per-element gem-placement pass.
+func _spawn_city_blorbs() -> void:
+	var packed: PackedScene = load(BLORB_SCENE)
+	if packed == null:
+		push_warning("Missing blorb scene: " + BLORB_SCENE)
+		return
+	for i in WILD_BLORB_CITY_COUNT:
+		var pos := _point_in_city_disk(CITY_CENTER, CITY_ZONE_RADIUS * 0.85, 1.1)
+		if pos == Vector2.INF:
+			continue
+		var inst = packed.instantiate()
+		inst.in_party = false
+		inst.initial_element = "city"
+		inst.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
+		get_parent().add_child(inst)
+	var gem_pos := _point_in_city_disk(CITY_CENTER, CITY_ZONE_RADIUS * 0.6, 1.0)
+	if gem_pos != Vector2.INF:
+		var gem_ground_y: float = terrain.get_mesh_height(gem_pos.x, gem_pos.y)
+		_place_gem(
+			self, Vector3(gem_pos.x, gem_ground_y + 0.3, gem_pos.y),
+			ShopCatalog.CITY_COLOR, "City Gem", true, true
+		)
+
+
+## Same reasoning as _point_in_canyon_disk -- the outskirts city sits well
+## outside the ordinary 190m field_half_size square _point_in_disk() covers.
+func _point_in_city_disk(center: Vector2, radius: float, bias: float) -> Vector2:
+	var r := radius * pow(_rng.randf(), bias)
+	var angle := _rng.randf_range(0.0, TAU)
+	return center + Vector2(cos(angle), sin(angle)) * r
 
 
 ## The volcano's own naturally-elemental find -- see WILD_BLORB_VOLCANO_

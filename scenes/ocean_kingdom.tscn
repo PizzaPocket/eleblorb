@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/kingdom_bootstrap.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://scripts/cloud_scatter.gd" id="7"]
 [ext_resource type="Script" path="res://scripts/ocean_kingdom_blorbs.gd" id="8"]
 [ext_resource type="Script" path="res://scripts/ocean_kingdom_wrap.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/ocean_kingdom_denizens.gd" id="10"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.25, 0.45, 0.62, 1)
@@ -63,6 +64,9 @@ script = ExtResource("7")
 
 [node name="OceanKingdomWrap" type="Node3D" parent="."]
 script = ExtResource("9")
+
+[node name="OceanKingdomDenizens" type="Node3D" parent="."]
+script = ExtResource("10")
 
 [node name="Player" parent="." instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84, 4)

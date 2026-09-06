@@ -33,12 +33,6 @@ extends Node
 ## combos aren't reserved by macOS the same way, so unifying onto Alt/Option
 ## sidesteps the whole class of collision instead of chasing each one.
 ##
-## Throw's controller binding (JOY_BUTTON_B) isn't specified by name in the
-## design doc ("Appropriate controller action") -- picked as the one
-## remaining unused face button once Jump/Interact/Transform claim A/X/Y.
-## (That was the original layout -- see the direct instruction below for
-## how Jump/Run/Transform's buttons were reshuffled from it.)
-##
 ## Per direct instruction: Jump moved off A onto Y, which freed up A for
 ## Run (off its original L3-click binding -- holding the stick down while
 ## also trying to steer with it was the reason L3 was picked in the first
@@ -46,6 +40,9 @@ extends Node
 ## run than clicking the stick). Transform, which used to share Y with
 ## Jump, drops back to just its D-pad Up binding now that Y is Jump's
 ## alone -- still on top of the keyboard's T, not instead of it.
+## Throwing no longer has a separate click/B action. When an inventory item
+## is held, the existing right_arm_power control becomes hold-to-prepare and
+## release-to-throw; B remains ui_cancel so it can back out of preparation.
 const ACTIONS := {
 	"move_left": {"keys": [KEY_A], "joy_axis": JOY_AXIS_LEFT_X, "joy_sign": -1.0},
 	"move_right": {"keys": [KEY_D], "joy_axis": JOY_AXIS_LEFT_X, "joy_sign": 1.0},
@@ -64,7 +61,6 @@ const ACTIONS := {
 	"left_leg_power": {"keys": [KEY_SHIFT], "joy_axis": JOY_AXIS_TRIGGER_LEFT, "joy_sign": 1.0},
 	"right_arm_power": {"keys": [KEY_E], "joy_buttons": [JOY_BUTTON_RIGHT_SHOULDER]},
 	"right_leg_power": {"keys": [KEY_C], "joy_axis": JOY_AXIS_TRIGGER_RIGHT, "joy_sign": 1.0},
-	"throw": {"mouse_button": MOUSE_BUTTON_LEFT, "joy_buttons": [JOY_BUTTON_B]},
 	"inventory": {"keys": [KEY_TAB], "joy_buttons": [JOY_BUTTON_BACK]},
 	"pause": {"keys": [KEY_ESCAPE], "joy_buttons": [JOY_BUTTON_START]},
 	# Godot's own Control/Viewport focus-navigation system checks for these
@@ -74,8 +70,9 @@ const ACTIONS := {
 	# other action in this file, rather than relying on Godot's own
 	# built-in project-default bindings existing/matching what this
 	# project's own bindings already use elsewhere. Reuses the SAME
-	# physical buttons "interact" (X) and "throw" (B) already use -- safe to
-	# double up, since ui_accept/ui_cancel only have any effect once some
+	# physical button "interact" (X) already uses, plus B as the conventional
+	# back/cancel face button. Safe to double up X, since ui_accept only has
+	# any effect once some
 	# Control actually has focus, which only happens while a menu is open
 	# (gameplay itself is paused whenever that's true, so "run" can't also
 	# be firing at the same moment).

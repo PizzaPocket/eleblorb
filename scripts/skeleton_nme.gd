@@ -43,8 +43,17 @@ const BURIAL_DEPTH := 2.2
 ## Generous -- once risen, a skeleton commits to the encounter that spawned
 ## it rather than needing the target to stay within a tight leash.
 const DETECTION_RADIUS := 30.0
+## StaticBody3D collision does not resolve movement when this script updates
+## global_position directly. Give every active NME a personal radius and a
+## speed-limited separation pass so several chasing the same target form a
+## loose ring rather than occupying one collision volume.
+const SEPARATION_RADIUS := 0.70
+const SEPARATION_PUSH_SPEED := 3.8
 
-enum State { RISING, HUNTING, ATTACKING, SINKING }
+enum State { RISING, HUNTING, ATTACKING, SINKING, CONSUMING }
+## See start_consuming()'s own doc comment.
+const CONSUME_APPROACH_DURATION := 1.0
+const CONSUME_HOLD_DURATION := 0.8
 
 var terrain_ref: Node = null
 ## For combat_math.gd's own damage-variance/crit rolls -- this project's
@@ -73,6 +82,19 @@ var _target: Node3D = null
 ## Keyed by instance ID so repeated stream ticks remain one participation
 ## entry rather than increasing that Blorb's share.
 var _xp_participants: Dictionary = {}
+
+var _consume_elapsed: float = 0.0
+var _consume_prey: Node3D = null
+var _consume_start_position: Vector3 = Vector3.ZERO
+
+## Electric's own stun / City's own haste-weaken -- see combat_math.gd's own
+## STUN_DURATION/HASTE_WEAKEN_DURATION comment. Both count down in _process()
+## regardless of state; apply_stun()/apply_haste_weaken() refresh to the max
+## of the current remaining time and the new duration rather than adding, so
+## a continuous stream re-applying every frame can't stack into a permanent
+## effect -- it just stays active until `duration` after the last tick.
+var _stun_remaining: float = 0.0
+var _haste_weaken_remaining: float = 0.0
 
 var _leg_left: Node3D
 var _leg_right: Node3D
@@ -136,6 +158,19 @@ func register_xp_participant(blorb: Blorb) -> void:
 	_xp_participants[blorb.get_instance_id()] = blorb
 
 
+## Electric's own arm/combat-stream power -- see combat_math.gd's own
+## STUN_DURATION comment. Refresh-to-max, not additive (see _stun_remaining's
+## own field comment).
+func apply_stun(duration: float) -> void:
+	_stun_remaining = maxf(_stun_remaining, duration)
+
+
+## City's own arm/combat-stream power -- see combat_math.gd's own
+## HASTE_WEAKEN_DURATION comment.
+func apply_haste_weaken(duration: float) -> void:
+	_haste_weaken_remaining = maxf(_haste_weaken_remaining, duration)
+
+
 ## Melting invalidates the whole encounter contribution, even if the Blorb
 ## reforms before this NME is eventually defeated. A fresh post-reform hit
 ## can register it again as a new contribution.
@@ -170,6 +205,8 @@ func _start_sinking() -> void:
 
 
 func _process(delta: float) -> void:
+	_stun_remaining = maxf(_stun_remaining - delta, 0.0)
+	_haste_weaken_remaining = maxf(_haste_weaken_remaining - delta, 0.0)
 	match _state:
 		State.RISING:
 			_process_rising(delta)
@@ -179,6 +216,44 @@ func _process(delta: float) -> void:
 			_process_attacking(delta)
 		State.SINKING:
 			_process_sinking(delta)
+		State.CONSUMING:
+			_process_consuming(delta)
+	if _state == State.HUNTING or _state == State.ATTACKING:
+		_apply_nme_separation(delta)
+
+
+func nme_separation_radius() -> float:
+	return SEPARATION_RADIUS * body_scale
+
+
+func _apply_nme_separation(delta: float) -> void:
+	var here := Vector2(global_position.x, global_position.z)
+	var correction := Vector2.ZERO
+	for node in get_tree().get_nodes_in_group("skeletons"):
+		var other := node as Node3D
+		if other == null or other == self or not is_instance_valid(other):
+			continue
+		if other.has_method("is_defeated") and bool(other.call("is_defeated")):
+			continue
+		var other_radius := SEPARATION_RADIUS
+		if other.has_method("nme_separation_radius"):
+			other_radius = float(other.call("nme_separation_radius"))
+		var away := here - Vector2(other.global_position.x, other.global_position.z)
+		var minimum_distance := nme_separation_radius() + other_radius
+		var distance := away.length()
+		if distance >= minimum_distance:
+			continue
+		var direction := away / distance if distance > 0.001 else (
+			Vector2.RIGHT if get_instance_id() < other.get_instance_id() else Vector2.LEFT
+		)
+		correction += direction * (minimum_distance - distance)
+	if correction.length_squared() <= 0.000001:
+		return
+	var shift := correction.limit_length(SEPARATION_PUSH_SPEED * delta)
+	var separated := here + shift
+	global_position.x = separated.x
+	global_position.z = separated.y
+	global_position.y = terrain_ref.get_mesh_height(separated.x, separated.y)
 
 
 func _process_rising(delta: float) -> void:
@@ -194,6 +269,40 @@ func _process_sinking(delta: float) -> void:
 	var t := clampf(_sink_elapsed / SINK_DURATION, 0.0, 1.0)
 	global_position.y = lerp(_rest_y, _rest_y - BURIAL_DEPTH, ease(t, 1.8))
 	if t >= 1.0:
+		queue_free()
+
+
+## Called by false_hero_nme.gd's own defeat/flee sequence once he's reached
+## his own flee point, rather than anything this file initiates on its
+## own -- an ordinary skeleton has no reason to single out a specific prey
+## otherwise. Takes over this skeleton's state entirely (its ordinary
+## HUNTING/ATTACKING loop never runs again): closes the remaining gap to
+## `prey` over CONSUME_APPROACH_DURATION, holds briefly, then frees both
+## nodes -- the same eased-lerp-into-queue_free() shape _process_sinking()
+## above already uses for an ordinary defeat, just closing a real gap
+## first instead of sinking in place.
+func start_consuming(prey: Node3D) -> void:
+	if _state == State.CONSUMING:
+		return
+	_state = State.CONSUMING
+	_consume_elapsed = 0.0
+	_consume_prey = prey
+	_consume_start_position = global_position
+	remove_from_group("skeletons")
+
+
+func _process_consuming(delta: float) -> void:
+	if _consume_prey == null or not is_instance_valid(_consume_prey):
+		queue_free()
+		return
+	_consume_elapsed += delta
+	var approach_t := clampf(_consume_elapsed / CONSUME_APPROACH_DURATION, 0.0, 1.0)
+	global_position = _consume_start_position.lerp(_consume_prey.global_position, ease(approach_t, 0.6))
+	var facing := Vector2(_consume_prey.global_position.x, _consume_prey.global_position.z) - Vector2(global_position.x, global_position.z)
+	if facing.length_squared() > 0.01:
+		visuals.rotation.y = atan2(facing.x, facing.y)
+	if _consume_elapsed >= CONSUME_APPROACH_DURATION + CONSUME_HOLD_DURATION:
+		_consume_prey.queue_free()
 		queue_free()
 
 
@@ -245,9 +354,20 @@ func _process_hunting(delta: float) -> void:
 		_state = State.ATTACKING
 		_attack_pose_elapsed = 0.0
 		return
+	# Electric's own stun -- see combat_math.gd's own STUN_DURATION comment.
+	# This is the only place real chase movement happens, so freezing here
+	# is enough to stop him closing distance for the stun's duration --
+	# placed after (not before) the attack-range check above so a stun
+	# doesn't also prevent starting to swing at a target already adjacent
+	# when it lands, only the actual approach.
+	if _stun_remaining > 0.0:
+		return
 
 	var dir := to_target.normalized()
-	var step := dir * MOVE_SPEED * delta
+	# City's own haste -- see combat_math.gd's own HASTE_SPEED_MULTIPLIER
+	# comment.
+	var speed := MOVE_SPEED * (CombatMath.HASTE_SPEED_MULTIPLIER if _haste_weaken_remaining > 0.0 else 1.0)
+	var step := dir * speed * delta
 	var new_here := here + step
 	global_position.x = new_here.x
 	global_position.z = new_here.y
@@ -312,7 +432,12 @@ func _process_attacking(delta: float) -> void:
 	_elbow_right.rotation.x = -sin(t * PI) * 1.0
 	if t >= 1.0:
 		if _target.has_method("take_damage"):
-			var roll := CombatMath.rolled_attack(ATTACK_BASE_DAMAGE, 0, _rng)
+			# City's own weaken -- see combat_math.gd's own
+			# WEAKEN_DAMAGE_MULTIPLIER comment.
+			var base_damage := ATTACK_BASE_DAMAGE
+			if _haste_weaken_remaining > 0.0:
+				base_damage *= CombatMath.WEAKEN_DAMAGE_MULTIPLIER
+			var roll := CombatMath.rolled_attack(base_damage, 0, _rng)
 			_target.take_damage(roll["amount"])
 		_attack_cooldown = ATTACK_COOLDOWN
 		_attack_pose_elapsed = 0.0

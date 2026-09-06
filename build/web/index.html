@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
-		<title>Eleblorb</title>
+		<title>Eleblorbs</title>
 		<style>
 html, body, #canvas {
 	margin: 0;
@@ -267,7 +267,7 @@ body.gamepad-connected .loader-controller { display: flex; }
 
 		<div id="status">
 			<div id="loading-content">
-				<h1 id="loading-title">Eleblorb</h1>
+				<h1 id="loading-title">Eleblorbs</h1>
 				<div id="loading-controls" aria-label="Controls">
 					<div class="loader-desktop">
 						<div class="loader-control"><div class="keys loader-wasd" aria-hidden="true"><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span></div><span class="loader-copy">Move</span></div>
@@ -278,7 +278,7 @@ body.gamepad-connected .loader-controller { display: flex; }
 					<div class="loader-mobile"><div class="joystick" aria-hidden="true"></div><span class="loader-copy">Drag to move · Drag the world to look</span></div>
 				</div>
 				<p id="loading-tip">Press F near people, objects, and Blorbs to interact.</p>
-				<div id="status-phase" role="status" aria-live="polite">Preparing Eleblorb…</div>
+				<div id="status-phase" role="status" aria-live="polite">Preparing Eleblorbs…</div>
 				<progress id="status-progress" max="1" value="0" aria-label="Loading progress"></progress>
 			</div>
 			<div id="status-notice"></div>
@@ -286,7 +286,7 @@ body.gamepad-connected .loader-controller { display: flex; }
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":3801380,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":3900524,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -448,10 +448,10 @@ const engine = new Engine(GODOT_CONFIG);
 			'onProgress': function (current, total) {
 				if (current > 0 && total > 0) {
 					const ratio = Math.min(current / total, 1);
-					window.eleblorbLoadingPhase(ratio >= 1 ? 'Starting Eleblorb…' : 'Downloading Eleblorb…', ratio * 0.9);
+					window.eleblorbLoadingPhase(ratio >= 1 ? 'Starting Eleblorbs…' : 'Downloading Eleblorbs…', ratio * 0.9);
 				} else {
 					statusProgress.removeAttribute('value');
-					statusPhase.textContent = 'Preparing Eleblorb…';
+					statusPhase.textContent = 'Preparing Eleblorbs…';
 				}
 			},
 		}).then(() => {

@@ -10,10 +10,15 @@ extends CanvasLayer
 ## (the antique dealer's "Browse Wares") it becomes a real modal with a
 ## separate player-response window. UIState then owns gameplay input so the
 ## same stick/D-pad and X action used elsewhere can navigate and answer.
+## Individual modal callers can additionally request a full simulation pause
+## (the wild-blorb join decision does), without changing every action dialog.
 
 # 6.0, not the original 3.5 -- per direct correction, villager lines were
 # disappearing before there was time to actually read them.
 const AUTO_DISMISS_TIME := 6.0
+## Long enough to render several frames of the decline row's focused state,
+## short enough to remain a crisp acknowledgement rather than menu latency.
+const CANCEL_CONFIRM_TIME := 0.14
 
 var _panel: PanelContainer
 var _speaker_label: Label
@@ -31,10 +36,18 @@ var _auto_dismiss_timer: float = 0.0
 ## paths silently colliding. Cleared as soon as it fires so it never
 ## double-runs.
 var _dismiss_callback: Callable = Callable()
+var _cancel_confirmation_pending: bool = false
+## True only when this dialog set SceneTree.paused itself. Tracking ownership
+## prevents an ordinary dialog close from resuming a pause established by a
+## different system.
+var _game_pause_owned: bool = false
 
 
 func _ready() -> void:
 	layer = 30
+	# A join decision can pause the SceneTree, but its buttons, focus repair,
+	# Back/B handling, and delayed decline acknowledgement must remain live.
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build_ui()
 
 
@@ -114,8 +127,10 @@ func _process(delta: float) -> void:
 
 func show_line(
 	speaker: String, line: String, actions: Array[Dictionary] = [],
-	dismiss_label: String = "Goodbye.", dismiss_callback: Callable = Callable()
+	dismiss_label: String = "Goodbye.", dismiss_callback: Callable = Callable(),
+	pause_game: bool = false
 ) -> void:
+	_cancel_confirmation_pending = false
 	_speaker_label.text = speaker
 	_line_label.text = line
 	_dismiss_callback = dismiss_callback
@@ -133,10 +148,12 @@ func show_line(
 		_response_panel.visible = true
 		if not was_modal:
 			UIState.push_modal()
+		_set_game_pause(pause_game)
 	else:
 		_response_panel.visible = false
 		if was_modal:
 			UIState.pop_modal()
+		_set_game_pause(false)
 		_auto_dismiss_timer = AUTO_DISMISS_TIME
 
 	_panel.visible = true
@@ -166,15 +183,43 @@ func _add_response(text: String, callback: Callable) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _panel.visible and event.is_action_pressed("ui_cancel"):
-		_on_dismiss_pressed()
+		_confirm_dismiss_from_cancel()
 		get_viewport().set_input_as_handled()
 
 
-## The one path that both the dismiss response button and ui_cancel route
-## through, so a dismiss_callback fires exactly once regardless of which one
-## the player used -- an action button's own callback (which may itself call
-## hide_dialog()) never runs through here and so never triggers it.
+## Back/B means the visible dismiss response, not an invisible generic close.
+## Move focus to that final response and leave it rendered briefly before
+## committing the callback, so the existing white text + response arrow
+## clearly acknowledge which choice was made.
+func _confirm_dismiss_from_cancel() -> void:
+	if _cancel_confirmation_pending:
+		return
+	if not _is_modal or _response_buttons.is_empty():
+		_on_dismiss_pressed()
+		return
+	_cancel_confirmation_pending = true
+	var dismiss_button: Button = _response_buttons.back()
+	for button: Button in _response_buttons:
+		button.disabled = button != dismiss_button
+	dismiss_button.grab_focus()
+	# Guarantee at least one rendered frame of the changed focus before the
+	# short confirmation hold begins.
+	await get_tree().process_frame
+	await get_tree().create_timer(CANCEL_CONFIRM_TIME).timeout
+	if _cancel_confirmation_pending and _panel.visible:
+		_commit_dismiss()
+
+
+## Direct button presses commit here immediately; Back/B first passes through
+## _confirm_dismiss_from_cancel() and invokes _commit_dismiss() after its
+## visible acknowledgement. Either route fires dismiss_callback exactly once.
 func _on_dismiss_pressed() -> void:
+	if _cancel_confirmation_pending:
+		return
+	_commit_dismiss()
+
+
+func _commit_dismiss() -> void:
 	var callback := _dismiss_callback
 	_dismiss_callback = Callable()
 	hide_dialog()
@@ -185,8 +230,22 @@ func _on_dismiss_pressed() -> void:
 func hide_dialog() -> void:
 	if not _panel.visible:
 		return
+	_cancel_confirmation_pending = false
 	_panel.visible = false
 	_response_panel.visible = false
 	if _is_modal:
 		UIState.pop_modal()
 		_is_modal = false
+	_set_game_pause(false)
+
+
+func _set_game_pause(should_pause: bool) -> void:
+	if should_pause and not _game_pause_owned:
+		# Only claim a pause we actually establish. If another system already
+		# paused the tree, closing this dialog must not resume it accidentally.
+		if not get_tree().paused:
+			get_tree().paused = true
+			_game_pause_owned = true
+	elif not should_pause and _game_pause_owned:
+		get_tree().paused = false
+		_game_pause_owned = false
