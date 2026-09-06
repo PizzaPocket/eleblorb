@@ -91,16 +91,25 @@ static func mitigated_damage(raw_amount: float, defense: int) -> float:
 
 ## Per direct instruction: Fire beats Plant, Plant beats Water, Water beats
 ## Fire -- a closed three-way loop, each pairing handicapped in reverse.
-## Every other element (Electric, Rock, Ground, Air, Psychic, and Normal/
-## "") stays neutral against everything, including each other, until a
-## future matchup is established -- see type_multiplier()'s own doc comment.
+## Wood extends this: per direct instruction, Wood beats Water (any water-
+## coded target, e.g. Fish Goblins -- see fish_goblin_nme.gd's own
+## current_combat_element()) and Plant beats Wood in turn. A plain
+## attacker->defender dict can't hold two counters for the same attacker
+## (Plant already counters Water), so this is a list of [attacker, defender]
+## pairs instead -- everything else about the lookup is unchanged. Every
+## other element (Electric, Rock, Ground, Air, Psychic, City, Ice, Snow, and
+## Normal/"") stays neutral against everything, including each other, until
+## a future matchup is established -- see type_multiplier()'s own doc
+## comment.
 const TYPE_EFFECTIVE_MULTIPLIER := 1.5
 const TYPE_HANDICAPPED_MULTIPLIER := 1.0 / 1.5
-const TYPE_ADVANTAGES := {
-	"fire": "plant",
-	"plant": "water",
-	"water": "fire",
-}
+const TYPE_ADVANTAGES := [
+	["fire", "plant"],
+	["plant", "water"],
+	["water", "fire"],
+	["plant", "wood"],
+	["wood", "water"],
+]
 
 
 ## The damage multiplier `attacker_element` deals against `defender_element`
@@ -115,9 +124,9 @@ const TYPE_ADVANTAGES := {
 static func type_multiplier(attacker_element: String, defender_element: String) -> float:
 	if attacker_element == "" or defender_element == "":
 		return 1.0
-	if TYPE_ADVANTAGES.get(attacker_element, "") == defender_element:
+	if [attacker_element, defender_element] in TYPE_ADVANTAGES:
 		return TYPE_EFFECTIVE_MULTIPLIER
-	if TYPE_ADVANTAGES.get(defender_element, "") == attacker_element:
+	if [defender_element, attacker_element] in TYPE_ADVANTAGES:
 		return TYPE_HANDICAPPED_MULTIPLIER
 	return 1.0
 

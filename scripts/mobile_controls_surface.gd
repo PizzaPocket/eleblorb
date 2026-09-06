@@ -15,6 +15,10 @@ const ACTION_GAP := 18.0
 const TABLET_SCALE := 1.25
 const TABLET_MARGIN_SCALE := 2.0
 const LOOK_SENSITIVITY := 0.0024
+const PHONE_ACTION_MIN := 72.0
+const PHONE_ACTION_MAX := 112.0
+const PHONE_JOYSTICK_MIN := 156.0
+const PHONE_JOYSTICK_MAX := 224.0
 
 const ACTION_LAYOUT := [
 	["FORM", "transform"], ["SWAP", "switch_blorbus"], ["BAG", "inventory"],
@@ -53,10 +57,20 @@ func _process(_delta: float) -> void:
 
 
 func _build_controls() -> void:
-	var scale_factor := TABLET_SCALE if UIKit.is_tablet_touch_viewport() else 1.0
-	var margin := CONTROL_MARGIN * (TABLET_MARGIN_SCALE if UIKit.is_tablet_touch_viewport() else 1.0)
-	_joystick_outer_size = JOYSTICK_OUTER_SIZE * scale_factor
-	_joystick_knob_size = JOYSTICK_KNOB_SIZE * scale_factor
+	var tablet := UIKit.is_tablet_touch_viewport()
+	var logical_size := UIKit.logical_viewport_size(self)
+	var short_side := minf(logical_size.x, logical_size.y)
+	var action_size := clampf(short_side * 0.145, PHONE_ACTION_MIN, PHONE_ACTION_MAX)
+	var joystick_size := clampf(short_side * 0.30, PHONE_JOYSTICK_MIN, PHONE_JOYSTICK_MAX)
+	if tablet:
+		action_size *= TABLET_SCALE
+		joystick_size *= TABLET_SCALE
+	var margin := clampf(short_side * 0.045, 22.0, CONTROL_MARGIN)
+	if tablet:
+		margin *= TABLET_MARGIN_SCALE
+	var scale_factor := action_size / ACTION_SIZE
+	_joystick_outer_size = joystick_size
+	_joystick_knob_size = joystick_size * (JOYSTICK_KNOB_SIZE / JOYSTICK_OUTER_SIZE)
 
 	_joystick_outer = PanelContainer.new()
 	_joystick_outer.name = "MovementJoystickOuter"
@@ -86,7 +100,7 @@ func _build_controls() -> void:
 	UIKit.anchor_to_edge(grid, 1.0, 1.0, margin, margin)
 	add_child(grid)
 	for definition in ACTION_LAYOUT:
-		var control := _action_control(String(definition[0]), ACTION_SIZE * scale_factor)
+		var control := _action_control(String(definition[0]), action_size)
 		_action_controls[control] = StringName(definition[1])
 		grid.add_child(control)
 

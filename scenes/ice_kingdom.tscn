@@ -1,20 +1,19 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/kingdom_bootstrap.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
-[ext_resource type="Script" path="res://scripts/flat_ground.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/ice_kingdom_terrain.gd" id="3"]
 [ext_resource type="Script" path="res://scripts/portal.gd" id="4"]
-[ext_resource type="Script" path="res://scripts/city_kingdom_generator.gd" id="5"]
-[ext_resource type="Script" path="res://scripts/city_skyline_ring.gd" id="6"]
-[ext_resource type="Script" path="res://scripts/day_night_cycle.gd" id="7"]
-[ext_resource type="Script" path="res://scripts/cloud_scatter.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/day_night_cycle.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/cloud_scatter.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/ice_kingdom_blorbs.gd" id="7"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
-sky_top_color = Color(0.85, 0.72, 0.5, 1)
-sky_horizon_color = Color(0.92, 0.85, 0.7, 1)
-sky_curve = 0.2
-ground_bottom_color = Color(0.3, 0.28, 0.22, 1)
-ground_horizon_color = Color(0.92, 0.85, 0.7, 1)
+sky_top_color = Color(0.35, 0.5, 0.68, 1)
+sky_horizon_color = Color(0.78, 0.86, 0.92, 1)
+sky_curve = 0.18
+ground_bottom_color = Color(0.55, 0.62, 0.68, 1)
+ground_horizon_color = Color(0.72, 0.8, 0.86, 1)
 
 [sub_resource type="Sky" id="Sky_1"]
 sky_material = SubResource("ProceduralSkyMaterial_1")
@@ -23,39 +22,35 @@ sky_material = SubResource("ProceduralSkyMaterial_1")
 background_mode = 2
 sky = SubResource("Sky_1")
 fog_enabled = true
-fog_light_color = Color(0.85, 0.78, 0.65, 1)
-fog_density = 0.0025
+fog_light_color = Color(0.82, 0.88, 0.94, 1)
+fog_density = 0.006
 
-[node name="CityKingdom" type="Node3D"]
+[node name="IceKingdom" type="Node3D"]
 script = ExtResource("1")
-kingdom_name = "City Kingdom"
-accent_color = Color(0.75, 0.68, 0.42, 1)
-return_gate_id = "city_kingdom"
+kingdom_name = "Ice Kingdom"
+accent_color = Color(0.72, 0.88, 0.96, 1)
+return_gate_id = "ice_kingdom"
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_1")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 rotation_degrees = Vector3(-55, -35, 0)
+light_color = Color(0.9, 0.94, 1, 1)
 shadow_enabled = true
 light_angular_distance = 1.5
 
 [node name="DayNightCycle" type="Node" parent="."]
-script = ExtResource("7")
+script = ExtResource("5")
 
 [node name="Terrain" type="StaticBody3D" parent="."]
 script = ExtResource("3")
-half_size = 950.0
-ground_color = Color(0.58, 0.55, 0.5, 1)
 
-[node name="CityStreets" type="Node3D" parent="."]
-script = ExtResource("5")
-
-[node name="CitySkyline" type="Node3D" parent="."]
-script = ExtResource("6")
+[node name="IceKingdomBlorbs" type="Node3D" parent="."]
+script = ExtResource("7")
 
 [node name="Clouds" type="Node3D" parent="."]
-script = ExtResource("8")
+script = ExtResource("6")
 
 [node name="Player" parent="." instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 4)

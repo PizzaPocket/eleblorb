@@ -15,6 +15,15 @@ func _ready() -> void:
 	_swim_depth = -3.0 - randf() * 4.0
 
 
+## Fish-skinned aquatic humanoid -- always water-coded, unlike False Hero's
+## own phase-conditional version of this same method. This is what makes
+## Wood's own type advantage against it (see combat_math.gd's own
+## TYPE_ADVANTAGES comment) real -- it had no element at all before, so
+## nothing could counter it.
+func current_combat_element() -> String:
+	return "water"
+
+
 func _build_figure() -> void:
 	var pivots := ProceduralFigure.build(
 		visuals, FISH_SKIN, SEAWEED, SEAWEED, ProceduralFigure.SLEEVE_STYLE_SHORT,

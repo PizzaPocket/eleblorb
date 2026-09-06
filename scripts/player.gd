@@ -1,6 +1,8 @@
 class_name Player
 extends CharacterBody3D
 
+const SUN_WU_KONG_SCENE: PackedScene = preload("res://scenes/sun_wu_kong.tscn")
+
 ## Third-person controller. Movement is camera-relative; the visual mesh turns
 ## to face the direction of travel. Works with keyboard/mouse (WASD to move,
 ## mouse to look) and gamepad (left stick to move, right stick to look) via
@@ -796,6 +798,8 @@ var _controlled_giant: Blorb = null
 ## reskinned as Xiao Hou Zi -- see _piloting_xiao_hou_zi), so this var is
 ## just bookkeeping for which NPC to hand control back to.
 var _controlled_xiao_hou_zi: XiaoHouZi = null
+var _sun_wu_kong_summon: SunWuKong = null
+const SUN_WU_KONG_SUMMON_TRIGGER_RADIUS := 18.0
 var _player_following_blorbus := false
 const PLAYER_FOLLOW_DISTANCE := 7.0
 const PLAYER_FOLLOW_ARRIVE_DISTANCE := 3.0
@@ -1239,6 +1243,7 @@ func _physics_process(delta: float) -> void:
 	_update_throw_input()
 	if Input.is_action_just_pressed("switch_blorbus") and not UIState.modal_open and not _player_following_manchego:
 		_toggle_blorbus_control()
+	_update_sun_wu_kong_summon()
 	if _player_following_manchego:
 		_update_manchego_control(delta)
 		return
@@ -2065,12 +2070,35 @@ func _try_start_xiao_hou_zi_control() -> bool:
 ## see xiao_hou_zi.gd's own class doc comment) back to himself in place,
 ## resuming his independent roam/follow AI from wherever he ended up.
 func _end_xiao_hou_zi_control() -> void:
+	if is_instance_valid(_sun_wu_kong_summon):
+		_sun_wu_kong_summon.dismiss()
+	_sun_wu_kong_summon = null
 	_piloting_xiao_hou_zi = false
 	_rebuild_visuals_rig(false)
 	if is_instance_valid(_controlled_xiao_hou_zi):
 		_controlled_xiao_hou_zi.end_possession()
 	_controlled_xiao_hou_zi = null
 	Hud.show_message("You are now controlling the player.")
+
+
+## Once the Jingu Bang has been returned, Xiao Hou Zi calls Sun Wu Kong at
+## the first sign of active combat. The summoned actor owns the fight and
+## dismisses itself after the last nearby NME is gone.
+func _update_sun_wu_kong_summon() -> void:
+	if not _piloting_xiao_hou_zi or not WorldState.sun_wu_kong_summon_unlocked:
+		return
+	if is_instance_valid(_sun_wu_kong_summon):
+		return
+	for node in get_tree().get_nodes_in_group("skeletons"):
+		var enemy := node as Node3D
+		if enemy == null or global_position.distance_to(enemy.global_position) > SUN_WU_KONG_SUMMON_TRIGGER_RADIUS:
+			continue
+		var summon: SunWuKong = SUN_WU_KONG_SCENE.instantiate()
+		summon.configure_as_summon(self)
+		summon.position = global_position + visuals.global_transform.basis.x * 1.5
+		get_parent().add_child(summon)
+		_sun_wu_kong_summon = summon
+		return
 
 
 ## Shared by _end_blorbus_control() (returning fully to the human) and

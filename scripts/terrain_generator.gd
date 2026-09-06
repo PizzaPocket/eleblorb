@@ -238,6 +238,26 @@ const SKIRT_SEGMENTS := 96  # matches distant_mountains.gd's SEGMENTS
 const CITY_CENTER := Vector2(-540, 0)
 const CITY_FLAT_RADIUS := 78.0
 const CITY_FLATTEN_TRANSITION := 18.0
+## The Chinese village sits out in the northwest-of-lake wasteland, confirmed
+## clear of every other landform/biome center -- see chinese_village.gd's own
+## doc comment. Per direct instruction, the whole village now sits on
+## floating islands over a chasm ("the Abyss of Impending Doom") rather than
+## on ordinary flat ground -- see chinese_village_abyss_coverage() below
+## for the height dip and _height_color()'s own use of it for the matching
+## dark color. The islands themselves are chinese_village.gd's own
+## responsibility (free-floating StaticBody3D props at a fixed height, not
+## part of this mesh) -- this file only has to carve the pit underneath them.
+const CHINESE_VILLAGE_CENTER := Vector2(250.0, -650.0)
+## Comfortably covers every island chinese_village.gd actually places (see
+## that file's own ISLAND_* layout consts) -- same "the smoothstep needs a
+## hard inner radius, not just a start-at-0 falloff" reasoning CITY_FLAT_
+## RADIUS's own comment already established for a settlement's foundation.
+const CHINESE_VILLAGE_ABYSS_RADIUS := 170.0
+const CHINESE_VILLAGE_ABYSS_TRANSITION := 50.0
+## Far deeper than GORGE_DEPTH (60) -- the ordinary wasteland floor -- so the
+## drop reads as a genuine bottomless-feeling chasm under the islands rather
+## than just another shallow gorge.
+const CHINESE_VILLAGE_ABYSS_DEPTH := -400.0
 # A smoothstep starting at 0 was never actually flat except at the exact
 # center point -- by the time you reached a building 20-30m out it had
 # already picked up real hill noise, enough for the ground to clip through
@@ -366,7 +386,24 @@ func _wasteland_height(x: float, z: float) -> float:
 	var variation := _wasteland_noise.get_noise_2d(x, z) * 2.4
 	var dist_city := Vector2(x, z).distance_to(CITY_CENTER)
 	var city_mask := smoothstep(CITY_FLAT_RADIUS, CITY_FLAT_RADIUS + CITY_FLATTEN_TRANSITION, dist_city)
-	return -GORGE_DEPTH + variation * city_mask
+	var ordinary := -GORGE_DEPTH + variation * city_mask
+	# The Abyss of Impending Doom plunges the ground far below the ordinary
+	# wasteland floor near the Chinese village -- see
+	# chinese_village_abyss_coverage()'s own doc comment. Lerped rather than
+	# multiplied (unlike city_mask above) since this isn't flattening a
+	# small ripple, it's replacing the floor entirely with a much deeper one.
+	return lerpf(ordinary, CHINESE_VILLAGE_ABYSS_DEPTH, chinese_village_abyss_coverage(x, z))
+
+
+## 1.0 at the Chinese village's own center, fading to 0.0 past
+## CHINESE_VILLAGE_ABYSS_RADIUS + CHINESE_VILLAGE_ABYSS_TRANSITION -- same
+## "coverage" shape jungle_coverage()/volcano_coverage() already establish,
+## just for a pit instead of a raised landform. Public so chinese_village.gd
+## can query the same edge the ground itself uses when deciding how far out
+## its own floating islands/bridges need to reach.
+func chinese_village_abyss_coverage(x: float, z: float) -> float:
+	var dist := Vector2(x, z).distance_to(CHINESE_VILLAGE_CENTER)
+	return 1.0 - smoothstep(CHINESE_VILLAGE_ABYSS_RADIUS, CHINESE_VILLAGE_ABYSS_RADIUS + CHINESE_VILLAGE_ABYSS_TRANSITION, dist)
 
 
 ## The plateau's boundary radius at a given angle around the origin --
@@ -712,6 +749,14 @@ func _height_color(h: float, past_edge: bool, world_pos: Vector2 = Vector2.INF) 
 		# rock return above takes over, or the whole biome would render as
 		# bare ground despite standing above real jungle canopy.
 		if world_pos != Vector2.INF:
+			# Checked first, same reasoning as jungle/volcano just below --
+			# the Abyss of Impending Doom needs to read as a genuine dark
+			# void, not whatever the plain bare-dirt/rock wasteland color
+			# would otherwise say about ground this deep.
+			var abyss_amount := chinese_village_abyss_coverage(world_pos.x, world_pos.y)
+			if abyss_amount > 0.0:
+				var abyss_color := Color(0.025, 0.02, 0.03)
+				return wasteland.lerp(abyss_color, abyss_amount)
 			var jungle_amount := jungle_coverage(world_pos.x, world_pos.y)
 			if jungle_amount > 0.0:
 				return wasteland.lerp(jungle_green, jungle_amount)

@@ -443,7 +443,10 @@ func _apply_responsive_layout() -> void:
 	if _panel == null:
 		return
 	var logical_size := UIKit.logical_viewport_size(self)
-	var stacked := logical_size.x < 900.0 or logical_size.y > logical_size.x * 1.15
+	# Touch capability is part of the breakpoint. A high-DPI phone can expose
+	# a wide backing viewport even though its usable CSS layout is still a
+	# phone-sized, coarse-pointer surface.
+	var stacked := UIKit.is_mobile_viewport(self) or logical_size.x < 900.0 or logical_size.y > logical_size.x * 1.15
 	var edge_x: float = UITheme.SPACE_MD if stacked else 100.0
 	var edge_y: float = UITheme.SPACE_MD if stacked else 70.0
 	_panel.offset_left = edge_x

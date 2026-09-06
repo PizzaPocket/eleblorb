@@ -7,14 +7,12 @@ extends Node3D
 ## kingdom_travel.gd's pending_gate_id), places the returning player/party
 ## at the matching gate instead of the scene's baked default spawn.
 
-const CITY_KINGDOM_SCENE := "res://scenes/city_kingdom.tscn"
 const PRIMATE_KINGDOM_SCENE := "res://scenes/primate_kingdom.tscn"
 const OCEAN_KINGDOM_SCENE := "res://scenes/ocean_kingdom.tscn"
 const FIRE_KINGDOM_SCENE := "res://scenes/fire_kingdom.tscn"
+const ICE_KINGDOM_SCENE := "res://scenes/ice_kingdom.tscn"
+const ROCK_GROUND_KINGDOM_SCENE := "res://scenes/rock_ground_kingdom.tscn"
 
-# Same CITY_CENTER city_generator.gd defines for itself, pulled out to its
-# own southern edge so the gate doesn't land inside a generated building.
-const CITY_GATE_XZ := Vector2(-540.0, 95.0)
 # Same JUNGLE_PLATEAU_CENTER terrain_generator.gd defines (plateau radius
 # 70), pulled toward the plateau's near edge -- the side a player actually
 # climbs up from.
@@ -29,6 +27,17 @@ const PRIMATE_GATE_XZ := Vector2(-500.0, 409.0)
 # rather than relying on the nominal 76m radius alone.
 const FIRE_GATE_XZ := Vector2(300.0, 393.0)
 const FIRE_GATE_OUTCROPPING_SIZE := Vector3(10.0, 1.2, 8.0)
+# Open northwest wasteland -- clear of every other landform (the main
+# plateau, canyon, jungle plateau, volcano, Humongous, the lake, and the
+# outskirts city all sit elsewhere), so the Ice Kingdom's own gate doesn't
+# need a new sculpted landform here, just the cosmetic frost dressing
+# wilderness_scatter.gd scatters around it (see that file's own
+# _scatter_ice_gate_dressing()).
+const ICE_GATE_XZ := Vector2(-450.0, -480.0)
+# Inside WildernessScatter.CANYON_ZONE_RADIUS of its own CANYON_BIOME_CENTER
+# (-215, 0), offset off to one side so it doesn't collide with the Mesa
+# Tower at dead-center or the Rock Gem's own disk sample.
+const CANYON_GATE_XZ := Vector2(-160.0, -30.0)
 
 var _portals_by_gate_id: Dictionary = {}
 
@@ -59,14 +68,16 @@ func _finish_loading() -> void:
 
 func _build_portals() -> void:
 	var terrain: Node = get_node("Terrain")
-	var city_h: float = terrain.get_mesh_height(CITY_GATE_XZ.x, CITY_GATE_XZ.y)
 	var primate_h: float = terrain.get_mesh_height(PRIMATE_GATE_XZ.x, PRIMATE_GATE_XZ.y)
 	var fire_anchor := _build_fire_portal_outcropping(terrain)
-	_add_portal("city_kingdom", CITY_KINGDOM_SCENE, Vector3(CITY_GATE_XZ.x, city_h, CITY_GATE_XZ.y), Color(0.75, 0.68, 0.42))
+	var ice_h: float = terrain.get_mesh_height(ICE_GATE_XZ.x, ICE_GATE_XZ.y)
+	var canyon_h: float = terrain.get_mesh_height(CANYON_GATE_XZ.x, CANYON_GATE_XZ.y)
 	_add_portal("primate_kingdom", PRIMATE_KINGDOM_SCENE, Vector3(PRIMATE_GATE_XZ.x, primate_h, PRIMATE_GATE_XZ.y), Color(0.36, 0.6, 0.32))
 	var village: Node = get_node("FloatingWaterVillage")
 	_add_portal("ocean_kingdom", OCEAN_KINGDOM_SCENE, village.get_portal_anchor(), Color(0.2, 0.56, 0.66))
 	_add_portal("fire_kingdom", FIRE_KINGDOM_SCENE, fire_anchor, Color(0.85, 0.32, 0.08))
+	_add_portal("ice_kingdom", ICE_KINGDOM_SCENE, Vector3(ICE_GATE_XZ.x, ice_h, ICE_GATE_XZ.y), Color(0.72, 0.88, 0.96))
+	_add_portal("rock_ground_kingdom", ROCK_GROUND_KINGDOM_SCENE, Vector3(CANYON_GATE_XZ.x, canyon_h, CANYON_GATE_XZ.y), Color(0.58, 0.44, 0.28))
 
 
 ## A broad, low rock slab emerging above the molten surface. Its real box

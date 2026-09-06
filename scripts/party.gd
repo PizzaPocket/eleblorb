@@ -1,6 +1,7 @@
 extends Node
 
-## Serialized bonded-companion roster (party blorbs + Xiao Hou Zi), kept here
+## Serialized bonded-companion roster (party blorbs + Xiao Hou Zi + Pandy),
+## kept here
 ## because a kingdom portal's change_scene_to_file() (see kingdom_travel.gd)
 ## frees the whole scene tree -- party membership otherwise only exists as
 ## live node state (blorb.gd/xiao_hou_zi.gd's own in_party). capture_from_tree()
@@ -16,6 +17,7 @@ extends Node
 
 const BLORB_SCENE: PackedScene = preload("res://scenes/blorb.tscn")
 const XIAO_HOU_ZI_SCENE: PackedScene = preload("res://scenes/xiao_hou_zi.tscn")
+const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
 
 ## Spread spawned companions out a little so they don't all stack on one
 ## point; matches no particular formation, just avoids instant overlap jitter.
@@ -47,6 +49,11 @@ func capture_from_tree(tree: SceneTree) -> void:
 		if monkey == null or not monkey.in_party:
 			continue
 		_roster.append({"kind": "xiao_hou_zi"})
+	for node in tree.get_nodes_in_group("pandy"):
+		var panda := node as Pandy
+		if panda == null or not panda.in_party:
+			continue
+		_roster.append({"kind": "pandy"})
 
 
 ## `parent` must be the destination scene's root (the same node "Player" and
@@ -78,6 +85,8 @@ func spawn_into(parent: Node, near_position: Vector3, facing: Vector3) -> void:
 					restored_assignments[assigned_slot] = spawned
 			"xiao_hou_zi":
 				_spawn_xiao_hou_zi(parent, spawn_pos)
+			"pandy":
+				_spawn_pandy(parent, spawn_pos)
 		index += 1
 	var player := parent.get_tree().get_first_node_in_group("player") as Player
 	if player != null:
@@ -108,3 +117,10 @@ func _spawn_xiao_hou_zi(parent: Node, spawn_pos: Vector3) -> void:
 	monkey.in_party = true
 	monkey.position = spawn_pos
 	parent.add_child(monkey)
+
+
+func _spawn_pandy(parent: Node, spawn_pos: Vector3) -> void:
+	var panda: Pandy = PANDY_SCENE.instantiate()
+	panda.in_party = true
+	panda.position = spawn_pos
+	parent.add_child(panda)

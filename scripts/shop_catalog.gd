@@ -19,6 +19,12 @@ const ROCK_COLOR := Color(0.55, 0.4, 0.24)
 const GROUND_COLOR := Color(0.35, 0.24, 0.1)
 const PLANT_COLOR := Color(0.35, 0.8, 0.3)
 const CITY_COLOR := Color(0.2, 0.65, 0.95)
+const ICE_COLOR := Color(0.78, 0.92, 0.98)
+const SNOW_COLOR := Color(0.94, 0.96, 0.98)
+const WOOD_COLOR := Color(0.42, 0.26, 0.15)
+const BEAN_OF_LIFE_COLOR := Color(0.36, 0.6, 0.22)
+const JINGU_BANG_RED := Color(0.75, 0.08, 0.06)
+const JINGU_BANG_GOLD := Color(0.85, 0.66, 0.18)
 
 static var _items: Array[Dictionary] = []
 
@@ -93,6 +99,21 @@ static func _ensure_items() -> void:
 			"name": "City Gem", "color": CITY_COLOR, "price": 0, "sell_price": 7,
 			"purchasable": false, "element": "city", "description": "Found somewhere in the city streets, not sold here.",
 			"build_visual": Callable(ShopCatalog, "_build_gem_visual").bind(CITY_COLOR),
+		},
+		{
+			"name": "Ice Gem", "color": ICE_COLOR, "price": 0, "sell_price": 8,
+			"purchasable": false, "element": "ice", "description": "Cold enough to frost over in your hand, not sold here.",
+			"build_visual": Callable(ShopCatalog, "_build_gem_visual").bind(ICE_COLOR),
+		},
+		{
+			"name": "Snow Gem", "color": SNOW_COLOR, "price": 0, "sell_price": 8,
+			"purchasable": false, "element": "snow", "description": "Packed soft and cold, not sold here.",
+			"build_visual": Callable(ShopCatalog, "_build_gem_visual").bind(SNOW_COLOR),
+		},
+		{
+			"name": "Wood Gem", "color": WOOD_COLOR, "price": 0, "sell_price": 8,
+			"purchasable": false, "element": "wood", "description": "Smells faintly of an old forest, not sold here.",
+			"build_visual": Callable(ShopCatalog, "_build_gem_visual").bind(WOOD_COLOR),
 		},
 		{
 			"name": "Diving Helmet", "color": Color(0.18, 0.58, 0.82), "price": 25, "sell_price": 12,
@@ -241,6 +262,29 @@ static func _ensure_items() -> void:
 			"purchasable": false, "element": "", "description": "Picked from the jungle, colored like nothing found elsewhere.",
 			"build_visual": Callable(ShopCatalog, "_build_mushroom_visual").bind(NatureProps.MUSHROOM_COLORS["Jungle Mushroom"]),
 		},
+		{
+			"name": "Bean of Life", "color": BEAN_OF_LIFE_COLOR, "price": 30, "sell_price": 14,
+			"purchasable": true, "element": "", "shop": "chinese_village",
+			"description": "A single string bean, absurdly long and tightly curled. Thrown to the ground, it's said to take root as a blorb slime plant.",
+			"build_visual": Callable(ShopCatalog, "_build_bean_of_life_visual"),
+		},
+		{
+			"name": "Paper Lantern", "color": Color(0.95, 0.72, 0.32), "price": 9, "sell_price": 4,
+			"purchasable": true, "element": "", "shop": "chinese_village",
+			"description": "Lit from within. Warm to carry on a cold walk.",
+			"build_visual": Callable(ShopCatalog, "_build_paper_lantern_visual"),
+		},
+		{
+			"name": "Steamed Bun", "color": Color(0.94, 0.9, 0.82), "price": 4, "sell_price": 2,
+			"purchasable": true, "element": "", "shop": "chinese_village",
+			"description": "Still warm from the basket.",
+			"build_visual": Callable(ShopCatalog, "_build_steamed_bun_visual"),
+		},
+		{
+			"name": "Jingu Bang", "color": JINGU_BANG_RED, "price": 0, "sell_price": 0,
+			"purchasable": false, "element": "", "description": "Sun Wu Kong's own legendary staff. Found, not sold.",
+			"build_visual": Callable(ShopCatalog, "build_jingu_bang_visual"),
+		},
 	]
 
 
@@ -344,6 +388,177 @@ static func _build_lakeweed_visual(item_scale: float = 1.0) -> Node3D:
 		blade.rotation.z = (float(i) - 1.0) * 0.2
 		root.add_child(blade)
 	_add_catalog_grip(root)
+	return root
+
+
+## A long string bean, tightly coiled into a spiral -- "big long curly
+## string bean" per direct instruction. Built from a chain of small SuperEgg
+## segments walking a shrinking helix (same "shrink each step" spirit as
+## NatureProps.build_slab_tower()'s own tapering tiers), each one oriented
+## along the helix's own tangent direction (derivative of the parametric
+## curve) rather than left at a fixed rotation, so the segments read as one
+## continuous curled pod instead of a stack of disconnected pills. Planting
+## it (throwing it to the ground to grow a blorb slime plant, per its own
+## description above) is not implemented yet -- this is the held/thrown item
+## only.
+const BEAN_SEGMENT_COUNT := 18
+const BEAN_SEGMENT_LENGTH := 0.032
+const BEAN_SEGMENT_RADIUS := 0.016
+const BEAN_CURL_TURNS := 2.4
+const BEAN_CURL_RADIUS_START := 0.1
+const BEAN_CURL_RADIUS_END := 0.035
+const BEAN_CURL_RISE_TOTAL := 0.06
+
+
+static func _build_bean_of_life_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	root.scale = Vector3.ONE * item_scale
+	var material := StandardMaterial3D.new()
+	material.albedo_color = BEAN_OF_LIFE_COLOR
+	material.roughness = 0.5
+	for i in BEAN_SEGMENT_COUNT:
+		var t := float(i) / float(BEAN_SEGMENT_COUNT - 1)
+		var angle := t * TAU * BEAN_CURL_TURNS
+		var radius := lerpf(BEAN_CURL_RADIUS_START, BEAN_CURL_RADIUS_END, t)
+		var pos := Vector3(cos(angle) * radius, t * BEAN_CURL_RISE_TOTAL, sin(angle) * radius)
+		var d_radius := BEAN_CURL_RADIUS_END - BEAN_CURL_RADIUS_START
+		var d_angle := TAU * BEAN_CURL_TURNS
+		var tangent := Vector3(
+			d_radius * cos(angle) - radius * sin(angle) * d_angle,
+			BEAN_CURL_RISE_TOTAL,
+			d_radius * sin(angle) + radius * cos(angle) * d_angle
+		).normalized()
+		var x_axis := tangent.cross(Vector3.UP)
+		if x_axis.length() < 0.001:
+			x_axis = Vector3.RIGHT
+		x_axis = x_axis.normalized()
+		var z_axis := x_axis.cross(tangent).normalized()
+		var segment := MeshInstance3D.new()
+		segment.mesh = SuperEgg.build_mesh(
+			Vector3(BEAN_SEGMENT_RADIUS, BEAN_SEGMENT_LENGTH * 0.5, BEAN_SEGMENT_RADIUS),
+			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+		)
+		segment.set_surface_override_material(0, material)
+		segment.basis = Basis(x_axis, tangent, z_axis)
+		segment.position = pos
+		root.add_child(segment)
+	_add_catalog_grip(root)
+	return root
+
+
+static func _build_paper_lantern_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	root.scale = Vector3.ONE * item_scale
+	var glow_color := Color(0.95, 0.72, 0.32)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = glow_color
+	material.emission_enabled = true
+	material.emission = glow_color
+	material.emission_energy_multiplier = 1.2
+	var body := SuperEgg.build_part(Vector3(0.08, 0.11, 0.08), glow_color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+	body.set_surface_override_material(0, material)
+	body.position.y = 0.11
+	root.add_child(body)
+	var trim_color := Color(0.35, 0.22, 0.13)
+	for y in [0.005, 0.215]:
+		var cap := SuperEgg.build_part(Vector3(0.035, 0.02, 0.035), trim_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		cap.position = Vector3(0, y, 0)
+		root.add_child(cap)
+	var light := OmniLight3D.new()
+	light.name = "Light"
+	light.position = Vector3(0, 0.11, 0)
+	light.light_color = glow_color
+	light.omni_range = 3.5
+	light.shadow_enabled = false
+	root.add_child(light)
+	var grip := Node3D.new()
+	grip.name = "GripPoint"
+	grip.position = Vector3(0, 0.24, 0)
+	root.add_child(grip)
+	return root
+
+
+static func _build_steamed_bun_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	root.scale = Vector3.ONE * item_scale
+	var bun_color := Color(0.94, 0.9, 0.82)
+	var bun := SuperEgg.build_part(Vector3(0.075, 0.05, 0.075), bun_color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+	bun.position.y = 0.05
+	root.add_child(bun)
+	var pleat_color := Color(0.8, 0.72, 0.58)
+	var pleat := SuperEgg.build_part(Vector3(0.014, 0.014, 0.014), pleat_color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+	pleat.position.y = 0.1
+	root.add_child(pleat)
+	_add_catalog_grip(root)
+	return root
+
+
+## Sun Wu Kong's legendary staff -- "a large staff, red in the middle with
+## gold ends on either side," per direct instruction and reference image
+## (a real Ruyi Jingu Bang replica: mostly red shaft, gold-banded grip
+## sections at both tips). JINGU_BANG_LENGTH is dramatically larger than
+## every other item in this catalog (all under half a meter) -- deliberate,
+## per direct instruction that it read as a large staff rather than an
+## ordinary handheld curio, even after player.gd's own HELD_ITEM_SCALE
+## (0.6) shrinks it down for holding. Also used directly (not through
+## get_items_for_shop()) by chinese_village.gd's own Fruit-based ground
+## pickup, at item_scale 1.0 -- see that file's own _build_jingu_bang_
+## pickup().
+const JINGU_BANG_LENGTH := 2.2
+const JINGU_BANG_RADIUS := 0.035
+const JINGU_BANG_END_FRACTION := 0.16
+const JINGU_BANG_BAND_COLOR := Color(0.45, 0.32, 0.08)
+
+
+static func build_jingu_bang_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	var length := JINGU_BANG_LENGTH * item_scale
+	var radius := JINGU_BANG_RADIUS * item_scale
+	var end_length := length * JINGU_BANG_END_FRACTION
+	var mid_length := length - end_length * 2.0
+
+	var red_material := StandardMaterial3D.new()
+	red_material.albedo_color = JINGU_BANG_RED
+	red_material.metallic = 0.1
+	red_material.roughness = 0.5
+	var mid := MeshInstance3D.new()
+	mid.mesh = SuperEgg.build_mesh(Vector3(radius, mid_length * 0.5, radius), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	mid.set_surface_override_material(0, red_material)
+	mid.rotation.z = deg_to_rad(90.0)
+	root.add_child(mid)
+
+	var gold_material := StandardMaterial3D.new()
+	gold_material.albedo_color = JINGU_BANG_GOLD
+	gold_material.metallic = 0.75
+	gold_material.roughness = 0.3
+	var end_radius := radius * 1.08
+	for x in [-(mid_length * 0.5 + end_length * 0.5), mid_length * 0.5 + end_length * 0.5]:
+		var cap := MeshInstance3D.new()
+		cap.mesh = SuperEgg.build_mesh(Vector3(end_radius, end_length * 0.5, end_radius), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		cap.set_surface_override_material(0, gold_material)
+		cap.rotation.z = deg_to_rad(90.0)
+		cap.position = Vector3(x, 0, 0)
+		root.add_child(cap)
+
+	var band_material := StandardMaterial3D.new()
+	band_material.albedo_color = JINGU_BANG_BAND_COLOR
+	band_material.metallic = 0.6
+	band_material.roughness = 0.35
+	for x in [-mid_length * 0.5, mid_length * 0.5]:
+		var band := MeshInstance3D.new()
+		band.mesh = SuperEgg.build_mesh(
+			Vector3(radius * 1.15, radius * 0.35, radius * 1.15), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+		)
+		band.set_surface_override_material(0, band_material)
+		band.rotation.z = deg_to_rad(90.0)
+		band.position = Vector3(x, 0, 0)
+		root.add_child(band)
+
+	# Gripped at the exact center, like a real quarterstaff, rather than
+	# GripPoint's usual "near one end" placement on smaller items.
+	var grip := Node3D.new()
+	grip.name = "GripPoint"
+	root.add_child(grip)
 	return root
 
 

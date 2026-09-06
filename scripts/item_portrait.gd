@@ -60,6 +60,10 @@ static func _capture(tree: SceneTree, key: String, item_name: String) -> void:
 	viewport.world_3d = World3D.new()
 	viewport.msaa_3d = Viewport.MSAA_4X
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	# InventoryUI is an autoload and asks for portraits while its own _ready()
+	# is still assembling controls. The SceneTree root rejects children during
+	# that phase, so cross one frame boundary before installing the viewport.
+	await tree.process_frame
 	tree.root.add_child(viewport)
 
 	var visual := (entry["build_visual"] as Callable).call(1.0) as Node3D
@@ -111,7 +115,23 @@ static func _capture(tree: SceneTree, key: String, item_name: String) -> void:
 
 	await tree.process_frame
 	await tree.process_frame
-	var image := viewport.get_texture().get_image()
+	# The dummy renderer used by automated headless validation exposes a
+	# viewport texture object without a backing renderer texture. There is no
+	# portrait to capture in that environment; avoid asking it for an image.
+	if DisplayServer.get_name() == "headless":
+		viewport.queue_free()
+		_finish_capture(key)
+		return
+	var viewport_texture: Texture2D = viewport.get_texture()
+	if viewport_texture == null:
+		viewport.queue_free()
+		_finish_capture(key)
+		return
+	var image: Image = viewport_texture.get_image()
+	if image == null or image.is_empty():
+		viewport.queue_free()
+		_finish_capture(key)
+		return
 	_cache[key] = ImageTexture.create_from_image(image)
 	viewport.queue_free()
 	_finish_capture(key)

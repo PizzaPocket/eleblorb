@@ -112,6 +112,22 @@ const CANYON_ZONE_RADIUS := 72.0
 ## above, defined the same standalone way).
 const CITY_CENTER := Vector2(-540.0, 0.0)
 const CITY_ZONE_RADIUS := 78.0
+## Duplicated from main.gd's own ICE_GATE_XZ, same reasoning as CITY_CENTER
+## above -- the Ice Kingdom's gate needs no new sculpted landform (see that
+## const's own comment), just this cosmetic frost dressing scattered around
+## it so the clearing itself reads as snowy.
+const ICE_GATE_XZ := Vector2(-450.0, -480.0)
+const ICE_GATE_DRESSING_RADIUS := 55.0
+## Duplicated from terrain_generator.gd's/chinese_village.gd's own
+## CHINESE_VILLAGE_CENTER, same reasoning as CITY_CENTER above -- keeps
+## _scatter_wasteland_rocks() (the only scatter pass whose range reaches this
+## far out) from dropping loose rocks into the Abyss of Impending Doom
+## (harmless, but pointless -- they'd land far below anything visible) or
+## through the village's own floating islands.
+const CHINESE_VILLAGE_CENTER := Vector2(250.0, -650.0)
+## Matches terrain_generator.gd's own CHINESE_VILLAGE_ABYSS_RADIUS +
+## CHINESE_VILLAGE_ABYSS_TRANSITION (170 + 50) with a little margin.
+const CHINESE_VILLAGE_EXCLUSION_RADIUS := 230.0
 ## Two wandering NPCs out in the wilderness, per direct instruction --
 ## "no backstory yet, just make it up for now as placeholder." Hand-set
 ## appearance (not drawn from town_generator.gd's shuffled pools, which
@@ -306,6 +322,7 @@ func _ready() -> void:
 	_build_plateau_side_ledges()
 	_scatter_wasteland_rocks()
 	_scatter_lake_gatherables()
+	_scatter_ice_gate_dressing()
 	# Wild blorbs and the giant must be children of Main for blorb.gd's
 	# sibling-relative Terrain/Player lookups. During this node's _ready(),
 	# Main is still entering its authored children and rejects add_child().
@@ -364,12 +381,51 @@ func _scatter_wasteland_rocks() -> void:
 				continue
 			if pos.distance_to(terrain.get_city_center()) < 105.0:
 				continue
+			if pos.distance_to(CHINESE_VILLAGE_CENTER) < CHINESE_VILLAGE_EXCLUSION_RADIUS:
+				continue
 			var rock := NatureProps.build_rock(_rng.randf_range(0.18, 0.68), false)
 			rock.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
 			rock.rotation.y = _rng.randf_range(0.0, TAU)
 			rock.scale.y = _rng.randf_range(0.55, 1.15)
 			add_child(rock)
 			break
+
+
+## A ring of frost-tinted pines and rocks around the Ice Kingdom's own
+## outskirts gate (see main.gd's own ICE_GATE_XZ comment) -- purely cosmetic
+## dressing so the clearing reads as snowy without needing a new sculpted
+## landform in terrain_generator.gd's own shared height function. Added to
+## self directly (not get_parent()), same as _scatter_wasteland_rocks()
+## above -- this runs synchronously during the ordinary scatter phase, not
+## the deferred actor phase, since decorative props (unlike blorbs) have no
+## sibling-lookup requirement of their own.
+func _scatter_ice_gate_dressing() -> void:
+	const PINE_COUNT := 10
+	const ROCK_COUNT := 14
+	var frost_leaf := Color(0.82, 0.9, 0.95)
+	var frost_rock := Color(0.78, 0.84, 0.9)
+	for i in PINE_COUNT:
+		var angle := _rng.randf_range(0.0, TAU)
+		var r := _rng.randf_range(10.0, ICE_GATE_DRESSING_RADIUS)
+		var pos := ICE_GATE_XZ + Vector2(cos(angle), sin(angle)) * r
+		var pine := NatureProps.build_pine_tree(_rng.randf_range(5.0, 9.0), frost_leaf)
+		pine.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
+		pine.rotation.y = _rng.randf_range(0.0, TAU)
+		add_child(pine)
+	for i in ROCK_COUNT:
+		var angle := _rng.randf_range(0.0, TAU)
+		var r := _rng.randf_range(6.0, ICE_GATE_DRESSING_RADIUS * 1.2)
+		var pos := ICE_GATE_XZ + Vector2(cos(angle), sin(angle)) * r
+		var rock := NatureProps.build_rock(_rng.randf_range(0.3, 1.0), false)
+		rock.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
+		rock.rotation.y = _rng.randf_range(0.0, TAU)
+		var frost_material := StandardMaterial3D.new()
+		frost_material.albedo_color = frost_rock
+		frost_material.roughness = 0.85
+		for child in rock.get_children():
+			if child is MeshInstance3D:
+				(child as MeshInstance3D).set_surface_override_material(0, frost_material)
+		add_child(rock)
 
 
 ## Shells and clams favor the newly exposed upper bank; lakeweed grows on

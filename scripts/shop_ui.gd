@@ -14,6 +14,13 @@ var _coin_readout: PanelContainer
 var _buy_list: VBoxContainer
 var _sell_list: VBoxContainer
 var _status_label: Label
+var _columns: GridContainer
+var _buy_column: VBoxContainer
+var _sell_column: VBoxContainer
+var _mobile_side_tabs: HBoxContainer
+var _buy_side_button: Button
+var _sell_side_button: Button
+var _mobile_side: String = "buy"
 var _catalog: Array[Dictionary] = []
 var _stock_by_name: Dictionary = {}
 var _focus_restore_side: String = ""
@@ -46,6 +53,7 @@ var _confirm_return_focus: Button = null
 func _ready() -> void:
 	layer = 31
 	_build_ui()
+	get_viewport().size_changed.connect(_apply_responsive_layout)
 	TokoinWallet.changed.connect(_on_state_changed)
 	Inventory.changed.connect(_on_state_changed)
 
@@ -100,42 +108,77 @@ func _build_ui() -> void:
 	_status_label = UIKit.caption_label("")
 	outer.add_child(_status_label)
 
-	var columns := HBoxContainer.new()
-	columns.add_theme_constant_override("separation", UITheme.SPACE_XL)
-	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	outer.add_child(columns)
+	_mobile_side_tabs = HBoxContainer.new()
+	_mobile_side_tabs.add_theme_constant_override("separation", UITheme.SPACE_SM)
+	_buy_side_button = UIKit.tab_button("Buy", true, func(): _set_mobile_side("buy"))
+	_sell_side_button = UIKit.tab_button("Sell", false, func(): _set_mobile_side("sell"))
+	_mobile_side_tabs.add_child(_buy_side_button)
+	_mobile_side_tabs.add_child(_sell_side_button)
+	outer.add_child(_mobile_side_tabs)
 
-	var buy_column := VBoxContainer.new()
-	buy_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	buy_column.add_theme_constant_override("separation", UITheme.SPACE_SM)
-	columns.add_child(buy_column)
-	buy_column.add_child(UIKit.section_header("Buy"))
+	_columns = GridContainer.new()
+	_columns.columns = 2
+	_columns.add_theme_constant_override("h_separation", UITheme.SPACE_XL)
+	_columns.add_theme_constant_override("v_separation", UITheme.SPACE_MD)
+	_columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	outer.add_child(_columns)
+
+	_buy_column = VBoxContainer.new()
+	_buy_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_buy_column.add_theme_constant_override("separation", UITheme.SPACE_SM)
+	_columns.add_child(_buy_column)
+	_buy_column.add_child(UIKit.section_header("Buy"))
 	var buy_scroll := ScrollContainer.new()
 	buy_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	# Vertical scroll only -- a row's content should wrap to fit the
 	# column's width, never spill sideways into a horizontal scrollbar.
 	buy_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	buy_column.add_child(buy_scroll)
+	_buy_column.add_child(buy_scroll)
 	_buy_list = VBoxContainer.new()
 	_buy_list.add_theme_constant_override("separation", UITheme.SPACE_SM)
 	_buy_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	buy_scroll.add_child(_buy_list)
 
-	var sell_column := VBoxContainer.new()
-	sell_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	sell_column.add_theme_constant_override("separation", UITheme.SPACE_SM)
-	columns.add_child(sell_column)
-	sell_column.add_child(UIKit.section_header("Sell"))
+	_sell_column = VBoxContainer.new()
+	_sell_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_sell_column.add_theme_constant_override("separation", UITheme.SPACE_SM)
+	_columns.add_child(_sell_column)
+	_sell_column.add_child(UIKit.section_header("Sell"))
 	var sell_scroll := ScrollContainer.new()
 	sell_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	sell_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	sell_column.add_child(sell_scroll)
+	_sell_column.add_child(sell_scroll)
 	_sell_list = VBoxContainer.new()
 	_sell_list.add_theme_constant_override("separation", UITheme.SPACE_SM)
 	_sell_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	sell_scroll.add_child(_sell_list)
 
 	_build_confirm_ui(shared_theme)
+	_apply_responsive_layout()
+
+
+func _apply_responsive_layout() -> void:
+	if _root_panel == null:
+		return
+	var mobile: bool = UIKit.is_mobile_viewport(self)
+	var edge: float = float(UITheme.SPACE_MD) if mobile else 100.0
+	var edge_y: float = float(UITheme.SPACE_MD) if mobile else 70.0
+	_root_panel.offset_left = edge
+	_root_panel.offset_right = -edge
+	_root_panel.offset_top = edge_y
+	_root_panel.offset_bottom = -edge_y
+	_mobile_side_tabs.visible = mobile
+	_columns.columns = 1 if mobile else 2
+	_buy_column.visible = not mobile or _mobile_side == "buy"
+	_sell_column.visible = not mobile or _mobile_side == "sell"
+
+
+func _set_mobile_side(side: String) -> void:
+	_mobile_side = side
+	UIKit.set_tab_button_active(_buy_side_button, side == "buy")
+	UIKit.set_tab_button_active(_sell_side_button, side == "sell")
+	_apply_responsive_layout()
+	_refresh()
 
 
 ## A buy or sell press opens this instead of acting immediately -- per direct

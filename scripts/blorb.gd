@@ -907,6 +907,12 @@ func _element_glow_color() -> Color:
 			return Color(0.4, 0.85, 0.35)
 		"city":
 			return Color(0.25, 0.7, 0.95)
+		"ice":
+			return Color(0.75, 0.93, 0.98)
+		"snow":
+			return Color(0.96, 0.97, 1.0)
+		"wood":
+			return Color(0.48, 0.3, 0.16)
 		_:
 			return Color(1.0, 0.88, 0.55)
 
@@ -1048,6 +1054,47 @@ func _apply_element_visuals() -> void:
 			core_material.emission = Color(0.35, 0.75, 1.0)
 			core_material.emission_energy_multiplier = 1.5
 			_add_core_light(Color(0.35, 0.75, 1.0))
+		"ice":
+			# A crisp, near-transparent glassy blue-white -- distinct from
+			# Air's own pale WISPY low-alpha look (higher alpha here, a real
+			# solid-ice read) and from City's saturated azure. No
+			# _add_core_light() -- per docs/world_bible.md, only Fire and
+			# Electric blorbs give off real light.
+			_body_material.albedo_color = Color(0.78, 0.92, 0.98, 0.85)
+			_body_material.roughness = 0.05
+			_body_material.metallic = 0.15
+			_body_material.emission_enabled = true
+			_body_material.emission = Color(0.7, 0.9, 1.0)
+			_body_material.emission_energy_multiplier = 0.35
+			core_material.albedo_color = Color(0.85, 0.95, 1.0)
+			core_material.emission_enabled = true
+			core_material.emission = Color(0.75, 0.92, 1.0)
+			core_material.emission_energy_multiplier = 0.9
+		"snow":
+			# Soft, matte, near-pure white -- deliberately flatter/less
+			# glassy than Ice above (higher roughness, no metallic) so a
+			# packed-snow blorb reads distinct from a solid-ice one despite
+			# sharing the same pale family.
+			_body_material.albedo_color = Color(0.94, 0.96, 0.98, 0.95)
+			_body_material.roughness = 0.55
+			_body_material.metallic = 0.0
+			core_material.albedo_color = Color(0.9, 0.95, 1.0)
+			core_material.emission_enabled = true
+			core_material.emission = Color(0.85, 0.92, 1.0)
+			core_material.emission_energy_multiplier = 0.5
+		"wood":
+			# Warm cedar brown -- distinct from Rock's sandy orange-brown and
+			# Ground's darker loamy brown (both above) via a warmer, redder
+			# hue. No emission on the body (a plain, unlit material, matching
+			# Rock/Ground's own no-body-emission treatment); a faint warm
+			# core glow only.
+			_body_material.albedo_color = Color(0.42, 0.26, 0.15, 0.95)
+			_body_material.roughness = 0.75
+			_body_material.metallic = 0.0
+			core_material.albedo_color = Color(0.55, 0.36, 0.2)
+			core_material.emission_enabled = true
+			core_material.emission = Color(0.5, 0.32, 0.16)
+			core_material.emission_energy_multiplier = 0.6
 
 
 ## Checked after every successful gem merge on a starter-trio member (see

@@ -1,0 +1,60 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/kingdom_bootstrap.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
+[ext_resource type="Script" path="res://scripts/rock_ground_kingdom_terrain.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/portal.gd" id="4"]
+[ext_resource type="Script" path="res://scripts/day_night_cycle.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/cloud_scatter.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/rock_ground_kingdom_blorbs.gd" id="7"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
+sky_top_color = Color(0.42, 0.32, 0.5, 1)
+sky_horizon_color = Color(0.78, 0.58, 0.4, 1)
+sky_curve = 0.18
+ground_bottom_color = Color(0.28, 0.2, 0.14, 1)
+ground_horizon_color = Color(0.55, 0.42, 0.28, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("ProceduralSkyMaterial_1")
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+fog_enabled = true
+fog_light_color = Color(0.68, 0.55, 0.42, 1)
+fog_density = 0.006
+
+[node name="RockGroundKingdom" type="Node3D"]
+script = ExtResource("1")
+kingdom_name = "Rock and Ground Kingdom"
+accent_color = Color(0.58, 0.44, 0.28, 1)
+return_gate_id = "rock_ground_kingdom"
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, -35, 0)
+light_color = Color(0.95, 0.88, 0.78, 1)
+shadow_enabled = true
+light_angular_distance = 1.5
+
+[node name="DayNightCycle" type="Node" parent="."]
+script = ExtResource("5")
+
+[node name="Terrain" type="StaticBody3D" parent="."]
+script = ExtResource("3")
+
+[node name="RockGroundKingdomBlorbs" type="Node3D" parent="."]
+script = ExtResource("7")
+
+[node name="Clouds" type="Node3D" parent="."]
+script = ExtResource("6")
+
+[node name="Player" parent="." instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 4)
+
+[node name="ReturnPortal" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
+script = ExtResource("4")

@@ -27,6 +27,10 @@ const STYLE_BUZZCUT := "buzzcut"
 const STYLE_AFRO := "afro"
 const STYLE_FLAT_TOP := "flat_top"
 const STYLE_BUN := "bun"
+## Per direct instruction, for the Chinese village's own child NPCs: two
+## bun-like clusters positioned on either side of the head rather than
+## STYLE_BUN's single back-top one -- see _build_pigtails()'s own comment.
+const STYLE_PIGTAILS := "pigtails"
 const STYLE_LONG := "long"
 ## The hero's own style, per direct instruction ("adjust the hero's hair
 ## into a NEW style") -- distinct from STYLE_BUZZCUT (which NPCs still use)
@@ -34,6 +38,11 @@ const STYLE_LONG := "long"
 ## are shared with the whole NPC population and this request was scoped
 ## to the hero specifically.
 const STYLE_HERO := "hero"
+## No hair mesh at all -- see fish_goblin_nme.gd's own use (a fish-skinned
+## humanoid has no hair to begin with). Distinct from passing an
+## unrecognized/empty string, which add_hair()'s own match falls back to
+## STYLE_BUZZCUT for -- this is a real, explicit "skip hair entirely" case.
+const STYLE_BALD := "bald"
 
 const DEFAULT_HAIR_COLOR := Color(0.14, 0.1, 0.08)
 
@@ -110,6 +119,17 @@ const FLAT_TOP_BACK_SHIFT := 0.01
 const BUN_RADIUS_FACTOR := 0.45
 const BUN_Y_FRACTION := 0.72
 const BUN_Z_FRACTION := 0.7
+
+## PIGTAILS: reuses STYLE_BUN's own "buzzcut base plus a small round piece"
+## technique, just two of them mirrored left/right instead of one centered
+## at the back. Radius shrunk a bit from BUN_RADIUS_FACTOR (two side buns
+## read as too large side-by-side at the same size as one center bun), and
+## pulled slightly less far back/down than the center bun so each one clears
+## the ear rather than overlapping it.
+const PIGTAIL_RADIUS_FACTOR := 0.36
+const PIGTAIL_Y_FRACTION := 0.62
+const PIGTAIL_Z_FRACTION := 0.45
+const PIGTAIL_X_FRACTION := 0.95
 
 ## LONG: "extending a bit to the sides and back then making the bottom
 ## much less round and extending downwards a variable length" -- bottom
@@ -189,6 +209,8 @@ static func add_hair(
 	var top_epsilon := maxf(head_epsilon * HAIR_EPSILON_RATIO, MIN_EPSILON)
 
 	match style:
+		STYLE_BALD:
+			pass
 		STYLE_AFRO:
 			_build_afro(head, semi_axes, top_epsilon, hair_color)
 		STYLE_FLAT_TOP:
@@ -196,6 +218,9 @@ static func add_hair(
 		STYLE_BUN:
 			_build_buzzcut(head, semi_axes, top_epsilon, hair_color)
 			_build_bun(head, semi_axes, hair_color)
+		STYLE_PIGTAILS:
+			_build_buzzcut(head, semi_axes, top_epsilon, hair_color)
+			_build_pigtails(head, semi_axes, hair_color)
 		STYLE_LONG:
 			_build_long(head, semi_axes, top_epsilon, hair_color, length_variance)
 		STYLE_HERO:
@@ -297,6 +322,19 @@ static func _build_bun(head: MeshInstance3D, semi_axes: Vector3, color: Color) -
 	_add_piece(
 		head, Vector3(bun_radius, bun_radius, bun_radius), bun_offset, MIN_EPSILON, MIN_EPSILON, color
 	)
+
+
+static func _build_pigtails(head: MeshInstance3D, semi_axes: Vector3, color: Color) -> void:
+	var edges := _buzzcut_edges(semi_axes)
+	var pigtail_radius := semi_axes.y * PIGTAIL_RADIUS_FACTOR
+	var y_offset: float = edges["top"] * PIGTAIL_Y_FRACTION
+	var z_offset: float = edges["back"] * PIGTAIL_Z_FRACTION
+	var x_offset: float = edges["width"] * PIGTAIL_X_FRACTION
+	for side in [-1.0, 1.0]:
+		_add_piece(
+			head, Vector3(pigtail_radius, pigtail_radius, pigtail_radius),
+			Vector3(side * x_offset, y_offset, z_offset), MIN_EPSILON, MIN_EPSILON, color
+		)
 
 
 static func _build_long(

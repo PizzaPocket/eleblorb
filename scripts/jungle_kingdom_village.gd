@@ -277,6 +277,30 @@ const JUNGLE_VILLAGER_IDENTITIES := [
 	},
 ]
 
+## Placement for the abandoned Wood Kingdom reveal -- see
+## _build_wood_kingdom_area()'s own doc comment. Well clear of the village
+## clearing (r=32 around the origin), Manchego/the quest ape (~(6,-4)), and
+## Kova Kong's own roam disk (primate_kingdom_gorilla.gd's GORILLA_LOCAL_XZ
+## (400,-280), r=42) -- confirmed via that file's own constants that he has
+## no quest state of his own, so this area is safe to place anywhere else in
+## the kingdom.
+const WOOD_AREA_CENTER := Vector2(-250.0, -300.0)
+const WOOD_AREA_RADIUS := 34.0
+const WOOD_TREE_LOCAL_OFFSETS := [
+	Vector2(-14.0, 10.0),
+	Vector2(12.0, 16.0),
+	Vector2(6.0, -14.0),
+	Vector2(-16.0, -8.0),
+]
+const WOOD_TREE_HEIGHT_MIN := 32.0
+const WOOD_TREE_HEIGHT_MAX := 40.0
+## Dull, greyed cedar-brown -- desaturated relative to TownProps.TRIM_WOOD/
+## NatureProps' own live-tree palette, so the same tree/treehouse geometry
+## reads as long-abandoned rather than as an ordinary occupied home.
+const WOOD_WEATHERED_TINT := Color(0.42, 0.36, 0.3)
+const WOOD_BLORB_SCENE: PackedScene = preload("res://scenes/blorb.tscn")
+const WOOD_BLORB_COUNT := 8
+
 var _rng := RandomNumberGenerator.new()
 var _terrain: Node
 var _next_villager_identity := 0
@@ -305,6 +329,8 @@ func _ready() -> void:
 	# suggests.
 	_build_ground_primates.call_deferred()
 	_build_manchego_and_quest_ape.call_deferred()
+	if WorldState.ice_kingdom_visited:
+		_build_wood_kingdom_area.call_deferred()
 
 
 func _build_tree_and_houses(local_pos: Vector2, height: float, terrain: Node, tree_index: int) -> void:
@@ -518,6 +544,75 @@ func _quest_ape_dialog_actions(ape: ApeTemplatePreview, manchego: Manchego) -> A
 			Hud.show_message("%s hops down. Manchego is yours now." % ape.display_name),
 	})
 	return actions
+
+
+## The abandoned Wood Kingdom reveal -- per direct instruction, "once you go
+## to the ice kingdom, when you go back to the plant kingdom, you're able to
+## find an abandoned plant kingdom now called the wood kingdom where you can
+## find wood [blorbs]." Gated on WorldState.ice_kingdom_visited (set once by
+## ice_kingdom_terrain.gd's own _ready()) -- the first WorldState-gated
+## kingdom generator in the project; every kingdom scene otherwise rebuilds
+## identically from scratch on every visit. Reuses NatureProps.
+## build_emergent_tree()'s own live-treehouse geometry (the same shape
+## _build_tree_and_houses() above uses for the ordinary village), recolored
+## via the same recursive-mesh-retint technique ice_kingdom_terrain.gd's own
+## _tint_meshes_recursive() established this session, so the "abandoned"
+## read comes from palette alone rather than needing new geometry of its
+## own. No anchored villagers on these decks -- abandoned means empty.
+## Called deferred from _ready() for the same reason every other
+## get_parent().add_child() call in this file is.
+func _build_wood_kingdom_area() -> void:
+	var parent := get_parent()
+	for offset in WOOD_TREE_LOCAL_OFFSETS:
+		var local_pos: Vector2 = WOOD_AREA_CENTER + (offset as Vector2)
+		var height := _rng.randf_range(WOOD_TREE_HEIGHT_MIN, WOOD_TREE_HEIGHT_MAX)
+		var base_y: float = _terrain.get_mesh_height(local_pos.x, local_pos.y)
+		var result := NatureProps.build_emergent_tree(height, _rng)
+		var tree_body: StaticBody3D = result["body"]
+		_tint_meshes_recursive(tree_body, WOOD_WEATHERED_TINT)
+		var trunk_pos := Vector3(local_pos.x, base_y, local_pos.y)
+		tree_body.position = trunk_pos
+		parent.add_child(tree_body)
+
+		var platforms: Array = result["platform_positions"]
+		if platforms.is_empty():
+			continue
+		var platform_local: Vector3 = platforms[0]
+		var platform_pos := trunk_pos + platform_local
+		var deck := TownProps.build_crate(DECK_SIZE, TownProps.TRIM_WOOD, true)
+		deck.position = Vector3(platform_pos.x, platform_pos.y - DECK_SIZE.y, platform_pos.z)
+		_tint_meshes_recursive(deck, WOOD_WEATHERED_TINT)
+		parent.add_child(deck)
+		var house := TownProps.build_building(1, 1, 1, WOOD_WEATHERED_TINT)
+		house.position = platform_pos
+		house.rotation.y = _rng.randf_range(0.0, TAU)
+		_tint_meshes_recursive(house, WOOD_WEATHERED_TINT)
+		parent.add_child(house)
+
+	for i in WOOD_BLORB_COUNT:
+		var angle := _rng.randf_range(0.0, TAU)
+		var r := WOOD_AREA_RADIUS * sqrt(_rng.randf())
+		var local := WOOD_AREA_CENTER + Vector2(cos(angle) * r, sin(angle) * r)
+		var inst: Blorb = WOOD_BLORB_SCENE.instantiate()
+		inst.in_party = false
+		inst.initial_element = "wood"
+		inst.position = Vector3(local.x, _terrain.get_mesh_height(local.x, local.y), local.y)
+		parent.add_child(inst)
+
+
+## Shared recursive mesh-retint helper -- NatureProps.build_emergent_tree()'s
+## own trunk tiers/canopy lobes/branch ramps are nested several levels deep
+## through per-tier/per-lobe Node3D wrappers, not direct MeshInstance3D
+## children, so a shallow get_children() loop would silently miss most of
+## them (the same bug ice_kingdom_terrain.gd's own identical helper was
+## written to avoid -- see that file's own comment for the full story).
+func _tint_meshes_recursive(node: Node, tint: Color) -> void:
+	if node is MeshInstance3D:
+		var material := StandardMaterial3D.new()
+		material.albedo_color = tint
+		(node as MeshInstance3D).set_surface_override_material(0, material)
+	for child in node.get_children():
+		_tint_meshes_recursive(child, tint)
 
 
 ## Assigns the next unused entry from JUNGLE_VILLAGER_IDENTITIES, in order --

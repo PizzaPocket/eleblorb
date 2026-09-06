@@ -31,6 +31,36 @@ var false_hero_defeated: bool = false
 ## it to the player (Hud), and there's only ever been the one title so far.
 var player_title: String = ""
 
+## Set once, the first time the player's own Ice Kingdom scene builds (see
+## ice_kingdom_terrain.gd's own _ready()). Gates the Wood Kingdom reveal
+## back in the Plant Kingdom (see jungle_kingdom_village.gd's own
+## _build_wood_kingdom_area()) -- the first WorldState-gated kingdom
+## generator in the project; every kingdom scene otherwise rebuilds
+## identically from scratch on every visit.
+var ice_kingdom_visited: bool = false
+
+## Set once the player bribes the Chinese village's Emperor with 150
+## tokoins (see chinese_village.gd's own _build_emperor()) -- gates his own
+## post-bribery dialogue and the farmer's follow-up "delegate rule to him"
+## action (see _build_farmer_and_pandy_quest()), which is what actually
+## hands over Pandy. Lives here rather than on the Emperor NPC instance
+## itself for the same reason false_hero_defeated does: main.tscn (and
+## ChineseVillage with it) reloads on every kingdom portal round trip.
+var chinese_village_emperor_deposed: bool = false
+
+## The farmer has accepted stewardship of the village and Pandy has been
+## entrusted to the player's party. Kept separately from the Emperor's
+## departure so the two-step conversation survives world travel cleanly.
+var chinese_village_rule_delegated: bool = false
+var pandy_joined: bool = false
+
+## Sun Wu Kong remains a resident of the Chinese village. Returning the
+## Jingu Bang unlocks Xiao Hou Zi's ability to call him into a fight; he is
+## never serialized as a walking party member.
+var sun_wu_kong_freed: bool = false
+var sun_wu_kong_has_jingu_bang: bool = false
+var sun_wu_kong_summon_unlocked: bool = false
+
 
 func is_collected(id: String) -> bool:
 	return id != "" and _collected_ids.has(id)

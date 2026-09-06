@@ -12,9 +12,11 @@ var _kraken: AnimatableBody3D
 var _ship: AnimatableBody3D
 var _tentacle_roots: Array[Node3D] = []
 var _time := 0.0
+var _terrain: Node
 
 
 func _ready() -> void:
+	_terrain = get_node_or_null("../Terrain")
 	_build_kraken()
 	_build_ship()
 	_spawn_fish_goblins()
@@ -132,7 +134,24 @@ func _build_ship() -> void:
 		pirate.stationary = true
 		pirate.shirt_color = Color(0.28, 0.04, 0.05)
 		pirate.pants_color = Color(0.08, 0.1, 0.16)
-		pirate.talk_lines = ["Keep your footing. The sea likes an overconfident sailor."]
+		# npc.gd's own _ready() only falls back to get_node("../../Terrain")
+		# when terrain_ref is still null -- that relative path assumes an NPC
+		# parented two levels below the same root Terrain lives under, but a
+		# pirate here is a child of _ship (itself a child of this node, itself
+		# a child of the kingdom root Terrain lives directly under), three
+		# levels deep. Setting terrain_ref explicitly before add_child()
+		# bypasses that mismatched lookup entirely, confirmed by direct
+		# report ("Node not found: ../../Terrain").
+		pirate.terrain_ref = _terrain
+		# Assigned from a locally-typed Array[String], not a bare array literal
+		# directly on the dynamically-typed `pirate` reference -- npc.gd's own
+		# talk_lines is a typed Array[String], and Godot's dynamic property
+		# setter doesn't coerce a plain untyped Array literal into that on
+		# assignment (confirmed by direct report; every other NPC-dialogue
+		# call site in this project already routes through a typed local
+		# variable first, e.g. town_generator.gd's own `lines: Array[String]`).
+		var lines: Array[String] = ["Keep your footing. The sea likes an overconfident sailor."]
+		pirate.talk_lines = lines
 		_ship.add_child(pirate)
 		pirate.position = Vector3(-2.5 + index * 2.5, 3.8, -2.0 + index * 4.0)
 

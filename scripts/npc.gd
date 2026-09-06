@@ -84,6 +84,13 @@ extends StaticBody3D
 @export var shop_category: String = "antique"
 ## Set by floating-platform settlements. Ordinary NPCs keep sampling terrain.
 @export var fixed_ground_y: float = INF
+## Optional hook for a caller-supplied array of extra dialogue actions,
+## appended after the vendor-only "wares" action (if any) -- mirrors
+## ApeTemplatePreview's own field of the same name/shape (that file's own
+## quest-ape usage is the precedent this follows). Each returned entry is
+## {"label": String, "callback": Callable}, exactly DialogUI.show_line()'s
+## own action shape. Left invalid (the default) for every ordinary NPC.
+var dialog_actions_provider: Callable = Callable()
 
 const INTERACT_RADIUS := 2.0
 # Same axial range of motion as player.gd's head tracking -- ~80 deg each
@@ -292,6 +299,8 @@ func _on_talk() -> void:
 				DialogUI.hide_dialog()
 				ShopUI.open(ShopCatalog.get_items_for_shop(shop_category)),
 		})
+	if dialog_actions_provider.is_valid():
+		actions.append_array(dialog_actions_provider.call() as Array)
 	DialogUI.show_line(display_name, line, actions)
 
 

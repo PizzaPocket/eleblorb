@@ -4,12 +4,25 @@ extends CanvasLayer
 ## are only instructional; this layer supplies movement, camera and actions.
 
 
+var _density_root: Control
+var _surface: MobileControlsSurface
+
+
 func _ready() -> void:
 	if not _touch_capable():
 		return
 	layer = 80
-	var surface := MobileControlsSurface.new()
-	UIKit.density_root(self).add_child(surface)
+	# Autoload children cannot safely be added while the root is still
+	# assembling its own child list.
+	_install_surface.call_deferred()
+
+
+func _install_surface() -> void:
+	if is_instance_valid(_surface):
+		return
+	_density_root = UIKit.density_root(self)
+	_surface = MobileControlsSurface.new()
+	_density_root.add_child(_surface)
 
 
 func _touch_capable() -> bool:
