@@ -464,6 +464,12 @@ static func loading_progress_stylebox(color: Color) -> SuperellipseStyleBox:
 ##     boundary, and keeps status copy in the standard passive panel language.
 ##     The backdrop and light plane may fill the rectangular viewport because
 ##     they represent the replaced world/frame, not bounded interface shapes.
+## 24. Character-facing menu tabs share one live paper-doll surface rather
+##     than constructing parallel portraits. Wide layouts keep contextual
+##     content at left and the doll at right; compact portrait layouts move
+##     that same doll above the independently scrolling content. A tab changes
+##     the doll's interaction layer (equipment editing versus inspection), not
+##     its renderer, camera, visual language, or responsive implementation.
 
 
 ## An inset, recessed-looking cell for an inventory grid slot -- darker

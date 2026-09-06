@@ -68,6 +68,13 @@ var _blorbs_tab: Control
 var _player_tab: Control
 var _blorb_scroll: ScrollContainer
 var _blorb_list: VBoxContainer
+var _blorbs_layout: GridContainer
+var _blorbs_info_panel: PanelContainer
+var _blorbs_portrait_host: Control
+var _player_layout: GridContainer
+var _player_info_panel: PanelContainer
+var _player_portrait_host: Control
+var _paper_doll_shell: Control
 var _portrait_container: Control
 var _portrait_button: Button
 var _portrait_remove_button: Button
@@ -84,7 +91,6 @@ var _items_tab_button: Button
 var _blorbs_tab_button: Button
 var _player_tab_button: Button
 var _player_stats: VBoxContainer
-var _player_portrait_container: Control
 var _item_held_feedback: PanelContainer
 var _item_held_feedback_timer: float = 0.0
 var _active_tab: String = "items"
@@ -114,6 +120,7 @@ func _ready() -> void:
 	layer = 35
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build_ui()
+	get_viewport().size_changed.connect(_apply_responsive_layout)
 	TokoinWallet.changed.connect(_on_wallet_changed)
 	Inventory.changed.connect(_refresh)
 	# So the held-slot highlight (see _build_slot's is_held check) actually
@@ -233,23 +240,25 @@ func _build_ui() -> void:
 	# spacer per row, and the two columns share the tab's remaining fixed
 	# height equally via stretch ratio, not a fixed pixel split, so the
 	# 50/50 layout holds regardless of the panel's own actual width.
-	var content_row := HBoxContainer.new()
-	content_row.add_theme_constant_override("separation", UITheme.SPACE_MD)
-	content_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_blorbs_tab.add_child(content_row)
+	_blorbs_layout = GridContainer.new()
+	_blorbs_layout.add_theme_constant_override("h_separation", UITheme.SPACE_MD)
+	_blorbs_layout.add_theme_constant_override("v_separation", UITheme.SPACE_MD)
+	_blorbs_layout.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_blorbs_layout.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_blorbs_tab.add_child(_blorbs_layout)
 
-	var blorb_scroll_panel := UIKit.scroll_panel()
-	blorb_scroll_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	blorb_scroll_panel.size_flags_stretch_ratio = 1.0
-	blorb_scroll_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	content_row.add_child(blorb_scroll_panel)
+	_blorbs_info_panel = UIKit.scroll_panel()
+	_blorbs_info_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_blorbs_info_panel.size_flags_stretch_ratio = 1.0
+	_blorbs_info_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_blorbs_layout.add_child(_blorbs_info_panel)
 	_blorb_scroll = ScrollContainer.new()
 	_blorb_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_blorb_scroll.size_flags_stretch_ratio = 1.0
 	_blorb_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_blorb_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_blorb_scroll.follow_focus = true
-	blorb_scroll_panel.add_child(_blorb_scroll)
+	_blorbs_info_panel.add_child(_blorb_scroll)
 	# A ScrollContainer clips at its viewport edge. Give rows a real gutter
 	# larger than the outside-offset focus ring so neither their squircle
 	# sides nor highlight can be cut off while scrolling.
@@ -266,8 +275,11 @@ func _build_ui() -> void:
 	_blorb_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	blorb_scroll_margin.add_child(_blorb_list)
 
-	_build_portrait_area(content_row)
+	_blorbs_portrait_host = _new_portrait_host()
+	_blorbs_layout.add_child(_blorbs_portrait_host)
+	_build_portrait_area()
 	_build_player_tab(vbox)
+	_apply_responsive_layout()
 	_build_release_confirm_ui(shared_theme)
 	_build_item_held_feedback(shared_theme)
 
@@ -327,12 +339,19 @@ func _build_release_confirm_ui(shared_theme: Theme) -> void:
 ## in 3D by PlayerPortrait's Area3D hit volumes. While focused, directional
 ## input follows the anatomy spatially and the action button assigns the
 ## selected blorb; moving outward returns focus to adjacent menu controls.
-func _build_portrait_area(parent: Control) -> void:
-	var shell := Control.new()
-	shell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	shell.size_flags_stretch_ratio = 1.0
-	shell.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	parent.add_child(shell)
+func _new_portrait_host() -> Control:
+	var host := Control.new()
+	host.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	host.size_flags_stretch_ratio = 1.0
+	host.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	return host
+
+
+func _build_portrait_area() -> void:
+	_paper_doll_shell = Control.new()
+	_paper_doll_shell.name = "SharedPaperDoll"
+	_paper_doll_shell.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_blorbs_portrait_host.add_child(_paper_doll_shell)
 
 	_portrait_button = Button.new()
 	var area := _portrait_button as Control
@@ -343,7 +362,7 @@ func _build_portrait_area(parent: Control) -> void:
 	_portrait_button.gui_input.connect(_on_portrait_input)
 	_portrait_button.focus_entered.connect(_on_portrait_focus_changed.bind(true))
 	_portrait_button.focus_exited.connect(_on_portrait_focus_changed.bind(false))
-	shell.add_child(area)
+	_paper_doll_shell.add_child(area)
 
 	_portrait_container = Control.new()
 	_portrait_container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -361,7 +380,7 @@ func _build_portrait_area(parent: Control) -> void:
 	UIKit.anchor_to_edge(
 		_portrait_remove_button, 1.0, 0.5, UITheme.SPACE_MD, 0.0
 	)
-	shell.add_child(_portrait_remove_button)
+	_paper_doll_shell.add_child(_portrait_remove_button)
 	_update_remove_action()
 
 	# Stacked below Remove, sharing its anchor point (anchor_v 0.5 centers with
@@ -376,35 +395,99 @@ func _build_portrait_area(parent: Control) -> void:
 	UIKit.anchor_to_edge(_release_button, 1.0, 0.5, UITheme.SPACE_MD, 0.0)
 	_release_button.offset_top += UITheme.BUTTON_MIN_HEIGHT + UITheme.SPACE_LG
 	_release_button.offset_bottom += UITheme.BUTTON_MIN_HEIGHT + UITheme.SPACE_LG
-	shell.add_child(_release_button)
+	_paper_doll_shell.add_child(_release_button)
 	_update_release_action()
 
 
 func _build_player_tab(parent: Control) -> void:
-	_player_tab = HBoxContainer.new()
-	(_player_tab as HBoxContainer).add_theme_constant_override("separation", UITheme.SPACE_LG)
+	_player_tab = VBoxContainer.new()
 	_player_tab.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_player_tab.visible = false
 	parent.add_child(_player_tab)
 
-	var info_panel := UIKit.scroll_panel()
-	info_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	info_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_player_tab.add_child(info_panel)
+	_player_layout = GridContainer.new()
+	_player_layout.add_theme_constant_override("h_separation", UITheme.SPACE_LG)
+	_player_layout.add_theme_constant_override("v_separation", UITheme.SPACE_MD)
+	_player_layout.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_player_layout.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_player_tab.add_child(_player_layout)
+	_player_info_panel = UIKit.scroll_panel()
+	_player_info_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_player_info_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_player_layout.add_child(_player_info_panel)
+	var player_scroll := ScrollContainer.new()
+	player_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	player_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	player_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	player_scroll.follow_focus = true
+	_player_info_panel.add_child(player_scroll)
 	var margin := MarginContainer.new()
 	margin.add_theme_constant_override("margin_left", UITheme.SPACE_LG)
 	margin.add_theme_constant_override("margin_right", UITheme.SPACE_LG)
 	margin.add_theme_constant_override("margin_top", UITheme.SPACE_LG)
 	margin.add_theme_constant_override("margin_bottom", UITheme.SPACE_LG)
-	info_panel.add_child(margin)
+	player_scroll.add_child(margin)
 	_player_stats = VBoxContainer.new()
 	_player_stats.add_theme_constant_override("separation", UITheme.SPACE_MD)
 	margin.add_child(_player_stats)
 
-	_player_portrait_container = Control.new()
-	_player_portrait_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_player_portrait_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_player_tab.add_child(_player_portrait_container)
+	_player_portrait_host = _new_portrait_host()
+	_player_layout.add_child(_player_portrait_host)
+
+
+## Kueh Machine's character editor keeps one live preview and reparents it
+## when its layout changes. Inventory follows that same rule both across
+## breakpoints and across the Blorbs/Player contexts: there is only one doll,
+## one ViewportTexture, and one set of sizing/focus behavior.
+func _apply_responsive_layout() -> void:
+	if _panel == null:
+		return
+	var logical_size := UIKit.logical_viewport_size(self)
+	var stacked := logical_size.x < 900.0 or logical_size.y > logical_size.x * 1.15
+	var edge_x: float = UITheme.SPACE_MD if stacked else 100.0
+	var edge_y: float = UITheme.SPACE_MD if stacked else 70.0
+	_panel.offset_left = edge_x
+	_panel.offset_right = -edge_x
+	_panel.offset_top = edge_y
+	_panel.offset_bottom = -edge_y
+	_blorbs_layout.columns = 1 if stacked else 2
+	_player_layout.columns = 1 if stacked else 2
+	var portrait_height := clampf(logical_size.y * 0.34, 250.0, 390.0)
+	for host in [_blorbs_portrait_host, _player_portrait_host]:
+		host.custom_minimum_size = Vector2(0.0, portrait_height if stacked else 0.0)
+		host.size_flags_vertical = Control.SIZE_SHRINK_BEGIN if stacked else Control.SIZE_EXPAND_FILL
+	_blorbs_info_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_player_info_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	# On a stacked layout the doll is the first row; on desktop it is the
+	# stable right-hand column. GridContainer lets us reorder the same nodes
+	# without building a second mobile screen.
+	_blorbs_layout.move_child(_blorbs_portrait_host, 0 if stacked else 1)
+	_player_layout.move_child(_player_portrait_host, 0 if stacked else 1)
+	_move_shared_paper_doll()
+
+
+func _move_shared_paper_doll() -> void:
+	if _paper_doll_shell == null:
+		return
+	var target := _player_portrait_host if _active_tab == "player" else _blorbs_portrait_host
+	if _paper_doll_shell.get_parent() != target:
+		_paper_doll_shell.reparent(target)
+	_paper_doll_shell.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var editing_suit := _active_tab == "blorbs"
+	_portrait_button.disabled = not editing_suit
+	_portrait_button.mouse_filter = Control.MOUSE_FILTER_STOP if editing_suit else Control.MOUSE_FILTER_IGNORE
+	if not editing_suit:
+		_portrait_slot_label.visible = false
+	_update_remove_action()
+	_update_release_action()
+	var player := get_tree().get_first_node_in_group("player") as Player
+	if player != null and not editing_suit:
+		# Player mode is inspection-only: show the committed suit, never the
+		# Blorbs tab's temporary selection or anatomical target highlight.
+		player.set_portrait_selected_blorb(null)
+		player.set_portrait_focused_blorb(null)
+		player.set_portrait_body_focus_active(false)
+		player.refresh_portrait_assignments()
 
 
 func _on_portrait_focus_changed(active: bool) -> void:
@@ -556,7 +639,7 @@ func _update_remove_action() -> void:
 	var can_remove := false
 	if player != null and _selected_blorb != null and is_instance_valid(_selected_blorb):
 		can_remove = player.get_blorb_suit().slot_for_assigned_blorb(_selected_blorb) != ""
-	_portrait_remove_button.visible = can_remove
+	_portrait_remove_button.visible = _active_tab == "blorbs" and can_remove
 	_portrait_remove_button.disabled = not can_remove
 
 
@@ -581,7 +664,8 @@ func _update_release_action() -> void:
 	if _release_button == null:
 		return
 	var can_release := (
-		_selected_blorb != null and is_instance_valid(_selected_blorb)
+		_active_tab == "blorbs"
+		and _selected_blorb != null and is_instance_valid(_selected_blorb)
 		and not _selected_blorb.is_blorbus
 	)
 	_release_button.visible = can_release
@@ -712,15 +796,7 @@ func _refresh_player() -> void:
 	]:
 		_player_stats.add_child(UIKit.inline_caption(line, UITheme.TEXT_PRIMARY))
 
-	for child in _player_portrait_container.get_children():
-		child.free()
-	var rect := TextureRect.new()
-	rect.texture = player.get_portrait_texture()
-	rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_player_portrait_container.add_child(rect)
+	_refresh_portrait()
 	player.refresh_portrait_assignments()
 
 
@@ -909,6 +985,7 @@ func _switch_tab(tab: String) -> void:
 	UIKit.set_tab_button_active(_items_tab_button, tab == "items")
 	UIKit.set_tab_button_active(_blorbs_tab_button, tab == "blorbs")
 	UIKit.set_tab_button_active(_player_tab_button, tab == "player")
+	_move_shared_paper_doll()
 	_refresh()
 
 
