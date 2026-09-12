@@ -1336,9 +1336,10 @@ const LAVA_HELM_ENCLOSE_MARGIN := 1.04
 const LAVA_HELM_SPAN_RATIO := 0.16 / 0.09
 ## Cut from Lava Slide's own 0.13/0.09 ratio per direct correction ("shorten
 ## the distance the pipe extends behind him"), then cut again from 0.8, then
-## again from 0.5, per further direct corrections ("the lobes are going back
-## too far" / "still too far back").
-const LAVA_HELM_BACK_RATIO := 0.3
+## 0.5, then 0.3 -- per repeated direct corrections that each prior cut was
+## still too far back, the last one described as "only a tiny adjustment,"
+## so this one is a much larger cut rather than another small increment.
+const LAVA_HELM_BACK_RATIO := 0.12
 const LAVA_HELM_LIFT_RATIO := 0.11 / 0.09
 const LAVA_HELM_FACE_FORWARD_RATIO := 0.17 / 0.09
 ## Past this |s|, an extra shrink factor (on top of the ordinary cos(phi)

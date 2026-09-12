@@ -167,10 +167,9 @@ func _build_cashew_head() -> void:
 		var roll_sign := -1.0 if i == 0 else 1.0
 		eye.rotate_object_local(Vector3(0.0, 0.0, 1.0), roll_sign * deg_to_rad(8.0))
 		# Position/orientation confirmed correct per direct report -- shape
-		# tuned further per direct correction ("oblong ovals, height much
-		# less than width"): Y cut again (0.45 -> 0.3) and X raised slightly
-		# (1.55 -> 1.65).
-		eye.scale = Vector3(1.65, 0.3, flatten_z)
+		# tuned further per direct correction ("even wider and even shorter
+		# height"): X raised again (1.65 -> 1.9), Y cut again (0.3 -> 0.18).
+		eye.scale = Vector3(1.9, 0.18, flatten_z)
 	old_head_mesh.visible = false
 	BlorbSuit._add_lava_mohawk(cashew, HEAD_VISUAL_RADIUS)
 	# Sat floating above the head mass -- brought down to the mesh surface.
@@ -371,13 +370,13 @@ func _add_spaulder(arm: Node3D, side: float) -> void:
 	# the shell's own top surface instead of leaning back along its curve.
 	var surface_y := shell_size.y * 0.85
 	var embed := cone.height * 0.15
-	# Per direct correction (three times now), moved further outward from
+	# Per direct correction (four times now), moved further outward from
 	# the shell's own root, away from the figure's meridian -- side * -1 is
 	# outward, the same confirmed convention as root.position.x above.
-	# 0.35 -> -0.02 -> -0.06 -> -0.09 (this one, moving in the confirmed
-	# correct direction each time, just needing more distance).
+	# 0.35 -> -0.02 -> -0.06 -> -0.09 -> -0.10 (this one, moving in the
+	# confirmed correct direction each time, just needing more distance).
 	horn.position = Vector3(
-		side * (shell_size.x * 0.35 - 0.09), surface_y + cone.height * 0.5 - embed, -shell_size.z * 0.05
+		side * (shell_size.x * 0.35 - 0.10), surface_y + cone.height * 0.5 - embed, -shell_size.z * 0.05
 	)
 	# Was leaning inward toward the head by 12 degrees (a sign error) --
 	# flipped to lean outward instead, plus the requested additional 20
