@@ -47,5 +47,6 @@ func _collect() -> void:
 		return
 	_collected = true
 	Inventory.add(flower_name, petal_color)
+	UISounds.play_foley(&"pickup", 0.42, get_instance_id())
 	Hud.show_message("Picked up the %s." % flower_name)
 	queue_free()

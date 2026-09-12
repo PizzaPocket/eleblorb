@@ -57,6 +57,7 @@ const ACTIONS := {
 	"interact": {"keys": [KEY_F], "joy_buttons": [JOY_BUTTON_X]},
 	"transform": {"keys": [KEY_T], "joy_buttons": [JOY_BUTTON_DPAD_UP]},
 	"switch_blorbus": {"keys": [KEY_B], "joy_buttons": [JOY_BUTTON_DPAD_LEFT]},
+	"platform_aid": {"keys": [KEY_V], "joy_buttons": [JOY_BUTTON_DPAD_DOWN]},
 	"left_arm_power": {"keys": [KEY_Q], "joy_buttons": [JOY_BUTTON_LEFT_SHOULDER]},
 	"left_leg_power": {"keys": [KEY_SHIFT], "joy_axis": JOY_AXIS_TRIGGER_LEFT, "joy_sign": 1.0},
 	"right_arm_power": {"keys": [KEY_E], "joy_buttons": [JOY_BUTTON_RIGHT_SHOULDER]},

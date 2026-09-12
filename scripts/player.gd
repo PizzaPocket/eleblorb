@@ -28,10 +28,6 @@ var _hp_regen_delay: float = 0.0
 
 @export var move_speed: float = 6.0
 @export var sprint_multiplier: float = 1.6
-## A matched pair of worn leg blorbs acts as skates while running. This is
-## deliberately traversal-only: _animate_walk() compensates for it so the
-## existing run pose and leg cadence remain exactly as they are without it.
-const BLORB_SKATE_SPEED_MULTIPLIER := 3.0
 ## Raised from the original 6.8 per direct instruction, so an ordinary jump
 ## reliably clears a blorb's collision top (~1.14m -- see blorb.gd's
 ## RADIUS/BODY_HEIGHT) rather than falling short of it, not just for the
@@ -70,6 +66,17 @@ const CLOUD_SINK_DEPTH := 0.10
 ## a fluffy cloud bank, so standing on top should read as resting lightly on
 ## foliage rather than sinking noticeably in.
 const TREE_CANOPY_SINK_DEPTH := 0.04
+
+# Frozen-lake traversal deliberately retains horizontal momentum. These are
+# world acceleration/friction rates, kept independent of animation cadence
+# and every blorb Speed stat.
+const ICE_ACCELERATION := 8.5
+const ICE_FRICTION := 0.72
+const ICE_SUPPORT_TOLERANCE := 0.34
+## The lake sheet has physical thickness. Collision recovery can put the feet
+## a fraction below its rendered top for one frame; accept and lift that narrow
+## band instead of dropping ice mode and leaving the capsule wedged in it.
+const ICE_SURFACE_RECOVERY_DEPTH := 0.52
 
 ## Runtime possession flag: true whenever the player is directly piloting
 ## Xiao Hou Zi (see xiao_hou_zi.gd's begin_possession()/end_possession() and
@@ -211,6 +218,7 @@ const POSE_SETTLE_SPEED := 8.0
 # around its feet-on-ground origin while the collision body remains safely
 # upright and stationary.
 const WAKE_INTRO_REST_DURATION := 0.9
+const WAKE_INTRO_EYE_OPEN_DURATION := 0.42
 const WAKE_INTRO_RISE_DURATION := 1.65
 const WAKE_INTRO_SETTLE_DURATION := 0.65
 const WAKE_INTRO_LYING_ANGLE := deg_to_rad(-90.0)
@@ -283,6 +291,7 @@ var _elbow_right: Node3D
 var _ankle_left: Node3D
 var _ankle_right: Node3D
 var _spine: Node3D
+var _thorax: Node3D
 # _piloting_xiao_hou_zi: holds the full pivots dict from MonkeyFigure.
 # build() so _process() can re-loft its limb tubes every frame the same way
 # BlorbSuitController re-lofts worn-blorb tubes -- see monkey_figure.gd's
@@ -309,7 +318,16 @@ var _hips: Node3D
 var _eyes: Array = []
 var _eye_blink := EyeBlink.new_state()
 var _walk_phase: float = 0.0
+var _footstep_half_cycle: int = 0
+var _footsteps_were_moving: bool = false
 var _prev_grounded: bool = true
+## Filters single-frame loss of floor contact while terrain step-up and
+## ground-snap hand the player between adjacent slope samples. Without this,
+## every tiny hand-off looked like a fresh landing and repeatedly restarted
+## the crouched landing/jump frame while simply walking uphill.
+var _continuous_airborne_time: float = 0.0
+const LANDING_MIN_AIRBORNE_TIME := 0.08
+var _was_in_water: bool = false
 ## How long the "was just genuinely touching ground" grace period lasts
 ## once is_on_floor() has actually fired, in seconds -- not indefinitely
 ## via _prev_grounded alone (see grounded's own comment in
@@ -324,6 +342,9 @@ var _prev_grounded: bool = true
 const GROUNDED_GRACE_DURATION := 0.15
 var _grounded_grace_timer: float = 0.0
 var _landing_timer: float = 0.0
+## Cached from the cloud support query so landing and stride foley both
+## consistently treat soft clouds as silent footing.
+var _standing_on_cloud := false
 ## Starts at zero after an impact, then fades the held landing limbs into
 ## the live walk/run cycle instead of letting phase-driven targets pop in.
 var _walk_cycle_recovery: float = 1.0
@@ -527,6 +548,14 @@ const GIANT_SUPER_JUMP_HEIGHT_MULTIPLIER := SUPER_JUMP_HEIGHT_MULTIPLIER * 6.0
 const GIANT_GOO_LIFT_SPEED := 4.0
 const GIANT_GOO_JUMP_LIFT_SPEED := 18.0
 const GIANT_GOO_JUMP_LIFT_DURATION := 0.45
+var _last_bounced_blorb: Blorb = null
+## A grounded platform call is deliberately two-stage: the arriving blorb
+## first starts an ordinary player hop, then waits under the arc for the
+## normal trampoline contact. This reads as hopping onto the helper rather
+## than teleporting onto its crown and guarantees enough clearance.
+var _platform_aid_setup_blorb: Blorb = null
+var _platform_aid_setup_elapsed := 0.0
+const PLATFORM_AID_COMPLETION_DEADLINE := 1.25
 const GIANT_SURFACE_LANDING_SINK_DEPTH := 0.45  # one quarter of the 1.8m player capsule
 const GIANT_SURFACE_RECOVERY_SPEED := 1.5
 const PLAYER_CAPSULE_HEIGHT := 1.8
@@ -540,6 +569,12 @@ const LAKE_BUOYANCY_LIFT_SPEED := 10.0
 const LAKE_MIN_SWIMMABLE_DEPTH := LAKE_SWIM_FOOT_DEPTH + 0.35
 const LAKE_DIVE_SPEED := 4.2
 const LAKE_DIVE_FLOOR_CLEARANCE := 0.5
+# Rock legs make the equipped body negatively buoyant; they do not teleport
+# it to the sampled terrain height. Acceleration gives the transition weight
+# while the terminal speed keeps a deep-ocean descent readable and controllable.
+const LAKE_WEIGHTED_SINK_ACCELERATION := 7.5
+const LAKE_WEIGHTED_SINK_SPEED := 5.5
+const LAKE_FLOOR_LANDING_TOLERANCE := 0.16
 const AIR_FLIGHT_SPEED := 6.0
 const AIR_FLIGHT_HOVER_HEIGHT := 0.5
 const AIR_FLIGHT_EXIT_RECOVERY_DURATION := 0.45
@@ -656,7 +691,11 @@ var _giant_goo_active: bool = false
 var _giant_surface_grounded: bool = false
 var _lake_buoyancy_active: bool = false
 var _lake_diving_active: bool = false
-var _lake_water_walk_active: bool = false
+var _lake_floor_walk_active: bool = false
+var _lake_weighted_descent_active: bool = false
+var _active_swim_surface_height: float = 0.0
+var _lava_swimming_active: bool = false
+var _lava_surface_walk_active: bool = false
 var _air_flight_active: bool = false
 var _was_air_flight_active: bool = false
 var _was_suit_flight_active: bool = false
@@ -694,12 +733,15 @@ var _left_arm_rock_active := false
 var _right_arm_rock_active := false
 var _left_arm_rock_cooldown := 0.0
 var _right_arm_rock_cooldown := 0.0
+var _left_leg_rock_cooldown := 0.0
+var _right_leg_rock_cooldown := 0.0
 var _left_arm_plant_active := false
 var _right_arm_plant_active := false
 var _left_arm_plant_cooldown := 0.0
 var _right_arm_plant_cooldown := 0.0
 var _water_leg_hover_active := false
 var _fire_hand_hover_active := false
+var _fire_leg_hover_active := false
 var _fire_limb_flight_active := false
 var _air_foot_hover_active := false
 var _was_powered_hover_active := false
@@ -768,6 +810,17 @@ var _throw_pose_blend: float = 0.0
 var _throw_arm_start_rotation: Vector3 = Vector3.ZERO
 var _throw_elbow_start_rotation: Vector3 = Vector3.ZERO
 var _throw_hand_start_rotation: Vector3 = Vector3.ZERO
+var _weapon_swing_active: bool = false
+var _weapon_swing_elapsed: float = 0.0
+var _weapon_swing_has_hit: bool = false
+var _weapon_swing_inward: bool = false
+var _next_weapon_swing_inward: bool = false
+const WEAPON_SWING_DURATION := 0.46
+const WEAPON_HIT_TIME := 0.46
+const STOMP_DAMAGE := 16.0
+const STOMP_REBOUND_SCALE := 0.78
+const THROW_ABDOMEN_WINDUP := deg_to_rad(-3.0)
+const THROW_THORAX_WINDUP := deg_to_rad(-4.0)
 
 ## Blorb suit -- see blorb_suit_controller.gd's own module docstring for
 ## the full equip/unequip animation design, and blorb_suit.gd for the
@@ -1011,6 +1064,7 @@ func _apply_pivots(pivots: Dictionary) -> void:
 	_ankle_left = pivots["ankle_left"]
 	_ankle_right = pivots["ankle_right"]
 	_spine = pivots["spine"]
+	_thorax = pivots.get("thorax")
 	_spine_rest_y = _spine.position.y
 	# .get(), not ["neck"] -- see _neck's own comment: MonkeyFigure's dict
 	# (used while piloting Xiao Hou Zi) has no "neck" key at all.
@@ -1241,6 +1295,8 @@ func _physics_process(delta: float) -> void:
 	_lava_warning_cooldown = maxf(_lava_warning_cooldown - delta, 0.0)
 	_apply_gamepad_look(delta)
 	_update_throw_input()
+	if Input.is_action_just_pressed("platform_aid") and not UIState.modal_open:
+		_call_platform_aid()
 	if Input.is_action_just_pressed("switch_blorbus") and not UIState.modal_open and not _player_following_manchego:
 		_toggle_blorbus_control()
 	_update_sun_wu_kong_summon()
@@ -1272,15 +1328,33 @@ func _physics_process(delta: float) -> void:
 			_blorb_super_jump_grace = maxf(_blorb_super_jump_grace - delta, 0.0)
 
 	_update_giant_goo_state(delta)
+	var water_entry_speed := maxf(-velocity.y, 0.0)
 	_update_lake_buoyancy(delta)
+	var in_water_now := _lake_buoyancy_active
+	if in_water_now and not _was_in_water and not _lava_swimming_active:
+		UISounds.play_foley(
+			&"water_splash" if water_entry_speed > 3.0 else &"water_wade",
+			clampf(0.35 + water_entry_speed / 14.0, 0.35, 0.9),
+			get_instance_id()
+		)
+	_was_in_water = in_water_now
 	_update_air_flight()
 	_update_limb_power_state(delta)
 	_update_suit_flight_transition()
 	var powered_hover := _is_powered_hover_active()
 	var suit_flight := _is_suit_flight_active()
-	var buoyant := _giant_goo_active or _lake_buoyancy_active or suit_flight or powered_hover
-	var surface_walking := _lake_water_walk_active
+	var buoyant := _giant_goo_active or (_lake_buoyancy_active and not _lake_floor_walk_active) or suit_flight or powered_hover
 	var giant_jump_ready := _giant_surface_grounded or _is_on_giant_mesh_surface()
+	# A helmeted swimmer is still allowed to breach once they have reached
+	# the same surface limit as an ordinary swimmer. Deeper diving must not
+	# accidentally turn Jump into an unrestricted underwater vertical boost.
+	var water_exit_jump_ready := false
+	if _lake_buoyancy_active and not _lake_floor_walk_active and not _lake_weighted_descent_active:
+		if not _lake_diving_active:
+			water_exit_jump_ready = true
+		elif terrain != null:
+			var dive_surface: float = _active_swim_surface_height - LAKE_SWIM_FOOT_DEPTH
+			water_exit_jump_ready = global_position.y >= dive_surface - 0.08
 
 	# FOOT_OFFSET keeps the character's collision volume a hair above the
 	# analytic snap height, so it isn't always in continuous contact with the
@@ -1334,6 +1408,7 @@ func _physics_process(delta: float) -> void:
 	# this fix (actively re-anchoring to that shifting height every frame,
 	# the same way _snap_to_terrain() already does for solid ground).
 	var on_cloud := cloud_stand_height != null and absf(global_position.y - (cloud_stand_height as float)) < 0.6 and velocity.y <= 0.1
+	_standing_on_cloud = on_cloud
 	# Same pattern as on_cloud immediately above, just against tree-canopy
 	# support instead. Without this, standing on a canopy never counted as
 	# grounded -- the one-way Y catch further down (see
@@ -1345,7 +1420,7 @@ func _physics_process(delta: float) -> void:
 	# reading as "lands for a moment, then keeps falling."
 	var canopy_stand_height: Variant = _tree_canopy_stand_height_at(global_position.x, global_position.z, global_position.y - FOOT_OFFSET + 0.2)
 	var on_canopy := canopy_stand_height != null and absf(global_position.y - (canopy_stand_height as float)) < 0.25 and velocity.y <= 0.1
-	var grounded := (_giant_surface_grounded or surface_walking or on_climbable_ramp or (
+	var grounded := (_giant_surface_grounded or _lake_floor_walk_active or _lava_surface_walk_active or on_climbable_ramp or (
 		is_on_floor() or _is_near_ground() or (_is_touching_terrain() and _grounded_grace_timer > 0.0)
 	) or on_cloud or on_canopy) and not _jumping
 	if suit_flight or powered_hover:
@@ -1364,7 +1439,7 @@ func _physics_process(delta: float) -> void:
 		_giant_goo_jump_lift_timer = GIANT_GOO_JUMP_LIFT_DURATION
 		velocity.y = 0.0
 		_jumping = false
-	elif jump_pressed:
+	elif jump_pressed and (grounded or water_exit_jump_ready) and not _lake_floor_walk_active and not _lake_weighted_descent_active:
 		var jump_height_multiplier := GIANT_SUPER_JUMP_HEIGHT_MULTIPLIER if giant_jump_ready else 1.0
 		if _lake_buoyancy_active and not _lake_diving_active:
 			jump_height_multiplier = WATER_EXIT_JUMP_HEIGHT_MULTIPLIER
@@ -1374,6 +1449,7 @@ func _physics_process(delta: float) -> void:
 		_giant_surface_jump_in_progress = giant_jump_ready
 		_jumping = true
 		jumped_this_frame = true
+		UISounds.play_foley(&"jump", 0.52, get_instance_id())
 	_update_blorb_super_jump_boost(delta)
 
 	var input_dir := _get_move_input()
@@ -1385,21 +1461,28 @@ func _physics_process(delta: float) -> void:
 	var aerial_active := _lake_diving_active or suit_flight
 	# Surface swimming keeps ordinary horizontal controls, but its body still
 	# needs the same neck-led travel lean as diving.
-	var neck_led_travel := _lake_buoyancy_active or suit_flight
+	var neck_led_travel := (_lake_buoyancy_active and not _lake_floor_walk_active and not _lake_weighted_descent_active) or suit_flight
 	var cam_basis := camera.global_transform.basis if aerial_active else camera_rig.global_transform.basis
 	var direction := cam_basis.x * input_dir.x + cam_basis.z * input_dir.y
 	if not aerial_active:
 		direction.y = 0.0
 
 	var skating := _is_blorb_skating()
+	var skate_speed_multiplier := worn_leg_speed_multiplier() if skating else 1.0
 	var ground_move_speed := TEMP_MONKEY_MOVE_SPEED if _piloting_xiao_hou_zi else move_speed
 	var current_speed := ground_move_speed * (sprint_multiplier if _is_sprinting() else 1.0)
-	if not aerial_active:
-		current_speed *= worn_leg_speed_multiplier()
+	if skating:
+		current_speed *= skate_speed_multiplier
 	if _lake_diving_active:
-		current_speed = LAKE_DIVE_SPEED
+		current_speed = LAKE_DIVE_SPEED * worn_swim_speed_multiplier()
+	elif _lake_floor_walk_active:
+		current_speed *= 0.82
+	elif _lake_weighted_descent_active:
+		current_speed *= 0.82
 	elif _air_flight_active or _fire_limb_flight_active:
 		current_speed = AIR_FLIGHT_SPEED * worn_flight_speed_multiplier()
+	elif _lake_buoyancy_active:
+		current_speed *= worn_swim_speed_multiplier()
 	# Air feet retain ordinary walk/run traversal speed and animation even
 	# though their direction includes camera pitch (see _animate_walk()).
 	if aerial_active and _is_sprinting():
@@ -1412,14 +1495,30 @@ func _physics_process(delta: float) -> void:
 		current_speed *= pow(FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER, active_fire_feet)
 	# Leg Speed replaces the old fixed skate multiplier. High-Speed legs reach
 	# and surpass that former very-fast reference through progression itself.
+	var sliding_on_ice := grounded and _is_supported_by_ice()
+	# Ice changes world traversal, not the authored gait. While the body
+	# accelerates or coasts under ice momentum, animate from current control
+	# intent at the ordinary walk/run rate; releasing the stick therefore
+	# returns to idle even if momentum continues carrying the player.
+	var ice_animation_speed := -1.0
+	if sliding_on_ice:
+		ice_animation_speed = (
+			ground_move_speed * (sprint_multiplier if _is_sprinting() else 1.0)
+			if direction.length() > 0.001
+			else 0.0
+		)
 
 	if direction.length() > 0.001:
 		direction = direction.normalized()
 		if neck_led_travel:
 			_aerial_motion_direction = direction
 			_aerial_strafe_input = input_dir.x
-		velocity.x = direction.x * current_speed
-		velocity.z = direction.z * current_speed
+		if sliding_on_ice and not neck_led_travel:
+			velocity.x = move_toward(velocity.x, direction.x * current_speed, ICE_ACCELERATION * delta)
+			velocity.z = move_toward(velocity.z, direction.z * current_speed, ICE_ACCELERATION * delta)
+		else:
+			velocity.x = direction.x * current_speed
+			velocity.z = direction.z * current_speed
 		if neck_led_travel:
 			velocity.y = direction.y * current_speed
 		var target_angle := atan2(direction.x, direction.z)
@@ -1430,12 +1529,16 @@ func _physics_process(delta: float) -> void:
 		else:
 			visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, rotation_speed * delta)
 	else:
-		velocity.x = move_toward(velocity.x, 0.0, current_speed)
-		velocity.z = move_toward(velocity.z, 0.0, current_speed)
+		if sliding_on_ice:
+			velocity.x = move_toward(velocity.x, 0.0, ICE_FRICTION * delta)
+			velocity.z = move_toward(velocity.z, 0.0, ICE_FRICTION * delta)
+		else:
+			velocity.x = move_toward(velocity.x, 0.0, current_speed)
+			velocity.z = move_toward(velocity.z, 0.0, current_speed)
 		if aerial_active:
 			velocity.y = move_toward(velocity.y, 0.0, current_speed)
 
-	# Water-leg and dual-hand Fire hover are level traversal modes: their
+	# Water-leg, dual-hand Fire, and dual-leg Fire hover are level traversal modes: their
 	# camera-relative direction has no Y component, so the jets own vertical
 	# lift. Air feet and four-limb Fire flight instead use camera-pitched
 	# direction above; with no input they hold the last elevation here.
@@ -1446,7 +1549,10 @@ func _physics_process(delta: float) -> void:
 	# one-frame stick/hover between impact and takeoff.
 	var bounced_before_move := _try_predictive_blorb_bounce(delta, grounded)
 
-	_animate_walk(delta, grounded, BLORB_SKATE_SPEED_MULTIPLIER if skating and not powered_hover else 1.0)
+	# Air-foot hover still traverses at the paired-leg skate speed, but that
+	# boost must be divided back out of gait timing just like grounded skates.
+	# `powered_hover` changes contact/foley, not animation cadence.
+	_animate_walk(delta, grounded, skate_speed_multiplier if skating else 1.0, ice_animation_speed)
 	# Flight aiming is applied after the base pose but before the dedicated
 	# shoulder-button power layer, so a held arm power still has precedence.
 	_apply_flight_aim_pose(delta)
@@ -1462,10 +1568,11 @@ func _physics_process(delta: float) -> void:
 	_apply_arm_power_poses(delta)
 	_apply_fire_jet_pose(delta)
 	_apply_throw_aim_pose(delta)
+	_apply_weapon_swing_pose(delta)
 	_apply_throw_facing(delta)
 	_update_water_streams(delta)
 
-	if grounded and not surface_walking and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and _is_touching_terrain():
+	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and _is_touching_terrain():
 		_try_step_up()
 	# Not gated behind _is_touching_terrain() the way _try_step_up() is --
 	# that check is specifically "close to the analytic ground function,"
@@ -1473,10 +1580,11 @@ func _physics_process(delta: float) -> void:
 	# and not jumped_this_frame alone (the same "don't fight an active
 	# jump" guard every other step/snap call here uses) is what actually
 	# matters for this one.
-	if grounded and not surface_walking and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded:
+	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded:
 		_try_step_onto_prop()
 	var pre_move_feet_y := global_position.y - FOOT_OFFSET
 	move_and_slide()
+	_resolve_ice_surface_contact(pre_move_feet_y)
 	_enforce_lava_access()
 	# Clouds are intentionally one-way: only a descending body that started
 	# above a puff top is caught. Rising flight/jumps pass straight through
@@ -1521,7 +1629,15 @@ func _physics_process(delta: float) -> void:
 	# every ground-level bump into a blorb's side.
 	if not bounced_before_move and not _check_rising_air_blorb_bounce(grounded):
 		_check_creature_bounce(grounded, pre_move_feet_y)
-	if grounded and not surface_walking and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and _is_touching_terrain():
+	# Last-resort invariant for a missed collision/crossing frame: an active
+	# descending jump may never settle on a normal blorb crown. This catches
+	# the reported frozen hop pose (including slope-assisted approaches) even
+	# when move_and_slide() has already zeroed the vertical velocity and the
+	# predictive crossing test can no longer reconstruct the prior crossing.
+	_recover_stalled_blorb_bounce()
+	_enforce_no_blorb_support_stall()
+	_enforce_platform_aid_completion(delta)
+	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and _is_touching_terrain():
 		_snap_to_terrain(delta)
 	# Same active re-anchoring _snap_to_terrain() does for solid ground,
 	# applied to a cloud top instead -- see on_cloud's own comment above for
@@ -1529,7 +1645,7 @@ func _physics_process(delta: float) -> void:
 	# proximity tolerance alone let the player's foothold height and the
 	# cloud's own real height under them drift apart while walking, reading
 	# as falling through).
-	if grounded and on_cloud and not surface_walking and not jumped_this_frame and not buoyant and not _giant_surface_grounded:
+	if grounded and on_cloud and not jumped_this_frame and not buoyant and not _giant_surface_grounded:
 		_snap_to_cloud(delta)
 	_store_giant_attachment()
 
@@ -1552,10 +1668,63 @@ func _physics_process(delta: float) -> void:
 	# computed above, before _jumping just cleared), so this actually fires
 	# one frame after the true physical landing. Imperceptible for a "split
 	# second" reaction, and simpler than a second, separately-timed check.
-	if grounded and not _prev_grounded:
+	if grounded and not _prev_grounded and _continuous_airborne_time >= LANDING_MIN_AIRBORNE_TIME:
 		_landing_timer = LANDING_DURATION
 		_walk_cycle_recovery = 0.0
+		# Air-foot hover deliberately retains a walk/run animation while making
+		# no ground contact; suppress its landing cue for the same reason its
+		# stride contacts are silent below.
+		if not _air_foot_hover_active and not _lake_buoyancy_active and not on_cloud:
+			UISounds.play_landing(get_instance_id())
+	if grounded:
+		_continuous_airborne_time = 0.0
+	else:
+		_continuous_airborne_time += delta
 	_prev_grounded = grounded
+
+
+func _is_supported_by_ice() -> bool:
+	if (
+		terrain == null
+		or not terrain.has_method("is_ice_surface")
+		or not terrain.has_method("get_ice_level")
+		or _jumping
+	):
+		return false
+	var xz := Vector2(global_position.x, global_position.z)
+	if not terrain.is_ice_surface(xz):
+		return false
+	var ice_level: float = terrain.get_ice_level()
+	var feet_delta := global_position.y - FOOT_OFFSET - ice_level
+	return feet_delta >= -ICE_SURFACE_RECOVERY_DEPTH and feet_delta <= ICE_SUPPORT_TOLERANCE
+
+
+## Frozen lake collision is a one-way standing surface from above. If the
+## physics solver leaves the capsule fractionally embedded in the sheet, put
+## its feet back on the exact visible top. A genuinely submerged player stays
+## underwater: both their previous and current feet are below the recovery
+## band, and the fishing hole is excluded by terrain.is_ice_surface().
+func _resolve_ice_surface_contact(previous_feet_y: float) -> void:
+	if (
+		terrain == null
+		or _jumping
+		or velocity.y > 0.1
+		or not terrain.has_method("is_ice_surface")
+		or not terrain.has_method("get_ice_level")
+	):
+		return
+	var xz := Vector2(global_position.x, global_position.z)
+	if not terrain.is_ice_surface(xz):
+		return
+	var ice_level: float = terrain.get_ice_level()
+	var current_feet_y := global_position.y - FOOT_OFFSET
+	var came_from_surface_band := previous_feet_y >= ice_level - ICE_SURFACE_RECOVERY_DEPTH
+	var remains_near_surface := current_feet_y >= ice_level - ICE_SURFACE_RECOVERY_DEPTH
+	if not came_from_surface_band or not remains_near_surface:
+		return
+	if current_feet_y <= ice_level + ICE_SUPPORT_TOLERANCE:
+		global_position.y = ice_level + FOOT_OFFSET
+		velocity.y = 0.0
 
 
 ## Lava is traversable terrain only with two fully worn fire blorbs on the
@@ -1571,7 +1740,7 @@ func _enforce_lava_access() -> void:
 	):
 		return
 	var xz := Vector2(global_position.x, global_position.z)
-	if not terrain.is_lava_area(xz) or _blorb_suit.has_lava_safe_legs():
+	if not terrain.is_lava_area(xz) or _blorb_suit.has_lava_safe_legs() or _blorb_suit.has_full_lava_suit():
 		return
 	var lava_surface: float = terrain.get_lava_surface_height(xz)
 	if global_position.y - FOOT_OFFSET > lava_surface + LAVA_CONTACT_TOLERANCE:
@@ -1651,10 +1820,15 @@ func _check_creature_bounce(was_grounded: bool, pre_move_feet_y: float) -> void:
 				)
 				_bounce_off_blorb(blorb)
 				return
+		elif creature.is_in_group("skeletons") and creature.has_method("take_damage"):
+			_stomp_nme(creature)
+			return
 		elif creature.is_in_group("npcs") and creature.has_method("head_bounce_surface_height_at"):
 			var npc_surface: Variant = creature.head_bounce_surface_height_at(global_position.x, global_position.z)
 			if npc_surface != null:
 				global_position.y = (npc_surface as float) + FOOT_OFFSET
+				if creature.has_method("is_demon_agent_combat_active") and bool(creature.is_demon_agent_combat_active()):
+					creature.take_damage(18.0, self)
 				_bounce_off_blorb(creature)
 				return
 	# The slide-collision list above misses landings the same way it does for
@@ -1685,6 +1859,16 @@ func _check_creature_bounce(was_grounded: bool, pre_move_feet_y: float) -> void:
 			return
 
 
+func _stomp_nme(nme: Node) -> void:
+	nme.take_damage(STOMP_DAMAGE, null)
+	velocity.y = jump_velocity * STOMP_REBOUND_SCALE
+	_jump_takeoff_speed = absf(velocity.y)
+	_jumping = true
+	_landing_timer = 0.0
+	_walk_cycle_recovery = 0.0
+	UISounds.play_foley(&"stomp_hit", 0.72, get_instance_id())
+
+
 ## A hovering air blorb is a manually moved StaticBody3D. When it rises into
 ## nearly stationary feet, Godot can resolve the overlap without reporting a
 ## slide collision; detect that narrow top-contact case geometrically so the
@@ -1712,6 +1896,67 @@ func _check_rising_air_blorb_bounce(was_grounded: bool) -> bool:
 	return false
 
 
+func _recover_stalled_blorb_bounce() -> bool:
+	# This is deliberately independent of `_jumping`. A collision-resolution
+	# path can clear that animation/state flag while leaving the capsule resting
+	# on the Blorb; requiring it here was the loophole that allowed a permanent
+	# jump pose over a permanently compressed companion.
+	if velocity.y > 0.1 or _giant_goo_active or _lake_buoyancy_active or _is_suit_flight_active() or _is_powered_hover_active():
+		return false
+	var feet_y := global_position.y - FOOT_OFFSET
+	for candidate in get_tree().get_nodes_in_group("blorbs"):
+		if not candidate is Blorb:
+			continue
+		var blorb := candidate as Blorb
+		var surface: Variant = blorb.bounce_surface_height_at(global_position.x, global_position.z)
+		if surface == null:
+			continue
+		var surface_y := surface as float
+		# Tight enough to exclude side brushes, but deliberately extends below
+		# the visible crown so a physics depenetration or squashed render frame
+		# cannot strand the feet just beneath the analytic surface.
+		if feet_y >= surface_y - 0.38 and feet_y <= surface_y + 0.18:
+			global_position.y = surface_y + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
+			_bounce_off_blorb(blorb)
+			return true
+	return false
+
+
+## Absolute trampoline invariant: an ordinary Blorb may never act as a stable
+## floor for the player. The analytic crown recovery above is the visually
+## precise path; this collision-backed fallback covers a collider/rendered-
+## surface disagreement, a squash frame, or a slope depenetration that places
+## the feet just outside that analytic radius. Any upward physical support
+## from a Blorb is converted into a launch during the same physics tick.
+func _enforce_no_blorb_support_stall() -> bool:
+	if velocity.y > 0.1 or _giant_goo_active or _lake_buoyancy_active or _is_suit_flight_active() or _is_powered_hover_active():
+		return false
+	for collision_index in get_slide_collision_count():
+		var collision := get_slide_collision(collision_index)
+		if collision.get_normal().y < 0.2:
+			continue
+		var collider := collision.get_collider() as Node
+		if collider == null or not collider.is_in_group("blorbs") or not collider is Blorb:
+			continue
+		var blorb := collider as Blorb
+		if blorb.blorb_type == "size" or blorb.is_worn or blorb.is_melted:
+			continue
+		var surface: Variant = blorb.bounce_surface_height_at(global_position.x, global_position.z)
+		if surface != null:
+			global_position.y = maxf(
+				global_position.y,
+				(surface as float) + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
+			)
+		else:
+			# Outside the rendered crown but still physically supported by its
+			# collider: separate upward before launching so the next frame cannot
+			# immediately resolve the capsule back to zero vertical velocity.
+			global_position.y += BLORB_BOUNCE_RELEASE_CLEARANCE + 0.08
+		_bounce_off_blorb(blorb)
+		return true
+	return false
+
+
 ## Launches the player back into the jump arc instead of settling, using the
 ## same _jumping/_landing_timer machinery an ordinary jump/landing already
 ## drives -- velocity.y staying positive here is what keeps `grounded` false
@@ -1719,20 +1964,130 @@ func _check_rising_air_blorb_bounce(was_grounded: bool) -> bool:
 ## frame's animation falls through to the impact crouch and then the
 ## airborne pose exactly like a real jump would.
 func _bounce_off_blorb(blorb: Node) -> void:
+	if blorb is Blorb:
+		_last_bounced_blorb = blorb as Blorb
+		if _platform_aid_setup_blorb == blorb:
+			_platform_aid_setup_blorb = null
+			_platform_aid_setup_elapsed = 0.0
+		_last_bounced_blorb.finish_platform_aid()
 	var super_jump := _jump_buffer_timer > 0.0
 	_jump_buffer_timer = 0.0
 	_blorb_super_jump_boost_time = 0.0
 	_blorb_super_jump_boost_impulse = 0.0
 	_apply_blorb_bounce_velocity(super_jump)
 	_jumping = true
-	_landing_timer = LANDING_DURATION
+	# A trampoline launch is already leaving the surface. Replaying the
+	# grounded impact pose during its ascent was the source of the apparent
+	# frozen/repeating jump frame above a still-squashed blorb.
+	_landing_timer = 0.0
 	_walk_cycle_recovery = 0.0
 	if blorb.has_method("trigger_bounce_squash"):
 		blorb.trigger_bounce_squash()
+	UISounds.play_blorb_bounce(super_jump, get_instance_id())
 	# An ordinary bounce still leaves a short window open for a late press
 	# to upgrade it -- see BLORB_SUPER_JUMP_GRACE_WINDOW's own comment. A
 	# same-frame-or-earlier super jump has nothing left to upgrade.
 	_blorb_super_jump_grace = 0.0 if super_jump else BLORB_SUPER_JUMP_GRACE_WINDOW
+
+
+func _call_platform_aid() -> void:
+	var platform_target: Node3D = _controlled_blorbus if _player_following_blorbus and is_instance_valid(_controlled_blorbus) else self
+	var chosen := _last_bounced_blorb
+	if chosen == null or not is_instance_valid(chosen) or chosen == platform_target or not chosen.in_party or chosen.is_worn or chosen.is_melted:
+		chosen = null
+		for node in get_tree().get_nodes_in_group("blorbs"):
+			var candidate := node as Blorb
+			if candidate != null and candidate != platform_target and candidate.in_party and not candidate.is_worn and not candidate.is_melted:
+				chosen = candidate
+				break
+	if chosen != null:
+		var support_y := _platform_aid_support_height(platform_target)
+		if chosen.element_state != "air" and is_nan(support_y):
+			return
+		_last_bounced_blorb = chosen
+		_platform_aid_setup_blorb = null
+		_platform_aid_setup_elapsed = 0.0
+		chosen.call_as_platform_aid(platform_target, support_y)
+
+
+## Finds the actual collider immediately below the controlled body. This is
+## deliberately a physics query rather than terrain.get_mesh_height(): roofs,
+## ships, rocks, palace floors, clouds with collision, and other raised
+## platforms must retain their own height instead of resolving to the world
+## terrain underneath them.
+func _platform_aid_support_height(target: Node3D) -> float:
+	var space_state := get_world_3d().direct_space_state
+	var from := target.global_position + Vector3.UP * 0.4
+	var terrain_y: float = terrain.get_mesh_height(target.global_position.x, target.global_position.z)
+	var to := Vector3(target.global_position.x, terrain_y - 8.0, target.global_position.z)
+	var query := PhysicsRayQueryParameters3D.create(from, to, 1 | TownProps.BLORB_CLIMBABLE_LAYER)
+	query.exclude = [self.get_rid()]
+	for node in get_tree().get_nodes_in_group("blorbs"):
+		if node is CollisionObject3D:
+			query.exclude.append((node as CollisionObject3D).get_rid())
+	var hit := space_state.intersect_ray(query)
+	if hit.is_empty():
+		return NAN
+	return (hit["position"] as Vector3).y
+
+
+func receive_platform_aid_bounce(platform: Blorb) -> void:
+	if platform != null and not _player_following_blorbus:
+		var planted := (
+			not _jumping
+			and velocity.y <= 0.1
+			and (is_on_floor() or _is_near_ground())
+		)
+		# From a planted stance, begin a genuine hop when the helper arrives and
+		# leave it waiting below. The descending crossing then uses the exact
+		# same bounce path as a manually aimed jump onto a blorb.
+		if planted and _platform_aid_setup_blorb == null:
+			_platform_aid_setup_blorb = platform
+			_platform_aid_setup_elapsed = 0.0
+			velocity.y = jump_velocity
+			_jump_takeoff_speed = absf(velocity.y)
+			_jumping = true
+			_landing_timer = 0.0
+			UISounds.play_foley(&"jump", 0.52, get_instance_id())
+			return
+		if _platform_aid_setup_blorb == platform and velocity.y > 0.0:
+			return
+		# The early approach callback above intentionally occurs before the
+		# helper is horizontally beneath the player. Only the actual descending
+		# contact phase needs a valid point on its rendered crown.
+		var surface: Variant = platform.bounce_surface_height_at(global_position.x, global_position.z)
+		if surface == null:
+			return
+		var feet_y := global_position.y - FOOT_OFFSET
+		if feet_y <= (surface as float) + 0.35:
+			global_position.y = (surface as float) + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
+			_bounce_off_blorb(platform)
+
+
+func _enforce_platform_aid_completion(delta: float) -> void:
+	if _platform_aid_setup_blorb == null:
+		_platform_aid_setup_elapsed = 0.0
+		return
+	if not is_instance_valid(_platform_aid_setup_blorb):
+		_platform_aid_setup_blorb = null
+		_platform_aid_setup_elapsed = 0.0
+		return
+	_platform_aid_setup_elapsed += delta
+	if _platform_aid_setup_elapsed < PLATFORM_AID_COMPLETION_DEADLINE:
+		return
+	# A timeout may cancel the setup, but it must never teleport either actor
+	# through a platform to manufacture a bounce. A real crown contact is the
+	# only successful completion path.
+	var platform := _platform_aid_setup_blorb
+	var surface: Variant = platform.bounce_surface_height_at(global_position.x, global_position.z)
+	var feet_y := global_position.y - FOOT_OFFSET
+	if surface != null and feet_y >= (surface as float) - 0.08 and feet_y <= (surface as float) + 0.38:
+		global_position.y = (surface as float) + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
+		_bounce_off_blorb(platform)
+	else:
+		platform.finish_platform_aid()
+		_platform_aid_setup_blorb = null
+		_platform_aid_setup_elapsed = 0.0
 
 
 func _apply_blorb_bounce_velocity(super_jump: bool) -> void:
@@ -1749,6 +2104,7 @@ func _blorb_bounce_launch_speed(super_jump: bool) -> float:
 func _begin_blorb_super_jump_boost() -> void:
 	if not _jumping:
 		return
+	UISounds.play_blorb_bounce(true, get_instance_id())
 	var target_speed := _blorb_bounce_launch_speed(true)
 	_blorb_super_jump_boost_impulse = maxf(target_speed - velocity.y, 0.0)
 	_blorb_super_jump_boost_time = (
@@ -1796,14 +2152,26 @@ func take_damage(amount: float) -> void:
 	if amount <= 0.0 or _piloting_xiao_hou_zi:
 		return
 	current_hp = maxf(current_hp - CombatMath.mitigated_damage(amount, current_defense()), 0.0)
+	UISounds.play_foley(&"player_hurt", clampf(amount / 24.0, 0.3, 0.9), get_instance_id())
 	_hp_regen_delay = HP_REGEN_DELAY
 	hp_changed.emit(current_hp, MAX_HP)
 
 
+## Used by engulfing hazards that eject the hero rather than leaving the
+## CharacterBody trapped inside their collision volume.
+func escape_from_lethal_hazard(safe_position: Vector3) -> void:
+	current_hp = 0.0
+	_hp_regen_delay = HP_REGEN_DELAY
+	hp_changed.emit(current_hp, MAX_HP)
+	global_position = safe_position
+	velocity = Vector3.ZERO
+	_jumping = false
+
+
 const BASE_DEFENSE := 5
-const WORN_LEG_SPEED_PER_POINT := 0.012
-const AIR_CHEST_SPEED_FLOOR := 0.72
-const AIR_CHEST_SPEED_PER_POINT := 0.025
+# Speed affects only special blorb traversal modes (skating, flight and
+# swimming), never the ordinary walk/run pace or animation cadence.
+const SPECIAL_MOVEMENT_SPEED_PER_POINT := 0.025
 
 
 func current_defense() -> int:
@@ -1811,30 +2179,53 @@ func current_defense() -> int:
 	if _blorb_suit == null:
 		return total
 	for blorb in _blorb_suit.worn_blorbs():
-		total += blorb.defense
+		total += blorb.effective_defense()
 	return total
 
 
 func worn_leg_speed_multiplier() -> float:
 	if _blorb_suit == null:
 		return 1.0
+	if not _blorb_suit.has_blorb_skates():
+		return 1.0
 	var points := 0
 	for slot in ["leg_left", "leg_right"]:
 		var blorb := _blorb_suit.worn_blorb_for_slot(slot)
 		if blorb != null:
 			points += blorb.speed
-	return 1.0 + float(points) * WORN_LEG_SPEED_PER_POINT
+	return 1.0 + float(points) * SPECIAL_MOVEMENT_SPEED_PER_POINT
 
 
 func worn_flight_speed_multiplier() -> float:
 	if _blorb_suit == null:
 		return 1.0
-	var chest := _blorb_suit.worn_blorb_for_slot("torso")
-	if chest == null or chest.element_state != "air":
+	if _air_flight_active:
+		var chest := _blorb_suit.worn_blorb_for_slot("torso")
+		if chest != null and chest.element_state == "air":
+			return 1.0 + float(chest.speed) * SPECIAL_MOVEMENT_SPEED_PER_POINT
+	if _fire_limb_flight_active:
+		var leg_points := 0
+		for slot in ["leg_left", "leg_right"]:
+			var leg := _blorb_suit.worn_blorb_for_slot(slot)
+			if leg != null and leg.element_state == "fire":
+				leg_points += leg.speed
+		return 1.0 + float(leg_points) * SPECIAL_MOVEMENT_SPEED_PER_POINT
+	return 1.0
+
+
+func worn_swim_speed_multiplier() -> float:
+	if _blorb_suit == null:
 		return 1.0
-	# Starting air chests sit below the original fixed flight speed. Around
-	# Speed 11 they reach that familiar pace; progression can carry beyond it.
-	return AIR_CHEST_SPEED_FLOOR + float(chest.speed) * AIR_CHEST_SPEED_PER_POINT
+	var points := 0
+	var contributors := 0
+	for slot in ["head", "leg_left", "leg_right"]:
+		var blorb := _blorb_suit.worn_blorb_for_slot(slot)
+		if blorb != null:
+			points += blorb.speed
+			contributors += 1
+	if contributors == 0:
+		return 1.0
+	return 1.0 + (float(points) / float(contributors)) * SPECIAL_MOVEMENT_SPEED_PER_POINT
 
 
 func heal(amount: float) -> void:
@@ -1867,7 +2258,10 @@ func _process(delta: float) -> void:
 		_update_head_look(delta)
 	_update_suit_input(delta)
 	_update_hp_regen(delta)
-	EyeBlink.apply(_eye_blink, delta, _eyes)
+	if _wake_intro_active:
+		_apply_wake_intro_eyes()
+	else:
+		EyeBlink.apply(_eye_blink, delta, _eyes)
 	# _piloting_xiao_hou_zi: re-loft the monkey's limb tubes from the
 	# (already-animated-this-frame) pivots' live global_position, the same
 	# per-frame noodle-rebuild pattern BlorbSuitController uses for worn
@@ -1890,6 +2284,7 @@ func begin_wake_intro() -> void:
 	UIState.push_modal()
 	_wake_intro_owns_modal_lock = true
 	_apply_wake_intro_pose(0.0)
+	_set_eye_openness(EyeBlink.CLOSED_OPENNESS)
 
 
 func _update_wake_intro(delta: float) -> void:
@@ -1966,6 +2361,24 @@ func _apply_wake_intro_pose(rise: float) -> void:
 	)
 
 
+func _apply_wake_intro_eyes() -> void:
+	# Keep the close-up unmistakably asleep through the opening hold, then
+	# open the eyes before the body begins most of its rise. This runs after
+	# the normal animation updates, so the ambient blink clock cannot stamp
+	# them open again during the wake tableau.
+	var opening_time: float = _wake_intro_elapsed - WAKE_INTRO_REST_DURATION
+	var opening: float = smoothstep(
+		0.0, 1.0, clampf(opening_time / WAKE_INTRO_EYE_OPEN_DURATION, 0.0, 1.0)
+	)
+	_set_eye_openness(lerpf(EyeBlink.CLOSED_OPENNESS, 1.0, opening))
+
+
+func _set_eye_openness(openness: float) -> void:
+	for eye in _eyes:
+		if is_instance_valid(eye):
+			(eye as Node3D).scale.y = openness
+
+
 func _finish_wake_intro() -> void:
 	visuals.rotation.x = 0.0
 	visuals.rotation.z = 0.0
@@ -1973,6 +2386,7 @@ func _finish_wake_intro() -> void:
 	camera_rig.position = _wake_intro_camera_position_rest
 	camera_pivot.rotation.x = _wake_intro_camera_pitch_rest
 	camera_spring_arm.spring_length = _wake_intro_camera_distance_rest
+	_set_eye_openness(1.0)
 	_wake_intro_active = false
 	WorldState.opening_wake_completed = true
 	if _wake_intro_owns_modal_lock:
@@ -2385,7 +2799,7 @@ func _update_blorbus_control(delta: float) -> void:
 	# follower clipped straight down into the water instead of staying put
 	# on the dock.
 	_update_lake_buoyancy(delta)
-	if not (_lake_buoyancy_active or _lake_water_walk_active) and not is_on_floor():
+	if not _lake_buoyancy_active and not is_on_floor():
 		global_position.y = terrain.get_mesh_height(global_position.x, global_position.z) + FOOT_OFFSET
 	# Face the motion that actually occurred, not merely the desired line to
 	# Blorbus. Collision sliding and the 7m/3m follow hysteresis can make
@@ -2550,6 +2964,7 @@ func _apply_arm_power_poses(delta: float) -> void:
 		Input.is_action_pressed("right_arm_power")
 		and not _fire_hand_hover_active
 		and not _throw_aim_active
+		and not _held_item_is_weapon()
 	)
 	var holding_power := left_power or right_power
 	if holding_power:
@@ -2721,10 +3136,17 @@ func _build_water_streams() -> void:
 	_water_stream_right = _make_water_stream("RightWaterHose")
 	_fire_stream_left = _make_fire_stream("LeftFlamethrower")
 	_fire_stream_right = _make_fire_stream("RightFlamethrower")
+	_fire_stream_left.local_coords = true
+	_fire_stream_right.local_coords = true
 	_water_leg_stream_left = _make_water_stream("LeftWaterFootJet")
 	_water_leg_stream_right = _make_water_stream("RightWaterFootJet")
 	_fire_leg_stream_left = _make_fire_stream("LeftFireFootJet")
 	_fire_leg_stream_right = _make_fire_stream("RightFireFootJet")
+	# Fire jets remain attached to their animated emitters. World-space
+	# simulation abandoned each flame at an old hand/foot position whenever
+	# the player moved quickly.
+	_fire_leg_stream_left.local_coords = true
+	_fire_leg_stream_right.local_coords = true
 	_electric_stream_left = LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR)
 	_electric_stream_right = LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR)
 	_city_stream_left = LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR)
@@ -2931,22 +3353,33 @@ const STREAM_HALF_ANGLE_COS := 0.85  # roughly a 32-degree half-angle cone
 
 func _update_limb_power_state(delta: float) -> void:
 	_left_arm_water_active = _consume_limb_power("arm_left", "left_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
-	_right_arm_water_active = false if _throw_aim_active else _consume_limb_power("arm_right", "right_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
+	_right_arm_water_active = false if _throw_aim_active or _held_item_is_weapon() else _consume_limb_power("arm_right", "right_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
 	_left_arm_fire_active = _consume_limb_power("arm_left", "left_arm_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
-	_right_arm_fire_active = false if _throw_aim_active else _consume_limb_power("arm_right", "right_arm_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
+	_right_arm_fire_active = false if _throw_aim_active or _held_item_is_weapon() else _consume_limb_power("arm_right", "right_arm_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
 	_left_arm_electric_active = _consume_limb_power("arm_left", "left_arm_power", "electric", ELECTRIC_POWER_MP_PER_SECOND, delta)
-	_right_arm_electric_active = false if _throw_aim_active else _consume_limb_power("arm_right", "right_arm_power", "electric", ELECTRIC_POWER_MP_PER_SECOND, delta)
+	_right_arm_electric_active = false if _throw_aim_active or _held_item_is_weapon() else _consume_limb_power("arm_right", "right_arm_power", "electric", ELECTRIC_POWER_MP_PER_SECOND, delta)
 	_left_arm_city_active = _consume_limb_power("arm_left", "left_arm_power", "city", CITY_POWER_MP_PER_SECOND, delta)
-	_right_arm_city_active = false if _throw_aim_active else _consume_limb_power("arm_right", "right_arm_power", "city", CITY_POWER_MP_PER_SECOND, delta)
+	_right_arm_city_active = false if _throw_aim_active or _held_item_is_weapon() else _consume_limb_power("arm_right", "right_arm_power", "city", CITY_POWER_MP_PER_SECOND, delta)
 	_left_leg_water_active = _consume_limb_power("leg_left", "left_leg_power", "water", WATER_POWER_MP_PER_SECOND, delta)
 	_right_leg_water_active = _consume_limb_power("leg_right", "right_leg_power", "water", WATER_POWER_MP_PER_SECOND, delta)
 	_left_leg_fire_active = _consume_limb_power("leg_left", "left_leg_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
 	_right_leg_fire_active = _consume_limb_power("leg_right", "right_leg_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
+	if _left_arm_water_active or _right_arm_water_active or _left_leg_water_active or _right_leg_water_active:
+		UISounds.pulse_power_loop(&"water", get_instance_id())
+	if _left_arm_fire_active or _right_arm_fire_active or _left_leg_fire_active or _right_leg_fire_active:
+		UISounds.pulse_power_loop(&"fire", get_instance_id())
+	if _left_arm_electric_active or _right_arm_electric_active or _left_arm_city_active or _right_arm_city_active:
+		UISounds.pulse_power_loop(&"electric", get_instance_id())
 
 	_water_leg_hover_active = _left_leg_water_active and _right_leg_water_active
 	_fire_hand_hover_active = _left_arm_fire_active and _right_arm_fire_active
+	# A matched pair of downward foot jets supplies the same basic lift and
+	# fall braking as the matched hand jets. It remains a level hover on its
+	# own; combining both pairs below upgrades that lift into directional
+	# four-limb flight.
+	_fire_leg_hover_active = _left_leg_fire_active and _right_leg_fire_active
 	_fire_limb_flight_active = (
-		_fire_hand_hover_active and _left_leg_fire_active and _right_leg_fire_active
+		_fire_hand_hover_active and _fire_leg_hover_active
 	)
 	_air_foot_hover_active = _blorb_suit.has_air_hover_legs()
 
@@ -2959,6 +3392,37 @@ func _update_limb_power_state(delta: float) -> void:
 	_was_powered_hover_active = hovering
 
 	_update_discrete_arm_powers(delta)
+	_update_rock_leg_powers(delta)
+
+
+func _update_rock_leg_powers(delta: float) -> void:
+	_left_leg_rock_cooldown = maxf(_left_leg_rock_cooldown - delta, 0.0)
+	_right_leg_rock_cooldown = maxf(_right_leg_rock_cooldown - delta, 0.0)
+	if UIState.modal_open:
+		return
+	if Input.is_action_just_pressed("left_leg_power") and _left_leg_rock_cooldown <= 0.0:
+		if _raise_rock_platform("leg_left"):
+			_left_leg_rock_cooldown = ROCK_POWER_COOLDOWN
+	if Input.is_action_just_pressed("right_leg_power") and _right_leg_rock_cooldown <= 0.0:
+		if _raise_rock_platform("leg_right"):
+			_right_leg_rock_cooldown = ROCK_POWER_COOLDOWN
+
+
+func _raise_rock_platform(slot: String) -> bool:
+	var blorb := _blorb_suit.worn_blorb_in_slot(slot)
+	if blorb == null or blorb.element_state not in ["rock", "ice"]:
+		return false
+	var here := Vector2(global_position.x, global_position.z)
+	if blorb.element_state == "rock" and terrain.has_method("is_ice_surface") and terrain.is_ice_surface(here):
+		return false
+	if not blorb.consume_mp(ROCK_POWER_MP_PER_SHOT):
+		return false
+	var ground_y: float = _crag_surface_height(blorb, here)
+	if blorb.element_state == "ice":
+		IceCrag.spawn(get_tree().current_scene, Vector3(global_position.x, ground_y, global_position.z), _rng, blorb.level, 1.35)
+	else:
+		RockCrag.spawn(get_tree().current_scene, Vector3(global_position.x, ground_y, global_position.z), _rng, blorb.level, 1.35)
+	return true
 
 
 func _consume_limb_power(
@@ -2973,7 +3437,7 @@ func _consume_limb_power(
 
 
 func _is_powered_hover_active() -> bool:
-	return _water_leg_hover_active or _fire_hand_hover_active or _air_foot_hover_active
+	return _water_leg_hover_active or _fire_hand_hover_active or _fire_leg_hover_active or _air_foot_hover_active
 
 
 ## Rock/plant share the same "held + correct element worn, gated by a
@@ -2982,15 +3446,15 @@ func _is_powered_hover_active() -> bool:
 ## folded into _consume_limb_power(), whose per-second rate model doesn't
 ## fit a per-shot cost.
 func _update_discrete_arm_powers(delta: float) -> void:
-	var left_rock := _update_discrete_power("arm_left", "left_arm_power", "rock", _left_arm_rock_cooldown, delta)
+	var left_rock := _update_discrete_power("arm_left", "left_arm_power", "rock_or_ice", _left_arm_rock_cooldown, delta)
 	_left_arm_rock_active = left_rock["active"]
 	_left_arm_rock_cooldown = left_rock["cooldown"]
 	if left_rock["active"] and _left_arm_rock_cooldown <= 0.0 and _fire_rock_power("arm_left", _palm_left):
 		_left_arm_rock_cooldown = ROCK_POWER_COOLDOWN
 
 	var right_rock := (
-		{"active": false, "cooldown": _right_arm_rock_cooldown} if _throw_aim_active
-		else _update_discrete_power("arm_right", "right_arm_power", "rock", _right_arm_rock_cooldown, delta)
+		{"active": false, "cooldown": _right_arm_rock_cooldown} if _throw_aim_active or _held_item_is_weapon()
+		else _update_discrete_power("arm_right", "right_arm_power", "rock_or_ice", _right_arm_rock_cooldown, delta)
 	)
 	_right_arm_rock_active = right_rock["active"]
 	_right_arm_rock_cooldown = right_rock["cooldown"]
@@ -3004,7 +3468,7 @@ func _update_discrete_arm_powers(delta: float) -> void:
 		_left_arm_plant_cooldown = PLANT_PELLET_COOLDOWN
 
 	var right_plant := (
-		{"active": false, "cooldown": _right_arm_plant_cooldown} if _throw_aim_active
+		{"active": false, "cooldown": _right_arm_plant_cooldown} if _throw_aim_active or _held_item_is_weapon()
 		else _update_discrete_power("arm_right", "right_arm_power", "plant", _right_arm_plant_cooldown, delta)
 	)
 	_right_arm_plant_active = right_plant["active"]
@@ -3024,7 +3488,7 @@ func _update_discrete_power(
 	var active := false
 	if not UIState.modal_open and Input.is_action_pressed(action):
 		var blorb := _blorb_suit.worn_blorb_in_slot(slot)
-		active = blorb != null and blorb.element_state == element
+		active = blorb != null and (blorb.element_state in ["rock", "ice"] if element == "rock_or_ice" else blorb.element_state == element)
 	return {"active": active, "cooldown": maxf(cooldown - delta, 0.0)}
 
 
@@ -3037,14 +3501,28 @@ func _update_discrete_power(
 ## blorb can't afford ROCK_POWER_MP_PER_SHOT.
 func _fire_rock_power(slot: String, hand: Node3D) -> bool:
 	var blorb := _blorb_suit.worn_blorb_in_slot(slot)
-	if blorb == null or not blorb.consume_mp(ROCK_POWER_MP_PER_SHOT):
+	if blorb == null or blorb.element_state not in ["rock", "ice"]:
+		return false
+	var hand_xz := Vector2(hand.global_position.x, hand.global_position.z)
+	if blorb.element_state == "rock" and terrain.has_method("is_ice_surface") and terrain.is_ice_surface(hand_xz):
+		return false
+	if not blorb.consume_mp(ROCK_POWER_MP_PER_SHOT):
 		return false
 	var forward := visuals.global_transform.basis * Vector3(0.0, 0.0, 1.0)
 	forward = forward.normalized() if forward.length_squared() > 0.001 else Vector3.FORWARD
 	var spawn_xz := Vector2(hand.global_position.x, hand.global_position.z) + Vector2(forward.x, forward.z) * ROCK_CRAG_SPAWN_DISTANCE
-	var spawn_point := Vector3(spawn_xz.x, terrain.get_mesh_height(spawn_xz.x, spawn_xz.y), spawn_xz.y)
-	RockCrag.spawn(get_tree().current_scene, spawn_point, _rng)
-	var roll := CombatMath.rolled_attack(ROCK_CRAG_DAMAGE_BASE, blorb.strength, _rng)
+	var spawn_y: float = _crag_surface_height(blorb, spawn_xz)
+	var spawn_point := Vector3(spawn_xz.x, spawn_y, spawn_xz.y)
+	var rock_count: int = mini(1 + (blorb.level - 1) / 5, 4)
+	for i in rock_count:
+		var angle: float = TAU * float(i) / float(rock_count)
+		var offset := Vector3(cos(angle), 0.0, sin(angle)) * (0.55 if i > 0 else 0.0)
+		if blorb.element_state == "ice":
+			IceCrag.spawn(get_tree().current_scene, spawn_point + offset, _rng, blorb.level)
+		else:
+			RockCrag.spawn(get_tree().current_scene, spawn_point + offset, _rng, blorb.level)
+	var level_damage_scale: float = 1.0 + float(blorb.level - 1) * 0.08
+	var roll := CombatMath.rolled_attack(ROCK_CRAG_DAMAGE_BASE * level_damage_scale, blorb.strength, _rng)
 	var credit_blorbs := _active_powered_blorbs()
 	for node in get_tree().get_nodes_in_group("skeletons"):
 		var skeleton := node as Node3D
@@ -3058,9 +3536,24 @@ func _fire_rock_power(slot: String, hand: Node3D) -> bool:
 		var defender_element: String = (
 			skeleton.current_combat_element() if skeleton.has_method("current_combat_element") else ""
 		)
-		var final_damage: float = roll["amount"] * CombatMath.type_multiplier("rock", defender_element)
+		var final_damage: float = roll["amount"] * CombatMath.type_multiplier(blorb.element_state, defender_element)
 		skeleton.take_damage(final_damage)
 	return true
+
+
+## Ice is a real raised support above the lakebed, not a terrain color. Ice
+## crags therefore erupt from the frozen sheet's own top elevation wherever
+## that sheet exists (excluding the fishing hole). Rock and off-lake ice keep
+## using ordinary terrain, preserving the existing rock-power rules.
+func _crag_surface_height(blorb: Blorb, pos: Vector2) -> float:
+	if (
+		blorb.element_state == "ice"
+		and terrain.has_method("is_ice_surface")
+		and terrain.is_ice_surface(pos)
+		and terrain.has_method("get_ice_level")
+	):
+		return terrain.get_ice_level()
+	return terrain.get_mesh_height(pos.x, pos.y)
 
 
 ## Fires a single SeedPellet forward from `hand` -- see that script's own
@@ -3083,6 +3576,7 @@ func _fire_plant_power(slot: String, hand: Node3D) -> bool:
 	pellet.credit_blorbs = _active_powered_blorbs()
 	get_tree().current_scene.add_child(pellet)
 	pellet.global_position = hand.global_position
+	UISounds.play_seed_eject(get_instance_id())
 	return true
 
 
@@ -3335,6 +3829,8 @@ func _on_cheats_toggled(_is_enabled: bool) -> void:
 func _on_held_item_changed() -> void:
 	if _throw_aim_active:
 		cancel_throw_preparation()
+	_weapon_swing_active = false
+	_weapon_swing_elapsed = 0.0
 	if _held_visual != null:
 		_held_visual.queue_free()
 		_held_visual = null
@@ -3343,8 +3839,19 @@ func _on_held_item_changed() -> void:
 	var entry := ShopCatalog.find(HeldItem.current["name"])
 	if entry.is_empty():
 		return
-	_held_visual = entry["build_visual"].call(HELD_ITEM_SCALE)
+	# Equipment authored at its actual usable dimensions (the sword) opts out
+	# of the generic small-prop reduction. Objects without held_scale retain the
+	# established inventory-object size, while each weapon can be balanced
+	# independently without changing its shop or ground display copy.
+	var held_scale: float = float(entry.get("held_scale", HELD_ITEM_SCALE))
+	_held_visual = entry["build_visual"].call(held_scale)
 	_palm_right.add_child(_held_visual)
+	# Display models may need a different orientation when actually gripped.
+	# In particular, the shop sword stands vertically on its rack but rotates
+	# its blade forward from the fist here. Apply this before solving GripPoint
+	# so the hilt surface—not the unrotated model origin—lands on the palm.
+	if _held_visual.has_meta("held_rotation"):
+		_held_visual.rotation = _held_visual.get_meta("held_rotation") as Vector3
 	# If the visual authored its own GripPoint (the spot on ITS surface
 	# meant to meet the palm), shift the whole visual so that point lands
 	# exactly on palm_right's own origin -- grip.position is in the visual's
@@ -3358,7 +3865,8 @@ func _on_held_item_changed() -> void:
 	# single-axis alignment alone still isn't enough).
 	var grip := _held_visual.get_node_or_null("GripPoint") as Node3D
 	if grip != null:
-		_held_visual.position = -grip.position * _held_visual.scale + HELD_ITEM_LOCAL_OFFSET
+		var scaled_grip := grip.position * _held_visual.scale
+		_held_visual.position = -(_held_visual.quaternion * scaled_grip) + HELD_ITEM_LOCAL_OFFSET
 	else:
 		_held_visual.position = HELD_ITEM_LOCAL_OFFSET
 	# Inherits the whole arm's walk-swing animation (and now the hand's own
@@ -3372,6 +3880,27 @@ func _on_held_item_changed() -> void:
 ## the right-arm blorb power/ordinary arm raise. ui_cancel backs out without
 ## consuming the item.
 func _update_throw_input() -> void:
+	if _held_item_is_weapon():
+		if _throw_aim_active:
+			cancel_throw_preparation()
+		if (
+			Input.is_action_just_pressed("right_arm_power")
+			and not _weapon_swing_active
+			and not UIState.modal_open
+			and not _player_following_blorbus
+			and not _player_following_manchego
+		):
+			_weapon_swing_active = true
+			_weapon_swing_elapsed = 0.0
+			_weapon_swing_has_hit = false
+			_weapon_swing_inward = _next_weapon_swing_inward
+			_next_weapon_swing_inward = not _next_weapon_swing_inward
+			UISounds.play_foley(
+				&"weapon_swing_inward" if _weapon_swing_inward else &"weapon_swing_outward",
+				0.48,
+				get_instance_id()
+			)
+		return
 	var right_hand_pressed := Input.is_action_pressed("right_arm_power")
 	if _throw_aim_active:
 		if (
@@ -3393,6 +3922,59 @@ func _update_throw_input() -> void:
 		and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
 	):
 		_begin_throw_preparation()
+
+
+func _held_item_is_weapon() -> bool:
+	if HeldItem.current.is_empty():
+		return false
+	return bool(ShopCatalog.find(str(HeldItem.current.get("name", ""))).get("weapon", false))
+
+
+func _apply_weapon_swing_pose(delta: float) -> void:
+	if not _weapon_swing_active:
+		return
+	_weapon_swing_elapsed += delta
+	var progress := clampf(_weapon_swing_elapsed / WEAPON_SWING_DURATION, 0.0, 1.0)
+	# Alternate a cut away from the body with its mirrored return cut. Both the
+	# sword and Jingu Bang use this shared weapon path, so repeated attacks form
+	# a deliberate outward/inward rhythm rather than replaying one swipe.
+	var arc := sin(progress * PI)
+	var start_x := -0.23 if _weapon_swing_inward else -1.28
+	var end_x := -1.28 if _weapon_swing_inward else -0.23
+	var start_z := -0.83 if _weapon_swing_inward else 0.72
+	var end_z := 0.72 if _weapon_swing_inward else -0.83
+	var wrist_start := PI * 0.5 + ProceduralFigure.WRIST_INWARD_ANGLE - 1.15 if _weapon_swing_inward else PI * 0.5 + ProceduralFigure.WRIST_INWARD_ANGLE
+	var wrist_end := PI * 0.5 + ProceduralFigure.WRIST_INWARD_ANGLE if _weapon_swing_inward else PI * 0.5 + ProceduralFigure.WRIST_INWARD_ANGLE - 1.15
+	_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, lerpf(start_x, end_x, progress), minf(1.0, delta * 18.0))
+	_arm_right.rotation.z = lerp_angle(_arm_right.rotation.z, lerpf(start_z, end_z, progress), minf(1.0, delta * 18.0))
+	_elbow_right.rotation.x = lerp_angle(_elbow_right.rotation.x, -0.82 + arc * 0.34, minf(1.0, delta * 18.0))
+	_hand_right.rotation.y = lerp_angle(_hand_right.rotation.y, lerpf(wrist_start, wrist_end, progress), minf(1.0, delta * 20.0))
+	_anchor_hand_to_wrist(_hand_right)
+	if not _weapon_swing_has_hit and progress >= WEAPON_HIT_TIME:
+		_weapon_swing_has_hit = true
+		_apply_weapon_hit()
+	if progress >= 1.0:
+		_weapon_swing_active = false
+
+
+func _apply_weapon_hit() -> void:
+	var entry := ShopCatalog.find(str(HeldItem.current.get("name", "")))
+	if entry.is_empty() or not bool(entry.get("weapon", false)):
+		return
+	var reach: float = float(entry.get("weapon_reach", 1.5))
+	var damage: float = float(entry.get("weapon_damage", 12.0))
+	var forward := visuals.global_transform.basis.z.normalized()
+	for node in get_tree().get_nodes_in_group("skeletons"):
+		var nme := node as Node3D
+		if nme == null or not nme.has_method("take_damage"):
+			continue
+		var offset := nme.global_position - global_position
+		var flat := Vector3(offset.x, 0.0, offset.z)
+		if flat.length() > reach or flat.length_squared() <= 0.0001:
+			continue
+		if forward.dot(flat.normalized()) < -0.05:
+			continue
+		nme.take_damage(damage, null)
 
 
 func _begin_throw_preparation() -> void:
@@ -3458,9 +4040,23 @@ func _update_throw_camera(delta: float) -> void:
 ## equipped prop while the player adjusts their aim.
 func _apply_throw_aim_pose(delta: float) -> void:
 	if not _throw_aim_active:
+		# This layer owns only torso yaw. Ease both stages back to anatomical
+		# neutral after a release/cancel without disturbing gait's forward lean.
+		_spine.rotation.y = lerp_angle(_spine.rotation.y, 0.0, minf(1.0, THROW_POSE_SETTLE_SPEED * delta))
+		if _thorax != null:
+			_thorax.rotation.y = lerp_angle(_thorax.rotation.y, 0.0, minf(1.0, THROW_POSE_SETTLE_SPEED * delta))
 		return
 	_throw_pose_blend = minf(_throw_pose_blend + THROW_POSE_SETTLE_SPEED * delta, 1.0)
 	var weight := smoothstep(0.0, 1.0, _throw_pose_blend)
+	# Pull the throwing-side shoulder subtly behind the body. The lower share
+	# rotates the abdomen and everything above it; the second share adds a
+	# smaller ribcage turn so the wind-up bends through the torso instead of
+	# looking like one rigid swivel at the waist.
+	_spine.rotation.y = lerp_angle(0.0, THROW_ABDOMEN_WINDUP, weight)
+	if _thorax != null:
+		_thorax.rotation.y = lerp_angle(0.0, THROW_THORAX_WINDUP, weight)
+	else:
+		_spine.rotation.y = lerp_angle(0.0, THROW_ABDOMEN_WINDUP + THROW_THORAX_WINDUP, weight)
 	# These assignments deliberately start from the captured pose, not the
 	# current one: _animate_walk() may still calculate the rest of the gait,
 	# but it can no longer move this shoulder/elbow/hand chain while aiming.
@@ -3537,6 +4133,7 @@ func _throw_held_item() -> void:
 	) / travel_time
 
 	_finish_throw_preparation()
+	UISounds.play_foley(&"throw_release", 0.55, get_instance_id())
 	Inventory.remove(item["name"])
 	HeldItem.clear()
 
@@ -3559,7 +4156,7 @@ func _update_head_look(delta: float) -> void:
 	# lerp_angle'd below, not applied instantly.
 	# Air-foot hovering deliberately keeps the ordinary walking head behavior.
 	var aerial_head_tracking := _lake_diving_active or _air_flight_active or _fire_limb_flight_active
-	var surface_swimming := _lake_buoyancy_active and not _lake_diving_active and not _lake_water_walk_active
+	var surface_swimming := _lake_buoyancy_active and not _lake_diving_active and not _lake_floor_walk_active and not _lake_weighted_descent_active
 	var yaw_limit := AERIAL_HEAD_YAW_LIMIT if aerial_head_tracking else HEAD_YAW_LIMIT
 	var pitch_min := -AERIAL_HEAD_PITCH_LIMIT if aerial_head_tracking else -HEAD_PITCH_UP_LIMIT
 	var pitch_max := AERIAL_HEAD_PITCH_LIMIT if aerial_head_tracking else HEAD_PITCH_DOWN_LIMIT
@@ -3721,21 +4318,58 @@ func _roll_idle_pose() -> void:
 	_idle_knee_bend = randf_range(IDLE_KNEE_MIN, IDLE_KNEE_MAX)
 
 
+func _update_footsteps(stride_phase: float, audible: bool, running: bool) -> void:
+	# Blorbus has no feet and owns his own soft glide cue; Humongous likewise
+	# owns a scaled movement-pressure cue. Never let the hidden/following human
+	# rig leak its stride sounds into either possession mode.
+	if _player_following_blorbus or _player_following_manchego:
+		_footsteps_were_moving = false
+		return
+	if _standing_on_cloud:
+		_footsteps_were_moving = false
+		return
+	var half_cycle: int = floori(stride_phase / PI)
+	if not audible:
+		_footsteps_were_moving = false
+		_footstep_half_cycle = half_cycle
+		return
+	if not _footsteps_were_moving:
+		_footsteps_were_moving = true
+		_footstep_half_cycle = half_cycle
+		return
+	if half_cycle == _footstep_half_cycle:
+		return
+	_footstep_half_cycle = half_cycle
+	# stride_phase 0 and PI are the two planted-foot/loading moments used by
+	# the run body's own contact bob and stance-knee curves below.
+	var snow_surface: bool = (
+		terrain != null
+		and terrain.has_method("is_snow_footstep_surface")
+		and terrain.is_snow_footstep_surface(Vector2(global_position.x, global_position.z))
+	)
+	UISounds.play_footstep(posmod(half_cycle, 2) == 1, running, get_instance_id(), snow_surface)
+
+
 ## `traversal_speed_multiplier` removes the blorb-skate boost from the
 ## animation calculation. The player covers three times the ground while
 ## skating, but the established run cycle keeps its original pace.
-func _animate_walk(delta: float, grounded: bool, traversal_speed_multiplier: float = 1.0) -> void:
+func _animate_walk(
+	delta: float, grounded: bool, traversal_speed_multiplier: float = 1.0,
+	animation_speed_override: float = -1.0
+) -> void:
 	# Lake swimming is neither a jump nor standing: both surface swimming and
 	# a motionless underwater diver use the intentionally relaxed descent
 	# silhouette. It takes precedence over the transient landing pose so
 	# entering water never reads as a land impact.
-	if _lake_buoyancy_active:
+	if _lake_buoyancy_active and not _lake_floor_walk_active and not _lake_weighted_descent_active:
+		_footsteps_were_moving = false
 		_animate_swimming(delta)
 		return
-	if _air_flight_active or _fire_limb_flight_active or _water_leg_hover_active or _fire_hand_hover_active:
+	if _air_flight_active or _fire_limb_flight_active or _water_leg_hover_active or _fire_hand_hover_active or _fire_leg_hover_active:
+		_footsteps_were_moving = false
 		# Flight shares the relaxed floating silhouette but intentionally does
-		# not inherit water's flipper-kick layer. Water jets and hand-fire hover
-		# also stay out of the walk cycle; their thrust carries the body.
+		# not inherit water's flipper-kick layer. Water jets and either paired
+		# Fire-jet hover also stay out of the walk cycle; thrust carries the body.
 		_animate_relaxed_floating(delta)
 		return
 	# Paired Air feet are deliberately different: they suspend the collision
@@ -3748,11 +4382,13 @@ func _animate_walk(delta: float, grounded: bool, traversal_speed_multiplier: flo
 	# this reads as an impact reaction, not a delay before movement
 	# responds).
 	if _landing_timer > 0.0:
+		_footsteps_were_moving = false
 		_landing_timer -= delta
 		_animate_landing(delta)
 		return
 
 	if not grounded:
+		_footsteps_were_moving = false
 		_animate_airborne(delta)
 		return
 	# Landing spreads the shoulders briefly to brace the impact. Every
@@ -3764,7 +4400,11 @@ func _animate_walk(delta: float, grounded: bool, traversal_speed_multiplier: flo
 	_arm_left.rotation.z = lerp_angle(_arm_left.rotation.z, left_arm_rest, arm_rest_t)
 	_arm_right.rotation.z = lerp_angle(_arm_right.rotation.z, right_arm_rest, arm_rest_t)
 
-	var horizontal_speed := Vector2(velocity.x, velocity.z).length() / traversal_speed_multiplier
+	var horizontal_speed := (
+		animation_speed_override
+		if animation_speed_override >= 0.0
+		else Vector2(velocity.x, velocity.z).length() / traversal_speed_multiplier
+	)
 	if horizontal_speed > 0.1:
 		# The cycle's phase keeps advancing normally, but its targets ease in
 		# from the impact pose over a short recovery instead of appearing as a
@@ -3796,6 +4436,11 @@ func _animate_walk(delta: float, grounded: bool, traversal_speed_multiplier: flo
 		var stride_phase := _walk_phase
 		if sprinting:
 			stride_phase += SPRINT_STRIDE_EASE * sin(2.0 * _walk_phase)
+		_update_footsteps(
+			stride_phase,
+			not _air_foot_hover_active and traversal_speed_multiplier <= 1.001,
+			sprinting
+		)
 		var swing := sin(stride_phase) * swing_amount
 		_leg_left.rotation.x = lerp_angle(_leg_left.rotation.x, swing, cycle_t)
 		_leg_right.rotation.x = lerp_angle(_leg_right.rotation.x, -swing, cycle_t)
@@ -3994,6 +4639,7 @@ func _animate_walk(delta: float, grounded: bool, traversal_speed_multiplier: flo
 		_hips.position.y = _hips_rest_y if _piloting_xiao_hou_zi else _hips_rest_y + body_offset
 		_was_moving = true
 	else:
+		_footsteps_were_moving = false
 		_walk_cycle_recovery = 1.0
 		# Re-rolls a fresh idle pose exactly once per moving-to-idle
 		# transition (not every idle frame, which would jitter, and not
@@ -4176,7 +4822,7 @@ func _update_aerial_body_anchor(delta: float) -> void:
 				visuals.global_transform = body_transform
 		visuals.position = visuals.position.lerp(Vector3(0.0, -FOOT_OFFSET, 0.0), minf(AERIAL_BODY_LEAN_SPEED * delta, 1.0))
 		_aerial_rest_heading_initialized = false
-	elif _lake_buoyancy_active or _air_flight_active or _fire_limb_flight_active:
+	elif (_lake_buoyancy_active and not _lake_floor_walk_active and not _lake_weighted_descent_active) or _air_flight_active or _fire_limb_flight_active:
 		var skull_anchor := _head.global_position
 		if _aerial_motion_direction.length_squared() > 0.001:
 			_aerial_was_moving = true
@@ -4307,13 +4953,42 @@ const MAX_TERRAIN_FOLLOW_HEIGHT := 3.0
 func _update_lake_buoyancy(delta: float) -> void:
 	_lake_buoyancy_active = false
 	_lake_diving_active = false
-	_lake_water_walk_active = false
+	_lake_floor_walk_active = false
+	_lake_weighted_descent_active = false
+	_lava_swimming_active = false
+	_lava_surface_walk_active = false
 	if _giant_goo_active or terrain == null:
 		return
 	var water_pos := Vector2(global_position.x, global_position.z)
-	if not terrain.is_lake_area(water_pos):
+	var in_lava_area: bool = (
+		terrain.has_method("is_lava_area")
+		and terrain.has_method("get_lava_surface_height")
+		and terrain.is_lava_area(water_pos)
+	)
+	var in_lava_volume: bool = in_lava_area and _blorb_suit.has_full_lava_suit()
+	var in_water_volume: bool = terrain.has_method("is_lake_area") and terrain.is_lake_area(water_pos)
+	if not in_water_volume and not in_lava_area:
 		return
-	var water_level: float = terrain.get_lake_water_level()
+	var water_level: float = terrain.get_lava_surface_height(water_pos) if in_lava_area else terrain.get_lake_water_level()
+	_active_swim_surface_height = water_level
+	_lava_swimming_active = in_lava_volume
+	# Two landed fire leg blorbs protect an ordinary suit by supporting it on
+	# the molten surface. Only the complete Lava Helm formation replaces this
+	# support with immersion/swimming. Preserve a real jump above the surface,
+	# then catch descending feet exactly at the liquid plane.
+	if in_lava_area and not in_lava_volume and _blorb_suit.has_lava_safe_legs():
+		var feet_y:float=global_position.y-FOOT_OFFSET
+		if _jumping and (velocity.y>0.0 or feet_y>water_level):
+			return
+		# Do not pull a falling player down from above. The ordinary gravity arc
+		# continues until the feet actually reach the molten surface band.
+		if feet_y>water_level+LAVA_CONTACT_TOLERANCE:
+			return
+		_lava_surface_walk_active=true
+		global_position.y=water_level+FOOT_OFFSET
+		velocity.y=0.0
+		_jumping=false
+		return
 	var floor_height: float = terrain.get_mesh_height(water_pos.x, water_pos.y)
 	# The shallow feathered shoreline stays walkable. Buoyancy begins only
 	# once the basin has enough real depth to immerse the character.
@@ -4324,20 +4999,21 @@ func _update_lake_buoyancy(delta: float) -> void:
 	# rather than pulling the player back down to the swim depth every frame.
 	if _is_on_climbable_ramp():
 		return
-	# A pair of water blorbs worn on the legs makes the lake surface a
-	# temporary floor. It intentionally wins over a diving helmet: taking
-	# those two leg pieces off is the deliberate way to dive again. Jumps
-	# are allowed to break the surface and are caught on descent exactly as
-	# ordinary terrain jumps are.
-	if _blorb_suit.has_water_walking_legs():
-		if _jumping and (velocity.y > 0.0 or global_position.y - FOOT_OFFSET > water_level):
-			return
-		if global_position.y - FOOT_OFFSET > water_level:
-			return
+	# A sealed diving head plus two Rock legs converts the seabed into an
+	# ordinary walkable floor. Becoming heavy starts a physical descent; only
+	# real contact with the seabed changes into the planar walking state.
+	if not in_lava_volume and _blorb_suit.has_head_diving_helmet() and _blorb_suit.has_rock_walking_legs():
 		_jumping = false
-		_lake_water_walk_active = true
-		global_position.y = water_level + FOOT_OFFSET
-		velocity.y = 0.0
+		_lake_buoyancy_active = true
+		var floor_target: float = floor_height + FOOT_OFFSET
+		var reached_floor := is_on_floor() or global_position.y <= floor_target + LAKE_FLOOR_LANDING_TOLERANCE
+		if reached_floor:
+			_lake_floor_walk_active = true
+			global_position.y = maxf(global_position.y, floor_target)
+			velocity.y = 0.0
+		else:
+			_lake_weighted_descent_active = true
+			velocity.y = move_toward(velocity.y, -LAKE_WEIGHTED_SINK_SPEED, LAKE_WEIGHTED_SINK_ACCELERATION * delta)
 		return
 	# A landed head blorb is a sealed, inflated diving helmet. It replaces
 	# the ordinary chest-deep buoyancy cap with free three-dimensional swim
@@ -4347,18 +5023,19 @@ func _update_lake_buoyancy(delta: float) -> void:
 	# per direct correction. Once its climb carries the player back above
 	# the surface, this returns early and hands off to the ordinary flight
 	# controller, which can then continue straight up out of the water.
-	if _blorb_suit.has_head_diving_helmet() or _blorb_suit.has_chest_air_blorb():
+	if _blorb_suit.has_head_diving_helmet() or in_lava_volume:
 		if global_position.y > water_level:
+			return
+		# Once a surface jump has launched, do not let the diving clamp erase
+		# its upward velocity on the following frame. The ordinary airborne
+		# path takes over until descending feet meet the water again.
+		if _jumping and velocity.y > 0.0:
 			return
 		_jumping = false
 		_lake_buoyancy_active = true
 		_lake_diving_active = true
 		var dive_floor := floor_height + LAKE_DIVE_FLOOR_CLEARANCE
-		var dive_surface := (
-			water_level + FOOT_OFFSET
-			if _blorb_suit.has_chest_air_blorb() and velocity.y > 0.0
-			else water_level - LAKE_SWIM_FOOT_DEPTH
-		)
+		var dive_surface := water_level - LAKE_SWIM_FOOT_DEPTH
 		global_position.y = clampf(global_position.y, dive_floor, dive_surface)
 		return
 	var swim_y := water_level - LAKE_SWIM_FOOT_DEPTH
@@ -4377,16 +5054,11 @@ func _update_lake_buoyancy(delta: float) -> void:
 	velocity.y = 0.0
 
 
-## A chest-mounted air blorb is the first flight prototype. Equipping it
-## lifts the player half a metre into a neutral hover; after that, the same
-## camera-relative 3D movement path as diving supplies free flight. Runs
-## after _update_lake_buoyancy() each frame, so _lake_diving_active already
-## reflects whether the player is currently submerged wearing this same
-## piece -- the initial hover lift is skipped in that case so equipping the
-## chest blorb underwater doesn't yank the player straight up out of the
-## lake; swimming still wins until they actually surface on their own.
+## A chest-mounted air blorb supplies free flight in air, but never turns
+## into underwater propulsion. Ordinary buoyancy keeps its wearer swimming
+## at the surface until a real Diving Helmet is present.
 func _update_air_flight() -> void:
-	_air_flight_active = _blorb_suit.has_chest_air_blorb() and not _lake_diving_active
+	_air_flight_active = _blorb_suit.has_chest_air_blorb() and not _lake_buoyancy_active
 	if _air_flight_active:
 		_jumping = false
 		if not _was_air_flight_active and not _lake_diving_active:

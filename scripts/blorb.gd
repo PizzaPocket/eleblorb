@@ -99,6 +99,11 @@ const COLLIDER_RADIUS := RADIUS * 0.9
 ## Root-to-crown height shared by the visible body and its collision sphere.
 ## Keeping these identical lets feet visibly meet the goo before a bounce.
 const BOUNCE_CROWN_HEIGHT := BODY_HEIGHT - EMBED_DEPTH
+## Notify a called platform's rider before the two collision volumes overlap.
+## The blorb collider is ~0.80m wide and the player capsule is 0.40m wide;
+## the old 0.50m arrival test therefore let the blorb physically shove a
+## planted player before receive_platform_aid_bounce() could start their hop.
+const PLATFORM_AID_APPROACH_DISTANCE := COLLIDER_RADIUS + 0.4 + 0.12
 
 # Radius-vs-height profile for the body's lathe (surface of revolution) --
 # t=0 is the bottom pole, t=1 the top pole, widest ring at BULGE_T (0.30,
@@ -111,7 +116,8 @@ const BOUNCE_CROWN_HEIGHT := BODY_HEIGHT - EMBED_DEPTH
 const BULGE_T := 0.30
 
 const CORE_RADIUS := 0.07  # apple-sized, matches gem.gd's own default scale
-const HEAD_MOD_ITEMS := ["Diving Helmet", "Knight's Helm"]
+const HEAD_MOD_ITEMS := ["Diving Helmet", "Knight's Helm", "Lava Helm", "Nautilus Crown"]
+const ARMOR_MOD_ITEMS := ["Dented Breastplate"]
 ## The "shiny blorb" cosmetic override applied in _build_visuals() -- a
 ## bright pearlescent cream, distinctly shinier than the plain off-white
 ## body_color default, but deliberately not tinted toward any element's own
@@ -126,12 +132,33 @@ func has_core_item(item_name: String) -> bool:
 func add_core_item(item_name: String) -> bool:
 	if item_name == "" or core_items.has(item_name):
 		return false
+	var exclusive_group: Array = []
 	if item_name in HEAD_MOD_ITEMS:
+		exclusive_group = HEAD_MOD_ITEMS
+	elif item_name in ARMOR_MOD_ITEMS:
+		exclusive_group = ARMOR_MOD_ITEMS
+	if not exclusive_group.is_empty():
 		for existing in core_items:
-			if existing in HEAD_MOD_ITEMS:
+			if existing in exclusive_group:
 				return false
 	core_items.append(item_name)
+	progression_changed.emit()
 	return true
+
+
+## Equipment bonuses are derived from the catalog rather than copied into
+## progression state. That keeps one source of truth for balance and means an
+## absorbed armor piece immediately protects both this creature and a wearer.
+func armor_defense_bonus() -> int:
+	var bonus := 0
+	for item_name in core_items:
+		var entry := ShopCatalog.find(item_name)
+		bonus += int(entry.get("armor_defense", 0))
+	return bonus
+
+
+func effective_defense() -> int:
+	return defense + armor_defense_bonus()
 
 const IDLE_GLIDE_SPEED := 1.4
 const ARRIVE_EPS := 0.05
@@ -166,6 +193,7 @@ const DISCOVERY_RADIUS := 9.0
 ## catching back up just pauses the accrual rather than resetting it, so an
 ## awkward bit of terrain doesn't undo real progress.
 const JOIN_BOND_DURATION := 25.0
+const BOUNCE_BOND_BONUS := 4.0
 ## How long a declined (or just-released) wild blorb ignores the player's
 ## proximity before DISCOVERY_RADIUS can notice it again -- see
 ## _decline_join_request()/release_to_wild(). Without this, a blorb that's
@@ -370,6 +398,13 @@ var _join_prompt_open: bool = false
 ## Counts down after a decline/release before DISCOVERY_RADIUS can notice
 ## this blorb again -- see JOIN_DECLINE_COOLDOWN's own doc comment.
 var _join_decline_cooldown: float = 0.0
+var _platform_aid_target: Node3D = null
+var _platform_aid_time: float = 0.0
+var _platform_aid_saved_collision_layer: int = 0
+## Exact world-space support selected beneath the caller when D-pad down was
+## pressed. Non-air helpers must arrive on this surface, rather than sampling
+## the unrelated terrain far below an elevated platform.
+var _platform_aid_support_y: float = NAN
 
 ## "" (normal) / "water" / "fire" -- current merge state. "" means this
 ## blorb hasn't been given a gem yet and can still accept any element (see
@@ -383,6 +418,8 @@ var _eye_blink := EyeBlink.new_state()
 ## randomized wing-beat timing.
 var _air_wing_flap_phase := 0.0
 var _air_wing_flap_speed := 1.0
+var _water_swim_phase := 0.0
+var _water_swim_rate := 1.0
 
 ## Optional player-given name. A blank value is displayed as the Blorb's
 ## elemental identity ("water blorb", "normal blorb", etc.); Blorbus's true
@@ -463,6 +500,8 @@ var is_player_controlled: bool = false
 func _ready() -> void:
 	_rng.randomize()
 	_air_wing_flap_speed = _rng.randf_range(1.2, 2.0)
+	_water_swim_phase = _rng.randf_range(0.0, TAU)
+	_water_swim_rate = _rng.randf_range(0.55, 0.9)
 	# Do this before the procedural children are built: their mesh and
 	# collision dimensions inherit this root scale together.
 	scale = Vector3(size_multiplier, size_multiplier * vertical_scale, size_multiplier)
@@ -503,6 +542,8 @@ func _ready() -> void:
 	# that function's own doc comment.
 	global_position.y = _ground_height_at(global_position.x, global_position.z) + _ground_embed_offset()
 	_idle_pause_timer = _rng.randf_range(IDLE_PAUSE_MIN, IDLE_PAUSE_MAX)
+	if blorb_name == "Blorbaka":
+		Interactable.attach(self, "Talk to Blorbaka", TALK_RADIUS, _on_blorbaka_talk)
 
 
 func _build_visuals() -> void:
@@ -513,6 +554,17 @@ func _build_visuals() -> void:
 	# measures every MeshInstance3D descendant regardless of .visible.
 	if is_shiny:
 		body_color = SHINY_BODY_COLOR
+	# Material state exists even for a melted/core-only portrait. Element
+	# application and suit/portrait snapshots both read it after this function,
+	# independently of whether a body mesh is intentionally rendered.
+	if is_shiny:
+		_body_material = BlorbBodyShape.build_body_material(
+			body_color, 0.03, 0.3, true, Color(1.0, 0.95, 0.8), 0.3
+		)
+	else:
+		_body_material = BlorbBodyShape.build_body_material(
+			body_color, 0.15, 0.05, false, Color.BLACK, 0.0
+		)
 	if not is_melted:
 		var body_mesh := MeshInstance3D.new()
 		# Built through the same shared function blorb_suit.gd's worn pieces
@@ -533,12 +585,6 @@ func _build_visuals() -> void:
 		# Shiny gets a noticeably glossier finish (lower roughness, higher
 		# metallic) plus a faint warm glow on top of its brighter body_color,
 		# so the rarity reads even at a glance and not just up close.
-		if is_shiny:
-			_body_material = BlorbBodyShape.build_body_material(
-				body_color, 0.03, 0.3, true, Color(1.0, 0.95, 0.8), 0.3
-			)
-		else:
-			_body_material = BlorbBodyShape.build_body_material(body_color, 0.15, 0.05, false, Color.BLACK, 0.0)
 		body_mesh.mesh = _build_body_mesh()
 		body_mesh.set_surface_override_material(0, _body_material)
 		body_mesh.position.y = -EMBED_DEPTH
@@ -693,7 +739,7 @@ func _decline_join_request() -> void:
 ## before offering this, but it's guarded here too since silently doing
 ## nothing is safer than an accidental permanent Blorbus release.
 func release_to_wild() -> void:
-	if is_blorbus or not in_party:
+	if is_story_companion() or not in_party:
 		return
 	in_party = false
 	_discovered = false
@@ -707,6 +753,59 @@ func release_to_wild() -> void:
 		_state = State.IDLE
 		_home = Vector2(global_position.x, global_position.z)
 		_has_wander_target = false
+
+
+func is_story_companion() -> bool:
+	return is_blorbus or blorb_name == "Blorbaka"
+
+
+func call_as_platform_aid(target: Node3D, support_y: float = NAN) -> void:
+	if not in_party or is_worn or is_melted:
+		return
+	if element_state != "air" and is_nan(support_y):
+		return
+	# Platform aid owns locomotion until arrival. Do not freeze and carry a
+	# half-completed ambient/climb hop (or its stretched body scale) through
+	# the early-returning aid branch below.
+	_hop_active = false
+	_hop_is_attack = false
+	_climbing = false
+	_fall_velocity = 0.0
+	body.scale = Vector3.ONE
+	# The approach is resolved geometrically, not as a physical shove. Save
+	# and temporarily disable this StaticBody's collision so entering the
+	# player's footprint cannot zero their launch velocity or wedge both
+	# actors into a permanently airborne animation state.
+	if _platform_aid_time <= 0.0:
+		_platform_aid_saved_collision_layer = collision_layer
+	collision_layer = 0
+	_platform_aid_target = target
+	_platform_aid_support_y = support_y
+	_platform_aid_time = 12.0
+	_state = State.FOLLOWING
+
+
+func finish_platform_aid() -> void:
+	_platform_aid_time = 0.0
+	_platform_aid_target = null
+	_platform_aid_support_y = NAN
+	if _platform_aid_saved_collision_layer != 0:
+		collision_layer = _platform_aid_saved_collision_layer
+		_platform_aid_saved_collision_layer = 0
+
+
+func receive_platform_aid_bounce(platform: Blorb) -> void:
+	if not is_player_controlled or platform == null:
+		return
+	var surface: Variant = platform.bounce_surface_height_at(global_position.x, global_position.z)
+	if surface == null:
+		return
+	global_position.y = surface as float
+	_control_jump_active = true
+	_control_jump_elapsed = 0.0
+	_control_jump_base_offset = (surface as float) - _ground_height_at(global_position.x, global_position.z) - _ground_embed_offset()
+	platform.trigger_bounce_squash()
+	platform.finish_platform_aid()
 
 
 ## Continuous elemental powers consume MP. Attempting to use an empty pool
@@ -801,14 +900,10 @@ func restore_progression(snapshot: Dictionary) -> void:
 	progression_changed.emit()
 
 
-func speed_factor() -> float:
-	# Ten is neutral. Starting rolls remain modest personal traits, while
-	# levels steadily improve traversal and attack cadence.
-	return maxf(0.5, 1.0 + (float(speed) - 10.0) * 0.025)
-
-
 func motion_speed_scale() -> float:
-	return movement_speed_multiplier * speed_factor()
+	# Stat Speed is intentionally absent here: it affects only the player's
+	# worn skating, swimming, and flight configurations.
+	return movement_speed_multiplier
 
 
 ## Used by skeleton NMEs' punches (this blorb's own Defense mitigates the
@@ -817,7 +912,8 @@ func motion_speed_scale() -> float:
 func take_damage(amount: float) -> void:
 	if amount <= 0.0 or is_melted:
 		return
-	current_hp = maxf(current_hp - CombatMath.mitigated_damage(amount, defense), 0.0)
+	current_hp = maxf(current_hp - CombatMath.mitigated_damage(amount, effective_defense()), 0.0)
+	UISounds.play_foley(&"blorb_hurt", clampf(amount / 20.0, 0.3, 0.85), get_instance_id())
 	_hp_regen_delay = HP_REGEN_DELAY
 	if current_hp <= 0.0:
 		melt()
@@ -856,7 +952,9 @@ func _update_resources(delta: float) -> void:
 func melt() -> void:
 	if is_melted:
 		return
+	finish_platform_aid()
 	is_melted = true
+	UISounds.play_foley(&"blorb_melt", 0.72, get_instance_id())
 	# Melting is a combat reset, not merely a temporary visual state. Remove
 	# every hit this Blorb registered against every live NME so reforming
 	# before one of those enemies dies cannot restore stale XP eligibility.
@@ -866,9 +964,7 @@ func melt() -> void:
 	body.visible = false
 	if _collision_shape != null:
 		_collision_shape.disabled = true
-	_combat_target = null
-	_state = State.IDLE
-	_set_combat_stream_active(false)
+	_cancel_autonomous_combat()
 
 
 func _reform() -> void:
@@ -1137,7 +1233,16 @@ func become_blorbus() -> void:
 	blorb_name = "Blorbus"
 	_apply_blorbus_visuals()
 	WorldState.blorbus_unlocked = true
-	Interactable.attach(self, "Talk", TALK_RADIUS, _on_talk)
+	Interactable.attach(self, "Talk to Blorbus", TALK_RADIUS, _on_talk)
+
+
+func _on_blorbaka_talk() -> void:
+	var lines: Array[String] = [
+		"He called himself a hero. I believed him longer than I should have.",
+		"The false hero promised we were protecting the village. We were serving the Demon Lord instead.",
+		"I cannot undo that mistake, but I can choose who I stand beside now.",
+	]
+	DialogUI.show_line("Blorbaka", lines[_rng.randi_range(0, lines.size() - 1)])
 
 
 func _apply_blorbus_visuals() -> void:
@@ -1197,6 +1302,9 @@ func _add_core_light(color: Color) -> void:
 func trigger_bounce_squash() -> void:
 	if not _hop_active:
 		body.scale = Vector3(1.0 + BOUNCE_SQUASH_AMOUNT, 1.0 - BOUNCE_SQUASH_AMOUNT, 1.0 + BOUNCE_SQUASH_AMOUNT)
+	if can_join_party and not in_party and not is_melted:
+		_discovered = true
+		_bond_time = minf(_bond_time + BOUNCE_BOND_BONUS, JOIN_BOND_DURATION)
 
 
 ## Purely cosmetic uniform scale override for the blorb suit's own hop
@@ -1220,6 +1328,7 @@ func set_visual_scale(scale_factor: float) -> void:
 ## below) all the way through the flight, only swapping for the flat suit
 ## piece once it actually lands -- see finish_worn().
 func begin_worn() -> void:
+	finish_platform_aid()
 	is_worn = true
 	collision_layer = 0
 	# A blorb hopping onto the suit mid-attack shouldn't keep visibly
@@ -1228,10 +1337,34 @@ func begin_worn() -> void:
 	# direct report: this used to keep emitting on its own indefinitely,
 	# since _process()'s own "if is_worn: return" guard right below skips
 	# the ordinary combat-state code that would otherwise have stopped it,
-	# and nothing else ever freed the particle node itself.
+	# and nothing else ever freed the active effect node itself. Route every
+	# element through one cleanup path: water/fire use particles,
+	# electric/city use a LightningBolt, and plant/melee may have queued or
+	# deferred attack state even though they have no persistent beam.
+	_cancel_autonomous_combat()
+	UISounds.play_foley(&"equip_launch", 0.48, get_instance_id())
+
+
+## Ends every part of free-roaming combat before a lifecycle change such as
+## melting or entering the suit. Do not branch on the current element: the
+## two visual node types are cached independently, and is_worn's early return
+## prevents either one from cleaning itself up on a later frame.
+## Already-launched plant pellets remain ordinary world projectiles; only a
+## queued plant shot/deferred melee impact is cancelled here.
+func _cancel_autonomous_combat() -> void:
+	_combat_target = null
+	_state = State.IDLE
+	_attack_cooldown = 0.0
+	_hop_is_attack = false
+	_attack_damage_applied = true
 	if _stream_particles != null:
+		_stream_particles.emitting = false
 		_stream_particles.queue_free()
 		_stream_particles = null
+	if _lightning_bolt != null:
+		_lightning_bolt.emitting = false
+		_lightning_bolt.queue_free()
+		_lightning_bolt = null
 
 
 ## Called once an equip hop's landing animation completes -- hides the
@@ -1240,6 +1373,7 @@ func begin_worn() -> void:
 ## the whole flight.
 func finish_worn() -> void:
 	body.visible = false
+	UISounds.play_foley(&"equip_settle", 0.5, get_instance_id())
 
 
 ## The reverse of finish_worn() -- called the instant an unequip hop
@@ -1249,6 +1383,7 @@ func finish_worn() -> void:
 ## actually lands -- see finish_unworn().
 func begin_unworn() -> void:
 	body.visible = true
+	UISounds.play_foley(&"equip_release", 0.42, get_instance_id())
 
 
 ## Returns the first solid world surface directly below a requested suit
@@ -1305,6 +1440,7 @@ func body_visual_snapshot() -> Dictionary:
 	if has_light:
 		light_color = (_core_mesh_instance.get_node("Light") as OmniLight3D).light_color
 	return {
+		"element": element_state,
 		"albedo": _body_material.albedo_color,
 		"roughness": _body_material.roughness,
 		"metallic": _body_material.metallic,
@@ -1328,9 +1464,57 @@ func _process(delta: float) -> void:
 	if portrait_mode:
 		return
 	_update_resources(delta)
+	if _platform_aid_time > 0.0 and not is_instance_valid(_platform_aid_target):
+		finish_platform_aid()
 	if is_worn:
 		return
 	if is_melted:
+		return
+	if _platform_aid_time > 0.0 and is_instance_valid(_platform_aid_target):
+		_platform_aid_time -= delta
+		if _platform_aid_time <= 0.0:
+			finish_platform_aid()
+			return
+		var target_position: Vector3 = _platform_aid_target.global_position
+		var top_offset: float = (BODY_HEIGHT - EMBED_DEPTH) * size_multiplier * vertical_scale
+		if element_state == "air":
+			# Air blorbs alone may intercept in full 3D, placing their visible
+			# crown immediately beneath the target's feet.
+			var air_destination := target_position - Vector3.UP * top_offset
+			global_position = global_position.move_toward(air_destination, 28.0 * delta)
+		else:
+			# Every other type skims the real support continuously. Moving XZ and
+			# resolving Y from the surface each frame prevents the old diagonal
+			# homing path from cutting through terrain or rising into open air.
+			var here := Vector2(global_position.x, global_position.z)
+			var destination_xz := Vector2(target_position.x, target_position.z)
+			var next_xz := here + (destination_xz - here).limit_length(28.0 * delta)
+			next_xz = _constrain_lava_destination(here, next_xz)
+			# During a platform call, the selected support top is authoritative.
+			# Treating the platform's vertical side as an ordinary blocking wall
+			# strands the helper below it forever; its raised support probe below
+			# acquires the crown as soon as the blorb crosses the actual footprint.
+			if is_nan(_platform_aid_support_y) or _platform_aid_support_y <= global_position.y + 0.45:
+				next_xz = _constrain_solid_destination(here, next_xz)
+			global_position.x = next_xz.x
+			global_position.z = next_xz.y
+			var horizontal_gap_before_landing := Vector2(global_position.x - target_position.x, global_position.z - target_position.z).length()
+			if horizontal_gap_before_landing < PLATFORM_AID_APPROACH_DISTANCE * 1.5:
+				# At the destination edge, climb/snap onto the exact physical top
+				# selected by the caller. Until then the blorb continues skimming its
+				# current real support and never flies diagonally through open space.
+				global_position.y = move_toward(global_position.y, _platform_aid_support_y + _ground_embed_offset(), 28.0 * delta)
+			else:
+				global_position.y = _ground_height_at(next_xz.x, next_xz.y) + _ground_embed_offset()
+		var horizontal_gap := Vector2(global_position.x - target_position.x, global_position.z - target_position.z).length()
+		# A non-air blorb stops against the player's collision before its centre
+		# can exactly coincide with theirs. Arrival is therefore horizontal and
+		# intentionally a little wider than the old 18cm test. The receiver
+		# decides whether this is a planted automatic launch or an airborne
+		# interception; successful bounce paths finish the aid themselves.
+		var arrived_on_support := element_state == "air" or absf(global_position.y - (_platform_aid_support_y + _ground_embed_offset())) < 0.08
+		if horizontal_gap < PLATFORM_AID_APPROACH_DISTANCE and arrived_on_support and _platform_aid_target.has_method("receive_platform_aid_bounce"):
+			_platform_aid_target.receive_platform_aid_bounce(self)
 		return
 	EyeBlink.apply(_eye_blink, delta, _eyes)
 	_update_air_wing_flap(delta)
@@ -1435,7 +1619,7 @@ func _process(delta: float) -> void:
 		match element_state:
 			"water", "fire", "electric", "city":
 				engage_range = STREAM_RANGE
-			"rock":
+			"rock", "ice":
 				engage_range = ROCK_ATTACK_RANGE
 			"plant":
 				engage_range = PLANT_ATTACK_RANGE
@@ -1464,7 +1648,7 @@ func _process(delta: float) -> void:
 				_update_elemental_stream(delta)
 			else:
 				match element_state:
-					"rock":
+					"rock", "ice":
 						_try_rock_attack()
 					"plant":
 						_try_plant_attack()
@@ -1516,6 +1700,7 @@ func _process(delta: float) -> void:
 	new_pos = _apply_player_push(new_pos, delta)
 	var unconstrained_pos := new_pos
 	new_pos = _constrain_lava_destination(here, new_pos)
+	new_pos = _constrain_solid_destination(here, new_pos)
 	if not new_pos.is_equal_approx(unconstrained_pos) and _state == State.IDLE:
 		# Do not let an idle wander target across molten ground pin a wild blorb
 		# against the edge forever. Following/combat targets remain live so they
@@ -1534,7 +1719,13 @@ func _process(delta: float) -> void:
 		# A released blorb lands on the first real surface below it, including
 		# raised props/platforms that ordinary terrain-following ignores.
 		ground_h = resolve_dismount_landing_position(global_position).y
-	# Air blorbs never settle to a ground/cloud surface. They retain a soft
+	var in_deep_water := false
+	var water_level := 0.0
+	if blorb_type != "size" and terrain.is_lake_area(Vector2(global_position.x, global_position.z)):
+		water_level = terrain.get_lake_water_level()
+		in_deep_water = water_level - ground_h >= LAKE_FLOAT_MIN_DEPTH
+	# Air blorbs never gain underwater flight. In deep water they remain at
+	# the surface; only Water blorbs can deliberately traverse its volume.
 	# hover even while idle, and a party member lifts toward its airborne
 	# player so it remains an actual aerial companion rather than trailing
 	# far below during flight.
@@ -1542,12 +1733,35 @@ func _process(delta: float) -> void:
 		_hop_active = false
 		_climbing = false
 		body.scale = body.scale.lerp(Vector3.ONE, SETTLE_SPEED * motion_speed_scale() * delta)
-		var hover_y := ground_h + _ground_embed_offset() + AIR_HOVER_HEIGHT
-		if in_party or _discovered:
+		var visible_height := BODY_HEIGHT * size_multiplier * vertical_scale
+		var hover_y := (
+			water_level - visible_height * LAKE_FLOAT_SUBMERGENCE_FRACTION
+			if in_deep_water
+			else ground_h + _ground_embed_offset() + AIR_HOVER_HEIGHT
+		)
+		if (in_party or _discovered) and not in_deep_water:
 			# Chase until the visible crown reaches the player's feet, never by
 			# driving the collider deep through them. Player then owns the bounce.
 			hover_y = maxf(hover_y, _player.global_position.y - BOUNCE_CROWN_HEIGHT)
 		global_position.y = move_toward(global_position.y, hover_y, AIR_HOVER_SETTLE_SPEED * delta)
+		_update_surface_tilt(delta, Vector3.UP)
+		return
+	# Water blorbs are true three-dimensional swimmers. Party members follow
+	# their player through the water column; wild Water blorbs independently
+	# drift in depth rather than being pinned to either surface or seabed.
+	if element_state == "water" and in_deep_water:
+		_hop_active = false
+		_climbing = false
+		body.scale = body.scale.lerp(Vector3.ONE, SETTLE_SPEED * motion_speed_scale() * delta)
+		var visible_height := BODY_HEIGHT * size_multiplier * vertical_scale
+		var swim_floor := ground_h + visible_height * 0.65
+		var swim_ceiling := water_level - visible_height * 0.42
+		var desired_y := lerpf(swim_floor, swim_ceiling, 0.58 + sin(Time.get_ticks_msec() * 0.001 * _water_swim_rate + _water_swim_phase) * 0.22)
+		if in_party or _discovered:
+			desired_y = clampf(_player.global_position.y - visible_height * 0.25, swim_floor, swim_ceiling)
+		global_position.y = move_toward(global_position.y, desired_y, LAKE_FLOAT_SETTLE_SPEED * delta)
+		_falling_after_dismount = false
+		_fall_velocity = 0.0
 		_update_surface_tilt(delta, Vector3.UP)
 		return
 	# A normal free blorb is buoyant: once the basin is genuinely deep it
@@ -1557,7 +1771,7 @@ func _process(delta: float) -> void:
 	# members naturally gather and drift around a swimming player.
 	var lake_float := false
 	if blorb_type != "size" and terrain.is_lake_area(Vector2(global_position.x, global_position.z)):
-		var water_level: float = terrain.get_lake_water_level()
+		water_level = terrain.get_lake_water_level()
 		lake_float = water_level - ground_h >= LAKE_FLOAT_MIN_DEPTH
 		if lake_float:
 			_hop_active = false
@@ -1760,7 +1974,10 @@ func _ground_height_at(x: float, z: float) -> float:
 			var giant_top: Variant = giant.giant_surface_height_at(x, z)
 			if giant_top != null:
 				return maxf(terrain_h, giant_top as float)
-	var from := Vector3(x, global_position.y + SUPPORT_ACQUIRE_HEIGHT, z)
+	var support_probe_y := global_position.y + SUPPORT_ACQUIRE_HEIGHT
+	if _platform_aid_time > 0.0 and not is_nan(_platform_aid_support_y):
+		support_probe_y = maxf(support_probe_y, _platform_aid_support_y + SUPPORT_ACQUIRE_HEIGHT)
+	var from := Vector3(x, support_probe_y, z)
 	var to := Vector3(x, terrain_h - 5.0, z)
 	var query := PhysicsRayQueryParameters3D.create(from, to, 1 | TownProps.BLORB_CLIMBABLE_LAYER)
 	query.exclude = _blorb_support_exclusions()
@@ -1816,6 +2033,34 @@ func _blorb_support_exclusions() -> Array[RID]:
 		if candidate is CollisionObject3D:
 			exclusions.append((candidate as CollisionObject3D).get_rid())
 	return exclusions
+
+
+## Blorbs are StaticBody3D nodes moved directly by their behavior code, so
+## collision layers alone cannot stop their own travel. Sweep their visible
+## middle from the current XZ to the proposed XZ and stop at solid world
+## geometry. This is especially important for the articulated Kraken: party
+## members cannot ghost through it, while the separate downward support ray
+## still lets them settle on its exact convex SuperEgg surfaces.
+func _constrain_solid_destination(current: Vector2, proposed: Vector2) -> Vector2:
+	var travel := proposed - current
+	if travel.length_squared() <= 0.000001:
+		return proposed
+	var probe_height := global_position.y + BODY_HEIGHT * size_multiplier * vertical_scale * 0.45
+	var from := Vector3(current.x, probe_height, current.y)
+	var to := Vector3(proposed.x, probe_height, proposed.y)
+	var query := PhysicsRayQueryParameters3D.create(from, to, 1 | TownProps.BLORB_CLIMBABLE_LAYER)
+	query.exclude = _blorb_support_exclusions()
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return proposed
+	var hit_position := hit["position"] as Vector3
+	var clearance := 0.22 * size_multiplier
+	var stopped := Vector2(hit_position.x, hit_position.z) - travel.normalized() * clearance
+	# Never let a very close hit push the blorb backwards past where this
+	# frame began; holding position is the stable response at a solid wall.
+	if (stopped - current).dot(travel) <= 0.0:
+		return current
+	return stopped
 
 
 ## BODY's mesh is embedded slightly into the ground at ordinary scale. When
@@ -1932,6 +2177,8 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		_control_jump_active = true
 		_control_jump_elapsed = 0.0
 		_control_jump_base_offset = 0.0
+		if blorb_type == "size":
+			UISounds.play_foley(&"giant_jump", 0.86, get_instance_id())
 	if _control_jump_active:
 		var previous_y := global_position.y
 		# Advancing scaled time instead of scaling only velocity ensures every
@@ -1959,11 +2206,17 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			_control_jump_active = false
 			_control_jump_base_offset = 0.0
 			trigger_bounce_squash()
+			if blorb_type == "size":
+				UISounds.play_foley(&"giant_land", 0.94, get_instance_id())
 	else:
 		global_position.y = rest_y
 		body.scale = body.scale.lerp(Vector3.ONE, SETTLE_SPEED * delta)
 	if planar.length() > 0.01:
 		rotation.y = lerp_angle(rotation.y, atan2(planar.x, planar.y) + PI, ROTATION_SPEED * motion_speed_scale() * delta)
+		if blorb_type == "size" and not _control_jump_active:
+			UISounds.play_foley(&"giant_move", 0.66, get_instance_id())
+		elif blorb_type != "size":
+			UISounds.pulse_blorb_glide(get_instance_id())
 
 
 ## Detects a descending direct-control body crossing a blorb surface or an
@@ -2046,6 +2299,7 @@ func _apply_jump_attack_damage() -> void:
 	if _combat_target != null and is_instance_valid(_combat_target) and _combat_target.has_method("take_damage"):
 		var roll := CombatMath.rolled_attack(JUMP_ATTACK_BASE_DAMAGE, strength, _rng)
 		_combat_target.take_damage(roll["amount"], self)
+		UISounds.play_blorb_body_hit(get_instance_id())
 
 
 ## Rock blorbs' combat response: erupts a cosmetic RockCrag at the target's
@@ -2058,8 +2312,28 @@ func _try_rock_attack() -> void:
 	if _attack_cooldown > 0.0 or _combat_target == null or not is_instance_valid(_combat_target):
 		return
 	var origin: Vector3 = _combat_target.global_position
-	RockCrag.spawn(get_tree().current_scene, origin, _rng)
-	var roll := CombatMath.rolled_attack(ROCK_CRAG_DAMAGE_BASE, strength, _rng)
+	if element_state == "rock" and terrain.has_method("is_ice_surface") and terrain.is_ice_surface(Vector2(origin.x, origin.z)):
+		return
+	# The target stands above the submerged lakebed when it is on the frozen
+	# lake. Anchor an ice eruption to that actual ice layer rather than either
+	# the target body's origin or get_mesh_height() beneath the water.
+	if (
+		element_state == "ice"
+		and terrain.has_method("is_ice_surface")
+		and terrain.is_ice_surface(Vector2(origin.x, origin.z))
+		and terrain.has_method("get_ice_level")
+	):
+		origin.y = terrain.get_ice_level()
+	var rock_count: int = mini(1 + (level - 1) / 5, 4)
+	for i in rock_count:
+		var angle: float = TAU * float(i) / float(rock_count)
+		var offset := Vector3(cos(angle), 0.0, sin(angle)) * (0.55 if i > 0 else 0.0)
+		if element_state == "ice":
+			IceCrag.spawn(get_tree().current_scene, origin + offset, _rng, level)
+		else:
+			RockCrag.spawn(get_tree().current_scene, origin + offset, _rng, level)
+	var level_damage_scale: float = 1.0 + float(level - 1) * 0.08
+	var roll := CombatMath.rolled_attack(ROCK_CRAG_DAMAGE_BASE * level_damage_scale, strength, _rng)
 	for node in get_tree().get_nodes_in_group("skeletons"):
 		var skeleton := node as Node3D
 		if skeleton == null or not skeleton.has_method("take_damage"):
@@ -2069,7 +2343,7 @@ func _try_rock_attack() -> void:
 		var defender_element: String = (
 			skeleton.current_combat_element() if skeleton.has_method("current_combat_element") else ""
 		)
-		var final_damage: float = roll["amount"] * CombatMath.type_multiplier("rock", defender_element)
+		var final_damage: float = roll["amount"] * CombatMath.type_multiplier(element_state, defender_element)
 		skeleton.take_damage(final_damage, self)
 	_attack_cooldown = ROCK_ATTACK_COOLDOWN
 
@@ -2093,6 +2367,7 @@ func _try_plant_attack() -> void:
 	pellet.attacker_blorb = self
 	get_tree().current_scene.add_child(pellet)
 	pellet.global_position = origin
+	UISounds.play_seed_eject(get_instance_id())
 	_attack_cooldown = PLANT_ATTACK_COOLDOWN
 
 
@@ -2112,6 +2387,9 @@ func _update_elemental_stream(delta: float) -> void:
 			rate = CITY_STREAM_MP_PER_SECOND
 	var draining := consume_mp(rate * delta)
 	_set_combat_stream_active(draining)
+	if draining:
+		var sound_kind: StringName = &"electric" if element_state in ["electric", "city"] else StringName(element_state)
+		UISounds.pulse_power_loop(sound_kind, get_instance_id())
 	if draining and _combat_target != null and is_instance_valid(_combat_target) and _combat_target.has_method("take_damage"):
 		var damage_rate := CombatMath.rolled_stream_rate(STREAM_BASE_DAMAGE_PER_SECOND, strength)
 		# Type effectiveness (see combat_math.gd's own doc comment) --

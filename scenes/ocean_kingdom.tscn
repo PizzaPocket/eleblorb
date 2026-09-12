@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/kingdom_bootstrap.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
@@ -10,6 +10,8 @@
 [ext_resource type="Script" path="res://scripts/ocean_kingdom_blorbs.gd" id="8"]
 [ext_resource type="Script" path="res://scripts/ocean_kingdom_wrap.gd" id="9"]
 [ext_resource type="Script" path="res://scripts/ocean_kingdom_denizens.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/ocean_kingdom_city.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/ocean_ambience.gd" id="12"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.25, 0.45, 0.62, 1)
@@ -26,12 +28,10 @@ background_mode = 2
 sky = SubResource("Sky_1")
 fog_enabled = true
 fog_light_color = Color(0.5, 0.7, 0.75, 1)
-# Raised well past the other kingdoms' own ~0.0025-0.003 -- per direct
-# instruction to sell an "endless ocean," the open water needs to fade to
-# an indistinct horizon haze a few hundred units out (roughly 95% fogged by
-# ~250m), long before OceanKingdomWrap's own 900-unit edge, so the actual
-# boundary/teleport is never visually legible.
-fog_density = 0.012
+# A light ocean haze keeps the far horizon soft without erasing islands,
+# ships, or navigation landmarks across ordinary gameplay distances. The
+# visual-only ocean extension still hides the 900-unit wrap boundary.
+fog_density = 0.002
 
 [node name="OceanKingdom" type="Node3D"]
 script = ExtResource("1")
@@ -67,6 +67,12 @@ script = ExtResource("9")
 
 [node name="OceanKingdomDenizens" type="Node3D" parent="."]
 script = ExtResource("10")
+
+[node name="OceanKingdomCity" type="Node3D" parent="."]
+script = ExtResource("11")
+
+[node name="OceanAmbience" type="Node" parent="."]
+script = ExtResource("12")
 
 [node name="Player" parent="." instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.84, 4)

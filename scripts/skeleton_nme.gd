@@ -11,9 +11,11 @@ extends StaticBody3D
 ## that file) and npc.gd's walk-cycle animation approach, swapping npc.gd's
 ## wander target for a live chase target.
 
-const BONE_COLOR := Color(0.92, 0.90, 0.84)
+const DEFAULT_BONE_COLOR := Color(0.92, 0.90, 0.84)
 
 @export var body_scale: float = 1.0
+@export var bone_color: Color = DEFAULT_BONE_COLOR
+@export var combat_element: String = ""
 ## Per-NME tuning point for the progression system. Future, harder NME
 ## scenes raise this value without changing the shared participation logic.
 @export var xp_reward: int = 24
@@ -120,10 +122,10 @@ func _ready() -> void:
 
 func _build_figure() -> void:
 	var pivots := ProceduralFigure.build(
-		visuals, BONE_COLOR, BONE_COLOR, BONE_COLOR, ProceduralFigure.SLEEVE_STYLE_NONE,
+		visuals, bone_color, bone_color, bone_color, ProceduralFigure.SLEEVE_STYLE_NONE,
 		body_scale, 0.55, 0.55, 1.0,
 		Color(0.0, 0.0, 0.0, 0.0),  # chest_emblem_color -- none
-		BONE_COLOR, FigureHair.STYLE_BUZZCUT, 0.0, BONE_COLOR,
+		bone_color, FigureHair.STYLE_BUZZCUT, 0.0, bone_color,
 		true  # skeleton_mode
 	)
 	_leg_left = pivots["leg_left"]
@@ -142,9 +144,14 @@ func is_defeated() -> bool:
 	return _state == State.SINKING
 
 
+func current_combat_element() -> String:
+	return combat_element
+
+
 func take_damage(amount: float, attacker: Blorb = null) -> void:
 	if amount <= 0.0 or _state == State.SINKING or _state == State.RISING:
 		return
+	UISounds.play_foley(&"damage_dealt", clampf(amount / 22.0, 0.28, 0.78), get_instance_id())
 	register_xp_participant(attacker)
 	current_hp = maxf(current_hp - amount, 0.0)
 	if current_hp <= 0.0:
@@ -317,7 +324,7 @@ func _find_target() -> Node3D:
 	var best: Node3D = null
 	var best_dist := DETECTION_RADIUS
 	var player := get_tree().get_first_node_in_group("player")
-	if player != null:
+	if player != null and not _position_is_safe(Vector2(player.global_position.x, player.global_position.z)):
 		var dist := here.distance_to(Vector2(player.global_position.x, player.global_position.z))
 		if dist < best_dist:
 			best_dist = dist
@@ -325,6 +332,8 @@ func _find_target() -> Node3D:
 	for node in get_tree().get_nodes_in_group("blorbs"):
 		var blorb := node as Blorb
 		if blorb == null or not blorb.in_party or blorb.is_worn or blorb.is_melted:
+			continue
+		if _position_is_safe(Vector2(blorb.global_position.x, blorb.global_position.z)):
 			continue
 		var dist := here.distance_to(Vector2(blorb.global_position.x, blorb.global_position.z))
 		if dist < best_dist:
@@ -369,6 +378,9 @@ func _process_hunting(delta: float) -> void:
 	var speed := MOVE_SPEED * (CombatMath.HASTE_SPEED_MULTIPLIER if _haste_weaken_remaining > 0.0 else 1.0)
 	var step := dir * speed * delta
 	var new_here := here + step
+	if _position_is_safe(new_here):
+		_target = null
+		return
 	global_position.x = new_here.x
 	global_position.z = new_here.y
 	global_position.y = terrain_ref.get_mesh_height(new_here.x, new_here.y)
@@ -393,10 +405,20 @@ func _process_hunting(delta: float) -> void:
 ## mid-chase -- re-picking immediately rather than continuing to chase a
 ## target that's no longer a valid combatant.
 func _target_invalid() -> bool:
+	if _target != null and _position_is_safe(Vector2(_target.global_position.x, _target.global_position.z)):
+		return true
 	if _target is Blorb:
 		var blorb := _target as Blorb
 		return not blorb.in_party or blorb.is_worn or blorb.is_melted
 	return false
+
+
+func _position_is_safe(pos: Vector2) -> bool:
+	if terrain_ref == null:
+		return false
+	if terrain_ref.has_method("is_safe_zone") and terrain_ref.is_safe_zone(pos):
+		return true
+	return terrain_ref.has_method("is_nme_hazard") and terrain_ref.is_nme_hazard(pos)
 
 
 func _process_attacking(delta: float) -> void:
@@ -439,5 +461,6 @@ func _process_attacking(delta: float) -> void:
 				base_damage *= CombatMath.WEAKEN_DAMAGE_MULTIPLIER
 			var roll := CombatMath.rolled_attack(base_damage, 0, _rng)
 			_target.take_damage(roll["amount"])
+			UISounds.play_nme_hit(get_instance_id())
 		_attack_cooldown = ATTACK_COOLDOWN
 		_attack_pose_elapsed = 0.0

@@ -31,6 +31,7 @@ const STYLE_BUN := "bun"
 ## bun-like clusters positioned on either side of the head rather than
 ## STYLE_BUN's single back-top one -- see _build_pigtails()'s own comment.
 const STYLE_PIGTAILS := "pigtails"
+const STYLE_PONYTAIL := "ponytail"
 const STYLE_LONG := "long"
 ## The hero's own style, per direct instruction ("adjust the hero's hair
 ## into a NEW style") -- distinct from STYLE_BUZZCUT (which NPCs still use)
@@ -131,6 +132,27 @@ const PIGTAIL_Y_FRACTION := 0.62
 const PIGTAIL_Z_FRACTION := 0.45
 const PIGTAIL_X_FRACTION := 0.95
 
+## Polished Kueh Machine ponytail: a single tapered tube following a cubic
+## S-curve. It reaches rearward before dropping so the body clears the head,
+## holds a consistent radius through its middle, then tapers to a true point.
+const PONYTAIL_Y_FRACTION := 0.72
+const PONYTAIL_Z_FRACTION := 0.85
+const PONYTAIL_HEIGHT := 0.42
+const PONYTAIL_BODY_RADIUS := 0.065
+const PONYTAIL_RADIAL_SEGMENTS := 16
+const PONYTAIL_TUBE_SAMPLES := 24
+const PONYTAIL_TAPER_IN_FRACTION := 0.15
+const PONYTAIL_TAPER_OUT_FRACTION := 0.20
+const PONYTAIL_S_P1_DROP_FRACTION := 0.10
+const PONYTAIL_S_P1_BACK_FRACTION := 0.30
+const PONYTAIL_S_P2_DROP_FRACTION := 0.66
+const PONYTAIL_S_P2_FORWARD_FRACTION := 0.015
+const PONYTAIL_TIP_BACK_FRACTION := 0.22
+const PONYTAIL_ROOT_INSET := 0.05
+const PONYTAIL_ROOT_UP_SHIFT := 0.01
+const TIED_BASE_UP_SHIFT := 0.01
+const TIED_BASE_FRONT_EXTRA := 0.004
+
 ## LONG: "extending a bit to the sides and back then making the bottom
 ## much less round and extending downwards a variable length" -- bottom
 ## epsilon goes straight to BOTTOM_EPSILON_TARGET (no partial blend at
@@ -221,6 +243,9 @@ static func add_hair(
 		STYLE_PIGTAILS:
 			_build_buzzcut(head, semi_axes, top_epsilon, hair_color)
 			_build_pigtails(head, semi_axes, hair_color)
+		STYLE_PONYTAIL:
+			_build_tied_base(head, semi_axes, top_epsilon, hair_color)
+			_build_ponytail(head, semi_axes, hair_color)
 		STYLE_LONG:
 			_build_long(head, semi_axes, top_epsilon, hair_color, length_variance)
 		STYLE_HERO:
@@ -282,6 +307,14 @@ static func _build_buzzcut(head: MeshInstance3D, semi_axes: Vector3, top_epsilon
 	_add_edge_piece(head, edges, top_epsilon, bottom_epsilon, color)
 
 
+static func _build_tied_base(head: MeshInstance3D, semi_axes: Vector3, top_epsilon: float, color: Color) -> void:
+	var edges := _buzzcut_edges(semi_axes)
+	edges["top"] += TIED_BASE_UP_SHIFT
+	edges["bottom"] += TIED_BASE_UP_SHIFT
+	edges["front"] += TIED_BASE_FRONT_EXTRA
+	_add_edge_piece(head, edges, top_epsilon, top_epsilon, color)
+
+
 static func _build_hero(head: MeshInstance3D, semi_axes: Vector3, top_epsilon: float, color: Color) -> void:
 	var edges := _buzzcut_edges(semi_axes)
 	edges["top"] += HERO_UP_SHIFT
@@ -322,6 +355,91 @@ static func _build_bun(head: MeshInstance3D, semi_axes: Vector3, color: Color) -
 	_add_piece(
 		head, Vector3(bun_radius, bun_radius, bun_radius), bun_offset, MIN_EPSILON, MIN_EPSILON, color
 	)
+
+
+## This is the polished Kueh Machine construction rather than a second
+## interpretation of the style: one continuous, tapered S-curved tube whose
+## zero-radius root begins just inside the tied hair base.
+static func _build_ponytail(
+	head: MeshInstance3D,
+	semi_axes: Vector3,
+	color: Color,
+	height: float = PONYTAIL_HEIGHT,
+	body_radius: float = PONYTAIL_BODY_RADIUS,
+	piece_name: String = "Ponytail"
+) -> void:
+	var edges := _buzzcut_edges(semi_axes)
+	var attach := Vector3(0, edges["top"] * PONYTAIL_Y_FRACTION + PONYTAIL_ROOT_UP_SHIFT, edges["back"] * PONYTAIL_Z_FRACTION)
+	var curve_root := attach + Vector3(0, 0, PONYTAIL_ROOT_INSET)
+	var p1 := attach + Vector3(0, -height * PONYTAIL_S_P1_DROP_FRACTION, -height * PONYTAIL_S_P1_BACK_FRACTION)
+	var p2 := attach + Vector3(0, -height * PONYTAIL_S_P2_DROP_FRACTION, height * PONYTAIL_S_P2_FORWARD_FRACTION)
+	var tip := attach + Vector3(0, -height, -height * PONYTAIL_TIP_BACK_FRACTION)
+	var taper_out_start := 1.0 - PONYTAIL_TAPER_OUT_FRACTION
+	var points := PackedVector3Array()
+	var radii := PackedFloat32Array()
+	for i in range(PONYTAIL_TUBE_SAMPLES + 1):
+		var t := float(i) / float(PONYTAIL_TUBE_SAMPLES)
+		var inv_t := 1.0 - t
+		points.append(
+			curve_root * (inv_t * inv_t * inv_t)
+			+ p1 * (3.0 * inv_t * inv_t * t)
+			+ p2 * (3.0 * inv_t * t * t)
+			+ tip * (t * t * t)
+		)
+		var radius := body_radius
+		if t < PONYTAIL_TAPER_IN_FRACTION:
+			radius = body_radius * smoothstep(0.0, PONYTAIL_TAPER_IN_FRACTION, t)
+		elif t > taper_out_start:
+			radius = body_radius * (1.0 - smoothstep(taper_out_start, 1.0, t))
+		radii.append(radius)
+	var piece := _build_tapered_tube(points, radii, PONYTAIL_RADIAL_SEGMENTS, color)
+	piece.name = piece_name
+	head.add_child(piece)
+
+
+static func _build_tapered_tube(
+	points: PackedVector3Array, radii: PackedFloat32Array, radial_segments: int, color: Color
+) -> MeshInstance3D:
+	var rings: Array[PackedVector3Array] = []
+	var point_count := points.size()
+	for i in range(point_count):
+		var tangent: Vector3
+		if i == 0:
+			tangent = (points[i + 1] - points[i]).normalized()
+		elif i == point_count - 1:
+			tangent = (points[i] - points[i - 1]).normalized()
+		else:
+			tangent = (points[i + 1] - points[i - 1]).normalized()
+		var right := tangent.cross(Vector3.RIGHT).normalized()
+		var up := right.cross(tangent).normalized()
+		var ring := PackedVector3Array()
+		for segment in radial_segments:
+			var theta := (float(segment) / radial_segments) * TAU
+			ring.append(points[i] + (right * cos(theta) + up * sin(theta)) * radii[i])
+		rings.append(ring)
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in range(point_count - 1):
+		for segment in radial_segments:
+			var next_segment := (segment + 1) % radial_segments
+			var a0 := rings[i][segment]
+			var a1 := rings[i][next_segment]
+			var b0 := rings[i + 1][segment]
+			var b1 := rings[i + 1][next_segment]
+			surface.add_vertex(a0)
+			surface.add_vertex(a1)
+			surface.add_vertex(b0)
+			surface.add_vertex(a1)
+			surface.add_vertex(b1)
+			surface.add_vertex(b0)
+	surface.generate_normals()
+	var mesh_instance := MeshInstance3D.new()
+	mesh_instance.mesh = surface.commit()
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.roughness = 0.55
+	mesh_instance.material_override = material
+	return mesh_instance
 
 
 static func _build_pigtails(head: MeshInstance3D, semi_axes: Vector3, color: Color) -> void:

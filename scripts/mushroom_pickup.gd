@@ -48,5 +48,6 @@ func _collect() -> void:
 		return
 	_collected = true
 	Inventory.add(mushroom_name, cap_color)
+	UISounds.play_foley(&"pickup", 0.44, get_instance_id())
 	Hud.show_message("Picked up the %s." % mushroom_name)
 	queue_free()

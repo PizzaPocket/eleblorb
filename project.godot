@@ -24,6 +24,7 @@ CheatCodes="*res://scripts/cheat_codes.gd"
 TokoinWallet="*res://scripts/tokoin_wallet.gd"
 Inventory="*res://scripts/inventory.gd"
 UIState="*res://scripts/ui_state.gd"
+UISounds="*res://scripts/ui_sounds.gd"
 InteractionManager="*res://scripts/interaction_manager.gd"
 HeldItem="*res://scripts/held_item.gd"
 Hud="*res://scripts/hud.gd"
@@ -39,6 +40,4 @@ KingdomTravel="*res://scripts/kingdom_travel.gd"
 
 [input_devices]
 
-# Touch is handled explicitly per finger. Synthesized mouse events otherwise
-# duplicate the same gesture and destabilize simultaneous move/look/action.
 pointing/emulate_mouse_from_touch=false

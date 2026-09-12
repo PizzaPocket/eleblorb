@@ -116,6 +116,11 @@ var _lantern_refresh_timer := 0.0
 
 
 func _ready() -> void:
+	# The clock is gameplay simulation, never UI. Keep this explicit rather
+	# than inheriting a future scene-root process mode that might continue
+	# during pause for menu or transition purposes.
+	process_mode = Node.PROCESS_MODE_PAUSABLE
+	game_time_hours = WorldState.game_time_hours
 	_environment = _world_environment.environment
 	_sky_material = _environment.sky.sky_material as ProceduralSkyMaterial
 	# See this file's own docstring -- fog no longer touches the sky at all.
@@ -159,7 +164,13 @@ func _build_moon() -> void:
 
 
 func _process(delta: float) -> void:
+	# PROCESS_MODE_PAUSABLE normally prevents this callback altogether while
+	# paused. The guard is also an authoritative safety net: no menu, full-pause
+	# story dialog, or future process-mode change may advance the shared clock.
+	if get_tree().paused:
+		return
 	game_time_hours = fmod(game_time_hours + delta * GAME_HOURS_PER_REAL_SECOND, 24.0)
+	WorldState.game_time_hours = game_time_hours
 	_lantern_refresh_timer -= delta
 	if _lantern_refresh_timer <= 0.0:
 		# City blocks can stream in/out after this node is ready. Cache the

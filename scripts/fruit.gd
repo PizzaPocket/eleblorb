@@ -61,5 +61,6 @@ func _collect() -> void:
 		return
 	_collected = true
 	Inventory.add(fruit_name, fruit_color)
+	UISounds.play_foley(&"pickup", 0.46, get_instance_id())
 	Hud.show_message("Picked up the %s." % fruit_name)
 	queue_free()

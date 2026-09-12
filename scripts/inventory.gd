@@ -10,17 +10,6 @@ signal changed
 ## pickups/purchases grow a stack instead of consuming another UI slot.
 var items: Array[Dictionary] = []
 
-## TEMPORARY PLAYTEST STOCK: remove this startup grant once aimed throwing
-## has been visually approved. Inventory is an autoload, so this runs once
-## per game session rather than every time the player crosses worlds.
-const TEMP_THROW_TEST_AIR_GEMS := 2
-
-
-func _ready() -> void:
-	for _index in TEMP_THROW_TEST_AIR_GEMS:
-		add("Air Gem", ShopCatalog.AIR_COLOR)
-
-
 func add(item_name: String, color: Color) -> void:
 	for item in items:
 		if item["name"] == item_name:

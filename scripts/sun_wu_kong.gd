@@ -51,6 +51,9 @@ const CHINESE_VILLAGE_ABYSS_SAFE_RADIUS := 225.0
 const CHINESE_VILLAGE_ISLAND_Y := -55.0
 
 var summoned: bool = false
+## Authored landmark placement may pin the resident sage above ordinary
+## island ground (the sealing rock now crowns the Emperor's castle).
+var fixed_ground_y: float = INF
 var _player: Node3D
 var _terrain: Node
 var _rock_visual: Node3D
@@ -169,8 +172,12 @@ func _apply_clothing(pivots: Dictionary) -> void:
 
 
 func _build_sealing_rock() -> void:
-	_rock_visual = NatureProps.build_rock(0.32 * DISPLAY_SCALE, false)
-	_rock_visual.position = Vector3(0, 0.14 * DISPLAY_SCALE, 0)
+	# NatureProps.build_rock() already places its lobes around the supplied
+	# ground origin. The former extra upward offset exposed the monkey's entire
+	# lower body beneath it. Keep the rock seated just through the roof surface
+	# so its solid silhouette encloses him from feet through crown.
+	_rock_visual = NatureProps.build_rock(0.36 * DISPLAY_SCALE, false)
+	_rock_visual.position = Vector3(0, -0.025 * DISPLAY_SCALE, 0)
 	add_child(_rock_visual)
 
 
@@ -181,6 +188,8 @@ func _build_sealing_rock() -> void:
 ## into the village later re-engages the island height just as correctly as
 ## leaving it re-engages ordinary terrain-following.
 func _ground_y(x: float, z: float) -> float:
+	if fixed_ground_y < INF:
+		return fixed_ground_y
 	if Vector2(x, z).distance_to(CHINESE_VILLAGE_CENTER) < CHINESE_VILLAGE_ABYSS_SAFE_RADIUS:
 		return CHINESE_VILLAGE_ISLAND_Y
 	if _terrain != null and _terrain.has_method("get_mesh_height"):

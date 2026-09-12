@@ -64,4 +64,5 @@ func _on_body_entered(_body: Node3D) -> void:
 		return
 	_collected = true
 	TokoinWallet.add(VALUE)
+	UISounds.play_foley(&"tokoin_pickup", 0.48, get_instance_id())
 	queue_free()

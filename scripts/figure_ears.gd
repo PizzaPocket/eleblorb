@@ -26,7 +26,8 @@ extends RefCounted
 static func add_ears(
 	head: MeshInstance3D, semi_axes: Vector3, skin_color: Color,
 	round_shape: bool = false, vertical_shift_fraction: float = 0.0,
-	pad_color: Color = Color(0.0, 0.0, 0.0, 0.0)
+	pad_color: Color = Color(0.0, 0.0, 0.0, 0.0),
+	size_multiplier: float = 1.0, back_sweep_degrees: float = 25.0
 ) -> void:
 	# Same scale as figure_eyes.gd's eye_radius -- "about the size of the
 	# player's eyes," per direct instruction -- then scaled up 25% twice
@@ -34,10 +35,10 @@ static func add_ears(
 	# total). ear_radius alone drives all three of the mesh's own
 	# semi_axes below, so this one multiplier grows the whole ear
 	# uniformly rather than just one dimension.
-	var ear_radius := semi_axes.x * 0.26 * 1.25 * 1.25
+	var ear_radius := semi_axes.x * 0.26 * 1.25 * 1.25 * size_multiplier
 	var eta := 0.0  # same latitude as the eyes (the head's own equator)
 	var side_angle := deg_to_rad(90.0)  # dead side -- straight out, not toward the face or the back
-	var back_tilt := deg_to_rad(25.0)  # orientation-only sweep, see below
+	var back_tilt := deg_to_rad(back_sweep_degrees)  # orientation-only sweep, see below
 	var ear_color := skin_color.darkened(0.12)
 
 	for side in [-1.0, 1.0]:

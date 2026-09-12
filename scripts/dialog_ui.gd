@@ -145,6 +145,7 @@ func show_line(
 		for action in actions:
 			_add_response(action["label"], action["callback"])
 		_add_response(dismiss_label, _on_dismiss_pressed)
+		_response_buttons.back().set_meta("ui_sound_kind", "back")
 		_response_panel.visible = true
 		if not was_modal:
 			UIState.push_modal()

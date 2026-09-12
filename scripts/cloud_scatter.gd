@@ -138,6 +138,19 @@ const MAX_STEP_RISE := 1.2
 ## by _ready()'s ambient placement).
 func build_sky_course(start: Vector3) -> void:
 	_ensure_material()
+	# Clear randomly generated puffs around the stair hand-off. They are
+	# scenery elsewhere, but here a low cluster can physically cover the
+	# authored route and make its first landing unreadable.
+	for child in get_children():
+		if child.name == "SkyParkourCourse" or not child is Node3D:
+			continue
+		var cloud := child as Node3D
+		var horizontal := Vector2(cloud.global_position.x - start.x, cloud.global_position.z - start.z)
+		# Ambient clusters can extend roughly 15m beyond their root once puff
+		# radius and local jitter are combined. Clear by that real footprint,
+		# not merely by the otherwise-invisible cluster origin.
+		if horizontal.length() < 42.0 and cloud.global_position.y < start.y + 18.0:
+			cloud.queue_free()
 	# town_generator.gd's own "rebuild_now" editor button re-runs the whole
 	# call chain that reaches here without this script's "Generated" subtree
 	# equivalent to free the old one first -- without this, each in-editor
@@ -203,15 +216,15 @@ func build_sky_course(start: Vector3) -> void:
 ## of them rather than dropping all the way back to the crate spiral or the
 ## ground below it.
 func _build_safety_net(course: Node3D, path_positions: Array[Vector2], start_y: float, rng: RandomNumberGenerator) -> void:
-	const NET_DROP := 11.0
+	const NET_DROP := 18.0
 	const NET_PUFF_MIN := 5.5
 	const NET_PUFF_MAX := 7.0
 	const NET_JITTER := 3.0
 	var net_y := start_y - NET_DROP
-	# One net cluster centered under a handful of points spread along the
-	# path (first, middle, and last step) rather than just the start --
-	# covers the whole course's own horizontal wander, not only its base.
-	var sample_indices: Array[int] = [0, path_positions.size() / 2, path_positions.size() - 1]
+	# Never put a catch cloud below the first point: that is exactly where the
+	# crate staircase arrives, and its large puffs were visibly swallowing the
+	# top of the stairs. Catch clouds begin under the aerial half of the route.
+	var sample_indices: Array[int] = [path_positions.size() / 2, path_positions.size() - 1]
 	for index in sample_indices:
 		var center := path_positions[index]
 		_build_course_cluster(course, center.x, center.y, net_y, rng, NET_PUFF_MIN, NET_PUFF_MAX, 6, 9, NET_JITTER)

@@ -119,6 +119,10 @@ func is_lake_area(world_pos: Vector2) -> bool:
 	return _river_coverage(world_pos.x, world_pos.y) > 0.01
 
 
+func is_safe_zone(world_pos: Vector2) -> bool:
+	return world_pos.length() < 55.0
+
+
 func get_lake_water_level() -> float:
 	return RIVER_WATER_LEVEL
 

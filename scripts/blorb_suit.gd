@@ -368,16 +368,16 @@ static func slot_shrink_scale(slot: String, rig_scale: float = 1.0) -> float:
 ## noodle spanning multiple independently-moving joints has to be
 ## regenerated from their live positions rather than just inheriting one
 ## pivot's transform.
-static func equip_slot(slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0) -> Array[Node3D]:
+static func equip_slot(slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, lava_helm_command: bool = false) -> Array[Node3D]:
 	var pieces: Array[Node3D] = []
 	match slot:
 		"arm_left", "arm_right", "leg_left", "leg_right":
 			var mesh_instance := MeshInstance3D.new()
 			root.add_child(mesh_instance)
-			rebuild_slot(mesh_instance, slot, pivots, root, blorb, rig_scale)
+			rebuild_slot(mesh_instance, slot, pivots, root, blorb, rig_scale, lava_helm_command)
 			pieces.append(mesh_instance)
 		"torso":
-			pieces = build_torso(pivots["spine"] as Node3D, blorb, rig_scale)
+			pieces = build_torso(pivots["spine"] as Node3D, blorb, rig_scale, lava_helm_command)
 		"head":
 			pieces = build_head(pivots["head"] as Node3D, blorb, rig_scale)
 	if blorb.element_state == "air":
@@ -385,6 +385,11 @@ static func equip_slot(slot: String, pivots: Dictionary, root: Node3D, blorb: Bl
 		var wing_attachment := _air_wing_attachment(slot, rig_scale)
 		var arm_wings := slot == "arm_left" or slot == "arm_right"
 		pieces.append(build_air_wings(wing_anchor, _air_wing_scale(slot) * rig_scale, wing_attachment, arm_wings))
+	# Head-fit measurement and visual hiding must distinguish original figure
+	# geometry from suit geometry that is still queued for deletion during a
+	# rapid remove/re-equip cycle. Mark every returned root once, centrally.
+	for piece in pieces:
+		piece.set_meta("blorb_suit_piece", true)
 	return pieces
 
 
@@ -540,33 +545,33 @@ static func animate_air_wings(wings: Node3D, flap_angle: float) -> void:
 ## comment for why only these need it. No-op (safe to call, just does
 ## nothing useful) for torso/head, which the controller never calls this
 ## for anyway (see is_dynamic_slot()).
-static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0) -> void:
+static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, lava_helm_command: bool = false) -> void:
 	match slot:
 		"arm_left":
 			rebuild_arm(
 				mesh_instance, root,
 				pivots["arm_left_shoulder"] as Node3D, pivots["arm_left_elbow"] as Node3D,
 				pivots["wrist_left"] as Node3D, pivots["fingertip_left"] as Node3D,
-				pivots["back_left"] as Node3D, blorb, rig_scale
+				pivots["back_left"] as Node3D, blorb, rig_scale, lava_helm_command
 			)
 		"arm_right":
 			rebuild_arm(
 				mesh_instance, root,
 				pivots["arm_right_shoulder"] as Node3D, pivots["arm_right_elbow"] as Node3D,
 				pivots["wrist_right"] as Node3D, pivots["fingertip_right"] as Node3D,
-				pivots["back_right"] as Node3D, blorb, rig_scale
+				pivots["back_right"] as Node3D, blorb, rig_scale, lava_helm_command
 			)
 		"leg_left":
 			rebuild_leg(
 				mesh_instance, root,
 				pivots["leg_left_hip"] as Node3D, pivots["leg_left_knee"] as Node3D,
-				pivots["leg_left_ankle"] as Node3D, pivots["toe_left"] as Node3D, blorb, rig_scale
+				pivots["leg_left_ankle"] as Node3D, pivots["toe_left"] as Node3D, blorb, rig_scale, lava_helm_command
 			)
 		"leg_right":
 			rebuild_leg(
 				mesh_instance, root,
 				pivots["leg_right_hip"] as Node3D, pivots["leg_right_knee"] as Node3D,
-				pivots["leg_right_ankle"] as Node3D, pivots["toe_right"] as Node3D, blorb, rig_scale
+				pivots["leg_right_ankle"] as Node3D, pivots["toe_right"] as Node3D, blorb, rig_scale, lava_helm_command
 			)
 
 
@@ -592,9 +597,12 @@ static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Di
 ## ARM_EYE_RAISE) that were otherwise sized for the human's much bigger arm.
 static func rebuild_arm(
 	mesh_instance: MeshInstance3D, root: Node3D, shoulder: Node3D, elbow: Node3D,
-	wrist: Node3D, fingertip: Node3D, back: Node3D, blorb: Blorb, rig_scale: float = 1.0
+	wrist: Node3D, fingertip: Node3D, back: Node3D, blorb: Blorb, rig_scale: float = 1.0,
+	lava_helm_command: bool = false
 ) -> void:
 	var vis: Dictionary = blorb.body_visual_snapshot()
+	var sealed_lava := blorb.element_state == "fire" and lava_helm_command
+	var sealed_lava_radius := 1.32 if sealed_lava else 1.0
 
 	var shoulder_pos := root.to_local(shoulder.global_position)
 	var elbow_pos := root.to_local(elbow.global_position)
@@ -633,12 +641,25 @@ static func rebuild_arm(
 	var wrist_bulged := wrist_pos + outward_dir * (HAND_BULGE_OUTWARD * 0.5 * rig_scale)
 	var tip_bulged := tip_pos + outward_dir * (HAND_BULGE_OUTWARD * rig_scale)
 
-	var points: Array[Vector3] = [shoulder_pos, elbow_pos, wrist_bulged, tip_bulged]
-	var r_shoulder := _avg_xz(ProceduralFigure.UPPER_ARM_SIZE) * LIMB_INFLATE * rig_scale
-	var r_elbow := _avg_xz(ProceduralFigure.FOREARM_SIZE) * LIMB_INFLATE * rig_scale
-	var r_wrist := _avg_xz(ProceduralFigure.HAND_SIZE) * LIMB_INFLATE * 1.2 * rig_scale
+	var r_shoulder := _avg_xz(ProceduralFigure.UPPER_ARM_SIZE) * LIMB_INFLATE * sealed_lava_radius * rig_scale
+	var r_elbow := _avg_xz(ProceduralFigure.FOREARM_SIZE) * LIMB_INFLATE * sealed_lava_radius * rig_scale
+	var r_wrist := _avg_xz(ProceduralFigure.HAND_SIZE) * LIMB_INFLATE * 1.2 * sealed_lava_radius * rig_scale
 	var r_tip := r_wrist * HAND_TIP_RADIUS_RATIO
+	var points: Array[Vector3] = [shoulder_pos, elbow_pos, wrist_bulged, tip_bulged]
 	var radii: Array[float] = [r_shoulder, r_elbow, r_wrist, r_tip]
+	if sealed_lava:
+		# Carry a rounded dome well beneath the cuirass instead of terminating
+		# the raised arm shell in the full-radius planar cut used previously.
+		# The intermediate ring reaches full shoulder width before the live
+		# pivot, while the farther hidden point gives the start taper room to
+		# round closed without exposing skin during articulation.
+		var inward := -(elbow_pos - shoulder_pos).normalized()
+		var shoulder_overlap := shoulder_pos + inward * 0.035 * rig_scale
+		var shoulder_dome_tip := shoulder_pos + inward * 0.12 * rig_scale
+		points.push_front(shoulder_overlap)
+		radii.push_front(r_shoulder * 1.08)
+		points.push_front(shoulder_dome_tip)
+		radii.push_front(r_shoulder * 0.72)
 
 	mesh_instance.mesh = build_limb_tube(points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION)
 	mesh_instance.set_surface_override_material(0, _build_goo_material(vis))
@@ -681,8 +702,10 @@ static func rebuild_arm(
 
 ## Noodle from hip through knee through ankle through toe. `rig_scale` -- see
 ## rebuild_arm()'s own doc comment for the full rationale, identical here.
-static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D, knee: Node3D, ankle: Node3D, toe: Node3D, blorb: Blorb, rig_scale: float = 1.0) -> void:
+static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D, knee: Node3D, ankle: Node3D, toe: Node3D, blorb: Blorb, rig_scale: float = 1.0, lava_helm_command: bool = false) -> void:
 	var vis: Dictionary = blorb.body_visual_snapshot()
+	var sealed_lava := blorb.element_state == "fire" and lava_helm_command
+	var sealed_lava_radius := 1.34 if sealed_lava else 1.0
 
 	var hip_pos := root.to_local(hip.global_position)
 	var knee_pos := root.to_local(knee.global_position)
@@ -704,9 +727,9 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 
 	# All radii scaled down 25% overall, per direct instruction ("way too
 	# thick all around").
-	var r_hip := _avg_xz(ProceduralFigure.UPPER_LEG_SIZE) * LIMB_INFLATE * LEG_RADIUS_SCALE * rig_scale
-	var r_knee := _avg_xz(ProceduralFigure.LOWER_LEG_SIZE) * LIMB_INFLATE * LEG_RADIUS_SCALE * rig_scale
-	var r_ankle := _avg_xz(ProceduralFigure.FOOT_SIZE) * LIMB_INFLATE * 1.1 * LEG_RADIUS_SCALE * rig_scale
+	var r_hip := _avg_xz(ProceduralFigure.UPPER_LEG_SIZE) * LIMB_INFLATE * LEG_RADIUS_SCALE * sealed_lava_radius * rig_scale
+	var r_knee := _avg_xz(ProceduralFigure.LOWER_LEG_SIZE) * LIMB_INFLATE * LEG_RADIUS_SCALE * sealed_lava_radius * rig_scale
+	var r_ankle := _avg_xz(ProceduralFigure.FOOT_SIZE) * LIMB_INFLATE * 1.1 * LEG_RADIUS_SCALE * sealed_lava_radius * rig_scale
 	var r_toe := r_ankle * FOOT_TOE_RADIUS_RATIO
 
 	# An extra control point partway down the shin, per direct instruction
@@ -731,6 +754,17 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 	# see the shape/eye/core placement on its own simpler baseline first.
 	var points: Array[Vector3] = [hip_pos, knee_pos, shin_pos, ankle_pos, toe_pos]
 	var radii: Array[float] = [r_hip, r_knee, r_shin, r_ankle, r_toe]
+	if sealed_lava:
+		# The hip closure follows the rounded shoulder construction above. Its
+		# dome closes high inside the diaper-length torso rather than showing a
+		# flat circular lid at the top of the leg.
+		var upward := -(knee_pos - hip_pos).normalized()
+		var hip_overlap := hip_pos + upward * 0.04 * rig_scale
+		var hip_dome_tip := hip_pos + upward * 0.14 * rig_scale
+		points.push_front(hip_overlap)
+		radii.push_front(r_hip * 1.08)
+		points.push_front(hip_dome_tip)
+		radii.push_front(r_hip * 0.72)
 
 	mesh_instance.mesh = build_limb_tube(points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION)
 	mesh_instance.set_surface_override_material(0, _build_goo_material(vis))
@@ -827,8 +861,9 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 ## oval sits, how big it is) is expressed in ProceduralFigure's own human
 ## terms and needs rescaling to actually land on/around a smaller rig's
 ## much shorter, narrower chest.
-static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0) -> Array[Node3D]:
+static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0, lava_helm_command: bool = false) -> Array[Node3D]:
 	var vis: Dictionary = blorb.body_visual_snapshot()
+	var sealed_lava := blorb.element_state == "fire" and lava_helm_command
 
 	# Spans only the CHEST's own local Y range (from where the abdomen
 	# ends to the top of the chest) -- per direct correction, "only in the
@@ -837,6 +872,20 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 	var chest_top := chest_bottom + ProceduralFigure.CHEST_SIZE.y * 2.0 * rig_scale
 	var half_height := (chest_top - chest_bottom) * 0.5 * TORSO_HEIGHT_INFLATE
 	var center_y := (chest_top + chest_bottom) * 0.5
+	if sealed_lava:
+		# A lava torso is the suit's continuous cuirass. spine_pivot's origin is
+		# the TOP of the pelvis (ProceduralFigure.build() places it at abdomen_y),
+		# while the hip mesh is centred one HIP_SIZE.y below that and has another
+		# HIP_SIZE.y of half-height below its centre.  Its exact lower edge in
+		# spine-local space is therefore -2 * HIP_SIZE.y -- not the former 0.55
+		# approximation, which stopped high inside the pelvis.  The shared
+		# CHEST_BOTTOM_EXTEND applied immediately below then carries the shell a
+		# further 4 cm past that edge, giving the requested diaper-like overlap
+		# even while the independently animated hips bob beneath the spine.
+		var sealed_bottom: float = -ProceduralFigure.HIP_SIZE.y * 2.0 * rig_scale
+		var sealed_top: float = chest_top + ProceduralFigure.HEAD_RAISE * 1.35 * rig_scale
+		half_height = (sealed_top - sealed_bottom) * 0.5
+		center_y = (sealed_top + sealed_bottom) * 0.5
 	# Extends the BOTTOM edge down by CHEST_BOTTOM_EXTEND while leaving the
 	# top edge exactly where it was, per direct instruction -- the standard
 	# asymmetric-extent-plus-offset technique (grow the half-extent by half
@@ -856,10 +905,15 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 	# something rig_scale (a pure size ratio) should touch. Detected the
 	# same way the rest of this file already keys "is this Xiao Hou Zi" off
 	# rig_scale, since he's the only rig that ever passes a non-1.0 value.
-	if is_equal_approx(rig_scale, MonkeyFigure.BLORB_SUIT_RIG_SCALE):
+	if not sealed_lava and is_equal_approx(rig_scale, MonkeyFigure.BLORB_SUIT_RIG_SCALE):
 		center_y = MonkeyFigure.BODY_HEIGHT * 0.5
-	var half_width := ProceduralFigure.CHEST_SIZE.x * TORSO_INFLATE * rig_scale
-	var half_depth := ProceduralFigure.CHEST_SIZE.z * TORSO_INFLATE * 1.2 * rig_scale
+	var torso_seal_scale := 1.1 if sealed_lava else 1.0
+	var half_width := ProceduralFigure.CHEST_SIZE.x * TORSO_INFLATE * torso_seal_scale * rig_scale
+	var half_depth := ProceduralFigure.CHEST_SIZE.z * TORSO_INFLATE * 1.2 * torso_seal_scale * rig_scale
+	if blorb.has_core_item("Dented Breastplate") and not sealed_lava:
+		return [_build_knight_breastplate(
+			spine_pivot, blorb, center_y, half_width, half_height, half_depth, rig_scale
+		)] as Array[Node3D]
 
 	var torso := MeshInstance3D.new()
 	# Back to a proper SuperEgg roundness (EPSILON_SOFT) per direct
@@ -893,6 +947,99 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 	return [torso] as Array[Node3D]
 
 
+## The absorbed breastplate is the torso counterpart to Knight's Helm: the
+## Blorb itself becomes a rounded medieval cuirass in its own material, with
+## broad upper armor, a guarded lower flare, an integrated collar, and its
+## living face still embedded in the front rather than covered by a prop.
+static func _build_knight_breastplate(
+	spine_pivot: Node3D, blorb: Blorb, center_y: float,
+	half_width: float, half_height: float, half_depth: float, rig_scale: float
+) -> Node3D:
+	var vis: Dictionary = blorb.body_visual_snapshot()
+	var root := Node3D.new()
+	root.name = "TorsoBlorbKnightBreastplate"
+	root.position.y = center_y
+	spine_pivot.add_child(root)
+
+	var plate_csg := CSGCombiner3D.new()
+	plate_csg.name = "KnightBreastplateCSG"
+	root.add_child(plate_csg)
+	var plate := CSGMesh3D.new()
+	plate.name = "KnightBreastplateBlorbBody"
+	plate.mesh = BlorbBodyShape.build_mesh_from_rings(
+		_build_knight_breastplate_rings(half_width, half_height, half_depth)
+	)
+	plate.material = _build_goo_material(vis)
+	plate_csg.add_child(plate)
+	var dent_cutter := CSGMesh3D.new()
+	dent_cutter.name = "ImpactDent"
+	var dent_sphere := SphereMesh.new()
+	dent_sphere.radius = half_width * 0.145
+	dent_sphere.height = half_width * 0.29
+	dent_sphere.radial_segments = 14
+	dent_sphere.rings = 8
+	dent_cutter.mesh = dent_sphere
+	dent_cutter.material = _build_goo_material(vis)
+	dent_cutter.operation = CSGShape3D.OPERATION_SUBTRACTION
+	dent_cutter.position = Vector3(half_width * 0.34, half_height * 0.27, half_depth * 1.10)
+	dent_cutter.scale = Vector3(1.0, 0.82, 0.62)
+	plate_csg.add_child(dent_cutter)
+
+	# A raised collar and central keel repeat the helm's close-fitting, rounded
+	# construction without turning the Blorb into a stack of ordinary metal.
+	var collar := SuperEgg.build_part(
+		Vector3(half_width * 0.62, half_height * 0.14, half_depth * 0.72),
+		vis["albedo"] as Color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
+	)
+	collar.material_override = _build_goo_material(vis)
+	collar.position = Vector3(0.0, half_height * 0.82, -half_depth * 0.02)
+	root.add_child(collar)
+	var keel := SuperEgg.build_part(
+		Vector3(half_width * 0.055, half_height * 0.68, half_depth * 0.055),
+		vis["albedo"] as Color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+	)
+	keel.material_override = _build_goo_material(vis)
+	keel.position = Vector3(0.0, -half_height * 0.02, half_depth * 1.02)
+	root.add_child(keel)
+
+	var eye_center := Vector3(0.0, half_height * 0.05, half_depth * 1.09 + TORSO_EYE_FORWARD_PUSH * rig_scale)
+	_update_face(
+		plate, eye_center, Vector3(0, 0, 1), half_width, vis,
+		TORSO_EYE_RADIUS_FRACTION, TORSO_CORE_RADIUS_FRACTION,
+		TORSO_EYE_FLATTEN, TORSO_EYE_SPACING, TORSO_EYE_OUTWARD_TILT
+	)
+	return root
+
+
+static func _build_knight_breastplate_rings(
+	half_width: float, half_height: float, half_depth: float
+) -> Array:
+	# Bottom-to-top profile: guarded skirt, drawn waist, broad shoulder plate,
+	# then a rounded close around the neck. Zero-radius poles keep it watertight.
+	var profile: Array[Vector2] = [
+		Vector2(-1.0, 0.0), Vector2(-0.92, 0.78), Vector2(-0.72, 0.96),
+		Vector2(-0.42, 0.84), Vector2(0.18, 0.96), Vector2(0.58, 1.12),
+		Vector2(0.80, 1.02), Vector2(0.94, 0.68), Vector2(1.0, 0.0),
+	]
+	var rings: Array = []
+	for profile_point in profile:
+		var ring: Array[Vector3] = []
+		for segment in BlorbBodyShape.RADIAL_SEGMENTS:
+			var angle := TAU * float(segment) / float(BlorbBodyShape.RADIAL_SEGMENTS)
+			var radius_scale := profile_point.y
+			# The upper front projects into a breastplate/visor-like chest guard,
+			# echoing the matching helm's own forward lower-face extension.
+			var upper_guard := smoothstep(0.05, 0.72, profile_point.x)
+			var front_weight := maxf(sin(angle), 0.0)
+			ring.append(Vector3(
+				cos(angle) * half_width * radius_scale,
+				profile_point.x * half_height,
+				sin(angle) * half_depth * radius_scale * (1.0 + upper_guard * front_weight * 0.12)
+			))
+		rings.append(ring)
+	return rings
+
+
 ## A head blorb has two forms: its ordinary drooping hat while on dry land,
 ## and a spherical diving helmet only while its wearer is buoyant in water
 ## or giant-blorb goo. Both are built once and the controller toggles their
@@ -902,7 +1049,17 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 ## fit whichever rig's own head_pivot this is actually being lofted onto.
 static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0) -> Array[Node3D]:
 	var vis: Dictionary = blorb.body_visual_snapshot()
-	var head_extent := maxf(ProceduralFigure.HEAD_SIZE.x, ProceduralFigure.HEAD_SIZE.z) * rig_scale
+	# Rigs with non-human proportions publish their real local head dimensions
+	# on the pivot. In particular, Xiao Hou Zi's head is proportionally much
+	# larger than a scaled-down human head; applying only the whole-rig ratio
+	# made his worn head piece look like it had shrunk his skull.
+	var fallback_head_size := ProceduralFigure.HEAD_SIZE * rig_scale
+	var head_size: Vector3 = head_pivot.get_meta("blorb_suit_head_size", fallback_head_size) as Vector3
+	var head_extent := maxf(head_size.x, head_size.z)
+	# Measure the actual live head subtree before adding any suit geometry.
+	# This includes tall hair and ornaments, which a generic head-size formula
+	# can never reliably enclose.
+	var worn_head_bounds := _measure_head_contents(head_pivot)
 	var albedo := vis["albedo"] as Color
 	var hat_radius := head_extent * HAT_RADIUS_SCALE
 	var hat_height := hat_radius * HAT_HEIGHT_SCALE
@@ -916,7 +1073,7 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	# authored lower/back adjustments retained from the original hat form.
 	hat.position = Vector3(
 		0.0,
-		ProceduralFigure.HEAD_SIZE.y * 2.0 * rig_scale - hat_height * HAT_EMBED_FRACTION - HAT_LOWER_SHIFT * rig_scale,
+		head_size.y * 2.0 - hat_height * HAT_EMBED_FRACTION - HAT_LOWER_SHIFT * rig_scale,
 		-HAT_BACK_SHIFT * rig_scale
 	)
 	head_pivot.add_child(hat)
@@ -934,15 +1091,24 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	hat_core.position = Vector3(0.0, hat_eye_y, hat_eye_radius * 0.3)
 	hat.add_child(hat_core)
 	_add_head_core_light(hat_core, vis)
+	if blorb.has_core_item("Nautilus Crown"):
+		_add_nautilus_pirate_hat(hat, hat_radius, vis)
+		return [hat] as Array[Node3D]
 	if blorb.has_core_item("Knight's Helm"):
 		hat.queue_free()
 		return [_build_knights_helm(head_pivot, head_extent, vis, rig_scale)] as Array[Node3D]
+	# Fire-only, per direct instruction -- thrown_item.gd now refuses the item
+	# on any other element before it ever reaches core_items, but this guard
+	# also covers a blorb that picked it up before that restriction existed.
+	if blorb.has_core_item("Lava Helm") and blorb.element_state == "fire":
+		hat.queue_free()
+		return [_build_lava_helm(head_pivot, worn_head_bounds, vis)] as Array[Node3D]
 
 	# Only a blorb that has absorbed the Diving Helmet item can transform
 	# into the sealed underwater form. Every other head blorb stays a hat.
 	if not blorb.has_core_item("Diving Helmet"):
 		return [hat] as Array[Node3D]
-	var helmet_radius := maxf(head_extent * 1.9, ProceduralFigure.HEAD_SIZE.y * 1.55 * rig_scale)
+	var helmet_radius := maxf(head_extent * 1.9, head_size.y * 1.55)
 	var helmet := MeshInstance3D.new()
 	helmet.name = "HeadBlorbHelmet"
 	var sphere := SphereMesh.new()
@@ -955,7 +1121,7 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	# The figure head mesh is centered at HEAD_SIZE.y under HeadPivot, so
 	# the sphere shares that center and fully encloses its crown, face, and
 	# back of skull with a generous breathing-space margin.
-	helmet.position = Vector3(0, ProceduralFigure.HEAD_SIZE.y * rig_scale, 0)
+	helmet.position = Vector3(0, head_size.y, 0)
 	head_pivot.add_child(helmet)
 
 	# Sphere surface data at a slightly raised forward eye line. BlorbFace
@@ -985,6 +1151,411 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	helmet.visible = false
 
 	return [hat, helmet] as Array[Node3D]
+
+
+static func _measure_head_contents(head_pivot: Node3D) -> AABB:
+	var found := false
+	var bounds := AABB()
+	for descendant in head_pivot.find_children("*", "MeshInstance3D", true, false):
+		var mesh_instance := descendant as MeshInstance3D
+		if (
+			mesh_instance == null
+			or mesh_instance.mesh == null
+			or mesh_instance.name.begins_with("HeadBlorb")
+			or _is_suit_geometry(mesh_instance, head_pivot)
+		):
+			continue
+		var source := mesh_instance.mesh.get_aabb()
+		for corner_index in 8:
+			var corner := source.position + Vector3(
+				source.size.x if (corner_index & 1) != 0 else 0.0,
+				source.size.y if (corner_index & 2) != 0 else 0.0,
+				source.size.z if (corner_index & 4) != 0 else 0.0
+			)
+			var local_point := head_pivot.to_local(mesh_instance.to_global(corner))
+			if not found:
+				bounds = AABB(local_point, Vector3.ZERO)
+				found = true
+			else:
+				bounds = bounds.expand(local_point)
+	if not found:
+		var fallback := ProceduralFigure.HEAD_SIZE
+		return AABB(Vector3(-fallback.x, 0.0, -fallback.z), fallback * 2.0)
+	return bounds
+
+
+## A released suit piece remains in the SceneTree until queue_free resolves at
+## frame end. Walk ancestors rather than checking only the mesh itself because
+## compound pieces such as the Lava Helm mark their returned root while their
+## visible mesh lives below it.
+static func _is_suit_geometry(node: Node, boundary: Node) -> bool:
+	var current: Node = node
+	while current != null and current != boundary:
+		if current.has_meta("blorb_suit_piece"):
+			return true
+		current = current.get_parent()
+	return false
+
+
+static func _build_lava_helm(head_pivot: Node3D, contents: AABB, vis: Dictionary) -> Node3D:
+	# Per direct correction, the real head stays visible underneath -- a
+	# translucent goo overlay over the real body part is how every other
+	# suit slot already works (no other slot in this file ever sets a real
+	# body-part visual's `visible` to false; this used to be the one
+	# exception). `protected_visual_scales` below guards against some other
+	# system (a future preview or suit animation change) resetting one of
+	# these visuals' scale while this piece is worn -- unrelated to that old
+	# hiding, and to head_pivot's own scale (see preserve_covered_head_
+	# scale()'s own comment: nothing in this codebase actually scales
+	# head_pivot itself, so protecting it was dead defensive code, removed).
+	var protected_visual_scales: Array[Dictionary] = []
+	for descendant in head_pivot.find_children("*", "VisualInstance3D", true, false):
+		var original_visual := descendant as VisualInstance3D
+		if (
+			original_visual != null
+			and original_visual.visible
+			and not _is_suit_geometry(original_visual, head_pivot)
+		):
+			protected_visual_scales.append({
+				"visual": original_visual,
+				"scale": original_visual.scale,
+			})
+	var root := Node3D.new()
+	root.name = "HeadBlorbLavaHelm"
+	root.set_meta("protected_visual_scales", protected_visual_scales)
+	head_pivot.add_child(root)
+
+	# Per direct correction, this is Lava Slide's own cashew/bent-pipe head
+	# shape, not a dome -- see _build_lava_helm_rings()'s own doc comment
+	# for how its single "face" bulge is sized and placed to guarantee full
+	# enclosure of `contents` (the actual measured head+hair bounds).
+	var shape := _lava_helm_shape(contents)
+	var origin: Vector3 = shape["origin"]
+	var face_forward: float = shape["face_forward"]
+	var bulb_radius: float = shape["bulb_radius"]
+	# The pipe's own face point (s=0), i.e. the true center of the
+	# enclosing bulge -- not `origin`, which is offset behind it.
+	var face_center := origin + Vector3(0.0, 0.0, face_forward)
+
+	var helm := MeshInstance3D.new()
+	helm.name = "LavaHelmBlorbBody"
+	# Rings come back already in head_pivot's own local space (the same
+	# space `contents` was measured in), so the mesh instance itself needs
+	# no separate position offset.
+	helm.mesh = BlorbBodyShape.build_mesh_from_rings(_build_lava_helm_rings(contents))
+	helm.material_override = _build_goo_material(vis)
+	root.add_child(helm)
+	_add_lava_helm_eyes(helm, contents, vis["albedo"] as Color)
+
+	var core := BlorbCore.build(bulb_radius * CORE_RADIUS_FRACTION * HAT_CORE_RADIUS_SCALE, vis["core_color"] as Color, vis["core_emissive"] as bool)
+	core.position = Vector3(face_center.x, face_center.y - bulb_radius * 0.1, face_center.z + bulb_radius * 0.31)
+	helm.add_child(core)
+	_add_head_core_light(core, vis)
+	_add_lava_mohawk(helm, bulb_radius)
+	# _add_lava_mohawk() (shared with the player's own worn Lava Helm hat)
+	# positions its flame assuming the parent's own origin sits at the
+	# object's center -- true there, but our own origin is head_pivot's,
+	# offset from the bulge's own center by however the actual head/hair
+	# sit within it.
+	var mohawk := helm.get_node_or_null("BurningMohawk") as Node3D
+	if mohawk != null:
+		mohawk.position += face_center
+
+	# The helmet is a covering attached beneath the head pivot. Its calculated
+	# shell radius must never become a scale operation on the wearer's anatomy.
+	preserve_covered_head_scale(root)
+	return root
+
+
+## Reasserts each of the real head's own visible meshes at their originally
+## authored scale while a Lava Helm is worn -- protects them from some other
+## system (a future preview or suit animation change) resetting one along
+## the way, independent of helmet sizing. Per direct correction, this used
+## to also reassert head_pivot's own scale, but nothing in this codebase
+## ever actually sets that to anything else; that half was dead defensive
+## code and has been removed.
+static func preserve_covered_head_scale(piece: Node3D) -> void:
+	if piece == null:
+		return
+	# is_instance_valid() must run on a raw, UNTYPED reference. Even just
+	# assigning an already-freed Object into a statically-typed `Object`
+	# variable (not only an `as` cast) makes GDScript's own type coercion
+	# throw "Trying to assign invalid previously freed instance" right at
+	# that assignment -- confirmed the hard way. This reference can go stale
+	# between this piece's build time (when it was captured) and any later
+	# frame this runs on.
+	var visual_states: Array = piece.get_meta("protected_visual_scales", []) as Array
+	for state_value in visual_states:
+		var state := state_value as Dictionary
+		var visual_ref = state.get("visual")
+		if is_instance_valid(visual_ref):
+			(visual_ref as VisualInstance3D).scale = state.get("scale") as Vector3
+
+
+## Frees are owned by BlorbSuitController, but special pieces may have visual
+## state to unwind first. Keeping that cleanup beside the builder prevents an
+## unequip, assignment change, or story suspension from leaving the real
+## head's scale still overridden after the Lava Helm disappears.
+static func release_piece(piece: Node3D) -> void:
+	if piece == null:
+		return
+	preserve_covered_head_scale(piece)
+	# queue_free is intentionally retained because callers can release during a
+	# tree update, but hide immediately so stale geometry cannot flash or enter
+	# another visible-subtree query before frame-end deletion.
+	piece.visible = false
+	piece.queue_free()
+
+
+## Per direct correction, NOT a dome fused to a separate boomerang crest --
+## this is the exact same single bent-pipe cashew technique as Lava Slide's
+## own living head (see lava_slide.gd's _build_lava_slide_head_rings()):
+## fattest at one "face" cross section, then narrowing gradually and
+## smoothly (never a hard taper) into two rounded tips swept up and back.
+## The only thing this version does differently is size and place that face
+## bulge from `contents` -- the actual measured head+hair bounds -- instead
+## of a fixed authored size, since it has to actually enclose an arbitrary
+## wearer's head rather than just look like one.
+##
+## Sizing: BULB_RADIUS is set to (at least) `contents`' own half-diagonal,
+## so a sphere of that radius centered on `contents`' own center always
+## contains the whole box, whatever its proportions -- and the face cross
+## section at s=0 is approximately exactly that sphere (radius stays within
+## cos(small angle) of BULB_RADIUS for s near 0, and the pipe's other two
+## span/back/lift dimensions move so little near s=0 that this reads as a
+## true sphere there, not just "close enough"). Every other shape constant
+## is expressed as a ratio against BULB_RADIUS, copied directly from Lava
+## Slide's own tuned proportions (each of his HEAD_* constants divided by
+## his own HEAD_PIPE_RADIUS), so this reads as the same cashew silhouette
+## uniformly rescaled to whatever this wearer's head needs -- not a
+## differently-shaped helm that merely shares the technique.
+## Cut from 1.15 per direct correction ("massively big") -- 1.04 is a much
+## tighter fit, a 4% safety buffer over the mathematically exact minimum
+## enclosing sphere rather than 15% of headroom to spare.
+const LAVA_HELM_ENCLOSE_MARGIN := 1.04
+const LAVA_HELM_SPAN_RATIO := 0.16 / 0.09
+## Cut from Lava Slide's own 0.13/0.09 ratio per direct correction ("shorten
+## the distance the pipe extends behind him"), then cut again from 0.8, then
+## again from 0.5, per further direct corrections ("the lobes are going back
+## too far" / "still too far back").
+const LAVA_HELM_BACK_RATIO := 0.3
+const LAVA_HELM_LIFT_RATIO := 0.11 / 0.09
+const LAVA_HELM_FACE_FORWARD_RATIO := 0.17 / 0.09
+## Past this |s|, an extra shrink factor (on top of the ordinary cos(phi)
+## taper every ring already gets) ramps in -- see _lava_helm_radius_at().
+## Per direct correction (twice now), pushed down again from 0.1 to
+## start almost immediately past the face bulge itself -- the exact
+## enclosing sphere is only strictly needed AT s=0; the real head's own
+## cross section is narrower than that everywhere else, so tapering can
+## start shrinking well before the shell has fully "cleared" the head and
+## still enclose it.
+const LAVA_HELM_CLEAR_S := 0.04
+## How much extra shrink (beyond the ordinary cos(phi) taper) has fully
+## ramped in by the very tip (|s|=1). Per direct correction (twice now),
+## raised again from 0.35 for a more pronounced shrink overall, spread
+## smoothly (smoothstep, not a hard cutoff) across nearly this whole
+## s=0.04..1.0 span. The actual point-free cashew closing at the tip still
+## comes from cos(phi) alone hitting zero there regardless of this value.
+const LAVA_HELM_EXTRA_TAPER := 0.6
+
+
+## Every shape constant this pipe needs, derived once from `contents` so
+## _build_lava_helm_rings() and _add_lava_helm_eyes() can't drift apart from
+## each other. `origin` is the offset that lands the pipe's own s=0 face
+## point (which sits BULB_FACE_FORWARD ahead of the pipe's local origin, per
+## _lava_helm_pipe_center()'s own (0,0,face_forward) at s=0) exactly on
+## `contents`' measured center.
+static func _lava_helm_shape(contents: AABB) -> Dictionary:
+	var center := contents.position + contents.size * 0.5
+	var bulb_radius := contents.size.length() * 0.5 * LAVA_HELM_ENCLOSE_MARGIN
+	var face_forward := bulb_radius * LAVA_HELM_FACE_FORWARD_RATIO
+	return {
+		"bulb_radius": bulb_radius,
+		"span": bulb_radius * LAVA_HELM_SPAN_RATIO,
+		"back": bulb_radius * LAVA_HELM_BACK_RATIO,
+		"lift": bulb_radius * LAVA_HELM_LIFT_RATIO,
+		"face_forward": face_forward,
+		"origin": center - Vector3(0.0, 0.0, face_forward),
+	}
+
+
+## Identical in structure to lava_slide.gd's own _head_pipe_center(), just
+## taking its span/back/lift/face_forward as parameters instead of reading
+## fixed constants, since this shape's own scale varies per wearer.
+static func _lava_helm_pipe_center(s: float, span: float, back: float, lift: float, face_forward: float) -> Vector3:
+	return Vector3(s * span, lift * s * s, face_forward * (1.0 - s * s) - back * s * s)
+
+
+static func _lava_helm_pipe_tangent(s: float, span: float, back: float, lift: float, face_forward: float) -> Vector3:
+	const STEP := 0.01
+	return (
+		_lava_helm_pipe_center(minf(s + STEP, 1.0), span, back, lift, face_forward)
+		- _lava_helm_pipe_center(maxf(s - STEP, -1.0), span, back, lift, face_forward)
+	).normalized()
+
+
+## The ordinary cos(phi) taper every ring gets, further multiplied by an
+## extra shrink factor once |s| passes LAVA_HELM_CLEAR_S -- per direct
+## correction, the shell stayed just as fat all the way out to the tips as
+## it needed to be near the face to actually enclose the head, when it only
+## needs to be that fat near the face. Shared by the ring builder and the
+## eye placer so they never taper against different curves.
+static func _lava_helm_radius_at(s: float, bulb_radius: float) -> float:
+	var phi := asin(clampf(s, -1.0, 1.0))
+	var base := bulb_radius * cos(phi)
+	var clear_t := clampf(inverse_lerp(LAVA_HELM_CLEAR_S, 1.0, absf(s)), 0.0, 1.0)
+	var extra := 1.0 - smoothstep(0.0, 1.0, clear_t) * LAVA_HELM_EXTRA_TAPER
+	return base * extra
+
+
+static func _build_lava_helm_rings(contents: AABB) -> Array:
+	var shape := _lava_helm_shape(contents)
+	var origin: Vector3 = shape["origin"]
+	var span: float = shape["span"]
+	var back: float = shape["back"]
+	var lift: float = shape["lift"]
+	var face_forward: float = shape["face_forward"]
+	var bulb_radius: float = shape["bulb_radius"]
+	const RING_COUNT := 32
+	const RADIAL_SEGMENTS := 16
+	var rings: Array = []
+	for ring_index in RING_COUNT + 1:
+		var phi: float = -PI * 0.5 + PI * float(ring_index) / float(RING_COUNT)
+		var s := sin(phi)
+		var radius := _lava_helm_radius_at(s, bulb_radius)
+		var center := origin + _lava_helm_pipe_center(s, span, back, lift, face_forward)
+		var tangent := _lava_helm_pipe_tangent(s, span, back, lift, face_forward)
+		var right := tangent.cross(Vector3.UP)
+		right = right.normalized() if right.length() > 0.001 else Vector3.RIGHT
+		var up := right.cross(tangent).normalized()
+		var ring: Array[Vector3] = []
+		for segment in RADIAL_SEGMENTS:
+			var angle: float = TAU * float(segment) / float(RADIAL_SEGMENTS)
+			# Negated sin term -- see lava_slide.gd's identical fix; this
+			# builder shares the same winding otherwise.
+			ring.append(center + (right * cos(angle) - up * sin(angle)) * radius)
+		rings.append(ring)
+	return rings
+
+
+## Same construction as lava_slide.gd's _head_pipe_surface_sample()/
+## _place_eye_on_head() (that file's own doc comments have the full
+## reasoning): each eye samples the pipe's REAL generated surface at a
+## small lateral offset from the face point, using the exact center/
+## tangent/radius math the mesh itself is built from, so it lands exactly
+## on the surface rather than at an independently-guessed offset.
+static func _add_lava_helm_eyes(helm: Node3D, contents: AABB, body_color: Color) -> void:
+	const EYE_S_OFFSET := 0.18
+	const EMBED_FRACTION := 0.35
+	var shape := _lava_helm_shape(contents)
+	var origin: Vector3 = shape["origin"]
+	var span: float = shape["span"]
+	var back: float = shape["back"]
+	var lift: float = shape["lift"]
+	var face_forward: float = shape["face_forward"]
+	var bulb_radius: float = shape["bulb_radius"]
+	var eye_radius := bulb_radius * 0.16 * 0.5 * 1.28
+	var eye_color := body_color.darkened(0.25)
+	for side in [-1.0, 1.0]:
+		# Explicit `: float =` rather than `:=` -- `side`'s own static type
+		# from the untyped array literal above is Variant, which `:=`
+		# inference can't resolve into a concrete type (unlike figure_eyes.gd
+		# /BlorbFace.add_eyes()'s identical loop, which uses this same
+		# explicit-type pattern for exactly this reason).
+		var s: float = side * EYE_S_OFFSET
+		var radius := _lava_helm_radius_at(s, bulb_radius)
+		var center := origin + _lava_helm_pipe_center(s, span, back, lift, face_forward)
+		var tangent := _lava_helm_pipe_tangent(s, span, back, lift, face_forward)
+		var outward := tangent.cross(Vector3.UP)
+		outward = outward.normalized() if outward.length() > 0.001 else Vector3.RIGHT
+		var surface := center + outward * radius
+		var eye := MeshInstance3D.new()
+		eye.name = "EyeL" if side < 0.0 else "EyeR"
+		eye.mesh = SuperEgg.build_mesh(
+			Vector3(eye_radius, eye_radius * 1.15, eye_radius), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+		)
+		var material := StandardMaterial3D.new()
+		material.albedo_color = eye_color
+		material.roughness = 0.8
+		eye.set_surface_override_material(0, material)
+		eye.basis = Basis.looking_at(-outward, Vector3.UP)
+		eye.scale = Vector3(1.0, 1.0, 0.4)
+		eye.position = surface - outward * (eye_radius * EMBED_FRACTION)
+		helm.add_child(eye)
+
+
+static func _add_lava_mohawk(parent: Node3D, radius: float) -> void:
+	var fire := GPUParticles3D.new()
+	fire.name = "BurningMohawk"
+	# Helmet-local simulation keeps the flame rooted to a moving wearer. The
+	# old world-space particles stayed behind at every previous head position,
+	# producing a smoke-trail ribbon rather than fire attached to a mohawk.
+	fire.local_coords = true
+	fire.amount = 86
+	fire.lifetime = 0.46
+	fire.randomness = 0.55
+	fire.visibility_aabb = AABB(Vector3(-radius, -radius, -radius), Vector3(radius * 2.0, radius * 3.0, radius * 2.0))
+	var texture := ParticleFX.build_soft_gradient_texture(32, 1.4, 0.22)
+	var quad := QuadMesh.new()
+	quad.size = Vector2(radius * 0.34, radius * 0.72)
+	var flame_material := ParticleFX.build_billboard_material(texture, Color.WHITE, true, 0.0)
+	flame_material.vertex_color_use_as_albedo = true
+	quad.material = flame_material
+	fire.draw_pass_1 = quad
+	var process := ParticleProcessMaterial.new()
+	process.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	process.emission_box_extents = Vector3(radius * 0.05, radius * 0.04, radius * 0.76)
+	# Sweep toward the helmet's rear (-Z) instead of rising toward its face.
+	# Retain a smaller upward component so it reads as a wind-combed flame
+	# crest, not a flamethrower jet fired horizontally from the scalp.
+	process.direction = Vector3(0.0, 0.48, -0.88).normalized()
+	process.spread = 16.0
+	process.initial_velocity_min = 1.3
+	process.initial_velocity_max = 2.25
+	process.gravity = Vector3(0.0, 0.4, 0.0)
+	process.particle_flag_align_y = true
+	process.angle_min = -12.0
+	process.angle_max = 12.0
+	process.scale_curve = ParticleFX.build_scale_curve(0.45, 1.12, 0.28, 0.18)
+	process.turbulence_enabled = true
+	process.turbulence_noise_strength = 0.8
+	process.turbulence_noise_scale = 2.0
+	process.turbulence_influence_min = 0.03
+	process.turbulence_influence_max = 0.12
+	process.color_ramp = ParticleFX.build_color_ramp([
+		{"offset": 0.0, "color": Color(1.0, 0.92, 0.34, 0.95)},
+		{"offset": 0.42, "color": Color(1.0, 0.25, 0.025, 0.82)},
+		{"offset": 1.0, "color": Color(0.4, 0.015, 0.005, 0.0)},
+	])
+	fire.process_material = process
+	fire.position = Vector3(0.0, radius * 1.04, -radius * 0.08)
+	parent.add_child(fire)
+
+
+static func _add_nautilus_pirate_hat(hat: Node3D, radius: float, vis: Dictionary) -> void:
+	var material := _build_goo_material(vis)
+	var crown := MeshInstance3D.new()
+	crown.name = "NautilusPirateCrown"
+	crown.mesh = SuperEgg.build_mesh(Vector3(radius * 1.05, radius * 0.42, radius * 0.78), 2.5, SuperEgg.EPSILON_FLAT)
+	crown.material_override = material
+	crown.position = Vector3(0.0, radius * 1.24, 0.0)
+	hat.add_child(crown)
+	for yaw_degrees: float in [0.0, 120.0, 240.0]:
+		var brim := MeshInstance3D.new()
+		brim.mesh = SuperEgg.build_mesh(Vector3(radius * 1.38, radius * 0.12, radius * 0.54), 2.5, SuperEgg.EPSILON_FLAT)
+		brim.material_override = material
+		brim.position = Vector3(0.0, radius * 1.02, 0.0)
+		brim.rotation.y = deg_to_rad(yaw_degrees)
+		hat.add_child(brim)
+	# The nautilus spiral is embossed in the same living goo color.
+	for index in 8:
+		var t := float(index) / 7.0
+		var angle := t * TAU * 1.4
+		var spiral := MeshInstance3D.new()
+		spiral.mesh = SuperEgg.build_mesh(Vector3(radius * 0.09, radius * 0.09, radius * 0.035), 2.2, 2.2)
+		spiral.material_override = material
+		spiral.position = Vector3(cos(angle) * radius * 0.36 * t, radius * 1.28 + sin(angle) * radius * 0.36 * t, radius * 0.79)
+		hat.add_child(spiral)
 
 
 ## `head_extent` arrives already scaled by the caller's own `rig_scale` (see
@@ -1180,7 +1751,7 @@ static func _avg_xz(size: Vector3) -> float:
 static func build_limb_tube(
 	control_points: Array[Vector3], control_radii: Array[float],
 	radial_segments: int, rings_per_segment: int, cap_fraction: float,
-	control_colors: Array[Color] = []
+	control_colors: Array[Color] = [], taper_start: bool = true
 ) -> ArrayMesh:
 	var n := control_points.size()
 	var p_start: Vector3 = control_points[0] * 2.0 - control_points[1]
@@ -1219,7 +1790,7 @@ static func build_limb_tube(
 			)
 			var radius := lerpf(control_radii[seg], control_radii[seg + 1], t)
 			var u := float(ring_index) / float(total_rings - 1)
-			radius *= _cap_taper(u, cap_fraction)
+			radius *= _cap_taper(u, cap_fraction, taper_start)
 
 			var right: Vector3
 			var up: Vector3
@@ -1280,8 +1851,8 @@ static func _catmull_rom_tangent(p0: Vector3, p1: Vector3, p2: Vector3, p3: Vect
 ## end (u=0/u=1) over cap_fraction of its total length -- a quarter-sine
 ## taper that keeps the tube ends from terminating as full-radius cuts.
 ## Flat (1.0, no taper) through the middle.
-static func _cap_taper(u: float, cap_fraction: float) -> float:
-	if u < cap_fraction:
+static func _cap_taper(u: float, cap_fraction: float, taper_start: bool = true) -> float:
+	if taper_start and u < cap_fraction:
 		return sin((u / cap_fraction) * PI * 0.5)
 	if u > 1.0 - cap_fraction:
 		return sin(((1.0 - u) / cap_fraction) * PI * 0.5)
@@ -1351,6 +1922,14 @@ static func _to_local_dir(root: Node3D, world_dir: Vector3) -> Vector3:
 ## exactly like an ordinary blorb, since it's literally the same material-
 ## construction code rather than a second hand-kept-in-sync copy.
 static func _build_goo_material(vis: Dictionary) -> StandardMaterial3D:
+	# Free Rock blorbs remain living creatures; only their worn armor form
+	# hardens into the same opaque, dry stone used by natural boulders.
+	if (vis.get("element", "") as String) == "rock":
+		var rock_material := StandardMaterial3D.new()
+		rock_material.albedo_color = NatureProps.ROCK_COLOR
+		rock_material.roughness = 0.96
+		rock_material.metallic = 0.0
+		return rock_material
 	var albedo := vis["albedo"] as Color
 	return BlorbBodyShape.build_body_material(
 		Color(albedo.r, albedo.g, albedo.b, maxf(albedo.a, 0.88)),

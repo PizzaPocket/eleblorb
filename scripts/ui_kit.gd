@@ -594,8 +594,15 @@ static func stat_meter(
 
 	var value_text := "%d/%d" % [value, max_value] if show_track else str(value)
 	var label_ctrl := inline_caption("%s: %s" % [stat_label, value_text], UITheme.TEXT_PRIMARY)
-	label_ctrl.custom_minimum_size.x = label_width
-	label_ctrl.clip_text = true
+	# A fixed column aligns ordinary rows, but must not become a clipping
+	# window when debug/high-level values gain digits. Measure the actual
+	# rendered caption and widen only as much as it needs. The adjacent bar
+	# deliberately retains its authored width: its length encodes magnitude
+	# and must remain visually comparable regardless of digit count.
+	label_ctrl.clip_text = false
+	var natural_label_width: float = ceilf(label_ctrl.get_minimum_size().x)
+	var resolved_label_width: float = maxf(label_width, natural_label_width)
+	label_ctrl.custom_minimum_size.x = resolved_label_width
 	label_ctrl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	label_ctrl.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	row.add_child(label_ctrl)
@@ -779,6 +786,7 @@ static func close_button(on_pressed: Callable) -> Button:
 	b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	b.pressed.connect(on_pressed)
+	b.set_meta("ui_sound_kind", "back")
 
 	var icon := CloseIcon.new()
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE

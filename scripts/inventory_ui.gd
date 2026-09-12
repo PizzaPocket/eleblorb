@@ -58,6 +58,10 @@ const BOUND_ITEM_SLOT_SIZE := Vector2(168, 156)
 const BLORB_METER_LABEL_WIDTH := 170.0
 const BLORB_METER_BAR_WIDTH := 260.0
 const ITEM_HELD_FEEDBACK_DURATION := 1.6
+## The paper-doll actions form one visual/control column. A shared width
+## prevents the shorter "Remove" label producing a smaller target than the
+## destructive action beneath it.
+const PORTRAIT_ACTION_MIN_WIDTH := 280.0
 
 var _panel: PanelContainer
 var _coin_readout: PanelContainer
@@ -199,7 +203,9 @@ func _build_ui() -> void:
 	# HUD overlay this modal would otherwise have to coordinate with.
 	_coin_readout = UIKit.tokoin_badge(TokoinWallet.value, UITheme.TEXT_PRIMARY)
 	right_header.add_child(_coin_readout)
-	right_header.add_child(UIKit.close_button(_close))
+	var close := UIKit.close_button(_close)
+	close.set_meta("ui_sound_kind", "menu_close")
+	right_header.add_child(close)
 
 	# Both tabs' content sits in the same fixed remaining space (SIZE_
 	# EXPAND_FILL) -- switching tabs only ever swaps which one is visible,
@@ -376,6 +382,7 @@ func _build_portrait_area() -> void:
 	area.add_child(_portrait_slot_label)
 
 	_portrait_remove_button = UIKit.button("Remove", _remove_selected_assignment)
+	_portrait_remove_button.custom_minimum_size.x = PORTRAIT_ACTION_MIN_WIDTH
 	_portrait_remove_button.gui_input.connect(_on_remove_input)
 	UIKit.anchor_to_edge(
 		_portrait_remove_button, 1.0, 0.5, UITheme.SPACE_MD, 0.0
@@ -391,11 +398,20 @@ func _build_portrait_area() -> void:
 	# Visible whenever a non-Blorbus blorb is selected, independent of
 	# whether it's currently assigned to a body slot.
 	_release_button = UIKit.button("Release to the Wild", _confirm_release_selected_blorb)
+	_release_button.custom_minimum_size.x = PORTRAIT_ACTION_MIN_WIDTH
 	_release_button.gui_input.connect(_on_release_input)
 	UIKit.anchor_to_edge(_release_button, 1.0, 0.5, UITheme.SPACE_MD, 0.0)
 	_release_button.offset_top += UITheme.BUTTON_MIN_HEIGHT + UITheme.SPACE_LG
 	_release_button.offset_bottom += UITheme.BUTTON_MIN_HEIGHT + UITheme.SPACE_LG
 	_paper_doll_shell.add_child(_release_button)
+	# Declare the vertical relationship to Godot's focus engine as well as
+	# handling it in _on_remove/_on_release_input below. This makes D-pad and
+	# stick navigation deterministic even when navigation is synthesized by
+	# the platform rather than arriving as the focused control's gui_input.
+	_portrait_remove_button.focus_neighbor_bottom = _portrait_remove_button.get_path_to(_release_button)
+	_portrait_remove_button.focus_next = _portrait_remove_button.get_path_to(_release_button)
+	_release_button.focus_neighbor_top = _release_button.get_path_to(_portrait_remove_button)
+	_release_button.focus_previous = _release_button.get_path_to(_portrait_remove_button)
 	_update_release_action()
 
 
@@ -669,7 +685,7 @@ func _update_release_action() -> void:
 	var can_release := (
 		_active_tab == "blorbs"
 		and _selected_blorb != null and is_instance_valid(_selected_blorb)
-		and not _selected_blorb.is_blorbus
+		and not _selected_blorb.is_story_companion()
 	)
 	_release_button.visible = can_release
 	_release_button.disabled = not can_release
@@ -709,7 +725,7 @@ func _remove_selected_assignment() -> void:
 ## the confirmation overlay rather than acting immediately -- per direct
 ## instruction, to guard against an accidental permanent release.
 func _confirm_release_selected_blorb() -> void:
-	if _selected_blorb == null or not is_instance_valid(_selected_blorb) or _selected_blorb.is_blorbus:
+	if _selected_blorb == null or not is_instance_valid(_selected_blorb) or _selected_blorb.is_story_companion():
 		return
 	_release_confirm_target = _selected_blorb
 	_release_confirm_label.text = (
@@ -939,6 +955,7 @@ func _open_inventory() -> void:
 	if get_tree().paused or UIState.modal_open:
 		return
 	_open = true
+	UISounds.play_crt_off()
 	_clear_item_held_feedback()
 	# _items_scroll's real width is already known by the time the panel can
 	# actually be opened (it went through its first layout pass back when
@@ -965,6 +982,7 @@ func _close() -> void:
 	if not _open:
 		return
 	_open = false
+	UISounds.play_crt_on()
 	_panel.visible = false
 	_clear_item_held_feedback()
 	var player := get_tree().get_first_node_in_group("player")
@@ -973,6 +991,10 @@ func _close() -> void:
 	get_tree().paused = false
 	UIState.pop_modal()
 	_set_portrait_active(false)
+
+
+func is_open() -> bool:
+	return _open
 
 
 func _on_wallet_changed(new_value: int) -> void:
@@ -1083,6 +1105,11 @@ func _refresh_blorbs() -> void:
 	for blorb in get_tree().get_nodes_in_group("blorbs"):
 		if blorb.in_party:
 			party.append(blorb)
+	party.sort_custom(func(a: Blorb, b: Blorb) -> bool:
+		var a_priority: int = 0 if a.is_blorbus else (1 if a.blorb_name == "Blorbaka" else 2)
+		var b_priority: int = 0 if b.is_blorbus else (1 if b.blorb_name == "Blorbaka" else 2)
+		return a_priority < b_priority
+	)
 
 	# A selected blorb that left the party (or was never in it -- shouldn't
 	# happen, but cheap to guard) can't stay selected.
@@ -1280,7 +1307,7 @@ func _build_blorb_row(blorb: Blorb) -> Control:
 		max_level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		meters.add_child(max_level_label)
 	var stat_values := UIKit.inline_caption(
-		"STR  %d    DEF  %d    SPD  %d" % [blorb.strength, blorb.defense, blorb.speed],
+		"STR  %d    DEF  %d    SPD  %d" % [blorb.strength, blorb.effective_defense(), blorb.speed],
 		UITheme.TEXT_PRIMARY
 	)
 	stat_values.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT

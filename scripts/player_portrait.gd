@@ -8,11 +8,17 @@ extends RefCounted
 const RESOLUTION := 768
 const PICK_LAYER := 1
 const PICK_WIDTH := 0.16
+## Paper-doll scale is part of the shared Player/Blorbs UI language. Keep one
+## authored frame for every assignment state instead of zooming in and out as
+## wings, helmets, or a highlighted preview piece enter and leave the doll.
+const FRAME_SPAN_SCALE := 0.72
+const FRAME_DEPTH_ALLOWANCE := 0.32
 
 var _viewport: SubViewport
 var _camera: Camera3D
 var _root: Node3D
 var _pivots: Dictionary
+var _body_frame_bounds: AABB
 var _preview_pieces_by_slot: Dictionary = {}
 var _preview_blorbs_by_slot: Dictionary = {}
 var _assignments: Dictionary = {}
@@ -42,6 +48,10 @@ func setup(player: Node3D, _live_visuals: Node3D) -> void:
 	_root.name = "PaperDollFigure"
 	_viewport.add_child(_root)
 	_pivots = Player.build_portrait_body(_root)
+	# Capture the canonical naked figure once. Suit geometry is deliberately
+	# excluded: it may change the silhouette, but must never change the apparent
+	# scale or center of the person wearing it.
+	_body_frame_bounds = _world_aabb(_root)
 	_build_dim_overlay()
 	_build_selected_overlay()
 	_build_reference_overlay()
@@ -103,10 +113,11 @@ func _build_lighting() -> void:
 
 
 func _build_camera() -> void:
-	var bounds := _world_aabb(_root)
+	var bounds := _body_frame_bounds
 	var center := bounds.get_center()
-	var half_fov_tan := tan(deg_to_rad(32.5))
-	var distance := maxf(bounds.size.y, bounds.size.x) * 0.58 / half_fov_tan
+	var half_fov_tan := tan(deg_to_rad(65.0 * 0.5))
+	var frame_span := maxf(bounds.size.y, bounds.size.x) * FRAME_SPAN_SCALE
+	var distance := frame_span / half_fov_tan + FRAME_DEPTH_ALLOWANCE
 	_camera = Camera3D.new()
 	_camera.fov = 65.0
 	_camera.position = center + Vector3(0, 0.03, maxf(distance, 2.0))
@@ -186,6 +197,10 @@ func _rebuild_preview() -> void:
 			if _assignments[assigned_slot] == _selected_blorb:
 				selected_is_assigned = true
 				break
+	# Resolve the complete visual assignment first. The sealed Lava Suit is a
+	# reversible five-piece configuration, not an effect the helm applies to a
+	# partial suit. This mirrors BlorbSuitController.has_full_lava_suit().
+	var preview_blorbs: Dictionary = {}
 	for slot in BlorbSuit.SLOT_ORDER:
 		var blorb := _assignments.get(slot) as Blorb
 		# An unassigned selected Blorb previews on the current target, replacing
@@ -194,9 +209,24 @@ func _rebuild_preview() -> void:
 		# an assigned piece and the bright target limb.
 		if not selected_is_assigned and slot == _highlighted_slot and _selected_blorb != null:
 			blorb = _selected_blorb
+		preview_blorbs[slot] = blorb
+	var preview_head := preview_blorbs.get("head") as Blorb
+	var lava_helm_command := (
+		is_instance_valid(preview_head)
+		and preview_head.element_state == "fire"
+		and preview_head.has_core_item("Lava Helm")
+	)
+	if lava_helm_command:
+		for required_slot in BlorbSuit.SLOT_ORDER:
+			var required_blorb := preview_blorbs.get(required_slot) as Blorb
+			if not is_instance_valid(required_blorb) or required_blorb.element_state != "fire":
+				lava_helm_command = false
+				break
+	for slot in BlorbSuit.SLOT_ORDER:
+		var blorb := preview_blorbs.get(slot) as Blorb
 		if blorb == null or not is_instance_valid(blorb):
 			continue
-		var pieces := BlorbSuit.equip_slot(slot, _preview_pivots(), _root, blorb)
+		var pieces := BlorbSuit.equip_slot(slot, _preview_pivots(), _root, blorb, 1.0, lava_helm_command)
 		_preview_pieces_by_slot[slot] = pieces
 		_preview_blorbs_by_slot[slot] = blorb
 	_apply_highlight()

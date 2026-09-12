@@ -378,6 +378,10 @@ static func build(
 	var head_size: Vector3 = HEAD_SIZE * (variant.get("head_size_scale", Vector3.ONE) as Vector3)
 	var head_pivot := Node3D.new()
 	head_pivot.name = "HeadPivot"
+	# BlorbSuit.build_head() must fit this actual head, not approximate it by
+	# applying the monkey's whole-body scale ratio to human head constants.
+	# Monkey heads occupy a deliberately different share of their anatomy.
+	head_pivot.set_meta("blorb_suit_head_size", head_size)
 	head_pivot.position = Vector3(0, body_height - HEAD_EMBED, 0)
 	# Counters the inherited spine tilt the same way _build_arm()'s own
 	# shoulder counter-rotation does (see that function's doc comment for

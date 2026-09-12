@@ -58,6 +58,7 @@ func _build_ui() -> void:
 
 	vbox.add_child(UIKit.heading("Paused"))
 	_resume_button = UIKit.button("Resume", _close)
+	_resume_button.set_meta("ui_sound_kind", "menu_close")
 	vbox.add_child(_resume_button)
 	vbox.add_child(UIKit.button("Quit", _quit))
 
@@ -92,6 +93,7 @@ func _open_menu() -> void:
 	if player != null and player.has_method("cancel_throw_preparation"):
 		player.cancel_throw_preparation()
 	_open = true
+	UISounds.play_crt_off()
 	_panel.visible = true
 	UIState.push_modal()
 	get_tree().paused = true
@@ -102,9 +104,14 @@ func _close() -> void:
 	if not _open:
 		return
 	_open = false
+	UISounds.play_crt_on()
 	_panel.visible = false
 	get_tree().paused = false
 	UIState.pop_modal()
+
+
+func is_open() -> bool:
+	return _open
 
 
 func _quit() -> void:

@@ -120,11 +120,17 @@ func _build_ui() -> void:
 	_columns.columns = 2
 	_columns.add_theme_constant_override("h_separation", UITheme.SPACE_XL)
 	_columns.add_theme_constant_override("v_separation", UITheme.SPACE_MD)
+	_columns.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	outer.add_child(_columns)
 
 	_buy_column = VBoxContainer.new()
 	_buy_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# The scroll container has intentionally no fixed minimum height. The
+	# column therefore has to claim the GridContainer's expandable row;
+	# without this, the grid shrinks to the section header and all item rows
+	# exist but are clipped inside a zero-height scroll viewport.
+	_buy_column.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_buy_column.add_theme_constant_override("separation", UITheme.SPACE_SM)
 	_columns.add_child(_buy_column)
 	_buy_column.add_child(UIKit.section_header("Buy"))
@@ -141,6 +147,7 @@ func _build_ui() -> void:
 
 	_sell_column = VBoxContainer.new()
 	_sell_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_sell_column.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_sell_column.add_theme_constant_override("separation", UITheme.SPACE_SM)
 	_columns.add_child(_sell_column)
 	_sell_column.add_child(UIKit.section_header("Sell"))

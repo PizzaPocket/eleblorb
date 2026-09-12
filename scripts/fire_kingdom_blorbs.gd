@@ -12,10 +12,6 @@ extends Node3D
 
 const BLORB_SCENE: PackedScene = preload("res://scenes/blorb.tscn")
 const FIRE_COUNT := 8
-## Matches fire_kingdom_terrain.gd's own LAVA_RADIUS -- stays out of the lake
-## itself, same as jungle_kingdom_blorbs.gd's own CLEAR_RADIUS keeps clear of
-## JungleVillage.
-const LAVA_CLEAR_RADIUS := 46.0
 const SPAWN_RADIUS := 220.0
 
 var _rng := RandomNumberGenerator.new()
@@ -52,7 +48,7 @@ func _pick_position() -> Variant:
 		var r := sqrt(_rng.randf_range(0.0, 1.0)) * SPAWN_RADIUS
 		var a := _rng.randf_range(0.0, TAU)
 		var pos := Vector2(cos(a) * r, sin(a) * r)
-		if pos.length() < LAVA_CLEAR_RADIUS * 1.1:
+		if pos.length() < 10.0 or _terrain.is_lava_area(pos) or _terrain.is_safe_zone(pos):
 			continue
 		return pos
 	return null

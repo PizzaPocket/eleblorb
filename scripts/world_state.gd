@@ -9,6 +9,10 @@ extends Node
 
 var _collected_ids: Dictionary = {}
 
+## Shared travel state survives scene replacement between kingdoms.
+var game_time_hours: float = 15.0
+var manchego_joined: bool = false
+
 ## Wild blorbs only begin noticing and bonding with the party once the
 ## starter trio's psychic Blorbus has awakened. As an autoload this survives
 ## kingdom scene changes; Party's restore path also reasserts it when it
@@ -39,14 +43,22 @@ var player_title: String = ""
 ## identically from scratch on every visit.
 var ice_kingdom_visited: bool = false
 
-## Set once the player bribes the Chinese village's Emperor with 150
-## tokoins (see chinese_village.gd's own _build_emperor()) -- gates his own
-## post-bribery dialogue and the farmer's follow-up "delegate rule to him"
-## action (see _build_farmer_and_pandy_quest()), which is what actually
-## hands over Pandy. Lives here rather than on the Emperor NPC instance
-## itself for the same reason false_hero_defeated does: main.tscn (and
-## ChineseVillage with it) reloads on every kingdom portal round trip.
+## Chinese-village story progression. Hearing the farmer's grievance makes
+## the Emperor's second audience available; the Demon Lord's Royal Chef then
+## steals the party's blorbs. Defeating him breaks his influence over the
+## Emperor, who transfers control of the village to the hero. The hero can
+## finally appoint the farmer as steward and receive Pandy. These live here
+## because the village is rebuilt on every return from another kingdom.
+var chinese_village_farmer_heard: bool = false
+var chinese_village_chef_defeated: bool = false
+var chinese_village_control_granted: bool = false
+## Retained as a compatibility alias for older in-progress saves/code paths;
+## it now means the Emperor has relinquished control, not that he was bribed.
 var chinese_village_emperor_deposed: bool = false
+## The Emperor's first audience mistakes the party's blorbs for meat buns.
+## They remain held in the royal kitchen until recovered there.
+var chinese_village_blorbs_taken: bool = false
+var chinese_village_blorbs_rescued: bool = false
 
 ## The farmer has accepted stewardship of the village and Pandy has been
 ## entrusted to the player's party. Kept separately from the Emperor's
@@ -60,6 +72,10 @@ var pandy_joined: bool = false
 var sun_wu_kong_freed: bool = false
 var sun_wu_kong_has_jingu_bang: bool = false
 var sun_wu_kong_summon_unlocked: bool = false
+
+## Lava Slide gives away the unique Lava Helm only once. He remains in the
+## Fire Kingdom afterward with his ordinary dialogue and roaming behavior.
+var lava_slide_helm_gifted: bool = false
 
 
 func is_collected(id: String) -> bool:

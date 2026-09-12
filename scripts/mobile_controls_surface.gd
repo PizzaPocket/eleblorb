@@ -24,7 +24,7 @@ const ACTION_LAYOUT := [
 	["FORM", "transform"], ["SWAP", "switch_blorbus"], ["BAG", "inventory"],
 	["L ARM", "left_arm_power"], ["JUMP", "jump"], ["R ARM", "right_arm_power"],
 	["L LEG", "left_leg_power"], ["USE", "interact"], ["R LEG", "right_leg_power"],
-	["RUN", "run"], ["Ⅱ", "pause"],
+	["RUN", "run"], ["CALL", "platform_aid"], ["Ⅱ", "pause"],
 ]
 
 var _joystick_outer: PanelContainer

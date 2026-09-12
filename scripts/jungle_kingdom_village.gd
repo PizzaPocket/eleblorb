@@ -485,6 +485,8 @@ func _build_ground_primates() -> void:
 ## otherwise crash on arrival, since the kingdom root is still mid-setup at
 ## that point.
 func _build_manchego_and_quest_ape() -> void:
+	if WorldState.manchego_joined:
+		return
 	var packed_manchego := load(MANCHEGO_SCENE) as PackedScene
 	var packed_ape := load(APE_TEMPLATE_SCENE) as PackedScene
 	if packed_manchego == null or packed_ape == null:
@@ -541,6 +543,7 @@ func _quest_ape_dialog_actions(ape: ApeTemplatePreview, manchego: Manchego) -> A
 			ape.unmount()
 			manchego.follows_player = true
 			manchego.set_available_to_player(true)
+			WorldState.manchego_joined = true
 			Hud.show_message("%s hops down. Manchego is yours now." % ape.display_name),
 	})
 	return actions

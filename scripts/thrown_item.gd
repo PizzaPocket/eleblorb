@@ -131,6 +131,12 @@ func _on_body_exited(body: Node3D) -> void:
 func _resolve_hit(body: Node3D, hit_position: Variant = null, hit_normal: Variant = null) -> void:
 	if _resolved:
 		return
+	if body.is_in_group("skeletons") and body.has_method("take_damage"):
+		# Thrown inventory objects remain recoverable after impact, but provide a
+		# modest blorbless attack for story encounters such as the Royal Chef.
+		body.take_damage(16.0, self)
+		_land(hit_position, hit_normal)
+		return
 
 	if body.is_in_group("blorbs"):
 		var entry := ShopCatalog.find(item_name)
@@ -138,15 +144,24 @@ func _resolve_hit(body: Node3D, hit_position: Variant = null, hit_normal: Varian
 		var core_item: String = entry.get("core_item", "") if not entry.is_empty() else ""
 		if element != "" and body.has_method("can_merge") and body.can_merge(element):
 			_resolved = true
+			UISounds.play_foley(&"throw_impact", 0.42, get_instance_id())
 			# The transformation overlay owns the actual state mutation at its
 			# whiteout midpoint, so the world never exposes a recolored Blorb before
 			# the cut sequence has presented the change.
 			BlorbTransformationUI.play_elemental_transformation(body as Blorb, element)
 			queue_free()
 			return
-		if core_item != "" and body.has_method("add_core_item") and body.add_core_item(core_item):
+		# Only Blorb instances ever join the "blorbs" group (see blorb.gd's
+		# own add_to_group() call), so the cast below is always valid here.
+		var required_element: String = entry.get("required_element", "") if not entry.is_empty() else ""
+		var element_allows_core := required_element == "" or (body as Blorb).element_state == required_element
+		if core_item != "" and element_allows_core and body.has_method("add_core_item") and body.add_core_item(core_item):
 			_resolved = true
-			Hud.show_message("The %s settles into the blorb's core!" % item_name)
+			UISounds.play_foley(&"throw_impact", 0.42, get_instance_id())
+			var core_slot: String = str(entry.get("core_slot", "core"))
+			Hud.show_message(
+				"The %s settles into the blorb's %s slot!" % [item_name, core_slot]
+			)
 			Inventory.changed.emit()
 			queue_free()
 			return
@@ -169,6 +184,7 @@ func _land(hit_position: Variant = null, hit_normal: Variant = null) -> void:
 		return
 	_resolved = true
 	_landed = true
+	UISounds.play_foley(&"throw_impact", 0.46, get_instance_id())
 	velocity = Vector3.ZERO
 	# `terrain` is intentionally typed as Node, so calls through it return a
 	# Variant to the parser. Pin the scalar type before later ray-hit branches
@@ -205,5 +221,6 @@ func _collect() -> void:
 	var entry := ShopCatalog.find(item_name)
 	var color: Color = entry.get("color", Color.WHITE) if not entry.is_empty() else Color.WHITE
 	Inventory.add(item_name, color)
+	UISounds.play_foley(&"pickup", 0.48, get_instance_id())
 	Hud.show_message("Picked up the %s." % item_name)
 	queue_free()

@@ -76,7 +76,12 @@ const FLOOR_COLLISION_THICKNESS := 0.2
 ## The door is always centered on the south wall's ground floor, as an
 ## actually-open gap (only its jambs/lintel collide, the opening itself
 ## doesn't) so the player can still walk in.
-static func build_building(w: int, d: int, floors: int, roof_color: Color) -> StaticBody3D:
+static func build_building(
+	w: int, d: int, floors: int, roof_color: Color,
+	ground_wall_color: Color = WALL_STONE,
+	upper_wall_color: Color = WALL_WOOD,
+	floor_color: Color = FLOOR_COLOR
+) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
 	body.collision_mask = 0
@@ -84,12 +89,12 @@ static func build_building(w: int, d: int, floors: int, roof_color: Color) -> St
 	var door_ix := int(w / 2.0)
 
 	for floor_index in floors:
-		_build_floor(body, w, d, float(floor_index) * FLOOR_HEIGHT)
+		_build_floor(body, w, d, float(floor_index) * FLOOR_HEIGHT, floor_color)
 
 	for floor_index in floors:
 		var y := float(floor_index) * FLOOR_HEIGHT
 		var is_ground := floor_index == 0
-		var wall_color := WALL_STONE if is_ground else WALL_WOOD
+		var wall_color := ground_wall_color if is_ground else upper_wall_color
 		for ix in w:
 			for iz in d:
 				var on_west := ix == 0
@@ -103,12 +108,14 @@ static func build_building(w: int, d: int, floors: int, roof_color: Color) -> St
 				var cz := (iz - (d - 1) / 2.0) * CELL_SIZE
 
 				if is_corner:
-					_build_corner_post(body, Vector3(cx, y, cz), wall_color)
-					continue
+					var corner_x := -w * CELL_SIZE * 0.5 if on_west else w * CELL_SIZE * 0.5
+					var corner_z := -d * CELL_SIZE * 0.5 if on_south else d * CELL_SIZE * 0.5
+					_build_corner_post(body, Vector3(corner_x, y, corner_z), wall_color)
 
-				var is_door_cell := is_ground and on_south and ix == door_ix
-				var opening := "door" if is_door_cell else "window"
-
+				# A corner belongs to two walls. The old early `continue` above
+				# skipped both, leaving every 1x1 house entirely open and cutting
+				# large holes out of larger houses. Build each boundary face
+				# independently; their small overlap hides behind the corner post.
 				# yaw is chosen so the wall's own local -Z (where the
 				# window inset/door face outward) ends up pointing away
 				# from the building's interior for every one of the 4
@@ -121,34 +128,28 @@ static func build_building(w: int, d: int, floors: int, roof_color: Color) -> St
 				# world -X (outward on the west/negative-X edge); east
 				# (yaw -90) turns it to world +X. Not visually re-verified
 				# in-engine.
-				var wall_pos: Vector3
-				var yaw_degrees: float
 				if on_west:
-					wall_pos = Vector3(-w * CELL_SIZE * 0.5, y, cz)
-					yaw_degrees = 90.0
-				elif on_east:
-					wall_pos = Vector3(w * CELL_SIZE * 0.5, y, cz)
-					yaw_degrees = -90.0
-				elif on_south:
-					wall_pos = Vector3(cx, y, -d * CELL_SIZE * 0.5)
-					yaw_degrees = 0.0
-				else:
-					wall_pos = Vector3(cx, y, d * CELL_SIZE * 0.5)
-					yaw_degrees = 180.0
-				_build_wall_cell(body, wall_pos, deg_to_rad(yaw_degrees), wall_color, opening)
+					_build_wall_cell(body, Vector3(-w * CELL_SIZE * 0.5, y, cz), deg_to_rad(90.0), wall_color, "window")
+				if on_east:
+					_build_wall_cell(body, Vector3(w * CELL_SIZE * 0.5, y, cz), deg_to_rad(-90.0), wall_color, "window")
+				if on_south:
+					var south_opening := "door" if is_ground and ix == door_ix else "window"
+					_build_wall_cell(body, Vector3(cx, y, -d * CELL_SIZE * 0.5), 0.0, wall_color, south_opening)
+				if on_north:
+					_build_wall_cell(body, Vector3(cx, y, d * CELL_SIZE * 0.5), deg_to_rad(180.0), wall_color, "window")
 
 	_build_roof(body, w, d, float(floors) * FLOOR_HEIGHT, roof_color)
 	return body
 
 
-static func _build_floor(body: StaticBody3D, w: int, d: int, y: float) -> void:
+static func _build_floor(body: StaticBody3D, w: int, d: int, y: float, floor_color: Color = FLOOR_COLOR) -> void:
 	for ix in w:
 		for iz in d:
 			var cx := (ix - (w - 1) / 2.0) * CELL_SIZE
 			var cz := (iz - (d - 1) / 2.0) * CELL_SIZE
 			var tile_pos := Vector3(cx, y, cz)
 			var tile := SuperEgg.build_part(
-				Vector3(CELL_SIZE * 0.5, 0.04, CELL_SIZE * 0.5), FLOOR_COLOR,
+				Vector3(CELL_SIZE * 0.5, 0.04, CELL_SIZE * 0.5), floor_color,
 				SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
 			)
 			tile.position = tile_pos
@@ -862,6 +863,66 @@ static func build_stall(canopy_color: Color) -> Dictionary:
 	# collider, same reasoning as TownProps' building roofs.
 	_add_box_collision(body, canopy_pos, Vector3(1.5, 0.3, 1.1))
 	return {"body": body, "counter_y": STALL_COUNTER_Y}
+
+
+## Full-size equipment cannot plausibly share the low, narrow produce-stall
+## silhouette above. The armorer gets a broad pavilion with a raised canopy,
+## an extra-deep counter, and a rear display rail: enough clear volume for a
+## real torso-sized breastplate and an upright sword without either piercing
+## the roof.
+static func build_armorer_stall(canopy_color: Color) -> Dictionary:
+	var body := StaticBody3D.new()
+	body.collision_layer = 1
+	body.collision_mask = 0
+	const COUNTER_Y := 0.88
+	const HALF_WIDTH := 1.45
+	const HALF_DEPTH := 0.52
+
+	var counter := SuperEgg.build_part(
+		Vector3(HALF_WIDTH, 0.065, HALF_DEPTH), TRIM_WOOD,
+		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	counter.position.y = COUNTER_Y
+	body.add_child(counter)
+
+	for x in [-1.28, 1.28]:
+		for z in [-0.42, 0.42]:
+			var leg := SuperEgg.build_part(
+				Vector3(0.055, COUNTER_Y * 0.5, 0.055), TRIM_WOOD,
+				SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+			)
+			leg.position = Vector3(x, COUNTER_Y * 0.5, z)
+			body.add_child(leg)
+
+	for x in [-1.38, 1.38]:
+		var post := SuperEgg.build_part(
+			Vector3(0.055, 1.38, 0.055), TRIM_WOOD,
+			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+		)
+		post.position = Vector3(x, 1.38, -0.46)
+		body.add_child(post)
+
+	# Rear rails visually organize the large wares without enclosing the stall
+	# or obscuring the armorer behind a solid wall.
+	for rail_y in [1.18, 1.82]:
+		var rail := SuperEgg.build_part(
+			Vector3(1.34, 0.035, 0.04), TRIM_WOOD,
+			SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+		)
+		rail.position = Vector3(0.0, rail_y, -0.46)
+		body.add_child(rail)
+
+	var canopy_position := Vector3(0.0, 2.78, -0.24)
+	var canopy := SuperEgg.build_part(
+		Vector3(1.62, 0.07, 0.72), canopy_color,
+		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	canopy.position = canopy_position
+	body.add_child(canopy)
+
+	_add_box_collision(body, Vector3(0.0, 0.48, 0.0), Vector3(2.95, 0.96, 1.12))
+	_add_box_collision(body, canopy_position, Vector3(3.35, 0.28, 1.58))
+	return {"body": body, "counter_y": COUNTER_Y}
 
 
 ## Simplified custom landmark -- a stone tower, a colored cap, and a

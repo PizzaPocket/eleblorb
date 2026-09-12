@@ -118,7 +118,9 @@ func _add_portal(gate_id: String, destination_scene: String, world_position: Vec
 func _place_returning_player() -> void:
 	var gate_id := KingdomTravel.pending_gate_id
 	KingdomTravel.pending_gate_id = ""
-	if gate_id == "" or not _portals_by_gate_id.has(gate_id):
+	if gate_id == "":
+		return
+	if not _portals_by_gate_id.has(gate_id):
 		return
 	var portal: Node3D = _portals_by_gate_id[gate_id]
 	var player := get_node("Player")

@@ -46,6 +46,9 @@ extends StaticBody3D
 ## Shown as the speaker name in DialogUI -- see npc.gd's/jungle_villager.gd's
 ## own identically-named export.
 @export var display_name: String = "Primate"
+## Optional authored eye color for story states such as Da Hou Zi's purple
+## mind-control gaze. Transparent retains the template's natural derivation.
+@export var eye_color_override: Color = Color.TRANSPARENT
 ## This NPC's own lines -- set per-instance by whatever spawns it (see
 ## jungle_kingdom_village.gd's identity rosters), same "no shared pool"
 ## reasoning npc.gd's own talk_lines doc comment gives.
@@ -193,6 +196,8 @@ func _ready() -> void:
 		"head_height_scale": head_height_scale,
 		"has_tail": has_tail,
 	}
+	if eye_color_override.a > 0.0:
+		variant["eye_color"] = eye_color_override
 	_pivots = ApeTemplate.build(self, fur_color, display_scale, variant)
 	_eyes = _pivots["eyes"]
 	_leg_rest_x = (_pivots["leg_left"] as Node3D).rotation.x
@@ -410,17 +415,33 @@ func _build_parkour_collision() -> void:
 	_add_segment_collider("LeftLowerLegCollision", _pivots["knee_left"], _pivots["ankle_left"], 0.11 * display_scale)
 	_add_segment_collider("RightUpperLegCollision", _pivots["leg_right"], _pivots["knee_right"], 0.13 * display_scale)
 	_add_segment_collider("RightLowerLegCollision", _pivots["knee_right"], _pivots["ankle_right"], 0.11 * display_scale)
+	_add_point_collider("LeftHandCollision", _pivots["hand_left"], 0.12 * display_scale)
+	_add_point_collider("RightHandCollision", _pivots["hand_right"], 0.12 * display_scale)
+	_add_point_collider("LeftFootCollision", _pivots["ankle_left"], 0.16 * display_scale)
+	_add_point_collider("RightFootCollision", _pivots["ankle_right"], 0.16 * display_scale)
 
 	var head_mesh := (_pivots["head"] as Node3D).get_child(0) as MeshInstance3D
 	var head_shape := CollisionShape3D.new()
 	head_shape.name = "HeadCollision"
 	var sphere := SphereShape3D.new()
 	var head_box := head_mesh.get_aabb()
-	sphere.radius = maxf(head_box.size.x, maxf(head_box.size.y, head_box.size.z)) * 0.5 * display_scale
+	# Keep the solid surface close to the visible skull rather than using its
+	# longest dimension as a large spherical bubble around the face.
+	sphere.radius = minf(head_box.size.x, minf(head_box.size.y, head_box.size.z)) * 0.52 * display_scale
 	head_shape.shape = sphere
 	add_child(head_shape)
 	_parkour_colliders.append({"shape": head_shape, "point": head_mesh})
 	_sync_parkour_collision()
+
+
+func _add_point_collider(collider_name: String, point: Node3D, radius: float) -> void:
+	var collision := CollisionShape3D.new()
+	collision.name = collider_name
+	var sphere := SphereShape3D.new()
+	sphere.radius = radius
+	collision.shape = sphere
+	add_child(collision)
+	_parkour_colliders.append({"shape": collision, "point": point})
 
 
 func _add_segment_collider(collider_name: String, start: Node3D, finish: Node3D, radius: float) -> void:
@@ -466,7 +487,10 @@ func _animate_walk(delta: float, moving: bool) -> void:
 	var elbow_left := _pivots["elbow_left"] as Node3D
 	var elbow_right := _pivots["elbow_right"] as Node3D
 	if moving:
+		var previous_step := floori(_walk_phase / PI)
 		_walk_phase += delta * _swing_speed
+		if parkour_collision and floori(_walk_phase / PI) != previous_step:
+			UISounds.play_foley(&"giant_step", 0.82, get_instance_id())
 		var swing := sin(_walk_phase) * WALK_SWING_AMOUNT
 		leg_left.rotation.x = _leg_rest_x + swing
 		leg_right.rotation.x = _leg_rest_x - swing

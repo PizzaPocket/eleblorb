@@ -135,6 +135,8 @@ var _look_target: Node3D = null
 
 var _rng := RandomNumberGenerator.new()
 var _stride_phase: float = 0.0
+var _hoof_quarter_cycle: int = 0
+var _hooves_were_moving: bool = false
 ## Eased look-yaw, radians relative to the body's own forward facing (self.
 ## rotation.y) -- see _update_head_look()'s own doc comment for why this is
 ## tracked separately rather than read back from head.rotation.y each frame
@@ -365,6 +367,7 @@ func _update_idle(delta: float) -> void:
 ## the plain gait branch, unchanged from before the jump ability existed.
 func _animate_gait(delta: float, moving: bool, running: bool = false) -> void:
 	if _is_airborne:
+		_hooves_were_moving = false
 		# Same apex_fraction shape as player.gd's own _animate_airborne():
 		# 0 at takeoff, 1 at the apex (vertical_velocity == 0), easing back
 		# toward 0 again on the way down (using a gentler reference speed on
@@ -383,11 +386,13 @@ func _animate_gait(delta: float, moving: bool, running: bool = false) -> void:
 			apex_fraction = 1.0 - smoothstep(0.0, _jump_takeoff_speed * 0.75, -_vertical_velocity)
 		HorseFigure.animate_airborne(_pivots, delta, apex_fraction, rising)
 	elif _landing_timer > 0.0:
+		_hooves_were_moving = false
 		_landing_timer -= delta
 		HorseFigure.animate_landing(_pivots, delta)
 	else:
 		if moving:
 			_stride_phase += delta * GAIT_CYCLE_SPEED * (RUN_CYCLE_SPEED_MULTIPLIER if running else 1.0)
+		_update_hoofsteps(moving, running)
 		HorseFigure.animate_gait(_pivots, delta, moving, _stride_phase, running)
 	# Re-loft the four leg noodle tubes from the pivots' just-updated global
 	# positions -- must run AFTER whichever branch above just ran, same
@@ -397,6 +402,26 @@ func _animate_gait(delta: float, moving: bool, running: bool = false) -> void:
 	# Tail sway/flit runs continuously regardless of moving/ridden/airborne
 	# state -- see HorseFigure.animate_tail()'s own doc comment.
 	HorseFigure.animate_tail(_pivots["_tail"], delta)
+
+
+## HorseFigure offsets the four legs by quarter-cycle increments, so every
+## PI/2 boundary is one real hoof's planted/loading moment. Keeping this on
+## the animation phase makes walk, run and playtest speed changes remain in
+## sync without a separate timer drifting away from the legs.
+func _update_hoofsteps(moving: bool, running: bool) -> void:
+	var quarter_cycle := floori(_stride_phase / (PI * 0.5))
+	if not moving or not is_player_controlled:
+		_hooves_were_moving = false
+		_hoof_quarter_cycle = quarter_cycle
+		return
+	if not _hooves_were_moving:
+		_hooves_were_moving = true
+		_hoof_quarter_cycle = quarter_cycle
+		return
+	if quarter_cycle == _hoof_quarter_cycle:
+		return
+	_hoof_quarter_cycle = quarter_cycle
+	UISounds.play_foley(&"horse_step", 0.61 if running else 0.43, get_instance_id())
 
 
 ## Driven every physics frame by player.gd's _update_manchego_control() while
@@ -428,6 +453,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		_is_airborne = true
 		_vertical_velocity = JUMP_VELOCITY
 		_jump_takeoff_speed = JUMP_VELOCITY
+		UISounds.play_foley(&"horse_jump", 0.58, get_instance_id())
 	if _is_airborne:
 		_vertical_velocity -= JUMP_GRAVITY * delta
 		global_position.y += _vertical_velocity * delta
@@ -435,6 +461,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			global_position.y = ground_h
 			_is_airborne = false
 			_landing_timer = LANDING_DURATION
+			UISounds.play_foley(&"horse_land", 0.67, get_instance_id())
 	else:
 		global_position.y = ground_h
 	if planar.length() > 0.01:

@@ -31,6 +31,8 @@ extends RefCounted
 ## See DESIGN.md-in-code below (the "design language" section at the
 ## bottom of this file) for the broader conventions every UI surface in
 ## this project should follow, not just these color/spacing tokens.
+## UI audio is centralized too: UISounds supplies a subtle focus tick,
+## confirmation tone, and back/decline tone to every interactive button.
 
 # 0.55, down from 0.78 (itself already down from an original 0.92) -- per
 # a further direct correction, modal backgrounds still read as too heavy.

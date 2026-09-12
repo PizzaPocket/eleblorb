@@ -74,6 +74,7 @@ func _on_pickup_body_entered(body: Node3D) -> void:
 	WorldState.mark_collected(unique_id)
 	var found_name := display_name if display_name != "" else "gem"
 	Inventory.add(found_name, gem_color)
+	UISounds.play_foley(&"pickup", 0.58, get_instance_id())
 	Hud.show_message("Found the %s!" % found_name)
 	queue_free()
 

@@ -920,7 +920,7 @@ static func build(
 	# darkened(0.25)), but based on the face mask's own color rather than
 	# fur_color -- the mask is what actually surrounds the eyes here, the
 	# same way skin does on a human face.
-	var eye_color := marking_color.darkened(0.25)
+	var eye_color: Color = variant.get("eye_color", marking_color.darkened(0.25))
 	var eyes := MonkeyFigure._add_eyes(
 		head_mesh, fur_color, notch_strength, head_size_base, eye_shape, HEAD_EPSILON, eye_color
 	)

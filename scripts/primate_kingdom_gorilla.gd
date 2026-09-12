@@ -19,7 +19,10 @@ extends Node3D
 ## directly to this gorilla's own StaticBody3D root, at roughly the height of
 ## the top of his head, so it moves with him for free if he ever wanders.
 
+## Known publicly as Kova Kong until the story reveals his true name: Da Hou
+## Zi, Xiao Hou Zi's mind-controlled older brother.
 const GORILLA_NAME := "Kova Kong"
+const GORILLA_TRUE_NAME := "Da Hou Zi"
 const GORILLA_SCENE := "res://scenes/ape_template_preview.tscn"
 ## Per direct correction ("he should not be near the village, he should be
 ## in another part of the primate kingdom") -- the previous placement (140,
@@ -60,6 +63,7 @@ const GORILLA_MOVEMENT_SPEED_MULTIPLIER := 0.1
 const GORILLA_GAIT_SPEED_MULTIPLIER := 3.0
 const GORILLA_ROAM_RADIUS := 42.0
 const GORILLA_FUR_COLOR := Color(0.12, 0.11, 0.11)
+const MIND_CONTROL_EYE_COLOR := Color(0.62, 0.18, 0.92)
 
 ## Special-quest banana reads as visually distinct from an ordinary
 ## NatureProps.FRUIT_COLORS["Banana"] pickup -- a warmer, more saturated gold
@@ -92,6 +96,7 @@ func _spawn_gorilla() -> void:
 		return
 	var gorilla := packed.instantiate() as ApeTemplatePreview
 	gorilla.fur_color = GORILLA_FUR_COLOR
+	gorilla.eye_color_override = MIND_CONTROL_EYE_COLOR
 	gorilla.has_tail = false
 	gorilla.body_type = 1.0
 	gorilla.display_scale = GORILLA_DISPLAY_SCALE

@@ -128,6 +128,12 @@ var _haste_weaken_remaining: float = 0.0
 
 var _pivots: Dictionary = {}
 var _suit_pieces: Array[Node3D] = []
+## The False Hero does not need the player's equip/inventory controller, but
+## his multi-joint arm and leg coverings still need that controller's core
+## behavior: rebuild their tube from the rig's live joint transforms every
+## frame. Each entry retains the cosmetic source Blorb because rebuild_slot()
+## reads its current body/element appearance while generating the mesh.
+var _dynamic_suit_entries: Array[Dictionary] = []
 var _hips_mesh: MeshInstance3D = null
 
 var _leg_left: Node3D
@@ -227,8 +233,10 @@ func _build_figure() -> void:
 ## ("Blorbaka," a named individual parallel to Blorbus -- see docs/
 ## world_bible.md) -- via BlorbSuit.equip_slot() directly rather than the
 ## full BlorbSuitController (that class's own paper-doll/inventory/hop
-## machinery is real-player-only overhead this NPC doesn't need; he just
-## needs the static geometry). equip_slot() requires a real, typed Blorb
+## machinery is real-player-only overhead this NPC doesn't need). Limb
+## geometry is nevertheless rebuilt from the live joints every frame below;
+## a tube spanning several pivots cannot follow animation by parenting alone.
+## equip_slot() requires a real, typed Blorb
 ## for its cosmetic fields (element/body color), so each slot's "source"
 ## is a throwaway portrait_mode Blorb -- the same technique blorb_portrait.
 ## gd's own paper-doll captures already use: portrait_mode=true makes
@@ -280,8 +288,38 @@ func _equip_cosmetic_slot(slot: String, element: String, pivot_map: Dictionary) 
 	source.portrait_mode = true
 	source.initial_element = element
 	add_child(source)
-	_suit_pieces.append_array(BlorbSuit.equip_slot(slot, pivot_map, visuals, source, 1.0))
-	source.queue_free()
+	# ProceduralFigure's tallest build spaces the joints farther apart; the
+	# suit's own thickness must scale too or limbs visibly escape its shell.
+	var pieces := BlorbSuit.equip_slot(slot, pivot_map, visuals, source, 1.25)
+	_suit_pieces.append_array(pieces)
+	if BlorbSuit.is_dynamic_slot(slot) and not pieces.is_empty():
+		# Keep the portrait source alive but invisible: rebuild_slot() needs its
+		# appearance data, while only the generated worn covering should render.
+		source.visible = false
+		_dynamic_suit_entries.append({
+			"slot": slot,
+			"mesh": pieces[0],
+			"source": source,
+			"pivots": pivot_map,
+		})
+	else:
+		source.queue_free()
+
+
+func _update_dynamic_suit() -> void:
+	for entry in _dynamic_suit_entries:
+		var mesh := entry["mesh"] as MeshInstance3D
+		var source := entry["source"] as Blorb
+		if not is_instance_valid(mesh) or not is_instance_valid(source):
+			continue
+		BlorbSuit.rebuild_slot(
+			mesh,
+			entry["slot"] as String,
+			entry["pivots"] as Dictionary,
+			visuals,
+			source,
+			1.25
+		)
 
 
 ## The whole suit "falling off" at defeat -- per direct instruction, this
@@ -293,6 +331,11 @@ func _strip_suit() -> void:
 		if is_instance_valid(piece):
 			piece.queue_free()
 	_suit_pieces.clear()
+	for entry in _dynamic_suit_entries:
+		var source := entry.get("source") as Blorb
+		if is_instance_valid(source):
+			source.queue_free()
+	_dynamic_suit_entries.clear()
 
 
 ## The suit pieces _strip_suit() frees above are purely cosmetic geometry
@@ -378,6 +421,7 @@ func _begin_fight() -> void:
 func take_damage(amount: float, attacker: Blorb = null) -> void:
 	if amount <= 0.0 or _state != State.FIGHTING:
 		return
+	UISounds.play_foley(&"damage_dealt", clampf(amount / 30.0, 0.25, 0.76), get_instance_id())
 	register_xp_participant(attacker)
 	current_hp = maxf(current_hp - amount, 0.0)
 	if current_hp <= 0.0:
@@ -445,6 +489,10 @@ func _process(delta: float) -> void:
 			_process_fighting(delta)
 		State.DEFEATED_FLEEING:
 			_process_fleeing(delta)
+	# Run after the state animation has written every joint for this frame.
+	# The suit mesh therefore follows the actual final transforms, including
+	# attack poses and hover poses, rather than an estimated duplicate pose.
+	_update_dynamic_suit()
 
 
 func _find_target() -> Node3D:
@@ -539,8 +587,11 @@ func _process_hover_phase(delta: float) -> void:
 		_leg_left.rotation.x = lerp_angle(_leg_left.rotation.x, deg_to_rad(-20.0), swing_t)
 		_leg_right.rotation.x = lerp_angle(_leg_right.rotation.x, deg_to_rad(-20.0), swing_t)
 	else:
-		_arm_left.rotation.x = lerp_angle(_arm_left.rotation.x, deg_to_rad(150.0), swing_t)
-		_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, deg_to_rad(150.0), swing_t)
+		# Fire hover mirrors the player's hands-down jet silhouette. The old
+		# 150-degree shoulder rotation was the source of the conspicuous
+		# straight-overhead arm pose.
+		_arm_left.rotation.x = lerp_angle(_arm_left.rotation.x, deg_to_rad(15.0), swing_t)
+		_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, deg_to_rad(15.0), swing_t)
 	# Closes distance aggressively and unconditionally while hovering (not
 	# just when far, and well past the old idle-drift pace) -- per direct
 	# instruction, a hover beat should read as a purposeful strike toward
@@ -571,9 +622,8 @@ func _process_hover_phase(delta: float) -> void:
 ## shape this mirrors), rather than the bare leg-swing-and-knee-bend-only
 ## cycle this file used before. Per direct instruction ("his movement and
 ## walk cycles should all leverage the Hero's ones"). The blorb suit pieces
-## need no separate sync of their own -- they're parented directly onto
-## these same pivots in _build_suit(), so animating the pivots here already
-## carries the suit along automatically.
+## are regenerated from these same live pivots by _update_dynamic_suit()
+## after the complete state animation has finished for the frame.
 func _apply_walk_cycle(delta: float, speed_scale: float = 1.0) -> void:
 	_walk_phase += delta * WALK_SWING_SPEED * speed_scale
 	var swing := sin(_walk_phase) * WALK_SWING_AMOUNT
@@ -638,6 +688,7 @@ func _process_flamethrower_phase(delta: float, leashed: bool) -> void:
 			_apply_walk_cycle(delta)
 	else:
 		_set_flamethrower_active(true)
+		UISounds.pulse_power_loop(&"fire", get_instance_id())
 		_settle_walk_cycle(delta)
 
 	if dist > 0.01:

@@ -84,6 +84,15 @@ const JUNGLE_EDGE_NOISE_SAMPLE_RADIUS := 60.0
 const JUNGLE_RISE_DISTANCE := 70.0
 const JUNGLE_PLATEAU_HEIGHT := -25.0  # top height, well above the -60 gorge floor
 
+# Snow plateau supporting the Ice Kingdom gate, shaped by the same natural
+# terrain coverage convention as the jungle plateau rather than decorative
+# white ground pieces.
+const ICE_PLATEAU_CENTER := Vector2(-450.0, -480.0)
+const ICE_PLATEAU_RADIUS := 72.0
+const ICE_EDGE_VARIATION := 13.0
+const ICE_RISE_DISTANCE := 68.0
+const ICE_PLATEAU_HEIGHT := -25.0
+
 # A volcano out in the open wasteland, per direct instruction. CORRECTED
 # per a direct follow-up report: the first-draft placement (-100, 260) put
 # the volcano's own CENTER barely 14 units past the main plateau's own
@@ -288,9 +297,14 @@ var _mountain_noise := FastNoiseLite.new()
 var _edge_noise := FastNoiseLite.new()
 var _lake_noise := FastNoiseLite.new()
 var _jungle_edge_noise := FastNoiseLite.new()
+var _ice_edge_noise := FastNoiseLite.new()
 var _wasteland_noise := FastNoiseLite.new()
 var _volcano_edge_noise := FastNoiseLite.new()
 var _volcano_rock_noise := FastNoiseLite.new()
+var _rng := RandomNumberGenerator.new()
+## Ported from fire_kingdom_terrain.gd's own identical vent+bubble system --
+## see _build_fire_vents()/_process() below.
+var _fire_vents: Array[Dictionary] = []
 
 
 func _init() -> void:
@@ -313,6 +327,9 @@ func _init() -> void:
 	_jungle_edge_noise.seed = 33720260815
 	_jungle_edge_noise.frequency = 0.05
 	_jungle_edge_noise.fractal_octaves = 2
+	_ice_edge_noise.seed = 44720260910
+	_ice_edge_noise.frequency = 0.05
+	_ice_edge_noise.fractal_octaves = 2
 
 	_wasteland_noise.seed = 1920260822
 	_wasteland_noise.frequency = 0.009
@@ -325,6 +342,8 @@ func _init() -> void:
 	_volcano_rock_noise.seed = 77320260905
 	_volcano_rock_noise.frequency = 0.06
 	_volcano_rock_noise.fractal_octaves = 3
+
+	_rng.seed = 20260912
 
 
 func get_height(x: float, z: float) -> float:
@@ -369,6 +388,11 @@ func get_height(x: float, z: float) -> float:
 				var jungle_height := JUNGLE_PLATEAU_HEIGHT + hills
 				height = lerpf(_wasteland_height(x, z), jungle_height, jungle_amount)
 			else:
+				var ice_amount := ice_plateau_coverage(x, z)
+				if ice_amount > 0.0:
+					var ice_height := ICE_PLATEAU_HEIGHT + hills
+					height = lerpf(_wasteland_height(x, z), ice_height, ice_amount)
+					return height
 				var volcano_amount := volcano_coverage(x, z)
 				if volcano_amount > 0.0:
 					height = lerpf(_wasteland_height(x, z), _volcano_height(x, z), volcano_amount)
@@ -474,6 +498,15 @@ func is_lake_area(world_pos: Vector2) -> bool:
 	return lake_coverage(world_pos.x, world_pos.y) > 0.01
 
 
+func is_safe_zone(world_pos: Vector2) -> bool:
+	return (
+		world_pos.length() < SPAWN_FLATTEN_RADIUS
+		or world_pos.distance_to(town_center) < town_flat_radius + 12.0
+		or world_pos.distance_to(CITY_CENTER) < CITY_FLAT_RADIUS + 15.0
+		or world_pos.distance_to(Vector2(250.0,-650.0)) < 165.0
+	)
+
+
 ## The jungle plateau's boundary radius at a given angle around its own
 ## center -- same organic-wobble technique as _edge_radius(), just centered
 ## on JUNGLE_PLATEAU_CENTER instead of the origin.
@@ -509,6 +542,17 @@ func get_jungle_plateau_center() -> Vector2:
 
 func get_jungle_plateau_radius() -> float:
 	return JUNGLE_PLATEAU_RADIUS
+
+
+func ice_plateau_coverage(x: float, z: float) -> float:
+	var rel := Vector2(x, z) - ICE_PLATEAU_CENTER
+	var angle := atan2(rel.y, rel.x)
+	var edge := ICE_PLATEAU_RADIUS + _ice_edge_noise.get_noise_2d(cos(angle)*60.0,sin(angle)*60.0)*ICE_EDGE_VARIATION
+	return 1.0-smoothstep(edge,edge+ICE_RISE_DISTANCE,rel.length())
+
+
+func is_ice_plateau_area(pos: Vector2) -> bool:
+	return ice_plateau_coverage(pos.x,pos.y)>0.01
 
 
 ## The volcano's boundary radius at a given angle around its own center --
@@ -678,6 +722,31 @@ func _ready() -> void:
 	collision_layer = 1
 	collision_mask = 0
 	_rebuild()
+	set_process(true)
+
+
+func _process(delta: float) -> void:
+	for vent in _fire_vents:
+		var timer: float = float(vent["timer"]) - delta
+		vent["timer"] = timer
+		var total: float = float(vent["total"])
+		var bubble := vent["bubble"] as MeshInstance3D
+		var peak: float = float(vent["peak"])
+		# Eased growth (smoothstep, not linear) reads as a bubble actually
+		# swelling under pressure rather than inflating at a constant rate.
+		var progress := smoothstep(0.0, 1.0, clampf(1.0 - timer / total, 0.0, 1.0))
+		var radius := lerpf(BUBBLE_START_RADIUS, peak, progress)
+		bubble.scale = Vector3.ONE * radius
+		if timer <= 0.0:
+			bubble.scale = Vector3.ZERO
+			if peak >= BUBBLE_SPRAY_THRESHOLD:
+				var particles := vent["particles"] as GPUParticles3D
+				particles.restart()
+				particles.emitting = true
+			var new_total := _rng.randf_range(2.4, 8.5)
+			vent["timer"] = new_total
+			vent["total"] = new_total
+			vent["peak"] = _rng.randf_range(BUBBLE_PEAK_RANGE.x, BUBBLE_PEAK_RANGE.y)
 
 
 func _rebuild() -> void:
@@ -686,6 +755,7 @@ func _rebuild() -> void:
 	_build_mesh()
 	_build_eastern_lake()
 	_build_volcano_lava()
+	_build_fire_vents()
 	_build_far_skirt()
 	_build_terrain_collision()
 
@@ -760,6 +830,11 @@ func _height_color(h: float, past_edge: bool, world_pos: Vector2 = Vector2.INF) 
 			var jungle_amount := jungle_coverage(world_pos.x, world_pos.y)
 			if jungle_amount > 0.0:
 				return wasteland.lerp(jungle_green, jungle_amount)
+			var ice_amount := ice_plateau_coverage(world_pos.x, world_pos.y)
+			if ice_amount > 0.0:
+				# The approach slope can blend at its extreme toe, but the plateau
+				# itself must read unequivocally as snow instead of grey wasteland.
+				return wasteland.lerp(snow, smoothstep(0.0, 0.18, ice_amount))
 			var volcano_amount := volcano_coverage(world_pos.x, world_pos.y)
 			if volcano_amount > 0.0:
 				# Blend basalt toward the scorched tone as a point sits closer
@@ -965,6 +1040,103 @@ func _build_volcano_lava() -> void:
 	glow.light_energy = 2.5
 	glow.omni_range = VOLCANO_RADIUS * VOLCANO_RIM_RADIUS_FRACTION * 1.4
 	add_child(glow)
+
+
+const FIRE_VENT_COUNT := 5
+## A vent's bubble grows from this radius up to a per-cycle random peak
+## (BUBBLE_PEAK_RANGE) over the same cooldown that paces its next spray, then
+## pops (instantly hides) right as that cooldown elapses. Below
+## BUBBLE_SPRAY_THRESHOLD, popping is all that happens -- a small bubble
+## just fizzles, no spray -- at or above it, the pop and the spray land on
+## the same frame. Ported verbatim from fire_kingdom_terrain.gd's own
+## identical constants/system.
+const BUBBLE_START_RADIUS := 0.05
+const BUBBLE_PEAK_RANGE := Vector2(0.35, 2.0)
+const BUBBLE_SPRAY_THRESHOLD := 1.15
+
+
+## Scatters vent points inside the lava pool's own organically-varied radius
+## -- each picks a random angle first, then a random distance up to 85% of
+## THAT angle's own _volcano_edge_radius()-derived max, so every point lands
+## safely inside the lava regardless of which way the pool's edge noise
+## happens to bulge at that angle.
+func _build_fire_vents() -> void:
+	_fire_vents.clear()
+	var y := VOLCANO_LAVA_HEIGHT + LAVA_SURFACE_Y_OFFSET
+	for i in FIRE_VENT_COUNT:
+		var angle := _rng.randf_range(0.0, TAU)
+		var max_radius := _volcano_edge_radius(angle) * VOLCANO_LAVA_RADIUS_FRACTION
+		var r := _rng.randf_range(0.0, max_radius * 0.85)
+		var pos := Vector3(VOLCANO_CENTER.x + cos(angle) * r, y, VOLCANO_CENTER.y + sin(angle) * r)
+		var particles := _make_fire_burst()
+		particles.position = pos
+		add_child(particles)
+		# Sphere centered exactly on the same surface point the particles use
+		# -- half above, half below the lava surface, per direct instruction.
+		var bubble := _make_lava_bubble()
+		bubble.position = pos
+		add_child(bubble)
+		var total := _rng.randf_range(0.8, 6.0)
+		_fire_vents.append({
+			"particles": particles, "bubble": bubble,
+			"timer": total, "total": total,
+			"peak": _rng.randf_range(BUBBLE_PEAK_RANGE.x, BUBBLE_PEAK_RANGE.y),
+		})
+
+
+func _make_lava_bubble() -> MeshInstance3D:
+	var bubble := MeshInstance3D.new()
+	var sphere := SphereMesh.new()
+	sphere.radius = 1.0
+	sphere.height = 2.0
+	sphere.radial_segments = 12
+	sphere.rings = 8
+	bubble.mesh = sphere
+	bubble.material_override = NatureProps.build_lava_material()
+	bubble.scale = Vector3.ZERO
+	return bubble
+
+
+func _make_fire_burst() -> GPUParticles3D:
+	var particles := GPUParticles3D.new()
+	particles.amount = 90
+	particles.lifetime = 0.62
+	particles.one_shot = true
+	particles.explosiveness = 0.76
+	var process := ParticleProcessMaterial.new()
+	process.direction = Vector3.UP
+	process.spread = 18.0
+	process.initial_velocity_min = 6.0
+	process.initial_velocity_max = 12.0
+	process.gravity = Vector3(0.0, 1.5, 0.0)
+	process.scale_min = 0.7
+	process.scale_max = 1.5
+	process.particle_flag_align_y = true
+	process.angle_min = -12.0
+	process.angle_max = 12.0
+	process.turbulence_enabled = true
+	process.turbulence_noise_strength = 1.0
+	process.turbulence_noise_scale = 2.0
+	process.turbulence_influence_min = 0.04
+	process.turbulence_influence_max = 0.15
+	process.color_ramp = ParticleFX.build_color_ramp([
+		{"offset": 0.0, "color": Color(1.0, 0.95, 0.75, 1.0)},
+		{"offset": 0.25, "color": Color(1.0, 0.55, 0.1, 1.0)},
+		{"offset": 0.6, "color": Color(0.85, 0.25, 0.05, 0.9)},
+		{"offset": 1.0, "color": Color(0.35, 0.06, 0.02, 0.0)},
+	])
+	process.scale_curve = ParticleFX.build_scale_curve(0.2, 1.15, 0.3, 0.12)
+	particles.process_material = process
+	var flame_material := ParticleFX.build_billboard_material(
+		ParticleFX.build_soft_gradient_texture(32, 1.7, 0.2), Color.WHITE, true, 0.0
+	)
+	flame_material.vertex_color_use_as_albedo = true
+	var quad := QuadMesh.new()
+	quad.size = Vector2(0.8, 1.7)
+	quad.material = flame_material
+	particles.draw_pass_1 = quad
+	particles.visibility_aabb = AABB(Vector3(-12, 0, -12), Vector3(24, 18, 24))
+	return particles
 
 
 ## Flat annulus from SKIRT_INNER_RADIUS out to SKIRT_OUTER_RADIUS, at a

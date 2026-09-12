@@ -338,6 +338,7 @@ func _finish_dynamic_initialization() -> void:
 	_spawn_volcano_fire_blorbs()
 	_spawn_canyon_rock_blorbs()
 	_spawn_city_blorbs()
+	_spawn_ice_plateau_blorbs()
 	_spawn_wasteland_giant_blorb()
 	_spawn_xiao_hou_zi()
 	_register_wilderness_lod_nodes(self)
@@ -362,6 +363,21 @@ func _spawn_xiao_hou_zi() -> void:
 	inst.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
 	get_parent().add_child(inst)
 	_update_wilderness_lod()
+
+
+func _spawn_ice_plateau_blorbs() -> void:
+	var packed: PackedScene = load(BLORB_SCENE)
+	if packed == null:
+		return
+	for i in 6:
+		var angle: float = TAU * float(i) / 6.0 + 0.35
+		var radius: float = 24.0 + float(i % 3) * 10.0
+		var pos: Vector2 = ICE_GATE_XZ + Vector2(cos(angle), sin(angle)) * radius
+		var blorb = packed.instantiate()
+		blorb.in_party = false
+		blorb.initial_element = "ice" if i % 2 == 0 else "snow"
+		blorb.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
+		get_parent().add_child(blorb)
 
 
 ## Static, mostly non-colliding stones give the broad desert floor scale and

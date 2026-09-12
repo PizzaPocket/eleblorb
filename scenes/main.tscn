@@ -33,12 +33,6 @@ sky = SubResource("Sky_1")
 fog_enabled = true
 fog_light_color = Color(0.78, 0.89, 0.98, 1)
 fog_density = 0.0025
-# 0.0, not the old 0.15 -- per a further direct correction, even that
-# reduced amount still visibly muted the sky. Fog now only ever fades
-# distant geometry (its actual intended job), never blends over the sky
-# itself. day_night_cycle.gd sets this explicitly at runtime too (belt and
-# suspenders); this static value is just what a designer opening the scene
-# sees before the cycle script's first frame runs.
 fog_sky_affect = 0.0
 
 [node name="Main" type="Node3D" unique_id=1359619256]
@@ -51,13 +45,6 @@ environment = SubResource("Environment_1")
 transform = Transform3D(0.81915206, 0.51983684, -0.24240386, 0, 0.42261824, 0.9063078, 0.57357645, -0.7424039, 0.3461886, 0, 20, 0)
 light_energy = 1.0
 shadow_enabled = true
-# Defaults to 0 (perfectly parallel rays), which is what made the clouds'
-# shadows on the ground razor-sharp regardless of how far away they are --
-# a real sun has a small but nonzero angular size, which is what actually
-# produces the soft, distance-dependent penumbra (contact-hardening)
-# real shadows have. 1.5 is a stylized exaggeration of the real sun's
-# ~0.53 degrees, chosen for a visibly soft edge rather than a physically
-# exact one.
 light_angular_distance = 1.5
 
 [node name="DayNightCycle" type="Node" parent="."]

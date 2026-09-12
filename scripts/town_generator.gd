@@ -296,9 +296,9 @@ const ANTIQUE_STALL_POSITIONS := {
 	"Cracked Hourglass": Vector3(0.3, 0.8, 0.15),
 }
 const RED_STALL_POSITIONS := {
-	"Notched Shortsword": Vector3(-0.3, 0.8, 0.0),
-	"Dented Breastplate": Vector3(0.15, 0.8, 0.1),
-	"Pitch Torch": Vector3(0.3, 0.8, -0.15),
+	"Notched Shortsword": Vector3(-0.88, 1.10, 0.0),
+	"Dented Breastplate": Vector3(0.0, 1.24, 0.04),
+	"Pitch Torch": Vector3(0.88, 1.08, -0.04),
 }
 const GREEN_STALL_POSITIONS := {
 	"Rye Loaf": Vector3(-0.3, 0.8, 0.05),
@@ -1142,7 +1142,11 @@ func _build_one_shop_stall(parent: Node3D, config: Dictionary) -> void:
 		return
 	var spot_marker: Node3D = get_node(marker_name)
 	var offset := Vector2(spot_marker.position.x, spot_marker.position.z)
-	var stall: Dictionary = TownProps.build_stall(config["canopy_color"])
+	var stall: Dictionary = (
+		TownProps.build_armorer_stall(config["canopy_color"])
+		if config["category"] == "red"
+		else TownProps.build_stall(config["canopy_color"])
+	)
 	var stall_body: StaticBody3D = stall["body"]
 	stall_body.position = Vector3(offset.x, _ground_y(offset), offset.y)
 	stall_body.rotation.y = spot_marker.rotation.y
@@ -1164,10 +1168,12 @@ func _build_one_shop_stall(parent: Node3D, config: Dictionary) -> void:
 		visual.position = local_pos
 		stall_body.add_child(visual)
 
-	# Vendor stands beside the stall (not on the counter), a bit further
-	# out from the plaza along the same direction as the stall, facing
-	# back in toward the plaza.
-	var vendor_offset := offset + Vector2(0.9, 0.0).rotated(spot_marker.rotation.y)
+	# Vendor stands beside the stall (not on the counter). The purpose-built
+	# armorer pavilion is over twice as wide as an ordinary market stall, so it
+	# needs its own clearance instead of reusing the old 0.9m offset—which put
+	# the armorer inside the counter up to his waist.
+	var vendor_side_clearance := 1.9 if config["category"] == "red" else 0.9
+	var vendor_offset := offset + Vector2(vendor_side_clearance, 0.0).rotated(spot_marker.rotation.y)
 	var to_center := -vendor_offset.normalized()
 	if Engine.is_editor_hint():
 		return

@@ -117,7 +117,7 @@ static func _ensure_items() -> void:
 		},
 		{
 			"name": "Diving Helmet", "color": Color(0.18, 0.58, 0.82), "price": 25, "sell_price": 12,
-			"purchasable": true, "element": "", "core_item": "Diving Helmet", "shop": "lake",
+			"purchasable": true, "element": "", "core_item": "Diving Helmet", "core_slot": "head", "armor_defense": 2, "shop": "lake",
 			"description": "Throw it into a blorb to bind a sealed diving helmet to its core.",
 			"build_visual": Callable(ShopCatalog, "_build_diving_helmet_visual"),
 		},
@@ -140,10 +140,35 @@ static func _ensure_items() -> void:
 			"build_visual": Callable(ShopCatalog, "_build_lakeweed_visual"),
 		},
 		{
+			"name": "Nautilus Shell", "color": Color(0.42, 0.9, 0.78), "price": 12, "sell_price": 5,
+			"purchasable": true, "element": "", "shop": "ocean_merfolk",
+			"description": "A luminous spiral shell carried up from the deep city.",
+			"build_visual": Callable(ShopCatalog, "_build_nautilus_shell_visual"),
+		},
+		{
+			"name": "Watering Can", "color": Color(0.34, 0.68, 0.72), "price": 18, "sell_price": 8,
+			"purchasable": true, "element": "", "shop": "ocean_merfolk",
+			"description": "A small sea-metal vessel made for carrying living water.",
+			"build_visual": Callable(ShopCatalog, "_build_watering_can_visual"),
+		},
+		{
+			"name": "Nautilus Crown", "color": Color(0.36, 0.88, 0.74), "price": 0, "sell_price": 0,
+			"purchasable": false, "element": "", "core_item": "Nautilus Crown", "core_slot": "head", "armor_defense": 7,
+			"description": "The Tidekeeper's spiral crown.",
+			"build_visual": Callable(ShopCatalog, "_build_nautilus_shell_visual"),
+		},
+		{
 			"name": "Knight's Helm", "color": Color(0.34, 0.36, 0.39), "price": 28, "sell_price": 14,
-			"purchasable": true, "element": "", "core_item": "Knight's Helm", "shop": "city",
+			"purchasable": true, "element": "", "core_item": "Knight's Helm", "core_slot": "head", "armor_defense": 6, "shop": "city",
 			"description": "A sealed steel helm. A blorb can bind one head modification at a time.",
 			"build_visual": Callable(ShopCatalog, "_build_knights_helm_visual"),
+		},
+		{
+			"name": "Lava Helm", "color": Color(0.035, 0.03, 0.028), "price": 0, "sell_price": 0,
+			"purchasable": false, "element": "", "core_item": "Lava Helm", "core_slot": "head", "armor_defense": 10,
+			"required_element": "fire",
+			"description": "A glassy volcanic helm whose swept crown is warm to the touch.",
+			"build_visual": Callable(ShopCatalog, "_build_lava_helm_visual"),
 		},
 		{
 			"name": "Corroded Pocket Compass", "color": Color(0.55, 0.42, 0.18), "price": 4, "sell_price": 4,
@@ -163,14 +188,15 @@ static func _ensure_items() -> void:
 		},
 		{
 			"name": "Notched Shortsword", "color": Color(0.75, 0.77, 0.8), "price": 18, "sell_price": 7,
-			"purchasable": true, "element": "", "shop": "red", "shops": ["city"],
+			"purchasable": true, "element": "", "shop": "red", "shops": ["city"], "weapon": true,
+			"weapon_damage": 15.0, "weapon_reach": 1.65, "held_scale": 1.0,
 			"description": "Seen some use. Still holds an edge.",
 			"build_visual": Callable(RedShopProps, "build_sword"),
 		},
 		{
 			"name": "Dented Breastplate", "color": Color(0.5, 0.52, 0.56), "price": 22, "sell_price": 9,
-			"purchasable": true, "element": "", "shop": "red", "shops": ["city"],
-			"description": "Whoever wore it last, it stopped whatever hit it.",
+			"purchasable": true, "element": "", "core_item": "Dented Breastplate", "core_slot": "armor", "armor_defense": 5, "shop": "red", "shops": ["city"],
+			"description": "Whoever wore it last, it stopped whatever hit it. A blorb can bind it as body armor.",
 			"build_visual": Callable(RedShopProps, "build_armor"),
 		},
 		{
@@ -282,7 +308,9 @@ static func _ensure_items() -> void:
 		},
 		{
 			"name": "Jingu Bang", "color": JINGU_BANG_RED, "price": 0, "sell_price": 0,
-			"purchasable": false, "element": "", "description": "Sun Wu Kong's own legendary staff. Found, not sold.",
+			"purchasable": false, "element": "", "weapon": true,
+			"weapon_damage": 24.0, "weapon_reach": 2.45,
+			"description": "Sun Wu Kong's own legendary staff. Found, not sold.",
 			"build_visual": Callable(ShopCatalog, "build_jingu_bang_visual"),
 		},
 	]
@@ -387,6 +415,41 @@ static func _build_lakeweed_visual(item_scale: float = 1.0) -> Node3D:
 		blade.position = Vector3((float(i) - 1.0) * 0.08, 0.3 + i * 0.04, 0)
 		blade.rotation.z = (float(i) - 1.0) * 0.2
 		root.add_child(blade)
+	_add_catalog_grip(root)
+	return root
+
+
+static func _build_nautilus_shell_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	root.scale = Vector3.ONE * item_scale
+	var color := Color(0.42, 0.9, 0.78)
+	for index in 11:
+		var t := float(index) / 10.0
+		var angle := t * TAU * 1.65
+		var radius := lerpf(0.025, 0.19, t)
+		var chamber := SuperEgg.build_part(Vector3(0.038 + t * 0.018, 0.03 + t * 0.012, 0.025), color.lightened(t * 0.12), 2.3, 2.3)
+		chamber.position = Vector3(cos(angle) * radius, sin(angle) * radius + 0.16, 0.0)
+		root.add_child(chamber)
+	_add_catalog_grip(root)
+	return root
+
+
+static func _build_watering_can_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	root.scale = Vector3.ONE * item_scale
+	var metal := Color(0.34, 0.68, 0.72)
+	var body := SuperEgg.build_part(Vector3(0.16, 0.13, 0.12), metal, 2.8, SuperEgg.EPSILON_FLAT)
+	body.position.y = 0.13
+	root.add_child(body)
+	var spout := SuperEgg.build_part(Vector3(0.045, 0.19, 0.045), metal.lightened(0.08), 2.2, 2.2)
+	spout.position = Vector3(0.23, 0.18, 0.0)
+	spout.rotation.z = deg_to_rad(-62.0)
+	root.add_child(spout)
+	for side: float in [-1.0, 1.0]:
+		var handle := SuperEgg.build_part(Vector3(0.025, 0.13, 0.025), metal.darkened(0.12), 2.0, 2.0)
+		handle.position = Vector3(side * 0.12, 0.29, 0.0)
+		handle.rotation.z = side * deg_to_rad(35.0)
+		root.add_child(handle)
 	_add_catalog_grip(root)
 	return root
 
@@ -558,6 +621,7 @@ static func build_jingu_bang_visual(item_scale: float = 1.0) -> Node3D:
 	# GripPoint's usual "near one end" placement on smaller items.
 	var grip := Node3D.new()
 	grip.name = "GripPoint"
+	grip.position = Vector3(0.0, 0.0, -radius)
 	root.add_child(grip)
 	return root
 
@@ -609,6 +673,24 @@ static func _build_knights_helm_visual(item_scale: float = 1.0) -> Node3D:
 	grip.name = "GripPoint"
 	grip.position = Vector3(0.0, -radius * 1.38, 0.0)
 	root.add_child(grip)
+	return root
+
+
+static func _build_lava_helm_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	# No real head to measure for a standalone shop/inventory icon -- the same
+	# generic-head fallback blorb_suit.gd's own _measure_head_contents() uses
+	# when it can't find real geometry either.
+	var head_size := ProceduralFigure.HEAD_SIZE * item_scale
+	var contents := AABB(Vector3(-head_size.x, 0.0, -head_size.z), head_size * 2.0)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(0.025, 0.022, 0.02)
+	material.metallic = 0.72
+	material.roughness = 0.16
+	var shell := MeshInstance3D.new()
+	shell.mesh = BlorbBodyShape.build_mesh_from_rings(BlorbSuit._build_lava_helm_rings(contents))
+	shell.material_override = material
+	root.add_child(shell)
 	return root
 
 

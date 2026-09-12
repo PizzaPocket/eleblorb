@@ -93,6 +93,11 @@ var _assignments: Dictionary = {}
 var _rng := RandomNumberGenerator.new()
 var _air_wing_flap_phase := 0.0
 var _assignment_reconcile_requested := false
+## Cached command state lets an already-worn torso and limbs immediately
+## change between ordinary fit and sealed fit when the Lava Helm arrives or
+## leaves. Torso geometry is otherwise static after equip, so merely changing
+## the limb rebuild path would leave it enlarged until the next full suit cycle.
+var _lava_helm_command_was_active := false
 
 
 func _init() -> void:
@@ -174,6 +179,27 @@ func worn_blorbs() -> Array[Blorb]:
 	return result
 
 
+## Story sequences may temporarily remove the party's blorbs from play.
+## Tear down live suit geometry immediately while preserving assignments,
+## so rescuing them restores the player's chosen layout on the next equip.
+func suspend_for_story() -> void:
+	for entry in _worn:
+		var pieces := entry.get("pieces") as Array
+		for piece in pieces:
+			if is_instance_valid(piece):
+				BlorbSuit.release_piece(piece as Node3D)
+		var blorb := entry.get("blorb") as Blorb
+		if is_instance_valid(blorb):
+			blorb.is_worn = false
+	for transition in _transitions:
+		var transition_blorb := transition.get("blorb") as Blorb
+		if is_instance_valid(transition_blorb):
+			transition_blorb.is_worn = false
+	_worn.clear()
+	_transitions.clear()
+	_suit_on = false
+
+
 func worn_blorb_for_slot(slot: String) -> Blorb:
 	for entry in _worn:
 		if String(entry.get("slot", "")) == slot:
@@ -221,17 +247,30 @@ func has_blorb_skates() -> bool:
 	return has_left and has_right
 
 
-## Water traversal, like skates, is only granted by a visibly landed pair.
-## A lone water blorb is still a normal suit piece; both feet are needed to
-## spread the player's weight across the lake surface.
-func has_water_walking_legs() -> bool:
-	return has_worn_element("leg_left", "water") and has_worn_element("leg_right", "water")
-
-
 ## Lava traversal requires a complete, visibly landed fire pair. Assignment
 ## alone is not protection, and losing either leg removes it immediately.
 func has_lava_safe_legs() -> bool:
 	return has_worn_element("leg_left", "fire") and has_worn_element("leg_right", "fire")
+
+
+func has_full_lava_suit() -> bool:
+	if not has_worn_element("arm_left", "fire") or not has_worn_element("arm_right", "fire"):
+		return false
+	if not has_worn_element("leg_left", "fire") or not has_worn_element("leg_right", "fire"):
+		return false
+	if not has_worn_element("torso", "fire"):
+		return false
+	var head := worn_blorb_in_slot("head")
+	return is_instance_valid(head) and head.element_state == "fire" and head.has_core_item("Lava Helm")
+
+
+func has_head_lava_helm() -> bool:
+	var head := worn_blorb_in_slot("head")
+	return is_instance_valid(head) and head.has_core_item("Lava Helm")
+
+
+func has_rock_walking_legs() -> bool:
+	return has_worn_element("leg_left", "rock") and has_worn_element("leg_right", "rock")
 
 
 ## A complete pair of visibly worn Air feet provides passive hover. Unlike
@@ -356,8 +395,22 @@ func update(delta: float) -> void:
 	# single shared phase the way the old EQUIPPING/UNEQUIPPING split was.
 	if not _transitions.is_empty():
 		_update_transitions(delta)
+	if _assignment_reconcile_requested and _transitions.is_empty():
+		_reconcile_worn_assignments()
+	var lava_helm_command := _lava_helm_command_active()
+	if lava_helm_command != _lava_helm_command_was_active:
+		_rebuild_worn_fire_pieces(lava_helm_command)
+		_lava_helm_command_was_active = lava_helm_command
 	if not _worn.is_empty():
-		_update_worn_limbs()
+		_update_worn_limbs(lava_helm_command)
+		# The Lava Helm sizes only its own shell. Keep the covered head, hair,
+		# and ears at their authored rig scale throughout wear and removal.
+		for entry in _worn:
+			if (entry["slot"] as String) != "head":
+				continue
+			for piece in (entry["pieces"] as Array):
+				if is_instance_valid(piece):
+					BlorbSuit.preserve_covered_head_scale(piece as Node3D)
 		# After _update_worn_limbs(): the dynamic (limb) pieces just rebuilt
 		# their eyes fresh this frame (_update_face() always resets scale.y
 		# to 1.0 on every call -- see its own comment on why .scale must be
@@ -365,9 +418,35 @@ func update(delta: float) -> void:
 		# AFTER the rebuild, not before, or it'd get silently clobbered.
 		_apply_eye_blink(delta)
 		_update_worn_air_wings(delta)
-	if _assignment_reconcile_requested and _transitions.is_empty():
-		_reconcile_worn_assignments()
 	_phase = Phase.WORN if not _worn.is_empty() else (Phase.TRANSITIONING if not _transitions.is_empty() else Phase.IDLE)
+
+
+func _lava_helm_command_active() -> bool:
+	# The helm is the command key, but the sealed configuration only exists
+	# while a complete five-piece Fire suit is physically worn. Because this is
+	# recomputed every frame from _worn, losing any piece immediately returns
+	# the survivors to normal and restoring it reforms the suit automatically.
+	return has_full_lava_suit()
+
+
+## Replaces only Fire torso/limb geometry. The Lava Helm itself has its own
+## authored shape and does not change, while non-Fire suit pieces should never
+## respond to the command. Releasing and recreating in the same frame makes
+## removal visibly and physically immediate.
+func _rebuild_worn_fire_pieces(lava_helm_command: bool) -> void:
+	for entry in _worn:
+		var slot := entry["slot"] as String
+		var blorb := entry["blorb"] as Blorb
+		if slot == "head" or not is_instance_valid(blorb) or blorb.element_state != "fire":
+			continue
+		for piece in (entry["pieces"] as Array):
+			if is_instance_valid(piece):
+				BlorbSuit.release_piece(piece as Node3D)
+		var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, lava_helm_command)
+		for piece in pieces:
+			if piece is VisualInstance3D:
+				PlayerPortrait.tag_for_portrait(piece as VisualInstance3D)
+		entry["pieces"] = pieces
 
 
 func _reconcile_worn_assignments() -> void:
@@ -567,7 +646,7 @@ func _update_transitions(delta: float) -> void:
 			var pieces := entry["pieces"] as Array
 			for piece in pieces:
 				if is_instance_valid(piece):
-					(piece as Node3D).queue_free()
+					BlorbSuit.release_piece(piece as Node3D)
 			var starting_blorb := entry["blorb"] as Blorb
 			var starting_slot := entry.get("from_slot", entry["slot"]) as String
 			var fresh_start_pos := _slot_anchor_position(starting_slot)
@@ -605,7 +684,7 @@ func _update_transitions(delta: float) -> void:
 		if t >= 1.0:
 			if mode in ["on", "move"]:
 				blorb.finish_worn()
-				var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale)
+				var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, _lava_helm_command_active())
 				# Tags each piece as visible to the paper-doll's own
 				# isolated portrait camera (see player_portrait.gd's own
 				# module docstring on render layers) -- done once here at
@@ -638,7 +717,7 @@ func _update_transitions(delta: float) -> void:
 ## Only the dynamic (limb) slots need rebuilding every frame -- torso/head
 ## are single-pivot pieces that already move for free via parenting (see
 ## BlorbSuit.equip_slot()'s own comment).
-func _update_worn_limbs() -> void:
+func _update_worn_limbs(lava_helm_command: bool) -> void:
 	for entry in _worn:
 		var slot := entry["slot"] as String
 		if not BlorbSuit.is_dynamic_slot(slot):
@@ -648,7 +727,7 @@ func _update_worn_limbs() -> void:
 			continue
 		var mesh_instance := pieces[0] as MeshInstance3D
 		var blorb := entry["blorb"] as Blorb
-		BlorbSuit.rebuild_slot(mesh_instance, slot, _pivots, _root, blorb, _rig_scale)
+		BlorbSuit.rebuild_slot(mesh_instance, slot, _pivots, _root, blorb, _rig_scale, lava_helm_command)
 
 
 ## Stamps each worn entry's OWN blink clock's current openness onto that

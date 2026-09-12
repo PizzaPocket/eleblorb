@@ -226,6 +226,7 @@ func _begin_sequence() -> void:
 
 
 func _glow_and_whiteout() -> void:
+	UISounds.play_foley(&"transform_rise", 0.52)
 	var glow := create_tween()
 	glow.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	glow.tween_method(
@@ -233,6 +234,7 @@ func _glow_and_whiteout() -> void:
 		0.0, 1.0, GLOW_TIME
 	)
 	await glow.finished
+	UISounds.play_foley(&"transform_flash", 0.62)
 	var flash := create_tween()
 	flash.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 	flash.tween_property(_whiteout, "modulate:a", 1.0, WHITEOUT_TIME)
@@ -241,6 +243,7 @@ func _glow_and_whiteout() -> void:
 
 
 func _reveal_from_white() -> void:
+	UISounds.play_foley(&"transform_reveal", 0.55)
 	var reveal := create_tween()
 	reveal.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	reveal.tween_property(_whiteout, "modulate:a", 0.0, REVEAL_TIME)

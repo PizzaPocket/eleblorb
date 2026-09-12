@@ -52,7 +52,7 @@ func _pick_position(favor_snow_zone: bool) -> Vector2:
 		var r: float = sqrt(_rng.randf_range(0.0, 1.0)) * radius
 		var a := _rng.randf_range(0.0, TAU)
 		var pos := Vector2(cos(a) * r, sin(a) * r)
-		if pos.length() < 10.0:
+		if pos.length() < 10.0 or _terrain.is_lake_area(pos) or _terrain.is_safe_zone(pos):
 			continue
 		return pos
 	return Vector2(radius, 0.0)

@@ -364,9 +364,12 @@ static func build(
 	shoe_color: Color = Color(0.0, 0.0, 0.0, 0.0),
 	skeleton_mode: bool = false,
 	has_glasses: bool = false,
-	leg_thickness_scale: float = 1.0
+	leg_thickness_scale: float = 1.0,
+	has_ears: bool = true,
+	hand_color_override: Color = Color(0.0, 0.0, 0.0, 0.0)
 ) -> Dictionary:
 	var arm_color := shirt_color if sleeve_style == SLEEVE_STYLE_LONG else skin_color
+	var hand_color: Color = skin_color if is_zero_approx(hand_color_override.a) else hand_color_override
 	var resolved_shoe_color := pants_color if is_zero_approx(shoe_color.a) else shoe_color
 
 	var rig := Node3D.new()
@@ -451,6 +454,12 @@ static func build(
 	spine_pivot.name = "SpinePivot"
 	spine_pivot.position = Vector3(0, abdomen_y, 0)
 	rig.add_child(spine_pivot)
+	# An identity thorax pivot lets authored poses distribute axial rotation
+	# naturally between the waist and ribcage. The abdomen remains attached to
+	# SpinePivot; chest, shoulders, neck and head travel with this upper stage.
+	var thorax_pivot := Node3D.new()
+	thorax_pivot.name = "ThoraxPivot"
+	spine_pivot.add_child(thorax_pivot)
 
 	if skeleton_mode:
 		build_spine_column(spine_pivot, abdomen_size, shirt_color, abdomen_z_offset)
@@ -467,7 +476,7 @@ static func build(
 	# against the abdomen below.
 	var chest := SuperEgg.build_part(chest_size, shirt_color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
 	chest.position = Vector3(0, chest_y - abdomen_y + chest_size.y, chest_z_offset)
-	spine_pivot.add_child(chest)
+	thorax_pivot.add_child(chest)
 	# Alpha 0 (the default) means "no emblem" -- most callers (every NPC)
 	# don't want one; per direct instruction this is opt-in per build() call.
 	if chest_emblem_color.a > 0.0:
@@ -520,7 +529,7 @@ static func build(
 	var neck_pivot := Node3D.new()
 	neck_pivot.name = "NeckPivot"
 	neck_pivot.position = Vector3(0, neck_y - abdomen_y, 0)
-	spine_pivot.add_child(neck_pivot)
+	thorax_pivot.add_child(neck_pivot)
 
 	var neck_local_y := neck_logical_half_height
 	# NECK_BACK_INSET describes where the neck's own BACK SURFACE sits
@@ -571,8 +580,9 @@ static func build(
 	head_mesh.position = Vector3(0, HEAD_SIZE.y, 0)
 	head_pivot.add_child(head_mesh)
 	var eyes := FigureEyes.add_eyes(head_mesh, HEAD_SIZE, skin_color)
-	if not skeleton_mode:
+	if not skeleton_mode and has_ears:
 		FigureEars.add_ears(head_mesh, HEAD_SIZE, skin_color)
+	if not skeleton_mode:
 		FigureHair.add_hair(
 			head_mesh, HEAD_SIZE, HEAD_EPSILON_TOP, hair_color, hair_style, hair_length_variance
 		)
@@ -617,15 +627,17 @@ static func build(
 	# confirmed this way). See the figure-rig skill's own note on this --
 	# recorded there since it's exactly the kind of hard-to-notice mistake
 	# that skill exists to flag for future rig work.
-	var arm_right := _build_arm(spine_pivot, chest_size, shoulder_y - abdomen_y, -1.0, arm_color, skin_color, arm_build_scale, sleeve_style, shirt_color)
-	var arm_left := _build_arm(spine_pivot, chest_size, shoulder_y - abdomen_y, 1.0, arm_color, skin_color, arm_build_scale, sleeve_style, shirt_color)
+	var arm_right := _build_arm(thorax_pivot, chest_size, shoulder_y - abdomen_y, -1.0, arm_color, hand_color, arm_build_scale, sleeve_style, shirt_color)
+	var arm_left := _build_arm(thorax_pivot, chest_size, shoulder_y - abdomen_y, 1.0, arm_color, hand_color, arm_build_scale, sleeve_style, shirt_color)
 	var leg_right := _build_leg(rig, hip_size, hip_y, -1.0, pants_color, resolved_shoe_color, leg_build_scale, leg_thickness_scale)
 	var leg_left := _build_leg(rig, hip_size, hip_y, 1.0, pants_color, resolved_shoe_color, leg_build_scale, leg_thickness_scale)
 
 	return {
 		"spine": spine_pivot,
+		"thorax": thorax_pivot,
 		"neck": neck_pivot,
 		"head": head_pivot,
+		"head_mesh": head_mesh,
 		"eyes": eyes,
 		"hips": hips,
 		"arm_left": arm_left["pivot"],
