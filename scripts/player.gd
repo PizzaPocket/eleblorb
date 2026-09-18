@@ -558,6 +558,7 @@ const WATER_STREAM_LIFETIME := 0.42
 @onready var camera_spring_arm: SpringArm3D = $CameraRig/CameraPivot/SpringArm3D
 @onready var camera: Camera3D = $CameraRig/CameraPivot/SpringArm3D/Camera3D
 @onready var visuals: Node3D = $Visuals
+@onready var _collision_shape: CollisionShape3D = $CollisionShape3D
 @onready var terrain: Node = get_node("../Terrain")
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -1122,6 +1123,16 @@ var _aerial_rest_heading_initialized: bool = false
 ## error becoming the next frame's anchor and cumulatively drifting away.
 var _aerial_skull_body_offset := Vector3.ZERO
 var _aerial_skull_anchor_initialized := false
+## The capsule's authored standing pose, captured in _ready(). While skull-
+## anchored, the same capsule is re-posed to follow the rendered body (see
+## _fit_collision_to_body()); releasing the anchor restores this exactly.
+var _standing_collision_transform := Transform3D.IDENTITY
+## Height of the posed body's lowest point above this CharacterBody's origin.
+## Zero while standing. While flying or diving level it rises to about 1.1 m,
+## because the skull stays pinned at its standing height above the origin and
+## the body hangs level from it. Analytic floors (the lakebed clamp, lava
+## contact) add this so they meet the body's real underside, not the origin.
+var _body_bottom_height := 0.0
 var _swim_kick_phase := 0.0
 ## True only for a jump that began while standing on the giant's upper mesh.
 ## It is deliberately distinct from merely being inside the goo at ground
@@ -1584,6 +1595,7 @@ func _ready() -> void:
 	# rendering only; the collision capsule (a separate sibling node) keeps
 	# its own real lift untouched.
 	visuals.position.y = -FOOT_OFFSET
+	_standing_collision_transform = _collision_shape.transform
 
 	# _piloting_xiao_hou_zi: camera reframed for the monkey's much
 	# smaller scale (see TEMP_MONKEY_CAMERA_HEIGHT/DISTANCE's own comments).
@@ -1677,6 +1689,11 @@ func _physics_process(delta: float) -> void:
 			else:
 				_cycle_playable_character(1)
 	_update_sun_wu_kong_summon()
+	# Every branch below hands control to another body and skips
+	# _update_aerial_body_anchor(). Starting one mid-flight must not leave the
+	# human following along with a capsule still posed level.
+	if _player_following_manchego or _piloting_xiao_hou_zi or is_instance_valid(_controlled_generic_member) or _player_following_blorbus:
+		_release_skull_anchor()
 	if _player_following_manchego:
 		_update_manchego_control(delta)
 		return
@@ -2448,7 +2465,9 @@ func _enforce_lava_access() -> void:
 	if not terrain.is_lava_area(xz) or _blorb_suit.has_lava_safe_legs() or _blorb_suit.has_full_lava_suit():
 		return
 	var lava_surface: float = terrain.get_lava_surface_height(xz)
-	if global_position.y - FOOT_OFFSET > lava_surface + LAVA_CONTACT_TOLERANCE:
+	# The body's underside, not the origin: a level flier's origin hangs up to
+	# ~1.1 m below the visible body (see _body_bottom_height).
+	if global_position.y - FOOT_OFFSET + _body_bottom_height > lava_surface + LAVA_CONTACT_TOLERANCE:
 		return
 	var safe_position: Vector3 = terrain.get_lava_escape_position(xz)
 	global_position = safe_position + Vector3.UP * FOOT_OFFSET
@@ -6301,7 +6320,7 @@ func _update_aerial_body_anchor(delta: float) -> void:
 	# normal upright walk/run silhouette. Turn its planar facing toward travel
 	# without applying the pitched, trailing-body flight anchor below.
 	if _air_foot_hover_active and not _air_flight_active and not _fire_limb_flight_active and not _lake_buoyancy_active:
-		_aerial_skull_anchor_initialized = false
+		_release_skull_anchor()
 		if _aerial_motion_direction.length_squared() > 0.001:
 			var planar_direction := _aerial_motion_direction
 			planar_direction.y = 0.0
@@ -6387,27 +6406,15 @@ func _update_aerial_body_anchor(delta: float) -> void:
 		# after that rotation, making the neck/head junction the real visual
 		# pivot without changing the collision shape's stable feet origin.
 		visuals.global_position += skull_anchor - _head.global_position
-		# Per direct report ("when I aim the camera downward, the flying
-		# player's body just totally clips into the ground") -- two earlier
-		# attempts pre-clamped the camera pitch itself before it ever
-		# reached the rotation above, on the theory that the far end of the
-		# body swings toward the ground as pitch steepens. Neither one
-		# changed anything, which means that theory (or at least which
-		# direction the swing actually goes) was wrong, not just
-		# under-tuned. Rather than guess a third time, check where the
-		# body's own two known extremes -- the head (pinned at the anchor
-		# above) and the rig's own root origin -- actually ended up after
-		# THIS frame's real rotation, and push the whole visual body up if
-		# either would sit below the real ground here. This doesn't depend
-		# on knowing which way the rotation goes at all.
-		if (_lake_diving_active or _air_flight_active or _fire_limb_flight_active) and terrain != null:
-			var ground_y: float = terrain.get_mesh_height(global_position.x, global_position.z)
-			var lowest_y := minf(_head.global_position.y, visuals.global_position.y)
-			const MIN_GROUND_CLEARANCE := 0.3
-			if lowest_y < ground_y + MIN_GROUND_CLEARANCE:
-				visuals.global_position.y += (ground_y + MIN_GROUND_CLEARANCE) - lowest_y
+		# The capsule follows the rendered body rather than standing upright
+		# under the pinned skull. A level flier can therefore skim the ground
+		# and slide along walls with its real silhouette, and a body swinging
+		# upright near the ground is pushed up onto its feet by ordinary
+		# collision recovery. This replaced a visual-only ground clamp, which
+		# was compensating for the snow-sink overwrite of the skull pin.
+		_fit_collision_to_body()
 	else:
-		_aerial_skull_anchor_initialized = false
+		_release_skull_anchor()
 		_aerial_rest_heading_initialized = false
 		# Restores camera_rig's own ordinary fixed local offset once flight/
 		# diving actually ends -- see the aerial branch's own comment on why
@@ -6459,6 +6466,37 @@ func _update_aerial_body_anchor(delta: float) -> void:
 			visuals.global_transform = body_transform
 			visuals.position = visuals.position.lerp(Vector3(0.0, -FOOT_OFFSET, 0.0), t)
 			_air_flight_exit_recovery = maxf(_air_flight_exit_recovery - delta, 0.0)
+
+
+## Re-poses the standing capsule so it follows the rendered body, keeping the
+## capsule's authored placement relative to the rig. Standing upright, this
+## reproduces _standing_collision_transform exactly.
+func _fit_collision_to_body() -> void:
+	var standing_visuals := Transform3D(Basis(), Vector3(0.0, -FOOT_OFFSET, 0.0))
+	var body := Transform3D(visuals.transform.basis.orthonormalized(), visuals.transform.origin)
+	_collision_shape.transform = body * standing_visuals.affine_inverse() * _standing_collision_transform
+	var capsule := _collision_shape.shape as CapsuleShape3D
+	var half_segment := maxf(capsule.height * 0.5 - capsule.radius, 0.0)
+	var axis_rise := absf(_collision_shape.transform.basis.y.normalized().y)
+	_body_bottom_height = _collision_shape.transform.origin.y - axis_rise * half_segment - capsule.radius
+
+
+## Ends skull anchoring: restores the standing capsule and clears the anchor
+## state. A level body skimming the ground has this CharacterBody's origin
+## up to ~1.1 m below the surface, so the origin is first lifted just enough
+## for the restored standing capsule to start above the analytic ground
+## (never above where the body's underside already was). Mid-air there is
+## nothing to clear, so nothing moves.
+func _release_skull_anchor() -> void:
+	if not _aerial_skull_anchor_initialized:
+		return
+	_aerial_skull_anchor_initialized = false
+	_collision_shape.transform = _standing_collision_transform
+	if terrain != null and _body_bottom_height > 0.0:
+		var ground_y: float = terrain.get_mesh_height(global_position.x, global_position.z)
+		var lift := clampf(ground_y + FOOT_OFFSET - global_position.y, 0.0, _body_bottom_height)
+		global_position.y += lift
+	_body_bottom_height = 0.0
 
 
 ## Landing impact reaction -- see LANDING_* consts above. Fast-eases into a
@@ -6659,7 +6697,9 @@ func _update_lake_buoyancy(delta: float) -> void:
 		_jumping = false
 		_lake_buoyancy_active = true
 		_lake_diving_active = true
-		var dive_floor := floor_height + LAKE_DIVE_FLOOR_CLEARANCE
+		# Measured to the body's underside, so a level diver can glide just
+		# above the lakebed instead of hovering a body-length over it.
+		var dive_floor := floor_height + LAKE_DIVE_FLOOR_CLEARANCE - _body_bottom_height
 		var dive_surface := water_level - LAKE_SWIM_FOOT_DEPTH
 		global_position.y = clampf(global_position.y, dive_floor, dive_surface)
 		return
