@@ -149,9 +149,11 @@ func _raw_height(x: float, z: float) -> float:
 	height = _lava_pool.carve(height, point)
 	# Frozen lake: the same carve; its ice sheet is built over the basin.
 	height = _frozen_lake.carve(height, point)
-	# Snow mountain, smooth to its summit.
+	# Snow mountain, smooth to its summit, added on top of the hills. (Not
+	# maxf(): the mountain term is zero everywhere outside it, so a max
+	# lifted every basin and hollow in the whole valley back up to zero.)
 	var mountain_distance := point.distance_to(MOUNTAIN_CENTER)
-	height = maxf(height, MOUNTAIN_HEIGHT * (1.0 - smoothstep(0.0, MOUNTAIN_RADIUS, mountain_distance)))
+	height += MOUNTAIN_HEIGHT * (1.0 - smoothstep(0.0, MOUNTAIN_RADIUS, mountain_distance))
 	# Level arrival clearing and portal pads.
 	height = lerpf(height, 0.0, 1.0 - smoothstep(START_RADIUS, START_RADIUS + 16.0, point.distance_to(START_CENTER)))
 	for border in BORDERS:
