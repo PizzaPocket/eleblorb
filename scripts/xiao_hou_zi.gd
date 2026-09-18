@@ -603,6 +603,15 @@ func playable_profile() -> PlayableCharacterProfile:
 	return _playable_profile
 
 
+## Camera framing contract -- see Player.camera_focus_point().
+func camera_focus_point() -> Vector3:
+	return global_position + Vector3.UP * _playable_profile.camera_height
+
+
+func camera_follow_distance() -> float:
+	return _playable_profile.camera_distance
+
+
 func is_playable_available() -> bool:
 	return in_party
 

@@ -377,10 +377,6 @@ var _piloting_xiao_hou_zi := false
 # shortened the legs and lowered the body, so his current crown height is
 # approximately 0.465m rather than forcing the rig back up to 0.50m.
 const TEMP_MONKEY_SCALE := 2.3585
-# Frame the half-metre monkey directly instead of retaining the human's
-# 1.6m-high, 3.5m-distant camera composition.
-const TEMP_MONKEY_CAMERA_HEIGHT := 0.75
-const TEMP_MONKEY_CAMERA_DISTANCE := 2.0
 # His short legs limit ground coverage, but they should still step briskly.
 # Since phase advancement is multiplied by traversal speed below, 2.16x at
 # 2.5m/s yields ~9.18rad/s: 10% below the human's 10.2rad/s full-walk cycle.
@@ -541,9 +537,10 @@ const WATER_STREAM_LIFETIME := 0.42
 ## CharacterBody's own top-level `rotation` to solve a spawn-framing
 ## problem (e.g. "the camera is blocked by something"). main.tscn's own
 ## spawn establishes that the player always starts facing the camera
-## straight on (CameraRig hangs off this body with zero local rotation, so
-## the camera's spawn position/facing is entirely inherited from THIS
-## node's own rotation) -- kingdom_bootstrap.gd's arrival spawn must keep
+## straight on (CameraRig starts with this body's own rotation, and
+## _update_camera_follow() carries any later change to it, so the camera's
+## facing is still inherited from THIS node's rotation even though the rig
+## is top_level) -- kingdom_bootstrap.gd's arrival spawn must keep
 ## that same framing. A first attempt at fixing a kingdom-portal-blocks-
 ## camera bug rotated this body's own `rotation.y` instead, which desynced
 ## it from _animate_walk()'s/_update_ai()-style world-space facing math
@@ -664,9 +661,7 @@ var _hips_rest_y: float = 0.0
 var _wake_intro_active: bool = false
 var _wake_intro_elapsed: float = 0.0
 var _wake_intro_owns_modal_lock: bool = false
-var _wake_intro_camera_position_rest: Vector3 = Vector3(0.0, 1.6, 0.0)
 var _wake_intro_camera_pitch_rest: float = 0.0
-var _wake_intro_camera_distance_rest: float = 3.5
 var _wake_intro_final_transform: Transform3D
 var _wake_intro_has_final_transform := false
 
@@ -1182,9 +1177,13 @@ var _electric_stream_right: LightningBolt
 var _city_stream_left: LightningBolt
 var _city_stream_right: LightningBolt
 var _throw_aim_active: bool = false
-var _throw_camera_recovering: bool = false
-var _throw_camera_base_length: float = 3.5
-var _throw_spring_arm_base_position: Vector3 = Vector3.ZERO
+## 0 = ordinary follow framing, 1 = the closer over-the-shoulder aim framing.
+## Eased by _update_camera_follow() so both entering and leaving aim blend.
+var _throw_camera_blend: float = 0.0
+## This body's yaw as of the last camera update. The rig is top_level, so a
+## teleport that turns this body (a recovery wake at an inn bed) would no
+## longer turn the view with it; _update_camera_follow() carries the change.
+var _camera_follow_root_yaw: float = 0.0
 var _throw_pose_blend: float = 0.0
 var _throw_arm_start_rotation: Vector3 = Vector3.ZERO
 var _throw_elbow_start_rotation: Vector3 = Vector3.ZERO
@@ -1503,15 +1502,22 @@ func _blorb_suit_pivot_map(pivots: Dictionary) -> Dictionary:
 	}
 
 
-## Local camera_rig offset/spring length -- the monkey's much smaller scale
-## needs its own much closer framing than the human's. Not routed through
-## _update_possession_camera() (that one's reserved for Blorbus/the giant,
-## which drive a separate body camera_rig has to chase in world space);
-## piloting Xiao Hou Zi keeps camera_rig local to this CharacterBody like
-## ordinary human control does, just with different numbers.
-func _apply_camera_framing(as_monkey: bool) -> void:
-	camera_rig.position.y = TEMP_MONKEY_CAMERA_HEIGHT if as_monkey else 1.6
-	camera_spring_arm.spring_length = TEMP_MONKEY_CAMERA_DISTANCE if as_monkey else 3.5
+## Camera framing contract, shared by every body the player can control
+## (see XiaoHouZi, Blorb and Manchego's own copies): the world point the camera
+## orbits, near the head, and the spring arm's resting length.
+## _update_camera_follow() asks whichever body PartyControl reports as
+## controlled, so no possession or mount path positions the camera itself.
+## While skull-anchored (flight, diving), the orbit point is the pinned skull
+## rather than a fixed height above the feet, which keeps the head a constant
+## distance from the camera at every pitch.
+func camera_focus_point() -> Vector3:
+	if _aerial_skull_anchor_initialized:
+		return global_position + _aerial_skull_body_offset
+	return global_position + Vector3.UP * _playable_profile.camera_height
+
+
+func camera_follow_distance() -> float:
+	return _playable_profile.camera_distance
 
 
 ## The human's own suit is always authored at the ProceduralFigure scale.
@@ -1597,16 +1603,13 @@ func _ready() -> void:
 	visuals.position.y = -FOOT_OFFSET
 	_standing_collision_transform = _collision_shape.transform
 
-	# _piloting_xiao_hou_zi: camera reframed for the monkey's much
-	# smaller scale (see TEMP_MONKEY_CAMERA_HEIGHT/DISTANCE's own comments).
-	# The debug jungle-plateau spawn teleport used while iterating on the
-	# rig has been removed -- the game now starts focused on the player at
-	# the normal main.tscn placement, same as always. Always false at
-	# startup in practice (possession only flips it later, at runtime), but
-	# routed through the same _apply_camera_framing() helper possession
-	# start/end use, so a future default-as-monkey debug session would still
-	# frame correctly.
-	_apply_camera_framing(_piloting_xiao_hou_zi)
+	# The rig never inherits this body's transform. _update_camera_follow()
+	# places it on whichever body is being controlled, every frame; this only
+	# avoids a first frame framed at the world origin.
+	camera_rig.top_level = true
+	_camera_follow_root_yaw = global_rotation.y
+	camera_rig.global_position = camera_focus_point()
+	camera_spring_arm.spring_length = camera_follow_distance()
 
 	var pivots := _build_pivots(_piloting_xiao_hou_zi)
 	_apply_pivots(pivots)
@@ -1626,8 +1629,7 @@ func _ready() -> void:
 	# bent by any single joint the way spine/head/a limb pivot are. Always
 	# 1.0 in practice here (_piloting_xiao_hou_zi is always false this early
 	# at startup), but routed through _current_blorb_suit_rig_scale() anyway
-	# for the same future-default-as-monkey reasoning _apply_camera_framing()
-	# above already documents.
+	# so a future default-as-monkey debug session would still fit the suit.
 	_blorb_suit.setup(self, visuals, _blorb_suit_pivot_map(pivots), _current_blorb_suit_rig_scale())
 	# Deferred, not called directly here -- sibling Blorb nodes' own _ready()
 	# (which is what actually adds each one to the "blorbs" group
@@ -1706,16 +1708,6 @@ func _physics_process(delta: float) -> void:
 	if _player_following_blorbus:
 		_update_blorbus_control(delta)
 		return
-	# Normal human control always owns a child camera rig. Possession and
-	# mounting deliberately detach it with top_level=true; if any interrupted
-	# transition leaves that flag behind, the player can fly hundreds of metres
-	# while the camera remains at the old world coordinate. Make attachment a
-	# state invariant here rather than relying on every exit path forever.
-	if camera_rig.top_level:
-		camera_rig.top_level = false
-		camera_rig.position = Vector3.ZERO
-		_apply_camera_framing(false)
-
 	# Tracked every frame, not just while grounded (where the ordinary jump
 	# input below is read) -- a press timed for a blorb bounce can happen
 	# while still airborne, and would otherwise be silently dropped.
@@ -2977,8 +2969,7 @@ func _process(delta: float) -> void:
 	# there got silently overwritten every frame. _process() runs after all
 	# physics processing for the frame, right before rendering, so this is
 	# the last word on camera position each frame.
-	_update_possession_camera()
-	_update_throw_camera(delta)
+	_update_camera_follow(delta)
 	_update_wake_intro(delta)
 	_clamp_camera_above_ground()
 	if _lake_diving_just_ended:
@@ -3002,9 +2993,7 @@ func begin_wake_intro() -> void:
 		return
 	_wake_intro_active = true
 	_wake_intro_elapsed = 0.0
-	_wake_intro_camera_position_rest = camera_rig.position
 	_wake_intro_camera_pitch_rest = camera_pivot.rotation.x
-	_wake_intro_camera_distance_rest = camera_spring_arm.spring_length
 	UIState.push_modal()
 	_wake_intro_owns_modal_lock = true
 	_apply_wake_intro_pose(0.0)
@@ -3016,9 +3005,7 @@ func begin_recovery_wake(final_transform: Transform3D = global_transform) -> voi
 		return
 	_wake_intro_active = true
 	_wake_intro_elapsed = 0.0
-	_wake_intro_camera_position_rest = camera_rig.position
 	_wake_intro_camera_pitch_rest = camera_pivot.rotation.x
-	_wake_intro_camera_distance_rest = camera_spring_arm.spring_length
 	_wake_intro_final_transform = final_transform
 	_wake_intro_has_final_transform = true
 	UIState.push_modal()
@@ -3103,7 +3090,6 @@ func _apply_wake_intro_pose(rise: float) -> void:
 	# camera orientation follows the body's lie-to-stand angle, keeping the
 	# close-up face-on rather than leaving the head to travel out of frame.
 	var face_world := _head.to_global(Vector3(0.0, ProceduralFigure.HEAD_SIZE.y, 0.0))
-	var face_target := to_local(face_world)
 	var close_pitch := lerp_angle(WAKE_INTRO_CAMERA_PITCH, 0.0, rise)
 	var settle_time := (
 		_wake_intro_elapsed - WAKE_INTRO_REST_DURATION - WAKE_INTRO_RISE_DURATION
@@ -3112,12 +3098,15 @@ func _apply_wake_intro_pose(rise: float) -> void:
 		settle_time / WAKE_INTRO_SETTLE_DURATION, 0.0, 1.0
 	)
 	var camera_settle := smoothstep(0.0, 1.0, settle_linear)
-	camera_rig.position = face_target.lerp(_wake_intro_camera_position_rest, camera_settle)
+	# _update_camera_follow() has already placed this frame's ordinary
+	# framing, so the close-up settles back into exactly what follow will
+	# keep producing once the intro ends.
+	camera_rig.global_position = face_world.lerp(camera_rig.global_position, camera_settle)
 	camera_pivot.rotation.x = lerp_angle(
 		close_pitch, _wake_intro_camera_pitch_rest, camera_settle
 	)
 	camera_spring_arm.spring_length = lerpf(
-		WAKE_INTRO_CAMERA_DISTANCE, _wake_intro_camera_distance_rest, camera_settle
+		WAKE_INTRO_CAMERA_DISTANCE, camera_spring_arm.spring_length, camera_settle
 	)
 
 
@@ -3143,9 +3132,7 @@ func _finish_wake_intro() -> void:
 	visuals.rotation.x = 0.0
 	visuals.rotation.z = 0.0
 	visuals.position.y = -FOOT_OFFSET
-	camera_rig.position = _wake_intro_camera_position_rest
 	camera_pivot.rotation.x = _wake_intro_camera_pitch_rest
-	camera_spring_arm.spring_length = _wake_intro_camera_distance_rest
 	_set_eye_openness(1.0)
 	if _wake_intro_has_final_transform:
 		global_transform = _wake_intro_final_transform
@@ -3208,7 +3195,6 @@ func _start_generic_party_control(member: Node3D) -> bool:
 	_controlled_generic_member = member
 	collision_layer = 0
 	PartyControl.set_active_member(member)
-	camera_rig.top_level = true
 	return true
 
 
@@ -3216,10 +3202,6 @@ func _end_generic_party_control() -> void:
 	_controlled_generic_member = null
 	collision_layer = 2
 	PartyControl.set_active_member(self)
-	if camera_rig.top_level:
-		camera_rig.top_level = false
-		camera_rig.position = Vector3.ZERO
-	_apply_camera_framing(false)
 
 
 func _update_generic_party_control(delta: float) -> void:
@@ -3240,14 +3222,6 @@ func _update_generic_party_control(delta: float) -> void:
 	var jump_pressed: bool = Input.is_action_just_pressed("jump") and not UIState.modal_open
 	member.drive_from_player(direction, delta, _is_sprinting(), jump_pressed)
 	_follow_controlled_party_body(member, delta)
-	var camera_height: float = 1.6
-	var camera_distance: float = 3.5
-	if member.has_method("playable_profile"):
-		var profile: PlayableCharacterProfile = member.playable_profile()
-		camera_height = profile.camera_height
-		camera_distance = profile.camera_distance
-	camera_spring_arm.spring_length = camera_distance
-	camera_rig.global_position = member.global_position + Vector3.UP * camera_height
 
 
 func _legacy_toggle_blorbus_control() -> void:
@@ -3283,7 +3257,6 @@ func _try_start_blorbus_control() -> bool:
 			_controlled_blorbus = blorbus
 			PartyControl.set_active_member(blorbus)
 			_player_following_blorbus = true
-			camera_rig.top_level = true
 			Hud.show_message("You are now controlling Blorbus.")
 			return true
 	return false
@@ -3337,8 +3310,6 @@ func _try_start_xiao_hou_zi_control() -> bool:
 	# presenting itself as the interaction body while following Xiao.
 	collision_layer = 0
 	PartyControl.set_active_member(monkey)
-	camera_rig.top_level = true
-	_apply_camera_framing(true)
 	Hud.show_message("You are now controlling Xiao Hou Zi.")
 	return true
 
@@ -3360,10 +3331,6 @@ func _end_xiao_hou_zi_control() -> void:
 	_controlled_xiao_hou_zi = null
 	collision_layer = 2
 	PartyControl.set_active_member(self)
-	if camera_rig.top_level:
-		camera_rig.top_level = false
-		camera_rig.position = Vector3.ZERO
-	_apply_camera_framing(false)
 	Hud.show_message("You are now controlling the player.")
 
 
@@ -3398,34 +3365,12 @@ func _release_blorbus_and_giant_possession() -> void:
 	if is_instance_valid(_controlled_blorbus):
 		_controlled_blorbus.is_player_controlled = false
 	_controlled_blorbus = null
-	# _try_start_blorbus_control() detaches camera_rig from this CharacterBody
-	# (top_level = true) so _update_blorbus_control() can freely drive its
-	# global_position to follow whichever separate body is being piloted --
-	# left on, that global_position (Blorbus/the giant's last tracked spot)
-	# would keep the camera pinned there even once nothing is repositioning
-	# it anymore. Re-attaching without zeroing position first would just
-	# reinterpret that same stale global position as a local offset instead
-	# (a bogus, often huge, one), so both have to be reset together. This
-	# used to live only in _end_blorbus_control(), which covers returning to
-	# the human -- but _try_start_xiao_hou_zi_control() also calls this
-	# function when advancing straight from Blorbus into Xiao Hou Zi without
-	# passing back through human control, and needs the exact same cleanup:
-	# the player and Xiao Hou Zi's own bodies already stay exactly where they
-	# were per the zero-teleport contract (see _try_start_xiao_hou_zi_control()
-	# 's own doc comment), so the camera should too, snapping back onto
-	# whichever body is now driving it (via _apply_camera_framing(), called
-	# right after this by both callers) rather than lagging at Blorbus's old
-	# spot.
-	if camera_rig.top_level:
-		camera_rig.top_level = false
-		camera_rig.position = Vector3.ZERO
 
 
 func _end_blorbus_control() -> void:
 	_release_blorbus_and_giant_possession()
 	_player_following_blorbus = false
 	PartyControl.set_active_member(self)
-	_apply_camera_framing(false)
 	Hud.show_message("You are now controlling the player.")
 
 
@@ -3448,9 +3393,7 @@ func start_riding_manchego(manchego: Manchego) -> void:
 	_controlled_manchego.begin_ride()
 	_player_following_manchego = true
 	_manchego_dismount_armed = false
-	camera_rig.top_level = true
-	# Same top_level idiom camera_rig itself uses right above -- lets
-	# _apply_manchego_seated_pose() drive `visuals` off Manchego's own live
+	# top_level lets _apply_manchego_seated_pose() drive `visuals` off Manchego's own live
 	# seat transform directly every frame instead of this CharacterBody's
 	# own position/rotation.y (which stays a loose, invisible-now follower;
 	# see _update_manchego_control()'s own comment for why that's still kept
@@ -3475,9 +3418,6 @@ func _end_manchego_control() -> void:
 	_manchego_dismount_armed = false
 	if is_instance_valid(_mounted_rider) and _mounted_rider != self and _mounted_rider.has_method("end_mounted"):
 		_mounted_rider.end_mounted()
-	if camera_rig.top_level and not _piloting_xiao_hou_zi:
-		camera_rig.top_level = false
-		camera_rig.position = Vector3.ZERO
 	if _mounted_rider == self and visuals.top_level:
 		visuals.top_level = false
 		# visuals' position/rotation held GLOBAL values a moment ago (that's
@@ -3503,7 +3443,6 @@ func _end_manchego_control() -> void:
 		_elbow_left.rotation.z = 0.0
 		_elbow_right.rotation.z = 0.0
 	_mounted_rider = null
-	_apply_camera_framing(_piloting_xiao_hou_zi)
 	Hud.show_message("Dismounted.")
 
 
@@ -3687,9 +3626,6 @@ func _update_xiao_hou_zi_control(delta: float) -> void:
 	var jump_pressed := Input.is_action_just_pressed("jump") and not UIState.modal_open
 	_controlled_xiao_hou_zi.drive_from_player(direction, delta, _is_sprinting(), jump_pressed)
 	_follow_controlled_party_body(_controlled_xiao_hou_zi, delta)
-	camera_rig.global_position = (
-		_controlled_xiao_hou_zi.global_position + Vector3.UP * TEMP_MONKEY_CAMERA_HEIGHT
-	)
 
 
 func _follow_controlled_party_body(target: Node3D, delta: float) -> void:
@@ -3781,7 +3717,6 @@ func begin_humongous_mind_merge(giant: Blorb) -> bool:
 	_controlled_blorbus.end_direct_control()
 	_controlled_giant = giant
 	_player_following_blorbus = true
-	camera_rig.top_level = true
 	PartyControl.set_control_override(giant, _controlled_blorbus)
 	HumongousState.mark_merged()
 	Hud.show_message("Blorbus's mind joined Humongous.")
@@ -3811,27 +3746,32 @@ func end_humongous_mind_merge() -> void:
 	Hud.show_message("Blorbus released the mind merge.")
 
 
-## Blorbus/giant/Manchego only -- see _piloting_xiao_hou_zi's own doc comment
-## for why possessing Xiao Hou Zi needs no equivalent branch here: it
-## reskins this CharacterBody in place rather than driving a separate body
-## camera_rig has to chase in world space, so camera_rig just stays local
-## like it does for ordinary human control (see _apply_camera_framing()).
-func _update_possession_camera() -> void:
-	if _player_following_manchego and is_instance_valid(_controlled_manchego):
-		camera_spring_arm.spring_length = 3.6
-		camera_rig.global_position = _controlled_manchego.global_position + Vector3.UP * 1.75
-		return
-	if not _player_following_blorbus:
-		return
-	var controlled: Blorb = _controlled_giant if is_instance_valid(_controlled_giant) else _controlled_blorbus
-	if is_instance_valid(controlled):
-		var height := 1.6
-		camera_spring_arm.spring_length = 3.5
-		if controlled.blorb_type == "size":
-			var camera_profile: Dictionary = controlled.psychic_camera_profile()
-			height = float(camera_profile.get("height", height))
-			camera_spring_arm.spring_length = float(camera_profile.get("distance", camera_spring_arm.spring_length))
-		camera_rig.global_position = controlled.global_position + Vector3.UP * height
+## The only writer of the camera rig's placement and the spring arm's length
+## and offset (the wake intro's close-up is a cinematic layered on top, see
+## _apply_wake_intro_pose()). Runs in _process(), after physics has moved
+## every body this frame. Framing always comes from whichever body
+## PartyControl reports as controlled, via the camera_focus_point() /
+## camera_follow_distance() contract, so switching characters, mounting, or
+## a mind merge never has to move the camera itself.
+func _update_camera_follow(delta: float) -> void:
+	var subject := PartyControl.active_control_body()
+	if not is_instance_valid(subject) or not subject.has_method("camera_focus_point"):
+		subject = self
+	var distance: float = subject.camera_follow_distance()
+	var root_yaw := global_rotation.y
+	if not is_equal_approx(root_yaw, _camera_follow_root_yaw):
+		camera_rig.rotate_y(angle_difference(_camera_follow_root_yaw, root_yaw))
+		_camera_follow_root_yaw = root_yaw
+	_throw_camera_blend = lerpf(
+		_throw_camera_blend, 1.0 if _throw_aim_active else 0.0,
+		clampf(THROW_CAMERA_BLEND_SPEED * delta, 0.0, 1.0)
+	)
+	camera_rig.global_position = subject.camera_focus_point()
+	camera_spring_arm.spring_length = distance * lerpf(1.0, THROW_CAMERA_DISTANCE_SCALE, _throw_camera_blend)
+	# SpringArm3D owns its Camera3D child's local position and rewrites it as
+	# collision length resolves, so the aim's shoulder offset moves the arm's
+	# own frame instead of fighting that engine update on the camera.
+	camera_spring_arm.position = Vector3(THROW_CAMERA_RIGHT_OFFSET * _throw_camera_blend, 0.0, 0.0)
 
 
 ## Per direct instruction: pressing "transform" (T / Y / Triangle -- see
@@ -5428,10 +5368,6 @@ func _apply_weapon_hit() -> void:
 
 
 func _begin_throw_preparation() -> void:
-	if _throw_camera_recovering == false:
-		_throw_camera_base_length = camera_spring_arm.spring_length
-		_throw_spring_arm_base_position = camera_spring_arm.position
-	_throw_camera_recovering = false
 	_throw_aim_active = true
 	# Capture once, before any walk/run pose can be applied this frame. The
 	# throw layer interpolates from these fixed rotations instead of from the
@@ -5454,35 +5390,7 @@ func cancel_throw_preparation() -> void:
 
 func _finish_throw_preparation() -> void:
 	_throw_aim_active = false
-	_throw_camera_recovering = true
 	Hud.set_throw_aiming(false)
-
-
-func _update_throw_camera(delta: float) -> void:
-	if not _throw_aim_active and not _throw_camera_recovering:
-		return
-	var target_length := _throw_camera_base_length
-	var target_position := _throw_spring_arm_base_position
-	if _throw_aim_active:
-		target_length *= THROW_CAMERA_DISTANCE_SCALE
-		target_position.x += THROW_CAMERA_RIGHT_OFFSET
-	var step := THROW_CAMERA_BLEND_SPEED * delta
-	var weight := clampf(step, 0.0, 1.0)
-	camera_spring_arm.spring_length = lerpf(
-		camera_spring_arm.spring_length, target_length, weight
-	)
-	# SpringArm3D owns its Camera3D child's local position and rewrites it as
-	# collision length resolves. Offset the arm's own stable frame instead of
-	# fighting that engine update on the child camera every render frame.
-	camera_spring_arm.position = camera_spring_arm.position.lerp(target_position, weight)
-	if (
-		_throw_camera_recovering
-		and absf(camera_spring_arm.spring_length - target_length) < 0.005
-		and camera_spring_arm.position.distance_to(target_position) < 0.005
-	):
-		camera_spring_arm.spring_length = target_length
-		camera_spring_arm.position = target_position
-		_throw_camera_recovering = false
 
 
 ## Highest-priority right-arm animation layer. It is applied after walk,
@@ -6342,18 +6250,8 @@ func _update_aerial_body_anchor(delta: float) -> void:
 			_aerial_skull_body_offset = _head.global_position-global_position
 			_aerial_skull_anchor_initialized = true
 		var skull_anchor := global_position+_aerial_skull_body_offset
-		# Per direct suggestion ("it should be like the camera is kind of
-		# like spring attached to the skull of the player, even when flying
-		# or swimming") -- camera_rig otherwise sits at its own fixed local
-		# offset (Vector3(0, 1.6, 0)) from this CharacterBody regardless of
-		# whatever the visual body is doing, never actually re-centering on
-		# the real head position. _aerial_skull_body_offset IS that real
-		# head position expressed in the same local frame (it's defined as
-		# _head.global_position - global_position, and the line above/below
-		# this one is what keeps the head pinned there every frame), so
-		# assigning it directly keeps the camera exactly co-located with the
-		# skull by construction, not by coincidence.
-		camera_rig.position = _aerial_skull_body_offset
+		# The camera orbits this same skull point (see camera_focus_point()),
+		# so pinning the head here keeps it a constant distance from the lens.
 		if _aerial_motion_direction.length_squared() > 0.001:
 			_aerial_was_moving = true
 			# This is a CAMERA-SPACE body transform, not a world-space pitch.
@@ -6416,14 +6314,6 @@ func _update_aerial_body_anchor(delta: float) -> void:
 	else:
 		_release_skull_anchor()
 		_aerial_rest_heading_initialized = false
-		# Restores camera_rig's own ordinary fixed local offset once flight/
-		# diving actually ends -- see the aerial branch's own comment on why
-		# it's reassigned to _aerial_skull_body_offset while active. Cheap
-		# and idempotent to run every non-aerial frame; only ever actually
-		# changes anything right at the moment flight/diving stops. Distinct
-		# from _apply_camera_framing()'s own camera_rig.position.y writes
-		# (monkey-scale framing), which stay untouched here.
-		camera_rig.position = Vector3(0.0, 1.6, 0.0)
 		# Leaving water is a hard transition back to gravity: do not retain the
 		# deliberately slow buoyant unwind once the body has emerged. Wing-suit
 		# removal in midair retains its own short physical recovery instead. That

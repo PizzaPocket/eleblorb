@@ -95,6 +95,10 @@ const BODY_HEIGHT := 1.15
 # continuous curvature all the way around. Sinking part of it below y=0
 # gives a grounded, "resting in the grass" look without a hard flat bottom.
 const EMBED_DEPTH := 0.2125
+## Standard camera composition for a blorb under direct control; matches the
+## human's PlayableCharacterProfile values. See camera_focus_point().
+const DEFAULT_CAMERA_HEIGHT := 1.6
+const DEFAULT_CAMERA_DISTANCE := 3.5
 const COLLIDER_RADIUS := RADIUS * 0.9
 ## Root-to-crown height shared by the visible body and its collision sphere.
 ## Keeping these identical lets feet visibly meet the goo before a bounce.
@@ -597,6 +601,18 @@ func begin_psychic_control(source: Node3D) -> bool:
 
 func end_psychic_control(_source: Node3D) -> void:
 	is_player_controlled = false
+
+
+## Camera framing contract -- see Player.camera_focus_point(). Size blorbs
+## (Humongous) frame from their scaled body; every other blorb, Blorbus
+## included, uses the human's standard composition.
+func camera_focus_point() -> Vector3:
+	var height: float = float(psychic_camera_profile().get("height", DEFAULT_CAMERA_HEIGHT))
+	return global_position + Vector3.UP * height
+
+
+func camera_follow_distance() -> float:
+	return float(psychic_camera_profile().get("distance", DEFAULT_CAMERA_DISTANCE))
 
 
 func psychic_camera_profile() -> Dictionary:

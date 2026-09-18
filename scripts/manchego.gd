@@ -50,6 +50,10 @@ const FOLLOW_DISTANCE := 6.0
 const ARRIVE_DISTANCE := 3.0
 const FOLLOW_MOVE_SPEED := 2.6
 const ROTATION_SPEED := 5.0
+## Camera framing while ridden: a little higher and farther back than the
+## rider alone, clearing the horse's own head. See camera_focus_point().
+const CAMERA_HEIGHT := 1.75
+const CAMERA_DISTANCE := 3.6
 const GROUND_SETTLE_SPEED := 8.0
 
 ## Ambient "grazing" wander for follows_player == false -- see that var's own
@@ -433,6 +437,15 @@ func _update_hoofsteps(moving: bool, running: bool) -> void:
 		return
 	_hoof_quarter_cycle = quarter_cycle
 	UISounds.play_foley(&"horse_step", 0.61 if running else 0.43, get_instance_id())
+
+
+## Camera framing contract -- see Player.camera_focus_point().
+func camera_focus_point() -> Vector3:
+	return global_position + Vector3.UP * CAMERA_HEIGHT
+
+
+func camera_follow_distance() -> float:
+	return CAMERA_DISTANCE
 
 
 ## Driven every physics frame by player.gd's _update_manchego_control() while
