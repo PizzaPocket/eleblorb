@@ -222,6 +222,76 @@ func resume_after_story() -> void:
 	_story_suspended = false
 
 
+## Hands this wearer's whole suit to `other` at once, with no hops: every
+## worn blorb (and any still hopping on) is worn by `other` in the same slot,
+## the paper-doll assignments move with them, and this wearer is left with
+## nothing. Blorbs that were hopping off simply finish landing. Used so the
+## suit always rides on whichever character is being controlled (see
+## Player._on_active_member_changed()).
+func transfer_suit_to(other: BlorbSuitController) -> void:
+	if other == null or other == self:
+		return
+	var carried: Dictionary = {}
+	for entry in _worn:
+		var blorb_ref = entry["blorb"]
+		for piece in (entry["pieces"] as Array):
+			if is_instance_valid(piece):
+				BlorbSuit.release_piece(piece as Node3D)
+		if is_instance_valid(blorb_ref):
+			carried[entry["slot"] as String] = blorb_ref as Blorb
+	for entry in _transitions:
+		var blorb_ref = entry["blorb"]
+		var mode := entry["mode"] as String
+		var started := bool(entry.get("started", false))
+		if mode in ["off", "move"] and not started:
+			for piece in (entry.get("pieces", []) as Array):
+				if is_instance_valid(piece):
+					BlorbSuit.release_piece(piece as Node3D)
+		if not is_instance_valid(blorb_ref):
+			continue
+		var blorb := blorb_ref as Blorb
+		if mode == "off":
+			if not started:
+				blorb.begin_unworn()
+			var drop: Vector3 = entry.get("land_pos", blorb.global_position)
+			blorb.finish_unworn(blorb.resolve_dismount_landing_position(drop))
+		else:
+			# Mid-hop onto this wearer: it lands on the new one instead.
+			blorb.set_visual_scale(1.0)
+			blorb.finish_worn()
+			carried[entry["slot"] as String] = blorb
+	var assignments := _assignments.duplicate()
+	var was_on := _suit_on
+	_worn.clear()
+	_transitions.clear()
+	_assignments.clear()
+	_suit_on = false
+	other.receive_suit(assignments, carried, was_on)
+
+
+## The receiving half of transfer_suit_to(). A slot this wearer already had
+## filled gives way: its own blorb drops off beside the body.
+func receive_suit(assignments: Dictionary, worn_by_slot: Dictionary, suit_on: bool) -> void:
+	for slot in assignments:
+		_assignments[slot] = assignments[slot]
+	for slot in worn_by_slot:
+		for index in range(_worn.size() - 1, -1, -1):
+			var entry: Dictionary = _worn[index]
+			if entry["slot"] != slot:
+				continue
+			for piece in (entry["pieces"] as Array):
+				if is_instance_valid(piece):
+					BlorbSuit.release_piece(piece as Node3D)
+			var displaced_ref = entry["blorb"]
+			if is_instance_valid(displaced_ref):
+				var displaced := displaced_ref as Blorb
+				displaced.begin_unworn()
+				displaced.finish_unworn(displaced.resolve_dismount_landing_position(_scatter_point(index, 6)))
+			_worn.remove_at(index)
+		_wear_on_body(slot, worn_by_slot[slot] as Blorb)
+	_suit_on = _suit_on or suit_on or not worn_by_slot.is_empty()
+
+
 ## True while the suit is toggled on (worn, or its blorbs hopping on).
 func is_suit_on() -> bool:
 	return _suit_on
@@ -782,34 +852,37 @@ func _update_transitions(delta: float) -> void:
 		if t >= 1.0:
 			if mode in ["on", "move"]:
 				blorb.finish_worn()
-				var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, _lava_helm_command_active())
-				# Tags each piece as visible to the paper-doll's own
-				# isolated portrait camera (see player_portrait.gd's own
-				# module docstring on render layers) -- done once here at
-				# creation, not on every subsequent per-frame rebuild
-				# (_update_worn_limbs() below, for dynamic arm/leg slots):
-				# rebuild_slot() only ever replaces the MESH RESOURCE on
-				# this same node, never the node itself, and .layers is a
-				# property of the node, not the resource, so it survives
-				# every later rebuild untouched.
-				for piece in pieces:
-					if piece is VisualInstance3D:
-						PlayerPortrait.tag_for_portrait(piece as VisualInstance3D)
-					# Air wings are a Node3D container with visual children, unlike
-					# the ordinary mesh-root suit pieces.
-					for visual in (piece as Node).find_children("*", "VisualInstance3D", true, false):
-						PlayerPortrait.tag_for_portrait(visual as VisualInstance3D)
-				# Its own independent EyeBlink clock, not the controller's --
-				# each worn piece is a DIFFERENT blorb from the party, so
-				# sharing one clock had every piece blinking in unison, which
-				# reads as one puppeted face rather than several individual
-				# creatures.
-				_worn.append({"slot": slot, "blorb": blorb, "pieces": pieces, "eye_blink": EyeBlink.new_state()})
+				_wear_on_body(slot, blorb)
 			else:
 				blorb.finish_unworn(target)
 			_transitions.remove_at(i)
 			continue
 		i += 1
+
+
+## Builds `blorb`'s suit piece in `slot` on this wearer's rig and records it
+## as worn. The blorb must already be in its worn state (hidden, frozen).
+func _wear_on_body(slot: String, blorb: Blorb) -> void:
+	var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, _lava_helm_command_active())
+	# Tags each piece as visible to the paper-doll's own isolated portrait
+	# camera (see player_portrait.gd's own module docstring on render layers)
+	# -- done once here at creation, not on every subsequent per-frame rebuild
+	# (_update_worn_limbs() below, for dynamic arm/leg slots): rebuild_slot()
+	# only ever replaces the MESH RESOURCE on this same node, never the node
+	# itself, and .layers is a property of the node, not the resource, so it
+	# survives every later rebuild untouched.
+	for piece in pieces:
+		if piece is VisualInstance3D:
+			PlayerPortrait.tag_for_portrait(piece as VisualInstance3D)
+		# Air wings are a Node3D container with visual children, unlike the
+		# ordinary mesh-root suit pieces.
+		for visual in (piece as Node).find_children("*", "VisualInstance3D", true, false):
+			PlayerPortrait.tag_for_portrait(visual as VisualInstance3D)
+	# Its own independent EyeBlink clock, not the controller's -- each worn
+	# piece is a DIFFERENT blorb from the party, so sharing one clock had every
+	# piece blinking in unison, which reads as one puppeted face rather than
+	# several individual creatures.
+	_worn.append({"slot": slot, "blorb": blorb, "pieces": pieces, "eye_blink": EyeBlink.new_state()})
 
 
 ## Only the dynamic (limb) slots need rebuilding every frame -- torso/head

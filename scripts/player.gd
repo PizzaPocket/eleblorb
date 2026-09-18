@@ -1392,6 +1392,25 @@ func get_own_blorb_suit() -> BlorbSuitController:
 	return _blorb_suit
 
 
+## Universal rule: the blorb suit rides on whichever character is being
+## controlled. When control passes to a character who can wear one, every
+## other wearer's suit (worn pieces and paper-doll assignments) moves onto
+## them at once, with no hops. Passing control to one who cannot (Blorbus, a
+## mount) leaves the suit where it is until a wearer is controlled again.
+func _on_active_member_changed(_previous: Node3D, current: Node3D) -> void:
+	if current == null or not PartyControl.member_capability(current, &"wear_blorb_suit"):
+		return
+	if not current.has_method("get_own_blorb_suit"):
+		return
+	var receiver: BlorbSuitController = current.get_own_blorb_suit()
+	for candidate in get_tree().get_nodes_in_group("party_playable_candidates"):
+		if candidate == current or not candidate.has_method("get_own_blorb_suit"):
+			continue
+		var giver: BlorbSuitController = candidate.get_own_blorb_suit()
+		if giver != null:
+			giver.transfer_suit_to(receiver)
+
+
 func _active_portrait() -> PlayerPortrait:
 	var active := PartyControl.active_member()
 	if active != null and active != self and active.has_method("get_portrait"):
@@ -1626,6 +1645,7 @@ func _ready() -> void:
 	add_to_group("player")
 	add_to_group("party_playable_candidates")
 	PartyControl.register_member(self)
+	PartyControl.active_member_changed.connect(_on_active_member_changed)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	# global_position.y is deliberately kept FOOT_OFFSET above the terrain
 	# snap height (see that const's own comment -- needed so is_on_floor()
