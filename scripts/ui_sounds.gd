@@ -141,11 +141,12 @@ func _ready() -> void:
 	# use independently synthesized variants rather than three players sharing
 	# one identical WAV. Separate inward/outward families mirror the motion's
 	# spectral travel while retaining one coherent weapon language.
-	# Four hoof variants cycle through the pool, so consecutive hooves in a
-	# stride never replay one identical waveform. See _make_hoof_step().
-	_register_foley_variants(&"horse_step", [
-		_make_hoof_step(0), _make_hoof_step(1), _make_hoof_step(2), _make_hoof_step(3),
-	])
+	# Hoof variants cycle through the pool, so consecutive hooves in a stride
+	# never replay one identical waveform. See _make_hoof_step().
+	var hoof_steps: Array[AudioStreamWAV] = []
+	for variant in HOOF_STEP_VARIANTS:
+		hoof_steps.append(_make_hoof_step(variant))
+	_register_foley_variants(&"horse_step", hoof_steps)
 	_register_foley_variants(&"weapon_swing_outward", [
 		_make_weapon_swipe(0, false), _make_weapon_swipe(1, false), _make_weapon_swipe(2, false),
 	])
@@ -983,68 +984,81 @@ func _make_foley(kind: StringName) -> AudioStreamWAV:
 
 
 ## A single hoof on packed ground, modeled on wip/yodguard-horse-walking-
-## sound-4-450266.mp3. Measured from that recording: each strike reaches its
-## peak within ~8 ms and falls ~12 dB in 20 ms, with its energy concentrated
-## at 900-1000 Hz (spectral centroid ~900 Hz), a weaker 500-600 Hz body, and
-## little above 1.3 kHz -- a hard, woody knock rather than a thump. Two or
-## three softer knocks follow at roughly 50 ms spacing as the hoof settles,
-## broader and earthier (160 Hz-1.6 kHz). The synthesis mirrors that: two
-## damped resonances plus a brief band-limited click for the strike, then
-## lower-tuned knocks, each with a small ground thump and seeded grit. Each
-## variant detunes the resonances and shifts the knock timing.
+## sound-4-450266.mp3. Measured from that recording: a single crack that is
+## mostly gone within 3-5 ms, coloured by a broad resonance (Q ~7-10) centred
+## at 900-1000 Hz, then two or three softer settling knocks and scattered grit
+## over the next ~150 ms. Nothing in it is pitched. So every layer here is a
+## short burst of seeded noise shaped by a resonant band-pass filter, never a
+## sine tone: pure tones rang long enough to read as notes, and four fixed
+## variants read as four repeating notes. Each variant draws its own
+## resonance centres, hoof micro-bounce, knock timing and grit scatter from
+## its seed, so no two hooves in a stride share a colour.
+const HOOF_STEP_VARIANTS := 10
+
+
 func _make_hoof_step(variant: int) -> AudioStreamWAV:
-	var strike_hz: Array[float] = [905.0, 960.0, 1010.0, 880.0]
-	var body_hz: Array[float] = [540.0, 575.0, 610.0, 520.0]
-	var knock_times: Array = [[0.052, 0.098], [0.061, 0.112], [0.047, 0.090], [0.058, 0.121]]
-	var knock_gains: Array = [[0.30, 0.17], [0.28, 0.15], [0.32, 0.16], [0.26, 0.18]]
 	var duration := 0.2
 	var frame_count := int(duration * SAMPLE_RATE)
-	var strike_frequency := strike_hz[variant]
-	var body_frequency := body_hz[variant]
-	var times: Array = knock_times[variant]
-	var gains: Array = knock_gains[variant]
-	var seed := 0x40F5 + variant * 7919
-	var fine_state := 0.0
-	var grit_high := 0.0
-	var grit_low := 0.0
+	var shape_seed := [0x6A11 + variant * 104729]
+	var draw := func(low: float, high: float) -> float:
+		shape_seed[0] = int((int(shape_seed[0]) * 1103515245 + 12345) & 0x7fffffff)
+		return lerpf(low, high, float(shape_seed[0]) / 2147483647.0)
+	var strike_filter := _band_pass(draw.call(880.0, 1010.0), draw.call(7.0, 10.0))
+	var body_filter := _band_pass(draw.call(520.0, 620.0), 3.0)
+	var thud_filter := _band_pass(draw.call(140.0, 190.0), 0.9)
+	var knock_filter := _band_pass(draw.call(620.0, 820.0), 5.0)
+	var grit_filter := _band_pass(draw.call(650.0, 900.0), 1.4)
+	# The hoof wall lands, then its toe or heel touches a moment later.
+	var bounce_time: float = draw.call(0.0015, 0.0035)
+	var bounce_gain: float = draw.call(0.2, 0.45)
+	var knock_times: Array[float] = []
+	var knock_gains: Array[float] = []
+	var knock_time: float = draw.call(0.035, 0.06)
+	var knock_count := 2 + int(draw.call(0.0, 1.999))
+	for knock in knock_count:
+		knock_times.append(knock_time)
+		knock_gains.append(draw.call(0.15, 0.38) * pow(0.75, knock))
+		knock_time += draw.call(0.03, 0.06)
+	var grain_times: Array[float] = []
+	var grain_gains: Array[float] = []
+	for grain in 8 + int(draw.call(0.0, 7.999)):
+		grain_times.append(draw.call(0.004, 0.16))
+		grain_gains.append(draw.call(0.03, 0.12))
+	var noise_seed := 0x2F00 + variant * 7919
 	var samples := PackedFloat32Array()
 	samples.resize(frame_count)
 	var peak := 0.0
 	for frame in frame_count:
 		var seconds := float(frame) / float(SAMPLE_RATE)
-		seed = int((seed * 1103515245 + 12345) & 0x7fffffff)
-		var white := float(seed) / 1073741824.0 - 1.0
-		fine_state = lerpf(fine_state, white, 0.35)
-		grit_high = lerpf(grit_high, white, 0.24)
-		grit_low = lerpf(grit_low, white, 0.022)
-		var grit := grit_high - grit_low
-		var attack := minf(seconds / 0.0012, 1.0)
-		var strike := (
-			sin(TAU * strike_frequency * seconds + 0.3) * exp(-seconds * 58.0)
-			+ sin(TAU * body_frequency * seconds + 1.1) * exp(-seconds * 80.0) * 0.3
-		) * attack
-		var click := (fine_state - grit_high * 0.9) * exp(-seconds * 260.0) * 0.45
-		var thud := sin(TAU * 165.0 * seconds) * exp(-seconds * 38.0) * 0.1 * minf(seconds / 0.003, 1.0)
-		var settle := grit * exp(-seconds * 30.0) * 0.3
-		for knock in times.size():
-			var since := seconds - float(times[knock])
-			if since < 0.0:
-				continue
-			var gain := float(gains[knock])
-			var knock_attack := minf(since / 0.0015, 1.0)
-			settle += gain * knock_attack * (
-				sin(TAU * strike_frequency * 0.74 * since + 0.5) * exp(-since * 95.0)
-				+ sin(TAU * body_frequency * 0.8 * since) * exp(-since * 90.0) * 0.35
-				+ sin(TAU * 180.0 * since) * exp(-since * 40.0) * 0.9
-			)
-			settle += gain * grit * exp(-since * 40.0) * 1.1
-		var tail := minf((duration - seconds) / 0.02, 1.0)
-		var value := (strike + click + thud + settle) * tail
+		noise_seed = int((noise_seed * 1103515245 + 12345) & 0x7fffffff)
+		var white := float(noise_seed) / 1073741824.0 - 1.0
+		var strike := exp(-seconds * 700.0) * minf(seconds / 0.0003, 1.0)
+		if seconds >= bounce_time:
+			strike += bounce_gain * exp(-(seconds - bounce_time) * 900.0)
+		var knock := 0.0
+		for index in knock_times.size():
+			var since := seconds - knock_times[index]
+			if since >= 0.0:
+				knock += knock_gains[index] * exp(-since * 650.0) * minf(since / 0.0004, 1.0)
+		var grit := 0.05 * exp(-seconds * 25.0)
+		for index in grain_times.size():
+			var since := seconds - grain_times[index]
+			if since >= 0.0 and since < 0.004:
+				grit += grain_gains[index] * exp(-since * 2500.0)
+		var strike_excitation := white * strike
+		var knock_excitation := white * knock
+		var value := (
+			strike_filter.step(strike_excitation)
+			+ body_filter.step(strike_excitation) * 0.22
+			+ thud_filter.step(strike_excitation + knock_excitation * 0.8) * 0.3
+			+ knock_filter.step(knock_excitation) * 0.45
+			+ grit_filter.step(white * grit) * 0.16
+		) * minf((duration - seconds) / 0.02, 1.0)
 		samples[frame] = value
 		peak = maxf(peak, absf(value))
-	# Transient peak, not a sustained tone: this reads at about the loudness
-	# of the other footsteps whose tonal bodies peak near 0.085.
-	var gain_to_peak := 0.17 / maxf(peak, 0.0001)
+	# A transient peak, not a sustained tone: this sits at about the loudness
+	# of the other footsteps, whose tonal bodies peak near 0.085.
+	var gain_to_peak := 0.2 / maxf(peak, 0.0001)
 	var bytes := PackedByteArray()
 	bytes.resize(frame_count * 2)
 	for frame in frame_count:
@@ -1055,6 +1069,41 @@ func _make_hoof_step(variant: int) -> AudioStreamWAV:
 	stream.stereo = false
 	stream.data = bytes
 	return stream
+
+
+## RBJ constant-peak band-pass biquad for _make_hoof_step(). A class rather
+## than a packed array of coefficients: its running state must persist between
+## calls, and packed arrays are copy-on-write.
+class BandPass:
+	var b0: float
+	var b2: float
+	var a1: float
+	var a2: float
+	var x1 := 0.0
+	var x2 := 0.0
+	var y1 := 0.0
+	var y2 := 0.0
+
+	func _init(center_hz: float, q: float, sample_rate: float) -> void:
+		var omega := TAU * center_hz / sample_rate
+		var alpha := sin(omega) / (2.0 * q)
+		var a0 := 1.0 + alpha
+		b0 = alpha / a0
+		b2 = -alpha / a0
+		a1 = -2.0 * cos(omega) / a0
+		a2 = (1.0 - alpha) / a0
+
+	func step(input: float) -> float:
+		var output := b0 * input + b2 * x2 - a1 * y1 - a2 * y2
+		x2 = x1
+		x1 = input
+		y2 = y1
+		y1 = output
+		return output
+
+
+func _band_pass(center_hz: float, q: float) -> BandPass:
+	return BandPass.new(center_hz, q, float(SAMPLE_RATE))
 
 
 ## Short weapon air displacement modeled on the supplied 144ms reference.
