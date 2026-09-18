@@ -69,6 +69,17 @@ const ROCK_VISIBILITY_RANGE := 200.0
 const LOD_COLLISION_RADIUS := 130.0
 const LOD_UPDATE_INTERVAL := 0.4
 
+## Window mode (used by the demo world's plant biome): scatter this kingdom's
+## jungle exactly as usual, with the same density, species mix, clearings and
+## rocky zones in the kingdom's own coordinates, but build only the props that
+## fall inside the rectangle of `window_half_size` around
+## `window_source_center`, and place each at the matching point around
+## `window_target_center` in the host world. Matches TerrainWindow at scale 1.
+@export var window_enabled := false
+@export var window_source_center := Vector2.ZERO
+@export var window_half_size := Vector2.ZERO
+@export var window_target_center := Vector2.ZERO
+
 var _rng := RandomNumberGenerator.new()
 var _terrain: Node = null
 var _lod_colliders: Array[CollisionObject3D] = []
@@ -130,6 +141,8 @@ func _scatter_trees() -> void:
 		if picked == null:
 			continue
 		var pos: Vector2 = picked
+		if not _in_window(pos):
+			continue
 		if _zone_of(pos) != "":
 			continue  # clearings and rocky zones stay tree-free
 		var builder: Callable = _tree_builders[_rng.randi() % _tree_builders.size()]
@@ -144,6 +157,8 @@ func _scatter_decor() -> void:
 		if picked == null:
 			continue
 		var pos: Vector2 = picked
+		if not _in_window(pos):
+			continue
 		var zone := _zone_of(pos)
 		if zone == "rocky" or zone == "river":
 			continue
@@ -160,13 +175,25 @@ func _scatter_rocks() -> void:
 			var r := sqrt(_rng.randf_range(0.0, 1.0)) * radius
 			var a := _rng.randf_range(0.0, TAU)
 			var pos := center + Vector2(cos(a) * r, sin(a) * r)
+			if not _in_window(pos):
+				continue
 			var prop: Node3D = NatureProps.build_rock_spire(
 				_rng.randf_range(1.4, 3.2), _rng.randi_range(2, 4), _rng
 			) if _rng.randf() < 0.35 else NatureProps.build_rock(_rng.randf_range(0.8, 2.4))
 			_place(prop, pos, ROCK_VISIBILITY_RANGE)
 
 
-func _place(prop: Node3D, pos: Vector2, visibility_range: float) -> void:
+func _in_window(pos: Vector2) -> bool:
+	if not window_enabled:
+		return true
+	var local := pos - window_source_center
+	return absf(local.x) <= window_half_size.x and absf(local.y) <= window_half_size.y
+
+
+func _place(prop: Node3D, source_pos: Vector2, visibility_range: float) -> void:
+	var pos := source_pos
+	if window_enabled:
+		pos = window_target_center + (source_pos - window_source_center)
 	var y: float = _terrain.get_mesh_height(pos.x, pos.y)
 	prop.position = Vector3(pos.x, y, pos.y)
 	prop.rotation.y = _rng.randf_range(0.0, TAU)

@@ -3,18 +3,20 @@ extends Node3D
 ## The demo world (see DemoWorldTerrain): a playable tour of every suit with a
 ## clear traversal power, and the testing ground for movement modes. The hero
 ## wakes in a clearing with two Normal blorbs, Xiao Hou Zi and Manchego, and
-## walks east. Each border between biomes is a gate of two portals back to
-## back; each suit's blorbs wait beside their portal, and passing through the
-## other side's portal swaps suits: the worn blorbs hop off and stay, and the
-## waiting ones hop on (see SuitRoster).
+## walks east. Each border between biomes is a gate of two one-way portals back
+## to back, facing apart: each biome's portal stands on the side you enter it
+## from, facing you, with its blorbs waiting there. Walking through a portal's
+## face swaps suits (the worn blorbs hop off and stay, the waiting ones hop on;
+## see SuitRoster); passing through the back of the other portal does nothing.
 
 const XIAO_HOU_ZI_SCENE: PackedScene = preload("res://scenes/xiao_hou_zi.tscn")
+const JUNGLE_KINGDOM_FOLIAGE := preload("res://scripts/jungle_kingdom_foliage.gd")
 const MANCHEGO_SCENE: PackedScene = preload("res://scenes/manchego.tscn")
 const NORMAL_SLOTS: Array[String] = ["leg_left", "leg_right"]
 ## Half the gap between a gate's two portals: just over CheckpointPortal's
 ## TUBE_RADIUS (0.11), so their rings touch without intersecting.
 const GATE_HALF_GAP := 0.13
-## How far past its gate a waiting set idles, on its own side.
+## How far in front of its portal (on the approach side) a waiting set idles.
 const SET_WAIT_OFFSET := 6.0
 ## The valley runs toward +X. The camera looks east over the hero's shoulder
 ## once he is up; during the wake intro he faces west, toward the camera.
@@ -33,19 +35,36 @@ func _ready() -> void:
 	for border_spec in DemoWorldTerrain.BORDERS:
 		var border: Dictionary = border_spec
 		var x: float = border["x"]
-		_add_portal(border["west"], x - GATE_HALF_GAP)
-		_add_portal(border["east"], x + GATE_HALF_GAP)
+		# Walking east you meet the eastern biome's portal face first; walking
+		# west, the western biome's.
+		_add_portal(border["east"], x - GATE_HALF_GAP, -PI * 0.5)
+		_add_portal(border["west"], x + GATE_HALF_GAP, PI * 0.5)
+	_add_plant_jungle()
 	call_deferred("_finish_loading")
 
 
-## Portals face east (their local Z turned to +X); either can be crossed from
-## either side, and the roster ignores the one for the suit already worn.
-func _add_portal(element: String, x: float) -> void:
+## The Primate Kingdom's own jungle scatter, windowed onto the plant biome at
+## the same spot DemoWorldTerrain shows that kingdom's ground. Named Scatter,
+## the sibling characters query for walkable tree-canopy support.
+func _add_plant_jungle() -> void:
+	var jungle: Node3D = JUNGLE_KINGDOM_FOLIAGE.new()
+	jungle.name = "Scatter"
+	jungle.window_enabled = true
+	jungle.window_source_center = DemoWorldTerrain.PLANT_SOURCE
+	jungle.window_half_size = DemoWorldTerrain.PLANT_HALF
+	jungle.window_target_center = DemoWorldTerrain.PLANT_CENTER
+	add_child(jungle)
+
+
+## One-way portals: `facing_yaw` turns the portal's face (its local +Z) to
+## face the side you approach it from.
+func _add_portal(element: String, x: float, facing_yaw: float) -> void:
 	var portal := CheckpointPortal.new()
 	portal.name = "Portal_%s_%d" % [element if element != "" else "normal", int(x)]
 	portal.element = element
+	portal.one_way = true
 	portal.position = _terrain.get_path_point(x)
-	portal.rotation.y = PI * 0.5
+	portal.rotation.y = facing_yaw
 	portal.crossed.connect(_roster.switch_to)
 	add_child(portal)
 
@@ -80,7 +99,8 @@ func _build_party() -> void:
 		var border: Dictionary = border_spec
 		var element: String = border["east"]
 		var head_item: String = DemoWorldTerrain.HEAD_ITEMS.get(element, "")
-		var home := _terrain.get_path_point(float(border["x"]) + SET_WAIT_OFFSET, 5.0)
+		# In front of the biome's portal face, on the approach (west) side.
+		var home := _terrain.get_path_point(float(border["x"]) - SET_WAIT_OFFSET, 5.0)
 		var blorbs := SuitLoadout.spawn_set(self, element, head_item, home)
 		_roster.add_set(element, blorbs, SuitLoadout.FULL_SUIT_SLOTS)
 	_roster.start_with("")

@@ -56,15 +56,37 @@ var _mountain_noise := FastNoiseLite.new()
 var _rng := RandomNumberGenerator.new()
 
 
-func _ready() -> void:
-	collision_layer = 1
-	collision_mask = 0
+## Configures the noise every height/colour query depends on. In _init(), not
+## _ready(), so a detached instance (never added to a tree, so never building
+## its mesh) can be sampled: the demo world shows windows of this kingdom
+## through sample_height()/sample_color() (see TerrainWindow).
+func _init() -> void:
 	_noise.seed = 20260910
 	_noise.frequency = 0.011
 	_noise.fractal_octaves = 4
 	_mountain_noise.seed = 20261910
 	_mountain_noise.frequency = 0.006
 	_mountain_noise.fractal_octaves = 4
+
+
+## This kingdom's own continuous height and ground colour at a point.
+func sample_height(x: float, z: float) -> float:
+	return _terrain_height(x, z)
+
+
+func sample_color(x: float, z: float) -> Color:
+	return _height_color(Vector2(x, z))
+
+
+## Distance from the authored snowboard descent's centreline, so scenery can
+## keep the run clear the way this kingdom's own mountain scatter does.
+func ski_route_distance(x: float, z: float) -> float:
+	return _ski_route_sample(Vector2(x, z)).x
+
+
+func _ready() -> void:
+	collision_layer = 1
+	collision_mask = 0
 	_rng.seed = 20260910
 	_build_mesh_and_collision()
 	_build_lake_surfaces()

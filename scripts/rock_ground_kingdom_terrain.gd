@@ -39,15 +39,31 @@ var _broad_noise := FastNoiseLite.new()
 var _detail_noise := FastNoiseLite.new()
 var _rng := RandomNumberGenerator.new()
 
-func _ready() -> void:
-	collision_layer = 1
-	collision_mask = 0
+## Configures the noise every height/colour query depends on. In _init(), not
+## _ready(), so a detached instance (never added to a tree, so never building
+## its mesh) can be sampled: the demo world shows windows of this kingdom
+## through sample_height()/sample_color() (see TerrainWindow).
+func _init() -> void:
 	_broad_noise.seed = 20260917
 	_broad_noise.frequency = 0.006
 	_broad_noise.fractal_octaves = 4
 	_detail_noise.seed = 20261917
 	_detail_noise.frequency = 0.019
 	_detail_noise.fractal_octaves = 3
+
+
+## This kingdom's own continuous height and ground colour at a point.
+func sample_height(x: float, z: float) -> float:
+	return _raw_height(x, z)
+
+
+func sample_color(x: float, z: float) -> Color:
+	return _height_color(_raw_height(x, z))
+
+
+func _ready() -> void:
+	collision_layer = 1
+	collision_mask = 0
 	_rng.seed = 20260917
 	_build_mesh_and_collision()
 	_scatter_landscape()

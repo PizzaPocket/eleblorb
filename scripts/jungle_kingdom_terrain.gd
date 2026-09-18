@@ -183,15 +183,31 @@ func get_mesh_normal(x: float, z: float) -> Vector3:
 	return Vector3(-slope_x, 1.0, -slope_z).normalized()
 
 
-func _ready() -> void:
-	collision_layer = 1
-	collision_mask = 0
+## Configures the noise every height/colour query depends on. In _init(), not
+## _ready(), so a detached instance (never added to a tree, so never building
+## its mesh) can be sampled: the demo world shows windows of this kingdom
+## through sample_height()/sample_color() (see TerrainWindow).
+func _init() -> void:
 	_hill_noise.seed = 20260817
 	_hill_noise.frequency = HILL_FREQUENCY
 	_hill_noise.fractal_octaves = 3
 	_river_noise.seed = 20260824
 	_river_noise.frequency = RIVER_WANDER_FREQUENCY
 	_river_noise.fractal_octaves = 2
+
+
+## This kingdom's own continuous height and ground colour at a point.
+func sample_height(x: float, z: float) -> float:
+	return _terrain_height(x, z)
+
+
+func sample_color(x: float, z: float) -> Color:
+	return _height_color(_terrain_height(x, z), _river_coverage(x, z))
+
+
+func _ready() -> void:
+	collision_layer = 1
+	collision_mask = 0
 	_build_mesh_and_collision()
 	_build_river_water()
 

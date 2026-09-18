@@ -6,7 +6,9 @@ extends Node3D
 ## it (most of the body, from either side, walking, jumping, flying or
 ## swimming) emits `crossed`; a SuitRoster answers by swapping to that
 ## element's suit set, which ignores the portal of the suit already worn.
-## Two portals set back to back make a border gate (see demo_world.gd).
+## A one-way portal only counts entering through its face (its local +Z side)
+## and never from behind. Two one-way portals set back to back, facing apart,
+## make a border gate (see demo_world.gd).
 ##
 ## The ring is deliberately not solid, per direct instruction: it is a
 ## threshold to pass through, not an obstacle, so it is marked decorative
@@ -20,6 +22,8 @@ signal crossed(element: String)
 ## Element of the suit this portal stands for, e.g. "water" ("" for Normal
 ## blorbs); its body colour tints the membrane and ring.
 @export var element: String = ""
+## Only a crossing from the face (+Z) side to the back counts.
+@export var one_way: bool = false
 ## Half the opening's width and height. The default admits the human with room
 ## to spare above the head and at the shoulders.
 @export var half_width: float = 1.35
@@ -178,7 +182,8 @@ func _physics_process(_delta: float) -> void:
 	if _has_last and _last_local.z != 0.0 and signf(local.z) != signf(_last_local.z) and local.distance_to(_last_local) < MAX_STEP:
 		var fraction := _last_local.z / (_last_local.z - local.z)
 		var crossing := _last_local.lerp(local, fraction)
-		if _inside_opening(Vector2(crossing.x, crossing.y)):
+		var entered_from_face := _last_local.z > 0.0
+		if _inside_opening(Vector2(crossing.x, crossing.y)) and (entered_from_face or not one_way):
 			crossed.emit(element)
 	_last_local = local
 	_has_last = true
