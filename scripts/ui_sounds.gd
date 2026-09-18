@@ -129,7 +129,7 @@ func _ready() -> void:
 		_power_loop_players[kind] = _make_turbulence_stream_player() if kind in [&"fire", &"water"] else _make_player(_make_power_loop(kind))
 		_power_loop_claims[kind] = {}
 	for event_name in [
-		&"jump", &"water_wade", &"water_splash", &"npc_step", &"plush_step", &"giant_step", &"npc_paw", &"horse_step", &"horse_land",
+		&"jump", &"water_wade", &"water_splash", &"npc_step", &"plush_step", &"giant_step", &"npc_paw", &"horse_land",
 		&"horse_jump", &"player_hurt", &"blorb_hurt", &"damage_dealt",
 		&"blorb_melt", &"blorb_glide", &"giant_move", &"giant_jump", &"giant_land", &"equip_launch", &"equip_settle", &"equip_release",
 		&"transform_rise", &"transform_flash", &"transform_reveal", &"pickup",
@@ -141,6 +141,11 @@ func _ready() -> void:
 	# use independently synthesized variants rather than three players sharing
 	# one identical WAV. Separate inward/outward families mirror the motion's
 	# spectral travel while retaining one coherent weapon language.
+	# Four hoof variants cycle through the pool, so consecutive hooves in a
+	# stride never replay one identical waveform. See _make_hoof_step().
+	_register_foley_variants(&"horse_step", [
+		_make_hoof_step(0), _make_hoof_step(1), _make_hoof_step(2), _make_hoof_step(3),
+	])
 	_register_foley_variants(&"weapon_swing_outward", [
 		_make_weapon_swipe(0, false), _make_weapon_swipe(1, false), _make_weapon_swipe(2, false),
 	])
@@ -849,7 +854,6 @@ func _make_foley(kind: StringName) -> AudioStreamWAV:
 		&"plush_step": duration = 0.052; start_hz = 142.0; end_hz = 82.0; texture = 0.035
 		&"giant_step": duration = 0.32; start_hz = 54.0; end_hz = 27.0; texture = 0.11
 		&"npc_paw": duration = 0.045; start_hz = 152.0; end_hz = 91.0; texture = 0.04
-		&"horse_step": duration = 0.085; start_hz = 192.0; end_hz = 104.0; texture = 0.10
 		&"horse_land": duration = 0.18; start_hz = 146.0; end_hz = 72.0; texture = 0.12
 		&"horse_jump": duration = 0.14; start_hz = 132.0; end_hz = 248.0; texture = 0.06
 		&"player_hurt": duration = 0.13; start_hz = 248.0; end_hz = 118.0; texture = 0.14
@@ -974,6 +978,81 @@ func _make_foley(kind: StringName) -> AudioStreamWAV:
 	var stream := AudioStreamWAV.new()
 	stream.format = AudioStreamWAV.FORMAT_16_BITS
 	stream.mix_rate = SAMPLE_RATE
+	stream.data = bytes
+	return stream
+
+
+## A single hoof on packed ground, modeled on wip/yodguard-horse-walking-
+## sound-4-450266.mp3. Measured from that recording: each strike reaches its
+## peak within ~8 ms and falls ~12 dB in 20 ms, with its energy concentrated
+## at 900-1000 Hz (spectral centroid ~900 Hz), a weaker 500-600 Hz body, and
+## little above 1.3 kHz -- a hard, woody knock rather than a thump. Two or
+## three softer knocks follow at roughly 50 ms spacing as the hoof settles,
+## broader and earthier (160 Hz-1.6 kHz). The synthesis mirrors that: two
+## damped resonances plus a brief band-limited click for the strike, then
+## lower-tuned knocks, each with a small ground thump and seeded grit. Each
+## variant detunes the resonances and shifts the knock timing.
+func _make_hoof_step(variant: int) -> AudioStreamWAV:
+	var strike_hz: Array[float] = [905.0, 960.0, 1010.0, 880.0]
+	var body_hz: Array[float] = [540.0, 575.0, 610.0, 520.0]
+	var knock_times: Array = [[0.052, 0.098], [0.061, 0.112], [0.047, 0.090], [0.058, 0.121]]
+	var knock_gains: Array = [[0.30, 0.17], [0.28, 0.15], [0.32, 0.16], [0.26, 0.18]]
+	var duration := 0.2
+	var frame_count := int(duration * SAMPLE_RATE)
+	var strike_frequency := strike_hz[variant]
+	var body_frequency := body_hz[variant]
+	var times: Array = knock_times[variant]
+	var gains: Array = knock_gains[variant]
+	var seed := 0x40F5 + variant * 7919
+	var fine_state := 0.0
+	var grit_high := 0.0
+	var grit_low := 0.0
+	var samples := PackedFloat32Array()
+	samples.resize(frame_count)
+	var peak := 0.0
+	for frame in frame_count:
+		var seconds := float(frame) / float(SAMPLE_RATE)
+		seed = int((seed * 1103515245 + 12345) & 0x7fffffff)
+		var white := float(seed) / 1073741824.0 - 1.0
+		fine_state = lerpf(fine_state, white, 0.35)
+		grit_high = lerpf(grit_high, white, 0.24)
+		grit_low = lerpf(grit_low, white, 0.022)
+		var grit := grit_high - grit_low
+		var attack := minf(seconds / 0.0012, 1.0)
+		var strike := (
+			sin(TAU * strike_frequency * seconds + 0.3) * exp(-seconds * 58.0)
+			+ sin(TAU * body_frequency * seconds + 1.1) * exp(-seconds * 80.0) * 0.3
+		) * attack
+		var click := (fine_state - grit_high * 0.9) * exp(-seconds * 260.0) * 0.45
+		var thud := sin(TAU * 165.0 * seconds) * exp(-seconds * 38.0) * 0.1 * minf(seconds / 0.003, 1.0)
+		var settle := grit * exp(-seconds * 30.0) * 0.3
+		for knock in times.size():
+			var since := seconds - float(times[knock])
+			if since < 0.0:
+				continue
+			var gain := float(gains[knock])
+			var knock_attack := minf(since / 0.0015, 1.0)
+			settle += gain * knock_attack * (
+				sin(TAU * strike_frequency * 0.74 * since + 0.5) * exp(-since * 95.0)
+				+ sin(TAU * body_frequency * 0.8 * since) * exp(-since * 90.0) * 0.35
+				+ sin(TAU * 180.0 * since) * exp(-since * 40.0) * 0.9
+			)
+			settle += gain * grit * exp(-since * 40.0) * 1.1
+		var tail := minf((duration - seconds) / 0.02, 1.0)
+		var value := (strike + click + thud + settle) * tail
+		samples[frame] = value
+		peak = maxf(peak, absf(value))
+	# Transient peak, not a sustained tone: this reads at about the loudness
+	# of the other footsteps whose tonal bodies peak near 0.085.
+	var gain_to_peak := 0.17 / maxf(peak, 0.0001)
+	var bytes := PackedByteArray()
+	bytes.resize(frame_count * 2)
+	for frame in frame_count:
+		bytes.encode_s16(frame * 2, clampi(int(samples[frame] * gain_to_peak * 32767.0), -32768, 32767))
+	var stream := AudioStreamWAV.new()
+	stream.format = AudioStreamWAV.FORMAT_16_BITS
+	stream.mix_rate = SAMPLE_RATE
+	stream.stereo = false
 	stream.data = bytes
 	return stream
 
