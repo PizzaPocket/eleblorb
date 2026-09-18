@@ -1185,6 +1185,16 @@ var _throw_camera_blend: float = 0.0
 ## teleport that turns this body (a recovery wake at an inn bed) would no
 ## longer turn the view with it; _update_camera_follow() carries the change.
 var _camera_follow_root_yaw: float = 0.0
+## Switching the followed body to one close by (mounting, dismounting, a
+## nearby companion) glides the camera across instead of cutting. Farther
+## switches still cut, since a long swoop across the map would disorient.
+const CAMERA_HANDOFF_DURATION := 0.4
+const CAMERA_HANDOFF_MAX_DISTANCE := 8.0
+var _camera_subject: Node3D = null
+var _camera_handoff_remaining: float = 0.0
+var _camera_handoff_from_focus: Vector3 = Vector3.ZERO
+var _camera_handoff_from_distance: float = 0.0
+var _camera_last_distance: float = 0.0
 var _throw_pose_blend: float = 0.0
 var _throw_arm_start_rotation: Vector3 = Vector3.ZERO
 var _throw_elbow_start_rotation: Vector3 = Vector3.ZERO
@@ -1250,9 +1260,20 @@ const PLAYER_FOLLOW_ARRIVE_DISTANCE := 3.0
 var _controlled_manchego: Manchego = null
 var _mounted_rider: Node3D = null
 var _player_following_manchego := false
-## Prevents the Interact press that mounted Manchego from immediately being
-## read again as a dismount. Armed after the player releases the control.
-var _manchego_dismount_armed := false
+## Dismounting climbs the rider down beside Manchego over
+## MANCHEGO_DISMOUNT_DURATION rather than snapping the figure to wherever the
+## unseen follower body happened to trail. -1.0 while not dismounting.
+var _manchego_dismount_elapsed := -1.0
+var _manchego_dismount_from := Transform3D()
+var _manchego_dismount_yaw := 0.0
+const MANCHEGO_DISMOUNT_DURATION := 0.45
+## Small rise at the middle of the step down, so it reads as swinging a leg
+## over and dropping rather than sliding through the saddle.
+const MANCHEGO_DISMOUNT_HOP := 0.18
+## Horizontal distance from the seat to where the rider lands at his side,
+## and the farther fallback directly behind him.
+const MANCHEGO_DISMOUNT_SIDE_OFFSET := 0.95
+const MANCHEGO_DISMOUNT_BEHIND_OFFSET := 1.7
 
 ## ---- Manchego seated rider pose ---- Per direct correction ("add the
 ## player riding the horse... instead of leaving him where he is, he should
@@ -1697,6 +1718,9 @@ func _physics_process(delta: float) -> void:
 	# human following along with a capsule still posed level.
 	if _player_following_manchego or _piloting_xiao_hou_zi or is_instance_valid(_controlled_generic_member) or _player_following_blorbus:
 		_release_skull_anchor()
+	if _manchego_dismount_elapsed >= 0.0:
+		_update_manchego_dismount(delta)
+		return
 	if _player_following_manchego:
 		_update_manchego_control(delta)
 		return
@@ -3385,6 +3409,8 @@ func _end_blorbus_control() -> void:
 ## possible, if unlikely, to wander into Manchego's prompt while already
 ## piloting Blorbus or reskinned as Xiao Hou Zi).
 func start_riding_manchego(manchego: Manchego) -> void:
+	if _manchego_dismount_elapsed >= 0.0:
+		_finish_manchego_dismount()
 	_release_blorbus_and_giant_possession()
 	_mounted_rider = PartyControl.active_member()
 	if _mounted_rider == null or not PartyControl.member_capability(_mounted_rider, &"ride_mount"):
@@ -3393,7 +3419,6 @@ func start_riding_manchego(manchego: Manchego) -> void:
 	PartyControl.set_control_override(manchego)
 	_controlled_manchego.begin_ride()
 	_player_following_manchego = true
-	_manchego_dismount_armed = false
 	# top_level lets _apply_manchego_seated_pose() drive `visuals` off Manchego's own live
 	# seat transform directly every frame instead of this CharacterBody's
 	# own position/rotation.y (which stays a loose, invisible-now follower;
@@ -3411,40 +3436,120 @@ func start_riding_manchego(manchego: Manchego) -> void:
 
 
 func _end_manchego_control() -> void:
+	# The human rider climbs down beside the horse (see _update_manchego_
+	# dismount()). Anything else -- Xiao Hou Zi riding, or Manchego freed
+	# mid-ride -- restores at once.
+	var climb_down := _mounted_rider == self and visuals.top_level and is_instance_valid(_controlled_manchego)
+	if climb_down:
+		_place_beside_mount(_controlled_manchego)
+		_manchego_dismount_from = visuals.global_transform
+		var horse_forward := _controlled_manchego.global_basis.z
+		_manchego_dismount_yaw = atan2(horse_forward.x, horse_forward.z)
 	if is_instance_valid(_controlled_manchego):
 		_controlled_manchego.end_ride()
 	_controlled_manchego = null
 	PartyControl.clear_control_override()
 	_player_following_manchego = false
-	_manchego_dismount_armed = false
 	if is_instance_valid(_mounted_rider) and _mounted_rider != self and _mounted_rider.has_method("end_mounted"):
 		_mounted_rider.end_mounted()
+	Hud.show_message("Dismounted.")
+	if climb_down:
+		_manchego_dismount_elapsed = 0.0
+		velocity = Vector3.ZERO
+		return
+	_finish_manchego_dismount()
+
+
+## Puts this CharacterBody's feet on the ground at Manchego's left side (the
+## traditional near side), else his right, else behind him: the first spot
+## where the standing capsule fits. The unseen follower body may be several
+## metres behind the horse while riding; this is where the rider really lands.
+func _place_beside_mount(mount: Manchego) -> void:
+	var seat := mount.get_seat_transform().origin
+	var left := mount.global_basis.x
+	left.y = 0.0
+	left = left.normalized()
+	var behind := -mount.global_basis.z
+	behind.y = 0.0
+	behind = behind.normalized()
+	var candidates: Array[Vector3] = [
+		seat + left * MANCHEGO_DISMOUNT_SIDE_OFFSET,
+		seat - left * MANCHEGO_DISMOUNT_SIDE_OFFSET,
+		seat + behind * MANCHEGO_DISMOUNT_BEHIND_OFFSET,
+	]
+	for index in candidates.size():
+		var spot := candidates[index]
+		spot.y = float(terrain.get_mesh_height(spot.x, spot.z)) + FOOT_OFFSET
+		if index == candidates.size() - 1 or _standing_space_clear(spot, mount):
+			global_position = spot
+			return
+
+
+func _standing_space_clear(feet: Vector3, mount: Node3D) -> bool:
+	var query := PhysicsShapeQueryParameters3D.new()
+	query.shape = _collision_shape.shape
+	query.transform = Transform3D(_standing_collision_transform.basis, feet + _standing_collision_transform.origin)
+	query.collision_mask = collision_mask
+	var excluded: Array[RID] = [get_rid()]
+	if mount is CollisionObject3D:
+		excluded.append((mount as CollisionObject3D).get_rid())
+	if terrain is CollisionObject3D:
+		excluded.append((terrain as CollisionObject3D).get_rid())
+	query.exclude = excluded
+	return get_world_3d().direct_space_state.intersect_shape(query, 1).is_empty()
+
+
+## Carries the still-top_level figure from the saddle to standing on the
+## landing spot _place_beside_mount() chose, easing the riding pose out as it
+## goes. Control resumes when it lands.
+func _update_manchego_dismount(delta: float) -> void:
+	_manchego_dismount_elapsed += delta
+	var t := clampf(_manchego_dismount_elapsed / MANCHEGO_DISMOUNT_DURATION, 0.0, 1.0)
+	var eased := smoothstep(0.0, 1.0, t)
+	var standing_basis := Basis(Vector3.UP, _manchego_dismount_yaw)
+	var standing_origin := global_position + Vector3.DOWN * FOOT_OFFSET
+	var from_rotation := _manchego_dismount_from.basis.get_rotation_quaternion()
+	visuals.global_transform = Transform3D(
+		Basis(from_rotation.slerp(standing_basis.get_rotation_quaternion(), eased)),
+		_manchego_dismount_from.origin.lerp(standing_origin, eased) + Vector3.UP * sin(PI * t) * MANCHEGO_DISMOUNT_HOP
+	)
+	velocity = Vector3.ZERO
+	_animate_walk(delta, true, 1.0)
+	# The two riding-only twists the ordinary gait never touches.
+	var settle := minf(RIDE_POSE_SETTLE_SPEED * delta, 1.0)
+	if _neck != null:
+		_neck.rotation = _neck.rotation.lerp(Vector3.ZERO, settle)
+	_elbow_left.rotation.z = lerp_angle(_elbow_left.rotation.z, 0.0, settle)
+	_elbow_right.rotation.z = lerp_angle(_elbow_right.rotation.z, 0.0, settle)
+	if t >= 1.0:
+		_finish_manchego_dismount()
+
+
+func _finish_manchego_dismount() -> void:
+	_manchego_dismount_elapsed = -1.0
 	if _mounted_rider == self and visuals.top_level:
+		# Keep the heading the figure already shows (the climb-down ends
+		# facing the horse's direction) rather than snapping to world +Z.
+		var forward := visuals.global_basis.z
+		var yaw := atan2(forward.x, forward.z)
 		visuals.top_level = false
 		# visuals' position/rotation held GLOBAL values a moment ago (that's
 		# what top_level means) -- flipping top_level back off re-interprets
 		# whatever numbers are already sitting in .transform as LOCAL
 		# instead, so it has to be explicitly reset back to its ordinary
-		# resting local transform here, or the figure would render wherever
-		# those stale global numbers happen to land relative to this
-		# CharacterBody. Matches _ready()'s own initial setup exactly.
-		visuals.transform = Transform3D(Basis.IDENTITY, Vector3(0, -FOOT_OFFSET, 0))
+		# resting local transform here.
+		visuals.transform = Transform3D(Basis(Vector3.UP, yaw), Vector3(0, -FOOT_OFFSET, 0))
 	# _neck.rotation.x is otherwise ONLY ever touched by
 	# _apply_manchego_seated_pose() (see MANCHEGO_HEAD_UPRIGHT_NECK_SHARE's
-	# own comment) -- unlike every other pose pivot here, nothing in the
-	# ordinary walk/idle/jump code eases it back to rest on its own, so it
-	# has to be reset explicitly or it'd stay frozen at its last
-	# riding-compensation value after dismounting.
-	if _mounted_rider == self and _neck != null:
-		_neck.rotation = Vector3.ZERO
-	# Same reasoning as _neck above -- _elbow_left/_right.rotation.Z is only
-	# ever touched by RIDE_ELBOW_INWARD (every OTHER elbow pose in this file
-	# only ever animates rotation.x), so it needs the same explicit reset.
+	# own comment) -- nothing in the ordinary walk/idle/jump code eases it
+	# back to rest on its own. The same holds for the elbows' rotation.z
+	# (RIDE_ELBOW_INWARD). The climb-down eases both; this makes them exact.
 	if _mounted_rider == self:
+		if _neck != null:
+			_neck.rotation = Vector3.ZERO
 		_elbow_left.rotation.z = 0.0
 		_elbow_right.rotation.z = 0.0
 	_mounted_rider = null
-	Hud.show_message("Dismounted.")
 
 
 ## Mirrors _update_blorbus_control() closely -- see that function's own
@@ -3456,9 +3561,9 @@ func _update_manchego_control(delta: float) -> void:
 	if not is_instance_valid(_controlled_manchego):
 		_end_manchego_control()
 		return
-	if not Input.is_action_pressed("interact"):
-		_manchego_dismount_armed = true
-	if _manchego_dismount_armed and Input.is_action_just_pressed("interact") and not UIState.modal_open:
+	# The back button (see input_map.gd's "dismount"), not Interact, so the
+	# press that mounted can never be read again as a dismount.
+	if Input.is_action_just_pressed("dismount") and not UIState.modal_open:
 		_end_manchego_control()
 		return
 	var input := _get_move_input()
@@ -3759,6 +3864,21 @@ func _update_camera_follow(delta: float) -> void:
 	if not is_instance_valid(subject) or not subject.has_method("camera_focus_point"):
 		subject = self
 	var distance: float = subject.camera_follow_distance()
+	var focus: Vector3 = subject.camera_focus_point()
+	if subject != _camera_subject:
+		if _camera_subject != null and camera_rig.global_position.distance_to(focus) < CAMERA_HANDOFF_MAX_DISTANCE:
+			_camera_handoff_from_focus = camera_rig.global_position
+			_camera_handoff_from_distance = _camera_last_distance
+			_camera_handoff_remaining = CAMERA_HANDOFF_DURATION
+		else:
+			_camera_handoff_remaining = 0.0
+		_camera_subject = subject
+	if _camera_handoff_remaining > 0.0:
+		_camera_handoff_remaining = maxf(_camera_handoff_remaining - delta, 0.0)
+		var handoff := smoothstep(0.0, 1.0, 1.0 - _camera_handoff_remaining / CAMERA_HANDOFF_DURATION)
+		focus = _camera_handoff_from_focus.lerp(focus, handoff)
+		distance = lerpf(_camera_handoff_from_distance, distance, handoff)
+	_camera_last_distance = distance
 	var root_yaw := global_rotation.y
 	if not is_equal_approx(root_yaw, _camera_follow_root_yaw):
 		camera_rig.rotate_y(angle_difference(_camera_follow_root_yaw, root_yaw))
@@ -3767,7 +3887,7 @@ func _update_camera_follow(delta: float) -> void:
 		_throw_camera_blend, 1.0 if _throw_aim_active else 0.0,
 		clampf(THROW_CAMERA_BLEND_SPEED * delta, 0.0, 1.0)
 	)
-	camera_rig.global_position = subject.camera_focus_point()
+	camera_rig.global_position = focus
 	camera_spring_arm.spring_length = distance * lerpf(1.0, THROW_CAMERA_DISTANCE_SCALE, _throw_camera_blend)
 	# SpringArm3D owns its Camera3D child's local position and rewrites it as
 	# collision length resolves, so the aim's shoulder offset moves the arm's

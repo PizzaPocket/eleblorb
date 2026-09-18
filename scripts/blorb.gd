@@ -2271,6 +2271,11 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	var current := Vector2(global_position.x, global_position.z)
 	var next := current + planar * speed * delta
 	next = _constrain_lava_destination(current, next)
+	# Same solid-obstacle stop the AI path applies, so directly controlled
+	# Blorbus meets the rocks and walls the player does. A giant is exempt:
+	# at landmark scale ordinary props are beneath him, not walls.
+	if blorb_type != "size":
+		next = _constrain_solid_destination(current, next)
 	global_position.x = next.x
 	global_position.z = next.y
 	var ground_h := _ground_height_at(next.x, next.y)

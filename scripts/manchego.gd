@@ -34,9 +34,11 @@ func can_be_mounted_by(rider: Node) -> bool:
 ## frame while the human CharacterBody follows at a loose distance, exactly
 ## like _update_blorbus_control() already does for Blorbus/the giant.
 ## Mounting happens via a "Ride Manchego" Interactable prompt (per direct
-## instruction) rather than the B-key cycle Blorbus/Xiao Hou Zi share;
-## pressing that same contextual Interact control again dismounts; the
-## separate Blorbus-switch control remains dedicated to psychic possession.
+## instruction) rather than the B-key cycle Blorbus/Xiao Hou Zi share.
+## Dismounting uses the back button (input_map.gd's "dismount"), and the
+## rider climbs down beside him (player.gd's _update_manchego_dismount()).
+## His own movement is swept against solid obstacles (ObstacleSweep), so he
+## meets the same rocks and walls the player does.
 
 const INTERACT_RADIUS := 2.5
 const HEAD_YAW_LIMIT := deg_to_rad(50.0)
@@ -55,6 +57,11 @@ const ROTATION_SPEED := 5.0
 const CAMERA_HEIGHT := 1.75
 const CAMERA_DISTANCE := 3.6
 const GROUND_SETTLE_SPEED := 8.0
+## Obstacle sweep volume (see ObstacleSweep): the body box above hoof height,
+## so rocks, walls and props stop him while terrain rises are left to ground
+## snapping. Matches the solid box built in _ready(), minus the legs' step.
+const SWEEP_STEP_HEIGHT := 0.35
+const SWEEP_BOX_SIZE := Vector3(0.7, 1.15, 1.7)
 
 ## Ambient "grazing" wander for follows_player == false -- see that var's own
 ## doc comment. A slower amble around a fixed anchor point, not the loyal-
@@ -95,8 +102,9 @@ const RUN_CYCLE_SPEED_MULTIPLIER := 1.8
 ## is a self-contained vertical arc tracked in _vertical_velocity, not
 ## anything player.gd's own gravity/jump_velocity feeds into. First-draft
 ## magnitudes, unverified in-engine -- adjustable on report, same as every
-## other unspecified number in HorseFigure.
-const JUMP_VELOCITY := 8.5
+## other unspecified number in HorseFigure. Raised per direct request from
+## 8.5 (a ~1.5 m hop) to about 2 m of clearance: v^2 / (2 * JUMP_GRAVITY).
+const JUMP_VELOCITY := 9.8
 const JUMP_GRAVITY := 24.0
 ## How long the landing-impact pose (HorseFigure.animate_landing()) holds
 ## before _animate_gait() resumes ordinary animate_gait()/rest -- same idiom
@@ -161,6 +169,7 @@ var _current_head_yaw: float = 0.0
 ## while he's actively being ridden, same reasoning xiao_hou_zi.gd's own
 ## identically-named field documents for its "Talk" prompt.
 var _interact_area: Area3D
+var _sweep_shape := BoxShape3D.new()
 
 
 func _ready() -> void:
@@ -182,6 +191,7 @@ func _ready() -> void:
 	add_child(collision_shape)
 	collision_layer = 1
 	collision_mask = 0
+	_sweep_shape.size = SWEEP_BOX_SIZE
 
 	_interact_area = Interactable.attach(
 		self, "Ride Manchego", INTERACT_RADIUS, _on_ride,
@@ -323,11 +333,9 @@ func _update_follow(delta: float) -> void:
 	var distance := offset.length()
 	var moving := false
 	if distance > FOLLOW_DISTANCE:
-		moving = true
 		var dir := offset.normalized()
 		var next := Vector2(global_position.x, global_position.z) + Vector2(dir.x, dir.z) * FOLLOW_MOVE_SPEED * delta
-		global_position.x = next.x
-		global_position.z = next.y
+		moving = _move_planar_toward(next) > GAIT_MOVING_THRESHOLD * delta
 		rotation.y = lerp_angle(rotation.y, atan2(dir.x, dir.z), ROTATION_SPEED * delta)
 	elif distance < ARRIVE_DISTANCE:
 		moving = false
@@ -365,8 +373,11 @@ func _update_idle(delta: float) -> void:
 		var to_target := _idle_wander_target - here
 		var step := to_target.limit_length(IDLE_WANDER_MOVE_SPEED * delta)
 		var next := here + step
-		global_position.x = next.x
-		global_position.z = next.y
+		if _move_planar_toward(next) < step.length() * 0.25:
+			# Blocked by a prop: give up this wander target and pause, rather
+			# than pressing into the obstacle until the next pick.
+			_idle_has_target = false
+			_idle_pause_timer = _rng.randf_range(IDLE_PAUSE_MIN, IDLE_PAUSE_MAX)
 		if to_target.length() > 0.01:
 			rotation.y = lerp_angle(rotation.y, atan2(to_target.x, to_target.y), ROTATION_SPEED * delta)
 	var idle_ground_h: float = terrain.get_mesh_height(global_position.x, global_position.z)
@@ -465,11 +476,10 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	if sprinting:
 		speed *= (_player as Player).sprint_multiplier
 	var next := Vector2(global_position.x, global_position.z) + planar * speed * delta
-	global_position.x = next.x
-	global_position.z = next.y
+	var travelled := _move_planar_toward(next)
 	# Explicit : float, not := -- see _update_follow()'s own identical
 	# comment on the same get_mesh_height() return-type pitfall.
-	var ground_h: float = terrain.get_mesh_height(next.x, next.y)
+	var ground_h: float = terrain.get_mesh_height(global_position.x, global_position.z)
 	# _landing_timer > 0.0 guards against an immediate re-jump the instant
 	# the impact pose starts -- has to actually finish reading as a landing
 	# first, not just touch the ground for one frame.
@@ -490,5 +500,37 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		global_position.y = ground_h
 	if planar.length() > 0.01:
 		rotation.y = lerp_angle(rotation.y, atan2(planar.x, planar.y), ROTATION_SPEED * delta)
-	var moving := planar.length() * speed > GAIT_MOVING_THRESHOLD
+	# From distance actually covered, not stick input: pressing into a wall
+	# must not keep the legs (and hoofbeats) cycling in place.
+	var moving := travelled > GAIT_MOVING_THRESHOLD * delta
 	_animate_gait(delta, moving, sprinting and moving)
+
+
+## Moves toward `target` on the XZ plane as far as solid obstacles allow,
+## sliding along them (see ObstacleSweep). Returns the distance covered.
+func _move_planar_toward(target: Vector2) -> float:
+	var motion := Vector3(target.x - global_position.x, 0.0, target.y - global_position.z)
+	if motion.length_squared() < 0.00000001:
+		return 0.0
+	var center := global_position + Vector3.UP * (SWEEP_STEP_HEIGHT + SWEEP_BOX_SIZE.y * 0.5)
+	var allowed := ObstacleSweep.slide(
+		get_world_3d().direct_space_state, _sweep_shape,
+		Transform3D(Basis(Vector3.UP, rotation.y), center), motion, _sweep_exclusions()
+	)
+	global_position.x += allowed.x
+	global_position.z += allowed.z
+	return Vector2(allowed.x, allowed.z).length()
+
+
+## Terrain is followed by ground snapping, not blocked by the sweep. The
+## party's own blorbs crowd around their rider and must not pin the horse in
+## place; wild blorbs still block him, as they block the player.
+func _sweep_exclusions() -> Array[RID]:
+	var excluded: Array[RID] = [get_rid()]
+	if terrain is CollisionObject3D:
+		excluded.append((terrain as CollisionObject3D).get_rid())
+	for node in get_tree().get_nodes_in_group("blorbs"):
+		var blorb := node as Blorb
+		if blorb != null and blorb.in_party:
+			excluded.append(blorb.get_rid())
+	return excluded

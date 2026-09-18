@@ -55,6 +55,11 @@ const ACTIONS := {
 	"jump": {"keys": [KEY_SPACE], "joy_buttons": [JOY_BUTTON_Y]},
 	"run": {"keys": [KEY_ALT], "joy_buttons": [JOY_BUTTON_A]},
 	"interact": {"keys": [KEY_F], "joy_buttons": [JOY_BUTTON_X]},
+	# Leaving a mount is a "back out" gesture, so it shares B with ui_cancel
+	# (menus own B only while a modal is open, when riding input is ignored).
+	# Keyboard has no back key (Escape is pause, and Backspace would fight
+	# text fields), so X stands in.
+	"dismount": {"keys": [KEY_X], "joy_buttons": [JOY_BUTTON_B]},
 	"transform": {"keys": [KEY_T], "joy_buttons": [JOY_BUTTON_DPAD_UP]},
 	"switch_blorbus": {"keys": [KEY_B]},
 	"switch_character_previous": {"keys": [KEY_B], "joy_buttons": [JOY_BUTTON_DPAD_LEFT]},
