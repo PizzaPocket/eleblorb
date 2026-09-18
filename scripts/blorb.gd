@@ -2280,6 +2280,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	global_position.z = next.y
 	var ground_h := _ground_height_at(next.x, next.y)
 	var rest_y := ground_h + _ground_embed_offset()
+	var floating_on_water := false
 	# Directly-controlled Blorbus is still just a blorb body in the water --
 	# per direct correction, he should float/swim across deep lake water
 	# instead of snapping down to the real lake floor the way ordinary ground
@@ -2291,6 +2292,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		if water_level - ground_h >= LAKE_FLOAT_MIN_DEPTH:
 			var visible_height := BODY_HEIGHT * size_multiplier * vertical_scale
 			rest_y = water_level - visible_height * LAKE_FLOAT_SUBMERGENCE_FRACTION
+			floating_on_water = true
 	# Psychic control grants the same deliberate high jump to Blorbus's own
 	# body and to the giant body he has merged into. The giant still never
 	# performs its ordinary AI's random ambient hops.
@@ -2336,7 +2338,8 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		rotation.y = lerp_angle(rotation.y, atan2(planar.x, planar.y) + PI, ROTATION_SPEED * motion_speed_scale() * delta)
 		if blorb_type == "size" and not _control_jump_active:
 			UISounds.play_foley(&"giant_move", 0.66, get_instance_id())
-		elif blorb_type != "size":
+		elif blorb_type != "size" and not _control_jump_active and not floating_on_water:
+			# The slide is ground contact: silent mid-jump and afloat.
 			UISounds.pulse_blorb_glide(get_instance_id())
 	# Direct control returns before the ordinary roaming update that normally
 	# owns support alignment. Always resolve the visible body toward the live

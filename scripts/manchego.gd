@@ -93,6 +93,8 @@ const GAIT_MOVING_THRESHOLD := 0.05
 ## there's no separate run/walk state to invent, sprinting while ridden IS
 ## the run trigger. First-draft magnitude, adjustable on report.
 const RUN_CYCLE_SPEED_MULTIPLIER := 1.8
+## Walk <-> gallop footfall timing transition, in blend units per second.
+const GAIT_BLEND_SPEED := 3.0
 
 ## ---- Jump ---- Per direct correction ("we'll want to add a jump ability...
 ## think how the player jumps"), only while actively ridden -- see
@@ -155,7 +157,9 @@ var _look_target: Node3D = null
 
 var _rng := RandomNumberGenerator.new()
 var _stride_phase: float = 0.0
-var _hoof_quarter_cycle: int = 0
+## Eases the footfall timing between walk (0) and gallop (1) instead of
+## jumping every leg to its new offset the frame sprinting starts or stops.
+var _gallop_blend: float = 0.0
 var _hooves_were_moving: bool = false
 ## Eased look-yaw, radians relative to the body's own forward facing (self.
 ## rotation.y) -- see _update_head_look()'s own doc comment for why this is
@@ -416,10 +420,12 @@ func _animate_gait(delta: float, moving: bool, running: bool = false) -> void:
 		_landing_timer -= delta
 		HorseFigure.animate_landing(_pivots, delta)
 	else:
+		var previous_phase := _stride_phase
 		if moving:
 			_stride_phase += delta * GAIT_CYCLE_SPEED * (RUN_CYCLE_SPEED_MULTIPLIER if running else 1.0)
-		_update_hoofsteps(moving, running)
-		HorseFigure.animate_gait(_pivots, delta, moving, _stride_phase, running)
+		_gallop_blend = move_toward(_gallop_blend, 1.0 if running else 0.0, GAIT_BLEND_SPEED * delta)
+		_update_hoofsteps(moving, running, previous_phase)
+		HorseFigure.animate_gait(_pivots, delta, moving, _stride_phase, running, _gallop_blend)
 	# Re-loft the four leg noodle tubes from the pivots' just-updated global
 	# positions -- must run AFTER whichever branch above just ran, same
 	# per-frame ordering player.gd uses for MonkeyFigure.rebuild_limbs(). See
@@ -430,24 +436,25 @@ func _animate_gait(delta: float, moving: bool, running: bool = false) -> void:
 	HorseFigure.animate_tail(_pivots["_tail"], delta)
 
 
-## HorseFigure offsets the four legs by quarter-cycle increments, so every
-## PI/2 boundary is one real hoof's planted/loading moment. Keeping this on
-## the animation phase makes walk, run and playtest speed changes remain in
-## sync without a separate timer drifting away from the legs.
-func _update_hoofsteps(moving: bool, running: bool) -> void:
-	var quarter_cycle := floori(_stride_phase / (PI * 0.5))
+## One hoofbeat per real touchdown. Each leg lands as its own phase
+## (stride phase + HorseFigure.leg_phase_offset()) crosses PI, so this checks
+## that crossing per leg between last frame's stride phase and this frame's.
+## Reading the same offsets the animation uses keeps sound and hooves locked
+## together through the walk's uneven lateral rhythm and the gallop.
+func _update_hoofsteps(moving: bool, running: bool, previous_phase: float) -> void:
 	if not moving or not is_player_controlled:
 		_hooves_were_moving = false
-		_hoof_quarter_cycle = quarter_cycle
 		return
 	if not _hooves_were_moving:
+		# No beat on the first moving frame: the legs were not mid-stride.
 		_hooves_were_moving = true
-		_hoof_quarter_cycle = quarter_cycle
 		return
-	if quarter_cycle == _hoof_quarter_cycle:
-		return
-	_hoof_quarter_cycle = quarter_cycle
-	UISounds.play_foley(&"horse_step", 0.61 if running else 0.43, get_instance_id())
+	for leg in HorseFigure.LEG_NAMES:
+		var offset := HorseFigure.leg_phase_offset(leg, _gallop_blend)
+		var before := floorf((previous_phase + offset - PI) / TAU)
+		var after := floorf((_stride_phase + offset - PI) / TAU)
+		if after > before:
+			UISounds.play_foley(&"horse_step", 0.61 if running else 0.43, get_instance_id())
 
 
 ## Camera framing contract -- see Player.camera_focus_point().

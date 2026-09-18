@@ -6,7 +6,9 @@ extends Node
 const SAMPLE_RATE := 44100
 const SELECTION_COOLDOWN := 0.035
 const POWER_LOOP_HOLD_MSEC := 140
-const BLORB_GLIDE_HOLD_MSEC := 150
+## Short, so the slide stops soon after ground contact does (a jump lifts
+## Blorbus off the ground and his movement stops pulsing this).
+const BLORB_GLIDE_HOLD_MSEC := 90
 # Just enough tolerance for an occasional missed physics frame. This is a
 # contact signal, not a release envelope: once grounded board pulses cease the
 # scrape must disappear with the board/snow contact.
@@ -53,7 +55,13 @@ var _blorb_glide_last_pulse_msec := -10000
 var _blorb_glide_rng := RandomNumberGenerator.new()
 var _blorb_glide_clock := 0.0
 var _blorb_glide_body := 0.0
-var _blorb_glide_texture := 0.0
+var _blorb_glide_lowpass := 0.0
+var _blorb_glide_gurgle := BandPass.new(300.0, 2.5, float(SAMPLE_RATE))
+var _blorb_glide_squish_age := 10.0
+var _blorb_glide_next_squish := 0.0
+var _blorb_glide_frame := 0
+## Each bubble: [age seconds, start Hz, amplitude, oscillator phase].
+var _blorb_glide_bubbles: Array = []
 var _snowboard_player: AudioStreamPlayer
 var _snowboard_playback: AudioStreamGeneratorPlayback
 var _snowboard_source_id := 0
@@ -87,6 +95,10 @@ var _ice_skate_right_load_envelope := 0.0
 var _ice_skate_recontact_envelope := 0.0
 var _foley_pools: Dictionary = {}
 var _foley_pool_indices: Dictionary = {}
+## Pools of distinct variants (not copies of one stream). These pick a random
+## variant, never the one just played: cycling in order made the variants a
+## recognisable repeating sequence.
+var _variant_pools: Dictionary = {}
 var _event_last_played: Dictionary = {}
 var _last_selection_msec: int = 0
 var _nme_hit_index: int = 0
@@ -129,7 +141,7 @@ func _ready() -> void:
 		_power_loop_players[kind] = _make_turbulence_stream_player() if kind in [&"fire", &"water"] else _make_player(_make_power_loop(kind))
 		_power_loop_claims[kind] = {}
 	for event_name in [
-		&"jump", &"water_wade", &"water_splash", &"npc_step", &"plush_step", &"giant_step", &"npc_paw", &"horse_land",
+		&"jump", &"water_wade", &"water_splash", &"npc_step", &"plush_step", &"giant_step", &"npc_paw",
 		&"horse_jump", &"player_hurt", &"blorb_hurt", &"damage_dealt",
 		&"blorb_melt", &"blorb_glide", &"giant_move", &"giant_jump", &"giant_land", &"equip_launch", &"equip_settle", &"equip_release",
 		&"transform_rise", &"transform_flash", &"transform_reveal", &"pickup",
@@ -147,6 +159,10 @@ func _ready() -> void:
 	for variant in HOOF_STEP_VARIANTS:
 		hoof_steps.append(_make_hoof_step(variant))
 	_register_foley_variants(&"horse_step", hoof_steps)
+	var hoof_landings: Array[AudioStreamWAV] = []
+	for variant in HOOF_LANDING_VARIANTS:
+		hoof_landings.append(_make_hoof_landing(variant))
+	_register_foley_variants(&"horse_land", hoof_landings)
 	_register_foley_variants(&"weapon_swing_outward", [
 		_make_weapon_swipe(0, false), _make_weapon_swipe(1, false), _make_weapon_swipe(2, false),
 	])
@@ -224,25 +240,55 @@ func _update_blorb_glide(delta: float, now: int) -> void:
 			_blorb_glide_playback = _blorb_glide_player.get_stream_playback() as AudioStreamGeneratorPlayback
 		_blorb_glide_player.volume_db = move_toward(_blorb_glide_player.volume_db,target_db,95.0*delta)
 	elif _blorb_glide_player.playing:
-		_blorb_glide_player.volume_db = move_toward(_blorb_glide_player.volume_db,-42.0,70.0*delta)
+		_blorb_glide_player.volume_db = move_toward(_blorb_glide_player.volume_db,-42.0,140.0*delta)
 		if _blorb_glide_player.volume_db<=-41.5:
 			_blorb_glide_player.stop()
 			_blorb_glide_playback = null
 
 
+## A wet gel body sliding, not friction: filtered white noise read as
+## sandpaper. Three layers instead, all rolled off above ~2 kHz:
+## - a hollow gurgle, noise through a resonant band-pass whose centre sweeps
+##   250-500 Hz with each squish, which gives the vowel-like wetness;
+## - irregular squelch pulses (every 0.16-0.32 s) as the body deforms, which
+##   swell the gurgle and a low suction body instead of a steady wash;
+## - small bubble pops, short sine chirps rising ~1.8x as they burst (how a
+##   real bubble sounds), at random pitches so they never form a melody.
 func _fill_blorb_glide_stream() -> void:
 	var frames := _blorb_glide_playback.get_frames_available()
+	var dt := 1.0/float(SAMPLE_RATE)
 	for _frame in frames:
-		var dt := 1.0/float(SAMPLE_RATE)
 		_blorb_glide_clock += dt
-		var white := _blorb_glide_rng.randf_range(-1.0,1.0)
-		_blorb_glide_body = lerpf(_blorb_glide_body,white,0.006)
-		_blorb_glide_texture = lerpf(_blorb_glide_texture,white,0.09)
-		# Overlapping unrelated drifts keep the soft gel/cloth friction alive
-		# without establishing a repeating locomotion beat.
-		var movement := 0.86+sin(TAU*0.43*_blorb_glide_clock+0.4)*0.08+sin(TAU*0.71*_blorb_glide_clock+2.1)*0.05
-		var sample := (_blorb_glide_body*0.72+(_blorb_glide_texture-_blorb_glide_body)*0.22)*movement*0.24
-		_blorb_glide_playback.push_frame(Vector2(sample,sample*0.985))
+		_blorb_glide_squish_age += dt
+		_blorb_glide_frame += 1
+		if _blorb_glide_clock >= _blorb_glide_next_squish:
+			_blorb_glide_squish_age = 0.0
+			_blorb_glide_next_squish = _blorb_glide_clock + _blorb_glide_rng.randf_range(0.16, 0.32)
+		var pulse := minf(_blorb_glide_squish_age / 0.04, 1.0) * exp(-maxf(_blorb_glide_squish_age - 0.04, 0.0) / 0.12)
+		var squish := maxf(0.35, pulse)
+		if _blorb_glide_frame % 64 == 0:
+			_blorb_glide_gurgle.tune(250.0 + 200.0 * pulse + 45.0 * sin(TAU * 0.9 * _blorb_glide_clock), 2.5)
+		var white := _blorb_glide_rng.randf_range(-1.0, 1.0)
+		var gurgle := _blorb_glide_gurgle.step(white)
+		_blorb_glide_body = lerpf(_blorb_glide_body, white, 0.006)
+		if _blorb_glide_rng.randf() < 8.0 * dt and _blorb_glide_bubbles.size() < 4:
+			_blorb_glide_bubbles.append([0.0, _blorb_glide_rng.randf_range(350.0, 700.0), _blorb_glide_rng.randf_range(0.15, 0.35), 0.0])
+		var bubbles := 0.0
+		var expired := false
+		for bubble in _blorb_glide_bubbles:
+			bubble[0] = float(bubble[0]) + dt
+			var age := float(bubble[0])
+			bubble[3] = float(bubble[3]) + TAU * float(bubble[1]) * (1.0 + 0.8 * minf(age / 0.03, 1.0)) * dt
+			bubbles += sin(float(bubble[3])) * float(bubble[2]) * exp(-age * 120.0) * minf(age / 0.002, 1.0)
+			expired = expired or age >= 0.05
+		if expired:
+			_blorb_glide_bubbles = _blorb_glide_bubbles.filter(func(bubble: Array) -> bool: return float(bubble[0]) < 0.05)
+		var raw := gurgle * squish + bubbles * 0.5 + _blorb_glide_body * squish * 0.8
+		# One-pole low-pass (~1.8 kHz): keeps the grit that read as sandpaper out.
+		_blorb_glide_lowpass = lerpf(_blorb_glide_lowpass, raw, 0.23)
+		# Matched to the previous glide's loudness (RMS) so the mix is unchanged.
+		var sample := _blorb_glide_lowpass * 0.21
+		_blorb_glide_playback.push_frame(Vector2(sample, sample * 0.985))
 
 
 ## Called every grounded board frame. Speed controls loudness and spectral
@@ -501,6 +547,7 @@ func _register_foley_variants(event_name: StringName, streams: Array[AudioStream
 		pool.append(_make_player(stream))
 	_foley_pools[event_name] = pool
 	_foley_pool_indices[event_name] = 0
+	_variant_pools[event_name] = true
 
 
 ## One scalable gameplay-facing entry point. Event names select a catalogue
@@ -528,8 +575,13 @@ func play_foley(event_name: StringName, intensity: float = 0.5, source_id: int =
 	_event_last_played[cooldown_key] = now
 	var pool: Array = _foley_pools[event_name]
 	var index: int = int(_foley_pool_indices[event_name])
+	if _variant_pools.has(event_name) and pool.size() > 1:
+		# index holds the variant played last; draw from the others.
+		index = (index + 1 + randi() % (pool.size() - 1)) % pool.size()
+		_foley_pool_indices[event_name] = index
+	else:
+		_foley_pool_indices[event_name] = (index + 1) % pool.size()
 	var player := pool[index] as AudioStreamPlayer
-	_foley_pool_indices[event_name] = (index + 1) % pool.size()
 	var distance_attenuation_db := 0.0
 	if source_id != 0:
 		var source := instance_from_id(source_id) as Node3D
@@ -545,7 +597,9 @@ func play_foley(event_name: StringName, intensity: float = 0.5, source_id: int =
 	# Musical confirmation cues must retain their authored intervals. Random
 	# transposition made identical Tokoins sound like different denominations
 	# and could push their two-note relationship into a sour interval.
-	player.pitch_scale = 1.0 if fixed_twinkle else randf_range(0.965, 1.035)
+	# Hooves come from one animal on one surface: keep their colour close.
+	var pitch_spread := 0.012 if event_name == &"horse_step" else 0.035
+	player.pitch_scale = 1.0 if fixed_twinkle else randf_range(1.0 - pitch_spread, 1.0 + pitch_spread)
 	var level_variation := 0.0 if fixed_twinkle else randf_range(-0.7, 0.0)
 	player.volume_db = lerpf(-5.5, -0.7, clampf(intensity, 0.0, 1.0)) + level_variation + distance_attenuation_db
 	player.play()
@@ -855,7 +909,6 @@ func _make_foley(kind: StringName) -> AudioStreamWAV:
 		&"plush_step": duration = 0.052; start_hz = 142.0; end_hz = 82.0; texture = 0.035
 		&"giant_step": duration = 0.32; start_hz = 54.0; end_hz = 27.0; texture = 0.11
 		&"npc_paw": duration = 0.045; start_hz = 152.0; end_hz = 91.0; texture = 0.04
-		&"horse_land": duration = 0.18; start_hz = 146.0; end_hz = 72.0; texture = 0.12
 		&"horse_jump": duration = 0.14; start_hz = 132.0; end_hz = 248.0; texture = 0.06
 		&"player_hurt": duration = 0.13; start_hz = 248.0; end_hz = 118.0; texture = 0.14
 		&"blorb_hurt": duration = 0.15; start_hz = 286.0; end_hz = 142.0; texture = 0.05
@@ -997,17 +1050,49 @@ const HOOF_STEP_VARIANTS := 10
 
 
 func _make_hoof_step(variant: int) -> AudioStreamWAV:
+	return _hoof_stream(_hoof_samples(variant, 0.0), 0.2)
+
+
+## Landing from a jump: forelegs touch down first, then the hinds, each
+## strike heavier than a walking step (lower resonance, more ground thump and
+## scattered grit) but from the same noise-and-resonance model, so the landing
+## shares the footsteps' texture.
+const HOOF_LANDING_VARIANTS := 4
+
+
+func _make_hoof_landing(variant: int) -> AudioStreamWAV:
+	var duration := 0.36
+	var mix := PackedFloat32Array()
+	mix.resize(int(duration * SAMPLE_RATE))
+	# [seconds after the first touchdown, relative loudness]: leading fore,
+	# trailing fore, then the two hinds a beat later.
+	var touchdowns: Array = [[0.0, 1.0], [0.028, 0.85], [0.105, 0.9], [0.124, 0.78]]
+	for index in touchdowns.size():
+		var hoof := _hoof_samples(100 + variant * 4 + index, 1.0)
+		var start := int(float(touchdowns[index][0]) * SAMPLE_RATE)
+		var gain := float(touchdowns[index][1])
+		for frame in hoof.size():
+			if start + frame < mix.size():
+				mix[start + frame] += hoof[frame] * gain
+	return _hoof_stream(mix, 0.26)
+
+
+## One hoof strike, unnormalised, 0.2 s long. `weight` 0 is a walking step;
+## 1 is a landing, which lowers the resonance and raises thump and grit.
+func _hoof_samples(variant: int, weight: float) -> PackedFloat32Array:
 	var duration := 0.2
 	var frame_count := int(duration * SAMPLE_RATE)
 	var shape_seed := [0x6A11 + variant * 104729]
 	var draw := func(low: float, high: float) -> float:
 		shape_seed[0] = int((int(shape_seed[0]) * 1103515245 + 12345) & 0x7fffffff)
 		return lerpf(low, high, float(shape_seed[0]) / 2147483647.0)
-	var strike_filter := _band_pass(draw.call(880.0, 1010.0), draw.call(7.0, 10.0))
-	var body_filter := _band_pass(draw.call(520.0, 620.0), 3.0)
-	var thud_filter := _band_pass(draw.call(140.0, 190.0), 0.9)
-	var knock_filter := _band_pass(draw.call(620.0, 820.0), 5.0)
-	var grit_filter := _band_pass(draw.call(650.0, 900.0), 1.4)
+	# Narrow ranges: variants differ like one horse's successive hooves, not
+	# like different instruments.
+	var strike_filter := _band_pass(draw.call(925.0, 975.0) * (1.0 - 0.1 * weight), draw.call(7.5, 9.0) - 1.5 * weight)
+	var body_filter := _band_pass(draw.call(545.0, 595.0), 3.0)
+	var thud_filter := _band_pass(draw.call(150.0, 175.0), 0.9)
+	var knock_filter := _band_pass(draw.call(680.0, 760.0), 5.0)
+	var grit_filter := _band_pass(draw.call(720.0, 820.0), 1.4)
 	# The hoof wall lands, then its toe or heel touches a moment later.
 	var bounce_time: float = draw.call(0.0015, 0.0035)
 	var bounce_gain: float = draw.call(0.2, 0.45)
@@ -1027,7 +1112,6 @@ func _make_hoof_step(variant: int) -> AudioStreamWAV:
 	var noise_seed := 0x2F00 + variant * 7919
 	var samples := PackedFloat32Array()
 	samples.resize(frame_count)
-	var peak := 0.0
 	for frame in frame_count:
 		var seconds := float(frame) / float(SAMPLE_RATE)
 		noise_seed = int((noise_seed * 1103515245 + 12345) & 0x7fffffff)
@@ -1050,15 +1134,23 @@ func _make_hoof_step(variant: int) -> AudioStreamWAV:
 		var value := (
 			strike_filter.step(strike_excitation)
 			+ body_filter.step(strike_excitation) * 0.22
-			+ thud_filter.step(strike_excitation + knock_excitation * 0.8) * 0.3
-			+ knock_filter.step(knock_excitation) * 0.45
-			+ grit_filter.step(white * grit) * 0.16
+			+ thud_filter.step(strike_excitation + knock_excitation * 0.8) * (0.3 + 0.6 * weight)
+			+ knock_filter.step(knock_excitation) * (0.45 + 0.2 * weight)
+			+ grit_filter.step(white * grit) * (0.16 + 0.25 * weight)
 		) * minf((duration - seconds) / 0.02, 1.0)
 		samples[frame] = value
+	return samples
+
+
+## Normalises to `target_peak` and wraps as a stream. Hoof sounds are sharp
+## transients rather than sustained tones, so a 0.2 peak sits at about the
+## loudness of the other footsteps, whose tonal bodies peak near 0.085.
+func _hoof_stream(samples: PackedFloat32Array, target_peak: float) -> AudioStreamWAV:
+	var frame_count := samples.size()
+	var peak := 0.0
+	for value in samples:
 		peak = maxf(peak, absf(value))
-	# A transient peak, not a sustained tone: this sits at about the loudness
-	# of the other footsteps, whose tonal bodies peak near 0.085.
-	var gain_to_peak := 0.2 / maxf(peak, 0.0001)
+	var gain_to_peak := target_peak / maxf(peak, 0.0001)
 	var bytes := PackedByteArray()
 	bytes.resize(frame_count * 2)
 	for frame in frame_count:
@@ -1071,7 +1163,7 @@ func _make_hoof_step(variant: int) -> AudioStreamWAV:
 	return stream
 
 
-## RBJ constant-peak band-pass biquad for _make_hoof_step(). A class rather
+## RBJ constant-peak band-pass biquad for the hoof and slime synthesis. A class rather
 ## than a packed array of coefficients: its running state must persist between
 ## calls, and packed arrays are copy-on-write.
 class BandPass:
@@ -1084,7 +1176,14 @@ class BandPass:
 	var y1 := 0.0
 	var y2 := 0.0
 
-	func _init(center_hz: float, q: float, sample_rate: float) -> void:
+	var sample_rate: float
+
+	func _init(center_hz: float, q: float, rate: float) -> void:
+		sample_rate = rate
+		tune(center_hz, q)
+
+	## Retunes without clearing the running state, for swept filters.
+	func tune(center_hz: float, q: float) -> void:
 		var omega := TAU * center_hz / sample_rate
 		var alpha := sin(omega) / (2.0 * q)
 		var a0 := 1.0 + alpha

@@ -1505,12 +1505,38 @@ static func _reloft_tail(state: Dictionary, yaw: float) -> void:
 ## running is optional (default false, every pre-existing call site
 ## unaffected) -- per direct correction, see RUN_BEND_MULTIPLIER's own
 ## comment for the full reasoning; just threaded through to each leg here.
-static func animate_gait(pivots: Dictionary, delta: float, moving: bool, phase: float, running: bool = false) -> void:
+## Footfall timing: when each hoof touches down, as a fraction of one stride.
+## Walk, measured (IntechOpen, "Laterally Coordinated Gaits in the Modern
+## Horse", ch. 83285): a four-beat LATERAL sequence, left hind -> left fore ->
+## right hind -> right fore. Each hind is followed by its same-side fore after
+## 21.6% of the stride, and by the next (diagonal) hind after 28.3%, so the
+## rhythm is short-long-short-long, not an even 25%.
+## Gallop (sprinting), approximated: the transverse gallop's sequence (right
+## hind, left hind, right fore, left fore; left lead) and its hinds-together,
+## fores-together couplets are documented, but no source found gave exact
+## percentages. These fractions put each couplet ~12% apart, the fore pair
+## ~18% after the hinds, and leave the rest of the stride airborne.
+const WALK_TOUCHDOWNS := {"hind_left": 0.0, "front_left": 0.216, "hind_right": 0.5, "front_right": 0.716}
+const GALLOP_TOUCHDOWNS := {"hind_right": 0.0, "hind_left": 0.12, "front_right": 0.30, "front_left": 0.42}
+const LEG_NAMES: Array[String] = ["hind_left", "front_left", "hind_right", "front_right"]
+
+
+## Phase offset that makes `leg` touch down at its table fraction. Each leg
+## animation lifts while sin(leg phase) > 0, so a hoof lands as its leg phase
+## crosses PI; stride phase + offset == PI at stride fraction f gives
+## offset = PI - TAU * f. `gallop_blend` eases walk (0) into gallop (1).
+static func leg_phase_offset(leg: String, gallop_blend: float) -> float:
+	var walk_offset := PI - TAU * float(WALK_TOUCHDOWNS[leg])
+	var gallop_offset := PI - TAU * float(GALLOP_TOUCHDOWNS[leg])
+	return lerp_angle(walk_offset, gallop_offset, clampf(gallop_blend, 0.0, 1.0))
+
+
+static func animate_gait(pivots: Dictionary, delta: float, moving: bool, phase: float, running: bool = false, gallop_blend: float = 0.0) -> void:
 	var legs: Dictionary = pivots["legs"]
-	_animate_front_leg(legs["front_left"], delta, moving, phase + PI * 0.5, running)
-	_animate_front_leg(legs["front_right"], delta, moving, phase + PI * 1.5, running)
-	_animate_hind_leg(legs["hind_left"], delta, moving, phase, running)
-	_animate_hind_leg(legs["hind_right"], delta, moving, phase + PI, running)
+	_animate_front_leg(legs["front_left"], delta, moving, phase + leg_phase_offset("front_left", gallop_blend), running)
+	_animate_front_leg(legs["front_right"], delta, moving, phase + leg_phase_offset("front_right", gallop_blend), running)
+	_animate_hind_leg(legs["hind_left"], delta, moving, phase + leg_phase_offset("hind_left", gallop_blend), running)
+	_animate_hind_leg(legs["hind_right"], delta, moving, phase + leg_phase_offset("hind_right", gallop_blend), running)
 	var spine_pivot: Node3D = pivots["spine"]
 	# Releases whatever takeoff/landing pitch animate_airborne() left behind
 	# -- see BODY_PITCH_TAKEOFF_AMOUNT's own comment. Harmless no-op once
