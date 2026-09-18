@@ -3878,6 +3878,14 @@ func _update_camera_follow(delta: float) -> void:
 		else:
 			_camera_handoff_remaining = 0.0
 		_camera_subject = subject
+		# The spring arm pulls in at anything solid behind the focus. The body
+		# being followed is solid too (Manchego, Blorbus): looking up while it
+		# faced the camera swung the arm through it and snapped the camera in
+		# against the back of the rider's head. Never collide with it.
+		camera_spring_arm.clear_excluded_objects()
+		camera_spring_arm.add_excluded_object(get_rid())
+		if subject is CollisionObject3D:
+			camera_spring_arm.add_excluded_object((subject as CollisionObject3D).get_rid())
 	if _camera_handoff_remaining > 0.0:
 		_camera_handoff_remaining = maxf(_camera_handoff_remaining - delta, 0.0)
 		var handoff := smoothstep(0.0, 1.0, 1.0 - _camera_handoff_remaining / CAMERA_HANDOFF_DURATION)
