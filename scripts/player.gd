@@ -165,8 +165,8 @@ const DIRTBIKE_ASCEND_TRACK_THRESHOLD := 0.02
 ## eases the transition into/out of the straddle pose (see
 ## _apply_dirtbike_pose()) instead of a hard cut. The visual lift itself
 ## (see DIRTBIKE_WHEEL_RADIUS's own comment) eases at SNOW_VISUAL_SINK_SPEED
-## instead, since it shares _update_snow_visual_sink()'s own move_toward()
-## on visuals.position.y rather than owning a separate write.
+## instead, since it is one term of _body_base_height() alongside the snow
+## sink rather than a separate write.
 const DIRTBIKE_POSE_SETTLE_SPEED := 8.0
 ## First-draft stance angles for straddling the wheel (think a motocross
 ## rider's neutral standing position: hips back over the axle, knees bent,
@@ -1035,9 +1035,9 @@ var _fire_limb_flight_active := false
 var _air_foot_hover_active := false
 var _was_powered_hover_active := false
 var _powered_hover_target_y := 0.0
-## The snow-sink component only of visuals.position.y -- see
-## _update_snow_visual_sink()'s own doc comment for why this is tracked
-## separately from the dirtbike lift added on top of it there.
+## The snow-sink component only of the body's base height -- eased on its
+## own, separately from the dirtbike lift added on top of it in
+## _body_base_height().
 var _visuals_snow_offset_y := -FOOT_OFFSET
 ## Dirt blorb suit -- see the DIRTBIKE_* consts' own doc comments.
 var _dirtbike_wheel_active := false
@@ -1102,9 +1102,9 @@ var _ice_skate_right: Node3D = null
 var _ice_skate_was_supported := false
 var _ice_skate_airborne := false
 var _ice_skate_surface_velocity := Vector3.ZERO
-## Baseline Y last applied by _update_snow_visual_sink(). While riding, that
-## pass applies only the baseline's delta so the chassis-pivot correction is
-## retained rather than erased on the next frame.
+## Base height applied by the last _compose_body_pose(). While riding, the
+## dirtbike pose applies only the change in base height, so its chassis-pivot
+## correction is retained rather than erased on the next frame.
 var _dirtbike_visual_base_y := -FOOT_OFFSET
 ## World-space swim heading, retained for the visual-only aerial anchor pass
 ## after move_and_slide() has placed the collision body this frame.
@@ -1119,6 +1119,12 @@ var _aerial_rest_heading_initialized: bool = false
 ## error becoming the next frame's anchor and cumulatively drifting away.
 var _aerial_skull_body_offset := Vector3.ZERO
 var _aerial_skull_anchor_initialized := false
+## The body's heading. Steering, throw aim, followers, the snowboard and the
+## giant ease or set this; _compose_body_pose() is what applies it.
+var _body_yaw := 0.0
+## Set when steering turned a vehicle this frame, so the dirtbike pose pivots
+## that turn about the rider's spine (see _pose_body_dirtbike()).
+var _body_yaw_steered := false
 ## The capsule's authored standing pose, captured in _ready(). While skull-
 ## anchored, the same capsule is re-posed to follow the rendered body (see
 ## _fit_collision_to_body()); releasing the anchor restores this exactly.
@@ -1719,7 +1725,7 @@ func _physics_process(delta: float) -> void:
 				_cycle_playable_character(1)
 	_update_sun_wu_kong_summon()
 	# Every branch below hands control to another body and skips
-	# _update_aerial_body_anchor(). Starting one mid-flight must not leave the
+	# _compose_body_pose(). Starting one mid-flight must not leave the
 	# human following along with a capsule still posed level.
 	if _player_following_manchego or _piloting_xiao_hou_zi or is_instance_valid(_controlled_generic_member) or _player_following_blorbus:
 		_release_skull_anchor()
@@ -2094,29 +2100,14 @@ func _physics_process(delta: float) -> void:
 			# pass below. Applying yaw here would still rotate around the feet.
 			_aerial_target_yaw = target_angle
 		elif _dirtbike_wheel_active or _snowboard_active or _ice_skating_active or skate_ballistic:
-			# Per direct correction ("the pivot when turning is around the
-			# back wheel, let's shift it forward to his center of mass") --
-			# visuals.rotation.y always turns around visuals' OWN origin,
-			# which sits at (or very near) the rear axle once the dirtbike
-			# lift is applied -- exactly "pivoting around the back wheel."
-			# Same anchor-preservation technique _update_aerial_body_anchor()
-			# already uses for its own skull anchor: capture a rig landmark
-			# approximating center of mass (_spine, the torso's own base)
-			# BEFORE rotating, then shift visuals' global position by
-			# whatever the rotation just displaced that landmark by, so the
-			# spine -- not the feet/wheel -- is what actually stays put
-			# through the turn. This remains the visual-only steering pivot
-			# while ballistic: input can aim the rider, but cannot bend the
-			# preserved launch velocity.
-			# Never preserve an already-drifted rendered X/Z coordinate. The
-			# CharacterBody is the authoritative chassis/camera location; the
-			# spine may keep its current height through the turn, but its planar
-			# centre must remain directly over that physical body.
-			var pivot_anchor := Vector3(global_position.x, _spine.global_position.y, global_position.z)
-			visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, rotation_speed * delta)
-			visuals.global_position += pivot_anchor - _spine.global_position
+			# Vehicles turn about the rider's centre of mass rather than the
+			# feet/rear axle; _pose_body_dirtbike() applies that pivot. This
+			# remains the visual-only steering while ballistic: input can aim
+			# the rider, but cannot bend the preserved launch velocity.
+			_body_yaw = lerp_angle(_body_yaw, target_angle, rotation_speed * delta)
+			_body_yaw_steered = true
 		else:
-			visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, rotation_speed * delta)
+			_body_yaw = lerp_angle(_body_yaw, target_angle, rotation_speed * delta)
 	else:
 		if _snowboard_active or _ice_skating_active or skate_ballistic:
 			pass
@@ -2242,11 +2233,6 @@ func _physics_process(delta: float) -> void:
 		var canopy_feet_height := (canopy_landing_height as float) - FOOT_OFFSET if canopy_landing_height != null else 0.0
 		if canopy_landing_height != null and pre_move_feet_y >= canopy_feet_height and global_position.y - FOOT_OFFSET <= canopy_feet_height:
 			_complete_one_way_support_landing(canopy_landing_height as float)
-	# Movement is resolved by the collision body, then the visual rig is
-	# tilted around the head/neck junction. This order keeps the skull anchor
-	# at the position that actually led this frame's swim rather than letting
-	# a feet-pivoted mesh arc the head away from it.
-	_update_aerial_body_anchor(delta)
 	# Uses `grounded` as computed at the top of this frame (before this jump/
 	# landing was resolved), same as the terrain step-up/snap calls around
 	# it -- so this only ever fires while the frame started airborne, not on
@@ -2304,40 +2290,21 @@ func _physics_process(delta: float) -> void:
 		_continuous_airborne_time = 0.0
 	else:
 		_continuous_airborne_time += delta
-	_update_snow_visual_sink(delta,grounded,on_cloud or on_canopy,buoyant)
-	# Apply this after the visual-height owner above. Besides being the final
-	# pitch write, this keeps its centre-of-mass pivot correction from being
-	# overwritten by the dirtbike lift/snow sink in the same frame.
-	_apply_dirtbike_wheelie_pitch(delta,grounded)
-	_apply_snowboard_surface_orientation(delta,grounded)
+	# Movement, bounces and ground snapping have all moved the collision body
+	# for this frame; now place the rendered body on it, once.
+	_compose_body_pose(delta, grounded, on_cloud or on_canopy, buoyant)
 	_update_dirtbike_wheels(delta)
 	_update_snowboard_visual()
 	_prev_grounded = grounded
 
 
-## Despite the name, this is really "the final say on visuals' own resting
-## Y offset every frame" -- snow sink was the first thing that needed it,
-## the dirt blorb suit's own rear-wheel lift is the second (see
-## DIRTBIKE_WHEEL_RADIUS's own comment: "the feet axis should be at the
-## ankles, effectively lifting up the player" -- riding the wheel raises the
-## whole visual rig by its radius, so the ankles end up sitting on TOP of it
-## rather than the wheel floating disconnected below the ordinary standing
-## height). Tracked as two SEPARATE terms, not one combined move_toward()
-## target -- the snow sink's own _visuals_snow_offset_y still eases at the
-## slow SNOW_VISUAL_SINK_SPEED (a gentle foot-sinking-into-snow feel), but
-## the dirtbike lift needs to read as a real, promptly visible mount/
-## dismount rather than crawl in at that same slow rate, so it's added on
-## top fresh every frame using _dirtbike_pose_blend's own already-eased 0..1
-## ramp (see _apply_dirtbike_pose(), which runs earlier this same frame) --
-## no separate easing of its own needed. This function still owns the final
-## assignment to visuals.position.y (it runs last among the general-purpose
-## per-frame passes, right before _prev_grounded), so a second independent
-## writer earlier in the frame would just get overwritten here regardless.
-## The one exception is skull-anchored flight/deep swimming, where the
-## aerial anchor's placement must survive (see the guard below).
-func _update_snow_visual_sink(delta: float,grounded: bool,on_soft_aerial_support: bool,buoyant: bool) -> void:
-	if _wake_intro_active:
-		return
+## The body's resting height above this CharacterBody's origin this frame:
+## the snow sink (a slow ease, so feet settle into snow), the dirt blorb
+## suit's rear-wheel lift (see DIRTBIKE_WHEEL_RADIUS: the ankles ride on top
+## of the wheel, raising the whole figure by its radius, eased by
+## _dirtbike_pose_blend), and the ice skates' blade lift. Pure: returns the
+## height for _compose_body_pose() and only advances the snow ease.
+func _body_base_height(delta: float, grounded: bool, on_soft_aerial_support: bool, buoyant: bool) -> float:
 	var on_snow: bool = (
 		grounded
 		and not on_soft_aerial_support
@@ -2350,27 +2317,11 @@ func _update_snow_visual_sink(delta: float,grounded: bool,on_soft_aerial_support
 	)
 	var snow_target_y: float = -FOOT_OFFSET - (SNOW_VISUAL_SINK_DEPTH if on_snow else 0.0)
 	_visuals_snow_offset_y = move_toward(_visuals_snow_offset_y, snow_target_y, SNOW_VISUAL_SINK_SPEED*delta)
-	var base_y:=(
+	return (
 		_visuals_snow_offset_y
-		+DIRTBIKE_WHEEL_RADIUS*_dirtbike_pose_blend
-		+(ice_skate_visual_lift() if _ice_skates_active else 0.0)
+		+ DIRTBIKE_WHEEL_RADIUS*_dirtbike_pose_blend
+		+ (ice_skate_visual_lift() if _ice_skates_active else 0.0)
 	)
-	if _aerial_skull_anchor_initialized:
-		# Flight and deep swimming already placed Visuals so the head sits on
-		# the skull anchor (see _update_aerial_body_anchor(), which runs
-		# earlier this frame). An absolute Y write here re-hinged the body
-		# about its feet, so the head-to-camera distance swung with camera
-		# pitch and travel direction. Keep the tracked base values current
-		# for the frame the anchor releases, but leave the pinned Y alone.
-		pass
-	elif _dirtbike_pose_blend>0.001:
-		# Preserve the translation produced by rotating about the rider/chassis
-		# centre. Reassigning an absolute Y here every frame erased that
-		# correction and visually restored a rear-wheel hinge.
-		visuals.position.y+=base_y-_dirtbike_visual_base_y
-	else:
-		visuals.position.y=base_y
-	_dirtbike_visual_base_y=base_y
 
 
 func _is_supported_by_ice() -> bool:
@@ -3544,6 +3495,7 @@ func _finish_manchego_dismount() -> void:
 		# instead, so it has to be explicitly reset back to its ordinary
 		# resting local transform here.
 		visuals.transform = Transform3D(Basis(Vector3.UP, yaw), Vector3(0, -FOOT_OFFSET, 0))
+		_body_yaw = yaw
 	# _neck.rotation.x is otherwise ONLY ever touched by
 	# _apply_manchego_seated_pose() (see MANCHEGO_HEAD_UPRIGHT_NECK_SHARE's
 	# own comment) -- nothing in the ordinary walk/idle/jump code eases it
@@ -3757,7 +3709,9 @@ func _follow_controlled_party_body(target: Node3D, delta: float) -> void:
 	var actual_motion := global_position - before_move
 	actual_motion.y = 0.0
 	if actual_motion.length_squared() > 0.000001:
-		visuals.rotation.y = atan2(actual_motion.x, actual_motion.z)
+		_body_yaw = atan2(actual_motion.x, actual_motion.z)
+	# Following is always an upright walk (any flight tilt is released).
+	_pose_body_ground(-FOOT_OFFSET)
 	_animate_walk(delta, actual_motion.length_squared() > 0.000001, 1.0)
 
 
@@ -3809,7 +3763,8 @@ func _update_blorbus_control(delta: float) -> void:
 	var actual_motion := global_position - before_move
 	actual_motion.y = 0.0
 	if actual_motion.length_squared() > 0.000001:
-		visuals.rotation.y = atan2(actual_motion.x, actual_motion.z)
+		_body_yaw = atan2(actual_motion.x, actual_motion.z)
+	_pose_body_ground(-FOOT_OFFSET)
 	_animate_walk(delta, true, 1.0)
 
 
@@ -4199,7 +4154,6 @@ func _apply_snowboard_pose(delta: float) -> void:
 		return
 	var w:=_snowboard_pose_blend
 	var tuck:=1.0 if _is_sprinting() and _snowboard_active else 0.0
-	var foot_anchor:=(_ankle_left.global_position+_ankle_right.global_position)*0.5
 	var speed_ratio:=clampf(Vector2(velocity.x,velocity.z).length()/SNOWBOARD_FULL_LEAN_SPEED,0.0,1.0)
 	var forward_lean:=(SNOWBOARD_SPEED_LEAN_MAX*speed_ratio+SNOWBOARD_TUCK_LEAN*tuck)*w
 	var hip_target:=-(SNOWBOARD_HIP_BEND+SNOWBOARD_TUCK_HIP_BEND*tuck)
@@ -4238,8 +4192,6 @@ func _apply_snowboard_pose(delta: float) -> void:
 	# Joint flexion lowers the pelvis naturally. Preserve the actual midpoint
 	# between the two ankles after posing so the stance sinks around planted
 	# feet instead of translating the rider toward either board edge.
-	var posed_foot_anchor:=(_ankle_left.global_position+_ankle_right.global_position)*0.5
-	visuals.global_position+=foot_anchor-posed_foot_anchor
 
 
 ## Alternating speed-skating stroke: one leg glides under the body's weight
@@ -4271,7 +4223,6 @@ func _apply_ice_skate_pose(delta: float) -> void:
 		return
 	# Preserve the feet's physical contact while the deeper sprint flexion
 	# lowers the body through the hip and knee chain.
-	var foot_anchor:=(_ankle_left.global_position+_ankle_right.global_position)*0.5
 	var w:=_ice_skate_pose_blend
 	# Pose strength and temporal interpolation are distinct. Using w itself as
 	# lerp weight became a literal one-frame snap once the blend reached 1.0.
@@ -4338,12 +4289,12 @@ func _apply_ice_skate_pose(delta: float) -> void:
 	if _thorax!=null:
 		_thorax.rotation.x=lerp_angle(_thorax.rotation.x,skate_lean*0.35,pose_t)
 	# Do not translate the torso and pelvis independently: that visually
-	# disconnects them from the fixed hip sockets. The bent leg chains plus
-	# the foot-anchor correction below lower the complete rig naturally.
+	# disconnects them from the fixed hip sockets. (A foot-anchor shift here
+	# once meant to lower the whole rig with the bent legs, but the ground
+	# pose reset it every frame, so it never took effect and was removed;
+	# the body height comes from _body_base_height() alone.)
 	_spine.position.y=lerpf(_spine.position.y,_spine_rest_y,pose_t)
 	_hips.position.y=lerpf(_hips.position.y,_hips_rest_y,pose_t)
-	var posed_foot_anchor:=(_ankle_left.global_position+_ankle_right.global_position)*0.5
-	visuals.global_position+=foot_anchor-posed_foot_anchor
 
 
 ## Resolve lateral hip roll from the live posed hierarchy instead of relying
@@ -4390,18 +4341,10 @@ static func ice_skate_stroke(cycle: float) -> Vector3:
 	return Vector3(push,recovery,support)/total
 
 
-## Deliberately called separately, LATER in _physics_process (after
-## _update_aerial_body_anchor(delta) -- see that call site's own comment),
-## not from _apply_dirtbike_pose() alongside the leg/arm pose above. Direct
-## report ("he is still not adjusting his pitch when riding in two wheel
-## mode") traced back to _update_aerial_body_anchor()'s own ordinary-
-## grounded branch unconditionally resetting visuals.rotation.x to 0 every
-## frame; excluding _dirtbike_wheelie_active from that reset (see its own
-## comment) should already prevent the stomp, but that requires staying in
-## sync with whatever else that function's own branches do. Running this
-## strictly AFTER it instead makes the ordering itself the guarantee: this
-## is provably the last write to visuals.rotation.x each frame, independent
-## of that function's own internals ever changing again.
+## Called only by _pose_body_dirtbike(), as the last step of placing the
+## body (see _compose_body_pose()), not from _apply_dirtbike_pose() alongside
+## the leg/arm pose above: the wheelie pitches the already-placed body about
+## the rear axle.
 func _apply_dirtbike_wheelie_pitch(delta: float,grounded: bool) -> void:
 	# Ordinary ground/aerial presentation owns pitch whenever the front wheel
 	# is absent. Writing a zero target here was flattening air-chest flight
@@ -5581,7 +5524,7 @@ func _apply_throw_facing(delta: float) -> void:
 	if forward.length_squared() < 0.0001:
 		return
 	var target_angle := atan2(forward.x, forward.z)
-	visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, rotation_speed * delta)
+	_body_yaw = lerp_angle(_body_yaw, target_angle, rotation_speed * delta)
 
 
 func _throw_held_item() -> void:
@@ -6353,144 +6296,195 @@ func _apply_airborne_pose(delta: float, apex_fraction: float) -> void:
 	_hips.rotation.z = lerp_angle(_hips.rotation.z, 0.0, t)
 
 
-## Tilts the rendered body about the base of the skull, where the neck meets
-## the head. The collision body still supplies robust movement and collision,
-## but this visual anchor means the skull is the point that leads through the
-## water while the torso and legs trail naturally behind it. It is deliberately
-## named for aerial movement so flying can reuse this exact mechanic later.
-func _update_aerial_body_anchor(delta: float) -> void:
-	# Air-foot hover travels in the camera's full 3D direction but retains a
-	# normal upright walk/run silhouette. Turn its planar facing toward travel
-	# without applying the pitched, trailing-body flight anchor below.
+## THE ONLY PER-FRAME WRITER OF `visuals`' TRANSFORM (the rendered body's
+## placement on this CharacterBody). Everything else feeds it inputs:
+## steering, throw aim, followers and the giant turn _body_yaw; the snow sink
+## and dirtbike/skate lifts come in through _body_base_height(); each mode
+## below owns its tilt. Several earlier writers each "fixed" a landmark by
+## shifting the body after some other writer had run, and the last one each
+## frame silently won (the snow sink overwrote flight's skull pin that way),
+## so there is one placement pass, run after movement, bounces and ground
+## snapping have finished moving the collision body.
+##
+## Exactly one mode places the body each frame, by what it pivots on:
+##   foot hover   - feet; yaw toward travel (air legs keep a walking body)
+##   skull        - base of the skull; flight and deep swimming
+##   flight exit  - feet; eases a flying body upright after flight ends
+##   dirtbike     - spine over the wheel for steering, rear axle for wheelies
+##   ground       - feet (skates included), plus the snowboard's slope tilt
+## Riding a mount and the wake intro own the transform outright (see
+## start_riding_manchego() and _apply_wake_intro_pose()), so this yields.
+func _compose_body_pose(delta: float, grounded: bool, on_soft_aerial_support: bool, buoyant: bool) -> void:
+	if _wake_intro_active or visuals.top_level:
+		return
+	var base_y := _body_base_height(delta, grounded, on_soft_aerial_support, buoyant)
 	if _air_foot_hover_active and not _air_flight_active and not _fire_limb_flight_active and not _lake_buoyancy_active:
 		_release_skull_anchor()
-		if _aerial_motion_direction.length_squared() > 0.001:
-			var planar_direction := _aerial_motion_direction
-			planar_direction.y = 0.0
-			if planar_direction.length_squared() > 0.001:
-				var target_yaw := atan2(planar_direction.x, planar_direction.z)
-				var target_basis := Basis(Vector3.UP, target_yaw)
-				var body_transform := visuals.global_transform
-				var t := minf(rotation_speed * delta, 1.0)
-				body_transform.basis = Basis(
-					body_transform.basis.get_rotation_quaternion().slerp(
-						target_basis.get_rotation_quaternion(), t
-					)
-				)
-				visuals.global_transform = body_transform
-		visuals.position = visuals.position.lerp(Vector3(0.0, -FOOT_OFFSET, 0.0), minf(AERIAL_BODY_LEAN_SPEED * delta, 1.0))
 		_aerial_rest_heading_initialized = false
+		_pose_body_foot_hover(delta, base_y)
 	elif (_lake_buoyancy_active and not _lake_floor_walk_active and not _lake_weighted_descent_active) or _air_flight_active or _fire_limb_flight_active:
-		if not _aerial_skull_anchor_initialized:
-			_aerial_skull_body_offset = _head.global_position-global_position
-			_aerial_skull_anchor_initialized = true
-		var skull_anchor := global_position+_aerial_skull_body_offset
-		# The camera orbits this same skull point (see camera_focus_point()),
-		# so pinning the head here keeps it a constant distance from the lens.
-		if _aerial_motion_direction.length_squared() > 0.001:
-			_aerial_was_moving = true
-			# This is a CAMERA-SPACE body transform, not a world-space pitch.
-			# The fixed trailing angle is therefore measured from the skull's
-			# viewed direction regardless of which way gravity/the horizon lies.
-			# Visuals faces +Z while a Camera3D views -Z, hence the 180° Y turn.
-			# At the surface, movement is deliberately yaw-only, so use the
-			# camera rig's level basis. Diving and flight retain the camera's
-			# full pitch for true 3D travel.
-			var travel_camera_basis := camera.global_transform.basis if (_lake_diving_active or _air_flight_active or _fire_limb_flight_active) else camera_rig.global_transform.basis
-			var camera_body_basis := travel_camera_basis * Basis(Vector3.UP, PI)
-			# The left stick still chooses the travel-facing direction IN camera
-			# space: forward=0, right=+90, back=180, left=-90. Previously the
-			# camera-space lean ignored this turn, so backing toward the camera
-			# moved correctly but left the body facing away from its travel.
-			# Visuals has the camera-facing 180° basis correction above, which
-			# mirrors this local yaw convention; negate stick X so forward-left
-			# aims the body forward-left rather than its reflected right side.
-			var stick_turn := atan2(-_aerial_strafe_input, -_get_move_input().y)
-			var travel_turn_basis := Basis(Vector3.UP, stick_turn)
-			var trailing_basis := Basis(Vector3.RIGHT, AERIAL_BODY_CRUISE_LEAN)
-			var roll_basis := Basis(Vector3.FORWARD, -_aerial_strafe_input * AERIAL_BODY_ROLL_MAX)
-			var target_rotation := (camera_body_basis * travel_turn_basis * trailing_basis * roll_basis).get_rotation_quaternion()
-			var t := minf(AERIAL_BODY_LEAN_SPEED * delta, 1.0)
-			var body_transform := visuals.global_transform
-			body_transform.basis = Basis(body_transform.basis.get_rotation_quaternion().slerp(target_rotation, t))
-			visuals.global_transform = body_transform
-		else:
-			# Capture the body's own current planar heading exactly once as input
-			# stops. The relaxed pose should return upright around THIS heading,
-			# never turn to face the camera merely because the active dive pose
-			# was camera-space.
-			if _aerial_was_moving or not _aerial_rest_heading_initialized:
-				var planar_forward := visuals.global_transform.basis.z
-				planar_forward.y = 0.0
-				if planar_forward.length_squared() > 0.001:
-					_aerial_rest_yaw = atan2(planar_forward.x, planar_forward.z)
-				else:
-					_aerial_rest_yaw = visuals.rotation.y
-				_aerial_was_moving = false
-				_aerial_rest_heading_initialized = true
-			var t := minf(AERIAL_BODY_REST_SPEED * delta, 1.0)
-			var upright_transform := visuals.global_transform
-			upright_transform.basis = Basis(Vector3.UP, _aerial_rest_yaw)
-			upright_transform.basis = Basis(upright_transform.basis.get_rotation_quaternion())
-			var current_transform := visuals.global_transform
-			current_transform.basis = Basis(current_transform.basis.get_rotation_quaternion().slerp(upright_transform.basis.get_rotation_quaternion(), t))
-			visuals.global_transform = current_transform
-		# Rotating Visuals normally pivots around its feet. Restore the head
-		# after that rotation, making the neck/head junction the real visual
-		# pivot without changing the collision shape's stable feet origin.
-		visuals.global_position += skull_anchor - _head.global_position
-		# The capsule follows the rendered body rather than standing upright
-		# under the pinned skull. A level flier can therefore skim the ground
-		# and slide along walls with its real silhouette, and a body swinging
-		# upright near the ground is pushed up onto its feet by ordinary
-		# collision recovery. This replaced a visual-only ground clamp, which
-		# was compensating for the snow-sink overwrite of the skull pin.
-		_fit_collision_to_body()
+		_pose_body_skull_anchored(delta)
 	else:
 		_release_skull_anchor()
 		_aerial_rest_heading_initialized = false
-		# Leaving water is a hard transition back to gravity: do not retain the
-		# deliberately slow buoyant unwind once the body has emerged. Wing-suit
-		# removal in midair retains its own short physical recovery instead. That
-		# recovery must slerp toward an explicitly upright WORLD basis; clearing
-		# local Euler X/Z independently can make a steep flight basis decompose to
-		# the opposite Y solution and turn the character around toward the camera.
-		if _air_flight_exit_recovery <= 0.0:
-			# BUG FIX: this branch runs every single ordinary grounded frame
-			# (nothing else in this function applies once not flying/
-			# swimming/hovering), which was silently wiping the dirt blorb
-			# suit's own wheelie lean back to 0 immediately after
-			# _apply_dirtbike_pose() (called earlier this same frame, see
-			# its own call site) had just set it -- confirmed by direct
-			# report ("when the arms are activated he does not pitch
-			# forward whatsoever"). rotation.x is the one property that
-			# function owns while riding, so it alone is excluded here.
-			# position.y gets reset to -FOOT_OFFSET here too, but harmlessly
-			# even during dirtbike riding: _update_snow_visual_sink() (called
-			# later this same frame, unconditionally) always reassigns it to
-			# the real final value regardless of whatever this line just set.
-			if not _dirtbike_wheel_active:
-				visuals.rotation.x = 0.0
-				visuals.position = Vector3(0.0, -FOOT_OFFSET, 0.0)
-			elif not _dirtbike_wheelie_active:
-				var dirtbike_rest_t:=minf(DIRTBIKE_WHEELIE_SETTLE_SPEED*delta,1.0)
-				visuals.rotation.x=lerp_angle(visuals.rotation.x,0.0,dirtbike_rest_t)
-				visuals.position=visuals.position.lerp(
-					Vector3(0.0,_dirtbike_visual_base_y,0.0),dirtbike_rest_t
-				)
-			visuals.rotation.z = 0.0
+		if _air_flight_exit_recovery > 0.0:
+			_pose_body_flight_exit(delta, base_y)
+		elif _dirtbike_wheel_active:
+			_pose_body_dirtbike(delta, grounded, base_y)
 		else:
-			var t := minf(AERIAL_BODY_LEAN_SPEED * delta, 1.0)
-			var upright_basis := Basis(Vector3.UP, _air_flight_exit_yaw)
-			var body_transform := visuals.global_transform
-			body_transform.basis = Basis(
-				body_transform.basis.get_rotation_quaternion().slerp(
-					upright_basis.get_rotation_quaternion(), t
-				)
-			)
-			visuals.global_transform = body_transform
-			visuals.position = visuals.position.lerp(Vector3(0.0, -FOOT_OFFSET, 0.0), t)
-			_air_flight_exit_recovery = maxf(_air_flight_exit_recovery - delta, 0.0)
+			_pose_body_ground(base_y)
+			if _snowboard_active:
+				_apply_snowboard_surface_orientation(delta, grounded)
+				# The slope tilt persists through its own heading, the same
+				# Euler yaw the next frame's ground pose starts from.
+				_body_yaw = visuals.rotation.y
+	_dirtbike_visual_base_y = base_y
+	_body_yaw_steered = false
+
+
+## Upright on the feet at the given height, facing _body_yaw.
+func _pose_body_ground(base_y: float) -> void:
+	visuals.rotation = Vector3(0.0, _body_yaw, 0.0)
+	visuals.position = Vector3(0.0, base_y, 0.0)
+
+
+## Air-foot hover travels in the camera's full 3D direction but keeps an
+## ordinary upright walk/run silhouette: turn the body toward the planar
+## travel direction without the pitched, trailing flight body.
+func _pose_body_foot_hover(delta: float, base_y: float) -> void:
+	visuals.rotation.y = _body_yaw
+	if _aerial_motion_direction.length_squared() > 0.001:
+		var planar_direction := _aerial_motion_direction
+		planar_direction.y = 0.0
+		if planar_direction.length_squared() > 0.001:
+			var target_basis := Basis(Vector3.UP, atan2(planar_direction.x, planar_direction.z))
+			var t := minf(rotation_speed * delta, 1.0)
+			visuals.basis = Basis(visuals.basis.get_rotation_quaternion().slerp(target_basis.get_rotation_quaternion(), t))
+	var settle := visuals.position.lerp(Vector3(0.0, -FOOT_OFFSET, 0.0), minf(AERIAL_BODY_LEAN_SPEED * delta, 1.0))
+	visuals.position = Vector3(settle.x, base_y, settle.z)
+	_sync_body_yaw_from_visuals()
+
+
+## Flight and deep swimming: the body pivots about the base of the skull, so
+## the skull leads through the air or water while the torso and legs trail,
+## and the camera (which orbits this same point, see camera_focus_point())
+## stays a constant distance from the head at every pitch. The collision
+## body keeps its feet origin; only the rendered body and the capsule pose
+## (_fit_collision_to_body()) follow the skull.
+func _pose_body_skull_anchored(delta: float) -> void:
+	if not _aerial_skull_anchor_initialized:
+		_aerial_skull_body_offset = _head.global_position-global_position
+		_aerial_skull_anchor_initialized = true
+	var skull_anchor := global_position+_aerial_skull_body_offset
+	if _aerial_motion_direction.length_squared() > 0.001:
+		_aerial_was_moving = true
+		# This is a CAMERA-SPACE body transform, not a world-space pitch.
+		# The fixed trailing angle is therefore measured from the skull's
+		# viewed direction regardless of which way gravity/the horizon lies.
+		# Visuals faces +Z while a Camera3D views -Z, hence the 180° Y turn.
+		# At the surface, movement is deliberately yaw-only, so use the
+		# camera rig's level basis. Diving and flight retain the camera's
+		# full pitch for true 3D travel.
+		var travel_camera_basis := camera.global_transform.basis if (_lake_diving_active or _air_flight_active or _fire_limb_flight_active) else camera_rig.global_transform.basis
+		var camera_body_basis := travel_camera_basis * Basis(Vector3.UP, PI)
+		# The left stick still chooses the travel-facing direction IN camera
+		# space: forward=0, right=+90, back=180, left=-90. Visuals has the
+		# camera-facing 180° basis correction above, which mirrors this local
+		# yaw convention; negate stick X so forward-left aims the body
+		# forward-left rather than its reflected right side.
+		var stick_turn := atan2(-_aerial_strafe_input, -_get_move_input().y)
+		var travel_turn_basis := Basis(Vector3.UP, stick_turn)
+		var trailing_basis := Basis(Vector3.RIGHT, AERIAL_BODY_CRUISE_LEAN)
+		var roll_basis := Basis(Vector3.FORWARD, -_aerial_strafe_input * AERIAL_BODY_ROLL_MAX)
+		var target_rotation := (camera_body_basis * travel_turn_basis * trailing_basis * roll_basis).get_rotation_quaternion()
+		var t := minf(AERIAL_BODY_LEAN_SPEED * delta, 1.0)
+		var body_transform := visuals.global_transform
+		body_transform.basis = Basis(body_transform.basis.get_rotation_quaternion().slerp(target_rotation, t))
+		visuals.global_transform = body_transform
+	else:
+		# Capture the body's own current planar heading exactly once as input
+		# stops. The relaxed pose should return upright around THIS heading,
+		# never turn to face the camera merely because the active dive pose
+		# was camera-space.
+		if _aerial_was_moving or not _aerial_rest_heading_initialized:
+			var planar_forward := visuals.global_transform.basis.z
+			planar_forward.y = 0.0
+			if planar_forward.length_squared() > 0.001:
+				_aerial_rest_yaw = atan2(planar_forward.x, planar_forward.z)
+			else:
+				_aerial_rest_yaw = _body_yaw
+			_aerial_was_moving = false
+			_aerial_rest_heading_initialized = true
+		var t := minf(AERIAL_BODY_REST_SPEED * delta, 1.0)
+		var upright := Basis(Vector3.UP, _aerial_rest_yaw).get_rotation_quaternion()
+		var current_transform := visuals.global_transform
+		current_transform.basis = Basis(current_transform.basis.get_rotation_quaternion().slerp(upright, t))
+		visuals.global_transform = current_transform
+	# Rotating Visuals normally pivots around its feet. Restore the head
+	# after that rotation, making the neck/head junction the real visual
+	# pivot without changing the collision body's stable feet origin.
+	visuals.global_position += skull_anchor - _head.global_position
+	# The capsule follows the rendered body rather than standing upright
+	# under the pinned skull. A level flier can therefore skim the ground
+	# and slide along walls with its real silhouette, and a body swinging
+	# upright near the ground is pushed up onto its feet by ordinary
+	# collision recovery.
+	_fit_collision_to_body()
+	_sync_body_yaw_from_visuals()
+
+
+## Removing the flight suit mid-air eases the body upright toward the heading
+## it was flying, about the feet, rather than snapping. It slerps toward an
+## explicitly upright WORLD basis: clearing Euler X/Z independently could make
+## a steep flight basis decompose to the opposite Y solution and turn the
+## character around toward the camera.
+func _pose_body_flight_exit(delta: float, base_y: float) -> void:
+	visuals.rotation.y = _body_yaw
+	var t := minf(AERIAL_BODY_LEAN_SPEED * delta, 1.0)
+	var upright := Basis(Vector3.UP, _air_flight_exit_yaw).get_rotation_quaternion()
+	visuals.basis = Basis(visuals.basis.get_rotation_quaternion().slerp(upright, t))
+	var settle := visuals.position.lerp(Vector3(0.0, -FOOT_OFFSET, 0.0), t)
+	visuals.position = Vector3(settle.x, base_y, settle.z)
+	_air_flight_exit_recovery = maxf(_air_flight_exit_recovery - delta, 0.0)
+	_sync_body_yaw_from_visuals()
+
+
+## The dirt blorb suit's body, in the order its pivots depend on each other:
+## 1. Steering turns about the rider's centre of mass, not the rear axle that
+##    Visuals' own origin sits on once lifted: after the turn, shift so the
+##    spine's planar centre is back over the CharacterBody (per direct
+##    correction, "shift it forward to his center of mass").
+## 2. Out of a wheelie, pitch and any steering drift ease back to level.
+## 3. The wheel lift follows _body_base_height() as a change in height, so
+##    the translation from rotating about the spine or axle is preserved.
+## 4. The wheelie pitches about the rear axle (_apply_dirtbike_wheelie_pitch()).
+func _pose_body_dirtbike(delta: float, grounded: bool, base_y: float) -> void:
+	var spine_height_before := _spine.global_position.y
+	visuals.rotation.y = _body_yaw
+	if _body_yaw_steered:
+		var pivot := Vector3(global_position.x, spine_height_before, global_position.z)
+		visuals.global_position += pivot - _spine.global_position
+	if not _dirtbike_wheelie_active:
+		var rest_t := minf(DIRTBIKE_WHEELIE_SETTLE_SPEED*delta, 1.0)
+		visuals.rotation.x = lerp_angle(visuals.rotation.x, 0.0, rest_t)
+		visuals.position = visuals.position.lerp(Vector3(0.0, _dirtbike_visual_base_y, 0.0), rest_t)
+	visuals.rotation.z = 0.0
+	visuals.position.y += base_y - _dirtbike_visual_base_y
+	_apply_dirtbike_wheelie_pitch(delta, grounded)
+
+
+func _sync_body_yaw_from_visuals() -> void:
+	var planar_forward := visuals.global_basis.z
+	planar_forward.y = 0.0
+	if planar_forward.length_squared() > 0.001:
+		_body_yaw = atan2(planar_forward.x, planar_forward.z)
+
+
+## Turns the body to face `yaw` at once, for scripted placement (a spawn, a
+## test setup). Gameplay turning eases _body_yaw instead.
+func set_body_heading(yaw: float) -> void:
+	_body_yaw = yaw
+	visuals.rotation.y = yaw
 
 
 ## Re-poses the standing capsule so it follows the rendered body, keeping the
@@ -6828,7 +6822,7 @@ func _update_dirtbike_state(delta: float) -> void:
 	# Only lifecycle (build/free) here, deliberately not positioning -- this
 	# runs early in _physics_process (alongside _update_air_flight()), before
 	# _animate_walk()/_apply_dirtbike_pose() have posed this frame's ankle/
-	# wrist pivots (or _update_snow_visual_sink()'s own visuals lift) yet.
+	# wrist pivots (or _compose_body_pose() lifted the body onto the wheel) yet.
 	# Positioning happens at the very end of _physics_process instead (see
 	# _update_dirtbike_wheels(), called last), so the wheel reads this
 	# frame's fully-resolved pose rather than last frame's.
@@ -6885,7 +6879,7 @@ func _update_snowboard_state() -> void:
 		velocity.z=0.0
 		var heading:=_snowboard_last_heading
 		if heading.length_squared()>0.001:
-			visuals.rotation.y=atan2(heading.x,heading.z)
+			_body_yaw=atan2(heading.x,heading.z)
 		_snowboard_smoothed_up=Vector3.UP
 		_snowboard_smoothed_rider_grade=0.0
 	if _snowboard_active:
@@ -7041,7 +7035,7 @@ func _face_snowboard_heading(delta: float) -> void:
 		return
 	_snowboard_last_heading=planar.normalized()
 	var target_yaw:=atan2(_snowboard_last_heading.x,_snowboard_last_heading.z)+SNOWBOARD_BODY_SIDE_ANGLE
-	visuals.rotation.y=lerp_angle(visuals.rotation.y,target_yaw,rotation_speed*delta)
+	_body_yaw=lerp_angle(_body_yaw,target_yaw,rotation_speed*delta)
 
 
 ## The board and rider deliberately have separate pitch owners. Nose and tail
@@ -7050,6 +7044,8 @@ func _face_snowboard_heading(delta: float) -> void:
 ## the complete body. This is the same physical idea as a bike whose free end
 ## continues rotating around its supported contact, without making a rider
 ## rigidly copy every small terrain facet.
+## Called only by _compose_body_pose(), after the ground pose: tilts the
+## already-placed body to the slope while keeping the feet where they were.
 func _apply_snowboard_surface_orientation(delta: float,grounded: bool) -> void:
 	if not _snowboard_active:
 		return
@@ -7144,7 +7140,7 @@ func _build_dirtbike_wheel() -> MeshInstance3D:
 ## instead means the wheel simply goes wherever the rig already is, grounded
 ## or airborne, with zero extra logic needed for either case. The visible
 ## "rests on the ground" result for the REAR wheel instead comes from
-## _update_snow_visual_sink()'s own visuals lift (see DIRTBIKE_WHEEL_
+## the dirtbike lift in _body_base_height() (see DIRTBIKE_WHEEL_
 ## RADIUS's own comment): once the ankles sit one radius above the ordinary
 ## foot height, an axle centered exactly on them puts the wheel's own rim
 ## right back at that ordinary ground contact point. The mesh's own build
@@ -7222,7 +7218,7 @@ func _update_giant_goo_state(delta: float) -> void:
 	if _giant_anchor == giant:
 		global_position = giant.to_global(_giant_anchor_local_position)
 		var yaw_delta := wrapf(giant.global_rotation.y - _giant_anchor_yaw, -PI, PI)
-		visuals.rotation.y = wrapf(visuals.rotation.y + yaw_delta, -PI, PI)
+		_body_yaw = wrapf(_body_yaw + yaw_delta, -PI, PI)
 		camera_rig.rotation.y = wrapf(camera_rig.rotation.y + yaw_delta, -PI, PI)
 	# A hot-reloaded giant can retain the old solid world layer. Restore its
 	# throwable-only layer before move_and_slide(): gems still detect it, but

@@ -130,7 +130,7 @@ func _start_at_lakeside(world: Node, player: Player) -> void:
 	player.global_position = stand + Vector3.UP * Player.FOOT_OFFSET
 	# Face the water with the camera behind. Visuals faces its own +Z; the
 	# camera views along the rig's -Z.
-	player.visuals.rotation.y = atan2(toward_water.x, toward_water.z)
+	player.set_body_heading(atan2(toward_water.x, toward_water.z))
 	player.camera_rig.rotation.y = atan2(-toward_water.x, -toward_water.z)
 	player.velocity = Vector3.ZERO
 
