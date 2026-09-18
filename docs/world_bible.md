@@ -51,12 +51,12 @@ The player can call their whole party onto their own body at once, and dismiss t
 ### Checkpoint portals
 
 - A **checkpoint portal** is an upright ring of piping in a super-egg outline, tall enough for the hero to walk through, its opening filled with a swirling, space-like membrane tinted the body colour of one element's blorbs. Its rim is not solid; it is a threshold rather than an obstacle.
-- Passing through one with most of the body (walking, jumping, flying or swimming, from either side) sends away every blorb currently in the party (Blorbus excepted) and at once assembles a full suit of that element's blorbs onto the hero, each hopping into place. Where the element's suit has a helm, the head blorb arrives already carrying it: the Diving Helmet for Water, the Lava Helm for Fire, the Toboggan for Ice.
+- Passing through one with most of the body (walking, jumping, flying or swimming, from either side) sends away every blorb currently in the party (Blorbus excepted) and at once assembles a full suit of that element's blorbs onto the hero, each hopping into place. Where the element's suit has a helm, the head blorb arrives already carrying it: the Diving Helmet for Water, the Lava Helm for Fire, the Toboggan for both Ice and Snow, and the Bird Helm for Air.
 - Passing back through the portal whose suit is already worn changes nothing.
 
 ## Demo World
 
-- A standalone world outside the story's geography: one long valley that runs through a biome for every blorb suit with a clear traversal power, each entered through a checkpoint portal of that element. From west to east: an arrival clearing like the Crossroads' own (the hero wakes there with two Normal blorbs on his legs), then a plant grove (Plant), a deep lake with a wadeable bank (Water), a dirt track of mounds and rock ramps (Ground), a lava pool inside a basalt rim (Fire), a frozen lake (Ice), a snow mountain with its portal on the summit (Snow), and a field of tall stone spires (Air). It exists for demonstrating and testing each suit, and will grow as suits and biomes are added.
+- A standalone world outside the story's geography: one long valley that runs through a biome for every blorb suit with a clear traversal power, each entered through a checkpoint portal of that element. From west to east: an arrival clearing like the Crossroads' own (the hero wakes there with two Normal blorbs on his legs), then a plant grove (Plant), a deep natural lake with a narrow beach (Water), a dirt track of mounds and rock ramps (Ground), a lava pool inside a basalt rim (Fire), a frozen lake of solid ice over water set in a snowfield (Ice), a snow mountain with its portal on the summit (Snow), and a field of tall stone spires (Air). It exists for demonstrating and testing each suit, and will grow as suits and biomes are added.
 
 ## Elemental Gems
 

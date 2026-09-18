@@ -22,12 +22,18 @@ const START_RADIUS := 32.0
 
 const PLANT_ZONE := Vector2(60.0, 175.0)
 
+## Both lakes are NaturalLake basins (the game's own lake technique). They
+## share WATER_LEVEL: the terrain reports one water level for the whole world,
+## and the frozen lake's water lies beneath its ice at that same level, exactly
+## as the Ice Kingdom layers them. The level sits below the surrounding ground
+## so each basin's natural upper slope shows as a bank.
+const WATER_LEVEL := -1.6
 const LAKE_CENTER := Vector2(265.0, 0.0)
 const LAKE_RADIUS := 55.0
-const LAKE_FLOOR := -14.0
-## Just under the surrounding ground, so the shore reads as a bank rather than
-## water lapping at a seam in the grass.
-const WATER_LEVEL := -1.2
+const LAKE_EDGE_VARIATION := 9.0
+const LAKE_DEPTH := 14.0
+## An open lake's bank levels out just above the water: a narrow beach.
+const LAKE_SHELF := WATER_LEVEL + 0.35
 
 const DIRT_ZONE := Vector2(350.0, 470.0)
 
@@ -36,29 +42,39 @@ const LAVA_RADIUS := 40.0
 const LAVA_LEVEL := -0.6
 const LAVA_FLOOR := -5.0
 
-const ICE_CENTER := Vector2(700.0, 0.0)
-const ICE_RADIUS := 55.0
-const ICE_LEVEL := -0.8
+const ICE_CENTER := Vector2(715.0, 0.0)
+const ICE_RADIUS := 50.0
+const ICE_EDGE_VARIATION := 9.0
+const ICE_LAKE_DEPTH := 8.0
+## The Ice Kingdom's layering: bank shelf, the ice skin 3 cm beneath it (so the
+## shore occludes the ice edge), a 0.38 m sheet, and the water under it.
+const ICE_LEVEL := WATER_LEVEL + 0.45
+const ICE_SURFACE_LEVEL := ICE_LEVEL - 0.03
+const ICE_THICKNESS := 0.38
+## The frozen lake's surroundings are snowfield, as in the Ice Kingdom.
+const ICE_SNOWFIELD_RADIUS := ICE_RADIUS + 38.0
 
-const MOUNTAIN_CENTER := Vector2(870.0, 0.0)
+const MOUNTAIN_CENTER := Vector2(900.0, 0.0)
 const MOUNTAIN_RADIUS := 110.0
 ## A smoothstep profile peaks in steepness at ~0.75 rise/run (about 37 deg) at
 ## mid-slope: walkable to the summit without the snow suit, rideable down.
 const MOUNTAIN_HEIGHT := 58.0
 
-const AIR_ZONE := Vector2(1020.0, 1190.0)
+const AIR_ZONE := Vector2(1050.0, 1185.0)
 
 ## Every portal, in the order the valley reaches them. Each stands on the path
-## (z = 0) facing east, at the start of its biome.
+## (z = 0) facing east, at the start of its biome, clear of any lake bank or
+## lava rim so its pad is level ground. Ice and Snow both bring the Toboggan;
+## Air brings the Bird Helm.
 ## The snow portal's x is MOUNTAIN_CENTER.x: it stands on the summit.
 const PORTALS := [
 	{"element": "plant", "head_item": "", "x": 48.0},
-	{"element": "water", "head_item": "Diving Helmet", "x": 190.0},
-	{"element": "ground", "head_item": "", "x": 342.0},
+	{"element": "water", "head_item": "Diving Helmet", "x": 176.0},
+	{"element": "ground", "head_item": "", "x": 350.0},
 	{"element": "fire", "head_item": "Lava Helm", "x": 488.0},
 	{"element": "ice", "head_item": "Toboggan", "x": 628.0},
-	{"element": "snow", "head_item": "", "x": 870.0},
-	{"element": "air", "head_item": "", "x": 1002.0},
+	{"element": "snow", "head_item": "Toboggan", "x": 900.0},
+	{"element": "air", "head_item": "Bird Helm", "x": 1030.0},
 ]
 ## Ground portals sit on a small level pad so the ring's base meets the ground.
 const PORTAL_PAD_RADIUS := 5.0
@@ -68,8 +84,10 @@ const JUNGLE := Color(0.2, 0.45, 0.18)
 const LAKEBED := Color(0.62, 0.56, 0.4)
 const DIRT := Color(0.42, 0.28, 0.16)
 const BASALT := Color(0.18, 0.15, 0.14)
-const ICE := Color(0.74, 0.88, 0.96)
-const SNOW := Color(0.93, 0.95, 0.98)
+## The Ice Kingdom's lakebed blue beneath the ice.
+const FROZEN_LAKEBED := Color(0.48, 0.62, 0.72)
+## Canonical snow: the same white as snow blorbs, boards and snowfields.
+const SNOW := Color(0.94, 0.96, 0.98)
 const STONE := Color(0.52, 0.5, 0.47)
 
 var _nx: int
@@ -79,6 +97,8 @@ var _nz: int
 var _heights := PackedFloat32Array()
 var _noise := FastNoiseLite.new()
 var _rng := RandomNumberGenerator.new()
+var _water_lake := NaturalLake.new(LAKE_CENTER, LAKE_RADIUS, LAKE_EDGE_VARIATION, LAKE_DEPTH, LAKE_SHELF, 20260919)
+var _frozen_lake := NaturalLake.new(ICE_CENTER, ICE_RADIUS, ICE_EDGE_VARIATION, ICE_LAKE_DEPTH, ICE_LEVEL, 20260920)
 
 
 func _ready() -> void:
@@ -107,19 +127,16 @@ func _raw_height(x: float, z: float) -> float:
 	# Dirt track: rolling mounds across the path for jumps and wheelies.
 	var dirt_mask := smoothstep(DIRT_ZONE.x, DIRT_ZONE.x + 15.0, x) * (1.0 - smoothstep(DIRT_ZONE.y - 15.0, DIRT_ZONE.y, x))
 	height += dirt_mask * 3.2 * maxf(sin((x - DIRT_ZONE.x) * 0.08), 0.0) * (0.6 + 0.4 * cos(z * 0.05))
-	# Lake: a bowl from a wadeable shelf at the rim down to a deep floor.
-	var lake_distance := point.distance_to(LAKE_CENTER)
-	var lake_target := lerpf(LAKE_FLOOR, WATER_LEVEL - 1.9, smoothstep(LAKE_RADIUS * 0.35, LAKE_RADIUS, lake_distance))
-	height = lerpf(height, lake_target, 1.0 - smoothstep(LAKE_RADIUS, LAKE_RADIUS + 14.0, lake_distance))
+	# Lake: punched into the ground with an organic shore (NaturalLake).
+	height = _water_lake.carve(height, point)
 	# Lava pool: a sunken bowl inside a raised basalt rim.
 	var lava_distance := point.distance_to(LAVA_CENTER)
 	var rim := smoothstep(LAVA_RADIUS - 2.0, LAVA_RADIUS + 3.0, lava_distance) * (1.0 - smoothstep(LAVA_RADIUS + 3.0, LAVA_RADIUS + 12.0, lava_distance))
 	height += rim * 1.6
 	var lava_target := lerpf(LAVA_FLOOR, LAVA_LEVEL - 0.5, smoothstep(LAVA_RADIUS * 0.5, LAVA_RADIUS, lava_distance))
 	height = lerpf(height, lava_target, 1.0 - smoothstep(LAVA_RADIUS - 2.0, LAVA_RADIUS, lava_distance))
-	# Frozen lake: a level sheet of ice with a gentle bank.
-	var ice_distance := point.distance_to(ICE_CENTER)
-	height = lerpf(height, ICE_LEVEL, 1.0 - smoothstep(ICE_RADIUS, ICE_RADIUS + 10.0, ice_distance))
+	# Frozen lake: the same carve; its ice sheet is built over the basin.
+	height = _frozen_lake.carve(height, point)
 	# Snow mountain, smooth to its summit.
 	var mountain_distance := point.distance_to(MOUNTAIN_CENTER)
 	height = maxf(height, MOUNTAIN_HEIGHT * (1.0 - smoothstep(0.0, MOUNTAIN_RADIUS, mountain_distance)))
@@ -142,13 +159,13 @@ func _height_color(x: float, z: float, height: float) -> Color:
 	var point := Vector2(x, z)
 	if absf(z) > 125.0 or x < -70.0 or x > 1200.0:
 		return STONE.lerp(GRASS, 0.35)
-	if point.distance_to(MOUNTAIN_CENTER) < MOUNTAIN_RADIUS:
+	if _frozen_lake.coverage(point) > 0.12:
+		return FROZEN_LAKEBED
+	if is_snow_footstep_surface(point):
 		return SNOW
-	if point.distance_to(ICE_CENTER) < ICE_RADIUS + 3.0:
-		return ICE
 	if point.distance_to(LAVA_CENTER) < LAVA_RADIUS + 14.0:
 		return BASALT
-	if point.distance_to(LAKE_CENTER) < LAKE_RADIUS + 16.0 and height < WATER_LEVEL + 0.6:
+	if _water_lake.coverage(point) > 0.02 or (point.distance_to(LAKE_CENTER) < LAKE_RADIUS + NaturalLake.BANK_WIDTH and height < 0.2):
 		return LAKEBED
 	if x >= DIRT_ZONE.x - 8.0 and x <= DIRT_ZONE.y:
 		return DIRT
@@ -184,7 +201,7 @@ func get_mesh_normal(x: float, z: float) -> Vector3:
 
 
 func is_lake_area(pos: Vector2) -> bool:
-	return pos.distance_to(LAKE_CENTER) < LAKE_RADIUS + 8.0
+	return _water_lake.coverage(pos) > 0.08 or _frozen_lake.coverage(pos) > 0.08
 
 
 func get_lake_water_level() -> float:
@@ -208,16 +225,23 @@ func get_lava_escape_position(pos: Vector2) -> Vector3:
 	return Vector3(escape.x, get_mesh_height(escape.x, escape.y), escape.y)
 
 
+## As in the Ice Kingdom: inside the drawn ice, and only where the terrain has
+## actually descended to the sheet, so the ice hidden under the bank never
+## turns snow into a skating surface.
 func is_ice_surface(pos: Vector2) -> bool:
-	return pos.distance_to(ICE_CENTER) < ICE_RADIUS and get_mesh_height(pos.x, pos.y) <= ICE_LEVEL + 0.06
+	return _frozen_lake.is_within_surface(pos) and get_mesh_height(pos.x, pos.y) <= ICE_SURFACE_LEVEL + 0.06
 
 
 func get_ice_level() -> float:
-	return ICE_LEVEL
+	return ICE_SURFACE_LEVEL
 
 
+## Snow terrain: the mountain, and the snowfield around the frozen lake. This
+## is also what the snowboard rides; nothing else is snow.
 func is_snow_footstep_surface(pos: Vector2) -> bool:
-	return pos.distance_to(MOUNTAIN_CENTER) < MOUNTAIN_RADIUS
+	if pos.distance_to(MOUNTAIN_CENTER) < MOUNTAIN_RADIUS:
+		return true
+	return pos.distance_to(ICE_CENTER) < ICE_SNOWFIELD_RADIUS and not is_ice_surface(pos) and not is_lake_area(pos)
 
 
 func is_safe_zone(pos: Vector2) -> bool:
@@ -281,24 +305,12 @@ func _build_mesh_and_collision() -> void:
 	add_child(collider)
 
 
-## Visual liquid surfaces. Water and lava are not solid (swimming and lava
-## contact are gameplay queries above); the ice sheet is the terrain itself,
-## given a glossy skin here.
+## Liquid surfaces. Water and lava are not solid (swimming and lava contact are
+## gameplay queries above); the frozen lake's ice sheet and edge are.
 func _build_liquid_surfaces() -> void:
-	var water := StandardMaterial3D.new()
-	water.albedo_color = Color(0.16, 0.42, 0.62, 0.68)
-	water.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	water.roughness = 0.12
-	water.metallic = 0.12
-	water.cull_mode = BaseMaterial3D.CULL_DISABLED
-	_add_disc("Water", LAKE_CENTER, LAKE_RADIUS + 12.0, WATER_LEVEL, water)
+	_water_lake.build_water(self, WATER_LEVEL)
+	_frozen_lake.build_frozen(self, ICE_SURFACE_LEVEL, ICE_THICKNESS, WATER_LEVEL)
 	_add_disc("Lava", LAVA_CENTER, LAVA_RADIUS + 1.0, LAVA_LEVEL, NatureProps.build_lava_material())
-	var ice := StandardMaterial3D.new()
-	ice.albedo_color = Color(0.8, 0.93, 1.0, 0.35)
-	ice.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	ice.roughness = 0.05
-	ice.metallic = 0.2
-	_add_disc("IceSheen", ICE_CENTER, ICE_RADIUS, ICE_LEVEL + 0.02, ice)
 
 
 func _add_disc(label: String, center: Vector2, radius: float, y: float, material: Material) -> void:
@@ -412,16 +424,30 @@ func _scatter_dirt_track() -> void:
 		ramp_x += _rng.randf_range(16.0, 26.0)
 
 
+## Snow-laden conifers and rocks, styled after the Ice Kingdom's snow forest
+## and mountain: pines in canonical snow white with a tall alpine cedar for
+## roughly every five, on the mountain's shoulders and the frozen lake's
+## snowfield. The climb, the ride down and the lake itself stay clear.
 func _scatter_mountain_pines() -> void:
-	for index in 40:
-		var angle := _rng.randf_range(0.0, TAU)
-		var radius := _rng.randf_range(MOUNTAIN_RADIUS * 0.55, MOUNTAIN_RADIUS * 0.95)
-		var x := MOUNTAIN_CENTER.x + cos(angle) * radius
-		var z := MOUNTAIN_CENTER.y + sin(angle) * radius
-		# Keep the climb and the ride down along the path clear.
-		if absf(z) < 12.0:
+	for index in 70:
+		var point: Vector2
+		if index % 3 == 0:
+			var lake_angle := _rng.randf_range(0.0, TAU)
+			point = ICE_CENTER + Vector2(cos(lake_angle), sin(lake_angle)) * _rng.randf_range(ICE_RADIUS + 12.0, ICE_SNOWFIELD_RADIUS)
+		else:
+			var angle := _rng.randf_range(0.0, TAU)
+			point = MOUNTAIN_CENTER + Vector2(cos(angle), sin(angle)) * _rng.randf_range(MOUNTAIN_RADIUS * 0.3, MOUNTAIN_RADIUS * 0.95)
+		if absf(point.y) < 14.0 or is_lake_area(point) or is_ice_surface(point) or absf(point.y) > 110.0:
 			continue
-		_place(NatureProps.build_pine_tree(_rng.randf_range(6.0, 11.0), Color(0.16, 0.36, 0.26)), x, z)
+		var prop: Node3D
+		if index % 7 == 0:
+			prop = NatureProps.build_rock(_rng.randf_range(0.7, 2.2), true)
+		elif index % 5 == 0:
+			prop = NatureProps.build_alpine_cedar_tree(_rng.randf_range(16.0, 24.0), SNOW)
+		else:
+			prop = NatureProps.build_pine_tree(_rng.randf_range(5.5, 11.0), SNOW)
+		prop.rotation.y = _rng.randf_range(0.0, TAU)
+		_place(prop, point.x, point.y)
 
 
 ## Tall stone spires to fly between and land on.

@@ -217,6 +217,9 @@ const DIRTBIKE_JUMP_HEIGHT_MULTIPLIER := 1.25
 ## can still accumulate the high speed expected from a long mountain.
 const SNOWBOARD_ROLLING_RESISTANCE := 0.075
 const SNOWBOARD_ICE_RESISTANCE := 0.075
+## Deceleration (m/s^2) when a grounded board is on anything but snow: a
+## ~30 km/h run off the snow's edge stops within about a metre.
+const SNOWBOARD_OFF_SNOW_BRAKING := 40.0
 const SNOWBOARD_AIR_DRAG := 0.00032
 const SNOWBOARD_TUCK_DRAG_MULTIPLIER := 0.42
 const SNOWBOARD_TUCK_TERMINAL_MULTIPLIER := 1.22
@@ -2005,7 +2008,14 @@ func _physics_process(delta: float) -> void:
 			if direction.length() > 0.001
 			else 0.0
 		)
-	if _snowboard_active and grounded:
+	if _snowboard_active and grounded and not _is_snowboard_surface():
+		# Off snow the board does not slide at all: it grinds to a halt, and
+		# neither slope nor steering can push it.
+		ice_animation_speed = 0.0
+		var stopped:=Vector2(velocity.x,velocity.z).move_toward(Vector2.ZERO,SNOWBOARD_OFF_SNOW_BRAKING*delta)
+		velocity.x=stopped.x
+		velocity.z=stopped.y
+	elif _snowboard_active and grounded:
 		ice_animation_speed = 0.0
 		var aerodynamic_tuck:=_is_sprinting()
 		var support_normal: Vector3=terrain.get_mesh_normal(global_position.x,global_position.z)
@@ -6981,12 +6991,14 @@ static func ice_skate_visual_lift(scale_factor: float=1.0) -> float:
 	return ICE_SKATE_TOTAL_HEIGHT*scale_factor+maxf(blorb_sole_depth-human_sole_depth,0.0)
 
 
+## The snowboard rides literal snow terrain only (per direct instruction):
+## ice, grass, dirt and every other surface give it nothing to glide on.
 func _is_snowboard_surface() -> bool:
 	if terrain==null:
 		return false
 	var xz:=Vector2(global_position.x,global_position.z)
 	if terrain.has_method("is_ice_surface") and terrain.is_ice_surface(xz):
-		return _is_supported_by_ice()
+		return false
 	return (
 		terrain.has_method("is_snow_footstep_surface")
 		and terrain.is_snow_footstep_surface(xz)
