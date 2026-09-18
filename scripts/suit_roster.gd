@@ -2,10 +2,11 @@ class_name SuitRoster
 extends Node
 
 ## Owns several suit sets (see SuitLoadout) and swaps between them on the
-## hero. Only the worn set is in the party; every other set waits, parked
-## (Blorb.wait_here()) wherever it last hopped off, which is beside its own
-## checkpoint portal. A swap is physical in both directions: the worn blorbs
-## hop off and stay there, then the new set joins and hops on.
+## hero. A set not yet reached waits, parked (Blorb.wait_here()) beside its
+## checkpoint portal. A swap is physical: the worn blorbs hop off, then the new
+## set joins the party and hops on. The party only ever grows: blorbs that
+## hop off stay in it and keep following, so passing back through an earlier
+## portal reassigns the suit to blorbs already travelling with the hero.
 
 ## Farther than this from the hero, a joining blorb is brought alongside him
 ## before hopping on, rather than flying the whole distance. Only happens if
@@ -71,7 +72,6 @@ func switch_to(key: String) -> void:
 		for blorb in (_sets[_current]["blorbs"] as Array[Blorb]):
 			if is_instance_valid(blorb):
 				suit.remove_assignment_for_blorb(blorb)
-				blorb.wait_here()
 	var entry: Dictionary = _sets[key]
 	var slots: Array[String] = entry["slots"]
 	var blorbs: Array[Blorb] = entry["blorbs"]

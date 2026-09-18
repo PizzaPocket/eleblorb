@@ -2,17 +2,23 @@ extends Node3D
 
 ## The demo world (see DemoWorldTerrain): a playable tour of every suit with a
 ## clear traversal power, and the testing ground for movement modes. The hero
-## wakes in a clearing with two Normal blorbs, Xiao Hou Zi and Manchego, and
-## walks east. Each border between biomes is a gate of two one-way portals back
-## to back, facing apart: each biome's portal stands on the side you enter it
-## from, facing you, with its blorbs waiting there. Walking through a portal's
-## face swaps suits (the worn blorbs hop off and stay, the waiting ones hop on;
-## see SuitRoster); passing through the back of the other portal does nothing.
+## wakes in a clearing with five Normal blorbs, Xiao Hou Zi, Manchego and
+## Pandy, passes through forest plains where wild shiny blorbs roam, and walks
+## east. Each border between biomes is a gate of two one-way portals back to
+## back, facing apart: each biome's portal stands on the side you enter it
+## from, facing you, with its blorbs waiting there. Walking or riding through a
+## portal's face swaps suits (the worn blorbs hop off, the waiting ones join
+## and hop on; see SuitRoster); passing through the back of the other portal
+## does nothing. The party only grows: blorbs that hop off keep following.
 
 const XIAO_HOU_ZI_SCENE: PackedScene = preload("res://scenes/xiao_hou_zi.tscn")
 const JUNGLE_KINGDOM_FOLIAGE := preload("res://scripts/jungle_kingdom_foliage.gd")
 const MANCHEGO_SCENE: PackedScene = preload("res://scenes/manchego.tscn")
-const NORMAL_SLOTS: Array[String] = ["leg_left", "leg_right"]
+const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
+## The hero's five starting Normal blorbs, assigned everywhere but the head.
+const NORMAL_SLOTS: Array[String] = ["leg_left", "leg_right", "arm_left", "arm_right", "torso"]
+## Wild shiny blorbs roaming the forest plains (as in the Crossroads field).
+const FOREST_SHINY_COUNT := 5
 ## Half the gap between a gate's two portals: just over CheckpointPortal's
 ## TUBE_RADIUS (0.11), so their rings touch without intersecting.
 const GATE_HALF_GAP := 0.13
@@ -29,6 +35,9 @@ var _roster := SuitRoster.new()
 
 
 func _ready() -> void:
+	# Wild blorbs (the forest's shinies) only offer to join once Blorbus has
+	# awakened; the demo starts past that point so they can be recruited.
+	WorldState.blorbus_unlocked = true
 	_roster.name = "SuitRoster"
 	add_child(_roster)
 	_roster.setup(_player)
@@ -93,7 +102,7 @@ func _finish_loading() -> void:
 ## Every suit set, waiting on its own side of the first gate that leads into
 ## its biome, plus the hero's starting pair, Xiao Hou Zi and Manchego.
 func _build_party() -> void:
-	var normal := SuitLoadout.spawn_set(self, "", "", _player.global_position + Vector3(-2.5, 0.0, 0.0), NORMAL_SLOTS, 1.2)
+	var normal := SuitLoadout.spawn_set(self, "", "", _player.global_position + Vector3(-3.0, 0.0, 0.0), NORMAL_SLOTS, 1.8)
 	_roster.add_set("", normal, NORMAL_SLOTS)
 	for border_spec in DemoWorldTerrain.BORDERS:
 		var border: Dictionary = border_spec
@@ -104,6 +113,7 @@ func _build_party() -> void:
 		var blorbs := SuitLoadout.spawn_set(self, element, head_item, home)
 		_roster.add_set(element, blorbs, SuitLoadout.FULL_SUIT_SLOTS)
 	_roster.start_with("")
+	_spawn_forest_shinies()
 	var monkey := XIAO_HOU_ZI_SCENE.instantiate() as XiaoHouZi
 	monkey.in_party = true
 	monkey.position = _player.global_position + Vector3(-3.0, 0.0, 2.5)
@@ -113,3 +123,22 @@ func _build_party() -> void:
 	manchego.available_to_player = true
 	manchego.position = _player.global_position + Vector3(-4.0, 0.0, -3.0)
 	add_child(manchego)
+	var pandy := PANDY_SCENE.instantiate() as Pandy
+	pandy.in_party = true
+	pandy.position = _player.global_position + Vector3(-5.0, 0.0, 3.0)
+	add_child(pandy)
+
+
+## Wild, recruitable shiny blorbs wandering the forest plains, placed as the
+## Crossroads places its own (wilderness_scatter.gd's _place_wild_blorb()).
+func _spawn_forest_shinies() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 20260919
+	for index in FOREST_SHINY_COUNT:
+		var x := rng.randf_range(DemoWorldTerrain.FOREST_ZONE.x + 20.0, DemoWorldTerrain.FOREST_ZONE.y - 20.0)
+		var z := rng.randf_range(-80.0, 80.0)
+		var shiny: Blorb = SuitLoadout.BLORB_SCENE.instantiate()
+		shiny.in_party = false
+		shiny.is_shiny = true
+		shiny.position = _terrain.get_path_point(x, z)
+		add_child(shiny)

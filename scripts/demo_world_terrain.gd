@@ -7,6 +7,7 @@ extends StaticBody3D
 ## TerrainWindow onto the real kingdom's terrain (its own height and colour
 ## functions), rather than an imitation:
 ##   clearing  - the Crossroads' own hills, spawn flattening and grass
+##   forest    - the Crossroads' grass plains with its own forest clusters
 ##   plant     - a patch of the Primate Kingdom's jungle, 1:1
 ##   snow      - the Ice Kingdom's snowboard mountain and the ranges around
 ##               it, full size, turned so its authored run descends east
@@ -29,7 +30,7 @@ const ROCK_GROUND_KINGDOM_TERRAIN := preload("res://scripts/rock_ground_kingdom_
 const FIRE_KINGDOM_TERRAIN := preload("res://scripts/fire_kingdom_terrain.gd")
 
 const X_MIN := -140.0
-const X_MAX := 6700.0
+const X_MAX := 7090.0
 const Z_HALF := 170.0
 const SPACING := 5.0
 ## Windows that span the valley's full width extend this far across it, so
@@ -51,9 +52,17 @@ const START_FLATTEN_TRANSITION := 12.0
 const SWELL_AMPLITUDE := 4.0
 const SWELL_FREQUENCY := 0.004
 
+## Forest: the Crossroads' own grass plains, dressed with that world's forest
+## clusters (its tree species, undergrowth and pickable meadows) densely
+## enough to read as woodland, and home to wild shiny blorbs (see
+## demo_world.gd). Still the Normal suit's ground: shiny blorbs have no suit
+## power of their own yet.
+const FOREST_ZONE := Vector2(95.0, 440.0)
+const FOREST_CLUSTERS := 26
+
 ## Plant: the Primate Kingdom around this point, clear of its village and river.
 const PLANT_SOURCE := Vector2(-150.0, -170.0)
-const PLANT_CENTER := Vector2(230.0, 0.0)
+const PLANT_CENTER := Vector2(620.0, 0.0)
 const PLANT_HALF := Vector2(150.0, 110.0)
 
 ## Water and ice share WATER_LEVEL: the terrain reports one water level for
@@ -61,7 +70,7 @@ const PLANT_HALF := Vector2(150.0, 110.0)
 ## same level, exactly as the Ice Kingdom layers them.
 const WATER_LEVEL := -7.0
 ## The long lake: LAKE_RADIUS wide, LAKE_RADIUS * LAKE_STRETCH long each way.
-const LAKE_CENTER := Vector2(921.0, 0.0)
+const LAKE_CENTER := Vector2(1311.0, 0.0)
 const LAKE_RADIUS := 60.0
 const LAKE_STRETCH := 6.0
 const LAKE_EDGE_VARIATION := 9.0
@@ -72,7 +81,7 @@ const LAKE_SHELF := WATER_LEVEL + 0.35
 const WASTELAND := Color(0.565, 0.495, 0.4)
 
 ## The long frozen lake.
-const ICE_CENTER := Vector2(2167.0, 0.0)
+const ICE_CENTER := Vector2(2557.0, 0.0)
 const ICE_RADIUS := 70.0
 const ICE_STRETCH := 7.5
 const ICE_EDGE_VARIATION := 9.0
@@ -97,7 +106,7 @@ const SNOW := Color(0.94, 0.96, 0.98)
 ## climb averaging ~24 degrees rather than a wall.
 const MOUNTAIN_SOURCE_PEAK := Vector2(-790.0, -330.0)
 const MOUNTAIN_SOURCE_RUN_END := Vector2(-205.0, -102.0)
-const MOUNTAIN_START_X := 2900.0
+const MOUNTAIN_START_X := 3290.0
 const MOUNTAIN_CLIMB := 650.0
 const MOUNTAIN_RUN := 700.0
 const MOUNTAIN_END_BLEND := 450.0
@@ -106,22 +115,22 @@ const MOUNTAIN_END_BLEND := 450.0
 ## kept inside its border ranges: over terraces, through the town's flat
 ## shelf, across a wash, and side to side over its western halfpipe canyon.
 const DIRT_SOURCE := Vector2(0.0, 150.0)
-const DIRT_START_X := 4275.0
+const DIRT_START_X := 4665.0
 const DIRT_LENGTH := 840.0
 
 ## The course climbs across the ground zone to SKY_HEIGHT, near the clouds
 ## (the Clouds node's layer), holds there to the cliff edge, then plunges to
 ## CHASM_FLOOR. The far wall rises back to 0 at the volcanic lowland.
 const SKY_HEIGHT := 110.0
-const CLIFF_EDGE_X := 5160.0
+const CLIFF_EDGE_X := 5550.0
 const CHASM_FLOOR := -60.0
-const CHASM_FAR_WALL_X := 5840.0
+const CHASM_FAR_WALL_X := 6230.0
 const CLIFF_FACE_WIDTH := 25.0
 
 ## Fire: a full-size Fire Kingdom volcano, its lava-filled mouth centred in a
 ## window of that kingdom's volcanic lowland.
 const VOLCANO_SOURCE_POOL := Vector2(-190.0, -145.0)
-const VOLCANO_CENTER := Vector2(6262.0, 0.0)
+const VOLCANO_CENTER := Vector2(6652.0, 0.0)
 const VOLCANO_HALF_LENGTH := 360.0
 
 const STONE := Color(0.52, 0.5, 0.47)
@@ -133,13 +142,13 @@ const CLIFF_ROCK := Color(0.42, 0.4, 0.38)
 ## of Normal blorbs (element ""). Every gate stands on the path (z = 0) on a
 ## small level pad, clear of lake banks and windows.
 const BORDERS := [
-	{"x": 70.0, "west": "", "east": "plant"},
-	{"x": 400.0, "west": "plant", "east": "water"},
-	{"x": 1445.0, "west": "water", "east": "ice"},
-	{"x": 2890.0, "west": "ice", "east": "snow"},
-	{"x": 4265.0, "west": "snow", "east": "ground"},
-	{"x": 5130.0, "west": "ground", "east": "air"},
-	{"x": 5885.0, "west": "air", "east": "fire"},
+	{"x": 460.0, "west": "", "east": "plant"},
+	{"x": 790.0, "west": "plant", "east": "water"},
+	{"x": 1835.0, "west": "water", "east": "ice"},
+	{"x": 3280.0, "west": "ice", "east": "snow"},
+	{"x": 4655.0, "west": "snow", "east": "ground"},
+	{"x": 5520.0, "west": "ground", "east": "air"},
+	{"x": 6275.0, "west": "air", "east": "fire"},
 ]
 ## Ice and Snow bring the Toboggan; Air brings the Bird Helm.
 const HEAD_ITEMS := {
@@ -407,34 +416,90 @@ func _plane_height(a: Vector3, b: Vector3, c: Vector3, x: float, z: float) -> fl
 	return wa * a.y + wb * b.y + (1.0 - wa - wb) * c.y
 
 
+## Longest stretch of valley one render chunk covers. Chunks let the renderer
+## skip whatever is off screen, and let each biome keep its own material.
+const CHUNK_LENGTH := 300.0
+
+
+## Each biome's own terrain material, as its world builds it: the Crossroads
+## and Primate Kingdom shade ground like their foliage (fully metallic, fully
+## rough); the Ice, Rock/Ground and Fire Kingdoms use plain diffuse ground.
+## Keyed by the x at which each takes over, west to east.
+func _terrain_materials() -> Array:
+	return [
+		[X_MIN, _terrain_material(1.0, 1.0)],                      # clearing, forest, plant, lake
+		[float(BORDERS[2]["x"]), _terrain_material(0.0, 0.88)],    # ice, snow
+		[float(BORDERS[4]["x"]), _terrain_material(0.0, 0.94)],    # ground, sky cliff
+		[float(BORDERS[6]["x"]), _terrain_material(0.0, 0.96)],    # fire
+	]
+
+
+func _terrain_material(metallic: float, roughness: float) -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.vertex_color_use_as_albedo = true
+	material.metallic = metallic
+	material.roughness = roughness
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	return material
+
+
+## The terrain renders as chunks along the valley (each sharing its edge
+## column with the next, so there are no seams), and collides as one shape.
 func _build_mesh_and_collision() -> void:
+	var materials := _terrain_materials()
+	var cuts: Array[int] = [0]
+	for entry in materials.slice(1):
+		cuts.append(clampi(int(round((float(entry[0]) - X_MIN) / SPACING)), 1, _nx - 2))
+	cuts.append(_nx - 1)
+	var faces := PackedVector3Array()
+	for material_index in cuts.size() - 1:
+		var section_start := cuts[material_index]
+		var section_end := cuts[material_index + 1]
+		var step := maxi(int(CHUNK_LENGTH / SPACING), 1)
+		var chunk_start := section_start
+		while chunk_start < section_end:
+			var chunk_end := mini(chunk_start + step, section_end)
+			faces.append_array(_build_chunk(chunk_start, chunk_end, materials[material_index][1]))
+			chunk_start = chunk_end
+	var shape := ConcavePolygonShape3D.new()
+	shape.set_faces(faces)
+	shape.backface_collision = true
+	var collider := CollisionShape3D.new()
+	collider.shape = shape
+	add_child(collider)
+
+
+## One render chunk over grid columns ix0..ix1 (inclusive). Returns its
+## triangles for the shared collider.
+func _build_chunk(ix0: int, ix1: int, material: Material) -> PackedVector3Array:
+	var faces := PackedVector3Array()
+	var columns := ix1 - ix0 + 1
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for iz in _nz:
-		for ix in _nx:
+		for ix in range(ix0, ix1 + 1):
 			var vertex := _grid_vertex(ix, iz)
 			tool.set_color(_height_color(vertex.x, vertex.z, vertex.y))
 			tool.set_normal(get_mesh_normal(vertex.x, vertex.z))
 			tool.add_vertex(vertex)
 	for iz in _nz - 1:
-		for ix in _nx - 1:
-			var i0: int = iz * _nx + ix
-			for index in [i0, i0 + _nx, i0 + 1, i0 + 1, i0 + _nx, i0 + _nx + 1]:
+		for local_x in columns - 1:
+			var i0: int = iz * columns + local_x
+			for index in [i0, i0 + columns, i0 + 1, i0 + 1, i0 + columns, i0 + columns + 1]:
 				tool.add_index(index)
-	var material := StandardMaterial3D.new()
-	material.vertex_color_use_as_albedo = true
-	material.roughness = 0.92
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+			var ix := ix0 + local_x
+			var a := _grid_vertex(ix, iz)
+			var b := _grid_vertex(ix + 1, iz)
+			var c := _grid_vertex(ix, iz + 1)
+			var d := _grid_vertex(ix + 1, iz + 1)
+			for vertex in [a, c, b, b, c, d]:
+				faces.append(vertex)
 	tool.set_material(material)
-	var terrain_mesh := MeshInstance3D.new()
-	terrain_mesh.mesh = tool.commit()
-	add_child(terrain_mesh)
-	var shape := ConcavePolygonShape3D.new()
-	shape.set_faces(terrain_mesh.mesh.get_faces())
-	shape.backface_collision = true
-	var collider := CollisionShape3D.new()
-	collider.shape = shape
-	add_child(collider)
+	var chunk := MeshInstance3D.new()
+	chunk.name = "TerrainChunk_%d" % ix0
+	chunk.mesh = tool.commit()
+	add_child(chunk)
+	return faces
 
 
 ## Liquid surfaces. Water and lava are not solid (swimming and lava contact are
@@ -479,6 +544,7 @@ func _build_volcano_lava() -> void:
 # window mode (see demo_world.gd's Scatter node), not placed here.
 
 func _scatter_scenery() -> void:
+	_scatter_forest()
 	_scatter_lake_shore()
 	_scatter_mountain()
 	_scatter_snowfield()
@@ -493,6 +559,70 @@ func _place(node: Node3D, x: float, z: float) -> void:
 
 func _on_path(point: Vector2) -> bool:
 	return absf(point.y) < 8.0 or absf(point.y) > 108.0
+
+
+## The Crossroads' own forest clusters (wilderness_scatter.gd's
+## _forest_cluster()/_meadow_cluster() and their builders): round and pine
+## trees in that world's leaf colours with mushrooms, bushes and grass tufts
+## beneath, and meadows of pickable flowers. Weighted toward forest so the
+## plains read as woodland.
+func _scatter_forest() -> void:
+	var trees := [
+		func(): return NatureProps.build_round_tree(6.5, NatureProps.TREE_LEAF_COLORS[0]),
+		func(): return NatureProps.build_round_tree(7.2, NatureProps.TREE_LEAF_COLORS[1]),
+		func(): return NatureProps.build_round_tree(5.6, NatureProps.TREE_LEAF_COLORS[2]),
+		func(): return NatureProps.build_round_tree(6.9, NatureProps.TREE_LEAF_COLORS[3]),
+		func(): return NatureProps.build_pine_tree(7.6, NatureProps.TREE_LEAF_COLORS[1]),
+		func(): return NatureProps.build_pine_tree(6.8, NatureProps.TREE_LEAF_COLORS[3]),
+	]
+	var undergrowth := [
+		func(): return _mushroom("Red Mushroom"),
+		func(): return _mushroom("Tan Mushroom"),
+		func(): return NatureProps.build_bush(),
+		func(): return NatureProps.build_grass_tuft(),
+	]
+	var meadow := [
+		func(): return _flower("Red Flower"),
+		func(): return _flower("Yellow Flower"),
+		func(): return _flower("Purple Flower"),
+		func(): return NatureProps.build_grass_tuft(),
+		func(): return NatureProps.build_grass_tuft(Color(0.1, 0.65, 0.55)),
+	]
+	for cluster in FOREST_CLUSTERS:
+		var side := -1.0 if _rng.randf() < 0.5 else 1.0
+		var center := Vector2(_rng.randf_range(FOREST_ZONE.x + 15.0, FOREST_ZONE.y - 15.0), side * _rng.randf_range(12.0, 95.0))
+		var is_meadow := _rng.randf() < 0.25
+		var radius := _rng.randf_range(8.0, 16.0) if is_meadow else _rng.randf_range(12.0, 26.0)
+		var count := int(_rng.randf_range(12, 26)) if is_meadow else int(_rng.randf_range(8, 18))
+		for index in count:
+			var point := center + Vector2.from_angle(_rng.randf_range(0.0, TAU)) * radius * sqrt(_rng.randf())
+			if _on_path(point):
+				continue
+			var builders: Array = meadow if is_meadow else trees
+			var prop: Node3D = (builders[_rng.randi() % builders.size()] as Callable).call()
+			prop.rotation.y = _rng.randf_range(0.0, TAU)
+			_place(prop, point.x, point.y)
+		if not is_meadow:
+			for index in int(_rng.randf_range(4, 10)):
+				var point := center + Vector2.from_angle(_rng.randf_range(0.0, TAU)) * radius * 0.8 * sqrt(_rng.randf())
+				if _on_path(point):
+					continue
+				var decor: Node3D = (undergrowth[_rng.randi() % undergrowth.size()] as Callable).call()
+				_place(decor, point.x, point.y)
+
+
+func _flower(flower_name: String) -> FlowerPickup:
+	var pickup := FlowerPickup.new()
+	pickup.flower_name = flower_name
+	pickup.petal_color = NatureProps.FLOWER_COLORS[flower_name]
+	return pickup
+
+
+func _mushroom(mushroom_name: String) -> MushroomPickup:
+	var pickup := MushroomPickup.new()
+	pickup.mushroom_name = mushroom_name
+	pickup.cap_color = NatureProps.MUSHROOM_COLORS[mushroom_name]
+	return pickup
 
 
 func _scatter_lake_shore() -> void:

@@ -6518,6 +6518,22 @@ func body_center() -> Vector3:
 	return _collision_shape.global_position
 
 
+## Where the hero's own body is, for world triggers that care about the
+## suit-wearing hero passing through them (CheckpointPortal): his body centre
+## on foot, or his torso above the saddle while he rides a mount. null while
+## control rests with another body (Blorbus, Xiao Hou Zi, a party member).
+func suit_wearer_center() -> Variant:
+	if PartyControl.active_control_body() == self:
+		return body_center()
+	if _player_following_manchego and _mounted_rider == self and is_instance_valid(_controlled_manchego):
+		return _controlled_manchego.get_seat_transform().origin + Vector3.UP * RIDER_TORSO_ABOVE_SEAT
+	return null
+
+
+## A seated rider's centre of mass sits about this far above the saddle.
+const RIDER_TORSO_ABOVE_SEAT := 0.5
+
+
 ## Turns the body to face `yaw` at once, for scripted placement (a spawn, a
 ## test setup). Gameplay turning eases _body_yaw instead.
 func set_body_heading(yaw: float) -> void:

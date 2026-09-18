@@ -173,12 +173,13 @@ func _physics_process(_delta: float) -> void:
 		_player = get_tree().get_first_node_in_group("player") as Player
 		if _player == null:
 			return
-	# Only the human wears these suits; ignore bodies he is not controlling
-	# himself (possessing Blorbus, riding Manchego, piloting Xiao Hou Zi).
-	if PartyControl.active_control_body() != _player:
+	# Only the human wears these suits: on foot or riding a mount, but not
+	# while control rests with Blorbus, Xiao Hou Zi or another party member.
+	var center: Variant = _player.suit_wearer_center()
+	if center == null:
 		_has_last = false
 		return
-	var local := to_local(_player.body_center())
+	var local := to_local(center as Vector3)
 	if _has_last and _last_local.z != 0.0 and signf(local.z) != signf(_last_local.z) and local.distance_to(_last_local) < MAX_STEP:
 		var fraction := _last_local.z / (_last_local.z - local.z)
 		var crossing := _last_local.lerp(local, fraction)
