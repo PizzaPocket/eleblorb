@@ -99,19 +99,7 @@ func _install_test_loadout() -> void:
 		await _start_at_lakeside(world, player)
 
 func _set_test_level(blorb: Blorb) -> void:
-	if blorb == null or blorb.level >= TEST_LEVEL:
-		return
-	var snapshot := blorb.progression_snapshot()
-	for next_level in range(blorb.level+1,TEST_LEVEL+1):
-		snapshot["strength"] = int(snapshot["strength"])+1+(1 if next_level%4 == 0 else 0)
-		snapshot["defense"] = int(snapshot["defense"])+1+(1 if next_level%5 == 0 else 0)
-		snapshot["speed"] = int(snapshot["speed"])+1+(1 if next_level%6 == 0 else 0)
-		snapshot["max_hp"] = int(snapshot["max_hp"])+4+ceili(float(next_level)/5.0)
-		snapshot["max_mp"] = int(snapshot["max_mp"])+2+ceili(float(next_level)/8.0)
-	snapshot["level"] = TEST_LEVEL
-	snapshot["experience"] = 0
-	blorb.restore_progression(snapshot)
-
+	SuitLoadout.raise_to_level(blorb, TEST_LEVEL)
 
 
 func _start_at_lakeside(world: Node, player: Player) -> void:

@@ -2,12 +2,10 @@ extends Node
 
 ## Keeps the first scene deliberately tiny, so LoadingScreen can render before
 ## the asset-heavy world scene is read and instantiated.
-## TEMPORARY TEST OVERRIDE: boots straight into the Crossroads Kingdom, whose
-## scene carries crossroads_test_setup.gd for the current playtest (currently
-## the Bird Helm/Sky Kingdom work). Restore this to res://scenes/main.tscn
-## (already the case) or repoint it at another kingdom's own scene as the
-## focused test moves on.
-const WORLD_SCENE := "res://scenes/main.tscn"
+## Boots into the demo world: the movement testing ground with a checkpoint
+## portal and biome for every suit (see demo_world.gd). The Crossroads, the
+## story's own starting world, is res://scenes/main.tscn.
+const WORLD_SCENE := "res://scenes/demo_world.tscn"
 
 var _requested := false
 var _changing_scene := false

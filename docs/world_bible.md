@@ -48,6 +48,16 @@ The player can call their whole party onto their own body at once, and dismiss t
 
 - Any equipment or traversal form created by reshaping a blorb's own body—such as Ground wheels or a Snow snowboard—keeps that blorb element's exact body hue. This rule does not apply when a power summons separate environmental matter: Air platforms are actual clouds and therefore retain the world's natural cloud color rather than the Air blorb's body color.
 
+### Checkpoint portals
+
+- A **checkpoint portal** is an upright ring of piping in a super-egg outline, tall enough for the hero to walk through, its opening filled with a swirling, space-like membrane tinted the body colour of one element's blorbs. Its rim is not solid; it is a threshold rather than an obstacle.
+- Passing through one with most of the body (walking, jumping, flying or swimming, from either side) sends away every blorb currently in the party (Blorbus excepted) and at once assembles a full suit of that element's blorbs onto the hero, each hopping into place. Where the element's suit has a helm, the head blorb arrives already carrying it: the Diving Helmet for Water, the Lava Helm for Fire, the Toboggan for Ice.
+- Passing back through the portal whose suit is already worn changes nothing.
+
+## Demo World
+
+- A standalone world outside the story's geography: one long valley that runs through a biome for every blorb suit with a clear traversal power, each entered through a checkpoint portal of that element. From west to east: an arrival clearing like the Crossroads' own (the hero wakes there with two Normal blorbs on his legs), then a plant grove (Plant), a deep lake with a wadeable bank (Water), a dirt track of mounds and rock ramps (Ground), a lava pool inside a basalt rim (Fire), a frozen lake (Ice), a snow mountain with its portal on the summit (Snow), and a field of tall stone spires (Air). It exists for demonstrating and testing each suit, and will grow as suits and biomes are added.
+
 ## Elemental Gems
 
 - Used to turn a normal blorb into an elemental blorb (thrown into it; see the merge mechanic above). Some blorbs are also found already naturally elemental out in the world, without ever needing a gem thrown at them — see Blorbs, above.
@@ -192,4 +202,6 @@ Not yet established — flag these back to the user if a future task depends on 
 - Yogi's (see Domestic cats under Setting, above) personality, backstory, and any plot role — her home in the first town and physical design are established, but nothing else about her yet.
 - What watering the established Tree of Life changes, and why the Watering Can matters beyond that association.
 - Why the hero battles the peaceful merfolk Tidekeeper, what the battle entails, and how the Tidekeeper yields the Nautilus Crown afterward.
+- Whether checkpoint portals exist anywhere in the story's own world (see Checkpoint portals, under Blorbs, above), and what they are in the fiction; so far they appear only in the Demo World.
+- The Demo World has no biome or portal yet for Rock, Electric, City, Shiny, or Size blorbs: their suit powers either have no clear biome pairing or are not yet defined.
 - The Sky Kingdom (see Setting, above) is a deliberate first-pass prototype -- its island count/layout and its structures' exact look are still open, pending further design once the Bird Helm's own shape is settled through live testing. Its central plot quest is established in premise only: restoring the Sky Kingdom's own vaporized Air blorbs (see Setting, above) and, presumably, doing something about its rulers' own isolated, faintly resentful relationship to each other -- the actual step-by-step questline for either is not yet designed.

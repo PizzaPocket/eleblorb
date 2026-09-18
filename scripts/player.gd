@@ -6480,6 +6480,14 @@ func _sync_body_yaw_from_visuals() -> void:
 		_body_yaw = atan2(planar_forward.x, planar_forward.z)
 
 
+## The centre of the body's mass in world space: the collision capsule's
+## centre, which stands upright on the feet but follows the rendered body
+## level while flying or swimming (see _fit_collision_to_body()). World
+## triggers that care about "most of the body passed through" read this.
+func body_center() -> Vector3:
+	return _collision_shape.global_position
+
+
 ## Turns the body to face `yaw` at once, for scripted placement (a spawn, a
 ## test setup). Gameplay turning eases _body_yaw instead.
 func set_body_heading(yaw: float) -> void:
