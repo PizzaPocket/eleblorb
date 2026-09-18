@@ -30,7 +30,8 @@ var current_hp: float = MAX_HP
 signal breath_changed(current: float, max_value: float)
 const MAX_BREATH := 12.0
 const BREATH_DRAIN_RATE := 1.0
-const BREATH_REFILL_RATE := 6.0
+## A full meter in 0.4 s: surfacing for a gulp of air refills it almost at once.
+const BREATH_REFILL_RATE := 30.0
 const BREATH_DAMAGE_INTERVAL := 1.1
 const BREATH_DAMAGE_AMOUNT := 4.0
 var breath: float = MAX_BREATH
@@ -6458,7 +6459,16 @@ var _in_lava_area_now: bool = false
 ## deliberate carve-out. A future space/vacuum biome would extend this the
 ## same way, alongside water, not lava.
 func _in_airless_area() -> bool:
-	return _lake_buoyancy_active and not _in_lava_area_now
+	return _lake_buoyancy_active and not _in_lava_area_now and not _face_above_water()
+
+
+## Every water state (surface swimming included) runs through lake buoyancy,
+## so being in the water alone must not count as airless. The face centre is
+## the same point the wake intro frames. While swimming at the surface the
+## skull is pinned just above the waterline, so this breathes there.
+func _face_above_water() -> bool:
+	var face := _head.to_global(Vector3(0.0, ProceduralFigure.HEAD_SIZE.y, 0.0))
+	return face.y >= _active_swim_surface_height
 
 
 ## Per direct instruction: a breath meter that drains while in an airless
