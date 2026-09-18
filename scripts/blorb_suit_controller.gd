@@ -222,6 +222,16 @@ func resume_after_story() -> void:
 	_story_suspended = false
 
 
+## True while the suit is toggled on (worn, or its blorbs hopping on).
+func is_suit_on() -> bool:
+	return _suit_on
+
+
+## True while any blorb is still mid-hop onto or off the body.
+func is_transitioning() -> bool:
+	return not _transitions.is_empty()
+
+
 func is_story_suspended() -> bool:
 	return _story_suspended
 

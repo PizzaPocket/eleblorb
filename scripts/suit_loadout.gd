@@ -1,61 +1,40 @@
 class_name SuitLoadout
 extends RefCounted
 
-## Assembles a complete single-element blorb suit on the player: the testing
-## and demo counterpart of recruiting, gemming and assigning six blorbs by
-## hand. Used by CheckpointPortal and the demo world's opening loadout.
+## Builds suit sets: groups of blorbs of one element, one per suit slot, ready
+## for a SuitRoster to swap onto the hero. The testing and demo counterpart of
+## recruiting, gemming and assigning blorbs by hand.
 
 const BLORB_SCENE: PackedScene = preload("res://scenes/blorb.tscn")
 ## Special-traversal stats (skating, swimming, flight) scale with worn blorbs'
 ## Speed; a fresh level-1 suit would under-represent every power being tested.
 const TEST_LEVEL := 30
+const FULL_SUIT_SLOTS: Array[String] = ["head", "leg_left", "leg_right", "torso", "arm_left", "arm_right"]
 
 
-## Drops every current party blorb (Blorbus excepted: he is a character, not
-## suit material), then gives the player six new `element` blorbs assigned to
-## every slot and puts the suit on, so they visibly hop onto the body.
-## `head_item` is bound into the head blorb's core (a helm such as the Diving
-## Helmet or Lava Helm). An empty element makes plain Normal blorbs.
-static func assemble(player: Player, element: String, head_item: String = "") -> void:
-	var tree := player.get_tree()
-	var world := player.get_parent()
-	var suit := player.get_own_blorb_suit()
-	# Instant teardown of any worn suit, keeping nothing: the old blorbs leave.
-	suit.suspend_for_story()
-	suit.resume_after_story()
-	for slot in BlorbSuit.SLOT_ORDER:
-		suit.unequip_slot(slot)
-	for node in tree.get_nodes_in_group("blorbs"):
-		var old := node as Blorb
-		if old == null or not old.in_party or old.blorb_type == "size" or old.is_blorbus:
-			continue
-		for wearer in tree.get_nodes_in_group("party_playable_candidates"):
-			if wearer.has_method("get_own_blorb_suit"):
-				(wearer.get_own_blorb_suit() as BlorbSuitController).remove_assignment_for_blorb(old)
-		old.queue_free()
+## Spawns one `element` blorb per slot in a loose ring around `center`, at
+## TEST_LEVEL. `head_item` is bound into the head blorb's core (a helm such as
+## the Diving Helmet). An empty element makes plain Normal blorbs. Returned in
+## the order of `slots`, which is the order a SuitRoster assigns them.
+static func spawn_set(
+	world: Node, element: String, head_item: String, center: Vector3,
+	slots: Array[String] = FULL_SUIT_SLOTS, spread: float = 2.2
+) -> Array[Blorb]:
 	var created: Array[Blorb] = []
-	for index in BlorbSuit.SLOT_ORDER.size():
-		var slot: String = BlorbSuit.SLOT_ORDER[index]
+	for index in slots.size():
 		var blorb: Blorb = BLORB_SCENE.instantiate()
-		blorb.in_party = true
+		blorb.in_party = false
 		blorb.is_starter_trio = false
 		blorb.initial_element = element
-		if slot == "head" and head_item != "":
+		if slots[index] == "head" and head_item != "":
 			var items: Array[String] = [head_item]
 			blorb.core_items = items
-		# A ring around the player, so the hop onto the body reads clearly.
-		var angle := TAU * float(index) / float(BlorbSuit.SLOT_ORDER.size())
-		blorb.position = player.global_position + Vector3(cos(angle), 0.0, sin(angle)) * 1.8
+		var angle := TAU * float(index) / float(slots.size())
+		blorb.position = center + Vector3(cos(angle), 0.0, sin(angle)) * spread
 		world.add_child(blorb)
 		raise_to_level(blorb, TEST_LEVEL)
 		created.append(blorb)
-	# Let the new blorbs finish _ready() (element, body, party registration)
-	# before assigning them, and let the freed ones leave the tree.
-	await tree.process_frame
-	for index in created.size():
-		if is_instance_valid(created[index]):
-			suit.equip_to_slot(created[index], BlorbSuit.SLOT_ORDER[index])
-	suit.toggle()
+	return created
 
 
 ## Raises a blorb to `level` with the same per-level stat growth as earning it.

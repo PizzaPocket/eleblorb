@@ -34,6 +34,12 @@ func force_recovery_resources(minimum_fraction: float = 1.0) -> void:
 	_active_playable_id = PartyControl.HUMAN_ID
 
 
+## Forgets the captured party so the next spawn_into() restores nothing. For a
+## world that rebuilds its own party on every load (see demo_world.gd).
+func discard_roster() -> void:
+	_roster.clear()
+
+
 func capture_from_tree(tree: SceneTree) -> void:
 	_roster.clear()
 	_active_playable_id = PartyControl.active_member_id()

@@ -4,8 +4,9 @@ extends Node3D
 ## A checkpoint portal: an upright super-egg ring of noodle piping filled with
 ## a swirling membrane tinted in its element's blorb colour. Passing through
 ## it (most of the body, from either side, walking, jumping, flying or
-## swimming) swaps the whole blorb party for a complete suit of that element
-## (see SuitLoadout.assemble()).
+## swimming) emits `crossed`; a SuitRoster answers by swapping to that
+## element's suit set, which ignores the portal of the suit already worn.
+## Two portals set back to back make a border gate (see demo_world.gd).
 ##
 ## The ring is deliberately not solid, per direct instruction: it is a
 ## threshold to pass through, not an obstacle, so it is marked decorative
@@ -14,11 +15,11 @@ extends Node3D
 ## Local frame: the opening lies in the XY plane with its base on local y=0,
 ## and the portal is crossed along local Z. Rotate the node to aim it.
 
-## Element of the suit this portal assembles, e.g. "water"; its body colour
-## tints the membrane and ring.
+signal crossed(element: String)
+
+## Element of the suit this portal stands for, e.g. "water" ("" for Normal
+## blorbs); its body colour tints the membrane and ring.
 @export var element: String = ""
-## Core item bound into the head blorb, e.g. "Diving Helmet". Empty for none.
-@export var head_item: String = ""
 ## Half the opening's width and height. The default admits the human with room
 ## to spare above the head and at the shoulders.
 @export var half_width: float = 1.35
@@ -178,7 +179,7 @@ func _physics_process(_delta: float) -> void:
 		var fraction := _last_local.z / (_last_local.z - local.z)
 		var crossing := _last_local.lerp(local, fraction)
 		if _inside_opening(Vector2(crossing.x, crossing.y)):
-			_activate()
+			crossed.emit(element)
 	_last_local = local
 	_has_last = true
 
@@ -188,12 +189,3 @@ func _inside_opening(point: Vector2) -> bool:
 	var epsilon := EPSILON_TOP if above else EPSILON_BOTTOM
 	var reach := pow(absf(point.x / half_width), epsilon) + pow(absf((point.y - half_height) / half_height), epsilon)
 	return reach <= pow(PASS_FORGIVENESS, epsilon)
-
-
-func _activate() -> void:
-	# Passing back and forth through the same portal keeps the suit it gave.
-	if String(_player.get_meta(&"checkpoint_suit", "")) == element:
-		return
-	_player.set_meta(&"checkpoint_suit", element)
-	UISounds.play_foley(&"transform_reveal", 0.7, _player.get_instance_id())
-	SuitLoadout.assemble(_player, element, head_item)

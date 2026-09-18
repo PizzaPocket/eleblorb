@@ -1397,6 +1397,25 @@ func _add_core_light(color: Color) -> void:
 	_core_mesh_instance.add_child(light)
 
 
+## Parks this blorb out of the party where it stands: it idles and wanders
+## around this spot without following, noticing the hero or asking to join.
+## A suit roster's set waiting beside its checkpoint portal (SuitRoster).
+func wait_here() -> void:
+	in_party = false
+	can_join_party = false
+	_discovered = false
+	_bond_time = 0.0
+	_state = State.IDLE
+	_home = Vector2(global_position.x, global_position.z)
+	_has_wander_target = false
+
+
+## Undoes wait_here(): back in the party, following as a companion.
+func rejoin_party() -> void:
+	in_party = true
+	can_join_party = true
+
+
 ## Called by player.gd (_bounce_off_blorb()) the instant a jump/fall lands
 ## on top of this blorb. Sets the squash directly rather than easing into
 ## it -- an impact should read as instant -- and leaves springing back out

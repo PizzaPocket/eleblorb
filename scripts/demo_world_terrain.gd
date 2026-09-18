@@ -7,10 +7,12 @@ extends StaticBody3D
 ## collision and every gameplay height query, the same way the kingdoms'
 ## terrains do.
 ##
-## West to east: the arrival clearing, the plant grove, the lake (water), the
-## dirt track (ground), the lava pool (fire), the frozen lake (ice), the snow
-## mountain with its portal on the peak (snow), and the spire field (air).
-## Steep ground rises along both sides and both ends to close the valley.
+## West to east: the arrival clearing (Normal), the plant grove, the lake
+## (water), the frozen lake in its snowfield (ice), the snow mountain (snow),
+## the dirt track (ground), the spire field (air) and the lava pool (fire).
+## Each pair of neighbours meets at a border gate: two portals back to back,
+## the western biome's on its side and the eastern biome's on its side (see
+## BORDERS). Steep ground rises along both sides and both ends.
 
 const X_MIN := -140.0
 const X_MAX := 1240.0
@@ -20,7 +22,7 @@ const SPACING := 5.0
 const START_CENTER := Vector2(0.0, 0.0)
 const START_RADIUS := 32.0
 
-const PLANT_ZONE := Vector2(60.0, 175.0)
+const PLANT_ZONE := Vector2(58.0, 168.0)
 
 ## Both lakes are NaturalLake basins (the game's own lake technique). They
 ## share WATER_LEVEL: the terrain reports one water level for the whole world,
@@ -35,14 +37,14 @@ const LAKE_DEPTH := 14.0
 ## An open lake's bank levels out just above the water: a narrow beach.
 const LAKE_SHELF := WATER_LEVEL + 0.35
 
-const DIRT_ZONE := Vector2(350.0, 470.0)
+const DIRT_ZONE := Vector2(766.0, 890.0)
 
-const LAVA_CENTER := Vector2(560.0, 0.0)
+const LAVA_CENTER := Vector2(1100.0, 0.0)
 const LAVA_RADIUS := 40.0
 const LAVA_LEVEL := -0.6
 const LAVA_FLOOR := -5.0
 
-const ICE_CENTER := Vector2(715.0, 0.0)
+const ICE_CENTER := Vector2(438.0, 0.0)
 const ICE_RADIUS := 50.0
 const ICE_EDGE_VARIATION := 9.0
 const ICE_LAKE_DEPTH := 8.0
@@ -54,29 +56,36 @@ const ICE_THICKNESS := 0.38
 ## The frozen lake's surroundings are snowfield, as in the Ice Kingdom.
 const ICE_SNOWFIELD_RADIUS := ICE_RADIUS + 38.0
 
-const MOUNTAIN_CENTER := Vector2(900.0, 0.0)
+const MOUNTAIN_CENTER := Vector2(642.0, 0.0)
 const MOUNTAIN_RADIUS := 110.0
 ## A smoothstep profile peaks in steepness at ~0.75 rise/run (about 37 deg) at
 ## mid-slope: walkable to the summit without the snow suit, rideable down.
 const MOUNTAIN_HEIGHT := 58.0
 
-const AIR_ZONE := Vector2(1050.0, 1185.0)
+const AIR_ZONE := Vector2(906.0, 1025.0)
 
-## Every portal, in the order the valley reaches them. Each stands on the path
-## (z = 0) facing east, at the start of its biome, clear of any lake bank or
-## lava rim so its pad is level ground. Ice and Snow both bring the Toboggan;
-## Air brings the Bird Helm.
-## The snow portal's x is MOUNTAIN_CENTER.x: it stands on the summit.
-const PORTALS := [
-	{"element": "plant", "head_item": "", "x": 48.0},
-	{"element": "water", "head_item": "Diving Helmet", "x": 176.0},
-	{"element": "ground", "head_item": "", "x": 350.0},
-	{"element": "fire", "head_item": "Lava Helm", "x": 488.0},
-	{"element": "ice", "head_item": "Toboggan", "x": 628.0},
-	{"element": "snow", "head_item": "Toboggan", "x": 900.0},
-	{"element": "air", "head_item": "Bird Helm", "x": 1030.0},
+## Every border gate, west to east. Each names the suit on either side and the
+## head item that suit's head blorb carries. The first gate's western side is
+## the hero's starting pair of Normal blorbs (element ""). Every gate stands on
+## the path (z = 0) on level ground, clear of lake banks and the lava rim.
+## Ice and Snow bring the Toboggan; Air brings the Bird Helm.
+const BORDERS := [
+	{"x": 48.0, "west": "", "east": "plant"},
+	{"x": 176.0, "west": "plant", "east": "water"},
+	{"x": 352.0, "west": "water", "east": "ice"},
+	{"x": 522.0, "west": "ice", "east": "snow"},
+	{"x": 758.0, "west": "snow", "east": "ground"},
+	{"x": 898.0, "west": "ground", "east": "air"},
+	{"x": 1038.0, "west": "air", "east": "fire"},
 ]
-## Ground portals sit on a small level pad so the ring's base meets the ground.
+const HEAD_ITEMS := {
+	"water": "Diving Helmet",
+	"ice": "Toboggan",
+	"snow": "Toboggan",
+	"air": "Bird Helm",
+	"fire": "Lava Helm",
+}
+## Each gate sits on a small level pad so the rings' bases meet the ground.
 const PORTAL_PAD_RADIUS := 5.0
 
 const GRASS := Color(0.36, 0.58, 0.28)
@@ -142,11 +151,9 @@ func _raw_height(x: float, z: float) -> float:
 	height = maxf(height, MOUNTAIN_HEIGHT * (1.0 - smoothstep(0.0, MOUNTAIN_RADIUS, mountain_distance)))
 	# Level arrival clearing and portal pads.
 	height = lerpf(height, 0.0, 1.0 - smoothstep(START_RADIUS, START_RADIUS + 16.0, point.distance_to(START_CENTER)))
-	for portal in PORTALS:
-		var portal_x: float = portal["x"]
-		if is_equal_approx(portal_x, MOUNTAIN_CENTER.x):
-			continue
-		var pad := 1.0 - smoothstep(PORTAL_PAD_RADIUS, PORTAL_PAD_RADIUS + 4.0, point.distance_to(Vector2(portal_x, 0.0)))
+	for border in BORDERS:
+		var border_x: float = border["x"]
+		var pad := 1.0 - smoothstep(PORTAL_PAD_RADIUS, PORTAL_PAD_RADIUS + 4.0, point.distance_to(Vector2(border_x, 0.0)))
 		height = lerpf(height, 0.0, pad)
 	# Valley walls along both sides and at both ends.
 	height += smoothstep(115.0, 165.0, absf(z)) * 34.0
@@ -256,10 +263,9 @@ func get_start_point() -> Vector3:
 	return Vector3(START_CENTER.x, get_mesh_height(START_CENTER.x, START_CENTER.y), START_CENTER.y)
 
 
-## Where each portal stands: on the path at its x, on the summit for snow.
-func get_portal_position(portal: Dictionary) -> Vector3:
-	var x: float = portal["x"]
-	return Vector3(x, get_mesh_height(x, 0.0), 0.0)
+## A point on the ground at `x` along the path, offset `z` across it.
+func get_path_point(x: float, z: float = 0.0) -> Vector3:
+	return Vector3(x, get_mesh_height(x, z), z)
 
 
 # ---- Construction ------------------------------------------------------------
@@ -456,7 +462,7 @@ func _scatter_air_spires() -> void:
 		var point := _zone_point(AIR_ZONE, 8.0, 95.0)
 		var spire := NatureProps.build_rock_spire(_rng.randf_range(2.2, 4.2), _rng.randi_range(4, 8), _rng)
 		_place(spire, point.x, point.y)
-	for index in 4:
+	for index in 3:
 		var x := AIR_ZONE.x + 30.0 + float(index) * 38.0
 		var spire := NatureProps.build_rock_spire(_rng.randf_range(3.0, 4.5), _rng.randi_range(7, 10), _rng)
 		_place(spire, x, _rng.randf_range(-4.0, 4.0))
