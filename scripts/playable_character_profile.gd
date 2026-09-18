@@ -32,6 +32,7 @@ static func human() -> PlayableCharacterProfile:
 		"wear_blorb_suit": true,
 		"ride_mount": true,
 		"use_items": true,
+		"needs_breath": true,
 	}
 	profile.move_speed = 6.0
 	profile.sprint_multiplier = 1.6
@@ -56,6 +57,7 @@ static func xiao_hou_zi() -> PlayableCharacterProfile:
 		"ride_mount": true,
 		"use_items": true,
 		"summon_sun_wu_kong": true,
+		# No "needs_breath": a living stuffed animal never runs out of air.
 	}
 	# Exact values from the previously tuned Player-hosted monkey mode.
 	profile.move_speed = 2.5

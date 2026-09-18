@@ -625,8 +625,9 @@ func playable_switch_order() -> int:
 
 
 func take_damage(amount: float) -> void:
-	# Intentionally invincible for now. Keep the method as a compatibility
-	# target for combat callers without creating a hidden HP/faint path.
+	# Invincible by design: he is a beloved stuffed animal come to life (see
+	# docs/world_bible.md). Kept as a compatibility target for combat callers
+	# without creating a hidden HP/faint path.
 	pass
 
 

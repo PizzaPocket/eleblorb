@@ -6459,6 +6459,8 @@ var _in_lava_area_now: bool = false
 ## deliberate carve-out. A future space/vacuum biome would extend this the
 ## same way, alongside water, not lava.
 func _in_airless_area() -> bool:
+	if not has_playable_capability(&"needs_breath"):
+		return false
 	return _lake_buoyancy_active and not _in_lava_area_now and not _face_above_water()
 
 
