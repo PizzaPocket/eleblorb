@@ -77,10 +77,28 @@ var _registered_lava_surfaces:Array[Dictionary]=[]
 var _under_lava_environment:Environment
 var _lava_camera:Camera3D
 
-func _ready()->void:
-	collision_layer=1;collision_mask=0
+## Configures the noise every height/colour query depends on. In _init(), not
+## _ready(), so a detached instance (never added to a tree, so never building
+## its mesh) can be sampled: the demo world shows windows of this kingdom
+## through sample_height()/sample_color() (see TerrainWindow). A detached
+## instance also never builds its lava river centrelines, so it samples the
+## volcanoes and lowlands without the river channels.
+func _init()->void:
 	_noise.seed=20260912;_noise.frequency=0.012;_noise.fractal_octaves=4
 	_mountain_noise.seed=20261912;_mountain_noise.frequency=0.006;_mountain_noise.fractal_octaves=4
+
+
+## This kingdom's own continuous height and ground colour at a point.
+func sample_height(x:float,z:float)->float:
+	return _terrain_height(x,z)
+
+
+func sample_color(x:float,z:float)->Color:
+	return _color(Vector2(x,z))
+
+
+func _ready()->void:
+	collision_layer=1;collision_mask=0
 	_rng.seed=20260912
 	_build_river_centerlines()
 	_build_mesh_and_collision();_build_lava_pools();_build_lava_rivers();_build_fire_vents();_scatter_volcanic_rocks()

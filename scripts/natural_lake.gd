@@ -8,6 +8,9 @@ extends RefCounted
 ## opaque water colour) or the Ice Kingdom's frozen surface: a solid ice sheet
 ## with an ice edge wall, over water.
 ##
+## `stretch` elongates the lake along world X (a long lake running down a
+## valley): its shape is computed in a space where X is divided by stretch.
+##
 ## A terrain owns one of these per lake, folds carve() into its height
 ## function, and calls build_water()/build_frozen() once its own mesh exists.
 ## Both surfaces extend SURFACE_OVERLAP beneath the bank, so interpolated
@@ -31,13 +34,15 @@ var depth: float
 ## Height the bank descends to at the waterline: the ice level for a frozen
 ## lake, just above the water for an open one (a narrow beach).
 var shelf_level: float
+var stretch := 1.0
 var _noise := FastNoiseLite.new()
 
 
 func _init(
 	lake_center: Vector2, lake_radius: float, lake_edge_variation: float,
-	lake_depth: float, lake_shelf_level: float, noise_seed: int
+	lake_depth: float, lake_shelf_level: float, noise_seed: int, lake_stretch: float = 1.0
 ) -> void:
+	stretch = lake_stretch
 	center = lake_center
 	radius = lake_radius
 	edge_variation = lake_edge_variation
@@ -60,25 +65,49 @@ func edge_radius(relative: Vector2) -> float:
 	return radius + organic * edge_variation
 
 
+## `pos` relative to the centre, in the unstretched space the shape lives in.
+func _local(pos: Vector2) -> Vector2:
+	return Vector2((pos.x - center.x) / stretch, pos.y - center.y)
+
+
+## Back from the unstretched shape space to world XZ.
+func _world(local: Vector2) -> Vector2:
+	return center + Vector2(local.x * stretch, local.y)
+
+
 ## 0 outside the lake, rising to 1 across SHORE_FEATHER inside its edge.
 func coverage(pos: Vector2) -> float:
-	var edge := edge_radius(pos - center)
-	return 1.0 - smoothstep(edge - SHORE_FEATHER, edge, pos.distance_to(center))
+	var local := _local(pos)
+	var edge := edge_radius(local)
+	return 1.0 - smoothstep(edge - SHORE_FEATHER, edge, local.length())
 
 
 ## Folds the lake into a terrain height: surrounding ground banks down to the
 ## shelf, then the basin deepens toward the middle.
 func carve(ground_height: float, pos: Vector2) -> float:
-	var bank := 1.0 - smoothstep(radius, radius + BANK_WIDTH, pos.distance_to(center))
+	var bank := 1.0 - smoothstep(radius, radius + BANK_WIDTH, _local(pos).length())
 	var banked := lerpf(ground_height, shelf_level, bank)
 	var lake := coverage(pos)
 	return lerpf(banked, shelf_level - depth * lake, lake)
 
 
+## Distance from the centre in the lake's own (unstretched) shape space:
+## compare with radius, radius + BANK_WIDTH and so on for rings that follow a
+## stretched lake's outline.
+func local_distance(pos: Vector2) -> float:
+	return _local(pos).length()
+
+
+## The world point at `angle` on the ring `local_radius` from the centre, in
+## shape space: a stretched lake's rings are ellipses along X.
+func point_on_ring(angle: float, local_radius: float) -> Vector2:
+	return _world(Vector2(cos(angle), sin(angle)) * local_radius)
+
+
 ## True where the surface layers are drawn (the edge plus its overlap).
 func is_within_surface(pos: Vector2) -> bool:
-	var relative := pos - center
-	return relative.length() <= edge_radius(relative) + SURFACE_OVERLAP
+	var local := _local(pos)
+	return local.length() <= edge_radius(local) + SURFACE_OVERLAP
 
 
 ## An open lake: a non-solid water sheet in the Crossroads lake's opaque water
@@ -138,7 +167,8 @@ func _disc_triangles(y: float) -> PackedVector3Array:
 			var edge1 := edge_radius(d1) + SURFACE_OVERLAP
 			var quad: Array[Vector2] = [d0 * edge0 * inner, d1 * edge1 * inner, d0 * edge0 * outer, d1 * edge1 * outer]
 			for corner in [0, 1, 2, 1, 3, 2]:
-				triangles.append(Vector3(center.x + quad[corner].x, y, center.y + quad[corner].y))
+				var world := _world(quad[corner])
+				triangles.append(Vector3(world.x, y, world.y))
 	return triangles
 
 
@@ -167,8 +197,10 @@ func _build_ice_edge_wall(parent: StaticBody3D, top_level: float, thickness: flo
 		var d1 := Vector2(cos(a1), sin(a1))
 		var r0 := edge_radius(d0) + SURFACE_OVERLAP
 		var r1 := edge_radius(d1) + SURFACE_OVERLAP
-		var top0 := Vector3(center.x + d0.x * r0, top_level, center.y + d0.y * r0)
-		var top1 := Vector3(center.x + d1.x * r1, top_level, center.y + d1.y * r1)
+		var edge0 := _world(d0 * r0)
+		var edge1 := _world(d1 * r1)
+		var top0 := Vector3(edge0.x, top_level, edge0.y)
+		var top1 := Vector3(edge1.x, top_level, edge1.y)
 		var low0 := top0 - Vector3.UP * thickness
 		var low1 := top1 - Vector3.UP * thickness
 		for vertex in [top0, low0, top1, top1, low0, low1]:

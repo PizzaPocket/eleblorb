@@ -69,6 +69,21 @@ func level_to_edge() -> void:
 	height_offset = total / float(SAMPLES)
 
 
+## For a rectangular window wider than the ground it sits in (only its two
+## ends, across X, meet the surroundings): sets height_offset to the mean
+## source height along those two ends within `z_extent` of the centreline.
+func level_to_x_ends(z_extent: float) -> void:
+	var total := 0.0
+	var count := 0
+	for end in [-1.0, 1.0]:
+		for step in 9:
+			var z := lerpf(-z_extent, z_extent, float(step) / 8.0)
+			var q := to_source(target_center + Vector2(end * half_size.x, z))
+			total += float(sampler.sample_height(q.x, q.y))
+			count += 1
+	height_offset = total / float(count)
+
+
 func to_source(target: Vector2) -> Vector2:
 	return source_center + ((target - target_center) * scale).rotated(rotation)
 
