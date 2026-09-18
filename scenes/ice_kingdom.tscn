@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/kingdom_bootstrap.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
@@ -9,6 +9,8 @@
 [ext_resource type="Script" path="res://scripts/ice_kingdom_blorbs.gd" id="7"]
 [ext_resource type="Script" path="res://scripts/ice_kingdom_village.gd" id="8"]
 [ext_resource type="Script" path="res://scripts/elemental_kingdom_nme_spawner.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/ice_kingdom_ski_lift.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/ice_kingdom_test_setup.gd" id="11"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.35, 0.5, 0.68, 1)
@@ -59,6 +61,9 @@ nme_color = Color(0.58, 0.82, 0.96, 1)
 [node name="SnowVillage" type="Node3D" parent="."]
 script = ExtResource("8")
 
+[node name="SkiLift" type="Node3D" parent="."]
+script = ExtResource("10")
+
 [node name="Clouds" type="Node3D" parent="."]
 script = ExtResource("6")
 
@@ -68,3 +73,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 4)
 [node name="ReturnPortal" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3)
 script = ExtResource("4")
+
+[node name="IceKingdomTestSetup" type="Node" parent="."]
+script = ExtResource("11")

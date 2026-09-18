@@ -37,9 +37,9 @@ func _ready() -> void:
 
 func _spawn_wild_blorbs() -> void:
 	for i in WATER_COUNT:
-		_place("water")
+		_place("water" if i % 2 == 0 else "")
 	for i in AIR_COUNT:
-		_place("air")
+		_place("air" if i % 2 == 0 else "")
 
 
 func _place(element: String) -> void:

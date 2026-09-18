@@ -249,14 +249,59 @@ static func response_arrow() -> Control:
 	return ResponseArrow.new()
 
 
+## A single selectable word/phrase inside DialogUI's own Chinese-dialogue
+## passage view -- borderless at rest, so a whole line reads as flowing
+## text rather than an obvious grid of buttons, with the shared focus-ring
+## outline (the same one every other focusable control in this project
+## already uses) standing in for both mouse hover and gamepad/keyboard
+## focus, so "scrolling over" a phrase with either input method looks and
+## behaves the same way.
+static func chinese_word_button(text: String, on_pressed: Callable) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.flat = true
+	b.custom_minimum_size.y = UITheme.BUTTON_MIN_HEIGHT * 0.72
+	b.add_theme_font_size_override("font_size", UITheme.FONT_BODY)
+	b.add_theme_color_override("font_color", UITheme.TEXT_PRIMARY)
+	b.add_theme_color_override("font_hover_color", UITheme.TEXT_PRIMARY)
+	b.add_theme_color_override("font_pressed_color", UITheme.TEXT_PRIMARY)
+	b.add_theme_color_override("font_focus_color", UITheme.TEXT_PRIMARY)
+	var ring := UITheme.focus_ring_stylebox()
+	b.add_theme_stylebox_override(&"normal", StyleBoxEmpty.new())
+	b.add_theme_stylebox_override(&"disabled", StyleBoxEmpty.new())
+	b.add_theme_stylebox_override(&"hover", ring)
+	b.add_theme_stylebox_override(&"pressed", ring)
+	b.add_theme_stylebox_override(&"focus", ring)
+	b.mouse_entered.connect(b.grab_focus)
+	b.pressed.connect(on_pressed)
+	return b
+
+
+## The plain, non-selectable punctuation that sits between chinese_word_
+## button()s in the same passage -- a Label, not a disabled Button, so it
+## never steals a mouse-hover or gamepad focus stop of its own.
+static func chinese_punctuation_label(text: String) -> Label:
+	var l := Label.new()
+	l.text = text
+	l.add_theme_font_size_override("font_size", UITheme.FONT_BODY)
+	l.add_theme_color_override("font_color", UITheme.TEXT_SECONDARY)
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.custom_minimum_size.y = UITheme.BUTTON_MIN_HEIGHT * 0.72
+	return l
+
+
 ## Blorbus's two embedded eye markings, translated into the shared 2D
 ## superellipse language and driven by the same randomized EyeBlink clock
-## as every physical blorb. Used as the Inventory modal's living header.
+## as every physical blorb. Used as the Inventory modal's living header, and
+## (at a smaller `scale`) DialogUI's own Chinese-dialogue panel header --
+## see blorbus_eyes()'s own doc comment for that second use.
 class BlorbusEyes extends Control:
 	var blink_state := EyeBlink.new_state()
+	var eye_scale := 1.0
 
-	func _init() -> void:
-		custom_minimum_size = Vector2(UITheme.FONT_DISPLAY * 6.0, UITheme.FONT_DISPLAY * 2.10)
+	func _init(scale: float = 1.0) -> void:
+		eye_scale = scale
+		custom_minimum_size = Vector2(UITheme.FONT_DISPLAY * 6.0, UITheme.FONT_DISPLAY * 2.10) * scale
 		size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
@@ -268,9 +313,9 @@ class BlorbusEyes extends Control:
 		var openness := EyeBlink.openness(blink_state)
 		# Keep the original eye dimensions; positional separation is now 50%
 		# wider than the previous already-expanded spacing.
-		var eye_size := Vector2(UITheme.FONT_DISPLAY * 1.16, UITheme.FONT_DISPLAY * 1.56 * openness)
+		var eye_size := Vector2(UITheme.FONT_DISPLAY * 1.16, UITheme.FONT_DISPLAY * 1.56 * openness) * eye_scale
 		var center_y := size.y * 0.5
-		var spacing := UITheme.FONT_DISPLAY * 1.35 * 1.875
+		var spacing := UITheme.FONT_DISPLAY * 1.35 * 1.875 * eye_scale
 		for side in [-1.0, 1.0]:
 			var center := Vector2(size.x * 0.5 + side * spacing, center_y)
 			var rect := Rect2(center - eye_size * 0.5, eye_size)
@@ -279,8 +324,13 @@ class BlorbusEyes extends Control:
 			draw_colored_polygon(points, UITheme.BLORBUS_EYE)
 
 
-static func blorbus_eyes() -> Control:
-	return BlorbusEyes.new()
+## `scale` proportionately shrinks (or grows) both the eyes themselves and
+## their spacing together -- added for DialogUI's own Chinese-dialogue
+## panel, which per direct instruction reuses this exact "blorb eyes at the
+## top" header motif but at a smaller overall panel size ("the eyes will be
+## proportionately scaled down").
+static func blorbus_eyes(scale: float = 1.0) -> Control:
+	return BlorbusEyes.new(scale)
 
 
 ## A tab-switch button (InventoryUI's Items/Blorbs row, or any future view

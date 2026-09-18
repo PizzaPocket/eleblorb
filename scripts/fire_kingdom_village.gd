@@ -39,7 +39,9 @@ func _ready()->void:
 	for i in offsets.size():
 		var p:Vector2=center+offsets[i]
 		var roof:Color=Color(0.17,0.08,0.055).lerp(Color(0.48,0.13,0.045),float(i%3)/2.0)
-		var house:=TownProps.build_building(2,2,1,roof,Color(0.24,0.105,0.065),Color(0.34,0.12,0.055))
+		# add_bed=true per direct instruction ("put a bed in pretty much
+		# everyone's home").
+		var house:=TownProps.build_building(2,2,1,roof,Color(0.24,0.105,0.065),Color(0.34,0.12,0.055),TownProps.FLOOR_COLOR,Color(-1.0,-1.0,-1.0),"panel",true)
 		# The door occupies the +X bay of the south wall. Mount the fixture on
 		# the solid -X bay instead of floating it directly in front of the open
 		# doorway. Rotate local -Z (the doorway's outward normal) toward the
@@ -50,6 +52,8 @@ func _ready()->void:
 	_build_village_braziers(center)
 	_build_lava_fountain(center)
 	_spawn_lava_slide()
+	var inn_pos := center + Vector2(14.0, -45.0)
+	VillageInn.create(self,_terrain,Vector3(inn_pos.x,_terrain.get_mesh_height(inn_pos.x,inn_pos.y),inn_pos.y),"fire_kingdom","caldera_village_inn",25,"Ember Rest",Color(0.20,0.06,0.035),Color(0.30,0.10,0.055),FIRE_APPEARANCE,true)
 
 
 func _spawn_lava_slide() -> void:
@@ -87,7 +91,7 @@ func _build_village_braziers(center:Vector2)->void:
 		add_child(brazier)
 
 func _build_brazier()->Node3D:
-	var root:=Node3D.new()
+	var root:=StaticBody3D.new();root.collision_layer=1;root.collision_mask=0
 	var iron:=Color(0.10,0.075,0.065)
 	var post:=SuperEgg.build_part(Vector3(0.13,0.62,0.13),iron,SuperEgg.EPSILON_FLAT,SuperEgg.EPSILON_FLAT);post.position.y=0.62;root.add_child(post)
 	var bowl:=SuperEgg.build_part(Vector3(0.48,0.14,0.48),Color(0.075,0.055,0.05),2.0,SuperEgg.EPSILON_FLAT);bowl.position.y=1.25;root.add_child(bowl)
@@ -97,6 +101,9 @@ func _build_brazier()->Node3D:
 		var foot:=SuperEgg.build_part(Vector3(0.045,0.34,0.045),iron,SuperEgg.EPSILON_FLAT,SuperEgg.EPSILON_FLAT);foot.position=radial*0.23+Vector3.UP*0.25;foot.rotation.z=radial.x*0.48;foot.rotation.x=-radial.z*0.48;root.add_child(foot)
 	var flame:=_make_lava_particles(18,0.52,1.4,3.0,4.7,-1.0);flame.position.y=1.42;root.add_child(flame)
 	var light:=OmniLight3D.new();light.position.y=1.55;light.light_color=Color(1.0,0.28,0.055);light.light_energy=1.4;light.omni_range=12.0;light.shadow_enabled=false;root.add_child(light)
+	CollisionPolicy.add_cylinder(root,post,0.15,1.24,post.position,false)
+	CollisionPolicy.add_cylinder(root,bowl,0.48,0.28,bowl.position,true)
+	CollisionPolicy.mark_decorative(flame)
 	return root
 
 func _add_wall_fire_fixture(house:Node3D,local_position:Vector3)->void:
@@ -126,12 +133,16 @@ func _build_lava_fountain(center:Vector2)->void:
 		var chord:=2.0*RADIUS*sin((a1-a0)*0.5);var tangent:=Vector3(-sin(mid),0.0,cos(mid));var radial:=Vector3(cos(mid),0.0,sin(mid));var pos:=radial*RADIUS+Vector3.UP*0.38
 		var basis:=Basis(tangent,Vector3.UP,radial)
 		var rim:=SuperEgg.build_part(Vector3(chord*0.55,0.38,0.30),Color(0.085,0.065,0.06),SuperEgg.EPSILON_FLAT,SuperEgg.EPSILON_FLAT);rim.position=pos;rim.basis=basis;fountain.add_child(rim)
-		var collision:=CollisionShape3D.new();var shape:=BoxShape3D.new();shape.size=Vector3(chord*1.08,0.76,0.66);collision.shape=shape;collision.position=pos;collision.basis=basis;fountain.add_child(collision)
+		CollisionPolicy.add_box(fountain,rim,Vector3(chord*1.08,0.76,0.66),pos,basis,true)
 	var lava_mesh:=CylinderMesh.new();lava_mesh.top_radius=RADIUS-0.32;lava_mesh.bottom_radius=RADIUS-0.32;lava_mesh.height=0.08;lava_mesh.radial_segments=36;lava_mesh.material=NatureProps.build_lava_material()
 	var lava:=MeshInstance3D.new();lava.mesh=lava_mesh;lava.position.y=0.58;fountain.add_child(lava)
 	var pedestal:=SuperEgg.build_part(Vector3(0.72,1.0,0.72),Color(0.08,0.06,0.055),SuperEgg.EPSILON_SOFT,SuperEgg.EPSILON_FLAT);pedestal.position.y=1.0;fountain.add_child(pedestal)
+	CollisionPolicy.add_cylinder(fountain,pedestal,0.72,2.0,pedestal.position,true)
+	CollisionPolicy.mark_hazard(lava)
 	var plume:=_make_lava_particles(90,1.0,2.4,7.0,10.0,-9.5);plume.position.y=1.9;fountain.add_child(plume)
+	CollisionPolicy.mark_decorative(plume)
 	var light:=OmniLight3D.new();light.position.y=2.3;light.light_color=Color(1.0,0.26,0.045);light.light_energy=2.5;light.omni_range=28.0;light.shadow_enabled=false;fountain.add_child(light)
+	CollisionPolicy.validate_body(fountain)
 	add_child(fountain)
 
 func _make_lava_particles(amount:int,width:float,height:float,min_speed:float,max_speed:float,gravity_y:float)->GPUParticles3D:

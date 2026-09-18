@@ -266,9 +266,17 @@ STATUS_VARIABLES_WITH_LOADER = STATUS_VARIABLES + """
 \t\tstatusPhase.textContent = text;
 \t\tif (Number.isFinite(progress)) {
 \t\t\tstatusProgress.max = 1;
-\t\t\tstatusProgress.value = Math.max(0, Math.min(1, progress));
+\t\t\tstatusProgress.dataset.target = String(Math.max(0, Math.min(1, progress)));
 \t\t}
 \t};
+\t(function animateEleblorbProgress() {
+\t\tconst target = Number(statusProgress.dataset.target || statusProgress.value || 0);
+\t\tif (Number.isFinite(target)) {
+\t\t\tconst current = Number(statusProgress.value || 0);
+\t\t\tstatusProgress.value = current + (target - current) * 0.08;
+\t\t}
+\t\trequestAnimationFrame(animateEleblorbProgress);
+\t})();
 \twindow.eleblorbWorldReady = function () {
 \t\twindow.eleblorbLoadingPhase('Ready', 1);
 \t\trequestAnimationFrame(() => requestAnimationFrame(() => {
@@ -289,15 +297,16 @@ PROGRESS_AND_LOADER_VISIBILITY = """\t\tstatusProgress.style.display = mode === 
 WHOLE_LAUNCH_PROGRESS = """\t\t\t'onProgress': function (current, total) {
 \t\t\t\tif (current > 0 && total > 0) {
 \t\t\t\t\tconst ratio = Math.min(current / total, 1);
-\t\t\t\t\twindow.eleblorbLoadingPhase(ratio >= 1 ? 'Starting Eleblorbs…' : 'Downloading Eleblorbs…', ratio * 0.9);
+\t\t\t\t\twindow.eleblorbLoadingPhase(ratio >= 1 ? 'Starting Eleblorbs…' : 'Downloading Eleblorbs…', ratio * 0.55);
 \t\t\t\t} else {
+\t\t\t\t\tdelete statusProgress.dataset.target;
 \t\t\t\t\tstatusProgress.removeAttribute('value');
 \t\t\t\t\tstatusPhase.textContent = 'Preparing Eleblorbs…';
 \t\t\t\t}
 \t\t\t},"""
 
 WAIT_FOR_WORLD = """\t\t}).then(() => {
-\t\t\twindow.eleblorbLoadingPhase('Building the world…', 0.92);"""
+\t\t\twindow.eleblorbLoadingPhase('Loading the world…', 0.55);"""
 
 
 def replace_once(source: str, old: str, new: str, label: str) -> str:

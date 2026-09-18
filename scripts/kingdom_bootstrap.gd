@@ -27,6 +27,7 @@ func _ready() -> void:
 
 func _finish_arrival() -> void:
 	await get_tree().process_frame
+	await LoadingScreen.wait_for_world_builds()
 	_snap_portal_to_ground()
 	# Negated from the portal's own basis.z -- see player.gd's own doc
 	# comment on camera_rig for why: the player's rotation is never touched
@@ -38,8 +39,16 @@ func _finish_arrival() -> void:
 	# lands on flips the portal to the opposite side instead -- out of the
 	# camera's way -- with zero rotation changes anywhere.
 	var facing := -_return_portal.global_transform.basis.z
+	if RecoveryManager.has_pending_recovery():
+		var fallback := _return_portal.global_transform
+		fallback.origin = _return_portal.global_position - facing * 3.0
+		await RecoveryManager.finish_scene_recovery(self, fallback)
+		KingdomTravel.pending_gate_id = ""
+		LoadingScreen.complete()
+		return
 	_player.global_position = _return_portal.global_position - facing * 3.0
 	Party.spawn_into(self, _player.global_position, facing)
+	HumongousState.finish_arrival.call_deferred(self, _player.global_position, facing)
 	KingdomTravel.pending_gate_id = ""
 	LoadingScreen.complete()
 

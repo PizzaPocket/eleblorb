@@ -1,6 +1,13 @@
 class_name Pandy
 extends StaticBody3D
 
+
+func party_role_capabilities() -> Dictionary:
+	# Pandy is deliberately a companion today. These flags are data rather
+	# than an inheritance choice so a story upgrade can make him playable or
+	# mountable without replacing his party identity.
+	return {"playable": false, "mount": false, "summon": false}
+
 ## The giant panda companion the Chinese village's farmer hands over once
 ## the player delegates rule of the village to him -- see chinese_village.
 ## gd's own _build_farmer_and_pandy_quest(). Ambient and visible near the
@@ -20,6 +27,7 @@ extends StaticBody3D
 
 const COAT_COLOR := Color(0.96, 0.96, 0.94)
 const MARKING_COLOR := Color(0.08, 0.08, 0.09)
+const EYE_COLOR := Color(0.16, 0.085, 0.035)
 const FOLLOW_DISTANCE := 4.5
 const ROTATION_SPEED := 5.0
 const LOOK_DISTANCE := 16.0
@@ -97,7 +105,7 @@ func _build_panda(root: Node3D) -> void:
 		patch.position = Vector3(side * 0.19, 0.06, -0.385)
 		patch.rotation.z = side * 0.28
 		_head.add_child(patch)
-		var eye := SuperEgg.build_part(Vector3(0.038, 0.052, 0.025), Color(0.92, 0.82, 0.38), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+		var eye := SuperEgg.build_part(Vector3(0.038, 0.052, 0.025), EYE_COLOR, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
 		eye.position = Vector3(side * 0.19, 0.07, -0.425)
 		_head.add_child(eye)
 		_eyes.append(eye)
@@ -115,7 +123,7 @@ func _build_panda(root: Node3D) -> void:
 	var nose := SuperEgg.build_part(Vector3(0.075, 0.055, 0.045), MARKING_COLOR, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
 	nose.position = Vector3(0, -0.02, -0.50)
 	_head.add_child(nose)
-	var tail := SuperEgg.build_part(Vector3(0.18, 0.18, 0.18), COAT_COLOR, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+	var tail := SuperEgg.build_part(Vector3(0.18, 0.18, 0.18), MARKING_COLOR, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
 	tail.position = Vector3(0, 0.78, 0.88)
 	root.add_child(tail)
 
@@ -125,6 +133,8 @@ func _build_panda(root: Node3D) -> void:
 ## footprint.
 func _ground_y(x: float, z: float) -> float:
 	if Vector2(x, z).distance_to(CHINESE_VILLAGE_CENTER) < CHINESE_VILLAGE_ABYSS_SAFE_RADIUS:
+		if _terrain != null and _terrain.has_method("get_chinese_village_island_surface_y"):
+			return _terrain.get_chinese_village_island_surface_y()
 		return CHINESE_VILLAGE_ISLAND_Y
 	if _terrain != null and _terrain.has_method("get_mesh_height"):
 		return _terrain.get_mesh_height(x, z)
@@ -156,7 +166,10 @@ func _process(delta: float) -> void:
 	global_position.z = new_here.y
 	global_position.y = _ground_y(new_here.x, new_here.y)
 	if to_player.length() > 0.01:
-		var target_angle: float = atan2(to_player.x, to_player.y)
+		# Pandy's face is authored toward local -Z (the head and muzzle both sit
+		# on that side), opposite the shared humanoid +Z convention. Include the
+		# half-turn here so his nose—not his tail—leads his follow movement.
+		var target_angle: float = atan2(to_player.x, to_player.y) + PI
 		rotation.y = lerp_angle(rotation.y, target_angle, ROTATION_SPEED * delta)
 	_update_idle_animation(delta, moving)
 

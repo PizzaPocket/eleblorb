@@ -286,7 +286,7 @@ body.gamepad-connected .loader-controller { display: flex; }
 
 		<script src="index.js"></script>
 		<script>
-const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":4203328,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":4306468,"index.wasm":39513091},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
 
@@ -347,9 +347,17 @@ const engine = new Engine(GODOT_CONFIG);
 		statusPhase.textContent = text;
 		if (Number.isFinite(progress)) {
 			statusProgress.max = 1;
-			statusProgress.value = Math.max(0, Math.min(1, progress));
+			statusProgress.dataset.target = String(Math.max(0, Math.min(1, progress)));
 		}
 	};
+	(function animateEleblorbProgress() {
+		const target = Number(statusProgress.dataset.target || statusProgress.value || 0);
+		if (Number.isFinite(target)) {
+			const current = Number(statusProgress.value || 0);
+			statusProgress.value = current + (target - current) * 0.08;
+		}
+		requestAnimationFrame(animateEleblorbProgress);
+	})();
 	window.eleblorbWorldReady = function () {
 		window.eleblorbLoadingPhase('Ready', 1);
 		requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -448,14 +456,15 @@ const engine = new Engine(GODOT_CONFIG);
 			'onProgress': function (current, total) {
 				if (current > 0 && total > 0) {
 					const ratio = Math.min(current / total, 1);
-					window.eleblorbLoadingPhase(ratio >= 1 ? 'Starting Eleblorbs…' : 'Downloading Eleblorbs…', ratio * 0.9);
+					window.eleblorbLoadingPhase(ratio >= 1 ? 'Starting Eleblorbs…' : 'Downloading Eleblorbs…', ratio * 0.55);
 				} else {
+					delete statusProgress.dataset.target;
 					statusProgress.removeAttribute('value');
 					statusPhase.textContent = 'Preparing Eleblorbs…';
 				}
 			},
 		}).then(() => {
-			window.eleblorbLoadingPhase('Building the world…', 0.92);
+			window.eleblorbLoadingPhase('Loading the world…', 0.55);
 		}, displayFailureNotice);
 	}
 }());

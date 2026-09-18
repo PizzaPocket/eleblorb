@@ -1,6 +1,14 @@
 class_name Manchego
 extends StaticBody3D
 
+
+func party_role_capabilities() -> Dictionary:
+	return {"playable": false, "mount": true, "summon": false}
+
+
+func can_be_mounted_by(rider: Node) -> bool:
+	return available_to_player and PartyControl.member_capability(rider, &"ride_mount")
+
 ## Manchego, the Primate Kingdom's horse mount (see docs/world_bible.md's
 ## own Mounts section) -- spawned in the Primate Kingdom's own village (see
 ## jungle_kingdom_village.gd's own _build_manchego_and_quest_ape()), idling
@@ -192,6 +200,9 @@ func set_available_to_player(value: bool) -> void:
 
 func _on_ride() -> void:
 	if is_player_controlled or not available_to_player:
+		return
+	var rider := PartyControl.active_member()
+	if not can_be_mounted_by(rider):
 		return
 	(_player as Player).start_riding_manchego(self)
 

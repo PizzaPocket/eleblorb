@@ -97,12 +97,18 @@ static func build_mesh_from_rings(rings: Array, ring_colors: Array[Color] = []) 
 			var a1: Vector3 = ring_a[seg_next]
 			var b0: Vector3 = ring_b[seg]
 			var b1: Vector3 = ring_b[seg_next]
+			# Match SuperEgg.build_mesh()'s established clockwise surface
+			# convention. These rings advance around their circumference in the
+			# opposite parametric direction from SuperEgg's sin/cos rings, so
+			# copying its index order verbatim inverted the generated normals.
+			# Translucent goo hid that mistake because its material is double-sided;
+			# the opaque Rock-suit material made the inward lighting obvious.
 			_add_colored_vertex(st, a0, color_a, has_colors)
-			_add_colored_vertex(st, b0, color_b, has_colors)
-			_add_colored_vertex(st, a1, color_a, has_colors)
 			_add_colored_vertex(st, a1, color_a, has_colors)
 			_add_colored_vertex(st, b0, color_b, has_colors)
+			_add_colored_vertex(st, a1, color_a, has_colors)
 			_add_colored_vertex(st, b1, color_b, has_colors)
+			_add_colored_vertex(st, b0, color_b, has_colors)
 	# Most blorb profiles close into zero-radius poles. A few deliberately
 	# shaped forms (the knight helm's flat crown/guard) terminate in a real
 	# ring instead; cap only those rings so they remain a single closed mesh
@@ -133,12 +139,12 @@ static func _add_ring_cap(st: SurfaceTool, ring: Array, bottom: bool, color: Col
 		var next := (i + 1) % ring.size()
 		if bottom:
 			_add_colored_vertex(st, center, color, has_color)
-			_add_colored_vertex(st, ring[next] as Vector3, color, has_color)
 			_add_colored_vertex(st, ring[i] as Vector3, color, has_color)
+			_add_colored_vertex(st, ring[next] as Vector3, color, has_color)
 		else:
 			_add_colored_vertex(st, center, color, has_color)
-			_add_colored_vertex(st, ring[i] as Vector3, color, has_color)
 			_add_colored_vertex(st, ring[next] as Vector3, color, has_color)
+			_add_colored_vertex(st, ring[i] as Vector3, color, has_color)
 
 
 static func build_mesh(radius: float, height: float, upper_taper_blend: float = 1.0) -> ArrayMesh:

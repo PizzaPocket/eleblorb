@@ -48,7 +48,8 @@ const MUSHROOM_COLORS := {
 	"Tan Mushroom": Color(0.8, 0.68, 0.45),
 	"Jungle Mushroom": Color(0.25, 0.5, 0.85),
 }
-const ROCK_COLOR := Color(0.55, 0.54, 0.5)
+## Natural rocks and every body formed by a Rock blorb share this hue.
+const ROCK_COLOR := ElementPalette.ROCK_BODY
 ## Banded sandstone palette for the canyon biome (see wilderness_scatter.gd's
 ## _build_canyon_biome()) -- cycling through these across paving slabs and
 ## a slab tower's own tiers is what gives them a striped, sedimentary look
@@ -148,6 +149,60 @@ static func build_pine_tree(height: float, leaf_color: Color) -> StaticBody3D:
 
 	# Trunk-only collision -- see build_round_tree()'s own comment on why.
 	_add_cylinder_collision(body, Vector3(0, trunk_height * 0.5, 0), 0.24, trunk_height)
+	return body
+
+
+## A much taller, long-trunked conifer for the Ice Kingdom's snow forest --
+## per direct instruction, "an alpine cedar which grows to a very tall
+## height with a long trunk and is snow covered like the existing pine
+## trees." Reuses build_pine_tree()'s own tiered-cone foliage technique
+## (same lobed, tapering tier stack, same tint-toward-white leaf_color
+## convention the caller already uses for "snow covered") rather than a new
+## silhouette -- only the proportions differ: a real cedar's own bare trunk
+## rises well past where a pine's foliage would already have started, so
+## trunk_height is a much larger fraction of the total here (0.45 vs.
+## build_pine_tree()'s own 0.22), with more, slightly airier tiers above it
+## for the taller overall silhouette.
+static func build_alpine_cedar_tree(height: float, leaf_color: Color) -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.collision_layer = 1
+	body.collision_mask = 0
+
+	var trunk_height := height * 0.45
+	# A tall, long trunk reads as visibly tapered rather than a uniform post
+	# -- thicker at the base, narrowing toward the foliage.
+	var trunk_base_radius := 0.16 + height * 0.014
+	var trunk_top_radius := trunk_base_radius * 0.62
+	var trunk := SuperEgg.build_part(
+		Vector3(
+			(trunk_base_radius + trunk_top_radius) * 0.5, trunk_height * 0.5,
+			(trunk_base_radius + trunk_top_radius) * 0.5
+		),
+		TRUNK_COLOR, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+	)
+	trunk.position = Vector3(0, trunk_height * 0.5, 0)
+	body.add_child(trunk)
+
+	const TIERS := 6
+	var foliage_height := height - trunk_height
+	var tier_span := foliage_height / TIERS
+	for i in TIERS:
+		var t := float(i) / float(TIERS - 1)
+		var tier_radius := lerpf(height * 0.24, height * 0.05, t)
+		var tier_y := trunk_height + tier_span * (float(i) + 0.5)
+		var tier := SuperEgg.build_part(
+			Vector3(tier_radius, tier_span * 0.55, tier_radius), leaf_color,
+			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
+		)
+		var tier_pos := Vector3(0, tier_y, 0)
+		tier.position = tier_pos
+		body.add_child(tier)
+		_add_canopy_blob(body, tier_pos, Vector3(tier_radius, tier_span * 0.55, tier_radius))
+
+	# Trunk-only collision -- see build_round_tree()'s own comment on why --
+	# sized off the trunk's own thicker base radius, not the pine's fixed
+	# 0.24, since this trunk is both taller and visibly stouter.
+	_add_cylinder_collision(body, Vector3(0, trunk_height * 0.5, 0), trunk_base_radius, trunk_height)
 	return body
 
 
@@ -267,31 +322,40 @@ static func build_lava_material() -> StandardMaterial3D:
 ## A boulder -- two overlapping boxy-ish lobes so it doesn't read as one
 ## perfectly round rock. collidable=false for small decorative pebbles
 ## that shouldn't block movement.
-static func build_rock(radius: float, collidable: bool = true) -> Node3D:
+static func build_rock(radius: float, collidable: bool = true, color: Color = ROCK_COLOR) -> Node3D:
 	var root: Node3D
 	if collidable:
 		var body := StaticBody3D.new()
-		body.collision_layer = 1
+		body.collision_layer = 1 | TownProps.BLORB_CLIMBABLE_LAYER
 		body.collision_mask = 0
 		root = body
 	else:
 		root = Node3D.new()
 
 	var main_rock := SuperEgg.build_part(
-		Vector3(radius, radius * 0.75, radius * 0.9), ROCK_COLOR, 3.5, 4.0
+		Vector3(radius, radius * 0.75, radius * 0.9), color, 3.5, 4.0
 	)
 	main_rock.position = Vector3(0, radius * 0.7, 0)
 	root.add_child(main_rock)
 
 	var lump_radius := radius * 0.55
 	var lump := SuperEgg.build_part(
-		Vector3(lump_radius, lump_radius * 0.85, lump_radius * 0.9), ROCK_COLOR.darkened(0.1), 3.5, 4.0
+		Vector3(lump_radius, lump_radius * 0.85, lump_radius * 0.9), color.darkened(0.1), 3.5, 4.0
 	)
 	lump.position = Vector3(radius * 0.5, radius * 0.4, radius * 0.2)
 	root.add_child(lump)
 
 	if collidable:
-		_add_cylinder_collision(root as StaticBody3D, Vector3(0, radius * 0.6, 0), radius * 0.95, radius * 1.3)
+		# Match the main lobe's complete authored vertical extent. The old
+		# collider ended at 1.25r while the visible rock reaches 1.45r, which
+		# made a correctly-colliding rider visibly sink into every boulder.
+		_add_cylinder_collision(root as StaticBody3D, Vector3(0, radius * 0.7, 0), radius * 0.9, radius * 1.5)
+		# The offset lobe is substantial visible rock too. Giving it its own
+		# primitive makes its shoulder solid without paying for per-rock mesh
+		# collision across the densely populated biome.
+		_add_cylinder_collision(
+			root as StaticBody3D, lump.position, lump_radius * 0.9, lump_radius * 1.7
+		)
 	return root
 
 
@@ -304,7 +368,7 @@ static func build_rock(radius: float, collidable: bool = true) -> Node3D:
 ## last, not just a hop.
 static func build_rock_spire(base_radius: float, tiers: int, rng: RandomNumberGenerator) -> StaticBody3D:
 	var body := StaticBody3D.new()
-	body.collision_layer = 1
+	body.collision_layer = 1 | TownProps.BLORB_CLIMBABLE_LAYER
 	body.collision_mask = 0
 
 	var radius := base_radius
@@ -322,7 +386,7 @@ static func build_rock_spire(base_radius: float, tiers: int, rng: RandomNumberGe
 		var visuals := build_rock(radius, false)
 		visuals.position = tier_pos
 		body.add_child(visuals)
-		_add_cylinder_collision(body, tier_pos + Vector3(0, radius * 0.6, 0), radius * 0.95, radius * 1.3)
+		_add_cylinder_collision(body, tier_pos + Vector3(0, radius * 0.7, 0), radius * 0.9, radius * 1.5)
 
 		y += radius * 1.15
 		radius *= rng.randf_range(0.62, 0.78)
@@ -413,7 +477,7 @@ static func build_rock_slab(size: Vector3, color: Color) -> StaticBody3D:
 ## tier's own top surface ends up, to place a bridging slab flush on it.
 static func build_slab_tower(base_width: float, tiers: int, rng: RandomNumberGenerator) -> Dictionary:
 	var body := StaticBody3D.new()
-	body.collision_layer = 1
+	body.collision_layer = 1 | TownProps.BLORB_CLIMBABLE_LAYER
 	body.collision_mask = 0
 
 	var width := base_width
@@ -469,7 +533,7 @@ static func build_rock_arch(span: float, rng: RandomNumberGenerator) -> Node3D:
 	root.add_child(body_b)
 
 	var bridge_body := StaticBody3D.new()
-	bridge_body.collision_layer = 1
+	bridge_body.collision_layer = 1 | TownProps.BLORB_CLIMBABLE_LAYER
 	bridge_body.collision_mask = 0
 	const BRIDGE_HEIGHT := 1.0
 	const BRIDGE_DEPTH := 3.2

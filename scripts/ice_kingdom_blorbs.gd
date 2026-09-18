@@ -13,7 +13,7 @@ extends Node3D
 const BLORB_SCENE: PackedScene = preload("res://scenes/blorb.tscn")
 const ICE_COUNT := 6
 const SNOW_COUNT := 8
-const SPAWN_RADIUS := 230.0
+const SPAWN_RADIUS := 520.0
 
 var _rng := RandomNumberGenerator.new()
 var _terrain: Node
@@ -29,16 +29,16 @@ func _ready() -> void:
 
 func _spawn_all() -> void:
 	for i in ICE_COUNT:
-		_place("ice", true)
+		_place("ice" if i % 2 == 0 else "", true)
 	for i in SNOW_COUNT:
-		_place("snow", false)
+		_place("snow" if i % 2 == 0 else "", false)
 
 
-## `favor_snow_zone` restricts the pick to the terrain's own snowy-forest
-## radius (see ice_kingdom_terrain.gd's is_snow_zone()) -- Ice blorbs stay
-## close to the arrival clearing, Snow blorbs range anywhere.
-func _place(element: String, favor_snow_zone: bool) -> void:
-	var pos := _pick_position(favor_snow_zone)
+## Ice blorbs inhabit the lake/glacier half (positive X); Snow blorbs inhabit
+## the village/mountain half (negative X). Normal blorbs remain interspersed
+## through both populations by the caller's alternating element string.
+func _place(element: String, ice_side: bool) -> void:
+	var pos := _pick_position(ice_side)
 	var inst = BLORB_SCENE.instantiate()
 	inst.in_party = false
 	inst.initial_element = element
@@ -46,13 +46,13 @@ func _place(element: String, favor_snow_zone: bool) -> void:
 	get_parent().add_child(inst)
 
 
-func _pick_position(favor_snow_zone: bool) -> Vector2:
-	var radius: float = float(_terrain.get_snow_radius()) if favor_snow_zone else SPAWN_RADIUS
-	for attempt in 8:
-		var r: float = sqrt(_rng.randf_range(0.0, 1.0)) * radius
-		var a := _rng.randf_range(0.0, TAU)
-		var pos := Vector2(cos(a) * r, sin(a) * r)
+func _pick_position(ice_side: bool) -> Vector2:
+	for attempt in 30:
+		var pos := Vector2(
+			_rng.randf_range(35.0,520.0) if ice_side else _rng.randf_range(-730.0,-35.0),
+			_rng.randf_range(-420.0,420.0)
+		)
 		if pos.length() < 10.0 or _terrain.is_lake_area(pos) or _terrain.is_safe_zone(pos):
 			continue
 		return pos
-	return Vector2(radius, 0.0)
+	return Vector2(420.0,0.0) if ice_side else Vector2(-420.0,0.0)

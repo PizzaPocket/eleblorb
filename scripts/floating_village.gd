@@ -21,7 +21,7 @@ var _terrain: Node
 
 func _ready() -> void:
 	_terrain = get_node_or_null("../Terrain")
-	call_deferred("_build")
+	LoadingScreen.enqueue_build_stage("Configuring world systems…",0.88,_build)
 
 
 func _build() -> void:

@@ -31,3 +31,20 @@ This project keeps a shared UI design system in `scripts/ui_theme.gd` (design to
 - Modal panels: translucent background, no border stroke — a soft drop shadow carries the depth cue instead. Interactive controls (buttons, chips) keep their border for click affordance.
 - Icon-style close buttons (dismissing a window-style modal) use a small drawn icon (`UIKit.close_button()`), not a Unicode glyph. Text buttons are for dialogue/conversational choices, not window chrome.
 - A passive HUD readout whose info is also available on demand elsewhere (e.g. the Tokoins count, also shown in ShopUI/InventoryUI) fades in briefly on a relevant change and back out, rather than staying permanently on screen.
+
+## World collision design
+
+Eleblorbs is a platformer RPG: substantial visible objects are physical by
+default. Architecture, furniture, counters, fountains, railings, large rocks,
+trees, vehicles, and creature surfaces that visually appear able to support or
+block a character must have collision for the player and every compatible
+party/NME controller. Build bespoke procedural props with `CollisionPolicy` so
+their visual and simplified primitive collider are authored together. Use the
+parkour policy where the top is a deliberate landing surface and blocking for
+solid obstacles. Mark fine trim, particles, flames, foliage tips, ropes, and
+flat decorative inlays explicitly decorative; liquid/hazard visuals use the
+hazard policy and their gameplay surface API rather than an ordinary solid
+collider. Prefer boxes, cylinders, capsules, or a small set of convex shapes;
+reserve close mesh collision for silhouettes where platforming accuracy truly
+depends on it. Never omit collision from substantial geometry merely as an
+implicit performance optimization.

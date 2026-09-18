@@ -7,8 +7,8 @@ extends RefCounted
 ## once per capture version before being shared across UI surfaces.
 
 const RESOLUTION := 192
-const CAPTURE_VERSION := 4
-const HELMET_ITEMS := ["Diving Helmet", "Knight's Helm"]
+const CAPTURE_VERSION := 5
+const HELMET_ITEMS := ["Diving Helmet", "Knight's Helm", "Toboggan"]
 
 static var _cache: Dictionary = {}
 static var _pending: Dictionary = {}

@@ -21,7 +21,7 @@ const PHONE_JOYSTICK_MIN := 156.0
 const PHONE_JOYSTICK_MAX := 224.0
 
 const ACTION_LAYOUT := [
-	["FORM", "transform"], ["SWAP", "switch_blorbus"], ["BAG", "inventory"],
+	["FORM", "transform"], ["SWAP", "switch_character_next"], ["BAG", "inventory"],
 	["L ARM", "left_arm_power"], ["JUMP", "jump"], ["R ARM", "right_arm_power"],
 	["L LEG", "left_leg_power"], ["USE", "interact"], ["R LEG", "right_leg_power"],
 	["RUN", "run"], ["CALL", "platform_aid"], ["Ⅱ", "pause"],

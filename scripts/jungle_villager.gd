@@ -166,6 +166,7 @@ const FACE_MARKING_NOTCH_STRENGTH := 0.5
 ## instance -- see class doc comment above and TALK_LINES' own comment.
 @export var display_name: String = "Jungle Villager"
 var talk_lines: Array[String] = []
+var dialog_actions_provider: Callable = Callable()
 
 var _pivots: Dictionary
 var _eyes: Array = []
@@ -220,7 +221,8 @@ func _ready() -> void:
 	_pivots = MonkeyFigure.build(self, fur_color, display_scale, variant)
 	_eyes = _pivots["eyes"]
 	_arm_rest_x = (_pivots["arm_left"] as Node3D).rotation.x
-	_terrain = get_node_or_null("../Terrain")
+	if _terrain == null:
+		_terrain = get_node_or_null("../../Terrain")
 	if roams and _terrain != null and _terrain.has_method("get_mesh_height"):
 		global_position.y = _terrain.get_mesh_height(global_position.x, global_position.z)
 	_pause_timer = _rng.randf_range(ROAM_PAUSE_MIN, ROAM_PAUSE_MAX)
@@ -243,9 +245,16 @@ func _ready() -> void:
 	)
 
 
+func set_terrain_reference(value: Node) -> void:
+	_terrain = value
+
+
 func _on_talk() -> void:
 	var lines := talk_lines if not talk_lines.is_empty() else TALK_LINES
-	DialogUI.show_line(display_name, lines[_rng.randi_range(0, lines.size() - 1)])
+	var actions: Array[Dictionary] = []
+	if dialog_actions_provider.is_valid():
+		actions.assign(dialog_actions_provider.call() as Array)
+	DialogUI.show_line(display_name,lines[_rng.randi_range(0,lines.size()-1)],actions)
 
 
 func _process(delta: float) -> void:
@@ -296,7 +305,10 @@ func _update_roam(delta: float) -> bool:
 
 	if _terrain != null and _terrain.has_method("get_mesh_height"):
 		var ground_h: float = _terrain.get_mesh_height(global_position.x, global_position.z)
-		global_position.y = move_toward(global_position.y, ground_h, GROUND_SETTLE_SPEED * delta)
+		# The terrain mesh and get_mesh_height() are the same triangles; snap to
+		# that exact surface each frame so uphill travel cannot bury the feet
+		# while a cosmetic settle animation catches up.
+		global_position.y = ground_h
 	return moving
 
 

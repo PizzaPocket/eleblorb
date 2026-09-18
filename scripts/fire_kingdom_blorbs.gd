@@ -28,17 +28,17 @@ func _ready() -> void:
 
 func _spawn_all() -> void:
 	for i in FIRE_COUNT:
-		_place()
+		_place("fire" if i % 2 == 0 else "")
 
 
-func _place() -> void:
+func _place(element: String) -> void:
 	var pos: Variant = _pick_position()
 	if pos == null:
 		return
 	var picked: Vector2 = pos
 	var inst = BLORB_SCENE.instantiate()
 	inst.in_party = false
-	inst.initial_element = "fire"
+	inst.initial_element = element
 	inst.position = Vector3(picked.x, _terrain.get_mesh_height(picked.x, picked.y), picked.y)
 	get_parent().add_child(inst)
 

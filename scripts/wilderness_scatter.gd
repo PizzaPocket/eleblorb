@@ -302,6 +302,10 @@ var _canopy_blobs: Array[Dictionary] = []
 
 
 func _ready() -> void:
+	LoadingScreen.enqueue_build_stage("Finalizing world state…",0.98,_build_wilderness)
+
+
+func _build_wilderness() -> void:
 	# Lets hud.gd find this node to trigger spawn_replenishment_wave() once
 	# every wild blorb currently out in the field has been found -- see
 	# that function's own doc comment.
@@ -375,7 +379,7 @@ func _spawn_ice_plateau_blorbs() -> void:
 		var pos: Vector2 = ICE_GATE_XZ + Vector2(cos(angle), sin(angle)) * radius
 		var blorb = packed.instantiate()
 		blorb.in_party = false
-		blorb.initial_element = "ice" if i % 2 == 0 else "snow"
+		blorb.initial_element = ("ice" if i % 4 == 0 else "snow") if i % 2 == 0 else ""
 		blorb.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
 		get_parent().add_child(blorb)
 
@@ -744,7 +748,7 @@ func _spawn_wild_blorbs() -> void:
 	for element in WILD_BLORB_OTHER_ELEMENTS:
 		_place_wild_blorb(element, false)
 	for i in WILD_BLORB_AIR_COUNT:
-		_place_wild_blorb("air", false)
+		_place_wild_blorb("air" if i % 2 == 0 else "", false)
 	_spawn_lake_water_blorbs()
 
 
@@ -764,7 +768,7 @@ func _spawn_jungle_plant_blorbs() -> void:
 		var pos := _point_in_jungle_disk(center, radius * 0.9, 1.0)
 		var inst = packed.instantiate()
 		inst.in_party = false
-		inst.initial_element = "plant"
+		inst.initial_element = "plant" if i % 2 == 0 else ""
 		inst.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
 		get_parent().add_child(inst)
 
@@ -783,7 +787,7 @@ func _spawn_canyon_rock_blorbs() -> void:
 			continue
 		var inst = packed.instantiate()
 		inst.in_party = false
-		inst.initial_element = "rock"
+		inst.initial_element = "rock" if i % 2 == 0 else ""
 		inst.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
 		get_parent().add_child(inst)
 
@@ -805,7 +809,7 @@ func _spawn_city_blorbs() -> void:
 			continue
 		var inst = packed.instantiate()
 		inst.in_party = false
-		inst.initial_element = "city"
+		inst.initial_element = "city" if i % 2 == 0 else ""
 		inst.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
 		get_parent().add_child(inst)
 	var gem_pos := _point_in_city_disk(CITY_CENTER, CITY_ZONE_RADIUS * 0.6, 1.0)
@@ -865,7 +869,7 @@ func _spawn_volcano_fire_blorbs() -> void:
 		var placed: Vector2 = pos
 		var inst = packed.instantiate()
 		inst.in_party = false
-		inst.initial_element = "fire"
+		inst.initial_element = "fire" if i % 2 == 0 else ""
 		inst.position = Vector3(placed.x, terrain.get_mesh_height(placed.x, placed.y), placed.y)
 		get_parent().add_child(inst)
 
@@ -949,7 +953,7 @@ func _spawn_lake_water_blorbs() -> void:
 			continue
 		var inst = packed.instantiate()
 		inst.in_party = false
-		inst.initial_element = "water"
+		inst.initial_element = "water" if spawned % 2 == 0 else ""
 		# Start at the shared waterline; blorb.gd's existing buoyancy settles
 		# it to its natural floating submergence on the next frame.
 		inst.position = Vector3(pos.x, terrain.get_lake_water_level(), pos.y)
@@ -962,23 +966,10 @@ func _spawn_lake_water_blorbs() -> void:
 ## It has no hopping phase at all; every deliberate motion is one tenth of
 ## a normal blorb's speed to sell the immense mass.
 func _spawn_wasteland_giant_blorb() -> void:
-	var packed: PackedScene = load(BLORB_SCENE)
-	if packed == null:
-		push_warning("Missing blorb scene: " + BLORB_SCENE)
-		return
-	var giant = packed.instantiate()
-	giant.blorb_name = "Humongous"
-	giant.blorb_type = "size"
-	giant.size_multiplier = WASTELAND_GIANT_SIZE
-	giant.vertical_scale = 0.72
-	giant.movement_speed_multiplier = WASTELAND_GIANT_MOVEMENT_SPEED
-	giant.allow_movement_hops = false
-	giant.can_join_party = false
-	giant.in_party = false
-	giant.body_color = Color(0.7, 0.78, 0.72, 0.9)
 	var pos := WASTELAND_GIANT_POS
-	giant.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
-	get_parent().add_child(giant)
+	HumongousState.spawn_home_body(
+		get_parent(), Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
+	)
 
 
 func _scatter_clusters() -> void:

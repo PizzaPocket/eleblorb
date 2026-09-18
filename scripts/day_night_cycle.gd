@@ -169,7 +169,10 @@ func _process(delta: float) -> void:
 	# story dialog, or future process-mode change may advance the shared clock.
 	if get_tree().paused:
 		return
+	var previous_hour := game_time_hours
 	game_time_hours = fmod(game_time_hours + delta * GAME_HOURS_PER_REAL_SECOND, 24.0)
+	if game_time_hours < previous_hour:
+		WorldState.calendar_day += 1
 	WorldState.game_time_hours = game_time_hours
 	_lantern_refresh_timer -= delta
 	if _lantern_refresh_timer <= 0.0:

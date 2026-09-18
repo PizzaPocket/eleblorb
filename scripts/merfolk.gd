@@ -181,15 +181,20 @@ func _add_nautilus_crown(head: Node3D) -> void:
 		head.add_child(shell)
 
 
+## Per direct correction ("the original intent for the sea folk was to have
+## some subtle like flower on the side of their hair... I'm not sure if
+## they're positioned correctly") -- this used to be one fixed local offset
+## regardless of hairstyle, which clipped into bulkier styles (afro, long)
+## and floated away from slimmer ones. HairOrnaments.side_hair_anchor()
+## queries that style's own real hair envelope instead.
 func _add_hair_ornament(head: MeshInstance3D) -> void:
-	# The anchor is slightly inside the upper-front side of the shared hair
-	# volume. Ornament pieces project only through its outward face, keeping
-	# them nestled into the hairstyle instead of floating beside the head.
 	var side := -1.0 if get_instance_id() % 2 == 0 else 1.0
+	var anchor := HairOrnaments.side_hair_anchor(ProceduralFigure.HEAD_SIZE, hair_style, side)
 	var ornament := Node3D.new()
 	ornament.name = "HairOrnament"
-	ornament.position = Vector3(side * 0.125, 0.125, 0.075)
-	ornament.rotation.y = side * deg_to_rad(18.0)
+	ornament.position = anchor["position"]
+	var outward: Vector3 = anchor["outward"]
+	ornament.rotation.y = atan2(outward.x, outward.z)
 	head.add_child(ornament)
 	if hair_ornament == "shell":
 		for index in 3:

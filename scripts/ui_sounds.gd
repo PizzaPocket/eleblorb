@@ -7,6 +7,11 @@ const SAMPLE_RATE := 44100
 const SELECTION_COOLDOWN := 0.035
 const POWER_LOOP_HOLD_MSEC := 140
 const BLORB_GLIDE_HOLD_MSEC := 150
+# Just enough tolerance for an occasional missed physics frame. This is a
+# contact signal, not a release envelope: once grounded board pulses cease the
+# scrape must disappear with the board/snow contact.
+const SNOWBOARD_HOLD_MSEC := 45
+const ICE_SKATE_HOLD_MSEC := 45
 const FOLEY_POOL_SIZE := 3
 
 var enabled: bool = true
@@ -49,6 +54,37 @@ var _blorb_glide_rng := RandomNumberGenerator.new()
 var _blorb_glide_clock := 0.0
 var _blorb_glide_body := 0.0
 var _blorb_glide_texture := 0.0
+var _snowboard_player: AudioStreamPlayer
+var _snowboard_playback: AudioStreamGeneratorPlayback
+var _snowboard_source_id := 0
+var _snowboard_last_pulse_msec := -10000
+var _snowboard_speed_target := 0.0
+var _snowboard_speed := 0.0
+var _snowboard_carve_target := 0.0
+var _snowboard_carve := 0.0
+var _snowboard_snow_mix := 1.0
+var _snowboard_rng := RandomNumberGenerator.new()
+var _snowboard_low_noise := 0.0
+var _snowboard_mid_noise := 0.0
+var _snowboard_fast_noise := 0.0
+var _snowboard_crunch_envelope := 0.0
+var _ice_skate_player: AudioStreamPlayer
+var _ice_skate_playback: AudioStreamGeneratorPlayback
+var _ice_skate_source_id := 0
+var _ice_skate_last_pulse_msec := -10000
+var _ice_skate_speed := 0.0
+var _ice_skate_acceleration := 0.0
+var _ice_skate_left_contact := 0.0
+var _ice_skate_right_contact := 0.0
+var _ice_skate_previous_left_contact := 0.0
+var _ice_skate_previous_right_contact := 0.0
+var _ice_skate_rng := RandomNumberGenerator.new()
+var _ice_skate_slow_noise := 0.0
+var _ice_skate_mid_noise := 0.0
+var _ice_skate_fast_noise := 0.0
+var _ice_skate_left_load_envelope := 0.0
+var _ice_skate_right_load_envelope := 0.0
+var _ice_skate_recontact_envelope := 0.0
 var _foley_pools: Dictionary = {}
 var _foley_pool_indices: Dictionary = {}
 var _event_last_played: Dictionary = {}
@@ -84,7 +120,11 @@ func _ready() -> void:
 	_water_rng.seed = 0xA73E_5102
 	_fire_rng.seed = 0xF1A4_E203
 	_blorb_glide_rng.seed = 0xB10B_610D
+	_snowboard_rng.seed = 0x5A0B_04D1
+	_ice_skate_rng.seed = 0x1CE5_CA7E
 	_blorb_glide_player = _make_turbulence_stream_player()
+	_snowboard_player = _make_turbulence_stream_player()
+	_ice_skate_player = _make_turbulence_stream_player()
 	for kind in [&"fire", &"water", &"electric"]:
 		_power_loop_players[kind] = _make_turbulence_stream_player() if kind in [&"fire", &"water"] else _make_player(_make_power_loop(kind))
 		_power_loop_claims[kind] = {}
@@ -114,6 +154,8 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	var now := Time.get_ticks_msec()
 	_update_blorb_glide(delta, now)
+	_update_snowboard_sound(delta,now)
+	_update_ice_skate_sound(now)
 	for kind in _power_loop_players:
 		var claims: Dictionary = _power_loop_claims[kind]
 		for source_id in claims.keys():
@@ -150,12 +192,18 @@ func _process(delta: float) -> void:
 		_fill_fire_stream()
 	if _blorb_glide_playback != null and _blorb_glide_player.playing:
 		_fill_blorb_glide_stream()
+	if _snowboard_playback != null and _snowboard_player.playing:
+		_fill_snowboard_stream()
+	if _ice_skate_playback != null and _ice_skate_player.playing:
+		_fill_ice_skate_stream()
 
 
 ## Movement calls this every frame rather than retriggering a short sample.
 ## The hold window converts those pulses into one smoothly gated procedural
 ## texture with no regular attacks that could be perceived as footsteps.
 func pulse_blorb_glide(source_id: int) -> void:
+	if not _selected_movement_source(source_id):
+		return
 	_blorb_glide_source_id = source_id
 	_blorb_glide_last_pulse_msec = Time.get_ticks_msec()
 
@@ -189,6 +237,142 @@ func _fill_blorb_glide_stream() -> void:
 		var movement := 0.86+sin(TAU*0.43*_blorb_glide_clock+0.4)*0.08+sin(TAU*0.71*_blorb_glide_clock+2.1)*0.05
 		var sample := (_blorb_glide_body*0.72+(_blorb_glide_texture-_blorb_glide_body)*0.22)*movement*0.24
 		_blorb_glide_playback.push_frame(Vector2(sample,sample*0.985))
+
+
+## Called every grounded board frame. Speed controls loudness and spectral
+## brightness; carve measures sideways edge load; snow_mix distinguishes a
+## granular snow bed from a smoother ice scrape. Nothing restarts a sample,
+## so acceleration and steering remain seamless and never expose a loop.
+func pulse_snowboard(source_id: int,speed: float,carve: float,snow_mix: float = 1.0) -> void:
+	if not _selected_movement_source(source_id):
+		return
+	_snowboard_source_id=source_id
+	_snowboard_speed_target=maxf(speed,0.0)
+	_snowboard_carve_target=clampf(carve,0.0,1.0)
+	_snowboard_snow_mix=clampf(snow_mix,0.0,1.0)
+	_snowboard_last_pulse_msec=Time.get_ticks_msec()
+
+
+func _update_snowboard_sound(delta: float,now: int) -> void:
+	var active:=enabled and now-_snowboard_last_pulse_msec<=SNOWBOARD_HOLD_MSEC and _snowboard_speed_target>0.18
+	# Board velocity is already physically continuous. Mirroring it directly
+	# means acceleration from rest naturally raises the sound, while landing
+	# from a hop at speed immediately resumes the correct loudness/brightness.
+	_snowboard_speed=_snowboard_speed_target
+	_snowboard_carve=move_toward(_snowboard_carve,_snowboard_carve_target,5.0*delta)
+	if active:
+		var speed_mix:=clampf(_snowboard_speed/28.0,0.0,1.0)
+		var target_db:=lerpf(-29.0,-8.5,sqrt(speed_mix))+world_distance_db(_snowboard_source_id)
+		if not _snowboard_player.playing:
+			_snowboard_player.volume_db=target_db
+			_snowboard_player.play()
+			_snowboard_playback=_snowboard_player.get_stream_playback() as AudioStreamGeneratorPlayback
+		_snowboard_player.volume_db=target_db
+	elif _snowboard_player.playing:
+		_snowboard_player.stop()
+		_snowboard_playback=null
+
+
+func _fill_snowboard_stream() -> void:
+	var frames:=_snowboard_playback.get_frames_available()
+	var speed_mix:=clampf(_snowboard_speed/28.0,0.0,1.0)
+	for _frame in frames:
+		var white:=_snowboard_rng.randf_range(-1.0,1.0)
+		_snowboard_low_noise=lerpf(_snowboard_low_noise,white,0.0035+speed_mix*0.002)
+		_snowboard_mid_noise=lerpf(_snowboard_mid_noise,white,0.035+speed_mix*0.055)
+		_snowboard_fast_noise=lerpf(_snowboard_fast_noise,white,0.15+speed_mix*0.24)
+		# The reference's core is broadband sliding friction: a soft pressure
+		# bed under dry, irregular crystals—not a pitched motor or repeating beat.
+		var pressure:=_snowboard_low_noise*0.46
+		var scrape:=(_snowboard_mid_noise-_snowboard_low_noise)*(0.62+speed_mix*0.34)
+		var spray:=(_snowboard_fast_noise-_snowboard_mid_noise)*(0.10+speed_mix*0.17)
+		var crunch_rate:=4.0+(18.0*speed_mix+24.0*_snowboard_carve)*_snowboard_snow_mix
+		if _snowboard_rng.randf()<crunch_rate/float(SAMPLE_RATE):
+			_snowboard_crunch_envelope=maxf(
+				_snowboard_crunch_envelope,
+				_snowboard_rng.randf_range(0.08,0.22)*(0.45+0.55*_snowboard_carve)
+			)
+		_snowboard_crunch_envelope*=0.9962
+		var crystals:=(_snowboard_fast_noise-_snowboard_low_noise)*_snowboard_crunch_envelope
+		var ice_sheen:=(_snowboard_fast_noise-_snowboard_mid_noise)*(1.0-_snowboard_snow_mix)*0.12
+		var sample:=(pressure+scrape+spray+crystals+ice_sheen)*(0.035+speed_mix*0.075)
+		_snowboard_playback.push_frame(Vector2(sample,sample*0.985))
+
+
+## Contact-driven skate foley. Speed controls the continuous blade friction,
+## acceleration adds pressure/grit, and the live animation contacts create
+## alternating load accents without replaying a fixed clip.
+func pulse_ice_skates(
+	source_id: int,speed: float,acceleration: float,
+	left_contact: float,right_contact: float
+) -> void:
+	if not _selected_movement_source(source_id):
+		return
+	var now:=Time.get_ticks_msec()
+	if now-_ice_skate_last_pulse_msec>ICE_SKATE_HOLD_MSEC*2 and speed>1.0:
+		# Landing/re-contact at speed starts at the current physical intensity.
+		_ice_skate_recontact_envelope=clampf(speed/18.0,0.0,1.0)
+	_ice_skate_source_id=source_id
+	_ice_skate_speed=maxf(speed,0.0)
+	_ice_skate_acceleration=clampf(acceleration,0.0,18.0)
+	_ice_skate_left_contact=clampf(left_contact,0.0,1.0)
+	_ice_skate_right_contact=clampf(right_contact,0.0,1.0)
+	if _ice_skate_left_contact>0.62 and _ice_skate_previous_left_contact<=0.62:
+		_ice_skate_left_load_envelope=0.32+0.28*clampf(acceleration/10.0,0.0,1.0)
+	if _ice_skate_right_contact>0.62 and _ice_skate_previous_right_contact<=0.62:
+		_ice_skate_right_load_envelope=0.32+0.28*clampf(acceleration/10.0,0.0,1.0)
+	_ice_skate_previous_left_contact=_ice_skate_left_contact
+	_ice_skate_previous_right_contact=_ice_skate_right_contact
+	_ice_skate_last_pulse_msec=now
+
+
+func _update_ice_skate_sound(now: int) -> void:
+	var active:=enabled and now-_ice_skate_last_pulse_msec<=ICE_SKATE_HOLD_MSEC and _ice_skate_speed>0.16
+	if active:
+		var speed_mix:=clampf(_ice_skate_speed/30.0,0.0,1.0)
+		var target_db:=lerpf(-31.0,-9.0,sqrt(speed_mix))+world_distance_db(_ice_skate_source_id)
+		if not _ice_skate_player.playing:
+			_ice_skate_player.volume_db=target_db
+			_ice_skate_player.play()
+			_ice_skate_playback=_ice_skate_player.get_stream_playback() as AudioStreamGeneratorPlayback
+		_ice_skate_player.volume_db=target_db
+	elif _ice_skate_player.playing:
+		_ice_skate_player.stop()
+		_ice_skate_playback=null
+		_ice_skate_previous_left_contact=0.0
+		_ice_skate_previous_right_contact=0.0
+
+
+func _fill_ice_skate_stream() -> void:
+	var frames:=_ice_skate_playback.get_frames_available()
+	var speed_mix:=clampf(_ice_skate_speed/30.0,0.0,1.0)
+	var thrust_mix:=clampf(_ice_skate_acceleration/10.0,0.0,1.0)
+	var contact_mix:=clampf((_ice_skate_left_contact+_ice_skate_right_contact)*0.62,0.0,1.0)
+	for _frame in frames:
+		var white:=_ice_skate_rng.randf_range(-1.0,1.0)
+		_ice_skate_slow_noise=lerpf(_ice_skate_slow_noise,white,0.018+speed_mix*0.012)
+		_ice_skate_mid_noise=lerpf(_ice_skate_mid_noise,white,0.12+speed_mix*0.16)
+		_ice_skate_fast_noise=lerpf(_ice_skate_fast_noise,white,0.48+speed_mix*0.28)
+		# Thin steel pressure and bright ice crystals: substantially less low
+		# body than the snowboard's broad snow friction.
+		var steel_scrape:=(_ice_skate_mid_noise-_ice_skate_slow_noise)*(0.54+0.32*speed_mix)
+		var ice_hiss:=(_ice_skate_fast_noise-_ice_skate_mid_noise)*(0.18+0.28*speed_mix)
+		var chatter_rate:=5.0+34.0*speed_mix+42.0*thrust_mix
+		if _ice_skate_rng.randf()<chatter_rate/float(SAMPLE_RATE):
+			var accent:=_ice_skate_rng.randf_range(0.08,0.22)*(0.55+0.45*contact_mix)
+			if _ice_skate_left_contact>=_ice_skate_right_contact:
+				_ice_skate_left_load_envelope=maxf(_ice_skate_left_load_envelope,accent)
+			else:
+				_ice_skate_right_load_envelope=maxf(_ice_skate_right_load_envelope,accent)
+		_ice_skate_left_load_envelope*=0.9960
+		_ice_skate_right_load_envelope*=0.9956
+		_ice_skate_recontact_envelope*=0.9945
+		var left_grit:=(_ice_skate_fast_noise-_ice_skate_slow_noise)*_ice_skate_left_load_envelope*_ice_skate_left_contact
+		var right_grit:=(_ice_skate_fast_noise-_ice_skate_slow_noise)*_ice_skate_right_load_envelope*_ice_skate_right_contact
+		var landing_cut:=(_ice_skate_mid_noise-_ice_skate_slow_noise)*_ice_skate_recontact_envelope
+		var amplitude:=(0.025+0.075*speed_mix)*contact_mix
+		var sample:=(steel_scrape+ice_hiss+left_grit+right_grit+landing_cut)*amplitude
+		_ice_skate_playback.push_frame(Vector2(sample*0.985,sample))
 
 
 func _input(event: InputEvent) -> void:
@@ -318,6 +502,17 @@ func _register_foley_variants(event_name: StringName, streams: Array[AudioStream
 ## overlaps (four hooves, rapid pickups, combat) without unlimited voices.
 func play_foley(event_name: StringName, intensity: float = 0.5, source_id: int = 0) -> void:
 	if not enabled or not _foley_pools.has(event_name):
+		return
+	# Movement Foley is the embodied perspective of the selected character,
+	# not ordinary world ambience. Followers and unselected party members may
+	# still animate, but their steps/glides/landings remain silent. Kova's
+	# authored giant_step is deliberately absent: his landmark-scale impacts
+	# are environmental sound and remain audible independently.
+	if event_name in [
+		&"jump", &"npc_step", &"plush_step", &"npc_paw",
+		&"horse_step", &"horse_jump", &"horse_land",
+		&"blorb_glide", &"giant_move", &"giant_jump", &"giant_land",
+	] and not _selected_movement_source(source_id):
 		return
 	var cooldown_key := "%s:%d" % [event_name, source_id]
 	var now := Time.get_ticks_msec()
@@ -676,8 +871,8 @@ func _make_foley(kind: StringName) -> AudioStreamWAV:
 		&"throw_release": duration = 0.11; start_hz = 198.0; end_hz = 102.0; texture = 0.13
 		&"throw_impact": duration = 0.09; start_hz = 126.0; end_hz = 59.0; texture = 0.12
 		&"stomp_hit": duration = 0.13; start_hz = 178.0; end_hz = 82.0; texture = 0.16
-		&"rock_erupt": duration = 0.28; start_hz = 184.0; end_hz = 76.0; texture = 0.28
-		&"rock_retract": duration = 0.20; start_hz = 132.0; end_hz = 68.0; texture = 0.20
+		&"rock_erupt": duration = 0.62; start_hz = 110.0; end_hz = 48.0; texture = 0.34
+		&"rock_retract": duration = 0.34; start_hz = 92.0; end_hz = 42.0; texture = 0.22
 	var frame_count: int = int(duration * SAMPLE_RATE)
 	var bytes := PackedByteArray()
 	bytes.resize(frame_count * 2)
@@ -712,23 +907,26 @@ func _make_foley(kind: StringName) -> AudioStreamWAV:
 		if kind in [&"rock_erupt", &"rock_retract"]:
 			var seconds := float(frame) / float(SAMPLE_RATE)
 			var emerging := kind == &"rock_erupt"
-			var attack := minf(seconds / (0.008 if emerging else 0.018), 1.0)
-			var envelope := attack * pow(1.0 - t, 2.0 if emerging else 2.8)
-			# Inharmonic stone resonance plus a restrained granular scrape. The
-			# emergence carries more weight and fracture; re-entry is the same
-			# material language softened into a short earthen settling sound.
-			var stone := (
-				sin(TAU * (148.0 if emerging else 112.0) * seconds + 0.4) * 0.43
-				+ sin(TAU * (263.0 if emerging else 207.0) * seconds + 1.7) * 0.22
-				+ sin(TAU * 487.0 * seconds + 2.6) * 0.10
-			)
-			var grit := 0.0
-			for grain in 7:
-				var grain_frequency := 690.0 + float(grain * 311)
-				grit += sin(TAU * grain_frequency * seconds + float(grain * grain + 2))
-			grit /= 7.0
-			var gain := 0.105 if emerging else 0.052
-			var rock_sample := (stone + grit * (0.42 if emerging else 0.25)) * envelope * gain
+			var attack := minf(seconds/(0.028 if emerging else 0.045),1.0)
+			var envelope := attack*pow(1.0-t,1.15 if emerging else 2.0)
+			# The reference is a sustained low earth movement carrying several
+			# separate brittle fractures—not a descending synthesized note. Two
+			# differently smoothed noise bands supply the rumble and granular
+			# scrape; short deterministic impulses add rock cracks over its body.
+			procedural_seed = int((procedural_seed*1103515245+12345)&0x7fffffff)
+			var raw := float(procedural_seed)/1073741824.0-1.0
+			body_state = lerpf(body_state,raw,0.006 if emerging else 0.01)
+			texture_state = lerpf(texture_state,raw,0.075 if emerging else 0.045)
+			var rumble := body_state*1.7+(texture_state-body_state)*0.42
+			var cracks := 0.0
+			var crack_centers := [0.075,0.19,0.34,0.51,0.73] if emerging else [0.16,0.43]
+			for crack_index in crack_centers.size():
+				var distance := absf(t-float(crack_centers[crack_index]))
+				var impulse := exp(-distance*(115.0+float(crack_index)*17.0))
+				var crack_frequency := 310.0+float(crack_index)*137.0
+				cracks += sin(TAU*crack_frequency*seconds+float(crack_index)*1.7)*impulse
+			var gain := 0.19 if emerging else 0.085
+			var rock_sample := (rumble+cracks*0.48)*envelope*gain
 			bytes.encode_s16(frame * 2, clampi(int(rock_sample * 32767.0), -32768, 32767))
 			continue
 		if kind in [&"tokoin_pickup", &"transform_reveal"]:
@@ -917,7 +1115,7 @@ func play_blorb_bounce(strong: bool = false, source_id: int = 0) -> void:
 
 
 func play_footstep(right_foot: bool, running: bool = false, source_id: int = 0, snow: bool = false) -> void:
-	if not enabled:
+	if not enabled or not _selected_movement_source(source_id):
 		return
 	var player := (
 		(_snow_footstep_right_player if right_foot else _snow_footstep_left_player)
@@ -931,10 +1129,18 @@ func play_footstep(right_foot: bool, running: bool = false, source_id: int = 0, 
 
 
 func play_landing(source_id: int = 0) -> void:
-	if enabled:
+	if enabled and _selected_movement_source(source_id):
 		_landing_player.pitch_scale = randf_range(0.97, 1.025)
 		_landing_player.volume_db = randf_range(-1.6, -0.8) + world_distance_db(source_id)
 		_landing_player.play()
+
+
+func _selected_movement_source(source_id: int) -> bool:
+	if source_id == 0:
+		return false
+	var source := instance_from_id(source_id) as Node
+	var selected := PartyControl.active_control_body()
+	return source != null and selected != null and source == selected
 
 
 func play_blorb_body_hit(source_id: int = 0) -> void:

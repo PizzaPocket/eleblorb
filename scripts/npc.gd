@@ -246,6 +246,8 @@ var _target: Vector2
 var _wander_center: Vector2
 var _walk_phase: float = 0.0
 var _rng := RandomNumberGenerator.new()
+var _held_combat_weapon: Node3D
+var _demon_agent_swinging := false
 
 
 func _ready() -> void:
@@ -714,6 +716,14 @@ func begin_demon_agent_battle(on_defeated: Callable) -> void:
 			(child as Area3D).set_deferred("monitoring", false)
 
 
+func equip_meat_cleaver() -> void:
+	if not is_instance_valid(_hand_right) or is_instance_valid(_held_combat_weapon):
+		return
+	_held_combat_weapon = ShopCatalog.build_meat_cleaver_visual(1.0)
+	_hand_right.add_child(_held_combat_weapon)
+	ShopCatalog.fit_visual_to_hand(_held_combat_weapon)
+
+
 func _reveal_demon_agent_form() -> void:
 	var former_skin := skin_color
 	var former_shirt := shirt_color
@@ -779,8 +789,25 @@ func _process_demon_agent_combat(delta: float) -> void:
 		_arm_left.rotation.x = -swing
 		_arm_right.rotation.x = swing
 	elif _demon_agent_attack_cooldown <= 0.0:
-		player.take_damage(14.0)
-		_demon_agent_attack_cooldown = 1.05
+		_start_demon_cleaver_swing(player)
+
+
+func _start_demon_cleaver_swing(player: Player) -> void:
+	if _demon_agent_swinging:
+		return
+	_demon_agent_swinging = true
+	_demon_agent_attack_cooldown = 1.05
+	var tween := create_tween()
+	tween.tween_property(_arm_right, "rotation:x", -1.75, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(_arm_right, "rotation:z", -0.32, 0.16)
+	tween.tween_callback(func() -> void:
+		if is_instance_valid(player) and global_position.distance_to(player.global_position) <= 1.7:
+			player.take_damage(14.0)
+			UISounds.play_foley(&"weapon_swing_inward", 0.62, get_instance_id())
+	)
+	tween.tween_property(_arm_right, "rotation:x", 0.12, 0.24).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	tween.parallel().tween_property(_arm_right, "rotation:z", 0.0, 0.24)
+	tween.tween_callback(func() -> void: _demon_agent_swinging = false)
 
 
 func _defeat_demon_agent() -> void:

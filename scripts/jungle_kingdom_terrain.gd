@@ -14,6 +14,8 @@ const HALF_SIZE := 900.0  # matches terrain_generator.gd's own FIELD_HALF_SIZE, 
 const RESOLUTION := 101  # vertices per side (100 quads) -- matches terrain_generator.gd's own RESOLUTION at this same extent
 const HILL_AMPLITUDE := 5.0
 const HILL_FREQUENCY := 0.02
+const VILLAGE_FLAT_RADIUS := 55.0
+const VILLAGE_FLAT_TRANSITION := 22.0
 
 ## A winding river carved into the ground, per direct feedback asking for
 ## "streams or rivers pushed down into the ground like the lake is pushed
@@ -159,6 +161,10 @@ func _river_hill_influence(x: float, z: float) -> float:
 
 func _terrain_height(x: float, z: float) -> float:
 	var hills := _hill_noise.get_noise_2d(x, z) * HILL_AMPLITUDE
+	# The treehouse village still needs a coherent floor for its ground-level
+	# residents and large inn. Flatten the protected clearing in the actual
+	# terrain source so render mesh, collision, and height queries all agree.
+	hills *= smoothstep(VILLAGE_FLAT_RADIUS,VILLAGE_FLAT_RADIUS+VILLAGE_FLAT_TRANSITION,Vector2(x,z).length())
 	var damped_hills := hills * (1.0 - _river_hill_influence(x, z))
 	return damped_hills - RIVER_DEPTH * _river_coverage(x, z)
 

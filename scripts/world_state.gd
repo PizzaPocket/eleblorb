@@ -11,6 +11,8 @@ var _collected_ids: Dictionary = {}
 
 ## Shared travel state survives scene replacement between kingdoms.
 var game_time_hours: float = 15.0
+var calendar_day: int = 0
+var player_current_hp: float = 100.0
 var manchego_joined: bool = false
 
 ## Wild blorbs only begin noticing and bonding with the party once the
@@ -59,6 +61,7 @@ var chinese_village_emperor_deposed: bool = false
 ## They remain held in the royal kitchen until recovered there.
 var chinese_village_blorbs_taken: bool = false
 var chinese_village_blorbs_rescued: bool = false
+var chinese_village_chef_dialog_beat: int = 0
 
 ## The farmer has accepted stewardship of the village and Pandy has been
 ## entrusted to the player's party. Kept separately from the Emperor's
@@ -76,6 +79,17 @@ var sun_wu_kong_summon_unlocked: bool = false
 ## Lava Slide gives away the unique Lava Helm only once. He remains in the
 ## Fire Kingdom afterward with his ordinary dialogue and roaming behavior.
 var lava_slide_helm_gifted: bool = false
+
+## Seed/Tree of Life and Dinosaur persist across scene travel.
+var seed_of_life_planted_day: int = -1
+var life_tree_last_harvest_day: int = -1
+var dinosaur_resurrected: bool = false
+var debug_crossroads_loadout_applied: bool = false
+
+
+func advance_to_morning() -> void:
+	calendar_day += 1
+	game_time_hours = 7.0
 
 
 func is_collected(id: String) -> bool:

@@ -264,6 +264,51 @@ static func _buzzcut_edges(semi_axes: Vector3) -> Dictionary:
 	}
 
 
+## Public: the REAL front/back/top/bottom/width edges a given style's own
+## hair mesh is actually built from (head_mesh-local, same frame every
+## _build_X() function above already works in) -- every modification here
+## mirrors that style's own _build_X() function exactly, so a caller placing
+## an ornament (a crown, a hair clip, jewelry) can query the true hair
+## envelope instead of guessing one fixed offset that only happens to clear
+## a single style. Per direct correction ("make sure to account for the
+## literal surface mesh of the hair... a lot of [ornaments] are clipping
+## into the head or being clipped by some hairstyles") -- see
+## hair_ornaments.gd, the caller this was built for.
+static func hair_edges(style: String, semi_axes: Vector3) -> Dictionary:
+	var edges := _buzzcut_edges(semi_axes)
+	match style:
+		STYLE_BALD:
+			edges = {"front": 0.0, "back": 0.0, "top": 0.0, "bottom": 0.0, "width": 0.0}
+		STYLE_AFRO:
+			edges["width"] = edges["width"] * AFRO_WIDTH_MULT - AFRO_WIDTH_REDUCTION
+			edges["top"] += AFRO_TOP_EXTRA
+			edges["back"] -= AFRO_BACK_EXTRA
+			edges["bottom"] -= AFRO_BOTTOM_EXTRA
+		STYLE_FLAT_TOP:
+			edges["top"] += FLAT_TOP_TOP_EXTRA
+			edges["front"] -= FLAT_TOP_BACK_SHIFT
+			edges["back"] -= FLAT_TOP_BACK_SHIFT
+		STYLE_PONYTAIL:
+			edges["top"] += TIED_BASE_UP_SHIFT
+			edges["bottom"] += TIED_BASE_UP_SHIFT
+			edges["front"] += TIED_BASE_FRONT_EXTRA
+		STYLE_LONG:
+			edges["width"] *= LONG_WIDTH_MULT
+			edges["front"] += LONG_FRONT_EXTRA
+			edges["back"] -= LONG_BACK_EXTRA
+		STYLE_HERO:
+			edges["top"] += HERO_UP_SHIFT
+			edges["bottom"] += HERO_UP_SHIFT
+			edges["front"] += HERO_FRONT_EXTRA
+		# BUZZCUT/BUN/PIGTAILS all start from the plain buzzcut envelope --
+		# the bun/pigtail piece is a separate bump on TOP of it (see
+		# BUN_RADIUS_FACTOR etc.'s own comments), not a resize of it, so the
+		# base edges already cover the safe placement envelope; a caller
+		# placing an ornament very close to the back-top on those two styles
+		# should still keep its own margin there.
+	return edges
+
+
 static func _center(pos_edge: float, neg_edge: float) -> float:
 	return (pos_edge + neg_edge) * 0.5
 

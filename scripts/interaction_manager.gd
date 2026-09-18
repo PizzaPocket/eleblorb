@@ -73,15 +73,24 @@ func _reselect() -> void:
 	# every other Dictionary/Array-derived typed-array assignment in this
 	# project already follows (see e.g. jungle_kingdom_village.gd's own
 	# `lines.assign(identity["lines"])`).
+	#
+	# CORRECTED: the filter lambda's own parameter must stay untyped. A
+	# typed `area: Area3D` parameter makes Godot type-check/downcast the
+	# argument before the lambda body ever runs, which throws ("Cannot
+	# convert argument 1 from Object to Object") on exactly the freed/stale
+	# reference this filter exists to catch -- a dangling Object no longer
+	# safely verifies as any specific class, even one it used to be. Only
+	# is_instance_valid() itself (which accepts a plain Object) can be
+	# called on it safely.
 	var valid_candidates: Array[Area3D] = []
-	valid_candidates.assign(_candidates.filter(func(area: Area3D) -> bool: return is_instance_valid(area)))
+	valid_candidates.assign(_candidates.filter(func(area): return is_instance_valid(area)))
 	_candidates = valid_candidates
 	if _candidates.is_empty():
 		return
 	if _candidates.size() == 1:
 		current = _candidates[0]
 		return
-	var player := get_tree().get_first_node_in_group("player") as Player
+	var player := PartyControl.active_member()
 	if player == null:
 		current = _candidates[0]
 		return
@@ -91,7 +100,9 @@ func _reselect() -> void:
 	# facing convention actually lives, the same "atan2(x, z)" forward every
 	# other creature/NPC rig in this project already uses for its own
 	# rotation.y target.
-	var body_forward := player.visuals.global_transform.basis.z
+	var body_forward := player.global_transform.basis.z
+	if player is Player:
+		body_forward = (player as Player).visuals.global_transform.basis.z
 	var best: Area3D = null
 	var best_score := INF
 	for area in _candidates:

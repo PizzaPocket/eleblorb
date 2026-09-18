@@ -14,6 +14,7 @@ extends Area3D
 @export var fruit_color: Color = Color(0.78, 0.14, 0.14)
 @export var fruit_name: String = "Apple"
 @export var radius: float = 0.09
+@export var unique_id: String = ""
 
 ## Optional override for species whose fruit isn't a plain sphere-plus-stem
 ## (Banana's curved-segment shape, Durian's spiked husk -- see
@@ -29,6 +30,9 @@ var _collected: bool = false
 
 
 func _ready() -> void:
+	if WorldState.is_collected(unique_id):
+		queue_free()
+		return
 	collision_layer = 0
 	collision_mask = 2  # player only (see player.tscn)
 	var visual: Node3D = visual_builder.call() if visual_builder.is_valid() else NatureProps.build_fruit_visual(fruit_color, radius)
@@ -60,6 +64,7 @@ func _collect() -> void:
 	if _collected:
 		return
 	_collected = true
+	WorldState.mark_collected(unique_id)
 	Inventory.add(fruit_name, fruit_color)
 	UISounds.play_foley(&"pickup", 0.46, get_instance_id())
 	Hud.show_message("Picked up the %s." % fruit_name)

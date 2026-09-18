@@ -78,7 +78,7 @@ func _process(_delta: float) -> void:
 	if get_tree().get_nodes_in_group("skeletons").size() >= MAX_CONCURRENT_SKELETONS:
 		return
 
-	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player := PartyControl.active_control_body()
 	if player == null:
 		return
 	var player_here := Vector2(player.global_position.x, player.global_position.z)

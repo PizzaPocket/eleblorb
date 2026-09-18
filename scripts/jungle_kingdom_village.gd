@@ -329,8 +329,14 @@ func _ready() -> void:
 	# suggests.
 	_build_ground_primates.call_deferred()
 	_build_manchego_and_quest_ape.call_deferred()
+	_build_village_inn()
 	if WorldState.ice_kingdom_visited:
 		_build_wood_kingdom_area.call_deferred()
+
+
+func _build_village_inn() -> void:
+	var pos := Vector2(27.0, 22.0)
+	VillageInn.create(self,_terrain,Vector3(pos.x,_terrain.get_mesh_height(pos.x,pos.y),pos.y),"primate_kingdom","plant_village_inn",15,"Bima Canopy",Color(0.20,0.48,0.22),Color(0.48,0.31,0.16),{},false,VILLAGER_SCENE,true)
 
 
 func _build_tree_and_houses(local_pos: Vector2, height: float, terrain: Node, tree_index: int) -> void:
@@ -372,10 +378,7 @@ func _build_treehouse(platform_pos: Vector3, color_seed: int, trunk_pos: Vector3
 	deck.position = Vector3(platform_pos.x, platform_pos.y - DECK_SIZE.y, platform_pos.z)
 	add_child(deck)
 
-	var house := TownProps.build_building(1, 1, 1, roof_color)
-	house.position = Vector3(platform_pos.x, platform_pos.y, platform_pos.z)
-	house.rotation.y = _rng.randf_range(0.0, TAU)
-	add_child(house)
+	_build_open_treehouse(self,platform_pos,roof_color,TownProps.TRIM_WOOD)
 
 	_spawn_anchored_villager(platform_pos, trunk_pos)
 
@@ -586,11 +589,7 @@ func _build_wood_kingdom_area() -> void:
 		deck.position = Vector3(platform_pos.x, platform_pos.y - DECK_SIZE.y, platform_pos.z)
 		_tint_meshes_recursive(deck, WOOD_WEATHERED_TINT)
 		parent.add_child(deck)
-		var house := TownProps.build_building(1, 1, 1, WOOD_WEATHERED_TINT)
-		house.position = platform_pos
-		house.rotation.y = _rng.randf_range(0.0, TAU)
-		_tint_meshes_recursive(house, WOOD_WEATHERED_TINT)
-		parent.add_child(house)
+		_build_open_treehouse(parent,platform_pos,Color(0.24,0.40,0.20),WOOD_WEATHERED_TINT)
 
 	for i in WOOD_BLORB_COUNT:
 		var angle := _rng.randf_range(0.0, TAU)
@@ -598,9 +597,27 @@ func _build_wood_kingdom_area() -> void:
 		var local := WOOD_AREA_CENTER + Vector2(cos(angle) * r, sin(angle) * r)
 		var inst: Blorb = WOOD_BLORB_SCENE.instantiate()
 		inst.in_party = false
-		inst.initial_element = "wood"
+		inst.initial_element = "wood" if i % 2 == 0 else ""
 		inst.position = Vector3(local.x, _terrain.get_mesh_height(local.x, local.y), local.y)
 		parent.add_child(inst)
+
+
+## Treehouses are open platforming pavilions: one central timber support and
+## a broad leaf roof, never four walls blocking the spiral route through the
+## tree. The same language serves the occupied and abandoned Wood villages.
+func _build_open_treehouse(parent: Node3D,platform_pos: Vector3,roof_color: Color,wood_color: Color) -> void:
+	var pavilion := StaticBody3D.new()
+	pavilion.collision_layer = 1
+	pavilion.position = platform_pos
+	var pillar := SuperEgg.build_part(Vector3(0.18,1.55,0.18),wood_color,SuperEgg.EPSILON_SOFT,SuperEgg.EPSILON_FLAT)
+	pillar.position.y = 1.55
+	pavilion.add_child(pillar)
+	CollisionPolicy.add_box(pavilion,pillar,Vector3(0.36,3.1,0.36),pillar.position,Basis(),false)
+	var roof := SuperEgg.build_part(Vector3(2.15,0.16,2.15),roof_color,3.6,3.6)
+	roof.position.y = 3.18
+	pavilion.add_child(roof)
+	CollisionPolicy.add_box(pavilion,roof,Vector3(4.3,0.32,4.3),roof.position,Basis(),true)
+	parent.add_child(pavilion)
 
 
 ## Shared recursive mesh-retint helper -- NatureProps.build_emergent_tree()'s

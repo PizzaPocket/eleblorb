@@ -116,7 +116,7 @@ const PLATFORM_AID_APPROACH_DISTANCE := COLLIDER_RADIUS + 0.4 + 0.12
 const BULGE_T := 0.30
 
 const CORE_RADIUS := 0.07  # apple-sized, matches gem.gd's own default scale
-const HEAD_MOD_ITEMS := ["Diving Helmet", "Knight's Helm", "Lava Helm", "Nautilus Crown"]
+const HEAD_MOD_ITEMS := ["Diving Helmet", "Knight's Helm", "Lava Helm", "Nautilus Crown", "Toboggan", "Bird Helm"]
 const ARMOR_MOD_ITEMS := ["Dented Breastplate"]
 ## The "shiny blorb" cosmetic override applied in _build_visuals() -- a
 ## bright pearlescent cream, distinctly shinier than the plain off-white
@@ -495,6 +495,10 @@ var is_blorbus: bool = false
 ## Player owns movement while psychically inhabiting this body. This keeps
 ## the ordinary idle/follow loop from fighting direct input.
 var is_player_controlled: bool = false
+## Ordinary blorbs remain party companions by default. Story content can
+## promote a specific individual into the playable roster without changing
+## its creature type or making every blorb controllable.
+var playable_unlocked: bool = false
 
 
 func _ready() -> void:
@@ -530,6 +534,11 @@ func _ready() -> void:
 	if blorb_type == "size":
 		collision_layer = GIANT_THROWABLE_LAYER
 	add_to_group("blorbs")
+	if blorb_type == "size":
+		add_to_group("psychic_control_targets")
+	else:
+		add_to_group("party_playable_candidates")
+		PartyControl.register_member(self)
 	_player = get_node("../Player")
 	# Reads the player's own walk speed directly rather than duplicating the
 	# number, so it stays correct if move_speed is ever retuned. Sprinting
@@ -544,6 +553,65 @@ func _ready() -> void:
 	_idle_pause_timer = _rng.randf_range(IDLE_PAUSE_MIN, IDLE_PAUSE_MAX)
 	if blorb_name == "Blorbaka":
 		Interactable.attach(self, "Talk to Blorbaka", TALK_RADIUS, _on_blorbaka_talk)
+
+
+func playable_id() -> String:
+	return PartyControl.BLORBUS_ID if is_blorbus else "blorb:%s" % blorb_name.to_snake_case()
+
+
+func is_playable_available() -> bool:
+	return (is_blorbus or playable_unlocked) and in_party and not is_melted and not is_worn
+
+
+func has_playable_capability(_capability: StringName) -> bool:
+	return false
+
+
+func playable_switch_order() -> int:
+	return 10 if is_blorbus else 100
+
+
+func begin_direct_control() -> void:
+	is_player_controlled = true
+
+
+func end_direct_control() -> void:
+	is_player_controlled = false
+
+
+func is_psychically_controllable_by(source: Node3D) -> bool:
+	return (
+		blorb_type == "size"
+		and source != null
+		and source.has_method("playable_id")
+		and String(source.playable_id()) == PartyControl.BLORBUS_ID
+	)
+
+
+func begin_psychic_control(source: Node3D) -> bool:
+	if not is_psychically_controllable_by(source):
+		return false
+	is_player_controlled = true
+	return true
+
+
+func end_psychic_control(_source: Node3D) -> void:
+	is_player_controlled = false
+
+
+func psychic_camera_profile() -> Dictionary:
+	if blorb_type != "size":
+		return {}
+	var scaled_height: float = BODY_HEIGHT * size_multiplier * vertical_scale
+	var crown_height: float = (BODY_HEIGHT - EMBED_DEPTH) * size_multiplier * vertical_scale
+	return {
+		"height": crown_height + scaled_height * 0.25,
+		"distance": RADIUS * size_multiplier * 1.4,
+	}
+
+
+func _exit_tree() -> void:
+	PartyControl.unregister_member(self)
 
 
 func _build_visuals() -> void:
@@ -924,6 +992,13 @@ func heal(amount: float) -> void:
 		current_hp = minf(current_hp + amount, float(max_hp))
 
 
+func restore_for_recovery(minimum_fraction: float = 1.0) -> void:
+	current_hp = maxf(current_hp, float(max_hp) * clampf(minimum_fraction, 0.0, 1.0))
+	current_mp = maxf(current_mp, float(max_mp) * clampf(minimum_fraction, 0.0, 1.0))
+	if is_melted:
+		_reform()
+
+
 func _update_resources(delta: float) -> void:
 	_mp_regen_delay = maxf(_mp_regen_delay - delta, 0.0)
 	_hp_regen_delay = maxf(_hp_regen_delay - delta, 0.0)
@@ -965,6 +1040,10 @@ func melt() -> void:
 	if _collision_shape != null:
 		_collision_shape.disabled = true
 	_cancel_autonomous_combat()
+	if is_blorbus and is_player_controlled:
+		var player := get_tree().get_first_node_in_group("player") as Player
+		if player != null:
+			player.force_human_control.call_deferred(false)
 
 
 func _reform() -> void:
@@ -1006,7 +1085,7 @@ func _element_glow_color() -> Color:
 		"ice":
 			return Color(0.75, 0.93, 0.98)
 		"snow":
-			return Color(0.96, 0.97, 1.0)
+			return ElementPalette.SNOW_BODY
 		"wood":
 			return Color(0.48, 0.3, 0.16)
 		_:
@@ -1029,7 +1108,7 @@ func _apply_element_visuals() -> void:
 			# Medium-dark blue, deliberately between a pale sky blue and
 			# a near-navy -- "dark viscous water," per direct
 			# instruction, not bright/cartoonish.
-			_body_material.albedo_color = Color(0.08, 0.28, 0.55, 0.9)
+			_body_material.albedo_color = Color(ElementPalette.WATER_BODY,0.9)
 			_body_material.roughness = 0.05
 			_body_material.metallic = 0.1
 			core_material.albedo_color = Color(0.2, 0.45, 0.8)
@@ -1037,7 +1116,7 @@ func _apply_element_visuals() -> void:
 			core_material.emission = Color(0.2, 0.45, 0.8)
 			core_material.emission_energy_multiplier = 1.0
 		"fire":
-			_body_material.albedo_color = Color(0.85, 0.25, 0.05, 0.95)
+			_body_material.albedo_color = Color(ElementPalette.FIRE_BODY,0.95)
 			_body_material.roughness = 0.35
 			_body_material.metallic = 0.0
 			_body_material.emission_enabled = true
@@ -1049,7 +1128,7 @@ func _apply_element_visuals() -> void:
 			core_material.emission_energy_multiplier = 1.6
 			_add_core_light(Color(1.0, 0.45, 0.05))
 		"electric":
-			_body_material.albedo_color = Color(0.92, 0.82, 0.15, 0.9)
+			_body_material.albedo_color = Color(ElementPalette.ELECTRIC_BODY,0.9)
 			_body_material.roughness = 0.1
 			_body_material.metallic = 0.05
 			_body_material.emission_enabled = true
@@ -1061,23 +1140,22 @@ func _apply_element_visuals() -> void:
 			core_material.emission_energy_multiplier = 1.8
 			_add_core_light(Color(1.0, 0.9, 0.25))
 		"rock":
-			# Warm banded-sandstone brown (matches the canyon biome's own
-			# CANYON_BAND_COLORS palette, see nature_props.gd) rather than
-			# flat grey stone -- this project's rock formations already
-			# lean earthy/orange, not grey.
-			_body_material.albedo_color = Color(0.5, 0.36, 0.22, 0.92)
+			# One shared hue with natural boulders and the hardened worn suit.
+			# The living free form remains slightly translucent and less dry.
+			var rock_color := ElementPalette.ROCK_BODY
+			_body_material.albedo_color = Color(rock_color.r,rock_color.g,rock_color.b,0.92)
 			_body_material.roughness = 0.7
 			_body_material.metallic = 0.0
-			core_material.albedo_color = Color(0.65, 0.48, 0.28)
+			core_material.albedo_color = rock_color.lightened(0.16)
 			core_material.emission_enabled = true
-			core_material.emission = Color(0.55, 0.4, 0.2)
+			core_material.emission = rock_color.lightened(0.08)
 			core_material.emission_energy_multiplier = 0.7
 		"ground":
 			# Deliberately darker/richer than "rock" above -- loamy soil,
 			# not sandstone -- so the two read as distinct elements despite
 			# both being earth-toned. Per direct instruction, ground is its
 			# own element, not just a synonym for rock.
-			_body_material.albedo_color = Color(0.3, 0.2, 0.1, 0.93)
+			_body_material.albedo_color = Color(ElementPalette.GROUND_BODY,0.93)
 			_body_material.roughness = 0.55
 			_body_material.metallic = 0.0
 			core_material.albedo_color = Color(0.5, 0.38, 0.15)
@@ -1086,7 +1164,7 @@ func _apply_element_visuals() -> void:
 			core_material.emission_energy_multiplier = 0.8
 		"air":
 			# Pale, luminous sky-blue: distinct from the darker water blorb.
-			_body_material.albedo_color = Color(0.62, 0.84, 1.0, 0.72)
+			_body_material.albedo_color = Color(ElementPalette.AIR_BODY,0.72)
 			_body_material.roughness = 0.02
 			_body_material.metallic = 0.08
 			_body_material.emission_enabled = true
@@ -1108,7 +1186,7 @@ func _apply_element_visuals() -> void:
 		"plant":
 			# Leafy, saturated green -- distinct from ground/rock's earth
 			# tones and matched to the jungle biome's own foliage palette.
-			_body_material.albedo_color = Color(0.22, 0.6, 0.2, 0.9)
+			_body_material.albedo_color = Color(ElementPalette.PLANT_BODY,0.9)
 			_body_material.roughness = 0.3
 			_body_material.metallic = 0.0
 			core_material.albedo_color = Color(0.4, 0.85, 0.35)
@@ -1123,7 +1201,7 @@ func _apply_element_visuals() -> void:
 			# Psychic-type individual (e.g. False Hero's own Blorbaka)
 			# needs its own distinguishable look rather than reading as
 			# another Blorbus.
-			_body_material.albedo_color = Color(0.45, 0.28, 0.62, 0.9)
+			_body_material.albedo_color = Color(ElementPalette.PSYCHIC_BODY,0.9)
 			_body_material.roughness = 0.15
 			_body_material.metallic = 0.05
 			_body_material.emission_enabled = true
@@ -1139,7 +1217,7 @@ func _apply_element_visuals() -> void:
 			# that case above) so the two don't read as reskins of each
 			# other; City is meant to feel electrified/urban (a lit-up
 			# core, same as Electric/Fire), not airy.
-			_body_material.albedo_color = Color(0.15, 0.5, 0.75, 0.9)
+			_body_material.albedo_color = Color(ElementPalette.CITY_BODY,0.9)
 			_body_material.roughness = 0.1
 			_body_material.metallic = 0.2
 			_body_material.emission_enabled = true
@@ -1156,7 +1234,7 @@ func _apply_element_visuals() -> void:
 			# solid-ice read) and from City's saturated azure. No
 			# _add_core_light() -- per docs/world_bible.md, only Fire and
 			# Electric blorbs give off real light.
-			_body_material.albedo_color = Color(0.78, 0.92, 0.98, 0.85)
+			_body_material.albedo_color = Color(ElementPalette.ICE_BODY,0.85)
 			_body_material.roughness = 0.05
 			_body_material.metallic = 0.15
 			_body_material.emission_enabled = true
@@ -1171,7 +1249,7 @@ func _apply_element_visuals() -> void:
 			# glassy than Ice above (higher roughness, no metallic) so a
 			# packed-snow blorb reads distinct from a solid-ice one despite
 			# sharing the same pale family.
-			_body_material.albedo_color = Color(0.94, 0.96, 0.98, 0.95)
+			_body_material.albedo_color = Color(ElementPalette.SNOW_BODY,0.95)
 			_body_material.roughness = 0.55
 			_body_material.metallic = 0.0
 			core_material.albedo_color = Color(0.9, 0.95, 1.0)
@@ -1184,13 +1262,22 @@ func _apply_element_visuals() -> void:
 			# hue. No emission on the body (a plain, unlit material, matching
 			# Rock/Ground's own no-body-emission treatment); a faint warm
 			# core glow only.
-			_body_material.albedo_color = Color(0.42, 0.26, 0.15, 0.95)
+			_body_material.albedo_color = Color(ElementPalette.WOOD_BODY,0.95)
 			_body_material.roughness = 0.75
 			_body_material.metallic = 0.0
 			core_material.albedo_color = Color(0.55, 0.36, 0.2)
 			core_material.emission_enabled = true
 			core_material.emission = Color(0.5, 0.32, 0.16)
 			core_material.emission_energy_multiplier = 0.6
+	# Eyes are created before an initial element is applied. Retint them from
+	# the final body material here so every transformed blorb follows the same
+	# darker-on-body eye convention instead of retaining its old goo colour.
+	var eye_color := _body_material.albedo_color.darkened(0.25)
+	for eye in _eyes:
+		if is_instance_valid(eye):
+			var eye_material := eye.get_surface_override_material(0) as StandardMaterial3D
+			if eye_material != null:
+				eye_material.albedo_color = eye_color
 
 
 ## Checked after every successful gem merge on a starter-trio member (see
@@ -1764,6 +1851,16 @@ func _process(delta: float) -> void:
 		_fall_velocity = 0.0
 		_update_surface_tilt(delta, Vector3.UP)
 		return
+	# Rock blorbs are deliberately non-buoyant. They fall under the ordinary
+	# gravity path below until they meet the seabed, and can only regain an
+	# above-water elevation by following onto real rising terrain or by being
+	# equipped. In particular they never borrow the generic surface float.
+	var rock_sinking := element_state == "rock" and in_deep_water
+	if rock_sinking:
+		_hop_active = false
+		_hop_is_attack = false
+		_climbing = false
+		body.scale = body.scale.lerp(Vector3.ONE, SETTLE_SPEED * motion_speed_scale() * delta)
 	# A normal free blorb is buoyant: once the basin is genuinely deep it
 	# follows the lake surface, remaining partially immersed, rather than
 	# snapping all the way down to terrain thousands of centimetres below.
@@ -1772,7 +1869,7 @@ func _process(delta: float) -> void:
 	var lake_float := false
 	if blorb_type != "size" and terrain.is_lake_area(Vector2(global_position.x, global_position.z)):
 		water_level = terrain.get_lake_water_level()
-		lake_float = water_level - ground_h >= LAKE_FLOAT_MIN_DEPTH
+		lake_float = water_level - ground_h >= LAKE_FLOAT_MIN_DEPTH and element_state != "rock"
 		if lake_float:
 			_hop_active = false
 			_climbing = false
@@ -1794,7 +1891,7 @@ func _process(delta: float) -> void:
 	# biome's slab floor and correcting with a jarring pop instead of
 	# visibly climbing onto it.
 	const CLIMB_HOP_THRESHOLD := 0.15
-	if allow_movement_hops and rise > CLIMB_HOP_THRESHOLD and not _climbing:
+	if allow_movement_hops and not rock_sinking and rise > CLIMB_HOP_THRESHOLD and not _climbing:
 		_climbing = true
 		_climb_start_y = global_position.y
 		if not _hop_active:
@@ -1974,7 +2071,10 @@ func _ground_height_at(x: float, z: float) -> float:
 			var giant_top: Variant = giant.giant_surface_height_at(x, z)
 			if giant_top != null:
 				return maxf(terrain_h, giant_top as float)
-	var support_probe_y := global_position.y + SUPPORT_ACQUIRE_HEIGHT
+	# Canyon paving and shelves are ordinary ground to blorbs, including on
+	# their first frame after a terrain-height spawn. A terrain-relative probe
+	# catches those supports without searching up through roofs elsewhere.
+	var support_probe_y := maxf(global_position.y + SUPPORT_ACQUIRE_HEIGHT, terrain_h + 4.0)
 	if _platform_aid_time > 0.0 and not is_nan(_platform_aid_support_y):
 		support_probe_y = maxf(support_probe_y, _platform_aid_support_y + SUPPORT_ACQUIRE_HEIGHT)
 	var from := Vector3(x, support_probe_y, z)
@@ -2165,7 +2265,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	# height would otherwise place him. Mirrors the free-roaming follower's
 	# own lake_float check above, just evaluated here instead since a
 	# player-controlled body skips the rest of _process() entirely.
-	if blorb_type != "size" and terrain.is_lake_area(next):
+	if blorb_type != "size" and element_state != "rock" and terrain.is_lake_area(next):
 		var water_level: float = terrain.get_lake_water_level()
 		if water_level - ground_h >= LAKE_FLOAT_MIN_DEPTH:
 			var visible_height := BODY_HEIGHT * size_multiplier * vertical_scale
@@ -2217,6 +2317,14 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			UISounds.play_foley(&"giant_move", 0.66, get_instance_id())
 		elif blorb_type != "size":
 			UISounds.pulse_blorb_glide(get_instance_id())
+	# Direct control returns before the ordinary roaming update that normally
+	# owns support alignment. Always resolve the visible body toward the live
+	# surface normal here too, including while idle, so an old slope tilt can
+	# never remain frozen after Blorbus reaches flatter ground.
+	var support_normal := Vector3.UP
+	if blorb_type != "size" and not terrain.is_lake_area(next):
+		support_normal = _surface_normal_at(next.x, next.y, ground_h)
+	_update_surface_tilt(delta, support_normal)
 
 
 ## Detects a descending direct-control body crossing a blorb surface or an
@@ -2324,6 +2432,11 @@ func _try_rock_attack() -> void:
 		and terrain.has_method("get_ice_level")
 	):
 		origin.y = terrain.get_ice_level()
+	elif element_state == "rock":
+		# Water is not a support surface. A cast aimed through it erupts from
+		# the actual seabed, with the local sandy material language.
+		origin.y = terrain.get_mesh_height(origin.x, origin.z)
+	var rock_color := _rock_crag_color(Vector2(origin.x, origin.z))
 	var rock_count: int = mini(1 + (level - 1) / 5, 4)
 	for i in rock_count:
 		var angle: float = TAU * float(i) / float(rock_count)
@@ -2331,7 +2444,7 @@ func _try_rock_attack() -> void:
 		if element_state == "ice":
 			IceCrag.spawn(get_tree().current_scene, origin + offset, _rng, level)
 		else:
-			RockCrag.spawn(get_tree().current_scene, origin + offset, _rng, level)
+			RockCrag.spawn(get_tree().current_scene, origin + offset, _rng, level, 1.0, rock_color)
 	var level_damage_scale: float = 1.0 + float(level - 1) * 0.08
 	var roll := CombatMath.rolled_attack(ROCK_CRAG_DAMAGE_BASE * level_damage_scale, strength, _rng)
 	for node in get_tree().get_nodes_in_group("skeletons"):
@@ -2346,6 +2459,10 @@ func _try_rock_attack() -> void:
 		var final_damage: float = roll["amount"] * CombatMath.type_multiplier(element_state, defender_element)
 		skeleton.take_damage(final_damage, self)
 	_attack_cooldown = ROCK_ATTACK_COOLDOWN
+
+
+func _rock_crag_color(pos: Vector2) -> Color:
+	return ElementPalette.ROCK_BODY
 
 
 ## Plant blorbs' combat response: fires a single SeedPellet at the target's

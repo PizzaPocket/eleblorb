@@ -13,6 +13,7 @@ const PICK_WIDTH := 0.16
 ## wings, helmets, or a highlighted preview piece enter and leave the doll.
 const FRAME_SPAN_SCALE := 0.72
 const FRAME_DEPTH_ALLOWANCE := 0.32
+const XIAO_HOU_ZI_DISPLAY_SCALE := 2.3585
 
 var _viewport: SubViewport
 var _camera: Camera3D
@@ -29,9 +30,10 @@ var _focused_blorb: Blorb = null
 var _dim_overlay: StandardMaterial3D
 var _selected_overlay: StandardMaterial3D
 var _reference_overlay: StandardMaterial3D
+var _rig_scale: float = 1.0
 
 
-func setup(player: Node3D, _live_visuals: Node3D) -> void:
+func setup(player: Node3D, _live_visuals: Node3D, body_kind: String = "human") -> void:
 	_viewport = SubViewport.new()
 	_viewport.name = "BlorbPaperDollViewport"
 	_viewport.size = Vector2i(RESOLUTION, RESOLUTION)
@@ -47,7 +49,12 @@ func setup(player: Node3D, _live_visuals: Node3D) -> void:
 	_root = Node3D.new()
 	_root.name = "PaperDollFigure"
 	_viewport.add_child(_root)
-	_pivots = Player.build_portrait_body(_root)
+	if body_kind == "xiao_hou_zi":
+		_pivots = MonkeyFigure.build(_root, MonkeyFigure.MONKEY_FUR_COLOR, XIAO_HOU_ZI_DISPLAY_SCALE)
+		_rig_scale = MonkeyFigure.BLORB_SUIT_RIG_SCALE
+	else:
+		_pivots = Player.build_portrait_body(_root)
+		_rig_scale = 1.0
 	# Capture the canonical naked figure once. Suit geometry is deliberately
 	# excluded: it may change the silhouette, but must never change the apparent
 	# scale or center of the person wearing it.
@@ -226,7 +233,7 @@ func _rebuild_preview() -> void:
 		var blorb := preview_blorbs.get(slot) as Blorb
 		if blorb == null or not is_instance_valid(blorb):
 			continue
-		var pieces := BlorbSuit.equip_slot(slot, _preview_pivots(), _root, blorb, 1.0, lava_helm_command)
+		var pieces := BlorbSuit.equip_slot(slot, _preview_pivots(), _root, blorb, _rig_scale, lava_helm_command)
 		_preview_pieces_by_slot[slot] = pieces
 		_preview_blorbs_by_slot[slot] = blorb
 	_apply_highlight()

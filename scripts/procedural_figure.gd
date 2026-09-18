@@ -461,10 +461,11 @@ static func build(
 	thorax_pivot.name = "ThoraxPivot"
 	spine_pivot.add_child(thorax_pivot)
 
+	var abdomen: MeshInstance3D = null
 	if skeleton_mode:
 		build_spine_column(spine_pivot, abdomen_size, shirt_color, abdomen_z_offset)
 	else:
-		var abdomen := SuperEgg.build_part(abdomen_size, shirt_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		abdomen = SuperEgg.build_part(abdomen_size, shirt_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 		abdomen.position = Vector3(0, abdomen_size.y, abdomen_z_offset)
 		spine_pivot.add_child(abdomen)
 
@@ -635,7 +636,10 @@ static func build(
 	return {
 		"spine": spine_pivot,
 		"thorax": thorax_pivot,
+		"abdomen": abdomen,
+		"chest": chest,
 		"neck": neck_pivot,
+		"neck_mesh": neck,
 		"head": head_pivot,
 		"head_mesh": head_mesh,
 		"eyes": eyes,

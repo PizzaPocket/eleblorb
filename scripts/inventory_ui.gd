@@ -61,7 +61,13 @@ const ITEM_HELD_FEEDBACK_DURATION := 1.6
 ## The paper-doll actions form one visual/control column. A shared width
 ## prevents the shorter "Remove" label producing a smaller target than the
 ## destructive action beneath it.
-const PORTRAIT_ACTION_MIN_WIDTH := 280.0
+const PORTRAIT_ACTION_MIN_WIDTH := 380.0
+const NAV_REPEAT_DELAY := 0.38
+const NAV_REPEAT_INTERVAL := 0.085
+## Destructive/context actions must visibly catch focus before a held stick
+## can repeat past them. This is separate from the list's initial repeat
+## delay because focus can arrive midway through an already-held direction.
+const PORTRAIT_ACTION_FOCUS_DWELL := 0.32
 
 var _panel: PanelContainer
 var _coin_readout: PanelContainer
@@ -98,6 +104,9 @@ var _player_stats: VBoxContainer
 var _item_held_feedback: PanelContainer
 var _item_held_feedback_timer: float = 0.0
 var _active_tab: String = "items"
+var _nav_repeat_direction := 0
+var _nav_repeat_timer := 0.0
+var _portrait_action_focus_dwell := 0.0
 var _open: bool = false
 ## The blorb currently selected in the left-hand party list -- clicking a
 ## slot region on the right-hand paper-doll equips this blorb there;
@@ -116,6 +125,9 @@ var _release_confirm_panel: PanelContainer
 var _release_confirm_label: Label
 var _release_confirm_buttons: Array[Button] = []
 var _release_confirm_target: Blorb = null
+var _item_action_panel: PanelContainer
+var _item_action_buttons: Array[Button] = []
+var _item_action_item: Dictionary = {}
 
 
 func _ready() -> void:
@@ -124,9 +136,11 @@ func _ready() -> void:
 	layer = 35
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build_ui()
+	_build_item_action_ui()
 	get_viewport().size_changed.connect(_apply_responsive_layout)
 	TokoinWallet.changed.connect(_on_wallet_changed)
 	Inventory.changed.connect(_refresh)
+	HumongousState.changed.connect(_refresh)
 	# So the held-slot highlight (see _build_slot's is_held check) actually
 	# updates the moment you click to hold/unhold something, not just on the
 	# next Inventory.changed (add/remove) or the next time the panel opens --
@@ -384,6 +398,7 @@ func _build_portrait_area() -> void:
 	_portrait_remove_button = UIKit.button("Remove", _remove_selected_assignment)
 	_portrait_remove_button.custom_minimum_size.x = PORTRAIT_ACTION_MIN_WIDTH
 	_portrait_remove_button.gui_input.connect(_on_remove_input)
+	_portrait_remove_button.focus_entered.connect(_on_portrait_action_focused)
 	UIKit.anchor_to_edge(
 		_portrait_remove_button, 1.0, 0.5, UITheme.SPACE_MD, 0.0
 	)
@@ -400,6 +415,7 @@ func _build_portrait_area() -> void:
 	_release_button = UIKit.button("Release to the Wild", _confirm_release_selected_blorb)
 	_release_button.custom_minimum_size.x = PORTRAIT_ACTION_MIN_WIDTH
 	_release_button.gui_input.connect(_on_release_input)
+	_release_button.focus_entered.connect(_on_portrait_action_focused)
 	UIKit.anchor_to_edge(_release_button, 1.0, 0.5, UITheme.SPACE_MD, 0.0)
 	_release_button.offset_top += UITheme.BUTTON_MIN_HEIGHT + UITheme.SPACE_LG
 	_release_button.offset_bottom += UITheme.BUTTON_MIN_HEIGHT + UITheme.SPACE_LG
@@ -663,6 +679,12 @@ func _update_remove_action() -> void:
 
 
 func _on_remove_input(event: InputEvent) -> void:
+	if _portrait_action_focus_dwell > 0.0 and (
+		event.is_action_pressed("ui_left") or event.is_action_pressed("ui_right")
+		or event.is_action_pressed("ui_up") or event.is_action_pressed("ui_down")
+	):
+		_portrait_remove_button.accept_event()
+		return
 	if event.is_action_pressed("ui_left") or event.is_action_pressed("ui_up"):
 		_portrait_button.grab_focus()
 		_portrait_remove_button.accept_event()
@@ -692,6 +714,12 @@ func _update_release_action() -> void:
 
 
 func _on_release_input(event: InputEvent) -> void:
+	if _portrait_action_focus_dwell > 0.0 and (
+		event.is_action_pressed("ui_left") or event.is_action_pressed("ui_right")
+		or event.is_action_pressed("ui_up") or event.is_action_pressed("ui_down")
+	):
+		_release_button.accept_event()
+		return
 	if event.is_action_pressed("ui_left"):
 		_portrait_button.grab_focus()
 		_release_button.accept_event()
@@ -766,7 +794,8 @@ func _refresh_portrait() -> void:
 	var player := get_tree().get_first_node_in_group("player")
 	if player == null:
 		return
-	var player_id := player.get_instance_id()
+	var active := PartyControl.active_member()
+	var player_id := active.get_instance_id() if active != null else player.get_instance_id()
 	if _portrait_player_id == player_id and _portrait_container.get_child_count() > 0:
 		return
 	# InventoryUI survives scene changes; Player and its SubViewport do not.
@@ -863,6 +892,11 @@ func _process(delta: float) -> void:
 	# DialogUI's own modal focus lock -- ui_cancel backs out of the confirm
 	# alone (Never mind.) rather than falling through to _back()'s ordinary
 	# blorb-deselect/close-inventory handling.
+	if _item_action_panel.visible:
+		if Input.is_action_just_pressed("ui_cancel"):
+			_close_item_actions()
+		UIKit.ensure_modal_focus(_item_action_panel, _item_action_buttons)
+		return
 	if _release_confirm_panel.visible:
 		if Input.is_action_just_pressed("ui_cancel"):
 			_cancel_release_confirm()
@@ -885,7 +919,47 @@ func _process(delta: float) -> void:
 		if absf(scroll_axis) > 0.18:
 			_blorb_scroll.scroll_vertical += roundi(scroll_axis * 720.0 * delta)
 	if _open:
+		_update_held_navigation_repeat(delta)
 		_ensure_inventory_focus()
+
+
+func _update_held_navigation_repeat(delta: float) -> void:
+	_portrait_action_focus_dwell = maxf(_portrait_action_focus_dwell-delta,0.0)
+	var direction := 0
+	if Input.is_action_pressed("ui_up"):
+		direction = -1
+	elif Input.is_action_pressed("ui_down"):
+		direction = 1
+	if direction == 0:
+		_nav_repeat_direction = 0
+		_nav_repeat_timer = 0.0
+		return
+	if direction != _nav_repeat_direction:
+		_nav_repeat_direction = direction
+		_nav_repeat_timer = NAV_REPEAT_DELAY
+		return
+	_nav_repeat_timer -= delta
+	if _nav_repeat_timer > 0.0:
+		return
+	_nav_repeat_timer += NAV_REPEAT_INTERVAL
+	var focused := get_viewport().gui_get_focus_owner() as Control
+	if focused == null:
+		return
+	if _portrait_action_focus_dwell > 0.0 and (
+		focused == _portrait_remove_button or focused == _release_button
+	):
+		return
+	var side: Side = SIDE_TOP if direction < 0 else SIDE_BOTTOM
+	var next := focused.find_valid_focus_neighbor(side)
+	if next != null and next != focused:
+		next.grab_focus()
+
+
+func _on_portrait_action_focused() -> void:
+	_portrait_action_focus_dwell = PORTRAIT_ACTION_FOCUS_DWELL
+	# Restart repeat timing from this stable stop. Otherwise the repeat timer
+	# may already be negative when the dwell expires and move immediately.
+	_nav_repeat_timer = maxf(_nav_repeat_timer,PORTRAIT_ACTION_FOCUS_DWELL)
 
 
 ## A modal must never strand controller navigation without a focus owner.
@@ -1274,6 +1348,8 @@ func _build_blorb_row(blorb: Blorb) -> Control:
 			)
 	for item_name in blorb.core_items:
 		equipment_row.add_child(_build_bound_item_slot(item_name))
+	if blorb.is_blorbus and HumongousState.is_carried():
+		equipment_row.add_child(_build_humongous_core_slot())
 
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -1348,6 +1424,31 @@ func _build_bound_item_slot(item_name: String) -> PanelContainer:
 	var label := UIKit.caption_label(item_name)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	contents.add_child(label)
+	return slot
+
+
+## Humongous is living core cargo, not a bound equipment item. His socket is
+## deliberately built beside those slots but kept visually and semantically
+## separate so future titans do not get folded into Blorbus.core_items.
+func _build_humongous_core_slot() -> PanelContainer:
+	var slot := PanelContainer.new()
+	slot.custom_minimum_size = BOUND_ITEM_SLOT_SIZE
+	slot.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	slot.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.add_theme_stylebox_override("panel", UITheme.slot_stylebox())
+	var contents := VBoxContainer.new()
+	contents.alignment = BoxContainer.ALIGNMENT_CENTER
+	contents.add_theme_constant_override("separation", UITheme.SPACE_XS)
+	contents.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.add_child(contents)
+	var portrait := UIKit.portrait_slot(84.0)
+	contents.add_child(portrait)
+	BlorbPortrait.apply_portrait(portrait, get_tree(), "", Color(0.7, 0.78, 0.72, 0.9), false)
+	var label := UIKit.caption_label("Humongous\nin core")
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	contents.add_child(label)
 	return slot
@@ -1458,12 +1559,93 @@ func _build_slot(item: Dictionary) -> Control:
 
 func _on_item_slot_pressed(item: Dictionary, is_held: bool) -> void:
 	_focus_restore_item_name = str(item.get("name", ""))
-	if is_held:
-		HeldItem.clear()
-		_clear_item_held_feedback()
-	else:
-		HeldItem.equip(item)
-		_show_item_held_feedback(str(item.get("name", "Item")))
+	_open_item_actions(item, is_held)
+
+
+func _build_item_action_ui() -> void:
+	_item_action_panel = UIKit.panel()
+	_item_action_panel.theme = UITheme.get_theme()
+	_item_action_panel.custom_minimum_size = Vector2(390, 0)
+	UIKit.anchor_to_edge(_item_action_panel, 0.5, 0.5, 0.0, 0.0)
+	_item_action_panel.visible = false
+	add_child(_item_action_panel)
+
+
+func _open_item_actions(item: Dictionary, is_held: bool) -> void:
+	_item_action_item = item
+	for child in _item_action_panel.get_children():
+		child.queue_free()
+	_item_action_buttons.clear()
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", UITheme.SPACE_LG)
+	margin.add_theme_constant_override("margin_right", UITheme.SPACE_LG)
+	margin.add_theme_constant_override("margin_top", UITheme.SPACE_LG)
+	margin.add_theme_constant_override("margin_bottom", UITheme.SPACE_LG)
+	_item_action_panel.add_child(margin)
+	var actions := VBoxContainer.new()
+	actions.add_theme_constant_override("separation", UITheme.SPACE_SM)
+	margin.add_child(actions)
+	actions.add_child(UIKit.heading(String(item.get("name", "Item"))))
+	var hold_button := UIKit.button("Stop Holding" if is_held else "Hold", _stop_holding if is_held else _hold_action_item)
+	actions.add_child(hold_button)
+	_item_action_buttons.append(hold_button)
+	var catalog := ShopCatalog.find(String(item.get("name", "")))
+	if bool(catalog.get("edible", false)):
+		var eat_button := UIKit.button("Eat", _eat_action_item)
+		actions.add_child(eat_button)
+		_item_action_buttons.append(eat_button)
+	var back_button := UIKit.button("Back", _close_item_actions)
+	back_button.set_meta("ui_sound_kind", "back")
+	actions.add_child(back_button)
+	_item_action_buttons.append(back_button)
+	_item_action_panel.visible = true
+	_item_action_buttons[0].grab_focus.call_deferred()
+
+
+## Per direct correction, choosing "Hold" closes the whole inventory
+## immediately instead of just backing out to the item grid -- the player is
+## done once they've picked what to hold. _close() itself clears any pending
+## held-item toast, so the "held in hand" feedback is shown after it, not
+## before, or it would be wiped out the instant the menu closes.
+func _hold_action_item() -> void:
+	var item_name := String(_item_action_item.get("name", "Item"))
+	HeldItem.equip(_item_action_item)
+	_item_action_panel.visible = false
+	_item_action_item = {}
+	_item_action_buttons.clear()
+	_close()
+	_show_item_held_feedback(item_name)
+
+
+func _stop_holding() -> void:
+	HeldItem.clear()
+	_clear_item_held_feedback()
+	_close_item_actions()
+
+
+func _eat_action_item() -> void:
+	var item_name := String(_item_action_item.get("name", ""))
+	var player := get_tree().get_first_node_in_group("player") as Player
+	var healing := ShopCatalog.edible_healing(item_name)
+	if player == null or healing <= 0.0:
+		return
+	if player.current_hp >= Player.MAX_HP:
+		Hud.show_message("You aren't hungry right now.")
+		_close_item_actions()
+		return
+	if Inventory.remove(item_name):
+		player.heal(healing)
+		if not Inventory.has(item_name) and not HeldItem.current.is_empty() and String(HeldItem.current.get("name", "")) == item_name:
+			HeldItem.clear()
+		Hud.show_message("%s eaten." % item_name)
+	_close_item_actions()
+
+
+func _close_item_actions() -> void:
+	_item_action_panel.visible = false
+	_item_action_item = {}
+	_item_action_buttons.clear()
+	_refresh()
 
 
 func _show_item_held_feedback(item_name: String) -> void:

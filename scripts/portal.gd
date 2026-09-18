@@ -77,6 +77,10 @@ func _on_activate() -> void:
 	if player == null or not player.is_piloting_blorbus():
 		Hud.show_message("The gate stays still.")
 		return
+	var controlled := player.get_controlled_body()
+	if controlled is Blorb and (controlled as Blorb).blorb_type == "size" and not HumongousState.can_cross_worlds():
+		Hud.show_message("Humongous must first enter Blorbus's core before he can cross worlds.")
+		return
 	KingdomTravel.travel_to(destination_scene, gate_id)
 
 

@@ -21,3 +21,8 @@ func spend(amount: int) -> bool:
 	value -= amount
 	changed.emit(value)
 	return true
+
+
+func set_value(amount: int) -> void:
+	value = maxi(amount, 0)
+	changed.emit(value)

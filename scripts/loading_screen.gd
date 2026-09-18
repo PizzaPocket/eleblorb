@@ -6,8 +6,8 @@ extends CanvasLayer
 
 const TIP_INTERVAL := 3.2
 const READY_HOLD_DURATION := 0.18
-const WEB_WORLD_PROGRESS_START := 0.90
-const WEB_WORLD_PROGRESS_END := 0.97
+const WEB_WORLD_PROGRESS_START := 0.55
+const WEB_WORLD_PROGRESS_END := 0.65
 
 const KEYBOARD_TIPS := [
 	"Press F near people, objects, and Blorbs to interact.",
@@ -45,7 +45,11 @@ var _initial_boot := true
 var _web_loader_active := false
 var _phase := "Preparing Eleblorbs…"
 var _progress := 0.0
+var _display_progress := 0.0
 var _owns_modal_lock := false
+var _build_queue: Array[Dictionary] = []
+var _build_queue_running := false
+var _pending_build_jobs := 0
 
 
 func _ready() -> void:
@@ -61,6 +65,9 @@ func _process(delta: float) -> void:
 	if _finishing or (_screen == null and not _web_loader_active):
 		return
 	_elapsed += delta
+	_display_progress = move_toward(_display_progress, _progress, delta * 0.34)
+	if _progress_bar != null:
+		_progress_bar.value = _display_progress
 	if _elapsed >= TIP_INTERVAL:
 		_elapsed = 0.0
 		_tip_index = (_tip_index + 1) % _tips().size()
@@ -72,6 +79,11 @@ func complete() -> void:
 		return
 	_completion_requested = true
 	set_phase("Ready", 1.0)
+	# The short ready hold is deliberately brief, so finish the visual fill
+	# explicitly instead of asking the normal smoothing pass to catch up.
+	_display_progress = 1.0
+	if _progress_bar != null:
+		_progress_bar.value = 1.0
 	if _initial_boot and _web_loader_active:
 		_web_eval("window.eleblorbWorldReady && window.eleblorbWorldReady();")
 		_initial_boot = false
@@ -99,6 +111,7 @@ func begin_transition() -> void:
 	_elapsed = 0.0
 	_phase = "Travelling…"
 	_progress = 0.0
+	_display_progress = 0.0
 	if _screen == null:
 		_build_ui()
 	else:
@@ -119,6 +132,37 @@ func set_phase(text: String, progress: float = -1.0) -> void:
 func set_world_load_progress(scene_progress: float) -> void:
 	var normalized := clampf(scene_progress, 0.0, 1.0)
 	set_phase("Loading the world…", lerpf(WEB_WORLD_PROGRESS_START, WEB_WORLD_PROGRESS_END, normalized))
+
+
+## Coarse, sequential construction jobs keep dependencies deterministic while
+## yielding one rendered frame between substantial generators. Reporting once
+## per generator is intentionally cheap; it avoids per-object progress work.
+func enqueue_build_stage(label: String, completion_progress: float, job: Callable) -> void:
+	_pending_build_jobs += 1
+	_build_queue.append({"label": label, "progress": completion_progress, "job": job})
+	if not _build_queue_running:
+		_build_queue_running = true
+		_drain_build_queue.call_deferred()
+
+
+func wait_for_world_builds() -> void:
+	# Allow every authored child to register its deferred construction job.
+	await get_tree().process_frame
+	while _pending_build_jobs > 0 or _build_queue_running:
+		await get_tree().process_frame
+
+
+func _drain_build_queue() -> void:
+	while not _build_queue.is_empty():
+		await get_tree().process_frame
+		var entry: Dictionary = _build_queue.pop_front()
+		set_phase(entry["label"] as String)
+		var job: Callable = entry["job"] as Callable
+		if job.is_valid():
+			job.call()
+		_pending_build_jobs -= 1
+		set_phase(entry["label"] as String, float(entry["progress"]))
+	_build_queue_running = false
 
 
 func _fade_out() -> void:
@@ -213,8 +257,6 @@ func _show_tip() -> void:
 func _refresh_ui() -> void:
 	if _phase_label != null:
 		_phase_label.text = _phase
-	if _progress_bar != null:
-		_progress_bar.value = _progress
 
 
 func _layout() -> void:

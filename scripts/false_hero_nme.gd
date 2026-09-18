@@ -134,6 +134,7 @@ var _suit_pieces: Array[Node3D] = []
 ## frame. Each entry retains the cosmetic source Blorb because rebuild_slot()
 ## reads its current body/element appearance while generating the mesh.
 var _dynamic_suit_entries: Array[Dictionary] = []
+var _suit_sources: Dictionary = {}
 var _hips_mesh: MeshInstance3D = null
 
 var _leg_left: Node3D
@@ -146,6 +147,8 @@ var _knee_left: Node3D
 var _knee_right: Node3D
 var _hand_left: Node3D
 var _hand_right: Node3D
+var _toe_left: Node3D
+var _toe_right: Node3D
 var _spine: Node3D
 var _hips: Node3D
 ## Cached rest heights the walk cycle's own body-dip bobs around -- see
@@ -156,6 +159,10 @@ var _spine_rest_y: float = 0.0
 var _hips_rest_y: float = 0.0
 
 var _flamethrower_stream: GPUParticles3D = null
+var _water_jet_left: GPUParticles3D = null
+var _water_jet_right: GPUParticles3D = null
+var _fire_hover_left: GPUParticles3D = null
+var _fire_hover_right: GPUParticles3D = null
 
 @onready var visuals: Node3D = $Visuals
 
@@ -214,6 +221,8 @@ func _build_figure() -> void:
 	_knee_right = _pivots["knee_right"]
 	_hand_left = _pivots["hand_left"] if _pivots.has("hand_left") else _pivots["palm_left"]
 	_hand_right = _pivots["hand_right"] if _pivots.has("hand_right") else _pivots["palm_right"]
+	_toe_left = _pivots["toe_left"]
+	_toe_right = _pivots["toe_right"]
 	_spine = _pivots["spine"]
 	_hips = _pivots["hips"]
 	_spine_rest_y = _spine.position.y
@@ -287,7 +296,15 @@ func _equip_cosmetic_slot(slot: String, element: String, pivot_map: Dictionary) 
 	var source: Blorb = packed.instantiate()
 	source.portrait_mode = true
 	source.initial_element = element
+	# Blorbaka (his head blorb) always carries the Bird Helm bound into her
+	# core -- per direct instruction, that's how the item exists in this
+	# world at all; it's never sold or thrown. The false hero wears it for
+	# the same reason the real Blorbaka does once dropped/joined below (see
+	# _drop_blorbs()).
+	if slot == "head" and element == "psychic":
+		source.core_items = ["Bird Helm"]
 	add_child(source)
+	_suit_sources[slot] = source
 	# ProceduralFigure's tallest build spaces the joints farther apart; the
 	# suit's own thickness must scale too or limbs visibly escape its shell.
 	var pieces := BlorbSuit.equip_slot(slot, pivot_map, visuals, source, 1.25)
@@ -303,7 +320,34 @@ func _equip_cosmetic_slot(slot: String, element: String, pivot_map: Dictionary) 
 			"pivots": pivot_map,
 		})
 	else:
-		source.queue_free()
+		# Static slots still retain their lightweight source as loadout data.
+		# Keeping one common slot interface lets AI wearers and playable wearers
+		# feed the same power/stat systems without making the enemy join a party.
+		source.visible = false
+
+
+func suit_wearer_kind() -> StringName:
+	return &"enemy"
+
+
+func suit_rig_scale() -> float:
+	# Existing False Hero fit calibration; do not derive this from Player.
+	return 1.25
+
+
+func worn_blorb_in_slot(slot: String) -> Blorb:
+	return _suit_sources.get(slot) as Blorb
+
+
+func suit_slot_pivots() -> Dictionary:
+	return {
+		"arm_left": _hand_left,
+		"arm_right": _hand_right,
+		"leg_left": _toe_left,
+		"leg_right": _toe_right,
+		"head": _pivots.get("head"),
+		"torso": _pivots.get("spine"),
+	}
 
 
 func _update_dynamic_suit() -> void:
@@ -336,6 +380,11 @@ func _strip_suit() -> void:
 		if is_instance_valid(source):
 			source.queue_free()
 	_dynamic_suit_entries.clear()
+	for source_node in _suit_sources.values():
+		var source := source_node as Blorb
+		if is_instance_valid(source) and not source.is_queued_for_deletion():
+			source.queue_free()
+	_suit_sources.clear()
 
 
 ## The suit pieces _strip_suit() frees above are purely cosmetic geometry
@@ -378,6 +427,10 @@ func _drop_blorbs() -> void:
 		inst.initial_element = element
 		if element == "psychic":
 			inst.blorb_name = "Blorbaka"
+			# Bound into her core from the start -- see _equip_cosmetic_slot()'s
+			# identical comment. Acquiring Blorbaka herself IS how the player
+			# acquires the Bird Helm; it's never a separate pickup.
+			inst.core_items = ["Bird Helm"]
 		main_root.add_child(inst)
 		inst.global_position = Vector3(pos.x, terrain_ref.get_mesh_height(pos.x, pos.z), pos.z)
 
@@ -493,15 +546,39 @@ func _process(delta: float) -> void:
 	# The suit mesh therefore follows the actual final transforms, including
 	# attack poses and hover poses, rather than an estimated duplicate pose.
 	_update_dynamic_suit()
+	_update_hover_power_fx()
+
+
+func _update_hover_power_fx() -> void:
+	var water_active: bool = _state == State.FIGHTING and _combat_phase == CombatPhase.WATER_HOVER
+	var fire_active: bool = _state == State.FIGHTING and _combat_phase == CombatPhase.FIRE_HOVER
+	if water_active and _water_jet_left == null:
+		_water_jet_left = SuitPowerFX.make_water_stream(self, "LeftWaterFootJet")
+		_water_jet_right = SuitPowerFX.make_water_stream(self, "RightWaterFootJet")
+	if fire_active and _fire_hover_left == null:
+		_fire_hover_left = SuitPowerFX.make_fire_stream(self, "LeftFireHandJet")
+		_fire_hover_right = SuitPowerFX.make_fire_stream(self, "RightFireHandJet")
+	var forward_reference: Vector3 = visuals.global_transform.basis.z
+	SuitPowerFX.point_stream(_water_jet_left, _toe_left, Vector3.DOWN, water_active, forward_reference)
+	SuitPowerFX.point_stream(_water_jet_right, _toe_right, Vector3.DOWN, water_active, forward_reference)
+	SuitPowerFX.point_stream(_fire_hover_left, _hand_left, Vector3.DOWN, fire_active, forward_reference)
+	SuitPowerFX.point_stream(_fire_hover_right, _hand_right, Vector3.DOWN, fire_active, forward_reference)
+	if water_active:
+		UISounds.pulse_power_loop(&"water", get_instance_id())
+	elif fire_active:
+		UISounds.pulse_power_loop(&"fire", get_instance_id())
 
 
 func _find_target() -> Node3D:
 	var here := Vector2(global_position.x, global_position.z)
 	var best: Node3D = null
 	var best_dist := ATTACK_RANGE * 4.0
-	var player := get_tree().get_first_node_in_group("player")
+	# Hostile AI follows control ownership too: attack the body the user is
+	# actually inhabiting (including Xiao or a psychically controlled titan),
+	# rather than always firing at the trailing human shell.
+	var player := PartyControl.active_control_body()
 	if player != null:
-		var dist := here.distance_to(Vector2(player.global_position.x, player.global_position.z))
+		var dist: float = here.distance_to(Vector2(player.global_position.x, player.global_position.z))
 		if dist < best_dist:
 			best_dist = dist
 			best = player
@@ -724,7 +801,7 @@ func _set_flamethrower_active(active: bool) -> void:
 			_flamethrower_stream.emitting = false
 		return
 	if _flamethrower_stream == null:
-		_flamethrower_stream = _make_flamethrower_stream()
+		_flamethrower_stream = SuitPowerFX.make_fire_stream(self, "FlamethrowerStream")
 	_flamethrower_stream.emitting = true
 	var hand := _hand_left if _hover_arm_side_is_left else _hand_right
 	var arm := _arm_left if _hover_arm_side_is_left else _arm_right

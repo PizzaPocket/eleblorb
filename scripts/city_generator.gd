@@ -86,7 +86,7 @@ var _city_skyline_visible := false
 
 func _ready() -> void:
 	terrain = get_node("../Terrain")
-	_rebuild()
+	LoadingScreen.enqueue_build_stage("Preparing navigation…",0.84,_rebuild)
 
 func _rebuild() -> void:
 	var old := get_node_or_null("Generated")

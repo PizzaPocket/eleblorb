@@ -426,21 +426,17 @@ static func build(
 	var head_tilt_factor: float = variant.get("head_tilt_factor", 0.0)
 	var total_tilt := -spine_forward_bend * (1.0 + head_tilt_factor)
 	var head_pivot := pivots["head"] as Node3D
-	# spine_pivot's children, by ProceduralFigure.build()'s own fixed
-	# construction order: abdomen, chest, then a NeckPivot of ITS OWN
-	# (added for player.gd's Manchego-seated-pose head/neck split -- see
-	# that file's own neck_pivot comment), which in turn parents the neck
-	# mesh AND head_pivot together (head_pivot used to be a direct
-	# spine_pivot child alongside neck; both moved under this pivot in a
-	# procedural_figure.gd change made after this section was originally
-	# written, which is what broke this file with a Nil-position crash --
-	# get_child(2) started returning that pivot instead of the neck mesh
-	# itself). arm_right/arm_left are still direct spine_pivot children,
-	# added after -- reached via pivots[], not indices, so unaffected.
-	var abdomen := spine_pivot.get_child(0) as MeshInstance3D
-	var chest := spine_pivot.get_child(1) as MeshInstance3D
-	var proc_neck_pivot := spine_pivot.get_child(2) as Node3D
-	var neck := proc_neck_pivot.get_child(0) as MeshInstance3D
+	# Resolve anatomical pieces through ProceduralFigure's named contract.
+	# This used to index spine_pivot's children by construction order, which
+	# crashed as soon as the shared rig inserted ThoraxPivot and the spine's
+	# direct children became [abdomen, thorax] instead of
+	# [abdomen, chest, neck, arms...]. Named references keep this ape-specific
+	# re-articulation independent of the shared rig's internal nesting.
+	var abdomen := pivots["abdomen"] as MeshInstance3D
+	var chest := pivots["chest"] as MeshInstance3D
+	var proc_thorax_pivot := pivots["thorax"] as Node3D
+	var proc_neck_pivot := pivots["neck"] as Node3D
+	var neck := pivots["neck_mesh"] as MeshInstance3D
 	var arm_right := pivots["arm_right"] as Node3D
 	var arm_left := pivots["arm_left"] as Node3D
 	# A dedicated pivot for the abdomen-hip joint, kept separate from
@@ -512,6 +508,7 @@ static func build(
 	# Now empty (both its own children just moved out above) and otherwise
 	# inert -- freed rather than left as dead weight in the tree.
 	proc_neck_pivot.free()
+	proc_thorax_pivot.free()
 	var neck_logical_half_height := ProceduralFigure.HEAD_RAISE * 0.5
 	var neck_pivot := Node3D.new()
 	neck_pivot.name = "NeckPivot"

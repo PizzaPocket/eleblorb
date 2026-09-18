@@ -54,6 +54,7 @@ const FLASH_READOUT_FADE_DURATION := 0.35
 
 var _coin_readout: PanelContainer
 var _coin_readout_tween: Tween
+var _coin_visibility_holds: int = 0
 var _prompt_readout: PanelContainer
 var _message_readout: PanelContainer
 var _message_timer: float = 0.0
@@ -71,6 +72,33 @@ var _passive_message_queue: Array[Dictionary] = []
 var _hp_readout: PanelContainer
 var _hp_meter: Control
 var _hp_readout_tween: Tween
+## Fired specifically on damage (not heal), see _on_player_hp_changed() --
+## a brief red tint over the meter row itself, fading back to white,
+## independent of the readout's own separate show/hide fade above. Per
+## direct instruction: "whenever you take damage, your HP meter actually
+## momentarily flashes to red and then fades back... the same goes for
+## taking damage from not having breath" (both go through Player.take_damage()
+## so one hook here covers both).
+const HP_DAMAGE_FLASH_COLOR := Color(1.0, 0.25, 0.25)
+const HP_DAMAGE_FLASH_FADE_DURATION := 0.5
+var _hp_damage_flash_tween: Tween
+var _last_hp_value: float = -1.0
+
+## Breath meter -- unlike the HP readout's transient flash-then-fade, this
+## stays visible continuously for as long as breath is not full (per direct
+## instruction: appears "immediately" on submersion and holds while
+## draining, not a quick flash), then fades out once breath is safely back
+## to full. Forces the HP readout visible alongside it too, per direct
+## instruction ("your heads up display will immediately show both your HP
+## meter and your breath meter"), handing HP's own visibility back to its
+## normal transient behavior once breath clears.
+var _breath_readout: PanelContainer
+var _breath_meter: Control
+var _breath_readout_tween: Tween
+var _breath_active: bool = false
+## Wraps _hp_readout and _breath_readout together so Breath is genuinely
+## stacked under HP by the container's own layout.
+var _health_stack: VBoxContainer
 
 ## Points toward the nearest not-yet-partied wild blorb -- "the game tells
 ## you which way to go," per direct instruction. Player is looked up lazily
@@ -146,12 +174,29 @@ func _build_ui() -> void:
 	# Top-left (the corner the module docstring notes Tokoins deliberately
 	# leaves free for something more actionable) -- fades in on damage/heal/
 	# regen same as the Tokoins badge, per design language rule 5/20.
+	# HP and Breath share one VBoxContainer so Breath is genuinely stacked
+	# under HP by the container's own layout, not a guessed fixed offset --
+	# per direct report, an earlier guessed constant here actually
+	# overlapped the two rows instead of clearing them.
+	_health_stack = VBoxContainer.new()
+	_health_stack.add_theme_constant_override("separation", UITheme.SPACE_SM)
+	UIKit.anchor_to_edge(_health_stack, 0.0, 0.0, UITheme.SPACE_LG, UITheme.SPACE_LG)
+	add_child(_health_stack)
+
 	_hp_meter = UIKit.stat_meter("HP", int(Player.MAX_HP), int(Player.MAX_HP), true)
 	_hp_readout = UIKit.backed_control(_hp_meter)
 	_hp_readout.theme = shared_theme
 	_hp_readout.modulate.a = 0.0
-	UIKit.anchor_to_edge(_hp_readout, 0.0, 0.0, UITheme.SPACE_LG, UITheme.SPACE_LG)
-	add_child(_hp_readout)
+	_health_stack.add_child(_hp_readout)
+
+	# Bar only, no numeric readout -- per direct instruction ("let's not
+	# show the number value for breath, we'll rely on only the visual bar
+	# to communicate it").
+	_breath_meter = _build_breath_meter_row(int(Player.MAX_BREATH), int(Player.MAX_BREATH))
+	_breath_readout = UIKit.backed_control(_breath_meter)
+	_breath_readout.theme = shared_theme
+	_breath_readout.modulate.a = 0.0
+	_health_stack.add_child(_breath_readout)
 
 
 func set_throw_aiming(active: bool) -> void:
@@ -176,6 +221,7 @@ func _process(delta: float) -> void:
 				_show_next_passive_message()
 
 	_ensure_player_hp_connected()
+	_ensure_player_breath_connected()
 	_update_wild_hint()
 
 
@@ -189,27 +235,134 @@ func _on_wallet_changed(new_value: int) -> void:
 ## hp_changed signal connected exactly once, the first frame a Player
 ## instance actually exists.
 var _hp_connected: bool = false
+var _hp_subject: Node = null
 
 
 func _ensure_player_hp_connected() -> void:
+	var desired := PartyControl.active_member()
+	if desired != _hp_subject:
+		if is_instance_valid(_hp_subject) and _hp_subject.has_signal("hp_changed"):
+			var old_callable := Callable(self, "_on_player_hp_changed")
+			if _hp_subject.is_connected("hp_changed", old_callable):
+				_hp_subject.disconnect("hp_changed", old_callable)
+		_hp_connected = false
+		_hp_subject = desired
 	if _hp_connected:
 		return
-	if _player == null:
+	if not is_instance_valid(_player):
 		_player = get_tree().get_first_node_in_group("player") as Node3D
-	if _player == null:
+	if _hp_subject == null or not _hp_subject.has_signal("hp_changed"):
 		return
-	_player.hp_changed.connect(_on_player_hp_changed)
+	_hp_subject.hp_changed.connect(_on_player_hp_changed)
 	_hp_connected = true
+	var current_value: Variant = _hp_subject.get("current_hp")
+	if current_value != null:
+		var maximum_value: Variant = _hp_subject.get("max_hp")
+		var maximum: float = float(maximum_value) if maximum_value != null else Player.MAX_HP
+		_on_player_hp_changed(float(current_value), maximum)
+
+
+## Breath belongs to the persistent human body specifically (see player.gd's
+## own breath/MAX_BREATH doc comment), unlike HP above which follows
+## whichever party member is currently piloted -- so this connects straight
+## to the Player node, not _hp_subject.
+var _breath_connected: bool = false
+
+
+func _ensure_player_breath_connected() -> void:
+	# Per direct report ("it seemed when I died... it reset me at the
+	# clearing but left my breath... at zero") -- `_player == null` never
+	# catches a scene reload: the OLD Player node is freed, not nulled out
+	# from under this reference, so it stays a stale (non-null but invalid)
+	# object forever and this whole function kept returning on its first
+	# line without ever reconnecting to the NEW Player instance. Checking
+	# is_instance_valid() instead catches exactly that case.
+	if not is_instance_valid(_player):
+		_player = get_tree().get_first_node_in_group("player") as Node3D
+		_breath_connected = false
+	if _breath_connected:
+		return
+	if _player == null or not _player.has_signal("breath_changed"):
+		return
+	_player.breath_changed.connect(_on_player_breath_changed)
+	_breath_connected = true
 
 
 ## Rebuilds the meter row in place -- StatMeterBar has no public setter for
 ## its drawn value (see ui_kit.gd), so the row is discarded and rebuilt each
 ## change rather than mutated, same as inventory_ui.gd's own blorb rows.
 func _on_player_hp_changed(current: float, max_value: float) -> void:
+	var took_damage := _last_hp_value >= 0.0 and current < _last_hp_value
+	_last_hp_value = current
 	_hp_meter.queue_free()
 	_hp_meter = UIKit.stat_meter("HP", roundi(current), int(max_value), true)
 	_hp_readout.add_child(_hp_meter)
-	_flash_hp_readout()
+	if took_damage:
+		_flash_hp_damage()
+	# The breath readout forces HP visible directly (see
+	# _on_player_breath_changed()) while a breath emergency is active --
+	# don't let this ordinary transient flash fight that by scheduling its
+	# own fade-out on top of it.
+	if not _breath_active:
+		_flash_hp_readout()
+
+
+## A brief red tint over the meter row itself, fading back to white -- see
+## HP_DAMAGE_FLASH_COLOR's own doc comment. Independent of _flash_hp_readout()
+## above, which fades the whole readout's VISIBILITY, not its color.
+func _flash_hp_damage() -> void:
+	if _hp_damage_flash_tween != null:
+		_hp_damage_flash_tween.kill()
+	_hp_meter.modulate = HP_DAMAGE_FLASH_COLOR
+	_hp_damage_flash_tween = create_tween()
+	_hp_damage_flash_tween.tween_property(_hp_meter, "modulate", Color.WHITE, HP_DAMAGE_FLASH_FADE_DURATION)
+
+
+## Same visual structure as UIKit.stat_meter() (a right-aligned label next
+## to a StatMeterBar, in a fixed-width label column so the bars still line
+## up), just without that helper's own numeric "label: value" text -- per
+## direct instruction ("let's not show the number value for breath, we'll
+## rely on only the visual bar to communicate it").
+func _build_breath_meter_row(current: int, max_value: int) -> Control:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", UITheme.SPACE_SM)
+	row.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var label_ctrl := UIKit.inline_caption("Breath", UITheme.TEXT_PRIMARY)
+	label_ctrl.custom_minimum_size.x = UIKit.STAT_METER_LABEL_WIDTH
+	label_ctrl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	label_ctrl.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	row.add_child(label_ctrl)
+	var bar := UIKit.StatMeterBar.new(current, max_value, max_value, UIKit.STAT_METER_COLOR, true)
+	bar.custom_minimum_size = Vector2(UIKit.STAT_METER_BAR_WIDTH, UIKit.STAT_METER_HEIGHT)
+	row.add_child(bar)
+	return row
+
+
+## Unlike HP's own transient flash-then-fade, this readout stays fully
+## visible for as long as breath is not full (see this var's own doc
+## comment), and forces the HP readout visible alongside it per direct
+## instruction.
+func _on_player_breath_changed(current: float, max_value: float) -> void:
+	_breath_meter.queue_free()
+	_breath_meter = _build_breath_meter_row(roundi(current), int(max_value))
+	_breath_readout.add_child(_breath_meter)
+	var active := current < max_value - 0.05
+	if active == _breath_active:
+		return
+	_breath_active = active
+	if active:
+		if _breath_readout_tween != null:
+			_breath_readout_tween.kill()
+			_breath_readout_tween = null
+		_breath_readout.modulate.a = 1.0
+		if _hp_readout_tween != null:
+			_hp_readout_tween.kill()
+			_hp_readout_tween = null
+		_hp_readout.modulate.a = 1.0
+	else:
+		_breath_readout_tween = _flash_readout(_breath_readout, _breath_readout_tween)
+		_flash_hp_readout()
 
 
 ## Fades a readout in, holds it, then fades it back out -- one authored
@@ -228,7 +381,29 @@ func _flash_readout(readout: Control, tween: Tween) -> Tween:
 
 
 func _flash_coin_readout() -> void:
+	if _coin_visibility_holds > 0:
+		if _coin_readout_tween != null:
+			_coin_readout_tween.kill()
+			_coin_readout_tween = null
+		_coin_readout.modulate.a = 1.0
+		return
 	_coin_readout_tween = _flash_readout(_coin_readout, _coin_readout_tween)
+
+
+## Transaction choices need the live purse balance visible until the choice
+## closes. A hold count makes this safe for future nested/shared consumers.
+func push_tokoin_visibility() -> void:
+	_coin_visibility_holds += 1
+	if _coin_readout_tween != null:
+		_coin_readout_tween.kill()
+		_coin_readout_tween = null
+	_coin_readout.modulate.a = 1.0
+
+
+func pop_tokoin_visibility() -> void:
+	_coin_visibility_holds = maxi(_coin_visibility_holds-1,0)
+	if _coin_visibility_holds == 0:
+		_flash_coin_readout()
 
 
 func _flash_hp_readout() -> void:
@@ -324,7 +499,10 @@ func _direction_hint_angle_to(target: Node3D) -> Variant:
 		return null
 	cam_forward = cam_forward.normalized()
 
-	var to_target := target.global_position - _player.global_position
+	var origin := PartyControl.active_control_body()
+	if origin == null:
+		origin = _player
+	var to_target := target.global_position - origin.global_position
 	to_target.y = 0.0
 	if to_target.length() < 0.001:
 		return null

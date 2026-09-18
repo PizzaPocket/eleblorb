@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/kingdom_bootstrap.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
@@ -7,6 +7,8 @@
 [ext_resource type="Script" path="res://scripts/day_night_cycle.gd" id="5"]
 [ext_resource type="Script" path="res://scripts/cloud_scatter.gd" id="6"]
 [ext_resource type="Script" path="res://scripts/rock_ground_kingdom_blorbs.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/rock_ground_kingdom_village.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/dinosaur_fossil.gd" id="9"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.42, 0.32, 0.5, 1)
@@ -48,6 +50,13 @@ script = ExtResource("3")
 
 [node name="RockGroundKingdomBlorbs" type="Node3D" parent="."]
 script = ExtResource("7")
+
+[node name="TerraceTown" type="Node3D" parent="."]
+script = ExtResource("8")
+
+[node name="DinosaurFossil" type="Node3D" parent="."]
+transform = Transform3D(0.906308, 0, -0.422618, 0, 1, 0, 0.422618, 0, 0.906308, 185, -12, -145)
+script = ExtResource("9")
 
 [node name="Clouds" type="Node3D" parent="."]
 script = ExtResource("6")

@@ -44,7 +44,7 @@ func _peak_color(h: float) -> Color:
 	var grass := Color(0.07451, 0.63922, 0.40392)
 	var dirt := Color(0.55, 0.42, 0.24)
 	var rock := Color(0.58, 0.57, 0.56)
-	var snow := Color(0.96, 0.97, 1.0)
+	var snow := ElementPalette.SNOW_BODY
 	if h < 60.0:
 		return grass.lerp(dirt, smoothstep(30.0, 60.0, h))
 	elif h < 130.0:

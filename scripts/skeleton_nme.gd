@@ -116,7 +116,7 @@ func _ready() -> void:
 	if terrain_ref == null:
 		terrain_ref = get_node("../../Terrain")
 	_build_figure()
-	_rest_y = terrain_ref.get_mesh_height(global_position.x, global_position.z)
+	_rest_y = _ground_support_height(global_position.x,global_position.z)
 	global_position.y = _rest_y - BURIAL_DEPTH
 
 
@@ -138,6 +138,19 @@ func _build_figure() -> void:
 	_elbow_right = pivots["elbow_right"]
 	_spine = pivots["spine"]
 	_hips = pivots["hips"]
+
+
+## NMEs walk on the same highest nearby physical support as the player and
+## blorbs, not only the analytic terrain beneath canyon paving or shelves.
+func _ground_support_height(x: float,z: float) -> float:
+	var terrain_height: float = terrain_ref.get_mesh_height(x,z)
+	if not is_inside_tree():
+		return terrain_height
+	var from_y: float = maxf(global_position.y+2.0,terrain_height+5.0)
+	var query := PhysicsRayQueryParameters3D.create(Vector3(x,from_y,z),Vector3(x,terrain_height-2.0,z),1|TownProps.BLORB_CLIMBABLE_LAYER)
+	query.exclude = [get_rid()]
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	return maxf(terrain_height,float(hit.position.y)) if not hit.is_empty() else terrain_height
 
 
 func is_defeated() -> bool:
@@ -260,7 +273,7 @@ func _apply_nme_separation(delta: float) -> void:
 	var separated := here + shift
 	global_position.x = separated.x
 	global_position.z = separated.y
-	global_position.y = terrain_ref.get_mesh_height(separated.x, separated.y)
+	global_position.y = _ground_support_height(separated.x,separated.y)
 
 
 func _process_rising(delta: float) -> void:
@@ -323,7 +336,7 @@ func _find_target() -> Node3D:
 	var here := Vector2(global_position.x, global_position.z)
 	var best: Node3D = null
 	var best_dist := DETECTION_RADIUS
-	var player := get_tree().get_first_node_in_group("player")
+	var player := PartyControl.active_control_body()
 	if player != null and not _position_is_safe(Vector2(player.global_position.x, player.global_position.z)):
 		var dist := here.distance_to(Vector2(player.global_position.x, player.global_position.z))
 		if dist < best_dist:
@@ -383,7 +396,7 @@ func _process_hunting(delta: float) -> void:
 		return
 	global_position.x = new_here.x
 	global_position.z = new_here.y
-	global_position.y = terrain_ref.get_mesh_height(new_here.x, new_here.y)
+	global_position.y = _ground_support_height(new_here.x,new_here.y)
 
 	var target_angle := atan2(dir.x, dir.y)
 	visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, ROTATION_SPEED * delta)

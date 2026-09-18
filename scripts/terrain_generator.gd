@@ -46,6 +46,7 @@ const MOUNTAIN_RING_FULL := 190.0
 
 const SPAWN_CENTER := Vector2(0, 0)
 const SPAWN_FLATTEN_RADIUS := 25.0
+const SPAWN_FLATTEN_TRANSITION := 12.0
 
 # The plateau rim is centered on the origin (like the mountain ring), not
 # the town -- town_center (150, 70) sits ~165 units out, and the town's own
@@ -358,7 +359,12 @@ func get_height(x: float, z: float) -> float:
 
 	var height := hills + mountains
 
-	var spawn_flatten := smoothstep(0.0, SPAWN_FLATTEN_RADIUS, dist_origin)
+	# The magical arrival clearing is a genuinely level piece of terrain,
+	# matching village foundations. Hills return only through a soft outer
+	# transition, beyond the fairy-circle flowers and planting bed.
+	var spawn_flatten := smoothstep(
+		SPAWN_FLATTEN_RADIUS, SPAWN_FLATTEN_RADIUS + SPAWN_FLATTEN_TRANSITION, dist_origin
+	)
 	var town_flatten := smoothstep(
 		town_flat_radius, town_flat_radius + town_flatten_transition, dist_town
 	)
@@ -428,6 +434,16 @@ func _wasteland_height(x: float, z: float) -> float:
 func chinese_village_abyss_coverage(x: float, z: float) -> float:
 	var dist := Vector2(x, z).distance_to(CHINESE_VILLAGE_CENTER)
 	return 1.0 - smoothstep(CHINESE_VILLAGE_ABYSS_RADIUS, CHINESE_VILLAGE_ABYSS_RADIUS + CHINESE_VILLAGE_ABYSS_TRANSITION, dist)
+
+
+## One authoritative elevation for the entire floating-village network,
+## sampled where its southern entry meets true wasteland. ChineseVillage,
+## Pandy and Sun Wu Kong all call this rather than maintaining separate
+## approximate constants that can disagree with the procedural terrain.
+func get_chinese_village_island_surface_y() -> float:
+	const ENTRY_SHORE_DISTANCE := 225.0
+	var shore := CHINESE_VILLAGE_CENTER + Vector2(0.0, ENTRY_SHORE_DISTANCE)
+	return get_mesh_height(shore.x, shore.y)
 
 
 ## The plateau's boundary radius at a given angle around the origin --
@@ -721,8 +737,8 @@ func _lake_floor_height(x: float, z: float) -> float:
 func _ready() -> void:
 	collision_layer = 1
 	collision_mask = 0
-	_rebuild()
 	set_process(true)
+	LoadingScreen.enqueue_build_stage("Generating world geometry…",0.73,_rebuild)
 
 
 func _process(delta: float) -> void:
@@ -787,7 +803,7 @@ func _height_color(h: float, past_edge: bool, world_pos: Vector2 = Vector2.INF) 
 	var grass := Color(0.07451, 0.63922, 0.40392)
 	var dirt := Color(0.55, 0.42, 0.24)
 	var rock := Color(0.58, 0.57, 0.56)
-	var snow := Color(0.96, 0.97, 1.0)
+	var snow := ElementPalette.SNOW_BODY
 	# A deep, rich canopy-floor green -- distinct from the ordinary grass
 	# color above so the jungle plateau reads as its own lush biome.
 	var jungle_green := Color(0.05098, 0.36078, 0.14902)

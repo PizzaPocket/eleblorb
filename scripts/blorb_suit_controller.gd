@@ -98,6 +98,7 @@ var _assignment_reconcile_requested := false
 ## leaves. Torso geometry is otherwise static after equip, so merely changing
 ## the limb rebuild path would leave it enlarged until the next full suit cycle.
 var _lava_helm_command_was_active := false
+var _story_suspended: bool = false
 
 
 func _init() -> void:
@@ -123,7 +124,7 @@ func setup(player: Node3D, root: Node3D, pivots: Dictionary, rig_scale: float = 
 
 
 func toggle() -> void:
-	if not _transitions.is_empty():
+	if _story_suspended or not _transitions.is_empty():
 		return
 	_suit_on = not _suit_on
 	if _suit_on:
@@ -139,10 +140,26 @@ func toggle() -> void:
 func equip_to_slot(blorb: Blorb, slot: String) -> void:
 	if blorb == null or not blorb.in_party or blorb.is_melted or not (slot in BlorbSuit.SLOT_ORDER):
 		return
+	# A bonded blorb is one physical character and cannot simultaneously be
+	# assigned to two wearers. Resolve ownership centrally whenever either
+	# the human or Xiao edits their paper doll.
+	if is_instance_valid(_player) and _player.is_inside_tree():
+		for candidate in _player.get_tree().get_nodes_in_group("party_playable_candidates"):
+			if candidate == _player or not candidate.has_method("get_own_blorb_suit"):
+				continue
+			var other := candidate.get_own_blorb_suit() as BlorbSuitController
+			if other != null:
+				other.remove_assignment_for_blorb(blorb)
 	for existing_slot in _assignments.keys():
 		if _assignments[existing_slot] == blorb:
 			_assignments.erase(existing_slot)
 	_assignments[slot] = blorb
+
+
+func remove_assignment_for_blorb(blorb: Blorb) -> void:
+	for slot in _assignments.keys():
+		if _assignments[slot] == blorb:
+			_assignments.erase(slot)
 
 
 ## Removes only the persistent assignment; it never changes the live suit.
@@ -183,6 +200,7 @@ func worn_blorbs() -> Array[Blorb]:
 ## Tear down live suit geometry immediately while preserving assignments,
 ## so rescuing them restores the player's chosen layout on the next equip.
 func suspend_for_story() -> void:
+	_story_suspended = true
 	for entry in _worn:
 		var pieces := entry.get("pieces") as Array
 		for piece in pieces:
@@ -198,6 +216,14 @@ func suspend_for_story() -> void:
 	_worn.clear()
 	_transitions.clear()
 	_suit_on = false
+
+
+func resume_after_story() -> void:
+	_story_suspended = false
+
+
+func is_story_suspended() -> bool:
+	return _story_suspended
 
 
 func worn_blorb_for_slot(slot: String) -> Blorb:
@@ -269,6 +295,15 @@ func has_head_lava_helm() -> bool:
 	return is_instance_valid(head) and head.has_core_item("Lava Helm")
 
 
+## Gates SkyKingdom's own visibility/collision -- see that script's own
+## class doc. Checked directly off the worn head slot rather than cached,
+## since equipping/removing the head blorb should reveal or hide the Sky
+## Kingdom the moment it happens, not on some later refresh.
+func has_head_bird_helm() -> bool:
+	var head := worn_blorb_in_slot("head")
+	return is_instance_valid(head) and head.has_core_item("Bird Helm")
+
+
 func has_rock_walking_legs() -> bool:
 	return has_worn_element("leg_left", "rock") and has_worn_element("leg_right", "rock")
 
@@ -278,6 +313,38 @@ func has_rock_walking_legs() -> bool:
 ## those buttons are deliberately inert for Air feet for now.
 func has_air_hover_legs() -> bool:
 	return has_worn_element("leg_left", "air") and has_worn_element("leg_right", "air")
+
+
+## Dirt blorb suit's own rear wheel -- a complete, visibly landed "ground"
+## leg pair (see docs/world_bible.md's Ground element entry). "ground" was
+## already a real, obtainable element with no suit ability of its own before
+## this; matched-leg-pair is the same shape every other passive leg-pair
+## movement power here already uses (has_air_hover_legs(), has_lava_safe_legs()).
+func has_dirtbike_legs() -> bool:
+	return has_worn_element("leg_left", "ground") and has_worn_element("leg_right", "ground")
+
+
+## A matched pair of Snow legs can form the snowboard. The player owns the
+## chord/toggle and movement state; this controller only reports the real,
+## visibly-landed suit prerequisite, just like the dirtbike helpers below.
+func has_snowboard_legs() -> bool:
+	return has_worn_element("leg_left", "snow") and has_worn_element("leg_right", "snow")
+
+
+## A matched pair of visibly worn Ice legs can form retractable skate
+## blades. As with the snowboard, the player owns the toggle and movement;
+## this controller only reports the physical suit prerequisite.
+func has_ice_skate_legs() -> bool:
+	return has_worn_element("leg_left", "ice") and has_worn_element("leg_right", "ice")
+
+
+## The front wheel/wheelie half of the dirt blorb suit. Per direct
+## instruction, this alone does nothing without has_dirtbike_legs() too --
+## player.gd is what combines the two (see its own dirtbike state), the same
+## way _fire_limb_flight_active there already combines separate hand/leg
+## hover flags rather than this controller pre-baking that combination in.
+func has_dirtbike_arms() -> bool:
+	return has_worn_element("arm_left", "ground") and has_worn_element("arm_right", "ground")
 
 
 ## A head blorb is a real, landed suit piece, not merely an assignment in
@@ -647,7 +714,21 @@ func _update_transitions(delta: float) -> void:
 			for piece in pieces:
 				if is_instance_valid(piece):
 					BlorbSuit.release_piece(piece as Node3D)
-			var starting_blorb := entry["blorb"] as Blorb
+			# entry["blorb"] can already be a freed instance here -- a kingdom
+			# portal trip keeps this scene (and this controller) ticking for
+			# TRANSITION_COVER_DURATION after the destination scene starts
+			# replacing/respawning party blorbs (see party.gd's spawn_into()),
+			# which can free a blorb this transition still references before
+			# it finishes. `as Blorb` on a freed instance throws "Trying to
+			# cast a freed object" -- read it untyped and check validity
+			# first, same convention as this file's other _worn/_transitions
+			# lookups (e.g. preserve_covered_head_scale()'s own fix for the
+			# identical crash).
+			var starting_blorb_ref = entry["blorb"]
+			if not is_instance_valid(starting_blorb_ref):
+				_transitions.remove_at(i)
+				continue
+			var starting_blorb := starting_blorb_ref as Blorb
 			var starting_slot := entry.get("from_slot", entry["slot"]) as String
 			var fresh_start_pos := _slot_anchor_position(starting_slot)
 			starting_blorb.begin_unworn()
@@ -666,7 +747,14 @@ func _update_transitions(delta: float) -> void:
 		var elapsed: float = (entry["elapsed"] as float) + delta
 		entry["elapsed"] = elapsed
 		var t := clampf(elapsed / JUMP_DURATION, 0.0, 1.0)
-		var blorb := entry["blorb"] as Blorb
+		# Same freed-instance risk as starting_blorb above -- the hop can still
+		# be mid-flight when the blorb it's animating gets freed out from under
+		# it during a kingdom portal trip.
+		var blorb_ref = entry["blorb"]
+		if not is_instance_valid(blorb_ref):
+			_transitions.remove_at(i)
+			continue
+		var blorb := blorb_ref as Blorb
 		var slot := entry["slot"] as String
 		var start_pos := entry["start_pos"] as Vector3
 		var target: Vector3 = (entry["land_pos"] as Vector3) if mode == "off" else _slot_anchor_position(slot)
@@ -747,7 +835,9 @@ func _apply_eye_blink(delta: float) -> void:
 				continue
 			var p := piece as Node3D
 			for eye_name in ["EyeL", "EyeR"]:
-				var eye := p.get_node_or_null(eye_name)
+				# Helm variants such as the Toboggan keep their face on a nested
+				# crown mesh rather than directly on the returned piece root.
+				var eye := p.find_child(eye_name,true,false)
 				if eye != null:
 					(eye as Node3D).scale.y = o
 

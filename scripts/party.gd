@@ -25,16 +25,31 @@ const MANCHEGO_SCENE: PackedScene = preload("res://scenes/manchego.tscn")
 const SPAWN_SPACING := 1.1
 
 var _roster: Array[Dictionary] = []
+var _active_playable_id: String = PartyControl.HUMAN_ID
+var _recovery_health_fraction: float = 1.0
+
+
+func force_recovery_resources(minimum_fraction: float = 1.0) -> void:
+	_recovery_health_fraction = clampf(minimum_fraction, 0.0, 1.0)
+	_active_playable_id = PartyControl.HUMAN_ID
 
 
 func capture_from_tree(tree: SceneTree) -> void:
 	_roster.clear()
+	_active_playable_id = PartyControl.active_member_id()
 	var player := tree.get_first_node_in_group("player") as Player
-	var suit: BlorbSuitController = player.get_blorb_suit() if player != null else null
+	var human_suit: BlorbSuitController = player.get_own_blorb_suit() if player != null else null
+	var xiao_suit: BlorbSuitController = null
+	for xiao_node in tree.get_nodes_in_group("xiao_hou_zi"):
+		if xiao_node is XiaoHouZi and (xiao_node as XiaoHouZi).in_party:
+			xiao_suit = (xiao_node as XiaoHouZi).get_blorb_suit()
+			break
 	for node in tree.get_nodes_in_group("blorbs"):
 		var blorb := node as Blorb
 		if blorb == null or not blorb.in_party or blorb.blorb_type == "size":
 			continue
+		var human_slot := human_suit.slot_for_assigned_blorb(blorb) if human_suit != null else ""
+		var xiao_slot := xiao_suit.slot_for_assigned_blorb(blorb) if xiao_suit != null else ""
 		_roster.append({
 			"kind": "blorb",
 			"element": blorb.element_state,
@@ -43,7 +58,8 @@ func capture_from_tree(tree: SceneTree) -> void:
 			"blorb_name": blorb.blorb_name,
 			"core_items": blorb.core_items.duplicate(),
 			"progression": blorb.progression_snapshot(),
-			"assigned_slot": suit.slot_for_assigned_blorb(blorb) if suit != null else "",
+			"assigned_slot": xiao_slot if xiao_slot != "" else human_slot,
+			"assigned_wearer": PartyControl.XIAO_HOU_ZI_ID if xiao_slot != "" else PartyControl.HUMAN_ID,
 		})
 	for node in tree.get_nodes_in_group("xiao_hou_zi"):
 		var monkey := node as XiaoHouZi
@@ -78,7 +94,8 @@ func spawn_into(parent: Node, near_position: Vector3, facing: Vector3) -> void:
 		flat_facing = Vector3.BACK
 	flat_facing = flat_facing.normalized()
 	var index := 0
-	var restored_assignments: Dictionary = {}
+	var restored_human_assignments: Dictionary = {}
+	var restored_xiao_assignments: Dictionary = {}
 	for entry in _roster:
 		var lateral := flat_facing.rotated(Vector3.UP, PI * 0.5) * (float(index) - float(_roster.size() - 1) * 0.5)
 		var spawn_pos := near_position - flat_facing * 2.0 + lateral * SPAWN_SPACING
@@ -87,7 +104,10 @@ func spawn_into(parent: Node, near_position: Vector3, facing: Vector3) -> void:
 				var spawned := _spawn_blorb(entry, parent, spawn_pos)
 				var assigned_slot := entry.get("assigned_slot", "") as String
 				if assigned_slot != "" and spawned != null:
-					restored_assignments[assigned_slot] = spawned
+					if String(entry.get("assigned_wearer", PartyControl.HUMAN_ID)) == PartyControl.XIAO_HOU_ZI_ID:
+						restored_xiao_assignments[assigned_slot] = spawned
+					else:
+						restored_human_assignments[assigned_slot] = spawned
 			"xiao_hou_zi":
 				_spawn_xiao_hou_zi(parent, spawn_pos)
 			"pandy":
@@ -97,9 +117,14 @@ func spawn_into(parent: Node, near_position: Vector3, facing: Vector3) -> void:
 		index += 1
 	var player := parent.get_tree().get_first_node_in_group("player") as Player
 	if player != null:
-		var suit := player.get_blorb_suit()
-		suit.restore_assignments(restored_assignments)
-		suit.auto_assign_new_members.call_deferred()
+		var human_suit := player.get_own_blorb_suit()
+		human_suit.restore_assignments(restored_human_assignments)
+		human_suit.auto_assign_new_members.call_deferred()
+		for xiao_node in parent.get_tree().get_nodes_in_group("xiao_hou_zi"):
+			if xiao_node is XiaoHouZi and (xiao_node as XiaoHouZi).in_party:
+				(xiao_node as XiaoHouZi).get_blorb_suit().restore_assignments(restored_xiao_assignments)
+				break
+		player.restore_active_party_member.call_deferred(_active_playable_id)
 
 
 func _spawn_blorb(entry: Dictionary, parent: Node, spawn_pos: Vector3) -> Blorb:
@@ -115,6 +140,7 @@ func _spawn_blorb(entry: Dictionary, parent: Node, spawn_pos: Vector3) -> Blorb:
 	blorb.position = spawn_pos
 	parent.add_child(blorb)
 	blorb.restore_progression(entry.get("progression", {}))
+	blorb.restore_for_recovery(_recovery_health_fraction)
 	if entry.get("is_blorbus", false):
 		blorb.become_blorbus()
 	return blorb

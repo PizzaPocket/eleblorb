@@ -12,7 +12,7 @@ extends Node3D
 const BLORB_SCENE: PackedScene = preload("res://scenes/blorb.tscn")
 const ROCK_COUNT := 10
 const GROUND_COUNT := 10
-const SPAWN_RADIUS := 190.0
+const SPAWN_RADIUS := 500.0
 
 var _rng := RandomNumberGenerator.new()
 var _terrain: Node
@@ -28,13 +28,13 @@ func _ready() -> void:
 
 func _spawn_all() -> void:
 	for i in ROCK_COUNT:
-		_place("rock")
+		_place("rock" if i % 2 == 0 else "", true)
 	for i in GROUND_COUNT:
-		_place("ground")
+		_place("ground" if i % 2 == 0 else "", false)
 
 
-func _place(element: String) -> void:
-	var pos := _pick_position()
+func _place(element: String, rock_side: bool) -> void:
+	var pos := _pick_position(rock_side)
 	var inst = BLORB_SCENE.instantiate()
 	inst.in_party = false
 	inst.initial_element = element
@@ -42,7 +42,12 @@ func _place(element: String) -> void:
 	get_parent().add_child(inst)
 
 
-func _pick_position() -> Vector2:
-	var r := sqrt(_rng.randf_range(0.0, 1.0)) * SPAWN_RADIUS
-	var a := _rng.randf_range(0.0, TAU)
-	return Vector2(cos(a) * r, sin(a) * r)
+func _pick_position(rock_side: bool) -> Vector2:
+	for attempt in 30:
+		var point := Vector2(
+			_rng.randf_range(-SPAWN_RADIUS,-35.0) if rock_side else _rng.randf_range(35.0,SPAWN_RADIUS),
+			_rng.randf_range(-SPAWN_RADIUS,SPAWN_RADIUS)
+		)
+		if _terrain.has_method("is_safe_zone") and _terrain.is_safe_zone(point): continue
+		return point
+	return Vector2(-90.0,90.0) if rock_side else Vector2(90.0,90.0)

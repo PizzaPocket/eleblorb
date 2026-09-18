@@ -379,7 +379,7 @@ var _next_variant_index: int = 0
 
 
 func _ready() -> void:
-	_rebuild()
+	LoadingScreen.enqueue_build_stage("Placing world objects…",0.79,_rebuild)
 
 
 ## Mirrors skeleton_spawner.gd's own throttled _process() re-check rather
@@ -455,6 +455,16 @@ func _rebuild() -> void:
 	_scatter_decorations(generated)
 	_scatter_platforming(generated)
 	_spawn_npcs(generated)
+	_build_village_inn(generated)
+
+
+func _build_village_inn(parent: Node3D) -> void:
+	var local_pos := Vector2(8.0, -34.0)
+	VillageInn.create(
+		parent, terrain, Vector3(town_center.x + local_pos.x, terrain.get_mesh_height(town_center.x + local_pos.x, town_center.y + local_pos.y), town_center.y + local_pos.y),
+		"outskirts", "starting_village_inn", 10, "Mara Hearth",
+		Color(0.52, 0.18, 0.15), Color(0.62, 0.45, 0.29)
+	)
 
 
 func _spawn_npcs(parent: Node3D) -> void:
@@ -811,16 +821,11 @@ const SKY_STAIRS_CLEARANCE := 8.0
 # from its own base; a constant turn instead winds it into a tight spiral
 # (see _build_sky_stairs()'s own comment for the resulting radius).
 const SKY_STAIRS_TURN := 0.35
-# How far below CloudScatter's own altitude_min the crate spiral stops,
-# handing off to build_sky_course()'s puff-based continuation -- enough
-# clearance that the last crate doesn't visually poke through the ambient
-# cloud layer's own lowest puffs.
+# How far below CloudScatter's own altitude_min the cloud-step spiral
+# stops, handing off to build_sky_course()'s own puff-based continuation --
+# enough clearance that the last step doesn't visually poke through the
+# ambient cloud layer's own lowest puffs.
 const SKY_STAIRS_CLOUD_MARGIN := 6.0
-# Same grass tone terrain_generator.gd's own ground uses (its "grass" var in
-# _height_color()) -- per direct instruction to cap each step in green grass,
-# matching the rest of the world's grass rather than inventing a new shade.
-const SKY_STAIRS_GRASS_COLOR := Color(0.07451, 0.63922, 0.40392)
-const SKY_STAIRS_GRASS_MOUND_HEIGHT := 0.3
 
 
 ## Scatters small parkour clusters -- crate staircases -- around the open
@@ -1001,7 +1006,7 @@ func _build_crate_stack_cluster(
 ## gap / (2*sin(turn/2)) =~ 2.2 / (2*sin(0.175)) =~ 6m, small enough to read
 ## as one coherent tower rather than sprawling across the field.
 func _build_sky_stairs(
-	parent: Node3D, occupied: Array[Vector2], placed: Array[Vector2], rng: RandomNumberGenerator
+	_parent: Node3D, occupied: Array[Vector2], placed: Array[Vector2], rng: RandomNumberGenerator
 ) -> void:
 	var clouds := get_node_or_null("../Clouds") as CloudScatter
 	if clouds == null:
@@ -1018,56 +1023,53 @@ func _build_sky_stairs(
 	if anchor == Vector2.INF:
 		return
 
-	var pos := Vector3(town_center.x + anchor.x, _ground_y(anchor), town_center.y + anchor.y)
+	# Per direct correction ("shift it back to start at the peak of the
+	# nearby hill, not near the bottom") -- the terrain here is naturally
+	# undulating rather than flat, and the anchor found above can land
+	# partway up a slope. Search a couple of rings around it for the
+	# actual local high point instead of just sampling the anchor itself.
+	const HILL_SEARCH_RADII: Array[float] = [11.0, 22.0]
+	const HILL_SEARCH_SAMPLES := 14
+	var peak := anchor
+	var peak_height := _ground_y(anchor)
+	for sample_index in HILL_SEARCH_SAMPLES:
+		var sample_angle := TAU * float(sample_index) / float(HILL_SEARCH_SAMPLES)
+		for sample_radius in HILL_SEARCH_RADII:
+			var sample_point := anchor + Vector2(cos(sample_angle), sin(sample_angle)) * sample_radius
+			var sample_height := _ground_y(sample_point)
+			if sample_height > peak_height:
+				peak_height = sample_height
+				peak = sample_point
+	anchor = peak
+
+	var pos := Vector3(town_center.x + anchor.x, peak_height, town_center.y + anchor.y)
 	var heading := rng.randf_range(0.0, TAU)
 	var target_y := clouds.altitude_min - SKY_STAIRS_CLOUD_MARGIN
-	var crate_colors: Array[Color] = [TownProps.TRIM_WOOD, TownProps.WALL_WOOD, Color(0.52, 0.4, 0.24)]
-	var step_index := 0
+	# Per direct correction ("actual cloud material, not solid material the
+	# color of clouds... doesn't seem to have the same physics as clouds you
+	# can't pass through them from the sides") -- each step used to be its
+	# own StaticBody3D box under this scene's own parent, which is ordinary
+	# solid Godot physics colliding from every side. Real clouds have NO
+	# physics collider at all: CloudScatter.get_support_height_at() is a
+	# purely analytic one-way query (see player.gd's own
+	# _cloud_stand_height_at()), and only works on puffs actually parented
+	# under the CloudScatter node itself. build_stair_step() below hands each
+	# step's world position to that sibling node so it's built (and owns
+	# its own single shared BirdHelmGate, "SkyStairsGate") the exact same
+	# way as every other standable cloud, instead of a lookalike collider
+	# living in the wrong part of the tree.
+	clouds.reset_stair_steps()
 	# The safety cap only guards against a future altitude_min/margin change
 	# making this loop unreasonably long -- at the established rise range it
 	# never comes close in practice (~55-65 steps to reach a typical ~65m
 	# climb).
+	var step_index := 0
 	while pos.y < target_y and step_index < 200:
 		var rise := rng.randf_range(0.9, MAX_STEP_RISE)
 		var gap := rng.randf_range(1.8, 2.6)
 		heading += SKY_STAIRS_TURN + rng.randf_range(-0.05, 0.05)
 		pos += Vector3(sin(heading) * gap, rise, cos(heading) * gap)
-		var size := Vector3(rng.randf_range(1.8, 2.4), rng.randf_range(0.4, 0.55), rng.randf_range(1.8, 2.4))
-		var crate := TownProps.build_crate(size, crate_colors[step_index % crate_colors.size()])
-		crate.rotation.y = rng.randf_range(0.0, TAU)
-		parent.add_child(crate)
-		crate.global_position = pos
-		# A grass mound on top of every step, per direct instruction. Per
-		# direct correction, an earlier flat slab merely balanced on top read
-		# as "perched on the convex top... not smoothly emerging," and had no
-		# collision of its own, so the player visibly sank into it (its
-		# collision stayed at the bare crate's own height, well below the
-		# slab's own visible top). This version is its own small SuperEgg
-		# mound (a rounded top, not a flat disc) sunk partway INTO the
-		# crate's own top volume -- the same overlap-a-flat-seam trick this
-		# project's joints already use (see e.g. NECK_OVERLAP in procedural_
-		# figure.gd) -- so it reads as emerging from the crate regardless of
-		# exactly how the crate's own "flat" superellipsoid top curves,
-		# rather than needing to match that curvature exactly. A matching
-		# second collision box, stacked on top of build_crate()'s own,
-		# extends solid ground up to the mound's real visible top.
-		var mound_half_extent := Vector3(size.x * 0.4, SKY_STAIRS_GRASS_MOUND_HEIGHT * 0.5, size.z * 0.4)
-		var mound_embed := mound_half_extent.y * 0.7
-		var mound_center_y := size.y - mound_embed + mound_half_extent.y
-		var grass_mound := SuperEgg.build_part(
-			mound_half_extent, SKY_STAIRS_GRASS_COLOR, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
-		)
-		grass_mound.position = Vector3(0, mound_center_y, 0)
-		crate.add_child(grass_mound)
-		# Same center and full height as the mound mesh itself -- covers
-		# exactly its own visible span, from its embedded base up to its
-		# real peak.
-		var mound_collision := CollisionShape3D.new()
-		var mound_shape := BoxShape3D.new()
-		mound_shape.size = Vector3(mound_half_extent.x * 1.6, mound_half_extent.y * 2.0, mound_half_extent.z * 1.6)
-		mound_collision.shape = mound_shape
-		mound_collision.position = Vector3(0, mound_center_y, 0)
-		crate.add_child(mound_collision)
+		clouds.build_stair_step(pos, rng)
 		step_index += 1
 
 	clouds.build_sky_course(pos)
@@ -1168,13 +1170,12 @@ func _build_one_shop_stall(parent: Node3D, config: Dictionary) -> void:
 		visual.position = local_pos
 		stall_body.add_child(visual)
 
-	# Vendor stands beside the stall (not on the counter). The purpose-built
-	# armorer pavilion is over twice as wide as an ordinary market stall, so it
-	# needs its own clearance instead of reusing the old 0.9m offset—which put
-	# the armorer inside the counter up to his waist.
-	var vendor_side_clearance := 1.9 if config["category"] == "red" else 0.9
-	var vendor_offset := offset + Vector2(vendor_side_clearance, 0.0).rotated(spot_marker.rotation.y)
-	var to_center := -vendor_offset.normalized()
+	# Shared stall blocking keeps every seller clear of the counter and beside
+	# the wares, facing the customer approach. Equipment stalls merely provide
+	# their wider physical footprint to the same rule.
+	var counter_half_width:=1.45 if config["category"]=="red" else 0.6
+	var vendor_layout:=TownProps.vendor_layout(offset,spot_marker.rotation.y,counter_half_width)
+	var vendor_offset:=vendor_layout["position"] as Vector2
 	if Engine.is_editor_hint():
 		return
 	var packed: PackedScene = load(NPC_SCENE)
@@ -1210,7 +1211,7 @@ func _build_one_shop_stall(parent: Node3D, config: Dictionary) -> void:
 	lines.assign(config["vendor_lines"])
 	vendor.vendor_lines = lines
 	vendor.shop_category = config["category"]
-	vendor.facing_degrees = rad_to_deg(atan2(to_center.x, to_center.y))
+	vendor.facing_degrees = vendor_layout["facing_degrees"] as float
 	vendor.position = Vector3(vendor_offset.x, _ground_y(vendor_offset), vendor_offset.y)
 	parent.add_child(vendor)
 

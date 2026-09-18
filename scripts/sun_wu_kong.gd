@@ -1,6 +1,10 @@
 class_name SunWuKong
 extends StaticBody3D
 
+
+func party_role_capabilities() -> Dictionary:
+	return {"playable": false, "mount": false, "summon": true}
+
 ## Sun Wu Kong lives in the Chinese village, first sealed beneath a rock.
 ## Xiao Hou Zi can free him; returning the Jingu Bang then unlocks a combat
 ## summon. He never becomes a permanent walking party member. When the
@@ -168,6 +172,11 @@ func _apply_clothing(pivots: Dictionary) -> void:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = CLOTHING_COLOR
 	material.roughness = 0.6
+	# MonkeyFigure's procedural torso is intentionally double-sided (its
+	# generated winding is shared with the fur material). Replacing that
+	# material without carrying over the cull mode made the red torso appear
+	# inside-out.
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	body.material_override = material
 
 
@@ -191,6 +200,8 @@ func _ground_y(x: float, z: float) -> float:
 	if fixed_ground_y < INF:
 		return fixed_ground_y
 	if Vector2(x, z).distance_to(CHINESE_VILLAGE_CENTER) < CHINESE_VILLAGE_ABYSS_SAFE_RADIUS:
+		if _terrain != null and _terrain.has_method("get_chinese_village_island_surface_y"):
+			return _terrain.get_chinese_village_island_surface_y()
 		return CHINESE_VILLAGE_ISLAND_Y
 	if _terrain != null and _terrain.has_method("get_mesh_height"):
 		return _terrain.get_mesh_height(x, z)

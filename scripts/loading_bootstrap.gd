@@ -2,6 +2,11 @@ extends Node
 
 ## Keeps the first scene deliberately tiny, so LoadingScreen can render before
 ## the asset-heavy world scene is read and instantiated.
+## TEMPORARY TEST OVERRIDE: boots straight into the Crossroads Kingdom, whose
+## scene carries crossroads_test_setup.gd for the current playtest (currently
+## the Bird Helm/Sky Kingdom work). Restore this to res://scenes/main.tscn
+## (already the case) or repoint it at another kingdom's own scene as the
+## focused test moves on.
 const WORLD_SCENE := "res://scenes/main.tscn"
 
 var _requested := false
@@ -9,12 +14,14 @@ var _changing_scene := false
 
 
 func _ready() -> void:
-	LoadingScreen.set_phase("Loading the world…", 0.90)
+	LoadingScreen.set_phase("Loading the world…", WEB_SCENE_LOAD_START)
 	# Do not even request the world until the lightweight loading scene has
 	# completed a real draw. Awaiting only process_frame is insufficient: the
 	# main thread can begin a synchronous resource load before the renderer has
 	# presented the UI, leaving the native window grey throughout construction.
 	call_deferred("_request_world_load_after_first_draw")
+
+const WEB_SCENE_LOAD_START := 0.55
 
 
 func _request_world_load_after_first_draw() -> void:
@@ -37,7 +44,7 @@ func _process(_delta: float) -> void:
 		LoadingScreen.set_world_load_progress(float(progress[0]))
 	if status == ResourceLoader.THREAD_LOAD_LOADED:
 		_changing_scene = true
-		LoadingScreen.set_phase("Building the world…", 0.97)
+		LoadingScreen.set_phase("Preparing world data…", 0.65)
 		var world := ResourceLoader.load_threaded_get(WORLD_SCENE) as PackedScene
 		if world != null:
 			get_tree().change_scene_to_packed(world)

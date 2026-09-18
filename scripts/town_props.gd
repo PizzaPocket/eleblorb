@@ -26,7 +26,6 @@ extends RefCounted
 const WALL_STONE := Color(0.76, 0.74, 0.7)
 const WALL_WOOD := Color(0.58, 0.4, 0.24)
 const TRIM_WOOD := Color(0.35, 0.22, 0.13)
-const WINDOW_COLOR := Color(0.55, 0.78, 0.85)
 const FLOOR_COLOR := Color(0.65, 0.5, 0.33)
 const ROAD_COLOR := Color(0.62, 0.58, 0.52)
 ## A vibrant roof per building (cycled by building index -- see
@@ -47,12 +46,12 @@ const WATER_COLOR := Color(0.08, 0.28, 0.55, 0.9)
 const LANTERN_GLOW := Color(1.0, 0.8, 0.4)
 
 # ---- Building grid -------------------------------------------------------
-const CELL_SIZE := 2.8
+const CELL_SIZE := 3.2
 const WALL_THICKNESS := 0.16
-const FLOOR_HEIGHT := 2.6
-const DOOR_WIDTH := 1.0
-const DOOR_HEIGHT := 2.05
-const WINDOW_SIZE := Vector2(0.6, 0.7)
+const FLOOR_HEIGHT := 3.25
+const DOOR_WIDTH := 1.2
+const DOOR_HEIGHT := 2.4
+const WINDOW_SIZE := Vector2(0.82, 0.86)
 const ROOF_PITCH := deg_to_rad(30.0)
 const ROOF_OVERHANG := 0.3
 const ROOF_THICKNESS := 0.1
@@ -76,21 +75,32 @@ const FLOOR_COLLISION_THICKNESS := 0.2
 ## The door is always centered on the south wall's ground floor, as an
 ## actually-open gap (only its jambs/lintel collide, the opening itself
 ## doesn't) so the player can still walk in.
+## wall_style: "panel" (default, a flat painted wall) or "log" (a log-cabin
+## stack of horizontal rounded logs occupying the exact same footprint --
+## see _build_log_wall_panel()). add_bed places one TownProps bed inside,
+## in the back corner farthest from the door, per direct instruction ("since
+## we now have the bed object... you can go ahead and put a bed in pretty
+## much everyone's home").
 static func build_building(
 	w: int, d: int, floors: int, roof_color: Color,
 	ground_wall_color: Color = WALL_STONE,
 	upper_wall_color: Color = WALL_WOOD,
-	floor_color: Color = FLOOR_COLOR
+	floor_color: Color = FLOOR_COLOR,
+	shutter_color: Color = Color(-1.0, -1.0, -1.0),
+	wall_style: String = "panel",
+	add_bed: bool = false
 ) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
 	body.collision_mask = 0
 
 	var door_ix := int(w / 2.0)
+	var resolved_shutter_color := shutter_color if shutter_color.r >= 0.0 else roof_color.darkened(0.12)
 
 	for floor_index in floors:
 		_build_floor(body, w, d, float(floor_index) * FLOOR_HEIGHT, floor_color)
 
+	var top_wall_color := ground_wall_color if floors <= 1 else upper_wall_color
 	for floor_index in floors:
 		var y := float(floor_index) * FLOOR_HEIGHT
 		var is_ground := floor_index == 0
@@ -129,38 +139,46 @@ static func build_building(
 				# (yaw -90) turns it to world +X. Not visually re-verified
 				# in-engine.
 				if on_west:
-					_build_wall_cell(body, Vector3(-w * CELL_SIZE * 0.5, y, cz), deg_to_rad(90.0), wall_color, "window")
+					_build_wall_cell(body, Vector3(-w * CELL_SIZE * 0.5, y, cz), deg_to_rad(90.0), wall_color, "window", resolved_shutter_color, wall_style)
 				if on_east:
-					_build_wall_cell(body, Vector3(w * CELL_SIZE * 0.5, y, cz), deg_to_rad(-90.0), wall_color, "window")
+					_build_wall_cell(body, Vector3(w * CELL_SIZE * 0.5, y, cz), deg_to_rad(-90.0), wall_color, "window", resolved_shutter_color, wall_style)
 				if on_south:
 					var south_opening := "door" if is_ground and ix == door_ix else "window"
-					_build_wall_cell(body, Vector3(cx, y, -d * CELL_SIZE * 0.5), 0.0, wall_color, south_opening)
+					_build_wall_cell(body, Vector3(cx, y, -d * CELL_SIZE * 0.5), 0.0, wall_color, south_opening, resolved_shutter_color, wall_style)
 				if on_north:
-					_build_wall_cell(body, Vector3(cx, y, d * CELL_SIZE * 0.5), deg_to_rad(180.0), wall_color, "window")
+					_build_wall_cell(body, Vector3(cx, y, d * CELL_SIZE * 0.5), deg_to_rad(180.0), wall_color, "window", resolved_shutter_color, wall_style)
 
 	_build_roof(body, w, d, float(floors) * FLOOR_HEIGHT, roof_color)
+	# Per direct correction ("the triangle area above the walls where the
+	# triangle roofs come together... there's just no triangle shape to fill
+	# it in") -- the gable roof's ridge rises above the flat top of the
+	# west/east end walls; this fills that gap.
+	_build_gable_infill(body, w, d, float(floors) * FLOOR_HEIGHT, top_wall_color)
+	if add_bed:
+		_build_house_bed(body, w, d)
 	return body
 
 
+## One single slab spanning the whole floor's footprint, not a per-cell
+## grid -- per direct correction ("the procedural floors... seem to be
+## using these modular tiled systems, which leaves a lot of gap in
+## between the tiles... have a final pass... merge that into a single
+## larger floor"). Even at EPSILON_FLAT, a superellipsoid's corners/edges
+## still round off slightly short of the nominal box, which is exactly what
+## showed as a seam wherever two tiles met -- one slab has no interior
+## seams left to show at all.
 static func _build_floor(body: StaticBody3D, w: int, d: int, y: float, floor_color: Color = FLOOR_COLOR) -> void:
-	for ix in w:
-		for iz in d:
-			var cx := (ix - (w - 1) / 2.0) * CELL_SIZE
-			var cz := (iz - (d - 1) / 2.0) * CELL_SIZE
-			var tile_pos := Vector3(cx, y, cz)
-			var tile := SuperEgg.build_part(
-				Vector3(CELL_SIZE * 0.5, 0.04, CELL_SIZE * 0.5), floor_color,
-				SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-			)
-			tile.position = tile_pos
-			body.add_child(tile)
-			# Landable per direct instruction -- upper-story floors previously
-			# had no collision at all (see the ground floor's own real
-			# terrain collision, which this is redundant with and harmless
-			# alongside).
-			_add_box_collision(
-				body, tile_pos, Vector3(CELL_SIZE, FLOOR_COLLISION_THICKNESS, CELL_SIZE)
-			)
+	var half_size := Vector3(float(w) * CELL_SIZE * 0.5, 0.04, float(d) * CELL_SIZE * 0.5)
+	var tile_pos := Vector3(0.0, y, 0.0)
+	var tile := SuperEgg.build_part(half_size, floor_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	tile.position = tile_pos
+	body.add_child(tile)
+	# Landable per direct instruction -- upper-story floors previously had no
+	# collision at all (see the ground floor's own real terrain collision,
+	# which this is redundant with and harmless alongside).
+	_add_box_collision(
+		body, tile_pos, Vector3(float(w) * CELL_SIZE, FLOOR_COLLISION_THICKNESS, float(d) * CELL_SIZE)
+	)
 
 
 static func _build_corner_post(body: StaticBody3D, pos: Vector3, color: Color) -> void:
@@ -173,8 +191,19 @@ static func _build_corner_post(body: StaticBody3D, pos: Vector3, color: Color) -
 	_add_box_collision(body, post_pos, Vector3(0.28, FLOOR_HEIGHT, 0.28))
 
 
+## The real outward half-thickness of a wall of this style -- a log wall's
+## logs bulge out well past WALL_THICKNESS*0.5 (they need real radius to
+## read as logs at all), so anything measuring where the wall's own outside
+## FACE actually is (a window's own shutters, the wall's shared collision
+## box) needs this instead of assuming the thin flat-panel thickness. Per
+## direct correction ("window shutters are now clipping into those walls").
+static func _wall_face_offset(wall_style: String) -> float:
+	return _log_radius() if wall_style == "log" else WALL_THICKNESS * 0.5
+
+
 static func _build_wall_cell(
-	body: StaticBody3D, pos: Vector3, yaw: float, color: Color, opening: String
+	body: StaticBody3D, pos: Vector3, yaw: float, color: Color, opening: String,
+	shutter_color: Color, wall_style: String = "panel"
 ) -> void:
 	var basis := Basis(Vector3.UP, yaw)
 
@@ -182,27 +211,43 @@ static func _build_wall_cell(
 		_build_door_cell(body, pos, basis, color)
 		return
 
-	var wall := SuperEgg.build_part(
-		Vector3(CELL_SIZE * 0.5, FLOOR_HEIGHT * 0.5, WALL_THICKNESS * 0.5), color,
-		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-	)
-	wall.basis = basis
 	var wall_pos := pos + Vector3(0, FLOOR_HEIGHT * 0.5, 0)
-	wall.position = wall_pos
-	body.add_child(wall)
-	_add_box_collision(body, wall_pos, Vector3(CELL_SIZE, FLOOR_HEIGHT, WALL_THICKNESS), basis)
-
-	if opening == "window":
-		var window := SuperEgg.build_part(
-			Vector3(WINDOW_SIZE.x * 0.5, WINDOW_SIZE.y * 0.5, 0.02), WINDOW_COLOR,
+	var face_offset := _wall_face_offset(wall_style)
+	if wall_style == "log":
+		_build_log_wall_panel(body, wall_pos, basis, color)
+	else:
+		var wall := SuperEgg.build_part(
+			Vector3(CELL_SIZE * 0.5, FLOOR_HEIGHT * 0.5, WALL_THICKNESS * 0.5), color,
 			SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
 		)
-		window.basis = basis
+		wall.basis = basis
+		wall.position = wall_pos
+		body.add_child(wall)
+	_add_box_collision(body, wall_pos, Vector3(CELL_SIZE, FLOOR_HEIGHT, face_offset * 2.0), basis)
+
+	if opening == "window":
 		var outward := basis * Vector3(0, 0, -1)
-		window.position = (
-			pos + Vector3(0, FLOOR_HEIGHT * 0.55, 0) + outward * (WALL_THICKNESS * 0.5 + 0.015)
+		var shutter_center := (
+			pos + Vector3(0, FLOOR_HEIGHT * 0.55, 0) + outward * (face_offset + 0.015)
 		)
-		body.add_child(window)
+		# Two closed leaves ARE the window treatment; there is no unrelated grey
+		# glass slab behind them and no decorative leaves parked off to the side.
+		for side in [-1.0, 1.0]:
+			var shutter := SuperEgg.build_part(
+				Vector3(WINDOW_SIZE.x * 0.245, WINDOW_SIZE.y * 0.5, 0.035),
+				shutter_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+			)
+			shutter.basis = basis
+			shutter.position = shutter_center + basis * Vector3(side * WINDOW_SIZE.x * 0.25, 0.0, -0.025)
+			body.add_child(shutter)
+			for batten_y in [-0.27, 0.27]:
+				var batten := SuperEgg.build_part(
+					Vector3(WINDOW_SIZE.x * 0.21, 0.025, 0.018),
+					shutter_color.darkened(0.22), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+				)
+				batten.basis = basis
+				batten.position = shutter.position + basis * Vector3(0.0, batten_y, -0.045)
+				body.add_child(batten)
 
 
 ## Leaves the actual doorway open -- only the two jambs and the lintel
@@ -241,6 +286,107 @@ static func _build_door_cell(body: StaticBody3D, pos: Vector3, basis: Basis, wal
 	# open doorway (no door mesh to visually imply something the player
 	# was just walking straight through anyway). Just the jambs/lintel
 	# above, framing an actually-empty gap.
+
+
+## Stacks several horizontal round SuperEgg "logs" across the exact same
+## CELL_SIZE x FLOOR_HEIGHT footprint a flat panel would occupy, spanning
+## LOG_OUTWARD_OFFSET*2 in actual thickness instead of WALL_THICKNESS (see
+## that constant and _wall_face_offset() -- both callers of a log wall, the
+## window shutters and the shared collision box, size against it instead of
+## the thin flat-panel thickness, or shutters end up buried in the thicker
+## logs and the collision stays thinner than what's actually rendered).
+## Per direct correction ("[the logs] allowing a huge amount of gap between
+## them... [the gable bands] fit together more cleanly with less gap... use
+## that very similar geometry to the regular walls too") -- LOG_OVERLAP
+## spaces log centers closer together than 2*radius (true circles merely
+## touching at one point, the old spacing, leave a big visible lens-shaped
+## gap between courses), and a moderately flatter epsilon (2.6, short of
+## the gable band's fully flat 5.5 -- that would lose the round "log" read
+## entirely) flattens each log's own top/bottom a bit further, closing the
+## gap further still while it's still clearly a rounded log, not a board.
+const LOG_COUNT := 9
+const LOG_OVERLAP := 0.7
+const LOG_EPSILON := 2.6
+## Shared by _build_log_wall_panel() and _wall_face_offset() below, so a log
+## wall's real outward thickness (used for window-shutter placement and the
+## wall's own collision box) always matches what's actually rendered.
+static func _log_radius() -> float:
+	return (FLOOR_HEIGHT / float(LOG_COUNT) * 0.5) / LOG_OVERLAP
+static func _build_log_wall_panel(body: StaticBody3D, center: Vector3, basis: Basis, color: Color) -> void:
+	var slot_height := FLOOR_HEIGHT / float(LOG_COUNT)
+	var log_radius := _log_radius()
+	var base_y := center.y - FLOOR_HEIGHT * 0.5
+	for i in LOG_COUNT:
+		var log_y := base_y + slot_height * (float(i) + 0.5)
+		var tint := color.lightened(0.06) if i % 2 == 0 else color.darkened(0.06)
+		var log := SuperEgg.build_part(
+			Vector3(CELL_SIZE * 0.5, log_radius, log_radius), tint, LOG_EPSILON, LOG_EPSILON
+		)
+		log.basis = basis
+		log.position = Vector3(center.x, log_y, center.z)
+		body.add_child(log)
+
+
+## Fills the triangular gap a gable roof otherwise leaves above a building's
+## short (west/east) end walls -- those only rise to the flat top of the top
+## floor, while the roof's own ridge keeps rising above that. Per direct
+## instruction: "the triangle area above the walls where the triangle roofs
+## come together... there's just no triangle shape to fill it in."
+## Approximated as several stacked, progressively narrower horizontal bands
+## (this project's SuperEgg-only convention -- no hand-rolled wedge mesh)
+## rather than one continuous triangle; close enough at this scale to read
+## as solid infill rather than a visibly stepped edge.
+const GABLE_INFILL_BANDS := 7
+static func _build_gable_infill(body: StaticBody3D, w: int, d: int, floor_top_y: float, color: Color) -> void:
+	var half_depth := d * CELL_SIZE * 0.5 + ROOF_OVERHANG
+	var slope_len := half_depth / cos(ROOF_PITCH)
+	var peak_y := floor_top_y + slope_len * sin(ROOF_PITCH)
+	var triangle_height := peak_y - floor_top_y
+	var half_base := d * CELL_SIZE * 0.5
+	var band_height := triangle_height / float(GABLE_INFILL_BANDS)
+	var sides: Array[float] = [-1.0, 1.0]
+	for side in sides:
+		var wall_x := side * w * CELL_SIZE * 0.5
+		var basis := Basis(Vector3.UP, deg_to_rad(90.0) if side < 0.0 else deg_to_rad(-90.0))
+		for i in GABLE_INFILL_BANDS:
+			var band_center_t := (float(i) + 0.5) / float(GABLE_INFILL_BANDS)
+			var band_half_width := half_base * (1.0 - band_center_t)
+			if band_half_width < 0.03:
+				continue
+			var band_y := floor_top_y + (float(i) + 0.5) * band_height
+			var band := SuperEgg.build_part(
+				Vector3(band_half_width, band_height * 0.5, WALL_THICKNESS * 0.5), color,
+				SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+			)
+			band.basis = basis
+			band.position = Vector3(wall_x, band_y, 0.0)
+			body.add_child(band)
+			_add_box_collision(
+				body, band.position, Vector3(band_half_width * 2.0, band_height, WALL_THICKNESS), basis
+			)
+
+
+## One simple frame+mattress bed (matching village_inn.gd's own guest beds)
+## placed in the back corner farthest from the door -- door_ix/south wall
+## match build_building()'s own convention, so "farthest corner" is always
+## the north-west one regardless of building size.
+const BED_FRAME_COLOR := Color(0.33, 0.18, 0.09)
+const BED_MATTRESS_COLOR := Color(0.88, 0.82, 0.68)
+static func _build_house_bed(body: StaticBody3D, w: int, d: int) -> void:
+	var corner_x := -(float(w) * CELL_SIZE * 0.5 - 1.0)
+	var corner_z := float(d) * CELL_SIZE * 0.5 - 1.0
+	var frame_pos := Vector3(corner_x, 0.35, corner_z)
+	var frame := SuperEgg.build_part(
+		Vector3(0.78, 0.23, 1.32), BED_FRAME_COLOR, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	frame.position = frame_pos
+	body.add_child(frame)
+	var mattress := SuperEgg.build_part(
+		Vector3(0.7, 0.16, 1.19), BED_MATTRESS_COLOR, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
+	)
+	mattress.position = frame_pos + Vector3(0.0, 0.27, 0.0)
+	body.add_child(mattress)
+	_add_box_collision(body, frame_pos, Vector3(1.56, 0.48, 2.64))
 
 
 ## A gable roof: two flat panels sloping down from a central ridge toward
@@ -863,6 +1009,30 @@ static func build_stall(canopy_color: Color) -> Dictionary:
 	# collider, same reasoning as TownProps' building roofs.
 	_add_box_collision(body, canopy_pos, Vector3(1.5, 0.3, 1.1))
 	return {"body": body, "counter_y": STALL_COUNTER_Y}
+
+
+## Shared market-stall blocking. Local -Z is the post/canopy-back side and
+## local +Z is the customer approach, so a vendor belongs just beyond one
+## counter end and slightly forward—not behind the displayed wares. The
+## returned facing points diagonally into the approach lane, keeping both
+## seller and merchandise readable while guaranteeing body clearance from
+## the counter footprint. Wider equipment pavilions only need supply their
+## own half-width; the placement rule remains identical.
+static func vendor_layout(
+	stall_position: Vector2,stall_yaw: float,counter_half_width: float=0.6
+) -> Dictionary:
+	const BODY_CLEARANCE := 0.48
+	const FORWARD_OFFSET := 0.52
+	const CUSTOMER_DEPTH := 1.25
+	var local_vendor:=Vector2(counter_half_width+BODY_CLEARANCE,FORWARD_OFFSET)
+	var local_customer:=Vector2(0.0,CUSTOMER_DEPTH)
+	var vendor_position:=stall_position+local_vendor.rotated(stall_yaw)
+	var customer_position:=stall_position+local_customer.rotated(stall_yaw)
+	var facing:=customer_position-vendor_position
+	return {
+		"position": vendor_position,
+		"facing_degrees": rad_to_deg(atan2(facing.x,facing.y)),
+	}
 
 
 ## Full-size equipment cannot plausibly share the low, narrow produce-stall

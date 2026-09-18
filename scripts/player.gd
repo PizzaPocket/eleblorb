@@ -10,21 +10,32 @@ const SUN_WU_KONG_SCENE: PackedScene = preload("res://scenes/sun_wu_kong.tscn")
 ## control scheme and how each action's keyboard/mouse and gamepad events
 ## are registered together.
 
-## Fired whenever current_hp changes (damage, heal, or regen) so hud.gd can
+## Fired whenever current_hp changes (damage or explicit healing) so hud.gd can
 ## drive its HP readout without polling every frame.
 signal hp_changed(current: float, max_value: float)
 
-## Minimal HP pool -- didn't exist before skeleton NMEs (see skeleton_nme.gd)
-## gave the player something to actually take damage from. Same regen-after-
-## delay shape as blorb.gd's own HP (see its HP_REGEN_PER_SECOND/
-## HP_REGEN_DELAY and _update_resources()); no death/respawn handling yet,
-## current_hp just clamps at 0 (see docs/world_bible.md's open threads).
+## The persistent human health pool. It never regenerates passively: food,
+## inns and faint recovery are the explicit restoration sources.
 const MAX_HP := 100.0
-const HP_REGEN_PER_SECOND := 2.0
-const HP_REGEN_DELAY := 4.0
 
 var current_hp: float = MAX_HP
-var _hp_regen_delay: float = 0.0
+
+## Fired whenever breath changes (draining or refilling) so hud.gd can show
+## a breath meter under the HP one. Per direct instruction: an "air supply"
+## system -- currently only underwater submersion without the Diving Helmet
+## drains it, but named/checked through _has_air_supply()/_in_airless_area()
+## below (not e.g. "has_diving_helmet()" inlined everywhere) specifically so
+## a future space biome (no atmosphere, a sealed suit) can extend the exact
+## same meter and damage-on-empty behavior later without reworking this.
+signal breath_changed(current: float, max_value: float)
+const MAX_BREATH := 12.0
+const BREATH_DRAIN_RATE := 1.0
+const BREATH_REFILL_RATE := 6.0
+const BREATH_DAMAGE_INTERVAL := 1.1
+const BREATH_DAMAGE_AMOUNT := 4.0
+var breath: float = MAX_BREATH
+var _breath_damage_timer := 0.0
+var _last_emitted_breath_int := -1
 
 @export var move_speed: float = 6.0
 @export var sprint_multiplier: float = 1.6
@@ -62,6 +73,277 @@ const AERIAL_CAMERA_PITCH_MAX := deg_to_rad(88.0)
 const GROUND_SNAP_MAX_SLOPE := 0.9  # rise/run, ~42 degrees
 const FOOT_OFFSET := 0.05
 const CLOUD_SINK_DEPTH := 0.10
+
+## ---- Dirt blorb suit: rear wheel ---- Per direct instruction: a landed
+## "ground"-element leg pair (BlorbSuitController.has_dirtbike_legs()) grows
+## a big wheel between the feet with "no constraints of traveling up even
+## very steep angled terrain," while still launching into the air and
+## falling under gravity off a ramp/canyon edge. Implemented as narrowly as
+## possible against the existing ground-follow system rather than a parallel
+## one: _try_step_up()/_snap_to_terrain() are the only two places that ever
+## refuse to follow an ASCENDING slope (their own GROUND_SNAP_MAX_SLOPE
+## check), so those two get a dirtbike bypass -- see each call site's own
+## comment. The DESCENDING half of _snap_to_terrain()'s check is left
+## completely untouched even while riding: that is exactly what already
+## turns a steep downhill drop (a ramp's far lip, a canyon edge) into "can't
+## snap, falls" instead of "glues to a cliff face," and normal gravity/jump
+## airborne handling (already slope- and vehicle-agnostic) takes over from
+## there with zero new code -- see this const block's own end for why no
+## separate momentum system was needed either.
+##
+## Purely a visual attachment (see _update_dirtbike_state()), not a suit
+## piece threaded through BlorbSuit.equip_slot()/rebuild_slot() -- it isn't
+## per-limb tube geometry that needs relofting as a joint moves, just one
+## shared prop positioned from a pivot pair each frame, same ownership
+## pattern this file already uses for the water/fire foot jets
+## (_update_water_streams()).
+##
+## Built as a solid SuperEgg disk (an oblate spheroid: equal X/Z semi-axes,
+## a short Y), not a torus/ring -- per direct correction ("the wheels should
+## be disks, not rings... the ring's normals are flipped"). Reusing SuperEgg
+## sidesteps that winding bug entirely rather than needing to fix it: it's
+## the same well-tested builder every other prop in this project already
+## uses, no custom triangle-order math of this file's own to get wrong.
+## epsilon=2.0 (this project's minimum -- "don't go below 2," see
+## superegg.gd's own class doc) is a deliberate choice, not the more common
+## EPSILON_SOFT/EPSILON_FLAT: the equatorial cross-section (the wheel's own
+## rim, viewed along the axle) always uses epsilon_top per that same class
+## doc, and only epsilon=2 traces a TRUE circle there -- anything higher
+## bows the rim toward a rounded square instead, wrong for a wheel.
+##
+## Both wheels share this one radius -- per direct correction ("the diameter
+## of both wheels should be the same") -- which is also exactly what makes
+## the wheelie's forward lean necessary in the first place: a same-size
+## front wheel mounted up at the wrists starts well clear of the ground, and
+## only reaches it once the body leans forward by _solve_dirtbike_wheelie_
+## pitch()'s own live-solved angle, below.
+## Per direct correction ("wheels diameter is too large, reduce by 20%") --
+## was 0.55.
+const DIRTBIKE_WHEEL_RADIUS := 0.44
+const DIRTBIKE_WHEEL_THICKNESS := DIRTBIKE_WHEEL_RADIUS * 0.6
+## Matches blorb.gd's own _apply_element_visuals() "ground" body color
+## exactly (Color(0.3, 0.2, 0.1, 0.93) there, alpha dropped since this prop
+## is solid/opaque rather than a living blorb's own slight translucency) --
+## per direct correction ("they should match the color of the ground
+## blorbs"). The project's "ground" element glow/core color is a lighter,
+## more yellow-brown (see _element_glow_color()) and is NOT what this
+## refers to -- the wheel needs the darker loamy BODY tone specifically.
+const DIRTBIKE_WHEEL_COLOR := ElementPalette.GROUND_BODY
+## How far past its default (~45 degrees) CharacterBody3D.floor_max_angle is
+## raised while riding -- a cheap safety net alongside the snap-function
+## bypasses above, so move_and_slide()'s own collision response doesn't
+## independently treat a steep-but-not-vertical slope as a wall and resist
+## the climb before the analytic Y-snap ever gets a say. Deliberately short
+## of 90 degrees: a genuine sheer cliff face should stay unclimbable even on
+## the wheel, matching "very steep angled terrain," not literal verticals.
+const DIRTBIKE_FLOOR_MAX_ANGLE := deg_to_rad(80.0)
+## Per direct correction ("when going up an upslope like the top of a peak
+## or top of a canyon or ramp, the expected behavior is that momentum would
+## continue and give some air, not immediately snap down on the other side
+## of the terrain") -- an ordinary downhill slope (never preceded by a
+## climb) still uses GROUND_SNAP_MAX_SLOPE's own ratio check below
+## unchanged, so a gentle downhill walk still glues normally. The moment
+## _snap_to_terrain() sees the terrain go from ascending to descending right
+## under the wheel, though, that specific transition (a true crest -- a
+## peak, a canyon lip, a ramp top) preserves the complete measured
+## world-space velocity from the final supported frame (see
+## _dirtbike_surface_velocity's own comment). This naturally includes both
+## speed and angle without reconstructing Y from a terrain sample. From
+## there, EVERY subsequent frame runs a real gravity-integrated fall
+## compared directly against the actual terrain height (see
+## _snap_to_terrain()'s own comment on that) rather than a fixed hang-time
+## timer -- per a further direct correction ("even when cresting smaller
+## hills at speed he should still get airtime... his downward translation
+## should never exceed the speed his body would be falling from gravity"),
+## since a fixed timer can't scale hang time to hill size the way comparing
+## against real gravity naturally does. DIRTBIKE_ASCEND_TRACK_THRESHOLD
+## filters out terrain noise from counting as "was climbing" in the first
+## place.
+const DIRTBIKE_ASCEND_TRACK_THRESHOLD := 0.02
+## How fast the standing/riding leg/arm pose blends toward its target --
+## eases the transition into/out of the straddle pose (see
+## _apply_dirtbike_pose()) instead of a hard cut. The visual lift itself
+## (see DIRTBIKE_WHEEL_RADIUS's own comment) eases at SNOW_VISUAL_SINK_SPEED
+## instead, since it shares _update_snow_visual_sink()'s own move_toward()
+## on visuals.position.y rather than owning a separate write.
+const DIRTBIKE_POSE_SETTLE_SPEED := 8.0
+## First-draft stance angles for straddling the wheel (think a motocross
+## rider's neutral standing position: hips back over the axle, knees bent,
+## feet forward on pegs) -- unverified in-engine like every other unspecified
+## magnitude in this rig, adjustable on report.
+const DIRTBIKE_HIP_BACK_ANGLE := deg_to_rad(18.0)
+const DIRTBIKE_KNEE_BEND := deg_to_rad(48.0)
+const DIRTBIKE_ANKLE_BEND := deg_to_rad(-24.0)
+## Straddles the wheel between the legs -- same signf(leg pivot's own local
+## X)-keyed outward splay _apply_manchego_seated_pose() already uses for
+## RIDE_HIP_SPLAY, reused here since it's the same "sit/stand astride
+## something round and wide" problem.
+const DIRTBIKE_HIP_SPLAY := deg_to_rad(10.0)
+## Per direct correction ("speed of the wheel should be pretty fast, not
+## just normal walking speed") -- multiplies HumanoidLocomotion's own ground
+## speed the same way skating's own worn_leg_speed_multiplier() already
+## does (see current_speed's own assembly in _physics_process). Stacks with
+## sprinting like every other speed multiplier here, so sprinting on the
+## wheel is faster still. First-draft magnitude, adjustable on report.
+const DIRTBIKE_SPEED_MULTIPLIER := 2.2
+## Per direct correction ("adding the arm wheels should speed it up even
+## more") -- an ADDITIONAL multiplier stacked on top of DIRTBIKE_SPEED_
+## MULTIPLIER while the wheelie (front wheel) is also active, not a
+## replacement for it.
+const DIRTBIKE_WHEELIE_SPEED_MULTIPLIER := 1.35
+## Wheel dynamics. Powered travel accelerates toward its target instead of
+## reaching full speed on the first input frame. With the drive released,
+## gravity along the slope, rolling resistance and quadratic air drag are
+## integrated continuously by HumanoidLocomotion.coast_wheel_velocity().
+const DIRTBIKE_DRIVE_ACCELERATION := 22.0
+## Tire traction is intentionally balanced: ordinary steering carries speed,
+## while a perpendicular carve scrubs and a full reversal brakes decisively.
+const DIRTBIKE_LATERAL_GRIP := 36.0
+const DIRTBIKE_REVERSE_BRAKING := 30.0
+const DIRTBIKE_ROLLING_RESISTANCE := 0.16
+const DIRTBIKE_AIR_DRAG := 0.011
+const DIRTBIKE_ROLL_STOP_SPEED := 0.12
+const DIRTBIKE_TERMINAL_ROLL_SPEED := 34.0
+const DIRTBIKE_GRADE_RESPONSE := 7.0
+## About 12% more vertical takeoff speed (sqrt(1.25)) without altering the
+## horizontal component or the terrain-derived launch direction.
+const DIRTBIKE_JUMP_HEIGHT_MULTIPLIER := 1.25
+
+## Snowboard: a passive, gravity-driven sibling of the dirtbike movement
+## model. Input carves/steers existing momentum but supplies no throttle.
+## Strong contact friction makes a board settle decisively on flats and
+## shallow run-outs. Low quadratic drag remains separate, so a real descent
+## can still accumulate the high speed expected from a long mountain.
+const SNOWBOARD_ROLLING_RESISTANCE := 0.075
+const SNOWBOARD_ICE_RESISTANCE := 0.075
+const SNOWBOARD_AIR_DRAG := 0.00032
+const SNOWBOARD_TUCK_DRAG_MULTIPLIER := 0.42
+const SNOWBOARD_TUCK_TERMINAL_MULTIPLIER := 1.22
+const SNOWBOARD_TURN_RATE := deg_to_rad(105.0)
+const SNOWBOARD_CARVE_GRIP := 2.4
+const SNOWBOARD_STOP_SPEED := 0.12
+const SNOWBOARD_TERMINAL_SPEED := 112.0
+## The kingdoms compress a real mountain into a shorter playable run. This
+## preserves gravity-led acceleration while letting a sustained steep grade
+## build the speed that a full-size descent would have had time to acquire.
+const SNOWBOARD_GRAVITY_SCALE := 1.45
+const SNOWBOARD_POSE_SETTLE_SPEED := 7.0
+## Terrain triangles are sampled across the board's length and their normal
+## is damped before reaching either rider or deck. Response softens further
+## at speed, representing the board's angular inertia instead of snapping to
+## every small change in the height field.
+const SNOWBOARD_PITCH_RESPONSE_SLOW := 5.0
+const SNOWBOARD_PITCH_RESPONSE_FAST := 2.4
+const SNOWBOARD_NORMAL_SAMPLE_DISTANCE := 1.05
+## Ankles and knees can let the deck conform to an ordinary grade while the
+## torso remains balanced. Beyond this grade the remaining angle belongs to
+## the whole rider, pivoting about the planted feet rather than bending the
+## board farther away from its two terrain contacts.
+const SNOWBOARD_RIDER_PITCH_THRESHOLD := deg_to_rad(17.0)
+const SNOWBOARD_RIDER_PITCH_RESPONSE := 5.5
+# This authored rig's anatomical left points along local +X (confirmed from
+# the live stance), so a regular stance rotates body-forward -90 degrees
+# from travel and twists the upper body back toward travel with +Y turns.
+const SNOWBOARD_BODY_SIDE_ANGLE := -PI * 0.5
+const SNOWBOARD_ABDOMEN_TWIST := deg_to_rad(16.0)
+const SNOWBOARD_THORAX_TWIST := deg_to_rad(18.0)
+## A real board stance is substantially wider than the ordinary standing
+## gait. Hip abduction spreads the feet longitudinally along the board while
+## keeping both upper legs seated in their actual hip sockets.
+const SNOWBOARD_STANCE_SPLAY := deg_to_rad(15.0)
+const SNOWBOARD_HIP_BEND := deg_to_rad(10.0)
+const SNOWBOARD_TUCK_HIP_BEND := deg_to_rad(16.0)
+const SNOWBOARD_KNEE_BEND := deg_to_rad(25.0)
+const SNOWBOARD_TUCK_KNEE_BEND := deg_to_rad(27.0)
+const SNOWBOARD_ARM_SPREAD := deg_to_rad(20.0)
+const SNOWBOARD_TUCK_ARM_SPREAD := deg_to_rad(12.0)
+const SNOWBOARD_ELBOW_BEND := deg_to_rad(10.0)
+const SNOWBOARD_TUCK_ELBOW_BEND := deg_to_rad(10.0)
+const SNOWBOARD_SPEED_LEAN_MAX := deg_to_rad(-17.0)
+const SNOWBOARD_TUCK_LEAN := deg_to_rad(-6.0)
+const SNOWBOARD_FULL_LEAN_SPEED := 25.0
+const SNOWBOARD_WIDTH := 0.32
+const SNOWBOARD_LENGTH := 2.45
+const SNOWBOARD_THICKNESS := 0.08
+const SNOWBOARD_COLOR := ElementPalette.SNOW_BODY
+
+## Ice-leg skates: powered on real ice, but still physically extend beneath
+## the shoes everywhere else. Their runner color is the exact canonical Ice
+## body material because elemental constructs are extensions of the blorbs.
+const ICE_SKATE_COLOR := ElementPalette.ICE_BODY
+const ICE_SKATE_RUNNER_HALF_LENGTH := 0.19
+const ICE_SKATE_RUNNER_HALF_WIDTH := 0.022
+const ICE_SKATE_RUNNER_HALF_HEIGHT := 0.025
+const ICE_SKATE_SUPPORT_HEIGHT := 0.055
+const ICE_SKATE_TOTAL_HEIGHT := ICE_SKATE_RUNNER_HALF_HEIGHT * 2.0 + ICE_SKATE_SUPPORT_HEIGHT
+const ICE_SKATE_POSE_SETTLE_SPEED := 9.0
+const ICE_SKATE_SPEED_MULTIPLIER := 2.55
+const ICE_SKATE_DRIVE_ACCELERATION := 16.0
+const ICE_SKATE_SPRINT_THRUST_MULTIPLIER := 1.75
+const ICE_SKATE_LATERAL_GRIP := 13.0
+const ICE_SKATE_REVERSE_BRAKING := 18.0
+const ICE_SKATE_ROLLING_RESISTANCE := 0.022
+const ICE_SKATE_AIR_DRAG := 0.0018
+const ICE_SKATE_STOP_SPEED := 0.10
+const ICE_SKATE_TERMINAL_SPEED := 32.0
+const ICE_SKATE_PUSH_HIP_BACK := deg_to_rad(25.0)
+const ICE_SKATE_GLIDE_HIP_FORWARD := deg_to_rad(13.0)
+const ICE_SKATE_RECOVERY_HIP_FORWARD := deg_to_rad(11.0)
+const ICE_SKATE_PUSH_OUTWARD := deg_to_rad(18.0)
+const ICE_SKATE_SPRINT_PUSH_OUTWARD := deg_to_rad(48.0)
+const ICE_SKATE_TOE_OUT := deg_to_rad(24.0)
+const ICE_SKATE_PUSH_KNEE := deg_to_rad(13.0)
+const ICE_SKATE_GLIDE_KNEE := deg_to_rad(27.0)
+const ICE_SKATE_RECOVERY_KNEE := deg_to_rad(20.0)
+const ICE_SKATE_BODY_LEAN := deg_to_rad(8.0)
+const ICE_SKATE_ARM_SWING := deg_to_rad(18.0)
+const ICE_SKATE_ELBOW_BEND := deg_to_rad(38.0)
+const ICE_SKATE_SPRINT_BODY_LEAN := deg_to_rad(17.0)
+const ICE_SKATE_SPRINT_POSE_MULTIPLIER := 2.0
+const ICE_SKATE_SPRINT_ARM_LIFT := deg_to_rad(16.0)
+const ICE_SKATE_CADENCE_GLIDE := 1.65
+const ICE_SKATE_CADENCE_THRUST := 4.35
+const ICE_SKATE_FULL_THRUST_ACCELERATION := 7.5
+# Above the human's ordinary 11.3 m/s jump, so a rising ice platform still
+# gives a meaningful boost, but bounded well below the old collision-spike
+# values that could launch the player into the stratosphere.
+const ICE_PLATFORM_LAUNCH_MAX_SPEED := 14.5
+
+## ---- Dirt blorb suit: front wheel / wheelie ---- Per direct instruction:
+## ALSO landing a "ground" arm pair (BlorbSuitController.has_dirtbike_arms())
+## does nothing on its own ("the condition is that you also have the dirt leg
+## blorbs, otherwise the arm power doesn't do anything") -- see
+## _update_dirtbike_state()'s own combination of the two. Holding BOTH
+## left_arm_power and right_arm_power already raises both arms forward on
+## its own, unconditionally, regardless of element or the wheel at all (see
+## _apply_arm_power_poses()'s own doc comment: a placeholder gesture for
+## whatever an arm's suit covering eventually casts) -- the wheelie only
+## adds the front wheel prop itself, between the two now-raised WRISTS (per
+## direct correction, "the arm axis should be at the wrists" -- _wrist_left/
+## _wrist_right, not _hand_left/_hand_right), plus the forward body lean
+## that brings it down to the ground. Releasing EITHER arm button removes
+## the front wheel and eases the body back upright, same as the arm-raise
+## pose itself already reverts independently per arm.
+##
+## The lean angle itself is solved live every frame from the rig's own
+## current wrist/ankle geometry -- see _solve_dirtbike_wheelie_pitch()'s own
+## doc comment for the derivation -- rather than a single guessed constant,
+## per direct instruction ("you must figure out the math to keep the back
+## wheel touching the ground but also pitch the player's body forward until
+## the perimeter of the front wheel also rests on the ground").
+const DIRTBIKE_WHEELIE_SETTLE_SPEED := 7.0
+## When the rear wheel remains supported but the front wheel has cleared its
+## surface, gravity creates a real forward pitching moment about the rear
+## contact. This angular acceleration prevents a stopped bike from balancing
+## forever with its front tire suspended in the air. Fully airborne travel
+## still preserves launch attitude as its separate ballistic rule requires.
+const DIRTBIKE_NOSE_DROP_ANGULAR_ACCELERATION := deg_to_rad(115.0)
+const DIRTBIKE_NOSE_DROP_MAX_ANGULAR_SPEED := deg_to_rad(150.0)
+## Snow yields visually beneath the feet without lowering the collision body.
+## Slightly shallower than cloud immersion: packed ground supports weight,
+## while a cloud is a deep, fluffy one-way volume.
+const SNOW_VISUAL_SINK_DEPTH := 0.075
+const SNOW_VISUAL_SINK_SPEED := 0.65
 ## Shallower than CLOUD_SINK_DEPTH -- a tree canopy is a thin leaf mass, not
 ## a fluffy cloud bank, so standing on top should read as resting lightly on
 ## foliage rather than sinking noticeably in.
@@ -384,6 +666,8 @@ var _wake_intro_owns_modal_lock: bool = false
 var _wake_intro_camera_position_rest: Vector3 = Vector3(0.0, 1.6, 0.0)
 var _wake_intro_camera_pitch_rest: float = 0.0
 var _wake_intro_camera_distance_rest: float = 3.5
+var _wake_intro_final_transform: Transform3D
+var _wake_intro_has_final_transform := false
 
 const SHIRT_COLOR := Color(0.15, 0.35, 0.72)
 const PANTS_COLOR := Color(0.1, 0.1, 0.13)
@@ -691,6 +975,14 @@ var _giant_goo_active: bool = false
 var _giant_surface_grounded: bool = false
 var _lake_buoyancy_active: bool = false
 var _lake_diving_active: bool = false
+## Set for one frame when diving ends (surfacing into ordinary chest-Air-
+## blorb flight, most commonly) -- see _process()'s own consumption of this
+## for why: diving alone permits the wider AERIAL_CAMERA_PITCH_MIN/MAX
+## range (see _rotate_camera()), and without an explicit re-clamp here the
+## camera could be left at a steep pitch from diving that flight's own
+## tighter PITCH_MIN/MAX never actually permits, reading as "off of normal
+## position" until the next look input happened to snap it back.
+var _lake_diving_just_ended: bool = false
 var _lake_floor_walk_active: bool = false
 var _lake_weighted_descent_active: bool = false
 var _active_swim_surface_height: float = 0.0
@@ -746,6 +1038,77 @@ var _fire_limb_flight_active := false
 var _air_foot_hover_active := false
 var _was_powered_hover_active := false
 var _powered_hover_target_y := 0.0
+## The snow-sink component only of visuals.position.y -- see
+## _update_snow_visual_sink()'s own doc comment for why this is tracked
+## separately from the dirtbike lift added on top of it there.
+var _visuals_snow_offset_y := -FOOT_OFFSET
+## Dirt blorb suit -- see the DIRTBIKE_* consts' own doc comments.
+var _dirtbike_wheel_active := false
+## The wheelie's own toggle state -- per direct correction ("let's change
+## the arm wheels to a toggle. If both are pressed down then it toggles the
+## arm wheel to on. pressing both again toggles it to off"). Forced back to
+## false if either prerequisite (the leg wheel, or the ground arm pair)
+## drops away, so a stale "on" can't silently persist into a state where it
+## no longer even makes sense -- see _update_dirtbike_state()'s own use.
+var _dirtbike_wheelie_toggled_on := false
+## Edge-detects the two-button chord for the toggle above: true only once
+## BOTH left_arm_power and right_arm_power are simultaneously held, false
+## the instant either releases -- the toggle fires on the frame this
+## transitions false -> true, not on every frame both happen to be held.
+var _dirtbike_wheelie_chord_was_pressed := false
+## Edge-detects UIState.modal_open closing -- see this field's own use in
+## _update_dirtbike_state() ("unpausing holding something should bring out
+## of arm wheels").
+var _was_modal_open := false
+## True exactly when _dirtbike_wheelie_toggled_on is (see
+## _update_dirtbike_state()) -- kept as its own field since every other
+## dirtbike function already reads this name.
+var _dirtbike_wheelie_active := false
+var _dirtbike_pose_blend := 0.0
+var _dirtbike_wheelie_blend := 0.0
+var _dirtbike_default_floor_max_angle := 0.0
+var _dirtbike_rear_wheel: MeshInstance3D = null
+var _dirtbike_front_wheel: MeshInstance3D = null
+## Cresting-a-climb launch state -- see _snap_to_terrain()'s own comment.
+var _dirtbike_was_climbing := false
+## The body's most recently resolved world-space velocity while constrained
+## to terrain. This is measured delta-position/delta-time, not reconstructed
+## from a sampled slope, and is preserved intact when support disappears.
+var _dirtbike_surface_velocity := Vector3.ZERO
+var _dirtbike_smoothed_grade := 0.0
+## Last slope for which both wheel contacts were physically plausible. When
+## the front tire clears a crest, retaining this tangent prevents a terrain
+## sample far below the airborne tire from pulling the bike's nose downward.
+var _dirtbike_supported_pitch := 0.0
+var _dirtbike_pitch_angular_velocity := 0.0
+var _dirtbike_airborne_pitch := 0.0
+var _dirtbike_pitch_was_grounded := false
+## Matched Snow legs toggle this with a simultaneous leg-button chord.
+var _snowboard_toggled_on := false
+var _snowboard_chord_was_pressed := false
+var _snowboard_active := false
+var _snowboard_pose_blend := 0.0
+var _snowboard: Node3D = null
+var _snowboard_last_heading := Vector3.FORWARD
+var _snowboard_smoothed_up := Vector3.UP
+var _snowboard_smoothed_rider_grade := 0.0
+## Matched Ice legs automatically extend these runners. They remain visible
+## off ice while their traversal physics only engage on the frozen lake.
+var _ice_skates_active := false
+var _ice_skating_active := false
+var _ice_skate_pose_blend := 0.0
+var _ice_skate_stride_phase := 0.0
+var _ice_skate_previous_speed := 0.0
+var _ice_skate_smoothed_acceleration := 0.0
+var _ice_skate_left: Node3D = null
+var _ice_skate_right: Node3D = null
+var _ice_skate_was_supported := false
+var _ice_skate_airborne := false
+var _ice_skate_surface_velocity := Vector3.ZERO
+## Baseline Y last applied by _update_snow_visual_sink(). While riding, that
+## pass applies only the baseline's delta so the chassis-pivot correction is
+## retained rather than erased on the next frame.
+var _dirtbike_visual_base_y := -FOOT_OFFSET
 ## World-space swim heading, retained for the visual-only aerial anchor pass
 ## after move_and_slide() has placed the collision body this frame.
 var _aerial_motion_direction := Vector3.ZERO
@@ -754,6 +1117,11 @@ var _aerial_target_yaw := 0.0
 var _aerial_was_moving: bool = false
 var _aerial_rest_yaw := 0.0
 var _aerial_rest_heading_initialized: bool = false
+## Flight/swim rotates Visuals while CameraRig remains tied to this body.
+## Capturing one body-relative skull anchor on entry prevents a transient pose
+## error becoming the next frame's anchor and cumulatively drifting away.
+var _aerial_skull_body_offset := Vector3.ZERO
+var _aerial_skull_anchor_initialized := false
 var _swim_kick_phase := 0.0
 ## True only for a jump that began while standing on the giant's upper mesh.
 ## It is deliberately distinct from merely being inside the goo at ground
@@ -851,6 +1219,7 @@ var _controlled_giant: Blorb = null
 ## reskinned as Xiao Hou Zi -- see _piloting_xiao_hou_zi), so this var is
 ## just bookkeeping for which NPC to hand control back to.
 var _controlled_xiao_hou_zi: XiaoHouZi = null
+var _controlled_generic_member: Node3D = null
 var _sun_wu_kong_summon: SunWuKong = null
 const SUN_WU_KONG_SUMMON_TRIGGER_RADIUS := 18.0
 var _player_following_blorbus := false
@@ -868,6 +1237,7 @@ const PLAYER_FOLLOW_ARRIVE_DISTANCE := 3.0
 ## start entry point manchego.gd's Interactable callback can call directly
 ## (see start_riding_manchego() below).
 var _controlled_manchego: Manchego = null
+var _mounted_rider: Node3D = null
 var _player_following_manchego := false
 ## Prevents the Interact press that mounted Manchego from immediately being
 ## read again as a dismount. Armed after the player releases the control.
@@ -965,50 +1335,65 @@ const RIDE_ELBOW_INWARD := deg_to_rad(35.0)
 
 ## Isolated paper-doll preview for InventoryUI's Blorbs tab.
 var _portrait := PlayerPortrait.new()
+var _playable_profile := PlayableCharacterProfile.human()
 
 
 ## Read-only access to the suit controller. InventoryUI edits its persistent
 ## assignment map; PlayerPortrait renders that map on a separate figure.
 func get_blorb_suit() -> BlorbSuitController:
+	var active := PartyControl.active_member()
+	if active != null and active != self and active.has_method("get_blorb_suit"):
+		return active.get_blorb_suit()
 	return _blorb_suit
+
+
+func get_own_blorb_suit() -> BlorbSuitController:
+	return _blorb_suit
+
+
+func _active_portrait() -> PlayerPortrait:
+	var active := PartyControl.active_member()
+	if active != null and active != self and active.has_method("get_portrait"):
+		return active.get_portrait()
+	return _portrait
 
 
 ## InventoryUI grabs this once (it's a live ViewportTexture, always
 ## current -- see player_portrait.gd) rather than requesting a fresh
 ## capture per refresh.
 func get_portrait_texture() -> Texture2D:
-	return _portrait.get_texture()
+	return _active_portrait().get_texture()
 
 
 ## InventoryUI calls this as its Blorbs tab opens/closes -- see
 ## PlayerPortrait.set_active()'s own comment for why the live camera
 ## shouldn't render every frame while nobody's actually looking at it.
 func set_portrait_active(active: bool) -> void:
-	_portrait.set_active(active)
+	_active_portrait().set_active(active)
 
 
 func refresh_portrait_assignments() -> void:
-	_portrait.refresh(_blorb_suit.assignment_snapshot())
+	_active_portrait().refresh(get_blorb_suit().assignment_snapshot())
 
 
 func pick_portrait_slot(viewport_position: Vector2) -> String:
-	return _portrait.pick_slot(viewport_position)
+	return _active_portrait().pick_slot(viewport_position)
 
 
 func set_portrait_highlighted_slot(slot: String) -> void:
-	_portrait.set_highlighted_slot(slot)
+	_active_portrait().set_highlighted_slot(slot)
 
 
 func set_portrait_selected_blorb(blorb: Blorb) -> void:
-	_portrait.set_selected_blorb(blorb)
+	_active_portrait().set_selected_blorb(blorb)
 
 
 func set_portrait_focused_blorb(blorb: Blorb) -> void:
-	_portrait.set_focused_blorb(blorb)
+	_active_portrait().set_focused_blorb(blorb)
 
 
 func set_portrait_body_focus_active(active: bool) -> void:
-	_portrait.set_body_focus_active(active)
+	_active_portrait().set_body_focus_active(active)
 
 
 ## Factored out of _ready() below into its own static function purely so
@@ -1118,19 +1503,9 @@ func _apply_camera_framing(as_monkey: bool) -> void:
 	camera_spring_arm.spring_length = TEMP_MONKEY_CAMERA_DISTANCE if as_monkey else 3.5
 
 
-## 1.0 (the human rig's own native scale, and what every ProceduralFigure-
-## derived formula in blorb_suit.gd is natively written in terms of) unless
-## actually piloting Xiao Hou Zi with CheatCodes.enabled off, in which case
-## it's MonkeyFigure.BLORB_SUIT_RIG_SCALE -- the one value both
-## _blorb_suit.setup() call sites below (and _apply_blorb_suit_rig_scale())
-## feed through so the suit fits whichever rig is actually worn. See
-## cheat_codes.gd's own class doc comment for the cheat itself: entering the
-## Konami Code brings back the original comically-oversized-on-him look as
-## an easter egg, on top of whatever else CheatCodes.enabled unlocks in the
-## future.
+## The human's own suit is always authored at the ProceduralFigure scale.
+## Xiao Hou Zi owns a separate controller with his MonkeyFigure fit profile.
 func _current_blorb_suit_rig_scale() -> float:
-	if _piloting_xiao_hou_zi and not CheatCodes.enabled:
-		return MonkeyFigure.BLORB_SUIT_RIG_SCALE
 	return 1.0
 
 
@@ -1142,26 +1517,6 @@ func _current_blorb_suit_rig_scale() -> float:
 ## swap or a fresh equip.
 func _apply_blorb_suit_rig_scale() -> void:
 	_blorb_suit.setup(self, visuals, _blorb_suit_pivot_map(_visuals_pivots), _current_blorb_suit_rig_scale())
-
-
-## Swaps the visible rig live, mid-game -- the core of possessing Xiao Hou
-## Zi (see _try_start_xiao_hou_zi_control()/_end_xiao_hou_zi_control()).
-## Frees whichever rig root _build_pivots() previously parented under
-## `visuals`, builds the other one in its place, and re-points every pivot
-## var (including BlorbSuitController's own copies via re-setup()) at the
-## new rig -- worn blorb tubes and held items re-loft onto it automatically
-## next frame, the same live-reloft pass they already run every frame.
-func _rebuild_visuals_rig(as_monkey: bool) -> void:
-	var old_rig := visuals.get_node_or_null("MonkeyFigure")
-	if old_rig == null:
-		old_rig = visuals.get_node_or_null("ProceduralFigure")
-	if old_rig != null:
-		old_rig.free()
-	var pivots := _build_pivots(as_monkey)
-	_apply_pivots(pivots)
-	_visuals_pivots = pivots
-	_blorb_suit.setup(self, visuals, _blorb_suit_pivot_map(pivots), _current_blorb_suit_rig_scale())
-	_apply_camera_framing(as_monkey)
 
 
 const HELD_ITEM_SCALE := 0.6
@@ -1204,11 +1559,20 @@ const THROW_HAND_COCK := deg_to_rad(18.0)
 
 
 func _ready() -> void:
+	current_hp = clampf(WorldState.player_current_hp, 0.0, MAX_HP)
 	_rng.randomize()
+	_dirtbike_default_floor_max_angle = floor_max_angle
+	# Scene-exported tuning remains authoritative. The shared profile mirrors
+	# it so composition never replaces an inspector adjustment with defaults.
+	_playable_profile.move_speed = move_speed
+	_playable_profile.sprint_multiplier = sprint_multiplier
+	_playable_profile.jump_speed = jump_velocity
 	# Hud (an autoload, not a scene sibling like blorb.gd's own "../Player")
 	# has no relative path to reach this node -- the wild-blorb direction
 	# hint looks it up by group instead (see hud.gd's _find_player()).
 	add_to_group("player")
+	add_to_group("party_playable_candidates")
+	PartyControl.register_member(self)
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	# global_position.y is deliberately kept FOOT_OFFSET above the terrain
 	# snap height (see that const's own comment -- needed so is_on_floor()
@@ -1275,6 +1639,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		cancel_throw_preparation()
 		get_viewport().set_input_as_handled()
 		return
+	if is_instance_valid(_controlled_giant) and event.is_action_pressed("ui_cancel") and not UIState.modal_open:
+		HumongousState.show_merge_exit(self)
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		# The OS warps the cursor to center on capture, which can report as one
 		# large spurious motion event; skip it so the camera doesn't snap.
@@ -1297,15 +1665,39 @@ func _physics_process(delta: float) -> void:
 	_update_throw_input()
 	if Input.is_action_just_pressed("platform_aid") and not UIState.modal_open:
 		_call_platform_aid()
-	if Input.is_action_just_pressed("switch_blorbus") and not UIState.modal_open and not _player_following_manchego:
-		_toggle_blorbus_control()
+	if not UIState.modal_open and not _player_following_manchego:
+		if Input.is_action_just_pressed("switch_character_previous"):
+			if is_instance_valid(_controlled_giant):
+				HumongousState.show_merge_exit(self)
+			else:
+				_cycle_playable_character(-1)
+		elif Input.is_action_just_pressed("switch_character_next"):
+			if is_instance_valid(_controlled_giant):
+				HumongousState.show_merge_exit(self)
+			else:
+				_cycle_playable_character(1)
 	_update_sun_wu_kong_summon()
 	if _player_following_manchego:
 		_update_manchego_control(delta)
 		return
+	if _piloting_xiao_hou_zi:
+		_update_xiao_hou_zi_control(delta)
+		return
+	if is_instance_valid(_controlled_generic_member):
+		_update_generic_party_control(delta)
+		return
 	if _player_following_blorbus:
 		_update_blorbus_control(delta)
 		return
+	# Normal human control always owns a child camera rig. Possession and
+	# mounting deliberately detach it with top_level=true; if any interrupted
+	# transition leaves that flag behind, the player can fly hundreds of metres
+	# while the camera remains at the old world coordinate. Make attachment a
+	# state invariant here rather than relying on every exit path forever.
+	if camera_rig.top_level:
+		camera_rig.top_level = false
+		camera_rig.position = Vector3.ZERO
+		_apply_camera_framing(false)
 
 	# Tracked every frame, not just while grounded (where the ordinary jump
 	# input below is read) -- a press timed for a blorb bounce can happen
@@ -1329,7 +1721,11 @@ func _physics_process(delta: float) -> void:
 
 	_update_giant_goo_state(delta)
 	var water_entry_speed := maxf(-velocity.y, 0.0)
+	var was_diving := _lake_diving_active
 	_update_lake_buoyancy(delta)
+	_update_breath(delta)
+	if was_diving and not _lake_diving_active:
+		_lake_diving_just_ended = true
 	var in_water_now := _lake_buoyancy_active
 	if in_water_now and not _was_in_water and not _lava_swimming_active:
 		UISounds.play_foley(
@@ -1339,6 +1735,9 @@ func _physics_process(delta: float) -> void:
 		)
 	_was_in_water = in_water_now
 	_update_air_flight()
+	_update_dirtbike_state(delta)
+	_update_snowboard_state()
+	_update_ice_skate_state()
 	_update_limb_power_state(delta)
 	_update_suit_flight_transition()
 	var powered_hover := _is_powered_hover_active()
@@ -1386,8 +1785,14 @@ func _physics_process(delta: float) -> void:
 	# is refreshed from real contact, not from `grounded` itself, so it can't
 	# perpetuate past however long is_on_floor() actually stays true plus
 	# GROUNDED_GRACE_DURATION's own short tail.
-	if is_on_floor():
+	# Ground grace belongs only to the procedural terrain it was invented to
+	# smooth. A raised slab/roof can also make is_on_floor() true, but banking
+	# grace there lets the far-below analytic terrain suppress gravity after
+	# the character walks beyond the platform edge—the canyon hover artefact.
+	if is_on_floor() and _is_aligned_with_terrain():
 		_grounded_grace_timer = GROUNDED_GRACE_DURATION
+	elif is_on_floor():
+		_grounded_grace_timer = 0.0
 	else:
 		_grounded_grace_timer = maxf(_grounded_grace_timer - delta, 0.0)
 
@@ -1420,9 +1825,22 @@ func _physics_process(delta: float) -> void:
 	# reading as "lands for a moment, then keeps falling."
 	var canopy_stand_height: Variant = _tree_canopy_stand_height_at(global_position.x, global_position.z, global_position.y - FOOT_OFFSET + 0.2)
 	var on_canopy := canopy_stand_height != null and absf(global_position.y - (canopy_stand_height as float)) < 0.25 and velocity.y <= 0.1
+	# The frozen lake is a separate collision sheet above its submerged terrain.
+	# Its analytic contact band remains stable when ConcavePolygon floor contact
+	# flickers at the organically triangulated shoreline, so it must count as a
+	# real grounded support for the jump gate as well as for skating physics.
+	var on_ice_support:=_is_supported_by_ice()
+	# One-way supports do not produce an is_on_floor() contact. If their
+	# analytic surface says a descending jumper is already resting on one,
+	# that is a completed landing and must end the jump state before grounded
+	# is derived below. Otherwise `_jumping` keeps grounded false forever and
+	# gravity pulls the character through on the following frame.
+	if _jumping and velocity.y <= 0.0 and (on_cloud or on_canopy):
+		_jumping = false
+		_giant_surface_jump_in_progress = false
 	var grounded := (_giant_surface_grounded or _lake_floor_walk_active or _lava_surface_walk_active or on_climbable_ramp or (
-		is_on_floor() or _is_near_ground() or (_is_touching_terrain() and _grounded_grace_timer > 0.0)
-	) or on_cloud or on_canopy) and not _jumping
+		is_on_floor() or _is_near_ground() or (_is_aligned_with_terrain() and _grounded_grace_timer > 0.0)
+	) or on_cloud or on_canopy or on_ice_support) and not _jumping
 	if suit_flight or powered_hover:
 		grounded = false
 	# grounded is fixed at the top of the frame, before the jump decision
@@ -1432,7 +1850,12 @@ func _physics_process(delta: float) -> void:
 	var jumped_this_frame := false
 
 	if not grounded and not buoyant:
-		velocity.y = maxf(velocity.y - gravity * JUMP_GRAVITY_SCALE * delta, -TERMINAL_FALL_SPEED)
+		if (_dirtbike_wheel_active or _snowboard_active or _ice_skate_airborne) and _jumping:
+			velocity=HumanoidLocomotion.ballistic_step(
+				velocity,delta,_playable_profile,TERMINAL_FALL_SPEED
+			)
+		else:
+			velocity.y = HumanoidLocomotion.apply_gravity(velocity.y, delta, _playable_profile, TERMINAL_FALL_SPEED)
 	elif jump_pressed and _giant_goo_active and not giant_jump_ready:
 		# Goo is buoyant, not a fallable jump arc: pressing Jump while inside
 		# it becomes a temporary fast upward swim toward the surface.
@@ -1443,12 +1866,21 @@ func _physics_process(delta: float) -> void:
 		var jump_height_multiplier := GIANT_SUPER_JUMP_HEIGHT_MULTIPLIER if giant_jump_ready else 1.0
 		if _lake_buoyancy_active and not _lake_diving_active:
 			jump_height_multiplier = WATER_EXIT_JUMP_HEIGHT_MULTIPLIER
-		var jump_speed_scale := TEMP_MONKEY_JUMP_MULTIPLIER if _piloting_xiao_hou_zi else 1.0
-		velocity.y = jump_velocity * jump_speed_scale * sqrt(jump_height_multiplier)
+		elif _dirtbike_wheel_active or _snowboard_active:
+			jump_height_multiplier *= DIRTBIKE_JUMP_HEIGHT_MULTIPLIER
+		velocity.y = HumanoidLocomotion.jump_speed(_playable_profile, jump_height_multiplier)
+		if _ice_skates_active:
+			# A deliberate skating jump is player-authored, not an inherited
+			# platform impulse. It must never be reduced below the character's
+			# normal jump merely because the ice-support handoff occurs nearby.
+			velocity.y=maxf(velocity.y,HumanoidLocomotion.jump_speed(_playable_profile))
 		_jump_takeoff_speed = absf(velocity.y)
 		_giant_surface_jump_in_progress = giant_jump_ready
 		_jumping = true
 		jumped_this_frame = true
+		if _ice_skates_active and _ice_skate_was_supported:
+			_ice_skate_airborne=true
+			_ice_skating_active=false
 		UISounds.play_foley(&"jump", 0.52, get_instance_id())
 	_update_blorb_super_jump_boost(delta)
 
@@ -1466,13 +1898,34 @@ func _physics_process(delta: float) -> void:
 	var direction := cam_basis.x * input_dir.x + cam_basis.z * input_dir.y
 	if not aerial_active:
 		direction.y = 0.0
+	# Dirt-bike air is intentionally ballistic. Input remains available below
+	# for facing, but neither it nor the live sprint modifier may rewrite the
+	# launch vector until a real landing ends the arc.
+	var dirtbike_ballistic:=_dirtbike_wheel_active and (not grounded or jumped_this_frame) and not buoyant
+	# `grounded` is deliberately cached before jump handling, so it remains
+	# true on the takeoff frame. Include jumped_this_frame or ordinary ground
+	# movement would rewrite the skate's horizontal launch speed once before
+	# ballistic preservation begins on the following frame.
+	var skate_ballistic:=_ice_skate_airborne and (not grounded or jumped_this_frame) and not buoyant
 
-	var skating := _is_blorb_skating()
+	var skating := _is_blorb_skating() and not _ice_skates_active
 	var skate_speed_multiplier := worn_leg_speed_multiplier() if skating else 1.0
-	var ground_move_speed := TEMP_MONKEY_MOVE_SPEED if _piloting_xiao_hou_zi else move_speed
-	var current_speed := ground_move_speed * (sprint_multiplier if _is_sprinting() else 1.0)
+	var ground_move_speed := _playable_profile.move_speed
+	# Sprint remains ordinary powered throttle while the tires are supported.
+	# Only the dirt-bike ballistic carve-out freezes the launch speed.
+	var speed_sprinting := _is_sprinting() and not dirtbike_ballistic and not _snowboard_active
+	var current_speed := HumanoidLocomotion.ground_speed(_playable_profile, speed_sprinting)
 	if skating:
 		current_speed *= skate_speed_multiplier
+	# Per direct correction ("speed of the wheel should be pretty fast, not
+	# just normal walking speed... adding the arm wheels should speed it up
+	# even more") -- stacks on top of ordinary walk/sprint speed the same
+	# way skating's own multiplier just did, then the wheelie adds a further
+	# multiplier on top of that rather than replacing it.
+	if _dirtbike_wheel_active:
+		current_speed *= DIRTBIKE_SPEED_MULTIPLIER
+		if _dirtbike_wheelie_active:
+			current_speed *= DIRTBIKE_WHEELIE_SPEED_MULTIPLIER
 	if _lake_diving_active:
 		current_speed = LAKE_DIVE_SPEED * worn_swim_speed_multiplier()
 	elif _lake_floor_walk_active:
@@ -1495,7 +1948,7 @@ func _physics_process(delta: float) -> void:
 		current_speed *= pow(FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER, active_fire_feet)
 	# Leg Speed replaces the old fixed skate multiplier. High-Speed legs reach
 	# and surpass that former very-fast reference through progression itself.
-	var sliding_on_ice := grounded and _is_supported_by_ice()
+	var sliding_on_ice := grounded and _is_supported_by_ice() and not _snowboard_active and not _ice_skating_active
 	# Ice changes world traversal, not the authored gait. While the body
 	# accelerates or coasts under ice momentum, animate from current control
 	# intent at the ordinary walk/run rate; releasing the stick therefore
@@ -1507,31 +1960,148 @@ func _physics_process(delta: float) -> void:
 			if direction.length() > 0.001
 			else 0.0
 		)
+	if _snowboard_active and grounded:
+		ice_animation_speed = 0.0
+		var aerodynamic_tuck:=_is_sprinting()
+		var support_normal: Vector3=terrain.get_mesh_normal(global_position.x,global_position.z)
+		if _is_supported_by_ice():
+			support_normal=Vector3.UP
+		var steering:=Vector2(direction.x,direction.z)
+		var board_velocity:=HumanoidLocomotion.gravity_surface_glide(
+			Vector2(velocity.x,velocity.z),support_normal,steering,delta,
+			SNOWBOARD_ICE_RESISTANCE if _is_supported_by_ice() else SNOWBOARD_ROLLING_RESISTANCE,
+			SNOWBOARD_AIR_DRAG*(SNOWBOARD_TUCK_DRAG_MULTIPLIER if aerodynamic_tuck else 1.0),
+			SNOWBOARD_TURN_RATE,SNOWBOARD_CARVE_GRIP,SNOWBOARD_STOP_SPEED,
+			SNOWBOARD_TERMINAL_SPEED*(SNOWBOARD_TUCK_TERMINAL_MULTIPLIER if aerodynamic_tuck else 1.0),
+			SNOWBOARD_GRAVITY_SCALE
+		)
+		velocity.x=board_velocity.x
+		velocity.z=board_velocity.y
+		var carve_amount:=0.0
+		if board_velocity.length_squared()>0.01 and steering.length_squared()>0.01:
+			carve_amount=absf(board_velocity.normalized().cross(steering.normalized()))
+		UISounds.pulse_snowboard(
+			get_instance_id(),board_velocity.length(),carve_amount,
+			0.0 if _is_supported_by_ice() else 1.0
+		)
+	elif _ice_skating_active and grounded:
+		ice_animation_speed=0.0
+		var steering:=Vector2(direction.x,direction.z)
+		var skating_velocity:=Vector2(velocity.x,velocity.z)
+		var skate_speed_before:=skating_velocity.length()
+		if steering.length_squared()>0.001:
+			var skate_target_speed:=HumanoidLocomotion.ground_speed(
+				_playable_profile,_is_sprinting()
+			)*ICE_SKATE_SPEED_MULTIPLIER*worn_leg_speed_multiplier()
+			skating_velocity=HumanoidLocomotion.drive_wheel_velocity(
+				skating_velocity,steering,skate_target_speed,delta,
+				ICE_SKATE_DRIVE_ACCELERATION*(ICE_SKATE_SPRINT_THRUST_MULTIPLIER if _is_sprinting() else 1.0),ICE_SKATE_LATERAL_GRIP,
+				ICE_SKATE_REVERSE_BRAKING,ICE_SKATE_STOP_SPEED
+			)
+		else:
+			skating_velocity=HumanoidLocomotion.coast_wheel_velocity(
+				skating_velocity,0.0,delta,ICE_SKATE_ROLLING_RESISTANCE,
+				ICE_SKATE_AIR_DRAG,ICE_SKATE_STOP_SPEED,ICE_SKATE_TERMINAL_SPEED
+			)
+		if skating_velocity.length()>ICE_SKATE_TERMINAL_SPEED:
+			skating_velocity=skating_velocity.normalized()*ICE_SKATE_TERMINAL_SPEED
+		velocity.x=skating_velocity.x
+		velocity.z=skating_velocity.y
+		var skate_acceleration:=maxf((skating_velocity.length()-skate_speed_before)/maxf(delta,0.0001),0.0)
+		var sound_cycle:=fposmod(_ice_skate_stride_phase/TAU,1.0)
+		var sound_left:=ice_skate_stroke(sound_cycle)
+		var sound_right:=ice_skate_stroke(fposmod(sound_cycle+0.5,1.0))
+		UISounds.pulse_ice_skates(
+			get_instance_id(),skating_velocity.length(),skate_acceleration,
+			1.0-sound_left.y,1.0-sound_right.y
+		)
 
 	if direction.length() > 0.001:
 		direction = direction.normalized()
-		if neck_led_travel:
+		# Per direct correction, the wheelie's own head tracking (see
+		# aerial_head_tracking's own comment in _update_head_look()) needs a
+		# travel direction to aim at too -- deliberately only this ONE
+		# neck_led_travel-gated line, not the velocity.y/_aerial_target_yaw
+		# branches below: the dirtbike stays an ordinary ground vehicle
+		# (normal yaw-facing, no camera-pitch-driven vertical movement),
+		# only the HEAD borrows flight's own tracking behavior.
+		if neck_led_travel or _dirtbike_wheelie_active:
 			_aerial_motion_direction = direction
 			_aerial_strafe_input = input_dir.x
-		if sliding_on_ice and not neck_led_travel:
+		if dirtbike_ballistic or skate_ballistic or _snowboard_active or _ice_skating_active:
+			pass
+		elif sliding_on_ice and not neck_led_travel:
 			velocity.x = move_toward(velocity.x, direction.x * current_speed, ICE_ACCELERATION * delta)
 			velocity.z = move_toward(velocity.z, direction.z * current_speed, ICE_ACCELERATION * delta)
+		elif _dirtbike_wheel_active and not neck_led_travel:
+			var driven_planar:=HumanoidLocomotion.drive_wheel_velocity(
+				Vector2(velocity.x,velocity.z),Vector2(direction.x,direction.z),
+				current_speed,delta,DIRTBIKE_DRIVE_ACCELERATION,
+				DIRTBIKE_LATERAL_GRIP,DIRTBIKE_REVERSE_BRAKING,
+				DIRTBIKE_ROLL_STOP_SPEED
+			)
+			velocity.x=driven_planar.x
+			velocity.z=driven_planar.y
 		else:
 			velocity.x = direction.x * current_speed
 			velocity.z = direction.z * current_speed
 		if neck_led_travel:
 			velocity.y = direction.y * current_speed
 		var target_angle := atan2(direction.x, direction.z)
+		if _snowboard_active:
+			target_angle += SNOWBOARD_BODY_SIDE_ANGLE
 		if neck_led_travel:
 			# All three visual axes must be applied inside the skull-anchored
 			# pass below. Applying yaw here would still rotate around the feet.
 			_aerial_target_yaw = target_angle
+		elif _dirtbike_wheel_active or _snowboard_active or _ice_skating_active or skate_ballistic:
+			# Per direct correction ("the pivot when turning is around the
+			# back wheel, let's shift it forward to his center of mass") --
+			# visuals.rotation.y always turns around visuals' OWN origin,
+			# which sits at (or very near) the rear axle once the dirtbike
+			# lift is applied -- exactly "pivoting around the back wheel."
+			# Same anchor-preservation technique _update_aerial_body_anchor()
+			# already uses for its own skull anchor: capture a rig landmark
+			# approximating center of mass (_spine, the torso's own base)
+			# BEFORE rotating, then shift visuals' global position by
+			# whatever the rotation just displaced that landmark by, so the
+			# spine -- not the feet/wheel -- is what actually stays put
+			# through the turn. This remains the visual-only steering pivot
+			# while ballistic: input can aim the rider, but cannot bend the
+			# preserved launch velocity.
+			# Never preserve an already-drifted rendered X/Z coordinate. The
+			# CharacterBody is the authoritative chassis/camera location; the
+			# spine may keep its current height through the turn, but its planar
+			# centre must remain directly over that physical body.
+			var pivot_anchor := Vector3(global_position.x, _spine.global_position.y, global_position.z)
+			visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, rotation_speed * delta)
+			visuals.global_position += pivot_anchor - _spine.global_position
 		else:
 			visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, rotation_speed * delta)
 	else:
-		if sliding_on_ice:
+		if _snowboard_active or _ice_skating_active or skate_ballistic:
+			pass
+		elif sliding_on_ice:
 			velocity.x = move_toward(velocity.x, 0.0, ICE_FRICTION * delta)
 			velocity.z = move_toward(velocity.z, 0.0, ICE_FRICTION * delta)
+		elif dirtbike_ballistic:
+			# No throttle, braking, sprint rescale, or air steering force.
+			# HumanoidLocomotion.ballistic_step() already advanced gravity.
+			pass
+		elif _dirtbike_wheel_active:
+			var rolling:=Vector2(velocity.x,velocity.z)
+			var sampled_grade:=_dirtbike_slope_along(rolling) if grounded else 0.0
+			_dirtbike_smoothed_grade=lerpf(
+				_dirtbike_smoothed_grade,sampled_grade,
+				minf(DIRTBIKE_GRADE_RESPONSE*delta,1.0)
+			)
+			rolling=HumanoidLocomotion.coast_wheel_velocity(
+				rolling,_dirtbike_smoothed_grade if grounded else 0.0,delta,
+				DIRTBIKE_ROLLING_RESISTANCE if grounded else 0.0,DIRTBIKE_AIR_DRAG,
+				DIRTBIKE_ROLL_STOP_SPEED,DIRTBIKE_TERMINAL_ROLL_SPEED
+			)
+			velocity.x=rolling.x
+			velocity.z=rolling.y
 		else:
 			velocity.x = move_toward(velocity.x, 0.0, current_speed)
 			velocity.z = move_toward(velocity.z, 0.0, current_speed)
@@ -1543,6 +2113,7 @@ func _physics_process(delta: float) -> void:
 	# lift. Air feet and four-limb Fire flight instead use camera-pitched
 	# direction above; with no input they hold the last elevation here.
 	_apply_powered_hover_vertical(delta, direction.length() > 0.001 and aerial_active)
+	_face_snowboard_heading(delta)
 	# Resolve a normal blorb landing before physics can convert it into a
 	# stationary floor contact. This also lets the launch velocity influence
 	# the pose and the very same move_and_slide() call, eliminating the old
@@ -1571,7 +2142,14 @@ func _physics_process(delta: float) -> void:
 	_apply_weapon_swing_pose(delta)
 	_apply_throw_facing(delta)
 	_update_water_streams(delta)
+	_apply_dirtbike_pose(delta)
+	_apply_snowboard_pose(delta)
+	_apply_ice_skate_pose(delta)
 
+	# Capture before either terrain helper pre-lifts the body. Dirt-bike launch
+	# velocity must include that complete vertical displacement, not merely the
+	# smaller remainder left after the helper has already raised the chassis.
+	var pre_move_position := global_position
 	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and _is_touching_terrain():
 		_try_step_up()
 	# Not gated behind _is_touching_terrain() the way _try_step_up() is --
@@ -1581,10 +2159,11 @@ func _physics_process(delta: float) -> void:
 	# jump" guard every other step/snap call here uses) is what actually
 	# matters for this one.
 	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded:
-		_try_step_onto_prop()
+		_try_step_onto_prop(delta)
 	var pre_move_feet_y := global_position.y - FOOT_OFFSET
 	move_and_slide()
 	_resolve_ice_surface_contact(pre_move_feet_y)
+	_update_ice_skate_airtime(delta,pre_move_position)
 	_enforce_lava_access()
 	# Clouds are intentionally one-way: only a descending body that started
 	# above a puff top is caught. Rising flight/jumps pass straight through
@@ -1602,22 +2181,28 @@ func _physics_process(delta: float) -> void:
 	# a "falling" descent this one-way catch should react to.
 	var descending_through_air := not (_giant_goo_active or _lake_buoyancy_active) and velocity.y <= 0.0
 	if descending_through_air:
-		var cloud_landing_height: Variant = _cloud_stand_height_at(global_position.x, global_position.z, pre_move_feet_y + 0.02)
+		# The desired foot plane sits CLOUD_SINK_DEPTH below the visible puff
+		# top. Include that full separation in the one-way query ceiling; the
+		# former +2cm ceiling could reject the cloud during the only frame the
+		# feet crossed their recessed landing plane, causing a permanent miss.
+		var cloud_landing_height: Variant = _cloud_stand_height_at(
+			global_position.x,global_position.z,pre_move_feet_y+CLOUD_SINK_DEPTH+0.04
+		)
 		var cloud_feet_height := (cloud_landing_height as float) - FOOT_OFFSET if cloud_landing_height != null else 0.0
 		if cloud_landing_height != null and pre_move_feet_y >= cloud_feet_height and global_position.y - FOOT_OFFSET <= cloud_feet_height:
-			global_position.y = cloud_landing_height as float
-			velocity.y = 0.0
+			_complete_one_way_support_landing(cloud_landing_height as float)
 		# Tree canopies (round/pine/palm/banana/banyan/baobab foliage) are
 		# the same kind of one-way support as clouds above -- walkable
 		# underneath and through the sides, landable only when already above
 		# the leaf mass and descending onto it. See
 		# NatureProps._add_canopy_blob() and
 		# WildernessScatter.get_support_height_at().
-		var canopy_landing_height: Variant = _tree_canopy_stand_height_at(global_position.x, global_position.z, pre_move_feet_y + 0.02)
+		var canopy_landing_height: Variant = _tree_canopy_stand_height_at(
+			global_position.x,global_position.z,pre_move_feet_y+TREE_CANOPY_SINK_DEPTH+0.04
+		)
 		var canopy_feet_height := (canopy_landing_height as float) - FOOT_OFFSET if canopy_landing_height != null else 0.0
 		if canopy_landing_height != null and pre_move_feet_y >= canopy_feet_height and global_position.y - FOOT_OFFSET <= canopy_feet_height:
-			global_position.y = canopy_landing_height as float
-			velocity.y = 0.0
+			_complete_one_way_support_landing(canopy_landing_height as float)
 	# Movement is resolved by the collision body, then the visual rig is
 	# tilted around the head/neck junction. This order keeps the skull anchor
 	# at the position that actually led this frame's swim rather than letting
@@ -1638,7 +2223,7 @@ func _physics_process(delta: float) -> void:
 	_enforce_no_blorb_support_stall()
 	_enforce_platform_aid_completion(delta)
 	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and _is_touching_terrain():
-		_snap_to_terrain(delta)
+		_snap_to_terrain(delta,pre_move_position)
 	# Same active re-anchoring _snap_to_terrain() does for solid ground,
 	# applied to a cloud top instead -- see on_cloud's own comment above for
 	# why a cloud's own bumpy, multi-puff surface needs this (a loose
@@ -1657,7 +2242,7 @@ func _physics_process(delta: float) -> void:
 	# is_on_floor() covers that: it's real collision contact, so it fires
 	# the instant the character actually lands on anything solid, elevated
 	# platform or not.
-	if _jumping and velocity.y <= 0.0 and (is_on_floor() or _is_near_ground() or _giant_surface_grounded):
+	if _jumping and velocity.y <= 0.0 and (is_on_floor() or _is_near_ground() or _giant_surface_grounded or on_cloud or on_canopy):
 		_jumping = false
 		_giant_surface_jump_in_progress = false
 
@@ -1674,21 +2259,104 @@ func _physics_process(delta: float) -> void:
 		# Air-foot hover deliberately retains a walk/run animation while making
 		# no ground contact; suppress its landing cue for the same reason its
 		# stride contacts are silent below.
-		if not _air_foot_hover_active and not _lake_buoyancy_active and not on_cloud:
+		if not _air_foot_hover_active and not _lake_buoyancy_active and not on_cloud and not _is_on_lava_surface():
 			UISounds.play_landing(get_instance_id())
 	if grounded:
 		_continuous_airborne_time = 0.0
 	else:
 		_continuous_airborne_time += delta
+	_update_snow_visual_sink(delta,grounded,on_cloud or on_canopy,buoyant)
+	# Apply this after the visual-height owner above. Besides being the final
+	# pitch write, this keeps its centre-of-mass pivot correction from being
+	# overwritten by the dirtbike lift/snow sink in the same frame.
+	_apply_dirtbike_wheelie_pitch(delta,grounded)
+	_apply_snowboard_surface_orientation(delta,grounded)
+	_update_dirtbike_wheels(delta)
+	_update_snowboard_visual()
 	_prev_grounded = grounded
 
 
+## Despite the name, this is really "the final say on visuals' own resting
+## Y offset every frame" -- snow sink was the first thing that needed it,
+## the dirt blorb suit's own rear-wheel lift is the second (see
+## DIRTBIKE_WHEEL_RADIUS's own comment: "the feet axis should be at the
+## ankles, effectively lifting up the player" -- riding the wheel raises the
+## whole visual rig by its radius, so the ankles end up sitting on TOP of it
+## rather than the wheel floating disconnected below the ordinary standing
+## height). Tracked as two SEPARATE terms, not one combined move_toward()
+## target -- the snow sink's own _visuals_snow_offset_y still eases at the
+## slow SNOW_VISUAL_SINK_SPEED (a gentle foot-sinking-into-snow feel), but
+## the dirtbike lift needs to read as a real, promptly visible mount/
+## dismount rather than crawl in at that same slow rate, so it's added on
+## top fresh every frame using _dirtbike_pose_blend's own already-eased 0..1
+## ramp (see _apply_dirtbike_pose(), which runs earlier this same frame) --
+## no separate easing of its own needed. This function still owns the final
+## assignment to visuals.position.y (it runs last among the general-purpose
+## per-frame passes, right before _prev_grounded), so a second independent
+## writer earlier in the frame would just get overwritten here regardless.
+## The one exception is skull-anchored flight/deep swimming, where the
+## aerial anchor's placement must survive (see the guard below).
+func _update_snow_visual_sink(delta: float,grounded: bool,on_soft_aerial_support: bool,buoyant: bool) -> void:
+	if _wake_intro_active:
+		return
+	var on_snow: bool = (
+		grounded
+		and not on_soft_aerial_support
+		and not buoyant
+		and not _snowboard_active
+		and not _ice_skates_active
+		and terrain != null
+		and terrain.has_method("is_snow_footstep_surface")
+		and terrain.is_snow_footstep_surface(Vector2(global_position.x,global_position.z))
+	)
+	var snow_target_y: float = -FOOT_OFFSET - (SNOW_VISUAL_SINK_DEPTH if on_snow else 0.0)
+	_visuals_snow_offset_y = move_toward(_visuals_snow_offset_y, snow_target_y, SNOW_VISUAL_SINK_SPEED*delta)
+	var base_y:=(
+		_visuals_snow_offset_y
+		+DIRTBIKE_WHEEL_RADIUS*_dirtbike_pose_blend
+		+(ice_skate_visual_lift() if _ice_skates_active else 0.0)
+	)
+	if _aerial_skull_anchor_initialized:
+		# Flight and deep swimming already placed Visuals so the head sits on
+		# the skull anchor (see _update_aerial_body_anchor(), which runs
+		# earlier this frame). An absolute Y write here re-hinged the body
+		# about its feet, so the head-to-camera distance swung with camera
+		# pitch and travel direction. Keep the tracked base values current
+		# for the frame the anchor releases, but leave the pinned Y alone.
+		pass
+	elif _dirtbike_pose_blend>0.001:
+		# Preserve the translation produced by rotating about the rider/chassis
+		# centre. Reassigning an absolute Y here every frame erased that
+		# correction and visually restored a rear-wheel hinge.
+		visuals.position.y+=base_y-_dirtbike_visual_base_y
+	else:
+		visuals.position.y=base_y
+	_dirtbike_visual_base_y=base_y
+
+
 func _is_supported_by_ice() -> bool:
+	if _jumping:
+		return false
+	# Ice power platforms are genuine skateable ice too. Prefer the actual
+	# floor collision before consulting the kingdom's analytic lake surface.
+	for collision_index in get_slide_collision_count():
+		var collision:=get_slide_collision(collision_index)
+		if collision.get_normal().y>0.45 and collision.get_collider() is IceCrag:
+			return true
+	# A settled CharacterBody may produce no new slide collision at all. Probe
+	# the small support band below the feet so a stationary or gently moving
+	# skater continues to recognize a player-created IceCrag.
+	var probe_from:=global_position+Vector3.UP*0.18
+	var probe_to:=global_position-Vector3.UP*0.62
+	var probe:=PhysicsRayQueryParameters3D.create(probe_from,probe_to,1)
+	probe.exclude=[self]
+	var support_hit:=get_world_3d().direct_space_state.intersect_ray(probe)
+	if not support_hit.is_empty() and support_hit.get("collider") is IceCrag:
+		return true
 	if (
 		terrain == null
 		or not terrain.has_method("is_ice_surface")
 		or not terrain.has_method("get_ice_level")
-		or _jumping
 	):
 		return false
 	var xz := Vector2(global_position.x, global_position.z)
@@ -1697,6 +2365,43 @@ func _is_supported_by_ice() -> bool:
 	var ice_level: float = terrain.get_ice_level()
 	var feet_delta := global_position.y - FOOT_OFFSET - ice_level
 	return feet_delta >= -ICE_SURFACE_RECOVERY_DEPTH and feet_delta <= ICE_SUPPORT_TOLERANCE
+
+
+## Captures the complete resolved surface vector, including vertical motion
+## imparted by a rising Ice crag. When its support falls away, that vector is
+## promoted to a true ballistic arc instead of terrain-following the body
+## back down or allowing ordinary mid-air input to rewrite it.
+func _update_ice_skate_airtime(delta: float,pre_move_position: Vector3) -> void:
+	if not _ice_skates_active:
+		_ice_skate_was_supported=false
+		_ice_skate_airborne=false
+		return
+	var supported_now:=_is_supported_by_ice()
+	if supported_now:
+		_ice_skate_surface_velocity=HumanoidLocomotion.resolved_velocity(
+			pre_move_position,global_position,delta
+		)
+		# Preserve the horizontal skate speed when a perfectly flat collision
+		# produces a near-zero measured delta during a brief contact frame.
+		if Vector2(_ice_skate_surface_velocity.x,_ice_skate_surface_velocity.z).length()<0.05:
+			_ice_skate_surface_velocity.x=velocity.x
+			_ice_skate_surface_velocity.z=velocity.z
+		_ice_skate_was_supported=true
+		if not _jumping:
+			_ice_skate_airborne=false
+		return
+	if _ice_skate_was_supported:
+		_ice_skate_was_supported=false
+		_ice_skate_airborne=true
+		if not _jumping:
+			velocity=_ice_skate_surface_velocity
+			# A moving crag can physically carry the skater upward, but collision
+			# correction over one frame is not a meaningful launch velocity. Cap
+			# the inherited lift to an authored platforming impulse so it cannot
+			# catapult the player into the clouds.
+			velocity.y=clampf(velocity.y,0.0,ICE_PLATFORM_LAUNCH_MAX_SPEED)
+			_jump_takeoff_speed=absf(velocity.y)
+			_jumping=true
 
 
 ## Frozen lake collision is a one-way standing surface from above. If the
@@ -1991,7 +2696,12 @@ func _bounce_off_blorb(blorb: Node) -> void:
 
 
 func _call_platform_aid() -> void:
-	var platform_target: Node3D = _controlled_blorbus if _player_following_blorbus and is_instance_valid(_controlled_blorbus) else self
+	# The helper belongs to the currently controlled party member, regardless
+	# of concrete character type. This keeps D-pad-down extensible instead of
+	# silently routing future characters back to the human body.
+	var platform_target: Node3D = PartyControl.active_control_body()
+	if not is_instance_valid(platform_target):
+		platform_target = self
 	var chosen := _last_bounced_blorb
 	if chosen == null or not is_instance_valid(chosen) or chosen == platform_target or not chosen.in_party or chosen.is_worn or chosen.is_melted:
 		chosen = null
@@ -2022,6 +2732,8 @@ func _platform_aid_support_height(target: Node3D) -> float:
 	var to := Vector3(target.global_position.x, terrain_y - 8.0, target.global_position.z)
 	var query := PhysicsRayQueryParameters3D.create(from, to, 1 | TownProps.BLORB_CLIMBABLE_LAYER)
 	query.exclude = [self.get_rid()]
+	if target is CollisionObject3D and target != self:
+		query.exclude.append((target as CollisionObject3D).get_rid())
 	for node in get_tree().get_nodes_in_group("blorbs"):
 		if node is CollisionObject3D:
 			query.exclude.append((node as CollisionObject3D).get_rid())
@@ -2143,29 +2855,31 @@ func is_air_flight_active() -> bool:
 	return _is_suit_flight_active()
 
 
-## _piloting_xiao_hou_zi early-return: per direct instruction, Xiao Hou Zi
-## has no damage/HP concept of his own at all (xiao_hou_zi.gd carries none),
-## and reskinning this CharacterBody as him (see that var's own doc comment)
-## shouldn't let skeleton attacks reach through to the human's HP pool while
-## he's the one on screen taking the punches.
+## This HP belongs to the persistent human body, independently of whichever
+## party member currently owns the camera. Xiao Hou Zi ignores attacks in
+## his own take_damage(), while damage that genuinely reaches this body can
+## still trigger a faint even while another member is being controlled.
 func take_damage(amount: float) -> void:
-	if amount <= 0.0 or _piloting_xiao_hou_zi:
+	if amount <= 0.0:
 		return
 	current_hp = maxf(current_hp - CombatMath.mitigated_damage(amount, current_defense()), 0.0)
+	WorldState.player_current_hp = current_hp
 	UISounds.play_foley(&"player_hurt", clampf(amount / 24.0, 0.3, 0.9), get_instance_id())
-	_hp_regen_delay = HP_REGEN_DELAY
 	hp_changed.emit(current_hp, MAX_HP)
+	if current_hp <= 0.0:
+		RecoveryManager.faint_player.call_deferred()
 
 
 ## Used by engulfing hazards that eject the hero rather than leaving the
 ## CharacterBody trapped inside their collision volume.
 func escape_from_lethal_hazard(safe_position: Vector3) -> void:
 	current_hp = 0.0
-	_hp_regen_delay = HP_REGEN_DELAY
+	WorldState.player_current_hp = current_hp
 	hp_changed.emit(current_hp, MAX_HP)
 	global_position = safe_position
 	velocity = Vector3.ZERO
 	_jumping = false
+	RecoveryManager.faint_player.call_deferred()
 
 
 const BASE_DEFENSE := 5
@@ -2233,14 +2947,8 @@ func heal(amount: float) -> void:
 		return
 	var before := current_hp
 	current_hp = minf(current_hp + amount, MAX_HP)
+	WorldState.player_current_hp = current_hp
 	if current_hp != before:
-		hp_changed.emit(current_hp, MAX_HP)
-
-
-func _update_hp_regen(delta: float) -> void:
-	_hp_regen_delay = maxf(_hp_regen_delay - delta, 0.0)
-	if _hp_regen_delay <= 0.0 and current_hp < MAX_HP:
-		current_hp = minf(current_hp + HP_REGEN_PER_SECOND * delta, MAX_HP)
 		hp_changed.emit(current_hp, MAX_HP)
 
 
@@ -2254,20 +2962,17 @@ func _process(delta: float) -> void:
 	_update_throw_camera(delta)
 	_update_wake_intro(delta)
 	_clamp_camera_above_ground()
+	if _lake_diving_just_ended:
+		_lake_diving_just_ended = false
+		camera_pivot.rotation.x = clampf(camera_pivot.rotation.x, PITCH_MIN, PITCH_MAX)
 	if not _wake_intro_active:
 		_update_head_look(delta)
-	_update_suit_input(delta)
-	_update_hp_regen(delta)
+	if not _piloting_xiao_hou_zi:
+		_update_suit_input(delta)
 	if _wake_intro_active:
 		_apply_wake_intro_eyes()
 	else:
 		EyeBlink.apply(_eye_blink, delta, _eyes)
-	# _piloting_xiao_hou_zi: re-loft the monkey's limb tubes from the
-	# (already-animated-this-frame) pivots' live global_position, the same
-	# per-frame noodle-rebuild pattern BlorbSuitController uses for worn
-	# blorb limbs -- see monkey_figure.gd's own rebuild_limbs().
-	if _piloting_xiao_hou_zi:
-		MonkeyFigure.rebuild_limbs(_monkey_pivots, visuals, delta)
 
 
 ## Called by main.gd only for the first, non-portal arrival. Acquiring a
@@ -2285,6 +2990,42 @@ func begin_wake_intro() -> void:
 	_wake_intro_owns_modal_lock = true
 	_apply_wake_intro_pose(0.0)
 	_set_eye_openness(EyeBlink.CLOSED_OPENNESS)
+
+
+func begin_recovery_wake(final_transform: Transform3D = global_transform) -> void:
+	if _wake_intro_active:
+		return
+	_wake_intro_active = true
+	_wake_intro_elapsed = 0.0
+	_wake_intro_camera_position_rest = camera_rig.position
+	_wake_intro_camera_pitch_rest = camera_pivot.rotation.x
+	_wake_intro_camera_distance_rest = camera_spring_arm.spring_length
+	_wake_intro_final_transform = final_transform
+	_wake_intro_has_final_transform = true
+	UIState.push_modal()
+	_wake_intro_owns_modal_lock = true
+	_apply_wake_intro_pose(0.0)
+	_set_eye_openness(EyeBlink.CLOSED_OPENNESS)
+
+
+func restore_for_recovery(minimum_fraction: float = 1.0) -> void:
+	current_hp = maxf(current_hp, MAX_HP * clampf(minimum_fraction, 0.0, 1.0))
+	WorldState.player_current_hp = current_hp
+	hp_changed.emit(current_hp, MAX_HP)
+
+
+func force_human_control(show_feedback: bool = true) -> void:
+	if is_instance_valid(_controlled_manchego):
+		_end_manchego_control()
+	if is_instance_valid(_controlled_xiao_hou_zi):
+		_end_xiao_hou_zi_control()
+	elif is_instance_valid(_controlled_generic_member):
+		_end_generic_party_control()
+	elif is_instance_valid(_controlled_blorbus) or is_instance_valid(_controlled_giant):
+		_end_blorbus_control()
+	PartyControl.set_active_member(self)
+	if show_feedback:
+		Hud.show_message("You are now controlling the player.")
 
 
 func _update_wake_intro(delta: float) -> void:
@@ -2387,6 +3128,9 @@ func _finish_wake_intro() -> void:
 	camera_pivot.rotation.x = _wake_intro_camera_pitch_rest
 	camera_spring_arm.spring_length = _wake_intro_camera_distance_rest
 	_set_eye_openness(1.0)
+	if _wake_intro_has_final_transform:
+		global_transform = _wake_intro_final_transform
+		_wake_intro_has_final_transform = false
 	_wake_intro_active = false
 	WorldState.opening_wake_completed = true
 	if _wake_intro_owns_modal_lock:
@@ -2403,6 +3147,91 @@ func _exit_tree() -> void:
 
 
 func _toggle_blorbus_control() -> void:
+	_cycle_playable_character(1)
+
+
+func playable_switch_order() -> int:
+	return _playable_profile.switch_order
+
+
+func _cycle_playable_character(direction: int) -> void:
+	var target: Node3D = PartyControl.adjacent_switchable_member(get_tree(), direction)
+	if target == null or target == PartyControl.active_member():
+		return
+	var target_id: String = String(target.playable_id())
+	if is_instance_valid(_controlled_generic_member):
+		_end_generic_party_control()
+	match target_id:
+		PartyControl.HUMAN_ID:
+			if _piloting_xiao_hou_zi:
+				_end_xiao_hou_zi_control()
+			elif _player_following_blorbus:
+				_end_blorbus_control()
+		PartyControl.BLORBUS_ID:
+			if _piloting_xiao_hou_zi:
+				_end_xiao_hou_zi_control()
+			_try_start_blorbus_control()
+		PartyControl.XIAO_HOU_ZI_ID:
+			_try_start_xiao_hou_zi_control()
+		_:
+			_start_generic_party_control(target)
+
+
+func _start_generic_party_control(member: Node3D) -> bool:
+	if member == null or not member.has_method("drive_from_player"):
+		push_warning("Playable roster member has no movement adapter: %s" % String(member.playable_id()))
+		return false
+	if _piloting_xiao_hou_zi:
+		_end_xiao_hou_zi_control()
+	elif _player_following_blorbus:
+		_release_blorbus_and_giant_possession()
+		_player_following_blorbus = false
+	_controlled_generic_member = member
+	collision_layer = 0
+	PartyControl.set_active_member(member)
+	camera_rig.top_level = true
+	return true
+
+
+func _end_generic_party_control() -> void:
+	_controlled_generic_member = null
+	collision_layer = 2
+	PartyControl.set_active_member(self)
+	if camera_rig.top_level:
+		camera_rig.top_level = false
+		camera_rig.position = Vector3.ZERO
+	_apply_camera_framing(false)
+
+
+func _update_generic_party_control(delta: float) -> void:
+	var member := _controlled_generic_member
+	if not is_instance_valid(member):
+		_end_generic_party_control()
+		return
+	if member.has_method("prepare_direct_control_environment"):
+		member.prepare_direct_control_environment(delta)
+	var pitched: bool = member.has_method("uses_pitched_movement_input") and bool(member.uses_pitched_movement_input())
+	var input := _get_move_input()
+	var basis: Basis = camera.global_transform.basis if pitched else camera_rig.global_transform.basis
+	var direction: Vector3 = basis.x * input.x + basis.z * input.y
+	if not pitched:
+		direction.y = 0.0
+	if direction.length_squared() > 0.0001:
+		direction = direction.normalized()
+	var jump_pressed: bool = Input.is_action_just_pressed("jump") and not UIState.modal_open
+	member.drive_from_player(direction, delta, _is_sprinting(), jump_pressed)
+	_follow_controlled_party_body(member, delta)
+	var camera_height: float = 1.6
+	var camera_distance: float = 3.5
+	if member.has_method("playable_profile"):
+		var profile: PlayableCharacterProfile = member.playable_profile()
+		camera_height = profile.camera_height
+		camera_distance = profile.camera_distance
+	camera_spring_arm.spring_length = camera_distance
+	camera_rig.global_position = member.global_position + Vector3.UP * camera_height
+
+
+func _legacy_toggle_blorbus_control() -> void:
 	if _piloting_xiao_hou_zi:
 		# Xiao Hou Zi is the last stop in the cycle -- one more press returns
 		# control to the human player.
@@ -2433,7 +3262,7 @@ func _try_start_blorbus_control() -> bool:
 				Hud.show_message("Blorbus can't switch while he is part of the blorb suit.")
 				return true
 			_controlled_blorbus = blorbus
-			_controlled_blorbus.is_player_controlled = true
+			PartyControl.set_active_member(blorbus)
 			_player_following_blorbus = true
 			camera_rig.top_level = true
 			Hud.show_message("You are now controlling Blorbus.")
@@ -2468,10 +3297,29 @@ func _try_start_xiao_hou_zi_control() -> bool:
 	if monkey == null:
 		return false
 	_release_blorbus_and_giant_possession()
-	monkey.begin_possession()
+	_player_following_blorbus = false
 	_controlled_xiao_hou_zi = monkey
 	_piloting_xiao_hou_zi = true
-	_rebuild_visuals_rig(true)
+	# Per direct report ("the human just kind of launches into a jump and
+	# then freezes in the air in a mid-jump pose") -- _update_xiao_hou_zi_
+	# control() returns early every frame from here on, so none of the
+	# ordinary grounded-movement code that normally clears _jumping/
+	# velocity.y ever runs again for this body. Whatever was true the
+	# instant possession began (mid-jump, mid-fall) stayed frozen forever,
+	# since _follow_controlled_party_body() only ever drives horizontal
+	# velocity, never touches _jumping, and snaps position.y to the ground
+	# without ever un-sticking the pose that _jumping still implies
+	# elsewhere. Clearing both here guarantees the shell starts its new
+	# AI-follow life grounded, the same state a fresh landing would leave it in.
+	_jumping = false
+	velocity = Vector3.ZERO
+	# Only the currently controlled pawn should activate proximity areas.
+	# The human remains solid to the world through collision_mask, but stops
+	# presenting itself as the interaction body while following Xiao.
+	collision_layer = 0
+	PartyControl.set_active_member(monkey)
+	camera_rig.top_level = true
+	_apply_camera_framing(true)
 	Hud.show_message("You are now controlling Xiao Hou Zi.")
 	return true
 
@@ -2488,10 +3336,15 @@ func _end_xiao_hou_zi_control() -> void:
 		_sun_wu_kong_summon.dismiss()
 	_sun_wu_kong_summon = null
 	_piloting_xiao_hou_zi = false
-	_rebuild_visuals_rig(false)
 	if is_instance_valid(_controlled_xiao_hou_zi):
-		_controlled_xiao_hou_zi.end_possession()
+		_controlled_xiao_hou_zi.end_direct_control()
 	_controlled_xiao_hou_zi = null
+	collision_layer = 2
+	PartyControl.set_active_member(self)
+	if camera_rig.top_level:
+		camera_rig.top_level = false
+		camera_rig.position = Vector3.ZERO
+	_apply_camera_framing(false)
 	Hud.show_message("You are now controlling the player.")
 
 
@@ -2505,11 +3358,11 @@ func _update_sun_wu_kong_summon() -> void:
 		return
 	for node in get_tree().get_nodes_in_group("skeletons"):
 		var enemy := node as Node3D
-		if enemy == null or global_position.distance_to(enemy.global_position) > SUN_WU_KONG_SUMMON_TRIGGER_RADIUS:
+		if enemy == null or _controlled_xiao_hou_zi.global_position.distance_to(enemy.global_position) > SUN_WU_KONG_SUMMON_TRIGGER_RADIUS:
 			continue
 		var summon: SunWuKong = SUN_WU_KONG_SCENE.instantiate()
-		summon.configure_as_summon(self)
-		summon.position = global_position + visuals.global_transform.basis.x * 1.5
+		summon.configure_as_summon(_controlled_xiao_hou_zi)
+		summon.position = _controlled_xiao_hou_zi.global_position + _controlled_xiao_hou_zi.global_transform.basis.x * 1.5
 		get_parent().add_child(summon)
 		_sun_wu_kong_summon = summon
 		return
@@ -2522,19 +3375,7 @@ func _update_sun_wu_kong_summon() -> void:
 ## to physically re-emerge if he was merged and invisible.
 func _release_blorbus_and_giant_possession() -> void:
 	if is_instance_valid(_controlled_giant):
-		_controlled_giant.is_player_controlled = false
-		if is_instance_valid(_controlled_blorbus):
-			var emerge_direction := global_position - _controlled_giant.global_position
-			emerge_direction.y = 0.0
-			if emerge_direction.length() < 0.01:
-				emerge_direction = Vector3.FORWARD
-			emerge_direction = emerge_direction.normalized()
-			var emerge_radius := Blorb.RADIUS * _controlled_giant.size_multiplier + 1.0
-			var emerge_pos := _controlled_giant.global_position + emerge_direction * emerge_radius
-			emerge_pos.y = terrain.get_mesh_height(emerge_pos.x, emerge_pos.z)
-			_controlled_blorbus.global_position = emerge_pos
-			_controlled_blorbus.visible = true
-	_controlled_giant = null
+		end_humongous_mind_merge()
 	if is_instance_valid(_controlled_blorbus):
 		_controlled_blorbus.is_player_controlled = false
 	_controlled_blorbus = null
@@ -2564,6 +3405,7 @@ func _release_blorbus_and_giant_possession() -> void:
 func _end_blorbus_control() -> void:
 	_release_blorbus_and_giant_possession()
 	_player_following_blorbus = false
+	PartyControl.set_active_member(self)
 	_apply_camera_framing(false)
 	Hud.show_message("You are now controlling the player.")
 
@@ -2579,9 +3421,11 @@ func _end_blorbus_control() -> void:
 ## piloting Blorbus or reskinned as Xiao Hou Zi).
 func start_riding_manchego(manchego: Manchego) -> void:
 	_release_blorbus_and_giant_possession()
-	if _piloting_xiao_hou_zi:
-		_end_xiao_hou_zi_control()
+	_mounted_rider = PartyControl.active_member()
+	if _mounted_rider == null or not PartyControl.member_capability(_mounted_rider, &"ride_mount"):
+		return
 	_controlled_manchego = manchego
+	PartyControl.set_control_override(manchego)
 	_controlled_manchego.begin_ride()
 	_player_following_manchego = true
 	_manchego_dismount_armed = false
@@ -2592,7 +3436,10 @@ func start_riding_manchego(manchego: Manchego) -> void:
 	# own position/rotation.y (which stays a loose, invisible-now follower;
 	# see _update_manchego_control()'s own comment for why that's still kept
 	# moving underneath).
-	visuals.top_level = true
+	if _mounted_rider == self:
+		visuals.top_level = true
+	elif _mounted_rider.has_method("begin_mounted"):
+		_mounted_rider.begin_mounted(manchego)
 	# Plain state confirmation, matching every other control-switch message
 	# in this file (e.g. "You are now controlling Blorbus.") -- none of them
 	# spell out the control used to switch back; see CLAUDE.md's "In-game
@@ -2604,12 +3451,15 @@ func _end_manchego_control() -> void:
 	if is_instance_valid(_controlled_manchego):
 		_controlled_manchego.end_ride()
 	_controlled_manchego = null
+	PartyControl.clear_control_override()
 	_player_following_manchego = false
 	_manchego_dismount_armed = false
-	if camera_rig.top_level:
+	if is_instance_valid(_mounted_rider) and _mounted_rider != self and _mounted_rider.has_method("end_mounted"):
+		_mounted_rider.end_mounted()
+	if camera_rig.top_level and not _piloting_xiao_hou_zi:
 		camera_rig.top_level = false
 		camera_rig.position = Vector3.ZERO
-	if visuals.top_level:
+	if _mounted_rider == self and visuals.top_level:
 		visuals.top_level = false
 		# visuals' position/rotation held GLOBAL values a moment ago (that's
 		# what top_level means) -- flipping top_level back off re-interprets
@@ -2625,15 +3475,17 @@ func _end_manchego_control() -> void:
 	# ordinary walk/idle/jump code eases it back to rest on its own, so it
 	# has to be reset explicitly or it'd stay frozen at its last
 	# riding-compensation value after dismounting.
-	if _neck != null:
+	if _mounted_rider == self and _neck != null:
 		_neck.rotation = Vector3.ZERO
 	# Same reasoning as _neck above -- _elbow_left/_right.rotation.Z is only
 	# ever touched by RIDE_ELBOW_INWARD (every OTHER elbow pose in this file
 	# only ever animates rotation.x), so it needs the same explicit reset.
-	_elbow_left.rotation.z = 0.0
-	_elbow_right.rotation.z = 0.0
-	_apply_camera_framing(false)
-	Hud.show_message("You are now controlling the player.")
+	if _mounted_rider == self:
+		_elbow_left.rotation.z = 0.0
+		_elbow_right.rotation.z = 0.0
+	_mounted_rider = null
+	_apply_camera_framing(_piloting_xiao_hou_zi)
+	Hud.show_message("Dismounted.")
 
 
 ## Mirrors _update_blorbus_control() closely -- see that function's own
@@ -2687,7 +3539,10 @@ func _update_manchego_control(delta: float) -> void:
 	# "turn visuals to face actual_motion, then play the walk cycle" pair
 	# below is replaced by seating the figure directly on Manchego's own
 	# back instead.
-	_apply_manchego_seated_pose(delta)
+	if _mounted_rider == self:
+		_apply_manchego_seated_pose(delta)
+	elif is_instance_valid(_mounted_rider) and _mounted_rider.has_method("update_mounted_pose"):
+		_mounted_rider.update_mounted_pose(_controlled_manchego.get_seat_transform(), delta)
 
 
 ## Seats the rider astride Manchego's back -- see RIDE_HIP_BEND's own doc
@@ -2737,14 +3592,50 @@ func _current_controlled_body() -> Node3D:
 		return _controlled_giant
 	if is_instance_valid(_controlled_blorbus):
 		return _controlled_blorbus
+	if is_instance_valid(_controlled_xiao_hou_zi):
+		return _controlled_xiao_hou_zi
 	return null
+
+
+func playable_id() -> String:
+	return _playable_profile.id
+
+
+func playable_profile() -> PlayableCharacterProfile:
+	return _playable_profile
+
+
+func is_playable_available() -> bool:
+	return true
+
+
+func has_playable_capability(capability: StringName) -> bool:
+	return bool(_playable_profile.capabilities.get(String(capability), false))
+
+
+func begin_direct_control() -> void:
+	pass
+
+
+func end_direct_control() -> void:
+	pass
+
+
+func restore_active_party_member(member_id: String) -> void:
+	match member_id:
+		PartyControl.BLORBUS_ID:
+			_try_start_blorbus_control()
+		PartyControl.XIAO_HOU_ZI_ID:
+			_try_start_xiao_hou_zi_control()
+		_:
+			PartyControl.set_active_member(self)
 
 
 ## Public query for portal.gd: a kingdom gate only opens while Blorbus (or
 ## the giant he merged into) is the one being directly piloted -- see that
 ## file's own doc comment for why this is the gate.
 func is_piloting_blorbus() -> bool:
-	return _current_controlled_body() != null
+	return is_instance_valid(_controlled_blorbus) or is_instance_valid(_controlled_giant)
 
 
 ## Whichever body currently has the player's direct control -- Blorbus, or
@@ -2754,7 +3645,54 @@ func is_piloting_blorbus() -> bool:
 ## the human only follows within PLAYER_FOLLOW_DISTANCE/ARRIVE_DISTANCE of
 ## Blorbus, not of whatever Blorbus happens to be standing next to.
 func get_controlled_body() -> Node3D:
-	return _current_controlled_body()
+	var controlled := PartyControl.active_control_body()
+	return controlled if controlled != self else null
+
+
+func _update_xiao_hou_zi_control(delta: float) -> void:
+	if not is_instance_valid(_controlled_xiao_hou_zi):
+		_end_xiao_hou_zi_control()
+		return
+	var input := _get_move_input()
+	_controlled_xiao_hou_zi.prepare_direct_control_environment(delta)
+	var basis := (
+		camera.global_transform.basis
+		if _controlled_xiao_hou_zi.uses_pitched_movement_input()
+		else camera_rig.global_transform.basis
+	)
+	var direction := basis.x * input.x + basis.z * input.y
+	if not _controlled_xiao_hou_zi.uses_pitched_movement_input():
+		direction.y = 0.0
+	if direction.length_squared() > 0.0001:
+		direction = direction.normalized()
+	var jump_pressed := Input.is_action_just_pressed("jump") and not UIState.modal_open
+	_controlled_xiao_hou_zi.drive_from_player(direction, delta, _is_sprinting(), jump_pressed)
+	_follow_controlled_party_body(_controlled_xiao_hou_zi, delta)
+	camera_rig.global_position = (
+		_controlled_xiao_hou_zi.global_position + Vector3.UP * TEMP_MONKEY_CAMERA_HEIGHT
+	)
+
+
+func _follow_controlled_party_body(target: Node3D, delta: float) -> void:
+	var offset := target.global_position - global_position
+	offset.y = 0.0
+	if offset.length() > PLAYER_FOLLOW_DISTANCE:
+		var follow_dir := offset.normalized()
+		velocity.x = follow_dir.x * move_speed
+		velocity.z = follow_dir.z * move_speed
+	elif offset.length() < PLAYER_FOLLOW_ARRIVE_DISTANCE:
+		velocity.x = move_toward(velocity.x, 0.0, move_speed)
+		velocity.z = move_toward(velocity.z, 0.0, move_speed)
+	velocity.y = 0.0
+	var before_move := global_position
+	move_and_slide()
+	if not is_on_floor():
+		global_position.y = terrain.get_mesh_height(global_position.x, global_position.z) + FOOT_OFFSET
+	var actual_motion := global_position - before_move
+	actual_motion.y = 0.0
+	if actual_motion.length_squared() > 0.000001:
+		visuals.rotation.y = atan2(actual_motion.x, actual_motion.z)
+	_animate_walk(delta, actual_motion.length_squared() > 0.000001, 1.0)
 
 
 func _update_blorbus_control(delta: float) -> void:
@@ -2770,8 +3708,6 @@ func _update_blorbus_control(delta: float) -> void:
 		direction = direction.normalized()
 	var jump_pressed := Input.is_action_just_pressed("jump") and not UIState.modal_open
 	controlled.drive_from_player(direction, delta, _is_sprinting(), jump_pressed)
-	if not is_instance_valid(_controlled_giant):
-		_try_merge_blorbus_into_giant()
 
 	# The human follows with the same wait-until-distant / stop-when-close
 	# cadence as a party blorb, while retaining CharacterBody collision.
@@ -2811,34 +3747,49 @@ func _update_blorbus_control(delta: float) -> void:
 	_animate_walk(delta, true, 1.0)
 
 
-## Small vertical slack matching drive_from_player()'s own resting height on
-## an analytic surface: Blorbus's _ground_embed_offset() deliberately keeps
-## his root a few centimetres above whatever he's standing on, so his mesh's
-## lower curve still visibly meets it. Without this tolerance, "standing on
-## Humongous" can never satisfy a strict <= surface test -- drive_from_player
-## always snaps him to just above the giant's own surface height, never
-## exactly onto or below it -- and the merge could never fire from ordinary
-## walking, only (unreliably) mid-jump.
-const BLORBUS_GIANT_MERGE_TOLERANCE := 0.2
-
-
-func _try_merge_blorbus_into_giant() -> void:
+func begin_humongous_mind_merge(giant: Blorb) -> bool:
+	if giant == null or not is_instance_valid(giant):
+		return false
 	if not is_instance_valid(_controlled_blorbus):
+		var active := PartyControl.active_member()
+		if active is Blorb and (active as Blorb).is_blorbus:
+			_controlled_blorbus = active as Blorb
+	if not is_instance_valid(_controlled_blorbus):
+		return false
+	if not giant.begin_psychic_control(_controlled_blorbus):
+		return false
+	_controlled_blorbus.visible = false
+	_controlled_blorbus.end_direct_control()
+	_controlled_giant = giant
+	_player_following_blorbus = true
+	camera_rig.top_level = true
+	PartyControl.set_control_override(giant, _controlled_blorbus)
+	HumongousState.mark_merged()
+	Hud.show_message("Blorbus's mind joined Humongous.")
+	return true
+
+
+func end_humongous_mind_merge() -> void:
+	if not is_instance_valid(_controlled_giant):
 		return
-	for candidate in get_tree().get_nodes_in_group("blorbs"):
-		if not candidate is Blorb:
-			continue
-		var giant := candidate as Blorb
-		if giant.blorb_type != "size":
-			continue
-		var surface: Variant = giant.giant_surface_height_at(_controlled_blorbus.global_position.x, _controlled_blorbus.global_position.z)
-		if surface != null and _controlled_blorbus.global_position.y <= (surface as float) + BLORBUS_GIANT_MERGE_TOLERANCE:
-			_controlled_blorbus.visible = false
-			_controlled_blorbus.is_player_controlled = false
-			_controlled_giant = giant
-			_controlled_giant.is_player_controlled = true
-			Hud.show_message("Blorbus psychically merged with Humongous!")
-			return
+	var giant := _controlled_giant
+	giant.end_psychic_control(_controlled_blorbus)
+	PartyControl.clear_control_override(giant)
+	if is_instance_valid(_controlled_blorbus):
+		var emerge_direction := global_position - giant.global_position
+		emerge_direction.y = 0.0
+		if emerge_direction.length_squared() < 0.01:
+			emerge_direction = giant.global_transform.basis.z
+		emerge_direction.y = 0.0
+		emerge_direction = emerge_direction.normalized()
+		var emerge_pos := giant.global_position + emerge_direction * (Blorb.RADIUS * giant.size_multiplier + 1.0)
+		emerge_pos.y = terrain.get_mesh_height(emerge_pos.x, emerge_pos.z)
+		_controlled_blorbus.global_position = emerge_pos
+		_controlled_blorbus.visible = true
+		_controlled_blorbus.begin_direct_control()
+	_controlled_giant = null
+	HumongousState.mark_released()
+	Hud.show_message("Blorbus released the mind merge.")
 
 
 ## Blorbus/giant/Manchego only -- see _piloting_xiao_hou_zi's own doc comment
@@ -2858,12 +3809,9 @@ func _update_possession_camera() -> void:
 		var height := 1.6
 		camera_spring_arm.spring_length = 3.5
 		if controlled.blorb_type == "size":
-			var scaled_height := Blorb.BODY_HEIGHT * controlled.size_multiplier * controlled.vertical_scale
-			var crown_height := (Blorb.BODY_HEIGHT - Blorb.EMBED_DEPTH) * controlled.size_multiplier * controlled.vertical_scale
-			# Anchor above the crown, then pull back by well over the body's
-			# radius so the camera cannot remain buried inside the giant's goo.
-			height = crown_height + scaled_height * 0.25
-			camera_spring_arm.spring_length = Blorb.RADIUS * controlled.size_multiplier * 1.4
+			var camera_profile: Dictionary = controlled.psychic_camera_profile()
+			height = float(camera_profile.get("height", height))
+			camera_spring_arm.spring_length = float(camera_profile.get("distance", camera_spring_arm.spring_length))
 		camera_rig.global_position = controlled.global_position + Vector3.UP * height
 
 
@@ -2880,7 +3828,8 @@ func _update_possession_camera() -> void:
 func _update_suit_input(delta: float) -> void:
 	if Input.is_action_just_pressed("transform") and not UIState.modal_open:
 		if _player_following_blorbus:
-			Hud.show_message("Return to the player before using the blorb suit.")
+			if is_instance_valid(_controlled_blorbus) and HumongousState.is_carried():
+				HumongousState.show_carried_actions(self)
 		else:
 			_blorb_suit.toggle()
 	# The head blorb is a normal hat until genuine buoyancy starts. This uses
@@ -3061,6 +4010,469 @@ func _anchor_hand_to_wrist(hand: Node3D) -> void:
 		return
 	var wrist_offset: Vector3 = _hand_wrist_offsets[key]
 	hand.position = (_hand_wrist_anchors[key] as Vector3) - hand.basis * wrist_offset
+
+
+## Straddle pose for the dirt blorb suit's rear wheel, plus the wheelie's
+## forward body lean -- called last in the per-frame pose chain (after
+## _apply_arm_power_poses(), same reasoning as that function's own doc
+## comment: it has to override whatever _animate_walk() set unconditionally,
+## with no gap). The leg joints need no explicit "ease back to normal" branch
+## here: _animate_walk() already drives them every single frame regardless
+## (see _apply_arm_power_poses()'s own comment on this exact point), so once
+## _dirtbike_pose_blend decays to 0 and this stops touching them, that
+## already-running normal pose simply resumes untouched. `visuals.rotation.x`
+## has no such standing owner during ordinary grounded movement, though, so
+## the wheelie pitch DOES need its own explicit two-target ease.
+func _apply_dirtbike_pose(delta: float) -> void:
+	var pose_t := DIRTBIKE_POSE_SETTLE_SPEED * delta
+	_dirtbike_pose_blend = move_toward(_dirtbike_pose_blend, 1.0 if _dirtbike_wheel_active else 0.0, pose_t)
+	# Computed here (not down by the front wheel's own presence check below)
+	# since the arm pose right below now needs it too -- see that block's
+	# own comment.
+	_dirtbike_wheelie_blend = move_toward(
+		_dirtbike_wheelie_blend, 1.0 if _dirtbike_wheelie_active else 0.0, DIRTBIKE_WHEELIE_SETTLE_SPEED * delta
+	)
+	if _dirtbike_pose_blend > 0.001:
+		var w := _dirtbike_pose_blend
+		_leg_left.rotation.x = lerp_angle(_leg_left.rotation.x, -DIRTBIKE_HIP_BACK_ANGLE, w)
+		_leg_right.rotation.x = lerp_angle(_leg_right.rotation.x, -DIRTBIKE_HIP_BACK_ANGLE, w)
+		_leg_left.rotation.z = lerp_angle(_leg_left.rotation.z, signf(_leg_left.position.x) * DIRTBIKE_HIP_SPLAY, w)
+		_leg_right.rotation.z = lerp_angle(_leg_right.rotation.z, signf(_leg_right.position.x) * DIRTBIKE_HIP_SPLAY, w)
+		_knee_left.rotation.x = lerp_angle(_knee_left.rotation.x, DIRTBIKE_KNEE_BEND, w)
+		_knee_right.rotation.x = lerp_angle(_knee_right.rotation.x, DIRTBIKE_KNEE_BEND, w)
+		_ankle_left.rotation.x = lerp_angle(_ankle_left.rotation.x, DIRTBIKE_ANKLE_BEND, w)
+		_ankle_right.rotation.x = lerp_angle(_ankle_right.rotation.x, DIRTBIKE_ANKLE_BEND, w)
+		# Per direct correction ("I still see the up and down movement of his
+		# upper body as an artefact from the walk cycle") -- _animate_walk()
+		# (called earlier this same frame) sets _spine/_hips.position.y to a
+		# per-stride bob every frame regardless of dirtbike state; nothing
+		# else ever eases it back to rest on its own the way the leg/arm
+		# rotations above get resumed by _animate_walk() itself once this
+		# stops touching them (rotations vs. this literal Y-position offset
+		# are different properties, so there's no equivalent "already
+		# running" owner to fall back on here -- this has to do it directly).
+		_spine.position.y = lerpf(_spine.position.y, _spine_rest_y, w)
+		_hips.position.y = lerpf(_hips.position.y, _hips_rest_y, w)
+		# Per direct correction, the wheelie is now a TOGGLE ("if both are
+		# pressed down then it toggles the arm wheel to on. pressing both
+		# again toggles it to off") rather than held -- see
+		# _dirtbike_wheelie_toggled_on's own doc comment. That means the
+		# arms have to stay raised for as long as the toggle is on even
+		# after the player lets go of both buttons, which
+		# _apply_arm_power_poses() (called earlier this same frame) has no
+		# way to know about -- it only ever reacts to the buttons
+		# themselves being currently held. So while toggled on, this drives
+		# the SAME extended-arm pose that function uses directly, taking
+		# over regardless of the buttons' live state.
+		if _dirtbike_wheelie_active:
+			_pose_extended_arm(_arm_left, _elbow_left, _hand_left, 1.0, _dirtbike_wheelie_blend)
+			_pose_extended_arm(_arm_right, _elbow_right, _hand_right, -1.0, _dirtbike_wheelie_blend)
+		else:
+			# Per direct correction ("arm motion should not run when
+			# traversing with the wheel legs, they should remain in resting
+			# position") -- each arm rests independently of the other, so
+			# this never fights _apply_arm_power_poses() for whichever arm
+			# IS actively raised for some other elemental arm power.
+			# Originally gated on BOTH blends being zero together, which
+			# meant holding just one arm button left the OTHER, untouched
+			# arm with nothing overriding _animate_walk()'s own walk-cycle
+			# swing on it at all -- confirmed backwards by direct report
+			# ("only one arm is held down, the other arm seems to still be
+			# wanting to wiggle like in the walk or run animation as if
+			# it's leaking through").
+			if _left_arm_power_blend <= 0.001:
+				_arm_left.rotation.x = lerp_angle(_arm_left.rotation.x, 0.0, w)
+				_arm_left.rotation.y = lerp_angle(_arm_left.rotation.y, 0.0, w)
+				_arm_left.rotation.z = lerp_angle(_arm_left.rotation.z, 0.0, w)
+				_elbow_left.rotation.x = lerp_angle(_elbow_left.rotation.x, 0.0, w)
+			if _right_arm_power_blend <= 0.001:
+				_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, 0.0, w)
+				_arm_right.rotation.y = lerp_angle(_arm_right.rotation.y, 0.0, w)
+				_arm_right.rotation.z = lerp_angle(_arm_right.rotation.z, 0.0, w)
+				_elbow_right.rotation.x = lerp_angle(_elbow_right.rotation.x, 0.0, w)
+
+## Regular (left-foot-forward) snowboard stance. The lower body stays
+## side-on to the board while abdomen and thorax share the turn toward the
+## downhill gaze, leaving the neck only the final natural portion.
+func _apply_snowboard_pose(delta: float) -> void:
+	_snowboard_pose_blend=move_toward(
+		_snowboard_pose_blend,1.0 if _snowboard_active else 0.0,
+		SNOWBOARD_POSE_SETTLE_SPEED*delta
+	)
+	if _snowboard_pose_blend<=0.001:
+		_spine.rotation.z=lerp_angle(_spine.rotation.z,0.0,minf(SNOWBOARD_POSE_SETTLE_SPEED*delta,1.0))
+		if _thorax!=null:
+			_thorax.rotation.z=lerp_angle(_thorax.rotation.z,0.0,minf(SNOWBOARD_POSE_SETTLE_SPEED*delta,1.0))
+		return
+	var w:=_snowboard_pose_blend
+	var tuck:=1.0 if _is_sprinting() and _snowboard_active else 0.0
+	var foot_anchor:=(_ankle_left.global_position+_ankle_right.global_position)*0.5
+	var speed_ratio:=clampf(Vector2(velocity.x,velocity.z).length()/SNOWBOARD_FULL_LEAN_SPEED,0.0,1.0)
+	var forward_lean:=(SNOWBOARD_SPEED_LEAN_MAX*speed_ratio+SNOWBOARD_TUCK_LEAN*tuck)*w
+	var hip_target:=-(SNOWBOARD_HIP_BEND+SNOWBOARD_TUCK_HIP_BEND*tuck)
+	_leg_left.rotation.x=lerp_angle(_leg_left.rotation.x,hip_target,w)
+	_leg_right.rotation.x=lerp_angle(_leg_right.rotation.x,hip_target,w)
+	_leg_left.rotation.z=lerp_angle(
+		_leg_left.rotation.z,signf(_leg_left.position.x)*SNOWBOARD_STANCE_SPLAY,w
+	)
+	_leg_right.rotation.z=lerp_angle(
+		_leg_right.rotation.z,signf(_leg_right.position.x)*SNOWBOARD_STANCE_SPLAY,w
+	)
+	var knee_target:=SNOWBOARD_KNEE_BEND+SNOWBOARD_TUCK_KNEE_BEND*tuck
+	_knee_left.rotation.x=lerp_angle(_knee_left.rotation.x,knee_target,w)
+	_knee_right.rotation.x=lerp_angle(_knee_right.rotation.x,knee_target,w)
+	_ankle_left.rotation.x=lerp_angle(_ankle_left.rotation.x,0.0,w)
+	_ankle_right.rotation.x=lerp_angle(_ankle_right.rotation.x,0.0,w)
+	# Balance arms are wider than idle and open further in the aerodynamic
+	# crouch. An actively commanded arm power retains precedence.
+	var arm_spread:=SNOWBOARD_ARM_SPREAD+SNOWBOARD_TUCK_ARM_SPREAD*tuck
+	var elbow_bend:=SNOWBOARD_ELBOW_BEND+SNOWBOARD_TUCK_ELBOW_BEND*tuck
+	if _left_arm_power_blend<=0.001:
+		_arm_left.rotation.x=lerp_angle(_arm_left.rotation.x,0.0,w)
+		_arm_left.rotation.z=lerp_angle(_arm_left.rotation.z,signf(_arm_left.position.x)*arm_spread,w)
+		_elbow_left.rotation.x=lerp_angle(_elbow_left.rotation.x,-elbow_bend,w)
+	if _right_arm_power_blend<=0.001 and HeldItem.current.is_empty():
+		_arm_right.rotation.x=lerp_angle(_arm_right.rotation.x,0.0,w)
+		_arm_right.rotation.z=lerp_angle(_arm_right.rotation.z,signf(_arm_right.position.x)*arm_spread,w)
+		_elbow_right.rotation.x=lerp_angle(_elbow_right.rotation.x,-elbow_bend,w)
+	_spine.rotation.y=lerp_angle(_spine.rotation.y,SNOWBOARD_ABDOMEN_TWIST,w)
+	_spine.rotation.z=lerp_angle(_spine.rotation.z,forward_lean,minf(SNOWBOARD_POSE_SETTLE_SPEED*delta,1.0))
+	if _thorax!=null:
+		_thorax.rotation.y=lerp_angle(_thorax.rotation.y,SNOWBOARD_THORAX_TWIST,w)
+		_thorax.rotation.z=lerp_angle(_thorax.rotation.z,forward_lean*0.35,minf(SNOWBOARD_POSE_SETTLE_SPEED*delta,1.0))
+	_spine.position.y=lerpf(_spine.position.y,_spine_rest_y,w)
+	_hips.position.y=lerpf(_hips.position.y,_hips_rest_y,w)
+	# Joint flexion lowers the pelvis naturally. Preserve the actual midpoint
+	# between the two ankles after posing so the stance sinks around planted
+	# feet instead of translating the rider toward either board edge.
+	var posed_foot_anchor:=(_ankle_left.global_position+_ankle_right.global_position)*0.5
+	visuals.global_position+=foot_anchor-posed_foot_anchor
+
+
+## Alternating speed-skating stroke: one leg glides under the body's weight
+## while the other pushes diagonally back/out, then the roles cross-fade.
+## This runs after the ordinary gait so no walk cycle leaks through the
+## skate silhouette, and eases away cleanly when the runners leave the ice.
+func _apply_ice_skate_pose(delta: float) -> void:
+	var planar_speed:=Vector2(velocity.x,velocity.z).length()
+	var moving: bool=_ice_skating_active and planar_speed>0.12
+	_ice_skate_pose_blend=move_toward(
+		_ice_skate_pose_blend,1.0 if moving else 0.0,
+		ICE_SKATE_POSE_SETTLE_SPEED*delta
+	)
+	if not moving:
+		_ice_skate_previous_speed=planar_speed
+		_ice_skate_smoothed_acceleration=0.0
+		# Once ice support is gone, _animate_walk() has already run earlier
+		# this frame and owns the correct walk/idle/jump targets. Do not write
+		# a fading skating target over those freshly restored rotations: the
+		# old path did exactly that until an arbitrarily tiny blend, then
+		# returned and could strand a residual forward lean indefinitely.
+		if _ice_skating_active:
+			# While stopped but still on ice, ordinary gait is intentionally
+			# suppressed, so this layer itself must settle its torso to neutral.
+			var rest_t:=minf(ICE_SKATE_POSE_SETTLE_SPEED*delta,1.0)
+			_spine.rotation.x=lerp_angle(_spine.rotation.x,0.0,rest_t)
+			if _thorax!=null:
+				_thorax.rotation.x=lerp_angle(_thorax.rotation.x,0.0,rest_t)
+		return
+	# Preserve the feet's physical contact while the deeper sprint flexion
+	# lowers the body through the hip and knee chain.
+	var foot_anchor:=(_ankle_left.global_position+_ankle_right.global_position)*0.5
+	var w:=_ice_skate_pose_blend
+	# Pose strength and temporal interpolation are distinct. Using w itself as
+	# lerp weight became a literal one-frame snap once the blend reached 1.0.
+	var pose_t:=minf(ICE_SKATE_POSE_SETTLE_SPEED*delta,1.0)*w
+	var sprinting:=_is_sprinting()
+	var effort:=ICE_SKATE_SPRINT_POSE_MULTIPLIER if sprinting else 1.0
+	var raw_acceleration:=maxf((planar_speed-_ice_skate_previous_speed)/maxf(delta,0.0001),0.0)
+	_ice_skate_previous_speed=planar_speed
+	_ice_skate_smoothed_acceleration=lerpf(
+		_ice_skate_smoothed_acceleration,raw_acceleration,
+		1.0-exp(-5.0*delta)
+	)
+	var thrust_mix:=clampf(_ice_skate_smoothed_acceleration/ICE_SKATE_FULL_THRUST_ACCELERATION,0.0,1.0)
+	var cadence:=lerpf(ICE_SKATE_CADENCE_GLIDE,ICE_SKATE_CADENCE_THRUST,smoothstep(0.0,1.0,thrust_mix))
+	_ice_skate_stride_phase+=delta*cadence
+	var cycle:=fposmod(_ice_skate_stride_phase/TAU,1.0)
+	var left_stroke:=ice_skate_stroke(cycle)
+	var right_stroke:=ice_skate_stroke(fposmod(cycle+0.5,1.0))
+	var left_push:=left_stroke.x
+	var right_push:=right_stroke.x
+	var left_recovery:=left_stroke.y
+	var right_recovery:=right_stroke.y
+	var left_support:=left_stroke.z
+	var right_support:=right_stroke.z
+	var left_knee:=(ICE_SKATE_GLIDE_KNEE*left_support+ICE_SKATE_PUSH_KNEE*left_push+ICE_SKATE_RECOVERY_KNEE*left_recovery)*effort
+	var right_knee:=(ICE_SKATE_GLIDE_KNEE*right_support+ICE_SKATE_PUSH_KNEE*right_push+ICE_SKATE_RECOVERY_KNEE*right_recovery)*effort
+	# Positive X is backward for this procedural leg rig (the same verified
+	# convention used by the run arms). The old negative push kicked forward.
+	var left_hip_x:=ICE_SKATE_PUSH_HIP_BACK*left_push*effort-ICE_SKATE_RECOVERY_HIP_FORWARD*left_recovery-ICE_SKATE_GLIDE_HIP_FORWARD*left_support*effort
+	var right_hip_x:=ICE_SKATE_PUSH_HIP_BACK*right_push*effort-ICE_SKATE_RECOVERY_HIP_FORWARD*right_recovery-ICE_SKATE_GLIDE_HIP_FORWARD*right_support*effort
+	_leg_left.rotation.x=lerp_angle(_leg_left.rotation.x,left_hip_x,pose_t)
+	_leg_right.rotation.x=lerp_angle(_leg_right.rotation.x,right_hip_x,pose_t)
+	# This rig's local yaw signs are opposite the earlier assumption: positive
+	# on the left and negative on the right open the toes, not the heels.
+	_leg_left.rotation.y=lerp_angle(_leg_left.rotation.y,ICE_SKATE_TOE_OUT*left_push*effort,pose_t)
+	_leg_right.rotation.y=lerp_angle(_leg_right.rotation.y,-ICE_SKATE_TOE_OUT*right_push*effort,pose_t)
+	_knee_left.rotation.x=lerp_angle(_knee_left.rotation.x,left_knee,pose_t)
+	_knee_right.rotation.x=lerp_angle(_knee_right.rotation.x,right_knee,pose_t)
+	# Resolve lateral extension after the sprint hip, toe, and knee pose is
+	# present. Deep flex changes the combined Euler result substantially, so
+	# measuring before these joints were posed could select a value that read
+	# correctly at normal effort but folded inward during sprint.
+	var outward_amount:=ICE_SKATE_SPRINT_PUSH_OUTWARD if sprinting else ICE_SKATE_PUSH_OUTWARD
+	_leg_left.rotation.z=lerp_angle(
+		_leg_left.rotation.z,_ice_skate_outward_roll(_leg_left,_ankle_left,outward_amount)*left_push,pose_t
+	)
+	_leg_right.rotation.z=lerp_angle(
+		_leg_right.rotation.z,_ice_skate_outward_roll(_leg_right,_ankle_right,outward_amount)*right_push,pose_t
+	)
+	# Counter the complete support-leg chain at the ankle. This keeps the
+	# weighted front runner parallel to the ice instead of pitching with the
+	# deeply bent knee; the pushing/recovering runner is allowed to articulate.
+	_ankle_left.rotation.x=lerp_angle(_ankle_left.rotation.x,-(left_hip_x+left_knee)*left_support,pose_t)
+	_ankle_right.rotation.x=lerp_angle(_ankle_right.rotation.x,-(right_hip_x+right_knee)*right_support,pose_t)
+	# Run-like opposition, held on exactly the same support weights as the
+	# legs: left glide leg pairs with the bent right arm forward and vice versa.
+	var sprint_arm_lift:=ICE_SKATE_SPRINT_ARM_LIFT if sprinting else 0.0
+	_arm_left.rotation.x=lerp_angle(_arm_left.rotation.x,(-ICE_SKATE_ARM_SWING*right_support+ICE_SKATE_ARM_SWING*0.55*left_support)*effort-sprint_arm_lift,pose_t)
+	_arm_right.rotation.x=lerp_angle(_arm_right.rotation.x,(-ICE_SKATE_ARM_SWING*left_support+ICE_SKATE_ARM_SWING*0.55*right_support)*effort-sprint_arm_lift,pose_t)
+	_elbow_left.rotation.x=lerp_angle(_elbow_left.rotation.x,-ICE_SKATE_ELBOW_BEND*right_support*effort,pose_t)
+	_elbow_right.rotation.x=lerp_angle(_elbow_right.rotation.x,-ICE_SKATE_ELBOW_BEND*left_support*effort,pose_t)
+	var skate_lean:=ICE_SKATE_BODY_LEAN+(ICE_SKATE_SPRINT_BODY_LEAN if sprinting else 0.0)
+	_spine.rotation.x=lerp_angle(_spine.rotation.x,skate_lean,pose_t)
+	if _thorax!=null:
+		_thorax.rotation.x=lerp_angle(_thorax.rotation.x,skate_lean*0.35,pose_t)
+	# Do not translate the torso and pelvis independently: that visually
+	# disconnects them from the fixed hip sockets. The bent leg chains plus
+	# the foot-anchor correction below lower the complete rig naturally.
+	_spine.position.y=lerpf(_spine.position.y,_spine_rest_y,pose_t)
+	_hips.position.y=lerpf(_hips.position.y,_hips_rest_y,pose_t)
+	var posed_foot_anchor:=(_ankle_left.global_position+_ankle_right.global_position)*0.5
+	visuals.global_position+=foot_anchor-posed_foot_anchor
+
+
+## Resolve lateral hip roll from the live posed hierarchy instead of relying
+## on a left/right sign convention. Several playable rigs use different
+## local bases; the correct candidate is simply the one that puts the ankle
+## farther from the character's centre along that leg's actual side.
+func _ice_skate_outward_roll(leg: Node3D,ankle: Node3D,amount: float) -> float:
+	var original:=leg.rotation.z
+	var right:=visuals.global_transform.basis.x.normalized()
+	var side:=signf((leg.global_position-_spine.global_position).dot(right))
+	if is_zero_approx(side):
+		side=signf(leg.position.x)
+	var best_angle:=0.0
+	var best_score:=-INF
+	# Search the complete safe arc. Merely comparing +/-amount can choose the
+	# less-inward endpoint when deep X/Y sprint flex makes both extremes fold
+	# toward the centre. Scoring the real ankle endpoint makes the requested
+	# left/back-left and right/back-right trajectories explicit.
+	for sample in 17:
+		var candidate:=lerpf(-amount,amount,float(sample)/16.0)
+		leg.rotation.z=candidate
+		leg.force_update_transform()
+		ankle.force_update_transform()
+		var score:=side*(ankle.global_position-leg.global_position).dot(right)
+		if score>best_score:
+			best_score=score
+			best_angle=candidate
+	leg.rotation.z=original
+	return best_angle
+
+
+## One skate's support -> push -> forward recovery cycle. The other leg uses
+## the same curve half a cycle later. Components are (push, recovery, support)
+## and always sum to one, preventing the old side-to-side pendulum motion.
+static func ice_skate_stroke(cycle: float) -> Vector3:
+	var p:=fposmod(cycle,1.0)
+	# Spend most of the first half planted in the glide. Weight transfers
+	# quickly into a rearward thrust, the extension hangs briefly, then that
+	# leg recovers forward slowly in preparation for its next planted phase.
+	var support:=1.0-smoothstep(0.38,0.50,p)+smoothstep(0.88,1.0,p)
+	var push:=smoothstep(0.42,0.52,p)*(1.0-smoothstep(0.70,0.88,p))
+	var recovery:=smoothstep(0.68,0.80,p)*(1.0-smoothstep(0.90,1.0,p))
+	var total:=maxf(push+recovery+support,0.001)
+	return Vector3(push,recovery,support)/total
+
+
+## Deliberately called separately, LATER in _physics_process (after
+## _update_aerial_body_anchor(delta) -- see that call site's own comment),
+## not from _apply_dirtbike_pose() alongside the leg/arm pose above. Direct
+## report ("he is still not adjusting his pitch when riding in two wheel
+## mode") traced back to _update_aerial_body_anchor()'s own ordinary-
+## grounded branch unconditionally resetting visuals.rotation.x to 0 every
+## frame; excluding _dirtbike_wheelie_active from that reset (see its own
+## comment) should already prevent the stomp, but that requires staying in
+## sync with whatever else that function's own branches do. Running this
+## strictly AFTER it instead makes the ordering itself the guarantee: this
+## is provably the last write to visuals.rotation.x each frame, independent
+## of that function's own internals ever changing again.
+func _apply_dirtbike_wheelie_pitch(delta: float,grounded: bool) -> void:
+	# Ordinary ground/aerial presentation owns pitch whenever the front wheel
+	# is absent. Writing a zero target here was flattening air-chest flight
+	# after its camera-space body pose had already been applied.
+	if not _dirtbike_wheelie_active:
+		_dirtbike_pitch_angular_velocity=0.0
+		return
+	var wheelie_t: float = minf(DIRTBIKE_WHEELIE_SETTLE_SPEED * delta,1.0)
+	var wheelie_target: float = _solve_dirtbike_wheelie_pitch()
+	if grounded:
+		wheelie_target += _dirtbike_terrain_pitch(delta)
+	elif _dirtbike_pitch_was_grounded:
+		_dirtbike_pitch_angular_velocity=0.0
+		_dirtbike_airborne_pitch = visuals.rotation.x
+		wheelie_target = _dirtbike_airborne_pitch
+	else:
+		_dirtbike_pitch_angular_velocity=0.0
+		wheelie_target = _dirtbike_airborne_pitch
+
+	# Pitch activation deliberately hinges around the planted rear axle so the
+	# rider and front wheel visibly rotate down into two-wheel mode. Steering
+	# yaw remains centre-of-mass anchored in the movement pass; pitch and yaw
+	# are separate rotations with separate physical pivots.
+	var rear_anchor: Vector3 = (_ankle_left.global_position+_ankle_right.global_position)*0.5
+	visuals.rotation.x = lerp_angle(visuals.rotation.x,wheelie_target,wheelie_t)
+	var moved_rear: Vector3 = (_ankle_left.global_position+_ankle_right.global_position)*0.5
+	visuals.global_position += rear_anchor-moved_rear
+	if grounded:
+		_settle_dirtbike_rear_wheel_on_terrain()
+	_dirtbike_pitch_was_grounded = grounded
+
+
+## Keeps the rear rim exactly planted throughout the eased transition. Since
+## the target pitch is solved from both terrain samples, the front rim meets
+## its own surface naturally as the rotation finishes instead of teleporting.
+func _settle_dirtbike_rear_wheel_on_terrain() -> void:
+	var rear: Vector3 = (_ankle_left.global_position+_ankle_right.global_position)*0.5
+	var support: Variant = _dirtbike_wheel_support_height(rear)
+	if support == null:
+		return
+	var rear_contact_y := support as float
+	var rear_error: float = rear_contact_y+DIRTBIKE_WHEEL_RADIUS-rear.y
+	visuals.global_position.y += rear_error
+
+
+## Solves the forward lean angle that brings the front wheel (axle at the
+## wrists) down to the same height as the rear wheel (axle at the ankles),
+## given both wheels share one radius (DIRTBIKE_WHEEL_RADIUS) -- per direct
+## instruction ("you must figure out the math to keep the back wheel
+## touching the ground but also pitch the player's body forward until the
+## perimeter of the front wheel also rests on the ground"). Solved fresh
+## from the rig's own current geometry every frame, so it automatically
+## tracks the arm-raise pose as it eases in, rather than a single guessed
+## fixed angle.
+##
+## Both wrist/ankle positions are read via global_transform.affine_inverse()
+## -- true LOCAL coordinates relative to `visuals`, which by definition
+## don't depend on whatever pitch `visuals` itself currently has (unlike its
+## global position, which is already pitched by last frame's own result).
+## Rotating a local point by an angle around the local X axis maps its Y/Z
+## as Y' = Y*cos(angle) - Z*sin(angle) -- Godot's own X-rotation matrix,
+## already confirmed for this project (see horse_figure.gd's
+## BODY_PITCH_TAKEOFF_AMOUNT for the identical derivation). Solving Y'=0
+## (front axle level with the rear one, since equal radii cancel out of that
+## equation entirely) gives angle = atan2(rel.y, rel.z) directly. No
+## separate sign/quadrant guess is needed the way a fixed constant would --
+## rel.y and rel.z's own actual signs (the wrist sits above and in front of
+## the ankle once the arms are raised) already pick the one physically
+## correct forward-leaning solution on their own. A pure local-X rotation
+## never touches the local X (left/right) component, and a world Y (yaw)
+## never changes height either, so this result holds regardless of which
+## direction the character is currently facing.
+func _solve_dirtbike_wheelie_pitch() -> float:
+	if not is_instance_valid(_wrist_left) or not is_instance_valid(_wrist_right):
+		return 0.0
+	if not is_instance_valid(_ankle_left) or not is_instance_valid(_ankle_right):
+		return 0.0
+	var to_local := visuals.global_transform.affine_inverse()
+	var wrist_local: Vector3 = to_local * ((_wrist_left.global_position + _wrist_right.global_position) * 0.5)
+	var ankle_local: Vector3 = to_local * ((_ankle_left.global_position + _ankle_right.global_position) * 0.5)
+	var rel := wrist_local - ankle_local
+	if absf(rel.y) < 0.001 and absf(rel.z) < 0.001:
+		return 0.0
+	return atan2(rel.y, rel.z)
+
+
+## Adds the actual terrain angle between the rear and front wheel contacts
+## to the rig's flat-ground wheelie solution. Positive local X rotation
+## lowers the character's local +Z (front), hence an uphill surface needs
+## the negative of atan2(front rise, wheelbase).
+func _dirtbike_terrain_pitch(delta: float) -> float:
+	if terrain == null:
+		return 0.0
+	if not is_instance_valid(_wrist_left) or not is_instance_valid(_wrist_right):
+		return 0.0
+	if not is_instance_valid(_ankle_left) or not is_instance_valid(_ankle_right):
+		return 0.0
+	var front: Vector3 = (_wrist_left.global_position+_wrist_right.global_position)*0.5
+	var rear: Vector3 = (_ankle_left.global_position+_ankle_right.global_position)*0.5
+	var wheelbase: float = Vector2(front.x-rear.x,front.z-rear.z).length()
+	if wheelbase < 0.05:
+		return 0.0
+	var front_support: Variant = _dirtbike_wheel_support_height(front)
+	var rear_support: Variant = _dirtbike_wheel_support_height(rear)
+	if rear_support == null:
+		return _dirtbike_supported_pitch
+	var rear_height := rear_support as float
+	var front_bottom: float = front.y-DIRTBIKE_WHEEL_RADIUS
+	if front_support != null:
+		var front_height := front_support as float
+		if front_bottom-front_height<=0.28:
+			_dirtbike_pitch_angular_velocity=0.0
+			_dirtbike_supported_pitch=-atan2(front_height-rear_height,wheelbase)
+			return _dirtbike_supported_pitch
+
+	# Only the rear wheel is carrying the bike. Integrate the forward pitching
+	# moment instead of retaining the last two-wheel angle forever. Contact is
+	# checked again every frame, so the fall stops as soon as the front rim
+	# reaches rock, ramp, architecture, or terrain.
+	_dirtbike_pitch_angular_velocity=minf(
+		_dirtbike_pitch_angular_velocity+DIRTBIKE_NOSE_DROP_ANGULAR_ACCELERATION*delta,
+		DIRTBIKE_NOSE_DROP_MAX_ANGULAR_SPEED
+	)
+	# Do not stop at horizontal or at an arbitrary maximum forward pitch. If
+	# the surface under the front half is lower, the front wheel is allowed to
+	# rotate below the rear axle and keeps falling until its rim actually
+	# reaches support. If the rear subsequently leaves support, the normal
+	# airborne branch above takes over and preserves that launch attitude.
+	_dirtbike_supported_pitch+=_dirtbike_pitch_angular_velocity*delta
+	return _dirtbike_supported_pitch
+
+
+## Returns the nearest real platform surface under a wheel axle. Unlike a
+## terrain height-function sample, this sees boulders, rock slabs, ramps,
+## roofs, ship decks, and every other solid platform. The probe begins just
+## above the axle so it cannot select an overhead floor as wheel support.
+func _dirtbike_wheel_support_height(axle: Vector3) -> Variant:
+	if terrain == null:
+		return null
+	var terrain_height: float = terrain.get_mesh_height(axle.x,axle.z)
+	var from := axle+Vector3.UP*(DIRTBIKE_WHEEL_RADIUS+0.18)
+	var to := Vector3(axle.x,terrain_height-3.0,axle.z)
+	var query := PhysicsRayQueryParameters3D.create(
+		from,to,1 | TownProps.BLORB_CLIMBABLE_LAYER
+	)
+	query.exclude=[get_rid()]
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return null
+	return (hit["position"] as Vector3).y
+
+
+## Terrain rise/run directly beneath the wheel, sampled along `dir_xz`
+## (typically the current velocity direction) -- positive means the ground
+## climbs in that direction. Shared by the uphill roll-to-a-stop
+## deceleration and could equally serve any other dirtbike slope query.
+func _dirtbike_slope_along(dir_xz: Vector2) -> float:
+	if terrain == null or dir_xz.length_squared() < 0.0001:
+		return 0.0
+	var dir := dir_xz.normalized()
+	const SAMPLE_DIST := 0.6
+	var h0: float = terrain.get_mesh_height(global_position.x, global_position.z)
+	var h1: float = terrain.get_mesh_height(global_position.x + dir.x * SAMPLE_DIST, global_position.z + dir.y * SAMPLE_DIST)
+	return (h1 - h0) / SAMPLE_DIST
 
 
 ## Two active Fire hands become downward lift jets rather than two forward
@@ -3410,18 +4822,27 @@ func _update_rock_leg_powers(delta: float) -> void:
 
 func _raise_rock_platform(slot: String) -> bool:
 	var blorb := _blorb_suit.worn_blorb_in_slot(slot)
-	if blorb == null or blorb.element_state not in ["rock", "ice"]:
+	if blorb == null or blorb.element_state not in ["rock", "ice", "air"]:
 		return false
 	var here := Vector2(global_position.x, global_position.z)
 	if blorb.element_state == "rock" and terrain.has_method("is_ice_surface") and terrain.is_ice_surface(here):
 		return false
 	if not blorb.consume_mp(ROCK_POWER_MP_PER_SHOT):
 		return false
+	if blorb.element_state == "air":
+		# Player origin is the feet. Put the cloud's solid top just beneath
+		# them so a foot power is an immediate aerial stepping stone.
+		CloudPlatform.spawn(get_tree().current_scene,global_position-Vector3.UP*0.17,_rng,blorb.level,1.15)
+		return true
 	var ground_y: float = _crag_surface_height(blorb, here)
 	if blorb.element_state == "ice":
 		IceCrag.spawn(get_tree().current_scene, Vector3(global_position.x, ground_y, global_position.z), _rng, blorb.level, 1.35)
 	else:
-		RockCrag.spawn(get_tree().current_scene, Vector3(global_position.x, ground_y, global_position.z), _rng, blorb.level, 1.35)
+		RockCrag.spawn(
+			get_tree().current_scene,
+			Vector3(global_position.x, ground_y, global_position.z),
+			_rng, blorb.level, 1.35, _rock_crag_color(here)
+		)
 	return true
 
 
@@ -3446,7 +4867,7 @@ func _is_powered_hover_active() -> bool:
 ## folded into _consume_limb_power(), whose per-second rate model doesn't
 ## fit a per-shot cost.
 func _update_discrete_arm_powers(delta: float) -> void:
-	var left_rock := _update_discrete_power("arm_left", "left_arm_power", "rock_or_ice", _left_arm_rock_cooldown, delta)
+	var left_rock := _update_discrete_power("arm_left", "left_arm_power", "platform", _left_arm_rock_cooldown, delta)
 	_left_arm_rock_active = left_rock["active"]
 	_left_arm_rock_cooldown = left_rock["cooldown"]
 	if left_rock["active"] and _left_arm_rock_cooldown <= 0.0 and _fire_rock_power("arm_left", _palm_left):
@@ -3454,7 +4875,7 @@ func _update_discrete_arm_powers(delta: float) -> void:
 
 	var right_rock := (
 		{"active": false, "cooldown": _right_arm_rock_cooldown} if _throw_aim_active or _held_item_is_weapon()
-		else _update_discrete_power("arm_right", "right_arm_power", "rock_or_ice", _right_arm_rock_cooldown, delta)
+		else _update_discrete_power("arm_right", "right_arm_power", "platform", _right_arm_rock_cooldown, delta)
 	)
 	_right_arm_rock_active = right_rock["active"]
 	_right_arm_rock_cooldown = right_rock["cooldown"]
@@ -3488,7 +4909,7 @@ func _update_discrete_power(
 	var active := false
 	if not UIState.modal_open and Input.is_action_pressed(action):
 		var blorb := _blorb_suit.worn_blorb_in_slot(slot)
-		active = blorb != null and (blorb.element_state in ["rock", "ice"] if element == "rock_or_ice" else blorb.element_state == element)
+		active = blorb != null and (blorb.element_state in ["rock", "ice", "air"] if element == "platform" else blorb.element_state == element)
 	return {"active": active, "cooldown": maxf(cooldown - delta, 0.0)}
 
 
@@ -3501,7 +4922,7 @@ func _update_discrete_power(
 ## blorb can't afford ROCK_POWER_MP_PER_SHOT.
 func _fire_rock_power(slot: String, hand: Node3D) -> bool:
 	var blorb := _blorb_suit.worn_blorb_in_slot(slot)
-	if blorb == null or blorb.element_state not in ["rock", "ice"]:
+	if blorb == null or blorb.element_state not in ["rock", "ice", "air"]:
 		return false
 	var hand_xz := Vector2(hand.global_position.x, hand.global_position.z)
 	if blorb.element_state == "rock" and terrain.has_method("is_ice_surface") and terrain.is_ice_surface(hand_xz):
@@ -3510,6 +4931,11 @@ func _fire_rock_power(slot: String, hand: Node3D) -> bool:
 		return false
 	var forward := visuals.global_transform.basis * Vector3(0.0, 0.0, 1.0)
 	forward = forward.normalized() if forward.length_squared() > 0.001 else Vector3.FORWARD
+	if blorb.element_state == "air":
+		var shoulder_y := _thorax.global_position.y if _thorax != null else global_position.y+1.45
+		var cloud_center := Vector3(global_position.x,shoulder_y,global_position.z)+forward*ROCK_CRAG_SPAWN_DISTANCE
+		CloudPlatform.spawn(get_tree().current_scene,cloud_center,_rng,blorb.level)
+		return true
 	var spawn_xz := Vector2(hand.global_position.x, hand.global_position.z) + Vector2(forward.x, forward.z) * ROCK_CRAG_SPAWN_DISTANCE
 	var spawn_y: float = _crag_surface_height(blorb, spawn_xz)
 	var spawn_point := Vector3(spawn_xz.x, spawn_y, spawn_xz.y)
@@ -3520,7 +4946,10 @@ func _fire_rock_power(slot: String, hand: Node3D) -> bool:
 		if blorb.element_state == "ice":
 			IceCrag.spawn(get_tree().current_scene, spawn_point + offset, _rng, blorb.level)
 		else:
-			RockCrag.spawn(get_tree().current_scene, spawn_point + offset, _rng, blorb.level)
+			RockCrag.spawn(
+				get_tree().current_scene, spawn_point + offset, _rng,
+				blorb.level, 1.0, _rock_crag_color(spawn_xz)
+			)
 	var level_damage_scale: float = 1.0 + float(blorb.level - 1) * 0.08
 	var roll := CombatMath.rolled_attack(ROCK_CRAG_DAMAGE_BASE * level_damage_scale, blorb.strength, _rng)
 	var credit_blorbs := _active_powered_blorbs()
@@ -3546,14 +4975,38 @@ func _fire_rock_power(slot: String, hand: Node3D) -> bool:
 ## that sheet exists (excluding the fishing hole). Rock and off-lake ice keep
 ## using ordinary terrain, preserving the existing rock-power rules.
 func _crag_surface_height(blorb: Blorb, pos: Vector2) -> float:
+	var base_height: float
 	if (
 		blorb.element_state == "ice"
 		and terrain.has_method("is_ice_surface")
 		and terrain.is_ice_surface(pos)
 		and terrain.has_method("get_ice_level")
 	):
-		return terrain.get_ice_level()
-	return terrain.get_mesh_height(pos.x, pos.y)
+		base_height = terrain.get_ice_level()
+	else:
+		base_height = terrain.get_mesh_height(pos.x, pos.y)
+	# Existing temporary crags are real foundations too. Selecting the highest
+	# supporting top beneath this XZ lets repeated casts build stable towers.
+	for platform in get_tree().get_nodes_in_group("power_platforms"):
+		var body := platform as Node3D
+		if body == null:
+			continue
+		var radius := float(body.get_meta("support_radius",0.0))
+		if Vector2(body.global_position.x,body.global_position.z).distance_to(pos) <= radius*0.88:
+			var support_top := (
+				float(body.call("get_support_top_y"))
+				if body.has_method("get_support_top_y")
+				else float(body.get_meta("support_top_y",-INF))
+			)
+			base_height = maxf(base_height,support_top)
+	return base_height
+
+
+## Rock cast through water originates in the sandy floor rather than treating
+## the liquid sheet as stone. Keeping this visual decision beside the shared
+## surface-height resolver makes hand and leg casts agree.
+func _rock_crag_color(pos: Vector2) -> Color:
+	return NatureProps.ROCK_COLOR
 
 
 ## Fires a single SeedPellet forward from `hand` -- see that script's own
@@ -3846,29 +5299,7 @@ func _on_held_item_changed() -> void:
 	var held_scale: float = float(entry.get("held_scale", HELD_ITEM_SCALE))
 	_held_visual = entry["build_visual"].call(held_scale)
 	_palm_right.add_child(_held_visual)
-	# Display models may need a different orientation when actually gripped.
-	# In particular, the shop sword stands vertically on its rack but rotates
-	# its blade forward from the fist here. Apply this before solving GripPoint
-	# so the hilt surface—not the unrotated model origin—lands on the palm.
-	if _held_visual.has_meta("held_rotation"):
-		_held_visual.rotation = _held_visual.get_meta("held_rotation") as Vector3
-	# If the visual authored its own GripPoint (the spot on ITS surface
-	# meant to meet the palm), shift the whole visual so that point lands
-	# exactly on palm_right's own origin -- grip.position is in the visual's
-	# pre-scale local units, so it has to be scaled by the same amount
-	# build_visual() just scaled the visual itself to convert that into the
-	# palm's own local space. Position-only (not full rotational alignment)
-	# -- see the figure-rig skill's guidance on preferring the simple,
-	# clearly-derived version over a fancier one that's more likely wrong
-	# without being able to see it in-engine. HELD_ITEM_LOCAL_OFFSET is
-	# added on top either way (see its own comment for why GripPoint's
-	# single-axis alignment alone still isn't enough).
-	var grip := _held_visual.get_node_or_null("GripPoint") as Node3D
-	if grip != null:
-		var scaled_grip := grip.position * _held_visual.scale
-		_held_visual.position = -(_held_visual.quaternion * scaled_grip) + HELD_ITEM_LOCAL_OFFSET
-	else:
-		_held_visual.position = HELD_ITEM_LOCAL_OFFSET
+	ShopCatalog.fit_visual_to_hand(_held_visual,HELD_ITEM_LOCAL_OFFSET)
 	# Inherits the whole arm's walk-swing animation (and now the hand's own
 	# wrist twist) for free via the parent chain -- a nice incidental
 	# "swinging held item" effect, not worth damping.
@@ -4155,7 +5586,18 @@ func _update_head_look(delta: float) -> void:
 	# snap in the targets here still eases visually since they're
 	# lerp_angle'd below, not applied instantly.
 	# Air-foot hovering deliberately keeps the ordinary walking head behavior.
-	var aerial_head_tracking := _lake_diving_active or _air_flight_active or _fire_limb_flight_active
+	# Per direct correction ("when the hand wheel is activated... the head
+	# should behave like when flying, keeping it lifted up and pointing in
+	# the direction he's heading") -- the wheelie pitches `visuals` forward
+	# by a real, possibly steep angle (see _solve_dirtbike_wheelie_pitch()),
+	# and without this the head would just passively inherit that pitch and
+	# stare down at the ground the same way it would on any other steeply
+	# pitched body. Reusing this exact flight/dive branch (rather than a
+	# separate one) is deliberate: it's already built for exactly "counter
+	# a steep body pitch and track the travel direction instead."
+	var aerial_head_tracking := (
+		_lake_diving_active or _air_flight_active or _fire_limb_flight_active or _dirtbike_wheelie_active
+	)
 	var surface_swimming := _lake_buoyancy_active and not _lake_diving_active and not _lake_floor_walk_active and not _lake_weighted_descent_active
 	var yaw_limit := AERIAL_HEAD_YAW_LIMIT if aerial_head_tracking else HEAD_YAW_LIMIT
 	var pitch_min := -AERIAL_HEAD_PITCH_LIMIT if aerial_head_tracking else -HEAD_PITCH_UP_LIMIT
@@ -4194,6 +5636,24 @@ func _update_head_look(delta: float) -> void:
 		var local_travel := visuals.global_transform.basis.inverse() * travel_direction.normalized()
 		target_yaw = clampf(atan2(local_travel.x, local_travel.z), -yaw_limit, yaw_limit)
 		target_elevation = -deg_to_rad(32.0)
+	elif _snowboard_active:
+		# The body is side-on (left side leading); the torso supplies part of
+		# the rotation and the neck completes a constrained downhill gaze.
+		var board_travel:=_snowboard_last_heading
+		if Vector2(velocity.x,velocity.z).length_squared()>0.01:
+			board_travel=Vector3(velocity.x,0.0,velocity.z).normalized()
+		var local_board_travel:=visuals.global_transform.basis.inverse()*board_travel
+		var torso_twist:=SNOWBOARD_ABDOMEN_TWIST+(SNOWBOARD_THORAX_TWIST if _thorax!=null else 0.0)
+		target_yaw=clampf(
+			atan2(local_board_travel.x,local_board_travel.z)-torso_twist,
+			-HEAD_YAW_LIMIT,HEAD_YAW_LIMIT
+		)
+		target_elevation=0.0
+	elif _ice_skating_active:
+		# Counter the gait's forward torso pitch so the gaze remains level in
+		# the direction of travel, with the deeper sprint crouch compensated too.
+		target_yaw=0.0
+		target_elevation=-(ICE_SKATE_BODY_LEAN+(ICE_SKATE_SPRINT_BODY_LEAN if _is_sprinting() else 0.0))*0.72
 	elif aerial_head_tracking:
 		# Flight/swim direction is the primary head target. Crucially, this is
 		# solved in the same local neck frame as grounded head tracking, never
@@ -4325,7 +5785,20 @@ func _update_footsteps(stride_phase: float, audible: bool, running: bool) -> voi
 	if _player_following_blorbus or _player_following_manchego:
 		_footsteps_were_moving = false
 		return
+	# The dirt-bike wheels own ground contact even though the underlying rig
+	# still evaluates a locomotion cycle for posing. Never translate that hidden
+	# leg cycle into audible human footfalls.
+	# Extended skate blades suppress steps only while they actually own the
+	# movement contact on ice (or are airborne from an ice-skating launch).
+	# Off ice they are passive hardware under an ordinary walking gait, so
+	# snow still produces its normal left/right footfall texture.
+	if _dirtbike_wheel_active or _snowboard_active or _ice_skating_active or _ice_skate_airborne:
+		_footsteps_were_moving = false
+		return
 	if _standing_on_cloud:
+		_footsteps_were_moving = false
+		return
+	if _is_on_lava_surface():
 		_footsteps_were_moving = false
 		return
 	var half_cycle: int = floori(stride_phase / PI)
@@ -4350,6 +5823,18 @@ func _update_footsteps(stride_phase: float, audible: bool, running: bool) -> voi
 	UISounds.play_footstep(posmod(half_cycle, 2) == 1, running, get_instance_id(), snow_surface)
 
 
+func _is_on_lava_surface() -> bool:
+	if terrain == null or not terrain.has_method("is_lava_area"):
+		return false
+	var xz := Vector2(global_position.x, global_position.z)
+	if not bool(terrain.is_lava_area(xz)) or _lava_swimming_active:
+		return false
+	if not terrain.has_method("get_lava_surface_height"):
+		return false
+	var lava_y: float = terrain.get_lava_surface_height(xz)
+	return absf((global_position.y - FOOT_OFFSET) - lava_y) <= 0.28
+
+
 ## `traversal_speed_multiplier` removes the blorb-skate boost from the
 ## animation calculation. The player covers three times the ground while
 ## skating, but the established run cycle keeps its original pace.
@@ -4357,6 +5842,13 @@ func _animate_walk(
 	delta: float, grounded: bool, traversal_speed_multiplier: float = 1.0,
 	animation_speed_override: float = -1.0
 ) -> void:
+	# Ice skating owns every locomotion joint and the body-height offsets in
+	# its dedicated final pose layer. Letting the ordinary zero-speed gait
+	# settle those same joints toward standing first made the two animators
+	# fight every frame and visually erased most of the sprint crouch.
+	if _ice_skating_active:
+		_footsteps_were_moving=false
+		return
 	# Lake swimming is neither a jump nor standing: both surface swimming and
 	# a motionless underwater diver use the intentionally relaxed descent
 	# silhouette. It takes precedence over the transient landing pose so
@@ -4395,8 +5887,8 @@ func _animate_walk(
 	# ordinary grounded pose returns that spread to its rig-specific rest
 	# angle.
 	var arm_rest_t := POSE_SETTLE_SPEED * delta
-	var left_arm_rest := MonkeyFigure.ARM_OUTWARD_ANGLE if _piloting_xiao_hou_zi else ProceduralFigure.ARM_OUTWARD_ANGLE
-	var right_arm_rest := -MonkeyFigure.ARM_OUTWARD_ANGLE if _piloting_xiao_hou_zi else -ProceduralFigure.ARM_OUTWARD_ANGLE
+	var left_arm_rest := ProceduralFigure.ARM_OUTWARD_ANGLE
+	var right_arm_rest := -ProceduralFigure.ARM_OUTWARD_ANGLE
 	_arm_left.rotation.z = lerp_angle(_arm_left.rotation.z, left_arm_rest, arm_rest_t)
 	_arm_right.rotation.z = lerp_angle(_arm_right.rotation.z, right_arm_rest, arm_rest_t)
 
@@ -4422,11 +5914,14 @@ func _animate_walk(
 		# SPRINT_BEND_SCALE push the swing arc and knee/elbow bend further
 		# than walking ever reaches.
 		var sprinting := _is_sprinting()
-		var cadence_scale := TEMP_MONKEY_WALK_CADENCE_SCALE if _piloting_xiao_hou_zi else 1.0
+		var cadence_scale := 1.0
 		var swing_speed := WALK_SWING_SPEED * cadence_scale * (SPRINT_SWING_SPEED_SCALE if sprinting else 1.0)
 		var swing_amount := SPRINT_SWING_AMOUNT if sprinting else WALK_SWING_AMOUNT
 		var bend_scale := SPRINT_BEND_SCALE if sprinting else 1.0
-		_walk_phase += delta * swing_speed * horizontal_speed
+		_walk_phase += HumanoidLocomotion.walk_phase_step(
+			delta, WALK_SWING_SPEED, horizontal_speed, _playable_profile,
+			SPRINT_SWING_SPEED_SCALE if sprinting else 1.0
+		)
 		# See SPRINT_STRIDE_EASE's own comment -- warps the phase used for the
 		# rest of this cycle (swing, knee/elbow bend, body bob below) so the
 		# run stride snaps through the crossing point and hangs at the
@@ -4535,7 +6030,7 @@ func _animate_walk(
 		var right_elbow_fraction := elbow_min_fraction + right_forward_fraction * elbow_bend_range
 		var left_elbow_fraction := elbow_min_fraction + left_forward_fraction * elbow_bend_range
 		var elbow_bend_scale := bend_scale * (SPRINT_ELBOW_EXTRA_BEND if sprinting else 1.0)
-		var default_elbow_bend := MonkeyFigure.DEFAULT_ELBOW_BEND if _piloting_xiao_hou_zi else 0.0
+		var default_elbow_bend := 0.0
 		_elbow_right.rotation.x = lerp_angle(_elbow_right.rotation.x, -(default_elbow_bend + right_elbow_fraction * ProceduralFigure.ELBOW_BEND_AMOUNT * elbow_bend_scale), cycle_t)
 		_elbow_left.rotation.x = lerp_angle(_elbow_left.rotation.x, -(default_elbow_bend + left_elbow_fraction * ProceduralFigure.ELBOW_BEND_AMOUNT * elbow_bend_scale), cycle_t)
 
@@ -4547,7 +6042,7 @@ func _animate_walk(
 		# figure.glb rig. Sprinting leans further (SPINE_LEAN_MAX_RUN) than
 		# walking (SPINE_LEAN_MAX_WALK), per direct instruction.
 		var lean_max := SPINE_LEAN_MAX_RUN if sprinting else SPINE_LEAN_MAX_WALK
-		var nominal_move_speed := TEMP_MONKEY_MOVE_SPEED if _piloting_xiao_hou_zi else move_speed
+		var nominal_move_speed := move_speed
 		var lean_target := lean_max * clampf(horizontal_speed / nominal_move_speed, 0.0, 1.0)
 		_spine.rotation.x = lerp_angle(_spine.rotation.x, lean_target, POSE_SETTLE_SPEED * delta)
 		if sprinting:
@@ -4628,7 +6123,7 @@ func _animate_walk(
 		# now low at stride_phase=0/PI (contact/loading, matches the knee/
 		# ankle bumps peaking at the same points) and high at PI/2/3PI/2
 		# (spring/flight).
-		var body_motion_scale := TEMP_MONKEY_BODY_MOTION_SCALE if _piloting_xiao_hou_zi else 1.0
+		var body_motion_scale := 1.0
 		var body_dip := -ProceduralFigure.WALK_BODY_DIP_AMOUNT * body_motion_scale * pow(sin(stride_phase), 2)
 		var body_bob := -RUN_BODY_BOB_AMOUNT * body_motion_scale * cos(2.0 * stride_phase)
 		var body_offset := body_bob if sprinting else body_dip
@@ -4636,7 +6131,7 @@ func _animate_walk(
 		# The monkey's pear body is already a child of its spine pivot, unlike
 		# the human pelvis. Moving both would apply the offset twice to the body
 		# and visibly pull it away from the leg attachments.
-		_hips.position.y = _hips_rest_y if _piloting_xiao_hou_zi else _hips_rest_y + body_offset
+		_hips.position.y = _hips_rest_y + body_offset
 		_was_moving = true
 	else:
 		_footsteps_were_moving = false
@@ -4685,7 +6180,7 @@ func _animate_walk(
 		# (not gated by IDLE_LEG_VARIANT_CHANCE the way the leg variant is) --
 		# per direct instruction, standing idle should never look like both
 		# arms hang in perfect lockstep.
-		var idle_elbow_base := -MonkeyFigure.DEFAULT_ELBOW_BEND if _piloting_xiao_hou_zi else 0.0
+		var idle_elbow_base := 0.0
 		_elbow_left.rotation.x = lerp_angle(_elbow_left.rotation.x, idle_elbow_base + _idle_elbow_left, POSE_SETTLE_SPEED * delta)
 		_elbow_right.rotation.x = lerp_angle(_elbow_right.rotation.x, idle_elbow_base + _idle_elbow_right, POSE_SETTLE_SPEED * delta)
 		_ankle_left.rotation.x = lerp_angle(_ankle_left.rotation.x, 0.0, POSE_SETTLE_SPEED * delta)
@@ -4806,6 +6301,7 @@ func _update_aerial_body_anchor(delta: float) -> void:
 	# normal upright walk/run silhouette. Turn its planar facing toward travel
 	# without applying the pitched, trailing-body flight anchor below.
 	if _air_foot_hover_active and not _air_flight_active and not _fire_limb_flight_active and not _lake_buoyancy_active:
+		_aerial_skull_anchor_initialized = false
 		if _aerial_motion_direction.length_squared() > 0.001:
 			var planar_direction := _aerial_motion_direction
 			planar_direction.y = 0.0
@@ -4823,7 +6319,22 @@ func _update_aerial_body_anchor(delta: float) -> void:
 		visuals.position = visuals.position.lerp(Vector3(0.0, -FOOT_OFFSET, 0.0), minf(AERIAL_BODY_LEAN_SPEED * delta, 1.0))
 		_aerial_rest_heading_initialized = false
 	elif (_lake_buoyancy_active and not _lake_floor_walk_active and not _lake_weighted_descent_active) or _air_flight_active or _fire_limb_flight_active:
-		var skull_anchor := _head.global_position
+		if not _aerial_skull_anchor_initialized:
+			_aerial_skull_body_offset = _head.global_position-global_position
+			_aerial_skull_anchor_initialized = true
+		var skull_anchor := global_position+_aerial_skull_body_offset
+		# Per direct suggestion ("it should be like the camera is kind of
+		# like spring attached to the skull of the player, even when flying
+		# or swimming") -- camera_rig otherwise sits at its own fixed local
+		# offset (Vector3(0, 1.6, 0)) from this CharacterBody regardless of
+		# whatever the visual body is doing, never actually re-centering on
+		# the real head position. _aerial_skull_body_offset IS that real
+		# head position expressed in the same local frame (it's defined as
+		# _head.global_position - global_position, and the line above/below
+		# this one is what keeps the head pinned there every frame), so
+		# assigning it directly keeps the camera exactly co-located with the
+		# skull by construction, not by coincidence.
+		camera_rig.position = _aerial_skull_body_offset
 		if _aerial_motion_direction.length_squared() > 0.001:
 			_aerial_was_moving = true
 			# This is a CAMERA-SPACE body transform, not a world-space pitch.
@@ -4876,8 +6387,36 @@ func _update_aerial_body_anchor(delta: float) -> void:
 		# after that rotation, making the neck/head junction the real visual
 		# pivot without changing the collision shape's stable feet origin.
 		visuals.global_position += skull_anchor - _head.global_position
+		# Per direct report ("when I aim the camera downward, the flying
+		# player's body just totally clips into the ground") -- two earlier
+		# attempts pre-clamped the camera pitch itself before it ever
+		# reached the rotation above, on the theory that the far end of the
+		# body swings toward the ground as pitch steepens. Neither one
+		# changed anything, which means that theory (or at least which
+		# direction the swing actually goes) was wrong, not just
+		# under-tuned. Rather than guess a third time, check where the
+		# body's own two known extremes -- the head (pinned at the anchor
+		# above) and the rig's own root origin -- actually ended up after
+		# THIS frame's real rotation, and push the whole visual body up if
+		# either would sit below the real ground here. This doesn't depend
+		# on knowing which way the rotation goes at all.
+		if (_lake_diving_active or _air_flight_active or _fire_limb_flight_active) and terrain != null:
+			var ground_y: float = terrain.get_mesh_height(global_position.x, global_position.z)
+			var lowest_y := minf(_head.global_position.y, visuals.global_position.y)
+			const MIN_GROUND_CLEARANCE := 0.3
+			if lowest_y < ground_y + MIN_GROUND_CLEARANCE:
+				visuals.global_position.y += (ground_y + MIN_GROUND_CLEARANCE) - lowest_y
 	else:
+		_aerial_skull_anchor_initialized = false
 		_aerial_rest_heading_initialized = false
+		# Restores camera_rig's own ordinary fixed local offset once flight/
+		# diving actually ends -- see the aerial branch's own comment on why
+		# it's reassigned to _aerial_skull_body_offset while active. Cheap
+		# and idempotent to run every non-aerial frame; only ever actually
+		# changes anything right at the moment flight/diving stops. Distinct
+		# from _apply_camera_framing()'s own camera_rig.position.y writes
+		# (monkey-scale framing), which stay untouched here.
+		camera_rig.position = Vector3(0.0, 1.6, 0.0)
 		# Leaving water is a hard transition back to gravity: do not retain the
 		# deliberately slow buoyant unwind once the body has emerged. Wing-suit
 		# removal in midair retains its own short physical recovery instead. That
@@ -4885,9 +6424,29 @@ func _update_aerial_body_anchor(delta: float) -> void:
 		# local Euler X/Z independently can make a steep flight basis decompose to
 		# the opposite Y solution and turn the character around toward the camera.
 		if _air_flight_exit_recovery <= 0.0:
-			visuals.rotation.x = 0.0
+			# BUG FIX: this branch runs every single ordinary grounded frame
+			# (nothing else in this function applies once not flying/
+			# swimming/hovering), which was silently wiping the dirt blorb
+			# suit's own wheelie lean back to 0 immediately after
+			# _apply_dirtbike_pose() (called earlier this same frame, see
+			# its own call site) had just set it -- confirmed by direct
+			# report ("when the arms are activated he does not pitch
+			# forward whatsoever"). rotation.x is the one property that
+			# function owns while riding, so it alone is excluded here.
+			# position.y gets reset to -FOOT_OFFSET here too, but harmlessly
+			# even during dirtbike riding: _update_snow_visual_sink() (called
+			# later this same frame, unconditionally) always reassigns it to
+			# the real final value regardless of whatever this line just set.
+			if not _dirtbike_wheel_active:
+				visuals.rotation.x = 0.0
+				visuals.position = Vector3(0.0, -FOOT_OFFSET, 0.0)
+			elif not _dirtbike_wheelie_active:
+				var dirtbike_rest_t:=minf(DIRTBIKE_WHEELIE_SETTLE_SPEED*delta,1.0)
+				visuals.rotation.x=lerp_angle(visuals.rotation.x,0.0,dirtbike_rest_t)
+				visuals.position=visuals.position.lerp(
+					Vector3(0.0,_dirtbike_visual_base_y,0.0),dirtbike_rest_t
+				)
 			visuals.rotation.z = 0.0
-			visuals.position = Vector3(0.0, -FOOT_OFFSET, 0.0)
 		else:
 			var t := minf(AERIAL_BODY_LEAN_SPEED * delta, 1.0)
 			var upright_basis := Basis(Vector3.UP, _air_flight_exit_yaw)
@@ -4913,14 +6472,14 @@ func _update_aerial_body_anchor(delta: float) -> void:
 ## already gentle.
 func _animate_landing(delta: float) -> void:
 	var t := LANDING_SETTLE_SPEED * delta
-	var landing_motion_scale := TEMP_MONKEY_BODY_MOTION_SCALE if _piloting_xiao_hou_zi else 1.0
+	var landing_motion_scale := 1.0
 	var landing_dip := LANDING_BODY_DIP_AMOUNT * landing_motion_scale
 	_spine.rotation.x = lerp_angle(_spine.rotation.x, LANDING_SPINE_LEAN, t)
 	_spine.position.y = lerp(_spine.position.y, _spine_rest_y - landing_dip, t)
 	# MonkeyFigure's pear body is already beneath the moving spine. Applying
 	# the landing offset to both would double its sink and detach it from the
 	# short legs, just like the earlier walk-bob issue.
-	var hips_landing_y := _hips_rest_y if _piloting_xiao_hou_zi else _hips_rest_y - landing_dip
+	var hips_landing_y := _hips_rest_y - landing_dip
 	_hips.position.y = lerp(_hips.position.y, hips_landing_y, t)
 	_leg_left.rotation.x = lerp_angle(_leg_left.rotation.x, -LANDING_HIP_BEND, t)
 	_leg_right.rotation.x = lerp_angle(_leg_right.rotation.x, -LANDING_HIP_BEND, t)
@@ -4945,6 +6504,61 @@ func _animate_landing(delta: float) -> void:
 
 const MAX_TERRAIN_FOLLOW_HEIGHT := 3.0
 
+## Generalized "has a sealed air supply" check -- currently just the Diving
+## Helmet, kept as its own function (not inlined at each call site) so a
+## future space biome's own sealed suit can extend this later without
+## touching every place breath is checked. Per direct instruction: equipping
+## the helmet while already out of breath recovers it immediately, which
+## falls out naturally here -- _update_breath() below only ever looks at
+## this function's CURRENT return value, never a cached one.
+func _has_air_supply() -> bool:
+	return _blorb_suit.has_head_diving_helmet()
+
+
+## Set every frame at the top of _update_lake_buoyancy(), before breath's own
+## check runs later that same frame.
+var _in_lava_area_now: bool = false
+
+
+## Generalized "no air here" hazard area -- currently only underwater
+## submersion. Lava is excluded entirely, in every one of its own sub-states
+## (fully suited swimming, protected surface walking, or even just standing
+## in unprotected lava) -- per direct instruction ("I don't want lava to
+## take away your breath... assume the lava helm takes care of it. You
+## shouldn't be running out of breath in lava ever"); it already has its own
+## separate heat-damage handling, so this isn't double-dipping, it's a
+## deliberate carve-out. A future space/vacuum biome would extend this the
+## same way, alongside water, not lava.
+func _in_airless_area() -> bool:
+	return _lake_buoyancy_active and not _in_lava_area_now
+
+
+## Per direct instruction: a breath meter that drains while in an airless
+## area without an air supply, refills quickly once either clears, and
+## deals periodic HP damage once it's fully empty until air is regained or
+## HP reaches zero (current_hp's own <= 0.0 check in take_damage() already
+## triggers the faint). The rounded-int gate on emitting breath_changed
+## keeps hud.gd from rebuilding its meter 60 times a second while breath is
+## merely trickling between two displayed integers.
+func _update_breath(delta: float) -> void:
+	var needs_air := _in_airless_area() and not _has_air_supply()
+	if needs_air:
+		breath = maxf(breath - BREATH_DRAIN_RATE * delta, 0.0)
+	else:
+		breath = minf(breath + BREATH_REFILL_RATE * delta, MAX_BREATH)
+	var rounded := roundi(breath)
+	if rounded != _last_emitted_breath_int:
+		_last_emitted_breath_int = rounded
+		breath_changed.emit(breath, MAX_BREATH)
+	if needs_air and breath <= 0.0:
+		_breath_damage_timer -= delta
+		if _breath_damage_timer <= 0.0:
+			_breath_damage_timer = BREATH_DAMAGE_INTERVAL
+			take_damage(BREATH_DAMAGE_AMOUNT)
+	else:
+		_breath_damage_timer = BREATH_DAMAGE_INTERVAL
+
+
 ## Lake buoyancy deliberately shares the giant's direct positional lift
 ## instead of adding a collision plane. A collision plane would make the
 ## lake behave like solid ground; this keeps the player visibly immersed and
@@ -4957,6 +6571,7 @@ func _update_lake_buoyancy(delta: float) -> void:
 	_lake_weighted_descent_active = false
 	_lava_swimming_active = false
 	_lava_surface_walk_active = false
+	_in_lava_area_now = false
 	if _giant_goo_active or terrain == null:
 		return
 	var water_pos := Vector2(global_position.x, global_position.z)
@@ -4965,6 +6580,7 @@ func _update_lake_buoyancy(delta: float) -> void:
 		and terrain.has_method("get_lava_surface_height")
 		and terrain.is_lava_area(water_pos)
 	)
+	_in_lava_area_now = in_lava_area
 	var in_lava_volume: bool = in_lava_area and _blorb_suit.has_full_lava_suit()
 	var in_water_volume: bool = terrain.has_method("is_lake_area") and terrain.is_lake_area(water_pos)
 	if not in_water_volume and not in_lava_area:
@@ -4999,10 +6615,13 @@ func _update_lake_buoyancy(delta: float) -> void:
 	# rather than pulling the player back down to the swim depth every frame.
 	if _is_on_climbable_ramp():
 		return
-	# A sealed diving head plus two Rock legs converts the seabed into an
-	# ordinary walkable floor. Becoming heavy starts a physical descent; only
-	# real contact with the seabed changes into the planar walking state.
-	if not in_lava_volume and _blorb_suit.has_head_diving_helmet() and _blorb_suit.has_rock_walking_legs():
+	# Two Rock legs convert the seabed into an ordinary walkable floor --
+	# per direct correction, no longer gated on the Diving Helmet too (see
+	# _has_air_supply()'s own doc comment: walking the bottom without the
+	# helmet still works, it just drains breath while doing it). Becoming
+	# heavy starts a physical descent; only real contact with the seabed
+	# changes into the planar walking state.
+	if not in_lava_volume and _blorb_suit.has_rock_walking_legs():
 		_jumping = false
 		_lake_buoyancy_active = true
 		var floor_target: float = floor_height + FOOT_OFFSET
@@ -5015,15 +6634,21 @@ func _update_lake_buoyancy(delta: float) -> void:
 			_lake_weighted_descent_active = true
 			velocity.y = move_toward(velocity.y, -LAKE_WEIGHTED_SINK_SPEED, LAKE_WEIGHTED_SINK_ACCELERATION * delta)
 		return
-	# A landed head blorb is a sealed, inflated diving helmet. It replaces
-	# the ordinary chest-deep buoyancy cap with free three-dimensional swim
-	# movement, bounded only by the lake floor and the same surface height
-	# an unhelmeted swimmer floats at. A worn chest air blorb gets the same
-	# treatment while actually submerged: flying must not override swimming,
-	# per direct correction. Once its climb carries the player back above
-	# the surface, this returns early and hands off to the ordinary flight
-	# controller, which can then continue straight up out of the water.
-	if _blorb_suit.has_head_diving_helmet() or in_lava_volume:
+	# Free three-dimensional dive/swim movement, bounded only by the lake
+	# floor and the same surface height an unhelmeted swimmer used to float
+	# at. Per direct correction ("no matter what the player is wearing...
+	# he can use diving physics and go underwater"), this is no longer
+	# gated on the Diving Helmet for ordinary water -- only breath (see
+	# _has_air_supply()) depends on the helmet now. Lava keeps its own
+	# original rule (only a full suit gets real immersion; see the
+	# unprotected-lava fallback below, still reached exactly when
+	# `in_lava_area and not in_lava_volume` and there's no other lava
+	# handling above). A worn chest air blorb gets the same treatment while
+	# actually submerged: flying must not override swimming, per direct
+	# correction. Once its climb carries the player back above the surface,
+	# this returns early and hands off to the ordinary flight controller,
+	# which can then continue straight up out of the water.
+	if not in_lava_area or in_lava_volume:
 		if global_position.y > water_level:
 			return
 		# Once a surface jump has launched, do not let the diving clamp erase
@@ -5038,6 +6663,14 @@ func _update_lake_buoyancy(delta: float) -> void:
 		var dive_surface := water_level - LAKE_SWIM_FOOT_DEPTH
 		global_position.y = clampf(global_position.y, dive_floor, dive_surface)
 		return
+	# Per direct instruction ("we no longer even need the mechanics of
+	# swimming at the surface of water... don't delete it entirely, just
+	# change it") -- ordinary water always resolves through the free-dive
+	# branch above now, so this plain chest-deep-only float is only ever
+	# reached for its one remaining real case: stepping into lava without a
+	# full suit and without Rock legs (Rock legs alone already return via
+	# the floor-walk branch above, full-suit lava returns via the dive
+	# branch above). Kept, not deleted, for exactly that case.
 	var swim_y := water_level - LAKE_SWIM_FOOT_DEPTH
 	# Let a jump break the surface normally, but catch the player again as
 	# soon as their descending feet re-enter the water. Without clearing this
@@ -5065,6 +6698,413 @@ func _update_air_flight() -> void:
 			var ground_height: float = terrain.get_mesh_height(global_position.x, global_position.z)
 			global_position.y = maxf(global_position.y, ground_height + FOOT_OFFSET + AIR_FLIGHT_HOVER_HEIGHT)
 	_was_air_flight_active = _air_flight_active
+
+
+## Dirt blorb suit gate + wheel visuals. Purely reads suit/input state and
+## drives the two wheel props here -- the actual movement consequences (no
+## uphill slope limit) live in _try_step_up()/_snap_to_terrain(), and the
+## leg/body pose lives in _apply_dirtbike_pose(), both of which just read
+## the two bools this sets.
+func _update_dirtbike_state(delta: float) -> void:
+	_dirtbike_wheel_active = _blorb_suit.has_dirtbike_legs()
+	floor_max_angle = DIRTBIKE_FLOOR_MAX_ANGLE if _dirtbike_wheel_active else _dirtbike_default_floor_max_angle
+
+	# Per direct correction ("if paused during arm wheels, unpausing holding
+	# something should bring out of arm wheels") -- edge-detects the modal
+	# (pause/menu) closing, same idiom as _dirtbike_wheelie_chord_was_pressed/
+	# _was_air_flight_active elsewhere in this file. A player can open a
+	# menu while the wheelie is toggled on and pick up/equip a held item
+	# from it; nothing else re-checks that combination once they close the
+	# menu, so this is the one place that has to.
+	if _was_modal_open and not UIState.modal_open and not HeldItem.current.is_empty():
+		_dirtbike_wheelie_toggled_on = false
+	_was_modal_open = UIState.modal_open
+
+	# Per direct correction, a TOGGLE now: the chord (both arm-power buttons
+	# together) flips _dirtbike_wheelie_toggled_on on the frame it first
+	# forms, not "active for as long as both stay held" any more -- see that
+	# field's own doc comment. Per a further direct correction ("if holding
+	# an object, which disables blorb powers, it should prevent from going
+	# into arm wheels") -- HeldItem.current.is_empty() is this project's own
+	# established "is the player holding anything" check (see
+	# _held_item_is_weapon()'s and _update_throw_input()'s own use of it);
+	# folded into chord_pressed itself so holding something doesn't just
+	# fail to fire the toggle, it can't even register as forming the chord.
+	var has_arms := _blorb_suit.has_dirtbike_arms()
+	var chord_pressed := (
+		not UIState.modal_open
+		and HeldItem.current.is_empty()
+		and Input.is_action_pressed("left_arm_power")
+		and Input.is_action_pressed("right_arm_power")
+	)
+	var chord_just_formed := chord_pressed and not _dirtbike_wheelie_chord_was_pressed
+	_dirtbike_wheelie_chord_was_pressed = chord_pressed
+	if not _dirtbike_wheel_active or not has_arms:
+		_dirtbike_wheelie_toggled_on = false
+		_dirtbike_supported_pitch = 0.0
+	elif chord_just_formed:
+		_dirtbike_wheelie_toggled_on = not _dirtbike_wheelie_toggled_on
+	_dirtbike_wheelie_active = _dirtbike_wheelie_toggled_on
+	if not _dirtbike_wheelie_active:
+		_dirtbike_supported_pitch = 0.0
+		_dirtbike_pitch_was_grounded = false
+
+	# Only lifecycle (build/free) here, deliberately not positioning -- this
+	# runs early in _physics_process (alongside _update_air_flight()), before
+	# _animate_walk()/_apply_dirtbike_pose() have posed this frame's ankle/
+	# wrist pivots (or _update_snow_visual_sink()'s own visuals lift) yet.
+	# Positioning happens at the very end of _physics_process instead (see
+	# _update_dirtbike_wheels(), called last), so the wheel reads this
+	# frame's fully-resolved pose rather than last frame's.
+	if _dirtbike_wheel_active:
+		if _dirtbike_rear_wheel == null:
+			_dirtbike_rear_wheel = _build_dirtbike_wheel()
+	elif _dirtbike_rear_wheel != null:
+		_dirtbike_rear_wheel.queue_free()
+		_dirtbike_rear_wheel = null
+
+	if _dirtbike_wheelie_active:
+		if _dirtbike_front_wheel == null:
+			_dirtbike_front_wheel = _build_dirtbike_wheel()
+	elif _dirtbike_front_wheel != null:
+		_dirtbike_front_wheel.queue_free()
+		_dirtbike_front_wheel = null
+
+
+## A simultaneous Snow-leg chord toggles the board as equipment state, not as
+## a ground-contact state. It can be deployed/retracted during a jump and
+## remains deployed through falls, landings, and temporary travel over a
+## non-snow surface. Only another chord or losing the required Snow legs may
+## remove it; terrain decides where it glides, never whether it exists.
+func _update_snowboard_state() -> void:
+	var has_legs:=_blorb_suit.has_snowboard_legs()
+	var chord_pressed:=(
+		has_legs
+		and not UIState.modal_open
+		and HeldItem.current.is_empty()
+		and Input.is_action_pressed("left_leg_power")
+		and Input.is_action_pressed("right_leg_power")
+	)
+	var chord_just_formed:=chord_pressed and not _snowboard_chord_was_pressed
+	_snowboard_chord_was_pressed=chord_pressed
+	var supported:=_is_snowboard_surface()
+	if not has_legs:
+		_snowboard_toggled_on=false
+	elif chord_just_formed:
+		_snowboard_toggled_on=not _snowboard_toggled_on
+	var was_active:=_snowboard_active
+	_snowboard_active=_snowboard_toggled_on and has_legs
+	if _snowboard_active:
+		floor_max_angle=DIRTBIKE_FLOOR_MAX_ANGLE
+		if not was_active:
+			# Midair deployment must not sample a distant mountain surface and
+			# snap the new deck toward it. It begins neutral and the ballistic
+			# visual pass aligns it with live travel until a real landing.
+			_snowboard_smoothed_up=_snowboard_surface_up() if supported else Vector3.UP
+	if was_active and not _snowboard_active:
+		# Board momentum belongs to this particular ride, not to the player or
+		# the next board instance. Unequipping must therefore end the ride
+		# completely instead of preserving a stale glide for the next toggle.
+		velocity.x=0.0
+		velocity.z=0.0
+		var heading:=_snowboard_last_heading
+		if heading.length_squared()>0.001:
+			visuals.rotation.y=atan2(heading.x,heading.z)
+		_snowboard_smoothed_up=Vector3.UP
+		_snowboard_smoothed_rider_grade=0.0
+	if _snowboard_active:
+		if _snowboard==null:
+			_snowboard=_build_snowboard()
+	elif _snowboard!=null:
+		_snowboard.queue_free()
+		_snowboard=null
+
+
+## A complete pair of Ice legs automatically forms runners. There is no
+## button chord: both leg buttons remain available for their ordinary ice-
+## platform powers, and only real ice grants the skating movement below.
+func _update_ice_skate_state() -> void:
+	var has_legs: bool=_blorb_suit.has_ice_skate_legs()
+	var was_active: bool=_ice_skates_active
+	_ice_skates_active=has_legs
+	var supported: bool=_ice_skates_active and _is_supported_by_ice()
+	if _ice_skate_airborne and is_on_floor() and not _jumping:
+		_ice_skate_airborne=false
+	_ice_skating_active=supported and not _ice_skate_airborne
+	if was_active and not _ice_skates_active:
+		# Retraction ends this ride. Old skating momentum must never survive a
+		# direction change and reappear when a new pair of blades is extended.
+		velocity.x=0.0
+		velocity.z=0.0
+		_ice_skate_stride_phase=0.0
+		_ice_skate_previous_speed=0.0
+		_ice_skate_smoothed_acceleration=0.0
+		_ice_skate_airborne=false
+		_ice_skate_was_supported=false
+		_ice_skate_surface_velocity=Vector3.ZERO
+	_set_ice_skate_visuals_present()
+
+
+func _set_ice_skate_visuals_present() -> void:
+	if _ice_skates_active:
+		if not is_instance_valid(_ice_skate_left):
+			_ice_skate_left=build_ice_skate_blade(_toe_left,"LeftIceSkate")
+		if not is_instance_valid(_ice_skate_right):
+			_ice_skate_right=build_ice_skate_blade(_toe_right,"RightIceSkate")
+		return
+	if is_instance_valid(_ice_skate_left):
+		_ice_skate_left.queue_free()
+	if is_instance_valid(_ice_skate_right):
+		_ice_skate_right.queue_free()
+	_ice_skate_left=null
+	_ice_skate_right=null
+
+
+## A narrow continuous runner with two short mounts. The toe marker carries
+## every ankle/foot motion, but the attachment depth comes from the worn
+## blorb boot surrounding that hidden human shoe. Its mounts therefore begin
+## at the visible blorb underside, with the runner below that surface.
+static func build_ice_skate_blade(
+	toe: Node3D,blade_name: String,scale_factor: float=1.0,sole_offset: float=-1.0
+) -> Node3D:
+	var root:=Node3D.new()
+	root.name=blade_name
+	toe.add_child(root)
+	var resolved_sole_offset: float=(
+		BlorbSuit.worn_boot_sole_depth(scale_factor)
+		if sole_offset<0.0 else sole_offset
+	)
+	var sole_y: float=-resolved_sole_offset
+	var support_height: float=ICE_SKATE_SUPPORT_HEIGHT*scale_factor
+	var runner_half_height: float=ICE_SKATE_RUNNER_HALF_HEIGHT*scale_factor
+	var runner_y: float=sole_y-support_height-runner_half_height
+	var runner:=SuperEgg.build_part(
+		Vector3(
+			ICE_SKATE_RUNNER_HALF_WIDTH*scale_factor,runner_half_height,
+			ICE_SKATE_RUNNER_HALF_LENGTH*scale_factor
+		),
+		ICE_SKATE_COLOR,4.8,4.8
+	)
+	runner.position=Vector3(0.0,runner_y,-ProceduralFigure.FOOT_SIZE.z*scale_factor)
+	root.add_child(runner)
+	for unscaled_z: float in [-0.055,-0.205]:
+		var mount:=SuperEgg.build_part(
+			Vector3(0.032*scale_factor,support_height*0.5,0.028*scale_factor),
+			ICE_SKATE_COLOR,3.8,3.8
+		)
+		mount.position=Vector3(0.0,sole_y-support_height*0.5,unscaled_z*scale_factor)
+		root.add_child(mount)
+	return root
+
+
+static func ice_skate_visual_lift(scale_factor: float=1.0) -> float:
+	var human_sole_depth: float=(ProceduralFigure.FOOT_SIZE.y+ProceduralFigure.JOINT_OVERLAP*0.5)*scale_factor
+	var blorb_sole_depth: float=BlorbSuit.worn_boot_sole_depth(scale_factor)
+	return ICE_SKATE_TOTAL_HEIGHT*scale_factor+maxf(blorb_sole_depth-human_sole_depth,0.0)
+
+
+func _is_snowboard_surface() -> bool:
+	if terrain==null:
+		return false
+	var xz:=Vector2(global_position.x,global_position.z)
+	if terrain.has_method("is_ice_surface") and terrain.is_ice_surface(xz):
+		return _is_supported_by_ice()
+	return (
+		terrain.has_method("is_snow_footstep_surface")
+		and terrain.is_snow_footstep_surface(xz)
+		and _is_aligned_with_terrain()
+	)
+
+
+func _build_snowboard() -> Node3D:
+	var root:=Node3D.new()
+	root.name="Snowboard"
+	visuals.add_child(root)
+	# One continuous manifold deck. Rounded SuperEgg ends give it a soft
+	# nose/tail without the visible seams of separately attached tip pieces.
+	var deck:=SuperEgg.build_part(
+		Vector3(SNOWBOARD_LENGTH*0.5,SNOWBOARD_THICKNESS,SNOWBOARD_WIDTH),
+		SNOWBOARD_COLOR,3.2,3.2
+	)
+	deck.name="ContinuousDeck"
+	root.add_child(deck)
+	return root
+
+
+func _update_snowboard_visual() -> void:
+	if _snowboard==null or not is_instance_valid(_ankle_left) or not is_instance_valid(_ankle_right):
+		return
+	var planar:=Vector3(velocity.x,0.0,velocity.z)
+	if planar.length_squared()>0.01:
+		_snowboard_last_heading=planar.normalized()
+	var supported:=_is_snowboard_surface()
+	var up:=_snowboard_smoothed_up
+	var forward:=_snowboard_last_heading.normalized()
+	# Once airborne, the deck follows the actual ballistic trajectory. Gravity
+	# changes velocity continuously, so its pitch naturally arcs down without
+	# a terrain-normal snap at the lip or while landing.
+	if not supported and velocity.length_squared()>0.01:
+		forward=velocity.normalized()
+	forward=(forward-up*forward.dot(up)).normalized() if supported else forward
+	if forward.length_squared()<0.001:
+		forward=Vector3.FORWARD
+	var across:=forward.cross(up).normalized()
+	if across.length_squared()<0.001:
+		across=forward.cross(Vector3.UP if absf(forward.dot(Vector3.UP))<0.95 else Vector3.RIGHT).normalized()
+	up=across.cross(forward).normalized()
+	_snowboard.global_transform.basis=Basis(forward,up,across)
+	var ankle_mid:=(_ankle_left.global_position+_ankle_right.global_position)*0.5
+	_snowboard.global_position=ankle_mid-up*0.12
+
+
+func _face_snowboard_heading(delta: float) -> void:
+	if not _snowboard_active:
+		return
+	var planar:=Vector3(velocity.x,0.0,velocity.z)
+	if planar.length_squared()<=0.01:
+		return
+	_snowboard_last_heading=planar.normalized()
+	var target_yaw:=atan2(_snowboard_last_heading.x,_snowboard_last_heading.z)+SNOWBOARD_BODY_SIDE_ANGLE
+	visuals.rotation.y=lerp_angle(visuals.rotation.y,target_yaw,rotation_speed*delta)
+
+
+## The board and rider deliberately have separate pitch owners. Nose and tail
+## contacts establish the full deck grade; ankles/knees absorb the first part
+## of that grade, and only the excess beyond their stance tolerance pitches
+## the complete body. This is the same physical idea as a bike whose free end
+## continues rotating around its supported contact, without making a rider
+## rigidly copy every small terrain facet.
+func _apply_snowboard_surface_orientation(delta: float,grounded: bool) -> void:
+	if not _snowboard_active:
+		return
+	var supported:=grounded and _is_snowboard_surface()
+	if supported:
+		var target_up:=_snowboard_surface_up()
+		var speed_ratio:=clampf(Vector2(velocity.x,velocity.z).length()/SNOWBOARD_TERMINAL_SPEED,0.0,1.0)
+		var response:=lerpf(SNOWBOARD_PITCH_RESPONSE_SLOW,SNOWBOARD_PITCH_RESPONSE_FAST,speed_ratio)
+		var damping:=1.0-exp(-response*delta)
+		_snowboard_smoothed_up=_snowboard_smoothed_up.slerp(target_up,damping).normalized()
+	var planar_forward:=Vector3(_snowboard_last_heading.x,0.0,_snowboard_last_heading.z)
+	if planar_forward.length_squared()<0.001:
+		return
+	planar_forward=planar_forward.normalized()
+	var deck_forward:=planar_forward-_snowboard_smoothed_up*planar_forward.dot(_snowboard_smoothed_up)
+	if deck_forward.length_squared()<0.001:
+		deck_forward=planar_forward
+	deck_forward=deck_forward.normalized()
+	var deck_grade:=asin(clampf(deck_forward.y,-1.0,1.0))
+	var rider_grade:=signf(deck_grade)*maxf(absf(deck_grade)-SNOWBOARD_RIDER_PITCH_THRESHOLD,0.0)
+	if not supported and velocity.length_squared()>0.01:
+		# Once launched, retain the attitude reached at the lip. Ballistic
+		# velocity owns the deck arc; it must not instantly fold the rider.
+		rider_grade=_snowboard_smoothed_rider_grade
+	var rider_damping:=1.0-exp(-SNOWBOARD_RIDER_PITCH_RESPONSE*delta)
+	_snowboard_smoothed_rider_grade=lerp_angle(
+		_snowboard_smoothed_rider_grade,rider_grade,rider_damping
+	)
+	var local_x:=Vector3(
+		planar_forward.x*cos(_snowboard_smoothed_rider_grade),
+		sin(_snowboard_smoothed_rider_grade),
+		planar_forward.z*cos(_snowboard_smoothed_rider_grade)
+	).normalized()
+	var local_z:=local_x.cross(Vector3.UP).normalized()
+	if local_z.length_squared()<0.001:
+		return
+	var up:=local_z.cross(local_x).normalized()
+	var target_basis:=Basis(local_x,up,local_z).orthonormalized()
+	var foot_anchor:=(_ankle_left.global_position+_ankle_right.global_position)*0.5
+	var transform:=visuals.global_transform
+	transform.basis=Basis(transform.basis.get_rotation_quaternion().slerp(
+		target_basis.get_rotation_quaternion(),minf(SNOWBOARD_POSE_SETTLE_SPEED*delta,1.0)
+	))
+	visuals.global_transform=transform
+	var posed_foot_anchor:=(_ankle_left.global_position+_ankle_right.global_position)*0.5
+	visuals.global_position+=foot_anchor-posed_foot_anchor
+
+
+## Measure the grade beneath the nose and tail rather than copying a single
+## terrain triangle's complete normal. This filters small facets and produces
+## the pitch a long board actually spans, while deliberately leaving the
+## neutral stance flat across its toe/heel axis; edging belongs to a future
+## intentional carve pose, not incidental cross-slope terrain noise.
+func _snowboard_surface_up() -> Vector3:
+	if terrain==null or not terrain.has_method("get_mesh_height") or _is_supported_by_ice():
+		return Vector3.UP
+	var heading:=Vector2(_snowboard_last_heading.x,_snowboard_last_heading.z).normalized()
+	if heading.length_squared()<0.001:
+		heading=Vector2(0.0,1.0)
+	var offset:=heading*SNOWBOARD_NORMAL_SAMPLE_DISTANCE
+	var nose_height: float=terrain.get_mesh_height(global_position.x+offset.x,global_position.z+offset.y)
+	var tail_height: float=terrain.get_mesh_height(global_position.x-offset.x,global_position.z-offset.y)
+	var longitudinal:=Vector3(offset.x*2.0,nose_height-tail_height,offset.y*2.0).normalized()
+	var across:=longitudinal.cross(Vector3.UP).normalized()
+	if across.length_squared()<0.001:
+		return Vector3.UP
+	var up:=across.cross(longitudinal).normalized()
+	return up if up.y>=0.0 else -up
+
+
+## A solid disk, not a torus -- see DIRTBIKE_WHEEL_RADIUS's own comment for
+## why (a torus this file built by hand had its normals flipped; a plain
+## SuperEgg part sidesteps that bug entirely by reusing the same builder
+## every other prop in the project already trusts).
+func _build_dirtbike_wheel() -> MeshInstance3D:
+	var semi_axes := Vector3(DIRTBIKE_WHEEL_RADIUS, DIRTBIKE_WHEEL_THICKNESS * 0.5, DIRTBIKE_WHEEL_RADIUS)
+	var wheel := SuperEgg.build_part(semi_axes, DIRTBIKE_WHEEL_COLOR, 2.0, 2.0)
+	wheel.name = "DirtbikeWheel"
+	visuals.add_child(wheel)
+	return wheel
+
+
+## Positions/orients a dirtbike wheel prop so its axle sits exactly at the
+## midpoint of `pivot_a`/`pivot_b` (the two ankles for the rear wheel, the
+## two wrists for the front -- per direct correction, "the feet axis should
+## be at the ankles"/"the arm axis should be at the wrists") -- no terrain
+## sampling at all, deliberately: per direct correction ("the wheels must
+## stay with the player's body when airborne, not snap to the ground"), a
+## terrain-height-derived position (this function's own first draft) kept
+## pinning the wheel to the ground even mid-launch, which is exactly wrong
+## once the wheel leaves the ground. Reading the pivot's own live position
+## instead means the wheel simply goes wherever the rig already is, grounded
+## or airborne, with zero extra logic needed for either case. The visible
+## "rests on the ground" result for the REAR wheel instead comes from
+## _update_snow_visual_sink()'s own visuals lift (see DIRTBIKE_WHEEL_
+## RADIUS's own comment): once the ankles sit one radius above the ordinary
+## foot height, an axle centered exactly on them puts the wheel's own rim
+## right back at that ordinary ground contact point. The mesh's own build
+## (a SuperEgg oblate spheroid, X/Z semi-axes equal) is fully rotationally
+## symmetric about its own local Y, so any orthonormal basis with column
+## Y = axle_dir renders identically -- no winding/sign ambiguity to flag
+## here the way a non-symmetric bent-pipe shape would need.
+func _position_dirtbike_wheel(wheel: MeshInstance3D, pivot_a: Node3D, pivot_b: Node3D, delta: float) -> void:
+	if not is_instance_valid(pivot_a) or not is_instance_valid(pivot_b):
+		return
+	var a := pivot_a.global_position
+	var b := pivot_b.global_position
+	var mid := (a + b) * 0.5
+	var axle_dir := (b - a)
+	axle_dir = axle_dir.normalized() if axle_dir.length() > 0.001 else global_transform.basis.x
+	var seed := Vector3.FORWARD if absf(axle_dir.dot(Vector3.FORWARD)) < 0.9 else Vector3.UP
+	var x_axis := seed.cross(axle_dir).normalized()
+	var z_axis := axle_dir.cross(x_axis).normalized()
+	wheel.global_position = mid
+	wheel.global_transform.basis = Basis(x_axis, axle_dir, z_axis)
+	# Rolls the wheel visually as the character actually moves, rather than
+	# a spin rate tied to an animation phase -- ground speed is exactly
+	# "how far the tire's own circumference has to have rolled" regardless
+	# of which movement mode produced it.
+	var roll_speed := Vector2(velocity.x, velocity.z).length() / maxf(DIRTBIKE_WHEEL_RADIUS, 0.01)
+	wheel.rotate_object_local(Vector3.UP, roll_speed * delta)
+
+
+## Called last in _physics_process (see that function's own final lines),
+## after every pose/pitch/visuals-lift pass this frame has already run --
+## see _position_dirtbike_wheel()'s own comment for why the timing matters.
+func _update_dirtbike_wheels(delta: float) -> void:
+	if _dirtbike_rear_wheel != null:
+		_position_dirtbike_wheel(_dirtbike_rear_wheel, _ankle_left, _ankle_right, delta)
+	if _dirtbike_front_wheel != null:
+		_position_dirtbike_wheel(_dirtbike_front_wheel, _wrist_left, _wrist_right, delta)
 
 
 func _update_suit_flight_transition() -> void:
@@ -5197,15 +7237,12 @@ func _is_on_giant_mesh_surface() -> bool:
 # jump has *landed* cleared _jumping at the apex, letting the very next
 # physics frame's snap teleport the character straight down instead of
 # actually falling. This one only turns true once genuinely near the ground.
-const LANDING_HEIGHT_THRESHOLD := 0.3
+const LANDING_HEIGHT_THRESHOLD := 0.10
 
 
 func _is_near_ground() -> bool:
 	var h: float = terrain.get_mesh_height(global_position.x, global_position.z)
-	var threshold := (
-		LANDING_HEIGHT_THRESHOLD * TEMP_MONKEY_HEIGHT_RATIO
-		if _piloting_xiao_hou_zi else LANDING_HEIGHT_THRESHOLD
-	)
+	var threshold := LANDING_HEIGHT_THRESHOLD
 	return (global_position.y - FOOT_OFFSET) - h < threshold
 
 
@@ -5225,6 +7262,11 @@ func _is_touching_terrain() -> bool:
 	# when it was needed. A height-threshold check has no such gap.
 	var h: float = terrain.get_mesh_height(global_position.x, global_position.z)
 	return (global_position.y - FOOT_OFFSET) - h < MAX_TERRAIN_FOLLOW_HEIGHT
+
+
+func _is_aligned_with_terrain() -> bool:
+	var height: float = terrain.get_mesh_height(global_position.x,global_position.z)
+	return absf((global_position.y-FOOT_OFFSET)-height) <= STEP_CORRECT_MAX_DRIFT
 
 
 ## How far the current position is allowed to already be from the analytic
@@ -5280,7 +7322,12 @@ func _try_step_up() -> void:
 	var rise := ahead_h - current_h
 	if rise <= 0.02:
 		return
-	if rise / STEP_LOOKAHEAD > GROUND_SNAP_MAX_SLOPE:
+	# Dirt blorb suit's rear wheel skips the slope gate entirely here -- this
+	# whole function only ever handles a RISE (see the guard just above), so
+	# there is no separate ascending/descending split to make the way
+	# _snap_to_terrain() below needs one. See DIRTBIKE_FLOOR_MAX_ANGLE's own
+	# comment for the other half of "no constraints traveling up."
+	if rise / STEP_LOOKAHEAD > GROUND_SNAP_MAX_SLOPE and not _dirtbike_wheel_active:
 		return
 	global_position.y += rise
 
@@ -5310,16 +7357,27 @@ const PROP_STEP_PROBE_CLEARANCE := 0.3
 ## the player's XZ, only pre-lifts Y (same trick _try_step_up() itself
 ## uses) so move_and_slide() right after resolves the move as walking
 ## onto a floor instead of bumping into the slab's side.
-func _try_step_onto_prop() -> void:
+func _try_step_onto_prop(delta: float) -> void:
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
 	if horizontal.length() < 0.1:
 		return
 	var move_dir := horizontal.normalized()
 	var foot_y := global_position.y - FOOT_OFFSET
-	var probe := global_position + move_dir * STEP_LOOKAHEAD
+	# A wheel discovers a ledge with its leading arc rather than waiting for
+	# the humanoid capsule to touch the wall. It can negotiate a vertical rise
+	# somewhat below its diameter; taller faces remain genuine obstacles.
+	var probe_distance: float = (
+		maxf(STEP_LOOKAHEAD,DIRTBIKE_WHEEL_RADIUS*1.35)
+		if _dirtbike_wheel_active else STEP_LOOKAHEAD
+	)
+	var max_step_height: float = (
+		DIRTBIKE_WHEEL_RADIUS*1.85
+		if _dirtbike_wheel_active else PROP_STEP_MAX_HEIGHT
+	)
+	var probe := global_position + move_dir * probe_distance
 
 	var space_state := get_world_3d().direct_space_state
-	var from := Vector3(probe.x, foot_y + PROP_STEP_MAX_HEIGHT + PROP_STEP_PROBE_CLEARANCE, probe.z)
+	var from := Vector3(probe.x, foot_y + max_step_height + PROP_STEP_PROBE_CLEARANCE, probe.z)
 	var to := Vector3(probe.x, foot_y, probe.z)
 	var query := PhysicsRayQueryParameters3D.create(from, to)
 	query.exclude = [self]
@@ -5335,22 +7393,94 @@ func _try_step_onto_prop() -> void:
 	# for the same pitfall already hit twice this session).
 	var hit_y: float = result.position.y
 	var rise := hit_y - foot_y
-	if rise <= 0.02 or rise > PROP_STEP_MAX_HEIGHT:
+	if rise <= 0.02 or rise > max_step_height:
 		return
-	global_position.y += rise
+	if _dirtbike_wheel_active:
+		# Resolve the rise progressively from actual wheel travel. This gives a
+		# rounded roll-up instead of the ordinary humanoid's one-frame step snap,
+		# while pre-lifting enough for move_and_slide() to clear the slab face.
+		var climb_step: float = maxf(horizontal.length()*delta*1.4,0.055)
+		global_position.y += minf(rise,climb_step)
+	else:
+		global_position.y += rise
 	velocity.y = 0.0
 
 
-func _snap_to_terrain(delta: float) -> void:
+func _snap_to_terrain(delta: float,pre_move_position: Vector3) -> void:
 	if not _is_touching_terrain():
 		return
 	var target_h: float = terrain.get_mesh_height(global_position.x, global_position.z)
 	var rise: float = target_h - (global_position.y - FOOT_OFFSET)
 	var run := maxf(Vector2(velocity.x, velocity.z).length() * delta, 0.001)
+
+	if _dirtbike_wheel_active or _snowboard_active:
+		var horizontal_velocity := Vector2(velocity.x,velocity.z)
+		var travel_slope: float = _dirtbike_slope_along(horizontal_velocity)
+		# Resolve onto support, then measure the complete motion that actually
+		# occurred this frame. In particular, Y is real delta-position/delta-time.
+		if travel_slope > DIRTBIKE_ASCEND_TRACK_THRESHOLD:
+			_dirtbike_was_climbing = true
+			global_position.y = target_h + FOOT_OFFSET
+			_dirtbike_surface_velocity = HumanoidLocomotion.resolved_velocity(
+				pre_move_position,global_position,delta
+			)
+			velocity.y = _dirtbike_surface_velocity.y
+			return
+		# Once the support slope falls away, preserve both the horizontal
+		# velocity and the full vertical tangent velocity. Marking this as a
+		# genuine jump arc also prevents ground grace from re-snapping the body
+		# during the first airborne frames.
+		if _dirtbike_was_climbing:
+			_dirtbike_was_climbing = false
+			velocity = _dirtbike_surface_velocity
+			velocity.y *= sqrt(DIRTBIKE_JUMP_HEIGHT_MULTIPLIER)
+			_jump_takeoff_speed = absf(velocity.y)
+			_jumping = true
+			return
+		_dirtbike_was_climbing = false
+		# Level or rising support that is not a tracked climb remains attached.
+		if rise >= 0.0:
+			global_position.y = target_h + FOOT_OFFSET
+			velocity.y = 0.0
+			return
+		# Per direct correction ("even when cresting smaller hills at speed
+		# he should still get airtime according to the laws of physics --
+		# his downward translation should never exceed the speed his body
+		# would be falling from gravity") -- every frame from here on is a
+		# REAL gravity-integrated fall, compared directly against the actual
+		# terrain height, rather than a fixed slope-ratio threshold or a
+		# one-shot hang-time timer (both tried and replaced). A slope gentle
+		# enough for gravity's own fall rate to keep pace with reads as
+		# smoothly hugging the downhill, since the predicted fall lands AT
+		# or past the terrain almost every frame; a drop steeper than
+		# gravity can match falls behind it, producing real air that scales
+		# with exactly how much the terrain outpaces gravity -- which
+		# naturally scales to any hill size, small or large, with no
+		# separate constant to tune for either case.
+		velocity.y = HumanoidLocomotion.apply_gravity(velocity.y, delta, _playable_profile, TERMINAL_FALL_SPEED)
+		var predicted_h := (global_position.y - FOOT_OFFSET) + velocity.y * delta
+		if predicted_h > target_h:
+			global_position.y = predicted_h + FOOT_OFFSET
+			return
+		global_position.y = target_h + FOOT_OFFSET
+		velocity.y = 0.0
+		return
+
 	if absf(rise) / run > GROUND_SNAP_MAX_SLOPE:
 		return
 	global_position.y = target_h + FOOT_OFFSET
 	velocity.y = 0.0
+
+
+## A cloud/canopy catch is a real landing even though these intentionally
+## one-way analytic surfaces have no physics collider to set is_on_floor().
+## Keep every bit of landing state transition in one place so no caller can
+## anchor the body while accidentally leaving it in a permanent jump state.
+func _complete_one_way_support_landing(root_height: float) -> void:
+	global_position.y = root_height
+	velocity.y = 0.0
+	_jumping = false
+	_giant_surface_jump_in_progress = false
 
 
 ## Same active re-anchoring _snap_to_terrain() does against the analytic

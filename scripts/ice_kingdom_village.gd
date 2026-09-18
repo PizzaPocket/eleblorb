@@ -1,7 +1,7 @@
 extends Node3D
 
 const NPC_SCENE := preload("res://scenes/npc.tscn")
-const ROOF_SNOW := Color(0.96, 0.98, 1.0)
+const ROOF_SNOW := ElementPalette.SNOW_BODY
 const ROOF_STRUCTURE := Color(0.24, 0.18, 0.15)
 const WALL_COLORS: Array[Color] = [Color(0.48,0.32,0.2), Color(0.58,0.42,0.28), Color(0.42,0.31,0.25)]
 const WINTER_APPEARANCE := {
@@ -67,13 +67,24 @@ const IDENTITIES := [
 
 var _terrain: Node
 var _rng := RandomNumberGenerator.new()
+## Dedicated to ChimneySmoke's own ongoing per-frame recycling (see
+## _process() below) -- kept separate from _rng so an unrelated future draw
+## against _rng during setup can't shift the smoke plumes' random sequence,
+## or vice versa.
+var _smoke_rng := RandomNumberGenerator.new()
+var _smoke_puffs: Array[ChimneySmoke.Puff] = []
 
 
 func _ready() -> void:
 	_terrain = get_node("../Terrain")
 	_rng.seed = 20260911
+	_smoke_rng.seed = 5591
 	_build_village()
 	_build_fishing_camp()
+
+
+func _process(delta: float) -> void:
+	ChimneySmoke.animate(_smoke_puffs, delta, _smoke_rng)
 
 
 func _build_village() -> void:
@@ -81,14 +92,60 @@ func _build_village() -> void:
 	var offsets: Array[Vector2] = [Vector2(-28,-18),Vector2(0,-25),Vector2(28,-15),Vector2(-31,13),Vector2(2,18),Vector2(31,15),Vector2(-5,40)]
 	for i in offsets.size():
 		var p: Vector2 = center + offsets[i]
-		var house := TownProps.build_building(2,2,1,ROOF_STRUCTURE,WALL_COLORS[i%WALL_COLORS.size()],WALL_COLORS[(i+1)%WALL_COLORS.size()])
+		# Per direct correction ("the walls of the houses to be made out of
+		# what looks like logs so they're more like log cabins") and ("put a
+		# bed in pretty much everyone's home").
+		var house := TownProps.build_building(2,2,1,ROOF_STRUCTURE,WALL_COLORS[i%WALL_COLORS.size()],WALL_COLORS[(i+1)%WALL_COLORS.size()],TownProps.FLOOR_COLOR,Color(-1.0,-1.0,-1.0),"log",true)
 		_add_roof_snow_cap(house, 2, 2, 1)
+		_build_fireplace(house, 2, 2)
 		house.position = Vector3(p.x,_terrain.get_mesh_height(p.x,p.y),p.y)
 		# TownProps puts its doorway on local -Z. Rotate that axis toward the
 		# village centre (not local +Z, which was the recurring inversion).
 		house.rotation.y = atan2(offsets[i].x, offsets[i].y)
 		add_child(house)
 		_spawn_villager(center + offsets[i]*0.62, i)
+	var inn_pos := center + Vector2(13.0, 39.0)
+	VillageInn.create(self, _terrain, Vector3(inn_pos.x, _terrain.get_mesh_height(inn_pos.x, inn_pos.y), inn_pos.y), "ice_kingdom", "snow_village_inn", 20, "Astrid Snowrest", ROOF_STRUCTURE, WALL_COLORS[0], WINTER_APPEARANCE)
+	_build_winter_merchant(center)
+
+
+## A small winter-goods stall makes the Toboggan a normal piece of this
+## village's economy rather than a debug-only object. Its displayed hat is
+## built from the exact same catalog geometry used in hand and inventory.
+func _build_winter_merchant(center: Vector2) -> void:
+	var offset:=Vector2(42.0,-34.0)
+	var position_2d:=center+offset
+	var yaw:=atan2(offset.x,offset.y)
+	var stall_data:=TownProps.build_stall(Color(0.31,0.38,0.58))
+	var stall:=stall_data["body"] as StaticBody3D
+	stall.name="WinterGoodsStall"
+	stall.position=Vector3(position_2d.x,_terrain.get_mesh_height(position_2d.x,position_2d.y),position_2d.y)
+	stall.rotation.y=yaw
+	add_child(stall)
+	# Catalog item scale is already authored as a handheld/wearable object.
+	# The former 1.5 multiplier made the counter model substantially larger
+	# than the same form after a blorb absorbed and wore it.
+	var display:=TobogganHelm.build_visual(1.0)
+	display.name="DisplayToboggan"
+	display.position=Vector3(0.0,float(stall_data["counter_y"])+0.08,0.0)
+	stall.add_child(display)
+	var vendor: Node3D=NPC_SCENE.instantiate()
+	vendor.set_terrain_reference(_terrain)
+	vendor.stationary=true
+	vendor.is_vendor=true
+	vendor.display_name="Solveig Woolcap"
+	vendor.shop_category="snow"
+	var lines: Array[String]=[
+		"A warm crown makes the mountain wind feel almost friendly.",
+		"I knit the cuff thick. Winter always finds the thin places.",
+	]
+	vendor.vendor_lines=lines
+	VillagerAppearance.apply_profile(vendor,IDENTITIES.size()+1,4,true,WINTER_APPEARANCE)
+	var layout:=TownProps.vendor_layout(position_2d,yaw)
+	var vendor_position:=layout["position"] as Vector2
+	vendor.position=Vector3(vendor_position.x,_terrain.get_mesh_height(vendor_position.x,vendor_position.y),vendor_position.y)
+	vendor.facing_degrees=layout["facing_degrees"] as float
+	add_child(vendor)
 
 
 func _spawn_villager(pos: Vector2, index: int) -> void:
@@ -132,7 +189,10 @@ func _build_fishing_camp() -> void:
 	add_child(fisher)
 	# The target sits below the ice opening. NPC owns the articulated rod and
 	# computes its line from the live rod tip every frame.
-	fisher.equip_fishing_rod(Vector3(hole.x, ice_y - 1.1, hole.y))
+	# The rod/line are world-space geometry parented to current_scene. During
+	# this village's _ready(), that root is still constructing its children;
+	# defer the gear creation one frame so the three add_child calls are legal.
+	fisher.call_deferred("equip_fishing_rod",Vector3(hole.x,ice_y-1.1,hole.y))
 
 
 func _gender_index_through(population_index: int, female: bool) -> int:
@@ -141,6 +201,147 @@ func _gender_index_through(population_index: int, female: bool) -> int:
 		if bool(IDENTITIES[i]["female"]) == female:
 			gender_index += 1
 	return gender_index
+
+
+## An interior hearth (a real recessed firebox opening -- back panel + two
+## side cheeks + a hearth floor, not a solid block -- topped by a mantel and
+## a stone chimney breast) whose flue climbs up through the actual sloped
+## roof, per direct instruction: "put a fireplace... with a chimney going up
+## and out through the roof... in the bottom of the fireplace, there should
+## be some actual fire burning." Placed against the north (rear) wall,
+## centered in X so it stays clear of both the south-wall doorway and
+## _build_house_bed()'s own north-WEST corner placement. Height math mirrors
+## _add_roof_snow_cap()'s own peak_y formula so the flue's top lands just
+## above the real roof surface at this same Z, not a guessed constant.
+## Per direct correction ("the fireplace seems a bit too small and the
+## chimney too skinny... the fire element... is not like in an opening like
+## a normal fireplace would have. It's sort of like being smushed") -- the
+## old version was one solid stone block with the flame overlapping it; this
+## builds an actual open recess (like a real fireplace) with the flame
+## genuinely sitting inside it, and every dimension is bigger throughout.
+const FIREPLACE_STONE := Color(0.34, 0.34, 0.36)
+const HEARTH_OPENING_WIDTH := 0.95
+const HEARTH_OPENING_HEIGHT := 0.95
+const HEARTH_DEPTH := 0.55
+const HEARTH_WALL_THICKNESS := 0.13
+func _build_fireplace(house: StaticBody3D, w: int, d: int) -> void:
+	var hearth_z := float(d) * TownProps.CELL_SIZE * 0.5 - 0.5
+	var half_footprint_w := HEARTH_OPENING_WIDTH * 0.5 + HEARTH_WALL_THICKNESS
+	var half_depth_local := HEARTH_DEPTH * 0.5
+
+	var hearth_floor := SuperEgg.build_part(
+		Vector3(half_footprint_w, 0.06, half_depth_local), FIREPLACE_STONE,
+		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	hearth_floor.position = Vector3(0.0, 0.06, hearth_z)
+	house.add_child(hearth_floor)
+	CollisionPolicy.add_box(
+		house, hearth_floor, Vector3(half_footprint_w * 2.0, 0.12, half_depth_local * 2.0),
+		hearth_floor.position, Basis(), true
+	)
+	var hearth_top := 0.12
+
+	# Back panel closes the recess at the far (wall) side -- the near side,
+	# toward the room, stays open: that opening is the whole point.
+	var back := SuperEgg.build_part(
+		Vector3(half_footprint_w, HEARTH_OPENING_HEIGHT * 0.5, HEARTH_WALL_THICKNESS * 0.5),
+		FIREPLACE_STONE, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	var back_z := hearth_z + half_depth_local - HEARTH_WALL_THICKNESS * 0.5
+	back.position = Vector3(0.0, hearth_top + HEARTH_OPENING_HEIGHT * 0.5, back_z)
+	house.add_child(back)
+	CollisionPolicy.add_box(
+		house, back, Vector3(half_footprint_w * 2.0, HEARTH_OPENING_HEIGHT, HEARTH_WALL_THICKNESS),
+		back.position, Basis(), true
+	)
+
+	var sides: Array[float] = [-1.0, 1.0]
+	for side in sides:
+		var cheek := SuperEgg.build_part(
+			Vector3(HEARTH_WALL_THICKNESS * 0.5, HEARTH_OPENING_HEIGHT * 0.5, half_depth_local),
+			FIREPLACE_STONE, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+		)
+		var cheek_x := side * (HEARTH_OPENING_WIDTH * 0.5 + HEARTH_WALL_THICKNESS * 0.5)
+		cheek.position = Vector3(cheek_x, hearth_top + HEARTH_OPENING_HEIGHT * 0.5, hearth_z)
+		house.add_child(cheek)
+		CollisionPolicy.add_box(
+			house, cheek, Vector3(HEARTH_WALL_THICKNESS, HEARTH_OPENING_HEIGHT, half_depth_local * 2.0),
+			cheek.position, Basis(), true
+		)
+
+	var mantel_thickness := 0.18
+	var mantel := SuperEgg.build_part(
+		Vector3(half_footprint_w + 0.06, mantel_thickness * 0.5, half_depth_local + 0.06),
+		FIREPLACE_STONE.darkened(0.05), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
+	)
+	var mantel_y := hearth_top + HEARTH_OPENING_HEIGHT + mantel_thickness * 0.5
+	mantel.position = Vector3(0.0, mantel_y, hearth_z)
+	house.add_child(mantel)
+	CollisionPolicy.add_box(
+		house, mantel, Vector3((half_footprint_w + 0.06) * 2.0, mantel_thickness, (half_depth_local + 0.06) * 2.0),
+		mantel.position, Basis(), true
+	)
+
+	var breast_height := 1.85
+	var breast := SuperEgg.build_part(
+		Vector3(half_footprint_w * 0.85, breast_height * 0.5, half_depth_local * 0.8),
+		FIREPLACE_STONE.darkened(0.05), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	var breast_y := mantel_y + mantel_thickness * 0.5 + breast_height * 0.5
+	breast.position = Vector3(0.0, breast_y, hearth_z)
+	house.add_child(breast)
+	CollisionPolicy.add_box(
+		house, breast, Vector3(half_footprint_w * 1.7, breast_height, half_depth_local * 1.6),
+		breast.position, Basis(), true
+	)
+
+	# Same peak_y derivation _add_roof_snow_cap() uses (this house is always
+	# floors=1), so the flue's own top sits just above the true roof surface
+	# at this exact Z rather than a hand-guessed height.
+	var half_depth := float(d) * TownProps.CELL_SIZE * 0.5 + TownProps.ROOF_OVERHANG
+	var slope_len := half_depth / cos(TownProps.ROOF_PITCH)
+	var peak_y := TownProps.FLOOR_HEIGHT + slope_len * sin(TownProps.ROOF_PITCH)
+	var roof_underside_y := peak_y - tan(TownProps.ROOF_PITCH) * absf(hearth_z)
+	var shaft_base_y := breast_y + breast_height * 0.5
+	var shaft_top_y := roof_underside_y + 0.7
+	var shaft_height := maxf(shaft_top_y - shaft_base_y, 0.3)
+	var shaft_radius := 0.24
+	var shaft := SuperEgg.build_part(
+		Vector3(shaft_radius, shaft_height * 0.5, shaft_radius), FIREPLACE_STONE,
+		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	shaft.position = Vector3(0.0, shaft_base_y + shaft_height * 0.5, hearth_z)
+	house.add_child(shaft)
+	CollisionPolicy.add_box(
+		house, shaft, Vector3(shaft_radius * 2.0, shaft_height, shaft_radius * 2.0), shaft.position, Basis(), true
+	)
+
+	var cap := SuperEgg.build_part(
+		Vector3(shaft_radius * 1.35, 0.07, shaft_radius * 1.35), FIREPLACE_STONE.darkened(0.1),
+		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	cap.position = Vector3(0.0, shaft_base_y + shaft_height + 0.07, hearth_z)
+	house.add_child(cap)
+
+	# The real fire model (see ParticleFX.build_flame_particles() -- the
+	# exact same recipe fire_kingdom_village.gd's own braziers use, just
+	# tuned for an indoor hearth), now genuinely sitting inside the open
+	# recess above, not overlapping solid stone.
+	var flame := ParticleFX.build_flame_particles(11, 0.6, 0.85, 1.8, 2.8, -0.6)
+	flame.position = Vector3(0.0, hearth_top + 0.05, hearth_z)
+	house.add_child(flame)
+	CollisionPolicy.mark_decorative(flame)
+	var light := OmniLight3D.new()
+	light.position = Vector3(0.0, hearth_top + 0.35, hearth_z)
+	light.light_color = Color(1.0, 0.42, 0.12)
+	light.light_energy = 1.1
+	light.omni_range = 8.0
+	light.shadow_enabled = false
+	house.add_child(light)
+
+	_smoke_puffs.append_array(
+		ChimneySmoke.spawn(house, Vector3(0.0, shaft_base_y + shaft_height + 0.12, hearth_z), _smoke_rng, 4)
+	)
 
 
 ## The structural roof stays dark on its underside. These two very thin

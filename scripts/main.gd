@@ -43,18 +43,29 @@ var _portals_by_gate_id: Dictionary = {}
 
 
 func _ready() -> void:
-	_build_portals()
 	call_deferred("_finish_loading")
 
 
 func _finish_loading() -> void:
 	await get_tree().process_frame
+	await LoadingScreen.wait_for_world_builds()
+	# Wilderness construction owns the canyon paving slabs. Portal support
+	# probes must run after those generated surfaces exist; building gates in
+	# Main._ready() placed the canyon gate at raw terrain height and the slab
+	# was subsequently generated halfway around it.
+	_build_portals()
+	var player := get_node("Player") as Player
+	if RecoveryManager.has_pending_recovery():
+		var fallback := player.global_transform
+		await RecoveryManager.finish_scene_recovery(self, fallback)
+		LoadingScreen.complete()
+		return
 	var should_play_opening := (
 		KingdomTravel.pending_gate_id == "" and not WorldState.opening_wake_completed
 	)
 	_place_returning_player()
+	HumongousState.finish_arrival.call_deferred(self, player.global_position, player.global_transform.basis.z)
 	if should_play_opening:
-		var player := get_node("Player") as Player
 		player.begin_wake_intro()
 	# Xiao Hou Zi is NOT spawned here -- per direct correction, an earlier
 	# pass added a spawn for him in this file without realizing
@@ -71,13 +82,19 @@ func _build_portals() -> void:
 	var primate_h: float = terrain.get_mesh_height(PRIMATE_GATE_XZ.x, PRIMATE_GATE_XZ.y)
 	var fire_anchor := _build_fire_portal_outcropping(terrain)
 	var ice_h: float = terrain.get_mesh_height(ICE_GATE_XZ.x, ICE_GATE_XZ.y)
-	var canyon_h: float = terrain.get_mesh_height(CANYON_GATE_XZ.x, CANYON_GATE_XZ.y)
+	var canyon_h: float = _highest_support_at(CANYON_GATE_XZ,terrain.get_mesh_height(CANYON_GATE_XZ.x,CANYON_GATE_XZ.y))
 	_add_portal("primate_kingdom", PRIMATE_KINGDOM_SCENE, Vector3(PRIMATE_GATE_XZ.x, primate_h, PRIMATE_GATE_XZ.y), Color(0.36, 0.6, 0.32))
 	var village: Node = get_node("FloatingWaterVillage")
 	_add_portal("ocean_kingdom", OCEAN_KINGDOM_SCENE, village.get_portal_anchor(), Color(0.2, 0.56, 0.66))
 	_add_portal("fire_kingdom", FIRE_KINGDOM_SCENE, fire_anchor, Color(0.85, 0.32, 0.08))
 	_add_portal("ice_kingdom", ICE_KINGDOM_SCENE, Vector3(ICE_GATE_XZ.x, ice_h, ICE_GATE_XZ.y), Color(0.72, 0.88, 0.96))
 	_add_portal("rock_ground_kingdom", ROCK_GROUND_KINGDOM_SCENE, Vector3(CANYON_GATE_XZ.x, canyon_h, CANYON_GATE_XZ.y), Color(0.58, 0.44, 0.28))
+
+
+func _highest_support_at(point: Vector2,terrain_height: float) -> float:
+	var query := PhysicsRayQueryParameters3D.create(Vector3(point.x,terrain_height+12.0,point.y),Vector3(point.x,terrain_height-2.0,point.y),1|TownProps.BLORB_CLIMBABLE_LAYER)
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	return maxf(terrain_height,float(hit.position.y)) if not hit.is_empty() else terrain_height
 
 
 ## A broad, low rock slab emerging above the molten surface. Its real box

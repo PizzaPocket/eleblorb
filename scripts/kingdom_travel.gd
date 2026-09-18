@@ -16,6 +16,7 @@ const TRANSITION_COVER_DURATION := 0.35
 
 
 func travel_to(destination_scene: String, gate_id: String) -> void:
+	HumongousState.prepare_travel(destination_scene)
 	Party.capture_from_tree(get_tree())
 	pending_gate_id = gate_id
 	LoadingScreen.begin_transition()

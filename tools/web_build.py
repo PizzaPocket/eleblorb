@@ -83,7 +83,7 @@ def validate_build() -> list[str]:
     html_path = WEB_DIR / "index.html"
     if html_path.is_file():
         html = html_path.read_text(encoding="utf-8")
-        for marker in ("eleblorbLoadingPhase", "eleblorbWorldReady", "Building the world"):
+        for marker in ("eleblorbLoadingPhase", "eleblorbWorldReady", "Loading the world"):
             if marker not in html:
                 errors.append(f"Unified loading handshake is missing from index.html: {marker}")
 

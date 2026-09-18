@@ -40,12 +40,12 @@ func _ready() -> void:
 func _spawn_all() -> void:
 	for i in NORMAL_COUNT:
 		_place("", false)
-	for element in OTHER_ELEMENTS:
-		_place(element, false)
+	for i in OTHER_ELEMENTS.size():
+		_place(OTHER_ELEMENTS[i] if i % 2 == 0 else "", false)
 	for i in PLANT_COUNT:
-		_place("plant", false)
+		_place("plant" if i % 2 == 0 else "", false)
 	for i in AIR_COUNT:
-		_place("air", false)
+		_place("air" if i % 2 == 0 else "", false)
 
 
 func _place(element: String, shiny: bool) -> void:

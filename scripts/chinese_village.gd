@@ -17,8 +17,8 @@ extends Node3D
 ## island at the center, three smaller spokes -- two ordinary village
 ## islands and one bamboo-forest island) joined by plank bridges, plus one
 ## longer entry bridge reaching back to solid ordinary wasteland to the
-## south. Every island sits at the same fixed ISLAND_SURFACE_Y -- nothing
-## on them ever samples real terrain height, since the real ground far
+## south. Every island sits at the same shared surface elevation sampled
+## once from the entry shore -- nothing on them independently samples terrain height, since the real ground far
 ## below is the abyss floor, not anywhere a building or a wandering
 ## villager should actually settle. NPCs use npc.gd's own fixed_ground_y
 ## override for this reason (see _spawn_villagers() etc.); Sun Wu Kong and
@@ -44,11 +44,11 @@ const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
 ## reaching into those other scripts. Shifted west and north (and further
 ## from the lake) per direct instruction.
 const VILLAGE_CENTER := Vector2(250.0, -650.0)
-## Every island (and everything on it) sits at this fixed world height --
-## no terrain sampling anywhere on/between them. Close to the ordinary
-## wasteland floor's own height (-60) so the one entry bridge reaching back
-## to solid ground stays close to level.
-const ISLAND_SURFACE_Y := -55.0
+## Runtime value sampled once from the exact ordinary-ground point where the
+## entry bridge lands. Every island, bridge, building and resident consumes
+## this same value, so the full network is level and meets the mainland with
+## no hard-coded-height discrepancy.
+var _island_surface_y: float = -55.0
 
 # ---------------------------------------------------------------------------
 # Island layout: a large imperial island surrounded by smaller, genuinely
@@ -353,8 +353,14 @@ var _royal_chef: Node3D
 
 
 func _ready() -> void:
+	LoadingScreen.enqueue_build_stage("Instantiating scene data…",0.93,_build_village)
+
+
+func _build_village() -> void:
 	terrain = get_node("../Terrain")
 	_rng.seed = 20260906
+	if terrain.has_method("get_chinese_village_island_surface_y"):
+		_island_surface_y = terrain.get_chinese_village_island_surface_y()
 
 	_palace = _build_island(PALACE_LOCAL, PALACE_RADIUS)
 	_village_a = _build_island(VILLAGE_A_LOCAL, VILLAGE_A_RADIUS)
@@ -422,6 +428,8 @@ func _ready() -> void:
 	_scatter_lanterns(_village_d, VILLAGE_D_RADIUS)
 	_scatter_lanterns(_village_e, VILLAGE_E_RADIUS)
 	_update_proximity_lantern_lights()
+	var inn_world := VILLAGE_CENTER + VILLAGE_E_LOCAL + Vector2(5.0, -5.0)
+	VillageInn.create(self, terrain, Vector3(inn_world.x, _island_surface_y, inn_world.y), "outskirts", "chinese_village_inn", 15, "Lin Quiet-Reed", Color(0.68, 0.08, 0.06), Color(0.48, 0.25, 0.12))
 
 
 func _process(delta: float) -> void:
@@ -458,7 +466,7 @@ func _build_island(local_pos: Vector2, radius: float) -> Node3D:
 	var island := StaticBody3D.new()
 	island.collision_layer = 1
 	island.collision_mask = 0
-	island.position = Vector3(world.x, ISLAND_SURFACE_Y, world.y)
+	island.position = Vector3(world.x, _island_surface_y, world.y)
 	island.set_meta("walk_radius", radius * 0.82)
 	add_child(island)
 
@@ -531,11 +539,11 @@ func _build_entry_bridge() -> void:
 	var start_local := PALACE_LOCAL + direction * PALACE_RADIUS * 0.91
 	var end_world := VILLAGE_CENTER + rim_local
 	var terrain_y: float = terrain.get_mesh_height(end_world.x, end_world.y)
-	_build_bridge_segment_sloped((start_local + rim_local) * 0.5, start_local.distance_to(rim_local), direction, ISLAND_SURFACE_Y, terrain_y)
+	_build_bridge_segment_sloped((start_local + rim_local) * 0.5, start_local.distance_to(rim_local), direction, _island_surface_y, terrain_y)
 
 
 func _build_bridge_segment(mid_local: Vector2, span: float, direction: Vector2) -> void:
-	_build_bridge_segment_sloped(mid_local, span, direction, ISLAND_SURFACE_Y, ISLAND_SURFACE_Y)
+	_build_bridge_segment_sloped(mid_local, span, direction, _island_surface_y, _island_surface_y)
 
 
 func _build_bridge_segment_sloped(mid_local: Vector2, span: float, direction: Vector2, from_y: float, to_y: float) -> void:
@@ -597,7 +605,7 @@ func _build_pagoda(island: Node3D, local_pos: Vector2, w: int, d: int, tier_coun
 	var wall_color := Color(0.88, 0.62, 0.12) if imperial_gold else TownProps.WALL_STONE
 	var upper_color := Color(0.96, 0.76, 0.24) if imperial_gold else TownProps.WALL_WOOD
 	var floor_color := Color(0.75, 0.47, 0.08) if imperial_gold else TownProps.FLOOR_COLOR
-	var body := TownProps.build_building(w, d, floors, TRIM_COLOR if imperial_gold else roof_color, wall_color, upper_color, floor_color)
+	var body := TownProps.build_building(w,d,floors,TRIM_COLOR if imperial_gold else roof_color,wall_color,upper_color,floor_color,Color(0.72,0.08,0.055) if imperial_gold else roof_color.darkened(0.08))
 	body.position = Vector3(local_pos.x, 0, local_pos.y)
 	body.rotation.y = 0.0 if imperial_gold else _rng.randf_range(0.0, TAU)
 	island.add_child(body)
@@ -727,7 +735,7 @@ func _add_palace_floor_with_stairwell(floor_y: float, width: float, depth: float
 ## Low guard edges make the aperture readable and prevent accidental side or
 ## rear falls. The end where that level's ramp emerges stays open onto the
 ## upper landing; alternating that end completes the switchback circulation.
-func _add_stairwell_guard(well_center: Vector2, well_size: Vector2, floor_y: float, egress_sign: float, color: Color) -> void:
+func _add_stairwell_guard(well_center: Vector2, well_size: Vector2, floor_y: float, _egress_sign: float, color: Color) -> void:
 	var rail_height: float = 0.82
 	var rail_thickness: float = 0.14
 	var rail_y: float = floor_y + rail_height * 0.5
@@ -736,10 +744,10 @@ func _add_stairwell_guard(well_center: Vector2, well_size: Vector2, floor_y: flo
 			Vector3(well_center.x + side * (well_size.x * 0.5 + rail_thickness * 0.5), rail_y, well_center.y),
 			Vector3(rail_thickness, rail_height, well_size.y + rail_thickness * 2.0), color
 		)
-	_add_palace_block(
-		Vector3(well_center.x, rail_y, well_center.y - egress_sign * well_size.y * 0.5 - egress_sign * rail_thickness * 0.5),
-		Vector3(well_size.x, rail_height, rail_thickness), color
-	)
+	# No transverse end rail: even though it sits at upper-floor height, it
+	# crosses the sloped clearance envelope and reads as a beam blocking every
+	# ascent. The two long side guards are sufficient fall protection while
+	# leaving both approach and landing completely open.
 
 
 func _build_palace_interiors() -> void:
@@ -754,9 +762,11 @@ func _build_palace_interiors() -> void:
 	var throne := SuperEgg.build_part(Vector3(1.25, 1.45, 0.72), gold, 3.4, SuperEgg.EPSILON_FLAT)
 	throne.position = Vector3(0.0, 2.0, -18.3)
 	_palace.add_child(throne)
+	CollisionPolicy.add_box(_palace, throne, Vector3(2.5, 2.9, 1.44), throne.position, throne.basis, true)
 	var throne_seat := SuperEgg.build_part(Vector3(1.05, 0.22, 0.85), red, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
 	throne_seat.position = Vector3(0.0, 0.92, -17.65)
 	_palace.add_child(throne_seat)
+	CollisionPolicy.add_box(_palace, throne_seat, Vector3(2.1, 0.44, 1.7), throne_seat.position, throne_seat.basis, true)
 	# Lacquer columns, low side benches, and symmetrical lantern rows repeat
 	# through all four levels without blocking doors or stair terraces.
 	for level in PALACE_LEVEL_COUNT:
@@ -768,9 +778,14 @@ func _build_palace_interiors() -> void:
 				var column := SuperEgg.build_part(Vector3(0.24, PALACE_STOREY_HEIGHT * 0.43, 0.24), red, 2.6, 2.6)
 				column.position = Vector3(side * (half_width - 1.25), base_y + PALACE_STOREY_HEIGHT * 0.5, PALACE_LOCAL_POS.y + z_offset)
 				_palace.add_child(column)
+				CollisionPolicy.add_cylinder(
+					_palace, column, 0.24, PALACE_STOREY_HEIGHT * 0.86,
+					column.position, false
+				)
 			var bench := SuperEgg.build_part(Vector3(1.8, 0.3, 0.48), dark_wood, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
 			bench.position = Vector3(side * (half_width - 2.0), base_y + 0.32, PALACE_LOCAL_POS.y + 1.2)
 			_palace.add_child(bench)
+			CollisionPolicy.add_box(_palace, bench, Vector3(3.6, 0.6, 0.96), bench.position, bench.basis, true)
 		for x in [-half_width * 0.48, 0.0, half_width * 0.48]:
 			var lantern := _build_deng_long()
 			lantern.position = Vector3(x, base_y + PALACE_STOREY_HEIGHT - 0.75, PALACE_LOCAL_POS.y)
@@ -892,7 +907,7 @@ func _spawn_villagers(island: Node3D, positions: Array[Vector2], identity_offset
 		var local := local_pos + jitter
 		var npc_inst: Node3D = NPC_SCENE.instantiate()
 		npc_inst.set_terrain_reference(terrain)
-		npc_inst.fixed_ground_y = ISLAND_SURFACE_Y
+		npc_inst.fixed_ground_y = _island_surface_y
 		npc_inst.wander_boundary_center = Vector2(island.global_position.x, island.global_position.z)
 		npc_inst.wander_boundary_radius = float(island.get_meta("walk_radius", 0.0))
 		_assign_villager_identity(npc_inst, identity_index)
@@ -931,7 +946,7 @@ func _spawn_kids() -> void:
 		var local := PLAY_HUT_LOCAL_POS + jitter
 		var npc_inst: Node3D = NPC_SCENE.instantiate()
 		npc_inst.set_terrain_reference(terrain)
-		npc_inst.fixed_ground_y = ISLAND_SURFACE_Y
+		npc_inst.fixed_ground_y = _island_surface_y
 		npc_inst.wander_boundary_center = Vector2(_village_a.global_position.x, _village_a.global_position.z)
 		npc_inst.wander_boundary_radius = float(_village_a.get_meta("walk_radius", 0.0))
 		var identity: Dictionary = KID_IDENTITIES[i]
@@ -1035,7 +1050,7 @@ func _build_jingu_bang_pickup(hut: Node3D) -> void:
 func _build_sun_wu_kong() -> void:
 	var sage: SunWuKong = SUN_WU_KONG_SCENE.instantiate()
 	var world := VILLAGE_CENTER + PALACE_LOCAL + SUN_WU_KONG_LOCAL_POS
-	sage.fixed_ground_y = ISLAND_SURFACE_Y + SUN_WU_KONG_CASTLE_Y
+	sage.fixed_ground_y = _island_surface_y + SUN_WU_KONG_CASTLE_Y
 	get_parent().add_child(sage)
 	sage.global_position = Vector3(world.x, sage.fixed_ground_y, world.y)
 
@@ -1142,10 +1157,11 @@ func _build_vendor_stall() -> void:
 		stall_body.add_child(visual)
 		index += 1
 
-	var vendor_local := VENDOR_LOCAL_POS + Vector2(0.9, 0.0).rotated(stall_body.rotation.y)
+	var vendor_layout:=TownProps.vendor_layout(VENDOR_LOCAL_POS,stall_body.rotation.y)
+	var vendor_local:=vendor_layout["position"] as Vector2
 	var npc_inst: Node3D = NPC_SCENE.instantiate()
 	npc_inst.set_terrain_reference(terrain)
-	npc_inst.fixed_ground_y = ISLAND_SURFACE_Y
+	npc_inst.fixed_ground_y = _island_surface_y
 	npc_inst.display_name = VENDOR_NAME
 	var lines: Array[String] = []
 	lines.assign(VENDOR_LINES)
@@ -1159,6 +1175,7 @@ func _build_vendor_stall() -> void:
 	npc_inst.shirt_color = TRIM_COLOR
 	npc_inst.pants_color = PANTS_COLORS[0]
 	npc_inst.body_scale = 1.0
+	npc_inst.facing_degrees=vendor_layout["facing_degrees"] as float
 	npc_inst.position = Vector3(vendor_local.x, 0, vendor_local.y)
 	_village_b.add_child(npc_inst)
 
@@ -1169,7 +1186,7 @@ func _build_vendor_stall() -> void:
 func _build_emperor() -> void:
 	var npc_inst: Node3D = NPC_SCENE.instantiate()
 	npc_inst.set_terrain_reference(terrain)
-	npc_inst.fixed_ground_y = ISLAND_SURFACE_Y + 0.08
+	npc_inst.fixed_ground_y = _island_surface_y + 0.08
 	npc_inst.display_name = EMPEROR_NAME
 	npc_inst.stationary = true
 	npc_inst.is_female = false
@@ -1204,24 +1221,77 @@ func _on_emperor_talk(_emperor: Node3D) -> bool:
 		DialogUI.show_line(EMPEROR_NAME, "农人的小事不值得朕费心。朕只等御厨献上最完美的肉包。")
 		return true
 	WorldState.chinese_village_blorbs_taken = true
-	_apply_blorb_captivity()
+	_apply_blorb_captivity(true)
 	DialogUI.show_line(EMPEROR_NAME, "你说什么农田？朕正在寻找天下最完美的肉包……等等，这些圆滚滚的正是！送去御膳房！")
 	return true
 
 
-func _apply_blorb_captivity() -> void:
+func _apply_blorb_captivity(animate_capture: bool = false) -> void:
 	if not WorldState.chinese_village_blorbs_taken or WorldState.chinese_village_blorbs_rescued:
 		return
-	var player := get_tree().get_first_node_in_group("player") as Player
-	if player != null:
-		player.get_blorb_suit().suspend_for_story()
+	_set_party_suits_story_suspended(true)
+	var party_blorbs: Array[Blorb] = []
 	for node in get_tree().get_nodes_in_group("blorbs"):
 		var blorb := node as Blorb
 		if blorb == null or not blorb.in_party:
 			continue
+		party_blorbs.append(blorb)
+	if animate_capture and not party_blorbs.is_empty():
+		_animate_blorbs_to_kitchen(party_blorbs)
+		return
+	for blorb in party_blorbs:
 		blorb.visible = false
 		blorb.process_mode = Node.PROCESS_MODE_DISABLED
+		blorb.collision_layer = 0
 	_build_captive_blorb_displays()
+
+
+func _set_party_suits_story_suspended(suspended: bool) -> void:
+	for candidate in get_tree().get_nodes_in_group("party_playable_candidates"):
+		if not candidate.has_method("get_own_blorb_suit"):
+			continue
+		var suit: BlorbSuitController = candidate.get_own_blorb_suit() as BlorbSuitController
+		if suit == null:
+			continue
+		if suspended:
+			suit.suspend_for_story()
+		else:
+			suit.resume_after_story()
+
+
+func _animate_blorbs_to_kitchen(party_blorbs: Array[Blorb]) -> void:
+	var player: Player = get_tree().get_first_node_in_group("player") as Player
+	var tween: Tween = create_tween().set_parallel(true)
+	for index in party_blorbs.size():
+		var blorb: Blorb = party_blorbs[index]
+		# A formerly worn body may still be parked at its pre-suit location.
+		# Begin its visible flight around the player so removal reads as the
+		# Emperor's command pulling the party away, never as a remote teleport.
+		if not blorb.visible and player != null:
+			var angle: float = TAU*float(index)/float(maxi(party_blorbs.size(),1))
+			blorb.global_position = player.global_position+Vector3(cos(angle)*0.8,0.7,sin(angle)*0.8)
+		blorb.visible = true
+		blorb.process_mode = Node.PROCESS_MODE_DISABLED
+		blorb.collision_layer = 0
+		var target_local: Vector3 = _captive_counter_position(index,party_blorbs.size())
+		var target_global: Vector3 = _royal_kitchen.to_global(target_local)
+		var delay: float = float(index)*0.035
+		tween.tween_property(blorb,"global_position",target_global,0.72).set_delay(delay).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+		tween.tween_property(blorb,"scale",Vector3.ONE*0.085,0.72).set_delay(delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	await tween.finished
+	for blorb in party_blorbs:
+		if is_instance_valid(blorb):
+			blorb.visible = false
+	_build_captive_blorb_displays()
+
+
+func _captive_counter_position(index: int,total: int) -> Vector3:
+	const COUNTER_COLUMNS := 24
+	var row_index: int = index/COUNTER_COLUMNS
+	var column_index: int = index%COUNTER_COLUMNS
+	var columns_this_row: int = mini(COUNTER_COLUMNS,total-row_index*COUNTER_COLUMNS)
+	var spread: float = (float(column_index)-float(columns_this_row-1)*0.5)*0.25
+	return Vector3(spread,1.08,-1.4+float(row_index)*0.24)
 
 
 func _build_captive_blorb_displays() -> void:
@@ -1239,12 +1309,14 @@ func _build_captive_blorb_displays() -> void:
 		display.portrait_blorbus = source.is_blorbus
 		display.body_color = source.body_color
 		display.initial_element = source.element_state
-		display.size_multiplier = 0.24
+		# A rou bao fits in one hand. Keep every captive genuinely item-sized,
+		# then wrap across the full preparation counter for arbitrarily large
+		# parties instead of enlarging them or letting the line spill over.
+		display.size_multiplier = 0.085
 		display.vertical_scale = source.vertical_scale
 		display.blorb_name = source.blorb_name
 		_royal_kitchen.add_child(display)
-		var spread: float = (float(index) - float(party_blorbs.size() - 1) * 0.5) * 0.38
-		display.position = Vector3(spread, 1.08, -1.4)
+		display.position = _captive_counter_position(index,party_blorbs.size())
 		_captive_blorb_displays.append(display)
 
 
@@ -1280,25 +1352,25 @@ func _build_royal_kitchen() -> void:
 	for side in [-1.0, 1.0]:
 		_add_palace_block(Vector3(side * (PALACE_DOOR_WIDTH + front_piece_width) * 0.5, kitchen_height * 0.5, front_z), Vector3(front_piece_width, kitchen_height, PALACE_WALL_THICKNESS), Color(0.66, 0.055, 0.045))
 	_add_palace_block(Vector3(0.0, kitchen_height - 0.35, front_z), Vector3(PALACE_DOOR_WIDTH, 0.7, PALACE_WALL_THICKNESS), TRIM_COLOR)
-	var counter := SuperEgg.build_part(Vector3(1.15, 0.48, 0.48), Color(0.48, 0.25, 0.1), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+	var counter := SuperEgg.build_part(Vector3(3.35, 0.48, 0.62), Color(0.48, 0.25, 0.1), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
 	counter.position = Vector3(0.0, 0.48, -1.4)
 	_royal_kitchen.add_child(counter)
-	var collision := CollisionShape3D.new()
-	var shape := BoxShape3D.new()
-	shape.size = Vector3(2.3, 0.96, 0.96)
-	collision.shape = shape
-	collision.position = counter.position
-	_royal_kitchen.add_child(collision)
+	CollisionPolicy.add_box(
+		_royal_kitchen, counter, Vector3(6.7, 0.96, 1.24),
+		counter.position, counter.basis, true
+	)
+	_build_royal_kitchen_furnishings(kitchen_width, kitchen_depth)
 	for side in [-1.0, 1.0]:
 		var lantern := _build_deng_long()
 		lantern.position = Vector3(side * 2.8, kitchen_height - 0.75, kitchen_center_z)
 		_palace.add_child(lantern)
 		_track_proximity_lantern(lantern)
 	if WorldState.chinese_village_chef_defeated:
+		_spawn_royal_cleaver_pickup()
 		return
 	var chef: Node3D = NPC_SCENE.instantiate()
 	chef.set_terrain_reference(terrain)
-	chef.fixed_ground_y = ISLAND_SURFACE_Y + 0.08
+	chef.fixed_ground_y = _island_surface_y + 0.08
 	chef.display_name = "御厨"
 	chef.stationary = true
 	chef.is_female = false
@@ -1328,12 +1400,23 @@ func _build_royal_kitchen() -> void:
 	chef.talk_override = func() -> bool: return _on_royal_chef_talk(chef)
 	chef.position = Vector3(2.4, 0.08, kitchen_center_z - 0.8)
 	_palace.add_child(chef)
+	chef.equip_meat_cleaver()
 	_royal_chef = chef
 
 
 func _on_royal_chef_talk(chef: Node3D) -> bool:
-	if not WorldState.chinese_village_blorbs_taken or WorldState.chinese_village_chef_defeated:
+	if WorldState.chinese_village_chef_defeated:
 		return false
+	if not WorldState.chinese_village_blorbs_taken:
+		var lines: Array[String] = [
+			"御膳房最讲究耐心。火候未到，什么都不能急着下锅。",
+			"陛下近来胃口挑剔。我只是在帮他找到配得上皇室的滋味。",
+			"这些案台日日擦洗。等真正珍贵的食材送来，就派上用场了。",
+		]
+		var beat := WorldState.chinese_village_chef_dialog_beat % lines.size()
+		WorldState.chinese_village_chef_dialog_beat += 1
+		DialogUI.show_line("御厨", lines[beat])
+		return true
 	var actions: Array[Dictionary] = [{
 		"label": "揭穿他。",
 		"callback": func() -> void:
@@ -1346,6 +1429,7 @@ func _on_royal_chef_talk(chef: Node3D) -> bool:
 
 func _on_royal_chef_defeated() -> void:
 	WorldState.chinese_village_chef_defeated = true
+	_spawn_royal_cleaver_pickup()
 	_rescue_kitchen_blorbs()
 	Hud.show_message("御厨化作一团黑烟，逃回了魔界。皇宫里的阴影也随之散去。")
 
@@ -1354,6 +1438,7 @@ func _rescue_kitchen_blorbs() -> void:
 	if WorldState.chinese_village_blorbs_rescued:
 		return
 	WorldState.chinese_village_blorbs_rescued = true
+	_set_party_suits_story_suspended(false)
 	_clear_captive_blorb_displays()
 	for node in get_tree().get_nodes_in_group("blorbs"):
 		var blorb := node as Blorb
@@ -1361,8 +1446,74 @@ func _rescue_kitchen_blorbs() -> void:
 			continue
 		blorb.visible = true
 		blorb.process_mode = Node.PROCESS_MODE_INHERIT
+		blorb.collision_layer = 1
+		blorb.scale = Vector3.ONE
 		blorb.global_position = _royal_kitchen.global_position + Vector3(_rng.randf_range(-1.5, 1.5), 0.0, 2.0 + _rng.randf_range(0.0, 1.5))
 	Hud.show_message("布洛布们恢复了原来的大小，从御膳房的案台上跳了下来。")
+
+
+func _build_royal_kitchen_furnishings(kitchen_width: float, kitchen_depth: float) -> void:
+	# A working imperial kitchen: twin brick hearths, bronze cooking pots,
+	# ingredient shelves, chopping stations, and stacked bamboo steamers.
+	var hearth_color := Color(0.36, 0.12, 0.075)
+	for side in [-1.0, 1.0]:
+		var hearth := SuperEgg.build_part(
+			Vector3(0.78, 0.52, 0.62), hearth_color,
+			SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+		)
+		hearth.position = Vector3(side * 3.65, 0.52, -2.25)
+		_royal_kitchen.add_child(hearth)
+		CollisionPolicy.add_box(
+			_royal_kitchen, hearth, Vector3(1.56, 1.04, 1.24),
+			hearth.position, hearth.basis, true
+		)
+		var pot := SuperEgg.build_part(
+			Vector3(0.48, 0.22, 0.48), Color(0.24, 0.16, 0.08),
+			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
+		)
+		pot.position = hearth.position + Vector3.UP * 0.7
+		_royal_kitchen.add_child(pot)
+		CollisionPolicy.add_cylinder(_royal_kitchen, pot, 0.48, 0.44, pot.position, true)
+		for tier in 3:
+			var steamer := SuperEgg.build_part(
+				Vector3(0.32 - tier * 0.025, 0.075, 0.32 - tier * 0.025),
+				Color(0.68, 0.46, 0.2), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
+			)
+			steamer.position = Vector3(side * 3.75, 0.12 + tier * 0.14, 1.95)
+			_royal_kitchen.add_child(steamer)
+			CollisionPolicy.mark_decorative(steamer)
+	# The former front-wall shelf crossed the only doorway at chest height.
+	# Keep storage along the back wall and leave a full-width circulation lane
+	# from the throne room into the kitchen.
+	for shelf_z in [-2.85]:
+		for shelf_y in [0.65, 1.35, 2.05]:
+			var shelf := SuperEgg.build_part(
+				Vector3(kitchen_width * 0.31, 0.055, 0.22), Color(0.34, 0.16, 0.065),
+				SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+			)
+			shelf.position = Vector3(0.0, shelf_y, clampf(shelf_z, -kitchen_depth * 0.5 + 0.5, kitchen_depth * 0.5 - 0.5))
+			_royal_kitchen.add_child(shelf)
+			CollisionPolicy.add_box(
+				_royal_kitchen, shelf,
+				Vector3(kitchen_width * 0.62, 0.11, 0.44),
+				shelf.position, shelf.basis, false
+			)
+
+
+func _spawn_royal_cleaver_pickup() -> void:
+	if WorldState.is_collected("royal_chef_cleaver"):
+		return
+	for child in _royal_kitchen.get_children():
+		if child is Fruit and (child as Fruit).unique_id == "royal_chef_cleaver":
+			return
+	var pickup := Fruit.new()
+	pickup.fruit_name = "Royal Meat Cleaver"
+	pickup.fruit_color = Color(0.68, 0.7, 0.72)
+	pickup.radius = 0.18
+	pickup.unique_id = "royal_chef_cleaver"
+	pickup.visual_builder = func() -> Node3D: return ShopCatalog.build_meat_cleaver_visual(1.0)
+	pickup.position = Vector3(2.4, 0.32, -0.8)
+	_royal_kitchen.add_child(pickup)
 
 
 ## The farmer begins the village storyline by explaining the Emperor's
@@ -1374,11 +1525,11 @@ func _build_farmer_and_pandy_quest() -> void:
 		panda = PANDY_SCENE.instantiate()
 		var panda_world := VILLAGE_CENTER + BAMBOO_ISLAND_LOCAL + FARMER_LOCAL_POS + Vector2(2.5, 0.0)
 		get_parent().add_child(panda)
-		panda.global_position = Vector3(panda_world.x, ISLAND_SURFACE_Y, panda_world.y)
+		panda.global_position = Vector3(panda_world.x, _island_surface_y, panda_world.y)
 
 	var farmer: Node3D = NPC_SCENE.instantiate()
 	farmer.set_terrain_reference(terrain)
-	farmer.fixed_ground_y = ISLAND_SURFACE_Y
+	farmer.fixed_ground_y = _island_surface_y
 	farmer.display_name = FARMER_NAME
 	farmer.stationary = true
 	farmer.is_female = false

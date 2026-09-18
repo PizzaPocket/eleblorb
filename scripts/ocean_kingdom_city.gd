@@ -60,6 +60,8 @@ func _ready() -> void:
 	_build_castle()
 	_build_village()
 	_spawn_merfolk.call_deferred()
+	var inn_pos := CITY_CENTER + Vector2(24.0, 18.0)
+	VillageInn.create(self, _terrain, Vector3(inn_pos.x, _terrain.get_mesh_height(inn_pos.x, inn_pos.y), inn_pos.y), "ocean_kingdom", "seafolk_village_inn", 25, "Nerissa Stillwater", Color(0.08, 0.48, 0.52), Color(0.12, 0.38, 0.46))
 
 
 func _build_castle() -> void:
@@ -86,12 +88,17 @@ func _build_castle() -> void:
 		var crown := SuperEgg.build_part(Vector3(4.2, 3.8, 4.2), PRISM_GREEN, 1.3, SuperEgg.EPSILON_FLAT)
 		crown.position = corner + Vector3.UP * 8.7
 		castle.add_child(crown)
+		CollisionPolicy.add_box(
+			castle, crown, Vector3(8.4, 7.6, 8.4), crown.position,
+			crown.basis, true
+		)
 	# A wide open approach reads as the palace entrance rather than a sealed
 	# monolith, with luminous shell-like columns marking the threshold.
 	for side: float in [-1.0, 1.0]:
 		var column := SuperEgg.build_part(Vector3(1.1, 5.5, 1.1), PRISM_GREEN, 2.2, 2.2)
 		column.position = Vector3(side * 6.0, 6.5, -12.8)
 		castle.add_child(column)
+		CollisionPolicy.add_cylinder(castle, column, 1.1, 11.0, column.position, false)
 	# Interior throne and aisle make crossing the doorway visibly worthwhile.
 	_add_block(castle, Vector3(0.0, 2.65, 9.0), Vector3(4.5, 1.3, 3.0), PRISM_GREEN.darkened(0.16))
 	_add_block(castle, Vector3(0.0, 4.35, 10.0), Vector3(3.2, 2.2, 1.0), PRISM_GREEN)
@@ -99,6 +106,7 @@ func _build_castle() -> void:
 		var aisle := SuperEgg.build_part(Vector3(1.15, 0.055, 0.72), Color(0.26, 0.86, 0.72), 2.2, 2.2)
 		aisle.position = Vector3(0.0, 2.08, -1.7 + float(aisle_index) * 1.55)
 		castle.add_child(aisle)
+		CollisionPolicy.mark_decorative(aisle)
 	var light := OmniLight3D.new()
 	light.light_color = Color(0.22, 0.94, 0.76)
 	light.light_energy = 3.0

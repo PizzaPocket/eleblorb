@@ -131,6 +131,14 @@ func _on_body_exited(body: Node3D) -> void:
 func _resolve_hit(body: Node3D, hit_position: Variant = null, hit_normal: Variant = null) -> void:
 	if _resolved:
 		return
+	var item_receiver: Node = body
+	while item_receiver != null and not item_receiver.has_method("receive_thrown_item"):
+		item_receiver = item_receiver.get_parent()
+	if item_receiver != null and bool(item_receiver.receive_thrown_item(item_name)):
+		_resolved = true
+		UISounds.play_foley(&"throw_impact", 0.42, get_instance_id())
+		queue_free()
+		return
 	if body.is_in_group("skeletons") and body.has_method("take_damage"):
 		# Thrown inventory objects remain recoverable after impact, but provide a
 		# modest blorbless attack for story encounters such as the Royal Chef.
@@ -139,6 +147,13 @@ func _resolve_hit(body: Node3D, hit_position: Variant = null, hit_normal: Varian
 		return
 
 	if body.is_in_group("blorbs"):
+		if item_name == "Blorb Slime":
+			var blorb := body as Blorb
+			blorb.heal(maxf(20.0,float(blorb.max_hp)*0.5))
+			Hud.show_message("The Blorb Slime restores %s." % (blorb.blorb_name if blorb.blorb_name != "" else "the blorb"))
+			_resolved = true
+			queue_free()
+			return
 		var entry := ShopCatalog.find(item_name)
 		var element: String = entry.get("element", "") if not entry.is_empty() else ""
 		var core_item: String = entry.get("core_item", "") if not entry.is_empty() else ""

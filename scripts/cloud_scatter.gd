@@ -17,8 +17,11 @@ class_name CloudScatter
 ## Dense enough to form a real aerial platforming field rather than a few
 ## distant sky decorations; seeded generation keeps the route repeatable.
 @export var cloud_count: int = 52
-@export var altitude_min: float = 70.0
-@export var altitude_max: float = 110.0
+# +25% over the original 70.0/110.0, per direct correction ("raise up the
+# level of the normal clouds as well as the Sky Kingdom because right now
+# it just kind of feels a bit too low to the ground").
+@export var altitude_min: float = 87.5
+@export var altitude_max: float = 137.5
 @export var spread: float = 260.0
 @export var rng_seed: int = 77
 
@@ -31,6 +34,16 @@ const NIGHT_COLOR := Color(0.22, 0.25, 0.38)
 
 var _rng := RandomNumberGenerator.new()
 var _material: StandardMaterial3D
+## Set by build_sky_course() once it actually runs -- see that function's
+## own comment on _place_air_gem() for why this is the practical way to
+## find "where the Air Gem cloud actually ended up" from another script.
+var last_sky_course_landing: Vector3 = Vector3.ZERO
+## Lazily created by build_stair_step() -- one shared BirdHelmGate holding
+## every step of town_generator.gd's own hand-authored spiral climb, so
+## get_support_height_at() (see its own comment on why it now recurses)
+## finds them the exact same way it finds build_sky_course()'s own
+## SkyParkourCourse puffs.
+var _stairs_gate: BirdHelmGate
 
 
 func _ready() -> void:
@@ -39,6 +52,14 @@ func _ready() -> void:
 
 	for i in cloud_count:
 		_place_cloud()
+
+
+## Lets another script (town_generator.gd's own converted sky-stairs steps)
+## use the exact same shared cloud material -- including day/night tinting
+## staying in sync -- instead of a separately-built lookalike.
+func get_material() -> StandardMaterial3D:
+	_ensure_material()
+	return _material
 
 
 func _ensure_material() -> void:
@@ -80,12 +101,22 @@ func _place_cloud() -> void:
 ## support one-way: rising bodies pass through undersides, falling bodies
 ## approaching from above can settle on the top.
 func get_support_height_at(world_x: float, world_z: float, max_surface_y: float = INF) -> Variant:
+	return _support_height_in_children(self, world_x, world_z, max_surface_y)
+
+
+## Recurses through every descendant instead of assuming a fixed "cloud ->
+## puff" nesting depth. Ambient puffs (_place_cloud()) really are only two
+## levels down, but a gated climbing course -- build_sky_course()'s own
+## SkyParkourCourse, and build_stair_step()'s own SkyStairsGate -- adds an
+## extra BirdHelmGate wrapper level in between to hide/uncollide the whole
+## course at once, which a fixed-depth walk would silently skip over
+## entirely (found while chasing "the platform on the spiral staircase...
+## doesn't seem to have the same physics as clouds").
+func _support_height_in_children(node: Node, world_x: float, world_z: float, max_surface_y: float) -> Variant:
 	var best: Variant = null
-	for cloud in get_children():
-		for puff_node in cloud.get_children():
-			if not puff_node is MeshInstance3D or not puff_node.has_meta("cloud_semi_axes"):
-				continue
-			var puff := puff_node as MeshInstance3D
+	for child in node.get_children():
+		if child is MeshInstance3D and child.has_meta("cloud_semi_axes"):
+			var puff := child as MeshInstance3D
 			var axes := puff.get_meta("cloud_semi_axes") as Vector3
 			var center := puff.global_position
 			# Match SuperEgg.EPSILON_SOFT's rounded-square horizontal profile.
@@ -95,9 +126,43 @@ func get_support_height_at(world_x: float, world_z: float, max_surface_y: float 
 			if horizontal_profile > 1.0:
 				continue
 			var top := center.y + axes.y * pow(1.0 - horizontal_profile, 1.0 / SuperEgg.EPSILON_SOFT)
-			if top <= max_surface_y and (best == null or top > best):
+			if top <= max_surface_y and (best == null or top > (best as float)):
 				best = top
+		elif child.get_child_count() > 0:
+			var nested: Variant = _support_height_in_children(child, world_x, world_z, max_surface_y)
+			if nested != null and (best == null or (nested as float) > (best as float)):
+				best = nested
 	return best
+
+
+## Adds one gated "cloud step" cluster to town_generator.gd's own hand-
+## authored spiral climb (see that file's own _build_sky_stairs()), using
+## the exact same organic multi-puff technique as the ambient sky and the
+## parkour course above it -- and, crucially, actually parented under this
+## node (not the town's own scene root, where a separately-built StaticBody3D
+## used to live) so get_support_height_at() finds it and gives it real
+## one-way cloud physics instead of an ordinary solid box that blocks from
+## every side. `world_pos` is where the step's own highest puff should land
+## (see _build_course_cluster()'s own comment on solving for that after the
+## fact), matching the per-step rise the caller's own spiral already walks.
+## Frees any previously-built spiral steps first -- same reasoning as
+## build_sky_course()'s own stale-"SkyParkourCourse" guard: town_generator.gd's
+## own editor "rebuild_now" button re-runs _build_sky_stairs() without ever
+## tearing this sibling CloudScatter node down first, so without this a
+## repeat rebuild would leave every previous run's steps behind, doubled up.
+func reset_stair_steps() -> void:
+	if is_instance_valid(_stairs_gate):
+		_stairs_gate.free()
+	_stairs_gate = null
+
+
+func build_stair_step(world_pos: Vector3, rng: RandomNumberGenerator) -> void:
+	_ensure_material()
+	if _stairs_gate == null or not is_instance_valid(_stairs_gate):
+		_stairs_gate = BirdHelmGate.new()
+		_stairs_gate.name = "SkyStairsGate"
+		add_child(_stairs_gate)
+	_build_course_cluster(_stairs_gate, world_pos.x, world_pos.z, world_pos.y, rng, 1.1, 1.6, 3, 5, 1.1)
 
 
 ## t: 0 (full day, white) .. 1 (full night, dim moonlit grey-blue).
@@ -159,7 +224,12 @@ func build_sky_course(start: Vector3) -> void:
 	var existing := get_node_or_null("SkyParkourCourse")
 	if existing != null:
 		existing.free()
-	var course := Node3D.new()
+	# A BirdHelmGate, not a plain Node3D -- per direct instruction, this
+	# whole course (and the Air Gem on it) is now "the gateway to the Sky
+	# Kingdom": invisible and untouchable until the player has the Bird
+	# Helm equipped, the same "totally turned off" rule Sky Kingdom's own
+	# islands use.
+	var course := BirdHelmGate.new()
 	course.name = "SkyParkourCourse"
 	add_child(course)
 
@@ -204,6 +274,12 @@ func build_sky_course(start: Vector3) -> void:
 	top_y += rng.randf_range(0.7, MAX_STEP_RISE)
 	_build_course_cluster(course, pos.x, pos.y, top_y, rng, LANDING_PUFF_MIN, LANDING_PUFF_MAX, 5, 7, LANDING_JITTER)
 	_place_air_gem(course, Vector3(pos.x, top_y + 0.5, pos.y))
+	# Recorded so other systems (sky_kingdom.gd) can position themselves
+	# relative to the actual landing cloud instead of a hand-guessed
+	# world-space constant -- this course's own final position depends on a
+	# long chain of preceding RNG draws (building placement, etc.) that
+	# isn't practical to reproduce by hand.
+	last_sky_course_landing = Vector3(pos.x, top_y, pos.y)
 
 	_build_safety_net(course, path_positions, start.y, rng)
 

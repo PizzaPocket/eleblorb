@@ -33,7 +33,7 @@ func _process(_delta: float) -> void:
 	_next_check_ms = now + CHECK_INTERVAL_MS
 	if get_tree().get_nodes_in_group("skeletons").size() >= MAX_CONCURRENT:
 		return
-	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player := PartyControl.active_control_body()
 	if player == null:
 		return
 	var player_pos := Vector2(player.global_position.x, player.global_position.z)

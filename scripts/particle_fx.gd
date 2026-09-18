@@ -99,3 +99,53 @@ static func build_billboard_material(texture: ImageTexture, tint: Color, additiv
 	material.emission = tint
 	material.emission_energy_multiplier = emission_energy
 	return material
+
+
+## The real flame recipe fire_kingdom_village.gd's own braziers/wall
+## fixtures/lava fountain all already use (see that file's own now-identical
+## _make_lava_particles()) -- promoted here so any other kingdom's own
+## hearth/campfire can share the exact same fire, not a lookalike built
+## separately. amount/width/height/speed/gravity tune a given flame's size
+## and vigor (a small indoor hearth wants a gentler, shorter flame than an
+## outdoor lava fountain).
+static func build_flame_particles(
+	amount: int, width: float, height: float,
+	min_speed: float, max_speed: float, gravity_y: float
+) -> GPUParticles3D:
+	var particles := GPUParticles3D.new()
+	particles.amount = amount * 3
+	particles.lifetime = 0.58
+	particles.randomness = 0.38
+	particles.emitting = true
+	var process := ParticleProcessMaterial.new()
+	process.direction = Vector3.UP
+	process.spread = 12.0
+	process.initial_velocity_min = min_speed
+	process.initial_velocity_max = max_speed
+	process.gravity = Vector3(0.0, gravity_y, 0.0)
+	process.scale_min = 0.45
+	process.scale_max = 1.15
+	process.particle_flag_align_y = true
+	process.angle_min = -12.0
+	process.angle_max = 12.0
+	process.turbulence_enabled = true
+	process.turbulence_noise_strength = 1.0
+	process.turbulence_noise_scale = 2.0
+	process.turbulence_influence_min = 0.04
+	process.turbulence_influence_max = 0.15
+	process.color_ramp = build_color_ramp([
+		{"offset": 0.0, "color": Color(1.0, 0.95, 0.75, 1.0)},
+		{"offset": 0.25, "color": Color(1.0, 0.55, 0.1, 1.0)},
+		{"offset": 0.6, "color": Color(0.85, 0.25, 0.05, 0.9)},
+		{"offset": 1.0, "color": Color(0.35, 0.06, 0.02, 0.0)},
+	])
+	process.scale_curve = build_scale_curve(0.18, 1.15, 0.32, 0.12)
+	particles.process_material = process
+	var flame_material := build_billboard_material(build_soft_gradient_texture(32, 1.7, 0.2), Color.WHITE, true, 0.0)
+	flame_material.vertex_color_use_as_albedo = true
+	var quad := QuadMesh.new()
+	quad.size = Vector2(width, height)
+	quad.material = flame_material
+	particles.draw_pass_1 = quad
+	particles.visibility_aabb = AABB(Vector3(-12, -2, -12), Vector3(24, 20, 24))
+	return particles

@@ -1,5 +1,5 @@
 class_name XiaoHouZi
-extends StaticBody3D
+extends CharacterBody3D
 
 ## Xiao Hou Zi, the jungle biome's resident monkey (see docs/world_bible.md).
 ## Roams the jungle plateau as ambient wildlife until the player wanders
@@ -166,6 +166,9 @@ enum State { ROAM, FOLLOWING }
 
 var _player: Node3D
 var _pivots: Dictionary
+var _blorb_suit := BlorbSuitController.new()
+var _portrait := PlayerPortrait.new()
+var _playable_profile := PlayableCharacterProfile.xiao_hou_zi()
 var _eyes: Array = []
 var _eye_blink := EyeBlink.new_state()
 var _look_target: Node3D = null
@@ -199,6 +202,63 @@ var _walk_phase: float = 0.0
 ## standing in for him while he directly pilots this body's own former
 ## self," set by begin_possession()/end_possession() below.
 var is_player_controlled: bool = false
+## These are the exact established Xiao modifiers formerly applied inside
+## Player's shared movement stack. Keep them explicit during extraction so
+## changing control ownership cannot silently retune the character.
+var _direct_vertical_velocity: float = 0.0
+var _mounted: bool = false
+var max_hp: float = 100.0
+var current_hp: float = 100.0
+var _direct_surface_swimming: bool = false
+var _direct_diving: bool = false
+var _direct_flying: bool = false
+var _direct_air_feet: bool = false
+var _direct_lava_surface: bool = false
+var _direct_water_leg_hover: bool = false
+var _direct_fire_hand_hover: bool = false
+var _direct_fire_leg_hover: bool = false
+var _direct_fire_limb_flight: bool = false
+var _direct_hover_height: float = 0.0
+var _direct_left_arm_water: bool = false
+var _direct_right_arm_water: bool = false
+var _direct_left_arm_fire: bool = false
+var _direct_right_arm_fire: bool = false
+var _direct_left_leg_water: bool = false
+var _direct_right_leg_water: bool = false
+var _direct_left_leg_fire: bool = false
+var _direct_right_leg_fire: bool = false
+var _direct_water_arm_fx: Array[GPUParticles3D] = []
+var _direct_fire_arm_fx: Array[GPUParticles3D] = []
+var _direct_water_leg_fx: Array[GPUParticles3D] = []
+var _direct_fire_leg_fx: Array[GPUParticles3D] = []
+var _direct_liquid_level: float = -INF
+var _direct_floor_height: float = 0.0
+var _direct_last_bounced_blorb: Blorb = null
+var _direct_dirtbike_active: bool = false
+var _direct_dirtbike_front_active: bool = false
+var _direct_dirtbike_front_toggled: bool = false
+var _direct_dirtbike_chord_was_pressed: bool = false
+var _direct_dirtbike_was_climbing: bool = false
+var _direct_dirtbike_airborne: bool = false
+var _direct_dirtbike_surface_velocity := Vector3.ZERO
+var _direct_dirtbike_smoothed_grade := 0.0
+var _direct_dirtbike_supported_pitch := 0.0
+var _direct_dirtbike_airborne_pitch := 0.0
+var _direct_dirtbike_pitch_was_grounded := false
+var _direct_dirtbike_rear_wheel: MeshInstance3D = null
+var _direct_dirtbike_front_wheel: MeshInstance3D = null
+var _direct_ice_skates_active: bool = false
+var _direct_ice_skating_active: bool = false
+var _direct_ice_skate_left: Node3D = null
+var _direct_ice_skate_right: Node3D = null
+var _direct_ice_skate_phase: float = 0.0
+var _direct_ice_skate_previous_speed: float = 0.0
+var _direct_ice_skate_smoothed_acceleration: float = 0.0
+var _direct_ice_skate_lift_y: float = 0.0
+var _direct_ice_skate_was_supported: bool = false
+var _direct_ice_skate_airborne: bool = false
+var _direct_ice_skate_surface_velocity := Vector3.ZERO
+const DIRECT_BOUNCE_CLEARANCE := 0.035
 ## Base glide speed while in the FOLLOWING AI state, catching back up to the
 ## player -- reads the player's own move_speed once at _ready() same as
 ## blorb.gd's _follow_glide_speed, so it stays correct if move_speed is ever
@@ -216,8 +276,13 @@ var _interact_area: Area3D
 
 func _ready() -> void:
 	_rng.randomize()
+	up_direction = Vector3.UP
+	floor_snap_length = 0.12
+	floor_max_angle = deg_to_rad(50.0)
 	_pivots = MonkeyFigure.build(self, MonkeyFigure.MONKEY_FUR_COLOR, DISPLAY_SCALE)
 	_eyes = _pivots["eyes"]
+	_blorb_suit.setup(self, self, _blorb_suit_pivot_map(), MonkeyFigure.BLORB_SUIT_RIG_SCALE)
+	_portrait.setup(self, self, "xiao_hou_zi")
 
 	# Own dedicated group -- lets player.gd's switch_blorbus cycling find him
 	# once recruited without ever touching the "blorbs" group. Never
@@ -225,6 +290,8 @@ func _ready() -> void:
 	# for why staying outside that group is the whole mechanism keeping him
 	# clear of every blorb-only system.
 	add_to_group("xiao_hou_zi")
+	add_to_group("party_playable_candidates")
+	PartyControl.register_member(self)
 	_player = get_node("../Player")
 	_follow_speed = (_player as Player).move_speed
 
@@ -254,7 +321,7 @@ func _ready() -> void:
 	collision_shape.position = Vector3(0, 0.09 * DISPLAY_SCALE, 0)
 	add_child(collision_shape)
 	collision_layer = 1
-	collision_mask = 0
+	collision_mask = 1
 
 	_interact_area = Interactable.attach(
 		self, "Talk", INTERACT_RADIUS, _on_talk,
@@ -270,26 +337,6 @@ func _on_talk() -> void:
 	DialogUI.show_line(display_name, line)
 
 
-## Swaps the visible rig live, mid-game -- Monkey normally, Human for the
-## duration of a possession (see begin_possession()/end_possession() below).
-## Frees whichever rig root is currently parented under self and builds the
-## other one in its place, mirroring player.gd's own _rebuild_visuals_rig().
-## Player.build_portrait_body() is a static helper (nothing about it is
-## instance-specific -- see its own doc comment in player.gd), so it's safe
-## to call here even though this isn't a Player node.
-func _rebuild_rig(as_human: bool) -> void:
-	var old_rig := get_node_or_null("MonkeyFigure")
-	if old_rig == null:
-		old_rig = get_node_or_null("ProceduralFigure")
-	if old_rig != null:
-		old_rig.free()
-	if as_human:
-		_pivots = Player.build_portrait_body(self)
-	else:
-		_pivots = MonkeyFigure.build(self, MonkeyFigure.MONKEY_FUR_COLOR, DISPLAY_SCALE)
-	_eyes = _pivots["eyes"]
-
-
 func _process(delta: float) -> void:
 	EyeBlink.apply(_eye_blink, delta, _eyes)
 	_update_head_look(delta)
@@ -297,14 +344,41 @@ func _process(delta: float) -> void:
 	# is_player_controlled's for why the same state machine already produces
 	# the right behavior whether he's independently himself or standing in
 	# for the human.
-	_update_ai(delta)
 	if not is_player_controlled:
-		# Re-lofts his limb tubes/tail from their live pivot positions every
-		# frame -- see MonkeyFigure.rebuild_limbs's own doc comment for why
-		# this can't just run once at build time. ProceduralFigure's rig has
-		# no equivalent need (see player.gd's own identically-conditioned
-		# _process(), which only ever calls this while piloting the monkey).
-		MonkeyFigure.rebuild_limbs(_pivots, self, delta)
+		_update_ai(delta)
+	# This body always remains Xiao Hou Zi's real MonkeyFigure now. Its tubes
+	# must follow the animated pivots during direct control as well as AI.
+	MonkeyFigure.rebuild_limbs(_pivots, self, delta)
+	_blorb_suit.update(delta)
+	_update_direct_ice_skate_state()
+	if is_player_controlled and Input.is_action_just_pressed("transform") and not UIState.modal_open:
+		_blorb_suit.toggle()
+
+
+func _blorb_suit_pivot_map() -> Dictionary:
+	return {
+		"arm_left_shoulder": _pivots["arm_left"], "arm_left_elbow": _pivots["elbow_left"],
+		"arm_right_shoulder": _pivots["arm_right"], "arm_right_elbow": _pivots["elbow_right"],
+		"leg_left_hip": _pivots["leg_left"], "leg_left_knee": _pivots["knee_left"], "leg_left_ankle": _pivots["ankle_left"],
+		"leg_right_hip": _pivots["leg_right"], "leg_right_knee": _pivots["knee_right"], "leg_right_ankle": _pivots["ankle_right"],
+		"spine": _pivots["spine"], "head": _pivots["head"],
+		"back_left": _pivots["back_left"], "back_right": _pivots["back_right"],
+		"wrist_left": _pivots["wrist_left"], "wrist_right": _pivots["wrist_right"],
+		"fingertip_left": _pivots["fingertip_left"], "fingertip_right": _pivots["fingertip_right"],
+		"toe_left": _pivots["toe_left"], "toe_right": _pivots["toe_right"],
+	}
+
+
+func get_blorb_suit() -> BlorbSuitController:
+	return _blorb_suit
+
+
+func get_own_blorb_suit() -> BlorbSuitController:
+	return _blorb_suit
+
+
+func get_portrait() -> PlayerPortrait:
+	return _portrait
 
 
 func _update_head_look(delta: float) -> void:
@@ -493,6 +567,24 @@ func _animate_walk(delta: float, moving: bool, cadence_scale: float = 1.0) -> vo
 		leg_right.rotation.x = lerp_angle(leg_right.rotation.x, 0.0, POSE_SETTLE_SPEED * delta)
 		arm_left.rotation.x = lerp_angle(arm_left.rotation.x, 0.0, POSE_SETTLE_SPEED * delta)
 		arm_right.rotation.x = lerp_angle(arm_right.rotation.x, 0.0, POSE_SETTLE_SPEED * delta)
+	# Direct skating additionally owns toe yaw, lateral hip roll, knees,
+	# ankles, elbows, spine lean, and the compensating head pitch. Ordinary
+	# Xiao locomotion must explicitly reclaim every one of those properties;
+	# otherwise leaving ice preserves whichever stroke pose happened to be
+	# active on the last supported frame.
+	var settle:=minf(POSE_SETTLE_SPEED*delta,1.0)
+	leg_left.rotation.y=lerp_angle(leg_left.rotation.y,0.0,settle)
+	leg_right.rotation.y=lerp_angle(leg_right.rotation.y,0.0,settle)
+	leg_left.rotation.z=lerp_angle(leg_left.rotation.z,0.0,settle)
+	leg_right.rotation.z=lerp_angle(leg_right.rotation.z,0.0,settle)
+	(_pivots["knee_left"] as Node3D).rotation.x=lerp_angle((_pivots["knee_left"] as Node3D).rotation.x,0.0,settle)
+	(_pivots["knee_right"] as Node3D).rotation.x=lerp_angle((_pivots["knee_right"] as Node3D).rotation.x,0.0,settle)
+	(_pivots["ankle_left"] as Node3D).rotation.x=lerp_angle((_pivots["ankle_left"] as Node3D).rotation.x,0.0,settle)
+	(_pivots["ankle_right"] as Node3D).rotation.x=lerp_angle((_pivots["ankle_right"] as Node3D).rotation.x,0.0,settle)
+	(_pivots["elbow_left"] as Node3D).rotation.x=lerp_angle((_pivots["elbow_left"] as Node3D).rotation.x,0.0,settle)
+	(_pivots["elbow_right"] as Node3D).rotation.x=lerp_angle((_pivots["elbow_right"] as Node3D).rotation.x,0.0,settle)
+	(_pivots["spine"] as Node3D).rotation.x=lerp_angle((_pivots["spine"] as Node3D).rotation.x,0.0,settle)
+	(_pivots["head"] as Node3D).rotation.x=lerp_angle((_pivots["head"] as Node3D).rotation.x,0.0,settle)
 
 
 ## Called by player.gd's _try_start_xiao_hou_zi_control(). Reskins THIS body
@@ -503,12 +595,38 @@ func _animate_walk(delta: float, moving: bool, cadence_scale: float = 1.0) -> vo
 ## _update_ai() needs to start treating him like a party member who'll stand
 ## put until the player (now off piloting this body) wanders away, then
 ## trail after them.
-func begin_possession() -> void:
+func playable_id() -> String:
+	return _playable_profile.id
+
+
+func playable_profile() -> PlayableCharacterProfile:
+	return _playable_profile
+
+
+func is_playable_available() -> bool:
+	return in_party
+
+
+func has_playable_capability(capability: StringName) -> bool:
+	return bool(_playable_profile.capabilities.get(String(capability), false))
+
+
+func playable_switch_order() -> int:
+	return _playable_profile.switch_order
+
+
+func take_damage(amount: float) -> void:
+	# Intentionally invincible for now. Keep the method as a compatibility
+	# target for combat callers without creating a hidden HP/faint path.
+	pass
+
+
+func begin_direct_control() -> void:
 	is_player_controlled = true
+	collision_layer = 2
 	_look_target = null
 	if _interact_area != null:
 		_interact_area.monitoring = false
-	_rebuild_rig(true)
 
 
 ## Called by player.gd's _end_xiao_hou_zi_control() -- reskins back to his
@@ -517,8 +635,904 @@ func begin_possession() -> void:
 ## body's position has stayed continuously live and correct the whole time
 ## it stood in for the human), re-enables the "Talk" prompt, and resumes
 ## being himself.
-func end_possession() -> void:
+func end_direct_control() -> void:
 	if _interact_area != null:
 		_interact_area.monitoring = true
 	is_player_controlled = false
-	_rebuild_rig(false)
+	collision_layer = 1
+	_direct_vertical_velocity = 0.0
+	_direct_dirtbike_front_toggled = false
+	_direct_dirtbike_front_active = false
+	_direct_dirtbike_active = false
+	_direct_dirtbike_airborne = false
+	_set_direct_dirtbike_wheel_presence()
+	_direct_ice_skating_active = false
+	_clear_direct_environment()
+
+
+func prepare_direct_control_environment(delta: float) -> void:
+	_clear_direct_environment()
+	_update_direct_dirtbike_state()
+	_update_direct_ice_skate_state()
+	_update_direct_powered_movement(delta)
+	var xz := Vector2(global_position.x, global_position.z)
+	_direct_floor_height = terrain.get_mesh_height(xz.x, xz.y)
+	var in_lava: bool = terrain.has_method("is_lava_area") and bool(terrain.is_lava_area(xz))
+	var in_water: bool = terrain.has_method("is_lake_area") and bool(terrain.is_lake_area(xz))
+	if in_lava:
+		_direct_liquid_level = terrain.get_lava_surface_height(xz)
+		if _blorb_suit.has_full_lava_suit() and global_position.y <= _direct_liquid_level:
+			_direct_diving = true
+		elif _blorb_suit.has_lava_safe_legs() and global_position.y <= _direct_liquid_level + 0.15:
+			_direct_lava_surface = true
+	elif in_water:
+		_direct_liquid_level = terrain.get_lake_water_level()
+		var depth := _direct_liquid_level - _direct_floor_height
+		if depth >= Player.LAKE_MIN_SWIMMABLE_DEPTH and global_position.y <= _direct_liquid_level:
+			if _blorb_suit.has_head_diving_helmet():
+				_direct_diving = true
+			else:
+				_direct_surface_swimming = true
+	if not _direct_diving and not _direct_surface_swimming and not _direct_lava_surface:
+		_direct_flying = _blorb_suit.has_chest_air_blorb()
+		_direct_air_feet = _blorb_suit.has_air_hover_legs()
+
+
+func uses_pitched_movement_input() -> bool:
+	return _direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight
+
+
+func _clear_direct_environment() -> void:
+	_direct_surface_swimming = false
+	_direct_diving = false
+	_direct_flying = false
+	_direct_air_feet = false
+	_direct_lava_surface = false
+	_direct_liquid_level = -INF
+
+
+func _update_direct_powered_movement(delta: float) -> void:
+	var was_hovering: bool = _direct_powered_hover_active()
+	_direct_left_arm_water = _consume_direct_power("arm_left", "left_arm_power", "water", Player.WATER_POWER_MP_PER_SECOND, delta)
+	_direct_right_arm_water = _consume_direct_power("arm_right", "right_arm_power", "water", Player.WATER_POWER_MP_PER_SECOND, delta)
+	_direct_left_arm_fire = _consume_direct_power("arm_left", "left_arm_power", "fire", Player.FIRE_POWER_MP_PER_SECOND, delta)
+	_direct_right_arm_fire = _consume_direct_power("arm_right", "right_arm_power", "fire", Player.FIRE_POWER_MP_PER_SECOND, delta)
+	_direct_left_leg_water = _consume_direct_power("leg_left", "left_leg_power", "water", Player.WATER_POWER_MP_PER_SECOND, delta)
+	_direct_right_leg_water = _consume_direct_power("leg_right", "right_leg_power", "water", Player.WATER_POWER_MP_PER_SECOND, delta)
+	_direct_left_leg_fire = _consume_direct_power("leg_left", "left_leg_power", "fire", Player.FIRE_POWER_MP_PER_SECOND, delta)
+	_direct_right_leg_fire = _consume_direct_power("leg_right", "right_leg_power", "fire", Player.FIRE_POWER_MP_PER_SECOND, delta)
+	_direct_water_leg_hover = _direct_left_leg_water and _direct_right_leg_water
+	_direct_fire_hand_hover = _direct_left_arm_fire and _direct_right_arm_fire
+	_direct_fire_leg_hover = _direct_left_leg_fire and _direct_right_leg_fire
+	_direct_fire_limb_flight = _direct_fire_hand_hover and _direct_fire_leg_hover
+	if _direct_left_arm_water or _direct_right_arm_water or _direct_left_leg_water or _direct_right_leg_water:
+		UISounds.pulse_power_loop(&"water", get_instance_id())
+	if _direct_left_arm_fire or _direct_right_arm_fire or _direct_left_leg_fire or _direct_right_leg_fire:
+		UISounds.pulse_power_loop(&"fire", get_instance_id())
+	if _direct_powered_hover_active() and not was_hovering:
+		_direct_hover_height = global_position.y
+
+
+func _consume_direct_power(slot: String, action: String, element: String, rate: float, delta: float) -> bool:
+	if UIState.modal_open or not Input.is_action_pressed(action):
+		return false
+	var blorb := _blorb_suit.worn_blorb_in_slot(slot)
+	return blorb != null and blorb.element_state == element and blorb.consume_mp(rate * delta)
+
+
+func _direct_powered_hover_active() -> bool:
+	return _direct_water_leg_hover or _direct_fire_hand_hover or _direct_fire_leg_hover or _direct_fire_limb_flight
+
+
+func _special_speed_multiplier(slots: Array[String], averaged: bool = false) -> float:
+	var contributors: Array[Blorb] = []
+	for slot in slots:
+		var blorb := _blorb_suit.worn_blorb_for_slot(slot)
+		if blorb != null:
+			contributors.append(blorb)
+	return (
+		HumanoidLocomotion.averaged_blorb_speed_multiplier(contributors, Player.SPECIAL_MOVEMENT_SPEED_PER_POINT)
+		if averaged
+		else HumanoidLocomotion.blorb_speed_multiplier(contributors, Player.SPECIAL_MOVEMENT_SPEED_PER_POINT)
+	)
+
+
+func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_pressed: bool) -> void:
+	if not is_player_controlled or _mounted:
+		return
+	var planar := Vector2(direction.x, direction.z)
+	if direction.length_squared() > 1.0:
+		direction = direction.normalized()
+	if planar.length_squared() > 1.0:
+		planar = planar.normalized()
+	var dirtbike_ballistic:=_direct_dirtbike_active and (
+		_direct_dirtbike_airborne or (not is_on_floor()) or jump_pressed
+	)
+	var speed := HumanoidLocomotion.ground_speed(_playable_profile, sprinting)
+	if _direct_dirtbike_active:
+		speed *= Player.DIRTBIKE_SPEED_MULTIPLIER
+		if _direct_dirtbike_front_active:
+			speed *= Player.DIRTBIKE_WHEELIE_SPEED_MULTIPLIER
+	if _blorb_suit.has_blorb_skates() and sprinting and not _direct_ice_skates_active:
+		speed *= _special_speed_multiplier(["leg_left", "leg_right"])
+	if _direct_diving:
+		speed = Player.LAKE_DIVE_SPEED * _special_speed_multiplier(["head", "leg_left", "leg_right"], true)
+		if sprinting:
+			speed *= Player.AERIAL_FAST_SPEED_MULTIPLIER
+	elif _direct_flying:
+		speed = Player.AIR_FLIGHT_SPEED * _special_speed_multiplier(["torso"])
+		# Fire feet are independent jet boosters during chest flight; each
+		# contributing leg compounds exactly as it does for the human motor.
+		var fire_boosters: Array[String] = []
+		for slot in ["leg_left", "leg_right"]:
+			var booster := _blorb_suit.worn_blorb_in_slot(slot)
+			if booster != null and booster.element_state == "fire" and Input.is_action_pressed("left_leg_power" if slot == "leg_left" else "right_leg_power"):
+				fire_boosters.append(slot)
+		if not fire_boosters.is_empty():
+			speed *= _special_speed_multiplier(fire_boosters)
+		if sprinting:
+			speed *= Player.FLIGHT_SPRINT_SPEED_MULTIPLIER
+	elif _direct_fire_limb_flight:
+		speed = Player.AIR_FLIGHT_SPEED * _special_speed_multiplier(["arm_left", "arm_right", "leg_left", "leg_right"], true)
+		if sprinting:
+			speed *= Player.FLIGHT_SPRINT_SPEED_MULTIPLIER
+	elif _direct_surface_swimming:
+		speed *= _special_speed_multiplier(["head", "leg_left", "leg_right"], true)
+	if (
+		_direct_ice_skating_active
+		and not (_direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight or _direct_surface_swimming)
+	):
+		var skating_velocity:=Vector2(velocity.x,velocity.z)
+		var skate_speed_before:=skating_velocity.length()
+		if planar.length_squared()>0.0001:
+			var skate_speed:=HumanoidLocomotion.ground_speed(
+				_playable_profile,sprinting
+			)*Player.ICE_SKATE_SPEED_MULTIPLIER*_special_speed_multiplier(["leg_left","leg_right"])
+			skating_velocity=HumanoidLocomotion.drive_wheel_velocity(
+				skating_velocity,planar,skate_speed,delta,
+				Player.ICE_SKATE_DRIVE_ACCELERATION*(Player.ICE_SKATE_SPRINT_THRUST_MULTIPLIER if sprinting else 1.0),Player.ICE_SKATE_LATERAL_GRIP,
+				Player.ICE_SKATE_REVERSE_BRAKING,Player.ICE_SKATE_STOP_SPEED
+			)
+		else:
+			skating_velocity=HumanoidLocomotion.coast_wheel_velocity(
+				skating_velocity,0.0,delta,Player.ICE_SKATE_ROLLING_RESISTANCE,
+				Player.ICE_SKATE_AIR_DRAG,Player.ICE_SKATE_STOP_SPEED,
+				Player.ICE_SKATE_TERMINAL_SPEED
+			)
+		if skating_velocity.length()>Player.ICE_SKATE_TERMINAL_SPEED:
+			skating_velocity=skating_velocity.normalized()*Player.ICE_SKATE_TERMINAL_SPEED
+		velocity.x=skating_velocity.x
+		velocity.z=skating_velocity.y
+		var skate_acceleration:=maxf((skating_velocity.length()-skate_speed_before)/maxf(delta,0.0001),0.0)
+		var sound_cycle:=fposmod(_direct_ice_skate_phase/TAU,1.0)
+		var sound_left:=Player.ice_skate_stroke(sound_cycle)
+		var sound_right:=Player.ice_skate_stroke(fposmod(sound_cycle+0.5,1.0))
+		UISounds.pulse_ice_skates(
+			get_instance_id(),skating_velocity.length(),skate_acceleration,
+			1.0-sound_left.y,1.0-sound_right.y
+		)
+	elif (
+		_direct_dirtbike_active
+		and not (_direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight or _direct_surface_swimming)
+	):
+		var rolling:=Vector2(velocity.x,velocity.z)
+		if dirtbike_ballistic:
+			pass
+		elif planar.length_squared()>0.0001:
+			rolling=HumanoidLocomotion.drive_wheel_velocity(
+				rolling,planar,speed,delta,Player.DIRTBIKE_DRIVE_ACCELERATION,
+				Player.DIRTBIKE_LATERAL_GRIP,Player.DIRTBIKE_REVERSE_BRAKING,
+				Player.DIRTBIKE_ROLL_STOP_SPEED
+			)
+		else:
+			var grade:=_direct_dirtbike_slope() if is_on_floor() and not _direct_dirtbike_airborne else 0.0
+			_direct_dirtbike_smoothed_grade=lerpf(
+				_direct_dirtbike_smoothed_grade,grade,
+				minf(Player.DIRTBIKE_GRADE_RESPONSE*delta,1.0)
+			)
+			rolling=HumanoidLocomotion.coast_wheel_velocity(
+				rolling,_direct_dirtbike_smoothed_grade,delta,
+				Player.DIRTBIKE_ROLLING_RESISTANCE,Player.DIRTBIKE_AIR_DRAG,
+				Player.DIRTBIKE_ROLL_STOP_SPEED,Player.DIRTBIKE_TERMINAL_ROLL_SPEED
+			)
+		velocity.x=rolling.x
+		velocity.z=rolling.y
+	elif _direct_ice_skate_airborne:
+		# Steering may rotate Xiao's pose below, but never rewrites the launch.
+		pass
+	else:
+		velocity.x = planar.x * speed
+		velocity.z = planar.y * speed
+	if _direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight:
+		velocity = direction * speed
+		_direct_vertical_velocity = velocity.y
+	elif _direct_powered_hover_active():
+		var height_error: float = _direct_hover_height - global_position.y
+		_direct_vertical_velocity = clampf(
+			height_error * Player.POWERED_HOVER_SETTLE_SPEED,
+			-Player.POWERED_HOVER_LIFT_SPEED,
+			Player.POWERED_HOVER_LIFT_SPEED
+		)
+		velocity.y = _direct_vertical_velocity
+	elif _direct_surface_swimming:
+		var swim_y := _direct_liquid_level - Player.LAKE_SWIM_FOOT_DEPTH
+		global_position.y = move_toward(global_position.y, swim_y, Player.LAKE_BUOYANCY_LIFT_SPEED * delta)
+		_direct_vertical_velocity = 0.0
+		velocity.y = 0.0
+		if jump_pressed:
+			_direct_vertical_velocity = HumanoidLocomotion.jump_speed(
+				_playable_profile, Player.WATER_EXIT_JUMP_HEIGHT_MULTIPLIER
+			)
+			velocity.y = _direct_vertical_velocity
+			_direct_surface_swimming = false
+	elif _direct_lava_surface:
+		global_position.y = _direct_liquid_level
+		_direct_vertical_velocity = 0.0
+		velocity.y = 0.0
+	elif _direct_dirtbike_airborne:
+		velocity=HumanoidLocomotion.ballistic_step(velocity,delta,_playable_profile,32.0)
+		_direct_vertical_velocity=velocity.y
+	elif _direct_ice_skate_airborne:
+		velocity=HumanoidLocomotion.ballistic_step(velocity,delta,_playable_profile,32.0)
+		_direct_vertical_velocity=velocity.y
+	elif is_on_floor() or _direct_is_supported_by_ice():
+		if jump_pressed:
+			_direct_vertical_velocity = HumanoidLocomotion.jump_speed(
+				_playable_profile,
+				Player.DIRTBIKE_JUMP_HEIGHT_MULTIPLIER if _direct_dirtbike_active else 1.0
+			)
+			if _direct_ice_skates_active:
+				_direct_vertical_velocity=maxf(
+					_direct_vertical_velocity,HumanoidLocomotion.jump_speed(_playable_profile)
+				)
+			_direct_dirtbike_airborne = _direct_dirtbike_active
+			if _direct_ice_skates_active and _direct_ice_skate_was_supported:
+				_direct_ice_skate_airborne=true
+				_direct_ice_skating_active=false
+		else:
+			_direct_vertical_velocity = 0.0
+	else:
+		_direct_vertical_velocity = HumanoidLocomotion.apply_gravity(
+			_direct_vertical_velocity, delta, _playable_profile, 32.0
+		)
+	velocity.y = _direct_vertical_velocity
+	if _direct_diving:
+		var dive_floor := _direct_floor_height + Player.LAKE_DIVE_FLOOR_CLEARANCE
+		var dive_surface := _direct_liquid_level - Player.LAKE_SWIM_FOOT_DEPTH
+		global_position.y = clampf(global_position.y, dive_floor, dive_surface)
+	var pre_move_position := global_position
+	var bounced_before_move: bool = _try_direct_blorb_bounce(delta)
+	move_and_slide()
+	_update_direct_ice_skate_airtime(delta,pre_move_position)
+	_resolve_direct_dirtbike_motion(delta,pre_move_position)
+	# CharacterBody movement can carry the body beyond a liquid boundary after
+	# the pre-move clamp. Clamp the resolved position too, matching the human
+	# swimmer's hard floor/surface guarantees.
+	if _direct_diving:
+		var resolved_dive_floor: float = _direct_floor_height + Player.LAKE_DIVE_FLOOR_CLEARANCE
+		var resolved_dive_surface: float = _direct_liquid_level - Player.LAKE_SWIM_FOOT_DEPTH
+		global_position.y = clampf(global_position.y, resolved_dive_floor, resolved_dive_surface)
+	elif _direct_surface_swimming:
+		global_position.y = minf(global_position.y, _direct_liquid_level - Player.LAKE_SWIM_FOOT_DEPTH)
+	elif _direct_lava_surface:
+		global_position.y = _direct_liquid_level
+	if not bounced_before_move:
+		_enforce_direct_blorb_bounce()
+	if is_on_floor() and velocity.y <= 0.0 and not _direct_dirtbike_airborne:
+		_direct_vertical_velocity = 0.0
+	if planar.length_squared() > 0.0001:
+		rotation.y = lerp_angle(rotation.y, atan2(planar.x, planar.y), ROTATION_SPEED * delta)
+	_animate_direct_motion(delta, direction, speed)
+	_apply_direct_power_pose(delta)
+	_apply_direct_dirtbike_pose(delta)
+	_update_direct_dirtbike_wheels(delta)
+	_update_direct_power_fx()
+
+
+func _ensure_direct_power_fx() -> void:
+	if _direct_water_arm_fx.is_empty():
+		_direct_water_arm_fx = [
+			SuitPowerFX.make_water_stream(self, "LeftWaterHand"),
+			SuitPowerFX.make_water_stream(self, "RightWaterHand"),
+		]
+		_direct_fire_arm_fx = [
+			SuitPowerFX.make_fire_stream(self, "LeftFireHand"),
+			SuitPowerFX.make_fire_stream(self, "RightFireHand"),
+		]
+		_direct_water_leg_fx = [
+			SuitPowerFX.make_water_stream(self, "LeftWaterFoot"),
+			SuitPowerFX.make_water_stream(self, "RightWaterFoot"),
+		]
+		_direct_fire_leg_fx = [
+			SuitPowerFX.make_fire_stream(self, "LeftFireFoot"),
+			SuitPowerFX.make_fire_stream(self, "RightFireFoot"),
+		]
+
+
+func _update_direct_power_fx() -> void:
+	_ensure_direct_power_fx()
+	var forward: Vector3 = global_transform.basis.z.normalized()
+	var hand_direction: Vector3 = Vector3.DOWN if _direct_fire_hand_hover else forward
+	var roll_reference: Vector3 = forward
+	SuitPowerFX.point_stream(_direct_water_arm_fx[0], _pivots["palm_left"], forward, _direct_left_arm_water, roll_reference)
+	SuitPowerFX.point_stream(_direct_water_arm_fx[1], _pivots["palm_right"], forward, _direct_right_arm_water, roll_reference)
+	SuitPowerFX.point_stream(_direct_fire_arm_fx[0], _pivots["palm_left"], hand_direction, _direct_left_arm_fire, roll_reference)
+	SuitPowerFX.point_stream(_direct_fire_arm_fx[1], _pivots["palm_right"], hand_direction, _direct_right_arm_fire, roll_reference)
+	SuitPowerFX.point_stream(_direct_water_leg_fx[0], _pivots["toe_left"], Vector3.DOWN, _direct_left_leg_water, roll_reference)
+	SuitPowerFX.point_stream(_direct_water_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _direct_right_leg_water, roll_reference)
+	SuitPowerFX.point_stream(_direct_fire_leg_fx[0], _pivots["toe_left"], Vector3.DOWN, _direct_left_leg_fire, roll_reference)
+	SuitPowerFX.point_stream(_direct_fire_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _direct_right_leg_fire, roll_reference)
+
+
+## Same trampoline invariant as the human motor: an ordinary Blorb can never
+## become a stable floor. Resolve the descending crown crossing before physics
+## can zero vertical velocity and strand both rigs in their squash/jump poses.
+func _try_direct_blorb_bounce(delta: float) -> bool:
+	if velocity.y > 0.1 or _direct_diving or _direct_surface_swimming or _direct_flying or _direct_air_feet:
+		return false
+	var current_feet_y: float = global_position.y
+	var projected_x: float = global_position.x + velocity.x * delta
+	var projected_z: float = global_position.z + velocity.z * delta
+	var projected_feet_y: float = current_feet_y + velocity.y * delta
+	var best: Blorb = null
+	var best_surface: float = -INF
+	for node in get_tree().get_nodes_in_group("blorbs"):
+		var candidate := node as Blorb
+		if candidate == null or candidate.is_worn or candidate.is_melted or candidate.blorb_type == "size":
+			continue
+		var surface: Variant = candidate.bounce_surface_height_at(projected_x, projected_z)
+		if surface == null:
+			continue
+		var surface_y: float = surface as float
+		if current_feet_y >= surface_y - 0.12 and projected_feet_y <= surface_y + 0.12 and surface_y > best_surface:
+			best = candidate
+			best_surface = surface_y
+	if best == null:
+		return false
+	global_position.y = best_surface + DIRECT_BOUNCE_CLEARANCE
+	_launch_from_blorb(best)
+	return true
+
+
+## Collision-backed recovery closes the remaining edge case where a squashed
+## or moving crown differs slightly from its analytic surface during a frame.
+func _enforce_direct_blorb_bounce() -> bool:
+	if velocity.y > 0.1 or _direct_diving or _direct_surface_swimming or _direct_flying or _direct_air_feet:
+		return false
+	for collision_index in get_slide_collision_count():
+		var collision: KinematicCollision3D = get_slide_collision(collision_index)
+		if collision.get_normal().y < 0.2:
+			continue
+		var candidate := collision.get_collider() as Blorb
+		if candidate == null or candidate.is_worn or candidate.is_melted or candidate.blorb_type == "size":
+			continue
+		var surface: Variant = candidate.bounce_surface_height_at(global_position.x, global_position.z)
+		if surface != null:
+			global_position.y = maxf(global_position.y, (surface as float) + DIRECT_BOUNCE_CLEARANCE)
+		_launch_from_blorb(candidate)
+		return true
+	return false
+
+
+func _launch_from_blorb(blorb: Blorb) -> void:
+	_direct_last_bounced_blorb = blorb
+	_direct_vertical_velocity = HumanoidLocomotion.jump_speed(_playable_profile)
+	velocity.y = _direct_vertical_velocity
+	blorb.trigger_bounce_squash()
+	blorb.finish_platform_aid()
+	UISounds.play_blorb_bounce(false, get_instance_id())
+
+
+func receive_platform_aid_bounce(platform: Blorb) -> void:
+	if not is_player_controlled or platform == null:
+		return
+	var surface: Variant = platform.bounce_surface_height_at(global_position.x, global_position.z)
+	if surface == null:
+		return
+	# Arrival is already constrained to the same physical support selected by
+	# Player's downward probe. Put Xiao on the crown and launch immediately;
+	# there is no intermediate planted frame that can shove or perma-squash.
+	global_position.y = (surface as float) + DIRECT_BOUNCE_CLEARANCE
+	_launch_from_blorb(platform)
+
+
+func _animate_direct_motion(delta: float, direction: Vector3, speed: float) -> void:
+	if _direct_diving or _direct_surface_swimming:
+		_animate_direct_swim(delta, speed)
+		return
+	if _direct_flying:
+		_animate_direct_flight(delta, direction)
+		return
+	if _direct_ice_skating_active:
+		_animate_direct_ice_skating(delta)
+		return
+	if not is_on_floor() and not _direct_air_feet and not _direct_lava_surface:
+		_animate_direct_airborne(delta)
+		return
+	var cadence := HumanoidLocomotion.walk_phase_step(
+		1.0, Player.WALK_SWING_SPEED, speed, _playable_profile
+	) / WALK_SWING_SPEED
+	_animate_walk(delta, Vector2(velocity.x, velocity.z).length_squared() > 0.01, cadence)
+
+
+func _animate_direct_ice_skating(delta: float) -> void:
+	var planar_speed:=Vector2(velocity.x,velocity.z).length()
+	var settle:=minf(Player.ICE_SKATE_POSE_SETTLE_SPEED*delta,1.0)
+	var sprinting:=Input.is_action_pressed("run")
+	var effort:=Player.ICE_SKATE_SPRINT_POSE_MULTIPLIER if sprinting else 1.0
+	if planar_speed<=0.12:
+		_direct_ice_skate_previous_speed=planar_speed
+		_direct_ice_skate_smoothed_acceleration=0.0
+		_animate_walk(delta,false)
+		return
+	var foot_anchor:=((_pivots["ankle_left"] as Node3D).global_position+(_pivots["ankle_right"] as Node3D).global_position)*0.5
+	var raw_acceleration:=maxf((planar_speed-_direct_ice_skate_previous_speed)/maxf(delta,0.0001),0.0)
+	_direct_ice_skate_previous_speed=planar_speed
+	_direct_ice_skate_smoothed_acceleration=lerpf(
+		_direct_ice_skate_smoothed_acceleration,raw_acceleration,1.0-exp(-5.0*delta)
+	)
+	var thrust_mix:=clampf(_direct_ice_skate_smoothed_acceleration/Player.ICE_SKATE_FULL_THRUST_ACCELERATION,0.0,1.0)
+	var cadence:=lerpf(Player.ICE_SKATE_CADENCE_GLIDE,Player.ICE_SKATE_CADENCE_THRUST,smoothstep(0.0,1.0,thrust_mix))
+	_direct_ice_skate_phase+=delta*cadence
+	var cycle:=fposmod(_direct_ice_skate_phase/TAU,1.0)
+	var left_stroke:=Player.ice_skate_stroke(cycle)
+	var right_stroke:=Player.ice_skate_stroke(fposmod(cycle+0.5,1.0))
+	var left_push:=left_stroke.x
+	var right_push:=right_stroke.x
+	var left_recovery:=left_stroke.y
+	var right_recovery:=right_stroke.y
+	var left_support:=left_stroke.z
+	var right_support:=right_stroke.z
+	var left_leg:=_pivots["leg_left"] as Node3D
+	var right_leg:=_pivots["leg_right"] as Node3D
+	var left_knee:=_pivots["knee_left"] as Node3D
+	var right_knee:=_pivots["knee_right"] as Node3D
+	var left_ankle:=_pivots["ankle_left"] as Node3D
+	var right_ankle:=_pivots["ankle_right"] as Node3D
+	var left_hip_x:=Player.ICE_SKATE_PUSH_HIP_BACK*left_push*effort-Player.ICE_SKATE_RECOVERY_HIP_FORWARD*left_recovery-Player.ICE_SKATE_GLIDE_HIP_FORWARD*left_support*effort
+	var right_hip_x:=Player.ICE_SKATE_PUSH_HIP_BACK*right_push*effort-Player.ICE_SKATE_RECOVERY_HIP_FORWARD*right_recovery-Player.ICE_SKATE_GLIDE_HIP_FORWARD*right_support*effort
+	left_leg.rotation.x=lerp_angle(left_leg.rotation.x,left_hip_x,settle)
+	right_leg.rotation.x=lerp_angle(right_leg.rotation.x,right_hip_x,settle)
+	left_leg.rotation.y=lerp_angle(left_leg.rotation.y,Player.ICE_SKATE_TOE_OUT*left_push*effort,settle)
+	right_leg.rotation.y=lerp_angle(right_leg.rotation.y,-Player.ICE_SKATE_TOE_OUT*right_push*effort,settle)
+	var left_knee_x:=(Player.ICE_SKATE_GLIDE_KNEE*left_support+Player.ICE_SKATE_PUSH_KNEE*left_push+Player.ICE_SKATE_RECOVERY_KNEE*left_recovery)*effort
+	var right_knee_x:=(Player.ICE_SKATE_GLIDE_KNEE*right_support+Player.ICE_SKATE_PUSH_KNEE*right_push+Player.ICE_SKATE_RECOVERY_KNEE*right_recovery)*effort
+	left_knee.rotation.x=lerp_angle(left_knee.rotation.x,left_knee_x,settle)
+	right_knee.rotation.x=lerp_angle(right_knee.rotation.x,right_knee_x,settle)
+	var outward_amount:=Player.ICE_SKATE_SPRINT_PUSH_OUTWARD if sprinting else Player.ICE_SKATE_PUSH_OUTWARD
+	left_leg.rotation.z=lerp_angle(left_leg.rotation.z,_direct_ice_skate_outward_roll(left_leg,left_ankle,outward_amount)*left_push,settle)
+	right_leg.rotation.z=lerp_angle(right_leg.rotation.z,_direct_ice_skate_outward_roll(right_leg,right_ankle,outward_amount)*right_push,settle)
+	left_ankle.rotation.x=lerp_angle(left_ankle.rotation.x,-(left_hip_x+left_knee_x)*left_support,settle)
+	right_ankle.rotation.x=lerp_angle(right_ankle.rotation.x,-(right_hip_x+right_knee_x)*right_support,settle)
+	var left_arm:=_pivots["arm_left"] as Node3D
+	var right_arm:=_pivots["arm_right"] as Node3D
+	var sprint_arm_lift:=Player.ICE_SKATE_SPRINT_ARM_LIFT if sprinting else 0.0
+	left_arm.rotation.x=lerp_angle(left_arm.rotation.x,(-Player.ICE_SKATE_ARM_SWING*right_support+Player.ICE_SKATE_ARM_SWING*0.55*left_support)*effort-sprint_arm_lift,settle)
+	right_arm.rotation.x=lerp_angle(right_arm.rotation.x,(-Player.ICE_SKATE_ARM_SWING*left_support+Player.ICE_SKATE_ARM_SWING*0.55*right_support)*effort-sprint_arm_lift,settle)
+	(_pivots["elbow_left"] as Node3D).rotation.x=lerp_angle((_pivots["elbow_left"] as Node3D).rotation.x,-Player.ICE_SKATE_ELBOW_BEND*right_support*effort,settle)
+	(_pivots["elbow_right"] as Node3D).rotation.x=lerp_angle((_pivots["elbow_right"] as Node3D).rotation.x,-Player.ICE_SKATE_ELBOW_BEND*left_support*effort,settle)
+	var skate_lean:=Player.ICE_SKATE_BODY_LEAN+(Player.ICE_SKATE_SPRINT_BODY_LEAN if sprinting else 0.0)
+	(_pivots["spine"] as Node3D).rotation.x=lerp_angle((_pivots["spine"] as Node3D).rotation.x,skate_lean,settle)
+	# Direct control disables Xiao's ordinary NPC look-at pass, so compensate
+	# the skating lean here to keep his eyes aimed along travel.
+	(_pivots["head"] as Node3D).rotation.x=lerp_angle(
+		(_pivots["head"] as Node3D).rotation.x,-skate_lean*0.72,settle
+	)
+	# Move Xiao's complete visual rig by the amount required to preserve skate
+	# contact after flexing the legs. This lowers his pelvis with the crouch
+	# instead of sinking the torso meshes through fixed hip sockets.
+	var rig:=_pivots.get("_rig") as Node3D
+	if rig!=null:
+		var posed_foot_anchor:=((_pivots["ankle_left"] as Node3D).global_position+(_pivots["ankle_right"] as Node3D).global_position)*0.5
+		rig.global_position+=foot_anchor-posed_foot_anchor
+
+
+func _direct_ice_skate_outward_roll(leg: Node3D,ankle: Node3D,amount: float) -> float:
+	var original:=leg.rotation.z
+	var rig:=_pivots.get("_rig") as Node3D
+	var right: Vector3=(rig.global_transform.basis.x if rig!=null else global_transform.basis.x).normalized()
+	var spine:=_pivots["spine"] as Node3D
+	var side:=signf((leg.global_position-spine.global_position).dot(right))
+	if is_zero_approx(side):
+		side=signf(leg.position.x)
+	var best_angle:=0.0
+	var best_score:=-INF
+	for sample in 17:
+		var candidate:=lerpf(-amount,amount,float(sample)/16.0)
+		leg.rotation.z=candidate
+		leg.force_update_transform()
+		ankle.force_update_transform()
+		var score:=side*(ankle.global_position-leg.global_position).dot(right)
+		if score>best_score:
+			best_score=score
+			best_angle=candidate
+	leg.rotation.z=original
+	return best_angle
+
+
+func _animate_direct_swim(delta: float, movement_speed: float) -> void:
+	_walk_phase += delta * Player.SWIM_KICK_SPEED * clampf(movement_speed / Player.LAKE_DIVE_SPEED, 0.6, 1.8)
+	var left_wave := sin(_walk_phase)
+	var right_wave := sin(_walk_phase + PI)
+	var settle := Player.JUMP_POSE_SETTLE_SPEED * delta
+	(_pivots["leg_left"] as Node3D).rotation.x = lerp_angle((_pivots["leg_left"] as Node3D).rotation.x, -Player.DESCENT_HIP_BEND + left_wave * Player.SWIM_KICK_HIP_AMOUNT, settle)
+	(_pivots["leg_right"] as Node3D).rotation.x = lerp_angle((_pivots["leg_right"] as Node3D).rotation.x, -Player.DESCENT_HIP_BEND + right_wave * Player.SWIM_KICK_HIP_AMOUNT, settle)
+	(_pivots["knee_left"] as Node3D).rotation.x = lerp_angle((_pivots["knee_left"] as Node3D).rotation.x, Player.DESCENT_KNEE_BEND + maxf(0.0, -left_wave) * Player.SWIM_KICK_KNEE_AMOUNT, settle)
+	(_pivots["knee_right"] as Node3D).rotation.x = lerp_angle((_pivots["knee_right"] as Node3D).rotation.x, Player.DESCENT_KNEE_BEND + maxf(0.0, -right_wave) * Player.SWIM_KICK_KNEE_AMOUNT, settle)
+	(_pivots["ankle_left"] as Node3D).rotation.x = lerp_angle((_pivots["ankle_left"] as Node3D).rotation.x, Player.SWIM_FLOAT_ANKLE_EXTEND + maxf(0.0, left_wave) * Player.SWIM_KICK_ANKLE_AMOUNT, settle)
+	(_pivots["ankle_right"] as Node3D).rotation.x = lerp_angle((_pivots["ankle_right"] as Node3D).rotation.x, Player.SWIM_FLOAT_ANKLE_EXTEND + maxf(0.0, right_wave) * Player.SWIM_KICK_ANKLE_AMOUNT, settle)
+
+
+func _animate_direct_airborne(delta: float) -> void:
+	var settle := Player.JUMP_POSE_SETTLE_SPEED * delta
+	(_pivots["arm_left"] as Node3D).rotation.x = lerp_angle((_pivots["arm_left"] as Node3D).rotation.x, -(Player.JUMP_ARM_SWING - Player.JUMP_ARM_ASYMMETRY), settle)
+	(_pivots["arm_right"] as Node3D).rotation.x = lerp_angle((_pivots["arm_right"] as Node3D).rotation.x, -(Player.JUMP_ARM_SWING + Player.JUMP_ARM_ASYMMETRY), settle)
+	(_pivots["leg_left"] as Node3D).rotation.x = lerp_angle((_pivots["leg_left"] as Node3D).rotation.x, -Player.JUMP_HIP_BEND, settle)
+	(_pivots["leg_right"] as Node3D).rotation.x = lerp_angle((_pivots["leg_right"] as Node3D).rotation.x, -Player.JUMP_HIP_BEND, settle)
+	(_pivots["knee_left"] as Node3D).rotation.x = lerp_angle((_pivots["knee_left"] as Node3D).rotation.x, Player.JUMP_KNEE_BEND, settle)
+	(_pivots["knee_right"] as Node3D).rotation.x = lerp_angle((_pivots["knee_right"] as Node3D).rotation.x, Player.JUMP_KNEE_BEND, settle)
+
+
+func _animate_direct_flight(delta: float, direction: Vector3) -> void:
+	var settle := Player.JUMP_POSE_SETTLE_SPEED * delta
+	var pitch := clampf(-direction.y, -0.8, 0.8)
+	(_pivots["spine"] as Node3D).rotation.x = lerp_angle((_pivots["spine"] as Node3D).rotation.x, pitch, settle)
+	(_pivots["leg_left"] as Node3D).rotation.x = lerp_angle((_pivots["leg_left"] as Node3D).rotation.x, 0.0, settle)
+	(_pivots["leg_right"] as Node3D).rotation.x = lerp_angle((_pivots["leg_right"] as Node3D).rotation.x, 0.0, settle)
+
+
+func _apply_direct_power_pose(delta: float) -> void:
+	if UIState.modal_open:
+		return
+	var settle: float = minf(Player.ARM_POWER_POSE_SETTLE_SPEED * delta, 1.0)
+	var both_fire_hands: bool = _direct_fire_hand_hover
+	for side in ["left", "right"]:
+		var action: String = "%s_arm_power" % side
+		if not Input.is_action_pressed(action):
+			continue
+		var arm := _pivots["arm_%s" % side] as Node3D
+		var elbow := _pivots["elbow_%s" % side] as Node3D
+		var wrist := _pivots["wrist_%s" % side] as Node3D
+		if arm == null or elbow == null or wrist == null:
+			continue
+		if both_fire_hands:
+			arm.rotation.x = lerp_angle(arm.rotation.x, Player.FIRE_JET_ARM_BACK_ANGLE, settle)
+			arm.rotation.z = lerp_angle(
+				arm.rotation.z,
+				signf(arm.position.x) * Player.FIRE_JET_ARM_OUTWARD_ANGLE,
+				settle
+			)
+			elbow.rotation.x = lerp_angle(elbow.rotation.x, Player.FIRE_JET_ELBOW_BEND, settle)
+		else:
+			arm.rotation.x = lerp_angle(arm.rotation.x, -Player.ARM_POWER_POSE_ANGLE, settle)
+			# MonkeyFigure follows the same local-axis convention as the human:
+			# this quarter turn presents the palm forward with fingertips vertical.
+			wrist.rotation.z = lerp_angle(wrist.rotation.z, signf(arm.position.x) * PI * 0.5, settle)
+
+
+func _update_direct_dirtbike_state() -> void:
+	_direct_dirtbike_active = _blorb_suit.has_dirtbike_legs()
+	floor_max_angle = Player.DIRTBIKE_FLOOR_MAX_ANGLE if _direct_dirtbike_active else deg_to_rad(50.0)
+	var has_arms: bool = _blorb_suit.has_dirtbike_arms()
+	var chord_pressed: bool = (
+		not UIState.modal_open
+		and HeldItem.current.is_empty()
+		and Input.is_action_pressed("left_arm_power")
+		and Input.is_action_pressed("right_arm_power")
+	)
+	var chord_just_formed: bool = chord_pressed and not _direct_dirtbike_chord_was_pressed
+	_direct_dirtbike_chord_was_pressed = chord_pressed
+	if not _direct_dirtbike_active or not has_arms:
+		_direct_dirtbike_front_toggled = false
+	elif chord_just_formed:
+		_direct_dirtbike_front_toggled = not _direct_dirtbike_front_toggled
+	_direct_dirtbike_front_active = _direct_dirtbike_front_toggled
+	if not _direct_dirtbike_front_active:
+		_direct_dirtbike_supported_pitch = 0.0
+		_direct_dirtbike_pitch_was_grounded = false
+	_set_direct_dirtbike_wheel_presence()
+
+
+## Same automatic paired-Ice-leg contract as Player. Geometry scales from
+## the playable profile, while all momentum math uses the shared locomotion
+## helpers and identical tuning constants.
+func _update_direct_ice_skate_state() -> void:
+	var has_legs: bool=_blorb_suit.has_ice_skate_legs()
+	var was_active: bool=_direct_ice_skates_active
+	_direct_ice_skates_active=has_legs
+	var supported: bool=has_legs and is_player_controlled and _direct_is_supported_by_ice()
+	if _direct_ice_skate_airborne and supported:
+		_direct_ice_skate_airborne=false
+	_direct_ice_skating_active=supported and not _direct_ice_skate_airborne
+	if was_active and not has_legs:
+		velocity.x=0.0
+		velocity.z=0.0
+		_direct_ice_skate_phase=0.0
+		_direct_ice_skate_previous_speed=0.0
+		_direct_ice_skate_smoothed_acceleration=0.0
+		_direct_ice_skate_was_supported=false
+		_direct_ice_skate_airborne=false
+		_direct_ice_skate_surface_velocity=Vector3.ZERO
+	_set_direct_ice_skate_visuals()
+
+
+func _direct_is_supported_by_ice() -> bool:
+	for collision_index in get_slide_collision_count():
+		var collision:=get_slide_collision(collision_index)
+		if collision.get_normal().y>0.45 and collision.get_collider() is IceCrag:
+			return true
+	var probe_from:=global_position+Vector3.UP*0.12
+	var probe_to:=global_position-Vector3.UP*0.42
+	var probe:=PhysicsRayQueryParameters3D.create(probe_from,probe_to,1)
+	probe.exclude=[self]
+	var support_hit:=get_world_3d().direct_space_state.intersect_ray(probe)
+	if not support_hit.is_empty() and support_hit.get("collider") is IceCrag:
+		return true
+	if (
+		terrain==null
+		or not terrain.has_method("is_ice_surface")
+		or not terrain.has_method("get_ice_level")
+	):
+		return false
+	var xz:=Vector2(global_position.x,global_position.z)
+	if not terrain.is_ice_surface(xz):
+		return false
+	var ice_level: float=terrain.get_ice_level()
+	return global_position.y>=ice_level-Player.ICE_SURFACE_RECOVERY_DEPTH and global_position.y<=ice_level+Player.ICE_SUPPORT_TOLERANCE
+
+
+func _update_direct_ice_skate_airtime(delta: float,pre_move_position: Vector3) -> void:
+	if not _direct_ice_skates_active or not is_player_controlled:
+		_direct_ice_skate_was_supported=false
+		_direct_ice_skate_airborne=false
+		return
+	var supported_now:=_direct_is_supported_by_ice()
+	if supported_now:
+		_direct_ice_skate_surface_velocity=HumanoidLocomotion.resolved_velocity(
+			pre_move_position,global_position,delta
+		)
+		if Vector2(_direct_ice_skate_surface_velocity.x,_direct_ice_skate_surface_velocity.z).length()<0.05:
+			_direct_ice_skate_surface_velocity.x=velocity.x
+			_direct_ice_skate_surface_velocity.z=velocity.z
+		_direct_ice_skate_was_supported=true
+		_direct_ice_skate_airborne=false
+		return
+	if _direct_ice_skate_was_supported:
+		_direct_ice_skate_was_supported=false
+		_direct_ice_skate_airborne=true
+		var commanded_jump_y: float=velocity.y
+		velocity=_direct_ice_skate_surface_velocity
+		velocity.y=clampf(velocity.y,0.0,Player.ICE_PLATFORM_LAUNCH_MAX_SPEED)
+		if commanded_jump_y>0.0:
+			velocity.y=commanded_jump_y
+		_direct_vertical_velocity=velocity.y
+
+
+func _set_direct_ice_skate_visuals() -> void:
+	var scale_factor: float=_playable_profile.suit_rig_scale
+	if _direct_ice_skates_active:
+		if not is_instance_valid(_direct_ice_skate_left):
+			_direct_ice_skate_left=Player.build_ice_skate_blade(
+				_pivots["toe_left"] as Node3D,"LeftIceSkate",scale_factor
+			)
+		if not is_instance_valid(_direct_ice_skate_right):
+			_direct_ice_skate_right=Player.build_ice_skate_blade(
+				_pivots["toe_right"] as Node3D,"RightIceSkate",scale_factor
+			)
+	else:
+		if is_instance_valid(_direct_ice_skate_left):
+			_direct_ice_skate_left.queue_free()
+		if is_instance_valid(_direct_ice_skate_right):
+			_direct_ice_skate_right.queue_free()
+		_direct_ice_skate_left=null
+		_direct_ice_skate_right=null
+	var rig:=_pivots.get("_rig") as Node3D
+	if rig!=null and not _mounted:
+		var desired_lift: float=(
+			Player.ice_skate_visual_lift(scale_factor) if _direct_ice_skates_active else 0.0
+		)
+		rig.position.y+=desired_lift-_direct_ice_skate_lift_y
+		_direct_ice_skate_lift_y=desired_lift
+
+
+func _set_direct_dirtbike_wheel_presence() -> void:
+	if _direct_dirtbike_active and _direct_dirtbike_rear_wheel == null:
+		_direct_dirtbike_rear_wheel = _build_direct_dirtbike_wheel("RearDirtbikeWheel")
+	elif not _direct_dirtbike_active and _direct_dirtbike_rear_wheel != null:
+		_direct_dirtbike_rear_wheel.queue_free()
+		_direct_dirtbike_rear_wheel = null
+	if _direct_dirtbike_front_active and _direct_dirtbike_front_wheel == null:
+		_direct_dirtbike_front_wheel = _build_direct_dirtbike_wheel("FrontDirtbikeWheel")
+	elif not _direct_dirtbike_front_active and _direct_dirtbike_front_wheel != null:
+		_direct_dirtbike_front_wheel.queue_free()
+		_direct_dirtbike_front_wheel = null
+
+
+func _build_direct_dirtbike_wheel(wheel_name: String) -> MeshInstance3D:
+	var radius: float = Player.DIRTBIKE_WHEEL_RADIUS*_playable_profile.suit_rig_scale
+	var thickness: float = Player.DIRTBIKE_WHEEL_THICKNESS*_playable_profile.suit_rig_scale
+	var wheel: MeshInstance3D = SuperEgg.build_part(
+		Vector3(radius,thickness*0.5,radius),Player.DIRTBIKE_WHEEL_COLOR,2.0,2.0
+	)
+	wheel.name = wheel_name
+	add_child(wheel)
+	return wheel
+
+
+func _direct_dirtbike_slope() -> float:
+	var planar: Vector2 = Vector2(velocity.x,velocity.z)
+	if terrain == null or planar.length_squared() < 0.0001:
+		return 0.0
+	var direction: Vector2 = planar.normalized()
+	var sample_distance: float = maxf(Player.DIRTBIKE_WHEEL_RADIUS*_playable_profile.suit_rig_scale*2.0,0.2)
+	var here: float = terrain.get_mesh_height(global_position.x,global_position.z)
+	var ahead: float = terrain.get_mesh_height(
+		global_position.x+direction.x*sample_distance,
+		global_position.z+direction.y*sample_distance
+	)
+	return (ahead-here)/sample_distance
+
+
+func _resolve_direct_dirtbike_motion(delta: float,pre_move_position: Vector3) -> void:
+	if not _direct_dirtbike_active or _direct_diving or _direct_surface_swimming or _direct_lava_surface or _direct_flying:
+		_direct_dirtbike_was_climbing = false
+		_direct_dirtbike_airborne = false
+		return
+	var ground_height: float = terrain.get_mesh_height(global_position.x,global_position.z)
+	var slope: float = _direct_dirtbike_slope()
+	if slope > Player.DIRTBIKE_ASCEND_TRACK_THRESHOLD and global_position.y <= ground_height+0.45:
+		_direct_dirtbike_was_climbing = true
+		_direct_dirtbike_airborne = false
+		global_position.y = ground_height
+		_direct_dirtbike_surface_velocity = HumanoidLocomotion.resolved_velocity(
+			pre_move_position,global_position,delta
+		)
+		_direct_vertical_velocity = _direct_dirtbike_surface_velocity.y
+		velocity.y = _direct_vertical_velocity
+		return
+	if _direct_dirtbike_was_climbing:
+		_direct_dirtbike_was_climbing = false
+		_direct_dirtbike_airborne = true
+		velocity = _direct_dirtbike_surface_velocity
+		velocity.y *= sqrt(Player.DIRTBIKE_JUMP_HEIGHT_MULTIPLIER)
+		_direct_vertical_velocity = velocity.y
+		return
+	if _direct_dirtbike_airborne:
+		if is_on_floor() and _direct_vertical_velocity <= 0.0:
+			_direct_dirtbike_airborne = false
+			_direct_vertical_velocity = 0.0
+		return
+	if absf(global_position.y-ground_height) <= 0.45:
+		global_position.y = ground_height
+		_direct_vertical_velocity = 0.0
+		velocity.y = 0.0
+
+
+func _apply_direct_dirtbike_pose(delta: float) -> void:
+	var rig: Node3D = _pivots.get("_rig") as Node3D
+	var spine: Node3D = _pivots["spine"] as Node3D
+	if not _direct_dirtbike_active or _direct_flying:
+		if rig != null and spine != null and absf(rig.rotation.x) > 0.001:
+			var upright_anchor: Vector3 = spine.global_position
+			rig.rotation.x = lerp_angle(rig.rotation.x,0.0,minf(Player.DIRTBIKE_WHEELIE_SETTLE_SPEED*delta,1.0))
+			rig.global_position += upright_anchor-spine.global_position
+		return
+	var settle: float = minf(Player.DIRTBIKE_POSE_SETTLE_SPEED*delta,1.0)
+	for side in ["left","right"]:
+		var leg: Node3D = _pivots["leg_%s" % side]
+		var knee: Node3D = _pivots["knee_%s" % side]
+		var ankle: Node3D = _pivots["ankle_%s" % side]
+		leg.rotation.x = lerp_angle(leg.rotation.x,-Player.DIRTBIKE_HIP_BACK_ANGLE,settle)
+		leg.rotation.z = lerp_angle(leg.rotation.z,signf(leg.position.x)*Player.DIRTBIKE_HIP_SPLAY,settle)
+		knee.rotation.x = lerp_angle(knee.rotation.x,Player.DIRTBIKE_KNEE_BEND,settle)
+		ankle.rotation.x = lerp_angle(ankle.rotation.x,Player.DIRTBIKE_ANKLE_BEND,settle)
+	if not _direct_dirtbike_front_active:
+		return
+	if rig == null or spine == null:
+		return
+	for side in ["left","right"]:
+		var arm: Node3D = _pivots["arm_%s" % side] as Node3D
+		var elbow: Node3D = _pivots["elbow_%s" % side] as Node3D
+		if arm != null:
+			arm.rotation.x = lerp_angle(arm.rotation.x,-Player.ARM_POWER_POSE_ANGLE,settle)
+		if elbow != null:
+			elbow.rotation.x = lerp_angle(elbow.rotation.x,0.0,settle)
+	var front: Vector3 = ((_pivots["wrist_left"] as Node3D).global_position+(_pivots["wrist_right"] as Node3D).global_position)*0.5
+	var rear: Vector3 = ((_pivots["ankle_left"] as Node3D).global_position+(_pivots["ankle_right"] as Node3D).global_position)*0.5
+	var local_front: Vector3 = rig.global_transform.affine_inverse()*front
+	var local_rear: Vector3 = rig.global_transform.affine_inverse()*rear
+	var relative: Vector3 = local_front-local_rear
+	var target_pitch: float = atan2(relative.y,relative.z)
+	var wheelbase: float = Vector2(front.x-rear.x,front.z-rear.z).length()
+	if wheelbase > 0.05 and not _direct_dirtbike_airborne:
+		var front_h: float = terrain.get_mesh_height(front.x,front.z)
+		var rear_h: float = terrain.get_mesh_height(rear.x,rear.z)
+		var contact_radius: float = Player.DIRTBIKE_WHEEL_RADIUS*_playable_profile.suit_rig_scale
+		if front.y-contact_radius-front_h<=0.28*_playable_profile.suit_rig_scale:
+			_direct_dirtbike_supported_pitch=-atan2(front_h-rear_h,wheelbase)
+		target_pitch += _direct_dirtbike_supported_pitch
+	if _direct_dirtbike_airborne:
+		if _direct_dirtbike_pitch_was_grounded:
+			_direct_dirtbike_airborne_pitch=rig.rotation.x
+		target_pitch=_direct_dirtbike_airborne_pitch
+	var rear_anchor: Vector3 = rear
+	rig.rotation.x = lerp_angle(rig.rotation.x,target_pitch,minf(Player.DIRTBIKE_WHEELIE_SETTLE_SPEED*delta,1.0))
+	var moved_rear: Vector3 = ((_pivots["ankle_left"] as Node3D).global_position+(_pivots["ankle_right"] as Node3D).global_position)*0.5
+	rig.global_position += rear_anchor-moved_rear
+	if not _direct_dirtbike_airborne:
+		var settled_rear: Vector3 = ((_pivots["ankle_left"] as Node3D).global_position+(_pivots["ankle_right"] as Node3D).global_position)*0.5
+		var radius: float = Player.DIRTBIKE_WHEEL_RADIUS*_playable_profile.suit_rig_scale
+		var rear_error: float = terrain.get_mesh_height(settled_rear.x,settled_rear.z)+radius-settled_rear.y
+		rig.global_position.y += rear_error
+	_direct_dirtbike_pitch_was_grounded=not _direct_dirtbike_airborne
+
+
+func _position_direct_dirtbike_wheel(wheel: MeshInstance3D,a: Node3D,b: Node3D,delta: float) -> void:
+	if wheel == null or a == null or b == null:
+		return
+	var midpoint: Vector3 = (a.global_position+b.global_position)*0.5
+	var axle: Vector3 = b.global_position-a.global_position
+	axle = axle.normalized() if axle.length() > 0.001 else global_transform.basis.x
+	var seed: Vector3 = Vector3.FORWARD if absf(axle.dot(Vector3.FORWARD)) < 0.9 else Vector3.UP
+	var x_axis: Vector3 = seed.cross(axle).normalized()
+	var z_axis: Vector3 = axle.cross(x_axis).normalized()
+	wheel.global_transform = Transform3D(Basis(x_axis,axle,z_axis),midpoint)
+	var radius: float = Player.DIRTBIKE_WHEEL_RADIUS*_playable_profile.suit_rig_scale
+	wheel.rotate_object_local(Vector3.UP,Vector2(velocity.x,velocity.z).length()/maxf(radius,0.01)*delta)
+
+
+func _update_direct_dirtbike_wheels(delta: float) -> void:
+	if _direct_dirtbike_rear_wheel != null:
+		_position_direct_dirtbike_wheel(_direct_dirtbike_rear_wheel,_pivots["ankle_left"],_pivots["ankle_right"],delta)
+	if _direct_dirtbike_front_wheel != null:
+		_position_direct_dirtbike_wheel(_direct_dirtbike_front_wheel,_pivots["wrist_left"],_pivots["wrist_right"],delta)
+
+
+func begin_mounted(_mount: Node3D) -> void:
+	_mounted = true
+	collision_layer = 0
+	var rig := _pivots.get("_rig") as Node3D
+	if rig != null:
+		rig.top_level = true
+
+
+func update_mounted_pose(seat_transform: Transform3D, delta: float) -> void:
+	var rig := _pivots.get("_rig") as Node3D
+	if rig == null:
+		return
+	# Keep the real gameplay body travelling with its visual rider so
+	# dismounting resumes at the horse rather than at the pre-mount location.
+	global_position = seat_transform.origin
+	var hip_height := (_pivots["spine"] as Node3D).position.y * DISPLAY_SCALE
+	var scaled_basis := seat_transform.basis.scaled(Vector3.ONE * DISPLAY_SCALE)
+	rig.global_transform = Transform3D(
+		scaled_basis,
+		seat_transform.origin - seat_transform.basis.y * hip_height
+	)
+	var settle := minf(10.0 * delta, 1.0)
+	(_pivots["leg_left"] as Node3D).rotation.x = lerp_angle((_pivots["leg_left"] as Node3D).rotation.x, -1.15, settle)
+	(_pivots["leg_right"] as Node3D).rotation.x = lerp_angle((_pivots["leg_right"] as Node3D).rotation.x, -1.15, settle)
+	(_pivots["knee_left"] as Node3D).rotation.x = lerp_angle((_pivots["knee_left"] as Node3D).rotation.x, 1.3, settle)
+	(_pivots["knee_right"] as Node3D).rotation.x = lerp_angle((_pivots["knee_right"] as Node3D).rotation.x, 1.3, settle)
+
+
+func end_mounted() -> void:
+	_mounted = false
+	collision_layer = 2 if is_player_controlled else 1
+	var rig := _pivots.get("_rig") as Node3D
+	if rig != null:
+		rig.top_level = false
+		rig.transform = Transform3D(Basis.IDENTITY.scaled(Vector3.ONE * DISPLAY_SCALE), Vector3.ZERO)
+
+
+# Compatibility aliases for old saves/scripts while callers migrate.
+func begin_possession() -> void:
+	begin_direct_control()
+
+
+func end_possession() -> void:
+	end_direct_control()
+
+
+func _exit_tree() -> void:
+	PartyControl.unregister_member(self)

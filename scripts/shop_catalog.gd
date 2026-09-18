@@ -20,9 +20,10 @@ const GROUND_COLOR := Color(0.35, 0.24, 0.1)
 const PLANT_COLOR := Color(0.35, 0.8, 0.3)
 const CITY_COLOR := Color(0.2, 0.65, 0.95)
 const ICE_COLOR := Color(0.78, 0.92, 0.98)
-const SNOW_COLOR := Color(0.94, 0.96, 0.98)
+const SNOW_COLOR := ElementPalette.SNOW_BODY
 const WOOD_COLOR := Color(0.42, 0.26, 0.15)
 const BEAN_OF_LIFE_COLOR := Color(0.36, 0.6, 0.22)
+const BLORB_SLIME_COLOR := Color(0.42, 0.92, 0.68)
 const JINGU_BANG_RED := Color(0.75, 0.08, 0.06)
 const JINGU_BANG_GOLD := Color(0.85, 0.66, 0.18)
 
@@ -54,6 +55,19 @@ static func find(item_name: String) -> Dictionary:
 		if item["name"] == item_name:
 			return item
 	return {}
+
+
+static func edible_healing(item_name: String) -> float:
+	var entry := find(item_name)
+	if not bool(entry.get("edible", false)):
+		return 0.0
+	if entry.has("healing_amount"):
+		return float(entry["healing_amount"])
+	match String(entry.get("rarity", "common")):
+		"uncommon": return 20.0
+		"rare": return 35.0
+		"exceptional": return 60.0
+		_: return 10.0
 
 
 static func _ensure_items() -> void:
@@ -164,11 +178,23 @@ static func _ensure_items() -> void:
 			"build_visual": Callable(ShopCatalog, "_build_knights_helm_visual"),
 		},
 		{
+			"name": "Toboggan", "color": TobogganHelm.KNIT_COLOR, "price": 18, "sell_price": 8,
+			"purchasable": true, "element": "", "core_item": "Toboggan", "core_slot": "head", "armor_defense": 3, "shop": "snow",
+			"description": "A thick winter knit with a folded band and soft pom-pom.",
+			"build_visual": Callable(TobogganHelm, "build_visual"),
+		},
+		{
 			"name": "Lava Helm", "color": Color(0.035, 0.03, 0.028), "price": 0, "sell_price": 0,
 			"purchasable": false, "element": "", "core_item": "Lava Helm", "core_slot": "head", "armor_defense": 10,
 			"required_element": "fire",
 			"description": "A glassy volcanic helm whose swept crown is warm to the touch.",
 			"build_visual": Callable(ShopCatalog, "_build_lava_helm_visual"),
+		},
+		{
+			"name": "Bird Helm", "color": Color(0.62, 0.58, 0.42), "price": 0, "sell_price": 0,
+			"purchasable": false, "element": "", "core_item": "Bird Helm", "core_slot": "head", "armor_defense": 4,
+			"description": "Blorbaka's own crest -- said to lend a wearer sight of the Sky Kingdom.",
+			"build_visual": Callable(ShopCatalog, "_build_bird_helm_visual"),
 		},
 		{
 			"name": "Corroded Pocket Compass", "color": Color(0.55, 0.42, 0.18), "price": 4, "sell_price": 4,
@@ -207,49 +233,58 @@ static func _ensure_items() -> void:
 		},
 		{
 			"name": "Rye Loaf", "color": Color(0.66, 0.46, 0.24), "price": 5, "sell_price": 2,
-			"purchasable": true, "element": "", "shop": "green", "shops": ["lake"],
+			"edible": true, "rarity": "uncommon",
+			"purchasable": true, "element": "", "shop": "green", "shops": ["lake", "snow"],
 			"description": "Dense enough to survive the bottom of a pack.",
 			"build_visual": Callable(GreenShopProps, "build_bread"),
 		},
 		{
 			"name": "Wedge of Cheese", "color": Color(0.92, 0.78, 0.25), "price": 4, "sell_price": 2,
+			"edible": true, "rarity": "uncommon",
 			"purchasable": true, "element": "", "shop": "green",
 			"description": "Waxed rind, sharp inside.",
 			"build_visual": Callable(GreenShopProps, "build_cheese"),
 		},
 		{
 			"name": "Dried Berries", "color": Color(0.55, 0.12, 0.22), "price": 3, "sell_price": 1,
-			"purchasable": true, "element": "", "shop": "green", "shops": ["lake"],
+			"edible": true, "rarity": "common",
+			"purchasable": true, "element": "", "shop": "green", "shops": ["lake", "snow"],
 			"description": "Shriveled, but they'll keep for months.",
 			"build_visual": Callable(GreenShopProps, "build_berries"),
 		},
 		{
 			"name": "Apple", "color": NatureProps.FRUIT_COLORS["Apple"], "price": 0, "sell_price": 2,
+			"edible": true, "rarity": "common",
 			"purchasable": false, "element": "", "description": "Fallen from a fruit tree out in the wilds.",
 			"build_visual": Callable(ShopCatalog, "_build_fruit_visual").bind(NatureProps.FRUIT_COLORS["Apple"]),
 		},
 		{
 			"name": "Orange", "color": NatureProps.FRUIT_COLORS["Orange"], "price": 0, "sell_price": 2,
+			"edible": true, "rarity": "common",
 			"purchasable": false, "element": "", "description": "Fallen from a fruit tree out in the wilds.",
 			"build_visual": Callable(ShopCatalog, "_build_fruit_visual").bind(NatureProps.FRUIT_COLORS["Orange"]),
 		},
 		{
 			"name": "Lemon", "color": NatureProps.FRUIT_COLORS["Lemon"], "price": 0, "sell_price": 1,
+			"edible": true, "rarity": "common",
 			"purchasable": false, "element": "", "description": "Fallen from a fruit tree out in the wilds.",
 			"build_visual": Callable(ShopCatalog, "_build_fruit_visual").bind(NatureProps.FRUIT_COLORS["Lemon"]),
 		},
 		{
 			"name": "Plum", "color": NatureProps.FRUIT_COLORS["Plum"], "price": 0, "sell_price": 2,
+			"edible": true, "rarity": "common",
 			"purchasable": false, "element": "", "description": "Fallen from a fruit tree out in the wilds.",
 			"build_visual": Callable(ShopCatalog, "_build_fruit_visual").bind(NatureProps.FRUIT_COLORS["Plum"]),
 		},
 		{
 			"name": "Banana", "color": NatureProps.FRUIT_COLORS["Banana"], "price": 0, "sell_price": 2,
+			"edible": true, "rarity": "common",
 			"purchasable": false, "element": "", "description": "Fallen from a banana tree in the jungle.",
 			"build_visual": Callable(ShopCatalog, "_build_banana_visual").bind(NatureProps.FRUIT_COLORS["Banana"]),
 		},
 		{
 			"name": "Durian", "color": NatureProps.FRUIT_COLORS["Durian"], "price": 0, "sell_price": 3,
+			"edible": true, "rarity": "rare",
 			"purchasable": false, "element": "", "description": "Fallen from a durian tree in the jungle. Smells worse than it looks.",
 			"build_visual": Callable(ShopCatalog, "_build_durian_visual"),
 		},
@@ -289,10 +324,16 @@ static func _ensure_items() -> void:
 			"build_visual": Callable(ShopCatalog, "_build_mushroom_visual").bind(NatureProps.MUSHROOM_COLORS["Jungle Mushroom"]),
 		},
 		{
-			"name": "Bean of Life", "color": BEAN_OF_LIFE_COLOR, "price": 30, "sell_price": 14,
+			"name": "Seed of Life", "color": BEAN_OF_LIFE_COLOR, "price": 30, "sell_price": 14,
 			"purchasable": true, "element": "", "shop": "chinese_village",
-			"description": "A single string bean, absurdly long and tightly curled. Thrown to the ground, it's said to take root as a blorb slime plant.",
+			"description": "A rare living seed. Plant it in the magical clearing to grow the Tree of Life.",
 			"build_visual": Callable(ShopCatalog, "_build_bean_of_life_visual"),
+		},
+		{
+			"name": "Blorb Slime", "color": BLORB_SLIME_COLOR, "price": 48, "sell_price": 22,
+			"purchasable": true, "element": "", "shop": "green", "shops": ["lake", "ocean_merfolk"],
+			"description": "Rare living slime that restores a blorb's body.",
+			"build_visual": Callable(ShopCatalog, "_build_blorb_slime_visual"),
 		},
 		{
 			"name": "Paper Lantern", "color": Color(0.95, 0.72, 0.32), "price": 9, "sell_price": 4,
@@ -302,6 +343,7 @@ static func _ensure_items() -> void:
 		},
 		{
 			"name": "Steamed Bun", "color": Color(0.94, 0.9, 0.82), "price": 4, "sell_price": 2,
+			"edible": true, "rarity": "uncommon",
 			"purchasable": true, "element": "", "shop": "chinese_village",
 			"description": "Still warm from the basket.",
 			"build_visual": Callable(ShopCatalog, "_build_steamed_bun_visual"),
@@ -313,7 +355,23 @@ static func _ensure_items() -> void:
 			"description": "Sun Wu Kong's own legendary staff. Found, not sold.",
 			"build_visual": Callable(ShopCatalog, "build_jingu_bang_visual"),
 		},
+		{
+			"name": "Royal Meat Cleaver", "color": Color(0.68, 0.7, 0.72),
+			"price": 0, "sell_price": 10, "purchasable": false, "element": "",
+			"weapon": true, "weapon_damage": 19.0, "weapon_reach": 1.45,
+			"held_scale": 1.0,
+			"description": "The Royal Chef's weighty chopping cleaver.",
+			"build_visual": Callable(ShopCatalog, "build_meat_cleaver_visual"),
+		},
 	]
+
+
+static func _build_blorb_slime_visual(item_scale: float) -> Node3D:
+	var root := Node3D.new()
+	var drop := SuperEgg.build_part(Vector3(0.11,0.085,0.11)*item_scale,BLORB_SLIME_COLOR,2.4,2.8)
+	drop.position.y = 0.085*item_scale
+	root.add_child(drop)
+	return root
 
 
 static func _build_gem_visual(item_scale: float, color: Color) -> Node3D:
@@ -454,16 +512,14 @@ static func _build_watering_can_visual(item_scale: float = 1.0) -> Node3D:
 	return root
 
 
-## A long string bean, tightly coiled into a spiral -- "big long curly
-## string bean" per direct instruction. Built from a chain of small SuperEgg
+## The Seed of Life retains the established long, tightly coiled organic
+## silhouette. Built from a chain of small SuperEgg
 ## segments walking a shrinking helix (same "shrink each step" spirit as
 ## NatureProps.build_slab_tower()'s own tapering tiers), each one oriented
 ## along the helix's own tangent direction (derivative of the parametric
 ## curve) rather than left at a fixed rotation, so the segments read as one
 ## continuous curled pod instead of a stack of disconnected pills. Planting
-## it (throwing it to the ground to grow a blorb slime plant, per its own
-## description above) is not implemented yet -- this is the held/thrown item
-## only.
+## it. The magical clearing owns its planting and growth rules.
 const BEAN_SEGMENT_COUNT := 18
 const BEAN_SEGMENT_LENGTH := 0.032
 const BEAN_SEGMENT_RADIUS := 0.016
@@ -554,6 +610,61 @@ static func _build_steamed_bun_visual(item_scale: float = 1.0) -> Node3D:
 	root.add_child(pleat)
 	_add_catalog_grip(root)
 	return root
+
+
+static func build_meat_cleaver_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	root.scale = Vector3.ONE * item_scale
+	var handle := SuperEgg.build_part(
+		Vector3(0.035, 0.19, 0.04), Color(0.25, 0.105, 0.045),
+		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT
+	)
+	handle.position.y = 0.18
+	root.add_child(handle)
+	var tang := SuperEgg.build_part(
+		Vector3(0.055, 0.035, 0.022), Color(0.18, 0.15, 0.12),
+		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	tang.position.y = 0.37
+	root.add_child(tang)
+	var blade_material := StandardMaterial3D.new()
+	blade_material.albedo_color = Color(0.68, 0.7, 0.72)
+	blade_material.metallic = 0.78
+	blade_material.roughness = 0.28
+	var blade := MeshInstance3D.new()
+	blade.mesh = SuperEgg.build_mesh(
+		Vector3(0.17, 0.22, 0.018), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	blade.position = Vector3(0.105, 0.54, 0.0)
+	blade.rotation.z = deg_to_rad(-7.0)
+	blade.set_surface_override_material(0, blade_material)
+	root.add_child(blade)
+	var grip := Node3D.new()
+	grip.name = "GripPoint"
+	grip.position = Vector3(0.0, 0.16, -0.04)
+	root.add_child(grip)
+	# Like the sword, the model's blade is authored along local +Y. The
+	# procedural palm already supplies its inward yaw, so local Z is the pitch
+	# axis that carries the blade forward rather than sideways through the arm.
+	root.set_meta("held_rotation", Vector3(0.0, 0.0, PI * 0.5))
+	return root
+
+
+## One grip contract for every held weapon, regardless of whether the owner
+## is the player or an NPC. Builders author a GripPoint on the physical hilt
+## and optional held_rotation; this aligns that exact point to the hand after
+## rotation and scale have been applied.
+static func fit_visual_to_hand(visual: Node3D, local_offset: Vector3 = Vector3.ZERO) -> void:
+	if visual == null:
+		return
+	if visual.has_meta("held_rotation"):
+		visual.rotation = visual.get_meta("held_rotation") as Vector3
+	var grip: Node3D = visual.get_node_or_null("GripPoint") as Node3D
+	if grip == null:
+		visual.position = local_offset
+		return
+	var scaled_grip: Vector3 = grip.position*visual.scale
+	visual.position = -(visual.quaternion*scaled_grip)+local_offset
 
 
 ## Sun Wu Kong's legendary staff -- "a large staff, red in the middle with
@@ -691,6 +802,34 @@ static func _build_lava_helm_visual(item_scale: float = 1.0) -> Node3D:
 	shell.mesh = BlorbBodyShape.build_mesh_from_rings(BlorbSuit._build_lava_helm_rings(contents))
 	shell.material_override = material
 	root.add_child(shell)
+	return root
+
+
+## Never actually sold or dropped loose -- Blorbaka carries this item bound
+## into her core from the moment she exists (see false_hero_nme.gd). This
+## exists only so anything that enumerates ShopCatalog's own core-item
+## entries (an inventory/portrait icon, an armor-bonus lookup) has a real
+## visual and description rather than an empty catalog gap.
+static func _build_bird_helm_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	var epsilon := BirdHelm.DOME_EPSILON
+	var semi_axes := ProceduralFigure.HEAD_SIZE * item_scale * 1.4
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(0.62, 0.58, 0.42)
+	material.roughness = 0.62
+	var shell := MeshInstance3D.new()
+	shell.mesh = BlorbBodyShape.build_mesh_from_rings(BirdHelm.build_dome_rings(semi_axes, epsilon))
+	shell.material_override = material
+	root.add_child(shell)
+	# No real head to measure for a standalone shop/inventory icon, so the
+	# beak simply attaches partway down the front surface rather than at a
+	# real-head-relative "nose height" the way the living helm computes it.
+	var beak_surface: Dictionary = BirdHelm.front_surface(0.35 * PI * 0.5, semi_axes, epsilon)
+	var beak_base := Vector3(0.0, beak_surface["y"] as float, beak_surface["radius"] as float)
+	var beak := MeshInstance3D.new()
+	beak.mesh = BlorbBodyShape.build_mesh_from_rings(BirdHelm.build_beak_rings(beak_base, semi_axes.z))
+	beak.material_override = material
+	shell.add_child(beak)
 	return root
 
 

@@ -290,7 +290,7 @@ func _find_target() -> Node3D:
 	var here := Vector2(global_position.x, global_position.z)
 	var best: Node3D = null
 	var best_dist := DETECTION_RADIUS
-	var player := get_tree().get_first_node_in_group("player")
+	var player := PartyControl.active_control_body()
 	if player != null and not _position_is_safe(Vector2(player.global_position.x, player.global_position.z)):
 		var dist := here.distance_to(Vector2(player.global_position.x, player.global_position.z))
 		if dist < best_dist:

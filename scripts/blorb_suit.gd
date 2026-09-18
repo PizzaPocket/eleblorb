@@ -259,6 +259,14 @@ const _CORE_MATCH_R_ANKLE := (
 )
 const LEG_CORE_RADIUS_FRACTION := CORE_RADIUS_FRACTION * _CORE_MATCH_R_WRIST / _CORE_MATCH_R_ANKLE
 
+
+## Local distance from ToeAttach to the underside of an ordinary worn blorb
+## boot. Traversal attachments must originate at the transformed blorb mesh,
+## not at the much shallower human shoe hidden inside it.
+static func worn_boot_sole_depth(rig_scale: float = 1.0) -> float:
+	var ankle_radius := _avg_xz(ProceduralFigure.FOOT_SIZE) * LIMB_INFLATE * 1.1 * LEG_RADIUS_SCALE
+	return ankle_radius * FOOT_TOE_RADIUS_RATIO * rig_scale
+
 ## Raised 10% per direct correction ("increase its size by 10%") on top of
 ## the earlier 1.55 pass -- 1.55 * 1.1. HAT_HEIGHT_SCALE doesn't need its
 ## own separate bump: hat_height is derived as hat_radius * HAT_HEIGHT_
@@ -1059,7 +1067,7 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	# Measure the actual live head subtree before adding any suit geometry.
 	# This includes tall hair and ornaments, which a generic head-size formula
 	# can never reliably enclose.
-	var worn_head_bounds := _measure_head_contents(head_pivot)
+	var worn_head_bounds := _canonical_head_contents(head_pivot)
 	var albedo := vis["albedo"] as Color
 	var hat_radius := head_extent * HAT_RADIUS_SCALE
 	var hat_height := hat_radius * HAT_HEIGHT_SCALE
@@ -1097,12 +1105,18 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	if blorb.has_core_item("Knight's Helm"):
 		hat.queue_free()
 		return [_build_knights_helm(head_pivot, head_extent, vis, rig_scale)] as Array[Node3D]
+	if blorb.has_core_item("Toboggan"):
+		hat.queue_free()
+		return [_build_toboggan(head_pivot,worn_head_bounds,vis)] as Array[Node3D]
 	# Fire-only, per direct instruction -- thrown_item.gd now refuses the item
 	# on any other element before it ever reaches core_items, but this guard
 	# also covers a blorb that picked it up before that restriction existed.
 	if blorb.has_core_item("Lava Helm") and blorb.element_state == "fire":
 		hat.queue_free()
 		return [_build_lava_helm(head_pivot, worn_head_bounds, vis)] as Array[Node3D]
+	if blorb.has_core_item("Bird Helm"):
+		hat.queue_free()
+		return [_build_bird_helm(head_pivot, worn_head_bounds, head_size, vis)] as Array[Node3D]
 
 	# Only a blorb that has absorbed the Diving Helmet item can transform
 	# into the sealed underwater form. Every other head blorb stays a hat.
@@ -1153,6 +1167,235 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	return [hat, helmet] as Array[Node3D]
 
 
+## A core-bound Toboggan is the blorb itself reshaped as winter knit. The
+## thick pitched band and pinched crown use the same shared profile as the
+## merchant item. Its lower edge is derived from brow-sized head width rather
+## than full hair height, so tall hair cannot pull the cuff down over the face.
+static func _build_toboggan(head_pivot: Node3D,contents: AABB,vis: Dictionary) -> Node3D:
+	var root:=Node3D.new()
+	root.name="HeadBlorbToboggan"
+	head_pivot.add_child(root)
+	var radius:=maxf(contents.size.x,contents.size.z)*0.5*1.10
+	var bottom_y:=contents.position.y+radius*1.10
+	var covered_height: float=contents.end.y-bottom_y
+	var height:=maxf(covered_height+radius*0.22,radius*1.42)
+	var material:=_build_goo_material(vis)
+	var shell:=MeshInstance3D.new()
+	shell.name="LivingTobogganCrown"
+	shell.mesh=BlorbBodyShape.build_mesh_from_rings(TobogganHelm.build_rings(radius,height))
+	shell.material_override=material
+	shell.position.y=bottom_y
+	root.add_child(shell)
+	var pom_radius:=TobogganHelm.pom_radius(radius)
+	var pom:=SuperEgg.build_part(Vector3.ONE*pom_radius,vis["albedo"] as Color,2.35,2.35)
+	pom.name="LivingPomPom"
+	pom.position.y=bottom_y+height+pom_radius*0.49
+	pom.position.z=TobogganHelm.pom_z(radius)
+	pom.set_surface_override_material(0,material)
+	root.add_child(pom)
+	var eye_t:=TobogganHelm.LIVING_EYE_T
+	var eye_radius:=TobogganHelm.radius_at(eye_t,radius)
+	# radius_at() is the radial surface value; the eye's vertical coordinate
+	# is independently determined by its position above the folded band.
+	var eye_y:=height*eye_t
+	var eye_depth:=TobogganHelm.depth_radius_at(eye_t,eye_radius)
+	var eyes:=BlorbFace.add_eyes(
+		shell,eye_radius,eye_y,TobogganHelm.slope_at(eye_t,radius,height),
+		vis["albedo"] as Color,TobogganHelm.LIVING_EYE_SCALE
+	)
+	for eye in eyes:
+		var eye_mesh:=eye as MeshInstance3D
+		var blorb_angle:=deg_to_rad(-28.0 if eye_mesh.name=="EyeL" else 28.0)
+		var surface_angle:=PI*0.5-blorb_angle
+		var surface:=TobogganHelm.surface_point_at(eye_t,surface_angle,radius,height)
+		var outward:=TobogganHelm.surface_normal_at(eye_t,surface_angle,radius,height)
+		var actual_eye_radius:=eye_radius*0.16*0.5*TobogganHelm.LIVING_EYE_SCALE
+		eye_mesh.basis=Basis.looking_at(-outward,Vector3.UP)
+		eye_mesh.scale=Vector3(1.0,1.0,0.4)
+		eye_mesh.position=surface-outward*(actual_eye_radius*BlorbFace.EMBED_DEPTH_FRACTION)
+	var core:=BlorbCore.build(
+		radius*CORE_RADIUS_FRACTION*HAT_CORE_RADIUS_SCALE,
+		vis["core_color"] as Color,vis["core_emissive"] as bool
+	)
+	core.position=Vector3(
+		0.0,
+		eye_y+TobogganHelm.pitched_y_at(eye_t,eye_depth*0.3,eye_depth),
+		eye_radius*0.3+TobogganHelm.center_z_at(eye_t,radius)
+	)
+	shell.add_child(core)
+	if vis["core_emissive"] as bool:
+		var core_material: StandardMaterial3D=core.get_meta("material")
+		core_material.emission=vis["core_emission"] as Color
+		core_material.emission_energy_multiplier=vis["core_emission_energy"] as float
+	_add_head_core_light(core,vis)
+	return root
+
+
+## Blorbaka's own living helm -- per direct correction, the upper half of a
+## SuperEgg superellipsoid (see bird_helm.gd's own build_dome_rings(), the
+## same rounded-shape family and roundness the head itself is built from,
+## not an idealized sphere), sized per-axis off the wearer's actual
+## measured head+hair bounds (`contents`) so it naturally matches that
+## shape rather than an unrelated geometric primitive, just offset a bit
+## larger. Its open rim reaches down to just below eye level, and dips in
+## a bell curve at the sides rather than sitting flat (see
+## build_dome_rings()'s own comment). Its own eyes sit at exactly the real
+## head's own eye height (see FigureEyes' eta=0 equator convention); a
+## hooked beak projects from just below that, roughly where a nose would
+## be; two wings stand vertically at the sides, swept back along the dome.
+## No crest, per direct correction.
+static func _build_bird_helm(head_pivot: Node3D, contents: AABB, head_size: Vector3, vis: Dictionary) -> Node3D:
+	var root := Node3D.new()
+	root.name = "HeadBlorbBirdHelm"
+	head_pivot.add_child(root)
+
+	var epsilon := BirdHelm.DOME_EPSILON
+	# The real eyes sit at head_size.y (the head mesh's own equator -- see
+	# this function's own class doc). The rim sits just below that eye line
+	# rather than all the way down at mid-face.
+	var rim_y := head_size.y * 0.88
+	# Sized independently per axis off the actual measured head+hair
+	# bounds, with a modest margin ("offset larger a bit") -- X/Z clear
+	# ears and any hair flaring sideways/backward, Y is the real vertical
+	# rise from the rim up to the hair's own top, so a tall hairstyle
+	# doesn't need the sides widened to match the way a forced sphere did.
+	const MARGIN := 1.08
+	var semi_axes := Vector3(
+		contents.size.x * 0.5 * MARGIN,
+		((contents.position.y + contents.size.y) - rim_y) * MARGIN,
+		contents.size.z * 0.5 * MARGIN
+	)
+
+	var helm := MeshInstance3D.new()
+	helm.name = "BirdHelmBlorbBody"
+	helm.mesh = BlorbBodyShape.build_mesh_from_rings(BirdHelm.build_dome_rings(semi_axes, epsilon))
+	helm.material_override = _build_goo_material(vis)
+	helm.position = Vector3(0.0, rim_y, 0.0)
+	root.add_child(helm)
+
+	var albedo := vis["albedo"] as Color
+	var eye_eta := BirdHelm.eta_for_local_y(head_size.y - rim_y, semi_axes.y, epsilon)
+	var eye_surface: Dictionary = BirdHelm.front_surface(eye_eta, semi_axes, epsilon)
+	var eye_y := eye_surface["y"] as float
+	var eye_radius := eye_surface["radius"] as float
+	# Placed by hand (not BlorbFace.add_eyes()) since that helper assumes a
+	# locally circular cross-section -- this dome's own X/Z semi-axes
+	# differ and the horizontal pull-in/extend varies by angle, so a
+	# uniform "radius at this height" rotated off dead-front doesn't
+	# actually land on the true surface. Each eye instead samples the
+	# dome's own real surface at its own angle directly.
+	const EYE_ANGLE := deg_to_rad(28.0)
+	const EYE_EMBED_FRACTION := 0.35
+	# Per direct correction: too small (+30% more on top of the earlier
+	# 1.4x), shifted up 2cm, and each brought in toward the midline 1.5cm.
+	var eye_mesh_radius := eye_radius * 0.16 * 0.5 * 1.4 * 1.3
+	const EYE_RAISE := 0.02
+	const EYE_INWARD_SHIFT := 0.015
+	var eye_color := albedo.darkened(0.25)
+	for side in [-1.0, 1.0]:
+		var eye_point := BirdHelm.surface_point(eye_eta, side * EYE_ANGLE, semi_axes, epsilon)
+		var outward := Vector3(eye_point.x, 0.0, eye_point.z)
+		# (0,0,1), not Godot's own Vector3.FORWARD -- this project's rigs
+		# use +Z as forward throughout (see this file's own class doc).
+		outward = outward.normalized() if outward.length() > 0.001 else Vector3(0.0, 0.0, 1.0)
+		var eye := MeshInstance3D.new()
+		eye.name = "EyeL" if side < 0.0 else "EyeR"
+		eye.mesh = SuperEgg.build_mesh(
+			Vector3(eye_mesh_radius, eye_mesh_radius * 1.15, eye_mesh_radius), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+		)
+		var eye_material := StandardMaterial3D.new()
+		eye_material.albedo_color = eye_color
+		eye_material.roughness = 0.8
+		eye.set_surface_override_material(0, eye_material)
+		eye.basis = Basis.looking_at(-outward, Vector3.UP)
+		# 0.6, not the usual whole-body BlorbFace.add_eyes() flatten of 0.4 --
+		# per direct correction ("extremely skinny"): at this eye's own much
+		# larger size (+30% on top of +40% already), that same flatten ratio
+		# read as a thin sliver rather than a normal rounded blorb eye.
+		eye.scale = Vector3(1.0, 1.0, 0.6)
+		eye.position = eye_point - outward * (eye_mesh_radius * EYE_EMBED_FRACTION)
+		eye.position.y += EYE_RAISE
+		eye.position.x -= side * EYE_INWARD_SHIFT
+		helm.add_child(eye)
+
+	var core := BlorbCore.build(semi_axes.z * CORE_RADIUS_FRACTION * HAT_CORE_RADIUS_SCALE, vis["core_color"] as Color, vis["core_emissive"] as bool)
+	if vis["core_emissive"] as bool:
+		var core_material: StandardMaterial3D = core.get_meta("material")
+		core_material.emission = vis["core_emission"] as Color
+		core_material.emission_energy_multiplier = vis["core_emission_energy"] as float
+	core.position = Vector3(0.0, eye_y, eye_radius * 0.3)
+	helm.add_child(core)
+	_add_head_core_light(core, vis)
+
+	# A hooked hawk beak just below the eyes -- above where the nose would
+	# be, projecting from the dome's own front surface. Its base is pulled
+	# back several cm into the dome's own interior rather than starting
+	# exactly flush at the measured surface, so it reads as growing out of
+	# the helmet rather than sitting glued to a visible seam on top of it.
+	const BEAK_EMBED := 0.035
+	# 1.5cm, then another 1.5cm per direct correction = 3cm total.
+	const BEAK_RAISE := 0.03
+	# Per direct correction ("increase the size of the beak by about 20%
+	# while keeping the bottom at its current position"): scaling the whole
+	# beak up also scales its own downward reach (TIP_DROP_RATIO * radius),
+	# so the base is raised by exactly that extra drop to cancel it out --
+	# the tip ends up at the same absolute height it was at before growing.
+	const BEAK_SIZE_SCALE := 1.2
+	var beak_radius := semi_axes.z * BEAK_SIZE_SCALE
+	var beak_extra_drop := semi_axes.z * BirdHelm.TIP_DROP_RATIO * (BEAK_SIZE_SCALE - 1.0)
+	var nose_eta := BirdHelm.eta_for_local_y(head_size.y * BirdHelm.NOSE_Y_FRACTION - rim_y, semi_axes.y, epsilon)
+	var beak_surface: Dictionary = BirdHelm.front_surface(nose_eta, semi_axes, epsilon)
+	var beak_base := Vector3(
+		0.0, (beak_surface["y"] as float) + BEAK_RAISE + beak_extra_drop, (beak_surface["radius"] as float) - BEAK_EMBED
+	)
+	var beak := MeshInstance3D.new()
+	beak.name = "BirdHelmBeak"
+	beak.mesh = BlorbBodyShape.build_mesh_from_rings(BirdHelm.build_beak_rings(beak_base, beak_radius))
+	beak.material_override = _build_goo_material(vis)
+	helm.add_child(beak)
+
+	# Wing decorations at the ears -- standing vertically (perpendicular to
+	# the ground, like a raked fin) rather than lying flat, swept back
+	# along the helmet for an aerodynamic look.
+	var ear_eta := BirdHelm.eta_for_local_y(head_size.y * BirdHelm.EAR_Y_FRACTION - rim_y, semi_axes.y, epsilon)
+	var ear_point := BirdHelm.side_surface(ear_eta, semi_axes, epsilon)
+	var ear_radius := ear_point.x
+	var ear_y := ear_point.y
+	# 0.025 + a further 0.04 ("raise up the wings on the sides by four
+	# centimeters"), per direct correction.
+	const WING_RAISE := 0.065
+	# 9 degrees, then "a few more" per direct correction = 14 total.
+	const WING_PITCH_FORWARD_DEGREES := 14.0
+	# +30% per direct correction ("increase the size by thirty percent").
+	const WING_SIZE_SCALE := 1.3
+	for side in [-1.0, 1.0]:
+		var ear_pos := Vector3(side * ear_radius, ear_y, 0.0)
+		var sweep := Vector3(side * 0.25, 0.12, -1.0).normalized()
+		# UP.cross(sweep), not sweep.cross(UP) -- the latter gives a
+		# left-handed (thin, UP, sweep) basis, which mirrors the mesh and
+		# flips its normals inward instead of outward.
+		var thin := Vector3.UP.cross(sweep).normalized()
+		var wing_length := semi_axes.z * 0.62 * WING_SIZE_SCALE
+		var wing_height := semi_axes.z * 0.32 * WING_SIZE_SCALE
+		var wing_thickness := semi_axes.z * 0.045 * WING_SIZE_SCALE
+		var wing := SuperEgg.build_part(
+			Vector3(wing_thickness, wing_height, wing_length), albedo, 2.2, 2.6
+		)
+		wing.material_override = _build_goo_material(vis)
+		# Rotating -thin (rather than +thin) tilts the wing's own "up" away
+		# from `sweep` -- i.e. forward, since thin.cross(UP) == sweep means
+		# a positive rotation would tilt it toward `sweep` (backward)
+		# instead.
+		wing.basis = Basis(thin, Vector3.UP, sweep).rotated(thin, -deg_to_rad(WING_PITCH_FORWARD_DEGREES))
+		wing.position = (
+			ear_pos + sweep * (wing_length * 0.55)
+			+ Vector3(0.0, wing_height * 0.15 + WING_RAISE, 0.0)
+		)
+		helm.add_child(wing)
+
+	return root
+
+
 static func _measure_head_contents(head_pivot: Node3D) -> AABB:
 	var found := false
 	var bounds := AABB()
@@ -1181,6 +1424,21 @@ static func _measure_head_contents(head_pivot: Node3D) -> AABB:
 	if not found:
 		var fallback := ProceduralFigure.HEAD_SIZE
 		return AABB(Vector3(-fallback.x, 0.0, -fallback.z), fallback * 2.0)
+	return bounds
+
+
+## Special helms fit the wearer's actual head and hair, but that fit is a
+## property of the naked authored rig—not of whichever suit-preview rebuild
+## happens to request it. The paper doll destroys and recreates its pieces as
+## focus/assignment state changes; repeatedly walking that live subtree made
+## a first-frame helm vulnerable to transient parent transforms before the
+## preview settled. Cache one local-space measurement on the head pivot and
+## make every subsequent world and portrait rebuild consume the same bounds.
+static func _canonical_head_contents(head_pivot: Node3D) -> AABB:
+	if head_pivot.has_meta("blorb_suit_head_contents"):
+		return head_pivot.get_meta("blorb_suit_head_contents") as AABB
+	var bounds:=_measure_head_contents(head_pivot)
+	head_pivot.set_meta("blorb_suit_head_contents",bounds)
 	return bounds
 
 
