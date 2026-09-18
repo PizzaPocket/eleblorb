@@ -1582,6 +1582,11 @@ const HELD_ITEM_SCALE := 0.6
 const HELD_ITEM_LOCAL_OFFSET := Vector3(0, 0, 0.02)
 const THROW_SPEED := 14.0
 const THROW_MAX_AIM_DISTANCE := 45.0
+## Aiming above the horizon usually hits nothing, leaving the aim point far
+## up the camera ray; solving an arc to reach it demanded a catapult-like
+## heave. Capping the upward launch speed turns those into a high lob (apex
+## ~v^2 / 2g = 7 m), while ordinary aimed throws never need this much.
+const THROW_MAX_UPWARD_SPEED := 12.0
 const THROW_CAMERA_DISTANCE_SCALE := 0.60
 ## Per direct report, 1.05 shifted the camera over the shoulder far enough
 ## that his own head blocked the reticle rather than clearing it -- reduced
@@ -5607,9 +5612,10 @@ func _throw_held_item() -> void:
 	var horizontal := Vector3(displacement.x, 0.0, displacement.z)
 	var travel_time := maxf(horizontal.length() / THROW_SPEED, 0.15)
 	thrown.velocity = horizontal / travel_time
-	thrown.velocity.y = (
-		displacement.y + 0.5 * ThrownItem.GRAVITY * travel_time * travel_time
-	) / travel_time
+	thrown.velocity.y = minf(
+		(displacement.y + 0.5 * ThrownItem.GRAVITY * travel_time * travel_time) / travel_time,
+		THROW_MAX_UPWARD_SPEED
+	)
 
 	_finish_throw_preparation()
 	UISounds.play_foley(&"throw_release", 0.55, get_instance_id())

@@ -142,7 +142,9 @@ func _resolve_hit(body: Node3D, hit_position: Variant = null, hit_normal: Varian
 	if body.is_in_group("skeletons") and body.has_method("take_damage"):
 		# Thrown inventory objects remain recoverable after impact, but provide a
 		# modest blorbless attack for story encounters such as the Royal Chef.
-		body.take_damage(16.0, self)
+		# No attacker: the NMEs' attacker parameter is a Blorb, used only to
+		# credit XP, and a thrown item earns no blorb experience.
+		body.take_damage(16.0)
 		_land(hit_position, hit_normal)
 		return
 
