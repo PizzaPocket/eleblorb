@@ -19,6 +19,10 @@ const X_MAX := 1240.0
 const Z_HALF := 170.0
 const SPACING := 5.0
 
+## Rolling hills across the whole valley. The clearing, the gate pads and the
+## mountain impose their own shapes over them; lakes are carved into them.
+const HILL_HEIGHT := 5.0
+
 const START_CENTER := Vector2(0.0, 0.0)
 const START_RADIUS := 32.0
 
@@ -27,9 +31,9 @@ const PLANT_ZONE := Vector2(58.0, 168.0)
 ## Both lakes are NaturalLake basins (the game's own lake technique). They
 ## share WATER_LEVEL: the terrain reports one water level for the whole world,
 ## and the frozen lake's water lies beneath its ice at that same level, exactly
-## as the Ice Kingdom layers them. The level sits below the surrounding ground
-## so each basin's natural upper slope shows as a bank.
-const WATER_LEVEL := -1.6
+## as the Ice Kingdom layers them. The level sits well below the surrounding
+## hills, so each lake lies in a clearly punched-down bowl with a real bank.
+const WATER_LEVEL := -7.0
 const LAKE_CENTER := Vector2(265.0, 0.0)
 const LAKE_RADIUS := 55.0
 const LAKE_EDGE_VARIATION := 9.0
@@ -39,10 +43,12 @@ const LAKE_SHELF := WATER_LEVEL + 0.35
 
 const DIRT_ZONE := Vector2(766.0, 890.0)
 
+## The lava pool is carved as a NaturalLake basin too, filled with lava.
 const LAVA_CENTER := Vector2(1100.0, 0.0)
 const LAVA_RADIUS := 40.0
-const LAVA_LEVEL := -0.6
-const LAVA_FLOOR := -5.0
+const LAVA_EDGE_VARIATION := 6.0
+const LAVA_DEPTH := 6.0
+const LAVA_LEVEL := -3.0
 
 const ICE_CENTER := Vector2(438.0, 0.0)
 const ICE_RADIUS := 50.0
@@ -108,13 +114,14 @@ var _noise := FastNoiseLite.new()
 var _rng := RandomNumberGenerator.new()
 var _water_lake := NaturalLake.new(LAKE_CENTER, LAKE_RADIUS, LAKE_EDGE_VARIATION, LAKE_DEPTH, LAKE_SHELF, 20260919)
 var _frozen_lake := NaturalLake.new(ICE_CENTER, ICE_RADIUS, ICE_EDGE_VARIATION, ICE_LAKE_DEPTH, ICE_LEVEL, 20260920)
+var _lava_pool := NaturalLake.new(LAVA_CENTER, LAVA_RADIUS, LAVA_EDGE_VARIATION, LAVA_DEPTH, LAVA_LEVEL + 0.3, 20260921)
 
 
 func _ready() -> void:
 	collision_layer = 1
 	collision_mask = 0
 	_noise.seed = 20260918
-	_noise.frequency = 0.02
+	_noise.frequency = 0.012
 	_noise.fractal_octaves = 3
 	_rng.seed = 20260918
 	_nx = int(round((X_MAX - X_MIN) / SPACING)) + 1
@@ -132,18 +139,14 @@ func _ready() -> void:
 
 func _raw_height(x: float, z: float) -> float:
 	var point := Vector2(x, z)
-	var height := _noise.get_noise_2d(x, z) * 1.4
+	var height := _noise.get_noise_2d(x, z) * HILL_HEIGHT
 	# Dirt track: rolling mounds across the path for jumps and wheelies.
 	var dirt_mask := smoothstep(DIRT_ZONE.x, DIRT_ZONE.x + 15.0, x) * (1.0 - smoothstep(DIRT_ZONE.y - 15.0, DIRT_ZONE.y, x))
 	height += dirt_mask * 3.2 * maxf(sin((x - DIRT_ZONE.x) * 0.08), 0.0) * (0.6 + 0.4 * cos(z * 0.05))
 	# Lake: punched into the ground with an organic shore (NaturalLake).
 	height = _water_lake.carve(height, point)
-	# Lava pool: a sunken bowl inside a raised basalt rim.
-	var lava_distance := point.distance_to(LAVA_CENTER)
-	var rim := smoothstep(LAVA_RADIUS - 2.0, LAVA_RADIUS + 3.0, lava_distance) * (1.0 - smoothstep(LAVA_RADIUS + 3.0, LAVA_RADIUS + 12.0, lava_distance))
-	height += rim * 1.6
-	var lava_target := lerpf(LAVA_FLOOR, LAVA_LEVEL - 0.5, smoothstep(LAVA_RADIUS * 0.5, LAVA_RADIUS, lava_distance))
-	height = lerpf(height, lava_target, 1.0 - smoothstep(LAVA_RADIUS - 2.0, LAVA_RADIUS, lava_distance))
+	# Lava pool: the same natural basin, its bank of basalt.
+	height = _lava_pool.carve(height, point)
 	# Frozen lake: the same carve; its ice sheet is built over the basin.
 	height = _frozen_lake.carve(height, point)
 	# Snow mountain, smooth to its summit.
@@ -153,7 +156,8 @@ func _raw_height(x: float, z: float) -> float:
 	height = lerpf(height, 0.0, 1.0 - smoothstep(START_RADIUS, START_RADIUS + 16.0, point.distance_to(START_CENTER)))
 	for border in BORDERS:
 		var border_x: float = border["x"]
-		var pad := 1.0 - smoothstep(PORTAL_PAD_RADIUS, PORTAL_PAD_RADIUS + 4.0, point.distance_to(Vector2(border_x, 0.0)))
+		# A wide blend: the pad must ease into hills up to HILL_HEIGHT tall.
+		var pad := 1.0 - smoothstep(PORTAL_PAD_RADIUS, PORTAL_PAD_RADIUS + 12.0, point.distance_to(Vector2(border_x, 0.0)))
 		height = lerpf(height, 0.0, pad)
 	# Valley walls along both sides and at both ends.
 	height += smoothstep(115.0, 165.0, absf(z)) * 34.0
@@ -170,9 +174,9 @@ func _height_color(x: float, z: float, height: float) -> Color:
 		return FROZEN_LAKEBED
 	if is_snow_footstep_surface(point):
 		return SNOW
-	if point.distance_to(LAVA_CENTER) < LAVA_RADIUS + 14.0:
+	if point.distance_to(LAVA_CENTER) < LAVA_RADIUS + NaturalLake.BANK_WIDTH:
 		return BASALT
-	if _water_lake.coverage(point) > 0.02 or (point.distance_to(LAKE_CENTER) < LAKE_RADIUS + NaturalLake.BANK_WIDTH and height < 0.2):
+	if _water_lake.coverage(point) > 0.02 or (point.distance_to(LAKE_CENTER) < LAKE_RADIUS + NaturalLake.BANK_WIDTH and height < LAKE_SHELF + 1.5):
 		return LAKEBED
 	if x >= DIRT_ZONE.x - 8.0 and x <= DIRT_ZONE.y:
 		return DIRT
@@ -216,19 +220,20 @@ func get_lake_water_level() -> float:
 
 
 func is_lava_area(pos: Vector2) -> bool:
-	return pos.distance_to(LAVA_CENTER) < LAVA_RADIUS
+	return _lava_pool.coverage(pos) > 0.08
 
 
 func get_lava_surface_height(_pos: Vector2) -> float:
 	return LAVA_LEVEL
 
 
-## Just outside the rim, straight out from wherever the lava was entered.
+## Up the bank, straight out from wherever the lava was entered.
 func get_lava_escape_position(pos: Vector2) -> Vector3:
 	var outward := pos - LAVA_CENTER
 	if outward.length_squared() < 0.01:
 		outward = Vector2(-1.0, 0.0)
-	var escape := LAVA_CENTER + outward.normalized() * (LAVA_RADIUS + 10.0)
+	outward = outward.normalized()
+	var escape := LAVA_CENTER + outward * (_lava_pool.edge_radius(outward) + 6.0)
 	return Vector3(escape.x, get_mesh_height(escape.x, escape.y), escape.y)
 
 
@@ -316,28 +321,7 @@ func _build_mesh_and_collision() -> void:
 func _build_liquid_surfaces() -> void:
 	_water_lake.build_water(self, WATER_LEVEL)
 	_frozen_lake.build_frozen(self, ICE_SURFACE_LEVEL, ICE_THICKNESS, WATER_LEVEL)
-	_add_disc("Lava", LAVA_CENTER, LAVA_RADIUS + 1.0, LAVA_LEVEL, NatureProps.build_lava_material())
-
-
-func _add_disc(label: String, center: Vector2, radius: float, y: float, material: Material) -> void:
-	var tool := SurfaceTool.new()
-	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
-	const SEGMENTS := 72
-	for index in SEGMENTS:
-		var a0 := TAU * float(index) / float(SEGMENTS)
-		var a1 := TAU * float(index + 1) / float(SEGMENTS)
-		# Counter-clockwise from above, so the face points up.
-		for p in [Vector2.ZERO, Vector2(cos(a1), sin(a1)) * radius, Vector2(cos(a0), sin(a0)) * radius]:
-			var offset: Vector2 = p
-			tool.set_normal(Vector3.UP)
-			tool.add_vertex(Vector3(center.x + offset.x, y, center.y + offset.y))
-	tool.set_material(material)
-	var disc := MeshInstance3D.new()
-	disc.name = label
-	disc.mesh = tool.commit()
-	disc.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	add_child(disc)
-	CollisionPolicy.mark_decorative(disc)
+	_lava_pool.build_surface(self, "Lava", LAVA_LEVEL, NatureProps.build_lava_material())
 
 
 # ---- Scenery -------------------------------------------------------------------
@@ -408,7 +392,7 @@ func _scatter_shores() -> void:
 		_place(NatureProps.build_rock(_rng.randf_range(0.6, 1.6)), x, z)
 	for index in 16:
 		var angle := _rng.randf_range(0.0, TAU)
-		var radius := LAVA_RADIUS + _rng.randf_range(5.0, 12.0)
+		var radius := LAVA_RADIUS + _rng.randf_range(8.0, 18.0)
 		var x := LAVA_CENTER.x + cos(angle) * radius
 		var z := LAVA_CENTER.y + sin(angle) * radius
 		if absf(z) < 6.0:

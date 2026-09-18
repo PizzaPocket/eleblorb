@@ -89,7 +89,13 @@ func build_water(parent: Node3D, level: float) -> void:
 	material.roughness = 0.05
 	material.metallic = 0.15
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	parent.add_child(_surface_mesh("LakeWater", _disc_triangles(level), material))
+	build_surface(parent, "LakeWater", level, material)
+
+
+## Any non-solid liquid sheet over the basin (water, or a lava pool's lava),
+## following the organic edge and tucked under the bank like the water.
+func build_surface(parent: Node3D, label: String, level: float, material: Material) -> void:
+	parent.add_child(_surface_mesh(label, _disc_triangles(level), material))
 
 
 ## A frozen lake, as in the Ice Kingdom: a solid, walkable ice sheet at
