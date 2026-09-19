@@ -18,6 +18,8 @@ const XIAO_HOU_ZI_SCENE: PackedScene = preload("res://scenes/xiao_hou_zi.tscn")
 const JUNGLE_KINGDOM_FOLIAGE := preload("res://scripts/jungle_kingdom_foliage.gd")
 const MANCHEGO_SCENE: PackedScene = preload("res://scenes/manchego.tscn")
 const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
+## The demo world's own background music (see WorldMusic).
+const MUSIC: AudioStream = preload("res://assets/audio/music/demo_world_theme.mp3")
 ## The hero's five starting Normal blorbs, assigned everywhere but the head.
 const NORMAL_SLOTS: Array[String] = ["leg_left", "leg_right", "arm_left", "arm_right", "torso"]
 ## Wild shiny blorbs roaming the forest plains (as in the Crossroads field).
@@ -65,6 +67,7 @@ func _ready() -> void:
 	# The Crystal Skates portal, standing on the frozen lake's ice.
 	var crystal_portal := _add_portal("ice", DemoWorldTerrain.CRYSTAL_PORTAL_X, -PI * 0.5, "crystal", 1.0, CrystalTrack.CRYSTAL_TINT)
 	crystal_portal.position.y = DemoWorldTerrain.ICE_SURFACE_LEVEL
+	add_child(WorldMusic.new(MUSIC))
 	# The Ocean Kingdom's Kraken, patrolling the sea's deep middle.
 	var kraken := Kraken.new()
 	kraken.route_center = _terrain.sea_center()
