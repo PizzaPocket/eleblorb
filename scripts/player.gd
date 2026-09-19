@@ -2289,7 +2289,6 @@ func _physics_process(delta: float) -> void:
 	_apply_throw_aim_pose(delta)
 	_apply_weapon_swing_pose(delta)
 	_apply_throw_facing(delta)
-	_update_water_streams(delta)
 	_apply_dirtbike_pose(delta)
 	_apply_snowboard_pose(delta)
 	_apply_ice_skate_pose(delta)
@@ -2411,6 +2410,10 @@ func _physics_process(delta: float) -> void:
 	# Movement, bounces and ground snapping have all moved the collision body
 	# for this frame; now place the rendered body on it, once.
 	_compose_body_pose(delta, grounded, on_cloud or on_canopy, buoyant)
+	# After the body has moved and been posed: the streams are top_level, so
+	# placing them any earlier leaves each one a whole frame's travel behind
+	# its hand or foot (half a metre for a fast swimmer).
+	_update_water_streams(delta)
 	_update_dirtbike_wheels(delta)
 	_update_snowboard_visual()
 	_prev_grounded = grounded
@@ -4075,10 +4078,12 @@ func _apply_arm_power_poses(delta: float) -> void:
 	# angle, then the jet pose pulling back toward the hips -- the two
 	# lerps never fully resolved, settling the arm at a permanent halfway
 	# compromise instead of cleanly canceling the raise.
-	var left_power := Input.is_action_pressed("left_arm_power") and not _fire_hand_hover_active
+	# Swimming Water jets likewise own their arms (_apply_swim_jet_pose()).
+	var left_power := Input.is_action_pressed("left_arm_power") and not _fire_hand_hover_active and not (_left_arm_water_active and _is_swimming())
 	var right_power := (
 		Input.is_action_pressed("right_arm_power")
 		and not _fire_hand_hover_active
+		and not (_right_arm_water_active and _is_swimming())
 		and not _throw_aim_active
 		and not _held_item_is_weapon()
 	)
@@ -4753,6 +4758,8 @@ func _build_water_streams() -> void:
 	# droplets so its arc hangs in the air behind a sweep.
 	_water_leg_stream_left.local_coords = true
 	_water_leg_stream_right.local_coords = true
+	_set_stream_inherits_velocity(_water_leg_stream_left, false)
+	_set_stream_inherits_velocity(_water_leg_stream_right, false)
 	_electric_stream_left = LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR)
 	_electric_stream_right = LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR)
 	_city_stream_left = LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR)
@@ -4769,6 +4776,14 @@ const FIRE_PARTICLE_SOFTNESS := 1.7
 ## far less, so a strong wobble would read as the same asymmetric shape
 ## repeating lick to lick rather than organic variety.
 const FIRE_PARTICLE_WOBBLE := 0.2
+
+
+## A world-space stream inherits its nozzle's velocity; one simulated in the
+## emitter's own space must not, or the nozzle's motion is counted twice.
+func _set_stream_inherits_velocity(stream: GPUParticles3D, inherits: bool) -> void:
+	var process := stream.process_material as ParticleProcessMaterial
+	if process != null:
+		process.inherit_velocity_ratio = 1.0 if inherits else 0.0
 
 
 func _make_water_stream(stream_name: String) -> GPUParticles3D:
@@ -5296,8 +5311,9 @@ func _update_water_streams(delta: float) -> void:
 	# Swimming jets stay attached to the hands like the Fire jets; a fast
 	# swimmer would otherwise leave each jet's start behind in the water.
 	if is_instance_valid(_water_stream_left):
-		_water_stream_left.local_coords = swimming
-		_water_stream_right.local_coords = swimming
+		for hose in [_water_stream_left, _water_stream_right]:
+			hose.local_coords = swimming
+			_set_stream_inherits_velocity(hose, not swimming)
 	_update_water_stream(
 		_water_stream_left, _palm_left, water_hand_direction,
 		_left_arm_water_active
