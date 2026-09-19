@@ -2,178 +2,176 @@ class_name NautilusCrown
 extends RefCounted
 
 ## The Nautilus Crown's shape, shared by the living helm a blorb becomes after
-## binding it (BlorbSuit._build_nautilus_crown()) and the loose item. Two
-## parts of one living mass:
+## binding it (BlorbSuit._build_nautilus_crown()) and the loose item. One
+## continuous piped curve, in the head's side-on (Y-Z) plane:
 ##
-## - The cap: a thick, rounded blorb shell sitting on the head from just
-##   above the eyes over the crown, its edge a rolled lip rather than a cut,
-##   the blorb's eyes on its brow. It covers the whole top and back of the
-##   skull, so nothing of the head shows through the shell above it.
-## - The shell: a nautilus spiral growing from the top of the cap and coiling
-##   back and up behind the head, so its mass sits clear of the skull. As in
-##   a real nautilus it is one solid body: every whorl is thick enough to
-##   overlap the one inside it, leaving no valleys between the turns, and it
-##   winds in until it closes at its centre. Broad where it leaves the cap, it
-##   narrows smoothly to the back of the head and holds that width after.
+## - The base: a smoothly rounded nose just in front of the forehead, the
+##   headwear's front face with the blorb's eyes on it. Behind it the tube,
+##   fat and nearly round in cross-section, sinks back into the head.
+## - The rise: from there it arcs up and back, hooking down toward the back of
+##   the head.
+## - The spiral: it winds inward round a centre above and behind the head as
+##   a logarithmic spiral, its cross-section flattening to a broad oval whose
+##   thickness across the curl exactly fills the gap to the next whorl in, so
+##   the turns stack into one solid mass with no valleys, until it closes.
 ##
+## Its width holds through the base, tapers as it arches back and curls, and
+## the innermost whorls may press back into the base: one solid mass.
 ## Worn, it gives the same air supply as the Diving Helmet; over two Water
 ## leg blorbs it commands the mermaid tail (see BlorbSuitController).
 
 const SHELL_COLOR := Color(0.36, 0.88, 0.74)
 
-## The cap: its rim this far above the head's centre (a fraction of the head's
-## half-height: just above the eyes), its inside this much wider and deeper
-## than the head, reaching this far above the top of the head (a fraction of
-## its height), and this thick (a fraction of the head's half-width).
-const CAP_RIM := 0.22
-const CAP_MARGIN := Vector2(1.08, 1.1)
-const CAP_CROWN_CLEARANCE := 0.05
-const CAP_THICKNESS := 0.3
-const CAP_SEGMENTS := 28
-
-## The spiral's centre: behind the head (a fraction of its half-depth beyond
-## the back of the skull) and above its centre (a fraction of half-height).
-## It starts on the top of the cap this far forward of the head's centre (a
-## fraction of half-depth).
-const COIL_BEHIND := 0.6
-const COIL_UP := 0.55
-const START_FORWARD := 0.0
+## The base's half-width, a fraction of the head's half-width, and its
+## thickness out of the head as a fraction of that width: nearly round.
+const BASE_WIDTH := 1.05
+const BASE_ROUNDNESS := 0.85
+## The base runs over the head from its nose just in front of the brow (angle
+## up from the front, round the head's centre) back toward the crown. Its
+## centreline starts at 1 + BASE_FRONT_GAP of the head's radius, just inside
+## the forehead so the tube's rounded front face stands just ahead of it, and
+## sinks to BASE_SINK of the head's radius at its back end, burying the rear
+## of the base in the head.
+const BASE_FROM := deg_to_rad(14.0)
+const BASE_TO := deg_to_rad(80.0)
+const BASE_FRONT_GAP := -0.12
+const BASE_SINK := 0.72
+const BASE_SAMPLES := 18
+## The spiral's centre above and behind the head (fractions of the head's
+## half-height and half-depth from its centre).
+const COIL_UP := 1.2
+const COIL_BACK := 1.1
 ## How fast the spiral tightens (its radius falls by exp(-DECAY * TAU) each
-## turn), and how much each whorl overlaps the one inside it.
+## turn), how much each whorl overlaps the one inside it, and where it
+## closes.
 const DECAY := 0.16
 const WHORL_OVERLAP := 1.2
-## Width where it leaves the cap and after it reaches the back of the head
-## (fractions of the head's half-width).
-const START_WIDTH := 1.05
-const BACK_WIDTH := 0.72
-## The spiral winds in until its centreline is this close to the centre.
 const CLOSING_RADIUS := 0.006
-const CENTRE_THICKNESS := 0.012
+const CENTRE_THICKNESS := 0.01
 const MAX_TURNS := 8.0
-const SAMPLES := 180
-const SEGMENTS := 20
+const SPIRAL_SAMPLES := 170
+## Width after the taper (a fraction of the head's half-width), reached where
+## the curve points straight back (the spiral's angle PI).
+const BACK_WIDTH := 0.72
+## The rounded nose: over this much of the base's width the tube swells from
+## a point to full size.
+const NOSE_LENGTH := 1.0
+## Passes of smoothing over the join between the base and the spiral, so the
+## rise is one flowing arc.
+const JOIN_SMOOTHING := 8
+const SEGMENTS := 22
 
 
-## The cap for a head whose bounds are `contents`.
-static func cap(contents: AABB) -> Dictionary:
+## The whole curve for a head whose bounds are `contents`: per sample, the
+## centreline point, the half-width across the head and the half-thickness
+## across the curl.
+static func shape(contents: AABB) -> Dictionary:
 	var center := contents.get_center()
 	var half := contents.size * 0.5
-	var rim := center.y + half.y * CAP_RIM
-	var inner := Vector2(half.x * CAP_MARGIN.x, half.z * CAP_MARGIN.y)
-	var inner_height := contents.end.y + contents.size.y * CAP_CROWN_CLEARANCE - rim
-	return {
-		"center": Vector2(center.x, center.z), "rim": rim, "inner": inner,
-		"inner_height": inner_height, "thickness": half.x * CAP_THICKNESS,
-	}
-
-
-## The cap's outer surface at `lift` (0 at the rim, 1 at the crown) and
-## `around` (radians round from the front, +Z), and its outward normal there.
-static func cap_surface(shell_cap: Dictionary, lift: float, around: float) -> Dictionary:
-	var thickness: float = shell_cap["thickness"]
-	var inner: Vector2 = shell_cap["inner"]
-	var semi := Vector3(inner.x + thickness, float(shell_cap["inner_height"]) + thickness, inner.y + thickness)
-	var phi := lift * PI * 0.5
-	var local := Vector3(sin(around) * semi.x * cos(phi), sin(phi) * semi.y, cos(around) * semi.z * cos(phi))
-	var center: Vector2 = shell_cap["center"]
-	var normal := Vector3(local.x / (semi.x * semi.x), local.y / (semi.y * semi.y), local.z / (semi.z * semi.z)).normalized()
-	return {"point": Vector3(center.x, float(shell_cap["rim"]), center.y) + local, "normal": normal}
-
-
-## The cap as one closed, lathed shell: down the inside from the crown, round
-## the rolled lip at the rim, and back up the outside to the crown.
-static func build_cap_mesh(shell_cap: Dictionary) -> ArrayMesh:
-	var inner: Vector2 = shell_cap["inner"]
-	var thickness: float = shell_cap["thickness"]
-	var inner_height: float = shell_cap["inner_height"]
-	var rim: float = shell_cap["rim"]
-	var center: Vector2 = shell_cap["center"]
-	var outer := inner + Vector2(thickness, thickness)
-	# Each profile entry: half-widths (x across, y front to back) and height.
-	var profile: Array = []
-	for index in 11:
-		var phi := PI * 0.5 * (1.0 - float(index) / 10.0)
-		profile.append([inner * cos(phi), rim + sin(phi) * inner_height])
-	for index in range(1, 10):
-		var s := PI * float(index) / 10.0
-		profile.append([inner.lerp(outer, (1.0 - cos(s)) * 0.5), rim - sin(s) * thickness * 0.5])
-	for index in 15:
-		var phi := PI * 0.5 * float(index) / 14.0
-		profile.append([outer * cos(phi), rim + sin(phi) * (inner_height + thickness)])
-	var rings: Array = []
-	for entry in profile:
-		var widths: Vector2 = entry[0]
-		var height: float = entry[1]
-		var ring: Array[Vector3] = []
-		for segment in CAP_SEGMENTS:
-			var angle := TAU * float(segment) / float(CAP_SEGMENTS)
-			ring.append(Vector3(center.x + cos(angle) * widths.x, height, center.y + sin(angle) * widths.y))
-		rings.append(ring)
-	return BlorbBodyShape.build_mesh_from_rings(rings)
-
-
-## The spiral for a head whose bounds are `contents`, starting on `shell_cap`.
-## Angles run in the Y-Z plane from +Z (forward) toward +Y (up).
-static func spiral(contents: AABB, shell_cap: Dictionary) -> Dictionary:
-	var center := contents.get_center()
-	var half := contents.size * 0.5
-	var coil := center + Vector3(0.0, COIL_UP * half.y, -half.z * (1.0 + COIL_BEHIND))
-	var cap_top := float(shell_cap["rim"]) + float(shell_cap["inner_height"]) + float(shell_cap["thickness"])
-	var start := Vector3(0.0, cap_top, center.z + half.z * START_FORWARD)
+	var base_width := half.x * BASE_WIDTH
+	var base_thickness := base_width * BASE_ROUNDNESS
+	var points: Array[Vector3] = []
+	var widths: Array[float] = []
+	var thicknesses: Array[float] = []
+	# The base, nearly round, from just ahead of the forehead back into the
+	# head.
+	for index in BASE_SAMPLES:
+		var along := float(index) / float(BASE_SAMPLES)
+		var angle := lerpf(BASE_FROM, BASE_TO, along)
+		var reach := lerpf(1.0 + BASE_FRONT_GAP, BASE_SINK, smoothstep(0.0, 1.0, along))
+		points.append(center + Vector3(0.0, sin(angle) * half.y, cos(angle) * half.z) * reach)
+		widths.append(base_width)
+		thicknesses.append(base_thickness)
+	# The rise and spiral, round a centre above and behind the head,
+	# starting where the base ends.
+	var coil := center + Vector3(0.0, half.y * COIL_UP, -half.z * COIL_BACK)
+	var start := center + Vector3(0.0, sin(BASE_TO) * half.y, cos(BASE_TO) * half.z) * BASE_SINK
 	var start_angle := atan2(start.y - coil.y, start.z - coil.z)
 	var start_radius := Vector2(start.z - coil.z, start.y - coil.y).length()
 	var winding := minf(log(start_radius / CLOSING_RADIUS) / DECAY, TAU * MAX_TURNS)
-	return {
-		"coil": coil, "start_angle": start_angle, "start_radius": start_radius,
-		"end_angle": start_angle + winding,
-		"start_width": half.x * START_WIDTH, "back_width": half.x * BACK_WIDTH,
-	}
-
-
-static func _radius_at(shape: Dictionary, angle: float) -> float:
-	return float(shape["start_radius"]) * exp(-DECAY * (angle - float(shape["start_angle"])))
-
-
-static func point_at(shape: Dictionary, angle: float) -> Vector3:
-	return (shape["coil"] as Vector3) + Vector3(0.0, sin(angle), cos(angle)) * _radius_at(shape, angle)
-
-
-static func width_at(shape: Dictionary, angle: float) -> float:
-	var taper := smoothstep(float(shape["start_angle"]), PI, angle)
-	return lerpf(float(shape["start_width"]), float(shape["back_width"]), taper)
-
-
-## Half the shell's thickness across the curl at `angle`. A whorl at radius r
-## and the next one in, at r * q (q = exp(-DECAY * TAU)), meet when
-## r - h(r) = r*q + h(r*q), giving h = r * (1 - q) / (1 + q); WHORL_OVERLAP
-## thickens that so the turns overlap into one mass.
-static func thickness_at(shape: Dictionary, angle: float) -> float:
 	var shrink := exp(-DECAY * TAU)
-	return maxf(_radius_at(shape, angle) * (1.0 - shrink) / (1.0 + shrink) * WHORL_OVERLAP, CENTRE_THICKNESS)
+	var back_width := half.x * BACK_WIDTH
+	for index in SPIRAL_SAMPLES + 1:
+		var angle := start_angle + winding * float(index) / float(SPIRAL_SAMPLES)
+		var radius := start_radius * exp(-DECAY * (angle - start_angle))
+		points.append(coil + Vector3(0.0, sin(angle), cos(angle)) * radius)
+		# Full and nearly round as it leaves the base, tapering in width and
+		# flattening into the stacked whorls as it arches back and curls.
+		var toward_back := smoothstep(start_angle, PI, angle)
+		var width := lerpf(base_width, back_width, toward_back)
+		var packed := maxf(radius * (1.0 - shrink) / (1.0 + shrink) * WHORL_OVERLAP, CENTRE_THICKNESS)
+		widths.append(width)
+		thicknesses.append(lerpf(base_thickness, minf(packed, width), toward_back))
+	# One flowing arc where the base turns up into the rise.
+	for _pass in JOIN_SMOOTHING:
+		for index in range(BASE_SAMPLES - 6, BASE_SAMPLES + 10):
+			points[index] = (points[index - 1] + points[index] * 2.0 + points[index + 1]) * 0.25
+	return {"points": points, "widths": widths, "thicknesses": thicknesses, "head_center": center, "base_width": base_width}
 
 
-static func build_shell_mesh(shape: Dictionary) -> ArrayMesh:
+## The curve's frame at sample `index`: its direction, the across-the-head
+## axis, and the out-from-the-head axis across the curl (pointing away from
+## the head's centre on the base).
+static func frame(curve: Dictionary, index: int) -> Dictionary:
+	var points: Array[Vector3] = curve["points"]
+	var before := points[maxi(index - 1, 0)]
+	var after := points[mini(index + 1, points.size() - 1)]
+	var tangent := (after - before).normalized()
+	var side := Vector3.RIGHT
+	# Same frame orientation as BlorbSuit.build_limb_tube(): side x up = tangent.
+	var up := tangent.cross(side)
+	return {"tangent": tangent, "side": side, "up": up}
+
+
+## The tube's size at sample `index`, including the nose's rounding: the
+## base swells from a point at the brow like the end of any blorb.
+static func size_at(curve: Dictionary, index: int) -> Vector2:
+	var points: Array[Vector3] = curve["points"]
+	var along := 0.0
+	for step in index:
+		along += points[step].distance_to(points[step + 1])
+	var nose := float(curve["base_width"]) * NOSE_LENGTH
+	var rounding := sqrt(maxf(0.0, 1.0 - pow(1.0 - clampf(along / nose, 0.0, 1.0), 2.0)))
+	return Vector2(float(curve["widths"][index]), float(curve["thicknesses"][index])) * rounding
+
+
+## A point on the tube's surface at sample `index`, `around` radians round
+## its cross-section (0 across to +X, PI/2 along "up"), and the outward
+## normal there.
+static func surface(curve: Dictionary, index: int, around: float) -> Dictionary:
+	var axes := frame(curve, index)
+	var size := size_at(curve, index)
+	var side: Vector3 = axes["side"]
+	var up: Vector3 = axes["up"]
+	var center: Vector3 = (curve["points"] as Array[Vector3])[index]
+	var point := center + side * cos(around) * size.x + up * sin(around) * size.y
+	var normal := (side * cos(around) / maxf(size.x, 0.0001) + up * sin(around) / maxf(size.y, 0.0001)).normalized()
+	return {"point": point, "normal": normal}
+
+
+static func build_mesh(curve: Dictionary) -> ArrayMesh:
 	var rings: Array = []
-	var start_angle := float(shape["start_angle"])
-	var end_angle := float(shape["end_angle"])
-	for sample in SAMPLES + 1:
-		var angle := lerpf(start_angle, end_angle, float(sample) / float(SAMPLES))
-		var center := point_at(shape, angle)
-		var tangent := (point_at(shape, angle + 0.01) - point_at(shape, angle - 0.01)).normalized()
-		var side := Vector3.RIGHT
-		# Same frame orientation as BlorbSuit.build_limb_tube(): side x up = tangent.
-		var up := tangent.cross(side)
-		var width := width_at(shape, angle)
-		var thickness := thickness_at(shape, angle)
-		# Where it grows out of the cap the shell swells in from nothing,
-		# rounding into the cap rather than starting as a flat cut.
-		var emerge := sin(clampf(float(sample) / 8.0, 0.0, 1.0) * PI * 0.5)
+	var points: Array[Vector3] = curve["points"]
+	for index in points.size():
+		var axes := frame(curve, index)
+		var size := size_at(curve, index)
+		var side: Vector3 = axes["side"]
+		var up: Vector3 = axes["up"]
 		var ring: Array[Vector3] = []
 		for segment in SEGMENTS:
 			var around := TAU * float(segment) / float(SEGMENTS)
-			ring.append(center + side * cos(around) * width * emerge + up * sin(around) * thickness * emerge)
+			ring.append(points[index] + side * cos(around) * size.x + up * sin(around) * size.y)
 		rings.append(ring)
 	return BlorbBodyShape.build_mesh_from_rings(rings)
+
+
+## Which way round the base's cross-section faces out of the head: +PI/2 or
+## -PI/2 along the frame's up axis at sample `index`.
+static func outward_around(curve: Dictionary, index: int) -> float:
+	var axes := frame(curve, index)
+	var center: Vector3 = (curve["points"] as Array[Vector3])[index]
+	var away := center - (curve["head_center"] as Vector3)
+	return PI * 0.5 if (axes["up"] as Vector3).dot(away) >= 0.0 else -PI * 0.5
 
 
 ## Standalone shop/inventory visual: sized off the figure's generic head.
@@ -181,14 +179,12 @@ static func build_visual(item_scale: float = 1.0) -> Node3D:
 	var root := Node3D.new()
 	root.name = "NautilusCrown"
 	var head_size := ProceduralFigure.HEAD_SIZE * item_scale
-	var contents := AABB(Vector3(-head_size.x, 0.0, -head_size.z), head_size * 2.0)
-	var shell_cap := cap(contents)
 	var material := StandardMaterial3D.new()
 	material.albedo_color = SHELL_COLOR
 	material.roughness = 0.35
-	for mesh in [build_cap_mesh(shell_cap), build_shell_mesh(spiral(contents, shell_cap))]:
-		var part := MeshInstance3D.new()
-		part.mesh = mesh
-		part.material_override = material
-		root.add_child(part)
+	var shell := MeshInstance3D.new()
+	shell.name = "Shell"
+	shell.mesh = build_mesh(shape(AABB(Vector3(-head_size.x, 0.0, -head_size.z), head_size * 2.0)))
+	shell.material_override = material
+	root.add_child(shell)
 	return root

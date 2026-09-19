@@ -2165,36 +2165,33 @@ static func _add_lava_mohawk(parent: Node3D, radius: float) -> void:
 	parent.add_child(fire)
 
 
-## The Nautilus Crown as a living blorb (NautilusCrown): a thick rounded cap
-## on the head with the blorb's eyes and core on its brow, and a nautilus
-## spiral growing from its top and coiling back and up behind the head.
+## The Nautilus Crown as a living blorb (NautilusCrown): one continuous tube,
+## round where it lies along the top of the head with the blorb's eyes and
+## core on its front, arcing up and back into a flattening nautilus spiral.
 static func _build_nautilus_crown(head_pivot: Node3D, contents: AABB, head_size: Vector3, vis: Dictionary) -> Node3D:
 	var root := Node3D.new()
 	root.name = "HeadBlorbNautilusCrown"
 	head_pivot.add_child(root)
-	var shell_cap := NautilusCrown.cap(contents)
-	var material := _build_goo_material(vis)
-	var cap_mesh := MeshInstance3D.new()
-	cap_mesh.name = "NautilusCapBlorbBody"
-	cap_mesh.mesh = NautilusCrown.build_cap_mesh(shell_cap)
-	cap_mesh.material_override = material
-	root.add_child(cap_mesh)
+	var curve := NautilusCrown.shape(contents)
 	var shell := MeshInstance3D.new()
-	shell.name = "NautilusShellBlorbBody"
-	shell.mesh = NautilusCrown.build_shell_mesh(NautilusCrown.spiral(contents, shell_cap))
-	shell.material_override = material
+	shell.name = "NautilusCrownBlorbBody"
+	shell.mesh = NautilusCrown.build_mesh(curve)
+	shell.material_override = _build_goo_material(vis)
 	root.add_child(shell)
-	# The eyes sit on the cap's brow, just above its lip: each placed on the
-	# cap's own surface and turned to face along its normal there, sunk a
-	# little into it the way every blorb eye is.
-	const EYE_LIFT := 0.22
-	const EYE_AROUND := deg_to_rad(30.0)
+	# The eyes on the base's front, just behind its rounded nose: each placed
+	# on the tube's own surface, facing along its normal there, sunk a little
+	# into it the way every blorb eye is.
+	const EYE_SAMPLE := 4
+	const EYE_SPREAD := 0.62
 	const EYE_EMBED_FRACTION := 0.35
-	var inner: Vector2 = shell_cap["inner"]
-	var eye_mesh_radius := inner.x * 0.16 * 0.5 * 1.8
+	var base_width: float = curve["base_width"]
+	var eye_mesh_radius := base_width * 0.16 * 0.5 * 1.8
 	var eye_color := (vis["albedo"] as Color).darkened(0.25)
+	var outward := NautilusCrown.outward_around(curve, EYE_SAMPLE)
 	for side in [-1.0, 1.0]:
-		var spot: Dictionary = NautilusCrown.cap_surface(shell_cap, EYE_LIFT, side * EYE_AROUND)
+		# Round from straight out of the head toward either side.
+		var around: float = outward - side * signf(outward) * EYE_SPREAD
+		var spot: Dictionary = NautilusCrown.surface(curve, EYE_SAMPLE, around)
 		var normal: Vector3 = spot["normal"]
 		var eye := MeshInstance3D.new()
 		eye.name = "EyeL" if side < 0.0 else "EyeR"
@@ -2208,15 +2205,15 @@ static func _build_nautilus_crown(head_pivot: Node3D, contents: AABB, head_size:
 		eye.basis = Basis.looking_at(-normal, Vector3.UP if absf(normal.y) < 0.95 else Vector3.BACK)
 		eye.scale = Vector3(1.0, 1.0, 0.5)
 		eye.position = (spot["point"] as Vector3) - normal * eye_mesh_radius * EYE_EMBED_FRACTION
-		cap_mesh.add_child(eye)
-	var brow: Dictionary = NautilusCrown.cap_surface(shell_cap, EYE_LIFT, 0.0)
-	var core := BlorbCore.build(inner.x * CORE_RADIUS_FRACTION * HAT_CORE_RADIUS_SCALE, vis["core_color"] as Color, vis["core_emissive"] as bool)
+		shell.add_child(eye)
+	var front: Dictionary = NautilusCrown.surface(curve, EYE_SAMPLE, outward)
+	var core := BlorbCore.build(base_width * CORE_RADIUS_FRACTION * HAT_CORE_RADIUS_SCALE, vis["core_color"] as Color, vis["core_emissive"] as bool)
 	if vis["core_emissive"] as bool:
 		var core_material: StandardMaterial3D = core.get_meta("material")
 		core_material.emission = vis["core_emission"] as Color
 		core_material.emission_energy_multiplier = vis["core_emission_energy"] as float
-	core.position = (brow["point"] as Vector3) - (brow["normal"] as Vector3) * float(shell_cap["thickness"]) * 0.5
-	cap_mesh.add_child(core)
+	core.position = (front["point"] as Vector3) - (front["normal"] as Vector3) * base_width * 0.4
+	shell.add_child(core)
 	_add_head_core_light(core, vis)
 	return root
 
