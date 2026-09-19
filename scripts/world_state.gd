@@ -9,8 +9,11 @@ extends Node
 
 var _collected_ids: Dictionary = {}
 
+## The game always boots, and every new day begins, in the morning.
+const MORNING_HOUR := 7.0
+
 ## Shared travel state survives scene replacement between kingdoms.
-var game_time_hours: float = 15.0
+var game_time_hours: float = MORNING_HOUR
 var calendar_day: int = 0
 var player_current_hp: float = 100.0
 var manchego_joined: bool = false
@@ -89,7 +92,7 @@ var debug_crossroads_loadout_applied: bool = false
 
 func advance_to_morning() -> void:
 	calendar_day += 1
-	game_time_hours = 7.0
+	game_time_hours = MORNING_HOUR
 
 
 func is_collected(id: String) -> bool:

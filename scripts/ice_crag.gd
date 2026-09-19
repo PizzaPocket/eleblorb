@@ -16,11 +16,21 @@ static func spawn(parent:Node,world_position:Vector3,rng:RandomNumberGenerator,l
 	parent.add_child(crag);crag.global_position=world_position-Vector3.UP*BURIAL_DEPTH
 	UISounds.play_foley(&"rock_erupt",0.52,crag.get_instance_id())
 	var radius:float=rng.randf_range(0.55,0.75)*(1.0+minf(float(level-1)*0.055,1.2))*platform_scale
-	var ice:=NatureProps.build_rock(radius,false);var mat:=StandardMaterial3D.new();mat.albedo_color=Color(ElementPalette.ICE_BODY,0.9);mat.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA;mat.roughness=0.1;mat.metallic=0.16
-	IceCrag._tint(ice,mat);crag.add_child(ice)
+	var ice:=NatureProps.build_rock(radius,false)
+	IceCrag._tint(ice,build_ice_material());crag.add_child(ice)
 	var collider:=CollisionShape3D.new();var shape:=CylinderShape3D.new();shape.radius=radius*0.95;shape.height=radius*1.50;collider.shape=shape;collider.position.y=radius*0.70;crag.add_child(collider)
 	crag._support_top_offset=radius*1.45;crag.add_to_group("power_platforms");crag.set_meta("support_radius",radius*0.95)
 	return crag
+
+## Raised ice: the Ice body colour, glassy and slightly translucent. Shared by
+## everything an Ice blorb forms out of ice (these crags, the skate runners).
+static func build_ice_material()->StandardMaterial3D:
+	var mat:=StandardMaterial3D.new()
+	mat.albedo_color=Color(ElementPalette.ICE_BODY,0.9)
+	mat.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.roughness=0.1
+	mat.metallic=0.16
+	return mat
 
 func get_support_top_y()->float:return global_position.y+_support_top_offset
 

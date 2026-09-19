@@ -61,21 +61,36 @@ const FORM_HELMS := {"fire": "Lava Helm", "ice": "Penguin Helm"}
 const PENGUIN_TORSO_WIDTH_SCALE := 1.3
 ## How far above the head's base (the top of the neck) the torso closes, so it
 ## tucks up under the head and its helm rather than stopping at the collar.
-const PENGUIN_TORSO_ABOVE_HEAD_BASE := 0.07
+const PENGUIN_TORSO_ABOVE_HEAD_BASE := 0.1
 ## Where the belly is widest, as a fraction of the torso's height from the
-## bottom, and how far forward it swells beyond the back's curve.
-const PENGUIN_BELLY_T := 0.32
+## bottom, how much wider than the torso's nominal width it bulges there (a
+## chubby penguin, fattest low down), and how far forward it swells beyond
+## the back's curve.
+const PENGUIN_BELLY_T := 0.26
+const PENGUIN_BELLY_WIDTH := 1.14
 const PENGUIN_BELLY_FORWARD := 0.14
-## Width at the ankle hem and at the shoulders, relative to the belly. Broad
-## enough at the shoulders to keep the flippers' shoulder domes inside.
-const PENGUIN_HEM_WIDTH := 0.8
+## Width at the ankle hem, at the shoulders and where the torso meets the
+## hood's flared base, relative to the torso's nominal width. Above the shoulders the torso
+## slopes smoothly in to the hood rather than closing in a flat lid.
+const PENGUIN_HEM_WIDTH := 0.98
 const PENGUIN_SHOULDER_WIDTH := 0.97
+const PENGUIN_NECK_WIDTH := 0.42
 ## Penguin flippers: thinner across their flat face than along it, and
 ## narrowing past the wrist to a point beyond the fingertips.
 const PENGUIN_FLIPPER_FLATTEN := 0.5
 const PENGUIN_FLIPPER_WIDTH := 1.25
 const PENGUIN_FLIPPER_TIP_RATIO := 0.3
 const PENGUIN_FLIPPER_REACH := 0.07
+## Penguin feet: the leg blorb shrinks to a flat foot, starting this far up
+## from the ankle toward the knee (the torso's hem covers everything above),
+## flattened top to bottom to this fraction while still enclosing the shoe.
+const PENGUIN_FOOT_START := 0.25
+const PENGUIN_FOOT_FLATTEN := 0.4
+## The flipper's shoulder cap, relative to the flipper's shoulder radius:
+## smaller than the Lava Suit's, so it stays inside the penguin's shoulders.
+const PENGUIN_SHOULDER_CAP := 0.85
+## The raised Penguin Helm hat's eyes, as big as the Bird Helm's.
+const PENGUIN_HAT_EYE_SCALE := 1.4 * 1.3
 
 ## Raised 20% per direct correction ("should totally encapsulate the
 ## thorax") on top of the earlier 1.25 pass -- 1.25 * 1.2.
@@ -693,26 +708,21 @@ static func rebuild_arm(
 	var r_tip := r_wrist * (PENGUIN_FLIPPER_TIP_RATIO if penguin else HAND_TIP_RADIUS_RATIO)
 	var points: Array[Vector3] = [shoulder_pos, elbow_pos, wrist_bulged, tip_bulged]
 	var radii: Array[float] = [r_shoulder, r_elbow, r_wrist, r_tip]
-	if sealed_lava or penguin:
-		# Carry a rounded dome well beneath the cuirass instead of terminating
-		# the raised arm shell in the full-radius planar cut used previously.
-		# The intermediate ring reaches full shoulder width before the live
-		# pivot, while the farther hidden point gives the start taper room to
-		# round closed without exposing skin during articulation.
+	var formed := sealed_lava or penguin
+	if formed:
+		# A round shoulder cap: a true hemisphere continuing the shell past the
+		# shoulder, so the top of the shoulder is a smooth dome rather than a
+		# tube end squeezed shut over a few centimetres.
 		var inward := -(elbow_pos - shoulder_pos).normalized()
-		var shoulder_overlap := shoulder_pos + inward * 0.035 * rig_scale
-		var shoulder_dome_tip := shoulder_pos + inward * 0.12 * rig_scale
-		points.push_front(shoulder_overlap)
-		radii.push_front(r_shoulder * 1.08)
-		points.push_front(shoulder_dome_tip)
-		radii.push_front(r_shoulder * 0.72)
+		var cap_radius := r_shoulder * (PENGUIN_SHOULDER_CAP if penguin else 1.08)
+		_prepend_round_cap(points, radii, shoulder_pos + inward * 0.02 * rig_scale, inward, cap_radius)
 
 	# The flipper is flat across the back-of-hand normal, so its broad faces
 	# look outward and inward against the body, the way a penguin's do.
 	var flatten_axis := outward_dir if penguin else Vector3.ZERO
 	mesh_instance.mesh = build_limb_tube(
 		points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION,
-		[] as Array[Color], true, flatten_axis, PENGUIN_FLIPPER_FLATTEN
+		[] as Array[Color], not formed, flatten_axis, PENGUIN_FLIPPER_FLATTEN
 	)
 	mesh_instance.set_surface_override_material(0, _build_goo_material(vis))
 
@@ -752,12 +762,26 @@ static func rebuild_arm(
 	)
 
 
+## Rounds off the start of a limb tube as a hemisphere of `radius` centred
+## at `center`, bulging along `outward`: control points on the dome, from its
+## pole in to its full-width rim, placed ahead of `points`. Build the tube
+## with taper_start false so the dome sets the shape.
+static func _prepend_round_cap(points: Array[Vector3], radii: Array[float], center: Vector3, outward: Vector3, radius: float) -> void:
+	const CAP_STEPS := 5
+	for step in CAP_STEPS + 1:
+		# From the rim (step 0) out to just short of the pole.
+		var angle := deg_to_rad(88.0) * float(step) / float(CAP_STEPS)
+		points.push_front(center + outward * radius * sin(angle))
+		radii.push_front(maxf(radius * cos(angle), radius * 0.04))
+
+
 ## Noodle from hip through knee through ankle through toe. `rig_scale` -- see
 ## rebuild_arm()'s own doc comment for the full rationale, identical here.
 static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D, knee: Node3D, ankle: Node3D, toe: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false) -> void:
 	var vis: Dictionary = blorb.body_visual_snapshot()
 	var sealed_lava := blorb.element_state == "fire" and form_command
 	var sealed_lava_radius := 1.34 if sealed_lava else 1.0
+	var penguin := blorb.element_state == "ice" and form_command
 
 	var hip_pos := root.to_local(hip.global_position)
 	var knee_pos := root.to_local(knee.global_position)
@@ -818,7 +842,21 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 		points.push_front(hip_dome_tip)
 		radii.push_front(r_hip * 0.72)
 
-	mesh_instance.mesh = build_limb_tube(points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION)
+	var foot_flatten := 1.0
+	var flatten_axis := Vector3.ZERO
+	if penguin:
+		# A flat penguin foot: only from just above the ankle out past the toe,
+		# domed over the top and squashed top to bottom.
+		var foot_top := ankle_pos.lerp(knee_pos, PENGUIN_FOOT_START)
+		points = [foot_top, ankle_pos, toe_pos]
+		radii = [r_ankle * 0.85, r_ankle, r_toe]
+		_prepend_round_cap(points, radii, foot_top, (foot_top - ankle_pos).normalized(), r_ankle * 0.85)
+		foot_flatten = PENGUIN_FOOT_FLATTEN
+		flatten_axis = _to_local_dir(root, toe.global_transform.basis * Vector3(0, 1, 0))
+	mesh_instance.mesh = build_limb_tube(
+		points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION,
+		[] as Array[Color], not penguin, flatten_axis, foot_flatten
+	)
 	mesh_instance.set_surface_override_material(0, _build_goo_material(vis))
 
 	# "Above the tip of the boot," per direct instruction -- BOOT_EYE_T of
@@ -865,7 +903,7 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 	var boot_centerline := raw_toe_pos - toe_forward * (BOOT_EYE_BACK_FROM_TOE * rig_scale)
 	var r_local := lerpf(r_ankle, r_toe, BOOT_EYE_T)
 
-	var eye_anchor := boot_centerline + toe_up * r_local
+	var eye_anchor := boot_centerline + toe_up * r_local * foot_flatten
 	# Flat downward shift on top of the reach above, per direct instruction
 	# -- same "0.01 = 1cm" scale convention as CHEST_BOTTOM_EXTEND/
 	# HAT_LOWER_SHIFT. World-relative (not toe_up-relative) since "lower...
@@ -1057,18 +1095,19 @@ static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: f
 
 ## Penguin torso silhouette, relative to its belly width, at height fraction
 ## `t` (0 at the ankle hem, 1 at the top). Swells from the hem to the belly,
-## eases in slightly to broad shoulders at `shoulder_t`, then rounds over as a
-## superellipse dome that closes under the head; the hem rounds closed too.
+## eases in slightly to broad shoulders at `shoulder_t`, then slopes smoothly
+## in to the neck, where the top ring sits up inside the hood's flared base.
+## The hem rounds closed.
 static func _penguin_torso_width(t: float, shoulder_t: float) -> float:
 	const BOTTOM_ROUND := 0.07
 	var width: float
 	if t <= PENGUIN_BELLY_T:
-		width = lerpf(PENGUIN_HEM_WIDTH, 1.0, smoothstep(0.0, 1.0, t / PENGUIN_BELLY_T))
+		width = lerpf(PENGUIN_HEM_WIDTH, PENGUIN_BELLY_WIDTH, smoothstep(0.0, 1.0, t / PENGUIN_BELLY_T))
 	elif t <= shoulder_t:
-		width = lerpf(1.0, PENGUIN_SHOULDER_WIDTH, smoothstep(0.0, 1.0, (t - PENGUIN_BELLY_T) / (shoulder_t - PENGUIN_BELLY_T)))
+		width = lerpf(PENGUIN_BELLY_WIDTH, PENGUIN_SHOULDER_WIDTH, smoothstep(0.0, 1.0, (t - PENGUIN_BELLY_T) / (shoulder_t - PENGUIN_BELLY_T)))
 	else:
 		var u := (t - shoulder_t) / (1.0 - shoulder_t)
-		width = PENGUIN_SHOULDER_WIDTH * pow(maxf(1.0 - pow(u, 2.4), 0.0), 1.0 / 2.4)
+		width = lerpf(PENGUIN_SHOULDER_WIDTH, PENGUIN_NECK_WIDTH, (1.0 - cos(u * PI)) * 0.5)
 	if t < BOTTOM_ROUND:
 		width *= pow(1.0 - pow((BOTTOM_ROUND - t) / BOTTOM_ROUND, 3.0), 1.0 / 3.0)
 	return width
@@ -1211,8 +1250,10 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	var hat_eye: Dictionary = BlorbBodyShape.eye_surface(HAT_EYE_T, hat_radius, hat_height)
 	var hat_eye_y := hat_eye["y"] as float
 	var hat_eye_radius := hat_eye["radius"] as float
+	var penguin_hat := blorb.has_core_item("Penguin Helm") and blorb.element_state == "ice"
 	BlorbFace.add_eyes(
-		hat, hat_eye_radius, hat_eye_y, hat_eye["dr_dy"] as float, albedo
+		hat, hat_eye_radius, hat_eye_y, hat_eye["dr_dy"] as float, albedo,
+		PENGUIN_HAT_EYE_SCALE if penguin_hat else 1.0
 	)
 	var hat_core := BlorbCore.build(hat_radius * CORE_RADIUS_FRACTION * HAT_CORE_RADIUS_SCALE, vis["core_color"] as Color, vis["core_emissive"] as bool)
 	if vis["core_emissive"] as bool:
@@ -1371,38 +1412,34 @@ static func _add_raised_penguin_beak(hat: MeshInstance3D, hat_radius: float, hat
 	var direction := Vector3(0.0, sin(PenguinHelm.RAISED_BEAK_TILT), cos(PenguinHelm.RAISED_BEAK_TILT))
 	var beak := MeshInstance3D.new()
 	beak.name = "RaisedPenguinBeak"
-	beak.mesh = PenguinHelm.build_beak_along(root_surface, direction, hat_radius * 0.5, hat_radius * 0.13)
+	beak.mesh = PenguinHelm.build_beak_along(root_surface, direction, hat_radius * 0.42, hat_radius * 0.2)
 	beak.material_override = _build_goo_material(vis)
 	hat.add_child(beak)
 
 
-## The Penguin Helm as a living blorb: a smooth rounded hood closing over the
-## whole head down to the jaw, with a slender beak pointing forward from
-## just below the eyes. Shape shared with the loose item (PenguinHelm).
+## The Penguin Helm as a living blorb: a hood whose round dome closes over the
+## crown and widens down past the jaw into a flared base sunk into the torso,
+## with a slender beak pointing forward from just below the eyes. Shape shared
+## with the loose item (PenguinHelm).
 static func _build_penguin_helm(head_pivot: Node3D, contents: AABB, head_size: Vector3, vis: Dictionary) -> Node3D:
 	var root := Node3D.new()
 	root.name = "HeadBlorbPenguinHelm"
 	head_pivot.add_child(root)
-	var semi_axes := PenguinHelm.hood_semi_axes(contents.size)
-	var center := contents.get_center() + Vector3(0.0, -semi_axes.y * PenguinHelm.HOOD_DROP, 0.0)
+	var half := PenguinHelm.hood_half_widths(contents.size)
+	var span := PenguinHelm.hood_span(contents.position.y, contents.end.y)
 	var hood := MeshInstance3D.new()
 	hood.name = "PenguinHelmBlorbBody"
-	hood.mesh = SuperEgg.build_mesh(semi_axes, PenguinHelm.HOOD_EPSILON, PenguinHelm.HOOD_EPSILON)
+	hood.mesh = PenguinHelm.build_hood_mesh(half, span)
 	hood.material_override = _build_goo_material(vis)
-	hood.position = center
 	root.add_child(hood)
 	# Eyes at the real head's own eye line (its mesh equator, head_size.y).
-	var eye_local_y := head_size.y - center.y
-	var eye_eta := PenguinHelm.eta_for_local_y(eye_local_y, semi_axes.y)
-	var front := SuperEgg.surface_point(semi_axes, eye_eta, 0.0, PenguinHelm.HOOD_EPSILON, PenguinHelm.HOOD_EPSILON)
+	var eye_y := head_size.y
 	const EYE_ANGLE := deg_to_rad(34.0)
 	const EYE_EMBED_FRACTION := 0.35
-	var eye_mesh_radius := semi_axes.z * 0.16 * 0.5 * 1.6
+	var eye_mesh_radius := half.y * 0.16 * 0.5 * 1.6
 	var eye_color := (vis["albedo"] as Color).darkened(0.25)
 	for side in [-1.0, 1.0]:
-		var eye_point := SuperEgg.surface_point(
-			semi_axes, eye_eta, side * EYE_ANGLE, PenguinHelm.HOOD_EPSILON, PenguinHelm.HOOD_EPSILON
-		)
+		var eye_point := PenguinHelm.hood_surface_point(half, span, eye_y, side * EYE_ANGLE)
 		var outward := Vector3(eye_point.x, 0.0, eye_point.z).normalized()
 		var eye := MeshInstance3D.new()
 		eye.name = "EyeL" if side < 0.0 else "EyeR"
@@ -1417,17 +1454,18 @@ static func _build_penguin_helm(head_pivot: Node3D, contents: AABB, head_size: V
 		eye.scale = Vector3(1.0, 1.0, 0.5)
 		eye.position = eye_point - outward * (eye_mesh_radius * EYE_EMBED_FRACTION)
 		hood.add_child(eye)
-	var core := BlorbCore.build(semi_axes.z * CORE_RADIUS_FRACTION * HAT_CORE_RADIUS_SCALE, vis["core_color"] as Color, vis["core_emissive"] as bool)
+	var front := PenguinHelm.hood_surface_point(half, span, eye_y, 0.0)
+	var core := BlorbCore.build(half.y * CORE_RADIUS_FRACTION * HAT_CORE_RADIUS_SCALE, vis["core_color"] as Color, vis["core_emissive"] as bool)
 	if vis["core_emissive"] as bool:
 		var core_material: StandardMaterial3D = core.get_meta("material")
 		core_material.emission = vis["core_emission"] as Color
 		core_material.emission_energy_multiplier = vis["core_emission_energy"] as float
-	core.position = Vector3(0.0, front.y, front.z * 0.3)
+	core.position = Vector3(0.0, eye_y, front.z * 0.3)
 	hood.add_child(core)
 	_add_head_core_light(core, vis)
 	var beak := MeshInstance3D.new()
 	beak.name = "PenguinBeak"
-	beak.mesh = PenguinHelm.build_beak_mesh(semi_axes, eye_eta)
+	beak.mesh = PenguinHelm.build_beak_mesh(half, span, eye_y, contents.size.y)
 	beak.material_override = _build_goo_material(vis)
 	hood.add_child(beak)
 	return root

@@ -4,7 +4,8 @@ extends Node
 ## position (DirectionalLight3D rotation/color/energy) and the sky/fog
 ## colors that go with it -- per direct instruction. 1 real minute = 1
 ## game hour (a full 24-hour game day takes 24 real minutes); the game
-## starts at 15:00 (3pm). Sunrise/sunset (6am/6pm) are authored directly
+## starts in the morning (WorldState.MORNING_HOUR), so a fresh session has a
+## whole day of light ahead of it. Sunrise/sunset (6am/6pm) are authored directly
 ## as keyframes below, not derived from real solar geometry -- this is a
 ## stylized game clock, not a simulation.
 ##
@@ -16,7 +17,6 @@ extends Node
 ## static values were.
 
 const GAME_HOURS_PER_REAL_SECOND := 1.0 / 60.0
-const START_HOUR := 15.0
 
 ## Each entry: game hour, sky top/horizon color, sun color/energy, fog
 ## color, the sun's elevation angle (radians above the horizon, negative =
@@ -101,7 +101,7 @@ const LANTERN_EMISSION_NIGHT := 1.4
 const LANTERN_EMISSION_DAY := 0.25
 const LANTERN_GROUP := "lanterns"
 
-var game_time_hours: float = START_HOUR
+var game_time_hours: float = WorldState.MORNING_HOUR
 
 @onready var _light: DirectionalLight3D = get_node("../DirectionalLight3D")
 @onready var _world_environment: WorldEnvironment = get_node("../WorldEnvironment")

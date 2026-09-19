@@ -272,8 +272,9 @@ const SNOWBOARD_THICKNESS := 0.08
 const SNOWBOARD_COLOR := ElementPalette.SNOW_BODY
 
 ## Ice-leg skates: powered on real ice, but still physically extend beneath
-## the shoes everywhere else. Their runner color is the exact canonical Ice
-## body material because elemental constructs are extensions of the blorbs.
+## the shoes everywhere else. Runners and mounts share the Ice blorbs' raised
+## ice (IceCrag.build_ice_material()): elemental constructs are extensions
+## of the blorbs.
 const ICE_SKATE_COLOR := ElementPalette.ICE_BODY
 const ICE_SKATE_RUNNER_HALF_LENGTH := 0.19
 const ICE_SKATE_RUNNER_HALF_WIDTH := 0.022
@@ -308,6 +309,11 @@ const PENGUIN_CHORD_WINDOW := 0.2
 ## On foot the formed Penguin Suit waddles: slow, in short quick steps, the
 ## whole body leaning over whichever foot is planted.
 const PENGUIN_WADDLE_SPEED_MULTIPLIER := 0.32
+## On ice the waddle is only a weak push: gliding momentum (from skating, a
+## slide or a run-up) carries on, bleeding away slowly, and the feet can add
+## speed only up to waddle pace in the direction held.
+const PENGUIN_ICE_GLIDE_FRICTION := 0.5
+const PENGUIN_ICE_WADDLE_ACCELERATION := 3.0
 const PENGUIN_WADDLE_CADENCE := 2.1
 const PENGUIN_WADDLE_STEP := deg_to_rad(7.0)
 const PENGUIN_WADDLE_THIGH_LIFT := deg_to_rad(6.0)
@@ -2098,6 +2104,8 @@ func _physics_process(delta: float) -> void:
 	# Leg Speed replaces the old fixed skate multiplier. High-Speed legs reach
 	# and surpass that former very-fast reference through progression itself.
 	var sliding_on_ice := grounded and _is_supported_by_ice() and not _snowboard_active and not _ice_skating_active
+	# The penguin glides on its feet across ice (_penguin_ice_glide_step()).
+	var penguin_gliding := sliding_on_ice and _penguin_waddling() and not jumped_this_frame
 	# Ice changes world traversal, not the authored gait. While the body
 	# accelerates or coasts under ice momentum, animate from current control
 	# intent at the ordinary walk/run rate; releasing the stick therefore
@@ -2112,6 +2120,8 @@ func _physics_process(delta: float) -> void:
 	if _penguin_belly_sliding and grounded and not jumped_this_frame:
 		ice_animation_speed = 0.0
 		_penguin_belly_slide_step(direction, delta)
+	elif penguin_gliding:
+		_penguin_ice_glide_step(direction, current_speed, delta)
 	elif _snowboard_active and grounded and not _is_snowboard_surface():
 		# Off snow the board does not slide at all: it grinds to a halt, and
 		# neither slope nor steering can push it.
@@ -2187,7 +2197,7 @@ func _physics_process(delta: float) -> void:
 		if neck_led_travel or _dirtbike_wheelie_active:
 			_aerial_motion_direction = direction
 			_aerial_strafe_input = input_dir.x
-		if dirtbike_ballistic or skate_ballistic or penguin_owns_velocity or _snowboard_active or _ice_skating_active:
+		if dirtbike_ballistic or skate_ballistic or penguin_owns_velocity or penguin_gliding or _snowboard_active or _ice_skating_active:
 			pass
 		elif sliding_on_ice and not neck_led_travel:
 			velocity.x = move_toward(velocity.x, direction.x * current_speed, ICE_ACCELERATION * delta)
@@ -2226,7 +2236,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			_body_yaw = lerp_angle(_body_yaw, target_angle, rotation_speed * delta)
 	else:
-		if _snowboard_active or _ice_skating_active or skate_ballistic or penguin_owns_velocity:
+		if _snowboard_active or _ice_skating_active or skate_ballistic or penguin_owns_velocity or penguin_gliding:
 			pass
 		elif sliding_on_ice:
 			velocity.x = move_toward(velocity.x, 0.0, ICE_FRICTION * delta)
@@ -7307,6 +7317,22 @@ func _update_penguin_chord(delta: float) -> bool:
 	return false
 
 
+## The formed Penguin Suit standing on ice: it glides on its feet, keeping
+## whatever momentum it has (bleeding away at PENGUIN_ICE_GLIDE_FRICTION),
+## while waddling only pushes it up to `waddle_speed` along the held
+## direction and never brakes a faster glide.
+func _penguin_ice_glide_step(steer: Vector3, waddle_speed: float, delta: float) -> void:
+	var planar := Vector2(velocity.x, velocity.z).move_toward(Vector2.ZERO, PENGUIN_ICE_GLIDE_FRICTION * delta)
+	var wanted := Vector2(steer.x, steer.z)
+	if wanted.length_squared() > 0.0001:
+		wanted = wanted.normalized()
+		var along := planar.dot(wanted)
+		if along < waddle_speed:
+			planar += wanted * minf(PENGUIN_ICE_WADDLE_ACCELERATION * delta, waddle_speed - along)
+	velocity.x = planar.x
+	velocity.z = planar.y
+
+
 ## Tobogganing on the belly: ice barely slows it, anything else stops it
 ## quickly, and the stick only bends its heading. Stands up when slow.
 func _penguin_belly_slide_step(steer: Vector3, delta: float) -> void:
@@ -7343,9 +7369,12 @@ func _update_ice_skate_state() -> void:
 	_ice_skating_active=supported and not _ice_skate_airborne and not _penguin_dive_airborne and not _penguin_belly_sliding
 	if was_active and not _ice_skates_active:
 		# Retraction ends this ride. Old skating momentum must never survive a
-		# direction change and reappear when a new pair of blades is extended.
-		velocity.x=0.0
-		velocity.z=0.0
+		# direction change and reappear when a new pair of blades is extended,
+		# except when the runners withdraw because the Penguin Suit formed:
+		# the penguin glides on in its place.
+		if not _blorb_suit.penguin_form_active():
+			velocity.x=0.0
+			velocity.z=0.0
 		_ice_skate_stride_phase=0.0
 		_ice_skate_previous_speed=0.0
 		_ice_skate_smoothed_acceleration=0.0
@@ -7385,6 +7414,7 @@ static func build_ice_skate_blade(
 		if sole_offset<0.0 else sole_offset
 	)
 	var sole_y: float=-resolved_sole_offset
+	var ice_material:=IceCrag.build_ice_material()
 	var support_height: float=ICE_SKATE_SUPPORT_HEIGHT*scale_factor
 	var runner_half_height: float=ICE_SKATE_RUNNER_HALF_HEIGHT*scale_factor
 	var runner_y: float=sole_y-support_height-runner_half_height
@@ -7396,6 +7426,7 @@ static func build_ice_skate_blade(
 		ICE_SKATE_COLOR,4.8,4.8
 	)
 	runner.position=Vector3(0.0,runner_y,-ProceduralFigure.FOOT_SIZE.z*scale_factor)
+	runner.set_surface_override_material(0,ice_material)
 	root.add_child(runner)
 	for unscaled_z: float in [-0.055,-0.205]:
 		var mount:=SuperEgg.build_part(
@@ -7403,6 +7434,7 @@ static func build_ice_skate_blade(
 			ICE_SKATE_COLOR,3.8,3.8
 		)
 		mount.position=Vector3(0.0,sole_y-support_height*0.5,unscaled_z*scale_factor)
+		mount.set_surface_override_material(0,ice_material)
 		root.add_child(mount)
 	return root
 
