@@ -6,9 +6,10 @@ extends Node3D
 ## out by bouncing on his blorbs up the ledges of its wall, and finds Manchego
 ## and Pandy stationed beside the shiny portal on the plain above; passing
 ## through it brings them into the party. Beyond lie forest plains where wild
-## shiny blorbs roam, and the course runs on east. Each border between biomes is a gate of two one-way portals back to
-## back, facing apart: each biome's portal stands on the side you enter it
-## from, facing you, with its blorbs waiting there. Walking or riding through a
+## shiny blorbs roam, and the course runs on east. Each border between
+## biomes is a gate of two one-way portals back to back, facing apart: each
+## biome's portal stands on the side you enter it from, facing you, and its
+## blorbs wait just beyond it, inside the biome. Walking or riding through a
 ## portal's face swaps suits (the worn blorbs hop off, the waiting ones join
 ## and hop on; see SuitRoster); passing through the back of the other portal
 ## does nothing. The party only grows: blorbs that hop off keep following.
@@ -27,9 +28,9 @@ const PORTAL_TUBE_RADIUS := 0.35
 ## so their rings touch without intersecting.
 const GATE_HALF_GAP := 0.37
 ## Where Manchego and Pandy wait, just past the shiny portal on the plain.
-const MANCHEGO_STATION := Vector2(58.0, -10.0)
-const PANDY_STATION := Vector2(58.0, 10.0)
-## How far in front of its portal (on the approach side) a waiting set idles.
+const MANCHEGO_STATION := Vector2(64.0, -12.0)
+const PANDY_STATION := Vector2(64.0, 12.0)
+## How far past its portal (inside the biome it opens onto) a waiting set idles.
 const SET_WAIT_OFFSET := 6.0
 ## The valley runs toward +X. The camera looks east over the hero's shoulder
 ## once he is up; during the wake intro he faces west, toward the camera.
@@ -123,8 +124,8 @@ func _build_party() -> void:
 		var border: Dictionary = border_spec
 		var element: String = border["east"]
 		var head_item: String = DemoWorldTerrain.HEAD_ITEMS.get(element, "")
-		# In front of the biome's portal face, on the approach (west) side.
-		var home := _terrain.get_path_point(float(border["x"]) - SET_WAIT_OFFSET, 5.0)
+		# Just past the portal, inside the biome it opens onto.
+		var home := _terrain.get_path_point(float(border["x"]) + SET_WAIT_OFFSET, 5.0)
 		var shiny := element == "shiny"
 		var blorbs := SuitLoadout.spawn_set(self, "" if shiny else element, head_item, home, SuitLoadout.FULL_SUIT_SLOTS, 2.2, shiny)
 		_roster.add_set(element, blorbs, SuitLoadout.FULL_SUIT_SLOTS)

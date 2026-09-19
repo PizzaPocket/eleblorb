@@ -54,19 +54,21 @@ const START_FLATTEN_TRANSITION := 12.0
 ## Normal: the hero wakes on the flat floor of a pit PIT_DEPTH deep, punched
 ## into the clearing. Its wall rises from PIT_FLOOR_RADIUS to PIT_RIM_RADIUS,
 ## too steep to walk; the way out is up PIT_LEDGES, rock ledges jutting from
-## the eastern wall, each within reach of a blorb bounce (8x an ordinary jump,
-## about 10.9 m) from the one below.
+## the eastern wall: a short one-two-three ladder, each ledge 6 m above the
+## last and stepped only a few metres along the wall, an easy blorb bounce
+## (8x an ordinary jump, about 10.9 m) from the one below. The last leaves a
+## short hop onto the rim.
 const PIT_DEPTH := 24.0
 const PIT_FLOOR_RADIUS := 24.0
 const PIT_RIM_RADIUS := 30.0
 ## Each ledge: angle round the pit from east (radians), distance from the
 ## pit's centre, and the height of its top above the floor.
 const PIT_LEDGES := [
-	Vector3(-0.73, 21.0, 6.0),
-	Vector3(-0.24, 21.0, 12.0),
-	Vector3(0.24, 21.0, 18.0),
+	Vector3(-0.26, 22.0, 6.0),
+	Vector3(0.0, 23.0, 12.0),
+	Vector3(0.26, 24.5, 18.0),
 ]
-const PIT_LEDGE_HALF_SIZE := Vector3(2.6, 1.3, 2.6)
+const PIT_LEDGE_HALF_SIZE := Vector3(2.0, 0.6, 2.0)
 ## A slow, broad swell under the hills outside the clearing, so the ground
 ## between biomes rolls rather than lying flat.
 const SWELL_AMPLITUDE := 4.0

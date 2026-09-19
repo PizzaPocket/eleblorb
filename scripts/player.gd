@@ -4704,6 +4704,12 @@ func _build_water_streams() -> void:
 	# the player moved quickly.
 	_fire_leg_stream_left.local_coords = true
 	_fire_leg_stream_right.local_coords = true
+	# Water foot jets are jets too (hover or, swimming, propulsion): kept
+	# attached the same way. Water hands switch to this only while swimming
+	# (see _update_water_streams()); on land the hose keeps world-space
+	# droplets so its arc hangs in the air behind a sweep.
+	_water_leg_stream_left.local_coords = true
+	_water_leg_stream_right.local_coords = true
 	_electric_stream_left = LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR)
 	_electric_stream_right = LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR)
 	_city_stream_left = LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR)
@@ -4746,6 +4752,9 @@ func _make_water_stream(stream_name: String) -> GPUParticles3D:
 	process.gravity = Vector3(0.0, -1.2, 0.0)
 	process.initial_velocity_min = WATER_STREAM_SPEED * 0.9
 	process.initial_velocity_max = WATER_STREAM_SPEED * 1.1
+	# Water leaves a moving nozzle carrying the nozzle's own speed, so a
+	# running hose's stream keeps pace instead of being outrun.
+	process.inherit_velocity_ratio = 1.0
 	process.scale_min = 0.85
 	process.scale_max = 1.3
 	# A bright near-white highlight right at the nozzle, settling into the
@@ -5032,7 +5041,7 @@ func _update_discrete_arm_powers(delta: float) -> void:
 	var left_plant := _update_discrete_power("arm_left", "left_arm_power", "plant", _left_arm_plant_cooldown, delta)
 	_left_arm_plant_active = left_plant["active"]
 	_left_arm_plant_cooldown = left_plant["cooldown"]
-	if left_plant["active"] and _left_arm_plant_cooldown <= 0.0 and _fire_plant_power("arm_left", _palm_left):
+	if left_plant["active"] and _left_arm_plant_cooldown <= 0.0 and _arm_fully_raised(_arm_left, _elbow_left) and _fire_plant_power("arm_left", _palm_left):
 		_left_arm_plant_cooldown = PLANT_PELLET_COOLDOWN
 
 	var right_plant := (
@@ -5041,7 +5050,7 @@ func _update_discrete_arm_powers(delta: float) -> void:
 	)
 	_right_arm_plant_active = right_plant["active"]
 	_right_arm_plant_cooldown = right_plant["cooldown"]
-	if right_plant["active"] and _right_arm_plant_cooldown <= 0.0 and _fire_plant_power("arm_right", _palm_right):
+	if right_plant["active"] and _right_arm_plant_cooldown <= 0.0 and _arm_fully_raised(_arm_right, _elbow_right) and _fire_plant_power("arm_right", _palm_right):
 		_right_arm_plant_cooldown = PLANT_PELLET_COOLDOWN
 
 
@@ -5156,6 +5165,21 @@ func _rock_crag_color(pos: Vector2) -> Color:
 	return NatureProps.ROCK_COLOR
 
 
+## Within this of the arm-power pose (shoulder raised, elbow straight), an arm
+## counts as fully extended and its pea shooter may fire.
+const ARM_RAISED_TOLERANCE := deg_to_rad(6.0)
+
+
+## True once the arm-power raise (see _apply_arm_power_poses()) has brought
+## this arm level and straight, so a shot leaves an outstretched arm rather
+## than one still swinging up.
+func _arm_fully_raised(arm_pivot: Node3D, elbow_pivot: Node3D) -> bool:
+	return (
+		absf(angle_difference(arm_pivot.rotation.x, -ARM_POWER_POSE_ANGLE)) <= ARM_RAISED_TOLERANCE
+		and absf(angle_difference(elbow_pivot.rotation.x, 0.0)) <= ARM_RAISED_TOLERANCE
+	)
+
+
 ## Fires a single SeedPellet forward from `hand` -- see that script's own
 ## class doc comment for how it resolves its own hit asynchronously once it
 ## actually connects. Returns false (and spends no MP/cooldown) if the worn
@@ -5167,7 +5191,9 @@ func _fire_plant_power(slot: String, hand: Node3D) -> bool:
 	var forward := visuals.global_transform.basis * Vector3(0.0, 0.0, 1.0)
 	forward = forward.normalized() if forward.length_squared() > 0.001 else Vector3.FORWARD
 	var pellet := SeedPellet.new()
-	pellet.velocity = forward * PLANT_PELLET_SPEED
+	# Launched from a moving arm, the pea carries the shooter's own velocity,
+	# so a running hero never outruns his own shots.
+	pellet.velocity = forward * PLANT_PELLET_SPEED + velocity
 	pellet.damage = CombatMath.rolled_attack(PLANT_PELLET_DAMAGE_BASE, blorb.strength, _rng)["amount"]
 	pellet.attacker_element = "plant"
 	# Snapshotted at fire time, not read back at hit time -- a pellet in
@@ -5222,6 +5248,11 @@ func _update_water_streams(delta: float) -> void:
 		backward = -velocity.normalized()
 	var water_hand_direction := backward if swimming else forward
 	var water_foot_direction := backward if swimming else downward
+	# Swimming jets stay attached to the hands like the Fire jets; a fast
+	# swimmer would otherwise leave each jet's start behind in the water.
+	if is_instance_valid(_water_stream_left):
+		_water_stream_left.local_coords = swimming
+		_water_stream_right.local_coords = swimming
 	_update_water_stream(
 		_water_stream_left, _palm_left, water_hand_direction,
 		_left_arm_water_active
