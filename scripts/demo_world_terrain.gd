@@ -1,7 +1,8 @@
 class_name DemoWorldTerrain
 extends StaticBody3D
 
-## The demo world: one long valley running east (+X) through a biome for every
+## The demo world: one long, organically edged island running generally east
+## (+X) through a biome for every
 ## blorb suit with a clear traversal power, a real biome simulator. Where a
 ## biome exists elsewhere in the game, this shows that biome itself through a
 ## TerrainWindow onto the real kingdom's terrain (its own height and colour
@@ -21,8 +22,10 @@ extends StaticBody3D
 ## own lake technique), each running from its biome's portal to the next
 ## border. Through the ground zone the course climbs
 ## to cloud height (see _course_elevation()); the sky zone is a cliff edge
-## over a deep chasm, flown across through the clouds to the volcanic lowland
-## beyond. Between biomes the ground keeps the Crossroads' hills with a slow
+## over a lava-bottomed chasm, flown across to a volcano that rises directly
+## from the chasm. The island's flanks descend past the sea to a single cheap
+## spherical ocean, so its silhouette still reads as a world from high flight.
+## Between biomes the ground keeps the Crossroads' hills with a slow
 ## swell, so nowhere is flat except the pit floor, its rim and each gate's pad.
 ## One heightfield owns rendering, collision and every gameplay height query.
 ##
@@ -34,14 +37,17 @@ const FIRE_KINGDOM_TERRAIN := preload("res://scripts/fire_kingdom_terrain.gd")
 const OCEAN_KINGDOM_TERRAIN := preload("res://scripts/ocean_kingdom_terrain.gd")
 
 const X_MIN := -140.0
-const X_MAX := 6608.0
+const X_MAX := 5575.0
 const Z_HALF := 300.0
-## The valley floor runs VALLEY_HALF_WIDTH either side of the path before its
-## walls rise, widening to OCEAN_HALF_WIDTH through the water zone's sea.
+## The island's playable crown runs roughly VALLEY_HALF_WIDTH either side of
+## its gently curving path before steep cliffs descend to the spherical sea.
 const VALLEY_HALF_WIDTH := 115.0
 const OCEAN_HALF_WIDTH := 240.0
-const VALLEY_WALL_RISE := 50.0
-const VALLEY_WALL_HEIGHT := 34.0
+const ISLAND_CLIFF_WIDTH := 78.0
+const ISLAND_SUBMERGED_DEPTH := 24.0
+const WORLD_OCEAN_RADIUS := 12000.0
+const WORLD_OCEAN_SEGMENTS := 128
+const WORLD_OCEAN_RINGS := 64
 const SPACING := 5.0
 ## Windows that span the valley's full width extend this far across it, so
 ## their sides stay inside the kingdom and only their ends blend.
@@ -91,8 +97,8 @@ const FOREST_CLUSTERS := 10
 
 ## Plant: the Primate Kingdom around this point, clear of its village and river.
 const PLANT_SOURCE := Vector2(-150.0, -170.0)
-const PLANT_CENTER := Vector2(250.0, 0.0)
-const PLANT_HALF := Vector2(58.0, 110.0)
+const PLANT_CENTER := Vector2(366.0, 0.0)
+const PLANT_HALF := Vector2(174.0, 110.0)
 
 ## Water and ice share WATER_LEVEL: the terrain reports one water level for
 ## the whole world, and the frozen lake's water lies beneath its ice at that
@@ -117,10 +123,15 @@ const LAKE_SHELF := WATER_LEVEL + 0.35
 const LAKE_FLOOR := LAKE_SHELF - LAKE_DEPTH
 ## One palm island rising from the sea, clear of the Kraken's patrol.
 const ISLAND_CENTER := Vector2(1180.0, 90.0)
-## The Ocean Kingdom's Kraken patrols the sea's deep middle on an ellipse of
-## these radii round the sea's centre: far enough in that its tentacles keep
-## to deep water, clear of the island and the Nautilus portal.
-const KRAKEN_ROUTE_RADIUS := Vector2(380.0, 60.0)
+## The Ocean Kingdom's Kraken patrols the sea's deep middle on an ellipse
+## round the sea's centre (kraken_route_radius()): its ends held this far in
+## from the sea's shores, past the sloping beach, so its tentacles keep to
+## deep water however long the sea is, and short of the Nautilus portal by
+## KRAKEN_PORTAL_CLEARANCE; KRAKEN_ROUTE_HALF_WIDTH either side of centre,
+## clear of the island.
+const KRAKEN_SHORE_CLEARANCE := 110.0
+const KRAKEN_PORTAL_CLEARANCE := 60.0
+const KRAKEN_ROUTE_HALF_WIDTH := 60.0
 const ISLAND_RADIUS := 55.0
 const ISLAND_HEIGHT := 7.0
 ## A portal standing on the seabed a third of the way through the water zone
@@ -156,15 +167,15 @@ const SNOW := Color(0.94, 0.96, 0.98)
 
 ## The mountain. Its steep western face (the Ice zone's climb) rises from the
 ## frozen lake to a summit plateau MOUNTAIN_PEAK_HEIGHT up, where the snow
-## portal stands; its long eastern flank descends to its foot at
-## MOUNTAIN_END_X. Down that flank winds an explicit snowboard course: a
+## portal stands; its eastern flank drops steeply (about 18 degrees on
+## average, 24 at the top) to its foot at MOUNTAIN_END_X. Down that flank winds an explicit snowboard course: a
 ## smooth groomed trough COURSE_HALF_WIDTH wide either side of its weaving
 ## centreline, held in by raised berms, with rougher mogul ground and trees
 ## beyond. The valley's sides rise into a gully so the course stays central.
 const MOUNTAIN_FOOT_X := 2433.0
 const MOUNTAIN_PEAK_WEST_X := 2780.0
 const MOUNTAIN_PEAK_EAST_X := 2818.0
-const MOUNTAIN_END_X := 4148.0
+const MOUNTAIN_END_X := 3483.0
 const MOUNTAIN_PEAK_HEIGHT := 220.0
 const MOUNTAIN_GULLY_HEIGHT := 35.0
 const COURSE_HALF_WIDTH := 16.0
@@ -178,23 +189,42 @@ const MOGUL_AMPLITUDE := 5.0
 ## kept inside its border ranges: over terraces, through the town's flat
 ## shelf, across a wash, and side to side over its western halfpipe canyon.
 const DIRT_SOURCE := Vector2(0.0, 150.0)
-const DIRT_START_X := 4183.0
+const DIRT_START_X := 3518.0
 const DIRT_LENGTH := 840.0
+## A rideable motocross line is authored into the sampled kingdom window. The
+## rough kingdom terrain remains on either side, but its perpendicular washes
+## and trenches cannot cut through this required route.
+const DIRT_COURSE_HALF_WIDTH := 20.0
+const DIRT_COURSE_SHOULDER := 16.0
+const DIRT_COURSE_WEAVE := 27.0
+const DIRT_COURSE_ROLLER_HEIGHT := 3.2
+const DIRT_COURSE_BANK_HEIGHT := 2.4
+## Broad titan clearings: level enough for their planted feet and short roam
+## cycles, but softly blended back into each biome rather than reading as
+## artificial square pads.
+const DA_HOU_ZI_CLEARING := Vector2(390.0, 58.0)
+const DA_HOU_ZI_CLEAR_RADIUS := 58.0
+const DINOSAUR_CLEARING := Vector2(3945.0, -62.0)
+const DINOSAUR_CLEAR_RADIUS := 48.0
+const TITAN_CLEAR_BLEND := 24.0
 
 ## The course climbs across the ground zone to SKY_HEIGHT, near the clouds
 ## (the Clouds node's layer), holds there to the cliff edge, then plunges to
-## CHASM_FLOOR. The far wall rises back to 0 at the volcanic lowland.
+## CHASM_FLOOR. The volcano begins directly at the far end instead of a
+## second generic cliff raising the course back to zero.
 const SKY_HEIGHT := 110.0
-const CLIFF_EDGE_X := 5068.0
+const CLIFF_EDGE_X := 4403.0
 const CHASM_FLOOR := -60.0
-const CHASM_FAR_WALL_X := 5748.0
 const CLIFF_FACE_WIDTH := 25.0
+const CHASM_LAVA_LEVEL := CHASM_FLOOR + 3.0
+const CHASM_LAVA_HALF_WIDTH := 105.0
 
 ## Fire: a full-size Fire Kingdom volcano, its lava-filled mouth centred in a
 ## window of that kingdom's volcanic lowland.
 const VOLCANO_SOURCE_POOL := Vector2(-190.0, -145.0)
-const VOLCANO_CENTER := Vector2(6170.0, 0.0)
-const VOLCANO_HALF_LENGTH := 360.0
+const VOLCANO_CENTER := Vector2(5015.0, 0.0)
+const VOLCANO_HALF_LENGTH := 255.0
+const VOLCANO_RISE := 34.0
 
 const STONE := Color(0.52, 0.5, 0.47)
 const CLIFF_ROCK := Color(0.42, 0.4, 0.38)
@@ -212,13 +242,14 @@ const CLIFF_ROCK := Color(0.42, 0.4, 0.38)
 const BORDERS := [
 	{"x": 62.0, "west": "", "east": "shiny"},
 	{"x": 192.0, "west": "shiny", "east": "plant"},
-	{"x": 308.0, "west": "plant", "east": "water", "pad": LAKE_SHELF},
+	{"x": 540.0, "west": "plant", "east": "water", "pad": LAKE_SHELF},
 	{"x": 1353.0, "west": "water", "east": "ice", "pad": ICE_LEVEL},
 	{"x": 2798.0, "west": "ice", "east": "snow"},
-	{"x": 4173.0, "west": "snow", "east": "ground"},
+	{"x": 3508.0, "west": "snow", "east": "ground"},
 	# The air gate is reached flat out on a dirt bike: three times the size.
-	{"x": 5038.0, "west": "ground", "east": "air", "portal_scale": 3.0},
-	{"x": 5793.0, "west": "air", "east": "fire"},
+	{"x": 4373.0, "west": "ground", "east": "air", "portal_scale": 3.0},
+	# Suspended above the lava chasm: the volcano begins below it immediately.
+	{"x": 4767.0, "west": "air", "east": "fire", "hover_y": 8.0, "west_portal_scale": 1.25, "east_portal_scale": 2.0},
 ]
 ## Ice brings the Penguin Helm, Snow the Toboggan, Air the Bird Helm.
 const HEAD_ITEMS := {
@@ -286,7 +317,9 @@ func _init() -> void:
 		Vector2(VOLCANO_HALF_LENGTH, FULL_WIDTH_HALF), 0.0, 1.0, 0.0, WINDOW_END_BLEND
 	)
 	_volcano_window.level_to_x_ends(100.0)
-	_volcano_lava_level = FIRE_KINGDOM_TERRAIN.VOLCANO_LAVA_SURFACE_Y - _volcano_window.height_offset
+	# The entire Fire window now grows from the chasm floor rather than a
+	# zero-height lowland, so its liquid surface follows that same offset.
+	_volcano_lava_level = FIRE_KINGDOM_TERRAIN.VOLCANO_LAVA_SURFACE_Y - _volcano_window.height_offset + CHASM_FLOOR + VOLCANO_RISE
 	_windows = [_plant_window, _dirt_window, _volcano_window]
 
 
@@ -300,6 +333,7 @@ func _notification(what: int) -> void:
 ## The Ocean Kingdom's underwater look, put on the camera while it is under the
 ## sea (see _process()).
 var _underwater_environment: Environment
+var _under_lava_environment: Environment
 var _underwater_camera: Camera3D
 
 
@@ -309,15 +343,42 @@ func _process(_delta: float) -> void:
 		return
 	var at := Vector2(active_camera.global_position.x, active_camera.global_position.z)
 	var under_sea := active_camera.global_position.y < WATER_LEVEL - 0.08 and _water_lake.coverage(at) > 0.5
-	if under_sea:
+	var under_lava := is_lava_area(at) and active_camera.global_position.y < get_lava_surface_height(at) - 0.06
+	if under_lava:
+		if _under_lava_environment == null:
+			_under_lava_environment = _build_under_lava_environment()
+		if active_camera.environment != _under_lava_environment:
+			active_camera.environment = _under_lava_environment
+		_underwater_camera = active_camera
+	elif under_sea:
 		if _underwater_environment == null:
 			_underwater_environment = OCEAN_KINGDOM_TERRAIN.build_underwater_environment()
 		if active_camera.environment != _underwater_environment:
 			active_camera.environment = _underwater_environment
 		_underwater_camera = active_camera
-	elif is_instance_valid(_underwater_camera) and _underwater_camera.environment == _underwater_environment:
+	elif is_instance_valid(_underwater_camera) and (_underwater_camera.environment == _underwater_environment or _underwater_camera.environment == _under_lava_environment):
 		_underwater_camera.environment = null
 		_underwater_camera = null
+
+
+func _build_under_lava_environment() -> Environment:
+	var environment := Environment.new()
+	environment.background_mode = Environment.BG_COLOR
+	environment.background_color = Color(0.20, 0.018, 0.004)
+	environment.background_energy_multiplier = 1.15
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	environment.ambient_light_color = Color(1.0, 0.18, 0.025)
+	environment.ambient_light_energy = 1.15
+	environment.fog_enabled = true
+	environment.fog_mode = Environment.FOG_MODE_EXPONENTIAL
+	environment.fog_light_color = Color(0.72, 0.075, 0.008)
+	environment.fog_light_energy = 1.2
+	environment.fog_density = 0.018
+	environment.fog_sky_affect = 1.0
+	environment.adjustment_enabled = true
+	environment.adjustment_brightness = 1.08
+	environment.adjustment_saturation = 1.12
+	return environment
 
 
 func _ready() -> void:
@@ -332,6 +393,7 @@ func _ready() -> void:
 			_heights[iz * _nx + ix] = _raw_height(X_MIN + float(ix) * SPACING, -Z_HALF + float(iz) * SPACING)
 	_build_mesh_and_collision()
 	_build_liquid_surfaces()
+	_build_world_ocean()
 	_scatter_scenery()
 
 
@@ -339,7 +401,8 @@ func _ready() -> void:
 
 ## The course's base elevation along the valley: level to the ground zone,
 ## climbing through it to SKY_HEIGHT, level to the cliff edge, down the cliff
-## face to the chasm floor, and up the far wall to the volcanic lowland.
+## face to the chasm floor. The Fire Kingdom window then raises the volcano
+## itself out of that floor; there is deliberately no generic far wall.
 func _course_elevation(x: float) -> float:
 	var dirt_end := DIRT_START_X + DIRT_LENGTH
 	var elevation := SKY_HEIGHT * clampf((x - DIRT_START_X) / DIRT_LENGTH, 0.0, 1.0)
@@ -347,8 +410,6 @@ func _course_elevation(x: float) -> float:
 		elevation = SKY_HEIGHT
 	if x > CLIFF_EDGE_X:
 		elevation = lerpf(SKY_HEIGHT, CHASM_FLOOR, smoothstep(CLIFF_EDGE_X, CLIFF_EDGE_X + CLIFF_FACE_WIDTH, x))
-	if x > CHASM_FAR_WALL_X:
-		elevation = lerpf(CHASM_FLOOR, 0.0, smoothstep(CHASM_FAR_WALL_X, CHASM_FAR_WALL_X + CLIFF_FACE_WIDTH, x))
 	return elevation
 
 
@@ -375,7 +436,28 @@ static func _channel_lake(
 ## walls rise: wider through the water zone's sea.
 func _valley_half_width(x: float) -> float:
 	var ocean := smoothstep(border_x("water") - 90.0, border_x("water") + 10.0, x) * (1.0 - smoothstep(border_x("ice") - 60.0, border_x("ice") + 40.0, x))
-	return lerpf(VALLEY_HALF_WIDTH, OCEAN_HALF_WIDTH, ocean)
+	var organic := sin(x * 0.0087) * 13.0 + sin(x * 0.021 + 1.7) * 6.0 + sin(x * 0.0031 - 0.8) * 18.0
+	return lerpf(VALLEY_HALF_WIDTH + organic, OCEAN_HALF_WIDTH + organic * 0.35, ocean)
+
+
+## The island's broad path bends gently rather than reading as a ruler-straight
+## rectangle. Its amplitude is deliberately modest: the biomes remain broad
+## enough that their authored gameplay still fits around it.
+static func path_center_z(x: float) -> float:
+	return sin(x * 0.0021) * 21.0 + sin(x * 0.0053 + 0.7) * 9.0
+
+
+## Yaw correction for something facing along the island path at `x`.
+static func path_yaw(x: float) -> float:
+	const D := 2.0
+	return -atan2(path_center_z(x + D) - path_center_z(x - D), D * 2.0)
+
+
+## Height of the decorative spherical sea directly under a world X/Z point.
+static func world_ocean_height(x: float, z: float) -> float:
+	var center_x := (X_MIN + X_MAX) * 0.5
+	var radial_sq := pow(x - center_x, 2.0) + z * z
+	return WATER_LEVEL - WORLD_OCEAN_RADIUS + sqrt(maxf(WORLD_OCEAN_RADIUS * WORLD_OCEAN_RADIUS - radial_sq, 0.0))
 
 
 ## 1 across the water zone's sea and shores.
@@ -402,9 +484,21 @@ func sea_center() -> Vector2:
 	return _water_lake.center
 
 
+## The Kraken's patrol ellipse radii, fitted to the sea's length.
+static func kraken_route_radius() -> Vector2:
+	var west_shore := border_x("water") + LAKE_SHORE_GAP
+	var east_shore := border_x("ice") - LAKE_EAST_SHORE_GAP
+	var sea_center_x := (west_shore + east_shore) * 0.5
+	var reach := minf(
+		(east_shore - west_shore) * 0.5 - KRAKEN_SHORE_CLEARANCE,
+		absf(NAUTILUS_PORTAL_X - sea_center_x) - KRAKEN_PORTAL_CLEARANCE
+	)
+	return Vector2(maxf(reach, 0.0), KRAKEN_ROUTE_HALF_WIDTH)
+
+
 ## Where the Nautilus portal stands: on the seabed at the path.
 func nautilus_portal_point() -> Vector3:
-	return Vector3(NAUTILUS_PORTAL_X, LAKE_FLOOR, 0.0)
+	return Vector3(NAUTILUS_PORTAL_X, LAKE_FLOOR, path_center_z(NAUTILUS_PORTAL_X))
 
 
 ## The mountain's height along the valley's centre, before its gully sides,
@@ -434,6 +528,44 @@ func course_center_z(x: float) -> float:
 	var t := clampf((x - MOUNTAIN_PEAK_EAST_X) / (MOUNTAIN_END_X - MOUNTAIN_PEAK_EAST_X), 0.0, 1.0)
 	var taper := smoothstep(0.0, 0.06, t) * (1.0 - smoothstep(0.94, 1.0, t))
 	return COURSE_WEAVE * taper * sin((x - MOUNTAIN_PEAK_EAST_X) * TAU / COURSE_WEAVE_WAVELENGTH)
+
+
+## The dirt-bike circuit bends between the sampled badland features instead
+## of asking the rider to drive straight across every wash and canyon.
+func dirt_course_center_z(x: float) -> float:
+	var t := clampf((x - DIRT_START_X) / DIRT_LENGTH, 0.0, 1.0)
+	var end_taper := smoothstep(0.0, 0.08, t) * (1.0 - smoothstep(0.9, 1.0, t))
+	return path_center_z(x) + DIRT_COURSE_WEAVE * end_taper * sin(t * TAU * 2.35)
+
+
+## Smooth motocross terrain relative to the zone's overall climb. Broad
+## rollers keep both wheels supported; four asymmetric ramp/landing pairs
+## provide deliberate launches without the sampled kingdom's crosswise trench.
+func _dirt_course_height(x: float, z: float) -> float:
+	var t := clampf((x - DIRT_START_X) / DIRT_LENGTH, 0.0, 1.0)
+	var center := dirt_course_center_z(x)
+	var across := z - center
+	var rolling := sin(t * TAU * 5.0) * DIRT_COURSE_ROLLER_HEIGHT
+	rolling += sin(t * TAU * 2.0 + 0.8) * 1.4
+	var jumps := 0.0
+	for jump_t in [0.16, 0.36, 0.59, 0.81]:
+		var distance := (t - float(jump_t)) * DIRT_LENGTH
+		# Long progressive face, rounded lip, then a lower landing downslope.
+		var face := smoothstep(-25.0, -2.0, distance) * (1.0 - smoothstep(-2.0, 9.0, distance))
+		var landing := smoothstep(9.0, 24.0, distance) * (1.0 - smoothstep(24.0, 48.0, distance))
+		jumps += face * 6.5 + landing * 2.2
+	# Raise the outside of each turn slightly: a readable bank, not a wall.
+	var turn_phase := cos(t * TAU * 2.35)
+	var bank := clampf(across / DIRT_COURSE_HALF_WIDTH, -1.0, 1.0) * turn_phase * DIRT_COURSE_BANK_HEIGHT
+	var endpoints := smoothstep(0.0, 0.035, t) * (1.0 - smoothstep(0.965, 1.0, t))
+	return (rolling + jumps + bank) * endpoints
+
+
+func _dirt_course_weight(x: float, z: float) -> float:
+	if x < border_x("ground") or x > DIRT_START_X + DIRT_LENGTH:
+		return 0.0
+	var across := absf(z - dirt_course_center_z(x))
+	return 1.0 - smoothstep(DIRT_COURSE_HALF_WIDTH, DIRT_COURSE_HALF_WIDTH + DIRT_COURSE_SHOULDER, across)
 
 
 ## 1 on the groomed course, 0 beyond its berms; only down the eastern flank.
@@ -489,6 +621,7 @@ func _pit_wall_radius_at(height: float) -> float:
 
 func _raw_height(x: float, z: float) -> float:
 	var point := Vector2(x, z)
+	var path_z := path_center_z(x)
 	var start_distance := point.distance_to(START_CENTER)
 	# The groomed course is smooth: no hills or swell underfoot.
 	var roughness := 1.0 - _course_weight(point) * _mountain_weight(x)
@@ -502,6 +635,11 @@ func _raw_height(x: float, z: float) -> float:
 		var weight := biome.weight(point)
 		if weight > 0.0:
 			height = lerpf(height, biome.height(point), weight)
+	# Preserve the kingdom sample as the surrounding badlands, but replace its
+	# route-crossing trenches with a deliberate, continuous dirt-bike circuit.
+	var dirt_course := _dirt_course_weight(x, z)
+	if dirt_course > 0.0:
+		height = lerpf(height, _dirt_course_height(x, z), dirt_course)
 	height += _mountain_height(point)
 	# Basins punched into the ground (NaturalLake).
 	height = _water_lake.carve(height, point)
@@ -517,6 +655,26 @@ func _raw_height(x: float, z: float) -> float:
 	if island > 0.0:
 		height = maxf(height, lerpf(height, WATER_LEVEL + ISLAND_HEIGHT, island))
 	height += _course_elevation(x)
+	var da_hou_zi_clear := 1.0 - smoothstep(
+		DA_HOU_ZI_CLEAR_RADIUS, DA_HOU_ZI_CLEAR_RADIUS + TITAN_CLEAR_BLEND,
+		point.distance_to(DA_HOU_ZI_CLEARING)
+	)
+	if da_hou_zi_clear > 0.0:
+		var da_hou_zi_height := _plant_window.height(DA_HOU_ZI_CLEARING) + _course_elevation(DA_HOU_ZI_CLEARING.x)
+		height = lerpf(height, da_hou_zi_height, da_hou_zi_clear)
+	var dinosaur_clear := 1.0 - smoothstep(
+		DINOSAUR_CLEAR_RADIUS, DINOSAUR_CLEAR_RADIUS + TITAN_CLEAR_BLEND,
+		point.distance_to(DINOSAUR_CLEARING)
+	)
+	if dinosaur_clear > 0.0:
+		var dinosaur_height := _dirt_window.height(DINOSAUR_CLEARING) + _course_elevation(DINOSAUR_CLEARING.x)
+		height = lerpf(height, dinosaur_height, dinosaur_clear)
+	if x > CLIFF_EDGE_X + CLIFF_FACE_WIDTH and x < border_x("fire") + 30.0:
+		var lava_across := absf(z - path_center_z(x))
+		var bank := smoothstep(CHASM_LAVA_HALF_WIDTH - 8.0, CHASM_LAVA_HALF_WIDTH + 24.0, lava_across)
+		bank *= 1.0 - smoothstep(CHASM_LAVA_HALF_WIDTH + 24.0, CHASM_LAVA_HALF_WIDTH + 62.0, lava_across)
+		height += bank * 15.0
+	height += _volcano_window.weight(point) * VOLCANO_RISE
 	# The starting pit, punched down to a flat floor.
 	if start_distance < PIT_RIM_RADIUS + 1.0:
 		height = minf(height, _pit_height(point))
@@ -526,14 +684,21 @@ func _raw_height(x: float, z: float) -> float:
 		var along := 1.0 - smoothstep(PORTAL_PAD_HALF_DEPTH, PORTAL_PAD_HALF_DEPTH + PORTAL_PAD_BLEND, absf(x - gate_x))
 		if along <= 0.0:
 			continue
-		var gate_half_width := PORTAL_HALF_WIDTH * float(border.get("portal_scale", 1.0))
-		var across := 1.0 - smoothstep(gate_half_width + 3.0, gate_half_width + 3.0 + PORTAL_PAD_BLEND, absf(z))
+		var gate_half_width := PORTAL_HALF_WIDTH * maxf(
+			float(border.get("portal_scale", 1.0)),
+			maxf(float(border.get("east_portal_scale", 1.0)), float(border.get("west_portal_scale", 1.0)))
+		)
+		var across := 1.0 - smoothstep(gate_half_width + 3.0, gate_half_width + 3.0 + PORTAL_PAD_BLEND, absf(z - path_center_z(gate_x)))
 		height = lerpf(height, float(border.get("pad", _base_level(gate_x))), along * across)
-	# Valley walls along both sides and at both ends.
+	# The island crown gives way to irregular, steep cliff sides, continuing
+	# beneath the spherical sea instead of ending in raised rectangular walls.
 	var half_width := _valley_half_width(x)
-	height += smoothstep(half_width, half_width + VALLEY_WALL_RISE, absf(z)) * VALLEY_WALL_HEIGHT
-	height += (1.0 - smoothstep(X_MIN + 20.0, -60.0, x)) * VALLEY_WALL_HEIGHT
-	height += smoothstep(X_MAX - 50.0, X_MAX - 20.0, x) * VALLEY_WALL_HEIGHT
+	var side_cliff := smoothstep(half_width, half_width + ISLAND_CLIFF_WIDTH, absf(z - path_z))
+	var west_cliff := 1.0 - smoothstep(X_MIN + 8.0, X_MIN + 92.0, x)
+	var east_cliff := smoothstep(X_MAX - 105.0, X_MAX - 8.0, x)
+	var cliff := maxf(side_cliff, maxf(west_cliff, east_cliff))
+	var submerged := world_ocean_height(x, z) - ISLAND_SUBMERGED_DEPTH
+	height = lerpf(height, submerged, cliff)
 	return height
 
 
@@ -576,10 +741,10 @@ func _height_color(x: float, z: float, height: float) -> Color:
 			)
 		color = color.lerp(sea_color, maxf(beach, 1.0 if _island_rise(point) > 0.0 else 0.0))
 	# The high course before the cliff, the cliff and the chasm: bare rock.
-	var rock := smoothstep(DIRT_START_X + DIRT_LENGTH - 20.0, DIRT_START_X + DIRT_LENGTH + 10.0, x) * (1.0 - smoothstep(CHASM_FAR_WALL_X + CLIFF_FACE_WIDTH, CHASM_FAR_WALL_X + CLIFF_FACE_WIDTH + 30.0, x))
+	var rock := smoothstep(DIRT_START_X + DIRT_LENGTH - 20.0, DIRT_START_X + DIRT_LENGTH + 10.0, x)
 	if rock > 0.0:
 		color = color.lerp(CLIFF_ROCK, rock)
-	if absf(z) > _valley_half_width(x) + 10.0 or x < -70.0 or x > X_MAX - 60.0:
+	if absf(z - path_center_z(x)) > _valley_half_width(x) + 10.0 or x < X_MIN + 70.0 or x > X_MAX - 70.0:
 		color = STONE.lerp(color, 0.35)
 	return color
 
@@ -619,15 +784,23 @@ func get_lake_water_level() -> float:
 
 ## The volcano's lava-filled mouth, as in the Fire Kingdom.
 func is_lava_area(pos: Vector2) -> bool:
-	return pos.distance_to(VOLCANO_CENTER) < FIRE_KINGDOM_TERRAIN.LAVA_MOUTH_RADIUS
+	return pos.distance_to(VOLCANO_CENTER) < FIRE_KINGDOM_TERRAIN.LAVA_MOUTH_RADIUS or _is_chasm_lava(pos)
 
 
-func get_lava_surface_height(_pos: Vector2) -> float:
-	return _volcano_lava_level
+func get_lava_surface_height(pos: Vector2) -> float:
+	return CHASM_LAVA_LEVEL if _is_chasm_lava(pos) else _volcano_lava_level
+
+
+func _is_chasm_lava(pos: Vector2) -> bool:
+	return pos.x > CLIFF_EDGE_X + CLIFF_FACE_WIDTH and pos.x < border_x("fire") + 24.0 and absf(pos.y - path_center_z(pos.x)) < CHASM_LAVA_HALF_WIDTH
 
 
 ## Out over the rim, straight out from wherever the lava was entered.
 func get_lava_escape_position(pos: Vector2) -> Vector3:
+	if _is_chasm_lava(pos):
+		var side := -1.0 if pos.y < path_center_z(pos.x) else 1.0
+		var escape_z := path_center_z(pos.x) + side * (CHASM_LAVA_HALF_WIDTH + 8.0)
+		return Vector3(pos.x, get_mesh_height(pos.x, escape_z), escape_z)
 	var outward := pos - VOLCANO_CENTER
 	if outward.length_squared() < 0.01:
 		outward = Vector2(-1.0, 0.0)
@@ -667,7 +840,8 @@ func get_start_point() -> Vector3:
 
 ## A point on the ground at `x` along the path, offset `z` across it.
 func get_path_point(x: float, z: float = 0.0) -> Vector3:
-	return Vector3(x, get_mesh_height(x, z), z)
+	var world_z := path_center_z(x) + z
+	return Vector3(x, get_mesh_height(x, world_z), world_z)
 
 
 # ---- Construction ------------------------------------------------------------
@@ -782,6 +956,77 @@ func _build_liquid_surfaces() -> void:
 	_water_lake.build_surface(self, "SeaWater", WATER_LEVEL, sea)
 	_frozen_lake.build_frozen(self, ICE_SURFACE_LEVEL, ICE_THICKNESS, WATER_LEVEL, false)
 	_build_volcano_lava()
+	_build_chasm_lava()
+
+
+## One broad lava lake at the bottom of the shortened Air chasm.
+func _build_chasm_lava() -> void:
+	var west := CLIFF_EDGE_X + CLIFF_FACE_WIDTH
+	var east := border_x("fire") + 28.0
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var segments := maxi(int((east - west) / 20.0), 2)
+	for index in segments:
+		var x0 := lerpf(west, east, float(index) / float(segments))
+		var x1 := lerpf(west, east, float(index + 1) / float(segments))
+		for vertex in [
+			Vector3(x0, CHASM_LAVA_LEVEL, path_center_z(x0) - CHASM_LAVA_HALF_WIDTH),
+			Vector3(x1, CHASM_LAVA_LEVEL, path_center_z(x1) - CHASM_LAVA_HALF_WIDTH),
+			Vector3(x0, CHASM_LAVA_LEVEL, path_center_z(x0) + CHASM_LAVA_HALF_WIDTH),
+			Vector3(x1, CHASM_LAVA_LEVEL, path_center_z(x1) - CHASM_LAVA_HALF_WIDTH),
+			Vector3(x1, CHASM_LAVA_LEVEL, path_center_z(x1) + CHASM_LAVA_HALF_WIDTH),
+			Vector3(x0, CHASM_LAVA_LEVEL, path_center_z(x0) + CHASM_LAVA_HALF_WIDTH),
+		]:
+			tool.add_vertex(vertex)
+	tool.generate_normals()
+	tool.set_material(NatureProps.build_lava_material())
+	var lava := MeshInstance3D.new()
+	lava.name = "AirChasmLava"
+	lava.mesh = tool.commit()
+	add_child(lava)
+	CollisionPolicy.mark_hazard(lava)
+
+
+## A single low-detail sphere supplies the planetary ocean silhouette. The
+## shader removes it inside the island footprint, leaving authored gameplay
+## water, ice and chasm lava unobstructed. It has no collision or physics cost.
+func _build_world_ocean() -> void:
+	var sphere := SphereMesh.new()
+	sphere.radius = WORLD_OCEAN_RADIUS
+	sphere.height = WORLD_OCEAN_RADIUS * 2.0
+	sphere.radial_segments = WORLD_OCEAN_SEGMENTS
+	sphere.rings = WORLD_OCEAN_RINGS
+	var shader := Shader.new()
+	shader.code = """
+shader_type spatial;
+render_mode cull_back, depth_draw_opaque;
+varying vec3 world_position;
+void vertex() { world_position = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; }
+void fragment() {
+	float path_z = sin(world_position.x * 0.0021) * 21.0 + sin(world_position.x * 0.0053 + 0.7) * 9.0;
+	float organic = sin(world_position.x * 0.0087) * 13.0 + sin(world_position.x * 0.021 + 1.7) * 6.0 + sin(world_position.x * 0.0031 - 0.8) * 18.0;
+	float half_width = 115.0 + organic + 86.0;
+	bool inside_x = world_position.x > -132.0 && world_position.x < 5567.0;
+	if (inside_x && abs(world_position.z - path_z) < half_width) { discard; }
+	vec3 deep_blue = vec3(0.055, 0.31, 0.53);
+	vec3 sky_blue = vec3(0.16, 0.52, 0.72);
+	float fresnel = pow(1.0 - max(dot(NORMAL, VIEW), 0.0), 3.0);
+	ALBEDO = mix(deep_blue, sky_blue, 0.28 + fresnel * 0.45);
+	ROUGHNESS = 0.28;
+	METALLIC = 0.05;
+}
+"""
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	var ocean := MeshInstance3D.new()
+	ocean.name = "SphericalWorldOcean"
+	ocean.mesh = sphere
+	ocean.material_override = material
+	ocean.position = Vector3((X_MIN + X_MAX) * 0.5, WATER_LEVEL - WORLD_OCEAN_RADIUS, 0.0)
+	ocean.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	ocean.extra_cull_margin = WORLD_OCEAN_RADIUS * 2.0
+	add_child(ocean)
+	CollisionPolicy.mark_decorative(ocean)
 
 
 ## The volcano's mouth filled with lava and lit from within, exactly as the
@@ -868,7 +1113,8 @@ func _place(node: Node3D, x: float, z: float) -> void:
 
 
 func _on_path(point: Vector2) -> bool:
-	return absf(point.y) < 8.0 or absf(point.y) > _valley_half_width(point.x) - 7.0
+	var across := absf(point.y - path_center_z(point.x))
+	return across < 8.0 or across > _valley_half_width(point.x) - 7.0
 
 
 ## The Crossroads' own forest clusters (wilderness_scatter.gd's
@@ -1043,18 +1289,22 @@ func _scatter_snowfield() -> void:
 		_place(tree, point.x, point.y)
 
 
-## The Rock/Ground Kingdom's own tilted-slab rock ramps along the canyon floor
-## and beside the path, rising east, for dirtbike launches.
+## Rock gates and course-edge markers keep the motocross route legible without
+## placing rigid ramp props in the wheel line. The launches themselves are
+## continuous terrain in _dirt_course_height(), so both wheels transition onto
+## them cleanly at any speed.
 func _scatter_dirt_track() -> void:
-	var ramp_x := DIRT_START_X + 40.0
-	var lanes: Array[float] = [0.0, -18.0, 18.0]
-	while ramp_x < DIRT_START_X + DIRT_LENGTH - 40.0:
-		var lane: float = lanes[_rng.randi() % lanes.size()]
-		var ramp := NatureProps.build_rock_ramp(_rng.randf_range(4.0, 6.0), _rng.randf_range(5.0, 8.0), _rng.randf_range(1.2, 2.4))
-		# The ramp rises along its local +Z; aim that east along the track.
-		ramp.rotation.y = PI * 0.5
-		_place(ramp, ramp_x, lane)
-		ramp_x += _rng.randf_range(20.0, 32.0)
+	var marker_x := DIRT_START_X + 35.0
+	var index := 0
+	while marker_x < DIRT_START_X + DIRT_LENGTH - 30.0:
+		var center := dirt_course_center_z(marker_x)
+		var side := -1.0 if index % 2 == 0 else 1.0
+		var offset := DIRT_COURSE_HALF_WIDTH + _rng.randf_range(8.0, 15.0)
+		var marker := NatureProps.build_rock(_rng.randf_range(0.9, 2.1), true)
+		marker.rotation.y = _rng.randf_range(0.0, TAU)
+		_place(marker, marker_x, center + side * offset)
+		marker_x += _rng.randf_range(28.0, 44.0)
+		index += 1
 
 
 ## Scattered basalt around the volcano's skirt, in the Fire Kingdom's rock tone.

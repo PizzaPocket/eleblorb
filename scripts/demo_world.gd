@@ -18,8 +18,16 @@ const XIAO_HOU_ZI_SCENE: PackedScene = preload("res://scenes/xiao_hou_zi.tscn")
 const JUNGLE_KINGDOM_FOLIAGE := preload("res://scripts/jungle_kingdom_foliage.gd")
 const MANCHEGO_SCENE: PackedScene = preload("res://scenes/manchego.tscn")
 const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
-## The demo world's own background music (see WorldMusic).
-const MUSIC: AudioStream = preload("res://assets/audio/music/demo_world_theme.mp3")
+const DA_HOU_ZI_SCENE: PackedScene = preload("res://scenes/ape_template_preview.tscn")
+const DA_HOU_ZI_CONFIG := preload("res://scripts/primate_kingdom_gorilla.gd")
+## The demo world's two-song playlist and reusable WorldMusic system remain
+## available for the later music pass. Playback is intentionally disabled in
+## _ready() for now so movement, ambience, powers and other foley can be heard
+## and tuned without musical masking.
+const MUSIC_PLAYLIST: Array[AudioStream] = [
+	preload("res://assets/audio/music/demo_song2.mp3"),
+	preload("res://assets/audio/music/demo_song3.mp3"),
+]
 ## The hero's five starting Normal blorbs, assigned everywhere but the head.
 const NORMAL_SLOTS: Array[String] = ["leg_left", "leg_right", "arm_left", "arm_right", "torso"]
 ## Wild shiny blorbs roaming the forest plains (as in the Crossroads field).
@@ -59,24 +67,32 @@ func _ready() -> void:
 		# Walking east you meet the eastern biome's portal face first; walking
 		# west, the western biome's.
 		var gate_scale: float = border.get("portal_scale", 1.0)
-		_add_portal(border["east"], x - GATE_HALF_GAP * gate_scale, -PI * 0.5, "", gate_scale)
-		_add_portal(border["west"], x + GATE_HALF_GAP * gate_scale, PI * 0.5, "", gate_scale)
+		var east_scale: float = border.get("east_portal_scale", gate_scale)
+		var west_scale: float = border.get("west_portal_scale", gate_scale)
+		var bend := DemoWorldTerrain.path_yaw(x)
+		var east_portal := _add_portal(border["east"], x - GATE_HALF_GAP * east_scale, -PI * 0.5 + bend, "", east_scale)
+		var west_portal := _add_portal(border["west"], x + GATE_HALF_GAP * west_scale, PI * 0.5 + bend, "", west_scale)
+		if border.has("hover_y"):
+			east_portal.position.y = float(border["hover_y"])
+			west_portal.position.y = float(border["hover_y"])
 	# The Nautilus portal on the seabed, facing west like the water portal.
 	var nautilus_portal := _add_portal("water", DemoWorldTerrain.NAUTILUS_PORTAL_X, -PI * 0.5, "nautilus")
 	nautilus_portal.position = _terrain.nautilus_portal_point()
 	# The Crystal Skates portal, standing on the frozen lake's ice.
 	var crystal_portal := _add_portal("ice", DemoWorldTerrain.CRYSTAL_PORTAL_X, -PI * 0.5, "crystal", 1.0, CrystalTrack.CRYSTAL_TINT)
 	crystal_portal.position.y = DemoWorldTerrain.ICE_SURFACE_LEVEL
-	# Kept low: background under the sound effects.
-	add_child(WorldMusic.new(MUSIC, -10.0))
+	# Background music is intentionally off during the current sound-design and
+	# traversal testing pass. Re-enable later with:
+	# add_child(WorldMusic.playlist(MUSIC_PLAYLIST, -10.0))
 	# The Ocean Kingdom's Kraken, patrolling the sea's deep middle.
 	var kraken := Kraken.new()
 	kraken.route_center = _terrain.sea_center()
-	kraken.route_radius = DemoWorldTerrain.KRAKEN_ROUTE_RADIUS
+	kraken.route_radius = DemoWorldTerrain.kraken_route_radius()
 	kraken.water_level = DemoWorldTerrain.WATER_LEVEL
 	kraken.terrain = _terrain
 	add_child(kraken)
 	_add_plant_jungle()
+	_add_demo_titans()
 	call_deferred("_finish_loading")
 
 
@@ -91,6 +107,40 @@ func _add_plant_jungle() -> void:
 	jungle.window_half_size = DemoWorldTerrain.PLANT_HALF
 	jungle.window_target_center = DemoWorldTerrain.PLANT_CENTER
 	add_child(jungle)
+
+
+## The demo course includes the established living Dinosaur and Da Hou Zi
+## rigs in broad terrain clearings. Humongous is intentionally left out until
+## his eventual course role and location are chosen.
+func _add_demo_titans() -> void:
+	var dinosaur := DinosaurTitan.new()
+	dinosaur.name = "Dinosaur"
+	dinosaur.scale = Vector3.ONE * 2.0
+	dinosaur.position = _terrain.get_path_point(
+		DemoWorldTerrain.DINOSAUR_CLEARING.x,
+		DemoWorldTerrain.DINOSAUR_CLEARING.y - DemoWorldTerrain.path_center_z(DemoWorldTerrain.DINOSAUR_CLEARING.x)
+	)
+	add_child(dinosaur)
+
+	var da_hou_zi := DA_HOU_ZI_SCENE.instantiate() as ApeTemplatePreview
+	da_hou_zi.name = "DaHouZi"
+	da_hou_zi.fur_color = DA_HOU_ZI_CONFIG.GORILLA_FUR_COLOR
+	da_hou_zi.eye_color_override = DA_HOU_ZI_CONFIG.MIND_CONTROL_EYE_COLOR
+	da_hou_zi.has_tail = false
+	da_hou_zi.body_type = 1.0
+	da_hou_zi.display_scale = DA_HOU_ZI_CONFIG.GORILLA_DISPLAY_SCALE
+	da_hou_zi.movement_speed_multiplier = DA_HOU_ZI_CONFIG.GORILLA_MOVEMENT_SPEED_MULTIPLIER
+	da_hou_zi.gait_speed_multiplier = DA_HOU_ZI_CONFIG.GORILLA_GAIT_SPEED_MULTIPLIER
+	da_hou_zi.roam_radius = 30.0
+	da_hou_zi.parkour_collision = true
+	da_hou_zi.display_name = DA_HOU_ZI_CONFIG.GORILLA_TRUE_NAME
+	var da_hou_zi_lines: Array[String] = ["Da Hou Zi watches through a strange purple haze."]
+	da_hou_zi.talk_lines = da_hou_zi_lines
+	da_hou_zi.position = _terrain.get_path_point(
+		DemoWorldTerrain.DA_HOU_ZI_CLEARING.x,
+		DemoWorldTerrain.DA_HOU_ZI_CLEARING.y - DemoWorldTerrain.path_center_z(DemoWorldTerrain.DA_HOU_ZI_CLEARING.x)
+	)
+	add_child(da_hou_zi)
 
 
 ## One-way portals: `facing_yaw` turns the portal's face (its local +Z) to

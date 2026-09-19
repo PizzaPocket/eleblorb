@@ -216,8 +216,8 @@ const DIRTBIKE_JUMP_HEIGHT_MULTIPLIER := 1.25
 ## Strong contact friction makes a board settle decisively on flats and
 ## shallow run-outs. Low quadratic drag remains separate, so a real descent
 ## can still accumulate the high speed expected from a long mountain.
-const SNOWBOARD_ROLLING_RESISTANCE := 0.075
-const SNOWBOARD_ICE_RESISTANCE := 0.075
+const SNOWBOARD_ROLLING_RESISTANCE := 0.04
+const SNOWBOARD_ICE_RESISTANCE := 0.032
 ## Deceleration (m/s^2) when a grounded board is on anything but snow: a
 ## ~30 km/h run off the snow's edge stops within about a metre.
 const SNOWBOARD_OFF_SNOW_BRAKING := 40.0
@@ -227,11 +227,11 @@ const SNOWBOARD_TUCK_TERMINAL_MULTIPLIER := 1.22
 const SNOWBOARD_TURN_RATE := deg_to_rad(105.0)
 const SNOWBOARD_CARVE_GRIP := 2.4
 const SNOWBOARD_STOP_SPEED := 0.12
-const SNOWBOARD_TERMINAL_SPEED := 112.0
+const SNOWBOARD_TERMINAL_SPEED := 150.0
 ## The kingdoms compress a real mountain into a shorter playable run. This
 ## preserves gravity-led acceleration while letting a sustained steep grade
 ## build the speed that a full-size descent would have had time to acquire.
-const SNOWBOARD_GRAVITY_SCALE := 1.45
+const SNOWBOARD_GRAVITY_SCALE := 2.15
 const SNOWBOARD_POSE_SETTLE_SPEED := 7.0
 ## Terrain triangles are sampled across the board's length and their normal
 ## is damped before reaching either rider or deck. Response softens further
@@ -1187,6 +1187,8 @@ var _snowboard: Node3D = null
 var _snowboard_last_heading := Vector3.FORWARD
 var _snowboard_smoothed_up := Vector3.UP
 var _snowboard_smoothed_rider_grade := 0.0
+var _snowboard_airborne_up := Vector3.UP
+var _snowboard_was_supported := false
 ## Matched Ice legs automatically extend these runners. They remain visible
 ## off ice while their traversal physics only engage on the frozen lake.
 var _ice_skates_active := false
@@ -4372,9 +4374,13 @@ func _apply_snowboard_pose(delta: float) -> void:
 	var tuck:=1.0 if _is_sprinting() and _snowboard_active else 0.0
 	var speed_ratio:=clampf(Vector2(velocity.x,velocity.z).length()/SNOWBOARD_FULL_LEAN_SPEED,0.0,1.0)
 	var forward_lean:=(SNOWBOARD_SPEED_LEAN_MAX*speed_ratio+SNOWBOARD_TUCK_LEAN*tuck)*w
+	var grade_heading:=Vector3(_snowboard_last_heading.x,0.0,_snowboard_last_heading.z).normalized()
+	var grade_forward:=grade_heading-_snowboard_smoothed_up*grade_heading.dot(_snowboard_smoothed_up)
+	var deck_grade:=asin(clampf(grade_forward.normalized().y,-1.0,1.0)) if grade_forward.length_squared()>0.001 else 0.0
+	var grade_flex:=clampf(deck_grade*0.55,-deg_to_rad(16.0),deg_to_rad(16.0))
 	var hip_target:=-(SNOWBOARD_HIP_BEND+SNOWBOARD_TUCK_HIP_BEND*tuck)
-	_leg_left.rotation.x=lerp_angle(_leg_left.rotation.x,hip_target,w)
-	_leg_right.rotation.x=lerp_angle(_leg_right.rotation.x,hip_target,w)
+	_leg_left.rotation.x=lerp_angle(_leg_left.rotation.x,hip_target+grade_flex,w)
+	_leg_right.rotation.x=lerp_angle(_leg_right.rotation.x,hip_target-grade_flex,w)
 	_leg_left.rotation.z=lerp_angle(
 		_leg_left.rotation.z,signf(_leg_left.position.x)*SNOWBOARD_STANCE_SPLAY,w
 	)
@@ -4382,8 +4388,8 @@ func _apply_snowboard_pose(delta: float) -> void:
 		_leg_right.rotation.z,signf(_leg_right.position.x)*SNOWBOARD_STANCE_SPLAY,w
 	)
 	var knee_target:=SNOWBOARD_KNEE_BEND+SNOWBOARD_TUCK_KNEE_BEND*tuck
-	_knee_left.rotation.x=lerp_angle(_knee_left.rotation.x,knee_target,w)
-	_knee_right.rotation.x=lerp_angle(_knee_right.rotation.x,knee_target,w)
+	_knee_left.rotation.x=lerp_angle(_knee_left.rotation.x,knee_target-grade_flex,w)
+	_knee_right.rotation.x=lerp_angle(_knee_right.rotation.x,knee_target+grade_flex,w)
 	_ankle_left.rotation.x=lerp_angle(_ankle_left.rotation.x,0.0,w)
 	_ankle_right.rotation.x=lerp_angle(_ankle_right.rotation.x,0.0,w)
 	# Balance arms are wider than idle and open further in the aerodynamic
@@ -6844,10 +6850,12 @@ func _pose_body_penguin(base_y: float) -> void:
 	visuals.position = Vector3(0.0, base_y + pivot_height, 0.0) - tipped * (Vector3.UP * PENGUIN_BODY_PIVOT_HEIGHT)
 
 
-## Skating the crystal track: the body pitched about the feet to lean into
-## the track's climb or dive (_crystal_body_pitch), facing _body_yaw.
+## Skating the crystal track: the body pitched about the feet to turn with
+## the track's climb or dive (_crystal_body_pitch, positive nose up, so a
+## climb tips the body back and a dive tips it forward), facing _body_yaw.
+## Visuals face +Z, so a nose-up pitch is a negative turn about +X.
 func _pose_body_crystal(base_y: float) -> void:
-	visuals.basis = Basis(Vector3.UP, _body_yaw) * Basis(Vector3.RIGHT, _crystal_body_pitch)
+	visuals.basis = Basis(Vector3.UP, _body_yaw) * Basis(Vector3.RIGHT, -_crystal_body_pitch)
 	visuals.position = Vector3(0.0, base_y, 0.0)
 
 
@@ -7409,6 +7417,8 @@ func _update_snowboard_state() -> void:
 			# snap the new deck toward it. It begins neutral and the ballistic
 			# visual pass aligns it with live travel until a real landing.
 			_snowboard_smoothed_up=_snowboard_surface_up() if supported else Vector3.UP
+			_snowboard_airborne_up=_snowboard_smoothed_up
+			_snowboard_was_supported=supported
 	if was_active and not _snowboard_active:
 		# Board momentum belongs to this particular ride, not to the player or
 		# the next board instance. Unequipping must therefore end the ride
@@ -7420,6 +7430,8 @@ func _update_snowboard_state() -> void:
 			_body_yaw=atan2(heading.x,heading.z)
 		_snowboard_smoothed_up=Vector3.UP
 		_snowboard_smoothed_rider_grade=0.0
+		_snowboard_airborne_up=Vector3.UP
+		_snowboard_was_supported=false
 	if _snowboard_active:
 		if _snowboard==null:
 			_snowboard=_build_snowboard()
@@ -7796,14 +7808,22 @@ static func ice_skate_visual_lift(scale_factor: float=1.0) -> float:
 func _is_snowboard_surface() -> bool:
 	if terrain==null:
 		return false
-	var xz:=Vector2(global_position.x,global_position.z)
-	if terrain.has_method("is_ice_surface") and terrain.is_ice_surface(xz):
+	if not terrain.has_method("is_snow_footstep_surface") or not terrain.has_method("get_mesh_height"):
 		return false
-	return (
-		terrain.has_method("is_snow_footstep_surface")
-		and terrain.is_snow_footstep_surface(xz)
-		and _is_aligned_with_terrain()
-	)
+	var heading:=Vector2(_snowboard_last_heading.x,_snowboard_last_heading.z).normalized()
+	if heading.length_squared()<0.001:
+		heading=Vector2(0.0,1.0)
+	var foot_y:=global_position.y-FOOT_OFFSET
+	# Nose and tail are the board's authoritative supports. Either end can
+	# retain contact at a lip; a centre-only test prematurely declared flight
+	# and was also responsible for several pitch discontinuities.
+	for sign_value: float in [-1.0,1.0]:
+		var contact: Vector2=Vector2(global_position.x,global_position.z)+heading*SNOWBOARD_NORMAL_SAMPLE_DISTANCE*sign_value
+		if terrain.has_method("is_ice_surface") and terrain.is_ice_surface(contact):
+			continue
+		if terrain.is_snow_footstep_surface(contact) and absf(foot_y-terrain.get_mesh_height(contact.x,contact.y))<=0.7:
+			return true
+	return false
 
 
 func _build_snowboard() -> Node3D:
@@ -7830,12 +7850,11 @@ func _update_snowboard_visual() -> void:
 	var supported:=_is_snowboard_surface()
 	var up:=_snowboard_smoothed_up
 	var forward:=_snowboard_last_heading.normalized()
-	# Once airborne, the deck follows the actual ballistic trajectory. Gravity
-	# changes velocity continuously, so its pitch naturally arcs down without
-	# a terrain-normal snap at the lip or while landing.
-	if not supported and velocity.length_squared()>0.01:
-		forward=velocity.normalized()
-	forward=(forward-up*forward.dot(up)).normalized() if supported else forward
+	# Translation and angular attitude are separate: gravity bends the flight
+	# path, but does not manufacture a nose-down torque on a free board.
+	if not supported:
+		up=_snowboard_airborne_up
+	forward=(forward-up*forward.dot(up)).normalized()
 	if forward.length_squared()<0.001:
 		forward=Vector3.FORWARD
 	var across:=forward.cross(up).normalized()
@@ -7876,6 +7895,10 @@ func _apply_snowboard_surface_orientation(delta: float,grounded: bool) -> void:
 		var response:=lerpf(SNOWBOARD_PITCH_RESPONSE_SLOW,SNOWBOARD_PITCH_RESPONSE_FAST,speed_ratio)
 		var damping:=1.0-exp(-response*delta)
 		_snowboard_smoothed_up=_snowboard_smoothed_up.slerp(target_up,damping).normalized()
+		_snowboard_airborne_up=_snowboard_smoothed_up
+	elif _snowboard_was_supported:
+		_snowboard_airborne_up=_snowboard_smoothed_up
+	_snowboard_was_supported=supported
 	var planar_forward:=Vector3(_snowboard_last_heading.x,0.0,_snowboard_last_heading.z)
 	if planar_forward.length_squared()<0.001:
 		return
@@ -7886,7 +7909,7 @@ func _apply_snowboard_surface_orientation(delta: float,grounded: bool) -> void:
 	deck_forward=deck_forward.normalized()
 	var deck_grade:=asin(clampf(deck_forward.y,-1.0,1.0))
 	var rider_grade:=signf(deck_grade)*maxf(absf(deck_grade)-SNOWBOARD_RIDER_PITCH_THRESHOLD,0.0)
-	if not supported and velocity.length_squared()>0.01:
+	if not supported:
 		# Once launched, retain the attitude reached at the lip. Ballistic
 		# velocity owns the deck arc; it must not instantly fold the rider.
 		rider_grade=_snowboard_smoothed_rider_grade
@@ -8330,7 +8353,8 @@ func _snap_to_terrain(delta: float,pre_move_position: Vector3) -> void:
 		if _dirtbike_was_climbing:
 			_dirtbike_was_climbing = false
 			velocity = _dirtbike_surface_velocity
-			velocity.y *= sqrt(DIRTBIKE_JUMP_HEIGHT_MULTIPLIER)
+			if _dirtbike_wheel_active:
+				velocity.y *= sqrt(DIRTBIKE_JUMP_HEIGHT_MULTIPLIER)
 			_jump_takeoff_speed = absf(velocity.y)
 			_jumping = true
 			return

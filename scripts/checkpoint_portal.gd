@@ -38,9 +38,9 @@ signal crossed(element: String)
 ## Thickness of the ring's piping; thicker for a wider portal.
 @export var tube_radius: float = 0.11
 
-## Shiny blorbs' body is nearly the Normal off-white, so their portal takes a
-## warm gold to tell the two apart at a glance.
-const SHINY_TINT := Color(1.0, 0.84, 0.38)
+## Shiny is a rarity rather than an element, so its gate uses the exact same
+## pearlescent body colour as a shiny blorb instead of an unrelated gold tint.
+const SHINY_TINT := Blorb.SHINY_BODY_COLOR
 const RING_SAMPLES := 96
 const TUBE_SIDES := 10
 ## A rounder crown over a flatter, boxier base: an egg standing on its broad
