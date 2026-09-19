@@ -17,16 +17,20 @@ const RAISED_BEAK_TILT := deg_to_rad(14.0)
 const HOOD_COLOR := Color(0.10, 0.12, 0.17)
 const BEAK_COLOR := Color(0.96, 0.56, 0.12)
 ## The hood is a lathed bell rather than a ball: a round dome over the crown
-## that widens smoothly down past the jaw into a flared base, which sinks into
-## the Penguin Suit's torso like a penguin's head running into its body.
+## that widens smoothly down past the jaw into a flared base, rounded under
+## like a bowl, which sinks into the Penguin Suit's torso like a penguin's
+## head running into its body. Centred on the measured head, and deep enough
+## front to back to keep the back of the skull inside.
 ## Half-widths relative to the measured head-and-hair bounds.
-const HOOD_MARGIN := Vector2(1.10, 1.12)
-## Width at the base relative to the head, the height (fraction from the
-## base) where the flare has eased in to head width, and how far below the
-## head's base the hood reaches, as a fraction of the head's height.
+const HOOD_MARGIN := Vector2(1.12, 1.2)
+## Width at the flare relative to the head, the fraction of the height (from
+## the base) the rounded underside takes, the height where the flare has eased
+## in to head width, and how far below the head's base the hood reaches, as a
+## fraction of the head's height.
 const HOOD_BASE_FLARE := 1.3
-const HOOD_WAIST_T := 0.5
-const HOOD_BASE_DROP := 0.45
+const HOOD_BASE_ROUND := 0.28
+const HOOD_WAIST_T := 0.55
+const HOOD_BASE_DROP := 0.18
 ## Clearance over the top of the head, as a fraction of the head's height.
 const HOOD_TOP_MARGIN := 0.06
 const HOOD_RINGS := 26
@@ -47,11 +51,15 @@ static func hood_half_widths(contents_size: Vector3) -> Vector2:
 	return Vector2(contents_size.x * 0.5 * HOOD_MARGIN.x, contents_size.z * 0.5 * HOOD_MARGIN.y)
 
 
-## Width relative to the head at height fraction `t` (0 base, 1 crown): the
-## flare easing in to head width at HOOD_WAIST_T, then a round dome.
+## Width relative to the head at height fraction `t` (0 base, 1 crown): a
+## rounded underside out to the flare, easing in to head width at
+## HOOD_WAIST_T, then a round dome.
 static func hood_width(t: float) -> float:
+	if t < HOOD_BASE_ROUND:
+		var under := 1.0 - t / HOOD_BASE_ROUND
+		return HOOD_BASE_FLARE * sqrt(maxf(0.0, 1.0 - under * under))
 	if t <= HOOD_WAIST_T:
-		return lerpf(HOOD_BASE_FLARE, 1.0, smoothstep(0.0, 1.0, t / HOOD_WAIST_T))
+		return lerpf(HOOD_BASE_FLARE, 1.0, smoothstep(0.0, 1.0, (t - HOOD_BASE_ROUND) / (HOOD_WAIST_T - HOOD_BASE_ROUND)))
 	var u := (t - HOOD_WAIST_T) / (1.0 - HOOD_WAIST_T)
 	return sqrt(maxf(0.0, 1.0 - u * u))
 

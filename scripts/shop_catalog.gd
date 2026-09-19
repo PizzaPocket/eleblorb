@@ -169,7 +169,7 @@ static func _ensure_items() -> void:
 			"name": "Nautilus Crown", "color": Color(0.36, 0.88, 0.74), "price": 0, "sell_price": 0,
 			"purchasable": false, "element": "", "core_item": "Nautilus Crown", "core_slot": "head", "armor_defense": 7,
 			"description": "The Tidekeeper's spiral crown.",
-			"build_visual": Callable(ShopCatalog, "_build_nautilus_shell_visual"),
+			"build_visual": Callable(NautilusCrown, "build_visual"),
 		},
 		{
 			"name": "Knight's Helm", "color": Color(0.34, 0.36, 0.39), "price": 28, "sell_price": 14,

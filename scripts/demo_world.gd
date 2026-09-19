@@ -28,8 +28,8 @@ const PORTAL_TUBE_RADIUS := 0.35
 ## so their rings touch without intersecting.
 const GATE_HALF_GAP := 0.37
 ## Where Manchego and Pandy wait, just past the shiny portal on the plain.
-const MANCHEGO_STATION := Vector2(64.0, -12.0)
-const PANDY_STATION := Vector2(64.0, 12.0)
+const MANCHEGO_STATION := Vector2(78.0, -12.0)
+const PANDY_STATION := Vector2(78.0, 12.0)
 ## How far past its portal (inside the biome it opens onto) a waiting set idles.
 const SET_WAIT_OFFSET := 6.0
 ## The valley runs toward +X. The camera looks east over the hero's shoulder
@@ -56,8 +56,9 @@ func _ready() -> void:
 		var x: float = border["x"]
 		# Walking east you meet the eastern biome's portal face first; walking
 		# west, the western biome's.
-		_add_portal(border["east"], x - GATE_HALF_GAP, -PI * 0.5)
-		_add_portal(border["west"], x + GATE_HALF_GAP, PI * 0.5)
+		var gate_scale: float = border.get("portal_scale", 1.0)
+		_add_portal(border["east"], x - GATE_HALF_GAP * gate_scale, -PI * 0.5, "", gate_scale)
+		_add_portal(border["west"], x + GATE_HALF_GAP * gate_scale, PI * 0.5, "", gate_scale)
 	# The Nautilus portal on the seabed, facing west like the water portal.
 	var nautilus_portal := _add_portal("water", DemoWorldTerrain.NAUTILUS_PORTAL_X, -PI * 0.5, "nautilus")
 	nautilus_portal.position = _terrain.nautilus_portal_point()
@@ -80,15 +81,15 @@ func _add_plant_jungle() -> void:
 
 ## One-way portals: `facing_yaw` turns the portal's face (its local +Z) to
 ## face the side you approach it from.
-func _add_portal(element: String, x: float, facing_yaw: float, suit_key: String = "") -> CheckpointPortal:
+func _add_portal(element: String, x: float, facing_yaw: float, suit_key: String = "", size_scale: float = 1.0) -> CheckpointPortal:
 	var portal := CheckpointPortal.new()
 	portal.name = "Portal_%s_%d" % [suit_key if suit_key != "" else (element if element != "" else "normal"), int(x)]
 	portal.element = element
 	portal.suit_key = suit_key
 	portal.one_way = true
-	portal.half_width = DemoWorldTerrain.PORTAL_HALF_WIDTH
-	portal.half_height = DemoWorldTerrain.PORTAL_HALF_HEIGHT
-	portal.tube_radius = PORTAL_TUBE_RADIUS
+	portal.half_width = DemoWorldTerrain.PORTAL_HALF_WIDTH * size_scale
+	portal.half_height = DemoWorldTerrain.PORTAL_HALF_HEIGHT * size_scale
+	portal.tube_radius = PORTAL_TUBE_RADIUS * size_scale
 	portal.position = _terrain.get_path_point(x)
 	portal.rotation.y = facing_yaw
 	portal.crossed.connect(_roster.switch_to)

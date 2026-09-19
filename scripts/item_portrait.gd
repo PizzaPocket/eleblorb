@@ -8,7 +8,7 @@ extends RefCounted
 
 const RESOLUTION := 192
 const CAPTURE_VERSION := 5
-const HELMET_ITEMS := ["Diving Helmet", "Knight's Helm", "Toboggan", "Penguin Helm"]
+const HELMET_ITEMS := ["Diving Helmet", "Knight's Helm", "Toboggan", "Penguin Helm", "Nautilus Crown"]
 
 static var _cache: Dictionary = {}
 static var _pending: Dictionary = {}

@@ -69,12 +69,21 @@ const PENGUIN_TORSO_ABOVE_HEAD_BASE := 0.1
 const PENGUIN_BELLY_T := 0.26
 const PENGUIN_BELLY_WIDTH := 1.14
 const PENGUIN_BELLY_FORWARD := 0.14
-## Width at the ankle hem, at the shoulders and where the torso meets the
-## hood's flared base, relative to the torso's nominal width. Above the shoulders the torso
-## slopes smoothly in to the hood rather than closing in a flat lid.
+## Width at the ankle hem and at the shoulders, relative to the torso's
+## nominal width. Above the shoulders the torso rounds over in one smooth
+## elliptical dome up under the hood: no neck, no flat lid.
 const PENGUIN_HEM_WIDTH := 0.98
 const PENGUIN_SHOULDER_WIDTH := 0.97
-const PENGUIN_NECK_WIDTH := 0.42
+## The hem stops this far above the ankles, clear of the feet.
+const PENGUIN_HEM_ABOVE_ANKLE := 0.05
+## A broad, flat tail from the low back: its half-extents (fractions of the
+## torso's nominal half-width across, and metres thick and long), where it
+## sits up the body, and how far its tip tips down toward the ground.
+const PENGUIN_TAIL_HALF_WIDTH := 0.5
+const PENGUIN_TAIL_HALF_THICKNESS := 0.035
+const PENGUIN_TAIL_HALF_LENGTH := 0.17
+const PENGUIN_TAIL_T := 0.1
+const PENGUIN_TAIL_PITCH := deg_to_rad(22.0)
 ## Penguin flippers: thinner across their flat face than along it, and
 ## narrowing past the wrist to a point beyond the fingertips.
 const PENGUIN_FLIPPER_FLATTEN := 0.5
@@ -86,9 +95,32 @@ const PENGUIN_FLIPPER_REACH := 0.07
 ## flattened top to bottom to this fraction while still enclosing the shoe.
 const PENGUIN_FOOT_START := 0.25
 const PENGUIN_FOOT_FLATTEN := 0.4
+## The foot runs this far past the shoe's toe before rounding closed, so the
+## end's taper lies beyond the real toes.
+const PENGUIN_FOOT_TOE_REACH := 0.07
 ## The flipper's shoulder cap, relative to the flipper's shoulder radius:
 ## smaller than the Lava Suit's, so it stays inside the penguin's shoulders.
 const PENGUIN_SHOULDER_CAP := 0.85
+## The mermaid tail (two Water leg blorbs under the Nautilus Crown, swimming):
+## one mass from above the hips tapering to the ankles, then a fluke around
+## both feet. Half-width and half-depth at each station down the tail, the
+## fluke's length past the toes and the notch pulled into its trailing edge.
+const MERMAID_TAIL_STATIONS := [
+	Vector2(0.19, 0.14),   # start, up inside the pelvis
+	Vector2(0.24, 0.17),   # hips
+	Vector2(0.16, 0.12),   # knees
+	Vector2(0.085, 0.075), # ankles: the narrowest point
+	Vector2(0.17, 0.06),   # toes: the fluke's root, wrapping both feet
+	Vector2(0.36, 0.035),  # fluke, widest
+	Vector2(0.30, 0.015),  # fluke's trailing edge
+]
+const MERMAID_TAIL_TOP := 0.1
+const MERMAID_FLUKE_LENGTH := 0.34
+const MERMAID_FLUKE_NOTCH := 0.12
+## How far above each foot its blorb's eyes sit on the fluke.
+const MERMAID_FACE_DEPTH := 0.06
+const MERMAID_TAIL_RINGS_PER_SEGMENT := 8
+const MERMAID_TAIL_SEGMENTS := 18
 ## The raised Penguin Helm hat's eyes, as big as the Bird Helm's.
 const PENGUIN_HAT_EYE_SCALE := 1.4 * 1.3
 
@@ -602,7 +634,10 @@ static func animate_air_wings(wings: Node3D, flap_angle: float) -> void:
 ## comment for why only these need it. No-op (safe to call, just does
 ## nothing useful) for torso/head, which the controller never calls this
 ## for anyway (see is_dynamic_slot()).
-static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false) -> void:
+## `mermaid`: the legs have merged into the mermaid tail. The left leg blorb
+## renders the whole tail (build_mermaid_tail_mesh()); both keep their own
+## eyes and core at their own feet.
+static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false, mermaid: bool = false) -> void:
 	match slot:
 		"arm_left":
 			rebuild_arm(
@@ -622,13 +657,16 @@ static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Di
 			rebuild_leg(
 				mesh_instance, root,
 				pivots["leg_left_hip"] as Node3D, pivots["leg_left_knee"] as Node3D,
-				pivots["leg_left_ankle"] as Node3D, pivots["toe_left"] as Node3D, blorb, rig_scale, form_command
+				pivots["leg_left_ankle"] as Node3D, pivots["toe_left"] as Node3D, blorb, rig_scale, form_command, mermaid
 			)
+			if mermaid:
+				mesh_instance.mesh = build_mermaid_tail_mesh(root, pivots, rig_scale)
+				mesh_instance.set_surface_override_material(0, _build_goo_material(blorb.body_visual_snapshot()))
 		"leg_right":
 			rebuild_leg(
 				mesh_instance, root,
 				pivots["leg_right_hip"] as Node3D, pivots["leg_right_knee"] as Node3D,
-				pivots["leg_right_ankle"] as Node3D, pivots["toe_right"] as Node3D, blorb, rig_scale, form_command
+				pivots["leg_right_ankle"] as Node3D, pivots["toe_right"] as Node3D, blorb, rig_scale, form_command, mermaid
 			)
 
 
@@ -762,6 +800,53 @@ static func rebuild_arm(
 	)
 
 
+## The mermaid tail, in `root` space, from both legs' live joints: one mass
+## starting up inside the pelvis, tapering through hips and knees to its
+## narrowest at the ankles, then flaring into a flat fluke that wraps both
+## (pointed) feet, its trailing edge notched into two lobes. Cross-sections
+## are ellipses, wide across the body (MERMAID_TAIL_STATIONS).
+static func build_mermaid_tail_mesh(root: Node3D, pivots: Dictionary, rig_scale: float) -> ArrayMesh:
+	var mid := func(left_key: String, right_key: String) -> Vector3:
+		return root.to_local(((pivots[left_key] as Node3D).global_position + (pivots[right_key] as Node3D).global_position) * 0.5)
+	var hip: Vector3 = mid.call("leg_left_hip", "leg_right_hip")
+	var knee: Vector3 = mid.call("leg_left_knee", "leg_right_knee")
+	var ankle: Vector3 = mid.call("leg_left_ankle", "leg_right_ankle")
+	var toe: Vector3 = mid.call("toe_left", "toe_right")
+	var side := (root.to_local((pivots["leg_left_hip"] as Node3D).global_position) - root.to_local((pivots["leg_right_hip"] as Node3D).global_position)).normalized()
+	var fluke_direction := (toe - ankle).normalized()
+	var top := hip + (hip - knee).normalized() * MERMAID_TAIL_TOP * rig_scale
+	var fluke_mid := toe + fluke_direction * MERMAID_FLUKE_LENGTH * 0.55 * rig_scale
+	var fluke_end := toe + fluke_direction * MERMAID_FLUKE_LENGTH * rig_scale
+	var points: Array[Vector3] = [top, hip, knee, ankle, toe, fluke_mid, fluke_end]
+	var extended: Array[Vector3] = [points[0] * 2.0 - points[1]]
+	extended.append_array(points)
+	extended.append(points[points.size() - 1] * 2.0 - points[points.size() - 2])
+	var fluke_start_index := 4
+	var rings: Array = []
+	for segment in points.size() - 1:
+		var steps := MERMAID_TAIL_RINGS_PER_SEGMENT + 1 if segment == points.size() - 2 else MERMAID_TAIL_RINGS_PER_SEGMENT
+		for step in steps:
+			var t := float(step) / float(MERMAID_TAIL_RINGS_PER_SEGMENT)
+			var center := _catmull_rom(extended[segment], extended[segment + 1], extended[segment + 2], extended[segment + 3], t)
+			var tangent := _catmull_rom_tangent(extended[segment], extended[segment + 1], extended[segment + 2], extended[segment + 3], t)
+			var eased := smoothstep(0.0, 1.0, t)
+			var size: Vector2 = (MERMAID_TAIL_STATIONS[segment] as Vector2).lerp(MERMAID_TAIL_STATIONS[segment + 1] as Vector2, eased) * rig_scale
+			var across := (side - tangent * side.dot(tangent)).normalized()
+			var up := tangent.cross(across)
+			# The fluke's notch: the trailing edge's middle drawn back toward
+			# the body, leaving two lobes out at the sides.
+			var fluke := 0.0
+			if segment >= fluke_start_index + 1:
+				fluke = clampf((float(segment - fluke_start_index - 1) + t), 0.0, 1.0)
+			var ring: Array[Vector3] = []
+			for around_index in MERMAID_TAIL_SEGMENTS:
+				var around := TAU * float(around_index) / float(MERMAID_TAIL_SEGMENTS)
+				var notch := -tangent * MERMAID_FLUKE_NOTCH * rig_scale * fluke * pow(1.0 - absf(cos(around)), 1.5)
+				ring.append(center + across * cos(around) * size.x + up * sin(around) * size.y + notch)
+			rings.append(ring)
+	return BlorbBodyShape.build_mesh_from_rings(rings)
+
+
 ## Rounds off the start of a limb tube as a hemisphere of `radius` centred
 ## at `center`, bulging along `outward`: control points on the dome, from its
 ## pole in to its full-width rim, placed ahead of `points`. Build the tube
@@ -777,7 +862,7 @@ static func _prepend_round_cap(points: Array[Vector3], radii: Array[float], cent
 
 ## Noodle from hip through knee through ankle through toe. `rig_scale` -- see
 ## rebuild_arm()'s own doc comment for the full rationale, identical here.
-static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D, knee: Node3D, ankle: Node3D, toe: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false) -> void:
+static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D, knee: Node3D, ankle: Node3D, toe: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false, mermaid: bool = false) -> void:
 	var vis: Dictionary = blorb.body_visual_snapshot()
 	var sealed_lava := blorb.element_state == "fire" and form_command
 	var sealed_lava_radius := 1.34 if sealed_lava else 1.0
@@ -848,16 +933,22 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 		# A flat penguin foot: only from just above the ankle out past the toe,
 		# domed over the top and squashed top to bottom.
 		var foot_top := ankle_pos.lerp(knee_pos, PENGUIN_FOOT_START)
-		points = [foot_top, ankle_pos, toe_pos]
-		radii = [r_ankle * 0.85, r_ankle, r_toe]
+		var foot_tip := toe_pos + reach_dir * PENGUIN_FOOT_TOE_REACH * rig_scale
+		points = [foot_top, ankle_pos, toe_pos, foot_tip]
+		radii = [r_ankle * 0.85, r_ankle, r_toe, r_toe * 0.8]
 		_prepend_round_cap(points, radii, foot_top, (foot_top - ankle_pos).normalized(), r_ankle * 0.85)
 		foot_flatten = PENGUIN_FOOT_FLATTEN
 		flatten_axis = _to_local_dir(root, toe.global_transform.basis * Vector3(0, 1, 0))
-	mesh_instance.mesh = build_limb_tube(
-		points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION,
-		[] as Array[Color], not penguin, flatten_axis, foot_flatten
-	)
-	mesh_instance.set_surface_override_material(0, _build_goo_material(vis))
+	if mermaid:
+		# The tail is one mass: rebuild_slot() gives the left leg blorb the
+		# whole tail and leaves this leg's own tube out. Only its face remains.
+		mesh_instance.mesh = null
+	else:
+		mesh_instance.mesh = build_limb_tube(
+			points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION,
+			[] as Array[Color], not penguin, flatten_axis, foot_flatten
+		)
+		mesh_instance.set_surface_override_material(0, _build_goo_material(vis))
 
 	# "Above the tip of the boot," per direct instruction -- BOOT_EYE_T of
 	# the way from ankle to toe (not the very tip, which the cap taper
@@ -902,6 +993,8 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 	# place on the boot even as ankle and knee animation reshape the leg.
 	var boot_centerline := raw_toe_pos - toe_forward * (BOOT_EYE_BACK_FROM_TOE * rig_scale)
 	var r_local := lerpf(r_ankle, r_toe, BOOT_EYE_T)
+	if mermaid:
+		r_local = MERMAID_FACE_DEPTH * rig_scale
 
 	var eye_anchor := boot_centerline + toe_up * r_local * foot_flatten
 	# Flat downward shift on top of the reach above, per direct instruction
@@ -1046,9 +1139,9 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 ## sits the pelvis, thigh and shin heights below the spine pivot.
 static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float) -> Node3D:
 	var vis: Dictionary = blorb.body_visual_snapshot()
-	var bottom := -(
+	var bottom := (-(
 		ProceduralFigure.HIP_SIZE.y + ProceduralFigure.UPPER_LEG_SIZE.y + ProceduralFigure.LOWER_LEG_SIZE.y
-	) * 2.0 * rig_scale
+	) * 2.0 + PENGUIN_HEM_ABOVE_ANKLE) * rig_scale
 	var chest_top := (ProceduralFigure.ABDOMEN_SIZE.y + ProceduralFigure.CHEST_SIZE.y) * 2.0 * rig_scale
 	var top := chest_top + (ProceduralFigure.HEAD_RAISE + PENGUIN_TORSO_ABOVE_HEAD_BASE) * rig_scale
 	# The shoulder joints (ProceduralFigure.build()'s shoulder_y, relative to
@@ -1078,6 +1171,19 @@ static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: f
 	torso.mesh = BlorbBodyShape.build_mesh_from_rings(rings)
 	torso.set_surface_override_material(0, _build_goo_material(vis))
 	spine_pivot.add_child(torso)
+	# The tail: a flattened SuperEgg jutting from the low back, part of the
+	# same blorb, its tip tipped down toward the ground.
+	var tail := MeshInstance3D.new()
+	tail.name = "PenguinTail"
+	tail.mesh = SuperEgg.build_mesh(Vector3(
+		half_width * PENGUIN_TAIL_HALF_WIDTH, PENGUIN_TAIL_HALF_THICKNESS * rig_scale, PENGUIN_TAIL_HALF_LENGTH * rig_scale
+	), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+	tail.set_surface_override_material(0, _build_goo_material(vis))
+	var back := half_depth * _penguin_torso_width(PENGUIN_TAIL_T, shoulder_t)
+	# Rotating about +X by a negative angle drops a part's -Z (back) end.
+	tail.basis = Basis(Vector3.RIGHT, -PENGUIN_TAIL_PITCH)
+	tail.position = Vector3(0.0, lerpf(bottom, top, PENGUIN_TAIL_T), -back) + tail.basis * Vector3(0.0, 0.0, -PENGUIN_TAIL_HALF_LENGTH * 0.6 * rig_scale)
+	torso.add_child(tail)
 	const EYE_T := 0.8
 	var eye_width := _penguin_torso_width(EYE_T, shoulder_t)
 	var eye_belly := half_depth * PENGUIN_BELLY_FORWARD * sin(PI * clampf(EYE_T / 0.85, 0.0, 1.0))
@@ -1095,9 +1201,9 @@ static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: f
 
 ## Penguin torso silhouette, relative to its belly width, at height fraction
 ## `t` (0 at the ankle hem, 1 at the top). Swells from the hem to the belly,
-## eases in slightly to broad shoulders at `shoulder_t`, then slopes smoothly
-## in to the neck, where the top ring sits up inside the hood's flared base.
-## The hem rounds closed.
+## eases in slightly to broad shoulders at `shoulder_t`, then rounds over as
+## an elliptical dome closing at the top, up under the hood. The hem rounds
+## closed.
 static func _penguin_torso_width(t: float, shoulder_t: float) -> float:
 	const BOTTOM_ROUND := 0.07
 	var width: float
@@ -1107,7 +1213,7 @@ static func _penguin_torso_width(t: float, shoulder_t: float) -> float:
 		width = lerpf(PENGUIN_BELLY_WIDTH, PENGUIN_SHOULDER_WIDTH, smoothstep(0.0, 1.0, (t - PENGUIN_BELLY_T) / (shoulder_t - PENGUIN_BELLY_T)))
 	else:
 		var u := (t - shoulder_t) / (1.0 - shoulder_t)
-		width = lerpf(PENGUIN_SHOULDER_WIDTH, PENGUIN_NECK_WIDTH, (1.0 - cos(u * PI)) * 0.5)
+		width = PENGUIN_SHOULDER_WIDTH * sqrt(maxf(0.0, 1.0 - u * u))
 	if t < BOTTOM_ROUND:
 		width *= pow(1.0 - pow((BOTTOM_ROUND - t) / BOTTOM_ROUND, 3.0), 1.0 / 3.0)
 	return width
@@ -1264,8 +1370,8 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	hat.add_child(hat_core)
 	_add_head_core_light(hat_core, vis)
 	if blorb.has_core_item("Nautilus Crown"):
-		_add_nautilus_pirate_hat(hat, hat_radius, vis)
-		return [hat] as Array[Node3D]
+		hat.queue_free()
+		return [_build_nautilus_crown(head_pivot, worn_head_bounds, head_size, vis)] as Array[Node3D]
 	if blorb.has_core_item("Knight's Helm"):
 		hat.queue_free()
 		return [_build_knights_helm(head_pivot, head_extent, vis, rig_scale)] as Array[Node3D]
@@ -1431,6 +1537,8 @@ static func _build_penguin_helm(head_pivot: Node3D, contents: AABB, head_size: V
 	hood.name = "PenguinHelmBlorbBody"
 	hood.mesh = PenguinHelm.build_hood_mesh(half, span)
 	hood.material_override = _build_goo_material(vis)
+	# Centred on the measured head (hair included), not the pivot.
+	hood.position = Vector3(contents.get_center().x, 0.0, contents.get_center().z)
 	root.add_child(hood)
 	# Eyes at the real head's own eye line (its mesh equator, head_size.y).
 	var eye_y := head_size.y
@@ -2031,30 +2139,51 @@ static func _add_lava_mohawk(parent: Node3D, radius: float) -> void:
 	parent.add_child(fire)
 
 
-static func _add_nautilus_pirate_hat(hat: Node3D, radius: float, vis: Dictionary) -> void:
-	var material := _build_goo_material(vis)
-	var crown := MeshInstance3D.new()
-	crown.name = "NautilusPirateCrown"
-	crown.mesh = SuperEgg.build_mesh(Vector3(radius * 1.05, radius * 0.42, radius * 0.78), 2.5, SuperEgg.EPSILON_FLAT)
-	crown.material_override = material
-	crown.position = Vector3(0.0, radius * 1.24, 0.0)
-	hat.add_child(crown)
-	for yaw_degrees: float in [0.0, 120.0, 240.0]:
-		var brim := MeshInstance3D.new()
-		brim.mesh = SuperEgg.build_mesh(Vector3(radius * 1.38, radius * 0.12, radius * 0.54), 2.5, SuperEgg.EPSILON_FLAT)
-		brim.material_override = material
-		brim.position = Vector3(0.0, radius * 1.02, 0.0)
-		brim.rotation.y = deg_to_rad(yaw_degrees)
-		hat.add_child(brim)
-	# The nautilus spiral is embossed in the same living goo color.
-	for index in 8:
-		var t := float(index) / 7.0
-		var angle := t * TAU * 1.4
-		var spiral := MeshInstance3D.new()
-		spiral.mesh = SuperEgg.build_mesh(Vector3(radius * 0.09, radius * 0.09, radius * 0.035), 2.2, 2.2)
-		spiral.material_override = material
-		spiral.position = Vector3(cos(angle) * radius * 0.36 * t, radius * 1.28 + sin(angle) * radius * 0.36 * t, radius * 0.79)
-		hat.add_child(spiral)
+## The Nautilus Crown as a living blorb: a shell helmet from just above the
+## eyes, sweeping back over the crown into a nautilus coil on the back of the
+## head (NautilusCrown), with the blorb's own eyes and core on its brow.
+static func _build_nautilus_crown(head_pivot: Node3D, contents: AABB, head_size: Vector3, vis: Dictionary) -> Node3D:
+	var root := Node3D.new()
+	root.name = "HeadBlorbNautilusCrown"
+	head_pivot.add_child(root)
+	var shape := NautilusCrown.spiral(contents)
+	var shell := MeshInstance3D.new()
+	shell.name = "NautilusCrownBlorbBody"
+	shell.mesh = NautilusCrown.build_shell_mesh(shape)
+	shell.material_override = _build_goo_material(vis)
+	root.add_child(shell)
+	# Eyes on the brow's outer face a little way up from its lip, looking out
+	# ahead: as large as the Bird Helm's, set either side of the midline.
+	var eye_angle := float(shape["start_angle"]) + 0.28
+	var brow := NautilusCrown.point_at(shape, eye_angle)
+	var outward := NautilusCrown.outward_at(shape, eye_angle)
+	var brow_width := NautilusCrown.width_at(shape, eye_angle)
+	var surface := brow + outward * brow_width * NautilusCrown.THICKNESS
+	var eye_mesh_radius := brow_width * 0.16 * 0.5 * 1.8
+	var eye_color := (vis["albedo"] as Color).darkened(0.25)
+	for side in [-1.0, 1.0]:
+		var eye := MeshInstance3D.new()
+		eye.name = "EyeL" if side < 0.0 else "EyeR"
+		eye.mesh = SuperEgg.build_mesh(
+			Vector3(eye_mesh_radius, eye_mesh_radius * 1.15, eye_mesh_radius), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+		)
+		var eye_material := StandardMaterial3D.new()
+		eye_material.albedo_color = eye_color
+		eye_material.roughness = 0.8
+		eye.set_surface_override_material(0, eye_material)
+		eye.basis = Basis.looking_at(-outward, Vector3.UP if absf(outward.y) < 0.95 else Vector3.BACK)
+		eye.scale = Vector3(1.0, 1.0, 0.5)
+		eye.position = surface + Vector3(side * brow_width * 0.42, 0.0, 0.0) - outward * eye_mesh_radius * 0.35
+		shell.add_child(eye)
+	var core := BlorbCore.build(brow_width * CORE_RADIUS_FRACTION * HAT_CORE_RADIUS_SCALE, vis["core_color"] as Color, vis["core_emissive"] as bool)
+	if vis["core_emissive"] as bool:
+		var core_material: StandardMaterial3D = core.get_meta("material")
+		core_material.emission = vis["core_emission"] as Color
+		core_material.emission_energy_multiplier = vis["core_emission_energy"] as float
+	core.position = brow + outward * brow_width * NautilusCrown.THICKNESS * 0.3
+	shell.add_child(core)
+	_add_head_core_light(core, vis)
+	return root
 
 
 ## `head_extent` arrives already scaled by the caller's own `rig_scale` (see

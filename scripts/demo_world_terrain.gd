@@ -34,7 +34,7 @@ const FIRE_KINGDOM_TERRAIN := preload("res://scripts/fire_kingdom_terrain.gd")
 const OCEAN_KINGDOM_TERRAIN := preload("res://scripts/ocean_kingdom_terrain.gd")
 
 const X_MIN := -140.0
-const X_MAX := 7090.0
+const X_MAX := 6608.0
 const Z_HALF := 300.0
 ## The valley floor runs VALLEY_HALF_WIDTH either side of the path before its
 ## walls rise, widening to OCEAN_HALF_WIDTH through the water zone's sea.
@@ -56,26 +56,41 @@ const CROSSROADS_HILL_AMPLITUDE := 3.0
 const CROSSROADS_GRASS := Color(0.07451, 0.63922, 0.40392)
 const START_CENTER := Vector2(0.0, 0.0)
 ## The clearing is level out to here: the pit's rim stands on it.
-const START_FLATTEN_RADIUS := 45.0
+const START_FLATTEN_RADIUS := 60.0
 const START_FLATTEN_TRANSITION := 12.0
 ## Normal: the hero wakes on the flat floor of a pit PIT_DEPTH deep, punched
 ## into the clearing. Its wall rises from PIT_FLOOR_RADIUS to PIT_RIM_RADIUS,
-## too steep to walk; the way out is up PIT_LEDGES, rock ledges jutting from
-## the eastern wall: a short one-two-three ladder, each ledge 6 m above the
-## last and stepped only a few metres along the wall, an easy blorb bounce
-## (8x an ordinary jump, about 10.9 m) from the one below. The last leaves a
-## short hop onto the rim.
+## too steep to walk. Only two blorb bounces (8x an ordinary jump, about
+## 10.9 m) are ever needed to climb out, both on the east side: from the
+## floor onto a rock ledge (PIT_FIRST_LEDGE), which sits against a broad
+## shelf in the wall itself, a small hop up; then from the shelf onto a
+## second ledge PIT_SECOND_LEDGE_RISE higher, from which a stair of small
+## rock steps, each an ordinary jump up and jutting from the wall at its own
+## height, climbs to the rim. On that side the wall rises beyond the shelf,
+## from PIT_SHELF_OUTER_RADIUS to PIT_SHELF_RIM_RADIUS.
 const PIT_DEPTH := 24.0
 const PIT_FLOOR_RADIUS := 24.0
 const PIT_RIM_RADIUS := 30.0
-## Each ledge: angle round the pit from east (radians), distance from the
-## pit's centre, and the height of its top above the floor.
-const PIT_LEDGES := [
-	Vector3(-0.26, 22.0, 6.0),
-	Vector3(0.0, 23.0, 12.0),
-	Vector3(0.26, 24.5, 18.0),
-]
+## The shelf: centred due east, PIT_SHELF_HALF_ANGLE either side, rising from
+## the floor's edge to its level between the two inner radii.
+const PIT_SHELF_HALF_ANGLE := 0.8
+const PIT_SHELF_HEIGHT := -17.6
+## (The terrain's grid has a vertex every SPACING metres: the shelf reaches
+## its level by the vertex ring at 25 m so it is flat right out to its edge.)
+const PIT_SHELF_INNER_START := 21.0
+const PIT_SHELF_INNER_END := 24.9
+const PIT_SHELF_OUTER_RADIUS := 38.0
+const PIT_SHELF_RIM_RADIUS := 44.0
+## Ledges: angle round the pit from east (radians), distance from the
+## centre, and the height of the ledge's top.
+const PIT_FIRST_LEDGE := Vector3(-0.26, 22.5, -18.0)
+const PIT_SECOND_LEDGE := Vector3(0.05, 37.0, PIT_SHELF_HEIGHT + 8.5)
 const PIT_LEDGE_HALF_SIZE := Vector3(2.0, 0.6, 2.0)
+## The stair from the second ledge to the rim: each step this much higher
+## than the last and this much further round the wall.
+const PIT_STAIR_RISE := 1.1
+const PIT_STAIR_TURN := 0.075
+const PIT_STAIR_HALF_SIZE := Vector3(1.3, 0.35, 1.3)
 ## A slow, broad swell under the hills outside the clearing, so the ground
 ## between biomes rolls rather than lying flat.
 const SWELL_AMPLITUDE := 4.0
@@ -85,13 +100,13 @@ const SWELL_FREQUENCY := 0.004
 ## clusters (its tree species, undergrowth and pickable meadows) densely
 ## enough to read as woodland, and home to wild shiny blorbs (see
 ## demo_world.gd).
-const FOREST_ZONE := Vector2(95.0, 440.0)
-const FOREST_CLUSTERS := 26
+const FOREST_ZONE := Vector2(75.0, 182.0)
+const FOREST_CLUSTERS := 10
 
 ## Plant: the Primate Kingdom around this point, clear of its village and river.
 const PLANT_SOURCE := Vector2(-150.0, -170.0)
-const PLANT_CENTER := Vector2(620.0, 0.0)
-const PLANT_HALF := Vector2(150.0, 110.0)
+const PLANT_CENTER := Vector2(250.0, 0.0)
+const PLANT_HALF := Vector2(58.0, 110.0)
 
 ## Water and ice share WATER_LEVEL: the terrain reports one water level for
 ## the whole world, and the frozen lake's water lies beneath its ice at that
@@ -113,18 +128,18 @@ const LAKE_SLOPE_WIDTH := 70.0
 const LAKE_SHELF := WATER_LEVEL + 0.35
 const LAKE_FLOOR := LAKE_SHELF - LAKE_DEPTH
 ## One palm island rising from the sea.
-const ISLAND_CENTER := Vector2(1500.0, 70.0)
+const ISLAND_CENTER := Vector2(1018.0, 70.0)
 const ISLAND_RADIUS := 55.0
 const ISLAND_HEIGHT := 7.0
 ## A portal standing on the seabed midway along the sea (see demo_world.gd):
 ## through it a single water blorb waits to take the head slot, wearing the
 ## Nautilus Crown.
-const NAUTILUS_PORTAL_X := 1310.0
+const NAUTILUS_PORTAL_X := 828.0
 
 ## The long frozen lake: from LAKE_SHORE_GAP past the ice portal to the
 ## mountain's foot.
 const ICE_RADIUS := 70.0
-const ICE_EAST_SHORE_X := 2900.0
+const ICE_EAST_SHORE_X := 2418.0
 const ICE_EDGE_VARIATION := 9.0
 const ICE_LAKE_DEPTH := 8.0
 ## The Ice Kingdom's layering: bank shelf, the ice skin 3 cm beneath it (so the
@@ -146,10 +161,10 @@ const SNOW := Color(0.94, 0.96, 0.98)
 ## smooth groomed trough COURSE_HALF_WIDTH wide either side of its weaving
 ## centreline, held in by raised berms, with rougher mogul ground and trees
 ## beyond. The valley's sides rise into a gully so the course stays central.
-const MOUNTAIN_FOOT_X := 2915.0
-const MOUNTAIN_PEAK_WEST_X := 3262.0
-const MOUNTAIN_PEAK_EAST_X := 3300.0
-const MOUNTAIN_END_X := 4630.0
+const MOUNTAIN_FOOT_X := 2433.0
+const MOUNTAIN_PEAK_WEST_X := 2780.0
+const MOUNTAIN_PEAK_EAST_X := 2818.0
+const MOUNTAIN_END_X := 4148.0
 const MOUNTAIN_PEAK_HEIGHT := 220.0
 const MOUNTAIN_GULLY_HEIGHT := 35.0
 const COURSE_HALF_WIDTH := 16.0
@@ -163,22 +178,22 @@ const MOGUL_AMPLITUDE := 5.0
 ## kept inside its border ranges: over terraces, through the town's flat
 ## shelf, across a wash, and side to side over its western halfpipe canyon.
 const DIRT_SOURCE := Vector2(0.0, 150.0)
-const DIRT_START_X := 4665.0
+const DIRT_START_X := 4183.0
 const DIRT_LENGTH := 840.0
 
 ## The course climbs across the ground zone to SKY_HEIGHT, near the clouds
 ## (the Clouds node's layer), holds there to the cliff edge, then plunges to
 ## CHASM_FLOOR. The far wall rises back to 0 at the volcanic lowland.
 const SKY_HEIGHT := 110.0
-const CLIFF_EDGE_X := 5550.0
+const CLIFF_EDGE_X := 5068.0
 const CHASM_FLOOR := -60.0
-const CHASM_FAR_WALL_X := 6230.0
+const CHASM_FAR_WALL_X := 5748.0
 const CLIFF_FACE_WIDTH := 25.0
 
 ## Fire: a full-size Fire Kingdom volcano, its lava-filled mouth centred in a
 ## window of that kingdom's volcanic lowland.
 const VOLCANO_SOURCE_POOL := Vector2(-190.0, -145.0)
-const VOLCANO_CENTER := Vector2(6652.0, 0.0)
+const VOLCANO_CENTER := Vector2(6170.0, 0.0)
 const VOLCANO_HALF_LENGTH := 360.0
 
 const STONE := Color(0.52, 0.5, 0.47)
@@ -190,18 +205,20 @@ const CLIFF_ROCK := Color(0.42, 0.4, 0.38)
 ## of Normal blorbs (element ""); "shiny" is a set of shiny Normal blorbs.
 ## Every gate stands on the path (z = 0) on a level strip as wide as its
 ## portal. A "pad" sets that strip's height; otherwise it follows the course
-## (see _base_level()). The lake gates stand down at the beach, so the water
+## (see _base_level()). A "portal_scale" enlarges that gate's portals (and
+## its strip) by that factor in width and height. The lake gates stand down at the beach, so the water
 ## begins just past the portal; the ice gate's strip sits at the frozen lake's
 ## bank level, just above the ice sheet tucked beneath it.
 const BORDERS := [
-	{"x": 48.0, "west": "", "east": "shiny"},
-	{"x": 460.0, "west": "shiny", "east": "plant"},
-	{"x": 790.0, "west": "plant", "east": "water", "pad": LAKE_SHELF},
-	{"x": 1835.0, "west": "water", "east": "ice", "pad": ICE_LEVEL},
-	{"x": 3280.0, "west": "ice", "east": "snow"},
-	{"x": 4655.0, "west": "snow", "east": "ground"},
-	{"x": 5520.0, "west": "ground", "east": "air"},
-	{"x": 6275.0, "west": "air", "east": "fire"},
+	{"x": 62.0, "west": "", "east": "shiny"},
+	{"x": 192.0, "west": "shiny", "east": "plant"},
+	{"x": 308.0, "west": "plant", "east": "water", "pad": LAKE_SHELF},
+	{"x": 1353.0, "west": "water", "east": "ice", "pad": ICE_LEVEL},
+	{"x": 2798.0, "west": "ice", "east": "snow"},
+	{"x": 4173.0, "west": "snow", "east": "ground"},
+	# The air gate is reached flat out on a dirt bike: three times the size.
+	{"x": 5038.0, "west": "ground", "east": "air", "portal_scale": 3.0},
+	{"x": 5793.0, "west": "air", "east": "fire"},
 ]
 ## Ice brings the Penguin Helm, Snow the Toboggan, Air the Bird Helm.
 const HEAD_ITEMS := {
@@ -445,9 +462,35 @@ func _base_level(x: float) -> float:
 	return _course_elevation(x) + _mountain_profile(x)
 
 
-## 1 inside the pit, falling to 0 up its wall.
-func _pit_weight(point: Vector2) -> float:
-	return 1.0 - smoothstep(PIT_FLOOR_RADIUS, PIT_RIM_RADIUS, point.distance_to(START_CENTER))
+## The pit's own ground height at `point` (0 on and beyond its rim): the
+## floor, the steep wall, and on the east side the shelf and its higher wall.
+func _pit_height(point: Vector2) -> float:
+	var offset := point - START_CENTER
+	var distance := offset.length()
+	var plain := -PIT_DEPTH * (1.0 - smoothstep(PIT_FLOOR_RADIUS, PIT_RIM_RADIUS, distance))
+	var shelf_side := 1.0 - smoothstep(PIT_SHELF_HALF_ANGLE - 0.25, PIT_SHELF_HALF_ANGLE, absf(atan2(offset.y, offset.x)))
+	if shelf_side <= 0.0:
+		return plain
+	var shelved := (
+		-PIT_DEPTH
+		+ (PIT_SHELF_HEIGHT + PIT_DEPTH) * smoothstep(PIT_SHELF_INNER_START, PIT_SHELF_INNER_END, distance)
+		- PIT_SHELF_HEIGHT * smoothstep(PIT_SHELF_OUTER_RADIUS, PIT_SHELF_RIM_RADIUS, distance)
+	)
+	return lerpf(plain, shelved, shelf_side)
+
+
+## The radius on the shelf side where the pit's wall stands `height` high:
+## where a stair step at that height meets the wall.
+func _pit_wall_radius_at(height: float) -> float:
+	var low := PIT_SHELF_OUTER_RADIUS
+	var high := PIT_SHELF_RIM_RADIUS
+	for step in 24:
+		var middle := (low + high) * 0.5
+		if _pit_height(START_CENTER + Vector2(middle, 0.0)) < height:
+			low = middle
+		else:
+			high = middle
+	return (low + high) * 0.5
 
 
 func _raw_height(x: float, z: float) -> float:
@@ -481,14 +524,16 @@ func _raw_height(x: float, z: float) -> float:
 		height = maxf(height, lerpf(height, WATER_LEVEL + ISLAND_HEIGHT, island))
 	height += _course_elevation(x)
 	# The starting pit, punched down to a flat floor.
-	height = lerpf(height, -PIT_DEPTH, _pit_weight(point))
+	if start_distance < PIT_SHELF_RIM_RADIUS + 1.0:
+		height = minf(height, _pit_height(point))
 	# Each gate's level strip, as wide as its portal.
 	for border in BORDERS:
 		var gate_x: float = border["x"]
 		var along := 1.0 - smoothstep(PORTAL_PAD_HALF_DEPTH, PORTAL_PAD_HALF_DEPTH + PORTAL_PAD_BLEND, absf(x - gate_x))
 		if along <= 0.0:
 			continue
-		var across := 1.0 - smoothstep(PORTAL_HALF_WIDTH + 3.0, PORTAL_HALF_WIDTH + 3.0 + PORTAL_PAD_BLEND, absf(z))
+		var gate_half_width := PORTAL_HALF_WIDTH * float(border.get("portal_scale", 1.0))
+		var across := 1.0 - smoothstep(gate_half_width + 3.0, gate_half_width + 3.0 + PORTAL_PAD_BLEND, absf(z))
 		height = lerpf(height, float(border.get("pad", _base_level(gate_x))), along * across)
 	# Valley walls along both sides and at both ends.
 	var half_width := _valley_half_width(x)
@@ -518,10 +563,12 @@ func _height_color(x: float, z: float, height: float) -> Color:
 	var snow := _snow_weight(point)
 	if snow > 0.0:
 		color = color.lerp(SNOW, snow)
-	# The pit's wall is bare rock.
-	var pit := _pit_weight(point)
-	if pit > 0.02 and pit < 0.98:
-		color = color.lerp(CLIFF_ROCK, 1.0 - absf(pit - 0.5) * 1.6)
+	# The pit's walls are bare rock; its floor and shelf stay grass.
+	if point.distance_to(START_CENTER) < PIT_SHELF_RIM_RADIUS + 1.0:
+		var pit := _pit_height(point)
+		var on_level := pit <= -PIT_DEPTH + 0.3 or absf(pit - PIT_SHELF_HEIGHT) < 0.3 or pit >= -0.2
+		if not on_level:
+			color = color.lerp(CLIFF_ROCK, 0.85)
 	# The sea, in the Ocean Kingdom's colours: sandy beaches and island
 	# shores, shallow and deep seabed by depth, island grass above the sand.
 	var beach := 1.0 - smoothstep(LAKE_RADIUS + NaturalLake.BANK_WIDTH - 4.0, LAKE_RADIUS + NaturalLake.BANK_WIDTH + 8.0, _water_lake.local_distance(point))
@@ -787,24 +834,38 @@ func _scatter_scenery() -> void:
 	_scatter_volcanic_rocks()
 
 
-## Rock ledges up the pit's eastern wall (PIT_LEDGES): each a flat-topped
-## stone block standing out from the wall, solid and meant to be landed on.
+## The pit's two ledges and its stair (see PIT_DEPTH): flat-topped stone
+## blocks standing out from the wall, solid and meant to be landed on.
 func _build_pit_ledges() -> void:
-	var floor_height := -PIT_DEPTH
-	for index in PIT_LEDGES.size():
-		var ledge: Vector3 = PIT_LEDGES[index]
-		var body := StaticBody3D.new()
-		body.name = "PitLedge%d" % index
-		body.collision_layer = 1
-		body.collision_mask = 0
-		var at := START_CENTER + Vector2.from_angle(ledge.x) * ledge.y
-		body.position = Vector3(at.x, floor_height + ledge.z - PIT_LEDGE_HALF_SIZE.y, at.y)
-		body.rotation.y = -ledge.x
-		var block := SuperEgg.build_part(PIT_LEDGE_HALF_SIZE, CLIFF_ROCK.lightened(0.08), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
-		block.name = "Rock"
-		body.add_child(block)
-		CollisionPolicy.add_box(body, block, PIT_LEDGE_HALF_SIZE * 2.0)
-		add_child(body)
+	_add_pit_block("PitLedge0", PIT_FIRST_LEDGE, PIT_LEDGE_HALF_SIZE)
+	_add_pit_block("PitLedge1", PIT_SECOND_LEDGE, PIT_LEDGE_HALF_SIZE)
+	var top := PIT_SECOND_LEDGE.z + PIT_STAIR_RISE
+	var angle := PIT_SECOND_LEDGE.x
+	var index := 0
+	while top < -0.1:
+		angle += PIT_STAIR_TURN
+		# Juts from the wall where the wall stands just below the step's top.
+		var radius := _pit_wall_radius_at(top - 0.4) - PIT_STAIR_HALF_SIZE.x * 0.6
+		_add_pit_block("PitStair%d" % index, Vector3(angle, radius, top), PIT_STAIR_HALF_SIZE)
+		top += PIT_STAIR_RISE
+		index += 1
+
+
+## One pit block: `spec` is (angle from east, distance from the pit's centre,
+## height of its top).
+func _add_pit_block(block_name: String, spec: Vector3, half_size: Vector3) -> void:
+	var body := StaticBody3D.new()
+	body.name = block_name
+	body.collision_layer = 1
+	body.collision_mask = 0
+	var at := START_CENTER + Vector2.from_angle(spec.x) * spec.y
+	body.position = Vector3(at.x, spec.z - half_size.y, at.y)
+	body.rotation.y = -spec.x
+	var block := SuperEgg.build_part(half_size, CLIFF_ROCK.lightened(0.08), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
+	block.name = "Rock"
+	body.add_child(block)
+	CollisionPolicy.add_box(body, block, half_size * 2.0)
+	add_child(body)
 
 
 func _place(node: Node3D, x: float, z: float) -> void:

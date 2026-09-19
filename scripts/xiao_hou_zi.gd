@@ -679,7 +679,7 @@ func prepare_direct_control_environment(delta: float) -> void:
 		_direct_liquid_level = terrain.get_lake_water_level()
 		var depth := _direct_liquid_level - _direct_floor_height
 		if depth >= Player.LAKE_MIN_SWIMMABLE_DEPTH and global_position.y <= _direct_liquid_level:
-			if _blorb_suit.has_head_diving_helmet():
+			if _blorb_suit.has_head_air_supply():
 				_direct_diving = true
 			else:
 				_direct_surface_swimming = true

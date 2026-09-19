@@ -102,6 +102,9 @@ var _form_command_was_active := false
 ## Penguin Helm forms it only while this is on (toggle_penguin_form()). It
 ## drops back off whenever the full suit breaks up.
 var _penguin_form_enabled := false
+## Set every frame by the wearer (set_mermaid_swimming()): whether it is
+## swimming, the only time the mermaid tail forms.
+var _mermaid_swimming := false
 var _story_suspended: bool = false
 
 
@@ -463,6 +466,32 @@ func has_head_blorb() -> bool:
 		if slot == "head":
 			return true
 	return false
+
+
+## A head helm that lets its wearer breathe underwater: the Diving Helmet or
+## the Nautilus Crown.
+func has_head_air_supply() -> bool:
+	var head := worn_blorb_in_slot("head")
+	return is_instance_valid(head) and (head.has_core_item("Diving Helmet") or head.has_core_item("Nautilus Crown"))
+
+
+## The Nautilus Crown on the head over two Water leg blorbs: the suit that
+## merges the legs into a mermaid tail while swimming.
+func has_mermaid_tail_suit() -> bool:
+	var head := worn_blorb_in_slot("head")
+	return (
+		is_instance_valid(head) and head.has_core_item("Nautilus Crown")
+		and has_worn_element("leg_left", "water") and has_worn_element("leg_right", "water")
+	)
+
+
+func set_mermaid_swimming(swimming: bool) -> void:
+	_mermaid_swimming = swimming
+
+
+## The legs are one mermaid tail right now.
+func mermaid_tail_active() -> bool:
+	return _mermaid_swimming and has_mermaid_tail_suit()
 
 
 func has_head_diving_helmet() -> bool:
@@ -935,7 +964,7 @@ func _update_worn_limbs(form_command: bool) -> void:
 			continue
 		var mesh_instance := pieces[0] as MeshInstance3D
 		var blorb := entry["blorb"] as Blorb
-		BlorbSuit.rebuild_slot(mesh_instance, slot, _pivots, _root, blorb, _rig_scale, form_command)
+		BlorbSuit.rebuild_slot(mesh_instance, slot, _pivots, _root, blorb, _rig_scale, form_command, mermaid_tail_active())
 
 
 ## Stamps each worn entry's OWN blink clock's current openness onto that

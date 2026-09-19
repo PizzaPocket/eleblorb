@@ -36,6 +36,7 @@ const BREATH_DAMAGE_INTERVAL := 1.1
 const BREATH_DAMAGE_AMOUNT := 4.0
 var breath: float = MAX_BREATH
 var _breath_damage_timer := 0.0
+var _last_emitted_breath_full := true
 var _last_emitted_breath_int := -1
 
 @export var move_speed: float = 6.0
@@ -921,6 +922,17 @@ const FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER := 1.35
 ## foot multiplies swim speed by this (compounding, as Fire feet do in flight),
 ## and with the stick released they drive the swimmer straight ahead.
 const SWIM_JET_SPEED_MULTIPLIER := FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER
+## The mermaid tail (Nautilus Crown over two Water leg blorbs, swimming):
+## far faster swimming, and sprint and Water jets still stack on top.
+const MERMAID_SWIM_SPEED_MULTIPLIER := 3.0
+## The tail's pose: legs drawn in so the ankles meet, toes pointed hard back
+## in line with the shins, and a dolphin kick with both legs in unison.
+const MERMAID_LEG_ADDUCT := deg_to_rad(7.5)
+const MERMAID_ANKLE_POINT := deg_to_rad(72.0)
+const MERMAID_KICK_SPEED := 10.0
+const MERMAID_KICK_HIP_AMOUNT := deg_to_rad(15.0)
+const MERMAID_KICK_KNEE_AMOUNT := deg_to_rad(28.0)
+const MERMAID_KICK_ANKLE_AMOUNT := deg_to_rad(8.0)
 const AERIAL_FAST_SPEED_MULTIPLIER := 1.8
 ## Flying sprint is intentionally twice its previous fast-flight rate;
 ## swimming retains AERIAL_FAST_SPEED_MULTIPLIER unchanged.
@@ -1208,6 +1220,8 @@ var _standing_collision_transform := Transform3D.IDENTITY
 ## contact) add this so they meet the body's real underside, not the origin.
 var _body_bottom_height := 0.0
 var _swim_kick_phase := 0.0
+## The mermaid tail has drawn the legs together (see _release_mermaid_legs()).
+var _mermaid_legs_drawn_in := false
 ## True only for a jump that began while standing on the giant's upper mesh.
 ## It is deliberately distinct from merely being inside the goo at ground
 ## level, which must never teleport a normal jump to the surface.
@@ -2101,6 +2115,9 @@ func _physics_process(delta: float) -> void:
 		current_speed *= pow(SWIM_JET_SPEED_MULTIPLIER, swim_jets)
 	if _penguin_waddling():
 		current_speed *= PENGUIN_WADDLE_SPEED_MULTIPLIER
+	if _blorb_suit.mermaid_tail_active():
+		# Sprint already speeds up swimming (surface and dive alike).
+		current_speed *= MERMAID_SWIM_SPEED_MULTIPLIER
 	# Leg Speed replaces the old fixed skate multiplier. High-Speed legs reach
 	# and surpass that former very-fast reference through progression itself.
 	var sliding_on_ice := grounded and _is_supported_by_ice() and not _snowboard_active and not _ice_skating_active
@@ -4019,6 +4036,7 @@ func _update_suit_input(delta: float) -> void:
 	# Do this after update(): a head blorb can complete its equip hop during
 	# that call and must immediately receive the correct form as well.
 	_blorb_suit.set_head_blorb_submerged(_lake_buoyancy_active or _giant_goo_active)
+	_blorb_suit.set_mermaid_swimming(_is_swimming())
 	_portrait.update()
 
 
@@ -4351,13 +4369,16 @@ func _apply_ice_skate_pose(delta: float) -> void:
 		# a fading skating target over those freshly restored rotations: the
 		# old path did exactly that until an arbitrarily tiny blend, then
 		# returned and could strand a residual forward lean indefinitely.
+		var rest_t:=minf(ICE_SKATE_POSE_SETTLE_SPEED*delta,1.0)
 		if _ice_skating_active:
 			# While stopped but still on ice, ordinary gait is intentionally
 			# suppressed, so this layer itself must settle its torso to neutral.
-			var rest_t:=minf(ICE_SKATE_POSE_SETTLE_SPEED*delta,1.0)
 			_spine.rotation.x=lerp_angle(_spine.rotation.x,0.0,rest_t)
-			if _thorax!=null:
-				_thorax.rotation.x=lerp_angle(_thorax.rotation.x,0.0,rest_t)
+		# Only this layer ever leans the thorax, so it must straighten it on
+		# every way out of skating (leaving the ice at speed, the runners
+		# withdrawing), not just a stop on ice; otherwise the lean stayed on.
+		if _thorax!=null:
+			_thorax.rotation.x=lerp_angle(_thorax.rotation.x,0.0,rest_t)
 		return
 	# Preserve the feet's physical contact while the deeper sprint flexion
 	# lowers the body through the hip and knee chain.
@@ -6030,6 +6051,12 @@ func _animate_penguin_waddle(delta: float) -> void:
 	_knee_right.rotation = _knee_right.rotation.lerp(Vector3(right_lift * PENGUIN_WADDLE_KNEE, 0.0, 0.0), t)
 	_ankle_left.rotation = _ankle_left.rotation.lerp(Vector3.ZERO, t)
 	_ankle_right.rotation = _ankle_right.rotation.lerp(Vector3.ZERO, t)
+	# A penguin waddles upright: no walking or skating lean.
+	_spine.rotation.x = lerp_angle(_spine.rotation.x, 0.0, t)
+	_spine.position.y = lerp(_spine.position.y, _spine_rest_y, t)
+	_hips.position.y = lerp(_hips.position.y, _hips_rest_y, t)
+	if _thorax != null:
+		_thorax.rotation.x = lerp_angle(_thorax.rotation.x, 0.0, t)
 	var arm_t := minf(t, _arm_power_recovery)
 	_arm_left.rotation.x = lerp_angle(_arm_left.rotation.x, 0.0, arm_t)
 	_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, 0.0, arm_t)
@@ -6118,6 +6145,8 @@ func _animate_walk(
 	delta: float, grounded: bool, traversal_speed_multiplier: float = 1.0,
 	animation_speed_override: float = -1.0
 ) -> void:
+	if not _blorb_suit.mermaid_tail_active():
+		_release_mermaid_legs(minf(POSE_SETTLE_SPEED * delta, 1.0))
 	# Ice skating owns every locomotion joint and the body-height offsets in
 	# its dedicated final pose layer. Letting the ordinary zero-speed gait
 	# settle those same joints toward standing first made the two animators
@@ -6499,8 +6528,14 @@ func _animate_relaxed_floating(delta: float) -> void:
 ## player is actually moving through water. This covers the surface and
 ## helmet-enabled diving states identically.
 func _animate_swimming(delta: float) -> void:
-	_animate_relaxed_floating(delta)
 	var t := JUMP_POSE_SETTLE_SPEED * delta
+	# The tail owns the whole pose: layering it over the relaxed float left
+	# the two easing toward different targets and settling halfway.
+	if _blorb_suit.mermaid_tail_active():
+		_animate_mermaid_swimming(delta, t)
+		return
+	_animate_relaxed_floating(delta)
+	_release_mermaid_legs(t)
 	# Override the descent pose's mild toe-point with the persistent relaxed
 	# flipper angle requested for all water states, including motionless
 	# surface floating and idle diving.
@@ -6532,6 +6567,51 @@ func _animate_swimming(delta: float) -> void:
 	_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, arm_back, t)
 	_elbow_left.rotation.x = lerp_angle(_elbow_left.rotation.x, -elbow_bend, t)
 	_elbow_right.rotation.x = lerp_angle(_elbow_right.rotation.x, -elbow_bend, t)
+
+
+## Swimming with the mermaid tail: legs held together inside it, ankles
+## meeting and toes pointed back, kicking both at once like a dolphin: the
+## hips drive, the knees fold on the upbeat, the feet whip with the fluke.
+## The kick quickens with speed. The arms keep the ordinary streamlined swim.
+func _animate_mermaid_swimming(delta: float, t: float) -> void:
+	_mermaid_legs_drawn_in = true
+	for leg in [_leg_left, _leg_right]:
+		var pivot := leg as Node3D
+		pivot.rotation.z = lerp_angle(pivot.rotation.z, -signf(pivot.position.x) * MERMAID_LEG_ADDUCT, t)
+	var swim_speed := velocity.length()
+	var speed_fraction := clampf(swim_speed / maxf(move_speed * MERMAID_SWIM_SPEED_MULTIPLIER, LAKE_DIVE_SPEED), 0.0, 1.0)
+	var wave := 0.0
+	if swim_speed > 0.1:
+		_swim_kick_phase += delta * MERMAID_KICK_SPEED * lerpf(0.5, 1.6, speed_fraction)
+		wave = sin(_swim_kick_phase)
+	var hip := -DESCENT_HIP_BEND * 0.4 + wave * MERMAID_KICK_HIP_AMOUNT
+	var knee := maxf(0.0, -wave) * MERMAID_KICK_KNEE_AMOUNT
+	var ankle := MERMAID_ANKLE_POINT + wave * MERMAID_KICK_ANKLE_AMOUNT
+	for pair in [[_leg_left, _knee_left, _ankle_left], [_leg_right, _knee_right, _ankle_right]]:
+		(pair[0] as Node3D).rotation.x = lerp_angle((pair[0] as Node3D).rotation.x, hip, t)
+		(pair[1] as Node3D).rotation.x = lerp_angle((pair[1] as Node3D).rotation.x, knee, t)
+		(pair[2] as Node3D).rotation.x = lerp_angle((pair[2] as Node3D).rotation.x, ankle, t)
+	var arm_back := SWIM_FAST_ARM_BACK_SWING * speed_fraction
+	var elbow_bend := SWIM_FAST_ELBOW_BEND * speed_fraction
+	_arm_left.rotation.x = lerp_angle(_arm_left.rotation.x, arm_back, t)
+	_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, arm_back, t)
+	_arm_left.rotation.z = lerp_angle(_arm_left.rotation.z, ProceduralFigure.ARM_OUTWARD_ANGLE, t)
+	_arm_right.rotation.z = lerp_angle(_arm_right.rotation.z, -ProceduralFigure.ARM_OUTWARD_ANGLE, t)
+	_elbow_left.rotation.x = lerp_angle(_elbow_left.rotation.x, -elbow_bend, t)
+	_elbow_right.rotation.x = lerp_angle(_elbow_right.rotation.x, -elbow_bend, t)
+	_spine.rotation.x = lerp_angle(_spine.rotation.x, 0.0, t)
+	_spine.position.y = lerp(_spine.position.y, _spine_rest_y, t)
+
+
+## Eases the legs back apart after the mermaid tail, which is the only pose
+## that draws them in: nothing else resets that sideways angle on its own.
+func _release_mermaid_legs(t: float) -> void:
+	if not _mermaid_legs_drawn_in:
+		return
+	_leg_left.rotation.z = lerp_angle(_leg_left.rotation.z, 0.0, t)
+	_leg_right.rotation.z = lerp_angle(_leg_right.rotation.z, 0.0, t)
+	if absf(_leg_left.rotation.z) < 0.002 and absf(_leg_right.rotation.z) < 0.002:
+		_mermaid_legs_drawn_in = false
 
 
 func _apply_airborne_pose(delta: float, apex_fraction: float) -> void:
@@ -6894,7 +6974,7 @@ const MAX_TERRAIN_FOLLOW_HEIGHT := 3.0
 ## falls out naturally here -- _update_breath() below only ever looks at
 ## this function's CURRENT return value, never a cached one.
 func _has_air_supply() -> bool:
-	return _blorb_suit.has_head_diving_helmet()
+	return _blorb_suit.has_head_air_supply()
 
 
 ## Set every frame at the top of _update_lake_buoyancy(), before breath's own
@@ -6940,8 +7020,13 @@ func _update_breath(delta: float) -> void:
 	else:
 		breath = minf(breath + BREATH_REFILL_RATE * delta, MAX_BREATH)
 	var rounded := roundi(breath)
-	if rounded != _last_emitted_breath_int:
+	# Also report the moment breath is exactly full again: the rounded value
+	# already reads full half a second early, so without this the HUD never
+	# learned breath had finished refilling and kept the meter on screen.
+	var full := breath >= MAX_BREATH
+	if rounded != _last_emitted_breath_int or full != _last_emitted_breath_full:
 		_last_emitted_breath_int = rounded
+		_last_emitted_breath_full = full
 		breath_changed.emit(breath, MAX_BREATH)
 	if needs_air and breath <= 0.0:
 		_breath_damage_timer -= delta
