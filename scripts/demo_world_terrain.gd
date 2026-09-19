@@ -62,11 +62,12 @@ const START_FLATTEN_TRANSITION := 12.0
 ## into the clearing. Its wall rises from PIT_FLOOR_RADIUS to PIT_RIM_RADIUS,
 ## too steep to walk. Only two blorb bounces (8x an ordinary jump, about
 ## 10.9 m) are ever needed to climb out, both on the east side: from the
-## floor onto a rock ledge (PIT_FIRST_LEDGE), which sits against a broad
-## shelf in the wall itself, a small hop up; then from the shelf onto a
-## second ledge PIT_SECOND_LEDGE_RISE higher, from which a stair of small
-## rock steps, each an ordinary jump up and jutting from the wall at its own
-## height, climbs to the rim. On that side the wall rises beyond the shelf,
+## floor onto a rock ledge (PIT_FIRST_LEDGE), then up two small hop
+## platforms (PIT_HOP_PLATFORMS) onto a broad shelf in the wall itself, set
+## high enough above the floor that its edge is too steep to walk; then from
+## the shelf onto a second ledge, from which a stair of small rock steps,
+## each an ordinary jump up and jutting from the wall at its own height,
+## climbs to the rim. On that side the wall rises beyond the shelf,
 ## from PIT_SHELF_OUTER_RADIUS to PIT_SHELF_RIM_RADIUS.
 const PIT_DEPTH := 24.0
 const PIT_FLOOR_RADIUS := 24.0
@@ -74,7 +75,7 @@ const PIT_RIM_RADIUS := 30.0
 ## The shelf: centred due east, PIT_SHELF_HALF_ANGLE either side, rising from
 ## the floor's edge to its level between the two inner radii.
 const PIT_SHELF_HALF_ANGLE := 0.8
-const PIT_SHELF_HEIGHT := -17.6
+const PIT_SHELF_HEIGHT := -15.0
 ## (The terrain's grid has a vertex every SPACING metres: the shelf reaches
 ## its level by the vertex ring at 25 m so it is flat right out to its edge.)
 const PIT_SHELF_INNER_START := 21.0
@@ -84,7 +85,13 @@ const PIT_SHELF_RIM_RADIUS := 44.0
 ## Ledges: angle round the pit from east (radians), distance from the
 ## centre, and the height of the ledge's top. The first sits right against
 ## the shelf's edge, a small hop below it.
-const PIT_FIRST_LEDGE := Vector3(-0.26, 23.0, -18.0)
+const PIT_FIRST_LEDGE := Vector3(-0.36, 20.0, -18.0)
+## Hop-height steps from the first ledge up to the shelf (same spec as the
+## ledges); the last leaves a small hop onto the shelf's edge.
+const PIT_HOP_PLATFORMS := [
+	Vector3(-0.21, 21.5, -16.9),
+	Vector3(-0.08, 23.0, -15.8),
+]
 const PIT_SECOND_LEDGE := Vector3(0.05, 37.0, PIT_SHELF_HEIGHT + 8.5)
 const PIT_LEDGE_HALF_SIZE := Vector3(2.0, 0.6, 2.0)
 ## The stair from the second ledge to the rim: each step this much higher
@@ -839,6 +846,8 @@ func _scatter_scenery() -> void:
 ## blocks standing out from the wall, solid and meant to be landed on.
 func _build_pit_ledges() -> void:
 	_add_pit_block("PitLedge0", PIT_FIRST_LEDGE, PIT_LEDGE_HALF_SIZE)
+	for index in PIT_HOP_PLATFORMS.size():
+		_add_pit_block("PitHop%d" % index, PIT_HOP_PLATFORMS[index], PIT_STAIR_HALF_SIZE)
 	_add_pit_block("PitLedge1", PIT_SECOND_LEDGE, PIT_LEDGE_HALF_SIZE)
 	var top := PIT_SECOND_LEDGE.z + PIT_STAIR_RISE
 	var angle := PIT_SECOND_LEDGE.x
