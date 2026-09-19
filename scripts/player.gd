@@ -309,6 +309,19 @@ const PENGUIN_STAND_HOP_HEIGHT := 0.35
 const PENGUIN_CHORD_WINDOW := 0.2
 ## On foot the formed Penguin Suit waddles: slow, in short quick steps, the
 ## whole body leaning over whichever foot is planted.
+## Crystal Skates (a pair of Ice leg blorbs each bound with them): moving
+## lays a crystal ice track ahead (CrystalTrack) that the skater rides like a
+## rail, steered in three dimensions by the camera and stick as the Air feet
+## are. The track's heading bends toward the wanted direction at most
+## CRYSTAL_TURN_RATE and climbs or dives at most CRYSTAL_MAX_PITCH, so the
+## ribbon stays smooth. Stopped, pushing off more than CRYSTAL_RESTART_ANGLE
+## away from the track restarts it from where the skater stands.
+const CRYSTAL_SPEED_MULTIPLIER := 2.0
+const CRYSTAL_ACCELERATION := 9.0
+const CRYSTAL_COAST_FRICTION := 1.2
+const CRYSTAL_TURN_RATE := 1.8
+const CRYSTAL_MAX_PITCH := deg_to_rad(60.0)
+const CRYSTAL_RESTART_ANGLE := deg_to_rad(45.0)
 const PENGUIN_WADDLE_SPEED_MULTIPLIER := 0.32
 ## On ice the waddle is only a weak push: gliding momentum (from skating, a
 ## slide or a run-up) carries on, bleeding away slowly, and the feet can add
@@ -1180,6 +1193,15 @@ var _ice_skate_right: Node3D = null
 var _ice_skate_was_supported := false
 var _ice_skate_airborne := false
 var _ice_skate_surface_velocity := Vector3.ZERO
+## Crystal riding: the track being ridden, whether the skater is on it, their
+## speed along it, the heading its leading end is being laid in, and a jump
+## or fall off it keeping its momentum until landing.
+var _crystal_track: CrystalTrack = null
+var _crystal_riding := false
+var _crystal_speed := 0.0
+var _crystal_heading := Vector3.FORWARD
+var _crystal_airborne := false
+var _ice_skate_blades_crystal := false
 ## Penguin Suit dive (airborne, ballistic) and belly slide (grounded on ice).
 var _penguin_dive_airborne := false
 var _penguin_belly_sliding := false
@@ -1902,6 +1924,8 @@ func _physics_process(delta: float) -> void:
 	_update_ice_skate_state()
 	_update_limb_power_state(delta)
 	_update_suit_flight_transition()
+	if _update_crystal_riding(delta, jump_pressed):
+		return
 	var powered_hover := _is_powered_hover_active()
 	var suit_flight := _is_suit_flight_active()
 	var buoyant := _giant_goo_active or (_lake_buoyancy_active and not _lake_floor_walk_active) or suit_flight or powered_hover
@@ -2012,7 +2036,7 @@ func _physics_process(delta: float) -> void:
 	var jumped_this_frame := false
 
 	if not grounded and not buoyant:
-		if (_dirtbike_wheel_active or _snowboard_active or _ice_skate_airborne or _penguin_dive_airborne) and _jumping:
+		if (_dirtbike_wheel_active or _snowboard_active or _ice_skate_airborne or _penguin_dive_airborne or _crystal_airborne) and _jumping:
 			velocity=HumanoidLocomotion.ballistic_step(
 				velocity,delta,_playable_profile,TERMINAL_FALL_SPEED
 			)
@@ -2081,6 +2105,8 @@ func _physics_process(delta: float) -> void:
 	# The penguin's dive keeps its launch like a skate jump, and its belly
 	# slide owns the planar velocity (_penguin_belly_slide_step()).
 	var penguin_owns_velocity:=(_penguin_dive_airborne and (not grounded or jumped_this_frame) and not buoyant) or (_penguin_belly_sliding and grounded)
+	# Leaving the crystal track keeps its momentum in the air, like a skate jump.
+	penguin_owns_velocity = penguin_owns_velocity or (_crystal_airborne and not grounded and not buoyant)
 
 	var skating := _is_blorb_skating() and not _ice_skates_active
 	var skate_speed_multiplier := worn_leg_speed_multiplier() if skating else 1.0
@@ -7368,6 +7394,121 @@ func _update_snowboard_state() -> void:
 		_snowboard=null
 
 
+## Crystal riding, run before the ordinary movement each frame: starts a ride
+## when the skates are on and a direction is given while standing on
+## anything, and while riding owns the whole frame (returns true). A jump
+## leaves the track and hands back to ordinary (ballistic) movement.
+func _update_crystal_riding(delta: float, jump_pressed: bool) -> bool:
+	if _crystal_riding and not _can_crystal_ride():
+		_end_crystal_ride(false)
+	if not _crystal_riding:
+		if _crystal_airborne and not _jumping and (is_on_floor() or _is_near_ground()):
+			_crystal_airborne = false
+		var wanted := _crystal_wanted_direction()
+		var standing := (is_on_floor() or _is_near_ground()) and not _jumping and velocity.y <= 0.1
+		if not (_can_crystal_ride() and standing and wanted != Vector3.ZERO):
+			return false
+		_begin_crystal_ride(wanted)
+	if jump_pressed and not UIState.modal_open:
+		_end_crystal_ride(true)
+		return false
+	var wanted := _crystal_wanted_direction()
+	if wanted != Vector3.ZERO:
+		var turn := _crystal_heading.angle_to(wanted)
+		if _crystal_speed < 1.0 and turn > CRYSTAL_RESTART_ANGLE:
+			_crystal_track.truncate_ahead()
+			_crystal_heading = wanted
+		elif turn > 0.0001:
+			_crystal_heading = _crystal_heading.slerp(wanted, minf(CRYSTAL_TURN_RATE * delta / turn, 1.0)).normalized()
+		var top_speed := HumanoidLocomotion.ground_speed(_playable_profile, _is_sprinting()) * CRYSTAL_SPEED_MULTIPLIER
+		_crystal_speed = move_toward(_crystal_speed, top_speed, CRYSTAL_ACCELERATION * delta)
+	else:
+		_crystal_speed = move_toward(_crystal_speed, 0.0, CRYSTAL_COAST_FRICTION * delta)
+	if _crystal_track.is_blocked() and _crystal_heading.angle_to(_crystal_track.lead_direction()) > 0.3:
+		_crystal_track.clear_block()
+	var skater_rids: Array[RID] = [get_rid()]
+	_crystal_track.extend(_crystal_heading, terrain, get_world_3d().direct_space_state, skater_rids)
+	if _crystal_track.advance(_crystal_speed * delta) > 0.0:
+		_crystal_speed = 0.0
+	global_position = _crystal_track.rider_point() + Vector3.UP * FOOT_OFFSET
+	var tangent := _crystal_track.rider_tangent()
+	velocity = tangent * _crystal_speed
+	if Vector2(tangent.x, tangent.z).length_squared() > 0.01:
+		_body_yaw = lerp_angle(_body_yaw, atan2(tangent.x, tangent.z), minf(rotation_speed * delta, 1.0))
+	_jumping = false
+	# A skating glide over the ordinary standing pose.
+	_animate_walk(delta, true, 1.0, 0.0)
+	var was_skating := _ice_skating_active
+	_ice_skating_active = _crystal_speed > 0.12
+	_apply_ice_skate_pose(delta)
+	_ice_skating_active = was_skating
+	UISounds.pulse_ice_skates(get_instance_id(), _crystal_speed, 0.0, 1.0, 1.0)
+	_compose_body_pose(delta, true, false, false)
+	_update_water_streams(delta)
+	_prev_grounded = true
+	return true
+
+
+func _can_crystal_ride() -> bool:
+	return (
+		_blorb_suit.has_crystal_skates()
+		and not _lake_buoyancy_active and not _giant_goo_active
+		and not _is_suit_flight_active() and not _is_powered_hover_active()
+		and not _dirtbike_wheel_active and not _snowboard_active
+	)
+
+
+## The direction the skater asks for: the stick in the camera's full frame
+## (as the Air feet steer), its climb or dive limited to CRYSTAL_MAX_PITCH.
+## Zero with the stick at rest.
+func _crystal_wanted_direction() -> Vector3:
+	var stick := _get_move_input()
+	if stick.length_squared() < 0.04:
+		return Vector3.ZERO
+	var view := camera.global_transform.basis
+	var direction := view.x * stick.x + view.z * stick.y
+	if direction.length_squared() < 0.0001:
+		return Vector3.ZERO
+	direction = direction.normalized()
+	var pitch := clampf(asin(clampf(direction.y, -1.0, 1.0)), -CRYSTAL_MAX_PITCH, CRYSTAL_MAX_PITCH)
+	var flat := Vector2(direction.x, direction.z)
+	if flat.length_squared() < 0.0001:
+		flat = Vector2(sin(_body_yaw), cos(_body_yaw))
+	flat = flat.normalized() * cos(pitch)
+	return Vector3(flat.x, sin(pitch), flat.y)
+
+
+## Starts a ride on a fresh track under the feet, setting off level in the
+## wanted direction's heading (the climb or dive then bends in smoothly).
+func _begin_crystal_ride(wanted: Vector3) -> void:
+	if is_instance_valid(_crystal_track):
+		_crystal_track.riding = false
+	_crystal_track = CrystalTrack.new()
+	get_tree().current_scene.add_child(_crystal_track)
+	_crystal_track.begin(global_position - Vector3.UP * FOOT_OFFSET)
+	_crystal_track.riding = true
+	var level := Vector3(wanted.x, 0.0, wanted.z)
+	_crystal_heading = level.normalized() if level.length_squared() > 0.0001 else Vector3(sin(_body_yaw), 0.0, cos(_body_yaw))
+	_crystal_speed = Vector2(velocity.x, velocity.z).length()
+	_crystal_riding = true
+	_crystal_airborne = false
+
+
+## Leaves the track, keeping its momentum: with a jump, or simply dropping
+## off when the skates can no longer ride. The track melts away behind.
+func _end_crystal_ride(jumped: bool) -> void:
+	_crystal_riding = false
+	if is_instance_valid(_crystal_track):
+		_crystal_track.riding = false
+		velocity = _crystal_track.rider_tangent() * _crystal_speed
+	if jumped:
+		velocity.y = maxf(velocity.y, 0.0) + HumanoidLocomotion.jump_speed(_playable_profile)
+		UISounds.play_foley(&"jump", 0.52, get_instance_id())
+	_jump_takeoff_speed = absf(velocity.y)
+	_jumping = true
+	_crystal_airborne = true
+
+
 ## Ends the dive on touchdown (onto the belly when it lands on ice) and ends
 ## the belly slide once it leaves the ground or the suit breaks up. The slide
 ## itself stops in _penguin_belly_slide_step() when it runs out of speed.
@@ -7538,11 +7679,20 @@ func _update_ice_skate_state() -> void:
 
 
 func _set_ice_skate_visuals_present() -> void:
+	# Crystal Skates show as crystal runners in place of the ice ones.
+	var crystal: bool=_blorb_suit.has_crystal_skates()
+	if _ice_skates_active and crystal!=_ice_skate_blades_crystal:
+		for blade in [_ice_skate_left,_ice_skate_right]:
+			if is_instance_valid(blade):
+				(blade as Node).queue_free()
+		_ice_skate_left=null
+		_ice_skate_right=null
+	_ice_skate_blades_crystal=crystal
 	if _ice_skates_active:
 		if not is_instance_valid(_ice_skate_left):
-			_ice_skate_left=build_ice_skate_blade(_toe_left,"LeftIceSkate")
+			_ice_skate_left=build_ice_skate_blade(_toe_left,"LeftIceSkate",1.0,-1.0,crystal)
 		if not is_instance_valid(_ice_skate_right):
-			_ice_skate_right=build_ice_skate_blade(_toe_right,"RightIceSkate")
+			_ice_skate_right=build_ice_skate_blade(_toe_right,"RightIceSkate",1.0,-1.0,crystal)
 		return
 	if is_instance_valid(_ice_skate_left):
 		_ice_skate_left.queue_free()
@@ -7557,7 +7707,7 @@ func _set_ice_skate_visuals_present() -> void:
 ## blorb boot surrounding that hidden human shoe. Its mounts therefore begin
 ## at the visible blorb underside, with the runner below that surface.
 static func build_ice_skate_blade(
-	toe: Node3D,blade_name: String,scale_factor: float=1.0,sole_offset: float=-1.0
+	toe: Node3D,blade_name: String,scale_factor: float=1.0,sole_offset: float=-1.0,crystal: bool=false
 ) -> Node3D:
 	var root:=Node3D.new()
 	root.name=blade_name
@@ -7567,7 +7717,7 @@ static func build_ice_skate_blade(
 		if sole_offset<0.0 else sole_offset
 	)
 	var sole_y: float=-resolved_sole_offset
-	var ice_material:=IceCrag.build_ice_material()
+	var ice_material:=CrystalTrack.crystal_material() if crystal else IceCrag.build_ice_material()
 	var support_height: float=ICE_SKATE_SUPPORT_HEIGHT*scale_factor
 	var runner_half_height: float=ICE_SKATE_RUNNER_HALF_HEIGHT*scale_factor
 	var runner_y: float=sole_y-support_height-runner_half_height

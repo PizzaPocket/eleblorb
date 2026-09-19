@@ -485,6 +485,19 @@ func has_mermaid_tail_suit() -> bool:
 	)
 
 
+## Both leg blorbs are Ice blorbs, each bound with Crystal Skates: the pair
+## lays a crystal ice track to skate on (Player's crystal riding). The formed
+## Penguin Suit takes precedence and has no skates.
+func has_crystal_skates() -> bool:
+	if penguin_form_active():
+		return false
+	for slot in ["leg_left", "leg_right"]:
+		var leg := worn_blorb_in_slot(slot)
+		if not is_instance_valid(leg) or leg.element_state != "ice" or not leg.has_core_item("Crystal Skates"):
+			return false
+	return true
+
+
 func set_mermaid_swimming(swimming: bool) -> void:
 	_mermaid_swimming = swimming
 

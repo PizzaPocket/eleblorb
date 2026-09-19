@@ -33,6 +33,8 @@ signal crossed(element: String)
 ## to spare above the head and at the shoulders.
 @export var half_width: float = 1.35
 @export var half_height: float = 1.75
+## A tint of its own instead of the element's (alpha 0: use the element's).
+@export var tint_override: Color = Color(0, 0, 0, 0)
 ## Thickness of the ring's piping; thicker for a wider portal.
 @export var tube_radius: float = 0.11
 
@@ -74,6 +76,8 @@ var _has_last := false
 
 func _ready() -> void:
 	var tint := SHINY_TINT if element == "shiny" else ElementPalette.body_color(element)
+	if tint_override.a > 0.0:
+		tint = Color(tint_override, 1.0)
 	var outline := _outline()
 	_build_ring(outline, tint)
 	_build_membrane(outline, tint)

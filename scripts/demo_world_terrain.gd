@@ -148,6 +148,10 @@ const NAUTILUS_PORTAL_X := 828.0
 ## mountain's foot.
 const ICE_RADIUS := 70.0
 const ICE_EAST_SHORE_X := 2418.0
+## A portal standing on the ice near the frozen lake's far end, before the
+## mountain: through it two Ice blorbs bound with Crystal Skates take over
+## both legs, to skate a crystal track up the mountain (see demo_world.gd).
+const CRYSTAL_PORTAL_X := 2330.0
 const ICE_EDGE_VARIATION := 9.0
 const ICE_LAKE_DEPTH := 8.0
 ## The Ice Kingdom's layering: bank shelf, the ice skin 3 cm beneath it (so the

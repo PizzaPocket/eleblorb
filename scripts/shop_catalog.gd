@@ -198,6 +198,13 @@ static func _ensure_items() -> void:
 			"build_visual": Callable(PenguinHelm, "build_visual"),
 		},
 		{
+			"name": "Crystal Skates", "color": CrystalTrack.CRYSTAL_TINT, "price": 0, "sell_price": 0,
+			"purchasable": false, "element": "", "core_item": "Crystal Skates", "core_slot": "legs", "armor_defense": 2,
+			"required_element": "ice",
+			"description": "A rare blade of living crystal. Worn in pairs, they lay ice wherever you skate.",
+			"build_visual": Callable(CrystalTrack, "build_skate_visual"),
+		},
+		{
 			"name": "Bird Helm", "color": Color(0.62, 0.58, 0.42), "price": 0, "sell_price": 0,
 			"purchasable": false, "element": "", "core_item": "Bird Helm", "core_slot": "head", "armor_defense": 4,
 			"description": "Blorbaka's own crest -- said to lend a wearer sight of the Sky Kingdom.",

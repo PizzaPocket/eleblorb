@@ -122,6 +122,8 @@ const BULGE_T := 0.30
 const CORE_RADIUS := 0.07  # apple-sized, matches gem.gd's own default scale
 const HEAD_MOD_ITEMS := ["Diving Helmet", "Knight's Helm", "Lava Helm", "Nautilus Crown", "Toboggan", "Bird Helm", "Penguin Helm"]
 const ARMOR_MOD_ITEMS := ["Dented Breastplate"]
+## Items a leg blorb binds (one at a time).
+const LEG_MOD_ITEMS := ["Crystal Skates"]
 ## The "shiny blorb" cosmetic override applied in _build_visuals() -- a
 ## bright pearlescent cream, distinctly shinier than the plain off-white
 ## body_color default, but deliberately not tinted toward any element's own
@@ -141,6 +143,8 @@ func add_core_item(item_name: String) -> bool:
 		exclusive_group = HEAD_MOD_ITEMS
 	elif item_name in ARMOR_MOD_ITEMS:
 		exclusive_group = ARMOR_MOD_ITEMS
+	elif item_name in LEG_MOD_ITEMS:
+		exclusive_group = LEG_MOD_ITEMS
 	if not exclusive_group.is_empty():
 		for existing in core_items:
 			if existing in exclusive_group:

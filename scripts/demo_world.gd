@@ -62,6 +62,9 @@ func _ready() -> void:
 	# The Nautilus portal on the seabed, facing west like the water portal.
 	var nautilus_portal := _add_portal("water", DemoWorldTerrain.NAUTILUS_PORTAL_X, -PI * 0.5, "nautilus")
 	nautilus_portal.position = _terrain.nautilus_portal_point()
+	# The Crystal Skates portal, standing on the frozen lake's ice.
+	var crystal_portal := _add_portal("ice", DemoWorldTerrain.CRYSTAL_PORTAL_X, -PI * 0.5, "crystal", 1.0, CrystalTrack.CRYSTAL_TINT)
+	crystal_portal.position.y = DemoWorldTerrain.ICE_SURFACE_LEVEL
 	_add_plant_jungle()
 	call_deferred("_finish_loading")
 
@@ -81,11 +84,12 @@ func _add_plant_jungle() -> void:
 
 ## One-way portals: `facing_yaw` turns the portal's face (its local +Z) to
 ## face the side you approach it from.
-func _add_portal(element: String, x: float, facing_yaw: float, suit_key: String = "", size_scale: float = 1.0) -> CheckpointPortal:
+func _add_portal(element: String, x: float, facing_yaw: float, suit_key: String = "", size_scale: float = 1.0, tint: Color = Color(0, 0, 0, 0)) -> CheckpointPortal:
 	var portal := CheckpointPortal.new()
 	portal.name = "Portal_%s_%d" % [suit_key if suit_key != "" else (element if element != "" else "normal"), int(x)]
 	portal.element = element
 	portal.suit_key = suit_key
+	portal.tint_override = tint
 	portal.one_way = true
 	portal.half_width = DemoWorldTerrain.PORTAL_HALF_WIDTH * size_scale
 	portal.half_height = DemoWorldTerrain.PORTAL_HALF_HEIGHT * size_scale
@@ -140,6 +144,12 @@ func _build_party() -> void:
 	var nautilus_home := _terrain.nautilus_portal_point() + Vector3(SET_WAIT_OFFSET, 0.0, 5.0)
 	var nautilus_head: Array[String] = ["head"]
 	_roster.add_overlay("nautilus", SuitLoadout.spawn_set(self, "water", "Nautilus Crown", nautilus_home, nautilus_head, 0.0), nautilus_head)
+	# Two Ice blorbs bound with Crystal Skates, waiting on the ice just past
+	# the crystal portal: they take over both legs.
+	var crystal_home := Vector3(DemoWorldTerrain.CRYSTAL_PORTAL_X + SET_WAIT_OFFSET, DemoWorldTerrain.ICE_SURFACE_LEVEL, 5.0)
+	var crystal_legs: Array[String] = ["leg_left", "leg_right"]
+	var crystal_items := {"leg_left": "Crystal Skates", "leg_right": "Crystal Skates"}
+	_roster.add_overlay("crystal", SuitLoadout.spawn_set(self, "ice", "", crystal_home, crystal_legs, 1.5, false, crystal_items), crystal_legs)
 	_roster.start_with("")
 	_spawn_forest_shinies()
 	var monkey := XIAO_HOU_ZI_SCENE.instantiate() as XiaoHouZi
