@@ -8,9 +8,9 @@ extends RefCounted
 ## - The base: a smoothly rounded nose just in front of the forehead, the
 ##   headwear's front face with the blorb's eyes on it. Behind it the tube,
 ##   fat and nearly round in cross-section, sinks back into the head.
-## - The rise: from there it arcs up and back, hooking down toward the back of
+## - The rise: from there it arcs back and quickly down round the back of
 ##   the head.
-## - The spiral: it winds inward round a centre above and behind the head as
+## - The spiral: it winds inward round a centre just behind the head as
 ##   a logarithmic spiral, its cross-section flattening to a broad oval whose
 ##   thickness across the curl exactly fills the gap to the next whorl in, so
 ##   the turns stack into one solid mass with no valleys, until it closes.
@@ -24,27 +24,30 @@ const SHELL_COLOR := Color(0.36, 0.88, 0.74)
 
 ## The base's half-width, a fraction of the head's half-width, and its
 ## thickness out of the head as a fraction of that width: nearly round.
-const BASE_WIDTH := 1.05
+const BASE_WIDTH := 1.25
 const BASE_ROUNDNESS := 0.85
-## The base runs over the head from its nose just in front of the brow (angle
-## up from the front, round the head's centre) back toward the crown. Its
+## The base sits like a band over the brow, from its nose just above the
+## eyes (angle up from the front, round the head's centre) back over the
+## front of the head. Its
 ## centreline starts at 1 + BASE_FRONT_GAP of the head's radius, just inside
 ## the forehead so the tube's rounded front face stands just ahead of it, and
 ## sinks to BASE_SINK of the head's radius at its back end, burying the rear
 ## of the base in the head.
-const BASE_FROM := deg_to_rad(14.0)
-const BASE_TO := deg_to_rad(80.0)
+const BASE_FROM := deg_to_rad(4.0)
+const BASE_TO := deg_to_rad(62.0)
 const BASE_FRONT_GAP := -0.12
 const BASE_SINK := 0.72
 const BASE_SAMPLES := 18
-## The spiral's centre above and behind the head (fractions of the head's
-## half-height and half-depth from its centre).
-const COIL_UP := 1.2
-const COIL_BACK := 1.1
+## The spiral's centre, just behind the head and barely above its middle
+## (fractions of the head's half-height and half-depth from its centre), so
+## the rise arcs back and down quickly and the spiral's bulk sits low round
+## the back of the head.
+const COIL_UP := 0.15
+const COIL_BACK := 1.0
 ## How fast the spiral tightens (its radius falls by exp(-DECAY * TAU) each
 ## turn), how much each whorl overlaps the one inside it, and where it
 ## closes.
-const DECAY := 0.16
+const DECAY := 0.2
 const WHORL_OVERLAP := 1.2
 const CLOSING_RADIUS := 0.006
 const CENTRE_THICKNESS := 0.01
@@ -82,7 +85,7 @@ static func shape(contents: AABB) -> Dictionary:
 		points.append(center + Vector3(0.0, sin(angle) * half.y, cos(angle) * half.z) * reach)
 		widths.append(base_width)
 		thicknesses.append(base_thickness)
-	# The rise and spiral, round a centre above and behind the head,
+	# The rise and spiral, round a centre just behind the head,
 	# starting where the base ends.
 	var coil := center + Vector3(0.0, half.y * COIL_UP, -half.z * COIL_BACK)
 	var start := center + Vector3(0.0, sin(BASE_TO) * half.y, cos(BASE_TO) * half.z) * BASE_SINK

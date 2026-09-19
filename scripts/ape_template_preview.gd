@@ -118,6 +118,12 @@ var _walk_phase := 0.0
 var _rng := RandomNumberGenerator.new()
 var _mounted_on: Manchego = null
 var _collision_shape: CollisionShape3D
+## Grounding: the rig root (the node carrying the whole body) and, per foot,
+## the foot mesh with a sample of its sole's vertices. After each walk pose
+## the body is moved so the lower sole rests exactly on the ground, however
+## the stride swings the legs (see _ground_feet()).
+var _rig: Node3D
+var _soles: Array[Dictionary] = []
 var _parkour_colliders: Array[Dictionary] = []
 var _look_target: Node3D = null
 ## Optional hook: when valid, called from _on_talk() with no arguments and
@@ -207,6 +213,8 @@ func _ready() -> void:
 	_elbow_rest_z_left = (_pivots["elbow_left"] as Node3D).rotation.z
 	_elbow_rest_z_right = (_pivots["elbow_right"] as Node3D).rotation.z
 
+	_capture_soles()
+	_ground_feet()
 	_terrain = get_node_or_null("../Terrain")
 	if _terrain != null and _terrain.has_method("get_mesh_height"):
 		global_position.y = _terrain.get_mesh_height(global_position.x, global_position.z)
@@ -264,11 +272,55 @@ func _process(delta: float) -> void:
 	else:
 		var moving := _update_roam(delta)
 		_animate_walk(delta, moving)
+		_ground_feet()
 		_update_head_look(delta)
 	if parkour_collision:
 		_sync_parkour_collision()
 	if has_tail:
 		MonkeyFigure._rebuild_tail(_pivots["_tail"] as Dictionary, delta)
+
+
+## Samples each foot's sole: the vertices in the bottom fifth of its mesh,
+## at most SOLE_SAMPLES of them.
+const SOLE_SAMPLES := 48
+
+
+func _capture_soles() -> void:
+	_rig = (_pivots["hips"] as Node3D).get_parent().get_parent() as Node3D
+	_soles.clear()
+	for ankle_name in ["ankle_left", "ankle_right"]:
+		var ankle := _pivots[ankle_name] as Node3D
+		if ankle.get_child_count() == 0 or not ankle.get_child(0) is MeshInstance3D:
+			continue
+		var foot := ankle.get_child(0) as MeshInstance3D
+		var bounds := foot.mesh.get_aabb()
+		var floor_y := bounds.position.y + bounds.size.y * 0.2
+		var sole := PackedVector3Array()
+		for vertex in foot.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX] as PackedVector3Array:
+			if vertex.y <= floor_y:
+				sole.append(vertex)
+		var stride := maxi(1, sole.size() / SOLE_SAMPLES)
+		var sampled := PackedVector3Array()
+		for index in range(0, sole.size(), stride):
+			sampled.append(sole[index])
+		_soles.append({"foot": foot, "points": sampled})
+
+
+## Moves the body so its lowest sole point sits on this node's origin (the
+## ground, see _update_roam()). The rig's own analytic grounding
+## (ApeTemplate.build()) leaves the soles short of the ground, and a stride
+## lifts both feet as the legs swing; measuring the actual feet covers both.
+func _ground_feet() -> void:
+	if _rig == null or _soles.is_empty():
+		return
+	var to_local_frame := global_transform.affine_inverse()
+	var lowest := INF
+	for sole in _soles:
+		var foot_frame: Transform3D = to_local_frame * (sole["foot"] as MeshInstance3D).global_transform
+		for point in sole["points"] as PackedVector3Array:
+			lowest = minf(lowest, (foot_frame * point).y)
+	if lowest < INF:
+		_rig.position.y -= lowest
 
 
 ## Same atan2(x, z)/clamp/lerp_angle pattern jungle_villager.gd's/npc.gd's own

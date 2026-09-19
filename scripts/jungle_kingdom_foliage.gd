@@ -79,6 +79,9 @@ const LOD_UPDATE_INTERVAL := 0.4
 @export var window_source_center := Vector2.ZERO
 @export var window_half_size := Vector2.ZERO
 @export var window_target_center := Vector2.ZERO
+## Host-world discs (x, z, radius) that window mode keeps free of trees and
+## rocks: room for something large to roam, such as the demo's Da Hou Zi.
+@export var window_keep_clear: Array[Vector3] = []
 
 var _rng := RandomNumberGenerator.new()
 var _terrain: Node = null
@@ -143,7 +146,7 @@ func _scatter_trees() -> void:
 		var pos: Vector2 = picked
 		if not _in_window(pos):
 			continue
-		if _zone_of(pos) != "":
+		if _zone_of(pos) != "" or _kept_clear(pos):
 			continue  # clearings and rocky zones stay tree-free
 		var builder: Callable = _tree_builders[_rng.randi() % _tree_builders.size()]
 		_place(builder.call(), pos, TREE_VISIBILITY_RANGE)
@@ -175,7 +178,7 @@ func _scatter_rocks() -> void:
 			var r := sqrt(_rng.randf_range(0.0, 1.0)) * radius
 			var a := _rng.randf_range(0.0, TAU)
 			var pos := center + Vector2(cos(a) * r, sin(a) * r)
-			if not _in_window(pos):
+			if not _in_window(pos) or _kept_clear(pos):
 				continue
 			var prop: Node3D = NatureProps.build_rock_spire(
 				_rng.randf_range(1.4, 3.2), _rng.randi_range(2, 4), _rng
@@ -188,6 +191,18 @@ func _in_window(pos: Vector2) -> bool:
 		return true
 	var local := pos - window_source_center
 	return absf(local.x) <= window_half_size.x and absf(local.y) <= window_half_size.y
+
+
+## True when window mode maps `pos` (kingdom coordinates) into one of the
+## host's window_keep_clear discs.
+func _kept_clear(pos: Vector2) -> bool:
+	if not window_enabled:
+		return false
+	var host := window_target_center + (pos - window_source_center)
+	for disc in window_keep_clear:
+		if host.distance_to(Vector2(disc.x, disc.y)) < disc.z:
+			return true
+	return false
 
 
 func _place(prop: Node3D, source_pos: Vector2, visibility_range: float) -> void:

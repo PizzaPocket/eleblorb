@@ -93,6 +93,15 @@ const MONKEY_HEAD_SIZE_SCALE := Vector3(1.0, 1.35, 1.08)
 ## all agree on the same actual surface -- see monkey_figure.gd's own
 ## head_epsilon parameter, added for exactly this.
 const HEAD_EPSILON := 3.3
+## Where the head hangs off the neck. An ape's spine meets its skull well
+## back on the skull's underside (a rear-set foramen magnum), so the head
+## hangs forward of the neck rather than sitting stacked on top of the
+## chest: the head is moved forward by this fraction of its half-depth and
+## down by this fraction of its half-height, putting the neck joint
+## (head_pivot, which the head still turns about) at the rear of the skull's
+## base.
+const HEAD_FORWARD_FRACTION := 0.6
+const HEAD_DROP_FRACTION := 0.4
 
 ## Raised from an initial 1.25 per direct instruction ("a bit longer").
 const HAND_LENGTH_SCALE := 1.45
@@ -903,7 +912,9 @@ static func build(
 	var head_size := monkey_head_size * head_rescale
 	var head_mesh := SuperEgg.build_part(head_size, fur_color, HEAD_EPSILON, HEAD_EPSILON)
 	head_mesh.material_override = MonkeyFigure._build_fur_material(fur_color)
-	head_mesh.position = Vector3(0, head_size_base.y, 0)
+	head_mesh.position = Vector3(
+		0, head_size_base.y * (1.0 - HEAD_DROP_FRACTION), head_size_base.z * HEAD_FORWARD_FRACTION
+	)
 	head_pivot.add_child(head_mesh)
 	if variant.get("has_face_marking", true):
 		MonkeyFigure._add_face_marking(head_mesh, notch_strength, head_size_base, marking_color, HEAD_EPSILON)

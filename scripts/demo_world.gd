@@ -106,6 +106,12 @@ func _add_plant_jungle() -> void:
 	jungle.window_source_center = DemoWorldTerrain.PLANT_SOURCE
 	jungle.window_half_size = DemoWorldTerrain.PLANT_HALF
 	jungle.window_target_center = DemoWorldTerrain.PLANT_CENTER
+	# Da Hou Zi roams his clearing (see _add_demo_titans()): no trees or rocks
+	# for him to walk through.
+	var keep_clear: Array[Vector3] = [Vector3(
+		DemoWorldTerrain.DA_HOU_ZI_CLEARING.x, DemoWorldTerrain.DA_HOU_ZI_CLEARING.y, DemoWorldTerrain.DA_HOU_ZI_CLEAR_RADIUS
+	)]
+	jungle.window_keep_clear = keep_clear
 	add_child(jungle)
 
 
