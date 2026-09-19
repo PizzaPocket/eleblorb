@@ -7,8 +7,13 @@ extends RefCounted
 ## the crown and down past the jaw, with a slender beak pointing forward from
 ## just below the eyes.
 ##
-## Worn by an Ice head over a full Ice suit it commands the Penguin Suit (see
-## BlorbSuit.FORM_HELMS), just as the Lava Helm commands the sealed Lava Suit.
+## Worn by an Ice head over a full Ice suit it can command the Penguin Suit
+## (see BlorbSuit.FORM_HELMS). Until the suit is formed the blorb wears it
+## raised: its ordinary hat with a rounded crown and the beak tipped up where
+## a nose would be. Forming the suit brings the hood down over the face.
+
+## Tilt of the raised beak above level.
+const RAISED_BEAK_TILT := deg_to_rad(28.0)
 
 const HOOD_COLOR := Color(0.10, 0.12, 0.17)
 const BEAK_COLOR := Color(0.96, 0.56, 0.12)
@@ -45,11 +50,16 @@ static func eta_for_local_y(local_y: float, semi_axis_y: float) -> float:
 ## tapering to a point ahead of it and drooping slightly.
 static func build_beak_mesh(semi_axes: Vector3, eye_eta: float) -> ArrayMesh:
 	var root_surface := SuperEgg.surface_point(semi_axes, eye_eta - BEAK_BELOW_EYES, 0.0, HOOD_EPSILON, HOOD_EPSILON)
-	var length := semi_axes.z * BEAK_LENGTH
-	var radius := semi_axes.z * BEAK_ROOT_RADIUS
-	var inside := root_surface - Vector3(0.0, 0.0, radius * 1.4)
-	var middle := root_surface + Vector3(0.0, -length * BEAK_DROOP * 0.3, length * 0.5)
-	var tip := root_surface + Vector3(0.0, -length * BEAK_DROOP, length)
+	var direction := Vector3(0.0, -BEAK_DROOP, 1.0).normalized()
+	return build_beak_along(root_surface, direction, semi_axes.z * BEAK_LENGTH, semi_axes.z * BEAK_ROOT_RADIUS)
+
+
+## A beak whose surface root is `root_surface`, pointing along `direction`:
+## sunk a little behind the root, tapering to a point `length` ahead of it.
+static func build_beak_along(root_surface: Vector3, direction: Vector3, length: float, radius: float) -> ArrayMesh:
+	var inside := root_surface - direction * radius * 1.4
+	var middle := root_surface + direction * length * 0.5
+	var tip := root_surface + direction * length
 	var points: Array[Vector3] = [inside, root_surface, middle, tip]
 	var radii: Array[float] = [radius, radius, radius * 0.55, radius * 0.12]
 	return BlorbSuit.build_limb_tube(

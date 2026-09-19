@@ -98,6 +98,10 @@ var _assignment_reconcile_requested := false
 ## the Penguin Suit) when the commanding helm arrives or leaves. Torso geometry is otherwise static after equip, so merely changing
 ## the limb rebuild path would leave it enlarged until the next full suit cycle.
 var _form_command_was_active := false
+## The Penguin Suit is commanded, not automatic: a full Ice suit under the
+## Penguin Helm forms it only while this is on (toggle_penguin_form()). It
+## drops back off whenever the full suit breaks up.
+var _penguin_form_enabled := false
 var _story_suspended: bool = false
 
 
@@ -363,10 +367,24 @@ func has_full_lava_suit() -> bool:
 	return _has_full_formed_suit("fire")
 
 
-## The Penguin Suit: five worn Ice pieces commanded by an Ice head carrying
-## the Penguin Helm. The same reversible configuration as the Lava Suit.
+## Five worn Ice pieces under an Ice head carrying the Penguin Helm: the suit
+## that can take the Penguin form.
 func has_full_penguin_suit() -> bool:
 	return _has_full_formed_suit("ice")
+
+
+## The Penguin Suit is formed: a full penguin-capable suit, commanded on.
+func penguin_form_active() -> bool:
+	return _penguin_form_enabled and has_full_penguin_suit()
+
+
+## Forms or unforms the Penguin Suit. Does nothing (returns false) unless the
+## full penguin-capable suit is worn.
+func toggle_penguin_form() -> bool:
+	if not has_full_penguin_suit():
+		return false
+	_penguin_form_enabled = not _penguin_form_enabled
+	return true
 
 
 ## True when every slot is worn by a blorb of `element` and the head carries
@@ -488,7 +506,8 @@ func worn_blorb_in_slot(slot: String) -> Blorb:
 
 
 ## Switches a worn head blorb between its ordinary hat and the inflated
-## diving helmet. This is intentionally driven by Player's real buoyancy
+## diving helmet (or, for the Penguin Helm, its hood while the Penguin Suit is
+## formed). This is intentionally driven by Player's real buoyancy
 ## state, not merely by wearing the blorb, so the helmet never persists on
 ## dry ground or while standing at a shoreline.
 func set_head_blorb_submerged(submerged: bool) -> void:
@@ -501,14 +520,19 @@ func set_head_blorb_submerged(submerged: bool) -> void:
 		# because the wearer entered water/goo: the sealed form exists, and
 		# may replace the hat, only for a blorb that absorbed Diving Helmet.
 		var use_diving_form := submerged and is_instance_valid(blorb) and blorb.has_core_item("Diving Helmet")
+		# The Penguin Helm likewise closes over the face, as its hood, only
+		# while the Penguin Suit is formed; otherwise it rides raised on the hat.
+		var use_penguin_hood := penguin_form_active()
 		for piece in (entry["pieces"] as Array):
 			if not is_instance_valid(piece):
 				continue
 			var form := piece as Node3D
 			if form.name == "HeadBlorbHat":
-				form.visible = not use_diving_form
+				form.visible = not use_diving_form and not use_penguin_hood
 			elif form.name == "HeadBlorbHelmet":
 				form.visible = use_diving_form
+			elif form.name == "HeadBlorbPenguinHelm":
+				form.visible = use_penguin_hood
 
 
 ## Seeds a default assignment for any in-party blorb that doesn't have one
@@ -553,6 +577,8 @@ func update(delta: float) -> void:
 		_update_transitions(delta)
 	if _assignment_reconcile_requested and _transitions.is_empty():
 		_reconcile_worn_assignments()
+	if _penguin_form_enabled and not has_full_penguin_suit():
+		_penguin_form_enabled = false
 	var form_command := _form_command_active()
 	if form_command != _form_command_was_active:
 		_rebuild_worn_form_pieces(form_command)
@@ -584,7 +610,7 @@ func _form_command_active() -> bool:
 	# immediately returns the survivors to normal and restoring it reforms the
 	# suit automatically. The flag carries no element: each piece's own
 	# element picks its form (see BlorbSuit.equip_slot()).
-	return has_full_lava_suit() or has_full_penguin_suit()
+	return has_full_lava_suit() or penguin_form_active()
 
 
 ## Replaces only the formed element's torso/limb geometry. The helm itself has

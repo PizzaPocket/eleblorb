@@ -56,16 +56,20 @@ const TOE_REACH_MARGIN := 0.025
 ## share: a full Fire suit under the Lava Helm seals into the Lava Suit, a
 ## full Ice suit under the Penguin Helm forms the Penguin Suit.
 const FORM_HELMS := {"fire": "Lava Helm", "ice": "Penguin Helm"}
-## Penguin Suit torso: even larger than the sealed Lava cuirass, and running
-## from the shoulders all the way down to the ankles.
+## Penguin Suit torso: even larger than the sealed Lava cuirass, running from
+## the ankles up past broad shoulders to close under the head.
 const PENGUIN_TORSO_WIDTH_SCALE := 1.3
+## How far above the head's base (the top of the neck) the torso closes, so it
+## tucks up under the head and its helm rather than stopping at the collar.
+const PENGUIN_TORSO_ABOVE_HEAD_BASE := 0.07
 ## Where the belly is widest, as a fraction of the torso's height from the
 ## bottom, and how far forward it swells beyond the back's curve.
 const PENGUIN_BELLY_T := 0.32
 const PENGUIN_BELLY_FORWARD := 0.14
-## Width at the ankle hem and at the shoulders, relative to the belly.
+## Width at the ankle hem and at the shoulders, relative to the belly. Broad
+## enough at the shoulders to keep the flippers' shoulder domes inside.
 const PENGUIN_HEM_WIDTH := 0.8
-const PENGUIN_SHOULDER_WIDTH := 0.6
+const PENGUIN_SHOULDER_WIDTH := 0.97
 ## Penguin flippers: thinner across their flat face than along it, and
 ## narrowing past the wrist to a point beyond the fingertips.
 const PENGUIN_FLIPPER_FLATTEN := 0.5
@@ -1008,7 +1012,12 @@ static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: f
 		ProceduralFigure.HIP_SIZE.y + ProceduralFigure.UPPER_LEG_SIZE.y + ProceduralFigure.LOWER_LEG_SIZE.y
 	) * 2.0 * rig_scale
 	var chest_top := (ProceduralFigure.ABDOMEN_SIZE.y + ProceduralFigure.CHEST_SIZE.y) * 2.0 * rig_scale
-	var top := chest_top + ProceduralFigure.HEAD_RAISE * 1.35 * rig_scale
+	var top := chest_top + (ProceduralFigure.HEAD_RAISE + PENGUIN_TORSO_ABOVE_HEAD_BASE) * rig_scale
+	# The shoulder joints (ProceduralFigure.build()'s shoulder_y, relative to
+	# the spine): the torso holds its full shoulder width to just above them,
+	# then rounds over to close under the head.
+	var shoulder := (ProceduralFigure.ABDOMEN_SIZE.y * 2.0 + ProceduralFigure.CHEST_SIZE.y * 1.6 - 0.035) * rig_scale
+	var shoulder_t := clampf((shoulder + 0.03 * rig_scale - bottom) / (top - bottom), 0.5, 0.95)
 	var half_width := ProceduralFigure.CHEST_SIZE.x * TORSO_INFLATE * PENGUIN_TORSO_WIDTH_SCALE * rig_scale
 	var half_depth := ProceduralFigure.CHEST_SIZE.z * TORSO_INFLATE * 1.2 * PENGUIN_TORSO_WIDTH_SCALE * rig_scale
 	const RING_COUNT := 30
@@ -1016,7 +1025,7 @@ static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: f
 	var rings: Array = []
 	for ring_index in RING_COUNT + 1:
 		var t := float(ring_index) / float(RING_COUNT)
-		var width := _penguin_torso_width(t)
+		var width := _penguin_torso_width(t, shoulder_t)
 		var y := lerpf(bottom, top, t)
 		var belly := half_depth * PENGUIN_BELLY_FORWARD * sin(PI * clampf(t / 0.85, 0.0, 1.0))
 		var ring: Array[Vector3] = []
@@ -1032,7 +1041,7 @@ static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: f
 	torso.set_surface_override_material(0, _build_goo_material(vis))
 	spine_pivot.add_child(torso)
 	const EYE_T := 0.8
-	var eye_width := _penguin_torso_width(EYE_T)
+	var eye_width := _penguin_torso_width(EYE_T, shoulder_t)
 	var eye_belly := half_depth * PENGUIN_BELLY_FORWARD * sin(PI * clampf(EYE_T / 0.85, 0.0, 1.0))
 	var eye_center := Vector3(
 		0.0, lerpf(bottom, top, EYE_T),
@@ -1047,22 +1056,22 @@ static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: f
 
 
 ## Penguin torso silhouette, relative to its belly width, at height fraction
-## `t` (0 at the ankle hem, 1 at the shoulders). Swells from the hem to the
-## belly, draws in toward the shoulders, and rounds closed at both ends.
-static func _penguin_torso_width(t: float) -> float:
-	var base: float
-	if t <= PENGUIN_BELLY_T:
-		base = lerpf(PENGUIN_HEM_WIDTH, 1.0, smoothstep(0.0, 1.0, t / PENGUIN_BELLY_T))
-	else:
-		base = lerpf(1.0, PENGUIN_SHOULDER_WIDTH, smoothstep(0.0, 1.0, (t - PENGUIN_BELLY_T) / (1.0 - PENGUIN_BELLY_T)))
+## `t` (0 at the ankle hem, 1 at the top). Swells from the hem to the belly,
+## eases in slightly to broad shoulders at `shoulder_t`, then rounds over as a
+## superellipse dome that closes under the head; the hem rounds closed too.
+static func _penguin_torso_width(t: float, shoulder_t: float) -> float:
 	const BOTTOM_ROUND := 0.07
-	const TOP_ROUND := 0.16
-	var closing := 1.0
+	var width: float
+	if t <= PENGUIN_BELLY_T:
+		width = lerpf(PENGUIN_HEM_WIDTH, 1.0, smoothstep(0.0, 1.0, t / PENGUIN_BELLY_T))
+	elif t <= shoulder_t:
+		width = lerpf(1.0, PENGUIN_SHOULDER_WIDTH, smoothstep(0.0, 1.0, (t - PENGUIN_BELLY_T) / (shoulder_t - PENGUIN_BELLY_T)))
+	else:
+		var u := (t - shoulder_t) / (1.0 - shoulder_t)
+		width = PENGUIN_SHOULDER_WIDTH * pow(maxf(1.0 - pow(u, 2.4), 0.0), 1.0 / 2.4)
 	if t < BOTTOM_ROUND:
-		closing = pow(1.0 - pow((BOTTOM_ROUND - t) / BOTTOM_ROUND, 3.0), 1.0 / 3.0)
-	elif t > 1.0 - TOP_ROUND:
-		closing = pow(maxf(1.0 - pow((t - (1.0 - TOP_ROUND)) / TOP_ROUND, 3.0), 0.0), 1.0 / 3.0)
-	return base * closing
+		width *= pow(1.0 - pow((BOTTOM_ROUND - t) / BOTTOM_ROUND, 3.0), 1.0 / 3.0)
+	return width
 
 
 ## The absorbed breastplate is the torso counterpart to Knight's Helm: the
@@ -1183,8 +1192,12 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	var hat_height := hat_radius * HAT_HEIGHT_SCALE
 	var hat := MeshInstance3D.new()
 	hat.name = "HeadBlorbHat"
+	# A head blorb holding a helm it can close over the face (the Diving
+	# Helmet, the Penguin Helm) wears a rounded crown rather than the usual
+	# slime point: a small cue that it has another form.
+	var round_crown := blorb.has_core_item("Diving Helmet") or (blorb.has_core_item("Penguin Helm") and blorb.element_state == "ice")
 	hat.mesh = BlorbBodyShape.build_mesh_from_rings(_build_hat_rings(
-		hat_radius, hat_height, hat_radius * HAT_DROOP_FRACTION
+		hat_radius, hat_height, hat_radius * HAT_DROOP_FRACTION, round_crown
 	))
 	hat.set_surface_override_material(0, _build_goo_material(vis))
 	# The hat's bottom pole is embedded slightly into the crown, with the
@@ -1224,10 +1237,15 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	if blorb.has_core_item("Lava Helm") and blorb.element_state == "fire":
 		hat.queue_free()
 		return [_build_lava_helm(head_pivot, worn_head_bounds, vis)] as Array[Node3D]
-	# Ice-only, like the Lava Helm is Fire-only.
+	# Ice-only, like the Lava Helm is Fire-only. Two forms, like the Diving
+	# Helmet: the hat with the beak raised, and the hood the controller shows
+	# instead once the Penguin Suit is formed (see
+	# BlorbSuitController.set_head_blorb_submerged()).
 	if blorb.has_core_item("Penguin Helm") and blorb.element_state == "ice":
-		hat.queue_free()
-		return [_build_penguin_helm(head_pivot, worn_head_bounds, head_size, vis)] as Array[Node3D]
+		_add_raised_penguin_beak(hat, hat_radius, hat_height, vis)
+		var hood := _build_penguin_helm(head_pivot, worn_head_bounds, head_size, vis)
+		hood.visible = false
+		return [hat, hood] as Array[Node3D]
 	if blorb.has_core_item("Bird Helm"):
 		hat.queue_free()
 		return [_build_bird_helm(head_pivot, worn_head_bounds, head_size, vis)] as Array[Node3D]
@@ -1343,6 +1361,19 @@ static func _build_toboggan(head_pivot: Node3D,contents: AABB,vis: Dictionary) -
 		core_material.emission_energy_multiplier=vis["core_emission_energy"] as float
 	_add_head_core_light(core,vis)
 	return root
+
+
+## The raised Penguin Helm: its beak on the hat blorb's own face, where a
+## nose would sit just below the eyes, tipped up (PenguinHelm.RAISED_BEAK_TILT).
+static func _add_raised_penguin_beak(hat: MeshInstance3D, hat_radius: float, hat_height: float, vis: Dictionary) -> void:
+	const NOSE_T := 0.3
+	var root_surface := Vector3(0.0, hat_height * NOSE_T, BlorbBodyShape.profile_radius(NOSE_T) * hat_radius * 0.96)
+	var direction := Vector3(0.0, sin(PenguinHelm.RAISED_BEAK_TILT), cos(PenguinHelm.RAISED_BEAK_TILT))
+	var beak := MeshInstance3D.new()
+	beak.name = "RaisedPenguinBeak"
+	beak.mesh = PenguinHelm.build_beak_along(root_surface, direction, hat_radius * 0.5, hat_radius * 0.13)
+	beak.material_override = _build_goo_material(vis)
+	hat.add_child(beak)
 
 
 ## The Penguin Helm as a living blorb: a smooth rounded hood closing over the
@@ -2139,8 +2170,8 @@ static func _add_head_core_light(core: Node3D, vis: Dictionary) -> void:
 ## it starts to angle downwards." smoothstep(0, radius, -z) has ZERO slope
 ## at z=0 (and again at z=-radius), matching the flat front's own zero
 ## slope exactly, so the whole transition reads as one continuous curve.
-static func _build_hat_rings(radius: float, height: float, droop: float) -> Array:
-	var rings: Array = BlorbBodyShape.build_rings(radius, height)
+static func _build_hat_rings(radius: float, height: float, droop: float, round_crown: bool = false) -> Array:
+	var rings: Array = _round_crown_rings(radius, height) if round_crown else BlorbBodyShape.build_rings(radius, height)
 	for ring in rings:
 		for i in ring.size():
 			var point: Vector3 = ring[i]
@@ -2150,6 +2181,24 @@ static func _build_hat_rings(radius: float, height: float, droop: float) -> Arra
 				var droop_amount := back_amount * (1.0 - height_t * 0.6)
 				point.y -= droop_amount * droop
 				ring[i] = point
+	return rings
+
+
+## BlorbBodyShape's blorb silhouette, but above its bulge the crown closes as
+## a full elliptical dome instead of tapering to a point.
+static func _round_crown_rings(radius: float, height: float) -> Array:
+	var rings: Array = []
+	for ring_index in BlorbBodyShape.RING_COUNT + 1:
+		var t := float(ring_index) / float(BlorbBodyShape.RING_COUNT)
+		var profile := BlorbBodyShape.profile_radius(t)
+		if t > BlorbBodyShape.BULGE_T:
+			var u := (t - BlorbBodyShape.BULGE_T) / (1.0 - BlorbBodyShape.BULGE_T)
+			profile = sqrt(maxf(0.0, 1.0 - u * u))
+		var points: Array[Vector3] = []
+		for segment in BlorbBodyShape.RADIAL_SEGMENTS:
+			var angle := TAU * float(segment) / float(BlorbBodyShape.RADIAL_SEGMENTS)
+			points.append(Vector3(cos(angle) * profile * radius, t * height, sin(angle) * profile * radius))
+		rings.append(points)
 	return rings
 
 

@@ -294,8 +294,31 @@ const ICE_SKATE_TERMINAL_SPEED := 32.0
 ## a low forward dive that lands on the belly and toboggans across the ice.
 ## The dive is at least this fast forward, and rises to this fraction of an
 ## ordinary jump's height.
-const PENGUIN_DIVE_FORWARD_SPEED := 8.5
+const PENGUIN_DIVE_FORWARD_SPEED := 15.0
 const PENGUIN_DIVE_HEIGHT := 0.45
+## Landing from the dive onto the belly kicks the slide on this much faster.
+const PENGUIN_SLIDE_LANDING_BOOST := 1.2
+## Jump while belly sliding hops back up onto the feet: this fraction of an
+## ordinary jump's height.
+const PENGUIN_STAND_HOP_HEIGHT := 0.35
+## The Penguin Suit is formed or unformed by pressing all four limb buttons
+## together, within this many seconds of the first. Limb powers wait out the
+## window, so a chord never also fires them.
+const PENGUIN_CHORD_WINDOW := 0.2
+## On foot the formed Penguin Suit waddles: slow, in short quick steps, the
+## whole body leaning over whichever foot is planted.
+const PENGUIN_WADDLE_SPEED_MULTIPLIER := 0.32
+const PENGUIN_WADDLE_CADENCE := 2.1
+const PENGUIN_WADDLE_STEP := deg_to_rad(7.0)
+const PENGUIN_WADDLE_THIGH_LIFT := deg_to_rad(6.0)
+const PENGUIN_WADDLE_KNEE := deg_to_rad(16.0)
+const PENGUIN_WADDLE_ROLL := deg_to_rad(7.0)
+## Flippers held a little out from the body while waddling.
+const PENGUIN_FLIPPER_SPREAD := deg_to_rad(14.0)
+## Lying prone, the face lifts forward this far, split between the base of the
+## neck and the base of the skull (as the Manchego seat's upright head is).
+const PENGUIN_HEAD_LIFT := deg_to_rad(78.0)
+const PENGUIN_HEAD_LIFT_NECK_SHARE := 0.5
 ## Belly-slide deceleration on ice, and off it (snow and ground grab the belly).
 const PENGUIN_SLIDE_FRICTION := 1.1
 const PENGUIN_SLIDE_OFF_ICE_FRICTION := 12.0
@@ -1134,6 +1157,17 @@ var _penguin_dive_airborne := false
 var _penguin_belly_sliding := false
 ## 0 upright .. 1 lying on the belly; eased by _compose_body_pose().
 var _penguin_prone := 0.0
+## Waddle: sideways lean (radians about the body's forward axis, positive over
+## the right foot), whether the waddle posed it this frame, and how far the
+## stepping has eased in.
+var _penguin_waddle_roll := 0.0
+var _penguin_waddle_posed := false
+var _penguin_waddle_blend := 0.0
+## The four-limb chord that forms/unforms the Penguin Suit.
+var _penguin_chord_timer := 0.0
+var _penguin_chord_consumed := false
+var _penguin_chord_pending_legs: Array[bool] = [false, false]
+var _penguin_chord_holding := false
 ## Base height applied by the last _compose_body_pose(). While riding, the
 ## dirtbike pose applies only the change in base height, so its chassis-pivot
 ## correction is retained rather than erased on the next frame.
@@ -1960,7 +1994,10 @@ func _physics_process(delta: float) -> void:
 		_giant_goo_jump_lift_timer = GIANT_GOO_JUMP_LIFT_DURATION
 		velocity.y = 0.0
 		_jumping = false
-	elif jump_pressed and grounded and on_ice_support and not buoyant and _blorb_suit.has_full_penguin_suit():
+	elif jump_pressed and grounded and not buoyant and _penguin_belly_sliding:
+		_stand_from_belly_slide()
+		jumped_this_frame = true
+	elif jump_pressed and grounded and on_ice_support and not buoyant and _blorb_suit.penguin_form_active():
 		_begin_penguin_dive()
 		jumped_this_frame = true
 	elif jump_pressed and (grounded or water_exit_jump_ready) and not _lake_floor_walk_active and not _lake_weighted_descent_active:
@@ -2056,6 +2093,8 @@ func _physics_process(delta: float) -> void:
 	var swim_jets := _swim_jet_count()
 	if swim_jets > 0:
 		current_speed *= pow(SWIM_JET_SPEED_MULTIPLIER, swim_jets)
+	if _penguin_waddling():
+		current_speed *= PENGUIN_WADDLE_SPEED_MULTIPLIER
 	# Leg Speed replaces the old fixed skate multiplier. High-Speed legs reach
 	# and surpass that former very-fast reference through progression itself.
 	var sliding_on_ice := grounded and _is_supported_by_ice() and not _snowboard_active and not _ice_skating_active
@@ -4043,6 +4082,10 @@ func _apply_arm_power_poses(delta: float) -> void:
 		and not _throw_aim_active
 		and not _held_item_is_weapon()
 	)
+	# Pressing all four limb buttons to form the Penguin Suit is not a power.
+	if _penguin_chord_holding:
+		left_power = false
+		right_power = false
 	var holding_power := left_power or right_power
 	if holding_power:
 		_arm_power_recovery = 0.0
@@ -4918,6 +4961,7 @@ const STREAM_HALF_ANGLE_COS := 0.85  # roughly a 32-degree half-angle cone
 
 
 func _update_limb_power_state(delta: float) -> void:
+	_penguin_chord_holding = _update_penguin_chord(delta)
 	_left_arm_water_active = _consume_limb_power("arm_left", "left_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
 	_right_arm_water_active = false if _throw_aim_active or _held_item_is_weapon() else _consume_limb_power("arm_right", "right_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
 	_left_arm_fire_active = _consume_limb_power("arm_left", "left_arm_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
@@ -4959,8 +5003,9 @@ func _update_limb_power_state(delta: float) -> void:
 		)
 	_was_powered_hover_active = hovering
 
-	_update_discrete_arm_powers(delta)
-	_update_rock_leg_powers(delta)
+	if not _penguin_chord_holding:
+		_update_discrete_arm_powers(delta)
+		_update_rock_leg_powers(delta)
 
 
 func _update_rock_leg_powers(delta: float) -> void:
@@ -5844,6 +5889,18 @@ func _update_head_look(delta: float) -> void:
 	# the ordinary look-around range that clamp is meant to limit.
 	if _player_following_manchego:
 		target_elevation -= RIDE_SPINE_LEAN * (1.0 - MANCHEGO_HEAD_UPRIGHT_NECK_SHARE)
+	# Lying prone in the Penguin Suit the face lifts forward, off the ice, the
+	# same way: split between the base of the neck and the base of the skull
+	# (PENGUIN_HEAD_LIFT_NECK_SHARE), and in place of camera tracking, which
+	# would read "forward" as straight up out of the tipped body.
+	var penguin_prone := smoothstep(0.0, 1.0, _penguin_prone)
+	if penguin_prone > 0.0:
+		target_yaw *= 1.0 - penguin_prone
+		target_elevation = lerpf(target_elevation, 0.0, penguin_prone) - PENGUIN_HEAD_LIFT * penguin_prone * (1.0 - PENGUIN_HEAD_LIFT_NECK_SHARE)
+	if _neck != null and not _player_following_manchego and _mounted_rider != self and _manchego_dismount_elapsed < 0.0:
+		_neck.rotation.x = lerp_angle(
+			_neck.rotation.x, -PENGUIN_HEAD_LIFT * penguin_prone * PENGUIN_HEAD_LIFT_NECK_SHARE, minf(turn_speed * delta, 1.0)
+		)
 	_head_look_yaw = lerp_angle(_head_look_yaw, target_yaw, turn_speed * delta)
 	_head_look_pitch = lerp_angle(_head_look_pitch, target_elevation, turn_speed * delta)
 	if aerial_head_tracking:
@@ -5919,6 +5976,45 @@ func _clamp_camera_above_ground() -> void:
 	var min_y: float = terrain.get_mesh_height(camera.global_position.x, camera.global_position.z) + CAMERA_GROUND_MARGIN
 	if camera.global_position.y < min_y:
 		camera.global_position.y = min_y
+
+
+## The formed Penguin Suit's gait, in place of the walk cycle, whose stride
+## would swing the legs out through the long penguin body: short quick steps
+## that barely lift each foot, the whole body leaning over the planted foot
+## (_penguin_waddle_roll, applied by _pose_body_penguin()), flippers held a
+## little out. Standing still, the steps and lean ease away.
+func _animate_penguin_waddle(delta: float) -> void:
+	var t := minf(POSE_SETTLE_SPEED * delta, 1.0)
+	var speed := Vector2(velocity.x, velocity.z).length()
+	var stepping := speed > 0.1 and _get_move_input().length_squared() > 0.01
+	_penguin_waddle_blend = move_toward(_penguin_waddle_blend, 1.0 if stepping else 0.0, 4.0 * delta)
+	if stepping:
+		var pace := HumanoidLocomotion.ground_speed(_playable_profile, false) * PENGUIN_WADDLE_SPEED_MULTIPLIER
+		_walk_phase += TAU * PENGUIN_WADDLE_CADENCE * clampf(speed / maxf(pace, 0.01), 0.6, 1.8) * delta
+	var phase := _walk_phase
+	var blend := _penguin_waddle_blend
+	# Negative hip X swings a leg forward, and each foot lifts on its way
+	# forward (see _animate_walk()'s knee timing).
+	var left_lift := maxf(0.0, cos(phase)) * blend
+	var right_lift := maxf(0.0, -cos(phase)) * blend
+	var swing := -sin(phase) * PENGUIN_WADDLE_STEP * blend
+	_leg_left.rotation = _leg_left.rotation.lerp(Vector3(swing - left_lift * PENGUIN_WADDLE_THIGH_LIFT, 0.0, 0.0), t)
+	_leg_right.rotation = _leg_right.rotation.lerp(Vector3(-swing - right_lift * PENGUIN_WADDLE_THIGH_LIFT, 0.0, 0.0), t)
+	_knee_left.rotation = _knee_left.rotation.lerp(Vector3(left_lift * PENGUIN_WADDLE_KNEE, 0.0, 0.0), t)
+	_knee_right.rotation = _knee_right.rotation.lerp(Vector3(right_lift * PENGUIN_WADDLE_KNEE, 0.0, 0.0), t)
+	_ankle_left.rotation = _ankle_left.rotation.lerp(Vector3.ZERO, t)
+	_ankle_right.rotation = _ankle_right.rotation.lerp(Vector3.ZERO, t)
+	var arm_t := minf(t, _arm_power_recovery)
+	_arm_left.rotation.x = lerp_angle(_arm_left.rotation.x, 0.0, arm_t)
+	_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, 0.0, arm_t)
+	_arm_left.rotation.z = lerp_angle(_arm_left.rotation.z, ProceduralFigure.ARM_OUTWARD_ANGLE + PENGUIN_FLIPPER_SPREAD, arm_t)
+	_arm_right.rotation.z = lerp_angle(_arm_right.rotation.z, -ProceduralFigure.ARM_OUTWARD_ANGLE - PENGUIN_FLIPPER_SPREAD, arm_t)
+	_elbow_left.rotation.x = lerp_angle(_elbow_left.rotation.x, 0.0, arm_t)
+	_elbow_right.rotation.x = lerp_angle(_elbow_right.rotation.x, 0.0, arm_t)
+	# Lifting the left foot plants the right: lean right (positive roll).
+	_penguin_waddle_roll = PENGUIN_WADDLE_ROLL * cos(phase) * blend
+	_penguin_waddle_posed = true
+	_update_footsteps(phase, stepping, false)
 
 
 ## Picks a fresh idle pose -- see the IDLE_* consts' own comment for the
@@ -6036,6 +6132,9 @@ func _animate_walk(
 	if not grounded:
 		_footsteps_were_moving = false
 		_animate_airborne(delta)
+		return
+	if _penguin_waddling():
+		_animate_penguin_waddle(delta)
 		return
 	# Landing spreads the shoulders briefly to brace the impact. Every
 	# ordinary grounded pose returns that spread to its rig-specific rest
@@ -6480,7 +6579,7 @@ func _compose_body_pose(delta: float, grounded: bool, on_soft_aerial_support: bo
 			_pose_body_flight_exit(delta, base_y)
 		elif _dirtbike_wheel_active:
 			_pose_body_dirtbike(delta, grounded, base_y)
-		elif _update_penguin_prone(delta) > 0.0:
+		elif _update_penguin_prone(delta) > 0.0 or absf(_penguin_waddle_roll) > 0.0001:
 			_pose_body_penguin(base_y)
 		else:
 			_pose_body_ground(base_y)
@@ -6498,18 +6597,24 @@ func _compose_body_pose(delta: float, grounded: bool, on_soft_aerial_support: bo
 func _update_penguin_prone(delta: float) -> float:
 	var target := 1.0 if (_penguin_dive_airborne or _penguin_belly_sliding) else 0.0
 	_penguin_prone = move_toward(_penguin_prone, target, PENGUIN_PRONE_RATE * delta)
+	# A waddle lean the gait did not refresh this frame settles upright.
+	if not _penguin_waddle_posed:
+		_penguin_waddle_roll = move_toward(_penguin_waddle_roll, 0.0, PENGUIN_WADDLE_ROLL * 4.0 * delta)
+	_penguin_waddle_posed = false
 	return _penguin_prone
 
 
-## The Penguin Suit's dive and belly slide: the body tips forward about its
-## belly, head leading, until it lies flat with the belly resting on the ice.
-## The collision capsule stays upright.
+## The Penguin Suit's body poses. Diving and belly sliding, the body tips
+## forward about its belly, head leading, until it lies flat with the belly
+## resting on the ice. Waddling, it leans side to side about the feet
+## (_penguin_waddle_roll). The collision capsule stays upright.
 func _pose_body_penguin(base_y: float) -> void:
 	var tip := smoothstep(0.0, 1.0, _penguin_prone)
-	var body_basis := Basis(Vector3.UP, _body_yaw) * Basis(Vector3.RIGHT, tip * PI * 0.5)
+	var tipped := Basis(Vector3.UP, _body_yaw) * Basis(Vector3.RIGHT, tip * PI * 0.5)
 	var pivot_height := lerpf(PENGUIN_BODY_PIVOT_HEIGHT, PENGUIN_BELLY_REST_HEIGHT, tip)
-	visuals.basis = body_basis
-	visuals.position = Vector3(0.0, base_y + pivot_height, 0.0) - body_basis * (Vector3.UP * PENGUIN_BODY_PIVOT_HEIGHT)
+	# The lean is applied innermost, so it turns about the feet (the origin).
+	visuals.basis = tipped * Basis(Vector3.BACK, _penguin_waddle_roll)
+	visuals.position = Vector3(0.0, base_y + pivot_height, 0.0) - tipped * (Vector3.UP * PENGUIN_BODY_PIVOT_HEIGHT)
 
 
 ## Upright on the feet at the given height, facing _body_yaw.
@@ -7084,14 +7189,11 @@ func _update_snowboard_state() -> void:
 		_snowboard=null
 
 
-## A complete pair of Ice legs automatically forms runners. There is no
-## button chord: both leg buttons remain available for their ordinary ice-
-## platform powers, and only real ice grants the skating movement below.
 ## Ends the dive on touchdown (onto the belly when it lands on ice) and ends
 ## the belly slide once it leaves the ground or the suit breaks up. The slide
 ## itself stops in _penguin_belly_slide_step() when it runs out of speed.
 func _update_penguin_state() -> void:
-	if not _blorb_suit.has_full_penguin_suit():
+	if not _blorb_suit.penguin_form_active():
 		_penguin_dive_airborne = false
 		_penguin_belly_sliding = false
 		return
@@ -7100,6 +7202,8 @@ func _update_penguin_state() -> void:
 		_penguin_dive_airborne = false
 		_penguin_belly_sliding = on_ice
 		if on_ice:
+			velocity.x *= PENGUIN_SLIDE_LANDING_BOOST
+			velocity.z *= PENGUIN_SLIDE_LANDING_BOOST
 			UISounds.play_foley(&"blorb_glide", 0.5, get_instance_id())
 	elif _penguin_belly_sliding and not on_ice and not (is_on_floor() or _is_near_ground()):
 		_penguin_belly_sliding = false
@@ -7129,6 +7233,64 @@ func _begin_penguin_dive() -> void:
 	UISounds.play_foley(&"jump", 0.52, get_instance_id())
 
 
+## Jump during a belly slide: a small hop back up onto the feet. The slide's
+## momentum carries on underfoot.
+func _stand_from_belly_slide() -> void:
+	_penguin_belly_sliding = false
+	velocity.y = HumanoidLocomotion.jump_speed(_playable_profile, PENGUIN_STAND_HOP_HEIGHT)
+	_jump_takeoff_speed = absf(velocity.y)
+	_jumping = true
+	UISounds.play_foley(&"jump", 0.45, get_instance_id())
+
+
+## On foot in the formed Penguin Suit: neither diving nor sliding.
+func _penguin_waddling() -> bool:
+	return _blorb_suit.penguin_form_active() and not _penguin_dive_airborne and not _penguin_belly_sliding
+
+
+## Watches for all four limb buttons pressed together (within
+## PENGUIN_CHORD_WINDOW) while the penguin-capable suit is worn, and toggles
+## the Penguin Suit. Returns true while limb powers must hold back: during the
+## window (leg presses in it are kept and fired if no chord completes) and
+## until a completed chord's buttons are all released.
+func _update_penguin_chord(delta: float) -> bool:
+	const ACTIONS := ["left_arm_power", "right_arm_power", "left_leg_power", "right_leg_power"]
+	if UIState.modal_open or not _blorb_suit.has_full_penguin_suit():
+		_penguin_chord_timer = 0.0
+		_penguin_chord_consumed = false
+		_penguin_chord_pending_legs = [false, false]
+		return false
+	if _penguin_chord_consumed:
+		_penguin_chord_consumed = ACTIONS.any(func(action: String) -> bool: return Input.is_action_pressed(action))
+		return true
+	var pressed_now := ACTIONS.any(func(action: String) -> bool: return Input.is_action_just_pressed(action))
+	if pressed_now and _penguin_chord_timer <= 0.0:
+		_penguin_chord_timer = PENGUIN_CHORD_WINDOW
+	if _penguin_chord_timer <= 0.0:
+		return false
+	if Input.is_action_just_pressed("left_leg_power"):
+		_penguin_chord_pending_legs[0] = true
+	if Input.is_action_just_pressed("right_leg_power"):
+		_penguin_chord_pending_legs[1] = true
+	if ACTIONS.all(func(action: String) -> bool: return Input.is_action_pressed(action)):
+		_penguin_chord_timer = 0.0
+		_penguin_chord_consumed = true
+		_penguin_chord_pending_legs = [false, false]
+		if _blorb_suit.toggle_penguin_form():
+			UISounds.play_foley(&"transform_reveal", 0.6, get_instance_id())
+		return true
+	_penguin_chord_timer -= delta
+	if _penguin_chord_timer > 0.0:
+		return true
+	# No chord: the leg presses held during the window act as ordinary presses.
+	if _penguin_chord_pending_legs[0] and _left_leg_rock_cooldown <= 0.0 and _raise_rock_platform("leg_left"):
+		_left_leg_rock_cooldown = ROCK_POWER_COOLDOWN
+	if _penguin_chord_pending_legs[1] and _right_leg_rock_cooldown <= 0.0 and _raise_rock_platform("leg_right"):
+		_right_leg_rock_cooldown = ROCK_POWER_COOLDOWN
+	_penguin_chord_pending_legs = [false, false]
+	return false
+
+
 ## Tobogganing on the belly: ice barely slows it, anything else stops it
 ## quickly, and the stick only bends its heading. Stands up when slow.
 func _penguin_belly_slide_step(steer: Vector3, delta: float) -> void:
@@ -7151,8 +7313,12 @@ func _penguin_belly_slide_step(steer: Vector3, delta: float) -> void:
 	UISounds.pulse_snowboard(get_instance_id(), speed, 0.0, 0.0 if on_ice else 1.0)
 
 
+## A complete pair of Ice legs automatically forms runners, and both leg
+## buttons remain available for their ordinary ice-platform powers; only real
+## ice grants the skating movement below. The formed Penguin Suit has no
+## runners: a penguin waddles (see _animate_penguin_waddle()).
 func _update_ice_skate_state() -> void:
-	var has_legs: bool=_blorb_suit.has_ice_skate_legs()
+	var has_legs: bool=_blorb_suit.has_ice_skate_legs() and not _blorb_suit.penguin_form_active()
 	var was_active: bool=_ice_skates_active
 	_ice_skates_active=has_legs
 	var supported: bool=_ice_skates_active and _is_supported_by_ice()
