@@ -137,7 +137,10 @@ const ICE_EAST_SHORE_X := 2418.0
 ## both legs, to skate a crystal track up the mountain (see demo_world.gd).
 const CRYSTAL_PORTAL_X := 2330.0
 const ICE_EDGE_VARIATION := 9.0
-const ICE_LAKE_DEPTH := 8.0
+## Frozen solid: there is no water under this lake's ice (unlike the Ice
+## Kingdom's, which has reasons to be reached), so its bed lies just beneath
+## the ice and nothing can slip under the sheet.
+const ICE_LAKE_DEPTH := 0.12
 ## The Ice Kingdom's layering: bank shelf, the ice skin 3 cm beneath it (so the
 ## shore occludes the ice edge), a 0.38 m sheet, and the water under it.
 const ICE_LEVEL := WATER_LEVEL + 0.45
@@ -604,8 +607,9 @@ func get_mesh_normal(x: float, z: float) -> Vector3:
 	).normalized()
 
 
+## Only the sea: the frozen lake is solid ice.
 func is_lake_area(pos: Vector2) -> bool:
-	return _water_lake.coverage(pos) > 0.08 or _frozen_lake.coverage(pos) > 0.08
+	return _water_lake.coverage(pos) > 0.08
 
 
 func get_lake_water_level() -> float:
@@ -775,7 +779,7 @@ func _build_liquid_surfaces() -> void:
 	sea.shader = OCEAN_KINGDOM_TERRAIN.OCEAN_WATER_SHADER
 	sea.set_shader_parameter("surface_color", OCEAN_KINGDOM_TERRAIN.WATER_COLOR)
 	_water_lake.build_surface(self, "SeaWater", WATER_LEVEL, sea)
-	_frozen_lake.build_frozen(self, ICE_SURFACE_LEVEL, ICE_THICKNESS, WATER_LEVEL)
+	_frozen_lake.build_frozen(self, ICE_SURFACE_LEVEL, ICE_THICKNESS, WATER_LEVEL, false)
 	_build_volcano_lava()
 
 

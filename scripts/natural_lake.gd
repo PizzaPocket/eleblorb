@@ -168,8 +168,9 @@ func build_surface(parent: Node3D, label: String, level: float, material: Materi
 
 ## A frozen lake, as in the Ice Kingdom: a solid, walkable ice sheet at
 ## `ice_surface_level` with a visible edge wall `thickness` deep, and the
-## water beneath it at `water_level`.
-func build_frozen(parent: StaticBody3D, ice_surface_level: float, thickness: float, water_level: float) -> void:
+## water beneath it at `water_level`, unless `with_water` is false: a lake
+## frozen solid, its ice lying straight on the ground beneath.
+func build_frozen(parent: StaticBody3D, ice_surface_level: float, thickness: float, water_level: float, with_water: bool = true) -> void:
 	var ice := StandardMaterial3D.new()
 	ice.albedo_color = ICE_COLOR
 	ice.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -180,6 +181,8 @@ func build_frozen(parent: StaticBody3D, ice_surface_level: float, thickness: flo
 	parent.add_child(_surface_mesh("FrozenLakeIce", ice_triangles, ice))
 	_add_collider(parent, ice_triangles)
 	_build_ice_edge_wall(parent, ice_surface_level, thickness)
+	if not with_water:
+		return
 	var water := StandardMaterial3D.new()
 	water.albedo_color = UNDER_ICE_WATER_COLOR
 	water.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

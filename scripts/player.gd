@@ -316,8 +316,15 @@ const PENGUIN_CHORD_WINDOW := 0.2
 ## CRYSTAL_TURN_RATE and climbs or dives at most CRYSTAL_MAX_PITCH, so the
 ## ribbon stays smooth. Stopped, pushing off more than CRYSTAL_RESTART_ANGLE
 ## away from the track restarts it from where the skater stands.
-const CRYSTAL_SPEED_MULTIPLIER := 2.0
-const CRYSTAL_ACCELERATION := 9.0
+## Faster than ordinary Ice skates (their speed times this), and sprinting
+## compounds a further boost on top of sprint's own.
+const CRYSTAL_SPEED_MULTIPLIER := 1.4
+const CRYSTAL_SPRINT_MULTIPLIER := 1.5
+const CRYSTAL_ACCELERATION := 14.0
+## The body pitches with the track by this fraction of its climb or dive,
+## leaning into it, and eases upright again off the track.
+const CRYSTAL_BODY_PITCH_FRACTION := 0.5
+const CRYSTAL_BODY_PITCH_RATE := 4.0
 const CRYSTAL_COAST_FRICTION := 1.2
 const CRYSTAL_TURN_RATE := 1.8
 const CRYSTAL_MAX_PITCH := deg_to_rad(60.0)
@@ -1202,6 +1209,9 @@ var _crystal_speed := 0.0
 var _crystal_heading := Vector3.FORWARD
 var _crystal_airborne := false
 var _ice_skate_blades_crystal := false
+## The body's lean along the crystal track (positive leaning forward, into a
+## climb), applied by _pose_body_crystal().
+var _crystal_body_pitch := 0.0
 ## Penguin Suit dive (airborne, ballistic) and belly slide (grounded on ice).
 var _penguin_dive_airborne := false
 var _penguin_belly_sliding := false
@@ -6783,6 +6793,8 @@ func _compose_body_pose(delta: float, grounded: bool, on_soft_aerial_support: bo
 			_pose_body_dirtbike(delta, grounded, base_y)
 		elif _update_penguin_prone(delta) > 0.0 or absf(_penguin_waddle_roll) > 0.0001:
 			_pose_body_penguin(base_y)
+		elif absf(_crystal_body_pitch) > 0.0001:
+			_pose_body_crystal(base_y)
 		else:
 			_pose_body_ground(base_y)
 			if _snowboard_active:
@@ -6817,6 +6829,13 @@ func _pose_body_penguin(base_y: float) -> void:
 	# The lean is applied innermost, so it turns about the feet (the origin).
 	visuals.basis = tipped * Basis(Vector3.BACK, _penguin_waddle_roll)
 	visuals.position = Vector3(0.0, base_y + pivot_height, 0.0) - tipped * (Vector3.UP * PENGUIN_BODY_PIVOT_HEIGHT)
+
+
+## Skating the crystal track: the body pitched about the feet to lean into
+## the track's climb or dive (_crystal_body_pitch), facing _body_yaw.
+func _pose_body_crystal(base_y: float) -> void:
+	visuals.basis = Basis(Vector3.UP, _body_yaw) * Basis(Vector3.RIGHT, _crystal_body_pitch)
+	visuals.position = Vector3(0.0, base_y, 0.0)
 
 
 ## Upright on the feet at the given height, facing _body_yaw.
@@ -7404,6 +7423,7 @@ func _update_crystal_riding(delta: float, jump_pressed: bool) -> bool:
 	if _crystal_riding and not _can_crystal_ride():
 		_end_crystal_ride(false)
 	if not _crystal_riding:
+		_crystal_body_pitch = move_toward(_crystal_body_pitch, 0.0, CRYSTAL_BODY_PITCH_RATE * delta)
 		if _crystal_airborne and not _jumping and (is_on_floor() or _is_near_ground()):
 			_crystal_airborne = false
 		var wanted := _crystal_wanted_direction()
@@ -7422,7 +7442,13 @@ func _update_crystal_riding(delta: float, jump_pressed: bool) -> bool:
 			_crystal_heading = wanted
 		elif turn > 0.0001:
 			_crystal_heading = _crystal_heading.slerp(wanted, minf(CRYSTAL_TURN_RATE * delta / turn, 1.0)).normalized()
-		var top_speed := HumanoidLocomotion.ground_speed(_playable_profile, _is_sprinting()) * CRYSTAL_SPEED_MULTIPLIER
+		# The ordinary skates' own top speed (capped at their terminal speed),
+		# then the crystal boost, and the sprint boost on top of that.
+		var skate_speed := minf(
+			HumanoidLocomotion.ground_speed(_playable_profile, false) * ICE_SKATE_SPEED_MULTIPLIER * worn_leg_speed_multiplier(),
+			ICE_SKATE_TERMINAL_SPEED
+		)
+		var top_speed := skate_speed * CRYSTAL_SPEED_MULTIPLIER * (CRYSTAL_SPRINT_MULTIPLIER if _is_sprinting() else 1.0)
 		_crystal_speed = move_toward(_crystal_speed, top_speed, CRYSTAL_ACCELERATION * delta)
 	else:
 		_crystal_speed = move_toward(_crystal_speed, 0.0, CRYSTAL_COAST_FRICTION * delta)
@@ -7435,6 +7461,8 @@ func _update_crystal_riding(delta: float, jump_pressed: bool) -> bool:
 	global_position = _crystal_track.rider_point() + Vector3.UP * FOOT_OFFSET
 	var tangent := _crystal_track.rider_tangent()
 	velocity = tangent * _crystal_speed
+	var climb := asin(clampf(tangent.y, -1.0, 1.0)) if tangent != Vector3.ZERO else 0.0
+	_crystal_body_pitch = move_toward(_crystal_body_pitch, climb * CRYSTAL_BODY_PITCH_FRACTION, CRYSTAL_BODY_PITCH_RATE * delta)
 	if Vector2(tangent.x, tangent.z).length_squared() > 0.01:
 		_body_yaw = lerp_angle(_body_yaw, atan2(tangent.x, tangent.z), minf(rotation_speed * delta, 1.0))
 	_jumping = false
@@ -7719,7 +7747,7 @@ static func build_ice_skate_blade(
 		if sole_offset<0.0 else sole_offset
 	)
 	var sole_y: float=-resolved_sole_offset
-	var ice_material:=CrystalTrack.crystal_material() if crystal else IceCrag.build_ice_material()
+	var ice_material:=CrystalTrack.crystal_material(CrystalTrack.BLADE_GLOW) if crystal else IceCrag.build_ice_material()
 	var support_height: float=ICE_SKATE_SUPPORT_HEIGHT*scale_factor
 	var runner_half_height: float=ICE_SKATE_RUNNER_HALF_HEIGHT*scale_factor
 	var runner_y: float=sole_y-support_height-runner_half_height

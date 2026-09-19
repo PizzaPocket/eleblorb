@@ -126,6 +126,15 @@ func extend(heading: Vector3, terrain: Node, space: PhysicsDirectSpaceState3D, e
 		if terrain != null and terrain.has_method("get_mesh_height"):
 			var ground: float = terrain.get_mesh_height(to.x, to.z)
 			to.y = maxf(to.y, ground + GROUND_CLEARANCE)
+		# Nor below any solid surface there (an ice sheet, a roof, a rock):
+		# the ice rides up onto it instead of dipping through it.
+		var down := PhysicsRayQueryParameters3D.create(
+			Vector3(to.x, maxf(from.y, to.y) + 2.0, to.z), Vector3(to.x, to.y - 0.5, to.z), 1
+		)
+		down.exclude = exclude + _plank_rids()
+		var surface := space.intersect_ray(down)
+		if not surface.is_empty():
+			to.y = maxf(to.y, (surface["position"] as Vector3).y + GROUND_CLEARANCE)
 		# Clearance for a standing body, not just the thin plank.
 		var probe := PhysicsRayQueryParameters3D.create(from + Vector3.UP * 0.9, to + Vector3.UP * 0.9, 1)
 		probe.exclude = exclude + _plank_rids()
@@ -285,16 +294,21 @@ func _release(plank: StaticBody3D) -> void:
 	_pool.append(plank)
 
 
-## Crystal ice: the Ice blorbs' raised ice (IceCrag), clearer and faintly
-## glowing, the look of the skates and everything they lay.
-static func crystal_material() -> StandardMaterial3D:
+## Crystal ice: the Ice blorbs' raised ice (IceCrag), clearer and glowing,
+## the look of the skates and everything they lay. `glow` sets how brightly:
+## the track glows faintly, the skates' own blades much more.
+static func crystal_material(glow: float = 0.25) -> StandardMaterial3D:
 	var material := IceCrag.build_ice_material()
 	material.albedo_color = Color(CRYSTAL_TINT, 0.78)
 	material.roughness = 0.04
 	material.emission_enabled = true
 	material.emission = CRYSTAL_TINT
-	material.emission_energy_multiplier = 0.25
+	material.emission_energy_multiplier = glow
 	return material
+
+
+## How brightly the skates' blades glow.
+const BLADE_GLOW := 2.2
 
 
 ## A loose pair of Crystal Skates for the shop/inventory: two slim crystal
@@ -302,7 +316,7 @@ static func crystal_material() -> StandardMaterial3D:
 static func build_skate_visual(item_scale: float = 1.0) -> Node3D:
 	var root := Node3D.new()
 	root.name = "CrystalSkates"
-	var material := crystal_material()
+	var material := crystal_material(BLADE_GLOW)
 	for side in [-1.0, 1.0]:
 		var runner := MeshInstance3D.new()
 		runner.mesh = SuperEgg.build_mesh(Vector3(0.025, 0.05, 0.2) * item_scale, 4.8, 4.8)
