@@ -3253,6 +3253,7 @@ func _start_generic_party_control(member: Node3D) -> bool:
 		_release_blorbus_and_giant_possession()
 		_player_following_blorbus = false
 	_controlled_generic_member = member
+	_begin_following_as_shell()
 	collision_layer = 0
 	PartyControl.set_active_member(member)
 	return true
@@ -3352,19 +3353,7 @@ func _try_start_xiao_hou_zi_control() -> bool:
 	_player_following_blorbus = false
 	_controlled_xiao_hou_zi = monkey
 	_piloting_xiao_hou_zi = true
-	# Per direct report ("the human just kind of launches into a jump and
-	# then freezes in the air in a mid-jump pose") -- _update_xiao_hou_zi_
-	# control() returns early every frame from here on, so none of the
-	# ordinary grounded-movement code that normally clears _jumping/
-	# velocity.y ever runs again for this body. Whatever was true the
-	# instant possession began (mid-jump, mid-fall) stayed frozen forever,
-	# since _follow_controlled_party_body() only ever drives horizontal
-	# velocity, never touches _jumping, and snaps position.y to the ground
-	# without ever un-sticking the pose that _jumping still implies
-	# elsewhere. Clearing both here guarantees the shell starts its new
-	# AI-follow life grounded, the same state a fresh landing would leave it in.
-	_jumping = false
-	velocity = Vector3.ZERO
+	_begin_following_as_shell()
 	# Only the currently controlled pawn should activate proximity areas.
 	# The human remains solid to the world through collision_mask, but stops
 	# presenting itself as the interaction body while following Xiao.
@@ -3770,6 +3759,16 @@ func _update_xiao_hou_zi_control(delta: float) -> void:
 	_follow_controlled_party_body(_controlled_xiao_hou_zi, delta)
 
 
+## The human hands control to a party member and starts following it (see
+## _follow_controlled_party_body()). Drops any run or jump in progress: the
+## follow code leaves velocity untouched between its arrive and follow
+## distances, so a run would otherwise carry on as a slide, and a stale jump
+## would cost a frame of grounding when control comes back.
+func _begin_following_as_shell() -> void:
+	_jumping = false
+	velocity = Vector3.ZERO
+
+
 func _follow_controlled_party_body(target: Node3D, delta: float) -> void:
 	var offset := target.global_position - global_position
 	offset.y = 0.0
@@ -3789,9 +3788,11 @@ func _follow_controlled_party_body(target: Node3D, delta: float) -> void:
 	actual_motion.y = 0.0
 	if actual_motion.length_squared() > 0.000001:
 		_body_yaw = atan2(actual_motion.x, actual_motion.z)
-	# Following is always an upright walk (any flight tilt is released).
+	# Following is always an upright walk (any flight tilt is released), and
+	# the body was just snapped to the ground above, so it is grounded whether
+	# or not it moved; idling here must not play the airborne pose.
 	_pose_body_ground(-FOOT_OFFSET)
-	_animate_walk(delta, actual_motion.length_squared() > 0.000001, 1.0)
+	_animate_walk(delta, true, 1.0)
 
 
 func _update_blorbus_control(delta: float) -> void:
