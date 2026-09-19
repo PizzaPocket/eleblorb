@@ -17,12 +17,16 @@ extends Node3D
 ## Local frame: the opening lies in the XY plane with its base on local y=0,
 ## and the portal is crossed along local Z. Rotate the node to aim it.
 
+## Emits suit_key when set, else element: the suit set a SuitRoster swaps to.
 signal crossed(element: String)
 
 ## Element of the suit this portal stands for, e.g. "water" ("" for Normal
 ## blorbs, "shiny" for shiny Normal blorbs); its body colour tints the
 ## membrane and ring.
 @export var element: String = ""
+## The suit set this portal swaps to, when it differs from the element whose
+## colour tints it (a water-tinted portal that brings one particular blorb).
+@export var suit_key: String = ""
 ## Only a crossing from the face (+Z) side to the back counts.
 @export var one_way: bool = false
 ## Half the opening's width and height. The default admits the human with room
@@ -194,7 +198,7 @@ func _physics_process(_delta: float) -> void:
 		var crossing := _last_local.lerp(local, fraction)
 		var entered_from_face := _last_local.z > 0.0
 		if _inside_opening(Vector2(crossing.x, crossing.y)) and (entered_from_face or not one_way):
-			crossed.emit(element)
+			crossed.emit(suit_key if suit_key != "" else element)
 	_last_local = local
 	_has_last = true
 

@@ -58,6 +58,9 @@ func _ready() -> void:
 		# west, the western biome's.
 		_add_portal(border["east"], x - GATE_HALF_GAP, -PI * 0.5)
 		_add_portal(border["west"], x + GATE_HALF_GAP, PI * 0.5)
+	# The Nautilus portal on the seabed, facing west like the water portal.
+	var nautilus_portal := _add_portal("water", DemoWorldTerrain.NAUTILUS_PORTAL_X, -PI * 0.5, "nautilus")
+	nautilus_portal.position = _terrain.nautilus_portal_point()
 	_add_plant_jungle()
 	call_deferred("_finish_loading")
 
@@ -77,10 +80,11 @@ func _add_plant_jungle() -> void:
 
 ## One-way portals: `facing_yaw` turns the portal's face (its local +Z) to
 ## face the side you approach it from.
-func _add_portal(element: String, x: float, facing_yaw: float) -> void:
+func _add_portal(element: String, x: float, facing_yaw: float, suit_key: String = "") -> CheckpointPortal:
 	var portal := CheckpointPortal.new()
-	portal.name = "Portal_%s_%d" % [element if element != "" else "normal", int(x)]
+	portal.name = "Portal_%s_%d" % [suit_key if suit_key != "" else (element if element != "" else "normal"), int(x)]
 	portal.element = element
+	portal.suit_key = suit_key
 	portal.one_way = true
 	portal.half_width = DemoWorldTerrain.PORTAL_HALF_WIDTH
 	portal.half_height = DemoWorldTerrain.PORTAL_HALF_HEIGHT
@@ -91,6 +95,7 @@ func _add_portal(element: String, x: float, facing_yaw: float) -> void:
 	if element == "shiny":
 		portal.crossed.connect(_on_shiny_portal_crossed)
 	add_child(portal)
+	return portal
 
 
 func _finish_loading() -> void:
@@ -129,6 +134,11 @@ func _build_party() -> void:
 		var shiny := element == "shiny"
 		var blorbs := SuitLoadout.spawn_set(self, "" if shiny else element, head_item, home, SuitLoadout.FULL_SUIT_SLOTS, 2.2, shiny)
 		_roster.add_set(element, blorbs, SuitLoadout.FULL_SUIT_SLOTS)
+	# One water blorb waiting just past the Nautilus portal on the seabed,
+	# wearing the Nautilus Crown: it takes over the head slot alone.
+	var nautilus_home := _terrain.nautilus_portal_point() + Vector3(SET_WAIT_OFFSET, 0.0, 5.0)
+	var nautilus_head: Array[String] = ["head"]
+	_roster.add_overlay("nautilus", SuitLoadout.spawn_set(self, "water", "Nautilus Crown", nautilus_home, nautilus_head, 0.0), nautilus_head)
 	_roster.start_with("")
 	_spawn_forest_shinies()
 	var monkey := XIAO_HOU_ZI_SCENE.instantiate() as XiaoHouZi

@@ -1408,3 +1408,57 @@ static func _add_box_collision(body: StaticBody3D, pos: Vector3, size: Vector3, 
 	shape.shape = box
 	shape.transform = Transform3D(basis, pos)
 	body.add_child(shape)
+
+
+# ---- Sea floor flora (the Ocean Kingdom's, shared) ------------------------------
+
+## A tall kelp ribbon of SuperEgg blades, drifting as it rises.
+static func build_ribbon_kelp(height: float, color: Color) -> Node3D:
+	var root: Node3D = Node3D.new()
+	var segment_count: int = 4
+	var segment_height: float = height / float(segment_count)
+	var drift: Vector3 = Vector3.ZERO
+	for segment in segment_count:
+		var progress: float = float(segment) / float(segment_count - 1)
+		var pivot: Node3D = Node3D.new()
+		pivot.position = drift
+		pivot.rotation.z = sin(float(segment) * 1.7 + height) * 0.13
+		root.add_child(pivot)
+		var blade: MeshInstance3D = SuperEgg.build_part(
+			Vector3(lerpf(0.22, 0.10, progress), segment_height * 0.56, 0.055),
+			color.lightened(progress * 0.08), SuperEgg.EPSILON_SOFT, 2.8
+		)
+		blade.position.y = segment_height * 0.5
+		pivot.add_child(blade)
+		drift += Vector3(sin(float(segment) * 1.31 + height) * height * 0.025, segment_height, cos(float(segment) * 1.07) * height * 0.018)
+	return root
+
+
+## A low fan of seaweed blades spread from one root.
+static func build_fan_seaweed(height: float, color: Color, rng: RandomNumberGenerator) -> Node3D:
+	var root: Node3D = Node3D.new()
+	for blade_index in 5:
+		var blade_height: float = height * rng.randf_range(0.58, 1.0)
+		var pivot: Node3D = Node3D.new()
+		pivot.rotation.z = deg_to_rad(float(blade_index - 2) * 11.0)
+		pivot.rotation.y = rng.randf_range(-0.25, 0.25)
+		root.add_child(pivot)
+		var blade: MeshInstance3D = SuperEgg.build_part(Vector3(0.11, blade_height * 0.5, 0.045), color.lightened(float(blade_index) * 0.025), 2.6, 2.8)
+		blade.position.y = blade_height * 0.5
+		pivot.add_child(blade)
+	return root
+
+
+## A branching coral: a trunk with alternating side branches.
+static func build_branching_coral(height: float, color: Color) -> Node3D:
+	var root: Node3D = Node3D.new()
+	var trunk: MeshInstance3D = SuperEgg.build_part(Vector3(0.15, height * 0.5, 0.15), color, 2.6, 2.6)
+	trunk.position.y = height * 0.5
+	root.add_child(trunk)
+	for branch_index in 4:
+		var branch_height: float = height * (0.34 + float(branch_index % 2) * 0.12)
+		var branch: MeshInstance3D = SuperEgg.build_part(Vector3(0.10, branch_height * 0.5, 0.10), color.lightened(0.04 * branch_index), 2.6, 2.6)
+		branch.position = Vector3((1.0 if branch_index % 2 == 0 else -1.0) * height * 0.16, height * (0.30 + float(branch_index) * 0.13), 0.0)
+		branch.rotation.z = deg_to_rad(28.0 if branch_index % 2 == 0 else -28.0)
+		root.add_child(branch)
+	return root

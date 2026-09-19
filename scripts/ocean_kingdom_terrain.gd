@@ -173,26 +173,33 @@ func _process(_delta: float) -> void:
 
 
 func _prepare_underwater_environment() -> void:
-	_underwater_environment = Environment.new()
-	_underwater_environment.background_mode = Environment.BG_COLOR
-	_underwater_environment.background_color = UNDERWATER_BACKGROUND
-	_underwater_environment.background_energy_multiplier = 1.12
-	_underwater_environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	_underwater_environment.ambient_light_color = Color(0.36, 0.69, 0.70)
-	_underwater_environment.ambient_light_energy = 1.34
-	_underwater_environment.fog_enabled = true
-	_underwater_environment.fog_mode = Environment.FOG_MODE_EXPONENTIAL
-	_underwater_environment.fog_light_color = UNDERWATER_FOG
-	_underwater_environment.fog_light_energy = 1.12
+	_underwater_environment = build_underwater_environment()
+
+
+## The sea's underwater look, swapped onto the camera while it is below the
+## surface. Shared with any other world that has this sea (the Demo World).
+static func build_underwater_environment() -> Environment:
+	var environment := Environment.new()
+	environment.background_mode = Environment.BG_COLOR
+	environment.background_color = UNDERWATER_BACKGROUND
+	environment.background_energy_multiplier = 1.12
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	environment.ambient_light_color = Color(0.36, 0.69, 0.70)
+	environment.ambient_light_energy = 1.34
+	environment.fog_enabled = true
+	environment.fog_mode = Environment.FOG_MODE_EXPONENTIAL
+	environment.fog_light_color = UNDERWATER_FOG
+	environment.fog_light_energy = 1.12
 	# Water retains a stronger depth cue than open air, but remains clear
 	# enough to navigate between reefs, the village lights, and landmarks.
 	# The previous 0.018 density obscured almost everything a few hundred
 	# metres away and made the kingdom feel much smaller than its real map.
-	_underwater_environment.fog_density = 0.0035
-	_underwater_environment.fog_sky_affect = 1.0
-	_underwater_environment.adjustment_enabled = true
-	_underwater_environment.adjustment_brightness = 1.16
-	_underwater_environment.adjustment_saturation = 0.94
+	environment.fog_density = 0.0035
+	environment.fog_sky_affect = 1.0
+	environment.adjustment_enabled = true
+	environment.adjustment_brightness = 1.16
+	environment.adjustment_saturation = 0.94
+	return environment
 
 
 func _floor_color(height: float) -> Color:
@@ -350,9 +357,9 @@ func _build_ocean_floor_landscape() -> void:
 				continue
 			var flora: Node3D
 			if index % 5 == 0:
-				flora = _build_fan_seaweed(_rng.randf_range(2.0, 4.8), KELP_COLORS[index % KELP_COLORS.size()])
+				flora = NatureProps.build_fan_seaweed(_rng.randf_range(2.0, 4.8), KELP_COLORS[index % KELP_COLORS.size()], _rng)
 			else:
-				flora = _build_ribbon_kelp(_rng.randf_range(2.8, 8.5), KELP_COLORS[index % KELP_COLORS.size()])
+				flora = NatureProps.build_ribbon_kelp(_rng.randf_range(2.8, 8.5), KELP_COLORS[index % KELP_COLORS.size()])
 			flora.position = Vector3(point.x, floor_y, point.y)
 			flora.rotation.y = _rng.randf_range(0.0, TAU)
 			_set_visual_range(flora, 175.0, 25.0)
@@ -372,9 +379,9 @@ func _build_ocean_floor_landscape() -> void:
 			if index % 6 == 0:
 				reef_piece = NatureProps.build_rock(_rng.randf_range(0.5, 1.5), false)
 			elif index % 3 == 0:
-				reef_piece = _build_fan_seaweed(_rng.randf_range(1.1, 2.6), REEF_COLORS[index % REEF_COLORS.size()])
+				reef_piece = NatureProps.build_fan_seaweed(_rng.randf_range(1.1, 2.6), REEF_COLORS[index % REEF_COLORS.size()], _rng)
 			else:
-				reef_piece = _build_branching_coral(_rng.randf_range(1.0, 3.0), REEF_COLORS[index % REEF_COLORS.size()])
+				reef_piece = NatureProps.build_branching_coral(_rng.randf_range(1.0, 3.0), REEF_COLORS[index % REEF_COLORS.size()])
 			reef_piece.position = Vector3(point.x, floor_y, point.y)
 			reef_piece.rotation.y = _rng.randf_range(0.0, TAU)
 			_set_visual_range(reef_piece, 210.0, 28.0)
@@ -395,55 +402,6 @@ func _random_disc(radius: float) -> Vector2:
 	var angle: float = _rng.randf_range(0.0, TAU)
 	var distance: float = sqrt(_rng.randf()) * radius
 	return Vector2(cos(angle), sin(angle)) * distance
-
-
-func _build_ribbon_kelp(height: float, color: Color) -> Node3D:
-	var root: Node3D = Node3D.new()
-	var segment_count: int = 4
-	var segment_height: float = height / float(segment_count)
-	var drift: Vector3 = Vector3.ZERO
-	for segment in segment_count:
-		var progress: float = float(segment) / float(segment_count - 1)
-		var pivot: Node3D = Node3D.new()
-		pivot.position = drift
-		pivot.rotation.z = sin(float(segment) * 1.7 + height) * 0.13
-		root.add_child(pivot)
-		var blade: MeshInstance3D = SuperEgg.build_part(
-			Vector3(lerpf(0.22, 0.10, progress), segment_height * 0.56, 0.055),
-			color.lightened(progress * 0.08), SuperEgg.EPSILON_SOFT, 2.8
-		)
-		blade.position.y = segment_height * 0.5
-		pivot.add_child(blade)
-		drift += Vector3(sin(float(segment) * 1.31 + height) * height * 0.025, segment_height, cos(float(segment) * 1.07) * height * 0.018)
-	return root
-
-
-func _build_fan_seaweed(height: float, color: Color) -> Node3D:
-	var root: Node3D = Node3D.new()
-	for blade_index in 5:
-		var blade_height: float = height * _rng.randf_range(0.58, 1.0)
-		var pivot: Node3D = Node3D.new()
-		pivot.rotation.z = deg_to_rad(float(blade_index - 2) * 11.0)
-		pivot.rotation.y = _rng.randf_range(-0.25, 0.25)
-		root.add_child(pivot)
-		var blade: MeshInstance3D = SuperEgg.build_part(Vector3(0.11, blade_height * 0.5, 0.045), color.lightened(float(blade_index) * 0.025), 2.6, 2.8)
-		blade.position.y = blade_height * 0.5
-		pivot.add_child(blade)
-	return root
-
-
-func _build_branching_coral(height: float, color: Color) -> Node3D:
-	var root: Node3D = Node3D.new()
-	var trunk: MeshInstance3D = SuperEgg.build_part(Vector3(0.15, height * 0.5, 0.15), color, 2.6, 2.6)
-	trunk.position.y = height * 0.5
-	root.add_child(trunk)
-	for branch_index in 4:
-		var branch_height: float = height * (0.34 + float(branch_index % 2) * 0.12)
-		var branch: MeshInstance3D = SuperEgg.build_part(Vector3(0.10, branch_height * 0.5, 0.10), color.lightened(0.04 * branch_index), 2.6, 2.6)
-		branch.position = Vector3((1.0 if branch_index % 2 == 0 else -1.0) * height * 0.16, height * (0.30 + float(branch_index) * 0.13), 0.0)
-		branch.rotation.z = deg_to_rad(28.0 if branch_index % 2 == 0 else -28.0)
-		root.add_child(branch)
-	return root
 
 
 func _build_seabed_glints() -> void:

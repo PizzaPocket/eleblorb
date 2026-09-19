@@ -31,10 +31,17 @@ extends StaticBody3D
 const JUNGLE_KINGDOM_TERRAIN := preload("res://scripts/jungle_kingdom_terrain.gd")
 const ROCK_GROUND_KINGDOM_TERRAIN := preload("res://scripts/rock_ground_kingdom_terrain.gd")
 const FIRE_KINGDOM_TERRAIN := preload("res://scripts/fire_kingdom_terrain.gd")
+const OCEAN_KINGDOM_TERRAIN := preload("res://scripts/ocean_kingdom_terrain.gd")
 
 const X_MIN := -140.0
 const X_MAX := 7090.0
-const Z_HALF := 170.0
+const Z_HALF := 300.0
+## The valley floor runs VALLEY_HALF_WIDTH either side of the path before its
+## walls rise, widening to OCEAN_HALF_WIDTH through the water zone's sea.
+const VALLEY_HALF_WIDTH := 115.0
+const OCEAN_HALF_WIDTH := 240.0
+const VALLEY_WALL_RISE := 50.0
+const VALLEY_WALL_HEIGHT := 34.0
 const SPACING := 5.0
 ## Windows that span the valley's full width extend this far across it, so
 ## their sides stay inside the kingdom and only their ends blend.
@@ -90,17 +97,29 @@ const PLANT_HALF := Vector2(150.0, 110.0)
 ## the whole world, and the frozen lake's water lies beneath its ice at that
 ## same level, exactly as the Ice Kingdom layers them.
 const WATER_LEVEL := -7.0
-## The long lake: a channel LAKE_RADIUS either side of its centreline, whose
-## shore runs from LAKE_SHORE_GAP past the water portal to LAKE_SHORE_GAP
-## short of the ice portal.
+## The water zone is a stretch of the Ocean Kingdom's sea: a channel
+## LAKE_RADIUS either side of its centreline whose shore runs from
+## LAKE_SHORE_GAP past the water portal to LAKE_SHORE_GAP short of the ice
+## portal. It shelves away from sandy beaches over LAKE_SLOPE_WIDTH to deep
+## water, deep enough for the Kraken though short of the open ocean's abyss,
+## over the Ocean Kingdom's rolling seabed, in its colours, with its palms on
+## the shore and its kelp and coral below.
 const LAKE_SHORE_GAP := 8.0
-const LAKE_RADIUS := 60.0
-const LAKE_EDGE_VARIATION := 9.0
-const LAKE_DEPTH := 14.0
+const LAKE_RADIUS := 150.0
+const LAKE_EDGE_VARIATION := 14.0
+const LAKE_DEPTH := 40.0
+const LAKE_SLOPE_WIDTH := 70.0
 ## An open lake's bank levels out just above the water: a narrow beach.
 const LAKE_SHELF := WATER_LEVEL + 0.35
-## The Crossroads lake lies in bare wasteland; its banks take that colour.
-const WASTELAND := Color(0.565, 0.495, 0.4)
+const LAKE_FLOOR := LAKE_SHELF - LAKE_DEPTH
+## One palm island rising from the sea.
+const ISLAND_CENTER := Vector2(1500.0, 70.0)
+const ISLAND_RADIUS := 55.0
+const ISLAND_HEIGHT := 7.0
+## A portal standing on the seabed midway along the sea (see demo_world.gd):
+## through it a single water blorb waits to take the head slot, wearing the
+## Nautilus Crown.
+const NAUTILUS_PORTAL_X := 1310.0
 
 ## The long frozen lake: from LAKE_SHORE_GAP past the ice portal to the
 ## mountain's foot.
@@ -229,7 +248,7 @@ func _init() -> void:
 	_swell.fractal_octaves = 2
 	_water_lake = _channel_lake(
 		border_x("water") + LAKE_SHORE_GAP, border_x("ice") - LAKE_SHORE_GAP,
-		LAKE_RADIUS, LAKE_EDGE_VARIATION, LAKE_DEPTH, LAKE_SHELF, 20260919
+		LAKE_RADIUS, LAKE_EDGE_VARIATION, LAKE_DEPTH, LAKE_SHELF, 20260919, LAKE_SLOPE_WIDTH
 	)
 	_frozen_lake = _channel_lake(
 		border_x("ice") + LAKE_SHORE_GAP, ICE_EAST_SHORE_X,
@@ -259,6 +278,29 @@ func _notification(what: int) -> void:
 		for sampler in [_jungle_sampler, _rock_sampler, _fire_sampler]:
 			if is_instance_valid(sampler):
 				(sampler as Node).free()
+
+
+## The Ocean Kingdom's underwater look, put on the camera while it is under the
+## sea (see _process()).
+var _underwater_environment: Environment
+var _underwater_camera: Camera3D
+
+
+func _process(_delta: float) -> void:
+	var active_camera := get_viewport().get_camera_3d()
+	if active_camera == null:
+		return
+	var at := Vector2(active_camera.global_position.x, active_camera.global_position.z)
+	var under_sea := active_camera.global_position.y < WATER_LEVEL - 0.08 and _water_lake.coverage(at) > 0.5
+	if under_sea:
+		if _underwater_environment == null:
+			_underwater_environment = OCEAN_KINGDOM_TERRAIN.build_underwater_environment()
+		if active_camera.environment != _underwater_environment:
+			active_camera.environment = _underwater_environment
+		_underwater_camera = active_camera
+	elif is_instance_valid(_underwater_camera) and _underwater_camera.environment == _underwater_environment:
+		_underwater_camera.environment = null
+		_underwater_camera = null
 
 
 func _ready() -> void:
@@ -304,12 +346,43 @@ static func border_x(east: String) -> float:
 ## A lake whose shore runs from x `west_shore` to x `east_shore` along z = 0.
 static func _channel_lake(
 	west_shore: float, east_shore: float, lake_radius: float, variation: float,
-	lake_depth: float, shelf: float, noise_seed: int
+	lake_depth: float, shelf: float, noise_seed: int, slope_width: float = NaturalLake.SHORE_FEATHER
 ) -> NaturalLake:
 	var half_length := maxf((east_shore - west_shore) * 0.5 - lake_radius, 0.0)
 	return NaturalLake.new(
-		Vector2((west_shore + east_shore) * 0.5, 0.0), lake_radius, variation, lake_depth, shelf, noise_seed, half_length
+		Vector2((west_shore + east_shore) * 0.5, 0.0), lake_radius, variation, lake_depth, shelf, noise_seed, half_length, slope_width
 	)
+
+
+## How far the valley floor reaches either side of the path at `x` before its
+## walls rise: wider through the water zone's sea.
+func _valley_half_width(x: float) -> float:
+	var ocean := smoothstep(border_x("water") - 90.0, border_x("water") + 10.0, x) * (1.0 - smoothstep(border_x("ice") - 60.0, border_x("ice") + 40.0, x))
+	return lerpf(VALLEY_HALF_WIDTH, OCEAN_HALF_WIDTH, ocean)
+
+
+## 1 across the water zone's sea and shores.
+func _ocean_weight(x: float) -> float:
+	return smoothstep(border_x("water") - 40.0, border_x("water"), x) * (1.0 - smoothstep(border_x("ice") - 20.0, border_x("ice"), x))
+
+
+## The Ocean Kingdom's rolling seabed (its _raw_height()'s layered waves).
+static func _ocean_seabed_relief(x: float, z: float) -> float:
+	return sin(x * 0.010) * 3.2 + cos(z * 0.012) * 2.5 + sin((x + z) * 0.006) * 2.0 + sin(x * 0.034) * cos(z * 0.029) * 0.9
+
+
+## The island's rise (0..1) at `point`: a broad, gently crowned island, as
+## the Ocean Kingdom shapes its own.
+static func _island_rise(point: Vector2) -> float:
+	var distance := point.distance_to(ISLAND_CENTER)
+	if distance >= ISLAND_RADIUS:
+		return 0.0
+	return pow(smoothstep(0.0, 1.0, 1.0 - distance / ISLAND_RADIUS), 0.34)
+
+
+## Where the Nautilus portal stands: on the seabed at the path.
+func nautilus_portal_point() -> Vector3:
+	return Vector3(NAUTILUS_PORTAL_X, LAKE_FLOOR, 0.0)
 
 
 ## The mountain's height along the valley's centre, before its gully sides,
@@ -396,6 +469,16 @@ func _raw_height(x: float, z: float) -> float:
 	# Basins punched into the ground (NaturalLake).
 	height = _water_lake.carve(height, point)
 	height = _frozen_lake.carve(height, point)
+	# The sea's floor rolls like the Ocean Kingdom's, a level pad under the
+	# Nautilus portal, and the island rising out of it.
+	var deep := _water_lake.depth_weight(point) * _water_lake.coverage(point)
+	if deep > 0.0:
+		height += _ocean_seabed_relief(x, z) * deep
+		var pad := (1.0 - smoothstep(PORTAL_PAD_HALF_DEPTH, PORTAL_PAD_HALF_DEPTH + PORTAL_PAD_BLEND, absf(x - NAUTILUS_PORTAL_X))) * (1.0 - smoothstep(PORTAL_HALF_WIDTH + 3.0, PORTAL_HALF_WIDTH + 3.0 + PORTAL_PAD_BLEND, absf(z)))
+		height = lerpf(height, LAKE_FLOOR, pad)
+	var island := _island_rise(point)
+	if island > 0.0:
+		height = maxf(height, lerpf(height, WATER_LEVEL + ISLAND_HEIGHT, island))
 	height += _course_elevation(x)
 	# The starting pit, punched down to a flat floor.
 	height = lerpf(height, -PIT_DEPTH, _pit_weight(point))
@@ -408,9 +491,10 @@ func _raw_height(x: float, z: float) -> float:
 		var across := 1.0 - smoothstep(PORTAL_HALF_WIDTH + 3.0, PORTAL_HALF_WIDTH + 3.0 + PORTAL_PAD_BLEND, absf(z))
 		height = lerpf(height, float(border.get("pad", _base_level(gate_x))), along * across)
 	# Valley walls along both sides and at both ends.
-	height += smoothstep(115.0, 165.0, absf(z)) * 34.0
-	height += (1.0 - smoothstep(X_MIN + 20.0, -60.0, x)) * 34.0
-	height += smoothstep(X_MAX - 50.0, X_MAX - 20.0, x) * 34.0
+	var half_width := _valley_half_width(x)
+	height += smoothstep(half_width, half_width + VALLEY_WALL_RISE, absf(z)) * VALLEY_WALL_HEIGHT
+	height += (1.0 - smoothstep(X_MIN + 20.0, -60.0, x)) * VALLEY_WALL_HEIGHT
+	height += smoothstep(X_MAX - 50.0, X_MAX - 20.0, x) * VALLEY_WALL_HEIGHT
 	return height
 
 
@@ -420,9 +504,9 @@ func _snow_weight(point: Vector2) -> float:
 	return maxf(snowfield, _mountain_weight(point.x))
 
 
-func _height_color(x: float, z: float, _height: float) -> Color:
+func _height_color(x: float, z: float, height: float) -> Color:
 	var point := Vector2(x, z)
-	var color := CROSSROADS_GRASS
+	var color := CROSSROADS_GRASS.lerp(OCEAN_KINGDOM_TERRAIN.GRASS_COLOR, _ocean_weight(x))
 	for biome in _windows:
 		var weight := biome.weight(point)
 		if weight > 0.0:
@@ -438,14 +522,24 @@ func _height_color(x: float, z: float, _height: float) -> Color:
 	var pit := _pit_weight(point)
 	if pit > 0.02 and pit < 0.98:
 		color = color.lerp(CLIFF_ROCK, 1.0 - absf(pit - 0.5) * 1.6)
-	var lake_bank := 1.0 - smoothstep(LAKE_RADIUS + NaturalLake.BANK_WIDTH - 4.0, LAKE_RADIUS + NaturalLake.BANK_WIDTH + 8.0, _water_lake.local_distance(point))
-	if lake_bank > 0.0:
-		color = color.lerp(WASTELAND, lake_bank)
+	# The sea, in the Ocean Kingdom's colours: sandy beaches and island
+	# shores, shallow and deep seabed by depth, island grass above the sand.
+	var beach := 1.0 - smoothstep(LAKE_RADIUS + NaturalLake.BANK_WIDTH - 4.0, LAKE_RADIUS + NaturalLake.BANK_WIDTH + 8.0, _water_lake.local_distance(point))
+	if beach > 0.0 or _island_rise(point) > 0.0:
+		var sea_color := OCEAN_KINGDOM_TERRAIN.BEACH_COLOR
+		var above_water := height - WATER_LEVEL
+		if above_water > 1.0 and _island_rise(point) > 0.0:
+			sea_color = OCEAN_KINGDOM_TERRAIN.GRASS_COLOR
+		elif above_water < -2.0:
+			sea_color = OCEAN_KINGDOM_TERRAIN.SHALLOW_FLOOR_COLOR.lerp(
+				OCEAN_KINGDOM_TERRAIN.DEEP_FLOOR_COLOR, smoothstep(-6.0, -16.0, above_water)
+			)
+		color = color.lerp(sea_color, maxf(beach, 1.0 if _island_rise(point) > 0.0 else 0.0))
 	# The high course before the cliff, the cliff and the chasm: bare rock.
 	var rock := smoothstep(DIRT_START_X + DIRT_LENGTH - 20.0, DIRT_START_X + DIRT_LENGTH + 10.0, x) * (1.0 - smoothstep(CHASM_FAR_WALL_X + CLIFF_FACE_WIDTH, CHASM_FAR_WALL_X + CLIFF_FACE_WIDTH + 30.0, x))
 	if rock > 0.0:
 		color = color.lerp(CLIFF_ROCK, rock)
-	if absf(z) > 125.0 or x < -70.0 or x > X_MAX - 60.0:
+	if absf(z) > _valley_half_width(x) + 10.0 or x < -70.0 or x > X_MAX - 60.0:
 		color = STONE.lerp(color, 0.35)
 	return color
 
@@ -559,7 +653,8 @@ const CHUNK_LENGTH := 300.0
 ## Keyed by the x at which each takes over, west to east.
 func _terrain_materials() -> Array:
 	return [
-		[X_MIN, _terrain_material(1.0, 1.0)],                  # pit, forest, plant, lake
+		[X_MIN, _terrain_material(1.0, 1.0)],                  # pit, forest, plant
+		[border_x("water"), _terrain_material(0.0, 0.86)],     # the sea
 		[border_x("ice"), _terrain_material(0.0, 0.88)],       # ice, snow
 		[border_x("ground"), _terrain_material(0.0, 0.94)],    # ground, sky cliff
 		[border_x("fire"), _terrain_material(0.0, 0.96)],      # fire
@@ -640,7 +735,10 @@ func _build_chunk(ix0: int, ix1: int, material: Material) -> PackedVector3Array:
 ## Liquid surfaces. Water and lava are not solid (swimming and lava contact are
 ## gameplay queries above); the frozen lake's ice sheet and edge are.
 func _build_liquid_surfaces() -> void:
-	_water_lake.build_water(self, WATER_LEVEL)
+	var sea := ShaderMaterial.new()
+	sea.shader = OCEAN_KINGDOM_TERRAIN.OCEAN_WATER_SHADER
+	sea.set_shader_parameter("surface_color", OCEAN_KINGDOM_TERRAIN.WATER_COLOR)
+	_water_lake.build_surface(self, "SeaWater", WATER_LEVEL, sea)
 	_frozen_lake.build_frozen(self, ICE_SURFACE_LEVEL, ICE_THICKNESS, WATER_LEVEL)
 	_build_volcano_lava()
 
@@ -715,7 +813,7 @@ func _place(node: Node3D, x: float, z: float) -> void:
 
 
 func _on_path(point: Vector2) -> bool:
-	return absf(point.y) < 8.0 or absf(point.y) > 108.0
+	return absf(point.y) < 8.0 or absf(point.y) > _valley_half_width(point.x) - 7.0
 
 
 ## The Crossroads' own forest clusters (wilderness_scatter.gd's
@@ -782,12 +880,75 @@ func _mushroom(mushroom_name: String) -> MushroomPickup:
 	return pickup
 
 
+## The Ocean Kingdom's shore and seabed life: palms, banana trees, bushes and
+## grass along both beaches and over the island; kelp meadows across the
+## seabed and coral reefs on the shelving shallows.
 func _scatter_lake_shore() -> void:
-	for index in 40:
-		var point := _water_lake.point_on_ring(_rng.randf_range(0.0, TAU), LAKE_RADIUS + _rng.randf_range(10.0, 22.0))
-		if _on_path(point):
+	var kelp_colors: Array = OCEAN_KINGDOM_TERRAIN.KELP_COLORS
+	var reef_colors: Array = OCEAN_KINGDOM_TERRAIN.REEF_COLORS
+	for index in 150:
+		var point := _water_lake.point_on_ring(_rng.randf_range(0.0, TAU), LAKE_RADIUS + _rng.randf_range(8.0, 70.0))
+		if _on_path(point) or absf(point.x - border_x("water")) < 20.0 or absf(point.x - border_x("ice")) < 20.0:
 			continue
-		_place(NatureProps.build_rock(_rng.randf_range(0.6, 1.6)), point.x, point.y)
+		if get_mesh_height(point.x, point.y) < WATER_LEVEL + 0.8:
+			continue
+		_place_shore_plant(point, index)
+	for index in 40:
+		var point := ISLAND_CENTER + Vector2.from_angle(_rng.randf_range(0.0, TAU)) * sqrt(_rng.randf()) * ISLAND_RADIUS * 0.6
+		if get_mesh_height(point.x, point.y) < WATER_LEVEL + 1.0:
+			continue
+		_place_shore_plant(point, index)
+	for index in 220:
+		var point := Vector2(
+			_rng.randf_range(_water_lake.center.x - _water_lake.half_length - LAKE_RADIUS, _water_lake.center.x + _water_lake.half_length + LAKE_RADIUS),
+			_rng.randf_range(-LAKE_RADIUS, LAKE_RADIUS)
+		)
+		var floor_y := get_mesh_height(point.x, point.y)
+		if _water_lake.coverage(point) < 0.9 or floor_y > WATER_LEVEL - 2.5 or absf(point.x - NAUTILUS_PORTAL_X) < 20.0 and absf(point.y) < 40.0:
+			continue
+		var flora: Node3D
+		if floor_y > WATER_LEVEL - 20.0 and index % 2 == 0:
+			if index % 6 == 0:
+				flora = NatureProps.build_rock(_rng.randf_range(0.5, 1.5), false)
+			elif index % 4 == 0:
+				flora = NatureProps.build_fan_seaweed(_rng.randf_range(1.1, 2.6), reef_colors[index % reef_colors.size()], _rng)
+			else:
+				flora = NatureProps.build_branching_coral(_rng.randf_range(1.0, 3.0), reef_colors[index % reef_colors.size()])
+		elif index % 5 == 0:
+			flora = NatureProps.build_fan_seaweed(_rng.randf_range(2.0, 4.8), kelp_colors[index % kelp_colors.size()], _rng)
+		else:
+			flora = NatureProps.build_ribbon_kelp(_rng.randf_range(2.8, 8.5), kelp_colors[index % kelp_colors.size()])
+		flora.rotation.y = _rng.randf_range(0.0, TAU)
+		_place(flora, point.x, point.y)
+		_set_visual_range(flora, 175.0, 25.0)
+
+
+## One shore plant, as the Ocean Kingdom's islands mix them: mostly palms,
+## with banana trees, bushes and grass tufts.
+func _place_shore_plant(point: Vector2, index: int) -> void:
+	var plant: Node3D
+	match index % 6:
+		0, 1, 2:
+			plant = NatureProps.build_palm_tree(_rng.randf_range(5.0, 9.5), _rng.randf_range(-0.14, 0.14), _rng)
+		3:
+			plant = NatureProps.build_banana_tree(_rng.randf_range(5.5, 8.0), _rng)
+		4:
+			plant = NatureProps.build_bush(Color(0.08, 0.62, 0.35))
+		_:
+			plant = NatureProps.build_grass_tuft(Color(0.18, 0.74, 0.39))
+	plant.rotation.y = _rng.randf_range(0.0, TAU)
+	_place(plant, point.x, point.y)
+	_set_visual_range(plant, 340.0, 30.0)
+
+
+func _set_visual_range(root: Node, end_distance: float, fade_margin: float) -> void:
+	if root is GeometryInstance3D:
+		var geometry := root as GeometryInstance3D
+		geometry.visibility_range_end = end_distance
+		geometry.visibility_range_end_margin = fade_margin
+		geometry.visibility_range_fade_mode = GeometryInstance3D.VISIBILITY_RANGE_FADE_SELF
+	for child in root.get_children():
+		_set_visual_range(child, end_distance, fade_margin)
 
 
 ## The mountain dressed as the Ice Kingdom dresses its own: rocks (every

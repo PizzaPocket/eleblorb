@@ -39,14 +39,20 @@ var depth: float
 ## lake, just above the water for an open one (a narrow beach).
 var shelf_level: float
 var half_length := 0.0
+## How far inside the shore the basin reaches its full depth. SHORE_FEATHER
+## by default (a steep-sided lake); wider for a sea shelving gradually away
+## from the beach.
+var slope_width := SHORE_FEATHER
 var _noise := FastNoiseLite.new()
 
 
 func _init(
 	lake_center: Vector2, lake_radius: float, lake_edge_variation: float,
-	lake_depth: float, lake_shelf_level: float, noise_seed: int, lake_half_length: float = 0.0
+	lake_depth: float, lake_shelf_level: float, noise_seed: int, lake_half_length: float = 0.0,
+	lake_slope_width: float = SHORE_FEATHER
 ) -> void:
 	half_length = lake_half_length
+	slope_width = lake_slope_width
 	center = lake_center
 	radius = lake_radius
 	edge_variation = lake_edge_variation
@@ -95,7 +101,14 @@ func carve(ground_height: float, pos: Vector2) -> float:
 	var bank := 1.0 - smoothstep(radius, radius + BANK_WIDTH, local_distance(pos))
 	var banked := lerpf(ground_height, shelf_level, bank)
 	var lake := coverage(pos)
-	return lerpf(banked, shelf_level - depth * lake, lake)
+	return lerpf(banked, shelf_level - depth * depth_weight(pos), lake)
+
+
+## 0 at the shore, rising to 1 where the basin reaches full depth,
+## slope_width inside the edge.
+func depth_weight(pos: Vector2) -> float:
+	var measure := _distance_and_edge(pos)
+	return 1.0 - smoothstep(measure.y - slope_width, measure.y, measure.x)
 
 
 ## Distance from the lake's centreline: compare with radius, radius +
