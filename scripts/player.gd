@@ -2686,16 +2686,15 @@ func _try_predictive_blorb_bounce(delta: float, was_grounded: bool) -> bool:
 			best_blorb = blorb
 	if best_blorb == null:
 		return false
-	global_position.y = best_surface_y + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
-	_bounce_off_blorb(best_blorb)
-	return true
+	return _launch_off_blorb(best_blorb)
 
 
 ## Post-movement recovery path for NPC heads and any blorb contact whose
 ## surface moved unexpectedly during this physics tick. Ordinary blorb
 ## landings should normally be resolved by the predictive pass above.
 func _check_creature_bounce(was_grounded: bool, pre_move_feet_y: float) -> void:
-	if was_grounded:
+	# A contact while still rising is the tail of a launch, not a landing.
+	if was_grounded or velocity.y > 0.1:
 		return
 	for i in get_slide_collision_count():
 		var collision := get_slide_collision(i)
@@ -2705,12 +2704,8 @@ func _check_creature_bounce(was_grounded: bool, pre_move_feet_y: float) -> void:
 		var creature := collider as Node
 		if creature.is_in_group("blorbs"):
 			var blorb := creature as Blorb
-			var blorb_surface: Variant = blorb.bounce_surface_height_at(global_position.x, global_position.z)
-			if blorb_surface != null:
-				global_position.y = (
-					(blorb_surface as float) + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
-				)
-				_bounce_off_blorb(blorb)
+			if blorb.bounce_surface_height_at(global_position.x, global_position.z) != null:
+				_launch_off_blorb(blorb)
 				return
 		elif creature.is_in_group("skeletons") and creature.has_method("take_damage"):
 			_stomp_nme(creature)
@@ -2746,8 +2741,7 @@ func _check_creature_bounce(was_grounded: bool, pre_move_feet_y: float) -> void:
 			continue
 		var surface_y := blorb_surface as float
 		if pre_move_feet_y >= surface_y and global_position.y - FOOT_OFFSET <= surface_y:
-			global_position.y = surface_y + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
-			_bounce_off_blorb(blorb)
+			_launch_off_blorb(blorb)
 			return
 
 
@@ -2782,9 +2776,7 @@ func _check_rising_air_blorb_bounce(was_grounded: bool) -> bool:
 		if feet_gap >= -0.04 and feet_gap <= 0.08:
 			# Resolve the visual contact before launching. This removes the old
 			# hovering gap while retaining the existing squash/bounce response.
-			global_position.y = contact_y + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
-			_bounce_off_blorb(blorb)
-			return true
+			return _launch_off_blorb(blorb)
 	return false
 
 
@@ -2808,9 +2800,7 @@ func _recover_stalled_blorb_bounce() -> bool:
 		# the visible crown so a physics depenetration or squashed render frame
 		# cannot strand the feet just beneath the analytic surface.
 		if feet_y >= surface_y - 0.38 and feet_y <= surface_y + 0.18:
-			global_position.y = surface_y + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
-			_bounce_off_blorb(blorb)
-			return true
+			return _launch_off_blorb(blorb)
 	return false
 
 
@@ -2833,20 +2823,45 @@ func _enforce_no_blorb_support_stall() -> bool:
 		var blorb := collider as Blorb
 		if blorb.blorb_type == "size" or blorb.is_worn or blorb.is_melted:
 			continue
-		var surface: Variant = blorb.bounce_surface_height_at(global_position.x, global_position.z)
-		if surface != null:
-			global_position.y = maxf(
-				global_position.y,
-				(surface as float) + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
-			)
-		else:
-			# Outside the rendered crown but still physically supported by its
-			# collider: separate upward before launching so the next frame cannot
-			# immediately resolve the capsule back to zero vertical velocity.
-			global_position.y += BLORB_BOUNCE_RELEASE_CLEARANCE + 0.08
-		_bounce_off_blorb(blorb)
-		return true
+		return _launch_off_blorb(blorb)
 	return false
+
+
+## The one way every blorb landing launches: rests the feet on the blorb
+## (_blorb_rest_feet_y()) and bounces. Refused while the player is already
+## rising from a launch, so a contact reported on the way up can never
+## re-launch every frame (the stuck squash-and-jump loop). Returns whether it
+## launched.
+func _launch_off_blorb(blorb: Blorb) -> bool:
+	if _jumping and velocity.y > 0.1:
+		return false
+	global_position.y = _blorb_rest_feet_y(blorb) + FOOT_OFFSET
+	_bounce_off_blorb(blorb)
+	return true
+
+
+## Where the feet rest to launch off `blorb`: never lower than they already
+## are, on or above its rendered crown, and high enough that the capsule's
+## rounded bottom clears the blorb's collision sphere. Off-centre, the crown
+## under the feet sits lower than where capsule and sphere meet, so resting
+## on the crown alone started the next move inside the sphere; physics then
+## reported that overlap as a fresh landing and the bounce repeated every
+## frame without ever leaving.
+func _blorb_rest_feet_y(blorb: Blorb) -> float:
+	var feet := global_position.y - FOOT_OFFSET
+	var crown: Variant = blorb.bounce_surface_height_at(global_position.x, global_position.z)
+	if crown != null:
+		feet = maxf(feet, (crown as float) + BLORB_BOUNCE_RELEASE_CLEARANCE)
+	var sphere := blorb.bounce_collider_sphere()
+	var capsule := _collision_shape.shape as CapsuleShape3D
+	var center: Vector3 = sphere["center"]
+	var reach := float(sphere["radius"]) + capsule.radius
+	var across := Vector2(global_position.x - center.x, global_position.z - center.z).length()
+	if across < reach:
+		# The capsule's lowest sphere sits `capsule.radius` above the feet.
+		var clear_feet := center.y + sqrt(reach * reach - across * across) - capsule.radius
+		feet = maxf(feet, clear_feet + BLORB_BOUNCE_RELEASE_CLEARANCE)
+	return feet
 
 
 ## Launches the player back into the jump arc instead of settling, using the
@@ -2959,8 +2974,7 @@ func receive_platform_aid_bounce(platform: Blorb) -> void:
 			return
 		var feet_y := global_position.y - FOOT_OFFSET
 		if feet_y <= (surface as float) + 0.35:
-			global_position.y = (surface as float) + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
-			_bounce_off_blorb(platform)
+			_launch_off_blorb(platform)
 
 
 func _enforce_platform_aid_completion(delta: float) -> void:
@@ -2981,8 +2995,7 @@ func _enforce_platform_aid_completion(delta: float) -> void:
 	var surface: Variant = platform.bounce_surface_height_at(global_position.x, global_position.z)
 	var feet_y := global_position.y - FOOT_OFFSET
 	if surface != null and feet_y >= (surface as float) - 0.08 and feet_y <= (surface as float) + 0.38:
-		global_position.y = (surface as float) + FOOT_OFFSET + BLORB_BOUNCE_RELEASE_CLEARANCE
-		_bounce_off_blorb(platform)
+		_launch_off_blorb(platform)
 	else:
 		platform.finish_platform_aid()
 		_platform_aid_setup_blorb = null
@@ -8262,6 +8275,11 @@ func _try_step_onto_prop(delta: float) -> void:
 	query.exclude = [self]
 	var result := space_state.intersect_ray(query)
 	if result.is_empty():
+		return
+	# Blorbs are trampolines, never steps: stepping up onto one lifted the
+	# player onto its round side and into the bounce handling at an odd angle.
+	var stepped_on := result.get("collider") as Node
+	if stepped_on != null and stepped_on.is_in_group("blorbs"):
 		return
 
 	# Explicit : float, not := -- result is an untyped Dictionary

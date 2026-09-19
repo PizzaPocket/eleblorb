@@ -2231,6 +2231,15 @@ func giant_surface_height_at(world_x: float, world_z: float) -> Variant:
 	return global_position.y + (t * BODY_HEIGHT - EMBED_DEPTH) * size_multiplier * vertical_scale
 
 
+## The blorb's collision sphere in world space ({"center", "radius"}), so a
+## character landing on it can rest clear of the sphere rather than inside
+## it (see Player._blorb_rest_feet_y()).
+func bounce_collider_sphere() -> Dictionary:
+	var shape := _collision_shape.shape as SphereShape3D
+	var scale_factor: float = _collision_shape.global_transform.basis.get_scale().x
+	return {"center": _collision_shape.global_position, "radius": shape.radius * scale_factor}
+
+
 ## Upper collision-sphere surface at an XZ point, used when a moving air
 ## blorb rises into a player. Static-body overlap recovery does not always
 ## appear in CharacterBody3D's slide-collision list, so the player needs the
