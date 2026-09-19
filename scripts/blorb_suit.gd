@@ -82,7 +82,9 @@ const PENGUIN_HEM_ABOVE_ANKLE := 0.05
 const PENGUIN_TAIL_HALF_WIDTH := 0.5
 const PENGUIN_TAIL_HALF_THICKNESS := 0.035
 const PENGUIN_TAIL_HALF_LENGTH := 0.17
-const PENGUIN_TAIL_T := 0.1
+const PENGUIN_TAIL_T := 0.13
+## How much of the tail's length is sunk into the body.
+const PENGUIN_TAIL_SUNK := 0.45
 const PENGUIN_TAIL_PITCH := deg_to_rad(22.0)
 ## Penguin flippers: thinner across their flat face than along it, and
 ## narrowing past the wrist to a point beyond the fingertips.
@@ -105,17 +107,18 @@ const PENGUIN_SHOULDER_CAP := 0.85
 ## one mass from above the hips tapering to the ankles, then a fluke around
 ## both feet. Half-width and half-depth at each station down the tail, the
 ## fluke's length past the toes and the notch pulled into its trailing edge.
+## Generous throughout, so the legs and feet inside never break its surface.
 const MERMAID_TAIL_STATIONS := [
-	Vector2(0.19, 0.14),   # start, up inside the pelvis
-	Vector2(0.24, 0.17),   # hips
-	Vector2(0.16, 0.12),   # knees
-	Vector2(0.085, 0.075), # ankles: the narrowest point
-	Vector2(0.17, 0.06),   # toes: the fluke's root, wrapping both feet
-	Vector2(0.36, 0.035),  # fluke, widest
-	Vector2(0.30, 0.015),  # fluke's trailing edge
+	Vector2(0.24, 0.19),   # start, up inside the pelvis
+	Vector2(0.30, 0.23),   # hips
+	Vector2(0.22, 0.18),   # knees
+	Vector2(0.15, 0.13),   # ankles: the narrowest point
+	Vector2(0.21, 0.11),   # toes: the fluke's root, wrapping both feet
+	Vector2(0.40, 0.05),   # fluke, widest
+	Vector2(0.34, 0.02),   # fluke's trailing edge
 ]
 const MERMAID_TAIL_TOP := 0.1
-const MERMAID_FLUKE_LENGTH := 0.34
+const MERMAID_FLUKE_LENGTH := 0.38
 const MERMAID_FLUKE_NOTCH := 0.12
 ## How far above each foot its blorb's eyes sit on the fluke.
 const MERMAID_FACE_DEPTH := 0.06
@@ -806,6 +809,29 @@ static func rebuild_arm(
 ## (pointed) feet, its trailing edge notched into two lobes. Cross-sections
 ## are ellipses, wide across the body (MERMAID_TAIL_STATIONS).
 static func build_mermaid_tail_mesh(root: Node3D, pivots: Dictionary, rig_scale: float) -> ArrayMesh:
+	var rings: Array = []
+	for frame in mermaid_tail_frames(root, pivots, rig_scale):
+		var center: Vector3 = frame["center"]
+		var tangent: Vector3 = frame["tangent"]
+		var across: Vector3 = frame["across"]
+		var up: Vector3 = frame["up"]
+		var size: Vector2 = frame["size"]
+		var fluke: float = frame["fluke"]
+		var ring: Array[Vector3] = []
+		for around_index in MERMAID_TAIL_SEGMENTS:
+			var around := TAU * float(around_index) / float(MERMAID_TAIL_SEGMENTS)
+			# The fluke's notch: the trailing edge's middle drawn back toward
+			# the body, leaving two lobes out at the sides.
+			var notch := -tangent * MERMAID_FLUKE_NOTCH * rig_scale * fluke * pow(1.0 - absf(cos(around)), 1.5)
+			ring.append(center + across * cos(around) * size.x + up * sin(around) * size.y + notch)
+		rings.append(ring)
+	return BlorbBodyShape.build_mesh_from_rings(rings)
+
+
+## The tail's cross-sections down its length, in `root` space: each a centre,
+## the tail's direction there, its across (side to side) and up axes, its
+## elliptical half-size, and how far into the fluke's notch it is (0..1).
+static func mermaid_tail_frames(root: Node3D, pivots: Dictionary, rig_scale: float) -> Array:
 	var mid := func(left_key: String, right_key: String) -> Vector3:
 		return root.to_local(((pivots[left_key] as Node3D).global_position + (pivots[right_key] as Node3D).global_position) * 0.5)
 	var hip: Vector3 = mid.call("leg_left_hip", "leg_right_hip")
@@ -822,7 +848,7 @@ static func build_mermaid_tail_mesh(root: Node3D, pivots: Dictionary, rig_scale:
 	extended.append_array(points)
 	extended.append(points[points.size() - 1] * 2.0 - points[points.size() - 2])
 	var fluke_start_index := 4
-	var rings: Array = []
+	var frames: Array = []
 	for segment in points.size() - 1:
 		var steps := MERMAID_TAIL_RINGS_PER_SEGMENT + 1 if segment == points.size() - 2 else MERMAID_TAIL_RINGS_PER_SEGMENT
 		for step in steps:
@@ -832,19 +858,14 @@ static func build_mermaid_tail_mesh(root: Node3D, pivots: Dictionary, rig_scale:
 			var eased := smoothstep(0.0, 1.0, t)
 			var size: Vector2 = (MERMAID_TAIL_STATIONS[segment] as Vector2).lerp(MERMAID_TAIL_STATIONS[segment + 1] as Vector2, eased) * rig_scale
 			var across := (side - tangent * side.dot(tangent)).normalized()
-			var up := tangent.cross(across)
-			# The fluke's notch: the trailing edge's middle drawn back toward
-			# the body, leaving two lobes out at the sides.
 			var fluke := 0.0
 			if segment >= fluke_start_index + 1:
 				fluke = clampf((float(segment - fluke_start_index - 1) + t), 0.0, 1.0)
-			var ring: Array[Vector3] = []
-			for around_index in MERMAID_TAIL_SEGMENTS:
-				var around := TAU * float(around_index) / float(MERMAID_TAIL_SEGMENTS)
-				var notch := -tangent * MERMAID_FLUKE_NOTCH * rig_scale * fluke * pow(1.0 - absf(cos(around)), 1.5)
-				ring.append(center + across * cos(around) * size.x + up * sin(around) * size.y + notch)
-			rings.append(ring)
-	return BlorbBodyShape.build_mesh_from_rings(rings)
+			frames.append({
+				"center": center, "tangent": tangent, "across": across, "up": tangent.cross(across),
+				"size": size, "fluke": fluke,
+			})
+	return frames
 
 
 ## Rounds off the start of a limb tube as a hemisphere of `radius` centred
@@ -1169,21 +1190,24 @@ static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: f
 	var torso := MeshInstance3D.new()
 	torso.name = "TorsoBlorbPenguin"
 	torso.mesh = BlorbBodyShape.build_mesh_from_rings(rings)
-	torso.set_surface_override_material(0, _build_goo_material(vis))
-	spine_pivot.add_child(torso)
-	# The tail: a flattened SuperEgg jutting from the low back, part of the
-	# same blorb, its tip tipped down toward the ground.
-	var tail := MeshInstance3D.new()
-	tail.name = "PenguinTail"
-	tail.mesh = SuperEgg.build_mesh(Vector3(
+	# The tail: a flattened SuperEgg growing out of the low back, tipped down
+	# toward the ground. Merged into the body's own mesh, so it is the same
+	# blorb and the same surface rather than a piece laid over it.
+	var tail_mesh := SuperEgg.build_mesh(Vector3(
 		half_width * PENGUIN_TAIL_HALF_WIDTH, PENGUIN_TAIL_HALF_THICKNESS * rig_scale, PENGUIN_TAIL_HALF_LENGTH * rig_scale
 	), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
-	tail.set_surface_override_material(0, _build_goo_material(vis))
 	var back := half_depth * _penguin_torso_width(PENGUIN_TAIL_T, shoulder_t)
 	# Rotating about +X by a negative angle drops a part's -Z (back) end.
-	tail.basis = Basis(Vector3.RIGHT, -PENGUIN_TAIL_PITCH)
-	tail.position = Vector3(0.0, lerpf(bottom, top, PENGUIN_TAIL_T), -back) + tail.basis * Vector3(0.0, 0.0, -PENGUIN_TAIL_HALF_LENGTH * 0.6 * rig_scale)
-	torso.add_child(tail)
+	var tail_basis := Basis(Vector3.RIGHT, -PENGUIN_TAIL_PITCH)
+	var tail_position := Vector3(0.0, lerpf(bottom, top, PENGUIN_TAIL_T), -back) + tail_basis * Vector3(
+		0.0, 0.0, -PENGUIN_TAIL_HALF_LENGTH * (1.0 - 2.0 * PENGUIN_TAIL_SUNK) * rig_scale
+	)
+	var merged := SurfaceTool.new()
+	merged.append_from(torso.mesh, 0, Transform3D.IDENTITY)
+	merged.append_from(tail_mesh, 0, Transform3D(tail_basis, tail_position))
+	torso.mesh = merged.commit()
+	torso.set_surface_override_material(0, _build_goo_material(vis))
+	spine_pivot.add_child(torso)
 	const EYE_T := 0.8
 	var eye_width := _penguin_torso_width(EYE_T, shoulder_t)
 	var eye_belly := half_depth * PENGUIN_BELLY_FORWARD * sin(PI * clampf(EYE_T / 0.85, 0.0, 1.0))
@@ -2158,7 +2182,7 @@ static func _build_nautilus_crown(head_pivot: Node3D, contents: AABB, head_size:
 	var brow := NautilusCrown.point_at(shape, eye_angle)
 	var outward := NautilusCrown.outward_at(shape, eye_angle)
 	var brow_width := NautilusCrown.width_at(shape, eye_angle)
-	var surface := brow + outward * brow_width * NautilusCrown.THICKNESS
+	var surface := brow + outward * NautilusCrown.thickness_at(shape, eye_angle)
 	var eye_mesh_radius := brow_width * 0.16 * 0.5 * 1.8
 	var eye_color := (vis["albedo"] as Color).darkened(0.25)
 	for side in [-1.0, 1.0]:
@@ -2180,7 +2204,7 @@ static func _build_nautilus_crown(head_pivot: Node3D, contents: AABB, head_size:
 		var core_material: StandardMaterial3D = core.get_meta("material")
 		core_material.emission = vis["core_emission"] as Color
 		core_material.emission_energy_multiplier = vis["core_emission_energy"] as float
-	core.position = brow + outward * brow_width * NautilusCrown.THICKNESS * 0.3
+	core.position = brow + outward * NautilusCrown.thickness_at(shape, eye_angle) * 0.3
 	shell.add_child(core)
 	_add_head_core_light(core, vis)
 	return root

@@ -81,9 +81,17 @@ const PIT_SHELF_INNER_START := 21.0
 const PIT_SHELF_INNER_END := 24.9
 const PIT_SHELF_OUTER_RADIUS := 38.0
 const PIT_SHELF_RIM_RADIUS := 44.0
+## The shelf's inner edge is a sheer rock face, as steep as the outer wall:
+## the terrain grid (SPACING) can only slope across a cell, so solid rock
+## blocks stand from the floor to the shelf's level between these radii,
+## hiding that slope, all round the shelf's arc.
+const PIT_SHELF_FACE_RADIUS := 20.5
+const PIT_SHELF_FACE_BACK := 25.4
+const PIT_SHELF_FACE_BLOCK_WIDTH := 4.0
 ## Ledges: angle round the pit from east (radians), distance from the
-## centre, and the height of the ledge's top.
-const PIT_FIRST_LEDGE := Vector3(-0.26, 22.5, -18.0)
+## centre, and the height of the ledge's top. The first sits a short hop
+## from the shelf's face.
+const PIT_FIRST_LEDGE := Vector3(-0.26, 17.9, -18.0)
 const PIT_SECOND_LEDGE := Vector3(0.05, 37.0, PIT_SHELF_HEIGHT + 8.5)
 const PIT_LEDGE_HALF_SIZE := Vector3(2.0, 0.6, 2.0)
 ## The stair from the second ledge to the rim: each step this much higher
@@ -837,6 +845,7 @@ func _scatter_scenery() -> void:
 ## The pit's two ledges and its stair (see PIT_DEPTH): flat-topped stone
 ## blocks standing out from the wall, solid and meant to be landed on.
 func _build_pit_ledges() -> void:
+	_build_pit_shelf_face()
 	_add_pit_block("PitLedge0", PIT_FIRST_LEDGE, PIT_LEDGE_HALF_SIZE)
 	_add_pit_block("PitLedge1", PIT_SECOND_LEDGE, PIT_LEDGE_HALF_SIZE)
 	var top := PIT_SECOND_LEDGE.z + PIT_STAIR_RISE
@@ -851,9 +860,24 @@ func _build_pit_ledges() -> void:
 		index += 1
 
 
+## The shelf's sheer inner face: overlapping boxy rock blocks round the
+## shelf's arc, from below the floor up to exactly the shelf's level, so the
+## shelf ends in a vertical drop to the floor.
+func _build_pit_shelf_face() -> void:
+	var depth := PIT_SHELF_FACE_BACK - PIT_SHELF_FACE_RADIUS
+	var middle_radius := (PIT_SHELF_FACE_BACK + PIT_SHELF_FACE_RADIUS) * 0.5
+	var arc := PIT_SHELF_HALF_ANGLE * 2.0 * PIT_SHELF_FACE_RADIUS
+	var count := int(ceil(arc / (PIT_SHELF_FACE_BLOCK_WIDTH * 0.8))) + 1
+	var bottom := -PIT_DEPTH - 1.0
+	var half_size := Vector3(depth * 0.5, (PIT_SHELF_HEIGHT - bottom) * 0.5, PIT_SHELF_FACE_BLOCK_WIDTH * 0.5)
+	for index in count:
+		var angle := lerpf(-PIT_SHELF_HALF_ANGLE, PIT_SHELF_HALF_ANGLE, float(index) / float(count - 1))
+		_add_pit_block("PitShelfFace%d" % index, Vector3(angle, middle_radius, PIT_SHELF_HEIGHT), half_size, true)
+
+
 ## One pit block: `spec` is (angle from east, distance from the pit's centre,
 ## height of its top).
-func _add_pit_block(block_name: String, spec: Vector3, half_size: Vector3) -> void:
+func _add_pit_block(block_name: String, spec: Vector3, half_size: Vector3, sheer: bool = false) -> void:
 	var body := StaticBody3D.new()
 	body.name = block_name
 	body.collision_layer = 1
@@ -861,7 +885,11 @@ func _add_pit_block(block_name: String, spec: Vector3, half_size: Vector3) -> vo
 	var at := START_CENTER + Vector2.from_angle(spec.x) * spec.y
 	body.position = Vector3(at.x, spec.z - half_size.y, at.y)
 	body.rotation.y = -spec.x
-	var block := SuperEgg.build_part(half_size, CLIFF_ROCK.lightened(0.08), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
+	# A cliff face is boxy all round; a ledge rounds off underneath.
+	var block := SuperEgg.build_part(
+		half_size, CLIFF_ROCK.lightened(0.04 if sheer else 0.08), SuperEgg.EPSILON_FLAT,
+		SuperEgg.EPSILON_FLAT if sheer else SuperEgg.EPSILON_SOFT
+	)
 	block.name = "Rock"
 	body.add_child(block)
 	CollisionPolicy.add_box(body, block, half_size * 2.0)

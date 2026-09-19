@@ -322,6 +322,12 @@ const PENGUIN_WADDLE_KNEE := deg_to_rad(16.0)
 const PENGUIN_WADDLE_ROLL := deg_to_rad(7.0)
 ## Flippers held a little out from the body while waddling.
 const PENGUIN_FLIPPER_SPREAD := deg_to_rad(14.0)
+## A penguin's jump barely moves its legs: only a small hip and knee tuck
+## (fractions of the ordinary jump's) and a push through the ankles. Diving
+## and sliding, the legs lie straight with the toes pointed back.
+const PENGUIN_JUMP_LEG_FRACTION := 0.12
+const PENGUIN_JUMP_ANKLE_EXTEND := deg_to_rad(40.0)
+const PENGUIN_STREAMLINED_TOE_POINT := deg_to_rad(75.0)
 ## Lying prone, the face lifts forward this far, split between the base of the
 ## neck and the base of the skull (as the Manchego seat's upright head is).
 const PENGUIN_HEAD_LIFT := deg_to_rad(78.0)
@@ -925,14 +931,18 @@ const SWIM_JET_SPEED_MULTIPLIER := FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER
 ## The mermaid tail (Nautilus Crown over two Water leg blorbs, swimming):
 ## far faster swimming, and sprint and Water jets still stack on top.
 const MERMAID_SWIM_SPEED_MULTIPLIER := 3.0
-## The tail's pose: legs drawn in so the ankles meet, toes pointed hard back
-## in line with the shins, and a dolphin kick with both legs in unison.
+## The tail's pose: legs drawn in so the ankles meet, toes pointed straight
+## back in line with the shins so the fluke runs on along the tail, and a
+## dolphin kick with both legs in unison. The ankles add the fluke's stroke,
+## lagging a quarter beat behind the hips so the fin whips through.
 const MERMAID_LEG_ADDUCT := deg_to_rad(7.5)
-const MERMAID_ANKLE_POINT := deg_to_rad(72.0)
+const MERMAID_ANKLE_POINT := deg_to_rad(86.0)
 const MERMAID_KICK_SPEED := 10.0
 const MERMAID_KICK_HIP_AMOUNT := deg_to_rad(15.0)
 const MERMAID_KICK_KNEE_AMOUNT := deg_to_rad(28.0)
-const MERMAID_KICK_ANKLE_AMOUNT := deg_to_rad(8.0)
+const MERMAID_KICK_ANKLE_AMOUNT := deg_to_rad(16.0)
+## The arms sweep back only part of the ordinary fast-swim amount.
+const MERMAID_ARM_BACK_FRACTION := 0.4
 const AERIAL_FAST_SPEED_MULTIPLIER := 1.8
 ## Flying sprint is intentionally twice its previous fast-flight rate;
 ## swimming retains AERIAL_FAST_SPEED_MULTIPLIER unchanged.
@@ -2423,12 +2433,13 @@ func _physics_process(delta: float) -> void:
 	# one frame after the true physical landing. Imperceptible for a "split
 	# second" reaction, and simpler than a second, separately-timed check.
 	if grounded and not _prev_grounded and _continuous_airborne_time >= LANDING_MIN_AIRBORNE_TIME:
-		_landing_timer = LANDING_DURATION
+		# The Penguin Suit has no knee-bending landing (see _animate_walk()).
+		_landing_timer = 0.0 if _blorb_suit.penguin_form_active() else LANDING_DURATION
 		_walk_cycle_recovery = 0.0
 		# Air-foot hover deliberately retains a walk/run animation while making
 		# no ground contact; suppress its landing cue for the same reason its
 		# stride contacts are silent below.
-		if not _air_foot_hover_active and not _lake_buoyancy_active and not on_cloud and not _is_on_lava_surface():
+		if not _air_foot_hover_active and not _lake_buoyancy_active and not on_cloud and not _is_on_lava_surface() and not _penguin_belly_sliding:
 			UISounds.play_landing(get_instance_id())
 	if grounded:
 		_continuous_airborne_time = 0.0
@@ -6070,6 +6081,48 @@ func _animate_penguin_waddle(delta: float) -> void:
 	_update_footsteps(phase, stepping, false)
 
 
+## A jump in the Penguin Suit: the legs stay almost where they stand (a
+## small fraction of the ordinary tuck), pushing off through the ankles.
+func _animate_penguin_airborne(delta: float) -> void:
+	var t := minf(JUMP_POSE_SETTLE_SPEED * delta, 1.0)
+	for leg in [_leg_left, _leg_right]:
+		(leg as Node3D).rotation = (leg as Node3D).rotation.lerp(Vector3(-JUMP_HIP_BEND * PENGUIN_JUMP_LEG_FRACTION, 0.0, 0.0), t)
+	for knee in [_knee_left, _knee_right]:
+		(knee as Node3D).rotation = (knee as Node3D).rotation.lerp(Vector3(JUMP_KNEE_BEND * PENGUIN_JUMP_LEG_FRACTION, 0.0, 0.0), t)
+	for ankle in [_ankle_left, _ankle_right]:
+		(ankle as Node3D).rotation = (ankle as Node3D).rotation.lerp(Vector3(PENGUIN_JUMP_ANKLE_EXTEND, 0.0, 0.0), t)
+	_hold_penguin_body(t)
+
+
+## Diving and belly sliding: legs straight and together, toes pointed back
+## along the body, flippers laid along the sides.
+func _animate_penguin_streamlined(delta: float) -> void:
+	var t := minf(JUMP_POSE_SETTLE_SPEED * delta, 1.0)
+	for leg in [_leg_left, _leg_right]:
+		(leg as Node3D).rotation = (leg as Node3D).rotation.lerp(Vector3.ZERO, t)
+	for knee in [_knee_left, _knee_right]:
+		(knee as Node3D).rotation = (knee as Node3D).rotation.lerp(Vector3.ZERO, t)
+	for ankle in [_ankle_left, _ankle_right]:
+		(ankle as Node3D).rotation = (ankle as Node3D).rotation.lerp(Vector3(PENGUIN_STREAMLINED_TOE_POINT, 0.0, 0.0), t)
+	_hold_penguin_body(t)
+
+
+## The penguin's upright body and flippers, shared by its jump and prone poses.
+func _hold_penguin_body(t: float) -> void:
+	_spine.rotation.x = lerp_angle(_spine.rotation.x, 0.0, t)
+	_spine.position.y = lerp(_spine.position.y, _spine_rest_y, t)
+	_hips.position.y = lerp(_hips.position.y, _hips_rest_y, t)
+	if _thorax != null:
+		_thorax.rotation.x = lerp_angle(_thorax.rotation.x, 0.0, t)
+	var arm_t := minf(t, _arm_power_recovery)
+	_arm_left.rotation.x = lerp_angle(_arm_left.rotation.x, 0.0, arm_t)
+	_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, 0.0, arm_t)
+	_arm_left.rotation.z = lerp_angle(_arm_left.rotation.z, ProceduralFigure.ARM_OUTWARD_ANGLE + PENGUIN_FLIPPER_SPREAD, arm_t)
+	_arm_right.rotation.z = lerp_angle(_arm_right.rotation.z, -ProceduralFigure.ARM_OUTWARD_ANGLE - PENGUIN_FLIPPER_SPREAD, arm_t)
+	_elbow_left.rotation.x = lerp_angle(_elbow_left.rotation.x, 0.0, arm_t)
+	_elbow_right.rotation.x = lerp_angle(_elbow_right.rotation.x, 0.0, arm_t)
+
+
 ## Picks a fresh idle pose -- see the IDLE_* consts' own comment for the
 ## reasoning and the caveat that the two new rotation axes here (leg
 ## abduction, hip drop) aren't visually re-verified in-engine.
@@ -6173,6 +6226,20 @@ func _animate_walk(
 	# body but traversal retains the ordinary walk/run cycle.
 	if _air_foot_hover_active:
 		grounded = true
+	# The formed Penguin Suit has its own airborne and prone poses, and no
+	# knee-bending landing reaction.
+	if _blorb_suit.penguin_form_active():
+		if _penguin_belly_sliding or _penguin_dive_airborne:
+			_footsteps_were_moving = false
+			_landing_timer = 0.0
+			_animate_penguin_streamlined(delta)
+			return
+		if not grounded:
+			_footsteps_were_moving = false
+			_landing_timer = 0.0
+			_animate_penguin_airborne(delta)
+			return
+		_landing_timer = 0.0
 	# Landing takes priority over everything else for a brief window --
 	# even if the character starts walking again immediately, the impact
 	# crouch still plays out first (LANDING_DURATION is short enough that
@@ -6586,13 +6653,14 @@ func _animate_mermaid_swimming(delta: float, t: float) -> void:
 		wave = sin(_swim_kick_phase)
 	var hip := -DESCENT_HIP_BEND * 0.4 + wave * MERMAID_KICK_HIP_AMOUNT
 	var knee := maxf(0.0, -wave) * MERMAID_KICK_KNEE_AMOUNT
-	var ankle := MERMAID_ANKLE_POINT + wave * MERMAID_KICK_ANKLE_AMOUNT
+	# The fluke's stroke: the ankles lag the hips by a quarter beat.
+	var ankle := MERMAID_ANKLE_POINT + (-cos(_swim_kick_phase) if swim_speed > 0.1 else 0.0) * MERMAID_KICK_ANKLE_AMOUNT
 	for pair in [[_leg_left, _knee_left, _ankle_left], [_leg_right, _knee_right, _ankle_right]]:
 		(pair[0] as Node3D).rotation.x = lerp_angle((pair[0] as Node3D).rotation.x, hip, t)
 		(pair[1] as Node3D).rotation.x = lerp_angle((pair[1] as Node3D).rotation.x, knee, t)
 		(pair[2] as Node3D).rotation.x = lerp_angle((pair[2] as Node3D).rotation.x, ankle, t)
-	var arm_back := SWIM_FAST_ARM_BACK_SWING * speed_fraction
-	var elbow_bend := SWIM_FAST_ELBOW_BEND * speed_fraction
+	var arm_back := SWIM_FAST_ARM_BACK_SWING * speed_fraction * MERMAID_ARM_BACK_FRACTION
+	var elbow_bend := SWIM_FAST_ELBOW_BEND * speed_fraction * MERMAID_ARM_BACK_FRACTION
 	_arm_left.rotation.x = lerp_angle(_arm_left.rotation.x, arm_back, t)
 	_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, arm_back, t)
 	_arm_left.rotation.z = lerp_angle(_arm_left.rotation.z, ProceduralFigure.ARM_OUTWARD_ANGLE, t)
