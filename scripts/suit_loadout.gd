@@ -14,11 +14,12 @@ const FULL_SUIT_SLOTS: Array[String] = ["head", "leg_left", "leg_right", "torso"
 
 ## Spawns one `element` blorb per slot in a loose ring around `center`, at
 ## TEST_LEVEL. `head_item` is bound into the head blorb's core (a helm such as
-## the Diving Helmet). An empty element makes plain Normal blorbs. Returned in
-## the order of `slots`, which is the order a SuitRoster assigns them.
+## the Diving Helmet). An empty element makes plain Normal blorbs, and
+## `shiny` makes them the rare shiny variant. Returned in the order of
+## `slots`, which is the order a SuitRoster assigns them.
 static func spawn_set(
 	world: Node, element: String, head_item: String, center: Vector3,
-	slots: Array[String] = FULL_SUIT_SLOTS, spread: float = 2.2
+	slots: Array[String] = FULL_SUIT_SLOTS, spread: float = 2.2, shiny: bool = false
 ) -> Array[Blorb]:
 	var created: Array[Blorb] = []
 	for index in slots.size():
@@ -26,6 +27,7 @@ static func spawn_set(
 		blorb.in_party = false
 		blorb.is_starter_trio = false
 		blorb.initial_element = element
+		blorb.is_shiny = shiny
 		if slots[index] == "head" and head_item != "":
 			var items: Array[String] = [head_item]
 			blorb.core_items = items

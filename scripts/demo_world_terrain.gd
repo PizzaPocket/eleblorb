@@ -6,26 +6,29 @@ extends StaticBody3D
 ## biome exists elsewhere in the game, this shows that biome itself through a
 ## TerrainWindow onto the real kingdom's terrain (its own height and colour
 ## functions), rather than an imitation:
-##   clearing  - the Crossroads' own hills, spawn flattening and grass
-##   forest    - the Crossroads' grass plains with its own forest clusters
+##   normal    - a flat-floored pit punched into the Crossroads' own clearing,
+##               climbed out of by bouncing on blorbs up rock ledges
+##   shiny     - the Crossroads' grass plains with its own forest clusters
 ##   plant     - a patch of the Primate Kingdom's jungle, 1:1
-##   snow      - the Ice Kingdom's snowboard mountain and the ranges around
-##               it, full size, turned so its authored run descends east
+##   ice       - a frozen lake from its portal to the mountain's foot, then
+##               the mountain's steep western face up to the summit
+##   snow      - an explicit snowboard course winding from the summit down
+##               the mountain's long eastern flank to its foot
 ##   ground    - a strip across the Rock/Ground Kingdom's terraces, washes
 ##               and halfpipe canyon, climbing as it goes
 ##   fire      - a full-size Fire Kingdom volcano with its lava-filled mouth
-## The long lake and the long frozen lake are stretched NaturalLake basins
-## (the game's own lake technique). Through the ground zone the course climbs
+## The long lake and the long frozen lake are NaturalLake channels (the game's
+## own lake technique), each running from its biome's portal to the next
+## border. Through the ground zone the course climbs
 ## to cloud height (see _course_elevation()); the sky zone is a cliff edge
 ## over a deep chasm, flown across through the clouds to the volcanic lowland
 ## beyond. Between biomes the ground keeps the Crossroads' hills with a slow
-## swell, so nowhere is flat except the clearing and each gate's small pad.
+## swell, so nowhere is flat except the pit floor, its rim and each gate's pad.
 ## One heightfield owns rendering, collision and every gameplay height query.
 ##
 ## Every zone's length is a constant below, meant to be tuned by feel.
 
 const JUNGLE_KINGDOM_TERRAIN := preload("res://scripts/jungle_kingdom_terrain.gd")
-const ICE_KINGDOM_TERRAIN := preload("res://scripts/ice_kingdom_terrain.gd")
 const ROCK_GROUND_KINGDOM_TERRAIN := preload("res://scripts/rock_ground_kingdom_terrain.gd")
 const FIRE_KINGDOM_TERRAIN := preload("res://scripts/fire_kingdom_terrain.gd")
 
@@ -45,18 +48,34 @@ const CROSSROADS_HILL_FREQUENCY := 0.015
 const CROSSROADS_HILL_AMPLITUDE := 3.0
 const CROSSROADS_GRASS := Color(0.07451, 0.63922, 0.40392)
 const START_CENTER := Vector2(0.0, 0.0)
-const START_FLATTEN_RADIUS := 25.0
+## The clearing is level out to here: the pit's rim stands on it.
+const START_FLATTEN_RADIUS := 45.0
 const START_FLATTEN_TRANSITION := 12.0
+## Normal: the hero wakes on the flat floor of a pit PIT_DEPTH deep, punched
+## into the clearing. Its wall rises from PIT_FLOOR_RADIUS to PIT_RIM_RADIUS,
+## too steep to walk; the way out is up PIT_LEDGES, rock ledges jutting from
+## the eastern wall, each within reach of a blorb bounce (8x an ordinary jump,
+## about 10.9 m) from the one below.
+const PIT_DEPTH := 24.0
+const PIT_FLOOR_RADIUS := 24.0
+const PIT_RIM_RADIUS := 30.0
+## Each ledge: angle round the pit from east (radians), distance from the
+## pit's centre, and the height of its top above the floor.
+const PIT_LEDGES := [
+	Vector3(-0.73, 21.0, 6.0),
+	Vector3(-0.24, 21.0, 12.0),
+	Vector3(0.24, 21.0, 18.0),
+]
+const PIT_LEDGE_HALF_SIZE := Vector3(2.6, 1.3, 2.6)
 ## A slow, broad swell under the hills outside the clearing, so the ground
 ## between biomes rolls rather than lying flat.
 const SWELL_AMPLITUDE := 4.0
 const SWELL_FREQUENCY := 0.004
 
-## Forest: the Crossroads' own grass plains, dressed with that world's forest
+## Shiny: the Crossroads' own grass plains, dressed with that world's forest
 ## clusters (its tree species, undergrowth and pickable meadows) densely
 ## enough to read as woodland, and home to wild shiny blorbs (see
-## demo_world.gd). Still the Normal suit's ground: shiny blorbs have no suit
-## power of their own yet.
+## demo_world.gd).
 const FOREST_ZONE := Vector2(95.0, 440.0)
 const FOREST_CLUSTERS := 26
 
@@ -69,10 +88,11 @@ const PLANT_HALF := Vector2(150.0, 110.0)
 ## the whole world, and the frozen lake's water lies beneath its ice at that
 ## same level, exactly as the Ice Kingdom layers them.
 const WATER_LEVEL := -7.0
-## The long lake: LAKE_RADIUS wide, LAKE_RADIUS * LAKE_STRETCH long each way.
-const LAKE_CENTER := Vector2(1311.0, 0.0)
+## The long lake: a channel LAKE_RADIUS either side of its centreline, whose
+## shore runs from LAKE_SHORE_GAP past the water portal to LAKE_SHORE_GAP
+## short of the ice portal.
+const LAKE_SHORE_GAP := 8.0
 const LAKE_RADIUS := 60.0
-const LAKE_STRETCH := 6.0
 const LAKE_EDGE_VARIATION := 9.0
 const LAKE_DEPTH := 14.0
 ## An open lake's bank levels out just above the water: a narrow beach.
@@ -80,10 +100,10 @@ const LAKE_SHELF := WATER_LEVEL + 0.35
 ## The Crossroads lake lies in bare wasteland; its banks take that colour.
 const WASTELAND := Color(0.565, 0.495, 0.4)
 
-## The long frozen lake.
-const ICE_CENTER := Vector2(2557.0, 0.0)
+## The long frozen lake: from LAKE_SHORE_GAP past the ice portal to the
+## mountain's foot.
 const ICE_RADIUS := 70.0
-const ICE_STRETCH := 7.5
+const ICE_EAST_SHORE_X := 2900.0
 const ICE_EDGE_VARIATION := 9.0
 const ICE_LAKE_DEPTH := 8.0
 ## The Ice Kingdom's layering: bank shelf, the ice skin 3 cm beneath it (so the
@@ -98,18 +118,25 @@ const FROZEN_LAKEBED := Color(0.48, 0.62, 0.72)
 ## Canonical snow: the same white as snow blorbs, boards and snowfields.
 const SNOW := Color(0.94, 0.96, 0.98)
 
-## Snow: the Ice Kingdom's mountain at full size. Its authored run descends
-## from the peak toward (-205, -102); the window turns that direction east.
-## The climb comes from the west, MOUNTAIN_CLIMB before the peak; the run
-## goes MOUNTAIN_RUN beyond it. Behind the peak the kingdom rises into its
-## border ranges, so the western end blends in over MOUNTAIN_END_BLEND: a long
-## climb averaging ~24 degrees rather than a wall.
-const MOUNTAIN_SOURCE_PEAK := Vector2(-790.0, -330.0)
-const MOUNTAIN_SOURCE_RUN_END := Vector2(-205.0, -102.0)
-const MOUNTAIN_START_X := 3290.0
-const MOUNTAIN_CLIMB := 650.0
-const MOUNTAIN_RUN := 700.0
-const MOUNTAIN_END_BLEND := 450.0
+## The mountain. Its steep western face (the Ice zone's climb) rises from the
+## frozen lake to a summit plateau MOUNTAIN_PEAK_HEIGHT up, where the snow
+## portal stands; its long eastern flank descends to its foot at
+## MOUNTAIN_END_X. Down that flank winds an explicit snowboard course: a
+## smooth groomed trough COURSE_HALF_WIDTH wide either side of its weaving
+## centreline, held in by raised berms, with rougher mogul ground and trees
+## beyond. The valley's sides rise into a gully so the course stays central.
+const MOUNTAIN_FOOT_X := 2915.0
+const MOUNTAIN_PEAK_WEST_X := 3262.0
+const MOUNTAIN_PEAK_EAST_X := 3300.0
+const MOUNTAIN_END_X := 4630.0
+const MOUNTAIN_PEAK_HEIGHT := 220.0
+const MOUNTAIN_GULLY_HEIGHT := 35.0
+const COURSE_HALF_WIDTH := 16.0
+const COURSE_TROUGH_DEPTH := 2.5
+const COURSE_BERM_HEIGHT := 1.6
+const COURSE_WEAVE := 38.0
+const COURSE_WEAVE_WAVELENGTH := 380.0
+const MOGUL_AMPLITUDE := 5.0
 
 ## Ground: an east-west strip across the Rock/Ground Kingdom at z = 150,
 ## kept inside its border ranges: over terraces, through the town's flat
@@ -138,13 +165,18 @@ const CLIFF_ROCK := Color(0.42, 0.4, 0.38)
 
 ## Every border gate, west to east: the biome on either side of it.
 ## Each biome's portal stands on the side you enter it from, facing you (see
-## demo_world.gd). The first gate's western side is the hero's starting pair
-## of Normal blorbs (element ""). Every gate stands on the path (z = 0) on a
-## small level pad, clear of lake banks and windows.
+## demo_world.gd). The first gate's western side is the hero's starting set
+## of Normal blorbs (element ""); "shiny" is a set of shiny Normal blorbs.
+## Every gate stands on the path (z = 0) on a level strip as wide as its
+## portal. A "pad" sets that strip's height; otherwise it follows the course
+## (see _base_level()). The lake gates stand down at the beach, so the water
+## begins just past the portal; the ice gate's strip sits at the frozen lake's
+## bank level, just above the ice sheet tucked beneath it.
 const BORDERS := [
-	{"x": 460.0, "west": "", "east": "plant"},
-	{"x": 790.0, "west": "plant", "east": "water"},
-	{"x": 1835.0, "west": "water", "east": "ice"},
+	{"x": 48.0, "west": "", "east": "shiny"},
+	{"x": 460.0, "west": "shiny", "east": "plant"},
+	{"x": 790.0, "west": "plant", "east": "water", "pad": LAKE_SHELF},
+	{"x": 1835.0, "west": "water", "east": "ice", "pad": ICE_LEVEL},
 	{"x": 3280.0, "west": "ice", "east": "snow"},
 	{"x": 4655.0, "west": "snow", "east": "ground"},
 	{"x": 5520.0, "west": "ground", "east": "air"},
@@ -158,7 +190,10 @@ const HEAD_ITEMS := {
 	"air": "Bird Helm",
 	"fire": "Lava Helm",
 }
-const PORTAL_PAD_RADIUS := 5.0
+## Portals span most of the valley floor, impossible to miss.
+const PORTAL_HALF_WIDTH := 30.0
+const PORTAL_HALF_HEIGHT := 5.0
+const PORTAL_PAD_HALF_DEPTH := 5.0
 const PORTAL_PAD_BLEND := 12.0
 
 var _nx: int
@@ -169,15 +204,13 @@ var _heights := PackedFloat32Array()
 var _hills := FastNoiseLite.new()
 var _swell := FastNoiseLite.new()
 var _rng := RandomNumberGenerator.new()
-var _water_lake := NaturalLake.new(LAKE_CENTER, LAKE_RADIUS, LAKE_EDGE_VARIATION, LAKE_DEPTH, LAKE_SHELF, 20260919, LAKE_STRETCH)
-var _frozen_lake := NaturalLake.new(ICE_CENTER, ICE_RADIUS, ICE_EDGE_VARIATION, ICE_LAKE_DEPTH, ICE_LEVEL, 20260920, ICE_STRETCH)
+var _water_lake: NaturalLake
+var _frozen_lake: NaturalLake
 ## Detached kingdom terrains, sampled only (never added to the tree).
 var _jungle_sampler: Node
-var _ice_sampler: Node
 var _rock_sampler: Node
 var _fire_sampler: Node
 var _plant_window: TerrainWindow
-var _mountain_window: TerrainWindow
 var _dirt_window: TerrainWindow
 var _volcano_window: TerrainWindow
 var _windows: Array[TerrainWindow] = []
@@ -192,23 +225,19 @@ func _init() -> void:
 	_swell.seed = 20260922
 	_swell.frequency = SWELL_FREQUENCY
 	_swell.fractal_octaves = 2
+	_water_lake = _channel_lake(
+		border_x("water") + LAKE_SHORE_GAP, border_x("ice") - LAKE_SHORE_GAP,
+		LAKE_RADIUS, LAKE_EDGE_VARIATION, LAKE_DEPTH, LAKE_SHELF, 20260919
+	)
+	_frozen_lake = _channel_lake(
+		border_x("ice") + LAKE_SHORE_GAP, ICE_EAST_SHORE_X,
+		ICE_RADIUS, ICE_EDGE_VARIATION, ICE_LAKE_DEPTH, ICE_LEVEL, 20260920
+	)
 	_jungle_sampler = JUNGLE_KINGDOM_TERRAIN.new()
-	_ice_sampler = ICE_KINGDOM_TERRAIN.new()
 	_rock_sampler = ROCK_GROUND_KINGDOM_TERRAIN.new()
 	_fire_sampler = FIRE_KINGDOM_TERRAIN.new()
 	_plant_window = TerrainWindow.new(_jungle_sampler, PLANT_SOURCE, PLANT_CENTER, PLANT_HALF)
 	_plant_window.level_to_edge()
-	# The mountain window's centre sits partway down the run, so the peak falls
-	# MOUNTAIN_CLIMB in from its western end.
-	var run := (MOUNTAIN_SOURCE_RUN_END - MOUNTAIN_SOURCE_PEAK).normalized()
-	var mountain_half := (MOUNTAIN_CLIMB + MOUNTAIN_RUN) * 0.5
-	var peak_to_center := mountain_half - MOUNTAIN_CLIMB
-	_mountain_window = TerrainWindow.new(
-		_ice_sampler, MOUNTAIN_SOURCE_PEAK + run * peak_to_center,
-		Vector2(MOUNTAIN_START_X + mountain_half, 0.0), Vector2(mountain_half, FULL_WIDTH_HALF),
-		0.0, 1.0, atan2(run.y, run.x), MOUNTAIN_END_BLEND
-	)
-	_mountain_window.level_to_x_ends(100.0)
 	_dirt_window = TerrainWindow.new(
 		_rock_sampler, DIRT_SOURCE, Vector2(DIRT_START_X + DIRT_LENGTH * 0.5, 0.0),
 		Vector2(DIRT_LENGTH * 0.5, FULL_WIDTH_HALF), 0.0, 1.0, 0.0, WINDOW_END_BLEND
@@ -220,12 +249,12 @@ func _init() -> void:
 	)
 	_volcano_window.level_to_x_ends(100.0)
 	_volcano_lava_level = FIRE_KINGDOM_TERRAIN.VOLCANO_LAVA_SURFACE_Y - _volcano_window.height_offset
-	_windows = [_plant_window, _mountain_window, _dirt_window, _volcano_window]
+	_windows = [_plant_window, _dirt_window, _volcano_window]
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:
-		for sampler in [_jungle_sampler, _ice_sampler, _rock_sampler, _fire_sampler]:
+		for sampler in [_jungle_sampler, _rock_sampler, _fire_sampler]:
 			if is_instance_valid(sampler):
 				(sampler as Node).free()
 
@@ -262,11 +291,97 @@ func _course_elevation(x: float) -> float:
 	return elevation
 
 
+## The x of the gate whose eastern side is `east`.
+static func border_x(east: String) -> float:
+	for border in BORDERS:
+		if border["east"] == east:
+			return float(border["x"])
+	return 0.0
+
+
+## A lake whose shore runs from x `west_shore` to x `east_shore` along z = 0.
+static func _channel_lake(
+	west_shore: float, east_shore: float, lake_radius: float, variation: float,
+	lake_depth: float, shelf: float, noise_seed: int
+) -> NaturalLake:
+	var half_length := maxf((east_shore - west_shore) * 0.5 - lake_radius, 0.0)
+	return NaturalLake.new(
+		Vector2((west_shore + east_shore) * 0.5, 0.0), lake_radius, variation, lake_depth, shelf, noise_seed, half_length
+	)
+
+
+## The mountain's height along the valley's centre, before its gully sides,
+## course and moguls: 0 west of its foot, up the western face (mostly even,
+## easing in and out), level across the summit, then down the eastern flank,
+## steepest at the top and easing out to 0 at MOUNTAIN_END_X.
+func _mountain_profile(x: float) -> float:
+	if x <= MOUNTAIN_FOOT_X or x >= MOUNTAIN_END_X:
+		return 0.0
+	if x < MOUNTAIN_PEAK_WEST_X:
+		var t := (x - MOUNTAIN_FOOT_X) / (MOUNTAIN_PEAK_WEST_X - MOUNTAIN_FOOT_X)
+		return MOUNTAIN_PEAK_HEIGHT * (0.7 * t + 0.3 * smoothstep(0.0, 1.0, t))
+	if x <= MOUNTAIN_PEAK_EAST_X:
+		return MOUNTAIN_PEAK_HEIGHT
+	var t := (x - MOUNTAIN_PEAK_EAST_X) / (MOUNTAIN_END_X - MOUNTAIN_PEAK_EAST_X)
+	return MOUNTAIN_PEAK_HEIGHT * pow(1.0 - t, 1.35)
+
+
+## 1 across the mountain (foot to foot), easing off just beyond each foot.
+func _mountain_weight(x: float) -> float:
+	return smoothstep(MOUNTAIN_FOOT_X - 30.0, MOUNTAIN_FOOT_X + 20.0, x) * (1.0 - smoothstep(MOUNTAIN_END_X - 20.0, MOUNTAIN_END_X + 25.0, x))
+
+
+## The snowboard course's centreline across the valley at `x`, weaving side to
+## side down the eastern flank and straight across the summit and the foot.
+func course_center_z(x: float) -> float:
+	var t := clampf((x - MOUNTAIN_PEAK_EAST_X) / (MOUNTAIN_END_X - MOUNTAIN_PEAK_EAST_X), 0.0, 1.0)
+	var taper := smoothstep(0.0, 0.06, t) * (1.0 - smoothstep(0.94, 1.0, t))
+	return COURSE_WEAVE * taper * sin((x - MOUNTAIN_PEAK_EAST_X) * TAU / COURSE_WEAVE_WAVELENGTH)
+
+
+## 1 on the groomed course, 0 beyond its berms; only down the eastern flank.
+func _course_weight(point: Vector2) -> float:
+	if point.x < MOUNTAIN_PEAK_EAST_X - 10.0 or point.x > MOUNTAIN_END_X + 10.0:
+		return 0.0
+	return 1.0 - smoothstep(COURSE_HALF_WIDTH, COURSE_HALF_WIDTH + 10.0, absf(point.y - course_center_z(point.x)))
+
+
+## The mountain's full relief at `point`: the profile, rising into the gully
+## sides, with the course's trough and berms and moguls beyond it.
+func _mountain_height(point: Vector2) -> float:
+	var weight := _mountain_weight(point.x)
+	if weight <= 0.0:
+		return 0.0
+	var height := _mountain_profile(point.x)
+	height += smoothstep(40.0, 115.0, absf(point.y)) * MOUNTAIN_GULLY_HEIGHT
+	if point.x > MOUNTAIN_PEAK_EAST_X:
+		var across := absf(point.y - course_center_z(point.x))
+		var trough := 1.0 - pow(minf(across / COURSE_HALF_WIDTH, 1.0), 2.0)
+		var berm := exp(-pow((across - COURSE_HALF_WIDTH - 3.0) / 3.5, 2.0))
+		var on_flank := smoothstep(MOUNTAIN_PEAK_EAST_X, MOUNTAIN_PEAK_EAST_X + 40.0, point.x) * (1.0 - smoothstep(MOUNTAIN_END_X - 60.0, MOUNTAIN_END_X, point.x))
+		height += (berm * COURSE_BERM_HEIGHT - trough * COURSE_TROUGH_DEPTH) * on_flank
+		height += _hills.get_noise_2d(point.x * 2.5, point.y * 2.5) * MOGUL_AMPLITUDE * (1.0 - _course_weight(point)) * on_flank
+	return height * weight
+
+
+## The height a gate's level strip sits at without a "pad": the course's
+## elevation plus the mountain along the valley's centre.
+func _base_level(x: float) -> float:
+	return _course_elevation(x) + _mountain_profile(x)
+
+
+## 1 inside the pit, falling to 0 up its wall.
+func _pit_weight(point: Vector2) -> float:
+	return 1.0 - smoothstep(PIT_FLOOR_RADIUS, PIT_RIM_RADIUS, point.distance_to(START_CENTER))
+
+
 func _raw_height(x: float, z: float) -> float:
 	var point := Vector2(x, z)
 	var start_distance := point.distance_to(START_CENTER)
-	var height := _hills.get_noise_2d(x, z) * CROSSROADS_HILL_AMPLITUDE
-	height += _swell.get_noise_2d(x, z) * SWELL_AMPLITUDE * smoothstep(START_FLATTEN_RADIUS + 20.0, START_FLATTEN_RADIUS + 80.0, start_distance)
+	# The groomed course is smooth: no hills or swell underfoot.
+	var roughness := 1.0 - _course_weight(point) * _mountain_weight(x)
+	var height := _hills.get_noise_2d(x, z) * CROSSROADS_HILL_AMPLITUDE * roughness
+	height += _swell.get_noise_2d(x, z) * SWELL_AMPLITUDE * roughness * smoothstep(START_FLATTEN_RADIUS + 20.0, START_FLATTEN_RADIUS + 80.0, start_distance)
 	# The Crossroads' arrival clearing: genuinely level, hills returning only
 	# through its soft outer transition.
 	height *= smoothstep(START_FLATTEN_RADIUS, START_FLATTEN_RADIUS + START_FLATTEN_TRANSITION, start_distance)
@@ -275,21 +390,32 @@ func _raw_height(x: float, z: float) -> float:
 		var weight := biome.weight(point)
 		if weight > 0.0:
 			height = lerpf(height, biome.height(point), weight)
+	height += _mountain_height(point)
 	# Basins punched into the ground (NaturalLake).
 	height = _water_lake.carve(height, point)
 	height = _frozen_lake.carve(height, point)
-	var elevation := _course_elevation(x)
-	height += elevation
-	# Each gate's small level pad, at the course's elevation there.
+	height += _course_elevation(x)
+	# The starting pit, punched down to a flat floor.
+	height = lerpf(height, -PIT_DEPTH, _pit_weight(point))
+	# Each gate's level strip, as wide as its portal.
 	for border in BORDERS:
-		var border_x: float = border["x"]
-		var pad := 1.0 - smoothstep(PORTAL_PAD_RADIUS, PORTAL_PAD_RADIUS + PORTAL_PAD_BLEND, point.distance_to(Vector2(border_x, 0.0)))
-		height = lerpf(height, _course_elevation(border_x), pad)
+		var gate_x: float = border["x"]
+		var along := 1.0 - smoothstep(PORTAL_PAD_HALF_DEPTH, PORTAL_PAD_HALF_DEPTH + PORTAL_PAD_BLEND, absf(x - gate_x))
+		if along <= 0.0:
+			continue
+		var across := 1.0 - smoothstep(PORTAL_HALF_WIDTH + 3.0, PORTAL_HALF_WIDTH + 3.0 + PORTAL_PAD_BLEND, absf(z))
+		height = lerpf(height, float(border.get("pad", _base_level(gate_x))), along * across)
 	# Valley walls along both sides and at both ends.
 	height += smoothstep(115.0, 165.0, absf(z)) * 34.0
 	height += (1.0 - smoothstep(X_MIN + 20.0, -60.0, x)) * 34.0
 	height += smoothstep(X_MAX - 50.0, X_MAX - 20.0, x) * 34.0
 	return height
+
+
+## 1 on snow: the whole mountain, and the snowfield round the frozen lake.
+func _snow_weight(point: Vector2) -> float:
+	var snowfield := 1.0 - smoothstep(ICE_RADIUS + ICE_SNOWFIELD_WIDTH - 12.0, ICE_RADIUS + ICE_SNOWFIELD_WIDTH, _frozen_lake.local_distance(point))
+	return maxf(snowfield, _mountain_weight(point.x))
 
 
 func _height_color(x: float, z: float, _height: float) -> Color:
@@ -301,9 +427,15 @@ func _height_color(x: float, z: float, _height: float) -> Color:
 			color = color.lerp(biome.color(point), weight)
 	if _frozen_lake.coverage(point) > 0.12:
 		return FROZEN_LAKEBED
-	var snowfield := 1.0 - smoothstep(ICE_RADIUS + ICE_SNOWFIELD_WIDTH - 12.0, ICE_RADIUS + ICE_SNOWFIELD_WIDTH, _frozen_lake.local_distance(point))
-	if snowfield > 0.0:
-		color = color.lerp(SNOW, snowfield)
+	# Snow is always snow-coloured: the same test decides the colour here and
+	# the snow surface in is_snow_footstep_surface().
+	var snow := _snow_weight(point)
+	if snow > 0.0:
+		color = color.lerp(SNOW, snow)
+	# The pit's wall is bare rock.
+	var pit := _pit_weight(point)
+	if pit > 0.02 and pit < 0.98:
+		color = color.lerp(CLIFF_ROCK, 1.0 - absf(pit - 0.5) * 1.6)
 	var lake_bank := 1.0 - smoothstep(LAKE_RADIUS + NaturalLake.BANK_WIDTH - 4.0, LAKE_RADIUS + NaturalLake.BANK_WIDTH + 8.0, _water_lake.local_distance(point))
 	if lake_bank > 0.0:
 		color = color.lerp(WASTELAND, lake_bank)
@@ -381,9 +513,7 @@ func get_ice_level() -> float:
 ## around the frozen lake. This is also what the snowboard rides; nothing else
 ## is snow.
 func is_snow_footstep_surface(pos: Vector2) -> bool:
-	if _mountain_window.weight(pos) > 0.3:
-		return true
-	return _frozen_lake.local_distance(pos) < ICE_RADIUS + ICE_SNOWFIELD_WIDTH and not is_ice_surface(pos) and not is_lake_area(pos)
+	return _snow_weight(pos) > 0.5 and not is_ice_surface(pos) and not is_lake_area(pos)
 
 
 func is_safe_zone(pos: Vector2) -> bool:
@@ -427,10 +557,10 @@ const CHUNK_LENGTH := 300.0
 ## Keyed by the x at which each takes over, west to east.
 func _terrain_materials() -> Array:
 	return [
-		[X_MIN, _terrain_material(1.0, 1.0)],                      # clearing, forest, plant, lake
-		[float(BORDERS[2]["x"]), _terrain_material(0.0, 0.88)],    # ice, snow
-		[float(BORDERS[4]["x"]), _terrain_material(0.0, 0.94)],    # ground, sky cliff
-		[float(BORDERS[6]["x"]), _terrain_material(0.0, 0.96)],    # fire
+		[X_MIN, _terrain_material(1.0, 1.0)],                  # pit, forest, plant, lake
+		[border_x("ice"), _terrain_material(0.0, 0.88)],       # ice, snow
+		[border_x("ground"), _terrain_material(0.0, 0.94)],    # ground, sky cliff
+		[border_x("fire"), _terrain_material(0.0, 0.96)],      # fire
 	]
 
 
@@ -548,12 +678,33 @@ func _build_volcano_lava() -> void:
 # window mode (see demo_world.gd's Scatter node), not placed here.
 
 func _scatter_scenery() -> void:
+	_build_pit_ledges()
 	_scatter_forest()
 	_scatter_lake_shore()
 	_scatter_mountain()
 	_scatter_snowfield()
 	_scatter_dirt_track()
 	_scatter_volcanic_rocks()
+
+
+## Rock ledges up the pit's eastern wall (PIT_LEDGES): each a flat-topped
+## stone block standing out from the wall, solid and meant to be landed on.
+func _build_pit_ledges() -> void:
+	var floor_height := -PIT_DEPTH
+	for index in PIT_LEDGES.size():
+		var ledge: Vector3 = PIT_LEDGES[index]
+		var body := StaticBody3D.new()
+		body.name = "PitLedge%d" % index
+		body.collision_layer = 1
+		body.collision_mask = 0
+		var at := START_CENTER + Vector2.from_angle(ledge.x) * ledge.y
+		body.position = Vector3(at.x, floor_height + ledge.z - PIT_LEDGE_HALF_SIZE.y, at.y)
+		body.rotation.y = -ledge.x
+		var block := SuperEgg.build_part(PIT_LEDGE_HALF_SIZE, CLIFF_ROCK.lightened(0.08), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
+		block.name = "Rock"
+		body.add_child(block)
+		CollisionPolicy.add_box(body, block, PIT_LEDGE_HALF_SIZE * 2.0)
+		add_child(body)
 
 
 func _place(node: Node3D, x: float, z: float) -> void:
@@ -637,17 +788,15 @@ func _scatter_lake_shore() -> void:
 		_place(NatureProps.build_rock(_rng.randf_range(0.6, 1.6)), point.x, point.y)
 
 
-## The Ice Kingdom's own mountain scatter rules (its _scatter_snow_mountain()):
-## an annulus of rocks (every third) and frost-grey snow pines around the
-## peak, never on the authored run, at that kingdom's full-size density.
+## The mountain dressed as the Ice Kingdom dresses its own: rocks (every
+## third) and frost-grey snow pines, thick on the rough ground either side of
+## the snowboard course and never on it.
 func _scatter_mountain() -> void:
-	for index in 160:
-		var angle := _rng.randf_range(0.0, TAU)
-		var source := MOUNTAIN_SOURCE_PEAK + Vector2(cos(angle), sin(angle)) * _rng.randf_range(95.0, 560.0 * 0.86)
-		if float(_ice_sampler.ski_route_distance(source.x, source.y)) < 42.0:
+	for index in 260:
+		var point := Vector2(_rng.randf_range(MOUNTAIN_FOOT_X + 20.0, MOUNTAIN_END_X - 20.0), _rng.randf_range(-110.0, 110.0))
+		if point.x > MOUNTAIN_PEAK_EAST_X - 20.0 and absf(point.y - course_center_z(point.x)) < COURSE_HALF_WIDTH + 12.0:
 			continue
-		var point := _mountain_window.to_target(source)
-		if _mountain_window.weight(point) < 0.8 or _on_path(point):
+		if _on_path(point) or absf(point.x - border_x("snow")) < 40.0:
 			continue
 		var prop: Node3D
 		if index % 3 == 0:

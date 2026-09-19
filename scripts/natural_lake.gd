@@ -8,8 +8,11 @@ extends RefCounted
 ## opaque water colour) or the Ice Kingdom's frozen surface: a solid ice sheet
 ## with an ice edge wall, over water.
 ##
-## `stretch` elongates the lake along world X (a long lake running down a
-## valley): its shape is computed in a space where X is divided by stretch.
+## `half_length` elongates the lake along world X (a long lake running down a
+## valley) as a stadium: a straight channel of that half-length with a
+## semicircular end at each tip. Every distance is measured from the nearest
+## point on that centreline, so the bank and shore keep the same width all
+## the way round, ends included.
 ##
 ## A terrain owns one of these per lake, folds carve() into its height
 ## function, and calls build_water()/build_frozen() once its own mesh exists.
@@ -21,8 +24,9 @@ const SHORE_FEATHER := 18.0
 ## Width of the bank that slopes surrounding ground down to the shelf.
 const BANK_WIDTH := 24.0
 const SURFACE_OVERLAP := 16.0
-const SURFACE_SEGMENTS := 72
-const SURFACE_RINGS := 20
+## Grid cell of the surface sheets, and spacing of the ice edge wall's samples.
+const SURFACE_CELL := 5.0
+const EDGE_SAMPLE_SPACING := 6.0
 const ICE_COLOR := Color(0.68, 0.87, 0.96, 0.84)
 const ICE_EDGE_COLOR := Color(0.56, 0.78, 0.9, 0.9)
 const UNDER_ICE_WATER_COLOR := Color(0.16, 0.42, 0.62, 0.68)
@@ -34,15 +38,15 @@ var depth: float
 ## Height the bank descends to at the waterline: the ice level for a frozen
 ## lake, just above the water for an open one (a narrow beach).
 var shelf_level: float
-var stretch := 1.0
+var half_length := 0.0
 var _noise := FastNoiseLite.new()
 
 
 func _init(
 	lake_center: Vector2, lake_radius: float, lake_edge_variation: float,
-	lake_depth: float, lake_shelf_level: float, noise_seed: int, lake_stretch: float = 1.0
+	lake_depth: float, lake_shelf_level: float, noise_seed: int, lake_half_length: float = 0.0
 ) -> void:
-	stretch = lake_stretch
+	half_length = lake_half_length
 	center = lake_center
 	radius = lake_radius
 	edge_variation = lake_edge_variation
@@ -53,61 +57,83 @@ func _init(
 	_noise.fractal_octaves = 4
 
 
-## The shoreline's distance from the centre in the direction of `relative`:
-## coherent noise plus two low harmonics bend it in and out, so the edge never
-## reads as a circle.
-func edge_radius(relative: Vector2) -> float:
-	if relative.length_squared() < 0.001:
-		return radius
-	var angle := atan2(relative.y, relative.x)
-	var organic := _noise.get_noise_2d(cos(angle) * 93.0 + 410.0, sin(angle) * 93.0 - 280.0)
-	organic += sin(angle * 3.0 + 0.7) * 0.34 + sin(angle * 5.0 - 1.1) * 0.18
+## The nearest point to `pos` on the lake's centreline segment.
+func _spine_point(pos: Vector2) -> Vector2:
+	return Vector2(clampf(pos.x, center.x - half_length, center.x + half_length), center.y)
+
+
+## The shoreline's distance from the centreline, outward along `normal` from
+## the centreline point `spine`: coherent noise plus two low harmonics sampled
+## where that direction meets the nominal shore, so the edge wanders in and out
+## along the sides and round the ends alike.
+func _edge_at(spine: Vector2, normal: Vector2) -> float:
+	var shore := spine + normal * radius
+	var organic := _noise.get_noise_2d(shore.x, shore.y)
+	organic += sin(shore.x * 0.019 + 0.7) * 0.34 + sin(shore.y * 0.07 - shore.x * 0.011 - 1.1) * 0.18
 	return radius + organic * edge_variation
 
 
-## `pos` relative to the centre, in the unstretched space the shape lives in.
-func _local(pos: Vector2) -> Vector2:
-	return Vector2((pos.x - center.x) / stretch, pos.y - center.y)
-
-
-## Back from the unstretched shape space to world XZ.
-func _world(local: Vector2) -> Vector2:
-	return center + Vector2(local.x * stretch, local.y)
+## Distance from the centreline, and the shoreline's distance along that same
+## direction.
+func _distance_and_edge(pos: Vector2) -> Vector2:
+	var spine := _spine_point(pos)
+	var offset := pos - spine
+	var distance := offset.length()
+	var normal := offset / distance if distance > 0.001 else Vector2(0.0, 1.0)
+	return Vector2(distance, _edge_at(spine, normal))
 
 
 ## 0 outside the lake, rising to 1 across SHORE_FEATHER inside its edge.
 func coverage(pos: Vector2) -> float:
-	var local := _local(pos)
-	var edge := edge_radius(local)
-	return 1.0 - smoothstep(edge - SHORE_FEATHER, edge, local.length())
+	var measure := _distance_and_edge(pos)
+	return 1.0 - smoothstep(measure.y - SHORE_FEATHER, measure.y, measure.x)
 
 
 ## Folds the lake into a terrain height: surrounding ground banks down to the
 ## shelf, then the basin deepens toward the middle.
 func carve(ground_height: float, pos: Vector2) -> float:
-	var bank := 1.0 - smoothstep(radius, radius + BANK_WIDTH, _local(pos).length())
+	var bank := 1.0 - smoothstep(radius, radius + BANK_WIDTH, local_distance(pos))
 	var banked := lerpf(ground_height, shelf_level, bank)
 	var lake := coverage(pos)
 	return lerpf(banked, shelf_level - depth * lake, lake)
 
 
-## Distance from the centre in the lake's own (unstretched) shape space:
-## compare with radius, radius + BANK_WIDTH and so on for rings that follow a
-## stretched lake's outline.
+## Distance from the lake's centreline: compare with radius, radius +
+## BANK_WIDTH and so on for rings that follow the lake's outline.
 func local_distance(pos: Vector2) -> float:
-	return _local(pos).length()
+	return pos.distance_to(_spine_point(pos))
 
 
-## The world point at `angle` on the ring `local_radius` from the centre, in
-## shape space: a stretched lake's rings are ellipses along X.
+## The centreline point and outward normal at `fraction` (0..1) of the way
+## round the outline: along the south side east, round the east end, along the
+## north side west, round the west end.
+func _outline_frame(fraction: float) -> Array:
+	var arc := PI * radius
+	var side := 2.0 * half_length
+	var s := fposmod(fraction, 1.0) * (2.0 * side + 2.0 * arc)
+	if s < side:
+		return [center + Vector2(-half_length + s, 0.0), Vector2(0.0, -1.0)]
+	s -= side
+	if s < arc:
+		return [center + Vector2(half_length, 0.0), Vector2.from_angle(-PI * 0.5 + s / radius)]
+	s -= arc
+	if s < side:
+		return [center + Vector2(half_length - s, 0.0), Vector2(0.0, 1.0)]
+	s -= side
+	return [center + Vector2(-half_length, 0.0), Vector2.from_angle(PI * 0.5 + s / radius)]
+
+
+## The world point at `angle` (a fraction of a full turn round the outline)
+## on the ring `local_radius` from the centreline.
 func point_on_ring(angle: float, local_radius: float) -> Vector2:
-	return _world(Vector2(cos(angle), sin(angle)) * local_radius)
+	var frame := _outline_frame(angle / TAU)
+	return (frame[0] as Vector2) + (frame[1] as Vector2) * local_radius
 
 
 ## True where the surface layers are drawn (the edge plus its overlap).
 func is_within_surface(pos: Vector2) -> bool:
-	var local := _local(pos)
-	return local.length() <= edge_radius(local) + SURFACE_OVERLAP
+	var measure := _distance_and_edge(pos)
+	return measure.x <= measure.y + SURFACE_OVERLAP
 
 
 ## An open lake: a non-solid water sheet in the Crossroads lake's opaque water
@@ -150,25 +176,27 @@ func build_frozen(parent: StaticBody3D, ice_surface_level: float, thickness: flo
 	parent.add_child(_surface_mesh("FrozenLakeWater", _disc_triangles(water_level), water))
 
 
-## Concentric rings following the organic edge (plus overlap), as a flat
-## triangle list at height `y`, clockwise from above (Godot's front face) so
-## faces agree with their upward normals. Shared by the visible mesh and, for ice, its collider.
+## A grid of SURFACE_CELL squares covering the edge plus its overlap, as a
+## flat triangle list at height `y`, clockwise from above (Godot's front face)
+## so faces agree with their upward normals. The grid's ragged outer cells lie
+## under the bank. Shared by the visible mesh and, for ice, its collider.
 func _disc_triangles(y: float) -> PackedVector3Array:
 	var triangles := PackedVector3Array()
-	for ring in SURFACE_RINGS:
-		var inner := float(ring) / float(SURFACE_RINGS)
-		var outer := float(ring + 1) / float(SURFACE_RINGS)
-		for index in SURFACE_SEGMENTS:
-			var a0 := TAU * float(index) / float(SURFACE_SEGMENTS)
-			var a1 := TAU * float(index + 1) / float(SURFACE_SEGMENTS)
-			var d0 := Vector2(cos(a0), sin(a0))
-			var d1 := Vector2(cos(a1), sin(a1))
-			var edge0 := edge_radius(d0) + SURFACE_OVERLAP
-			var edge1 := edge_radius(d1) + SURFACE_OVERLAP
-			var quad: Array[Vector2] = [d0 * edge0 * inner, d1 * edge1 * inner, d0 * edge0 * outer, d1 * edge1 * outer]
-			for corner in [0, 2, 1, 1, 2, 3]:
-				var world := _world(quad[corner])
-				triangles.append(Vector3(world.x, y, world.y))
+	var reach := radius + edge_variation * 1.6 + SURFACE_OVERLAP
+	var x0 := center.x - half_length - reach
+	var z0 := center.y - reach
+	var columns := int(ceil((half_length + reach) * 2.0 / SURFACE_CELL))
+	var rows := int(ceil(reach * 2.0 / SURFACE_CELL))
+	for row in rows:
+		for column in columns:
+			var a := Vector2(x0 + float(column) * SURFACE_CELL, z0 + float(row) * SURFACE_CELL)
+			if not is_within_surface(a + Vector2.ONE * SURFACE_CELL * 0.5):
+				continue
+			var b := a + Vector2(SURFACE_CELL, 0.0)
+			var c := a + Vector2(0.0, SURFACE_CELL)
+			var d := a + Vector2(SURFACE_CELL, SURFACE_CELL)
+			for corner in [a, b, c, b, d, c]:
+				triangles.append(Vector3(corner.x, y, corner.y))
 	return triangles
 
 
@@ -190,15 +218,17 @@ func _build_ice_edge_wall(parent: StaticBody3D, top_level: float, thickness: flo
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var faces := PackedVector3Array()
-	for index in SURFACE_SEGMENTS:
-		var a0 := TAU * float(index) / float(SURFACE_SEGMENTS)
-		var a1 := TAU * float(index + 1) / float(SURFACE_SEGMENTS)
-		var d0 := Vector2(cos(a0), sin(a0))
-		var d1 := Vector2(cos(a1), sin(a1))
-		var r0 := edge_radius(d0) + SURFACE_OVERLAP
-		var r1 := edge_radius(d1) + SURFACE_OVERLAP
-		var edge0 := _world(d0 * r0)
-		var edge1 := _world(d1 * r1)
+	var perimeter := 4.0 * half_length + TAU * radius
+	var samples := maxi(int(perimeter / EDGE_SAMPLE_SPACING), 48)
+	for index in samples:
+		var frame0 := _outline_frame(float(index) / float(samples))
+		var frame1 := _outline_frame(float(index + 1) / float(samples))
+		var spine0: Vector2 = frame0[0]
+		var spine1: Vector2 = frame1[0]
+		var normal0: Vector2 = frame0[1]
+		var normal1: Vector2 = frame1[1]
+		var edge0 := spine0 + normal0 * (_edge_at(spine0, normal0) + SURFACE_OVERLAP)
+		var edge1 := spine1 + normal1 * (_edge_at(spine1, normal1) + SURFACE_OVERLAP)
 		var top0 := Vector3(edge0.x, top_level, edge0.y)
 		var top1 := Vector3(edge1.x, top_level, edge1.y)
 		var low0 := top0 - Vector3.UP * thickness

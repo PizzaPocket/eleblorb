@@ -888,6 +888,10 @@ const POWERED_HOVER_SETTLE_SPEED := 9.0
 ## Each actively firing Fire foot compounds this multiplier while a chest
 ## Air blorb is already supplying flight: one leg = 1.35x, two = 1.8225x.
 const FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER := 1.35
+## Water limbs while swimming jet backward instead: each active Water hand or
+## foot multiplies swim speed by this (compounding, as Fire feet do in flight),
+## and with the stick released they drive the swimmer straight ahead.
+const SWIM_JET_SPEED_MULTIPLIER := FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER
 const AERIAL_FAST_SPEED_MULTIPLIER := 1.8
 ## Flying sprint is intentionally twice its previous fast-flight rate;
 ## swimming retains AERIAL_FAST_SPEED_MULTIPLIER unchanged.
@@ -1982,6 +1986,9 @@ func _physics_process(delta: float) -> void:
 	_update_blorb_super_jump_boost(delta)
 
 	var input_dir := _get_move_input()
+	# Water jets drive a swimmer ahead even with the stick released.
+	if _swim_jet_count() > 0 and input_dir.length_squared() < 0.0001:
+		input_dir = Vector2(0.0, -1.0)
 	_aerial_motion_direction = Vector3.ZERO
 	_aerial_strafe_input = 0.0
 	# On land movement stays yaw-only. Inside a head-blorb dive, use the
@@ -2046,6 +2053,9 @@ func _physics_process(delta: float) -> void:
 	if _air_flight_active:
 		var active_fire_feet := int(_left_leg_fire_active) + int(_right_leg_fire_active)
 		current_speed *= pow(FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER, active_fire_feet)
+	var swim_jets := _swim_jet_count()
+	if swim_jets > 0:
+		current_speed *= pow(SWIM_JET_SPEED_MULTIPLIER, swim_jets)
 	# Leg Speed replaces the old fixed skate multiplier. High-Speed legs reach
 	# and surpass that former very-fast reference through progression itself.
 	var sliding_on_ice := grounded and _is_supported_by_ice() and not _snowboard_active and not _ice_skating_active
@@ -2236,6 +2246,7 @@ func _physics_process(delta: float) -> void:
 	# get wrong.
 	_apply_arm_power_poses(delta)
 	_apply_fire_jet_pose(delta)
+	_apply_swim_jet_pose(delta)
 	_apply_throw_aim_pose(delta)
 	_apply_weapon_swing_pose(delta)
 	_apply_throw_facing(delta)
@@ -4585,6 +4596,35 @@ func _dirtbike_slope_along(dir_xz: Vector2) -> float:
 ## When both Fire feet join them, the legs lock into a straight jet-flight
 ## silhouette as well; ordinary walk/jump animation continues underneath but
 ## this final layer wins while all four controls remain powered.
+## Swimming (at the surface or diving), not wading on the lakebed.
+func _is_swimming() -> bool:
+	return _lake_buoyancy_active and not _lake_floor_walk_active and not _lake_weighted_descent_active
+
+
+## How many Water hands and feet are jetting the swimmer along: 0 out of water.
+func _swim_jet_count() -> int:
+	if not _is_swimming():
+		return 0
+	return int(_left_arm_water_active) + int(_right_arm_water_active) + int(_left_leg_water_active) + int(_right_leg_water_active)
+
+
+## Swimming Water jets, posed like the Fire suit's: jetting hands swept back
+## beside the hips and jetting legs held straight, both streaming behind.
+func _apply_swim_jet_pose(delta: float) -> void:
+	if _swim_jet_count() == 0:
+		return
+	var t := minf(FIRE_JET_POSE_SETTLE_SPEED * delta, 1.0)
+	if _left_arm_water_active:
+		_pose_fire_jet_arm(_arm_left, _elbow_left, _hand_left, 1.0, t)
+	if _right_arm_water_active:
+		_pose_fire_jet_arm(_arm_right, _elbow_right, _hand_right, -1.0, t)
+	if not (_left_leg_water_active or _right_leg_water_active):
+		return
+	for joint in [_leg_left, _leg_right, _knee_left, _knee_right, _ankle_left, _ankle_right]:
+		var pivot := joint as Node3D
+		pivot.rotation = pivot.rotation.lerp(Vector3.ZERO, t)
+
+
 func _apply_fire_jet_pose(delta: float) -> void:
 	if not _fire_hand_hover_active:
 		return
@@ -4887,7 +4927,9 @@ func _update_limb_power_state(delta: float) -> void:
 	if _left_arm_electric_active or _right_arm_electric_active or _left_arm_city_active or _right_arm_city_active:
 		UISounds.pulse_power_loop(&"electric", get_instance_id())
 
-	_water_leg_hover_active = _left_leg_water_active and _right_leg_water_active
+	# In the water, Water feet jet backward to swim (see _swim_jet_count())
+	# rather than downward to hover.
+	_water_leg_hover_active = _left_leg_water_active and _right_leg_water_active and not _is_swimming()
 	_fire_hand_hover_active = _left_arm_fire_active and _right_arm_fire_active
 	# A matched pair of downward foot jets supplies the same basic lift and
 	# fall braking as the matched hand jets. It remains a level hover on its
@@ -5172,12 +5214,19 @@ func _update_water_streams(delta: float) -> void:
 			fire_hand_jet_direction = combined_foot_direction.normalized()
 	var left_hand_direction := fire_hand_jet_direction if _fire_hand_hover_active else forward
 	var right_hand_direction := fire_hand_jet_direction if _fire_hand_hover_active else forward
+	# Swimming, Water hands and feet jet straight back against the travel.
+	var swimming := _is_swimming()
+	var backward := -forward
+	if velocity.length_squared() > 0.25:
+		backward = -velocity.normalized()
+	var water_hand_direction := backward if swimming else forward
+	var water_foot_direction := backward if swimming else downward
 	_update_water_stream(
-		_water_stream_left, _palm_left, forward,
+		_water_stream_left, _palm_left, water_hand_direction,
 		_left_arm_water_active
 	)
 	_update_water_stream(
-		_water_stream_right, _palm_right, forward,
+		_water_stream_right, _palm_right, water_hand_direction,
 		_right_arm_water_active
 	)
 	_update_water_stream(
@@ -5188,8 +5237,8 @@ func _update_water_streams(delta: float) -> void:
 		_fire_stream_right, _palm_right, right_hand_direction,
 		_right_arm_fire_active
 	)
-	_update_water_stream(_water_leg_stream_left, _toe_left, downward, _left_leg_water_active)
-	_update_water_stream(_water_leg_stream_right, _toe_right, downward, _right_leg_water_active)
+	_update_water_stream(_water_leg_stream_left, _toe_left, water_foot_direction, _left_leg_water_active)
+	_update_water_stream(_water_leg_stream_right, _toe_right, water_foot_direction, _right_leg_water_active)
 	_update_water_stream(
 		_fire_leg_stream_left, _toe_left, _foot_jet_direction(_ankle_left), _left_leg_fire_active
 	)
@@ -5201,7 +5250,7 @@ func _update_water_streams(delta: float) -> void:
 	_update_lightning_bolt(_city_stream_left, _palm_left, forward, _left_arm_city_active)
 	_update_lightning_bolt(_city_stream_right, _palm_right, forward, _right_arm_city_active)
 	var forward_stream_active := (
-		_left_arm_water_active or _right_arm_water_active
+		((_left_arm_water_active or _right_arm_water_active) and not swimming)
 		or _left_arm_electric_active or _right_arm_electric_active
 		or _left_arm_city_active or _right_arm_city_active
 		or ((_left_arm_fire_active or _right_arm_fire_active) and not _fire_hand_hover_active)

@@ -2,9 +2,11 @@ extends Node3D
 
 ## The demo world (see DemoWorldTerrain): a playable tour of every suit with a
 ## clear traversal power, and the testing ground for movement modes. The hero
-## wakes in a clearing with five Normal blorbs, Xiao Hou Zi, Manchego and
-## Pandy, passes through forest plains where wild shiny blorbs roam, and walks
-## east. Each border between biomes is a gate of two one-way portals back to
+## wakes on the floor of a pit with five Normal blorbs and Xiao Hou Zi, climbs
+## out by bouncing on his blorbs up the ledges of its wall, and finds Manchego
+## and Pandy stationed beside the shiny portal on the plain above; passing
+## through it brings them into the party. Beyond lie forest plains where wild
+## shiny blorbs roam, and the course runs on east. Each border between biomes is a gate of two one-way portals back to
 ## back, facing apart: each biome's portal stands on the side you enter it
 ## from, facing you, with its blorbs waiting there. Walking or riding through a
 ## portal's face swaps suits (the worn blorbs hop off, the waiting ones join
@@ -19,9 +21,14 @@ const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
 const NORMAL_SLOTS: Array[String] = ["leg_left", "leg_right", "arm_left", "arm_right", "torso"]
 ## Wild shiny blorbs roaming the forest plains (as in the Crossroads field).
 const FOREST_SHINY_COUNT := 5
-## Half the gap between a gate's two portals: just over CheckpointPortal's
-## TUBE_RADIUS (0.11), so their rings touch without intersecting.
-const GATE_HALF_GAP := 0.13
+## The demo's portals span most of the valley floor, with piping to match.
+const PORTAL_TUBE_RADIUS := 0.35
+## Half the gap between a gate's two portals: just over PORTAL_TUBE_RADIUS,
+## so their rings touch without intersecting.
+const GATE_HALF_GAP := 0.37
+## Where Manchego and Pandy wait, just past the shiny portal on the plain.
+const MANCHEGO_STATION := Vector2(58.0, -10.0)
+const PANDY_STATION := Vector2(58.0, 10.0)
 ## How far in front of its portal (on the approach side) a waiting set idles.
 const SET_WAIT_OFFSET := 6.0
 ## The valley runs toward +X. The camera looks east over the hero's shoulder
@@ -32,6 +39,8 @@ const WEST_BODY_YAW := -PI * 0.5
 @onready var _player: Player = $Player
 @onready var _terrain: DemoWorldTerrain = $Terrain
 var _roster := SuitRoster.new()
+var _manchego: Manchego
+var _pandy: Pandy
 
 
 func _ready() -> void:
@@ -72,9 +81,14 @@ func _add_portal(element: String, x: float, facing_yaw: float) -> void:
 	portal.name = "Portal_%s_%d" % [element if element != "" else "normal", int(x)]
 	portal.element = element
 	portal.one_way = true
+	portal.half_width = DemoWorldTerrain.PORTAL_HALF_WIDTH
+	portal.half_height = DemoWorldTerrain.PORTAL_HALF_HEIGHT
+	portal.tube_radius = PORTAL_TUBE_RADIUS
 	portal.position = _terrain.get_path_point(x)
 	portal.rotation.y = facing_yaw
 	portal.crossed.connect(_roster.switch_to)
+	if element == "shiny":
+		portal.crossed.connect(_on_shiny_portal_crossed)
 	add_child(portal)
 
 
@@ -100,7 +114,8 @@ func _finish_loading() -> void:
 
 
 ## Every suit set, waiting on its own side of the first gate that leads into
-## its biome, plus the hero's starting pair, Xiao Hou Zi and Manchego.
+## its biome, plus the hero's starting five and Xiao Hou Zi, and Manchego and
+## Pandy stationed by the shiny portal.
 func _build_party() -> void:
 	var normal := SuitLoadout.spawn_set(self, "", "", _player.global_position + Vector3(-3.0, 0.0, 0.0), NORMAL_SLOTS, 1.8)
 	_roster.add_set("", normal, NORMAL_SLOTS)
@@ -110,7 +125,8 @@ func _build_party() -> void:
 		var head_item: String = DemoWorldTerrain.HEAD_ITEMS.get(element, "")
 		# In front of the biome's portal face, on the approach (west) side.
 		var home := _terrain.get_path_point(float(border["x"]) - SET_WAIT_OFFSET, 5.0)
-		var blorbs := SuitLoadout.spawn_set(self, element, head_item, home)
+		var shiny := element == "shiny"
+		var blorbs := SuitLoadout.spawn_set(self, "" if shiny else element, head_item, home, SuitLoadout.FULL_SUIT_SLOTS, 2.2, shiny)
 		_roster.add_set(element, blorbs, SuitLoadout.FULL_SUIT_SLOTS)
 	_roster.start_with("")
 	_spawn_forest_shinies()
@@ -118,15 +134,27 @@ func _build_party() -> void:
 	monkey.in_party = true
 	monkey.position = _player.global_position + Vector3(-3.0, 0.0, 2.5)
 	add_child(monkey)
-	var manchego := MANCHEGO_SCENE.instantiate() as Manchego
-	manchego.follows_player = true
-	manchego.available_to_player = true
-	manchego.position = _player.global_position + Vector3(-4.0, 0.0, -3.0)
-	add_child(manchego)
-	var pandy := PANDY_SCENE.instantiate() as Pandy
-	pandy.in_party = true
-	pandy.position = _player.global_position + Vector3(-5.0, 0.0, 3.0)
-	add_child(pandy)
+	# Stationed: idling in place, not yet in the party and not yet rideable.
+	_manchego = MANCHEGO_SCENE.instantiate() as Manchego
+	_manchego.follows_player = false
+	_manchego.available_to_player = false
+	_manchego.position = _terrain.get_path_point(MANCHEGO_STATION.x, MANCHEGO_STATION.y)
+	_manchego.rotation.y = -PI * 0.5
+	add_child(_manchego)
+	_manchego.set_available_to_player(false)
+	_pandy = PANDY_SCENE.instantiate() as Pandy
+	_pandy.in_party = false
+	_pandy.position = _terrain.get_path_point(PANDY_STATION.x, PANDY_STATION.y)
+	add_child(_pandy)
+
+
+## Passing through the shiny portal brings the stationed pair into the party.
+func _on_shiny_portal_crossed(_element: String) -> void:
+	if is_instance_valid(_manchego) and not _manchego.follows_player:
+		_manchego.follows_player = true
+		_manchego.set_available_to_player(true)
+	if is_instance_valid(_pandy):
+		_pandy.in_party = true
 
 
 ## Wild, recruitable shiny blorbs wandering the forest plains, placed as the

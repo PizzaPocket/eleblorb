@@ -20,7 +20,8 @@ extends Node3D
 signal crossed(element: String)
 
 ## Element of the suit this portal stands for, e.g. "water" ("" for Normal
-## blorbs); its body colour tints the membrane and ring.
+## blorbs, "shiny" for shiny Normal blorbs); its body colour tints the
+## membrane and ring.
 @export var element: String = ""
 ## Only a crossing from the face (+Z) side to the back counts.
 @export var one_way: bool = false
@@ -28,8 +29,12 @@ signal crossed(element: String)
 ## to spare above the head and at the shoulders.
 @export var half_width: float = 1.35
 @export var half_height: float = 1.75
+## Thickness of the ring's piping; thicker for a wider portal.
+@export var tube_radius: float = 0.11
 
-const TUBE_RADIUS := 0.11
+## Shiny blorbs' body is nearly the Normal off-white, so their portal takes a
+## warm gold to tell the two apart at a glance.
+const SHINY_TINT := Color(1.0, 0.84, 0.38)
 const RING_SAMPLES := 96
 const TUBE_SIDES := 10
 ## A rounder crown over a flatter, boxier base: an egg standing on its broad
@@ -64,7 +69,7 @@ var _has_last := false
 
 
 func _ready() -> void:
-	var tint := ElementPalette.body_color(element)
+	var tint := SHINY_TINT if element == "shiny" else ElementPalette.body_color(element)
 	var outline := _outline()
 	_build_ring(outline, tint)
 	_build_membrane(outline, tint)
@@ -112,7 +117,7 @@ func _build_ring(outline: PackedVector2Array, tint: Color) -> void:
 		for side in TUBE_SIDES:
 			var angle := TAU * float(side) / float(TUBE_SIDES)
 			var direction := outward * cos(angle) + Vector3.BACK * sin(angle)
-			ring.append(center + direction * TUBE_RADIUS)
+			ring.append(center + direction * tube_radius)
 			ring_normals.append(direction)
 		rings.append(ring)
 		normals.append(ring_normals)
