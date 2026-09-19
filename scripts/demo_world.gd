@@ -67,7 +67,8 @@ func _ready() -> void:
 	# The Crystal Skates portal, standing on the frozen lake's ice.
 	var crystal_portal := _add_portal("ice", DemoWorldTerrain.CRYSTAL_PORTAL_X, -PI * 0.5, "crystal", 1.0, CrystalTrack.CRYSTAL_TINT)
 	crystal_portal.position.y = DemoWorldTerrain.ICE_SURFACE_LEVEL
-	add_child(WorldMusic.new(MUSIC))
+	# Kept low: background under the sound effects.
+	add_child(WorldMusic.new(MUSIC, -10.0))
 	# The Ocean Kingdom's Kraken, patrolling the sea's deep middle.
 	var kraken := Kraken.new()
 	kraken.route_center = _terrain.sea_center()

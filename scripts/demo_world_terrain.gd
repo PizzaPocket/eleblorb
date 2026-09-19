@@ -123,20 +123,20 @@ const ISLAND_CENTER := Vector2(1180.0, 90.0)
 const KRAKEN_ROUTE_RADIUS := Vector2(380.0, 60.0)
 const ISLAND_RADIUS := 55.0
 const ISLAND_HEIGHT := 7.0
-## A portal standing on the seabed halfway through the water zone (midway
-## between its portals; see demo_world.gd): through it a single water blorb
-## waits to take the head slot, wearing the Nautilus Crown.
-const NAUTILUS_PORTAL_X := 830.5
+## A portal standing on the seabed a third of the way through the water zone
+## (from its portal toward the ice portal; see demo_world.gd): through it a
+## single water blorb waits to take the head slot, wearing the Nautilus Crown.
+const NAUTILUS_PORTAL_X := 656.3
 
 ## The long frozen lake: from LAKE_SHORE_GAP past the ice portal to the
 ## mountain's foot.
 const ICE_RADIUS := 70.0
 const ICE_EAST_SHORE_X := 2418.0
-## A portal standing on the frozen lake's ice halfway through the ice zone
-## (midway between the ice and snow portals): through it two Ice blorbs bound
-## with Crystal Skates take over both legs, to skate a crystal track on and
-## up the mountain (see demo_world.gd).
-const CRYSTAL_PORTAL_X := 2075.5
+## A portal standing on the frozen lake's ice a third of the way through the
+## ice zone (from the ice portal toward the snow portal): through it two Ice
+## blorbs bound with Crystal Skates take over both legs, to skate a crystal
+## track on and up the mountain (see demo_world.gd).
+const CRYSTAL_PORTAL_X := 1834.7
 const ICE_EDGE_VARIATION := 9.0
 ## Frozen solid: there is no water under this lake's ice (unlike the Ice
 ## Kingdom's, which has reasons to be reached), so its bed lies just beneath
