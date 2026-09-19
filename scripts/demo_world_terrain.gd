@@ -485,14 +485,17 @@ func _build_chunk(ix0: int, ix1: int, material: Material) -> PackedVector3Array:
 	for iz in _nz - 1:
 		for local_x in columns - 1:
 			var i0: int = iz * columns + local_x
-			for index in [i0, i0 + columns, i0 + 1, i0 + 1, i0 + columns, i0 + columns + 1]:
+			# Clockwise seen from above, so the top is each triangle's front face.
+			# The material draws both sides and lights a back face with its
+			# normal reversed, so the opposite order lit the ground from below.
+			for index in [i0, i0 + 1, i0 + columns, i0 + 1, i0 + columns + 1, i0 + columns]:
 				tool.add_index(index)
 			var ix := ix0 + local_x
 			var a := _grid_vertex(ix, iz)
 			var b := _grid_vertex(ix + 1, iz)
 			var c := _grid_vertex(ix, iz + 1)
 			var d := _grid_vertex(ix + 1, iz + 1)
-			for vertex in [a, c, b, b, c, d]:
+			for vertex in [a, b, c, b, d, c]:
 				faces.append(vertex)
 	tool.set_material(material)
 	var chunk := MeshInstance3D.new()
@@ -521,10 +524,11 @@ func _build_volcano_lava() -> void:
 		var a1 := TAU * float(index + 1) / 64.0
 		for vertex in [
 			Vector3(VOLCANO_CENTER.x, _volcano_lava_level, VOLCANO_CENTER.y),
-			Vector3(VOLCANO_CENTER.x + cos(a1) * radius, _volcano_lava_level, VOLCANO_CENTER.y + sin(a1) * radius),
 			Vector3(VOLCANO_CENTER.x + cos(a0) * radius, _volcano_lava_level, VOLCANO_CENTER.y + sin(a0) * radius),
+			Vector3(VOLCANO_CENTER.x + cos(a1) * radius, _volcano_lava_level, VOLCANO_CENTER.y + sin(a1) * radius),
 		]:
 			tool.add_vertex(vertex)
+	tool.generate_normals()
 	tool.set_material(NatureProps.build_lava_material())
 	var lava := MeshInstance3D.new()
 	lava.name = "VolcanoLava"

@@ -151,8 +151,8 @@ func build_frozen(parent: StaticBody3D, ice_surface_level: float, thickness: flo
 
 
 ## Concentric rings following the organic edge (plus overlap), as a flat
-## triangle list at height `y`, counter-clockwise from above so faces and
-## normals point up. Shared by the visible mesh and, for ice, its collider.
+## triangle list at height `y`, clockwise from above (Godot's front face) so
+## faces agree with their upward normals. Shared by the visible mesh and, for ice, its collider.
 func _disc_triangles(y: float) -> PackedVector3Array:
 	var triangles := PackedVector3Array()
 	for ring in SURFACE_RINGS:
@@ -166,7 +166,7 @@ func _disc_triangles(y: float) -> PackedVector3Array:
 			var edge0 := edge_radius(d0) + SURFACE_OVERLAP
 			var edge1 := edge_radius(d1) + SURFACE_OVERLAP
 			var quad: Array[Vector2] = [d0 * edge0 * inner, d1 * edge1 * inner, d0 * edge0 * outer, d1 * edge1 * outer]
-			for corner in [0, 1, 2, 1, 3, 2]:
+			for corner in [0, 2, 1, 1, 2, 3]:
 				var world := _world(quad[corner])
 				triangles.append(Vector3(world.x, y, world.y))
 	return triangles
@@ -206,6 +206,9 @@ func _build_ice_edge_wall(parent: StaticBody3D, top_level: float, thickness: flo
 		for vertex in [top0, low0, top1, top1, low0, low1]:
 			tool.add_vertex(vertex)
 			faces.append(vertex)
+	# Normals that agree with each face's winding, so both sides light
+	# correctly with culling disabled.
+	tool.generate_normals()
 	var material := StandardMaterial3D.new()
 	material.albedo_color = ICE_EDGE_COLOR
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

@@ -120,7 +120,10 @@ func _build_ring(outline: PackedVector2Array, tint: Color) -> void:
 		var next := (index + 1) % count
 		for side in TUBE_SIDES:
 			var side_next := (side + 1) % TUBE_SIDES
-			for pair in [[index, side], [next, side], [index, side_next], [index, side_next], [next, side], [next, side_next]]:
+			# Clockwise seen from outside the tube (Godot's front face), matching
+			# the outward normals: the material draws both sides and lights a
+			# back face with its normal reversed.
+			for pair in [[index, side], [index, side_next], [next, side], [index, side_next], [next, side_next], [next, side]]:
 				tool.set_normal(normals[pair[0]][pair[1]])
 				tool.add_vertex(rings[pair[0]][pair[1]])
 	var material := StandardMaterial3D.new()
@@ -146,7 +149,8 @@ func _build_membrane(outline: PackedVector2Array, tint: Color) -> void:
 	var center := Vector2(0.0, half_height)
 	var count := outline.size()
 	for index in count:
-		for point in [center, outline[index], outline[(index + 1) % count]]:
+		# Clockwise seen from the portal's face (+Z), the side its normal names.
+		for point in [center, outline[(index + 1) % count], outline[index]]:
 			var p: Vector2 = point
 			tool.set_normal(Vector3.BACK)
 			tool.set_uv(Vector2(p.x / half_width * 0.5 + 0.5, 0.5 - (p.y - half_height) / half_height * 0.5))
