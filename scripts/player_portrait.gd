@@ -204,9 +204,10 @@ func _rebuild_preview() -> void:
 			if _assignments[assigned_slot] == _selected_blorb:
 				selected_is_assigned = true
 				break
-	# Resolve the complete visual assignment first. The sealed Lava Suit is a
-	# reversible five-piece configuration, not an effect the helm applies to a
-	# partial suit. This mirrors BlorbSuitController.has_full_lava_suit().
+	# Resolve the complete visual assignment first. A formed suit (the sealed
+	# Lava Suit, the Penguin Suit) is a reversible five-piece configuration,
+	# not an effect the helm applies to a partial suit. This mirrors
+	# BlorbSuitController._has_full_formed_suit().
 	var preview_blorbs: Dictionary = {}
 	for slot in BlorbSuit.SLOT_ORDER:
 		var blorb := _assignments.get(slot) as Blorb
@@ -218,22 +219,19 @@ func _rebuild_preview() -> void:
 			blorb = _selected_blorb
 		preview_blorbs[slot] = blorb
 	var preview_head := preview_blorbs.get("head") as Blorb
-	var lava_helm_command := (
-		is_instance_valid(preview_head)
-		and preview_head.element_state == "fire"
-		and preview_head.has_core_item("Lava Helm")
-	)
-	if lava_helm_command:
+	var form_element := BlorbSuit.form_helm_element(preview_head) if is_instance_valid(preview_head) else ""
+	var form_command := form_element != ""
+	if form_command:
 		for required_slot in BlorbSuit.SLOT_ORDER:
 			var required_blorb := preview_blorbs.get(required_slot) as Blorb
-			if not is_instance_valid(required_blorb) or required_blorb.element_state != "fire":
-				lava_helm_command = false
+			if not is_instance_valid(required_blorb) or required_blorb.element_state != form_element:
+				form_command = false
 				break
 	for slot in BlorbSuit.SLOT_ORDER:
 		var blorb := preview_blorbs.get(slot) as Blorb
 		if blorb == null or not is_instance_valid(blorb):
 			continue
-		var pieces := BlorbSuit.equip_slot(slot, _preview_pivots(), _root, blorb, _rig_scale, lava_helm_command)
+		var pieces := BlorbSuit.equip_slot(slot, _preview_pivots(), _root, blorb, _rig_scale, form_command)
 		_preview_pieces_by_slot[slot] = pieces
 		_preview_blorbs_by_slot[slot] = blorb
 	_apply_highlight()

@@ -150,10 +150,10 @@ const BORDERS := [
 	{"x": 5520.0, "west": "ground", "east": "air"},
 	{"x": 6275.0, "west": "air", "east": "fire"},
 ]
-## Ice and Snow bring the Toboggan; Air brings the Bird Helm.
+## Ice brings the Penguin Helm, Snow the Toboggan, Air the Bird Helm.
 const HEAD_ITEMS := {
 	"water": "Diving Helmet",
-	"ice": "Toboggan",
+	"ice": "Penguin Helm",
 	"snow": "Toboggan",
 	"air": "Bird Helm",
 	"fire": "Lava Helm",

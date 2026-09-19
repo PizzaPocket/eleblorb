@@ -94,10 +94,10 @@ var _rng := RandomNumberGenerator.new()
 var _air_wing_flap_phase := 0.0
 var _assignment_reconcile_requested := false
 ## Cached command state lets an already-worn torso and limbs immediately
-## change between ordinary fit and sealed fit when the Lava Helm arrives or
-## leaves. Torso geometry is otherwise static after equip, so merely changing
+## change between ordinary fit and their formed shape (the sealed Lava Suit,
+## the Penguin Suit) when the commanding helm arrives or leaves. Torso geometry is otherwise static after equip, so merely changing
 ## the limb rebuild path would leave it enlarged until the next full suit cycle.
-var _lava_helm_command_was_active := false
+var _form_command_was_active := false
 var _story_suspended: bool = false
 
 
@@ -360,14 +360,23 @@ func has_lava_safe_legs() -> bool:
 
 
 func has_full_lava_suit() -> bool:
-	if not has_worn_element("arm_left", "fire") or not has_worn_element("arm_right", "fire"):
-		return false
-	if not has_worn_element("leg_left", "fire") or not has_worn_element("leg_right", "fire"):
-		return false
-	if not has_worn_element("torso", "fire"):
-		return false
+	return _has_full_formed_suit("fire")
+
+
+## The Penguin Suit: five worn Ice pieces commanded by an Ice head carrying
+## the Penguin Helm. The same reversible configuration as the Lava Suit.
+func has_full_penguin_suit() -> bool:
+	return _has_full_formed_suit("ice")
+
+
+## True when every slot is worn by a blorb of `element` and the head carries
+## that element's commanding helm (BlorbSuit.FORM_HELMS).
+func _has_full_formed_suit(element: String) -> bool:
+	for slot in ["arm_left", "arm_right", "leg_left", "leg_right", "torso"]:
+		if not has_worn_element(slot, element):
+			return false
 	var head := worn_blorb_in_slot("head")
-	return is_instance_valid(head) and head.element_state == "fire" and head.has_core_item("Lava Helm")
+	return is_instance_valid(head) and BlorbSuit.form_helm_element(head) == element
 
 
 func has_head_lava_helm() -> bool:
@@ -544,12 +553,12 @@ func update(delta: float) -> void:
 		_update_transitions(delta)
 	if _assignment_reconcile_requested and _transitions.is_empty():
 		_reconcile_worn_assignments()
-	var lava_helm_command := _lava_helm_command_active()
-	if lava_helm_command != _lava_helm_command_was_active:
-		_rebuild_worn_fire_pieces(lava_helm_command)
-		_lava_helm_command_was_active = lava_helm_command
+	var form_command := _form_command_active()
+	if form_command != _form_command_was_active:
+		_rebuild_worn_form_pieces(form_command)
+		_form_command_was_active = form_command
 	if not _worn.is_empty():
-		_update_worn_limbs(lava_helm_command)
+		_update_worn_limbs(form_command)
 		# The Lava Helm sizes only its own shell. Keep the covered head, hair,
 		# and ears at their authored rig scale throughout wear and removal.
 		for entry in _worn:
@@ -568,28 +577,30 @@ func update(delta: float) -> void:
 	_phase = Phase.WORN if not _worn.is_empty() else (Phase.TRANSITIONING if not _transitions.is_empty() else Phase.IDLE)
 
 
-func _lava_helm_command_active() -> bool:
-	# The helm is the command key, but the sealed configuration only exists
-	# while a complete five-piece Fire suit is physically worn. Because this is
-	# recomputed every frame from _worn, losing any piece immediately returns
-	# the survivors to normal and restoring it reforms the suit automatically.
-	return has_full_lava_suit()
+func _form_command_active() -> bool:
+	# The helm is the command key, but a formed configuration only exists
+	# while a complete five-piece suit of its element is physically worn.
+	# Because this is recomputed every frame from _worn, losing any piece
+	# immediately returns the survivors to normal and restoring it reforms the
+	# suit automatically. The flag carries no element: each piece's own
+	# element picks its form (see BlorbSuit.equip_slot()).
+	return has_full_lava_suit() or has_full_penguin_suit()
 
 
-## Replaces only Fire torso/limb geometry. The Lava Helm itself has its own
-## authored shape and does not change, while non-Fire suit pieces should never
-## respond to the command. Releasing and recreating in the same frame makes
-## removal visibly and physically immediate.
-func _rebuild_worn_fire_pieces(lava_helm_command: bool) -> void:
+## Replaces only the formed element's torso/limb geometry. The helm itself has
+## its own authored shape and does not change, while pieces of any other
+## element never respond to the command. Releasing and recreating in the same
+## frame makes removal visibly and physically immediate.
+func _rebuild_worn_form_pieces(form_command: bool) -> void:
 	for entry in _worn:
 		var slot := entry["slot"] as String
 		var blorb := entry["blorb"] as Blorb
-		if slot == "head" or not is_instance_valid(blorb) or blorb.element_state != "fire":
+		if slot == "head" or not is_instance_valid(blorb) or not BlorbSuit.FORM_HELMS.has(blorb.element_state):
 			continue
 		for piece in (entry["pieces"] as Array):
 			if is_instance_valid(piece):
 				BlorbSuit.release_piece(piece as Node3D)
-		var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, lava_helm_command)
+		var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, form_command)
 		for piece in pieces:
 			if piece is VisualInstance3D:
 				PlayerPortrait.tag_for_portrait(piece as VisualInstance3D)
@@ -863,7 +874,7 @@ func _update_transitions(delta: float) -> void:
 ## Builds `blorb`'s suit piece in `slot` on this wearer's rig and records it
 ## as worn. The blorb must already be in its worn state (hidden, frozen).
 func _wear_on_body(slot: String, blorb: Blorb) -> void:
-	var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, _lava_helm_command_active())
+	var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, _form_command_active())
 	# Tags each piece as visible to the paper-doll's own isolated portrait
 	# camera (see player_portrait.gd's own module docstring on render layers)
 	# -- done once here at creation, not on every subsequent per-frame rebuild
@@ -888,7 +899,7 @@ func _wear_on_body(slot: String, blorb: Blorb) -> void:
 ## Only the dynamic (limb) slots need rebuilding every frame -- torso/head
 ## are single-pivot pieces that already move for free via parenting (see
 ## BlorbSuit.equip_slot()'s own comment).
-func _update_worn_limbs(lava_helm_command: bool) -> void:
+func _update_worn_limbs(form_command: bool) -> void:
 	for entry in _worn:
 		var slot := entry["slot"] as String
 		if not BlorbSuit.is_dynamic_slot(slot):
@@ -898,7 +909,7 @@ func _update_worn_limbs(lava_helm_command: bool) -> void:
 			continue
 		var mesh_instance := pieces[0] as MeshInstance3D
 		var blorb := entry["blorb"] as Blorb
-		BlorbSuit.rebuild_slot(mesh_instance, slot, _pivots, _root, blorb, _rig_scale, lava_helm_command)
+		BlorbSuit.rebuild_slot(mesh_instance, slot, _pivots, _root, blorb, _rig_scale, form_command)
 
 
 ## Stamps each worn entry's OWN blink clock's current openness onto that

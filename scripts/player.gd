@@ -290,6 +290,26 @@ const ICE_SKATE_ROLLING_RESISTANCE := 0.022
 const ICE_SKATE_AIR_DRAG := 0.0018
 const ICE_SKATE_STOP_SPEED := 0.10
 const ICE_SKATE_TERMINAL_SPEED := 32.0
+## Penguin Suit (a full Ice suit under the Penguin Helm): Jump on ice launches
+## a low forward dive that lands on the belly and toboggans across the ice.
+## The dive is at least this fast forward, and rises to this fraction of an
+## ordinary jump's height.
+const PENGUIN_DIVE_FORWARD_SPEED := 8.5
+const PENGUIN_DIVE_HEIGHT := 0.45
+## Belly-slide deceleration on ice, and off it (snow and ground grab the belly).
+const PENGUIN_SLIDE_FRICTION := 1.1
+const PENGUIN_SLIDE_OFF_ICE_FRICTION := 12.0
+## How quickly the stick bends a belly slide's heading (radians per second).
+const PENGUIN_SLIDE_TURN_RATE := 1.3
+## Below this speed the penguin stands back up.
+const PENGUIN_SLIDE_STOP_SPEED := 0.9
+## How quickly the body tips between upright and prone (fraction per second).
+const PENGUIN_PRONE_RATE := 5.5
+## The body tips about this height above the feet (the belly), and while
+## prone that point rests this high above the ground: the Penguin torso's
+## belly half-depth, so the belly lies on the ice.
+const PENGUIN_BODY_PIVOT_HEIGHT := 0.75
+const PENGUIN_BELLY_REST_HEIGHT := 0.34
 const ICE_SKATE_PUSH_HIP_BACK := deg_to_rad(25.0)
 const ICE_SKATE_GLIDE_HIP_FORWARD := deg_to_rad(13.0)
 const ICE_SKATE_RECOVERY_HIP_FORWARD := deg_to_rad(11.0)
@@ -1105,6 +1125,11 @@ var _ice_skate_right: Node3D = null
 var _ice_skate_was_supported := false
 var _ice_skate_airborne := false
 var _ice_skate_surface_velocity := Vector3.ZERO
+## Penguin Suit dive (airborne, ballistic) and belly slide (grounded on ice).
+var _penguin_dive_airborne := false
+var _penguin_belly_sliding := false
+## 0 upright .. 1 lying on the belly; eased by _compose_body_pose().
+var _penguin_prone := 0.0
 ## Base height applied by the last _compose_body_pose(). While riding, the
 ## dirtbike pose applies only the change in base height, so its chassis-pivot
 ## correction is retained rather than erased on the next frame.
@@ -1805,6 +1830,7 @@ func _physics_process(delta: float) -> void:
 	_update_air_flight()
 	_update_dirtbike_state(delta)
 	_update_snowboard_state()
+	_update_penguin_state()
 	_update_ice_skate_state()
 	_update_limb_power_state(delta)
 	_update_suit_flight_transition()
@@ -1918,7 +1944,7 @@ func _physics_process(delta: float) -> void:
 	var jumped_this_frame := false
 
 	if not grounded and not buoyant:
-		if (_dirtbike_wheel_active or _snowboard_active or _ice_skate_airborne) and _jumping:
+		if (_dirtbike_wheel_active or _snowboard_active or _ice_skate_airborne or _penguin_dive_airborne) and _jumping:
 			velocity=HumanoidLocomotion.ballistic_step(
 				velocity,delta,_playable_profile,TERMINAL_FALL_SPEED
 			)
@@ -1930,6 +1956,9 @@ func _physics_process(delta: float) -> void:
 		_giant_goo_jump_lift_timer = GIANT_GOO_JUMP_LIFT_DURATION
 		velocity.y = 0.0
 		_jumping = false
+	elif jump_pressed and grounded and on_ice_support and not buoyant and _blorb_suit.has_full_penguin_suit():
+		_begin_penguin_dive()
+		jumped_this_frame = true
 	elif jump_pressed and (grounded or water_exit_jump_ready) and not _lake_floor_walk_active and not _lake_weighted_descent_active:
 		var jump_height_multiplier := GIANT_SUPER_JUMP_HEIGHT_MULTIPLIER if giant_jump_ready else 1.0
 		if _lake_buoyancy_active and not _lake_diving_active:
@@ -1975,6 +2004,9 @@ func _physics_process(delta: float) -> void:
 	# movement would rewrite the skate's horizontal launch speed once before
 	# ballistic preservation begins on the following frame.
 	var skate_ballistic:=_ice_skate_airborne and (not grounded or jumped_this_frame) and not buoyant
+	# The penguin's dive keeps its launch like a skate jump, and its belly
+	# slide owns the planar velocity (_penguin_belly_slide_step()).
+	var penguin_owns_velocity:=(_penguin_dive_airborne and (not grounded or jumped_this_frame) and not buoyant) or (_penguin_belly_sliding and grounded)
 
 	var skating := _is_blorb_skating() and not _ice_skates_active
 	var skate_speed_multiplier := worn_leg_speed_multiplier() if skating else 1.0
@@ -2028,7 +2060,10 @@ func _physics_process(delta: float) -> void:
 			if direction.length() > 0.001
 			else 0.0
 		)
-	if _snowboard_active and grounded and not _is_snowboard_surface():
+	if _penguin_belly_sliding and grounded and not jumped_this_frame:
+		ice_animation_speed = 0.0
+		_penguin_belly_slide_step(direction, delta)
+	elif _snowboard_active and grounded and not _is_snowboard_surface():
 		# Off snow the board does not slide at all: it grinds to a halt, and
 		# neither slope nor steering can push it.
 		ice_animation_speed = 0.0
@@ -2103,7 +2138,7 @@ func _physics_process(delta: float) -> void:
 		if neck_led_travel or _dirtbike_wheelie_active:
 			_aerial_motion_direction = direction
 			_aerial_strafe_input = input_dir.x
-		if dirtbike_ballistic or skate_ballistic or _snowboard_active or _ice_skating_active:
+		if dirtbike_ballistic or skate_ballistic or penguin_owns_velocity or _snowboard_active or _ice_skating_active:
 			pass
 		elif sliding_on_ice and not neck_led_travel:
 			velocity.x = move_toward(velocity.x, direction.x * current_speed, ICE_ACCELERATION * delta)
@@ -2129,6 +2164,9 @@ func _physics_process(delta: float) -> void:
 			# All three visual axes must be applied inside the skull-anchored
 			# pass below. Applying yaw here would still rotate around the feet.
 			_aerial_target_yaw = target_angle
+		elif penguin_owns_velocity:
+			# The dive and belly slide face along their own travel instead.
+			pass
 		elif _dirtbike_wheel_active or _snowboard_active or _ice_skating_active or skate_ballistic:
 			# Vehicles turn about the rider's centre of mass rather than the
 			# feet/rear axle; _pose_body_dirtbike() applies that pivot. This
@@ -2139,7 +2177,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			_body_yaw = lerp_angle(_body_yaw, target_angle, rotation_speed * delta)
 	else:
-		if _snowboard_active or _ice_skating_active or skate_ballistic:
+		if _snowboard_active or _ice_skating_active or skate_ballistic or penguin_owns_velocity:
 			pass
 		elif sliding_on_ice:
 			velocity.x = move_toward(velocity.x, 0.0, ICE_FRICTION * delta)
@@ -6361,6 +6399,8 @@ func _compose_body_pose(delta: float, grounded: bool, on_soft_aerial_support: bo
 			_pose_body_flight_exit(delta, base_y)
 		elif _dirtbike_wheel_active:
 			_pose_body_dirtbike(delta, grounded, base_y)
+		elif _update_penguin_prone(delta) > 0.0:
+			_pose_body_penguin(base_y)
 		else:
 			_pose_body_ground(base_y)
 			if _snowboard_active:
@@ -6370,6 +6410,25 @@ func _compose_body_pose(delta: float, grounded: bool, on_soft_aerial_support: bo
 				_body_yaw = visuals.rotation.y
 	_dirtbike_visual_base_y = base_y
 	_body_yaw_steered = false
+
+
+## Eases _penguin_prone toward lying down while the Penguin Suit dives or
+## belly-slides, and back upright otherwise. Returns the new value.
+func _update_penguin_prone(delta: float) -> float:
+	var target := 1.0 if (_penguin_dive_airborne or _penguin_belly_sliding) else 0.0
+	_penguin_prone = move_toward(_penguin_prone, target, PENGUIN_PRONE_RATE * delta)
+	return _penguin_prone
+
+
+## The Penguin Suit's dive and belly slide: the body tips forward about its
+## belly, head leading, until it lies flat with the belly resting on the ice.
+## The collision capsule stays upright.
+func _pose_body_penguin(base_y: float) -> void:
+	var tip := smoothstep(0.0, 1.0, _penguin_prone)
+	var body_basis := Basis(Vector3.UP, _body_yaw) * Basis(Vector3.RIGHT, tip * PI * 0.5)
+	var pivot_height := lerpf(PENGUIN_BODY_PIVOT_HEIGHT, PENGUIN_BELLY_REST_HEIGHT, tip)
+	visuals.basis = body_basis
+	visuals.position = Vector3(0.0, base_y + pivot_height, 0.0) - body_basis * (Vector3.UP * PENGUIN_BODY_PIVOT_HEIGHT)
 
 
 ## Upright on the feet at the given height, facing _body_yaw.
@@ -6947,6 +7006,70 @@ func _update_snowboard_state() -> void:
 ## A complete pair of Ice legs automatically forms runners. There is no
 ## button chord: both leg buttons remain available for their ordinary ice-
 ## platform powers, and only real ice grants the skating movement below.
+## Ends the dive on touchdown (onto the belly when it lands on ice) and ends
+## the belly slide once it leaves the ground or the suit breaks up. The slide
+## itself stops in _penguin_belly_slide_step() when it runs out of speed.
+func _update_penguin_state() -> void:
+	if not _blorb_suit.has_full_penguin_suit():
+		_penguin_dive_airborne = false
+		_penguin_belly_sliding = false
+		return
+	var on_ice := _is_supported_by_ice()
+	if _penguin_dive_airborne and not _jumping and velocity.y <= 0.0 and (is_on_floor() or on_ice or _is_near_ground()):
+		_penguin_dive_airborne = false
+		_penguin_belly_sliding = on_ice
+		if on_ice:
+			UISounds.play_foley(&"blorb_glide", 0.5, get_instance_id())
+	elif _penguin_belly_sliding and not on_ice and not (is_on_floor() or _is_near_ground()):
+		_penguin_belly_sliding = false
+
+
+## Jump on ice in the Penguin Suit: a low ballistic dive forward, toward the
+## stick if it is held, otherwise the way the body faces, and never slower
+## than PENGUIN_DIVE_FORWARD_SPEED.
+func _begin_penguin_dive() -> void:
+	var stick := _get_move_input()
+	var rig_basis := camera_rig.global_transform.basis
+	var heading := rig_basis.x * stick.x + rig_basis.z * stick.y
+	heading.y = 0.0
+	if heading.length_squared() < 0.0001:
+		heading = Vector3(sin(_body_yaw), 0.0, cos(_body_yaw))
+	heading = heading.normalized()
+	var speed := maxf(Vector2(velocity.x, velocity.z).length(), PENGUIN_DIVE_FORWARD_SPEED)
+	velocity.x = heading.x * speed
+	velocity.z = heading.z * speed
+	velocity.y = HumanoidLocomotion.jump_speed(_playable_profile, PENGUIN_DIVE_HEIGHT)
+	_body_yaw = atan2(heading.x, heading.z)
+	_jump_takeoff_speed = absf(velocity.y)
+	_jumping = true
+	_penguin_dive_airborne = true
+	_penguin_belly_sliding = false
+	_ice_skating_active = false
+	UISounds.play_foley(&"jump", 0.52, get_instance_id())
+
+
+## Tobogganing on the belly: ice barely slows it, anything else stops it
+## quickly, and the stick only bends its heading. Stands up when slow.
+func _penguin_belly_slide_step(steer: Vector3, delta: float) -> void:
+	var planar := Vector2(velocity.x, velocity.z)
+	var on_ice := _is_supported_by_ice()
+	var speed := maxf(planar.length() - (PENGUIN_SLIDE_FRICTION if on_ice else PENGUIN_SLIDE_OFF_ICE_FRICTION) * delta, 0.0)
+	if speed < PENGUIN_SLIDE_STOP_SPEED:
+		_penguin_belly_sliding = false
+		velocity.x = 0.0
+		velocity.z = 0.0
+		return
+	var heading := planar.normalized()
+	var wanted := Vector2(steer.x, steer.z)
+	if wanted.length_squared() > 0.0001:
+		var turn := clampf(heading.angle_to(wanted.normalized()), -PENGUIN_SLIDE_TURN_RATE * delta, PENGUIN_SLIDE_TURN_RATE * delta)
+		heading = heading.rotated(turn)
+	velocity.x = heading.x * speed
+	velocity.z = heading.y * speed
+	_body_yaw = lerp_angle(_body_yaw, atan2(heading.x, heading.y), minf(rotation_speed * delta, 1.0))
+	UISounds.pulse_snowboard(get_instance_id(), speed, 0.0, 0.0 if on_ice else 1.0)
+
+
 func _update_ice_skate_state() -> void:
 	var has_legs: bool=_blorb_suit.has_ice_skate_legs()
 	var was_active: bool=_ice_skates_active
@@ -6954,7 +7077,7 @@ func _update_ice_skate_state() -> void:
 	var supported: bool=_ice_skates_active and _is_supported_by_ice()
 	if _ice_skate_airborne and is_on_floor() and not _jumping:
 		_ice_skate_airborne=false
-	_ice_skating_active=supported and not _ice_skate_airborne
+	_ice_skating_active=supported and not _ice_skate_airborne and not _penguin_dive_airborne and not _penguin_belly_sliding
 	if was_active and not _ice_skates_active:
 		# Retraction ends this ride. Old skating momentum must never survive a
 		# direction change and reappear when a new pair of blades is extended.

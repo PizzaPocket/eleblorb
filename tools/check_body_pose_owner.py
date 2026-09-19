@@ -26,6 +26,7 @@ ALLOWED = {
     "_pose_body_skull_anchored",
     "_pose_body_flight_exit",
     "_pose_body_dirtbike",
+    "_pose_body_penguin",
     # Helpers called only from the placement modes.
     "_apply_dirtbike_wheelie_pitch",
     "_settle_dirtbike_rear_wheel_on_terrain",

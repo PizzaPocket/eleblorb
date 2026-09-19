@@ -52,6 +52,27 @@ const HAND_BULGE_OUTWARD := 0.03
 const FINGERTIP_REACH_MARGIN := 0.025
 const TOE_REACH_MARGIN := 0.025
 
+## The helm that commands each formed suit, by the element the whole suit must
+## share: a full Fire suit under the Lava Helm seals into the Lava Suit, a
+## full Ice suit under the Penguin Helm forms the Penguin Suit.
+const FORM_HELMS := {"fire": "Lava Helm", "ice": "Penguin Helm"}
+## Penguin Suit torso: even larger than the sealed Lava cuirass, and running
+## from the shoulders all the way down to the ankles.
+const PENGUIN_TORSO_WIDTH_SCALE := 1.3
+## Where the belly is widest, as a fraction of the torso's height from the
+## bottom, and how far forward it swells beyond the back's curve.
+const PENGUIN_BELLY_T := 0.32
+const PENGUIN_BELLY_FORWARD := 0.14
+## Width at the ankle hem and at the shoulders, relative to the belly.
+const PENGUIN_HEM_WIDTH := 0.8
+const PENGUIN_SHOULDER_WIDTH := 0.6
+## Penguin flippers: thinner across their flat face than along it, and
+## narrowing past the wrist to a point beyond the fingertips.
+const PENGUIN_FLIPPER_FLATTEN := 0.5
+const PENGUIN_FLIPPER_WIDTH := 1.25
+const PENGUIN_FLIPPER_TIP_RATIO := 0.3
+const PENGUIN_FLIPPER_REACH := 0.07
+
 ## Raised 20% per direct correction ("should totally encapsulate the
 ## thorax") on top of the earlier 1.25 pass -- 1.25 * 1.2.
 const TORSO_INFLATE := 1.5
@@ -376,16 +397,25 @@ static func slot_shrink_scale(slot: String, rig_scale: float = 1.0) -> float:
 ## noodle spanning multiple independently-moving joints has to be
 ## regenerated from their live positions rather than just inheriting one
 ## pivot's transform.
-static func equip_slot(slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, lava_helm_command: bool = false) -> Array[Node3D]:
+## The element whose formed suit `head_blorb` commands, or "" when it
+## carries no commanding helm (or carries one bound to another element).
+static func form_helm_element(head_blorb: Blorb) -> String:
+	for element in FORM_HELMS:
+		if head_blorb.element_state == element and head_blorb.has_core_item(FORM_HELMS[element] as String):
+			return element
+	return ""
+
+
+static func equip_slot(slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false) -> Array[Node3D]:
 	var pieces: Array[Node3D] = []
 	match slot:
 		"arm_left", "arm_right", "leg_left", "leg_right":
 			var mesh_instance := MeshInstance3D.new()
 			root.add_child(mesh_instance)
-			rebuild_slot(mesh_instance, slot, pivots, root, blorb, rig_scale, lava_helm_command)
+			rebuild_slot(mesh_instance, slot, pivots, root, blorb, rig_scale, form_command)
 			pieces.append(mesh_instance)
 		"torso":
-			pieces = build_torso(pivots["spine"] as Node3D, blorb, rig_scale, lava_helm_command)
+			pieces = build_torso(pivots["spine"] as Node3D, blorb, rig_scale, form_command)
 		"head":
 			pieces = build_head(pivots["head"] as Node3D, blorb, rig_scale)
 	if blorb.element_state == "air":
@@ -553,33 +583,33 @@ static func animate_air_wings(wings: Node3D, flap_angle: float) -> void:
 ## comment for why only these need it. No-op (safe to call, just does
 ## nothing useful) for torso/head, which the controller never calls this
 ## for anyway (see is_dynamic_slot()).
-static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, lava_helm_command: bool = false) -> void:
+static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false) -> void:
 	match slot:
 		"arm_left":
 			rebuild_arm(
 				mesh_instance, root,
 				pivots["arm_left_shoulder"] as Node3D, pivots["arm_left_elbow"] as Node3D,
 				pivots["wrist_left"] as Node3D, pivots["fingertip_left"] as Node3D,
-				pivots["back_left"] as Node3D, blorb, rig_scale, lava_helm_command
+				pivots["back_left"] as Node3D, blorb, rig_scale, form_command
 			)
 		"arm_right":
 			rebuild_arm(
 				mesh_instance, root,
 				pivots["arm_right_shoulder"] as Node3D, pivots["arm_right_elbow"] as Node3D,
 				pivots["wrist_right"] as Node3D, pivots["fingertip_right"] as Node3D,
-				pivots["back_right"] as Node3D, blorb, rig_scale, lava_helm_command
+				pivots["back_right"] as Node3D, blorb, rig_scale, form_command
 			)
 		"leg_left":
 			rebuild_leg(
 				mesh_instance, root,
 				pivots["leg_left_hip"] as Node3D, pivots["leg_left_knee"] as Node3D,
-				pivots["leg_left_ankle"] as Node3D, pivots["toe_left"] as Node3D, blorb, rig_scale, lava_helm_command
+				pivots["leg_left_ankle"] as Node3D, pivots["toe_left"] as Node3D, blorb, rig_scale, form_command
 			)
 		"leg_right":
 			rebuild_leg(
 				mesh_instance, root,
 				pivots["leg_right_hip"] as Node3D, pivots["leg_right_knee"] as Node3D,
-				pivots["leg_right_ankle"] as Node3D, pivots["toe_right"] as Node3D, blorb, rig_scale, lava_helm_command
+				pivots["leg_right_ankle"] as Node3D, pivots["toe_right"] as Node3D, blorb, rig_scale, form_command
 			)
 
 
@@ -606,11 +636,12 @@ static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Di
 static func rebuild_arm(
 	mesh_instance: MeshInstance3D, root: Node3D, shoulder: Node3D, elbow: Node3D,
 	wrist: Node3D, fingertip: Node3D, back: Node3D, blorb: Blorb, rig_scale: float = 1.0,
-	lava_helm_command: bool = false
+	form_command: bool = false
 ) -> void:
 	var vis: Dictionary = blorb.body_visual_snapshot()
-	var sealed_lava := blorb.element_state == "fire" and lava_helm_command
-	var sealed_lava_radius := 1.32 if sealed_lava else 1.0
+	var sealed_lava := blorb.element_state == "fire" and form_command
+	var penguin := blorb.element_state == "ice" and form_command
+	var sealed_lava_radius := 1.32 if sealed_lava else (PENGUIN_FLIPPER_WIDTH if penguin else 1.0)
 
 	var shoulder_pos := root.to_local(shoulder.global_position)
 	var elbow_pos := root.to_local(elbow.global_position)
@@ -625,7 +656,7 @@ static func rebuild_arm(
 	# past the real hand instead.
 	var raw_tip_pos := root.to_local(fingertip.global_position)
 	var reach_dir := (raw_tip_pos - wrist_pos).normalized()
-	var tip_pos := raw_tip_pos + reach_dir * FINGERTIP_REACH_MARGIN * rig_scale
+	var tip_pos := raw_tip_pos + reach_dir * (PENGUIN_FLIPPER_REACH if penguin else FINGERTIP_REACH_MARGIN) * rig_scale
 
 	# `back` is procedural_figure.gd's own BackAttach point -- already
 	# confirmed-by-observation to sit right on the true back-of-hand
@@ -646,16 +677,19 @@ static func rebuild_arm(
 	# arm and the torso. Shifting the wrist/tip control points themselves
 	# outward (rather than the radius) pushes that whole end of the tube
 	# further out without also reaching further in.
-	var wrist_bulged := wrist_pos + outward_dir * (HAND_BULGE_OUTWARD * 0.5 * rig_scale)
-	var tip_bulged := tip_pos + outward_dir * (HAND_BULGE_OUTWARD * rig_scale)
+	# A flipper has no knuckled hand end to bulge around: it runs straight on
+	# past the wrist to its point.
+	var bulge := 0.0 if penguin else HAND_BULGE_OUTWARD * rig_scale
+	var wrist_bulged := wrist_pos + outward_dir * (bulge * 0.5)
+	var tip_bulged := tip_pos + outward_dir * bulge
 
 	var r_shoulder := _avg_xz(ProceduralFigure.UPPER_ARM_SIZE) * LIMB_INFLATE * sealed_lava_radius * rig_scale
 	var r_elbow := _avg_xz(ProceduralFigure.FOREARM_SIZE) * LIMB_INFLATE * sealed_lava_radius * rig_scale
 	var r_wrist := _avg_xz(ProceduralFigure.HAND_SIZE) * LIMB_INFLATE * 1.2 * sealed_lava_radius * rig_scale
-	var r_tip := r_wrist * HAND_TIP_RADIUS_RATIO
+	var r_tip := r_wrist * (PENGUIN_FLIPPER_TIP_RATIO if penguin else HAND_TIP_RADIUS_RATIO)
 	var points: Array[Vector3] = [shoulder_pos, elbow_pos, wrist_bulged, tip_bulged]
 	var radii: Array[float] = [r_shoulder, r_elbow, r_wrist, r_tip]
-	if sealed_lava:
+	if sealed_lava or penguin:
 		# Carry a rounded dome well beneath the cuirass instead of terminating
 		# the raised arm shell in the full-radius planar cut used previously.
 		# The intermediate ring reaches full shoulder width before the live
@@ -669,7 +703,13 @@ static func rebuild_arm(
 		points.push_front(shoulder_dome_tip)
 		radii.push_front(r_shoulder * 0.72)
 
-	mesh_instance.mesh = build_limb_tube(points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION)
+	# The flipper is flat across the back-of-hand normal, so its broad faces
+	# look outward and inward against the body, the way a penguin's do.
+	var flatten_axis := outward_dir if penguin else Vector3.ZERO
+	mesh_instance.mesh = build_limb_tube(
+		points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION,
+		[] as Array[Color], true, flatten_axis, PENGUIN_FLIPPER_FLATTEN
+	)
 	mesh_instance.set_surface_override_material(0, _build_goo_material(vis))
 
 	# Uses the SAME bulged points the tube itself was just built from, so
@@ -688,7 +728,7 @@ static func rebuild_arm(
 	# sizing/submersion below key off (ref_size), so both get proportioned
 	# to the tube's real local thickness here, not the wrist's bigger one.
 	var r_local := lerpf(r_wrist, r_tip, HAND_EYE_T)
-	var hand_surface := hand_center + outward_dir * r_local
+	var hand_surface := hand_center + outward_dir * r_local * (PENGUIN_FLIPPER_FLATTEN if penguin else 1.0)
 
 	# Ground truth for the eye frame, straight off the hand's own CURRENT
 	# rotation rather than anything carried over from a previous frame --
@@ -710,9 +750,9 @@ static func rebuild_arm(
 
 ## Noodle from hip through knee through ankle through toe. `rig_scale` -- see
 ## rebuild_arm()'s own doc comment for the full rationale, identical here.
-static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D, knee: Node3D, ankle: Node3D, toe: Node3D, blorb: Blorb, rig_scale: float = 1.0, lava_helm_command: bool = false) -> void:
+static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D, knee: Node3D, ankle: Node3D, toe: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false) -> void:
 	var vis: Dictionary = blorb.body_visual_snapshot()
-	var sealed_lava := blorb.element_state == "fire" and lava_helm_command
+	var sealed_lava := blorb.element_state == "fire" and form_command
 	var sealed_lava_radius := 1.34 if sealed_lava else 1.0
 
 	var hip_pos := root.to_local(hip.global_position)
@@ -869,9 +909,11 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 ## oval sits, how big it is) is expressed in ProceduralFigure's own human
 ## terms and needs rescaling to actually land on/around a smaller rig's
 ## much shorter, narrower chest.
-static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0, lava_helm_command: bool = false) -> Array[Node3D]:
+static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false) -> Array[Node3D]:
+	if blorb.element_state == "ice" and form_command:
+		return [_build_penguin_torso(spine_pivot, blorb, rig_scale)] as Array[Node3D]
 	var vis: Dictionary = blorb.body_visual_snapshot()
-	var sealed_lava := blorb.element_state == "fire" and lava_helm_command
+	var sealed_lava := blorb.element_state == "fire" and form_command
 
 	# Spans only the CHEST's own local Y range (from where the abdomen
 	# ends to the top of the chest) -- per direct correction, "only in the
@@ -953,6 +995,74 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 	)
 
 	return [torso] as Array[Node3D]
+
+
+## The Penguin Suit's body: one egg-shaped blorb from the shoulders to the
+## ankles, broadest low at the belly, which swells forward past the curve of
+## the back. The legs run down inside it and only the feet show beneath the
+## hem. Built in spine-local space, like the sealed Lava cuirass; the ankle
+## sits the pelvis, thigh and shin heights below the spine pivot.
+static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float) -> Node3D:
+	var vis: Dictionary = blorb.body_visual_snapshot()
+	var bottom := -(
+		ProceduralFigure.HIP_SIZE.y + ProceduralFigure.UPPER_LEG_SIZE.y + ProceduralFigure.LOWER_LEG_SIZE.y
+	) * 2.0 * rig_scale
+	var chest_top := (ProceduralFigure.ABDOMEN_SIZE.y + ProceduralFigure.CHEST_SIZE.y) * 2.0 * rig_scale
+	var top := chest_top + ProceduralFigure.HEAD_RAISE * 1.35 * rig_scale
+	var half_width := ProceduralFigure.CHEST_SIZE.x * TORSO_INFLATE * PENGUIN_TORSO_WIDTH_SCALE * rig_scale
+	var half_depth := ProceduralFigure.CHEST_SIZE.z * TORSO_INFLATE * 1.2 * PENGUIN_TORSO_WIDTH_SCALE * rig_scale
+	const RING_COUNT := 30
+	const RADIAL_SEGMENTS := 24
+	var rings: Array = []
+	for ring_index in RING_COUNT + 1:
+		var t := float(ring_index) / float(RING_COUNT)
+		var width := _penguin_torso_width(t)
+		var y := lerpf(bottom, top, t)
+		var belly := half_depth * PENGUIN_BELLY_FORWARD * sin(PI * clampf(t / 0.85, 0.0, 1.0))
+		var ring: Array[Vector3] = []
+		for segment in RADIAL_SEGMENTS:
+			var angle := TAU * float(segment) / float(RADIAL_SEGMENTS)
+			# Only the front half swells: the back keeps its plain curve.
+			var forward := belly * maxf(sin(angle), 0.0)
+			ring.append(Vector3(cos(angle) * half_width * width, y, sin(angle) * half_depth * width + forward))
+		rings.append(ring)
+	var torso := MeshInstance3D.new()
+	torso.name = "TorsoBlorbPenguin"
+	torso.mesh = BlorbBodyShape.build_mesh_from_rings(rings)
+	torso.set_surface_override_material(0, _build_goo_material(vis))
+	spine_pivot.add_child(torso)
+	const EYE_T := 0.8
+	var eye_width := _penguin_torso_width(EYE_T)
+	var eye_belly := half_depth * PENGUIN_BELLY_FORWARD * sin(PI * clampf(EYE_T / 0.85, 0.0, 1.0))
+	var eye_center := Vector3(
+		0.0, lerpf(bottom, top, EYE_T),
+		half_depth * eye_width + eye_belly + TORSO_EYE_FORWARD_PUSH * rig_scale
+	)
+	_update_face(
+		torso, eye_center, Vector3(0, 0, 1), half_width * eye_width, vis,
+		TORSO_EYE_RADIUS_FRACTION, TORSO_CORE_RADIUS_FRACTION, TORSO_EYE_FLATTEN, TORSO_EYE_SPACING,
+		TORSO_EYE_OUTWARD_TILT
+	)
+	return torso
+
+
+## Penguin torso silhouette, relative to its belly width, at height fraction
+## `t` (0 at the ankle hem, 1 at the shoulders). Swells from the hem to the
+## belly, draws in toward the shoulders, and rounds closed at both ends.
+static func _penguin_torso_width(t: float) -> float:
+	var base: float
+	if t <= PENGUIN_BELLY_T:
+		base = lerpf(PENGUIN_HEM_WIDTH, 1.0, smoothstep(0.0, 1.0, t / PENGUIN_BELLY_T))
+	else:
+		base = lerpf(1.0, PENGUIN_SHOULDER_WIDTH, smoothstep(0.0, 1.0, (t - PENGUIN_BELLY_T) / (1.0 - PENGUIN_BELLY_T)))
+	const BOTTOM_ROUND := 0.07
+	const TOP_ROUND := 0.16
+	var closing := 1.0
+	if t < BOTTOM_ROUND:
+		closing = pow(1.0 - pow((BOTTOM_ROUND - t) / BOTTOM_ROUND, 3.0), 1.0 / 3.0)
+	elif t > 1.0 - TOP_ROUND:
+		closing = pow(maxf(1.0 - pow((t - (1.0 - TOP_ROUND)) / TOP_ROUND, 3.0), 0.0), 1.0 / 3.0)
+	return base * closing
 
 
 ## The absorbed breastplate is the torso counterpart to Knight's Helm: the
@@ -1114,6 +1224,10 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	if blorb.has_core_item("Lava Helm") and blorb.element_state == "fire":
 		hat.queue_free()
 		return [_build_lava_helm(head_pivot, worn_head_bounds, vis)] as Array[Node3D]
+	# Ice-only, like the Lava Helm is Fire-only.
+	if blorb.has_core_item("Penguin Helm") and blorb.element_state == "ice":
+		hat.queue_free()
+		return [_build_penguin_helm(head_pivot, worn_head_bounds, head_size, vis)] as Array[Node3D]
 	if blorb.has_core_item("Bird Helm"):
 		hat.queue_free()
 		return [_build_bird_helm(head_pivot, worn_head_bounds, head_size, vis)] as Array[Node3D]
@@ -1228,6 +1342,63 @@ static func _build_toboggan(head_pivot: Node3D,contents: AABB,vis: Dictionary) -
 		core_material.emission=vis["core_emission"] as Color
 		core_material.emission_energy_multiplier=vis["core_emission_energy"] as float
 	_add_head_core_light(core,vis)
+	return root
+
+
+## The Penguin Helm as a living blorb: a smooth rounded hood closing over the
+## whole head down to the jaw, with a slender beak pointing forward from
+## just below the eyes. Shape shared with the loose item (PenguinHelm).
+static func _build_penguin_helm(head_pivot: Node3D, contents: AABB, head_size: Vector3, vis: Dictionary) -> Node3D:
+	var root := Node3D.new()
+	root.name = "HeadBlorbPenguinHelm"
+	head_pivot.add_child(root)
+	var semi_axes := PenguinHelm.hood_semi_axes(contents.size)
+	var center := contents.get_center() + Vector3(0.0, -semi_axes.y * PenguinHelm.HOOD_DROP, 0.0)
+	var hood := MeshInstance3D.new()
+	hood.name = "PenguinHelmBlorbBody"
+	hood.mesh = SuperEgg.build_mesh(semi_axes, PenguinHelm.HOOD_EPSILON, PenguinHelm.HOOD_EPSILON)
+	hood.material_override = _build_goo_material(vis)
+	hood.position = center
+	root.add_child(hood)
+	# Eyes at the real head's own eye line (its mesh equator, head_size.y).
+	var eye_local_y := head_size.y - center.y
+	var eye_eta := PenguinHelm.eta_for_local_y(eye_local_y, semi_axes.y)
+	var front := SuperEgg.surface_point(semi_axes, eye_eta, 0.0, PenguinHelm.HOOD_EPSILON, PenguinHelm.HOOD_EPSILON)
+	const EYE_ANGLE := deg_to_rad(34.0)
+	const EYE_EMBED_FRACTION := 0.35
+	var eye_mesh_radius := semi_axes.z * 0.16 * 0.5 * 1.6
+	var eye_color := (vis["albedo"] as Color).darkened(0.25)
+	for side in [-1.0, 1.0]:
+		var eye_point := SuperEgg.surface_point(
+			semi_axes, eye_eta, side * EYE_ANGLE, PenguinHelm.HOOD_EPSILON, PenguinHelm.HOOD_EPSILON
+		)
+		var outward := Vector3(eye_point.x, 0.0, eye_point.z).normalized()
+		var eye := MeshInstance3D.new()
+		eye.name = "EyeL" if side < 0.0 else "EyeR"
+		eye.mesh = SuperEgg.build_mesh(
+			Vector3(eye_mesh_radius, eye_mesh_radius * 1.15, eye_mesh_radius), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+		)
+		var eye_material := StandardMaterial3D.new()
+		eye_material.albedo_color = eye_color
+		eye_material.roughness = 0.8
+		eye.set_surface_override_material(0, eye_material)
+		eye.basis = Basis.looking_at(-outward, Vector3.UP)
+		eye.scale = Vector3(1.0, 1.0, 0.5)
+		eye.position = eye_point - outward * (eye_mesh_radius * EYE_EMBED_FRACTION)
+		hood.add_child(eye)
+	var core := BlorbCore.build(semi_axes.z * CORE_RADIUS_FRACTION * HAT_CORE_RADIUS_SCALE, vis["core_color"] as Color, vis["core_emissive"] as bool)
+	if vis["core_emissive"] as bool:
+		var core_material: StandardMaterial3D = core.get_meta("material")
+		core_material.emission = vis["core_emission"] as Color
+		core_material.emission_energy_multiplier = vis["core_emission_energy"] as float
+	core.position = Vector3(0.0, front.y, front.z * 0.3)
+	hood.add_child(core)
+	_add_head_core_light(core, vis)
+	var beak := MeshInstance3D.new()
+	beak.name = "PenguinBeak"
+	beak.mesh = PenguinHelm.build_beak_mesh(semi_axes, eye_eta)
+	beak.material_override = _build_goo_material(vis)
+	hood.add_child(beak)
 	return root
 
 
@@ -2010,7 +2181,8 @@ static func _avg_xz(size: Vector3) -> float:
 static func build_limb_tube(
 	control_points: Array[Vector3], control_radii: Array[float],
 	radial_segments: int, rings_per_segment: int, cap_fraction: float,
-	control_colors: Array[Color] = [], taper_start: bool = true
+	control_colors: Array[Color] = [], taper_start: bool = true,
+	flatten_axis: Vector3 = Vector3.ZERO, flatten: float = 1.0
 ) -> ArrayMesh:
 	var n := control_points.size()
 	var p_start: Vector3 = control_points[0] * 2.0 - control_points[1]
@@ -2062,7 +2234,14 @@ static func build_limb_tube(
 				right = frame[0] as Vector3
 				up = frame[1] as Vector3
 
-			rings.append(_build_ring(pos, right, up, radius, radial_segments))
+			var ring := _build_ring(pos, right, up, radius, radial_segments)
+			if flatten_axis != Vector3.ZERO:
+				# Squash each ring toward its centre along flatten_axis only,
+				# turning the round tube into a flat blade (penguin flippers).
+				for point_index in ring.size():
+					var offset := ring[point_index] - pos
+					ring[point_index] = pos + offset - flatten_axis * offset.dot(flatten_axis) * (1.0 - flatten)
+			rings.append(ring)
 			if has_colors:
 				# Flat per-segment color (the segment's OWN start point,
 				# control_colors[seg]) rather than lerping toward

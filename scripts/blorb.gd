@@ -120,7 +120,7 @@ const PLATFORM_AID_APPROACH_DISTANCE := COLLIDER_RADIUS + 0.4 + 0.12
 const BULGE_T := 0.30
 
 const CORE_RADIUS := 0.07  # apple-sized, matches gem.gd's own default scale
-const HEAD_MOD_ITEMS := ["Diving Helmet", "Knight's Helm", "Lava Helm", "Nautilus Crown", "Toboggan", "Bird Helm"]
+const HEAD_MOD_ITEMS := ["Diving Helmet", "Knight's Helm", "Lava Helm", "Nautilus Crown", "Toboggan", "Bird Helm", "Penguin Helm"]
 const ARMOR_MOD_ITEMS := ["Dented Breastplate"]
 ## The "shiny blorb" cosmetic override applied in _build_visuals() -- a
 ## bright pearlescent cream, distinctly shinier than the plain off-white
