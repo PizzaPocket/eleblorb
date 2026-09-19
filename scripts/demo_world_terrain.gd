@@ -60,44 +60,22 @@ const START_FLATTEN_RADIUS := 60.0
 const START_FLATTEN_TRANSITION := 12.0
 ## Normal: the hero wakes on the flat floor of a pit PIT_DEPTH deep, punched
 ## into the clearing. Its wall rises from PIT_FLOOR_RADIUS to PIT_RIM_RADIUS,
-## too steep to walk. Only two blorb bounces (8x an ordinary jump, about
-## 10.9 m) are ever needed to climb out, both on the east side: from the
-## floor onto a rock ledge (PIT_FIRST_LEDGE), then up two small hop
-## platforms (PIT_HOP_PLATFORMS) onto a broad shelf in the wall itself, set
-## high enough above the floor that its edge is too steep to walk; then from
-## the shelf onto a second ledge, from which a stair of small rock steps,
-## each an ordinary jump up and jutting from the wall at its own height,
-## climbs to the rim. On that side the wall rises beyond the shelf,
-## from PIT_SHELF_OUTER_RADIUS to PIT_SHELF_RIM_RADIUS.
-const PIT_DEPTH := 24.0
+## too steep to walk. One blorb bounce (8x an ordinary jump, about 10.9 m)
+## reaches a rock platform on the east wall (PIT_FIRST_LEDGE_RISE above the
+## floor); from it a stair of small rock steps, each an ordinary hop up and
+## jutting from the wall at its own height, climbs to the rim.
+const PIT_DEPTH := 11.0
 const PIT_FLOOR_RADIUS := 24.0
 const PIT_RIM_RADIUS := 30.0
-## The shelf: centred due east, PIT_SHELF_HALF_ANGLE either side, rising from
-## the floor's edge to its level between the two inner radii.
-const PIT_SHELF_HALF_ANGLE := 0.8
-const PIT_SHELF_HEIGHT := -15.0
-## (The terrain's grid has a vertex every SPACING metres: the shelf reaches
-## its level by the vertex ring at 25 m so it is flat right out to its edge.)
-const PIT_SHELF_INNER_START := 21.0
-const PIT_SHELF_INNER_END := 24.9
-const PIT_SHELF_OUTER_RADIUS := 38.0
-const PIT_SHELF_RIM_RADIUS := 44.0
-## Ledges: angle round the pit from east (radians), distance from the
-## centre, and the height of the ledge's top. The first sits right against
-## the shelf's edge, a small hop below it.
-const PIT_FIRST_LEDGE := Vector3(-0.36, 20.0, -18.0)
-## Hop-height steps from the first ledge up to the shelf (same spec as the
-## ledges); the last leaves a small hop onto the shelf's edge.
-const PIT_HOP_PLATFORMS := [
-	Vector3(-0.21, 21.5, -16.9),
-	Vector3(-0.08, 23.0, -15.8),
-]
-const PIT_SECOND_LEDGE := Vector3(0.05, 37.0, PIT_SHELF_HEIGHT + 8.5)
+## The first platform: angle round the pit from east (radians) and how far
+## above the floor its top is.
+const PIT_FIRST_LEDGE_ANGLE := 0.0
+const PIT_FIRST_LEDGE_RISE := 6.5
 const PIT_LEDGE_HALF_SIZE := Vector3(2.0, 0.6, 2.0)
-## The stair from the second ledge to the rim: each step this much higher
-## than the last and this much further round the wall.
+## The stair from the platform to the rim: each step this much higher than
+## the last and this much further round the wall.
 const PIT_STAIR_RISE := 1.1
-const PIT_STAIR_TURN := 0.075
+const PIT_STAIR_TURN := 0.12
 const PIT_STAIR_HALF_SIZE := Vector3(1.3, 0.35, 1.3)
 ## A slow, broad swell under the hills outside the clearing, so the ground
 ## between biomes rolls rather than lying flat.
@@ -475,27 +453,16 @@ func _base_level(x: float) -> float:
 
 
 ## The pit's own ground height at `point` (0 on and beyond its rim): the
-## floor, the steep wall, and on the east side the shelf and its higher wall.
+## flat floor and the steep wall round it.
 func _pit_height(point: Vector2) -> float:
-	var offset := point - START_CENTER
-	var distance := offset.length()
-	var plain := -PIT_DEPTH * (1.0 - smoothstep(PIT_FLOOR_RADIUS, PIT_RIM_RADIUS, distance))
-	var shelf_side := 1.0 - smoothstep(PIT_SHELF_HALF_ANGLE - 0.25, PIT_SHELF_HALF_ANGLE, absf(atan2(offset.y, offset.x)))
-	if shelf_side <= 0.0:
-		return plain
-	var shelved := (
-		-PIT_DEPTH
-		+ (PIT_SHELF_HEIGHT + PIT_DEPTH) * smoothstep(PIT_SHELF_INNER_START, PIT_SHELF_INNER_END, distance)
-		- PIT_SHELF_HEIGHT * smoothstep(PIT_SHELF_OUTER_RADIUS, PIT_SHELF_RIM_RADIUS, distance)
-	)
-	return lerpf(plain, shelved, shelf_side)
+	return -PIT_DEPTH * (1.0 - smoothstep(PIT_FLOOR_RADIUS, PIT_RIM_RADIUS, point.distance_to(START_CENTER)))
 
 
-## The radius on the shelf side where the pit's wall stands `height` high:
-## where a stair step at that height meets the wall.
+## The radius where the pit's wall stands `height` high: where a platform
+## or step at that height meets the wall.
 func _pit_wall_radius_at(height: float) -> float:
-	var low := PIT_SHELF_OUTER_RADIUS
-	var high := PIT_SHELF_RIM_RADIUS
+	var low := PIT_FLOOR_RADIUS
+	var high := PIT_RIM_RADIUS
 	for step in 24:
 		var middle := (low + high) * 0.5
 		if _pit_height(START_CENTER + Vector2(middle, 0.0)) < height:
@@ -536,7 +503,7 @@ func _raw_height(x: float, z: float) -> float:
 		height = maxf(height, lerpf(height, WATER_LEVEL + ISLAND_HEIGHT, island))
 	height += _course_elevation(x)
 	# The starting pit, punched down to a flat floor.
-	if start_distance < PIT_SHELF_RIM_RADIUS + 1.0:
+	if start_distance < PIT_RIM_RADIUS + 1.0:
 		height = minf(height, _pit_height(point))
 	# Each gate's level strip, as wide as its portal.
 	for border in BORDERS:
@@ -575,11 +542,10 @@ func _height_color(x: float, z: float, height: float) -> Color:
 	var snow := _snow_weight(point)
 	if snow > 0.0:
 		color = color.lerp(SNOW, snow)
-	# The pit's walls are bare rock; its floor and shelf stay grass.
-	if point.distance_to(START_CENTER) < PIT_SHELF_RIM_RADIUS + 1.0:
+	# The pit's wall is bare rock; its floor stays grass.
+	if point.distance_to(START_CENTER) < PIT_RIM_RADIUS + 1.0:
 		var pit := _pit_height(point)
-		var on_level := pit <= -PIT_DEPTH + 0.3 or absf(pit - PIT_SHELF_HEIGHT) < 0.3 or pit >= -0.2
-		if not on_level:
+		if pit > -PIT_DEPTH + 0.3 and pit < -0.2:
 			color = color.lerp(CLIFF_ROCK, 0.85)
 	# The sea, in the Ocean Kingdom's colours: sandy beaches and island
 	# shores, shallow and deep seabed by depth, island grass above the sand.
@@ -846,15 +812,13 @@ func _scatter_scenery() -> void:
 	_scatter_volcanic_rocks()
 
 
-## The pit's two ledges and its stair (see PIT_DEPTH): flat-topped stone
+## The pit's platform and its stair (see PIT_DEPTH): flat-topped stone
 ## blocks standing out from the wall, solid and meant to be landed on.
 func _build_pit_ledges() -> void:
-	_add_pit_block("PitLedge0", PIT_FIRST_LEDGE, PIT_LEDGE_HALF_SIZE)
-	for index in PIT_HOP_PLATFORMS.size():
-		_add_pit_block("PitHop%d" % index, PIT_HOP_PLATFORMS[index], PIT_STAIR_HALF_SIZE)
-	_add_pit_block("PitLedge1", PIT_SECOND_LEDGE, PIT_LEDGE_HALF_SIZE)
-	var top := PIT_SECOND_LEDGE.z + PIT_STAIR_RISE
-	var angle := PIT_SECOND_LEDGE.x
+	var top := -PIT_DEPTH + PIT_FIRST_LEDGE_RISE
+	var angle := PIT_FIRST_LEDGE_ANGLE
+	_add_pit_block("PitLedge0", Vector3(angle, _pit_wall_radius_at(top - 0.4) - PIT_LEDGE_HALF_SIZE.x * 0.6, top), PIT_LEDGE_HALF_SIZE)
+	top += PIT_STAIR_RISE
 	var index := 0
 	while top < -0.1:
 		angle += PIT_STAIR_TURN

@@ -117,7 +117,9 @@ const MERMAID_TAIL_STATIONS := [
 	Vector2(0.40, 0.05),   # fluke, widest
 	Vector2(0.34, 0.02),   # fluke's trailing edge
 ]
-const MERMAID_TAIL_TOP := 0.1
+## How far above the hip joints the tail starts: up to the top of the
+## pelvis, so the hips are wholly inside it.
+const MERMAID_TAIL_TOP := 0.22
 const MERMAID_FLUKE_LENGTH := 0.38
 const MERMAID_FLUKE_NOTCH := 0.12
 ## How far above each foot its blorb's eyes sit on the fluke.

@@ -4735,7 +4735,9 @@ func _apply_swim_jet_pose(delta: float) -> void:
 		_pose_fire_jet_arm(_arm_left, _elbow_left, _hand_left, 1.0, t)
 	if _right_arm_water_active:
 		_pose_fire_jet_arm(_arm_right, _elbow_right, _hand_right, -1.0, t)
-	if not (_left_leg_water_active or _right_leg_water_active):
+	# The mermaid tail keeps its own kick and pointed toes: the jets fire
+	# from the fluke without straightening the legs inside it.
+	if not (_left_leg_water_active or _right_leg_water_active) or _blorb_suit.mermaid_tail_active():
 		return
 	for joint in [_leg_left, _leg_right, _knee_left, _knee_right, _ankle_left, _ankle_right]:
 		var pivot := joint as Node3D

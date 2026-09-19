@@ -34,11 +34,15 @@ const CROWN_CLEARANCE := 1.08
 const CLOSING_RADIUS := 0.006
 const MAX_TURNS := 8.0
 const CENTRE_THICKNESS := 0.012
-## Shell width at the brow (fraction of the head's half-width) and how slowly
-## it narrows as the spiral tightens, so the coil stays broad over the back
-## of the head. How much each whorl overlaps the one inside it.
-const BROW_WIDTH := 1.15
-const WIDTH_FALLOFF := 0.2
+## The brow is the shell's broad, full opening: wide (BROW_WIDTH, a fraction
+## of the head's half-width) and deep across the curl (APERTURE_SWELL more
+## than the whorl alone). From there it narrows smoothly, with no corner,
+## to BACK_WIDTH by the time it reaches the back of the head (angle PI, the
+## curl pointing straight back), and holds that width round the coil.
+const BROW_WIDTH := 1.3
+const BACK_WIDTH := 0.95
+const APERTURE_SWELL := 0.7
+## How much each whorl overlaps the one inside it.
 const WHORL_OVERLAP := 1.06
 const SAMPLES := 220
 const SEGMENTS := 20
@@ -61,6 +65,7 @@ static func spiral(contents: AABB) -> Dictionary:
 	return {
 		"coil": coil, "start_angle": start_angle, "start_radius": start_radius, "decay": decay,
 		"end_angle": start_angle + winding, "brow_width": contents.size.x * 0.5 * BROW_WIDTH,
+		"back_width": contents.size.x * 0.5 * BACK_WIDTH,
 	}
 
 
@@ -71,8 +76,8 @@ static func point_at(shape: Dictionary, angle: float) -> Vector3:
 
 
 static func width_at(shape: Dictionary, angle: float) -> float:
-	var shrink := exp(-float(shape["decay"]) * (angle - float(shape["start_angle"])))
-	return maxf(float(shape["brow_width"]) * pow(shrink, WIDTH_FALLOFF), 0.004)
+	var taper := smoothstep(float(shape["start_angle"]), PI, angle)
+	return lerpf(float(shape["brow_width"]), float(shape["back_width"]), taper)
 
 
 ## Half the shell's thickness across the curl at `angle`. A whorl at radius
@@ -82,8 +87,11 @@ static func width_at(shape: Dictionary, angle: float) -> float:
 static func thickness_at(shape: Dictionary, angle: float) -> float:
 	var radius := float(shape["start_radius"]) * exp(-float(shape["decay"]) * (angle - float(shape["start_angle"])))
 	var shrink := exp(-float(shape["decay"]) * TAU)
+	# The opening over the brow swells deeper still, easing into the whorl's
+	# own thickness by the crown; it only overlaps the whorl inside it more.
+	var aperture := 1.0 + APERTURE_SWELL * (1.0 - smoothstep(float(shape["start_angle"]), PI * 0.5, angle))
 	# The innermost turn keeps a little body so the centre closes solid.
-	return maxf(radius * (1.0 - shrink) / (1.0 + shrink) * WHORL_OVERLAP, CENTRE_THICKNESS)
+	return maxf(radius * (1.0 - shrink) / (1.0 + shrink) * WHORL_OVERLAP * aperture, CENTRE_THICKNESS)
 
 
 ## Outward (away from the coil centre) at `angle`: the shell's outer face.
