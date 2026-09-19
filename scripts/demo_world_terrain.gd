@@ -100,12 +100,14 @@ const PLANT_HALF := Vector2(58.0, 110.0)
 const WATER_LEVEL := -7.0
 ## The water zone is a stretch of the Ocean Kingdom's sea: a channel
 ## LAKE_RADIUS either side of its centreline whose shore runs from
-## LAKE_SHORE_GAP past the water portal to LAKE_SHORE_GAP short of the ice
-## portal. It shelves away from sandy beaches over LAKE_SLOPE_WIDTH to deep
+## LAKE_SHORE_GAP past the water portal to LAKE_EAST_SHORE_GAP short of the
+## ice portal: far enough that the frozen lake's ice, which reaches well
+## past its own shore under the bank, never meets the open water. It shelves away from sandy beaches over LAKE_SLOPE_WIDTH to deep
 ## water, deep enough for the Kraken though short of the open ocean's abyss,
 ## over the Ocean Kingdom's rolling seabed, in its colours, with its palms on
 ## the shore and its kelp and coral below.
 const LAKE_SHORE_GAP := 8.0
+const LAKE_EAST_SHORE_GAP := 60.0
 const LAKE_RADIUS := 150.0
 const LAKE_EDGE_VARIATION := 14.0
 const LAKE_DEPTH := 40.0
@@ -113,8 +115,12 @@ const LAKE_SLOPE_WIDTH := 70.0
 ## An open lake's bank levels out just above the water: a narrow beach.
 const LAKE_SHELF := WATER_LEVEL + 0.35
 const LAKE_FLOOR := LAKE_SHELF - LAKE_DEPTH
-## One palm island rising from the sea.
-const ISLAND_CENTER := Vector2(1018.0, 70.0)
+## One palm island rising from the sea, clear of the Kraken's patrol.
+const ISLAND_CENTER := Vector2(1180.0, 90.0)
+## The Ocean Kingdom's Kraken patrols the sea's deep middle on an ellipse of
+## these radii round the sea's centre: far enough in that its tentacles keep
+## to deep water, clear of the island and the Nautilus portal.
+const KRAKEN_ROUTE_RADIUS := Vector2(380.0, 60.0)
 const ISLAND_RADIUS := 55.0
 const ISLAND_HEIGHT := 7.0
 ## A portal standing on the seabed midway along the sea (see demo_world.gd):
@@ -254,7 +260,7 @@ func _init() -> void:
 	_swell.frequency = SWELL_FREQUENCY
 	_swell.fractal_octaves = 2
 	_water_lake = _channel_lake(
-		border_x("water") + LAKE_SHORE_GAP, border_x("ice") - LAKE_SHORE_GAP,
+		border_x("water") + LAKE_SHORE_GAP, border_x("ice") - LAKE_EAST_SHORE_GAP,
 		LAKE_RADIUS, LAKE_EDGE_VARIATION, LAKE_DEPTH, LAKE_SHELF, 20260919, LAKE_SLOPE_WIDTH
 	)
 	_frozen_lake = _channel_lake(
@@ -385,6 +391,11 @@ static func _island_rise(point: Vector2) -> float:
 	if distance >= ISLAND_RADIUS:
 		return 0.0
 	return pow(smoothstep(0.0, 1.0, 1.0 - distance / ISLAND_RADIUS), 0.34)
+
+
+## The centre of the sea (the water lake), where the Kraken's patrol centres.
+func sea_center() -> Vector2:
+	return _water_lake.center
 
 
 ## Where the Nautilus portal stands: on the seabed at the path.
