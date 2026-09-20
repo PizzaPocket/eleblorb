@@ -38,6 +38,9 @@ var leg_speed_multiplier := 1.0
 ## leaves a busy one alone.
 var left_arm_busy := false
 var right_arm_busy := false
+## The frame the rider aims in, normally the camera's. Powers that steer in
+## three dimensions (the crystal track) resolve their direction through it.
+var aim_basis := Basis()
 
 
 func _init(

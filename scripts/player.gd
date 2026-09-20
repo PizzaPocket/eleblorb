@@ -1231,6 +1231,7 @@ var _snowboard_mode := SnowboardMode.new()
 var _rig: RigAdapter = null
 var _traversal := TraversalDirector.new()
 var _ice_skates := IceSkateMode.new()
+var _crystal := CrystalSkateMode.new()
 ## Matched Ice legs automatically extend these runners. They remain visible
 ## off ice while their traversal physics only engage on the frozen lake.
 var _ice_skates_active := false
@@ -7543,51 +7544,40 @@ func _update_snowboard_state() -> void:
 ## anything, and while riding owns the whole frame (returns true). A jump
 ## leaves the track and hands back to ordinary (ballistic) movement.
 func _update_crystal_riding(delta: float, jump_pressed: bool) -> bool:
-	if _crystal_riding and not _can_crystal_ride():
-		_end_crystal_ride(false)
-	if not _crystal_riding:
-		_crystal_body_pitch = move_toward(_crystal_body_pitch, 0.0, CRYSTAL_BODY_PITCH_RATE * delta)
-		if _crystal_airborne and not _jumping and (is_on_floor() or _is_near_ground()):
-			_crystal_airborne = false
-		var wanted := _crystal_wanted_direction()
-		var standing := (is_on_floor() or _is_near_ground()) and not _jumping and velocity.y <= 0.1
-		if not (_can_crystal_ride() and standing and wanted != Vector3.ZERO):
-			return false
-		_begin_crystal_ride(wanted)
-	if jump_pressed and not UIState.modal_open:
-		_end_crystal_ride(true)
+	# The ride itself is CrystalSkateMode's, shared with every other character
+	# that will skate a track. It takes the whole frame when it engages, so
+	# everything below the call is this body's own posing and audio.
+	var ctx := _traversal_context(delta)
+	ctx.aim_basis = camera.global_transform.basis
+	ctx.grounded = (is_on_floor() or _is_near_ground()) and not _jumping and velocity.y <= 0.1
+	var blocked := not _can_crystal_ride()
+	var was_riding := _crystal.riding
+	var owned := _crystal.ride(
+		ctx, _get_move_input(), jump_pressed and not UIState.modal_open, blocked, FOOT_OFFSET
+	)
+	_crystal_riding = _crystal.riding
+	_crystal_speed = _crystal.speed
+	_crystal_heading = _crystal.heading
+	_crystal_body_pitch = _crystal.body_pitch
+	_crystal_track = _crystal.track
+	if _crystal.airborne and not _jumping and (is_on_floor() or _is_near_ground()):
+		_crystal.airborne = false
+	_crystal_airborne = _crystal.airborne
+	if was_riding and not _crystal.riding:
+		# Leaving the track hands its momentum to the body, and a jump adds
+		# its own on top.
+		if _crystal.exit_velocity != Vector3.ZERO:
+			velocity = _crystal.exit_velocity
+		if jump_pressed and not UIState.modal_open:
+			velocity.y = maxf(velocity.y, 0.0) + HumanoidLocomotion.jump_speed(_playable_profile)
+			UISounds.play_foley(&"jump", 0.52, get_instance_id())
+		_jump_takeoff_speed = absf(velocity.y)
+		_jumping = true
+	if not owned:
 		return false
-	var wanted := _crystal_wanted_direction()
-	if wanted != Vector3.ZERO:
-		var turn := _crystal_heading.angle_to(wanted)
-		if _crystal_speed < 1.0 and turn > CRYSTAL_RESTART_ANGLE:
-			_crystal_track.truncate_ahead()
-			_crystal_heading = wanted
-		elif turn > 0.0001:
-			_crystal_heading = _crystal_heading.slerp(wanted, minf(CRYSTAL_TURN_RATE * delta / turn, 1.0)).normalized()
-		# The ordinary skates' own top speed (capped at their terminal speed),
-		# then the crystal boost, and the sprint boost on top of that.
-		var skate_speed := minf(
-			HumanoidLocomotion.ground_speed(_playable_profile, false) * ICE_SKATE_SPEED_MULTIPLIER * worn_leg_speed_multiplier(),
-			ICE_SKATE_TERMINAL_SPEED
-		)
-		var top_speed := skate_speed * CRYSTAL_SPEED_MULTIPLIER * (CRYSTAL_SPRINT_MULTIPLIER if _is_sprinting() else 1.0)
-		_crystal_speed = move_toward(_crystal_speed, top_speed, CRYSTAL_ACCELERATION * delta)
-	else:
-		_crystal_speed = move_toward(_crystal_speed, 0.0, CRYSTAL_COAST_FRICTION * delta)
-	if _crystal_track.is_blocked() and _crystal_heading.angle_to(_crystal_track.lead_direction()) > 0.3:
-		_crystal_track.clear_block()
-	var skater_rids: Array[RID] = [get_rid()]
-	_crystal_track.extend(_crystal_heading, terrain, get_world_3d().direct_space_state, skater_rids)
-	if _crystal_track.advance(_crystal_speed * delta) > 0.0:
-		_crystal_speed = 0.0
-	global_position = _crystal_track.rider_point() + Vector3.UP * FOOT_OFFSET
-	var tangent := _crystal_track.rider_tangent()
-	velocity = tangent * _crystal_speed
-	var climb := asin(clampf(tangent.y, -1.0, 1.0)) if tangent != Vector3.ZERO else 0.0
-	_crystal_body_pitch = move_toward(_crystal_body_pitch, climb * CRYSTAL_BODY_PITCH_FRACTION, CRYSTAL_BODY_PITCH_RATE * delta)
-	if Vector2(tangent.x, tangent.z).length_squared() > 0.01:
-		_body_yaw = lerp_angle(_body_yaw, atan2(tangent.x, tangent.z), minf(rotation_speed * delta, 1.0))
+	var facing := _crystal.facing()
+	if facing != Vector3.ZERO:
+		_body_yaw = lerp_angle(_body_yaw, atan2(facing.x, facing.z), minf(rotation_speed * delta, 1.0))
 	_jumping = false
 	# A skating glide over the ordinary standing pose.
 	_animate_walk(delta, true, 1.0, 0.0)
