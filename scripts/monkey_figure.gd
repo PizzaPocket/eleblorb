@@ -344,8 +344,9 @@ const TAIL_ANIM_YAW_HOLD_MAX := 3.8
 ##          the arm the human figure's hand takes (HAND_FRACTION), with a
 ##          joint at that point. "hand_left" and "wrist_left" are that joint,
 ##          which turns the hand; "fingertip_left" rides on its end.
-##   leg:   MonkeyHipPivot > MonkeyKneePivot > MonkeyAnkleMarker
-##          "ankle_left" and "toe_left" are that one marker, and nothing is
+##   leg:   MonkeyHipPivot > MonkeyKneePivot > MonkeyAnkleMarker >
+##          MonkeyToeMarker. "ankle_left" and "toe_left" used to be that one
+##          marker, and nothing is
 ##          parented to it: the leg and foot are one procedural tube rebuilt
 ##          each frame under the rig root. The ankle nonetheless articulates
 ##          the foot now, because _rebuild_footed_leg() builds the foot's
@@ -496,8 +497,8 @@ static func build(
 		"knee_right": leg_right["joint"],
 		"ankle_left": leg_left["end"],
 		"ankle_right": leg_right["end"],
-		"toe_left": leg_left["end"],
-		"toe_right": leg_right["end"],
+		"toe_left": leg_left["toe"],
+		"toe_right": leg_right["toe"],
 		"hand_left": arm_left["wrist"],
 		"hand_right": arm_right["wrist"],
 		"palm_left": arm_left["end"],
@@ -563,6 +564,19 @@ static func _build_leg(
 	ankle_marker.set_meta(RigAdapter.DRIVES_GEOMETRY_META, true)
 	knee_pivot.add_child(ankle_marker)
 
+	# The toe, where his rendered foot actually reaches: forward of the ankle
+	# and down at the sole (see _rebuild_footed_leg()'s own bulb placement).
+	# This rig used to return the ankle marker itself as the toe, so anything
+	# reading both got the same point twice. The blorb suit takes the pair as
+	# the direction the foot points -- (toe - ankle).normalized() -- which
+	# with two identical points is a zero vector, and its leg then ended in a
+	# degenerate cap: stray bulbs under the feet, with the core and eyes
+	# thrown onto the back of the heel instead of the front of the toes.
+	var toe_marker := Node3D.new()
+	toe_marker.name = "MonkeyToeMarker"
+	toe_marker.position = Vector3(0, -ANKLE_GROUND_CLEARANCE, FOOT_BULB_FORWARD)
+	ankle_marker.add_child(toe_marker)
+
 	var mesh_instance := MeshInstance3D.new()
 	mesh_instance.name = "LegTube"
 	_apply_fur_material(mesh_instance, fur_color)
@@ -575,7 +589,7 @@ static func _build_leg(
 
 	return {
 		"pivot": hip_pivot, "joint": knee_pivot, "end": ankle_marker,
-		"mesh": mesh_instance, "sole": sole,
+		"toe": toe_marker, "mesh": mesh_instance, "sole": sole,
 	}
 
 
