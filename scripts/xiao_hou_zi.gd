@@ -174,6 +174,15 @@ var _blorb_suit := BlorbSuitController.new()
 ## character (docs/traversal_powers_architecture.md).
 var _rig: RigAdapter = null
 var _ice_skates := IceSkateMode.new()
+var _snowboard_mode := SnowboardMode.new()
+## His snowboard: the same power the player rides, on his own rig and at his
+## own scale. Toggled by the leg-power chord, as the player's is.
+var _direct_snowboard_active: bool = false
+var _direct_snowboard_toggled: bool = false
+var _direct_snowboard_chord_was_pressed: bool = false
+var _direct_snowboard: Node3D = null
+var _direct_snowboard_up: Vector3 = Vector3.UP
+var _direct_snowboard_heading: Vector3 = Vector3.FORWARD
 var _portrait := PlayerPortrait.new()
 var _playable_profile := PlayableCharacterProfile.xiao_hou_zi()
 var _eyes: Array = []
@@ -717,6 +726,7 @@ func end_direct_control() -> void:
 func prepare_direct_control_environment(delta: float) -> void:
 	_clear_direct_environment()
 	_update_direct_dirtbike_state()
+	_update_direct_snowboard_state()
 	_update_direct_ice_skate_state()
 	_update_direct_powered_movement(delta)
 	var xz := Vector2(global_position.x, global_position.z)
@@ -909,6 +919,25 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			1.0-sound_left.y,1.0-sound_right.y
 		)
 	elif (
+		_direct_snowboard_active
+		and is_on_floor()
+		and not (_direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight or _direct_surface_swimming)
+	):
+		var board_ctx := _traversal_context(delta)
+		board_ctx.direction = Vector3(planar.x, 0.0, planar.y)
+		var board_velocity: Vector2
+		if _direct_snowboard_surface():
+			var support_normal: Vector3 = terrain.get_mesh_normal(global_position.x, global_position.z)
+			board_velocity = _snowboard_mode.glide(
+				board_ctx, support_normal, _direct_is_supported_by_ice()
+			)
+		else:
+			board_velocity = _snowboard_mode.brake_off_snow(board_ctx)
+		velocity.x = board_velocity.x
+		velocity.z = board_velocity.y
+		if board_velocity.length_squared() > 0.01:
+			_direct_snowboard_heading = Vector3(board_velocity.x, 0.0, board_velocity.y).normalized()
+	elif (
 		_direct_dirtbike_active
 		and not (_direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight or _direct_surface_swimming)
 	):
@@ -1007,6 +1036,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	move_and_slide()
 	_update_direct_ice_skate_airtime(delta,pre_move_position)
 	_resolve_direct_dirtbike_motion(delta,pre_move_position)
+	_resolve_direct_snowboard_motion(delta,pre_move_position)
 	# CharacterBody movement can carry the body beyond a liquid boundary after
 	# the pre-move clamp. Clamp the resolved position too, matching the human
 	# swimmer's hard floor/surface guarantees.
@@ -1028,6 +1058,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	_apply_direct_power_pose(delta)
 	_apply_direct_dirtbike_pose(delta)
 	_apply_direct_swim_attitude(delta)
+	_apply_direct_snowboard(delta)
 	_update_direct_dirtbike_wheels(delta)
 	_update_direct_power_fx()
 
@@ -1251,6 +1282,67 @@ func _apply_direct_power_pose(delta: float) -> void:
 			wrist.rotation.z = lerp_angle(wrist.rotation.z, signf(arm.position.x) * PI * 0.5, settle)
 
 
+## Snow legs, and the same left/right leg-power chord the player toggles a
+## board with. The deck is built at his own rig scale, so it fits his feet.
+func _update_direct_snowboard_state() -> void:
+	var has_legs: bool = _blorb_suit.has_snowboard_legs()
+	var chord_pressed: bool = (
+		has_legs
+		and not UIState.modal_open
+		and HeldItem.current.is_empty()
+		and Input.is_action_pressed("left_leg_power")
+		and Input.is_action_pressed("right_leg_power")
+	)
+	var chord_just_formed: bool = chord_pressed and not _direct_snowboard_chord_was_pressed
+	_direct_snowboard_chord_was_pressed = chord_pressed
+	if not has_legs:
+		_direct_snowboard_toggled = false
+	elif chord_just_formed:
+		_direct_snowboard_toggled = not _direct_snowboard_toggled
+	var was_active := _direct_snowboard_active
+	_direct_snowboard_active = _direct_snowboard_toggled and has_legs
+	if _direct_snowboard_active:
+		floor_max_angle = Player.DIRTBIKE_FLOOR_MAX_ANGLE
+		if _direct_snowboard == null:
+			var rig := _pivots.get("_rig") as Node3D
+			if rig != null:
+				_direct_snowboard = SnowboardMode.build_deck(rig, _playable_profile.suit_rig_scale)
+	elif _direct_snowboard != null:
+		_direct_snowboard.queue_free()
+		_direct_snowboard = null
+	if was_active and not _direct_snowboard_active:
+		velocity.x = 0.0
+		velocity.z = 0.0
+		_snowboard_mode.reset()
+		_direct_snowboard_up = Vector3.UP
+
+
+## True where his board can actually slide: snow, or the frozen lake.
+func _direct_snowboard_surface() -> bool:
+	if terrain == null or not terrain.has_method("is_snow_footstep_surface"):
+		return false
+	var here := Vector2(global_position.x, global_position.z)
+	if terrain.has_method("is_ice_surface") and terrain.is_ice_surface(here):
+		return true
+	return terrain.is_snow_footstep_surface(here)
+
+
+## The board's own contact with the snow, after the move: the shared model,
+## same as the player's. His origin sits on the ground, so his foot offset is
+## zero.
+func _resolve_direct_snowboard_motion(delta: float, _pre_move_position: Vector3) -> void:
+	if not _direct_snowboard_active or terrain == null:
+		return
+	if _direct_diving or _direct_surface_swimming or _direct_flying or _direct_lava_surface:
+		return
+	var target_h: float = terrain.get_mesh_height(global_position.x, global_position.z)
+	var rise: float = target_h - global_position.y
+	var horizontal := Vector2(velocity.x, velocity.z)
+	var surface_fall := horizontal.length() * _direct_dirtbike_slope()
+	_snowboard_mode.follow_terrain(_traversal_context(delta), target_h, rise, surface_fall, 0.0)
+	_direct_vertical_velocity = velocity.y
+
+
 func _update_direct_dirtbike_state() -> void:
 	_direct_dirtbike_active = _blorb_suit.has_dirtbike_legs()
 	floor_max_angle = Player.DIRTBIKE_FLOOR_MAX_ANGLE if _direct_dirtbike_active else deg_to_rad(50.0)
@@ -1445,6 +1537,36 @@ func _resolve_direct_dirtbike_motion(delta: float,pre_move_position: Vector3) ->
 		global_position.y = ground_height
 		_direct_vertical_velocity = 0.0
 		velocity.y = 0.0
+
+
+## The riding stance, and the deck under it. Both are the shared power's, so
+## his board looks and behaves like the player's at his own size.
+func _apply_direct_snowboard(delta: float) -> void:
+	if terrain != null and _direct_snowboard_active and _direct_snowboard_surface():
+		var normal: Vector3 = terrain.get_mesh_normal(global_position.x, global_position.z)
+		_direct_snowboard_up = _direct_snowboard_up.slerp(normal, minf(6.0 * delta, 1.0)).normalized()
+	_snowboard_mode.pose_stance(
+		_traversal_context(delta), _direct_snowboard_active,
+		_direct_snowboard_up, _direct_snowboard_heading
+	)
+	if _direct_snowboard == null:
+		return
+	var forward := _direct_snowboard_heading.normalized()
+	var up := _direct_snowboard_up
+	forward = (forward - up * forward.dot(up))
+	if forward.length_squared() < 0.001:
+		forward = Vector3.FORWARD
+	forward = forward.normalized()
+	var across := forward.cross(up).normalized()
+	if across.length_squared() < 0.001:
+		return
+	up = across.cross(forward).normalized()
+	_direct_snowboard.global_transform.basis = Basis(forward, up, across)
+	var ankle_left := _pivots.get("ankle_left") as Node3D
+	var ankle_right := _pivots.get("ankle_right") as Node3D
+	if ankle_left != null and ankle_right != null:
+		var mid := (ankle_left.global_position + ankle_right.global_position) * 0.5
+		_direct_snowboard.global_position = mid - up * SnowboardMode.THICKNESS * _playable_profile.suit_rig_scale
 
 
 ## Swimming lies the body down along its travel instead of paddling along
