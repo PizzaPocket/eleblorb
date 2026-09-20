@@ -170,6 +170,10 @@ enum State { ROAM, FOLLOWING }
 var _player: Node3D
 var _pivots: Dictionary
 var _blorb_suit := BlorbSuitController.new()
+## His joints by rig-neutral name, and the powers he shares with every other
+## character (docs/traversal_powers_architecture.md).
+var _rig: RigAdapter = null
+var _ice_skates := IceSkateMode.new()
 var _portrait := PlayerPortrait.new()
 var _playable_profile := PlayableCharacterProfile.xiao_hou_zi()
 var _eyes: Array = []
@@ -262,9 +266,6 @@ var _direct_ice_skates_active: bool = false
 var _direct_ice_skating_active: bool = false
 var _direct_ice_skate_left: Node3D = null
 var _direct_ice_skate_right: Node3D = null
-var _direct_ice_skate_phase: float = 0.0
-var _direct_ice_skate_previous_speed: float = 0.0
-var _direct_ice_skate_smoothed_acceleration: float = 0.0
 var _direct_ice_skate_lift_y: float = 0.0
 var _direct_ice_skate_was_supported: bool = false
 var _direct_ice_skate_airborne: bool = false
@@ -291,6 +292,7 @@ func _ready() -> void:
 	floor_snap_length = 0.12
 	floor_max_angle = deg_to_rad(50.0)
 	_pivots = MonkeyFigure.build(self, MonkeyFigure.MONKEY_FUR_COLOR, DISPLAY_SCALE)
+	_rig = RigAdapter.new(_rig_joint_map())
 	_eyes = _pivots["eyes"]
 	_blorb_suit.setup(
 		self, self, _blorb_suit_pivot_map(), _playable_profile.suit_rig_scale,
@@ -367,6 +369,34 @@ func _process(delta: float) -> void:
 	_update_direct_ice_skate_state()
 	if is_player_controlled and Input.is_action_just_pressed("transform") and not UIState.modal_open:
 		_blorb_suit.toggle()
+
+
+## Every joint a shared power may need: the suit's own map plus the torso
+## joints the suit never dresses but poses do use. Kept separate from
+## _blorb_suit_pivot_map() so the suit is handed exactly what it expects.
+func _rig_joint_map() -> Dictionary:
+	var map := _blorb_suit_pivot_map()
+	for name in ["thorax", "neck", "hips"]:
+		var node: Node3D = _pivots.get(name) as Node3D
+		if node != null:
+			map[name] = node
+	return map
+
+
+## This frame, described for a shared power. Same shape the player builds
+## (Player._traversal_context()), so a power cannot tell the two apart.
+func _traversal_context(delta: float) -> TraversalContext:
+	var ctx := TraversalContext.new(self, _playable_profile, _rig, _blorb_suit, _terrain())
+	ctx.delta = delta
+	ctx.sprinting = Input.is_action_pressed("run")
+	ctx.grounded = is_on_floor()
+	ctx.visuals = _pivots.get("_rig") as Node3D
+	ctx.leg_speed_multiplier = _special_speed_multiplier(["leg_left", "leg_right"])
+	return ctx
+
+
+func _terrain() -> Node:
+	return get_node_or_null("../Terrain")
 
 
 func _blorb_suit_pivot_map() -> Dictionary:
@@ -871,7 +901,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		velocity.x=skating_velocity.x
 		velocity.z=skating_velocity.y
 		var skate_acceleration:=maxf((skating_velocity.length()-skate_speed_before)/maxf(delta,0.0001),0.0)
-		var sound_cycle:=fposmod(_direct_ice_skate_phase/TAU,1.0)
+		var sound_cycle:=fposmod(_ice_skates.stride_phase()/TAU,1.0)
 		var sound_left:=Player.ice_skate_stroke(sound_cycle)
 		var sound_right:=Player.ice_skate_stroke(fposmod(sound_cycle+0.5,1.0))
 		UISounds.pulse_ice_skates(
@@ -1150,99 +1180,15 @@ func _animate_direct_motion(delta: float, direction: Vector3, speed: float) -> v
 	_animate_walk(delta, Vector2(velocity.x, velocity.z).length_squared() > 0.01, cadence)
 
 
+## Skating's pose is IceSkateMode's, the same one the player uses: his own
+## copy of it is gone. His rig can carry it now that his ankle articulates
+## (see MonkeyFigure._rebuild_footed_leg()), and anything tuned on it from
+## here lands for both of them.
 func _animate_direct_ice_skating(delta: float) -> void:
-	var planar_speed:=Vector2(velocity.x,velocity.z).length()
-	var settle:=minf(Player.ICE_SKATE_POSE_SETTLE_SPEED*delta,1.0)
-	var sprinting:=Input.is_action_pressed("run")
-	var effort:=Player.ICE_SKATE_SPRINT_POSE_MULTIPLIER if sprinting else 1.0
-	if planar_speed<=0.12:
-		_direct_ice_skate_previous_speed=planar_speed
-		_direct_ice_skate_smoothed_acceleration=0.0
-		_animate_walk(delta,false)
-		return
-	var foot_anchor:=((_pivots["ankle_left"] as Node3D).global_position+(_pivots["ankle_right"] as Node3D).global_position)*0.5
-	var raw_acceleration:=maxf((planar_speed-_direct_ice_skate_previous_speed)/maxf(delta,0.0001),0.0)
-	_direct_ice_skate_previous_speed=planar_speed
-	_direct_ice_skate_smoothed_acceleration=lerpf(
-		_direct_ice_skate_smoothed_acceleration,raw_acceleration,1.0-exp(-5.0*delta)
-	)
-	var thrust_mix:=clampf(_direct_ice_skate_smoothed_acceleration/Player.ICE_SKATE_FULL_THRUST_ACCELERATION,0.0,1.0)
-	var cadence:=lerpf(Player.ICE_SKATE_CADENCE_GLIDE,Player.ICE_SKATE_CADENCE_THRUST,smoothstep(0.0,1.0,thrust_mix))
-	_direct_ice_skate_phase+=delta*cadence
-	var cycle:=fposmod(_direct_ice_skate_phase/TAU,1.0)
-	var left_stroke:=Player.ice_skate_stroke(cycle)
-	var right_stroke:=Player.ice_skate_stroke(fposmod(cycle+0.5,1.0))
-	var left_push:=left_stroke.x
-	var right_push:=right_stroke.x
-	var left_recovery:=left_stroke.y
-	var right_recovery:=right_stroke.y
-	var left_support:=left_stroke.z
-	var right_support:=right_stroke.z
-	var left_leg:=_pivots["leg_left"] as Node3D
-	var right_leg:=_pivots["leg_right"] as Node3D
-	var left_knee:=_pivots["knee_left"] as Node3D
-	var right_knee:=_pivots["knee_right"] as Node3D
-	var left_ankle:=_pivots["ankle_left"] as Node3D
-	var right_ankle:=_pivots["ankle_right"] as Node3D
-	var left_hip_x:=Player.ICE_SKATE_PUSH_HIP_BACK*left_push*effort-Player.ICE_SKATE_RECOVERY_HIP_FORWARD*left_recovery-Player.ICE_SKATE_GLIDE_HIP_FORWARD*left_support*effort
-	var right_hip_x:=Player.ICE_SKATE_PUSH_HIP_BACK*right_push*effort-Player.ICE_SKATE_RECOVERY_HIP_FORWARD*right_recovery-Player.ICE_SKATE_GLIDE_HIP_FORWARD*right_support*effort
-	left_leg.rotation.x=lerp_angle(left_leg.rotation.x,left_hip_x,settle)
-	right_leg.rotation.x=lerp_angle(right_leg.rotation.x,right_hip_x,settle)
-	left_leg.rotation.y=lerp_angle(left_leg.rotation.y,Player.ICE_SKATE_TOE_OUT*left_push*effort,settle)
-	right_leg.rotation.y=lerp_angle(right_leg.rotation.y,-Player.ICE_SKATE_TOE_OUT*right_push*effort,settle)
-	var left_knee_x:=(Player.ICE_SKATE_GLIDE_KNEE*left_support+Player.ICE_SKATE_PUSH_KNEE*left_push+Player.ICE_SKATE_RECOVERY_KNEE*left_recovery)*effort
-	var right_knee_x:=(Player.ICE_SKATE_GLIDE_KNEE*right_support+Player.ICE_SKATE_PUSH_KNEE*right_push+Player.ICE_SKATE_RECOVERY_KNEE*right_recovery)*effort
-	left_knee.rotation.x=lerp_angle(left_knee.rotation.x,left_knee_x,settle)
-	right_knee.rotation.x=lerp_angle(right_knee.rotation.x,right_knee_x,settle)
-	var outward_amount:=Player.ICE_SKATE_SPRINT_PUSH_OUTWARD if sprinting else Player.ICE_SKATE_PUSH_OUTWARD
-	left_leg.rotation.z=lerp_angle(left_leg.rotation.z,_direct_ice_skate_outward_roll(left_leg,left_ankle,outward_amount)*left_push,settle)
-	right_leg.rotation.z=lerp_angle(right_leg.rotation.z,_direct_ice_skate_outward_roll(right_leg,right_ankle,outward_amount)*right_push,settle)
-	left_ankle.rotation.x=lerp_angle(left_ankle.rotation.x,-(left_hip_x+left_knee_x)*left_support,settle)
-	right_ankle.rotation.x=lerp_angle(right_ankle.rotation.x,-(right_hip_x+right_knee_x)*right_support,settle)
-	var left_arm:=_pivots["arm_left"] as Node3D
-	var right_arm:=_pivots["arm_right"] as Node3D
-	var sprint_arm_lift:=Player.ICE_SKATE_SPRINT_ARM_LIFT if sprinting else 0.0
-	left_arm.rotation.x=lerp_angle(left_arm.rotation.x,(-Player.ICE_SKATE_ARM_SWING*right_support+Player.ICE_SKATE_ARM_SWING*0.55*left_support)*effort-sprint_arm_lift,settle)
-	right_arm.rotation.x=lerp_angle(right_arm.rotation.x,(-Player.ICE_SKATE_ARM_SWING*left_support+Player.ICE_SKATE_ARM_SWING*0.55*right_support)*effort-sprint_arm_lift,settle)
-	(_pivots["elbow_left"] as Node3D).rotation.x=lerp_angle((_pivots["elbow_left"] as Node3D).rotation.x,-Player.ICE_SKATE_ELBOW_BEND*right_support*effort,settle)
-	(_pivots["elbow_right"] as Node3D).rotation.x=lerp_angle((_pivots["elbow_right"] as Node3D).rotation.x,-Player.ICE_SKATE_ELBOW_BEND*left_support*effort,settle)
-	var skate_lean:=Player.ICE_SKATE_BODY_LEAN+(Player.ICE_SKATE_SPRINT_BODY_LEAN if sprinting else 0.0)
-	(_pivots["spine"] as Node3D).rotation.x=lerp_angle((_pivots["spine"] as Node3D).rotation.x,skate_lean,settle)
-	# Direct control disables Xiao's ordinary NPC look-at pass, so compensate
-	# the skating lean here to keep his eyes aimed along travel.
-	(_pivots["head"] as Node3D).rotation.x=lerp_angle(
-		(_pivots["head"] as Node3D).rotation.x,-skate_lean*0.72,settle
-	)
-	# Move Xiao's complete visual rig by the amount required to preserve skate
-	# contact after flexing the legs. This lowers his pelvis with the crouch
-	# instead of sinking the torso meshes through fixed hip sockets.
-	var rig:=_pivots.get("_rig") as Node3D
-	if rig!=null:
-		var posed_foot_anchor:=((_pivots["ankle_left"] as Node3D).global_position+(_pivots["ankle_right"] as Node3D).global_position)*0.5
-		rig.global_position+=foot_anchor-posed_foot_anchor
-
-
-func _direct_ice_skate_outward_roll(leg: Node3D,ankle: Node3D,amount: float) -> float:
-	var original:=leg.rotation.z
-	var rig:=_pivots.get("_rig") as Node3D
-	var right: Vector3=(rig.global_transform.basis.x if rig!=null else global_transform.basis.x).normalized()
-	var spine:=_pivots["spine"] as Node3D
-	var side:=signf((leg.global_position-spine.global_position).dot(right))
-	if is_zero_approx(side):
-		side=signf(leg.position.x)
-	var best_angle:=0.0
-	var best_score:=-INF
-	for sample in 17:
-		var candidate:=lerpf(-amount,amount,float(sample)/16.0)
-		leg.rotation.z=candidate
-		leg.force_update_transform()
-		ankle.force_update_transform()
-		var score:=side*(ankle.global_position-leg.global_position).dot(right)
-		if score>best_score:
-			best_score=score
-			best_angle=candidate
-	leg.rotation.z=original
-	return best_angle
+	if Vector2(velocity.x, velocity.z).length() <= 0.12:
+		_animate_walk(delta, false)
+	_ice_skates.engaged = _direct_ice_skating_active
+	_ice_skates.pose(_traversal_context(delta))
 
 
 func _animate_direct_swim(delta: float, movement_speed: float) -> void:
@@ -1342,9 +1288,7 @@ func _update_direct_ice_skate_state() -> void:
 	if was_active and not has_legs:
 		velocity.x=0.0
 		velocity.z=0.0
-		_direct_ice_skate_phase=0.0
-		_direct_ice_skate_previous_speed=0.0
-		_direct_ice_skate_smoothed_acceleration=0.0
+		_ice_skates.reset()
 		_direct_ice_skate_was_supported=false
 		_direct_ice_skate_airborne=false
 		_direct_ice_skate_surface_velocity=Vector3.ZERO
