@@ -66,6 +66,61 @@ func is_available(ctx: TraversalContext) -> bool:
 	return ctx.suit.has_ice_skate_legs() and not ctx.suit.penguin_form_active()
 
 
+## The blades themselves, and how far they lift their wearer. Equipment
+## belongs with the power that uses it, the same way the snowboard owns its
+## deck. Everything here is built from the wearer's own scale, so a smaller
+## rig gets blades that fit its feet and a lift that matches them: they are
+## what it stands on.
+const BLADE_COLOR := ElementPalette.ICE_BODY
+const RUNNER_HALF_LENGTH := 0.19
+const RUNNER_HALF_WIDTH := 0.022
+const RUNNER_HALF_HEIGHT := 0.025
+const SUPPORT_HEIGHT := 0.055
+const TOTAL_HEIGHT := RUNNER_HALF_HEIGHT * 2.0 + SUPPORT_HEIGHT
+
+
+static func build_blade(
+	toe: Node3D,blade_name: String,scale_factor: float=1.0,sole_offset: float=-1.0,crystal: bool=false
+) -> Node3D:
+	var root:=Node3D.new()
+	root.name=blade_name
+	toe.add_child(root)
+	var resolved_sole_offset: float=(
+		BlorbSuit.worn_boot_sole_depth(scale_factor)
+		if sole_offset<0.0 else sole_offset
+	)
+	var sole_y: float=-resolved_sole_offset
+	var ice_material:=CrystalTrack.crystal_material(CrystalTrack.BLADE_GLOW) if crystal else IceCrag.build_ice_material()
+	var support_height: float=SUPPORT_HEIGHT*scale_factor
+	var runner_half_height: float=RUNNER_HALF_HEIGHT*scale_factor
+	var runner_y: float=sole_y-support_height-runner_half_height
+	var runner:=SuperEgg.build_part(
+		Vector3(
+			RUNNER_HALF_WIDTH*scale_factor,runner_half_height,
+			RUNNER_HALF_LENGTH*scale_factor
+		),
+		BLADE_COLOR,4.8,4.8
+	)
+	runner.position=Vector3(0.0,runner_y,-ProceduralFigure.FOOT_SIZE.z*scale_factor)
+	runner.set_surface_override_material(0,ice_material)
+	root.add_child(runner)
+	for unscaled_z: float in [-0.055,-0.205]:
+		var mount:=SuperEgg.build_part(
+			Vector3(0.032*scale_factor,support_height*0.5,0.028*scale_factor),
+			BLADE_COLOR,3.8,3.8
+		)
+		mount.position=Vector3(0.0,sole_y-support_height*0.5,unscaled_z*scale_factor)
+		mount.set_surface_override_material(0,ice_material)
+		root.add_child(mount)
+	return root
+
+
+static func visual_lift(scale_factor: float=1.0) -> float:
+	var human_sole_depth: float=(ProceduralFigure.FOOT_SIZE.y+ProceduralFigure.JOINT_OVERLAP*0.5)*scale_factor
+	var blorb_sole_depth: float=BlorbSuit.worn_boot_sole_depth(scale_factor)
+	return TOTAL_HEIGHT*scale_factor+maxf(blorb_sole_depth-human_sole_depth,0.0)
+
+
 ## Where the stride currently is, for whoever is pacing the skating audio.
 func stride_phase() -> float:
 	return _stride_phase

@@ -303,12 +303,12 @@ const SNOWBOARD_COLOR := SnowboardMode.DECK_COLOR
 ## the shoes everywhere else. Runners and mounts share the Ice blorbs' raised
 ## ice (IceCrag.build_ice_material()): elemental constructs are extensions
 ## of the blorbs.
-const ICE_SKATE_COLOR := ElementPalette.ICE_BODY
-const ICE_SKATE_RUNNER_HALF_LENGTH := 0.19
-const ICE_SKATE_RUNNER_HALF_WIDTH := 0.022
-const ICE_SKATE_RUNNER_HALF_HEIGHT := 0.025
-const ICE_SKATE_SUPPORT_HEIGHT := 0.055
-const ICE_SKATE_TOTAL_HEIGHT := ICE_SKATE_RUNNER_HALF_HEIGHT * 2.0 + ICE_SKATE_SUPPORT_HEIGHT
+const ICE_SKATE_COLOR := IceSkateMode.BLADE_COLOR
+const ICE_SKATE_RUNNER_HALF_LENGTH := IceSkateMode.RUNNER_HALF_LENGTH
+const ICE_SKATE_RUNNER_HALF_WIDTH := IceSkateMode.RUNNER_HALF_WIDTH
+const ICE_SKATE_RUNNER_HALF_HEIGHT := IceSkateMode.RUNNER_HALF_HEIGHT
+const ICE_SKATE_SUPPORT_HEIGHT := IceSkateMode.SUPPORT_HEIGHT
+const ICE_SKATE_TOTAL_HEIGHT := IceSkateMode.TOTAL_HEIGHT
 const ICE_SKATE_POSE_SETTLE_SPEED := 9.0
 ## Skating's tuning belongs to IceSkateMode now. These forward to it for the
 ## callers that have not migrated onto the shared system yet, so there stays
@@ -7860,43 +7860,13 @@ func _set_ice_skate_visuals_present() -> void:
 static func build_ice_skate_blade(
 	toe: Node3D,blade_name: String,scale_factor: float=1.0,sole_offset: float=-1.0,crystal: bool=false
 ) -> Node3D:
-	var root:=Node3D.new()
-	root.name=blade_name
-	toe.add_child(root)
-	var resolved_sole_offset: float=(
-		BlorbSuit.worn_boot_sole_depth(scale_factor)
-		if sole_offset<0.0 else sole_offset
-	)
-	var sole_y: float=-resolved_sole_offset
-	var ice_material:=CrystalTrack.crystal_material(CrystalTrack.BLADE_GLOW) if crystal else IceCrag.build_ice_material()
-	var support_height: float=ICE_SKATE_SUPPORT_HEIGHT*scale_factor
-	var runner_half_height: float=ICE_SKATE_RUNNER_HALF_HEIGHT*scale_factor
-	var runner_y: float=sole_y-support_height-runner_half_height
-	var runner:=SuperEgg.build_part(
-		Vector3(
-			ICE_SKATE_RUNNER_HALF_WIDTH*scale_factor,runner_half_height,
-			ICE_SKATE_RUNNER_HALF_LENGTH*scale_factor
-		),
-		ICE_SKATE_COLOR,4.8,4.8
-	)
-	runner.position=Vector3(0.0,runner_y,-ProceduralFigure.FOOT_SIZE.z*scale_factor)
-	runner.set_surface_override_material(0,ice_material)
-	root.add_child(runner)
-	for unscaled_z: float in [-0.055,-0.205]:
-		var mount:=SuperEgg.build_part(
-			Vector3(0.032*scale_factor,support_height*0.5,0.028*scale_factor),
-			ICE_SKATE_COLOR,3.8,3.8
-		)
-		mount.position=Vector3(0.0,sole_y-support_height*0.5,unscaled_z*scale_factor)
-		mount.set_surface_override_material(0,ice_material)
-		root.add_child(mount)
-	return root
+	# The blades belong to IceSkateMode with the rest of skating. Kept here as
+	# a forward for the callers that have not moved onto the shared system.
+	return IceSkateMode.build_blade(toe,blade_name,scale_factor,sole_offset,crystal)
 
 
 static func ice_skate_visual_lift(scale_factor: float=1.0) -> float:
-	var human_sole_depth: float=(ProceduralFigure.FOOT_SIZE.y+ProceduralFigure.JOINT_OVERLAP*0.5)*scale_factor
-	var blorb_sole_depth: float=BlorbSuit.worn_boot_sole_depth(scale_factor)
-	return ICE_SKATE_TOTAL_HEIGHT*scale_factor+maxf(blorb_sole_depth-human_sole_depth,0.0)
+	return IceSkateMode.visual_lift(scale_factor)
 
 
 ## The snowboard rides literal snow terrain only (per direct instruction):
