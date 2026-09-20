@@ -33,6 +33,11 @@ var grounded := false
 ## How much faster this body's worn legs carry it, which the suit decides and
 ## the driver hands over rather than each power recomputing it.
 var leg_speed_multiplier := 1.0
+## Whether each arm is already committed to something else this frame, such
+## as an arm power or a held item. A pose that would otherwise place the arms
+## leaves a busy one alone.
+var left_arm_busy := false
+var right_arm_busy := false
 
 
 func _init(

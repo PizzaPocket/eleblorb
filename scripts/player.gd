@@ -259,7 +259,7 @@ const SNOWBOARD_LATCH_DROP_MARGIN := SnowboardMode.LATCH_DROP_MARGIN
 ## kind of term as the dirt bike's wheel radius in _body_base_height(), and
 ## visual only -- the collision body keeps its ordinary feet origin.
 const SNOWBOARD_DECK_LIFT := SnowboardMode.DECK_LIFT
-const SNOWBOARD_POSE_SETTLE_SPEED := 7.0
+const SNOWBOARD_POSE_SETTLE_SPEED := SnowboardMode.POSE_SETTLE_SPEED
 ## Terrain triangles are sampled across the board's length and their normal
 ## is damped before reaching either rider or deck. Response softens further
 ## at speed, representing the board's angular inertia instead of snapping to
@@ -277,23 +277,23 @@ const SNOWBOARD_RIDER_PITCH_RESPONSE := 5.5
 # the live stance), so a regular stance rotates body-forward -90 degrees
 # from travel and twists the upper body back toward travel with +Y turns.
 const SNOWBOARD_BODY_SIDE_ANGLE := -PI * 0.5
-const SNOWBOARD_ABDOMEN_TWIST := deg_to_rad(16.0)
-const SNOWBOARD_THORAX_TWIST := deg_to_rad(18.0)
+const SNOWBOARD_ABDOMEN_TWIST := SnowboardMode.ABDOMEN_TWIST
+const SNOWBOARD_THORAX_TWIST := SnowboardMode.THORAX_TWIST
 ## A real board stance is substantially wider than the ordinary standing
 ## gait. Hip abduction spreads the feet longitudinally along the board while
 ## keeping both upper legs seated in their actual hip sockets.
-const SNOWBOARD_STANCE_SPLAY := deg_to_rad(15.0)
-const SNOWBOARD_HIP_BEND := deg_to_rad(10.0)
-const SNOWBOARD_TUCK_HIP_BEND := deg_to_rad(16.0)
-const SNOWBOARD_KNEE_BEND := deg_to_rad(25.0)
-const SNOWBOARD_TUCK_KNEE_BEND := deg_to_rad(27.0)
-const SNOWBOARD_ARM_SPREAD := deg_to_rad(20.0)
-const SNOWBOARD_TUCK_ARM_SPREAD := deg_to_rad(12.0)
-const SNOWBOARD_ELBOW_BEND := deg_to_rad(10.0)
-const SNOWBOARD_TUCK_ELBOW_BEND := deg_to_rad(10.0)
-const SNOWBOARD_SPEED_LEAN_MAX := deg_to_rad(-17.0)
-const SNOWBOARD_TUCK_LEAN := deg_to_rad(-6.0)
-const SNOWBOARD_FULL_LEAN_SPEED := 25.0
+const SNOWBOARD_STANCE_SPLAY := SnowboardMode.STANCE_SPLAY
+const SNOWBOARD_HIP_BEND := SnowboardMode.HIP_BEND
+const SNOWBOARD_TUCK_HIP_BEND := SnowboardMode.TUCK_HIP_BEND
+const SNOWBOARD_KNEE_BEND := SnowboardMode.KNEE_BEND
+const SNOWBOARD_TUCK_KNEE_BEND := SnowboardMode.TUCK_KNEE_BEND
+const SNOWBOARD_ARM_SPREAD := SnowboardMode.ARM_SPREAD
+const SNOWBOARD_TUCK_ARM_SPREAD := SnowboardMode.TUCK_ARM_SPREAD
+const SNOWBOARD_ELBOW_BEND := SnowboardMode.ELBOW_BEND
+const SNOWBOARD_TUCK_ELBOW_BEND := SnowboardMode.TUCK_ELBOW_BEND
+const SNOWBOARD_SPEED_LEAN_MAX := SnowboardMode.SPEED_LEAN_MAX
+const SNOWBOARD_TUCK_LEAN := SnowboardMode.TUCK_LEAN
+const SNOWBOARD_FULL_LEAN_SPEED := SnowboardMode.FULL_LEAN_SPEED
 const SNOWBOARD_WIDTH := 0.32
 const SNOWBOARD_LENGTH := 2.45
 const SNOWBOARD_THICKNESS := 0.08
@@ -4487,59 +4487,14 @@ func _apply_dirtbike_pose(delta: float) -> void:
 ## side-on to the board while abdomen and thorax share the turn toward the
 ## downhill gaze, leaving the neck only the final natural portion.
 func _apply_snowboard_pose(delta: float) -> void:
-	_snowboard_pose_blend=move_toward(
-		_snowboard_pose_blend,1.0 if _snowboard_active else 0.0,
-		SNOWBOARD_POSE_SETTLE_SPEED*delta
-	)
-	if _snowboard_pose_blend<=0.001:
-		_spine.rotation.z=lerp_angle(_spine.rotation.z,0.0,minf(SNOWBOARD_POSE_SETTLE_SPEED*delta,1.0))
-		if _thorax!=null:
-			_thorax.rotation.z=lerp_angle(_thorax.rotation.z,0.0,minf(SNOWBOARD_POSE_SETTLE_SPEED*delta,1.0))
-		return
-	var w:=_snowboard_pose_blend
-	var tuck:=1.0 if _is_sprinting() and _snowboard_active else 0.0
-	var speed_ratio:=clampf(Vector2(velocity.x,velocity.z).length()/SNOWBOARD_FULL_LEAN_SPEED,0.0,1.0)
-	var forward_lean:=(SNOWBOARD_SPEED_LEAN_MAX*speed_ratio+SNOWBOARD_TUCK_LEAN*tuck)*w
-	var grade_heading:=Vector3(_snowboard_last_heading.x,0.0,_snowboard_last_heading.z).normalized()
-	var grade_forward:=grade_heading-_snowboard_smoothed_up*grade_heading.dot(_snowboard_smoothed_up)
-	var deck_grade:=asin(clampf(grade_forward.normalized().y,-1.0,1.0)) if grade_forward.length_squared()>0.001 else 0.0
-	var grade_flex:=clampf(deck_grade*0.55,-deg_to_rad(16.0),deg_to_rad(16.0))
-	var hip_target:=-(SNOWBOARD_HIP_BEND+SNOWBOARD_TUCK_HIP_BEND*tuck)
-	_leg_left.rotation.x=lerp_angle(_leg_left.rotation.x,hip_target+grade_flex,w)
-	_leg_right.rotation.x=lerp_angle(_leg_right.rotation.x,hip_target-grade_flex,w)
-	_leg_left.rotation.z=lerp_angle(
-		_leg_left.rotation.z,signf(_leg_left.position.x)*SNOWBOARD_STANCE_SPLAY,w
-	)
-	_leg_right.rotation.z=lerp_angle(
-		_leg_right.rotation.z,signf(_leg_right.position.x)*SNOWBOARD_STANCE_SPLAY,w
-	)
-	var knee_target:=SNOWBOARD_KNEE_BEND+SNOWBOARD_TUCK_KNEE_BEND*tuck
-	_knee_left.rotation.x=lerp_angle(_knee_left.rotation.x,knee_target-grade_flex,w)
-	_knee_right.rotation.x=lerp_angle(_knee_right.rotation.x,knee_target+grade_flex,w)
-	_ankle_left.rotation.x=lerp_angle(_ankle_left.rotation.x,0.0,w)
-	_ankle_right.rotation.x=lerp_angle(_ankle_right.rotation.x,0.0,w)
-	# Balance arms are wider than idle and open further in the aerodynamic
-	# crouch. An actively commanded arm power retains precedence.
-	var arm_spread:=SNOWBOARD_ARM_SPREAD+SNOWBOARD_TUCK_ARM_SPREAD*tuck
-	var elbow_bend:=SNOWBOARD_ELBOW_BEND+SNOWBOARD_TUCK_ELBOW_BEND*tuck
-	if _left_arm_power_blend<=0.001:
-		_arm_left.rotation.x=lerp_angle(_arm_left.rotation.x,0.0,w)
-		_arm_left.rotation.z=lerp_angle(_arm_left.rotation.z,signf(_arm_left.position.x)*arm_spread,w)
-		_elbow_left.rotation.x=lerp_angle(_elbow_left.rotation.x,-elbow_bend,w)
-	if _right_arm_power_blend<=0.001 and HeldItem.current.is_empty():
-		_arm_right.rotation.x=lerp_angle(_arm_right.rotation.x,0.0,w)
-		_arm_right.rotation.z=lerp_angle(_arm_right.rotation.z,signf(_arm_right.position.x)*arm_spread,w)
-		_elbow_right.rotation.x=lerp_angle(_elbow_right.rotation.x,-elbow_bend,w)
-	_spine.rotation.y=lerp_angle(_spine.rotation.y,SNOWBOARD_ABDOMEN_TWIST,w)
-	_spine.rotation.z=lerp_angle(_spine.rotation.z,forward_lean,minf(SNOWBOARD_POSE_SETTLE_SPEED*delta,1.0))
-	if _thorax!=null:
-		_thorax.rotation.y=lerp_angle(_thorax.rotation.y,SNOWBOARD_THORAX_TWIST,w)
-		_thorax.rotation.z=lerp_angle(_thorax.rotation.z,forward_lean*0.35,minf(SNOWBOARD_POSE_SETTLE_SPEED*delta,1.0))
-	_spine.position.y=lerpf(_spine.position.y,_spine_rest_y,w)
-	_hips.position.y=lerpf(_hips.position.y,_hips_rest_y,w)
-	# Joint flexion lowers the pelvis naturally. Preserve the actual midpoint
-	# between the two ankles after posing so the stance sinks around planted
-	# feet instead of translating the rider toward either board edge.
+	# The stance lives in SnowboardMode, shared with every other character
+	# that rides one. Its blend still drives this body's deck lift (see
+	# _body_base_height()), so it is mirrored back here.
+	var ctx := _traversal_context(delta)
+	ctx.left_arm_busy = _left_arm_power_blend > 0.001
+	ctx.right_arm_busy = _right_arm_power_blend > 0.001 or not HeldItem.current.is_empty()
+	_snowboard_mode.pose_stance(ctx, _snowboard_active, _snowboard_smoothed_up, _snowboard_last_heading)
+	_snowboard_pose_blend = _snowboard_mode.pose_blend
 
 
 ## Alternating speed-skating stroke: one leg glides under the body's weight

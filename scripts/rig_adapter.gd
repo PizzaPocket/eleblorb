@@ -31,6 +31,15 @@ var _aliases: Dictionary = {}
 var _measured: Dictionary = {}
 
 
+## Where each joint sits before anything poses it, captured once so a pose
+## can return a joint to rest without every caller keeping its own copy.
+var _rest_positions: Dictionary = {}
+
+
+func rest_position(name: String) -> Vector3:
+	return _rest_positions.get(name, Vector3.ZERO)
+
+
 func _init(pivot_map: Dictionary = {}) -> void:
 	var seen: Dictionary = {}
 	for name in pivot_map:
@@ -39,6 +48,7 @@ func _init(pivot_map: Dictionary = {}) -> void:
 			continue
 		var key := String(name)
 		_joints[key] = node
+		_rest_positions[key] = node.position
 		var id := node.get_instance_id()
 		if seen.has(id):
 			_aliases[key] = seen[id]

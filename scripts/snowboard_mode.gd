@@ -120,6 +120,105 @@ func _land(ctx: TraversalContext, target_h: float, surface_fall: float, foot_off
 		ground_latch = LANDING_LATCH
 
 
+## Riding stance: knees and hips flexed, feet splayed across the deck, the
+## torso twisted to face down the fall line and leaning into the speed, with
+## the arms out for balance. Grade flex opens one knee and closes the other
+## so the board stays along the slope under it.
+const POSE_SETTLE_SPEED := 7.0
+const STANCE_SPLAY := deg_to_rad(15.0)
+const HIP_BEND := deg_to_rad(10.0)
+const TUCK_HIP_BEND := deg_to_rad(16.0)
+const KNEE_BEND := deg_to_rad(25.0)
+const TUCK_KNEE_BEND := deg_to_rad(27.0)
+const ARM_SPREAD := deg_to_rad(20.0)
+const TUCK_ARM_SPREAD := deg_to_rad(12.0)
+const ELBOW_BEND := deg_to_rad(10.0)
+const TUCK_ELBOW_BEND := deg_to_rad(10.0)
+const ABDOMEN_TWIST := deg_to_rad(16.0)
+const THORAX_TWIST := deg_to_rad(18.0)
+const SPEED_LEAN_MAX := deg_to_rad(-17.0)
+const TUCK_LEAN := deg_to_rad(-6.0)
+const FULL_LEAN_SPEED := 25.0
+const GRADE_FLEX_LIMIT := deg_to_rad(16.0)
+
+var pose_blend := 0.0
+
+
+## `riding` is whether the board is out; `deck_up` is the board's own smoothed
+## up axis and `heading` the direction it points, both owned by whoever draws
+## the deck.
+func pose_stance(ctx: TraversalContext, riding: bool, deck_up: Vector3, heading: Vector3) -> void:
+	var rig := ctx.rig
+	if rig == null:
+		return
+	var settle := minf(POSE_SETTLE_SPEED * ctx.delta, 1.0)
+	pose_blend = move_toward(pose_blend, 1.0 if riding else 0.0, POSE_SETTLE_SPEED * ctx.delta)
+	if pose_blend <= 0.001:
+		_relax(rig, "spine", settle)
+		_relax(rig, "thorax", settle)
+		return
+	var w := pose_blend
+	var tuck := 1.0 if ctx.sprinting and riding else 0.0
+	var speed_ratio := clampf(
+		Vector2(ctx.body.velocity.x, ctx.body.velocity.z).length() / FULL_LEAN_SPEED, 0.0, 1.0
+	)
+	var forward_lean := (SPEED_LEAN_MAX * speed_ratio + TUCK_LEAN * tuck) * w
+	var grade_heading := Vector3(heading.x, 0.0, heading.z).normalized()
+	var grade_forward := grade_heading - deck_up * grade_heading.dot(deck_up)
+	var deck_grade := 0.0
+	if grade_forward.length_squared() > 0.001:
+		deck_grade = asin(clampf(grade_forward.normalized().y, -1.0, 1.0))
+	var grade_flex := clampf(deck_grade * 0.55, -GRADE_FLEX_LIMIT, GRADE_FLEX_LIMIT)
+	var hip_target := -(HIP_BEND + TUCK_HIP_BEND * tuck)
+	var knee_target := KNEE_BEND + TUCK_KNEE_BEND * tuck
+	for side in 2:
+		var prefix := "leg_left" if side == 0 else "leg_right"
+		var flex := grade_flex if side == 0 else -grade_flex
+		var hip := rig.joint("%s_hip" % prefix)
+		if hip != null:
+			hip.rotation.x = lerp_angle(hip.rotation.x, hip_target + flex, w)
+			hip.rotation.z = lerp_angle(hip.rotation.z, signf(hip.position.x) * STANCE_SPLAY, w)
+		var knee := rig.joint("%s_knee" % prefix)
+		if knee != null:
+			knee.rotation.x = lerp_angle(knee.rotation.x, knee_target - flex, w)
+		# Feet sit flat on the deck; a rig whose ankle drives nothing skips it.
+		if rig.articulates("%s_ankle" % prefix):
+			var ankle := rig.joint("%s_ankle" % prefix)
+			ankle.rotation.x = lerp_angle(ankle.rotation.x, 0.0, w)
+	var arm_spread := ARM_SPREAD + TUCK_ARM_SPREAD * tuck
+	var elbow_bend := ELBOW_BEND + TUCK_ELBOW_BEND * tuck
+	for side in 2:
+		if (ctx.left_arm_busy if side == 0 else ctx.right_arm_busy):
+			continue
+		var shoulder := rig.joint("arm_left_shoulder" if side == 0 else "arm_right_shoulder")
+		if shoulder != null:
+			shoulder.rotation.x = lerp_angle(shoulder.rotation.x, 0.0, w)
+			shoulder.rotation.z = lerp_angle(shoulder.rotation.z, signf(shoulder.position.x) * arm_spread, w)
+		var elbow := rig.joint("arm_left_elbow" if side == 0 else "arm_right_elbow")
+		if elbow != null:
+			elbow.rotation.x = lerp_angle(elbow.rotation.x, -elbow_bend, w)
+	var spine := rig.joint("spine")
+	if spine != null:
+		spine.rotation.y = lerp_angle(spine.rotation.y, ABDOMEN_TWIST, w)
+		spine.rotation.z = lerp_angle(spine.rotation.z, forward_lean, settle)
+		spine.position.y = lerpf(spine.position.y, rig.rest_position("spine").y, w)
+	var thorax := rig.joint("thorax")
+	if thorax != null:
+		thorax.rotation.y = lerp_angle(thorax.rotation.y, THORAX_TWIST, w)
+		thorax.rotation.z = lerp_angle(thorax.rotation.z, forward_lean * 0.35, settle)
+	var hips := rig.joint("hips")
+	if hips != null:
+		hips.position.y = lerpf(hips.position.y, rig.rest_position("hips").y, w)
+
+
+## Only this layer ever leans the torso sideways, so it straightens it on the
+## way out of riding.
+static func _relax(rig: RigAdapter, name: String, settle: float) -> void:
+	var joint := rig.joint(name)
+	if joint != null:
+		joint.rotation.z = lerp_angle(joint.rotation.z, 0.0, settle)
+
+
 func reset() -> void:
 	airborne = false
 	ground_latch = 0.0
