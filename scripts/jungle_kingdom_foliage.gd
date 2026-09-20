@@ -95,6 +95,8 @@ var _lod_timer := 0.0
 ## kingdom, so it needs the same working support the outskirts jungle
 ## biome's canopy already has, not a copy that silently never gets queried.
 var _canopy_blobs: Array[Dictionary] = []
+## The box enclosing every canopy blob, grown as they register.
+var _canopy_bounds := AABB()
 
 var _tree_builders: Array = [
 	func(): return NatureProps.build_palm_tree(15.0, _rng.randf_range(0.12, 0.28), _rng),
@@ -295,10 +297,11 @@ func _register_canopy_blobs(instance: Node3D) -> void:
 		return
 	var uniform_scale: float = instance.scale.x
 	for blob in (instance.get_meta("canopy_blobs") as Array):
-		_canopy_blobs.append({
-			"center": instance.to_global(blob["local_pos"]),
-			"axes": (blob["semi_axes"] as Vector3) * uniform_scale,
-		})
+		var blob_center: Vector3 = instance.to_global(blob["local_pos"])
+		var blob_axes: Vector3 = (blob["semi_axes"] as Vector3) * uniform_scale
+		_canopy_blobs.append({"center": blob_center, "axes": blob_axes})
+		var blob_bounds := AABB(blob_center - blob_axes, blob_axes * 2.0)
+		_canopy_bounds = blob_bounds if _canopy_blobs.size() == 1 else _canopy_bounds.merge(blob_bounds)
 
 
 ## Highest walkable tree-canopy top at this XZ position, no higher than
@@ -307,7 +310,19 @@ func _register_canopy_blobs(instance: Node3D) -> void:
 ## one-way support math): the exact contract player.gd's
 ## _tree_canopy_stand_height_at() and blorb.gd's _ground_height_at() query
 ## on a "../Scatter" sibling.
+## As with the clouds: every character and every free blorb asks this every
+## frame, wherever they are, and the canopy occupies one stretch of a course
+## kilometres long. One box test rejects the overwhelmingly common case
+## before any per-blob maths runs.
 func get_support_height_at(world_x: float, world_z: float, max_surface_y: float = INF) -> Variant:
+	if _canopy_blobs.is_empty():
+		return null
+	if (
+		world_x < _canopy_bounds.position.x or world_x > _canopy_bounds.end.x
+		or world_z < _canopy_bounds.position.z or world_z > _canopy_bounds.end.z
+		or max_surface_y < _canopy_bounds.position.y
+	):
+		return null
 	var best: Variant = null
 	for blob in _canopy_blobs:
 		var center: Vector3 = blob["center"]

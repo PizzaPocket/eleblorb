@@ -47,6 +47,7 @@ var _stairs_gate: BirdHelmGate
 
 
 func _ready() -> void:
+	add_to_group("cloud_scatters")
 	_rng.seed = rng_seed
 	_ensure_material()
 
@@ -88,6 +89,7 @@ func _place_cloud() -> void:
 		mesh_instance.mesh = SuperEgg.build_mesh(semi_axes, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
 		mesh_instance.material_override = _material
 		mesh_instance.set_meta("cloud_semi_axes", semi_axes)
+		_puffs_dirty = true
 		mesh_instance.position = Vector3(
 			_rng.randf_range(-8.0, 8.0),
 			_rng.randf_range(-1.5, 1.5),
@@ -100,8 +102,84 @@ func _place_cloud() -> void:
 ## top is not above `max_surface_y`. Callers use that ceiling to make cloud
 ## support one-way: rising bodies pass through undersides, falling bodies
 ## approaching from above can settle on the top.
+## Puffs flattened out of the node tree, with the bounds enclosing them all:
+## rebuilt whenever a puff is added, read on every support query.
+var _puffs: Array[Dictionary] = []
+var _puff_bounds := AABB()
+var _puffs_dirty := true
+
+
+## Marks the flattened puff list stale. Any code that adds a puff after this
+## node is built (the sky course, the stair gates) calls it.
+func invalidate_support_cache() -> void:
+	_puffs_dirty = true
+
+
+func _rebuild_support_cache() -> void:
+	_puffs.clear()
+	_collect_puffs(self)
+	_puffs_dirty = false
+	if _puffs.is_empty():
+		_puff_bounds = AABB()
+		return
+	var first: Dictionary = _puffs[0]
+	_puff_bounds = AABB((first["center"] as Vector3) - (first["axes"] as Vector3), (first["axes"] as Vector3) * 2.0)
+	for puff in _puffs:
+		var centre: Vector3 = puff["center"]
+		var axes: Vector3 = puff["axes"]
+		_puff_bounds = _puff_bounds.merge(AABB(centre - axes, axes * 2.0))
+
+
+func _collect_puffs(node: Node) -> void:
+	for child in node.get_children():
+		if child is MeshInstance3D and child.has_meta("cloud_semi_axes"):
+			var puff := child as MeshInstance3D
+			_puffs.append({
+				"center": puff.global_position,
+				"axes": puff.get_meta("cloud_semi_axes") as Vector3,
+			})
+		elif child.get_child_count() > 0:
+			_collect_puffs(child)
+
+
+## The standable cloud top at a point, or null.
+##
+## Every character and every free blorb asks this, every frame, and a cloud
+## field sits at one place on a course kilometres long: the overwhelmingly
+## common answer is "nowhere near". So the puffs are flattened once and
+## enclosed in one box, and a query outside that box costs a single test
+## instead of a walk of hundreds of nodes with two pow() calls apiece.
 func get_support_height_at(world_x: float, world_z: float, max_surface_y: float = INF) -> Variant:
-	return _support_height_in_children(self, world_x, world_z, max_surface_y)
+	if _puffs_dirty:
+		_rebuild_support_cache()
+	if _puffs.is_empty():
+		return null
+	if (
+		world_x < _puff_bounds.position.x or world_x > _puff_bounds.end.x
+		or world_z < _puff_bounds.position.z or world_z > _puff_bounds.end.z
+		or max_surface_y < _puff_bounds.position.y
+	):
+		return null
+	var best: Variant = null
+	for puff in _puffs:
+		var center: Vector3 = puff["center"]
+		var axes: Vector3 = puff["axes"]
+		# Cheap rejections before the profile maths, which is the expensive
+		# part: most puffs in range across one axis are out across another.
+		if absf(world_x - center.x) > axes.x or absf(world_z - center.z) > axes.z:
+			continue
+		if center.y - axes.y > max_surface_y:
+			continue
+		var horizontal_profile := (
+			pow(absf((world_x - center.x) / axes.x), SuperEgg.EPSILON_SOFT)
+			+ pow(absf((world_z - center.z) / axes.z), SuperEgg.EPSILON_SOFT)
+		)
+		if horizontal_profile > 1.0:
+			continue
+		var top := center.y + axes.y * pow(1.0 - horizontal_profile, 1.0 / SuperEgg.EPSILON_SOFT)
+		if top <= max_surface_y and (best == null or top > (best as float)):
+			best = top
+	return best
 
 
 ## Recurses through every descendant instead of assuming a fixed "cloud ->
@@ -348,6 +426,7 @@ func _build_course_cluster(
 		mesh_instance.mesh = SuperEgg.build_mesh(semi_axes, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
 		mesh_instance.material_override = _material
 		mesh_instance.set_meta("cloud_semi_axes", semi_axes)
+		_puffs_dirty = true
 		mesh_instance.position = data["offset"]
 		cloud.add_child(mesh_instance)
 
