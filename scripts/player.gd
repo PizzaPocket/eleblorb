@@ -34,10 +34,20 @@ const BREATH_DRAIN_RATE := 1.0
 const BREATH_REFILL_RATE := 30.0
 const BREATH_DAMAGE_INTERVAL := 1.1
 const BREATH_DAMAGE_AMOUNT := 4.0
+const SPACE_THRUST := 8.0
+const SPACE_BOOST_THRUST := 14.0
+const SPACE_BRAKE := 10.0
+const SPACE_MAX_SPEED := 18.0
+## The rescue portal sits just below mathematical zero gravity. Let a valid
+## Space propulsion profile take over there so crossing it never leaves the
+## wearer in a short, helpless falling band before the vacuum motor engages.
+const ZERO_G_CONTROL_GRAVITY_THRESHOLD := 0.1
+const FIRE_VACUUM_BREATH_MULTIPLIER := 1.65
 var breath: float = MAX_BREATH
 var _breath_damage_timer := 0.0
 var _last_emitted_breath_full := true
 var _last_emitted_breath_int := -1
+var _remote_space_velocity := Vector3.ZERO
 
 @export var move_speed: float = 6.0
 @export var sprint_multiplier: float = 1.6
@@ -232,6 +242,10 @@ const SNOWBOARD_TERMINAL_SPEED := 150.0
 ## preserves gravity-led acceleration while letting a sustained steep grade
 ## build the speed that a full-size descent would have had time to acquire.
 const SNOWBOARD_GRAVITY_SCALE := 2.15
+## Mesh-scale ripples must not masquerade as jumps. A snowboard only leaves a
+## crest through the automatic trajectory handoff when it carries meaningful
+## upward velocity; explicit Jump remains unaffected.
+const SNOWBOARD_CREST_LAUNCH_MIN_VERTICAL_SPEED := 1.35
 const SNOWBOARD_POSE_SETTLE_SPEED := 7.0
 ## Terrain triangles are sampled across the board's length and their normal
 ## is damped before reaching either rider or deck. Response softens further
@@ -1306,6 +1320,7 @@ var _water_leg_stream_left: GPUParticles3D
 var _water_leg_stream_right: GPUParticles3D
 var _fire_leg_stream_left: GPUParticles3D
 var _fire_leg_stream_right: GPUParticles3D
+var _space_thruster_sound_cooldown := 0.0
 ## LightningBolt, not GPUParticles3D -- see lightning_fx.gd's own class doc
 ## comment for why electric/city need a genuinely different rendering
 ## technique from the water/fire particle-spray streams above.
@@ -1710,7 +1725,10 @@ func _current_blorb_suit_rig_scale() -> float:
 ## instant the Konami Code lands instead of waiting for the next possession
 ## swap or a fresh equip.
 func _apply_blorb_suit_rig_scale() -> void:
-	_blorb_suit.setup(self, visuals, _blorb_suit_pivot_map(_visuals_pivots), _current_blorb_suit_rig_scale())
+	_blorb_suit.setup(
+		self, visuals, _blorb_suit_pivot_map(_visuals_pivots), _current_blorb_suit_rig_scale(),
+		_playable_profile.suit_limb_fit
+	)
 
 
 const HELD_ITEM_SCALE := 0.6
@@ -1813,7 +1831,10 @@ func _ready() -> void:
 	# 1.0 in practice here (_piloting_xiao_hou_zi is always false this early
 	# at startup), but routed through _current_blorb_suit_rig_scale() anyway
 	# so a future default-as-monkey debug session would still fit the suit.
-	_blorb_suit.setup(self, visuals, _blorb_suit_pivot_map(pivots), _current_blorb_suit_rig_scale())
+	_blorb_suit.setup(
+		self, visuals, _blorb_suit_pivot_map(pivots), _current_blorb_suit_rig_scale(),
+		_playable_profile.suit_limb_fit
+	)
 	# Deferred, not called directly here -- sibling Blorb nodes' own _ready()
 	# (which is what actually adds each one to the "blorbs" group
 	# auto_assign_new_members() scans) isn't guaranteed to have already run
@@ -1857,6 +1878,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_space_thruster_sound_cooldown = maxf(_space_thruster_sound_cooldown - delta, 0.0)
+	_clear_space_thrusters()
 	_lava_warning_cooldown = maxf(_lava_warning_cooldown - delta, 0.0)
 	_apply_gamepad_look(delta)
 	_update_throw_input()
@@ -1874,6 +1897,18 @@ func _physics_process(delta: float) -> void:
 			else:
 				_cycle_playable_character(1)
 	_update_sun_wu_kong_summon()
+	# Breath belongs to the human protagonist, not to whichever party body the
+	# camera currently controls. Keep his exposed body breathing (or suffocating)
+	# while Blorbus, Xiao Hou Zi, a mount, or another playable member is active.
+	var controlling_another_body := (
+		_player_following_manchego
+		or _piloting_xiao_hou_zi
+		or is_instance_valid(_controlled_generic_member)
+		or _player_following_blorbus
+	)
+	var atmosphere := AtmosphereLayer.active(get_tree())
+	if controlling_another_body and atmosphere != null and atmosphere.airlessness_at(global_position) > 0.0:
+		_update_breath(delta)
 	# Every branch below hands control to another body and skips
 	# _compose_body_pose(). Starting one mid-flight must not leave the
 	# human following along with a capsule still posed level.
@@ -1919,6 +1954,8 @@ func _physics_process(delta: float) -> void:
 	var was_diving := _lake_diving_active
 	_update_lake_buoyancy(delta)
 	_update_breath(delta)
+	if _update_zero_gravity_movement(delta):
+		return
 	if was_diving and not _lake_diving_active:
 		_lake_diving_just_ended = true
 	var in_water_now := _lake_buoyancy_active
@@ -2053,7 +2090,8 @@ func _physics_process(delta: float) -> void:
 				velocity,delta,_playable_profile,TERMINAL_FALL_SPEED
 			)
 		else:
-			velocity.y = HumanoidLocomotion.apply_gravity(velocity.y, delta, _playable_profile, TERMINAL_FALL_SPEED)
+			var gravity_velocity := HumanoidLocomotion.apply_gravity(velocity.y, delta, _playable_profile, TERMINAL_FALL_SPEED)
+			velocity.y = lerpf(velocity.y, gravity_velocity, _atmosphere_gravity_factor())
 	elif jump_pressed and _giant_goo_active and not giant_jump_ready:
 		# Goo is buoyant, not a fallable jump arc: pressing Jump while inside
 		# it becomes a temporary fast upward swim toward the surface.
@@ -3403,6 +3441,11 @@ func _update_generic_party_control(delta: float) -> void:
 		return
 	if member.has_method("prepare_direct_control_environment"):
 		member.prepare_direct_control_environment(delta)
+	var atmosphere := AtmosphereLayer.active(get_tree())
+	if atmosphere != null and atmosphere.gravity_factor_at(member.global_position) <= ZERO_G_CONTROL_GRAVITY_THRESHOLD:
+		_update_remote_zero_g(member, delta, false)
+		_follow_controlled_party_body(member, delta)
+		return
 	var pitched: bool = member.has_method("uses_pitched_movement_input") and bool(member.uses_pitched_movement_input())
 	var input := _get_move_input()
 	var basis: Basis = camera.global_transform.basis if pitched else camera_rig.global_transform.basis
@@ -3414,6 +3457,47 @@ func _update_generic_party_control(delta: float) -> void:
 	var jump_pressed: bool = Input.is_action_just_pressed("jump") and not UIState.modal_open
 	member.drive_from_player(direction, delta, _is_sprinting(), jump_pressed)
 	_follow_controlled_party_body(member, delta)
+
+
+func _update_remote_zero_g(member: Node3D, delta: float, psychic: bool) -> void:
+	var input := _get_move_input()
+	var direction := camera.global_transform.basis.x * input.x + camera.global_transform.basis.z * input.y
+	var can_thrust := psychic
+	var suit: BlorbSuitController = null
+	var profile_allows_suit_thrust := (
+		member.has_method("has_playable_capability")
+		and bool(member.has_playable_capability(&"zero_gravity_propulsion"))
+	)
+	if profile_allows_suit_thrust and member.has_method("get_own_blorb_suit"):
+		suit = member.get_own_blorb_suit() as BlorbSuitController
+		can_thrust = suit != null and suit.has_space_propulsion()
+	var space_velocity := _remote_space_velocity
+	if member is CharacterBody3D:
+		space_velocity = (member as CharacterBody3D).velocity
+	var braking := Input.is_action_pressed("dismount") and not UIState.modal_open
+	var jets := _space_thruster_names(input, braking)
+	var vertical := _space_vertical_thrust() if suit != null and can_thrust else 0.0
+	var applying_thrust := (input.length_squared() > 0.0001 or absf(vertical) > 0.001) and can_thrust
+	if applying_thrust:
+		var thrust := SPACE_BOOST_THRUST if _is_sprinting() else SPACE_THRUST
+		space_velocity += direction * thrust * delta
+		space_velocity += Vector3.UP * vertical * thrust * delta
+	if braking:
+		space_velocity = space_velocity.move_toward(Vector3.ZERO, SPACE_BRAKE * delta)
+	if suit != null:
+		# Explicit branch, not a ternary -- see _update_zero_gravity_movement().
+		var active_jets: Array[String] = []
+		if applying_thrust or braking:
+			active_jets = jets
+		suit.set_space_thrusters(active_jets, 1.0 if _is_sprinting() else 0.6)
+		_pulse_space_thruster_sound(member, applying_thrust or braking, _is_sprinting())
+	space_velocity = space_velocity.limit_length(SPACE_MAX_SPEED)
+	_remote_space_velocity = space_velocity
+	if member is CharacterBody3D:
+		(member as CharacterBody3D).velocity = space_velocity
+		(member as CharacterBody3D).move_and_slide()
+	else:
+		member.global_position += space_velocity * delta
 
 
 func _legacy_toggle_blorbus_control() -> void:
@@ -3735,6 +3819,11 @@ func _update_manchego_control(delta: float) -> void:
 	# while _player_following_manchego is true.
 	var jump_pressed := Input.is_action_just_pressed("jump") and not UIState.modal_open
 	_controlled_manchego.drive_from_player(direction, delta, _is_sprinting(), jump_pressed)
+	# Mounting transfers locomotion to Manchego, not the rider's suit inputs.
+	# Keep the same power state machine alive so projectiles and continuous
+	# streams can be aimed from the saddle.
+	if _mounted_rider == self:
+		_update_limb_power_state(delta)
 
 	var offset := _controlled_manchego.global_position - global_position
 	offset.y = 0.0
@@ -3761,8 +3850,9 @@ func _update_manchego_control(delta: float) -> void:
 	# back instead.
 	if _mounted_rider == self:
 		_apply_manchego_seated_pose(delta)
+		_apply_arm_power_poses(delta)
 	elif is_instance_valid(_mounted_rider) and _mounted_rider.has_method("update_mounted_pose"):
-		_mounted_rider.update_mounted_pose(_controlled_manchego.get_seat_transform(), delta)
+		_mounted_rider.update_mounted_pose(_controlled_manchego.get_rider_transform(_mounted_rider), delta)
 
 
 ## Seats the rider astride Manchego's back -- see RIDE_HIP_BEND's own doc
@@ -3800,7 +3890,7 @@ func _apply_manchego_seated_pose(delta: float) -> void:
 	_elbow_left.rotation.z = lerp_angle(_elbow_left.rotation.z, -signf(_arm_left.position.x) * RIDE_ELBOW_INWARD, t)
 	_elbow_right.rotation.z = lerp_angle(_elbow_right.rotation.z, -signf(_arm_right.position.x) * RIDE_ELBOW_INWARD, t)
 
-	var seat_transform := _controlled_manchego.get_seat_transform()
+	var seat_transform := _controlled_manchego.get_rider_transform(self)
 	var hip_bottom_local_offset := Vector3(0, ProceduralFigure.HIP_PIVOT_Y, 0) * HEIGHT_SCALE
 	visuals.global_transform = Transform3D(
 		seat_transform.basis, seat_transform.origin - seat_transform.basis * hip_bottom_local_offset
@@ -3875,6 +3965,11 @@ func _update_xiao_hou_zi_control(delta: float) -> void:
 		return
 	var input := _get_move_input()
 	_controlled_xiao_hou_zi.prepare_direct_control_environment(delta)
+	var atmosphere := AtmosphereLayer.active(get_tree())
+	if atmosphere != null and atmosphere.gravity_factor_at(_controlled_xiao_hou_zi.global_position) <= ZERO_G_CONTROL_GRAVITY_THRESHOLD:
+		_update_remote_zero_g(_controlled_xiao_hou_zi, delta, false)
+		_follow_controlled_party_body(_controlled_xiao_hou_zi, delta)
+		return
 	var basis := (
 		camera.global_transform.basis
 		if _controlled_xiao_hou_zi.uses_pitched_movement_input()
@@ -3902,6 +3997,17 @@ func _begin_following_as_shell() -> void:
 
 func _follow_controlled_party_body(target: Node3D, delta: float) -> void:
 	var offset := target.global_position - global_position
+	var atmosphere := AtmosphereLayer.active(get_tree())
+	if atmosphere != null and atmosphere.gravity_factor_at(global_position) <= ZERO_G_CONTROL_GRAVITY_THRESHOLD:
+		if offset.length() > PLAYER_FOLLOW_DISTANCE:
+			velocity = offset.normalized() * move_speed
+		elif offset.length() < PLAYER_FOLLOW_ARRIVE_DISTANCE:
+			velocity = velocity.move_toward(Vector3.ZERO, move_speed * delta)
+		move_and_slide()
+		_footsteps_were_moving = false
+		_animate_relaxed_floating(delta)
+		_compose_body_pose(delta, false, false, true)
+		return
 	offset.y = 0.0
 	if offset.length() > PLAYER_FOLLOW_DISTANCE:
 		var follow_dir := offset.normalized()
@@ -3930,6 +4036,11 @@ func _update_blorbus_control(delta: float) -> void:
 	var controlled: Node3D = _current_controlled_body()
 	if not is_instance_valid(controlled):
 		_end_blorbus_control()
+		return
+	var atmosphere := AtmosphereLayer.active(get_tree())
+	if atmosphere != null and atmosphere.gravity_factor_at(controlled.global_position) <= ZERO_G_CONTROL_GRAVITY_THRESHOLD:
+		_update_remote_zero_g(controlled, delta, true)
+		_follow_controlled_party_body(controlled, delta)
 		return
 	var input := _get_move_input()
 	var basis := camera_rig.global_transform.basis
@@ -7110,6 +7221,9 @@ const MAX_TERRAIN_FOLLOW_HEIGHT := 3.0
 ## falls out naturally here -- _update_breath() below only ever looks at
 ## this function's CURRENT return value, never a cached one.
 func _has_air_supply() -> bool:
+	var atmosphere := AtmosphereLayer.active(get_tree())
+	if atmosphere != null and atmosphere.airlessness_at(global_position) > 0.0:
+		return _blorb_suit.has_space_life_support()
 	return _blorb_suit.has_head_air_supply()
 
 
@@ -7130,7 +7244,10 @@ var _in_lava_area_now: bool = false
 func _in_airless_area() -> bool:
 	if not has_playable_capability(&"needs_breath"):
 		return false
-	return _lake_buoyancy_active and not _in_lava_area_now and not _face_above_water()
+	var underwater := _lake_buoyancy_active and not _in_lava_area_now and not _face_above_water()
+	var atmosphere := AtmosphereLayer.active(get_tree())
+	var vacuum := atmosphere != null and atmosphere.is_vacuum_at(global_position)
+	return underwater or vacuum
 
 
 ## Every water state (surface swimming included) runs through lake buoyancy,
@@ -7152,7 +7269,13 @@ func _face_above_water() -> bool:
 func _update_breath(delta: float) -> void:
 	var needs_air := _in_airless_area() and not _has_air_supply()
 	if needs_air:
-		breath = maxf(breath - BREATH_DRAIN_RATE * delta, 0.0)
+		var drain := BREATH_DRAIN_RATE
+		var atmosphere := AtmosphereLayer.active(get_tree())
+		if atmosphere != null:
+			drain *= lerpf(1.0, 1.5, atmosphere.airlessness_at(global_position))
+			if _left_arm_fire_active or _right_arm_fire_active or _left_leg_fire_active or _right_leg_fire_active:
+				drain *= FIRE_VACUUM_BREATH_MULTIPLIER
+		breath = maxf(breath - drain * delta, 0.0)
 	else:
 		breath = minf(breath + BREATH_REFILL_RATE * delta, MAX_BREATH)
 	var rounded := roundi(breath)
@@ -7171,6 +7294,101 @@ func _update_breath(delta: float) -> void:
 			take_damage(BREATH_DAMAGE_AMOUNT)
 	else:
 		_breath_damage_timer = BREATH_DAMAGE_INTERVAL
+
+
+func _atmosphere_gravity_factor() -> float:
+	var atmosphere := AtmosphereLayer.active(get_tree())
+	return atmosphere.gravity_factor_at(global_position) if atmosphere != null else 1.0
+
+
+func _update_zero_gravity_movement(delta: float) -> bool:
+	var atmosphere := AtmosphereLayer.active(get_tree())
+	if atmosphere == null or atmosphere.gravity_factor_at(global_position) > ZERO_G_CONTROL_GRAVITY_THRESHOLD:
+		return false
+	var input := _get_move_input()
+	var basis := camera.global_transform.basis
+	var thrust_direction := basis.x * input.x + basis.z * input.y
+	var can_thrust := has_playable_capability(&"zero_gravity_propulsion") and _blorb_suit.has_space_propulsion()
+	var braking := Input.is_action_pressed("dismount") and not UIState.modal_open
+	var vertical := _space_vertical_thrust() if can_thrust else 0.0
+	var applying_thrust := (thrust_direction.length_squared() > 0.0001 or absf(vertical) > 0.001) and can_thrust
+	if applying_thrust:
+		var thrust := SPACE_BOOST_THRUST if _is_sprinting() else SPACE_THRUST
+		velocity += thrust_direction * thrust * delta
+		velocity += Vector3.UP * vertical * thrust * delta
+	if braking:
+		velocity = velocity.move_toward(Vector3.ZERO, SPACE_BRAKE * delta)
+	# Built through an explicit branch, not a ternary: a `[]` literal is an
+	# untyped Array, which types the whole expression as Array and fails the
+	# assignment to an Array[String] at runtime.
+	var active_jets: Array[String] = []
+	if applying_thrust or braking:
+		active_jets = _space_thruster_names(input, braking)
+	_blorb_suit.set_space_thrusters(active_jets, 1.0 if _is_sprinting() else 0.6)
+	_pulse_space_thruster_sound(self, applying_thrust or braking, _is_sprinting())
+	velocity = velocity.limit_length(SPACE_MAX_SPEED)
+	move_and_slide()
+	if velocity.length_squared() > 0.01:
+		_body_yaw = lerp_angle(_body_yaw, atan2(velocity.x, velocity.z), minf(3.0 * delta, 1.0))
+	_footsteps_were_moving = false
+	_landing_timer = 0.0
+	_animate_relaxed_floating(delta)
+	_compose_body_pose(delta, false, false, true)
+	return true
+
+
+func _space_vertical_thrust() -> float:
+	var upward := 0.0
+	var downward := 0.0
+	if Input.is_action_pressed("left_leg_power"):
+		upward += 0.5
+	if Input.is_action_pressed("right_leg_power"):
+		upward += 0.5
+	if Input.is_action_pressed("left_arm_power"):
+		downward += 0.5
+	if Input.is_action_pressed("right_arm_power"):
+		downward += 0.5
+	return upward - downward
+
+
+func _space_thruster_names(input: Vector2, braking: bool) -> Array[String]:
+	if braking:
+		return ["back", "chest", "side_left", "side_right", "shoulder_left", "shoulder_right", "foot_left", "foot_right"]
+	var names: Array[String] = []
+	if input.y < -0.05:
+		names.append("back")
+	elif input.y > 0.05:
+		names.append("chest")
+	if input.x > 0.05:
+		names.append("side_left")
+	elif input.x < -0.05:
+		names.append("side_right")
+	if Input.is_action_pressed("left_leg_power"):
+		names.append("foot_left")
+	if Input.is_action_pressed("right_leg_power"):
+		names.append("foot_right")
+	if Input.is_action_pressed("left_arm_power"):
+		names.append("shoulder_left")
+	if Input.is_action_pressed("right_arm_power"):
+		names.append("shoulder_right")
+	return names
+
+
+func _clear_space_thrusters() -> void:
+	var no_thrusters: Array[String] = []
+	_blorb_suit.set_space_thrusters(no_thrusters)
+	for member in [_controlled_xiao_hou_zi, _controlled_generic_member]:
+		if is_instance_valid(member) and member.has_method("get_own_blorb_suit"):
+			var suit := member.get_own_blorb_suit() as BlorbSuitController
+			if suit != null:
+				suit.set_space_thrusters(no_thrusters)
+
+
+func _pulse_space_thruster_sound(source: Node3D, active: bool, boosted: bool) -> void:
+	if not active or _space_thruster_sound_cooldown > 0.0:
+		return
+	UISounds.play_foley(&"space_thruster", 0.22 if boosted else 0.12, source.get_instance_id())
+	_space_thruster_sound_cooldown = 0.24 if boosted else 0.32
 
 
 ## Lake buoyancy deliberately shares the giant's direct positional lift
@@ -8352,6 +8570,10 @@ func _snap_to_terrain(delta: float,pre_move_position: Vector3) -> void:
 		# during the first airborne frames.
 		if _dirtbike_was_climbing:
 			_dirtbike_was_climbing = false
+			if _snowboard_active and _dirtbike_surface_velocity.y < SNOWBOARD_CREST_LAUNCH_MIN_VERTICAL_SPEED:
+				global_position.y = target_h + FOOT_OFFSET
+				velocity.y = 0.0
+				return
 			velocity = _dirtbike_surface_velocity
 			if _dirtbike_wheel_active:
 				velocity.y *= sqrt(DIRTBIKE_JUMP_HEIGHT_MULTIPLIER)
