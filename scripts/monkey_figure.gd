@@ -333,9 +333,12 @@ const TAIL_ANIM_YAW_HOLD_MAX := 3.8
 ##          marker. There is no hand segment, so a wrist twist or a palm roll
 ##          rotates nothing and a fingertip offset does not exist.
 ##   leg:   MonkeyHipPivot > MonkeyKneePivot > MonkeyAnkleMarker
-##          "ankle_left" and "toe_left" are that one marker, and it has NO
-##          children. Rotating the ankle moves nothing at all: no foot mesh
-##          hangs off it. The human rig instead runs
+##          "ankle_left" and "toe_left" are that one marker, and nothing is
+##          parented to it: the leg and foot are one procedural tube rebuilt
+##          each frame under the rig root. The ankle nonetheless articulates
+##          the foot now, because _rebuild_footed_leg() builds the foot's
+##          frame from that marker's basis (see its own comment for the
+##          decision it reverses). The human rig instead runs
 ##          hip > LegTilt > KneePivot > AnklePivot > foot mesh > ToeAttach.
 ##   spine: SpinePivot > HeadPivot, with no thorax, neck, abdomen or chest
 ##          pivot between them. Poses that twist a thorax or bend a neck have
@@ -1352,14 +1355,28 @@ static func _rebuild_footed_leg(
 	var hip_pos := root.to_local(hip.global_position)
 	var knee_pos := root.to_local(knee.global_position)
 	var ankle_pos := root.to_local(ankle.global_position)
-	# The compatibility ankle marker still receives the shared human
-	# controller's ankle rotations, but visible monkey geometry must remain a
-	# single knee-driven pear. Build its lower frame from the knee basis and
-	# ankle POSITION only, deliberately ignoring ankle.global_transform.basis.
+	# The foot follows the ankle. This REVERSES an earlier decision, recorded
+	# here so the reversal is not mistaken for drift: the lower frame used to
+	# be built from the knee's basis and the ankle's POSITION only, ignoring
+	# ankle.global_transform.basis, to keep the leg one continuous knee-driven
+	# pear rather than reading as a leg followed by a foot bend.
+	#
+	# That kept his silhouette intact, but it also silently discarded every
+	# ankle angle written to him -- his walk settle, his skating, his swimming
+	# and his dirt bike all write one -- which is why four foot poses looked
+	# stiff on him and no amount of tuning them changed anything. Powers are
+	# becoming shared across characters (see
+	# docs/traversal_powers_architecture.md), so his foot has to be able to
+	# articulate like the human's.
+	#
+	# At rest the ankle marker carries no rotation of its own, so its basis
+	# IS the knee's and the geometry is unchanged: verified by rebuilding the
+	# leg both ways and comparing the mesh, which is identical to the vertex.
+	# Only a pose that actually turns the ankle now bends the foot.
 	var root_basis_inverse := root.global_transform.basis.inverse()
-	var lower_up := (root_basis_inverse * (knee.global_transform.basis * Vector3.UP)).normalized()
+	var lower_up := (root_basis_inverse * (ankle.global_transform.basis * Vector3.UP)).normalized()
 	var lower_forward := (
-		root_basis_inverse * (knee.global_transform.basis * Vector3(0, 0, 1))
+		root_basis_inverse * (ankle.global_transform.basis * Vector3(0, 0, 1))
 	).normalized()
 	# A strictly descending sequence with small progressive forward shifts:
 	# this is one continuous pear profile, not a leg followed by a foot bend.
