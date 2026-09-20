@@ -170,6 +170,11 @@ const DEFAULT_ELBOW_BEND := deg_to_rad(25.0)
 const ARM_RADIUS_SHOULDER := 0.0055
 const ARM_RADIUS_ELBOW := 0.009
 const ARM_RADIUS_WRIST := 0.0135
+## Where the inserted thorax and neck pivots sit: the thorax this far up the
+## body, the neck this far below the head. Both are rotation-free at rest, so
+## these choose where a twist or a nod bends from, nothing else.
+const THORAX_HEIGHT_FRACTION := 0.55
+const NECK_DROP := 0.02
 # The leg widens continuously from its top into the foot bulb. Keeping each
 # successive control radius larger prevents a sudden bell at the ankle.
 const LEG_RADIUS_HIP := 0.013
@@ -340,9 +345,10 @@ const TAIL_ANIM_YAW_HOLD_MAX := 3.8
 ##          frame from that marker's basis (see its own comment for the
 ##          decision it reverses). The human rig instead runs
 ##          hip > LegTilt > KneePivot > AnklePivot > foot mesh > ToeAttach.
-##   spine: SpinePivot > HeadPivot, with no thorax, neck, abdomen or chest
-##          pivot between them. Poses that twist a thorax or bend a neck have
-##          nowhere to write on this rig.
+##   spine: SpinePivot > MonkeyThoraxPivot > MonkeyNeckPivot > HeadPivot.
+##          The thorax and neck were added later (they carry no rotation at
+##          rest, so the rig is unchanged by their presence); there is still
+##          no abdomen or chest pivot.
 ##
 ## Rotation directions, where a joint does exist, match the human rig exactly,
 ## so a pose's SIGNS port across unchanged even though its reachable joints do
@@ -422,7 +428,23 @@ static func build(
 	# instruction ("their head should be tilted upward... since they're
 	# leaning forward so much").
 	head_pivot.rotation.x = -spine_forward_bend * (1.0 + (variant.get("head_tilt_factor", 0.0) as float))
-	spine_pivot.add_child(head_pivot)
+	# A thorax and a neck between the spine and the head. This rig has never
+	# had either, so every pose that twists a thorax or bends a neck -- the
+	# snowboard's torso twist, the pitched swimming and flight body -- had
+	# nowhere to write and did nothing on him. Both are inserted carrying no
+	# rotation of their own, and head_pivot's own position is rebased through
+	# them, so the rig is identical at rest and only a pose that actually
+	# turns one of them changes anything.
+	var thorax_pivot := Node3D.new()
+	thorax_pivot.name = "MonkeyThoraxPivot"
+	thorax_pivot.position = Vector3(0, body_height * THORAX_HEIGHT_FRACTION, 0)
+	spine_pivot.add_child(thorax_pivot)
+	var neck_pivot := Node3D.new()
+	neck_pivot.name = "MonkeyNeckPivot"
+	neck_pivot.position = Vector3(0, head_pivot.position.y - NECK_DROP - thorax_pivot.position.y, 0)
+	thorax_pivot.add_child(neck_pivot)
+	head_pivot.position -= thorax_pivot.position + neck_pivot.position
+	neck_pivot.add_child(head_pivot)
 	var head_mesh := SuperEgg.build_part(head_size, fur_color, HEAD_EPSILON, HEAD_EPSILON)
 	head_mesh.material_override = _build_fur_material(fur_color)
 	head_mesh.position = Vector3(0, head_size.y, 0)
@@ -452,6 +474,8 @@ static func build(
 
 	var pivots := {
 		"spine": spine_pivot,
+		"thorax": thorax_pivot,
+		"neck": neck_pivot,
 		"head": head_pivot,
 		"eyes": eyes,
 		"hips": body,  # no separate pelvis mesh -- see this file's own class doc
@@ -525,6 +549,11 @@ static func _build_leg(
 	var ankle_marker := Node3D.new()
 	ankle_marker.name = "MonkeyAnkleMarker"
 	ankle_marker.position = Vector3(0, -leg_lower_len, 0)
+	# Nothing is parented to this marker, yet the foot does follow it: the leg
+	# is one tube rebuilt each frame from the marker's basis (see
+	# _rebuild_footed_leg()). Declare that, because nothing about the scene
+	# graph reveals it and a pose needs to know the ankle is worth writing to.
+	ankle_marker.set_meta(RigAdapter.DRIVES_GEOMETRY_META, true)
 	knee_pivot.add_child(ankle_marker)
 
 	var mesh_instance := MeshInstance3D.new()

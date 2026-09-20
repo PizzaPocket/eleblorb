@@ -20,6 +20,10 @@ extends RefCounted
 
 enum Joint { REAL, ALIASED, ABSENT }
 
+## A joint carrying this marks itself as driving geometry that no scene-graph
+## inspection can find, because a per-frame rebuild realises it instead.
+const DRIVES_GEOMETRY_META := &"rig_drives_geometry"
+
 var _joints: Dictionary = {}
 ## Aliased names, mapped to the first name that claimed the same node.
 var _aliases: Dictionary = {}
@@ -76,6 +80,15 @@ func articulates(name: String) -> bool:
 		return false
 	if _measured.has(name):
 		return bool(_measured[name])
+	# A rig whose geometry is rebuilt each frame rather than parented to its
+	# joints can say so itself, because no amount of watching the scene graph
+	# will reveal it: Xiao Hou Zi's foot follows his ankle marker through
+	# MonkeyFigure's own limb rebuild, with nothing hanging off that marker at
+	# all (see _rebuild_footed_leg()).
+	var declared := joint(name)
+	if declared != null and bool(declared.get_meta(DRIVES_GEOMETRY_META, false)):
+		_measured[name] = true
+		return true
 	# Either test alone has a blind spot: a joint can drive a mesh of its own
 	# with no joint below it (the head), or drive a mesh that is not its child
 	# at all through a rebuild (Xiao Hou Zi's whole limbs). A joint needs only
