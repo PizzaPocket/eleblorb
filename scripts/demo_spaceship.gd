@@ -47,6 +47,9 @@ const PANEL := Color(0.74, 0.78, 0.85)
 const SCREEN := Color(0.52, 0.86, 1.0)
 const STRIP_LIGHT := Color(0.66, 0.92, 1.0)
 
+## The escape pod, mounted outside the blorb hatch (see escape_pod.gd).
+var escape_pod: EscapePod
+
 var _was_inside := false
 
 
@@ -80,6 +83,7 @@ func _build_ship() -> void:
 	_build_cabin_collision()
 	_build_interior_fittings()
 	_build_stack()
+	_build_escape_pod()
 
 
 ## The core stage itself: one hollow shell, its doorway cut straight through.
@@ -245,6 +249,19 @@ func _console(at: Vector3, side: float) -> void:
 		lit.emission_energy_multiplier = 1.4
 	body.add_child(screen)
 	CollisionPolicy.mark_decorative(screen)
+
+
+## The pod hangs on the flank directly outside the blorb hatch, turned so its
+## own opening faces back through that hatch. Its shell is authored with the
+## opening on +X, so a half turn about Y points it at the hull.
+func _build_escape_pod() -> void:
+	escape_pod = EscapePod.new()
+	escape_pod.name = "EscapePod"
+	escape_pod.position = Vector3(
+		HULL_RADIUS + EscapePod.POD_RADIUS - 0.6, HATCH_CENTER.y, HATCH_CENTER.x
+	)
+	escape_pod.rotation.y = PI
+	add_child(escape_pod)
 
 
 ## Everything outside the pressure hull: the nose stack, the two strap-on

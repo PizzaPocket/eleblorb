@@ -270,7 +270,14 @@ const VOLCANO_CENTER := Vector2(5347.5, 0.0)
 const VOLCANO_HALF_LENGTH := 255.0
 const VOLCANO_RISE := 54.0
 const HUMONGOUS_CLEARING := Vector2(5705.0, -8.0)
-const HUMONGOUS_CLEAR_RADIUS := 72.0
+## Humongous stands on a broad plain at the end of the course, not a pad cut
+## barely wider than his own feet: room to walk around him, to land an escape
+## pod beside him, and to fight. Its own generous blend carries it out to the
+## volcano's skirt rather than ending in a drop.
+## Sized to the ground that actually exists between the volcano's skirt and
+## the island's own east cliff, rather than any larger.
+const HUMONGOUS_CLEAR_RADIUS := 105.0
+const HUMONGOUS_CLEAR_BLEND := 75.0
 
 const STONE := Color(0.52, 0.5, 0.47)
 const CLIFF_ROCK := Color(0.42, 0.4, 0.38)
@@ -789,7 +796,7 @@ func _raw_height(x: float, z: float) -> float:
 		var dinosaur_height := _dirt_window.height(DINOSAUR_CLEARING) + _course_elevation(DINOSAUR_CLEARING.x)
 		height = lerpf(height, dinosaur_height, dinosaur_clear)
 	var humongous_clear := 1.0 - smoothstep(
-		HUMONGOUS_CLEAR_RADIUS, HUMONGOUS_CLEAR_RADIUS + TITAN_CLEAR_BLEND,
+		HUMONGOUS_CLEAR_RADIUS, HUMONGOUS_CLEAR_RADIUS + HUMONGOUS_CLEAR_BLEND,
 		point.distance_to(HUMONGOUS_CLEARING)
 	)
 	if humongous_clear > 0.0:

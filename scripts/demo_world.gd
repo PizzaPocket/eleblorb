@@ -149,6 +149,15 @@ func _add_space_zone() -> void:
 	_spaceship.position = Vector3(DemoWorldTerrain.VOLCANO_CENTER.x - 58.0, SPACESHIP_Y, DemoWorldTerrain.VOLCANO_CENTER.y)
 	_spaceship.cabin_entered.connect(_on_spaceship_cabin_entered)
 	add_child(_spaceship)
+	# The pod exists once the ship has built itself, so this follows the add.
+	# It rides back down to the ground beside Humongous.
+	var landing := DemoWorldTerrain.HUMONGOUS_CLEARING
+	_spaceship.escape_pod.landing_point = Vector3(
+		landing.x + 22.0,
+		_terrain.get_mesh_height(landing.x + 22.0, landing.y + 16.0) + EscapePod.POD_HALF_LENGTH,
+		landing.y + 16.0
+	)
+	_spaceship.escape_pod.impacted.connect(_on_escape_pod_impact)
 
 
 ## The Primate Kingdom's own jungle scatter, windowed onto the plant biome at
@@ -320,11 +329,21 @@ func _spawn_blorbus_in_spaceship() -> void:
 	_space_blorbus.blorb_name = "Blorbus"
 	_space_blorbus.in_party = false
 	_space_blorbus.can_join_party = false
-	# Well inside the pressure threshold, visible through the large entrance.
-	_space_blorbus.position = _spaceship.to_global(Vector3(0.0, 0.5, 8.0))
+	# Standing on the cabin deck, well inside the pressure threshold and in
+	# view of the doorway.
+	_space_blorbus.position = _spaceship.to_global(
+		Vector3(0.0, DemoSpaceship.DECK_Y + 0.6, 8.0)
+	)
 	add_child(_space_blorbus)
 	_space_blorbus.become_blorbus()
 	_space_blorbus.wait_here()
+
+
+## The pod's arrival. The ground deformation it should punch in waits on the
+## terrain collider being split into chunks; for now it announces itself.
+func _on_escape_pod_impact(at: Vector3) -> void:
+	UISounds.play_foley(&"giant_step", 1.0, get_instance_id())
+	print_verbose("Escape pod down at ", at)
 
 
 func _on_spaceship_cabin_entered() -> void:
