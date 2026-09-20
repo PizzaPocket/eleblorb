@@ -18,6 +18,11 @@ extends Node
 
 const GAME_HOURS_PER_REAL_SECOND := 1.0 / 60.0
 
+## Leave negative to inherit the persistent shared world clock. Purpose-built
+## test/demo scenes may set an explicit starting hour without changing how
+## ordinary kingdom travel preserves time of day.
+@export_range(-1.0, 23.99, 0.01) var initial_time_override := -1.0
+
 ## Each entry: game hour, sky top/horizon color, sun color/energy, fog
 ## color, the sun's elevation angle (radians above the horizon, negative =
 ## below it), and "night" (0..1, how deep into night we are -- drives
@@ -105,14 +110,20 @@ var game_time_hours: float = WorldState.MORNING_HOUR
 
 @onready var _light: DirectionalLight3D = get_node("../DirectionalLight3D")
 @onready var _world_environment: WorldEnvironment = get_node("../WorldEnvironment")
-@onready var _clouds: CloudScatter = get_node("../Clouds")
 var _environment: Environment
 var _sky_material: ProceduralSkyMaterial
 var _moon: MeshInstance3D
 var _moon_material: StandardMaterial3D
 var _star_field: StarField
 var _lanterns: Array[Node] = []
+## How often the sky, fog, clouds and lanterns are re-tinted: about fifteen
+## times a second, against a day that takes minutes to pass.
+const PRESENTATION_INTERVAL := 1.0 / 15.0
+var _presentation_timer := 0.0
+var _cloud_scatters: Array[Node] = []
+var _cloud_refresh_timer := 0.0
 var _lantern_refresh_timer := 0.0
+var _base_fog_density := 0.0
 
 
 func _ready() -> void:
@@ -120,8 +131,11 @@ func _ready() -> void:
 	# than inheriting a future scene-root process mode that might continue
 	# during pause for menu or transition purposes.
 	process_mode = Node.PROCESS_MODE_PAUSABLE
+	if initial_time_override >= 0.0:
+		WorldState.game_time_hours = fposmod(initial_time_override, 24.0)
 	game_time_hours = WorldState.game_time_hours
 	_environment = _world_environment.environment
+	_base_fog_density = _environment.fog_density
 	_sky_material = _environment.sky.sky_material as ProceduralSkyMaterial
 	# See this file's own docstring -- fog no longer touches the sky at all.
 	_environment.fog_sky_affect = 0.0
@@ -174,6 +188,15 @@ func _process(delta: float) -> void:
 	if game_time_hours < previous_hour:
 		WorldState.calendar_day += 1
 	WorldState.game_time_hours = game_time_hours
+	# The clock advances every frame; the PRESENTATION of it does not need to.
+	# Re-tinting the sky, the fog, every cloud field and every lantern sixty
+	# times a second buys nothing the eye can see over a day lasting minutes,
+	# and dirtying the sky material each frame forces its radiance to be
+	# rebuilt continuously.
+	_presentation_timer -= delta
+	if _presentation_timer > 0.0:
+		return
+	_presentation_timer = PRESENTATION_INTERVAL
 	_lantern_refresh_timer -= delta
 	if _lantern_refresh_timer <= 0.0:
 		# City blocks can stream in/out after this node is ready. Cache the
@@ -185,6 +208,11 @@ func _process(delta: float) -> void:
 
 func _apply_time() -> void:
 	var kf := _blend_keyframes(game_time_hours)
+	var space_factor := 0.0
+	var atmosphere := AtmosphereLayer.active(get_tree())
+	var active_camera := get_viewport().get_camera_3d()
+	if atmosphere != null and active_camera != null:
+		space_factor = atmosphere.sky_darkening_at(active_camera.global_position)
 	var elevation: float = kf["elevation"]
 	# World-space compass convention, verified in the playable scene: +X is
 	# east and -Z is north. This puts the sun due east at 06:00, due south
@@ -207,15 +235,33 @@ func _apply_time() -> void:
 	_light.light_color = kf["sun_color"]
 	_light.light_energy = kf["sun_energy"]
 
-	_sky_material.sky_top_color = kf["sky_top"]
-	_sky_material.sky_horizon_color = kf["sky_horizon"]
-	_sky_material.ground_horizon_color = kf["sky_horizon"]
+	var space_black := Color(0.002, 0.001, 0.008)
+	var planet_limb_glow := Color(0.055, 0.022, 0.10)
+	var planet_nightside := Color(0.010, 0.006, 0.025)
+	_sky_material.sky_top_color = (kf["sky_top"] as Color).lerp(space_black, space_factor)
+	_sky_material.sky_horizon_color = (kf["sky_horizon"] as Color).lerp(space_black, space_factor)
+	# The lower hemisphere is empty sky behind the separately rendered ocean
+	# planet. In space it becomes a restrained violet atmospheric limb rather
+	# than retaining a flat ocean-blue background or blacking out the planet.
+	_sky_material.ground_horizon_color = (kf["sky_horizon"] as Color).lerp(planet_limb_glow, space_factor)
+	_sky_material.ground_bottom_color = (kf["sky_top"] as Color).darkened(0.35).lerp(planet_nightside, space_factor)
 
-	_environment.fog_light_color = kf["fog_color"]
+	_environment.fog_light_color = (kf["fog_color"] as Color).lerp(space_black, space_factor)
+	_environment.fog_density = lerpf(_base_fog_density, 0.0, space_factor)
 
 	var night_factor: float = kf["night"]
-	_clouds.set_night_factor(night_factor)
-	_star_field.set_night_factor(night_factor)
+	# DemoWorld has both ordinary valley clouds and a separate Air-zone layer.
+	# Both are CloudScatter instances and must share the same lighting state.
+	# Cached like the lanterns already are: this allocated a fresh array of
+	# the whole group every single frame.
+	if _cloud_refresh_timer <= 0.0:
+		_cloud_scatters.assign(get_tree().get_nodes_in_group("cloud_scatters"))
+		_cloud_refresh_timer = 1.0
+	_cloud_refresh_timer -= PRESENTATION_INTERVAL
+	for cloud_scatter in _cloud_scatters:
+		if cloud_scatter is CloudScatter:
+			(cloud_scatter as CloudScatter).set_night_factor(night_factor)
+	_star_field.set_night_factor(maxf(night_factor, space_factor))
 	_apply_moon(sun_dir)
 	_apply_lanterns(night_factor)
 

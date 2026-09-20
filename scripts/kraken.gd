@@ -58,7 +58,28 @@ func _ready() -> void:
 	_update(0.0, 0.0)
 
 
+## How near the driven body has to be before this animates at all, and how
+## often that is rechecked. Every frame it runs, it writes ninety-eight
+## collider transforms and twelve tentacles' worth of rotations; from the
+## other end of the course none of that can be seen.
+const SIMULATE_RADIUS := 420.0
+const PRESENCE_RECHECK := 0.5
+
+var _nearby := false
+var _presence_recheck := 0.0
+
+
 func _physics_process(delta: float) -> void:
+	_presence_recheck -= delta
+	if _presence_recheck <= 0.0:
+		_presence_recheck = PRESENCE_RECHECK
+		var driven := PartyControl.active_control_body()
+		_nearby = (
+			is_instance_valid(driven)
+			and driven.global_position.distance_to(global_position) <= SIMULATE_RADIUS
+		)
+	if not _nearby:
+		return
 	_time += delta
 	_update(_time, delta)
 

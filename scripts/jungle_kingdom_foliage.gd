@@ -284,7 +284,12 @@ func _update_lod() -> void:
 		if not is_instance_valid(collider):
 			continue
 		var active: bool = collider.global_position.distance_to(player.global_position) <= LOD_COLLISION_RADIUS
-		collider.collision_layer = int(collider.get_meta("lod_collision_layer")) if active else 0
+		# Writing a collision layer costs a physics-server round trip even
+		# when the value is unchanged, which for a static forest is almost
+		# always. Only write on an actual change.
+		var wanted: int = int(collider.get_meta("lod_collision_layer")) if active else 0
+		if collider.collision_layer != wanted:
+			collider.collision_layer = wanted
 
 
 ## Resolves `instance`'s own NatureProps-authored canopy blobs (see that
