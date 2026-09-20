@@ -217,9 +217,13 @@ const DIRT_COURSE_BANK_HEIGHT := 2.4
 ## A broad clear arrival into the Ground zone. The imported kingdom sample
 ## contains a large wash crossing this exact seam; retain its rugged terrain
 ## farther in, but do not greet the bike with a perpendicular trench.
-const DIRT_ENTRY_APRON_LENGTH := 105.0
-const DIRT_ENTRY_APRON_HALF_WIDTH := 96.0
-const DIRT_ENTRY_APRON_SHOULDER := 28.0
+const DIRT_ENTRY_APRON_LENGTH := 300.0
+const DIRT_ENTRY_APRON_HALF_WIDTH := 130.0
+## Wide, because the apron has to let go of the imported kingdom ground
+## across its width as gradually as it does along its length: a short
+## shoulder stood the same wall sideways.
+const DIRT_ENTRY_APRON_SHOULDER := 110.0
+const DIRT_ENTRY_APRON_RELEASE := 220.0
 ## Broad titan clearings: level enough for their planted feet and short roam
 ## cycles, but softly blended back into each biome rather than reading as
 ## artificial square pads.
@@ -256,8 +260,13 @@ const CLIFF_FACE_WIDTH := 25.0
 ## runs on under the volcano's near slope: the volcanic body itself is the
 ## basin's far shore, with no seam between them.
 const CHASM_LAVA_LEVEL := CHASM_FLOOR - 6.0
-const LAVA_LAKE_RADIUS := 105.0
-const LAVA_LAKE_EDGE_VARIATION := 30.0
+const LAVA_LAKE_RADIUS := 92.0
+const LAVA_LAKE_EDGE_VARIATION := 26.0
+## The island widens through the chasm. The lava lake, its banks and the
+## drawn sheet's own overlap together need more room across than the ordinary
+## valley has: without this the sheet ran out over the island's flank and
+## hung in the air past the bank.
+const CHASM_VALLEY_BULGE := 120.0
 const LAVA_LAKE_DEPTH := 14.0
 const LAVA_LAKE_SHELF := CHASM_LAVA_LEVEL - 0.6
 const LAVA_LAKE_SLOPE_WIDTH := 34.0
@@ -269,6 +278,10 @@ const VOLCANO_SOURCE_POOL := Vector2(-190.0, -145.0)
 const VOLCANO_CENTER := Vector2(5347.5, 0.0)
 const VOLCANO_HALF_LENGTH := 255.0
 const VOLCANO_RISE := 54.0
+## How far the volcano's own ground fades in across its window's edge. Long,
+## so the lava basin shelves up into the volcanic body over hundreds of
+## metres: one lava biome, not a volcano standing on its own pad.
+const VOLCANO_WINDOW_BLEND := 260.0
 const HUMONGOUS_CLEARING := Vector2(5705.0, -8.0)
 ## Humongous stands on a broad plain at the end of the course, not a pad cut
 ## barely wider than his own feet: room to walk around him, to land an escape
@@ -308,7 +321,10 @@ const BORDERS := [
 	{"x": CLIFF_EDGE_X - CLIFF_EDGE_VARIATION - 14.0, "west": "ground", "east": "air", "portal_scale": 3.0, "no_pad": true},
 	# Suspended above the lava chasm: the volcano begins below it immediately.
 	# Both halves use the former Air portal's good width, but twice its height.
-	{"x": 5099.5, "west": "air", "east": "fire", "hover_y": CHASM_LAVA_LEVEL + 7.0, "portal_width_scale": 1.25, "portal_height_scale": 2.5},
+	# Hovering over the lava, so it levels no strip: the pad used to raise a
+	# ridge clean across the basin at exactly the point the lava and the
+	# volcano should read as one continuous place.
+	{"x": 5099.5, "west": "air", "east": "fire", "hover_y": CHASM_LAVA_LEVEL + 7.0, "portal_width_scale": 1.25, "portal_height_scale": 2.5, "no_pad": true},
 ]
 ## Ice brings the Penguin Helm, Snow the Toboggan, Air the Bird Helm.
 const HEAD_ITEMS := {
@@ -379,9 +395,14 @@ func _init() -> void:
 		Vector2(DIRT_LENGTH * 0.5, FULL_WIDTH_HALF), 0.0, 1.0, 0.0, WINDOW_END_BLEND
 	)
 	_dirt_window.level_to_x_ends(100.0)
+	# Radial, with a long blend: a rectangular window ends on a straight line
+	# drawn across the valley, which read as a perpendicular ridge standing
+	# between the lava and the volcano. Round, and fading over most of its own
+	# radius, the volcanic ground instead swells straight up out of the lake.
 	_volcano_window = TerrainWindow.new(
 		_fire_sampler, VOLCANO_SOURCE_POOL, VOLCANO_CENTER,
-		Vector2(VOLCANO_HALF_LENGTH, FULL_WIDTH_HALF), 0.0, 1.0, 0.0, WINDOW_END_BLEND
+		Vector2(VOLCANO_HALF_LENGTH, FULL_WIDTH_HALF), VOLCANO_HALF_LENGTH + 120.0,
+		1.0, 0.0, VOLCANO_WINDOW_BLEND
 	)
 	_volcano_window.level_to_x_ends(100.0)
 	# The entire Fire window now grows from the chasm floor rather than a
@@ -523,6 +544,12 @@ func _valley_half_width(x: float, side: float = 0.0) -> float:
 		organic += sin(x * 0.013 + (0.4 if side > 0.0 else 2.1)) * 15.0
 		organic += sin(x * 0.0047 + (1.2 if side > 0.0 else -0.6)) * 9.0
 	var width := lerpf(VALLEY_HALF_WIDTH + organic, OCEAN_HALF_WIDTH + organic * 0.35, ocean)
+	# The lava chasm and the volcano share one broad basin, so the island
+	# swells through both rather than pinching in at exactly the point the
+	# lava needs its widest banks.
+	var chasm := smoothstep(CLIFF_EDGE_X - 140.0, CLIFF_EDGE_X + 30.0, x)
+	chasm *= 1.0 - smoothstep(VOLCANO_CENTER.x + VOLCANO_HALF_LENGTH - 60.0, X_MAX - 120.0, x)
+	width += CHASM_VALLEY_BULGE * chasm
 	if side > 0.0:
 		# Fade the shoulder in beyond the entry bank and back out where the
 		# mountain takes over, retaining the island's irregular silhouette rather
@@ -678,7 +705,10 @@ func _dirt_entry_apron_weight(x: float, z: float) -> float:
 	var ground_gate := border_x("ground")
 	var apron_end := DIRT_START_X + DIRT_ENTRY_APRON_LENGTH
 	var along := smoothstep(ground_gate - 10.0, ground_gate + 12.0, x)
-	along *= 1.0 - smoothstep(apron_end - 30.0, apron_end, x)
+	# Released over most of its own length, not over a final 30 m: the
+	# imported kingdom ground beneath it sits tens of metres lower on one
+	# flank, and letting go of it abruptly stood a wall across the zone.
+	along *= 1.0 - smoothstep(apron_end - DIRT_ENTRY_APRON_RELEASE, apron_end, x)
 	var across := absf(z - dirt_course_center_z(x))
 	var width := 1.0 - smoothstep(
 		DIRT_ENTRY_APRON_HALF_WIDTH,
