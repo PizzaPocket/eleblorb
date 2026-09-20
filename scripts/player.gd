@@ -242,10 +242,22 @@ const SNOWBOARD_TERMINAL_SPEED := 150.0
 ## preserves gravity-led acceleration while letting a sustained steep grade
 ## build the speed that a full-size descent would have had time to acquire.
 const SNOWBOARD_GRAVITY_SCALE := 2.15
-## Mesh-scale ripples must not masquerade as jumps. A snowboard only leaves a
-## crest through the automatic trajectory handoff when it carries meaningful
-## upward velocity; explicit Jump remains unaffected.
-const SNOWBOARD_CREST_LAUNCH_MIN_VERTICAL_SPEED := 1.35
+## The board leaves the snow only where the ground genuinely falls away
+## faster than gravity carries the rider down (see
+## _follow_snowboard_terrain()). Landing then latches it down for this long,
+## during which the ground must fall this much further below the board before
+## it may fly again -- a landing cannot bounce straight back into the air,
+## while an explicit Jump is unaffected either way.
+const SNOWBOARD_LANDING_LATCH := 0.12
+const SNOWBOARD_LATCH_DROP_MARGIN := 0.25
+## The rider stands on the deck, so the deck's underside -- not the bare
+## sole -- is what rests on the snow. The deck hangs 0.12 below the ankle
+## mid-point and is SNOWBOARD_THICKNESS deep as a semi-axis, while the ankle
+## itself sits ProceduralFigure.FOOT_SIZE.y * 2.0 above the sole plane: the
+## whole figure therefore lifts by 0.12 + SNOWBOARD_THICKNESS - 0.07. Same
+## kind of term as the dirt bike's wheel radius in _body_base_height(), and
+## visual only -- the collision body keeps its ordinary feet origin.
+const SNOWBOARD_DECK_LIFT := 0.13
 const SNOWBOARD_POSE_SETTLE_SPEED := 7.0
 ## Terrain triangles are sampled across the board's length and their normal
 ## is damped before reaching either rider or deck. Response softens further
@@ -1203,6 +1215,11 @@ var _snowboard_smoothed_up := Vector3.UP
 var _snowboard_smoothed_rider_grade := 0.0
 var _snowboard_airborne_up := Vector3.UP
 var _snowboard_was_supported := false
+## The board's own contact state, kept separate from the dirt bike's crest
+## latch (_dirtbike_was_climbing): whether it is currently flying, and the
+## remaining landing latch (see SNOWBOARD_LANDING_LATCH).
+var _snowboard_airborne := false
+var _snowboard_ground_latch := 0.0
 ## Matched Ice legs automatically extend these runners. They remain visible
 ## off ice while their traversal physics only engage on the frozen lake.
 var _ice_skates_active := false
@@ -2410,7 +2427,12 @@ func _physics_process(delta: float) -> void:
 	# velocity must include that complete vertical displacement, not merely the
 	# smaller remainder left after the helper has already raised the chassis.
 	var pre_move_position := global_position
-	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and _is_touching_terrain():
+	# The snowboard is excluded from both step helpers: a board follows its
+	# own contact plane (see _follow_snowboard_terrain()) rather than stepping
+	# up onto bumps like a walking character. Their one-frame lifts also used
+	# to be measured as launch velocity by the crest code below, which is what
+	# made the board hop continuously.
+	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and not _snowboard_active and _is_touching_terrain():
 		_try_step_up()
 	# Not gated behind _is_touching_terrain() the way _try_step_up() is --
 	# that check is specifically "close to the analytic ground function,"
@@ -2418,7 +2440,7 @@ func _physics_process(delta: float) -> void:
 	# and not jumped_this_frame alone (the same "don't fight an active
 	# jump" guard every other step/snap call here uses) is what actually
 	# matters for this one.
-	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded:
+	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and not _snowboard_active:
 		_try_step_onto_prop(delta)
 	var pre_move_feet_y := global_position.y - FOOT_OFFSET
 	move_and_slide()
@@ -2555,6 +2577,7 @@ func _body_base_height(delta: float, grounded: bool, on_soft_aerial_support: boo
 	return (
 		_visuals_snow_offset_y
 		+ DIRTBIKE_WHEEL_RADIUS*_dirtbike_pose_blend
+		+ SNOWBOARD_DECK_LIFT*_snowboard_pose_blend
 		+ (ice_skate_visual_lift() if _ice_skates_active else 0.0)
 	)
 
@@ -7650,6 +7673,8 @@ func _update_snowboard_state() -> void:
 		_snowboard_smoothed_rider_grade=0.0
 		_snowboard_airborne_up=Vector3.UP
 		_snowboard_was_supported=false
+		_snowboard_airborne=false
+		_snowboard_ground_latch=0.0
 	if _snowboard_active:
 		if _snowboard==null:
 			_snowboard=_build_snowboard()
@@ -8551,7 +8576,11 @@ func _snap_to_terrain(delta: float,pre_move_position: Vector3) -> void:
 	var rise: float = target_h - (global_position.y - FOOT_OFFSET)
 	var run := maxf(Vector2(velocity.x, velocity.z).length() * delta, 0.001)
 
-	if _dirtbike_wheel_active or _snowboard_active:
+	if _snowboard_active:
+		_follow_snowboard_terrain(delta,target_h,rise)
+		return
+
+	if _dirtbike_wheel_active:
 		var horizontal_velocity := Vector2(velocity.x,velocity.z)
 		var travel_slope: float = _dirtbike_slope_along(horizontal_velocity)
 		# Resolve onto support, then measure the complete motion that actually
@@ -8570,13 +8599,8 @@ func _snap_to_terrain(delta: float,pre_move_position: Vector3) -> void:
 		# during the first airborne frames.
 		if _dirtbike_was_climbing:
 			_dirtbike_was_climbing = false
-			if _snowboard_active and _dirtbike_surface_velocity.y < SNOWBOARD_CREST_LAUNCH_MIN_VERTICAL_SPEED:
-				global_position.y = target_h + FOOT_OFFSET
-				velocity.y = 0.0
-				return
 			velocity = _dirtbike_surface_velocity
-			if _dirtbike_wheel_active:
-				velocity.y *= sqrt(DIRTBIKE_JUMP_HEIGHT_MULTIPLIER)
+			velocity.y *= sqrt(DIRTBIKE_JUMP_HEIGHT_MULTIPLIER)
 			_jump_takeoff_speed = absf(velocity.y)
 			_jumping = true
 			return
@@ -8613,6 +8637,65 @@ func _snap_to_terrain(delta: float,pre_move_position: Vector3) -> void:
 		return
 	global_position.y = target_h + FOOT_OFFSET
 	velocity.y = 0.0
+
+
+## The snowboard's own contact model, replacing the dirt bike's crest-launch
+## handoff (which the board used to share, and which launched it off every
+## mesh-scale ripple). Two rules, and no speed-dependent thresholds:
+##
+## - Rising or level snow under the board is simply followed. Climbing a
+##   grade never writes upward velocity, so terrain-following motion can
+##   never be mistaken for a jump the way it was before.
+## - A planted board carries the slope's OWN vertical speed (its horizontal
+##   speed times the grade under it), not zero. This is what makes riding a
+##   steady slope stable at any speed: the board is already descending at
+##   exactly the rate the snow falls away, so the next frame finds it on the
+##   surface rather than hanging above it. Zeroing it instead -- as an
+##   ordinary walking snap does -- meant that at 38 m/s the ground dropped
+##   0.29 m in a frame while gravity from rest covered 0.006 m, so the board
+##   "outran" the snow and flew on every single slope.
+## - Real flight therefore begins only where the snow falls away faster than
+##   gravity can pull the board down from the speed it already has: a
+##   cornice, a ramp lip, a cliff. Air scales with the drop, with nothing to
+##   tune.
+##
+## Landing keeps the downhill momentum, drops the impact velocity, and
+## latches the board down briefly (SNOWBOARD_LANDING_LATCH) so a touchdown
+## cannot bounce straight back into the air. Explicit Jump is unaffected: it
+## runs earlier in the frame and sets _jumping, which gates this call.
+func _follow_snowboard_terrain(delta: float,target_h: float,rise: float) -> void:
+	_snowboard_ground_latch = maxf(_snowboard_ground_latch - delta,0.0)
+	_dirtbike_was_climbing = false
+	# The vertical speed of travelling along the snow at the current grade.
+	var horizontal := Vector2(velocity.x,velocity.z)
+	var surface_fall := horizontal.length() * _dirtbike_slope_along(horizontal)
+	if rise >= 0.0:
+		_land_snowboard(target_h,surface_fall)
+		return
+	# A fresh landing needs the ground to fall further away than an ordinary
+	# frame would, so the touchdown itself cannot relaunch the board.
+	var drop_margin := SNOWBOARD_LATCH_DROP_MARGIN if _snowboard_ground_latch > 0.0 else 0.0
+	if -rise <= drop_margin:
+		_land_snowboard(target_h,surface_fall)
+		return
+	velocity.y = HumanoidLocomotion.apply_gravity(velocity.y,delta,_playable_profile,TERMINAL_FALL_SPEED)
+	var predicted_h := (global_position.y - FOOT_OFFSET) + velocity.y * delta
+	if predicted_h > target_h:
+		global_position.y = predicted_h + FOOT_OFFSET
+		_snowboard_airborne = true
+		return
+	_land_snowboard(target_h,surface_fall)
+
+
+## Plants the board on the snow at `target_h`, riding the surface at
+## `surface_fall` (the grade's own vertical speed) and keeping its horizontal
+## momentum. A landing out of real flight also starts the latch.
+func _land_snowboard(target_h: float,surface_fall: float) -> void:
+	global_position.y = target_h + FOOT_OFFSET
+	velocity.y = minf(surface_fall,0.0)
+	if _snowboard_airborne:
+		_snowboard_airborne = false
+		_snowboard_ground_latch = SNOWBOARD_LANDING_LATCH
 
 
 ## A cloud/canopy catch is a real landing even though these intentionally
