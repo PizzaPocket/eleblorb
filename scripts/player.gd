@@ -226,30 +226,31 @@ const DIRTBIKE_JUMP_HEIGHT_MULTIPLIER := 1.25
 ## Strong contact friction makes a board settle decisively on flats and
 ## shallow run-outs. Low quadratic drag remains separate, so a real descent
 ## can still accumulate the high speed expected from a long mountain.
-const SNOWBOARD_ROLLING_RESISTANCE := 0.04
-const SNOWBOARD_ICE_RESISTANCE := 0.032
+## Snowboard tuning belongs to SnowboardMode now; these forward to it.
+const SNOWBOARD_ROLLING_RESISTANCE := SnowboardMode.ROLLING_RESISTANCE
+const SNOWBOARD_ICE_RESISTANCE := SnowboardMode.ICE_RESISTANCE
 ## Deceleration (m/s^2) when a grounded board is on anything but snow: a
 ## ~30 km/h run off the snow's edge stops within about a metre.
-const SNOWBOARD_OFF_SNOW_BRAKING := 40.0
-const SNOWBOARD_AIR_DRAG := 0.00032
-const SNOWBOARD_TUCK_DRAG_MULTIPLIER := 0.42
-const SNOWBOARD_TUCK_TERMINAL_MULTIPLIER := 1.22
-const SNOWBOARD_TURN_RATE := deg_to_rad(105.0)
-const SNOWBOARD_CARVE_GRIP := 2.4
-const SNOWBOARD_STOP_SPEED := 0.12
-const SNOWBOARD_TERMINAL_SPEED := 150.0
+const SNOWBOARD_OFF_SNOW_BRAKING := SnowboardMode.OFF_SNOW_BRAKING
+const SNOWBOARD_AIR_DRAG := SnowboardMode.AIR_DRAG
+const SNOWBOARD_TUCK_DRAG_MULTIPLIER := SnowboardMode.TUCK_DRAG_MULTIPLIER
+const SNOWBOARD_TUCK_TERMINAL_MULTIPLIER := SnowboardMode.TUCK_TERMINAL_MULTIPLIER
+const SNOWBOARD_TURN_RATE := SnowboardMode.TURN_RATE
+const SNOWBOARD_CARVE_GRIP := SnowboardMode.CARVE_GRIP
+const SNOWBOARD_STOP_SPEED := SnowboardMode.STOP_SPEED
+const SNOWBOARD_TERMINAL_SPEED := SnowboardMode.TERMINAL_SPEED
 ## The kingdoms compress a real mountain into a shorter playable run. This
 ## preserves gravity-led acceleration while letting a sustained steep grade
 ## build the speed that a full-size descent would have had time to acquire.
-const SNOWBOARD_GRAVITY_SCALE := 2.15
+const SNOWBOARD_GRAVITY_SCALE := SnowboardMode.GRAVITY_SCALE
 ## The board leaves the snow only where the ground genuinely falls away
 ## faster than gravity carries the rider down (see
 ## _follow_snowboard_terrain()). Landing then latches it down for this long,
 ## during which the ground must fall this much further below the board before
 ## it may fly again -- a landing cannot bounce straight back into the air,
 ## while an explicit Jump is unaffected either way.
-const SNOWBOARD_LANDING_LATCH := 0.12
-const SNOWBOARD_LATCH_DROP_MARGIN := 0.25
+const SNOWBOARD_LANDING_LATCH := SnowboardMode.LANDING_LATCH
+const SNOWBOARD_LATCH_DROP_MARGIN := SnowboardMode.LATCH_DROP_MARGIN
 ## The rider stands on the deck, so the deck's underside -- not the bare
 ## sole -- is what rests on the snow. The deck hangs 0.12 below the ankle
 ## mid-point and is SNOWBOARD_THICKNESS deep as a semi-axis, while the ankle
@@ -257,7 +258,7 @@ const SNOWBOARD_LATCH_DROP_MARGIN := 0.25
 ## whole figure therefore lifts by 0.12 + SNOWBOARD_THICKNESS - 0.07. Same
 ## kind of term as the dirt bike's wheel radius in _body_base_height(), and
 ## visual only -- the collision body keeps its ordinary feet origin.
-const SNOWBOARD_DECK_LIFT := 0.13
+const SNOWBOARD_DECK_LIFT := SnowboardMode.DECK_LIFT
 const SNOWBOARD_POSE_SETTLE_SPEED := 7.0
 ## Terrain triangles are sampled across the board's length and their normal
 ## is damped before reaching either rider or deck. Response softens further
@@ -1223,6 +1224,7 @@ var _snowboard_was_supported := false
 ## remaining landing latch (see SNOWBOARD_LANDING_LATCH).
 var _snowboard_airborne := false
 var _snowboard_ground_latch := 0.0
+var _snowboard_mode := SnowboardMode.new()
 ## The shared traversal system: this body's joints by rig-neutral name, and
 ## the powers that have been moved onto it so far. See
 ## docs/traversal_powers_architecture.md.
@@ -2263,7 +2265,7 @@ func _physics_process(delta: float) -> void:
 		# Off snow the board does not slide at all: it grinds to a halt, and
 		# neither slope nor steering can push it.
 		ice_animation_speed = 0.0
-		var stopped:=Vector2(velocity.x,velocity.z).move_toward(Vector2.ZERO,SNOWBOARD_OFF_SNOW_BRAKING*delta)
+		var stopped:=_snowboard_mode.brake_off_snow(_traversal_context(delta))
 		velocity.x=stopped.x
 		velocity.z=stopped.y
 	elif _snowboard_active and grounded:
@@ -2273,14 +2275,9 @@ func _physics_process(delta: float) -> void:
 		if _is_supported_by_ice():
 			support_normal=Vector3.UP
 		var steering:=Vector2(direction.x,direction.z)
-		var board_velocity:=HumanoidLocomotion.gravity_surface_glide(
-			Vector2(velocity.x,velocity.z),support_normal,steering,delta,
-			SNOWBOARD_ICE_RESISTANCE if _is_supported_by_ice() else SNOWBOARD_ROLLING_RESISTANCE,
-			SNOWBOARD_AIR_DRAG*(SNOWBOARD_TUCK_DRAG_MULTIPLIER if aerodynamic_tuck else 1.0),
-			SNOWBOARD_TURN_RATE,SNOWBOARD_CARVE_GRIP,SNOWBOARD_STOP_SPEED,
-			SNOWBOARD_TERMINAL_SPEED*(SNOWBOARD_TUCK_TERMINAL_MULTIPLIER if aerodynamic_tuck else 1.0),
-			SNOWBOARD_GRAVITY_SCALE
-		)
+		var board_ctx := _traversal_context(delta)
+		board_ctx.direction = direction
+		var board_velocity := _snowboard_mode.glide(board_ctx,support_normal,_is_supported_by_ice())
 		velocity.x=board_velocity.x
 		velocity.z=board_velocity.y
 		var carve_amount:=0.0
@@ -8565,38 +8562,16 @@ func _snap_to_terrain(delta: float,pre_move_position: Vector3) -> void:
 ## cannot bounce straight back into the air. Explicit Jump is unaffected: it
 ## runs earlier in the frame and sets _jumping, which gates this call.
 func _follow_snowboard_terrain(delta: float,target_h: float,rise: float) -> void:
-	_snowboard_ground_latch = maxf(_snowboard_ground_latch - delta,0.0)
+	# The contact model lives in SnowboardMode, shared with every other
+	# character that will ride one. It is a layer inside ordinary grounded
+	# movement, so it is called from here rather than through the director.
 	_dirtbike_was_climbing = false
-	# The vertical speed of travelling along the snow at the current grade.
 	var horizontal := Vector2(velocity.x,velocity.z)
 	var surface_fall := horizontal.length() * _dirtbike_slope_along(horizontal)
-	if rise >= 0.0:
-		_land_snowboard(target_h,surface_fall)
-		return
-	# A fresh landing needs the ground to fall further away than an ordinary
-	# frame would, so the touchdown itself cannot relaunch the board.
-	var drop_margin := SNOWBOARD_LATCH_DROP_MARGIN if _snowboard_ground_latch > 0.0 else 0.0
-	if -rise <= drop_margin:
-		_land_snowboard(target_h,surface_fall)
-		return
-	velocity.y = HumanoidLocomotion.apply_gravity(velocity.y,delta,_playable_profile,TERMINAL_FALL_SPEED)
-	var predicted_h := (global_position.y - FOOT_OFFSET) + velocity.y * delta
-	if predicted_h > target_h:
-		global_position.y = predicted_h + FOOT_OFFSET
-		_snowboard_airborne = true
-		return
-	_land_snowboard(target_h,surface_fall)
-
-
-## Plants the board on the snow at `target_h`, riding the surface at
-## `surface_fall` (the grade's own vertical speed) and keeping its horizontal
-## momentum. A landing out of real flight also starts the latch.
-func _land_snowboard(target_h: float,surface_fall: float) -> void:
-	global_position.y = target_h + FOOT_OFFSET
-	velocity.y = minf(surface_fall,0.0)
-	if _snowboard_airborne:
-		_snowboard_airborne = false
-		_snowboard_ground_latch = SNOWBOARD_LANDING_LATCH
+	var ctx := _traversal_context(delta)
+	_snowboard_mode.follow_terrain(ctx,target_h,rise,surface_fall,FOOT_OFFSET)
+	_snowboard_airborne = _snowboard_mode.airborne
+	_snowboard_ground_latch = _snowboard_mode.ground_latch
 
 
 ## A cloud/canopy catch is a real landing even though these intentionally

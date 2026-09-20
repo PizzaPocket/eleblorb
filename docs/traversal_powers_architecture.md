@@ -152,6 +152,21 @@ change in slices 0 to 5; the whole point is that Xiao and the others gain.
    character with its own gait, rig and unique abilities only. This slice is
    where the line count comes back down.
 
+## Progress
+
+- Scaffolding, director, rig adapter: done. The director runs in the
+  player's frame.
+- Rig parity: done. Xiao Hou Zi gained a thorax, a neck and an articulating
+  ankle; `tools/probe_parity.gd` reports 16 articulating joints for the
+  player and 14 for him, the difference being hands, which he has no
+  geometry for.
+- Ice skates: done for both characters. Pose, movement, stride and tuning
+  all live in `IceSkateMode`; Xiao's duplicate is deleted.
+- Snowboard: contact model and glide moved to `SnowboardMode`; its pose and
+  Xiao's wiring remain.
+- Swim: Xiao pitches his body now, but through his own controller rather
+  than a shared mode. Still to migrate.
+
 ## Verification
 
 A headless parity probe (`tools/probe_parity.gd`) that, for every
