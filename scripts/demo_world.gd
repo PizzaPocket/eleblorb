@@ -154,7 +154,7 @@ func _add_space_zone() -> void:
 	var landing := DemoWorldTerrain.HUMONGOUS_CLEARING
 	_spaceship.escape_pod.landing_point = Vector3(
 		landing.x + 22.0,
-		_terrain.get_mesh_height(landing.x + 22.0, landing.y + 16.0) + EscapePod.POD_HALF_LENGTH,
+		_terrain.get_mesh_height(landing.x + 22.0, landing.y + 16.0) + EscapePod.POD_RADIUS,
 		landing.y + 16.0
 	)
 	_spaceship.escape_pod.impacted.connect(_on_escape_pod_impact)

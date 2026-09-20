@@ -3,8 +3,9 @@ extends Node3D
 
 ## The ASAN vehicle's escape pod (see demo_spaceship.gd), mounted outside the
 ## blorb-sized hatch at the aft end of the hull's flank. Its own shell is a
-## small hollow superegg with a single superellipse opening facing that hatch,
-## so only a blorb can reach it: nothing else on the course fits through.
+## hollow sphere with a single circular opening facing that hatch, the same
+## radius as the hatch itself, so the two meet as one way through: only a
+## blorb fits, and nothing else on the course is small enough.
 ##
 ## Once a blorb is aboard the pod seals and counts itself down, then drops
 ## away and flies to `landing_point` at speed, carrying its rider pinned in
@@ -16,13 +17,16 @@ const SHELL := Color(0.90, 0.92, 0.96)
 const TRIM := Color(0.15, 0.16, 0.20)
 const GLOW := Color(1.0, 0.62, 0.26)
 
-## The pod's own body: shell radius, half-length and wall thickness.
-const POD_RADIUS := 2.4
-const POD_HALF_LENGTH := 3.6
-const POD_WALL := 0.22
-## Its opening, on the shell's +X side, facing the hull's hatch.
-const POD_DOOR_CENTER := Vector2(0.0, 0.0)
-const POD_DOOR_HALF := Vector2(1.5, 1.5)
+## A sphere: one radius, and a wall thick enough to read as a hull.
+const POD_RADIUS := 3.4
+const POD_WALL := 0.25
+## Its opening, a circle on the shell's +X side facing the hull's hatch. The
+## same radius as the hull's own hatch, so the two openings meet.
+const POD_DOOR_RADIUS := 1.7
+## How far the sphere's centre stands off the hull's surface so that its own
+## opening's rim lands on that surface: for an opening of half-angle t,
+## sin t = door / radius and the rim sits radius * cos t back from the centre.
+const POD_SEAT_DROP := 1.6
 ## How long it counts down once someone is aboard, and how fast it flies.
 const COUNTDOWN := 5.0
 const FLIGHT_SPEED := 260.0
@@ -48,11 +52,16 @@ func _build_pod() -> void:
 	var shell := MeshInstance3D.new()
 	shell.name = "PodShell"
 	var apertures: Array[Dictionary] = [
-		{"center": POD_DOOR_CENTER, "half": POD_DOOR_HALF, "exponent": 2.6},
+		{
+			"center": Vector2.ZERO,
+			"half": Vector2(POD_DOOR_RADIUS, POD_DOOR_RADIUS),
+			"exponent": 2.0,
+		},
 	]
+	# A true sphere (epsilon 2 on both profiles) with one circular opening.
 	shell.mesh = SuperEgg.build_hollow_shell_mesh(
-		Vector3(POD_RADIUS, POD_HALF_LENGTH, POD_RADIUS), POD_WALL, apertures,
-		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT, SuperEgg.RINGS, SuperEgg.SEGMENTS
+		Vector3(POD_RADIUS, POD_RADIUS, POD_RADIUS), POD_WALL, apertures,
+		2.0, 2.0, SuperEgg.RINGS * 2, SuperEgg.SEGMENTS * 2
 	)
 	var material := StandardMaterial3D.new()
 	material.albedo_color = SHELL
@@ -67,24 +76,22 @@ func _build_pod() -> void:
 	var floor_body := StaticBody3D.new()
 	floor_body.name = "PodFloor"
 	floor_body.collision_layer = 1
-	floor_body.position = Vector3(0.0, -POD_HALF_LENGTH + 0.9, 0.0)
+	floor_body.position = Vector3(0.0, -POD_SEAT_DROP - 0.2, 0.0)
 	add_child(floor_body)
-	var pad := SuperEgg.build_part(
-		Vector3(POD_RADIUS - 0.6, 0.18, POD_RADIUS - 0.6), TRIM,
-		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-	)
+	var pad_half := Vector3(POD_RADIUS * 0.72, 0.18, POD_RADIUS * 0.72)
+	var pad := SuperEgg.build_part(pad_half, TRIM, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
 	pad.name = "PodFloorPad"
 	floor_body.add_child(pad)
-	CollisionPolicy.add_box(floor_body, pad, Vector3(POD_RADIUS - 0.6, 0.18, POD_RADIUS - 0.6) * 2.0)
+	CollisionPolicy.add_box(floor_body, pad, pad_half * 2.0)
 
 	_seat = Node3D.new()
 	_seat.name = "PodSeat"
-	_seat.position = Vector3(0.0, -POD_HALF_LENGTH + 1.6, 0.0)
+	_seat.position = Vector3(0.0, -POD_SEAT_DROP + 0.6, 0.0)
 	add_child(_seat)
 
 	var retro := SuperEgg.build_part(Vector3(1.5, 0.7, 1.5), TRIM)
 	retro.name = "PodRetro"
-	retro.position = Vector3(0.0, POD_HALF_LENGTH - 0.3, 0.0)
+	retro.position = Vector3(0.0, POD_RADIUS - 0.2, 0.0)
 	add_child(retro)
 	CollisionPolicy.mark_decorative(retro)
 
@@ -94,7 +101,7 @@ func _build_pod() -> void:
 	beacon.light_energy = 1.4
 	beacon.omni_range = 9.0
 	beacon.shadow_enabled = false
-	beacon.position = Vector3(0.0, -POD_HALF_LENGTH + 2.4, 0.0)
+	beacon.position = Vector3(0.0, 0.6, 0.0)
 	add_child(beacon)
 
 

@@ -25,10 +25,26 @@ const HULL_WALL := 0.9
 const DOOR_CENTER := Vector2(-6.0, -1.0)
 const DOOR_HALF := Vector2(6.5, 5.0)
 const DOOR_EXPONENT := 2.8
-## A second, much smaller opening at the aft end of the same flank, sized so
-## only a blorb fits through it. It leads to the escape pod.
+## A second, much smaller opening at the aft end of the same flank: a circle
+## (a superellipse of exponent 2 with equal halves), sized so only a blorb
+## fits through it, and matched by the escape pod's own circular opening.
 const HATCH_CENTER := Vector2(-26.0, -3.6)
-const HATCH_HALF := Vector2(1.7, 1.6)
+const HATCH_RADIUS := EscapePod.POD_DOOR_RADIUS
+## Windows down both flanks, at eye height above the deck: each is cut out of
+## the hull and then filled by the very piece the cut removed, rebuilt in
+## glass (SuperEgg.build_shell_patch_mesh()), so every pane sits flush in its
+## own opening by construction.
+const WINDOW_STATIONS := [8.0, 18.0, 28.0]
+const WINDOW_Y := 1.5
+const WINDOW_HALF := Vector2(3.4, 2.1)
+const WINDOW_EXPONENT := 2.6
+const GLASS := Color(0.44, 0.68, 0.86, 0.34)
+## The hull is built on a finer grid than the default. Openings are cut cell
+## by cell, so the grid's own spacing is the resolution of every outline: at
+## the default the windows came out as chunky staircases. Panes are the exact
+## complement of the cut, so nothing can gap either way.
+const HULL_RINGS := 72
+const HULL_SEGMENTS := 96
 ## The deck: its height below the hull's axis, how far it reaches either side
 ## of the centreline, and its thickness.
 const DECK_Y := -5.0
@@ -93,20 +109,10 @@ func _build_ship() -> void:
 func _build_hull() -> void:
 	var shell := MeshInstance3D.new()
 	shell.name = "Hull"
-	# The superegg's own Y is the hull's Z, and its Z is the hull's -Y.
-	var apertures: Array[Dictionary] = [
-		{
-			"center": Vector2(DOOR_CENTER.x, -DOOR_CENTER.y),
-			"half": DOOR_HALF, "exponent": DOOR_EXPONENT,
-		},
-		{
-			"center": Vector2(HATCH_CENTER.x, -HATCH_CENTER.y),
-			"half": HATCH_HALF, "exponent": DOOR_EXPONENT,
-		},
-	]
+	var apertures := _hull_apertures()
 	shell.mesh = SuperEgg.build_hollow_shell_mesh(
-		Vector3(HULL_RADIUS, HULL_HALF_LENGTH, HULL_RADIUS), HULL_WALL, apertures,
-		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+		_hull_axes(), HULL_WALL, apertures, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT,
+		HULL_RINGS, HULL_SEGMENTS
 	)
 	shell.rotation.x = PI * 0.5
 	var material := _hull_material(HULL)
@@ -116,6 +122,76 @@ func _build_hull() -> void:
 	shell.material_override = material
 	add_child(shell)
 	CollisionPolicy.mark_decorative(shell)
+	_glaze_windows(apertures)
+
+
+## Every opening cut through the hull. The superegg's own Y is the hull's Z
+## and its Z is the hull's -Y, so each centre is written in that frame.
+func _hull_apertures() -> Array[Dictionary]:
+	var apertures: Array[Dictionary] = [
+		{
+			"center": Vector2(DOOR_CENTER.x, -DOOR_CENTER.y),
+			"half": DOOR_HALF, "exponent": DOOR_EXPONENT,
+		},
+		{
+			"center": Vector2(HATCH_CENTER.x, -HATCH_CENTER.y),
+			"half": Vector2(HATCH_RADIUS, HATCH_RADIUS), "exponent": 2.0,
+		},
+	]
+	for side: float in [-1.0, 1.0]:
+		for station: float in WINDOW_STATIONS:
+			apertures.append({
+				"center": Vector2(station, -WINDOW_Y),
+				"half": WINDOW_HALF, "exponent": WINDOW_EXPONENT, "side": side,
+			})
+	return apertures
+
+
+## Fills each window opening with the piece its own cut removed, rebuilt in
+## glass. Same axes, same wall, same aperture: the pane cannot drift out of
+## its hole because it is the hole.
+func _glaze_windows(apertures: Array[Dictionary]) -> void:
+	var glass := StandardMaterial3D.new()
+	glass.albedo_color = GLASS
+	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	glass.roughness = 0.05
+	glass.metallic = 0.2
+	glass.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var index := 0
+	for aperture in apertures:
+		if float(aperture.get("exponent", 0.0)) != WINDOW_EXPONENT:
+			continue
+		var pane := MeshInstance3D.new()
+		pane.name = "Window%d" % index
+		index += 1
+		pane.mesh = SuperEgg.build_shell_patch_mesh(
+			_hull_axes(), HULL_WALL, aperture, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT,
+			HULL_RINGS, HULL_SEGMENTS
+		)
+		pane.material_override = glass
+		pane.rotation.x = PI * 0.5
+		add_child(pane)
+		CollisionPolicy.mark_decorative(pane)
+
+
+func _hull_axes() -> Vector3:
+	return Vector3(HULL_RADIUS, HULL_HALF_LENGTH, HULL_RADIUS)
+
+
+## The hull's own outer surface distance from its axis at `hull_z`, found by
+## walking the superegg's profile rather than assuming a cylinder: the hull
+## tapers toward both ends, so the pod has to sit against the real surface.
+func _hull_surface_x(hull_z: float) -> float:
+	var best := HULL_RADIUS
+	var closest := INF
+	for step in 361:
+		var eta := -PI * 0.5 + PI * float(step) / 360.0
+		var point := SuperEgg.surface_point(_hull_axes(), eta, PI * 0.5)
+		var gap := absf(point.y - hull_z)
+		if gap < closest:
+			closest = gap
+			best = point.x
+	return best
 
 
 ## The deck: a solid floor plate running the cabin's length, and the surface
@@ -193,7 +269,9 @@ func _build_interior_fittings() -> void:
 		var station := -HULL_HALF_LENGTH + 10.0
 		while station < HULL_HALF_LENGTH - 10.0:
 			# The doorway's own stretch of flank carries no console.
-			if side < 0.0 or absf(station - DOOR_CENTER.x) > DOOR_HALF.x + 2.0:
+			var clear_of_door := side < 0.0 or absf(station - DOOR_CENTER.x) > DOOR_HALF.x + 2.0
+			var clear_of_hatch := absf(station - HATCH_CENTER.x) > HATCH_RADIUS + 5.0
+			if clear_of_door and clear_of_hatch:
 				_console(Vector3(side * (DECK_HALF_WIDTH - 1.2), DECK_Y + 1.1, station), side)
 			station += 7.5
 	var strip := SuperEgg.build_part(
@@ -257,8 +335,12 @@ func _console(at: Vector3, side: float) -> void:
 func _build_escape_pod() -> void:
 	escape_pod = EscapePod.new()
 	escape_pod.name = "EscapePod"
+	# Standing off the hull's real surface by exactly enough that the sphere's
+	# own opening rim meets it, less a little overlap so no seam can show.
+	var half_angle := asin(clampf(EscapePod.POD_DOOR_RADIUS / EscapePod.POD_RADIUS, 0.0, 1.0))
+	var standoff := EscapePod.POD_RADIUS * cos(half_angle) - 0.35
 	escape_pod.position = Vector3(
-		HULL_RADIUS + EscapePod.POD_RADIUS - 0.6, HATCH_CENTER.y, HATCH_CENTER.x
+		_hull_surface_x(HATCH_CENTER.x) + standoff, HATCH_CENTER.y, HATCH_CENTER.x
 	)
 	escape_pod.rotation.y = PI
 	add_child(escape_pod)

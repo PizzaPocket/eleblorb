@@ -313,7 +313,7 @@ static func build_inset_pad_mesh(
 static func build_hollow_shell_mesh(
 	semi_axes: Vector3, wall_thickness: float, apertures: Array[Dictionary],
 	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT,
-	rings: int = RINGS * 2, segments: int = SEGMENTS * 2
+	rings: int = RINGS * 2, segments: int = SEGMENTS * 2, keep_cut: bool = false
 ) -> ArrayMesh:
 	var inner_axes := Vector3(
 		maxf(semi_axes.x - wall_thickness, 0.01),
@@ -351,7 +351,7 @@ static func build_hollow_shell_mesh(
 	for ring_index in rings:
 		for segment in segments:
 			var next_segment := (segment + 1) % segments
-			if cut[ring_index][segment]:
+			if cut[ring_index][segment] != keep_cut:
 				continue
 			var a0: Vector3 = outer[ring_index][segment]
 			var a1: Vector3 = outer[ring_index][next_segment]
@@ -369,7 +369,7 @@ static func build_hollow_shell_mesh(
 	# across that shared edge.
 	for ring_index in rings:
 		for segment in segments:
-			if not cut[ring_index][segment]:
+			if cut[ring_index][segment] == keep_cut:
 				continue
 			var next_segment := (segment + 1) % segments
 			var neighbours := [
@@ -382,21 +382,39 @@ static func build_hollow_shell_mesh(
 				var neighbour_ring: int = entry[0]
 				if neighbour_ring < 0 or neighbour_ring >= rings:
 					continue
-				if cut[neighbour_ring][entry[1] as int]:
+				if cut[neighbour_ring][entry[1] as int] != keep_cut:
 					continue
 				_add_rim(st, entry[2] as Vector3, entry[3] as Vector3, entry[4] as Vector3, entry[5] as Vector3)
 	st.generate_normals()
 	return st.commit()
 
 
+## The piece one aperture removes from a shell, built from the same grid and
+## the same cut test as the hole itself, so it fits that hole exactly rather
+## than by matching numbers by hand. Fill a window with one of these in glass
+## and it sits flush in its own opening; every argument must match the call
+## that cut the shell.
+static func build_shell_patch_mesh(
+	semi_axes: Vector3, wall_thickness: float, aperture: Dictionary,
+	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT,
+	rings: int = RINGS * 2, segments: int = SEGMENTS * 2
+) -> ArrayMesh:
+	var only: Array[Dictionary] = [aperture]
+	return build_hollow_shell_mesh(
+		semi_axes, wall_thickness, only, epsilon_top, epsilon_bottom, rings, segments, true
+	)
+
+
 ## True where any aperture prism removes `point`. Each entry is
-## {"center": Vector2, "half": Vector2, "exponent": float}: a superellipse in
-## the local Y/Z plane, subtracted through the +X half only, so the wall
-## opposite each opening stays whole.
+## {"center": Vector2, "half": Vector2, "exponent": float, "side": float}: a
+## superellipse in the local Y/Z plane, subtracted through one X half only
+## ("side", +1 by default), so the wall opposite each opening stays whole.
+## An "exponent" of 2 with equal halves is a plain circle.
 static func _inside_any_aperture(point: Vector3, apertures: Array[Dictionary]) -> bool:
-	if point.x <= 0.0:
-		return false
 	for aperture in apertures:
+		var side: float = aperture.get("side", 1.0)
+		if point.x * side <= 0.0:
+			continue
 		var centre: Vector2 = aperture["center"]
 		var half: Vector2 = aperture["half"]
 		var exponent: float = aperture.get("exponent", EPSILON_SOFT)
