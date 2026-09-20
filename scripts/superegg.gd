@@ -296,13 +296,12 @@ static func build_inset_pad_mesh(
 ## cut's rim closing the two surfaces together so the shell reads as real
 ## walls with real thickness rather than a paper skin.
 ##
-## The aperture is a superellipse prism used as a negative: it is centred at
-## `aperture_center` (local Y/Z, on the +X side of the shell), has half-extents
-## `aperture_half` (Y then Z) and squareness `aperture_exponent`, and is
-## subtracted straight through the +X wall only -- the far wall behind it stays
-## whole. Anything the cut removes is replaced by rim geometry joining the
-## outer surface to the inner one, so a character can walk in through a real
-## doorway in a real hull.
+## Each aperture is a superellipse prism used as a negative: centred at
+## `center` (local Y/Z, on the +X side of the shell), with half-extents `half`
+## (Y then Z) and squareness `exponent`, subtracted straight through the +X
+## wall only -- the wall behind it stays whole. Anything a cut removes is
+## replaced by rim geometry joining the outer surface to the inner one, so a
+## character can walk in through a real doorway in a real hull.
 ##
 ## `wall_thickness` shrinks the semi-axes rather than offsetting each surface
 ## point along its own normal: on an anisotropic shell the wall is therefore a
@@ -312,9 +311,9 @@ static func build_inset_pad_mesh(
 ##
 ## Denser than the solid builder by default: a doorway's rim shows the grid.
 static func build_hollow_shell_mesh(
-	semi_axes: Vector3, wall_thickness: float, aperture_center: Vector2, aperture_half: Vector2,
-	aperture_exponent: float = EPSILON_SOFT, epsilon_top: float = EPSILON_SOFT,
-	epsilon_bottom: float = EPSILON_SOFT, rings: int = RINGS * 2, segments: int = SEGMENTS * 2
+	semi_axes: Vector3, wall_thickness: float, apertures: Array[Dictionary],
+	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT,
+	rings: int = RINGS * 2, segments: int = SEGMENTS * 2
 ) -> ArrayMesh:
 	var inner_axes := Vector3(
 		maxf(semi_axes.x - wall_thickness, 0.01),
@@ -344,7 +343,7 @@ static func build_hollow_shell_mesh(
 				(outer[ring_index][segment] as Vector3) + (outer[ring_index][next_segment] as Vector3)
 				+ (outer[ring_index + 1][segment] as Vector3) + (outer[ring_index + 1][next_segment] as Vector3)
 			) * 0.25
-			row.append(_inside_aperture(centre, aperture_center, aperture_half, aperture_exponent))
+			row.append(_inside_any_aperture(centre, apertures))
 		cut.append(row)
 
 	var st := SurfaceTool.new()
@@ -390,16 +389,22 @@ static func build_hollow_shell_mesh(
 	return st.commit()
 
 
-## True where the aperture prism removes `point`: inside the superellipse in
-## the local Y/Z plane, and on the +X half so only the near wall is cut.
-static func _inside_aperture(
-	point: Vector3, aperture_center: Vector2, aperture_half: Vector2, aperture_exponent: float
-) -> bool:
+## True where any aperture prism removes `point`. Each entry is
+## {"center": Vector2, "half": Vector2, "exponent": float}: a superellipse in
+## the local Y/Z plane, subtracted through the +X half only, so the wall
+## opposite each opening stays whole.
+static func _inside_any_aperture(point: Vector3, apertures: Array[Dictionary]) -> bool:
 	if point.x <= 0.0:
 		return false
-	var across := absf(point.y - aperture_center.x) / maxf(aperture_half.x, 0.001)
-	var along := absf(point.z - aperture_center.y) / maxf(aperture_half.y, 0.001)
-	return pow(across, aperture_exponent) + pow(along, aperture_exponent) <= 1.0
+	for aperture in apertures:
+		var centre: Vector2 = aperture["center"]
+		var half: Vector2 = aperture["half"]
+		var exponent: float = aperture.get("exponent", EPSILON_SOFT)
+		var across := absf(point.y - centre.x) / maxf(half.x, 0.001)
+		var along := absf(point.z - centre.y) / maxf(half.y, 0.001)
+		if pow(across, exponent) + pow(along, exponent) <= 1.0:
+			return true
+	return false
 
 
 static func _add_quad(st: SurfaceTool, a0: Vector3, b0: Vector3, a1: Vector3, b1: Vector3) -> void:

@@ -25,6 +25,10 @@ const HULL_WALL := 0.9
 const DOOR_CENTER := Vector2(-6.0, -1.0)
 const DOOR_HALF := Vector2(6.5, 5.0)
 const DOOR_EXPONENT := 2.8
+## A second, much smaller opening at the aft end of the same flank, sized so
+## only a blorb fits through it. It leads to the escape pod.
+const HATCH_CENTER := Vector2(-26.0, -3.6)
+const HATCH_HALF := Vector2(1.7, 1.6)
 ## The deck: its height below the hull's axis, how far it reaches either side
 ## of the centreline, and its thickness.
 const DECK_Y := -5.0
@@ -85,11 +89,20 @@ func _build_ship() -> void:
 func _build_hull() -> void:
 	var shell := MeshInstance3D.new()
 	shell.name = "Hull"
+	# The superegg's own Y is the hull's Z, and its Z is the hull's -Y.
+	var apertures: Array[Dictionary] = [
+		{
+			"center": Vector2(DOOR_CENTER.x, -DOOR_CENTER.y),
+			"half": DOOR_HALF, "exponent": DOOR_EXPONENT,
+		},
+		{
+			"center": Vector2(HATCH_CENTER.x, -HATCH_CENTER.y),
+			"half": HATCH_HALF, "exponent": DOOR_EXPONENT,
+		},
+	]
 	shell.mesh = SuperEgg.build_hollow_shell_mesh(
-		Vector3(HULL_RADIUS, HULL_HALF_LENGTH, HULL_RADIUS), HULL_WALL,
-		# The superegg's own Y is the hull's Z, and its Z is the hull's -Y.
-		Vector2(DOOR_CENTER.x, -DOOR_CENTER.y), Vector2(DOOR_HALF.x, DOOR_HALF.y),
-		DOOR_EXPONENT, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+		Vector3(HULL_RADIUS, HULL_HALF_LENGTH, HULL_RADIUS), HULL_WALL, apertures,
+		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
 	shell.rotation.x = PI * 0.5
 	var material := _hull_material(HULL)

@@ -144,9 +144,25 @@ func point_on_ring(angle: float, local_radius: float) -> Vector2:
 
 
 ## True where the surface layers are drawn (the edge plus its overlap).
-func is_within_surface(pos: Vector2) -> bool:
+func is_within_surface(pos: Vector2, overlap: float = SURFACE_OVERLAP) -> bool:
 	var measure := _distance_and_edge(pos)
-	return measure.x <= measure.y + SURFACE_OVERLAP
+	return measure.x <= measure.y + overlap
+
+
+## How far past the shoreline a liquid sheet must be drawn so that its own
+## edge is certainly buried in ground standing above the liquid.
+##
+## A sheet is built from whole SURFACE_CELL cells kept when their centre is
+## inside, so its boundary is a stair-stepped grid line, not the smooth
+## shoreline. Stop that line anywhere the bed still lies below the liquid and
+## the steps show as a jagged edge running across the bed -- the single most
+## repeated liquid-surface bug in this project. Drawing out past BANK_WIDTH
+## puts the boundary in the bank, which by construction has climbed back to
+## the surrounding ground, so the steps are inside the terrain where nothing
+## can see them. Pass this to build_surface() for any pool whose liquid level
+## sits at or below its own shelf.
+func bank_covering_overlap() -> float:
+	return BANK_WIDTH + SURFACE_OVERLAP
 
 
 ## An open lake: a non-solid water sheet in the Crossroads lake's opaque water
@@ -162,8 +178,11 @@ func build_water(parent: Node3D, level: float) -> void:
 
 ## Any non-solid liquid sheet over the basin (water, or a lava pool's lava),
 ## following the organic edge and tucked under the bank like the water.
-func build_surface(parent: Node3D, label: String, level: float, material: Material) -> void:
-	parent.add_child(_surface_mesh(label, _disc_triangles(level), material))
+func build_surface(
+	parent: Node3D, label: String, level: float, material: Material,
+	overlap: float = SURFACE_OVERLAP
+) -> void:
+	parent.add_child(_surface_mesh(label, _disc_triangles(level, overlap), material))
 
 
 ## A frozen lake, as in the Ice Kingdom: a solid, walkable ice sheet at
@@ -196,9 +215,9 @@ func build_frozen(parent: StaticBody3D, ice_surface_level: float, thickness: flo
 ## flat triangle list at height `y`, clockwise from above (Godot's front face)
 ## so faces agree with their upward normals. The grid's ragged outer cells lie
 ## under the bank. Shared by the visible mesh and, for ice, its collider.
-func _disc_triangles(y: float) -> PackedVector3Array:
+func _disc_triangles(y: float, overlap: float = SURFACE_OVERLAP) -> PackedVector3Array:
 	var triangles := PackedVector3Array()
-	var reach := radius + edge_variation * 1.6 + SURFACE_OVERLAP
+	var reach := radius + edge_variation * 1.6 + overlap
 	var x0 := center.x - half_length - reach
 	var z0 := center.y - reach
 	var columns := int(ceil((half_length + reach) * 2.0 / SURFACE_CELL))
@@ -206,7 +225,7 @@ func _disc_triangles(y: float) -> PackedVector3Array:
 	for row in rows:
 		for column in columns:
 			var a := Vector2(x0 + float(column) * SURFACE_CELL, z0 + float(row) * SURFACE_CELL)
-			if not is_within_surface(a + Vector2.ONE * SURFACE_CELL * 0.5):
+			if not is_within_surface(a + Vector2.ONE * SURFACE_CELL * 0.5, overlap):
 				continue
 			var b := a + Vector2(SURFACE_CELL, 0.0)
 			var c := a + Vector2(0.0, SURFACE_CELL)

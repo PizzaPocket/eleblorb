@@ -358,7 +358,7 @@ func _init() -> void:
 	)
 	_lava_lake = _channel_lake(
 		CLIFF_EDGE_X + CLIFF_FACE_WIDTH + LAVA_LAKE_WEST_GAP,
-		VOLCANO_CENTER.x - FIRE_KINGDOM_TERRAIN.LAVA_MOUTH_RADIUS * 0.2,
+		VOLCANO_CENTER.x - FIRE_KINGDOM_TERRAIN.LAVA_MOUTH_RADIUS * 1.15,
 		LAVA_LAKE_RADIUS, LAVA_LAKE_EDGE_VARIATION, LAVA_LAKE_DEPTH, LAVA_LAKE_SHELF,
 		20260924, LAVA_LAKE_SLOPE_WIDTH
 	)
@@ -797,10 +797,13 @@ func _raw_height(x: float, z: float) -> float:
 		height = lerpf(height, titan_height, humongous_clear)
 	# The lava basin, carved into the chasm floor the same way the sea and the
 	# frozen lake are carved into theirs: organic shoreline, banked shores and
-	# a shelving bed. Carved before the volcano rises so the volcanic body
-	# grows straight out of the lake's far end with no seam between them.
-	height = _lava_lake.carve(height, point)
-	height += _volcano_window.weight(point) * VOLCANO_RISE
+	# a shelving bed. The volcano owns its own ground: the carve fades out
+	# across its window, so the basin shelves up into the volcanic body
+	# instead of cutting a trough through it.
+	var volcano_weight := _volcano_window.weight(point)
+	if volcano_weight < 1.0:
+		height = lerpf(_lava_lake.carve(height, point), height, volcano_weight)
+	height += volcano_weight * VOLCANO_RISE
 	# The starting pit, punched down to a flat floor.
 	if start_distance < PIT_RIM_RADIUS + 1.0:
 		height = minf(height, _pit_height(point))
@@ -1124,7 +1127,12 @@ func _build_liquid_surfaces() -> void:
 ## The lava lake's own surface sheet, drawn to the same organic outline the
 ## basin was carved to (see _lava_lake) rather than a ruled strip.
 func _build_chasm_lava() -> void:
-	_lava_lake.build_surface(self, "AirChasmLava", CHASM_LAVA_LEVEL, NatureProps.build_lava_material())
+	# Drawn out past the bank so the sheet's own grid edge is buried in ground
+	# standing above the lava -- see NaturalLake.bank_covering_overlap().
+	_lava_lake.build_surface(
+		self, "AirChasmLava", CHASM_LAVA_LEVEL, NatureProps.build_lava_material(),
+		_lava_lake.bank_covering_overlap()
+	)
 	var lava := get_node_or_null("AirChasmLava") as MeshInstance3D
 	if lava != null:
 		CollisionPolicy.mark_hazard(lava)
