@@ -1225,14 +1225,11 @@ var _snowboard_ground_latch := 0.0
 ## docs/traversal_powers_architecture.md.
 var _rig: RigAdapter = null
 var _traversal := TraversalDirector.new()
+var _ice_skates := IceSkateMode.new()
 ## Matched Ice legs automatically extend these runners. They remain visible
 ## off ice while their traversal physics only engage on the frozen lake.
 var _ice_skates_active := false
 var _ice_skating_active := false
-var _ice_skate_pose_blend := 0.0
-var _ice_skate_stride_phase := 0.0
-var _ice_skate_previous_speed := 0.0
-var _ice_skate_smoothed_acceleration := 0.0
 var _ice_skate_left: Node3D = null
 var _ice_skate_right: Node3D = null
 var _ice_skate_was_supported := false
@@ -1837,7 +1834,7 @@ func _ready() -> void:
 	var pivots := _build_pivots(_piloting_xiao_hou_zi)
 	_apply_pivots(pivots)
 	_visuals_pivots = pivots
-	_rig = RigAdapter.new(_blorb_suit_pivot_map(pivots))
+	_rig = RigAdapter.new(_rig_joint_map(pivots))
 	_build_water_streams()
 	_roll_idle_pose()
 	HeldItem.changed.connect(_on_held_item_changed)
@@ -2314,7 +2311,7 @@ func _physics_process(delta: float) -> void:
 		velocity.x=skating_velocity.x
 		velocity.z=skating_velocity.y
 		var skate_acceleration:=maxf((skating_velocity.length()-skate_speed_before)/maxf(delta,0.0001),0.0)
-		var sound_cycle:=fposmod(_ice_skate_stride_phase/TAU,1.0)
+		var sound_cycle:=fposmod(_ice_skates.stride_phase()/TAU,1.0)
 		var sound_left:=ice_skate_stroke(sound_cycle)
 		var sound_right:=ice_skate_stroke(fposmod(sound_cycle+0.5,1.0))
 		UISounds.pulse_ice_skates(
@@ -4572,149 +4569,25 @@ func _apply_snowboard_pose(delta: float) -> void:
 ## This runs after the ordinary gait so no walk cycle leaks through the
 ## skate silhouette, and eases away cleanly when the runners leave the ice.
 func _apply_ice_skate_pose(delta: float) -> void:
-	var planar_speed:=Vector2(velocity.x,velocity.z).length()
-	var moving: bool=_ice_skating_active and planar_speed>0.12
-	_ice_skate_pose_blend=move_toward(
-		_ice_skate_pose_blend,1.0 if moving else 0.0,
-		ICE_SKATE_POSE_SETTLE_SPEED*delta
-	)
-	if not moving:
-		_ice_skate_previous_speed=planar_speed
-		_ice_skate_smoothed_acceleration=0.0
-		# Once ice support is gone, _animate_walk() has already run earlier
-		# this frame and owns the correct walk/idle/jump targets. Do not write
-		# a fading skating target over those freshly restored rotations: the
-		# old path did exactly that until an arbitrarily tiny blend, then
-		# returned and could strand a residual forward lean indefinitely.
-		var rest_t:=minf(ICE_SKATE_POSE_SETTLE_SPEED*delta,1.0)
-		if _ice_skating_active:
-			# While stopped but still on ice, ordinary gait is intentionally
-			# suppressed, so this layer itself must settle its torso to neutral.
-			_spine.rotation.x=lerp_angle(_spine.rotation.x,0.0,rest_t)
-		# Only this layer ever leans the thorax, so it must straighten it on
-		# every way out of skating (leaving the ice at speed, the runners
-		# withdrawing), not just a stop on ice; otherwise the lean stayed on.
-		if _thorax!=null:
-			_thorax.rotation.x=lerp_angle(_thorax.rotation.x,0.0,rest_t)
-		return
-	# Preserve the feet's physical contact while the deeper sprint flexion
-	# lowers the body through the hip and knee chain.
-	var w:=_ice_skate_pose_blend
-	# Pose strength and temporal interpolation are distinct. Using w itself as
-	# lerp weight became a literal one-frame snap once the blend reached 1.0.
-	var pose_t:=minf(ICE_SKATE_POSE_SETTLE_SPEED*delta,1.0)*w
-	var sprinting:=_is_sprinting()
-	var effort:=ICE_SKATE_SPRINT_POSE_MULTIPLIER if sprinting else 1.0
-	var raw_acceleration:=maxf((planar_speed-_ice_skate_previous_speed)/maxf(delta,0.0001),0.0)
-	_ice_skate_previous_speed=planar_speed
-	_ice_skate_smoothed_acceleration=lerpf(
-		_ice_skate_smoothed_acceleration,raw_acceleration,
-		1.0-exp(-5.0*delta)
-	)
-	var thrust_mix:=clampf(_ice_skate_smoothed_acceleration/ICE_SKATE_FULL_THRUST_ACCELERATION,0.0,1.0)
-	var cadence:=lerpf(ICE_SKATE_CADENCE_GLIDE,ICE_SKATE_CADENCE_THRUST,smoothstep(0.0,1.0,thrust_mix))
-	_ice_skate_stride_phase+=delta*cadence
-	var cycle:=fposmod(_ice_skate_stride_phase/TAU,1.0)
-	var left_stroke:=ice_skate_stroke(cycle)
-	var right_stroke:=ice_skate_stroke(fposmod(cycle+0.5,1.0))
-	var left_push:=left_stroke.x
-	var right_push:=right_stroke.x
-	var left_recovery:=left_stroke.y
-	var right_recovery:=right_stroke.y
-	var left_support:=left_stroke.z
-	var right_support:=right_stroke.z
-	var left_knee:=(ICE_SKATE_GLIDE_KNEE*left_support+ICE_SKATE_PUSH_KNEE*left_push+ICE_SKATE_RECOVERY_KNEE*left_recovery)*effort
-	var right_knee:=(ICE_SKATE_GLIDE_KNEE*right_support+ICE_SKATE_PUSH_KNEE*right_push+ICE_SKATE_RECOVERY_KNEE*right_recovery)*effort
-	# Positive X is backward for this procedural leg rig (the same verified
-	# convention used by the run arms). The old negative push kicked forward.
-	var left_hip_x:=ICE_SKATE_PUSH_HIP_BACK*left_push*effort-ICE_SKATE_RECOVERY_HIP_FORWARD*left_recovery-ICE_SKATE_GLIDE_HIP_FORWARD*left_support*effort
-	var right_hip_x:=ICE_SKATE_PUSH_HIP_BACK*right_push*effort-ICE_SKATE_RECOVERY_HIP_FORWARD*right_recovery-ICE_SKATE_GLIDE_HIP_FORWARD*right_support*effort
-	_leg_left.rotation.x=lerp_angle(_leg_left.rotation.x,left_hip_x,pose_t)
-	_leg_right.rotation.x=lerp_angle(_leg_right.rotation.x,right_hip_x,pose_t)
-	# This rig's local yaw signs are opposite the earlier assumption: positive
-	# on the left and negative on the right open the toes, not the heels.
-	_leg_left.rotation.y=lerp_angle(_leg_left.rotation.y,ICE_SKATE_TOE_OUT*left_push*effort,pose_t)
-	_leg_right.rotation.y=lerp_angle(_leg_right.rotation.y,-ICE_SKATE_TOE_OUT*right_push*effort,pose_t)
-	_knee_left.rotation.x=lerp_angle(_knee_left.rotation.x,left_knee,pose_t)
-	_knee_right.rotation.x=lerp_angle(_knee_right.rotation.x,right_knee,pose_t)
-	# Resolve lateral extension after the sprint hip, toe, and knee pose is
-	# present. Deep flex changes the combined Euler result substantially, so
-	# measuring before these joints were posed could select a value that read
-	# correctly at normal effort but folded inward during sprint.
-	var outward_amount:=ICE_SKATE_SPRINT_PUSH_OUTWARD if sprinting else ICE_SKATE_PUSH_OUTWARD
-	_leg_left.rotation.z=lerp_angle(
-		_leg_left.rotation.z,_ice_skate_outward_roll(_leg_left,_ankle_left,outward_amount)*left_push,pose_t
-	)
-	_leg_right.rotation.z=lerp_angle(
-		_leg_right.rotation.z,_ice_skate_outward_roll(_leg_right,_ankle_right,outward_amount)*right_push,pose_t
-	)
-	# Counter the complete support-leg chain at the ankle. This keeps the
-	# weighted front runner parallel to the ice instead of pitching with the
-	# deeply bent knee; the pushing/recovering runner is allowed to articulate.
-	_ankle_left.rotation.x=lerp_angle(_ankle_left.rotation.x,-(left_hip_x+left_knee)*left_support,pose_t)
-	_ankle_right.rotation.x=lerp_angle(_ankle_right.rotation.x,-(right_hip_x+right_knee)*right_support,pose_t)
-	# Run-like opposition, held on exactly the same support weights as the
-	# legs: left glide leg pairs with the bent right arm forward and vice versa.
-	var sprint_arm_lift:=ICE_SKATE_SPRINT_ARM_LIFT if sprinting else 0.0
-	_arm_left.rotation.x=lerp_angle(_arm_left.rotation.x,(-ICE_SKATE_ARM_SWING*right_support+ICE_SKATE_ARM_SWING*0.55*left_support)*effort-sprint_arm_lift,pose_t)
-	_arm_right.rotation.x=lerp_angle(_arm_right.rotation.x,(-ICE_SKATE_ARM_SWING*left_support+ICE_SKATE_ARM_SWING*0.55*right_support)*effort-sprint_arm_lift,pose_t)
-	_elbow_left.rotation.x=lerp_angle(_elbow_left.rotation.x,-ICE_SKATE_ELBOW_BEND*right_support*effort,pose_t)
-	_elbow_right.rotation.x=lerp_angle(_elbow_right.rotation.x,-ICE_SKATE_ELBOW_BEND*left_support*effort,pose_t)
-	var skate_lean:=ICE_SKATE_BODY_LEAN+(ICE_SKATE_SPRINT_BODY_LEAN if sprinting else 0.0)
-	_spine.rotation.x=lerp_angle(_spine.rotation.x,skate_lean,pose_t)
-	if _thorax!=null:
-		_thorax.rotation.x=lerp_angle(_thorax.rotation.x,skate_lean*0.35,pose_t)
-	# Do not translate the torso and pelvis independently: that visually
-	# disconnects them from the fixed hip sockets. (A foot-anchor shift here
-	# once meant to lower the whole rig with the bent legs, but the ground
-	# pose reset it every frame, so it never took effect and was removed;
-	# the body height comes from _body_base_height() alone.)
-	_spine.position.y=lerpf(_spine.position.y,_spine_rest_y,pose_t)
-	_hips.position.y=lerpf(_hips.position.y,_hips_rest_y,pose_t)
-
-
-## Resolve lateral hip roll from the live posed hierarchy instead of relying
-## on a left/right sign convention. Several playable rigs use different
-## local bases; the correct candidate is simply the one that puts the ankle
-## farther from the character's centre along that leg's actual side.
-func _ice_skate_outward_roll(leg: Node3D,ankle: Node3D,amount: float) -> float:
-	var original:=leg.rotation.z
-	var right:=visuals.global_transform.basis.x.normalized()
-	var side:=signf((leg.global_position-_spine.global_position).dot(right))
-	if is_zero_approx(side):
-		side=signf(leg.position.x)
-	var best_angle:=0.0
-	var best_score:=-INF
-	# Search the complete safe arc. Merely comparing +/-amount can choose the
-	# less-inward endpoint when deep X/Y sprint flex makes both extremes fold
-	# toward the centre. Scoring the real ankle endpoint makes the requested
-	# left/back-left and right/back-right trajectories explicit.
-	for sample in 17:
-		var candidate:=lerpf(-amount,amount,float(sample)/16.0)
-		leg.rotation.z=candidate
-		leg.force_update_transform()
-		ankle.force_update_transform()
-		var score:=side*(ankle.global_position-leg.global_position).dot(right)
-		if score>best_score:
-			best_score=score
-			best_angle=candidate
-	leg.rotation.z=original
-	return best_angle
+	# The pose itself lives in IceSkateMode, shared with every other character
+	# that will skate (see docs/traversal_powers_architecture.md). The
+	# movement half is still the branch in _physics_process above, so it tells
+	# the mode whether skating is engaged; that shim goes away when the
+	# movement moves in too.
+	_ice_skates.engaged = _ice_skating_active
+	var ctx := _traversal_context(delta)
+	_ice_skates.pose(ctx)
 
 
 ## One skate's support -> push -> forward recovery cycle. The other leg uses
 ## the same curve half a cycle later. Components are (push, recovery, support)
 ## and always sum to one, preventing the old side-to-side pendulum motion.
 static func ice_skate_stroke(cycle: float) -> Vector3:
-	var p:=fposmod(cycle,1.0)
-	# Spend most of the first half planted in the glide. Weight transfers
-	# quickly into a rearward thrust, the extension hangs briefly, then that
-	# leg recovers forward slowly in preparation for its next planted phase.
-	var support:=1.0-smoothstep(0.38,0.50,p)+smoothstep(0.88,1.0,p)
-	var push:=smoothstep(0.42,0.52,p)*(1.0-smoothstep(0.70,0.88,p))
-	var recovery:=smoothstep(0.68,0.80,p)*(1.0-smoothstep(0.90,1.0,p))
-	var total:=maxf(push+recovery+support,0.001)
-	return Vector3(push,recovery,support)/total
+	# The curve itself now belongs to IceSkateMode, along with the pose that
+	# reads it. Kept here as a forward for the callers that have not moved
+	# onto the shared system yet (xiao_hou_zi.gd, and this file's own skating
+	# audio); it goes away with them.
+	return IceSkateMode.stroke(cycle)
 
 
 ## Called only by _pose_body_dirtbike(), as the last step of placing the
@@ -7010,6 +6883,19 @@ func _pose_body_crystal(base_y: float) -> void:
 	visuals.position = Vector3(0.0, base_y, 0.0)
 
 
+## Every joint a traversal power may need, by rig-neutral name: the suit's
+## own map plus the torso joints the suit never dresses but poses do use.
+## .get() throughout, because which of these a rig actually has differs (see
+## RigAdapter, which reports that rather than hiding it).
+func _rig_joint_map(pivots: Dictionary) -> Dictionary:
+	var map := _blorb_suit_pivot_map(pivots)
+	for name in ["thorax", "neck", "hips", "abdomen", "chest"]:
+		var node: Node3D = pivots.get(name) as Node3D
+		if node != null:
+			map[name] = node
+	return map
+
+
 ## This frame, described for a traversal power: the body, its profile, its
 ## suit and its rig, plus the intent the player is expressing right now.
 ## Built fresh each frame rather than kept, so nothing can go stale.
@@ -7024,6 +6910,7 @@ func _traversal_context(delta: float) -> TraversalContext:
 	ctx.sprinting = _is_sprinting()
 	ctx.jump_pressed = Input.is_action_just_pressed("jump") and not UIState.modal_open
 	ctx.grounded = is_on_floor() or _is_near_ground()
+	ctx.visuals = visuals
 	return ctx
 
 
@@ -8001,9 +7888,7 @@ func _update_ice_skate_state() -> void:
 		if not _blorb_suit.penguin_form_active():
 			velocity.x=0.0
 			velocity.z=0.0
-		_ice_skate_stride_phase=0.0
-		_ice_skate_previous_speed=0.0
-		_ice_skate_smoothed_acceleration=0.0
+		_ice_skates.reset()
 		_ice_skate_airborne=false
 		_ice_skate_was_supported=false
 		_ice_skate_surface_velocity=Vector3.ZERO

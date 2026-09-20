@@ -18,6 +18,10 @@ var profile: PlayableCharacterProfile
 var suit: BlorbSuitController
 var rig: RigAdapter
 var terrain: Node
+## The rendered body root, which carries the character's facing. Poses that
+## need "which way is this character's own right" read it from here rather
+## than from the collision body, which this project never rotates.
+var visuals: Node3D
 var delta := 0.0
 ## The frame's intent, already resolved into world space by whoever is
 ## driving: a direction, whether sprint is held, and whether jump was pressed
