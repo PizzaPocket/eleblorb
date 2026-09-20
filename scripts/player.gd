@@ -1220,6 +1220,11 @@ var _snowboard_was_supported := false
 ## remaining landing latch (see SNOWBOARD_LANDING_LATCH).
 var _snowboard_airborne := false
 var _snowboard_ground_latch := 0.0
+## The shared traversal system: this body's joints by rig-neutral name, and
+## the powers that have been moved onto it so far. See
+## docs/traversal_powers_architecture.md.
+var _rig: RigAdapter = null
+var _traversal := TraversalDirector.new()
 ## Matched Ice legs automatically extend these runners. They remain visible
 ## off ice while their traversal physics only engage on the frozen lake.
 var _ice_skates_active := false
@@ -1832,6 +1837,7 @@ func _ready() -> void:
 	var pivots := _build_pivots(_piloting_xiao_hou_zi)
 	_apply_pivots(pivots)
 	_visuals_pivots = pivots
+	_rig = RigAdapter.new(_blorb_suit_pivot_map(pivots))
 	_build_water_streams()
 	_roll_idle_pose()
 	HeldItem.changed.connect(_on_held_item_changed)
@@ -1945,6 +1951,17 @@ func _physics_process(delta: float) -> void:
 		return
 	if _player_following_blorbus:
 		_update_blorbus_control(delta)
+		return
+	# The traversal director: powers that have been moved onto the shared
+	# system (see docs/traversal_powers_architecture.md) get their chance
+	# here, before the branches below that still hold the ones which have
+	# not. A power that takes the frame owns the movement and the pose, so
+	# nothing after this runs for it. Empty while the migration is under
+	# way, which is exactly a no-op.
+	# Guarded so that while no power has been migrated this costs nothing at
+	# all, rather than building a context object every frame for an empty
+	# list: the no-op is then provable by inspection.
+	if not _traversal.modes.is_empty() and _traversal.run(_traversal_context(delta)):
 		return
 	# Tracked every frame, not just while grounded (where the ordinary jump
 	# input below is read) -- a press timed for a blorb bounce can happen
@@ -6991,6 +7008,23 @@ func _pose_body_penguin(base_y: float) -> void:
 func _pose_body_crystal(base_y: float) -> void:
 	visuals.basis = Basis(Vector3.UP, _body_yaw) * Basis(Vector3.RIGHT, -_crystal_body_pitch)
 	visuals.position = Vector3(0.0, base_y, 0.0)
+
+
+## This frame, described for a traversal power: the body, its profile, its
+## suit and its rig, plus the intent the player is expressing right now.
+## Built fresh each frame rather than kept, so nothing can go stale.
+func _traversal_context(delta: float) -> TraversalContext:
+	var ctx := TraversalContext.new(self, _playable_profile, _rig, _blorb_suit, terrain)
+	ctx.delta = delta
+	var input := _get_move_input()
+	var basis := camera.global_transform.basis
+	var direction := basis.x * input.x + basis.z * input.y
+	direction.y = 0.0
+	ctx.direction = direction.normalized() if direction.length_squared() > 0.0001 else Vector3.ZERO
+	ctx.sprinting = _is_sprinting()
+	ctx.jump_pressed = Input.is_action_just_pressed("jump") and not UIState.modal_open
+	ctx.grounded = is_on_floor() or _is_near_ground()
+	return ctx
 
 
 ## Upright on the feet at the given height, facing _body_yaw.
