@@ -68,9 +68,31 @@ Each existing power becomes one of these: `SwimMode`, `MermaidTailMode`,
 `LavaWalkMode`, `LavaDiveMode`, `ZeroGMode`.
 
 **3. `RigAdapter`** — the joint vocabulary above, plus the profile's scale
-data, plus graceful absence (MonkeyFigure has no `neck`; a pose asking for one
-gets a no-op rather than a crash). Poses are written once against joint names
-and land correctly on any rig.
+data, plus honest handling of rigs that do not have every joint. Measured
+against both rigs (see the comment above `MonkeyFigure.build()`):
+
+| Chain | Human | Xiao Hou Zi |
+|---|---|---|
+| Arm | shoulder, elbow, hand segment, wrist, fingertip | shoulder, elbow, then one marker that **is** hand, wrist and fingertip |
+| Leg | hip, tilt, knee, ankle, foot segment, toe | hip, knee, then one marker that **is** ankle and toe, with no children |
+| Spine | spine, thorax, neck, head (plus abdomen, chest) | spine, head |
+
+Rotation directions match exactly on the joints both rigs have, so a pose's
+signs port unchanged; what does not port is which joints exist. Three
+consequences the adapter has to make explicit rather than silent:
+
+- An ankle pose (the skate blade angle, the penguin's flat feet, the
+  snowboard's grade flex, the mermaid's ankle stroke) currently writes to a
+  node on Xiao that moves nothing.
+- A wrist or palm pose has no hand segment to turn.
+- A thorax twist or neck bend has no pivot at all.
+
+So the adapter reports, per joint, whether it is real, aliased onto another,
+or absent, and a mode asks for what it needs. Where a joint is missing, the
+mode supplies a fallback written once (for example, fold an ankle angle into
+the knee, or drop it) rather than every mode rediscovering the gap. The
+alternative, which we should consider for the limbs that matter most, is
+giving MonkeyFigure the missing joints so the fallbacks are not needed.
 
 **4. `TraversalDirector`** — owns the ordered mode list for a body, runs
 `update()` in priority order, and the first mode that returns true owns the

@@ -323,6 +323,33 @@ const TAIL_ANIM_YAW_HOLD_MAX := 3.8
 ##   face/muzzle (like a real-world colobus or mandrill), so this can be set
 ##   noticeably darker than fur_color for that look instead of always
 ##   matching it
+## MEASURED, not derived (headless probe, both rigs built and each joint
+## rotated in turn to see where the limb's far end actually went). This rig is
+## deliberately simpler than ProceduralFigure's and several of its returned
+## keys ALIAS ONE NODE, which silently makes some poses no-ops:
+##
+##   arm:   MonkeyShoulderPivot > MonkeyElbowPivot > MonkeyWristMarker
+##          "hand_left", "wrist_left" and "fingertip_left" are all that one
+##          marker. There is no hand segment, so a wrist twist or a palm roll
+##          rotates nothing and a fingertip offset does not exist.
+##   leg:   MonkeyHipPivot > MonkeyKneePivot > MonkeyAnkleMarker
+##          "ankle_left" and "toe_left" are that one marker, and it has NO
+##          children. Rotating the ankle moves nothing at all: no foot mesh
+##          hangs off it. The human rig instead runs
+##          hip > LegTilt > KneePivot > AnklePivot > foot mesh > ToeAttach.
+##   spine: SpinePivot > HeadPivot, with no thorax, neck, abdomen or chest
+##          pivot between them. Poses that twist a thorax or bend a neck have
+##          nowhere to write on this rig.
+##
+## Rotation directions, where a joint does exist, match the human rig exactly,
+## so a pose's SIGNS port across unchanged even though its reachable joints do
+## not. On both rigs, with the figure facing +Z and the character's own left
+## at +X: a positive rotation.x at a shoulder, elbow, hip or knee swings that
+## limb's far end BACKWARD; a positive rotation.z swings it toward +X (outward
+## for a left limb, inward for a right one, hence the `side *` factor every
+## pose already uses); a positive rotation.x on the spine leans the head
+## FORWARD. On the human's ankle alone, a positive rotation.x points the toes
+## DOWN and a positive rotation.z rolls the foot up and outward.
 static func build(
 	parent: Node3D, fur_color: Color = MONKEY_FUR_COLOR, scale: float = 1.0, variant: Dictionary = {}
 ) -> Dictionary:
