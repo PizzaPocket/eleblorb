@@ -175,6 +175,7 @@ var _blorb_suit := BlorbSuitController.new()
 var _rig: RigAdapter = null
 var _ice_skates := IceSkateMode.new()
 var _snowboard_mode := SnowboardMode.new()
+var _crystal := CrystalSkateMode.new()
 ## His snowboard: the same power the player rides, on his own rig and at his
 ## own scale. Toggled by the leg-power chord, as the player's is.
 var _direct_snowboard_active: bool = false
@@ -847,6 +848,8 @@ func _special_speed_multiplier(slots: Array[String], averaged: bool = false) -> 
 func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_pressed: bool) -> void:
 	if not is_player_controlled or _mounted:
 		return
+	if _update_direct_crystal_riding(direction, delta, sprinting, jump_pressed):
+		return
 	var planar := Vector2(direction.x, direction.z)
 	if direction.length_squared() > 1.0:
 		direction = direction.normalized()
@@ -1280,6 +1283,44 @@ func _apply_direct_power_pose(delta: float) -> void:
 			# MonkeyFigure follows the same local-axis convention as the human:
 			# this quarter turn presents the palm forward with fingertips vertical.
 			wrist.rotation.z = lerp_angle(wrist.rotation.z, signf(arm.position.x) * PI * 0.5, settle)
+
+
+## Skating a crystal track: the shared power, on his rig. It takes the whole
+## frame when it engages, so his ordinary movement does not run at all while
+## he rides. His origin sits on the ground, so his foot offset is zero.
+func _update_direct_crystal_riding(
+	direction: Vector3, delta: float, sprinting: bool, jump_pressed: bool
+) -> bool:
+	var ctx := _traversal_context(delta)
+	ctx.sprinting = sprinting
+	ctx.aim_basis = Basis(Vector3.UP, rotation.y)
+	ctx.grounded = is_on_floor() and _direct_vertical_velocity <= 0.1
+	var stick := Vector2(direction.x, direction.z)
+	var blocked := (
+		_direct_diving or _direct_surface_swimming or _direct_flying or _direct_air_feet
+		or _direct_fire_limb_flight or _direct_lava_surface or _direct_dirtbike_active
+		or _direct_snowboard_active
+	)
+	var was_riding := _crystal.riding
+	var owned := _crystal.ride(ctx, stick, jump_pressed and not UIState.modal_open, blocked, 0.0)
+	if was_riding and not _crystal.riding:
+		if _crystal.exit_velocity != Vector3.ZERO:
+			velocity = _crystal.exit_velocity
+		if jump_pressed and not UIState.modal_open:
+			velocity.y = maxf(velocity.y, 0.0) + HumanoidLocomotion.jump_speed(_playable_profile)
+		_direct_vertical_velocity = velocity.y
+	if not owned:
+		return false
+	_direct_vertical_velocity = velocity.y
+	var facing := _crystal.facing()
+	if facing != Vector3.ZERO:
+		rotation.y = lerp_angle(rotation.y, atan2(facing.x, facing.z), minf(ROTATION_SPEED * delta, 1.0))
+	# A skating glide over his standing pose, then the shared skate stance.
+	_animate_walk(delta, true)
+	_ice_skates.engaged = _crystal.speed > 0.12
+	_ice_skates.pose(ctx)
+	UISounds.pulse_ice_skates(get_instance_id(), _crystal.speed, 0.0, 1.0, 1.0)
+	return true
 
 
 ## Snow legs, and the same left/right leg-power chord the player toggles a
