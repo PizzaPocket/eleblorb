@@ -120,7 +120,7 @@ const PLATFORM_AID_APPROACH_DISTANCE := COLLIDER_RADIUS + 0.4 + 0.12
 const BULGE_T := 0.30
 
 const CORE_RADIUS := 0.07  # apple-sized, matches gem.gd's own default scale
-const HEAD_MOD_ITEMS := ["Diving Helmet", "Knight's Helm", "Lava Helm", "Nautilus Crown", "Toboggan", "Bird Helm", "Penguin Helm"]
+const HEAD_MOD_ITEMS := ["Diving Helmet", "Knight's Helm", "Lava Helm", "Nautilus Crown", "Toboggan", "Bird Helm", "Penguin Helm", "Space Helm"]
 const ARMOR_MOD_ITEMS := ["Dented Breastplate"]
 ## Items a leg blorb binds (one at a time).
 const LEG_MOD_ITEMS := ["Crystal Skates"]
@@ -1108,6 +1108,8 @@ func _element_glow_color() -> Color:
 			return ElementPalette.SNOW_BODY
 		"wood":
 			return Color(0.48, 0.3, 0.16)
+		"space":
+			return Color(0.62, 0.52, 0.9)
 		_:
 			return Color(1.0, 0.88, 0.55)
 
@@ -1289,15 +1291,46 @@ func _apply_element_visuals() -> void:
 			core_material.emission_enabled = true
 			core_material.emission = Color(0.5, 0.32, 0.16)
 			core_material.emission_energy_multiplier = 0.6
+		"space":
+			_body_material.albedo_color = Color(ElementPalette.SPACE_BODY, 0.97)
+			_body_material.roughness = 0.18
+			_body_material.metallic = 0.12
+			_body_material.emission_enabled = true
+			_body_material.emission = ElementPalette.SPACE_BODY.lightened(0.08)
+			_body_material.emission_energy_multiplier = 0.35
+			core_material.albedo_color = Color(0.72, 0.64, 0.95)
+			core_material.emission_enabled = true
+			core_material.emission = Color(0.58, 0.48, 0.92)
+			core_material.emission_energy_multiplier = 1.15
+			_add_space_star_dots()
 	# Eyes are created before an initial element is applied. Retint them from
 	# the final body material here so every transformed blorb follows the same
 	# darker-on-body eye convention instead of retaining its old goo colour.
-	var eye_color := _body_material.albedo_color.darkened(0.25)
+	var body_rgb := _body_material.albedo_color
+	var luminance := body_rgb.r * 0.2126 + body_rgb.g * 0.7152 + body_rgb.b * 0.0722
+	var eye_color := body_rgb.lightened(0.62) if luminance < 0.24 else body_rgb.darkened(0.25)
 	for eye in _eyes:
 		if is_instance_valid(eye):
 			var eye_material := eye.get_surface_override_material(0) as StandardMaterial3D
 			if eye_material != null:
 				eye_material.albedo_color = eye_color
+
+
+func _add_space_star_dots() -> void:
+	if body.get_node_or_null("SpaceStarDots") != null:
+		return
+	var root := Node3D.new()
+	root.name = "SpaceStarDots"
+	body.add_child(root)
+	for point in [
+		Vector3(-0.25, 0.78, 0.49), Vector3(0.21, 0.58, 0.57),
+		Vector3(-0.40, 0.41, 0.31), Vector3(0.43, 0.92, 0.21),
+		Vector3(-0.12, 1.13, 0.29), Vector3(0.34, 0.29, 0.38),
+	]:
+		var dot := SuperEgg.build_part(Vector3.ONE * 0.035, Color.WHITE)
+		dot.position = point
+		root.add_child(dot)
+		CollisionPolicy.mark_decorative(dot)
 
 
 ## Checked after every successful gem merge on a starter-trio member (see
@@ -1582,6 +1615,40 @@ func body_visual_snapshot() -> Dictionary:
 	}
 
 
+## How far from the body being driven a parked blorb may be before it stops
+## simulating, and how often it rechecks. The demo world alone parks around
+## sixty of these at checkpoints the player may not reach for an hour, and
+## each was running wander logic, separation against every other blorb, a
+## ground query and a raycast every frame, from anywhere on the course.
+##
+## Party members, the player's own body and a blorb on its way to help never
+## sleep, however far away they are.
+const SLEEP_RADIUS := 150.0
+const SLEEP_RECHECK := 0.5
+
+var _sleeping := false
+var _sleep_recheck := 0.0
+
+
+## True when this blorb is far enough from the action to skip the frame. The
+## distance is rechecked a couple of times a second, staggered per blorb, so
+## the check itself is not the new cost.
+func _dormant(delta: float) -> bool:
+	if in_party or is_player_controlled or _platform_aid_time > 0.0:
+		_sleeping = false
+		return false
+	_sleep_recheck -= delta
+	if _sleep_recheck > 0.0:
+		return _sleeping
+	_sleep_recheck = SLEEP_RECHECK * (1.0 + 0.4 * fposmod(float(get_instance_id()) * 0.37, 1.0))
+	var driven := PartyControl.active_control_body()
+	if not is_instance_valid(driven):
+		_sleeping = false
+		return false
+	_sleeping = global_position.distance_to(driven.global_position) > SLEEP_RADIUS
+	return _sleeping
+
+
 func _process(delta: float) -> void:
 	# A portrait_mode instance (see blorb_portrait.gd) has no Player sibling
 	# to reference -- _player is left null since _ready() returns before
@@ -1595,6 +1662,8 @@ func _process(delta: float) -> void:
 	if is_worn:
 		return
 	if is_melted:
+		return
+	if _dormant(delta):
 		return
 	if _platform_aid_time > 0.0 and is_instance_valid(_platform_aid_target):
 		_platform_aid_time -= delta
@@ -1645,6 +1714,14 @@ func _process(delta: float) -> void:
 	EyeBlink.apply(_eye_blink, delta, _eyes)
 	_update_air_wing_flap(delta)
 	if is_player_controlled:
+		return
+	var atmosphere := AtmosphereLayer.active(get_tree())
+	if in_party and atmosphere != null and atmosphere.gravity_factor_at(global_position) <= 0.02:
+		var leader := PartyControl.active_control_body()
+		if is_instance_valid(leader):
+			var offset_3d: Vector3 = leader.global_position - global_position
+			if offset_3d.length() > FOLLOW_DISTANCE:
+				global_position += offset_3d.normalized() * _follow_glide_speed * delta
 		return
 	var here := Vector2(global_position.x, global_position.z)
 
@@ -2101,11 +2178,11 @@ func _ground_height_at(x: float, z: float) -> float:
 	# mask, but its analytic goo surface is standable too. Treat entering its
 	# footprint like the player's viscous lift onto that surface.
 	if blorb_type != "size":
-		for candidate in get_tree().get_nodes_in_group("blorbs"):
-			if not candidate is Blorb or candidate == self:
-				continue
+		# Cached: this used to scan every blorb in the world, allocating the
+		# group array, once per blorb per frame, to find the single giant.
+		for candidate in [_known_giant()]:
 			var giant := candidate as Blorb
-			if giant.blorb_type != "size":
+			if giant == null or giant == self:
 				continue
 			var giant_top: Variant = giant.giant_surface_height_at(x, z)
 			if giant_top != null:
@@ -2735,6 +2812,27 @@ func _nearest_party_blorb_position() -> Variant:
 			best = other_pos
 			found = true
 	return best if found else null
+
+
+## The world's one "size" blorb, looked up at most a few times a second
+## rather than every frame. Null until one exists.
+static var _giant: Blorb = null
+static var _giant_checked := 0
+
+
+func _known_giant() -> Blorb:
+	if is_instance_valid(_giant) and _giant.blorb_type == "size":
+		return _giant
+	var now := Time.get_ticks_msec()
+	if now - _giant_checked < 500:
+		return null
+	_giant_checked = now
+	for candidate in get_tree().get_nodes_in_group("blorbs"):
+		var blorb := candidate as Blorb
+		if blorb != null and blorb.blorb_type == "size":
+			_giant = blorb
+			return _giant
+	return null
 
 
 func _apply_separation(pos: Vector2) -> Vector2:
