@@ -123,9 +123,17 @@ static func gravity_surface_glide(
 		result=Vector2.from_angle(current_angle+turn)*speed
 	if speed>0.0:
 		var normal_force_ratio:=clampf(normal.dot(Vector3.UP),0.0,1.0)
-		var deceleration:=(rolling_resistance*gravity_strength*normal_force_ratio+drag_coefficient*speed*speed)*delta
+		var resistance:=rolling_resistance*gravity_strength*normal_force_ratio
+		var deceleration:=(resistance+drag_coefficient*speed*speed)*delta
 		var next_speed:=clampf(speed-deceleration,0.0,terminal_speed)
-		result=result.normalized()*next_speed if next_speed>stop_speed else Vector2.ZERO
+		# Coming to rest is only possible where the slope cannot overcome the
+		# surface's own resistance. Without that test a board standing still
+		# on a real gradient could never set off: one frame of gravity adds
+		# less than stop_speed, so every frame was rounded back to zero and it
+		# sat there on a mountainside.
+		var pull:=Vector2(tangent_gravity.x,tangent_gravity.z).length()
+		var can_rest:=pull<=resistance
+		result=Vector2.ZERO if next_speed<=stop_speed and can_rest else result.normalized()*maxf(next_speed,0.0)
 	return result
 
 
