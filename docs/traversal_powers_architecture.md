@@ -94,6 +94,16 @@ the knee, or drop it) rather than every mode rediscovering the gap. The
 alternative, which we should consider for the limbs that matter most, is
 giving MonkeyFigure the missing joints so the fallbacks are not needed.
 
+**Two kinds of power**, found while migrating the first one. Some take a
+frame outright: crystal riding, zero gravity, flight and the penguin's dive
+all replace ordinary movement completely, and those fit `update() -> bool`
+and the director's "first to take the frame owns it" rule. Others are layers
+inside ordinary movement: skating replaces the horizontal velocity while
+ordinary grounded movement still owns the steering, the ground snap and the
+rest of the frame. A layer is called at its point in the frame rather than
+through the director. Both kinds live in the same class, so a power is still
+one file; only how it is invoked differs.
+
 **4. `TraversalDirector`** — owns the ordered mode list for a body, runs
 `update()` in priority order, and the first mode that returns true owns the
 frame and supplies the pose. This replaces the long `if/elif` chains in

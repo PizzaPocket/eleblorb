@@ -309,15 +309,18 @@ const ICE_SKATE_RUNNER_HALF_HEIGHT := 0.025
 const ICE_SKATE_SUPPORT_HEIGHT := 0.055
 const ICE_SKATE_TOTAL_HEIGHT := ICE_SKATE_RUNNER_HALF_HEIGHT * 2.0 + ICE_SKATE_SUPPORT_HEIGHT
 const ICE_SKATE_POSE_SETTLE_SPEED := 9.0
-const ICE_SKATE_SPEED_MULTIPLIER := 2.55
-const ICE_SKATE_DRIVE_ACCELERATION := 16.0
-const ICE_SKATE_SPRINT_THRUST_MULTIPLIER := 1.75
-const ICE_SKATE_LATERAL_GRIP := 13.0
-const ICE_SKATE_REVERSE_BRAKING := 18.0
-const ICE_SKATE_ROLLING_RESISTANCE := 0.022
-const ICE_SKATE_AIR_DRAG := 0.0018
-const ICE_SKATE_STOP_SPEED := 0.10
-const ICE_SKATE_TERMINAL_SPEED := 32.0
+## Skating's tuning belongs to IceSkateMode now. These forward to it for the
+## callers that have not migrated onto the shared system yet, so there stays
+## exactly one set of numbers.
+const ICE_SKATE_SPEED_MULTIPLIER := IceSkateMode.SPEED_MULTIPLIER
+const ICE_SKATE_DRIVE_ACCELERATION := IceSkateMode.DRIVE_ACCELERATION
+const ICE_SKATE_SPRINT_THRUST_MULTIPLIER := IceSkateMode.SPRINT_THRUST_MULTIPLIER
+const ICE_SKATE_LATERAL_GRIP := IceSkateMode.LATERAL_GRIP
+const ICE_SKATE_REVERSE_BRAKING := IceSkateMode.REVERSE_BRAKING
+const ICE_SKATE_ROLLING_RESISTANCE := IceSkateMode.ROLLING_RESISTANCE
+const ICE_SKATE_AIR_DRAG := IceSkateMode.AIR_DRAG
+const ICE_SKATE_STOP_SPEED := IceSkateMode.STOP_SPEED
+const ICE_SKATE_TERMINAL_SPEED := IceSkateMode.TERMINAL_SPEED
 ## Penguin Suit (a full Ice suit under the Penguin Helm): Jump on ice launches
 ## a low forward dive that lands on the belly and toboggans across the ice.
 ## The dive is at least this fast forward, and rises to this fraction of an
@@ -2289,35 +2292,13 @@ func _physics_process(delta: float) -> void:
 		)
 	elif _ice_skating_active and grounded:
 		ice_animation_speed=0.0
-		var steering:=Vector2(direction.x,direction.z)
-		var skating_velocity:=Vector2(velocity.x,velocity.z)
-		var skate_speed_before:=skating_velocity.length()
-		if steering.length_squared()>0.001:
-			var skate_target_speed:=HumanoidLocomotion.ground_speed(
-				_playable_profile,_is_sprinting()
-			)*ICE_SKATE_SPEED_MULTIPLIER*worn_leg_speed_multiplier()
-			skating_velocity=HumanoidLocomotion.drive_wheel_velocity(
-				skating_velocity,steering,skate_target_speed,delta,
-				ICE_SKATE_DRIVE_ACCELERATION*(ICE_SKATE_SPRINT_THRUST_MULTIPLIER if _is_sprinting() else 1.0),ICE_SKATE_LATERAL_GRIP,
-				ICE_SKATE_REVERSE_BRAKING,ICE_SKATE_STOP_SPEED
-			)
-		else:
-			skating_velocity=HumanoidLocomotion.coast_wheel_velocity(
-				skating_velocity,0.0,delta,ICE_SKATE_ROLLING_RESISTANCE,
-				ICE_SKATE_AIR_DRAG,ICE_SKATE_STOP_SPEED,ICE_SKATE_TERMINAL_SPEED
-			)
-		if skating_velocity.length()>ICE_SKATE_TERMINAL_SPEED:
-			skating_velocity=skating_velocity.normalized()*ICE_SKATE_TERMINAL_SPEED
-		velocity.x=skating_velocity.x
-		velocity.z=skating_velocity.y
-		var skate_acceleration:=maxf((skating_velocity.length()-skate_speed_before)/maxf(delta,0.0001),0.0)
-		var sound_cycle:=fposmod(_ice_skates.stride_phase()/TAU,1.0)
-		var sound_left:=ice_skate_stroke(sound_cycle)
-		var sound_right:=ice_skate_stroke(fposmod(sound_cycle+0.5,1.0))
-		UISounds.pulse_ice_skates(
-			get_instance_id(),skating_velocity.length(),skate_acceleration,
-			1.0-sound_left.y,1.0-sound_right.y
-		)
+		# Skating's own velocity, and its audio, live in IceSkateMode. It is a
+		# layer inside ordinary grounded movement rather than a power that
+		# takes the whole frame, so it is called here rather than through the
+		# director (see that class's drive()).
+		var skate_ctx := _traversal_context(delta)
+		skate_ctx.direction = direction
+		_ice_skates.drive(skate_ctx)
 
 	if direction.length() > 0.001:
 		direction = direction.normalized()
@@ -6911,6 +6892,7 @@ func _traversal_context(delta: float) -> TraversalContext:
 	ctx.jump_pressed = Input.is_action_just_pressed("jump") and not UIState.modal_open
 	ctx.grounded = is_on_floor() or _is_near_ground()
 	ctx.visuals = visuals
+	ctx.leg_speed_multiplier = worn_leg_speed_multiplier()
 	return ctx
 
 

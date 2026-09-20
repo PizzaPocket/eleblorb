@@ -30,6 +30,9 @@ var direction := Vector3.ZERO
 var sprinting := false
 var jump_pressed := false
 var grounded := false
+## How much faster this body's worn legs carry it, which the suit decides and
+## the driver hands over rather than each power recomputing it.
+var leg_speed_multiplier := 1.0
 
 
 func _init(

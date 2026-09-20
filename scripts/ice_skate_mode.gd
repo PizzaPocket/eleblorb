@@ -32,6 +32,17 @@ const CADENCE_GLIDE := 1.65
 const CADENCE_THRUST := 4.35
 const FULL_THRUST_ACCELERATION := 7.5
 const MOVING_SPEED := 0.12
+## Movement tuning. This class is the owner now; player.gd forwards these for
+## the callers that have not migrated yet (xiao_hou_zi.gd's own copy).
+const SPEED_MULTIPLIER := 2.55
+const DRIVE_ACCELERATION := 16.0
+const SPRINT_THRUST_MULTIPLIER := 1.75
+const LATERAL_GRIP := 13.0
+const REVERSE_BRAKING := 18.0
+const ROLLING_RESISTANCE := 0.022
+const AIR_DRAG := 0.0018
+const STOP_SPEED := 0.10
+const TERMINAL_SPEED := 32.0
 
 ## Set by whoever owns the movement half while that is still outside this
 ## class. Once the movement moves in, this becomes the mode's own state.
@@ -82,6 +93,46 @@ static func stroke(cycle: float) -> Vector3:
 	var recovery := smoothstep(0.68, 0.80, p) * (1.0 - smoothstep(0.90, 1.0, p))
 	var total := maxf(push + recovery + support, 0.001)
 	return Vector3(push, recovery, support) / total
+
+
+## Skating's own velocity for this frame: steering drives the blades, no
+## steering coasts, and the whole thing is capped at the runners' terminal
+## speed.
+##
+## A LAYER, not a frame owner. Some powers take a frame outright (crystal
+## riding, zero gravity, flight); skating instead replaces the horizontal
+## velocity inside ordinary grounded movement, which still owns the steering,
+## the ground snap and the rest of the frame. See the note on the two kinds
+## in docs/traversal_powers_architecture.md.
+func drive(ctx: TraversalContext) -> void:
+	var steering := Vector2(ctx.direction.x, ctx.direction.z)
+	var skating := Vector2(ctx.body.velocity.x, ctx.body.velocity.z)
+	var before := skating.length()
+	if steering.length_squared() > 0.001:
+		var target := (
+			HumanoidLocomotion.ground_speed(ctx.profile, ctx.sprinting)
+			* SPEED_MULTIPLIER * ctx.leg_speed_multiplier
+		)
+		skating = HumanoidLocomotion.drive_wheel_velocity(
+			skating, steering, target, ctx.delta,
+			DRIVE_ACCELERATION * (SPRINT_THRUST_MULTIPLIER if ctx.sprinting else 1.0),
+			LATERAL_GRIP, REVERSE_BRAKING, STOP_SPEED
+		)
+	else:
+		skating = HumanoidLocomotion.coast_wheel_velocity(
+			skating, 0.0, ctx.delta, ROLLING_RESISTANCE, AIR_DRAG, STOP_SPEED, TERMINAL_SPEED
+		)
+	if skating.length() > TERMINAL_SPEED:
+		skating = skating.normalized() * TERMINAL_SPEED
+	ctx.body.velocity.x = skating.x
+	ctx.body.velocity.z = skating.y
+	var acceleration := maxf((skating.length() - before) / maxf(ctx.delta, 0.0001), 0.0)
+	var cycle := fposmod(_stride_phase / TAU, 1.0)
+	var left := stroke(cycle)
+	var right := stroke(fposmod(cycle + 0.5, 1.0))
+	UISounds.pulse_ice_skates(
+		ctx.body.get_instance_id(), skating.length(), acceleration, 1.0 - left.y, 1.0 - right.y
+	)
 
 
 func pose(ctx: TraversalContext) -> void:
