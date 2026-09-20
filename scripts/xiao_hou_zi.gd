@@ -73,6 +73,9 @@ extends CharacterBody3D
 ## touches the "blorbs" group (see _ready()) so every blorb-only system
 ## stays blind to him.
 var in_party: bool = false
+## Ordinary world encounters use the proximity/bond recruitment below. Demo
+## courses can disable that path and award him from a deliberate portal beat.
+@export var auto_join_enabled: bool = true
 
 const INTERACT_RADIUS := 2.0
 # Same axial look-turn range npc.gd's own head tracking uses -- see that
@@ -223,6 +226,12 @@ var _direct_left_arm_water: bool = false
 var _direct_right_arm_water: bool = false
 var _direct_left_arm_fire: bool = false
 var _direct_right_arm_fire: bool = false
+var _direct_left_arm_electric: bool = false
+var _direct_right_arm_electric: bool = false
+var _direct_left_arm_city: bool = false
+var _direct_right_arm_city: bool = false
+var _direct_left_arm_plant_cooldown: float = 0.0
+var _direct_right_arm_plant_cooldown: float = 0.0
 var _direct_left_leg_water: bool = false
 var _direct_right_leg_water: bool = false
 var _direct_left_leg_fire: bool = false
@@ -231,6 +240,8 @@ var _direct_water_arm_fx: Array[GPUParticles3D] = []
 var _direct_fire_arm_fx: Array[GPUParticles3D] = []
 var _direct_water_leg_fx: Array[GPUParticles3D] = []
 var _direct_fire_leg_fx: Array[GPUParticles3D] = []
+var _direct_electric_arm_fx: Array[LightningBolt] = []
+var _direct_city_arm_fx: Array[LightningBolt] = []
 var _direct_liquid_level: float = -INF
 var _direct_floor_height: float = 0.0
 var _direct_last_bounced_blorb: Blorb = null
@@ -281,7 +292,10 @@ func _ready() -> void:
 	floor_max_angle = deg_to_rad(50.0)
 	_pivots = MonkeyFigure.build(self, MonkeyFigure.MONKEY_FUR_COLOR, DISPLAY_SCALE)
 	_eyes = _pivots["eyes"]
-	_blorb_suit.setup(self, self, _blorb_suit_pivot_map(), MonkeyFigure.BLORB_SUIT_RIG_SCALE)
+	_blorb_suit.setup(
+		self, self, _blorb_suit_pivot_map(), _playable_profile.suit_rig_scale,
+		_playable_profile.suit_limb_fit
+	)
 	_portrait.setup(self, self, "xiao_hou_zi")
 
 	# Own dedicated group -- lets player.gd's switch_blorbus cycling find him
@@ -402,7 +416,7 @@ func _update_head_look(delta: float) -> void:
 func _update_ai(delta: float) -> void:
 	var here := Vector2(global_position.x, global_position.z)
 
-	if not in_party and not _discovered:
+	if auto_join_enabled and not in_party and not _discovered:
 		var dist_to_player := here.distance_to(Vector2(_player.global_position.x, _player.global_position.z))
 		if dist_to_player < DISCOVERY_RADIUS:
 			_discovered = true
@@ -427,7 +441,7 @@ func _update_ai(delta: float) -> void:
 		_has_wander_target = false
 		_pause_timer = _rng.randf_range(ROAM_PAUSE_MIN, ROAM_PAUSE_MAX)
 
-	if not in_party and _discovered and dist_follow < FOLLOW_DISTANCE:
+	if auto_join_enabled and not in_party and _discovered and dist_follow < FOLLOW_DISTANCE:
 		_bond_time += delta
 		if _bond_time >= JOIN_BOND_DURATION:
 			in_party = true
@@ -608,6 +622,16 @@ func camera_focus_point() -> Vector3:
 	return global_position + Vector3.UP * _playable_profile.camera_height
 
 
+## World-trigger contract shared with Player. The centre is derived from this
+## profile's actual standing height, not the human collision capsule.
+func body_center() -> Vector3:
+	return global_position + Vector3.UP * (_playable_profile.standing_height * 0.5)
+
+
+func suit_wearer_center() -> Variant:
+	return body_center() if PartyControl.active_control_body() == self else null
+
+
 func camera_follow_distance() -> float:
 	return _playable_profile.camera_distance
 
@@ -707,6 +731,10 @@ func _update_direct_powered_movement(delta: float) -> void:
 	_direct_right_arm_water = _consume_direct_power("arm_right", "right_arm_power", "water", Player.WATER_POWER_MP_PER_SECOND, delta)
 	_direct_left_arm_fire = _consume_direct_power("arm_left", "left_arm_power", "fire", Player.FIRE_POWER_MP_PER_SECOND, delta)
 	_direct_right_arm_fire = _consume_direct_power("arm_right", "right_arm_power", "fire", Player.FIRE_POWER_MP_PER_SECOND, delta)
+	_direct_left_arm_electric = _consume_direct_power("arm_left", "left_arm_power", "electric", Player.ELECTRIC_POWER_MP_PER_SECOND, delta)
+	_direct_right_arm_electric = _consume_direct_power("arm_right", "right_arm_power", "electric", Player.ELECTRIC_POWER_MP_PER_SECOND, delta)
+	_direct_left_arm_city = _consume_direct_power("arm_left", "left_arm_power", "city", Player.CITY_POWER_MP_PER_SECOND, delta)
+	_direct_right_arm_city = _consume_direct_power("arm_right", "right_arm_power", "city", Player.CITY_POWER_MP_PER_SECOND, delta)
 	_direct_left_leg_water = _consume_direct_power("leg_left", "left_leg_power", "water", Player.WATER_POWER_MP_PER_SECOND, delta)
 	_direct_right_leg_water = _consume_direct_power("leg_right", "right_leg_power", "water", Player.WATER_POWER_MP_PER_SECOND, delta)
 	_direct_left_leg_fire = _consume_direct_power("leg_left", "left_leg_power", "fire", Player.FIRE_POWER_MP_PER_SECOND, delta)
@@ -719,10 +747,39 @@ func _update_direct_powered_movement(delta: float) -> void:
 		UISounds.pulse_power_loop(&"water", get_instance_id())
 	if _direct_left_arm_fire or _direct_right_arm_fire or _direct_left_leg_fire or _direct_right_leg_fire:
 		UISounds.pulse_power_loop(&"fire", get_instance_id())
+	if _direct_left_arm_electric or _direct_right_arm_electric or _direct_left_arm_city or _direct_right_arm_city:
+		UISounds.pulse_power_loop(&"electric", get_instance_id())
+	_update_direct_plant_powers(delta)
 	if _direct_powered_hover_active() and not was_hovering:
 		_direct_hover_height = global_position.y
 
 
+func _update_direct_plant_powers(delta: float) -> void:
+	_direct_left_arm_plant_cooldown = maxf(_direct_left_arm_plant_cooldown - delta, 0.0)
+	_direct_right_arm_plant_cooldown = maxf(_direct_right_arm_plant_cooldown - delta, 0.0)
+	if UIState.modal_open:
+		return
+	for side in ["left", "right"]:
+		var cooldown: float = _direct_left_arm_plant_cooldown if side == "left" else _direct_right_arm_plant_cooldown
+		if cooldown > 0.0 or not Input.is_action_pressed("%s_arm_power" % side):
+			continue
+		var slot := "arm_%s" % side
+		var blorb := _blorb_suit.worn_blorb_in_slot(slot)
+		if blorb == null or blorb.element_state != "plant" or not blorb.consume_mp(Player.PLANT_POWER_MP_PER_SHOT):
+			continue
+		var pellet := SeedPellet.new()
+		var forward := global_basis.z.normalized()
+		pellet.velocity = forward * Player.PLANT_PELLET_SPEED + velocity
+		pellet.damage = CombatMath.rolled_attack(Player.PLANT_PELLET_DAMAGE_BASE, blorb.strength, _rng)["amount"]
+		pellet.attacker_element = "plant"
+		pellet.credit_blorbs = [blorb]
+		get_tree().current_scene.add_child(pellet)
+		pellet.global_position = (_pivots["palm_%s" % side] as Node3D).global_position
+		UISounds.play_seed_eject(get_instance_id())
+		if side == "left":
+			_direct_left_arm_plant_cooldown = Player.PLANT_PELLET_COOLDOWN
+		else:
+			_direct_right_arm_plant_cooldown = Player.PLANT_PELLET_COOLDOWN
 func _consume_direct_power(slot: String, action: String, element: String, rate: float, delta: float) -> bool:
 	if UIState.modal_open or not Input.is_action_pressed(action):
 		return false
@@ -902,9 +959,14 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		else:
 			_direct_vertical_velocity = 0.0
 	else:
-		_direct_vertical_velocity = HumanoidLocomotion.apply_gravity(
+		var gravity_velocity := HumanoidLocomotion.apply_gravity(
 			_direct_vertical_velocity, delta, _playable_profile, 32.0
 		)
+		var gravity_factor := 1.0
+		var atmosphere := AtmosphereLayer.active(get_tree())
+		if atmosphere != null:
+			gravity_factor = atmosphere.gravity_factor_at(global_position)
+		_direct_vertical_velocity = lerpf(_direct_vertical_velocity, gravity_velocity, gravity_factor)
 	velocity.y = _direct_vertical_velocity
 	if _direct_diving:
 		var dive_floor := _direct_floor_height + Player.LAKE_DIVE_FLOOR_CLEARANCE
@@ -935,6 +997,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	_animate_direct_motion(delta, direction, speed)
 	_apply_direct_power_pose(delta)
 	_apply_direct_dirtbike_pose(delta)
+	_apply_direct_swim_attitude(delta)
 	_update_direct_dirtbike_wheels(delta)
 	_update_direct_power_fx()
 
@@ -957,6 +1020,14 @@ func _ensure_direct_power_fx() -> void:
 			SuitPowerFX.make_fire_stream(self, "LeftFireFoot"),
 			SuitPowerFX.make_fire_stream(self, "RightFireFoot"),
 		]
+		_direct_electric_arm_fx = [
+			LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR),
+			LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR),
+		]
+		_direct_city_arm_fx = [
+			LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR),
+			LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR),
+		]
 
 
 func _update_direct_power_fx() -> void:
@@ -972,6 +1043,20 @@ func _update_direct_power_fx() -> void:
 	SuitPowerFX.point_stream(_direct_water_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _direct_right_leg_water, roll_reference)
 	SuitPowerFX.point_stream(_direct_fire_leg_fx[0], _pivots["toe_left"], Vector3.DOWN, _direct_left_leg_fire, roll_reference)
 	SuitPowerFX.point_stream(_direct_fire_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _direct_right_leg_fire, roll_reference)
+	_point_direct_lightning(_direct_electric_arm_fx[0], _pivots["palm_left"], forward, _direct_left_arm_electric)
+	_point_direct_lightning(_direct_electric_arm_fx[1], _pivots["palm_right"], forward, _direct_right_arm_electric)
+	_point_direct_lightning(_direct_city_arm_fx[0], _pivots["palm_left"], forward, _direct_left_arm_city)
+	_point_direct_lightning(_direct_city_arm_fx[1], _pivots["palm_right"], forward, _direct_right_arm_city)
+
+
+func _point_direct_lightning(bolt: LightningBolt, emitter: Node3D, direction: Vector3, active: bool) -> void:
+	if bolt == null or emitter == null:
+		return
+	bolt.emitting = active
+	if not active:
+		return
+	bolt.global_position = emitter.global_position
+	bolt.look_at(bolt.global_position + direction, Vector3.UP)
 
 
 ## Same trampoline invariant as the human motor: an ordinary Blorb can never
@@ -1418,11 +1503,52 @@ func _resolve_direct_dirtbike_motion(delta: float,pre_move_position: Vector3) ->
 		velocity.y = 0.0
 
 
+## Swimming lies the body down along its travel instead of paddling along
+## bolt upright, which is what he did until now: his limbs had a swim pose
+## but nothing ever pitched his body, because the human's own pitched body
+## (Player._pose_body_skull_anchored()) sits below the early return that
+## hands his frame over.
+##
+## Same technique his wheelie already uses: turn the rig about a spine anchor
+## and put the anchor back where it was, so he pivots around his own middle
+## rather than swinging about his feet. Diving lies him flatter than swimming
+## at the surface, where his head stays up.
+const SWIM_BODY_PITCH := deg_to_rad(76.0)
+const SURFACE_SWIM_BODY_PITCH := deg_to_rad(52.0)
+const SWIM_BODY_PITCH_SPEED := 4.5
+
+
+func _apply_direct_swim_attitude(delta: float) -> void:
+	var rig: Node3D = _pivots.get("_rig") as Node3D
+	var spine: Node3D = _pivots.get("spine") as Node3D
+	if rig == null or spine == null or _mounted:
+		return
+	var target := 0.0
+	if _direct_diving:
+		target = SWIM_BODY_PITCH
+	elif _direct_surface_swimming:
+		target = SURFACE_SWIM_BODY_PITCH
+	elif _direct_dirtbike_active or _direct_flying:
+		# Those poses own the rig's pitch themselves.
+		return
+	if absf(rig.rotation.x - target) < 0.0005:
+		return
+	var anchor: Vector3 = spine.global_position
+	rig.rotation.x = lerp_angle(rig.rotation.x, target, minf(SWIM_BODY_PITCH_SPEED * delta, 1.0))
+	rig.global_position += anchor - spine.global_position
+
+
 func _apply_direct_dirtbike_pose(delta: float) -> void:
 	var rig: Node3D = _pivots.get("_rig") as Node3D
 	var spine: Node3D = _pivots["spine"] as Node3D
 	if not _direct_dirtbike_active or _direct_flying:
-		if rig != null and spine != null and absf(rig.rotation.x) > 0.001:
+		# Only straighten the rig when nothing else owns its pitch. Swimming
+		# lies the body down (see _apply_direct_swim_attitude(), which runs
+		# right after this), and this settle used to pull against it every
+		# frame: the two met at an equilibrium well short of level instead of
+		# the swimmer lying flat.
+		var swimming := _direct_diving or _direct_surface_swimming
+		if rig != null and spine != null and not swimming and absf(rig.rotation.x) > 0.001:
 			var upright_anchor: Vector3 = spine.global_position
 			rig.rotation.x = lerp_angle(rig.rotation.x,0.0,minf(Player.DIRTBIKE_WHEELIE_SETTLE_SPEED*delta,1.0))
 			rig.global_position += upright_anchor-spine.global_position
@@ -1513,6 +1639,7 @@ func update_mounted_pose(seat_transform: Transform3D, delta: float) -> void:
 	# Keep the real gameplay body travelling with its visual rider so
 	# dismounting resumes at the horse rather than at the pre-mount location.
 	global_position = seat_transform.origin
+	_update_direct_powered_movement(delta)
 	var hip_height := (_pivots["spine"] as Node3D).position.y * DISPLAY_SCALE
 	var scaled_basis := seat_transform.basis.scaled(Vector3.ONE * DISPLAY_SCALE)
 	rig.global_transform = Transform3D(
@@ -1520,10 +1647,17 @@ func update_mounted_pose(seat_transform: Transform3D, delta: float) -> void:
 		seat_transform.origin - seat_transform.basis.y * hip_height
 	)
 	var settle := minf(10.0 * delta, 1.0)
+	(_pivots["spine"] as Node3D).rotation.x = lerp_angle((_pivots["spine"] as Node3D).rotation.x, deg_to_rad(-10.0), settle)
+	(_pivots["arm_left"] as Node3D).rotation.x = lerp_angle((_pivots["arm_left"] as Node3D).rotation.x, deg_to_rad(-48.0), settle)
+	(_pivots["arm_right"] as Node3D).rotation.x = lerp_angle((_pivots["arm_right"] as Node3D).rotation.x, deg_to_rad(-48.0), settle)
+	(_pivots["elbow_left"] as Node3D).rotation.z = lerp_angle((_pivots["elbow_left"] as Node3D).rotation.z, deg_to_rad(-18.0), settle)
+	(_pivots["elbow_right"] as Node3D).rotation.z = lerp_angle((_pivots["elbow_right"] as Node3D).rotation.z, deg_to_rad(18.0), settle)
 	(_pivots["leg_left"] as Node3D).rotation.x = lerp_angle((_pivots["leg_left"] as Node3D).rotation.x, -1.15, settle)
 	(_pivots["leg_right"] as Node3D).rotation.x = lerp_angle((_pivots["leg_right"] as Node3D).rotation.x, -1.15, settle)
 	(_pivots["knee_left"] as Node3D).rotation.x = lerp_angle((_pivots["knee_left"] as Node3D).rotation.x, 1.3, settle)
 	(_pivots["knee_right"] as Node3D).rotation.x = lerp_angle((_pivots["knee_right"] as Node3D).rotation.x, 1.3, settle)
+	_apply_direct_power_pose(delta)
+	_update_direct_power_fx()
 
 
 func end_mounted() -> void:
