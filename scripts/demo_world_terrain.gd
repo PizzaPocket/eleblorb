@@ -239,11 +239,15 @@ const CLIFF_EDGE_X := 4735.5
 ## its length by up to this much, so the ground biome ends on an organic
 ## cliff edge (see _cliff_edge_x()).
 const CLIFF_EDGE_VARIATION := 30.0
-## The chasm floor stays well above the world ocean's own surface at this
-## end of the island (about -22 m out here, see world_ocean_height()). A
-## floor below it put the lava lake and the surrounding sea at much the same
-## height, which read as one continuous plane from inside the chasm.
-const CHASM_FLOOR := 16.0
+## The chasm is deliberately deep: riding off the lip is a long fall. Its
+## floor still clears the world ocean's own surface at this end of the
+## island (about -25 m at the cliff, -36 m out at the volcano, see
+## world_ocean_height()), because a floor at or below the sea put the lava
+## and the surrounding water at much the same height, which read as one
+## continuous plane from inside the chasm. The margin is kept to roughly the
+## height of the cliff's own rock band rather than anything larger: the lava
+## should sit low down there, just never as low as the sea.
+const CHASM_FLOOR := -2.0
 const CLIFF_FACE_WIDTH := 25.0
 ## The lava lake lies in an organic basin punched into that floor (a
 ## NaturalLake, exactly as the sea and the frozen lake are), its surface this
