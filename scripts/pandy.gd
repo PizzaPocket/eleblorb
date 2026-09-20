@@ -137,6 +137,10 @@ func _ground_y(x: float, z: float) -> float:
 			return _terrain.get_chinese_village_island_surface_y()
 		return CHINESE_VILLAGE_ISLAND_Y
 	if _terrain != null and _terrain.has_method("get_mesh_height"):
+		# Whatever is actually underfoot, so a deck or a platform holds him up
+		# instead of the ground dragging him down through it.
+		if is_equal_approx(x, global_position.x) and is_equal_approx(z, global_position.z):
+			return WorldSupport.ground_height(self, _terrain)
 		return _terrain.get_mesh_height(x, z)
 	return global_position.y
 

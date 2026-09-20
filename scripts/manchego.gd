@@ -260,6 +260,23 @@ func get_seat_transform() -> Transform3D:
 	return (_pivots["seat"] as Node3D).global_transform
 
 
+## Rider-scale-aware saddle point measured back from the neck rather than a
+## fixed centre of the back. Small riders sit farther forward while a large
+## rider retains the established seat clearance.
+func get_rider_transform(rider: Node3D) -> Transform3D:
+	var seat := get_seat_transform()
+	var human_height := PlayableCharacterProfile.human().standing_height
+	var standing_height := human_height
+	if rider != null and rider.has_method("playable_profile"):
+		var profile := rider.playable_profile() as PlayableCharacterProfile
+		if profile != null:
+			standing_height = profile.standing_height
+	var scale_ratio := clampf(standing_height / human_height, 0.2, 1.4)
+	var forward_shift := (1.0 - scale_ratio) * 0.34
+	seat.origin += seat.basis.z.normalized() * forward_shift
+	return seat
+
+
 func _process(delta: float) -> void:
 	EyeBlink.apply(_eye_blink, delta, _eyes)
 	_update_head_look(delta)
@@ -347,7 +364,7 @@ func _update_follow(delta: float) -> void:
 	# file's own @onready-equivalent assignment in _ready()), so GDScript
 	# can't infer get_mesh_height()'s return type through := alone (same
 	# pitfall blorb.gd's own _ground_height_at() flags).
-	var ground_h: float = terrain.get_mesh_height(global_position.x, global_position.z)
+	var ground_h: float = WorldSupport.ground_height(self, terrain)
 	global_position.y = move_toward(global_position.y, ground_h, GROUND_SETTLE_SPEED * delta)
 	_animate_gait(delta, moving)
 
@@ -384,7 +401,7 @@ func _update_idle(delta: float) -> void:
 			_idle_pause_timer = _rng.randf_range(IDLE_PAUSE_MIN, IDLE_PAUSE_MAX)
 		if to_target.length() > 0.01:
 			rotation.y = lerp_angle(rotation.y, atan2(to_target.x, to_target.y), ROTATION_SPEED * delta)
-	var idle_ground_h: float = terrain.get_mesh_height(global_position.x, global_position.z)
+	var idle_ground_h: float = WorldSupport.ground_height(self, terrain)
 	global_position.y = move_toward(global_position.y, idle_ground_h, GROUND_SETTLE_SPEED * delta)
 	_animate_gait(delta, moving)
 
@@ -464,6 +481,21 @@ func camera_focus_point() -> Vector3:
 
 func camera_follow_distance() -> float:
 	return CAMERA_DISTANCE
+
+
+## World-trigger contract for a playable seated on this mount. The saddle is
+## the authoritative moving point; the offset scales to the rider's own body
+## profile so Xiao Hou Zi and future differently proportioned playables pass
+## a portal with their actual torso rather than Manchego's head or the human
+## CharacterBody that follows invisibly underneath.
+func controlled_rider_center(rider: Node3D) -> Vector3:
+	var torso_above_seat := 0.5
+	if rider != null and rider.has_method("playable_profile"):
+		var profile := rider.playable_profile() as PlayableCharacterProfile
+		if profile != null:
+			torso_above_seat = clampf(profile.standing_height * 0.27, 0.16, 0.5)
+	var seat := get_rider_transform(rider)
+	return seat.origin + seat.basis.y.normalized() * torso_above_seat
 
 
 ## Driven every physics frame by player.gd's _update_manchego_control() while
