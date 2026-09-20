@@ -170,6 +170,11 @@ const DEFAULT_ELBOW_BEND := deg_to_rad(25.0)
 const ARM_RADIUS_SHOULDER := 0.0055
 const ARM_RADIUS_ELBOW := 0.009
 const ARM_RADIUS_WRIST := 0.0135
+## What share of the whole arm is hand, taken from the human figure so the
+## two rigs agree on where a hand begins: its hand is 0.116 of a 0.706 arm.
+## Nothing is added to this rig for it; the tube's own last stretch becomes
+## the hand, with a joint at that point.
+const HAND_FRACTION := 0.164
 ## Where the inserted thorax and neck pivots sit: the thorax this far up the
 ## body, the neck this far below the head. Both are rotation-free at rest, so
 ## these choose where a twist or a nod bends from, nothing else.
@@ -333,10 +338,12 @@ const TAIL_ANIM_YAW_HOLD_MAX := 3.8
 ## deliberately simpler than ProceduralFigure's and several of its returned
 ## keys ALIAS ONE NODE, which silently makes some poses no-ops:
 ##
-##   arm:   MonkeyShoulderPivot > MonkeyElbowPivot > MonkeyWristMarker
-##          "hand_left", "wrist_left" and "fingertip_left" are all that one
-##          marker. There is no hand segment, so a wrist twist or a palm roll
-##          rotates nothing and a fingertip offset does not exist.
+##   arm:   MonkeyShoulderPivot > MonkeyElbowPivot > MonkeyWristPivot >
+##          MonkeyFingertipMarker. No hand was modelled and none was added:
+##          the tube's own last stretch IS the hand, taking the same share of
+##          the arm the human figure's hand takes (HAND_FRACTION), with a
+##          joint at that point. "hand_left" and "wrist_left" are that joint,
+##          which turns the hand; "fingertip_left" rides on its end.
 ##   leg:   MonkeyHipPivot > MonkeyKneePivot > MonkeyAnkleMarker
 ##          "ankle_left" and "toe_left" are that one marker, and nothing is
 ##          parented to it: the leg and foot are one procedural tube rebuilt
@@ -491,14 +498,14 @@ static func build(
 		"ankle_right": leg_right["end"],
 		"toe_left": leg_left["end"],
 		"toe_right": leg_right["end"],
-		"hand_left": arm_left["end"],
-		"hand_right": arm_right["end"],
+		"hand_left": arm_left["wrist"],
+		"hand_right": arm_right["wrist"],
 		"palm_left": arm_left["end"],
 		"palm_right": arm_right["end"],
 		"back_left": arm_left["end"],
 		"back_right": arm_right["end"],
-		"wrist_left": arm_left["end"],
-		"wrist_right": arm_right["end"],
+		"wrist_left": arm_left["wrist"],
+		"wrist_right": arm_right["wrist"],
 		"fingertip_left": arm_left["end"],
 		"fingertip_right": arm_right["end"],
 		# Internal-only keys, not part of procedural_figure.gd's own
@@ -610,10 +617,25 @@ static func _build_arm(
 	elbow_pivot.rotation.x = -DEFAULT_ELBOW_BEND
 	shoulder_pivot.add_child(elbow_pivot)
 
+	# The last stretch of the arm IS the hand: no separate hand geometry is
+	# added, the tube simply gains a joint where the human figure's own hand
+	# begins, as a fraction of total arm length (HAND_FRACTION). Rotating
+	# that joint bends the end of the arm, which is what a hand does, and the
+	# fingertip marker rides on it.
+	var arm_length := (UPPER_ARM_LEN + FOREARM_LEN) * limb_length_scale
+	var hand_length := arm_length * HAND_FRACTION
 	var wrist_marker := Node3D.new()
-	wrist_marker.name = "MonkeyWristMarker"
-	wrist_marker.position = Vector3(0, -FOREARM_LEN * limb_length_scale, 0)
+	wrist_marker.name = "MonkeyWristPivot"
+	wrist_marker.position = Vector3(0, -(FOREARM_LEN * limb_length_scale - hand_length), 0)
+	# Its geometry is the tube's own last segment, rebuilt each frame rather
+	# than parented here, so it has to say so (see RigAdapter.articulates()).
+	wrist_marker.set_meta(RigAdapter.DRIVES_GEOMETRY_META, true)
 	elbow_pivot.add_child(wrist_marker)
+
+	var fingertip_marker := Node3D.new()
+	fingertip_marker.name = "MonkeyFingertipMarker"
+	fingertip_marker.position = Vector3(0, -hand_length, 0)
+	wrist_marker.add_child(fingertip_marker)
 
 	var mesh_instance := MeshInstance3D.new()
 	mesh_instance.name = "ArmTube"
@@ -623,7 +645,10 @@ static func _build_arm(
 	# visually lifting the shoulders to the sides of the head.
 	rig.add_child(mesh_instance)
 
-	return {"pivot": shoulder_pivot, "joint": elbow_pivot, "end": wrist_marker, "mesh": mesh_instance}
+	return {
+		"pivot": shoulder_pivot, "joint": elbow_pivot, "wrist": wrist_marker,
+		"end": fingertip_marker, "mesh": mesh_instance,
+	}
 
 
 ## Builds the tail's rest-pose control points/mesh/material and an initial
@@ -1340,15 +1365,25 @@ static func rebuild_limbs(pivots: Dictionary, root: Node3D, delta: float = 0.0) 
 	var has_pads: bool = pivots.get("_has_foot_pads", true)
 	var leg_radius_scale: float = pivots.get("_leg_radius_scale", 1.0)
 	var wrist_radius := lerpf(ARM_RADIUS_ELBOW, ARM_RADIUS_WRIST, taper_scale)
+	# Through the wrist and on to the fingertip: the hand is the tube's own
+	# last stretch, so it bends when the wrist turns. The radius at the wrist
+	# is the old profile's value at that point, which keeps the silhouette.
+	var hand_start_radius := lerpf(ARM_RADIUS_ELBOW, wrist_radius, 1.0 - HAND_FRACTION * 2.0)
 	_rebuild_tube(
 		pivots["_limb_mesh_arm_left"] as MeshInstance3D, root,
-		[pivots["arm_left"] as Node3D, pivots["elbow_left"] as Node3D, pivots["wrist_left"] as Node3D],
-		[ARM_RADIUS_SHOULDER, ARM_RADIUS_ELBOW, wrist_radius]
+		[
+			pivots["arm_left"] as Node3D, pivots["elbow_left"] as Node3D,
+			pivots["wrist_left"] as Node3D, pivots["fingertip_left"] as Node3D,
+		],
+		[ARM_RADIUS_SHOULDER, ARM_RADIUS_ELBOW, hand_start_radius, wrist_radius]
 	)
 	_rebuild_tube(
 		pivots["_limb_mesh_arm_right"] as MeshInstance3D, root,
-		[pivots["arm_right"] as Node3D, pivots["elbow_right"] as Node3D, pivots["wrist_right"] as Node3D],
-		[ARM_RADIUS_SHOULDER, ARM_RADIUS_ELBOW, wrist_radius]
+		[
+			pivots["arm_right"] as Node3D, pivots["elbow_right"] as Node3D,
+			pivots["wrist_right"] as Node3D, pivots["fingertip_right"] as Node3D,
+		],
+		[ARM_RADIUS_SHOULDER, ARM_RADIUS_ELBOW, hand_start_radius, wrist_radius]
 	)
 	_rebuild_footed_leg(
 		pivots["_limb_mesh_leg_left"] as MeshInstance3D, root,

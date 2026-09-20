@@ -91,10 +91,20 @@ func _process(_d: float) -> bool:
 	print(footer)
 	# What the second rig lacks relative to the first.
 	if adapters.size() > 1:
+		# A joint counts as covered when the node it shares moves: on the
+		# monkey rig the hand IS the wrist, which is a difference in naming
+		# rather than in what the character can do.
+		var other := adapters[1] as RigAdapter
 		var missing: Array[String] = []
 		for joint in JOINTS:
-			if (adapters[0] as RigAdapter).articulates(joint) and not (adapters[1] as RigAdapter).articulates(joint):
-				missing.append(joint)
+			if not (adapters[0] as RigAdapter).articulates(joint):
+				continue
+			if other.articulates(joint):
+				continue
+			var alias := other.alias_of(joint)
+			if alias != "" and other.articulates(alias):
+				continue
+			missing.append(joint)
 		print("\n%s lacks, relative to the player: %s" % [
 			_rigs[1][0], ", ".join(missing) if missing.size() > 0 else "nothing"])
 	return true
