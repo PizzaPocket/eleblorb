@@ -294,10 +294,10 @@ const SNOWBOARD_TUCK_ELBOW_BEND := SnowboardMode.TUCK_ELBOW_BEND
 const SNOWBOARD_SPEED_LEAN_MAX := SnowboardMode.SPEED_LEAN_MAX
 const SNOWBOARD_TUCK_LEAN := SnowboardMode.TUCK_LEAN
 const SNOWBOARD_FULL_LEAN_SPEED := SnowboardMode.FULL_LEAN_SPEED
-const SNOWBOARD_WIDTH := 0.32
-const SNOWBOARD_LENGTH := 2.45
-const SNOWBOARD_THICKNESS := 0.08
-const SNOWBOARD_COLOR := ElementPalette.SNOW_BODY
+const SNOWBOARD_WIDTH := SnowboardMode.WIDTH
+const SNOWBOARD_LENGTH := SnowboardMode.LENGTH
+const SNOWBOARD_THICKNESS := SnowboardMode.THICKNESS
+const SNOWBOARD_COLOR := SnowboardMode.DECK_COLOR
 
 ## Ice-leg skates: powered on real ice, but still physically extend beneath
 ## the shoes everywhere else. Runners and mounts share the Ice blorbs' raised
@@ -7923,18 +7923,9 @@ func _is_snowboard_surface() -> bool:
 
 
 func _build_snowboard() -> Node3D:
-	var root:=Node3D.new()
-	root.name="Snowboard"
-	visuals.add_child(root)
-	# One continuous manifold deck. Rounded SuperEgg ends give it a soft
-	# nose/tail without the visible seams of separately attached tip pieces.
-	var deck:=SuperEgg.build_part(
-		Vector3(SNOWBOARD_LENGTH*0.5,SNOWBOARD_THICKNESS,SNOWBOARD_WIDTH),
-		SNOWBOARD_COLOR,3.2,3.2
-	)
-	deck.name="ContinuousDeck"
-	root.add_child(deck)
-	return root
+	# The deck belongs to SnowboardMode, which builds it at the wearer's own
+	# scale so a smaller rig gets a board that fits its feet.
+	return SnowboardMode.build_deck(visuals, _current_blorb_suit_rig_scale())
 
 
 func _update_snowboard_visual() -> void:

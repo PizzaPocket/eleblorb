@@ -219,6 +219,28 @@ static func _relax(rig: RigAdapter, name: String, settle: float) -> void:
 		joint.rotation.z = lerp_angle(joint.rotation.z, 0.0, settle)
 
 
+## The board itself: one continuous manifold deck, rounded at nose and tail
+## by the SuperEgg rather than seamed on. Built at the wearer's own scale, so
+## a smaller rig gets a board that fits its feet rather than the human's.
+const LENGTH := 2.45
+const WIDTH := 0.32
+const THICKNESS := 0.08
+const DECK_COLOR := ElementPalette.SNOW_BODY
+
+
+static func build_deck(parent: Node3D, rig_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	root.name = "Snowboard"
+	parent.add_child(root)
+	var deck := SuperEgg.build_part(
+		Vector3(LENGTH * 0.5, THICKNESS, WIDTH) * rig_scale, DECK_COLOR, 3.2, 3.2
+	)
+	deck.name = "ContinuousDeck"
+	root.add_child(deck)
+	CollisionPolicy.mark_decorative(deck)
+	return root
+
+
 func reset() -> void:
 	airborne = false
 	ground_latch = 0.0
