@@ -2,11 +2,12 @@ extends Node3D
 
 ## The demo world (see DemoWorldTerrain): a playable tour of every suit with a
 ## clear traversal power, and the testing ground for movement modes. The hero
-## wakes on the floor of a pit with five Normal blorbs and Xiao Hou Zi, climbs
+## wakes on the floor of a pit with five Normal blorbs, climbs
 ## out by bouncing on his blorbs up the ledges of its wall, and finds Manchego
 ## and Pandy stationed beside the shiny portal on the plain above; passing
-## through it brings them into the party. Beyond lie forest plains where wild
-## shiny blorbs roam, and the course runs on east. Each border between
+## through it brings them into the party. Xiao Hou Zi instead waits at the
+## Plant portal and joins only when that portal is crossed. Beyond lie forest
+## plains where wild shiny blorbs roam, and the course runs on east. Each border between
 ## biomes is a gate of two one-way portals back to back, facing apart: each
 ## biome's portal stands on the side you enter it from, facing you, and its
 ## blorbs wait just beyond it, inside the biome. Walking or riding through a
@@ -15,9 +16,11 @@ extends Node3D
 ## does nothing. The party only grows: blorbs that hop off keep following.
 
 const XIAO_HOU_ZI_SCENE: PackedScene = preload("res://scenes/xiao_hou_zi.tscn")
+const BLORB_SCENE: PackedScene = preload("res://scenes/blorb.tscn")
 const JUNGLE_KINGDOM_FOLIAGE := preload("res://scripts/jungle_kingdom_foliage.gd")
 const MANCHEGO_SCENE: PackedScene = preload("res://scenes/manchego.tscn")
 const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
+const SUN_WU_KONG_SCENE: PackedScene = preload("res://scenes/sun_wu_kong.tscn")
 const DA_HOU_ZI_SCENE: PackedScene = preload("res://scenes/ape_template_preview.tscn")
 const DA_HOU_ZI_CONFIG := preload("res://scripts/primate_kingdom_gorilla.gd")
 ## The demo world's two-song playlist and reusable WorldMusic system remain
@@ -46,12 +49,19 @@ const SET_WAIT_OFFSET := 6.0
 ## once he is up; during the wake intro he faces west, toward the camera.
 const EAST_CAMERA_YAW := -PI * 0.5
 const WEST_BODY_YAW := -PI * 0.5
+const SPACE_PORTAL_Y := 750.0
+const SPACESHIP_Y := 900.0
+const SPACE_TINT := Color(0.12, 0.045, 0.22)
 
 @onready var _player: Player = $Player
 @onready var _terrain: DemoWorldTerrain = $Terrain
 var _roster := SuitRoster.new()
 var _manchego: Manchego
 var _pandy: Pandy
+var _sun_wu_kong: SunWuKong
+var _xiao_hou_zi: XiaoHouZi
+var _spaceship: DemoSpaceship
+var _space_blorbus: Blorb
 
 
 func _ready() -> void:
@@ -61,17 +71,29 @@ func _ready() -> void:
 	_roster.name = "SuitRoster"
 	add_child(_roster)
 	_roster.setup(_player)
+	var atmosphere := AtmosphereLayer.new()
+	atmosphere.name = "AtmosphereLayer"
+	add_child(atmosphere)
 	for border_spec in DemoWorldTerrain.BORDERS:
 		var border: Dictionary = border_spec
 		var x: float = border["x"]
 		# Walking east you meet the eastern biome's portal face first; walking
 		# west, the western biome's.
 		var gate_scale: float = border.get("portal_scale", 1.0)
-		var east_scale: float = border.get("east_portal_scale", gate_scale)
-		var west_scale: float = border.get("west_portal_scale", gate_scale)
+		var gate_width: float = border.get("portal_width_scale", gate_scale)
+		var gate_height: float = border.get("portal_height_scale", gate_scale)
 		var bend := DemoWorldTerrain.path_yaw(x)
-		var east_portal := _add_portal(border["east"], x - GATE_HALF_GAP * east_scale, -PI * 0.5 + bend, "", east_scale)
-		var west_portal := _add_portal(border["west"], x + GATE_HALF_GAP * west_scale, PI * 0.5 + bend, "", west_scale)
+		# A border is one architectural gate: derive both directional membranes
+		# from one centre, tangent and size. They sit a small equal distance on
+		# opposite sides of that centre (back-to-back, never coplanar), while the
+		# shared centre prevents curved-path sampling from making a pair drift.
+		var east_portal := _add_portal(border["east"], x, -PI * 0.5 + bend, "", gate_width, Color(0, 0, 0, 0), gate_height)
+		var west_portal := _add_portal(border["west"], x, PI * 0.5 + bend, "", gate_width, Color(0, 0, 0, 0), gate_height)
+		var gate_center := east_portal.position
+		var path_tangent := Vector3(cos(bend), 0.0, -sin(bend)).normalized()
+		var pair_offset := path_tangent * GATE_HALF_GAP * gate_width
+		east_portal.position = gate_center - pair_offset
+		west_portal.position = gate_center + pair_offset
 		if border.has("hover_y"):
 			east_portal.position.y = float(border["hover_y"])
 			west_portal.position.y = float(border["hover_y"])
@@ -81,12 +103,13 @@ func _ready() -> void:
 	# The Crystal Skates portal, standing on the frozen lake's ice.
 	var crystal_portal := _add_portal("ice", DemoWorldTerrain.CRYSTAL_PORTAL_X, -PI * 0.5, "crystal", 1.0, CrystalTrack.CRYSTAL_TINT)
 	crystal_portal.position.y = DemoWorldTerrain.ICE_SURFACE_LEVEL
-	# Background music is intentionally off during the current sound-design and
-	# traversal testing pass. Re-enable later with:
-	# add_child(WorldMusic.playlist(MUSIC_PLAYLIST, -10.0))
+	_add_space_zone()
+	# The reusable two-song music system remains available, but playback is
+	# intentionally disabled during the current movement/foley testing pass.
+	# Re-enable with: add_child(WorldMusic.playlist(MUSIC_PLAYLIST, -10.0))
 	# The Ocean Kingdom's Kraken, patrolling the sea's deep middle.
 	var kraken := Kraken.new()
-	kraken.route_center = _terrain.sea_center()
+	kraken.route_center = _terrain.kraken_route_center()
 	kraken.route_radius = DemoWorldTerrain.kraken_route_radius()
 	kraken.water_level = DemoWorldTerrain.WATER_LEVEL
 	kraken.terrain = _terrain
@@ -94,6 +117,38 @@ func _ready() -> void:
 	_add_plant_jungle()
 	_add_demo_titans()
 	call_deferred("_finish_loading")
+
+
+func _add_space_zone() -> void:
+	# Local +Z faces downward after this rotation, so an upward-moving body
+	# enters through the one-way face and descending through its back does not
+	# replace the Space suit.
+	var portal := CheckpointPortal.new()
+	portal.name = "Portal_space_ascent"
+	portal.element = "space"
+	portal.tint_override = SPACE_TINT
+	portal.one_way = true
+	portal.half_width = 15.0
+	portal.half_height = 15.0
+	portal.tube_radius = 0.28
+	# CheckpointPortal's authored origin is the bottom of its upright opening;
+	# once laid flat, offset by half-height so the membrane centre—not its rim—
+	# is directly over the volcano mouth.
+	portal.position = Vector3(
+		DemoWorldTerrain.VOLCANO_CENTER.x, SPACE_PORTAL_Y,
+		DemoWorldTerrain.VOLCANO_CENTER.y - portal.half_height
+	)
+	portal.rotation.x = PI * 0.5
+	portal.crossed.connect(_roster.switch_to)
+	add_child(portal)
+
+	_spaceship = DemoSpaceship.new()
+	_spaceship.name = "ASANSpaceship"
+	# West of the ascent portal, so its doorway (on the hull's +X flank) faces
+	# back toward whoever rises through it.
+	_spaceship.position = Vector3(DemoWorldTerrain.VOLCANO_CENTER.x - 58.0, SPACESHIP_Y, DemoWorldTerrain.VOLCANO_CENTER.y)
+	_spaceship.cabin_entered.connect(_on_spaceship_cabin_entered)
+	add_child(_spaceship)
 
 
 ## The Primate Kingdom's own jungle scatter, windowed onto the plant biome at
@@ -116,8 +171,7 @@ func _add_plant_jungle() -> void:
 
 
 ## The demo course includes the established living Dinosaur and Da Hou Zi
-## rigs in broad terrain clearings. Humongous is intentionally left out until
-## his eventual course role and location are chosen.
+## rigs in broad terrain clearings, including Humongous beyond the volcano.
 func _add_demo_titans() -> void:
 	var dinosaur := DinosaurTitan.new()
 	dinosaur.name = "Dinosaur"
@@ -148,24 +202,39 @@ func _add_demo_titans() -> void:
 	)
 	add_child(da_hou_zi)
 
+	var humongous_at := DemoWorldTerrain.HUMONGOUS_CLEARING
+	HumongousState.spawn_demo_body(
+		self,
+		Vector3(humongous_at.x, _terrain.get_mesh_height(humongous_at.x, humongous_at.y), humongous_at.y)
+	)
+
 
 ## One-way portals: `facing_yaw` turns the portal's face (its local +Z) to
 ## face the side you approach it from.
-func _add_portal(element: String, x: float, facing_yaw: float, suit_key: String = "", size_scale: float = 1.0, tint: Color = Color(0, 0, 0, 0)) -> CheckpointPortal:
+func _add_portal(element: String, x: float, facing_yaw: float, suit_key: String = "", width_scale: float = 1.0, tint: Color = Color(0, 0, 0, 0), height_scale: float = -1.0) -> CheckpointPortal:
 	var portal := CheckpointPortal.new()
 	portal.name = "Portal_%s_%d" % [suit_key if suit_key != "" else (element if element != "" else "normal"), int(x)]
 	portal.element = element
 	portal.suit_key = suit_key
 	portal.tint_override = tint
 	portal.one_way = true
-	portal.half_width = DemoWorldTerrain.PORTAL_HALF_WIDTH * size_scale
-	portal.half_height = DemoWorldTerrain.PORTAL_HALF_HEIGHT * size_scale
-	portal.tube_radius = PORTAL_TUBE_RADIUS * size_scale
+	if height_scale < 0.0:
+		height_scale = width_scale
+	portal.half_width = DemoWorldTerrain.PORTAL_HALF_WIDTH * width_scale
+	portal.half_height = DemoWorldTerrain.PORTAL_HALF_HEIGHT * height_scale
+	portal.tube_radius = PORTAL_TUBE_RADIUS * width_scale
 	portal.position = _terrain.get_path_point(x)
 	portal.rotation.y = facing_yaw
 	portal.crossed.connect(_roster.switch_to)
 	if element == "shiny":
 		portal.crossed.connect(_on_shiny_portal_crossed)
+	elif element == "plant":
+		portal.crossed.connect(_on_plant_portal_crossed)
+	elif element == "air":
+		# Only the east-facing Ground -> Air membrane recruits Sun Wu Kong.
+		# The later Air -> Fire gate's east-facing membrane is Fire, so it cannot
+		# accidentally fire this story beat a second time.
+		portal.crossed.connect(_on_sky_portal_crossed)
 	add_child(portal)
 	return portal
 
@@ -192,8 +261,8 @@ func _finish_loading() -> void:
 
 
 ## Every suit set, waiting on its own side of the first gate that leads into
-## its biome, plus the hero's starting five and Xiao Hou Zi, and Manchego and
-## Pandy stationed by the shiny portal.
+## its biome, plus the hero's starting five. Xiao Hou Zi waits at the Plant
+## portal; Manchego and Pandy are stationed by the shiny portal.
 func _build_party() -> void:
 	var normal := SuitLoadout.spawn_set(self, "", "", _player.global_position + Vector3(-3.0, 0.0, 0.0), NORMAL_SLOTS, 1.8)
 	_roster.add_set("", normal, NORMAL_SLOTS)
@@ -206,6 +275,9 @@ func _build_party() -> void:
 		var shiny := element == "shiny"
 		var blorbs := SuitLoadout.spawn_set(self, "" if shiny else element, head_item, home, SuitLoadout.FULL_SUIT_SLOTS, 2.2, shiny)
 		_roster.add_set(element, blorbs, SuitLoadout.FULL_SUIT_SLOTS)
+	var space_home := Vector3(DemoWorldTerrain.VOLCANO_CENTER.x, SPACE_PORTAL_Y + 8.0, DemoWorldTerrain.VOLCANO_CENTER.y)
+	var space_blorbs := SuitLoadout.spawn_set(self, "space", "Space Helm", space_home, SuitLoadout.FULL_SUIT_SLOTS, 2.2)
+	_roster.add_set("space", space_blorbs, SuitLoadout.FULL_SUIT_SLOTS)
 	# One water blorb waiting just past the Nautilus portal on the seabed,
 	# wearing the Nautilus Crown: it takes over the head slot alone.
 	var nautilus_home := _terrain.nautilus_portal_point() + Vector3(SET_WAIT_OFFSET, 0.0, 5.0)
@@ -219,10 +291,13 @@ func _build_party() -> void:
 	_roster.add_overlay("crystal", SuitLoadout.spawn_set(self, "ice", "", crystal_home, crystal_legs, 1.5, false, crystal_items), crystal_legs)
 	_roster.start_with("")
 	_spawn_forest_shinies()
-	var monkey := XIAO_HOU_ZI_SCENE.instantiate() as XiaoHouZi
-	monkey.in_party = true
-	monkey.position = _player.global_position + Vector3(-3.0, 0.0, 2.5)
-	add_child(monkey)
+	_spawn_blorbus_in_spaceship()
+	_xiao_hou_zi = XIAO_HOU_ZI_SCENE.instantiate() as XiaoHouZi
+	_xiao_hou_zi.in_party = false
+	_xiao_hou_zi.auto_join_enabled = false
+	_xiao_hou_zi.position = _terrain.get_path_point(DemoWorldTerrain.border_x("plant") + SET_WAIT_OFFSET, -7.0)
+	_xiao_hou_zi.rotation.y = -PI * 0.5
+	add_child(_xiao_hou_zi)
 	# Stationed: idling in place, not yet in the party and not yet rideable.
 	_manchego = MANCHEGO_SCENE.instantiate() as Manchego
 	_manchego.follows_player = false
@@ -235,6 +310,27 @@ func _build_party() -> void:
 	_pandy.in_party = false
 	_pandy.position = _terrain.get_path_point(PANDY_STATION.x, PANDY_STATION.y)
 	add_child(_pandy)
+	_spawn_sun_wu_kong_at_sky_portal()
+
+
+func _spawn_blorbus_in_spaceship() -> void:
+	if not is_instance_valid(_spaceship):
+		return
+	_space_blorbus = BLORB_SCENE.instantiate() as Blorb
+	_space_blorbus.blorb_name = "Blorbus"
+	_space_blorbus.in_party = false
+	_space_blorbus.can_join_party = false
+	# Well inside the pressure threshold, visible through the large entrance.
+	_space_blorbus.position = _spaceship.to_global(Vector3(0.0, 0.5, 8.0))
+	add_child(_space_blorbus)
+	_space_blorbus.become_blorbus()
+	_space_blorbus.wait_here()
+
+
+func _on_spaceship_cabin_entered() -> void:
+	if is_instance_valid(_space_blorbus) and not _space_blorbus.in_party:
+		_space_blorbus.rejoin_party()
+		Hud.show_message("Blorbus joined the party.")
 
 
 ## Passing through the shiny portal brings the stationed pair into the party.
@@ -244,6 +340,30 @@ func _on_shiny_portal_crossed(_element: String) -> void:
 		_manchego.set_available_to_player(true)
 	if is_instance_valid(_pandy):
 		_pandy.in_party = true
+
+
+func _on_plant_portal_crossed(_element: String) -> void:
+	if is_instance_valid(_xiao_hou_zi):
+		_xiao_hou_zi.in_party = true
+
+
+## Sun Wu Kong waits visibly in the air just beyond the Ground -> Air portal,
+## already carrying the Jingu Bang and standing on his personal Jindouyun.
+## The portal crossing, not proximity, is the clean demo-story recruitment.
+func _spawn_sun_wu_kong_at_sky_portal() -> void:
+	var portal_x := DemoWorldTerrain.CLIFF_EDGE_X + 1.0
+	var station := _terrain.get_path_point(portal_x + 13.0, -10.0)
+	station.y += 5.0
+	_sun_wu_kong = SUN_WU_KONG_SCENE.instantiate() as SunWuKong
+	_sun_wu_kong.configure_as_jindouyun_companion(false)
+	_sun_wu_kong.position = station
+	_sun_wu_kong.rotation.y = -PI * 0.5
+	add_child(_sun_wu_kong)
+
+
+func _on_sky_portal_crossed(_element: String) -> void:
+	if is_instance_valid(_sun_wu_kong):
+		_sun_wu_kong.join_party()
 
 
 ## Wild, recruitable shiny blorbs wandering the forest plains, placed as the

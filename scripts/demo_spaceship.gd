@@ -1,0 +1,298 @@
+class_name DemoSpaceship
+extends Node3D
+
+signal cabin_entered
+
+## The ASAN launch vehicle, hanging in space above the volcano (see
+## demo_world.gd). Built the way everything in this project is built, out of
+## SuperEggs: the main hull is one long hollow superegg shell with real wall
+## thickness and a superellipse aperture punched through its flank
+## (SuperEgg.build_hollow_shell_mesh()), not a skin of linked segments. A
+## solid flat deck runs the length of the cabin inside it, and that deck, not
+## the curved hull, is what anyone walks and platforms on.
+##
+## Proportions follow a heavy-lift rocket: a long core stage, a tapering nose
+## stack, two strap-on boosters down the far flank, and a clustered engine
+## bell at the aft. The hull lies along local Z, nose forward (+Z), with the
+## doorway facing +X so it can be flown straight into from the ascent portal.
+
+## The core stage: radius, half-length, and how thick its wall reads.
+const HULL_RADIUS := 11.0
+const HULL_HALF_LENGTH := 35.0
+const HULL_WALL := 0.9
+## The doorway, as a superellipse punched through the +X flank: its centre
+## along the hull and up the flank, and its half-extents the same way.
+const DOOR_CENTER := Vector2(-6.0, -1.0)
+const DOOR_HALF := Vector2(6.5, 5.0)
+const DOOR_EXPONENT := 2.8
+## The deck: its height below the hull's axis, how far it reaches either side
+## of the centreline, and its thickness.
+const DECK_Y := -5.0
+const DECK_HALF_WIDTH := 8.5
+const DECK_THICKNESS := 0.5
+## Head height inside: the cabin's collision ceiling.
+const CABIN_CEILING_Y := 7.0
+## Breathable volume, inset from the hull so the seal never reads as extending
+## through the wall.
+const CABIN_AIR_RADIUS := 9.6
+
+const HULL := Color(0.88, 0.90, 0.94)
+const HULL_SHADOW := Color(0.62, 0.66, 0.74)
+const TRIM := Color(0.15, 0.16, 0.20)
+const PANEL := Color(0.74, 0.78, 0.85)
+const SCREEN := Color(0.52, 0.86, 1.0)
+const STRIP_LIGHT := Color(0.66, 0.92, 1.0)
+
+var _was_inside := false
+
+
+func _ready() -> void:
+	add_to_group("pressurized_volumes")
+	_build_ship()
+
+
+## Inside the pressure hull: within the cabin's own radius of the hull axis,
+## clear of both end walls, and above the deck.
+func contains_breathable_point(point: Vector3) -> bool:
+	var local := to_local(point)
+	if absf(local.z) > HULL_HALF_LENGTH - 2.0:
+		return false
+	if local.y < DECK_Y or local.y > CABIN_CEILING_Y + 2.0:
+		return false
+	return Vector2(local.x, local.y).length() <= CABIN_AIR_RADIUS
+
+
+func _process(_delta: float) -> void:
+	var body := PartyControl.active_control_body()
+	var inside := is_instance_valid(body) and contains_breathable_point(body.global_position)
+	if inside and not _was_inside:
+		cabin_entered.emit()
+	_was_inside = inside
+
+
+func _build_ship() -> void:
+	_build_hull()
+	_build_deck()
+	_build_cabin_collision()
+	_build_interior_fittings()
+	_build_stack()
+
+
+## The core stage itself: one hollow shell, its doorway cut straight through.
+## The shell is authored in the superegg's own frame, whose long axis is Y,
+## then turned a quarter turn so the hull lies along Z; the aperture stays on
+## +X through that turn (it is the axis the turn is about).
+func _build_hull() -> void:
+	var shell := MeshInstance3D.new()
+	shell.name = "Hull"
+	shell.mesh = SuperEgg.build_hollow_shell_mesh(
+		Vector3(HULL_RADIUS, HULL_HALF_LENGTH, HULL_RADIUS), HULL_WALL,
+		# The superegg's own Y is the hull's Z, and its Z is the hull's -Y.
+		Vector2(DOOR_CENTER.x, -DOOR_CENTER.y), Vector2(DOOR_HALF.x, DOOR_HALF.y),
+		DOOR_EXPONENT, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+	)
+	shell.rotation.x = PI * 0.5
+	var material := _hull_material(HULL)
+	# Both faces of the shell are seen: the outside from space, the inside
+	# from the cabin.
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	shell.material_override = material
+	add_child(shell)
+	CollisionPolicy.mark_decorative(shell)
+
+
+## The deck: a solid floor plate running the cabin's length, and the surface
+## everyone actually stands on. The hull around it is scenery; this is not.
+func _build_deck() -> void:
+	var body := StaticBody3D.new()
+	body.name = "Deck"
+	body.collision_layer = 1
+	body.position = Vector3(0.0, DECK_Y - DECK_THICKNESS, 0.0)
+	add_child(body)
+	var plate := SuperEgg.build_part(
+		Vector3(DECK_HALF_WIDTH, DECK_THICKNESS, HULL_HALF_LENGTH - 3.0), PANEL,
+		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	plate.name = "DeckPlate"
+	body.add_child(plate)
+	CollisionPolicy.add_box(
+		body, plate, Vector3(DECK_HALF_WIDTH, DECK_THICKNESS, HULL_HALF_LENGTH - 3.0) * 2.0
+	)
+	# A brighter grating strip down the centreline, as in the reference cabin.
+	var grating := SuperEgg.build_part(
+		Vector3(2.6, 0.06, HULL_HALF_LENGTH - 5.0), HULL_SHADOW,
+		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	grating.name = "DeckGrating"
+	grating.position = Vector3(0.0, DECK_THICKNESS, 0.0)
+	body.add_child(grating)
+	CollisionPolicy.mark_decorative(grating)
+
+
+## Walls a body can lean on, rather than leaving the curved shell uncollided:
+## the two flanks, the ceiling and both end walls, with the doorway left open
+## on +X. Boxes, per this project's collision policy.
+func _build_cabin_collision() -> void:
+	var length := HULL_HALF_LENGTH - 2.0
+	var height := (CABIN_CEILING_Y - DECK_Y) * 0.5
+	var mid_y := (CABIN_CEILING_Y + DECK_Y) * 0.5
+	_wall("CabinWallFar", Vector3(-DECK_HALF_WIDTH - 0.4, mid_y, 0.0), Vector3(0.4, height, length))
+	_wall("CabinCeiling", Vector3(0.0, CABIN_CEILING_Y + 0.4, 0.0), Vector3(DECK_HALF_WIDTH, 0.4, length))
+	_wall("CabinWallFore", Vector3(0.0, mid_y, length - 0.4), Vector3(DECK_HALF_WIDTH, height, 0.4))
+	_wall("CabinWallAft", Vector3(0.0, mid_y, -length + 0.4), Vector3(DECK_HALF_WIDTH, height, 0.4))
+	# The near flank is interrupted by the doorway: a panel each side of it,
+	# and a header above.
+	var door_fore := DOOR_CENTER.x + DOOR_HALF.x
+	var door_aft := DOOR_CENTER.x - DOOR_HALF.x
+	var fore_span := (length - door_fore) * 0.5
+	var aft_span := (length + door_aft) * 0.5
+	_wall("CabinWallNearFore", Vector3(DECK_HALF_WIDTH + 0.4, mid_y, door_fore + fore_span), Vector3(0.4, height, fore_span))
+	_wall("CabinWallNearAft", Vector3(DECK_HALF_WIDTH + 0.4, mid_y, door_aft - aft_span), Vector3(0.4, height, aft_span))
+	var header_bottom := DOOR_CENTER.y + DOOR_HALF.y
+	_wall(
+		"CabinDoorHeader",
+		Vector3(DECK_HALF_WIDTH + 0.4, (header_bottom + CABIN_CEILING_Y) * 0.5, DOOR_CENTER.x),
+		Vector3(0.4, maxf((CABIN_CEILING_Y - header_bottom) * 0.5, 0.2), DOOR_HALF.x)
+	)
+
+
+func _wall(label: String, at: Vector3, half: Vector3) -> void:
+	var body := StaticBody3D.new()
+	body.name = label
+	body.collision_layer = 1
+	body.position = at
+	add_child(body)
+	var panel := SuperEgg.build_part(half, HULL_SHADOW, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	panel.name = "%sPanel" % label
+	body.add_child(panel)
+	CollisionPolicy.add_box(body, panel, half * 2.0)
+
+
+## Consoles, screens and light strips down both flanks, in the reference
+## cabin's arrangement: a continuous bank of instrument panels at working
+## height with lit screens above them, under a run of ceiling strip light.
+func _build_interior_fittings() -> void:
+	for side: float in [-1.0, 1.0]:
+		var station := -HULL_HALF_LENGTH + 10.0
+		while station < HULL_HALF_LENGTH - 10.0:
+			# The doorway's own stretch of flank carries no console.
+			if side < 0.0 or absf(station - DOOR_CENTER.x) > DOOR_HALF.x + 2.0:
+				_console(Vector3(side * (DECK_HALF_WIDTH - 1.2), DECK_Y + 1.1, station), side)
+			station += 7.5
+	var strip := SuperEgg.build_part(
+		Vector3(0.5, 0.18, HULL_HALF_LENGTH - 6.0), STRIP_LIGHT,
+		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+	)
+	strip.name = "CeilingStrip"
+	strip.position = Vector3(0.0, CABIN_CEILING_Y - 0.3, 0.0)
+	var glow := strip.get_surface_override_material(0) as StandardMaterial3D
+	if glow != null:
+		glow.emission_enabled = true
+		glow.emission = STRIP_LIGHT
+		glow.emission_energy_multiplier = 1.6
+	add_child(strip)
+	CollisionPolicy.mark_decorative(strip)
+	var light := OmniLight3D.new()
+	light.name = "CabinLight"
+	light.position = Vector3(0.0, CABIN_CEILING_Y - 1.5, 0.0)
+	light.light_color = Color(0.78, 0.9, 1.0)
+	light.light_energy = 2.4
+	light.omni_range = 46.0
+	light.shadow_enabled = false
+	add_child(light)
+
+
+## One instrument station: a slanted console block with a lit screen standing
+## behind it, facing the centreline.
+func _console(at: Vector3, side: float) -> void:
+	var body := StaticBody3D.new()
+	body.name = "Console"
+	body.collision_layer = 1
+	body.position = at
+	body.rotation.y = -PI * 0.5 * side
+	add_child(body)
+	var desk := SuperEgg.build_part(Vector3(2.8, 1.1, 1.0), PANEL, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	desk.name = "ConsoleDesk"
+	body.add_child(desk)
+	CollisionPolicy.add_box(body, desk, Vector3(2.8, 1.1, 1.0) * 2.0)
+	var face := SuperEgg.build_part(Vector3(2.4, 0.7, 0.08), TRIM, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	face.name = "ConsoleFace"
+	face.position = Vector3(0.0, 0.5, -1.0)
+	face.rotation.x = deg_to_rad(28.0)
+	body.add_child(face)
+	CollisionPolicy.mark_decorative(face)
+	var screen := SuperEgg.build_part(Vector3(1.6, 0.9, 0.06), SCREEN, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	screen.name = "ConsoleScreen"
+	screen.position = Vector3(0.0, 2.1, -0.4)
+	screen.rotation.x = deg_to_rad(12.0)
+	var lit := screen.get_surface_override_material(0) as StandardMaterial3D
+	if lit != null:
+		lit.emission_enabled = true
+		lit.emission = SCREEN
+		lit.emission_energy_multiplier = 1.4
+	body.add_child(screen)
+	CollisionPolicy.mark_decorative(screen)
+
+
+## Everything outside the pressure hull: the nose stack, the two strap-on
+## boosters down the far flank (clear of the doorway), the aft engine cluster
+## and its fins. All solid, so any of it can be landed on from outside.
+func _build_stack() -> void:
+	_outer_part("NoseCone", Vector3(0.0, 0.0, HULL_HALF_LENGTH + 5.0), Vector3(7.6, 7.6, 9.0), HULL)
+	_outer_part("NoseTip", Vector3(0.0, 0.0, HULL_HALF_LENGTH + 15.0), Vector3(2.0, 2.0, 7.0), HULL)
+	_outer_part("Collar", Vector3(0.0, 0.0, HULL_HALF_LENGTH - 2.0), Vector3(11.4, 11.4, 2.2), TRIM)
+	for side: float in [-1.0, 1.0]:
+		var booster_x := -6.0
+		var booster_y := side * 12.0
+		_outer_part(
+			"Booster", Vector3(booster_x, booster_y, -6.0), Vector3(4.6, 4.6, 24.0), HULL
+		)
+		_outer_part(
+			"BoosterNose", Vector3(booster_x, booster_y, 20.0), Vector3(4.0, 4.0, 6.0), HULL
+		)
+		_outer_part(
+			"BoosterBand", Vector3(booster_x, booster_y, 2.0), Vector3(4.8, 4.8, 1.2), TRIM
+		)
+		_outer_part(
+			"BoosterBell", Vector3(booster_x, booster_y, -32.0), Vector3(3.6, 3.6, 3.4), TRIM
+		)
+	for offset in [Vector2(-4.2, -4.2), Vector2(4.2, -4.2), Vector2(-4.2, 4.2), Vector2(4.2, 4.2)]:
+		_outer_part(
+			"EngineBell", Vector3(offset.x, offset.y, -HULL_HALF_LENGTH - 3.0),
+			Vector3(3.2, 3.2, 4.0), TRIM
+		)
+	_outer_part("AftSkirt", Vector3(0.0, 0.0, -HULL_HALF_LENGTH + 1.0), Vector3(11.3, 11.3, 3.0), TRIM)
+	var brand := Label3D.new()
+	brand.name = "Brand"
+	brand.text = "ASAN"
+	brand.font_size = 96
+	brand.modulate = Color(0.24, 0.30, 0.52)
+	brand.outline_size = 0
+	brand.position = Vector3(-HULL_RADIUS - 0.2, 0.0, 12.0)
+	brand.rotation = Vector3(0.0, -PI * 0.5, PI * 0.5)
+	brand.pixel_size = 0.03
+	add_child(brand)
+
+
+## One solid piece of the stack: a SuperEgg with a matching box collider, so
+## the whole vehicle can be climbed over from outside.
+func _outer_part(label: String, at: Vector3, half: Vector3, color: Color) -> MeshInstance3D:
+	var body := StaticBody3D.new()
+	body.name = "%sBody" % label
+	body.collision_layer = 1
+	body.position = at
+	add_child(body)
+	var piece := SuperEgg.build_part(half, color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+	piece.name = label
+	piece.material_override = _hull_material(color)
+	body.add_child(piece)
+	CollisionPolicy.add_box(body, piece, half * 2.0)
+	return piece
+
+
+func _hull_material(color: Color) -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.roughness = 0.34
+	material.metallic = 0.12
+	return material

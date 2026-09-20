@@ -289,3 +289,144 @@ static func build_inset_pad_mesh(
 		st.add_vertex(ba4)
 	st.generate_normals()
 	return st.commit()
+
+
+## A HOLLOW superegg: an outer surface, an inner surface `wall_thickness`
+## beneath it, and a superellipse aperture punched through one side, with the
+## cut's rim closing the two surfaces together so the shell reads as real
+## walls with real thickness rather than a paper skin.
+##
+## The aperture is a superellipse prism used as a negative: it is centred at
+## `aperture_center` (local Y/Z, on the +X side of the shell), has half-extents
+## `aperture_half` (Y then Z) and squareness `aperture_exponent`, and is
+## subtracted straight through the +X wall only -- the far wall behind it stays
+## whole. Anything the cut removes is replaced by rim geometry joining the
+## outer surface to the inner one, so a character can walk in through a real
+## doorway in a real hull.
+##
+## `wall_thickness` shrinks the semi-axes rather than offsetting each surface
+## point along its own normal: on an anisotropic shell the wall is therefore a
+## little thicker across the short axes than the long one, which is the
+## convincing way round for a hull and cannot self-intersect as a true offset
+## can. Keep it well under the smallest semi-axis.
+##
+## Denser than the solid builder by default: a doorway's rim shows the grid.
+static func build_hollow_shell_mesh(
+	semi_axes: Vector3, wall_thickness: float, aperture_center: Vector2, aperture_half: Vector2,
+	aperture_exponent: float = EPSILON_SOFT, epsilon_top: float = EPSILON_SOFT,
+	epsilon_bottom: float = EPSILON_SOFT, rings: int = RINGS * 2, segments: int = SEGMENTS * 2
+) -> ArrayMesh:
+	var inner_axes := Vector3(
+		maxf(semi_axes.x - wall_thickness, 0.01),
+		maxf(semi_axes.y - wall_thickness, 0.01),
+		maxf(semi_axes.z - wall_thickness, 0.01)
+	)
+	var outer: Array = []
+	var inner: Array = []
+	for ring_index in rings + 1:
+		var eta := -PI * 0.5 + PI * float(ring_index) / float(rings)
+		var outer_ring: Array[Vector3] = []
+		var inner_ring: Array[Vector3] = []
+		for segment in segments:
+			var omega := TAU * float(segment) / float(segments)
+			outer_ring.append(surface_point(semi_axes, eta, omega, epsilon_top, epsilon_bottom))
+			inner_ring.append(surface_point(inner_axes, eta, omega, epsilon_top, epsilon_bottom))
+		outer.append(outer_ring)
+		inner.append(inner_ring)
+
+	# Which cells the aperture removes, tested at each cell's own centre.
+	var cut: Array = []
+	for ring_index in rings:
+		var row: Array[bool] = []
+		for segment in segments:
+			var next_segment := (segment + 1) % segments
+			var centre: Vector3 = (
+				(outer[ring_index][segment] as Vector3) + (outer[ring_index][next_segment] as Vector3)
+				+ (outer[ring_index + 1][segment] as Vector3) + (outer[ring_index + 1][next_segment] as Vector3)
+			) * 0.25
+			row.append(_inside_aperture(centre, aperture_center, aperture_half, aperture_exponent))
+		cut.append(row)
+
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for ring_index in rings:
+		for segment in segments:
+			var next_segment := (segment + 1) % segments
+			if cut[ring_index][segment]:
+				continue
+			var a0: Vector3 = outer[ring_index][segment]
+			var a1: Vector3 = outer[ring_index][next_segment]
+			var b0: Vector3 = outer[ring_index + 1][segment]
+			var b1: Vector3 = outer[ring_index + 1][next_segment]
+			_add_quad(st, a0, b0, a1, b1)
+			# The inner surface faces the cabin, so its winding is reversed.
+			var c0: Vector3 = inner[ring_index][segment]
+			var c1: Vector3 = inner[ring_index][next_segment]
+			var d0: Vector3 = inner[ring_index + 1][segment]
+			var d1: Vector3 = inner[ring_index + 1][next_segment]
+			_add_quad(st, c0, c1, d0, d1)
+
+	# The rim: wherever a kept cell borders a cut one, close outer to inner
+	# across that shared edge.
+	for ring_index in rings:
+		for segment in segments:
+			if not cut[ring_index][segment]:
+				continue
+			var next_segment := (segment + 1) % segments
+			var neighbours := [
+				[ring_index, (segment + segments - 1) % segments, outer[ring_index][segment], outer[ring_index + 1][segment], inner[ring_index][segment], inner[ring_index + 1][segment]],
+				[ring_index, next_segment, outer[ring_index][next_segment], outer[ring_index + 1][next_segment], inner[ring_index][next_segment], inner[ring_index + 1][next_segment]],
+				[ring_index - 1, segment, outer[ring_index][segment], outer[ring_index][next_segment], inner[ring_index][segment], inner[ring_index][next_segment]],
+				[ring_index + 1, segment, outer[ring_index + 1][segment], outer[ring_index + 1][next_segment], inner[ring_index + 1][segment], inner[ring_index + 1][next_segment]],
+			]
+			for entry in neighbours:
+				var neighbour_ring: int = entry[0]
+				if neighbour_ring < 0 or neighbour_ring >= rings:
+					continue
+				if cut[neighbour_ring][entry[1] as int]:
+					continue
+				_add_rim(st, entry[2] as Vector3, entry[3] as Vector3, entry[4] as Vector3, entry[5] as Vector3)
+	st.generate_normals()
+	return st.commit()
+
+
+## True where the aperture prism removes `point`: inside the superellipse in
+## the local Y/Z plane, and on the +X half so only the near wall is cut.
+static func _inside_aperture(
+	point: Vector3, aperture_center: Vector2, aperture_half: Vector2, aperture_exponent: float
+) -> bool:
+	if point.x <= 0.0:
+		return false
+	var across := absf(point.y - aperture_center.x) / maxf(aperture_half.x, 0.001)
+	var along := absf(point.z - aperture_center.y) / maxf(aperture_half.y, 0.001)
+	return pow(across, aperture_exponent) + pow(along, aperture_exponent) <= 1.0
+
+
+static func _add_quad(st: SurfaceTool, a0: Vector3, b0: Vector3, a1: Vector3, b1: Vector3) -> void:
+	st.add_vertex(a0)
+	st.add_vertex(b0)
+	st.add_vertex(a1)
+	st.add_vertex(a1)
+	st.add_vertex(b0)
+	st.add_vertex(b1)
+
+
+## One rim quad joining an outer edge to the matching inner edge, wound so it
+## faces into the doorway rather than into the wall it closes.
+static func _add_rim(st: SurfaceTool, outer_a: Vector3, outer_b: Vector3, inner_a: Vector3, inner_b: Vector3) -> void:
+	var normal := (outer_b - outer_a).cross(inner_a - outer_a)
+	var toward_wall := (outer_a + outer_b) * 0.5
+	if normal.dot(toward_wall) > 0.0:
+		st.add_vertex(outer_a)
+		st.add_vertex(outer_b)
+		st.add_vertex(inner_a)
+		st.add_vertex(inner_a)
+		st.add_vertex(outer_b)
+		st.add_vertex(inner_b)
+		return
+	st.add_vertex(outer_a)
+	st.add_vertex(inner_a)
+	st.add_vertex(outer_b)
+	st.add_vertex(outer_b)
+	st.add_vertex(inner_a)
+	st.add_vertex(inner_b)
