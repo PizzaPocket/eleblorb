@@ -17,6 +17,38 @@ extends RefCounted
 
 const REACH := 3.0
 const RISE := 1.0
+## The one-way surfaces: clouds and tree canopies hold a body up from above
+## but are entered freely from below, so each is queried with a ceiling and
+## a body sinks slightly into it rather than perching on top. A canopy is a
+## thin leaf mass, so it takes less than a cloud.
+const CLOUD_SINK_DEPTH := 0.10
+const CANOPY_SINK_DEPTH := 0.04
+
+
+## The height to stand at on a cloud above `world`, or null where there is
+## none. Any character can ask; only the one-way surface decides.
+static func cloud_stand_height(body: Node3D, foot_offset: float, ceiling: float) -> Variant:
+	return _one_way_stand_height(body, "Clouds", foot_offset, ceiling, CLOUD_SINK_DEPTH)
+
+
+## The same for a walkable tree canopy.
+static func canopy_stand_height(body: Node3D, foot_offset: float, ceiling: float) -> Variant:
+	return _one_way_stand_height(body, "Scatter", foot_offset, ceiling, CANOPY_SINK_DEPTH)
+
+
+## Duck-typed on the sibling's name and its get_support_height_at() contract,
+## which both the Crossroads scatter and a kingdom's own foliage implement
+## without sharing a class.
+static func _one_way_stand_height(
+	body: Node3D, sibling: String, foot_offset: float, ceiling: float, sink: float
+) -> Variant:
+	var source := body.get_node_or_null("../%s" % sibling)
+	if source == null or not source.has_method("get_support_height_at"):
+		return null
+	var top: Variant = source.get_support_height_at(body.global_position.x, body.global_position.z, ceiling)
+	if top == null:
+		return null
+	return (top as float) + foot_offset - sink
 
 
 ## The height to stand at, at the body's own XZ. `terrain` may be null.

@@ -84,7 +84,7 @@ const AERIAL_CAMERA_PITCH_MAX := deg_to_rad(88.0)
 # GROUND_SNAP_MAX_SLOPE, which is what keeps steep mountainsides unclimbable.
 const GROUND_SNAP_MAX_SLOPE := 0.9  # rise/run, ~42 degrees
 const FOOT_OFFSET := 0.05
-const CLOUD_SINK_DEPTH := 0.10
+const CLOUD_SINK_DEPTH := WorldSupport.CLOUD_SINK_DEPTH
 
 ## ---- Dirt blorb suit: rear wheel ---- Per direct instruction: a landed
 ## "ground"-element leg pair (BlorbSuitController.has_dirtbike_legs()) grows
@@ -457,7 +457,7 @@ const SNOW_VISUAL_SINK_SPEED := 0.65
 ## Shallower than CLOUD_SINK_DEPTH -- a tree canopy is a thin leaf mass, not
 ## a fluffy cloud bank, so standing on top should read as resting lightly on
 ## foliage rather than sinking noticeably in.
-const TREE_CANOPY_SINK_DEPTH := 0.04
+const TREE_CANOPY_SINK_DEPTH := WorldSupport.CANOPY_SINK_DEPTH
 
 # Frozen-lake traversal deliberately retains horizontal momentum. These are
 # world acceleration/friction rates, kept independent of animation cadence
@@ -8490,32 +8490,17 @@ func _is_blorb_skating() -> bool:
 ## Root Y required to stand slightly embedded in a one-way cloud surface.
 ## CloudScatter returns only tops no higher than the supplied ceiling, which
 ## is what preserves pass-through behavior from below.
-func _cloud_stand_height_at(x: float, z: float, max_surface_y: float) -> Variant:
-	var clouds := get_node_or_null("../Clouds") as CloudScatter
-	if clouds == null:
-		return null
-	var top: Variant = clouds.get_support_height_at(x, z, max_surface_y)
-	if top == null:
-		return null
-	return (top as float) + FOOT_OFFSET - CLOUD_SINK_DEPTH
+func _cloud_stand_height_at(_x: float, _z: float, max_surface_y: float) -> Variant:
+	# Shared with every other character, so anyone can stand on a cloud.
+	return WorldSupport.cloud_stand_height(self, FOOT_OFFSET, max_surface_y)
 
 
 ## Root Y required to stand slightly embedded in a one-way tree canopy --
 ## same reasoning as _cloud_stand_height_at() above, just a shallower sink
 ## (see TREE_CANOPY_SINK_DEPTH).
-func _tree_canopy_stand_height_at(x: float, z: float, max_surface_y: float) -> Variant:
-	# Duck-typed rather than `as WildernessScatter` -- kingdom scenes (see
-	# jungle_kingdom_foliage.gd) implement the same get_support_height_at()
-	# contract on their own "Scatter" sibling without being a
-	# WildernessScatter themselves (that class carries a mountain of
-	# outskirts-only logic no kingdom scene needs).
-	var scatter := get_node_or_null("../Scatter")
-	if scatter == null or not scatter.has_method("get_support_height_at"):
-		return null
-	var top: Variant = scatter.get_support_height_at(x, z, max_surface_y)
-	if top == null:
-		return null
-	return (top as float) + FOOT_OFFSET - TREE_CANOPY_SINK_DEPTH
+func _tree_canopy_stand_height_at(_x: float, _z: float, max_surface_y: float) -> Variant:
+	# Shared with every other character, so anyone can stand in the canopy.
+	return WorldSupport.canopy_stand_height(self, FOOT_OFFSET, max_surface_y)
 
 
 func _get_move_input() -> Vector2:

@@ -1023,6 +1023,10 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	elif (is_on_floor() or _direct_is_supported_by_ice()) and jump_pressed and _penguin.is_available(_traversal_context(delta)):
 		# In the suit a jump is a dive.
 		_begin_direct_penguin_dive(Vector3(planar.x, 0.0, planar.y))
+	elif _direct_one_way_support(delta):
+		# Clouds and tree canopies hold him up exactly as they do the human;
+		# he never asked them before, so both were thin air to him.
+		pass
 	elif is_on_floor() or _direct_is_supported_by_ice():
 		if jump_pressed:
 			_direct_vertical_velocity = HumanoidLocomotion.jump_speed(
@@ -1245,6 +1249,23 @@ func _animate_direct_ice_skating(delta: float) -> void:
 		_animate_walk(delta, false)
 	_ice_skates.engaged = _direct_ice_skating_active
 	_ice_skates.pose(_traversal_context(delta))
+
+
+## Stands him on a cloud or in a tree canopy when one is under his feet and
+## he is falling onto it. Returns true when one caught him.
+func _direct_one_way_support(delta: float) -> bool:
+	if _direct_vertical_velocity > 0.1 or _direct_diving or _direct_surface_swimming or _direct_flying:
+		return false
+	var ceiling: float = global_position.y + 0.2
+	var stand: Variant = WorldSupport.cloud_stand_height(self, 0.0, ceiling)
+	if stand == null:
+		stand = WorldSupport.canopy_stand_height(self, 0.0, ceiling)
+	if stand == null:
+		return false
+	global_position.y = move_toward(global_position.y, float(stand), 8.0 * delta)
+	_direct_vertical_velocity = 0.0
+	velocity.y = 0.0
+	return true
 
 
 ## How many water limbs are jetting while he swims.
