@@ -26,7 +26,27 @@ const TERMINAL_ROLL_SPEED := 34.0
 ## triangle does not read as a hill.
 const GRADE_RESPONSE := 7.0
 
+## How far ahead of the wheels the grade is read. A property of the ground
+## rather than of the rider, so it does not scale with the rig: sampled over a
+## shorter baseline, ordinary terrain noise reads as a steep climb, and the
+## crest latch then throws the bike off every ripple. A quarter-size rider
+## measuring over 0.2 m rode the dirt course at 100 m/s for exactly that
+## reason, against the human's 13.
+const SLOPE_SAMPLE_DISTANCE := 0.6
+
+## A tracked climb hands its own measured motion over as a launch when the
+## support falls away; below this grade the wheels are not climbing anything.
+const ASCEND_TRACK_THRESHOLD := 0.02
+## About 12% more vertical takeoff speed (sqrt(1.25)) off a crest, without
+## altering the horizontal component or the terrain-derived direction.
+const JUMP_HEIGHT_MULTIPLIER := 1.25
+
 var smoothed_grade := 0.0
+## The crest latch and the air it produces: whether the wheels were climbing
+## last frame, and whether they are off the ground now.
+var was_climbing := false
+var airborne := false
+var surface_velocity := Vector3.ZERO
 
 
 func id() -> StringName:
@@ -61,5 +81,103 @@ func coast(rolling: Vector2, sampled_grade: float, delta: float, grounded: bool)
 	)
 
 
+## The grade along `direction` at the body's feet.
+static func slope_along(terrain: Node, at: Vector3, direction: Vector2) -> float:
+	if terrain == null or direction.length_squared() < 0.0001:
+		return 0.0
+	var aim := direction.normalized()
+	var here: float = terrain.get_mesh_height(at.x, at.z)
+	var ahead: float = terrain.get_mesh_height(
+		at.x + aim.x * SLOPE_SAMPLE_DISTANCE, at.z + aim.y * SLOPE_SAMPLE_DISTANCE
+	)
+	return (ahead - here) / SLOPE_SAMPLE_DISTANCE
+
+
+## One frame of ground contact under the wheels. `target_h` is the terrain
+## beneath them, `foot_offset` how far the body's origin rides above its
+## feet, and `travel_slope` the grade along the direction of travel, which
+## each rig measures its own way.
+##
+## Climbing is tracked rather than followed: the motion that actually
+## occurred is measured while the wheels climb, and handed over whole as a
+## real arc the moment the support falls away. That is what makes a crest
+## throw the bike rather than glue it to the far side.
+##
+## Returns true if the bike left the ground this frame, so the caller can
+## mark its own jump state.
+func follow_terrain(
+	ctx: TraversalContext, target_h: float, foot_offset: float,
+	travel_slope: float, pre_move_position: Vector3
+) -> bool:
+	var body := ctx.body
+	var feet_y: float = body.global_position.y - foot_offset
+	if airborne:
+		# Already flying. An arc in progress is nobody else's to rewrite:
+		# measuring the ground again mid-flight is what used to feed a launch
+		# back into itself, each pass reading the last one's motion as more
+		# climb and throwing the bike harder than the one before.
+		if feet_y <= target_h:
+			body.global_position.y = target_h + foot_offset
+			body.velocity.y = 0.0
+			airborne = false
+		elif body.is_on_floor() and body.velocity.y <= 0.0:
+			airborne = false
+		return false
+	if travel_slope > ASCEND_TRACK_THRESHOLD:
+		# Resolve onto the support, then measure the whole motion that
+		# actually occurred this frame. Y in particular is a real change in
+		# position over time, not a value anyone chose.
+		was_climbing = true
+		airborne = false
+		body.global_position.y = target_h + foot_offset
+		surface_velocity = HumanoidLocomotion.resolved_velocity(
+			pre_move_position, body.global_position, ctx.delta
+		)
+		body.velocity.y = surface_velocity.y
+		return false
+	if was_climbing:
+		# The support has fallen away from under a climb: keep both the
+		# horizontal velocity and the full vertical tangent.
+		was_climbing = false
+		airborne = true
+		body.velocity = surface_velocity
+		body.velocity.y *= sqrt(JUMP_HEIGHT_MULTIPLIER)
+		return true
+	was_climbing = false
+	if target_h - feet_y >= 0.0:
+		# Level or rising ground that is not a tracked climb stays attached.
+		body.global_position.y = target_h + foot_offset
+		body.velocity.y = 0.0
+		airborne = false
+		return false
+	# Per direct correction ("even when cresting smaller hills at speed he
+	# should still get airtime according to the laws of physics -- his
+	# downward translation should never exceed the speed his body would be
+	# falling from gravity") -- every frame from here is a real
+	# gravity-integrated fall compared against the actual terrain height,
+	# rather than a slope-ratio threshold or a hang-time timer, both of which
+	# were tried and replaced. A slope gentle enough for gravity to keep pace
+	# with reads as hugging the downhill, because the predicted fall lands at
+	# or past the terrain almost every frame; a drop steeper than gravity can
+	# match falls behind it, producing real air that scales with exactly how
+	# far the terrain outpaces gravity. That scales to any hill, with no
+	# separate constant for small ones and large ones.
+	body.velocity.y = HumanoidLocomotion.apply_gravity(
+		body.velocity.y, ctx.delta, ctx.profile, Player.TERMINAL_FALL_SPEED
+	)
+	var predicted := feet_y + body.velocity.y * ctx.delta
+	if predicted > target_h:
+		body.global_position.y = predicted + foot_offset
+		airborne = true
+		return false
+	body.global_position.y = target_h + foot_offset
+	body.velocity.y = 0.0
+	airborne = false
+	return false
+
+
 func reset() -> void:
 	smoothed_grade = 0.0
+	was_climbing = false
+	airborne = false
+	surface_velocity = Vector3.ZERO

@@ -1549,52 +1549,24 @@ func _build_direct_dirtbike_wheel(wheel_name: String) -> MeshInstance3D:
 
 
 func _direct_dirtbike_slope() -> float:
-	var planar: Vector2 = Vector2(velocity.x,velocity.z)
-	if terrain == null or planar.length_squared() < 0.0001:
-		return 0.0
-	var direction: Vector2 = planar.normalized()
-	var sample_distance: float = maxf(Player.DIRTBIKE_WHEEL_RADIUS*_playable_profile.suit_rig_scale*2.0,0.2)
-	var here: float = terrain.get_mesh_height(global_position.x,global_position.z)
-	var ahead: float = terrain.get_mesh_height(
-		global_position.x+direction.x*sample_distance,
-		global_position.z+direction.y*sample_distance
-	)
-	return (ahead-here)/sample_distance
+	return DirtbikeMode.slope_along(terrain, global_position, Vector2(velocity.x, velocity.z))
 
 
 func _resolve_direct_dirtbike_motion(delta: float,pre_move_position: Vector3) -> void:
 	if not _direct_dirtbike_active or _direct_diving or _direct_surface_swimming or _direct_lava_surface or _direct_flying:
+		_dirtbike.was_climbing = false
 		_direct_dirtbike_was_climbing = false
 		_direct_dirtbike_airborne = false
 		return
-	var ground_height: float = terrain.get_mesh_height(global_position.x,global_position.z)
-	var slope: float = _direct_dirtbike_slope()
-	if slope > Player.DIRTBIKE_ASCEND_TRACK_THRESHOLD and global_position.y <= ground_height+0.45:
-		_direct_dirtbike_was_climbing = true
-		_direct_dirtbike_airborne = false
-		global_position.y = ground_height
-		_direct_dirtbike_surface_velocity = HumanoidLocomotion.resolved_velocity(
-			pre_move_position,global_position,delta
-		)
-		_direct_vertical_velocity = _direct_dirtbike_surface_velocity.y
-		velocity.y = _direct_vertical_velocity
-		return
-	if _direct_dirtbike_was_climbing:
-		_direct_dirtbike_was_climbing = false
-		_direct_dirtbike_airborne = true
-		velocity = _direct_dirtbike_surface_velocity
-		velocity.y *= sqrt(Player.DIRTBIKE_JUMP_HEIGHT_MULTIPLIER)
-		_direct_vertical_velocity = velocity.y
-		return
-	if _direct_dirtbike_airborne:
-		if is_on_floor() and _direct_vertical_velocity <= 0.0:
-			_direct_dirtbike_airborne = false
-			_direct_vertical_velocity = 0.0
-		return
-	if absf(global_position.y-ground_height) <= 0.45:
-		global_position.y = ground_height
-		_direct_vertical_velocity = 0.0
-		velocity.y = 0.0
+	# His origin sits at his feet, so he rides with no offset between them.
+	var ground_height: float = terrain.get_mesh_height(global_position.x, global_position.z)
+	_dirtbike.follow_terrain(
+		_traversal_context(delta), ground_height, 0.0, _direct_dirtbike_slope(), pre_move_position
+	)
+	_direct_dirtbike_was_climbing = _dirtbike.was_climbing
+	_direct_dirtbike_airborne = _dirtbike.airborne
+	_direct_dirtbike_surface_velocity = _dirtbike.surface_velocity
+	_direct_vertical_velocity = velocity.y
 
 
 ## The riding stance, and the deck under it. Both are the shared power's, so

@@ -171,7 +171,7 @@ const DIRTBIKE_FLOOR_MAX_ANGLE := deg_to_rad(80.0)
 ## against real gravity naturally does. DIRTBIKE_ASCEND_TRACK_THRESHOLD
 ## filters out terrain noise from counting as "was climbing" in the first
 ## place.
-const DIRTBIKE_ASCEND_TRACK_THRESHOLD := 0.02
+const DIRTBIKE_ASCEND_TRACK_THRESHOLD := DirtbikeMode.ASCEND_TRACK_THRESHOLD
 ## How fast the standing/riding leg/arm pose blends toward its target --
 ## eases the transition into/out of the straddle pose (see
 ## _apply_dirtbike_pose()) instead of a hard cut. The visual lift itself
@@ -213,9 +213,7 @@ const DIRTBIKE_AIR_DRAG := DirtbikeMode.AIR_DRAG
 const DIRTBIKE_ROLL_STOP_SPEED := DirtbikeMode.ROLL_STOP_SPEED
 const DIRTBIKE_TERMINAL_ROLL_SPEED := DirtbikeMode.TERMINAL_ROLL_SPEED
 const DIRTBIKE_GRADE_RESPONSE := DirtbikeMode.GRADE_RESPONSE
-## About 12% more vertical takeoff speed (sqrt(1.25)) without altering the
-## horizontal component or the terrain-derived launch direction.
-const DIRTBIKE_JUMP_HEIGHT_MULTIPLIER := 1.25
+const DIRTBIKE_JUMP_HEIGHT_MULTIPLIER := DirtbikeMode.JUMP_HEIGHT_MULTIPLIER
 
 ## Snowboard: a passive, gravity-driven sibling of the dirtbike movement
 ## model. Input carves/steers existing momentum but supplies no throttle.
@@ -4614,13 +4612,7 @@ func _dirtbike_wheel_support_height(axle: Vector3) -> Variant:
 ## climbs in that direction. Shared by the uphill roll-to-a-stop
 ## deceleration and could equally serve any other dirtbike slope query.
 func _dirtbike_slope_along(dir_xz: Vector2) -> float:
-	if terrain == null or dir_xz.length_squared() < 0.0001:
-		return 0.0
-	var dir := dir_xz.normalized()
-	const SAMPLE_DIST := 0.6
-	var h0: float = terrain.get_mesh_height(global_position.x, global_position.z)
-	var h1: float = terrain.get_mesh_height(global_position.x + dir.x * SAMPLE_DIST, global_position.z + dir.y * SAMPLE_DIST)
-	return (h1 - h0) / SAMPLE_DIST
+	return DirtbikeMode.slope_along(terrain, global_position, dir_xz)
 
 
 ## Two active Fire hands become downward lift jets rather than two forward
@@ -8018,56 +8010,19 @@ func _snap_to_terrain(delta: float,pre_move_position: Vector3) -> void:
 		return
 
 	if _dirtbike_wheel_active:
-		var horizontal_velocity := Vector2(velocity.x,velocity.z)
-		var travel_slope: float = _dirtbike_slope_along(horizontal_velocity)
-		# Resolve onto support, then measure the complete motion that actually
-		# occurred this frame. In particular, Y is real delta-position/delta-time.
-		if travel_slope > DIRTBIKE_ASCEND_TRACK_THRESHOLD:
-			_dirtbike_was_climbing = true
-			global_position.y = target_h + FOOT_OFFSET
-			_dirtbike_surface_velocity = HumanoidLocomotion.resolved_velocity(
-				pre_move_position,global_position,delta
-			)
-			velocity.y = _dirtbike_surface_velocity.y
-			return
-		# Once the support slope falls away, preserve both the horizontal
-		# velocity and the full vertical tangent velocity. Marking this as a
-		# genuine jump arc also prevents ground grace from re-snapping the body
-		# during the first airborne frames.
-		if _dirtbike_was_climbing:
-			_dirtbike_was_climbing = false
-			velocity = _dirtbike_surface_velocity
-			velocity.y *= sqrt(DIRTBIKE_JUMP_HEIGHT_MULTIPLIER)
+		# The contact model itself is DirtbikeMode's, so both riders meet the
+		# same crest the same way. Marking a launch as a genuine jump arc also
+		# keeps ground grace from re-snapping the body in its first airborne
+		# frames.
+		var travel_slope: float = _dirtbike_slope_along(Vector2(velocity.x, velocity.z))
+		var launched: bool = _dirtbike.follow_terrain(
+			_traversal_context(delta), target_h, FOOT_OFFSET, travel_slope, pre_move_position
+		)
+		_dirtbike_was_climbing = _dirtbike.was_climbing
+		_dirtbike_surface_velocity = _dirtbike.surface_velocity
+		if launched:
 			_jump_takeoff_speed = absf(velocity.y)
 			_jumping = true
-			return
-		_dirtbike_was_climbing = false
-		# Level or rising support that is not a tracked climb remains attached.
-		if rise >= 0.0:
-			global_position.y = target_h + FOOT_OFFSET
-			velocity.y = 0.0
-			return
-		# Per direct correction ("even when cresting smaller hills at speed
-		# he should still get airtime according to the laws of physics --
-		# his downward translation should never exceed the speed his body
-		# would be falling from gravity") -- every frame from here on is a
-		# REAL gravity-integrated fall, compared directly against the actual
-		# terrain height, rather than a fixed slope-ratio threshold or a
-		# one-shot hang-time timer (both tried and replaced). A slope gentle
-		# enough for gravity's own fall rate to keep pace with reads as
-		# smoothly hugging the downhill, since the predicted fall lands AT
-		# or past the terrain almost every frame; a drop steeper than
-		# gravity can match falls behind it, producing real air that scales
-		# with exactly how much the terrain outpaces gravity -- which
-		# naturally scales to any hill size, small or large, with no
-		# separate constant to tune for either case.
-		velocity.y = HumanoidLocomotion.apply_gravity(velocity.y, delta, _playable_profile, TERMINAL_FALL_SPEED)
-		var predicted_h := (global_position.y - FOOT_OFFSET) + velocity.y * delta
-		if predicted_h > target_h:
-			global_position.y = predicted_h + FOOT_OFFSET
-			return
-		global_position.y = target_h + FOOT_OFFSET
-		velocity.y = 0.0
 		return
 
 	if absf(rise) / run > GROUND_SNAP_MAX_SLOPE:
