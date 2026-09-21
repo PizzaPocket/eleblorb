@@ -118,6 +118,81 @@ func pose_swim(ctx: TraversalContext, reference_speed: float, lead_head: bool = 
 		_lead_with_the_head(rig, t)
 
 
+## The mermaid tail: a VARIANT of swimming rather than a separate power, the
+## legs held together inside the tail and kicking as one like a dolphin. The
+## hips drive, the knees fold on the upbeat, and the fluke whips a quarter
+## beat behind them. The kick quickens with speed, and the arms stay
+## streamlined but sweep less than a free swimmer's.
+##
+## Like the ordinary swim, it only kicks once actually under way: a tail at
+## rest hangs still.
+const MERMAID_SPEED_MULTIPLIER := 3.0
+const MERMAID_LEG_ADDUCT := deg_to_rad(7.5)
+const MERMAID_ANKLE_POINT := deg_to_rad(86.0)
+const MERMAID_KICK_SPEED := 10.0
+const MERMAID_KICK_HIP_AMOUNT := deg_to_rad(15.0)
+const MERMAID_KICK_KNEE_AMOUNT := deg_to_rad(28.0)
+const MERMAID_KICK_ANKLE_AMOUNT := deg_to_rad(16.0)
+const MERMAID_ARM_BACK_FRACTION := 0.4
+
+
+func update_mermaid_motion(ctx: TraversalContext, reference_speed: float) -> void:
+	var speed := ctx.body.velocity.length()
+	var wants := 1.0 if speed > MOVING_SPEED else 0.0
+	motion = move_toward(motion, wants, MOTION_BLEND_RATE * ctx.delta)
+	if motion <= 0.001:
+		kick_phase = 0.0
+		return
+	var fraction := clampf(speed / maxf(reference_speed, 0.001), 0.0, 1.0)
+	kick_phase += ctx.delta * MERMAID_KICK_SPEED * lerpf(0.5, 1.6, fraction) * motion
+
+
+func pose_mermaid(ctx: TraversalContext, reference_speed: float, lead_head: bool = true) -> void:
+	var rig := ctx.rig
+	if rig == null:
+		return
+	var t := minf(POSE_SETTLE_SPEED * ctx.delta, 1.0)
+	var speed := ctx.body.velocity.length()
+	var fraction := clampf(speed / maxf(reference_speed, 0.001), 0.0, 1.0)
+	var wave := sin(kick_phase) * motion
+	var hip := -REST_HIP_BEND * 0.4 + wave * MERMAID_KICK_HIP_AMOUNT
+	var knee := maxf(0.0, -wave) * MERMAID_KICK_KNEE_AMOUNT
+	# The fluke lags the hips by a quarter beat.
+	var ankle := MERMAID_ANKLE_POINT - cos(kick_phase) * MERMAID_KICK_ANKLE_AMOUNT * motion
+	for side in 2:
+		var prefix := "leg_left" if side == 0 else "leg_right"
+		var hip_joint := rig.joint("%s_hip" % prefix)
+		if hip_joint != null:
+			hip_joint.rotation.x = lerp_angle(hip_joint.rotation.x, hip, t)
+			# Drawn together inside the one tail.
+			hip_joint.rotation.z = lerp_angle(
+				hip_joint.rotation.z, -signf(hip_joint.position.x) * MERMAID_LEG_ADDUCT, t
+			)
+		var knee_joint := rig.joint("%s_knee" % prefix)
+		if knee_joint != null:
+			knee_joint.rotation.x = lerp_angle(knee_joint.rotation.x, knee, t)
+		if rig.articulates("%s_ankle" % prefix):
+			var ankle_joint := rig.joint("%s_ankle" % prefix)
+			ankle_joint.rotation.x = lerp_angle(ankle_joint.rotation.x, ankle, t)
+	var arm_back := FAST_ARM_BACK_SWING * fraction * MERMAID_ARM_BACK_FRACTION * motion
+	var elbow_bend := FAST_ELBOW_BEND * fraction * MERMAID_ARM_BACK_FRACTION * motion
+	for side in 2:
+		if (ctx.left_arm_busy if side == 0 else ctx.right_arm_busy):
+			continue
+		var shoulder := rig.joint("arm_left_shoulder" if side == 0 else "arm_right_shoulder")
+		if shoulder != null:
+			shoulder.rotation.x = lerp_angle(shoulder.rotation.x, arm_back, t)
+		var elbow := rig.joint("arm_left_elbow" if side == 0 else "arm_right_elbow")
+		if elbow != null:
+			elbow.rotation.x = lerp_angle(elbow.rotation.x, -elbow_bend, t)
+	var spine := rig.joint("spine")
+	if spine != null:
+		spine.rotation.x = lerp_angle(spine.rotation.x, 0.0, t)
+		spine.position.y = lerpf(spine.position.y, rig.rest_position("spine").y, t)
+	if lead_head:
+		_lead_with_the_head(rig, t)
+
+
 ## Under way the head lifts to look along the travel, the way a swimmer
 ## looks where they are going rather than at the bottom. At rest it returns.
 func _lead_with_the_head(rig: RigAdapter, t: float) -> void:

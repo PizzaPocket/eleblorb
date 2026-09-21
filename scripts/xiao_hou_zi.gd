@@ -1233,6 +1233,12 @@ func _animate_direct_swim(delta: float, movement_speed: float) -> void:
 	# the kick every frame regardless, which is why he paddled on the spot.
 	var ctx := _traversal_context(delta)
 	var reference: float = maxf(movement_speed, Player.LAKE_DIVE_SPEED)
+	# The tail is a variant of the same power, so he gets one the moment his
+	# suit qualifies rather than needing a second implementation.
+	if _blorb_suit.mermaid_tail_active():
+		_swim.update_mermaid_motion(ctx, reference * SwimMode.MERMAID_SPEED_MULTIPLIER)
+		_swim.pose_mermaid(ctx, reference * SwimMode.MERMAID_SPEED_MULTIPLIER)
+		return
 	_swim.update_motion(ctx, reference)
 	_swim.pose_swim(ctx, reference)
 

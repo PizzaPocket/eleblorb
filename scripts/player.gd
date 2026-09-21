@@ -980,19 +980,19 @@ const FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER := 1.35
 const SWIM_JET_SPEED_MULTIPLIER := FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER
 ## The mermaid tail (Nautilus Crown over two Water leg blorbs, swimming):
 ## far faster swimming, and sprint and Water jets still stack on top.
-const MERMAID_SWIM_SPEED_MULTIPLIER := 3.0
+const MERMAID_SWIM_SPEED_MULTIPLIER := SwimMode.MERMAID_SPEED_MULTIPLIER
 ## The tail's pose: legs drawn in so the ankles meet, toes pointed straight
 ## back in line with the shins so the fluke runs on along the tail, and a
 ## dolphin kick with both legs in unison. The ankles add the fluke's stroke,
 ## lagging a quarter beat behind the hips so the fin whips through.
-const MERMAID_LEG_ADDUCT := deg_to_rad(7.5)
-const MERMAID_ANKLE_POINT := deg_to_rad(86.0)
-const MERMAID_KICK_SPEED := 10.0
-const MERMAID_KICK_HIP_AMOUNT := deg_to_rad(15.0)
-const MERMAID_KICK_KNEE_AMOUNT := deg_to_rad(28.0)
-const MERMAID_KICK_ANKLE_AMOUNT := deg_to_rad(16.0)
+const MERMAID_LEG_ADDUCT := SwimMode.MERMAID_LEG_ADDUCT
+const MERMAID_ANKLE_POINT := SwimMode.MERMAID_ANKLE_POINT
+const MERMAID_KICK_SPEED := SwimMode.MERMAID_KICK_SPEED
+const MERMAID_KICK_HIP_AMOUNT := SwimMode.MERMAID_KICK_HIP_AMOUNT
+const MERMAID_KICK_KNEE_AMOUNT := SwimMode.MERMAID_KICK_KNEE_AMOUNT
+const MERMAID_KICK_ANKLE_AMOUNT := SwimMode.MERMAID_KICK_ANKLE_AMOUNT
 ## The arms sweep back only part of the ordinary fast-swim amount.
-const MERMAID_ARM_BACK_FRACTION := 0.4
+const MERMAID_ARM_BACK_FRACTION := SwimMode.MERMAID_ARM_BACK_FRACTION
 const AERIAL_FAST_SPEED_MULTIPLIER := 1.8
 ## Flying sprint is intentionally twice its previous fast-flight rate;
 ## swimming retains AERIAL_FAST_SPEED_MULTIPLIER unchanged.
@@ -6634,34 +6634,17 @@ func _animate_swimming(delta: float) -> void:
 ## hips drive, the knees fold on the upbeat, the feet whip with the fluke.
 ## The kick quickens with speed. The arms keep the ordinary streamlined swim.
 func _animate_mermaid_swimming(delta: float, t: float) -> void:
+	# The tail is a variant of swimming, not a power of its own, so it lives
+	# in SwimMode beside the ordinary stroke and is shared with every other
+	# character that can wear one.
 	_mermaid_legs_drawn_in = true
-	for leg in [_leg_left, _leg_right]:
-		var pivot := leg as Node3D
-		pivot.rotation.z = lerp_angle(pivot.rotation.z, -signf(pivot.position.x) * MERMAID_LEG_ADDUCT, t)
-	var swim_speed := velocity.length()
-	var speed_fraction := clampf(swim_speed / maxf(move_speed * MERMAID_SWIM_SPEED_MULTIPLIER, LAKE_DIVE_SPEED), 0.0, 1.0)
-	var wave := 0.0
-	if swim_speed > 0.1:
-		_swim_kick_phase += delta * MERMAID_KICK_SPEED * lerpf(0.5, 1.6, speed_fraction)
-		wave = sin(_swim_kick_phase)
-	var hip := -DESCENT_HIP_BEND * 0.4 + wave * MERMAID_KICK_HIP_AMOUNT
-	var knee := maxf(0.0, -wave) * MERMAID_KICK_KNEE_AMOUNT
-	# The fluke's stroke: the ankles lag the hips by a quarter beat.
-	var ankle := MERMAID_ANKLE_POINT + (-cos(_swim_kick_phase) if swim_speed > 0.1 else 0.0) * MERMAID_KICK_ANKLE_AMOUNT
-	for pair in [[_leg_left, _knee_left, _ankle_left], [_leg_right, _knee_right, _ankle_right]]:
-		(pair[0] as Node3D).rotation.x = lerp_angle((pair[0] as Node3D).rotation.x, hip, t)
-		(pair[1] as Node3D).rotation.x = lerp_angle((pair[1] as Node3D).rotation.x, knee, t)
-		(pair[2] as Node3D).rotation.x = lerp_angle((pair[2] as Node3D).rotation.x, ankle, t)
-	var arm_back := SWIM_FAST_ARM_BACK_SWING * speed_fraction * MERMAID_ARM_BACK_FRACTION
-	var elbow_bend := SWIM_FAST_ELBOW_BEND * speed_fraction * MERMAID_ARM_BACK_FRACTION
-	_arm_left.rotation.x = lerp_angle(_arm_left.rotation.x, arm_back, t)
-	_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, arm_back, t)
+	var ctx := _traversal_context(delta)
+	var reference: float = maxf(move_speed * SwimMode.MERMAID_SPEED_MULTIPLIER, LAKE_DIVE_SPEED)
+	_swim.update_mermaid_motion(ctx, reference)
+	_swim.pose_mermaid(ctx, reference, false)
+	# The arms open to their resting outward angle inside the tail's pose.
 	_arm_left.rotation.z = lerp_angle(_arm_left.rotation.z, ProceduralFigure.ARM_OUTWARD_ANGLE, t)
 	_arm_right.rotation.z = lerp_angle(_arm_right.rotation.z, -ProceduralFigure.ARM_OUTWARD_ANGLE, t)
-	_elbow_left.rotation.x = lerp_angle(_elbow_left.rotation.x, -elbow_bend, t)
-	_elbow_right.rotation.x = lerp_angle(_elbow_right.rotation.x, -elbow_bend, t)
-	_spine.rotation.x = lerp_angle(_spine.rotation.x, 0.0, t)
-	_spine.position.y = lerp(_spine.position.y, _spine_rest_y, t)
 
 
 ## Eases the legs back apart after the mermaid tail, which is the only pose
