@@ -23,6 +23,14 @@ const FIRE_MP_PER_SECOND := 4.5
 const ELECTRIC_MP_PER_SECOND := 4.0
 const CITY_MP_PER_SECOND := 4.0
 
+## A jet hover holds the height it was started at rather than drifting. How
+## fast it corrects toward that height, how fast it may climb or sink doing
+## so, and how far above the ground it takes station when started from a
+## standstill.
+const HOVER_SETTLE_SPEED := 9.0
+const HOVER_LIFT_SPEED := 5.0
+const HOVER_HEIGHT := 1.15
+
 var left_arm_water := false
 var right_arm_water := false
 var left_arm_fire := false
@@ -76,6 +84,16 @@ func update(
 	# both pairs together upgrade that lift into directional four-limb flight.
 	fire_leg_hover = left_leg_fire and right_leg_fire
 	fire_limb_flight = fire_hand_hover and fire_leg_hover
+
+
+## One frame of holding station at `target_y`. Eased rather than set
+## outright: the two copies of this disagreed, and a hover that snaps its
+## vertical velocity to the correction reads as a twitch rather than a body
+## holding itself up.
+static func hold_height(body: CharacterBody3D, target_y: float, delta: float) -> void:
+	var error := target_y - body.global_position.y
+	var wanted := clampf(error * HOVER_SETTLE_SPEED, -HOVER_LIFT_SPEED, HOVER_LIFT_SPEED)
+	body.velocity.y = move_toward(body.velocity.y, wanted, HOVER_SETTLE_SPEED * delta)
 
 
 ## Whether any jet is currently holding the body up by itself.

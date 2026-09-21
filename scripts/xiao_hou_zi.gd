@@ -953,13 +953,8 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		velocity = direction * speed
 		_direct_vertical_velocity = velocity.y
 	elif _powers.powered_hover_active():
-		var height_error: float = _direct_hover_height - global_position.y
-		_direct_vertical_velocity = clampf(
-			height_error * Player.POWERED_HOVER_SETTLE_SPEED,
-			-Player.POWERED_HOVER_LIFT_SPEED,
-			Player.POWERED_HOVER_LIFT_SPEED
-		)
-		velocity.y = _direct_vertical_velocity
+		SuitPowers.hold_height(self, _direct_hover_height, delta)
+		_direct_vertical_velocity = velocity.y
 	elif _direct_lava_surface:
 		global_position.y = _direct_liquid_level
 		_direct_vertical_velocity = 0.0
@@ -1038,50 +1033,61 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 
 
 func _ensure_direct_power_fx() -> void:
-	if _direct_water_arm_fx.is_empty():
-		_direct_water_arm_fx = [
-			SuitPowerFX.make_water_stream(self, "LeftWaterHand"),
-			SuitPowerFX.make_water_stream(self, "RightWaterHand"),
-		]
-		_direct_fire_arm_fx = [
-			SuitPowerFX.make_fire_stream(self, "LeftFireHand"),
-			SuitPowerFX.make_fire_stream(self, "RightFireHand"),
-		]
-		_direct_water_leg_fx = [
-			SuitPowerFX.make_water_stream(self, "LeftWaterFoot"),
-			SuitPowerFX.make_water_stream(self, "RightWaterFoot"),
-		]
-		_direct_fire_leg_fx = [
-			SuitPowerFX.make_fire_stream(self, "LeftFireFoot"),
-			SuitPowerFX.make_fire_stream(self, "RightFireFoot"),
-		]
-		_direct_electric_arm_fx = [
-			LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR),
-			LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR),
-		]
-		_direct_city_arm_fx = [
-			LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR),
-			LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR),
-		]
+	if not _direct_water_arm_fx.is_empty():
+		return
+	# Sized to him. A jet authored for the human figure, thrown unchanged by a
+	# rig a quarter that size, reads as a firehose from nowhere near his hand.
+	var fit: float = _playable_profile.suit_rig_scale
+	_direct_water_arm_fx = [
+		SuitPowerFX.make_water_stream(self, "LeftWaterHand", fit),
+		SuitPowerFX.make_water_stream(self, "RightWaterHand", fit),
+	]
+	_direct_fire_arm_fx = [
+		SuitPowerFX.make_fire_stream(self, "LeftFireHand", fit),
+		SuitPowerFX.make_fire_stream(self, "RightFireHand", fit),
+	]
+	_direct_water_leg_fx = [
+		SuitPowerFX.make_water_stream(self, "LeftWaterFoot", fit),
+		SuitPowerFX.make_water_stream(self, "RightWaterFoot", fit),
+	]
+	_direct_fire_leg_fx = [
+		SuitPowerFX.make_fire_stream(self, "LeftFireFoot", fit),
+		SuitPowerFX.make_fire_stream(self, "RightFireFoot", fit),
+	]
+	_direct_electric_arm_fx = [
+		LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR),
+		LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR),
+	]
+	_direct_city_arm_fx = [
+		LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR),
+		LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR),
+	]
 
 
 func _update_direct_power_fx() -> void:
 	_ensure_direct_power_fx()
 	var forward: Vector3 = global_transform.basis.z.normalized()
-	var hand_direction: Vector3 = Vector3.DOWN if _powers.fire_hand_hover else forward
-	var roll_reference: Vector3 = forward
-	SuitPowerFX.point_stream(_direct_water_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_water, roll_reference)
-	SuitPowerFX.point_stream(_direct_water_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_water, roll_reference)
-	SuitPowerFX.point_stream(_direct_fire_arm_fx[0], _pivots["palm_left"], hand_direction, _powers.left_arm_fire, roll_reference)
-	SuitPowerFX.point_stream(_direct_fire_arm_fx[1], _pivots["palm_right"], hand_direction, _powers.right_arm_fire, roll_reference)
-	SuitPowerFX.point_stream(_direct_water_leg_fx[0], _pivots["toe_left"], Vector3.DOWN, _powers.left_leg_water, roll_reference)
-	SuitPowerFX.point_stream(_direct_water_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _powers.right_leg_water, roll_reference)
-	SuitPowerFX.point_stream(_direct_fire_leg_fx[0], _pivots["toe_left"], Vector3.DOWN, _powers.left_leg_fire, roll_reference)
-	SuitPowerFX.point_stream(_direct_fire_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _powers.right_leg_fire, roll_reference)
-	SuitPowerFX.point_bolt(_direct_electric_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_electric, roll_reference)
-	SuitPowerFX.point_bolt(_direct_electric_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_electric, roll_reference)
-	SuitPowerFX.point_bolt(_direct_city_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_city, roll_reference)
-	SuitPowerFX.point_bolt(_direct_city_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_city, roll_reference)
+	# Where each jet points is the power's decision, not his: swimming turns
+	# the water jets around to push against his travel, and a fire foot leaves
+	# through the sole of whatever his ankle is doing. His arms used to fire
+	# permanently forward and his legs permanently down, so underwater his
+	# jets pushed him the wrong way.
+	var aim := SuitPowerFX.jet_aim(
+		forward, velocity, _direct_diving, _powers,
+		[_pivots.get("ankle_left"), _pivots.get("ankle_right")]
+	)
+	SuitPowerFX.point_stream(_direct_water_arm_fx[0], _pivots["palm_left"], aim["water_hand"], _powers.left_arm_water, forward)
+	SuitPowerFX.point_stream(_direct_water_arm_fx[1], _pivots["palm_right"], aim["water_hand"], _powers.right_arm_water, forward)
+	SuitPowerFX.point_stream(_direct_fire_arm_fx[0], _pivots["palm_left"], aim["left_fire_hand"], _powers.left_arm_fire, forward)
+	SuitPowerFX.point_stream(_direct_fire_arm_fx[1], _pivots["palm_right"], aim["right_fire_hand"], _powers.right_arm_fire, forward)
+	SuitPowerFX.point_stream(_direct_water_leg_fx[0], _pivots["toe_left"], aim["water_foot"], _powers.left_leg_water, forward)
+	SuitPowerFX.point_stream(_direct_water_leg_fx[1], _pivots["toe_right"], aim["water_foot"], _powers.right_leg_water, forward)
+	SuitPowerFX.point_stream(_direct_fire_leg_fx[0], _pivots["toe_left"], aim["left_fire_foot"], _powers.left_leg_fire, forward)
+	SuitPowerFX.point_stream(_direct_fire_leg_fx[1], _pivots["toe_right"], aim["right_fire_foot"], _powers.right_leg_fire, forward)
+	SuitPowerFX.point_bolt(_direct_electric_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_electric, forward)
+	SuitPowerFX.point_bolt(_direct_electric_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_electric, forward)
+	SuitPowerFX.point_bolt(_direct_city_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_city, forward)
+	SuitPowerFX.point_bolt(_direct_city_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_city, forward)
 
 
 ## Same trampoline invariant as the human motor: an ordinary Blorb can never
@@ -1099,9 +1105,9 @@ func _try_direct_blorb_bounce(delta: float) -> bool:
 	)
 	if best == null:
 		return false
-	var surface: Variant = best.bounce_surface_height_at(projected_xz.x, projected_xz.y)
-	if surface != null:
-		global_position.y = BlorbBounce.release_height(surface as float)
+	global_position.y = BlorbBounce.rest_feet_y(
+		best, global_position, global_position.y, _body_radius()
+	)
 	_launch_from_blorb(best)
 	return true
 
@@ -1114,11 +1120,17 @@ func _enforce_direct_blorb_bounce() -> bool:
 	var candidate := BlorbBounce.in_contact(self)
 	if candidate == null:
 		return false
-	var surface: Variant = candidate.bounce_surface_height_at(global_position.x, global_position.z)
-	if surface != null:
-		global_position.y = maxf(global_position.y, BlorbBounce.release_height(surface as float))
+	global_position.y = BlorbBounce.rest_feet_y(
+		candidate, global_position, global_position.y, _body_radius()
+	)
 	_launch_from_blorb(candidate)
 	return true
+
+
+## How far his own collider reaches below its centre, which is what has to
+## clear a blorb's collision sphere on the way off it.
+func _body_radius() -> float:
+	return 0.08 * DISPLAY_SCALE
 
 
 func _launch_from_blorb(blorb: Blorb) -> void:
@@ -1133,13 +1145,13 @@ func _launch_from_blorb(blorb: Blorb) -> void:
 func receive_platform_aid_bounce(platform: Blorb) -> void:
 	if not is_player_controlled or platform == null:
 		return
-	var surface: Variant = platform.bounce_surface_height_at(global_position.x, global_position.z)
-	if surface == null:
-		return
 	# Arrival is already constrained to the same physical support selected by
-	# Player's downward probe. Put Xiao on the crown and launch immediately;
-	# there is no intermediate planted frame that can shove or perma-squash.
-	global_position.y = BlorbBounce.release_height(surface as float)
+	# Player's downward probe. Put Xiao clear of the blorb and launch
+	# immediately; there is no intermediate planted frame that can shove or
+	# perma-squash.
+	global_position.y = BlorbBounce.rest_feet_y(
+		platform, global_position, global_position.y, _body_radius()
+	)
 	_launch_from_blorb(platform)
 
 

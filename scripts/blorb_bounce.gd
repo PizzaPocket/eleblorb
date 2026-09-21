@@ -66,6 +66,33 @@ static func in_contact(body: CharacterBody3D) -> Blorb:
 	return null
 
 
-## Where a body's feet rest once thrown clear of `surface_y`.
+## Where a body's feet rest to launch off `blorb`: never lower than they
+## already are, on or above its rendered crown, and high enough that the
+## body's own rounded bottom clears the blorb's collision sphere.
+##
+## That last part is the whole point. Off-centre, the crown under the feet
+## sits lower than where the two colliders actually meet, so resting on the
+## crown alone starts the next move inside the sphere; physics then reports
+## that overlap as a fresh landing and the bounce repeats every frame without
+## ever leaving, which is what a body frozen mid-jump over a permanently
+## squashed blorb actually is.
+static func rest_feet_y(blorb: Blorb, at: Vector3, feet_y: float, body_radius: float) -> float:
+	var rest := feet_y
+	var crown: Variant = blorb.bounce_surface_height_at(at.x, at.z)
+	if crown != null:
+		rest = maxf(rest, (crown as float) + RELEASE_CLEARANCE)
+	var sphere: Dictionary = blorb.bounce_collider_sphere()
+	var center: Vector3 = sphere["center"]
+	var reach: float = float(sphere["radius"]) + body_radius
+	var across := Vector2(at.x - center.x, at.z - center.z).length()
+	if across < reach:
+		# The body's lowest point sits `body_radius` above its feet.
+		var clear_feet: float = center.y + sqrt(reach * reach - across * across) - body_radius
+		rest = maxf(rest, clear_feet + RELEASE_CLEARANCE)
+	return rest
+
+
+## Where a body's feet rest once thrown clear of `surface_y`, where the
+## blorb's own collider is not in question.
 static func release_height(surface_y: float) -> float:
 	return surface_y + RELEASE_CLEARANCE

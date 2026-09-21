@@ -73,7 +73,11 @@ static func xiao_hou_zi() -> PlayableCharacterProfile:
 	# Exact values from the previously tuned Player-hosted monkey mode.
 	profile.move_speed = 2.5
 	profile.sprint_multiplier = 1.6
-	profile.jump_speed = 11.3 * 1.8
+	# The same jump as the human, which for a rig a quarter his size is an
+	# enormous leap: per direct instruction, a monkey should clear what a
+	# person clears. The blorb trampoline launches off this same number, so
+	# he bounces to the human's height too.
+	profile.jump_speed = 11.3
 	profile.gravity_scale = 4.8
 	profile.walk_cadence_scale = 2.16
 	profile.body_motion_scale = 0.1

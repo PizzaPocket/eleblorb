@@ -26,13 +26,21 @@ const FIRE_PARTICLE_SOFTNESS := 1.7
 const FIRE_PARTICLE_WOBBLE := 0.2
 
 
-static func make_water_stream(parent: Node, stream_name: String) -> GPUParticles3D:
+## `rig_scale` sizes the whole stream to its wearer. A jet authored for a
+## figure nearly two metres tall, thrown unchanged by one a quarter that
+## size, reads as a firehose erupting from somewhere near the body rather
+## than from its hand or its foot.
+static func make_water_stream(
+	parent: Node, stream_name: String, rig_scale: float = 1.0
+) -> GPUParticles3D:
 	var stream := GPUParticles3D.new()
 	stream.name = stream_name
 	stream.amount = 180
 	stream.lifetime = WATER_STREAM_LIFETIME
 	stream.randomness = 0.12
-	stream.visibility_aabb = AABB(Vector3(-0.6, -0.6, -7.0), Vector3(1.2, 1.2, 7.4))
+	stream.visibility_aabb = AABB(
+		Vector3(-0.6, -0.6, -7.0) * rig_scale, Vector3(1.2, 1.2, 7.4) * rig_scale
+	)
 	# A soft, alpha-blended billboard instead of a solid-colored SphereMesh
 	# -- per direct report, the old sphere read as a hard uniform ball
 	# regardless of color, not water.
@@ -40,16 +48,16 @@ static func make_water_stream(parent: Node, stream_name: String) -> GPUParticles
 	var water_material := ParticleFX.build_billboard_material(texture, Color.WHITE, false, 0.35)
 	water_material.vertex_color_use_as_albedo = true
 	var droplet := QuadMesh.new()
-	droplet.size = Vector2(0.16, 0.16)
+	droplet.size = Vector2(0.16, 0.16) * rig_scale
 	droplet.material = water_material
 	var process := ParticleProcessMaterial.new()
 	# point_stream() below aims local -Z down the character's +Z forward axis.
 	process.direction = Vector3(0.0, 0.0, -1.0)
 	process.spread = 1.0
 	# A hose stays almost parallel but has a slight weighty downward arc.
-	process.gravity = Vector3(0.0, -1.2, 0.0)
-	process.initial_velocity_min = WATER_STREAM_SPEED * 0.9
-	process.initial_velocity_max = WATER_STREAM_SPEED * 1.1
+	process.gravity = Vector3(0.0, -1.2, 0.0) * rig_scale
+	process.initial_velocity_min = WATER_STREAM_SPEED * 0.9 * rig_scale
+	process.initial_velocity_max = WATER_STREAM_SPEED * 1.1 * rig_scale
 	# Water leaves a moving nozzle carrying the nozzle's own speed, so a
 	# running hose's stream keeps pace instead of being outrun. A stream
 	# simulated in the emitter's own space must not (see
@@ -76,7 +84,9 @@ static func make_water_stream(parent: Node, stream_name: String) -> GPUParticles
 	return stream
 
 
-static func make_fire_stream(parent: Node, stream_name: String) -> GPUParticles3D:
+static func make_fire_stream(
+	parent: Node, stream_name: String, rig_scale: float = 1.0
+) -> GPUParticles3D:
 	var stream := GPUParticles3D.new()
 	stream.name = stream_name
 	# A dense short-lived, broad cone reads as a continuous flamethrower,
@@ -84,7 +94,9 @@ static func make_fire_stream(parent: Node, stream_name: String) -> GPUParticles3
 	stream.amount = 260
 	stream.lifetime = 0.34
 	stream.randomness = 0.35
-	stream.visibility_aabb = AABB(Vector3(-1.5, -1.5, -7.0), Vector3(3.0, 3.0, 7.4))
+	stream.visibility_aabb = AABB(
+		Vector3(-1.5, -1.5, -7.0) * rig_scale, Vector3(3.0, 3.0, 7.4) * rig_scale
+	)
 	# Soft, additively-blended billboards instead of a solid-colored
 	# SphereMesh -- per direct report ("look like orange bubbles"). See
 	# particle_fx.gd's own class doc comment: overlapping additive
@@ -102,14 +114,14 @@ static func make_fire_stream(parent: Node, stream_name: String) -> GPUParticles3
 	# blob looked like fire, but no longer like it was going anywhere in
 	# particular.
 	var flame := QuadMesh.new()
-	flame.size = Vector2(0.22, 0.5)
+	flame.size = Vector2(0.22, 0.5) * rig_scale
 	flame.material = flame_material
 	var process := ParticleProcessMaterial.new()
 	process.direction = Vector3(0.0, 0.0, -1.0)
 	process.spread = 6.0
-	process.gravity = Vector3(0.0, -1.4, 0.0)
-	process.initial_velocity_min = 9.0
-	process.initial_velocity_max = 14.0
+	process.gravity = Vector3(0.0, -1.4, 0.0) * rig_scale
+	process.initial_velocity_min = 9.0 * rig_scale
+	process.initial_velocity_max = 14.0 * rig_scale
 	process.scale_min = 0.5
 	process.scale_max = 1.05
 	# Aligns each particle's own local Y (the quad's long axis, see
@@ -167,6 +179,56 @@ static func set_inherits_velocity(stream: GPUParticles3D, inherits: bool) -> voi
 ## a held jet reads as a live thing rather than a rigid cone.
 const AIM_WOBBLE_ANGLE := deg_to_rad(2.5)
 const AIM_WOBBLE_SPEED := 3.2
+
+
+## Where each jet points this frame, for any character.
+##
+## A jet is not simply "forward" or "down": swimming turns the water jets
+## around to push against the travel, a pair of fire hands aims down to
+## hover, four-limb flight turns the hands to follow the feet, and a fire
+## foot leaves through the sole of whatever the ankle is doing. All of that
+## was worked out in the human's own file, and the other character pointed
+## its arms permanently forward and its legs permanently down, so its jets
+## fired the wrong way underwater and never followed its feet.
+##
+## `ankles` is the pair of ankle nodes, in left/right order; a rig without
+## them falls back to straight down.
+static func jet_aim(
+	forward: Vector3, travel: Vector3, swimming: bool, powers: SuitPowers, ankles: Array
+) -> Dictionary:
+	var ahead := forward.normalized() if forward.length_squared() > 0.001 else Vector3.FORWARD
+	var left_sole := sole_direction(ankles[0] if ankles.size() > 0 else null)
+	var right_sole := sole_direction(ankles[1] if ankles.size() > 1 else null)
+	# Hovering hands aim down; in four-limb flight they follow the feet, so
+	# the whole body throws in one direction.
+	var hand_jet := Vector3.DOWN
+	if powers.fire_limb_flight:
+		var combined := left_sole + right_sole
+		if combined.length_squared() > 0.001:
+			hand_jet = combined.normalized()
+	# Swimming, the water jets push back against the travel rather than
+	# spraying ahead of the swimmer.
+	var backward := -ahead
+	if travel.length_squared() > 0.25:
+		backward = -travel.normalized()
+	var hand := hand_jet if powers.fire_hand_hover else ahead
+	return {
+		"left_fire_hand": hand,
+		"right_fire_hand": hand,
+		"water_hand": backward if swimming else ahead,
+		"water_foot": backward if swimming else Vector3.DOWN,
+		"left_fire_foot": left_sole,
+		"right_fire_foot": right_sole,
+		"forward": ahead,
+	}
+
+
+## Out through the sole of whatever the ankle is doing.
+static func sole_direction(ankle: Node3D) -> Vector3:
+	if ankle == null:
+		return Vector3.DOWN
+	var out_of_sole := -ankle.global_transform.basis.y
+	return out_of_sole.normalized() if out_of_sole.length_squared() > 0.001 else Vector3.DOWN
 
 
 ## Points a particle stream out of `emitter` along `direction`, emitting only

@@ -955,9 +955,10 @@ const LAKE_FLOOR_LANDING_TOLERANCE := 0.16
 const AIR_FLIGHT_SPEED := 6.0
 const AIR_FLIGHT_HOVER_HEIGHT := 0.5
 const AIR_FLIGHT_EXIT_RECOVERY_DURATION := 0.45
-const POWERED_HOVER_HEIGHT := 1.15
-const POWERED_HOVER_LIFT_SPEED := 5.0
-const POWERED_HOVER_SETTLE_SPEED := 9.0
+## The jet hover's own hold, which belongs to the power: see SuitPowers.
+const POWERED_HOVER_HEIGHT := SuitPowers.HOVER_HEIGHT
+const POWERED_HOVER_LIFT_SPEED := SuitPowers.HOVER_LIFT_SPEED
+const POWERED_HOVER_SETTLE_SPEED := SuitPowers.HOVER_SETTLE_SPEED
 ## Each actively firing Fire foot compounds this multiplier while a chest
 ## Air blorb is already supplying flight: one leg = 1.35x, two = 1.8225x.
 const FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER := 1.35
@@ -2774,28 +2775,12 @@ func _launch_off_blorb(blorb: Blorb) -> bool:
 	return true
 
 
-## Where the feet rest to launch off `blorb`: never lower than they already
-## are, on or above its rendered crown, and high enough that the capsule's
-## rounded bottom clears the blorb's collision sphere. Off-centre, the crown
-## under the feet sits lower than where capsule and sphere meet, so resting
-## on the crown alone started the next move inside the sphere; physics then
-## reported that overlap as a fresh landing and the bounce repeated every
-## frame without ever leaving.
+## See BlorbBounce.rest_feet_y(), which both characters launch from.
 func _blorb_rest_feet_y(blorb: Blorb) -> float:
-	var feet := global_position.y - FOOT_OFFSET
-	var crown: Variant = blorb.bounce_surface_height_at(global_position.x, global_position.z)
-	if crown != null:
-		feet = maxf(feet, (crown as float) + BLORB_BOUNCE_RELEASE_CLEARANCE)
-	var sphere := blorb.bounce_collider_sphere()
 	var capsule := _collision_shape.shape as CapsuleShape3D
-	var center: Vector3 = sphere["center"]
-	var reach := float(sphere["radius"]) + capsule.radius
-	var across := Vector2(global_position.x - center.x, global_position.z - center.z).length()
-	if across < reach:
-		# The capsule's lowest sphere sits `capsule.radius` above the feet.
-		var clear_feet := center.y + sqrt(reach * reach - across * across) - capsule.radius
-		feet = maxf(feet, clear_feet + BLORB_BOUNCE_RELEASE_CLEARANCE)
-	return feet
+	return BlorbBounce.rest_feet_y(
+		blorb, global_position, global_position.y - FOOT_OFFSET, capsule.radius
+	)
 
 
 ## Launches the player back into the jump arc instead of settling, using the
@@ -4998,12 +4983,7 @@ func _apply_powered_hover_vertical(delta: float, directional_flight: bool) -> vo
 		# the activation height.
 		_powered_hover_target_y = global_position.y + velocity.y * delta
 		return
-	var height_error := _powered_hover_target_y - global_position.y
-	var target_velocity := clampf(
-		height_error * POWERED_HOVER_SETTLE_SPEED,
-		-POWERED_HOVER_LIFT_SPEED, POWERED_HOVER_LIFT_SPEED
-	)
-	velocity.y = move_toward(velocity.y, target_velocity, POWERED_HOVER_SETTLE_SPEED * delta)
+	SuitPowers.hold_height(self, _powered_hover_target_y, delta)
 
 
 func _update_water_streams(delta: float) -> void:
@@ -5012,21 +4992,10 @@ func _update_water_streams(delta: float) -> void:
 		forward = Vector3.FORWARD
 	else:
 		forward = forward.normalized()
-	var downward := Vector3.DOWN
-	var fire_hand_jet_direction := downward
-	if _powers.fire_limb_flight:
-		var combined_foot_direction := _foot_jet_direction(_ankle_left) + _foot_jet_direction(_ankle_right)
-		if combined_foot_direction.length_squared() > 0.001:
-			fire_hand_jet_direction = combined_foot_direction.normalized()
-	var left_hand_direction := fire_hand_jet_direction if _powers.fire_hand_hover else forward
-	var right_hand_direction := fire_hand_jet_direction if _powers.fire_hand_hover else forward
-	# Swimming, Water hands and feet jet straight back against the travel.
 	var swimming := _is_swimming()
-	var backward := -forward
-	if velocity.length_squared() > 0.25:
-		backward = -velocity.normalized()
-	var water_hand_direction := backward if swimming else forward
-	var water_foot_direction := backward if swimming else downward
+	var aim := SuitPowerFX.jet_aim(
+		forward, velocity, swimming, _powers, [_ankle_left, _ankle_right]
+	)
 	# Swimming jets stay attached to the hands like the Fire jets; a fast
 	# swimmer would otherwise leave each jet's start behind in the water.
 	if is_instance_valid(_water_stream_left):
@@ -5036,28 +5005,28 @@ func _update_water_streams(delta: float) -> void:
 	# A jet aimed straight down takes its roll from the body's own forward.
 	var roll_reference := visuals.global_transform.basis.z.normalized()
 	SuitPowerFX.point_stream(
-		_water_stream_left, _palm_left, water_hand_direction,
+		_water_stream_left, _palm_left, aim["water_hand"],
 		_powers.left_arm_water, roll_reference
 	)
 	SuitPowerFX.point_stream(
-		_water_stream_right, _palm_right, water_hand_direction,
+		_water_stream_right, _palm_right, aim["water_hand"],
 		_powers.right_arm_water, roll_reference
 	)
 	SuitPowerFX.point_stream(
-		_fire_stream_left, _palm_left, left_hand_direction,
+		_fire_stream_left, _palm_left, aim["left_fire_hand"],
 		_powers.left_arm_fire, roll_reference
 	)
 	SuitPowerFX.point_stream(
-		_fire_stream_right, _palm_right, right_hand_direction,
+		_fire_stream_right, _palm_right, aim["right_fire_hand"],
 		_powers.right_arm_fire, roll_reference
 	)
-	SuitPowerFX.point_stream(_water_leg_stream_left, _toe_left, water_foot_direction, _powers.left_leg_water, roll_reference)
-	SuitPowerFX.point_stream(_water_leg_stream_right, _toe_right, water_foot_direction, _powers.right_leg_water, roll_reference)
+	SuitPowerFX.point_stream(_water_leg_stream_left, _toe_left, aim["water_foot"], _powers.left_leg_water, roll_reference)
+	SuitPowerFX.point_stream(_water_leg_stream_right, _toe_right, aim["water_foot"], _powers.right_leg_water, roll_reference)
 	SuitPowerFX.point_stream(
-		_fire_leg_stream_left, _toe_left, _foot_jet_direction(_ankle_left), _powers.left_leg_fire, roll_reference
+		_fire_leg_stream_left, _toe_left, aim["left_fire_foot"], _powers.left_leg_fire, roll_reference
 	)
 	SuitPowerFX.point_stream(
-		_fire_leg_stream_right, _toe_right, _foot_jet_direction(_ankle_right), _powers.right_leg_fire, roll_reference
+		_fire_leg_stream_right, _toe_right, aim["right_fire_foot"], _powers.right_leg_fire, roll_reference
 	)
 	SuitPowerFX.point_bolt(_electric_stream_left, _palm_left, forward, _powers.left_arm_electric, roll_reference)
 	SuitPowerFX.point_bolt(_electric_stream_right, _palm_right, forward, _powers.right_arm_electric, roll_reference)
@@ -5199,10 +5168,7 @@ func _active_powered_blorbs() -> Array[Blorb]:
 
 
 func _foot_jet_direction(ankle: Node3D) -> Vector3:
-	if ankle == null:
-		return Vector3.DOWN
-	var out_of_sole := -ankle.global_transform.basis.y
-	return out_of_sole.normalized() if out_of_sole.length_squared() > 0.001 else Vector3.DOWN
+	return SuitPowerFX.sole_direction(ankle)
 
 
 ## Angle/speed of the small organic waver applied to a stream's own AIM
