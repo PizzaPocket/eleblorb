@@ -14,6 +14,9 @@ extends Node
 const MAX_HOP_DISTANCE := 15.0
 
 var _player: Player
+## Physical owner of the roster's currently deployed set. The demo can be
+## driven by any suit-capable playable, so this is not necessarily Player.
+var _current_wearer: Node3D
 ## element -> {"blorbs": Array[Blorb], "slots": Array[String]}
 var _sets: Dictionary = {}
 ## Overlay sets: key -> {"blorbs", "slots"}. An overlay replaces only its own
@@ -28,6 +31,20 @@ var _pending := ""
 
 func setup(player: Player) -> void:
 	_player = player
+	_current_wearer = player
+
+
+func _active_wearer() -> Node3D:
+	var active := PartyControl.active_member()
+	if is_instance_valid(active) and PartyControl.member_capability(active, &"wear_blorb_suit") and active.has_method("get_own_blorb_suit"):
+		return active
+	return _player
+
+
+func _suit_for(wearer: Node3D) -> BlorbSuitController:
+	if not is_instance_valid(wearer) or not wearer.has_method("get_own_blorb_suit"):
+		return null
+	return wearer.get_own_blorb_suit() as BlorbSuitController
 
 
 ## Registers a set under `key` (an element, or any label such as "normal").
@@ -48,7 +65,8 @@ func add_overlay(key: String, blorbs: Array[Blorb], slots: Array[String]) -> voi
 ## off. For the opening, before anything has been worn.
 func start_with(key: String) -> void:
 	_current = key
-	var suit := _player.get_own_blorb_suit()
+	_current_wearer = _player
+	var suit := _suit_for(_current_wearer)
 	var entry: Dictionary = _sets[key]
 	var slots: Array[String] = entry["slots"]
 	var blorbs: Array[Blorb] = entry["blorbs"]
@@ -72,25 +90,38 @@ func switch_to(key: String) -> void:
 	if _switching:
 		_pending = key
 		return
-	if key == _current:
+	var wearer := _active_wearer()
+	if key == _current and wearer == _current_wearer:
 		return
 	_switching = true
-	var suit := _player.get_own_blorb_suit()
-	UISounds.play_foley(&"transform_reveal", 0.7, _player.get_instance_id())
+	var old_suit := _suit_for(_current_wearer)
+	var suit := _suit_for(wearer)
+	if suit == null:
+		_switching = false
+		return
+	UISounds.play_foley(&"transform_reveal", 0.7, wearer.get_instance_id())
 	# The worn set hops off first; the suit controller allows one direction of
 	# transition at a time.
-	if suit.is_suit_on():
+	if old_suit != null and old_suit.is_suit_on():
+		old_suit.toggle()
+	while old_suit != null and old_suit.is_transitioning():
+		await get_tree().process_frame
+	# A newly selected wearer may already have their own suit deployed. Fold it
+	# away before replacing assignments so no stale live pieces remain.
+	if suit != old_suit and suit.is_suit_on():
 		suit.toggle()
 	while suit.is_transitioning():
 		await get_tree().process_frame
 	if _sets.has(_current):
 		for blorb in (_sets[_current]["blorbs"] as Array[Blorb]):
 			if is_instance_valid(blorb):
-				suit.remove_assignment_for_blorb(blorb)
+				if old_suit != null:
+					old_suit.remove_assignment_for_blorb(blorb)
 	for overlay_key in _active_overlays:
 		for blorb in (_overlays[overlay_key]["blorbs"] as Array[Blorb]):
 			if is_instance_valid(blorb):
-				suit.remove_assignment_for_blorb(blorb)
+				if old_suit != null:
+					old_suit.remove_assignment_for_blorb(blorb)
 	_active_overlays.clear()
 	var entry: Dictionary = _sets[key]
 	var slots: Array[String] = entry["slots"]
@@ -99,12 +130,13 @@ func switch_to(key: String) -> void:
 		var blorb := blorbs[index]
 		if not is_instance_valid(blorb):
 			continue
-		if blorb.global_position.distance_to(_player.global_position) > MAX_HOP_DISTANCE:
+		if blorb.global_position.distance_to(wearer.global_position) > MAX_HOP_DISTANCE:
 			var angle := TAU * float(index) / float(blorbs.size())
-			blorb.global_position = _player.global_position + Vector3(cos(angle), 0.0, sin(angle)) * 2.5
+			blorb.global_position = wearer.global_position + Vector3(cos(angle), 0.0, sin(angle)) * 2.5
 		blorb.rejoin_party()
 		suit.equip_to_slot(blorb, slots[index])
 	_current = key
+	_current_wearer = wearer
 	suit.toggle()
 	while suit.is_transitioning():
 		await get_tree().process_frame
@@ -121,8 +153,17 @@ func switch_to(key: String) -> void:
 func _apply_overlay(key: String) -> void:
 	if _switching or key in _active_overlays:
 		return
-	var suit := _player.get_own_blorb_suit()
-	UISounds.play_foley(&"transform_reveal", 0.7, _player.get_instance_id())
+	var wearer := _active_wearer()
+	# If control changed since the last full gate, transfer that full set first;
+	# the requested overlay is replayed once the transfer completes.
+	if wearer != _current_wearer:
+		_pending = key
+		switch_to(_current)
+		return
+	var suit := _suit_for(wearer)
+	if suit == null:
+		return
+	UISounds.play_foley(&"transform_reveal", 0.7, wearer.get_instance_id())
 	var entry: Dictionary = _overlays[key]
 	var slots: Array[String] = entry["slots"]
 	var blorbs: Array[Blorb] = entry["blorbs"]
@@ -130,8 +171,8 @@ func _apply_overlay(key: String) -> void:
 		var blorb := blorbs[index]
 		if not is_instance_valid(blorb):
 			continue
-		if blorb.global_position.distance_to(_player.global_position) > MAX_HOP_DISTANCE:
-			blorb.global_position = _player.global_position + Vector3(2.0, 0.0, 0.0)
+		if blorb.global_position.distance_to(wearer.global_position) > MAX_HOP_DISTANCE:
+			blorb.global_position = wearer.global_position + Vector3(2.0, 0.0, 0.0)
 		blorb.rejoin_party()
 		suit.equip_to_slot(blorb, slots[index])
 	suit.apply_assignment_changes()

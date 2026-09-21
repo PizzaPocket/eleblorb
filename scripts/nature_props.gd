@@ -1455,10 +1455,23 @@ static func build_branching_coral(height: float, color: Color) -> Node3D:
 	var trunk: MeshInstance3D = SuperEgg.build_part(Vector3(0.15, height * 0.5, 0.15), color, 2.6, 2.6)
 	trunk.position.y = height * 0.5
 	root.add_child(trunk)
-	for branch_index in 4:
-		var branch_height: float = height * (0.34 + float(branch_index % 2) * 0.12)
+	# Each sprig begins at its junction on the central stalk, then grows upward
+	# and outward from that endpoint.  The former branches rotated about their
+	# centres, leaving half of every branch aimed down/in like an upside-down
+	# rib rather than a living coral fork.
+	for branch_index in 5:
+		var side := 1.0 if branch_index % 2 == 0 else -1.0
+		var branch_height: float = height * (0.24 + float(branch_index % 3) * 0.035)
+		var junction_y := height * (0.24 + float(branch_index) * 0.135)
+		var branch_pivot := Node3D.new()
+		branch_pivot.name = "CoralSprig%02d" % branch_index
+		branch_pivot.position = Vector3(side * 0.07, junction_y, 0.0)
+		# Positive Z rotation sends local +Y toward -X, hence the negated side.
+		# A small alternating yaw distributes the crown in three dimensions
+		# without changing its unmistakably upright growth direction.
+		branch_pivot.rotation = Vector3(0.0, (-0.24 if branch_index % 3 == 0 else 0.24), -side * deg_to_rad(38.0))
+		root.add_child(branch_pivot)
 		var branch: MeshInstance3D = SuperEgg.build_part(Vector3(0.10, branch_height * 0.5, 0.10), color.lightened(0.04 * branch_index), 2.6, 2.6)
-		branch.position = Vector3((1.0 if branch_index % 2 == 0 else -1.0) * height * 0.16, height * (0.30 + float(branch_index) * 0.13), 0.0)
-		branch.rotation.z = deg_to_rad(28.0 if branch_index % 2 == 0 else -28.0)
-		root.add_child(branch)
+		branch.position.y = branch_height * 0.5
+		branch_pivot.add_child(branch)
 	return root

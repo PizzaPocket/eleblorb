@@ -31,6 +31,7 @@ var _dim_overlay: StandardMaterial3D
 var _selected_overlay: StandardMaterial3D
 var _reference_overlay: StandardMaterial3D
 var _rig_scale: float = 1.0
+var _limb_fit: Dictionary = {}
 
 
 func setup(player: Node3D, _live_visuals: Node3D, body_kind: String = "human") -> void:
@@ -51,7 +52,9 @@ func setup(player: Node3D, _live_visuals: Node3D, body_kind: String = "human") -
 	_viewport.add_child(_root)
 	if body_kind == "xiao_hou_zi":
 		_pivots = MonkeyFigure.build(_root, MonkeyFigure.MONKEY_FUR_COLOR, XIAO_HOU_ZI_DISPLAY_SCALE)
-		_rig_scale = MonkeyFigure.BLORB_SUIT_RIG_SCALE
+		var profile := PlayableCharacterProfile.xiao_hou_zi()
+		_rig_scale = profile.suit_rig_scale
+		_limb_fit = profile.suit_limb_fit
 	else:
 		_pivots = Player.build_portrait_body(_root)
 		_rig_scale = 1.0
@@ -231,7 +234,7 @@ func _rebuild_preview() -> void:
 		var blorb := preview_blorbs.get(slot) as Blorb
 		if blorb == null or not is_instance_valid(blorb):
 			continue
-		var pieces := BlorbSuit.equip_slot(slot, _preview_pivots(), _root, blorb, _rig_scale, form_command)
+		var pieces := BlorbSuit.equip_slot(slot, _preview_pivots(), _root, blorb, _rig_scale, form_command, _limb_fit)
 		_preview_pieces_by_slot[slot] = pieces
 		_preview_blorbs_by_slot[slot] = blorb
 	_apply_highlight()

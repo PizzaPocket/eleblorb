@@ -81,6 +81,16 @@ func spawn_home_body(parent: Node, position: Vector3) -> Blorb:
 	return _spawn_body(parent, position)
 
 
+## The holistic demo deliberately stages the resident titan outside the
+## Crossroads without implying he has travelled there through Blorbus's core.
+## This is presentation-only placement; the ordinary kingdom travel contract
+## above remains unchanged.
+func spawn_demo_body(parent: Node, position: Vector3) -> Blorb:
+	if mode != MODE_RELEASED or is_instance_valid(_world_body):
+		return null
+	return _spawn_body(parent, position)
+
+
 func prepare_travel(destination_scene: String) -> void:
 	# A Humongous who was never carried simply stays free at his Crossroads
 	# home. Only a body deliberately released in a spoke is recalled into the

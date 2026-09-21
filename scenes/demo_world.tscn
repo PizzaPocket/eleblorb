@@ -35,6 +35,7 @@ light_angular_distance = 1.5
 
 [node name="DayNightCycle" type="Node" parent="."]
 script = ExtResource("4")
+initial_time_override = 12.0
 
 [node name="Clouds" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5408, 0, 0)

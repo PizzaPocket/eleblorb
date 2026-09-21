@@ -22,6 +22,7 @@ const CITY_COLOR := Color(0.2, 0.65, 0.95)
 const ICE_COLOR := Color(0.78, 0.92, 0.98)
 const SNOW_COLOR := ElementPalette.SNOW_BODY
 const WOOD_COLOR := Color(0.42, 0.26, 0.15)
+const SPACE_COLOR := ElementPalette.SPACE_BODY
 const BEAN_OF_LIFE_COLOR := Color(0.36, 0.6, 0.22)
 const BLORB_SLIME_COLOR := Color(0.42, 0.92, 0.68)
 const JINGU_BANG_RED := Color(0.75, 0.08, 0.06)
@@ -134,6 +135,13 @@ static func _ensure_items() -> void:
 			"purchasable": true, "element": "", "core_item": "Diving Helmet", "core_slot": "head", "armor_defense": 2, "shop": "lake",
 			"description": "Throw it into a blorb to bind a sealed diving helmet to its core.",
 			"build_visual": Callable(ShopCatalog, "_build_diving_helmet_visual"),
+		},
+		{
+			"name": "Space Helm", "color": SPACE_COLOR, "price": 0, "sell_price": 0,
+			"purchasable": false, "element": "", "core_item": "Space Helm", "core_slot": "head", "armor_defense": 8,
+			"required_element": "space",
+			"description": "A sealed dark visor linked to a Space Blorb life-support chest.",
+			"build_visual": Callable(ShopCatalog, "_build_space_helm_visual"),
 		},
 		{
 			"name": "Lake Shell", "color": Color(0.92, 0.72, 0.54), "price": 0, "sell_price": 2,
@@ -766,6 +774,20 @@ static func _build_diving_helmet_visual(item_scale: float = 1.0) -> Node3D:
 		item_scale, helmet_radius, helmet_height,
 		Color(0.18, 0.58, 0.82, 0.9), 0.45, 0.22
 	)
+
+
+static func _build_space_helm_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	var radius := maxf(ProceduralFigure.HEAD_SIZE.x, ProceduralFigure.HEAD_SIZE.z) * 1.55 * item_scale
+	var shell := SuperEgg.build_part(Vector3.ONE * radius, SPACE_COLOR)
+	root.add_child(shell)
+	var visor := SuperEgg.build_part(
+		Vector3(radius * 0.78, radius * 0.48, radius * 0.13),
+		Color(0.16, 0.27, 0.44, 0.74)
+	)
+	visor.position = Vector3(0.0, radius * 0.08, radius * 0.91)
+	root.add_child(visor)
+	return root
 
 
 static func _build_knights_helm_visual(item_scale: float = 1.0) -> Node3D:

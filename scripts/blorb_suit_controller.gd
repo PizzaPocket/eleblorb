@@ -50,6 +50,7 @@ var _pivots: Dictionary
 ## setup() and re-applied by re-calling setup() whenever the cheat toggles or
 ## the piloted body changes.
 var _rig_scale: float = 1.0
+var _limb_fit: Dictionary = {}
 ## Active hop entries, "on" or "off" mode -- see _start_equip_all()/
 ## _start_unequip_all()/equip_to_slot()/_begin_unequip_slot() for the exact
 ## keys each mode fills in.
@@ -106,6 +107,7 @@ var _penguin_form_enabled := false
 ## swimming, the only time the mermaid tail forms.
 var _mermaid_swimming := false
 var _story_suspended: bool = false
+var _space_thrusters: Dictionary = {}
 
 
 func _init() -> void:
@@ -123,11 +125,88 @@ func _init() -> void:
 ## the piloted body or the oversized-suit cheat toggle changes, so a
 ## currently-worn suit picks up the new proportions on its very next rebuild
 ## rather than waiting for a fresh equip.
-func setup(player: Node3D, root: Node3D, pivots: Dictionary, rig_scale: float = 1.0) -> void:
+func setup(player: Node3D, root: Node3D, pivots: Dictionary, rig_scale: float = 1.0, limb_fit: Dictionary = {}) -> void:
+	var rig_changed := _root != root
 	_player = player
 	_root = root
 	_pivots = pivots
 	_rig_scale = rig_scale
+	_limb_fit = limb_fit.duplicate()
+	if rig_changed or _space_thrusters.is_empty():
+		_build_space_thrusters()
+
+
+## Directional reaction-control jets belong to the suit rig, not Player, so
+## every scalable wearer gets the same feedback at their own proportions.
+func set_space_thrusters(active_names: Array[String], strength: float = 1.0) -> void:
+	var permitted := has_space_propulsion()
+	for key in _space_thrusters:
+		var stream := _space_thrusters[key] as GPUParticles3D
+		if is_instance_valid(stream):
+			stream.emitting = permitted and String(key) in active_names
+			stream.amount_ratio = clampf(strength, 0.25, 1.0)
+
+
+func _build_space_thrusters() -> void:
+	for stream in _space_thrusters.values():
+		if is_instance_valid(stream):
+			(stream as Node).queue_free()
+	_space_thrusters.clear()
+	if _pivots.is_empty():
+		return
+	var spine := _pivots.get("spine") as Node3D
+	var left_shoulder := _pivots.get("arm_left_shoulder") as Node3D
+	var right_shoulder := _pivots.get("arm_right_shoulder") as Node3D
+	var left_toe := _pivots.get("toe_left") as Node3D
+	var right_toe := _pivots.get("toe_right") as Node3D
+	if spine != null:
+		_add_space_thruster("back", spine, Vector3(0.0, 0.16, -0.22) * _rig_scale, Vector3(0, 0, -1))
+		_add_space_thruster("chest", spine, Vector3(0.0, 0.16, 0.22) * _rig_scale, Vector3(0, 0, 1))
+	if left_shoulder != null:
+		_add_space_thruster("shoulder_left", left_shoulder, Vector3.ZERO, Vector3.UP)
+		_add_space_thruster("side_left", left_shoulder, Vector3(-0.08, 0.0, 0.0) * _rig_scale, Vector3.LEFT)
+	if right_shoulder != null:
+		_add_space_thruster("shoulder_right", right_shoulder, Vector3.ZERO, Vector3.UP)
+		_add_space_thruster("side_right", right_shoulder, Vector3(0.08, 0.0, 0.0) * _rig_scale, Vector3.RIGHT)
+	if left_toe != null:
+		_add_space_thruster("foot_left", left_toe, Vector3.ZERO, Vector3.DOWN)
+	if right_toe != null:
+		_add_space_thruster("foot_right", right_toe, Vector3.ZERO, Vector3.DOWN)
+
+
+func _add_space_thruster(key: String, anchor: Node3D, offset: Vector3, exhaust_direction: Vector3) -> void:
+	var stream := GPUParticles3D.new()
+	stream.name = "SpaceThruster_%s" % key
+	stream.amount = 14
+	stream.lifetime = 0.16
+	stream.randomness = 0.55
+	stream.local_coords = true
+	stream.visibility_aabb = AABB(Vector3(-0.4, -0.4, -0.8), Vector3(0.8, 0.8, 1.6))
+	var texture := ParticleFX.build_soft_gradient_texture(16, 2.4)
+	var material := ParticleFX.build_billboard_material(texture, Color.WHITE, true, 0.0)
+	material.vertex_color_use_as_albedo = true
+	var puff := QuadMesh.new()
+	puff.size = Vector2(0.045, 0.10) * maxf(_rig_scale, 0.25)
+	puff.material = material
+	var process := ParticleProcessMaterial.new()
+	process.direction = exhaust_direction.normalized()
+	process.spread = 12.0
+	process.gravity = Vector3.ZERO
+	process.initial_velocity_min = 0.7 * maxf(_rig_scale, 0.4)
+	process.initial_velocity_max = 1.5 * maxf(_rig_scale, 0.4)
+	process.scale_min = 0.35
+	process.scale_max = 0.75
+	process.color_ramp = ParticleFX.build_color_ramp([
+		{"offset": 0.0, "color": Color(0.92, 0.95, 1.0, 0.58)},
+		{"offset": 0.45, "color": Color(0.62, 0.70, 1.0, 0.25)},
+		{"offset": 1.0, "color": Color(0.35, 0.28, 0.62, 0.0)},
+	])
+	stream.process_material = process
+	stream.draw_pass_1 = puff
+	stream.emitting = false
+	stream.position = offset
+	anchor.add_child(stream)
+	_space_thrusters[key] = stream
 
 
 func toggle() -> void:
@@ -374,6 +453,22 @@ func has_full_lava_suit() -> bool:
 ## that can take the Penguin form.
 func has_full_penguin_suit() -> bool:
 	return _has_full_formed_suit("ice")
+
+
+func has_full_space_suit() -> bool:
+	return _has_full_formed_suit("space")
+
+
+func has_space_life_support() -> bool:
+	var head := worn_blorb_in_slot("head")
+	return (
+		is_instance_valid(head) and head.element_state == "space" and head.has_core_item("Space Helm")
+		and has_worn_element("torso", "space")
+	)
+
+
+func has_space_propulsion() -> bool:
+	return has_full_space_suit()
 
 
 ## The Penguin Suit is formed: a full penguin-capable suit, commanded on.
@@ -668,7 +763,7 @@ func _rebuild_worn_form_pieces(form_command: bool) -> void:
 		for piece in (entry["pieces"] as Array):
 			if is_instance_valid(piece):
 				BlorbSuit.release_piece(piece as Node3D)
-		var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, form_command)
+		var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, form_command, _limb_fit)
 		for piece in pieces:
 			if piece is VisualInstance3D:
 				PlayerPortrait.tag_for_portrait(piece as VisualInstance3D)
@@ -942,7 +1037,7 @@ func _update_transitions(delta: float) -> void:
 ## Builds `blorb`'s suit piece in `slot` on this wearer's rig and records it
 ## as worn. The blorb must already be in its worn state (hidden, frozen).
 func _wear_on_body(slot: String, blorb: Blorb) -> void:
-	var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, _form_command_active())
+	var pieces := BlorbSuit.equip_slot(slot, _pivots, _root, blorb, _rig_scale, _form_command_active(), _limb_fit)
 	# Tags each piece as visible to the paper-doll's own isolated portrait
 	# camera (see player_portrait.gd's own module docstring on render layers)
 	# -- done once here at creation, not on every subsequent per-frame rebuild
@@ -977,7 +1072,7 @@ func _update_worn_limbs(form_command: bool) -> void:
 			continue
 		var mesh_instance := pieces[0] as MeshInstance3D
 		var blorb := entry["blorb"] as Blorb
-		BlorbSuit.rebuild_slot(mesh_instance, slot, _pivots, _root, blorb, _rig_scale, form_command, mermaid_tail_active())
+		BlorbSuit.rebuild_slot(mesh_instance, slot, _pivots, _root, blorb, _rig_scale, form_command, mermaid_tail_active(), _limb_fit)
 
 
 ## Stamps each worn entry's OWN blink clock's current openness onto that

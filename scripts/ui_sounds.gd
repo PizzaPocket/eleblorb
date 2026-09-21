@@ -146,7 +146,7 @@ func _ready() -> void:
 		&"blorb_melt", &"blorb_glide", &"giant_move", &"giant_jump", &"giant_land", &"equip_launch", &"equip_settle", &"equip_release",
 		&"transform_rise", &"transform_flash", &"transform_reveal", &"pickup",
 		&"tokoin_pickup", &"throw_release", &"throw_impact", &"stomp_hit",
-		&"rock_erupt", &"rock_retract",
+		&"rock_erupt", &"rock_retract", &"space_thruster",
 	]:
 		_register_foley(event_name, _make_foley(event_name))
 	# The reference swipe is a compact 144ms broadband air movement. Weapons
@@ -564,7 +564,7 @@ func play_foley(event_name: StringName, intensity: float = 0.5, source_id: int =
 	if event_name in [
 		&"jump", &"npc_step", &"plush_step", &"npc_paw",
 		&"horse_step", &"horse_jump", &"horse_land",
-		&"blorb_glide", &"giant_move", &"giant_jump", &"giant_land",
+		&"blorb_glide", &"giant_move", &"giant_jump", &"giant_land", &"space_thruster",
 	] and not _selected_movement_source(source_id):
 		return
 	var cooldown_key := "%s:%d" % [event_name, source_id]
@@ -601,7 +601,8 @@ func play_foley(event_name: StringName, intensity: float = 0.5, source_id: int =
 	var pitch_spread := 0.012 if event_name == &"horse_step" else 0.035
 	player.pitch_scale = 1.0 if fixed_twinkle else randf_range(1.0 - pitch_spread, 1.0 + pitch_spread)
 	var level_variation := 0.0 if fixed_twinkle else randf_range(-0.7, 0.0)
-	player.volume_db = lerpf(-5.5, -0.7, clampf(intensity, 0.0, 1.0)) + level_variation + distance_attenuation_db
+	var event_trim := -10.0 if event_name == &"space_thruster" else 0.0
+	player.volume_db = lerpf(-5.5, -0.7, clampf(intensity, 0.0, 1.0)) + level_variation + distance_attenuation_db + event_trim
 	player.play()
 
 
@@ -931,6 +932,7 @@ func _make_foley(kind: StringName) -> AudioStreamWAV:
 		&"stomp_hit": duration = 0.13; start_hz = 178.0; end_hz = 82.0; texture = 0.16
 		&"rock_erupt": duration = 0.62; start_hz = 110.0; end_hz = 48.0; texture = 0.34
 		&"rock_retract": duration = 0.34; start_hz = 92.0; end_hz = 42.0; texture = 0.22
+		&"space_thruster": duration = 0.16; start_hz = 205.0; end_hz = 125.0; texture = 0.72
 	var frame_count: int = int(duration * SAMPLE_RATE)
 	var bytes := PackedByteArray()
 	bytes.resize(frame_count * 2)
@@ -986,6 +988,18 @@ func _make_foley(kind: StringName) -> AudioStreamWAV:
 			var gain := 0.19 if emerging else 0.085
 			var rock_sample := (rumble+cracks*0.48)*envelope*gain
 			bytes.encode_s16(frame * 2, clampi(int(rock_sample * 32767.0), -32768, 32767))
+			continue
+		if kind == &"space_thruster":
+			var seconds := float(frame) / float(SAMPLE_RATE)
+			procedural_seed = int((procedural_seed * 1103515245 + 12345) & 0x7fffffff)
+			var raw := float(procedural_seed) / 1073741824.0 - 1.0
+			# Two gentle smoothing stages remove the water-gun-like sharp hiss.
+			noise_state = lerpf(noise_state, raw, 0.075)
+			texture_state = lerpf(texture_state, noise_state, 0.018)
+			var attack := minf(seconds / 0.018, 1.0)
+			var envelope := attack * pow(1.0 - t, 2.1)
+			var air_puff := (noise_state * 0.42 + texture_state * 0.58) * envelope * 0.055
+			bytes.encode_s16(frame * 2, clampi(int(air_puff * 32767.0), -32768, 32767))
 			continue
 		if kind in [&"tokoin_pickup", &"transform_reveal"]:
 			var seconds := float(frame) / float(SAMPLE_RATE)

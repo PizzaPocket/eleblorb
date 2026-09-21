@@ -19,6 +19,7 @@ const BLORB_SCENE: PackedScene = preload("res://scenes/blorb.tscn")
 const XIAO_HOU_ZI_SCENE: PackedScene = preload("res://scenes/xiao_hou_zi.tscn")
 const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
 const MANCHEGO_SCENE: PackedScene = preload("res://scenes/manchego.tscn")
+const SUN_WU_KONG_SCENE: PackedScene = preload("res://scenes/sun_wu_kong.tscn")
 
 ## Spread spawned companions out a little so they don't all stack on one
 ## point; matches no particular formation, just avoids instant overlap jitter.
@@ -81,6 +82,10 @@ func capture_from_tree(tree: SceneTree) -> void:
 		var manchego := node as Manchego
 		if manchego != null and manchego.available_to_player:
 			_roster.append({"kind": "manchego"})
+	for node in tree.get_nodes_in_group("sun_wu_kong"):
+		var sage := node as SunWuKong
+		if sage != null and sage.cloud_companion and sage.in_party:
+			_roster.append({"kind": "sun_wu_kong"})
 
 
 ## `parent` must be the destination scene's root (the same node "Player" and
@@ -120,6 +125,8 @@ func spawn_into(parent: Node, near_position: Vector3, facing: Vector3) -> void:
 				_spawn_pandy(parent, spawn_pos)
 			"manchego":
 				_spawn_manchego(parent, spawn_pos)
+			"sun_wu_kong":
+				_spawn_sun_wu_kong(parent, spawn_pos)
 		index += 1
 	var player := parent.get_tree().get_first_node_in_group("player") as Player
 	if player != null:
@@ -172,3 +179,10 @@ func _spawn_manchego(parent: Node, spawn_pos: Vector3) -> void:
 	manchego.available_to_player = true
 	manchego.position = spawn_pos
 	parent.add_child(manchego)
+
+
+func _spawn_sun_wu_kong(parent: Node, spawn_pos: Vector3) -> void:
+	var sage := SUN_WU_KONG_SCENE.instantiate() as SunWuKong
+	sage.configure_as_jindouyun_companion(true)
+	sage.position = spawn_pos + Vector3.UP * 1.5
+	parent.add_child(sage)

@@ -18,6 +18,12 @@ var standing_height: float
 var camera_height: float
 var camera_distance: float
 var suit_rig_scale: float
+## Dimensionless adjustments applied after suit_rig_scale. A single height
+## ratio cannot describe differently-proportioned rigs: compact figures may
+## have short limbs but comparatively broad wrists, knees and feet. Keeping
+## these measurements on the character profile lets every future suit wearer
+## describe its fit without character-name branches in BlorbSuit.
+var suit_limb_fit: Dictionary
 var switch_order: int
 
 
@@ -33,6 +39,9 @@ static func human() -> PlayableCharacterProfile:
 		"ride_mount": true,
 		"use_items": true,
 		"needs_breath": true,
+		# The motor still requires a complete Space suit; this declares that the
+		# rig knows how to pose and steer one.
+		"zero_gravity_propulsion": true,
 	}
 	profile.move_speed = 6.0
 	profile.sprint_multiplier = 1.6
@@ -44,6 +53,7 @@ static func human() -> PlayableCharacterProfile:
 	profile.camera_height = 1.6
 	profile.camera_distance = 3.5
 	profile.suit_rig_scale = 1.0
+	profile.suit_limb_fit = {}
 	profile.switch_order = 0
 	return profile
 
@@ -57,6 +67,7 @@ static func xiao_hou_zi() -> PlayableCharacterProfile:
 		"ride_mount": true,
 		"use_items": true,
 		"summon_sun_wu_kong": true,
+		"zero_gravity_propulsion": true,
 		# No "needs_breath": a living stuffed animal never runs out of air.
 	}
 	# Exact values from the previously tuned Player-hosted monkey mode.
@@ -72,5 +83,27 @@ static func xiao_hou_zi() -> PlayableCharacterProfile:
 	# Established MonkeyFigure.BLORB_SUIT_RIG_SCALE value. This copy is a saved
 	# tuning datum, not a second runtime calculation.
 	profile.suit_rig_scale = 0.245
+	# Xiao's MonkeyFigure is much broader at its distal limbs than a uniformly
+	# scaled-down ProceduralFigure. These station multipliers preserve the live
+	# joint path while ensuring the goo shell encloses the authored limb tube.
+	profile.suit_limb_fit = {
+		# Deliberately overlap both anatomical seams. Suit pieces are shells:
+		# stopping exactly at a mathematical joint exposes the wearer as the
+		# animation bends, while this small profile-relative overlap remains
+		# correct for any future rig built to Xiao's compact pear-body family.
+		"torso_bottom": MonkeyFigure.BODY_HEIGHT * 0.17,
+		"torso_top": MonkeyFigure.BODY_HEIGHT - MonkeyFigure.HEAD_EMBED + 0.010,
+		"arm_shoulder": 1.25,
+		"arm_elbow": 1.40,
+		"arm_wrist": 1.65,
+		"arm_tip": 1.55,
+		"round_arm_tip": true,
+		"monkey_foot_curve": true,
+		"leg_hip": 1.40,
+		"leg_knee": 1.70,
+		"leg_ankle": 1.65,
+		"leg_toe": 1.55,
+		"leg_hip_overlap": 0.010 * MonkeyFigure.REFERENCE_BUILD_SCALE,
+	}
 	profile.switch_order = 20
 	return profile

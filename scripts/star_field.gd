@@ -4,12 +4,9 @@ class_name StarField
 ## A few hundred point stars scattered across a sphere shell overhead, one
 ## MultiMesh draw call for the lot. The shell follows the player in XZ so it
 ## covers the full, much wider play area rather than only the central plateau.
-## Kept well inside distant_mountains.gd's RADIUS (950) and biased toward the
-## upper sky (MIN_Y) rather than spread
-## all the way to the horizon -- both because that reads more like a real
-## night sky (stars concentrated overhead, mountains own the horizon band)
-## and because it keeps each star's brightness from getting heavily muted
-## by Environment's regular distance fog before it reaches the camera.
+## The shell is deliberately far beyond any reachable flying route. Its
+## sprites grow in direct proportion to the radius, preserving their apparent
+## size while preventing the player from ever flying above the night sky.
 ##
 ## Plain StandardMaterial3D (unshaded, alpha-blended, per-instance vertex
 ## color) rather than a custom shader -- a first attempt used a hand-written
@@ -22,13 +19,16 @@ class_name StarField
 ## cloud_scatter.gd's set_night_factor() drives its shared puff material.
 
 const STAR_COUNT := 350
-const RADIUS := 900.0
+const RADIUS := 9000.0
 const MIN_Y := 0.15  # roughly 8.6 degrees above the horizon, at minimum
-const STAR_SIZE := 5.7  # scaled with RADIUS so each star's angular size on screen is unchanged
+const STAR_SIZE := 57.0  # 10x radius and size preserves the old angular size.
+const STAR_TEXTURE_SIZE := 32
+const REQUIRED_CAMERA_FAR := RADIUS * 1.2
 const RNG_SEED := 4242
 
 var _material: StandardMaterial3D
 var _player: Node3D
+var _configured_camera: Camera3D
 
 
 func _ready() -> void:
@@ -42,6 +42,8 @@ func _ready() -> void:
 	_material.vertex_color_use_as_albedo = true
 	_material.billboard_mode = BaseMaterial3D.BILLBOARD_ENABLED
 	_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	_material.albedo_texture = _build_round_star_texture()
+	_material.set_flag(BaseMaterial3D.FLAG_DISABLE_FOG, true)
 
 	var quad := QuadMesh.new()
 	quad.size = Vector2(STAR_SIZE, STAR_SIZE)
@@ -62,10 +64,17 @@ func _ready() -> void:
 	mmi.multimesh = multimesh
 	mmi.material_override = _material
 	mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mmi.extra_cull_margin = RADIUS * 2.0
 	add_child(mmi)
 
 
 func _process(_delta: float) -> void:
+	# A 9 km sky shell needs a matching far plane. Reapply when character or
+	# camera switching promotes a different gameplay camera.
+	var active_camera := get_viewport().get_camera_3d()
+	if active_camera and active_camera != _configured_camera:
+		active_camera.far = maxf(active_camera.far, REQUIRED_CAMERA_FAR)
+		_configured_camera = active_camera
 	if not is_instance_valid(_player):
 		_player = get_tree().get_first_node_in_group("player") as Node3D
 	if _player:
@@ -73,6 +82,19 @@ func _process(_delta: float) -> void:
 		# center on the player. Following Y would make stars bob when jumping.
 		var player_position := _player.global_position
 		global_position = Vector3(player_position.x, global_position.y, player_position.z)
+
+
+func _build_round_star_texture() -> ImageTexture:
+	# A tiny procedural radial mask keeps the shared MultiMesh to one draw call,
+	# but makes every billboard a soft circular point instead of a white square.
+	var image := Image.create(STAR_TEXTURE_SIZE, STAR_TEXTURE_SIZE, false, Image.FORMAT_RGBA8)
+	for y in STAR_TEXTURE_SIZE:
+		for x in STAR_TEXTURE_SIZE:
+			var uv := (Vector2(x, y) + Vector2(0.5, 0.5)) / float(STAR_TEXTURE_SIZE)
+			var radial_distance := (uv - Vector2(0.5, 0.5)).length() * 2.0
+			var alpha := 1.0 - smoothstep(0.72, 1.0, radial_distance)
+			image.set_pixel(x, y, Color(1.0, 1.0, 1.0, alpha))
+	return ImageTexture.create_from_image(image)
 
 
 func _random_upper_dir(rng: RandomNumberGenerator) -> Vector3:

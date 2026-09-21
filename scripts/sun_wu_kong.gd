@@ -3,13 +3,14 @@ extends StaticBody3D
 
 
 func party_role_capabilities() -> Dictionary:
-	return {"playable": false, "mount": false, "summon": true}
+	return {"playable": false, "mount": false, "summon": true, "companion": true}
 
 ## Sun Wu Kong lives in the Chinese village, first sealed beneath a rock.
 ## Xiao Hou Zi can free him; returning the Jingu Bang then unlocks a combat
-## summon. He never becomes a permanent walking party member. When the
-## player is controlling Xiao Hou Zi and an NME closes in, Player creates a
-## temporary summoned instance which arrives and departs in smoke.
+## summon. At the Sky Portal he can also join as a persistent companion,
+## riding the Jindouyun rather than walking: that live body follows the
+## currently controlled party member in all three dimensions. Temporary
+## combat summons remain separate instances which arrive and depart in smoke.
 ##
 ## Built on MonkeyFigure directly, the same rig family as Xiao Hou Zi, with
 ## distinct golden fur and red clothing.
@@ -31,6 +32,15 @@ const SUMMON_ATTACK_COOLDOWN := 0.7
 const SUMMON_DAMAGE := 14.0
 const SUMMON_COMBAT_RADIUS := 24.0
 const SUMMON_LINGER_DURATION := 2.5
+## Jindouyun is supposed to keep pace with sprinting suit flight. The ordinary
+## chase speed is already above the demo Air suit's fast cruise, then scales
+## elastically with separation so a sharp dive or direction change does not
+## leave a supposedly legendary cloud kilometres behind.
+const CLOUD_FOLLOW_DISTANCE := 4.8
+const CLOUD_FOLLOW_SPEED := 30.0
+const CLOUD_CATCHUP_SPEED := 54.0
+const CLOUD_TELEPORT_DISTANCE := 120.0
+const CLOUD_TURN_SPEED := 7.0
 
 ## The Inventory item name for his legendary staff -- see chinese_village.gd's
 ## own _build_jingu_bang_pickup(), where the physical item is hidden among
@@ -55,6 +65,11 @@ const CHINESE_VILLAGE_ABYSS_SAFE_RADIUS := 225.0
 const CHINESE_VILLAGE_ISLAND_Y := -55.0
 
 var summoned: bool = false
+## Persistent party form. Kept independent from `summoned`: a combat summon
+## still has its short encounter lifetime, while this body and its Jindouyun
+## are captured by Party across world travel.
+var cloud_companion: bool = false
+var in_party: bool = false
 ## Authored landmark placement may pin the resident sage above ordinary
 ## island ground (the sealing rock now crowns the Emperor's castle).
 var fixed_ground_y: float = INF
@@ -69,6 +84,9 @@ var _dismissing: bool = false
 var _arm_right: Node3D
 var _elbow_right: Node3D
 var _palm_right: Node3D
+var _jindouyun: Node3D
+var _cloud_time := 0.0
+var _cloud_rest_position := Vector3.ZERO
 
 
 func _ready() -> void:
@@ -81,7 +99,8 @@ func _ready() -> void:
 	add_to_group("sun_wu_kong")
 	_player = get_node_or_null("../Player")
 	_terrain = get_node_or_null("../Terrain")
-	global_position.y = _ground_y(global_position.x, global_position.z)
+	if not cloud_companion:
+		global_position.y = _ground_y(global_position.x, global_position.z)
 
 	var collision_shape := CollisionShape3D.new()
 	var collider := SphereShape3D.new()
@@ -95,6 +114,9 @@ func _ready() -> void:
 	if summoned:
 		_build_staff(pivots)
 		_spawn_smoke.call_deferred()
+	elif cloud_companion:
+		_build_staff(pivots)
+		_build_jindouyun()
 	else:
 		if not WorldState.sun_wu_kong_freed:
 			_build_sealing_rock()
@@ -106,6 +128,46 @@ func _ready() -> void:
 func configure_as_summon(summoner: Node3D) -> void:
 	summoned = true
 	_summoner = summoner
+
+
+func configure_as_jindouyun_companion(joined: bool = false) -> void:
+	cloud_companion = true
+	in_party = joined
+
+
+func join_party() -> void:
+	in_party = true
+
+
+## A small personal cloud, not an Air-blorb body. Its overlapping soft lobes
+## use the same atmospheric blue-white family as CloudPlatform, scaled to the
+## monkey rather than large enough to become a general parkour platform.
+func _build_jindouyun() -> void:
+	_jindouyun = Node3D.new()
+	_jindouyun.name = "Jindouyun"
+	_jindouyun.position = Vector3(0.0, -0.08, 0.0)
+	_cloud_rest_position = _jindouyun.position
+	add_child(_jindouyun)
+	var lobe_specs := [
+		[Vector3(0.48, 0.15, 0.28), Vector3(0.0, 0.0, 0.0)],
+		[Vector3(0.30, 0.13, 0.24), Vector3(-0.34, 0.015, 0.01)],
+		[Vector3(0.32, 0.14, 0.22), Vector3(0.34, 0.025, -0.01)],
+		[Vector3(0.31, 0.12, 0.20), Vector3(-0.10, 0.035, -0.19)],
+		[Vector3(0.28, 0.12, 0.19), Vector3(0.16, 0.025, 0.18)],
+	]
+	for spec in lobe_specs:
+		var lobe_size: Vector3 = spec[0]
+		var lobe_position: Vector3 = spec[1]
+		var lobe := SuperEgg.build_part(
+			lobe_size, Color(0.88, 0.94, 0.99, 0.88),
+			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+		)
+		lobe.position = lobe_position
+		var material := lobe.get_surface_override_material(0) as StandardMaterial3D
+		if material != null:
+			material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			material.roughness = 0.9
+		_jindouyun.add_child(lobe)
 
 
 func dismiss() -> void:
@@ -243,6 +305,9 @@ func _on_interact() -> void:
 
 
 func _process(delta: float) -> void:
+	if cloud_companion:
+		_update_cloud_companion(delta)
+		return
 	if not summoned or _dismissing:
 		return
 	_attack_cooldown = maxf(_attack_cooldown - delta, 0.0)
@@ -273,6 +338,42 @@ func _process(delta: float) -> void:
 	if to_target.length() > 0.01:
 		var target_angle := atan2(to_target.x, to_target.y)
 		rotation.y = lerp_angle(rotation.y, target_angle, ROTATION_SPEED * delta)
+
+
+func _update_cloud_companion(delta: float) -> void:
+	_cloud_time += delta
+	if _jindouyun != null:
+		_jindouyun.position = _cloud_rest_position + Vector3.UP * sin(_cloud_time * 2.1) * 0.035
+	if not in_party:
+		# Waiting at the portal: crown held proudly upward, with only the cloud's
+		# own gentle float. Recruitment never starts merely from proximity.
+		return
+	var target := PartyControl.active_control_body()
+	if target == null:
+		target = _player
+	if target == null or target == self:
+		return
+	var target_position := target.global_position
+	if target.has_method("camera_focus_point"):
+		target_position = target.camera_focus_point()
+	var heading := target.global_transform.basis.z
+	heading.y = 0.0
+	if heading.length_squared() < 0.001:
+		heading = Vector3.BACK
+	heading = heading.normalized()
+	var side := Vector3.UP.cross(heading).normalized()
+	var desired := target_position - heading * CLOUD_FOLLOW_DISTANCE + side * 1.7 + Vector3.UP * 0.45
+	var offset := desired - global_position
+	var distance := offset.length()
+	if distance > CLOUD_TELEPORT_DISTANCE:
+		global_position = desired
+		return
+	if distance > 0.02:
+		var catchup := clampf(distance / 18.0, 0.0, 1.0)
+		var speed := lerpf(CLOUD_FOLLOW_SPEED, CLOUD_CATCHUP_SPEED, catchup)
+		global_position += offset.limit_length(speed * delta)
+		var target_angle := atan2(offset.x, offset.z)
+		rotation.y = lerp_angle(rotation.y, target_angle, minf(1.0, CLOUD_TURN_SPEED * delta))
 
 
 func _nearest_target() -> Node3D:

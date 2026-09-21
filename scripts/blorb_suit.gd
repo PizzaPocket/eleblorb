@@ -55,7 +55,7 @@ const TOE_REACH_MARGIN := 0.025
 ## The helm that commands each formed suit, by the element the whole suit must
 ## share: a full Fire suit under the Lava Helm seals into the Lava Suit, a
 ## full Ice suit under the Penguin Helm forms the Penguin Suit.
-const FORM_HELMS := {"fire": "Lava Helm", "ice": "Penguin Helm"}
+const FORM_HELMS := {"fire": "Lava Helm", "ice": "Penguin Helm", "space": "Space Helm"}
 ## Penguin Suit torso: even larger than the sealed Lava cuirass, running from
 ## the ankles up past broad shoulders to close under the head.
 const PENGUIN_TORSO_WIDTH_SCALE := 1.3
@@ -462,16 +462,16 @@ static func form_helm_element(head_blorb: Blorb) -> String:
 	return ""
 
 
-static func equip_slot(slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false) -> Array[Node3D]:
+static func equip_slot(slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false, limb_fit: Dictionary = {}) -> Array[Node3D]:
 	var pieces: Array[Node3D] = []
 	match slot:
 		"arm_left", "arm_right", "leg_left", "leg_right":
 			var mesh_instance := MeshInstance3D.new()
 			root.add_child(mesh_instance)
-			rebuild_slot(mesh_instance, slot, pivots, root, blorb, rig_scale, form_command)
+			rebuild_slot(mesh_instance, slot, pivots, root, blorb, rig_scale, form_command, false, limb_fit)
 			pieces.append(mesh_instance)
 		"torso":
-			pieces = build_torso(pivots["spine"] as Node3D, blorb, rig_scale, form_command)
+			pieces = build_torso(pivots["spine"] as Node3D, blorb, rig_scale, form_command, limb_fit)
 		"head":
 			pieces = build_head(pivots["head"] as Node3D, blorb, rig_scale)
 	if blorb.element_state == "air":
@@ -642,27 +642,27 @@ static func animate_air_wings(wings: Node3D, flap_angle: float) -> void:
 ## `mermaid`: the legs have merged into the mermaid tail. The left leg blorb
 ## renders the whole tail (build_mermaid_tail_mesh()); both keep their own
 ## eyes and core at their own feet.
-static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false, mermaid: bool = false) -> void:
+static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Dictionary, root: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false, mermaid: bool = false, limb_fit: Dictionary = {}) -> void:
 	match slot:
 		"arm_left":
 			rebuild_arm(
 				mesh_instance, root,
 				pivots["arm_left_shoulder"] as Node3D, pivots["arm_left_elbow"] as Node3D,
 				pivots["wrist_left"] as Node3D, pivots["fingertip_left"] as Node3D,
-				pivots["back_left"] as Node3D, blorb, rig_scale, form_command
+				pivots["back_left"] as Node3D, blorb, rig_scale, form_command, limb_fit
 			)
 		"arm_right":
 			rebuild_arm(
 				mesh_instance, root,
 				pivots["arm_right_shoulder"] as Node3D, pivots["arm_right_elbow"] as Node3D,
 				pivots["wrist_right"] as Node3D, pivots["fingertip_right"] as Node3D,
-				pivots["back_right"] as Node3D, blorb, rig_scale, form_command
+				pivots["back_right"] as Node3D, blorb, rig_scale, form_command, limb_fit
 			)
 		"leg_left":
 			rebuild_leg(
 				mesh_instance, root,
 				pivots["leg_left_hip"] as Node3D, pivots["leg_left_knee"] as Node3D,
-				pivots["leg_left_ankle"] as Node3D, pivots["toe_left"] as Node3D, blorb, rig_scale, form_command, mermaid
+				pivots["leg_left_ankle"] as Node3D, pivots["toe_left"] as Node3D, blorb, rig_scale, form_command, mermaid, limb_fit
 			)
 			if mermaid:
 				mesh_instance.mesh = build_mermaid_tail_mesh(root, pivots, rig_scale)
@@ -671,7 +671,7 @@ static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Di
 			rebuild_leg(
 				mesh_instance, root,
 				pivots["leg_right_hip"] as Node3D, pivots["leg_right_knee"] as Node3D,
-				pivots["leg_right_ankle"] as Node3D, pivots["toe_right"] as Node3D, blorb, rig_scale, form_command, mermaid
+				pivots["leg_right_ankle"] as Node3D, pivots["toe_right"] as Node3D, blorb, rig_scale, form_command, mermaid, limb_fit
 			)
 
 
@@ -698,7 +698,7 @@ static func rebuild_slot(mesh_instance: MeshInstance3D, slot: String, pivots: Di
 static func rebuild_arm(
 	mesh_instance: MeshInstance3D, root: Node3D, shoulder: Node3D, elbow: Node3D,
 	wrist: Node3D, fingertip: Node3D, back: Node3D, blorb: Blorb, rig_scale: float = 1.0,
-	form_command: bool = false
+	form_command: bool = false, limb_fit: Dictionary = {}
 ) -> void:
 	var vis: Dictionary = blorb.body_visual_snapshot()
 	var sealed_lava := blorb.element_state == "fire" and form_command
@@ -717,7 +717,12 @@ static func rebuild_arm(
 	# along the same wrist-to-fingertip direction moves that zero-point
 	# past the real hand instead.
 	var raw_tip_pos := root.to_local(fingertip.global_position)
-	var reach_dir := (raw_tip_pos - wrist_pos).normalized()
+	var reach_dir := raw_tip_pos - wrist_pos
+	# A one-piece monkey arm aliases its compatibility fingertip to its wrist.
+	# Continue the real forearm path instead of normalizing a zero vector.
+	if reach_dir.length_squared() < 0.000001:
+		reach_dir = wrist_pos - elbow_pos
+	reach_dir = reach_dir.normalized()
 	var tip_pos := raw_tip_pos + reach_dir * (PENGUIN_FLIPPER_REACH if penguin else FINGERTIP_REACH_MARGIN) * rig_scale
 
 	# `back` is procedural_figure.gd's own BackAttach point -- already
@@ -745,12 +750,19 @@ static func rebuild_arm(
 	var wrist_bulged := wrist_pos + outward_dir * (bulge * 0.5)
 	var tip_bulged := tip_pos + outward_dir * bulge
 
-	var r_shoulder := _avg_xz(ProceduralFigure.UPPER_ARM_SIZE) * LIMB_INFLATE * sealed_lava_radius * rig_scale
-	var r_elbow := _avg_xz(ProceduralFigure.FOREARM_SIZE) * LIMB_INFLATE * sealed_lava_radius * rig_scale
-	var r_wrist := _avg_xz(ProceduralFigure.HAND_SIZE) * LIMB_INFLATE * 1.2 * sealed_lava_radius * rig_scale
-	var r_tip := r_wrist * (PENGUIN_FLIPPER_TIP_RATIO if penguin else HAND_TIP_RADIUS_RATIO)
+	var r_shoulder := _avg_xz(ProceduralFigure.UPPER_ARM_SIZE) * LIMB_INFLATE * sealed_lava_radius * rig_scale * float(limb_fit.get("arm_shoulder", 1.0))
+	var r_elbow := _avg_xz(ProceduralFigure.FOREARM_SIZE) * LIMB_INFLATE * sealed_lava_radius * rig_scale * float(limb_fit.get("arm_elbow", 1.0))
+	var r_wrist := _avg_xz(ProceduralFigure.HAND_SIZE) * LIMB_INFLATE * 1.2 * sealed_lava_radius * rig_scale * float(limb_fit.get("arm_wrist", 1.0))
+	var r_tip := _avg_xz(ProceduralFigure.HAND_SIZE) * LIMB_INFLATE * 1.2 * sealed_lava_radius * rig_scale * (PENGUIN_FLIPPER_TIP_RATIO if penguin else HAND_TIP_RADIUS_RATIO) * float(limb_fit.get("arm_tip", 1.0))
 	var points: Array[Vector3] = [shoulder_pos, elbow_pos, wrist_bulged, tip_bulged]
 	var radii: Array[float] = [r_shoulder, r_elbow, r_wrist, r_tip]
+	var round_arm_tip := bool(limb_fit.get("round_arm_tip", false)) and not penguin
+	if round_arm_tip:
+		# No separate hand bone exists on this rig: finish the continuous arm
+		# loft with a hemisphere rather than a split, pointed zero-radius tip.
+		points.resize(3)
+		radii.resize(3)
+		_append_round_cap(points, radii, wrist_bulged, reach_dir, r_wrist)
 	var formed := sealed_lava or penguin
 	if formed:
 		# A round shoulder cap: a true hemisphere continuing the shell past the
@@ -765,7 +777,7 @@ static func rebuild_arm(
 	var flatten_axis := outward_dir if penguin else Vector3.ZERO
 	mesh_instance.mesh = build_limb_tube(
 		points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION,
-		[] as Array[Color], not formed, flatten_axis, PENGUIN_FLIPPER_FLATTEN
+		[] as Array[Color], not formed, flatten_axis, PENGUIN_FLIPPER_FLATTEN, not round_arm_tip
 	)
 	mesh_instance.set_surface_override_material(0, _build_goo_material(vis))
 
@@ -883,9 +895,19 @@ static func _prepend_round_cap(points: Array[Vector3], radii: Array[float], cent
 		radii.push_front(maxf(radius * cos(angle), radius * 0.04))
 
 
+## Matching end hemisphere. The first existing ring is its full-width rim;
+## the added rings smoothly round toward a small pole without a second taper.
+static func _append_round_cap(points: Array[Vector3], radii: Array[float], center: Vector3, outward: Vector3, radius: float) -> void:
+	const CAP_STEPS := 5
+	for step in range(1, CAP_STEPS + 1):
+		var angle := deg_to_rad(88.0) * float(step) / float(CAP_STEPS)
+		points.append(center + outward * radius * sin(angle))
+		radii.append(maxf(radius * cos(angle), radius * 0.04))
+
+
 ## Noodle from hip through knee through ankle through toe. `rig_scale` -- see
 ## rebuild_arm()'s own doc comment for the full rationale, identical here.
-static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D, knee: Node3D, ankle: Node3D, toe: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false, mermaid: bool = false) -> void:
+static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D, knee: Node3D, ankle: Node3D, toe: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false, mermaid: bool = false, limb_fit: Dictionary = {}) -> void:
 	var vis: Dictionary = blorb.body_visual_snapshot()
 	var sealed_lava := blorb.element_state == "fire" and form_command
 	var sealed_lava_radius := 1.34 if sealed_lava else 1.0
@@ -911,10 +933,10 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 
 	# All radii scaled down 25% overall, per direct instruction ("way too
 	# thick all around").
-	var r_hip := _avg_xz(ProceduralFigure.UPPER_LEG_SIZE) * LIMB_INFLATE * LEG_RADIUS_SCALE * sealed_lava_radius * rig_scale
-	var r_knee := _avg_xz(ProceduralFigure.LOWER_LEG_SIZE) * LIMB_INFLATE * LEG_RADIUS_SCALE * sealed_lava_radius * rig_scale
-	var r_ankle := _avg_xz(ProceduralFigure.FOOT_SIZE) * LIMB_INFLATE * 1.1 * LEG_RADIUS_SCALE * sealed_lava_radius * rig_scale
-	var r_toe := r_ankle * FOOT_TOE_RADIUS_RATIO
+	var r_hip := _avg_xz(ProceduralFigure.UPPER_LEG_SIZE) * LIMB_INFLATE * LEG_RADIUS_SCALE * sealed_lava_radius * rig_scale * float(limb_fit.get("leg_hip", 1.0))
+	var r_knee := _avg_xz(ProceduralFigure.LOWER_LEG_SIZE) * LIMB_INFLATE * LEG_RADIUS_SCALE * sealed_lava_radius * rig_scale * float(limb_fit.get("leg_knee", 1.0))
+	var r_ankle := _avg_xz(ProceduralFigure.FOOT_SIZE) * LIMB_INFLATE * 1.1 * LEG_RADIUS_SCALE * sealed_lava_radius * rig_scale * float(limb_fit.get("leg_ankle", 1.0))
+	var r_toe := _avg_xz(ProceduralFigure.FOOT_SIZE) * LIMB_INFLATE * 1.1 * LEG_RADIUS_SCALE * sealed_lava_radius * rig_scale * FOOT_TOE_RADIUS_RATIO * float(limb_fit.get("leg_toe", 1.0))
 
 	# An extra control point partway down the shin, per direct instruction
 	# ("the enlargement is starting abruptly from the knee... should more
@@ -938,6 +960,35 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 	# see the shape/eye/core placement on its own simpler baseline first.
 	var points: Array[Vector3] = [hip_pos, knee_pos, shin_pos, ankle_pos, toe_pos]
 	var radii: Array[float] = [r_hip, r_knee, r_shin, r_ankle, r_toe]
+	var monkey_foot_curve := bool(limb_fit.get("monkey_foot_curve", false)) and not penguin
+	if monkey_foot_curve:
+		# The compatibility toe and ankle are the same node, while the monkey's
+		# visible lower leg actually curves forward into a soft foot. Recreate
+		# that knee-relative arc for its suit shell, at the rig's display scale.
+		var knee_basis := knee.global_transform.basis
+		var lower_up := _to_local_dir(root, knee_basis * Vector3.UP)
+		var lower_forward := _to_local_dir(root, knee_basis * Vector3(0, 0, 1))
+		var display_scale := MonkeyFigure.REFERENCE_BUILD_SCALE
+		# Match the authored monkey limb itself instead of re-scaling the human
+		# boot radii. This removes the isolated ankle/toe bulb that appeared when
+		# a compact pipe-leg inherited a human foot's relative thickness.
+		r_hip = MonkeyFigure.LEG_RADIUS_HIP * display_scale * 1.14
+		r_knee = MonkeyFigure.LEG_RADIUS_KNEE * display_scale * 1.14
+		r_ankle = MonkeyFigure.FOOT_BULB_RADIUS * display_scale * 1.14
+		r_toe = MonkeyFigure.FOOT_BOTTOM_RADIUS * display_scale * 1.14
+		var transition := ankle_pos + lower_up * 0.018 * display_scale + lower_forward * MonkeyFigure.FOOT_BULB_FORWARD * 0.3 * display_scale
+		var bulb := ankle_pos + lower_up * (MonkeyFigure.FOOT_BULB_CENTER_Y - MonkeyFigure.ANKLE_GROUND_CLEARANCE) * display_scale + lower_forward * MonkeyFigure.FOOT_BULB_FORWARD * display_scale
+		var sole_end := ankle_pos - lower_up * MonkeyFigure.ANKLE_GROUND_CLEARANCE * display_scale + lower_forward * MonkeyFigure.FOOT_BULB_FORWARD * display_scale
+		points = [hip_pos, knee_pos, transition, bulb, sole_end]
+		radii = [r_hip, r_knee, lerpf(r_knee, r_ankle, 0.45), r_ankle, r_toe]
+		_append_round_cap(points, radii, sole_end, lower_forward, r_toe)
+		# Bury a rounded upper closure inside the pear torso. It follows the live
+		# hip-to-knee axis, so the extra coverage scales and animates with the rig
+		# rather than being a character-specific world-space offset.
+		var hip_overlap := float(limb_fit.get("leg_hip_overlap", 0.0))
+		if hip_overlap > 0.0:
+			var hip_outward := -(knee_pos - hip_pos).normalized()
+			_prepend_round_cap(points, radii, hip_pos + hip_outward * hip_overlap, hip_outward, r_hip)
 	if sealed_lava:
 		# The hip closure follows the rounded shoulder construction above. Its
 		# dome closes high inside the diaper-length torso rather than showing a
@@ -969,7 +1020,7 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 	else:
 		mesh_instance.mesh = build_limb_tube(
 			points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION,
-			[] as Array[Color], not penguin, flatten_axis, foot_flatten
+			[] as Array[Color], not penguin, flatten_axis, foot_flatten, not monkey_foot_curve
 		)
 		mesh_instance.set_surface_override_material(0, _build_goo_material(vis))
 
@@ -1067,7 +1118,7 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 ## oval sits, how big it is) is expressed in ProceduralFigure's own human
 ## terms and needs rescaling to actually land on/around a smaller rig's
 ## much shorter, narrower chest.
-static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false) -> Array[Node3D]:
+static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false, limb_fit: Dictionary = {}) -> Array[Node3D]:
 	if blorb.element_state == "ice" and form_command:
 		return [_build_penguin_torso(spine_pivot, blorb, rig_scale)] as Array[Node3D]
 	var vis: Dictionary = blorb.body_visual_snapshot()
@@ -1080,6 +1131,13 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 	var chest_top := chest_bottom + ProceduralFigure.CHEST_SIZE.y * 2.0 * rig_scale
 	var half_height := (chest_top - chest_bottom) * 0.5 * TORSO_HEIGHT_INFLATE
 	var center_y := (chest_top + chest_bottom) * 0.5
+	if limb_fit.has("torso_bottom") and limb_fit.has("torso_top"):
+		# Non-human profiles supply their real spine-local anatomy landmarks;
+		# Xiao's top is exactly his body/head seam rather than a scaled guess.
+		chest_bottom = float(limb_fit["torso_bottom"])
+		chest_top = float(limb_fit["torso_top"])
+		half_height = (chest_top - chest_bottom) * 0.5
+		center_y = (chest_top + chest_bottom) * 0.5
 	if sealed_lava:
 		# A lava torso is the suit's continuous cuirass. spine_pivot's origin is
 		# the TOP of the pelvis (ProceduralFigure.build() places it at abdomen_y),
@@ -1113,8 +1171,8 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 	# something rig_scale (a pure size ratio) should touch. Detected the
 	# same way the rest of this file already keys "is this Xiao Hou Zi" off
 	# rig_scale, since he's the only rig that ever passes a non-1.0 value.
-	if not sealed_lava and is_equal_approx(rig_scale, MonkeyFigure.BLORB_SUIT_RIG_SCALE):
-		center_y = MonkeyFigure.BODY_HEIGHT * 0.5
+	# Profile-supplied torso landmarks above replace the former Xiao-only
+	# center override; both center and extent now come from real anatomy.
 	var torso_seal_scale := 1.1 if sealed_lava else 1.0
 	var half_width := ProceduralFigure.CHEST_SIZE.x * TORSO_INFLATE * torso_seal_scale * rig_scale
 	var half_depth := ProceduralFigure.CHEST_SIZE.z * TORSO_INFLATE * 1.2 * torso_seal_scale * rig_scale
@@ -1136,6 +1194,26 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 	torso.set_surface_override_material(0, _build_goo_material(vis))
 	torso.position = Vector3(0, center_y, 0)
 	spine_pivot.add_child(torso)
+	var pieces: Array[Node3D] = [torso]
+	if blorb.element_state == "space":
+		for dot_position in [
+			Vector3(-half_width * 0.42, half_height * 0.28, half_depth * 0.96),
+			Vector3(half_width * 0.30, -half_height * 0.12, half_depth * 0.99),
+			Vector3(half_width * 0.08, half_height * 0.48, half_depth * 0.94),
+		]:
+			var star := SuperEgg.build_part(Vector3.ONE * half_width * 0.045, Color.WHITE)
+			star.position = dot_position
+			torso.add_child(star)
+			CollisionPolicy.mark_decorative(star)
+		for side in [-1.0, 1.0]:
+			var tank := SuperEgg.build_part(
+				Vector3(half_width * 0.32, half_height * 0.72, half_depth * 0.34),
+				ElementPalette.SPACE_BODY.lightened(0.12)
+			)
+			tank.name = "SpaceAirTank"
+			tank.position = Vector3(side * half_width * 0.52, center_y, -half_depth * 1.12)
+			spine_pivot.add_child(tank)
+			pieces.append(tank)
 
 	# "Looking forward, as if looking out from the hero's chest," per
 	# direct instruction -- see TORSO_EYE_RADIUS_FRACTION/TORSO_EYE_FLATTEN
@@ -1152,7 +1230,7 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 		TORSO_EYE_OUTWARD_TILT
 	)
 
-	return [torso] as Array[Node3D]
+	return pieces
 
 
 ## The Penguin Suit's body: one egg-shaped blorb from the shoulders to the
@@ -1422,6 +1500,9 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	if blorb.has_core_item("Bird Helm"):
 		hat.queue_free()
 		return [_build_bird_helm(head_pivot, worn_head_bounds, head_size, vis)] as Array[Node3D]
+	if blorb.has_core_item("Space Helm") and blorb.element_state == "space":
+		hat.queue_free()
+		return [_build_space_helm(head_pivot, worn_head_bounds, head_size, vis)] as Array[Node3D]
 
 	# Only a blorb that has absorbed the Diving Helmet item can transform
 	# into the sealed underwater form. Every other head blorb stays a hat.
@@ -1470,6 +1551,42 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	helmet.visible = false
 
 	return [hat, helmet] as Array[Node3D]
+
+
+static func _build_space_helm(head_pivot: Node3D, contents: AABB, head_size: Vector3, vis: Dictionary) -> Node3D:
+	var root := Node3D.new()
+	root.name = "HeadBlorbSpaceHelm"
+	head_pivot.add_child(root)
+	var radius := maxf(maxf(contents.size.x, contents.size.z) * 0.62, head_size.x * 1.35)
+	var shell := MeshInstance3D.new()
+	var sphere := SphereMesh.new()
+	sphere.radius = radius
+	sphere.height = radius * 2.0
+	sphere.radial_segments = 28
+	sphere.rings = 16
+	shell.mesh = sphere
+	shell.material_override = _build_goo_material(vis)
+	shell.position.y = head_size.y
+	root.add_child(shell)
+	for star_position in [
+		Vector3(-radius * 0.44, head_size.y + radius * 0.50, radius * 0.58),
+		Vector3(radius * 0.48, head_size.y + radius * 0.34, radius * 0.53),
+	]:
+		var star := SuperEgg.build_part(Vector3.ONE * radius * 0.035, Color.WHITE)
+		star.position = star_position
+		root.add_child(star)
+		CollisionPolicy.mark_decorative(star)
+	var visor := SuperEgg.build_part(
+		Vector3(radius * 0.76, radius * 0.48, radius * 0.12),
+		Color(0.16, 0.27, 0.44, 0.72)
+	)
+	visor.position = Vector3(0.0, head_size.y + radius * 0.08, radius * 0.91)
+	root.add_child(visor)
+	BlorbFace.add_eyes(visor, radius * 0.64, 0.0, 0.0, vis["albedo"] as Color, 1.08)
+	var core := BlorbCore.build(radius * CORE_RADIUS_FRACTION * 0.7, vis["core_color"] as Color, true)
+	core.position = Vector3(0.0, 0.0, radius * 0.08)
+	visor.add_child(core)
+	return root
 
 
 ## A core-bound Toboggan is the blorb itself reshaped as winter knit. The
@@ -2181,18 +2298,18 @@ static func _build_nautilus_crown(head_pivot: Node3D, contents: AABB, head_size:
 	# The eyes on the base's front, just behind its rounded nose: each placed
 	# on the tube's own surface, facing along its normal there, sunk a little
 	# into it the way every blorb eye is.
-	const EYE_SAMPLE := 4
-	const EYE_SPREAD := 0.62
 	const EYE_EMBED_FRACTION := 0.35
+	const EYE_DEPTH_SCALE := 0.4
 	var base_width: float = curve["base_width"]
 	var eye_mesh_radius := base_width * 0.16 * 0.5 * 1.8
 	var eye_color := (vis["albedo"] as Color).darkened(0.25)
-	var outward := NautilusCrown.outward_around(curve, EYE_SAMPLE)
+	var eye_surface_center := Vector3.ZERO
+	var eye_normal_center := Vector3.ZERO
 	for side in [-1.0, 1.0]:
-		# Round from straight out of the head toward either side.
-		var around: float = outward - side * signf(outward) * EYE_SPREAD
-		var spot: Dictionary = NautilusCrown.surface(curve, EYE_SAMPLE, around)
+		var spot: Dictionary = NautilusCrown.front_eye_surface(curve, side)
 		var normal: Vector3 = spot["normal"]
+		eye_surface_center += spot["point"] as Vector3
+		eye_normal_center += normal
 		var eye := MeshInstance3D.new()
 		eye.name = "EyeL" if side < 0.0 else "EyeR"
 		eye.mesh = SuperEgg.build_mesh(
@@ -2202,17 +2319,32 @@ static func _build_nautilus_crown(head_pivot: Node3D, contents: AABB, head_size:
 		eye_material.albedo_color = eye_color
 		eye_material.roughness = 0.8
 		eye.set_surface_override_material(0, eye_material)
-		eye.basis = Basis.looking_at(-normal, Vector3.UP if absf(normal.y) < 0.95 else Vector3.BACK)
-		eye.scale = Vector3(1.0, 1.0, 0.5)
+		# Build the eye's complete frame from this exact surface point. Local Z
+		# follows the true outward normal; local Y is world-up projected onto
+		# the tangent plane, so the tall oval stays upright without ceasing to
+		# be tangent. The former looking_at(-normal) aimed the flattened axis in
+		# the opposite direction and produced visibly skewed, floating eyes.
+		var eye_up := (Vector3.UP-normal*Vector3.UP.dot(normal)).normalized()
+		if eye_up.length_squared()<0.001:
+			eye_up=Vector3.BACK
+		var eye_right := eye_up.cross(normal).normalized()
+		eye_up=normal.cross(eye_right).normalized()
+		eye.basis = Basis(eye_right,eye_up,normal)
+		eye.scale = Vector3(1.0, 1.0, EYE_DEPTH_SCALE)
 		eye.position = (spot["point"] as Vector3) - normal * eye_mesh_radius * EYE_EMBED_FRACTION
 		shell.add_child(eye)
-	var front: Dictionary = NautilusCrown.surface(curve, EYE_SAMPLE, outward)
+	eye_surface_center *= 0.5
+	eye_normal_center = eye_normal_center.normalized()
 	var core := BlorbCore.build(base_width * CORE_RADIUS_FRACTION * HAT_CORE_RADIUS_SCALE, vis["core_color"] as Color, vis["core_emissive"] as bool)
 	if vis["core_emissive"] as bool:
 		var core_material: StandardMaterial3D = core.get_meta("material")
 		core_material.emission = vis["core_emission"] as Color
 		core_material.emission_energy_multiplier = vis["core_emission_energy"] as float
-	core.position = (front["point"] as Vector3) - (front["normal"] as Vector3) * base_width * 0.4
+	# Seat the core behind the face without following the eye surface normal
+	# downward.  That old vertical component was what made the core protrude
+	# through the crown's lower rim even when the eyes themselves were raised.
+	var core_inset := Vector3(eye_normal_center.x, 0.0, eye_normal_center.z).normalized()
+	core.position = eye_surface_center - core_inset * base_width * 0.4
 	shell.add_child(core)
 	_add_head_core_light(core, vis)
 	return root
@@ -2430,7 +2562,7 @@ static func build_limb_tube(
 	control_points: Array[Vector3], control_radii: Array[float],
 	radial_segments: int, rings_per_segment: int, cap_fraction: float,
 	control_colors: Array[Color] = [], taper_start: bool = true,
-	flatten_axis: Vector3 = Vector3.ZERO, flatten: float = 1.0
+	flatten_axis: Vector3 = Vector3.ZERO, flatten: float = 1.0, taper_end: bool = true
 ) -> ArrayMesh:
 	var n := control_points.size()
 	var p_start: Vector3 = control_points[0] * 2.0 - control_points[1]
@@ -2469,7 +2601,7 @@ static func build_limb_tube(
 			)
 			var radius := lerpf(control_radii[seg], control_radii[seg + 1], t)
 			var u := float(ring_index) / float(total_rings - 1)
-			radius *= _cap_taper(u, cap_fraction, taper_start)
+			radius *= _cap_taper(u, cap_fraction, taper_start, taper_end)
 
 			var right: Vector3
 			var up: Vector3
@@ -2537,10 +2669,10 @@ static func _catmull_rom_tangent(p0: Vector3, p1: Vector3, p2: Vector3, p3: Vect
 ## end (u=0/u=1) over cap_fraction of its total length -- a quarter-sine
 ## taper that keeps the tube ends from terminating as full-radius cuts.
 ## Flat (1.0, no taper) through the middle.
-static func _cap_taper(u: float, cap_fraction: float, taper_start: bool = true) -> float:
+static func _cap_taper(u: float, cap_fraction: float, taper_start: bool = true, taper_end: bool = true) -> float:
 	if taper_start and u < cap_fraction:
 		return sin((u / cap_fraction) * PI * 0.5)
-	if u > 1.0 - cap_fraction:
+	if taper_end and u > 1.0 - cap_fraction:
 		return sin(((1.0 - u) / cap_fraction) * PI * 0.5)
 	return 1.0
 

@@ -72,9 +72,10 @@ var chinese_village_chef_dialog_beat: int = 0
 var chinese_village_rule_delegated: bool = false
 var pandy_joined: bool = false
 
-## Sun Wu Kong remains a resident of the Chinese village. Returning the
-## Jingu Bang unlocks Xiao Hou Zi's ability to call him into a fight; he is
-## never serialized as a walking party member.
+## Returning the Jingu Bang unlocks Xiao Hou Zi's ability to call Sun Wu Kong
+## into a fight. He can later join the travelling party at the Sky Portal,
+## riding Jindouyun rather than becoming a walking follower; Party serializes
+## that live companion separately from these Chinese-village story flags.
 var sun_wu_kong_freed: bool = false
 var sun_wu_kong_has_jingu_bang: bool = false
 var sun_wu_kong_summon_unlocked: bool = false

@@ -18,6 +18,7 @@ const CITY_BODY := Color(0.15,0.50,0.75)
 const ICE_BODY := Color(0.78,0.92,0.98)
 const SNOW_BODY := Color(0.94,0.96,0.98)
 const WOOD_BODY := Color(0.42,0.26,0.15)
+const SPACE_BODY := Color(0.105,0.055,0.18)
 
 
 static func body_color(element: String) -> Color:
@@ -34,4 +35,5 @@ static func body_color(element: String) -> Color:
 		"ice": return ICE_BODY
 		"snow": return SNOW_BODY
 		"wood": return WOOD_BODY
+		"space": return SPACE_BODY
 		_: return Color(0.94,0.96,0.93)

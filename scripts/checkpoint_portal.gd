@@ -69,7 +69,8 @@ void fragment() {
 }
 """
 
-var _player: Player
+var _tracked_body: Node3D
+var _tracked_source: Node3D
 var _last_local := Vector3.ZERO
 var _has_last := false
 
@@ -186,13 +187,24 @@ func _build_membrane(outline: PackedVector2Array, tint: Color) -> void:
 ## counts when the point where it crossed lies inside the opening (with
 ## PASS_FORGIVENESS), whichever way the body is travelling.
 func _physics_process(_delta: float) -> void:
-	if not is_instance_valid(_player):
-		_player = get_tree().get_first_node_in_group("player") as Player
-		if _player == null:
-			return
-	# Only the human wears these suits: on foot or riding a mount, but not
-	# while control rests with Blorbus, Xiao Hou Zi or another party member.
-	var center: Variant = _player.suit_wearer_center()
+	var body := PartyControl.active_control_body()
+	var source := PartyControl.control_source()
+	if body != _tracked_body or source != _tracked_source:
+		_tracked_body = body
+		_tracked_source = source
+		_has_last = false
+	if not is_instance_valid(body) or not is_instance_valid(source):
+		_has_last = false
+		return
+	# A mount is the moving control body, but the playable riding it still owns
+	# the crossing. Ask the carrier for the rider's physical centre rather than
+	# requiring a horse (or any future mount) to masquerade as a suit wearer.
+	# Off a mount, the controlled playable reports its ordinary body centre.
+	var center: Variant = null
+	if body != source and body.has_method("controlled_rider_center"):
+		center = body.controlled_rider_center(source)
+	elif source.has_method("suit_wearer_center"):
+		center = source.suit_wearer_center()
 	if center == null:
 		_has_last = false
 		return
