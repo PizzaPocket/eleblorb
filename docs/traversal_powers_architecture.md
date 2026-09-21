@@ -164,8 +164,23 @@ change in slices 0 to 5; the whole point is that Xiao and the others gain.
   all live in `IceSkateMode`; Xiao's duplicate is deleted.
 - Snowboard: contact model and glide moved to `SnowboardMode`; its pose and
   Xiao's wiring remain.
-- Swim: Xiao pitches his body now, but through his own controller rather
-  than a shared mode. Still to migrate.
+- Water: swimming, the mermaid tail and the underwater jets are `SwimMode`,
+  and Xiao Hou Zi pitches his body and rides the tail like anyone else.
+- Snow and ice: `PenguinMode` and `CrystalSkateMode` are shared. His dive is
+  ballistic now, so the belly slide keeps the speed that started it.
+- Air: `FlightMode`. A flier hangs upright holding station and lies along its
+  travel under way, on either rig. Cloud and canopy support are shared
+  through `WorldSupport`, and every cloud layer in the world is asked.
+- Fire: `LavaMode` holds the three answers a suit can give a molten pool --
+  barred at the edge, carried on the surface, swimming the volume -- so
+  every character meets the same rules.
+- Dirt bike: the wheel dynamics are `DirtbikeMode`; the pose stays per rig.
+
+One resolved owner of the rig pitch per frame, in priority order, replaced
+the per-pair guards. Several powers used to ease that one value toward
+different targets at once and settle in between: 34 degrees instead of 90,
+21 instead of 52, 32 instead of 78. Any new power joins that order rather
+than adding a guard against each existing one.
 
 ## Verification
 

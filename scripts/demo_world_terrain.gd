@@ -346,6 +346,9 @@ var _nz: int
 ## _raw_height() at every grid vertex, computed once: characters query heights
 ## many times a frame, and the mesh build samples each vertex's neighbours.
 var _heights := PackedFloat32Array()
+## One entry per render chunk: the grid columns it spans, its material, and
+## the mesh and collider it currently owns, so a chunk can be rebuilt alone.
+var _chunks: Array[Dictionary] = []
 var _hills := FastNoiseLite.new()
 var _swell := FastNoiseLite.new()
 var _rng := RandomNumberGenerator.new()
@@ -1031,8 +1034,13 @@ func _plane_height(a: Vector3, b: Vector3, c: Vector3, x: float, z: float) -> fl
 
 
 ## Longest stretch of valley one render chunk covers. Chunks let the renderer
-## skip whatever is off screen, and let each biome keep its own material.
+## skip whatever is off screen, let each biome keep its own material, and give
+## a crater a small piece of world to rebuild (see carve_crater()).
 const CHUNK_LENGTH := 300.0
+## How far past a crater's own radius the thrown-up rim reaches, and how high
+## it stands relative to the crater's depth.
+const CRATER_LIP_REACH := 1.45
+const CRATER_LIP_HEIGHT := 0.22
 
 
 ## Each biome's own terrain material, as its world builds it: the Crossroads
@@ -1085,14 +1093,15 @@ func _snow_terrain_material() -> StandardMaterial3D:
 
 
 ## The terrain renders as chunks along the valley (each sharing its edge
-## column with the next, so there are no seams), and collides as one shape.
+## column with the next, so there are no seams), and each chunk carries its
+## own collider.
 func _build_mesh_and_collision() -> void:
 	var materials := _terrain_materials()
 	var cuts: Array[int] = [0]
 	for entry in materials.slice(1):
 		cuts.append(clampi(int(round((float(entry[0]) - X_MIN) / SPACING)), 1, _nx - 2))
 	cuts.append(_nx - 1)
-	var faces := PackedVector3Array()
+	_chunks.clear()
 	for material_index in cuts.size() - 1:
 		var section_start := cuts[material_index]
 		var section_end := cuts[material_index + 1]
@@ -1100,14 +1109,131 @@ func _build_mesh_and_collision() -> void:
 		var chunk_start := section_start
 		while chunk_start < section_end:
 			var chunk_end := mini(chunk_start + step, section_end)
-			faces.append_array(_build_chunk(chunk_start, chunk_end, materials[material_index][1]))
+			_chunks.append({
+				"start": chunk_start,
+				"end": chunk_end,
+				"material": materials[material_index][1],
+			})
 			chunk_start = chunk_end
+	for chunk_index in _chunks.size():
+		_build_terrain_chunk(chunk_index)
+
+
+## Builds one chunk's mesh and its own collider. Each chunk carries its own
+## shape rather than the world sharing one, so a later change to the heights
+## costs the chunks it touches instead of re-cooking every triangle in the
+## valley (see carve_crater()).
+func _build_terrain_chunk(chunk_index: int) -> void:
+	var chunk: Dictionary = _chunks[chunk_index]
+	var faces := _build_chunk(int(chunk["start"]), int(chunk["end"]), chunk["material"])
+	chunk["mesh"] = get_node_or_null("TerrainChunk_%d" % int(chunk["start"]))
 	var shape := ConcavePolygonShape3D.new()
 	shape.set_faces(faces)
 	shape.backface_collision = true
 	var collider := CollisionShape3D.new()
+	collider.name = "TerrainChunkCollider_%d" % int(chunk["start"])
 	collider.shape = shape
 	add_child(collider)
+	chunk["collider"] = collider
+	_chunks[chunk_index] = chunk
+
+
+## Punches a bowl into the ground and rebuilds only what it reaches. The
+## heights are the ground, so every query that reads them -- standing,
+## walking, prop placement -- follows the new shape with nothing to tell.
+##
+## `depth` is how far the centre drops; the bowl eases back to the untouched
+## ground at `radius`, and a raised lip just outside it reads as thrown-up
+## spoil rather than a dent.
+func carve_crater(center: Vector2, radius: float, depth: float) -> void:
+	if radius <= SPACING or _heights.is_empty():
+		return
+	var lip := radius * CRATER_LIP_REACH
+	var min_ix := clampi(int(floor((center.x - lip - X_MIN) / SPACING)), 0, _nx - 1)
+	var max_ix := clampi(int(ceil((center.x + lip - X_MIN) / SPACING)), 0, _nx - 1)
+	var min_iz := clampi(int(floor((center.y - lip + Z_HALF) / SPACING)), 0, _nz - 1)
+	var max_iz := clampi(int(ceil((center.y + lip + Z_HALF) / SPACING)), 0, _nz - 1)
+	for iz in range(min_iz, max_iz + 1):
+		for ix in range(min_ix, max_ix + 1):
+			var here := Vector2(X_MIN + float(ix) * SPACING, -Z_HALF + float(iz) * SPACING)
+			var distance := here.distance_to(center)
+			if distance >= lip:
+				continue
+			if distance <= radius:
+				# The bowl: deepest at the point of impact, easing out.
+				var bowl: float = cos(distance / radius * PI * 0.5)
+				_heights[iz * _nx + ix] -= depth * bowl * bowl
+			else:
+				# The spoil thrown up around it, falling away to nothing.
+				var out: float = (distance - radius) / (lip - radius)
+				_heights[iz * _nx + ix] += depth * CRATER_LIP_HEIGHT * (1.0 - out) * sin(out * PI)
+	# A normal is taken from the ground around a vertex, so the ring of
+	# vertices just outside the crater is lit by it too.
+	var shade_min_ix := maxi(min_ix - 1, 0)
+	var shade_max_ix := mini(max_ix + 1, _nx - 1)
+	var shade_min_iz := maxi(min_iz - 1, 0)
+	var shade_max_iz := mini(max_iz + 1, _nz - 1)
+	for chunk_index in _chunks.size():
+		var chunk: Dictionary = _chunks[chunk_index]
+		if int(chunk["end"]) < shade_min_ix or int(chunk["start"]) > shade_max_ix:
+			continue
+		_revise_chunk(chunk_index, shade_min_ix, shade_max_ix, shade_min_iz, shade_max_iz)
+
+
+## Reworks the few vertices of one chunk that a carve moved, in place. A chunk
+## spans hundreds of metres of valley and rebuilding one outright costs about
+## 120 ms, nearly all of it in shading vertices the crater never touched; this
+## copies those through untouched and recomputes only the hole.
+func _revise_chunk(
+	chunk_index: int, min_ix: int, max_ix: int, min_iz: int, max_iz: int
+) -> void:
+	var chunk: Dictionary = _chunks[chunk_index]
+	var mesh_instance := chunk.get("mesh") as MeshInstance3D
+	var mesh := mesh_instance.mesh as ArrayMesh if mesh_instance != null else null
+	var ix0 := int(chunk["start"])
+	var ix1 := int(chunk["end"])
+	var columns := ix1 - ix0 + 1
+	if mesh != null and mesh.get_surface_count() > 0:
+		var arrays := mesh.surface_get_arrays(0)
+		var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var normals: PackedVector3Array = arrays[Mesh.ARRAY_NORMAL]
+		var colors: PackedColorArray = arrays[Mesh.ARRAY_COLOR]
+		for iz in range(maxi(min_iz, 0), mini(max_iz, _nz - 1) + 1):
+			for ix in range(maxi(min_ix, ix0), mini(max_ix, ix1) + 1):
+				var vertex := _grid_vertex(ix, iz)
+				var index := iz * columns + (ix - ix0)
+				vertices[index] = vertex
+				normals[index] = get_mesh_normal(vertex.x, vertex.z)
+				colors[index] = _height_color(vertex.x, vertex.z, vertex.y)
+		arrays[Mesh.ARRAY_VERTEX] = vertices
+		arrays[Mesh.ARRAY_NORMAL] = normals
+		arrays[Mesh.ARRAY_COLOR] = colors
+		var revised := ArrayMesh.new()
+		revised.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+		revised.surface_set_material(0, chunk["material"])
+		mesh_instance.mesh = revised
+	# The collider's triangles are laid out cell by cell in the same order the
+	# chunk was built in, so the handful the crater moved are rewritten where
+	# they sit rather than the chunk's fourteen thousand being remade.
+	var collider := chunk.get("collider") as CollisionShape3D
+	var shape := collider.shape as ConcavePolygonShape3D if collider != null else null
+	if shape == null:
+		return
+	var faces := shape.get_faces()
+	var cells := columns - 1
+	for iz in range(maxi(min_iz - 1, 0), mini(max_iz, _nz - 2) + 1):
+		for ix in range(maxi(min_ix - 1, ix0), mini(max_ix, ix1 - 1) + 1):
+			var a := _grid_vertex(ix, iz)
+			var b := _grid_vertex(ix + 1, iz)
+			var c := _grid_vertex(ix, iz + 1)
+			var d := _grid_vertex(ix + 1, iz + 1)
+			var face := (iz * cells + (ix - ix0)) * 6
+			for offset in 6:
+				faces[face + offset] = [a, b, c, b, d, c][offset]
+	var revised_shape := ConcavePolygonShape3D.new()
+	revised_shape.set_faces(faces)
+	revised_shape.backface_collision = true
+	collider.shape = revised_shape
 
 
 ## One render chunk over grid columns ix0..ix1 (inclusive). Returns its

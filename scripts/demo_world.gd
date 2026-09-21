@@ -51,6 +51,10 @@ const EAST_CAMERA_YAW := -PI * 0.5
 const WEST_BODY_YAW := -PI * 0.5
 const SPACE_PORTAL_Y := 750.0
 const SPACESHIP_Y := 900.0
+## The hole the escape pod leaves. Wide enough to read as a crater from the
+## clearing rather than a pothole, and deep enough to climb out of.
+const ESCAPE_POD_CRATER_RADIUS := 16.0
+const ESCAPE_POD_CRATER_DEPTH := 3.2
 const SPACE_TINT := Color(0.12, 0.045, 0.22)
 
 @onready var _player: Player = $Player
@@ -341,8 +345,16 @@ func _spawn_blorbus_in_spaceship() -> void:
 
 ## The pod's arrival. The ground deformation it should punch in waits on the
 ## terrain collider being split into chunks; for now it announces itself.
+## It arrives hard enough to leave the ground changed. The bowl is punched
+## into the terrain itself rather than dressed on top of it, so it is there
+## to walk down into afterwards and everything that reads the ground agrees
+## about where the ground now is.
 func _on_escape_pod_impact(at: Vector3) -> void:
 	UISounds.play_foley(&"giant_step", 1.0, get_instance_id())
+	if _terrain != null:
+		_terrain.carve_crater(
+			Vector2(at.x, at.z), ESCAPE_POD_CRATER_RADIUS, ESCAPE_POD_CRATER_DEPTH
+		)
 	print_verbose("Escape pod down at ", at)
 
 
