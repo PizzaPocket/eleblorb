@@ -203,20 +203,16 @@ const DIRTBIKE_SPEED_MULTIPLIER := 2.2
 ## MULTIPLIER while the wheelie (front wheel) is also active, not a
 ## replacement for it.
 const DIRTBIKE_WHEELIE_SPEED_MULTIPLIER := 1.35
-## Wheel dynamics. Powered travel accelerates toward its target instead of
-## reaching full speed on the first input frame. With the drive released,
-## gravity along the slope, rolling resistance and quadratic air drag are
-## integrated continuously by HumanoidLocomotion.coast_wheel_velocity().
-const DIRTBIKE_DRIVE_ACCELERATION := 22.0
-## Tire traction is intentionally balanced: ordinary steering carries speed,
-## while a perpendicular carve scrubs and a full reversal brakes decisively.
-const DIRTBIKE_LATERAL_GRIP := 36.0
-const DIRTBIKE_REVERSE_BRAKING := 30.0
-const DIRTBIKE_ROLLING_RESISTANCE := 0.16
-const DIRTBIKE_AIR_DRAG := 0.011
-const DIRTBIKE_ROLL_STOP_SPEED := 0.12
-const DIRTBIKE_TERMINAL_ROLL_SPEED := 34.0
-const DIRTBIKE_GRADE_RESPONSE := 7.0
+## Wheel dynamics, which belong to the bike rather than to whoever is riding
+## it: see DirtbikeMode, which owns them for every character.
+const DIRTBIKE_DRIVE_ACCELERATION := DirtbikeMode.DRIVE_ACCELERATION
+const DIRTBIKE_LATERAL_GRIP := DirtbikeMode.LATERAL_GRIP
+const DIRTBIKE_REVERSE_BRAKING := DirtbikeMode.REVERSE_BRAKING
+const DIRTBIKE_ROLLING_RESISTANCE := DirtbikeMode.ROLLING_RESISTANCE
+const DIRTBIKE_AIR_DRAG := DirtbikeMode.AIR_DRAG
+const DIRTBIKE_ROLL_STOP_SPEED := DirtbikeMode.ROLL_STOP_SPEED
+const DIRTBIKE_TERMINAL_ROLL_SPEED := DirtbikeMode.TERMINAL_ROLL_SPEED
+const DIRTBIKE_GRADE_RESPONSE := DirtbikeMode.GRADE_RESPONSE
 ## About 12% more vertical takeoff speed (sqrt(1.25)) without altering the
 ## horizontal component or the terrain-derived launch direction.
 const DIRTBIKE_JUMP_HEIGHT_MULTIPLIER := 1.25
@@ -1199,7 +1195,7 @@ var _dirtbike_was_climbing := false
 ## to terrain. This is measured delta-position/delta-time, not reconstructed
 ## from a sampled slope, and is preserved intact when support disappears.
 var _dirtbike_surface_velocity := Vector3.ZERO
-var _dirtbike_smoothed_grade := 0.0
+var _dirtbike := DirtbikeMode.new()
 ## Last slope for which both wheel contacts were physically plausible. When
 ## the front tire clears a crest, retaining this tangent prevents a terrain
 ## sample far below the airborne tire from pulling the bike's nose downward.
@@ -2316,11 +2312,9 @@ func _physics_process(delta: float) -> void:
 			velocity.x = move_toward(velocity.x, direction.x * current_speed, ICE_ACCELERATION * delta)
 			velocity.z = move_toward(velocity.z, direction.z * current_speed, ICE_ACCELERATION * delta)
 		elif _dirtbike_wheel_active and not neck_led_travel:
-			var driven_planar:=HumanoidLocomotion.drive_wheel_velocity(
+			var driven_planar:=_dirtbike.drive(
 				Vector2(velocity.x,velocity.z),Vector2(direction.x,direction.z),
-				current_speed,delta,DIRTBIKE_DRIVE_ACCELERATION,
-				DIRTBIKE_LATERAL_GRIP,DIRTBIKE_REVERSE_BRAKING,
-				DIRTBIKE_ROLL_STOP_SPEED
+				current_speed,delta
 			)
 			velocity.x=driven_planar.x
 			velocity.z=driven_planar.y
@@ -2360,15 +2354,8 @@ func _physics_process(delta: float) -> void:
 			pass
 		elif _dirtbike_wheel_active:
 			var rolling:=Vector2(velocity.x,velocity.z)
-			var sampled_grade:=_dirtbike_slope_along(rolling) if grounded else 0.0
-			_dirtbike_smoothed_grade=lerpf(
-				_dirtbike_smoothed_grade,sampled_grade,
-				minf(DIRTBIKE_GRADE_RESPONSE*delta,1.0)
-			)
-			rolling=HumanoidLocomotion.coast_wheel_velocity(
-				rolling,_dirtbike_smoothed_grade if grounded else 0.0,delta,
-				DIRTBIKE_ROLLING_RESISTANCE if grounded else 0.0,DIRTBIKE_AIR_DRAG,
-				DIRTBIKE_ROLL_STOP_SPEED,DIRTBIKE_TERMINAL_ROLL_SPEED
+			rolling=_dirtbike.coast(
+				rolling,_dirtbike_slope_along(rolling) if grounded else 0.0,delta,grounded
 			)
 			velocity.x=rolling.x
 			velocity.z=rolling.y

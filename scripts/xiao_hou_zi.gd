@@ -180,6 +180,7 @@ var _swim := SwimMode.new()
 var _penguin := PenguinMode.new()
 var _flight := FlightMode.new()
 var _lava := LavaMode.new()
+var _dirtbike := DirtbikeMode.new()
 ## His snowboard: the same power the player rides, on his own rig and at his
 ## own scale. Toggled by the leg-power chord, as the player's is.
 var _direct_snowboard_active: bool = false
@@ -270,7 +271,6 @@ var _direct_dirtbike_chord_was_pressed: bool = false
 var _direct_dirtbike_was_climbing: bool = false
 var _direct_dirtbike_airborne: bool = false
 var _direct_dirtbike_surface_velocity := Vector3.ZERO
-var _direct_dirtbike_smoothed_grade := 0.0
 var _direct_dirtbike_supported_pitch := 0.0
 var _direct_dirtbike_airborne_pitch := 0.0
 var _direct_dirtbike_pitch_was_grounded := false
@@ -982,21 +982,11 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		if dirtbike_ballistic:
 			pass
 		elif planar.length_squared()>0.0001:
-			rolling=HumanoidLocomotion.drive_wheel_velocity(
-				rolling,planar,speed,delta,Player.DIRTBIKE_DRIVE_ACCELERATION,
-				Player.DIRTBIKE_LATERAL_GRIP,Player.DIRTBIKE_REVERSE_BRAKING,
-				Player.DIRTBIKE_ROLL_STOP_SPEED
-			)
+			rolling=_dirtbike.drive(rolling,planar,speed,delta)
 		else:
-			var grade:=_direct_dirtbike_slope() if is_on_floor() and not _direct_dirtbike_airborne else 0.0
-			_direct_dirtbike_smoothed_grade=lerpf(
-				_direct_dirtbike_smoothed_grade,grade,
-				minf(Player.DIRTBIKE_GRADE_RESPONSE*delta,1.0)
-			)
-			rolling=HumanoidLocomotion.coast_wheel_velocity(
-				rolling,_direct_dirtbike_smoothed_grade,delta,
-				Player.DIRTBIKE_ROLLING_RESISTANCE,Player.DIRTBIKE_AIR_DRAG,
-				Player.DIRTBIKE_ROLL_STOP_SPEED,Player.DIRTBIKE_TERMINAL_ROLL_SPEED
+			var wheels_down: bool = is_on_floor() and not _direct_dirtbike_airborne
+			rolling=_dirtbike.coast(
+				rolling,_direct_dirtbike_slope() if wheels_down else 0.0,delta,wheels_down
 			)
 		velocity.x=rolling.x
 		velocity.z=rolling.y
