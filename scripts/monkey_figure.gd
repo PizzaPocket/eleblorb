@@ -501,6 +501,11 @@ static func build(
 		"toe_right": leg_right["toe"],
 		"sole_left": leg_left["sole_marker"],
 		"sole_right": leg_right["sole_marker"],
+		# How this rig's own lower leg is actually shaped, for anything that
+		# has to wrap it. The blorb suit used to reach into this file by name
+		# for exactly these numbers, which meant only this one rig ever got a
+		# shell that followed its foot -- see suit_leg_profile().
+		"suit_leg_profile": suit_leg_profile,
 		"hand_left": arm_left["wrist"],
 		"hand_right": arm_right["wrist"],
 		"palm_left": arm_left["end"],
@@ -602,6 +607,48 @@ static func _build_leg(
 		"pivot": hip_pivot, "joint": knee_pivot, "end": ankle_marker,
 		"toe": toe_marker, "sole_marker": sole_marker,
 		"mesh": mesh_instance, "sole": sole,
+	}
+
+
+## The stations this rig's own lower leg passes through, in `root`'s local
+## space, with the radius of the bare limb at each: knee, then the curve
+## forward and down into the soft foot, ending under the toes.
+##
+## Published so anything wrapping this leg follows the leg it is actually
+## wrapping. A shell built from another figure's foot dimensions and scaled
+## down gives a compact pipe-leg a human foot's relative thickness, which is
+## where the stray bulbs under his feet came from.
+static func suit_leg_profile(root: Node3D, knee: Node3D, ankle: Node3D) -> Dictionary:
+	var ankle_pos := root.to_local(ankle.global_position)
+	var root_basis_inverse := root.global_transform.basis.inverse()
+	var lower_up := (root_basis_inverse * (ankle.global_transform.basis * Vector3.UP)).normalized()
+	var lower_forward := (
+		root_basis_inverse * (ankle.global_transform.basis * Vector3(0, 0, 1))
+	).normalized()
+	var scale_factor := REFERENCE_BUILD_SCALE
+	var transition := (
+		ankle_pos + lower_up * 0.018 * scale_factor
+		+ lower_forward * FOOT_BULB_FORWARD * 0.3 * scale_factor
+	)
+	var bulb := (
+		ankle_pos
+		+ lower_up * (FOOT_BULB_CENTER_Y - ANKLE_GROUND_CLEARANCE) * scale_factor
+		+ lower_forward * FOOT_BULB_FORWARD * scale_factor
+	)
+	var sole_end := (
+		ankle_pos - lower_up * ANKLE_GROUND_CLEARANCE * scale_factor
+		+ lower_forward * FOOT_BULB_FORWARD * scale_factor
+	)
+	return {
+		"knee_radius": LEG_RADIUS_KNEE * scale_factor,
+		"hip_radius": LEG_RADIUS_HIP * scale_factor,
+		"stations": [transition, bulb, sole_end],
+		"radii": [
+			lerpf(LEG_RADIUS_KNEE, FOOT_BULB_RADIUS, 0.45) * scale_factor,
+			FOOT_BULB_RADIUS * scale_factor,
+			FOOT_BOTTOM_RADIUS * scale_factor,
+		],
+		"tip_direction": lower_forward,
 	}
 
 

@@ -102,11 +102,10 @@ static func xiao_hou_zi() -> PlayableCharacterProfile:
 		"arm_wrist": 1.65,
 		"arm_tip": 1.55,
 		"round_arm_tip": true,
-		"monkey_foot_curve": true,
-		"leg_hip": 1.40,
-		"leg_knee": 1.70,
-		"leg_ankle": 1.65,
-		"leg_toe": 1.55,
+		# His own rig says how his lower leg is shaped; the suit follows it
+		# rather than wrapping a scaled-down human boot around a pipe leg.
+		"leg_profile": MonkeyFigure.suit_leg_profile,
+		"leg_profile_inflate": 1.14,
 		"leg_hip_overlap": 0.010 * MonkeyFigure.REFERENCE_BUILD_SCALE,
 	}
 	profile.switch_order = 20

@@ -968,31 +968,30 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 	# see the shape/eye/core placement on its own simpler baseline first.
 	var points: Array[Vector3] = [hip_pos, knee_pos, shin_pos, ankle_pos, toe_pos]
 	var radii: Array[float] = [r_hip, r_knee, r_shin, r_ankle, r_toe]
-	var monkey_foot_curve := bool(limb_fit.get("monkey_foot_curve", false)) and not penguin
+	# A rig that knows how its own lower leg is shaped hands over the stations
+	# and radii to follow. This file used to reach into MonkeyFigure by name
+	# for exactly those numbers, which meant one rig got a shell that followed
+	# its foot and every other rig got a human boot scaled down.
+	var profile_source: Variant = limb_fit.get("leg_profile")
+	var leg_profile: Dictionary = {}
+	if profile_source is Callable and not penguin:
+		leg_profile = (profile_source as Callable).call(root, knee, ankle)
+	var monkey_foot_curve := not leg_profile.is_empty()
 	if monkey_foot_curve:
-		# The compatibility toe and ankle are the same node, while the monkey's
-		# visible lower leg actually curves forward into a soft foot. Recreate
-		# that knee-relative arc for its suit shell, at the rig's display scale.
-		var knee_basis := knee.global_transform.basis
-		var lower_up := _to_local_dir(root, knee_basis * Vector3.UP)
-		var lower_forward := _to_local_dir(root, knee_basis * Vector3(0, 0, 1))
-		var display_scale := MonkeyFigure.REFERENCE_BUILD_SCALE
-		# Match the authored monkey limb itself instead of re-scaling the human
-		# boot radii. This removes the isolated ankle/toe bulb that appeared when
-		# a compact pipe-leg inherited a human foot's relative thickness.
-		r_hip = MonkeyFigure.LEG_RADIUS_HIP * display_scale * 1.14
-		r_knee = MonkeyFigure.LEG_RADIUS_KNEE * display_scale * 1.14
-		r_ankle = MonkeyFigure.FOOT_BULB_RADIUS * display_scale * 1.14
-		r_toe = MonkeyFigure.FOOT_BOTTOM_RADIUS * display_scale * 1.14
-		var transition := ankle_pos + lower_up * 0.018 * display_scale + lower_forward * MonkeyFigure.FOOT_BULB_FORWARD * 0.3 * display_scale
-		var bulb := ankle_pos + lower_up * (MonkeyFigure.FOOT_BULB_CENTER_Y - MonkeyFigure.ANKLE_GROUND_CLEARANCE) * display_scale + lower_forward * MonkeyFigure.FOOT_BULB_FORWARD * display_scale
-		var sole_end := ankle_pos - lower_up * MonkeyFigure.ANKLE_GROUND_CLEARANCE * display_scale + lower_forward * MonkeyFigure.FOOT_BULB_FORWARD * display_scale
-		points = [hip_pos, knee_pos, transition, bulb, sole_end]
-		radii = [r_hip, r_knee, lerpf(r_knee, r_ankle, 0.45), r_ankle, r_toe]
-		_append_round_cap(points, radii, sole_end, lower_forward, r_toe)
-		# Bury a rounded upper closure inside the pear torso. It follows the live
-		# hip-to-knee axis, so the extra coverage scales and animates with the rig
-		# rather than being a character-specific world-space offset.
+		var fit := float(limb_fit.get("leg_profile_inflate", 1.14))
+		r_hip = float(leg_profile["hip_radius"]) * fit
+		r_knee = float(leg_profile["knee_radius"]) * fit
+		var stations: Array = leg_profile["stations"]
+		var station_radii: Array = leg_profile["radii"]
+		points = [hip_pos, knee_pos]
+		radii = [r_hip, r_knee]
+		for index in stations.size():
+			points.append(stations[index] as Vector3)
+			radii.append(float(station_radii[index]) * fit)
+		r_ankle = radii[radii.size() - 2]
+		r_toe = radii[radii.size() - 1]
+		var tip: Vector3 = points[points.size() - 1]
+		_append_round_cap(points, radii, tip, leg_profile["tip_direction"] as Vector3, r_toe)
 		var hip_overlap := float(limb_fit.get("leg_hip_overlap", 0.0))
 		if hip_overlap > 0.0:
 			var hip_outward := -(knee_pos - hip_pos).normalized()
