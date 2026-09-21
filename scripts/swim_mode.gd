@@ -76,7 +76,9 @@ func attitude_pitch(diving: bool) -> float:
 ## The relaxed float, with the kick laid over it in proportion to how much
 ## the swimmer is actually going somewhere. A rig missing a joint skips that
 ## part rather than writing somewhere nothing moves.
-func pose_swim(ctx: TraversalContext, reference_speed: float) -> void:
+## `lead_head` is false for a body whose head-look is owned elsewhere, so
+## this never fights it for the same joint.
+func pose_swim(ctx: TraversalContext, reference_speed: float, lead_head: bool = true) -> void:
 	var rig := ctx.rig
 	if rig == null:
 		return
@@ -112,7 +114,8 @@ func pose_swim(ctx: TraversalContext, reference_speed: float) -> void:
 		var elbow := rig.joint("arm_left_elbow" if side == 0 else "arm_right_elbow")
 		if elbow != null:
 			elbow.rotation.x = lerp_angle(elbow.rotation.x, -elbow_bend, t)
-	_lead_with_the_head(rig, t)
+	if lead_head:
+		_lead_with_the_head(rig, t)
 
 
 ## Under way the head lifts to look along the travel, the way a swimmer

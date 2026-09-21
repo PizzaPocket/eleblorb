@@ -1232,6 +1232,7 @@ var _rig: RigAdapter = null
 var _traversal := TraversalDirector.new()
 var _ice_skates := IceSkateMode.new()
 var _crystal := CrystalSkateMode.new()
+var _swim := SwimMode.new()
 ## Matched Ice legs automatically extend these runners. They remain visible
 ## off ice while their traversal physics only engage on the frozen lake.
 var _ice_skates_active := false
@@ -6618,37 +6619,14 @@ func _animate_swimming(delta: float) -> void:
 		return
 	_animate_relaxed_floating(delta)
 	_release_mermaid_legs(t)
-	# Override the descent pose's mild toe-point with the persistent relaxed
-	# flipper angle requested for all water states, including motionless
-	# surface floating and idle diving.
-	_ankle_left.rotation.x = lerp_angle(_ankle_left.rotation.x, SWIM_FLOAT_ANKLE_EXTEND, t)
-	_ankle_right.rotation.x = lerp_angle(_ankle_right.rotation.x, SWIM_FLOAT_ANKLE_EXTEND, t)
-	var swim_speed := velocity.length()
-	if swim_speed <= 0.1:
-		return
-	var speed_fraction := clampf(swim_speed / maxf(move_speed, LAKE_DIVE_SPEED), 0.0, 1.0)
-	# Fast swimming accelerates the kick substantially rather than merely
-	# increasing its amplitude.
-	_swim_kick_phase += delta * SWIM_KICK_SPEED * lerpf(0.6, 1.8, speed_fraction)
-	var left_wave := sin(_swim_kick_phase)
-	var right_wave := -left_wave
-	# Positive ankle rotation is this rig's established toe/foot extension
-	# toward the calf. Keep a small continuous extension, then pulse it with
-	# each leg's propulsive downbeat.
-	_leg_left.rotation.x = lerp_angle(_leg_left.rotation.x, -DESCENT_HIP_BEND + left_wave * SWIM_KICK_HIP_AMOUNT, t)
-	_leg_right.rotation.x = lerp_angle(_leg_right.rotation.x, -DESCENT_HIP_BEND + right_wave * SWIM_KICK_HIP_AMOUNT, t)
-	_knee_left.rotation.x = lerp_angle(_knee_left.rotation.x, DESCENT_KNEE_BEND + maxf(0.0, -left_wave) * SWIM_KICK_KNEE_AMOUNT, t)
-	_knee_right.rotation.x = lerp_angle(_knee_right.rotation.x, DESCENT_KNEE_BEND + maxf(0.0, -right_wave) * SWIM_KICK_KNEE_AMOUNT, t)
-	_ankle_left.rotation.x = lerp_angle(_ankle_left.rotation.x, SWIM_FLOAT_ANKLE_EXTEND + maxf(0.0, left_wave) * SWIM_KICK_ANKLE_AMOUNT, t)
-	_ankle_right.rotation.x = lerp_angle(_ankle_right.rotation.x, SWIM_FLOAT_ANKLE_EXTEND + maxf(0.0, right_wave) * SWIM_KICK_ANKLE_AMOUNT, t)
-	# Positive shoulder X swings a hanging arm backward (-Z) in this rig.
-	# Scale the streamlined posture with speed so a slow float stays relaxed.
-	var arm_back := SWIM_FAST_ARM_BACK_SWING * speed_fraction
-	var elbow_bend := SWIM_FAST_ELBOW_BEND * speed_fraction
-	_arm_left.rotation.x = lerp_angle(_arm_left.rotation.x, arm_back, t)
-	_arm_right.rotation.x = lerp_angle(_arm_right.rotation.x, arm_back, t)
-	_elbow_left.rotation.x = lerp_angle(_elbow_left.rotation.x, -elbow_bend, t)
-	_elbow_right.rotation.x = lerp_angle(_elbow_right.rotation.x, -elbow_bend, t)
+	# The kick, the streamlined arms and the rest float are SwimMode's, shared
+	# with every other character that swims. It gates the kick on actually
+	# being under way, which is what stops a swimmer paddling on the spot.
+	# The head is left alone here: _update_head_look() owns it for this body.
+	var ctx := _traversal_context(delta)
+	var reference: float = maxf(move_speed, LAKE_DIVE_SPEED)
+	_swim.update_motion(ctx, reference)
+	_swim.pose_swim(ctx, reference, false)
 
 
 ## Swimming with the mermaid tail: legs held together inside it, ankles
