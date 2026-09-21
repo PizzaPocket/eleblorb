@@ -179,6 +179,7 @@ var _crystal := CrystalSkateMode.new()
 var _swim := SwimMode.new()
 var _penguin := PenguinMode.new()
 var _flight := FlightMode.new()
+var _lava := LavaMode.new()
 ## His snowboard: the same power the player rides, on his own rig and at his
 ## own scale. Toggled by the leg-power chord, as the player's is.
 var _direct_snowboard_active: bool = false
@@ -734,16 +735,26 @@ func prepare_direct_control_environment(delta: float) -> void:
 	_update_direct_penguin_state()
 	_update_direct_ice_skate_state()
 	_update_direct_powered_movement(delta)
+	# Turned back at the pool's edge by the same rule the player answers to.
+	# His origin sits at his feet, so his underside is simply where he is.
+	_lava.enforce_access(_traversal_context(delta), global_position.y, 0.0)
 	var xz := Vector2(global_position.x, global_position.z)
 	_direct_floor_height = terrain.get_mesh_height(xz.x, xz.y)
 	var in_lava: bool = terrain.has_method("is_lava_area") and bool(terrain.is_lava_area(xz))
 	var in_water: bool = terrain.has_method("is_lake_area") and bool(terrain.is_lake_area(xz))
 	if in_lava:
 		_direct_liquid_level = terrain.get_lava_surface_height(xz)
-		if _blorb_suit.has_full_lava_suit() and global_position.y <= _direct_liquid_level:
-			_direct_diving = true
-		elif _blorb_suit.has_lava_safe_legs() and global_position.y <= _direct_liquid_level + 0.15:
-			_direct_lava_surface = true
+		match LavaMode.contact(_blorb_suit):
+			LavaMode.Contact.IMMERSED:
+				if global_position.y <= _direct_liquid_level:
+					_direct_diving = true
+			LavaMode.Contact.SURFACE:
+				# A real jump off the surface is preserved; the molten plane
+				# catches him again on the way down, at the same band the
+				# player is caught at.
+				var rising: bool = velocity.y > 0.0 and global_position.y > _direct_liquid_level
+				if not rising and global_position.y <= _direct_liquid_level + LavaMode.CONTACT_TOLERANCE:
+					_direct_lava_surface = true
 	elif in_water:
 		_direct_liquid_level = terrain.get_lake_water_level()
 		var depth := _direct_liquid_level - _direct_floor_height

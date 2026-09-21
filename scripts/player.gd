@@ -638,8 +638,7 @@ const AERIAL_HEAD_PITCH_LIMIT := deg_to_rad(85.0)
 const AERIAL_HEAD_TURN_SPEED := 6.0
 
 const CAMERA_GROUND_MARGIN := 0.4
-const LAVA_CONTACT_TOLERANCE := 0.45
-const LAVA_WARNING_COOLDOWN := 1.25
+const LAVA_CONTACT_TOLERANCE := LavaMode.CONTACT_TOLERANCE
 const WATER_STREAM_SPEED := 15.0
 const WATER_STREAM_LIFETIME := 0.42
 
@@ -1234,6 +1233,7 @@ var _ice_skates := IceSkateMode.new()
 var _crystal := CrystalSkateMode.new()
 var _swim := SwimMode.new()
 var _penguin := PenguinMode.new()
+var _lava := LavaMode.new()
 ## Matched Ice legs automatically extend these runners. They remain visible
 ## off ice while their traversal physics only engage on the frozen lake.
 var _ice_skates_active := false
@@ -1321,7 +1321,6 @@ var _giant_anchor_yaw: float = 0.0
 var _blorb_super_jump_grace: float = 0.0
 var _blorb_super_jump_boost_time: float = 0.0
 var _blorb_super_jump_boost_impulse: float = 0.0
-var _lava_warning_cooldown: float = 0.0
 ## Own RandomNumberGenerator instance for combat_math.gd's rolled_attack()
 ## rolls (rock/plant arm powers) -- this project's established convention
 ## (see blorb.gd's own _rng) over the global randf()/randi(), so a roll
@@ -1908,7 +1907,6 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	_space_thruster_sound_cooldown = maxf(_space_thruster_sound_cooldown - delta, 0.0)
 	_clear_space_thrusters()
-	_lava_warning_cooldown = maxf(_lava_warning_cooldown - delta, 0.0)
 	_apply_gamepad_look(delta)
 	_update_throw_input()
 	if Input.is_action_just_pressed("platform_aid") and not UIState.modal_open:
@@ -2441,7 +2439,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	_resolve_ice_surface_contact(pre_move_feet_y)
 	_update_ice_skate_airtime(delta,pre_move_position)
-	_enforce_lava_access()
+	_enforce_lava_access(delta)
 	# Clouds are intentionally one-way: only a descending body that started
 	# above a puff top is caught. Rising flight/jumps pass straight through
 	# the underside, then a fall settles 10cm into the cloud.
@@ -2679,31 +2677,14 @@ func _resolve_ice_surface_contact(previous_feet_y: float) -> void:
 ## legs. A high jump/flight may pass over it; contact without the complete
 ## pair returns the player to the nearest solid edge. The same rule catches
 ## removing either leg while already standing out in the pool.
-func _enforce_lava_access() -> void:
-	if (
-		terrain == null
-		or not terrain.has_method("is_lava_area")
-		or not terrain.has_method("get_lava_surface_height")
-		or not terrain.has_method("get_lava_escape_position")
-	):
-		return
-	var xz := Vector2(global_position.x, global_position.z)
-	if not terrain.is_lava_area(xz) or _blorb_suit.has_lava_safe_legs() or _blorb_suit.has_full_lava_suit():
-		return
-	var lava_surface: float = terrain.get_lava_surface_height(xz)
-	# The body's underside, not the origin: a level flier's origin hangs up to
-	# ~1.1 m below the visible body (see _body_bottom_height).
-	if global_position.y - FOOT_OFFSET + _body_bottom_height > lava_surface + LAVA_CONTACT_TOLERANCE:
-		return
-	var safe_position: Vector3 = terrain.get_lava_escape_position(xz)
-	global_position = safe_position + Vector3.UP * FOOT_OFFSET
-	velocity = Vector3.ZERO
-	_jumping = false
-	if _lava_warning_cooldown <= 0.0:
-		# Plain reaction, not an explanation of the requirement -- see
-		# CLAUDE.md's "In-game text and player guidance" rule.
-		Hud.show_message("The heat drives you back.")
-		_lava_warning_cooldown = LAVA_WARNING_COOLDOWN
+func _enforce_lava_access(delta: float) -> void:
+	# The rule itself lives in LavaMode, so every character is turned back at
+	# the same edge. The body's underside is passed rather than the origin: a
+	# level flier's origin hangs up to ~1.1 m below the visible body (see
+	# _body_bottom_height).
+	var ctx := _traversal_context(delta)
+	if _lava.enforce_access(ctx, global_position.y - FOOT_OFFSET + _body_bottom_height, FOOT_OFFSET):
+		_jumping = false
 
 
 ## Predicts whether this frame's motion will cross a blorb's rendered crown.
