@@ -178,6 +178,7 @@ var _snowboard_mode := SnowboardMode.new()
 var _crystal := CrystalSkateMode.new()
 var _swim := SwimMode.new()
 var _penguin := PenguinMode.new()
+var _flight := FlightMode.new()
 ## His snowboard: the same power the player rides, on his own rig and at his
 ## own scale. Toggled by the leg-power chord, as the player's is.
 var _direct_snowboard_active: bool = false
@@ -1287,8 +1288,9 @@ func _animate_direct_penguin(delta: float) -> void:
 	if rig == null:
 		return
 	var attitude := _penguin.attitude()
-	rig.rotation.x = lerp_angle(rig.rotation.x, float(attitude["tip"]), minf(8.0 * delta, 1.0))
 	rig.rotation.z = lerp_angle(rig.rotation.z, float(attitude["roll"]), minf(8.0 * delta, 1.0))
+	# The tip itself is applied by _apply_direct_swim_attitude(), which is now
+	# the one place his body's pitch is written.
 
 
 func _animate_direct_swim(delta: float, movement_speed: float) -> void:
@@ -1330,7 +1332,10 @@ func _animate_direct_airborne(delta: float) -> void:
 
 func _animate_direct_flight(delta: float, direction: Vector3) -> void:
 	var settle := Player.JUMP_POSE_SETTLE_SPEED * delta
-	var pitch := clampf(-direction.y, -0.8, 0.8)
+	# His body lies along its travel through the shared attitude (see
+	# _rig_pitch_target()); the spine keeps only a small extra bend so a climb
+	# or dive still reads in the silhouette.
+	var pitch := clampf(-direction.y, -0.8, 0.8) * 0.35
 	(_pivots["spine"] as Node3D).rotation.x = lerp_angle((_pivots["spine"] as Node3D).rotation.x, pitch, settle)
 	(_pivots["leg_left"] as Node3D).rotation.x = lerp_angle((_pivots["leg_left"] as Node3D).rotation.x, 0.0, settle)
 	(_pivots["leg_right"] as Node3D).rotation.x = lerp_angle((_pivots["leg_right"] as Node3D).rotation.x, 0.0, settle)
@@ -1726,26 +1731,39 @@ const SURFACE_SWIM_BODY_PITCH := deg_to_rad(52.0)
 const SWIM_BODY_PITCH_SPEED := 4.5
 
 
+## Which power owns how far his body lies over this frame, and by how much.
+##
+## Several used to ease this same value toward different targets at once --
+## the penguin tipping flat while the dirt bike straightened, the swim
+## lying down while the dirt bike straightened -- and the result was a body
+## stuck at whatever angle the tug of war settled on: 34 degrees instead of
+## 90, 21 instead of 52. Resolving one owner per frame, in priority order,
+## is the fix for the whole class rather than another guard per pair.
+func _rig_pitch_target(delta: float) -> float:
+	if _penguin.diving or _penguin.sliding:
+		return float(_penguin.attitude()["tip"])
+	if _direct_flying or _direct_fire_limb_flight:
+		var flight_ctx := _traversal_context(delta)
+		_flight.update_motion(flight_ctx)
+		return _flight.attitude_pitch(velocity)
+	if _direct_diving or _direct_surface_swimming:
+		return _swim.attitude_pitch(_direct_diving)
+	if _direct_dirtbike_active:
+		# The wheelie owns its own pitch entirely.
+		return NAN
+	return 0.0
+
+
 func _apply_direct_swim_attitude(delta: float) -> void:
 	var rig: Node3D = _pivots.get("_rig") as Node3D
 	var spine: Node3D = _pivots.get("spine") as Node3D
 	if rig == null or spine == null or _mounted:
 		return
-	if _penguin.diving or _penguin.sliding:
-		# The penguin owns the rig's pitch while it dives or slides; two
-		# systems easing the same value toward different targets is what left
-		# his swim stuck partway over.
+	var target := _rig_pitch_target(delta)
+	if is_nan(target):
+		# Something else owns the pitch outright this frame.
 		return
-	var swimming := _direct_diving or _direct_surface_swimming
-	var target := 0.0
-	if swimming:
-		# How far over he lies is the shared mode's call, and it depends on
-		# whether he is actually going anywhere: at rest he hangs upright.
-		target = _swim.attitude_pitch(_direct_diving)
-	elif _direct_dirtbike_active or _direct_flying:
-		# Those poses own the rig's pitch themselves.
-		return
-	else:
+	if target == 0.0 and not (_direct_diving or _direct_surface_swimming):
 		_swim.reset()
 	if absf(rig.rotation.x - target) < 0.0005:
 		return
@@ -1755,21 +1773,17 @@ func _apply_direct_swim_attitude(delta: float) -> void:
 
 
 func _apply_direct_dirtbike_pose(delta: float) -> void:
+	if not _direct_dirtbike_active or _direct_flying:
+		# The rig's own pitch is not this function's to settle. It used to
+		# straighten the body here whenever the bike was not in use, which
+		# meant every other attitude -- the swimmer lying down, the flier
+		# lying along its travel -- was fighting a second system easing the
+		# same value, and the two met well short of the intended angle.
+		# _apply_direct_swim_attitude() now resolves one owner per frame and
+		# eases back upright itself when nothing owns it.
+		return
 	var rig: Node3D = _pivots.get("_rig") as Node3D
 	var spine: Node3D = _pivots["spine"] as Node3D
-	if not _direct_dirtbike_active or _direct_flying:
-		# Only straighten the rig when nothing else owns its pitch. Swimming
-		# lies the body down (see _apply_direct_swim_attitude(), which runs
-		# right after this), and this settle used to pull against it every
-		# frame: the two met at an equilibrium well short of level instead of
-		# the swimmer lying flat.
-		var swimming := _direct_diving or _direct_surface_swimming
-		var penguin := _penguin.diving or _penguin.sliding
-		if rig != null and spine != null and not swimming and not penguin and absf(rig.rotation.x) > 0.001:
-			var upright_anchor: Vector3 = spine.global_position
-			rig.rotation.x = lerp_angle(rig.rotation.x,0.0,minf(Player.DIRTBIKE_WHEELIE_SETTLE_SPEED*delta,1.0))
-			rig.global_position += upright_anchor-spine.global_position
-		return
 	var settle: float = minf(Player.DIRTBIKE_POSE_SETTLE_SPEED*delta,1.0)
 	for side in ["left","right"]:
 		var leg: Node3D = _pivots["leg_%s" % side]
