@@ -179,6 +179,7 @@ var _crystal := CrystalSkateMode.new()
 var _swim := SwimMode.new()
 var _penguin := PenguinMode.new()
 var _flight := FlightMode.new()
+var _powers := SuitPowers.new()
 var _lava := LavaMode.new()
 var _dirtbike := DirtbikeMode.new()
 ## His snowboard: the same power the player rides, on his own rig and at his
@@ -236,25 +237,9 @@ var _direct_diving: bool = false
 var _direct_flying: bool = false
 var _direct_air_feet: bool = false
 var _direct_lava_surface: bool = false
-var _direct_water_leg_hover: bool = false
-var _direct_fire_hand_hover: bool = false
-var _direct_fire_leg_hover: bool = false
-var _direct_fire_limb_flight: bool = false
 var _direct_hover_height: float = 0.0
-var _direct_left_arm_water: bool = false
-var _direct_right_arm_water: bool = false
-var _direct_left_arm_fire: bool = false
-var _direct_right_arm_fire: bool = false
-var _direct_left_arm_electric: bool = false
-var _direct_right_arm_electric: bool = false
-var _direct_left_arm_city: bool = false
-var _direct_right_arm_city: bool = false
 var _direct_left_arm_plant_cooldown: float = 0.0
 var _direct_right_arm_plant_cooldown: float = 0.0
-var _direct_left_leg_water: bool = false
-var _direct_right_leg_water: bool = false
-var _direct_left_leg_fire: bool = false
-var _direct_right_leg_fire: bool = false
 var _direct_water_arm_fx: Array[GPUParticles3D] = []
 var _direct_fire_arm_fx: Array[GPUParticles3D] = []
 var _direct_water_leg_fx: Array[GPUParticles3D] = []
@@ -769,7 +754,7 @@ func prepare_direct_control_environment(delta: float) -> void:
 
 
 func uses_pitched_movement_input() -> bool:
-	return _direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight
+	return _direct_diving or _direct_flying or _direct_air_feet or _powers.fire_limb_flight
 
 
 func _clear_direct_environment() -> void:
@@ -782,31 +767,13 @@ func _clear_direct_environment() -> void:
 
 
 func _update_direct_powered_movement(delta: float) -> void:
-	var was_hovering: bool = _direct_powered_hover_active()
-	_direct_left_arm_water = _consume_direct_power("arm_left", "left_arm_power", "water", Player.WATER_POWER_MP_PER_SECOND, delta)
-	_direct_right_arm_water = _consume_direct_power("arm_right", "right_arm_power", "water", Player.WATER_POWER_MP_PER_SECOND, delta)
-	_direct_left_arm_fire = _consume_direct_power("arm_left", "left_arm_power", "fire", Player.FIRE_POWER_MP_PER_SECOND, delta)
-	_direct_right_arm_fire = _consume_direct_power("arm_right", "right_arm_power", "fire", Player.FIRE_POWER_MP_PER_SECOND, delta)
-	_direct_left_arm_electric = _consume_direct_power("arm_left", "left_arm_power", "electric", Player.ELECTRIC_POWER_MP_PER_SECOND, delta)
-	_direct_right_arm_electric = _consume_direct_power("arm_right", "right_arm_power", "electric", Player.ELECTRIC_POWER_MP_PER_SECOND, delta)
-	_direct_left_arm_city = _consume_direct_power("arm_left", "left_arm_power", "city", Player.CITY_POWER_MP_PER_SECOND, delta)
-	_direct_right_arm_city = _consume_direct_power("arm_right", "right_arm_power", "city", Player.CITY_POWER_MP_PER_SECOND, delta)
-	_direct_left_leg_water = _consume_direct_power("leg_left", "left_leg_power", "water", Player.WATER_POWER_MP_PER_SECOND, delta)
-	_direct_right_leg_water = _consume_direct_power("leg_right", "right_leg_power", "water", Player.WATER_POWER_MP_PER_SECOND, delta)
-	_direct_left_leg_fire = _consume_direct_power("leg_left", "left_leg_power", "fire", Player.FIRE_POWER_MP_PER_SECOND, delta)
-	_direct_right_leg_fire = _consume_direct_power("leg_right", "right_leg_power", "fire", Player.FIRE_POWER_MP_PER_SECOND, delta)
-	_direct_water_leg_hover = _direct_left_leg_water and _direct_right_leg_water
-	_direct_fire_hand_hover = _direct_left_arm_fire and _direct_right_arm_fire
-	_direct_fire_leg_hover = _direct_left_leg_fire and _direct_right_leg_fire
-	_direct_fire_limb_flight = _direct_fire_hand_hover and _direct_fire_leg_hover
-	if _direct_left_arm_water or _direct_right_arm_water or _direct_left_leg_water or _direct_right_leg_water:
-		UISounds.pulse_power_loop(&"water", get_instance_id())
-	if _direct_left_arm_fire or _direct_right_arm_fire or _direct_left_leg_fire or _direct_right_leg_fire:
-		UISounds.pulse_power_loop(&"fire", get_instance_id())
-	if _direct_left_arm_electric or _direct_right_arm_electric or _direct_left_arm_city or _direct_right_arm_city:
-		UISounds.pulse_power_loop(&"electric", get_instance_id())
+	var was_hovering: bool = _powers.powered_hover_active()
+	_powers.update(
+		_blorb_suit, delta, _direct_diving or _direct_surface_swimming,
+		false, false, get_instance_id()
+	)
 	_update_direct_plant_powers(delta)
-	if _direct_powered_hover_active() and not was_hovering:
+	if _powers.powered_hover_active() and not was_hovering:
 		_direct_hover_height = global_position.y
 
 
@@ -836,17 +803,6 @@ func _update_direct_plant_powers(delta: float) -> void:
 			_direct_left_arm_plant_cooldown = Player.PLANT_PELLET_COOLDOWN
 		else:
 			_direct_right_arm_plant_cooldown = Player.PLANT_PELLET_COOLDOWN
-func _consume_direct_power(slot: String, action: String, element: String, rate: float, delta: float) -> bool:
-	if UIState.modal_open or not Input.is_action_pressed(action):
-		return false
-	var blorb := _blorb_suit.worn_blorb_in_slot(slot)
-	return blorb != null and blorb.element_state == element and blorb.consume_mp(rate * delta)
-
-
-func _direct_powered_hover_active() -> bool:
-	return _direct_water_leg_hover or _direct_fire_hand_hover or _direct_fire_leg_hover or _direct_fire_limb_flight
-
-
 func _special_speed_multiplier(slots: Array[String], averaged: bool = false) -> float:
 	var contributors: Array[Blorb] = []
 	for slot in slots:
@@ -858,6 +814,14 @@ func _special_speed_multiplier(slots: Array[String], averaged: bool = false) -> 
 		if averaged
 		else HumanoidLocomotion.blorb_speed_multiplier(contributors, Player.SPECIAL_MOVEMENT_SPEED_PER_POINT)
 	)
+
+
+## How many water limbs are jetting while he swims, which is nothing at all
+## when he is out of the water.
+func _direct_swim_jets() -> int:
+	if not (_direct_diving or _direct_surface_swimming):
+		return 0
+	return _powers.swim_jet_count()
 
 
 func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_pressed: bool) -> void:
@@ -897,7 +861,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			speed *= _special_speed_multiplier(fire_boosters)
 		if sprinting:
 			speed *= Player.FLIGHT_SPRINT_SPEED_MULTIPLIER
-	elif _direct_fire_limb_flight:
+	elif _powers.fire_limb_flight:
 		speed = Player.AIR_FLIGHT_SPEED * _special_speed_multiplier(["arm_left", "arm_right", "leg_left", "leg_right"], true)
 		if sprinting:
 			speed *= Player.FLIGHT_SPRINT_SPEED_MULTIPLIER
@@ -907,10 +871,10 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	# the blast. The shared power decides how much, so his jets match the
 	# human's rather than doing nothing at all as they did.
 	if _direct_diving or _direct_surface_swimming:
-		speed *= SwimMode.jet_speed_multiplier(_direct_swim_jet_count())
+		speed *= SwimMode.jet_speed_multiplier(_direct_swim_jets())
 	if (
 		_direct_ice_skating_active
-		and not (_direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight or _direct_surface_swimming)
+		and not (_direct_diving or _direct_flying or _direct_air_feet or _powers.fire_limb_flight or _direct_surface_swimming)
 	):
 		var skating_velocity:=Vector2(velocity.x,velocity.z)
 		var skate_speed_before:=skating_velocity.length()
@@ -958,7 +922,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	elif (
 		_direct_snowboard_active
 		and is_on_floor()
-		and not (_direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight or _direct_surface_swimming)
+		and not (_direct_diving or _direct_flying or _direct_air_feet or _powers.fire_limb_flight or _direct_surface_swimming)
 	):
 		var board_ctx := _traversal_context(delta)
 		board_ctx.direction = Vector3(planar.x, 0.0, planar.y)
@@ -976,7 +940,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			_direct_snowboard_heading = Vector3(board_velocity.x, 0.0, board_velocity.y).normalized()
 	elif (
 		_direct_dirtbike_active
-		and not (_direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight or _direct_surface_swimming)
+		and not (_direct_diving or _direct_flying or _direct_air_feet or _powers.fire_limb_flight or _direct_surface_swimming)
 	):
 		var rolling:=Vector2(velocity.x,velocity.z)
 		if dirtbike_ballistic:
@@ -996,10 +960,10 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	else:
 		velocity.x = planar.x * speed
 		velocity.z = planar.y * speed
-	if _direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight:
+	if _direct_diving or _direct_flying or _direct_air_feet or _powers.fire_limb_flight:
 		velocity = direction * speed
 		_direct_vertical_velocity = velocity.y
-	elif _direct_powered_hover_active():
+	elif _powers.powered_hover_active():
 		var height_error: float = _direct_hover_height - global_position.y
 		_direct_vertical_velocity = clampf(
 			height_error * Player.POWERED_HOVER_SETTLE_SPEED,
@@ -1128,20 +1092,20 @@ func _ensure_direct_power_fx() -> void:
 func _update_direct_power_fx() -> void:
 	_ensure_direct_power_fx()
 	var forward: Vector3 = global_transform.basis.z.normalized()
-	var hand_direction: Vector3 = Vector3.DOWN if _direct_fire_hand_hover else forward
+	var hand_direction: Vector3 = Vector3.DOWN if _powers.fire_hand_hover else forward
 	var roll_reference: Vector3 = forward
-	SuitPowerFX.point_stream(_direct_water_arm_fx[0], _pivots["palm_left"], forward, _direct_left_arm_water, roll_reference)
-	SuitPowerFX.point_stream(_direct_water_arm_fx[1], _pivots["palm_right"], forward, _direct_right_arm_water, roll_reference)
-	SuitPowerFX.point_stream(_direct_fire_arm_fx[0], _pivots["palm_left"], hand_direction, _direct_left_arm_fire, roll_reference)
-	SuitPowerFX.point_stream(_direct_fire_arm_fx[1], _pivots["palm_right"], hand_direction, _direct_right_arm_fire, roll_reference)
-	SuitPowerFX.point_stream(_direct_water_leg_fx[0], _pivots["toe_left"], Vector3.DOWN, _direct_left_leg_water, roll_reference)
-	SuitPowerFX.point_stream(_direct_water_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _direct_right_leg_water, roll_reference)
-	SuitPowerFX.point_stream(_direct_fire_leg_fx[0], _pivots["toe_left"], Vector3.DOWN, _direct_left_leg_fire, roll_reference)
-	SuitPowerFX.point_stream(_direct_fire_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _direct_right_leg_fire, roll_reference)
-	_point_direct_lightning(_direct_electric_arm_fx[0], _pivots["palm_left"], forward, _direct_left_arm_electric)
-	_point_direct_lightning(_direct_electric_arm_fx[1], _pivots["palm_right"], forward, _direct_right_arm_electric)
-	_point_direct_lightning(_direct_city_arm_fx[0], _pivots["palm_left"], forward, _direct_left_arm_city)
-	_point_direct_lightning(_direct_city_arm_fx[1], _pivots["palm_right"], forward, _direct_right_arm_city)
+	SuitPowerFX.point_stream(_direct_water_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_water, roll_reference)
+	SuitPowerFX.point_stream(_direct_water_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_water, roll_reference)
+	SuitPowerFX.point_stream(_direct_fire_arm_fx[0], _pivots["palm_left"], hand_direction, _powers.left_arm_fire, roll_reference)
+	SuitPowerFX.point_stream(_direct_fire_arm_fx[1], _pivots["palm_right"], hand_direction, _powers.right_arm_fire, roll_reference)
+	SuitPowerFX.point_stream(_direct_water_leg_fx[0], _pivots["toe_left"], Vector3.DOWN, _powers.left_leg_water, roll_reference)
+	SuitPowerFX.point_stream(_direct_water_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _powers.right_leg_water, roll_reference)
+	SuitPowerFX.point_stream(_direct_fire_leg_fx[0], _pivots["toe_left"], Vector3.DOWN, _powers.left_leg_fire, roll_reference)
+	SuitPowerFX.point_stream(_direct_fire_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _powers.right_leg_fire, roll_reference)
+	_point_direct_lightning(_direct_electric_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_electric)
+	_point_direct_lightning(_direct_electric_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_electric)
+	_point_direct_lightning(_direct_city_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_city)
+	_point_direct_lightning(_direct_city_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_city)
 
 
 func _point_direct_lightning(bolt: LightningBolt, emitter: Node3D, direction: Vector3, active: bool) -> void:
@@ -1276,16 +1240,6 @@ func _direct_one_way_support(delta: float) -> bool:
 	return true
 
 
-## How many water limbs are jetting while he swims.
-func _direct_swim_jet_count() -> int:
-	if not (_direct_diving or _direct_surface_swimming):
-		return 0
-	return (
-		int(_direct_left_arm_water) + int(_direct_right_arm_water)
-		+ int(_direct_left_leg_water) + int(_direct_right_leg_water)
-	)
-
-
 ## Diving and sliding tip his body flat about its belly, the way the human's
 ## does, while his collision body stays upright.
 func _animate_direct_penguin(delta: float) -> void:
@@ -1312,18 +1266,18 @@ func _animate_direct_swim(delta: float, movement_speed: float) -> void:
 	if _blorb_suit.mermaid_tail_active():
 		_swim.update_mermaid_motion(ctx, reference * SwimMode.MERMAID_SPEED_MULTIPLIER)
 		_swim.pose_mermaid(ctx, reference * SwimMode.MERMAID_SPEED_MULTIPLIER)
-		if _direct_swim_jet_count() > 0:
+		if _direct_swim_jets() > 0:
 			_swim.pose_jets(
-				ctx, _direct_left_arm_water, _direct_right_arm_water,
-				_direct_left_leg_water, _direct_right_leg_water, true
+				ctx, _powers.left_arm_water, _powers.right_arm_water,
+				_powers.left_leg_water, _powers.right_leg_water, true
 			)
 		return
 	_swim.update_motion(ctx, reference)
 	_swim.pose_swim(ctx, reference)
-	if _direct_swim_jet_count() > 0:
+	if _direct_swim_jets() > 0:
 		_swim.pose_jets(
-			ctx, _direct_left_arm_water, _direct_right_arm_water,
-			_direct_left_leg_water, _direct_right_leg_water, false
+			ctx, _powers.left_arm_water, _powers.right_arm_water,
+			_powers.left_leg_water, _powers.right_leg_water, false
 		)
 
 
@@ -1352,7 +1306,7 @@ func _apply_direct_power_pose(delta: float) -> void:
 	if UIState.modal_open:
 		return
 	var settle: float = minf(Player.ARM_POWER_POSE_SETTLE_SPEED * delta, 1.0)
-	var both_fire_hands: bool = _direct_fire_hand_hover
+	var both_fire_hands: bool = _powers.fire_hand_hover
 	for side in ["left", "right"]:
 		var action: String = "%s_arm_power" % side
 		if not Input.is_action_pressed(action):
@@ -1390,7 +1344,7 @@ func _update_direct_crystal_riding(
 	var stick := Vector2(direction.x, direction.z)
 	var blocked := (
 		_direct_diving or _direct_surface_swimming or _direct_flying or _direct_air_feet
-		or _direct_fire_limb_flight or _direct_lava_surface or _direct_dirtbike_active
+		or _powers.fire_limb_flight or _direct_lava_surface or _direct_dirtbike_active
 		or _direct_snowboard_active
 	)
 	var was_riding := _crystal.riding
@@ -1749,7 +1703,7 @@ const SWIM_BODY_PITCH_SPEED := 4.5
 func _rig_pitch_target(delta: float) -> float:
 	if _penguin.diving or _penguin.sliding:
 		return float(_penguin.attitude()["tip"])
-	if _direct_flying or _direct_fire_limb_flight:
+	if _direct_flying or _powers.fire_limb_flight:
 		var flight_ctx := _traversal_context(delta)
 		_flight.update_motion(flight_ctx)
 		return _flight.attitude_pitch(velocity)

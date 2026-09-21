@@ -1118,23 +1118,9 @@ var _air_flight_exit_recovery := 0.0
 ## solution. The recovery pass instead stands the body upright around this
 ## explicitly preserved heading.
 var _air_flight_exit_yaw := 0.0
-var _left_arm_water_active := false
-var _right_arm_water_active := false
-var _left_arm_fire_active := false
-var _right_arm_fire_active := false
-var _left_leg_water_active := false
-var _right_leg_water_active := false
-var _left_leg_fire_active := false
-var _right_leg_fire_active := false
-## Electric is arms-only (no leg/hover variant -- there's no analogous
-## mechanic the way fire/water legs already grant a jet hover), so unlike
-## the water/fire flag sets above there's no _left_leg_electric_active.
-var _left_arm_electric_active := false
-var _right_arm_electric_active := false
-## City is arms-only too, same as electric -- see CITY_POWER_MP_PER_SECOND's
-## own comment.
-var _left_arm_city_active := false
-var _right_arm_city_active := false
+## Every continuous limb power this frame, worked out once for whoever is
+## wearing the suit. See SuitPowers.
+var _powers := SuitPowers.new()
 ## Rock/plant are discrete, cooldown-gated attacks rather than a continuous
 ## per-frame drain (see ROCK_POWER_COOLDOWN/PLANT_PELLET_COOLDOWN's own
 ## comments) -- these flags mean "button held with that element worn"
@@ -1151,10 +1137,6 @@ var _left_arm_plant_active := false
 var _right_arm_plant_active := false
 var _left_arm_plant_cooldown := 0.0
 var _right_arm_plant_cooldown := 0.0
-var _water_leg_hover_active := false
-var _fire_hand_hover_active := false
-var _fire_leg_hover_active := false
-var _fire_limb_flight_active := false
 var _air_foot_hover_active := false
 var _was_powered_hover_active := false
 var _powered_hover_target_y := 0.0
@@ -2215,19 +2197,19 @@ func _physics_process(delta: float) -> void:
 		current_speed *= 0.82
 	elif _lake_weighted_descent_active:
 		current_speed *= 0.82
-	elif _air_flight_active or _fire_limb_flight_active:
+	elif _air_flight_active or _powers.fire_limb_flight:
 		current_speed = AIR_FLIGHT_SPEED * worn_flight_speed_multiplier()
 	elif _lake_buoyancy_active:
 		current_speed *= worn_swim_speed_multiplier()
 	# Air feet retain ordinary walk/run traversal speed and animation even
 	# though their direction includes camera pitch (see _animate_walk()).
 	if aerial_active and _is_sprinting():
-		if _air_flight_active or _fire_limb_flight_active:
+		if _air_flight_active or _powers.fire_limb_flight:
 			current_speed *= FLIGHT_SPRINT_SPEED_MULTIPLIER
 		elif _lake_diving_active:
 			current_speed *= AERIAL_FAST_SPEED_MULTIPLIER
 	if _air_flight_active:
-		var active_fire_feet := int(_left_leg_fire_active) + int(_right_leg_fire_active)
+		var active_fire_feet := int(_powers.left_leg_fire) + int(_powers.right_leg_fire)
 		current_speed *= pow(FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER, active_fire_feet)
 	var swim_jets := _swim_jet_count()
 	if swim_jets > 0:
@@ -3143,7 +3125,7 @@ func worn_flight_speed_multiplier() -> float:
 		var chest := _blorb_suit.worn_blorb_for_slot("torso")
 		if chest != null and chest.element_state == "air":
 			return 1.0 + float(chest.speed) * SPECIAL_MOVEMENT_SPEED_PER_POINT
-	if _fire_limb_flight_active:
+	if _powers.fire_limb_flight:
 		var leg_points := 0
 		for slot in ["leg_left", "leg_right"]:
 			var leg := _blorb_suit.worn_blorb_for_slot(slot)
@@ -4255,7 +4237,7 @@ func _apply_arm_power_poses(delta: float) -> void:
 	if UIState.modal_open:
 		return
 	var t := ARM_POWER_POSE_SETTLE_SPEED * delta
-	# Excluded while _fire_hand_hover_active -- both arm-power buttons are
+	# Excluded while _powers.fire_hand_hover -- both arm-power buttons are
 	# still physically held then (that's what makes both hands Fire and
 	# triggers hovering in the first place), but _apply_fire_jet_pose()
 	# (called right after this function, see its own call site) is what
@@ -4266,11 +4248,11 @@ func _apply_arm_power_poses(delta: float) -> void:
 	# lerps never fully resolved, settling the arm at a permanent halfway
 	# compromise instead of cleanly canceling the raise.
 	# Swimming Water jets likewise own their arms (_apply_swim_jet_pose()).
-	var left_power := Input.is_action_pressed("left_arm_power") and not _fire_hand_hover_active and not (_left_arm_water_active and _is_swimming())
+	var left_power := Input.is_action_pressed("left_arm_power") and not _powers.fire_hand_hover and not (_powers.left_arm_water and _is_swimming())
 	var right_power := (
 		Input.is_action_pressed("right_arm_power")
-		and not _fire_hand_hover_active
-		and not (_right_arm_water_active and _is_swimming())
+		and not _powers.fire_hand_hover
+		and not (_powers.right_arm_water and _is_swimming())
 		and not _throw_aim_active
 		and not _held_item_is_weapon()
 	)
@@ -4677,9 +4659,7 @@ func _is_swimming() -> bool:
 
 ## How many Water hands and feet are jetting the swimmer along: 0 out of water.
 func _swim_jet_count() -> int:
-	if not _is_swimming():
-		return 0
-	return int(_left_arm_water_active) + int(_right_arm_water_active) + int(_left_leg_water_active) + int(_right_leg_water_active)
+	return _powers.swim_jet_count() if _is_swimming() else 0
 
 
 ## Swimming Water jets, posed like the Fire suit's: jetting hands swept back
@@ -4690,18 +4670,18 @@ func _apply_swim_jet_pose(delta: float) -> void:
 	if _swim_jet_count() == 0:
 		return
 	_swim.pose_jets(
-		_traversal_context(delta), _left_arm_water_active, _right_arm_water_active,
-		_left_leg_water_active, _right_leg_water_active, _blorb_suit.mermaid_tail_active()
+		_traversal_context(delta), _powers.left_arm_water, _powers.right_arm_water,
+		_powers.left_leg_water, _powers.right_leg_water, _blorb_suit.mermaid_tail_active()
 	)
 
 
 func _apply_fire_jet_pose(delta: float) -> void:
-	if not _fire_hand_hover_active:
+	if not _powers.fire_hand_hover:
 		return
 	var t := minf(FIRE_JET_POSE_SETTLE_SPEED * delta, 1.0)
 	_pose_fire_jet_arm(_arm_left, _elbow_left, _hand_left, 1.0, t)
 	_pose_fire_jet_arm(_arm_right, _elbow_right, _hand_right, -1.0, t)
-	if not _fire_limb_flight_active:
+	if not _powers.fire_limb_flight:
 		return
 	_leg_left.rotation.x = lerp_angle(_leg_left.rotation.x, 0.0, t)
 	_leg_right.rotation.x = lerp_angle(_leg_right.rotation.x, 0.0, t)
@@ -4958,13 +4938,15 @@ func _update_lightning_bolt(bolt: LightningBolt, hand: Node3D, forward: Vector3,
 	bolt.look_at(origin + wobble * forward, up_reference)
 
 
-const WATER_POWER_MP_PER_SECOND := 3.0
-const FIRE_POWER_MP_PER_SECOND := 4.5
-const ELECTRIC_POWER_MP_PER_SECOND := 4.0
-## City is arms-only too, folding into the same forward-stream damage
-## pipeline as electric -- see combat_math.gd's own HASTE_WEAKEN_DURATION
-## comment for the status effect its own damage tick also applies.
-const CITY_POWER_MP_PER_SECOND := 4.0
+## The continuous limb-power drains, which belong to the powers rather than
+## to whoever is using them: see SuitPowers. City folds into the same
+## forward-stream damage pipeline as electric -- see combat_math.gd's own
+## HASTE_WEAKEN_DURATION comment for the status effect its damage tick also
+## applies.
+const WATER_POWER_MP_PER_SECOND := SuitPowers.WATER_MP_PER_SECOND
+const FIRE_POWER_MP_PER_SECOND := SuitPowers.FIRE_MP_PER_SECOND
+const ELECTRIC_POWER_MP_PER_SECOND := SuitPowers.ELECTRIC_MP_PER_SECOND
+const CITY_POWER_MP_PER_SECOND := SuitPowers.CITY_MP_PER_SECOND
 
 ## Rock/plant are discrete, cooldown-gated attacks (see the flag/cooldown
 ## fields' own comment) rather than a continuous per-second drain, so their
@@ -4998,36 +4980,10 @@ const STREAM_HALF_ANGLE_COS := 0.85  # roughly a 32-degree half-angle cone
 
 func _update_limb_power_state(delta: float) -> void:
 	_penguin_chord_holding = _update_penguin_chord(delta)
-	_left_arm_water_active = _consume_limb_power("arm_left", "left_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
-	_right_arm_water_active = false if _throw_aim_active or _held_item_is_weapon() else _consume_limb_power("arm_right", "right_arm_power", "water", WATER_POWER_MP_PER_SECOND, delta)
-	_left_arm_fire_active = _consume_limb_power("arm_left", "left_arm_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
-	_right_arm_fire_active = false if _throw_aim_active or _held_item_is_weapon() else _consume_limb_power("arm_right", "right_arm_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
-	_left_arm_electric_active = _consume_limb_power("arm_left", "left_arm_power", "electric", ELECTRIC_POWER_MP_PER_SECOND, delta)
-	_right_arm_electric_active = false if _throw_aim_active or _held_item_is_weapon() else _consume_limb_power("arm_right", "right_arm_power", "electric", ELECTRIC_POWER_MP_PER_SECOND, delta)
-	_left_arm_city_active = _consume_limb_power("arm_left", "left_arm_power", "city", CITY_POWER_MP_PER_SECOND, delta)
-	_right_arm_city_active = false if _throw_aim_active or _held_item_is_weapon() else _consume_limb_power("arm_right", "right_arm_power", "city", CITY_POWER_MP_PER_SECOND, delta)
-	_left_leg_water_active = _consume_limb_power("leg_left", "left_leg_power", "water", WATER_POWER_MP_PER_SECOND, delta)
-	_right_leg_water_active = _consume_limb_power("leg_right", "right_leg_power", "water", WATER_POWER_MP_PER_SECOND, delta)
-	_left_leg_fire_active = _consume_limb_power("leg_left", "left_leg_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
-	_right_leg_fire_active = _consume_limb_power("leg_right", "right_leg_power", "fire", FIRE_POWER_MP_PER_SECOND, delta)
-	if _left_arm_water_active or _right_arm_water_active or _left_leg_water_active or _right_leg_water_active:
-		UISounds.pulse_power_loop(&"water", get_instance_id())
-	if _left_arm_fire_active or _right_arm_fire_active or _left_leg_fire_active or _right_leg_fire_active:
-		UISounds.pulse_power_loop(&"fire", get_instance_id())
-	if _left_arm_electric_active or _right_arm_electric_active or _left_arm_city_active or _right_arm_city_active:
-		UISounds.pulse_power_loop(&"electric", get_instance_id())
-
-	# In the water, Water feet jet backward to swim (see _swim_jet_count())
-	# rather than downward to hover.
-	_water_leg_hover_active = _left_leg_water_active and _right_leg_water_active and not _is_swimming()
-	_fire_hand_hover_active = _left_arm_fire_active and _right_arm_fire_active
-	# A matched pair of downward foot jets supplies the same basic lift and
-	# fall braking as the matched hand jets. It remains a level hover on its
-	# own; combining both pairs below upgrades that lift into directional
-	# four-limb flight.
-	_fire_leg_hover_active = _left_leg_fire_active and _right_leg_fire_active
-	_fire_limb_flight_active = (
-		_fire_hand_hover_active and _fire_leg_hover_active
+	# A hand already committed to a thrown item or a weapon does not also jet.
+	var right_hand_busy: bool = _throw_aim_active or _held_item_is_weapon()
+	_powers.update(
+		_blorb_suit, delta, _is_swimming(), false, right_hand_busy, get_instance_id()
 	)
 	_air_foot_hover_active = _blorb_suit.has_air_hover_legs()
 
@@ -5083,25 +5039,16 @@ func _raise_rock_platform(slot: String) -> bool:
 	return true
 
 
-func _consume_limb_power(
-	slot: String, action: String, element: String, rate: float, delta: float
-) -> bool:
-	if UIState.modal_open or not Input.is_action_pressed(action):
-		return false
-	var blorb := _blorb_suit.worn_blorb_in_slot(slot)
-	if blorb == null or blorb.element_state != element:
-		return false
-	return blorb.consume_mp(rate * delta)
 
 
 func _is_powered_hover_active() -> bool:
-	return _water_leg_hover_active or _fire_hand_hover_active or _fire_leg_hover_active or _air_foot_hover_active
+	return _powers.water_leg_hover or _powers.fire_hand_hover or _powers.fire_leg_hover or _air_foot_hover_active
 
 
 ## Rock/plant share the same "held + correct element worn, gated by a
 ## per-shot cooldown rather than a per-second drain" shape (see their flag/
 ## cooldown fields' own comment) -- handled together here rather than
-## folded into _consume_limb_power(), whose per-second rate model doesn't
+## folded into SuitPowers.update(), whose per-second rate model does not
 ## fit a per-shot cost.
 func _update_discrete_arm_powers(delta: float) -> void:
 	var left_rock := _update_discrete_power("arm_left", "left_arm_power", "platform", _left_arm_rock_cooldown, delta)
@@ -5288,7 +5235,7 @@ func _fire_plant_power(slot: String, hand: Node3D) -> bool:
 
 
 func _is_suit_flight_active() -> bool:
-	return _air_flight_active or _fire_limb_flight_active or _air_foot_hover_active
+	return _air_flight_active or _powers.fire_limb_flight or _air_foot_hover_active
 
 
 func _apply_powered_hover_vertical(delta: float, directional_flight: bool) -> void:
@@ -5316,12 +5263,12 @@ func _update_water_streams(delta: float) -> void:
 		forward = forward.normalized()
 	var downward := Vector3.DOWN
 	var fire_hand_jet_direction := downward
-	if _fire_limb_flight_active:
+	if _powers.fire_limb_flight:
 		var combined_foot_direction := _foot_jet_direction(_ankle_left) + _foot_jet_direction(_ankle_right)
 		if combined_foot_direction.length_squared() > 0.001:
 			fire_hand_jet_direction = combined_foot_direction.normalized()
-	var left_hand_direction := fire_hand_jet_direction if _fire_hand_hover_active else forward
-	var right_hand_direction := fire_hand_jet_direction if _fire_hand_hover_active else forward
+	var left_hand_direction := fire_hand_jet_direction if _powers.fire_hand_hover else forward
+	var right_hand_direction := fire_hand_jet_direction if _powers.fire_hand_hover else forward
 	# Swimming, Water hands and feet jet straight back against the travel.
 	var swimming := _is_swimming()
 	var backward := -forward
@@ -5337,37 +5284,37 @@ func _update_water_streams(delta: float) -> void:
 			_set_stream_inherits_velocity(hose, not swimming)
 	_update_water_stream(
 		_water_stream_left, _palm_left, water_hand_direction,
-		_left_arm_water_active
+		_powers.left_arm_water
 	)
 	_update_water_stream(
 		_water_stream_right, _palm_right, water_hand_direction,
-		_right_arm_water_active
+		_powers.right_arm_water
 	)
 	_update_water_stream(
 		_fire_stream_left, _palm_left, left_hand_direction,
-		_left_arm_fire_active
+		_powers.left_arm_fire
 	)
 	_update_water_stream(
 		_fire_stream_right, _palm_right, right_hand_direction,
-		_right_arm_fire_active
+		_powers.right_arm_fire
 	)
-	_update_water_stream(_water_leg_stream_left, _toe_left, water_foot_direction, _left_leg_water_active)
-	_update_water_stream(_water_leg_stream_right, _toe_right, water_foot_direction, _right_leg_water_active)
+	_update_water_stream(_water_leg_stream_left, _toe_left, water_foot_direction, _powers.left_leg_water)
+	_update_water_stream(_water_leg_stream_right, _toe_right, water_foot_direction, _powers.right_leg_water)
 	_update_water_stream(
-		_fire_leg_stream_left, _toe_left, _foot_jet_direction(_ankle_left), _left_leg_fire_active
+		_fire_leg_stream_left, _toe_left, _foot_jet_direction(_ankle_left), _powers.left_leg_fire
 	)
 	_update_water_stream(
-		_fire_leg_stream_right, _toe_right, _foot_jet_direction(_ankle_right), _right_leg_fire_active
+		_fire_leg_stream_right, _toe_right, _foot_jet_direction(_ankle_right), _powers.right_leg_fire
 	)
-	_update_lightning_bolt(_electric_stream_left, _palm_left, forward, _left_arm_electric_active)
-	_update_lightning_bolt(_electric_stream_right, _palm_right, forward, _right_arm_electric_active)
-	_update_lightning_bolt(_city_stream_left, _palm_left, forward, _left_arm_city_active)
-	_update_lightning_bolt(_city_stream_right, _palm_right, forward, _right_arm_city_active)
+	_update_lightning_bolt(_electric_stream_left, _palm_left, forward, _powers.left_arm_electric)
+	_update_lightning_bolt(_electric_stream_right, _palm_right, forward, _powers.right_arm_electric)
+	_update_lightning_bolt(_city_stream_left, _palm_left, forward, _powers.left_arm_city)
+	_update_lightning_bolt(_city_stream_right, _palm_right, forward, _powers.right_arm_city)
 	var forward_stream_active := (
-		((_left_arm_water_active or _right_arm_water_active) and not swimming)
-		or _left_arm_electric_active or _right_arm_electric_active
-		or _left_arm_city_active or _right_arm_city_active
-		or ((_left_arm_fire_active or _right_arm_fire_active) and not _fire_hand_hover_active)
+		((_powers.left_arm_water or _powers.right_arm_water) and not swimming)
+		or _powers.left_arm_electric or _powers.right_arm_electric
+		or _powers.left_arm_city or _powers.right_arm_city
+		or ((_powers.left_arm_fire or _powers.right_arm_fire) and not _powers.fire_hand_hover)
 	)
 	# Runs on a hover-only frame too (no forward stream at all) so a purely
 	# hovering worn blorb still gets an XP-participation chance -- see
@@ -5451,8 +5398,8 @@ func _damage_skeletons_in_stream(forward: Vector3, delta: float, dealing_damage:
 func _active_forward_stream_blorbs() -> Array[Blorb]:
 	var participants: Array[Blorb] = []
 	var active_slots := {
-		"arm_left": _left_arm_water_active or _left_arm_electric_active or _left_arm_city_active or (_left_arm_fire_active and not _fire_hand_hover_active),
-		"arm_right": _right_arm_water_active or _right_arm_electric_active or _right_arm_city_active or (_right_arm_fire_active and not _fire_hand_hover_active),
+		"arm_left": _powers.left_arm_water or _powers.left_arm_electric or _powers.left_arm_city or (_powers.left_arm_fire and not _powers.fire_hand_hover),
+		"arm_right": _powers.right_arm_water or _powers.right_arm_electric or _powers.right_arm_city or (_powers.right_arm_fire and not _powers.fire_hand_hover),
 	}
 	for slot in active_slots:
 		if not active_slots[slot]:
@@ -5479,15 +5426,15 @@ func _active_powered_blorbs() -> Array[Blorb]:
 	var participants: Array[Blorb] = []
 	var active_slots := {
 		"arm_left": (
-			_left_arm_water_active or _left_arm_fire_active or _left_arm_electric_active
-			or _left_arm_city_active or _left_arm_rock_active or _left_arm_plant_active
+			_powers.left_arm_water or _powers.left_arm_fire or _powers.left_arm_electric
+			or _powers.left_arm_city or _left_arm_rock_active or _left_arm_plant_active
 		),
 		"arm_right": (
-			_right_arm_water_active or _right_arm_fire_active or _right_arm_electric_active
-			or _right_arm_city_active or _right_arm_rock_active or _right_arm_plant_active
+			_powers.right_arm_water or _powers.right_arm_fire or _powers.right_arm_electric
+			or _powers.right_arm_city or _right_arm_rock_active or _right_arm_plant_active
 		),
-		"leg_left": _left_leg_water_active or _left_leg_fire_active,
-		"leg_right": _right_leg_water_active or _right_leg_fire_active,
+		"leg_left": _powers.left_leg_water or _powers.left_leg_fire,
+		"leg_right": _powers.right_leg_water or _powers.right_leg_fire,
 	}
 	for slot in active_slots:
 		if not active_slots[slot]:
@@ -5685,8 +5632,8 @@ func _begin_throw_preparation() -> void:
 	_throw_arm_start_rotation = _arm_right.rotation
 	_throw_elbow_start_rotation = _elbow_right.rotation
 	_throw_hand_start_rotation = _hand_right.rotation
-	_right_arm_water_active = false
-	_right_arm_fire_active = false
+	_powers.right_arm_water = false
+	_powers.right_arm_fire = false
 	Hud.set_throw_aiming(true)
 
 
@@ -5832,7 +5779,7 @@ func _update_head_look(delta: float) -> void:
 	# separate one) is deliberate: it's already built for exactly "counter
 	# a steep body pitch and track the travel direction instead."
 	var aerial_head_tracking := (
-		_lake_diving_active or _air_flight_active or _fire_limb_flight_active or _dirtbike_wheelie_active
+		_lake_diving_active or _air_flight_active or _powers.fire_limb_flight or _dirtbike_wheelie_active
 	)
 	var surface_swimming := _lake_buoyancy_active and not _lake_diving_active and not _lake_floor_walk_active and not _lake_weighted_descent_active
 	var yaw_limit := AERIAL_HEAD_YAW_LIMIT if aerial_head_tracking else HEAD_YAW_LIMIT
@@ -6194,7 +6141,7 @@ func _animate_walk(
 		_footsteps_were_moving = false
 		_animate_swimming(delta)
 		return
-	if _air_flight_active or _fire_limb_flight_active or _water_leg_hover_active or _fire_hand_hover_active or _fire_leg_hover_active:
+	if _air_flight_active or _powers.fire_limb_flight or _powers.water_leg_hover or _powers.fire_hand_hover or _powers.fire_leg_hover:
 		_footsteps_were_moving = false
 		# Flight shares the relaxed floating silhouette but intentionally does
 		# not inherit water's flipper-kick layer. Water jets and either paired
@@ -6679,11 +6626,11 @@ func _compose_body_pose(delta: float, grounded: bool, on_soft_aerial_support: bo
 	if _wake_intro_active or visuals.top_level:
 		return
 	var base_y := _body_base_height(delta, grounded, on_soft_aerial_support, buoyant)
-	if _air_foot_hover_active and not _air_flight_active and not _fire_limb_flight_active and not _lake_buoyancy_active:
+	if _air_foot_hover_active and not _air_flight_active and not _powers.fire_limb_flight and not _lake_buoyancy_active:
 		_release_skull_anchor()
 		_aerial_rest_heading_initialized = false
 		_pose_body_foot_hover(delta, base_y)
-	elif (_lake_buoyancy_active and not _lake_floor_walk_active and not _lake_weighted_descent_active) or _air_flight_active or _fire_limb_flight_active:
+	elif (_lake_buoyancy_active and not _lake_floor_walk_active and not _lake_weighted_descent_active) or _air_flight_active or _powers.fire_limb_flight:
 		_pose_body_skull_anchored(delta)
 	else:
 		_release_skull_anchor()
@@ -6823,7 +6770,7 @@ func _pose_body_skull_anchored(delta: float) -> void:
 		# At the surface, movement is deliberately yaw-only, so use the
 		# camera rig's level basis. Diving and flight retain the camera's
 		# full pitch for true 3D travel.
-		var travel_camera_basis := camera.global_transform.basis if (_lake_diving_active or _air_flight_active or _fire_limb_flight_active) else camera_rig.global_transform.basis
+		var travel_camera_basis := camera.global_transform.basis if (_lake_diving_active or _air_flight_active or _powers.fire_limb_flight) else camera_rig.global_transform.basis
 		var camera_body_basis := travel_camera_basis * Basis(Vector3.UP, PI)
 		# The left stick still chooses the travel-facing direction IN camera
 		# space: forward=0, right=+90, back=180, left=-90. Visuals has the
@@ -7083,7 +7030,7 @@ func _update_breath(delta: float) -> void:
 		var atmosphere := AtmosphereLayer.active(get_tree())
 		if atmosphere != null:
 			drain *= lerpf(1.0, 1.5, atmosphere.airlessness_at(global_position))
-			if _left_arm_fire_active or _right_arm_fire_active or _left_leg_fire_active or _right_leg_fire_active:
+			if _powers.left_arm_fire or _powers.right_arm_fire or _powers.left_leg_fire or _powers.right_leg_fire:
 				drain *= FIRE_VACUUM_BREATH_MULTIPLIER
 		breath = maxf(breath - drain * delta, 0.0)
 	else:
