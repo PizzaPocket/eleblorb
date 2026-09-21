@@ -1148,23 +1148,18 @@ var _powered_hover_target_y := 0.0
 var _visuals_snow_offset_y := -FOOT_OFFSET
 ## Dirt blorb suit -- see the DIRTBIKE_* consts' own doc comments.
 var _dirtbike_wheel_active := false
-## The wheelie's own toggle state -- per direct correction ("let's change
-## the arm wheels to a toggle. If both are pressed down then it toggles the
-## arm wheel to on. pressing both again toggles it to off"). Forced back to
-## false if either prerequisite (the leg wheel, or the ground arm pair)
-## drops away, so a stale "on" can't silently persist into a state where it
-## no longer even makes sense -- see _update_dirtbike_state()'s own use.
-var _dirtbike_wheelie_toggled_on := false
-## Edge-detects the two-button chord for the toggle above: true only once
-## BOTH left_arm_power and right_arm_power are simultaneously held, false
-## the instant either releases -- the toggle fires on the frame this
-## transitions false -> true, not on every frame both happen to be held.
-var _dirtbike_wheelie_chord_was_pressed := false
-## Edge-detects UIState.modal_open closing -- see this field's own use in
+## The wheelie's own toggle -- per direct correction ("let's change the arm
+## wheels to a toggle. If both are pressed down then it toggles the arm wheel
+## to on. pressing both again toggles it to off"). Forced back off if either
+## prerequisite (the leg wheel, or the ground arm pair) drops away, so a
+## stale "on" cannot silently persist into a state where it no longer makes
+## sense. See PowerChord.
+var _wheelie_chord := PowerChord.new()
+## Edges UIState.modal_open closing -- see this field's own use in
 ## _update_dirtbike_state() ("unpausing holding something should bring out
 ## of arm wheels").
 var _was_modal_open := false
-## True exactly when _dirtbike_wheelie_toggled_on is (see
+## True exactly when the wheelie chord is toggled on (see
 ## _update_dirtbike_state()) -- kept as its own field since every other
 ## dirtbike function already reads this name.
 var _dirtbike_wheelie_active := false
@@ -1187,9 +1182,8 @@ var _dirtbike_supported_pitch := 0.0
 var _dirtbike_pitch_angular_velocity := 0.0
 var _dirtbike_airborne_pitch := 0.0
 var _dirtbike_pitch_was_grounded := false
-## Matched Snow legs toggle this with a simultaneous leg-button chord.
-var _snowboard_toggled_on := false
-var _snowboard_chord_was_pressed := false
+## Matched Snow legs call up the board with a simultaneous leg-button chord.
+var _snowboard_chord := PowerChord.new()
 var _snowboard_active := false
 var _snowboard_pose_blend := 0.0
 var _snowboard: Node3D = null
@@ -4403,7 +4397,7 @@ func _apply_dirtbike_pose(delta: float) -> void:
 		# Per direct correction, the wheelie is now a TOGGLE ("if both are
 		# pressed down then it toggles the arm wheel to on. pressing both
 		# again toggles it to off") rather than held -- see
-		# _dirtbike_wheelie_toggled_on's own doc comment. That means the
+		# the wheelie chord's own doc comment. That means the
 		# arms have to stay raised for as long as the toggle is on even
 		# after the player lets go of both buttons, which
 		# _apply_arm_power_poses() (called earlier this same frame) has no
@@ -7116,40 +7110,22 @@ func _update_dirtbike_state(delta: float) -> void:
 
 	# Per direct correction ("if paused during arm wheels, unpausing holding
 	# something should bring out of arm wheels") -- edge-detects the modal
-	# (pause/menu) closing, same idiom as _dirtbike_wheelie_chord_was_pressed/
-	# _was_air_flight_active elsewhere in this file. A player can open a
-	# menu while the wheelie is toggled on and pick up/equip a held item
-	# from it; nothing else re-checks that combination once they close the
-	# menu, so this is the one place that has to.
+	# (pause/menu) closing, the same idiom as _was_air_flight_active
+	# elsewhere in this file. A player can open a menu while the wheelie is
+	# toggled on and pick up or equip a held item from it; nothing else
+	# re-checks that combination once they close the menu, so this is the
+	# one place that has to.
 	if _was_modal_open and not UIState.modal_open and not HeldItem.current.is_empty():
-		_dirtbike_wheelie_toggled_on = false
+		_wheelie_chord.toggled = false
 	_was_modal_open = UIState.modal_open
 
-	# Per direct correction, a TOGGLE now: the chord (both arm-power buttons
-	# together) flips _dirtbike_wheelie_toggled_on on the frame it first
-	# forms, not "active for as long as both stay held" any more -- see that
-	# field's own doc comment. Per a further direct correction ("if holding
-	# an object, which disables blorb powers, it should prevent from going
-	# into arm wheels") -- HeldItem.current.is_empty() is this project's own
-	# established "is the player holding anything" check (see
-	# _held_item_is_weapon()'s and _update_throw_input()'s own use of it);
-	# folded into chord_pressed itself so holding something doesn't just
-	# fail to fire the toggle, it can't even register as forming the chord.
-	var has_arms := _blorb_suit.has_dirtbike_arms()
-	var chord_pressed := (
-		not UIState.modal_open
-		and HeldItem.current.is_empty()
-		and Input.is_action_pressed("left_arm_power")
-		and Input.is_action_pressed("right_arm_power")
-	)
-	var chord_just_formed := chord_pressed and not _dirtbike_wheelie_chord_was_pressed
-	_dirtbike_wheelie_chord_was_pressed = chord_pressed
-	if not _dirtbike_wheel_active or not has_arms:
-		_dirtbike_wheelie_toggled_on = false
+	# A toggle, per direct correction: the chord flips it on the frame it
+	# first forms, not "active for as long as both stay held". Holding an
+	# object keeps the chord from registering at all -- see PowerChord.
+	var can_wheelie: bool = _dirtbike_wheel_active and _blorb_suit.has_dirtbike_arms()
+	_dirtbike_wheelie_active = _wheelie_chord.update(can_wheelie, PowerChord.ARMS)
+	if not can_wheelie:
 		_dirtbike_supported_pitch = 0.0
-	elif chord_just_formed:
-		_dirtbike_wheelie_toggled_on = not _dirtbike_wheelie_toggled_on
-	_dirtbike_wheelie_active = _dirtbike_wheelie_toggled_on
 	if not _dirtbike_wheelie_active:
 		_dirtbike_supported_pitch = 0.0
 		_dirtbike_pitch_was_grounded = false
@@ -7183,22 +7159,9 @@ func _update_dirtbike_state(delta: float) -> void:
 ## remove it; terrain decides where it glides, never whether it exists.
 func _update_snowboard_state() -> void:
 	var has_legs:=_blorb_suit.has_snowboard_legs()
-	var chord_pressed:=(
-		has_legs
-		and not UIState.modal_open
-		and HeldItem.current.is_empty()
-		and Input.is_action_pressed("left_leg_power")
-		and Input.is_action_pressed("right_leg_power")
-	)
-	var chord_just_formed:=chord_pressed and not _snowboard_chord_was_pressed
-	_snowboard_chord_was_pressed=chord_pressed
 	var supported:=_is_snowboard_surface()
-	if not has_legs:
-		_snowboard_toggled_on=false
-	elif chord_just_formed:
-		_snowboard_toggled_on=not _snowboard_toggled_on
 	var was_active:=_snowboard_active
-	_snowboard_active=_snowboard_toggled_on and has_legs
+	_snowboard_active=_snowboard_chord.update(has_legs)
 	if _snowboard_active:
 		floor_max_angle=DIRTBIKE_FLOOR_MAX_ANGLE
 		if not was_active:

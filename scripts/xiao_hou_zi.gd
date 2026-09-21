@@ -180,13 +180,13 @@ var _swim := SwimMode.new()
 var _penguin := PenguinMode.new()
 var _flight := FlightMode.new()
 var _powers := SuitPowers.new()
+var _snowboard_chord := PowerChord.new()
+var _wheelie_chord := PowerChord.new()
 var _lava := LavaMode.new()
 var _dirtbike := DirtbikeMode.new()
 ## His snowboard: the same power the player rides, on his own rig and at his
 ## own scale. Toggled by the leg-power chord, as the player's is.
 var _direct_snowboard_active: bool = false
-var _direct_snowboard_toggled: bool = false
-var _direct_snowboard_chord_was_pressed: bool = false
 var _direct_snowboard: Node3D = null
 var _direct_snowboard_up: Vector3 = Vector3.UP
 var _direct_snowboard_heading: Vector3 = Vector3.FORWARD
@@ -251,8 +251,6 @@ var _direct_floor_height: float = 0.0
 var _direct_last_bounced_blorb: Blorb = null
 var _direct_dirtbike_active: bool = false
 var _direct_dirtbike_front_active: bool = false
-var _direct_dirtbike_front_toggled: bool = false
-var _direct_dirtbike_chord_was_pressed: bool = false
 var _direct_dirtbike_was_climbing: bool = false
 var _direct_dirtbike_airborne: bool = false
 var _direct_dirtbike_surface_velocity := Vector3.ZERO
@@ -704,7 +702,7 @@ func end_direct_control() -> void:
 	is_player_controlled = false
 	collision_layer = 1
 	_direct_vertical_velocity = 0.0
-	_direct_dirtbike_front_toggled = false
+	_wheelie_chord.toggled = false
 	_direct_dirtbike_front_active = false
 	_direct_dirtbike_active = false
 	_direct_dirtbike_airborne = false
@@ -1384,21 +1382,8 @@ func _begin_direct_penguin_dive(direction: Vector3) -> void:
 ## board with. The deck is built at his own rig scale, so it fits his feet.
 func _update_direct_snowboard_state() -> void:
 	var has_legs: bool = _blorb_suit.has_snowboard_legs()
-	var chord_pressed: bool = (
-		has_legs
-		and not UIState.modal_open
-		and HeldItem.current.is_empty()
-		and Input.is_action_pressed("left_leg_power")
-		and Input.is_action_pressed("right_leg_power")
-	)
-	var chord_just_formed: bool = chord_pressed and not _direct_snowboard_chord_was_pressed
-	_direct_snowboard_chord_was_pressed = chord_pressed
-	if not has_legs:
-		_direct_snowboard_toggled = false
-	elif chord_just_formed:
-		_direct_snowboard_toggled = not _direct_snowboard_toggled
 	var was_active := _direct_snowboard_active
-	_direct_snowboard_active = _direct_snowboard_toggled and has_legs
+	_direct_snowboard_active = _snowboard_chord.update(has_legs)
 	if _direct_snowboard_active:
 		floor_max_angle = Player.DIRTBIKE_FLOOR_MAX_ANGLE
 		if _direct_snowboard == null:
@@ -1444,20 +1429,8 @@ func _resolve_direct_snowboard_motion(delta: float, _pre_move_position: Vector3)
 func _update_direct_dirtbike_state() -> void:
 	_direct_dirtbike_active = _blorb_suit.has_dirtbike_legs()
 	floor_max_angle = Player.DIRTBIKE_FLOOR_MAX_ANGLE if _direct_dirtbike_active else deg_to_rad(50.0)
-	var has_arms: bool = _blorb_suit.has_dirtbike_arms()
-	var chord_pressed: bool = (
-		not UIState.modal_open
-		and HeldItem.current.is_empty()
-		and Input.is_action_pressed("left_arm_power")
-		and Input.is_action_pressed("right_arm_power")
-	)
-	var chord_just_formed: bool = chord_pressed and not _direct_dirtbike_chord_was_pressed
-	_direct_dirtbike_chord_was_pressed = chord_pressed
-	if not _direct_dirtbike_active or not has_arms:
-		_direct_dirtbike_front_toggled = false
-	elif chord_just_formed:
-		_direct_dirtbike_front_toggled = not _direct_dirtbike_front_toggled
-	_direct_dirtbike_front_active = _direct_dirtbike_front_toggled
+	var can_wheelie: bool = _direct_dirtbike_active and _blorb_suit.has_dirtbike_arms()
+	_direct_dirtbike_front_active = _wheelie_chord.update(can_wheelie, PowerChord.ARMS)
 	if not _direct_dirtbike_front_active:
 		_direct_dirtbike_supported_pitch = 0.0
 		_direct_dirtbike_pitch_was_grounded = false
