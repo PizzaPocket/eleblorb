@@ -267,7 +267,6 @@ var _direct_ice_skate_lift_y: float = 0.0
 var _direct_ice_skate_was_supported: bool = false
 var _direct_ice_skate_airborne: bool = false
 var _direct_ice_skate_surface_velocity := Vector3.ZERO
-const DIRECT_BOUNCE_CLEARANCE := 0.035
 ## Base glide speed while in the FOLLOWING AI state, catching back up to the
 ## player -- reads the player's own move_speed once at _ready() same as
 ## blorb.gd's _follow_glide_speed, so it stays correct if move_speed is ever
@@ -1112,26 +1111,18 @@ func _update_direct_power_fx() -> void:
 func _try_direct_blorb_bounce(delta: float) -> bool:
 	if velocity.y > 0.1 or _direct_diving or _direct_surface_swimming or _direct_flying or _direct_air_feet:
 		return false
-	var current_feet_y: float = global_position.y
-	var projected_x: float = global_position.x + velocity.x * delta
-	var projected_z: float = global_position.z + velocity.z * delta
-	var projected_feet_y: float = current_feet_y + velocity.y * delta
-	var best: Blorb = null
-	var best_surface: float = -INF
-	for node in get_tree().get_nodes_in_group("blorbs"):
-		var candidate := node as Blorb
-		if candidate == null or candidate.is_worn or candidate.is_melted or candidate.blorb_type == "size":
-			continue
-		var surface: Variant = candidate.bounce_surface_height_at(projected_x, projected_z)
-		if surface == null:
-			continue
-		var surface_y: float = surface as float
-		if current_feet_y >= surface_y - 0.12 and projected_feet_y <= surface_y + 0.12 and surface_y > best_surface:
-			best = candidate
-			best_surface = surface_y
+	# His origin sits at his feet, so his feet are simply where he is.
+	var projected_xz := Vector2(
+		global_position.x + velocity.x * delta, global_position.z + velocity.z * delta
+	)
+	var best := BlorbBounce.predicted(
+		get_tree(), global_position.y, projected_xz, global_position.y + velocity.y * delta
+	)
 	if best == null:
 		return false
-	global_position.y = best_surface + DIRECT_BOUNCE_CLEARANCE
+	var surface: Variant = best.bounce_surface_height_at(projected_xz.x, projected_xz.y)
+	if surface != null:
+		global_position.y = BlorbBounce.release_height(surface as float)
 	_launch_from_blorb(best)
 	return true
 
@@ -1141,19 +1132,14 @@ func _try_direct_blorb_bounce(delta: float) -> bool:
 func _enforce_direct_blorb_bounce() -> bool:
 	if velocity.y > 0.1 or _direct_diving or _direct_surface_swimming or _direct_flying or _direct_air_feet:
 		return false
-	for collision_index in get_slide_collision_count():
-		var collision: KinematicCollision3D = get_slide_collision(collision_index)
-		if collision.get_normal().y < 0.2:
-			continue
-		var candidate := collision.get_collider() as Blorb
-		if candidate == null or candidate.is_worn or candidate.is_melted or candidate.blorb_type == "size":
-			continue
-		var surface: Variant = candidate.bounce_surface_height_at(global_position.x, global_position.z)
-		if surface != null:
-			global_position.y = maxf(global_position.y, (surface as float) + DIRECT_BOUNCE_CLEARANCE)
-		_launch_from_blorb(candidate)
-		return true
-	return false
+	var candidate := BlorbBounce.in_contact(self)
+	if candidate == null:
+		return false
+	var surface: Variant = candidate.bounce_surface_height_at(global_position.x, global_position.z)
+	if surface != null:
+		global_position.y = maxf(global_position.y, BlorbBounce.release_height(surface as float))
+	_launch_from_blorb(candidate)
+	return true
 
 
 func _launch_from_blorb(blorb: Blorb) -> void:
@@ -1174,7 +1160,7 @@ func receive_platform_aid_bounce(platform: Blorb) -> void:
 	# Arrival is already constrained to the same physical support selected by
 	# Player's downward probe. Put Xiao on the crown and launch immediately;
 	# there is no intermediate planted frame that can shove or perma-squash.
-	global_position.y = (surface as float) + DIRECT_BOUNCE_CLEARANCE
+	global_position.y = BlorbBounce.release_height(surface as float)
 	_launch_from_blorb(platform)
 
 

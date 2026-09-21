@@ -1024,13 +1024,11 @@ const SWIM_KICK_ANKLE_AMOUNT := deg_to_rad(10.0)
 # than CharacterBody3D's own (~45-degree) floor_max_angle, so the bounce can
 # trigger even where a genuine is_on_floor() landing wouldn't.
 const BLORB_BOUNCE_NORMAL_MIN := 0.5
-## Predict contact from this frame's downward travel before move_and_slide()
-## can settle the CharacterBody against the blorb. The small precontact band
-## absorbs moving-blorb/physics-tick disagreement; recovery depth catches a
-## contact that began a frame earlier without turning side-brushes into jumps.
-const BLORB_BOUNCE_PRECONTACT_MARGIN := 0.10
-const BLORB_BOUNCE_RECOVERY_DEPTH := 0.22
-const BLORB_BOUNCE_RELEASE_CLEARANCE := 0.035
+## The bounce's own bands, which belong to the rule rather than to whoever
+## lands on the blorb: see BlorbBounce.
+const BLORB_BOUNCE_PRECONTACT_MARGIN := BlorbBounce.PRECONTACT_MARGIN
+const BLORB_BOUNCE_RECOVERY_DEPTH := BlorbBounce.RECOVERY_DEPTH
+const BLORB_BOUNCE_RELEASE_CLEARANCE := BlorbBounce.RELEASE_CLEARANCE
 # A forgiveness window for "hit the jump button right as you bounce" --
 # demanding a press on the exact physics frame contact resolves would be
 # unreasonably precise. The "jump" action gets buffered for this long; if a blorb
@@ -2644,29 +2642,14 @@ func _try_predictive_blorb_bounce(delta: float, was_grounded: bool) -> bool:
 		or _is_powered_hover_active()
 	):
 		return false
-	var current_feet_y := global_position.y - FOOT_OFFSET
 	var projected_xz := Vector2(
 		global_position.x + velocity.x * delta,
 		global_position.z + velocity.z * delta
 	)
-	var projected_feet_y := current_feet_y + velocity.y * delta
-	var best_blorb: Blorb = null
-	var best_surface_y := -INF
-	for candidate in get_tree().get_nodes_in_group("blorbs"):
-		if not candidate is Blorb:
-			continue
-		var blorb := candidate as Blorb
-		var surface: Variant = blorb.bounce_surface_height_at(projected_xz.x, projected_xz.y)
-		if surface == null:
-			continue
-		var surface_y := surface as float
-		if current_feet_y < surface_y - BLORB_BOUNCE_RECOVERY_DEPTH:
-			continue
-		if projected_feet_y > surface_y + BLORB_BOUNCE_PRECONTACT_MARGIN:
-			continue
-		if surface_y > best_surface_y:
-			best_surface_y = surface_y
-			best_blorb = blorb
+	var best_blorb := BlorbBounce.predicted(
+		get_tree(), global_position.y - FOOT_OFFSET, projected_xz,
+		global_position.y - FOOT_OFFSET + velocity.y * delta
+	)
 	if best_blorb == null:
 		return false
 	return _launch_off_blorb(best_blorb)
