@@ -949,9 +949,9 @@ const GIANT_SURFACE_SNAP_TOLERANCE := 4.0
 # invisible standable floor. With the player's feet 1.1m below the surface,
 # their head and shoulders remain above water while the rest of the body is
 # visibly submerged.
-const LAKE_SWIM_FOOT_DEPTH := 1.4
+const LAKE_SWIM_FOOT_DEPTH := LiquidEnvironment.SWIM_FOOT_DEPTH
 const LAKE_BUOYANCY_LIFT_SPEED := 10.0
-const LAKE_MIN_SWIMMABLE_DEPTH := LAKE_SWIM_FOOT_DEPTH + 0.35
+const LAKE_MIN_SWIMMABLE_DEPTH := LiquidEnvironment.MIN_SWIMMABLE_DEPTH
 const LAKE_DIVE_SPEED := 4.2
 const LAKE_DIVE_FLOOR_CLEARANCE := 0.5
 # Rock legs make the equipped body negatively buoyant; they do not teleport
@@ -1119,6 +1119,8 @@ var _air_flight_exit_yaw := 0.0
 ## Every continuous limb power this frame, worked out once for whoever is
 ## wearing the suit. See SuitPowers.
 var _powers := SuitPowers.new()
+## The liquid under this body, read fresh each frame.
+var _liquid := LiquidEnvironment.new()
 ## Rock/plant are discrete, cooldown-gated attacks rather than a continuous
 ## per-frame drain (see ROCK_POWER_COOLDOWN/PLANT_PELLET_COOLDOWN's own
 ## comments) -- these flags mean "button held with that element worn"
@@ -6927,25 +6929,24 @@ func _update_lake_buoyancy(delta: float) -> void:
 	_in_lava_area_now = false
 	if _giant_goo_active or terrain == null:
 		return
+	# The facts about this spot are LiquidEnvironment's, so both characters
+	# come to the same answer about the same pond.
+	_liquid.read(terrain, _blorb_suit, global_position)
 	var water_pos := Vector2(global_position.x, global_position.z)
-	var in_lava_area: bool = (
-		terrain.has_method("is_lava_area")
-		and terrain.has_method("get_lava_surface_height")
-		and terrain.is_lava_area(water_pos)
-	)
+	var in_lava_area: bool = _liquid.in_lava()
 	_in_lava_area_now = in_lava_area
-	var in_lava_volume: bool = in_lava_area and _blorb_suit.has_full_lava_suit()
-	var in_water_volume: bool = terrain.has_method("is_lake_area") and terrain.is_lake_area(water_pos)
+	var in_lava_volume: bool = _liquid.lava_contact == LavaMode.Contact.IMMERSED
+	var in_water_volume: bool = _liquid.in_water()
 	if not in_water_volume and not in_lava_area:
 		return
-	var water_level: float = terrain.get_lava_surface_height(water_pos) if in_lava_area else terrain.get_lake_water_level()
+	var water_level: float = _liquid.surface_height
 	_active_swim_surface_height = water_level
 	_lava_swimming_active = in_lava_volume
 	# Two landed fire leg blorbs protect an ordinary suit by supporting it on
 	# the molten surface. Only the complete Lava Helm formation replaces this
 	# support with immersion/swimming. Preserve a real jump above the surface,
 	# then catch descending feet exactly at the liquid plane.
-	if in_lava_area and not in_lava_volume and _blorb_suit.has_lava_safe_legs():
+	if _liquid.lava_contact == LavaMode.Contact.SURFACE:
 		var feet_y:float=global_position.y-FOOT_OFFSET
 		if _jumping and (velocity.y>0.0 or feet_y>water_level):
 			return
@@ -6958,10 +6959,10 @@ func _update_lake_buoyancy(delta: float) -> void:
 		velocity.y=0.0
 		_jumping=false
 		return
-	var floor_height: float = terrain.get_mesh_height(water_pos.x, water_pos.y)
+	var floor_height: float = _liquid.floor_height
 	# The shallow feathered shoreline stays walkable. Buoyancy begins only
 	# once the basin has enough real depth to immerse the character.
-	if water_level - floor_height < LAKE_MIN_SWIMMABLE_DEPTH:
+	if not _liquid.deep_enough_to_swim():
 		return
 	# Dock ramps deliberately start below the swimmer's feet. Once one is
 	# beneath the player, let its continuous climbable collision take over

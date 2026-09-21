@@ -180,6 +180,8 @@ var _swim := SwimMode.new()
 var _penguin := PenguinMode.new()
 var _flight := FlightMode.new()
 var _powers := SuitPowers.new()
+## The liquid under him, read fresh each frame.
+var _liquid := LiquidEnvironment.new()
 var _snowboard_chord := PowerChord.new()
 var _wheelie_chord := PowerChord.new()
 var _lava := LavaMode.new()
@@ -232,7 +234,6 @@ var _direct_vertical_velocity: float = 0.0
 var _mounted: bool = false
 var max_hp: float = 100.0
 var current_hp: float = 100.0
-var _direct_surface_swimming: bool = false
 var _direct_diving: bool = false
 var _direct_flying: bool = false
 var _direct_air_feet: bool = false
@@ -720,15 +721,13 @@ func prepare_direct_control_environment(delta: float) -> void:
 	# Turned back at the pool's edge by the same rule the player answers to.
 	# His origin sits at his feet, so his underside is simply where he is.
 	_lava.enforce_access(_traversal_context(delta), global_position.y, 0.0)
-	var xz := Vector2(global_position.x, global_position.z)
-	_direct_floor_height = terrain.get_mesh_height(xz.x, xz.y)
-	var in_lava: bool = terrain.has_method("is_lava_area") and bool(terrain.is_lava_area(xz))
-	var in_water: bool = terrain.has_method("is_lake_area") and bool(terrain.is_lake_area(xz))
-	if in_lava:
-		_direct_liquid_level = terrain.get_lava_surface_height(xz)
-		match LavaMode.contact(_blorb_suit):
+	_liquid.read(terrain, _blorb_suit, global_position)
+	_direct_floor_height = _liquid.floor_height
+	_direct_liquid_level = _liquid.surface_height
+	if _liquid.in_lava():
+		match _liquid.lava_contact:
 			LavaMode.Contact.IMMERSED:
-				if global_position.y <= _direct_liquid_level:
+				if _liquid.submerged(global_position.y):
 					_direct_diving = true
 			LavaMode.Contact.SURFACE:
 				# A real jump off the surface is preserved; the molten plane
@@ -737,15 +736,11 @@ func prepare_direct_control_environment(delta: float) -> void:
 				var rising: bool = velocity.y > 0.0 and global_position.y > _direct_liquid_level
 				if not rising and global_position.y <= _direct_liquid_level + LavaMode.CONTACT_TOLERANCE:
 					_direct_lava_surface = true
-	elif in_water:
-		_direct_liquid_level = terrain.get_lake_water_level()
-		var depth := _direct_liquid_level - _direct_floor_height
-		if depth >= Player.LAKE_MIN_SWIMMABLE_DEPTH and global_position.y <= _direct_liquid_level:
-			if _blorb_suit.has_head_air_supply():
-				_direct_diving = true
-			else:
-				_direct_surface_swimming = true
-	if not _direct_diving and not _direct_surface_swimming and not _direct_lava_surface:
+	elif _liquid.in_water() and _liquid.deep_enough_to_swim() and _liquid.submerged(global_position.y):
+		# Anybody can go under, whatever they are wearing. Only breath
+		# depends on the helmet, which he does not need at all.
+		_direct_diving = true
+	if not _direct_diving and not _direct_lava_surface:
 		_direct_flying = _blorb_suit.has_chest_air_blorb()
 		_direct_air_feet = _blorb_suit.has_air_hover_legs()
 
@@ -755,7 +750,6 @@ func uses_pitched_movement_input() -> bool:
 
 
 func _clear_direct_environment() -> void:
-	_direct_surface_swimming = false
 	_direct_diving = false
 	_direct_flying = false
 	_direct_air_feet = false
@@ -766,7 +760,7 @@ func _clear_direct_environment() -> void:
 func _update_direct_powered_movement(delta: float) -> void:
 	var was_hovering: bool = _powers.powered_hover_active()
 	_powers.update(
-		_blorb_suit, delta, _direct_diving or _direct_surface_swimming,
+		_blorb_suit, delta, _direct_diving,
 		false, false, get_instance_id()
 	)
 	_update_direct_plant_powers(delta)
@@ -816,7 +810,7 @@ func _special_speed_multiplier(slots: Array[String], averaged: bool = false) -> 
 ## How many water limbs are jetting while he swims, which is nothing at all
 ## when he is out of the water.
 func _direct_swim_jets() -> int:
-	if not (_direct_diving or _direct_surface_swimming):
+	if not (_direct_diving):
 		return 0
 	return _powers.swim_jet_count()
 
@@ -862,16 +856,14 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		speed = Player.AIR_FLIGHT_SPEED * _special_speed_multiplier(["arm_left", "arm_right", "leg_left", "leg_right"], true)
 		if sprinting:
 			speed *= Player.FLIGHT_SPRINT_SPEED_MULTIPLIER
-	elif _direct_surface_swimming:
-		speed *= _special_speed_multiplier(["head", "leg_left", "leg_right"], true)
 	# Water jets underwater propel the swimmer, each firing limb adding to
 	# the blast. The shared power decides how much, so his jets match the
 	# human's rather than doing nothing at all as they did.
-	if _direct_diving or _direct_surface_swimming:
+	if _direct_diving:
 		speed *= SwimMode.jet_speed_multiplier(_direct_swim_jets())
 	if (
 		_direct_ice_skating_active
-		and not (_direct_diving or _direct_flying or _direct_air_feet or _powers.fire_limb_flight or _direct_surface_swimming)
+		and not (_direct_diving or _direct_flying or _direct_air_feet or _powers.fire_limb_flight)
 	):
 		var skating_velocity:=Vector2(velocity.x,velocity.z)
 		var skate_speed_before:=skating_velocity.length()
@@ -919,7 +911,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	elif (
 		_direct_snowboard_active
 		and is_on_floor()
-		and not (_direct_diving or _direct_flying or _direct_air_feet or _powers.fire_limb_flight or _direct_surface_swimming)
+		and not (_direct_diving or _direct_flying or _direct_air_feet or _powers.fire_limb_flight)
 	):
 		var board_ctx := _traversal_context(delta)
 		board_ctx.direction = Vector3(planar.x, 0.0, planar.y)
@@ -937,7 +929,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			_direct_snowboard_heading = Vector3(board_velocity.x, 0.0, board_velocity.y).normalized()
 	elif (
 		_direct_dirtbike_active
-		and not (_direct_diving or _direct_flying or _direct_air_feet or _powers.fire_limb_flight or _direct_surface_swimming)
+		and not (_direct_diving or _direct_flying or _direct_air_feet or _powers.fire_limb_flight)
 	):
 		var rolling:=Vector2(velocity.x,velocity.z)
 		if dirtbike_ballistic:
@@ -968,17 +960,6 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			Player.POWERED_HOVER_LIFT_SPEED
 		)
 		velocity.y = _direct_vertical_velocity
-	elif _direct_surface_swimming:
-		var swim_y := _direct_liquid_level - Player.LAKE_SWIM_FOOT_DEPTH
-		global_position.y = move_toward(global_position.y, swim_y, Player.LAKE_BUOYANCY_LIFT_SPEED * delta)
-		_direct_vertical_velocity = 0.0
-		velocity.y = 0.0
-		if jump_pressed:
-			_direct_vertical_velocity = HumanoidLocomotion.jump_speed(
-				_playable_profile, Player.WATER_EXIT_JUMP_HEIGHT_MULTIPLIER
-			)
-			velocity.y = _direct_vertical_velocity
-			_direct_surface_swimming = false
 	elif _direct_lava_surface:
 		global_position.y = _direct_liquid_level
 		_direct_vertical_velocity = 0.0
@@ -1039,8 +1020,6 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		var resolved_dive_floor: float = _direct_floor_height + Player.LAKE_DIVE_FLOOR_CLEARANCE
 		var resolved_dive_surface: float = _direct_liquid_level - Player.LAKE_SWIM_FOOT_DEPTH
 		global_position.y = clampf(global_position.y, resolved_dive_floor, resolved_dive_surface)
-	elif _direct_surface_swimming:
-		global_position.y = minf(global_position.y, _direct_liquid_level - Player.LAKE_SWIM_FOOT_DEPTH)
 	elif _direct_lava_surface:
 		global_position.y = _direct_liquid_level
 	if not bounced_before_move:
@@ -1109,7 +1088,7 @@ func _update_direct_power_fx() -> void:
 ## become a stable floor. Resolve the descending crown crossing before physics
 ## can zero vertical velocity and strand both rigs in their squash/jump poses.
 func _try_direct_blorb_bounce(delta: float) -> bool:
-	if velocity.y > 0.1 or _direct_diving or _direct_surface_swimming or _direct_flying or _direct_air_feet:
+	if velocity.y > 0.1 or _direct_diving or _direct_flying or _direct_air_feet:
 		return false
 	# His origin sits at his feet, so his feet are simply where he is.
 	var projected_xz := Vector2(
@@ -1130,7 +1109,7 @@ func _try_direct_blorb_bounce(delta: float) -> bool:
 ## Collision-backed recovery closes the remaining edge case where a squashed
 ## or moving crown differs slightly from its analytic surface during a frame.
 func _enforce_direct_blorb_bounce() -> bool:
-	if velocity.y > 0.1 or _direct_diving or _direct_surface_swimming or _direct_flying or _direct_air_feet:
+	if velocity.y > 0.1 or _direct_diving or _direct_flying or _direct_air_feet:
 		return false
 	var candidate := BlorbBounce.in_contact(self)
 	if candidate == null:
@@ -1168,7 +1147,7 @@ func _animate_direct_motion(delta: float, direction: Vector3, speed: float) -> v
 	if _penguin.diving or _penguin.sliding:
 		_animate_direct_penguin(delta)
 		return
-	if _direct_diving or _direct_surface_swimming:
+	if _direct_diving:
 		_animate_direct_swim(delta, speed)
 		return
 	if _direct_flying:
@@ -1200,7 +1179,7 @@ func _animate_direct_ice_skating(delta: float) -> void:
 ## Stands him on a cloud or in a tree canopy when one is under his feet and
 ## he is falling onto it. Returns true when one caught him.
 func _direct_one_way_support(delta: float) -> bool:
-	if _direct_vertical_velocity > 0.1 or _direct_diving or _direct_surface_swimming or _direct_flying:
+	if _direct_vertical_velocity > 0.1 or _direct_diving or _direct_flying:
 		return false
 	var ceiling: float = global_position.y + 0.2
 	var stand: Variant = WorldSupport.cloud_stand_height(self, 0.0, ceiling)
@@ -1317,7 +1296,7 @@ func _update_direct_crystal_riding(
 	ctx.grounded = is_on_floor() and _direct_vertical_velocity <= 0.1
 	var stick := Vector2(direction.x, direction.z)
 	var blocked := (
-		_direct_diving or _direct_surface_swimming or _direct_flying or _direct_air_feet
+		_direct_diving or _direct_flying or _direct_air_feet
 		or _powers.fire_limb_flight or _direct_lava_surface or _direct_dirtbike_active
 		or _direct_snowboard_active
 	)
@@ -1402,7 +1381,7 @@ func _direct_snowboard_surface() -> bool:
 func _resolve_direct_snowboard_motion(delta: float, _pre_move_position: Vector3) -> void:
 	if not _direct_snowboard_active or terrain == null:
 		return
-	if _direct_diving or _direct_surface_swimming or _direct_flying or _direct_lava_surface:
+	if _direct_diving or _direct_flying or _direct_lava_surface:
 		return
 	var target_h: float = terrain.get_mesh_height(global_position.x, global_position.z)
 	var rise: float = target_h - global_position.y
@@ -1539,7 +1518,7 @@ func _direct_dirtbike_slope() -> float:
 
 
 func _resolve_direct_dirtbike_motion(delta: float,pre_move_position: Vector3) -> void:
-	if not _direct_dirtbike_active or _direct_diving or _direct_surface_swimming or _direct_lava_surface or _direct_flying:
+	if not _direct_dirtbike_active or _direct_diving or _direct_lava_surface or _direct_flying:
 		_dirtbike.was_climbing = false
 		_direct_dirtbike_was_climbing = false
 		_direct_dirtbike_airborne = false
@@ -1615,7 +1594,7 @@ func _rig_pitch_target(delta: float) -> float:
 		var flight_ctx := _traversal_context(delta)
 		_flight.update_motion(flight_ctx)
 		return _flight.attitude_pitch(velocity)
-	if _direct_diving or _direct_surface_swimming:
+	if _direct_diving:
 		return _swim.attitude_pitch(_direct_diving)
 	if _direct_dirtbike_active:
 		# The wheelie owns its own pitch entirely.
@@ -1632,7 +1611,7 @@ func _apply_direct_swim_attitude(delta: float) -> void:
 	if is_nan(target):
 		# Something else owns the pitch outright this frame.
 		return
-	if target == 0.0 and not (_direct_diving or _direct_surface_swimming):
+	if target == 0.0 and not (_direct_diving):
 		_swim.reset()
 	if absf(rig.rotation.x - target) < 0.0005:
 		return
