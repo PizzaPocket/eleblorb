@@ -1295,6 +1295,8 @@ var _palm_right: Node3D
 var _palm_left: Node3D
 var _toe_right: Node3D
 var _toe_left: Node3D
+var _sole_left: Node3D
+var _sole_right: Node3D
 var _water_stream_left: GPUParticles3D
 var _water_stream_right: GPUParticles3D
 var _fire_stream_left: GPUParticles3D
@@ -1657,6 +1659,8 @@ func _apply_pivots(pivots: Dictionary) -> void:
 	_palm_left = pivots["palm_left"]
 	_toe_right = pivots["toe_right"]
 	_toe_left = pivots["toe_left"]
+	_sole_left = pivots["sole_left"]
+	_sole_right = pivots["sole_right"]
 
 
 ## The pivot-name map BlorbSuitController.setup() expects, built from
@@ -1674,6 +1678,7 @@ func _blorb_suit_pivot_map(pivots: Dictionary) -> Dictionary:
 		"wrist_left": pivots["wrist_left"], "wrist_right": pivots["wrist_right"],
 		"fingertip_left": pivots["fingertip_left"], "fingertip_right": pivots["fingertip_right"],
 		"toe_left": pivots["toe_left"], "toe_right": pivots["toe_right"],
+		"sole_left": pivots["sole_left"], "sole_right": pivots["sole_right"],
 	}
 
 
@@ -5025,13 +5030,13 @@ func _update_water_streams(delta: float) -> void:
 		_fire_stream_right, _palm_right, aim["right_fire_hand"],
 		_powers.right_arm_fire, roll_reference
 	)
-	SuitPowerFX.point_stream(_water_leg_stream_left, _toe_left, aim["water_foot"], _powers.left_leg_water, roll_reference)
-	SuitPowerFX.point_stream(_water_leg_stream_right, _toe_right, aim["water_foot"], _powers.right_leg_water, roll_reference)
+	SuitPowerFX.point_stream(_water_leg_stream_left, _sole_left, aim["water_foot"], _powers.left_leg_water, roll_reference)
+	SuitPowerFX.point_stream(_water_leg_stream_right, _sole_right, aim["water_foot"], _powers.right_leg_water, roll_reference)
 	SuitPowerFX.point_stream(
-		_fire_leg_stream_left, _toe_left, aim["left_fire_foot"], _powers.left_leg_fire, roll_reference
+		_fire_leg_stream_left, _sole_left, aim["left_fire_foot"], _powers.left_leg_fire, roll_reference
 	)
 	SuitPowerFX.point_stream(
-		_fire_leg_stream_right, _toe_right, aim["right_fire_foot"], _powers.right_leg_fire, roll_reference
+		_fire_leg_stream_right, _sole_right, aim["right_fire_foot"], _powers.right_leg_fire, roll_reference
 	)
 	SuitPowerFX.point_bolt(_electric_stream_left, _palm_left, forward, _powers.left_arm_electric, roll_reference)
 	SuitPowerFX.point_bolt(_electric_stream_right, _palm_right, forward, _powers.right_arm_electric, roll_reference)
@@ -7348,9 +7353,9 @@ func _set_ice_skate_visuals_present() -> void:
 	_ice_skate_blades_crystal=crystal
 	if _ice_skates_active:
 		if not is_instance_valid(_ice_skate_left):
-			_ice_skate_left=IceSkateMode.build_blade(_toe_left,"LeftIceSkate",1.0,-1.0,crystal)
+			_ice_skate_left=IceSkateMode.build_blade(_sole_left,_toe_left,"LeftIceSkate",1.0,-1.0,crystal)
 		if not is_instance_valid(_ice_skate_right):
-			_ice_skate_right=IceSkateMode.build_blade(_toe_right,"RightIceSkate",1.0,-1.0,crystal)
+			_ice_skate_right=IceSkateMode.build_blade(_sole_right,_toe_right,"RightIceSkate",1.0,-1.0,crystal)
 		return
 	if is_instance_valid(_ice_skate_left):
 		_ice_skate_left.queue_free()

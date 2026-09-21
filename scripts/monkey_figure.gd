@@ -499,6 +499,8 @@ static func build(
 		"ankle_right": leg_right["end"],
 		"toe_left": leg_left["toe"],
 		"toe_right": leg_right["toe"],
+		"sole_left": leg_left["sole_marker"],
+		"sole_right": leg_right["sole_marker"],
 		"hand_left": arm_left["wrist"],
 		"hand_right": arm_right["wrist"],
 		"palm_left": arm_left["end"],
@@ -577,6 +579,15 @@ static func _build_leg(
 	toe_marker.position = Vector3(0, -ANKLE_GROUND_CLEARANCE, FOOT_BULB_FORWARD)
 	ankle_marker.add_child(toe_marker)
 
+	# The underside of his foot, where it meets the ground: directly below
+	# the ankle rather than forward at the toe. Whatever a body wears or
+	# emits from the bottom of its foot attaches here, and this rig answers
+	# with its own foot depth instead of anyone assuming one.
+	var sole_marker := Node3D.new()
+	sole_marker.name = "MonkeySoleMarker"
+	sole_marker.position = Vector3(0, -ANKLE_GROUND_CLEARANCE, 0)
+	ankle_marker.add_child(sole_marker)
+
 	var mesh_instance := MeshInstance3D.new()
 	mesh_instance.name = "LegTube"
 	_apply_fur_material(mesh_instance, fur_color)
@@ -589,7 +600,8 @@ static func _build_leg(
 
 	return {
 		"pivot": hip_pivot, "joint": knee_pivot, "end": ankle_marker,
-		"toe": toe_marker, "mesh": mesh_instance, "sole": sole,
+		"toe": toe_marker, "sole_marker": sole_marker,
+		"mesh": mesh_instance, "sole": sole,
 	}
 
 

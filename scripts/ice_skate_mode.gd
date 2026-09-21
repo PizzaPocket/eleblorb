@@ -174,42 +174,64 @@ const RUNNER_HALF_LENGTH := 0.19
 const RUNNER_HALF_WIDTH := 0.022
 const RUNNER_HALF_HEIGHT := 0.025
 const SUPPORT_HEIGHT := 0.055
+## How far fore and aft of the ankle the two mounts stand, as a fraction of
+## the wearer's own foot length. The human's authored mounts sat 0.075 either
+## side of a 0.13 foot, which is where this comes from.
+const MOUNT_SPREAD := 0.577
 const TOTAL_HEIGHT := RUNNER_HALF_HEIGHT * 2.0 + SUPPORT_HEIGHT
 
 
+## `sole` is the underside of the wearer's own foot, which every rig
+## publishes for itself, and `toe` its forward tip: the blade is placed and
+## sized from those two rather than from the human figure's foot dimensions,
+## which is what it used to reach for. A rig with a different foot then gets
+## a blade that sits under that foot instead of under an assumption.
+##
+## `boot_drop` is how far a worn blorb boot's underside hangs below the bare
+## sole; the mounts begin there and the runner hangs below them.
 static func build_blade(
-	toe: Node3D,blade_name: String,scale_factor: float=1.0,sole_offset: float=-1.0,crystal: bool=false
+	sole: Node3D, toe: Node3D, blade_name: String, scale_factor: float = 1.0,
+	boot_drop: float = -1.0, crystal: bool = false
 ) -> Node3D:
-	var root:=Node3D.new()
-	root.name=blade_name
-	toe.add_child(root)
-	var resolved_sole_offset: float=(
-		BlorbSuit.worn_boot_sole_depth(scale_factor)
-		if sole_offset<0.0 else sole_offset
+	var root := Node3D.new()
+	root.name = blade_name
+	sole.add_child(root)
+	var drop: float = (
+		BlorbSuit.worn_boot_drop_below_sole(scale_factor) if boot_drop < 0.0 else boot_drop
 	)
-	var sole_y: float=-resolved_sole_offset
-	var ice_material:=CrystalTrack.crystal_material(CrystalTrack.BLADE_GLOW) if crystal else IceCrag.build_ice_material()
-	var support_height: float=SUPPORT_HEIGHT*scale_factor
-	var runner_half_height: float=RUNNER_HALF_HEIGHT*scale_factor
-	var runner_y: float=sole_y-support_height-runner_half_height
-	var runner:=SuperEgg.build_part(
+	var sole_y := -drop
+	var foot_length: float = RUNNER_HALF_LENGTH * scale_factor
+	if toe != null:
+		var reach := sole.global_position.distance_to(toe.global_position)
+		if reach > 0.0001:
+			foot_length = reach
+	var ice_material: Material = (
+		CrystalTrack.crystal_material(CrystalTrack.BLADE_GLOW)
+		if crystal else IceCrag.build_ice_material()
+	)
+	var support_height: float = SUPPORT_HEIGHT * scale_factor
+	var runner_half_height: float = RUNNER_HALF_HEIGHT * scale_factor
+	var runner := SuperEgg.build_part(
 		Vector3(
-			RUNNER_HALF_WIDTH*scale_factor,runner_half_height,
-			RUNNER_HALF_LENGTH*scale_factor
+			RUNNER_HALF_WIDTH * scale_factor, runner_half_height,
+			RUNNER_HALF_LENGTH * scale_factor
 		),
-		BLADE_COLOR,4.8,4.8
+		BLADE_COLOR, 4.8, 4.8
 	)
-	runner.position=Vector3(0.0,runner_y,-ProceduralFigure.FOOT_SIZE.z*scale_factor)
-	runner.set_surface_override_material(0,ice_material)
+	# Centred under the sole, which is under the ankle: the runner runs the
+	# length of the foot either side of it.
+	runner.position = Vector3(0.0, sole_y - support_height - runner_half_height, 0.0)
+	runner.set_surface_override_material(0, ice_material)
 	root.add_child(runner)
-	for unscaled_z: float in [-0.055,-0.205]:
-		var mount:=SuperEgg.build_part(
-			Vector3(0.032*scale_factor,support_height*0.5,0.028*scale_factor),
-			BLADE_COLOR,3.8,3.8
+	for fore: float in [MOUNT_SPREAD, -MOUNT_SPREAD]:
+		var mount := SuperEgg.build_part(
+			Vector3(0.032 * scale_factor, support_height * 0.5, 0.028 * scale_factor),
+			BLADE_COLOR, 3.8, 3.8
 		)
-		mount.position=Vector3(0.0,sole_y-support_height*0.5,unscaled_z*scale_factor)
-		mount.set_surface_override_material(0,ice_material)
+		mount.position = Vector3(0.0, sole_y - support_height * 0.5, fore * foot_length)
+		mount.set_surface_override_material(0, ice_material)
 		root.add_child(mount)
+	CollisionPolicy.mark_decorative(root)
 	return root
 
 

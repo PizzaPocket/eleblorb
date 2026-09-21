@@ -407,6 +407,7 @@ func _blorb_suit_pivot_map() -> Dictionary:
 		"wrist_left": _pivots["wrist_left"], "wrist_right": _pivots["wrist_right"],
 		"fingertip_left": _pivots["fingertip_left"], "fingertip_right": _pivots["fingertip_right"],
 		"toe_left": _pivots["toe_left"], "toe_right": _pivots["toe_right"],
+		"sole_left": _pivots["sole_left"], "sole_right": _pivots["sole_right"],
 	}
 
 
@@ -1058,12 +1059,12 @@ func _ensure_direct_power_fx() -> void:
 		SuitPowerFX.make_fire_stream(self, "RightFireFoot", fit),
 	]
 	_direct_electric_arm_fx = [
-		LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR),
-		LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR),
+		LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR, fit),
+		LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR, fit),
 	]
 	_direct_city_arm_fx = [
-		LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR),
-		LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR),
+		LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR, fit),
+		LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR, fit),
 	]
 
 
@@ -1083,10 +1084,10 @@ func _update_direct_power_fx() -> void:
 	SuitPowerFX.point_stream(_direct_water_arm_fx[1], _pivots["palm_right"], aim["water_hand"], _powers.right_arm_water, forward)
 	SuitPowerFX.point_stream(_direct_fire_arm_fx[0], _pivots["palm_left"], aim["left_fire_hand"], _powers.left_arm_fire, forward)
 	SuitPowerFX.point_stream(_direct_fire_arm_fx[1], _pivots["palm_right"], aim["right_fire_hand"], _powers.right_arm_fire, forward)
-	SuitPowerFX.point_stream(_direct_water_leg_fx[0], _pivots["toe_left"], aim["water_foot"], _powers.left_leg_water, forward)
-	SuitPowerFX.point_stream(_direct_water_leg_fx[1], _pivots["toe_right"], aim["water_foot"], _powers.right_leg_water, forward)
-	SuitPowerFX.point_stream(_direct_fire_leg_fx[0], _pivots["toe_left"], aim["left_fire_foot"], _powers.left_leg_fire, forward)
-	SuitPowerFX.point_stream(_direct_fire_leg_fx[1], _pivots["toe_right"], aim["right_fire_foot"], _powers.right_leg_fire, forward)
+	SuitPowerFX.point_stream(_direct_water_leg_fx[0], _pivots["sole_left"], aim["water_foot"], _powers.left_leg_water, forward)
+	SuitPowerFX.point_stream(_direct_water_leg_fx[1], _pivots["sole_right"], aim["water_foot"], _powers.right_leg_water, forward)
+	SuitPowerFX.point_stream(_direct_fire_leg_fx[0], _pivots["sole_left"], aim["left_fire_foot"], _powers.left_leg_fire, forward)
+	SuitPowerFX.point_stream(_direct_fire_leg_fx[1], _pivots["sole_right"], aim["right_fire_foot"], _powers.right_leg_fire, forward)
 	SuitPowerFX.point_bolt(_direct_electric_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_electric, forward)
 	SuitPowerFX.point_bolt(_direct_electric_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_electric, forward)
 	SuitPowerFX.point_bolt(_direct_city_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_city, forward)
@@ -1484,11 +1485,13 @@ func _set_direct_ice_skate_visuals() -> void:
 	if _direct_ice_skates_active:
 		if not is_instance_valid(_direct_ice_skate_left):
 			_direct_ice_skate_left=IceSkateMode.build_blade(
-				_pivots["toe_left"] as Node3D,"LeftIceSkate",scale_factor
+				_pivots["sole_left"] as Node3D,_pivots["toe_left"] as Node3D,
+				"LeftIceSkate",scale_factor
 			)
 		if not is_instance_valid(_direct_ice_skate_right):
 			_direct_ice_skate_right=IceSkateMode.build_blade(
-				_pivots["toe_right"] as Node3D,"RightIceSkate",scale_factor
+				_pivots["sole_right"] as Node3D,_pivots["toe_right"] as Node3D,
+				"RightIceSkate",scale_factor
 			)
 	else:
 		if is_instance_valid(_direct_ice_skate_left):

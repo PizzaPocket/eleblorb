@@ -157,8 +157,10 @@ func _build_space_thrusters() -> void:
 	var spine := _pivots.get("spine") as Node3D
 	var left_shoulder := _pivots.get("arm_left_shoulder") as Node3D
 	var right_shoulder := _pivots.get("arm_right_shoulder") as Node3D
-	var left_toe := _pivots.get("toe_left") as Node3D
-	var right_toe := _pivots.get("toe_right") as Node3D
+	# A foot thruster leaves through the sole, which every rig publishes for
+	# itself, rather than through the toe.
+	var left_sole := _pivots.get("sole_left") as Node3D
+	var right_sole := _pivots.get("sole_right") as Node3D
 	if spine != null:
 		_add_space_thruster("back", spine, Vector3(0.0, 0.16, -0.22) * _rig_scale, Vector3(0, 0, -1))
 		_add_space_thruster("chest", spine, Vector3(0.0, 0.16, 0.22) * _rig_scale, Vector3(0, 0, 1))
@@ -168,10 +170,10 @@ func _build_space_thrusters() -> void:
 	if right_shoulder != null:
 		_add_space_thruster("shoulder_right", right_shoulder, Vector3.ZERO, Vector3.UP)
 		_add_space_thruster("side_right", right_shoulder, Vector3(0.08, 0.0, 0.0) * _rig_scale, Vector3.RIGHT)
-	if left_toe != null:
-		_add_space_thruster("foot_left", left_toe, Vector3.ZERO, Vector3.DOWN)
-	if right_toe != null:
-		_add_space_thruster("foot_right", right_toe, Vector3.ZERO, Vector3.DOWN)
+	if left_sole != null:
+		_add_space_thruster("foot_left", left_sole, Vector3.ZERO, Vector3.DOWN)
+	if right_sole != null:
+		_add_space_thruster("foot_right", right_sole, Vector3.ZERO, Vector3.DOWN)
 
 
 func _add_space_thruster(key: String, anchor: Node3D, offset: Vector3, exhaust_direction: Vector3) -> void:
@@ -181,7 +183,9 @@ func _add_space_thruster(key: String, anchor: Node3D, offset: Vector3, exhaust_d
 	stream.lifetime = 0.16
 	stream.randomness = 0.55
 	stream.local_coords = true
-	stream.visibility_aabb = AABB(Vector3(-0.4, -0.4, -0.8), Vector3(0.8, 0.8, 1.6))
+	stream.visibility_aabb = AABB(
+		Vector3(-0.4, -0.4, -0.8) * _rig_scale, Vector3(0.8, 0.8, 1.6) * _rig_scale
+	)
 	var texture := ParticleFX.build_soft_gradient_texture(16, 2.4)
 	var material := ParticleFX.build_billboard_material(texture, Color.WHITE, true, 0.0)
 	material.vertex_color_use_as_albedo = true

@@ -344,6 +344,14 @@ static func worn_boot_sole_depth(rig_scale: float = 1.0) -> float:
 	var ankle_radius := _avg_xz(ProceduralFigure.FOOT_SIZE) * LIMB_INFLATE * 1.1 * LEG_RADIUS_SCALE
 	return ankle_radius * FOOT_TOE_RADIUS_RATIO * rig_scale
 
+
+## How far a worn boot's underside hangs below the wearer's own bare sole.
+## The depth above is measured from the middle of the foot, which is where
+## the toe marker sits; anything attaching to the sole itself wants the part
+## that is actually below it.
+static func worn_boot_drop_below_sole(rig_scale: float = 1.0) -> float:
+	return maxf(worn_boot_sole_depth(rig_scale) - ProceduralFigure.FOOT_SIZE.y * rig_scale, 0.0)
+
 ## Raised 10% per direct correction ("increase its size by 10%") on top of
 ## the earlier 1.55 pass -- 1.55 * 1.1. HAT_HEIGHT_SCALE doesn't need its
 ## own separate bump: hat_height is derived as hat_radius * HAT_HEIGHT_

@@ -53,15 +53,22 @@ var emitting: bool = false:
 ## Set once at creation (see spawn() below) and left alone -- the whole
 ## bolt (core-to-edge color range) is built from this single tint.
 var color: Color = Color(1.0, 0.95, 0.3)
+## How large this bolt is relative to the figure it was authored against.
+var wearer_scale: float = 1.0
 
 var _mesh_instance: MeshInstance3D
 var _regen_timer: float = 0.0
 var _rng := RandomNumberGenerator.new()
 
 
-static func spawn(parent: Node3D, bolt_color: Color) -> LightningBolt:
+## `rig_scale` sizes the bolt to whoever is throwing it, the same way every
+## other suit power is sized to its wearer: a six-metre bolt of the human's
+## thickness thrown from a hand a quarter that size is not the same power,
+## it is a different one.
+static func spawn(parent: Node3D, bolt_color: Color, rig_scale: float = 1.0) -> LightningBolt:
 	var bolt := LightningBolt.new()
 	bolt.color = bolt_color
+	bolt.wearer_scale = maxf(rig_scale, 0.01)
 	parent.add_child(bolt)
 	return bolt
 
@@ -100,16 +107,16 @@ func _regenerate() -> void:
 	points.append(Vector3.ZERO)
 	for i in range(1, SEGMENT_COUNT):
 		var t := float(i) / float(SEGMENT_COUNT)
-		var point := Vector3(0.0, 0.0, -RANGE * t)
+		var point := Vector3(0.0, 0.0, -RANGE * wearer_scale * t)
 		var side := Vector3(_rng.randf_range(-1.0, 1.0), _rng.randf_range(-1.0, 1.0), 0.0)
 		if side.length_squared() > 0.0001:
 			side = side.normalized()
 		# Tapered to zero at both ends (sin(t*PI) peaks at the midpoint) so
 		# the bolt never visibly detaches from its own source or target.
 		var taper := sin(t * PI)
-		point += side * JITTER_AMOUNT * taper
+		point += side * JITTER_AMOUNT * wearer_scale * taper
 		points.append(point)
-	points.append(Vector3(0.0, 0.0, -RANGE))
+	points.append(Vector3(0.0, 0.0, -RANGE * wearer_scale))
 	_mesh_instance.mesh = _build_ribbon_mesh(points)
 
 
@@ -125,8 +132,8 @@ func _build_ribbon_mesh(points: Array[Vector3]) -> ArrayMesh:
 		var right := dir.cross(up)
 		if right.length_squared() < 0.0001:
 			right = Vector3.RIGHT
-		right = right.normalized() * THICKNESS
-		var cross_axis := dir.cross(right).normalized() * THICKNESS
+		right = right.normalized() * THICKNESS * wearer_scale
+		var cross_axis := dir.cross(right).normalized() * THICKNESS * wearer_scale
 		# Per-segment brightness rolled fresh each regeneration -- a real
 		# arc doesn't glow evenly along its own length, some stretches read
 		# brighter/hotter than others at any given instant.

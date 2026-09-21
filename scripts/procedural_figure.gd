@@ -656,6 +656,8 @@ static func build(
 		"ankle_right": leg_right["ankle"],
 		"toe_left": leg_left["toe"],
 		"toe_right": leg_right["toe"],
+		"sole_left": leg_left["sole"],
+		"sole_right": leg_right["sole"],
 		"hand_left": arm_left["hand"],
 		"hand_right": arm_right["hand"],
 		"palm_left": arm_left["palm"],
@@ -1028,7 +1030,20 @@ static func _build_leg(
 	toe.position = Vector3(0, 0, foot_size.z)
 	foot.add_child(toe)
 
-	return {"pivot": leg_pivot, "joint": knee_pivot, "ankle": ankle_pivot, "toe": toe}
+	# The underside of the foot, where it meets the ground, in the foot's own
+	# space so it follows every ankle motion. Anything a body wears or emits
+	# from the bottom of its foot -- a skate blade, a jet -- attaches here
+	# rather than guessing at an offset from the ankle, so a rig of any shape
+	# answers for its own sole.
+	var sole := Node3D.new()
+	sole.name = "SoleAttach"
+	sole.position = Vector3(0, -foot_size.y, 0)
+	foot.add_child(sole)
+
+	return {
+		"pivot": leg_pivot, "joint": knee_pivot, "ankle": ankle_pivot,
+		"toe": toe, "sole": sole,
+	}
 
 
 ## Builds a limb segment slightly longer than its *logical* size at one or
