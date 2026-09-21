@@ -299,6 +299,11 @@ const LEG_RADIUS_SCALE := 0.75
 ## reference the exact same ratio rather than a second hardcoded copy.
 const HAND_TIP_RADIUS_RATIO := 0.7
 const FOOT_TOE_RADIUS_RATIO := 0.8
+## How far past a published limb tip the shell's last control point sits, as a
+## fraction of the radius there. The tube tapers to nothing at that point, so
+## a little reach keeps the boot from clipping the toe it covers without
+## hanging anything below the sole.
+const TIP_REACH_FRACTION := 0.35
 ## Where along wrist->tip / ankle->toe each limb's own eye/core anchor
 ## sits (see rebuild_arm()'s HAND_EYE_T / rebuild_leg()'s BOOT_EYE_T) --
 ## same reason as the ratios above: shared here so the core-size match
@@ -990,8 +995,14 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 			radii.append(float(station_radii[index]) * fit)
 		r_ankle = radii[radii.size() - 2]
 		r_toe = radii[radii.size() - 1]
+		# The shell closes the way the leg itself closes: build_limb_tube()
+		# tapers its last control point to nothing, so the boot ends where the
+		# foot ends. A rounded cap appended past that point instead hung a ball
+		# of the toe's full radius below the sole, which is the extension of
+		# blorb leg that showed beneath his actual feet.
 		var tip: Vector3 = points[points.size() - 1]
-		_append_round_cap(points, radii, tip, leg_profile["tip_direction"] as Vector3, r_toe)
+		var tip_direction := (leg_profile["tip_direction"] as Vector3).normalized()
+		points[points.size() - 1] = tip + tip_direction * r_toe * TIP_REACH_FRACTION
 		var hip_overlap := float(limb_fit.get("leg_hip_overlap", 0.0))
 		if hip_overlap > 0.0:
 			var hip_outward := -(knee_pos - hip_pos).normalized()
