@@ -1102,20 +1102,10 @@ func _update_direct_power_fx() -> void:
 	SuitPowerFX.point_stream(_direct_water_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _powers.right_leg_water, roll_reference)
 	SuitPowerFX.point_stream(_direct_fire_leg_fx[0], _pivots["toe_left"], Vector3.DOWN, _powers.left_leg_fire, roll_reference)
 	SuitPowerFX.point_stream(_direct_fire_leg_fx[1], _pivots["toe_right"], Vector3.DOWN, _powers.right_leg_fire, roll_reference)
-	_point_direct_lightning(_direct_electric_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_electric)
-	_point_direct_lightning(_direct_electric_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_electric)
-	_point_direct_lightning(_direct_city_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_city)
-	_point_direct_lightning(_direct_city_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_city)
-
-
-func _point_direct_lightning(bolt: LightningBolt, emitter: Node3D, direction: Vector3, active: bool) -> void:
-	if bolt == null or emitter == null:
-		return
-	bolt.emitting = active
-	if not active:
-		return
-	bolt.global_position = emitter.global_position
-	bolt.look_at(bolt.global_position + direction, Vector3.UP)
+	SuitPowerFX.point_bolt(_direct_electric_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_electric, roll_reference)
+	SuitPowerFX.point_bolt(_direct_electric_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_electric, roll_reference)
+	SuitPowerFX.point_bolt(_direct_city_arm_fx[0], _pivots["palm_left"], forward, _powers.left_arm_city, roll_reference)
+	SuitPowerFX.point_bolt(_direct_city_arm_fx[1], _pivots["palm_right"], forward, _powers.right_arm_city, roll_reference)
 
 
 ## Same trampoline invariant as the human motor: an ordinary Blorb can never

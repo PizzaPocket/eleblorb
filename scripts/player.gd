@@ -635,8 +635,10 @@ const AERIAL_HEAD_TURN_SPEED := 6.0
 
 const CAMERA_GROUND_MARGIN := 0.4
 const LAVA_CONTACT_TOLERANCE := LavaMode.CONTACT_TOLERANCE
-const WATER_STREAM_SPEED := 15.0
-const WATER_STREAM_LIFETIME := 0.42
+## The water hose's own throw, which belongs to the stream rather than to
+## whoever is holding it: see SuitPowerFX.
+const WATER_STREAM_SPEED := SuitPowerFX.WATER_STREAM_SPEED
+const WATER_STREAM_LIFETIME := SuitPowerFX.WATER_STREAM_LIFETIME
 
 ## CONVENTION, confirmed by direct correction -- do not rotate this
 ## CharacterBody's own top-level `rotation` to solve a spawn-framing
@@ -4738,16 +4740,16 @@ func _apply_flight_aim_pose(delta: float) -> void:
 
 
 func _build_water_streams() -> void:
-	_water_stream_left = _make_water_stream("LeftWaterHose")
-	_water_stream_right = _make_water_stream("RightWaterHose")
-	_fire_stream_left = _make_fire_stream("LeftFlamethrower")
-	_fire_stream_right = _make_fire_stream("RightFlamethrower")
+	_water_stream_left = SuitPowerFX.make_water_stream(self, "LeftWaterHose")
+	_water_stream_right = SuitPowerFX.make_water_stream(self, "RightWaterHose")
+	_fire_stream_left = SuitPowerFX.make_fire_stream(self, "LeftFlamethrower")
+	_fire_stream_right = SuitPowerFX.make_fire_stream(self, "RightFlamethrower")
 	_fire_stream_left.local_coords = true
 	_fire_stream_right.local_coords = true
-	_water_leg_stream_left = _make_water_stream("LeftWaterFootJet")
-	_water_leg_stream_right = _make_water_stream("RightWaterFootJet")
-	_fire_leg_stream_left = _make_fire_stream("LeftFireFootJet")
-	_fire_leg_stream_right = _make_fire_stream("RightFireFootJet")
+	_water_leg_stream_left = SuitPowerFX.make_water_stream(self, "LeftWaterFootJet")
+	_water_leg_stream_right = SuitPowerFX.make_water_stream(self, "RightWaterFootJet")
+	_fire_leg_stream_left = SuitPowerFX.make_fire_stream(self, "LeftFireFootJet")
+	_fire_leg_stream_right = SuitPowerFX.make_fire_stream(self, "RightFireFootJet")
 	# Fire jets remain attached to their animated emitters. World-space
 	# simulation abandoned each flame at an old hand/foot position whenever
 	# the player moved quickly.
@@ -4759,183 +4761,14 @@ func _build_water_streams() -> void:
 	# droplets so its arc hangs in the air behind a sweep.
 	_water_leg_stream_left.local_coords = true
 	_water_leg_stream_right.local_coords = true
-	_set_stream_inherits_velocity(_water_leg_stream_left, false)
-	_set_stream_inherits_velocity(_water_leg_stream_right, false)
+	SuitPowerFX.set_inherits_velocity(_water_leg_stream_left, false)
+	SuitPowerFX.set_inherits_velocity(_water_leg_stream_right, false)
 	_electric_stream_left = LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR)
 	_electric_stream_right = LightningBolt.spawn(self, LightningBolt.ELECTRIC_LIGHTNING_COLOR)
 	_city_stream_left = LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR)
 	_city_stream_right = LightningBolt.spawn(self, LightningBolt.CITY_LIGHTNING_COLOR)
 
 
-## Soft particle texture/ramp tuning -- see particle_fx.gd's own class doc
-## comment for the general technique this and _make_fire_stream() both use.
-const WATER_PARTICLE_SOFTNESS := 2.2
-const FIRE_PARTICLE_SOFTNESS := 1.7
-## Lower than it might otherwise be -- with angle_min/max now a narrow
-## range instead of a full 0-360 spin (see _make_fire_stream()'s own
-## comment on particle_flag_align_y), each particle's own rotation varies
-## far less, so a strong wobble would read as the same asymmetric shape
-## repeating lick to lick rather than organic variety.
-const FIRE_PARTICLE_WOBBLE := 0.2
-
-
-## A world-space stream inherits its nozzle's velocity; one simulated in the
-## emitter's own space must not, or the nozzle's motion is counted twice.
-func _set_stream_inherits_velocity(stream: GPUParticles3D, inherits: bool) -> void:
-	var process := stream.process_material as ParticleProcessMaterial
-	if process != null:
-		process.inherit_velocity_ratio = 1.0 if inherits else 0.0
-
-
-func _make_water_stream(stream_name: String) -> GPUParticles3D:
-	var stream := GPUParticles3D.new()
-	stream.name = stream_name
-	stream.amount = 180
-	stream.lifetime = WATER_STREAM_LIFETIME
-	stream.randomness = 0.12
-	stream.visibility_aabb = AABB(Vector3(-0.6, -0.6, -7.0), Vector3(1.2, 1.2, 7.4))
-	# A soft, alpha-blended billboard instead of a solid-colored SphereMesh
-	# -- per direct report, the old sphere read as a hard uniform ball
-	# regardless of color, not water.
-	var texture := ParticleFX.build_soft_gradient_texture(24, WATER_PARTICLE_SOFTNESS)
-	var water_material := ParticleFX.build_billboard_material(texture, Color.WHITE, false, 0.35)
-	water_material.vertex_color_use_as_albedo = true
-	var droplet := QuadMesh.new()
-	droplet.size = Vector2(0.16, 0.16)
-	droplet.material = water_material
-	var process := ParticleProcessMaterial.new()
-	# look_at() below aims local -Z down the character's +Z forward axis.
-	process.direction = Vector3(0.0, 0.0, -1.0)
-	process.spread = 1.0
-	# A hose stays almost parallel but has a slight weighty downward arc.
-	process.gravity = Vector3(0.0, -1.2, 0.0)
-	process.initial_velocity_min = WATER_STREAM_SPEED * 0.9
-	process.initial_velocity_max = WATER_STREAM_SPEED * 1.1
-	# Water leaves a moving nozzle carrying the nozzle's own speed, so a
-	# running hose's stream keeps pace instead of being outrun.
-	process.inherit_velocity_ratio = 1.0
-	process.scale_min = 0.85
-	process.scale_max = 1.3
-	# A bright near-white highlight right at the nozzle, settling into the
-	# same rich blue every fountain/water blorb already uses, fading to
-	# transparent as each droplet reaches the end of its short life -- a
-	# flat single color (the earlier approach) read as one uniform, opaque
-	# ball; this reads as an actual spray of individual droplets catching
-	# the light.
-	process.color_ramp = ParticleFX.build_color_ramp([
-		{"offset": 0.0, "color": Color(0.85, 0.95, 1.0, 0.95)},
-		{"offset": 0.35, "color": TownProps.WATER_COLOR},
-		{"offset": 1.0, "color": Color(TownProps.WATER_COLOR.r, TownProps.WATER_COLOR.g, TownProps.WATER_COLOR.b, 0.0)},
-	])
-	stream.process_material = process
-	stream.draw_pass_1 = droplet
-	stream.emitting = false
-	add_child(stream)
-	stream.top_level = true
-	return stream
-
-
-func _make_fire_stream(stream_name: String) -> GPUParticles3D:
-	var stream := GPUParticles3D.new()
-	stream.name = stream_name
-	# A dense short-lived, broad cone reads as a continuous flamethrower,
-	# unlike the long evenly-spaced droplets used by the water hose.
-	stream.amount = 260
-	stream.lifetime = 0.34
-	stream.randomness = 0.35
-	stream.visibility_aabb = AABB(Vector3(-1.5, -1.5, -7.0), Vector3(3.0, 3.0, 7.4))
-	# Soft, additively-blended billboards instead of a solid-colored
-	# SphereMesh -- per direct report ("look like orange bubbles"). See
-	# particle_fx.gd's own class doc comment: overlapping additive
-	# particles build up glowing brightness the way real flame does,
-	# rather than each one just occluding what's behind it like a solid
-	# object would.
-	var texture := ParticleFX.build_soft_gradient_texture(24, FIRE_PARTICLE_SOFTNESS, FIRE_PARTICLE_WOBBLE)
-	var flame_material := ParticleFX.build_billboard_material(texture, Color.WHITE, true, 0.0)
-	flame_material.vertex_color_use_as_albedo = true
-	# Elongated (taller than wide), not square -- paired with
-	# particle_flag_align_y below, this reads as a streak pointed along
-	# each particle's own direction of travel rather than a round puff, so
-	# the whole spray reads as a directional jet again. Per direct
-	# correction: the earlier square, freely-spinning (angle_min/max 0-360)
-	# blob looked like fire, but no longer like it was going anywhere in
-	# particular.
-	var flame := QuadMesh.new()
-	flame.size = Vector2(0.22, 0.5)
-	flame.material = flame_material
-	var process := ParticleProcessMaterial.new()
-	process.direction = Vector3(0.0, 0.0, -1.0)
-	process.spread = 6.0
-	process.gravity = Vector3(0.0, -1.4, 0.0)
-	process.initial_velocity_min = 9.0
-	process.initial_velocity_max = 14.0
-	process.scale_min = 0.5
-	process.scale_max = 1.05
-	# Aligns each particle's own local Y (the quad's long axis, see
-	# flame.size above) to its own velocity direction while still
-	# billboarding around that axis to face the camera -- Godot's own
-	# standard technique for a directional streak (rain, sparks, jets),
-	# rather than a billboard that only ever reads as a flat round puff
-	# regardless of how fast or which way it's actually moving.
-	process.particle_flag_align_y = true
-	# A small range, not a full random spin -- enough per-particle variety
-	# that the reused wobble texture (see build_soft_gradient_texture()'s
-	# own comment) doesn't look identical lick to lick, without undoing the
-	# velocity alignment just set above.
-	process.angle_min = -12.0
-	process.angle_max = 12.0
-	# A real flame cools as it travels outward: bright pale heat at the
-	# nozzle, through orange, settling into the same deep red-orange every
-	# fire blorb/Fire Gem already uses, fading to transparent as it dies.
-	process.color_ramp = ParticleFX.build_color_ramp([
-		{"offset": 0.0, "color": Color(1.0, 0.95, 0.75, 1.0)},
-		{"offset": 0.25, "color": Color(1.0, 0.55, 0.1, 1.0)},
-		{"offset": 0.6, "color": Color(0.85, 0.25, 0.05, 0.9)},
-		{"offset": 1.0, "color": Color(0.35, 0.06, 0.02, 0.0)},
-	])
-	# Visibly forms just past the nozzle, then dissipates -- not a fixed
-	# size the whole time.
-	process.scale_curve = ParticleFX.build_scale_curve(0.6, 1.15, 0.3, 0.7)
-	# Organic flicker, but modest -- per direct correction, the original
-	# turbulence strength scattered particles enough sideways motion that
-	# the spray stopped reading as a coherent jet at all. Kept low enough
-	# now to still flicker without visibly dispersing the cone.
-	process.turbulence_enabled = true
-	process.turbulence_noise_strength = 1.0
-	process.turbulence_noise_scale = 2.0
-	process.turbulence_influence_min = 0.04
-	process.turbulence_influence_max = 0.15
-	stream.process_material = process
-	stream.draw_pass_1 = flame
-	stream.emitting = false
-	add_child(stream)
-	stream.top_level = true
-	return stream
-
-
-
-
-## Same position/look_at()/wobble aiming _update_water_stream() applies to a
-## GPUParticles3D stream, just typed for LightningBolt instead -- GDScript
-## has no structural typing, so a plain Node3D-typed LightningBolt can't be
-## passed into that function's GPUParticles3D-typed parameter, and this
-## small duplicate is simpler than forcing an artificial shared base type
-## across two otherwise-unrelated node kinds.
-func _update_lightning_bolt(bolt: LightningBolt, hand: Node3D, forward: Vector3, active: bool) -> void:
-	if bolt == null or hand == null:
-		return
-	bolt.emitting = active
-	if not active:
-		return
-	var origin := hand.global_position
-	bolt.global_position = origin
-	var up_reference := Vector3.UP
-	if absf(forward.normalized().dot(up_reference)) > 0.98:
-		up_reference = visuals.global_transform.basis.z.normalized()
-	var phase := float(bolt.get_instance_id() % 1000) * 0.01
-	var t := Time.get_ticks_msec() * 0.001 * STREAM_AIM_WOBBLE_SPEED + phase
-	var wobble := Basis(Vector3.UP, sin(t) * STREAM_AIM_WOBBLE_ANGLE) * Basis(Vector3.RIGHT, cos(t * 1.3) * STREAM_AIM_WOBBLE_ANGLE)
-	bolt.look_at(origin + wobble * forward, up_reference)
 
 
 ## The continuous limb-power drains, which belong to the powers rather than
@@ -5281,35 +5114,37 @@ func _update_water_streams(delta: float) -> void:
 	if is_instance_valid(_water_stream_left):
 		for hose in [_water_stream_left, _water_stream_right]:
 			hose.local_coords = swimming
-			_set_stream_inherits_velocity(hose, not swimming)
-	_update_water_stream(
+			SuitPowerFX.set_inherits_velocity(hose, not swimming)
+	# A jet aimed straight down takes its roll from the body's own forward.
+	var roll_reference := visuals.global_transform.basis.z.normalized()
+	SuitPowerFX.point_stream(
 		_water_stream_left, _palm_left, water_hand_direction,
-		_powers.left_arm_water
+		_powers.left_arm_water, roll_reference
 	)
-	_update_water_stream(
+	SuitPowerFX.point_stream(
 		_water_stream_right, _palm_right, water_hand_direction,
-		_powers.right_arm_water
+		_powers.right_arm_water, roll_reference
 	)
-	_update_water_stream(
+	SuitPowerFX.point_stream(
 		_fire_stream_left, _palm_left, left_hand_direction,
-		_powers.left_arm_fire
+		_powers.left_arm_fire, roll_reference
 	)
-	_update_water_stream(
+	SuitPowerFX.point_stream(
 		_fire_stream_right, _palm_right, right_hand_direction,
-		_powers.right_arm_fire
+		_powers.right_arm_fire, roll_reference
 	)
-	_update_water_stream(_water_leg_stream_left, _toe_left, water_foot_direction, _powers.left_leg_water)
-	_update_water_stream(_water_leg_stream_right, _toe_right, water_foot_direction, _powers.right_leg_water)
-	_update_water_stream(
-		_fire_leg_stream_left, _toe_left, _foot_jet_direction(_ankle_left), _powers.left_leg_fire
+	SuitPowerFX.point_stream(_water_leg_stream_left, _toe_left, water_foot_direction, _powers.left_leg_water, roll_reference)
+	SuitPowerFX.point_stream(_water_leg_stream_right, _toe_right, water_foot_direction, _powers.right_leg_water, roll_reference)
+	SuitPowerFX.point_stream(
+		_fire_leg_stream_left, _toe_left, _foot_jet_direction(_ankle_left), _powers.left_leg_fire, roll_reference
 	)
-	_update_water_stream(
-		_fire_leg_stream_right, _toe_right, _foot_jet_direction(_ankle_right), _powers.right_leg_fire
+	SuitPowerFX.point_stream(
+		_fire_leg_stream_right, _toe_right, _foot_jet_direction(_ankle_right), _powers.right_leg_fire, roll_reference
 	)
-	_update_lightning_bolt(_electric_stream_left, _palm_left, forward, _powers.left_arm_electric)
-	_update_lightning_bolt(_electric_stream_right, _palm_right, forward, _powers.right_arm_electric)
-	_update_lightning_bolt(_city_stream_left, _palm_left, forward, _powers.left_arm_city)
-	_update_lightning_bolt(_city_stream_right, _palm_right, forward, _powers.right_arm_city)
+	SuitPowerFX.point_bolt(_electric_stream_left, _palm_left, forward, _powers.left_arm_electric, roll_reference)
+	SuitPowerFX.point_bolt(_electric_stream_right, _palm_right, forward, _powers.right_arm_electric, roll_reference)
+	SuitPowerFX.point_bolt(_city_stream_left, _palm_left, forward, _powers.left_arm_city, roll_reference)
+	SuitPowerFX.point_bolt(_city_stream_right, _palm_right, forward, _powers.right_arm_city, roll_reference)
 	var forward_stream_active := (
 		((_powers.left_arm_water or _powers.right_arm_water) and not swimming)
 		or _powers.left_arm_electric or _powers.right_arm_electric
@@ -5453,35 +5288,14 @@ func _foot_jet_direction(ankle: Node3D) -> Vector3:
 
 
 ## Angle/speed of the small organic waver applied to a stream's own AIM
-## below -- distinct from _make_fire_stream()'s per-particle turbulence
+## below -- distinct from SuitPowerFX.make_fire_stream()'s per-particle turbulence
 ## (which randomizes each particle's own motion once already emitted).
 ## Following a flamethrower VFX tutorial's own core technique of also
 ## randomizing the EMITTER's own aim (there, noise-modulated keyframes on
 ## the held prop's rotation), a real held hose/flamethrower never points
 ## perfectly still either.
-const STREAM_AIM_WOBBLE_ANGLE := deg_to_rad(2.5)
-const STREAM_AIM_WOBBLE_SPEED := 3.2
-
-
-func _update_water_stream(stream: GPUParticles3D, hand: Node3D, forward: Vector3, active: bool) -> void:
-	if stream == null or hand == null:
-		return
-	stream.emitting = active
-	if not active:
-		return
-	var origin := hand.global_position
-	stream.global_position = origin
-	# Looking exactly down with world-up as the secondary axis is singular.
-	# The body's forward supplies a stable roll reference for vertical jets.
-	var up_reference := Vector3.UP
-	if absf(forward.normalized().dot(up_reference)) > 0.98:
-		up_reference = visuals.global_transform.basis.z.normalized()
-	# Phased off the stream's own instance ID so the two hands/feet don't
-	# wobble in an obviously mirrored, synced way.
-	var phase := float(stream.get_instance_id() % 1000) * 0.01
-	var t := Time.get_ticks_msec() * 0.001 * STREAM_AIM_WOBBLE_SPEED + phase
-	var wobble := Basis(Vector3.UP, sin(t) * STREAM_AIM_WOBBLE_ANGLE) * Basis(Vector3.RIGHT, cos(t * 1.3) * STREAM_AIM_WOBBLE_ANGLE)
-	stream.look_at(origin + wobble * forward, up_reference)
+const STREAM_AIM_WOBBLE_ANGLE := SuitPowerFX.AIM_WOBBLE_ANGLE
+const STREAM_AIM_WOBBLE_SPEED := SuitPowerFX.AIM_WOBBLE_SPEED
 
 
 ## CheatCodes.toggled's handler -- see the _ready() connection above. Only
@@ -5923,7 +5737,7 @@ func _update_head_look(delta: float) -> void:
 		var world_gaze := (visuals.global_transform.basis * local_gaze).normalized()
 		var camera_up := camera.global_transform.basis.y.normalized()
 		# Looking nearly straight up/down the camera's own up axis is
-		# singular for looking_at() (same issue _update_water_stream()
+		# singular for looking_at() (same issue SuitPowerFX.point_stream(, roll_reference)
 		# already guards against elsewhere in this file, for the same
 		# reason) -- the body's own forward is a stable fallback reference
 		# in that case.
