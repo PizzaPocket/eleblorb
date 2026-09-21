@@ -1487,14 +1487,7 @@ func _set_direct_dirtbike_wheel_presence() -> void:
 
 
 func _build_direct_dirtbike_wheel(wheel_name: String) -> MeshInstance3D:
-	var radius: float = Player.DIRTBIKE_WHEEL_RADIUS*_playable_profile.suit_rig_scale
-	var thickness: float = Player.DIRTBIKE_WHEEL_THICKNESS*_playable_profile.suit_rig_scale
-	var wheel: MeshInstance3D = SuperEgg.build_part(
-		Vector3(radius,thickness*0.5,radius),Player.DIRTBIKE_WHEEL_COLOR,2.0,2.0
-	)
-	wheel.name = wheel_name
-	add_child(wheel)
-	return wheel
+	return DirtbikeMode.build_wheel(self, wheel_name, _playable_profile.suit_rig_scale)
 
 
 func _direct_dirtbike_slope() -> float:

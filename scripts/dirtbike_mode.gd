@@ -13,6 +13,17 @@ extends TraversalMode
 ## slope, rolling resistance and quadratic air drag are integrated
 ## continuously, so a bike coasts down a hill and dies out on the flat.
 
+## The wheels themselves. Per direct correction ("wheels diameter is too
+## large, reduce by 20%"), the radius was 0.55. A same-size front wheel
+## mounted at the wrists starts well clear of the ground and only reaches it
+## once the body leans forward into the wheelie.
+const WHEEL_RADIUS := 0.44
+const WHEEL_THICKNESS := WHEEL_RADIUS * 0.6
+## Matches blorb.gd's own "ground" body colour exactly, per direct correction
+## ("they should match the color of the ground blorbs"): the darker loamy
+## BODY tone, not the lighter, more yellow-brown element glow.
+const WHEEL_COLOR := ElementPalette.GROUND_BODY
+
 const DRIVE_ACCELERATION := 22.0
 ## Tire traction is deliberately balanced: ordinary steering carries speed,
 ## while a perpendicular carve scrubs and a full reversal brakes decisively.
@@ -79,6 +90,19 @@ func coast(rolling: Vector2, sampled_grade: float, delta: float, grounded: bool)
 		ROLLING_RESISTANCE if grounded else 0.0, AIR_DRAG,
 		ROLL_STOP_SPEED, TERMINAL_ROLL_SPEED
 	)
+
+
+## A solid disk, not a torus: a hand-built torus had its normals flipped,
+## and a plain SuperEgg part sidesteps that by reusing the builder every
+## other prop in the project already trusts. Built at the wearer's own scale,
+## so a smaller rider gets wheels that fit, the same way the snowboard's deck
+## and the skate blades do.
+static func build_wheel(parent: Node3D, wheel_name: String, rig_scale: float = 1.0) -> MeshInstance3D:
+	var semi_axes := Vector3(WHEEL_RADIUS, WHEEL_THICKNESS * 0.5, WHEEL_RADIUS) * rig_scale
+	var wheel := SuperEgg.build_part(semi_axes, WHEEL_COLOR, 2.0, 2.0)
+	wheel.name = wheel_name
+	parent.add_child(wheel)
+	return wheel
 
 
 ## The grade along `direction` at the body's feet.

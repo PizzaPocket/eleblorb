@@ -129,18 +129,10 @@ const CLOUD_SINK_DEPTH := WorldSupport.CLOUD_SINK_DEPTH
 ## front wheel mounted up at the wrists starts well clear of the ground, and
 ## only reaches it once the body leans forward by _solve_dirtbike_wheelie_
 ## pitch()'s own live-solved angle, below.
-## Per direct correction ("wheels diameter is too large, reduce by 20%") --
-## was 0.55.
-const DIRTBIKE_WHEEL_RADIUS := 0.44
-const DIRTBIKE_WHEEL_THICKNESS := DIRTBIKE_WHEEL_RADIUS * 0.6
-## Matches blorb.gd's own _apply_element_visuals() "ground" body color
-## exactly (Color(0.3, 0.2, 0.1, 0.93) there, alpha dropped since this prop
-## is solid/opaque rather than a living blorb's own slight translucency) --
-## per direct correction ("they should match the color of the ground
-## blorbs"). The project's "ground" element glow/core color is a lighter,
-## more yellow-brown (see _element_glow_color()) and is NOT what this
-## refers to -- the wheel needs the darker loamy BODY tone specifically.
-const DIRTBIKE_WHEEL_COLOR := ElementPalette.GROUND_BODY
+## The wheels belong to DirtbikeMode with the rest of the bike.
+const DIRTBIKE_WHEEL_RADIUS := DirtbikeMode.WHEEL_RADIUS
+const DIRTBIKE_WHEEL_THICKNESS := DirtbikeMode.WHEEL_THICKNESS
+const DIRTBIKE_WHEEL_COLOR := DirtbikeMode.WHEEL_COLOR
 ## How far past its default (~45 degrees) CharacterBody3D.floor_max_angle is
 ## raised while riding -- a cheap safety net alongside the snap-function
 ## bypasses above, so move_and_slide()'s own collision response doesn't
@@ -7573,16 +7565,8 @@ func _snowboard_surface_up() -> Vector3:
 	return up if up.y>=0.0 else -up
 
 
-## A solid disk, not a torus -- see DIRTBIKE_WHEEL_RADIUS's own comment for
-## why (a torus this file built by hand had its normals flipped; a plain
-## SuperEgg part sidesteps that bug entirely by reusing the same builder
-## every other prop in the project already trusts).
 func _build_dirtbike_wheel() -> MeshInstance3D:
-	var semi_axes := Vector3(DIRTBIKE_WHEEL_RADIUS, DIRTBIKE_WHEEL_THICKNESS * 0.5, DIRTBIKE_WHEEL_RADIUS)
-	var wheel := SuperEgg.build_part(semi_axes, DIRTBIKE_WHEEL_COLOR, 2.0, 2.0)
-	wheel.name = "DirtbikeWheel"
-	visuals.add_child(wheel)
-	return wheel
+	return DirtbikeMode.build_wheel(visuals, "DirtbikeWheel")
 
 
 ## Positions/orients a dirtbike wheel prop so its axle sits exactly at the
