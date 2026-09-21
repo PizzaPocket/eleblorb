@@ -24,11 +24,45 @@ const RISE := 1.0
 const CLOUD_SINK_DEPTH := 0.10
 const CANOPY_SINK_DEPTH := 0.04
 
+static var _cloud_layers_cache: Array[Node] = []
+static var _cloud_layers_frame := -1
+
 
 ## The height to stand at on a cloud above `world`, or null where there is
 ## none. Any character can ask; only the one-way surface decides.
+##
+## Every cloud layer in the world is asked, not one named sibling. The demo
+## world has two, and for a long time only the Air Kingdom's was ever
+## queried: the 180 clouds strung down the valley were scenery you fell
+## through, for no reason anybody chose. A cloud is a cloud.
 static func cloud_stand_height(body: Node3D, foot_offset: float, ceiling: float) -> Variant:
-	return _one_way_stand_height(body, "Clouds", foot_offset, ceiling, CLOUD_SINK_DEPTH)
+	var best: Variant = null
+	for layer in _cloud_layers(body):
+		var top: Variant = layer.get_support_height_at(
+			body.global_position.x, body.global_position.z, ceiling
+		)
+		if top != null and (best == null or (top as float) > (best as float)):
+			best = top
+	if best == null:
+		return null
+	return (best as float) + foot_offset - CLOUD_SINK_DEPTH
+
+
+## The world's cloud layers, looked up once a frame rather than once a query.
+## Every body and every free blorb asks for cloud support every frame, and the
+## group lookup allocates a fresh array each time it is made.
+static func _cloud_layers(body: Node3D) -> Array[Node]:
+	var tree := body.get_tree()
+	if tree == null:
+		return []
+	var frame := Engine.get_process_frames()
+	if frame != _cloud_layers_frame:
+		_cloud_layers_frame = frame
+		_cloud_layers_cache.clear()
+		for layer in tree.get_nodes_in_group("cloud_scatters"):
+			if layer.has_method("get_support_height_at"):
+				_cloud_layers_cache.append(layer)
+	return _cloud_layers_cache
 
 
 ## The same for a walkable tree canopy.

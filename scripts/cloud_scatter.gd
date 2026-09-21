@@ -102,11 +102,18 @@ func _place_cloud() -> void:
 ## top is not above `max_surface_y`. Callers use that ceiling to make cloud
 ## support one-way: rising bodies pass through undersides, falling bodies
 ## approaching from above can settle on the top.
+## Width of one bucket in the XZ index below. Comfortably wider than a single
+## puff, so most puffs land in one or two cells.
+const SUPPORT_CELL_SIZE := 40.0
+
 ## Puffs flattened out of the node tree, with the bounds enclosing them all:
 ## rebuilt whenever a puff is added, read on every support query.
 var _puffs: Array[Dictionary] = []
 var _puff_bounds := AABB()
 var _puffs_dirty := true
+## Puff indices bucketed by XZ cell, so a query inside the field looks at the
+## handful of puffs overhead rather than every puff in the layer.
+var _puff_cells: Dictionary = {}
 
 
 ## Marks the flattened puff list stale. Any code that adds a puff after this
@@ -117,6 +124,7 @@ func invalidate_support_cache() -> void:
 
 func _rebuild_support_cache() -> void:
 	_puffs.clear()
+	_puff_cells.clear()
 	_collect_puffs(self)
 	_puffs_dirty = false
 	if _puffs.is_empty():
@@ -124,10 +132,26 @@ func _rebuild_support_cache() -> void:
 		return
 	var first: Dictionary = _puffs[0]
 	_puff_bounds = AABB((first["center"] as Vector3) - (first["axes"] as Vector3), (first["axes"] as Vector3) * 2.0)
-	for puff in _puffs:
+	for index in _puffs.size():
+		var puff: Dictionary = _puffs[index]
 		var centre: Vector3 = puff["center"]
 		var axes: Vector3 = puff["axes"]
 		_puff_bounds = _puff_bounds.merge(AABB(centre - axes, axes * 2.0))
+		# Every cell this puff reaches over, so a query reads one cell.
+		var from := _cell_of(centre.x - axes.x, centre.z - axes.z)
+		var to := _cell_of(centre.x + axes.x, centre.z + axes.z)
+		for cell_x in range(from.x, to.x + 1):
+			for cell_z in range(from.y, to.y + 1):
+				var key := Vector2i(cell_x, cell_z)
+				var bucket: PackedInt32Array = _puff_cells.get(key, PackedInt32Array())
+				bucket.append(index)
+				_puff_cells[key] = bucket
+
+
+func _cell_of(world_x: float, world_z: float) -> Vector2i:
+	return Vector2i(
+		int(floor(world_x / SUPPORT_CELL_SIZE)), int(floor(world_z / SUPPORT_CELL_SIZE))
+	)
 
 
 func _collect_puffs(node: Node) -> void:
@@ -149,6 +173,10 @@ func _collect_puffs(node: Node) -> void:
 ## common answer is "nowhere near". So the puffs are flattened once and
 ## enclosed in one box, and a query outside that box costs a single test
 ## instead of a walk of hundreds of nodes with two pow() calls apiece.
+##
+## Inside the box, the XZ index decides: a valley layer can be kilometres
+## wide and a thousand puffs deep, and only the few directly overhead can
+## possibly hold anybody up.
 func get_support_height_at(world_x: float, world_z: float, max_surface_y: float = INF) -> Variant:
 	if _puffs_dirty:
 		_rebuild_support_cache()
@@ -160,8 +188,10 @@ func get_support_height_at(world_x: float, world_z: float, max_surface_y: float 
 		or max_surface_y < _puff_bounds.position.y
 	):
 		return null
+	var bucket: PackedInt32Array = _puff_cells.get(_cell_of(world_x, world_z), PackedInt32Array())
 	var best: Variant = null
-	for puff in _puffs:
+	for index in bucket:
+		var puff: Dictionary = _puffs[index]
 		var center: Vector3 = puff["center"]
 		var axes: Vector3 = puff["axes"]
 		# Cheap rejections before the profile maths, which is the expensive

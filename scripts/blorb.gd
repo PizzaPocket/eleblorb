@@ -2142,11 +2142,9 @@ func _ground_height_at(x: float, z: float) -> float:
 	# direct Y-following means they can only acquire a cloud when already at
 	# or above it (for example after being released in the air), never snap
 	# upward from the ground through a cloud's underside.
-	var clouds := get_node_or_null("../Clouds") as CloudScatter
-	if clouds != null:
-		var cloud_top: Variant = clouds.get_support_height_at(x, z, global_position.y + 0.2)
-		if cloud_top != null:
-			return maxf(terrain_h, (cloud_top as float) - 0.10)
+	var cloud_stand: Variant = WorldSupport.cloud_stand_height(self, 0.0, global_position.y + 0.2)
+	if cloud_stand != null:
+		return maxf(terrain_h, cloud_stand as float)
 	# Tree canopies are the same kind of one-way support as clouds above --
 	# see NatureProps._add_canopy_blob() and
 	# WildernessScatter.get_support_height_at(). Shallower sink than the
