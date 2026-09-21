@@ -176,6 +176,7 @@ var _rig: RigAdapter = null
 var _ice_skates := IceSkateMode.new()
 var _snowboard_mode := SnowboardMode.new()
 var _crystal := CrystalSkateMode.new()
+var _swim := SwimMode.new()
 ## His snowboard: the same power the player rides, on his own rig and at his
 ## own scale. Toggled by the leg-power chord, as the player's is.
 var _direct_snowboard_active: bool = false
@@ -1226,16 +1227,14 @@ func _animate_direct_ice_skating(delta: float) -> void:
 
 
 func _animate_direct_swim(delta: float, movement_speed: float) -> void:
-	_walk_phase += delta * Player.SWIM_KICK_SPEED * clampf(movement_speed / Player.LAKE_DIVE_SPEED, 0.6, 1.8)
-	var left_wave := sin(_walk_phase)
-	var right_wave := sin(_walk_phase + PI)
-	var settle := Player.JUMP_POSE_SETTLE_SPEED * delta
-	(_pivots["leg_left"] as Node3D).rotation.x = lerp_angle((_pivots["leg_left"] as Node3D).rotation.x, -Player.DESCENT_HIP_BEND + left_wave * Player.SWIM_KICK_HIP_AMOUNT, settle)
-	(_pivots["leg_right"] as Node3D).rotation.x = lerp_angle((_pivots["leg_right"] as Node3D).rotation.x, -Player.DESCENT_HIP_BEND + right_wave * Player.SWIM_KICK_HIP_AMOUNT, settle)
-	(_pivots["knee_left"] as Node3D).rotation.x = lerp_angle((_pivots["knee_left"] as Node3D).rotation.x, Player.DESCENT_KNEE_BEND + maxf(0.0, -left_wave) * Player.SWIM_KICK_KNEE_AMOUNT, settle)
-	(_pivots["knee_right"] as Node3D).rotation.x = lerp_angle((_pivots["knee_right"] as Node3D).rotation.x, Player.DESCENT_KNEE_BEND + maxf(0.0, -right_wave) * Player.SWIM_KICK_KNEE_AMOUNT, settle)
-	(_pivots["ankle_left"] as Node3D).rotation.x = lerp_angle((_pivots["ankle_left"] as Node3D).rotation.x, Player.SWIM_FLOAT_ANKLE_EXTEND + maxf(0.0, left_wave) * Player.SWIM_KICK_ANKLE_AMOUNT, settle)
-	(_pivots["ankle_right"] as Node3D).rotation.x = lerp_angle((_pivots["ankle_right"] as Node3D).rotation.x, Player.SWIM_FLOAT_ANKLE_EXTEND + maxf(0.0, right_wave) * Player.SWIM_KICK_ANKLE_AMOUNT, settle)
+	# The swim pose is SwimMode's, shared with the human. It carries the part
+	# this body never had: a swimmer at rest hangs still with the legs
+	# trailing, and only kicks once actually under way. This used to advance
+	# the kick every frame regardless, which is why he paddled on the spot.
+	var ctx := _traversal_context(delta)
+	var reference: float = maxf(movement_speed, Player.LAKE_DIVE_SPEED)
+	_swim.update_motion(ctx, reference)
+	_swim.pose_swim(ctx, reference)
 
 
 func _animate_direct_airborne(delta: float) -> void:
@@ -1630,14 +1629,17 @@ func _apply_direct_swim_attitude(delta: float) -> void:
 	var spine: Node3D = _pivots.get("spine") as Node3D
 	if rig == null or spine == null or _mounted:
 		return
+	var swimming := _direct_diving or _direct_surface_swimming
 	var target := 0.0
-	if _direct_diving:
-		target = SWIM_BODY_PITCH
-	elif _direct_surface_swimming:
-		target = SURFACE_SWIM_BODY_PITCH
+	if swimming:
+		# How far over he lies is the shared mode's call, and it depends on
+		# whether he is actually going anywhere: at rest he hangs upright.
+		target = _swim.attitude_pitch(_direct_diving)
 	elif _direct_dirtbike_active or _direct_flying:
 		# Those poses own the rig's pitch themselves.
 		return
+	else:
+		_swim.reset()
 	if absf(rig.rotation.x - target) < 0.0005:
 		return
 	var anchor: Vector3 = spine.global_position
