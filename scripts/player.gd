@@ -326,10 +326,10 @@ const ICE_SKATE_TERMINAL_SPEED := IceSkateMode.TERMINAL_SPEED
 ## a low forward dive that lands on the belly and toboggans across the ice.
 ## The dive is at least this fast forward, and rises to this fraction of an
 ## ordinary jump's height.
-const PENGUIN_DIVE_FORWARD_SPEED := 15.0
-const PENGUIN_DIVE_HEIGHT := 0.45
+const PENGUIN_DIVE_FORWARD_SPEED := PenguinMode.DIVE_FORWARD_SPEED
+const PENGUIN_DIVE_HEIGHT := PenguinMode.DIVE_HEIGHT
 ## Landing from the dive onto the belly kicks the slide on this much faster.
-const PENGUIN_SLIDE_LANDING_BOOST := 1.2
+const PENGUIN_SLIDE_LANDING_BOOST := PenguinMode.SLIDE_LANDING_BOOST
 ## Jump while belly sliding hops back up onto the feet: this fraction of an
 ## ordinary jump's height.
 const PENGUIN_STAND_HOP_HEIGHT := 0.35
@@ -359,17 +359,17 @@ const CRYSTAL_COAST_FRICTION := 1.2
 const CRYSTAL_TURN_RATE := 1.8
 const CRYSTAL_MAX_PITCH := deg_to_rad(60.0)
 const CRYSTAL_RESTART_ANGLE := deg_to_rad(45.0)
-const PENGUIN_WADDLE_SPEED_MULTIPLIER := 0.32
+const PENGUIN_WADDLE_SPEED_MULTIPLIER := PenguinMode.WADDLE_SPEED_MULTIPLIER
 ## On ice the waddle is only a weak push: gliding momentum (from skating, a
 ## slide or a run-up) carries on, bleeding away slowly, and the feet can add
 ## speed only up to waddle pace in the direction held.
 const PENGUIN_ICE_GLIDE_FRICTION := 0.5
 const PENGUIN_ICE_WADDLE_ACCELERATION := 3.0
-const PENGUIN_WADDLE_CADENCE := 2.1
-const PENGUIN_WADDLE_STEP := deg_to_rad(7.0)
-const PENGUIN_WADDLE_THIGH_LIFT := deg_to_rad(6.0)
-const PENGUIN_WADDLE_KNEE := deg_to_rad(16.0)
-const PENGUIN_WADDLE_ROLL := deg_to_rad(7.0)
+const PENGUIN_WADDLE_CADENCE := PenguinMode.WADDLE_CADENCE
+const PENGUIN_WADDLE_STEP := PenguinMode.WADDLE_STEP
+const PENGUIN_WADDLE_THIGH_LIFT := PenguinMode.WADDLE_THIGH_LIFT
+const PENGUIN_WADDLE_KNEE := PenguinMode.WADDLE_KNEE
+const PENGUIN_WADDLE_ROLL := PenguinMode.WADDLE_ROLL
 ## Flippers held a little out from the body while waddling.
 const PENGUIN_FLIPPER_SPREAD := deg_to_rad(14.0)
 ## A penguin's jump barely moves its legs: only a small hip and knee tuck
@@ -383,19 +383,19 @@ const PENGUIN_STREAMLINED_TOE_POINT := deg_to_rad(75.0)
 const PENGUIN_HEAD_LIFT := deg_to_rad(78.0)
 const PENGUIN_HEAD_LIFT_NECK_SHARE := 0.5
 ## Belly-slide deceleration on ice, and off it (snow and ground grab the belly).
-const PENGUIN_SLIDE_FRICTION := 1.1
-const PENGUIN_SLIDE_OFF_ICE_FRICTION := 12.0
+const PENGUIN_SLIDE_FRICTION := PenguinMode.SLIDE_FRICTION
+const PENGUIN_SLIDE_OFF_ICE_FRICTION := PenguinMode.SLIDE_OFF_ICE_FRICTION
 ## How quickly the stick bends a belly slide's heading (radians per second).
-const PENGUIN_SLIDE_TURN_RATE := 1.3
+const PENGUIN_SLIDE_TURN_RATE := PenguinMode.SLIDE_TURN_RATE
 ## Below this speed the penguin stands back up.
-const PENGUIN_SLIDE_STOP_SPEED := 0.9
+const PENGUIN_SLIDE_STOP_SPEED := PenguinMode.SLIDE_STOP_SPEED
 ## How quickly the body tips between upright and prone (fraction per second).
-const PENGUIN_PRONE_RATE := 5.5
+const PENGUIN_PRONE_RATE := PenguinMode.PRONE_RATE
 ## The body tips about this height above the feet (the belly), and while
 ## prone that point rests this high above the ground: the Penguin torso's
 ## belly half-depth, so the belly lies on the ice.
-const PENGUIN_BODY_PIVOT_HEIGHT := 0.75
-const PENGUIN_BELLY_REST_HEIGHT := 0.34
+const PENGUIN_BODY_PIVOT_HEIGHT := PenguinMode.BODY_PIVOT_HEIGHT
+const PENGUIN_BELLY_REST_HEIGHT := PenguinMode.BELLY_REST_HEIGHT
 const ICE_SKATE_PUSH_HIP_BACK := deg_to_rad(25.0)
 const ICE_SKATE_GLIDE_HIP_FORWARD := deg_to_rad(13.0)
 const ICE_SKATE_RECOVERY_HIP_FORWARD := deg_to_rad(11.0)
@@ -1233,6 +1233,7 @@ var _traversal := TraversalDirector.new()
 var _ice_skates := IceSkateMode.new()
 var _crystal := CrystalSkateMode.new()
 var _swim := SwimMode.new()
+var _penguin := PenguinMode.new()
 ## Matched Ice legs automatically extend these runners. They remain visible
 ## off ice while their traversal physics only engage on the frozen lake.
 var _ice_skates_active := false
@@ -6741,11 +6742,14 @@ func _compose_body_pose(delta: float, grounded: bool, on_soft_aerial_support: bo
 ## Eases _penguin_prone toward lying down while the Penguin Suit dives or
 ## belly-slides, and back upright otherwise. Returns the new value.
 func _update_penguin_prone(delta: float) -> float:
-	var target := 1.0 if (_penguin_dive_airborne or _penguin_belly_sliding) else 0.0
-	_penguin_prone = move_toward(_penguin_prone, target, PENGUIN_PRONE_RATE * delta)
-	# A waddle lean the gait did not refresh this frame settles upright.
-	if not _penguin_waddle_posed:
-		_penguin_waddle_roll = move_toward(_penguin_waddle_roll, 0.0, PENGUIN_WADDLE_ROLL * 4.0 * delta)
+	# The tip between upright and flat is PenguinMode's, shared with every
+	# other character that can wear the suit.
+	_penguin.diving = _penguin_dive_airborne
+	_penguin.sliding = _penguin_belly_sliding
+	_penguin.waddle_roll = _penguin_waddle_roll
+	_penguin._waddle_posed = _penguin_waddle_posed
+	_penguin_prone = _penguin.update_prone(_traversal_context(delta))
+	_penguin_waddle_roll = _penguin.waddle_roll
 	_penguin_waddle_posed = false
 	return _penguin_prone
 
@@ -6755,12 +6759,16 @@ func _update_penguin_prone(delta: float) -> float:
 ## resting on the ice. Waddling, it leans side to side about the feet
 ## (_penguin_waddle_roll). The collision capsule stays upright.
 func _pose_body_penguin(base_y: float) -> void:
-	var tip := smoothstep(0.0, 1.0, _penguin_prone)
-	var tipped := Basis(Vector3.UP, _body_yaw) * Basis(Vector3.RIGHT, tip * PI * 0.5)
-	var pivot_height := lerpf(PENGUIN_BODY_PIVOT_HEIGHT, PENGUIN_BELLY_REST_HEIGHT, tip)
-	# The lean is applied innermost, so it turns about the feet (the origin).
-	visuals.basis = tipped * Basis(Vector3.BACK, _penguin_waddle_roll)
-	visuals.position = Vector3(0.0, base_y + pivot_height, 0.0) - tipped * (Vector3.UP * PENGUIN_BODY_PIVOT_HEIGHT)
+	# How far it has tipped, and what it pivots about, are PenguinMode's; this
+	# body then turns itself. The lean is applied innermost, so it turns about
+	# the feet (the origin).
+	var attitude := _penguin.attitude()
+	var tipped := Basis(Vector3.UP, _body_yaw) * Basis(Vector3.RIGHT, float(attitude["tip"]))
+	visuals.basis = tipped * Basis(Vector3.BACK, float(attitude["roll"]))
+	visuals.position = (
+		Vector3(0.0, base_y + float(attitude["pivot_height"]), 0.0)
+		- tipped * (Vector3.UP * PenguinMode.BODY_PIVOT_HEIGHT)
+	)
 
 
 ## Skating the crystal track: the body pitched about the feet to turn with
@@ -7728,23 +7736,20 @@ func _penguin_ice_glide_step(steer: Vector3, waddle_speed: float, delta: float) 
 ## Tobogganing on the belly: ice barely slows it, anything else stops it
 ## quickly, and the stick only bends its heading. Stands up when slow.
 func _penguin_belly_slide_step(steer: Vector3, delta: float) -> void:
-	var planar := Vector2(velocity.x, velocity.z)
+	# The slide itself is PenguinMode's; this body supplies its own surface
+	# test, facing and audio.
 	var on_ice := _is_supported_by_ice()
-	var speed := maxf(planar.length() - (PENGUIN_SLIDE_FRICTION if on_ice else PENGUIN_SLIDE_OFF_ICE_FRICTION) * delta, 0.0)
-	if speed < PENGUIN_SLIDE_STOP_SPEED:
-		_penguin_belly_sliding = false
-		velocity.x = 0.0
-		velocity.z = 0.0
+	var ctx := _traversal_context(delta)
+	ctx.direction = steer
+	_penguin.sliding = _penguin_belly_sliding
+	var heading := _penguin.slide_step(ctx, on_ice)
+	_penguin_belly_sliding = _penguin.sliding
+	if heading == Vector2.ZERO:
 		return
-	var heading := planar.normalized()
-	var wanted := Vector2(steer.x, steer.z)
-	if wanted.length_squared() > 0.0001:
-		var turn := clampf(heading.angle_to(wanted.normalized()), -PENGUIN_SLIDE_TURN_RATE * delta, PENGUIN_SLIDE_TURN_RATE * delta)
-		heading = heading.rotated(turn)
-	velocity.x = heading.x * speed
-	velocity.z = heading.y * speed
 	_body_yaw = lerp_angle(_body_yaw, atan2(heading.x, heading.y), minf(rotation_speed * delta, 1.0))
-	UISounds.pulse_snowboard(get_instance_id(), speed, 0.0, 0.0 if on_ice else 1.0)
+	UISounds.pulse_snowboard(
+		get_instance_id(), Vector2(velocity.x, velocity.z).length(), 0.0, 0.0 if on_ice else 1.0
+	)
 
 
 ## A complete pair of Ice legs automatically forms runners, and both leg
