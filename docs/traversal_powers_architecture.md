@@ -176,6 +176,22 @@ change in slices 0 to 5; the whole point is that Xiao and the others gain.
   every character meets the same rules.
 - Dirt bike: the wheel dynamics are `DirtbikeMode`; the pose stays per rig.
 
+Slice 6, deleting the duplicates, is under way. What has gone so far is the
+machinery around the powers rather than the powers themselves:
+
+- `SuitPowers`: the twelve limb-and-element combinations, their drain rates,
+  the derived hovers and the sound pulses, worked out once per frame for
+  whoever is wearing the suit.
+- `SuitPowerFX`: one recipe per stream and one way to aim it, replacing two
+  near-identical factories and three aiming functions.
+- `PowerChord`: the two-button latch that calls up the snowboard and the
+  wheelie, which existed four times.
+- `IceSkateMode.follow_ice()` and `DirtbikeMode.follow_terrain()`: leaving the
+  ice, and meeting a crest, decided once.
+
+Each of those was a place where the two copies had already drifted, and the
+drift was always invisible until somebody played the other character.
+
 One resolved owner of the rig pitch per frame, in priority order, replaced
 the per-pair guards. Several powers used to ease that one value toward
 different targets at once and settle in between: 34 degrees instead of 90,
