@@ -1424,28 +1424,12 @@ func _update_direct_ice_skate_state() -> void:
 
 
 func _direct_is_supported_by_ice() -> bool:
-	for collision_index in get_slide_collision_count():
-		var collision:=get_slide_collision(collision_index)
-		if collision.get_normal().y>0.45 and collision.get_collider() is IceCrag:
-			return true
-	var probe_from:=global_position+Vector3.UP*0.12
-	var probe_to:=global_position-Vector3.UP*0.42
-	var probe:=PhysicsRayQueryParameters3D.create(probe_from,probe_to,1)
-	probe.exclude=[self]
-	var support_hit:=get_world_3d().direct_space_state.intersect_ray(probe)
-	if not support_hit.is_empty() and support_hit.get("collider") is IceCrag:
-		return true
-	if (
-		terrain==null
-		or not terrain.has_method("is_ice_surface")
-		or not terrain.has_method("get_ice_level")
-	):
-		return false
-	var xz:=Vector2(global_position.x,global_position.z)
-	if not terrain.is_ice_surface(xz):
-		return false
-	var ice_level: float=terrain.get_ice_level()
-	return global_position.y>=ice_level-Player.ICE_SURFACE_RECOVERY_DEPTH and global_position.y<=ice_level+Player.ICE_SUPPORT_TOLERANCE
+	# His origin sits at his feet, and a climb is his equivalent of the
+	# human's jump state.
+	return IceSkateMode.supported_by_ice(
+		_traversal_context(get_physics_process_delta_time()),
+		global_position.y, velocity.y > 0.0
+	)
 
 
 func _update_direct_ice_skate_airtime(delta: float,pre_move_position: Vector3) -> void:
@@ -1466,11 +1450,11 @@ func _set_direct_ice_skate_visuals() -> void:
 	var scale_factor: float=_playable_profile.suit_rig_scale
 	if _direct_ice_skates_active:
 		if not is_instance_valid(_direct_ice_skate_left):
-			_direct_ice_skate_left=Player.build_ice_skate_blade(
+			_direct_ice_skate_left=IceSkateMode.build_blade(
 				_pivots["toe_left"] as Node3D,"LeftIceSkate",scale_factor
 			)
 		if not is_instance_valid(_direct_ice_skate_right):
-			_direct_ice_skate_right=Player.build_ice_skate_blade(
+			_direct_ice_skate_right=IceSkateMode.build_blade(
 				_pivots["toe_right"] as Node3D,"RightIceSkate",scale_factor
 			)
 	else:
@@ -1483,7 +1467,7 @@ func _set_direct_ice_skate_visuals() -> void:
 	var rig:=_pivots.get("_rig") as Node3D
 	if rig!=null and not _mounted:
 		var desired_lift: float=(
-			Player.ice_skate_visual_lift(scale_factor) if _direct_ice_skates_active else 0.0
+			IceSkateMode.visual_lift(scale_factor) if _direct_ice_skates_active else 0.0
 		)
 		rig.position.y+=desired_lift-_direct_ice_skate_lift_y
 		_direct_ice_skate_lift_y=desired_lift

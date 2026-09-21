@@ -458,11 +458,11 @@ const TREE_CANOPY_SINK_DEPTH := WorldSupport.CANOPY_SINK_DEPTH
 # and every blorb Speed stat.
 const ICE_ACCELERATION := 8.5
 const ICE_FRICTION := 0.72
-const ICE_SUPPORT_TOLERANCE := 0.34
+const ICE_SUPPORT_TOLERANCE := IceSkateMode.SUPPORT_TOLERANCE
 ## The lake sheet has physical thickness. Collision recovery can put the feet
 ## a fraction below its rendered top for one frame; accept and lift that narrow
 ## band instead of dropping ice mode and leaving the capsule wedged in it.
-const ICE_SURFACE_RECOVERY_DEPTH := 0.52
+const ICE_SURFACE_RECOVERY_DEPTH := IceSkateMode.SURFACE_RECOVERY_DEPTH
 
 ## Runtime possession flag: true whenever the player is directly piloting
 ## Xiao Hou Zi (see xiao_hou_zi.gd's begin_possession()/end_possession() and
@@ -2534,41 +2534,15 @@ func _body_base_height(delta: float, grounded: bool, on_soft_aerial_support: boo
 		_visuals_snow_offset_y
 		+ DIRTBIKE_WHEEL_RADIUS*_dirtbike_pose_blend
 		+ SNOWBOARD_DECK_LIFT*_snowboard_pose_blend
-		+ (ice_skate_visual_lift() if _ice_skates_active else 0.0)
+		+ (IceSkateMode.visual_lift() if _ice_skates_active else 0.0)
 	)
 
 
 func _is_supported_by_ice() -> bool:
-	if _jumping:
-		return false
-	# Ice power platforms are genuine skateable ice too. Prefer the actual
-	# floor collision before consulting the kingdom's analytic lake surface.
-	for collision_index in get_slide_collision_count():
-		var collision:=get_slide_collision(collision_index)
-		if collision.get_normal().y>0.45 and collision.get_collider() is IceCrag:
-			return true
-	# A settled CharacterBody may produce no new slide collision at all. Probe
-	# the small support band below the feet so a stationary or gently moving
-	# skater continues to recognize a player-created IceCrag.
-	var probe_from:=global_position+Vector3.UP*0.18
-	var probe_to:=global_position-Vector3.UP*0.62
-	var probe:=PhysicsRayQueryParameters3D.create(probe_from,probe_to,1)
-	probe.exclude=[self]
-	var support_hit:=get_world_3d().direct_space_state.intersect_ray(probe)
-	if not support_hit.is_empty() and support_hit.get("collider") is IceCrag:
-		return true
-	if (
-		terrain == null
-		or not terrain.has_method("is_ice_surface")
-		or not terrain.has_method("get_ice_level")
-	):
-		return false
-	var xz := Vector2(global_position.x, global_position.z)
-	if not terrain.is_ice_surface(xz):
-		return false
-	var ice_level: float = terrain.get_ice_level()
-	var feet_delta := global_position.y - FOOT_OFFSET - ice_level
-	return feet_delta >= -ICE_SURFACE_RECOVERY_DEPTH and feet_delta <= ICE_SUPPORT_TOLERANCE
+	return IceSkateMode.supported_by_ice(
+		_traversal_context(get_physics_process_delta_time()),
+		global_position.y - FOOT_OFFSET, _jumping
+	)
 
 
 ## Captures the complete resolved surface vector, including vertical motion
@@ -7440,9 +7414,9 @@ func _set_ice_skate_visuals_present() -> void:
 	_ice_skate_blades_crystal=crystal
 	if _ice_skates_active:
 		if not is_instance_valid(_ice_skate_left):
-			_ice_skate_left=build_ice_skate_blade(_toe_left,"LeftIceSkate",1.0,-1.0,crystal)
+			_ice_skate_left=IceSkateMode.build_blade(_toe_left,"LeftIceSkate",1.0,-1.0,crystal)
 		if not is_instance_valid(_ice_skate_right):
-			_ice_skate_right=build_ice_skate_blade(_toe_right,"RightIceSkate",1.0,-1.0,crystal)
+			_ice_skate_right=IceSkateMode.build_blade(_toe_right,"RightIceSkate",1.0,-1.0,crystal)
 		return
 	if is_instance_valid(_ice_skate_left):
 		_ice_skate_left.queue_free()
@@ -7450,22 +7424,6 @@ func _set_ice_skate_visuals_present() -> void:
 		_ice_skate_right.queue_free()
 	_ice_skate_left=null
 	_ice_skate_right=null
-
-
-## A narrow continuous runner with two short mounts. The toe marker carries
-## every ankle/foot motion, but the attachment depth comes from the worn
-## blorb boot surrounding that hidden human shoe. Its mounts therefore begin
-## at the visible blorb underside, with the runner below that surface.
-static func build_ice_skate_blade(
-	toe: Node3D,blade_name: String,scale_factor: float=1.0,sole_offset: float=-1.0,crystal: bool=false
-) -> Node3D:
-	# The blades belong to IceSkateMode with the rest of skating. Kept here as
-	# a forward for the callers that have not moved onto the shared system.
-	return IceSkateMode.build_blade(toe,blade_name,scale_factor,sole_offset,crystal)
-
-
-static func ice_skate_visual_lift(scale_factor: float=1.0) -> float:
-	return IceSkateMode.visual_lift(scale_factor)
 
 
 ## The snowboard rides literal snow terrain only (per direct instruction):

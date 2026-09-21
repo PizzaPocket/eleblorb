@@ -44,6 +44,24 @@ const AIR_DRAG := 0.0018
 const STOP_SPEED := 0.10
 const TERMINAL_SPEED := 32.0
 
+## The band probed just under the feet for a player-made ice crag, as
+## fractions of the wearer's own standing height: a settled CharacterBody can
+## produce no new slide collision at all, so a stationary or gently moving
+## skater still has to be able to find what it is standing on. Written as
+## fractions because the two hand-picked copies had drifted badly apart -- one
+## reached a third of a body length below the feet and the other nearly a
+## whole one, so a small rig registered ice from well above it.
+const SUPPORT_PROBE_RISE := 0.095
+const SUPPORT_PROBE_REACH := 0.327
+## Ice power platforms are genuine skateable ice, and a contact this steep or
+## shallower is a wall rather than a floor.
+const SUPPORT_NORMAL_MIN := 0.45
+## How far the solver may leave a body embedded in, or floating above, the
+## analytic sheet and still count as standing on it. A property of the sheet,
+## so it does not scale with the skater.
+const SURFACE_RECOVERY_DEPTH := 0.52
+const SUPPORT_TOLERANCE := 0.34
+
 ## A crag can physically carry a skater upward, but one frame of collision
 ## correction is not a meaningful launch. The inherited lift is capped to an
 ## authored platforming impulse so a rising platform cannot catapult anybody
@@ -68,6 +86,38 @@ var _stride_phase := 0.0
 
 func id() -> StringName:
 	return &"ice_skates"
+
+
+## Whether there is ice under these feet: a player-made crag first, then the
+## kingdom's own analytic sheet. A deliberate jump is not supported by
+## anything, however close the ice below still is.
+static func supported_by_ice(ctx: TraversalContext, feet_y: float, jumping: bool) -> bool:
+	if jumping:
+		return false
+	var body := ctx.body
+	for index in body.get_slide_collision_count():
+		var collision := body.get_slide_collision(index)
+		if collision.get_normal().y > SUPPORT_NORMAL_MIN and collision.get_collider() is IceCrag:
+			return true
+	var from := body.global_position + Vector3.UP * ctx.height_fraction(SUPPORT_PROBE_RISE)
+	var to := body.global_position - Vector3.UP * ctx.height_fraction(SUPPORT_PROBE_REACH)
+	var query := PhysicsRayQueryParameters3D.create(from, to, 1)
+	query.exclude = [body.get_rid()]
+	var hit := body.get_world_3d().direct_space_state.intersect_ray(query)
+	if not hit.is_empty() and hit.get("collider") is IceCrag:
+		return true
+	var terrain: Node = ctx.terrain
+	if (
+		terrain == null
+		or not terrain.has_method("is_ice_surface")
+		or not terrain.has_method("get_ice_level")
+	):
+		return false
+	var xz := Vector2(body.global_position.x, body.global_position.z)
+	if not bool(terrain.is_ice_surface(xz)):
+		return false
+	var below_sheet: float = feet_y - float(terrain.get_ice_level())
+	return below_sheet >= -SURFACE_RECOVERY_DEPTH and below_sheet <= SUPPORT_TOLERANCE
 
 
 ## One frame of ice contact. `supported` is the body's own answer about
