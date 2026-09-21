@@ -177,6 +177,7 @@ var _ice_skates := IceSkateMode.new()
 var _snowboard_mode := SnowboardMode.new()
 var _crystal := CrystalSkateMode.new()
 var _swim := SwimMode.new()
+var _penguin := PenguinMode.new()
 ## His snowboard: the same power the player rides, on his own rig and at his
 ## own scale. Toggled by the leg-power chord, as the player's is.
 var _direct_snowboard_active: bool = false
@@ -729,6 +730,7 @@ func prepare_direct_control_environment(delta: float) -> void:
 	_clear_direct_environment()
 	_update_direct_dirtbike_state()
 	_update_direct_snowboard_state()
+	_update_direct_penguin_state()
 	_update_direct_ice_skate_state()
 	_update_direct_powered_movement(delta)
 	var xz := Vector2(global_position.x, global_position.z)
@@ -927,6 +929,14 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			get_instance_id(),skating_velocity.length(),skate_acceleration,
 			1.0-sound_left.y,1.0-sound_right.y
 		)
+	elif _penguin.sliding:
+		var slide_ctx := _traversal_context(delta)
+		slide_ctx.direction = Vector3(planar.x, 0.0, planar.y)
+		var slide_heading := _penguin.slide_step(slide_ctx, _direct_is_supported_by_ice())
+		if slide_heading != Vector2.ZERO:
+			rotation.y = lerp_angle(
+				rotation.y, atan2(slide_heading.x, slide_heading.y), minf(ROTATION_SPEED * delta, 1.0)
+			)
 	elif (
 		_direct_snowboard_active
 		and is_on_floor()
@@ -1010,6 +1020,9 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	elif _direct_ice_skate_airborne:
 		velocity=HumanoidLocomotion.ballistic_step(velocity,delta,_playable_profile,32.0)
 		_direct_vertical_velocity=velocity.y
+	elif (is_on_floor() or _direct_is_supported_by_ice()) and jump_pressed and _penguin.is_available(_traversal_context(delta)):
+		# In the suit a jump is a dive.
+		_begin_direct_penguin_dive(Vector3(planar.x, 0.0, planar.y))
 	elif is_on_floor() or _direct_is_supported_by_ice():
 		if jump_pressed:
 			_direct_vertical_velocity = HumanoidLocomotion.jump_speed(
@@ -1202,6 +1215,9 @@ func receive_platform_aid_bounce(platform: Blorb) -> void:
 
 
 func _animate_direct_motion(delta: float, direction: Vector3, speed: float) -> void:
+	if _penguin.diving or _penguin.sliding:
+		_animate_direct_penguin(delta)
+		return
 	if _direct_diving or _direct_surface_swimming:
 		_animate_direct_swim(delta, speed)
 		return
@@ -1239,6 +1255,19 @@ func _direct_swim_jet_count() -> int:
 		int(_direct_left_arm_water) + int(_direct_right_arm_water)
 		+ int(_direct_left_leg_water) + int(_direct_right_leg_water)
 	)
+
+
+## Diving and sliding tip his body flat about its belly, the way the human's
+## does, while his collision body stays upright.
+func _animate_direct_penguin(delta: float) -> void:
+	var ctx := _traversal_context(delta)
+	_penguin.update_prone(ctx)
+	var rig := _pivots.get("_rig") as Node3D
+	if rig == null:
+		return
+	var attitude := _penguin.attitude()
+	rig.rotation.x = lerp_angle(rig.rotation.x, float(attitude["tip"]), minf(8.0 * delta, 1.0))
+	rig.rotation.z = lerp_angle(rig.rotation.z, float(attitude["roll"]), minf(8.0 * delta, 1.0))
 
 
 func _animate_direct_swim(delta: float, movement_speed: float) -> void:
@@ -1353,6 +1382,27 @@ func _update_direct_crystal_riding(
 	return true
 
 
+## The Penguin Suit, through the shared power: he had none at all. The dive
+## and the belly slide are the same as the human's, on his own rig.
+func _update_direct_penguin_state() -> void:
+	var ctx := _traversal_context(0.016)
+	var grounded := is_on_floor() or _direct_is_supported_by_ice()
+	_penguin.update_state(ctx, grounded, _direct_is_supported_by_ice(), _direct_vertical_velocity > 0.0)
+
+
+## Launches the dive: forward off a jump, toward the stick if it is held and
+## otherwise the way he faces, at the shared power's own speed.
+func _begin_direct_penguin_dive(direction: Vector3) -> void:
+	var heading := direction
+	if heading.length_squared() < 0.0001:
+		heading = Vector3(sin(rotation.y), 0.0, cos(rotation.y))
+	velocity = PenguinMode.dive_velocity(
+		heading, HumanoidLocomotion.jump_speed(_playable_profile)
+	)
+	_direct_vertical_velocity = velocity.y
+	_penguin.diving = true
+
+
 ## Snow legs, and the same left/right leg-power chord the player toggles a
 ## board with. The deck is built at his own rig scale, so it fits his feet.
 func _update_direct_snowboard_state() -> void:
@@ -1441,7 +1491,7 @@ func _update_direct_dirtbike_state() -> void:
 ## the playable profile, while all momentum math uses the shared locomotion
 ## helpers and identical tuning constants.
 func _update_direct_ice_skate_state() -> void:
-	var has_legs: bool=_blorb_suit.has_ice_skate_legs()
+	var has_legs: bool=_blorb_suit.has_ice_skate_legs() and not _blorb_suit.penguin_form_active()
 	var was_active: bool=_direct_ice_skates_active
 	_direct_ice_skates_active=has_legs
 	var supported: bool=has_legs and is_player_controlled and _direct_is_supported_by_ice()
@@ -1660,6 +1710,11 @@ func _apply_direct_swim_attitude(delta: float) -> void:
 	var spine: Node3D = _pivots.get("spine") as Node3D
 	if rig == null or spine == null or _mounted:
 		return
+	if _penguin.diving or _penguin.sliding:
+		# The penguin owns the rig's pitch while it dives or slides; two
+		# systems easing the same value toward different targets is what left
+		# his swim stuck partway over.
+		return
 	var swimming := _direct_diving or _direct_surface_swimming
 	var target := 0.0
 	if swimming:
@@ -1688,7 +1743,8 @@ func _apply_direct_dirtbike_pose(delta: float) -> void:
 		# frame: the two met at an equilibrium well short of level instead of
 		# the swimmer lying flat.
 		var swimming := _direct_diving or _direct_surface_swimming
-		if rig != null and spine != null and not swimming and absf(rig.rotation.x) > 0.001:
+		var penguin := _penguin.diving or _penguin.sliding
+		if rig != null and spine != null and not swimming and not penguin and absf(rig.rotation.x) > 0.001:
 			var upright_anchor: Vector3 = spine.global_position
 			rig.rotation.x = lerp_angle(rig.rotation.x,0.0,minf(Player.DIRTBIKE_WHEELIE_SETTLE_SPEED*delta,1.0))
 			rig.global_position += upright_anchor-spine.global_position
