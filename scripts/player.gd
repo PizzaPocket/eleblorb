@@ -413,7 +413,7 @@ const ICE_SKATE_FULL_THRUST_ACCELERATION := 7.5
 # Above the human's ordinary 11.3 m/s jump, so a rising ice platform still
 # gives a meaningful boost, but bounded well below the old collision-spike
 # values that could launch the player into the stratosphere.
-const ICE_PLATFORM_LAUNCH_MAX_SPEED := 14.5
+const ICE_PLATFORM_LAUNCH_MAX_SPEED := IceSkateMode.PLATFORM_LAUNCH_MAX_SPEED
 
 ## ---- Dirt blorb suit: front wheel / wheelie ---- Per direct instruction:
 ## ALSO landing a "ground" arm pair (BlorbSuitController.has_dirtbike_arms())
@@ -2578,36 +2578,17 @@ func _is_supported_by_ice() -> bool:
 ## promoted to a true ballistic arc instead of terrain-following the body
 ## back down or allowing ordinary mid-air input to rewrite it.
 func _update_ice_skate_airtime(delta: float,pre_move_position: Vector3) -> void:
-	if not _ice_skates_active:
-		_ice_skate_was_supported=false
-		_ice_skate_airborne=false
-		return
-	var supported_now:=_is_supported_by_ice()
-	if supported_now:
-		_ice_skate_surface_velocity=HumanoidLocomotion.resolved_velocity(
-			pre_move_position,global_position,delta
-		)
-		# Preserve the horizontal skate speed when a perfectly flat collision
-		# produces a near-zero measured delta during a brief contact frame.
-		if Vector2(_ice_skate_surface_velocity.x,_ice_skate_surface_velocity.z).length()<0.05:
-			_ice_skate_surface_velocity.x=velocity.x
-			_ice_skate_surface_velocity.z=velocity.z
-		_ice_skate_was_supported=true
-		if not _jumping:
-			_ice_skate_airborne=false
-		return
-	if _ice_skate_was_supported:
-		_ice_skate_was_supported=false
-		_ice_skate_airborne=true
-		if not _jumping:
-			velocity=_ice_skate_surface_velocity
-			# A moving crag can physically carry the skater upward, but collision
-			# correction over one frame is not a meaningful launch velocity. Cap
-			# the inherited lift to an authored platforming impulse so it cannot
-			# catapult the player into the clouds.
-			velocity.y=clampf(velocity.y,0.0,ICE_PLATFORM_LAUNCH_MAX_SPEED)
-			_jump_takeoff_speed=absf(velocity.y)
-			_jumping=true
+	_ice_skates.engaged = _ice_skates_active
+	var launch: Variant = _ice_skates.follow_ice(
+		_traversal_context(delta), _is_supported_by_ice(), pre_move_position, _jumping
+	)
+	_ice_skate_was_supported = _ice_skates.was_supported
+	_ice_skate_airborne = _ice_skates.airborne
+	_ice_skate_surface_velocity = _ice_skates.surface_velocity
+	if launch != null:
+		velocity = launch as Vector3
+		_jump_takeoff_speed = absf(velocity.y)
+		_jumping = true
 
 
 ## Frozen lake collision is a one-way standing surface from above. If the

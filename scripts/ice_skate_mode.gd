@@ -44,9 +44,21 @@ const AIR_DRAG := 0.0018
 const STOP_SPEED := 0.10
 const TERMINAL_SPEED := 32.0
 
+## A crag can physically carry a skater upward, but one frame of collision
+## correction is not a meaningful launch. The inherited lift is capped to an
+## authored platforming impulse so a rising platform cannot catapult anybody
+## into the clouds.
+const PLATFORM_LAUNCH_MAX_SPEED := 14.5
+
 ## Set by whoever owns the movement half while that is still outside this
 ## class. Once the movement moves in, this becomes the mode's own state.
 var engaged := false
+## Contact with the ice, and the surface's own motion while it lasts. When
+## the support falls away, that motion becomes a real ballistic arc rather
+## than the body terrain-following its way back down.
+var was_supported := false
+var airborne := false
+var surface_velocity := Vector3.ZERO
 
 var _blend := 0.0
 var _previous_speed := 0.0
@@ -56,6 +68,42 @@ var _stride_phase := 0.0
 
 func id() -> StringName:
 	return &"ice_skates"
+
+
+## One frame of ice contact. `supported` is the body's own answer about
+## whether the ice is under it, since each rig probes its own way, and
+## `jumping` means a deliberate jump owns the arc already. Returns the
+## velocity to adopt on leaving the ice, or null to leave velocity alone.
+func follow_ice(
+	ctx: TraversalContext, supported: bool, pre_move_position: Vector3, jumping: bool
+) -> Variant:
+	if not engaged:
+		was_supported = false
+		airborne = false
+		return null
+	var body := ctx.body
+	if supported:
+		surface_velocity = HumanoidLocomotion.resolved_velocity(
+			pre_move_position, body.global_position, ctx.delta
+		)
+		# Preserve the horizontal skate speed when a perfectly flat collision
+		# produces a near-zero measured delta during a brief contact frame.
+		if Vector2(surface_velocity.x, surface_velocity.z).length() < 0.05:
+			surface_velocity.x = body.velocity.x
+			surface_velocity.z = body.velocity.z
+		was_supported = true
+		if not jumping:
+			airborne = false
+		return null
+	if not was_supported:
+		return null
+	was_supported = false
+	airborne = true
+	if jumping:
+		return null
+	var launch := surface_velocity
+	launch.y = clampf(launch.y, 0.0, PLATFORM_LAUNCH_MAX_SPEED)
+	return launch
 
 
 ## Matched Ice legs, and not while the Penguin Suit is formed: the runners

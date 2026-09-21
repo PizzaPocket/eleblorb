@@ -1484,30 +1484,17 @@ func _direct_is_supported_by_ice() -> bool:
 
 
 func _update_direct_ice_skate_airtime(delta: float,pre_move_position: Vector3) -> void:
-	if not _direct_ice_skates_active or not is_player_controlled:
-		_direct_ice_skate_was_supported=false
-		_direct_ice_skate_airborne=false
-		return
-	var supported_now:=_direct_is_supported_by_ice()
-	if supported_now:
-		_direct_ice_skate_surface_velocity=HumanoidLocomotion.resolved_velocity(
-			pre_move_position,global_position,delta
-		)
-		if Vector2(_direct_ice_skate_surface_velocity.x,_direct_ice_skate_surface_velocity.z).length()<0.05:
-			_direct_ice_skate_surface_velocity.x=velocity.x
-			_direct_ice_skate_surface_velocity.z=velocity.z
-		_direct_ice_skate_was_supported=true
-		_direct_ice_skate_airborne=false
-		return
-	if _direct_ice_skate_was_supported:
-		_direct_ice_skate_was_supported=false
-		_direct_ice_skate_airborne=true
-		var commanded_jump_y: float=velocity.y
-		velocity=_direct_ice_skate_surface_velocity
-		velocity.y=clampf(velocity.y,0.0,Player.ICE_PLATFORM_LAUNCH_MAX_SPEED)
-		if commanded_jump_y>0.0:
-			velocity.y=commanded_jump_y
-		_direct_vertical_velocity=velocity.y
+	_ice_skates.engaged = _direct_ice_skates_active and is_player_controlled
+	var launch: Variant = _ice_skates.follow_ice(
+		_traversal_context(delta), _direct_is_supported_by_ice(), pre_move_position,
+		velocity.y > 0.0
+	)
+	_direct_ice_skate_was_supported = _ice_skates.was_supported
+	_direct_ice_skate_airborne = _ice_skates.airborne
+	_direct_ice_skate_surface_velocity = _ice_skates.surface_velocity
+	if launch != null:
+		velocity = launch as Vector3
+		_direct_vertical_velocity = velocity.y
 
 
 func _set_direct_ice_skate_visuals() -> void:
