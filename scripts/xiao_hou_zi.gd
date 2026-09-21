@@ -736,7 +736,7 @@ func prepare_direct_control_environment(delta: float) -> void:
 				var rising: bool = velocity.y > 0.0 and global_position.y > _direct_liquid_level
 				if not rising and global_position.y <= _direct_liquid_level + LavaMode.CONTACT_TOLERANCE:
 					_direct_lava_surface = true
-	elif _liquid.in_water() and _liquid.deep_enough_to_swim() and _liquid.submerged(global_position.y):
+	elif _liquid.in_water() and _liquid.deep_enough_to_swim(_head_height()) and _liquid.submerged(global_position.y):
 		# Anybody can go under, whatever they are wearing. Only breath
 		# depends on the helmet, which he does not need at all.
 		_direct_diving = true
@@ -1000,7 +1000,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	velocity.y = _direct_vertical_velocity
 	if _direct_diving:
 		var dive_floor := _direct_floor_height + Player.LAKE_DIVE_FLOOR_CLEARANCE
-		var dive_surface := _direct_liquid_level - Player.LAKE_SWIM_FOOT_DEPTH
+		var dive_surface := _direct_liquid_level - _swim_float_depth()
 		global_position.y = clampf(global_position.y, dive_floor, dive_surface)
 	var pre_move_position := global_position
 	var bounced_before_move: bool = _try_direct_blorb_bounce(delta)
@@ -1013,7 +1013,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	# swimmer's hard floor/surface guarantees.
 	if _direct_diving:
 		var resolved_dive_floor: float = _direct_floor_height + Player.LAKE_DIVE_FLOOR_CLEARANCE
-		var resolved_dive_surface: float = _direct_liquid_level - Player.LAKE_SWIM_FOOT_DEPTH
+		var resolved_dive_surface: float = _direct_liquid_level - _swim_float_depth()
 		global_position.y = clampf(global_position.y, resolved_dive_floor, resolved_dive_surface)
 	elif _direct_lava_surface:
 		global_position.y = _direct_liquid_level
@@ -1129,6 +1129,19 @@ func _enforce_direct_blorb_bounce() -> bool:
 
 ## How far his own collider reaches below its centre, which is what has to
 ## clear a blorb's collision sphere on the way off it.
+## How tall he is to the top of his own head. Everything about floating is
+## measured from it, so his head clears the water exactly as the human's
+## does rather than his whole body sitting under it.
+func _head_height() -> float:
+	return LiquidEnvironment.head_height(
+		_pivots.get("head") as Node3D, global_position.y, _playable_profile
+	)
+
+
+func _swim_float_depth() -> float:
+	return LiquidEnvironment.float_depth(_head_height())
+
+
 func _body_radius() -> float:
 	return 0.08 * DISPLAY_SCALE
 

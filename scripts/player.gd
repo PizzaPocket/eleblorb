@@ -938,12 +938,10 @@ const GIANT_SURFACE_RECOVERY_SPEED := 1.5
 const PLAYER_CAPSULE_HEIGHT := 1.8
 const GIANT_SURFACE_SNAP_TOLERANCE := 4.0
 # Lake water uses the giant's slow, deliberate buoyancy rather than an
-# invisible standable floor. With the player's feet 1.1m below the surface,
-# their head and shoulders remain above water while the rest of the body is
-# visibly submerged.
-const LAKE_SWIM_FOOT_DEPTH := LiquidEnvironment.SWIM_FOOT_DEPTH
+# invisible standable floor. How deep a floating body's feet hang, and how
+# deep water has to be before it must be swum, are both measured from the
+# swimmer's own head now -- see LiquidEnvironment and _head_height().
 const LAKE_BUOYANCY_LIFT_SPEED := 10.0
-const LAKE_MIN_SWIMMABLE_DEPTH := LiquidEnvironment.MIN_SWIMMABLE_DEPTH
 const LAKE_DIVE_SPEED := 4.2
 const LAKE_DIVE_FLOOR_CLEARANCE := 0.5
 # Rock legs make the equipped body negatively buoyant; they do not teleport
@@ -1989,7 +1987,7 @@ func _physics_process(delta: float) -> void:
 		if not _lake_diving_active:
 			water_exit_jump_ready = true
 		elif terrain != null:
-			var dive_surface: float = _active_swim_surface_height - LAKE_SWIM_FOOT_DEPTH
+			var dive_surface: float = _active_swim_surface_height - _swim_float_depth()
 			water_exit_jump_ready = global_position.y >= dive_surface - 0.08
 
 	# FOOT_OFFSET keeps the character's collision volume a hair above the
@@ -2776,6 +2774,19 @@ func _launch_off_blorb(blorb: Blorb) -> bool:
 
 
 ## See BlorbBounce.rest_feet_y(), which both characters launch from.
+## How tall this body is to the top of its own head, which is what decides
+## where it floats and how deep water has to be before it must be swum.
+func _head_height() -> float:
+	return LiquidEnvironment.head_height(
+		_head, global_position.y - FOOT_OFFSET, _playable_profile
+	)
+
+
+## How far its feet hang below the surface while floating.
+func _swim_float_depth() -> float:
+	return LiquidEnvironment.float_depth(_head_height())
+
+
 func _blorb_rest_feet_y(blorb: Blorb) -> float:
 	var capsule := _collision_shape.shape as CapsuleShape3D
 	return BlorbBounce.rest_feet_y(
@@ -6894,7 +6905,7 @@ func _update_lake_buoyancy(delta: float) -> void:
 	var floor_height: float = _liquid.floor_height
 	# The shallow feathered shoreline stays walkable. Buoyancy begins only
 	# once the basin has enough real depth to immerse the character.
-	if not _liquid.deep_enough_to_swim():
+	if not _liquid.deep_enough_to_swim(_head_height()):
 		return
 	# Dock ramps deliberately start below the swimmer's feet. Once one is
 	# beneath the player, let its continuous climbable collision take over
@@ -6948,7 +6959,7 @@ func _update_lake_buoyancy(delta: float) -> void:
 		# Measured to the body's underside, so a level diver can glide just
 		# above the lakebed instead of hovering a body-length over it.
 		var dive_floor := floor_height + LAKE_DIVE_FLOOR_CLEARANCE - _body_bottom_height
-		var dive_surface := water_level - LAKE_SWIM_FOOT_DEPTH
+		var dive_surface := water_level - _swim_float_depth()
 		global_position.y = clampf(global_position.y, dive_floor, dive_surface)
 		return
 	# Per direct instruction ("we no longer even need the mechanics of
@@ -6959,7 +6970,7 @@ func _update_lake_buoyancy(delta: float) -> void:
 	# full suit and without Rock legs (Rock legs alone already return via
 	# the floor-walk branch above, full-suit lava returns via the dive
 	# branch above). Kept, not deleted, for exactly that case.
-	var swim_y := water_level - LAKE_SWIM_FOOT_DEPTH
+	var swim_y := water_level - _swim_float_depth()
 	# Let a jump break the surface normally, but catch the player again as
 	# soon as their descending feet re-enter the water. Without clearing this
 	# flag, an underwater jump could remain an endless gravity fall all the
