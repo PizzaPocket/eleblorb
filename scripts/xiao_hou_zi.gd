@@ -889,6 +889,11 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			speed *= Player.FLIGHT_SPRINT_SPEED_MULTIPLIER
 	elif _direct_surface_swimming:
 		speed *= _special_speed_multiplier(["head", "leg_left", "leg_right"], true)
+	# Water jets underwater propel the swimmer, each firing limb adding to
+	# the blast. The shared power decides how much, so his jets match the
+	# human's rather than doing nothing at all as they did.
+	if _direct_diving or _direct_surface_swimming:
+		speed *= SwimMode.jet_speed_multiplier(_direct_swim_jet_count())
 	if (
 		_direct_ice_skating_active
 		and not (_direct_diving or _direct_flying or _direct_air_feet or _direct_fire_limb_flight or _direct_surface_swimming)
@@ -1226,6 +1231,16 @@ func _animate_direct_ice_skating(delta: float) -> void:
 	_ice_skates.pose(_traversal_context(delta))
 
 
+## How many water limbs are jetting while he swims.
+func _direct_swim_jet_count() -> int:
+	if not (_direct_diving or _direct_surface_swimming):
+		return 0
+	return (
+		int(_direct_left_arm_water) + int(_direct_right_arm_water)
+		+ int(_direct_left_leg_water) + int(_direct_right_leg_water)
+	)
+
+
 func _animate_direct_swim(delta: float, movement_speed: float) -> void:
 	# The swim pose is SwimMode's, shared with the human. It carries the part
 	# this body never had: a swimmer at rest hangs still with the legs
@@ -1238,9 +1253,19 @@ func _animate_direct_swim(delta: float, movement_speed: float) -> void:
 	if _blorb_suit.mermaid_tail_active():
 		_swim.update_mermaid_motion(ctx, reference * SwimMode.MERMAID_SPEED_MULTIPLIER)
 		_swim.pose_mermaid(ctx, reference * SwimMode.MERMAID_SPEED_MULTIPLIER)
+		if _direct_swim_jet_count() > 0:
+			_swim.pose_jets(
+				ctx, _direct_left_arm_water, _direct_right_arm_water,
+				_direct_left_leg_water, _direct_right_leg_water, true
+			)
 		return
 	_swim.update_motion(ctx, reference)
 	_swim.pose_swim(ctx, reference)
+	if _direct_swim_jet_count() > 0:
+		_swim.pose_jets(
+			ctx, _direct_left_arm_water, _direct_right_arm_water,
+			_direct_left_leg_water, _direct_right_leg_water, false
+		)
 
 
 func _animate_direct_airborne(delta: float) -> void:

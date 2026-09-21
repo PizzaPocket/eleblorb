@@ -977,7 +977,7 @@ const FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER := 1.35
 ## Water limbs while swimming jet backward instead: each active Water hand or
 ## foot multiplies swim speed by this (compounding, as Fire feet do in flight),
 ## and with the stick released they drive the swimmer straight ahead.
-const SWIM_JET_SPEED_MULTIPLIER := FIRE_FOOT_FLIGHT_SPEED_MULTIPLIER
+const SWIM_JET_SPEED_MULTIPLIER := SwimMode.JET_SPEED_MULTIPLIER
 ## The mermaid tail (Nautilus Crown over two Water leg blorbs, swimming):
 ## far faster swimming, and sprint and Water jets still stack on top.
 const MERMAID_SWIM_SPEED_MULTIPLIER := SwimMode.MERMAID_SPEED_MULTIPLIER
@@ -4716,20 +4716,14 @@ func _swim_jet_count() -> int:
 ## Swimming Water jets, posed like the Fire suit's: jetting hands swept back
 ## beside the hips and jetting legs held straight, both streaming behind.
 func _apply_swim_jet_pose(delta: float) -> void:
+	# Streamlining under a water jet is SwimMode's, shared with every other
+	# character that can fire one.
 	if _swim_jet_count() == 0:
 		return
-	var t := minf(FIRE_JET_POSE_SETTLE_SPEED * delta, 1.0)
-	if _left_arm_water_active:
-		_pose_fire_jet_arm(_arm_left, _elbow_left, _hand_left, 1.0, t)
-	if _right_arm_water_active:
-		_pose_fire_jet_arm(_arm_right, _elbow_right, _hand_right, -1.0, t)
-	# The mermaid tail keeps its own kick and pointed toes: the jets fire
-	# from the fluke without straightening the legs inside it.
-	if not (_left_leg_water_active or _right_leg_water_active) or _blorb_suit.mermaid_tail_active():
-		return
-	for joint in [_leg_left, _leg_right, _knee_left, _knee_right, _ankle_left, _ankle_right]:
-		var pivot := joint as Node3D
-		pivot.rotation = pivot.rotation.lerp(Vector3.ZERO, t)
+	_swim.pose_jets(
+		_traversal_context(delta), _left_arm_water_active, _right_arm_water_active,
+		_left_leg_water_active, _right_leg_water_active, _blorb_suit.mermaid_tail_active()
+	)
 
 
 func _apply_fire_jet_pose(delta: float) -> void:

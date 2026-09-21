@@ -193,6 +193,60 @@ func pose_mermaid(ctx: TraversalContext, reference_speed: float, lead_head: bool
 		_lead_with_the_head(rig, t)
 
 
+## Water jets underwater are not the land jet: each active water limb drives
+## the swimmer forward, and the limbs streamline rather than gesturing. The
+## jetting hands sweep back beside the hips and the jetting legs straighten
+## and stream behind, so the whole body reads as being propelled.
+##
+## A mermaid keeps her own kick and pointed toes: the jets fire from the
+## fluke without straightening the legs inside the tail.
+const JET_SPEED_MULTIPLIER := 1.35
+const JET_POSE_SETTLE_SPEED := 9.0
+const JET_ARM_BACK_ANGLE := deg_to_rad(8.0)
+const JET_ARM_OUTWARD_ANGLE := deg_to_rad(16.0)
+const JET_ELBOW_BEND := deg_to_rad(10.0)
+
+
+## How much faster this swimmer travels with `jets` water limbs firing.
+static func jet_speed_multiplier(jets: int) -> float:
+	return pow(JET_SPEED_MULTIPLIER, maxf(jets, 0))
+
+
+## Streamlines whichever limbs are jetting. `tail` keeps the legs inside a
+## mermaid's fluke rather than straightening them.
+func pose_jets(
+	ctx: TraversalContext, left_arm: bool, right_arm: bool,
+	left_leg: bool, right_leg: bool, tail: bool = false
+) -> void:
+	var rig := ctx.rig
+	if rig == null:
+		return
+	var t := minf(JET_POSE_SETTLE_SPEED * ctx.delta, 1.0)
+	for side in 2:
+		if not (left_arm if side == 0 else right_arm):
+			continue
+		if (ctx.left_arm_busy if side == 0 else ctx.right_arm_busy):
+			continue
+		var outward := 1.0 if side == 0 else -1.0
+		var shoulder := rig.joint("arm_left_shoulder" if side == 0 else "arm_right_shoulder")
+		if shoulder != null:
+			shoulder.rotation.x = lerp_angle(shoulder.rotation.x, JET_ARM_BACK_ANGLE, t)
+			shoulder.rotation.y = lerp_angle(shoulder.rotation.y, 0.0, t)
+			shoulder.rotation.z = lerp_angle(shoulder.rotation.z, outward * JET_ARM_OUTWARD_ANGLE, t)
+		var elbow := rig.joint("arm_left_elbow" if side == 0 else "arm_right_elbow")
+		if elbow != null:
+			elbow.rotation = elbow.rotation.lerp(Vector3(-JET_ELBOW_BEND, 0.0, 0.0), t)
+	if tail or not (left_leg or right_leg):
+		return
+	for side in 2:
+		var prefix := "leg_left" if side == 0 else "leg_right"
+		for name in ["%s_hip" % prefix, "%s_knee" % prefix, "%s_ankle" % prefix]:
+			if not rig.articulates(name):
+				continue
+			var joint := rig.joint(name)
+			joint.rotation = joint.rotation.lerp(Vector3.ZERO, t)
+
+
 ## Under way the head lifts to look along the travel, the way a swimmer
 ## looks where they are going rather than at the bottom. At rest it returns.
 func _lead_with_the_head(rig: RigAdapter, t: float) -> void:
