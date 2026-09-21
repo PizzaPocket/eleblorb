@@ -715,7 +715,7 @@ func prepare_direct_control_environment(delta: float) -> void:
 	_clear_direct_environment()
 	_update_direct_dirtbike_state()
 	_update_direct_snowboard_state()
-	_update_direct_penguin_state()
+	_update_direct_penguin_state(delta)
 	_update_direct_ice_skate_state()
 	_update_direct_powered_movement(delta)
 	# Turned back at the pool's edge by the same rule the player answers to.
@@ -743,6 +743,9 @@ func prepare_direct_control_environment(delta: float) -> void:
 	if not _direct_diving and not _direct_lava_surface:
 		_direct_flying = _blorb_suit.has_chest_air_blorb()
 		_direct_air_feet = _blorb_suit.has_air_hover_legs()
+	# The tail forms while its wearer is actually swimming, and the suit only
+	# ever heard that from the human, so his legs never became one.
+	_blorb_suit.set_mermaid_swimming(_direct_diving)
 
 
 func uses_pitched_movement_input() -> bool:
@@ -1349,8 +1352,13 @@ func _update_direct_crystal_riding(
 
 ## The Penguin Suit, through the shared power: he had none at all. The dive
 ## and the belly slide are the same as the human's, on his own rig.
-func _update_direct_penguin_state() -> void:
-	var ctx := _traversal_context(0.016)
+func _update_direct_penguin_state(delta: float) -> void:
+	# The four-button chord that forms the suit is the power's, not the
+	# human's. He could never become a penguin at all before, because only
+	# the human's own file knew how to enter the form. He has no rock
+	# platforms, so leg presses that lapse without a chord are simply let go.
+	_penguin.update_form_chord(_blorb_suit, delta, get_instance_id())
+	var ctx := _traversal_context(delta)
 	var grounded := is_on_floor() or _direct_is_supported_by_ice()
 	_penguin.update_state(ctx, grounded, _direct_is_supported_by_ice(), _direct_vertical_velocity > 0.0)
 

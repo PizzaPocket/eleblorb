@@ -38,12 +38,23 @@ const WADDLE_THIGH_LIFT := deg_to_rad(6.0)
 const WADDLE_KNEE := deg_to_rad(16.0)
 const WADDLE_ROLL := deg_to_rad(7.0)
 
+## The Penguin Suit is formed or unformed by pressing all four limb buttons
+## together, within this many seconds of the first. Limb powers wait out the
+## window, so a chord never also fires them.
+const CHORD_WINDOW := 0.2
+const CHORD_ACTIONS: Array[String] = [
+	"left_arm_power", "right_arm_power", "left_leg_power", "right_leg_power",
+]
+
 var diving := false
 var sliding := false
 var prone := 0.0
 var waddle_roll := 0.0
 var waddle_phase := 0.0
 var _waddle_posed := false
+var _chord_timer := 0.0
+var _chord_consumed := false
+var _chord_pending_legs: Array[bool] = [false, false]
 
 
 func id() -> StringName:
@@ -52,6 +63,54 @@ func id() -> StringName:
 
 func is_available(ctx: TraversalContext) -> bool:
 	return ctx.suit != null and ctx.suit.penguin_form_active()
+
+
+## Watches for the four-button chord that forms or unforms the suit, which
+## only the human's own file used to do, so nobody else could ever become a
+## penguin at all.
+##
+## Returns whether limb powers must hold back this frame -- during the window,
+## and until a completed chord's buttons are all released -- and which leg
+## presses were held through a window that lapsed without a chord. A caller
+## with its own use for those presses fires them; one without ignores them.
+func update_form_chord(suit: BlorbSuitController, delta: float, sound_key: int = 0) -> Dictionary:
+	var lapsed: Array[bool] = [false, false]
+	if suit == null or UIState.modal_open or not suit.has_full_penguin_suit():
+		_chord_timer = 0.0
+		_chord_consumed = false
+		_chord_pending_legs = [false, false]
+		return {"holding": false, "lapsed_legs": lapsed}
+	if _chord_consumed:
+		_chord_consumed = CHORD_ACTIONS.any(
+			func(action: String) -> bool: return Input.is_action_pressed(action)
+		)
+		return {"holding": true, "lapsed_legs": lapsed}
+	var pressed_now := CHORD_ACTIONS.any(
+		func(action: String) -> bool: return Input.is_action_just_pressed(action)
+	)
+	if pressed_now and _chord_timer <= 0.0:
+		_chord_timer = CHORD_WINDOW
+	if _chord_timer <= 0.0:
+		return {"holding": false, "lapsed_legs": lapsed}
+	if Input.is_action_just_pressed("left_leg_power"):
+		_chord_pending_legs[0] = true
+	if Input.is_action_just_pressed("right_leg_power"):
+		_chord_pending_legs[1] = true
+	if CHORD_ACTIONS.all(func(action: String) -> bool: return Input.is_action_pressed(action)):
+		_chord_timer = 0.0
+		_chord_consumed = true
+		_chord_pending_legs = [false, false]
+		if suit.toggle_penguin_form():
+			UISounds.play_foley(&"transform_reveal", 0.6, sound_key)
+		return {"holding": true, "lapsed_legs": lapsed}
+	_chord_timer -= delta
+	if _chord_timer > 0.0:
+		return {"holding": true, "lapsed_legs": lapsed}
+	# No chord formed: the leg presses held through the window were ordinary
+	# presses after all.
+	lapsed = _chord_pending_legs.duplicate()
+	_chord_pending_legs = [false, false]
+	return {"holding": false, "lapsed_legs": lapsed}
 
 
 ## True while upright on its feet: not in the air off a dive, not sliding.

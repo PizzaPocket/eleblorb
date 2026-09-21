@@ -319,10 +319,7 @@ const PENGUIN_SLIDE_LANDING_BOOST := PenguinMode.SLIDE_LANDING_BOOST
 ## Jump while belly sliding hops back up onto the feet: this fraction of an
 ## ordinary jump's height.
 const PENGUIN_STAND_HOP_HEIGHT := 0.35
-## The Penguin Suit is formed or unformed by pressing all four limb buttons
-## together, within this many seconds of the first. Limb powers wait out the
-## window, so a chord never also fires them.
-const PENGUIN_CHORD_WINDOW := 0.2
+const PENGUIN_CHORD_WINDOW := PenguinMode.CHORD_WINDOW
 ## On foot the formed Penguin Suit waddles: slow, in short quick steps, the
 ## whole body leaning over whichever foot is planted.
 ## Crystal Skates (a pair of Ice leg blorbs each bound with them): moving
@@ -1230,9 +1227,6 @@ var _penguin_waddle_roll := 0.0
 var _penguin_waddle_posed := false
 var _penguin_waddle_blend := 0.0
 ## The four-limb chord that forms/unforms the Penguin Suit.
-var _penguin_chord_timer := 0.0
-var _penguin_chord_consumed := false
-var _penguin_chord_pending_legs: Array[bool] = [false, false]
 var _penguin_chord_holding := false
 ## Base height applied by the last _compose_body_pose(). While riding, the
 ## dirtbike pose applies only the change in base height, so its chassis-pivot
@@ -7266,47 +7260,18 @@ func _penguin_waddling() -> bool:
 	return _blorb_suit.penguin_form_active() and not _penguin_dive_airborne and not _penguin_belly_sliding
 
 
-## Watches for all four limb buttons pressed together (within
-## PENGUIN_CHORD_WINDOW) while the penguin-capable suit is worn, and toggles
-## the Penguin Suit. Returns true while limb powers must hold back: during the
-## window (leg presses in it are kept and fired if no chord completes) and
-## until a completed chord's buttons are all released.
+## The chord itself lives in PenguinMode, so anybody wearing the suit can
+## form it. Leg presses held through a window that lapsed without a chord
+## were ordinary presses after all, and this body has rock platforms to
+## raise with them.
 func _update_penguin_chord(delta: float) -> bool:
-	const ACTIONS := ["left_arm_power", "right_arm_power", "left_leg_power", "right_leg_power"]
-	if UIState.modal_open or not _blorb_suit.has_full_penguin_suit():
-		_penguin_chord_timer = 0.0
-		_penguin_chord_consumed = false
-		_penguin_chord_pending_legs = [false, false]
-		return false
-	if _penguin_chord_consumed:
-		_penguin_chord_consumed = ACTIONS.any(func(action: String) -> bool: return Input.is_action_pressed(action))
-		return true
-	var pressed_now := ACTIONS.any(func(action: String) -> bool: return Input.is_action_just_pressed(action))
-	if pressed_now and _penguin_chord_timer <= 0.0:
-		_penguin_chord_timer = PENGUIN_CHORD_WINDOW
-	if _penguin_chord_timer <= 0.0:
-		return false
-	if Input.is_action_just_pressed("left_leg_power"):
-		_penguin_chord_pending_legs[0] = true
-	if Input.is_action_just_pressed("right_leg_power"):
-		_penguin_chord_pending_legs[1] = true
-	if ACTIONS.all(func(action: String) -> bool: return Input.is_action_pressed(action)):
-		_penguin_chord_timer = 0.0
-		_penguin_chord_consumed = true
-		_penguin_chord_pending_legs = [false, false]
-		if _blorb_suit.toggle_penguin_form():
-			UISounds.play_foley(&"transform_reveal", 0.6, get_instance_id())
-		return true
-	_penguin_chord_timer -= delta
-	if _penguin_chord_timer > 0.0:
-		return true
-	# No chord: the leg presses held during the window act as ordinary presses.
-	if _penguin_chord_pending_legs[0] and _left_leg_rock_cooldown <= 0.0 and _raise_rock_platform("leg_left"):
+	var chord := _penguin.update_form_chord(_blorb_suit, delta, get_instance_id())
+	var lapsed: Array = chord["lapsed_legs"]
+	if lapsed[0] and _left_leg_rock_cooldown <= 0.0 and _raise_rock_platform("leg_left"):
 		_left_leg_rock_cooldown = ROCK_POWER_COOLDOWN
-	if _penguin_chord_pending_legs[1] and _right_leg_rock_cooldown <= 0.0 and _raise_rock_platform("leg_right"):
+	if lapsed[1] and _right_leg_rock_cooldown <= 0.0 and _raise_rock_platform("leg_right"):
 		_right_leg_rock_cooldown = ROCK_POWER_COOLDOWN
-	_penguin_chord_pending_legs = [false, false]
-	return false
+	return bool(chord["holding"])
 
 
 ## The formed Penguin Suit standing on ice: it glides on its feet, keeping
