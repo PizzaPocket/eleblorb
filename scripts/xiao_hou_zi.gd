@@ -949,6 +949,12 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			rotation.y = lerp_angle(
 				rotation.y, atan2(slide_heading.x, slide_heading.y), minf(ROTATION_SPEED * delta, 1.0)
 			)
+	elif _penguin.diving and (jump_pressed or not is_on_floor()):
+		# A dive is ballistic: the launch carries, exactly as the skate and
+		# board launches do. Ordinary walking used to overwrite it on the very
+		# next frame, so a 15 m/s dive landed at his 2.5 m/s walking pace and
+		# the belly slide had almost nothing left to scrub.
+		pass
 	elif (
 		_direct_snowboard_active
 		and is_on_floor()
