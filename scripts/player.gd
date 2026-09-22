@@ -318,7 +318,7 @@ const PENGUIN_DIVE_HEIGHT := PenguinMode.DIVE_HEIGHT
 const PENGUIN_SLIDE_LANDING_BOOST := PenguinMode.SLIDE_LANDING_BOOST
 ## Jump while belly sliding hops back up onto the feet: this fraction of an
 ## ordinary jump's height.
-const PENGUIN_STAND_HOP_HEIGHT := 0.35
+const PENGUIN_STAND_HOP_HEIGHT := PenguinMode.STAND_HOP_HEIGHT
 const PENGUIN_CHORD_WINDOW := PenguinMode.CHORD_WINDOW
 ## On foot the formed Penguin Suit waddles: slow, in short quick steps, the
 ## whole body leaning over whichever foot is planted.
@@ -7106,8 +7106,12 @@ func _update_crystal_riding(delta: float, jump_pressed: bool) -> bool:
 	ctx.grounded = (is_on_floor() or _is_near_ground()) and not _jumping and velocity.y <= 0.1
 	var blocked := not _can_crystal_ride()
 	var was_riding := _crystal.riding
+	# The camera's own frame resolves the stick into the world direction the
+	# track is aimed along, including its pitch.
+	var input := _get_move_input()
+	var aim := ctx.aim_basis.x * input.x + ctx.aim_basis.z * input.y
 	var owned := _crystal.ride(
-		ctx, _get_move_input(), jump_pressed and not UIState.modal_open, blocked, FOOT_OFFSET
+		ctx, aim, jump_pressed and not UIState.modal_open, blocked, FOOT_OFFSET
 	)
 	_crystal_riding = _crystal.riding
 	_crystal_speed = _crystal.speed

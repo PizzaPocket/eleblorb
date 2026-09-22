@@ -62,6 +62,11 @@ const PENGUIN_TORSO_WIDTH_SCALE := 1.3
 ## How far above the head's base (the top of the neck) the torso closes, so it
 ## tucks up under the head and its helm rather than stopping at the collar.
 const PENGUIN_TORSO_ABOVE_HEAD_BASE := 0.1
+## How far the penguin's crown stands above the wearer's shoulders, as a
+## fraction of the distance from those shoulders down to its hem. Measured
+## rather than authored in one figure's units, so the body fits whoever is
+## inside it.
+const PENGUIN_TORSO_ABOVE_SHOULDER := 0.17
 ## Where the belly is widest, as a fraction of the torso's height from the
 ## bottom, how much wider than the torso's nominal width it bulges there (a
 ## chubby penguin, fattest low down), and how far forward it swells beyond
@@ -299,20 +304,22 @@ const LEG_RADIUS_SCALE := 0.75
 ## reference the exact same ratio rather than a second hardcoded copy.
 const HAND_TIP_RADIUS_RATIO := 0.7
 const FOOT_TOE_RADIUS_RATIO := 0.8
-## How far past a published limb tip the shell's last control point sits, as a
-## fraction of the radius there. The tube tapers to nothing at that point, so
-## a little reach keeps the boot from clipping the toe it covers without
-## hanging anything below the sole.
-const TIP_REACH_FRACTION := 0.35
 ## Where along wrist->tip / ankle->toe each limb's own eye/core anchor
 ## sits (see rebuild_arm()'s HAND_EYE_T / rebuild_leg()'s BOOT_EYE_T) --
 ## same reason as the ratios above: shared here so the core-size match
 ## derivation below uses the exact real value.
 const HAND_EYE_T := 0.55
 const BOOT_EYE_T := 0.8
-## Eye/core frame is now measured directly back from ToeAttach, rather than
-## interpolated from the ankle, so it remains locked to the live foot tip.
+## Eye/core frame is measured directly back from the toe, rather than
+## interpolated from the ankle, so it stays locked to the live foot tip.
+##
+## As a fraction of the wearer's own foot length, not a distance in the human
+## figure's units: scaled down, the human's 0.12 m setback is longer than a
+## small rig's entire foot, which put the boot's face and core behind that
+## character's heels. The human's own foot is 0.13 long, which is where this
+## fraction comes from.
 const BOOT_EYE_BACK_FROM_TOE := 0.12
+const BOOT_EYE_BACK_FRACTION := BOOT_EYE_BACK_FROM_TOE / ProceduralFigure.FOOT_SIZE.z
 
 ## The foot's own r_ankle (see rebuild_leg()) is noticeably bigger than
 ## the arm's own r_wrist (see rebuild_arm()) -- FOOT_SIZE's own average
@@ -484,7 +491,7 @@ static func equip_slot(slot: String, pivots: Dictionary, root: Node3D, blorb: Bl
 			rebuild_slot(mesh_instance, slot, pivots, root, blorb, rig_scale, form_command, false, limb_fit)
 			pieces.append(mesh_instance)
 		"torso":
-			pieces = build_torso(pivots["spine"] as Node3D, blorb, rig_scale, form_command, limb_fit)
+			pieces = build_torso(pivots["spine"] as Node3D, blorb, rig_scale, form_command, limb_fit, pivots)
 		"head":
 			pieces = build_head(pivots["head"] as Node3D, blorb, rig_scale)
 	if blorb.element_state == "air":
@@ -995,14 +1002,17 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 			radii.append(float(station_radii[index]) * fit)
 		r_ankle = radii[radii.size() - 2]
 		r_toe = radii[radii.size() - 1]
-		# The shell closes the way the leg itself closes: build_limb_tube()
-		# tapers its last control point to nothing, so the boot ends where the
-		# foot ends. A rounded cap appended past that point instead hung a ball
-		# of the toe's full radius below the sole, which is the extension of
-		# blorb leg that showed beneath his actual feet.
-		var tip: Vector3 = points[points.size() - 1]
-		var tip_direction := (leg_profile["tip_direction"] as Vector3).normalized()
-		points[points.size() - 1] = tip + tip_direction * r_toe * TIP_REACH_FRACTION
+		# The shell closes exactly the way the leg itself closes, at the same
+		# point: build_limb_tube() tapers its last control point to nothing, so
+		# the boot rounds off where the foot rounds off.
+		#
+		# Two earlier attempts are recorded here because each looked like the
+		# fix for the other. Appending a rounded cap past that point hung a
+		# ball of the toe's full radius below the sole, which read as an extra
+		# length of leg under his feet. Pushing the point forward instead
+		# closed the taper forward and left the underside cut flat, as if the
+		# sole had been lopped off. Leaving the point where the rig put it
+		# does neither.
 		var hip_overlap := float(limb_fit.get("leg_hip_overlap", 0.0))
 		if hip_overlap > 0.0:
 			var hip_outward := -(knee_pos - hip_pos).normalized()
@@ -1083,7 +1093,8 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 	# The toe's own live transform is the positional AND rotational source
 	# of truth. A fixed local-back offset keeps the face/core at the same
 	# place on the boot even as ankle and knee animation reshape the leg.
-	var boot_centerline := raw_toe_pos - toe_forward * (BOOT_EYE_BACK_FROM_TOE * rig_scale)
+	var foot_length := maxf(raw_toe_pos.distance_to(ankle_pos), 0.0001)
+	var boot_centerline := raw_toe_pos - toe_forward * (BOOT_EYE_BACK_FRACTION * foot_length)
 	var r_local := lerpf(r_ankle, r_toe, BOOT_EYE_T)
 	if mermaid:
 		r_local = MERMAID_FACE_DEPTH * rig_scale
@@ -1136,9 +1147,9 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 ## oval sits, how big it is) is expressed in ProceduralFigure's own human
 ## terms and needs rescaling to actually land on/around a smaller rig's
 ## much shorter, narrower chest.
-static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false, limb_fit: Dictionary = {}) -> Array[Node3D]:
+static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0, form_command: bool = false, limb_fit: Dictionary = {}, pivots: Dictionary = {}) -> Array[Node3D]:
 	if blorb.element_state == "ice" and form_command:
-		return [_build_penguin_torso(spine_pivot, blorb, rig_scale)] as Array[Node3D]
+		return [_build_penguin_torso(spine_pivot, blorb, rig_scale, pivots)] as Array[Node3D]
 	var vis: Dictionary = blorb.body_visual_snapshot()
 	var sealed_lava := blorb.element_state == "fire" and form_command
 
@@ -1256,17 +1267,32 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 ## the back. The legs run down inside it and only the feet show beneath the
 ## hem. Built in spine-local space, like the sealed Lava cuirass; the ankle
 ## sits the pelvis, thigh and shin heights below the spine pivot.
-static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float) -> Node3D:
+## The penguin's body is measured against the wearer, not against the human
+## figure scaled down: per direct instruction its top stands just above the
+## shoulders and its hem comes down to just above the ankles. Every rig
+## already publishes both joints, so any body gets a penguin that fits it.
+static func _build_penguin_torso(
+	spine_pivot: Node3D, blorb: Blorb, rig_scale: float, pivots: Dictionary = {}
+) -> Node3D:
 	var vis: Dictionary = blorb.body_visual_snapshot()
+	# Fallbacks in the human figure's own terms, for a caller with no rig to
+	# measure.
 	var bottom := (-(
 		ProceduralFigure.HIP_SIZE.y + ProceduralFigure.UPPER_LEG_SIZE.y + ProceduralFigure.LOWER_LEG_SIZE.y
 	) * 2.0 + PENGUIN_HEM_ABOVE_ANKLE) * rig_scale
 	var chest_top := (ProceduralFigure.ABDOMEN_SIZE.y + ProceduralFigure.CHEST_SIZE.y) * 2.0 * rig_scale
 	var top := chest_top + (ProceduralFigure.HEAD_RAISE + PENGUIN_TORSO_ABOVE_HEAD_BASE) * rig_scale
-	# The shoulder joints (ProceduralFigure.build()'s shoulder_y, relative to
-	# the spine): the torso holds its full shoulder width to just above them,
-	# then rounds over to close under the head.
 	var shoulder := (ProceduralFigure.ABDOMEN_SIZE.y * 2.0 + ProceduralFigure.CHEST_SIZE.y * 1.6 - 0.035) * rig_scale
+	var measured_shoulder: Variant = _local_height(spine_pivot, pivots.get("arm_left_shoulder"))
+	var measured_ankle: Variant = _local_height(spine_pivot, pivots.get("leg_left_ankle"))
+	if measured_shoulder != null and measured_ankle != null:
+		var shoulder_y: float = measured_shoulder
+		var ankle_y: float = measured_ankle
+		shoulder = shoulder_y
+		bottom = ankle_y + PENGUIN_HEM_ABOVE_ANKLE * rig_scale
+		top = shoulder + PENGUIN_TORSO_ABOVE_SHOULDER * (shoulder - bottom)
+	# The torso holds its full width to just above the shoulders, then rounds
+	# over to close under the head.
 	var shoulder_t := clampf((shoulder + 0.03 * rig_scale - bottom) / (top - bottom), 0.5, 0.95)
 	var half_width := ProceduralFigure.CHEST_SIZE.x * TORSO_INFLATE * PENGUIN_TORSO_WIDTH_SCALE * rig_scale
 	var half_depth := ProceduralFigure.CHEST_SIZE.z * TORSO_INFLATE * 1.2 * PENGUIN_TORSO_WIDTH_SCALE * rig_scale
@@ -1326,6 +1352,15 @@ static func _build_penguin_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: f
 ## eases in slightly to broad shoulders at `shoulder_t`, then rounds over as
 ## an elliptical dome closing at the top, up under the hood. The hem rounds
 ## closed.
+## A joint's height above `origin`, along the origin's own up axis, or null
+## where the rig has no such joint to measure.
+static func _local_height(origin: Node3D, joint: Variant) -> Variant:
+	var node := joint as Node3D
+	if origin == null or node == null:
+		return null
+	return origin.to_local(node.global_position).y
+
+
 static func _penguin_torso_width(t: float, shoulder_t: float) -> float:
 	const BOTTOM_ROUND := 0.07
 	var width: float

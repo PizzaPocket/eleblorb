@@ -40,15 +40,20 @@ func is_available(ctx: TraversalContext) -> bool:
 	return ctx.suit != null and ctx.suit.has_crystal_skates()
 
 
-## Where the rider is steering, in three dimensions: the aim direction,
-## pitched no more steeply than the track can climb or dive.
-func wanted_direction(ctx: TraversalContext, stick: Vector2) -> Vector3:
-	if stick.length_squared() < 0.04 or ctx.aim_basis == Basis():
+## Where the rider is steering, in three dimensions: `aim` is the direction
+## asked for in world space, pitched here no more steeply than the track can
+## climb or dive.
+##
+## A world direction rather than a stick and a frame to resolve it in: each
+## driver already has one, and the frame was being applied twice to a stick
+## that had been resolved once already. It was also compared against the
+## identity basis to mean "no aim", which is exactly the basis a body facing
+## straight down +Z hands over, so that rider could never start a track at
+## all from that heading.
+func wanted_direction(_ctx: TraversalContext, aim: Vector3) -> Vector3:
+	if aim.length_squared() < 0.04:
 		return Vector3.ZERO
-	var direction := ctx.aim_basis.x * stick.x + ctx.aim_basis.z * stick.y
-	if direction.length_squared() < 0.0001:
-		return Vector3.ZERO
-	direction = direction.normalized()
+	var direction := aim.normalized()
 	var pitch := clampf(asin(clampf(direction.y, -1.0, 1.0)), -MAX_PITCH, MAX_PITCH)
 	var flat := Vector2(direction.x, direction.z)
 	if flat.length_squared() < 0.0001:
@@ -96,20 +101,20 @@ func end(keep_momentum: bool) -> void:
 ## One frame of the ride. Returns true when it owned the frame, in which case
 ## the caller poses and does nothing else. `blocked` is the caller saying
 ## something else already owns this body.
-func ride(ctx: TraversalContext, stick: Vector2, jump_pressed: bool, blocked: bool, foot_offset: float) -> bool:
+func ride(ctx: TraversalContext, aim: Vector3, jump_pressed: bool, blocked: bool, foot_offset: float) -> bool:
 	var available := is_available(ctx) and not blocked
 	if riding and not available:
 		end(false)
 	if not riding:
 		body_pitch = move_toward(body_pitch, 0.0, BODY_PITCH_RATE * ctx.delta)
-		var wanted_start := wanted_direction(ctx, stick)
+		var wanted_start := wanted_direction(ctx, aim)
 		if not (available and ctx.grounded and wanted_start != Vector3.ZERO):
 			return false
 		begin(ctx, wanted_start, foot_offset)
 	if jump_pressed:
 		end(true)
 		return false
-	var wanted := wanted_direction(ctx, stick)
+	var wanted := wanted_direction(ctx, aim)
 	if wanted != Vector3.ZERO:
 		var turn := heading.angle_to(wanted)
 		if speed < 1.0 and turn > RESTART_ANGLE:

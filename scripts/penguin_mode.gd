@@ -26,6 +26,9 @@ const SLIDE_FRICTION := 1.1
 const SLIDE_OFF_ICE_FRICTION := 12.0
 const SLIDE_TURN_RATE := 1.3
 const SLIDE_STOP_SPEED := 0.9
+## A jump out of a belly slide hops back up onto the feet at this fraction of
+## an ordinary jump's height.
+const STAND_HOP_HEIGHT := 0.35
 ## Tipping between upright and flat, and where the body pivots in each.
 const PRONE_RATE := 5.5
 const BODY_PIVOT_HEIGHT := 0.75
@@ -170,6 +173,14 @@ func slide_step(ctx: TraversalContext, on_ice: bool) -> Vector2:
 	ctx.body.velocity.x = heading.x * speed
 	ctx.body.velocity.z = heading.y * speed
 	return heading
+
+
+## Stands up out of a belly slide. Returns the vertical speed of the hop, so
+## each character applies it to its own body.
+func stand_from_slide(ctx: TraversalContext) -> float:
+	sliding = false
+	diving = false
+	return HumanoidLocomotion.jump_speed(ctx.profile, STAND_HOP_HEIGHT)
 
 
 ## Eases the body between upright and flat, and settles a waddle lean that

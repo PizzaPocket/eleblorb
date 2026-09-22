@@ -969,6 +969,11 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	elif _direct_ice_skate_airborne:
 		velocity=HumanoidLocomotion.ballistic_step(velocity,delta,_playable_profile,32.0)
 		_direct_vertical_velocity=velocity.y
+	elif _penguin.sliding and jump_pressed:
+		# A jump out of a belly slide hops back onto the feet, as it does for
+		# the human. He had no way out of a slide but running out of ice.
+		_direct_vertical_velocity = _penguin.stand_from_slide(_traversal_context(delta))
+		velocity.y = _direct_vertical_velocity
 	elif (is_on_floor() or _direct_is_supported_by_ice()) and jump_pressed and _penguin.is_available(_traversal_context(delta)):
 		# In the suit a jump is a dive.
 		_begin_direct_penguin_dive(Vector3(planar.x, 0.0, planar.y))
@@ -1321,16 +1326,17 @@ func _update_direct_crystal_riding(
 ) -> bool:
 	var ctx := _traversal_context(delta)
 	ctx.sprinting = sprinting
-	ctx.aim_basis = Basis(Vector3.UP, rotation.y)
 	ctx.grounded = is_on_floor() and _direct_vertical_velocity <= 0.1
-	var stick := Vector2(direction.x, direction.z)
+	# The direction handed to him is already resolved into world space by
+	# whoever is driving, so it is the aim as it stands.
+	var aim := direction
 	var blocked := (
 		_direct_diving or _direct_flying or _direct_air_feet
 		or _powers.fire_limb_flight or _direct_lava_surface or _direct_dirtbike_active
 		or _direct_snowboard_active
 	)
 	var was_riding := _crystal.riding
-	var owned := _crystal.ride(ctx, stick, jump_pressed and not UIState.modal_open, blocked, 0.0)
+	var owned := _crystal.ride(ctx, aim, jump_pressed and not UIState.modal_open, blocked, 0.0)
 	if was_riding and not _crystal.riding:
 		if _crystal.exit_velocity != Vector3.ZERO:
 			velocity = _crystal.exit_velocity
