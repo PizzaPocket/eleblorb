@@ -38,6 +38,13 @@ const WINDOW_STATIONS := [8.0, 18.0, 28.0]
 const WINDOW_Y := 1.5
 const WINDOW_HALF := Vector2(3.4, 2.1)
 const WINDOW_EXPONENT := 2.6
+## Hull left standing between a window and any doorway or hatch, so every
+## opening keeps a frame of its own.
+const WINDOW_KEEP_CLEAR := 2.5
+## How far a window may be slid along the flank, and in what increments, to
+## find room beside an opening it would otherwise have met.
+const WINDOW_SLIDE := 1.5
+const WINDOW_SLIDE_STEPS := 14
 const GLASS := Color(0.44, 0.68, 0.86, 0.34)
 ## The hull is built on a finer grid than the default. Openings are cut cell
 ## by cell, so the grid's own spacing is the resolution of every outline: at
@@ -55,6 +62,9 @@ const CABIN_CEILING_Y := 7.0
 ## Breathable volume, inset from the hull so the seal never reads as extending
 ## through the wall.
 const CABIN_AIR_RADIUS := 9.6
+## How long a console bank runs along the flank, which is also the clearance
+## it keeps from a window so it never stands in front of the glass.
+const CONSOLE_HALF_LENGTH := 2.4
 
 const HULL := Color(0.88, 0.90, 0.94)
 const HULL_SHADOW := Color(0.62, 0.66, 0.74)
@@ -96,7 +106,6 @@ func _process(_delta: float) -> void:
 func _build_ship() -> void:
 	_build_hull()
 	_build_deck()
-	_build_cabin_collision()
 	_build_interior_fittings()
 	_build_stack()
 	_build_escape_pod()
@@ -120,9 +129,45 @@ func _build_hull() -> void:
 	# from the cabin.
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	shell.material_override = material
-	add_child(shell)
-	CollisionPolicy.mark_decorative(shell)
+	# The hull is what you actually stand inside, so it collides as the shape
+	# it is drawn as, holes and all. A box of flat panels used to be built
+	# inside it to do this job, which is what made the shell's own thickness
+	# decorative and cost the cabin most of its width.
+	var body := StaticBody3D.new()
+	body.name = "HullBody"
+	body.collision_layer = 1
+	body.rotation.x = PI * 0.5
+	add_child(body)
+	shell.rotation.x = 0.0
+	body.add_child(shell)
+	var shape := ConcavePolygonShape3D.new()
+	shape.set_faces(_mesh_faces(shell.mesh))
+	# Both faces of the shell are stood against: the inside from the cabin,
+	# the outside when climbing on it.
+	shape.backface_collision = true
+	var collider := CollisionShape3D.new()
+	collider.name = "HullCollider"
+	collider.shape = shape
+	body.add_child(collider)
 	_glaze_windows(apertures)
+
+
+## Every triangle of `mesh`, for a collider that matches the drawn surface.
+func _mesh_faces(mesh: Mesh) -> PackedVector3Array:
+	var faces := PackedVector3Array()
+	if mesh == null:
+		return faces
+	for surface in mesh.get_surface_count():
+		var arrays := mesh.surface_get_arrays(surface)
+		var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+		var raw_indices: Variant = arrays[Mesh.ARRAY_INDEX]
+		if raw_indices == null:
+			faces.append_array(vertices)
+			continue
+		var indices: PackedInt32Array = raw_indices
+		for index in indices:
+			faces.append(vertices[index])
+	return faces
 
 
 ## Every opening cut through the hull. The superegg's own Y is the hull's Z
@@ -138,13 +183,62 @@ func _hull_apertures() -> Array[Dictionary]:
 			"half": Vector2(HATCH_RADIUS, HATCH_RADIUS), "exponent": 2.0,
 		},
 	]
+	# A window is never cut where a way in or out already is. The openings
+	# share one surface, and two that meet make a single ragged hole with no
+	# frame between them, which is what the windows did to the doorway.
+	# Only the ways in and out are protected. The windows' own spacing is
+	# authored, and policing them against each other as well was quietly
+	# costing the flank two of its three panes.
+	var ways := apertures.duplicate()
 	for side: float in [-1.0, 1.0]:
 		for station: float in WINDOW_STATIONS:
-			apertures.append({
-				"center": Vector2(station, -WINDOW_Y),
-				"half": WINDOW_HALF, "exponent": WINDOW_EXPONENT, "side": side,
-			})
+			var placed := _place_window(station, side, ways)
+			if not placed.is_empty():
+				apertures.append(placed)
 	return apertures
+
+
+## A window at `station`, slid along the flank until it clears every opening
+## already cut. Sliding rather than dropping it: the flank is meant to carry
+## three windows a side, and one that would have met the doorway belongs a
+## little further along, not nowhere.
+func _place_window(station: float, side: float, existing: Array[Dictionary]) -> Dictionary:
+	for step in WINDOW_SLIDE_STEPS + 1:
+		for direction: float in [1.0, -1.0]:
+			var moved := station + direction * float(step) * WINDOW_SLIDE
+			if absf(moved) > HULL_HALF_LENGTH - WINDOW_HALF.x - 4.0:
+				continue
+			var window := {
+				"center": Vector2(moved, -WINDOW_Y),
+				"half": WINDOW_HALF, "exponent": WINDOW_EXPONENT, "side": side,
+			}
+			if _aperture_clear_of_ways(window, existing):
+				return window
+			if step == 0:
+				break
+	return {}
+
+
+## Whether `candidate` keeps its distance from every opening already cut.
+## Both footprints are grown by WINDOW_KEEP_CLEAR first, so they are not
+## merely disjoint but leave hull between them to hold a frame.
+static func _aperture_clear_of_ways(candidate: Dictionary, existing: Array[Dictionary]) -> bool:
+	var centre: Vector2 = candidate["center"]
+	var half: Vector2 = candidate["half"]
+	var side: float = float(candidate.get("side", 0.0))
+	for opening in existing:
+		# Two openings on opposite flanks cannot meet. An opening with no side
+		# of its own is cut straight through, so it is on both.
+		var other_side: float = float(opening.get("side", 0.0))
+		if side != 0.0 and other_side != 0.0 and side != other_side:
+			continue
+		var other_centre: Vector2 = opening["center"]
+		var other_half: Vector2 = opening["half"]
+		var gap := (centre - other_centre).abs()
+		var reach := half + other_half + Vector2.ONE * WINDOW_KEEP_CLEAR
+		if gap.x < reach.x and gap.y < reach.y:
+			return false
+	return true
 
 
 ## Fills each window opening with the piece its own cut removed, rebuilt in
@@ -172,6 +266,12 @@ func _glaze_windows(apertures: Array[Dictionary]) -> void:
 		pane.rotation.x = PI * 0.5
 		add_child(pane)
 		CollisionPolicy.mark_decorative(pane)
+
+
+## Where a console stands against the flank: inside the hull's own wall, far
+## enough in that the curve above it clears a standing body.
+func _console_flank_offset() -> float:
+	return HULL_RADIUS - HULL_WALL - 1.6
 
 
 func _hull_axes() -> Vector3:
@@ -225,54 +325,28 @@ func _build_deck() -> void:
 ## Walls a body can lean on, rather than leaving the curved shell uncollided:
 ## the two flanks, the ceiling and both end walls, with the doorway left open
 ## on +X. Boxes, per this project's collision policy.
-func _build_cabin_collision() -> void:
-	var length := HULL_HALF_LENGTH - 2.0
-	var height := (CABIN_CEILING_Y - DECK_Y) * 0.5
-	var mid_y := (CABIN_CEILING_Y + DECK_Y) * 0.5
-	_wall("CabinWallFar", Vector3(-DECK_HALF_WIDTH - 0.4, mid_y, 0.0), Vector3(0.4, height, length))
-	_wall("CabinCeiling", Vector3(0.0, CABIN_CEILING_Y + 0.4, 0.0), Vector3(DECK_HALF_WIDTH, 0.4, length))
-	_wall("CabinWallFore", Vector3(0.0, mid_y, length - 0.4), Vector3(DECK_HALF_WIDTH, height, 0.4))
-	_wall("CabinWallAft", Vector3(0.0, mid_y, -length + 0.4), Vector3(DECK_HALF_WIDTH, height, 0.4))
-	# The near flank is interrupted by the doorway: a panel each side of it,
-	# and a header above.
-	var door_fore := DOOR_CENTER.x + DOOR_HALF.x
-	var door_aft := DOOR_CENTER.x - DOOR_HALF.x
-	var fore_span := (length - door_fore) * 0.5
-	var aft_span := (length + door_aft) * 0.5
-	_wall("CabinWallNearFore", Vector3(DECK_HALF_WIDTH + 0.4, mid_y, door_fore + fore_span), Vector3(0.4, height, fore_span))
-	_wall("CabinWallNearAft", Vector3(DECK_HALF_WIDTH + 0.4, mid_y, door_aft - aft_span), Vector3(0.4, height, aft_span))
-	var header_bottom := DOOR_CENTER.y + DOOR_HALF.y
-	_wall(
-		"CabinDoorHeader",
-		Vector3(DECK_HALF_WIDTH + 0.4, (header_bottom + CABIN_CEILING_Y) * 0.5, DOOR_CENTER.x),
-		Vector3(0.4, maxf((CABIN_CEILING_Y - header_bottom) * 0.5, 0.2), DOOR_HALF.x)
-	)
-
-
-func _wall(label: String, at: Vector3, half: Vector3) -> void:
-	var body := StaticBody3D.new()
-	body.name = label
-	body.collision_layer = 1
-	body.position = at
-	add_child(body)
-	var panel := SuperEgg.build_part(half, HULL_SHADOW, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-	panel.name = "%sPanel" % label
-	body.add_child(panel)
-	CollisionPolicy.add_box(body, panel, half * 2.0)
-
-
 ## Consoles, screens and light strips down both flanks, in the reference
 ## cabin's arrangement: a continuous bank of instrument panels at working
 ## height with lit screens above them, under a run of ceiling strip light.
 func _build_interior_fittings() -> void:
+	# The consoles stand against the hull itself now that nothing is built
+	# inside it, set in far enough that the flank curves away above them
+	# rather than through them. Each one keeps clear of the doorway, of the
+	# blorb hatch and of every window, so nothing stands in front of a way
+	# out or blocks the view through the glass.
+	var flank := _console_flank_offset()
 	for side: float in [-1.0, 1.0]:
 		var station := -HULL_HALF_LENGTH + 10.0
 		while station < HULL_HALF_LENGTH - 10.0:
 			# The doorway's own stretch of flank carries no console.
 			var clear_of_door := side < 0.0 or absf(station - DOOR_CENTER.x) > DOOR_HALF.x + 2.0
 			var clear_of_hatch := absf(station - HATCH_CENTER.x) > HATCH_RADIUS + 5.0
-			if clear_of_door and clear_of_hatch:
-				_console(Vector3(side * (DECK_HALF_WIDTH - 1.2), DECK_Y + 1.1, station), side)
+			var clear_of_windows := true
+			for window_station: float in WINDOW_STATIONS:
+				if absf(station - window_station) < WINDOW_HALF.x + CONSOLE_HALF_LENGTH:
+					clear_of_windows = false
+			if clear_of_door and clear_of_hatch and clear_of_windows:
+				_console(Vector3(side * flank, DECK_Y + 1.1, station), side)
 			station += 7.5
 	var strip := SuperEgg.build_part(
 		Vector3(0.5, 0.18, HULL_HALF_LENGTH - 6.0), STRIP_LIGHT,

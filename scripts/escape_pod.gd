@@ -33,6 +33,10 @@ const FLIGHT_SPEED := 260.0
 ## How close to the seat's centre a body must be to count as aboard.
 const SEAT_RADIUS := 2.0
 
+## How much of the shell's inside counts as breathable air, as a fraction of
+## its radius: the pod is a sealed sphere, so everything within its wall is.
+const AIR_FRACTION := 0.92
+
 ## Where it flies to, set by whoever builds the world.
 var landing_point := Vector3.ZERO
 
@@ -45,7 +49,16 @@ var _seat: Node3D
 
 
 func _ready() -> void:
+	# Its own sealed volume of air, which it keeps after it drops away.
+	add_to_group("pressurized_volumes")
 	_build_pod()
+
+
+## The pod holds its own atmosphere. It is a sealed sphere with one opening
+## that meets the hull's own hatch, so a rider aboard it is no more in vacuum
+## than one in the cabin, and it keeps its air after it drops away.
+func contains_breathable_point(point: Vector3) -> bool:
+	return to_local(point).length() <= (POD_RADIUS - POD_WALL) * AIR_FRACTION
 
 
 func _build_pod() -> void:
