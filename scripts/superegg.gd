@@ -346,6 +346,15 @@ static func build_hollow_shell_mesh(
 			row.append(_inside_any_aperture(centre, apertures))
 		cut.append(row)
 
+	# Cells are kept or dropped whole, so the opening's edge would otherwise
+	# follow the grid rather than the curve: a window only a handful of cells
+	# across comes out as a staircase, which reads as a rectangle with notched
+	# corners rather than as a superellipse. Every vertex that borders both a
+	# kept cell and a dropped one is pulled onto the exact boundary instead,
+	# which costs nothing and makes the rim the shape it was asked for however
+	# coarse the grid beneath it.
+	_snap_aperture_rims(outer, inner, cut, apertures, rings, segments)
+
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for ring_index in rings:
@@ -410,6 +419,80 @@ static func build_shell_patch_mesh(
 ## superellipse in the local Y/Z plane, subtracted through one X half only
 ## ("side", +1 by default), so the wall opposite each opening stays whole.
 ## An "exponent" of 2 with equal halves is a plain circle.
+## Pulls every vertex on an opening's edge onto that opening's own curve.
+## A vertex is on the edge when the cells meeting at it are not all kept or
+## all dropped.
+static func _snap_aperture_rims(
+	outer: Array, inner: Array, cut: Array, apertures: Array[Dictionary],
+	rings: int, segments: int
+) -> void:
+	for ring_index in rings + 1:
+		for segment in segments:
+			var mixed := false
+			var any_cut := false
+			var any_kept := false
+			for ring_offset: int in [-1, 0]:
+				var row: int = ring_index + ring_offset
+				if row < 0 or row >= rings:
+					continue
+				for segment_offset: int in [-1, 0]:
+					var column: int = posmod(segment + segment_offset, segments)
+					if bool(cut[row][column]):
+						any_cut = true
+					else:
+						any_kept = true
+			mixed = any_cut and any_kept
+			if not mixed:
+				continue
+			var vertex: Vector3 = outer[ring_index][segment]
+			var opening := _nearest_aperture(vertex, apertures)
+			if opening.is_empty():
+				continue
+			var moved := _on_aperture_edge(vertex, opening)
+			var shift := moved - vertex
+			outer[ring_index][segment] = moved
+			inner[ring_index][segment] = (inner[ring_index][segment] as Vector3) + shift
+
+
+## The opening this vertex belongs to: the one whose boundary it is nearest,
+## among those on its own side of the shell.
+static func _nearest_aperture(point: Vector3, apertures: Array[Dictionary]) -> Dictionary:
+	var best: Dictionary = {}
+	var closest := INF
+	for aperture in apertures:
+		var side: float = aperture.get("side", 1.0)
+		if point.x * side <= 0.0:
+			continue
+		var centre: Vector2 = aperture["center"]
+		var half: Vector2 = aperture["half"]
+		var exponent: float = aperture.get("exponent", EPSILON_SOFT)
+		var across := (point.y - centre.x) / maxf(half.x, 0.001)
+		var along := (point.z - centre.y) / maxf(half.y, 0.001)
+		var reach := pow(absf(across), exponent) + pow(absf(along), exponent)
+		var distance := absf(reach - 1.0)
+		if distance < closest:
+			closest = distance
+			best = aperture
+	return best
+
+
+## `point` moved onto `aperture`'s own boundary curve, along the line from
+## the opening's centre, leaving the shell's own axis untouched.
+static func _on_aperture_edge(point: Vector3, aperture: Dictionary) -> Vector3:
+	var centre: Vector2 = aperture["center"]
+	var half: Vector2 = aperture["half"]
+	var exponent: float = aperture.get("exponent", EPSILON_SOFT)
+	var across := (point.y - centre.x) / maxf(half.x, 0.001)
+	var along := (point.z - centre.y) / maxf(half.y, 0.001)
+	var reach := pow(absf(across), exponent) + pow(absf(along), exponent)
+	if reach <= 0.000001:
+		return point
+	var scale := 1.0 / pow(reach, 1.0 / exponent)
+	return Vector3(
+		point.x, centre.x + across * scale * half.x, centre.y + along * scale * half.y
+	)
+
+
 static func _inside_any_aperture(point: Vector3, apertures: Array[Dictionary]) -> bool:
 	for aperture in apertures:
 		var side: float = aperture.get("side", 1.0)

@@ -38,9 +38,21 @@ const MONKEY_FUR_COLOR := Color(0.62, 0.46, 0.30)  # light brown, per spec
 
 # Ground-up stack (mirrors procedural_figure.gd's own ankle_y/knee_y/hip_y
 # derivation), sized to land the top of the head at ~0.20m total height.
-const ANKLE_GROUND_CLEARANCE := 0.005  # no foot mesh to provide this lift, so a small fixed clearance stands in for it
-const LEG_LOWER_LEN := 0.0225
-const LEG_UPPER_LEN := 0.0225
+## Where his ankle actually is: the height at which his lower leg stops
+## running down and bends forward into the foot, measured off his own drawn
+## leg. It used to be 0.005, which is the floor, so his "ankle" was a
+## ground-contact marker and anything that reasoned about the joint -- a
+## suit shell, a skate, a jet -- was reasoning about his toes.
+##
+## The knee sits halfway between this and the hip, and the hip does not move,
+## so his standing height and his silhouette are unchanged.
+const ANKLE_HEIGHT := 0.0212
+## The stations his foot passes through, as heights above the floor he stands
+## on. Absolute rather than offsets from the ankle, so moving the ankle to
+## where it belongs does not drag the foot along with it.
+const FOOT_TRANSITION_HEIGHT := 0.023
+const LEG_LOWER_LEN := 0.0144
+const LEG_UPPER_LEN := 0.0144
 # Set the legs broadly beneath the pear body's lower left/right flanks. At
 # 78% of BODY_RADIUS the hip nodes read as two distinct attachments across
 # its wide base instead of a close-set pair emerging near the center pole.
@@ -86,7 +98,7 @@ const REFERENCE_BUILD_SCALE := 2.3585
 ## compile-time const instead of a local var so BLORB_SUIT_RIG_SCALE can be
 ## derived from it directly.
 const _STANDING_HEIGHT_RAW := (
-	ANKLE_GROUND_CLEARANCE + LEG_LOWER_LEN + LEG_UPPER_LEN
+	ANKLE_HEIGHT + LEG_LOWER_LEN + LEG_UPPER_LEN
 	+ BODY_HEIGHT - HEAD_EMBED + HEAD_SIZE.y * 2.0
 )
 
@@ -388,7 +400,7 @@ static func build(
 	var leg_upper_len := LEG_UPPER_LEN * limb_length_scale
 	var leg_lower_len := LEG_LOWER_LEN * limb_length_scale
 
-	var ankle_y := ANKLE_GROUND_CLEARANCE
+	var ankle_y := ANKLE_HEIGHT
 	var knee_y := ankle_y + leg_lower_len
 	var hip_y := knee_y + leg_upper_len
 
@@ -586,7 +598,7 @@ static func _build_leg(
 	# thrown onto the back of the heel instead of the front of the toes.
 	var toe_marker := Node3D.new()
 	toe_marker.name = "MonkeyToeMarker"
-	toe_marker.position = Vector3(0, -ANKLE_GROUND_CLEARANCE, FOOT_BULB_FORWARD)
+	toe_marker.position = Vector3(0, -ANKLE_HEIGHT, FOOT_BULB_FORWARD)
 	ankle_marker.add_child(toe_marker)
 
 	# The underside of his foot, where it meets the ground: directly below
@@ -595,7 +607,7 @@ static func _build_leg(
 	# with its own foot depth instead of anyone assuming one.
 	var sole_marker := Node3D.new()
 	sole_marker.name = "MonkeySoleMarker"
-	sole_marker.position = Vector3(0, -ANKLE_GROUND_CLEARANCE, 0)
+	sole_marker.position = Vector3(0, -ANKLE_HEIGHT, 0)
 	ankle_marker.add_child(sole_marker)
 
 	var mesh_instance := MeshInstance3D.new()
@@ -632,22 +644,21 @@ static func suit_leg_profile(root: Node3D, knee: Node3D, ankle: Node3D) -> Dicti
 	).normalized()
 	var scale_factor := REFERENCE_BUILD_SCALE
 	var transition := (
-		ankle_pos + lower_up * 0.018 * scale_factor
+		ankle_pos - lower_up * (ANKLE_HEIGHT - FOOT_TRANSITION_HEIGHT) * scale_factor
 		+ lower_forward * FOOT_BULB_FORWARD * 0.3 * scale_factor
 	)
 	var bulb := (
-		ankle_pos
-		+ lower_up * (FOOT_BULB_CENTER_Y - ANKLE_GROUND_CLEARANCE) * scale_factor
+		ankle_pos - lower_up * (ANKLE_HEIGHT - FOOT_BULB_CENTER_Y) * scale_factor
 		+ lower_forward * FOOT_BULB_FORWARD * scale_factor
 	)
 	var sole_radius := FOOT_BOTTOM_RADIUS * scale_factor
 	var sole := (
-		ankle_pos - lower_up * (ANKLE_GROUND_CLEARANCE * scale_factor - sole_radius)
+		ankle_pos - lower_up * (ANKLE_HEIGHT * scale_factor - sole_radius)
 		+ lower_forward * FOOT_BULB_FORWARD * scale_factor
 	)
 	var toe_radius := sole_radius * FOOT_TOE_PINCH
 	var toe := (
-		ankle_pos - lower_up * (ANKLE_GROUND_CLEARANCE * scale_factor - toe_radius)
+		ankle_pos - lower_up * (ANKLE_HEIGHT * scale_factor - toe_radius)
 		+ lower_forward * (FOOT_BULB_FORWARD * scale_factor + sole_radius * FOOT_TOE_REACH)
 	)
 	return {
@@ -1529,11 +1540,11 @@ static func _rebuild_footed_leg(
 	# A strictly descending sequence with small progressive forward shifts:
 	# this is one continuous pear profile, not a leg followed by a foot bend.
 	var transition_pos := (
-		ankle_pos + lower_up * 0.018 + lower_forward * (FOOT_BULB_FORWARD * 0.3)
+		ankle_pos - lower_up * (ANKLE_HEIGHT - FOOT_TRANSITION_HEIGHT)
+		+ lower_forward * (FOOT_BULB_FORWARD * 0.3)
 	)
 	var bulb_pos := (
-		ankle_pos
-		+ lower_up * (FOOT_BULB_CENTER_Y - ANKLE_GROUND_CLEARANCE)
+		ankle_pos - lower_up * (ANKLE_HEIGHT - FOOT_BULB_CENTER_Y)
 		+ lower_forward * FOOT_BULB_FORWARD
 	)
 	# The sole, then the toe. The sole's centre rides one of its own radii
@@ -1547,7 +1558,7 @@ static func _rebuild_footed_leg(
 	# been lopped off flat underneath.
 	var sole_radius := FOOT_BOTTOM_RADIUS * leg_radius_scale
 	var sole_pos := (
-		ankle_pos - lower_up * (ANKLE_GROUND_CLEARANCE - sole_radius)
+		ankle_pos - lower_up * (ANKLE_HEIGHT - sole_radius)
 		+ lower_forward * FOOT_BULB_FORWARD
 	)
 	# The toe rides its own radius above the floor for the same reason the
@@ -1555,7 +1566,7 @@ static func _rebuild_footed_leg(
 	# sinking through it.
 	var toe_radius := sole_radius * FOOT_TOE_PINCH
 	var toe_pos := (
-		ankle_pos - lower_up * (ANKLE_GROUND_CLEARANCE - toe_radius)
+		ankle_pos - lower_up * (ANKLE_HEIGHT - toe_radius)
 		+ lower_forward * (FOOT_BULB_FORWARD + sole_radius * FOOT_TOE_REACH)
 	)
 	var points: Array[Vector3] = [hip_pos, knee_pos, transition_pos, bulb_pos, sole_pos, toe_pos]

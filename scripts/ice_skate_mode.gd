@@ -204,11 +204,7 @@ static func build_blade(
 	# scale the rig already carried, so a blade built for a quarter-size rider
 	# inside a rig scaled up again came out several times too deep and the
 	# body floated above it.
-	var foot_length := REFERENCE_FOOT_LENGTH
-	if toe != null:
-		var reach: float = sole.to_local(toe.global_position).length()
-		if reach > 0.0001:
-			foot_length = reach
+	var foot_length := _foot_length(sole, toe)
 	var scale_factor := foot_length / REFERENCE_FOOT_LENGTH
 	var drop: float = (
 		BlorbSuit.worn_boot_drop_below_sole(scale_factor) if boot_drop < 0.0 else boot_drop
@@ -252,14 +248,22 @@ static func visual_lift(scale_factor: float = 1.0) -> float:
 	return BlorbSuit.worn_boot_drop_below_sole(scale_factor) + TOTAL_HEIGHT * scale_factor
 
 
+## How far this foot reaches forward of its own sole, in the sole's own
+## frame. The forward component rather than the straight-line distance: a rig
+## whose toe sits a little higher than its sole would otherwise report a
+## longer foot than it has, and wear a blade to match.
+static func _foot_length(sole: Node3D, toe: Node3D) -> float:
+	if sole == null or toe == null:
+		return REFERENCE_FOOT_LENGTH
+	var reach: float = absf(sole.to_local(toe.global_position).z)
+	return reach if reach > 0.0001 else REFERENCE_FOOT_LENGTH
+
+
 ## The lift for a particular wearer, taken from the foot the blade is on.
 static func visual_lift_for(sole: Node3D, toe: Node3D) -> float:
 	if sole == null or toe == null:
 		return visual_lift()
-	var reach: float = sole.to_local(toe.global_position).length()
-	if reach <= 0.0001:
-		return visual_lift()
-	return visual_lift(reach / REFERENCE_FOOT_LENGTH)
+	return visual_lift(_foot_length(sole, toe) / REFERENCE_FOOT_LENGTH)
 
 
 ## Where the stride currently is, for whoever is pacing the skating audio.
