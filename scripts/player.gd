@@ -2524,7 +2524,7 @@ func _body_base_height(delta: float, grounded: bool, on_soft_aerial_support: boo
 		_visuals_snow_offset_y
 		+ DIRTBIKE_WHEEL_RADIUS*_dirtbike_pose_blend
 		+ SNOWBOARD_DECK_LIFT*_snowboard_pose_blend
-		+ (IceSkateMode.visual_lift() if _ice_skates_active else 0.0)
+		+ (IceSkateMode.visual_lift_for(_sole_left, _toe_left) if _ice_skates_active else 0.0)
 	)
 
 

@@ -188,6 +188,11 @@ const FOOT_BULB_RADIUS := 0.022
 const FOOT_BULB_FORWARD := 0.010
 const FOOT_BULB_CENTER_Y := 0.020
 const FOOT_BOTTOM_RADIUS := 0.013
+## How far past the sole the toe reaches, and how far it pinches in doing so,
+## both as fractions of the sole's own radius: the foot ends in a rounded toe
+## rather than tapering to a point on the floor.
+const FOOT_TOE_REACH := 1.15
+const FOOT_TOE_PINCH := 0.62
 
 # Match the blorb suit's noodle tessellation and rounded end treatment so
 # Xiao Hou Zi's limbs share that same smooth, continuous general silhouette.
@@ -635,18 +640,24 @@ static func suit_leg_profile(root: Node3D, knee: Node3D, ankle: Node3D) -> Dicti
 		+ lower_up * (FOOT_BULB_CENTER_Y - ANKLE_GROUND_CLEARANCE) * scale_factor
 		+ lower_forward * FOOT_BULB_FORWARD * scale_factor
 	)
-	var sole_end := (
-		ankle_pos - lower_up * ANKLE_GROUND_CLEARANCE * scale_factor
+	var sole_radius := FOOT_BOTTOM_RADIUS * scale_factor
+	var sole := (
+		ankle_pos - lower_up * (ANKLE_GROUND_CLEARANCE * scale_factor - sole_radius)
 		+ lower_forward * FOOT_BULB_FORWARD * scale_factor
+	)
+	var toe_radius := sole_radius * FOOT_TOE_PINCH
+	var toe := (
+		ankle_pos - lower_up * (ANKLE_GROUND_CLEARANCE * scale_factor - toe_radius)
+		+ lower_forward * (FOOT_BULB_FORWARD * scale_factor + sole_radius * FOOT_TOE_REACH)
 	)
 	return {
 		"knee_radius": LEG_RADIUS_KNEE * scale_factor,
 		"hip_radius": LEG_RADIUS_HIP * scale_factor,
-		"stations": [transition, bulb, sole_end],
+		"stations": [transition, bulb, sole, toe],
 		"radii": [
 			lerpf(LEG_RADIUS_KNEE, FOOT_BULB_RADIUS, 0.45) * scale_factor,
 			FOOT_BULB_RADIUS * scale_factor,
-			FOOT_BOTTOM_RADIUS * scale_factor,
+			sole_radius, toe_radius,
 		],
 		"tip_direction": lower_forward,
 	}
@@ -1525,10 +1536,29 @@ static func _rebuild_footed_leg(
 		+ lower_up * (FOOT_BULB_CENTER_Y - ANKLE_GROUND_CLEARANCE)
 		+ lower_forward * FOOT_BULB_FORWARD
 	)
-	var bottom_pos := (
-		ankle_pos - lower_up * ANKLE_GROUND_CLEARANCE + lower_forward * FOOT_BULB_FORWARD
+	# The sole, then the toe. The sole's centre rides one of its own radii
+	# above the ground so the tube's SURFACE rests on it, giving the foot a
+	# rounded underside with real area; the toe carries on forward and is
+	# where the tube tapers away to nothing.
+	#
+	# Both used to be the same point, a single station at ground level that
+	# the cap taper shrank to zero. The foot therefore ended in a cone with
+	# no sole at all, which is why a shell wrapped around it read as having
+	# been lopped off flat underneath.
+	var sole_radius := FOOT_BOTTOM_RADIUS * leg_radius_scale
+	var sole_pos := (
+		ankle_pos - lower_up * (ANKLE_GROUND_CLEARANCE - sole_radius)
+		+ lower_forward * FOOT_BULB_FORWARD
 	)
-	var points: Array[Vector3] = [hip_pos, knee_pos, transition_pos, bulb_pos, bottom_pos]
+	# The toe rides its own radius above the floor for the same reason the
+	# sole does, so the whole underside rests on the ground rather than
+	# sinking through it.
+	var toe_radius := sole_radius * FOOT_TOE_PINCH
+	var toe_pos := (
+		ankle_pos - lower_up * (ANKLE_GROUND_CLEARANCE - toe_radius)
+		+ lower_forward * (FOOT_BULB_FORWARD + sole_radius * FOOT_TOE_REACH)
+	)
+	var points: Array[Vector3] = [hip_pos, knee_pos, transition_pos, bulb_pos, sole_pos, toe_pos]
 	# taper_scale eases the bulge itself (and the point partway toward it)
 	# back toward the knee's own radius -- FOOT_BOTTOM_RADIUS is left alone
 	# since the toe tip's own pinch is a separate detail, not the "widens
@@ -1537,7 +1567,7 @@ static func _rebuild_footed_leg(
 		LEG_RADIUS_HIP * leg_radius_scale, LEG_RADIUS_KNEE * leg_radius_scale,
 		lerpf(LEG_RADIUS_KNEE, 0.019, taper_scale) * leg_radius_scale,
 		lerpf(LEG_RADIUS_KNEE, FOOT_BULB_RADIUS, taper_scale) * leg_radius_scale,
-		FOOT_BOTTOM_RADIUS * leg_radius_scale,
+		sole_radius, toe_radius,
 	]
 	mesh_instance.mesh = BlorbSuit.build_limb_tube(
 		points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, LIMB_CAP_FRACTION

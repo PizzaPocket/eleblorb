@@ -1512,7 +1512,9 @@ func _set_direct_ice_skate_visuals() -> void:
 	var rig:=_pivots.get("_rig") as Node3D
 	if rig!=null and not _mounted:
 		var desired_lift: float=(
-			IceSkateMode.visual_lift(scale_factor) if _direct_ice_skates_active else 0.0
+			IceSkateMode.visual_lift_for(
+				_pivots.get("sole_left") as Node3D, _pivots.get("toe_left") as Node3D
+			) if _direct_ice_skates_active else 0.0
 		)
 		rig.position.y+=desired_lift-_direct_ice_skate_lift_y
 		_direct_ice_skate_lift_y=desired_lift

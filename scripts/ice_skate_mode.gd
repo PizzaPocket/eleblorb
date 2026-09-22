@@ -178,6 +178,9 @@ const SUPPORT_HEIGHT := 0.055
 ## the wearer's own foot length. The human's authored mounts sat 0.075 either
 ## side of a 0.13 foot, which is where this comes from.
 const MOUNT_SPREAD := 0.577
+## The human's own foot, ankle to toe: the blade's dimensions are all written
+## against it, and a shorter foot gets a proportionally shorter blade.
+const REFERENCE_FOOT_LENGTH := ProceduralFigure.FOOT_SIZE.z
 const TOTAL_HEIGHT := RUNNER_HALF_HEIGHT * 2.0 + SUPPORT_HEIGHT
 
 
@@ -190,21 +193,27 @@ const TOTAL_HEIGHT := RUNNER_HALF_HEIGHT * 2.0 + SUPPORT_HEIGHT
 ## `boot_drop` is how far a worn blorb boot's underside hangs below the bare
 ## sole; the mounts begin there and the runner hangs below them.
 static func build_blade(
-	sole: Node3D, toe: Node3D, blade_name: String, scale_factor: float = 1.0,
+	sole: Node3D, toe: Node3D, blade_name: String, _unused: float = 1.0,
 	boot_drop: float = -1.0, crystal: bool = false
 ) -> Node3D:
 	var root := Node3D.new()
 	root.name = blade_name
 	sole.add_child(root)
+	# Sized from the foot it is strapped to, measured in that foot's own local
+	# frame. A scale passed in from outside was applied on top of whatever
+	# scale the rig already carried, so a blade built for a quarter-size rider
+	# inside a rig scaled up again came out several times too deep and the
+	# body floated above it.
+	var foot_length := REFERENCE_FOOT_LENGTH
+	if toe != null:
+		var reach: float = sole.to_local(toe.global_position).length()
+		if reach > 0.0001:
+			foot_length = reach
+	var scale_factor := foot_length / REFERENCE_FOOT_LENGTH
 	var drop: float = (
 		BlorbSuit.worn_boot_drop_below_sole(scale_factor) if boot_drop < 0.0 else boot_drop
 	)
 	var sole_y := -drop
-	var foot_length: float = RUNNER_HALF_LENGTH * scale_factor
-	if toe != null:
-		var reach := sole.global_position.distance_to(toe.global_position)
-		if reach > 0.0001:
-			foot_length = reach
 	var ice_material: Material = (
 		CrystalTrack.crystal_material(CrystalTrack.BLADE_GLOW)
 		if crystal else IceCrag.build_ice_material()
@@ -235,10 +244,22 @@ static func build_blade(
 	return root
 
 
-static func visual_lift(scale_factor: float=1.0) -> float:
-	var human_sole_depth: float=(ProceduralFigure.FOOT_SIZE.y+ProceduralFigure.JOINT_OVERLAP*0.5)*scale_factor
-	var blorb_sole_depth: float=BlorbSuit.worn_boot_sole_depth(scale_factor)
-	return TOTAL_HEIGHT*scale_factor+maxf(blorb_sole_depth-human_sole_depth,0.0)
+## How far the blade hangs below the sole it is strapped to, which is exactly
+## how far its wearer stands off the ice. Measured from the blade's own
+## dimensions rather than estimated from the human figure's foot, which left
+## a small rider hovering well above their own skates.
+static func visual_lift(scale_factor: float = 1.0) -> float:
+	return BlorbSuit.worn_boot_drop_below_sole(scale_factor) + TOTAL_HEIGHT * scale_factor
+
+
+## The lift for a particular wearer, taken from the foot the blade is on.
+static func visual_lift_for(sole: Node3D, toe: Node3D) -> float:
+	if sole == null or toe == null:
+		return visual_lift()
+	var reach: float = sole.to_local(toe.global_position).length()
+	if reach <= 0.0001:
+		return visual_lift()
+	return visual_lift(reach / REFERENCE_FOOT_LENGTH)
 
 
 ## Where the stride currently is, for whoever is pacing the skating audio.
