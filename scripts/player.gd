@@ -7395,7 +7395,10 @@ func _is_snowboard_surface() -> bool:
 func _build_snowboard() -> Node3D:
 	# The deck belongs to SnowboardMode, which builds it at the wearer's own
 	# scale so a smaller rig gets a board that fits its feet.
-	return SnowboardMode.build_deck(visuals, _current_blorb_suit_rig_scale())
+	return SnowboardMode.build_deck(
+		visuals, _current_blorb_suit_rig_scale(),
+		_blorb_suit.worn_blorb_in_slot("leg_left")
+	)
 
 
 func _update_snowboard_visual() -> void:

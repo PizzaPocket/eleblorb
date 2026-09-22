@@ -56,6 +56,17 @@ const TOE_REACH_MARGIN := 0.025
 ## share: a full Fire suit under the Lava Helm seals into the Lava Suit, a
 ## full Ice suit under the Penguin Helm forms the Penguin Suit.
 const FORM_HELMS := {"fire": "Lava Helm", "ice": "Penguin Helm", "space": "Space Helm"}
+## The Space Helm's face: a superellipse opening cut through the shell, and
+## the glass that fills it one inset deeper so the helmet's rim stands proud.
+## The half-extents are fractions of the helmet's own radius, so any head
+## gets the same visor.
+const VISOR_HALF := Vector2(0.78, 0.52)
+const VISOR_EXPONENT := 2.6
+const VISOR_WALL_FRACTION := 0.09
+const VISOR_GLASS := Color(0.16, 0.27, 0.44, 0.62)
+## A centimetre on the human's own helmet, and that same share of any other.
+const REFERENCE_HELM_RADIUS := 0.20
+const VISOR_INSET := 0.01
 ## Penguin Suit torso: even larger than the sealed Lava cuirass, running from
 ## the ankles up past broad shoulders to close under the head.
 const PENGUIN_TORSO_WIDTH_SCALE := 1.3
@@ -1240,6 +1251,8 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 				ElementPalette.SPACE_BODY.lightened(0.12)
 			)
 			tank.name = "SpaceAirTank"
+			# The tanks are the blorb reshaped, like everything else it wears.
+			tank.set_surface_override_material(0, _build_goo_material(vis))
 			tank.position = Vector3(side * half_width * 0.52, center_y, -half_depth * 1.12)
 			spine_pivot.add_child(tank)
 			pieces.append(tank)
@@ -1611,15 +1624,31 @@ static func _build_space_helm(head_pivot: Node3D, contents: AABB, head_size: Vec
 	root.name = "HeadBlorbSpaceHelm"
 	head_pivot.add_child(root)
 	var radius := maxf(maxf(contents.size.x, contents.size.z) * 0.62, head_size.x * 1.35)
+	var axes := Vector3.ONE * radius
+	# The face is cut out of the helmet rather than laid on it: one superellipse
+	# aperture, extruded through the shell's own wall, the same way the ship's
+	# windows are cut through its hull. A flat slab stuck on the front read as
+	# a plate rather than as something to see out of.
+	var face := {
+		"center": Vector2(0.0, 0.0),
+		"half": Vector2(radius * VISOR_HALF.x, radius * VISOR_HALF.y),
+		"exponent": VISOR_EXPONENT,
+		"side": 1.0,
+	}
+	var wall := radius * VISOR_WALL_FRACTION
 	var shell := MeshInstance3D.new()
-	var sphere := SphereMesh.new()
-	sphere.radius = radius
-	sphere.height = radius * 2.0
-	sphere.radial_segments = 28
-	sphere.rings = 16
-	shell.mesh = sphere
-	shell.material_override = _build_goo_material(vis)
+	shell.name = "SpaceHelmShell"
+	shell.mesh = SuperEgg.build_hollow_shell_mesh(
+		axes, wall, [face] as Array[Dictionary], 2.0, 2.0,
+		SuperEgg.RINGS * 2, SuperEgg.SEGMENTS * 2
+	)
+	var shell_material := _build_goo_material(vis)
+	shell_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	shell.material_override = shell_material
 	shell.position.y = head_size.y
+	# The superegg's own long axis is Y and the aperture rides its +X; a
+	# quarter turn each way brings that opening round to the front.
+	shell.rotation = Vector3(PI * 0.5, -PI * 0.5, 0.0)
 	root.add_child(shell)
 	for star_position in [
 		Vector3(-radius * 0.44, head_size.y + radius * 0.50, radius * 0.58),
@@ -1629,16 +1658,31 @@ static func _build_space_helm(head_pivot: Node3D, contents: AABB, head_size: Vec
 		star.position = star_position
 		root.add_child(star)
 		CollisionPolicy.mark_decorative(star)
-	var visor := SuperEgg.build_part(
-		Vector3(radius * 0.76, radius * 0.48, radius * 0.12),
-		Color(0.16, 0.27, 0.44, 0.72)
+	# The visor is the piece the cut removed, rebuilt in glass one inset
+	# deeper: same opening, same curve, set back toward the head so the
+	# helmet's own rim stands proud of it.
+	var inset := maxf(VISOR_INSET * (radius / REFERENCE_HELM_RADIUS), radius * 0.02)
+	var visor := MeshInstance3D.new()
+	visor.name = "SpaceHelmVisor"
+	visor.mesh = SuperEgg.build_shell_patch_mesh(
+		axes - Vector3.ONE * inset, wall, face, 2.0, 2.0,
+		SuperEgg.RINGS * 2, SuperEgg.SEGMENTS * 2
 	)
-	visor.position = Vector3(0.0, head_size.y + radius * 0.08, radius * 0.91)
+	var glass := StandardMaterial3D.new()
+	glass.albedo_color = VISOR_GLASS
+	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	glass.roughness = 0.08
+	glass.metallic = 0.3
+	glass.cull_mode = BaseMaterial3D.CULL_DISABLED
+	visor.material_override = glass
+	visor.position.y = head_size.y
+	visor.rotation = shell.rotation
 	root.add_child(visor)
+	CollisionPolicy.mark_decorative(visor)
 	BlorbFace.add_eyes(visor, radius * 0.64, 0.0, 0.0, vis["albedo"] as Color, 1.08)
 	var core := BlorbCore.build(radius * CORE_RADIUS_FRACTION * 0.7, vis["core_color"] as Color, true)
-	core.position = Vector3(0.0, 0.0, radius * 0.08)
-	visor.add_child(core)
+	core.position = Vector3(0.0, head_size.y, radius * 0.08)
+	root.add_child(core)
 	return root
 
 
@@ -2792,6 +2836,16 @@ static func _to_local_dir(root: Node3D, world_dir: Vector3) -> Vector3:
 ## worn piece reacts to scene lighting (day/night sun color, sunset, etc)
 ## exactly like an ordinary blorb, since it's literally the same material-
 ## construction code rather than a second hand-kept-in-sync copy.
+## The worn gel a suit is made of, for a piece built outside this file. Every
+## visible part of a suit is the blorb itself reshaped, so a board underfoot
+## or a tank on the back is the same translucent material as the limb it
+## grows from, not an opaque prop in its colour.
+static func gel_material_for(blorb: Blorb) -> StandardMaterial3D:
+	if blorb == null:
+		return StandardMaterial3D.new()
+	return _build_goo_material(blorb.body_visual_snapshot())
+
+
 static func _build_goo_material(vis: Dictionary) -> StandardMaterial3D:
 	# Free Rock blorbs remain living creatures; only their worn armor form
 	# hardens into the same opaque, dry stone used by natural boulders.

@@ -228,7 +228,10 @@ const THICKNESS := 0.08
 const DECK_COLOR := ElementPalette.SNOW_BODY
 
 
-static func build_deck(parent: Node3D, rig_scale: float = 1.0) -> Node3D:
+## `worn` is the snow blorb the board grows out of. The board is that blorb
+## reshaped, so it takes the same translucent gel as the legs it is under
+## rather than reading as an opaque plank in snow colour.
+static func build_deck(parent: Node3D, rig_scale: float = 1.0, worn: Blorb = null) -> Node3D:
 	var root := Node3D.new()
 	root.name = "Snowboard"
 	parent.add_child(root)
@@ -236,6 +239,8 @@ static func build_deck(parent: Node3D, rig_scale: float = 1.0) -> Node3D:
 		Vector3(LENGTH * 0.5, THICKNESS, WIDTH) * rig_scale, DECK_COLOR, 3.2, 3.2
 	)
 	deck.name = "ContinuousDeck"
+	if worn != null:
+		deck.set_surface_override_material(0, BlorbSuit.gel_material_for(worn))
 	root.add_child(deck)
 	CollisionPolicy.mark_decorative(deck)
 	return root

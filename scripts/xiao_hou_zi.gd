@@ -1394,7 +1394,10 @@ func _update_direct_snowboard_state() -> void:
 		if _direct_snowboard == null:
 			var rig := _pivots.get("_rig") as Node3D
 			if rig != null:
-				_direct_snowboard = SnowboardMode.build_deck(rig, _playable_profile.suit_rig_scale)
+				_direct_snowboard = SnowboardMode.build_deck(
+					rig, _playable_profile.suit_rig_scale,
+					_blorb_suit.worn_blorb_in_slot("leg_left")
+				)
 	elif _direct_snowboard != null:
 		_direct_snowboard.queue_free()
 		_direct_snowboard = null
