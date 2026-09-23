@@ -17,6 +17,12 @@ extends Node3D
 
 const XIAO_HOU_ZI_SCENE: PackedScene = preload("res://scenes/xiao_hou_zi.tscn")
 const BLORB_SCENE: PackedScene = preload("res://scenes/blorb.tscn")
+## Dinosaur lies as bones until Blorb Slime is thrown into them, here as in
+## his own kingdom.
+const DINOSAUR_FOSSIL_SCENE: GDScript = preload("res://scripts/dinosaur_fossil.gd")
+## Enough to raise him and a couple over, so a missed throw is not the end of
+## it.
+const DEMO_BLORB_SLIME_COUNT := 3
 const JUNGLE_KINGDOM_FOLIAGE := preload("res://scripts/jungle_kingdom_foliage.gd")
 const MANCHEGO_SCENE: PackedScene = preload("res://scenes/manchego.tscn")
 const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
@@ -120,7 +126,16 @@ func _ready() -> void:
 	add_child(kraken)
 	_add_plant_jungle()
 	_add_demo_titans()
+	_stock_demo_inventory()
 	call_deferred("_finish_loading")
+
+
+## The demo hands over what its own course needs to be played through, rather
+## than expecting it to have been earned elsewhere: Blorb Slime for the bones
+## lying in the dirt clearing.
+func _stock_demo_inventory() -> void:
+	while Inventory.quantity_of("Blorb Slime") < DEMO_BLORB_SLIME_COUNT:
+		Inventory.add("Blorb Slime", ShopCatalog.BLORB_SLIME_COLOR)
 
 
 func _add_space_zone() -> void:
@@ -188,7 +203,9 @@ func _add_plant_jungle() -> void:
 ## The demo course includes the established living Dinosaur and Da Hou Zi
 ## rigs in broad terrain clearings, including Humongous beyond the volcano.
 func _add_demo_titans() -> void:
-	var dinosaur := DinosaurTitan.new()
+	# He lies here as bones, as he does in his own kingdom, and stands up only
+	# when Blorb Slime is thrown into them.
+	var dinosaur: Node3D = DINOSAUR_FOSSIL_SCENE.new()
 	dinosaur.name = "Dinosaur"
 	dinosaur.position = _terrain.get_path_point(
 		DemoWorldTerrain.DINOSAUR_CLEARING.x,

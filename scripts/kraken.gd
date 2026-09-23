@@ -63,9 +63,10 @@ func _ready() -> void:
 ## often that is rechecked. Every frame it runs, it writes ninety-eight
 ## collider transforms and twelve tentacles' worth of rotations; from the
 ## other end of the course none of that can be seen.
-## How large this titan swims, wherever it appears. Raised by half again per
-## direct instruction, to stand alongside Humongous.
-const DISPLAY_SCALE := 1.5
+## How large this titan swims, wherever it appears. Raised to two and a half
+## times its old size per direct instruction ("150% larger"), to stand
+## alongside Humongous.
+const DISPLAY_SCALE := 2.5
 
 const SIMULATE_RADIUS := 420.0
 const PRESENCE_RECHECK := 0.5

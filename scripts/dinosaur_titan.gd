@@ -12,9 +12,10 @@ extends StaticBody3D
 ## as every other creature in the game.
 ## How large this titan stands, wherever it appears. The demo world used to
 ## set a scale of its own while its own kingdom built one at 1.0, so the same
-## creature was two different sizes depending on where you met it. Raised by
-## half again per direct instruction, to stand alongside Humongous.
-const DISPLAY_SCALE := 3.0
+## creature was two different sizes depending on where you met it. Raised to
+## two and a half times its old size per direct instruction ("150% larger"),
+## to stand alongside Humongous.
+const DISPLAY_SCALE := 5.0
 
 const BODY_COLOR := Color(0.68, 1.0, 0.05)
 const BODY_EPSILON_TOP := 2.5

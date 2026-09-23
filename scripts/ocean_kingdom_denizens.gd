@@ -16,7 +16,7 @@ const SAIL := Color(0.86, 0.79, 0.62)
 const KRAKEN_ROUTE_CENTER := Vector2.ZERO
 ## Widened alongside the kraken itself (see Kraken.DISPLAY_SCALE), so a
 ## larger body still has its own sea room to swim in.
-const KRAKEN_ROUTE_RADIUS := Vector2(310.0, 255.0)
+const KRAKEN_ROUTE_RADIUS := Vector2(430.0, 350.0)
 const SHIP_ROUTE_CENTER := Vector2.ZERO
 const SHIP_ROUTE_RADIUS := Vector2(350.0, 285.0)
 const SHIP_ROUTE_ANGULAR_SPEED := 0.018
@@ -257,4 +257,4 @@ func _spawn_fish_goblins() -> void:
 		var goblin := FISH_GOBLIN_SCENE.instantiate()
 		add_child(goblin)
 		var angle := TAU * float(index) / 8.0
-		goblin.position = Vector3(KRAKEN_ROUTE_CENTER.x + cos(angle) * 295.0, -14.0, KRAKEN_ROUTE_CENTER.y + sin(angle) * 270.0)
+		goblin.position = Vector3(KRAKEN_ROUTE_CENTER.x + cos(angle) * 410.0, -14.0, KRAKEN_ROUTE_CENTER.y + sin(angle) * 365.0)

@@ -304,7 +304,10 @@ const TAIL_ANIM_YAW_HOLD_MAX := 3.8
 ##   hand/foot -- 1.0 reproduces Xiao Hou Zi's own full flare, 0.0 keeps the
 ##   limb the same radius as its elbow/knee all the way to the tip
 ## - "has_foot_pads": bool, whether the foot's underside gets a distinct
-##   sole-colored patch or just continues as ordinary fur
+##   sole-colored patch or just continues as ordinary fur. Off by default for
+##   now: the patch never read correctly on the sole and, with the foot's own
+##   underside rebuilt, made it impossible to tell the leg's mass from the
+##   pad laid over it. One word here brings it back.
 ## - "body_taper_blend": float 0..1, how much the torso narrows from hips to
 ##   shoulders -- 1.0 is Xiao Hou Zi's own full pear-shaped taper, lower
 ##   values keep the upper body closer to full width (see
@@ -544,7 +547,7 @@ static func build(
 		"_tail": tail,
 		"_rig": rig,
 		"_taper_scale": variant.get("limb_taper_scale", 1.0),
-		"_has_foot_pads": variant.get("has_foot_pads", true),
+		"_has_foot_pads": variant.get("has_foot_pads", false),
 		"_leg_radius_scale": variant.get("leg_radius_scale", 1.0),
 	}
 	rebuild_limbs(pivots, rig, 0.0)
@@ -1457,7 +1460,7 @@ static func rebuild_limbs(pivots: Dictionary, root: Node3D, delta: float = 0.0) 
 	# a second time by the scene tree.
 	root = pivots["_rig"] as Node3D
 	var taper_scale: float = pivots.get("_taper_scale", 1.0)
-	var has_pads: bool = pivots.get("_has_foot_pads", true)
+	var has_pads: bool = pivots.get("_has_foot_pads", false)
 	var leg_radius_scale: float = pivots.get("_leg_radius_scale", 1.0)
 	var wrist_radius := lerpf(ARM_RADIUS_ELBOW, ARM_RADIUS_WRIST, taper_scale)
 	# Through the wrist and on to the fingertip: the hand is the tube's own

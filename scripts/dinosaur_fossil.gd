@@ -18,7 +18,10 @@ var _resurrection_in_progress := false
 
 
 func _ready() -> void:
-	scale = Vector3.ONE*2.0
+	# The bones are the same creature as the titan they become, so they are
+	# built at his size. They used to stand at a scale of their own, which
+	# left a skeleton visibly smaller than the animal that rose out of it.
+	scale = Vector3.ONE*DinosaurTitan.DISPLAY_SCALE
 	if WorldState.dinosaur_resurrected:
 		_build_living_dinosaur()
 		return
@@ -120,10 +123,15 @@ func _run_resurrection() -> void:
 	var titan:=_build_living_dinosaur()
 	titan.process_mode=Node.PROCESS_MODE_DISABLED
 	titan.collision_layer=0
-	titan.scale=Vector3.ONE*0.94
+	# The pop as the flesh takes is relative to the size he actually stands
+	# at, not an absolute one: writing Vector3.ONE here threw away whatever
+	# scale he had just been built with and left a resurrected Dinosaur
+	# smaller than one that had always been alive.
+	var standing: Vector3 = titan.scale
+	titan.scale=standing*0.94
 
 	var reveal:=create_tween().set_parallel(true)
-	reveal.tween_property(titan,"scale",Vector3.ONE,FLESH_REVEAL_DURATION).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	reveal.tween_property(titan,"scale",standing,FLESH_REVEAL_DURATION).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	for child in blobs:
 		var blob:=child as MeshInstance3D
 		reveal.tween_property(blob,"transparency",1.0,FLESH_REVEAL_DURATION)
@@ -162,6 +170,12 @@ func _build_living_dinosaur() -> DinosaurTitan:
 	var titan:=DinosaurTitan.new()
 	titan.name="Dinosaur"
 	add_child(titan)
+	# This node carries a scale of its own, for the bones. The titan sets its
+	# own DISPLAY_SCALE as it enters the tree, and the two would otherwise
+	# multiply: a resurrected Dinosaur would stand twice the size of one that
+	# had always been alive.
+	var inherited: float = maxf(scale.x, 0.0001)
+	titan.scale = Vector3.ONE * (DinosaurTitan.DISPLAY_SCALE / inherited)
 	return titan
 
 

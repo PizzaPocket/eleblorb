@@ -28,7 +28,7 @@ const GORILLA_SCENE := "res://scenes/ape_template_preview.tscn"
 ## in another part of the primate kingdom") -- the previous placement (140,
 ## -90, distance ~166 from the village clearing at the origin) was already
 ## well clear of it by ordinary XZ-distance standards, but at this creature's
-## own landmark HEIGHT (see GORILLA_DISPLAY_SCALE below -- roughly 48m tall)
+## own landmark HEIGHT (see GORILLA_DISPLAY_SCALE below -- roughly 80m tall)
 ## he reads as visually dominant/"nearby" from much further away than that,
 ## poking up over the canopy from most of the kingdom. Pushed much further
 ## out instead of just a little, and onto a different bearing from the
@@ -45,9 +45,9 @@ const GORILLA_LOCAL_XZ := Vector2(400.0, -280.0)
 ## times the size of a normal blorb," per docs/world_bible.md's own Blorbs
 ## section) without claiming an exact cross-species size equivalence that
 ## doesn't really exist between the two creatures' unrelated size units.
-## Raised by half again per direct instruction, to stand alongside Humongous:
-## roughly 48 m rather than 32.
-const GORILLA_DISPLAY_SCALE := 24.0
+## Raised to two and a half times its old size per direct instruction
+## ("150% larger"), to stand alongside Humongous: roughly 80 m rather than 32.
+const GORILLA_DISPLAY_SCALE := 40.0
 ## Started matching blorb.gd's own movement_speed_multiplier value for
 ## Humongous exactly (0.1), per direct instruction ("his movements should be
 ## proportionally slowed down for his size just like [Humongous'] are").
