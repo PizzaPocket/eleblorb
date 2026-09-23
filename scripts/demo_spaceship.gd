@@ -30,6 +30,9 @@ const DOOR_EXPONENT := 2.8
 ## fits through it, and matched by the escape pod's own circular opening.
 const HATCH_CENTER := Vector2(-26.0, -3.6)
 const HATCH_RADIUS := EscapePod.POD_DOOR_RADIUS
+## How far the pod's shell is pushed into the hull's. The two overlap by this
+## much, which is what closes the seam between them.
+const POD_SEAL_INSET := 0.9
 ## Windows down both flanks, at eye height above the deck: each is cut out of
 ## the hull and then filled by the very piece the cut removed, rebuilt in
 ## glass (SuperEgg.build_shell_patch_mesh()), so every pane sits flush in its
@@ -86,13 +89,20 @@ func _ready() -> void:
 
 ## Inside the pressure hull: within the cabin's own radius of the hull axis,
 ## clear of both end walls, and above the deck.
+## The air fills the pressure hull, so it is the hull's own volume that
+## answers, not a box in the middle of it. A body is breathing whenever it is
+## inside the shell's inner surface and above the deck it stands on.
 func contains_breathable_point(point: Vector3) -> bool:
 	var local := to_local(point)
-	if absf(local.z) > HULL_HALF_LENGTH - 2.0:
+	if local.y < DECK_Y:
 		return false
-	if local.y < DECK_Y or local.y > CABIN_CEILING_Y + 2.0:
-		return false
-	return Vector2(local.x, local.y).length() <= CABIN_AIR_RADIUS
+	# The hull is drawn with its long axis on Y and turned to lie along Z, so
+	# the test is written in that same frame.
+	var inner := _hull_axes() - Vector3.ONE * HULL_WALL
+	return SuperEgg.contains_point(
+		inner, Vector3(local.x, local.z, -local.y),
+		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+	)
 
 
 func _process(_delta: float) -> void:
@@ -178,10 +188,7 @@ func _hull_apertures() -> Array[Dictionary]:
 			"center": Vector2(DOOR_CENTER.x, -DOOR_CENTER.y),
 			"half": DOOR_HALF, "exponent": DOOR_EXPONENT,
 		},
-		{
-			"center": Vector2(HATCH_CENTER.x, -HATCH_CENTER.y),
-			"half": Vector2(HATCH_RADIUS, HATCH_RADIUS), "exponent": 2.0,
-		},
+		_pod_hatch_aperture(),
 	]
 	# A window is never cut where a way in or out already is. The openings
 	# share one surface, and two that meet make a single ragged hole with no
@@ -217,6 +224,21 @@ func _place_window(station: float, side: float, existing: Array[Dictionary]) -> 
 			if step == 0:
 				break
 	return {}
+
+
+## The hatch, cut by the escape pod's own shell rather than by a circle drawn
+## on the hull. The superegg is authored with its long axis on Y and turned a
+## quarter turn to lie along Z, so the pod's position is written in that frame:
+## the hull's Z is the superegg's Y, and the hull's Y its -Z.
+func _pod_hatch_aperture() -> Dictionary:
+	var mount := _pod_mount()
+	return {
+		"sphere_center": Vector3(mount.x, mount.z, -mount.y),
+		"sphere_radius": EscapePod.POD_RADIUS,
+		"half": Vector2(HATCH_RADIUS, HATCH_RADIUS),
+		"center": Vector2(HATCH_CENTER.x, -HATCH_CENTER.y),
+		"exponent": 2.0,
+	}
 
 
 ## Whether `candidate` keeps its distance from every opening already cut.
@@ -406,16 +428,23 @@ func _console(at: Vector3, side: float) -> void:
 ## The pod hangs on the flank directly outside the blorb hatch, turned so its
 ## own opening faces back through that hatch. Its shell is authored with the
 ## opening on +X, so a half turn about Y points it at the hull.
+## Where the pod's own centre sits against the hull: standing off the real
+## surface by enough that its opening's rim reaches the hull, less an inset so
+## the two shells overlap. That overlap is what makes the seal seamless, and
+## it is the same sphere that cuts the hull's hatch (see _hull_apertures()),
+## so the hole is exactly where the pod meets the ship and nowhere else.
+func _pod_mount() -> Vector3:
+	var half_angle := asin(clampf(EscapePod.POD_DOOR_RADIUS / EscapePod.POD_RADIUS, 0.0, 1.0))
+	var standoff := EscapePod.POD_RADIUS * cos(half_angle) - POD_SEAL_INSET
+	return Vector3(
+		_hull_surface_x(HATCH_CENTER.x) + standoff, HATCH_CENTER.y, HATCH_CENTER.x
+	)
+
+
 func _build_escape_pod() -> void:
 	escape_pod = EscapePod.new()
 	escape_pod.name = "EscapePod"
-	# Standing off the hull's real surface by exactly enough that the sphere's
-	# own opening rim meets it, less a little overlap so no seam can show.
-	var half_angle := asin(clampf(EscapePod.POD_DOOR_RADIUS / EscapePod.POD_RADIUS, 0.0, 1.0))
-	var standoff := EscapePod.POD_RADIUS * cos(half_angle) - 0.35
-	escape_pod.position = Vector3(
-		_hull_surface_x(HATCH_CENTER.x) + standoff, HATCH_CENTER.y, HATCH_CENTER.x
-	)
+	escape_pod.position = _pod_mount()
 	escape_pod.rotation.y = PI
 	add_child(escape_pod)
 

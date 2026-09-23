@@ -290,6 +290,10 @@ const HUMONGOUS_CLEARING := Vector2(5705.0, -8.0)
 ## Sized to the ground that actually exists between the volcano's skirt and
 ## the island's own east cliff, rather than any larger.
 const HUMONGOUS_CLEAR_RADIUS := 105.0
+## Where the escape pod comes down: clear of the giant's own body, which is
+## about 44.5 m across, with room for the crater it digs and still well inside
+## his cleared ground.
+const HUMONGOUS_LANDING := HUMONGOUS_CLEARING + Vector2(78.0, 0.0)
 const HUMONGOUS_CLEAR_BLEND := 75.0
 
 const STONE := Color(0.52, 0.5, 0.47)

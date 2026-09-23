@@ -463,13 +463,17 @@ static func _nearest_aperture(point: Vector3, apertures: Array[Dictionary]) -> D
 		var side: float = aperture.get("side", 1.0)
 		if point.x * side <= 0.0:
 			continue
-		var centre: Vector2 = aperture["center"]
-		var half: Vector2 = aperture["half"]
-		var exponent: float = aperture.get("exponent", EPSILON_SOFT)
-		var across := (point.y - centre.x) / maxf(half.x, 0.001)
-		var along := (point.z - centre.y) / maxf(half.y, 0.001)
-		var reach := pow(absf(across), exponent) + pow(absf(along), exponent)
-		var distance := absf(reach - 1.0)
+		var distance := 0.0
+		if aperture.has("sphere_center"):
+			var sphere_centre: Vector3 = aperture["sphere_center"]
+			distance = absf(point.distance_to(sphere_centre) - float(aperture["sphere_radius"]))
+		else:
+			var centre: Vector2 = aperture["center"]
+			var half: Vector2 = aperture["half"]
+			var exponent: float = aperture.get("exponent", EPSILON_SOFT)
+			var across := (point.y - centre.x) / maxf(half.x, 0.001)
+			var along := (point.z - centre.y) / maxf(half.y, 0.001)
+			distance = absf(pow(absf(across), exponent) + pow(absf(along), exponent) - 1.0)
 		if distance < closest:
 			closest = distance
 			best = aperture
@@ -479,6 +483,14 @@ static func _nearest_aperture(point: Vector3, apertures: Array[Dictionary]) -> D
 ## `point` moved onto `aperture`'s own boundary curve, along the line from
 ## the opening's centre, leaving the shell's own axis untouched.
 static func _on_aperture_edge(point: Vector3, aperture: Dictionary) -> Vector3:
+	if aperture.has("sphere_center"):
+		# Onto the cutting mass's own surface, so the rim is the seam where
+		# the two shells actually meet.
+		var sphere_centre: Vector3 = aperture["sphere_center"]
+		var outward := point - sphere_centre
+		if outward.length_squared() < 0.000001:
+			return point
+		return sphere_centre + outward.normalized() * float(aperture["sphere_radius"])
 	var centre: Vector2 = aperture["center"]
 	var half: Vector2 = aperture["half"]
 	var exponent: float = aperture.get("exponent", EPSILON_SOFT)
@@ -498,6 +510,14 @@ static func _inside_any_aperture(point: Vector3, apertures: Array[Dictionary]) -
 		var side: float = aperture.get("side", 1.0)
 		if point.x * side <= 0.0:
 			continue
+		# A solid mass can cut the opening instead of a flat outline: the hole
+		# is then exactly where that mass meets this shell, which is how two
+		# hulls are made to seal against each other.
+		if aperture.has("sphere_center"):
+			var sphere_centre: Vector3 = aperture["sphere_center"]
+			if point.distance_to(sphere_centre) <= float(aperture["sphere_radius"]):
+				return true
+			continue
 		var centre: Vector2 = aperture["center"]
 		var half: Vector2 = aperture["half"]
 		var exponent: float = aperture.get("exponent", EPSILON_SOFT)
@@ -506,6 +526,23 @@ static func _inside_any_aperture(point: Vector3, apertures: Array[Dictionary]) -
 		if pow(across, exponent) + pow(along, exponent) <= 1.0:
 			return true
 	return false
+
+
+## Whether `point` lies inside the superellipsoid of `semi_axes`, by the same
+## profile the surface is drawn from. The solid answer to "is this inside the
+## body", for anything that needs the real volume rather than a box around it.
+static func contains_point(
+	semi_axes: Vector3, point: Vector3,
+	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT
+) -> bool:
+	var ax := maxf(absf(semi_axes.x), 0.0001)
+	var ay := maxf(absf(semi_axes.y), 0.0001)
+	var az := maxf(absf(semi_axes.z), 0.0001)
+	var epsilon: float = epsilon_top if point.y >= 0.0 else epsilon_bottom
+	var around := (
+		pow(absf(point.x / ax), epsilon) + pow(absf(point.z / az), epsilon)
+	)
+	return pow(around, epsilon / epsilon) + pow(absf(point.y / ay), epsilon) <= 1.0
 
 
 static func _add_quad(st: SurfaceTool, a0: Vector3, b0: Vector3, a1: Vector3, b1: Vector3) -> void:

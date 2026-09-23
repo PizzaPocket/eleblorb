@@ -155,11 +155,13 @@ func _add_space_zone() -> void:
 	add_child(_spaceship)
 	# The pod exists once the ship has built itself, so this follows the add.
 	# It rides back down to the ground beside Humongous.
-	var landing := DemoWorldTerrain.HUMONGOUS_CLEARING
+	# Beside the giant rather than inside him: he is some 44.5 m across, and
+	# the old spot was 27 m from his centre.
+	var landing := DemoWorldTerrain.HUMONGOUS_LANDING
 	_spaceship.escape_pod.landing_point = Vector3(
-		landing.x + 22.0,
-		_terrain.get_mesh_height(landing.x + 22.0, landing.y + 16.0) + EscapePod.POD_RADIUS,
-		landing.y + 16.0
+		landing.x,
+		_terrain.get_mesh_height(landing.x, landing.y) + EscapePod.POD_RADIUS,
+		landing.y
 	)
 	_spaceship.escape_pod.impacted.connect(_on_escape_pod_impact)
 
