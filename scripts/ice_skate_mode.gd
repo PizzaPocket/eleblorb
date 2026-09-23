@@ -146,6 +146,13 @@ func follow_ice(
 			airborne = false
 		return null
 	if not was_supported:
+		# Already off the ice, and the arc that carried the skater off it is
+		# over the moment ordinary ground is under them again. Without this
+		# the launch was preserved for ever: a skater who left the lake kept
+		# the ice's own momentum on grass and dirt and slid on it indefinitely,
+		# because nothing off the ice could ever end the arc.
+		if airborne and body.is_on_floor() and body.velocity.y <= 0.0:
+			airborne = false
 		return null
 	was_supported = false
 	airborne = true

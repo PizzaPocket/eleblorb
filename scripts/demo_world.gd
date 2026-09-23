@@ -190,7 +190,6 @@ func _add_plant_jungle() -> void:
 func _add_demo_titans() -> void:
 	var dinosaur := DinosaurTitan.new()
 	dinosaur.name = "Dinosaur"
-	dinosaur.scale = Vector3.ONE * 2.0
 	dinosaur.position = _terrain.get_path_point(
 		DemoWorldTerrain.DINOSAUR_CLEARING.x,
 		DemoWorldTerrain.DINOSAUR_CLEARING.y - DemoWorldTerrain.path_center_z(DemoWorldTerrain.DINOSAUR_CLEARING.x)

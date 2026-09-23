@@ -14,7 +14,9 @@ const SAIL := Color(0.86, 0.79, 0.62)
 # onto the same water. These closed, disjoint bands make separation a route
 # invariant rather than merely choosing two different spawn points.
 const KRAKEN_ROUTE_CENTER := Vector2.ZERO
-const KRAKEN_ROUTE_RADIUS := Vector2(250.0, 205.0)
+## Widened alongside the kraken itself (see Kraken.DISPLAY_SCALE), so a
+## larger body still has its own sea room to swim in.
+const KRAKEN_ROUTE_RADIUS := Vector2(310.0, 255.0)
 const SHIP_ROUTE_CENTER := Vector2.ZERO
 const SHIP_ROUTE_RADIUS := Vector2(350.0, 285.0)
 const SHIP_ROUTE_ANGULAR_SPEED := 0.018
@@ -255,4 +257,4 @@ func _spawn_fish_goblins() -> void:
 		var goblin := FISH_GOBLIN_SCENE.instantiate()
 		add_child(goblin)
 		var angle := TAU * float(index) / 8.0
-		goblin.position = Vector3(KRAKEN_ROUTE_CENTER.x + cos(angle) * 235.0, -14.0, KRAKEN_ROUTE_CENTER.y + sin(angle) * 220.0)
+		goblin.position = Vector3(KRAKEN_ROUTE_CENTER.x + cos(angle) * 295.0, -14.0, KRAKEN_ROUTE_CENTER.y + sin(angle) * 270.0)

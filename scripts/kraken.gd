@@ -53,6 +53,7 @@ func _init() -> void:
 
 
 func _ready() -> void:
+	scale = Vector3.ONE * DISPLAY_SCALE
 	position = Vector3(route_center.x + route_radius.x, water_level - IDLE_DEPTH, route_center.y)
 	_build()
 	_update(0.0, 0.0)
@@ -62,6 +63,10 @@ func _ready() -> void:
 ## often that is rechecked. Every frame it runs, it writes ninety-eight
 ## collider transforms and twelve tentacles' worth of rotations; from the
 ## other end of the course none of that can be seen.
+## How large this titan swims, wherever it appears. Raised by half again per
+## direct instruction, to stand alongside Humongous.
+const DISPLAY_SCALE := 1.5
+
 const SIMULATE_RADIUS := 420.0
 const PRESENCE_RECHECK := 0.5
 

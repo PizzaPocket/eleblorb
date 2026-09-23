@@ -10,6 +10,12 @@ extends StaticBody3D
 ## Electric lime -- one consistent body color everywhere (no separate skin/
 ## belly tones). Only the eyes and eyelids read as separate markings, same
 ## as every other creature in the game.
+## How large this titan stands, wherever it appears. The demo world used to
+## set a scale of its own while its own kingdom built one at 1.0, so the same
+## creature was two different sizes depending on where you met it. Raised by
+## half again per direct instruction, to stand alongside Humongous.
+const DISPLAY_SCALE := 3.0
+
 const BODY_COLOR := Color(0.68, 1.0, 0.05)
 const BODY_EPSILON_TOP := 2.5
 const BODY_EPSILON_BOTTOM := 2.8
@@ -208,6 +214,7 @@ var _animated_colliders: Array[Dictionary] = []
 
 
 func _ready() -> void:
+	scale = Vector3.ONE * DISPLAY_SCALE
 	_rng.randomize()
 	_wander_anchor = _turn_pivot_parent_position()
 	collision_layer = 1 | TownProps.BLORB_CLIMBABLE_LAYER

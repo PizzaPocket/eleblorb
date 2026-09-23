@@ -122,7 +122,9 @@ const LAKE_SHORE_GAP := 8.0
 const LAKE_EAST_SHORE_GAP := 60.0
 const LAKE_RADIUS := 150.0
 const LAKE_EDGE_VARIATION := 14.0
-const LAKE_DEPTH := 40.0
+## Deep enough that a kraken half again as large still swims clear of the bed
+## (see Kraken.DISPLAY_SCALE and its own IDLE_DEPTH).
+const LAKE_DEPTH := 52.0
 const LAKE_SLOPE_WIDTH := 70.0
 ## An open lake's bank levels out just above the water: a narrow beach.
 const LAKE_SHELF := WATER_LEVEL + 0.35
@@ -137,7 +139,8 @@ const ISLAND_CENTER := Vector2(1125.0, 42.0)
 ## fully deep water and keeps the eastern turn clear of the moved island.
 const KRAKEN_SHORE_CLEARANCE := 110.0
 const KRAKEN_PORTAL_CLEARANCE := 60.0
-const KRAKEN_ROUTE_HALF_WIDTH := 34.0
+## The channel the kraken swims, widened and deepened alongside it.
+const KRAKEN_ROUTE_HALF_WIDTH := 51.0
 const KRAKEN_ROUTE_Z_OFFSET := -34.0
 const ISLAND_RADIUS := 55.0
 const ISLAND_HEIGHT := 7.0
@@ -228,9 +231,13 @@ const DIRT_ENTRY_APRON_RELEASE := 220.0
 ## cycles, but softly blended back into each biome rather than reading as
 ## artificial square pads.
 const DA_HOU_ZI_CLEARING := Vector2(390.0, 58.0)
-const DA_HOU_ZI_CLEAR_RADIUS := 58.0
+## Room for a titan half again as large as before (see
+## PRIMATE_KINGDOM_GORILLA.GORILLA_DISPLAY_SCALE).
+const DA_HOU_ZI_CLEAR_RADIUS := 87.0
 const DINOSAUR_CLEARING := Vector2(4277.5, -62.0)
-const DINOSAUR_CLEAR_RADIUS := 48.0
+## Room for a titan half again as large as before (see
+## DinosaurTitan.DISPLAY_SCALE).
+const DINOSAUR_CLEAR_RADIUS := 72.0
 const TITAN_CLEAR_BLEND := 24.0
 
 ## The course climbs across the ground zone to SKY_HEIGHT, near the clouds
