@@ -55,8 +55,12 @@ const GLASS := Color(0.44, 0.68, 0.86, 0.34)
 ## by cell, so the grid's own spacing is the resolution of every outline: at
 ## the default the windows came out as chunky staircases. Panes are the exact
 ## complement of the cut, so nothing can gap either way.
-const HULL_RINGS := 72
-const HULL_SEGMENTS := 96
+## Fine enough that an opening's clipped edge reads as a curve rather than as
+## the grid beneath it. The clip puts vertices exactly on the boundary either
+## way, but how closely the polyline between them follows the curve is still a
+## question of how big a cell is.
+const HULL_RINGS := 160
+const HULL_SEGMENTS := 208
 ## The deck: its height below the hull's axis, how far it reaches either side
 ## of the centreline, and its thickness.
 const DECK_Y := -5.0
@@ -72,6 +76,8 @@ const CABIN_AIR_RADIUS := 9.6
 const CONSOLE_HALF_LENGTH := 2.4
 ## Where the consoles stand along each flank. Two spread down the near side
 ## and one on the far side, all of them under the long window above.
+## How far a console stands clear of the wall behind it.
+const CONSOLE_WALL_GAP := 1.6
 const CONSOLE_STATIONS_NEAR := [9.0, 26.0]
 const CONSOLE_STATIONS_FAR := [17.0]
 
@@ -100,8 +106,6 @@ func _ready() -> void:
 ## inside the shell's inner surface and above the deck it stands on.
 func contains_breathable_point(point: Vector3) -> bool:
 	var local := to_local(point)
-	if local.y < DECK_Y:
-		return false
 	# Against the hull's OUTER surface, not its inner one. The shell collides,
 	# so nothing can be inside the outer surface without being in the cabin,
 	# and testing the inner surface instead put a body standing against the
@@ -302,12 +306,28 @@ func _glaze_windows(apertures: Array[Dictionary]) -> void:
 
 ## Where a console stands against the flank: inside the hull's own wall, far
 ## enough in that the curve above it clears a standing body.
-func _console_flank_offset() -> float:
-	return HULL_RADIUS - HULL_WALL - 1.6
+func _console_flank_offset_at(hull_z: float) -> float:
+	# The hull narrows toward both ends, so a fixed offset put a console
+	# through the wall at some stations and out through an opening at others.
+	return maxf(_deck_half_width_at(hull_z) - CONSOLE_WALL_GAP, 1.0)
 
 
 func _hull_axes() -> Vector3:
 	return Vector3(HULL_RADIUS, HULL_HALF_LENGTH, HULL_RADIUS)
+
+
+## How far out the floor reaches at `hull_z`: to the hull's own inner surface
+## at deck height, so the two meet with nothing between them.
+func _deck_half_width_at(hull_z: float) -> float:
+	var axes := _hull_axes() - Vector3.ONE * HULL_WALL
+	var rise: float = absf(DECK_Y) / maxf(axes.x, 0.0001)
+	var along: float = absf(hull_z) / maxf(axes.y, 0.0001)
+	# The shell's own profile: how much width is left at this station once the
+	# length and the drop to the deck have been spent.
+	var spent: float = pow(along, SuperEgg.EPSILON_SOFT) + pow(rise, SuperEgg.EPSILON_SOFT)
+	if spent >= 1.0:
+		return 0.0
+	return axes.x * pow(1.0 - spent, 1.0 / SuperEgg.EPSILON_SOFT)
 
 
 ## The hull's own outer surface distance from its axis at `hull_z`, found by
@@ -328,21 +348,33 @@ func _hull_surface_x(hull_z: float) -> float:
 
 ## The deck: a solid floor plate running the cabin's length, and the surface
 ## everyone actually stands on. The hull around it is scenery; this is not.
+## The floor spans the hull, so it is built to the hull's own cross-section at
+## deck height rather than as one fixed-width slab. The shell tapers toward
+## both ends, so a slab wide enough amidships left a gap down each side
+## everywhere else.
 func _build_deck() -> void:
 	var body := StaticBody3D.new()
 	body.name = "Deck"
 	body.collision_layer = 1
 	body.position = Vector3(0.0, DECK_Y - DECK_THICKNESS, 0.0)
 	add_child(body)
-	var plate := SuperEgg.build_part(
-		Vector3(DECK_HALF_WIDTH, DECK_THICKNESS, HULL_HALF_LENGTH - 3.0), PANEL,
-		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-	)
-	plate.name = "DeckPlate"
-	body.add_child(plate)
-	CollisionPolicy.add_box(
-		body, plate, Vector3(DECK_HALF_WIDTH, DECK_THICKNESS, HULL_HALF_LENGTH - 3.0) * 2.0
-	)
+	var reach := HULL_HALF_LENGTH - 3.0
+	var panels := 24
+	for index in panels:
+		var from := -reach + 2.0 * reach * float(index) / float(panels)
+		var to := -reach + 2.0 * reach * float(index + 1) / float(panels)
+		var middle := (from + to) * 0.5
+		var half_width := _deck_half_width_at(middle)
+		if half_width <= 0.2:
+			continue
+		var half := Vector3(half_width, DECK_THICKNESS, (to - from) * 0.5)
+		var plate := SuperEgg.build_part(
+			half, PANEL, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+		)
+		plate.name = "DeckPlate%d" % index
+		plate.position = Vector3(0.0, 0.0, middle)
+		body.add_child(plate)
+		CollisionPolicy.add_box(body, plate, half * 2.0)
 	# A brighter grating strip down the centreline, as in the reference cabin.
 	var grating := SuperEgg.build_part(
 		Vector3(2.6, 0.06, HULL_HALF_LENGTH - 5.0), HULL_SHADOW,
@@ -366,7 +398,6 @@ func _build_interior_fittings() -> void:
 	# rather than through them. They stand UNDER the long window rather than
 	# beside it, per direct instruction: two spread down one flank and one on
 	# the other, instead of three crowded in a row.
-	var flank := _console_flank_offset()
 	for side: float in [-1.0, 1.0]:
 		for station: float in (CONSOLE_STATIONS_NEAR if side > 0.0 else CONSOLE_STATIONS_FAR):
 			# The doorway's own stretch of flank carries no console.
@@ -374,7 +405,9 @@ func _build_interior_fittings() -> void:
 				continue
 			if absf(station - HATCH_CENTER.x) < HATCH_RADIUS + CONSOLE_HALF_LENGTH + 3.0:
 				continue
-			_console(Vector3(side * flank, DECK_Y + 1.1, station), side)
+			_console(
+				Vector3(side * _console_flank_offset_at(station), DECK_Y + 1.1, station), side
+			)
 	var strip := SuperEgg.build_part(
 		Vector3(0.5, 0.18, HULL_HALF_LENGTH - 6.0), STRIP_LIGHT,
 		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
@@ -405,7 +438,9 @@ func _console(at: Vector3, side: float) -> void:
 	body.name = "Console"
 	body.collision_layer = 1
 	body.position = at
-	body.rotation.y = -PI * 0.5 * side
+	# Facing inward, across the cabin: the panel and its screen turn toward
+	# whoever is standing at it rather than toward the hull behind it.
+	body.rotation.y = PI * 0.5 * side
 	add_child(body)
 	var desk := SuperEgg.build_part(Vector3(2.8, 1.1, 1.0), PANEL, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	desk.name = "ConsoleDesk"

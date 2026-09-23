@@ -333,58 +333,65 @@ static func build_hollow_shell_mesh(
 		outer.append(outer_ring)
 		inner.append(inner_ring)
 
-	# Which cells the aperture removes, tested at each cell's own centre.
-	var cut: Array = []
-	for ring_index in rings:
-		var row: Array[bool] = []
+	# How deep inside an opening each grid vertex lies. Cells are not kept or
+	# dropped whole: one that straddles an edge is CLIPPED to it, so the
+	# silhouette follows the opening's own curve however coarse the grid
+	# beneath it. Dropping whole cells is what made every port and doorway
+	# read as a staircase.
+	var depth: Array = []
+	for ring_index in rings + 1:
+		var row: Array[float] = []
 		for segment in segments:
-			var next_segment := (segment + 1) % segments
-			var centre: Vector3 = (
-				(outer[ring_index][segment] as Vector3) + (outer[ring_index][next_segment] as Vector3)
-				+ (outer[ring_index + 1][segment] as Vector3) + (outer[ring_index + 1][next_segment] as Vector3)
-			) * 0.25
-			row.append(_inside_any_aperture(centre, apertures))
-		cut.append(row)
+			row.append(_aperture_depth(outer[ring_index][segment], apertures))
+		depth.append(row)
 
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for ring_index in rings:
 		for segment in segments:
 			var next_segment := (segment + 1) % segments
-			if cut[ring_index][segment] != keep_cut:
-				continue
-			var a0: Vector3 = outer[ring_index][segment]
-			var a1: Vector3 = outer[ring_index][next_segment]
-			var b0: Vector3 = outer[ring_index + 1][segment]
-			var b1: Vector3 = outer[ring_index + 1][next_segment]
-			_add_quad(st, a0, b0, a1, b1)
-			# The inner surface faces the cabin, so its winding is reversed.
-			var c0: Vector3 = inner[ring_index][segment]
-			var c1: Vector3 = inner[ring_index][next_segment]
-			var d0: Vector3 = inner[ring_index + 1][segment]
-			var d1: Vector3 = inner[ring_index + 1][next_segment]
-			_add_quad(st, c0, c1, d0, d1)
-
-	# The rim: wherever a kept cell borders a cut one, close outer to inner
-	# across that shared edge.
-	for ring_index in rings:
-		for segment in segments:
-			if cut[ring_index][segment] == keep_cut:
-				continue
-			var next_segment := (segment + 1) % segments
-			var neighbours := [
-				[ring_index, (segment + segments - 1) % segments, outer[ring_index][segment], outer[ring_index + 1][segment], inner[ring_index][segment], inner[ring_index + 1][segment]],
-				[ring_index, next_segment, outer[ring_index][next_segment], outer[ring_index + 1][next_segment], inner[ring_index][next_segment], inner[ring_index + 1][next_segment]],
-				[ring_index - 1, segment, outer[ring_index][segment], outer[ring_index][next_segment], inner[ring_index][segment], inner[ring_index][next_segment]],
-				[ring_index + 1, segment, outer[ring_index + 1][segment], outer[ring_index + 1][next_segment], inner[ring_index + 1][segment], inner[ring_index + 1][next_segment]],
+			# The cell's four corners, in a loop, and how deep each one is.
+			var corner_depth: Array[float] = [
+				depth[ring_index][segment], depth[ring_index][next_segment],
+				depth[ring_index + 1][next_segment], depth[ring_index + 1][segment],
 			]
-			for entry in neighbours:
-				var neighbour_ring: int = entry[0]
-				if neighbour_ring < 0 or neighbour_ring >= rings:
-					continue
-				if cut[neighbour_ring][entry[1] as int] != keep_cut:
-					continue
-				_add_rim(st, entry[2] as Vector3, entry[3] as Vector3, entry[4] as Vector3, entry[5] as Vector3)
+			var outer_corner: Array[Vector3] = [
+				outer[ring_index][segment], outer[ring_index][next_segment],
+				outer[ring_index + 1][next_segment], outer[ring_index + 1][segment],
+			]
+			var inner_corner: Array[Vector3] = [
+				inner[ring_index][segment], inner[ring_index][next_segment],
+				inner[ring_index + 1][next_segment], inner[ring_index + 1][segment],
+			]
+			# Keeping the shell means keeping what lies OUTSIDE the opening;
+			# building the piece an opening removed keeps the inside instead.
+			var kept := _clip_cell(corner_depth, keep_cut)
+			if kept.size() < 3:
+				continue
+			var outer_loop: Array[Vector3] = []
+			var inner_loop: Array[Vector3] = []
+			for weights in kept:
+				outer_loop.append(_blend_corners(outer_corner, weights as Array))
+				inner_loop.append(_blend_corners(inner_corner, weights as Array))
+			for step in range(1, kept.size() - 1):
+				st.add_vertex(outer_loop[0])
+				st.add_vertex(outer_loop[step])
+				st.add_vertex(outer_loop[step + 1])
+				# The inner surface faces the cabin, so its winding reverses.
+				st.add_vertex(inner_loop[0])
+				st.add_vertex(inner_loop[step + 1])
+				st.add_vertex(inner_loop[step])
+			# The rim: every edge the clip itself produced, closed from the
+			# outer surface across to the inner one. An edge of the original
+			# cell is shared with a neighbour and needs no wall.
+			for index in kept.size():
+				var here: Array = kept[index]
+				var after: Array = kept[(index + 1) % kept.size()]
+				if bool(here[4]) and bool(after[4]):
+					_add_rim(
+						st, outer_loop[index], outer_loop[(index + 1) % kept.size()],
+						inner_loop[index], inner_loop[(index + 1) % kept.size()]
+					)
 	st.generate_normals()
 	return st.commit()
 
@@ -403,6 +410,75 @@ static func build_shell_patch_mesh(
 	return build_hollow_shell_mesh(
 		semi_axes, wall_thickness, only, epsilon_top, epsilon_bottom, rings, segments, true
 	)
+
+
+## One cell clipped to an opening's edge, as bilinear weights over its four
+## corners. Each entry is [w0, w1, w2, w3, on_edge]; on_edge marks a point the
+## clip itself produced, which is where the rim wall goes.
+static func _clip_cell(corner_depth: Array[float], keep_inside: bool) -> Array:
+	var polygon: Array = []
+	for index in 4:
+		var weights := [0.0, 0.0, 0.0, 0.0, false]
+		weights[index] = 1.0
+		polygon.append(weights)
+	var keep_sign := 1.0 if keep_inside else -1.0
+	var clipped: Array = []
+	for index in polygon.size():
+		var here: Array = polygon[index]
+		var after: Array = polygon[(index + 1) % polygon.size()]
+		var here_depth := keep_sign * _weighted_depth(corner_depth, here)
+		var after_depth := keep_sign * _weighted_depth(corner_depth, after)
+		if here_depth >= 0.0:
+			clipped.append(here)
+		if (here_depth >= 0.0) != (after_depth >= 0.0):
+			var t := clampf(
+				here_depth / maxf(here_depth - after_depth, 0.000001), 0.0, 1.0
+			)
+			var crossing := [0.0, 0.0, 0.0, 0.0, true]
+			for corner in 4:
+				crossing[corner] = lerpf(float(here[corner]), float(after[corner]), t)
+			clipped.append(crossing)
+	return clipped
+
+
+static func _weighted_depth(corner_depth: Array[float], weights: Array) -> float:
+	var total := 0.0
+	for index in 4:
+		total += corner_depth[index] * float(weights[index])
+	return total
+
+
+static func _blend_corners(corners: Array[Vector3], weights: Array) -> Vector3:
+	var point := Vector3.ZERO
+	for index in 4:
+		point += corners[index] * float(weights[index])
+	return point
+
+
+## How far inside an opening a point lies: positive inside, negative outside,
+## zero exactly on its edge. The clip interpolates along this, so the edge it
+## finds is the opening's own curve rather than the nearest grid line.
+static func _aperture_depth(point: Vector3, apertures: Array[Dictionary]) -> float:
+	var deepest := -1.0
+	for aperture in apertures:
+		var side: float = aperture.get("side", 1.0)
+		if point.x * side <= 0.0:
+			continue
+		var measure := 2.0
+		if aperture.has("sphere_center"):
+			var sphere_centre: Vector3 = aperture["sphere_center"]
+			measure = point.distance_to(sphere_centre) / maxf(float(aperture["sphere_radius"]), 0.0001)
+		else:
+			var centre: Vector2 = aperture["center"]
+			var half: Vector2 = aperture["half"]
+			var exponent: float = aperture.get("exponent", EPSILON_SOFT)
+			var across := absf(point.y - centre.x) / maxf(half.x, 0.001)
+			var along := absf(point.z - centre.y) / maxf(half.y, 0.001)
+			# The exponent-th root, so this reads as a distance and
+			# interpolates evenly from one grid vertex to the next.
+			measure = pow(pow(across, exponent) + pow(along, exponent), 1.0 / exponent)
+		deepest = maxf(deepest, 1.0 - measure)
+	return deepest
 
 
 static func _inside_any_aperture(point: Vector3, apertures: Array[Dictionary]) -> bool:
