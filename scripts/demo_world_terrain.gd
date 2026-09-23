@@ -246,6 +246,12 @@ const DINOSAUR_CLEARING := Vector2(4277.5, -62.0)
 ## Room for a titan two and a half times its old size (see
 ## DinosaurTitan.DISPLAY_SCALE).
 const DINOSAUR_CLEAR_RADIUS := 120.0
+## How far the clearing is sunk below the dirt around it, so a creature 143 m
+## long stands in a basin rather than on a plateau.
+const DINOSAUR_BASIN_DROP := 26.0
+## The basin's own walls slope in over this, longer than an ordinary clearing
+## blend so the drop reads as a canyon rather than a step.
+const DINOSAUR_BASIN_BLEND := 95.0
 const TITAN_CLEAR_BLEND := 24.0
 
 ## The course climbs across the ground zone to SKY_HEIGHT, near the clouds
@@ -841,11 +847,18 @@ func _raw_height(x: float, z: float) -> float:
 		var da_hou_zi_height := _plant_window.height(DA_HOU_ZI_CLEARING) + _course_elevation(DA_HOU_ZI_CLEARING.x)
 		height = lerpf(height, da_hou_zi_height, da_hou_zi_clear)
 	var dinosaur_clear := 1.0 - smoothstep(
-		DINOSAUR_CLEAR_RADIUS, DINOSAUR_CLEAR_RADIUS + TITAN_CLEAR_BLEND,
+		DINOSAUR_CLEAR_RADIUS, DINOSAUR_CLEAR_RADIUS + DINOSAUR_BASIN_BLEND,
 		point.distance_to(DINOSAUR_CLEARING)
 	)
 	if dinosaur_clear > 0.0:
-		var dinosaur_height := _dirt_window.height(DINOSAUR_CLEARING) + _course_elevation(DINOSAUR_CLEARING.x)
+		# Sunk rather than raised, per direct instruction: a flat disc at the
+		# surrounding ground's own height read as a platform he stood on top
+		# of. Dropping it turns the same clearing into a basin he is down
+		# inside, with the dirt zone's walls rising around him.
+		var dinosaur_height := (
+			_dirt_window.height(DINOSAUR_CLEARING) + _course_elevation(DINOSAUR_CLEARING.x)
+			- DINOSAUR_BASIN_DROP
+		)
 		height = lerpf(height, dinosaur_height, dinosaur_clear)
 	var humongous_clear := 1.0 - smoothstep(
 		HUMONGOUS_CLEAR_RADIUS, HUMONGOUS_CLEAR_RADIUS + HUMONGOUS_CLEAR_BLEND,

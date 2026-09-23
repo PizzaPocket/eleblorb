@@ -201,6 +201,10 @@ var _leg_phase := 0.0
 ## he currently is," so a long run of wander cycles can't slowly drift him away
 ## from the fossil site the way re-anchoring every pause would.
 var _rng := RandomNumberGenerator.new()
+## The ground this body walks on. He wandered at whatever height he was first
+## placed at, so any slope under him left him treading the air above it or
+## sunk into it, which his own size made impossible to miss.
+var _terrain: Node = null
 var _wander_anchor := Vector3.ZERO
 var _wander_target := Vector3.ZERO
 var _has_wander_target := false
@@ -216,6 +220,7 @@ var _animated_colliders: Array[Dictionary] = []
 
 func _ready() -> void:
 	scale = Vector3.ONE * DISPLAY_SCALE
+	_terrain = _find_terrain()
 	_rng.randomize()
 	_wander_anchor = _turn_pivot_parent_position()
 	collision_layer = 1 | TownProps.BLORB_CLIMBABLE_LAYER
@@ -231,6 +236,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	var moving := _update_wander(delta)
+	_settle_to_ground()
 	_animate_gait(delta, moving)
 
 	for entry in _animated_colliders:
@@ -246,6 +252,30 @@ func _physics_process(delta: float) -> void:
 ## rooted on this titan's own resting spot instead of the player. Returns
 ## whether he's actually mid-walk this frame, for _animate_gait() to gate
 ## the leg swing on.
+## The world's terrain, wherever this titan has been placed in it: he can be
+## a child of a fossil, of a kingdom, or of the world itself.
+func _find_terrain() -> Node:
+	var scene := get_tree().current_scene if get_tree() != null else null
+	if scene == null:
+		return null
+	var found := scene.get_node_or_null("Terrain")
+	return found if found != null and found.has_method("get_mesh_height") else null
+
+
+## Puts his feet back on the ground beneath him, in his parent's own frame so
+## whatever scale he is built at carries through untouched.
+func _settle_to_ground() -> void:
+	if _terrain == null:
+		return
+	var here := global_position
+	var ground: float = _terrain.get_mesh_height(here.x, here.z)
+	var parent := get_parent() as Node3D
+	var lift: float = ground - here.y
+	if parent != null:
+		lift /= maxf(parent.global_transform.basis.get_scale().y, 0.0001)
+	position.y += lift
+
+
 func _update_wander(delta: float) -> bool:
 	var moving := false
 	var pivot_position := _turn_pivot_parent_position()
