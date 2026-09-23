@@ -181,6 +181,68 @@ static func eye_surface(t: float, radius: float, height: float) -> Dictionary:
 ## night_cycle.gd only ever touches the scene's DirectionalLight3D/sky/fog
 ## globally, so any ordinary lit StandardMaterial3D in the scene (this one
 ## included) already reacts automatically, no per-object hookup needed.
+## A Space blorb's skin: its own body colour speckled with stars, drawn into
+## the surface rather than hung off it. Small white cubes floating around the
+## body were the earlier attempt and read as exactly that; a star belongs in
+## the skin.
+##
+## The field is hashed off the surface position, so it is fixed to the body
+## and moves with it, and dense enough to read as a sky without any one point
+## being large enough to look like an object.
+static func build_star_field_material(
+	albedo: Color, roughness: float, metallic: float, emission: Color
+) -> ShaderMaterial:
+	var shader := Shader.new()
+	shader.code = """
+shader_type spatial;
+render_mode cull_disabled, depth_prepass_alpha;
+uniform vec4 body_color : source_color;
+uniform vec4 star_glow : source_color;
+uniform float body_roughness;
+uniform float body_metallic;
+// How many cells of sky across the body, how few of them hold a star, and
+// how small each star sits inside its own cell.
+uniform float star_density = 34.0;
+uniform float star_chance = 0.13;
+uniform float star_size = 0.17;
+
+float hash13(vec3 cell) {
+	return fract(sin(dot(cell, vec3(12.9898, 78.233, 37.719))) * 43758.5453);
+}
+
+void fragment() {
+	vec3 cell = floor(VERTEX * star_density);
+	float pick = hash13(cell);
+	// Each star sits somewhere of its own inside its cell, not on a grid.
+	vec3 offset = vec3(
+		hash13(cell + 11.0), hash13(cell + 23.0), hash13(cell + 41.0)
+	);
+	vec3 local = fract(VERTEX * star_density) - offset;
+	float star = 0.0;
+	if (pick < star_chance) {
+		float near = length(local);
+		star = 1.0 - smoothstep(star_size * 0.35, star_size, near);
+		// A little variety in brightness, so the field is not uniform.
+		star *= 0.55 + 0.45 * hash13(cell + 7.0);
+	}
+	ALBEDO = mix(body_color.rgb, vec3(1.0), star);
+	ALPHA = body_color.a;
+	ROUGHNESS = mix(body_roughness, 0.25, star);
+	METALLIC = body_metallic * (1.0 - star);
+	EMISSION = star_glow.rgb * star;
+	RIM = 0.45;
+	RIM_TINT = 0.6;
+}
+"""
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	material.set_shader_parameter("body_color", albedo)
+	material.set_shader_parameter("star_glow", emission)
+	material.set_shader_parameter("body_roughness", roughness)
+	material.set_shader_parameter("body_metallic", metallic)
+	return material
+
+
 static func build_body_material(
 	albedo: Color, roughness: float, metallic: float,
 	emission_enabled: bool, emission: Color, emission_energy: float

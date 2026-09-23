@@ -23,6 +23,9 @@ const DINOSAUR_FOSSIL_SCENE: GDScript = preload("res://scripts/dinosaur_fossil.g
 ## Enough to raise him and a couple over, so a missed throw is not the end of
 ## it.
 const DEMO_BLORB_SLIME_COUNT := 3
+## TEMPORARY, for testing the ship: start already through the space portal and
+## wearing the Space suit. Set false to start on the ground.
+const DEMO_START_IN_SPACE := true
 const JUNGLE_KINGDOM_FOLIAGE := preload("res://scripts/jungle_kingdom_foliage.gd")
 const MANCHEGO_SCENE: PackedScene = preload("res://scenes/manchego.tscn")
 const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
@@ -128,6 +131,37 @@ func _ready() -> void:
 	_add_demo_titans()
 	_stock_demo_inventory()
 	call_deferred("_finish_loading")
+
+
+## TEMPORARY, for testing the ship: begins the demo as though the player had
+## just risen through the space portal in the Space suit, rather than making
+## them fly the whole course to reach it. Set DEMO_START_IN_SPACE back to
+## false to start on the ground again.
+func _start_in_space() -> void:
+	var player := _player as Node3D
+	if player == null:
+		return
+	# A few frames after the world has settled: asked for during loading, the
+	# roster is not yet listening and nothing is equipped at all.
+	for _settle in 30:
+		await get_tree().process_frame
+	# The suit is called for while he is still on the ground: its blorbs fly
+	# to their wearer, and from the ground they would never reach him 750 m
+	# up. Only once they have landed does he go through the portal.
+	var roster := get_node_or_null("SuitRoster")
+	if roster != null and roster.has_method("switch_to"):
+		roster.switch_to("space")
+	var suit := _player.get_own_blorb_suit() if _player.has_method("get_own_blorb_suit") else null
+	var waited := 0
+	while waited < 600 and suit != null and not suit.has_space_propulsion():
+		await get_tree().process_frame
+		waited += 1
+	player.global_position = Vector3(
+		DemoWorldTerrain.VOLCANO_CENTER.x, SPACE_PORTAL_Y + 6.0,
+		DemoWorldTerrain.VOLCANO_CENTER.y
+	)
+	if player is CharacterBody3D:
+		(player as CharacterBody3D).velocity = Vector3.ZERO
 
 
 ## The demo hands over what its own course needs to be played through, rather
@@ -283,6 +317,8 @@ func _finish_loading() -> void:
 		await RecoveryManager.finish_scene_recovery(self, Transform3D(Basis(), start))
 	else:
 		_player.global_position = start
+	if DEMO_START_IN_SPACE:
+		_start_in_space()
 		_player.set_body_heading(WEST_BODY_YAW)
 		_player.camera_rig.rotation.y = EAST_CAMERA_YAW
 	_build_party()

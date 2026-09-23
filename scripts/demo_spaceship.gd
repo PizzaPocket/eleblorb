@@ -37,9 +37,11 @@ const POD_SEAL_INSET := 0.9
 ## the hull and then filled by the very piece the cut removed, rebuilt in
 ## glass (SuperEgg.build_shell_patch_mesh()), so every pane sits flush in its
 ## own opening by construction.
-const WINDOW_STATIONS := [8.0, 18.0, 28.0]
+## One long port a side rather than three small ones, per direct instruction.
+## It sits above the consoles, which stand under it.
+const WINDOW_STATIONS := [17.0]
 const WINDOW_Y := 1.5
-const WINDOW_HALF := Vector2(3.4, 2.1)
+const WINDOW_HALF := Vector2(13.0, 4.2)
 const WINDOW_EXPONENT := 2.6
 ## Hull left standing between a window and any doorway or hatch, so every
 ## opening keeps a frame of its own.
@@ -68,6 +70,10 @@ const CABIN_AIR_RADIUS := 9.6
 ## How long a console bank runs along the flank, which is also the clearance
 ## it keeps from a window so it never stands in front of the glass.
 const CONSOLE_HALF_LENGTH := 2.4
+## Where the consoles stand along each flank. Two spread down the near side
+## and one on the far side, all of them under the long window above.
+const CONSOLE_STATIONS_NEAR := [9.0, 26.0]
+const CONSOLE_STATIONS_FAR := [17.0]
 
 const HULL := Color(0.88, 0.90, 0.94)
 const HULL_SHADOW := Color(0.62, 0.66, 0.74)
@@ -96,11 +102,15 @@ func contains_breathable_point(point: Vector3) -> bool:
 	var local := to_local(point)
 	if local.y < DECK_Y:
 		return false
+	# Against the hull's OUTER surface, not its inner one. The shell collides,
+	# so nothing can be inside the outer surface without being in the cabin,
+	# and testing the inner surface instead put a body standing against the
+	# wall or near either end outside its own ship's air.
+	#
 	# The hull is drawn with its long axis on Y and turned to lie along Z, so
 	# the test is written in that same frame.
-	var inner := _hull_axes() - Vector3.ONE * HULL_WALL
 	return SuperEgg.contains_point(
-		inner, Vector3(local.x, local.z, -local.y),
+		_hull_axes(), Vector3(local.x, local.z, -local.y),
 		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
 
@@ -353,23 +363,18 @@ func _build_deck() -> void:
 func _build_interior_fittings() -> void:
 	# The consoles stand against the hull itself now that nothing is built
 	# inside it, set in far enough that the flank curves away above them
-	# rather than through them. Each one keeps clear of the doorway, of the
-	# blorb hatch and of every window, so nothing stands in front of a way
-	# out or blocks the view through the glass.
+	# rather than through them. They stand UNDER the long window rather than
+	# beside it, per direct instruction: two spread down one flank and one on
+	# the other, instead of three crowded in a row.
 	var flank := _console_flank_offset()
 	for side: float in [-1.0, 1.0]:
-		var station := -HULL_HALF_LENGTH + 10.0
-		while station < HULL_HALF_LENGTH - 10.0:
+		for station: float in (CONSOLE_STATIONS_NEAR if side > 0.0 else CONSOLE_STATIONS_FAR):
 			# The doorway's own stretch of flank carries no console.
-			var clear_of_door := side < 0.0 or absf(station - DOOR_CENTER.x) > DOOR_HALF.x + 2.0
-			var clear_of_hatch := absf(station - HATCH_CENTER.x) > HATCH_RADIUS + 5.0
-			var clear_of_windows := true
-			for window_station: float in WINDOW_STATIONS:
-				if absf(station - window_station) < WINDOW_HALF.x + CONSOLE_HALF_LENGTH:
-					clear_of_windows = false
-			if clear_of_door and clear_of_hatch and clear_of_windows:
-				_console(Vector3(side * flank, DECK_Y + 1.1, station), side)
-			station += 7.5
+			if side > 0.0 and absf(station - DOOR_CENTER.x) < DOOR_HALF.x + CONSOLE_HALF_LENGTH:
+				continue
+			if absf(station - HATCH_CENTER.x) < HATCH_RADIUS + CONSOLE_HALF_LENGTH + 3.0:
+				continue
+			_console(Vector3(side * flank, DECK_Y + 1.1, station), side)
 	var strip := SuperEgg.build_part(
 		Vector3(0.5, 0.18, HULL_HALF_LENGTH - 6.0), STRIP_LIGHT,
 		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT

@@ -1236,15 +1236,9 @@ static func build_torso(spine_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.
 	spine_pivot.add_child(torso)
 	var pieces: Array[Node3D] = [torso]
 	if blorb.element_state == "space":
-		for dot_position in [
-			Vector3(-half_width * 0.42, half_height * 0.28, half_depth * 0.96),
-			Vector3(half_width * 0.30, -half_height * 0.12, half_depth * 0.99),
-			Vector3(half_width * 0.08, half_height * 0.48, half_depth * 0.94),
-		]:
-			var star := SuperEgg.build_part(Vector3.ONE * half_width * 0.045, Color.WHITE)
-			star.position = dot_position
-			torso.add_child(star)
-			CollisionPolicy.mark_decorative(star)
+		# The stars are in the skin, not hung off it -- see
+		# BlorbBodyShape.build_star_field_material(). Small white cubes stuck
+		# to the surface read as exactly that.
 		for side in [-1.0, 1.0]:
 			var tank := SuperEgg.build_part(
 				Vector3(half_width * 0.32, half_height * 0.72, half_depth * 0.34),
@@ -1643,21 +1637,17 @@ static func _build_space_helm(head_pivot: Node3D, contents: AABB, head_size: Vec
 		SuperEgg.RINGS * 2, SuperEgg.SEGMENTS * 2
 	)
 	var shell_material := _build_goo_material(vis)
-	shell_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	# A Space helm's gel is a star field, which draws both faces by its own
+	# render mode; only a plain material has a cull mode to set.
+	var shell_standard := shell_material as StandardMaterial3D
+	if shell_standard != null:
+		shell_standard.cull_mode = BaseMaterial3D.CULL_DISABLED
 	shell.material_override = shell_material
 	shell.position.y = head_size.y
 	# The superegg's own long axis is Y and the aperture rides its +X; a
 	# quarter turn each way brings that opening round to the front.
 	shell.rotation = Vector3(PI * 0.5, -PI * 0.5, 0.0)
 	root.add_child(shell)
-	for star_position in [
-		Vector3(-radius * 0.44, head_size.y + radius * 0.50, radius * 0.58),
-		Vector3(radius * 0.48, head_size.y + radius * 0.34, radius * 0.53),
-	]:
-		var star := SuperEgg.build_part(Vector3.ONE * radius * 0.035, Color.WHITE)
-		star.position = star_position
-		root.add_child(star)
-		CollisionPolicy.mark_decorative(star)
 	# The visor is the piece the cut removed, rebuilt in glass one inset
 	# deeper: same opening, same curve, set back toward the head so the
 	# helmet's own rim stands proud of it.
@@ -2840,15 +2830,22 @@ static func _to_local_dir(root: Node3D, world_dir: Vector3) -> Vector3:
 ## visible part of a suit is the blorb itself reshaped, so a board underfoot
 ## or a tank on the back is the same translucent material as the limb it
 ## grows from, not an opaque prop in its colour.
-static func gel_material_for(blorb: Blorb) -> StandardMaterial3D:
+static func gel_material_for(blorb: Blorb) -> Material:
 	if blorb == null:
 		return StandardMaterial3D.new()
 	return _build_goo_material(blorb.body_visual_snapshot())
 
 
-static func _build_goo_material(vis: Dictionary) -> StandardMaterial3D:
+static func _build_goo_material(vis: Dictionary) -> Material:
 	# Free Rock blorbs remain living creatures; only their worn armor form
 	# hardens into the same opaque, dry stone used by natural boulders.
+	if (vis.get("element", "") as String) == "space":
+		var albedo_space := vis["albedo"] as Color
+		return BlorbBodyShape.build_star_field_material(
+			Color(albedo_space.r, albedo_space.g, albedo_space.b, maxf(albedo_space.a, 0.88)),
+			vis["roughness"] as float, vis["metallic"] as float,
+			ElementPalette.SPACE_BODY.lightened(0.45)
+		)
 	if (vis.get("element", "") as String) == "rock":
 		var rock_material := StandardMaterial3D.new()
 		rock_material.albedo_color = NatureProps.ROCK_COLOR

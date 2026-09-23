@@ -1302,7 +1302,7 @@ func _apply_element_visuals() -> void:
 			core_material.emission_enabled = true
 			core_material.emission = Color(0.58, 0.48, 0.92)
 			core_material.emission_energy_multiplier = 1.15
-			_add_space_star_dots()
+			_apply_space_star_field()
 	# Eyes are created before an initial element is applied. Retint them from
 	# the final body material here so every transformed blorb follows the same
 	# darker-on-body eye convention instead of retaining its old goo colour.
@@ -1316,21 +1316,24 @@ func _apply_element_visuals() -> void:
 				eye_material.albedo_color = eye_color
 
 
-func _add_space_star_dots() -> void:
-	if body.get_node_or_null("SpaceStarDots") != null:
-		return
-	var root := Node3D.new()
-	root.name = "SpaceStarDots"
-	body.add_child(root)
-	for point in [
-		Vector3(-0.25, 0.78, 0.49), Vector3(0.21, 0.58, 0.57),
-		Vector3(-0.40, 0.41, 0.31), Vector3(0.43, 0.92, 0.21),
-		Vector3(-0.12, 1.13, 0.29), Vector3(0.34, 0.29, 0.38),
-	]:
-		var dot := SuperEgg.build_part(Vector3.ONE * 0.035, Color.WHITE)
-		dot.position = point
-		root.add_child(dot)
-		CollisionPolicy.mark_decorative(dot)
+## A Space blorb is speckled with stars, drawn into its own skin. This used to
+## hang six small white cubes off the body, which is what they looked like:
+## floating blocks rather than stars. The field lives in the surface now (see
+## BlorbBodyShape.build_star_field_material()), so it wraps the body, moves
+## with it and has no geometry of its own.
+func _apply_space_star_field() -> void:
+	var stale := body.get_node_or_null("SpaceStarDots")
+	if stale != null:
+		stale.queue_free()
+	var field := BlorbBodyShape.build_star_field_material(
+		_body_material.albedo_color, _body_material.roughness,
+		_body_material.metallic, ElementPalette.SPACE_BODY.lightened(0.45)
+	)
+	# Onto every surface the body draws, whichever of them carries the goo.
+	for child in body.get_children():
+		var mesh := child as MeshInstance3D
+		if mesh != null and mesh.get_surface_override_material(0) == _body_material:
+			mesh.set_surface_override_material(0, field)
 
 
 ## Checked after every successful gem merge on a starter-trio member (see
