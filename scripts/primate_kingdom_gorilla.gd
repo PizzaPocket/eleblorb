@@ -62,7 +62,12 @@ const GORILLA_DISPLAY_SCALE := 40.0
 const GORILLA_MOVEMENT_SPEED_MULTIPLIER := 0.1
 ## Kova's enormous stride still needs to visibly cycle while his translation
 ## stays ponderous. This affects animation only; movement above remains slow.
-const GORILLA_GAIT_SPEED_MULTIPLIER := 3.0
+##
+## The cadence itself divides by display_scale, so growing him slowed his
+## stride in step with his size and he walked as if in slow motion. Raised to
+## carry the larger scale and then a little further, per direct instruction,
+## so he strides at a natural rate for something his size.
+const GORILLA_GAIT_SPEED_MULTIPLIER := 9.0
 const GORILLA_ROAM_RADIUS := 42.0
 const GORILLA_FUR_COLOR := Color(0.12, 0.11, 0.11)
 const MIND_CONTROL_EYE_COLOR := Color(0.62, 0.18, 0.92)

@@ -49,6 +49,12 @@ const ISLAND_SUBMERGED_DEPTH := 48.0
 # physics. Ten times the former radius makes the surrounding sea feel vastly
 # more expansive while retaining the same single lightweight draw call.
 const WORLD_OCEAN_RADIUS := 120000.0
+## How far PAST the point where the basin climbs back above sea level the
+## sea's own hole reaches. The edge of the hole then sits under ground that
+## already stands above the sea, so it is hidden; stopping short of that line
+## instead leaves a band of submerged bank where the sea shows through the
+## lake's own water.
+const OCEAN_HOLE_MARGIN := 16.0
 const WORLD_OCEAN_SEGMENTS := 128
 const WORLD_OCEAN_RINGS := 64
 const SPACING := 5.0
@@ -120,12 +126,14 @@ const WORLD_OCEAN_LEVEL := WATER_LEVEL - 4.0
 ## the shore and its kelp and coral below.
 const LAKE_SHORE_GAP := 8.0
 const LAKE_EAST_SHORE_GAP := 60.0
-const LAKE_RADIUS := 150.0
+## Widened alongside the basin's new depth: 72 m sunk inside a 150 m bowl is
+## a quarry, not a lake. The bank now falls at a little over thirty degrees.
+const LAKE_RADIUS := 230.0
 const LAKE_EDGE_VARIATION := 14.0
 ## Deep enough that a kraken half again as large still swims clear of the bed
 ## (see Kraken.DISPLAY_SCALE and its own IDLE_DEPTH).
 const LAKE_DEPTH := 72.0
-const LAKE_SLOPE_WIDTH := 70.0
+const LAKE_SLOPE_WIDTH := 110.0
 ## An open lake's bank levels out just above the water: a narrow beach.
 const LAKE_SHELF := WATER_LEVEL + 0.35
 const LAKE_FLOOR := LAKE_SHELF - LAKE_DEPTH
@@ -1316,6 +1324,29 @@ func _build_chasm_lava() -> void:
 ## passes continuously beneath the island and naturally intersects its deep
 ## cliff base; no island-footprint shader cutout is needed. It has no collision
 ## or physics cost.
+## The stretch of ground the world sea must not be drawn over: the lake's own
+## spine, and the distance out from it at which the basin climbs back above
+## sea level. Sampled off the built terrain rather than assumed, and pulled in
+## by a margin so the edge of the hole sits under solid ground.
+func _lake_basin_footprint() -> Dictionary:
+	var centre := _water_lake.center
+	var half_length := _water_lake.half_length
+	var reach := LAKE_RADIUS + LAKE_EDGE_VARIATION + LAKE_SLOPE_WIDTH
+	var step := 4.0
+	var out := reach
+	var distance := 0.0
+	while distance <= reach:
+		if get_mesh_height(centre.x, centre.y + distance) > WORLD_OCEAN_LEVEL:
+			out = distance
+			break
+		distance += step
+	return {
+		"from": Vector2(centre.x - half_length, centre.y),
+		"to": Vector2(centre.x + half_length, centre.y),
+		"radius": out + OCEAN_HOLE_MARGIN,
+	}
+
+
 func _build_world_ocean() -> void:
 	var sphere := SphereMesh.new()
 	sphere.radius = WORLD_OCEAN_RADIUS
@@ -1326,7 +1357,17 @@ func _build_world_ocean() -> void:
 	shader.code = """
 shader_type spatial;
 render_mode cull_back, depth_draw_opaque;
+uniform vec2 hole_from;
+uniform vec2 hole_to;
+uniform float hole_radius;
 void fragment() {
+	vec3 world = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	vec2 here = vec2(world.x, world.z);
+	vec2 span = hole_to - hole_from;
+	float along = clamp(dot(here - hole_from, span) / max(dot(span, span), 0.0001), 0.0, 1.0);
+	if (distance(here, hole_from + span * along) < hole_radius) {
+		discard;
+	}
 	vec3 deep_blue = vec3(0.055, 0.31, 0.53);
 	vec3 sky_blue = vec3(0.16, 0.52, 0.72);
 	float fresnel = pow(1.0 - max(dot(NORMAL, VIEW), 0.0), 3.0);
@@ -1337,6 +1378,20 @@ void fragment() {
 """
 	var material := ShaderMaterial.new()
 	material.shader = shader
+	# The basin is dug far below this sea, so its surface would otherwise cut
+	# straight across the inside of the lake. The sea is not drawn over the
+	# basin's own footprint, and that footprint stops short of where the
+	# ground rises back above sea level, so the hole's edge is buried under
+	# the island rather than showing as a seam.
+	#
+	# A hole cut out of this mesh cannot do it: the sea is a 120 km sphere
+	# whose cells are kilometres across, and the lake is a few hundred metres.
+	# Cutting the whole island's footprint instead, which was the earlier
+	# attempt, cost the seamless join where the sea meets the island's sides.
+	var footprint := _lake_basin_footprint()
+	material.set_shader_parameter("hole_from", footprint["from"])
+	material.set_shader_parameter("hole_to", footprint["to"])
+	material.set_shader_parameter("hole_radius", footprint["radius"])
 	var ocean := MeshInstance3D.new()
 	ocean.name = "SphericalWorldOcean"
 	ocean.mesh = sphere

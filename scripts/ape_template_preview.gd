@@ -66,6 +66,11 @@ extends StaticBody3D
 ## Separate cadence control for landmark-scale creatures. Their translation
 ## and visible stride must be tunable independently to prevent foot sliding.
 @export var gait_speed_multiplier: float = 1.0
+## How quickly this body turns on the spot, on top of the size-based slowing
+## below. A pivot was the one motion that ignored scale entirely: every ape
+## turned at the same angular rate, so a landmark-sized one snapped round on
+## its own axis while everything else about it lumbered.
+@export var turn_speed_multiplier: float = 1.0
 @export var roam_radius: float = ROAM_RADIUS
 ## Uses articulated, pose-following collision shapes so a giant creature is
 ## a traversable piece of the world rather than one oversized blocking pill.
@@ -160,6 +165,7 @@ var _arm_rest_x := 0.0
 ## reduce to the original fixed constants unchanged.
 var _move_speed := ROAM_MOVE_SPEED
 var _swing_speed := WALK_SWING_SPEED
+var _turn_speed := ROTATION_SPEED
 ## No permanent elbow bend on this rig (unlike hip/knee/ankle) -- 0.0
 ## matches ProceduralFigure's own human elbow rest.
 var _elbow_rest_x := 0.0
@@ -193,6 +199,11 @@ func _ready() -> void:
 	# based term alone already gives a giant an appropriately slow, ponderous
 	# stride without needing a second slowdown layered on top of it.
 	_swing_speed = WALK_SWING_SPEED / display_scale * gait_speed_multiplier
+	# Turning slows with size, but by the square root rather than the whole of
+	# it: a body twice as long does not take twice as long to come about, and
+	# dividing by the full scale left a giant unable to turn at all. An
+	# ordinary ape is at scale 1 and so is unaffected.
+	_turn_speed = ROTATION_SPEED / sqrt(maxf(display_scale, 1.0)) * turn_speed_multiplier
 	var variant := {
 		"marking_color": marking_color,
 		"spine_forward_bend": spine_forward_bend,
@@ -429,7 +440,7 @@ func _update_roam(delta: float) -> bool:
 		var new_pos := here + step
 		if to_target.length() > 0.01:
 			var target_angle := atan2(to_target.x, to_target.y)
-			rotation.y = lerp_angle(rotation.y, target_angle, ROTATION_SPEED * delta)
+			rotation.y = lerp_angle(rotation.y, target_angle, _turn_speed * delta)
 		global_position.x = new_pos.x
 		global_position.z = new_pos.y
 
