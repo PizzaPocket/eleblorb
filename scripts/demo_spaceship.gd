@@ -59,8 +59,12 @@ const GLASS := Color(0.44, 0.68, 0.86, 0.34)
 ## the grid beneath it. The clip puts vertices exactly on the boundary either
 ## way, but how closely the polyline between them follows the curve is still a
 ## question of how big a cell is.
-const HULL_RINGS := 160
-const HULL_SEGMENTS := 208
+## The shell's own grid, deliberately moderate. An opening's outline no longer
+## depends on it: the cells its edge runs through are subdivided and clipped
+## (see SuperEgg.EDGE_SUBDIVISION), so a hole is sampled finely while the rest
+## of the hull stays cheap.
+const HULL_RINGS := 56
+const HULL_SEGMENTS := 76
 ## The deck: its height below the hull's axis, how far it reaches either side
 ## of the centreline, and its thickness.
 const DECK_Y := -5.0
@@ -164,8 +168,15 @@ func _build_hull() -> void:
 	add_child(body)
 	shell.rotation.x = 0.0
 	body.add_child(shell)
+	# The collider is built from the same shell at a coarse edge: a body
+	# leaning on the wall cannot feel how finely the window's outline is
+	# sampled, and paying for that in physics as well as in pixels is waste.
+	var collision_shell := SuperEgg.build_hollow_shell_mesh(
+		_hull_axes(), HULL_WALL, apertures, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT,
+		HULL_RINGS, HULL_SEGMENTS, false, 1
+	)
 	var shape := ConcavePolygonShape3D.new()
-	shape.set_faces(_mesh_faces(shell.mesh))
+	shape.set_faces(_mesh_faces(collision_shell))
 	# Both faces of the shell are stood against: the inside from the cabin,
 	# the outside when climbing on it.
 	shape.backface_collision = true

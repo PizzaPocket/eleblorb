@@ -310,10 +310,17 @@ static func build_inset_pad_mesh(
 ## can. Keep it well under the smallest semi-axis.
 ##
 ## Denser than the solid builder by default: a doorway's rim shows the grid.
+## How finely a cell the opening's edge runs through is subdivided before
+## being clipped. Only those cells pay for it, so an outline can be sampled
+## many times more densely than the shell's own grid for very little.
+const EDGE_SUBDIVISION := 9
+
+
 static func build_hollow_shell_mesh(
 	semi_axes: Vector3, wall_thickness: float, apertures: Array[Dictionary],
 	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT,
-	rings: int = RINGS * 2, segments: int = SEGMENTS * 2, keep_cut: bool = false
+	rings: int = RINGS * 2, segments: int = SEGMENTS * 2, keep_cut: bool = false,
+	edge_subdivision: int = EDGE_SUBDIVISION
 ) -> ArrayMesh:
 	var inner_axes := Vector3(
 		maxf(semi_axes.x - wall_thickness, 0.01),
@@ -365,33 +372,68 @@ static func build_hollow_shell_mesh(
 			]
 			# Keeping the shell means keeping what lies OUTSIDE the opening;
 			# building the piece an opening removed keeps the inside instead.
-			var kept := _clip_cell(corner_depth, keep_cut)
-			if kept.size() < 3:
+			var inside_count := 0
+			for corner in 4:
+				if corner_depth[corner] >= 0.0:
+					inside_count += 1
+			if inside_count == 4 and not keep_cut:
 				continue
-			var outer_loop: Array[Vector3] = []
-			var inner_loop: Array[Vector3] = []
-			for weights in kept:
-				outer_loop.append(_blend_corners(outer_corner, weights as Array))
-				inner_loop.append(_blend_corners(inner_corner, weights as Array))
-			for step in range(1, kept.size() - 1):
-				st.add_vertex(outer_loop[0])
-				st.add_vertex(outer_loop[step])
-				st.add_vertex(outer_loop[step + 1])
-				# The inner surface faces the cabin, so its winding reverses.
-				st.add_vertex(inner_loop[0])
-				st.add_vertex(inner_loop[step + 1])
-				st.add_vertex(inner_loop[step])
-			# The rim: every edge the clip itself produced, closed from the
-			# outer surface across to the inner one. An edge of the original
-			# cell is shared with a neighbour and needs no wall.
-			for index in kept.size():
-				var here: Array = kept[index]
-				var after: Array = kept[(index + 1) % kept.size()]
-				if bool(here[4]) and bool(after[4]):
-					_add_rim(
-						st, outer_loop[index], outer_loop[(index + 1) % kept.size()],
-						inner_loop[index], inner_loop[(index + 1) % kept.size()]
-					)
+			if inside_count == 0 and keep_cut:
+				continue
+			# A cell nowhere near an edge is emitted whole. A cell the edge
+			# runs through is subdivided first and each piece clipped, so the
+			# outline is sampled far more densely than the hull's own grid
+			# without making the whole hull finer. The chord from one crossing
+			# to the next is what reads as a flat, and that is a question of
+			# how often the edge is sampled, not of how exactly each sample
+			# sits on the curve.
+			var steps := 1 if inside_count == 0 or inside_count == 4 else maxi(edge_subdivision, 1)
+			for row in steps:
+				for column in steps:
+					var patch_weights: Array = [
+						_cell_weights(float(row) / float(steps), float(column) / float(steps)),
+						_cell_weights(float(row + 1) / float(steps), float(column) / float(steps)),
+						_cell_weights(float(row + 1) / float(steps), float(column + 1) / float(steps)),
+						_cell_weights(float(row) / float(steps), float(column + 1) / float(steps)),
+					]
+					var patch_outer: Array[Vector3] = []
+					var patch_inner: Array[Vector3] = []
+					var patch_depth: Array[float] = []
+					for weights in patch_weights:
+						var at := _blend_corners(outer_corner, weights as Array)
+						patch_outer.append(at)
+						patch_inner.append(_blend_corners(inner_corner, weights as Array))
+						# The field itself at this point, rather than the coarse
+						# cell's corners interpolated, so every sample lands on
+						# the curve instead of near it.
+						patch_depth.append(_aperture_depth(at, apertures))
+					var kept := _clip_cell(patch_depth, keep_cut)
+					if kept.size() < 3:
+						continue
+					var outer_loop: Array[Vector3] = []
+					var inner_loop: Array[Vector3] = []
+					for weights in kept:
+						outer_loop.append(_blend_corners(patch_outer, weights as Array))
+						inner_loop.append(_blend_corners(patch_inner, weights as Array))
+					for step in range(1, kept.size() - 1):
+						st.add_vertex(outer_loop[0])
+						st.add_vertex(outer_loop[step])
+						st.add_vertex(outer_loop[step + 1])
+						# The inner surface faces the cabin: winding reverses.
+						st.add_vertex(inner_loop[0])
+						st.add_vertex(inner_loop[step + 1])
+						st.add_vertex(inner_loop[step])
+					# The rim: every edge the clip produced, closed straight
+					# across the wall from the outer surface to the inner one.
+					# A flat cap, square to both.
+					for index in kept.size():
+						var here: Array = kept[index]
+						var after: Array = kept[(index + 1) % kept.size()]
+						if bool(here[4]) and bool(after[4]):
+							_add_rim(
+								st, outer_loop[index], outer_loop[(index + 1) % kept.size()],
+								inner_loop[index], inner_loop[(index + 1) % kept.size()]
+							)
 	st.generate_normals()
 	return st.commit()
 
@@ -415,6 +457,12 @@ static func build_shell_patch_mesh(
 ## One cell clipped to an opening's edge, as bilinear weights over its four
 ## corners. Each entry is [w0, w1, w2, w3, on_edge]; on_edge marks a point the
 ## clip itself produced, which is where the rim wall goes.
+## The bilinear weights of the point at (u, v) inside a cell whose corners are
+## given in a loop.
+static func _cell_weights(u: float, v: float) -> Array:
+	return [(1.0 - u) * (1.0 - v), u * (1.0 - v), u * v, (1.0 - u) * v, false]
+
+
 static func _clip_cell(corner_depth: Array[float], keep_inside: bool) -> Array:
 	var polygon: Array = []
 	for index in 4:
