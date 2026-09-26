@@ -291,36 +291,30 @@ static func build_inset_pad_mesh(
 	return st.commit()
 
 
-## A HOLLOW superegg: an outer surface, an inner surface `wall_thickness`
-## beneath it, and a superellipse aperture punched through one side, with the
-## cut's rim closing the two surfaces together so the shell reads as real
-## walls with real thickness rather than a paper skin.
+## How many points an opening's outline is sampled at, all the way round. The
+## outline is generated AS A CURVE, at even spacing, rather than harvested
+## from wherever the shell's own grid lines happen to cross it.
 ##
-## Each aperture is a superellipse prism used as a negative: centred at
-## `center` (local Y/Z, on the +X side of the shell), with half-extents `half`
-## (Y then Z) and squareness `exponent`, subtracted straight through the +X
-## wall only -- the wall behind it stays whole. Anything a cut removes is
-## replaced by rim geometry joining the outer surface to the inner one, so a
-## character can walk in through a real doorway in a real hull.
-##
-## `wall_thickness` shrinks the semi-axes rather than offsetting each surface
-## point along its own normal: on an anisotropic shell the wall is therefore a
-## little thicker across the short axes than the long one, which is the
-## convincing way round for a hull and cannot self-intersect as a true offset
-## can. Keep it well under the smallest semi-axis.
-##
-## Denser than the solid builder by default: a doorway's rim shows the grid.
-## How finely a cell the opening's edge runs through is subdivided before
-## being clipped. Only those cells pay for it, so an outline can be sampled
-## many times more densely than the shell's own grid for very little.
-const EDGE_SUBDIVISION := 9
+## That distinction is the whole difference between a smooth hole and a
+## sawtooth one. Walking the grid and drawing a chord across each cell the
+## curve passes through does put every corner exactly on the curve, but their
+## spacing is dictated by the grid: dense where the curve cuts many cell
+## edges, sparse where it runs along one, reversing sharply in between.
+## Measured on the ship's window, that gave 619 boundary points turning 43
+## degrees on average and up to 165. An evenly spaced ring of this many points
+## turns 360/RIM_SAMPLES degrees, and nothing else.
+const RIM_SAMPLES := 96
+## How far out, in the opening's own units, the shell's grid is cleared to make
+## room for the ring and the fan that reaches it. Beyond 1.0 is outside the
+## opening itself.
+const RIM_CLEARANCE := 1.22
 
 
 static func build_hollow_shell_mesh(
 	semi_axes: Vector3, wall_thickness: float, apertures: Array[Dictionary],
 	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT,
 	rings: int = RINGS * 2, segments: int = SEGMENTS * 2, keep_cut: bool = false,
-	edge_subdivision: int = EDGE_SUBDIVISION
+	_unused_subdivision: int = 0
 ) -> ArrayMesh:
 	var inner_axes := Vector3(
 		maxf(semi_axes.x - wall_thickness, 0.01),
@@ -340,109 +334,235 @@ static func build_hollow_shell_mesh(
 		outer.append(outer_ring)
 		inner.append(inner_ring)
 
-	# How deep inside an opening each grid vertex lies. Cells are not kept or
-	# dropped whole: one that straddles an edge is CLIPPED to it, so the
-	# silhouette follows the opening's own curve however coarse the grid
-	# beneath it. Dropping whole cells is what made every port and doorway
-	# read as a staircase.
-	var depth: Array = []
-	for ring_index in rings + 1:
-		var row: Array[float] = []
-		for segment in segments:
-			row.append(_aperture_depth(outer[ring_index][segment], apertures))
-		depth.append(row)
-
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+
+	# Only the piece an opening removed was asked for: that is the ring's own
+	# disc, so it is built from the ring alone and the grid is not involved.
+	if keep_cut:
+		for aperture in apertures:
+			_add_aperture_disc(st, aperture, semi_axes, inner_axes, epsilon_top)
+		st.generate_normals()
+		return st.commit()
+
+	# Every cell the openings have cleared away, out to RIM_CLEARANCE so there
+	# is room for the ring and the fan reaching it.
+	var cleared: Array = []
 	for ring_index in rings:
+		var row: Array[bool] = []
 		for segment in segments:
 			var next_segment := (segment + 1) % segments
-			# The cell's four corners, in a loop, and how deep each one is.
-			var corner_depth: Array[float] = [
-				depth[ring_index][segment], depth[ring_index][next_segment],
-				depth[ring_index + 1][next_segment], depth[ring_index + 1][segment],
-			]
-			var outer_corner: Array[Vector3] = [
+			var drop := false
+			for corner in [
 				outer[ring_index][segment], outer[ring_index][next_segment],
-				outer[ring_index + 1][next_segment], outer[ring_index + 1][segment],
-			]
-			var inner_corner: Array[Vector3] = [
-				inner[ring_index][segment], inner[ring_index][next_segment],
-				inner[ring_index + 1][next_segment], inner[ring_index + 1][segment],
-			]
-			# Keeping the shell means keeping what lies OUTSIDE the opening;
-			# building the piece an opening removed keeps the inside instead.
-			var inside_count := 0
-			for corner in 4:
-				if corner_depth[corner] >= 0.0:
-					inside_count += 1
-			if inside_count == 4 and not keep_cut:
+				outer[ring_index + 1][segment], outer[ring_index + 1][next_segment],
+			]:
+				if _aperture_reach(corner as Vector3, apertures) <= RIM_CLEARANCE:
+					drop = true
+			row.append(drop)
+		cleared.append(row)
+
+	for ring_index in rings:
+		for segment in segments:
+			if bool(cleared[ring_index][segment]):
 				continue
-			if inside_count == 0 and keep_cut:
-				continue
-			# A cell nowhere near an edge is emitted whole. A cell the edge
-			# runs through is subdivided first and each piece clipped, so the
-			# outline is sampled far more densely than the hull's own grid
-			# without making the whole hull finer. The chord from one crossing
-			# to the next is what reads as a flat, and that is a question of
-			# how often the edge is sampled, not of how exactly each sample
-			# sits on the curve.
-			var steps := 1 if inside_count == 0 or inside_count == 4 else maxi(edge_subdivision, 1)
-			for row in steps:
-				for column in steps:
-					var patch_weights: Array = [
-						_cell_weights(float(row) / float(steps), float(column) / float(steps)),
-						_cell_weights(float(row + 1) / float(steps), float(column) / float(steps)),
-						_cell_weights(float(row + 1) / float(steps), float(column + 1) / float(steps)),
-						_cell_weights(float(row) / float(steps), float(column + 1) / float(steps)),
-					]
-					var patch_outer: Array[Vector3] = []
-					var patch_inner: Array[Vector3] = []
-					var patch_depth: Array[float] = []
-					for weights in patch_weights:
-						var at := _blend_corners(outer_corner, weights as Array)
-						patch_outer.append(at)
-						patch_inner.append(_blend_corners(inner_corner, weights as Array))
-						# The field itself at this point, rather than the coarse
-						# cell's corners interpolated, so every sample lands on
-						# the curve instead of near it.
-						patch_depth.append(_aperture_depth(at, apertures))
-					var kept := _clip_cell(patch_depth, keep_cut)
-					if kept.size() < 3:
-						continue
-					var outer_loop: Array[Vector3] = []
-					var inner_loop: Array[Vector3] = []
-					for weights in kept:
-						outer_loop.append(_blend_corners(patch_outer, weights as Array))
-						inner_loop.append(_blend_corners(patch_inner, weights as Array))
-					for step in range(1, kept.size() - 1):
-						st.add_vertex(outer_loop[0])
-						st.add_vertex(outer_loop[step])
-						st.add_vertex(outer_loop[step + 1])
-						# The inner surface faces the cabin: winding reverses.
-						st.add_vertex(inner_loop[0])
-						st.add_vertex(inner_loop[step + 1])
-						st.add_vertex(inner_loop[step])
-					# The rim: every edge the clip produced, closed straight
-					# across the wall from the outer surface to the inner one.
-					# A flat cap, square to both.
-					for index in kept.size():
-						var here: Array = kept[index]
-						var after: Array = kept[(index + 1) % kept.size()]
-						if bool(here[4]) and bool(after[4]):
-							_add_rim(
-								st, outer_loop[index], outer_loop[(index + 1) % kept.size()],
-								inner_loop[index], inner_loop[(index + 1) % kept.size()]
-							)
+			var next_segment := (segment + 1) % segments
+			_add_quad(
+				st, outer[ring_index][segment], outer[ring_index + 1][segment],
+				outer[ring_index][next_segment], outer[ring_index + 1][next_segment]
+			)
+			# The inner surface faces the cabin, so its winding is reversed.
+			_add_quad(
+				st, inner[ring_index][segment], inner[ring_index][next_segment],
+				inner[ring_index + 1][segment], inner[ring_index + 1][next_segment]
+			)
+
+	# Each opening: its own exact ring, the flat cap across the wall, and a fan
+	# out to the grid the cells were cleared from.
+	for aperture in apertures:
+		_add_aperture_rim(
+			st, aperture, semi_axes, inner_axes, epsilon_top,
+			outer, inner, cleared, rings, segments
+		)
 	st.generate_normals()
 	return st.commit()
 
 
-## The piece one aperture removes from a shell, built from the same grid and
-## the same cut test as the hole itself, so it fits that hole exactly rather
-## than by matching numbers by hand. Fill a window with one of these in glass
-## and it sits flush in its own opening; every argument must match the call
-## that cut the shell.
+## An opening's outline as an ordered ring of surface points, evenly spaced
+## around it. `radius` of 1.0 is the opening's own edge; larger walks a curve
+## outside it, which is how the fan reaches the grid.
+static func aperture_ring(
+	aperture: Dictionary, axes: Vector3, epsilon: float, radius: float = 1.0
+) -> Array[Vector3]:
+	var ring: Array[Vector3] = []
+	var side: float = aperture.get("side", 1.0)
+	for index in RIM_SAMPLES:
+		var angle := TAU * float(index) / float(RIM_SAMPLES)
+		var flat := _aperture_edge_point(aperture, angle, radius)
+		var across: Variant = _surface_x(axes, flat, epsilon)
+		if across == null:
+			# Past the shell's own pole: hold the previous point so the ring
+			# stays closed rather than tearing.
+			ring.append(ring[ring.size() - 1] if not ring.is_empty() else Vector3.ZERO)
+			continue
+		ring.append(Vector3(side * (across as float), flat.x, flat.y))
+	return ring
+
+
+## A point on the opening's outline at `angle`, in the shell's own y/z plane.
+static func _aperture_edge_point(aperture: Dictionary, angle: float, radius: float) -> Vector2:
+	if aperture.has("sphere_center"):
+		var sphere_centre: Vector3 = aperture["sphere_center"]
+		var sphere_radius: float = float(aperture["sphere_radius"]) * radius
+		return Vector2(
+			sphere_centre.y + sphere_radius * cos(angle),
+			sphere_centre.z + sphere_radius * sin(angle)
+		)
+	var centre: Vector2 = aperture["center"]
+	var half: Vector2 = aperture["half"]
+	var exponent: float = aperture.get("exponent", EPSILON_SOFT)
+	var ca := cos(angle)
+	var sa := sin(angle)
+	return Vector2(
+		centre.x + radius * half.x * signf(ca) * pow(absf(ca), 2.0 / exponent),
+		centre.y + radius * half.y * signf(sa) * pow(absf(sa), 2.0 / exponent)
+	)
+
+
+## Where the shell's surface stands out from its axis at this y and z, or null
+## where that pair lies beyond the shell altogether. Solved from the
+## superellipsoid the surface is drawn from, so the ring sits exactly on it.
+static func _surface_x(axes: Vector3, flat: Vector2, epsilon: float) -> Variant:
+	var spent: float = (
+		pow(absf(flat.x) / maxf(axes.y, 0.0001), epsilon)
+		+ pow(absf(flat.y) / maxf(axes.z, 0.0001), epsilon)
+	)
+	if spent >= 1.0:
+		return null
+	return axes.x * pow(1.0 - spent, 1.0 / epsilon)
+
+
+## The disc an opening removes, in glass or whatever else fills it: the ring's
+## own fan, on both faces, plus the wall between them.
+static func _add_aperture_disc(
+	st: SurfaceTool, aperture: Dictionary, axes: Vector3, inner_axes: Vector3, epsilon: float
+) -> void:
+	var outer_ring := aperture_ring(aperture, axes, epsilon)
+	var inner_ring := aperture_ring(aperture, inner_axes, epsilon)
+	var outer_centre := Vector3.ZERO
+	var inner_centre := Vector3.ZERO
+	for index in RIM_SAMPLES:
+		outer_centre += outer_ring[index]
+		inner_centre += inner_ring[index]
+	outer_centre /= float(RIM_SAMPLES)
+	inner_centre /= float(RIM_SAMPLES)
+	for index in RIM_SAMPLES:
+		var after := (index + 1) % RIM_SAMPLES
+		st.add_vertex(outer_centre)
+		st.add_vertex(outer_ring[index])
+		st.add_vertex(outer_ring[after])
+		st.add_vertex(inner_centre)
+		st.add_vertex(inner_ring[after])
+		st.add_vertex(inner_ring[index])
+		_add_rim(st, outer_ring[index], outer_ring[after], inner_ring[index], inner_ring[after])
+
+
+## One opening's edge: the flat cap across the wall thickness, and the fan
+## from the ring out to the grid that was cleared for it.
+static func _add_aperture_rim(
+	st: SurfaceTool, aperture: Dictionary, axes: Vector3, inner_axes: Vector3, epsilon: float,
+	outer: Array, inner: Array, cleared: Array, rings: int, segments: int
+) -> void:
+	var outer_ring := aperture_ring(aperture, axes, epsilon)
+	var inner_ring := aperture_ring(aperture, inner_axes, epsilon)
+	# The cap: one flat quad per step of the ring, straight across the wall and
+	# square to both faces. Exactly RIM_SAMPLES facets, by construction.
+	for index in RIM_SAMPLES:
+		var after := (index + 1) % RIM_SAMPLES
+		_add_rim(st, outer_ring[after], outer_ring[index], inner_ring[after], inner_ring[index])
+	# The fan: from the ring out to a second ring standing just inside the
+	# cleared grid, then from that out to the cleared grid's own corners. Both
+	# rings are ordered the same way round, so this is a plain strip.
+	var outer_reach := aperture_ring(aperture, axes, epsilon, RIM_CLEARANCE)
+	var inner_reach := aperture_ring(aperture, inner_axes, epsilon, RIM_CLEARANCE)
+	for index in RIM_SAMPLES:
+		var after := (index + 1) % RIM_SAMPLES
+		_add_quad(st, outer_ring[index], outer_reach[index], outer_ring[after], outer_reach[after])
+		_add_quad(st, inner_reach[index], inner_ring[index], inner_reach[after], inner_ring[after])
+	# And from that second ring to the cells that were kept, closing the gap
+	# the clearance left. Each cleared cell's own corners that border a kept
+	# cell are tied back to the nearest step of the ring.
+	for ring_index in rings:
+		for segment in segments:
+			if not bool(cleared[ring_index][segment]):
+				continue
+			var next_segment := (segment + 1) % segments
+			var edges := [
+				[outer[ring_index][segment], outer[ring_index][next_segment],
+					inner[ring_index][segment], inner[ring_index][next_segment],
+					ring_index - 1, segment],
+				[outer[ring_index + 1][next_segment], outer[ring_index + 1][segment],
+					inner[ring_index + 1][next_segment], inner[ring_index + 1][segment],
+					ring_index + 1, segment],
+				[outer[ring_index + 1][segment], outer[ring_index][segment],
+					inner[ring_index + 1][segment], inner[ring_index][segment],
+					ring_index, (segment + segments - 1) % segments],
+				[outer[ring_index][next_segment], outer[ring_index + 1][next_segment],
+					inner[ring_index][next_segment], inner[ring_index + 1][next_segment],
+					ring_index, next_segment],
+			]
+			for entry in edges:
+				var neighbour_ring: int = entry[4]
+				if neighbour_ring < 0 or neighbour_ring >= rings:
+					continue
+				if bool(cleared[neighbour_ring][entry[5] as int]):
+					continue
+				# This grid edge faces the opening: tie it to the reach ring.
+				var from_point: Vector3 = entry[0]
+				var to_point: Vector3 = entry[1]
+				var near_from := _nearest_ring_step(outer_reach, from_point)
+				var near_to := _nearest_ring_step(outer_reach, to_point)
+				_add_quad(st, from_point, outer_reach[near_from], to_point, outer_reach[near_to])
+				_add_quad(
+					st, inner_reach[near_from], entry[2] as Vector3,
+					inner_reach[near_to], entry[3] as Vector3
+				)
+
+
+static func _nearest_ring_step(ring: Array[Vector3], point: Vector3) -> int:
+	var best := 0
+	var closest := INF
+	for index in ring.size():
+		var gap: float = ring[index].distance_squared_to(point)
+		if gap < closest:
+			closest = gap
+			best = index
+	return best
+
+
+## How far out an opening a point lies, in that opening's own units: 1.0 is
+## exactly on its edge, less is inside it.
+static func _aperture_reach(point: Vector3, apertures: Array[Dictionary]) -> float:
+	var nearest := INF
+	for aperture in apertures:
+		var side: float = aperture.get("side", 1.0)
+		if point.x * side <= 0.0:
+			continue
+		var reach := INF
+		if aperture.has("sphere_center"):
+			var sphere_centre: Vector3 = aperture["sphere_center"]
+			reach = point.distance_to(sphere_centre) / maxf(float(aperture["sphere_radius"]), 0.0001)
+		else:
+			var centre: Vector2 = aperture["center"]
+			var half: Vector2 = aperture["half"]
+			var exponent: float = aperture.get("exponent", EPSILON_SOFT)
+			var across := absf(point.y - centre.x) / maxf(half.x, 0.001)
+			var along := absf(point.z - centre.y) / maxf(half.y, 0.001)
+			reach = pow(pow(across, exponent) + pow(along, exponent), 1.0 / exponent)
+		nearest = minf(nearest, reach)
+	return nearest
+
+
 static func build_shell_patch_mesh(
 	semi_axes: Vector3, wall_thickness: float, aperture: Dictionary,
 	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT,

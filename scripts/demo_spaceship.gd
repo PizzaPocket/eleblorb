@@ -80,6 +80,10 @@ const CABIN_AIR_RADIUS := 9.6
 const CONSOLE_HALF_LENGTH := 2.4
 ## Where the consoles stand along each flank. Two spread down the near side
 ## and one on the far side, all of them under the long window above.
+## How many steps the floor's own outline is swept in. Its width follows the
+## hull at every one, so this is how finely that curve is drawn rather than how
+## many pieces the floor is made of: it is one mesh.
+const DECK_STATIONS := 96
 ## How far a console stands clear of the wall behind it.
 const CONSOLE_WALL_GAP := 1.6
 const CONSOLE_STATIONS_NEAR := [9.0, 26.0]
@@ -329,6 +333,16 @@ func _hull_axes() -> Vector3:
 
 ## How far out the floor reaches at `hull_z`: to the hull's own inner surface
 ## at deck height, so the two meet with nothing between them.
+## One quad of the floor, into both the drawn mesh and its collider.
+func _deck_quad(
+	tool: SurfaceTool, faces: PackedVector3Array,
+	a0: Vector3, a1: Vector3, b0: Vector3, b1: Vector3
+) -> void:
+	for corner in [a0, b0, a1, a1, b0, b1]:
+		tool.add_vertex(corner)
+		faces.append(corner)
+
+
 func _deck_half_width_at(hull_z: float) -> float:
 	var axes := _hull_axes() - Vector3.ONE * HULL_WALL
 	var rise: float = absf(DECK_Y) / maxf(axes.x, 0.0001)
@@ -359,10 +373,15 @@ func _hull_surface_x(hull_z: float) -> float:
 
 ## The deck: a solid floor plate running the cabin's length, and the surface
 ## everyone actually stands on. The hull around it is scenery; this is not.
-## The floor spans the hull, so it is built to the hull's own cross-section at
-## deck height rather than as one fixed-width slab. The shell tapers toward
-## both ends, so a slab wide enough amidships left a gap down each side
-## everywhere else.
+## The floor spans the hull, so it IS the hull's own cross-section at deck
+## height: one mesh whose edge is that curve, swept the cabin's length and
+## closed at both ends.
+##
+## Two earlier attempts are recorded because each looked like the answer to
+## the other. One fixed-width slab gapped down each side everywhere but
+## amidships, since the shell tapers toward both ends. Two dozen slabs of
+## stepped width replaced that gap with a staircase, which is the same fault
+## at a smaller scale. A curve is not a series of boxes.
 func _build_deck() -> void:
 	var body := StaticBody3D.new()
 	body.name = "Deck"
@@ -370,22 +389,44 @@ func _build_deck() -> void:
 	body.position = Vector3(0.0, DECK_Y - DECK_THICKNESS, 0.0)
 	add_child(body)
 	var reach := HULL_HALF_LENGTH - 3.0
-	var panels := 24
-	for index in panels:
-		var from := -reach + 2.0 * reach * float(index) / float(panels)
-		var to := -reach + 2.0 * reach * float(index + 1) / float(panels)
-		var middle := (from + to) * 0.5
-		var half_width := _deck_half_width_at(middle)
-		if half_width <= 0.2:
-			continue
-		var half := Vector3(half_width, DECK_THICKNESS, (to - from) * 0.5)
-		var plate := SuperEgg.build_part(
-			half, PANEL, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-		)
-		plate.name = "DeckPlate%d" % index
-		plate.position = Vector3(0.0, 0.0, middle)
-		body.add_child(plate)
-		CollisionPolicy.add_box(body, plate, half * 2.0)
+	var steps := DECK_STATIONS
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var faces := PackedVector3Array()
+	for index in steps:
+		var from := -reach + 2.0 * reach * float(index) / float(steps)
+		var to := -reach + 2.0 * reach * float(index + 1) / float(steps)
+		var from_half := _deck_half_width_at(from)
+		var to_half := _deck_half_width_at(to)
+		var top := DECK_THICKNESS
+		var under := -DECK_THICKNESS
+		# The top surface, the underside, and the curved edge joining them.
+		_deck_quad(tool, faces,
+			Vector3(-from_half, top, from), Vector3(from_half, top, from),
+			Vector3(-to_half, top, to), Vector3(to_half, top, to))
+		_deck_quad(tool, faces,
+			Vector3(from_half, under, from), Vector3(-from_half, under, from),
+			Vector3(to_half, under, to), Vector3(-to_half, under, to))
+		for side: float in [-1.0, 1.0]:
+			_deck_quad(tool, faces,
+				Vector3(side * from_half, under, from), Vector3(side * from_half, top, from),
+				Vector3(side * to_half, under, to), Vector3(side * to_half, top, to))
+	var plate := MeshInstance3D.new()
+	plate.name = "DeckPlate"
+	tool.generate_normals()
+	plate.mesh = tool.commit()
+	var panel := StandardMaterial3D.new()
+	panel.albedo_color = PANEL
+	panel.roughness = 0.6
+	plate.material_override = panel
+	body.add_child(plate)
+	var shape := ConcavePolygonShape3D.new()
+	shape.set_faces(faces)
+	shape.backface_collision = true
+	var collider := CollisionShape3D.new()
+	collider.name = "DeckCollider"
+	collider.shape = shape
+	body.add_child(collider)
 	# A brighter grating strip down the centreline, as in the reference cabin.
 	var grating := SuperEgg.build_part(
 		Vector3(2.6, 0.06, HULL_HALF_LENGTH - 5.0), HULL_SHADOW,
