@@ -75,6 +75,10 @@ const CABIN_CEILING_Y := 7.0
 ## Breathable volume, inset from the hull so the seal never reads as extending
 ## through the wall.
 const CABIN_AIR_RADIUS := 9.6
+## How far the air reaches past the cabin's own inner surface, so a body
+## pressed against the wall is still breathing. Comfortably less than the
+## wall's thickness, so the air never reaches outside the hull.
+const AIR_WALL_GRIP := 0.35
 ## How long a console bank runs along the flank, which is also the clearance
 ## it keeps from a window so it never stands in front of the glass.
 const CONSOLE_HALF_LENGTH := 2.4
@@ -109,20 +113,21 @@ func _ready() -> void:
 
 ## Inside the pressure hull: within the cabin's own radius of the hull axis,
 ## clear of both end walls, and above the deck.
-## The air fills the pressure hull, so it is the hull's own volume that
-## answers, not a box in the middle of it. A body is breathing whenever it is
-## inside the shell's inner surface and above the deck it stands on.
+## The air fills the cabin: the hull's INNER volume, not its outer skin.
+##
+## The boundary sits a little proud of the inner surface but still well inside
+## the wall, which is what makes both halves of this true at once. Testing the
+## inner surface exactly put a body standing against the wall outside its own
+## ship's air, and dropped it into zero gravity; testing the outer surface
+## instead reached out past the hull, so gravity came on while a body was still
+## in the doorway rather than through it. The wall itself is the margin.
 func contains_breathable_point(point: Vector3) -> bool:
 	var local := to_local(point)
-	# Against the hull's OUTER surface, not its inner one. The shell collides,
-	# so nothing can be inside the outer surface without being in the cabin,
-	# and testing the inner surface instead put a body standing against the
-	# wall or near either end outside its own ship's air.
-	#
 	# The hull is drawn with its long axis on Y and turned to lie along Z, so
 	# the test is written in that same frame.
+	var cabin := _hull_axes() - Vector3.ONE * (HULL_WALL - AIR_WALL_GRIP)
 	return SuperEgg.contains_point(
-		_hull_axes(), Vector3(local.x, local.z, -local.y),
+		cabin, Vector3(local.x, local.z, -local.y),
 		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
 

@@ -67,6 +67,10 @@ const VISOR_GLASS := Color(0.16, 0.27, 0.44, 0.62)
 ## A centimetre on the human's own helmet, and that same share of any other.
 const REFERENCE_HELM_RADIUS := 0.20
 const VISOR_INSET := 0.01
+## A Space helm has to clear whatever the head already carries, hair included,
+## measured from the helm's own centre rather than guessed from the head's
+## width. A radius taken from width alone left the back of a tall crown out.
+const HELM_ENCLOSE_MARGIN := 1.03
 ## Penguin Suit torso: even larger than the sealed Lava cuirass, running from
 ## the ankles up past broad shoulders to close under the head.
 const PENGUIN_TORSO_WIDTH_SCALE := 1.3
@@ -1617,7 +1621,19 @@ static func _build_space_helm(head_pivot: Node3D, contents: AABB, head_size: Vec
 	var root := Node3D.new()
 	root.name = "HeadBlorbSpaceHelm"
 	head_pivot.add_child(root)
-	var radius := maxf(maxf(contents.size.x, contents.size.z) * 0.62, head_size.x * 1.35)
+	var centre := Vector3(0.0, head_size.y, 0.0)
+	var enclosing := 0.0
+	for corner_index in 8:
+		var corner := contents.position + Vector3(
+			contents.size.x * float(corner_index & 1),
+			contents.size.y * float((corner_index >> 1) & 1),
+			contents.size.z * float((corner_index >> 2) & 1)
+		)
+		enclosing = maxf(enclosing, corner.distance_to(centre))
+	var radius := maxf(
+		maxf(maxf(contents.size.x, contents.size.z) * 0.62, head_size.x * 1.35),
+		enclosing * HELM_ENCLOSE_MARGIN
+	)
 	var axes := Vector3.ONE * radius
 	# The face is cut out of the helmet rather than laid on it: one superellipse
 	# aperture, extruded through the shell's own wall, the same way the ship's

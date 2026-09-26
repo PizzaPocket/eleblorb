@@ -349,22 +349,27 @@ static func build_hollow_shell_mesh(
 	# is room for the ring and the fan reaching it.
 	var cleared: Array = []
 	for ring_index in rings:
-		var row: Array[bool] = []
+		var row: Array[int] = []
 		for segment in segments:
 			var next_segment := (segment + 1) % segments
-			var drop := false
+			# Which opening cleared this cell, or -1 for one that stands. An
+			# opening only ever stitches back to the cells IT cleared: reaching
+			# for any cleared cell meant each opening tied itself to every
+			# other one's hole, right across the hull.
+			var owner := -1
 			for corner in [
 				outer[ring_index][segment], outer[ring_index][next_segment],
 				outer[ring_index + 1][segment], outer[ring_index + 1][next_segment],
 			]:
-				if _aperture_reach(corner as Vector3, apertures) <= RIM_CLEARANCE:
-					drop = true
-			row.append(drop)
+				var nearest := _nearest_aperture_index(corner as Vector3, apertures)
+				if nearest >= 0:
+					owner = nearest
+			row.append(owner)
 		cleared.append(row)
 
 	for ring_index in rings:
 		for segment in segments:
-			if bool(cleared[ring_index][segment]):
+			if int(cleared[ring_index][segment]) >= 0:
 				continue
 			var next_segment := (segment + 1) % segments
 			_add_quad(
@@ -379,9 +384,9 @@ static func build_hollow_shell_mesh(
 
 	# Each opening: its own exact ring, the flat cap across the wall, and a fan
 	# out to the grid the cells were cleared from.
-	for aperture in apertures:
+	for index in apertures.size():
 		_add_aperture_rim(
-			st, aperture, semi_axes, inner_axes, epsilon_top,
+			st, apertures[index], index, semi_axes, inner_axes, epsilon_top,
 			outer, inner, cleared, rings, segments
 		)
 	st.generate_normals()
@@ -442,35 +447,56 @@ static func _surface_x(axes: Vector3, flat: Vector2, epsilon: float) -> Variant:
 	return axes.x * pow(1.0 - spent, 1.0 / epsilon)
 
 
-## The disc an opening removes, in glass or whatever else fills it: the ring's
-## own fan, on both faces, plus the wall between them.
+## The disc an opening removes, in glass or whatever else fills it: the same
+## curve, on the same surface. Built as concentric rings shrinking in toward
+## the opening's own centre, every point solved back onto the shell, so the
+## piece bulges exactly as the shell did. Fanning the ring to its averaged
+## centre instead put that centre inside the shell, and the pane read as a
+## dish hollowed into the face rather than a cover over it.
+const DISC_RINGS := 5
+
+
 static func _add_aperture_disc(
 	st: SurfaceTool, aperture: Dictionary, axes: Vector3, inner_axes: Vector3, epsilon: float
 ) -> void:
-	var outer_ring := aperture_ring(aperture, axes, epsilon)
-	var inner_ring := aperture_ring(aperture, inner_axes, epsilon)
-	var outer_centre := Vector3.ZERO
-	var inner_centre := Vector3.ZERO
-	for index in RIM_SAMPLES:
-		outer_centre += outer_ring[index]
-		inner_centre += inner_ring[index]
-	outer_centre /= float(RIM_SAMPLES)
-	inner_centre /= float(RIM_SAMPLES)
+	var outer_rings: Array = []
+	var inner_rings: Array = []
+	for step in DISC_RINGS + 1:
+		var radius := float(step) / float(DISC_RINGS)
+		outer_rings.append(aperture_ring(aperture, axes, epsilon, radius))
+		inner_rings.append(aperture_ring(aperture, inner_axes, epsilon, radius))
+	# The innermost "ring" is one point repeated, so that band is a fan.
+	var outer_centre: Vector3 = (outer_rings[0] as Array[Vector3])[0]
+	var inner_centre: Vector3 = (inner_rings[0] as Array[Vector3])[0]
 	for index in RIM_SAMPLES:
 		var after := (index + 1) % RIM_SAMPLES
 		st.add_vertex(outer_centre)
-		st.add_vertex(outer_ring[index])
-		st.add_vertex(outer_ring[after])
+		st.add_vertex((outer_rings[1] as Array[Vector3])[index])
+		st.add_vertex((outer_rings[1] as Array[Vector3])[after])
 		st.add_vertex(inner_centre)
-		st.add_vertex(inner_ring[after])
-		st.add_vertex(inner_ring[index])
-		_add_rim(st, outer_ring[index], outer_ring[after], inner_ring[index], inner_ring[after])
+		st.add_vertex((inner_rings[1] as Array[Vector3])[after])
+		st.add_vertex((inner_rings[1] as Array[Vector3])[index])
+	for step in range(1, DISC_RINGS):
+		var here_out: Array[Vector3] = outer_rings[step]
+		var next_out: Array[Vector3] = outer_rings[step + 1]
+		var here_in: Array[Vector3] = inner_rings[step]
+		var next_in: Array[Vector3] = inner_rings[step + 1]
+		for index in RIM_SAMPLES:
+			var after := (index + 1) % RIM_SAMPLES
+			_add_quad(st, here_out[index], next_out[index], here_out[after], next_out[after])
+			_add_quad(st, next_in[index], here_in[index], next_in[after], here_in[after])
+	var edge_out: Array[Vector3] = outer_rings[DISC_RINGS]
+	var edge_in: Array[Vector3] = inner_rings[DISC_RINGS]
+	for index in RIM_SAMPLES:
+		var after := (index + 1) % RIM_SAMPLES
+		_add_rim(st, edge_out[index], edge_out[after], edge_in[index], edge_in[after])
 
 
 ## One opening's edge: the flat cap across the wall thickness, and the fan
 ## from the ring out to the grid that was cleared for it.
 static func _add_aperture_rim(
-	st: SurfaceTool, aperture: Dictionary, axes: Vector3, inner_axes: Vector3, epsilon: float,
+	st: SurfaceTool, aperture: Dictionary, own_index: int,
+	axes: Vector3, inner_axes: Vector3, epsilon: float,
 	outer: Array, inner: Array, cleared: Array, rings: int, segments: int
 ) -> void:
 	var outer_ring := aperture_ring(aperture, axes, epsilon)
@@ -494,7 +520,7 @@ static func _add_aperture_rim(
 	# cell are tied back to the nearest step of the ring.
 	for ring_index in rings:
 		for segment in segments:
-			if not bool(cleared[ring_index][segment]):
+			if int(cleared[ring_index][segment]) != own_index:
 				continue
 			var next_segment := (segment + 1) % segments
 			var edges := [
@@ -515,7 +541,7 @@ static func _add_aperture_rim(
 				var neighbour_ring: int = entry[4]
 				if neighbour_ring < 0 or neighbour_ring >= rings:
 					continue
-				if bool(cleared[neighbour_ring][entry[5] as int]):
+				if int(cleared[neighbour_ring][entry[5] as int]) >= 0:
 					continue
 				# This grid edge faces the opening: tie it to the reach ring.
 				var from_point: Vector3 = entry[0]
@@ -536,6 +562,20 @@ static func _nearest_ring_step(ring: Array[Vector3], point: Vector3) -> int:
 		var gap: float = ring[index].distance_squared_to(point)
 		if gap < closest:
 			closest = gap
+			best = index
+	return best
+
+
+## Which opening has cleared this point, or -1 for none: the nearest one whose
+## own clearance reaches it.
+static func _nearest_aperture_index(point: Vector3, apertures: Array[Dictionary]) -> int:
+	var best := -1
+	var closest := INF
+	for index in apertures.size():
+		var one: Array[Dictionary] = [apertures[index]]
+		var reach := _aperture_reach(point, one)
+		if reach <= RIM_CLEARANCE and reach < closest:
+			closest = reach
 			best = index
 	return best
 
