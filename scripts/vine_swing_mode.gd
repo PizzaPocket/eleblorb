@@ -365,10 +365,10 @@ func _spent_toward(ctx: TraversalContext, wanted: Vector3) -> bool:
 ## to lie AHEAD of him: catching something level or behind would stop the run
 ## rather than continue it.
 func _catch_next(ctx: TraversalContext, wanted: Vector3) -> bool:
-	var found: Variant = find_anchor(ctx, wanted, true, anchor_rid)
+	var found := find_anchor(ctx, wanted, true, anchor_rid)
 	if found == null:
 		return false
-	var next := found as Vector3
+	var next := found.point
 	var ahead := Vector3(
 		next.x - ctx.body.global_position.x, 0.0, next.z - ctx.body.global_position.z
 	).dot(wanted)
@@ -406,20 +406,6 @@ func heading(ctx: TraversalContext) -> Vector3:
 	if travel.length_squared() > 0.25:
 		return travel.normalized()
 	return Vector3.ZERO
-
-
-## Where the next throw looks. The stick comes first: a player holding a
-## direction at the apex is saying which way to carry on, and the ray fan scores
-## its forward rays highest, so that direction is what the throw biases toward.
-## Failing a stick, the travel, which is where the arc is already going.
-func _swing_aim(ctx: TraversalContext, aim: Vector3) -> Vector3:
-	if ctx.direction.length_squared() > 0.0001:
-		return _horizontal(ctx.direction, ctx)
-	var travel := ctx.body.velocity
-	travel.y = 0.0
-	if travel.length_squared() > 1.0:
-		return travel.normalized()
-	return _horizontal(aim, ctx)
 
 
 func _horizontal(aim: Vector3, ctx: TraversalContext) -> Vector3:
