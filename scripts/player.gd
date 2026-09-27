@@ -4771,7 +4771,16 @@ func _update_vine_swing(delta: float, jump_pressed: bool) -> bool:
 	ctx.left_arm_busy = _throw_aim_active
 	ctx.right_arm_busy = _throw_aim_active or _held_item_is_weapon()
 	var aim: Vector3 = -camera.global_transform.basis.z
+	var was_swinging := _vine_swing.swinging
 	if not _vine_swing.swing(ctx, aim, jump_pressed and not UIState.modal_open):
+		if was_swinging and _vine_swing.exit_velocity != Vector3.ZERO:
+			# Letting go hands the arc's momentum to the body, the same way
+			# leaving the crystal track does, so the swing launches him instead of
+			# dropping him and the next throw can build on it.
+			velocity = _vine_swing.exit_velocity
+			_vine_swing.exit_velocity = Vector3.ZERO
+			_jump_takeoff_speed = absf(velocity.y)
+			_jumping = true
 		return false
 	_animate_walk(delta, false)
 	_pose_body_vine_swing(delta)

@@ -1336,7 +1336,14 @@ func _update_direct_vine_swing(direction: Vector3, delta: float, jump_pressed: b
 	var ctx := _traversal_context(delta)
 	ctx.direction = direction
 	ctx.grounded = is_on_floor()
+	var was_swinging := _vine_swing.swinging
 	if not _vine_swing.swing(ctx, direction, jump_pressed and not UIState.modal_open):
+		if was_swinging and _vine_swing.exit_velocity != Vector3.ZERO:
+			# The arc's momentum carries on past the release, as it does for the
+			# human (see Player._update_vine_swing()).
+			velocity = _vine_swing.exit_velocity
+			_vine_swing.exit_velocity = Vector3.ZERO
+			_direct_vertical_velocity = velocity.y
 		return false
 	_direct_vertical_velocity = velocity.y
 	# Facing comes from the shared power, which prefers the stick over the travel,
