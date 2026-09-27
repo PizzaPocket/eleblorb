@@ -58,21 +58,30 @@ const RELATCH_DELAY := 0.28
 ## true through the whole descending half of an arc, so the hands alternated like
 ## a metronome. Waiting for the climb to actually stop threw from a body that had
 ## already stalled, and in practice hardly threw at all.
-## A chain is three beats, not two: swing, LET GO and arc forward freely, then
-## throw for the next support and catch it. The middle beat was missing. The rope
-## used to jump straight from one anchor to the next while still attached, so the
-## swinger was never once in free flight and nothing about it read as letting go
-## and reaching for the next tree.
+## When this vine stops being able to carry him the way he is asking to go, the
+## free hand throws for the next one. That is the whole rule, and it is a fact
+## about the rope rather than a moment to be guessed at: a rope holds him on a
+## sphere around its anchor, so once he is out past that anchor in the direction
+## he wants AND has stopped gaining ground that way, this vine has given
+## everything it has. He is at the far end of his arc, reaching, which is exactly
+## where a hand goes out for the next tree.
 ##
-## The release is timed for carry rather than for a threshold: he lets go while
-## RISING and moving the way he asked to go, which is the part of an arc that
-## converts swing into forward launch. Below this climb angle there is not enough
-## up in the trajectory to be worth leaving on.
-const RELEASE_MIN_CLIMB := deg_to_rad(16.0)
-## The least time spent in the air after letting go, so the free arc is visible
-## rather than an instant swap of ropes.
-const MIN_AIR := 0.22
-## How far ahead of him the next support has to stand to be worth catching.
+## Two earlier rules failed by testing the wrong thing. One watched vertical speed
+## for an apex, which is true through half of every arc. The other watched for
+## rising-and-moving-forward, which the cast's own lift satisfies on the FIRST
+## frame (it launches him at 64 degrees), so he threw a vine and let go of it
+## immediately.
+## Waiting for that progress to reach ZERO is waiting too long: that is the
+## instant before the rope hauls him back the other way, so a throw that finds
+## nothing there leaves him being dragged off the way he asked to go. He throws
+## while the arc is still carrying him, once its forward speed has fallen to this
+## fraction of the fastest it reached on this grip. Past the anchor, still moving,
+## and before the swing back.
+const HANDOFF_CARRY_FRACTION := 0.55
+## Below this a swing is not really carrying him anywhere, so the fraction above
+## would fire on noise.
+const FORWARD_SPENT_SPEED := 1.6
+## How far ahead of him the next support has to stand to be worth taking.
 const CATCH_MIN_AHEAD := 6.0
 ## How fast a thrown vine reaches its anchor, and a spent one returns.
 const CAST_SPEED := 46.0
@@ -196,9 +205,9 @@ var _hand_rest_position: Dictionary = {}
 ## where an aimed basis leaves its residue).
 var _borrowed: Dictionary = {}
 var _releasing := false
-## Let go on purpose mid-chain, arcing forward with the next throw still to come.
-var seeking := false
-var air_timer := 0.0
+## The fastest this grip has carried him toward what the stick is asking for,
+## which HANDOFF_CARRY_FRACTION is a fraction of.
+var _peak_carry := 0.0
 var _vine: MeshInstance3D
 var _cast_fraction := 0.0
 var _retiring: Array[Dictionary] = []
@@ -225,29 +234,17 @@ func swing(ctx: TraversalContext, aim: Vector3, jump_pressed: bool) -> bool:
 		_hand_back(ctx)
 		return false
 	relatch_timer = maxf(relatch_timer - ctx.delta, 0.0)
-	air_timer = maxf(air_timer - ctx.delta, 0.0)
 	if swinging:
 		if jump_pressed:
-			# Jump is a deliberate exit, so it ends the chain rather than
-			# continuing it: no throw follows until he asks for one.
+			# Jump is a deliberate exit: it ends the chain rather than continuing
+			# it, and no throw follows until he asks for one.
 			_open_hand()
-			seeking = false
 			relatch_timer = RELATCH_DELAY
 			return false
 		_hang(ctx, aim)
 		return true
 	_hand_back(ctx)
-	# The middle beat: let go, arcing forward, reaching for the next support. The
-	# arc itself is the driver's ordinary airborne movement, which already keeps
-	# every bit of the momentum, so this only watches for something to catch.
-	if seeking:
-		if ctx.grounded:
-			seeking = false
-		elif air_timer <= 0.0 and ctx.direction.length_squared() > 0.0001:
-			if _catch_next(ctx, ctx.direction.normalized()):
-				_hang(ctx, aim)
-				return true
-	if not seeking and jump_pressed and relatch_timer <= 0.0 and _throw(ctx, aim, true):
+	if jump_pressed and relatch_timer <= 0.0 and _throw(ctx, aim, true):
 		_hang(ctx, aim)
 		return true
 	return false
@@ -258,7 +255,6 @@ func swing(ctx: TraversalContext, aim: Vector3, jump_pressed: bool) -> bool:
 ## left a line trailing back to a tree the swinger had already left.
 func _open_hand() -> void:
 	swinging = false
-	seeking = false
 	_eased.clear()
 	if is_instance_valid(_vine):
 		_vine.queue_free()
@@ -289,6 +285,7 @@ func _throw(ctx: TraversalContext, aim: Vector3, with_pickup: bool) -> bool:
 		ctx.body.global_position.distance_to(anchor), MIN_ROPE, MAX_ROPE
 	)
 	grip_timer = MIN_GRIP
+	_peak_carry = 0.0
 	if with_pickup:
 		left_hand = true
 		var forward := _horizontal(aim, ctx)
@@ -383,42 +380,34 @@ func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 	# rhythm belongs to the player rather than to a timer.
 	var steered := ctx.direction.length_squared() > 0.0001
 	var wanted := ctx.direction.normalized() if steered else Vector3.ZERO
-	if steered and grip_timer <= 0.0 and _carrying_forward(body.velocity, wanted):
-		_let_go_forward()
-	else:
-		_draw_vine(ctx)
+	# The arc is followed all the way through, and only at its far end, where this
+	# vine can carry him no further the way he is asking to go, does the free hand
+	# reach for the next one. Failing to find one costs nothing: the vine he has
+	# is still load-bearing and the swing carries on.
+	if steered and grip_timer <= 0.0 and _spent_toward(ctx, wanted):
+		_catch_next(ctx, wanted)
+	_draw_vine(ctx)
 
 
-## Whether the arc is now carrying him the way he asked to go, rising: the moment
-## worth leaving on, because the swing's speed becomes forward distance rather
-## than being spent climbing back up the far side.
-func _carrying_forward(velocity: Vector3, wanted: Vector3) -> bool:
-	if velocity.y <= 0.0:
+## Whether this vine has given all it can toward `wanted`: he is out past its
+## anchor that way and no longer gaining ground. Being past the anchor is what
+## keeps the launch from counting, since a throw begins with him behind or beneath
+## it, swinging toward it rather than away.
+func _spent_toward(ctx: TraversalContext, wanted: Vector3) -> bool:
+	var carrying := Vector3(
+		ctx.body.velocity.x, 0.0, ctx.body.velocity.z
+	).dot(wanted)
+	_peak_carry = maxf(_peak_carry, carrying)
+	var out_from_anchor := ctx.body.global_position - anchor
+	out_from_anchor.y = 0.0
+	if out_from_anchor.dot(wanted) <= 0.0:
 		return false
-	var along := Vector3(velocity.x, 0.0, velocity.z).dot(wanted)
-	if along <= 0.0:
+	if _peak_carry <= FORWARD_SPENT_SPEED:
 		return false
-	return atan2(velocity.y, along) >= RELEASE_MIN_CLIMB
+	return carrying <= _peak_carry * HANDOFF_CARRY_FRACTION
 
 
-## Lets go mid-chain and hands the frame back, keeping every bit of the arc's
-## momentum. The vine goes at once and the other hand comes forward, ready to
-## throw for whatever the search turns up next.
-func _let_go_forward() -> void:
-	swinging = false
-	seeking = true
-	air_timer = MIN_AIR
-	left_hand = not left_hand
-	if is_instance_valid(_vine):
-		_retiring.append({
-			"mesh": _vine, "anchor": anchor,
-			"left_hand": not left_hand, "fraction": _cast_fraction,
-		})
-	_vine = null
-	_cast_fraction = 0.0
-
-
-## Mid-arc, looking for the next support in the direction being asked for. It has
+## The next support in the direction being asked for, taken hand over hand. It has
 ## to lie AHEAD of him: catching something level or behind would stop the run
 ## rather than continue it.
 func _catch_next(ctx: TraversalContext, wanted: Vector3) -> bool:
@@ -431,14 +420,19 @@ func _catch_next(ctx: TraversalContext, wanted: Vector3) -> bool:
 	).dot(wanted)
 	if ahead < CATCH_MIN_AHEAD:
 		return false
+	var held := anchor
+	var hand_was := left_hand
 	anchor = next
 	anchor_rid = found_rid
 	rope_length = clampf(
 		ctx.body.global_position.distance_to(anchor), MIN_ROPE, MAX_ROPE
 	)
-	swinging = true
-	seeking = false
+	left_hand = not left_hand
+	# The spent vine retracts to the hand that threw it while the other hand's
+	# own throw is already on its way out.
+	_retire_vine_from(held, hand_was)
 	grip_timer = MIN_GRIP
+	_peak_carry = 0.0
 	_cast_fraction = 0.0
 	return true
 
