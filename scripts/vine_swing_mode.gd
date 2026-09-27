@@ -416,8 +416,15 @@ func _pose_arm(ctx: TraversalContext) -> void:
 		# Straight: the arm hangs from the vine rather than pulling on it.
 		_borrow(elbow)
 		_ease_rotation(elbow, Vector3.ZERO, SHOULDER_RATE, ctx.delta)
+	# The hand SEGMENT, not one of its attachment markers: a marker is a point on
+	# the hand, so rotating it moves nothing. An ALIASED hand is accepted rather
+	# than refused, because on Xiao Hou Zi's rig one node genuinely serves both
+	# "hand" and "wrist" and rotating it does bend his hand; only a missing one
+	# is a reason to stop.
 	var hand := rig.joint("hand_left" if left_hand else "hand_right")
-	if hand == null or not rig.has_real("hand_left" if left_hand else "hand_right"):
+	if hand == null:
+		hand = rig.joint("wrist_left" if left_hand else "wrist_right")
+	if hand == null:
 		return
 	# The arm-power raise's own wrist bend, in the forearm's own frame so it is
 	# the same bend whatever angle the arm is carried to, rolled half a turn

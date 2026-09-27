@@ -375,7 +375,11 @@ func _process(delta: float) -> void:
 ## _blorb_suit_pivot_map() so the suit is handed exactly what it expects.
 func _rig_joint_map() -> Dictionary:
 	var map := _blorb_suit_pivot_map()
-	for name in ["thorax", "neck", "hips"]:
+	# See Player._rig_joint_map() on why the hand segment belongs here. On this
+	# rig it is the same node as "wrist_left" (MonkeyFigure publishes both names
+	# for one joint), so it comes back ALIASED rather than REAL -- which is the
+	# truth about this rig, and rotating it does bend his hand.
+	for name in ["thorax", "neck", "hips", "hand_left", "hand_right"]:
 		var node: Node3D = _pivots.get(name) as Node3D
 		if node != null:
 			map[name] = node

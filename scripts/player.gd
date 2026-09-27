@@ -6455,7 +6455,13 @@ func _pose_body_crystal(base_y: float) -> void:
 ## RigAdapter, which reports that rather than hiding it).
 func _rig_joint_map(pivots: Dictionary) -> Dictionary:
 	var map := _blorb_suit_pivot_map(pivots)
-	for name in ["thorax", "neck", "hips", "abdomen", "chest"]:
+	# "hand_left"/"hand_right" are the hand SEGMENT, which is what a wrist pose
+	# actually has to rotate. They were missing here, so a power asking the rig
+	# for the hand got null and silently posed no wrist at all: the vine swing's
+	# wrist bend never appeared for exactly this reason. The two attachment
+	# markers already published ("wrist_left", "fingertip_left") are points on
+	# that segment, useful for reading a position and useless for rotating it.
+	for name in ["thorax", "neck", "hips", "abdomen", "chest", "hand_left", "hand_right"]:
 		var node: Node3D = pivots.get(name) as Node3D
 		if node != null:
 			map[name] = node
