@@ -29,9 +29,12 @@ const MIN_ANCHOR_RISE := 5.0
 const MIN_ROPE := 7.0
 const MAX_ROPE := 52.0
 ## Steering authority while hanging, then the pickup a first throw grants so
-## the swing visibly lifts into its first descending arc.
+## the swing visibly lifts into its first descending arc. The lift is stated as
+## a multiple of this character's OWN jump height rather than as a speed, both
+## so it scales to any rig and so it can be read as what it is: a throw that
+## catches launches the swinger well clear of the ground, onto a high first arc.
 const STEER_ACCELERATION := 5.5
-const CAST_LIFT := 7.0
+const CAST_JUMP_HEIGHT := 2.5
 const CAST_FORWARD := 8.5
 ## The shortest a grip can last, so one apex cannot fire two throws, and how
 ## long an opened hand stays open before it can catch again.
@@ -67,11 +70,39 @@ const VINE_BOTTOM_RADIUS := 0.022
 ## given. Driving the same axis the working raise drives is both simpler and
 ## the thing actually asked for.
 const SHOULDER_STRAIGHT_UP := PI
-const SHOULDER_BLEND := 14.0
-## The wrist keeps the arm-power raise's own orientation, which pitches the
-## fingers back to point at the sky, and then the whole forearm rolls half a
-## turn. Fingers that pointed up point at the toes. Half a turn is its own
-## mirror, so there is no inward/outward sign to get wrong here.
+## How long the swing's pose takes to take over from whatever the body was
+## doing. It then OWNS these joints: the weight reaches exactly 1.0 and each
+## target is written absolutely.
+##
+## It has to. The driver runs its ordinary animation every frame and this pose
+## after it, so a pose that only eased partway toward its target was pulled back
+## by that animation the next frame and the two settled at a permanent halfway
+## compromise: the shoulder never passed about 45 degrees however high the rope
+## ran, and the wrist read as having no bend at all. player.gd's own arm-power
+## pose records the identical failure against the fire-jet pose, and solves it
+## the same way, with an absolute target and a ramped weight.
+const POSE_TAKEOVER := 0.14
+## The wrist's bend is the arm-power raise's own, held RELATIVE TO THE FOREARM
+## rather than to the world, so it is the same bend at every arm angle. Holding
+## it relative to the world instead made the bend shrink as the arm rose, until
+## an arm straight overhead had no bend left.
+##
+## This is that pose's hand orientation in the forearm's own frame, worked out
+## from the two things it is built from. The arm-power raise commands the
+## shoulder -90 degrees about X, which turns the arm's own -Y from straight down
+## to straight forward, so the forearm's frame there has columns X=(1,0,0),
+## Y=(0,0,-1), Z=(0,1,0). The hand's wanted world orientation there is
+## Basis(-body.x, -body.y, body.z) (palm to the front, fingertips at the sky,
+## per _pose_extended_arm). Transposing the first into the second leaves:
+const ARM_POWER_HAND := Basis(
+	Vector3(-1.0, 0.0, 0.0), Vector3(0.0, 0.0, -1.0), Vector3(0.0, -1.0, 0.0)
+)
+## Then the whole forearm rolls half a turn about its own length, which in that
+## same frame is -Y. Half a turn is its own mirror, so there is no inward or
+## outward sign to get wrong. The fingertips, perpendicular to the forearm
+## either way, swap to the far side: pointing at the sky with the arm forward
+## becomes pointing at the toes.
+const FOREARM_AXIS := Vector3(0.0, -1.0, 0.0)
 const FOREARM_ROLL := PI
 ## The opposite leg to the holding hand leads the swing, the same leg the arm
 ## would answer in a stride. Hip FORWARD is negative rotation.x and the knee's
@@ -83,7 +114,6 @@ const SWING_HIP_TRAIL := deg_to_rad(16.0)
 ## The knees keep the airborne pose's own fold (JUMP_KNEE_BEND is 130 degrees);
 ## only the hips are the swing's own.
 const SWING_KNEE_BEND := deg_to_rad(130.0)
-const LEG_BLEND := 9.0
 ## How quickly the joints this mode wrote hand themselves back afterwards.
 const RELEASE_BLEND := 11.0
 
@@ -97,6 +127,8 @@ var relatch_timer := 0.0
 ## Whether this grip has climbed yet, which is what makes the next stop
 ## climbing an apex rather than just a slow moment.
 var _climbed := false
+## How far this pose has taken the joints over, 0 to 1. See POSE_TAKEOVER.
+var _pose_weight := 0.0
 ## Every joint this mode wrote, with the rotation it found there, so leaving the
 ## swing puts back what the ordinary animation does not itself rewrite (it
 ## drives rotation.x each frame and leaves y and z alone, which is exactly
@@ -177,11 +209,16 @@ func _throw(ctx: TraversalContext, aim: Vector3, with_pickup: bool) -> bool:
 	)
 	grip_timer = MIN_GRIP
 	_climbed = false
+	if not swinging:
+		_pose_weight = 0.0
 	if with_pickup:
 		left_hand = true
 		var forward := _horizontal(aim, ctx)
 		ctx.body.velocity += forward * CAST_FORWARD
-		ctx.body.velocity.y = maxf(ctx.body.velocity.y, CAST_LIFT)
+		ctx.body.velocity.y = maxf(
+			ctx.body.velocity.y,
+			HumanoidLocomotion.jump_speed(ctx.profile, CAST_JUMP_HEIGHT)
+		)
 	swinging = true
 	_cast_fraction = 0.0
 	return true
@@ -249,7 +286,13 @@ func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 	if body.velocity.y > APEX_RISE_MIN:
 		_climbed = true
 	var at_apex := _climbed and body.velocity.y <= 0.0
-	if at_apex and grip_timer <= 0.0:
+	# The stick is what asks for the next vine. Holding a direction at the top of
+	# an arc throws the free hand that way and carries the traversal on; holding
+	# nothing keeps the grip and lets the swing simply swing. That puts the
+	# rhythm in the player's hands rather than on a timer, and it is what makes a
+	# line of trees crossable at speed.
+	var steered := ctx.direction.length_squared() > 0.0001
+	if at_apex and steered and grip_timer <= 0.0:
 		var held := anchor
 		var hand_was := left_hand
 		if _throw(ctx, _swing_aim(ctx, aim), false) and anchor.distance_to(held) > 2.0:
@@ -261,10 +304,13 @@ func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 	_draw_vine(ctx)
 
 
-## Where the next throw looks: along the travel, which during a swing is the
-## direction the arc is actually carrying the body, falling back to the
-## thrower's own aim when barely moving.
+## Where the next throw looks. The stick comes first: a player holding a
+## direction at the apex is saying which way to carry on, and the ray fan scores
+## its forward rays highest, so that direction is what the throw biases toward.
+## Failing a stick, the travel, which is where the arc is already going.
 func _swing_aim(ctx: TraversalContext, aim: Vector3) -> Vector3:
+	if ctx.direction.length_squared() > 0.0001:
+		return _horizontal(ctx.direction, ctx)
 	var travel := ctx.body.velocity
 	travel.y = 0.0
 	if travel.length_squared() > 1.0:
@@ -294,6 +340,7 @@ func pose(ctx: TraversalContext) -> void:
 	var rig := ctx.rig
 	if rig == null or not swinging or ctx.visuals == null:
 		return
+	_pose_weight = minf(_pose_weight + ctx.delta / POSE_TAKEOVER, 1.0)
 	var busy := ctx.left_arm_busy if left_hand else ctx.right_arm_busy
 	if not busy:
 		_pose_arm(ctx)
@@ -308,7 +355,7 @@ func _pose_arm(ctx: TraversalContext) -> void:
 	var shoulder := rig.joint("%s_shoulder" % prefix)
 	if shoulder == null:
 		return
-	var t := minf(SHOULDER_BLEND * ctx.delta, 1.0)
+	var t := _pose_weight
 	# Left is +1 and right is -1 for the outward tilt, matching the airborne
 	# pose's own two literals rather than being derived again.
 	var side := 1.0 if left_hand else -1.0
@@ -331,20 +378,12 @@ func _pose_arm(ctx: TraversalContext) -> void:
 	var hand := rig.joint("hand_left" if left_hand else "hand_right")
 	if hand == null or not rig.has_real("hand_left" if left_hand else "hand_right"):
 		return
-	var parent := hand.get_parent() as Node3D
-	if parent == null:
-		return
-	# The arm-power raise's own hand orientation, verbatim: palm toward the
-	# hero's front, fingertips vertically skyward (see _pose_extended_arm in
-	# player.gd, whose palm/fingertip axes were confirmed by observation).
-	var body_basis := ctx.visuals.global_transform.basis.orthonormalized()
-	var raised := Basis(-body_basis.x, -body_basis.y, body_basis.z)
-	# Then roll the forearm half a turn about its own length, which is the
-	# parent's local -Y in world. Fingers that pointed at the sky now point at
-	# the ground.
-	var along_forearm: Vector3 = -parent.global_transform.basis.orthonormalized().y
+	# The arm-power raise's own wrist bend, in the forearm's own frame so it is
+	# the same bend whatever angle the arm is carried to, rolled half a turn
+	# about the forearm's length. See ARM_POWER_HAND.
 	_borrow(hand)
-	_slerp_into_parent(hand, raised.rotated(along_forearm, FOREARM_ROLL), t)
+	var wanted := Basis(FOREARM_AXIS, FOREARM_ROLL) * ARM_POWER_HAND
+	hand.quaternion = hand.quaternion.slerp(wanted.get_rotation_quaternion(), t)
 
 
 ## How far the shoulder has to carry the arm for it to lie along the rope, in
@@ -362,25 +401,12 @@ func _rope_raise(ctx: TraversalContext, from: Vector3) -> float:
 	return clampf(acos(-elevation), 0.0, SHOULDER_STRAIGHT_UP)
 
 
-## Eases a joint toward a world-space orientation, expressed in its parent's
-## frame so the joint's own local rotation is what actually changes.
-func _slerp_into_parent(joint: Node3D, wanted_world: Basis, t: float) -> void:
-	var parent := joint.get_parent() as Node3D
-	if parent == null:
-		return
-	var wanted_local := (
-		parent.global_transform.basis.orthonormalized().inverse()
-		* wanted_world.orthonormalized()
-	).orthonormalized()
-	joint.quaternion = joint.quaternion.slerp(wanted_local.get_rotation_quaternion(), t)
-
-
 ## The leg opposite the holding hand leads, the other trails, and the knees keep
 ## the airborne pose's own fold. Hip forward is negative rotation.x, the knee's
 ## bend positive: see SWING_HIP_LEAD.
 func _pose_legs(ctx: TraversalContext) -> void:
 	var rig := ctx.rig
-	var t := minf(LEG_BLEND * ctx.delta, 1.0)
+	var t := _pose_weight
 	var lead_is_left := not left_hand
 	for side in 2:
 		var prefix := "leg_left" if side == 0 else "leg_right"
