@@ -242,11 +242,22 @@ var _background_decor_builders := [
 ## variety instead of every banyan/baobab/flowering tree being identically
 ## huge.
 var _jungle_tree_builders := [
-	func(): return NatureProps.build_palm_tree(15.0, _rng.randf_range(0.12, 0.28), _rng),
-	func(): return NatureProps.build_palm_tree(13.0, _rng.randf_range(0.15, 0.32), _rng),
-	func(): return NatureProps.build_banyan_tree(_rng.randf_range(15.0, 30.0), _rng),
-	func(): return NatureProps.build_baobab_tree(_rng.randf_range(13.5, 27.0), _rng),
-	func(): return NatureProps.build_flowering_tree(_rng.randf_range(12.0, 24.0), NatureProps.JUNGLE_LEAF_COLORS[0], Color(0.95, 0.6, 0.8), _rng),
+	func(): return NatureProps.build_palm_tree(
+		15.0 * NatureProps.jungle_height_stretch(_rng), _rng.randf_range(0.12, 0.28), _rng
+	),
+	func(): return NatureProps.build_palm_tree(
+		13.0 * NatureProps.jungle_height_stretch(_rng), _rng.randf_range(0.15, 0.32), _rng
+	),
+	func(): return NatureProps.build_banyan_tree(
+		_rng.randf_range(15.0, 30.0) * NatureProps.jungle_height_stretch(_rng), _rng
+	),
+	func(): return NatureProps.build_baobab_tree(
+		_rng.randf_range(13.5, 27.0) * NatureProps.jungle_height_stretch(_rng), _rng
+	),
+	func(): return NatureProps.build_flowering_tree(
+		_rng.randf_range(12.0, 24.0) * NatureProps.jungle_height_stretch(_rng),
+		NatureProps.JUNGLE_LEAF_COLORS[0], Color(0.95, 0.6, 0.8), _rng
+	),
 ]
 var _jungle_undergrowth_builders := [
 	func(): return _make_mushroom_pickup("Jungle Mushroom"),
@@ -1078,6 +1089,13 @@ func _build_jungle_biome() -> void:
 	const TREE_COUNT := 55
 	for i in TREE_COUNT:
 		var pos := _point_in_jungle_disk(center, radius * 0.9, 1.0)
+		# An emergent is its own roll rather than a sixth species in the list:
+		# picked uniformly among six it would have made a sixth of the plateau
+		# forty-metre giants. The shared distribution decides how many, so this
+		# plateau, the Primate Kingdom and the demo window all agree.
+		if NatureProps.rolls_jungle_emergent(_rng):
+			_place_emergent(pos)
+			continue
 		_place_solid(_jungle_tree_builders, pos)
 
 	const UNDERGROWTH_COUNT := 110
@@ -1407,6 +1425,17 @@ func _scatter_wanderers(count: int, builders: Array) -> void:
 		if pos == Vector2.INF:
 			continue
 		_place_solid(builders, pos)
+
+
+## One wild emergent, placed like any other solid prop but without the random
+## rescale the species get: its height is already drawn per individual, and
+## scaling it again would put its crown anywhere.
+func _place_emergent(pos: Vector2) -> void:
+	var instance := NatureProps.build_wild_emergent_tree(_rng)
+	instance.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
+	instance.rotation.y = _rng.randf_range(0.0, TAU)
+	add_child(instance)
+	_register_canopy_blobs(instance)
 
 
 func _place_solid(builders: Array, pos: Vector2) -> void:

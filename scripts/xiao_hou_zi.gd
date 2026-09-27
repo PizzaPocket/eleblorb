@@ -186,6 +186,8 @@ var _snowboard_chord := PowerChord.new()
 var _wheelie_chord := PowerChord.new()
 var _lava := LavaMode.new()
 var _dirtbike := DirtbikeMode.new()
+## The Leaf Hat's vine, the same power the human swings on.
+var _vine_swing := VineSwingMode.new()
 ## His snowboard: the same power the player rides, on his own rig and at his
 ## own scale. Toggled by the leg-power chord, as the player's is.
 var _direct_snowboard_active: bool = false
@@ -822,6 +824,8 @@ func _direct_swim_jets() -> int:
 func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_pressed: bool) -> void:
 	if not is_player_controlled or _mounted:
 		return
+	if _update_direct_vine_swing(direction, delta, jump_pressed):
+		return
 	if _update_direct_crystal_riding(direction, delta, sprinting, jump_pressed):
 		return
 	var planar := Vector2(direction.x, direction.z)
@@ -1321,6 +1325,27 @@ func _apply_direct_power_pose(delta: float) -> void:
 ## Skating a crystal track: the shared power, on his rig. It takes the whole
 ## frame when it engages, so his ordinary movement does not run at all while
 ## he rides. His origin sits on the ground, so his foot offset is zero.
+## Vine swinging, through the shared power. The trees are world-scale, so his
+## reach and rope are the human's exactly; only the throwing hand's height
+## above his feet follows his own much smaller rig.
+func _update_direct_vine_swing(direction: Vector3, delta: float, jump_pressed: bool) -> bool:
+	var ctx := _traversal_context(delta)
+	ctx.direction = direction
+	ctx.grounded = is_on_floor()
+	if not _vine_swing.swing(ctx, direction, jump_pressed and not UIState.modal_open):
+		return false
+	_direct_vertical_velocity = velocity.y
+	var travel := velocity
+	travel.y = 0.0
+	if travel.length_squared() > 0.04:
+		rotation.y = lerp_angle(
+			rotation.y, atan2(travel.x, travel.z), minf(ROTATION_SPEED * delta, 1.0)
+		)
+	_animate_walk(delta, false)
+	_vine_swing.pose(ctx)
+	return true
+
+
 func _update_direct_crystal_riding(
 	direction: Vector3, delta: float, sprinting: bool, jump_pressed: bool
 ) -> bool:

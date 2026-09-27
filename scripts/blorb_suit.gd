@@ -67,10 +67,14 @@ const VISOR_GLASS := Color(0.16, 0.27, 0.44, 0.62)
 ## A centimetre on the human's own helmet, and that same share of any other.
 const REFERENCE_HELM_RADIUS := 0.20
 const VISOR_INSET := 0.01
-## A Space helm has to clear whatever the head already carries, hair included,
-## measured from the helm's own centre rather than guessed from the head's
-## width. A radius taken from width alone left the back of a tall crown out.
-const HELM_ENCLOSE_MARGIN := 1.03
+## Space Helm fit. The radius stays proportional to the head rather than to
+## the diagonal of its hair AABB: wrapping a sphere around all eight AABB
+## corners also enclosed their large empty corner volumes and turned the helm
+## into a giant ball. Small centre shifts below clear a tall/back-swept style.
+const SPACE_HELM_CONTENT_RADIUS_SCALE := 0.66
+const SPACE_HELM_HEAD_RADIUS_SCALE := 1.42
+const SPACE_HELM_HEIGHT_RADIUS_SCALE := 0.56
+const SPACE_HELM_CLEARANCE_FRACTION := 0.04
 ## Penguin Suit torso: even larger than the sealed Lava cuirass, running from
 ## the ankles up past broad shoulders to close under the head.
 const PENGUIN_TORSO_WIDTH_SCALE := 1.3
@@ -1503,6 +1507,10 @@ static func build_head(head_pivot: Node3D, blorb: Blorb, rig_scale: float = 1.0)
 	var albedo := vis["albedo"] as Color
 	var hat_radius := head_extent * HAT_RADIUS_SCALE
 	var hat_height := hat_radius * HAT_HEIGHT_SCALE
+	# The Leaf Hat is the Plant blorb's complete living form—not an ordinary
+	# slime cap with a leaf balanced on it.
+	if blorb.has_core_item("Leaf Hat") and blorb.element_state == "plant":
+		return [_build_leaf_hat(head_pivot, worn_head_bounds, head_size, vis)] as Array[Node3D]
 	var hat := MeshInstance3D.new()
 	hat.name = "HeadBlorbHat"
 	# A head blorb holding a helm it can close over the face (the Diving
@@ -1621,73 +1629,93 @@ static func _build_space_helm(head_pivot: Node3D, contents: AABB, head_size: Vec
 	var root := Node3D.new()
 	root.name = "HeadBlorbSpaceHelm"
 	head_pivot.add_child(root)
-	var centre := Vector3(0.0, head_size.y, 0.0)
-	var enclosing := 0.0
-	for corner_index in 8:
-		var corner := contents.position + Vector3(
-			contents.size.x * float(corner_index & 1),
-			contents.size.y * float((corner_index >> 1) & 1),
-			contents.size.z * float((corner_index >> 2) & 1)
-		)
-		enclosing = maxf(enclosing, corner.distance_to(centre))
 	var radius := maxf(
-		maxf(maxf(contents.size.x, contents.size.z) * 0.62, head_size.x * 1.35),
-		enclosing * HELM_ENCLOSE_MARGIN
+		maxf(
+			maxf(contents.size.x, contents.size.z) * SPACE_HELM_CONTENT_RADIUS_SCALE,
+			head_size.x * SPACE_HELM_HEAD_RADIUS_SCALE
+		),
+		contents.size.y * SPACE_HELM_HEIGHT_RADIUS_SCALE
 	)
+	var clearance := radius * SPACE_HELM_CLEARANCE_FRACTION
+	# Keep the familiar face-centred placement whenever it already fits. If
+	# hair rises above or sweeps behind it, move the sphere only the minimum
+	# required amount within the interval that still covers the opposite side.
+	# This solves the reported top/back clipping without scaling every axis.
+	var centre := Vector3.ZERO
+	var x_min := contents.end.x + clearance - radius
+	var x_max := contents.position.x - clearance + radius
+	var y_min := contents.end.y + clearance - radius
+	var y_max := contents.position.y - clearance + radius
+	var z_min := contents.end.z + clearance - radius
+	var z_max := contents.position.z - clearance + radius
+	centre.x = clampf(0.0, minf(x_min, x_max), maxf(x_min, x_max))
+	centre.y = clampf(head_size.y, minf(y_min, y_max), maxf(y_min, y_max))
+	centre.z = clampf(0.0, minf(z_min, z_max), maxf(z_min, z_max))
 	var axes := Vector3.ONE * radius
-	# The face is cut out of the helmet rather than laid on it: one superellipse
-	# aperture, extruded through the shell's own wall, the same way the ship's
-	# windows are cut through its hull. A flat slab stuck on the front read as
-	# a plate rather than as something to see out of.
-	var face := {
-		"center": Vector2(0.0, 0.0),
-		"half": Vector2(radius * VISOR_HALF.x, radius * VISOR_HALF.y),
-		"exponent": VISOR_EXPONENT,
-		"side": 1.0,
-	}
 	var wall := radius * VISOR_WALL_FRACTION
-	var shell := MeshInstance3D.new()
-	shell.name = "SpaceHelmShell"
-	shell.mesh = SuperEgg.build_hollow_shell_mesh(
-		axes, wall, [face] as Array[Dictionary], 2.0, 2.0,
-		SuperEgg.RINGS * 2, SuperEgg.SEGMENTS * 2
-	)
 	var shell_material := _build_goo_material(vis)
-	# A Space helm's gel is a star field, which draws both faces by its own
-	# render mode; only a plain material has a cull mode to set.
-	var shell_standard := shell_material as StandardMaterial3D
-	if shell_standard != null:
-		shell_standard.cull_mode = BaseMaterial3D.CULL_DISABLED
-	shell.material_override = shell_material
-	shell.position.y = head_size.y
-	# The superegg's own long axis is Y and the aperture rides its +X; a
-	# quarter turn each way brings that opening round to the front.
+	var cut_material := SolidModel.material(Color(0.08, 0.10, 0.16), 0.45, 0.05)
+	var shell := CSGCombiner3D.new()
+	shell.name = "SpaceHelmShell"
+	shell.position = centre
+	# SolidModel's cutters run along local X. This established rotation carries
+	# that face round to the wearer's forward direction.
 	shell.rotation = Vector3(PI * 0.5, -PI * 0.5, 0.0)
 	root.add_child(shell)
-	# The visor is the piece the cut removed, rebuilt in glass one inset
-	# deeper: same opening, same curve, set back toward the head so the
-	# helmet's own rim stands proud of it.
-	var inset := maxf(VISOR_INSET * (radius / REFERENCE_HELM_RADIUS), radius * 0.02)
-	var visor := MeshInstance3D.new()
-	visor.name = "SpaceHelmVisor"
-	visor.mesh = SuperEgg.build_shell_patch_mesh(
-		axes - Vector3.ONE * inset, wall, face, 2.0, 2.0,
-		SuperEgg.RINGS * 2, SuperEgg.SEGMENTS * 2
+	SolidModel.add_super(
+		shell, "Outer", axes, CSGShape3D.OPERATION_UNION, shell_material,
+		Vector3.ZERO, 2.0
 	)
-	var glass := StandardMaterial3D.new()
-	glass.albedo_color = VISOR_GLASS
-	glass.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	glass.roughness = 0.08
-	glass.metallic = 0.3
-	glass.cull_mode = BaseMaterial3D.CULL_DISABLED
-	visor.material_override = glass
-	visor.position.y = head_size.y
+	SolidModel.add_super(
+		shell, "InnerNegative", axes - Vector3.ONE * wall,
+		CSGShape3D.OPERATION_SUBTRACTION, cut_material, Vector3.ZERO, 2.0
+	)
+	SolidModel.add_profile(
+		shell, "VisorNegative", wall * 4.0,
+		Vector2(radius * VISOR_HALF.x, radius * VISOR_HALF.y), VISOR_EXPONENT,
+		CSGShape3D.OPERATION_SUBTRACTION, cut_material,
+		Vector3(radius - wall * 0.5, 0.0, 0.0)
+	)
+	SolidModel.bake_when_ready(shell, root)
+
+	# A shallow convex lens, clipped by the very same visor profile. Its apex is
+	# inset from the helmet's outer surface while the shell thickness remains
+	# visible as a hard rim around it.
+	var inset := maxf(VISOR_INSET * (radius / REFERENCE_HELM_RADIUS), radius * 0.02)
+	var visor := CSGCombiner3D.new()
+	visor.name = "SpaceHelmVisor"
+	visor.position = centre
 	visor.rotation = shell.rotation
 	root.add_child(visor)
-	CollisionPolicy.mark_decorative(visor)
-	BlorbFace.add_eyes(visor, radius * 0.64, 0.0, 0.0, vis["albedo"] as Color, 1.08)
+	var glass := SolidModel.material(VISOR_GLASS, 0.08, 0.3)
+	var lens_radius := radius * 1.28
+	var lens_centre := Vector3(radius - inset - lens_radius, 0.0, 0.0)
+	SolidModel.add_super(
+		visor, "LensOuter", Vector3.ONE * lens_radius,
+		CSGShape3D.OPERATION_UNION, glass, lens_centre, 2.0
+	)
+	SolidModel.add_super(
+		visor, "LensInner", Vector3.ONE * (lens_radius - wall * 0.42),
+		CSGShape3D.OPERATION_SUBTRACTION, glass, lens_centre, 2.0
+	)
+	SolidModel.add_profile(
+		visor, "LensBoundary", radius * 3.0,
+		Vector2(radius * VISOR_HALF.x, radius * VISOR_HALF.y), VISOR_EXPONENT,
+		CSGShape3D.OPERATION_INTERSECTION, glass
+	)
+	SolidModel.add_box(
+		visor, "LensFrontHalf", Vector3(radius * 1.25, radius * 2.0, radius * 2.0),
+		CSGShape3D.OPERATION_INTERSECTION, glass, Vector3(radius * 0.38, 0.0, 0.0)
+	)
+	SolidModel.bake_when_ready(visor, root)
+	var face_anchor := Node3D.new()
+	face_anchor.name = "SpaceHelmFace"
+	face_anchor.position = centre
+	face_anchor.rotation = shell.rotation
+	root.add_child(face_anchor)
+	BlorbFace.add_eyes(face_anchor, radius * 0.64, 0.0, 0.0, vis["albedo"] as Color, 1.08)
 	var core := BlorbCore.build(radius * CORE_RADIUS_FRACTION * 0.7, vis["core_color"] as Color, true)
-	core.position = Vector3(0.0, head_size.y, radius * 0.08)
+	core.position = centre + Vector3(0.0, 0.0, radius * 0.08)
 	root.add_child(core)
 	return root
 
@@ -1753,6 +1781,57 @@ static func _build_toboggan(head_pivot: Node3D,contents: AABB,vis: Dictionary) -
 		core_material.emission=vis["core_emission"] as Color
 		core_material.emission_energy_multiplier=vis["core_emission_energy"] as float
 	_add_head_core_light(core,vis)
+	return root
+
+
+## The Plant head blorb becomes the hat itself: one broad leaf wrapping down
+## over the crown, with its normal living eyes/core set into the front half.
+## There is deliberately no ordinary slime-hat mesh beneath it.
+static func _build_leaf_hat(
+	head_pivot: Node3D, contents: AABB, head_size: Vector3, vis: Dictionary
+) -> Node3D:
+	var width := maxf(contents.size.x, head_size.x)
+	var depth := maxf(contents.size.z, head_size.z)
+	var height := maxf(contents.size.y, head_size.y)
+	var half_width := width * 0.72
+	var half_length := depth * 0.82
+	var curl := height * 0.16
+	var albedo := vis["albedo"] as Color
+	var root := LeafHat.build_fitted(
+		half_width, half_length, curl, height * 1.05, albedo
+	)
+	root.name = "LivingLeafHat"
+	root.position = Vector3(0.0, contents.end.y + height * 0.045, -depth * 0.04)
+	head_pivot.add_child(root)
+
+	# Sample the actual curved leaf for each eye, then align its flattened face
+	# to that precise tangent. They live on the broad forward half, not the
+	# pointed tip, and sink by the standard BlorbFace embed depth.
+	var face_radius := half_width * 0.58
+	var eye_scale := 1.45
+	var eyes := BlorbFace.add_eyes(root, face_radius, 0.0, 0.0, albedo, eye_scale)
+	for eye_node in eyes:
+		var eye := eye_node as MeshInstance3D
+		var side := -1.0 if eye.name == "EyeL" else 1.0
+		var x := side * half_width * 0.22
+		var z := half_length * 0.40
+		var surface := LeafHat.surface_point(x, z, half_width, half_length, curl)
+		var outward := LeafHat.surface_normal(x, z, half_width, half_length, curl)
+		var eye_radius := face_radius * 0.16 * 0.5 * eye_scale
+		eye.basis = Basis.looking_at(-outward, Vector3.FORWARD)
+		eye.scale = Vector3(1.0, 1.0, 0.4)
+		eye.position = surface - outward * (eye_radius * BlorbFace.EMBED_DEPTH_FRACTION)
+	var core := BlorbCore.build(
+		half_width * 0.13, vis["core_color"] as Color, vis["core_emissive"] as bool
+	)
+	core.name = "LeafBlorbCore"
+	core.position = Vector3(0.0, -curl * 0.08, half_length * 0.34)
+	root.add_child(core)
+	if vis["core_emissive"] as bool:
+		var core_material: StandardMaterial3D = core.get_meta("material")
+		core_material.emission = vis["core_emission"] as Color
+		core_material.emission_energy_multiplier = vis["core_emission_energy"] as float
+	_add_head_core_light(core, vis)
 	return root
 
 

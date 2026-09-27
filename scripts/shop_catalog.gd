@@ -144,6 +144,13 @@ static func _ensure_items() -> void:
 			"build_visual": Callable(ShopCatalog, "_build_space_helm_visual"),
 		},
 		{
+			"name": "Leaf Hat", "color": LeafHat.LEAF_COLOR, "price": 0, "sell_price": 0,
+			"purchasable": false, "element": "", "core_item": "Leaf Hat", "core_slot": "head", "armor_defense": 4,
+			"required_element": "plant",
+			"description": "A curled living leaf held to a Plant Blorb by a supple vine.",
+			"build_visual": Callable(LeafHat, "build_visual"),
+		},
+		{
 			"name": "Lake Shell", "color": Color(0.92, 0.72, 0.54), "price": 0, "sell_price": 2,
 			"purchasable": false, "element": "", "shop": "lake",
 			"description": "A warm-striped shell gathered from the newly exposed shore.",

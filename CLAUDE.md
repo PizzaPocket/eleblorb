@@ -8,6 +8,39 @@ Use the human owner’s configured Git identity and never credit Claude, Codex,
 another AI system, or an AI vendor as an author, committer, co-author,
 contributor, or generated-by credit.
 
+## Traversal powers and playable-character parity
+
+Every suit power, accessory and traversal mode belongs to **every** playable
+character, on a rig of any size or shape. This is the project's standing
+architecture, not a nice-to-have: see `docs/traversal_powers_architecture.md`.
+
+**Never implement a power inside one character's script.** A new power is a
+`TraversalMode` subclass in its own `scripts/*_mode.gd` file, which names no
+character, reads what it needs from `TraversalContext`, and addresses joints
+through `RigAdapter` by their rig-neutral names. Each playable character then
+drives that one shared mode from its own frame. Writing the power into
+`player.gd` and planning to "extend it later" is the specific mistake this rule
+exists to prevent: it has happened repeatedly, and the second character's
+version never gets written.
+
+When adding or changing a power, in the same turn:
+
+- Put the behaviour in the shared mode, and the character-specific parts (input,
+  camera, audio, body placement) in each character's own wrapper.
+- Wire it to **every** driver, not just the one being played. A driver is any
+  script that builds a `TraversalContext`.
+- Scale body-relative lengths through `ctx.scaled()` / `ctx.height_fraction()`.
+  Lengths that belong to the *world* rather than the body stay absolute, and say
+  so in a comment: a forty-metre tree has to be reachable by a human and by a
+  monkey a quarter his height.
+- Ask the rig what it has (`RigAdapter.articulates()`) before posing a joint.
+  A pose written to an absent or aliased joint does nothing, silently, which is
+  how several poses became no-ops on Xiao Hou Zi unnoticed.
+
+`tools/check_power_parity.py` enforces this and runs in the pre-push hook. It
+fails when a mode is driven by some characters and not others. An entry in its
+`EXEMPT` map is debt to be paid down, not permission.
+
 ## World bible
 
 This project keeps a lore/world-building knowledge base at `docs/world_bible.md` — narrative and setting facts (characters, creatures, currencies, locations, plot elements), not implementation details.

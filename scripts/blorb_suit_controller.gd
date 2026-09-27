@@ -475,6 +475,20 @@ func has_space_propulsion() -> bool:
 	return has_full_space_suit()
 
 
+## A complete Plant suit commanded by the Leaf Hat can cast load-bearing
+## vines. This deliberately checks visibly worn pieces rather than paper-doll
+## assignments, matching every other traversal prerequisite here.
+func has_vine_swing_suit() -> bool:
+	for slot in ["arm_left", "arm_right", "leg_left", "leg_right", "torso"]:
+		if not has_worn_element(slot, "plant"):
+			return false
+	var head := worn_blorb_in_slot("head")
+	return (
+		is_instance_valid(head) and head.element_state == "plant"
+		and head.has_core_item("Leaf Hat")
+	)
+
+
 ## The Penguin Suit is formed: a full penguin-capable suit, commanded on.
 func penguin_form_active() -> bool:
 	return _penguin_form_enabled and has_full_penguin_suit()

@@ -1125,6 +1125,13 @@ var _left_arm_plant_active := false
 var _right_arm_plant_active := false
 var _left_arm_plant_cooldown := 0.0
 var _right_arm_plant_cooldown := 0.0
+## Leaf Hat traversal. Both arm buttons toggle it through the same reusable
+## chord latch as snowboard/wheel modes; the active rope always terminates on
+## real overhead collision rather than an invented point in empty sky.
+## Vine swinging is VineSwingMode's, shared with every other character that
+## wears the Leaf Hat. Jump throws the vine and jump opens the hand again;
+## there is no separate mode toggle.
+var _vine_swing := VineSwingMode.new()
 var _air_foot_hover_active := false
 var _was_powered_hover_active := false
 var _powered_hover_target_y := 0.0
@@ -1971,6 +1978,11 @@ func _physics_process(delta: float) -> void:
 	_update_penguin_state()
 	_update_ice_skate_state()
 	_update_limb_power_state(delta)
+	# Jump is the whole vine control: it throws for a support in reach and, on
+	# the next press, opens the hand with the arc's momentum intact. A jump
+	# with nothing overhead stays an ordinary jump.
+	if _update_vine_swing(delta, jump_pressed):
+		return
 	_update_suit_flight_transition()
 	if _update_crystal_riding(delta, jump_pressed):
 		return
@@ -4741,9 +4753,26 @@ func _update_limb_power_state(delta: float) -> void:
 		)
 	_was_powered_hover_active = hovering
 
-	if not _penguin_chord_holding:
+	if not _penguin_chord_holding and not _vine_swing.swinging:
 		_update_discrete_arm_powers(delta)
 		_update_rock_leg_powers(delta)
+
+
+## Vine swinging, run before ordinary movement each frame. The swing itself is
+## VineSwingMode's, shared with every other character that wears the Leaf Hat;
+## it takes the whole frame while hanging, so this body only supplies the
+## frame's intent and then poses itself around the mode's own arm.
+func _update_vine_swing(delta: float, jump_pressed: bool) -> bool:
+	var ctx := _traversal_context(delta)
+	ctx.aim_basis = camera.global_transform.basis
+	ctx.left_arm_busy = _throw_aim_active
+	ctx.right_arm_busy = _throw_aim_active or _held_item_is_weapon()
+	var aim: Vector3 = -camera.global_transform.basis.z
+	if not _vine_swing.swing(ctx, aim, jump_pressed and not UIState.modal_open):
+		return false
+	_animate_walk(delta, false)
+	_vine_swing.pose(ctx)
+	return true
 
 
 func _update_rock_leg_powers(delta: float) -> void:

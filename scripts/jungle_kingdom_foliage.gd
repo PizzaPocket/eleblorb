@@ -45,6 +45,14 @@ const CLEAR_RADIUS := 24.0
 ## own class doc comment for that original density target.
 const TREE_COUNT := 600
 const DECOR_COUNT := 1200
+## Window mode is a self-contained biome, not a statistical sample of the
+## kingdom's much larger disk. Populate this many successful tree positions
+## inside the demo slice itself; filtering TREE_COUNT disk samples previously
+## left only a small fraction and made the "jungle" read as a clearing.
+## Dense enough to retain a closed jungle canopy, but with enough separation
+## between trunks for a player, mount, or swinging body to steer through it.
+const DEMO_WINDOW_TREE_COUNT := 250
+const DEMO_TALL_TREE_CHANCE := 0.28
 
 ## Circular clearings -- open ground (grass/flowers only, no trees) breaking
 ## up the canopy, per direct feedback. Fixed hand-placed spots rather than
@@ -82,6 +90,10 @@ const LOD_UPDATE_INTERVAL := 0.4
 ## Host-world discs (x, z, radius) that window mode keeps free of trees and
 ## rocks: room for something large to roam, such as the demo's Da Hou Zi.
 @export var window_keep_clear: Array[Vector3] = []
+## A keep-clear disc can still carry a deliberately spaced ring of emergent
+## vine anchors. Their trunks stay outside the protected roaming core; only
+## their high canopies reach across it.
+@export var window_keep_clear_jumbo_trees := false
 
 var _rng := RandomNumberGenerator.new()
 var _terrain: Node = null
@@ -98,14 +110,25 @@ var _canopy_blobs: Array[Dictionary] = []
 ## The box enclosing every canopy blob, grown as they register.
 var _canopy_bounds := AABB()
 
+## Each species' own ordinary height, multiplied per individual by the shared
+## jungle height distribution (NatureProps.jungle_height_stretch()), so a stand
+## of one species is layered rather than level. The fruiting understorey
+## species keep their own scale: a banana tree is not a canopy tree.
 var _tree_builders: Array = [
-	func(): return NatureProps.build_palm_tree(15.0, _rng.randf_range(0.12, 0.28), _rng),
-	func(): return NatureProps.build_banyan_tree(_rng.randf_range(14.0, 26.0), _rng),
-	func(): return NatureProps.build_baobab_tree(_rng.randf_range(13.0, 22.0), _rng),
+	func(): return NatureProps.build_palm_tree(
+		15.0 * NatureProps.jungle_height_stretch(_rng), _rng.randf_range(0.12, 0.28), _rng
+	),
+	func(): return NatureProps.build_banyan_tree(
+		_rng.randf_range(14.0, 26.0) * NatureProps.jungle_height_stretch(_rng), _rng
+	),
+	func(): return NatureProps.build_baobab_tree(
+		_rng.randf_range(13.0, 22.0) * NatureProps.jungle_height_stretch(_rng), _rng
+	),
 	func(): return NatureProps.build_durian_tree(_rng.randf_range(10.0, 18.0), _rng),
 	func(): return NatureProps.build_banana_tree(_rng.randf_range(5.0, 8.0), _rng),
 	func(): return NatureProps.build_flowering_tree(
-		_rng.randf_range(12.0, 22.0), NatureProps.JUNGLE_LEAF_COLORS[0], Color(0.95, 0.6, 0.8), _rng
+		_rng.randf_range(12.0, 22.0) * NatureProps.jungle_height_stretch(_rng),
+		NatureProps.JUNGLE_LEAF_COLORS[0], Color(0.95, 0.6, 0.8), _rng
 	),
 ]
 var _decor_builders: Array = [
@@ -126,6 +149,8 @@ func _ready() -> void:
 	_rng.seed = 20260818
 	_terrain = get_node_or_null("../Terrain")
 	_scatter_trees()
+	_scatter_keep_clear_jumbo_trees()
+	_scatter_vine_swing_trees()
 	_scatter_decor()
 	_scatter_rocks()
 	_register_lod_colliders(self)
@@ -141,6 +166,9 @@ func _process(delta: float) -> void:
 func _scatter_trees() -> void:
 	if _terrain == null or not _terrain.has_method("get_mesh_height"):
 		return
+	if window_enabled:
+		_scatter_window_trees()
+		return
 	for i in TREE_COUNT:
 		var picked: Variant = _pick_position()
 		if picked == null:
@@ -150,8 +178,183 @@ func _scatter_trees() -> void:
 			continue
 		if _zone_of(pos) != "" or _kept_clear(pos):
 			continue  # clearings and rocky zones stay tree-free
+		if NatureProps.rolls_jungle_emergent(_rng):
+			_place(NatureProps.build_wild_emergent_tree(_rng), pos, 380.0)
+			continue
 		var builder: Callable = _tree_builders[_rng.randi() % _tree_builders.size()]
 		_place(builder.call(), pos, TREE_VISIBILITY_RANGE)
+
+
+func _scatter_window_trees() -> void:
+	var placed := 0
+	var attempts := 0
+	while placed < DEMO_WINDOW_TREE_COUNT and attempts < DEMO_WINDOW_TREE_COUNT * 12:
+		attempts += 1
+		var pos := window_source_center + Vector2(
+			_rng.randf_range(-window_half_size.x, window_half_size.x),
+			_rng.randf_range(-window_half_size.y, window_half_size.y)
+		)
+		if _zone_of(pos) != "" or _kept_clear(pos):
+			continue
+		# Preserve only a narrow readable thread through the forest. The former
+		# sparse generator effectively cleared the entire biome, not merely a path.
+		if absf(pos.y - window_source_center.y) < 4.5 and _rng.randf() < 0.82:
+			continue
+		var tree: Node3D
+		if NatureProps.rolls_jungle_emergent(_rng):
+			_place(NatureProps.build_wild_emergent_tree(_rng), pos, 380.0)
+			placed += 1
+			continue
+		if _rng.randf() < DEMO_TALL_TREE_CHANCE:
+			match _rng.randi() % 3:
+				0:
+					tree = NatureProps.build_palm_tree(
+						_rng.randf_range(24.0, 34.0), _rng.randf_range(0.08, 0.24), _rng
+					)
+				1:
+					tree = NatureProps.build_banyan_tree(_rng.randf_range(26.0, 36.0), _rng)
+				_:
+					tree = NatureProps.build_baobab_tree(_rng.randf_range(25.0, 34.0), _rng)
+		else:
+			var builder: Callable = _tree_builders[_rng.randi() % _tree_builders.size()]
+			tree = builder.call() as Node3D
+		_place(tree, pos, TREE_VISIBILITY_RANGE)
+		placed += 1
+
+
+## A chain of true emergent trees along the demo route gives the Leaf Hat real,
+## readable overhead anchors. These are not invisible traversal markers: their
+## collidable trunks and limbs are the exact geometry the vine's ray fan must
+## strike, and the ordinary random canopy remains between them.
+##
+## The spacing is derived from the vine's own reach rather than chosen as a
+## round number, because the requirement is precisely that the next anchor is
+## catchable from the last. Ten trees spread over the whole window averaged
+## nearly forty metres apart and wandered a hundred more across it, so a swing
+## begun at the portal ran out of anywhere to go almost immediately.
+##
+## They alternate sides of the route's own clear thread, which both keeps their
+## trunks out of the walking line and gives the swing its left-right rhythm.
+## Spacing and offset together have to keep CONSECUTIVE anchors inside one
+## rope's length, which is the diagonal between them and not the spacing alone.
+## Fixed stations along the route could not do it: most of them landed in a
+## clearing or a rocky patch and were dropped, leaving four anchors and a gap of
+## 266 metres. So the chain is grown instead of laid out. Each anchor looks
+## ahead for the nearest valid ground within one rope of the last one, trying
+## the route's own thread first and reaching further out only as it must.
+const VINE_ROUTE_STEPS := [22.0, 18.0, 27.0, 32.0]
+const VINE_ROUTE_LATERALS := [10.0, 16.0, 23.0, 30.0]
+## The rope's own length less a margin, since the thrower is never exactly
+## under the anchor it is reaching from.
+const VINE_ROUTE_MAX_GAP := VineSwingMode.MAX_ROPE * 0.85
+## Nothing usable ahead: step past it and pick the chain up on the far side.
+## The titan clearing is the one place this happens by design, and it carries
+## its own ring of anchors.
+const VINE_ROUTE_SKIP := 26.0
+const VINE_ROUTE_MAX_ANCHORS := 40
+## A keep-clear disc excludes ordinary trunks out to its full radius, which
+## protects the terrain flattening and the titan's own sightlines. His route is
+## a fraction of that: the existing anchor ring already stands at 62 to 70 m
+## inside the same disc for exactly this reason. Excluding vine anchors out to
+## the full 145 m rejected 346 of 424 candidate spots along the demo route,
+## which is the dead end that appeared right after the portal. So the chain
+## keeps out of his roaming core and is free beyond it.
+const VINE_ROUTE_TITAN_CORE := 66.0
+## Route anchors are deliberately at the top of the emergent range: everything
+## else in the biome varies in height, but these have to be reliably throwable.
+const VINE_ROUTE_HEIGHT_MIN := 44.0
+const VINE_ROUTE_HEIGHT_MAX := 54.0
+
+
+func _scatter_vine_swing_trees() -> void:
+	if not window_enabled or _terrain == null:
+		return
+	var span := window_half_size.x * 0.9
+	var thread := window_source_center.y
+	var finish := window_source_center.x + span
+	var cursor := window_source_center.x - span
+	var previous := Vector2.ZERO
+	var chained := false
+	var placed := 0
+	while cursor <= finish and placed < VINE_ROUTE_MAX_ANCHORS:
+		var chosen := Vector2.ZERO
+		var found := false
+		for step: float in VINE_ROUTE_STEPS:
+			for lateral: float in VINE_ROUTE_LATERALS:
+				for side: float in [1.0, -1.0]:
+					var candidate := Vector2(
+						cursor + step + _rng.randf_range(-2.0, 2.0), thread + side * lateral
+					)
+					if not _in_window(candidate) or not _clear_of_titan_core(candidate):
+						continue
+					if _zone_of(candidate) != "":
+						continue
+					if chained and previous.distance_to(candidate) > VINE_ROUTE_MAX_GAP:
+						continue
+					chosen = candidate
+					found = true
+					break
+				if found:
+					break
+			if found:
+				break
+		if not found:
+			cursor += VINE_ROUTE_SKIP
+			chained = false
+			continue
+		var built: Dictionary = NatureProps.build_emergent_tree(
+			_rng.randf_range(VINE_ROUTE_HEIGHT_MIN, VINE_ROUTE_HEIGHT_MAX), _rng, false
+		)
+		var tree := built["body"] as StaticBody3D
+		tree.name = "VineSwingEmergent%d" % placed
+		tree.set_meta("vine_swing_anchor", true)
+		_place(tree, chosen, 380.0)
+		previous = chosen
+		chained = true
+		cursor = chosen.x
+		placed += 1
+
+
+## Whether an anchor may stand here: outside every keep-clear disc's roaming
+## core, rather than outside the whole disc. See VINE_ROUTE_TITAN_CORE.
+func _clear_of_titan_core(pos: Vector2) -> bool:
+	if not window_enabled:
+		return true
+	var host := window_target_center + (pos - window_source_center)
+	for disc in window_keep_clear:
+		var core: float = minf(VINE_ROUTE_TITAN_CORE, float(disc.z))
+		if host.distance_to(Vector2(disc.x, disc.y)) < core:
+			return false
+	return true
+
+
+## The demo titan clearing cannot be an empty dead zone: place a handful of
+## true jumbo trees around its roaming core. Fixed angular spacing keeps the
+## result organic but guarantees Da Hou Zi never meets a trunk on his route.
+func _scatter_keep_clear_jumbo_trees() -> void:
+	if not window_enabled or not window_keep_clear_jumbo_trees or _terrain == null:
+		return
+	for disc in window_keep_clear:
+		var host_center := Vector2(disc.x, disc.y)
+		var protected_radius := float(disc.z)
+		# His 30 m route plus his titan-scale body has generous clearance at 66 m.
+		# Do not follow the full 145 m terrain-flattening radius: the demo window is
+		# narrower than that, and the canopy should remain visible from the route.
+		var ring_radius := minf(maxf(protected_radius * 0.46, 62.0), 70.0)
+		var angles := [-2.58, -1.72, -0.82, 0.08, 0.82, 2.48]
+		for index in angles.size():
+			var angle: float = angles[index]
+			var host_pos := host_center + Vector2(cos(angle), sin(angle)) * ring_radius
+			var source_pos := window_source_center + (host_pos - window_target_center)
+			if not _in_window(source_pos):
+				continue
+			var built: Dictionary = NatureProps.build_emergent_tree(
+				_rng.randf_range(44.0, 54.0), _rng, false
+			)
+			var tree := built["body"] as StaticBody3D
+			tree.name = "TitanClearingEmergent%d" % index
+			tree.set_meta("vine_swing_anchor", true)
+			_place(tree, source_pos, 380.0)
 
 
 func _scatter_decor() -> void:

@@ -1164,16 +1164,60 @@ static func build_flowering_tree(height: float, leaf_color: Color, blossom_color
 	return body
 
 
+## How tall a jungle tree of any species grows. Every scatter in the game drew
+## its trees from one narrow band per species, so a jungle was a single ceiling
+## with a few hand-placed giants punched through it. Real jungle is layered, and
+## the game now needs that layering to mean something: a Leaf Hat can only
+## swing where something stands tall enough to throw at, so a jungle whose own
+## trees vary in height is swingable everywhere rather than only along a route
+## somebody placed by hand.
+##
+## Most individuals stand at their species' ordinary height. Roughly a quarter
+## stretch well above their neighbours, and about one in eight is a true
+## emergent, which is a different species entirely rather than a stretched one
+## (see build_emergent_tree(), whose proportions are drawn for that scale).
+## Callers roll for an emergent first and otherwise stretch their own pick, so
+## every jungle scatter shares the one distribution.
+const JUNGLE_TALL_CHANCE := 0.26
+const JUNGLE_TALL_STRETCH_MIN := 1.24
+const JUNGLE_TALL_STRETCH_MAX := 1.62
+const JUNGLE_EMERGENT_CHANCE := 0.12
+const JUNGLE_EMERGENT_HEIGHT_MIN := 37.0
+const JUNGLE_EMERGENT_HEIGHT_MAX := 54.0
+
+
+## A multiplier on a species' own height, for one individual.
+static func jungle_height_stretch(rng: RandomNumberGenerator) -> float:
+	if rng.randf() >= JUNGLE_TALL_CHANCE:
+		return 1.0
+	return rng.randf_range(JUNGLE_TALL_STRETCH_MIN, JUNGLE_TALL_STRETCH_MAX)
+
+
+## Whether this individual is an emergent rather than one of the ordinary
+## canopy species.
+static func rolls_jungle_emergent(rng: RandomNumberGenerator) -> bool:
+	return rng.randf() < JUNGLE_EMERGENT_CHANCE
+
+
+static func jungle_emergent_height(rng: RandomNumberGenerator) -> float:
+	return rng.randf_range(JUNGLE_EMERGENT_HEIGHT_MIN, JUNGLE_EMERGENT_HEIGHT_MAX)
+
+
+## One wild emergent, with its natural crown and no village architecture.
+static func build_wild_emergent_tree(rng: RandomNumberGenerator) -> Node3D:
+	var built := build_emergent_tree(jungle_emergent_height(rng), rng, false)
+	return built["body"] as Node3D
+
+
 ## A giant emergent-canopy tree, towering well above every other jungle
 ## species here (see build_banyan_tree()'s own 30.0 top height for
 ## comparison) -- the "especially tall" species the primate kingdom's
-## village is built into, per direct instruction. Its trunk carries a
-## spiral of climbable branch-ramps, each ending in a landable platform,
-## winding up around the exterior from near the ground to just under the
-## canopy. Returns a Dictionary ({"body": StaticBody3D, "platform_positions":
-## Array[Vector3]}) rather than a bare StaticBody3D like the other tree
-## builders -- callers (jungle_kingdom_village.gd) need those platform
-## positions (in body-local space) to mount treehouses on them.
+## village is built into, per direct instruction. The natural jumbo tree is
+## reusable on its own; `with_treehouse_architecture` optionally adds a spiral
+## of climbable branch-ramps and landings for village construction. Returns a
+## Dictionary ({"body": StaticBody3D, "platform_positions": Array[Vector3]})
+## because architectural callers need the landing positions in body-local
+## space to mount their treehouses.
 ##
 ## Branch ramps/landings are each other builders' own fully self-contained
 ## StaticBody3D (TownProps.build_ramp()/build_crate()) nested as children of
@@ -1206,8 +1250,38 @@ const EMERGENT_TWIG_LENGTH_MIN := 1.4
 const EMERGENT_TWIG_LENGTH_MAX := 2.6
 const EMERGENT_TWIG_LEAF_MIN := 0.7
 const EMERGENT_TWIG_LEAF_MAX := 1.5
+## Real limbs, as opposed to the fine twigs above. These are anatomy, not
+## architecture: every emergent tree grows them, treehouse or not. Losing them
+## is exactly what happened when the wilderness variant was added, because the
+## only branch geometry there was lived inside the treehouse block.
+##
+## Their heights, azimuths, lengths, pitches and leaf clusters are all drawn
+## per limb, so no two trees carry the same crown. The spiral uses the same
+## golden angle the ramps do, for the same reason (see EMERGENT_GOLDEN_ANGLE),
+## but takes its own random starting phase so a tree's limbs and its ramps are
+## not stacked on one another.
+const EMERGENT_BOUGH_SPACING := 6.2
+const EMERGENT_BOUGH_SPACING_JITTER := 1.6
+## The lower trunk of an emergent stays clear: that is what makes it emergent.
+const EMERGENT_BOUGH_START_FRACTION := 0.40
+const EMERGENT_BOUGH_LENGTH_MIN := 5.0
+const EMERGENT_BOUGH_LENGTH_MAX := 11.5
+const EMERGENT_BOUGH_PITCH_MIN := 0.08
+const EMERGENT_BOUGH_PITCH_MAX := 0.44
+## How thick a limb leaves the trunk, and how much of that it keeps at its tip.
+const EMERGENT_BOUGH_ROOT_FRACTION := 0.44
+const EMERGENT_BOUGH_TIP_FRACTION := 0.52
+const EMERGENT_BOUGH_LEAF_MIN := 1.9
+const EMERGENT_BOUGH_LEAF_MAX := 3.6
+## A limb that also carries a cluster partway along it, not only at the tip.
+const EMERGENT_BOUGH_MID_LEAF_CHANCE := 0.45
+## A limb is kept this far from a treehouse landing so the two never grow
+## through each other on a village tree.
+const EMERGENT_BOUGH_LANDING_CLEARANCE := 3.4
 
-static func build_emergent_tree(height: float, rng: RandomNumberGenerator) -> Dictionary:
+static func build_emergent_tree(
+	height: float, rng: RandomNumberGenerator, with_treehouse_architecture: bool = true
+) -> Dictionary:
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
 	body.collision_mask = 0
@@ -1251,6 +1325,15 @@ static func build_emergent_tree(height: float, rng: RandomNumberGenerator) -> Di
 		_add_canopy_blob(body, lobe.position, Vector3(lobe_radius, lobe_radius * 0.55, lobe_radius))
 
 	var platform_positions: Array[Vector3] = []
+	# The giant tree is the reusable natural asset. Treehouse ramps and landing
+	# platforms are an optional architectural layer requested by village
+	# builders, not intrinsic anatomy that wilderness callers must tear off.
+	# Its limbs, though, ARE anatomy, and are grown below either way.
+	if not with_treehouse_architecture:
+		_add_emergent_boughs(
+			body, base_radius, top_radius, trunk_top, leaf_color, rng, platform_positions
+		)
+		return {"body": body, "platform_positions": platform_positions}
 	var angle := rng.randf_range(0.0, TAU)
 	var current_y := 0.0
 	var current_pos := Vector3.ZERO
@@ -1289,7 +1372,113 @@ static func build_emergent_tree(height: float, rng: RandomNumberGenerator) -> Di
 		_add_emergent_twigs(body, lerpf(base_radius, top_radius, t), current_y, angle, leaf_color, rng)
 		angle += EMERGENT_GOLDEN_ANGLE
 
+	_add_emergent_boughs(
+		body, base_radius, top_radius, trunk_top, leaf_color, rng, platform_positions
+	)
 	return {"body": body, "platform_positions": platform_positions}
+
+
+## The tree's real limbs: a spiral of substantial branches up the upper trunk,
+## each drawn individually so no two trees carry the same crown. A limb is
+## load-bearing geometry, both because it visibly is (this kingdom's treetop
+## platforming reads a branch as somewhere to stand) and because the vine a
+## Leaf Hat throws needs real collision to catch on. So each one gets its own
+## simplified box along its length, authored here with the visual it belongs
+## to, rather than being left as decoration the way the fine twigs are.
+static func _add_emergent_boughs(
+	body: StaticBody3D, base_radius: float, top_radius: float, trunk_top: float,
+	leaf_color: Color, rng: RandomNumberGenerator, avoid_heights: Array[Vector3]
+) -> void:
+	var angle := rng.randf_range(0.0, TAU)
+	var y := trunk_top * EMERGENT_BOUGH_START_FRACTION
+	while y < trunk_top * 0.97:
+		var t := clampf(y / trunk_top, 0.0, 1.0)
+		var trunk_r := lerpf(base_radius, top_radius, t)
+		var clear := true
+		for landing in avoid_heights:
+			if absf(landing.y - y) < EMERGENT_BOUGH_LANDING_CLEARANCE:
+				clear = false
+		if clear:
+			_add_emergent_bough(body, trunk_r, y, angle, t, leaf_color, rng)
+			_add_emergent_twigs(body, trunk_r, y, angle, leaf_color, rng)
+		angle += EMERGENT_GOLDEN_ANGLE
+		y += EMERGENT_BOUGH_SPACING + rng.randf_range(
+			-EMERGENT_BOUGH_SPACING_JITTER, EMERGENT_BOUGH_SPACING_JITTER
+		)
+
+
+## One limb: a thick inner half and a thinner outer half reaching up and away
+## from the trunk, a leaf cluster at the tip and sometimes another partway,
+## and one box collider along the whole reach.
+static func _add_emergent_bough(
+	body: StaticBody3D, trunk_r: float, y: float, angle: float, height_t: float,
+	leaf_color: Color, rng: RandomNumberGenerator
+) -> void:
+	# Limbs shorten toward the crown, where the trunk itself has narrowed.
+	var length: float = lerpf(
+		EMERGENT_BOUGH_LENGTH_MAX, EMERGENT_BOUGH_LENGTH_MIN, height_t
+	) * rng.randf_range(0.78, 1.16)
+	var pitch := rng.randf_range(EMERGENT_BOUGH_PITCH_MIN, EMERGENT_BOUGH_PITCH_MAX)
+	var direction := Vector3(cos(angle), 0.0, sin(angle))
+	var along := (direction * cos(pitch) + Vector3.UP * sin(pitch)).normalized()
+	var root := Vector3(direction.x * trunk_r * 0.85, y, direction.z * trunk_r * 0.85)
+	var root_radius := trunk_r * EMERGENT_BOUGH_ROOT_FRACTION
+	var tip_radius := root_radius * EMERGENT_BOUGH_TIP_FRACTION
+
+	# The limb's own long axis is local Y, the same convention the trunk tiers
+	# and twigs use, so it needs a basis built with Y along the limb rather
+	# than a look_at(), which would aim local -Z instead.
+	var side := Vector3.RIGHT if absf(along.dot(Vector3.RIGHT)) < 0.9 else Vector3.FORWARD
+	var limb_x := side.cross(along).normalized()
+	var limb_z := along.cross(limb_x).normalized()
+	var limb_basis := Basis(limb_x, along, limb_z)
+	var inner_limb: Node3D = null
+	for half in 2:
+		var span := length * 0.5
+		var radius: float = lerpf(root_radius, tip_radius, (float(half) + 0.5) * 0.5)
+		var segment := SuperEgg.build_part(
+			Vector3(radius, span * 0.5, radius), TRUNK_COLOR.lightened(0.04),
+			SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
+		)
+		segment.transform = Transform3D(
+			limb_basis, root + along * (span * (float(half) + 0.5))
+		)
+		body.add_child(segment)
+		if half == 0:
+			inner_limb = segment
+
+	var tip := root + along * length
+	var leaf_radius := rng.randf_range(EMERGENT_BOUGH_LEAF_MIN, EMERGENT_BOUGH_LEAF_MAX)
+	var cluster := SuperEgg.build_part(
+		Vector3(leaf_radius, leaf_radius * 0.62, leaf_radius), leaf_color,
+		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+	)
+	cluster.position = tip
+	body.add_child(cluster)
+	CollisionPolicy.mark_decorative(cluster)
+	if rng.randf() < EMERGENT_BOUGH_MID_LEAF_CHANCE:
+		var mid_radius := leaf_radius * rng.randf_range(0.5, 0.78)
+		var mid := SuperEgg.build_part(
+			Vector3(mid_radius, mid_radius * 0.62, mid_radius), leaf_color,
+			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+		)
+		mid.position = root + along * (length * rng.randf_range(0.45, 0.72))
+		body.add_child(mid)
+		CollisionPolicy.mark_decorative(mid)
+
+	# One box down the limb's length, its top the landing surface, authored
+	# with the limb it belongs to rather than with the leaves it carries. The
+	# box's own long axis is Z, so the basis puts `along` there; its Y is then
+	# Z cross X, which is what keeps the basis right-handed.
+	if inner_limb == null:
+		return
+	var box_x := limb_x
+	var box_y := along.cross(box_x).normalized()
+	CollisionPolicy.add_box(
+		body, inner_limb,
+		Vector3(root_radius * 2.0, root_radius * 1.6, length),
+		root + along * (length * 0.5), Basis(box_x, box_y, along), true
+	)
 
 
 ## Small leaf-tipped twigs sprouting off the trunk at a ramp landing's own
