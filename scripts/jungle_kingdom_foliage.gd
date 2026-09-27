@@ -219,7 +219,31 @@ func _scatter_trees() -> void:
 		_place(builder.call(), pos, TREE_VISIBILITY_RANGE)
 
 
+## The window's emergents, laid before the ordinary canopy rather than rolled
+## inside it. Rolled inside it they competed for ground the smaller trees had
+## already taken, and a jungle meant to be full of giants had a dozen.
+func _scatter_window_emergents() -> void:
+	var target := int(round(float(DEMO_WINDOW_TREE_COUNT) * NatureProps.JUNGLE_EMERGENT_CHANCE))
+	var attempts := 0
+	var placed := 0
+	while placed < target and attempts < target * 24:
+		attempts += 1
+		var pos := window_source_center + Vector2(
+			_rng.randf_range(-window_half_size.x, window_half_size.x),
+			_rng.randf_range(-window_half_size.y, window_half_size.y)
+		)
+		if _zone_of(pos) != "" or _kept_clear(pos) or not _gate_clear(pos):
+			continue
+		if absf(pos.y - window_source_center.y) < 4.5:
+			continue
+		if not _claim_room(pos, GIANT_MIN_SEPARATION):
+			continue
+		_place(NatureProps.build_wild_emergent_tree(_rng), pos, 380.0)
+		placed += 1
+
+
 func _scatter_window_trees() -> void:
+	_scatter_window_emergents()
 	var placed := 0
 	var attempts := 0
 	while placed < DEMO_WINDOW_TREE_COUNT and attempts < DEMO_WINDOW_TREE_COUNT * 12:
@@ -237,12 +261,6 @@ func _scatter_window_trees() -> void:
 		if not _gate_clear(pos):
 			continue
 		var tree: Node3D
-		if NatureProps.rolls_jungle_emergent(_rng):
-			if not _claim_room(pos, GIANT_MIN_SEPARATION):
-				continue
-			_place(NatureProps.build_wild_emergent_tree(_rng), pos, 380.0)
-			placed += 1
-			continue
 		if _rng.randf() < DEMO_TALL_TREE_CHANCE:
 			if not _claim_room(pos, TALL_MIN_SEPARATION):
 				continue
@@ -460,10 +478,19 @@ func _scatter_rocks() -> void:
 
 ## Whether a trunk of this size has room here, and claiming it if so. Called
 ## once per placement: a tree that cannot claim its room is not placed.
+##
+## A pair needs the MEAN of the two claims between them, not the larger. Taking
+## the larger meant a giant had to stand its own full 30 m clear of every sapling
+## as well as of every other giant, so once the ordinary scatter had filled in,
+## emergents were crowded out almost entirely: raising their rate fivefold moved
+## the count from 14 to 15. It also matched nothing real, since undergrowth grows
+## right up to a big trunk. The mean keeps giant from giant at the full 30 m,
+## lets a small tree come within about 20 m of one, and leaves ordinary trees at
+## their own 9 m.
 func _claim_room(pos: Vector2, separation: float) -> bool:
 	for taken in _claimed:
 		var apart: float = pos.distance_to(Vector2(taken.x, taken.y))
-		if apart < maxf(separation, taken.z):
+		if apart < (separation + taken.z) * 0.5:
 			return false
 	_claimed.append(Vector3(pos.x, pos.y, separation))
 	return true

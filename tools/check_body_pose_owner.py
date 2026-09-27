@@ -28,6 +28,7 @@ ALLOWED = {
     "_pose_body_dirtbike",
     "_pose_body_penguin",
     "_pose_body_crystal",
+    "_pose_body_vine_swing",
     # Helpers called only from the placement modes.
     "_apply_dirtbike_wheelie_pitch",
     "_settle_dirtbike_rear_wheel_on_terrain",

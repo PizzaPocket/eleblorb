@@ -23,10 +23,13 @@ extends TraversalMode
 ## stand before it counts as overhead at all.
 const ANCHOR_RANGE := 78.0
 ## A vine is not a grappling hook onto the nearest bush. A support has to stand
-## this far above the thrower AND this far away from him before it will hold, so
-## a low tree, a boulder or a bank the swinger is standing next to cannot start
-## a swing that has nowhere to go.
-const MIN_ANCHOR_RISE := 11.0
+## this far above the thrower AND MIN_ROPE away from him before it will hold, so
+## a low tree, a boulder or a bank the swinger is standing next to cannot start a
+## swing that has nowhere to go. The span does most of that work: the rise stays
+## modest because a swinger already high on an arc is level with a good deal of
+## what he needs to throw at, and demanding a tall rise from up there stopped the
+## chain from continuing at all.
+const MIN_ANCHOR_RISE := 7.0
 ## The rope's working length. An anchor further away than MAX_ROPE is refused
 ## rather than clamped: clamping one would snap the body the difference in a
 ## single frame, which reads as a teleport into the tree. One nearer than
@@ -45,15 +48,17 @@ const CAST_FORWARD := 8.5
 ## long an opened hand stays open before it can catch again.
 const MIN_GRIP := 0.25
 const RELATCH_DELAY := 0.28
-## The free hand throws on the way UP to the apex, not at it. Waiting for the
-## climb to actually stop meant throwing from a body that had already stalled,
-## with no momentum left to carry into the next arc. So the throw goes when the
-## climb has decayed to this fraction of its own peak: still rising, but past the
-## useful part of the rise. Raise it to throw earlier and flatter, lower it to
-## throw later and higher.
-const HANDOFF_CLIMB_FRACTION := 0.45
-## Below this the arc never really climbed, so there was no apex to anticipate.
-const APEX_RISE_MIN := 0.6
+## The free hand throws once this vine has given all the forward progress it has
+## to give: the body has swung PAST its own anchor in the direction being asked
+## for, and the rope is out near its full length. That is the far end of the arc,
+## geometrically, and it needs no apex to be detected.
+##
+## Two earlier triggers both failed for the same underlying reason, which was
+## trying to infer the moment from vertical speed. "Vertical speed near zero" is
+## true through the whole descending half of an arc, so the hands alternated like
+## a metronome. Waiting for the climb to actually stop threw from a body that had
+## already stalled, and in practice hardly threw at all.
+const HANDOFF_ROPE_FRACTION := 0.88
 ## How fast a thrown vine reaches its anchor, and a spent one returns.
 const CAST_SPEED := 46.0
 const RETRACT_SPEED := 58.0
@@ -121,8 +126,12 @@ const FOREARM_ROLL := PI
 ## own bend is POSITIVE: both taken from _apply_airborne_pose() in player.gd,
 ## which applies -(hip_bend) and +knee_bend after that shoulder/hip sign was
 ## found backwards once by direct observation. Reused, not re-derived.
-const SWING_HIP_LEAD := deg_to_rad(52.0)
-const SWING_HIP_TRAIL := deg_to_rad(16.0)
+## Both hips bend FORWARD, the trailing one simply much less. It used to bend
+## backwards, which with a knee folded this far put the trailing foot further
+## behind than any stride reaches; bending forward less already carries that foot
+## well back, because the calf is folded up behind the thigh.
+const SWING_HIP_LEAD := deg_to_rad(84.0)
+const SWING_HIP_TRAIL := deg_to_rad(17.0)
 ## The knees keep the airborne pose's own fold (JUMP_KNEE_BEND is 130 degrees);
 ## only the hips are the swing's own.
 const SWING_KNEE_BEND := deg_to_rad(130.0)
@@ -138,10 +147,7 @@ var grip_timer := 0.0
 var relatch_timer := 0.0
 ## Whether this grip has climbed yet, which is what makes the next stop
 ## climbing an apex rather than just a slow moment.
-var _climbed := false
-## The fastest this grip has climbed, which is what HANDOFF_CLIMB_FRACTION is a
-## fraction of.
-var _peak_climb := 0.0
+
 ## This pose's own eased value per joint, keyed by instance id: a Vector3 of
 ## Euler angles, or a Quaternion for the hand. Absent means the pose has not
 ## touched that joint yet and should start from wherever it now is.
@@ -229,8 +235,6 @@ func _throw(ctx: TraversalContext, aim: Vector3, with_pickup: bool) -> bool:
 		ctx.body.global_position.distance_to(anchor), MIN_ROPE, MAX_ROPE
 	)
 	grip_timer = MIN_GRIP
-	_climbed = false
-	_peak_climb = 0.0
 	if with_pickup:
 		left_hand = true
 		var forward := _horizontal(aim, ctx)
@@ -303,19 +307,19 @@ func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 	radial = body.global_position - anchor
 	if radial.length() > rope_length:
 		body.global_position = anchor + radial.normalized() * rope_length
-	if body.velocity.y > APEX_RISE_MIN:
-		_climbed = true
-		_peak_climb = maxf(_peak_climb, body.velocity.y)
-	var nearing_apex := (
-		_climbed and body.velocity.y <= _peak_climb * HANDOFF_CLIMB_FRACTION
-	)
-	# The stick is what asks for the next vine. Holding a direction at the top of
-	# an arc throws the free hand that way and carries the traversal on; holding
-	# nothing keeps the grip and lets the swing simply swing. That puts the
-	# rhythm in the player's hands rather than on a timer, and it is what makes a
-	# line of trees crossable at speed.
+	# The stick is what asks for the next vine. Hold a direction and the free hand
+	# throws that way the moment this vine has carried the body as far that way as
+	# it can; hold nothing and the grip keeps, and the swing simply swings. The
+	# rhythm belongs to the player rather than to a timer.
 	var steered := ctx.direction.length_squared() > 0.0001
-	if nearing_apex and steered and grip_timer <= 0.0:
+	var wanted := ctx.direction.normalized() if steered else Vector3.ZERO
+	var past_anchor := false
+	if steered:
+		var out_from_anchor := body.global_position - anchor
+		out_from_anchor.y = 0.0
+		past_anchor = out_from_anchor.dot(wanted) > 0.0
+	var rope_out := radial.length() >= rope_length * HANDOFF_ROPE_FRACTION
+	if steered and past_anchor and rope_out and grip_timer <= 0.0:
 		var held := anchor
 		var hand_was := left_hand
 		if _throw(ctx, _swing_aim(ctx, aim), false) and anchor.distance_to(held) > 2.0:
@@ -323,8 +327,25 @@ func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 			left_hand = not left_hand
 		else:
 			anchor = held
-			_climbed = false
 	_draw_vine(ctx)
+
+
+## Which way the body should be facing: where the stick is asking to go, else
+## where the arc is actually carrying it. A swinger should never be left facing
+## sideways or backwards because the aim changed under him, so this is offered
+## for the driver to turn its own body toward, the same as any other movement.
+## Returns ZERO when there is nothing to say, and the driver keeps its heading.
+func heading(ctx: TraversalContext) -> Vector3:
+	if ctx.direction.length_squared() > 0.0001:
+		var steer := ctx.direction
+		steer.y = 0.0
+		if steer.length_squared() > 0.0001:
+			return steer.normalized()
+	var travel := ctx.body.velocity
+	travel.y = 0.0
+	if travel.length_squared() > 0.25:
+		return travel.normalized()
+	return Vector3.ZERO
 
 
 ## Where the next throw looks. The stick comes first: a player holding a
@@ -438,7 +459,7 @@ func _pose_legs(ctx: TraversalContext) -> void:
 		if hip != null:
 			_borrow(hip)
 			_ease_rotation(hip, Vector3(
-				-SWING_HIP_LEAD if leads else SWING_HIP_TRAIL, 0.0, 0.0
+				-SWING_HIP_LEAD if leads else -SWING_HIP_TRAIL, 0.0, 0.0
 			), LEG_RATE, ctx.delta)
 		var knee := rig.joint("%s_knee" % prefix)
 		if knee != null:

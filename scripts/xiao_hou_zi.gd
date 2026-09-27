@@ -1335,11 +1335,13 @@ func _update_direct_vine_swing(direction: Vector3, delta: float, jump_pressed: b
 	if not _vine_swing.swing(ctx, direction, jump_pressed and not UIState.modal_open):
 		return false
 	_direct_vertical_velocity = velocity.y
-	var travel := velocity
-	travel.y = 0.0
-	if travel.length_squared() > 0.04:
+	# Facing comes from the shared power, which prefers the stick over the travel,
+	# so he turns to where the player is aiming rather than where the arc happens
+	# to be carrying him.
+	var facing := _vine_swing.heading(ctx)
+	if facing != Vector3.ZERO:
 		rotation.y = lerp_angle(
-			rotation.y, atan2(travel.x, travel.z), minf(ROTATION_SPEED * delta, 1.0)
+			rotation.y, atan2(facing.x, facing.z), minf(ROTATION_SPEED * delta, 1.0)
 		)
 	_animate_walk(delta, false)
 	_vine_swing.pose(ctx)

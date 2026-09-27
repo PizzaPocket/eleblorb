@@ -1208,10 +1208,14 @@ static func build_flowering_tree(height: float, leaf_color: Color, blossom_color
 const JUNGLE_TALL_CHANCE := 0.34
 const JUNGLE_EMERGENT_HEIGHT_MIN := 37.0
 const JUNGLE_EMERGENT_HEIGHT_MAX := 54.0
-## Measured at 0.12 this put 52 trees over 34 m into the demo's 348 by 220 m
-## plant window, which read as a wall. The swingable route does not depend on
-## these (the anchor chain guarantees it), so they are free to be occasional.
-const JUNGLE_EMERGENT_CHANCE := 0.05
+## How often an individual is an emergent rather than one of the canopy species.
+## This was cut right back once, to 0.05, because 52 giants in the demo's plant
+## window read as a wall. That diagnosis was wrong: the wall was the total
+## absence of any separation rule, which let two trunks stand 0.4 m apart and put
+## 135 pairs closer than one of their own crowns. With a real separation rule in
+## place (GIANT_MIN_SEPARATION, 30 m, about two crowns' width) the count bounds
+## itself, so this can be generous and a jungle can be properly full of them.
+const JUNGLE_EMERGENT_CHANCE := 0.26
 ## Per species, how far a tall individual stretches. A slender stem carries a
 ## real stretch; a fat one carries none.
 const SLENDER_STRETCH := Vector2(1.45, 2.05)

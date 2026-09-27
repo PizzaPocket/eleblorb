@@ -4771,8 +4771,25 @@ func _update_vine_swing(delta: float, jump_pressed: bool) -> bool:
 	if not _vine_swing.swing(ctx, aim, jump_pressed and not UIState.modal_open):
 		return false
 	_animate_walk(delta, false)
+	_pose_body_vine_swing(delta)
 	_vine_swing.pose(ctx)
 	return true
+
+
+## A swinger turns to face where he is going, like every other movement mode.
+## Nothing set the body's heading during a swing, so it stayed frozen at whatever
+## it happened to be when the vine caught, and changing aim left him travelling
+## sideways or backwards.
+func _pose_body_vine_swing(delta: float) -> void:
+	var facing := _vine_swing.heading(_traversal_context(delta))
+	if facing != Vector3.ZERO:
+		_body_yaw = lerp_angle(
+			_body_yaw, atan2(facing.x, facing.z), minf(rotation_speed * delta, 1.0)
+		)
+	visuals.basis = Basis(Vector3.UP, _body_yaw)
+	# Airborne on every count while hanging from a vine: not grounded, not on
+	# aerial support, not buoyant.
+	visuals.position = Vector3(0.0, _body_base_height(delta, false, false, false), 0.0)
 
 
 func _update_rock_leg_powers(delta: float) -> void:
