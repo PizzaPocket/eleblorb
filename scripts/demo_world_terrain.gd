@@ -38,7 +38,7 @@ const OCEAN_KINGDOM_TERRAIN := preload("res://scripts/ocean_kingdom_terrain.gd")
 
 const X_MIN := -140.0
 const X_MAX := 5907.5
-const Z_HALF := 300.0
+const Z_HALF := 350.0
 ## The island's playable crown runs roughly VALLEY_HALF_WIDTH either side of
 ## its gently curving path before steep cliffs descend to the spherical sea.
 const VALLEY_HALF_WIDTH := 115.0
@@ -55,6 +55,9 @@ const WORLD_OCEAN_RADIUS := 120000.0
 ## instead leaves a band of submerged bank where the sea shows through the
 ## lake's own water.
 const OCEAN_HOLE_MARGIN := 16.0
+## How many places along the lake the basin's width is measured at. One is not
+## enough: see _lake_basin_footprint().
+const OCEAN_HOLE_STATIONS := 15
 const WORLD_OCEAN_SEGMENTS := 128
 const WORLD_OCEAN_RINGS := 64
 const SPACING := 5.0
@@ -242,16 +245,21 @@ const DA_HOU_ZI_CLEARING := Vector2(390.0, 58.0)
 ## Room for a titan two and a half times its old size (see
 ## PRIMATE_KINGDOM_GORILLA.GORILLA_DISPLAY_SCALE).
 const DA_HOU_ZI_CLEAR_RADIUS := 145.0
-const DINOSAUR_CLEARING := Vector2(4277.5, -62.0)
+const DINOSAUR_CLEARING := Vector2(4277.5, -155.0)
 ## Room for a titan two and a half times its old size (see
 ## DinosaurTitan.DISPLAY_SCALE).
-const DINOSAUR_CLEAR_RADIUS := 120.0
+const DINOSAUR_CLEAR_RADIUS := 105.0
 ## How far the clearing is sunk below the dirt around it, so a creature 143 m
 ## long stands in a basin rather than on a plateau.
 const DINOSAUR_BASIN_DROP := 26.0
 ## The basin's own walls slope in over this, longer than an ordinary clearing
 ## blend so the drop reads as a canyon rather than a step.
-const DINOSAUR_BASIN_BLEND := 95.0
+const DINOSAUR_BASIN_BLEND := 35.0
+## The normal island crown would put this side basin on the coastal cliff.
+## Widen only the south flank around Dinosaur; the central motocross country
+## and the opposite coast keep their irregular imported badlands.
+const DINOSAUR_SIDE_EXTENSION := 150.0
+const DINOSAUR_SIDE_EXTENSION_X_BLEND := 150.0
 const TITAN_CLEAR_BLEND := 24.0
 
 ## The course climbs across the ground zone to SKY_HEIGHT, near the clouds
@@ -353,6 +361,7 @@ const BORDERS := [
 ]
 ## Ice brings the Penguin Helm, Snow the Toboggan, Air the Bird Helm.
 const HEAD_ITEMS := {
+	"plant": "Leaf Hat",
 	"water": "Diving Helmet",
 	"ice": "Penguin Helm",
 	"snow": "Toboggan",
@@ -371,6 +380,7 @@ var _nz: int
 ## _raw_height() at every grid vertex, computed once: characters query heights
 ## many times a frame, and the mesh build samples each vertex's neighbours.
 var _heights := PackedFloat32Array()
+var _heightfield_ready := false
 ## One entry per render chunk: the grid columns it spans, its material, and
 ## the mesh and collider it currently owns, so a chunk can be rebuilt alone.
 var _chunks: Array[Dictionary] = []
@@ -504,13 +514,32 @@ func _ready() -> void:
 	_nx = int(round((X_MAX - X_MIN) / SPACING)) + 1
 	_nz = int(round(Z_HALF * 2.0 / SPACING)) + 1
 	_heights.resize(_nx * _nz)
-	for iz in _nz:
+	# The demo is substantially longer than an ordinary kingdom. Divide its
+	# expensive construction into truthful stages with a rendered frame between
+	# them, while gameplay queries use the same analytical height function until
+	# the sampled grid is complete.
+	const SAMPLE_BANDS := 6
+	for band in SAMPLE_BANDS:
+		var row_from := int(floor(float(_nz) * float(band) / float(SAMPLE_BANDS)))
+		var row_to := int(floor(float(_nz) * float(band + 1) / float(SAMPLE_BANDS)))
+		LoadingScreen.enqueue_build_stage(
+			"Sampling terrain data…", lerpf(0.66, 0.75, float(band + 1) / float(SAMPLE_BANDS)),
+			Callable(self, "_sample_height_rows").bind(row_from, row_to)
+		)
+	LoadingScreen.enqueue_build_stage("Building terrain and collision…", 0.82, _build_mesh_and_collision)
+	LoadingScreen.enqueue_build_stage("Preparing world surfaces…", 0.88, _build_liquid_surfaces)
+	LoadingScreen.enqueue_build_stage("Preparing planetary backdrop…", 0.91, _build_world_ocean)
+	LoadingScreen.enqueue_build_stage("Placing world objects…", 0.96, _scatter_scenery)
+
+
+func _sample_height_rows(row_from: int, row_to: int) -> void:
+	for iz in range(row_from, row_to):
 		for ix in _nx:
-			_heights[iz * _nx + ix] = _raw_height(X_MIN + float(ix) * SPACING, -Z_HALF + float(iz) * SPACING)
-	_build_mesh_and_collision()
-	_build_liquid_surfaces()
-	_build_world_ocean()
-	_scatter_scenery()
+			_heights[iz * _nx + ix] = _raw_height(
+				X_MIN + float(ix) * SPACING, -Z_HALF + float(iz) * SPACING
+			)
+	if row_to >= _nz:
+		_heightfield_ready = true
 
 
 # ---- Shape -----------------------------------------------------------------
@@ -585,6 +614,13 @@ func _valley_half_width(x: float, side: float = 0.0) -> float:
 		var ice_bank_span := smoothstep(border_x("ice") - 8.0, border_x("ice") + 55.0, x)
 		ice_bank_span *= 1.0 - smoothstep(ICE_EAST_SHORE_X - 70.0, MOUNTAIN_FOOT_X + 20.0, x)
 		width += ICE_RIGHT_BANK_EXTENSION * ice_bank_span
+	elif side < 0.0:
+		var dinosaur_side := 1.0 - smoothstep(
+			DINOSAUR_SIDE_EXTENSION_X_BLEND,
+			DINOSAUR_SIDE_EXTENSION_X_BLEND + 45.0,
+			absf(x - DINOSAUR_CLEARING.x)
+		)
+		width += DINOSAUR_SIDE_EXTENSION * dinosaur_side
 	return width
 
 
@@ -1055,7 +1091,10 @@ func get_path_point(x: float, z: float = 0.0) -> Vector3:
 # ---- Construction ------------------------------------------------------------
 
 func _grid_vertex(ix: int, iz: int) -> Vector3:
-	return Vector3(X_MIN + float(ix) * SPACING, _heights[iz * _nx + ix], -Z_HALF + float(iz) * SPACING)
+	var x := X_MIN + float(ix) * SPACING
+	var z := -Z_HALF + float(iz) * SPACING
+	var height := _heights[iz * _nx + ix] if _heightfield_ready else _raw_height(x, z)
+	return Vector3(x, height, z)
 
 
 func _plane_height(a: Vector3, b: Vector3, c: Vector3, x: float, z: float) -> float:
@@ -1341,18 +1380,39 @@ func _build_chasm_lava() -> void:
 ## spine, and the distance out from it at which the basin climbs back above
 ## sea level. Sampled off the built terrain rather than assumed, and pulled in
 ## by a margin so the edge of the hole sits under solid ground.
+## How far out the hole in the world sea has to reach so that no part of this
+## lake's basin is left under it.
+##
+## Measured along many rays, not one. It used to take a single ray north from the
+## lake's own middle, which reads 200 m; the basin stays below the sea out to 224 m
+## at the lake's southern end, where its shore wanders widest. That 24 m was drawn
+## over, and the sea's surface cut across the inside of the lake there. A capsule
+## with a wandering shore and two end caps cannot be characterised by one ray.
 func _lake_basin_footprint() -> Dictionary:
 	var centre := _water_lake.center
 	var half_length := _water_lake.half_length
 	var reach := LAKE_RADIUS + LAKE_EDGE_VARIATION + LAKE_SLOPE_WIDTH
 	var step := 4.0
-	var out := reach
-	var distance := 0.0
-	while distance <= reach:
-		if get_mesh_height(centre.x, centre.y + distance) > WORLD_OCEAN_LEVEL:
-			out = distance
-			break
-		distance += step
+	var out := 0.0
+	for station in OCEAN_HOLE_STATIONS:
+		var x: float = lerpf(
+			centre.x - half_length, centre.x + half_length,
+			float(station) / float(OCEAN_HOLE_STATIONS - 1)
+		)
+		for side: float in [1.0, -1.0]:
+			# Each ray stops at the bank, where the ground first rises back above
+			# the sea. Taking instead the LAST point below it walks straight past
+			# the bank and finds the open sea beyond the island: that put the hole
+			# at 368 m and its own edge out over water, which is the visible seam
+			# this footprint exists to avoid.
+			var distance := 0.0
+			var below := 0.0
+			while distance <= reach:
+				if get_mesh_height(x, centre.y + side * distance) > WORLD_OCEAN_LEVEL:
+					break
+				below = distance
+				distance += step
+			out = maxf(out, below)
 	return {
 		"from": Vector2(centre.x - half_length, centre.y),
 		"to": Vector2(centre.x + half_length, centre.y),
@@ -1361,36 +1421,6 @@ func _lake_basin_footprint() -> Dictionary:
 
 
 func _build_world_ocean() -> void:
-	var sphere := SphereMesh.new()
-	sphere.radius = WORLD_OCEAN_RADIUS
-	sphere.height = WORLD_OCEAN_RADIUS * 2.0
-	sphere.radial_segments = WORLD_OCEAN_SEGMENTS
-	sphere.rings = WORLD_OCEAN_RINGS
-	var shader := Shader.new()
-	shader.code = """
-shader_type spatial;
-render_mode cull_back, depth_draw_opaque;
-uniform vec2 hole_from;
-uniform vec2 hole_to;
-uniform float hole_radius;
-void fragment() {
-	vec3 world = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
-	vec2 here = vec2(world.x, world.z);
-	vec2 span = hole_to - hole_from;
-	float along = clamp(dot(here - hole_from, span) / max(dot(span, span), 0.0001), 0.0, 1.0);
-	if (distance(here, hole_from + span * along) < hole_radius) {
-		discard;
-	}
-	vec3 deep_blue = vec3(0.055, 0.31, 0.53);
-	vec3 sky_blue = vec3(0.16, 0.52, 0.72);
-	float fresnel = pow(1.0 - max(dot(NORMAL, VIEW), 0.0), 3.0);
-	ALBEDO = mix(deep_blue, sky_blue, 0.28 + fresnel * 0.45);
-	ROUGHNESS = 0.28;
-	METALLIC = 0.05;
-}
-"""
-	var material := ShaderMaterial.new()
-	material.shader = shader
 	# The basin is dug far below this sea, so its surface would otherwise cut
 	# straight across the inside of the lake. The sea is not drawn over the
 	# basin's own footprint, and that footprint stops short of where the
@@ -1402,18 +1432,14 @@ void fragment() {
 	# Cutting the whole island's footprint instead, which was the earlier
 	# attempt, cost the seamless join where the sea meets the island's sides.
 	var footprint := _lake_basin_footprint()
-	material.set_shader_parameter("hole_from", footprint["from"])
-	material.set_shader_parameter("hole_to", footprint["to"])
-	material.set_shader_parameter("hole_radius", footprint["radius"])
-	var ocean := MeshInstance3D.new()
-	ocean.name = "SphericalWorldOcean"
-	ocean.mesh = sphere
-	ocean.material_override = material
-	ocean.position = Vector3((X_MIN + X_MAX) * 0.5, WORLD_OCEAN_LEVEL - WORLD_OCEAN_RADIUS, 0.0)
-	ocean.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	ocean.extra_cull_margin = WORLD_OCEAN_RADIUS * 2.0
+	var ocean := PlanetaryOcean.new()
+	ocean.surface_level = WORLD_OCEAN_LEVEL
+	ocean.planet_center = Vector2((X_MIN + X_MAX) * 0.5, 0.0)
+	ocean.planet_radius = WORLD_OCEAN_RADIUS
+	ocean.radial_segments = WORLD_OCEAN_SEGMENTS
+	ocean.rings = WORLD_OCEAN_RINGS
+	ocean.configure_hole(footprint["from"], footprint["to"], footprint["radius"])
 	add_child(ocean)
-	CollisionPolicy.mark_decorative(ocean)
 
 
 ## The volcano's mouth filled with lava and lit from within, exactly as the
