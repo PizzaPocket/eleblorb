@@ -58,14 +58,22 @@ const RELATCH_DELAY := 0.28
 ## true through the whole descending half of an arc, so the hands alternated like
 ## a metronome. Waiting for the climb to actually stop threw from a body that had
 ## already stalled, and in practice hardly threw at all.
-const HANDOFF_ROPE_FRACTION := 0.88
-## How much further along the asked-for direction the next support has to stand
-## before it is worth swapping to. Without this the fan kept choosing the trunk
-## already held, which is the nearest tall thing to a swinger hanging off it.
-const HANDOFF_FORWARD_GAIN := 9.0
-## How long to wait after a sweep that found nothing worth taking, so a whole
-## arc does not cast a ray fan every frame.
-const HANDOFF_RETRY := 0.18
+## A chain is three beats, not two: swing, LET GO and arc forward freely, then
+## throw for the next support and catch it. The middle beat was missing. The rope
+## used to jump straight from one anchor to the next while still attached, so the
+## swinger was never once in free flight and nothing about it read as letting go
+## and reaching for the next tree.
+##
+## The release is timed for carry rather than for a threshold: he lets go while
+## RISING and moving the way he asked to go, which is the part of an arc that
+## converts swing into forward launch. Below this climb angle there is not enough
+## up in the trajectory to be worth leaving on.
+const RELEASE_MIN_CLIMB := deg_to_rad(16.0)
+## The least time spent in the air after letting go, so the free arc is visible
+## rather than an instant swap of ropes.
+const MIN_AIR := 0.22
+## How far ahead of him the next support has to stand to be worth catching.
+const CATCH_MIN_AHEAD := 6.0
 ## How fast a thrown vine reaches its anchor, and a spent one returns.
 const CAST_SPEED := 46.0
 const RETRACT_SPEED := 58.0
@@ -106,6 +114,10 @@ const SHOULDER_STRAIGHT_UP := PI
 const SHOULDER_RATE := 9.0
 const HAND_RATE := 10.0
 const LEG_RATE := 6.5
+## The free arm's own hang: a little forward of straight down with a soft elbow,
+## which is where an unoccupied arm sits on a body that is not walking.
+const RELAXED_SHOULDER := deg_to_rad(14.0)
+const RELAXED_ELBOW := deg_to_rad(18.0)
 ## The wrist's bend is the arm-power raise's own, held RELATIVE TO THE FOREARM
 ## rather than to the world, so it is the same bend at every arm angle. Holding
 ## it relative to the world instead made the bend shrink as the arm rose, until
@@ -153,6 +165,12 @@ const RELEASE_BLEND := 11.0
 
 var swinging := false
 var anchor := Vector3.ZERO
+## The body the rope is tied to, so the search for the NEXT support can look past
+## it. Hanging from a trunk, that trunk is the first thing every forward ray hits,
+## so it hid every tree behind it and the automatic hand-over had nothing to find.
+var anchor_rid := RID()
+## Which body find_anchor() last picked, alongside the point it returned.
+var found_rid := RID()
 var rope_length := 0.0
 ## Which hand carries the load. The other one is the one that throws next.
 var left_hand := true
@@ -178,6 +196,9 @@ var _hand_rest_position: Dictionary = {}
 ## where an aimed basis leaves its residue).
 var _borrowed: Dictionary = {}
 var _releasing := false
+## Let go on purpose mid-chain, arcing forward with the next throw still to come.
+var seeking := false
+var air_timer := 0.0
 var _vine: MeshInstance3D
 var _cast_fraction := 0.0
 var _retiring: Array[Dictionary] = []
@@ -204,15 +225,29 @@ func swing(ctx: TraversalContext, aim: Vector3, jump_pressed: bool) -> bool:
 		_hand_back(ctx)
 		return false
 	relatch_timer = maxf(relatch_timer - ctx.delta, 0.0)
+	air_timer = maxf(air_timer - ctx.delta, 0.0)
 	if swinging:
 		if jump_pressed:
+			# Jump is a deliberate exit, so it ends the chain rather than
+			# continuing it: no throw follows until he asks for one.
 			_open_hand()
+			seeking = false
 			relatch_timer = RELATCH_DELAY
 			return false
 		_hang(ctx, aim)
 		return true
 	_hand_back(ctx)
-	if jump_pressed and relatch_timer <= 0.0 and _throw(ctx, aim, true):
+	# The middle beat: let go, arcing forward, reaching for the next support. The
+	# arc itself is the driver's ordinary airborne movement, which already keeps
+	# every bit of the momentum, so this only watches for something to catch.
+	if seeking:
+		if ctx.grounded:
+			seeking = false
+		elif air_timer <= 0.0 and ctx.direction.length_squared() > 0.0001:
+			if _catch_next(ctx, ctx.direction.normalized()):
+				_hang(ctx, aim)
+				return true
+	if not seeking and jump_pressed and relatch_timer <= 0.0 and _throw(ctx, aim, true):
 		_hang(ctx, aim)
 		return true
 	return false
@@ -223,6 +258,7 @@ func swing(ctx: TraversalContext, aim: Vector3, jump_pressed: bool) -> bool:
 ## left a line trailing back to a tree the swinger had already left.
 func _open_hand() -> void:
 	swinging = false
+	seeking = false
 	_eased.clear()
 	if is_instance_valid(_vine):
 		_vine.queue_free()
@@ -248,6 +284,7 @@ func _throw(ctx: TraversalContext, aim: Vector3, with_pickup: bool) -> bool:
 		# the player where to stand.
 		return false
 	anchor = found as Vector3
+	anchor_rid = found_rid
 	rope_length = clampf(
 		ctx.body.global_position.distance_to(anchor), MIN_ROPE, MAX_ROPE
 	)
@@ -269,12 +306,18 @@ func _throw(ctx: TraversalContext, aim: Vector3, with_pickup: bool) -> bool:
 ## along `aim` score first, so a throw goes where the swing is already going,
 ## while the side and rear rays let a grove or a lined street carry the
 ## traversal without demanding precise aim at every hand-off.
-func find_anchor(ctx: TraversalContext, aim: Vector3, reach_out: bool = false) -> Variant:
+func find_anchor(
+	ctx: TraversalContext, aim: Vector3, reach_out: bool = false, skip: RID = RID()
+) -> Variant:
 	var space := ctx.body.get_world_3d().direct_space_state
 	var origin: Vector3 = ctx.body.global_position + Vector3.UP * ctx.scaled(REFERENCE_HAND_HEIGHT)
 	var forward := _horizontal(aim, ctx)
 	var best: Variant = null
 	var best_score := -INF
+	found_rid = RID()
+	var excluded: Array[RID] = [ctx.body.get_rid()]
+	if skip.is_valid():
+		excluded.append(skip)
 	for yaw_degrees: float in [0.0, -24.0, 24.0, -48.0, 48.0, -78.0, 78.0, 180.0]:
 		var horizontal := forward.rotated(Vector3.UP, deg_to_rad(yaw_degrees))
 		for rise: float in [0.92, 0.72, 0.55, 0.40]:
@@ -284,7 +327,7 @@ func find_anchor(ctx: TraversalContext, aim: Vector3, reach_out: bool = false) -
 			var query := PhysicsRayQueryParameters3D.create(
 				origin, origin + direction * ANCHOR_RANGE, 1
 			)
-			query.exclude = [ctx.body.get_rid()]
+			query.exclude = excluded
 			var hit := space.intersect_ray(query)
 			if hit.is_empty():
 				continue
@@ -307,6 +350,7 @@ func find_anchor(ctx: TraversalContext, aim: Vector3, reach_out: bool = false) -
 			if score > best_score:
 				best_score = score
 				best = point
+				found_rid = hit["rid"]
 	return best
 
 
@@ -339,54 +383,64 @@ func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 	# rhythm belongs to the player rather than to a timer.
 	var steered := ctx.direction.length_squared() > 0.0001
 	var wanted := ctx.direction.normalized() if steered else Vector3.ZERO
-	var past_anchor := false
-	if steered:
-		var out_from_anchor := body.global_position - anchor
-		out_from_anchor.y = 0.0
-		past_anchor = out_from_anchor.dot(wanted) > 0.0
-	var rope_out := radial.length() >= rope_length * HANDOFF_ROPE_FRACTION
-	if steered and past_anchor and rope_out and grip_timer <= 0.0:
-		_reach_for_next(ctx, wanted)
-	_draw_vine(ctx)
+	if steered and grip_timer <= 0.0 and _carrying_forward(body.velocity, wanted):
+		_let_go_forward()
+	else:
+		_draw_vine(ctx)
 
 
-## Looks for the next support and takes it, or leaves the current grip alone.
-##
-## The candidate is judged BEFORE anything is committed. It used to be thrown
-## first and undone if it turned out to be no good, which was worse than it
-## sounds: the throw had already rewritten the rope's length and restarted the
-## vine's own growth, so a rejected candidate left the swinger on a rope of the
-## wrong length with a vine visibly re-growing to a tree he was still hanging
-## from. Since the fan scores the nearest tall thing highly, and the tree already
-## held is exactly that, the rejected case was the common one.
-##
-## What makes a candidate worth taking is forward progress: it has to stand
-## HANDOFF_FORWARD_GAIN further along the direction being asked for than the
-## anchor already held. That is what "shoot out a new vine that way" means, and
-## it rules out grabbing the same trunk again without needing to know which tree
-## anything belongs to.
-func _reach_for_next(ctx: TraversalContext, wanted: Vector3) -> void:
-	var found: Variant = find_anchor(ctx, _swing_aim(ctx, wanted), true)
+## Whether the arc is now carrying him the way he asked to go, rising: the moment
+## worth leaving on, because the swing's speed becomes forward distance rather
+## than being spent climbing back up the far side.
+func _carrying_forward(velocity: Vector3, wanted: Vector3) -> bool:
+	if velocity.y <= 0.0:
+		return false
+	var along := Vector3(velocity.x, 0.0, velocity.z).dot(wanted)
+	if along <= 0.0:
+		return false
+	return atan2(velocity.y, along) >= RELEASE_MIN_CLIMB
+
+
+## Lets go mid-chain and hands the frame back, keeping every bit of the arc's
+## momentum. The vine goes at once and the other hand comes forward, ready to
+## throw for whatever the search turns up next.
+func _let_go_forward() -> void:
+	swinging = false
+	seeking = true
+	air_timer = MIN_AIR
+	left_hand = not left_hand
+	if is_instance_valid(_vine):
+		_retiring.append({
+			"mesh": _vine, "anchor": anchor,
+			"left_hand": not left_hand, "fraction": _cast_fraction,
+		})
+	_vine = null
+	_cast_fraction = 0.0
+
+
+## Mid-arc, looking for the next support in the direction being asked for. It has
+## to lie AHEAD of him: catching something level or behind would stop the run
+## rather than continue it.
+func _catch_next(ctx: TraversalContext, wanted: Vector3) -> bool:
+	var found: Variant = find_anchor(ctx, wanted, true, anchor_rid)
 	if found == null:
-		# Nothing out there yet. Wait a moment before sweeping again rather than
-		# casting a ray fan every single frame for the rest of the arc.
-		grip_timer = HANDOFF_RETRY
-		return
+		return false
 	var next := found as Vector3
-	var gained := (next - anchor).dot(wanted)
-	if gained < HANDOFF_FORWARD_GAIN:
-		grip_timer = HANDOFF_RETRY
-		return
-	var held := anchor
-	var hand_was := left_hand
+	var ahead := Vector3(
+		next.x - ctx.body.global_position.x, 0.0, next.z - ctx.body.global_position.z
+	).dot(wanted)
+	if ahead < CATCH_MIN_AHEAD:
+		return false
 	anchor = next
+	anchor_rid = found_rid
 	rope_length = clampf(
 		ctx.body.global_position.distance_to(anchor), MIN_ROPE, MAX_ROPE
 	)
-	left_hand = not left_hand
-	_retire_vine_from(held, hand_was)
+	swinging = true
+	seeking = false
 	grip_timer = MIN_GRIP
 	_cast_fraction = 0.0
+	return true
 
 
 ## Which way the body should be facing: where the stick is asking to go, else
@@ -451,6 +505,7 @@ func pose(ctx: TraversalContext) -> void:
 	var busy := ctx.left_arm_busy if left_hand else ctx.right_arm_busy
 	if not busy:
 		_pose_arm(ctx)
+	_relax_arm(ctx, not left_hand)
 	_pose_legs(ctx)
 
 
@@ -511,6 +566,38 @@ func _pose_arm(ctx: TraversalContext) -> void:
 	hand.quaternion = current
 	if wrist != null and _wrist_anchor.has(id):
 		hand.position = (_wrist_anchor[id] as Vector3) - hand.basis * wrist.position
+
+
+## The arm that is NOT holding the vine. Left to itself it kept whatever the last
+## hand-over abandoned it in, hand still turned palm-up, reading as an arm frozen
+## mid-gesture. It hangs relaxed instead, and its hand is given back the rotation
+## and the position this pose borrowed, so nothing of the grip is left on it.
+func _relax_arm(ctx: TraversalContext, free_left: bool) -> void:
+	var rig := ctx.rig
+	if free_left and ctx.left_arm_busy:
+		return
+	if not free_left and ctx.right_arm_busy:
+		return
+	var prefix := "arm_left" if free_left else "arm_right"
+	var side := 1.0 if free_left else -1.0
+	var shoulder := rig.joint("%s_shoulder" % prefix)
+	if shoulder != null:
+		_borrow(shoulder)
+		_ease_rotation(shoulder, Vector3(
+			-RELAXED_SHOULDER, 0.0, side * ProceduralFigure.ARM_OUTWARD_ANGLE
+		), SHOULDER_RATE, ctx.delta)
+	var elbow := rig.joint("%s_elbow" % prefix)
+	if elbow != null:
+		_borrow(elbow)
+		_ease_rotation(elbow, Vector3(-RELAXED_ELBOW, 0.0, 0.0), SHOULDER_RATE, ctx.delta)
+	var hand := rig.joint("hand_left" if free_left else "hand_right")
+	if hand == null:
+		return
+	var id := hand.get_instance_id()
+	if _hand_rest_position.has(id):
+		hand.position = _hand_rest_position[id] as Vector3
+	if _borrowed.has(id):
+		_ease_rotation(hand, _borrowed[id] as Vector3, HAND_RATE, ctx.delta)
 
 
 ## How far the shoulder has to carry the arm for it to lie along the rope, in
