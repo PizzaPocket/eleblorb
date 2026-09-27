@@ -53,25 +53,26 @@ const REFERENCE_HAND_HEIGHT := 1.6
 const VINE_TOP_RADIUS := 0.016
 const VINE_BOTTOM_RADIUS := 0.022
 
-## The holding arm follows the rope instead of holding one fixed angle, and it
-## is aimed by building the shoulder's own basis rather than by commanding an
-## Euler angle. That is deliberate: this rig's shoulder pivot does not turn by
-## the angle it is given (ARM_POWER_POSE_ANGLE in player.gd records 150 degrees
-## commanded reading as a true 90, measured twice, with no root cause found),
-## so any angle computed here would inherit that unexplained scale. Aiming the
-## segment's own axis at the anchor is exact whatever the pivot does with it.
+## The holding arm follows the rope, using the SAME shoulder rotation the
+## arm-power raise uses and simply carrying it further. That raise is the known
+## good one: player.gd commands `rotation.x = -ARM_POWER_POSE_ANGLE` (90
+## degrees) and the arm lands forward and horizontal. So the shoulder here is
+## driven on that same axis, scaled by how high the rope actually runs: zero at
+## rest with the arm down, a quarter turn with the rope horizontal, and a half
+## turn with the rope straight overhead, which is as far as a shoulder goes.
 ##
-## The arm extends along its own local -Y, the convention every segment in this
-## rig uses (see procedural_figure.gd's own joint offsets, all negative down
-## the chain).
-##
-## A shoulder cannot carry the arm past straight up, so the aim is clamped
-## there: the rope direction is pushed out of the rear half-space rather than
-## allowed to fold the joint backwards.
+## An earlier pass aimed the shoulder by building a basis instead, to sidestep
+## an old note that this pivot under-turned by a factor of 1.6. That note is
+## stale; the constant reads 90 degrees today and the pivot turns by what it is
+## given. Driving the same axis the working raise drives is both simpler and
+## the thing actually asked for.
+const SHOULDER_STRAIGHT_UP := PI
 const SHOULDER_BLEND := 14.0
-## How far the wrist may turn the fingers away from the forearm's own line. A
-## real wrist manages something close to this before the forearm has to roll.
-const WRIST_LIMIT := deg_to_rad(78.0)
+## The wrist keeps the arm-power raise's own orientation, which pitches the
+## fingers back to point at the sky, and then the whole forearm rolls half a
+## turn. Fingers that pointed up point at the toes. Half a turn is its own
+## mirror, so there is no inward/outward sign to get wrong here.
+const FOREARM_ROLL := PI
 ## The opposite leg to the holding hand leads the swing, the same leg the arm
 ## would answer in a stride. Hip FORWARD is negative rotation.x and the knee's
 ## own bend is POSITIVE: both taken from _apply_airborne_pose() in player.gd,
@@ -299,8 +300,8 @@ func pose(ctx: TraversalContext) -> void:
 	_pose_legs(ctx)
 
 
-## Aims the shoulder so the arm lies along the rope, then the wrist so the
-## fingers point back down toward the toes with the palm turned onto the vine.
+## The arm-power raise, carried as far up as the rope runs, and the arm-power
+## wrist rolled half a turn so the fingers hang toward the toes.
 func _pose_arm(ctx: TraversalContext) -> void:
 	var rig := ctx.rig
 	var prefix := "arm_left" if left_hand else "arm_right"
@@ -308,88 +309,57 @@ func _pose_arm(ctx: TraversalContext) -> void:
 	if shoulder == null:
 		return
 	var t := minf(SHOULDER_BLEND * ctx.delta, 1.0)
-	var up_the_rope := anchor - shoulder.global_position
-	if up_the_rope.length_squared() < 0.0001:
-		return
-	up_the_rope = _within_shoulder_reach(ctx, up_the_rope.normalized())
-	# The arm runs along its own local -Y, so -Y has to end up along the rope.
+	# Left is +1 and right is -1 for the outward tilt, matching the airborne
+	# pose's own two literals rather than being derived again.
+	var side := 1.0 if left_hand else -1.0
+	var raise_angle := _rope_raise(ctx, shoulder.global_position)
 	_borrow(shoulder)
-	_aim_segment(shoulder, up_the_rope, ctx.visuals.global_transform.basis.x, t)
+	# Plain lerpf, not lerp_angle: straight up is a half turn, and lerp_angle
+	# takes the shortest arc, which at that magnitude is the wrong way round.
+	shoulder.rotation.x = lerpf(shoulder.rotation.x, -raise_angle, t)
+	shoulder.rotation.y = lerp_angle(shoulder.rotation.y, 0.0, t)
+	shoulder.rotation.z = lerp_angle(
+		shoulder.rotation.z, side * ProceduralFigure.ARM_OUTWARD_ANGLE, t
+	)
 	var elbow := rig.joint("%s_elbow" % prefix)
 	if elbow != null:
-		# Straight: the arm is hanging from the vine, not pulling on it.
+		# Straight: the arm hangs from the vine rather than pulling on it.
 		_borrow(elbow)
 		elbow.rotation.x = lerp_angle(elbow.rotation.x, 0.0, t)
 		elbow.rotation.y = lerp_angle(elbow.rotation.y, 0.0, t)
 		elbow.rotation.z = lerp_angle(elbow.rotation.z, 0.0, t)
 	var hand := rig.joint("hand_left" if left_hand else "hand_right")
-	if hand == null:
-		hand = rig.joint("wrist_left" if left_hand else "wrist_right")
 	if hand == null or not rig.has_real("hand_left" if left_hand else "hand_right"):
 		return
-	# Fingers point at the toes, not up at the sky: a hand hanging from a vine
-	# curls back down over it. The wrist can only turn so far off the forearm's
-	# own line, so the reachable direction closest to straight down is used, and
-	# the rest of the turn is what reads as the forearm rolling outward.
-	var down: Vector3 = -ctx.visuals.global_transform.basis.y
-	var fingers := _within_wrist_reach(down, -up_the_rope)
-	# Palm onto the vine: with the fingers curled down, the palm faces back up
-	# the rope. Palm is the hand's own local +Z (confirmed; see the PalmAttach
-	# comment in procedural_figure.gd).
-	var palm := up_the_rope - fingers * up_the_rope.dot(fingers)
-	if palm.length_squared() < 0.0001:
-		palm = ctx.visuals.global_transform.basis.z
+	var parent := hand.get_parent() as Node3D
+	if parent == null:
+		return
+	# The arm-power raise's own hand orientation, verbatim: palm toward the
+	# hero's front, fingertips vertically skyward (see _pose_extended_arm in
+	# player.gd, whose palm/fingertip axes were confirmed by observation).
+	var body_basis := ctx.visuals.global_transform.basis.orthonormalized()
+	var raised := Basis(-body_basis.x, -body_basis.y, body_basis.z)
+	# Then roll the forearm half a turn about its own length, which is the
+	# parent's local -Y in world. Fingers that pointed at the sky now point at
+	# the ground.
+	var along_forearm: Vector3 = -parent.global_transform.basis.orthonormalized().y
 	_borrow(hand)
-	_aim_hand(hand, fingers, palm.normalized(), t)
+	_slerp_into_parent(hand, raised.rotated(along_forearm, FOREARM_ROLL), t)
 
 
-## The rope direction, kept out of the half-space behind the body so the
-## shoulder is never asked to carry the arm past straight up.
-func _within_shoulder_reach(ctx: TraversalContext, direction: Vector3) -> Vector3:
-	var forward: Vector3 = ctx.visuals.global_transform.basis.z
-	var behind := direction.dot(forward)
-	if behind >= 0.0:
-		return direction
-	var flattened := direction - forward * behind
-	if flattened.length_squared() < 0.0001:
-		return Vector3.UP
-	return flattened.normalized()
-
-
-## `wanted` if the wrist can turn that far off `along`, otherwise as far toward
-## it as WRIST_LIMIT allows.
-func _within_wrist_reach(wanted: Vector3, along: Vector3) -> Vector3:
-	var apart := along.angle_to(wanted)
-	if apart <= WRIST_LIMIT:
-		return wanted
-	var axis := along.cross(wanted)
-	if axis.length_squared() < 0.000001:
-		return along
-	return along.rotated(axis.normalized(), WRIST_LIMIT)
-
-
-## Turns a segment so its own local -Y lies along `direction`, given a hint for
-## which way is sideways. Exact whatever the pivot does with an Euler angle.
-func _aim_segment(segment: Node3D, direction: Vector3, side_hint: Vector3, t: float) -> void:
-	var down_the_limb := -direction
-	var side := side_hint - down_the_limb * side_hint.dot(down_the_limb)
-	if side.length_squared() < 0.0001:
-		side = Vector3.FORWARD - down_the_limb * Vector3.FORWARD.dot(down_the_limb)
-	if side.length_squared() < 0.0001:
-		return
-	side = side.normalized()
-	var wanted := Basis(side, down_the_limb, side.cross(down_the_limb).normalized())
-	_slerp_into_parent(segment, wanted, t)
-
-
-## The hand, whose own -Y is the fingertips and whose +Z is the palm.
-func _aim_hand(hand: Node3D, fingers: Vector3, palm: Vector3, t: float) -> void:
-	var y := -fingers
-	var z := palm - y * palm.dot(y)
-	if z.length_squared() < 0.0001:
-		return
-	z = z.normalized()
-	_slerp_into_parent(hand, Basis(y.cross(z).normalized(), y, z), t)
+## How far the shoulder has to carry the arm for it to lie along the rope, in
+## the same units the arm-power raise is commanded in: nothing with the rope
+## straight down, a quarter turn with it level, a half turn with it overhead.
+func _rope_raise(ctx: TraversalContext, from: Vector3) -> float:
+	var rope := anchor - from
+	if rope.length_squared() < 0.0001:
+		return SHOULDER_STRAIGHT_UP
+	var up: Vector3 = ctx.visuals.global_transform.basis.orthonormalized().y
+	# The angle away from straight down, which runs 0 to a half turn whichever
+	# way the rope leans. Leaning back never folds the joint backwards; it just
+	# reads as the same elevation in front, which is the shoulder's own limit.
+	var elevation := clampf(rope.normalized().dot(up), -1.0, 1.0)
+	return clampf(acos(-elevation), 0.0, SHOULDER_STRAIGHT_UP)
 
 
 ## Eases a joint toward a world-space orientation, expressed in its parent's
