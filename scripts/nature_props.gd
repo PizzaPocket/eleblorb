@@ -1181,7 +1181,10 @@ static func build_flowering_tree(height: float, leaf_color: Color, blossom_color
 const JUNGLE_TALL_CHANCE := 0.26
 const JUNGLE_TALL_STRETCH_MIN := 1.24
 const JUNGLE_TALL_STRETCH_MAX := 1.62
-const JUNGLE_EMERGENT_CHANCE := 0.12
+## Measured at 0.12 this put 52 trees over 34 m into the demo's 348 by 220 m
+## plant window, which read as a wall. The swingable route does not depend on
+## these (the anchor chain guarantees it), so they are free to be occasional.
+const JUNGLE_EMERGENT_CHANCE := 0.05
 const JUNGLE_EMERGENT_HEIGHT_MIN := 37.0
 const JUNGLE_EMERGENT_HEIGHT_MAX := 54.0
 

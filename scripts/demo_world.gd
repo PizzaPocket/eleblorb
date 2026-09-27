@@ -23,9 +23,6 @@ const DINOSAUR_FOSSIL_SCENE: GDScript = preload("res://scripts/dinosaur_fossil.g
 ## Enough to raise him and a couple over, so a missed throw is not the end of
 ## it.
 const DEMO_BLORB_SLIME_COUNT := 3
-## TEMPORARY, for testing the ship: start already through the space portal and
-## wearing the Space suit. Set false to start on the ground.
-const DEMO_START_IN_SPACE := true
 const JUNGLE_KINGDOM_FOLIAGE := preload("res://scripts/jungle_kingdom_foliage.gd")
 const MANCHEGO_SCENE: PackedScene = preload("res://scenes/manchego.tscn")
 const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
@@ -44,6 +41,12 @@ const MUSIC_PLAYLIST: Array[AudioStream] = [
 const NORMAL_SLOTS: Array[String] = ["leg_left", "leg_right", "arm_left", "arm_right", "torso"]
 ## Wild shiny blorbs roaming the forest plains (as in the Crossroads field).
 const FOREST_SHINY_COUNT := 5
+## The doorway the scatter keeps every trunk out of: shallow through the gate,
+## wide enough to clear the portal itself (PORTAL_HALF_WIDTH is 30) and the
+## approach to it. Shallow on purpose, so a border does not read as a bald
+## circle cut out of the biome.
+const GATE_KEEP_CLEAR_DEPTH := 17.0
+const GATE_KEEP_CLEAR_WIDTH := DemoWorldTerrain.PORTAL_HALF_WIDTH + 7.0
 ## The demo's portals span most of the valley floor, with piping to match.
 const PORTAL_TUBE_RADIUS := 0.35
 ## Half the gap between a gate's two portals: just over PORTAL_TUBE_RADIUS,
@@ -133,37 +136,6 @@ func _ready() -> void:
 	call_deferred("_finish_loading")
 
 
-## TEMPORARY, for testing the ship: begins the demo as though the player had
-## just risen through the space portal in the Space suit, rather than making
-## them fly the whole course to reach it. Set DEMO_START_IN_SPACE back to
-## false to start on the ground again.
-func _start_in_space() -> void:
-	var player := _player as Node3D
-	if player == null:
-		return
-	# A few frames after the world has settled: asked for during loading, the
-	# roster is not yet listening and nothing is equipped at all.
-	for _settle in 30:
-		await get_tree().process_frame
-	# The suit is called for while he is still on the ground: its blorbs fly
-	# to their wearer, and from the ground they would never reach him 750 m
-	# up. Only once they have landed does he go through the portal.
-	var roster := get_node_or_null("SuitRoster")
-	if roster != null and roster.has_method("switch_to"):
-		roster.switch_to("space")
-	var suit := _player.get_own_blorb_suit() if _player.has_method("get_own_blorb_suit") else null
-	var waited := 0
-	while waited < 600 and suit != null and not suit.has_space_propulsion():
-		await get_tree().process_frame
-		waited += 1
-	player.global_position = Vector3(
-		DemoWorldTerrain.VOLCANO_CENTER.x, SPACE_PORTAL_Y + 6.0,
-		DemoWorldTerrain.VOLCANO_CENTER.y
-	)
-	if player is CharacterBody3D:
-		(player as CharacterBody3D).velocity = Vector3.ZERO
-
-
 ## The demo hands over what its own course needs to be played through, rather
 ## than expecting it to have been earned elsewhere: Blorb Slime for the bones
 ## lying in the dirt clearing.
@@ -225,12 +197,28 @@ func _add_plant_jungle() -> void:
 	jungle.window_source_center = DemoWorldTerrain.PLANT_SOURCE
 	jungle.window_half_size = DemoWorldTerrain.PLANT_HALF
 	jungle.window_target_center = DemoWorldTerrain.PLANT_CENTER
-	# Da Hou Zi roams his clearing (see _add_demo_titans()): no trees or rocks
-	# for him to walk through.
+	# Da Hou Zi's route keeps ordinary random trunks out, while a deliberately
+	# spaced ring of jumbo vine anchors gives the clearing overhead traversal
+	# without putting a trunk in his path.
 	var keep_clear: Array[Vector3] = [Vector3(
 		DemoWorldTerrain.DA_HOU_ZI_CLEARING.x, DemoWorldTerrain.DA_HOU_ZI_CLEARING.y, DemoWorldTerrain.DA_HOU_ZI_CLEAR_RADIUS
 	)]
 	jungle.window_keep_clear = keep_clear
+	jungle.window_keep_clear_jumbo_trees = true
+	# A gate has to stay open. The plant window begins and ends exactly on a
+	# border (192 and 540), so without this the scatter stood trunks inside both
+	# portals: three in the plant gate and eight in the water gate.
+	var gates: Array[Vector4] = []
+	for border_spec in DemoWorldTerrain.BORDERS:
+		var border: Dictionary = border_spec
+		var gate_x: float = float(border["x"])
+		if absf(gate_x - DemoWorldTerrain.PLANT_CENTER.x) > DemoWorldTerrain.PLANT_HALF.x + GATE_KEEP_CLEAR_DEPTH:
+			continue
+		var gate_point: Vector3 = _terrain.get_path_point(gate_x, 0.0)
+		gates.append(Vector4(
+			gate_point.x, gate_point.z, GATE_KEEP_CLEAR_DEPTH, GATE_KEEP_CLEAR_WIDTH
+		))
+	jungle.window_gate_clear = gates
 	add_child(jungle)
 
 
@@ -241,6 +229,9 @@ func _add_demo_titans() -> void:
 	# when Blorb Slime is thrown into them.
 	var dinosaur: Node3D = DINOSAUR_FOSSIL_SCENE.new()
 	dinosaur.name = "Dinosaur"
+	# His enormous rotating footprint stays within the dedicated side basin;
+	# this does not alter his wider roaming behavior in the Ground Kingdom.
+	dinosaur.set("titan_wander_radius", 5.0)
 	dinosaur.position = _terrain.get_path_point(
 		DemoWorldTerrain.DINOSAUR_CLEARING.x,
 		DemoWorldTerrain.DINOSAUR_CLEARING.y - DemoWorldTerrain.path_center_z(DemoWorldTerrain.DINOSAUR_CLEARING.x)
@@ -317,10 +308,6 @@ func _finish_loading() -> void:
 		await RecoveryManager.finish_scene_recovery(self, Transform3D(Basis(), start))
 	else:
 		_player.global_position = start
-	if DEMO_START_IN_SPACE:
-		_start_in_space()
-		_player.set_body_heading(WEST_BODY_YAW)
-		_player.camera_rig.rotation.y = EAST_CAMERA_YAW
 	_build_party()
 	if not recovering and not WorldState.opening_wake_completed:
 		_player.begin_wake_intro()

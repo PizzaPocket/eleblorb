@@ -94,6 +94,24 @@ const LOD_UPDATE_INTERVAL := 0.4
 ## vine anchors. Their trunks stay outside the protected roaming core; only
 ## their high canopies reach across it.
 @export var window_keep_clear_jumbo_trees := false
+## Boxes nothing at all may stand in, vine anchors included: a portal gate is
+## the case this exists for. Each is (centre x, centre z, half depth in x, half
+## width in z). A box rather than a disc because a gate is a doorway: the demo's
+## portals are 60 m wide (PORTAL_HALF_WIDTH), so a disc big enough to clear one
+## would carve a bald 72 m circle out of the forest at every border, while a
+## shallow wide box clears the opening and nothing else. A keep-clear disc above
+## is the titan kind, which anchors may enter beyond its roaming core; these are
+## absolute.
+@export var window_gate_clear: Array[Vector4] = []
+
+## Trees had no separation rule of any kind, so the scatter could and did put
+## two trunks 0.4 m apart, and 135 pairs in the demo window stood closer than
+## one of their own crowns. A crown is wide, so the room a tree needs scales
+## with how big it is: measured on the built window, ordinary canopy species
+## reach 4 to 9 m and an emergent's crown reaches past 17 m.
+const TREE_MIN_SEPARATION := 9.0
+const TALL_MIN_SEPARATION := 15.0
+const GIANT_MIN_SEPARATION := 30.0
 
 var _rng := RandomNumberGenerator.new()
 var _terrain: Node = null
@@ -106,6 +124,8 @@ var _lod_timer := 0.0
 ## Per direct feedback, treetop platforming is "the key fun" of this
 ## kingdom, so it needs the same working support the outskirts jungle
 ## biome's canopy already has, not a copy that silently never gets queried.
+## Every trunk already standing, as (x, z, the room it claimed).
+var _claimed: Array[Vector3] = []
 var _canopy_blobs: Array[Dictionary] = []
 ## The box enclosing every canopy blob, grown as they register.
 var _canopy_bounds := AABB()
@@ -148,9 +168,11 @@ var _clearing_decor_builders: Array = [
 func _ready() -> void:
 	_rng.seed = 20260818
 	_terrain = get_node_or_null("../Terrain")
-	_scatter_trees()
-	_scatter_keep_clear_jumbo_trees()
+	# The route's own anchors and the titan ring are laid first: they have a
+	# job to do, so they claim their room before the random fill takes it.
 	_scatter_vine_swing_trees()
+	_scatter_keep_clear_jumbo_trees()
+	_scatter_trees()
 	_scatter_decor()
 	_scatter_rocks()
 	_register_lod_colliders(self)
@@ -178,8 +200,14 @@ func _scatter_trees() -> void:
 			continue
 		if _zone_of(pos) != "" or _kept_clear(pos):
 			continue  # clearings and rocky zones stay tree-free
+		if not _gate_clear(pos):
+			continue
 		if NatureProps.rolls_jungle_emergent(_rng):
+			if not _claim_room(pos, GIANT_MIN_SEPARATION):
+				continue
 			_place(NatureProps.build_wild_emergent_tree(_rng), pos, 380.0)
+			continue
+		if not _claim_room(pos, TREE_MIN_SEPARATION):
 			continue
 		var builder: Callable = _tree_builders[_rng.randi() % _tree_builders.size()]
 		_place(builder.call(), pos, TREE_VISIBILITY_RANGE)
@@ -200,12 +228,18 @@ func _scatter_window_trees() -> void:
 		# sparse generator effectively cleared the entire biome, not merely a path.
 		if absf(pos.y - window_source_center.y) < 4.5 and _rng.randf() < 0.82:
 			continue
+		if not _gate_clear(pos):
+			continue
 		var tree: Node3D
 		if NatureProps.rolls_jungle_emergent(_rng):
+			if not _claim_room(pos, GIANT_MIN_SEPARATION):
+				continue
 			_place(NatureProps.build_wild_emergent_tree(_rng), pos, 380.0)
 			placed += 1
 			continue
 		if _rng.randf() < DEMO_TALL_TREE_CHANCE:
+			if not _claim_room(pos, TALL_MIN_SEPARATION):
+				continue
 			match _rng.randi() % 3:
 				0:
 					tree = NatureProps.build_palm_tree(
@@ -216,6 +250,8 @@ func _scatter_window_trees() -> void:
 				_:
 					tree = NatureProps.build_baobab_tree(_rng.randf_range(25.0, 34.0), _rng)
 		else:
+			if not _claim_room(pos, TREE_MIN_SEPARATION):
+				continue
 			var builder: Callable = _tree_builders[_rng.randi() % _tree_builders.size()]
 			tree = builder.call() as Node3D
 		_place(tree, pos, TREE_VISIBILITY_RANGE)
@@ -242,8 +278,11 @@ func _scatter_window_trees() -> void:
 ## 266 metres. So the chain is grown instead of laid out. Each anchor looks
 ## ahead for the nearest valid ground within one rope of the last one, trying
 ## the route's own thread first and reaching further out only as it must.
-const VINE_ROUTE_STEPS := [22.0, 18.0, 27.0, 32.0]
-const VINE_ROUTE_LATERALS := [10.0, 16.0, 23.0, 30.0]
+## Stepped out for the longer rope and, more to the point, for the crowns: at
+## 22 m apart, emergents whose crowns reach past 17 m grew straight through one
+## another and walled the route in.
+const VINE_ROUTE_STEPS := [33.0, 28.0, 38.0, 44.0]
+const VINE_ROUTE_LATERALS := [9.0, 13.0, 17.0]
 ## The rope's own length less a margin, since the thrower is never exactly
 ## under the anchor it is reaching from.
 const VINE_ROUTE_MAX_GAP := VineSwingMode.MAX_ROPE * 0.85
@@ -287,6 +326,8 @@ func _scatter_vine_swing_trees() -> void:
 					)
 					if not _in_window(candidate) or not _clear_of_titan_core(candidate):
 						continue
+					if not _gate_clear(candidate):
+						continue
 					if _zone_of(candidate) != "":
 						continue
 					if chained and previous.distance_to(candidate) > VINE_ROUTE_MAX_GAP:
@@ -302,6 +343,9 @@ func _scatter_vine_swing_trees() -> void:
 			cursor += VINE_ROUTE_SKIP
 			chained = false
 			continue
+		# The chain is laid before the random scatter, so it claims its room
+		# first and the ordinary trees fill in around it.
+		_claim_room(chosen, GIANT_MIN_SEPARATION)
 		var built: Dictionary = NatureProps.build_emergent_tree(
 			_rng.randf_range(VINE_ROUTE_HEIGHT_MIN, VINE_ROUTE_HEIGHT_MAX), _rng, false
 		)
@@ -348,6 +392,8 @@ func _scatter_keep_clear_jumbo_trees() -> void:
 			var source_pos := window_source_center + (host_pos - window_target_center)
 			if not _in_window(source_pos):
 				continue
+			if not _claim_room(source_pos, GIANT_MIN_SEPARATION):
+				continue
 			var built: Dictionary = NatureProps.build_emergent_tree(
 				_rng.randf_range(44.0, 54.0), _rng, false
 			)
@@ -389,6 +435,30 @@ func _scatter_rocks() -> void:
 				_rng.randf_range(1.4, 3.2), _rng.randi_range(2, 4), _rng
 			) if _rng.randf() < 0.35 else NatureProps.build_rock(_rng.randf_range(0.8, 2.4))
 			_place(prop, pos, ROCK_VISIBILITY_RANGE)
+
+
+## Whether a trunk of this size has room here, and claiming it if so. Called
+## once per placement: a tree that cannot claim its room is not placed.
+func _claim_room(pos: Vector2, separation: float) -> bool:
+	for taken in _claimed:
+		var apart: float = pos.distance_to(Vector2(taken.x, taken.y))
+		if apart < maxf(separation, taken.z):
+			return false
+	_claimed.append(Vector3(pos.x, pos.y, separation))
+	return true
+
+
+## Whether anything at all may stand here. A portal gate has to stay open: the
+## scatter was putting three trunks inside the plant gate and eight inside the
+## water gate, measured on the built window.
+func _gate_clear(pos: Vector2) -> bool:
+	if not window_enabled:
+		return true
+	var host := window_target_center + (pos - window_source_center)
+	for gate in window_gate_clear:
+		if absf(host.x - gate.x) < gate.z and absf(host.y - gate.y) < gate.w:
+			return false
+	return true
 
 
 func _in_window(pos: Vector2) -> bool:
