@@ -104,18 +104,41 @@ const LOD_UPDATE_INTERVAL := 0.4
 ## absolute.
 @export var window_gate_clear: Array[Vector4] = []
 
-## Trees had no separation rule of any kind, so the scatter could and did put
-## two trunks 0.4 m apart, and 135 pairs in the demo window stood closer than
-## one of their own crowns. A crown is wide, so the room a tree needs scales
-## with how big it is: measured on the built window, ordinary canopy species
-## reach 4 to 9 m and an emergent's crown reaches past 17 m.
-const TREE_MIN_SEPARATION := 9.0
-const TALL_MIN_SEPARATION := 15.0
+## Trees had no separation rule of any kind, so the scatter could and did put two
+## trunks 0.4 m apart, and 135 pairs in the demo window stood closer than one of
+## their own crowns.
+##
+## What two trees actually need between them depends on whether their crowns share
+## a height band, and a jungle is layered. An emergent carries its crown 50 m up;
+## a palm carries its own at 12 m. Those two never compete for the same air, so
+## they need nothing more than room for their trunks, and undergrowth grows right
+## up against a big bole in life. Treating the requirement as one number per tree
+## was wrong in exactly that case: a giant's own 38 m pushed every sapling that far
+## off and left its base bare, which is what prompted this.
+##
+## So a claim records where a crown sits and how far it reaches, and two trees are
+## in different tiers when the gap between their crowns is more than the larger
+## crown's own reach. Different tiers need TRUNK_CLEARANCE. The same tier needs
+## their two reaches added, less a little, so neighbouring crowns interlock the way
+## a canopy does rather than standing apart.
+const TRUNK_CLEARANCE := 4.5
+const CANOPY_INTERLOCK := 0.85
+## A crown's own place on a tree, as fractions of its height. The canopy species
+## carry a broad crown over a short bole; an emergent carries a narrower one at the
+## top of a long bare trunk (see NatureProps.build_emergent_tree()).
+const CANOPY_CROWN_HEIGHT := 0.62
+const CANOPY_CROWN_REACH := 0.40
+const EMERGENT_CROWN_HEIGHT := 0.80
+const EMERGENT_CROWN_REACH := 0.34
+## A nominal height for the ordinary canopy species, whose own heights are drawn
+## inside their builders. Their exact value barely matters here, since every one of
+## them lands in the same tier as the others and far below any emergent.
+const CANOPY_NOMINAL_HEIGHT := 18.0
 ## Grown with the trees: a crown is 0.34 of the height across, so the tallest now
 ## reach 26 m and two of them at 30 m apart would grow through one another. Kept
 ## close enough that their crowns still interlock, which is what a canopy does,
 ## without the trunks crowding.
-const GIANT_MIN_SEPARATION := 38.0
+
 
 var _rng := RandomNumberGenerator.new()
 var _terrain: Node = null
@@ -128,8 +151,9 @@ var _lod_timer := 0.0
 ## Per direct feedback, treetop platforming is "the key fun" of this
 ## kingdom, so it needs the same working support the outskirts jungle
 ## biome's canopy already has, not a copy that silently never gets queried.
-## Every trunk already standing, as (x, z, the room it claimed).
-var _claimed: Array[Vector3] = []
+## Every trunk already standing, as (x, z, where its crown sits, how far it
+## reaches). See _claim_room().
+var _claimed: Array[Vector4] = []
 var _canopy_blobs: Array[Dictionary] = []
 ## The box enclosing every canopy blob, grown as they register.
 var _canopy_bounds := AABB()
@@ -213,11 +237,14 @@ func _scatter_trees() -> void:
 		if not _gate_clear(pos):
 			continue
 		if NatureProps.rolls_jungle_emergent(_rng):
-			if not _claim_room(pos, GIANT_MIN_SEPARATION):
+			var giant := NatureProps.jungle_emergent_height(_rng)
+			var crown := _emergent_crown(giant)
+			if not _claim_room(pos, crown.x, crown.y):
 				continue
-			_place(NatureProps.build_wild_emergent_tree(_rng), pos, 380.0)
+			_place(_wild_emergent(giant), pos, 380.0)
 			continue
-		if not _claim_room(pos, TREE_MIN_SEPARATION):
+		var canopy := _canopy_crown(CANOPY_NOMINAL_HEIGHT)
+		if not _claim_room(pos, canopy.x, canopy.y):
 			continue
 		var builder: Callable = _tree_builders[_rng.randi() % _tree_builders.size()]
 		_place(builder.call(), pos, TREE_VISIBILITY_RANGE)
@@ -240,9 +267,11 @@ func _scatter_window_emergents() -> void:
 			continue
 		if absf(pos.y - window_source_center.y) < 4.5:
 			continue
-		if not _claim_room(pos, GIANT_MIN_SEPARATION):
+		var height := NatureProps.jungle_emergent_height(_rng)
+		var crown := _emergent_crown(height)
+		if not _claim_room(pos, crown.x, crown.y):
 			continue
-		_place(NatureProps.build_wild_emergent_tree(_rng), pos, 380.0)
+		_place(_wild_emergent(height), pos, 380.0)
 		placed += 1
 
 
@@ -266,7 +295,8 @@ func _scatter_window_trees() -> void:
 			continue
 		var tree: Node3D
 		if _rng.randf() < DEMO_TALL_TREE_CHANCE:
-			if not _claim_room(pos, TALL_MIN_SEPARATION):
+			var tall := _canopy_crown(30.0)
+			if not _claim_room(pos, tall.x, tall.y):
 				continue
 			match _rng.randi() % 3:
 				0:
@@ -284,7 +314,8 @@ func _scatter_window_trees() -> void:
 						NatureProps.JUNGLE_LEAF_COLORS[0], Color(0.95, 0.6, 0.8), _rng
 					)
 		else:
-			if not _claim_room(pos, TREE_MIN_SEPARATION):
+			var canopy := _canopy_crown(CANOPY_NOMINAL_HEIGHT)
+			if not _claim_room(pos, canopy.x, canopy.y):
 				continue
 			var builder: Callable = _tree_builders[_rng.randi() % _tree_builders.size()]
 			tree = builder.call() as Node3D
@@ -344,6 +375,10 @@ const VINE_ROUTE_TITAN_CORE := 46.0
 ## angles so it reads as a treeline and not as a fence, standing just outside his
 ## roaming room: the clearing was noticeably bare around its edges with six.
 const TITAN_RING_MARGIN := 9.0
+## How far in and out, and how far around, each ring tree wanders from the even
+## spacing, so the clearing's edge does not read as a planted row.
+const TITAN_RING_SPREAD := 34.0
+const TITAN_RING_WOBBLE := 0.19
 const TITAN_RING_ANGLES := [
 	-2.95, -2.41, -1.88, -1.31, -0.74, -0.16, 0.42, 1.06, 1.74, 2.44,
 ]
@@ -394,10 +429,10 @@ func _scatter_vine_swing_trees() -> void:
 		# The chain is laid before the random scatter, so it claims its room first
 		# and the ordinary trees fill in around it. Recorded unconditionally: this
 		# anchor is going in whether the ground was free or not.
-		_force_room(chosen, GIANT_MIN_SEPARATION)
-		var built: Dictionary = NatureProps.build_emergent_tree(
-			_rng.randf_range(VINE_ROUTE_HEIGHT_MIN, VINE_ROUTE_HEIGHT_MAX), _rng, false
-		)
+		var height := _rng.randf_range(VINE_ROUTE_HEIGHT_MIN, VINE_ROUTE_HEIGHT_MAX)
+		var crown := _emergent_crown(height)
+		_force_room(chosen, crown.x, crown.y)
+		var built: Dictionary = NatureProps.build_emergent_tree(height, _rng, false)
 		var tree := built["body"] as StaticBody3D
 		tree.name = "VineSwingEmergent%d" % placed
 		tree.set_meta("vine_swing_anchor", true)
@@ -435,19 +470,28 @@ func _scatter_keep_clear_jumbo_trees() -> void:
 		# narrower than that, and the canopy should remain visible from the route.
 		# Just outside his roaming room, so his route stays clear while the ring
 		# still reads as the edge of the clearing rather than a distant treeline.
-		var ring_radius := protected_radius + TITAN_RING_MARGIN
 		var angles := TITAN_RING_ANGLES
 		for index in angles.size():
 			var angle: float = angles[index]
-			var host_pos := host_center + Vector2(cos(angle), sin(angle)) * ring_radius
+			# Uneven angles were not enough on their own: at one shared radius the
+			# ring still read as planted in a row. Each tree stands its own
+			# distance out, so the treeline wanders as a treeline does.
+			var ring_radius := (
+				protected_radius + TITAN_RING_MARGIN
+				+ _rng.randf_range(0.0, TITAN_RING_SPREAD)
+			)
+			var host_pos := host_center + Vector2(
+				cos(angle + _rng.randf_range(-TITAN_RING_WOBBLE, TITAN_RING_WOBBLE)),
+				sin(angle + _rng.randf_range(-TITAN_RING_WOBBLE, TITAN_RING_WOBBLE))
+			) * ring_radius
 			var source_pos := window_source_center + (host_pos - window_target_center)
 			if not _in_window(source_pos):
 				continue
-			if not _claim_room(source_pos, GIANT_MIN_SEPARATION):
+			var height := _rng.randf_range(VINE_ROUTE_HEIGHT_MIN, VINE_ROUTE_HEIGHT_MAX)
+			var crown := _emergent_crown(height)
+			if not _claim_room(source_pos, crown.x, crown.y):
 				continue
-			var built: Dictionary = NatureProps.build_emergent_tree(
-				_rng.randf_range(VINE_ROUTE_HEIGHT_MIN, VINE_ROUTE_HEIGHT_MAX), _rng, false
-			)
+			var built: Dictionary = NatureProps.build_emergent_tree(height, _rng, false)
 			var tree := built["body"] as StaticBody3D
 			tree.name = "TitanClearingEmergent%d" % index
 			tree.set_meta("vine_swing_anchor", true)
@@ -488,6 +532,13 @@ func _scatter_rocks() -> void:
 			_place(prop, pos, ROCK_VISIBILITY_RANGE)
 
 
+## A wild emergent at a height already drawn here, so the room claimed for it and
+## the tree actually built are the same size.
+func _wild_emergent(height: float) -> Node3D:
+	var built: Dictionary = NatureProps.build_emergent_tree(height, _rng, false)
+	return built["body"] as Node3D
+
+
 ## Whether a trunk of this size has room here, and claiming it if so. Called
 ## once per placement: a tree that cannot claim its room is not placed.
 ##
@@ -499,13 +550,33 @@ func _scatter_rocks() -> void:
 ## right up to a big trunk. The mean keeps giant from giant at the full 30 m,
 ## lets a small tree come within about 20 m of one, and leaves ordinary trees at
 ## their own 9 m.
-func _claim_room(pos: Vector2, separation: float) -> bool:
+func _claim_room(pos: Vector2, crown_y: float, crown_reach: float) -> bool:
 	for taken in _claimed:
-		var apart: float = pos.distance_to(Vector2(taken.x, taken.y))
-		if apart < (separation + taken.z) * 0.5:
+		if pos.distance_to(Vector2(taken.x, taken.y)) < _room_between(
+			crown_y, crown_reach, taken.z, taken.w
+		):
 			return false
-	_claimed.append(Vector3(pos.x, pos.y, separation))
+	_claimed.append(Vector4(pos.x, pos.y, crown_y, crown_reach))
 	return true
+
+
+## How far apart two crowns have to stand. Nothing but trunk room when they sit in
+## different tiers; their two reaches, interlocking a little, when they share one.
+func _room_between(
+	crown_y: float, crown_reach: float, other_y: float, other_reach: float
+) -> float:
+	if absf(crown_y - other_y) > maxf(crown_reach, other_reach):
+		return TRUNK_CLEARANCE
+	return (crown_reach + other_reach) * CANOPY_INTERLOCK
+
+
+## An emergent's crown, and one of the ordinary canopy species', from its height.
+func _emergent_crown(height: float) -> Vector2:
+	return Vector2(height * EMERGENT_CROWN_HEIGHT, height * EMERGENT_CROWN_REACH)
+
+
+func _canopy_crown(height: float) -> Vector2:
+	return Vector2(height * CANOPY_CROWN_HEIGHT, height * CANOPY_CROWN_REACH)
 
 
 ## Room taken whether or not it was free, for a trunk that is going in regardless.
@@ -516,8 +587,8 @@ func _claim_room(pos: Vector2, separation: float) -> bool:
 ## _claim_room() returns without appending, so an anchor placed despite it was
 ## invisible to every later tree and the ordinary scatter dropped trunks on top of
 ## it: measured, a 76 m emergent with another tree 3.5 m away.
-func _force_room(pos: Vector2, separation: float) -> void:
-	_claimed.append(Vector3(pos.x, pos.y, separation))
+func _force_room(pos: Vector2, crown_y: float, crown_reach: float) -> void:
+	_claimed.append(Vector4(pos.x, pos.y, crown_y, crown_reach))
 
 
 ## Whether anything at all may stand here. A portal gate has to stay open: the

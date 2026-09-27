@@ -188,6 +188,8 @@ var _lava := LavaMode.new()
 var _dirtbike := DirtbikeMode.new()
 ## The Leaf Hat's vine, the same power the human swings on.
 var _vine_swing := VineSwingMode.new()
+## Airborne off a released swing, so the arc's momentum is his until he lands.
+var _direct_vine_airborne := false
 ## His snowboard: the same power the player rides, on his own rig and at his
 ## own scale. Toggled by the leg-power chord, as the player's is.
 var _direct_snowboard_active: bool = false
@@ -955,8 +957,10 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			)
 		velocity.x=rolling.x
 		velocity.z=rolling.y
-	elif _direct_ice_skate_airborne:
-		# Steering may rotate Xiao's pose below, but never rewrites the launch.
+	elif _direct_ice_skate_airborne or _direct_vine_airborne:
+		# Steering may rotate Xiao's pose below, but never rewrites the launch. A
+		# released swing keeps the arc's own speed for the same reason a skate jump
+		# keeps its own (see Player's vine_ballistic).
 		pass
 	else:
 		velocity.x = planar.x * speed
@@ -1344,6 +1348,9 @@ func _update_direct_vine_swing(direction: Vector3, delta: float, jump_pressed: b
 			velocity = _vine_swing.exit_velocity
 			_vine_swing.exit_velocity = Vector3.ZERO
 			_direct_vertical_velocity = velocity.y
+			_direct_vine_airborne = true
+		if _direct_vine_airborne and is_on_floor() and velocity.y <= 0.1:
+			_direct_vine_airborne = false
 		return false
 	_direct_vertical_velocity = velocity.y
 	# Facing comes from the shared power, which prefers the stick over the travel,

@@ -1132,6 +1132,8 @@ var _right_arm_plant_cooldown := 0.0
 ## wears the Leaf Hat. Jump throws the vine and jump opens the hand again;
 ## there is no separate mode toggle.
 var _vine_swing := VineSwingMode.new()
+## Airborne off a released swing, so the arc's momentum is his until he lands.
+var _vine_airborne := false
 var _air_foot_hover_active := false
 var _was_powered_hover_active := false
 var _powered_hover_target_y := 0.0
@@ -2163,6 +2165,11 @@ func _physics_process(delta: float) -> void:
 	# movement would rewrite the skate's horizontal launch speed once before
 	# ballistic preservation begins on the following frame.
 	var skate_ballistic:=_ice_skate_airborne and (not grounded or jumped_this_frame) and not buoyant
+	# A swing let go of keeps the arc's own speed until he lands. Without this the
+	# ordinary branch below overwrote horizontal velocity from the stick on the
+	# very next frame, so handing the momentum over achieved nothing and letting go
+	# read as an ordinary jump.
+	var vine_ballistic := _vine_airborne and not grounded and not buoyant
 	# The penguin's dive keeps its launch like a skate jump, and its belly
 	# slide owns the planar velocity (_penguin_belly_slide_step()).
 	var penguin_owns_velocity:=(_penguin_dive_airborne and (not grounded or jumped_this_frame) and not buoyant) or (_penguin_belly_sliding and grounded)
@@ -2284,7 +2291,7 @@ func _physics_process(delta: float) -> void:
 		if neck_led_travel or _dirtbike_wheelie_active:
 			_aerial_motion_direction = direction
 			_aerial_strafe_input = input_dir.x
-		if dirtbike_ballistic or skate_ballistic or penguin_owns_velocity or penguin_gliding or _snowboard_active or _ice_skating_active:
+		if dirtbike_ballistic or skate_ballistic or vine_ballistic or penguin_owns_velocity or penguin_gliding or _snowboard_active or _ice_skating_active:
 			pass
 		elif sliding_on_ice and not neck_led_travel:
 			velocity.x = move_toward(velocity.x, direction.x * current_speed, ICE_ACCELERATION * delta)
@@ -4781,6 +4788,9 @@ func _update_vine_swing(delta: float, jump_pressed: bool) -> bool:
 			_vine_swing.exit_velocity = Vector3.ZERO
 			_jump_takeoff_speed = absf(velocity.y)
 			_jumping = true
+			_vine_airborne = true
+		if _vine_airborne and (is_on_floor() or _is_near_ground()) and velocity.y <= 0.1:
+			_vine_airborne = false
 		return false
 	_animate_walk(delta, false)
 	_pose_body_vine_swing(delta)

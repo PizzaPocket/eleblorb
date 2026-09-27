@@ -30,6 +30,10 @@ const ELEVATIONS: Array[float] = [0.92, 0.72, 0.55, 0.40]
 const ALIGNMENT_WEIGHT := 9.0
 const NEAR_WEIGHT := 0.08
 const FAR_WEIGHT := 0.45
+## How many unusable hits a single bearing will step over before giving up on it,
+## and how far past each one the ray resumes.
+const PASS_THROUGH := 3
+const PASS_THROUGH_STEP := 0.4
 
 
 ## One support worth throwing at. A class rather than a bare Vector3 because the
@@ -70,26 +74,39 @@ static func best(
 			var direction := (
 				horizontal * sqrt(maxf(0.0, 1.0 - rise * rise)) + Vector3.UP * rise
 			).normalized()
-			var query := PhysicsRayQueryParameters3D.create(
-				origin, origin + direction * RANGE, 1
-			)
-			query.exclude = excluded
-			var hit := space.intersect_ray(query)
-			if hit.is_empty():
-				continue
-			var point: Vector3 = hit["position"]
-			var climb := point.y - from.y
-			if climb < MIN_RISE:
-				continue
-			var reach := from.distance_to(point)
-			if reach > span.y or reach < span.x:
-				continue
-			var score := (
-				climb
-				+ horizontal.dot(forward) * ALIGNMENT_WEIGHT
-				+ (reach * FAR_WEIGHT if reach_out else -reach * NEAR_WEIGHT)
-			)
-			if score > best_score:
-				best_score = score
-				found = Found.new(point, hit["rid"])
+			# A sapling must not shadow the tree behind it. The first thing a ray
+			# meets is often undergrowth, too low to swing from, and taking that
+			# as the answer wasted the whole bearing: once the jungle filled in
+			# properly the sweep stopped finding anything at all. So a rejected
+			# hit is stepped over and the ray carries on from just past it.
+			var start := origin
+			var travelled := 0.0
+			for attempt in PASS_THROUGH + 1:
+				var left := RANGE - travelled
+				if left <= 0.0:
+					break
+				var query := PhysicsRayQueryParameters3D.create(
+					start, start + direction * left, 1
+				)
+				query.exclude = excluded
+				var hit := space.intersect_ray(query)
+				if hit.is_empty():
+					break
+				var point: Vector3 = hit["position"]
+				var climb := point.y - from.y
+				var reach := from.distance_to(point)
+				if climb < MIN_RISE or reach > span.y or reach < span.x:
+					# Step past this one and look again along the same bearing.
+					travelled = start.distance_to(point) + PASS_THROUGH_STEP + travelled
+					start = point + direction * PASS_THROUGH_STEP
+					continue
+				var score := (
+					climb
+					+ horizontal.dot(forward) * ALIGNMENT_WEIGHT
+					+ (reach * FAR_WEIGHT if reach_out else -reach * NEAR_WEIGHT)
+				)
+				if score > best_score:
+					best_score = score
+					found = Found.new(point, hit["rid"])
+				break
 	return found

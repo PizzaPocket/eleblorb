@@ -20,6 +20,10 @@ const CAST_SPEED := 46.0
 ## that whole time a line still ran from the swinger's wrist back to a tree he had
 ## already left, which read as still being attached to it.
 const RETRACT_TIME := 0.11
+## The cord's thickness on the human figure. It is scaled by whoever is swinging,
+## because the vine is grown by that character's own blorb and should read as
+## proportional to the body holding it: unscaled it looked right on the human and
+## noticeably thick in a monkey's hand.
 const TOP_RADIUS := 0.016
 const BOTTOM_RADIUS := 0.022
 ## The throwing hand's height above the feet on the human figure, used only when
@@ -62,14 +66,28 @@ func grow(ctx: TraversalContext, anchor: Vector3, from_left: bool) -> void:
 		_mesh = MeshInstance3D.new()
 		_mesh.name = "SwingVine"
 		var material := StandardMaterial3D.new()
-		material.albedo_color = LeafHat.VINE_COLOR
+		# The vine is grown by the blorb wearing the Leaf Hat, so it is that
+		# blorb's own colour rather than a fixed green, the same way the hat
+		# itself takes the colour of the blorb it is made from.
+		material.albedo_color = _grower_color(ctx)
 		material.roughness = 0.9
 		_mesh.material_override = material
 		scene.add_child(_mesh)
 	var start := hand_point(ctx, from_left)
 	var full := start.distance_to(anchor)
 	_grown = move_toward(_grown, 1.0, CAST_SPEED * ctx.delta / maxf(full, 0.001))
-	_draw(_mesh, start, start.lerp(anchor, _grown))
+	_draw(_mesh, start, start.lerp(anchor, _grown), ctx.height_ratio())
+
+
+## The colour of the blorb this vine grew from: the head blorb of the suit that
+## can swing at all. Falls back to the Leaf Hat's own green if there is somehow no
+## blorb to ask.
+static func _grower_color(ctx: TraversalContext) -> Color:
+	if ctx.suit != null:
+		var head := ctx.suit.worn_blorb_in_slot("head")
+		if head != null and String(head.element_state) != "":
+			return ElementPalette.body_color(String(head.element_state))
+	return LeafHat.VINE_COLOR
 
 
 ## Hands the cord over to the retracting set, its tip travelling back to the hand
@@ -123,12 +141,14 @@ func advance(ctx: TraversalContext) -> void:
 			continue
 		entry["fraction"] = fraction
 		_retiring[index] = entry
-		_draw(mesh, hand, hand.lerp(from_anchor, fraction))
+		_draw(mesh, hand, hand.lerp(from_anchor, fraction), ctx.height_ratio())
 
 
 ## One cord, as a tapered cylinder laid between two points. The mesh is reused
 ## across frames and only its height changes, so a swing allocates nothing.
-static func _draw(mesh_instance: MeshInstance3D, start: Vector3, finish: Vector3) -> void:
+static func _draw(
+	mesh_instance: MeshInstance3D, start: Vector3, finish: Vector3, width: float
+) -> void:
 	var length := start.distance_to(finish)
 	mesh_instance.visible = length > 0.002
 	if not mesh_instance.visible:
@@ -136,8 +156,8 @@ static func _draw(mesh_instance: MeshInstance3D, start: Vector3, finish: Vector3
 	var cylinder := mesh_instance.mesh as CylinderMesh
 	if cylinder == null:
 		cylinder = CylinderMesh.new()
-		cylinder.top_radius = TOP_RADIUS
-		cylinder.bottom_radius = BOTTOM_RADIUS
+		cylinder.top_radius = TOP_RADIUS * width
+		cylinder.bottom_radius = BOTTOM_RADIUS * width
 		cylinder.radial_segments = 7
 		mesh_instance.mesh = cylinder
 	cylinder.height = length
