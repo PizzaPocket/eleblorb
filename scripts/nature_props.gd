@@ -1206,8 +1206,14 @@ static func build_flowering_tree(height: float, leaf_color: Color, blossom_color
 ## An emergent is a separate species rather than a stretched one, drawn at that
 ## scale from the start (see build_emergent_tree()).
 const JUNGLE_TALL_CHANCE := 0.34
-const JUNGLE_EMERGENT_HEIGHT_MIN := 37.0
-const JUNGLE_EMERGENT_HEIGHT_MAX := 54.0
+## An emergent's whole point is clearing the canopy, and there is no reason for
+## the ceiling to sit where the first pass happened to put it. Its own geometry
+## carries the height: the trunk is 0.86 of it and the crown 0.34 across, so a 78
+## m tree is a 67 m trunk under a 26 m crown, which is what an emergent looks
+## like. The span is wide on purpose, so a stand of them is a skyline rather than
+## a row of equals.
+const JUNGLE_EMERGENT_HEIGHT_MIN := 42.0
+const JUNGLE_EMERGENT_HEIGHT_MAX := 78.0
 ## How often an individual is an emergent rather than one of the canopy species.
 ## This was cut right back once, to 0.05, because 52 giants in the demo's plant
 ## window read as a wall. That diagnosis was wrong: the wall was the total

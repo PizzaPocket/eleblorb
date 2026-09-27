@@ -111,7 +111,11 @@ const LOD_UPDATE_INTERVAL := 0.4
 ## reach 4 to 9 m and an emergent's crown reaches past 17 m.
 const TREE_MIN_SEPARATION := 9.0
 const TALL_MIN_SEPARATION := 15.0
-const GIANT_MIN_SEPARATION := 30.0
+## Grown with the trees: a crown is 0.34 of the height across, so the tallest now
+## reach 26 m and two of them at 30 m apart would grow through one another. Kept
+## close enough that their crowns still interlock, which is what a canopy does,
+## without the trunks crowding.
+const GIANT_MIN_SEPARATION := 38.0
 
 var _rng := RandomNumberGenerator.new()
 var _terrain: Node = null
@@ -345,8 +349,8 @@ const TITAN_RING_ANGLES := [
 ]
 ## Route anchors are deliberately at the top of the emergent range: everything
 ## else in the biome varies in height, but these have to be reliably throwable.
-const VINE_ROUTE_HEIGHT_MIN := 44.0
-const VINE_ROUTE_HEIGHT_MAX := 54.0
+const VINE_ROUTE_HEIGHT_MIN := 58.0
+const VINE_ROUTE_HEIGHT_MAX := 84.0
 
 
 func _scatter_vine_swing_trees() -> void:
@@ -387,9 +391,10 @@ func _scatter_vine_swing_trees() -> void:
 			cursor += VINE_ROUTE_SKIP
 			chained = false
 			continue
-		# The chain is laid before the random scatter, so it claims its room
-		# first and the ordinary trees fill in around it.
-		_claim_room(chosen, GIANT_MIN_SEPARATION)
+		# The chain is laid before the random scatter, so it claims its room first
+		# and the ordinary trees fill in around it. Recorded unconditionally: this
+		# anchor is going in whether the ground was free or not.
+		_force_room(chosen, GIANT_MIN_SEPARATION)
 		var built: Dictionary = NatureProps.build_emergent_tree(
 			_rng.randf_range(VINE_ROUTE_HEIGHT_MIN, VINE_ROUTE_HEIGHT_MAX), _rng, false
 		)
@@ -441,7 +446,7 @@ func _scatter_keep_clear_jumbo_trees() -> void:
 			if not _claim_room(source_pos, GIANT_MIN_SEPARATION):
 				continue
 			var built: Dictionary = NatureProps.build_emergent_tree(
-				_rng.randf_range(44.0, 54.0), _rng, false
+				_rng.randf_range(VINE_ROUTE_HEIGHT_MIN, VINE_ROUTE_HEIGHT_MAX), _rng, false
 			)
 			var tree := built["body"] as StaticBody3D
 			tree.name = "TitanClearingEmergent%d" % index
@@ -501,6 +506,18 @@ func _claim_room(pos: Vector2, separation: float) -> bool:
 			return false
 	_claimed.append(Vector3(pos.x, pos.y, separation))
 	return true
+
+
+## Room taken whether or not it was free, for a trunk that is going in regardless.
+## The route's own anchors are the case: the swing has to be able to cross the
+## biome, so a station that finds no clear ground is placed anyway.
+##
+## It has to be RECORDED either way, which is the part that was missing. A refused
+## _claim_room() returns without appending, so an anchor placed despite it was
+## invisible to every later tree and the ordinary scatter dropped trunks on top of
+## it: measured, a 76 m emergent with another tree 3.5 m away.
+func _force_room(pos: Vector2, separation: float) -> void:
+	_claimed.append(Vector3(pos.x, pos.y, separation))
 
 
 ## Whether anything at all may stand here. A portal gate has to stay open: the

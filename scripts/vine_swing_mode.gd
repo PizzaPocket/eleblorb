@@ -37,6 +37,20 @@ const CAST_FORWARD := 8.5
 ## Above this horizontal speed a throw is a continuation rather than a start, so
 ## it adds nothing and simply catches.
 const PICKUP_SPEED_LIMIT := 6.0
+## Every hand-over lifts him, by more the lower he is, until he is cruising this
+## far above the ground. A swing that starts from the floor otherwise spends its
+## first arcs grazing it, which looks wrong however correct the physics are; a few
+## hops carry him up to a height worth swinging at, and then stop mattering.
+const CRUISE_HEIGHT := 30.0
+## How much of the remaining climb a hand-over takes out of the way. Stated as a
+## share of the gap rather than as a speed or a jump multiple, because the thing
+## being asked for is altitude: the hop is whatever upward speed buys that much
+## rise under this world's own gravity, which is 4.8 times ordinary and makes a
+## jump-sized hop worth about a metre and a half. It also tapers by itself, since
+## the gap it is a share of shrinks with every hop.
+const HOP_GAP_FRACTION := 0.45
+## Below this the climb is not worth a hop.
+const HOP_MIN_RISE := 0.6
 ## The shortest a grip can last, so one apex cannot fire two throws, and how
 ## long an opened hand stays open before it can catch again.
 const MIN_GRIP := 0.25
@@ -385,9 +399,30 @@ func _catch_next(ctx: TraversalContext, wanted: Vector3) -> bool:
 	# The spent vine retracts to the hand that threw it while the other hand's
 	# own throw is already on its way out.
 	_cord.retire(held, hand_was)
+	_hop(ctx)
 	grip_timer = MIN_GRIP
 	_peak_carry = 0.0
 	return true
+
+
+## The lift a hand-over gives: enough to take HOP_GAP_FRACTION of whatever climb
+## is left to CRUISE_HEIGHT. Taken as a floor on his vertical speed rather than
+## added to it, so it always reads as a hop upward and never compounds into a
+## launch, and it costs nothing once he is already cruising.
+func _hop(ctx: TraversalContext) -> void:
+	var terrain: Node = ctx.terrain
+	if terrain == null or not terrain.has_method("get_mesh_height"):
+		return
+	var here: Vector3 = ctx.body.global_position
+	var clearance := here.y - float(terrain.get_mesh_height(here.x, here.z))
+	var rise := (CRUISE_HEIGHT - clearance) * HOP_GAP_FRACTION
+	if rise < HOP_MIN_RISE:
+		return
+	var gravity := (
+		float(ProjectSettings.get_setting("physics/3d/default_gravity", 9.8))
+		* ctx.profile.gravity_scale
+	)
+	ctx.body.velocity.y = maxf(ctx.body.velocity.y, sqrt(2.0 * gravity * rise))
 
 
 ## Which way the body should be facing: where the stick is asking to go, else
