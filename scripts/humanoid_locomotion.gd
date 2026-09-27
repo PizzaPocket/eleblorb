@@ -159,6 +159,22 @@ static func walk_phase_step(
 	return delta * base_swing_speed * horizontal_speed * profile.walk_cadence_scale * sprint_cadence_scale
 
 
+## What a point of a worn blorb's Speed is worth to FLIGHT, as opposed to ground
+## movement (Player.SPECIAL_MOVEMENT_SPEED_PER_POINT, 0.025). Flight earns more,
+## because flight has somewhere to be: the demo's space portal stands 750 m above
+## the volcano, and a fully grown Fire suit could not reach it. Measured at level
+## 30 with average rolls, a blorb carries Speed 44 and 149 MP, four Fire limbs
+## drain 4.5 MP/s each from their own blorb, so one lasts 33 s -- and at the old
+## rate that bought 636 m of climb against a 750 m portal. It died 114 m short.
+## Sprinting made it, since the drain is per second rather than per metre, but a
+## power should not require knowing that.
+const FLIGHT_SPEED_PER_POINT := 0.06
+## A flight carried by ONE blorb (an Air chest) counts each point double, so a
+## single contributor keeps pace with the two a Fire suit's legs provide instead
+## of flying at half the speed for the same level.
+const SOLO_FLIGHT_SPEED_PER_POINT := FLIGHT_SPEED_PER_POINT * 2.0
+
+
 static func blorb_speed_multiplier(blorbs: Array, per_point: float) -> float:
 	if blorbs.is_empty():
 		return 1.0

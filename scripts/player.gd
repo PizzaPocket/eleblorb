@@ -3054,17 +3054,20 @@ func worn_leg_speed_multiplier() -> float:
 func worn_flight_speed_multiplier() -> float:
 	if _blorb_suit == null:
 		return 1.0
+	# Flight has its own rate, higher than ground movement's: see
+	# HumanoidLocomotion.FLIGHT_SPEED_PER_POINT for the portal this exists to make
+	# reachable. The chest carries a flight alone, so its points count double.
 	if _air_flight_active:
 		var chest := _blorb_suit.worn_blorb_for_slot("torso")
 		if chest != null and chest.element_state == "air":
-			return 1.0 + float(chest.speed) * SPECIAL_MOVEMENT_SPEED_PER_POINT
+			return 1.0 + float(chest.speed) * HumanoidLocomotion.SOLO_FLIGHT_SPEED_PER_POINT
 	if _powers.fire_limb_flight:
 		var leg_points := 0
 		for slot in ["leg_left", "leg_right"]:
 			var leg := _blorb_suit.worn_blorb_for_slot(slot)
 			if leg != null and leg.element_state == "fire":
 				leg_points += leg.speed
-		return 1.0 + float(leg_points) * SPECIAL_MOVEMENT_SPEED_PER_POINT
+		return 1.0 + float(leg_points) * HumanoidLocomotion.FLIGHT_SPEED_PER_POINT
 	return 1.0
 
 
