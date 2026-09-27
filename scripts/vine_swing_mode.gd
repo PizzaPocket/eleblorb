@@ -22,11 +22,16 @@ extends TraversalMode
 ## How far a throw carries, and how high above the thrower a support must
 ## stand before it counts as overhead at all.
 const ANCHOR_RANGE := 78.0
-const MIN_ANCHOR_RISE := 5.0
+## A vine is not a grappling hook onto the nearest bush. A support has to stand
+## this far above the thrower AND this far away from him before it will hold, so
+## a low tree, a boulder or a bank the swinger is standing next to cannot start
+## a swing that has nowhere to go.
+const MIN_ANCHOR_RISE := 11.0
 ## The rope's working length. An anchor further away than MAX_ROPE is refused
 ## rather than clamped: clamping one would snap the body the difference in a
-## single frame, which reads as a teleport into the tree.
-const MIN_ROPE := 7.0
+## single frame, which reads as a teleport into the tree. One nearer than
+## MIN_ROPE is refused too, for the reason above MIN_ANCHOR_RISE.
+const MIN_ROPE := 12.0
 const MAX_ROPE := 52.0
 ## Steering authority while hanging, then the pickup a first throw grants so
 ## the swing visibly lifts into its first descending arc. The lift is stated as
@@ -40,11 +45,14 @@ const CAST_FORWARD := 8.5
 ## long an opened hand stays open before it can catch again.
 const MIN_GRIP := 0.25
 const RELATCH_DELAY := 0.28
-## The free hand throws at the apex of an arc and nowhere else. The apex is an
-## event, not a threshold: the body has to have been climbing and then stop
-## climbing. Testing "vertical speed below a small number" instead, as this did
-## at first, is true through the whole descending half of every arc, so the
-## hands alternated on the grip timer and read as a metronome.
+## The free hand throws on the way UP to the apex, not at it. Waiting for the
+## climb to actually stop meant throwing from a body that had already stalled,
+## with no momentum left to carry into the next arc. So the throw goes when the
+## climb has decayed to this fraction of its own peak: still rising, but past the
+## useful part of the rise. Raise it to throw earlier and flatter, lower it to
+## throw later and higher.
+const HANDOFF_CLIMB_FRACTION := 0.45
+## Below this the arc never really climbed, so there was no apex to anticipate.
 const APEX_RISE_MIN := 0.6
 ## How fast a thrown vine reaches its anchor, and a spent one returns.
 const CAST_SPEED := 46.0
@@ -70,18 +78,22 @@ const VINE_BOTTOM_RADIUS := 0.022
 ## given. Driving the same axis the working raise drives is both simpler and
 ## the thing actually asked for.
 const SHOULDER_STRAIGHT_UP := PI
-## How long the swing's pose takes to take over from whatever the body was
-## doing. It then OWNS these joints: the weight reaches exactly 1.0 and each
-## target is written absolutely.
+## These joints are written ABSOLUTELY, because the driver runs its own animation
+## every frame and this pose after it: a pose that only eased partway toward its
+## target got pulled back the next frame and the two settled at a permanent
+## halfway compromise (the shoulder never passing 45 degrees, the wrist reading
+## as unbent). player.gd's arm-power pose records the identical failure against
+## the fire-jet pose.
 ##
-## It has to. The driver runs its ordinary animation every frame and this pose
-## after it, so a pose that only eased partway toward its target was pulled back
-## by that animation the next frame and the two settled at a permanent halfway
-## compromise: the shoulder never passed about 45 degrees however high the rope
-## ran, and the wrist read as having no bend at all. player.gd's own arm-power
-## pose records the identical failure against the fire-jet pose, and solves it
-## the same way, with an absolute target and a ramped weight.
-const POSE_TAKEOVER := 0.14
+## But a limb must never appear somewhere new: it travels from where it is. So
+## what gets written is this pose's OWN eased state, seeded from wherever the
+## joint actually was when the pose first touched it and moved at these rates
+## from there. Writing the raw target absolutely is what snapped, and it snapped
+## hardest at a hand-over, where the free arm becomes the holding arm and the
+## legs trade lead for trail, so every one of those targets changes at once.
+const SHOULDER_RATE := 9.0
+const HAND_RATE := 10.0
+const LEG_RATE := 6.5
 ## The wrist's bend is the arm-power raise's own, held RELATIVE TO THE FOREARM
 ## rather than to the world, so it is the same bend at every arm angle. Holding
 ## it relative to the world instead made the bend shrink as the arm rose, until
@@ -127,8 +139,16 @@ var relatch_timer := 0.0
 ## Whether this grip has climbed yet, which is what makes the next stop
 ## climbing an apex rather than just a slow moment.
 var _climbed := false
-## How far this pose has taken the joints over, 0 to 1. See POSE_TAKEOVER.
-var _pose_weight := 0.0
+## The fastest this grip has climbed, which is what HANDOFF_CLIMB_FRACTION is a
+## fraction of.
+var _peak_climb := 0.0
+## This pose's own eased value per joint, keyed by instance id: a Vector3 of
+## Euler angles, or a Quaternion for the hand. Absent means the pose has not
+## touched that joint yet and should start from wherever it now is.
+var _eased: Dictionary = {}
+## Which hand the pose last ran for, so a hand-over can re-seed from the arms'
+## real positions rather than easing on from the other arm's numbers.
+var _posed_left := true
 ## Every joint this mode wrote, with the rotation it found there, so leaving the
 ## swing puts back what the ordinary animation does not itself rewrite (it
 ## drives rotation.x each frame and leaves y and z alone, which is exactly
@@ -180,6 +200,7 @@ func swing(ctx: TraversalContext, aim: Vector3, jump_pressed: bool) -> bool:
 ## left a line trailing back to a tree the swinger had already left.
 func _open_hand() -> void:
 	swinging = false
+	_eased.clear()
 	if is_instance_valid(_vine):
 		_vine.queue_free()
 	_vine = null
@@ -209,8 +230,7 @@ func _throw(ctx: TraversalContext, aim: Vector3, with_pickup: bool) -> bool:
 	)
 	grip_timer = MIN_GRIP
 	_climbed = false
-	if not swinging:
-		_pose_weight = 0.0
+	_peak_climb = 0.0
 	if with_pickup:
 		left_hand = true
 		var forward := _horizontal(aim, ctx)
@@ -251,7 +271,7 @@ func find_anchor(ctx: TraversalContext, aim: Vector3) -> Variant:
 			if point.y - ctx.body.global_position.y < MIN_ANCHOR_RISE:
 				continue
 			var span := ctx.body.global_position.distance_to(point)
-			if span > MAX_ROPE:
+			if span > MAX_ROPE or span < MIN_ROPE:
 				continue
 			var score := (point.y - ctx.body.global_position.y) + horizontal.dot(forward) * 9.0 - span * 0.08
 			if score > best_score:
@@ -285,14 +305,17 @@ func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 		body.global_position = anchor + radial.normalized() * rope_length
 	if body.velocity.y > APEX_RISE_MIN:
 		_climbed = true
-	var at_apex := _climbed and body.velocity.y <= 0.0
+		_peak_climb = maxf(_peak_climb, body.velocity.y)
+	var nearing_apex := (
+		_climbed and body.velocity.y <= _peak_climb * HANDOFF_CLIMB_FRACTION
+	)
 	# The stick is what asks for the next vine. Holding a direction at the top of
 	# an arc throws the free hand that way and carries the traversal on; holding
 	# nothing keeps the grip and lets the swing simply swing. That puts the
 	# rhythm in the player's hands rather than on a timer, and it is what makes a
 	# line of trees crossable at speed.
 	var steered := ctx.direction.length_squared() > 0.0001
-	if at_apex and steered and grip_timer <= 0.0:
+	if nearing_apex and steered and grip_timer <= 0.0:
 		var held := anchor
 		var hand_was := left_hand
 		if _throw(ctx, _swing_aim(ctx, aim), false) and anchor.distance_to(held) > 2.0:
@@ -340,7 +363,11 @@ func pose(ctx: TraversalContext) -> void:
 	var rig := ctx.rig
 	if rig == null or not swinging or ctx.visuals == null:
 		return
-	_pose_weight = minf(_pose_weight + ctx.delta / POSE_TAKEOVER, 1.0)
+	if _posed_left != left_hand:
+		# The hands have changed over. Every target moved at once, so drop the
+		# eased state and let each joint set off again from where it really is.
+		_eased.clear()
+		_posed_left = left_hand
 	var busy := ctx.left_arm_busy if left_hand else ctx.right_arm_busy
 	if not busy:
 		_pose_arm(ctx)
@@ -355,26 +382,19 @@ func _pose_arm(ctx: TraversalContext) -> void:
 	var shoulder := rig.joint("%s_shoulder" % prefix)
 	if shoulder == null:
 		return
-	var t := _pose_weight
 	# Left is +1 and right is -1 for the outward tilt, matching the airborne
 	# pose's own two literals rather than being derived again.
 	var side := 1.0 if left_hand else -1.0
 	var raise_angle := _rope_raise(ctx, shoulder.global_position)
 	_borrow(shoulder)
-	# Plain lerpf, not lerp_angle: straight up is a half turn, and lerp_angle
-	# takes the shortest arc, which at that magnitude is the wrong way round.
-	shoulder.rotation.x = lerpf(shoulder.rotation.x, -raise_angle, t)
-	shoulder.rotation.y = lerp_angle(shoulder.rotation.y, 0.0, t)
-	shoulder.rotation.z = lerp_angle(
-		shoulder.rotation.z, side * ProceduralFigure.ARM_OUTWARD_ANGLE, t
-	)
+	_ease_rotation(shoulder, Vector3(
+		-raise_angle, 0.0, side * ProceduralFigure.ARM_OUTWARD_ANGLE
+	), SHOULDER_RATE, ctx.delta)
 	var elbow := rig.joint("%s_elbow" % prefix)
 	if elbow != null:
 		# Straight: the arm hangs from the vine rather than pulling on it.
 		_borrow(elbow)
-		elbow.rotation.x = lerp_angle(elbow.rotation.x, 0.0, t)
-		elbow.rotation.y = lerp_angle(elbow.rotation.y, 0.0, t)
-		elbow.rotation.z = lerp_angle(elbow.rotation.z, 0.0, t)
+		_ease_rotation(elbow, Vector3.ZERO, SHOULDER_RATE, ctx.delta)
 	var hand := rig.joint("hand_left" if left_hand else "hand_right")
 	if hand == null or not rig.has_real("hand_left" if left_hand else "hand_right"):
 		return
@@ -382,8 +402,12 @@ func _pose_arm(ctx: TraversalContext) -> void:
 	# the same bend whatever angle the arm is carried to, rolled half a turn
 	# about the forearm's length. See ARM_POWER_HAND.
 	_borrow(hand)
-	var wanted := Basis(FOREARM_AXIS, FOREARM_ROLL) * ARM_POWER_HAND
-	hand.quaternion = hand.quaternion.slerp(wanted.get_rotation_quaternion(), t)
+	var wanted := (Basis(FOREARM_AXIS, FOREARM_ROLL) * ARM_POWER_HAND).get_rotation_quaternion()
+	var id := hand.get_instance_id()
+	var current: Quaternion = _eased[id] if _eased.has(id) else hand.quaternion
+	current = current.slerp(wanted, minf(HAND_RATE * ctx.delta, 1.0))
+	_eased[id] = current
+	hand.quaternion = current
 
 
 ## How far the shoulder has to carry the arm for it to lie along the rope, in
@@ -406,7 +430,6 @@ func _rope_raise(ctx: TraversalContext, from: Vector3) -> float:
 ## bend positive: see SWING_HIP_LEAD.
 func _pose_legs(ctx: TraversalContext) -> void:
 	var rig := ctx.rig
-	var t := _pose_weight
 	var lead_is_left := not left_hand
 	for side in 2:
 		var prefix := "leg_left" if side == 0 else "leg_right"
@@ -414,13 +437,33 @@ func _pose_legs(ctx: TraversalContext) -> void:
 		var hip := rig.joint("%s_hip" % prefix)
 		if hip != null:
 			_borrow(hip)
-			hip.rotation.x = lerp_angle(
-				hip.rotation.x, -SWING_HIP_LEAD if leads else SWING_HIP_TRAIL, t
-			)
+			_ease_rotation(hip, Vector3(
+				-SWING_HIP_LEAD if leads else SWING_HIP_TRAIL, 0.0, 0.0
+			), LEG_RATE, ctx.delta)
 		var knee := rig.joint("%s_knee" % prefix)
 		if knee != null:
 			_borrow(knee)
-			knee.rotation.x = lerp_angle(knee.rotation.x, SWING_KNEE_BEND, t)
+			_ease_rotation(knee, Vector3(SWING_KNEE_BEND, 0.0, 0.0), LEG_RATE, ctx.delta)
+
+
+## Writes a joint absolutely, from this pose's own eased value rather than from
+## the target, so the joint travels there instead of appearing there. Seeded from
+## wherever the joint actually is the first time it is touched.
+##
+## The pitch uses plain lerpf, not lerp_angle: the shoulder's own target runs to
+## a half turn, and lerp_angle takes the shortest arc, which at that magnitude
+## goes the wrong way round.
+func _ease_rotation(joint: Node3D, target: Vector3, rate: float, delta: float) -> void:
+	var id := joint.get_instance_id()
+	var current: Vector3 = _eased[id] if _eased.has(id) else joint.rotation
+	var t := minf(rate * delta, 1.0)
+	current = Vector3(
+		lerpf(current.x, target.x, t),
+		lerp_angle(current.y, target.y, t),
+		lerp_angle(current.z, target.z, t)
+	)
+	_eased[id] = current
+	joint.rotation = current
 
 
 ## Records a joint's rotation the first time this mode touches it.

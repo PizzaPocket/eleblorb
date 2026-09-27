@@ -243,19 +243,22 @@ var _background_decor_builders := [
 ## huge.
 var _jungle_tree_builders := [
 	func(): return NatureProps.build_palm_tree(
-		15.0 * NatureProps.jungle_height_stretch(_rng), _rng.randf_range(0.12, 0.28), _rng
+		15.0 * NatureProps.species_height_stretch(NatureProps.SLENDER_STRETCH, _rng),
+		_rng.randf_range(0.12, 0.28), _rng
 	),
 	func(): return NatureProps.build_palm_tree(
-		13.0 * NatureProps.jungle_height_stretch(_rng), _rng.randf_range(0.15, 0.32), _rng
+		13.0 * NatureProps.species_height_stretch(NatureProps.SLENDER_STRETCH, _rng),
+		_rng.randf_range(0.15, 0.32), _rng
 	),
 	func(): return NatureProps.build_banyan_tree(
-		_rng.randf_range(15.0, 30.0) * NatureProps.jungle_height_stretch(_rng), _rng
+		_rng.randf_range(15.0, 30.0)
+		* NatureProps.species_height_stretch(NatureProps.BROAD_STRETCH, _rng), _rng
 	),
-	func(): return NatureProps.build_baobab_tree(
-		_rng.randf_range(13.5, 27.0) * NatureProps.jungle_height_stretch(_rng), _rng
-	),
+	# No stretch for the baobab: see species_height_stretch()'s own notes.
+	func(): return NatureProps.build_baobab_tree(_rng.randf_range(13.5, 27.0), _rng),
 	func(): return NatureProps.build_flowering_tree(
-		_rng.randf_range(12.0, 24.0) * NatureProps.jungle_height_stretch(_rng),
+		_rng.randf_range(12.0, 24.0)
+		* NatureProps.species_height_stretch(NatureProps.BROAD_STRETCH, _rng),
 		NatureProps.JUNGLE_LEAF_COLORS[0], Color(0.95, 0.6, 0.8), _rng
 	),
 ]

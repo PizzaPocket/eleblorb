@@ -1081,7 +1081,17 @@ static func build_banyan_tree(height: float, rng: RandomNumberGenerator) -> Stat
 const BAOBAB_TRUNK_TIERS := 4
 const BAOBAB_CROWN_LOBES := 3
 
-static func build_baobab_tree(height: float, rng: RandomNumberGenerator) -> StaticBody3D:
+## A baobab's trunk is 0.24 of its height across at the base, by far the fattest
+## in this file, so its height is capped HERE rather than trusted to every
+## caller. Asked for 34 m it built a trunk 16 m across, which is what prompted
+## this; the demo window's own "tall tree" branch was asking for 25 to 34.
+## Capped, its widest is under 10 m across, which is what a real baobab does. It
+## still varies freely below the cap.
+const BAOBAB_MAX_HEIGHT := 20.0
+
+
+static func build_baobab_tree(asked_height: float, rng: RandomNumberGenerator) -> StaticBody3D:
+	var height: float = minf(asked_height, BAOBAB_MAX_HEIGHT)
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
 	body.collision_mask = 0
@@ -1164,36 +1174,66 @@ static func build_flowering_tree(height: float, leaf_color: Color, blossom_color
 	return body
 
 
-## How tall a jungle tree of any species grows. Every scatter in the game drew
-## its trees from one narrow band per species, so a jungle was a single ceiling
-## with a few hand-placed giants punched through it. Real jungle is layered, and
-## the game now needs that layering to mean something: a Leaf Hat can only
-## swing where something stands tall enough to throw at, so a jungle whose own
-## trees vary in height is swingable everywhere rather than only along a route
-## somebody placed by hand.
+## How tall a jungle tree grows, per species. Every scatter in the game drew its
+## trees from one narrow band per species, so a jungle was a single ceiling with
+## a few hand-placed giants punched through it. Real jungle is layered, and the
+## game needs that layering to mean something: a Leaf Hat can only swing where
+## something stands tall enough to throw at.
 ##
-## Most individuals stand at their species' ordinary height. Roughly a quarter
-## stretch well above their neighbours, and about one in eight is a true
-## emergent, which is a different species entirely rather than a stretched one
-## (see build_emergent_tree(), whose proportions are drawn for that scale).
-## Callers roll for an emergent first and otherwise stretch their own pick, so
-## every jungle scatter shares the one distribution.
-const JUNGLE_TALL_CHANCE := 0.26
-const JUNGLE_TALL_STRETCH_MIN := 1.24
-const JUNGLE_TALL_STRETCH_MAX := 1.62
+## The stretch is per species and NOT shared, because every builder in this file
+## derives its whole geometry from `height` as a set of fractions. Stretching
+## height therefore scales a tree UP rather than growing it TALLER, girth and
+## all, and how well that reads depends entirely on how slender the trunk
+## already is. Measured from the builders themselves, as trunk radius over trunk
+## height:
+##
+##   palm      0.72 h tall, 0.028-0.038 h thick -> ratio 0.04. A bare slender
+##             stem, the one species that genuinely reads as an emergent when it
+##             grows. Gets the full stretch.
+##   banana    0.40 h tall, 0.045 h thick -> ratio 0.11, but it is understorey
+##             by design and a 12 m banana tree is not a thing. No stretch.
+##   banyan    0.42 h tall, 0.075 h thick -> ratio 0.18. A squat bole under a
+##             broad crown. A modest stretch reads as a mature tree; a large one
+##             reads as a scaled-up model.
+##   durian    0.40 h trunk under a 0.4 h round crown. Same as banyan, and its
+##   flowering fruit and blossoms scale with it, so keep the stretch modest.
+##   baobab    0.70 h tall, 0.24 h thick at the base tapering to 0.14 -> ratio
+##             0.34, by far the fattest trunk here. Stretching it produced the
+##             15 m wide trunks that prompted this: at 1.6x a 20 m baobab's base
+##             goes from 4.8 m to 7.7 m across. No stretch, per direct
+##             instruction. Its own 13-22 m band already varies it.
+##
+## An emergent is a separate species rather than a stretched one, drawn at that
+## scale from the start (see build_emergent_tree()).
+const JUNGLE_TALL_CHANCE := 0.34
+const JUNGLE_EMERGENT_HEIGHT_MIN := 37.0
+const JUNGLE_EMERGENT_HEIGHT_MAX := 54.0
 ## Measured at 0.12 this put 52 trees over 34 m into the demo's 348 by 220 m
 ## plant window, which read as a wall. The swingable route does not depend on
 ## these (the anchor chain guarantees it), so they are free to be occasional.
 const JUNGLE_EMERGENT_CHANCE := 0.05
-const JUNGLE_EMERGENT_HEIGHT_MIN := 37.0
-const JUNGLE_EMERGENT_HEIGHT_MAX := 54.0
+## Per species, how far a tall individual stretches. A slender stem carries a
+## real stretch; a fat one carries none.
+const SLENDER_STRETCH := Vector2(1.45, 2.05)
+const BROAD_STRETCH := Vector2(1.12, 1.32)
+const NO_STRETCH := Vector2(1.0, 1.0)
 
 
-## A multiplier on a species' own height, for one individual.
-static func jungle_height_stretch(rng: RandomNumberGenerator) -> float:
+## A multiplier on a species' own height, for one individual, drawn from that
+## species' own range. Pass the range: SLENDER_STRETCH for a bare stem such as a
+## palm, BROAD_STRETCH for a bole under a crown, NO_STRETCH for a baobab or an
+## understorey species.
+static func species_height_stretch(range_of: Vector2, rng: RandomNumberGenerator) -> float:
+	if is_equal_approx(range_of.x, 1.0) and is_equal_approx(range_of.y, 1.0):
+		return 1.0
 	if rng.randf() >= JUNGLE_TALL_CHANCE:
 		return 1.0
-	return rng.randf_range(JUNGLE_TALL_STRETCH_MIN, JUNGLE_TALL_STRETCH_MAX)
+	return rng.randf_range(range_of.x, range_of.y)
+
+
+## The broad-trunked case, for a caller that has not said which species it is.
+static func jungle_height_stretch(rng: RandomNumberGenerator) -> float:
+	return species_height_stretch(BROAD_STRETCH, rng)
 
 
 ## Whether this individual is an emergent rather than one of the ordinary

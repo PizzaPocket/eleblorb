@@ -136,18 +136,24 @@ var _canopy_bounds := AABB()
 ## species keep their own scale: a banana tree is not a canopy tree.
 var _tree_builders: Array = [
 	func(): return NatureProps.build_palm_tree(
-		15.0 * NatureProps.jungle_height_stretch(_rng), _rng.randf_range(0.12, 0.28), _rng
+		15.0 * NatureProps.species_height_stretch(NatureProps.SLENDER_STRETCH, _rng),
+		_rng.randf_range(0.12, 0.28), _rng
 	),
 	func(): return NatureProps.build_banyan_tree(
-		_rng.randf_range(14.0, 26.0) * NatureProps.jungle_height_stretch(_rng), _rng
+		_rng.randf_range(14.0, 26.0)
+		* NatureProps.species_height_stretch(NatureProps.BROAD_STRETCH, _rng), _rng
 	),
-	func(): return NatureProps.build_baobab_tree(
-		_rng.randf_range(13.0, 22.0) * NatureProps.jungle_height_stretch(_rng), _rng
+	# The baobab's trunk is the fattest here and scaling it up reads as a
+	# scaled-up model, not a taller tree. Its own band varies it instead.
+	func(): return NatureProps.build_baobab_tree(_rng.randf_range(13.0, 22.0), _rng),
+	func(): return NatureProps.build_durian_tree(
+		_rng.randf_range(10.0, 18.0)
+		* NatureProps.species_height_stretch(NatureProps.BROAD_STRETCH, _rng), _rng
 	),
-	func(): return NatureProps.build_durian_tree(_rng.randf_range(10.0, 18.0), _rng),
 	func(): return NatureProps.build_banana_tree(_rng.randf_range(5.0, 8.0), _rng),
 	func(): return NatureProps.build_flowering_tree(
-		_rng.randf_range(12.0, 22.0) * NatureProps.jungle_height_stretch(_rng),
+		_rng.randf_range(12.0, 22.0)
+		* NatureProps.species_height_stretch(NatureProps.BROAD_STRETCH, _rng),
 		NatureProps.JUNGLE_LEAF_COLORS[0], Color(0.95, 0.6, 0.8), _rng
 	),
 ]
@@ -248,7 +254,13 @@ func _scatter_window_trees() -> void:
 				1:
 					tree = NatureProps.build_banyan_tree(_rng.randf_range(26.0, 36.0), _rng)
 				_:
-					tree = NatureProps.build_baobab_tree(_rng.randf_range(25.0, 34.0), _rng)
+					# This branch exists to make TALL trees, so it asks a species
+					# that reads well tall. It used to ask for a 25 to 34 m
+					# baobab, whose trunk at that size is a wall.
+					tree = NatureProps.build_flowering_tree(
+						_rng.randf_range(25.0, 33.0),
+						NatureProps.JUNGLE_LEAF_COLORS[0], Color(0.95, 0.6, 0.8), _rng
+					)
 		else:
 			if not _claim_room(pos, TREE_MIN_SEPARATION):
 				continue
@@ -299,6 +311,13 @@ const VINE_ROUTE_MAX_ANCHORS := 40
 ## which is the dead end that appeared right after the portal. So the chain
 ## keeps out of his roaming core and is free beyond it.
 const VINE_ROUTE_TITAN_CORE := 66.0
+## The ring of anchors around a titan's clearing. Ten rather than six, at uneven
+## angles so it reads as a treeline and not as a fence, standing just outside his
+## roaming room: the clearing was noticeably bare around its edges with six.
+const TITAN_RING_MARGIN := 9.0
+const TITAN_RING_ANGLES := [
+	-2.95, -2.41, -1.88, -1.31, -0.74, -0.16, 0.42, 1.06, 1.74, 2.44,
+]
 ## Route anchors are deliberately at the top of the emergent range: everything
 ## else in the biome varies in height, but these have to be reliably throwable.
 const VINE_ROUTE_HEIGHT_MIN := 44.0
@@ -384,8 +403,10 @@ func _scatter_keep_clear_jumbo_trees() -> void:
 		# His 30 m route plus his titan-scale body has generous clearance at 66 m.
 		# Do not follow the full 145 m terrain-flattening radius: the demo window is
 		# narrower than that, and the canopy should remain visible from the route.
-		var ring_radius := minf(maxf(protected_radius * 0.46, 62.0), 70.0)
-		var angles := [-2.58, -1.72, -0.82, 0.08, 0.82, 2.48]
+		# Just outside his roaming room, so his route stays clear while the ring
+		# still reads as the edge of the clearing rather than a distant treeline.
+		var ring_radius := protected_radius + TITAN_RING_MARGIN
+		var angles := TITAN_RING_ANGLES
 		for index in angles.size():
 			var angle: float = angles[index]
 			var host_pos := host_center + Vector2(cos(angle), sin(angle)) * ring_radius

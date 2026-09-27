@@ -41,6 +41,15 @@ const MUSIC_PLAYLIST: Array[AudioStream] = [
 const NORMAL_SLOTS: Array[String] = ["leg_left", "leg_right", "arm_left", "arm_right", "torso"]
 ## Wild shiny blorbs roaming the forest plains (as in the Crossroads field).
 const FOREST_SHINY_COUNT := 5
+## The room Da Hou Zi's own roaming needs, which is NOT the same thing as
+## DA_HOU_ZI_CLEAR_RADIUS. That 145 m is the radius the terrain is flattened
+## over; it was being handed to the scatter as though it were his stride, and the
+## result was a 290 m circle of bare ground covering most of the plant window.
+## Measured inside it: no tree at all within 36 m of him, and two trees in the
+## whole band from 108 to 144 m. He roams GORILLA_ROAM_RADIUS (42 m) and stands
+## about 80 m tall, so this is his stride plus his own reach, and the forest
+## closes in again beyond it while the ground stays flat out to 145.
+const TITAN_ROAM_KEEP_CLEAR := 78.0
 ## The doorway the scatter keeps every trunk out of: shallow through the gate,
 ## wide enough to clear the portal itself (PORTAL_HALF_WIDTH is 30) and the
 ## approach to it. Shallow on purpose, so a border does not read as a bald
@@ -201,7 +210,8 @@ func _add_plant_jungle() -> void:
 	# spaced ring of jumbo vine anchors gives the clearing overhead traversal
 	# without putting a trunk in his path.
 	var keep_clear: Array[Vector3] = [Vector3(
-		DemoWorldTerrain.DA_HOU_ZI_CLEARING.x, DemoWorldTerrain.DA_HOU_ZI_CLEARING.y, DemoWorldTerrain.DA_HOU_ZI_CLEAR_RADIUS
+		DemoWorldTerrain.DA_HOU_ZI_CLEARING.x, DemoWorldTerrain.DA_HOU_ZI_CLEARING.y,
+		TITAN_ROAM_KEEP_CLEAR
 	)]
 	jungle.window_keep_clear = keep_clear
 	jungle.window_keep_clear_jumbo_trees = true
