@@ -328,7 +328,14 @@ const VINE_ROUTE_MAX_ANCHORS := 40
 ## the full 145 m rejected 346 of 424 candidate spots along the demo route,
 ## which is the dead end that appeared right after the portal. So the chain
 ## keeps out of his roaming core and is free beyond it.
-const VINE_ROUTE_TITAN_CORE := 66.0
+## Measured against his own stride rather than guessed: GORILLA_ROAM_RADIUS is
+## 42 m, so a trunk 46 m from the middle of his clearing stands just outside
+## where he actually walks. It was 66, which sounds cautious until you notice the
+## route's own thread passes about 51 m from that middle: the chain was therefore
+## barred from the whole stretch his clearing crosses, and a swing coming east ran
+## out of anywhere to go right there. Ordinary trees still keep their full
+## distance (TITAN_ROAM_KEEP_CLEAR); this is only for the anchors the route needs.
+const VINE_ROUTE_TITAN_CORE := 46.0
 ## The ring of anchors around a titan's clearing. Ten rather than six, at uneven
 ## angles so it reads as a treeline and not as a fence, standing just outside his
 ## roaming room: the clearing was noticeably bare around its edges with six.

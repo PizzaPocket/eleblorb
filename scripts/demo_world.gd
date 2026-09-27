@@ -318,6 +318,12 @@ func _finish_loading() -> void:
 		await RecoveryManager.finish_scene_recovery(self, Transform3D(Basis(), start))
 	else:
 		_player.global_position = start
+		# He wakes facing along the course, with the camera looking the way he
+		# will travel. The temporary space start moved these two lines into its
+		# own branch and out of this one; removing that branch took the start
+		# facing with it, leaving him a quarter turn off.
+		_player.set_body_heading(WEST_BODY_YAW)
+		_player.camera_rig.rotation.y = EAST_CAMERA_YAW
 	_build_party()
 	if not recovering and not WorldState.opening_wake_completed:
 		_player.begin_wake_intro()

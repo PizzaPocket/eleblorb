@@ -59,6 +59,13 @@ const RELATCH_DELAY := 0.28
 ## a metronome. Waiting for the climb to actually stop threw from a body that had
 ## already stalled, and in practice hardly threw at all.
 const HANDOFF_ROPE_FRACTION := 0.88
+## How much further along the asked-for direction the next support has to stand
+## before it is worth swapping to. Without this the fan kept choosing the trunk
+## already held, which is the nearest tall thing to a swinger hanging off it.
+const HANDOFF_FORWARD_GAIN := 9.0
+## How long to wait after a sweep that found nothing worth taking, so a whole
+## arc does not cast a ray fan every frame.
+const HANDOFF_RETRY := 0.18
 ## How fast a thrown vine reaches its anchor, and a spent one returns.
 const CAST_SPEED := 46.0
 const RETRACT_SPEED := 58.0
@@ -121,6 +128,12 @@ const ARM_POWER_HAND := Basis(
 ## becomes pointing at the toes.
 const FOREARM_AXIS := Vector3(0.0, -1.0, 0.0)
 const FOREARM_ROLL := PI
+## How far off the forearm's own line the fingers finally sit. The arm-power
+## raise's bend is a right angle; half of that reads as a hand hanging from a
+## vine rather than one cranked over. The basis above is rotated by
+## (WRIST_BEND - a right angle) about the forearm frame's X to get there, which
+## is zero at a right angle and opens the wrist as the bend shrinks.
+const WRIST_BEND := deg_to_rad(45.0)
 ## The opposite leg to the holding hand leads the swing, the same leg the arm
 ## would answer in a stride. Hip FORWARD is negative rotation.x and the knee's
 ## own bend is POSITIVE: both taken from _apply_airborne_pose() in player.gd,
@@ -155,6 +168,10 @@ var _eased: Dictionary = {}
 ## Which hand the pose last ran for, so a hand-over can re-seed from the arms'
 ## real positions rather than easing on from the other arm's numbers.
 var _posed_left := true
+## Where each posed hand's wrist belongs in its parent's frame, and where that
+## hand itself sat before the pose moved it. See _pose_arm().
+var _wrist_anchor: Dictionary = {}
+var _hand_rest_position: Dictionary = {}
 ## Every joint this mode wrote, with the rotation it found there, so leaving the
 ## swing puts back what the ordinary animation does not itself rewrite (it
 ## drives rotation.x each frame and leaves y and z alone, which is exactly
@@ -252,7 +269,7 @@ func _throw(ctx: TraversalContext, aim: Vector3, with_pickup: bool) -> bool:
 ## along `aim` score first, so a throw goes where the swing is already going,
 ## while the side and rear rays let a grove or a lined street carry the
 ## traversal without demanding precise aim at every hand-off.
-func find_anchor(ctx: TraversalContext, aim: Vector3) -> Variant:
+func find_anchor(ctx: TraversalContext, aim: Vector3, reach_out: bool = false) -> Variant:
 	var space := ctx.body.get_world_3d().direct_space_state
 	var origin: Vector3 = ctx.body.global_position + Vector3.UP * ctx.scaled(REFERENCE_HAND_HEIGHT)
 	var forward := _horizontal(aim, ctx)
@@ -277,7 +294,16 @@ func find_anchor(ctx: TraversalContext, aim: Vector3) -> Variant:
 			var span := ctx.body.global_position.distance_to(point)
 			if span > MAX_ROPE or span < MIN_ROPE:
 				continue
-			var score := (point.y - ctx.body.global_position.y) + horizontal.dot(forward) * 9.0 - span * 0.08
+			# A first throw wants the best support nearby, so distance counts
+			# against a candidate. A hand-over wants to GET somewhere, so there it
+			# counts for one instead: scored the first way, a hand-over kept
+			# choosing something barely ahead of the tree already held and the
+			# chain stalled after a few links.
+			var score := (
+				(point.y - ctx.body.global_position.y)
+				+ horizontal.dot(forward) * 9.0
+				+ (span * 0.45 if reach_out else -span * 0.08)
+			)
 			if score > best_score:
 				best_score = score
 				best = point
@@ -320,14 +346,47 @@ func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 		past_anchor = out_from_anchor.dot(wanted) > 0.0
 	var rope_out := radial.length() >= rope_length * HANDOFF_ROPE_FRACTION
 	if steered and past_anchor and rope_out and grip_timer <= 0.0:
-		var held := anchor
-		var hand_was := left_hand
-		if _throw(ctx, _swing_aim(ctx, aim), false) and anchor.distance_to(held) > 2.0:
-			_retire_vine_from(held, hand_was)
-			left_hand = not left_hand
-		else:
-			anchor = held
+		_reach_for_next(ctx, wanted)
 	_draw_vine(ctx)
+
+
+## Looks for the next support and takes it, or leaves the current grip alone.
+##
+## The candidate is judged BEFORE anything is committed. It used to be thrown
+## first and undone if it turned out to be no good, which was worse than it
+## sounds: the throw had already rewritten the rope's length and restarted the
+## vine's own growth, so a rejected candidate left the swinger on a rope of the
+## wrong length with a vine visibly re-growing to a tree he was still hanging
+## from. Since the fan scores the nearest tall thing highly, and the tree already
+## held is exactly that, the rejected case was the common one.
+##
+## What makes a candidate worth taking is forward progress: it has to stand
+## HANDOFF_FORWARD_GAIN further along the direction being asked for than the
+## anchor already held. That is what "shoot out a new vine that way" means, and
+## it rules out grabbing the same trunk again without needing to know which tree
+## anything belongs to.
+func _reach_for_next(ctx: TraversalContext, wanted: Vector3) -> void:
+	var found: Variant = find_anchor(ctx, _swing_aim(ctx, wanted), true)
+	if found == null:
+		# Nothing out there yet. Wait a moment before sweeping again rather than
+		# casting a ray fan every single frame for the rest of the arc.
+		grip_timer = HANDOFF_RETRY
+		return
+	var next := found as Vector3
+	var gained := (next - anchor).dot(wanted)
+	if gained < HANDOFF_FORWARD_GAIN:
+		grip_timer = HANDOFF_RETRY
+		return
+	var held := anchor
+	var hand_was := left_hand
+	anchor = next
+	rope_length = clampf(
+		ctx.body.global_position.distance_to(anchor), MIN_ROPE, MAX_ROPE
+	)
+	left_hand = not left_hand
+	_retire_vine_from(held, hand_was)
+	grip_timer = MIN_GRIP
+	_cast_fraction = 0.0
 
 
 ## Which way the body should be facing: where the stick is asking to go, else
@@ -430,12 +489,28 @@ func _pose_arm(ctx: TraversalContext) -> void:
 	# the same bend whatever angle the arm is carried to, rolled half a turn
 	# about the forearm's length. See ARM_POWER_HAND.
 	_borrow(hand)
-	var wanted := (Basis(FOREARM_AXIS, FOREARM_ROLL) * ARM_POWER_HAND).get_rotation_quaternion()
+	var rolled := Basis(FOREARM_AXIS, FOREARM_ROLL) * ARM_POWER_HAND
+	var wanted := (
+		Basis(Vector3.RIGHT, WRIST_BEND - PI * 0.5) * rolled
+	).get_rotation_quaternion()
 	var id := hand.get_instance_id()
+	# The hand's own node origin is the centre of its rendered segment, not the
+	# wrist (see the PalmAttach/WristAttach comments in procedural_figure.gd), so
+	# turning it swings the wrist end away and the butt of the palm stops meeting
+	# the wrist. Where the wrist sits in the forearm's frame is captured before
+	# anything is written and then held: the hand is placed each frame so its own
+	# wrist marker returns there. player.gd's arm-power pose does the same thing
+	# through _anchor_hand_to_wrist(); this is that, without the cache.
+	var wrist := rig.joint("wrist_left" if left_hand else "wrist_right")
+	if wrist != null and not _wrist_anchor.has(id):
+		_wrist_anchor[id] = hand.position + hand.basis * wrist.position
+		_hand_rest_position[id] = hand.position
 	var current: Quaternion = _eased[id] if _eased.has(id) else hand.quaternion
 	current = current.slerp(wanted, minf(HAND_RATE * ctx.delta, 1.0))
 	_eased[id] = current
 	hand.quaternion = current
+	if wrist != null and _wrist_anchor.has(id):
+		hand.position = (_wrist_anchor[id] as Vector3) - hand.basis * wrist.position
 
 
 ## How far the shoulder has to carry the arm for it to lie along the rope, in
@@ -510,6 +585,10 @@ func _hand_back(ctx: TraversalContext) -> void:
 		return
 	var t := minf(RELEASE_BLEND * ctx.delta, 1.0)
 	var settled := true
+	for id: int in _hand_rest_position.keys():
+		var moved := instance_from_id(id) as Node3D
+		if moved != null and is_instance_valid(moved):
+			moved.position = _hand_rest_position[id] as Vector3
 	for id: int in _borrowed.keys():
 		var joint := instance_from_id(id) as Node3D
 		if joint == null or not is_instance_valid(joint):
@@ -523,6 +602,8 @@ func _hand_back(ctx: TraversalContext) -> void:
 			settled = false
 	if settled:
 		_borrowed.clear()
+		_wrist_anchor.clear()
+		_hand_rest_position.clear()
 		_releasing = false
 
 
@@ -549,15 +630,16 @@ func _draw_vine(ctx: TraversalContext) -> void:
 	_segment(_vine, start, start.lerp(anchor, _cast_fraction))
 
 
-## Where a vine meets its hand. Xiao Hou Zi has no separate fingertip, so the
-## wrist is asked next and the body itself last, rather than assuming a joint
-## every rig happens not to have.
+## Where a vine meets its hand: the wrist, which is where a hand grips a line
+## rather than the fingertips it curls past. The fingertip is asked for only if
+## a rig has no wrist marker, and the body itself last, rather than assuming a
+## joint every rig happens not to have.
 func _hand_point(ctx: TraversalContext, use_left: bool) -> Vector3:
 	var rig := ctx.rig
 	if rig != null:
 		var names := (
-			["fingertip_left", "wrist_left"] if use_left
-			else ["fingertip_right", "wrist_right"]
+			["wrist_left", "fingertip_left"] if use_left
+			else ["wrist_right", "fingertip_right"]
 		)
 		for joint_name: String in names:
 			var hand := rig.joint(joint_name)
