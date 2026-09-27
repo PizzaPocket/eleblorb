@@ -347,7 +347,12 @@ func _scatter_window_trees() -> void:
 ## 22 m apart, emergents whose crowns reach past 17 m grew straight through one
 ## another and walled the route in.
 const VINE_ROUTE_STEPS := [33.0, 28.0, 38.0, 44.0]
-const VINE_ROUTE_LATERALS := [9.0, 13.0, 17.0]
+const VINE_ROUTE_LATERALS := [9.0, 15.0, 22.0]
+## How far the route's own line drifts either side of the thread, and how much of
+## that drift one station may take. The rope's gap check bounds it in practice, so
+## these can be generous: what they buy is a route that meanders.
+const VINE_ROUTE_WANDER := 46.0
+const VINE_ROUTE_WANDER_STEP := 21.0
 ## The rope's own length less a margin, since the thrower is never exactly
 ## under the anchor it is reaching from.
 const VINE_ROUTE_MAX_GAP := VineSwingMode.MAX_ROPE * 0.85
@@ -398,28 +403,41 @@ func _scatter_vine_swing_trees() -> void:
 	var previous := Vector2.ZERO
 	var chained := false
 	var placed := 0
+	# The line the chain follows wanders instead of running dead straight. It used
+	# to take the FIRST candidate that passed every test, and since the nesting
+	# tried the smallest offset on one side first, and the route's own thread is
+	# always clear, every anchor took it: measured, nine anchors at z +9 exactly,
+	# a 262 m row. Ordering was the whole cause, so the candidates are shuffled
+	# now as well, and neither the wander nor the shuffle can break the chain,
+	# because the rope's own gap check still has to pass.
+	var wander := 0.0
 	while cursor <= finish and placed < VINE_ROUTE_MAX_ANCHORS:
+		wander = clampf(
+			wander + _rng.randf_range(-VINE_ROUTE_WANDER_STEP, VINE_ROUTE_WANDER_STEP),
+			-VINE_ROUTE_WANDER, VINE_ROUTE_WANDER
+		)
 		var chosen := Vector2.ZERO
 		var found := false
-		for step: float in VINE_ROUTE_STEPS:
-			for lateral: float in VINE_ROUTE_LATERALS:
-				for side: float in [1.0, -1.0]:
-					var candidate := Vector2(
-						cursor + step + _rng.randf_range(-2.0, 2.0), thread + side * lateral
-					)
-					if not _in_window(candidate) or not _clear_of_titan_core(candidate):
-						continue
-					if not _gate_clear(candidate):
-						continue
-					if _zone_of(candidate) != "":
-						continue
-					if chained and previous.distance_to(candidate) > VINE_ROUTE_MAX_GAP:
-						continue
-					chosen = candidate
-					found = true
-					break
-				if found:
-					break
+		# The wander is the thing that can make a station impossible, by pushing it
+		# into a clearing or a titan's core, so it is the thing given up first. The
+		# line is pulled back toward the thread and the station tried again before
+		# the chain will consider skipping forward: a skip leaves a hole wider than
+		# the rope, and one of those breaks the run. Measured, the first wander cost
+		# a station and left a 62.5 m gap against a 52 m rope.
+		for pull: float in [1.0, 0.5, 0.0]:
+			for candidate: Vector2 in _route_candidates(cursor, thread + wander * pull):
+				if not _in_window(candidate) or not _clear_of_titan_core(candidate):
+					continue
+				if not _gate_clear(candidate):
+					continue
+				if _zone_of(candidate) != "":
+					continue
+				if chained and previous.distance_to(candidate) > VINE_ROUTE_MAX_GAP:
+					continue
+				chosen = candidate
+				found = true
+				wander *= pull
+				break
 			if found:
 				break
 		if not found:
@@ -441,6 +459,29 @@ func _scatter_vine_swing_trees() -> void:
 		chained = true
 		cursor = chosen.x
 		placed += 1
+
+
+## Every place the next anchor might stand, in a shuffled order. Shuffled with
+## this node's own generator rather than Array.shuffle(), which uses the global
+## one and would make the scatter differ from run to run.
+##
+## The order matters more than the contents: taking the first candidate that
+## passes, from a list that always began with the same small offset, is what put
+## the whole chain on one straight line.
+func _route_candidates(cursor: float, centre: float) -> Array[Vector2]:
+	var candidates: Array[Vector2] = []
+	for step: float in VINE_ROUTE_STEPS:
+		for lateral: float in VINE_ROUTE_LATERALS:
+			for side: float in [1.0, -1.0]:
+				candidates.append(Vector2(
+					cursor + step + _rng.randf_range(-2.0, 2.0), centre + side * lateral
+				))
+	for index in range(candidates.size() - 1, 0, -1):
+		var swap := _rng.randi_range(0, index)
+		var kept := candidates[index]
+		candidates[index] = candidates[swap]
+		candidates[swap] = kept
+	return candidates
 
 
 ## Whether an anchor may stand here: outside every keep-clear disc's roaming
