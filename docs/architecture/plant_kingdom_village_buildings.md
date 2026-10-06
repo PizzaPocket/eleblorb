@@ -298,11 +298,44 @@ door.
   lamp fuel.
 - **Variation:** the smallest hut; the resin store.
 
-### Training-grounds shed (Batu)
+### Training grounds and shed (Batu)
 
-- A closed shed 5 × 4 m at the training grounds' edge, bark walls on a stone
-  footing, its lashed door always shut.
-- **Variation:** the only fully closed building in the village.
+The training grounds are a real part of the village: a yard where anyone may
+spar against dummies, and where those dummies can become NMEs (see the world
+bible: a dummy left unobserved for three nights comes to life). The design
+shows this without a word of explanation.
+
+- **Site:** a 20 × 16 m yard centred at `(-48, -48)`, just outside the
+  village's safe zone, with its gate on the worn path toward the floor huts.
+  Any dummy that wakes does so outside the village.
+- **Yard:**
+  - trampled bare earth inside a bamboo rail fence (1.2 m, rails lashed);
+  - one 1.2 m gate facing the village;
+  - *mahang* saplings crowding the fence outside.
+- **The dummies:** eight, standing on posts set in the earth round a 9 m
+  sparring circle. Each is built from forest material:
+  - a lashed rattan frame;
+  - coconut-fibre stuffing bound in banana leaf and bark cloth;
+  - a coconut-husk head;
+  - arms of stout cane.
+  
+  No two are quite alike, because Batu makes each by hand. Some are freshly
+  bound; a few lean, scuffed and split from use. They are solid (parkour tops
+  are not wanted on them) and sized to an ape, so they stand taller than the
+  hero.
+- **Furniture:** a rack of practice staves and cane blades, a log bench, a
+  water gourd on a post, a basket of spare husk heads.
+- **The shed:** 5 × 4 m on the yard's far side, bark walls on a stone footing,
+  a leaf roof, its lashed door always shut.
+  - Inside (seen only if the door is ever opened): frames in every stage of
+    binding, coils of rattan, stacks of husk heads, and one finished dummy
+    standing in the corner facing the wall.
+  - The village's only fully closed building.
+- **Signs of trouble:** one dummy post near the fence stands empty, its
+  lashings snapped, and the earth by it is churned. Nobody has replaced it.
+- **Variation:** the only fenced yard besides the paddock; the only closed
+  building; the only place in the village without a lamp, because Batu takes
+  his with him into the shed.
 
 ### Tirta's fishing landing
 

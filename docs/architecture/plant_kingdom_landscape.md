@@ -170,7 +170,7 @@ The commons is a deck, so its plants grow in containers and on the trees:
 | **Ape lodge** `(38, -14)` | A beaten-earth yard with fallen-log seats under a fig. Long grass and elephant ears at the margins. | the apes |
 | **Tailed monkeys' house** `(-34, -16)` | Drying racks of split rattan, coils of vine rope under the floor. Rattan rambling up the nearest trees at the forest edge, where Rotan harvests it. | Rotan |
 | **Floor hut** `(-24, 34)` | A *damar* tree beside the hut, its trunk scored and weeping resin, and resin cups on it (Damar's namesake and the village lamp fuel). Pots of herbs at the step. | Damar, Wangi |
-| **Training grounds** `(-42, -42)` | Trampled bare earth with *mahang* saplings crowding the edges. The shed's door stays shut. | Batu |
+| **Training grounds** `(-48, -48)` | Trampled bare earth with *mahang* saplings crowding the edges. The shed's door stays shut. | Batu |
 | **River trail and fishing landing** | The trail is worn earth, 2.5 m, through gingers and ferns. At the river: bamboo clumps, a fig leaning over the water, flat stones, a sand bar, Tirta's fish-trap rack. | Tirta |
 
 ### Worn ground

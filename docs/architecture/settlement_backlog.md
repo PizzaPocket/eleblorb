@@ -397,6 +397,13 @@ Planning priorities:
 - Monkey and ape bodies are **not gendered** (user, 2026-10-06). The census
   genders are identity only (pronouns, relationships, names), never body shape:
   no gendered build pools for `JungleVillager` or `ApeTemplate`.
+- Training grounds designed (proposed 2026-10-06): moved to `(-48, -48)`, just
+  outside the safe zone; eight hand-made dummies round a sparring circle,
+  Batu's closed shed, one empty post. Code: build the yard, the dummies as
+  inert props that can become the training-dummy NME, and the shed.
+- Dialogue: replace Batu's and Intan's "whoever's running" lines in
+  `scripts/jungle_kingdom_village.gd` with the rewritten lines in
+  `plant_kingdom_village.md` (section 3).
 - Then interiors and the dress charter.
 
 Code work once approved (not started):

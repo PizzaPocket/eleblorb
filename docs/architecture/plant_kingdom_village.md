@@ -78,8 +78,11 @@ The village's social shape comes from its residents' own words:
   floor-dwellers.
 - **River fishing** at the river's bank.
 - **Vine, bark and rope work** for the ramps, bridges and treehouses.
-- **The training grounds,** a business on the clearing's edge whose keeper is
-  secretive.
+- **The training grounds,** Batu's yard just outside the clearing's edge,
+  where anyone can come and spar against the dummies he makes. Everyone knows
+  it is Batu's. What nobody knows is what he does in his shed. The yard has
+  gone quiet lately, because people have stopped trusting the dummies after
+  dark.
 - **The inn,** for rare travellers.
 
 ## 3. Community
@@ -195,7 +198,7 @@ from.
 | **Rotan** | man | tailed monkey | the tailed monkeys' house | Akar's elder brother; unmarried | rope and vine maker |
 | **Sari** | woman | ape | the ape lodge | married to Teguh; Batu's sister | watches Kova Kong from the tree line |
 | **Teguh** | man | ape | the ape lodge | married to Sari; old friend of Xiao Hou Zi and of Jati | the apes' steady one |
-| **Batu** | man | ape | the ape lodge | Sari's elder brother; keeps his own counsel even with her | runs the training grounds, and does not say how |
+| **Batu** | man | ape | the ape lodge | Sari's elder brother; keeps his own counsel even with her | runs the training grounds and makes their dummies; keeps his shed shut and says nothing about it |
 | **Ossian Redbrow** | man | ape | his lean-to by the stable | a newcomer; Kilat's favourite subject | waiting for the Special Banana |
 
 #### The inn
@@ -224,6 +227,22 @@ from.
 | The ape lodge | Sari, Teguh, Batu | ground |
 | Ossian | Ossian | lean-to |
 | The inn | Bima | commons |
+
+### Lines rewritten for clarity (proposed 2026-10-06)
+
+Two existing lines talked about "whoever's running" the training grounds, as
+if nobody knew. The plan was unclear, not the villagers. Batu runs it, and
+everyone knows. The mystery is the dummies themselves.
+
+| Speaker | Old line | New line |
+|---|---|---|
+| **Batu** | "The training dummies out past the clearing used to get more use. Whoever's running that business isn't telling anyone how." | "Used to be half the floor came out to my yard to hit the dummies. Now nobody comes. Can't say I blame them, after dark." |
+| **Intan** | "The training grounds down below have gone quiet lately. Whoever's running that dummy business isn't telling anyone how." | "Batu's yard has gone quiet. He still goes into that shed of his every night, and he doesn't come out till dawn." |
+
+Both keep their second lines. Batu's is about the curse. Intan's stays: "Don't
+wander near the practice dummies after dark. I've heard they don't stay
+dummies forever." It is atmosphere, and it never states how or when a dummy
+wakes.
 
 ### Lines that change with the names
 

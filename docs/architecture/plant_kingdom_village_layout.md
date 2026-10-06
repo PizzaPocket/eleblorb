@@ -101,7 +101,7 @@ A small camp for the households who live on the floor, around the gate plaza.
 | Tailed monkeys' house | Rotan, Kilat, Akar | `(-34, -16)` | 10 × 6 m raised hut | vine rope coiled under the floor |
 | Garden house and gardens | Delima, Melati | `(-38, 14)` | 9 × 6 m raised hut; edged beds to the west | Melati's shoots, herbs and a fruit-tree nursery, with a path and gate |
 | Floor hut | Damar, Wangi | `(-24, 34)` | 8 × 6 m raised hut | |
-| Training grounds | Batu | `(-42, -42)` | 20 × 16 m trampled yard with training dummies | at the clearing's edge; a shed whose door stays shut |
+| Training grounds | Batu | `(-48, -48)` | 20 × 16 m fenced yard with eight training dummies, a sparring circle and Batu's shed | **just outside the safe zone** (radius 55 m): its nearest corner stands at about 55 m, so a dummy that wakes as an NME is outside the village, as the ape skeletons are; moved from `(-42, -42)`, which straddled the boundary; a gate toward the village path |
 | River trail | public | from the plaza south | 2.5 m | to Tirta's fishing landing on the river bank |
 
 Ground buildings keep at least 3 m apart and clear of each tree's ramp
