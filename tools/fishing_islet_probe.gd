@@ -27,10 +27,17 @@ const PROBES := {
 	"Exit 3 foot": [Vector2(29.7, 32.2), -1.5],
 	"Houseboat west deck": [Vector2(-24.5, 11), 0.35],
 	"Gangway mid": [Vector2(-22, 6), 0.43],
-	"Pavilion floor": [Vector2(-2, 0), 0.5],
+	"Pavilion floor": [Vector2(-2, 2.5), 0.5, 3.0],
 	"Venn veranda floor": [Vector2(-29.5, -14.0), 0.75, 2.5],
 	"Venn living room floor": [Vector2(-29.5, -16.6), 0.75, 3.0],
 	"Venn threshold ramp": [Vector2(-31.0, -12.5), 0.62],
+	"Sen porch": [Vector2(-13.0, -11.0), 0.75, 2.5],
+	"Sen corridor": [Vector2(-15.5, -16.3), 0.75, 3.0],
+	"Cistern stores floor": [Vector2(-2.0, -15.0), 0.75, 3.0],
+	"Net shed floor": [Vector2(8.0, -14.0), 0.5, 2.0],
+	"Pavilion spur": [Vector2(-2.0, -5.5), 0.5],
+	"Aran veranda": [Vector2(7.0, 2.0), 0.75, 2.5],
+	"Aran living room": [Vector2(12.5, 1.15), 0.75, 3.0],
 }
 
 var _failures := 0

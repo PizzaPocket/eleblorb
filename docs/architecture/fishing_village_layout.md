@@ -175,6 +175,7 @@ every public route is at least 3.2 m, including under eaves and pavilion beams.
 | Venn spur | landing → Venn front | `(-30,-12) → (-30,-13)` | the shop veranda opens directly onto the landing |
 | Slip work spur | Venn yard → slip | `(-34,-17) → (-40,-17)` | behind the house; customers never cross it |
 | Sen spur | spine → Sen porch | `(-15,-7) → (-15,-10)` | lands on the porch beside the clinic door (`x -15.5`); the family and school doors open off the same porch |
+| Pavilion spur | spine → pavilion | `(-2,-7) → (-2,-4)`, 3.6 m | the pavilion's principal approach, drawn in the plan diagram but missing from this table and the plan until 2026-10-07; it continues the cistern spur's line, water to the north and the meeting place to the south |
 | Cistern spur | spine → cistern house | `(-2,-7) → (-2,-12)` | public: anyone may draw water |
 | Net shed spur | spine → net shed | `(8,-7) → (8,-12)` | Salim and Jori carry gear here, not through the pavilion |
 | Aran spur | spine → Aran front | `(8,-7) → (8,-3)` | |

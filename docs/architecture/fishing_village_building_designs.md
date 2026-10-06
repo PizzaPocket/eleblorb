@@ -266,6 +266,18 @@ and the family's rooms at the back.
 - **Roof.** Hip, with a gutter on every face into the cistern. Natural timber,
   green ridge. The base is always damp, with moss on the footing.
 
+- **Built (2026-10-07)** in `FishingBuildings.cistern_house()`. The brief put the
+  cistern "behind" a house that already ran to `z -20`, where Anvil Rock's sheer
+  face stands at about `z -20.5` (`tools/fishing_rock_section.gd` prints the real
+  heights). Resolved in section: the **stone tank** 6 × 1.5 m stands on the shelf
+  at `z -20..-18.5` against the rock foot, mossed at the waterline, under a plank
+  lid, fed by the seep's stone channel from the face and by the north gutter; the
+  **stores house** is 6 × 5 m (`x -5..1, z -18.4..-13.4`), one room with shelves on
+  three walls, a north hatch over the tank lid, one south door between two
+  rope-bound posts. The brief's 2 × 2 apron became a 3.6 m threshold ramp to the
+  spur, with the tap and bucket ledge on the wall above its east part, piped
+  round from the tank. Leena's bead ledger and evening stool are by the door.
+
 ### 4.7 Net shed (Salim, shared with Jori)
 
 - **Plan.** Footprint `x 4..12, z -20..-12` (8 x 8). Open-sided 6 x 6 m under a
@@ -275,6 +287,14 @@ and the family's rooms at the back.
 - **Doors and facing.** Open on three sides; the main face south to the spine at
   `x 8`.
 - **Roof.** Gable, ridge east to west, the tallest on the spine (ridge 7.4 m).
+
+- **Built (2026-10-07)** in `FishingBuildings.net_shed()`. The deck fills the
+  8 × 8 footprint at public deck height, flush with the spur, so carts and blorbs
+  roll in. The shed is 6 × 6 m with posts 4.8 m to the plate (ridge about W + 7.3);
+  no post stands in the 6 m front opening, which a deeper beam spans. The loft
+  is 2 m deep along the north at 2.6 m, reached by a 32 degree ramp up the west
+  side whose foot lands on the front deck. Nets hang from the rafters to 2.2 m
+  above the floor, so every route keeps its headroom.
 
 ### 4.8 Communal pavilion (Leena)
 
@@ -286,6 +306,21 @@ and the family's rooms at the back.
   edge opens onto the water court and swim exit 2.
 - **Roof.** Hip over the whole span, natural timber with green ridge and fascia,
   carved ridge ends (the village's centre).
+
+- **Built (2026-10-07)** in `FishingBuildings.pavilion()`. Two corrections:
+  - **It had no way in from the spine.** The plan diagram shows a link from the
+    spine down to the pavilion on the cistern's line, but neither the route table
+    nor `FishingVillagePlan` had it, so the pavilion was reachable only from its
+    west end. `PavilionSpur` (3.6 m, `(-2,-7) → (-2,-4)`) is now in both.
+  - **Posts on the through-way.** The `x 0` bay line put three posts on the
+    straight way from the spur to swim exit 2; they are dropped, and the edge and
+    ridge beams span 6 m between the rope-bound posts at `x -3` and `3`.
+  The hall is open on every side with the long tables on the north half either
+  side of the through-way, the stove in the north-west corner with its flue up
+  through the hip, the repair bench at the east end, the bell on the south-east
+  post, rain jars in the corners, lamps under the ridge, household mugs on their
+  pegs and the height marks on a post. The raised ridge vent rides the ridge on
+  short posts, with carved curls at the ridge ends.
 
 ### 4.9 Aran house and pearl yard (Mai, Salim, Dala, Pree)
 
@@ -303,6 +338,24 @@ and the family's rooms at the back.
   moored at the veranda.
 - **History.** The oldest house, on Dala's generation's first piles, repaired many
   times.
+
+- **Built (2026-10-07)** in `FishingBuildings.aran_house()`, redrawn because the
+  brief's four 3 × 3 rooms in a 6 × 6 square left the kitchen diagonal to the
+  living room (reached only through a bedroom), and "Pree's corner under the
+  stair" had no stair:
+  - The house is 6 × 8 m (`x 8..14, z -3..5`), ridge north to south, in three
+    rows: **Mai and Salim** (north-west) and **Pree** (north-east, her own small
+    room); the **living room** across the whole middle, which the veranda door
+    opens into and every room opens off; **Dala's room** (south-west, nearest the
+    veranda, a window onto the water, her chair for watching at night) and the
+    **kitchen** (south-east).
+  - The veranda is 2 m deep, not 2.5: the footprint allows no more. A threshold
+    ramp meets the Aran spur at its north end; Dala's worn chair stands at the
+    rail with the shell barometer and the weather bell; Pree's herb floats are
+    tied below it.
+  - The kitchen's **wet door** is on the south wall at `x 12`, west of the
+    living-room door's line, so the two leaves leave a way between them; a ramp
+    runs from it down to the pearl yard pontoon.
 
 ### 4.10 Pearl yard pontoon (Mai)
 

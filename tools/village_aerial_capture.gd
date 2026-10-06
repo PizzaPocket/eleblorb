@@ -16,6 +16,10 @@ const TARGETS := {
 	"china": {"scene": "res://scenes/main.tscn", "center": Vector2(250.0, -650.0), "extent": 170.0,
 		"eye_from": Vector2(0.0, 150.0), "eye_to": Vector2(0.0, 40.0),
 		"ground_node": "ChineseVillage", "ground_prop": "_island_surface_y"},
+	# The fishing village stands over the lake: ground is the lake surface.
+	"fishing": {"scene": "res://scenes/main.tscn", "center": Vector2(440.0, 0.0), "extent": 60.0,
+		"eye_from": Vector2(-62.0, 14.0), "eye_to": Vector2(-30.0, -10.0),
+		"ground_node": "FloatingWaterVillage", "ground_prop": "_water"},
 }
 const OUTPUT_DIR := "res://wip/village_audit"
 

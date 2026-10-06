@@ -106,6 +106,9 @@ const ROUTES: Array[Dictionary] = [
 		"points":[Vector2(-8,2),Vector2(-20,4),Vector2(-28,2)]},
 	{"name":"PortalSpur","class":"spur","width":2.4,"ends":["HeronLanding","PortalLanding"],
 		"points":[Vector2(21,3),Vector2(20,10),Vector2(23,17),Vector2(27,19)]},
+	# The pavilion's principal approach, on the cistern's line: water to the
+	# north of the spine, the meeting place to the south (layout section 3).
+	{"name":"PavilionSpur","class":"return","width":3.6,"ends":["Pavilion"],"points":[Vector2(-2,-7),Vector2(-2,-4)]},
 	{"name":"SenSpur","class":"spur","width":2.4,"ends":["SenHouse"],"points":[Vector2(-15,-7),Vector2(-15,-10)]},
 	{"name":"CisternSpur","class":"spur","width":2.4,"ends":["CisternHouse"],"points":[Vector2(-2,-7),Vector2(-2,-12)]},
 	{"name":"NetShedSpur","class":"spur","width":2.4,"ends":["NetShed"],"points":[Vector2(8,-7),Vector2(8,-12)]},

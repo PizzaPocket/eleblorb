@@ -134,9 +134,19 @@ will be rideable as a separate project, and players swim until then.
 
 1. **Look at what exists:** windowed renders of the islets' silhouettes and the
    Venn house, plus an eye-level walk with the human, Blorbus and Xiao Hou Zi.
-2. **Sen house** from the redrawn brief, through the proof scene.
-3. The cistern house, net shed, pavilion and Aran house, each through the proof
-   scene and added to `FishingBuildings.BUILT`.
+2. Done (2026-10-07): the **Sen house, cistern house, net shed, pavilion and
+   Aran house**, each through the proof scene (0 FAIL) and placed in the world
+   (`tools/fishing_islet_probe.tscn` checks every floor, 0 FAIL). Each brief that
+   failed its own drawing was corrected and the change recorded in the design
+   brief: the cistern sits at the real rock face, the pavilion gained the missing
+   `PavilionSpur`, the Aran house was replanned around a living room. Every door
+   now swings into the room it serves. The proof scene builds the islets and fails
+   rock in a footprint; `tools/fishing_rock_section.gd` prints the face.
+3. **Islets need a landscaping pass.** Seen at last
+   (`VILLAGE=fishing` in `tools/village_aerial_capture.tscn`): the faces read as
+   uniform grey curtains of vertical flutes, the shelf's 1 m grid edge shows as
+   stair steps through the water, and there are no ledges, waterline notch,
+   planting or colour variation. Use the landscaping skill.
 4. The floating structures: the Vale houseboat, Rian's barge and Ivo's launch.
 5. Interiors, water work (the pearl yard and lines), and ledge planting on the
    islets.
