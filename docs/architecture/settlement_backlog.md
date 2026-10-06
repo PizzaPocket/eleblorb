@@ -552,10 +552,10 @@ concept.
   - the shifting hat as a shared item and as the Ground suit's helm, switching
     to the helmet with `DirtbikeMode` (visor cut by Boolean subtraction, as the
     Space Helm);
-  - gate the dirt bike's full power on the hat (worn or bound to a blorb) in
-    the shared `DirtbikeMode`, once what stays available without it is
-    decided; give the hat at the demo world's Ground portal so the demo keeps
-    full power;
+  - make `has_dirtbike_arms()` (the front wheel and full double-wheel bike)
+    also require the hat, worn or bound to a blorb; the leg pair's rear wheel
+    on dirt needs no hat. Sell the hat at Inez's shop; give it at the demo
+    world's Ground portal so the demo keeps the full bike;
   - any riding through one shared `TraversalMode` for every character;
   - the inn's fixture from `earth_closet` to `porcelain`;
   - the desert planting and wind-blown tumbleweeds.
@@ -567,9 +567,11 @@ concept.
     fuller tail, sized to a stuffed-monkey rider, with Ossian seated to match.
   - Before the saddle, `can_be_mounted_by()` refuses full-size riders and
     accepts small ones such as Xiao Hou Zi.
-  - The saddle (from Wes Tolliver) is an equippable item. With it, mounting
-    picks his size from the rider's body scale, with a short grow or shrink
-    transition. Proposed: chibi when unridden.
-  - Size and the saddle persist in `WorldState`.
+  - The saddle (from Wes Tolliver) is an equippable item. With it, his size is
+    switched by hand (a short grow or shrink transition) and stays as set until
+    switched again; who can mount depends on that size against the rider's
+    body scale.
+  - Owning the saddle persists; **his size does not**: it lives only in the
+    running session and defaults to chibi on any reset (reload or restart).
   - Mount riding stays one shared mode for every character (traversal parity).
 

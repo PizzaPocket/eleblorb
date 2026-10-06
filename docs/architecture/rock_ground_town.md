@@ -179,21 +179,23 @@ experts, the hero can make him full size.
   Equipped on Manchego, it lets him **grow to full size or shrink back down**.
   Working name: the shifting saddle. How the hero gets it (a commission, a
   race, a favour) is open.
-- **From then on, his size follows his rider:**
-  - **chibi** when Xiao Hou Zi rides him (or any rider of stuffed-monkey
-    scale);
-  - **full size** when the hero rides him (or any full-size rider).
-
-  Proposed: when nobody is riding him he rests at chibi size, his natural
-  size, and grows only when a full-size rider mounts.
+- **From then on, his size is switched by hand,** and it **sticks** (user,
+  2026-10-06). He stays whatever size he was last set to, ridden or not,
+  until it is switched again.
+  - At **chibi** size, Xiao Hou Zi and riders of stuffed-monkey scale can ride
+    him.
+  - At **full size**, the hero and full-size riders can.
+- **On a reset he is chibi again.** His size is not kept in long-term saved
+  data: whenever the game resets (a reload or restart), he defaults back to
+  chibi. This keeps the state simple.
 - **The change:** quick and mechanical, like the town's horses and hats. The
   saddle's stitching glows, and he swells or settles over about a second,
   changing proportions as he goes: legs lengthening and slimming, tail
   lengthening. No puff of smoke.
 - **Traversal parity:** riding Manchego stays one shared mount mode for every
-  playable character. The saddle chooses his size from the rider's own body
-  scale, not from which character is riding, so a future character of any size
-  gets the right horse.
+  playable character. Who can mount him depends on his current size against
+  the rider's own body scale, not on which character is riding, so a future
+  character of any size works the same way.
 
 ## 5. The cowboy hat helm
 
@@ -222,15 +224,16 @@ bike. **The cowboy hat becomes the Ground suit's helm.**
   must be wearing the hat, or have it bound to one of their blorbs. This
   follows the formed-suit pattern, where a helm commands its element's whole
   power (the Lava Helm, the Leaf Hat, the Penguin Helm).
-  - Today `DirtbikeMode` works for any Ground suit with no helm at all.
-  - Exactly what stays available without the hat, and what the hat adds, is
-    open.
-  - A natural split: a slow, basic dirt bike without it, and with it full
-    speed, jumps and the rough canyon ground.
+  - **Without the hat:** a pair of Ground legs still gives the **rear wheel**
+    from the leg power on dirt ground (`has_dirtbike_legs()`).
+  - **With the hat:** the Ground **arm** power adds the **front wheel**, for
+    the full **double-wheel** dirt bike and its wheelie
+    (`has_dirtbike_arms()`). That arm power requires the hat, worn or bound
+    to one of the hero's blorbs.
   - The check lives in the shared mode, so it applies to every character.
-- **So the hat is not a race prize.** It comes **before** racing, because the
-  races need it. Inez makes it, and how she comes to give or sell it to the
-  hero is open. The demo world's Ground stretch, which already features the
+- **The hat is bought** (user, 2026-10-06) at Inez Villanueva's hat shop in
+  town. It is not a race prize: it comes before racing, because the races need
+  it. The demo world's Ground stretch, which already features the
   dirt bike, should then hand the hat out at its portal, as the Water and Ice
   stretches hand out the Nautilus Crown and the Crystal Skates, so the demo keeps full power.
 
@@ -371,11 +374,7 @@ from horses, riders, stares and races instead.
 
 **Open:**
 - how the hero gets the saddle;
-- Manchego's size when nobody rides him (proposed: chibi);
 - what the gang wants, and the town's story role;
 - whether the player can ride a cyborg horse, and how;
-- how the hero gets the hat from Inez (not a race prize: it comes before
-  racing);
-- what the dirt bike can do without the hat, and what the hat unlocks.
 - the kingdom's name: the user called it the Earth Kingdom and the Earth and
   Rock Kingdom, while the code and bible say Rock and Ground.
