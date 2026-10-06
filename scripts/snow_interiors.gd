@@ -199,12 +199,12 @@ static func _inn(body: StaticBody3D, ctx: Dictionary) -> void:
 	# Mudroom: pegs, a bench, boots.
 	_pegs(body, ix - 0.08, -3.3, "-x", 2.0)
 	Furnishings.bench(body, Vector3(6.2, FL, -4.0), 0.0, 2.0)
-	Furnishings.shelf(body, Vector3(ix - 0.3, FL, -2.4), PI * 0.5, 1.2, 2, "boxes")
+	Furnishings.shelf(body, Vector3(ix - 0.3, FL, -2.55), PI * 0.5, 1.2, 2, "boxes")
 	_lamp(body, 5.0, 2.45, -3.0, 0.5, 4.0)
 	# Drying room: poles for mittens and scarves, snowboards on the rear partition, a warm stone bench on the kitchen wall.
 	_drying_rack(body, 3.3, 7.0, -0.3, 1.9, 8)
 	_drying_rack(body, 3.3, 7.0, 0.9, 1.5, 6)
-	_piece(body, Vector3(1.8, 0.2, 0.25), Color(0.56, 0.54, 0.5), Vector3(5.2, 0.24, 1.35), 0.0, true, 4.0)
+	_piece(body, Vector3(1.8, 0.2, 0.25), Color(0.56, 0.54, 0.5), Vector3(5.2, 0.24, 1.25), 0.0, true, 4.0)
 	_lamp(body, 5.2, 2.45, 0.2, 0.45, 4.0)
 	# Kitchen: a prep table, hanging pots, the range, loaves cooling for the stall.
 	Furnishings.table(body, Vector3(4.6, FL, 2.6), 0.0, 1.5, 0.8, "none")
@@ -243,7 +243,7 @@ static func _inn_wing(body: StaticBody3D, ctx: Dictionary) -> void:
 		_lamp(body, cx, 2.4, 0.5, 0.4, 3.5)
 	# The party dormitory: three beds along the rear wall and a long table.
 	for i in 3:
-		_bed(body, -0.2 + 1.7 * float(i), iz - 1.22, "north", blankets[(i + 1) % blankets.size()])
+		_bed(body, -0.2 + 1.62 * float(i), iz - 1.22, "north", blankets[(i + 1) % blankets.size()])
 	# Keep the dormitory table behind the door's approach instead of making the
 	# first metre of the room an obstacle course.
 	Furnishings.table(body, Vector3(1.4, FL, 0.85), 0.0, 1.8, 0.8, "stools")
@@ -323,7 +323,7 @@ static func _rescue(body: StaticBody3D, ctx: Dictionary) -> void:
 	_lamp(body, -1.8, 2.3, 3.0, 0.45, 3.5)
 	# Meeting hall.
 	Furnishings.table(body, Vector3(1.9, FL, 0.25), 0.0, 3.0, 1.1, "benches")
-	Furnishings.bench(body, Vector3(1.0, FL, iz - 0.4), 0.0, 3.0)
+	Furnishings.bench(body, Vector3(1.9, FL, iz - 0.4), 0.0, 3.0)
 	Furnishings.settle(body, Vector3(ix - 0.35, FL, -2.4), PI * 0.5, 1.6, Furnishings.CLOTH_BLUE)
 	# The weather board: carved marks only, never words.
 	_piece(body, Vector3(1.1, 0.7, 0.04), PLANK_DARK, Vector3(3.2, 1.6, iz - 0.08), 0.0, false)

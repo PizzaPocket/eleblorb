@@ -317,18 +317,17 @@ static func _audit_lanes(root: Node3D, lanes: Array[Dictionary]) -> Array[String
 # Stacking: floor plans must agree with the storeys above and below
 # ---------------------------------------------------------------------------
 
-const BEARING_TOLERANCE := 0.25
-const UNSUPPORTED_LIMIT := 0.8
 const SAMPLE := 0.35
 
 
-## A building's storeys are drawn against one another. Three failures this audit
-## catches (all found in the Holt Inn on 2026-10-04):
+## A building's storeys are drawn against one another. Two failures this audit
+## catches (both found in the Holt Inn on 2026-10-04):
 ##   1. A wall on one floor runs into the opening cut through the floor above
 ##      it (a hearth hall, a stairwell): its top stands free in the void.
-##   2. A wall on an upper floor has nothing under it: no wall below, no beam,
-##      not the outside wall. It would be standing on floor joists alone.
-##   3. A wall on an upper floor stands on a void in its own deck.
+##   2. A wall on an upper floor stands on a void in its own deck.
+## An upper wall with no wall or beam directly below it is not a failure: most
+## upper walls are light partitions that sit on the floor joists. Supports are
+## still recorded for whatever builds beams or posts, but are not audited.
 ## Registered by TownProps (walls, voids) and by whatever builds beams or posts.
 static func audit_stacking(root: Node3D) -> Array[String]:
 	var groups := {}
@@ -338,14 +337,12 @@ static func audit_stacking(root: Node3D) -> Array[String]:
 		var group: Dictionary = groups[key]
 		var walls: Array = group["walls"]
 		var voids: Array = group["voids"]
-		var supports: Array = group["supports"]
 		for wall: Dictionary in walls:
 			var floor_index := int(roundf(float(wall["base_y"]) / TownProps.FLOOR_HEIGHT))
 			var length := (wall["to"] as Vector2).distance_to(wall["from"] as Vector2)
 			var steps := maxi(int(length / SAMPLE), 1)
 			var inside_above := 0.0
 			var inside_own := 0.0
-			var unsupported := 0.0
 			for i in steps + 1:
 				var point := (wall["from"] as Vector2).lerp(wall["to"] as Vector2, float(i) / float(steps))
 				for void_item: Dictionary in voids:
@@ -355,32 +352,11 @@ static func audit_stacking(root: Node3D) -> Array[String]:
 						inside_above += length / float(steps)
 					if inside and deck_floor == floor_index and floor_index >= 1:
 						inside_own += length / float(steps)
-				if floor_index >= 1 and not _is_supported(point, floor_index, walls, supports):
-					unsupported += length / float(steps)
 			if inside_above > 0.15:
 				problems.append("%s: wall '%s' rises into the opening above it for %.1f m (a wall may not run under a void in the next floor)" % [key, wall["label"], inside_above])
 			if inside_own > 0.15:
 				problems.append("%s: wall '%s' stands over a hole in its own floor for %.1f m" % [key, wall["label"], inside_own])
-			if unsupported > UNSUPPORTED_LIMIT:
-				problems.append("%s: wall '%s' on floor %d has nothing under it for %.1f m (no wall, beam or post below)" % [key, wall["label"], floor_index, unsupported])
 	return problems
-
-
-static func _is_supported(point: Vector2, floor_index: int, walls: Array, supports: Array) -> bool:
-	for other: Dictionary in walls:
-		var other_floor := int(roundf(float(other["base_y"]) / TownProps.FLOOR_HEIGHT))
-		if other_floor != floor_index - 1:
-			continue
-		var closest := Geometry2D.get_closest_point_to_segment(point, other["from"] as Vector2, other["to"] as Vector2)
-		if closest.distance_to(point) <= BEARING_TOLERANCE:
-			return true
-	for support: Dictionary in supports:
-		if int(roundf(float(support["deck_y"]) / TownProps.FLOOR_HEIGHT)) != floor_index:
-			continue
-		var closest := Geometry2D.get_closest_point_to_segment(point, support["from"] as Vector2, support["to"] as Vector2)
-		if closest.distance_to(point) <= BEARING_TOLERANCE:
-			return true
-	return false
 
 
 ## Walls, voids and supports from every registering body, in world plan

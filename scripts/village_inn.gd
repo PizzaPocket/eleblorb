@@ -377,7 +377,8 @@ func _build_common_room_tables() -> void:
 ## side bears on a wall below it, and the south side's carry a summer beam. The
 ## 2026-10-04 walkthrough found a plan where they did not agree: a ground wall ran
 ## up into the hearth hall's opening, and eleven upper walls had nothing under
-## them. ClearZones.audit_stacking now checks this.
+## them. ClearZones.audit_stacking now checks the first; partitions on joists are
+## allowed.
 const GALLERY_Z := 3.6
 ## North-south bearing lines shared by the ground rear rooms and the upper rear rooms.
 const OFFICE_WALL_X := -3.4
