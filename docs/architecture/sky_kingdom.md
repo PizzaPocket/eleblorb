@@ -52,18 +52,24 @@ deliberate first pass:
 
 The Tempestars are not gods. They are a people of the sky, as the merfolk are
 of the sea and the lava people of the volcano. Their culture draws on the
-human world's images of a heaven above the clouds:
+human world's images of a heaven above the clouds, led by the Chinese
+Celestial Court because Sun Wu Kong, already part of the game, comes from that
+tradition:
 
+- **The Chinese Celestial Court, as Journey to the West tells it:** the Jade
+  Emperor's palace beyond the Southern Heavenly Gate, audiences in the Hall of
+  Miraculous Mist, a bureaucracy of offices and titles, the lowly post of
+  keeper of the heavenly horses that Sun Wukong was given and resented, the
+  empty title "Great Sage Equal to Heaven" granted to quiet him, the Queen
+  Mother of the West's peaches that ripen once in an age, the Peach Banquet he
+  was not invited to and wrecked, the Weaver Girl who wove the coloured
+  clouds, and the Heavenly River.
 - **Greek Olympus:** a court of immortals on a summit veiled in cloud, its
   gates of cloud kept by the Horai, feasts of nectar and ambrosia, Hephaestus's
   golden attendants and the self-moving golden tripods that wheeled themselves
   to the gods' assembly and back, the Muses' music, contests and games.
 - **Roman heaven and civic religion:** colonnades, the council in the round,
   the triclinium banquet with diners reclining on couches, the eternal hearth.
-- **The Chinese Celestial Court:** the Jade Emperor's palace beyond the Southern
-  Heavenly Gate, its many offices and titles, the Queen Mother of the West's
-  orchard of peaches that ripen once in an age, the Weaver Girl who wove the
-  coloured clouds, and the Heavenly River.
 
 These sources supply the feeling of a leisured heaven. They do not supply
 religion, worship, real deities or a copied temple. Nobody in the game prays to
@@ -116,6 +122,50 @@ craft. This is the kingdom's beauty and its trouble:
 Tempestars age and have children, but their lives are very long and children
 are rare. Someone who looks young may have watched the courts drift apart; the
 elders remember the Hall of Assembly full.
+
+### Sun Wu Kong and the courts (proposed)
+
+The Tempestars' long memory includes Sun Wu Kong, and their version of events
+follows his legend closely:
+
+1. **The lowly post.** Long ago he rode the Jindouyun up into the courts
+   uninvited and demanded a place. To be rid of him politely, Highcloud made
+   him **Keeper of the Air Blorbs**, herding the wild flocks that drifted
+   between the clouds. It was the humblest office in the kingdom. He did it
+   well, grew fond of the blorbs, and then learned how little the post was
+   worth to anyone else.
+2. **The empty title.** In fury he demanded a rank equal to the rulers. The
+   courts gave him the title **Great Sage Equal to Highcloud**, with no cloud,
+   court or duties attached, and set him to guard the Orchard Cloud's peaches
+   to keep him busy.
+3. **The Peach Banquet.** Left off the guest list for the Orchard Cloud's great
+   Peach Banquet, he ate the season's golden peaches, drank the nectar,
+   overturned the tables and the Ring Cloud's games, and fought the courts'
+   champions to a standstill with the Jingu Bang.
+4. **The sealing.** All six courts met in the Hall of Assembly on the Hollow
+   Cloud, the only time in living memory they acted together, and sealed him
+   beneath a rock on the highest roof below them: the crown of the Emperor's
+   castle in the Chinese village. The sealing decree, inscribed in gold, is the
+   last decision on the Hall's walls. With their common trouble gone, the courts
+   stopped meeting.
+
+**Now.** The Air blorbs have had no keeper since. The courts believe Sun Wu Kong
+is still sealed. When he arrives alongside the hero, freed by Xiao Hou Zi,
+they assume he has taken the Air blorbs in revenge for his old post. The real
+cause is the Demon King. Restoring the Air blorbs clears Sun Wu Kong's name and
+puts the old question back on the table: what the courts owe the one person
+who ever looked after the blorbs, and whether they can meet in the Hall again
+for anything better than a sealing.
+
+Who remembers what:
+
+- **Squall** keeps his offences in the Highcloud ledger, itemised.
+- **Rime** still counts the peaches he ate.
+- **Corona** has never forgiven the ruined games; **Scud** secretly wants a
+  rematch.
+- **Mist** tends the sealing decree in the empty Hall.
+- **Breeze**, who chased Air blorbs as a child, remembers him as the keeper who
+  let the children help.
 
 ## 3. Community
 
@@ -217,6 +267,7 @@ Olympian contests and the hippodrome.
 |---|---|---|
 | Ceremony, precedence, records of rank | Cumulus, Squall | Highcloud |
 | News and invitations between clouds | Breeze | everywhere |
+| Keeping the Air blorb flocks | vacant since Sun Wu Kong's sealing | between the clouds |
 | Nectar | Dew (Highcloud); each court sets its own bowls | east terraces |
 | Ambrosia, fruit, banquets | Mellow, Rime, Iris | Orchard Cloud |
 | Gold: anchors, pins, vessels, tripods | Nimbus, Virga | Anvil Cloud |
@@ -331,26 +382,31 @@ strands, blossom and vines are decorative.
 
 ## 6. Architectural charter (draft)
 
-- **Primary, about 70 percent: Greco-Roman celestial classical.** Peristyle
-  courts, round tholos pavilions, colonnades and exedrae, porches with
-  pediments reduced to soft SuperEgg forms, an odeon for music, a hippodrome
-  ring, triclinium banquet halls with floating couches. Quartz shafts, gold
-  capitals and bases, floating roofs.
-- **Secondary, about 25 percent: Chinese celestial court.** Limited to named
-  elements: the kingdom's arrival gate (after the Southern Heavenly Gate), pailou
-  gateways at each court's threshold, sweeping eave lines on the Orchard
-  Cloud's banquet hall and Highcloud's throne hall, moon gates of set cloud, and
-  the peach orchard's layout.
+- **Primary, about 60 percent: the Chinese celestial palace.** The image of
+  heaven's palaces standing on cloud: axial courts entered through gates, halls
+  raised on stepped quartz podiums with balustrades, sweeping eaves with
+  upturned corners floating clear of their columns, covered galleries joining
+  halls, open pavilions (ting), moon gates of set cloud, and the hierarchy of
+  height and roof that the Celestial Court's bureaucracy expresses. This
+  governs Highcloud, the Hollow Cloud, the Orchard Cloud and the Dawn Gate.
+  Quartz replaces red-lacquered timber; gold replaces painted brackets.
+- **Secondary, about 30 percent: Greco-Roman classical.** Limited to the
+  programs it suits: the Drift Cloud's odeon, the Ring Cloud's racing ring and
+  judges' tholos, colonnaded nectar terraces, and the banquet couches.
+- **Accent, about 10 percent: woven-cloud textiles and drifting gold.** Awnings,
+  sails, wind harps, nectar bowls and tripods: the moving, living layer.
 - **Accent, about 5 percent: woven-cloud textiles and drifting gold.** Awnings,
   sails, wind harps, nectar bowls and tripods: the moving, living layer.
 - **Palette:** 60 percent quartz white and cloud white, 30 percent pale sky
   pastels on woven cloud and Tempestar clothing (the prototype's sky blue,
   dawn pink, gold dawn, lavender, mint and peach), 10 percent gold.
-- **Hierarchy:** height and the width of the floating gap show rank. Highcloud
-  stands tallest and its throne hall's roof floats highest. Ordinary residences
-  are small tholoi or moored rooms.
+- **Hierarchy:** podium height, the number of eave tiers and the width of the
+  floating gap show rank, as roof rank did at the Celestial Court. Highcloud's
+  hall has the only double floating eave. Ordinary residences are single-eave
+  pavilions or moored rooms.
 - **Exclusions:** no copied real temple, shrine or sacred emblem; no altars,
-  statues of gods or worship spaces; no heavy masonry walls; no solid gold
+  statues of gods or worship spaces; no Buddhist imagery from the legend's
+  sealing (here the courts themselves sealed him); no heavy masonry walls; no solid gold
   buildings; no ordinary pitched timber roofs; no chimneys (there is no
   cooking fire: ambrosia bakes in sunlight).
 
@@ -358,11 +414,11 @@ strands, blossom and vines are decorative.
 
 | Court | Signature building | Character |
 |---|---|---|
-| Highcloud | throne hall on a stepped quartz podium, roof floating highest | formal, axial, a little empty |
+| Highcloud | the Hall of Mist: audience hall on a triple quartz podium behind its own gate, double eaves floating highest | formal, axial, a little empty |
 | Anvil Cloud | open gold forge under a storm-dark cloud crown | the only working court; scorched gold, glowing, cluttered |
 | Drift Cloud | small odeon with wind harps between columns | musical, intimate, half-empty seats |
-| Hollow Cloud | ring colonnade around an empty central opening through the cloud to the world below; observatory | grand and vacant; the void is the hall |
-| Orchard Cloud | banquet hall with floating couches; peach trees above and below the cloud | lavish, warm, overflowing |
+| Hollow Cloud | the Hall of Assembly: a ring of galleries around an empty central opening through the cloud to the world below, the gold sealing decree on its walls; observatory | grand and vacant; the void is the hall |
+| Orchard Cloud | the Peach Garden and the banquet hall of the Peach Banquet, with floating couches; peach trees above and below the cloud | lavish, warm, overflowing |
 | Ring Cloud | racing ring around the cloud's rim, judges' tholos, prize pavilion | open, athletic, bright |
 
 ## 7. Exchange with the hero
@@ -434,6 +490,9 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
   cloud lower bodies;
 - the cuisine: dawn nectar on gold, ambrosia baked in sunlight, golden
   peaches, self-moving golden tripods;
+- Sun Wu Kong's history with the courts: the keeper's post, the empty title,
+  the Peach Banquet and the sealing as the Hall of Assembly's last act;
+- the Chinese celestial palace as the primary style;
 - the census of twenty-one in six courts, including the two new courts,
   thirteen new adults and two children;
 - the empty Hall of Assembly on the Hollow Cloud;
@@ -450,6 +509,9 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
 - The naming scheme. The prototype's six names are weather words with compound
   surnames; this brief's new names follow that pattern as placeholders.
 - What Tempestar food and gifts do for the hero.
-- How Sun Wu Kong, who once kept the Celestial Court's stables in legend and
-  rides his own cloud, relates to the Tempestars, if at all.
+- How much of the Sun Wu Kong history is quest content: whether the hero must
+  clear his name, whether he takes back the keeper's post once the Air blorbs
+  return, and how the courts react to him in the party.
+- The order of story events: the Air blorbs must vanish after the sealing for
+  the courts' suspicion to make sense.
 - Whether the courts choose to meet again once the Air blorbs return.
