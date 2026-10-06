@@ -232,7 +232,7 @@ bike. **The cowboy hat becomes the Ground suit's helm.**
   races need it. Inez makes it, and how she comes to give or sell it to the
   hero is open. The demo world's Ground stretch, which already features the
   dirt bike, should then hand the hat out at its portal, as the Water and Ice
-  stretches do with their helms, so the demo keeps full power.
+  stretches hand out the Nautilus Crown and the Crystal Skates, so the demo keeps full power.
 
 ### Design notes
 
