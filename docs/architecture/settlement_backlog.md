@@ -113,6 +113,8 @@ Next work:
   footprints, routes, boat lanes, berths, swim exits and the portal's move to
   Heron Rock.
 - Add the islets and shelves to the lake terrain.
+- Review the architecture briefs (`docs/architecture/fishing_village_buildings.md`):
+  the kit of parts, household palettes and every building's form.
 - Author `FishingVillagePlan` as the only source for structures, the public
   jetty spine and return route, household and work spurs, gangways, boat lanes
   and berths, swim exits, trade and schedules.
