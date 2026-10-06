@@ -35,7 +35,7 @@ several after the user corrected an earlier version.
 
 | Population | Environment and culture expressed in dress | Where |
 |---|---|---|
-| **Ohio** | cosmopolitan village; seeded sleeve split (sleeveless, short, long), dresses for some women, wide hair and skin ranges | `town_generator.gd`, `_assign_figure_variant()` |
+| **Ohio** | deliberately colourful, vibrant and varied: saturated shirts, trousers and shoes chosen independently (a couple of dark options kept so not everyone is bright head to toe); "interesting" hair colours including teal and purple alongside natural tones; eight skin tones across the full range; seeded sleeve split; dresses for some women; palettes cycled without repeats so neighbours never match | `town_generator.gd`, `NPC_*_COLORS`, `_assign_figure_variant()` | `town_generator.gd`, `_assign_figure_variant()` |
 | **Snow Village** | cold climate: long sleeves for everyone, gloves, opaque tights or trousers under every skirt (`dress_has_covered_legs`), winter jewel-tone shirts, eight skin tones across the full human range for a cosmopolitan people | `ice_kingdom_village.gd`, `WINTER_APPEARANCE`, applied through `VillagerAppearance.apply_profile()` |
 | **Chinese village** | East Asian skin range (four warm tones), black to dark-brown hair, children's pigtails and buns, the Emperor's beard, raised court bun, crown and gold robe (`wears_emperor_regalia`), the Royal Chef's hat with a red band | `chinese_village.gd`, `SKIN_COLORS`, `HAIR_COLORS` |
 | **Sea folk** | no textiles underwater: shiny **scale clothing** in silver, dark blue or brown (silver formal, brown for work); sleeveless or short; some cropped tops (`has_midriff`); shells or sea flowers set in women's hair; teal skin; tails in teal, blue, red and mauve | `merfolk.gd`, `ocean_kingdom_city.gd` |
@@ -147,6 +147,15 @@ Beards (`stubble`, `full`) are for men only.
   flowers) are for women; men wear the full scale top.
 - Sleeve length is not gendered: the sleeveless, short and long split applies
   to everyone, set by climate and work.
+
+**Not yet done: a gendered body pass.** Today women's and men's bodies differ
+only in the width and height scales above, plus hair, beards and dress. The rig
+has no gendered shaping of shoulders, waist, chest or face. A dedicated pass
+should design that shaping once, in `ProceduralFigure`, stylised and in keeping
+with the SuperEgg language, never sexualised, so every humanoid people (Ohio,
+the villages, sea folk upper bodies, Tempestars) inherits it. Use the
+`figure-rig` skill for the geometry. Until then, do not add per-population
+fixes for body shape.
 
 **Writing gender into a census.** Name each resident's gender in the
 settlement brief when the census is written, and keep it consistent with the

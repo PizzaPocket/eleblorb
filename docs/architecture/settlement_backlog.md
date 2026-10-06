@@ -275,3 +275,12 @@ Planning priorities:
   as dry volumes, reusing the `pressurized_volumes` approach; add a legged sea-folk rig.
 - Have every Hawaiian line and gloss reviewed by a fluent speaker.
 
+## 9. Characters: gendered body pass (cross-settlement)
+
+Status: not started. Women's and men's bodies currently differ only in height,
+chest and hip width scales, hair, beards and dress (see the `character-design`
+skill). Design gendered shaping of shoulders, waist, chest and face once in
+`ProceduralFigure`, stylised and never sexualised, so every humanoid people
+inherits it. Ohio's colourful, varied clothing and hair palettes stay as they
+are. Fix the pirate crew's missing `is_female` in the same pass.
+
