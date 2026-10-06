@@ -310,16 +310,27 @@ Planning priorities:
   as dry volumes, reusing the `pressurized_volumes` approach; add a legged sea-folk rig.
 - Have every Hawaiian line and gloss reviewed by a fluent speaker.
 
-## 9. Characters: women's abdomen rule and pirate genders (cross-settlement)
+## 9. Characters: bring every population up to the gendered body rules
 
-Status: not started. Gendered body shapes exist through separate height,
-chest and hip ranges. Two fixes remain (see the `character-design` skill):
+Status: not started. The rules (see the `character-design` skill): women's
+height tops out lower; only men get the broad-chested build; women's hips are
+wider, so their legs are set wider; and women's abdomens never protrude past
+the thorax. Audit of every population (2026-10-06):
 
-- **Women's abdomens never protrude past the thorax.** `ProceduralFigure`
-  lets every abdomen's front protrude up to 1.12 times the chest's front depth;
-  limit that to men and keep women's flush with the chest. Split the shared
-  abdomen pools in Ohio, the Snow Village and the Fire Kingdom so women draw
-  from a narrower one. This is what gives at least one Ohio woman a belly
-  larger than her chest.
-- **Pirate crew genders:** set `is_female` for every crew member and gate beards
-  on it.
+| Population | State | Fix |
+|---|---|---|
+| Ohio villagers | gendered height, chest and hip pools | abdomen rule; women's own abdomen pool |
+| **Innkeepers (shared `VillageInn`)** | **every keeper is built male**: `apply_profile(keeper, 0, 0, false, ...)` ignores gender, so Mira Holt, a woman, has a male body and a buzzcut even though her profile carries a woman's proportions and a bun | pass each keeper's gender into `VillageInn.create()`; Mira Holt and Isaro (the sea folk keeper) are women; the genders of 林静, Dolma Hearthstone and Ember Rest are not yet stated and need deciding |
+| Snow Village | gendered profile | abdomen rule; women's abdomen pool |
+| Fire Kingdom | gendered profile | abdomen rule; women's abdomen pool |
+| Rock and Ground village | gendered profile | abdomen rule; women's abdomen pool |
+| **Chinese village adults** | **not gendered**: gender is picked at random rather than from each villager's identity; one height range for everyone; no chest or hip pools | take gender from the approved identities; apply the gendered pools through a community profile |
+| Chinese village children | child chest and hip scales | none |
+| Sea folk | fixed women's and men's chest and hips | women shorter than men (both use the same height today); abdomen rule |
+| Tempestars | fixed gendered height, chest and hips | abdomen rule |
+| **Pirate crews** | **no genders set**: Mara Reef, Nell Crow and Ada Shoal are male-bodied, and Ada has stubble | set every crew member's gender; beards for men only |
+| Jungle primates | their own rig | not applicable |
+
+The abdomen rule itself: in `ProceduralFigure`, limit
+`ABDOMEN_FRONT_OVERHANG_MAX` (1.12 times the chest's front depth) to men and
+keep women's abdomen front flush with the chest.

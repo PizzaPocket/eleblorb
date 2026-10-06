@@ -220,6 +220,10 @@ garment colour, hair style, hair colour, build, accessory).
 - Pirate crews built without `is_female`: Mara Reef, Nell Crow and Ada Shoal
   have male bodies and male hair, and the stubble rule (indices 2, 5 and 7)
   gives Ada stubble. Still to fix in `ocean_kingdom_denizens.gd`.
+- Every innkeeper built male: `VillageInn` applies the keeper's profile with
+  `is_female` false, so Mira Holt has a male body and a buzzcut.
+- Chinese village adults given a random gender instead of their identity's,
+  with no gendered height, chest or hip pools.
 
 ## 9. Checklist
 
