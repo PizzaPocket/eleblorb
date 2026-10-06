@@ -83,7 +83,9 @@ The census proposes **fifteen residents in seven households**.
 
 Taro and poi from the *loʻi*; fish from the fishpond and the reef; lei and
 *kapa*; ukulele; the store's goods, partly brought through the gate; the guest
-house. The store is the hero's shop; its stock is not yet decided.
+house. The store is the hero's shop; for now it sells fruit (bananas from the
+village's own *maiʻa*, with oranges and lemons brought through the gate), a
+placeholder until its stock is designed.
 
 ## 4. Settlement structure (pre-layout)
 
@@ -163,5 +165,5 @@ guest house as one of the kingdom's two rest points (Sam charges the ordinary
 Crossroads rate of 10 Tokoins through the shared transaction interface); the
 generalised lexicon.
 
-**Open:** the store's stock; the island's spring and terrain changes the *loʻi* need; whether the
+**Open:** the island's spring and terrain changes the *loʻi* need; whether the
 village has a part in the Tidekeeper or Kraken stories.

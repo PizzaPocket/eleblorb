@@ -1,7 +1,8 @@
 # Fire Kingdom Caldera City
 
 Status: community and settlement brief ready for dimensioned civic-layout
-synthesis. The named census and several story details remain working proposals;
+synthesis. The fourteen-person named census is approved (2026-10-06); several
+story details remain working proposals;
 no terrain, population, or architecture should be rebuilt until the layout is
 reviewed.
 
@@ -197,7 +198,7 @@ separate full-time residents.
 
 ## Proposed named census
 
-Status: complete working register for review. These names deliberately avoid
+Status: approved (2026-10-06). These names deliberately avoid
 English fire and geology words. A lava person has a personal name followed by a
 household name; household names are inherited or adopted through family and do
 not describe a profession. The current register contains fourteen permanent

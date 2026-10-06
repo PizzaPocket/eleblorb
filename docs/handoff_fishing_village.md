@@ -1,7 +1,8 @@
 # Handoff: Crossroads Fishing Village
 
-Status: design brief approved 2026-10-06; dimensioned civic layout in review
-(`docs/architecture/fishing_village_layout.md`). No construction has begun and
+Status: design brief and dimensioned civic layout approved 2026-10-06
+(`docs/architecture/fishing_village_layout.md`). Players arrive by swimming
+until boats exist. No construction has begun and
 `FishingVillagePlan` is not yet authored. Read
 `docs/architecture/fishing_village.md`, then the layout plan.
 

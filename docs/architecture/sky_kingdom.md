@@ -1,6 +1,6 @@
 # Sky Kingdom: Courts of the Clouds
 
-Status: concept brief, second pass, in review (2026-10-06). The dimensioned
+Status: concept brief, second pass (2026-10-06); its layout is approved. The dimensioned
 layout and building programs are in `sky_kingdom_layout.md`; the kit of parts and
 per-building architecture briefs are in `sky_kingdom_buildings.md`. It replaces the
 first-pass prototype's loose cluster of pavilions with a planned celestial
@@ -587,12 +587,9 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
   buildings;
 - replacing runtime-resolved island placement with an authored layout.
 
-**Open:**
+**Deferred by the user (not to be designed now):** what Tempestar food and
+gifts do for the hero; how much of Sun Wu Kong's history becomes quest
+content; whether he returns to rule the jungle monkeys and whether his absence
+had any part in the Primate Kingdom's curse.
 
-- What Tempestar food and gifts do for the hero.
-- How much of the Sun Wu Kong history is quest content, and how the courts'
-  anger shows when he travels in the party.
-- Whether the courts ever admit they were wrong to blame him for the Air
-  blorbs.
-- Whether Sun Wu Kong returns to rule the Primate Kingdom's monkeys, and
-  whether his absence had any part in the kingdom falling under the curse.
+**Open:** whether the courts ever admit they were wrong to blame Sun Wu Kong.

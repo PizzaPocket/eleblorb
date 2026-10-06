@@ -1,8 +1,8 @@
 # Chinese Village: audit and rebuild proposal
 
 Status: population, backstory, quest resolution and postquest civic use are
-approved. The layout in section 4 remains a design brief rather than an
-implemented plan. No building has moved for this pass.
+approved. The layout re-fit in section 4, with its courtyard charter and palace
+restructure, was approved on 2026-10-06 but is not yet implemented. No building has moved for this pass.
 
 Source of truth today is `scripts/chinese_village.gd` (1572 lines, no plan data
 file, no validator). Measurements come from `tools/audit_china.tscn` (headless,

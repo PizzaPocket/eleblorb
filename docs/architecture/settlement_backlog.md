@@ -86,8 +86,8 @@ follow climate and work rather than filling empty space.
 
 ## 3. Crossroads Fishing Village
 
-Status: design brief and fifteen-person census approved (2026-10-06);
-dimensioned civic layout in review (`docs/architecture/fishing_village_layout.md`).
+Status: design brief, fifteen-person census and dimensioned civic layout
+approved (2026-10-06) (`docs/architecture/fishing_village_layout.md`).
 No construction has begun. The current implementation is
 a dock strip with seven generic huts, six decorative boats and one merchant.
 The approved direction is an original, cosmopolitan lake community whose
@@ -124,13 +124,12 @@ Next work:
 
 Open:
 
-- How the player reaches the village: today a 205 m swim from the west shore.
-  Options are swimming only, a west-shore landing with Ivo's ferry, or a long
-  public jetty from the shore.
+- None blocking: players swim to the village until boats exist.
 
 ## 4. Fire Kingdom Caldera City
 
-Status: concept planning and proposed named census complete (2026-10-05). The
+Status: concept planning complete (2026-10-05); named census approved
+(2026-10-06). The
 current implementation is eight generic homes around an 8.4-metre-wide
 decorative lava fountain. The proposed direction replaces it with a terraced
 city around a broad natural magma reservoir, with a second public district
@@ -141,8 +140,8 @@ Planning priorities:
 
 - Confirm the lava people's physiology: thermal energy sustains them, while
   rocks, minerals, and metals supply bodily matter and an analogue to flavor.
-- Review the proposed fourteen-person register across the Aro, Iren, Kel, Vara,
-  Oren, and Nahl households. It combines compatible roles so science, vent
+- Approved (2026-10-06): the fourteen-person register across the Aro, Iren,
+  Kel, Vara, Oren, and Nahl households. It combines compatible roles so science, vent
   stewardship, forging, glasswork, mineral work, education, care, government,
   and the occasional guest house do not each require a separate NPC.
 - Build a three-band plan: dry visitor and market ring, inhabited working
@@ -176,8 +175,7 @@ Planning priorities:
 Status: audit complete and population approved (2026-10-04); see
 `chinese_village.md` and `docs/handoff_chinese_village.md`. The households,
 history, Ohio trade link and the innkeeper 林静 are canon. The layout re-fit,
-courtyard charter and palace restructure await approval. No building moves
-until then. Queue: Ohio walkthrough first, then the layout re-fit.
+courtyard charter and palace restructure were approved on 2026-10-06. Queue: Ohio walkthrough first, then the layout re-fit.
 
 Planning priorities:
 
@@ -208,7 +206,7 @@ Planning priorities:
 
 ## 6. Sky Kingdom Courts
 
-Status: second-pass concept brief in review (2026-10-06). See
+Status: second-pass concept brief (2026-10-06); dimensioned layout approved. See
 `docs/architecture/sky_kingdom.md`. The current implementation is a prototype
 of four runtime-placed cloud islands with seeded pavilions and six Tempestars,
 all revealed only by the Bird Helm.
@@ -223,7 +221,7 @@ Planning priorities:
   before any building is designed.
 - The hero flies between clouds (Air Gem) and Tempestars float, so islands need
   no bridges; spacing can follow composition and each court's separateness.
-- Review the dimensioned layout and building programs in
+- Approved: the dimensioned layout and building programs in
   `docs/architecture/sky_kingdom_layout.md`: an authored frame from a fixed
   staircase landing, Aethra on the arrival axis, the four other courts in a
   ring around Koinon, and every building's footprint and program.

@@ -1,6 +1,9 @@
 # Ocean Kingdom: The Cage Island
 
-Status: concept brief, first planning pass, in review (2026-10-06). Read with
+Status: concept brief, first planning pass (2026-10-06). **Build the
+environment only:** the crater, cage, stands and landing. Do not build the
+inhabitants or any tournament NPCs, and do not write fight mechanics or
+scripting, until the user confirms their direction. Read with
 `ocean_kingdom.md`. The island's inhabitants are not yet designed: the user
 will supply their direction.
 

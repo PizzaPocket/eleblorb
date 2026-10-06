@@ -1,4 +1,4 @@
-# Handoff: Chinese Village pass (population and story approved, layout not started)
+# Handoff: Chinese Village pass (population, story and layout re-fit approved; layout not yet built)
 
 Nothing from this work is committed. The working tree holds many unrelated
 modified files, so review `git status` before staging. Follow `AGENTS.md` and

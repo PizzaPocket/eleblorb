@@ -1,8 +1,8 @@
 # Handoff: Fire Kingdom Caldera City
 
 Status: community, civic-system, and architectural brief complete enough for a
-dimensioned layout synthesis; fourteen-person census remains a working proposal
-until explicitly approved. The outer-wilds regrowth and island-skirt systems
+dimensioned layout synthesis; the fourteen-person census was approved on
+2026-10-06. The outer-wilds regrowth and island-skirt systems
 have been implemented, but the caldera city itself has not been reconstructed.
 Read
 `docs/architecture/fire_caldera_city.md` first.

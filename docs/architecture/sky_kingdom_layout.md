@@ -1,6 +1,6 @@
 # Sky Kingdom: Civic Layout and Building Programs
 
-Status: dimensioned schematic for review (2026-10-06). Read with
+Status: layout approved (2026-10-06). Read with
 `sky_kingdom.md`, which owns the Tempestars, their courts, cuisine, flora,
 materials and charter. This document places the six courts in the sky and
 gives each building its program. Architecture briefs per building follow

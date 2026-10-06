@@ -31,12 +31,20 @@ Status: concept brief, first planning pass, in review (2026-10-06). Read with
 
 The ships are two populations with two pasts, and they despise each other.
 
-### The *Harbinger*: a navy that no longer exists
+Both ships belong to the European tradition of piracy. Historically, most
+Caribbean pirates were English, with many French buccaneers and Dutch sailors,
+and their crews were thoroughly mixed: escaped enslaved Africans, Irish,
+Scandinavian and Mediterranean sailors served alongside them. Spain was mainly
+the target, its treasure fleets the prize. The two ships take the two biggest
+strands of that history: a **British** naval privateer and a **French**
+buccaneer crew. Where they sail from is not a story question; they are pirates.
 
-- **Captain Brine** (black beard, bicorne) and his crew were once privateers,
-  licensed to raid by a sea power from beyond the horizon. That navy is gone,
-  and with it their letter of marque. They kept the ship, the discipline and
-  the uniforms, faded but mended.
+### The *Harbinger*: British privateers without a navy
+
+- **Captain Brine** (black beard, bicorne) and his crew were once British
+  privateers, licensed to raid under a letter of marque. The war, and the
+  licence, are long over. They kept the ship, the discipline and the uniforms,
+  faded but mended.
 - **Culture:** ranks, ship's bells, watches, a logbook kept daily, drills
   nobody orders any more. They call themselves privateers. Everyone else calls
   them pirates.
@@ -46,12 +54,15 @@ The ships are two populations with two pasts, and they despise each other.
   carved figurehead; a coppered hull. Neat, painted, coiled.
 - **Hat:** the bicorne fits the later naval era the ship comes from.
 
-### The *Fortune's Rag*: free pirates from everywhere
+### The *Belle Fortune*: French buccaneers
 
-- **Captain Hollis Marigold** (orange beard, tricorn) commands a crew of
-  runaways from many nations who took a merchant ship and made it theirs.
+- **Capitaine Lucien Souci** (orange beard, tricorn; *souci* is French for
+  marigold) leads a crew in the tradition of the French buccaneers of the
+  Caribbean, who took a merchant ship and made it theirs. As real buccaneer
+  crews were, they are mixed: French, Dutch, West African, Irish, Spanish and
+  Levantine sailors.
 - **Culture:** the democracy of the historical pirate "articles": the crew
-  voted Marigold captain and can vote him out; a quartermaster elected
+  voted Souci captain and can vote him out; a quartermaster elected
   separately holds real power; shares are equal and written down. Loud,
   generous, quarrelsome, superstitious.
 - **The ship:** a captured merchant galleon: broad and round-bellied, with a
@@ -59,10 +70,11 @@ The ships are two populations with two pasts, and they despise each other.
   unevenly, mismatched patched sails, colourful repairs, cargo lashed
   everywhere.
 - **Hat:** the tricorn, of the older golden age of piracy.
-- **Proposed crew of eight:** Captain **Hollis Marigold**; quartermaster
-  **Bastian Ruiz**; boatswain **Yaw Mensah**; navigator **Ingrid Holm**; cook
-  **Teo Abad**; gunner **Bridget Nolan**; sailmaker **Sami Haddad**; cabin hand
-  **Finch**, the youngest aboard.
+- **Crew of eight:** Capitaine **Lucien Souci**; quartermaster **Bastien
+  Roux**; boatswain **Yaw Mensah**; navigator **Anneke Vos**, who is Dutch;
+  cook **Teo Abad**, a Spanish deserter; gunner **Bridget Nolan**, who is
+  Irish; sailmaker **Sami Haddad**; and cabin hand **Moineau** ("sparrow"), the
+  youngest aboard.
 
 ### Captain Brine's crew roles (proposed)
 
@@ -76,8 +88,8 @@ When the hero arrives, the Demon King's discord has set every community in
 the kingdom against the others (how is still open). Restoring harmony is the
 kingdom's story.
 
-- The two ships are at open war: Brine's crew think Marigold's are rabble;
-  Marigold's crew think Brine's are servants without a master.
+- The two ships are at open war: Brine's crew think Souci's are rabble;
+  Souci's crew think Brine's are servants without a master.
 - Both are barred from Kai Mālie's beach, where they once traded for water and
   food.
 - The sea folk hate both and believe the ships are fouling the reef.
@@ -88,7 +100,7 @@ kingdom's story.
 Each ship is a building that moves. Their interiors should be enterable so the
 crews have somewhere to live:
 
-| Space | *Harbinger* (frigate) | *Fortune's Rag* (galleon) |
+| Space | *Harbinger* (frigate) | *Belle Fortune* (galleon) |
 |---|---|---|
 | Upper deck | flush, clear, orderly | cluttered with lashed cargo |
 | Aft | quarterdeck and wheel | stepped sterncastle, wheel on the top tier |
@@ -116,10 +128,12 @@ are rebuilt: set each crew member's gender explicitly and gate beards on it
 the two captains' beards, hooks and hats; Captain Brine and his named crew.
 
 **Proposed:** the two origins (a lost navy's privateer frigate and a captured
-merchant galleon run by elected articles); ship names; Marigold and his crew;
+merchant galleon run by elected articles); ship names; Souci and his crew;
 crew roles; enterable interiors.
 
-**Open:** where "beyond the horizon" is, and whether either crew ever returns
-there; whether the ships can be boarded and fought, or are only parkour and
+**Settled:** the *Harbinger* is British and the *Belle Fortune* French; where
+they came from is not a story question.
+
+**Open:** whether the ships can be boarded and fought, or are only parkour and
 conversation; whether either ship becomes rideable once boat riding exists;
 the pirates' part in the kingdom's story.

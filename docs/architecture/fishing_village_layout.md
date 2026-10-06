@@ -1,6 +1,6 @@
 # Crossroads Fishing Village: Civic Layout Plan
 
-Status: dimensioned schematic for review (2026-10-06). This plan places the
+Status: layout approved (2026-10-06). This plan places the
 approved community, programs and boats on the lake. It fixes relationships,
 route hierarchy, approximate footprints, water use and implementation
 constraints. Building architecture follows only after this plan is approved.
@@ -342,11 +342,9 @@ route, lane, berth and height above; the portal's move to Heron Rock.
 
 **Open:**
 
-- **How the player reaches the village.** Today it is a 205 m swim. Options:
-  keep swimming as the only way (the lake is meant to be explored); add a
-  shore landing on the west bank with Ivo's ferry, rideable once boat riding
-  exists; or add a long public jetty from the shore, which over 40 to 130 m of
-  water would need its own shelf or a floating causeway.
+- None blocking. Players reach the village by swimming, as now; boats come
+  later with boat riding.
 
-**Settled since:** boats will be rideable, as a separate project with its own
-control design. The berths and lanes above are its starting data.
+**Settled since:** the layout is approved; arrival is by swimming until boats
+exist; boats will be rideable, as a separate project with its own control
+design. The berths and lanes above are its starting data.

@@ -28,7 +28,8 @@ four populations with separate briefs:
 ## How they relate: discord now, harmony later
 
 When the hero arrives, every community is at odds with the others. The Demon
-King has sown the discord; how is still open. Restoring harmony is the
+King has sown the discord; how is deferred, with the rest of the kingdom's
+backstory, until the user returns to it. Restoring harmony is the
 kingdom's story, as it is in the Sky Kingdom.
 
 | Between | Before the discord | Now |
@@ -58,7 +59,8 @@ kingdom's story, as it is in the Sky Kingdom.
    enlargement.
 3. Lay out the sea folk city's rings and air halls.
 4. Build the second ship and the ship interiors.
-5. Lay out the cage island (now a crescent crater) and design the tournament.
+5. Lay out the cage island (now a crescent crater): environment only, no
+   inhabitants, NPCs or fight scripting until the user confirms direction.
 6. Planting: `ocean_landscape.md` replaces the random island scatter with
    Hawaiian zonation, per-islet characters and tended settlement planting.
 7. The shared systems each needs: the generalised lexicon for Hawaiian, air

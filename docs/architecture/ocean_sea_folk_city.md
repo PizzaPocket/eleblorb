@@ -118,8 +118,9 @@ several existing lines refer to them.
 ### Governance
 
 The Tidekeeper rules, but as a listener and judge. Each household speaks for
-itself in the audience hall. The battle with the Tidekeeper, and why the hero
-fights a peaceful ruler, are still open.
+itself in the audience hall. The hero fights the Tidekeeper because fighting to
+test a visitor's mettle is part of sea folk culture: a challenge of respect,
+not hostility.
 
 ### Relations: discord now, harmony later
 
@@ -164,8 +165,9 @@ The guest hall is an air hall kept by **Pelaju**, who deals with every visitor
 from the surface. It is a rest point, one of two in the kingdom (the other is
 Kai Mālie's guest house). Resting restores the party and melted blorbs,
 advances to morning and plays the standard waking sequence in a dry bed inside
-the hall; the party gathers on the hall's floor, never in the moon pool. How
-the sea folk are paid is open.
+the hall; the party gathers on the hall's floor, never in the moon pool. A
+night costs the ordinary rate of 10 Tokoins through the shared transaction
+interface.
 
 ### Glass tunnels
 
@@ -216,8 +218,11 @@ resident; the Demon King's discord with the other communities;
 the seven households, the residents' roles and two children; the concentric
 plan with the Ring Current; the Glassworks at a warm vent.
 
-**Open:** why the hero battles the Tidekeeper; how the guest hall is paid for;
-the sea folk's own rituals.
+**Settled:** the Tidekeeper's fight is a cultural test of mettle; the guest
+hall charges 10 Tokoins.
+
+**Deferred by the user:** the Ocean Kingdom's backstory, including how the
+Demon King sowed the discord.
 
 ## Implementation notes
 
