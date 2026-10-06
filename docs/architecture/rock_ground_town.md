@@ -353,6 +353,10 @@ spread.
 - a cowboy hat the player can receive and use as a helm;
 - a mostly bare dirt-and-rock biome with a few cacti, shrubs and tumbleweeds.
 
+**Fixed (user, 2026-10-06):** no firearms. Nobody in the town carries a gun:
+no holsters, gun belts, rifles on racks or shoot-outs. The Western menace comes
+from horses, riders, stares and races instead.
+
 **Proposed:**
 - the census of sixteen, replacing the eight rock-named residents;
 - Dolma's inn becoming the saloon and hotel;
@@ -373,6 +377,5 @@ spread.
 - how the hero gets the hat from Inez (not a race prize: it comes before
   racing);
 - what the dirt bike can do without the hat, and what the hat unlocks.
-- whether firearms appear (the game has none yet);
 - the kingdom's name: the user called it the Earth Kingdom and the Earth and
   Rock Kingdom, while the code and bible say Rock and Ground.
