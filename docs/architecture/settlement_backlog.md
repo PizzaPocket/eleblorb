@@ -268,7 +268,11 @@ Planning priorities:
   The survey found the island only about 55 m in dry radius, with a steep shore,
   no beach and the dock 83 m offshore, so the layout adds a coastal plain,
   beach, reef flat, taro terraces, a spring and a pier, and enlarges the cage
-  island. Then lay out the sea folk city's rings, air halls and tunnels.
+  island. The sea folk city's layout is in
+  `docs/architecture/ocean_sea_folk_city_layout.md` (in review): the castle
+  turned to face arrivals, the rings and Ring Current, three air halls, two glass
+  tunnels, light pipes, and the existing inn rebuilt as Isaro's guest hall at
+  25 Tokoins.
 - Build the missing second ship and the ships' priority interiors.
 - The main island becomes an old, eroded 28 m volcano with a windward valley
   holding the taro terraces; the cage island becomes a young crescent crater
