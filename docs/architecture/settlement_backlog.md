@@ -262,7 +262,8 @@ Planning priorities:
 - Approve the four briefs: the Atlantean-modern sea folk city with air halls,
   glass tunnels, a legged form and renamed residents; the two ships' origins
   and crews; Kai Mālie's community, ahupuaʻa plan and charter, with every
-  resident speaking Hawaiian; the Shellbacks' cage island and tournament.
+  resident speaking Hawaiian; the cage island and its short tournament (its creatures await the user's
+  direction).
 - Design the discord the Demon King has sown between the communities and how
   the hero restores harmony.
 - Lay out Kai Mālie first, since it frames the arrival view, then the sea folk

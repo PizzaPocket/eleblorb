@@ -8,7 +8,7 @@ four populations with separate briefs:
 | The sea folk (merfolk) | `ocean_sea_folk_city.md` | the deep-sea city at world `(0, -540)`, 72 m down |
 | The pirates of two ships | `ocean_pirate_ships.md` | at sea, on the route around the kingdom's centre |
 | Kai Mālie, the island village | `ocean_island_village.md` | the eastern shore of the main island, facing the arrival dock |
-| The Shellbacks of the cage island | `ocean_cage_island.md` | the small island at `(112, 88)`, east-northeast of the dock |
+| The cage island's creatures (pending) | `ocean_cage_island.md` | the small island at `(112, 88)`, east-northeast of the dock |
 
 ## Survey (from the current code)
 
@@ -35,7 +35,7 @@ kingdom's story, as it is in the Sky Kingdom.
 | Island and pirates | trade for water and food on the beach | the pirates are barred |
 | Sea folk and pirates | avoidance | hatred; the sea folk say the ships foul the reef |
 | The two ships | contempt | open war |
-| The Shellbacks and everyone | scavenging what washes up | they profit from the discord with grudge matches |
+| The cage island and everyone | — | its creatures profit from the discord: each community sends a contender to the cage |
 | Everyone and the Kraken | fear | fear |
 
 ## Shared decisions for the kingdom
