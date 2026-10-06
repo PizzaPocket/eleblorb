@@ -70,7 +70,7 @@ is these mongooses too.
 ### The band (proposed 2026-10-06)
 
 One band of ten: eight adults and two pups. As with real mongooses, they
-sleep together in one den and act as one crowd. They have only short names for
+sleep heaped together and act as one crowd. They have only short names for
 one another, simple sounds rather than words from any human language.
 
 | Name | Gender | In the band |
@@ -95,17 +95,29 @@ one another, simple sounds rather than words from any human language.
 - **The day:** sunning on the eastern ledges at dawn while Pell watches from
   the crest; squabbling and foraging through the morning. When anyone lands,
   the whole band piles into the stands and the chant begins.
-- **The night:** all ten heaped together in their den.
+- **The night:** all ten heaped together in whichever den they are using.
+  Every few days they move to another, as banded mongooses do.
 - **Fights:** they do not referee. They want a fighter to fight, and they
   howl down anyone who will not.
 
 ### Homes and places
 
-- **The den:** a burrow dug into the rim's outer face below the crest, where
-  the tuff is thickest. Rough mouths at least 2.8 m high for their height; one
-  big chamber floored with trampled grass, littered with eggshells and fish
-  bones.
-- **Sunning ledges:** the eastern outer ledges, worn smooth.
+- **The dens:** like real mongooses, they borrow shelter rather than dig it.
+  They have **three dens**, which they rotate between every few days:
+  1. a deep **crack** in the tuff on the rim's outer face below the crest;
+  2. a **boulder pile** at the foot of the north horn;
+  3. the space under a broad **overhanging ledge** on the southern outer slope.
+
+  Each den:
+  - has a rough mouth at least 2.8 m high for their height;
+  - is bedded with dragged-in *pili* grass, littered with eggshells and fish
+    bones;
+  - has grass and *ʻaʻaliʻi* scrub close by to bolt into;
+  - has a flat sunning rock in the open in front.
+  
+  The two dens not in use show it: old bedding, a few bones, quiet.
+- **Sunning ledges:** the eastern outer ledges, worn smooth, and the
+  sunning rock before each den.
 - **The trophy heap:** beside the cage gate, everything taken from beaten
   fighters: a pirate's hat, a broken fishing spear, a sea folk shell clasp,
   and things nobody can name.
@@ -130,10 +142,23 @@ one another, simple sounds rather than words from any human language.
 ### When harmony returns (story state)
 
 Their violence comes from being out of harmony with their place, not from
-their nature. When things change and the discord lifts, they finally find that
-harmony and are at peace:
+their nature.
+
+**The island itself already suits them.** Mongooses naturally live in dry,
+open grassland and scrub, denning in rock crevices and boulder piles, sunning
+on rocks and hunting in the open with cover close by. That describes the young
+cone's dry, grassy slopes exactly: in Hawaii, the small Indian mongoose thrives
+in just such dry lowland. What is out of harmony is **how they live on it**:
+- crowded round a cage of wreckage instead of ranging over their slopes;
+- fighting instead of hunting;
+- feeding on violence instead of on the land.
+
+When things change and the discord lifts, they finally find that harmony and
+are at peace:
 - the cage goes quiet and the vines start to take it;
-- the band suns on the ledges and forages the shore without a fight in sight;
+- the band spreads out over the slopes again: sunning on their rocks,
+  hunting through the grass and along the shore, moving between their three
+  dens, without a fight in sight;
 - the chant is heard only from the pups, at play.
 
 What exactly changes to bring this about is open. This is a revisit state for
@@ -189,7 +214,8 @@ The crater is the arena; little has to be built.
 - **Trophy heap:** beside the gate, outside the cage.
 - **Landing:** the beach inside the breach; arrivals walk straight up the
   floor to the cage gate, under the eyes of the whole rim.
-- **The den:** dug into the rim's outer face below the crest (section 3).
+- **The dens:** three borrowed dens, a crack, a boulder pile and an
+  overhang, on the outer slopes (section 3).
 - **Routes:** every public route, aisle and the cage gate meet the hero's and
   party's minimums (3 m on the floor and beach, 2 m on aisles, 3.2 m headroom).
 
@@ -245,7 +271,7 @@ and built the cage; base beasts of low intelligence; the leader, a male, in a Ha
 shirt probably taken from Kai Mālie, the rest in simple grass and leaves; out
 of harmony with their place, and able to find peace if things change.
 
-**Proposed (culture):** the band of ten (eight adults, two pups), the den, the trophy heap, the
+**Proposed (culture):** the band of ten (eight adults, two pups), the three rotating dens, the trophy heap, the
 howling rock, the crude cage, the look, and the quiet state after harmony.
 
 **Open:** what change brings them into harmony; what happens when the hero
