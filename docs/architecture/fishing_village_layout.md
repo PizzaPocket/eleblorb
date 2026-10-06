@@ -344,9 +344,9 @@ route, lane, berth and height above; the portal's move to Heron Rock.
 
 - **How the player reaches the village.** Today it is a 205 m swim. Options:
   keep swimming as the only way (the lake is meant to be explored); add a
-  shore landing on the west bank with Ivo's ferry as rideable or scheduled
-  transport (depends on the rideable-boats decision); or add a long public
-  jetty from the shore, which over 40 to 130 m of water would need its own
-  shelf or a floating causeway.
-- **Whether working boats are rideable** in this pass (carried over from the
-  brief). The berths and lanes above work either way.
+  shore landing on the west bank with Ivo's ferry, rideable once boat riding
+  exists; or add a long public jetty from the shore, which over 40 to 130 m of
+  water would need its own shelf or a floating causeway.
+
+**Settled since:** boats will be rideable, as a separate project with its own
+control design. The berths and lanes above are its starting data.

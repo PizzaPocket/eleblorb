@@ -11,8 +11,9 @@ and trade responsibilities are in the architecture brief and `world_bible.md`.
 
 Settled: pearls are ordinary cultivated valuables, and the village is anchored
 by two steep limestone islets rising from submerged shoulders (Ko Panyi is the
-siting precedent). Still open: whether working boats become rideable in this
-pass.
+siting precedent). Boats will be rideable, but boat riding is a separate project
+with its own control design and a shared traversal mode for every playable
+character; this village build does not wait for it.
 
 ## Sequence
 

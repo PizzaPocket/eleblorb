@@ -399,11 +399,9 @@ Settled (2026-10-06):
 - Freshwater pearls are ordinary cultivated valuables with no magical quality.
 - The two anchoring islets are steep limestone rising from submerged shoulders,
   with Ko Panyi as the siting precedent.
-
-Still open before construction:
-
-- Whether working boats become rideable in this pass or remain scheduled
-  environmental traffic until vehicle boarding is generalized.
+- Working boats will be rideable. Boat riding is a separate project with its
+  own control design, built as a shared traversal mode for every playable
+  character; the village does not wait for it.
 
 ## Research principles
 

@@ -124,8 +124,6 @@ Next work:
 
 Open:
 
-- Whether working boats become rideable in this pass or remain scheduled
-  environmental traffic until vehicle boarding is generalized.
 - How the player reaches the village: today a 205 m swim from the west shore.
   Options are swimming only, a west-shore landing with Ivo's ferry, or a long
   public jetty from the shore.
@@ -233,3 +231,21 @@ Planning priorities:
   `docs/architecture/sky_kingdom_buildings.md`, then prototype in order: the
   upturned swept roof on its own (fallback: straight floating hip-and-gable
   with raised gold corner finials), the Hall of Mist, and a tholos.
+
+## 7. Boat riding (separate project)
+
+Boats will be rideable. Boat riding is its own project, separate from the
+village build, because its controls need their own design. Per the project's
+traversal rule it must be a shared `TraversalMode` that every playable
+character can drive, not code in one character's script. Until it lands, boats
+stay moored or follow scheduled routes, and the village plan already gives each
+one an owner, berth and lane.
+
+Planning priorities:
+
+- Design the controls: boarding and leaving, steering, speed, and how a boat
+  behaves at berths, swim exits and lane edges.
+- Build it as a shared `TraversalMode` wired to every driver, scaled through
+  `TraversalContext`, per `docs/traversal_powers_architecture.md`.
+- Start from the fishing village's boats and lanes, then Ivo's ferry run to the
+  west shore, which could become the village's ordinary arrival route.
