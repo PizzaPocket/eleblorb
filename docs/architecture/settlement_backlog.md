@@ -217,9 +217,10 @@ all revealed only by the Bird Helm.
 
 Planning priorities:
 
-- Approve the six-court, twenty-one-person register (names pending a naming
-  scheme), the cuisine, the cloud-rooted flora, exchange without merchants, and
-  the leisured culture with its costs.
+- Approve the six-court, twenty-one-person register, the cuisine, the
+  cloud-rooted flora, exchange without merchants, and the leisured culture with
+  its costs. The islands and residents are renamed; `sky_kingdom.gd` still uses
+  the prototype names until the rebuild.
 - Approve the cloud, gold and quartz material system and its gameplay rules
   before any building is designed.
 - The hero flies between clouds (Air Gem) and Tempestars float, so islands need

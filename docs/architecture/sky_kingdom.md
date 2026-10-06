@@ -58,7 +58,7 @@ carrying Sun Wu Kong's story, since he is already part of the game:
 
 - **The Chinese Celestial Court, as Journey to the West tells it:** the Jade
   Emperor's palace beyond the Southern Heavenly Gate, audiences in the Hall of
-  Miraculous Mist, a bureaucracy of offices and titles, the lowly post of
+  Miraculous Archeia, a bureaucracy of offices and titles, the lowly post of
   keeper of the heavenly horses that Sun Wukong was given and resented, the
   empty title "Great Sage Equal to Heaven" granted to quiet him, the Queen
   Mother of the West's peaches that ripen once in an age, the Peach Banquet he
@@ -160,12 +160,12 @@ for anything better than a sealing.
 
 Who remembers what:
 
-- **Squall** keeps his offences in Aethra ledger, itemised.
-- **Rime** still counts the peaches he ate.
-- **Corona** has never forgiven the ruined games; **Scud** secretly wants a
+- **Mnesia** keeps his offences in Aethra ledger, itemised.
+- **Chunlu** still counts the peaches he ate.
+- **Nikandra** has never forgiven the ruined games; **Tachys** secretly wants a
   rematch.
-- **Mist** tends the sealing decree in the empty Hall.
-- **Breeze**, who chased Air blorbs as a child, remembers him as the keeper who
+- **Archeia** tends the sealing decree in the empty Hall.
+- **Alkis**, who chased Air blorbs as a child, remembers him as the keeper who
   let the children help.
 
 ## 3. Community
@@ -188,7 +188,7 @@ Hollow Cloud.
 
 Aethra's Hall of Mist and Pantao's Peach Garden carry the Chinese palace style;
 the other courts are Greco-Roman. The old names remain in `sky_kingdom.gd`,
-and Cirro's existing line explains the name "Hollow Cloud"; both change when
+and Sophrona's existing line explains the name "Hollow Cloud"; both change when
 the kingdom is rebuilt.
 
 The census is **twenty-one Tempestars in six courts**: nineteen adults and two
@@ -197,49 +197,75 @@ around one ruler, and each corresponds to an office of the mythic heavenly
 courts. Duties that were once one shared government are now split among rival
 courts that rarely speak.
 
-Names currently follow the prototype's convention: a weather word followed by a
-compound surname. The naming scheme is under review (see Open); the new names
-below are placeholders until it is settled.
+Names match the island names: invented Greek-rooted names for the Greco-Roman
+courts and Chinese names for Pantao. Tempestars go by a single given name and
+are known by their court ("Drosia of Aethra"). They replace every prototype
+name; "(existing)" marks a renamed prototype resident, with the old name for
+reference.
+
+| Name | Root or meaning | Prototype name |
+|---|---|---|
+| Aristeon | *aristos*, best | Cumulus Highvane |
+| Mnesia | memory | Squall Windrider |
+| Alkis | strength, quickness | Breeze Suncrest |
+| Drosia | *drosos*, dew | — |
+| Aurelia | Latin *aurum*, gold | Nimbus Greywisp |
+| Kallix | *kallos*, beauty | — |
+| Keraunia | *keraunos*, thunderbolt | — |
+| Elegon | elegy | Gale Stormwick |
+| Aulia | *aulos*, the double flute | — |
+| Rhapsos | the rhapsode, reciter of verse | — |
+| Sophrona | *sophrosyne*, temperance and good sense | Cirro Ashveil |
+| Astrion | star | — |
+| Archeia | *archeion*, archive | — |
+| Xiangyun | 祥云, auspicious cloud | — |
+| Tianlu | 天禄, heavenly bounty | — |
+| Chunlu | 春露, spring dew | — |
+| Mingyue | 明月, bright moon | — |
+| Nikandra | *nike*, victory | — |
+| Tachys | swift | — |
+| Stephane | *stephanos*, wreath | — |
+| Dromeus | runner | — |
 
 ### Aethra: the court of state (capital, tallest)
 
 The Olympian or Jade Emperor's throne room, reduced to one cloud.
 
-- **Cumulus Highvane** (existing), ruler. Holds the tallest crown and gives
+- **Aristeon** (existing), ruler. Holds the tallest crown and gives
   audiences that nobody else attends. Proud of precedence; quietly misses the
   company the updrafts used to bring.
-- **Squall Windrider** (existing), chamberlain and keeper of ledgers. Records
+- **Mnesia** (existing), chamberlain and keeper of ledgers. Records
   titles, precedence and every slight between courts. Keeps the ruler's robes
   from blowing off the edge.
-- **Breeze Suncrest** (existing), herald. The youngest at Aethra and the only
+- **Alkis** (existing), herald. The youngest at Aethra and the only
   Tempestar who still floats between clouds carrying invitations and news,
   like Hermes or Iris. Chased Air blorbs as a child.
-- **Dew Brightcup**, cupbearer. Sets the gold dew bowls out before dawn and
+- **Drosia**, cupbearer. Sets the gold dew bowls out before dawn and
   gathers the nectar for Aethra's table. Knows precisely how much each court
-  drinks, which makes Dew the court's best source of gossip.
+  drinks, which makes Drosia the court's best source of gossip.
 
 ### Chrysa: the court of craft and weather
 
 Hephaestus's forge and the thunderhead's anvil top.
 
-- **Nimbus Greywisp** (existing), ruler and goldsmith. The only court that
+- **Aurelia** (existing), ruler and goldsmith. The only court that
   makes things: gold pins, tripods, bowls and the anchors every building in
   the kingdom depends on. Resents that the other courts treat this as a service
   owed to them.
-- **Virga Brightanvil**, apprentice goldsmith. Brilliant at beginning pieces and
-  rarely finishes one, as the rain that evaporates before it lands.
-- **Graupel Stonebrow**, weather-shaper. Herds storm cloud for the forge's heat
-  and light and keeps the Anvil's own weather.
+- **Kallix**, apprentice goldsmith. Brilliant at beginning pieces and
+  rarely finishes one.
+- **Keraunia**, weather-shaper. Herds storm cloud for the forge's heat
+  and light and keeps Chrysa's own weather.
 
 ### Lyria: the court of music and verse
 
 The Muses' choir in a court of three.
 
-- **Gale Stormwick** (existing), ruler and poet. Feels the crown as an exile and
+- **Elegon** (existing), ruler and poet. Feels the crown as an exile and
   would trade it for a neighbour.
-- **Zephyr Lyremantle**, musician. Plays wind harps strung between the
+- **Aulia**, musician. Plays wind harps strung between the
   colonnade's columns. Rehearses for audiences that have stopped coming.
-- **Haze Softquill**, keeper of songs. Holds the kingdom's verse in memory and
+- **Rhapsos**, keeper of songs. Holds the kingdom's verse in memory and
   on gold leaf.
 
 ### Koinon: the court of learning and the empty hall
@@ -247,12 +273,12 @@ The Muses' choir in a court of three.
 The council of the heavens, now a scholar's observatory beside an empty
 assembly.
 
-- **Cirro Ashveil** (existing), ruler and philosopher. At the cloud's centre is the vacant
-  Hall of Assembly, where all the courts once met. Cirro
+- **Sophrona** (existing), ruler and philosopher. At the cloud's centre is the vacant
+  Hall of Assembly, where all the courts once met. Sophrona
   thinks it is waiting to be filled.
-- **Alto Starmantle**, stargazer. Keeps the observatory and the calendar of
+- **Astrion**, stargazer. Keeps the observatory and the calendar of
   seasons, as the Horai once kept heaven's gates.
-- **Mist Pallwhisper**, archivist. Tends the empty hall and the decisions
+- **Archeia**, archivist. Tends the empty hall and the decisions
   inscribed in gold around it, the last of them very old.
 
 ### Pantao (new): the court of the feast
@@ -260,44 +286,44 @@ assembly.
 The Queen Mother of the West's peach garden and the golden fruit of the
 Hesperides.
 
-- **Iris Dawnbloom**, ruler and hostess. Holds the most lavish banquets in the
+- **Xiangyun**, ruler and hostess. Holds the most lavish banquets in the
   kingdom, partly to outshine Aethra. The guest list is a weapon.
-- **Mellow Honeymantle**, master of the table. Composes the kingdom's cuisine:
+- **Tianlu**, master of the table. Composes the kingdom's cuisine:
   ambrosia, nectar wines, peach dishes, sky-fruit, and the order of courses.
-- **Rime Sweetbough**, orchard keeper. Tends the cloud-rooted peach and fruit
+- **Chunlu**, orchard keeper. Tends the cloud-rooted peach and fruit
   trees, and is the one who knows which peach is truly first.
-- **Iris's child** (name pending), the younger of the kingdom's two children.
+- **Mingyue**, Xiangyun's daughter and the younger of the kingdom's two children.
   Raised at banquets, and openly bored by them.
 
 ### Dromos (new): the court of games
 
 Olympian contests and the hippodrome.
 
-- **Corona Fairwind**, ruler and judge of contests. Presides over races and
+- **Nikandra**, ruler and judge of contests. Presides over races and
   games around a ring-shaped cloud, and keeps the record of every victory.
-- **Scud Quickwhirl**, racer. Young, fast and bored, and the court's champion
+- **Tachys**, racer. Young, fast and bored, and the court's champion
   because there is hardly anyone left to race.
-- **Flurry Brightring**, keeper of the course and the prizes: gold rings,
+- **Stephane**, keeper of the course and the prizes: gold rings,
   wreaths of woven cloud, laurels from Pantao when the two courts
   are speaking.
-- **Corona's child** (name pending), the elder child. Races Scud and loses,
+- **Dromeus**, Nikandra's son and the elder child. Races Tachys and loses,
   and would race anyone from any court if the rulers allowed it.
 
 ### Responsibility map
 
 | Need | Who | Where |
 |---|---|---|
-| Ceremony, precedence, records of rank | Cumulus, Squall | Aethra |
-| News and invitations between clouds | Breeze | everywhere |
+| Ceremony, precedence, records of rank | Aristeon, Mnesia | Aethra |
+| News and invitations between clouds | Alkis | everywhere |
 | Keeping the Air blorb flocks | vacant since Sun Wu Kong's sealing | between the clouds |
-| Nectar | Dew (Aethra); each court sets its own bowls | east terraces |
-| Ambrosia, fruit, banquets | Mellow, Rime, Iris | Pantao |
-| Gold: anchors, pins, vessels, tripods | Nimbus, Virga | Chrysa |
-| Weather and cloud-shaping | Graupel; every Tempestar a little | Chrysa |
-| Music and verse | Zephyr, Haze, Gale | Lyria |
-| Calendar, seasons, stars | Alto | Koinon |
-| Shared law and archives | Mist, Cirro | Koinon hall |
-| Games and contests | Corona, Scud, Flurry | Dromos |
+| Nectar | Drosia (Aethra); each court sets its own bowls | east terraces |
+| Ambrosia, fruit, banquets | Tianlu, Chunlu, Xiangyun | Pantao |
+| Gold: anchors, pins, vessels, tripods | Aurelia, Kallix | Chrysa |
+| Weather and cloud-shaping | Keraunia; every Tempestar a little | Chrysa |
+| Music and verse | Aulia, Rhapsos, Elegon | Lyria |
+| Calendar, seasons, stars | Astrion | Koinon |
+| Shared law and archives | Archeia, Sophrona | Koinon hall |
+| Games and contests | Nikandra, Tachys, Stephane | Dromos |
 
 There is no labour of survival anywhere in this table. Everything listed is
 either pleasure or a duty that only matters because other courts exist, which
@@ -307,8 +333,8 @@ is why so much of it has lapsed.
 
 Each court is sovereign over its own cloud and nothing else. The Hall of
 Assembly on Koinon is where shared decisions were once made; no
-court has called it in living memory. Contact now runs through Breeze's
-invitations, Dew's gossip and banquets that are as much contests as meals.
+court has called it in living memory. Contact now runs through Alkis's
+invitations, Drosia's gossip and banquets that are as much contests as meals.
 Disputes are over precedence, over whose cloud shadows whose terrace, over the
 first peach and over whose music is better.
 
@@ -529,9 +555,6 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
 
 **Open:**
 
-
-- The naming scheme. The prototype's six names are weather words with compound
-  surnames; this brief's new names follow that pattern as placeholders.
 - What Tempestar food and gifts do for the hero.
 - How much of the Sun Wu Kong history is quest content: whether the hero must
   clear his name, whether he takes back the keeper's post once the Air blorbs
