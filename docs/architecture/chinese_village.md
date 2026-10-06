@@ -372,6 +372,127 @@ A crown of a palace roof was the wrong place for it.
 - **When he is freed,** the rock splits in two and the gold band falls. The
   halves stay where they fell, and the children climb on them.
 
+### 4.7 Dress charter (proposed 2026-10-06)
+
+The village is classical, not present-day (3.8, decision 0), so its people wear
+**late-imperial Chinese commoners' dress**, the everyday clothes of Ming and
+Qing villages: jackets with **standing collars** (the "Mandarin" collar,
+*lìlǐng*), trousers, skirts, sashes and cloth shoes. That period also fits the
+Emperor's tasselled crown and the courtyard architecture.
+
+**Environment.** A mild, breezy island climate over the Abyss: light layers,
+nothing heavy, sleeves rolled or short for hot work. The carriers, roofers and
+farmer work outdoors, so straw hats and tied-in trouser legs belong to them.
+
+**What makes a garment read as period and never as a modern t-shirt.** Every
+upper garment has all of these:
+- a **standing collar**: a band about 3 to 4 cm high round the neck;
+- a **front closure with knotted cloth buttons** (*pánkòu*, "frog" buttons).
+  It is either the side-fastening *dàjīn*, a diagonal edge from the collar to
+  under the right arm, or the centre-front *duìjīn*;
+- **contrasting edge binding** (*xiāngbiān*) along the collar, the front edge,
+  the cuffs and the hem;
+- **length below the hip**, with side slits at the hem;
+- **wide, straight-cut sleeves.**
+
+**Short sleeves** are allowed, and keep all of the above. They come in two
+forms:
+- the **half-sleeve jacket** (*bànbì*): wide elbow-length sleeves with a bound
+  cuff;
+- the **sleeveless vest** (*kǎnjiān*) worn over a long-sleeved jacket, or alone
+  over bare arms for heavy work.
+
+A fitted, collarless, hip-length, narrow-sleeved shirt is the one thing never
+worn.
+
+**Sources and garments**
+
+| Garment | Term | Who |
+|---|---|---|
+| Short work jacket and trousers | *duǎndǎ* | working men and women: carrier, roofer, tiler, farmer, lamp keeper |
+| Side-fastening jacket | *ǎo*, over trousers (*ǎokù*) or a skirt (*ǎoqún*) | women's everyday wear |
+| Pleated panel skirt | *mǎmiànqún* | women on festival days and at the inn; elders |
+| Long gown | *chángshān* | older men, the village chief on civic days, the peddler on the road |
+| Half-sleeve jacket | *bànbì* | anyone in hot work: the bao kitchen, the roofer on the ridge |
+| Sleeveless vest | *kǎnjiān* | over a jacket for elders and the cool evening; alone for heavy work |
+| Work apron | *wéiqún* | Hua Chen, 林静, Liang Zhen after the quest |
+| Waist sash | | every jacket worn open or for work |
+| Cloth shoes | *bùxié*: black uppers, thick white soles | everyone |
+| Conical straw hat | *dǒulì* | the farmer, the carrier, the roofer outdoors |
+
+**Skin and hair.** The village's four East Asian skin tones and black to dark
+brown hair, unchanged. Greying and white hair for the elders.
+
+**Hair kit.**
+- **Men:** a topknot (the existing bun) under a small cloth wrap (*tóujīn*),
+  which was the commoner men's style of the period; the farmer stays bald.
+- **Women:** buns held with a wooden or silver hairpin (*zān*).
+- **Girls:** pigtails or twin buns. **Boys:** a small topknot or a short
+  crop.
+
+**Palette**, tied to the village's architecture: white plaster, red lacquer,
+grey and green tile.
+- 60 percent: **indigo-dyed cotton** (*lánbù*), from light blue-grey to deep
+  indigo, and black.
+- 30 percent: undyed natural off-white hemp, grey, warm brown and a muted tile
+  green.
+- 10 percent: lacquer red and jade green, in edge binding, sashes and
+  festival skirts.
+- **Imperial yellow is never worn by anyone**, as it is never used on any
+  building but the palace.
+
+**Signature item:** the standing collar with knotted buttons and contrasting
+edge binding, on every person in the village.
+
+**Hierarchy.**
+- **Emperor Liang Zhen:** his existing regalia (the red robe with gold trim,
+  the ten-corded crown, full boots). After the quest he gives these up for a
+  cook's indigo *duǎndǎ* with rolled sleeves, a white apron and a plain
+  topknot wrap, and the crown stays on its stand in the palace (see the palace
+  brief).
+- **The Royal Chef:** keeps his existing pale uniform and toque. A foreign,
+  court-kitchen look that sits slightly apart from the village is right for
+  the Demon Lord's agent.
+- **Tian Bo:** a farmer's straw hat and short jacket. As chief, he wears a
+  plain *chángshān* only on civic days in the village hall.
+
+**Exclusions.**
+- **No t-shirts,** and no fitted modern cuts.
+- **No qipao.** It is a twentieth-century city dress.
+- **No Qing queue.** The shaved-forehead braid was imposed by conquest and
+  carries that history.
+- **No imperial yellow, and no dragon or phoenix motifs,** which were reserved
+  for the court.
+- **No Japanese or Korean garments** (kimono, hanbok) and no costume-shop
+  "Hanfu".
+- **No modern sneakers.**
+
+### 4.8 Individual looks (proposed 2026-10-06)
+
+| Resident | Look |
+|---|---|
+| **Liang Zhen** (Emperor) | regalia as built; after the quest, the cook's look above |
+| **The Royal Chef** | as built |
+| **Tian Bo** (farmer, elder, later chief) | bald; *dǒulì*; a muted-green short jacket with brown edge binding, rolled sleeves, trousers tied at the ankle; a *chángshān* in grey on civic days |
+| **林静** (innkeeper) | an indigo *ǎo* with red edge binding over a dark *mǎmiànqún*; a white apron; a bun with a silver pin |
+| **Chen** (peddler) | a travelling *chángshān* in brown, hitched up by a sash; a pack frame; a cloth head wrap |
+| **Mei Lian** (lantern maker, elder) | a black *kǎnjiān* over a grey long-sleeved *ǎo*; a red-paper smudge on her sleeve; grey bun with a wooden pin |
+| **Jin Wei** (her daughter) | a light-indigo *ǎo* with jade binding, trousers; sleeves bound back with a cord for lantern work |
+| **Xiu** (child) | a small red *ǎo* (the household's lantern red); twin buns |
+| **Yun Tao** (tiler) | a natural-hemp *bànbì* half-sleeve jacket, dark trousers, a tile-green sash; topknot wrap |
+| **Bao** (child) | a short indigo jacket and trousers; a small topknot |
+| **Hua Chen** (bao maker) | a white *bànbì* with indigo binding, flour on the apron; a bun tucked under a kerchief |
+| **Ting** (child) | a light-blue *ǎo*; pigtails (as now) |
+| **Lian Fu** (lamp keeper) | a deep-indigo *duǎndǎ* with long sleeves, a lamp hook at his sash |
+| **Bo Xiang** (carrier) | a sleeveless natural *kǎnjiān* over bare arms, black trousers tied at the ankle, a *dǒulì*; a carrying pole |
+| **Rong** (child) | a brown short jacket; a small topknot |
+| **Shu Mei** (waymarker, elder) | a grey long *ǎo* to the knee over trousers, a black *kǎnjiān*; white hair in a low bun |
+| **Pei** (child) | a jade-green *ǎo*; pigtails |
+| **Wen Zhao** (roofer) | a brown *bànbì*, trousers rolled to the calf, a *dǒulì* pushed back on his shoulders |
+
+Households share one colour (the Lantern household its red, the Tile household
+its tile green), and no two neighbours match.
+
 ## 5. Build order after approval
 
 0. Approve and record the population (section 3), then update the world bible.

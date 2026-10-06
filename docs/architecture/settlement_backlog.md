@@ -526,3 +526,19 @@ Future state changes (the courts meeting again after the Air blorbs return,
 the Plant Kingdom after the curse lifts, the Ocean Kingdom's communities
 reconciled) join this table when their designs are approved.
 
+## 14. Chinese village dress
+
+- Review the dress charter and individual looks (`chinese_village.md` 4.7
+  and 4.8): late-imperial commoners' dress, a standing collar with frog
+  buttons and edge binding on everyone, short sleeves only as a half-sleeve
+  jacket or a vest, never a t-shirt.
+- Code once approved: add the garments to the shared figure code
+  (`ProceduralFigure` and `npc.gd` flags, as `FigureDress` was): standing
+  collar, *dàjīn* and *duìjīn* closures with frog buttons, edge-binding colour,
+  below-hip jacket length with side slits, wide sleeves with bound cuffs, the
+  vest, apron, sash, pleated skirt, conical straw hat, head wrap and hairpin
+  (through `HairOrnaments`). Then a Chinese village profile through
+  `VillagerAppearance.apply_profile()` replacing the random `SHIRT_COLORS`
+  draw (which includes a yellow the charter excludes), and the per-resident
+  looks. Liang Zhen's post-quest look joins the revisit states in item 13.
+
