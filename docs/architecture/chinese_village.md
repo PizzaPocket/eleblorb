@@ -342,7 +342,7 @@ closer together near the base, branching and leaf sprays only in the upper
 third, small young shoots at clump edges. A path, two clearings (the
 farmer's and a resting spot) and sparse understory.
 
-### 4.6 Sun Wu Kong's sealing rock (proposed 2026-10-06)
+### 4.6 Sun Wu Kong's sealing rock (approved 2026-10-06)
 
 The rock is older than the palace, older than the village, and older than the
 plateau's breaking. The courts sealed him under it long ago, when the islands

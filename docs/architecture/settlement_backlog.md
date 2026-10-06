@@ -356,7 +356,7 @@ Planning priorities:
   apes and whether the shadows of the ashed are seen are deferred to the
   storyline.
 - Landscape and planting plan: `docs/architecture/plant_kingdom_landscape.md`.
-- Building briefs: `docs/architecture/plant_kingdom_village_buildings.md`.
+- Building briefs approved 2026-10-06: `docs/architecture/plant_kingdom_village_buildings.md`.
 - Approve the residents' new names (Malay and Indonesian single names; Ossian
   Redbrow keeps his) and the Water Curtain Cave brief
   (`docs/architecture/plant_kingdom_water_curtain_cave.md`).
@@ -412,12 +412,50 @@ and a real closet with a door for the open-pavilion inn.
 
 ## 12. Chinese village: palace brief and the sealing rock
 
-- Review `docs/architecture/chinese_village_palace.md`: the palace's plan and
-  both states (imperial palace and civic centre) in one unchanged shell.
-- Review the sealing rock's move from the palace crown to Lantern Row
-  (`chinese_village.md` 4.6).
+- Approved 2026-10-06: `docs/architecture/chinese_village_palace.md`, the
+  palace's plan and both states (imperial palace and civic centre) in one
+  unchanged shell; and the sealing rock's move from the palace crown to
+  Lantern Row (`chinese_village.md` 4.6).
 - Code once approved: move `SUN_WU_KONG_LOCAL_POS`/`SUN_WU_KONG_CASTLE_Y` in
   `scripts/chinese_village.gd` to island A's rim, enlarge the rock in
   `sun_wu_kong.gd` with the gold band and the split halves, and drop the
   castle-crown collision cap that existed only for him.
+
+## 13. Story-state changes on revisit (code required)
+
+Several settlements change after story events, and those changes have to be
+**coded as triggers**: a story action sets a persistent `WorldState` flag, and
+the village reads the flag when it is built. Approved designs describe what
+each state looks like; none of the switching exists yet.
+
+Rules for every change:
+
+- **Trigger:** the action that causes it (a fight won, a quest step, a
+  handover) sets or advances a `WorldState` flag or counter, saved with the
+  game.
+- **When it shows:** the village builds the state matching its flags **when the
+  player arrives** (each visit or reload), never by swapping props in front of
+  the player mid-scene. The one exception is a change the player causes and
+  watches (the rock splitting), which plays once and is then built in its new
+  state on every later visit.
+- **What changes:** props, dressing, doors open or shut, lights, who stands
+  where, residents' schedules and their **dialogue lines and actions** (talk
+  options, shop or rest actions). Walls, roofs, terraces and routes never
+  change between states.
+- **Staged changes** (a relationship growing over visits) use a counter of
+  visits since the trigger, advanced once per arrival.
+- **No text announces a change.** The player notices it.
+
+| Change | Where | Trigger (flag) | What the village builds afterward |
+|---|---|---|---|
+| Palace becomes the civic centre | Chinese village | `chinese_village_rule_delegated` (exists; Tian Bo made chief) | every room's civic dressing from `chinese_village_palace.md` section 4: gate open, throne gone, village hall benches, communal dining, records and reading rooms, village store, public lookout, open garden; Tian Bo's and the villagers' civic schedules and lines; Liang Zhen in the community kitchen and living in the Chef's old room |
+| Liang Zhen and Hua Chen | Chinese village | a new counter of visits since `chinese_village_rule_delegated` | staged: Hua Chen's bao on the kitchen rack, then her apron beside his, then the two of them on the garden bench; their lines advance with each stage |
+| The sealing rock splits | Chinese village, Lantern Row | `sun_wu_kong_freed` (exists) | the split halves with the gold band fallen; children climbing them; the children's and Mei Lian's lines about him change |
+| The Water Curtain Cave is reclaimed | Plant Kingdom, Flower Fruit Mountain | a new flag (e.g. `sun_wu_kong_seat_reclaimed`), set by the deferred quest that brings Sun Wu Kong back | the cave's reclaimed dressing (`plant_kingdom_water_curtain_cave.md` section 4): ledge cleared, stoves lit, bowls of fruit, new mats, the red-and-gold banner; Sun Wu Kong on his seat when he is not travelling with the party |
+| Ossian dismounts | Plant Kingdom village | `manchego_joined` (exists) | Ossian roams as an ordinary resident; his lean-to stays; the stable stands empty or holds Manchego when the party leaves him there |
+| The Wood Kingdom appears | Plant Kingdom | `ice_kingdom_visited` (exists) | already coded; listed so it follows the same rules |
+
+Future state changes (the courts meeting again after the Air blorbs return,
+the Plant Kingdom after the curse lifts, the Ocean Kingdom's communities
+reconciled) join this table when their designs are approved.
 

@@ -1,6 +1,6 @@
 # Plant Kingdom: Primate Village Architecture Briefs
 
-Status: building briefs for review (2026-10-06). Read with
+Status: building briefs approved (2026-10-06). Read with
 `plant_kingdom_village.md` (community and charter), `plant_kingdom_village_layout.md`
 (layout) and `plant_kingdom_landscape.md` (planting). Positions, owners and
 footprints come from the layout.

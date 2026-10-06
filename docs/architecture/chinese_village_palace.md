@@ -1,6 +1,6 @@
 # Chinese Village: The Palace and Its Civic Conversion
 
-Status: building brief for review (2026-10-06). It develops section 4.3 of
+Status: building brief approved (2026-10-06). It develops section 4.3 of
 `chinese_village.md` (palace restructure, approved in outline) into a full
 brief for both states. The story behind the two states is approved in
 `chinese_village.md` sections 3.8 and 3.9.
