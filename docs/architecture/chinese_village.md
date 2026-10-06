@@ -30,14 +30,15 @@ a 225 m sloped entry bridge running due south from the palace to the mainland.
 Residents: Emperor, Royal Chef (hostile agent), farmer Tian Bo, Pandy, vendor
 Chen, innkeeper 林静 (renamed from Lin Quiet-Reed), eight adult villagers (Mei Lian, Wen Zhao, Bo
 Xiang, Hua Chen, Jin Wei, Lian Fu, Yun Tao, Shu Mei), six children (Ting, Xiu,
-Pei, Rong, Bao). Sun Wu Kong is sealed on the castle crown.
+Pei, Rong, Bao). Sun Wu Kong is sealed on the castle crown (moving to Lantern
+Row, section 4.6).
 
 Quest chain (must survive any rebuild): Tian Bo's grievance, Liang Zhen's
 audience, blorbs shrunk to buns on the kitchen counter, Chef fight without
 blorbs, cleaver drop, Liang Zhen restored without an Emperor fight, Tian Bo
 made village chief, Pandy joins, palace becomes a civic centre, and Liang Zhen
 becomes the community chef. Jingu Bang hunt at the play hut, Sun Wu Kong freed
-from the castle crown.
+from the sealing rock.
 
 ## 2. Measured defects
 
@@ -275,7 +276,8 @@ axis.
   island and from D. It becomes the working island: bean terraces, a tool shed,
   the farmer's cottage and Pandy's pen on the south half, the clumping grove on
   the north half with a path through it.
-- **A, Lantern Row:** lantern workshop, two homes, the play hut stays.
+- **A, Lantern Row:** lantern workshop, two homes, the play hut stays, and
+  Sun Wu Kong's sealing rock on the island's north rim (section 4.6).
 - **B, Market Island:** Chen's stall, Hua Chen's bao house and shopfront, two
   homes. Lian Fu's home must be assigned separately, close enough to the entry
   bridge for his lamp round to read clearly.
@@ -323,7 +325,8 @@ paired deck and apron heights that the validator checks.
   Chef encounter with a clear fight floor and captive-blorb counter, then
   Liang Zhen's welcoming community kitchen with communal preparation and meal
   service.
-- Sun Wu Kong's sealing rock stays on the highest roof ridge or terrace.
+- Sun Wu Kong's sealing rock leaves the palace (section 4.6). Full brief for
+  both the imperial and the civic state: `chinese_village_palace.md`.
 
 ### 4.4 Royal garden
 
@@ -338,6 +341,32 @@ by age, radius 0.04 to 0.1 m, slight lean away from clump centre, nodes
 closer together near the base, branching and leaf sprays only in the upper
 third, small young shoots at clump edges. A path, two clearings (the
 farmer's and a resting spot) and sparse understory.
+
+### 4.6 Sun Wu Kong's sealing rock (proposed 2026-10-06)
+
+The rock is older than the palace, older than the village, and older than the
+plateau's breaking. The courts sealed him under it long ago, when the islands
+were still one high plateau. When the first families settled three generations
+ago, the rock was already there, grown over with moss, and they built round it.
+A crown of a palace roof was the wrong place for it.
+
+- **Where:** on the north rim of island A, Lantern Row, facing out over the
+  Abyss, clear of the bridge landings, the lantern workshop's yard and the two
+  homes' doors.
+- **What:** a weathered grey boulder about 5 × 3.5 m and 3 m high, half sunk
+  in the turf, with moss and grass on its top. Sun Wu Kong is pinned beneath its
+  overhang with his head and shoulders free, as in his legend. The courts' seal
+  is a thin gold band bound round the rock, with six small abstract emblems
+  for the six courts and no lettering.
+- **The play hut** stands in the rock's lee. The children built it there
+  because he is the best company on the islands. The Jingu Bang lies among the
+  hut's loose sticks, where it fell when he was sealed, and nobody has noticed
+  it.
+- **The adults** leave the rock alone. Mei Lian, the lantern maker, ties a
+  fresh red cord round it each New Year, a habit from her grandmother that
+  nobody explains.
+- **When he is freed,** the rock splits in two and the gold band falls. The
+  halves stay where they fell, and the children climb on them.
 
 ## 5. Build order after approval
 

@@ -408,3 +408,14 @@ mǎtǒng, composting vault seat, modern flush toilet, vacuum toilet,
 incinerating toilet), a per-inn fixture choice passed to `VillageInn.create`,
 and a real closet with a door for the open-pavilion inn.
 
+## 12. Chinese village: palace brief and the sealing rock
+
+- Review `docs/architecture/chinese_village_palace.md`: the palace's plan and
+  both states (imperial palace and civic centre) in one unchanged shell.
+- Review the sealing rock's move from the palace crown to Lantern Row
+  (`chinese_village.md` 4.6).
+- Code once approved: move `SUN_WU_KONG_LOCAL_POS`/`SUN_WU_KONG_CASTLE_Y` in
+  `scripts/chinese_village.gd` to island A's rim, enlarge the rock in
+  `sun_wu_kong.gd` with the gold band and the split halves, and drop the
+  castle-crown collision cap that existed only for him.
+

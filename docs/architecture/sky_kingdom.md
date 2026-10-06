@@ -145,8 +145,9 @@ follows his legend closely:
    champions to a standstill with the Jingu Bang.
 4. **The sealing.** All six courts met in the Hall of Assembly on Koinon, the
    only time in living memory they acted together, and sealed him beneath a
-   rock on the highest roof below them: the crown of the Emperor's castle in
-   the Chinese village. They bound the seal so that only one of his own
+   rock on a high plateau below them, long before anyone lived there. The
+   plateau later broke into the floating islands of the Chinese village, and
+   the rock now stands on Lantern Row. They bound the seal so that only one of his own
    monkeys could lift it, sure that none would ever come looking for him. That
    is why Xiao Hou Zi can free him. The sealing decree, inscribed in gold, is the
    last decision on the Hall's walls. With their common trouble gone, the courts
