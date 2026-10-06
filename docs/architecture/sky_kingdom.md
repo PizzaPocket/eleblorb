@@ -1,7 +1,8 @@
 # Sky Kingdom: Courts of the Clouds
 
 Status: concept brief, second pass, in review (2026-10-06). The dimensioned
-layout and building programs are in `sky_kingdom_layout.md`. It replaces the
+layout and building programs are in `sky_kingdom_layout.md`; the kit of parts and
+per-building architecture briefs are in `sky_kingdom_buildings.md`. It replaces the
 first-pass prototype's loose cluster of pavilions with a planned celestial
 society, census, material system and architectural charter. No layout
 coordinates are fixed yet; those follow approval of this brief.
