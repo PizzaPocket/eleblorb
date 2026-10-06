@@ -63,8 +63,7 @@ human world's images of a heaven above the clouds:
 - **The Chinese Celestial Court:** the Jade Emperor's palace beyond the Southern
   Heavenly Gate, its many offices and titles, the Queen Mother of the West's
   orchard of peaches that ripen once in an age, the Weaver Girl who wove the
-  coloured clouds, the Heavenly River, and the bridge of birds that once a year
-  spans it.
+  coloured clouds, and the Heavenly River.
 
 These sources supply the feeling of a leisured heaven. They do not supply
 religion, worship, real deities or a copied temple. Nobody in the game prays to
@@ -112,31 +111,23 @@ craft. This is the kingdom's beauty and its trouble:
 - Problems are always another court's problem. When the Air blorbs vanished,
   every court assumed someone else would see to it, and nobody did.
 
-### Why the courts drifted apart (proposed)
+### Lifespans
 
-Wild Air blorbs once gathered in long drifting chains between the clouds,
-the way the birds of the Chinese legend form a bridge across the Heavenly
-River. Tempestars float on their own cloud bodies and never valued the bridges
-much. Ordinary travellers, guests and tripods carrying feasts depended on them.
-When the Demon King vaporised the Air blorbs into the clouds, the bridges went
-with them. Visits stopped and banquets went unshared. The great Hall of
-Assembly on the Hollow Cloud emptied, and pride turned the separation into
-policy.
-
-Restoring the Air blorbs therefore restores the bridges. That gives the
-established central quest a civic result: the courts can meet again. Whether
-they choose to is the second half of the story.
+Tempestars age and have children, but their lives are very long and children
+are rare. Someone who looks young may have watched the courts drift apart; the
+elders remember the Hall of Assembly full.
 
 ## 3. Community
 
-The census is **nineteen Tempestars in six courts**: the four existing courts
-with added members, and two new courts. Each court is a household-like group
+The census is **twenty-one Tempestars in six courts**: nineteen adults and two
+children, in the four existing courts with added members and two new courts. Each court is a household-like group
 around one ruler, and each corresponds to an office of the mythic heavenly
 courts. Duties that were once one shared government are now split among rival
 courts that rarely speak.
 
-Names follow the existing convention: a weather word followed by a compound
-surname.
+Names currently follow the prototype's convention: a weather word followed by a
+compound surname. The naming scheme is under review (see Open); the new names
+below are placeholders until it is settled.
 
 ### Highcloud: the court of state (capital, tallest)
 
@@ -203,6 +194,8 @@ Hesperides.
   ambrosia, nectar wines, peach dishes, sky-fruit, and the order of courses.
 - **Rime Sweetbough**, orchard keeper. Tends the cloud-rooted peach and fruit
   trees, and is the one who knows which peach is truly first.
+- **Iris's child** (name pending), the younger of the kingdom's two children.
+  Raised at banquets, and openly bored by them.
 
 ### The Ring Cloud (new): the court of games
 
@@ -215,6 +208,8 @@ Olympian contests and the hippodrome.
 - **Flurry Brightring**, keeper of the course and the prizes: gold rings,
   wreaths of woven cloud, laurels from the Orchard Cloud when the two courts
   are speaking.
+- **Corona's child** (name pending), the elder child. Races Scud and loses,
+  and would race anyone from any court if the rulers allowed it.
 
 ### Responsibility map
 
@@ -312,7 +307,29 @@ collision policy:
   a simplified collider that matches the visible top.
 - Everything, NPCs and tripods included, remains gated on the Bird Helm.
 
-## 5. Architectural charter (draft)
+## 5. Flora: cloud-rooted plants
+
+The kingdom grows no soil plants. Its trees and flowers root directly in bank
+cloud and grow from the essence of cloud itself. Trunks, branches and leaves
+use the same cloud material as the islands and the world's ordinary clouds:
+soft, white and lit like cloud, taking the sky's dawn and dusk tints with it.
+Only fruit and some blossoms carry their own colour.
+
+| Species | Form | Colour beyond cloud | Where |
+|---|---|---|---|
+| Cloud peach | broad, low-spreading orchard tree | golden peaches | Orchard Cloud; one old tree at Highcloud |
+| Cloud willow | weeping crown whose long strands thin out and fade before they touch anything | none | beside nectar terraces and the odeon |
+| Tier pine | flat, stacked layers like stratus decks | none | Hollow Cloud, framing the empty hall; Highcloud's axis |
+| Puff shrub | low, round cumulus bushes, clipped into hedges | none | court thresholds and garden edges |
+| Cloud wisteria | trailing blossom over colonnades and floating roofs | faint dawn pink and lavender blossom | Drift Cloud, Orchard Cloud |
+| Undercloud vine | hangs from an island's underside toward the light reflected from below | pale gold berries | beneath the Orchard and Anvil Clouds |
+| Sky lily | flat leaves and cup flowers floating on shallow pools of set cloud | pale gold or white flowers | the Hollow Cloud's empty hall, Highcloud's forecourt |
+
+Collision follows the project policy: trunks and substantial branches block and
+can be climbed or stood on where they visibly could bear weight; foliage, willow
+strands, blossom and vines are decorative.
+
+## 6. Architectural charter (draft)
 
 - **Primary, about 70 percent: Greco-Roman celestial classical.** Peristyle
   courts, round tholos pavilions, colonnades and exedrae, porches with
@@ -348,7 +365,38 @@ collision policy:
 | Orchard Cloud | banquet hall with floating couches; peach trees above and below the cloud | lavish, warm, overflowing |
 | Ring Cloud | racing ring around the cloud's rim, judges' tholos, prize pavilion | open, athletic, bright |
 
-## 6. Settlement structure (pre-layout)
+## 7. Exchange with the hero
+
+Nobody in the kingdom is a merchant. Tempestars have everything they need and
+no wish to work, and Tokoins mean nothing to them. Trade happens in the ways a
+bored, proud, leisured people actually part with things:
+
+- **Curiosities from below.** Novelty is the one thing the courts lack. Each
+  court will exchange its own goods for things from the ground world that suit
+  its taste, presented through the shared transaction interface as a swap
+  rather than a sale:
+  - the Orchard Cloud wants foods it has never tasted (rye bread, cheese,
+    dried berries, smoked fish, lake clams) and gives nectar, ambrosia and,
+    rarely, a golden peach;
+  - the Hollow Cloud wants old, unexplained objects (the kind Aldren Vey deals
+    in) and gives gold-leaf verse and star charts;
+  - the Anvil Cloud wants metals and minerals it has never worked, such as
+    Fire Kingdom ores, and gives small gold pieces;
+  - the Drift Cloud wants news and stories of the world below, delivered in
+    conversation, and gives woven-cloud goods.
+- **Prizes.** The Ring Cloud's races and the Drift Cloud's contests award gold
+  rings, wreaths of woven cloud and the occasional rarer object to whoever
+  wins, the hero included.
+- **The open table.** What the Orchard Cloud's banquets leave over is set out
+  on gold tripods for anyone to take. It is the kingdom's only free food, and
+  a quiet boast.
+- **Gifts of favour.** A ruler pleased or flattered gives a gift, and a
+  courtier sent with one is the closest thing the kingdom has to a delivery.
+
+What these items do for the hero (healing, restoring melted blorbs, equipment)
+is still open.
+
+## 8. Settlement structure (pre-layout)
 
 - **Arrival:** the town staircase tops out at the Air Gem landing, which becomes
   the forecourt of the **Dawn Gate**, the kingdom's arrival gate after the
@@ -358,8 +406,10 @@ collision policy:
   distances so each looks toward or away from the others in a way that says
   something about their relationship. The Hollow Cloud stands at the
   geometric centre of the group, which is why its empty hall matters.
-- **Between the clouds:** today, gaps that only Tempestars cross easily. After
-  the Air blorbs return, their chains form the bridges.
+- **Between the clouds:** open sky. Tempestars float across it on their own
+  cloud bodies, and the hero flies, having already used the Air Gem to reach
+  this height. There are no bridges; the gaps can be generous, and each court's
+  separateness should read from a distance.
 - **Inside each court:** a threshold gateway, a forecourt, the signature
   building, residences as small tholoi or moored rooms, an east-facing nectar
   terrace, and the court's characteristic outdoor room (forge yard, odeon,
@@ -369,8 +419,11 @@ collision policy:
 
 ## Fixed, proposed and open
 
-**Fixed (from the world bible and prototype):** Bird Helm gate and the town
-staircase entrance; islands as ordinary clouds at the ordinary altitude;
+**Fixed (from the world bible, the prototype and direction):** Bird Helm gate
+and the town staircase entrance; the hero flies here, having used the Air Gem;
+Tempestars float between clouds, so there are no bridges; Tempestars age and
+have children over very long lives; nobody is a merchant; plants are rooted in
+cloud and rendered in cloud material; islands as ordinary clouds at the ordinary altitude;
 Tempestar bodies with a humanoid upper half and a cloud vortex below; the six
 existing names and their courts; many small rulers and no single monarch;
 quartz, gold and pastel; the missing Air blorbs as the central quest.
@@ -381,10 +434,12 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
   cloud lower bodies;
 - the cuisine: dawn nectar on gold, ambrosia baked in sunlight, golden
   peaches, self-moving golden tripods;
-- the census of nineteen in six courts, including the two new courts and
-  thirteen new names;
-- the Air blorbs as the old bridges between clouds, and the empty Hall of
-  Assembly on the Hollow Cloud;
+- the census of twenty-one in six courts, including the two new courts,
+  thirteen new adults and two children;
+- the empty Hall of Assembly on the Hollow Cloud;
+- the cloud-rooted flora;
+- exchange through curiosities, prizes, the open table and gifts, with no
+  merchants and no Tokoins;
 - the cloud, gold and quartz material system and its gameplay rules;
 - the architectural charter, the Dawn Gate and the per-court signature
   buildings;
@@ -392,15 +447,9 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
 
 **Open:**
 
-- How the hero crosses between clouds before the Air blorbs return: drifting
-  stepping clouds Breeze shepherds, wingsuit and hover routes, or one court
-  reachable at first with the rest opening later.
-- Whether Tempestars age and have children. This brief leaves no children in
-  the census and treats Breeze, Virga and Scud as the young.
-- Whether any court trades or sells to the hero, and what: nectar, ambrosia or
-  golden peaches as food items; gold work from the Anvil Cloud.
-- Whether the hero can eat Tempestar food, and what it does.
+- The naming scheme. The prototype's six names are weather words with compound
+  surnames; this brief's new names follow that pattern as placeholders.
+- What Tempestar food and gifts do for the hero.
 - How Sun Wu Kong, who once kept the Celestial Court's stables in legend and
   rides his own cloud, relates to the Tempestars, if at all.
-- The second half of the quest: whether the courts choose to meet again once
-  the bridges return.
+- Whether the courts choose to meet again once the Air blorbs return.
