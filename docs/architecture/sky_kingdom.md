@@ -156,8 +156,15 @@ and vanished only recently. The courts believe Sun Wu Kong is still sealed. When
 they assume he has taken the Air blorbs in revenge for his old post. The real
 cause is the Demon King. Restoring the Air blorbs clears Sun Wu Kong's name and
 puts the old question back on the table: what the courts owe the one person
-who ever looked after the blorbs, and whether they can meet in the Hall again
-for anything better than a sealing.
+who ever looked after the blorbs.
+
+**Resolution.** The return of the Air blorbs restores harmony. Seeing the flocks
+drift between the clouds again makes the courts realise how distant and
+frivolous they had become: rulers who let a whole people's creatures vanish
+while they argued over precedence and peaches. The courts meet in the Hall of
+Assembly again, for the first time since the sealing, and this time for
+something better. Koinon's empty seats fill, and the courts visit one another
+again. How the quest stages that change is not yet designed.
 
 Who remembers what:
 
@@ -565,4 +572,3 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
 - How much of the Sun Wu Kong history is quest content: whether the hero must
   clear his name, whether he takes back the keeper's post once the Air blorbs
   return, and how the courts react to him in the party.
-- Whether the courts choose to meet again once the Air blorbs return.

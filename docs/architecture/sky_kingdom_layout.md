@@ -262,5 +262,8 @@ positions; every building, footprint and program above; the movement and
 validator rules.
 
 **Open:** what Tempestar food and gifts do for the hero; how much of Sun Wu
-Kong's history becomes quest content; whether the courts meet again once the
-Air blorbs return. None of these changes the layout.
+Kong's history becomes quest content. Neither changes the layout.
+
+**Story state to support:** after the Air blorbs return, the courts reconcile and
+reconvene. The plan data should allow a second schedule set in which the Hall of
+Assembly's six seats are occupied and residents visit other courts.
