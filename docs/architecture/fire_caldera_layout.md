@@ -1,6 +1,6 @@
 # Fire Caldera City: Civic Layout Plan
 
-Status: dimensioned schematic for review. This plan turns the approved city
+Status: approved (2026-10-06). This plan turns the approved city
 systems into one coherent surface and submerged layout. It fixes relationships,
 route hierarchy, approximate footprints, and implementation constraints. Exact
 building architecture follows only after this civic plan is approved.

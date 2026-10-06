@@ -84,10 +84,10 @@ Read
 ## Next planning task
 
 The coherent, dimensioned civic layout is now drafted in
-`docs/architecture/fire_caldera_layout.md`. Review its adjacency matrix, scaled
-surface plan, dry and molten route networks, utilities, emergency paths,
-footprints, access phases, and submerged depth bands before architecture or
-implementation begins. It fixes:
+`docs/architecture/fire_caldera_layout.md`, approved 2026-10-06: its adjacency
+matrix, scaled surface plan, dry and molten route networks, utilities,
+emergency paths, footprints, access phases and submerged depth bands. Building
+architecture briefs come next. It fixes:
 
 1. the arrival axis from the kingdom gate and the paired entrance pylons;
 2. the irregular 28-to-32-metre-radius reservoir and its authored banks;
