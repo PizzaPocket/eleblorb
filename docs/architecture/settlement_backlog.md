@@ -310,12 +310,16 @@ Planning priorities:
   as dry volumes, reusing the `pressurized_volumes` approach; add a legged sea-folk rig.
 - Have every Hawaiian line and gloss reviewed by a fluent speaker.
 
-## 9. Characters: gendered body pass (cross-settlement)
+## 9. Characters: women's abdomen rule and pirate genders (cross-settlement)
 
-Status: not started. Women's and men's bodies currently differ only in height,
-chest and hip width scales, hair, beards and dress (see the `character-design`
-skill). Design gendered shaping of shoulders, waist, chest and face once in
-`ProceduralFigure`, stylised and never sexualised, so every humanoid people
-inherits it. Ohio's colourful, varied clothing and hair palettes stay as they
-are. Fix the pirate crew's missing `is_female` in the same pass.
+Status: not started. Gendered body shapes exist through separate height,
+chest and hip ranges. Two fixes remain (see the `character-design` skill):
 
+- **Women's abdomens never protrude past the thorax.** `ProceduralFigure`
+  lets every abdomen's front protrude up to 1.12 times the chest's front depth;
+  limit that to men and keep women's flush with the chest. Split the shared
+  abdomen pools in Ohio, the Snow Village and the Fire Kingdom so women draw
+  from a narrower one. This is what gives at least one Ohio woman a belly
+  larger than her chest.
+- **Pirate crew genders:** set `is_female` for every crew member and gate beards
+  on it.

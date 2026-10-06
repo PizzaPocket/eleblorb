@@ -122,7 +122,7 @@ body and draws from male pools.
 | `body_scale` (height) | 0.84 to 0.99 | 0.97 to 1.16 | overlapping at the middle |
 | `chest_build_scale` | 0.86 to 1.0 | 1.01 to 1.18 | only men get broad chests; arms follow the chest |
 | `hip_build_scale` | 0.98 to 1.16 | 0.92 to 1.07 | women tend wider in the hips; legs always follow the hips |
-| `abdomen_width_scale` | 0.94 to 1.32 | same | shared, wide, one-directional: 1.0 is the narrow end |
+| `abdomen_width_scale` | should be narrower (see below) | 0.94 to 1.32 | currently one shared pool; 1.0 is the narrow end; front overhang past the chest is for men only |
 
 Per-gender pools need their own counters; a shared counter indexing a gendered
 pool was a real bug. Non-human peoples set fixed gendered proportions in their
@@ -148,14 +148,15 @@ Beards (`stubble`, `full`) are for men only.
 - Sleeve length is not gendered: the sleeveless, short and long split applies
   to everyone, set by climate and work.
 
-**Not yet done: a gendered body pass.** Today women's and men's bodies differ
-only in the width and height scales above, plus hair, beards and dress. The rig
-has no gendered shaping of shoulders, waist, chest or face. A dedicated pass
-should design that shaping once, in `ProceduralFigure`, stylised and in keeping
-with the SuperEgg language, never sexualised, so every humanoid people (Ohio,
-the villages, sea folk upper bodies, Tempestars) inherits it. Use the
-`figure-rig` skill for the geometry. Until then, do not add per-population
-fixes for body shape.
+**Women's abdomens never protrude past the thorax.** A woman's abdomen is no
+wider, no deeper at the back and no further forward at the front than her
+chest. `ProceduralFigure.build()` caps width and back depth at the chest for
+everyone, but lets the front protrude up to `ABDOMEN_FRONT_OVERHANG_MAX`
+(1.12 times the chest's front depth) as a slight belly. That allowance is for
+men only. Today it applies to women too, and the abdomen pools in Ohio, the
+Snow Village and the Fire Kingdom are not split by gender, so a woman can draw
+a large value and show a belly past her chest. Fix: give women an overhang of
+1.0 (flush with the chest), and give them their own narrower abdomen pool.
 
 **Writing gender into a census.** Name each resident's gender in the
 settlement brief when the census is written, and keep it consistent with the
