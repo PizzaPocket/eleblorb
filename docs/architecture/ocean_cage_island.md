@@ -26,6 +26,19 @@ Pending. They are small creatures who run the tournament. Their species,
 culture, census and names wait on the user's direction. (A hermit-crab
 proposal was rejected.)
 
+## 3a. The chant
+
+The inhabitants chant at every fight, from the stands and as the hero enters
+the cage. The text is fixed by the user and is used exactly as written:
+
+> Fight. Fight.
+> You must fight.
+> If you win, we kill you.
+> If you lose, you die.
+
+It is a crowd chant, not an explanation of the rules: winning does not
+actually lead to the crowd killing the hero. Its menace is the joke.
+
 ## 4. The tournament
 
 A short tournament of a few opponents. The hero fights contenders sent by the
