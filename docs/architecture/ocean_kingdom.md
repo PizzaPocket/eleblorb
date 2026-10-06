@@ -40,8 +40,8 @@ kingdom's story, as it is in the Sky Kingdom.
 
 ## Shared decisions for the kingdom
 
-- **Rest point:** proposed at Kai Mālie's guest house, so the sea folk city
-  does not need one unless a second is wanted below.
+- **Rest points:** two. Sam Okafor's guest house at Kai Mālie on the surface,
+  and Pelaju's guest hall, an air hall in the sea folk city, below.
 - **Air:** the sea folk's air halls and the glass tunnels between them give the
   hero a place to breathe and walk underwater without a helmet.
 - **Boats:** once boat riding exists, the island's canoes and the ships are

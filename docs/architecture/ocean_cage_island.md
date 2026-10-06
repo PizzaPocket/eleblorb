@@ -47,16 +47,31 @@ culture's centre.
 Whoever holds the champion's title has the last word, which is why the title
 matters so much. Clackjaw runs everything else.
 
-## 4. The tournament (proposed)
+## 4. The tournament
 
-- **Ladder:** the hero enters at the bottom and fights up through ranked
-  opponents to the champion.
-- **Grudge matches (proposed link to the kingdom's story):** the Shellbacks
-  thrive on the Demon King's discord. They invite each feuding community to
-  send a champion to settle scores in the cage: a sea folk champion, a fighter
-  from each ship, and one from Kai Mālie. Beating them is part of how the hero
-  breaks the cycle of grievance, though the reconciliation itself happens
-  elsewhere.
+The hero fights contenders from every community in the kingdom. The Shellbacks
+thrive on the Demon King's discord: each feuding community has sent a champion
+to settle its scores in the cage, and the Shellbacks rank them all on one
+ladder. Beating them is part of how the hero breaks the cycle of grievance,
+though the reconciliation itself happens elsewhere.
+
+### The ladder (proposed order, bottom to top)
+
+| Rung | Contender | From |
+|---|---|---|
+| 1 | **Bottlecap** | the Shellbacks |
+| 2 | **Cowrie** | the Shellbacks |
+| 3 | **Makoa Kealoha**, the net fisher | Kai Mālie |
+| 4 | **Driftnail** | the Shellbacks |
+| 5 | **Tudaro**, the edge warden | the sea folk |
+| 6 | **Yaw Mensah**, boatswain | the *Fortune's Rag* |
+| 7 | **Old Kelp**, the *Harbinger*'s aged sailing master, the oldest pirate at sea and still the hardest to put down | the *Harbinger* |
+| 8 | **Snapper** | the Shellbacks |
+| 9 | **Old Ironshell**, reigning champion | the Shellbacks |
+
+The sea folk contender fights in the water-filled half of the cage floor or in
+a flooded variant of the cage; how a tailed fighter fights on sand is part of
+the fight design.
 - **Prizes:** shiny salvage, gear and the champion's title. Exact rewards are
   open.
 - **Fights** use the game's existing combat. Whether the hero fights alone,
@@ -88,10 +103,12 @@ matters so much. Clackjaw runs everything else.
 ## Fixed, proposed and open
 
 **Fixed (from direction):** a smaller island with a battle cage; small creature
-inhabitants who make the hero fight a cage match tournament.
+inhabitants who make the hero fight a cage match tournament; contenders from
+every community, including an old pirate.
 
 **Proposed:** the island at `(112, 88)`; the Shellbacks and their found-object
-shells; the census of eleven; the ladder and grudge matches; the salvage
+shells; the census of eleven; the ladder's order and its contenders, with Old
+Kelp as the old pirate; the salvage
 architecture.
 
 **Open:** the species, if hermit-crab people are not right; how fights work and

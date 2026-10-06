@@ -156,8 +156,16 @@ The existing two-ring plan becomes Plato's concentric city:
    glass.
 
 Air halls: the Exchange (trade and the hero's meeting place), the guest hall
-(the kingdom's rest point, if the island does not provide one), and the
-Glassworks. Homes stay wet.
+and the Glassworks. Homes stay wet.
+
+### The guest hall: the city's rest point
+
+The guest hall is an air hall kept by **Pelaju**, who deals with every visitor
+from the surface. It is a rest point, one of two in the kingdom (the other is
+Kai Mālie's guest house). Resting restores the party and melted blorbs,
+advances to morning and plays the standard waking sequence in a dry bed inside
+the hall; the party gathers on the hall's floor, never in the moon pool. How
+the sea folk are paid is open.
 
 ### Glass tunnels
 
@@ -208,8 +216,8 @@ resident; the Demon King's discord with the other communities;
 the seven households, the residents' roles and two children; the concentric
 plan with the Ring Current; the Glassworks at a warm vent.
 
-**Open:** why the hero battles the Tidekeeper; whether the city hosts the
-kingdom's rest point or the island does; the sea folk's own rituals.
+**Open:** why the hero battles the Tidekeeper; how the guest hall is paid for;
+the sea folk's own rituals.
 
 ## Implementation notes
 

@@ -158,7 +158,9 @@ communities at first.
 **Proposed:** the name Kai Mālie; the voyaging history; the census of fifteen
 in seven households; the ahupuaʻa plan from spring to reef; the plantation and
 regional modern charter with traditional *hale* for communal buildings; the
-guest house as the kingdom's rest point; the generalised lexicon.
+guest house as one of the kingdom's two rest points (Sam charges the ordinary
+Crossroads rate of 10 Tokoins through the shared transaction interface); the
+generalised lexicon.
 
 **Open:** the store's stock; the island's spring and terrain changes the *loʻi* need; whether the
 village has a part in the Tidekeeper or Kraken stories.
