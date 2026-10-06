@@ -70,12 +70,18 @@ The ships are two populations with two pasts, and they despise each other.
 lookout; **Tobias Wake**, carpenter; **Pip Salt**, ship's boy; **Rook Gale**,
 gunner; **Ada Shoal**, surgeon.
 
-### Between the ships
+### Between the ships, and everyone else
 
-They share the ocean and avoid each other's water. Brine's crew think
-Marigold's are rabble; Marigold's crew think Brine's are servants without a
-master. Both avoid the Kraken. Both anchor off the island to trade for water
-and food and are kept to the beach. The sea folk avoid both.
+When the hero arrives, the Demon King's discord has set every community in
+the kingdom against the others (how is still open). Restoring harmony is the
+kingdom's story.
+
+- The two ships are at open war: Brine's crew think Marigold's are rabble;
+  Marigold's crew think Brine's are servants without a master.
+- Both are barred from Kai Mālie's beach, where they once traded for water and
+  food.
+- The sea folk hate both and believe the ships are fouling the reef.
+- Both avoid the Kraken.
 
 ## 3. Ships as architecture
 

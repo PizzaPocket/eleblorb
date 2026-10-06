@@ -15,12 +15,12 @@ entry.
 - sixteen enterable homes in two rings, at 49 m and 82 m from the centre;
 - eight spokes of luminous stepping stones, kelp gardens and living pearl lamps
   in aqua, blue and violet;
-- twenty named merfolk with one line each, among them **Tidekeeper Nerion**.
+- twenty named merfolk with one line each, among them **Tidekeeper Asaru**.
 
 ### Non-regression requirements
 
 - The castle remains the brightest landmark, with its open, traversable
-  audience hall and Nerion's nautilus crown.
+  audience hall and Asaru's nautilus crown.
 - The existing twenty residents, names, looks and voices; every resident named.
 - The luminous paths, pearl lamps and kelp gardens.
 - The Nautilus Shell and Watering Can merchants.
@@ -66,17 +66,54 @@ folk build **air halls**, glass domes filled with compressed air.
 
 The census keeps the existing twenty residents and adds two children, for
 **twenty-two** in seven households. Roles come from what each resident already
-says.
+says. Every resident is renamed (section 3a).
 
 | Household | Residents | Work |
 |---|---|---|
-| **Tidehall** (the palace) | **Tidekeeper Nerion**; **Azura Ripplefin**; **Tavio Reedtail** | Nerion listens and judges; Azura watches the Kraken; Tavio keeps the city's edge and reads Fish Goblin trails |
-| **The Glassworks** | **Nilo Tideglass**; **Brin Nautilus** | Nilo blows the glass; Brin engineers the air halls, chamber by chamber |
-| **The Lamp House** | **Luma Pearlsong**; **Corren Bluewake**; their daughter **Coralie Bluewake** (child) | Luma grows and sings to the living pearl lamps; Corren reads storms in them |
-| **The Garden House** | **Nerissa Bloomfin**; **Ronan Amberkelp**; **Caspian Kelpweaver**; Caspian's son **Tamsin Kelpweaver** (child) | Nerissa's sea flowers; Ronan sells Watering Cans and tends the link to the Seed of Life; Caspian braids the kelp that grows around the homes |
-| **The Exchange** | **Marella Shellwise**; **Pelagos Drift**; **Ondine Silvergill** | Marella keeps the trading hall and sells Nautilus Shells; Pelagos listens to the surface and deals with the island and the ships; Ondine makes scale clothing |
-| **The Reef House** | **Thalina Foamcrest**; **Maris Coralglow**; **Calypso Sunkenstar** | Thalina studies the reef's smallest life; Maris records the night reef; Calypso keeps the light pipes that bring daylight down |
-| **The Current House** | **Orin Redfin**; **Delmar Deepcurrent**; **Selkie Seabloom**; **Muirin Softcurrent** | Orin carries messages on the ring current; Delmar charts the deep edge; Selkie makes shell ornaments; Muirin teaches the young |
+| **Tidehall** (the palace) | **Tidekeeper Asaru**; **Ikara**; **Tudaro** | Asaru listens and judges; Ikara watches the Kraken; Tudaro keeps the city's edge and reads Fish Goblin trails |
+| **The Glassworks** | **Kunei**; **Damaku** | Kunei blows the glass; Damaku engineers the air halls, chamber by chamber |
+| **The Lamp House** | **Lunira**; **Korasi**; their daughter **Mira** (child) | Lunira grows and sings to the living pearl lamps; Korasi reads storms in them |
+| **The Garden House** | **Nesaja**; **Rodasu**; **Kasuno**; Kasuno's son **Tami** (child) | Nesaja's sea flowers; Rodasu sells Watering Cans and tends the link to the Seed of Life; Kasuno braids the kelp that grows around the homes |
+| **The Exchange** | **Maresa**; **Pelaju**; **Sujira** | Maresa keeps the trading hall and sells Nautilus Shells; Pelaju listens to the surface and deals with the island and the ships; Sujira makes scale clothing |
+| **The Reef House** | **Talisa**; **Arimu**; **Kaluja** | Talisa studies the reef's smallest life; Arimu records the night reef; Kaluja keeps the light pipes that bring daylight down |
+| **The Current House** | **Oruko**; **Dakuro**; **Sekira**; **Munaja** | Oruko carries messages on the ring current; Dakuro charts the deep edge; Sekira makes shell ornaments; Munaja teaches the young |
+
+### 3a. Names
+
+The prototype's names (Marella Shellwise, Corren Bluewake and so on) are
+replaced. Sea folk now go by a single given name and are known by their
+household ("Maresa of the Exchange"). The names use open syllables and the
+sounds of Linear A, the undeciphered script of Minoan Crete, so they have no
+translated meanings: a sound palette of *a*, *i* and *u*, with *k*, *d*, *t*,
+*r*, *s*, *n*, *m* and *j*.
+
+| New name | Role | Prototype name |
+|---|---|---|
+| Tidekeeper Asaru | ruler and judge | Tidekeeper Nerion |
+| Ikara | Kraken watcher | Azura Ripplefin |
+| Tudaro | edge warden | Tavio Reedtail |
+| Kunei | glassblower | Nilo Tideglass |
+| Damaku | air hall engineer | Brin Nautilus |
+| Lunira | pearl lamp keeper | Luma Pearlsong |
+| Korasi | storm reader | Corren Bluewake |
+| Mira | child | — |
+| Nesaja | sea flower gardener | Nerissa Bloomfin |
+| Rodasu | Watering Can seller | Ronan Amberkelp |
+| Kasuno | kelp braider | Caspian Kelpweaver |
+| Tami | child | — |
+| Maresa | keeper of the Exchange, Nautilus Shell seller | Marella Shellwise |
+| Pelaju | surface liaison | Pelagos Drift |
+| Sujira | scale clothier | Ondine Silvergill |
+| Talisa | reef scientist | Thalina Foamcrest |
+| Arimu | night reef recorder | Maris Coralglow |
+| Kaluja | light pipe keeper | Calypso Sunkenstar |
+| Oruko | courier on the Ring Current | Orin Redfin |
+| Dakuro | deep edge cartographer | Delmar Deepcurrent |
+| Sekira | shell jeweller | Selkie Seabloom |
+| Munaja | teacher | Muirin Softcurrent |
+
+`ocean_kingdom_city.gd` still uses the prototype names until the rebuild, and
+several existing lines refer to them.
 
 ### Governance
 
@@ -84,14 +121,19 @@ The Tidekeeper rules, but as a listener and judge. Each household speaks for
 itself in the audience hall. The battle with the Tidekeeper, and why the hero
 fights a peaceful ruler, are still open.
 
-### Relations
+### Relations: discord now, harmony later
 
-- **The island village:** an old and friendly exchange at the shoreline.
-  Pelagos and the island's elders know one another; Thalina works with a
-  marine biologist who lives on the island.
+When the hero arrives, every community in the kingdom is at odds with the
+others. The Demon King has sown the discord; how is still open. Restoring
+harmony between them is the kingdom's story, as it is in the Sky Kingdom.
+
+- **The island village:** the shoreline exchange, generations old, has broken
+  off. Each side blames the other for damage to its waters. Pelaju and the
+  island's elders, who were friends, no longer speak; Talisa's work with the
+  island's marine biologist has stopped.
 - **The pirates:** heard overhead "like distant wooden thunder." The sea folk
-  keep out of their way and mistrust both crews.
-- **The Kraken and Fish Goblins:** a danger Azura and Tavio watch. The goblins
+  hate both crews and believe the ships are fouling the reef.
+- **The Kraken and Fish Goblins:** a danger Ikara and Tudaro watch. The goblins
   serve the Kraken, not the city.
 
 ## 4. Settlement structure (pre-layout)
@@ -103,7 +145,7 @@ The existing two-ring plan becomes Plato's concentric city:
    hall, the Lamp House and the school court.
 3. **The Ring Current:** a channel of fast-moving water circling the civic
    ring, a real swimming lane that carries a swimmer around the city. This is
-   the "copper current" Orin raced.
+   the "copper current" Oruko raced.
 4. **The home ring:** the households on a second terrace, with braided kelp
    around their walls.
 5. **The garden ring:** kelp gardens, sea-flower beds and the reef workshops.
@@ -116,6 +158,27 @@ The existing two-ring plan becomes Plato's concentric city:
 Air halls: the Exchange (trade and the hero's meeting place), the guest hall
 (the kingdom's rest point, if the island does not provide one), and the
 Glassworks. Homes stay wet.
+
+### Glass tunnels
+
+Compressed-air **glass tunnels** join the air halls into one dry network, so
+sea folk on legs and an unhelmeted hero can walk between them without
+entering the water.
+
+- **Form:** a superellipse tube of curved glass on orichalcum ribs, its floor
+  flat and its walls clear, running a little above the seabed on slender
+  supports. Fish, kelp and the city's lights pass on the other side of the
+  glass.
+- **Routes:** the Exchange to the guest hall around the civic ring; one tunnel
+  out along a radial avenue to the Glassworks at the vent; short branches to
+  any later air hall. Tunnels cross over the Ring Current and the avenues so
+  swimmers pass beneath them.
+- **Entry:** every junction has a moon pool, so a swimmer can come up into
+  the network anywhere it branches.
+- **Dimensions:** walking floor at least 3 m wide, headroom at least 3.2 m,
+  gentle ramps only.
+- **Air:** the whole network is one pressurised volume, as the spaceship's
+  cabin and docking neck are.
 
 ## 5. Architectural charter (draft)
 
@@ -140,6 +203,8 @@ already built; merfolk bodies; the merchants; the Tidekeeper and Nautilus Crown.
 
 **Proposed:** the Atlantis and Minoan influences with modern technology;
 orichalcum; air halls entered by moon pool, where the sea folk walk on legs;
+glass tunnels joining the air halls; Linear A-sounding names for every
+resident; the Demon King's discord with the other communities;
 the seven households, the residents' roles and two children; the concentric
 plan with the Ring Current; the Glassworks at a warm vent.
 

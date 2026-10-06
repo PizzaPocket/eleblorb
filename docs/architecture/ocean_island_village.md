@@ -13,8 +13,8 @@ tradition with a modern blend. The proposed name is **Kai Mālie**, "calm sea."
 Most residents are Native Hawaiian. Others have the international backgrounds
 of modern Hawaiʻi (Japanese, Filipino and Portuguese family lines from the
 plantation era) or arrived more recently through the lake gate from the
-Crossroads. Hawaiian residents speak Hawaiian, using the same learning
-dialogue system as the Chinese village.
+Crossroads. Every resident speaks Hawaiian, the language of the community,
+using the same learning dialogue system as the Chinese village.
 
 ### History (proposed)
 
@@ -61,17 +61,20 @@ The census proposes **fifteen residents in seven households**.
 | **Akana** | **Puanani Akana** | *kumu hula* and the village schoolteacher; keeper of chant and history |
 | **Nakamura** | **Hiro Nakamura**; **Grace Nakamura** | the village store and shave ice counter; Hiro's family line goes back to plantation-era Japanese arrivals, Grace's to Filipino ones |
 | **Medeiros** | **Manny Medeiros**; **Kahala Medeiros**, his wife | Manny, of Portuguese family line, makes ukulele and plays; Kahala practises *lāʻau lapaʻau*, Hawaiian plant medicine |
-| **Newcomers** | **Sam Okafor**; **Elena Varga** | Sam came through the lake gate from Ohio and keeps the guest house; Elena is a marine biologist who studies the reef with the sea folk's Thalina Foamcrest |
+| **Newcomers** | **Sam Okafor**; **Elena Varga** | Sam came through the lake gate from Ohio and keeps the guest house; Elena is a marine biologist who studies the reef with the sea folk's Talisa |
 
 ### Governance and relations
 
 - **Kūpuna:** Kawika, Malia and Puanani meet as the council of elders in the
   *hālau* when the village must decide something together.
-- **The sea folk:** exchange at the shoreline is old and friendly. Kawika knows
-  Pelagos Drift; Elena works with Thalina.
-- **The pirates:** both crews anchor offshore to trade for water and food. They
-  are kept to the beach and the store, and never go near the *loʻi* or the
-  fishpond.
+- **Discord now, harmony later.** When the hero arrives, the Demon King's
+  discord has set every community in the kingdom against the others (how is
+  still open). Restoring harmony is the kingdom's story.
+- **The sea folk:** the shoreline exchange is generations old but has broken
+  off; each side blames the other for damage to its waters. Kawika and Pelaju,
+  old friends, no longer speak, and Elena's work with Talisa has stopped.
+- **The pirates:** both crews used to anchor offshore to trade for water and
+  food on the beach. Now they are barred from it.
 - **The Crossroads:** goods come through the lake gate, which links the island
   to the fishing village's portal landing.
 
@@ -126,8 +129,8 @@ terraces stepping up behind.
 
 ## 6. Language
 
-Hawaiian residents speak Hawaiian, presented exactly as the Chinese village's
-lines are: the line is shown in Hawaiian, and each word can be selected to see
+Every resident speaks Hawaiian, the language of the community, presented
+exactly as the Chinese village's lines are: the line is shown in Hawaiian, and each word can be selected to see
 its meaning.
 
 - **Spelling:** standard modern orthography, with the *ʻokina* written as
@@ -139,9 +142,8 @@ its meaning.
   per language, so `DialogUI` can present Hawaiian the same way. A Hawaiian
   entry carries its meaning and, optionally, a pronunciation or stress guide in
   place of pinyin.
-- **Who speaks what (proposed):** Native Hawaiian residents speak Hawaiian.
-  Residents of other backgrounds speak English, using Hawaiian words where
-  islanders naturally would, and those words are selectable too.
+- **Who speaks what:** everyone in the village speaks Hawaiian, whatever their
+  background, including the two newcomers from the Crossroads.
 - **Accuracy:** every Hawaiian line and gloss must be checked by a fluent
   speaker before release.
 
@@ -149,14 +151,14 @@ its meaning.
 
 **Fixed (from direction):** a modern village on the largest island rooted in
 ancient Hawaiian culture; mostly Native Hawaiian residents with some of
-international background; Hawaiian dialogue through the Chinese village's
-language system.
+international background; every resident speaks Hawaiian through the Chinese
+village's language system; the Demon King's discord with the kingdom's other
+communities at first.
 
 **Proposed:** the name Kai Mālie; the voyaging history; the census of fifteen
 in seven households; the ahupuaʻa plan from spring to reef; the plantation and
 regional modern charter with traditional *hale* for communal buildings; the
 guest house as the kingdom's rest point; the generalised lexicon.
 
-**Open:** the store's stock; whether English-speaking residents use mixed
-lines; the island's spring and terrain changes the *loʻi* need; whether the
+**Open:** the store's stock; the island's spring and terrain changes the *loʻi* need; whether the
 village has a part in the Tidekeeper or Kraken stories.
