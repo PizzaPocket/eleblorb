@@ -68,12 +68,12 @@ building fits its approved footprint.
 - 9 × 6 m, three bays including a 2 m *lānai* across the green-facing front;
   double-pitched hip.
 - **Rooms:** living room; kitchen at the back; Kawika and Malia's bedroom;
-  Keoni's room; a work porch at the side where Malia beats *kapa* and dries
+  Keoni's room; a second, side *lānai* where Malia beats *kapa* and dries
   *lauhala*.
 - **Colour:** soft green walls, cream trim.
 - **History:** the oldest house, its lava-rock piers laid by Kawika's
-  grandfather; the work porch added for Malia.
-- **Variation:** the side work porch; the oldest, most weathered board.
+  grandfather; the side *lānai* added for Malia's work.
+- **Variation:** the side work *lānai*; the oldest, most weathered board.
 
 ### Kealoha home (Leilani, Makoa, Noelani)
 
@@ -175,7 +175,7 @@ building fits its approved footprint.
 
 | Building | Plan | Storeys | Roof | *Lānai* faces | Colour | Mark |
 |---|---|---|---|---|---|---|
-| Kahananui | rectangle + side porch | 1 | double hip | green | green | *kapa* porch, oldest |
+| Kahananui | rectangle + side *lānai* | 1 | double hip | green | green | *kapa* *lānai*, oldest |
 | Kealoha | rectangle | 1 | double hip | green | cream | nets, surfboard |
 | Akana | square, smallest | 1 | double hip | beach path | red | lei table |
 | Okafor guest house | rectangle | 2 | double hip | pier head | green | turtle board |
