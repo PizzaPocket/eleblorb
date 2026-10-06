@@ -1,7 +1,7 @@
 extends StaticBody3D
 
 ## The first "NME" (enemy) type -- a minion manifesting from the Demon
-## King's mirror world (see docs/world_bible.md's Aggros section), rising
+## King's mirror world (see docs/world_bible.md's NMEs section), rising
 ## out of the ground in the open wasteland and attacking the player and
 ## any free-roaming party blorbs with punches. Blorbs are what actually
 ## fight it off (see blorb.gd's State.COMBAT) -- this script never damages

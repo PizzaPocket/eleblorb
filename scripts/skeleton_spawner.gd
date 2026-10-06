@@ -2,7 +2,7 @@ extends Node3D
 class_name SkeletonSpawner
 
 ## Proximity-triggered skeleton encounters (see skeleton_nme.gd, docs/
-## world_bible.md's Aggros section) -- a real-time cooldown checks the
+## world_bible.md's NMEs section) -- a real-time cooldown checks the
 ## player's current position and, if it's valid open wasteland, rolls a
 ## chance to rise a new skeleton nearby. Not an ambient population like
 ## WildernessScatter's one-shot field of props/NPCs/wild blorbs (this file
@@ -94,7 +94,7 @@ func _process(_delta: float) -> void:
 
 
 ## True for the starting clearing, town, city, or lake -- everywhere a
-## skeleton should never rise, per docs/world_bible.md's Aggros section.
+## skeleton should never rise, per docs/world_bible.md's NMEs section.
 ## Both the player's position and candidate position pass through this same
 ## function, so encounters cannot straddle a protected boundary.
 func _is_excluded(pos: Vector2) -> bool:

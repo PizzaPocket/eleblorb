@@ -1,7 +1,7 @@
 extends StaticBody3D
 
 ## A second "NME" (enemy) type -- a skeletal primate manifesting from the
-## Demon King's mirror world (see docs/world_bible.md's Aggros section), the
+## Demon King's mirror world (see docs/world_bible.md's NMEs section), the
 ## Primate Kingdom's own counterpart to the outskirts' human skeleton_nme.gd.
 ## Same rise-from-the-ground/chase/punch state machine and XP-participant
 ## contract as that file (see its own class doc comment for the full

@@ -2,7 +2,7 @@ extends StaticBody3D
 
 ## The game's first named, story antagonist -- a false idol posing as
 ## "Hero of the Village and Savior of Earth" while secretly working against
-## the player (see docs/world_bible.md's own Setting/Aggros entries). Talking
+## the player (see docs/world_bible.md's own Setting/NMEs entries). Talking
 ## to him in town starts a real boss fight: unlike every other NME, the
 ## PLAYER fights him directly with their own worn blorb-suit powers (see
 ## player.gd), and he fights back the same way -- alternating water-leg
