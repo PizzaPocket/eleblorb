@@ -469,7 +469,8 @@ the primate inn now pass theirs. Still to do: the Snowrest Inn's modern washroom
 (cistern flush, basin, mirror, shower), a real door-closed closet for the
 open-pavilion primate inn, per-culture walls and screens around each fixture
 (the mǎtǒng's screen, the privy's yard closet), the Okafor guest house, and the
-Mor houseboat's wash space (`marine` is built but not yet placed).
+Mor houseboat's wash space (the `marine` toilet is placed in the houseboat's
+south-east corner by `floating_village.gd`; the basin and screen are not).
 
 ## 12. Chinese village: palace brief and the sealing rock
 
