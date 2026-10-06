@@ -282,6 +282,9 @@ Planning priorities:
   does not switch on inside them. It serves the ships below the waterline and
   the sea folk's air halls and tunnels.
 - Then build the second ship and the ships' interiors.
+- Give each crew member the watch schedule and work spots in
+  `ocean_pirate_ships.md`, section 4, and author two or three wreck sites on the
+  seabed for the daily salvage stop.
 - The main island becomes an old, eroded 28 m volcano with a windward valley
   holding the taro terraces; the cage island becomes a young crescent crater
   whose rim forms the stands. Review both in the layout and cage briefs.

@@ -161,6 +161,65 @@ enlarged to game scale with decks, rooms and programs for a crew of twelve,
 companion ramps between decks, and a shared "dry volume" system so the decks
 below the waterline stay dry.
 
+## 4. Daily work and livelihood
+
+### How they make a living
+
+There is no merchant shipping in the Ocean Kingdom to raid, and the discord has
+shut both crews out of Kai Mālie's beach. They live on:
+
+- **Salvage.** Wrecks and sunken cargo on the seabed are their real income. Once
+  a day each ship heaves to over a wreck site for about an hour, the coxswain
+  takes the boat out, and divers bring up what they can with grapples and
+  lines. Much of what they cannot use ends up washing ashore, and some of the
+  cage island's junk began here. The seabed needs two or three authored wreck
+  sites for this (a landscape item for the ocean floor).
+- **Fishing.** Lines over the side every afternoon, and a net from the boat when
+  the ship is hove to. Fresh fish is most of what the cooks have.
+- **Each other.** The two crews fight over the best salvage sites, which keeps
+  the feud alive.
+- **The *Harbinger*'s patrols.** Brine still sails his route as a patrol, logs
+  every sighting, and demands "tolls" in the name of a war that ended long ago.
+  Nobody pays. It is who they are, not a living.
+- **Beach trade, after harmony.** Once the discord ends, both crews trade
+  salvage and fish at Kai Mālie's beach for water, fruit and taro again.
+
+The ships still sail their routes continuously, as now; heaving to over a wreck
+is the one daily pause, and it should be brief enough that the ships remain
+moving landmarks.
+
+### Watches
+
+Real crews worked in **watches**: shifts of about four hours, so the ship was
+worked day and night. Each ship keeps two watches that alternate on deck, plus
+**idlers**, the specialists who work by day and sleep at night. The captain
+keeps no watch.
+
+| Ship | Watch A | Watch B | Idlers (day work) |
+|---|---|---|---|
+| *Harbinger* | Mara Reef (leads), Nell Crow, Rook Gale, Pip Salt | Old Kelp (leads), Silas Thorne, Josiah Penn | Eben Marsh, Ada Shoal, Tobias Wake, Hester Lane |
+| *Belle Fortune* | Yaw Mensah (leads), Inês Prado, Jacob de Wit, Moineau | Bastien Roux (leads), Bridget Nolan, Anneke Vos | Teo Abad, Henri Dufour, Gaspard Ferrand, Sami Haddad |
+
+The *Harbinger* keeps watches by the bell, exactly. The *Belle Fortune* keeps
+them loosely and argues about whose turn it is.
+
+### Work through the day (game clock)
+
+Each crew member has a work spot for each part of the day, so the ships read as
+places where work happens. Two residents never share a spot.
+
+| Time | *Harbinger* | *Belle Fortune* |
+|---|---|---|
+| **Dawn** (5 to 8) | watch A scrubs the decks with sand and stone; Eben lights the galley; Nell to the masthead | most of the crew asleep; Teo already cooking; Inês at the masthead |
+| **Morning** (8 to 12) | sail handling and rigging repair (Silas, the watch on deck); Hester in the sail room; Tobias caulking; Ada at sick call; breakfast at the mess tables | sail work when someone remembers; Gaspard patching; Sami at his canvas; Bastien at the ledger in the council room |
+| **Noon** | Old Kelp takes the noon sun sight on the quarterdeck and enters it in the log | Anneke takes the sun sight on the poop deck; everyone argues about the result |
+| **Afternoon** (12 to 16) | gun drill under Rook Gale; the hour hove to over a wreck, Josiah's boat out with divers; lines over the side | hove to over a wreck, the boat out with Jacob and Yaw diving; fishing from the rail; dice in the council room |
+| **Dusk** (16 to 20) | lanterns lit along the decks; supper at the mess tables; Brine writes the log in the great cabin | lanterns lit; supper on deck around the hatch; a vote if anyone has called one |
+| **Night** (20 to 5) | one watch on deck (wheel, lookout, pumps), the other in hammocks; idlers asleep | one watch on deck, some of them asleep at their posts; the rest in hammocks |
+
+The captains: Brine at the wheel or in the great cabin, by the clock; Souci at
+the wheel by day and in the council room at dusk.
+
 ## Known issue in the current crew
 
 `ocean_kingdom_denizens.gd` never sets `is_female`, so **Mara Reef**, **Nell
@@ -174,7 +233,9 @@ are rebuilt: set each crew member's gender explicitly and gate beards on it
 **Fixed:** two three-masted ships, their lanterns, exterior stairs and parkour,
 the two captains' beards, hooks and hats; Captain Brine and his named crew.
 
-**Proposed:** the two origins (a lost navy's privateer frigate and a captured
+**Proposed:** salvage, fishing, the *Harbinger*'s pointless patrols and post-harmony
+beach trade as the crews' living; a daily hour hove to over a wreck; watches,
+idlers and a work spot for every crew member through the day; the two origins (a lost navy's privateer frigate and a captured
 merchant fluyt run by elected articles); ship names; Souci and his crew;
 crew roles; enterable interiors.
 
