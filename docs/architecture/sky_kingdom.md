@@ -10,8 +10,8 @@ coordinates are fixed yet; those follow approval of this brief.
 `scripts/sky_kingdom.gd` builds a prototype that the world bible calls a
 deliberate first pass:
 
-- four cloud islands: **Highcloud** (radius 46 m) and three satellites, the
-  **Anvil Cloud**, the **Drift Cloud** and the **Hollow Cloud** (radius 30 m);
+- four cloud islands: **Aethra** (radius 46 m) and three satellites, the
+  **Chrysa**, the **Lyria** and the **Koinon** (radius 30 m);
 - island positions as offsets from the Air Gem landing at the top of the town's
   cloud staircase, resolved at runtime from procedural cloud placement, along
   an "away from the village" direction;
@@ -129,21 +129,20 @@ The Tempestars' long memory includes Sun Wu Kong, and their version of events
 follows his legend closely:
 
 1. **The lowly post.** Long ago he rode the Jindouyun up into the courts
-   uninvited and demanded a place. To be rid of him politely, Highcloud made
+   uninvited and demanded a place. To be rid of him politely, Aethra made
    him **Keeper of the Air Blorbs**, herding the wild flocks that drifted
    between the clouds. It was the humblest office in the kingdom. He did it
    well, grew fond of the blorbs, and then learned how little the post was
    worth to anyone else.
 2. **The empty title.** In fury he demanded a rank equal to the rulers. The
-   courts gave him the title **Great Sage Equal to Highcloud**, with no cloud,
-   court or duties attached, and set him to guard the Orchard Cloud's peaches
+   courts gave him the title **Great Sage Equal to Aethra**, with no cloud,
+   court or duties attached, and set him to guard Pantao's peaches
    to keep him busy.
-3. **The Peach Banquet.** Left off the guest list for the Orchard Cloud's great
+3. **The Peach Banquet.** Left off the guest list for Pantao's great
    Peach Banquet, he ate the season's golden peaches, drank the nectar,
-   overturned the tables and the Ring Cloud's games, and fought the courts'
+   overturned the tables and Dromos's games, and fought the courts'
    champions to a standstill with the Jingu Bang.
-4. **The sealing.** All six courts met in the Hall of Assembly on the Hollow
-   Cloud, the only time in living memory they acted together, and sealed him
+4. **The sealing.** All six courts met in the Hall of Assembly on Koinon, the only time in living memory they acted together, and sealed him
    beneath a rock on the highest roof below them: the crown of the Emperor's
    castle in the Chinese village. The sealing decree, inscribed in gold, is the
    last decision on the Hall's walls. With their common trouble gone, the courts
@@ -161,7 +160,7 @@ for anything better than a sealing.
 
 Who remembers what:
 
-- **Squall** keeps his offences in the Highcloud ledger, itemised.
+- **Squall** keeps his offences in Aethra ledger, itemised.
 - **Rime** still counts the peaches he ate.
 - **Corona** has never forgiven the ruined games; **Scud** secretly wants a
   rematch.
@@ -170,6 +169,27 @@ Who remembers what:
   let the children help.
 
 ## 3. Community
+
+### Island names
+
+The six cloud islands take mixed names that match each court's style:
+Greek-rooted for the Greco-Roman courts and Chinese for the court of the Peach
+Garden. They replace the prototype's Highcloud, Anvil Cloud, Drift Cloud and
+Hollow Cloud.
+
+| Island | Meaning | Court |
+|---|---|---|
+| **Aethra** | from *aether*, the bright upper air | state; the capital |
+| **Chrysa** | from *chrysos*, gold | craft and weather; the goldsmiths |
+| **Lyria** | from the lyre | music and verse |
+| **Koinon** | "the common", what is shared by all | learning and the empty Hall of Assembly |
+| **Pantao** | 蟠桃, the flat peaches of immortality in the Celestial Court | the feast and the Peach Garden |
+| **Dromos** | racecourse | games |
+
+Aethra's Hall of Mist and Pantao's Peach Garden carry the Chinese palace style;
+the other courts are Greco-Roman. The old names remain in `sky_kingdom.gd`,
+and Cirro's existing line explains the name "Hollow Cloud"; both change when
+the kingdom is rebuilt.
 
 The census is **twenty-one Tempestars in six courts**: nineteen adults and two
 children, in the four existing courts with added members and two new courts. Each court is a household-like group
@@ -181,7 +201,7 @@ Names currently follow the prototype's convention: a weather word followed by a
 compound surname. The naming scheme is under review (see Open); the new names
 below are placeholders until it is settled.
 
-### Highcloud: the court of state (capital, tallest)
+### Aethra: the court of state (capital, tallest)
 
 The Olympian or Jade Emperor's throne room, reduced to one cloud.
 
@@ -191,14 +211,14 @@ The Olympian or Jade Emperor's throne room, reduced to one cloud.
 - **Squall Windrider** (existing), chamberlain and keeper of ledgers. Records
   titles, precedence and every slight between courts. Keeps the ruler's robes
   from blowing off the edge.
-- **Breeze Suncrest** (existing), herald. The youngest at Highcloud and the only
+- **Breeze Suncrest** (existing), herald. The youngest at Aethra and the only
   Tempestar who still floats between clouds carrying invitations and news,
   like Hermes or Iris. Chased Air blorbs as a child.
 - **Dew Brightcup**, cupbearer. Sets the gold dew bowls out before dawn and
-  gathers the nectar for Highcloud's table. Knows precisely how much each court
+  gathers the nectar for Aethra's table. Knows precisely how much each court
   drinks, which makes Dew the court's best source of gossip.
 
-### The Anvil Cloud: the court of craft and weather
+### Chrysa: the court of craft and weather
 
 Hephaestus's forge and the thunderhead's anvil top.
 
@@ -211,7 +231,7 @@ Hephaestus's forge and the thunderhead's anvil top.
 - **Graupel Stonebrow**, weather-shaper. Herds storm cloud for the forge's heat
   and light and keeps the Anvil's own weather.
 
-### The Drift Cloud: the court of music and verse
+### Lyria: the court of music and verse
 
 The Muses' choir in a court of three.
 
@@ -222,26 +242,26 @@ The Muses' choir in a court of three.
 - **Haze Softquill**, keeper of songs. Holds the kingdom's verse in memory and
   on gold leaf.
 
-### The Hollow Cloud: the court of learning and the empty hall
+### Koinon: the court of learning and the empty hall
 
 The council of the heavens, now a scholar's observatory beside an empty
 assembly.
 
-- **Cirro Ashveil** (existing), ruler and philosopher. The "hollow" is the vacant
-  Hall of Assembly at the cloud's centre, where all the courts once met. Cirro
+- **Cirro Ashveil** (existing), ruler and philosopher. At the cloud's centre is the vacant
+  Hall of Assembly, where all the courts once met. Cirro
   thinks it is waiting to be filled.
 - **Alto Starmantle**, stargazer. Keeps the observatory and the calendar of
   seasons, as the Horai once kept heaven's gates.
 - **Mist Pallwhisper**, archivist. Tends the empty hall and the decisions
   inscribed in gold around it, the last of them very old.
 
-### The Orchard Cloud (new): the court of the feast
+### Pantao (new): the court of the feast
 
 The Queen Mother of the West's peach garden and the golden fruit of the
 Hesperides.
 
 - **Iris Dawnbloom**, ruler and hostess. Holds the most lavish banquets in the
-  kingdom, partly to outshine Highcloud. The guest list is a weapon.
+  kingdom, partly to outshine Aethra. The guest list is a weapon.
 - **Mellow Honeymantle**, master of the table. Composes the kingdom's cuisine:
   ambrosia, nectar wines, peach dishes, sky-fruit, and the order of courses.
 - **Rime Sweetbough**, orchard keeper. Tends the cloud-rooted peach and fruit
@@ -249,7 +269,7 @@ Hesperides.
 - **Iris's child** (name pending), the younger of the kingdom's two children.
   Raised at banquets, and openly bored by them.
 
-### The Ring Cloud (new): the court of games
+### Dromos (new): the court of games
 
 Olympian contests and the hippodrome.
 
@@ -258,7 +278,7 @@ Olympian contests and the hippodrome.
 - **Scud Quickwhirl**, racer. Young, fast and bored, and the court's champion
   because there is hardly anyone left to race.
 - **Flurry Brightring**, keeper of the course and the prizes: gold rings,
-  wreaths of woven cloud, laurels from the Orchard Cloud when the two courts
+  wreaths of woven cloud, laurels from Pantao when the two courts
   are speaking.
 - **Corona's child** (name pending), the elder child. Races Scud and loses,
   and would race anyone from any court if the rulers allowed it.
@@ -267,17 +287,17 @@ Olympian contests and the hippodrome.
 
 | Need | Who | Where |
 |---|---|---|
-| Ceremony, precedence, records of rank | Cumulus, Squall | Highcloud |
+| Ceremony, precedence, records of rank | Cumulus, Squall | Aethra |
 | News and invitations between clouds | Breeze | everywhere |
 | Keeping the Air blorb flocks | vacant since Sun Wu Kong's sealing | between the clouds |
-| Nectar | Dew (Highcloud); each court sets its own bowls | east terraces |
-| Ambrosia, fruit, banquets | Mellow, Rime, Iris | Orchard Cloud |
-| Gold: anchors, pins, vessels, tripods | Nimbus, Virga | Anvil Cloud |
-| Weather and cloud-shaping | Graupel; every Tempestar a little | Anvil Cloud |
-| Music and verse | Zephyr, Haze, Gale | Drift Cloud |
-| Calendar, seasons, stars | Alto | Hollow Cloud |
-| Shared law and archives | Mist, Cirro | Hollow Cloud hall |
-| Games and contests | Corona, Scud, Flurry | Ring Cloud |
+| Nectar | Dew (Aethra); each court sets its own bowls | east terraces |
+| Ambrosia, fruit, banquets | Mellow, Rime, Iris | Pantao |
+| Gold: anchors, pins, vessels, tripods | Nimbus, Virga | Chrysa |
+| Weather and cloud-shaping | Graupel; every Tempestar a little | Chrysa |
+| Music and verse | Zephyr, Haze, Gale | Lyria |
+| Calendar, seasons, stars | Alto | Koinon |
+| Shared law and archives | Mist, Cirro | Koinon hall |
+| Games and contests | Corona, Scud, Flurry | Dromos |
 
 There is no labour of survival anywhere in this table. Everything listed is
 either pleasure or a duty that only matters because other courts exist, which
@@ -286,7 +306,7 @@ is why so much of it has lapsed.
 ### Governance
 
 Each court is sovereign over its own cloud and nothing else. The Hall of
-Assembly on the Hollow Cloud is where shared decisions were once made; no
+Assembly on Koinon is where shared decisions were once made; no
 court has called it in living memory. Contact now runs through Breeze's
 invitations, Dew's gossip and banquets that are as much contests as meals.
 Disputes are over precedence, over whose cloud shadows whose terrace, over the
@@ -370,13 +390,13 @@ Only fruit and some blossoms carry their own colour.
 
 | Species | Form | Colour beyond cloud | Where |
 |---|---|---|---|
-| Cloud peach | broad, low-spreading orchard tree | golden peaches | Orchard Cloud; one old tree at Highcloud |
+| Cloud peach | broad, low-spreading orchard tree | golden peaches | Pantao; one old tree at Aethra |
 | Cloud willow | weeping crown whose long strands thin out and fade before they touch anything | none | beside nectar terraces and the odeon |
-| Tier pine | flat, stacked layers like stratus decks | none | Hollow Cloud, framing the empty hall; Highcloud's axis |
+| Tier pine | flat, stacked layers like stratus decks | none | Koinon, framing the empty hall; Aethra's axis |
 | Puff shrub | low, round cumulus bushes, clipped into hedges | none | court thresholds and garden edges |
-| Cloud wisteria | trailing blossom over colonnades and floating roofs | faint dawn pink and lavender blossom | Drift Cloud, Orchard Cloud |
-| Undercloud vine | hangs from an island's underside toward the light reflected from below | pale gold berries | beneath the Orchard and Anvil Clouds |
-| Sky lily | flat leaves and cup flowers floating on shallow pools of set cloud | pale gold or white flowers | the Hollow Cloud's empty hall, Highcloud's forecourt |
+| Cloud wisteria | trailing blossom over colonnades and floating roofs | faint dawn pink and lavender blossom | Lyria, Pantao |
+| Undercloud vine | hangs from an island's underside toward the light reflected from below | pale gold berries | beneath the Orchard and Chrysas |
+| Sky lily | flat leaves and cup flowers floating on shallow pools of set cloud | pale gold or white flowers | Koinon's empty hall, Aethra's forecourt |
 
 Collision follows the project policy: trunks and substantial branches block and
 can be climbed or stood on where they visibly could bear weight; foliage, willow
@@ -388,12 +408,12 @@ strands, blossom and vines are decorative.
   courts, round tholos pavilions, colonnades and exedrae, porches with
   pediments reduced to soft SuperEgg forms, an odeon, a racing ring, banquet
   couches and colonnaded nectar terraces. Quartz shafts, gold capitals and
-  bases, floating roofs. It governs the Anvil, Drift, Hollow and Ring courts,
+  bases, floating roofs. It governs Chrysa, Lyria, Koinon and Dromos,
   every residence and terrace, and the kingdom's overall feel.
 - **Secondary, about 35 percent: the Chinese celestial palace.** It governs the
   places that carry Sun Wu Kong's story: the Dawn Gate after the Southern
-  Heavenly Gate, Highcloud's Hall of Mist on its stepped quartz podium with
-  floating double eaves, and the Orchard Cloud's Peach Garden and banquet hall.
+  Heavenly Gate, Aethra's Hall of Mist on its stepped quartz podium with
+  floating double eaves, and Pantao's Peach Garden and banquet hall.
   Elsewhere it appears only as named details: moon gates of set cloud and
   upturned eave corners on gate pavilions. Quartz replaces red-lacquered
   timber; gold replaces painted brackets.
@@ -403,7 +423,7 @@ strands, blossom and vines are decorative.
   pastels on woven cloud and Tempestar clothing (the prototype's sky blue,
   dawn pink, gold dawn, lavender, mint and peach), 10 percent gold.
 - **Hierarchy:** podium height and the width of the floating gap between
-  columns and roof show rank. Highcloud's Hall of Mist stands highest and has
+  columns and roof show rank. Aethra's Hall of Mist stands highest and has
   the kingdom's only double floating eave. Ordinary residences are small
   tholoi or moored rooms.
 - **Exclusions:** no copied real temple, shrine or sacred emblem; no altars,
@@ -416,12 +436,12 @@ strands, blossom and vines are decorative.
 
 | Court | Signature building | Character |
 |---|---|---|
-| Highcloud | the Hall of Mist: audience hall on a triple quartz podium behind its own gate, double eaves floating highest | formal, axial, a little empty |
-| Anvil Cloud | open gold forge under a storm-dark cloud crown | the only working court; scorched gold, glowing, cluttered |
-| Drift Cloud | small odeon with wind harps between columns | musical, intimate, half-empty seats |
-| Hollow Cloud | the Hall of Assembly: a ring of galleries around an empty central opening through the cloud to the world below, the gold sealing decree on its walls; observatory | grand and vacant; the void is the hall |
-| Orchard Cloud | the Peach Garden and the banquet hall of the Peach Banquet, with floating couches; peach trees above and below the cloud | lavish, warm, overflowing |
-| Ring Cloud | racing ring around the cloud's rim, judges' tholos, prize pavilion | open, athletic, bright |
+| Aethra | the Hall of Mist: audience hall on a triple quartz podium behind its own gate, double eaves floating highest | formal, axial, a little empty |
+| Chrysa | open gold forge under a storm-dark cloud crown | the only working court; scorched gold, glowing, cluttered |
+| Lyria | small odeon with wind harps between columns | musical, intimate, half-empty seats |
+| Koinon | the Hall of Assembly: a ring of galleries around an empty central opening through the cloud to the world below, the gold sealing decree on its walls; observatory | grand and vacant; the void is the hall |
+| Pantao | the Peach Garden and the banquet hall of the Peach Banquet, with floating couches; peach trees above and below the cloud | lavish, warm, overflowing |
+| Dromos | racing ring around the cloud's rim, judges' tholos, prize pavilion | open, athletic, bright |
 
 ## 7. Exchange with the hero
 
@@ -433,19 +453,19 @@ bored, proud, leisured people actually part with things:
   court will exchange its own goods for things from the ground world that suit
   its taste, presented through the shared transaction interface as a swap
   rather than a sale:
-  - the Orchard Cloud wants foods it has never tasted (rye bread, cheese,
+  - Pantao wants foods it has never tasted (rye bread, cheese,
     dried berries, smoked fish, lake clams) and gives nectar, ambrosia and,
     rarely, a golden peach;
-  - the Hollow Cloud wants old, unexplained objects (the kind Aldren Vey deals
+  - Koinon wants old, unexplained objects (the kind Aldren Vey deals
     in) and gives gold-leaf verse and star charts;
-  - the Anvil Cloud wants metals and minerals it has never worked, such as
+  - Chrysa wants metals and minerals it has never worked, such as
     Fire Kingdom ores, and gives small gold pieces;
-  - the Drift Cloud wants news and stories of the world below, delivered in
+  - Lyria wants news and stories of the world below, delivered in
     conversation, and gives woven-cloud goods.
-- **Prizes.** The Ring Cloud's races and the Drift Cloud's contests award gold
+- **Prizes.** Dromos's races and Lyria's contests award gold
   rings, wreaths of woven cloud and the occasional rarer object to whoever
   wins, the hero included.
-- **The open table.** What the Orchard Cloud's banquets leave over is set out
+- **The open table.** What Pantao's banquets leave over is set out
   on gold tripods for anyone to take. It is the kingdom's only free food, and
   a quiet boast.
 - **Gifts of favour.** A ruler pleased or flattered gives a gift, and a
@@ -459,10 +479,10 @@ is still open.
 - **Arrival:** the town staircase tops out at the Air Gem landing, which becomes
   the forecourt of the **Dawn Gate**, the kingdom's arrival gate after the
   Southern Heavenly Gate. Its keepers are long gone; the gate stands open.
-- **Hierarchy of clouds:** Highcloud is the nearest large court, visible through
+- **Hierarchy of clouds:** Aethra is the nearest large court, visible through
   the gate. The other five courts are arranged around it at varying heights and
   distances so each looks toward or away from the others in a way that says
-  something about their relationship. The Hollow Cloud stands at the
+  something about their relationship. Koinon stands at the
   geometric centre of the group, which is why its empty hall matters.
 - **Between the clouds:** open sky. Tempestars float across it on their own
   cloud bodies, and the hero flies, having already used the Air Gem to reach
@@ -498,7 +518,7 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
   a strong second where Sun Wu Kong's story is set;
 - the census of twenty-one in six courts, including the two new courts,
   thirteen new adults and two children;
-- the empty Hall of Assembly on the Hollow Cloud;
+- the empty Hall of Assembly on Koinon;
 - the cloud-rooted flora;
 - exchange through curiosities, prizes, the open table and gifts, with no
   merchants and no Tokoins;
@@ -509,9 +529,6 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
 
 **Open:**
 
-- The names of the cloud islands. Highcloud, the Anvil, Drift and Hollow
-  Clouds (from the prototype) and the Orchard and Ring Clouds (this brief) are
-  all placeholders.
 
 - The naming scheme. The prototype's six names are weather words with compound
   surnames; this brief's new names follow that pattern as placeholders.
