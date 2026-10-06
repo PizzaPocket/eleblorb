@@ -296,6 +296,10 @@ Planning priorities:
 - Review the planting plan (`docs/architecture/ocean_landscape.md`): Hawaiian
   zonation under north-east trade winds, canoe plants around Kai Mālie, natives
   in the wild, one character per islet, and the new plant builders it needs.
+- Review the ocean floor landscape (`docs/architecture/ocean_floor_landscape.md`):
+  zonation by depth, fringing reefs, the luminous trail to the city and three
+  wreck sites, and the cage island's environment dimensions
+  (`ocean_cage_island.md`, section 6).
 - Decide how tournament fights work.
 - Replace the sea folk's segmented `AquaticTail` with the player mermaid tail's
   design, sized to start at the hips and emerge from them seamlessly, hips in

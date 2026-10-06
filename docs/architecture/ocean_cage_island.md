@@ -96,6 +96,42 @@ The crater is the arena; little has to be built.
 - **Routes:** every public route, aisle and the cage gate meet the hero's and
   party's minimums (3 m on the floor and beach, 2 m on aisles, 3.2 m headroom).
 
+## 6. Environment dimensions
+
+Environment only; no inhabitants, NPCs or fight scripting (see status). Local
+frame as in section 2: origin at the crater centre, `w` toward the arrival dock,
+`p` to its right, heights above sea level.
+
+| Element | Dimensions |
+|---|---|
+| Crater at the waterline | about 70 m across (radius 35 m) |
+| Rim crest | 16 m high at the far side (`w = -30`), falling smoothly to about 4 m at the two horns |
+| Breach | about 100° of arc centred on `+w`, between the horns at roughly `(w, p) = (20, ±25)` |
+| Bay | inside the breach, 0 to 2 m deep over pale sand, shoaling onto the beach |
+| Landing beach | `w = +12..+20`, rising from the waterline to the crater floor at +2.5 m |
+| Crater floor | level packed sand and tuff, 26 m across, at +2.5 m, centred at `w = -4` |
+| Stands | three natural ledges on the rim's inner face, at +5, +7.5 and +10 m, each about 2.5 m deep, running about 260° around the crater; timber edges and seats where a ledge needs them |
+| Aisles | three ramped aisles 2 m wide, at bearings 90°, 180° and 270° from `+w`, no steeper than 1:4, from the floor to the top ledge and on to the crest |
+| Announcer's perch | a flat tuff platform 4 × 3 m on the crest at `w = -30`, +16 m, facing the gate |
+| Cage | a regular octagon 18 m across the flats, on the crater floor; walls of salvaged spars and lashed net 4.5 m high; a net roof at 6 m so no fighter leaves by air; one gate 3 m wide facing `+w` and the beach; a sand floor ringed in timber |
+| Board of rankings | a flat tuff face beside the gate, outside the cage |
+
+### Collision and traversal
+
+- The rim, ledges, aisles, perch, floor and beach are solid ground; the outer
+  slopes are steep enough to discourage climbing but not walled.
+- The cage's spars, net walls and net roof are solid; the gate opens and closes.
+- Routes: 3 m on the beach and floor, 2 m on the aisles, 3.2 m headroom
+  everywhere except inside the cage (6 m to the net).
+- The terrain needs finer sampling or authored ground pieces for the rim, ledges
+  and aisles; the generic dome is replaced.
+
+### Planting
+
+As in `ocean_landscape.md`: *pili* and *ʻaʻaliʻi* on the outer slopes, lichen
+and whisk fern on the ledges, one young *ʻōhiʻa* high on the rim, beach plants
+at the horns, nothing where people sit.
+
 ## Fixed, proposed and open
 
 **Fixed (from direction):** a smaller island with a battle cage; small creature
