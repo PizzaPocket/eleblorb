@@ -372,7 +372,7 @@ A crown of a palace roof was the wrong place for it.
 - **When he is freed,** the rock splits in two and the gold band falls. The
   halves stay where they fell, and the children climb on them.
 
-### 4.7 Dress charter (proposed 2026-10-06)
+### 4.7 Dress charter (approved 2026-10-06)
 
 The village is classical, not present-day (3.8, decision 0), so its people wear
 **late-imperial Chinese commoners' dress**, the everyday clothes of Ming and
@@ -456,7 +456,7 @@ edge binding, on every person in the village.
 - **Tian Bo:** a farmer's straw hat and short jacket. As chief, he wears a
   plain *chángshān* only on civic days in the village hall.
 
-**The Emperor's regalia: sense check (proposed 2026-10-06).** Checked
+**The Emperor's regalia: sense check (approved 2026-10-06, twelve strings).** Checked
 against what late-imperial emperors and princes actually wore. What is built
 today (`npc.gd`, `_add_emperor_regalia`; the world bible): a red square crown
 with ten gold cords front and back, a red robe with gold trim, black boots, a
@@ -466,7 +466,7 @@ high bun and a long beard.
 |---|---|---|---|
 | Crown type | a flat-topped *miǎnguān* | right: the board-topped crown with hanging bead strings is the emperor's highest crown | keep: it is his silhouette |
 | Crown colour | red all over | the board (*yán*) is **black on top, red underneath** | black top, red underside and edge |
-| Strands | ten gold cords at front and back | strings of **jade beads** (*liú*), **twelve** at front and back for an emperor; nine for a prince; no rank wore ten | twelve strings of white-and-coloured jade beads; or nine, if his rank should quietly show he is really a small king |
+| Strands | ten gold cords at front and back | strings of **jade beads** (*liú*), **twelve** at front and back for an emperor; nine for a prince; no rank wore ten | **twelve** strings of white-and-coloured jade beads (approved) |
 | Robe colour | red | defensible: Song emperors held court in crimson, and Ming princes wore red dragon robes. Yellow was the Ming and Qing emperors' colour | keep red; the yellow stays on his palace roofs, where it already says "emperor" |
 | Collar | the generic shirt | the dragon robe has a **round collar** (*pánlǐng*) fastening at the right shoulder | a round collar: it sets him apart from the village's standing collars |
 | Motifs | gold trim | **gold dragon roundels** on the chest, back and shoulders | add the roundels; dragons appear only on his robe and the throne screen |
@@ -494,7 +494,7 @@ the character-design skill and a code comment say gold. It is red.
   "Hanfu".
 - **No modern sneakers.**
 
-### 4.8 Individual looks (proposed 2026-10-06)
+### 4.8 Individual looks (approved 2026-10-06)
 
 | Resident | Look |
 |---|---|

@@ -529,7 +529,7 @@ reconciled) join this table when their designs are approved.
 
 ## 14. Chinese village dress
 
-- Review the dress charter and individual looks (`chinese_village.md` 4.7
+- Approved 2026-10-06: the dress charter and individual looks (`chinese_village.md` 4.7
   and 4.8): late-imperial commoners' dress, a standing collar with frog
   buttons and edge binding on everyone, short sleeves only as a half-sleeve
   jacket or a vest, never a t-shirt.
@@ -542,8 +542,8 @@ reconciled) join this table when their designs are approved.
   `VillagerAppearance.apply_profile()` replacing the random `SHIRT_COLORS`
   draw (which includes a yellow the charter excludes), and the per-resident
   looks. Liang Zhen's post-quest look joins the revisit states in item 13.
-- Emperor's regalia (once the sense check in 4.7 is approved): crown board black
-  on top and red beneath, twelve (or nine) strings of jade beads instead of ten
+- Emperor's regalia (approved 2026-10-06): crown board black
+  on top and red beneath, twelve strings of jade beads instead of ten
   gold cords, a round-collared robe with gold dragon roundels, a jade hoop belt;
   update the "gold robe" comment in `npc.gd`.
 
