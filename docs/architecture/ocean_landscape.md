@@ -132,5 +132,5 @@ flora; landscaping around the settlements.
 character for each satellite; canoe plants where people live and natives in the
 wild; the species, tenders and jobs above; excluded invasives; the builder list.
 
-**Open:** planting density for performance; whether any fauna (seabirds, the
-*nēnē* goose, monk seals on the beaches) belongs in a later pass.
+**Open:** planting density for performance. Wildlife is out of scope here; it
+will get its own skill and pass across the whole game.
