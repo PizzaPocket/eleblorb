@@ -47,9 +47,9 @@ From `jungle_kingdom_village.gd`, `jungle_kingdom_terrain.gd`,
 
 | Class | Rig | Who | Where they live |
 |---|---|---|---|
-| **Stuffed-animal monkeys** | the stuffed-animal monkey rig (`JungleVillager`, Xiao Hou Zi's kind) | eighteen villagers and the innkeeper | mostly in the trees; four on the clearing floor |
+| **Stuffed-animal monkeys** | the stuffed-animal monkey rig (`JungleVillager`, Xiao Hou Zi's kind) | eighteen villagers, the innkeeper and the newcomer Ossian Redbrow | mostly in the trees; four on the clearing floor |
 | **Monkeys** (tailed) | the primate rig with a tail (`ApeTemplate`) | Rotan, Kilat, Akar | the clearing floor |
-| **Apes** (no tail) | the primate rig without a tail | Batu, Sari, Teguh, Ossian Redbrow | the clearing floor; too heavy for the treehouses |
+| **Apes** (no tail) | the primate rig without a tail | Batu, Sari, Teguh | the clearing floor; too heavy for the treehouses |
 
 The village's social shape comes from its residents' own words:
 
@@ -199,13 +199,38 @@ from.
 | **Sari** | woman | ape | the ape lodge | married to Teguh; Batu's sister | watches Kova Kong from the tree line |
 | **Teguh** | man | ape | the ape lodge | married to Sari; old friend of Xiao Hou Zi and of Jati | the apes' steady one |
 | **Batu** | man | ape | the ape lodge | Sari's elder brother; keeps his own counsel even with her | runs the training grounds and makes their dummies; keeps his shed shut and says nothing about it |
-| **Ossian Redbrow** | man | ape | his lean-to by the stable | a newcomer; Kilat's favourite subject | waiting for the Special Banana |
+| **Ossian Redbrow** | man | stuffed monkey (changed from ape, 2026-10-06) | his lean-to by the stable | a newcomer; Kilat's favourite subject | waiting for the Special Banana |
 
 #### The inn
 
 | Resident | Gender | Class | Household | Relationships | Role |
 |---|---|---|---|---|---|
 | **Bima** | man | stuffed monkey | the inn, his own room | Wangi's brother; his guests eat at her kitchen | innkeeper |
+
+### Ossian and the small Manchego (user direction, 2026-10-06)
+
+- **Ossian Redbrow** is a **stuffed-animal monkey** like the villagers, not a
+  large ape: a reddish-furred newcomer on the same rig as Xiao Hou Zi's kind.
+- **Manchego starts small.** When the hero first meets him here, Manchego is a
+  **chibi** horse, sized to a stuffed-animal monkey rider, with Ossian on his
+  back. He is not a miniature of the full horse. He has the proportions of a
+  stuffed toy horse:
+  - legs **thicker, shorter and stumpier**;
+  - a rounder, fuller barrel;
+  - a bigger head for his body;
+  - a shorter, fuller tail, proportioned to match.
+
+  He keeps his Przewalski's dun colouring, his warm orange-brown mane and his
+  eyes shaped like Xiao Hou Zi's.
+- **Who can ride him.** After Ossian hands him over, he is too small for the
+  hero to ride. Only **Xiao Hou Zi** (and riders of that size) can, and no
+  text says so. The hero simply has no way to mount him, while Xiao Hou Zi
+  does.
+- **Growing him to full size** comes later, in the Rock and Ground Kingdom,
+  where the people are horse experts (see `rock_ground_town.md`, "Manchego and
+  the saddle").
+- **The stable and paddock** stay as planned. The stall's manger and the
+  trough are set low for him.
 
 ### Households summary
 

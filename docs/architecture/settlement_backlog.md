@@ -555,4 +555,17 @@ concept.
   - any riding through one shared `TraversalMode` for every character;
   - the inn's fixture from `earth_closet` to `porcelain`;
   - the desert planting and wind-blown tumbleweeds.
+- **Manchego's sizes and the saddle** (user direction, 2026-10-06):
+  - Ossian Redbrow moves from the ape rig to the `JungleVillager` stuffed-monkey
+    rig.
+  - Manchego gets a chibi build: a `HorseFigure` variant with thicker,
+    shorter, stumpier legs, a rounder barrel, a larger head and a shorter,
+    fuller tail, sized to a stuffed-monkey rider, with Ossian seated to match.
+  - Before the saddle, `can_be_mounted_by()` refuses full-size riders and
+    accepts small ones such as Xiao Hou Zi.
+  - The saddle (from Wes Tolliver) is an equippable item. With it, mounting
+    picks his size from the rider's body scale, with a short grow or shrink
+    transition. Proposed: chibi when unridden.
+  - Size and the saddle persist in `WorldState`.
+  - Mount riding stays one shared mode for every character (traversal parity).
 

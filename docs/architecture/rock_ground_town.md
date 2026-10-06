@@ -83,7 +83,7 @@ whether the Demon King's discord is behind it, is open.
 
 ## 3. Community (proposed census, 2026-10-06)
 
-Sixteen residents in ten households. The eight rock-named residents are
+Seventeen residents in eleven households. The eight rock-named residents are
 replaced: their names belonged to the earlier earth-and-stone concept.
 **Dolma Hearthstone keeps her name and her house**, which becomes the saloon
 and hotel.
@@ -102,6 +102,7 @@ Black cowboys, about one in four of the real trail hands.
 | **Josie Bell** | girl, 12 | the Bell ranch | their daughter; wants nothing in the world but to race |
 | **Mateo Villanueva** | man | the livery | farrier and mechanic: shoes the horses, fixes their cybernetics, tunes their bike forms |
 | **Inez Villanueva** | woman | the livery | Mateo's mother; the **hat maker**, who builds the town's shifting hats |
+| **Wes Tolliver** | man | the saddlery | the **saddle maker**; his tack shop stands beside the livery, and his saddles carry the same cowboy-punk technology as Inez's hats |
 | **Walt Beasley** | man | the general store | storekeeper; sells everything from beans to wheel bearings |
 | **Pearl Dunaway** | woman | the assay office | assayer and banker: weighs the prospectors' ore and keeps the town's money |
 | **Hollis Grant** | man | the doctor's | doctor and barber, "Doc" to everyone |
@@ -166,6 +167,33 @@ The result is a dirt bike with a horse's head, mane flying.
   Lark? Does Manchego relate to them? Any riding must follow the traversal
   parity rule (CLAUDE.md): one shared `TraversalMode` for every playable
   character, reusing `DirtbikeMode`'s wheel dynamics for the bike form.
+
+## 4a. Manchego and the saddle (user direction, 2026-10-06)
+
+Manchego joins the party as a **chibi** horse in the Plant Kingdom: too small
+for the hero to ride, ridden only by Xiao Hou Zi. In this town of horse
+experts, the hero can make him full size.
+
+- **The saddle.** The saddle maker **Wes Tolliver** makes Manchego a saddle
+  with the town's cybernetic technology built into its tree and stitching.
+  Equipped on Manchego, it lets him **grow to full size or shrink back down**.
+  Working name: the shifting saddle. How the hero gets it (a commission, a
+  race, a favour) is open.
+- **From then on, his size follows his rider:**
+  - **chibi** when Xiao Hou Zi rides him (or any rider of stuffed-monkey
+    scale);
+  - **full size** when the hero rides him (or any full-size rider).
+
+  Proposed: when nobody is riding him he rests at chibi size, his natural
+  size, and grows only when a full-size rider mounts.
+- **The change:** quick and mechanical, like the town's horses and hats. The
+  saddle's stitching glows, and he swells or settles over about a second,
+  changing proportions as he goes: legs lengthening and slimming, tail
+  lengthening. No puff of smoke.
+- **Traversal parity:** riding Manchego stays one shared mount mode for every
+  playable character. The saddle chooses his size from the rider's own body
+  scale, not from which character is riding, so a future character of any size
+  gets the right horse.
 
 ## 5. The cowboy hat helm
 
@@ -261,7 +289,8 @@ this is a deliberate fusion.
 - **The general store.**
 - **The assay office and bank.**
 - **The doctor's and barber's.**
-- **The livery stable and garage**, and Inez's hat shop beside it.
+- **The livery stable and garage**, with Inez's hat shop and Wes's saddlery
+  beside it.
 - **The race barn** and the **rodeo arena**, which is also the start and
   finish of a **race course** out across the dirt flats and canyons. This is
   where the Ground half's open dirt and the Rock half's canyons both earn their
@@ -316,6 +345,7 @@ spread.
 - the census of sixteen, replacing the eight rock-named residents;
 - Dolma's inn becoming the saloon and hotel;
 - the Kane gang;
+- Wes Tolliver the saddle maker and the shifting saddle for Manchego;
 - the cowboy hat as the Ground suit's helm, shifting with `DirtbikeMode`;
 - earning it by racing;
 - the architectural charter direction;
@@ -325,6 +355,8 @@ spread.
 - the porcelain toilet.
 
 **Open:**
+- how the hero gets the saddle;
+- Manchego's size when nobody rides him (proposed: chibi);
 - what the gang wants, and the town's story role;
 - whether the player can ride a cyborg horse, and how;
 - how the hat is earned;
