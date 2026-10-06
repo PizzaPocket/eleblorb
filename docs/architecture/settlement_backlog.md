@@ -207,3 +207,22 @@ Planning priorities:
   not read as a regular scaffold or a grid of identical poles.
 - Validate every residence, palace level, kitchen entrance, island edge and
   bridge for player, Blorbus and mount traversal before revising dialogue.
+
+## 6. Sky Kingdom Courts
+
+Status: second-pass concept brief in review (2026-10-06). See
+`docs/architecture/sky_kingdom.md`. The current implementation is a prototype
+of four runtime-placed cloud islands with seeded pavilions and six Tempestars,
+all revealed only by the Bird Helm.
+
+Planning priorities:
+
+- Approve the six-court, nineteen-person register, the cuisine and the
+  leisured culture with its costs.
+- Approve the cloud, gold and quartz material system and its gameplay rules
+  before any building is designed.
+- Decide how the hero travels between clouds before and after the Air blorbs
+  return, since that fixes island spacing and heights.
+- Then author a dimensioned layout with fixed positions for the staircase
+  landing, the Dawn Gate and all six courts, replacing positions resolved from
+  procedural cloud placement.
