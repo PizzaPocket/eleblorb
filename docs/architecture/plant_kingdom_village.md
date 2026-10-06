@@ -67,6 +67,9 @@ The village's social shape comes from its residents' own words:
 
 ### Livelihood
 
+- **The commons:** a large shared deck at 11.4 m spanning the three trees above
+  the gate, with the gathering circle, shared kitchen, dining terrace, market,
+  rain cistern and food store, reached by everyone (see the layout).
 - **Foraging:** fruit (bananas and durian, both already in the game's catalogue
   and growing on its trees), nuts, shoots and honey, mostly gathered by the
   floor-dwellers.
@@ -117,7 +120,7 @@ Roles come from what each resident already says.
 | **Sedge Marrow** | stuffed monkey | forager; runs the fruit stall |
 | **Ilva Bracken** | stuffed monkey | keeps the ground gardens |
 | **Osmund Reave** | stuffed monkey | ground-dweller who has lost two cousins to the ashing |
-| **Dune Sarrow** | stuffed monkey | friendly to outsiders; tends the communal hearth |
+| **Dune Sarrow** | stuffed monkey | friendly to outsiders; keeps the shared kitchen on the commons |
 | **Wick Thistledown** | tailed monkey | rope and vine maker |
 | **Fable Quickpaw** | tailed monkey | runner and gossip |
 | **Doran Mossback** | tailed monkey | path keeper; knows every root |
@@ -134,8 +137,9 @@ Roles come from what each resident already says.
 
 ### Governance
 
-The elders of the Elder Tree decide for the village, and the floor-dwellers
-feel they are not asked. Ending the curse is the kingdom's plot quest; mending
+The elders of the Elder Tree decide for the village, meeting in the gathering
+circle on the commons, where canopy and floor households meet; the
+floor-dwellers still feel they are not asked. Ending the curse is the kingdom's plot quest; mending
 the canopy and the floor is a smaller story the village tells on its own.
 
 ## 4. Architectural charter (draft)
@@ -148,7 +152,8 @@ the canopy and the floor is a smaller story the village tells on its own.
   rather than nailed ("bark doesn't hold a nail the way wood does").
 - **Secondary, about 25 percent: ground lodges.** Low, wide, thatched lodges on
   short timber stilts for the floor-dwellers, built heavier for apes.
-- **Accent, about 5 percent:** the communal hearth and carved trunk markers.
+- **Accent, about 5 percent:** the commons, the village's one large deck, and
+  carved trunk markers.
 - **Structural precedents** (spatial only, not cultural costume): high
   rainforest treehouses lashed around living trunks, and canopy walkways of
   rope and plank.
@@ -156,7 +161,7 @@ the canopy and the floor is a smaller story the village tells on its own.
   prototype's varied roof colours as household accents), vine-rope, warm fruit
   colours at the stall.
 - **Exclusions:** nailed carpentry, enclosed boxes, lights on poles, fire in the
-  trees (cooking happens at the ground hearth).
+  trees except the commons' single stone-based kitchen hearth.
 
 ## 5. Fixed, proposed and open
 

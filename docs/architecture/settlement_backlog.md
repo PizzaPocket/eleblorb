@@ -347,9 +347,11 @@ Planning priorities:
 
 - Approve the community: canopy and floor households, no children because of
   the curse, roles from the residents' own lines, the fruit stall.
-- Approve the layout: the gate plaza, ground lodges for apes and floor-dwellers,
-  the communal hearth, household rings and rope bridges in the trees, and a
-  32° public switchback on each tree beside the steep climbing ramps.
+- Approve the layout: the commons, a large shared deck at 11.4 m spanning the
+  three trees above the gate with the shared amenities; a small ground camp
+  with a stable, paddock and gardens; household rings and rope bridges higher
+  up; a grand ramp and a 32° public switchback on each tree beside the steep
+  climbing ramps.
 - Decide the open questions: whether the curse touches apes, whether the
   shadows of the ashed are seen, whether to rename the residents, and whether
   Sun Wu Kong's old seat appears.
