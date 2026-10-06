@@ -217,10 +217,22 @@ bike. **The cowboy hat becomes the Ground suit's helm.**
 - When the wearer goes into `DirtbikeMode`, the hat shifts into the dirt-bike
   helmet. When they stop riding, it shifts back. This is the same pattern as
   the Diving Helmet changing form when submerged.
-
-**Proposed way to get one:** the player earns it by racing. For example, Inez
-gives one to whoever beats Sadie Vex, or Lark, in the town race. This is open
-for the user to decide.
+- **The hat unlocks the dirt bike's full power** (user direction,
+  2026-10-06). To have full access to the Ground suit's dirt bike, the hero
+  must be wearing the hat, or have it bound to one of their blorbs. This
+  follows the formed-suit pattern, where a helm commands its element's whole
+  power (the Lava Helm, the Leaf Hat, the Penguin Helm).
+  - Today `DirtbikeMode` works for any Ground suit with no helm at all.
+  - Exactly what stays available without the hat, and what the hat adds, is
+    open.
+  - A natural split: a slow, basic dirt bike without it, and with it full
+    speed, jumps and the rough canyon ground.
+  - The check lives in the shared mode, so it applies to every character.
+- **So the hat is not a race prize.** It comes **before** racing, because the
+  races need it. Inez makes it, and how she comes to give or sell it to the
+  hero is open. The demo world's Ground stretch, which already features the
+  dirt bike, should then hand the hat out at its portal, as the Water and Ice
+  stretches do with their helms, so the demo keeps full power.
 
 ### Design notes
 
@@ -347,7 +359,6 @@ spread.
 - the Kane gang;
 - Wes Tolliver the saddle maker and the shifting saddle for Manchego;
 - the cowboy hat as the Ground suit's helm, shifting with `DirtbikeMode`;
-- earning it by racing;
 - the architectural charter direction;
 - the places list;
 - the race course;
@@ -359,7 +370,9 @@ spread.
 - Manchego's size when nobody rides him (proposed: chibi);
 - what the gang wants, and the town's story role;
 - whether the player can ride a cyborg horse, and how;
-- how the hat is earned;
+- how the hero gets the hat from Inez (not a race prize: it comes before
+  racing);
+- what the dirt bike can do without the hat, and what the hat unlocks.
 - whether firearms appear (the game has none yet);
 - the kingdom's name: the user called it the Earth Kingdom and the Earth and
   Rock Kingdom, while the code and bible say Rock and Ground.

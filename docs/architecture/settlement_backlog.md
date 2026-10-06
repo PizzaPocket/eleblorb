@@ -552,6 +552,10 @@ concept.
   - the shifting hat as a shared item and as the Ground suit's helm, switching
     to the helmet with `DirtbikeMode` (visor cut by Boolean subtraction, as the
     Space Helm);
+  - gate the dirt bike's full power on the hat (worn or bound to a blorb) in
+    the shared `DirtbikeMode`, once what stays available without it is
+    decided; give the hat at the demo world's Ground portal so the demo keeps
+    full power;
   - any riding through one shared `TraversalMode` for every character;
   - the inn's fixture from `earth_closet` to `porcelain`;
   - the desert planting and wind-blown tumbleweeds.
