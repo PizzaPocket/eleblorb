@@ -217,8 +217,10 @@ sleeveless or short sleeves, some cropped tops, and shells or sea flowers in
 women's hair.
 
 - **Environment:** underwater: no woven cloth; scale clothing grown and fitted.
-  In air halls the legs appear, clad in a scale wrap continuing the tail's
-  colour, so a person's tail colour carries onto their legs.
+  The tail emerges seamlessly from the hips, and the hips share the tail's
+  colour and material. In air halls the hips, legs and feet all take that same
+  tail material, so a person's tail colour carries onto their whole lower
+  body.
 - **Sources:** Minoan dress in outline only: fitted, belted waists, short
   sleeves; nothing copied from sacred imagery.
 - **Skin and hair:** teal skin in a narrow family of greener and bluer tones;
@@ -287,6 +289,16 @@ Demon King sowed the discord.
   needs the same kind of query from the liquid system: inside the hall's air,
   a body is out of the water, stops swimming, breathes and walks. The moon pool
   surface is an ordinary water surface with swim exits.
-- **Legs for sea folk.** Merfolk currently have no hip segment and no legs. The
-  rig needs a legged variant and a transition at the pool edge. Use the
-  `figure-rig` skill.
+- **New sea folk tail (user direction).** Replace the segmented `AquaticTail`
+  on the sea folk with the same design as the player's mermaid tail
+  (`blorb_suit.gd`, `MERMAID_TAIL_*`, `build_mermaid_tail_mesh()`, worn when two
+  Water leg blorbs swim under the Nautilus Crown), but sized differently: it
+  starts at the width of the hips rather than wide enough to enclose two legs,
+  and emerges from the hips seamlessly. The hips use the tail's colour and
+  material.
+- **Legged form.** When a sea person shifts to legs in an air hall, the full
+  hips, leg segments and feet are the exact same colour and material as their
+  tail. The rig needs a legged variant and a transition at the pool edge. Use
+  the `figure-rig` skill.
+- **Fish Goblins keep the segmented tail.** Its lobster-like look is
+  deliberately unsettling and stays theirs alone.

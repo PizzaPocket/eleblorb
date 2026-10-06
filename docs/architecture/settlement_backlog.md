@@ -281,6 +281,10 @@ Planning priorities:
   zonation under north-east trade winds, canoe plants around Kai Mālie, natives
   in the wild, one character per islet, and the new plant builders it needs.
 - Decide how tournament fights work.
+- Replace the sea folk's segmented `AquaticTail` with the player mermaid tail's
+  design, sized to start at the hips and emerge from them seamlessly, hips in
+  the tail's material; in the legged form, hips, legs and feet all in that same
+  material. Fish Goblins keep the segmented tail.
 - Shared systems: generalise `ChineseLexicon` into a lexicon per language for
   Hawaiian dialogue; let air halls and glass tunnels answer the liquid system
   as dry volumes, reusing the `pressurized_volumes` approach; add a legged sea-folk rig.
