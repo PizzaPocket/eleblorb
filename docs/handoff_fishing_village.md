@@ -1,8 +1,9 @@
 # Handoff: Crossroads Fishing Village
 
-Status: design brief approved 2026-10-06. No construction has begun and the
-`FishingVillagePlan` layout is not yet authored. Read
-`docs/architecture/fishing_village.md` first.
+Status: design brief approved 2026-10-06; dimensioned civic layout in review
+(`docs/architecture/fishing_village_layout.md`). No construction has begun and
+`FishingVillagePlan` is not yet authored. Read
+`docs/architecture/fishing_village.md`, then the layout plan.
 
 The population is now fixed at fifteen named residents in five households. Do
 not generate filler NPCs. The complete census, relationships, buildings, boats
@@ -38,10 +39,24 @@ story brief remains in `docs/handoff_chinese_village.md`.
   elevation from the shared water level and swim pose, not a copied absolute Y
   coordinate, and validate the route with the human, Blorbus and Xiao Hou Zi.
 
+## Survey findings (2026-10-06)
+
+- The present village stands over the deepest water in the basin: 135 m below
+  the surface, about 205 m from wading depth on the west shore. Piles there are
+  implausible, so the layout adds Anvil Rock and Heron Rock with submerged
+  shoulder shelves 2.5 to 4 m deep, and only those shelves take piles.
+- No limestone islets exist in the terrain yet. Adding them is the first
+  implementation step.
+- The world had no prevailing wind; the layout sets a west breeze off the
+  plateau so smoke and drying sit downwind on the east edge.
+- The current swim ramps use a copied 1.45 m submerged base; the layout gives
+  the derived formula instead.
+
 ## First implementation task
 
-Do not start by replacing huts. First survey the lake basin and produce an
-authored `FishingVillagePlan` containing:
+After the layout is approved, do not start by replacing huts. Add the islets
+and shelves to the terrain, then author `FishingVillagePlan` from the layout
+plan, containing:
 
 1. fixed and floating structure footprints;
 2. public loop, household spurs, work spurs and gangways;

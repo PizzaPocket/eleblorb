@@ -86,8 +86,9 @@ follow climate and work rather than filling empty space.
 
 ## 3. Crossroads Fishing Village
 
-Status: design brief and fifteen-person census approved (2026-10-06); layout
-not yet authored, and no construction has begun. The current implementation is
+Status: design brief and fifteen-person census approved (2026-10-06);
+dimensioned civic layout in review (`docs/architecture/fishing_village_layout.md`).
+No construction has begun. The current implementation is
 a dock strip with seven generic huts, six decorative boats and one merchant.
 The approved direction is an original, cosmopolitan lake community whose
 primary built precedent is the working fishbone layout of George Town's Clan
@@ -108,9 +109,10 @@ Settled:
 
 Next work:
 
-- Survey the lake basin, portal return clearance and terrain collision; place
-  the sheltered crescent and the two limestone islets with their submerged
-  shoulders.
+- Review and approve the layout plan: Anvil Rock and Heron Rock, their shelves,
+  footprints, routes, boat lanes, berths, swim exits and the portal's move to
+  Heron Rock.
+- Add the islets and shelves to the lake terrain.
 - Author `FishingVillagePlan` as the only source for structures, the public
   jetty spine and return route, household and work spurs, gangways, boat lanes
   and berths, swim exits, trade and schedules.
@@ -124,6 +126,9 @@ Open:
 
 - Whether working boats become rideable in this pass or remain scheduled
   environmental traffic until vehicle boarding is generalized.
+- How the player reaches the village: today a 205 m swim from the west shore.
+  Options are swimming only, a west-shore landing with Ivo's ferry, or a long
+  public jetty from the shore.
 
 ## 4. Fire Kingdom Caldera City
 

@@ -1,8 +1,9 @@
 # Crossroads Fishing Village
 
 Status: design brief approved (2026-10-06). The fifteen-person census, the
-steep limestone islet setting and ordinary cultivated pearls are settled; the
-`FishingVillagePlan` layout has not yet been authored. This is the next
+steep limestone islet setting and ordinary cultivated pearls are settled. The
+dimensioned civic layout is in review in `fishing_village_layout.md`; the
+`FishingVillagePlan` data has not yet been authored. This is the next
 settlement planning pass after the remaining Snow Village visual and walked
 checks. Chinese Village implementation is held until this pass has an approved
 plan.
