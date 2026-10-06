@@ -69,7 +69,7 @@ is these mongooses too.
 
 ### The band (proposed 2026-10-06)
 
-One band of twelve: ten adults and two pups. As with real mongooses, they
+One band of ten: eight adults and two pups. As with real mongooses, they
 sleep together in one den and act as one crowd. They have only short names for
 one another, simple sounds rather than words from any human language.
 
@@ -81,10 +81,8 @@ one another, simple sounds rather than words from any human language.
 | **Sorrel** | man | drags the cage gate shut behind each fighter and wedges it |
 | **Pell** | man | the lookout on the crest at dawn: the first to see someone coming, and to screech it |
 | **Quill** | woman | hoards the things taken from beaten fighters on the trophy heap by the gate |
-| **Tolle** | man | a brawler, always first into a scuffle in the stands |
 | **Dask** | man | lashes more wreckage onto the cage whenever it sags |
 | **Lune** | woman | climbs the cage's net roof during fights to scream down at the fighters |
-| **Mabby** | woman | guards the food and bites anyone who reaches for it first |
 | **Nib** | girl | pup; play-fights everything, shadowed by Kett |
 | **Tuck** | boy | pup; copies the chant badly, shadowed by Pell |
 
@@ -97,7 +95,7 @@ one another, simple sounds rather than words from any human language.
 - **The day:** sunning on the eastern ledges at dawn while Pell watches from
   the crest; squabbling and foraging through the morning. When anyone lands,
   the whole band piles into the stands and the chant begins.
-- **The night:** all twelve heaped together in their den.
+- **The night:** all ten heaped together in their den.
 - **Fights:** they do not referee. They want a fighter to fight, and they
   howl down anyone who will not.
 
@@ -247,7 +245,7 @@ and built the cage; base beasts of low intelligence; the leader, a male, in a Ha
 shirt probably taken from Kai Mālie, the rest in simple grass and leaves; out
 of harmony with their place, and able to find peace if things change.
 
-**Proposed (culture):** the band of twelve, the den, the trophy heap, the
+**Proposed (culture):** the band of ten (eight adults, two pups), the den, the trophy heap, the
 howling rock, the crude cage, the look, and the quiet state after harmony.
 
 **Open:** what change brings them into harmony; what happens when the hero

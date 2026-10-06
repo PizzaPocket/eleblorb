@@ -316,7 +316,7 @@ Planning priorities:
   and crews; Kai Mālie's community, ahupuaʻa plan and charter, with every
   resident speaking Hawaiian; the cage island and its short tournament (its inhabitants are tall
   anthropomorphic mongooses, decided 2026-10-06; savage, low-intelligence beasts out of harmony with their
-  place; band of twelve proposed in `ocean_cage_island.md` section 3).
+  place; band of ten proposed in `ocean_cage_island.md` section 3).
 - Design the discord the Demon King has sown between the communities and how
   the hero restores harmony.
 - Review Kai Mālie's layout (`docs/architecture/ocean_island_village_layout.md`).
