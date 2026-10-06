@@ -288,7 +288,10 @@ Demon King sowed the discord.
   `contains_breathable_point()`, which `AtmosphereLayer` consults. An air hall
   needs the same kind of query from the liquid system: inside the hall's air,
   a body is out of the water, stops swimming, breathes and walks. The moon pool
-  surface is an ordinary water surface with swim exits.
+  surface is an ordinary water surface with swim exits. The same shared
+  **dry volume** system the pirate ships need below their waterline does this
+  (`ocean_pirate_ships_design.md`, section 6): no liquid inside, and no
+  underwater fog or tint while the camera is inside.
 - **New sea folk tail (user direction).** Replace the segmented `AquaticTail`
   on the sea folk with the same design as the player's mermaid tail
   (`blorb_suit.gd`, `MERMAID_TAIL_*`, `build_mermaid_tail_mesh()`, worn when two

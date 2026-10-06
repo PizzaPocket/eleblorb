@@ -273,7 +273,15 @@ Planning priorities:
   turned to face arrivals, the rings and Ring Current, three air halls, two glass
   tunnels, light pipes, and the existing inn rebuilt as Isaro's guest hall at
   25 Tokoins.
-- Build the missing second ship and the ships' priority interiors.
+- Review the ship design (`docs/architecture/ocean_pirate_ships_design.md`):
+  the *Harbinger* as a sloop-of-war and the *Belle Fortune* as a Dutch fluyt,
+  enlarged with decks and rooms for twelve crew each and companion ramps.
+- Build a shared **dry volume** system before any hull or air hall: interiors
+  register oriented boxes; `LiquidEnvironment` reports no liquid inside them;
+  the ocean surface shader discards fragments inside them; the underwater view
+  does not switch on inside them. It serves the ships below the waterline and
+  the sea folk's air halls and tunnels.
+- Then build the second ship and the ships' interiors.
 - The main island becomes an old, eroded 28 m volcano with a windward valley
   holding the taro terraces; the cage island becomes a young crescent crater
   whose rim forms the stands. Review both in the layout and cage briefs.

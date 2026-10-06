@@ -65,12 +65,13 @@ buccaneer crew. Where they sail from is not a story question; they are pirates.
   voted Souci captain and can vote him out; a quartermaster elected
   separately holds real power; shares are equal and written down. Loud,
   generous, quarrelsome, superstitious.
-- **The ship:** a captured merchant galleon: broad and round-bellied, with a
-  tall stepped sterncastle of several cabins, gun ports cut in later and
+- **The ship:** a captured Dutch merchant fluyt: broad and round-bellied, its
+  sides curving in to a narrow deck, with a tall stepped sterncastle of several
+  cabins, gun ports cut in later and
   unevenly, mismatched patched sails, colourful repairs, cargo lashed
   everywhere.
 - **Hat:** the tricorn, of the older golden age of piracy.
-- **Crew of eight:** Capitaine **Lucien Souci**; quartermaster **Bastien
+- **Original crew of eight** (now twelve; see `ocean_pirate_ships_design.md`): Capitaine **Lucien Souci**; quartermaster **Bastien
   Roux**; boatswain **Yaw Mensah**; navigator **Anneke Vos**, who is Dutch;
   cook **Teo Abad**, a Spanish deserter; gunner **Bridget Nolan**, who is
   Irish; sailmaker **Sami Haddad**; and cabin hand **Moineau** ("sparrow"), the
@@ -123,6 +124,10 @@ only go to men (fixing the current bug).
 | Pip Salt | boy | ship's boy; small; short sleeves; no beard |
 | Rook Gale | man | gunner; stubble; short sleeves; powder-blackened |
 | Ada Shoal | woman | surgeon; navy long sleeves; bun; no stubble |
+| Silas Thorne | man | boatswain; full beard; short sleeves; a silver call on a cord |
+| Eben Marsh | man | cook; apron over navy; stubble |
+| Hester Lane | woman | sailmaker; long sleeves; palm and needle; hair under a cap |
+| Josiah Penn | man | coxswain; short sleeves; tarred hat |
 
 ### The *Belle Fortune*: buccaneer motley
 
@@ -143,25 +148,18 @@ only go to men (fixing the current bug).
 | Bridget Nolan | woman | gunner; red hair; sleeveless; powder-stained |
 | Sami Haddad | man | sailmaker; olive-brown skin; stubble; needles in his sash |
 | Moineau | boy | cabin hand; small; oversized shirt; bare feet |
+| Gaspard Ferrand | man | carpenter; sleeveless; blue sash; tool belt |
+| Henri Dufour | man | surgeon; long sleeves; spectacles; black sash |
+| Inês Prado | woman | lookout; sleeveless; yellow headscarf; spyglass |
+| Jacob de Wit | man | able seaman; fair; cropped trousers; orange sash |
 
 ## 3. Ships as architecture
 
-Each ship is a building that moves. Their interiors should be enterable so the
-crews have somewhere to live:
-
-| Space | *Harbinger* (frigate) | *Belle Fortune* (galleon) |
-|---|---|---|
-| Upper deck | flush, clear, orderly | cluttered with lashed cargo |
-| Aft | quarterdeck and wheel | stepped sterncastle, wheel on the top tier |
-| Captain's cabin | great cabin behind the stern gallery: chart table, logbook | a cabin shared by vote for meetings and dice |
-| Crew | hammocks slung in rows on the gun deck | hammocks wherever there is room |
-| Galley | a proper stove forward | Teo's galley, the warmest place aboard |
-| Hold | stores in order | plunder in heaps |
-
-Movement constraints: both hulls stay `AnimatableBody3D` moving platforms;
-stairs, ladders and hatches must carry a standing body; interiors need 2.0 m
-headroom on decks the hero walks; the captain's cabin and galley are the
-priority interiors.
+Designed in `ocean_pirate_ships_design.md`: the *Harbinger* as a ship-rigged
+British sloop-of-war and the *Belle Fortune* as a captured Dutch fluyt, each
+enlarged to game scale with decks, rooms and programs for a crew of twelve,
+companion ramps between decks, and a shared "dry volume" system so the decks
+below the waterline stay dry.
 
 ## Known issue in the current crew
 
@@ -177,7 +175,7 @@ are rebuilt: set each crew member's gender explicitly and gate beards on it
 the two captains' beards, hooks and hats; Captain Brine and his named crew.
 
 **Proposed:** the two origins (a lost navy's privateer frigate and a captured
-merchant galleon run by elected articles); ship names; Souci and his crew;
+merchant fluyt run by elected articles); ship names; Souci and his crew;
 crew roles; enterable interiors.
 
 **Settled:** the *Harbinger* is British and the *Belle Fortune* French; where

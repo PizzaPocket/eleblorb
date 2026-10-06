@@ -66,4 +66,6 @@ kingdom's story, as it is in the Sky Kingdom.
 6. Planting: `ocean_landscape.md` replaces the random island scatter with
    Hawaiian zonation, per-islet characters and tended settlement planting.
 7. The shared systems each needs: the generalised lexicon for Hawaiian, air
-   halls in the liquid system, and a legged sea-folk rig.
+   halls in the liquid system, and a legged sea-folk rig. The air halls, glass
+   tunnels and the ships' decks below the waterline all need one shared dry
+   volume system (see `ocean_pirate_ships_design.md`, section 6).
