@@ -18,7 +18,19 @@ extends RefCounted
 const TIMBER := Color(0.55, 0.40, 0.26)
 const TIMBER_PALE := Color(0.66, 0.52, 0.36)
 const TIMBER_DARK := Color(0.33, 0.22, 0.14)
-const PLANK := Color(0.50, 0.36, 0.22)
+## House floors: indoor boards, out of the sun, a warm mid brown.
+const PLANK := Color(0.58, 0.43, 0.29)
+## Open decks: tropical hardwood (chengal, belian) bleached by sun and water to
+## a silvery grey-brown on top. Only wet timber (piles, beam undersides) stays
+## dark. Each plank varies a little toward silver or warmer brown.
+const DECK := Color(0.60, 0.53, 0.43)
+const DECK_SILVER := Color(0.66, 0.65, 0.60)
+const DECK_WARM := Color(0.55, 0.42, 0.30)
+const PLANK_WIDTH := 0.2
+const PLANK_GAP := 0.015
+const PLANK_THICKNESS := 0.05
+## Longest plank; wider decks are planked in staggered lengths over joists.
+const PLANK_MAX := 3.2
 const SHINGLE := Color(0.47, 0.39, 0.31)
 const ROPE := Color(0.72, 0.62, 0.42)
 
@@ -196,10 +208,96 @@ static func beam(body: StaticBody3D, a: Vector2, b: Vector2, y: float, half_sect
 	CollisionPolicy.mark_decorative(mesh)
 
 
-## A plank floor: a plain slab filling to the walls (a rounded slab would leave
-## open corners), top at `top_y`.
+## A plank floor, top at `top_y`: planks over joists, with one smooth collider
+## for the whole floor so nothing snags on a plank edge. Planks run across the
+## rect's longer side (laid across the way people walk along it).
 static func floor_slab(body: StaticBody3D, rect: Rect2, top_y: float, color: Color = PLANK) -> void:
-	slab(body, rect, top_y - FLOOR_THICKNESS * 0.5, FLOOR_THICKNESS, color, true)
+	var centre := rect.get_center()
+	var along_x := rect.size.x >= rect.size.y
+	var basis := Basis() if not along_x else Basis(Vector3.UP, PI * 0.5)
+	var across := rect.size.y if along_x else rect.size.x
+	var along := rect.size.x if along_x else rect.size.y
+	var planks := plank_surface(body, Transform3D(basis, Vector3(centre.x, top_y, centre.y)), across, along, color)
+	CollisionPolicy.add_box(body, planks, Vector3(rect.size.x, FLOOR_THICKNESS, rect.size.y), Vector3(centre.x, top_y - FLOOR_THICKNESS * 0.5, centre.y), Basis(), true)
+	# The joists' dark line under the planks, seen through the gaps and at the
+	# deck's edge.
+	var under := MeshInstance3D.new()
+	var box := BoxMesh.new()
+	box.size = Vector3(rect.size.x - 0.04, FLOOR_THICKNESS - PLANK_THICKNESS, rect.size.y - 0.04)
+	under.mesh = box
+	under.material_override = SolidModel.material(TIMBER_DARK.darkened(0.3), 0.9, 0.0)
+	under.position = Vector3(centre.x, top_y - PLANK_THICKNESS - box.size.y * 0.5 - 0.01, centre.y)
+	body.add_child(under)
+	CollisionPolicy.mark_decorative(under)
+
+
+## Planks covering an `across` x `along` area in `parent`'s frame at `xform`
+## (local x across the planks' length, local z along the run, the planks' top at
+## local y 0). Squarish SuperEgg boards, gapped, in staggered lengths, each a
+## little different in tone, drawn as one MultiMesh. Visual only: the caller
+## pairs it with the collider (CollisionPolicy).
+static func plank_surface(parent: Node3D, xform: Transform3D, across: float, along: float, color: Color = DECK) -> MultiMeshInstance3D:
+	var pitch := PLANK_WIDTH + PLANK_GAP
+	var rows := maxi(int(round(along / pitch)), 1)
+	var row_pitch := along / float(rows)
+	var transforms: Array[Transform3D] = []
+	var tones: Array[Color] = []
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(Vector3(xform.origin.x, xform.origin.z, across * 31.0 + along))
+	for row in rows:
+		var z := -along * 0.5 + (float(row) + 0.5) * row_pitch
+		# Joints fall on joist lines, staggered row to row.
+		var cuts: Array[float] = [-across * 0.5]
+		if across > PLANK_MAX:
+			var x := -across * 0.5 + PLANK_MAX * (0.34 + 0.33 * float(row % 3))
+			while x < across * 0.5 - 0.4:
+				cuts.append(x)
+				x += PLANK_MAX
+		cuts.append(across * 0.5)
+		for i in cuts.size() - 1:
+			var length := cuts[i + 1] - cuts[i] - PLANK_GAP
+			var centre := (cuts[i] + cuts[i + 1]) * 0.5
+			var basis := Basis().scaled(Vector3(length, 1.0, 1.0))
+			transforms.append(xform * Transform3D(basis, Vector3(centre, -PLANK_THICKNESS * 0.5, z)))
+			var tone := color.lerp(DECK_SILVER if rng.randf() < 0.5 else DECK_WARM, rng.randf_range(0.0, 0.45))
+			if rng.randf() < 0.04:
+				tone = tone.lightened(0.18)
+			tones.append(tone.darkened(rng.randf_range(0.0, 0.06)))
+	var multi := MultiMesh.new()
+	multi.transform_format = MultiMesh.TRANSFORM_3D
+	multi.use_colors = true
+	multi.mesh = _plank_mesh()
+	multi.instance_count = transforms.size()
+	for i in transforms.size():
+		multi.set_instance_transform(i, transforms[i])
+		multi.set_instance_color(i, tones[i])
+	var instance := MultiMeshInstance3D.new()
+	instance.name = "Planks"
+	instance.multimesh = multi
+	var material := StandardMaterial3D.new()
+	material.vertex_color_use_as_albedo = true
+	# Instance colours are authored in sRGB like every other colour here.
+	material.vertex_color_is_srgb = true
+	material.roughness = 0.88
+	instance.material_override = material
+	parent.add_child(instance)
+	return instance
+
+
+static var _plank_mesh_cache: Mesh
+
+
+## One plank, a metre long (scaled to length), squarish SuperEgg. The plan
+## outline shares the profile's exponent, and at EPSILON_FLAT a long thin plank
+## tapers over its last 20 cm into a lozenge; at 14 the end rounds over a few
+## centimetres, a board with softened edges.
+const PLANK_EPSILON := 14.0
+
+
+static func _plank_mesh() -> Mesh:
+	if _plank_mesh_cache == null:
+		_plank_mesh_cache = SuperEgg.build_mesh(Vector3(0.5, PLANK_THICKNESS * 0.5, PLANK_WIDTH * 0.5), PLANK_EPSILON, PLANK_EPSILON)
+	return _plank_mesh_cache
 
 
 ## A flat plank ceiling at the ring beam: the roof space above is vented at the
@@ -233,6 +331,7 @@ static func piles(body: StaticBody3D, rows: Array, top_y: float, shelf_y: float)
 			var half := Vector3(PILE_HALF, (top_y - shelf_y) * 0.5, PILE_HALF)
 			var mesh := SuperEgg.build_part(half, TIMBER_DARK.darkened(0.15), TownProps.POST_EPSILON, TownProps.POST_EPSILON)
 			mesh.position = Vector3(p.x, (top_y + shelf_y) * 0.5, p.y)
+			mesh.set_meta("pile", true)
 			body.add_child(mesh)
 			CollisionPolicy.add_box(body, mesh, half * 2.0, mesh.position, Basis(), false)
 			var cap := SuperEgg.build_part(Vector3(PILE_HALF + 0.04, 0.05, PILE_HALF + 0.04), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
@@ -280,17 +379,68 @@ static func rail(body: StaticBody3D, a: Vector2, b: Vector2, floor_y: float) -> 
 	CollisionPolicy.mark_decorative(mid_rail)
 
 
-## A broad timber ramp from `low` (at `low_y`) up to `high` (at `high_y`),
-## `width` across: the threshold from a deck up to a house floor. Its own body,
-## built with the shared ramp so the top face is flush at both ends.
-static func ramp(body: StaticBody3D, low: Vector2, high: Vector2, low_y: float, high_y: float, width: float) -> void:
+## A broad planked ramp from `low` (at `low_y`) up to `high` (at `high_y`),
+## `width` across: the threshold from a deck up to a house floor, a slipway, a
+## swim exit. Planks laid across the slope on two stringers, with one sloped
+## collider whose top face is flush with the planks at both ends. Its own body.
+static func ramp(body: StaticBody3D, low: Vector2, high: Vector2, low_y: float, high_y: float, width: float, color: Color = DECK) -> StaticBody3D:
 	var run := low.distance_to(high)
-	var ramp_body := TownProps.build_ramp(width, run, high_y - low_y, PLANK.lightened(0.05))
-	ramp_body.name = "ThresholdRamp"
+	var rise := high_y - low_y
+	var slope := sqrt(run * run + rise * rise)
 	var dir := (high - low) / run
-	ramp_body.position = Vector3(low.x, low_y, low.y)
-	ramp_body.rotation.y = atan2(dir.x, dir.y)
+	var basis := Basis(Vector3.UP, atan2(dir.x, dir.y)) * Basis(Vector3.RIGHT, -atan2(rise, run))
+	var mid := Vector3((low.x + high.x) * 0.5, (low_y + high_y) * 0.5, (low.y + high.y) * 0.5)
+	var ramp_body := StaticBody3D.new()
+	ramp_body.name = "Ramp"
+	ramp_body.collision_layer = 1 | TownProps.BLORB_CLIMBABLE_LAYER
+	ramp_body.collision_mask = 0
 	body.add_child(ramp_body)
+	var planks := plank_surface(ramp_body, Transform3D(basis, mid), width, slope, color)
+	CollisionPolicy.add_box(ramp_body, planks, Vector3(width, 0.3, slope), mid - basis.y * 0.15, basis, true)
+	for side: float in [-1.0, 1.0]:
+		var stringer := SuperEgg.build_part(Vector3(0.07, 0.11, slope * 0.5), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		stringer.transform = Transform3D(basis, mid + basis * Vector3(side * (width * 0.5 - 0.25), -PLANK_THICKNESS - 0.11, 0.0))
+		ramp_body.add_child(stringer)
+		CollisionPolicy.mark_decorative(stringer)
+	return ramp_body
+
+
+## Handrails along both sides of a ramp's upper part, the part that stands
+## above the water (swim exits keep their lower ends open for climbing out).
+static func ramp_rails(body: StaticBody3D, low: Vector2, high: Vector2, low_y: float, high_y: float, width: float) -> void:
+	var start := clampf(-low_y / maxf(high_y - low_y, 0.01), 0.0, 1.0)
+	for side: float in [-1.0, 1.0]:
+		var offset := Vector2(-(high - low).normalized().y, (high - low).normalized().x) * side * (width * 0.5 - 0.06)
+		var a := low.lerp(high, start) + offset
+		var b := high + offset
+		var ya := lerpf(low_y, high_y, start)
+		var count := 3
+		for i in count + 1:
+			var t := float(i) / float(count)
+			var p := a.lerp(b, t)
+			var y := lerpf(ya, high_y, t)
+			var baluster := SuperEgg.build_part(Vector3(0.035, RAIL_HEIGHT * 0.5, 0.035), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+			baluster.position = Vector3(p.x, y + RAIL_HEIGHT * 0.5, p.y)
+			body.add_child(baluster)
+			CollisionPolicy.mark_decorative(baluster)
+		var from := Vector3(a.x, ya + RAIL_HEIGHT, a.y)
+		var to := Vector3(b.x, high_y + RAIL_HEIGHT, b.y)
+		var along := (to - from).normalized()
+		var rail_mesh := SuperEgg.build_part(Vector3(0.04, 0.04, from.distance_to(to) * 0.5), TIMBER, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		# Its long axis (local z) along the rail.
+		rail_mesh.transform = Transform3D(Basis.looking_at(-along, Vector3.UP), (from + to) * 0.5)
+		body.add_child(rail_mesh)
+		CollisionPolicy.mark_decorative(rail_mesh)
+
+
+## A junction lamp: a rope-bound post with a bracket arm toward `arm`, and an
+## oil lamp hung from the arm (the charter's "lamps hang under eaves and from
+## junction posts"; no lights on poles).
+static func lamp_post(body: StaticBody3D, at: Vector2, floor_y: float, arm: Vector2) -> void:
+	post(body, at, floor_y - FLOOR_THICKNESS, floor_y + 2.7, TIMBER, true)
+	var tip := at + arm.normalized() * 0.65
+	beam(body, at, tip, floor_y + 2.55, Vector2(0.05, 0.06), TIMBER_DARK)
+	Furnishings.hanging_lamp(body, Vector3(tip.x, floor_y + 2.05, tip.y), 0.9, 7.0)
 
 
 ## A glazed rain jar under a downpipe: every roof drains somewhere.

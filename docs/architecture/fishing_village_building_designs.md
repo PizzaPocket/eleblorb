@@ -169,6 +169,15 @@ drawings; the revisions below are what was built, and why.
 - **Roof.** Gable, ridge east to west, the only gable on the west side.
 - **Colour.** Natural timber, sawdust on the deck.
 
+- **Built (2026-10-07)** in `FishingBuildings.boatwright_slip()`. The brief's
+  slip ran 12 m west out of a footprint that ends at `x -46`, and gave no way to
+  it. As built: the tool shelter `x -46..-40, z -22..-18` under a gable, open
+  south and west, no post in its 6 m front opening; a work apron
+  `x -42..-40, z -18..-12` joined to the arrival landing by a 1 m bridge; the
+  slipway, 4 m wide, from the apron's edge at deck height down 6 m into the slip
+  lane on rollers, where the repair boat is hauled up. The north row of piles
+  stands just inside the shelf's edge at `z -22`.
+
 ### 4.4 Sen house, clinic and school room (Asha, Rian)
 
 **Redrawn (2026-10-06).** The first brief failed its own plan in two ways:
@@ -253,6 +262,11 @@ and the family's rooms at the back.
   lines to the spine's south piles; a gangway from the spine at `(-15, -5..-3)`.
 - **Facing.** Open to the south (light for fine work and the water court).
 - **Roof.** Pent, 16 degrees, falling south. Colour violet and cream.
+
+- **Built (2026-10-07)** in `FishingBuildings.shell_barge()`. Until now the
+  plan's gangway led to nothing: the builder had no case for a `barge`. The
+  lean-to over the north half rises to 2.9 m so its south eave still clears
+  2.0 m; the bench breaks where the gangway lands.
 
 ### 4.6 Cistern house and shared stores (village; Leena keeps the stores)
 
@@ -387,6 +401,15 @@ and the family's rooms at the back.
 - **Berth.** The working boat's berth east of the deck on the working-boat lane.
 - **Colour.** Natural timber, smoke-darkened.
 
+- **Built (2026-10-07)** in `FishingBuildings.catch_deck()`. Heron Rock's face
+  stands at about `x 35.5`, just clear of the deck. The catch gangway lands at the
+  north-west corner, so the slatted drying shelter takes the north-east
+  (`x 39..44, z 2..7`), its screens on the north and east, open to the deck; the
+  sorting table and rinse trough stand at the working boat's berth on the east
+  edge; the smokehouse (`x 41..44, z 11..14`), a closed hut of smoke-dark boards
+  with its door to the west, holds the stone hearth under a short flue and the
+  board with the recipe cut in symbols.
+
 ### 4.13 Mor guest houseboat (Leena, Ivo, Sela)
 
 - **Plan.** A floating hull 18 x 7 m at `x -26..-8, z 8..15`, deck W + 0.35. From
@@ -426,6 +449,13 @@ and the family's rooms at the back.
 - **Plan.** `x 18..24, z -3..3`, 6 x 6 m, where the spine ends and the gangway to
   the Vale houseboat and the spur to the portal leave. A bench, a mooring post
   and Jori's first-watch lamp.
+
+- **Landings dressed (2026-10-07)** by `FishingBuildings.dress()` on the plan's
+  decks. The arrival market shelter is narrowed to `x -39.6..-34.6` so it neither
+  blocks the slip's bridge nor the Venn shop frontage. Lights everywhere are oil
+  lamps on rope-bound junction posts (`StiltKit.lamp_post`), five along the spine
+  at the spur junctions; the earlier post lanterns were "lights on poles", which
+  the charter excludes.
 
 ### 4.17 Swim exits (three)
 

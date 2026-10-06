@@ -77,10 +77,9 @@ func _audit(body: StaticBody3D, anchor: Vector2) -> void:
 	var piles := 0
 	for node in body.find_children("*", "MeshInstance3D", true, false):
 		var mesh := node as MeshInstance3D
-		# Piles are the only parts reaching below the shelf top.
-		if mesh.position.y < -1.0 and mesh.get_parent() == body:
+		if mesh.get_meta("pile", false):
 			piles += 1
-			var plan := anchor + Vector2(mesh.position.x, mesh.position.z)
+			var plan := anchor + Vector2(mesh.global_position.x - body.global_position.x, mesh.global_position.z - body.global_position.z)
 			if FishingVillagePlan.shelf_distance(plan) > -0.2:
 				_fail("pile at plan (%.1f, %.1f) is not on a shelf" % [plan.x, plan.y])
 	print("ok   %s: %d piles, %d colliders" % [_building, piles, body.find_children("*", "CollisionShape3D", true, false).size()])

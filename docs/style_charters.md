@@ -79,6 +79,9 @@ Detail and per-building forms: `docs/architecture/fishing_village_buildings.md`.
   - Foundation: squarish timber piles 0.3 m with caps, braced in pairs, on the shelves only. Floating hulls are moored by lines to pile clusters, never to the lake bed.
   - Signature motif: **rope-bound posts at every threshold and work deck**, seen at least three times in the village.
   - Palette: natural timber and sun-faded shingle (60), household wall colour (30), accent shutters and ridge caps (10).
+  - Decks (2026-10-07): planks, never slabs. Squarish SuperEgg boards 0.2 m wide with 15 mm gaps, laid across the way of travel on joists, staggered joints on wide decks (`StiltKit.plank_surface`, one MultiMesh per deck, one smooth collider). Ramps, thresholds, swim exits and slipways are planked the same way on two stringers.
+  - Timber tones: open decks are tropical hardwood (chengal, belian) bleached by sun and water to a silvery grey-brown, each plank a little greyer or warmer, the odd replaced board paler; house floors a warmer mid brown out of the sun; only wet timber (piles, beam undersides) is dark. Not the near-black of creosoted or tarred timber.
+  - Lights: oil lamps hung from rope-bound junction posts with a bracket arm, and under eaves (`StiltKit.lamp_post`).
 - **Hierarchy.** Polite: the communal pavilion and the Mor guest houseboat (largest roofs, ridge vents, fascia carving). Vernacular: homes, work decks, sheds.
 - **Exclusions.** Sealed boxes; Peranakan shophouse facades; clan temples or sacred roofs; brick or masonry walls; lights on poles; uniform brown; plain unclipped roof slabs; SuperEgg props standing in for rock.
 - **Doors and openings face the route that serves them** (the layout's route ledger), the veranda faces the water court or landing, and service sides face outward.

@@ -17,7 +17,8 @@ const PILE_SPACING := 4.0
 const PILE_RADIUS := 0.17
 ## A pile's foot is driven this far into the shelf.
 const PILE_EMBED := 0.4
-const DECK_COLOR := Color(0.26, 0.16, 0.09)
+## Sun-bleached hardwood on top; only the wet piles stay dark (StiltKit.DECK).
+const DECK_COLOR := StiltKit.DECK
 const PILE_COLOR := Color(0.2, 0.12, 0.07)
 const HOUSE_HEIGHT := 3.0
 const ROOF_PITCH := deg_to_rad(22.0)
@@ -84,6 +85,10 @@ func _build_structure(structure: Dictionary) -> void:
 		"deck":
 			_deck(str(structure["name"]), rect, FishingVillagePlan.DECK_TOP, DECK_COLOR)
 			_queue_piles(rect)
+			if structure_name in FishingBuildings.DRESSED:
+				var dressing := FishingBuildings.dress(structure_name)
+				add_child(dressing)
+				dressing.global_position = _at(Vector2.ZERO, 0.0)
 		"house":
 			_deck(str(structure["name"]), rect, FishingVillagePlan.DECK_TOP, DECK_COLOR)
 			_house(str(structure["name"]), rect, FishingVillagePlan.DECK_TOP, wall)
@@ -105,17 +110,14 @@ func _build_structure(structure: Dictionary) -> void:
 			_mussel_lines(rect)
 
 
-## A slab of timber decking: SuperEgg, with a box collider through the shared
+## A deck of planks over joists, with one box collider through the shared
 ## collision policy. `top` is relative to the lake surface.
 func _deck(name_text: String, rect: Rect2, top: float, color: Color) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = name_text
 	add_child(body)
-	body.global_position = _at(rect.get_center(), top - DECK_THICKNESS * 0.5)
-	var size := Vector3(rect.size.x, DECK_THICKNESS, rect.size.y)
-	var visual := SuperEgg.build_part(size * 0.5, color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-	body.add_child(visual)
-	CollisionPolicy.add_box(body, visual, size)
+	body.global_position = _at(rect.get_center(), 0.0)
+	StiltKit.floor_slab(body, Rect2(-rect.size * 0.5, rect.size), top, color)
 	return body
 
 
@@ -183,7 +185,9 @@ func _houseboat(name_text: String, rect: Rect2, wall_color: Color) -> void:
 	var deck := _deck(name_text, rect, float_top, DECK_COLOR.lightened(0.04))
 	var hull_size := Vector3(rect.size.x + 0.6, 1.3, rect.size.y + 0.4)
 	var hull := SuperEgg.build_part(hull_size * 0.5, wall_color.darkened(0.35), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
-	hull.position.y = -float_top - 0.2 - DECK_THICKNESS * 0.5 + 0.1
+	# The deck body stands at the lake surface; the hull's centre sits 0.4 m
+	# below it, its top just under the planks.
+	hull.position.y = -DECK_THICKNESS - 0.1
 	deck.add_child(hull)
 	CollisionPolicy.add_box(deck, hull, hull_size, hull.position, Basis(), false)
 	# Cabin between the arrival deck at the west end and the cargo deck at the east.
@@ -337,14 +341,17 @@ func _build_route(route: Dictionary) -> void:
 			var rise: float = route["rise"]
 			pitch = atan2(rise, length)
 			top = FishingVillagePlan.DECK_TOP - rise * 0.5
-		body.global_position = _at(a.lerp(b, 0.5), top - DECK_THICKNESS * 0.5)
-		# A little longer than the segment so joints in a bend leave no gap.
-		var size := Vector3(width, DECK_THICKNESS, length + (0.0 if is_gangway else width * 0.5))
+		body.global_position = _at(a.lerp(b, 0.5), top)
+		# A little longer than the segment so joints in a bend leave no gap. Where
+		# planks overlap (a bend, a spur meeting the spine, a route running onto
+		# a landing) they sit a few millimetres apart so the overlap does not
+		# flicker: landings on top, then the spine, then every other route, and
+		# alternate segments of one route apart. Collision is not offset.
+		var run := length + (0.0 if is_gangway else width * 0.5)
 		var basis := Basis(Vector3.UP, yaw) * Basis(Vector3.RIGHT, pitch)
-		var visual := SuperEgg.build_part(size * 0.5, DECK_COLOR, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-		visual.basis = basis
-		body.add_child(visual)
-		CollisionPolicy.add_box(body, visual, size, Vector3.ZERO, basis)
+		var sink := (0.004 if route["class"] == "spine" else 0.009) + 0.002 * float(i % 2)
+		var planks := StiltKit.plank_surface(body, Transform3D(basis, Vector3(0.0, -sink, 0.0)), width, run, DECK_COLOR)
+		CollisionPolicy.add_box(body, planks, Vector3(width, DECK_THICKNESS, run), basis * Vector3(0.0, -DECK_THICKNESS * 0.5, 0.0), basis)
 		if not is_gangway:
 			_queue_route_piles(a, b, width)
 
@@ -353,16 +360,20 @@ func _build_swim_exits() -> void:
 	var head := 1.596
 	var lower := FishingVillagePlan.exit_lower_end(head)
 	var run := FishingVillagePlan.exit_run(head)
-	var rise := FishingVillagePlan.DECK_TOP - lower
+	var body := StaticBody3D.new()
+	body.name = "SwimExits"
+	add_child(body)
+	body.global_position = _at(Vector2.ZERO, 0.0)
 	for e in FishingVillagePlan.SWIM_EXITS:
 		var width: float = float(e["x1"]) - float(e["x0"])
-		var ramp := TownProps.build_ramp(width, run, rise, DECK_COLOR.lightened(0.08))
+		var x := (float(e["x0"]) + float(e["x1"])) * 0.5
+		# Planked, flush with the deck at its edge, its foot at the derived
+		# height a swimmer floats at, `run` out into the water.
+		var low := Vector2(x, float(e["edge_z"]) + run)
+		var high := Vector2(x, float(e["edge_z"]))
+		var ramp := StiltKit.ramp(body, low, high, lower, FishingVillagePlan.DECK_TOP, width)
 		ramp.name = str(e["name"])
-		add_child(ramp)
-		# The ramp's low end lies `run` south of the deck edge, its high end
-		# flush with the deck: turned half way round so it climbs northward.
-		ramp.global_position = _at(Vector2((float(e["x0"]) + float(e["x1"])) * 0.5, float(e["edge_z"]) + run), lower)
-		ramp.rotation.y = PI
+		StiltKit.ramp_rails(body, low, high, lower, FishingVillagePlan.DECK_TOP, width)
 
 
 # ---------------------------------------------------------------------------
@@ -441,27 +452,15 @@ func _build_piles() -> void:
 # Lights, boats and the shop
 # ---------------------------------------------------------------------------
 
-## Low village lanterns for night wayfinding along the jetty spine.
+## Lamps for night wayfinding, hung from rope-bound junction posts where the
+## spurs leave the spine (the charter allows no lights on poles).
 func _build_streetlights() -> void:
-	var spine: Array = []
-	for route in FishingVillagePlan.ROUTES:
-		if route["name"] == "JettySpine":
-			spine = route["points"]
-	var travelled := 0.0
-	var next_at := 6.0
-	for i in spine.size() - 1:
-		var a: Vector2 = spine[i]
-		var b: Vector2 = spine[i + 1]
-		var length := a.distance_to(b)
-		var along := (b - a) / length
-		var side := Vector2(-along.y, along.x) * 1.5
-		while next_at <= travelled + length:
-			var lantern := TownProps.build_lantern()
-			lantern.name = "FishingVillageStreetlight"
-			add_child(lantern)
-			lantern.global_position = _at(a + along * (next_at - travelled) + side, FishingVillagePlan.DECK_TOP)
-			next_at += 10.0
-		travelled += length
+	var body := StaticBody3D.new()
+	body.name = "JunctionLamps"
+	add_child(body)
+	body.global_position = _at(Vector2.ZERO, 0.0)
+	for lamp: Dictionary in FishingBuildings.JUNCTION_LAMPS:
+		StiltKit.lamp_post(body, lamp["at"], FishingVillagePlan.DECK_TOP, lamp["arm"])
 
 
 func _build_boats() -> void:

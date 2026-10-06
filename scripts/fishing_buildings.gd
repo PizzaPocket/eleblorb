@@ -10,7 +10,21 @@ extends RefCounted
 
 ## Buildings that have left the placeholder stage. FloatingVillage builds these
 ## instead of its owned placeholder boxes.
-const BUILT := ["VennHouse", "SenHouse", "CisternHouse", "NetShed", "Pavilion", "AranHouse"]
+const BUILT := ["VennHouse", "SenHouse", "CisternHouse", "NetShed", "Pavilion", "AranHouse", "BoatwrightSlip", "CatchDeck", "ShellBarge"]
+## Decks FloatingVillage builds from the plan that carry furnishings and
+## shelters from their briefs (`dress()`).
+const DRESSED := ["ArrivalLanding", "HeronLanding", "PortalLanding"]
+## Junction lamps along the jetty spine, at the spur junctions and landings,
+## each with the side its arm reaches over (plan coordinates).
+const JUNCTION_LAMPS: Array[Dictionary] = [
+	# Each stands 0.25 m inside the spine's north edge (its centre line runs
+	# through the plan points, 3.6 m wide), beside the spur it marks.
+	{"at": Vector2(-27.0, -7.6), "arm": Vector2(0, 1)},
+	{"at": Vector2(-16.7, -8.2), "arm": Vector2(0, 1)},
+	{"at": Vector2(-3.7, -8.95), "arm": Vector2(0, 1)},
+	{"at": Vector2(9.7, -8.8), "arm": Vector2(0, 1)},
+	{"at": Vector2(18.4, -2.6), "arm": Vector2(1, 1)},
+]
 
 const SHELF_Y := -3.2 - 0.4
 const HOUSE_FLOOR := FishingVillagePlan.HOUSE_FLOOR
@@ -31,6 +45,12 @@ static func build(name_text: String) -> StaticBody3D:
 			return pavilion()
 		"AranHouse":
 			return aran_house()
+		"BoatwrightSlip":
+			return boatwright_slip()
+		"CatchDeck":
+			return catch_deck()
+		"ShellBarge":
+			return shell_barge()
 	return null
 
 
@@ -49,6 +69,7 @@ static func anchor(name_text: String) -> Vector2:
 			return PAVILION_ORIGIN
 		"AranHouse":
 			return ARAN_ORIGIN
+	# Slip, catch deck and the dressing bodies are drawn in plan coordinates.
 	return Vector2.ZERO
 
 
@@ -315,7 +336,7 @@ const SEN_ORIGIN := Vector2(-15.5, -16.0)
 const SEN_HALF := Vector2(4.5, 4.0)
 const SEN_CORRIDOR := Vector2(-1.0, 0.4)
 const SEN_PORCH_Z := 6.0
-const SEN_SHUTTER := Color(0.90, 0.86, 0.74)
+const SEN_SHUTTER := Color(0.80, 0.73, 0.58)
 const SEN_PENT_AT_WALL := 2.75
 ## Door and window positions along the front, chosen so every frame clears its
 ## neighbour and the bay partitions (the brief's numbers did not; see 4.4).
@@ -785,7 +806,7 @@ static func net_shed() -> StaticBody3D:
 		rows.append(row)
 		StiltKit.beam(body, Vector2(-4.1, z), Vector2(4.1, z), f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH * 0.5, Vector2(0.11, StiltKit.BEAM_DEPTH * 0.5))
 	StiltKit.piles(body, rows, f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH, SHELF_Y)
-	StiltKit.floor_slab(body, Rect2(-4.0, -3.5, 8.0, 8.0), f)
+	StiltKit.floor_slab(body, Rect2(-4.0, -3.5, 8.0, 8.0), f, StiltKit.DECK)
 
 	# Frame. No post stands in the 6 m front opening where the spur arrives: a
 	# deeper front beam spans it. Tie beams on the bay lines carry the nets.
@@ -898,7 +919,7 @@ static func pavilion() -> StaticBody3D:
 		rows.append(row)
 		StiltKit.beam(body, Vector2(-6.1, z), Vector2(6.1, z), f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH * 0.5, Vector2(0.11, StiltKit.BEAM_DEPTH * 0.5))
 	StiltKit.piles(body, rows, f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH, SHELF_Y)
-	StiltKit.floor_slab(body, Rect2(-6.0, -4.0, 12.0, 8.0), f)
+	StiltKit.floor_slab(body, Rect2(-6.0, -4.0, 12.0, 8.0), f, StiltKit.DECK)
 
 	# Posts four bays by two; the centre row carries the ridge. The posts either
 	# side of the north and south ways are rope-bound.
@@ -1205,6 +1226,326 @@ static func _narrow_bed(body: StaticBody3D, at: Vector3, blanket: Color) -> void
 	Furnishings.piece(body, Vector3(0.98, 0.08, 0.44), TownProps.BED_MATTRESS_COLOR, at + Vector3(0, 0.46, 0), 0.0, false, SuperEgg.EPSILON_SOFT)
 	Furnishings.piece(body, Vector3(0.7, 0.05, 0.46), blanket, at + Vector3(-0.25, 0.53, 0), 0.0, false, SuperEgg.EPSILON_SOFT)
 	Furnishings.piece(body, Vector3(0.2, 0.07, 0.3), Color(0.92, 0.90, 0.84), at + Vector3(0.78, 0.56, 0), 0.0, false, SuperEgg.EPSILON_SOFT)
+
+
+# ---------------------------------------------------------------------------
+# 4.3 Boatwright slip (Mateo). Plan coordinates.
+# ---------------------------------------------------------------------------
+# Tool shelter x -46..-40, z -22..-18 under a gable, open south and west, its
+# timber racks on the boarded north wall. A work apron x -42..-40, z -18..-12
+# joins it to the arrival landing (a 1 m bridge over the gap at z -13..-12).
+# The slipway, 4 m wide (z -18..-14), runs west from the apron at deck height
+# down into the slip lane on rollers; the repair boat is hauled up on it.
+
+static func boatwright_slip() -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = "BoatwrightSlip"
+	var f := DECK_TOP
+	var plate := f + 3.0
+	var beam_y := f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH * 0.5
+	var rows: Array = []
+	# The shelf's edge is at z -22; the north row stands just inside it.
+	for z: float in [-21.7, -18.0]:
+		var row: Array[Vector2] = []
+		for x: float in [-45.7, -43.0, -40.3]:
+			row.append(Vector2(x, z))
+		rows.append(row)
+	for z: float in [-15.0, -12.3]:
+		var row: Array[Vector2] = []
+		for x: float in [-41.7, -40.3]:
+			row.append(Vector2(x, z))
+		rows.append(row)
+	for row: Array in rows:
+		StiltKit.beam(body, (row[0] as Vector2) - Vector2(0.2, 0), (row[row.size() - 1] as Vector2) + Vector2(0.2, 0), beam_y, Vector2(0.11, StiltKit.BEAM_DEPTH * 0.5))
+	StiltKit.piles(body, rows, f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH, SHELF_Y)
+	StiltKit.floor_slab(body, Rect2(-46.0, -22.0, 6.0, 4.0), f, StiltKit.DECK)
+	StiltKit.floor_slab(body, Rect2(-42.0, -18.0, 2.0, 6.0), f, StiltKit.DECK)
+
+	# Shelter: posts, the boarded north wall and east gable, gable roof.
+	# The south face is the shelter's opening: no middle post there, the
+	# front beam spans its 6 m.
+	for x: float in [-46.0, -43.0, -40.0]:
+		StiltKit.post(body, Vector2(x, -22.0), f - StiltKit.FLOOR_THICKNESS, plate)
+		if x != -43.0:
+			StiltKit.post(body, Vector2(x, -18.0), f - StiltKit.FLOOR_THICKNESS, plate, StiltKit.TIMBER, x > -41.0)
+	StiltKit.beam(body, Vector2(-46.0, -18.0), Vector2(-40.0, -18.0), plate - 0.15, Vector2(0.12, 0.15))
+	StiltKit.beam(body, Vector2(-46.0, -22.0), Vector2(-46.0, -18.0), plate - 0.1, Vector2(0.1, 0.1))
+	var no_openings: Array[Dictionary] = []
+	StiltKit.wall(body, Vector2(-46.0, -22.0), Vector2(-40.0, -22.0), Vector2(0, -1), f, 3.0, no_openings, StiltKit.TIMBER_PALE, StiltKit.TIMBER_DARK)
+	StiltKit.wall(body, Vector2(-40.0, -22.0), Vector2(-40.0, -18.0), Vector2(1, 0), f, 3.0, no_openings, StiltKit.TIMBER_PALE, StiltKit.TIMBER_DARK)
+	var roof := StaticBody3D.new()
+	roof.name = "SlipRoof"
+	roof.position = Vector3(-43.0, 0.0, -20.0)
+	body.add_child(roof)
+	var rise := tan(StiltRoofs.PITCH)
+	var peak := 2.0 * rise + StiltRoofs.PLATE - StiltRoofs.THICKNESS - 0.02
+	for x: float in [-3.0, 3.0]:
+		TownProps._build_panel_facade(roof, 4.0, Vector3(x, plate, 0.0), -PI * 0.5, StiltKit.TIMBER_PALE, [], plate, peak + 0.1, TownProps.WALL_THICKNESS, [{"a": peak, "b": rise}, {"a": peak, "b": -rise}])
+	StiltRoofs.gable(roof, Vector2(3.0, 2.0), plate, StiltKit.SHINGLE, StiltKit.TIMBER_DARK)
+
+	# The slipway: a timber ramp on rollers from the apron's edge down into the
+	# lane, and the bridge to the landing.
+	StiltKit.ramp(body, Vector2(-48.0, -16.0), Vector2(-42.0, -16.0), -1.5, f, 4.0)
+	for i in 5:
+		var x := -47.3 + 1.1 * float(i)
+		var roller := SuperEgg.build_part(Vector3(0.07, 0.07, 1.8), StiltKit.TIMBER_DARK, 2.0, 2.0)
+		roller.position = Vector3(x, -1.5 + (x + 48.0) / 6.0 * (f + 1.5) + 0.05, -16.0)
+		body.add_child(roller)
+		CollisionPolicy.mark_decorative(roller)
+
+	# Mateo's shelter: timber racked on the north wall, plane and adze on pegs,
+	# the barrel steam box, planks on trestles, a half-planked dinghy with tar
+	# pots, sawdust, and the carved sternpost from the cargo boat he came on.
+	for i in 4:
+		Furnishings.piece(body, Vector3(2.4, 0.05, 0.14), StiltKit.TIMBER_PALE.darkened(0.05 * float(i % 2)), Vector3(-43.0, f + 0.9 + 0.35 * float(i), -21.75), 0.0, false)
+	for x: float in [-45.2, -43.0, -40.8]:
+		Furnishings.piece(body, Vector3(0.04, 0.04, 0.2), StiltKit.TIMBER_DARK, Vector3(x, f + 0.85, -21.75), 0.0, false)
+	Furnishings.peg_rail(body, Vector3(-40.1, f, -20.5), StiltKit.yaw_back_to(Vector2(1, 0)), 1.2)
+	Furnishings.barrel(body, Vector3(-45.3, f, -21.2), 0.5)
+	Furnishings.piece(body, Vector3(1.2, 0.05, 0.3), StiltKit.TIMBER_PALE, Vector3(-43.5, f + 0.75, -19.6), 0.0, true)
+	for x: float in [-44.4, -42.6]:
+		Furnishings.piece(body, Vector3(0.05, 0.36, 0.25), StiltKit.TIMBER_DARK, Vector3(x, f + 0.36, -19.6), 0.0, false)
+	Furnishings.piece(body, Vector3(0.9, 0.22, 0.35), Color(0.55, 0.42, 0.28), Vector3(-43.5, f + 1.05, -19.6), 0.0, false, SuperEgg.EPSILON_SOFT)
+	for x: float in [-41.4, -41.0]:
+		Furnishings.piece(body, Vector3(0.12, 0.14, 0.12), Color(0.12, 0.10, 0.09), Vector3(x, f + 0.14, -19.0), 0.0, false, 2.2)
+	for p: Vector2 in [Vector2(-44.6, -20.2), Vector2(-42.2, -21.0), Vector2(-41.3, -18.6)]:
+		Furnishings.piece(body, Vector3(0.4, 0.004, 0.3), Color(0.82, 0.70, 0.48), Vector3(p.x, f + 0.004, p.y), 0.4, false, SuperEgg.EPSILON_SOFT)
+	Furnishings.piece(body, Vector3(0.08, 0.6, 0.1), Color(0.48, 0.30, 0.18), Vector3(-41.2, f + 2.2, -21.82), 0.15, false, SuperEgg.EPSILON_SOFT)
+	Furnishings.hanging_lamp(body, Vector3(-43.0, plate - 0.4, -20.0), 0.6, 5.0)
+
+	ClearZones.add_lane(body, "landing to the shelter", [Vector3(-41.0, f, -12.2), Vector3(-41.0, f, -18.3)], 0.55)
+	ClearZones.add_lane(body, "into the shelter", [Vector3(-41.0, f, -18.3), Vector3(-44.5, f, -18.5)])
+	return body
+
+
+# ---------------------------------------------------------------------------
+# 4.12 Catch deck, drying shelter and smokehouse (Osei). Plan coordinates.
+# ---------------------------------------------------------------------------
+# Deck x 36..44, z 2..14 on the Heron shelf (the rock face stands at x 35.5).
+# The catch gangway arrives at its north-west corner (38, 2). The slatted
+# drying shelter takes the north-east, x 39..44, z 2..7, under a pent; the
+# sorting table and rinse trough stand at the working boat's berth on the east
+# edge; the smokehouse, the village's only fire, stands downwind at the
+# south-east, x 41..44, z 11..14.
+
+static func catch_deck() -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = "CatchDeck"
+	var f := DECK_TOP
+	var smoke := StiltKit.TIMBER.darkened(0.35)
+	var rows: Array = []
+	for z: float in [2.0, 5.0, 8.0, 11.0, 14.0]:
+		var row: Array[Vector2] = []
+		for x: float in [36.3, 39.0, 41.5, 43.7]:
+			row.append(Vector2(x, z))
+		rows.append(row)
+		StiltKit.beam(body, Vector2(36.0, z), Vector2(44.0, z), f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH * 0.5, Vector2(0.11, StiltKit.BEAM_DEPTH * 0.5))
+	StiltKit.piles(body, rows, f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH, SHELF_Y)
+	StiltKit.floor_slab(body, Rect2(36.0, 2.0, 8.0, 12.0), f, StiltKit.DECK.darkened(0.12))
+
+	# Drying shelter: posts, a pent falling north, slatted screens on the north
+	# and east sides; open to the deck south and west.
+	var top := f + 2.9
+	for p: Vector2 in [Vector2(39.0, 2.15), Vector2(41.5, 2.15), Vector2(43.85, 2.15), Vector2(39.0, 7.0), Vector2(43.85, 7.0)]:
+		# Each post meets the pent's underside where it stands: the roof is
+		# highest on the south (deck) side and falls north.
+		StiltKit.post(body, p, f - StiltKit.FLOOR_THICKNESS, top - (7.35 - p.y) * tan(StiltRoofs.PENT_PITCH) - 0.03, smoke)
+	StiltRoofs.pent(body, Rect2(38.7, 1.75, 5.6, 5.6), top + StiltRoofs.THICKNESS / cos(StiltRoofs.PENT_PITCH), Vector3(0, 0, -1), StiltKit.SHINGLE.darkened(0.2))
+	for screen: Array in [[Vector2(39.0, 2.15), Vector2(43.85, 2.15)], [Vector2(43.85, 2.15), Vector2(43.85, 7.0)]]:
+		_slat_screen(body, screen[0], screen[1], f, 2.0, smoke)
+	# Racks of drying fish across the shelter.
+	for z: float in [3.4, 4.6, 5.8]:
+		StiltKit.beam(body, Vector2(39.3, z), Vector2(43.6, z), f + 2.0, Vector2(0.03, 0.03), smoke)
+		for i in 7:
+			Furnishings.piece(body, Vector3(0.05, 0.22, 0.1), Color(0.70, 0.58, 0.42).darkened(0.05 * float(i % 3)), Vector3(39.6 + 0.6 * float(i), f + 1.72, z), 0.0, false, SuperEgg.EPSILON_SOFT)
+
+	# At the berth: the sorting table and the rinse trough, a brine bucket.
+	Furnishings.piece(body, Vector3(0.4, 0.05, 1.0), Furnishings.OAK_LIGHT, Vector3(43.3, f + 0.85, 8.6), 0.0, true)
+	for z: float in [7.8, 9.4]:
+		Furnishings.piece(body, Vector3(0.35, 0.4, 0.05), Furnishings.OAK_DARK, Vector3(43.3, f + 0.4, z))
+	Furnishings.piece(body, Vector3(0.35, 0.25, 0.6), Color(0.40, 0.34, 0.26), Vector3(43.35, f + 0.25, 10.2), 0.0, true, SuperEgg.EPSILON_SOFT)
+	Furnishings.piece(body, Vector3(0.3, 0.02, 0.52), Color(0.45, 0.62, 0.68, 0.8), Vector3(43.35, f + 0.5, 10.2), 0.0, false)
+	Furnishings.piece(body, Vector3(0.2, 0.2, 0.2), Furnishings.OAK, Vector3(42.5, f + 0.2, 10.0), 0.0, false, 2.2)
+	Furnishings.piece(body, Vector3(0.18, 0.04, 0.06), Color(0.30, 0.24, 0.20), Vector3(43.3, f + 0.92, 8.2), 0.0, false, SuperEgg.EPSILON_SOFT)
+
+	# The smokehouse: a small closed hut of smoke-dark boards, a stone hearth
+	# inside under a short flue, its door on the west, facing the deck.
+	var hut := StaticBody3D.new()
+	hut.name = "Smokehouse"
+	hut.position = Vector3(42.5, 0.0, 12.5)
+	body.add_child(hut)
+	var hh := 1.5
+	StiltKit.wall(hut, Vector2(-hh, -hh), Vector2(hh, -hh), Vector2(0, -1), f, 2.4, [], smoke, smoke)
+	StiltKit.wall(hut, Vector2(-hh, hh), Vector2(hh, hh), Vector2(0, 1), f, 2.4, [], smoke, smoke)
+	StiltKit.wall(hut, Vector2(hh, -hh), Vector2(hh, hh), Vector2(1, 0), f, 2.4, [], smoke, smoke)
+	StiltKit.wall(hut, Vector2(-hh, -hh), Vector2(-hh, hh), Vector2(-1, 0), f, 2.4, [StiltKit.door(Vector2(-hh, 0.0), 2.1, 1, 1.0)], smoke, smoke)
+	for x: float in [-hh, hh]:
+		for z: float in [-hh, hh]:
+			StiltKit.post(hut, Vector2(x, z), f - StiltKit.FLOOR_THICKNESS, f + 2.4, smoke.darkened(0.2))
+	StiltRoofs.gable(hut, Vector2(hh, hh), f + 2.4, StiltKit.SHINGLE.darkened(0.3), smoke.darkened(0.3))
+	var hearth := SuperEgg.build_part(Vector3(0.55, 0.3, 0.55), STONE.darkened(0.15), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	hearth.position = Vector3(0.75, f + 0.3, 0.0)
+	hut.add_child(hearth)
+	ClearZones.mark_furniture(CollisionPolicy.add_box(hut, hearth, Vector3(1.1, 0.6, 1.1), hearth.position, Basis(), true), true)
+	Furnishings.piece(hut, Vector3(0.25, 0.04, 0.25), Color(0.95, 0.45, 0.15), Vector3(0.75, f + 0.63, 0.0), 0.0, false, 2.2)
+	ClearZones.add(hut, "smokehouse hearth", "fire", Vector2(0.75, 0.0), Vector2(-1, 0), 0.5, 0.6, 0.6, f, f + 1.6)
+	_roof_flue(hut, Vector2(0.75, 0.0), f + 0.6, f + 2.4 + StiltRoofs.PLATE + 1.5 * tan(StiltRoofs.PITCH) + 0.5)
+	for i in 4:
+		StiltKit.beam(hut, Vector2(-0.9, -1.0 + 0.6 * float(i)), Vector2(1.3, -1.0 + 0.6 * float(i)), f + 2.0, Vector2(0.025, 0.025), smoke)
+	# His grandmother's recipe cut into a board by the hearth, in symbols.
+	Furnishings.piece(hut, Vector3(0.012, 0.22, 0.32), Furnishings.OAK, Vector3(hh - 0.1, f + 1.4, 0.9))
+	for i in 4:
+		Furnishings.piece(hut, Vector3(0.006, 0.03, 0.05), smoke.darkened(0.4), Vector3(hh - 0.115, f + 1.5 - 0.08 * float(i), 0.82 + 0.05 * float(i % 2)))
+
+	ClearZones.add_lane(body, "gangway to the sorting table", [Vector3(38.0, f, 2.3), Vector3(38.0, f, 8.5), Vector3(42.2, f, 8.6)])
+	ClearZones.add_lane(body, "deck to the smokehouse door", [Vector3(38.0, f, 12.5), Vector3(40.4, f, 12.5)])
+	return body
+
+
+## A screen of upright slats between two posts, with a collider so nothing
+## walks through it.
+static func _slat_screen(body: StaticBody3D, a: Vector2, b: Vector2, floor_y: float, height: float, color: Color) -> void:
+	var length := a.distance_to(b)
+	var dir := (b - a) / length
+	var count := int(length / 0.18)
+	for i in count:
+		var p := a + dir * (0.09 + float(i) * length / float(count))
+		var slat := SuperEgg.build_part(Vector3(0.03, height * 0.5, 0.03), color.lightened(0.04 * float(i % 2)), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		slat.position = Vector3(p.x, floor_y + 0.25 + height * 0.5, p.y)
+		body.add_child(slat)
+		CollisionPolicy.mark_decorative(slat)
+	var mid := (a + b) * 0.5
+	var rail := SuperEgg.build_part(Vector3(length * 0.5, 0.04, 0.05), color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	rail.transform = Transform3D(Basis(Vector3.UP, atan2(-dir.y, dir.x)), Vector3(mid.x, floor_y + 0.25 + height, mid.y))
+	body.add_child(rail)
+	CollisionPolicy.add_box(body, rail, Vector3(length, height + 0.25, 0.1), Vector3(mid.x, floor_y + (height + 0.25) * 0.5, mid.y), Basis(Vector3.UP, atan2(-dir.y, dir.x)), false)
+
+
+# ---------------------------------------------------------------------------
+# 4.5 Rian's shell-works barge. Plan coordinates.
+# ---------------------------------------------------------------------------
+# A floating barge 8 x 3.5 m at x -20..-12, z -3..0.5, deck at the floating
+# deck height, moored by four lines to the spine's south piles. A lean-to roof
+# over the north half shades the workbench; the south half is open for light
+# onto the water court. The spine's gangway lands at (-15, -3), where the bench
+# breaks for it.
+
+static func shell_barge() -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = "ShellBarge"
+	var f := FishingVillagePlan.FLOAT_DECK
+	var violet := _household("Rian")
+	var hull := SuperEgg.build_part(Vector3(4.15, 0.45, 1.85), StiltKit.TIMBER_DARK.darkened(0.35), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+	hull.position = Vector3(-16.0, f - 0.5, -1.25)
+	body.add_child(hull)
+	CollisionPolicy.add_box(body, hull, Vector3(8.3, 0.9, 3.7), hull.position, Basis(), true)
+	var strake := SuperEgg.build_part(Vector3(4.2, 0.06, 1.9), violet.darkened(0.15), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	strake.position = Vector3(-16.0, f - 0.12, -1.25)
+	body.add_child(strake)
+	CollisionPolicy.mark_decorative(strake)
+	# Planks laid across the barge's beam, run along its length.
+	var planks := StiltKit.plank_surface(body, Transform3D(Basis(Vector3.UP, PI * 0.5), Vector3(-16.0, f, -1.25)), 3.5, 8.0, StiltKit.DECK.darkened(0.04))
+	CollisionPolicy.add_box(body, planks, Vector3(8.0, 0.1, 3.5), Vector3(-16.0, f - 0.05, -1.25), Basis(), true)
+
+	# The lean-to: high on the north edge, falling south over the bench, its
+	# low eave still 2 m clear.
+	var high := f + 2.9
+	var low := high - 2.5 * tan(StiltRoofs.PENT_PITCH)
+	for x: float in [-19.8, -16.0, -12.2]:
+		StiltKit.post(body, Vector2(x, -2.85), f, high - 0.12, StiltKit.TIMBER, x == -16.0)
+		StiltKit.post(body, Vector2(x, -0.5), f, low - 0.12)
+	StiltRoofs.pent(body, Rect2(-20.2, -3.2, 8.4, 2.9), high + StiltRoofs.THICKNESS / cos(StiltRoofs.PENT_PITCH), Vector3(0, 0, 1), StiltKit.SHINGLE)
+
+	# The heavy bench along the north side, broken where the gangway lands; the
+	# vice, the foot saw and the sealing press on it; shell bins by thickness;
+	# the stowage chest; rope coils; the sailmaker's palm and needles on a hook;
+	# the lamp that swings from the roof.
+	for run: Vector2 in [Vector2(-19.6, -16.6), Vector2(-13.4, -12.4)]:
+		var centre := (run.x + run.y) * 0.5
+		var half := (run.y - run.x) * 0.5
+		Furnishings.piece(body, Vector3(half, 0.06, 0.35), Furnishings.OAK, Vector3(centre, f + 0.86, -2.55), 0.0, true)
+		for x: float in [run.x + 0.15, run.y - 0.15]:
+			Furnishings.piece(body, Vector3(0.06, 0.4, 0.3), Furnishings.OAK_DARK, Vector3(x, f + 0.4, -2.55))
+	Furnishings.piece(body, Vector3(0.1, 0.12, 0.16), Furnishings.IRON, Vector3(-19.2, f + 1.0, -2.45), 0.0, false)
+	var wheel := SuperEgg.build_part(Vector3(0.3, 0.3, 0.025), Furnishings.IRON, 2.0, 2.0)
+	wheel.position = Vector3(-18.1, f + 1.25, -2.55)
+	body.add_child(wheel)
+	CollisionPolicy.mark_decorative(wheel)
+	Furnishings.piece(body, Vector3(0.18, 0.04, 0.12), Furnishings.OAK_DARK, Vector3(-18.1, f + 0.1, -2.1), 0.0, false)
+	for x: float in [-13.2, -12.6]:
+		Furnishings.piece(body, Vector3(0.04, 0.35, 0.04), Furnishings.IRON, Vector3(x, f + 1.27, -2.55))
+	Furnishings.piece(body, Vector3(0.36, 0.05, 0.12), Furnishings.IRON, Vector3(-12.9, f + 1.6, -2.55))
+	Furnishings.piece(body, Vector3(0.025, 0.2, 0.025), Furnishings.IRON, Vector3(-12.9, f + 1.75, -2.55))
+	for i in 3:
+		var bin := Vector3(-19.4 + 0.75 * float(i), f, -1.4)
+		Furnishings.piece(body, Vector3(0.3, 0.2, 0.25), Furnishings.OAK.darkened(0.05 * float(i)), bin + Vector3(0, 0.2, 0), 0.0, true)
+		for k in 4:
+			Furnishings.piece(body, Vector3(0.06 + 0.02 * float(i), 0.015 + 0.01 * float(i), 0.05), Color(0.92, 0.88, 0.80), bin + Vector3(-0.15 + 0.1 * float(k), 0.42, 0.02 * float(k % 2)), 0.3 * float(k), false, 2.2)
+	Furnishings.chest(body, Vector3(-12.75, f, -1.3), StiltKit.yaw_back_to(Vector2(1, 0)), Furnishings.OAK_DARK, 0.8)
+	for p: Vector3 in [Vector3(-14.4, 0, 0.0), Vector3(-19.4, 0, 0.0)]:
+		Furnishings.piece(body, Vector3(0.32, 0.08, 0.32), StiltKit.ROPE, Vector3(p.x, f + 0.08, p.z), 0.0, false, 2.0)
+	Furnishings.piece(body, Vector3(0.05, 0.08, 0.02), Color(0.50, 0.38, 0.26), Vector3(-16.0, f + 1.7, -2.72), 0.0, false, SuperEgg.EPSILON_SOFT)
+	# A pile of discarded buttons he cannot throw out; a post notched for seasons.
+	for i in 9:
+		Furnishings.piece(body, Vector3(0.02, 0.006, 0.02), Color(0.94, 0.92, 0.88).darkened(0.05 * float(i % 3)), Vector3(-17.9 + 0.035 * float(i % 3), f + 0.93 + 0.01 * float(i / 3), -2.42 + 0.03 * float(i % 2)), 0.0, false, 2.0)
+	for i in 6:
+		Furnishings.piece(body, Vector3(0.006, 0.006, 0.05), StiltKit.TIMBER_DARK.darkened(0.3), Vector3(-12.33, f + 1.0 + 0.1 * float(i), -0.5), 0.0, false)
+	Furnishings.hanging_lamp(body, Vector3(-16.6, f + 2.2, -1.9), 0.6, 4.5)
+
+	# Mooring lines from the barge's north corners and middle to the spine's
+	# south piles.
+	for p: Vector2 in [Vector2(-19.9, -3.0), Vector2(-12.1, -3.0)]:
+		var from := Vector3(p.x, f + 0.3, p.y)
+		var to := Vector3(p.x + signf(-16.0 - p.x) * -0.3, DECK_TOP - 0.25, -4.9)
+		var length := from.distance_to(to)
+		var line := SuperEgg.build_part(Vector3(0.02, length * 0.5, 0.02), StiltKit.ROPE, 2.0, 2.0)
+		var up := (to - from).normalized()
+		var side := up.cross(Vector3.RIGHT).normalized()
+		line.transform = Transform3D(Basis(side.cross(up), up, side), (from + to) * 0.5)
+		body.add_child(line)
+		CollisionPolicy.mark_decorative(line)
+
+	ClearZones.add_lane(body, "gangway onto the barge", [Vector3(-15.0, f, -2.9), Vector3(-15.0, f, 0.2)])
+	ClearZones.add_lane(body, "along the open deck", [Vector3(-19.5, f, 0.0), Vector3(-12.5, f, 0.0)])
+	return body
+
+
+# ---------------------------------------------------------------------------
+# Landings (4.1, 4.15, 4.16): furnishings on the plan's decks. Plan coordinates.
+# ---------------------------------------------------------------------------
+
+static func dress(name_text: String) -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = name_text + "Dressing"
+	var f := DECK_TOP
+	match name_text:
+		"ArrivalLanding":
+			# The market shelter between the slip's bridge and the Venn frontage,
+			# a pent falling north over the notice board (carved pictures only);
+			# the bench on the south edge looking west to the shore; crates and
+			# coiled lines by the ferry berth.
+			for x: float in [-39.6, -37.1, -34.6]:
+				StiltKit.post(body, Vector2(x, -11.85), f - StiltKit.FLOOR_THICKNESS, f + 2.4)
+				StiltKit.post(body, Vector2(x, -9.6), f - StiltKit.FLOOR_THICKNESS, f + 2.95)
+			StiltRoofs.pent(body, Rect2(-39.9, -12.15, 5.6, 2.85), f + 3.0 + StiltRoofs.THICKNESS, Vector3(0, 0, -1), StiltKit.SHINGLE)
+			Furnishings.piece(body, Vector3(1.1, 0.6, 0.05), Furnishings.OAK, Vector3(-37.1, f + 1.5, -11.75), 0.0, true)
+			for i in 6:
+				Furnishings.piece(body, Vector3(0.14, 0.11, 0.015), Color(0.90, 0.86, 0.76).darkened(0.05 * float(i % 2)), Vector3(-37.8 + 0.3 * float(i % 3) + 0.15 * float(i / 3), f + 1.7 - 0.35 * float(i / 3), -11.7), 0.0, false)
+			Furnishings.bench(body, Vector3(-40.5, f, 1.4), StiltKit.yaw_back_to(Vector2(0, 1)), 1.8)
+			for i in 3:
+				Furnishings.piece(body, Vector3(0.35, 0.3, 0.35), Furnishings.OAK.darkened(0.06 * float(i)), Vector3(-41.2, f + 0.3 + 0.6 * float(i / 2), -5.6 - 0.75 * float(i % 2)), 0.1 * float(i), true)
+			Furnishings.piece(body, Vector3(0.35, 0.08, 0.35), StiltKit.ROPE, Vector3(-41.3, f + 0.08, -1.0), 0.0, false, 2.0)
+		"HeronLanding":
+			# A bench for watching the boats come in, a mooring post with
+			# Jori's first-watch lamp.
+			Furnishings.bench(body, Vector3(23.4, f, 0.0), StiltKit.yaw_back_to(Vector2(-1, 0)), 1.6)
+			StiltKit.lamp_post(body, Vector2(23.7, 2.6), f, Vector2(-1, 0))
+		"PortalLanding":
+			# Bare deck: a lamp on each of two corner posts, a coil of rope.
+			StiltKit.lamp_post(body, Vector2(26.4, 16.4), f, Vector2(1, 1))
+			StiltKit.lamp_post(body, Vector2(34.6, 16.4), f, Vector2(-1, 1))
+			Furnishings.piece(body, Vector3(0.35, 0.08, 0.35), StiltKit.ROPE, Vector3(26.9, f + 0.08, 17.2), 0.0, false, 2.0)
+	return body
 
 
 # ---------------------------------------------------------------------------

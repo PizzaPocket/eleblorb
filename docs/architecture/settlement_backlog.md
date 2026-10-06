@@ -142,12 +142,19 @@ will be rideable as a separate project, and players swim until then.
    `PavilionSpur`, the Aran house was replanned around a living room. Every door
    now swings into the room it serves. The proof scene builds the islets and fails
    rock in a footprint; `tools/fishing_rock_section.gd` prints the face.
+2a. Done (2026-10-07): the **boatwright slip, catch deck and smokehouse,
+   Rian's barge**, the landings' furnishings and the junction lamps. Every deck,
+   route, gangway, ramp and swim exit is now **planked** (the user's review:
+   slabs read as placeholders, and the near-black deck colour was creosote, not
+   sun-bleached tropical hardwood); see the charter.
 3. **Islets need a landscaping pass.** Seen at last
    (`VILLAGE=fishing` in `tools/village_aerial_capture.tscn`): the faces read as
    uniform grey curtains of vertical flutes, the shelf's 1 m grid edge shows as
    stair steps through the water, and there are no ledges, waterline notch,
    planting or colour variation. Use the landscaping skill.
-4. The floating structures: the Vale houseboat, Rian's barge and Ivo's launch.
+4. The floating structures still to build: the **Mor guest houseboat** (the
+   rest point; its cabin is a working placeholder), the **Vale houseboat**, the
+   **pearl yard pontoon** and **Ivo's launch**.
 5. Interiors, water work (the pearl yard and lines), and ledge planting on the
    islets.
 6. Schedules and dialogue.
