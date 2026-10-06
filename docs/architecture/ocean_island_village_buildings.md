@@ -98,7 +98,12 @@ building fits its approved footprint.
   the pier head and a smaller upper *lānai*.
 - **Ground floor:** reception and common room, a kitchen, Sam's room.
 - **Upper floor:** three guest rooms and the party room where the hero wakes,
-  reached by an interior ramp (5.2 m run, landings at both ends).
+  reached by an interior ramp (5.2 m run, landings at both ends), and a shared
+  **bathroom** off the landing.
+- **Bathrooms (modern):** a flush toilet with a cistern, a washbasin, a mirror
+  and a shower upstairs, and a toilet and basin off the common room downstairs
+  for day visitors. Both drain to a septic tank behind the house, well away from
+  the stream and the reef.
 - **Colour:** soft green with cream trim.
 - **History:** a plantation-era boarding house Sam bought and reopened.
 - **Variation:** the only two-storey house besides the store; a hand-painted

@@ -76,7 +76,7 @@ reachable by everyone, and directly above the arrival.
 | Market | Delima's fruit stall; Rotan's rope and vine | stalls under a long leaf roof facing the grand ramp's arrival |
 | Rain cistern and washing | shared | the largest leaf roof funnels rain into a lashed barrel cistern; washing basins below it |
 | Food store | shared | hanging baskets and a raised store out of reach of ground pests |
-| Inn | Bima | moved up from the ground to the commons' edge beside the East Tree (approved 2026-10-06), same keeper and price |
+| Inn | Bima | moved up from the ground to the commons' edge beside the East Tree (approved 2026-10-06), same keeper and price. Its toilet is a **privy closet** of woven rattan screens with a hung door at the deck's edge: a timber bench seat over a sealed clay vat, with a basket of dry leaf litter and a scoop, and a water gourd and basin. The vat is lowered by rope to the ground and emptied to the garden compost, never dropped onto the plaza |
 
 ### Getting up
 

@@ -78,7 +78,13 @@ human city; boxes.
 - A dome 16 m across, 8 m high, on a 3 m plinth.
 - **Inside:** the moon pool; a common room with low couches; four dry bedrooms
   around the dome's edge, one large enough for the party, where the hero wakes;
-  Isaro's counter by the pool.
+  Isaro's counter by the pool; a **washroom** between two of the bedrooms,
+  reached from the common room, for guests on legs.
+- **Washroom (modern):** a vacuum-flush toilet of the kind ships and aircraft
+  use, sparing with water, in a nacre shell with an orichalcum flush plate; a
+  glass washbasin with a tap and a mirror; a shower. Waste goes to a sealed
+  holding tank in the plinth, which is pumped out to a treatment vault at the
+  city's edge, never into the sea.
 - **Variation:** the warmest light; the only dome with rooms partitioned off.
 
 ### The Glassworks (air hall; Kunei and Damaku)

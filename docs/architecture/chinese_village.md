@@ -296,7 +296,11 @@ paired deck and apron heights that the validator checks.
 - Shops and workshops: the same vocabulary, open front on a timber shopfront,
   ridge ornaments omitted.
 - The inn: two-storey hall with gallery, red lacquer sign, the one ordinary
-  building allowed a green-glazed ridge.
+  building allowed a green-glazed ridge. Sanitation is traditional: a lidded
+  wooden commode (*mǎtǒng*) behind a screen in each guest room, and a latrine
+  closet off the back courtyard with a door, a bench seat over a removable vat
+  and a water jar and basin for washing hands. Night soil is collected each
+  morning and carried to the village fields, as Chinese villages did.
 - Palace: imperial yellow glazed tile, double-eave hip roof, white marble
   terraces, vermilion walls. Yellow is not used anywhere else.
 - Everything built from SuperEgg parts, with `CollisionPolicy` on plinths,

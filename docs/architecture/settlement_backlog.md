@@ -381,3 +381,30 @@ Code work once approved (not started):
   time does not regress; then the emergent-first fill, the 24 to 36 m tall
   tier, the three chained vine routes, and replacing the baobab. The demo
   window must come out the same. See `plant_kingdom_landscape.md` section 2.
+
+## 11. Toilets at every rest point
+
+User rule (2026-10-06), now in the architecture skill: every resting place has
+a toilet, true to its culture, with modern fixtures for a modern culture. In
+code, every inn already gets one, but it is `TownProps.build_dry_toilet()` for
+all of them: the same porcelain pedestal in every culture, including the
+open-pavilion treehouse inn.
+
+| Rest point | Culture | Fixture planned | Status |
+|---|---|---|---|
+| Holt Inn, Ohio | English medieval and early-modern vernacular | an **earth closet**: an oak box seat with a lid over a removable pail, a hopper of dry earth and a scoop, a basin and ewer; emptied to compost | code has the porcelain pedestal; swap the fixture (washroom stays) |
+| Snowrest Inn, Snow Village | a modern mountain town on a Norse root | modern: flush toilet with cistern, basin and mirror, shower beside the equipment-drying room | code has the porcelain dry toilet; upgrade to a modern washroom |
+| Ember Rest, Fire caldera | lava people with advanced thermal engineering; guests only | modern: an **incinerating toilet** in insulated basalt, heated by the city's thermal system, with a cool-water basin for guests | washroom in the brief; fixture to build |
+| Rock and Ground inn | Pueblo-style earth and stone | an adobe **privy closet** off the yard: a timber seat over a lined composting vault, ash from the bread oven as cover, a water jar and basin | to add to the brief and code |
+| Chinese village inn | traditional Chinese | a lidded wooden **mǎtǒng** behind a screen in each guest room, and a latrine closet off the back courtyard; night soil to the fields | in `chinese_village.md` |
+| Primate village inn, on the commons | jungle lashed-vine | a rattan-screened **privy closet** at the deck's edge: bench seat over a sealed clay vat with leaf litter, lowered by rope to the garden compost | in the layout |
+| Sea folk guest hall | Atlantean modern | modern: a **vacuum-flush toilet**, glass basin, shower; sealed holding tank pumped to a treatment vault at the city's edge | in the buildings brief |
+| Okafor guest house, Kai Mālie | modern Hawaiian | modern: flush toilets, basins and a shower, upstairs and down; septic tank | in the buildings brief |
+| Mor guest houseboat, fishing village | cosmopolitan lake boat people | a contained marine composting toilet and wash space | already in the brief |
+| Sky Kingdom | — | no rest point yet; any future one gives guests a washroom in cloud and gold | — |
+
+Code work: shared `TownProps` builders for each fixture (earth closet,
+mǎtǒng, composting vault seat, modern flush toilet, vacuum toilet,
+incinerating toilet), a per-inn fixture choice passed to `VillageInn.create`,
+and a real closet with a door for the open-pavilion inn.
+

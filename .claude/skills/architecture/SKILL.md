@@ -277,10 +277,37 @@ Architects plan how a building keeps warm and breathes; do the same.
 - **Counter** at the side or rear of the common room, 2.5 m or more away from the door so the entry is never crowded, with the keeper's space behind it (1.0 m minimum) and an **office or keeper's room directly behind** for the books, keys and strongbox.
 - **Kitchen and pantry** adjoin the common room with a serving hatch or door, and have their own door to a service yard (wood, water, deliveries). Cellar or stores off the kitchen.
 - **Guest rooms upstairs** along a landing corridor (1.4 m), each 2.4 to 3.0 x 3.5 m with a bed, a chest and a window. The party room can be larger. Heads of beds against walls.
-- **Privy** at the far rear, against an outside wall, in a closet about 1.2 x 1.6 m, reached from the service side, with the seat's back to the wall. Never in the middle of a room.
+- **Toilet** in its own closet or washroom (see "Toilets at every resting place" below), against an outside wall, reached from the guest side without passing through a private room, with the seat's back to the wall. Never in the middle of a room.
 - **Owner's room** upstairs or beside the office, small and private.
 - Stable or yard to the side or rear. A bench or porch at the front for waiting.
 - The inn stands on the arrival road, near the green, not on it.
+
+**Toilets at every resting place.** Every rest point (an inn, guest house,
+guest hall, houseboat, or anywhere the party sleeps and wakes) has at least one
+toilet, without exception. The fixture belongs to the culture that built the
+place:
+- **A modern culture gets modern fixtures:** a flush toilet with its cistern, a
+  washbasin with a tap, a mirror, and a shower where guests stay overnight.
+- **A traditional culture gets its own tradition's fixture,** named by its real
+  term in the brief: a privy or earth closet, a lidded commode, a composting
+  vault, a ship's head. It is never a generic modern bowl dropped into a
+  historic building, nor a porcelain pedestal in a hut.
+- **A people who do not need toilets themselves** (lava people, cloud people,
+  merfolk in water) still give their guests one, built in their own materials
+  and technology.
+
+Placement and services:
+- The toilet stands in an enclosed closet or washroom with a hung door, at
+  least 1.2 × 1.6 m for a closet, and has somewhere to wash hands.
+- Guests reach it from their rooms or the common room without passing through
+  the keeper's private rooms or the kitchen.
+- Waste goes somewhere believable: a sewer, septic tank or holding tank for
+  modern places; a removable pail, vault or vat emptied to compost or fields for
+  traditional ones. Nothing ever discharges into water near homes, swimmers,
+  fishing grounds or drinking water, or drops from a height onto a place people
+  walk.
+- Write the fixture, its term, its enclosure and where the waste goes into
+  every rest point's brief.
 
 **Civic hall (meeting house and archive).** One tall hall, double height under the roof, benches along the walls, a raised end with the reeve's table, a hearth, a porch with a pediment to signal civic dignity. Beside it: records room (strongroom, dry, few windows), a clerk's or teacher's room, perhaps a small school corner. The bell sits in a proper belfry or turret (open frame, visible bell shape, pull rope), not a disc on the roof. It faces the green on its long side. A church would have a nave and chancel on an east-west axis and a tower; this world has a meeting house.
 
@@ -367,6 +394,7 @@ roof junction appears in the roof plan and drains away from walls and openings;
 no roof volume is positioned independently of its supporting mass.
 9. Render interior shots of each building type and read them as plans: can you tell what each room is for?
 10. Record any new fact about a person, place or building in `docs/world_bible.md`.
+11a. Every rest point has a toilet in an enclosed closet or washroom, with a fixture true to its culture and era (modern fixtures for a modern culture) and a believable place for the waste to go.
 11. Trade provenance: every stall and shop item is in the settlement's trade ledger with a maker, a building, inputs and a carrier, and the validator passes the ledger check.
 
 
