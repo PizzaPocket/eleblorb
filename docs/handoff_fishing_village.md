@@ -1,11 +1,17 @@
 # Handoff: Crossroads Fishing Village
 
-Status: planning pass started 2026-10-04. No construction has begun. Read
+Status: design brief approved 2026-10-06. No construction has begun and the
+`FishingVillagePlan` layout is not yet authored. Read
 `docs/architecture/fishing_village.md` first.
 
 The population is now fixed at fifteen named residents in five households. Do
 not generate filler NPCs. The complete census, relationships, buildings, boats
 and trade responsibilities are in the architecture brief and `world_bible.md`.
+
+Settled: pearls are ordinary cultivated valuables, and the village is anchored
+by two steep limestone islets rising from submerged shoulders (Ko Panyi is the
+siting precedent). Still open: whether working boats become rideable in this
+pass.
 
 ## Sequence
 
@@ -58,7 +64,8 @@ meet a surface-floating human at approximately foot height.
 - Use George Town's Clan Jetties as the primary built precedent: a working
   timber access spine with branching stilt homes, work sheds and moorings. Do
   not reinterpret this as Singapore shophouse or generic Peranakan design, and
-  do not copy the real settlements' surname-clan social organization.
+  do not copy the real settlements' surname-clan social organization. Ko
+  Panyi informs siting against the limestone islets only.
 - Freshwater mussels and clams support local pearl work; do not place unexplained
   marine oyster beds in the lake.
 - Preserve the Ocean portal, lake merchant behavior, underwater equipment

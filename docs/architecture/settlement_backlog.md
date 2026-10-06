@@ -86,43 +86,44 @@ follow climate and work rather than filling empty space.
 
 ## 3. Crossroads Fishing Village
 
-Status: planning pass started (2026-10-04). The current implementation is a
-dock strip with seven generic huts, six decorative boats and one merchant. The
-approved direction is an original, cosmopolitan lake community whose primary
-built precedent is the working fishbone layout of George Town's Clan Jetties in
-Penang, without importing their surname-clan identity or copying one ethnic
-style. See `docs/architecture/fishing_village.md` and
-`docs/handoff_fishing_village.md`.
+Status: design brief and fifteen-person census approved (2026-10-06); layout
+not yet authored, and no construction has begun. The current implementation is
+a dock strip with seven generic huts, six decorative boats and one merchant.
+The approved direction is an original, cosmopolitan lake community whose
+primary built precedent is the working fishbone layout of George Town's Clan
+Jetties in Penang, sited against two steep limestone islets after Ko Panyi,
+without importing either community's clan, ethnic or religious identity. See
+`docs/architecture/fishing_village.md` and `docs/handoff_fishing_village.md`.
 
-Planning priorities:
+Settled:
 
-- Determine the minimum named population and household groups needed to fish,
-  cultivate freshwater pearl mussels, maintain boats and platforms, process and
-  sell the catch, trade lake shells, clams and lakeweed, care for children and
-  elders, and host travellers.
-- Give each structure a program and owner: family houses, the merchant's home
-  and shop, pearl and shell yard, fish sorting and drying decks, net and
-  boat-repair shelter, shared landing, storage, guest houseboat, and a modest
-  communal pavilion. No anonymous hut remains merely to make the settlement
-  look larger.
-- Organize the settlement from a working public jetty spine, with household
-  spurs, working docks, a secondary return route, flexible gangways and open
-  water lanes shaped around its rock-islet anchors.
-  Public circulation and wet work must not compete for the same narrow deck.
-- Make small working boats part of daily life. Each belongs to a household or
-  trade, sits at a plausible mooring and has a clear path into open water.
-- Apply the tropical-water style charter in the dedicated brief: framed light
-  walls, broad ventilated roofs, deep shade, covered social thresholds,
-  the current draft's varied color range organized into coherent household and
-  boat palettes, rainwater capture and contained sanitation.
-- Landscape through aquatic edges and use: mussel baskets, drying racks, nets,
-  floating planters, limited rock-islet vegetation, reeds at the shore
-  connection and at least three unobstructed swim ramps. Each ramp must reach
-  approximately the human player's foot height in the normal surface-floating
-  pose and meet its deck without a step or collision lip.
-- Replace the single generic vendor identity with a planned community roster,
-  then write dialogue from each person's work, household and relationship to
-  the lake. Keep the existing lake trade and Ocean Kingdom portal functional.
+- Fifteen named residents in five households: Venn (landing house, shop and
+  boatyard), Aran (pearl house and mussel yard), Vale (fishing house and
+  processing edge), Mor (guest houseboat and cargo landing) and Sen (clinic,
+  school room and shell workshop). The census replaces the single generic Lake
+  Diver, who becomes Nara Venn.
+- Every structure, boat and stall item has an owner and trade source in the
+  brief. Pearls are ordinary cultivated valuables.
+- The Mor houseboat is the rest point at 10 Tokoins.
+
+Next work:
+
+- Survey the lake basin, portal return clearance and terrain collision; place
+  the sheltered crescent and the two limestone islets with their submerged
+  shoulders.
+- Author `FishingVillagePlan` as the only source for structures, the public
+  jetty spine and return route, household and work spurs, gangways, boat lanes
+  and berths, swim exits, trade and schedules.
+- Add a fishing-village mode to `tools/validate_village.gd` before populating
+  the plan, including the three-swim-exit and foot-height ramp checks.
+- Then build circulation and swim exits, the architectural kit proofs, the
+  village, interiors, water work and landscape, and finally schedules and
+  dialogue.
+
+Open:
+
+- Whether working boats become rideable in this pass or remain scheduled
+  environmental traffic until vehicle boarding is generalized.
 
 ## 4. Fire Kingdom Caldera City
 

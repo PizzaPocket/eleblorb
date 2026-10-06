@@ -1,9 +1,11 @@
 # Crossroads Fishing Village
 
-Status: design brief in review. This is the next settlement planning pass after
-the remaining Snow Village visual and walked checks. Chinese Village
-implementation is held until this pass has an approved population, plan and
-style charter.
+Status: design brief approved (2026-10-06). The fifteen-person census, the
+steep limestone islet setting and ordinary cultivated pearls are settled; the
+`FishingVillagePlan` layout has not yet been authored. This is the next
+settlement planning pass after the remaining Snow Village visual and walked
+checks. Chinese Village implementation is held until this pass has an approved
+plan.
 
 ## Design premise
 
@@ -22,6 +24,12 @@ shelters and communal houses accumulated along the working spines. Their useful
 lesson is therefore not a Peranakan shophouse style. It is the growth of a
 waterfront neighborhood from work, mooring and access: a principal plank jetty,
 side branches, stilt houses, sheds and water approaches forming a fishbone plan.
+
+The secondary reference is Ko Panyi in Phang Nga Bay, a stilt village built out
+from the foot of a sheer limestone island. It informs siting rather than
+building style: the rock gives shelter and a fixed anchor, the piles stand on
+the shallower shoulder at its base, and the settlement spreads over the water
+because the cliff leaves almost no level land.
 
 The game must translate that spatial intelligence rather than reproduce one
 real clan, ethnicity, religion, costume or decorative vocabulary. The village's
@@ -54,7 +62,9 @@ mostly brown fishing village.
 ## Settlement structure
 
 The recommended plan adapts the Clan Jetties' fishbone logic to a lake
-settlement anchored by two modest natural rock islets. One principal public
+settlement anchored by two steep limestone islets that rise from submerged
+shoulders in the otherwise deep basin. Permanent piles stand on those shallower
+shoulders; deep water beyond them stays open for boats and swimmers. One principal public
 jetty joins the arrival islet to the communal heart. Short side branches serve
 homes and work decks; secondary gangways bend with the sheltered water rather
 than forcing the entire settlement into a rigid rectangle. The result can form
@@ -75,7 +85,8 @@ and social origin.
    private wet-work deck.
 4. **Pearl and shell yard.** Clean sorting tables, submerged mussel baskets,
    grading trays, shell storage and a small craft bench form one legible work
-   sequence. Cultivation lines stay outside swimming and boat lanes.
+   sequence. Its pearls are ordinary cultivated valuables with no magical
+   quality. Cultivation lines stay outside swimming and boat lanes.
 5. **Fishing and processing edge.** Net mending, catch sorting, a screened
    drying shelter and a compact smokehouse sit downwind on the outer edge. This
    area has direct boat access and does not occupy the village's main walkway.
@@ -331,8 +342,10 @@ must not block swim exits or the Ocean portal.
 - Preserve open swimming water through and around the settlement.
 - Group mussel baskets and fish pens by current, depth and access rather than in
   a decorative grid.
-- Use the two rock islets for limited shade vegetation, repair anchors and
-  pauses in the deck network. They should remain natural rocks, not disguised
+- The two islets are steep limestone: sheer, weathered faces with vegetation
+  only on ledges, crevices and the crown. Decks tie into their base and
+  shoulders as repair anchors and pauses in the network; they never terrace the
+  rock into level building plots. The islets remain natural karst, not disguised
   rectangular foundations.
 - Add ropes, floats, drying lines, traps and baskets only at the work stage that
   uses them. Empty water is an important part of the composition.
@@ -361,7 +374,8 @@ must not block swim exits or the Ocean portal.
 ## Implementation sequence
 
 1. Survey lake depth, shoreline, portal return location and current terrain
-   collisions. Choose the sheltered crescent and rock-islet locations.
+   collisions. Choose the sheltered crescent and the two limestone islets'
+   locations, sizes and submerged shoulders.
 2. Author `FishingVillagePlan` as the only source for households, structures,
    routes, work areas, boats, trade and schedules.
 3. Build the approved fifteen-person census and household relationships into
@@ -377,10 +391,16 @@ must not block swim exits or the Ocean portal.
 8. Run an aerial, eye-level, water-level and underwater audit, followed by
    walked tests with the human, Blorbus and a mounted character.
 
-## Decisions to approve before construction
+## Decisions
 
-- Whether freshwater pearls are ordinary cultivated valuables or carry a small
-  magical quality. The architectural plan works either way.
+Settled (2026-10-06):
+
+- Freshwater pearls are ordinary cultivated valuables with no magical quality.
+- The two anchoring islets are steep limestone rising from submerged shoulders,
+  with Ko Panyi as the siting precedent.
+
+Still open before construction:
+
 - Whether working boats become rideable in this pass or remain scheduled
   environmental traffic until vehicle boarding is generalized.
 
@@ -397,6 +417,9 @@ The reference research is used for spatial and working-water reasoning:
 - The historic communities were surname clans, including Chew, Tan, Lee, Lim,
   Yeoh and others. That history should be understood accurately but not copied
   into this cosmopolitan fictional settlement.
+- Ko Panyi's stilt village grew out from the base of a sheer limestone island
+  in Phang Nga Bay. Only its siting against karst rock is borrowed, not its
+  community's religious or ethnic identity.
 - Broader Gulf of Thailand fishing and boat-community references may still
   inform working boats, diving and water livelihoods. They do not supply a
   generic architectural costume.
