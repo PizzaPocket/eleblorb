@@ -4,7 +4,8 @@ Status (2026-10-06): plan, islets, circulation, swim exits and the Mor rest
 point are built and verified in the world (`tools/fishing_islet_probe.tscn`, 0
 FAIL). The Venn house is the first real building; every other structure is
 still an owned placeholder in `floating_village.gd`. Current state and next
-steps are in `docs/architecture/settlement_backlog.md`, item 3.
+steps are in `docs/architecture/settlement_backlog.md`, item 3. The Sen house
+brief was redrawn on 2026-10-06 and is ready to build.
 
 How to build the next structure: write or fix its drawings in
 `fishing_village_building_designs.md`, add a builder to

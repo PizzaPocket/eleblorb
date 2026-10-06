@@ -174,8 +174,7 @@ every public route is at least 3.2 m, including under eaves and pavilion beams.
 | ShellBargeGangway | spine → Rian's barge | `(-15,-5) → (-15,-3)` | flexible, 2.6 m |
 | Venn spur | landing → Venn front | `(-30,-12) → (-30,-13)` | the shop veranda opens directly onto the landing |
 | Slip work spur | Venn yard → slip | `(-34,-17) → (-40,-17)` | behind the house; customers never cross it |
-| Sen spur | spine → clinic | `(-15,-7) → (-15,-10)` | |
-| Rian's deck | Sen house → side deck | internal door only | not public |
+| Sen spur | spine → Sen porch | `(-15,-7) → (-15,-10)` | lands on the porch beside the clinic door (`x -15.5`); the family and school doors open off the same porch |
 | Cistern spur | spine → cistern house | `(-2,-7) → (-2,-12)` | public: anyone may draw water |
 | Net shed spur | spine → net shed | `(8,-7) → (8,-12)` | Salim and Jori carry gear here, not through the pavilion |
 | Aran spur | spine → Aran front | `(8,-7) → (8,-3)` | |

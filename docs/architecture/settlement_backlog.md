@@ -86,98 +86,75 @@ follow climate and work rather than filling empty space.
 
 ## 3. Crossroads Fishing Village
 
-Status: design brief, fifteen-person census and dimensioned civic layout
-approved (2026-10-06) (`docs/architecture/fishing_village_layout.md`).
-No construction has begun. The current implementation is
-a dock strip with seven generic huts, six decorative boats and one merchant.
-The approved direction is an original, cosmopolitan lake community whose
-primary built precedent is the working fishbone layout of George Town's Clan
-Jetties in Penang, sited against two steep limestone islets after Ko Panyi,
-without importing either community's clan, ethnic or religious identity. See
-`docs/architecture/fishing_village.md` and `docs/handoff_fishing_village.md`.
+**Current status (2026-10-06).** The plan, islets and circulation are built
+and verified, and the Mor rest point works. The **Venn house** is the only real
+building; every other structure is still an owned placeholder in
+`floating_village.gd`. Nothing has yet been checked by eye in a windowed render.
 
-Settled:
+Approved:
+- design brief (`fishing_village.md`);
+- fifteen-person census in five households;
+- civic layout (`fishing_village_layout.md`);
+- style charter (`docs/style_charters.md`).
 
-- Fifteen named residents in five households: Venn (landing house, shop and
-  boatyard), Aran (pearl house and mussel yard), Vale (fishing house and
-  processing edge), Mor (guest houseboat and cargo landing) and Sen (clinic,
-  school room and shell workshop). The census replaces the single generic Lake
-  Diver, who becomes Nara Venn.
-- Every structure, boat and stall item has an owner and trade source in the
-  brief. Pearls are ordinary cultivated valuables.
-- The Mor houseboat is the rest point at 10 Tokoins.
+Settled: pearls are ordinary; the village stands against two limestone islets
+(Ko Panyi precedent); the Mor houseboat is the rest point at 10 Tokoins; boats
+will be rideable as a separate project, and players swim until then.
 
-Done (2026-10-06): `FishingVillagePlan` (`scripts/fishing_village_plan.gd`) holds
-the structures, routes, lanes, berths, swim exits, portal gate and trade ledger,
-and `VILLAGE=fishing tools/check_village_layout.sh` validates it with 0 failures
-(five corrections to the layout are recorded in `fishing_village_layout.md`).
-The validator does not yet check the built village; that mode comes with the
-build.
+### Done
 
-Quality audit and first building (2026-10-06, later):
+- **Plan data:** `FishingVillagePlan` (`scripts/fishing_village_plan.gd`) holds
+  structures, routes, lanes, berths, swim exits, the portal gate and the trade
+  ledger. `tools/validate_fishing_plan.tscn` checks it: 16 structures, 11
+  routes, 0 FAIL. (Under `--script` it never compiled yet printed 0 FAIL, so it
+  now runs as a scene.)
+- **Islets:** Anvil Rock and Heron Rock (`scripts/fishing_islets.gd`), one 1 m
+  grid heightfield mesh each, with trimesh collision and the shelves as part of
+  the bodies.
+- **Circulation and berths:** `floating_village.gd` builds only from the plan:
+  decks and piles on the shelves, the jetty spine and spurs, the houseboat
+  gangway, three derived swim exits, the portal landing, and boats at their
+  berths.
+- **Rest point:** the Mor cabin, with Leena as keeper, a 10 Tokoin rest, wake
+  and stand markers, and the `marine` toilet.
+- **World check:** `tools/fishing_islet_probe.tscn` passes in the world: 20
+  heights, the decks, the swim exits, the gangway, the rest point and Nara.
+- **Venn house:** `FishingBuildings.venn_house()`, built from the shared
+  `StiltKit` and `StiltRoofs`, proved by `tools/fishing_building_proof.tscn` (0
+  FAIL) and placed in the village. Drawing it changed its brief: no loft, counter
+  and store swapped, a threshold ramp, ring beam 3.3 m.
+- **Briefs:** design briefs (`fishing_village_building_designs.md`) and
+  interior briefs (`fishing_village_interiors.md`).
+- **Sen house:** redrawn on 2026-10-06 (design brief 4.4). The clinic door now
+  stands in the clinic's bay, and the family has a private door and corridor.
+- **Colours:** `HOUSEHOLD_COLORS` match the briefs: Sen violet, Mor
+  terracotta, shared structures green.
 
-- The plan validator had never actually run: under `--script` it failed to
-  compile (autoloads missing) yet exited 0 and printed "0 FAIL". It now runs as
-  `tools/validate_fishing_plan.tscn` and reports what it checked (16 structures,
-  11 routes, 0 FAIL).
-- The islet probe's "hang" was a script error (a Callable compared to a String)
-  that stopped it before `quit()`, not the open editor. Fixed, with a watchdog.
-  It now passes in the world: islets, decks, swim exits, gangway, the Mor rest
-  point (registered, Leena aboard) and Nara.
-- `HOUSEHOLD_COLORS` contradicted the briefs (Sen was green, Mor violet); now
-  Sen violet, Mor terracotta, shared structures green, as approved.
-- **Venn house built** (`FishingBuildings.venn_house()`) from the shared kit
-  `StiltKit` (`scripts/stilt_kit.gd`) and `StiltRoofs` (`scripts/stilt_roofs.gd`),
-  proved in isolation by `tools/fishing_building_proof.tscn` (0 FAIL) and placed in
-  the village in place of its placeholder; Nara sells from the veranda counter.
-  Drawing the brief against itself changed it (no loft, counter and store swapped,
-  threshold ramp, ring beam 3.3 m); see design brief 4.2.
+### Next, in order
 
-Next: the Sen house (its brief puts the clinic door in the wrong bay and has no
-way to the bedrooms that avoids the clinic; resolve in the drawings first), then
-the cistern house, net shed, pavilion and Aran house, each through the proof
-scene, then the floating structures. Add each to `FishingBuildings.BUILT`.
+1. **Look at what exists:** windowed renders of the islets' silhouettes and the
+   Venn house, plus an eye-level walk with the human, Blorbus and Xiao Hou Zi.
+2. **Sen house** from the redrawn brief, through the proof scene.
+3. The cistern house, net shed, pavilion and Aran house, each through the proof
+   scene and added to `FishingBuildings.BUILT`.
+4. The floating structures: the Vale houseboat, Rian's barge and Ivo's launch.
+5. Interiors, water work (the pearl yard and lines), and ledge planting on the
+   islets.
+6. Schedules and dialogue.
 
-Next work:
+### How to build one structure
 
-- Islets built (2026-10-06): `scripts/fishing_islets.gd` makes Anvil Rock and
-  Heron Rock, each one body holding its rock stack and its shelf column from the
-  lake bed to W - 3.2 m, from the plan's own numbers. The 18 m terrain grid cannot
-  hold a shelf, so the shelves are part of the islet bodies, not the height
-  field. `tools/fishing_islet_probe.tscn` confirms the collision heights. Not yet
-  seen in the engine: check the silhouettes, then add ledge planting.
-- **Rework in progress (2026-10-06, after the first walkthrough).** The houses
-  and islets first built were placeholders and are being replaced in the proper
-  order. Done: the fishing style charter (`docs/style_charters.md`), the floating
-  households (Vale houseboat, Rian's barge, Ivo's launch) in the plan and layout,
-  architectural design briefs (`fishing_village_building_designs.md`), interior
-  briefs (`fishing_village_interiors.md`), and the islets rebuilt as one 1 m-grid
-  heightfield mesh with trimesh collision (`scripts/fishing_islets.gd`), not
-  SuperEggs. **Not yet verified in the engine** (editor open). Next, once the
-  design briefs are approved: build one structure at a time in an isolated scene
-  (Venn house first), with real plans, framed openings and interiors, then replace
-  the placeholder solids in `floating_village.gd`.
-- Circulation built (2026-10-06): `scripts/floating_village.gd` now builds only
-  from `FishingVillagePlan`: decks and piles on the shelves, the jetty spine and
-  spurs, the houseboat gangway, three derived swim exits, the portal landing with
-  the gate turned north-west, owned placeholder houses in household colours, and
-  boats at their berths. `tools/fishing_islet_probe.tscn` checks 20 heights and
-  the vendor (Nara Venn). Still placeholders: house forms, the houseboat's
-  interior and rest point, the pavilion's furnishing.
-- Houseboat rest point written (2026-10-06, **not yet run**): the Mor cabin in
-  `floating_village.gd` is a walled room with a doorway, three berths, the marine
-  toilet, Leena Mor as keeper and a 10 Tokoin rest action, with its wake and
-  stand markers aboard. The probe that would check it hung because the editor
-  was open; re-run `tools/fishing_islet_probe.tscn` with the editor closed.
-- Review the architecture briefs (`docs/architecture/fishing_village_buildings.md`):
-  the kit of parts, household palettes and every building's form.
-- Then the architectural kit proofs, the
-  village, interiors, water work and landscape, and finally schedules and
-  dialogue.
+1. Fix its drawings in `fishing_village_building_designs.md`.
+2. Write a builder in `scripts/fishing_buildings.gd` from `StiltKit` and
+   `StiltRoofs`.
+3. Run `Godot --headless --path . tools/fishing_building_proof.tscn --
+   --building=Name` until it reports 0 FAIL.
+4. Render it with `--shots=/abs/dir` and look at the result.
+5. Add it to `FishingBuildings.BUILT`.
 
-Open:
+New `class_name` scripts need one `Godot --headless --path . --import` first.
 
-- None blocking: players swim to the village until boats exist.
+**Open:** none blocking.
 
 ## 4. Fire Kingdom Caldera City
 

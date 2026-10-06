@@ -62,12 +62,15 @@ shell worker, her younger brother).
   under it), a slate wall of chalk marks, a window onto the porch, a shelf of
   shells used for counting, a dry mat. *Only Asha's class:* Pree's drawing of a
   water bug taped to the wall; a row of wooden sailing boats the children carved.
-- **Asha's room.** A bed, a chest, record shelves with tied bundles, a lamp, a
-  writing desk by the window. The village's decisions in pictured knots on a
-  cord board.
+- **Family entry and records room** (the house's private door). Asha's record
+  shelves with tied bundles, the village's decisions in pictured knots on a
+  cord board, a low bench, boots and oilskins on pegs, a lamp.
+- **Kitchen and wash.** A clay brazier under its hood, a water jar, a basin
+  and towel, a woodbox, a shelf of bowls for two.
+- **Asha's room.** A bed, a chest, a lamp, a writing desk by the window.
 - **Rian's room.** A narrow bed, sail repair needles in a roll, spools of thread,
   a drying line of buttons, a mother-of-pearl button on a nail by the door.
-  Spare coils of rope in the passage.
+  Spare coils of rope in the corridor.
 
 ## 4. Rian's shell-works barge
 

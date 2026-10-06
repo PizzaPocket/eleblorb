@@ -171,22 +171,65 @@ drawings; the revisions below are what was built, and why.
 
 ### 4.4 Sen house, clinic and school room (Asha, Rian)
 
-- **Plan.** Footprint `x -20..-11, z -20..-10` (9 x 10). A three-bay main range
-  9 x 6 m (`z -18..-12`) under a hip roof; a covered **porch** 9 x 2 m on the
-  spine side (`z -12..-10`) under a pent roof; a rear service strip 9 x 2 m
-  (`z -20..-18`).
-  - Rooms: **clinic** 3 x 6 at the east end, entered from the porch (cot, shelves,
-    washing table); **school room** 3 x 6 in the middle, entered from the clinic and
-    from the porch by a second door; **sleeping rooms** for Asha and Rian, each 3 x 3,
-    at the west end, entered from a passage along the rear strip; Asha's record
-    shelves in the passage.
-- **Doors.** Clinic door south from the porch, centred at `x -15` to meet the Sen
-  spur at `(-15, -10)`, carved with a knot mark. School door south from the porch
-  at `x -18.5`. A rear door on the north into the service strip for firewood.
-- **Roof.** Hip over the range, pent over the porch. Colour violet panels, cream
-  shutters.
-- **History.** Built new when Asha and Rian stayed after the storm season, the
-  longest house, with its porch added later for the clinic queue.
+**Redrawn (2026-10-06).** The first brief failed its own plan in two ways:
+- **The clinic door was in the wrong bay.** It was centred at `x -15`, which
+  falls in the middle bay (the school room), while the clinic was the east bay.
+- **The family had no private way in.** The sleeping rooms were reached only
+  through the clinic or the school room, so Asha and Rian walked through
+  patients and pupils to reach their beds.
+
+The redraw keeps the footprint, the porch and the spur, and sorts the house by
+a privacy gradient: public rooms on the porch, a private corridor behind them,
+and the family's rooms at the back.
+
+- **Footprint.** `x -20..-11, z -20..-10` (9 × 10), unchanged.
+  - The main range now takes the full depth behind the porch: 9 × 8 m
+    (`z -20..-12`) under one hip roof.
+  - The old rear service strip is absorbed; the rock face lies close behind,
+    so it served nothing.
+  - **Porch** 9 × 2 m (`z -12..-10`) under a pent, floor W + 0.75, reached by the
+    Sen spur at `(-15, -10)`. It is the clinic's waiting place, and the bench
+    for the queue stands at its east end.
+- **Bays.** West `x -20..-17`, middle `x -17..-14`, east `x -14..-11`.
+- **Rows.**
+  - front row, the public rooms: `z -15.6..-12` (3.6 m);
+  - private corridor: `z -17..-15.6` (1.4 m);
+  - back row, the private rooms: `z -20..-17` (3.0 m).
+
+| Room | Bay and row | Size | Door |
+|---|---|---|---|
+| **Family entry and records room** | west, front | 3 × 3.6 | the **family door** from the porch at `x -18.5`, the house's private entrance; an open archway north into the corridor; a leaf door east into the clinic, so Asha reaches her records while treating |
+| **Clinic** | middle, front | 3 × 3.6 | the **clinic door** from the porch, centred at `x -15.5`, straight off the spur's end; knot-carved; a leaf door east into the school room |
+| **School room** | east, front | 3 × 3.6 | its own door from the porch at `x -12.5`, so pupils never pass through the clinic |
+| **Private corridor** | full width | 9 × 1.4 | from the family archway; no door into the clinic or school room |
+| **Asha's room** | west, back | 3 × 3.0 | from the corridor |
+| **Rian's room** | middle, back | 3 × 3.0 | from the corridor |
+| **Kitchen and wash** | east, back | 3 × 3.0 | from the corridor; a clay brazier with a hood and a flue through the hip, a water jar, a wash basin, the woodbox |
+
+- **Routes.**
+  - A patient goes spur → porch → clinic.
+  - A pupil goes porch → school room.
+  - Asha and Rian go porch → family door → corridor → their rooms, without
+    entering either public room.
+  - Asha moves between the records, the clinic and the school room by the two
+    connecting doors, which stay shut when a patient wants privacy.
+- **Doors** swing into the rooms they serve. The corridor's doors open into
+  the bedrooms and the kitchen, never into the corridor.
+- **Windows.**
+  - Front rooms: south onto the porch, the clinic's beside its door and the
+    school room's facing the water court.
+  - Back rooms: north, one each.
+  - East end: one window, in the kitchen.
+- **Section and roof.** Floor W + 0.75; ring beam 3.3 m; partitions full height
+  to a flat plank ceiling at the plate. A hip over the 9 × 8 m range rises about
+  2.5 m to a short east–west ridge. A 16° pent over the porch, tucked under the
+  hip's eave as on the Venn house. The flue rises through the hip's east slope.
+- **Piles.** On the 3 m grid at `x -20, -17, -14, -11` and
+  `z -20, -17, -15.6, -12, -10`. The corridor line takes a beam rather than a
+  pile row where a pile would fall off the shelf.
+- **Colour and history.** Violet panels, cream shutters. Built new when Asha
+  and Rian stayed after the storm season; the porch was added later for the
+  clinic queue, its posts paler.
 
 ### 4.5 Rian's shell-works barge
 
@@ -329,7 +372,7 @@ water, upper end flush with its deck, lower end at the derived height
 |---|---|---|---|---|---|
 | Venn house | square plus veranda | hip | shop veranda | teal | counter, loft lamp |
 | Slip shelter | open shed | gable | none | natural | rollers, sawdust |
-| Sen house | long range | hip | porch | violet | knot-carved clinic door |
+| Sen house | deep range, public front and private back | hip | porch with three doors | violet | knot-carved clinic door |
 | Rian's barge | open barge | pent | none | violet | saw and press |
 | Cistern house | square on rock | hip | tap apron | natural | wet footing |
 | Net shed | open | high gable | none | natural | hanging nets |
