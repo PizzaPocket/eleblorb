@@ -173,6 +173,8 @@ func _populate_ship(ship: AnimatableBody3D) -> void:
 		var pirate := NPC_SCENE.instantiate()
 		var names: Array[String] = ["Captain Brine", "Mara Reef", "Old Kelp", "Nell Crow", "Tobias Wake", "Pip Salt", "Rook Gale", "Ada Shoal"]
 		pirate.display_name = names[index]
+		# Mara Reef, Nell Crow and Ada Shoal are women; the rest of the crew are men.
+		pirate.is_female = index in [1, 3, 7]
 		pirate.stationary = index == 0
 		pirate.deck_wanderer = true
 		var deck_lane_x := -2.45 if index % 2 == 0 else 2.45
@@ -195,7 +197,7 @@ func _populate_ship(ship: AnimatableBody3D) -> void:
 			pirate.beard_color = Color(0.025, 0.02, 0.018)
 			pirate.beard_scale = 1.5
 		else:
-			pirate.beard_style = "stubble" if index in [2, 5, 7] else "none"
+			pirate.beard_style = "stubble" if index in [2, 5] else "none"
 			pirate.beard_color = Color(0.09, 0.065, 0.045)
 			if index in [2, 5]:
 				pirate.peg_leg = "left" if index % 2 == 0 else "right"

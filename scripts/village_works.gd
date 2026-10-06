@@ -182,7 +182,7 @@ void fragment() {
 ## cascade down the slope; its surface scrolls with foam.
 static func build_cascade(
 	parent: Node3D, centre: Array[Vector2], widths: Array[float], start_y: float,
-	shore_y: float, ground: Callable, node_name: String = "Cascade"
+	shore_y: float, ground: Callable, node_name: String = "Cascade", heights: Array[float] = []
 ) -> MeshInstance3D:
 	var tool := SurfaceTool.new()
 	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -203,6 +203,10 @@ static func build_cascade(
 		if i == 0:
 			ya = start_y
 			yb = start_y
+		# A free-falling arc carries its own heights instead of hugging the ground.
+		if not heights.is_empty():
+			ya = heights[i]
+			yb = heights[i]
 		rows.append({"l": Vector3(a.x, ya, a.y), "r": Vector3(b.x, yb, b.y), "v": travelled})
 	for i in rows.size() - 1:
 		var r0: Dictionary = rows[i]

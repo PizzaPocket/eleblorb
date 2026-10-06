@@ -106,6 +106,44 @@ static func piped_frame(
 	return instance
 
 
+## The inside of an opening, the reveal between its two frames, lined in the
+## frame's own colour so the pipes and the gap between them read as one trim
+## rather than two pipes on a differently coloured wall. The outline is pulled in
+## a hair toward `inside` so the liner lies just over the cut face, never in it.
+## It runs from z = -half_depth to z = +half_depth, buried ends and all.
+static func reveal_liner(
+	points: Array[Vector2], half_depth: float, color: Color, inside: Vector2,
+	shrink: float = 0.997, closed: bool = false
+) -> MeshInstance3D:
+	var outline: Array[Vector2] = []
+	for point in points:
+		outline.append(inside + (point - inside) * shrink)
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var spans := outline.size() if closed else outline.size() - 1
+	for index in spans:
+		var a := outline[index]
+		var b := outline[(index + 1) % outline.size()]
+		var edge := (b - a).normalized()
+		var normal2 := Vector2(edge.y, -edge.x)
+		if normal2.dot(inside - (a + b) * 0.5) < 0.0:
+			normal2 = -normal2
+		var normal := Vector3(normal2.x, normal2.y, 0.0)
+		for corner: Array in [[a, -half_depth], [a, half_depth], [b, -half_depth], [b, -half_depth], [a, half_depth], [b, half_depth]]:
+			var p: Vector2 = corner[0]
+			tool.set_normal(normal)
+			tool.add_vertex(Vector3(p.x, p.y, corner[1]))
+	var instance := MeshInstance3D.new()
+	instance.mesh = tool.commit()
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.roughness = 0.7
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	instance.material_override = material
+	CollisionPolicy.mark_decorative(instance)
+	return instance
+
+
 ## A flat slab of the doorway's own shape (square foot, rounded head), `thickness`
 ## deep along +/-Z. Used for the door leaf.
 static func arch_slab(half_width: float, height: float, exponent: float, thickness: float) -> ArrayMesh:

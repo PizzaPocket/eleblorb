@@ -58,7 +58,7 @@ func _build_town() -> void:
 		_add_stone_facade(house, 2, 2)
 		_spawn_villager(center+offsets[i]*0.62,i)
 	var inn_point := center+Vector2(18.0,-48.0)
-	VillageInn.create(self,_terrain,Vector3(inn_point.x,_terrain.get_mesh_height(inn_point.x,inn_point.y),inn_point.y),"rock_ground_kingdom","stone_rest_inn",20,"Dolma Hearthstone",Color(0.28,0.18,0.12),Color(0.52,0.36,0.22),EARTH_PROFILE)
+	VillageInn.create(self,_terrain,Vector3(inn_point.x,_terrain.get_mesh_height(inn_point.x,inn_point.y),inn_point.y),"rock_ground_kingdom","stone_rest_inn",20,"Dolma Hearthstone",Color(0.28,0.18,0.12),Color(0.52,0.36,0.22),EARTH_PROFILE,false,null,false,"panel",null,[],true,"earth_closet")
 	_build_well(center)
 
 ## Clads the south (door) wall's own two non-door columns in a tight grid of

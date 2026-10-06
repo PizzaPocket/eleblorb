@@ -63,9 +63,10 @@ func _ready() -> void:
 	add_child(_visuals)
 	var pivots := ProceduralFigure.build(
 		_visuals, skin_color, scale_clothing_color, skin_color,
-		sleeve_style, 1.08, 0.90 if is_female else 1.02, 1.06 if is_female else 0.92, 0.94,
+		sleeve_style, 1.0 if is_female else 1.08, 0.90 if is_female else 1.02, 1.06 if is_female else 0.92, 0.94,
 		Color(0.0, 0.0, 0.0, 0.0), hair_color,
-		hair_style, hair_length_variance, tail_color, false, false, 0.78, false
+		hair_style, hair_length_variance, tail_color, false, false, 0.78, false,
+		Color(0.0, 0.0, 0.0, 0.0), is_female
 	)
 	var left_leg := pivots["leg_left"] as Node3D
 	var right_leg := pivots["leg_right"] as Node3D

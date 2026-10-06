@@ -143,7 +143,7 @@ const BAMBOO_LEAF_COUNT := 5
 # ---------------------------------------------------------------------------
 # The kids' own play hut (Village A) -- see _build_play_hut()'s own comment.
 # ---------------------------------------------------------------------------
-const PLAY_HUT_LOCAL_POS := Vector2(6.0, 6.0)
+const PLAY_HUT_LOCAL_POS := Vector2(2.5, -10.8)
 const PLAY_HUT_POLE_COUNT := 7
 const PLAY_HUT_POLE_HEIGHT := 1.3
 const PLAY_HUT_POLE_RADIUS := 0.03
@@ -152,12 +152,12 @@ const PLAY_HUT_STICK_COLOR := Color(0.42, 0.3, 0.18)
 const LOOSE_STICK_COUNT := 9
 const KID_ROAM_JITTER := 6.0
 
-## Sun Wu Kong's sealing rock crowns the Emperor's castle.
-const SUN_WU_KONG_LOCAL_POS := PALACE_LOCAL_POS
-## Exact top of the crown cap: four storeys, then the cap center offset and
-## its half-height (0.35 + 0.35). Sun Wu Kong's feet and the cap collision
-## therefore resolve against the same visible surface.
-const SUN_WU_KONG_CASTLE_Y := PALACE_LEVEL_COUNT * PALACE_STOREY_HEIGHT + 0.70
+## Sun Wu Kong's sealing rock stands on the north rim of island A, Lantern Row,
+## facing out over the Abyss (chinese_village.md, section 4.6). Island-local
+## metres; the play hut stands in its lee, to the south.
+const SEALING_ROCK_LOCAL_POS := Vector2(0.0, -15.5)
+## He is pinned beneath the overhang, head and shoulders free on the north side.
+const SUN_WU_KONG_OFFSET_FROM_ROCK := Vector2(0.0, -1.3)
 
 ## The outdoor merchant's stall (Village B).
 const VENDOR_LOCAL_POS := Vector2(-7.0, 6.0)
@@ -223,7 +223,8 @@ const PANTS_COLORS := [
 	Color(0.24, 0.2, 0.16),
 ]
 
-## One entry per named villager -- own name, own lines, matching every other
+## One entry per named villager -- own name, gender (from the approved
+## census in docs/architecture/chinese_village.md), own lines, matching every other
 ## villager roster in the project. Lines are in Chinese per direct
 ## instruction ("all the people in the chinese village should literally
 ## speak Chinese in their dialog") -- display_name stays a Latin
@@ -232,6 +233,7 @@ const PANTS_COLORS := [
 const VILLAGER_IDENTITIES := [
 	{
 		"name": "Mei Lian",
+		"female": true,
 		"lines": [
 			"灯笼总是亮到半夜。没人记得这规矩是谁定下的。",
 			"你走了这么远来找我们。很少有人是特意来的。",
@@ -239,6 +241,7 @@ const VILLAGER_IDENTITIES := [
 	},
 	{
 		"name": "Wen Zhao",
+		"female": false,
 		"lines": [
 			"村里每座屋顶的角度都不一样。我爷爷盖了一半,没有一个对得上。",
 			"荒地大多时候很安静。我早就不介意走去井边了。",
@@ -246,6 +249,7 @@ const VILLAGER_IDENTITIES := [
 	},
 	{
 		"name": "Bo Xiang",
+		"female": false,
 		"lines": [
 			"天气好的时候,我走南边那条路去俄亥俄换面粉和盐。路很远。",
 			"我在村里住过三个不同的屋子,各有各的好。",
@@ -253,6 +257,7 @@ const VILLAGER_IDENTITIES := [
 	},
 	{
 		"name": "Hua Chen",
+		"female": true,
 		"lines": [
 			"这里没有城门,没有传送门,没有什么会把你吞到别处去。只有我们。",
 			"风一转,屋檐就呼啸起来。我花了好多年才不觉得瘆人。",
@@ -260,6 +265,7 @@ const VILLAGER_IDENTITIES := [
 	},
 	{
 		"name": "Jin Wei",
+		"female": true,
 		"lines": [
 			"我母亲挂起了这一排的第一批灯笼。我只是一直在换纸。",
 			"你会渐渐习惯这里地平线有多远。去了热闹的地方,反倒不习惯了。",
@@ -267,6 +273,7 @@ const VILLAGER_IDENTITIES := [
 	},
 	{
 		"name": "Lian Fu",
+		"female": false,
 		"lines": [
 			"有些晚上家家户户的窗户都亮着。整个村子好像一起醒着。",
 			"我不再问旅人从哪里来了。大多数答案早就说不通了。",
@@ -274,6 +281,7 @@ const VILLAGER_IDENTITIES := [
 	},
 	{
 		"name": "Yun Tao",
+		"female": false,
 		"lines": [
 			"这瓦的颜色是很久以前从别处运来的。现在这附近没人烧得出这颜色了。",
 			"我最喜欢黄昏前那段安静时光,灯笼还没亮起的时候。",
@@ -281,6 +289,7 @@ const VILLAGER_IDENTITIES := [
 	},
 	{
 		"name": "Shu Mei",
+		"female": true,
 		"lines": [
 			"再往西走,荒地就没有尽头了。我们大概是住得最远的人家了。",
 			"我数过路边的灯笼柱很多次,从来数不出一样的数字。",
@@ -307,6 +316,7 @@ const KID_HIP_BUILD_SCALE := 1.12
 const KID_IDENTITIES := [
 	{
 		"name": "Ting",
+		"female": true,
 		"lines": [
 			"我今早扎辫子扎了好久,不过很值得。",
 			"我才不怕竹林呢。才、才不太怕。",
@@ -314,6 +324,7 @@ const KID_IDENTITIES := [
 	},
 	{
 		"name": "Xiu",
+		"female": true,
 		"lines": [
 			"我能把灯笼全都数出来。没人信,但我真的可以。",
 			"妈妈说不许一个人跑去竹林那边。",
@@ -321,6 +332,7 @@ const KID_IDENTITIES := [
 	},
 	{
 		"name": "Pei",
+		"female": true,
 		"lines": [
 			"我们比赛跑去井边吧!",
 			"我昨天抓到一只蟋蟀,不过又把它放走了。",
@@ -328,6 +340,7 @@ const KID_IDENTITIES := [
 	},
 	{
 		"name": "Rong",
+		"female": false,
 		"lines": [
 			"货郎给我看过他的一根豆子。比我的手臂还长。",
 			"大人总说屋檐响只是风声。",
@@ -335,6 +348,7 @@ const KID_IDENTITIES := [
 	},
 	{
 		"name": "Bao",
+		"female": false,
 		"lines": [
 			"长大以后我要盖一个像文昭家一样的屋顶。",
 			"想看看我的石头收藏吗?真的很不错。",
@@ -439,7 +453,7 @@ func _build_village() -> void:
 	var inn_world := VILLAGE_CENTER + VILLAGE_E_LOCAL + Vector2(5.0, -5.0)
 	var inn_lines: Array[String] = []
 	inn_lines.assign(INNKEEPER_LINES)
-	VillageInn.create(self, terrain, Vector3(inn_world.x, _island_surface_y, inn_world.y), "outskirts", "chinese_village_inn", 15, INNKEEPER_NAME, Color(0.68, 0.08, 0.06), Color(0.48, 0.25, 0.12), {}, false, null, false, "panel", null, inn_lines)
+	VillageInn.create(self, terrain, Vector3(inn_world.x, _island_surface_y, inn_world.y), "outskirts", "chinese_village_inn", 15, INNKEEPER_NAME, Color(0.68, 0.08, 0.06), Color(0.48, 0.25, 0.12), {}, false, null, false, "panel", null, inn_lines, true, "matong")
 
 
 func _process(delta: float) -> void:
@@ -707,15 +721,8 @@ func _build_palace() -> void:
 
 	var crown := SuperEgg.build_part(Vector3(4.5, 0.35, 4.5), TRIM_COLOR, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	crown.position = Vector3(PALACE_LOCAL_POS.x, float(PALACE_LEVEL_COUNT) * PALACE_STOREY_HEIGHT + 0.35, PALACE_LOCAL_POS.y)
+	CollisionPolicy.mark_decorative(crown)
 	_palace.add_child(crown)
-	# The crown used to be visual-only, leaving the lower roof slab as the
-	# highest collision. Characters consequently stood half inside this cap.
-	var crown_collision := CollisionShape3D.new()
-	var crown_shape := BoxShape3D.new()
-	crown_shape.size = Vector3(9.0, 0.70, 9.0)
-	crown_collision.shape = crown_shape
-	crown_collision.position = crown.position
-	_palace.add_child(crown_collision)
 
 
 ## Build one floor as four non-overlapping slabs around a rectangular opening.
@@ -929,7 +936,7 @@ func _assign_villager_identity(npc_inst: Node3D, index: int) -> void:
 	var lines: Array[String] = []
 	lines.assign(identity["lines"])
 	npc_inst.talk_lines = lines
-	npc_inst.is_female = _rng.randf() < 0.5
+	npc_inst.is_female = bool(identity["female"])
 	# Fixed default look for ordinary adult villagers, per direct
 	# instruction -- not drawn from a random pool the way outfit colors
 	# below still are.
@@ -938,7 +945,17 @@ func _assign_villager_identity(npc_inst: Node3D, index: int) -> void:
 	npc_inst.hair_style = FigureHair.STYLE_BUN
 	npc_inst.shirt_color = SHIRT_COLORS[_rng.randi() % SHIRT_COLORS.size()]
 	npc_inst.pants_color = PANTS_COLORS[_rng.randi() % PANTS_COLORS.size()]
-	npc_inst.body_scale = _rng.randf_range(0.92, 1.08)
+	# Gendered build pools, matching the other settlements' profiles: women
+	# stand a little shorter with the wider hips, only men get the broad chest.
+	if npc_inst.is_female:
+		npc_inst.body_scale = _rng.randf_range(0.90, 0.98)
+		npc_inst.chest_build_scale = 0.96
+		npc_inst.hip_build_scale = 1.10
+	else:
+		npc_inst.body_scale = _rng.randf_range(0.98, 1.08)
+		npc_inst.chest_build_scale = 1.04
+		npc_inst.hip_build_scale = 1.0
+	npc_inst.abdomen_width_scale = 1.08
 
 
 ## Small roaming children on Village A, per direct instruction. Reuses the
@@ -962,7 +979,7 @@ func _spawn_kids() -> void:
 		var lines: Array[String] = []
 		lines.assign(identity["lines"])
 		npc_inst.talk_lines = lines
-		npc_inst.is_female = _rng.randf() < 0.5
+		npc_inst.is_female = bool(identity["female"])
 		npc_inst.skin_color = SKIN_COLORS[1]
 		npc_inst.hair_color = HAIR_COLORS[0]
 		npc_inst.hair_style = FigureHair.STYLE_PIGTAILS if i == 0 else KID_HAIR_STYLES[_rng.randi() % KID_HAIR_STYLES.size()]
@@ -1056,11 +1073,20 @@ func _build_jingu_bang_pickup(hut: Node3D) -> void:
 ## abyss-aware, so no fixed_ground_y-style override is needed here the way
 ## ordinary npc.gd instances need one.
 func _build_sun_wu_kong() -> void:
+	var rock := SealingRock.new()
+	rock.name = "SealingRock"
+	_village_a.add_child(rock)
+	rock.position = Vector3(SEALING_ROCK_LOCAL_POS.x, 0.0, SEALING_ROCK_LOCAL_POS.y)
+	if WorldState.sun_wu_kong_freed:
+		# Freed, he no longer stands here; the split rock is built on its own.
+		return
 	var sage: SunWuKong = SUN_WU_KONG_SCENE.instantiate()
-	var world := VILLAGE_CENTER + PALACE_LOCAL + SUN_WU_KONG_LOCAL_POS
-	sage.fixed_ground_y = _island_surface_y + SUN_WU_KONG_CASTLE_Y
+	sage.fixed_ground_y = _island_surface_y
 	get_parent().add_child(sage)
-	sage.global_position = Vector3(world.x, sage.fixed_ground_y, world.y)
+	var at := rock.global_position + Vector3(SUN_WU_KONG_OFFSET_FROM_ROCK.x, 0.0, SUN_WU_KONG_OFFSET_FROM_ROCK.y)
+	sage.global_position = Vector3(at.x, _island_surface_y, at.z)
+	# Facing out over the Abyss, to the north.
+	sage.rotation.y = PI
 
 
 ## A little bamboo forest, scattered sparsely across its own island rather

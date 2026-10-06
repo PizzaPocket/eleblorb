@@ -426,12 +426,20 @@ static func _build_roof(
 			var basis := _slab_basis(front, run, -drop)
 			var mid := Vector3(0.0, (a.y + b.y) * 0.5, sign_z * (a.x + b.x) * 0.5)
 			var overlap := 0.05 if i == 0 else 0.0
-			var slab := SuperEgg.build_part(
-				Vector3(half_length, ROOF_T * 0.5, length * 0.5 + overlap), roof_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-			)
 			var centre := mid - basis.y * ROOF_T * 0.5
-			slab.transform = Transform3D(basis, centre)
-			body.add_child(slab)
+			# The same roof construction as Ohio (TownProps.roof_slab): squarish
+			# shoulders, and the slope meeting the ridge is cut in the vertical plane
+			# through it so the two slopes join in one flat seam, with no overlap.
+			var slab: MeshInstance3D
+			if i == 0:
+				slab = TownProps.build_ridge_slab(
+					body, basis, centre, half_length, length, ROOF_T, roof_color,
+					-sign_z, Plane(Vector3(0.0, 0.0, -sign_z), 0.0)
+				)
+			else:
+				slab = TownProps.roof_slab(Vector3(half_length, ROOF_T * 0.5, length * 0.5), roof_color)
+				slab.transform = Transform3D(basis, centre)
+				body.add_child(slab)
 			CollisionPolicy.add_box(body, slab, Vector3(half_length * 2.0, ROOF_T, length + overlap * 2.0), centre, basis, true)
 			# Snow lies on the slab but stops short of the drip edge on the last run.
 			var last_run := i == profile.size() - 2

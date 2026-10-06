@@ -10,6 +10,10 @@ var innkeeper_name := "Innkeeper"
 ## Overrides the keeper's default talk lines for a village that speaks its own
 ## language. Empty keeps the stock lines.
 var keeper_lines: Array[String] = []
+## The keeper's body follows the keeper's identity, not the default male build.
+var keeper_is_female := false
+## The washroom fixture, true to the inn's culture (see ToiletFixtures.KINDS).
+var toilet_fixture := "porcelain"
 var _stand_marker: Marker3D
 var _wake_marker: Marker3D
 var _half_width := 8.0
@@ -42,7 +46,8 @@ static func create(
 	keeper_appearance: Dictionary = {}, keeper_is_lava_person: bool = false,
 	keeper_scene: PackedScene = null, open_pavilion_style: bool = false,
 	architecture_style: String = "panel", door_faces: Variant = null,
-	lines: Array[String] = []
+	lines: Array[String] = [], keeper_is_female: bool = false,
+	fixture: String = "porcelain"
 ) -> VillageInn:
 	var inn := VillageInn.new()
 	inn.world_id = for_world
@@ -50,6 +55,8 @@ static func create(
 	inn.fee = price
 	inn.innkeeper_name = keeper
 	inn.keeper_lines = lines
+	inn.keeper_is_female = keeper_is_female
+	inn.toilet_fixture = fixture
 	parent.add_child(inn)
 	inn.global_position = world_position
 	# Where a terrain exposes its village centre, turn the building's known
@@ -166,8 +173,9 @@ func _build(
 		keeper.stationary = true
 		keeper.fixed_ground_y = global_position.y
 		keeper.facing_degrees = 180.0
+		keeper.is_female = keeper_is_female
 		if not keeper_appearance.is_empty():
-			VillagerAppearance.apply_profile(keeper,0,0,false,keeper_appearance)
+			VillagerAppearance.apply_profile(keeper,0,0,keeper_is_female,keeper_appearance)
 		keeper.lava_body = keeper_is_lava_person
 	else:
 		# Local-species keepers (currently the Plant Kingdom's stuffed-animal
@@ -770,7 +778,7 @@ func _build_service_rooms(color: Color) -> void:
 		wall.add_child(panel)
 		CollisionPolicy.add_box(wall,panel,size,panel.position,Basis(),false)
 	add_child(wall)
-	var toilet:=TownProps.build_dry_toilet()
+	var toilet:=ToiletFixtures.build(toilet_fixture)
 	toilet.name="DryToilet"
 	# Its tank/back is against the north wall; the user faces into the room.
 	toilet.position=Vector3(_half_width-1.55,0.0,_half_depth-0.75)

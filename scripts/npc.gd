@@ -354,7 +354,8 @@ func _build_figure() -> void:
 		# thickness -- see ProceduralFigure._build_leg()'s own comment.
 		0.72 if wears_dress else 1.0,
 		true,
-		glove_color
+		glove_color,
+		is_female
 	)
 	_leg_left = pivots["leg_left"]
 	_leg_right = pivots["leg_right"]

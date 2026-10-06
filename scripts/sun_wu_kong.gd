@@ -71,11 +71,10 @@ var summoned: bool = false
 var cloud_companion: bool = false
 var in_party: bool = false
 ## Authored landmark placement may pin the resident sage above ordinary
-## island ground (the sealing rock now crowns the Emperor's castle).
+## island ground (the sealing rock stands on Lantern Row's north rim).
 var fixed_ground_y: float = INF
 var _player: Node3D
 var _terrain: Node
-var _rock_visual: Node3D
 var _rng := RandomNumberGenerator.new()
 var _summoner: Node3D
 var _attack_cooldown: float = 0.0
@@ -118,8 +117,6 @@ func _ready() -> void:
 		_build_staff(pivots)
 		_build_jindouyun()
 	else:
-		if not WorldState.sun_wu_kong_freed:
-			_build_sealing_rock()
 		if WorldState.sun_wu_kong_has_jingu_bang:
 			_build_staff(pivots)
 		Interactable.attach(self, "Talk", INTERACT_RADIUS, _on_interact)
@@ -242,16 +239,6 @@ func _apply_clothing(pivots: Dictionary) -> void:
 	body.material_override = material
 
 
-func _build_sealing_rock() -> void:
-	# NatureProps.build_rock() already places its lobes around the supplied
-	# ground origin. The former extra upward offset exposed the monkey's entire
-	# lower body beneath it. Keep the rock seated just through the roof surface
-	# so its solid silhouette encloses him from feet through crown.
-	_rock_visual = NatureProps.build_rock(0.36 * DISPLAY_SCALE, false)
-	_rock_visual.position = Vector3(0, -0.025 * DISPLAY_SCALE, 0)
-	add_child(_rock_visual)
-
-
 ## True ordinary terrain height everywhere except within the Chinese
 ## village's own floating-island footprint, where the real ground is the
 ## Abyss of Impending Doom far below -- see CHINESE_VILLAGE_* consts' own
@@ -289,9 +276,8 @@ func _on_interact() -> void:
 			Hud.show_message("石头纹丝不动。")
 			return
 		WorldState.sun_wu_kong_freed = true
-		if _rock_visual != null:
-			_rock_visual.queue_free()
-			_rock_visual = null
+		# The village's SealingRock splits and stays split; it is not his.
+		get_tree().call_group("sealing_rock", "split")
 		Hud.show_message("孙悟空从石下站了起来。")
 		return
 	if not WorldState.sun_wu_kong_has_jingu_bang and Inventory.has(JINGU_BANG_ITEM_NAME):

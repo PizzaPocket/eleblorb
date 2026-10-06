@@ -715,6 +715,9 @@ const INTERIOR_DOOR_HEIGHT := 2.3
 const OPENING_EXPONENT := 4.0
 const DOOR_CUT_EXTENSION := 0.7
 const FRAME_PIPE := 0.045
+## Frame pipes, doors and windows alike, are a little slimmer than before
+## (doors were 1.2 x FRAME_PIPE, windows 1.0 x), so they read as a subtle edge.
+const PIPE_SCALE := 0.9
 const SHUTTER_DEPTH := 0.035
 
 
@@ -758,8 +761,15 @@ static func _build_panel_opening_trim(
 		var frame_sink := 0.04 if bool(opening.get("interior", false)) else 0.2
 		var arch := OpeningTrim.door_arch(half_w, height, opening_exponent, DOOR_CUT_EXTENSION, frame_sink)
 		var inside := Vector2(0.0, height * 0.5)
+		# The reveal between the two frames takes the frame's colour, and the pipes
+		# are slim, so the trim reads as one quiet edge rather than two bright
+		# pipes either side of a differently coloured wall.
+		var liner := OpeningTrim.reveal_liner(arch, half_t, trim_color, inside)
+		liner.name = "DoorReveal"
+		liner.position = Vector3(cx, bottom, 0.0)
+		pivot.add_child(liner)
 		for face in 2:
-			var frame := OpeningTrim.piped_frame(arch, FRAME_PIPE * 1.2, trim_color, false, inside)
+			var frame := OpeningTrim.piped_frame(arch, FRAME_PIPE * PIPE_SCALE, trim_color, false, inside)
 			frame.name = "DoorFrame"
 			frame.position = Vector3(cx, bottom, outer_z if face == 0 else inner_z)
 			frame.rotation.y = PI if face == 0 else 0.0
@@ -802,8 +812,13 @@ static func _build_panel_opening_trim(
 		crossbar.position = Vector3(cx, mid + 0.1, 0.0)
 		pivot.add_child(crossbar)
 		CollisionPolicy.mark_decorative(crossbar)
+	# As with doorways, the reveal between the two frames takes the frame colour.
+	var liner := OpeningTrim.reveal_liner(loop, half_t, trim_color, Vector2.ZERO, 0.995, true)
+	liner.name = "WindowReveal"
+	liner.position = Vector3(cx, mid, 0.0)
+	pivot.add_child(liner)
 	for face in 2:
-		var frame := OpeningTrim.piped_frame(loop, FRAME_PIPE, trim_color, true)
+		var frame := OpeningTrim.piped_frame(loop, FRAME_PIPE * PIPE_SCALE, trim_color, true)
 		frame.position = Vector3(cx, mid, outer_z if face == 0 else inner_z)
 		frame.rotation.y = PI if face == 0 else 0.0
 		pivot.add_child(frame)
@@ -1972,6 +1987,46 @@ static func _build_roof_panel(
 	# Landable: the player can reach a roof, so it holds them (the slope is well
 	# inside CharacterBody3D's floor angle).
 	_add_box_collision(body, panel_pos, Vector3(width, ROOF_COLLISION_THICKNESS, slope_len), panel_basis)
+
+
+## How far a slope slab runs past its ridge before the ridge cut trims it back.
+const ROOF_CUT_EXTENSION := 0.34
+
+
+## One roof slope as a clipped SuperEgg slab: Ohio's refined roof construction,
+## shared so every settlement's roofs are built the same way. The shoulders are
+## very squarish (ROOF_EDGE_EPSILON) and the mesh is sampled densely enough for
+## that corner to be square. `planes` clip it (retained side is distance <= 0,
+## in the slab's own frame).
+static func roof_slab(semi_axes: Vector3, color: Color, planes: Array[Plane] = []) -> MeshInstance3D:
+	var slab := MeshInstance3D.new()
+	slab.mesh = SuperEgg.build_clipped_mesh(semi_axes, planes, ROOF_EDGE_EPSILON, ROOF_EDGE_EPSILON, ROOF_SEGMENTS, ROOF_RINGS)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.roughness = 0.82
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	slab.material_override = material
+	return slab
+
+
+## A slope slab that meets a ridge. It runs past the ridge by ROOF_CUT_EXTENSION
+## and is cut along `ridge_plane` (body frame; the retained side is distance <= 0),
+## so the two slopes of a gable meet in one hard flat seam and every free edge
+## keeps the squarish shoulder. `basis` has x across the slope, y its normal and
+## z down or up it; `toward_ridge` is +1 if the ridge lies along +z of the
+## basis and -1 if along -z. `centre` is the middle of the visible slab.
+static func build_ridge_slab(
+	body: Node3D, basis: Basis, centre: Vector3, half_width: float, length: float,
+	thickness: float, color: Color, toward_ridge: float, ridge_plane: Plane
+) -> MeshInstance3D:
+	var origin := centre + basis.z * (toward_ridge * ROOF_CUT_EXTENSION * 0.5)
+	var semi := Vector3(half_width, thickness * 0.5, length * 0.5 + ROOF_CUT_EXTENSION * 0.5)
+	var to_local := Transform3D(basis, origin).affine_inverse()
+	var planes: Array[Plane] = [to_local * ridge_plane]
+	var slab := roof_slab(semi, color, planes)
+	slab.transform = Transform3D(basis, origin)
+	body.add_child(slab)
+	return slab
 
 
 # ---------------------------------------------------------------------------

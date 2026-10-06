@@ -53,7 +53,7 @@ func _ready()->void:
 	_build_lava_fountain(center)
 	_spawn_lava_slide()
 	var inn_pos := center + Vector2(14.0, -45.0)
-	VillageInn.create(self,_terrain,Vector3(inn_pos.x,_terrain.get_mesh_height(inn_pos.x,inn_pos.y),inn_pos.y),"fire_kingdom","caldera_village_inn",25,"Ember Rest",Color(0.20,0.06,0.035),Color(0.30,0.10,0.055),FIRE_APPEARANCE,true)
+	VillageInn.create(self,_terrain,Vector3(inn_pos.x,_terrain.get_mesh_height(inn_pos.x,inn_pos.y),inn_pos.y),"fire_kingdom","caldera_village_inn",25,"Ember Rest",Color(0.20,0.06,0.035),Color(0.30,0.10,0.055),FIRE_APPEARANCE,true,null,false,"panel",null,[],false,"incinerating")
 
 
 func _spawn_lava_slide() -> void:

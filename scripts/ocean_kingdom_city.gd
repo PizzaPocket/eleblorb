@@ -61,7 +61,7 @@ func _ready() -> void:
 	_build_village()
 	_spawn_merfolk.call_deferred()
 	var inn_pos := CITY_CENTER + Vector2(24.0, 18.0)
-	VillageInn.create(self, _terrain, Vector3(inn_pos.x, _terrain.get_mesh_height(inn_pos.x, inn_pos.y), inn_pos.y), "ocean_kingdom", "seafolk_village_inn", 25, "Nerissa Stillwater", Color(0.08, 0.48, 0.52), Color(0.12, 0.38, 0.46))
+	VillageInn.create(self, _terrain, Vector3(inn_pos.x, _terrain.get_mesh_height(inn_pos.x, inn_pos.y), inn_pos.y), "ocean_kingdom", "seafolk_village_inn", 25, "Nerissa Stillwater", Color(0.08, 0.48, 0.52), Color(0.12, 0.38, 0.46), {}, false, null, false, "panel", null, [], true, "vacuum")
 
 
 func _build_castle() -> void:

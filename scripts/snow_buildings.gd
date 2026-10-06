@@ -165,9 +165,7 @@ static func lean_to(body: StaticBody3D, spec: Dictionary, side: float, depth_out
 	var centre_x := side * (width * 0.5 + depth_out * 0.5)
 	var tilt := Basis(Vector3.BACK, -side * angle)
 	var drop := depth_out * tan(angle)
-	var roof := SuperEgg.build_part(
-		Vector3(depth_out * 0.5 + 0.35, 0.07, depth * 0.5 + 0.3), LogHouse.ROOF_COLOR, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-	)
+	var roof := TownProps.roof_slab(Vector3(depth_out * 0.5 + 0.35, 0.07, depth * 0.5 + 0.3), LogHouse.ROOF_COLOR)
 	var roof_centre := Vector3(centre_x, wall_y - drop * 0.5 + 0.1, 0.0)
 	roof.transform = Transform3D(tilt, roof_centre)
 	body.add_child(roof)

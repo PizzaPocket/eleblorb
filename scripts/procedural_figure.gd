@@ -366,7 +366,8 @@ static func build(
 	has_glasses: bool = false,
 	leg_thickness_scale: float = 1.0,
 	has_ears: bool = true,
-	hand_color_override: Color = Color(0.0, 0.0, 0.0, 0.0)
+	hand_color_override: Color = Color(0.0, 0.0, 0.0, 0.0),
+	feminine_torso: bool = false
 ) -> Dictionary:
 	var arm_color := shirt_color if sleeve_style == SLEEVE_STYLE_LONG else skin_color
 	var hand_color: Color = skin_color if is_zero_approx(hand_color_override.a) else hand_color_override
@@ -405,8 +406,11 @@ static func build(
 	# flush.
 	var abdomen_x := minf(ABDOMEN_SIZE.x * abdomen_width_scale, chest_size.x)
 	var abdomen_back_depth := minf(ABDOMEN_SIZE.z * abdomen_width_scale, chest_size.z)
+	# Only men's abdomens may stand proud of the chest. Women's stay flush
+	# with the thorax's own front, whatever the width scale.
+	var abdomen_overhang := 1.0 if feminine_torso else ABDOMEN_FRONT_OVERHANG_MAX
 	var abdomen_front_depth := minf(
-		ABDOMEN_SIZE.z * abdomen_width_scale, chest_size.z * ABDOMEN_FRONT_OVERHANG_MAX
+		ABDOMEN_SIZE.z * abdomen_width_scale, chest_size.z * abdomen_overhang
 	)
 	var abdomen_size := Vector3(
 		abdomen_x, ABDOMEN_SIZE.y, (abdomen_front_depth + abdomen_back_depth) * 0.5

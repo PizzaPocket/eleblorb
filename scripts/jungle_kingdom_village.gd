@@ -51,7 +51,7 @@ const APE_TEMPLATE_SCENE := "res://scenes/ape_template_preview.tscn"
 ## doc comment.
 const PRIMATE_TEMPLATE_IDENTITIES := [
 	{
-		"name": "Torvin Oakjaw",
+		"name": "Batu",
 		"has_tail": false,
 		"lines": [
 			"The training dummies out past the clearing used to get more use. Whoever's running that business isn't telling anyone how.",
@@ -59,7 +59,7 @@ const PRIMATE_TEMPLATE_IDENTITIES := [
 		],
 	},
 	{
-		"name": "Maddox Cindertusk",
+		"name": "Sari",
 		"has_tail": false,
 		"lines": [
 			"Kova Kong's out past the tree line, if you're brave enough to go looking. Hard to miss him, honestly.",
@@ -67,7 +67,7 @@ const PRIMATE_TEMPLATE_IDENTITIES := [
 		],
 	},
 	{
-		"name": "Perrin Vale",
+		"name": "Teguh",
 		"has_tail": false,
 		"lines": [
 			"Xiao Hou Zi used to pass through here before he took up with travelers. Good company, when he sat still.",
@@ -75,7 +75,7 @@ const PRIMATE_TEMPLATE_IDENTITIES := [
 		],
 	},
 	{
-		"name": "Wick Thistledown",
+		"name": "Rotan",
 		"has_tail": true,
 		"lines": [
 			"The canopy villagers look down on us, and I mean that literally -- they're all up in the trees.",
@@ -83,7 +83,7 @@ const PRIMATE_TEMPLATE_IDENTITIES := [
 		],
 	},
 	{
-		"name": "Fable Quickpaw",
+		"name": "Kilat",
 		"has_tail": true,
 		"lines": [
 			"That ape on the horse showed up a few days back. Hasn't said much to the rest of us.",
@@ -91,7 +91,7 @@ const PRIMATE_TEMPLATE_IDENTITIES := [
 		],
 	},
 	{
-		"name": "Doran Mossback",
+		"name": "Akar",
 		"has_tail": true,
 		"lines": [
 			"Watch where you step near the old roots. They trip up more outsiders than the ramps do.",
@@ -150,126 +150,126 @@ const SPECIAL_BANANA_ITEM_NAME := "Special Banana"
 # since _ready() spawns all 13 anchored villagers before any ground ones.
 const JUNGLE_VILLAGER_IDENTITIES := [
 	{
-		"name": "Kesh Underbough",
+		"name": "Dahan",
 		"lines": [
 			"Ramps get slick after rain. Mind your footing, especially past the third landing on any tree, not just this one.",
 			"I've climbed every rung on this trunk since I could walk. Still haven't found the top worth the trip.",
 		],
 	},
 	{
-		"name": "Tamsin Reedwalker",
+		"name": "Tirta",
 		"lines": [
 			"The river below wasn't always so wide. It carved that shape in a season nobody living now remembers starting.",
 			"Fish don't come this high, but I still watch the water most evenings. Habit, I suppose, more than purpose.",
 		],
 	},
 	{
-		"name": "Elden Barrow",
+		"name": "Purnama",
 		"lines": [
 			"The elders keep to the tallest trees for a reason nobody younger seems to ask about anymore.",
 			"A curse doesn't care how careful you are. It only cares whether a cradle gets used.",
 		],
 	},
 	{
-		"name": "Nettle Vray",
+		"name": "Tunas",
 		"lines": [
 			"You're the first outsider I've seen up this high. Most people can't climb this far, or won't.",
 			"Is it true you talk to a slime? I'd ask it questions all day if it were mine.",
 		],
 	},
 	{
-		"name": "Corvin Ashwake",
+		"name": "Abu",
 		"lines": [
-			"Ashwake. Yes, that's the family name, and no, I didn't choose it. Ask my grandmother about the joke.",
+			"Abu. Yes, it means ash, and no, I didn't choose it. Ask my grandmother about the joke.",
 			"We don't joke about the ashing where the young ones can hear. Elsewhere, though, someone has to.",
 		],
 	},
 	{
-		"name": "Sable Hollow",
+		"name": "Senja",
 		"lines": [
 			"A cradle went up two trees over last month. Nobody's said the word since, but everyone's counting the days.",
 			"My shadow's the only part of me that isn't afraid of what's coming. Small comfort, but I'll take it.",
 		],
 	},
 	{
-		"name": "Rook Bramblewood",
+		"name": "Jati",
 		"lines": [
 			"Built half these ramps myself, or repaired what the storms took. Bark doesn't hold a nail the way wood does.",
 			"Xiao Hou Zi used to climb up here and pester me about tools. Miss the racket, honestly.",
 		],
 	},
 	{
-		"name": "Yarrow Dess",
+		"name": "Rimba",
 		"lines": [
 			"Something's coming for this world, or so the vines whisper. I've stopped asking which vines. Nobody ever says.",
 			"I'd rather not think too hard about the shadows that outlast us. Doesn't change what they are.",
 		],
 	},
 	{
-		"name": "Pemberly Cade",
+		"name": "Intan",
 		"lines": [
 			"The training grounds down below have gone quiet lately. Whoever's running that dummy business isn't telling anyone how.",
 			"Don't wander near the practice dummies after dark. I've heard they don't stay dummies forever.",
 		],
 	},
 	{
-		"name": "Tovik Greymoss",
+		"name": "Bintang",
 		"lines": [
 			"Down in the lowland jungle, that's where you'll find Xiao Hou Zi, if he hasn't wandered off again.",
 			"He used to visit before he took up with travelers. Good company, when he sat still long enough.",
 		],
 	},
 	{
-		"name": "Wisha Fenlow",
+		"name": "Sekar",
 		"lines": [
 			"We don't get many visitors up here. Most people can't climb this high, and fewer bother trying.",
 			"I like the quiet more than I like company, if I'm honest. Don't take it personally.",
 		],
 	},
 	{
-		"name": "Bracken Solt",
+		"name": "Bayu",
 		"lines": [
 			"Every trunk in this village has its own creak. I could find my way home blind, just by listening.",
 			"The wind changes before a storm does, up this high. You learn to read it or you learn to fall.",
 		],
 	},
 	{
-		"name": "Marlow Quist",
+		"name": "Embun",
 		"lines": [
 			"Watch your step past the third landing on the east tree. That one's been loose for a season now.",
 			"I keep telling the carpenters to fix it. They keep telling me it's character.",
 		],
 	},
 	{
-		"name": "Sedge Marrow",
+		"name": "Delima",
 		"lines": [
 			"The clearing floor's soft after rain. Good for bare feet, bad for anyone in a hurry.",
 			"I forage down here most mornings. The canopy villagers say I've gone native. I say they've gone up.",
 		],
 	},
 	{
-		"name": "Ilva Bracken",
+		"name": "Melati",
 		"lines": [
 			"There used to be more of us down on the ground. The trees got safer, somehow, and everyone climbed.",
 			"I like having my feet on something that isn't swaying. Call it a personal failing.",
 		],
 	},
 	{
-		"name": "Osmund Reave",
+		"name": "Damar",
 		"lines": [
 			"Whatever's cursing this kingdom, it doesn't seem to care whether you're up a tree or down here with me.",
 			"My shadow's outlived two of my cousins now. Doesn't make for easy conversation with it.",
 		],
 	},
 	{
-		"name": "Linnet Grove",
+		"name": "Murai",
 		"lines": [
 			"The clearing gets loud with birdsong an hour before dawn, then goes dead quiet right after. Never figured out why.",
 			"You get used to the canopy blocking most of the sky. Then one day you look up and it startles you.",
 		],
 	},
 	{
-		"name": "Dune Sarrow",
+		"name": "Wangi",
 		"lines": [
 			"I've met maybe three outsiders in my life. You're the friendliest looking one so far, for what that's worth.",
 			"Ask the elders about the curse if you really want an answer. I just try not to think about it.",
@@ -336,7 +336,7 @@ func _ready() -> void:
 
 func _build_village_inn() -> void:
 	var pos := Vector2(27.0, 22.0)
-	VillageInn.create(self,_terrain,Vector3(pos.x,_terrain.get_mesh_height(pos.x,pos.y),pos.y),"primate_kingdom","plant_village_inn",15,"Bima Canopy",Color(0.20,0.48,0.22),Color(0.48,0.31,0.16),{},false,VILLAGER_SCENE,true)
+	VillageInn.create(self,_terrain,Vector3(pos.x,_terrain.get_mesh_height(pos.x,pos.y),pos.y),"primate_kingdom","plant_village_inn",15,"Bima",Color(0.20,0.48,0.22),Color(0.48,0.31,0.16),{},false,VILLAGER_SCENE,true,"panel",null,[],false,"composting_seat")
 
 
 func _build_tree_and_houses(local_pos: Vector2, height: float, terrain: Node, tree_index: int) -> void:

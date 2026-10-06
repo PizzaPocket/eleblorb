@@ -423,8 +423,10 @@ func _process(delta: float) -> void:
 	_mill_animation_time += delta
 	for wheel_visual in _water_wheel_visuals:
 		if is_instance_valid(wheel_visual):
-			# Flow is local +Z, so the exposed east-west axle turns about X.
-			wheel_visual.rotation.x = -_mill_animation_time * 0.62
+			# An undershot wheel: the race flows east, the axle runs north-south and
+			# local +X is world +Z, so a positive turn about it carries the blades
+			# in the water (the bottom of the wheel) east, with the current.
+			wheel_visual.rotation.x = _mill_animation_time * 0.62
 	for drive in _sawmill_drives:
 		_animate_sawmill_drive(drive)
 	var now := Time.get_ticks_msec()
@@ -721,7 +723,7 @@ func _build_village_inn(parent: Node3D) -> void:
 	var inn := VillageInn.create(
 		parent, terrain, Vector3(town_center.x + local_pos.x, terrain.get_mesh_height(town_center.x + local_pos.x, town_center.y + local_pos.y), town_center.y + local_pos.y),
 		"outskirts", "starting_village_inn", 10, "Mira Holt",
-		Color(0.52,0.18,0.15),TownProps.WALL_STONE,keeper_profile,false,null,false,"continuous_panel",town_center+INN_ROAD_POINT
+		Color(0.52,0.18,0.15),TownProps.WALL_STONE,keeper_profile,false,null,false,"continuous_panel",town_center+INN_ROAD_POINT,[],true
 	)
 	var inn_yaw := atan2(0.0, -(INN_ROAD_POINT.y - INN_LOCAL.y))
 	_record_solid("HoltInn", "building", INN_LOCAL, Vector2(9.6, 8.0), inn_yaw)
@@ -1477,6 +1479,69 @@ func _plan_waterworks() -> Dictionary:
 ## the slope to the lake's surface.
 func _build_cascade(parent: Node3D, plan: Dictionary, start: Vector2, start_y: float, ground: Callable) -> void:
 	var direction: Vector2 = plan["dir"]
+	var shore_y: float = terrain.get_lake_water_level()
+	const STEP := 2.0
+	const STEEP_DROP := 1.2
+	var width0 := STREAM_WIDTH + 0.6
+	# Walk out from the aqueduct's end to the cliff's lip (the first step that falls
+	# away steeply) and on to where the ground meets the lake.
+	var lip_step := -1
+	var lake_step := -1
+	var previous_y := _ground_y(start)
+	for step in range(1, 140):
+		var y := _ground_y(start + direction * STEP * float(step))
+		if lip_step < 0 and previous_y - y > STEEP_DROP:
+			lip_step = step - 1
+		previous_y = y
+		if y <= shore_y + 0.3:
+			lake_step = step
+			break
+	if lip_step < 0 or lake_step < 0:
+		_build_cascade_on_slope(parent, direction, start, start_y, ground)
+		return
+	# The water runs down the slope to the lip as before...
+	var points: Array[Vector2] = [start]
+	var widths: Array[float] = [width0]
+	for step in range(1, lip_step + 1):
+		points.append(start + direction * STEP * float(step))
+		widths.append(width0 + float(step) * 0.07)
+	VillageWorks.build_cascade(parent, points, widths, start_y, shore_y, ground)
+	_add_cascade_spray(parent, points, widths, start_y, shore_y)
+	# ...then leaves the cliff in a free arc, out past its foot until it stands
+	# vertically over the lake, and falls into it.
+	var lip := start + direction * STEP * float(lip_step)
+	var lip_y := maxf(_ground_y(lip) + 0.16, shore_y + 1.0)
+	var drop := lip_y - shore_y
+	var fall_time := sqrt(2.0 * drop / 9.81)
+	var reach := STEP * float(lake_step - lip_step) + 3.0
+	while reach < STEP * float(lake_step - lip_step) + 40.0:
+		var clear := true
+		for k in range(1, 31):
+			var t := fall_time * float(k) / 30.0
+			var at := lip + direction * (reach / fall_time * t)
+			if lip_y - 0.5 * 9.81 * t * t < _ground_y(at) + 0.3 and _ground_y(at) > shore_y:
+				clear = false
+				break
+		if clear:
+			break
+		reach += 2.0
+	var arc_points: Array[Vector2] = []
+	var arc_widths: Array[float] = []
+	var arc_heights: Array[float] = []
+	const ARC_SAMPLES := 40
+	for k in range(0, ARC_SAMPLES + 1):
+		var t := fall_time * float(k) / float(ARC_SAMPLES)
+		arc_points.append(lip + direction * (reach / fall_time * t))
+		arc_widths.append(width0 + float(lip_step) * 0.07 + 2.5 * float(k) / float(ARC_SAMPLES))
+		arc_heights.append(maxf(lip_y - 0.5 * 9.81 * t * t, shore_y + 0.1))
+	VillageWorks.build_cascade(parent, arc_points, arc_widths, lip_y, shore_y, ground, "CascadeFall", arc_heights)
+	var landing := arc_points[arc_points.size() - 1]
+	_add_mist(parent, Vector3(landing.x, shore_y + 0.3, landing.y), Vector3(5.0, 0.3, 5.0), 70, 2.6, 4.5)
+	_add_mist(parent, Vector3(lip.x, lip_y + 0.2, lip.y), Vector3(width0 * 0.5, 0.2, 0.6), 16, 1.2, 1.4)
+
+
+## Where there is no cliff to leave, the water simply follows the slope to the lake.
+func _build_cascade_on_slope(parent: Node3D, direction: Vector2, start: Vector2, start_y: float, ground: Callable) -> void:
 	var shore_y: float = terrain.get_lake_water_level()
 	var points: Array[Vector2] = [start]
 	var widths: Array[float] = [STREAM_WIDTH + 0.6]
