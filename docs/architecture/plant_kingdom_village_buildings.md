@@ -168,7 +168,7 @@ bamboo panels and roll-up blinds.
 | **Veranda** | 14 × 3 m | open, facing the commons; Bima's counter at one end with a resin lamp, a guest mat, a bench, orchid baskets and jasmine in a pot at the door |
 | **Party room** | 8 × 6 m | eight hero-length sleeping platforms with woven mats and kapok pillows, a bamboo rail for gear, two roll-up windows onto the forest; the party wakes here |
 | **Guest room** | 3 × 4 m | one platform, a peg rail, a window |
-| **Bima's room** | 3 × 4 m | a hammock, a chest, a shelf of carved fruit-stone tokens from past guests |
+| **Bima's room** | 3 × 4 m | a hammock, a chest, a shelf of carved fruit-stone tokens from past guests; a basket his sister sends up with spare food |
 | **Washroom** | 2 × 3 m | the privy closet (bench seat over a sealed clay vat, leaf litter and scoop), a log washbasin with a water tube from the commons cistern; vat lowered by rope to the compost |
 
 The party room, guest room and Bima's room open off a 1.4 m passage from the
@@ -205,21 +205,25 @@ and a broad leaf roof. Inside:
 Each household carries one carved trunk marker at its landing: a lashed bundle
 of its own colours and objects, never lettering.
 
-| Tree, ring | Resident | Pavilion | Marks |
+Pavilions are sized by household:
+- a **single pavilion** is about 4 × 4 m with one hammock nest;
+- a **couple's pavilion** is about 5 × 4 m with one broad shared nest, a
+  second storage bay and a sitting mat by the open side;
+- **joined pavilions** are two single pavilions sharing a small deck between
+  them.
+
+| Tree, ring | Household | Pavilion | Marks |
 |---|---|---|---|
-| **Elder Tree, crown deck 45.6 m** | Purnama | the largest pavilion, 5 × 5 m, on a crown deck that reaches into the light | the village's memory: knotted cords counting years, one for every season since the curse began; a cushion for visitors |
-| Elder Tree, 34.2 m | Rimba | open on all sides to the vines | vines trained round the posts; a listening seat facing outward |
-| Elder Tree, 34.2 m | Sekar | the quietest corner of the ring, roll-up blinds always half down | a backstrap loom, woven mats stacked, dyed fibre drying |
-| Elder Tree, 22.8 m | Abu | the busiest landing, at the bridge head | a hammock for guests as well as Abu's own; a gourd of palm wine; carved joke figures on the rail |
-| Elder Tree, 22.8 m | Senja | facing west, toward dusk | a cord of knots counting the days since the last cradle; a small shelf of keepsakes from lost neighbours |
-| **East Tree, 34.2 m** | Bayu | the most exposed corner, wind side | wind chimes of seed pods and bamboo, a feather vane on a pole |
-| East Tree, 34.2 m | Tunas | the newest pavilion, its thatch still green | a collection of found things: shells, seeds, a feather from every bird in the forest; a seat facing the village |
-| East Tree, 22.8 m | Dahan | beside the ramp head | coils of lashing, spare rungs, a mallet; Dahan checks the ramps from here |
-| East Tree, 22.8 m | Embun | the third-landing worrier's pavilion, set back from the edge | extra rope rails of Embun's own tying, a net slung lower than anyone else's |
-| **North Tree, 34.2 m** | Murai | facing the dawn | bird feeders of halved gourds, a woven blind for watching, a carved board of bird shapes |
-| North Tree, 34.2 m | Intan | overlooking the training grounds | a seat with the best view of the clearing's edge; a pebble tally of comings and goings |
-| North Tree, 22.8 m | Tirta | facing the river | fish traps and nets drying, a basket of river stones |
-| North Tree, 22.8 m | Bintang | at the bridge head | a woven map of paths in coloured cords, walking sticks, a pack always half packed |
+| **Elder Tree, crown deck 45.6 m** | Purnama and Sekar, sisters | the largest, 7 × 5 m: two sleeping alcoves either side of the central pillar, a shared weaving corner at the open side, a visitors' cushion | Purnama's knotted cords counting the seasons since the curse began; Sekar's backstrap loom and stacked mats; a basket hoist from the 34.2 m ring for supplies, so neither sister has to carry loads up |
+| Elder Tree, 34.2 m | Senja and Rimba, married | a couple's pavilion facing west, toward dusk | Senja's cord of knots counting the days since Laras's cradle; vines trained round Rimba's listening seat; **an empty cradle hook in the roof beam**, never used |
+| Elder Tree, 22.8 m | Abu | a single pavilion at the bridge head, the busiest landing | a spare hammock for guests; carved joke figures on the rail; a covered supper basket on a peg, ready for the evening climb to his grandmother |
+| **East Tree, 34.2 m** | Tunas | a single pavilion, the newest, thatch still green, directly above her aunt and uncle | a collection of found things (shells, seeds, a feather from every bird); a few of Embun's spare rope rails, tied by her aunt anyway |
+| East Tree, 34.2 m | Bayu | a single pavilion on the wind corner | wind chimes of seed pods and bamboo, a feather vane; a second seat where Tunas learns the wind |
+| East Tree, 22.8 m | Jati and Embun, married | a couple's pavilion beside the ramp | Jati's drawings of ramp joints scratched on bark; Embun's extra rope rails and a net slung lower than anyone else's; Tunas's old hammock still rolled in a corner |
+| East Tree, 22.8 m | Dahan | a single pavilion at the ramp head | coils of lashing, spare rungs, a mallet; Dahan checks the ramps from here |
+| **North Tree, 34.2 m** | Intan and Murai, siblings | joined pavilions with a shared deck between them | Intan's side faces the training grounds, with a pebble tally of comings and goings; Murai's faces the dawn, with gourd bird feeders and a carved board of bird shapes |
+| North Tree, 34.2 m | *(Laras and Gilang)* | **the empty pavilion**, on the far side of the ring from Intan and Murai | hammocks still slung, a cradle hanging from the beam, blinds tied down from outside, the thatch going grey; nobody walks that part of the ring |
+| North Tree, 22.8 m | Tirta and Bintang, married | a couple's pavilion facing the river, at the bridge head | Tirta's fish traps and nets drying; Bintang's woven map of paths in coloured cords and a pack always half packed |
 
 ### Bridges
 
@@ -241,9 +245,11 @@ door.
   stone pads, floor 1.0 m up, decking of thick planks, built for apes.
 - **Gallery** 2.5 m deep along the front, facing the plaza, with a long log
   bench.
-- **Inside:** three sleeping rooms with wide, low sleeping platforms; a shared
-  room with a firepit on a stone hearth set into the floor (ground buildings
-  may have fire), a smoke hole in the roof.
+- **Inside:** Sari and Teguh's room with one broad low sleeping platform;
+  Batu's room, the end room, with its own door to the gallery so he comes and
+  goes without passing his sister's; a shared room with a firepit on a stone
+  hearth set into the floor (ground buildings may have fire) and a smoke hole
+  in the roof.
 - **Marks:**
   - Batu: a locked chest and a bundle of training-dummy parts under a cloth.
   - Sari: a stool at the gallery's end facing toward Kova Kong.
@@ -265,7 +271,9 @@ door.
 ### Tailed monkeys' house (Rotan, Kilat, Akar)
 
 - A raised hut 10 × 6 m, floor 1.2 m up, with a deep gallery on the front.
-- **Inside:** three hammock nests in one room.
+- **Inside:** Akar and Kilat's room with a broad shared nest; Rotan's room
+  at the back, with his own hammock and the best of his rope; a shared front
+  room opening onto the gallery.
 - **Under the floor:** coils of vine rope and bundles of rattan stored dry.
 - **Gallery:** Rotan's twisting frame, Akar's walking poles, Kilat's pack.
 - **Variation:** the highest stilts; rope everywhere.
@@ -274,15 +282,18 @@ door.
 
 - A raised hut 9 × 6 m, gallery facing the plaza path and the back door to the
   gardens.
-- **Inside:** two rooms, each with a sleeping platform and storage; a work
-  room with baskets of fruit and seed, drying racks of ginger and turmeric.
+- **Inside:** Delima and Melati's room with one shared sleeping platform; a
+  work room with baskets of fruit and seed and drying racks of ginger and
+  turmeric; a store at the back for the stall's baskets.
 - **Variation:** the only house with a garden gate in line with its back
   door; jasmine at the front.
 
 ### Floor hut (Damar, Wangi)
 
 - A raised hut 8 × 6 m, gallery facing the plaza.
-- **Inside:** two sleeping rooms; a small shared room with pots and herb jars.
+- **Inside:** Damar and Wangi's room with one shared sleeping platform; a
+  small shared room with pots and herb jars where Bima drops in most
+  mornings.
 - **Outside:** the *damar* tree with resin cups and a resin store, the village's
   lamp fuel.
 - **Variation:** the smallest hut; the resin store.
@@ -309,8 +320,11 @@ door.
 | Food store | above the deck | small square | woven | small leaf | collared legs |
 | Workshop | 11.4 m | rectangle | half open | leaf | shavings |
 | Inn | 11.4 m lobe | long | woven | long hip, red-brown | the walled house |
-| Household pavilions | rings | round | open | round leaf, household colour | central pillar, hammock |
-| Purnama's crown pavilion | 45.6 m | round, largest | open | leaf | knotted year cords |
+| Single pavilions | rings | round, 4 × 4 m | open | round leaf, household colour | central pillar, one nest |
+| Couples' pavilions | rings | 5 × 4 m | open | round leaf, household colour | shared nest |
+| Joined pavilions | North Tree 34.2 m | two rounds and a deck | open | two leaf roofs | the siblings' shared deck |
+| The empty pavilion | North Tree 34.2 m | couple's | blinds tied down | greying leaf | the hanging cradle |
+| The sisters' crown pavilion | 45.6 m | largest, two alcoves | open | leaf | knotted year cords, loom, hoist |
 | Ape lodge | ground | long | bark | long, heavy | squared posts |
 | Tailed monkeys' house | ground | rectangle | woven | leaf | rope under the floor |
 | Garden house | ground | rectangle | woven | leaf | garden gate |
@@ -346,6 +360,8 @@ on the ground the raised-house tradition.
 - the inn as the one walled house on the commons;
 - the household pavilions and their marks;
 - the public privy;
-- Purnama's knotted year cords.
+- Purnama's knotted year cords;
+- households, genders and relationships (census, `plant_kingdom_village.md`);
+- the empty pavilion and the unused cradle hook.
 
 **Open:** none blocking.

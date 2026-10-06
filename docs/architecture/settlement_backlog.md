@@ -360,6 +360,12 @@ Planning priorities:
 - Approve the residents' new names (Malay and Indonesian single names; Ossian
   Redbrow keeps his) and the Water Curtain Cave brief
   (`docs/architecture/plant_kingdom_water_curtain_cave.md`).
+- Households, genders and relationships set (proposed 2026-10-06, census in
+  `plant_kingdom_village.md`); the building briefs now size every home by
+  household, including the empty pavilion of the lost couple.
+- Code gap: neither primate rig has a gender. `JungleVillager` and
+  `ApeTemplate` need gendered build pools designed in the dress charter
+  (character-design skill) before the census genders can show.
 - Then interiors and the dress charter.
 
 Code work once approved (not started):

@@ -119,9 +119,9 @@ storage baskets and rain gourds.
 
 | Tree | Rings above the commons | Households |
 |---|---|---|
-| Elder Tree (62 m) | 22.8 m (bridge level), 34.2 m, and the elders' crown deck at 45.6 m | Purnama at the crown; Abu, Senja, Rimba and Sekar below |
-| East Tree (56 m) | 22.8 m (bridge level), 34.2 m | Dahan, Embun, Bayu and Tunas; Jati's workshop on the commons corner |
-| North Tree (58 m) | 22.8 m (bridge level), 34.2 m | Tirta, Bintang, Intan and Murai |
+| Elder Tree (62 m) | 22.8 m (bridge level), 34.2 m, and the elders' crown deck at 45.6 m | the sisters Purnama and Sekar at the crown; Senja and Rimba at 34.2 m; Abu at 22.8 m |
+| East Tree (56 m) | 22.8 m (bridge level), 34.2 m | Jati and Embun, and Dahan, at 22.8 m; Tunas and Bayu at 34.2 m; Jati's workshop on the commons corner |
+| North Tree (58 m) | 22.8 m (bridge level), 34.2 m | Tirta and Bintang at 22.8 m; Intan and Murai, and the empty pavilion of Laras and Gilang, at 34.2 m |
 
 Heights match the existing landing spacing (every 3.8 m).
 
@@ -151,7 +151,9 @@ By day: canopy residents on their rings; Delima and Rotan at the market; Wangi i
 the kitchen; Melati in the gardens; Ossian with Manchego at the stable; Batu at
 the training grounds; Sari at the tree line; Tirta at the river in the
 evening. At dusk everyone gathers on the commons to eat, and the elders sit in
-the gathering circle. Bima at the inn. No two residents share a spot.
+the gathering circle; Abu carries his grandmother's supper up to the crown deck
+afterward, and Bima walks over from the inn to eat at his sister Wangi's
+kitchen. Bima at the inn. No two residents share a spot.
 
 ## Fixed, proposed and open
 
