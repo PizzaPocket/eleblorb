@@ -44,7 +44,8 @@ kingdom's story, as it is in the Sky Kingdom.
 ## Shared decisions for the kingdom
 
 - **Rest points:** two. Sam Okafor's guest house at Kai Mālie on the surface,
-  and Pelaju's guest hall, an air hall in the sea folk city, below.
+  and Isaro's guest hall, an air hall in the sea folk city, below. Both charge
+  25 Tokoins, the kingdom's existing inn rate.
 - **Air:** the sea folk's air halls and the glass tunnels between them give the
   hero a place to breathe and walk underwater without a helmet.
 - **Boats:** once boat riding exists, the island's canoes and the ships are
@@ -57,7 +58,8 @@ kingdom's story, as it is in the Sky Kingdom.
    frames every visitor's first view. Done: `ocean_island_village_layout.md`
    (in review), including the terrain it needs and the cage island's
    enlargement.
-3. Lay out the sea folk city's rings and air halls.
+3. Lay out the sea folk city's rings and air halls. Done:
+   `ocean_sea_folk_city_layout.md` (in review).
 4. Build the second ship and the ship interiors.
 5. Lay out the cage island (now a crescent crater): environment only, no
    inhabitants, NPCs or fight scripting until the user confirms direction.

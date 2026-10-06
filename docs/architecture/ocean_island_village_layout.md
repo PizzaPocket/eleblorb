@@ -183,7 +183,7 @@ are narrow by nature; one 2 m ramp per terrace keeps the *loʻi* reachable.
 
 - **Arrival:** the pier gives the dock a walking route ashore. Swimming and
   flight still work.
-- **Rest point:** Sam's guest house, 10 Tokoins, waking in its upstairs guest
+- **Rest point:** Sam's guest house, 25 Tokoins (the kingdom's inn rate), waking in its upstairs guest
   room; the party gathers on its *lānai*.
 - **Shop:** the Nakamura store's *lānai* counter facing the pier head.
 - **Discord state:** the meeting rocks stand empty and the pirates' beach is

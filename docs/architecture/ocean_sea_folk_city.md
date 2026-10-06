@@ -65,7 +65,7 @@ folk build **air halls**, glass domes filled with compressed air.
 ## 3. Community
 
 The census keeps the existing twenty residents and adds two children, for
-**twenty-two** in seven households. Roles come from what each resident already
+**twenty-three**: seven households and the innkeeper. Roles come from what each resident already
 says. Every resident is renamed (section 3a).
 
 | Household | Residents | Work |
@@ -76,6 +76,7 @@ says. Every resident is renamed (section 3a).
 | **The Garden House** | **Nesaja**; **Rodasu**; **Kasuno**; Kasuno's son **Tami** (child) | Nesaja's sea flowers; Rodasu sells Watering Cans and tends the link to the Seed of Life; Kasuno braids the kelp that grows around the homes |
 | **The Exchange** | **Maresa**; **Pelaju**; **Sujira** | Maresa keeps the trading hall and sells Nautilus Shells; Pelaju listens to the surface and deals with the island and the ships; Sujira makes scale clothing |
 | **The Reef House** | **Talisa**; **Arimu**; **Kaluja** | Talisa studies the reef's smallest life; Arimu records the night reef; Kaluja keeps the light pipes that bring daylight down |
+| **The guest hall** | **Isaro** | keeps the guest hall, the city's inn and rest point |
 | **The Current House** | **Oruko**; **Dakuro**; **Sekira**; **Munaja** | Oruko carries messages on the ring current; Dakuro charts the deep edge; Sekira makes shell ornaments; Munaja teaches the young |
 
 ### 3a. Names
@@ -103,6 +104,7 @@ translated meanings: a sound palette of *a*, *i* and *u*, with *k*, *d*, *t*,
 | Tami | child | — |
 | Maresa | keeper of the Exchange, Nautilus Shell seller | Marella Shellwise |
 | Pelaju | surface liaison | Pelagos Drift |
+| Isaro | innkeeper of the guest hall | Nerissa Stillwater (the existing inn's keeper) |
 | Sujira | scale clothier | Ondine Silvergill |
 | Talisa | reef scientist | Thalina Foamcrest |
 | Arimu | night reef recorder | Maris Coralglow |
@@ -161,13 +163,14 @@ and the Glassworks. Homes stay wet.
 
 ### The guest hall: the city's rest point
 
-The guest hall is an air hall kept by **Pelaju**, who deals with every visitor
-from the surface. It is a rest point, one of two in the kingdom (the other is
-Kai Mālie's guest house). Resting restores the party and melted blorbs,
+The guest hall is an air hall kept by **Isaro**. It replaces the existing
+`seafolk_village_inn` (whose keeper, Nerissa Stillwater, is Isaro under her new
+name) at nearly the same place, and is a rest point, one of two in the kingdom
+(the other is Kai Mālie's guest house). Resting restores the party and melted blorbs,
 advances to morning and plays the standard waking sequence in a dry bed inside
 the hall; the party gathers on the hall's floor, never in the moon pool. A
-night costs the ordinary rate of 10 Tokoins through the shared transaction
-interface.
+night costs 25 Tokoins, the existing inn's price and the kingdom's rate,
+through the shared transaction interface.
 
 ### Glass tunnels
 
@@ -219,7 +222,7 @@ the seven households, the residents' roles and two children; the concentric
 plan with the Ring Current; the Glassworks at a warm vent.
 
 **Settled:** the Tidekeeper's fight is a cultural test of mettle; the guest
-hall charges 10 Tokoins.
+hall charges 25 Tokoins. The layout is in `ocean_sea_folk_city_layout.md`.
 
 **Deferred by the user:** the Ocean Kingdom's backstory, including how the
 Demon King sowed the discord.
