@@ -209,6 +209,58 @@ entering the water.
   emblems; ruins and broken columns; anything that reads as a sunken human
   city.
 
+## 5a. Dress charter
+
+Written to the `character-design` skill. The prototype's choices stand: teal
+skin, shiny scale clothing (silver formal, dark blue, brown for work),
+sleeveless or short sleeves, some cropped tops, and shells or sea flowers in
+women's hair.
+
+- **Environment:** underwater: no woven cloth; scale clothing grown and fitted.
+  In air halls the legs appear, clad in a scale wrap continuing the tail's
+  colour, so a person's tail colour carries onto their legs.
+- **Sources:** Minoan dress in outline only: fitted, belted waists, short
+  sleeves; nothing copied from sacred imagery.
+- **Skin and hair:** teal skin in a narrow family of greener and bluer tones;
+  hair in sea-teal, ocean blue, coral red and deep red.
+- **Palette:** silver, dark blue and brown scale (60 percent), tail colours in
+  teal, blue, red and mauve (30 percent), orichalcum red-gold (10 percent).
+- **Signature:** a thin orichalcum belt or armband on every adult (new shared
+  ornament).
+- **Hierarchy:** the Tidekeeper's nautilus crown; Tidehall's household in
+  silver scale; workers in brown.
+- **Exclusions:** cloth, human fashion, shoes, horns of consecration, double
+  axes.
+
+Genders follow the existing code (odd-numbered residents are women), now
+written explicitly.
+
+| Resident | Gender | Scale | Notes |
+|---|---|---|---|
+| Tidekeeper Asaru | man | silver | nautilus crown; broad |
+| Maresa | woman | silver | shell in hair; trader's orichalcum chain |
+| Korasi | man | dark blue | sleeveless |
+| Nesaja | woman | brown (garden) | sea flower in hair |
+| Tudaro | man | dark blue | sleeveless; edge warden's spear-like staff |
+| Lunira | woman | silver | cropped top; a small pearl lamp at her belt |
+| Oruko | man | dark blue | slight, fast; sleeveless |
+| Sekira | woman | silver | shell ornaments of her own making |
+| Pelaju | man | silver | formal; short sleeves |
+| Talisa | woman | brown (work) | sample pouches |
+| Kasuno | man | brown (work) | kelp cord wound on one arm |
+| Arimu | woman | dark blue | sea flower in hair |
+| Dakuro | man | brown | chart case |
+| Sujira | woman | silver | the finest scale work in the city |
+| Kunei | man | brown, scorched at the edges | glassblower's armguards |
+| Ikara | woman | dark blue | lookout's lens on a cord |
+| Damaku | man | brown | tool belt |
+| Kaluja | woman | silver | a sliver of light-pipe glass as a pendant |
+| Munaja | man | dark blue | — |
+| Rodasu | woman | brown (garden) | a small watering can on her belt |
+| Isaro | woman | silver | the innkeeper's orichalcum keys |
+| Mira | girl | silver | small; shell in hair |
+| Tami | boy | brown | small |
+
 ## Fixed, proposed and open
 
 **Fixed:** the castle, homes, paths, lamps, gardens and twenty residents

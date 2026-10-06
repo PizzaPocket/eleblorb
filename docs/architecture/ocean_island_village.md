@@ -150,6 +150,50 @@ its meaning.
 - **Accuracy:** every Hawaiian line and gloss must be checked by a fluent
   speaker before release.
 
+## 6a. Dress charter
+
+Written to the `character-design` skill. Modern island clothes informed by
+Hawaiian heritage, as people in Hawaiʻi actually dress.
+
+- **Environment:** warm, sunny, wet in the valley: short sleeves, light fabric,
+  bare feet or slippers; long sleeves only for sun or work.
+- **Sources:** modern Hawaiian dress: aloha shirts, *muʻumuʻu* (loose long
+  dresses), *holokū* for formal occasions, fresh flower lei.
+- **Skin and hair:** warm brown tones for the Native Hawaiian families; the
+  other family lines' tones as their backgrounds give them. Dark hair for most,
+  grey and white for elders.
+- **Palette:** aloha-print colours drawn from the village's planting (hibiscus
+  red, plumeria cream, ti green, ʻilima orange, ocean blue) at 60 percent;
+  work clothes in faded denim and khaki at 30 percent; flower colours in lei at
+  10 percent.
+- **Kit:** short-sleeved shirts (patterned aloha shirts are a new shared
+  garment; plain colour until then); `wears_dress` as the *muʻumuʻu* for women;
+  cropped trousers for work in the *loʻi* and on the reef.
+- **Signature:** a fresh lei, worn around the neck or as a *lei poʻo* (head lei)
+  on the hair (new ornament through `HairOrnaments`).
+- **Hierarchy:** the kūpuna wear the finest lei; Puanani wears a *lei poʻo*.
+- **Exclusions:** grass skirts or coconut bras as everyday wear; feather cloaks
+  (*ʻahu ʻula*) and helmets (*mahiole*), which belonged to chiefs; tiki and
+  tourist costume.
+
+| Resident | Gender | Look |
+|---|---|---|
+| Kawika Kahananui | man | elder; white hair; faded aloha shirt; lei |
+| Malia Kahananui | woman | elder; grey hair in a bun; *muʻumuʻu*; the finest lei |
+| Keoni Kahananui | boy | small; tee and cropped trousers; bare feet |
+| Leilani Kealoha | woman | long sleeves rolled up; cropped trousers for the *loʻi*; ponytail |
+| Makoa Kealoha | man | broad; sleeveless; cropped trousers; throw net over a shoulder |
+| Noelani Kealoha | woman | lifeguard; sleeveless; hair long and loose |
+| Kahiau Kahale | man | navigator; short-sleeved shirt; a woven hat |
+| Iolana Kahale | woman | apprentice; short sleeves; hair tied back; adze at her belt |
+| Puanani Akana | woman | *kumu hula*; *muʻumuʻu*; *lei poʻo*; long hair |
+| Hiro Nakamura | man | Japanese family line; light warm skin; aloha shirt; apron at the counter |
+| Grace Nakamura | woman | Filipino family line; medium warm skin; short sleeves; bun |
+| Manny Medeiros | man | Portuguese family line; olive skin; aloha shirt; ukulele |
+| Kahala Medeiros | woman | *muʻumuʻu*; a basket of medicinal plants |
+| Sam Okafor | man | Nigerian family line by way of Ohio; deep brown skin; aloha shirt |
+| Elena Varga | woman | fair, sun-browned; sleeveless; reef boots; sample bag |
+
 ## Fixed, proposed and open
 
 **Fixed (from direction):** a modern village on the largest island rooted in

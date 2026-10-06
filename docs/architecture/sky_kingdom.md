@@ -554,6 +554,56 @@ is still open.
 - **Island sizes:** the six courts need more ground than the prototype's 30 m
   satellites provide. The layout pass should size each cloud from its program.
 
+## 9. Dress charter
+
+Written to the `character-design` skill. The prototype's choices stand: pastel
+skins, very light clothing, gold jewellery and a gold laurel wreath for rulers.
+
+- **Environment:** high, bright, breezy sky. Light, airy, pale clothing; bare or
+  lightly covered arms; no shoes (the lower body is cloud).
+- **Sources:** Greek and Roman drapery (chiton, himation) for most courts;
+  Chinese celestial-court robes with long sleeves for Pantao and for audiences
+  in Aethra's Hall of Mist.
+- **Skin and hair:** the existing pastel skin palette (sky blue, dawn pink, gold
+  dawn, lavender, mint, peach, near-white) and the existing hair palette
+  (cloud white, periwinkle, gold, aqua, rose, apricot, lilac).
+- **Palette:** clothing in the existing light set (pale sky blue, dusk purple,
+  near-white), with the contrast rule: a different light entry, never a darker
+  one.
+- **Kit:** the shared sleeve split (sleeveless or short); a draped sash or
+  himation over one shoulder (new shared garment); long sleeves for Pantao.
+- **Signature:** gold: armlets, circlets, earrings and the binding-ring motif.
+- **Hierarchy:** rulers wear the gold laurel wreath; Aethra's courtiers wear a
+  plain gold circlet.
+- **Court accents:** Chrysa scorched-gold and smudged hems; Dromos sleeveless
+  and athletic; Lyria long trailing sashes; Koinon plain, scholarly,
+  near-white; Pantao dawn-pink long sleeves and hair in buns.
+- **Exclusions:** halos, wings, religious iconography, dark or earthen clothing.
+
+| Court | Resident | Gender | Look |
+|---|---|---|---|
+| Aethra | Aristeon | man | broad, tallest; laurel; near-white with a gold-edged sash |
+| Aethra | Mnesia | woman | long sleeves in Hall of Mist style; bun; ledger satchel |
+| Aethra | Alkis | man | slight; sleeveless; light sky blue; a satchel of gold invitation tubes |
+| Aethra | Drosia | woman | short sleeves; dawn pink; a gold dew bowl at her hip |
+| Chrysa | Aurelia | woman | laurel; sleeveless; scorched-gold sash; heavy armlets |
+| Chrysa | Kallix | man | short sleeves; smudged near-white; one unfinished gold ring on a cord |
+| Chrysa | Keraunia | woman | sleeveless; storm lilac, the darkest pastel allowed; hair loose |
+| Lyria | Elegon | man | laurel; long trailing sash; lilac |
+| Lyria | Aulia | woman | sleeveless; aqua; flute at her belt |
+| Lyria | Rhapsos | man | short sleeves; near-white; gold-leaf scrolls |
+| Koinon | Sophrona | woman | laurel; plain near-white; long hair |
+| Koinon | Astrion | man | short sleeves; periwinkle; a small gold star pin |
+| Koinon | Archeia | woman | long sleeves; pale sky blue; bun |
+| Pantao | Xiangyun | woman | laurel; long dawn-pink sleeves; high bun |
+| Pantao | Tianlu | man | long sleeves; apricot; broad build |
+| Pantao | Chunlu | woman | short sleeves; mint; a peach blossom in her hair |
+| Pantao | Mingyue | girl | small; long sleeves; pigtails |
+| Dromos | Nikandra | woman | laurel; sleeveless; near-white with a gold victory ring |
+| Dromos | Tachys | man | slight, sleeveless; light sky blue; wind-swept hair |
+| Dromos | Stephane | woman | short sleeves; mint; a woven-cloud wreath |
+| Dromos | Dromeus | boy | small; sleeveless; copies Tachys |
+
 ## Fixed, proposed and open
 
 **Fixed (from the world bible, the prototype and direction):** Bird Helm gate

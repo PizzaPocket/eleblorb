@@ -95,6 +95,55 @@ kingdom's story.
 - The sea folk hate both and believe the ships are fouling the reef.
 - Both avoid the Kraken.
 
+## 3a. Dress charters
+
+Written to the `character-design` skill. Today both crews would wear the same
+red shirts over dark trousers; the two origins should read apart at a
+distance. Existing gear stays: the captains' hats, hooks, peg legs, cropped
+trousers and beards. Every crew member's gender is set explicitly, and beards
+only go to men (fixing the current bug).
+
+### The *Harbinger*: faded British naval
+
+- **Palette:** navy blue shirts and coats, off-white canvas trousers, black
+  shoes; the red is reduced to an accent (a neckerchief, the captain's hat band).
+- **Kit:** long sleeves for officers, short for hands; full boots for the
+  captain and first mate; everything mended and clean.
+- **Signature:** brass buttons and a neat neckerchief.
+- **Skin range:** mostly light to medium, with darker skin where a sailor's
+  background says so, as in real British crews.
+
+| Crew | Gender | Look |
+|---|---|---|
+| Captain Brine | man | bicorne, hook, full black beard; navy long sleeves; boots |
+| Mara Reef | woman | first mate; navy long sleeves; boots; hair tied back |
+| Old Kelp | man | white hair, stubble; short sleeves; cropped trousers |
+| Nell Crow | woman | lookout; short sleeves; ponytail |
+| Tobias Wake | man | carpenter; deep brown skin; sleeveless; tool belt |
+| Pip Salt | boy | ship's boy; small; short sleeves; no beard |
+| Rook Gale | man | gunner; stubble; short sleeves; powder-blackened |
+| Ada Shoal | woman | surgeon; navy long sleeves; bun; no stubble |
+
+### The *Belle Fortune*: buccaneer motley
+
+- **Palette:** mismatched bright colours (red, yellow, green, sun-faded blue)
+  with no two crew matching; sashes and headscarves.
+- **Kit:** sleeveless and short sleeves; cropped trousers; bare feet or worn
+  shoes; a sash at every waist and a headscarf for most (new shared garments).
+- **Signature:** a coloured sash.
+- **Skin range:** as varied as the crew's backgrounds.
+
+| Crew | Gender | Look |
+|---|---|---|
+| Capitaine Lucien Souci | man | tricorn, hook, orange beard; marigold-yellow sash |
+| Bastien Roux | man | quartermaster; red headscarf; long sleeves; ledger |
+| Yaw Mensah | man | boatswain; deep brown skin; sleeveless; green sash |
+| Anneke Vos | woman | navigator; fair; long sleeves; braid; brass sextant |
+| Teo Abad | man | cook; olive skin; apron over a short-sleeved shirt |
+| Bridget Nolan | woman | gunner; red hair; sleeveless; powder-stained |
+| Sami Haddad | man | sailmaker; olive-brown skin; stubble; needles in his sash |
+| Moineau | boy | cabin hand; small; oversized shirt; bare feet |
+
 ## 3. Ships as architecture
 
 Each ship is a building that moves. Their interiors should be enterable so the
