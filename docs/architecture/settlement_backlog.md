@@ -249,3 +249,24 @@ Planning priorities:
   `TraversalContext`, per `docs/traversal_powers_architecture.md`.
 - Start from the fishing village's boats and lanes, then Ivo's ferry run to the
   west shore, which could become the village's ordinary arrival route.
+
+## 8. Ocean Kingdom: sea folk city, pirate ships and Kai Mālie
+
+Status: first planning pass, in review (2026-10-06). See
+`docs/architecture/ocean_kingdom.md` and its three briefs. The current
+implementation has the merfolk city with twenty residents, one of the two
+pirate ships, and no island village.
+
+Planning priorities:
+
+- Approve the three briefs: the Atlantean-modern sea folk city with air halls
+  and a legged form; the two ships' origins and crews; Kai Mālie's community,
+  ahupuaʻa plan and charter.
+- Lay out Kai Mālie first, since it frames the arrival view, then the sea folk
+  city's rings and air halls.
+- Build the missing second ship and the ships' priority interiors.
+- Shared systems: generalise `ChineseLexicon` into a lexicon per language for
+  Hawaiian dialogue; let air halls answer the liquid system as dry volumes,
+  reusing the `pressurized_volumes` approach; add a legged sea-folk rig.
+- Have every Hawaiian line and gloss reviewed by a fluent speaker.
+
