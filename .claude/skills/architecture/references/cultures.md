@@ -109,10 +109,12 @@ Full charter: `docs/architecture/sky_kingdom.md`; layout:
   Aethra's Hall of Mist and Pantao's Peach Garden and banquet hall, where Sun Wu
   Kong's story is set. Woven cloud and gold are the accent. Never both
   traditions' roof and wall systems on one building.
-- **Materials.** Cloud gives volume, gold holds it, quartz carries weight. Bank
-  cloud is the ground; woven cloud makes awnings and curtains (no collision);
+- **Materials.** Cloud is everything you stand on, gold holds it, quartz stands
+  upright (columns, walls, roofs; never a floor). Every floor, podium, ramp and
+  island surface is cloud and one-way: passable rising from below. Bank cloud
+  is the ground; woven cloud makes awnings and curtains (no collision);
   set cloud makes floating couches, steps and moored rooms, held by gold.
-- **Massing and roofs.** Halls on stepped quartz podiums; roofs float a clear gap
+- **Massing and roofs.** Halls on stepped cloud podiums banded in gold; roofs float a clear gap
   above their columns; some columns hang short of the floor; drifting stairs of
   separate slabs with a continuous walking line.
 - **Hierarchy.** Podium height and the width of the floating gap; Aethra's Hall

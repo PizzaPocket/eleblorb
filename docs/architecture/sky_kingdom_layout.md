@@ -106,7 +106,7 @@ neighbouring courts are 70 to 110 m.
   with the hero as they do any destination the hero flies to. Within a court,
   every public route is walkable: 3 m wide, headroom 3.2 m, level changes by
   ramp of at most 32° or by a drifting stair (below).
-- **Drifting stairs** read as separate quartz slabs, but their walking line is
+- **Drifting stairs** read as separate set-cloud slabs, but their walking line is
   continuous: horizontal gaps under 0.2 m, rises under 0.25 m, total grade no
   steeper than a ramp. They are public routes, not parkour.
 - **Edges.** Cloud edges are open; a fall drops to the world below, and the hero
@@ -123,7 +123,7 @@ stay inside the island radius.
 ### Dawn Gate cloud
 
 - **Dawn Gate** (Chinese palace style, after the Southern Heavenly Gate): a
-  three-bay gate hall on a single quartz podium, 14 m wide and 6 m deep, with a
+  three-bay gate hall on a single cloud podium, 14 m wide and 6 m deep, with a
   floating double eave. Its central bay frames Aethra. The side bays hold the
   empty posts where the gate's keepers once stood.
 - **Forecourt** between the top of the course and the gate, 12 m deep. The Air
@@ -134,7 +134,7 @@ stay inside the island radius.
 
 | Building | Style | Footprint | Program |
 |---|---|---|---|
-| Hall of Mist | Chinese palace | 22 × 14 m on a triple quartz podium 3 m high, at `(0, 8)` | audience hall: Aristeon's throne dais at the rear, a floor for petitioners in front, side galleries; double floating eave, the kingdom's only one |
+| Hall of Mist | Chinese palace | 22 × 14 m on a triple cloud podium 3 m high, at `(0, 8)` | audience hall: Aristeon's throne dais at the rear, a floor for petitioners in front, side galleries; double floating eave, the kingdom's only one |
 | Propylon and forecourt | Chinese gate pavilion | 10 × 5 m at `(0, -22)`; forecourt 16 × 14 m | landing forecourt and the court's threshold |
 | Chamberlain's tholos | Greco-Roman | round, 7 m diameter, at `(-14, -4)` | Mnesia's ledger room and robe store, with a reading table |
 | Herald's moored room | set cloud and gold | 5 m round room moored at `(18, -6)` | Alkis's room, the only one with a door facing outward to the sky |
@@ -236,8 +236,10 @@ can reach every tier.
 2. **Fixed landing.** The staircase anchor becomes authored data so the frame is
    identical every run.
 3. **Bird Helm gate and lazy build** stay exactly as they are.
-4. **Collision:** bank cloud keeps the simplified pad collider; quartz, gold and
-   set-cloud furniture get primitive colliders; woven cloud, foliage and
+4. **Collision:** bank cloud keeps the simplified pad collider; every cloud
+   floor, island surface, podium, ramp and stair is one-way (passable rising
+   from below) through one shared mechanism for all bodies; quartz, gold and
+   set-cloud furniture get ordinary primitive colliders; woven cloud, foliage and
    lightning are decorative.
 5. **Validator mode** (`--village=sky`): overlapping footprints; islands outside
    the ambient band or closer than 60 m centre to centre; a court without a

@@ -356,8 +356,8 @@ first peach and over whose music is better.
 ## 4. Material system: cloud, gold and quartz
 
 The kingdom is built from three materials with distinct roles. The rule that
-connects them is simple enough to read on sight: **cloud gives volume, gold
-holds it, quartz carries weight.**
+connects them is simple enough to read on sight: **cloud is everything you
+stand on, gold holds it, quartz stands upright.**
 
 ### Cloud
 
@@ -369,8 +369,10 @@ Tempestars can coax cloud into three states:
 2. **Woven cloud:** drawn into threads and woven, as by the Weaver Girl, into
    translucent awnings, curtains, sails, cushions and robes. Light, moving,
    never structural.
-3. **Set cloud:** cloud persuaded to hold a shape: floating couches, stools,
-   tables, bowers, small floating rooms and steps. Set cloud holds its shape
+3. **Set cloud:** cloud persuaded to hold a shape: every floor, platform,
+   podium, ramp, stair and terrace, and floating couches, stools, tables,
+   bowers and small floating rooms. A podium tier is a slab of set cloud with
+   a gold band around its edge. Set cloud holds its shape
    only where gold binds it. A couch is a cloud volume pinned by a gold frame;
    a floating room is a cloud shell held inside gold rings.
 
@@ -384,9 +386,9 @@ structurally and sparingly, not as general wall cladding.
 
 ### Quartz
 
-Clear to milky-white sky quartz, the existing pavilion material, forms floors,
-column shafts, stairs, platforms and anything a body must stand on reliably.
-It takes light like marble and glass at once.
+Clear to milky-white sky quartz, the existing pavilion material, forms what
+stands upright: column shafts, screen walls, balustrade posts and roof slabs.
+It takes light like marble and glass at once. It is never a floor.
 
 ### Construction that defies gravity
 
@@ -396,8 +398,8 @@ The courts build as if weight were optional, within rules a player can learn:
   held by gold pins of light, so sky shows between capital and eave.
 - **Hanging columns:** some columns hang from a roof and stop short of the
   floor, ending in gold finials.
-- **Drifting stairs:** stairs of separate quartz slabs float in sequence with
-  open air between them.
+- **Drifting stairs:** stairs of separate set-cloud slabs float in sequence
+  with open air between them.
 - **Moored rooms:** small round rooms of set cloud float beside a building,
   held by gold rings and reached by a short gangway.
 - **Undersides:** gardens and fruit trees grow downward from the underside of
@@ -408,10 +410,21 @@ The courts build as if weight were optional, within rules a player can learn:
 These keep the fantasy physically honest for platforming, per the project's
 collision policy:
 
-- Anything a character is meant to stand on, climb or be blocked by has
-  collision: quartz floors and stairs, gold frames, set-cloud couches, tables
-  and steps. Woven cloud (awnings, curtains, sails) is decorative and is
-  passed through.
+- **Cloud floors are one-way.** Every floor, platform, podium, ramp, stair,
+  terrace and island surface is cloud, and a body rising from below passes up
+  through it, then lands and stands on it from above. A flying hero can rise
+  through a court from underneath, or through a hall's floor into the room.
+  Approached from the side, a podium tier still blocks like a step.
+- Anything else a character is meant to stand on, climb or be blocked by has
+  ordinary collision: quartz columns, walls and roofs, gold frames, set-cloud
+  couches and tables. Woven cloud (awnings, curtains, sails) is decorative and
+  is passed through.
+- One-way behaviour belongs to the shared physics layer, not to any one
+  character: the hero, every party member and every Tempestar treat cloud
+  floors the same way. Godot 3D has no built-in one-way collision for
+  `CollisionShape3D`, so this needs one shared mechanism (for example a cloud
+  floor collision layer that a body ignores while it is below the surface top
+  and moving upward).
 - Floating furniture and slabs may bob, but slowly and by a few centimetres at
   most. Anything that moves farther is a real moving platform with carry
   behaviour, not a visual drift with static collision.
@@ -447,7 +460,7 @@ strands, blossom and vines are decorative.
 
 This split is deliberately closer than the usual 75/20 charter. Cohesion comes
 from shared invariants instead: quartz shafts, gold capitals and bases, the
-floating roof gap, superellipse openings, the stepped quartz podium and the
+floating roof gap, superellipse openings, the gold-banded cloud podium and the
 palette. No single building uses both traditions' roof and wall systems.
 
 - **Primary, about 55 percent: Greco-Roman celestial classical.** Peristyle
@@ -458,7 +471,7 @@ palette. No single building uses both traditions' roof and wall systems.
   every residence and terrace, and the kingdom's overall feel.
 - **Secondary, about 35 percent: the Chinese celestial palace.** It governs the
   places that carry Sun Wu Kong's story: the Dawn Gate after the Southern
-  Heavenly Gate, Aethra's Hall of Mist on its stepped quartz podium with
+  Heavenly Gate, Aethra's Hall of Mist on its stepped cloud podium with
   floating double eaves, and Pantao's Peach Garden and banquet hall.
   Elsewhere it appears only as named details: moon gates of set cloud and
   upturned eave corners on gate pavilions. Quartz replaces red-lacquered
@@ -482,7 +495,7 @@ palette. No single building uses both traditions' roof and wall systems.
 
 | Court | Signature building | Character |
 |---|---|---|
-| Aethra | the Hall of Mist: audience hall on a triple quartz podium behind its own gate, double eaves floating highest | formal, axial, a little empty |
+| Aethra | the Hall of Mist: audience hall on a triple cloud podium behind its own gate, double eaves floating highest | formal, axial, a little empty |
 | Chrysa | open gold forge under a storm-dark cloud crown | the only working court; scorched gold, glowing, cluttered |
 | Lyria | small odeon with wind harps between columns | musical, intimate, half-empty seats |
 | Koinon | the Hall of Assembly: a ring of galleries around an empty central opening through the cloud to the world below, the gold sealing decree on its walls; observatory | grand and vacant; the void is the hall |

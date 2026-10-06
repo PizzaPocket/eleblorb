@@ -17,14 +17,14 @@ wall systems.
 | Element | Term | Specification |
 |---|---|---|
 | Structural module | bay | 3.2 m (`TownProps.CELL_SIZE`) between column centres |
-| Base | stepped podium (crepidoma in the Greco-Roman buildings, *taiji* platform in the Chinese) | quartz, 1.0 m per tier; tier count shows rank |
+| Base | stepped podium (crepidoma in the Greco-Roman buildings, *taiji* platform in the Chinese) | set cloud with a gold edge band, 1.0 m per tier; tier count shows rank; one-way from below |
 | Columns | pier with capital and base | squarish SuperEgg quartz shaft (`EPSILON_FLAT`), 0.7 m on halls, 0.45 m on tholoi and pavilions; gold capital and base blocks |
 | Floating roof | — | roof hovers clear above its columns: 0.6 m on ordinary buildings, 1.0 m on a court's principal building, 1.6 m on the Hall of Mist |
 | Roof anchor | gold pins | a short gold finial on each capital and a matching pendant under the roof, aligned, with a faint glow between them |
 | Signature motif | gold binding ring | the ring that holds set cloud: at every column neck, every roof corner, every couch and every gate; never decoration alone |
 | Openings | superellipse arch, oculus | punched through quartz screen walls and framed in gold on both faces |
 | Enclosure | screen wall, cloud panel, curtain | quartz screen walls only where privacy or storage requires; translucent set-cloud panels in gold frames for light partitions; woven-cloud curtains for doorways and between columns |
-| Floors | — | quartz slabs inside and on podiums; bank cloud outside |
+| Floors | — | set cloud inside, on podiums, terraces and ramps; bank cloud outside; every floor one-way from below |
 | Light | — | gold vessels and quartz that glow after dusk; no lanterns on posts |
 | Palette | 60/30/10 | quartz and cloud white / sky pastels on woven cloud / gold |
 
@@ -67,7 +67,7 @@ gods, lanterns on posts, Buddhist imagery, banners carrying text.
 
 | Element | Term | Tradition |
 |---|---|---|
-| Stepped quartz base | crepidoma / *taiji* | both: the shared invariant |
+| Stepped cloud base with gold band | crepidoma / *taiji* | both: the shared invariant |
 | Gable with pediment, 15° | pediment | Greco-Roman |
 | Dome over columns | tholos | Greco-Roman |
 | Hip-and-gable with upturned corners, 30° | *xieshan* | Chinese |
@@ -227,7 +227,7 @@ standing alone at the forecourt edge.
 - **Variation:** the only cluttered interior; scorch marks; the age mark of the
   newer bay.
 
-**Storm terrace:** open quartz platform 10 × 8 m with a balustrade, under the
+**Storm terrace:** open set-cloud platform 10 × 8 m with a balustrade, under the
 crown. Keraunia's weather instruments.
 
 **Apprentice's bench:** 6 × 4 m lean-to with a single-slope flat cap against no
@@ -300,6 +300,8 @@ share more than half their axes.
 - Every podium has a ramp at most 32° with landings at each tier; every drop over
   1 m beside a route has a balustrade.
 - Roofs are collidable: the hero flies and may land on them.
+- Every floor, podium, ramp, terrace and island surface is cloud and one-way:
+  passable rising from below, solid from above.
 - Woven-cloud curtains, wind harp strings and glow between gold pins are
   decorative; columns, podiums, couches, panels and roofs are solid.
 - Each court's emblem on its Koinon seat is an abstract shape. No building carries
