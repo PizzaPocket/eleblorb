@@ -392,9 +392,9 @@ Planning priorities:
 - Households, genders and relationships set (proposed 2026-10-06, census in
   `plant_kingdom_village.md`); the building briefs now size every home by
   household, including the empty pavilion of the lost couple.
-- Code gap: neither primate rig has a gender. `JungleVillager` and
-  `ApeTemplate` need gendered build pools designed in the dress charter
-  (character-design skill) before the census genders can show.
+- Monkey and ape bodies are **not gendered** (user, 2026-10-06). The census
+  genders are identity only (pronouns, relationships, names), never body shape:
+  no gendered build pools for `JungleVillager` or `ApeTemplate`.
 - Then interiors and the dress charter.
 
 Code work once approved (not started):

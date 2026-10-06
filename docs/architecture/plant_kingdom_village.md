@@ -137,7 +137,8 @@ tree, not a family name.
 
 ### Households, genders and relationships (proposed 2026-10-06)
 
-Twenty-six residents in fourteen households: 12 women and 14 men. There are
+Twenty-six residents in fourteen households: 12 women and 14 men. Genders are
+identity only: monkey and ape bodies are never shaped by gender. There are
 couples in every part of the village, but **no children**: nobody has dared a
 cradle since the last one, and the couples live with that.
 
