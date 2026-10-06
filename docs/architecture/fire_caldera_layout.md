@@ -373,7 +373,8 @@ The fire-city validator must fail:
 - Final shop inventory and progression gating inside the approved shop
   programs.
 - Exact submerged story encounters and rewards.
-- Final architectural form of every reserved building envelope.
+- Final architectural form of every reserved building envelope: now proposed
+  in `fire_caldera_buildings.md` (2026-10-06).
 
 The next gate is review of this civic diagram. Building architecture and
 procedural implementation begin only after its relationships and scale are

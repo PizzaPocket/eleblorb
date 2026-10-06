@@ -250,7 +250,7 @@ Hostile creatures — "NME"s — that oppose the player and their blorbs, as opp
 
 ## Keeper and crew genders (decided 2026-10-06)
 
-Bodies follow identity. The innkeepers Mira Holt (Ohio), 林静 (Chinese village), Dolma Hearthstone (Rock and Ground) and Isaro (sea folk) are women. Among the Chinese villagers Mei Lian, Hua Chen, Jin Wei, Shu Mei, Ting, Xiu and Pei are female; Wen Zhao, Bo Xiang, Lian Fu, Yun Tao, Rong and Bao are male. Pirates Mara Reef, Nell Crow and Ada Shoal are women. Ember Rest's keeper is decided last, because the Fire City rebuild may remove the inn.
+Bodies follow identity. The innkeepers Mira Holt (Ohio), 林静 (Chinese village), Dolma Hearthstone (Rock and Ground) and Isaro (sea folk) are women. Among the Chinese villagers Mei Lian, Hua Chen, Jin Wei, Shu Mei, Ting, Xiu and Pei are female; Wen Zhao, Bo Xiang, Lian Fu, Yun Tao, Rong and Bao are male. Pirates Mara Reef, Nell Crow and Ada Shoal are women. The Fire City's guest house keeps the rest point, and its approved keeper is the elder temperer Eris Nahl, a woman; her body follows when the city is rebuilt.
 
 ## Open threads
 - Whose sunken skiff lies under the Ice Kingdom's lake, and why the Penguin Helm was sealed in its chest.

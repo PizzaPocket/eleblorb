@@ -159,7 +159,9 @@ New `class_name` scripts need one `Godot --headless --path . --import` first.
 ## 4. Fire Kingdom Caldera City
 
 Status: concept planning complete (2026-10-05); named census and dimensioned
-layout (`fire_caldera_layout.md`) approved (2026-10-06). The
+layout (`fire_caldera_layout.md`) approved (2026-10-06); architecture
+briefs for every plot and the lower city written for review
+(`fire_caldera_buildings.md`, 2026-10-06). The
 current implementation is eight generic homes around an 8.4-metre-wide
 decorative lava fountain. The proposed direction replaces it with a terraced
 city around a broad natural magma reservoir, with a second public district
