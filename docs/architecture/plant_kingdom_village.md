@@ -23,7 +23,7 @@ From `jungle_kingdom_village.gd`, `jungle_kingdom_terrain.gd`,
   one villager standing on it; thirteen in all.
 - **Ground:** three villagers roam within 32 m; six "primate template"
   primates roam the clearing; Ossian Redbrow sits on Manchego at `(6, -4)`; the
-  inn (kept by Bima Canopy, 15 Tokoins) stands at `(27, 22)`.
+  inn (kept by Bima, 15 Tokoins) stands at `(27, 22)`.
 - **Beyond:** Kova Kong at `(400, -280)`; the hidden Wood Kingdom area at
   `(-250, -300)`; ape skeleton NMEs spawning outside the safe zone; training
   dummies "out past the clearing".
@@ -48,8 +48,8 @@ From `jungle_kingdom_village.gd`, `jungle_kingdom_terrain.gd`,
 | Class | Rig | Who | Where they live |
 |---|---|---|---|
 | **Stuffed-animal monkeys** | the stuffed-animal monkey rig (`JungleVillager`, Xiao Hou Zi's kind) | eighteen villagers and the innkeeper | mostly in the trees; four on the clearing floor |
-| **Monkeys** (tailed) | the primate rig with a tail (`ApeTemplate`) | Wick Thistledown, Fable Quickpaw, Doran Mossback | the clearing floor |
-| **Apes** (no tail) | the primate rig without a tail | Torvin Oakjaw, Maddox Cindertusk, Perrin Vale, Ossian Redbrow | the clearing floor; too heavy for the treehouses |
+| **Monkeys** (tailed) | the primate rig with a tail (`ApeTemplate`) | Rotan, Kilat, Akar | the clearing floor |
+| **Apes** (no tail) | the primate rig without a tail | Batu, Sari, Teguh, Ossian Redbrow | the clearing floor; too heavy for the treehouses |
 
 The village's social shape comes from its residents' own words:
 
@@ -63,7 +63,10 @@ The village's social shape comes from its residents' own words:
   village. "A cradle went up two trees over last month." Everyone is counting the
   days. Whether the apes, who are not monkeys, are touched by the curse is open.
 - **No king.** If the Sky Kingdom's proposed history stands, the jungle monkeys'
-  king was Sun Wu Kong, and they have had none since he left.
+  king was Sun Wu Kong, and they have had none since he left. His seat, the
+  Water Curtain Cave behind the falls where the river rises, about 650 m
+  upriver, has been forgotten; no villager knows it is there
+  (`plant_kingdom_water_curtain_cave.md`).
 
 ### Livelihood
 
@@ -84,56 +87,78 @@ The village's social shape comes from its residents' own words:
 Twenty-six named residents. Households follow the three trees and the floor.
 Roles come from what each resident already says.
 
+### Names (renamed 2026-10-06)
+
+The jungle is a Southeast Asian rainforest of emergent trees, durian and
+banana, so the residents take their names from Malay and Indonesian, the
+languages of that forest, as in *orang hutan* ("person of the forest"). The
+innkeeper Bima already had one. Each resident goes by **one name**, as many
+Indonesians do, and the names are everyday words of the forest, sky and
+household that are also used as given names. A resident is known by their
+tree, not a family name.
+
+- Each name fits its bearer's work or temperament, but nobody explains it in
+  play. The exception is Abu ("ash"), whose own line makes the joke.
+- Names only: the village speaks the common language. This is not a language
+  system like Kai Mālie's Hawaiian or the Chinese village's.
+- **Ossian Redbrow keeps his name.** He is a newcomer from somewhere else, and
+  his foreign name is part of what marks him as one.
+
 ### The Elder Tree (62 m, the tallest, at `(-16, 9)`)
 
-| Resident | Role |
-|---|---|
-| **Elden Barrow** | the eldest; keeper of what is known about the curse |
-| **Corvin Ashwake** | the village's joker, whose family name is a bitter joke about the ashing |
-| **Sable Hollow** | lost a neighbour's cradle last month; keeps count of the days |
-| **Yarrow Dess** | listens to the vines, and has stopped asking which ones |
-| **Wisha Fenlow** | prefers the quiet of the high landings; weaves |
+| Resident | Was | Meaning | Role |
+|---|---|---|---|
+| **Purnama** | Elden Barrow | full moon | the eldest; keeper of what is known about the curse |
+| **Abu** | Corvin Ashwake | ash | the village's joker, whose name is a bitter joke about the ashing |
+| **Senja** | Sable Hollow | dusk | lost a neighbour's cradle last month; keeps count of the days |
+| **Rimba** | Yarrow Dess | deep forest | listens to the vines, and has stopped asking which ones |
+| **Sekar** | Wisha Fenlow | flower (Javanese) | prefers the quiet of the high landings; weaves |
 
 ### The East Tree (56 m, at `(14, 12)`)
 
-| Resident | Role |
-|---|---|
-| **Rook Bramblewood** | carpenter; built or repaired most of the ramps |
-| **Kesh Underbough** | ramp keeper; has climbed every rung |
-| **Marlow Quist** | warns everyone about the loose third landing, which Rook calls character |
-| **Bracken Solt** | wind reader; can find home blind by each trunk's creak |
-| **Nettle Vray** | the youngest adult, curious, wants to meet the hero's slime |
+| Resident | Was | Meaning | Role |
+|---|---|---|---|
+| **Jati** | Rook Bramblewood | teak | carpenter; built or repaired most of the ramps |
+| **Dahan** | Kesh Underbough | bough | ramp keeper; has climbed every rung |
+| **Embun** | Marlow Quist | dew | warns everyone about the loose third landing, which Jati calls character |
+| **Bayu** | Bracken Solt | wind | wind reader; can find home blind by each trunk's creak |
+| **Tunas** | Nettle Vray | new shoot | the youngest adult, curious, wants to meet the hero's slime |
 
 ### The North Tree (58 m, at `(2, -18)`)
 
-| Resident | Role |
-|---|---|
-| **Tamsin Reedwalker** | fisher; watches the river every evening |
-| **Tovik Greymoss** | knows where Xiao Hou Zi roams; the village's guide |
-| **Pemberly Cade** | has noticed the training grounds going quiet |
-| **Linnet Grove** | naturalist; studies the dawn birdsong |
+| Resident | Was | Meaning | Role |
+|---|---|---|---|
+| **Tirta** | Tamsin Reedwalker | water | fisher; watches the river every evening |
+| **Bintang** | Tovik Greymoss | star | knows where Xiao Hou Zi roams; the village's guide |
+| **Intan** | Pemberly Cade | diamond | has noticed the training grounds going quiet |
+| **Murai** | Linnet Grove | magpie-robin, a songbird | naturalist; studies the dawn birdsong |
 
 ### The clearing floor
 
-| Resident | Class | Role |
-|---|---|---|
-| **Sedge Marrow** | stuffed monkey | forager; runs the fruit stall |
-| **Ilva Bracken** | stuffed monkey | keeps the ground gardens |
-| **Osmund Reave** | stuffed monkey | ground-dweller who has lost two cousins to the ashing |
-| **Dune Sarrow** | stuffed monkey | friendly to outsiders; keeps the shared kitchen on the commons |
-| **Wick Thistledown** | tailed monkey | rope and vine maker |
-| **Fable Quickpaw** | tailed monkey | runner and gossip |
-| **Doran Mossback** | tailed monkey | path keeper; knows every root |
-| **Torvin Oakjaw** | ape | runs the training grounds, and does not say how |
-| **Maddox Cindertusk** | ape | watches Kova Kong from the tree line |
-| **Perrin Vale** | ape | old friend of Xiao Hou Zi |
-| **Ossian Redbrow** | ape | newcomer, on Manchego, waiting for the Special Banana |
+| Resident | Was | Meaning | Class | Role |
+|---|---|---|---|---|
+| **Delima** | Sedge Marrow | pomegranate | stuffed monkey | forager; runs the fruit stall |
+| **Melati** | Ilva Bracken | jasmine | stuffed monkey | keeps the ground gardens |
+| **Damar** | Osmund Reave | resin; a lamp | stuffed monkey | ground-dweller who has lost two cousins to the ashing |
+| **Wangi** | Dune Sarrow | fragrant | stuffed monkey | friendly to outsiders; keeps the shared kitchen on the commons |
+| **Rotan** | Wick Thistledown | rattan | tailed monkey | rope and vine maker |
+| **Kilat** | Fable Quickpaw | lightning | tailed monkey | runner and gossip |
+| **Akar** | Doran Mossback | root | tailed monkey | path keeper; knows every root |
+| **Batu** | Torvin Oakjaw | stone | ape | runs the training grounds, and does not say how |
+| **Sari** | Maddox Cindertusk | essence | ape | watches Kova Kong from the tree line |
+| **Teguh** | Perrin Vale | steadfast | ape | old friend of Xiao Hou Zi |
+| **Ossian Redbrow** | (unchanged) | | ape | newcomer, on Manchego, waiting for the Special Banana |
 
 ### The inn
 
 | Resident | Class | Role |
 |---|---|---|
-| **Bima Canopy** | stuffed monkey | innkeeper |
+| **Bima** (was Bima Canopy) | stuffed monkey | innkeeper |
+
+### Lines that change with the names
+
+Only one existing line names its speaker. Abu's first line becomes: "Abu. Yes,
+it means ash, and no, I didn't choose it. Ask my grandmother about the joke."
 
 ### Governance
 
@@ -176,7 +201,12 @@ charter.
 
 - Whether the curse touches apes.
 - Whether the surviving shadows of the ashed are visible in the village.
-- Whether the residents' names should be reworked like the Sky Kingdom's and
-  sea folk's.
-- Whether Sun Wu Kong's old seat (in his legend, the Water Curtain Cave behind a
-  waterfall on Flower Fruit Mountain) has a place in this kingdom.
+- What the village makes of the Water Curtain Cave once Sun Wu Kong reclaims it.
+
+**Resolved (2026-10-06):**
+
+- The residents are renamed (section 3, Names).
+- Sun Wu Kong's old seat, the Water Curtain Cave, stands behind the falls at
+  the river's source on Flower Fruit Mountain, the cliffs at the kingdom's west
+  end. It is long forgotten until he comes back and reclaims it. See
+  `plant_kingdom_water_curtain_cave.md`.

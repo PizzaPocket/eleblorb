@@ -352,8 +352,23 @@ Planning priorities:
   with a stable, paddock and gardens; household rings and rope bridges higher
   up; a grand ramp and a 32° public switchback on each tree beside the steep
   climbing ramps.
-- Decide the open questions: whether the curse touches apes, whether the
-  shadows of the ashed are seen, whether to rename the residents, and whether
-  Sun Wu Kong's old seat appears.
+- Decide the remaining open questions: whether the curse touches apes, and
+  whether the shadows of the ashed are seen.
+- Approve the residents' new names (Malay and Indonesian single names; Ossian
+  Redbrow keeps his) and the Water Curtain Cave brief
+  (`docs/architecture/plant_kingdom_water_curtain_cave.md`).
 - Then building briefs, interiors, planting and dress charters.
 
+Code work once approved (not started):
+
+- Rename the residents in `scripts/jungle_kingdom_village.gd` (both identity
+  rosters and the inn keeper's name in the `VillageInn.create` call) and
+  rewrite Abu's first line.
+- End the river at a plunge pool at `x ≈ -640` in
+  `scripts/jungle_kingdom_terrain.gd` (coverage, carving and the water sheet),
+  and raise the Flower Fruit Mountain plateau to the west.
+- Build the cliff, gorge, falls and cave as authored rock geometry with
+  `CollisionPolicy`, excluding the terrain under the cave; add the
+  mountain-top stream as its own small water volume.
+- A world-state switch between the cave's forgotten and reclaimed dressing,
+  set by the deferred Sun Wu Kong quest.
