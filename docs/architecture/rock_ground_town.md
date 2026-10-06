@@ -179,12 +179,14 @@ experts, the hero can make him full size.
   Equipped on Manchego, it lets him **grow to full size or shrink back down**.
   Working name: the shifting saddle. How the hero gets it (a commission, a
   race, a favour) is open.
-- **From then on, his size is switched by hand,** and it **sticks** (user,
-  2026-10-06). He stays whatever size he was last set to, ridden or not,
-  until it is switched again.
-  - At **chibi** size, Xiao Hou Zi and riders of stuffed-monkey scale can ride
-    him.
-  - At **full size**, the hero and full-size riders can.
+- **From then on, anyone can ride him** (user, 2026-10-06).
+  - Walk up to him and the **Ride Manchego** option appears, whether you are
+    the hero or Xiao Hou Zi.
+  - If he is not the right size for that rider, he **changes size first**
+    (full size for the hero, chibi for Xiao Hou Zi), and then the rider
+    mounts.
+  - After dismounting he **stays at that size** until a rider of the other
+    size mounts him.
 - **On a reset he is chibi again.** His size is not kept in long-term saved
   data: whenever the game resets (a reload or restart), he defaults back to
   chibi. This keeps the state simple.
@@ -193,8 +195,8 @@ experts, the hero can make him full size.
   changing proportions as he goes: legs lengthening and slimming, tail
   lengthening. No puff of smoke.
 - **Traversal parity:** riding Manchego stays one shared mount mode for every
-  playable character. Who can mount him depends on his current size against
-  the rider's own body scale, not on which character is riding, so a future
+  playable character. The size he grows or shrinks to is chosen from the
+  rider's own body scale, not from which character is riding, so a future
   character of any size works the same way.
 
 ## 5. The cowboy hat helm

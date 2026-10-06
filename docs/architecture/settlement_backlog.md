@@ -567,10 +567,11 @@ concept.
     fuller tail, sized to a stuffed-monkey rider, with Ossian seated to match.
   - Before the saddle, `can_be_mounted_by()` refuses full-size riders and
     accepts small ones such as Xiao Hou Zi.
-  - The saddle (from Wes Tolliver) is an equippable item. With it, his size is
-    switched by hand (a short grow or shrink transition) and stays as set until
-    switched again; who can mount depends on that size against the rider's
-    body scale.
+  - The saddle (from Wes Tolliver) is an equippable item. With it, the "Ride
+    Manchego" option appears for every rider. If his size does not fit the
+    rider's body scale, he grows or shrinks first (a short transition), then
+    the rider mounts. He keeps that size after dismounting until a rider of
+    the other size mounts.
   - Owning the saddle persists; **his size does not**: it lives only in the
     running session and defaults to chibi on any reset (reload or restart).
   - Mount riding stays one shared mode for every character (traversal parity).
