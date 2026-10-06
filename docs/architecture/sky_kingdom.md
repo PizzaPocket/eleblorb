@@ -149,8 +149,10 @@ follows his legend closely:
    last decision on the Hall's walls. With their common trouble gone, the courts
    stopped meeting.
 
-**Now.** The Air blorbs have had no keeper since. The courts believe Sun Wu Kong
-is still sealed. When he arrives alongside the hero, freed by Xiao Hou Zi,
+**Now.** The sealing was long ago, within the long memory of the eldest
+Tempestars but before most ground-dwellers' grandparents were born. The Air
+blorbs went on drifting between the clouds without a keeper for all that time,
+and vanished only recently. The courts believe Sun Wu Kong is still sealed. When he arrives alongside the hero, freed by Xiao Hou Zi,
 they assume he has taken the Air blorbs in revenge for his old post. The real
 cause is the Demon King. Restoring the Air blorbs clears Sun Wu Kong's name and
 puts the old question back on the table: what the courts owe the one person
@@ -517,6 +519,4 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
 - How much of the Sun Wu Kong history is quest content: whether the hero must
   clear his name, whether he takes back the keeper's post once the Air blorbs
   return, and how the courts react to him in the party.
-- The order of story events: the Air blorbs must vanish after the sealing for
-  the courts' suspicion to make sense.
 - Whether the courts choose to meet again once the Air blorbs return.
