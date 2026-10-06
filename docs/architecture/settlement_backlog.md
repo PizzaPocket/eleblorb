@@ -374,7 +374,8 @@ Code work once approved (not started):
   mountain-top stream as its own small water volume.
 - A world-state switch between the cave's forgotten and reclaimed dressing,
   set by the deferred Sun Wu Kong quest.
-- **Jungle density parity with the demo world** (user requirement): at least
+- **Jungle density parity with the demo world** (user requirement; backlog
+  only, do not start until asked): at least
   5.8 trees and 1.5 emergents per 1,000 m² across the whole kingdom, which today
   has at most 1.2 and 0.3 inside a 420 m disc and nothing beyond it. Requires
   streaming the scatter by seeded 64 m cells and sharing meshes first, so load
@@ -392,7 +393,7 @@ open-pavilion treehouse inn.
 
 | Rest point | Culture | Fixture planned | Status |
 |---|---|---|---|
-| Holt Inn, Ohio | English medieval and early-modern vernacular | an **earth closet**: an oak box seat with a lid over a removable pail, a hopper of dry earth and a scoop, a basin and ewer; emptied to compost | code has the porcelain pedestal; swap the fixture (washroom stays) |
+| Holt Inn, Ohio | an old English village tradition living in the present day (old-timey town and trades, today's comforts) | modern: the existing **porcelain toilet** in the washroom, with a basin | done; keep as is (user, 2026-10-06) |
 | Snowrest Inn, Snow Village | a modern mountain town on a Norse root | modern: flush toilet with cistern, basin and mirror, shower beside the equipment-drying room | code has the porcelain dry toilet; upgrade to a modern washroom |
 | Ember Rest, Fire caldera | lava people with advanced thermal engineering; guests only | modern: an **incinerating toilet** in insulated basalt, heated by the city's thermal system, with a cool-water basin for guests | washroom in the brief; fixture to build |
 | Rock and Ground inn | Pueblo-style earth and stone | an adobe **privy closet** off the yard: a timber seat over a lined composting vault, ash from the bread oven as cover, a water jar and basin | to add to the brief and code |

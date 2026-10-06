@@ -288,10 +288,17 @@ toilet, without exception. The fixture belongs to the culture that built the
 place:
 - **A modern culture gets modern fixtures:** a flush toilet with its cistern, a
   washbasin with a tap, a mirror, and a shower where guests stay overnight.
-- **A traditional culture gets its own tradition's fixture,** named by its real
-  term in the brief: a privy or earth closet, a lidded commode, a composting
+- **A layered culture counts as modern.** Several settlements are old
+  traditions living in the present day: quaint old-timey towns with old-timey
+  trades whose people wear t-shirts and have today's comforts (Ohio, Kai Mālie,
+  the Snow Village). Their buildings keep their historic style, and their
+  bathrooms are modern: a porcelain flush toilet in a half-timbered inn is
+  correct there, not an anachronism.
+- **A culture that genuinely lives in the past gets its own tradition's
+  fixture,** named by its real term in the brief: a privy or earth closet, a lidded commode, a composting
   vault, a ship's head. It is never a generic modern bowl dropped into a
-  historic building, nor a porcelain pedestal in a hut.
+  genuinely historic culture, nor a porcelain pedestal in a hut. Check the
+  settlement's brief and the world bible for which kind it is.
 - **A people who do not need toilets themselves** (lava people, cloud people,
   merfolk in water) still give their guests one, built in their own materials
   and technology.
