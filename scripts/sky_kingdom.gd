@@ -197,6 +197,15 @@ func _build_all_islands() -> void:
 	var landing := _resolve_landing()
 	var away := _resolve_away_direction(landing)
 	var capital_pos := landing + _to_world_offset(CAPITAL_LOCAL_OFFSET, away)
+	# Shared ambient weather must not intrude into authored Sky Kingdom
+	# islands. These are resolved from the real procedural landing position,
+	# and remove only scenery clouds -- never the course or island platforms.
+	var clouds := get_node_or_null("../Clouds") as CloudScatter
+	if clouds != null:
+		clouds.add_ambient_exclusion(capital_pos, 66.0, capital_pos.y - 30.0, capital_pos.y + 34.0)
+		for local_offset in SATELLITE_LOCAL_OFFSETS:
+			var reserved_pos := landing + _to_world_offset(local_offset, away)
+			clouds.add_ambient_exclusion(reserved_pos, 48.0, reserved_pos.y - 25.0, reserved_pos.y + 30.0)
 	_islands.append(_build_island(capital_pos, 46.0, true, "Highcloud"))
 	var satellite_cloud_names := ["the Anvil Cloud", "the Drift Cloud", "the Hollow Cloud"]
 	for i in SATELLITE_LOCAL_OFFSETS.size():

@@ -392,6 +392,19 @@ static func _ensure_items() -> void:
 			"description": "The Royal Chef's weighty chopping cleaver.",
 			"build_visual": Callable(ShopCatalog, "build_meat_cleaver_visual"),
 		},
+		{
+			"name": "Boxing Gloves", "color": Color(0.72, 0.10, 0.08),
+			"price": 0, "sell_price": 14, "purchasable": false, "element": "",
+			"weapon": true, "weapon_damage": 16.0, "weapon_reach": 1.05,
+			"description": "A matched pair of padded red fighting gloves found in the Holt Inn.",
+			"build_visual": Callable(ShopCatalog, "_build_boxing_gloves_visual"),
+		},
+		{
+			"name": "Holt Inn Key", "color": Color(0.82, 0.66, 0.24),
+			"price": 0, "sell_price": 0, "purchasable": false, "element": "",
+			"description": "A key for the two locked rooms beside the Holt Inn hearth.",
+			"build_visual": Callable(ShopCatalog, "_build_inn_key_visual"),
+		},
 	]
 
 
@@ -400,6 +413,45 @@ static func _build_blorb_slime_visual(item_scale: float) -> Node3D:
 	var drop := SuperEgg.build_part(Vector3(0.11,0.085,0.11)*item_scale,BLORB_SLIME_COLOR,2.4,2.8)
 	drop.position.y = 0.085*item_scale
 	root.add_child(drop)
+	return root
+
+
+static func _build_boxing_gloves_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	root.scale = Vector3.ONE * item_scale
+	for side: float in [-1.0, 1.0]:
+		var cuff := SuperEgg.build_part(Vector3(0.075, 0.07, 0.065), Color(0.48, 0.055, 0.045), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
+		cuff.position = Vector3(side * 0.11, 0.07, 0.0)
+		root.add_child(cuff)
+		var glove := SuperEgg.build_part(Vector3(0.105, 0.115, 0.10), Color(0.72, 0.10, 0.08), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+		glove.position = Vector3(side * 0.11, 0.22, -0.025)
+		root.add_child(glove)
+	_add_catalog_grip(root)
+	return root
+
+
+static func _build_inn_key_visual(item_scale: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	root.scale = Vector3.ONE * item_scale
+	var brass := Color(0.82, 0.66, 0.24)
+	var ring := TorusMesh.new()
+	ring.inner_radius = 0.055
+	ring.outer_radius = 0.082
+	ring.rings = 16
+	ring.ring_segments = 8
+	ring.material = SolidModel.material(brass, 0.3, 0.65)
+	var bow := MeshInstance3D.new()
+	bow.mesh = ring
+	bow.rotation.x = PI * 0.5
+	root.add_child(bow)
+	var shaft := SuperEgg.build_part(Vector3(0.025, 0.12, 0.018), brass, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	shaft.position.y = -0.15
+	root.add_child(shaft)
+	for offset in [0.0, 0.055]:
+		var tooth := SuperEgg.build_part(Vector3(0.045, 0.018, 0.018), brass, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		tooth.position = Vector3(0.035, -0.255 + offset, 0.0)
+		root.add_child(tooth)
+	_add_catalog_grip(root)
 	return root
 
 

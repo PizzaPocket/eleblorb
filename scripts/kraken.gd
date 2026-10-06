@@ -40,6 +40,10 @@ var _eye_blink := EyeBlink.new_state()
 var _route_angle := 0.0
 var _swim_elapsed := 0.0
 var _time := 0.0
+var _player_controlled := false
+var _control_moving := false
+var _control_sprinting := false
+var _titan_suit_host: TitanSuitHost
 
 
 func _init() -> void:
@@ -57,6 +61,10 @@ func _ready() -> void:
 	position = Vector3(route_center.x + route_radius.x, water_level - IDLE_DEPTH, route_center.y)
 	_build()
 	_update(0.0, 0.0)
+	_titan_suit_host = TitanSuitHost.new()
+	_titan_suit_host.name = "TitanSuitHost"
+	add_child(_titan_suit_host)
+	_titan_suit_host.setup(self, "Kraken")
 
 
 ## How near the driven body has to be before this animates at all, and how
@@ -92,23 +100,29 @@ func _physics_process(delta: float) -> void:
 
 func _update(time: float, delta: float) -> void:
 	var cycle_time := fmod(time, IDLE_DURATION + SWIM_DURATION)
-	var swimming := cycle_time >= IDLE_DURATION
+	var swimming := _player_controlled or cycle_time >= IDLE_DURATION
 	if swimming:
-		_route_angle += route_angular_speed * delta
-		_swim_elapsed += delta
-	var x: float = route_center.x + cos(_route_angle) * route_radius.x
-	var z: float = route_center.y + sin(_route_angle) * route_radius.y
-	var floor_height: float = float(terrain.get_mesh_height(x, z)) if terrain != null else water_level - 42.0
-	# The full relaxed tentacle fan reaches roughly 26 metres below the
-	# body's origin. Floor-aware clearance makes clipping impossible even
-	# if its route later crosses a shallower ridge.
-	var y: float = maxf(water_level - IDLE_DEPTH + sin(time * 0.22) * 0.45, floor_height + FLOOR_CLEARANCE)
-	position = Vector3(x, y, z)
+		if not _player_controlled:
+			_route_angle += route_angular_speed * delta
+			_swim_elapsed += delta
+		elif _control_moving:
+			_swim_elapsed += delta * (1.65 if _control_sprinting else 1.0)
+	var x: float = global_position.x
+	var z: float = global_position.z
+	if not _player_controlled:
+		x = route_center.x + cos(_route_angle) * route_radius.x
+		z = route_center.y + sin(_route_angle) * route_radius.y
+		var floor_height: float = float(terrain.get_mesh_height(x, z)) if terrain != null else water_level - 42.0
+		# The full relaxed tentacle fan reaches roughly 26 metres below the
+		# body's origin. Floor-aware clearance makes clipping impossible even
+		# if its route later crosses a shallower ridge.
+		var y: float = maxf(water_level - IDLE_DEPTH + sin(time * 0.22) * 0.45, floor_height + FLOOR_CLEARANCE)
+		position = Vector3(x, y, z)
 	var route_velocity := Vector2(
 		-sin(_route_angle) * route_radius.x,
 		cos(_route_angle) * route_radius.y
 	).normalized()
-	if _mantle != null:
+	if _mantle != null and not _player_controlled:
 		var target_basis := Basis.IDENTITY
 		if swimming:
 			# The mantle's local +Y axis is its crown. Aim that axis along the
@@ -134,6 +148,82 @@ func _update(time: float, delta: float) -> void:
 			root.scale = root.scale.lerp(Vector3.ONE, clampf(delta * 0.8, 0.0, 1.0))
 	_sync_colliders()
 	EyeBlink.apply(_eye_blink, delta, [_eye])
+
+
+func can_accept_titan_suit() -> bool:
+	return true
+
+
+func titan_interaction_radius() -> float:
+	return 8.0 * DISPLAY_SCALE
+
+
+func titan_suit_clearance_scale() -> float:
+	return 1.065
+
+
+func titan_suit_excludes_mesh(mesh: MeshInstance3D) -> bool:
+	var node: Node = mesh
+	while node != null and node != self:
+		if "tentacle" in node.name.to_lower():
+			return true
+		node = node.get_parent()
+	return false
+
+
+func titan_suit_face_profile() -> Dictionary:
+	# The opening follows the mantle's single expressive eye. Tentacles are
+	# deliberately outside the suit profile and emerge uncovered below it.
+	return {
+		"center": _eye.global_position,
+		"forward": _eye.global_basis.z.normalized(),
+		"up": _eye.global_basis.y.normalized(),
+		"half": Vector3(1.65, 1.75, 2.8),
+	}
+
+
+func begin_host_control(_source: Node3D) -> bool:
+	_player_controlled = true
+	return true
+
+
+func end_host_control(_source: Node3D) -> void:
+	_player_controlled = false
+	_control_moving = false
+	_control_sprinting = false
+	route_center = Vector2(global_position.x, global_position.z)
+	_route_angle = 0.0
+
+
+func host_exit_label() -> String:
+	return "Release Kraken"
+
+
+func uses_pitched_movement_input() -> bool:
+	return true
+
+
+func camera_focus_point() -> Vector3:
+	return global_position + Vector3.UP * 12.0
+
+
+func camera_follow_distance() -> float:
+	return 44.0
+
+
+func drive_from_player(direction: Vector3, delta: float, sprinting: bool, _jump_pressed: bool) -> void:
+	if not _player_controlled:
+		return
+	_control_moving = direction.length_squared() > 0.0001
+	_control_sprinting = sprinting
+	if _control_moving:
+		var speed := 7.0 * (1.65 if sprinting else 1.0)
+		global_position += direction.normalized() * speed * delta
+		global_position.y = minf(global_position.y, water_level - 1.5)
+		var travel := direction.normalized()
+		var right := Vector3.UP.cross(travel)
+		if right.length_squared() > 0.001:
+			_mantle.basis = Basis(right.normalized(), travel, right.normalized().cross(travel)).orthonormalized()
 
 
 func _add_box(parent: Node3D, part_position: Vector3, size: Vector3, color: Color, part_rotation := Vector3.ZERO) -> Node3D:
@@ -218,6 +308,7 @@ func _build() -> void:
 			if (segment + index) % 2 == 0:
 				var spot := SuperEgg.build_part(Vector3(radius * 0.48, radius * 0.62, 0.10), KRAKEN_SPLOTCH, 2.4, 2.4)
 				spot.position = (previous + next) * 0.5 + Vector3(0.0, 0.0, radius * 0.92)
+				CollisionPolicy.mark_decorative(spot)
 				root.add_child(spot)
 			previous = next
 
@@ -248,6 +339,7 @@ func _add_splotches() -> void:
 		patch.name = "TealSplotch%02d" % index
 		patch.position = radial * 4.72 + Vector3.UP * y
 		patch.basis = Basis.looking_at(-radial, Vector3.UP)
+		CollisionPolicy.mark_decorative(patch)
 		_mantle.add_child(patch)
 
 

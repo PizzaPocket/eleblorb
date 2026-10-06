@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import shutil
 import subprocess
 
 from web_build import write_manifest
@@ -13,6 +14,8 @@ from web_build import write_manifest
 ROOT = Path(__file__).resolve().parents[1]
 HTML = ROOT / "build" / "web" / "index.html"
 GODOT = Path("/Applications/Godot.app/Contents/MacOS/Godot")
+VARELA_FONT = ROOT / "assets" / "fonts" / "VarelaRound-Regular.ttf"
+WEB_VARELA_FONT = HTML.parent / "VarelaRound-Regular.ttf"
 
 STYLE_END = "\t\t</style>"
 SPLASH_IMAGE = '\t\t\t<img id="status-splash" class="show-image--false fullsize--true use-filter--true" src="index.png" alt="">\n'
@@ -34,8 +37,16 @@ ENGINE_END = """\t\t}).then(() => {
 
 LOADER_CSS = r"""
 
+@font-face {
+	font-family: "Varela Round";
+	src: url("VarelaRound-Regular.ttf") format("truetype");
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+}
+
 :root {
-	--eleblorb-ui-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	--eleblorb-ui-font: "Varela Round", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 	--eleblorb-vv-left: 0px;
 	--eleblorb-vv-top: 0px;
 	--eleblorb-vv-width: 100vw;
@@ -219,28 +230,70 @@ STATUS_VARIABLES_WITH_LOADER = STATUS_VARIABLES + """
 
 \tconst desktopTips = [
 \t\t'Press F near people, objects, and Blorbs to interact.',
-\t\t'Press Tab to open Items, Blorbs, and your Character.',
-\t\t'Press T to toggle your Blorb suit.',
-\t\t'Bounce off a Blorb and jump as you land to leap higher.',
-\t\t'A compass can point you toward wild Blorbs.'
+\t\t'Press T to equip or remove your Blorb suit.',
+\t\t'Press Tab to open Items, Blorbs, and Character equipment.',
+\t\t'Press B or N to switch between playable party members.',
+\t\t'Press V to call an available Blorb beneath you.',
+\t\t'Hold Alt while moving to run.',
+\t\t'Use Q and E for arm powers; Shift and C for leg powers.',
+\t\t'Bounce off a Blorb and jump as you land to leap higher.'
+\t];
+\tconst controllerTips = [
+\t\t'Press X near people, objects, and Blorbs to interact.',
+\t\t'Press D-pad Up to equip or remove your Blorb suit.',
+\t\t'Use the View button to open Items, Blorbs, and Character equipment.',
+\t\t'Press D-pad Left or Right to switch playable party members.',
+\t\t'Press D-pad Down to call an available Blorb beneath you.',
+\t\t'Hold A while moving to run.',
+\t\t'Use the shoulder buttons and triggers for Blorb powers.',
+\t\t'Bounce off a Blorb and press Y as you land to leap higher.'
 \t];
 \tconst touchTips = [
 \t\t'Tap an action when you are close enough to interact.',
-\t\t'Open your inventory to see Items, Blorbs, and your Character.',
+\t\t'Open your inventory to see Items, Blorbs, and Character equipment.',
 \t\t'Use the Blorb suit action to wear your party Blorbs.',
-\t\t'Bounce off a Blorb and jump as you land to leap higher.',
-\t\t'A compass can point you toward wild Blorbs.'
+\t\t'Use the character arrows to change playable party members.',
+\t\t'Call an available Blorb beneath you for help platforming.',
+\t\t'Hold the run action while moving to travel faster.',
+\t\t'Arm and leg actions activate the powers of worn Blorbs.',
+\t\t'Bounce off a Blorb and jump as you land to leap higher.'
 \t];
 \tlet tipIndex = 0;
 \tconst touchPrimary = window.matchMedia('(hover: none) and (pointer: coarse)');
-\tsetInterval(() => {
-\t\tconst tips = touchPrimary.matches ? touchTips : desktopTips;
-\t\ttipIndex = (tipIndex + 1) % tips.length;
+\tlet inputMode = touchPrimary.matches ? 'touch' : 'desktop';
+\tlet lastPhaseText = '';
+\tfunction activeTips() {
+\t\treturn inputMode === 'controller' ? controllerTips : (inputMode === 'touch' ? touchTips : desktopTips);
+\t}
+\tfunction showTip() {
+\t\tconst tips = activeTips();
+\t\ttipIndex %= tips.length;
 \t\tloadingTip.textContent = tips[tipIndex];
-\t}, 3200);
+\t}
+\tfunction setInputMode(mode) {
+\t\tif (mode === inputMode) return;
+\t\tinputMode = mode;
+\t\ttipIndex = 0;
+\t\tdocument.body.classList.toggle('gamepad-connected', mode === 'controller');
+\t\tshowTip();
+\t}
+\tfunction advanceTip() {
+\t\tconst tips = activeTips();
+\t\ttipIndex = (tipIndex + 1) % tips.length;
+\t\tshowTip();
+\t}
+\tsetInterval(advanceTip, 3200);
 
-\twindow.addEventListener('gamepadconnected', () => document.body.classList.add('gamepad-connected'));
-\twindow.addEventListener('gamepaddisconnected', () => document.body.classList.remove('gamepad-connected'));
+\twindow.addEventListener('gamepadconnected', () => setInputMode('controller'));
+\twindow.addEventListener('gamepaddisconnected', () => {
+\t\tconst connected = Array.from(navigator.getGamepads ? navigator.getGamepads() : []).some(Boolean);
+\t\tif (!connected) setInputMode(touchPrimary.matches ? 'touch' : 'desktop');
+\t});
+\twindow.addEventListener('keydown', () => setInputMode('desktop'));
+\twindow.addEventListener('mousedown', () => setInputMode('desktop'));
+\twindow.addEventListener('touchstart', () => setInputMode('touch'), {passive: true});
+\tif (Array.from(navigator.getGamepads ? navigator.getGamepads() : []).some(Boolean)) setInputMode('controller');
+\telse showTip();
 
 \tfunction syncVisibleViewport(notifyGodot) {
 \t\tconst viewport = window.visualViewport;
@@ -264,6 +317,10 @@ STATUS_VARIABLES_WITH_LOADER = STATUS_VARIABLES + """
 
 \twindow.eleblorbLoadingPhase = function (text, progress) {
 \t\tstatusPhase.textContent = text;
+\t\tif (text !== lastPhaseText) {
+\t\t\tlastPhaseText = text;
+\t\t\tadvanceTip();
+\t\t}
 \t\tif (Number.isFinite(progress)) {
 \t\t\tstatusProgress.max = 1;
 \t\t\tstatusProgress.dataset.target = String(Math.max(0, Math.min(1, progress)));
@@ -343,6 +400,9 @@ def main() -> None:
         )
     if not HTML.exists():
         raise FileNotFoundError(f"No exported HTML at {HTML}")
+    # The HTML loader renders before Godot can expose resources inside the PCK,
+    # so give that first visible screen its own copy of the shared UI font.
+    shutil.copy2(VARELA_FONT, WEB_VARELA_FONT)
     patch_html()
     write_manifest()
     print(f"Exported one continuous Eleblorb loader: {HTML}")

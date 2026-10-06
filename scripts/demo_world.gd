@@ -120,18 +120,32 @@ func _ready() -> void:
 		east_portal.position = gate_center - pair_offset
 		west_portal.position = gate_center + pair_offset
 		if border.has("hover_y"):
-			east_portal.position.y = float(border["hover_y"])
-			west_portal.position.y = float(border["hover_y"])
+			# A hovering pair still has to clear the actual terrain below both
+			# membranes. The volcano now rises into the far end of the lava basin,
+			# so a fixed lava-relative height could bury this gate in its flank.
+			var hover_y := float(border["hover_y"])
+			var east_ground: float = _terrain.get_mesh_height(east_portal.position.x, east_portal.position.z)
+			var west_ground: float = _terrain.get_mesh_height(west_portal.position.x, west_portal.position.z)
+			var clear_y := maxf(hover_y, maxf(east_ground, west_ground) + 0.65)
+			east_portal.position.y = clear_y
+			west_portal.position.y = clear_y
 	# The Nautilus portal on the seabed, facing west like the water portal.
 	var nautilus_portal := _add_portal("water", DemoWorldTerrain.NAUTILUS_PORTAL_X, -PI * 0.5, "nautilus")
 	nautilus_portal.position = _terrain.nautilus_portal_point()
 	# The Crystal Skates portal, standing on the frozen lake's ice.
 	var crystal_portal := _add_portal("ice", DemoWorldTerrain.CRYSTAL_PORTAL_X, -PI * 0.5, "crystal", 1.0, CrystalTrack.CRYSTAL_TINT)
 	crystal_portal.position.y = DemoWorldTerrain.ICE_SURFACE_LEVEL
-	_add_space_zone()
 	# The reusable two-song music system remains available, but playback is
 	# intentionally disabled during the current movement/foley testing pass.
 	# Re-enable with: add_child(WorldMusic.playlist(MUSIC_PLAYLIST, -10.0))
+	LoadingScreen.enqueue_build_stage("Configuring world systems…", 0.97, _add_space_zone)
+	LoadingScreen.enqueue_build_stage("Populating environment data…", 0.98, _add_demo_environment)
+	LoadingScreen.enqueue_build_stage("Preparing world actors…", 0.99, _add_demo_titans)
+	_stock_demo_inventory()
+	call_deferred("_finish_loading")
+
+
+func _add_demo_environment() -> void:
 	# The Ocean Kingdom's Kraken, patrolling the sea's deep middle.
 	var kraken := Kraken.new()
 	kraken.route_center = _terrain.kraken_route_center()
@@ -140,9 +154,6 @@ func _ready() -> void:
 	kraken.terrain = _terrain
 	add_child(kraken)
 	_add_plant_jungle()
-	_add_demo_titans()
-	_stock_demo_inventory()
-	call_deferred("_finish_loading")
 
 
 ## The demo hands over what its own course needs to be played through, rather
@@ -246,6 +257,14 @@ func _add_demo_titans() -> void:
 		DemoWorldTerrain.DINOSAUR_CLEARING.x,
 		DemoWorldTerrain.DINOSAUR_CLEARING.y - DemoWorldTerrain.path_center_z(DemoWorldTerrain.DINOSAUR_CLEARING.x)
 	)
+	# The fossil/living rig's historical origin is at its hindquarters. Place
+	# that origin off-centre by the inverse torso-pivot offset so the actual
+	# physical Dinosaur—not its butt/root node—is centred in the basin.
+	dinosaur.position -= Vector3(
+		DinosaurTitan.TURN_PIVOT_LOCAL.x * DinosaurTitan.DISPLAY_SCALE,
+		0.0,
+		DinosaurTitan.TURN_PIVOT_LOCAL.z * DinosaurTitan.DISPLAY_SCALE
+	)
 	add_child(dinosaur)
 
 	var da_hou_zi := DA_HOU_ZI_SCENE.instantiate() as ApeTemplatePreview
@@ -259,6 +278,7 @@ func _add_demo_titans() -> void:
 	da_hou_zi.gait_speed_multiplier = DA_HOU_ZI_CONFIG.GORILLA_GAIT_SPEED_MULTIPLIER
 	da_hou_zi.roam_radius = 30.0
 	da_hou_zi.parkour_collision = true
+	da_hou_zi.titan_host = true
 	da_hou_zi.display_name = DA_HOU_ZI_CONFIG.GORILLA_TRUE_NAME
 	var da_hou_zi_lines: Array[String] = ["Da Hou Zi watches through a strange purple haze."]
 	da_hou_zi.talk_lines = da_hou_zi_lines
@@ -324,6 +344,7 @@ func _finish_loading() -> void:
 		# facing with it, leaving him a quarter turn off.
 		_player.set_body_heading(WEST_BODY_YAW)
 		_player.camera_rig.rotation.y = EAST_CAMERA_YAW
+	LoadingScreen.set_phase("Finalizing world state…", 0.995)
 	_build_party()
 	if not recovering and not WorldState.opening_wake_completed:
 		_player.begin_wake_intro()

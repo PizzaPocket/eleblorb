@@ -11,8 +11,10 @@ build/*
 # Local work-in-progress source kits and Blender scratch files
 wip/
 
-# Local tool and operating-system state
-.claude/
+# Local tool and operating-system state. The project skills under
+# .claude/skills are shared source; everything else in .claude is per-machine.
+.claude/*
+!.claude/skills/
 .codex/
 .DS_Store
 **/.DS_Store

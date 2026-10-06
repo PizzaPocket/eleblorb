@@ -149,3 +149,51 @@ static func build_flame_particles(
 	particles.draw_pass_1 = quad
 	particles.visibility_aabb = AABB(Vector3(-12, -2, -12), Vector3(24, 20, 24))
 	return particles
+
+
+## Soft white mist or spray that rises off falling water and drifts apart.
+## `extents` is the half-size of the emitting box, `rise` how fast and how far
+## it climbs, `size` the billboard size. Non-additive, so it reads as vapour
+## and not as glow.
+static func build_mist_particles(
+	amount: int, extents: Vector3, rise: float, size: float, lifetime: float = 2.4,
+	opacity: float = 0.55
+) -> GPUParticles3D:
+	var particles := GPUParticles3D.new()
+	particles.amount = amount
+	particles.lifetime = lifetime
+	particles.randomness = 0.5
+	particles.emitting = true
+	var process := ParticleProcessMaterial.new()
+	process.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+	process.emission_box_extents = extents
+	process.direction = Vector3.UP
+	process.spread = 28.0
+	process.initial_velocity_min = rise * 0.5
+	process.initial_velocity_max = rise
+	process.gravity = Vector3(0.0, 0.15, 0.0)
+	process.scale_min = 0.6
+	process.scale_max = 1.3
+	process.angle_min = -180.0
+	process.angle_max = 180.0
+	process.turbulence_enabled = true
+	process.turbulence_noise_strength = 0.6
+	process.turbulence_noise_scale = 1.4
+	process.turbulence_influence_min = 0.05
+	process.turbulence_influence_max = 0.2
+	process.color_ramp = build_color_ramp([
+		{"offset": 0.0, "color": Color(1.0, 1.0, 1.0, 0.0)},
+		{"offset": 0.2, "color": Color(0.96, 0.98, 1.0, opacity)},
+		{"offset": 1.0, "color": Color(0.9, 0.95, 1.0, 0.0)},
+	])
+	process.scale_curve = build_scale_curve(0.5, 1.0, 0.5, 1.6)
+	particles.process_material = process
+	var material := build_billboard_material(build_soft_gradient_texture(48, 1.3, 0.25), Color.WHITE, false, 0.0)
+	material.vertex_color_use_as_albedo = true
+	material.emission_enabled = false
+	var quad := QuadMesh.new()
+	quad.size = Vector2(size, size)
+	quad.material = material
+	particles.draw_pass_1 = quad
+	particles.visibility_aabb = AABB(Vector3(-extents.x - 6.0, -2.0, -extents.z - 6.0), Vector3(extents.x * 2.0 + 12.0, rise * lifetime + 8.0, extents.z * 2.0 + 12.0))
+	return particles

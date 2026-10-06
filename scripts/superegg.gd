@@ -43,11 +43,19 @@ static func surface_point(
 	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT
 ) -> Vector3:
 	var lat_epsilon := epsilon_bottom if eta < 0.0 else epsilon_top
-	var ce := _pow_sign(cos(eta), lat_epsilon)
-	var se := _pow_sign(sin(eta), lat_epsilon)
-	var so := _pow_sign(sin(omega), epsilon_top)
-	var co := _pow_sign(cos(omega), epsilon_top)
+	# cos(PI/2) is 6e-17, not 0, and a large exponent raises that to a visible
+	# fraction (6e-17 ** (2/40) is 0.15): the pole of a high-exponent slab came out
+	# as a small loop, leaving a hole in the middle of its top face. Snap the
+	# trigonometry to exact zeros at the axes.
+	var ce := _pow_sign(_snap(cos(eta)), lat_epsilon)
+	var se := _pow_sign(_snap(sin(eta)), lat_epsilon)
+	var so := _pow_sign(_snap(sin(omega)), epsilon_top)
+	var co := _pow_sign(_snap(cos(omega)), epsilon_top)
 	return Vector3(semi_axes.x * ce * so, semi_axes.y * se, semi_axes.z * ce * co)
+
+
+static func _snap(value: float) -> float:
+	return 0.0 if absf(value) < 1e-9 else value
 
 
 static func _pow_sign(value: float, epsilon: float) -> float:
@@ -104,6 +112,146 @@ static func build_part(
 	material.roughness = 0.6
 	mesh_instance.set_surface_override_material(0, material)
 	return mesh_instance
+
+
+## Builds a SuperEgg that has been cleanly cut by one or more planes. The
+## retained side of every plane is the side for which Plane.distance_to(point)
+## is <= 0. Each cut is closed with a planar cap, so this is a real solid mesh
+## rather than a curved shell hidden behind trim. The source SuperEgg and the
+## intersection of half-spaces are convex, which keeps every cap convex and
+## lets us triangulate it without a heavyweight runtime CSG operation.
+static func build_clipped_mesh(
+	semi_axes: Vector3, clip_planes: Array[Plane],
+	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT,
+	segment_count: int = SEGMENTS, ring_count: int = RINGS
+) -> ArrayMesh:
+	# `segment_count` and `ring_count` let a large slab be sampled more finely: at a
+	# high exponent the corner of a long slab is only as square as the sampling is
+	# dense, so roofs ask for more than the figure rig's default.
+	var polygons: Array = []
+	var rings: Array = []
+	for ring_i in ring_count + 1:
+		var v := float(ring_i) / float(ring_count)
+		var eta := -PI * 0.5 + v * PI
+		var points: Array[Vector3] = []
+		for seg in segment_count:
+			var omega := (float(seg) / float(segment_count)) * TAU
+			points.append(surface_point(semi_axes, eta, omega, epsilon_top, epsilon_bottom))
+		rings.append(points)
+
+	for ring_i in ring_count:
+		var ring_a: Array = rings[ring_i]
+		var ring_b: Array = rings[ring_i + 1]
+		for seg in segment_count:
+			var seg_next := (seg + 1) % segment_count
+			var a0: Vector3 = ring_a[seg]
+			var a1: Vector3 = ring_a[seg_next]
+			var b0: Vector3 = ring_b[seg]
+			var b1: Vector3 = ring_b[seg_next]
+			for triangle: Array[Vector3] in [
+				[a0, b0, a1] as Array[Vector3],
+				[a1, b0, b1] as Array[Vector3],
+			]:
+				var polygon := triangle
+				for plane in clip_planes:
+					polygon = _clip_polygon_to_plane(polygon, plane)
+					if polygon.size() < 3:
+						break
+				if polygon.size() >= 3:
+					polygons.append(polygon)
+
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for polygon_value in polygons:
+		var polygon: Array[Vector3] = polygon_value
+		for index in range(1, polygon.size() - 1):
+			_add_triangle(st, polygon[0], polygon[index], polygon[index + 1])
+
+	# A final clipped polygon can have several vertices on a cut boundary. Pool
+	# all of them, sort round that plane, then close the solid with a separate
+	# hard-normal fan. Keeping cap vertices separate prevents the curved skin's
+	# generated normals from softening the freshly cut edge.
+	for plane in clip_planes:
+		var cap_points: Array[Vector3] = []
+		for polygon_value in polygons:
+			var polygon: Array[Vector3] = polygon_value
+			for point in polygon:
+				if absf(plane.distance_to(point)) <= 0.001:
+					_append_unique_point(cap_points, point)
+		if cap_points.size() < 3:
+			continue
+		var centre := Vector3.ZERO
+		for point in cap_points:
+			centre += point
+		centre /= float(cap_points.size())
+		var normal := plane.normal.normalized()
+		var reference := Vector3.UP if absf(normal.dot(Vector3.UP)) < 0.92 else Vector3.RIGHT
+		var axis_u := reference.cross(normal).normalized()
+		var axis_v := normal.cross(axis_u).normalized()
+		cap_points.sort_custom(func(a: Vector3, b: Vector3) -> bool:
+			var da := a - centre
+			var db := b - centre
+			return atan2(da.dot(axis_v), da.dot(axis_u)) < atan2(db.dot(axis_v), db.dot(axis_u))
+		)
+		# Plane.normal points out of the retained half-space. Reverse the ring if
+		# the chosen basis happens to wind it the other way.
+		var first_normal := (cap_points[0] - centre).cross(cap_points[1] - centre)
+		if first_normal.dot(normal) < 0.0:
+			cap_points.reverse()
+		for index in cap_points.size():
+			_add_triangle(st, centre, cap_points[index], cap_points[(index + 1) % cap_points.size()])
+
+	st.generate_normals()
+	return st.commit()
+
+
+static func build_clipped_part(
+	semi_axes: Vector3, clip_planes: Array[Plane], color: Color,
+	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT
+) -> MeshInstance3D:
+	var mesh_instance := MeshInstance3D.new()
+	mesh_instance.mesh = build_clipped_mesh(semi_axes, clip_planes, epsilon_top, epsilon_bottom)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.roughness = 0.6
+	mesh_instance.set_surface_override_material(0, material)
+	return mesh_instance
+
+
+static func _clip_polygon_to_plane(points: Array[Vector3], plane: Plane) -> Array[Vector3]:
+	var result: Array[Vector3] = []
+	if points.is_empty():
+		return result
+	for index in points.size():
+		var current := points[index]
+		var next := points[(index + 1) % points.size()]
+		var current_distance := plane.distance_to(current)
+		var next_distance := plane.distance_to(next)
+		var current_inside := current_distance <= 0.00001
+		var next_inside := next_distance <= 0.00001
+		if current_inside:
+			result.append(current)
+		if current_inside != next_inside:
+			var denominator := current_distance - next_distance
+			if absf(denominator) > 0.000001:
+				var amount := current_distance / denominator
+				result.append(current.lerp(next, amount))
+	return result
+
+
+static func _append_unique_point(points: Array[Vector3], candidate: Vector3) -> void:
+	for point in points:
+		if point.distance_squared_to(candidate) < 0.000001:
+			return
+	points.append(candidate)
+
+
+static func _add_triangle(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -> void:
+	if (b - a).cross(c - a).length_squared() < 0.00000001:
+		return
+	st.add_vertex(a)
+	st.add_vertex(b)
+	st.add_vertex(c)
 
 
 ## Vector3's own `[]` operator returns Variant (not float) when indexed by

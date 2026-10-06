@@ -7,10 +7,15 @@ extends Node3D
 ## the living titan is revealed.
 const BONE := Color(0.74,0.66,0.50)
 const DARK_BONE := Color(0.57,0.49,0.36)
-const ASSEMBLY_DURATION := 0.28
-const ASSEMBLY_STAGGER := 0.004
-const SLIME_SPREAD_DURATION := 0.22
-const FLESH_REVEAL_DURATION := 0.16
+const ASSEMBLY_DURATION := 0.65
+const ASSEMBLY_STAGGER := 0.012
+const SLIME_SPREAD_DURATION := 0.55
+const SLIME_SPREAD_STAGGER := 0.055
+const FLESH_REVEAL_DURATION := 0.45
+
+## A world can tighten the living titan's route to match a deliberately
+## carved local habitat without changing Dinosaur's ordinary kingdom tuning.
+@export var titan_wander_radius := DinosaurTitan.WANDER_RADIUS
 
 var _fossil_body: StaticBody3D = null
 var _bone_entries: Array[Dictionary] = []
@@ -112,7 +117,7 @@ func _run_resurrection() -> void:
 	var spread:=create_tween().set_parallel(true)
 	for i in blobs.size():
 		var blob:=blobs[i] as MeshInstance3D
-		spread.tween_property(blob,"scale",Vector3.ONE,SLIME_SPREAD_DURATION).set_delay(float(i)*0.025).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		spread.tween_property(blob,"scale",Vector3.ONE,SLIME_SPREAD_DURATION).set_delay(float(i)*SLIME_SPREAD_STAGGER).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	await spread.finished
 	if not is_inside_tree():
 		return
@@ -176,6 +181,8 @@ func _build_living_dinosaur() -> DinosaurTitan:
 	# had always been alive.
 	var inherited: float = maxf(scale.x, 0.0001)
 	titan.scale = Vector3.ONE * (DinosaurTitan.DISPLAY_SCALE / inherited)
+	titan.wander_radius = titan_wander_radius
+	titan.reset_wander_anchor()
 	return titan
 
 

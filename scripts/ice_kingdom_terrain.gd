@@ -24,28 +24,47 @@ const ICE_THICKNESS := 0.38
 ## a dry crescent between the organic shore and the ice/water meshes.
 const LAKE_SURFACE_OVERLAP := 16.0
 const FISHING_HOLE_CENTER := LAKE_CENTER + Vector2(-46.0, 12.0)
+## Where a great cedar fell from the bank and broke the ice at the rim, on the
+## village side of the lake. The gap is open water; the trunk is the swimmer's
+## way back up to the shore (see IceLakeFeatures).
+const ICE_BREAK_ANGLE := deg_to_rad(204.0)
+const ICE_BREAK_RADIUS := 9.0
 const FISHING_HOLE_RADIUS := 3.2
 const SNOW_RADIUS := 360.0
 const PINE_COUNT := 105
 const SPIRE_COUNT := 34
-# The snowboard mountain owns most of the western half of this 1.8km map.
-# Its broad footprint supports a long descent rather than one short mound.
-const SNOW_MOUNTAIN_PEAK := Vector2(-790.0,-330.0)
-const SNOW_MOUNTAIN_RADIUS := 560.0
-const SNOW_MOUNTAIN_HEIGHT := 218.0
-const SKI_ROUTE_POINTS: Array[Vector3] = [
-	Vector3(-205.0,5.0,-102.0), Vector3(-310.0,20.0,-158.0),
-	Vector3(-415.0,45.0,-115.0), Vector3(-520.0,79.0,-205.0),
-	Vector3(-625.0,119.0,-170.0), Vector3(-715.0,165.0,-265.0),
-	Vector3(-790.0,207.0,-330.0),
+# The resort mountain is a central landform, not an edge wall. Its complete
+# back shoulder remains inside the kingdom so the summit looks over another
+# alpine basin instead of the end of the world. Three groomed routes share the
+# summit and fan toward the village-side base: a long broad novice piste, a
+# turning intermediate piste, and a steeper fall-line advanced piste.
+const SNOW_MOUNTAIN_PEAK := Vector2(-610.0,-270.0)
+const SNOW_MOUNTAIN_RADIUS := 500.0
+const SNOW_MOUNTAIN_HEIGHT := 242.0
+const BUNNY_ROUTE_POINTS: Array[Vector3] = [
+	Vector3(-165.0,0.0,-115.0),Vector3(-285.0,30.0,-92.0),
+	Vector3(-360.0,94.0,-125.0),Vector3(-425.0,135.0,-105.0),
+	Vector3(-490.0,205.0,-145.0),Vector3(-550.0,240.0,-195.0),
+	Vector3(-610.0,242.0,-270.0),
 ]
-## The ascent line deliberately occupies its own side of the mountain. The
-## former endpoints drew a straight line across two bends of SKI_ROUTE_POINTS
-## (within ~6m while both terrain blends were many metres wide), so making
-## either corridor safe necessarily flattened the other. This parallel line
-## stays roughly 60m or more from the authored descent for their full spans.
-const SKI_LIFT_LOWER := Vector2(-176.0,-163.0)
-const SKI_LIFT_UPPER := Vector2(-750.0,-429.0)
+const INTERMEDIATE_ROUTE_POINTS: Array[Vector3] = [
+	Vector3(-225.0,16.0,-170.0),Vector3(-315.0,82.0,-205.0),
+	Vector3(-385.0,139.0,-175.0),Vector3(-455.0,214.0,-225.0),
+	Vector3(-525.0,241.0,-215.0),Vector3(-610.0,242.0,-270.0),
+]
+const ADVANCED_ROUTE_POINTS: Array[Vector3] = [
+	Vector3(-255.0,40.0,-260.0),Vector3(-345.0,118.0,-275.0),
+	Vector3(-430.0,199.0,-285.0),Vector3(-500.0,239.0,-278.0),
+	Vector3(-555.0,242.0,-272.0),Vector3(-610.0,242.0,-270.0),
+]
+const SKI_ROUTES := [BUNNY_ROUTE_POINTS,INTERMEDIATE_ROUTE_POINTS,ADVANCED_ROUTE_POINTS]
+## The bunny run ends and the lift starts on the village pad's north-west
+## corner (SnowPlan.BUNNY_RUNOUT and SnowPlan.LIFT_LOWER), beside the base
+## plaza. The lift follows the mountain's quieter southern shoulder. Terrain is no
+## longer pulled up or down to meet this line; pylons bridge the naturally
+## varying clearance instead of creating an artificial ridge or trench.
+const SKI_LIFT_LOWER := Vector2(-165.0,-131.0)
+const SKI_LIFT_UPPER := Vector2(-590.0,-315.0)
 const GLACIER_PEAKS: Array[Vector4] = [
 	Vector4(350.0,-65.0,54.0,78.0), Vector4(425.0,170.0,68.0,92.0),
 	Vector4(125.0,250.0,48.0,70.0), Vector4(390.0,315.0,43.0,66.0),
@@ -90,12 +109,65 @@ func _ready() -> void:
 	_rng.seed = 20260910
 	_build_mesh_and_collision()
 	_build_lake_surfaces()
+	_build_world_ocean()
 	_scatter_snow_forest()
 	_scatter_snow_mountain()
+	_build_piste_markers()
 	_scatter_ice_spires()
 	_scatter_frost_bushes()
 	_scatter_frozen_lake_floor_tokoins.call_deferred()
+	IceLakeFeatures.build.call_deferred(self)
 	WorldState.ice_kingdom_visited = true
+
+
+## The planetary sea is a shared visual sphere at OCEAN_LEVEL. The frozen lake's
+## basin is dug far below that level, so without a cut-out the sea's surface
+## shows inside the basin and slices across the water under the ice, which is
+## where a swimmer looks. As in the demo world, this kingdom owns its sea (its
+## DayNightCycle has the generic one switched off, otherwise an uncut sphere
+## would remain underneath) and masks it over the lake's footprint. The mask is
+## the lake's largest radius plus a margin; the bank is nearly a cliff, so the
+## ground is already above the sea there and the mask's edge is buried.
+const OCEAN_LEVEL := -12.0
+const OCEAN_HOLE_MARGIN := 6.0
+
+
+func _build_world_ocean() -> void:
+	var ocean := PlanetaryOcean.new()
+	ocean.surface_level = OCEAN_LEVEL
+	ocean.configure_hole(LAKE_CENTER, LAKE_CENTER, LAKE_RADIUS + LAKE_EDGE_VARIATION + OCEAN_HOLE_MARGIN)
+	get_parent().add_child.call_deferred(ocean)
+
+
+## Color-and-shape trail markers communicate the three routes without world
+## text: green round marks for the broad novice run, blue diamonds for the
+## intermediate, and dark double diamonds for the fall line.
+func _build_piste_markers() -> void:
+	var colors:=[Color(0.12,0.62,0.30),Color(0.10,0.34,0.76),Color(0.08,0.09,0.12)]
+	for route_index in SKI_ROUTES.size():
+		var route:Array=SKI_ROUTES[route_index]
+		for point_index in range(1,route.size()-1):
+			var p:Vector3=route[point_index]
+			var next:Vector3=route[point_index+1]
+			var tangent:=Vector2(next.x-p.x,next.z-p.z).normalized()
+			var side:=Vector2(-tangent.y,tangent.x)
+			var root:=StaticBody3D.new()
+			root.name=["BunnyPisteMarker","IntermediatePisteMarker","AdvancedPisteMarker"][route_index]
+			root.collision_layer=1
+			root.position=Vector3(p.x,get_mesh_height(p.x,p.z),p.z)+Vector3(side.x*5.5,0,side.y*5.5)
+			var post:=SuperEgg.build_part(Vector3(0.09,1.15,0.09),Color(0.24,0.20,0.16),2.4,2.4)
+			post.position.y=1.15
+			root.add_child(post)
+			CollisionPolicy.add_cylinder(root,post,0.09,2.3,post.position,false)
+			var count:=2 if route_index==2 else 1
+			for mark_index in count:
+				var mark:=SuperEgg.build_part(Vector3(0.29,0.29,0.055),colors[route_index],2.0,2.0)
+				mark.position=Vector3((float(mark_index)-float(count-1)*0.5)*0.48,1.72,-0.08)
+				if route_index>0:
+					mark.rotation.z=PI*0.25
+				root.add_child(mark)
+				CollisionPolicy.mark_decorative(mark)
+			add_child(root)
 
 
 ## A loose trail of coins across the real lake bottom. It begins beneath the
@@ -132,25 +204,19 @@ func _terrain_height(x: float, z: float) -> float:
 	var snow_mountain := mountain_shape*SNOW_MOUNTAIN_HEIGHT*mountain_ridges
 	var glacier_height := _glacier_height(pos)
 	var banked_ground: float = lerpf(hills + mountains + snow_mountain + glacier_height, ICE_LEVEL, lake_bank)
-	# The lift is a traversal corridor too. Near the summit, raw mountain noise
-	# formerly rose directly beside the final chair/pylon and swept riders into
-	# the cliff. Blend a rider-width clearance beneath the straight lift span,
-	# including both offset lanes, while leaving the surrounding mountain intact.
-	# This is evaluated before the ski run so even a future layout edit that
-	# brings their feathered edges close cannot overwrite the descent itself.
-	var lift_sample:=_ski_lift_ground_sample(pos)
-	banked_ground=lerpf(
-		banked_ground,lift_sample.y,
-		1.0-smoothstep(7.5,15.0,lift_sample.x)
-	)
-	# The snowboard descent is terrain, not a ramp prop: gently blend a wide,
-	# continuous corridor through the mountain while retaining the authored
-	# rising profile of the route points. It has final ownership of its mask.
-	var route_sample := _ski_route_sample(pos)
-	var route_distance: float = route_sample.x
-	var route_height: float = route_sample.y
-	banked_ground = lerpf(banked_ground,route_height,1.0-smoothstep(18.0,34.0,route_distance))
-	return lerpf(banked_ground, ICE_LEVEL - LAKE_DEPTH * lake, lake)
+	# Each piste is a broad groomed terrain corridor. The widths deliberately
+	# differ: the bunny slope is forgiving, while the advanced line retains a
+	# narrower, steeper fall line. Smooth feathering prevents hard berms.
+	for route_index in SKI_ROUTES.size():
+		var route_sample := _route_sample(pos,SKI_ROUTES[route_index])
+		var inner_width: float = [27.0,22.0,17.0][route_index]
+		var outer_width: float = [43.0,37.0,31.0][route_index]
+		banked_ground=lerpf(banked_ground,route_sample.y,1.0-smoothstep(inner_width,outer_width,route_sample.x))
+	var terrain_height:=lerpf(banked_ground, ICE_LEVEL - LAKE_DEPTH * lake, lake)
+	# The glacier/mountain perimeter has a real seaward back slope. Its final
+	# vertices are buried well beneath the -12 m planetary ocean instead of
+	# exposing the edge of a square snow plane.
+	return lerpf(terrain_height,-68.0,smoothstep(HALF_SIZE*0.93,HALF_SIZE,pos.length()))
 
 
 ## Distance and stable ground profile beneath the lift's centreline. Endpoint
@@ -162,7 +228,7 @@ func _ski_lift_ground_sample(pos: Vector2) -> Vector2:
 	var span:=upper-lower
 	var t:=clampf((pos-lower).dot(span)/span.length_squared(),0.0,1.0)
 	var nearest:=lower+span*t
-	var height:=lerpf(5.0,207.0,smoothstep(0.0,1.0,t))
+	var height:=lerpf(0.0,207.0,smoothstep(0.0,1.0,t))
 	return Vector2(pos.distance_to(nearest),height)
 
 
@@ -178,12 +244,12 @@ func _glacier_height(pos: Vector2) -> float:
 
 ## Returns (distance to route, interpolated authored height). Kept public so
 ## the lift/scatter can share the exact same terrain-space snowboard corridor.
-func _ski_route_sample(pos: Vector2) -> Vector2:
+func _route_sample(pos: Vector2,points: Array) -> Vector2:
 	var best_distance := INF
 	var best_height := 0.0
-	for i in SKI_ROUTE_POINTS.size()-1:
-		var a3: Vector3 = SKI_ROUTE_POINTS[i]
-		var b3: Vector3 = SKI_ROUTE_POINTS[i+1]
+	for i in points.size()-1:
+		var a3: Vector3 = points[i]
+		var b3: Vector3 = points[i+1]
 		var a := Vector2(a3.x,a3.z)
 		var b := Vector2(b3.x,b3.z)
 		var segment := b-a
@@ -196,8 +262,21 @@ func _ski_route_sample(pos: Vector2) -> Vector2:
 	return Vector2(best_distance,best_height)
 
 
+func _ski_route_sample(pos: Vector2) -> Vector2:
+	var best := Vector2(INF,0.0)
+	for route in SKI_ROUTES:
+		var sample := _route_sample(pos,route)
+		if sample.x < best.x:
+			best = sample
+	return best
+
+
 func get_ski_route_points() -> Array[Vector3]:
-	return SKI_ROUTE_POINTS.duplicate()
+	return BUNNY_ROUTE_POINTS.duplicate()
+
+
+func get_ski_routes() -> Array:
+	return [BUNNY_ROUTE_POINTS.duplicate(),INTERMEDIATE_ROUTE_POINTS.duplicate(),ADVANCED_ROUTE_POINTS.duplicate()]
 
 
 func get_ski_lift_endpoints() -> Array[Vector2]:
@@ -305,6 +384,10 @@ func get_fishing_hole_center() -> Vector2:
 	return FISHING_HOLE_CENTER
 
 
+func get_lake_center() -> Vector2:
+	return LAKE_CENTER
+
+
 func get_ice_level() -> float:
 	return ICE_SURFACE_LEVEL
 
@@ -345,6 +428,7 @@ func _build_mesh_and_collision() -> void:
 	st.set_material(mat)
 	var mesh := MeshInstance3D.new()
 	mesh.mesh = st.commit()
+	GroundPaint.mark_terrain(mesh)
 	add_child(mesh)
 	var faces := PackedVector3Array()
 	for iz in RESOLUTION - 1:
@@ -401,6 +485,16 @@ func _build_ice_surface_around_hole() -> void:
 				st.set_normal(Vector3.UP)
 				st.add_vertex(vertices[index])
 				faces.append(vertices[index])
+		# Where the ray ends short of the shore because the ice is broken, give the
+		# raw edge its thickness.
+		if outer0 < _lake_ray_extent_from_hole(a0, false) - 2.0 or outer1 < _lake_ray_extent_from_hole(a1, false) - 2.0:
+			var top0 := Vector3(FISHING_HOLE_CENTER.x+cos(a0)*outer0,ICE_SURFACE_LEVEL,FISHING_HOLE_CENTER.y+sin(a0)*outer0)
+			var top1 := Vector3(FISHING_HOLE_CENTER.x+cos(a1)*outer1,ICE_SURFACE_LEVEL,FISHING_HOLE_CENTER.y+sin(a1)*outer1)
+			var low0 := top0-Vector3.UP*ICE_THICKNESS
+			var low1 := top1-Vector3.UP*ICE_THICKNESS
+			for vertex in [top0,low0,top1,top1,low0,low1]:
+				st.add_vertex(vertex)
+				faces.append(vertex)
 	var mat := StandardMaterial3D.new()
 	mat.albedo_color=Color(0.68,0.87,0.96,0.84)
 	mat.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA
@@ -420,13 +514,25 @@ func _build_ice_surface_around_hole() -> void:
 	add_child(collider)
 
 
-func _lake_ray_extent_from_hole(angle: float) -> float:
+## Centre of the broken-ice gap: just inside the organic shore along the break
+## angle, so the gap opens against the bank.
+func ice_break_center() -> Vector2:
+	var direction := Vector2(cos(ICE_BREAK_ANGLE), sin(ICE_BREAK_ANGLE))
+	return LAKE_CENTER + direction * (_lake_edge_radius(direction) - 3.0)
+
+
+func _in_ice_break(point: Vector2) -> bool:
+	return point.distance_to(ice_break_center()) < ICE_BREAK_RADIUS
+
+
+func _lake_ray_extent_from_hole(angle: float, with_break: bool = true) -> float:
 	var direction := Vector2(cos(angle),sin(angle))
 	var low := FISHING_HOLE_RADIUS
 	var high := LAKE_RADIUS*2.1
 	for iteration in 14:
 		var middle := (low+high)*0.5
-		if _lake_coverage(FISHING_HOLE_CENTER+direction*middle)>0.001:
+		var point := FISHING_HOLE_CENTER+direction*middle
+		if _lake_coverage(point)>0.001 and not (with_break and _in_ice_break(point)):
 			low=middle
 		else:
 			high=middle
@@ -443,6 +549,11 @@ func _build_ice_edge_wall(center: Vector2, radius: float, organic: bool = false)
 		var a1: float = TAU*float(i+1)/float(SEGMENTS)
 		var radius0 := (_lake_edge_radius(Vector2(cos(a0), sin(a0))) + LAKE_SURFACE_OVERLAP) if organic else radius
 		var radius1 := (_lake_edge_radius(Vector2(cos(a1), sin(a1))) + LAKE_SURFACE_OVERLAP) if organic else radius
+		if organic:
+			var middle_angle := (a0 + a1) * 0.5
+			var middle_point := center + Vector2(cos(middle_angle), sin(middle_angle)) * (radius0 + radius1) * 0.5
+			if middle_point.distance_to(ice_break_center()) < ICE_BREAK_RADIUS + 6.0:
+				continue
 		var top0 := Vector3(center.x+cos(a0)*radius0,ICE_SURFACE_LEVEL,center.y+sin(a0)*radius0)
 		var top1 := Vector3(center.x+cos(a1)*radius1,ICE_SURFACE_LEVEL,center.y+sin(a1)*radius1)
 		var low0 := top0-Vector3.UP*ICE_THICKNESS

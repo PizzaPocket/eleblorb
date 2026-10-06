@@ -21,3 +21,7 @@ func pop_modal() -> void:
 	_modal_count = maxi(_modal_count - 1, 0)
 	if _modal_count == 0:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+func reset_for_new_session() -> void:
+	_modal_count = 0

@@ -1075,11 +1075,12 @@ static func build_banyan_tree(height: float, rng: RandomNumberGenerator) -> Stat
 	return body
 
 
-## A very thick, tapering, sparse-crowned baobab -- the swollen trunk (far
-## fatter relative to its own height than any other tree here) is the
-## point; the crown on top is deliberately small and sparse by comparison.
-const BAOBAB_TRUNK_TIERS := 4
-const BAOBAB_CROWN_LOBES := 3
+## A baobab is a single bottle-shaped bole that narrows into a crown of thick,
+## mostly bare, repeatedly forking limbs. It is specifically not a stack of
+## rounded trunk pieces or a conventional ball canopy.
+const BAOBAB_TRUNK_RINGS := 11
+const BAOBAB_TRUNK_SIDES := 24
+const BAOBAB_PRIMARY_BRANCHES := 7
 
 ## A baobab's trunk is 0.24 of its height across at the base, by far the fattest
 ## in this file, so its height is capped HERE rather than trusted to every
@@ -1096,35 +1097,123 @@ static func build_baobab_tree(asked_height: float, rng: RandomNumberGenerator) -
 	body.collision_layer = 1
 	body.collision_mask = 0
 
-	var trunk_height := height * 0.7
-	var base_radius := height * 0.24
-	var top_radius := height * 0.14
-	var tier_height := trunk_height / BAOBAB_TRUNK_TIERS
-	for i in BAOBAB_TRUNK_TIERS:
-		var t := float(i) / float(BAOBAB_TRUNK_TIERS - 1)
-		var tier_radius := lerpf(base_radius, top_radius, t * t)
-		var tier := SuperEgg.build_part(
-			Vector3(tier_radius, tier_height * 0.65, tier_radius), TRUNK_COLOR.lightened(0.15),
-			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
-		)
-		tier.position = Vector3(0, tier_height * (float(i) + 0.5), 0)
-		body.add_child(tier)
+	var trunk_height := height * 0.68
+	var trunk := MeshInstance3D.new()
+	trunk.name = "BottleTrunk"
+	trunk.mesh = _build_baobab_trunk_mesh(height, trunk_height, rng)
+	var bark := StandardMaterial3D.new()
+	bark.albedo_color = TRUNK_COLOR.lightened(0.15)
+	bark.roughness = 0.92
+	trunk.material_override = bark
+	body.add_child(trunk)
+
+	# Several fitted primitive bands follow the bottle silhouette much more
+	# closely than the former one full-height, full-base-radius cylinder.
+	_add_cylinder_collision(body, Vector3(0, trunk_height * 0.13, 0), height * 0.155, trunk_height * 0.26)
+	_add_cylinder_collision(body, Vector3(0, trunk_height * 0.46, 0), height * 0.145, trunk_height * 0.40)
+	_add_cylinder_collision(body, Vector3(0, trunk_height * 0.82, 0), height * 0.095, trunk_height * 0.32)
 
 	var leaf_color: Color = JUNGLE_LEAF_COLORS[rng.randi() % JUNGLE_LEAF_COLORS.size()]
-	for i in BAOBAB_CROWN_LOBES:
-		var a := rng.randf_range(0.0, TAU)
-		var r := top_radius * rng.randf_range(0.3, 0.7)
-		var lobe_radius := top_radius * rng.randf_range(0.5, 0.7)
-		var lobe := SuperEgg.build_part(
-			Vector3(lobe_radius, lobe_radius * 0.75, lobe_radius), leaf_color,
-			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
-		)
-		lobe.position = Vector3(cos(a) * r, trunk_height + lobe_radius * 0.6, sin(a) * r)
-		body.add_child(lobe)
-		_add_canopy_blob(body, lobe.position, Vector3(lobe_radius, lobe_radius * 0.75, lobe_radius))
-
-	_add_cylinder_collision(body, Vector3(0, trunk_height * 0.5, 0), base_radius * 0.95, trunk_height)
+	var phase := rng.randf_range(0.0, TAU)
+	for i in BAOBAB_PRIMARY_BRANCHES:
+		var angle := phase + TAU * float(i) / BAOBAB_PRIMARY_BRANCHES + rng.randf_range(-0.18, 0.18)
+		_add_baobab_branch(body, height, trunk_height, angle, leaf_color, rng)
 	return body
+
+
+static func _build_baobab_trunk_mesh(
+	height: float, trunk_height: float, rng: RandomNumberGenerator
+) -> ArrayMesh:
+	var ring_points: Array = []
+	var lobe_phase := rng.randf_range(0.0, TAU)
+	for ring_index in BAOBAB_TRUNK_RINGS:
+		var t := float(ring_index) / float(BAOBAB_TRUNK_RINGS - 1)
+		# Swollen just above the buttressed base, then a continuous narrowing
+		# into the branch crown. smoothstep keeps every transition shoulderless.
+		var radius: float
+		if t < 0.16:
+			radius = lerpf(height * 0.145, height * 0.17, smoothstep(0.0, 0.16, t))
+		else:
+			var taper := smoothstep(0.16, 1.0, t)
+			radius = lerpf(height * 0.17, height * 0.057, pow(taper, 1.18))
+		var ring: Array[Vector3] = []
+		for side_index in BAOBAB_TRUNK_SIDES:
+			var angle := TAU * float(side_index) / BAOBAB_TRUNK_SIDES
+			# Low-amplitude vertical fluting makes bark anatomy without turning
+			# the silhouette into separate lobes.
+			var fluting := 1.0 + 0.045 * sin(angle * 5.0 + lobe_phase) * (1.0 - t * 0.55)
+			ring.append(Vector3(sin(angle) * radius * fluting, t * trunk_height, cos(angle) * radius * fluting))
+		ring_points.append(ring)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for ring_index in BAOBAB_TRUNK_RINGS - 1:
+		var lower: Array = ring_points[ring_index]
+		var upper: Array = ring_points[ring_index + 1]
+		for side_index in BAOBAB_TRUNK_SIDES:
+			var next := (side_index + 1) % BAOBAB_TRUNK_SIDES
+			st.add_vertex(lower[side_index])
+			st.add_vertex(upper[side_index])
+			st.add_vertex(lower[next])
+			st.add_vertex(lower[next])
+			st.add_vertex(upper[side_index])
+			st.add_vertex(upper[next])
+	var bottom: Array = ring_points[0]
+	for side_index in BAOBAB_TRUNK_SIDES:
+		var next := (side_index + 1) % BAOBAB_TRUNK_SIDES
+		st.add_vertex(Vector3.ZERO)
+		st.add_vertex(bottom[next])
+		st.add_vertex(bottom[side_index])
+	st.index()
+	st.generate_normals()
+	return st.commit()
+
+
+static func _add_baobab_branch(
+	body: StaticBody3D, height: float, trunk_height: float, angle: float,
+	leaf_color: Color, rng: RandomNumberGenerator
+) -> void:
+	var radial := Vector3(sin(angle), 0.0, cos(angle))
+	var root := radial * height * 0.045 + Vector3.UP * rng.randf_range(trunk_height * 0.78, trunk_height * 0.96)
+	var inner_length := height * rng.randf_range(0.13, 0.20)
+	var inner_dir := (radial * rng.randf_range(0.56, 0.76) + Vector3.UP * rng.randf_range(0.66, 0.86)).normalized()
+	var fork := root + inner_dir * inner_length
+	_add_baobab_limb(body, root, fork, height * 0.043)
+	for fork_index in 2:
+		var fork_angle := angle + (-0.34 if fork_index == 0 else 0.34) + rng.randf_range(-0.1, 0.1)
+		var fork_radial := Vector3(sin(fork_angle), 0.0, cos(fork_angle))
+		var outer_dir := (fork_radial * rng.randf_range(0.72, 0.9) + Vector3.UP * rng.randf_range(0.34, 0.58)).normalized()
+		var tip := fork + outer_dir * height * rng.randf_range(0.10, 0.17)
+		_add_baobab_limb(body, fork, tip, height * 0.025)
+		# Baobabs are often leafless and never carry a solid green ball. Sparse,
+		# irregular tip clusters leave the branching silhouette plainly visible.
+		if rng.randf() < 0.72:
+			var leaf_radius := height * rng.randf_range(0.035, 0.065)
+			var leaf := SuperEgg.build_part(
+				Vector3(leaf_radius * 1.25, leaf_radius * 0.6, leaf_radius), leaf_color,
+				SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+			)
+			leaf.position = tip
+			body.add_child(leaf)
+			CollisionPolicy.mark_decorative(leaf)
+			_add_canopy_blob(body, tip, Vector3(leaf_radius * 1.25, leaf_radius * 0.6, leaf_radius))
+
+
+static func _add_baobab_limb(body: StaticBody3D, start: Vector3, finish: Vector3, radius: float) -> void:
+	var span := finish - start
+	if span.length_squared() < 0.001:
+		return
+	var along := span.normalized()
+	var reference := Vector3.RIGHT if absf(along.dot(Vector3.RIGHT)) < 0.9 else Vector3.FORWARD
+	var axis_x := reference.cross(along).normalized()
+	var axis_z := along.cross(axis_x).normalized()
+	var basis := Basis(axis_x, along, axis_z)
+	var limb := SuperEgg.build_part(
+		Vector3(radius, span.length() * 0.54, radius), TRUNK_COLOR.lightened(0.12),
+		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+	)
+	limb.transform = Transform3D(basis, (start + finish) * 0.5)
+	body.add_child(limb)
+	_add_cylinder_collision(body, limb.position, radius * 0.92, span.length(), basis)
 
 
 ## A hanging chain of small overlapping leaf blobs, meant to dangle from a

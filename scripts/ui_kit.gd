@@ -298,9 +298,11 @@ static func chinese_punctuation_label(text: String) -> Label:
 class BlorbusEyes extends Control:
 	var blink_state := EyeBlink.new_state()
 	var eye_scale := 1.0
+	var eye_color := UITheme.BLORBUS_EYE
 
-	func _init(scale: float = 1.0) -> void:
+	func _init(scale: float = 1.0, color: Color = UITheme.BLORBUS_EYE) -> void:
 		eye_scale = scale
+		eye_color = color
 		custom_minimum_size = Vector2(UITheme.FONT_DISPLAY * 6.0, UITheme.FONT_DISPLAY * 2.10) * scale
 		size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -321,7 +323,7 @@ class BlorbusEyes extends Control:
 			var rect := Rect2(center - eye_size * 0.5, eye_size)
 			var radius := SuperellipseStyleBox.clamped_radius(rect, eye_size.x * 0.42)
 			var points := SuperellipseStyleBox.boundary_points(rect, radius, UITheme.SUPERELLIPSE_EXPONENT)
-			draw_colored_polygon(points, UITheme.BLORBUS_EYE)
+			draw_colored_polygon(points, eye_color)
 
 
 ## `scale` proportionately shrinks (or grows) both the eyes themselves and
@@ -329,8 +331,8 @@ class BlorbusEyes extends Control:
 ## panel, which per direct instruction reuses this exact "blorb eyes at the
 ## top" header motif but at a smaller overall panel size ("the eyes will be
 ## proportionately scaled down").
-static func blorbus_eyes(scale: float = 1.0) -> Control:
-	return BlorbusEyes.new(scale)
+static func blorbus_eyes(scale: float = 1.0, color: Color = UITheme.BLORBUS_EYE) -> Control:
+	return BlorbusEyes.new(scale, color)
 
 
 ## A tab-switch button (InventoryUI's Items/Blorbs row, or any future view

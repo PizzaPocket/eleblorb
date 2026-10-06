@@ -2,5 +2,5 @@
 
 [ext_resource type="Script" path="res://scripts/loading_bootstrap.gd" id="1"]
 
-[node name="Loading" type="Node"]
+[node name="Loading" type="Node" groups=["pause_disabled"]]
 script = ExtResource("1")

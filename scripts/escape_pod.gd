@@ -20,6 +20,8 @@ const GLOW := Color(1.0, 0.62, 0.26)
 ## A sphere: one radius, and a wall thick enough to read as a hull.
 const POD_RADIUS := 3.4
 const POD_WALL := 0.25
+## Shared overlap between this shell and the shuttle hull at the docking neck.
+const HULL_SEAL_INSET := 0.9
 ## Its opening, a circle on the shell's +X side facing the hull's hatch. The
 ## same radius as the hull's own hatch, so the two openings meet.
 const POD_DOOR_RADIUS := 1.7
@@ -62,36 +64,42 @@ func contains_breathable_point(point: Vector3) -> bool:
 
 
 func _build_pod() -> void:
-	var shell := MeshInstance3D.new()
+	var shell := CSGCombiner3D.new()
 	shell.name = "PodShell"
-	var apertures: Array[Dictionary] = [
-		{
-			"center": Vector2.ZERO,
-			"half": Vector2(POD_DOOR_RADIUS, POD_DOOR_RADIUS),
-			"exponent": 2.0,
-		},
-	]
-	# A true sphere (epsilon 2 on both profiles) with one circular opening.
-	shell.mesh = SuperEgg.build_hollow_shell_mesh(
-		Vector3(POD_RADIUS, POD_RADIUS, POD_RADIUS), POD_WALL, apertures,
-		2.0, 2.0, SuperEgg.RINGS * 2, SuperEgg.SEGMENTS * 2
+	shell.use_collision = true
+	shell.collision_layer = 1
+	shell.collision_mask = 1
+	var material := SolidModel.material(SHELL, 0.3, 0.14)
+	var cut_material := SolidModel.material(TRIM, 0.46, 0.08)
+	SolidModel.add_super(
+		shell, "OuterSphere", Vector3.ONE * POD_RADIUS,
+		CSGShape3D.OPERATION_UNION, material, Vector3.ZERO, 2.0
 	)
-	var material := StandardMaterial3D.new()
-	material.albedo_color = SHELL
-	material.roughness = 0.3
-	material.metallic = 0.14
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	shell.material_override = material
+	SolidModel.add_super(
+		shell, "CabinNegative", Vector3.ONE * (POD_RADIUS - POD_WALL),
+		CSGShape3D.OPERATION_SUBTRACTION, cut_material, Vector3.ZERO, 2.0
+	)
+	SolidModel.add_profile(
+		# Long enough to clear both the pod wall and the section deliberately
+		# inset into the shuttle hull, leaving a continuous traversable throat.
+		shell, "DoorNegative", (POD_WALL + HULL_SEAL_INSET + 0.4) * 2.0,
+		Vector2(POD_DOOR_RADIUS, POD_DOOR_RADIUS), 2.0,
+		CSGShape3D.OPERATION_SUBTRACTION, cut_material,
+		Vector3(POD_RADIUS - (POD_WALL + HULL_SEAL_INSET) * 0.5, 0.0, 0.0)
+	)
 	add_child(shell)
-	CollisionPolicy.mark_decorative(shell)
+	SolidModel.bake_when_ready(shell, self)
 
 	# The seat pad the rider rides on, and the floor under it.
+	var pad_half := Vector3(POD_RADIUS * 0.72, 0.18, POD_RADIUS * 0.72)
 	var floor_body := StaticBody3D.new()
 	floor_body.name = "PodFloor"
 	floor_body.collision_layer = 1
-	floor_body.position = Vector3(0.0, -POD_SEAT_DROP - 0.2, 0.0)
+	# The pad's top is exactly the circular hatch's bottom. DemoSpaceship places
+	# that bottom on DECK_Y, so cabin deck, docking throat, and pod floor are
+	# one uninterrupted walkable plane rather than three near-matching steps.
+	floor_body.position = Vector3(0.0, -POD_DOOR_RADIUS - pad_half.y, 0.0)
 	add_child(floor_body)
-	var pad_half := Vector3(POD_RADIUS * 0.72, 0.18, POD_RADIUS * 0.72)
 	var pad := SuperEgg.build_part(pad_half, TRIM, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
 	pad.name = "PodFloorPad"
 	floor_body.add_child(pad)

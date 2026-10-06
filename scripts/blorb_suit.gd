@@ -35,6 +35,11 @@ const RINGS_PER_SEGMENT := 6
 ## point (a plain sin() quarter-ease, zero slope at the very tip, so it
 ## rounds off instead of coming to a sharp cone) -- see _cap_taper().
 const TUBE_CAP_FRACTION := 0.1
+## Shared sampling density for a true hemispherical/capsule endpoint. Four
+## stations left a visible change in slope where a constant-radius tube met
+## its dome; twelve makes that tangent transition visually continuous while
+## remaining tiny compared with the rest of a character mesh.
+const CAPSULE_DOME_STEPS := 12
 
 ## How far the arm noodle's wrist/tip control points shift outward (see
 ## rebuild_arm()), per direct instruction -- "a bit bulkier" at the hand
@@ -2744,7 +2749,8 @@ static func build_limb_tube(
 	control_points: Array[Vector3], control_radii: Array[float],
 	radial_segments: int, rings_per_segment: int, cap_fraction: float,
 	control_colors: Array[Color] = [], taper_start: bool = true,
-	flatten_axis: Vector3 = Vector3.ZERO, flatten: float = 1.0, taper_end: bool = true
+	flatten_axis: Vector3 = Vector3.ZERO, flatten: float = 1.0, taper_end: bool = true,
+	control_cross_scales: Array[Vector2] = [], end_dome_steps: int = 0
 ) -> ArrayMesh:
 	var n := control_points.size()
 	var p_start: Vector3 = control_points[0] * 2.0 - control_points[1]
@@ -2797,6 +2803,15 @@ static func build_limb_tube(
 				up = frame[1] as Vector3
 
 			var ring := _build_ring(pos, right, up, radius, radial_segments)
+			if not control_cross_scales.is_empty():
+				var cross_scale := control_cross_scales[seg].lerp(control_cross_scales[seg + 1], t)
+				for point_index in ring.size():
+					var offset := ring[point_index] - pos
+					ring[point_index] = (
+						pos
+						+ right * offset.dot(right) * cross_scale.x
+						+ up * offset.dot(up) * cross_scale.y
+					)
 			if flatten_axis != Vector3.ZERO:
 				# Squash each ring toward its centre along flatten_axis only,
 				# turning the round tube into a flat blade (penguin flippers).
@@ -2820,6 +2835,38 @@ static func build_limb_tube(
 			prev_right = right
 			prev_up = up
 			ring_index += 1
+
+	# A real hemispherical end must be authored AFTER the interpolated body.
+	# Feeding dome stations back through Catmull-Rom re-interpolates an
+	# already-defined curve: short hands become flat discs and tight foot/tail
+	# caps overshoot into lips or spikes.  Here the last body ring is the
+	# hemisphere's equator, then exact sin/cos stations continue along the
+	# final tangent.  Position and radius therefore share the same radius and
+	# meet the body with matching zero slope, regardless of limb scale.
+	if end_dome_steps > 0 and control_radii[n - 1] > 0.0:
+		var dome_center := control_points[n - 1]
+		var dome_radius := control_radii[n - 1]
+		var dome_cross_scale := (
+			control_cross_scales[n - 1] if not control_cross_scales.is_empty() else Vector2.ONE
+		)
+		for dome_step in range(1, end_dome_steps + 1):
+			var theta := float(dome_step) / float(end_dome_steps) * PI * 0.5
+			var center := dome_center + prev_tangent * (dome_radius * sin(theta))
+			var radius := dome_radius * cos(theta)
+			if dome_step == end_dome_steps:
+				radius = 0.0
+			var ring := _build_ring(center, prev_right, prev_up, radius, radial_segments)
+			if dome_cross_scale != Vector2.ONE:
+				for point_index in ring.size():
+					var offset := ring[point_index] - center
+					ring[point_index] = (
+						center
+						+ prev_right * offset.dot(prev_right) * dome_cross_scale.x
+						+ prev_up * offset.dot(prev_up) * dome_cross_scale.y
+					)
+			rings.append(ring)
+			if has_colors:
+				ring_colors.append(control_colors[n - 1])
 
 	return BlorbBodyShape.build_mesh_from_rings(rings, ring_colors)
 

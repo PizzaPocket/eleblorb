@@ -245,6 +245,8 @@ var _direct_lava_surface: bool = false
 var _direct_hover_height: float = 0.0
 var _direct_left_arm_plant_cooldown: float = 0.0
 var _direct_right_arm_plant_cooldown: float = 0.0
+var _direct_left_arm_power_blend: float = 0.0
+var _direct_right_arm_power_blend: float = 0.0
 var _direct_water_arm_fx: Array[GPUParticles3D] = []
 var _direct_fire_arm_fx: Array[GPUParticles3D] = []
 var _direct_water_leg_fx: Array[GPUParticles3D] = []
@@ -268,6 +270,7 @@ var _direct_ice_skates_active: bool = false
 var _direct_ice_skating_active: bool = false
 var _direct_ice_skate_left: Node3D = null
 var _direct_ice_skate_right: Node3D = null
+var _direct_ice_skate_blades_crystal: bool = false
 var _direct_ice_skate_lift_y: float = 0.0
 var _direct_ice_skate_was_supported: bool = false
 var _direct_ice_skate_airborne: bool = false
@@ -1308,14 +1311,19 @@ func _apply_direct_power_pose(delta: float) -> void:
 	var both_fire_hands: bool = _powers.fire_hand_hover
 	for side in ["left", "right"]:
 		var action: String = "%s_arm_power" % side
-		if not Input.is_action_pressed(action):
-			continue
 		var arm := _pivots["arm_%s" % side] as Node3D
 		var elbow := _pivots["elbow_%s" % side] as Node3D
 		var wrist := _pivots["wrist_%s" % side] as Node3D
 		if arm == null or elbow == null or wrist == null:
 			continue
-		if both_fire_hands:
+		var held := Input.is_action_pressed(action)
+		var blend: float = _direct_left_arm_power_blend if side == "left" else _direct_right_arm_power_blend
+		blend = move_toward(blend, 1.0 if held and not both_fire_hands else 0.0, settle)
+		if side == "left":
+			_direct_left_arm_power_blend = blend
+		else:
+			_direct_right_arm_power_blend = blend
+		if held and both_fire_hands:
 			arm.rotation.x = lerp_angle(arm.rotation.x, Player.FIRE_JET_ARM_BACK_ANGLE, settle)
 			arm.rotation.z = lerp_angle(
 				arm.rotation.z,
@@ -1323,11 +1331,24 @@ func _apply_direct_power_pose(delta: float) -> void:
 				settle
 			)
 			elbow.rotation.x = lerp_angle(elbow.rotation.x, Player.FIRE_JET_ELBOW_BEND, settle)
-		else:
-			arm.rotation.x = lerp_angle(arm.rotation.x, -Player.ARM_POWER_POSE_ANGLE, settle)
+		elif blend > 0.001:
+			# This is a final animation layer, not another small per-frame pull
+			# competing with locomotion.  Once blend reaches one it owns the
+			# chain absolutely, exactly like the human's established pose.
+			PlayableArmPose.apply_forward_raise(
+				arm, elbow, signf(arm.position.x), blend,
+				MonkeyFigure.ARM_OUTWARD_ANGLE, Player.ARM_POWER_POSE_ANGLE
+			)
 			# MonkeyFigure follows the same local-axis convention as the human:
 			# this quarter turn presents the palm forward with fingertips vertical.
-			wrist.rotation.z = lerp_angle(wrist.rotation.z, signf(arm.position.x) * PI * 0.5, settle)
+			wrist.rotation.z = lerp_angle(wrist.rotation.z, signf(arm.position.x) * PI * 0.5, blend)
+		else:
+			# The old code never released this rotation.  Each arm therefore
+			# acquired a different permanent silhouette the first time its button
+			# was pressed, making its hand appear to be created on demand.
+			wrist.rotation.x = lerp_angle(wrist.rotation.x, 0.0, settle)
+			wrist.rotation.y = lerp_angle(wrist.rotation.y, 0.0, settle)
+			wrist.rotation.z = lerp_angle(wrist.rotation.z, 0.0, settle)
 
 
 ## Skating a crystal track: the shared power, on his rig. It takes the whole
@@ -1535,23 +1556,33 @@ func _update_direct_ice_skate_airtime(delta: float,pre_move_position: Vector3) -
 
 
 func _set_direct_ice_skate_visuals() -> void:
-	var scale_factor: float=_playable_profile.suit_rig_scale
+	# The capability is read from this wearer's actual landed leg occupants,
+	# not from a character-global flag. Thus portal swaps and suit transfers
+	# cannot carry the previous wearer's Crystal Skate visuals forward.
+	var crystal: bool=_blorb_suit.has_crystal_skates()
+	if _direct_ice_skates_active and crystal != _direct_ice_skate_blades_crystal:
+		for blade in [_direct_ice_skate_left, _direct_ice_skate_right]:
+			if is_instance_valid(blade):
+				(blade as Node).free()
+		_direct_ice_skate_left=null
+		_direct_ice_skate_right=null
+	_direct_ice_skate_blades_crystal=crystal
 	if _direct_ice_skates_active:
 		if not is_instance_valid(_direct_ice_skate_left):
 			_direct_ice_skate_left=IceSkateMode.build_blade(
 				_pivots["sole_left"] as Node3D,_pivots["toe_left"] as Node3D,
-				"LeftIceSkate",scale_factor
+				"LeftIceSkate",1.0,-1.0,crystal
 			)
 		if not is_instance_valid(_direct_ice_skate_right):
 			_direct_ice_skate_right=IceSkateMode.build_blade(
 				_pivots["sole_right"] as Node3D,_pivots["toe_right"] as Node3D,
-				"RightIceSkate",scale_factor
+				"RightIceSkate",1.0,-1.0,crystal
 			)
 	else:
 		if is_instance_valid(_direct_ice_skate_left):
-			_direct_ice_skate_left.queue_free()
+			_direct_ice_skate_left.free()
 		if is_instance_valid(_direct_ice_skate_right):
-			_direct_ice_skate_right.queue_free()
+			_direct_ice_skate_right.free()
 		_direct_ice_skate_left=null
 		_direct_ice_skate_right=null
 	var rig:=_pivots.get("_rig") as Node3D

@@ -1,21 +1,24 @@
 @tool
 extends Node3D
+class_name DistantMountains
 
-## A single ring of jagged, noise-varied peaks far beyond the playable
-## plateau/gorge (see terrain_generator.gd) -- a cheap backdrop silhouette
-## rather than real distant terrain, so the gorge doesn't just fade into
-## empty sky. Colored with the same grass/dirt/rock/snow height gradient as
-## the main terrain (scaled up for its own taller peaks) so it reads as a
-## lush mountain range continuing into the distance rather than a flat
-## painted wall. No collision -- nothing out here is reachable, it's well
-## past terrain_generator.gd's edge barrier, and fog (see main.tscn) does
-## most of the work of blending it into the sky.
+## Organic distant relief beyond the playable terrain. The former version was
+## one vertical ribbon: a jagged top edge over a perfectly flat wall. This is
+## instead a small radial terrain field. Its near foot meets the world's far
+## skirt, successive irregular rings form foothills and mountain shoulders,
+## and its seaward flank continues below the shared planetary ocean. From the
+## playable area the world therefore reads as a large island/landmass, never a
+## map plane standing in front of a backdrop card. No collision is warranted
+## this far outside the traversable terrain.
 
-const RADIUS := 950.0  # matches terrain_generator.gd's SKIRT_OUTER_RADIUS
-const SEGMENTS := 96
-const BASE_HEIGHT := 40.0
-const PEAK_VARIATION := 160.0
-const BOTTOM_Y := -150.0
+const RADIUS := 950.0  # near foot; matches terrain_generator's skirt outside
+const OUTER_RADIUS := 1320.0
+const SEGMENTS := 128
+const RING_FRACTIONS: Array[float] = [0.0,0.18,0.42,0.66,0.84,1.0]
+const BASE_HEIGHT := 38.0
+const PEAK_VARIATION := 175.0
+const MAIN_WORLD_FOOT_Y := -60.0
+const OCEAN_BURY_MARGIN := 55.0
 
 var _noise := FastNoiseLite.new()
 
@@ -30,10 +33,16 @@ func _ready() -> void:
 
 
 func _peak_height(angle: float) -> float:
-	var sample := _noise.get_noise_2d(cos(angle) * RADIUS * 0.1, sin(angle) * RADIUS * 0.1)
-	# Floor the low end so there's always some semblance of a range instead
-	# of gaps of flat nothing between peaks.
-	return BASE_HEIGHT + maxf(sample, -0.2) * PEAK_VARIATION
+	var sample := _noise.get_noise_2d(cos(angle) * 83.0, sin(angle) * 83.0)
+	var broad := 0.28*sin(angle*3.0+0.6)+0.17*cos(angle*7.0-0.4)
+	return BASE_HEIGHT+maxf(sample*0.82+broad,-0.18)*PEAK_VARIATION
+
+
+func _ocean_level() -> float:
+	var cycle:=get_parent().get_node_or_null("DayNightCycle")
+	if cycle!=null and cycle.get("planetary_ocean_level")!=null:
+		return float(cycle.get("planetary_ocean_level"))
+	return -25.0
 
 
 func _peak_color(h: float) -> Color:
@@ -56,29 +65,36 @@ func _peak_color(h: float) -> Color:
 func _build() -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-
-	var heights: Array[float] = []
-	for i in SEGMENTS + 1:
-		heights.append(_peak_height((float(i) / SEGMENTS) * TAU))
-
-	for i in SEGMENTS:
-		var a0 := (float(i) / SEGMENTS) * TAU
-		var a1 := (float(i + 1) / SEGMENTS) * TAU
-		var p0 := Vector2(cos(a0), sin(a0)) * RADIUS
-		var p1 := Vector2(cos(a1), sin(a1)) * RADIUS
-		var h0 := heights[i]
-		var h1 := heights[i + 1]
-
-		var top0 := Vector3(p0.x, h0, p0.y)
-		var top1 := Vector3(p1.x, h1, p1.y)
-		var bottom0 := Vector3(p0.x, BOTTOM_Y, p0.y)
-		var bottom1 := Vector3(p1.x, BOTTOM_Y, p1.y)
-
-		var c0 := _peak_color(h0)
-		var c1 := _peak_color(h1)
-
-		_add_tri(st, bottom0, top0, top1, c0, c0, c1)
-		_add_tri(st, bottom0, top1, bottom1, c0, c1, c1)
+	var ocean_floor:=_ocean_level()-OCEAN_BURY_MARGIN
+	var rings: Array=[]
+	for ring_index in RING_FRACTIONS.size():
+		var fraction:float=RING_FRACTIONS[ring_index]
+		var ring: Array[Dictionary]=[]
+		for i in SEGMENTS:
+			var angle:=TAU*float(i)/float(SEGMENTS)
+			var angular_noise:=_noise.get_noise_2d(cos(angle)*41.0+float(ring_index)*9.0,sin(angle)*41.0)
+			var radius:=lerpf(RADIUS,OUTER_RADIUS,fraction)+angular_noise*lerpf(5.0,20.0,fraction)
+			var peak:=_peak_height(angle)
+			var height:float
+			match ring_index:
+				0: height=MAIN_WORLD_FOOT_Y
+				1: height=lerpf(MAIN_WORLD_FOOT_Y,peak,0.36)+angular_noise*8.0
+				2: height=peak
+				3: height=peak*0.58-18.0+angular_noise*12.0
+				4: height=lerpf(peak*0.22-55.0,ocean_floor,0.44)
+				_: height=ocean_floor
+			var flat:=Vector2(cos(angle),sin(angle))*radius
+			ring.append({"position":Vector3(flat.x,height,flat.y),"color":_peak_color(height)})
+		rings.append(ring)
+	for ring_index in rings.size()-1:
+		for i in SEGMENTS:
+			var next:=(i+1)%SEGMENTS
+			var a:Dictionary=rings[ring_index][i]
+			var b:Dictionary=rings[ring_index][next]
+			var c:Dictionary=rings[ring_index+1][i]
+			var d:Dictionary=rings[ring_index+1][next]
+			_add_tri(st,a["position"],c["position"],b["position"],a["color"],c["color"],b["color"])
+			_add_tri(st,b["position"],c["position"],d["position"],b["color"],c["color"],d["color"])
 
 	var material := StandardMaterial3D.new()
 	material.vertex_color_use_as_albedo = true

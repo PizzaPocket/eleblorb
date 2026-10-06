@@ -1,6 +1,9 @@
 class_name UITheme
 extends RefCounted
 
+const VARELA_ROUND := preload("res://assets/fonts/VarelaRound-Regular.ttf")
+const NOTO_SANS_SC := preload("res://assets/fonts/NotoSansSC-VF.ttf")
+
 ## Central design-system tokens for every UI surface in the game (Hud,
 ## DialogUI, ShopUI, InventoryUI) -- one shared Theme resource so visual
 ## language (colors, type scale, spacing, panel/button style) lives in one
@@ -139,12 +142,14 @@ const FOCUS_RING_WIDTH := 4
 const FOCUS_RING_OFFSET := 7.0
 
 static var _cached: Theme = null
+static var _cached_ui_font: Font = null
 
 
 static func get_theme() -> Theme:
 	if _cached != null:
 		return _cached
 	var theme := Theme.new()
+	theme.default_font = _ui_font()
 
 	theme.set_font_size("font_size", "Label", FONT_BODY)
 	theme.set_color("font_color", "Label", TEXT_PRIMARY)
@@ -167,6 +172,19 @@ static func get_theme() -> Theme:
 
 	_cached = theme
 	return theme
+
+
+static func _ui_font() -> Font:
+	if _cached_ui_font != null:
+		return _cached_ui_font
+	# Varela Round gives Latin UI its friendly, compact silhouette. Noto Sans
+	# SC is bundled as its complete Simplified-Chinese fallback: it is less
+	# overtly rounded, but keeps every Chinese string legible and metrically
+	# predictable instead of silently falling back to an operating-system font.
+	var primary := VARELA_ROUND.duplicate() as FontFile
+	primary.fallbacks = [NOTO_SANS_SC]
+	_cached_ui_font = primary
+	return _cached_ui_font
 
 
 static func panel_stylebox() -> SuperellipseStyleBox:
@@ -424,6 +442,14 @@ static func loading_progress_stylebox(color: Color) -> SuperellipseStyleBox:
 ##     reserved right margin as their sole selection marker. Focus never
 ##     changes the text column's width or alignment. While present, they own
 ##     movement and action input through UIState like every other modal.
+## 17. The application start screen is a full, opaque field of Blorbus's
+##     physical skin color, not a modal floating over the loading screen. Its
+##     living UIKit.blorbus_eyes() header blinks independently above one clear
+##     action. Its canonical Blorb mark and white wordmark form one proportional
+##     horizontal lockup; its opaque backdrop uses Inventory's exact
+##     BLORBUS_PANEL hue, and its eye header is the same unscaled
+##     UIKit.blorbus_eyes() component used by Inventory. Gameplay assets are
+##     not requested until that action is chosen.
 ## 17. The Blorb paper doll navigates spatially, never by an arbitrary slot
 ##     cycle. White is focus; psychic pink exclusively means a Blorb selected
 ##     for assignment. Committing a portrait transfers focus to its assigned
@@ -472,6 +498,10 @@ static func loading_progress_stylebox(color: Color) -> SuperellipseStyleBox:
 ##     that same doll above the independently scrolling content. A tab changes
 ##     the doll's interaction layer (equipment editing versus inspection), not
 ##     its renderer, camera, visual language, or responsive implementation.
+## 25. UI typography uses Varela Round for Latin text, with bundled Noto Sans
+##     Simplified Chinese as its complete glyph fallback. Font sizing remains
+##     governed by the shared type scale here, never viewport-stretch
+##     magnification or a platform-dependent system-font substitution.
 
 
 ## An inset, recessed-looking cell for an inventory grid slot -- darker

@@ -10,6 +10,11 @@ signal changed
 ## pickups/purchases grow a stack instead of consuming another UI slot.
 var items: Array[Dictionary] = []
 
+
+func reset_for_new_session() -> void:
+	items.clear()
+	changed.emit()
+
 func add(item_name: String, color: Color) -> void:
 	for item in items:
 		if item["name"] == item_name:

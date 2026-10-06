@@ -583,6 +583,53 @@ const SPRINT_STRIDE_EASE := 0.35
 const SPRINT_ELBOW_EXTRA_BEND := 1.3
 const POSE_SETTLE_SPEED := 8.0
 
+
+## Applies one fully-resolved frame of the live sprint cycle to any freshly
+## built ProceduralFigure rig. The title photo uses this instead of a second
+## hand-authored "running-ish" pose, so its hero is literally frozen from the
+## same phase warping, opposing limb swing, stance/swing knee bends, elbow
+## curve, ankle flex, body bob and forward lean used by _animate_walk().
+static func apply_run_cycle_snapshot(pivots: Dictionary, raw_phase: float, speed_fraction: float = 1.0) -> void:
+	var stride_phase := raw_phase + SPRINT_STRIDE_EASE * sin(2.0 * raw_phase)
+	var swing := sin(stride_phase) * SPRINT_SWING_AMOUNT
+	(pivots["leg_left"] as Node3D).rotation = Vector3(swing, 0.0, 0.0)
+	(pivots["leg_right"] as Node3D).rotation = Vector3(-swing, 0.0, 0.0)
+	(pivots["arm_left"] as Node3D).rotation.x = -swing
+	(pivots["arm_right"] as Node3D).rotation.x = swing
+	(pivots["arm_left"] as Node3D).rotation.z = ProceduralFigure.ARM_OUTWARD_ANGLE
+	(pivots["arm_right"] as Node3D).rotation.z = -ProceduralFigure.ARM_OUTWARD_ANGLE
+
+	var left_knee := maxf(0.0, cos(stride_phase + PI)) * ProceduralFigure.KNEE_BEND_AMOUNT * SPRINT_BEND_SCALE
+	var right_knee := maxf(0.0, cos(stride_phase)) * ProceduralFigure.KNEE_BEND_AMOUNT * SPRINT_BEND_SCALE
+	left_knee += maxf(0.0, cos(stride_phase)) * KNEE_STANCE_BEND_AMOUNT * SPRINT_BEND_SCALE
+	right_knee += maxf(0.0, cos(stride_phase + PI)) * KNEE_STANCE_BEND_AMOUNT * SPRINT_BEND_SCALE
+	(pivots["knee_left"] as Node3D).rotation.x = left_knee
+	(pivots["knee_right"] as Node3D).rotation.x = right_knee
+
+	var right_forward := (1.0 - sin(stride_phase)) * 0.5
+	var left_forward := 1.0 - right_forward
+	var elbow_floor := SPRINT_ELBOW_MIN_FRACTION
+	var elbow_range := 1.0 - elbow_floor
+	var elbow_scale := SPRINT_BEND_SCALE * SPRINT_ELBOW_EXTRA_BEND
+	(pivots["elbow_right"] as Node3D).rotation.x = -(
+		(elbow_floor + right_forward * elbow_range) * ProceduralFigure.ELBOW_BEND_AMOUNT * elbow_scale
+	)
+	(pivots["elbow_left"] as Node3D).rotation.x = -(
+		(elbow_floor + left_forward * elbow_range) * ProceduralFigure.ELBOW_BEND_AMOUNT * elbow_scale
+	)
+	(pivots["ankle_right"] as Node3D).rotation.x = (
+		-ANKLE_DORSIFLEX_AMOUNT * maxf(0.0, -cos(stride_phase))
+		+ ANKLE_PLANTARFLEX_AMOUNT * maxf(0.0, -sin(stride_phase))
+	)
+	(pivots["ankle_left"] as Node3D).rotation.x = (
+		-ANKLE_DORSIFLEX_AMOUNT * maxf(0.0, cos(stride_phase))
+		+ ANKLE_PLANTARFLEX_AMOUNT * maxf(0.0, sin(stride_phase))
+	)
+	(pivots["spine"] as Node3D).rotation.x = SPINE_LEAN_MAX_RUN * clampf(speed_fraction, 0.0, 1.0)
+	var body_bob := -RUN_BODY_BOB_AMOUNT * cos(2.0 * stride_phase)
+	(pivots["spine"] as Node3D).position.y += body_bob
+	(pivots["hips"] as Node3D).position.y += body_bob
+
 # One-shot opening tableau: the hero wakes from the coma described in the
 # world bible already lying face-up in the starting field, takes a moment to
 # orient, then rises before ordinary control unlocks. The visual rig rotates
@@ -1376,6 +1423,14 @@ var _blorb_suit := BlorbSuitController.new()
 ## recruited) -> human (see _toggle_blorbus_control()).
 var _controlled_blorbus: Blorb = null
 var _controlled_giant: Blorb = null
+## A vehicle or creature temporarily receiving input through the same control
+## redirection contract. Unlike a playable roster member, a host is entered,
+## piloted, then exited back to the body that entered it. Titan hosts retain
+## Humongous as that return body; vehicles retain the current party member.
+var _controlled_host: Node3D = null
+var _host_return_body: Node3D = null
+var _host_control_source: Node3D = null
+var _host_suit: TitanSuitHost = null
 ## Which party member's own NPC body is currently reskinned as the human and
 ## AI-following this CharacterBody in his place -- see
 ## _try_start_xiao_hou_zi_control()/_end_xiao_hou_zi_control(). Distinct from
@@ -1855,6 +1910,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		cancel_throw_preparation()
 		get_viewport().set_input_as_handled()
 		return
+	if is_instance_valid(_controlled_host) and event.is_action_pressed("ui_cancel") and not UIState.modal_open:
+		_show_host_exit_dialog()
+		get_viewport().set_input_as_handled()
+		return
 	if is_instance_valid(_controlled_giant) and event.is_action_pressed("ui_cancel") and not UIState.modal_open:
 		HumongousState.show_merge_exit(self)
 		get_viewport().set_input_as_handled()
@@ -1882,7 +1941,7 @@ func _physics_process(delta: float) -> void:
 	_update_throw_input()
 	if Input.is_action_just_pressed("platform_aid") and not UIState.modal_open:
 		_call_platform_aid()
-	if not UIState.modal_open and not _player_following_manchego:
+	if not UIState.modal_open and not _player_following_manchego and not is_instance_valid(_controlled_host):
 		if Input.is_action_just_pressed("switch_character_previous"):
 			if is_instance_valid(_controlled_giant):
 				HumongousState.show_merge_exit(self)
@@ -1902,6 +1961,7 @@ func _physics_process(delta: float) -> void:
 		or _piloting_xiao_hou_zi
 		or is_instance_valid(_controlled_generic_member)
 		or _player_following_blorbus
+		or is_instance_valid(_controlled_host)
 	)
 	var atmosphere := AtmosphereLayer.active(get_tree())
 	if controlling_another_body and atmosphere != null and atmosphere.airlessness_at(global_position) > 0.0:
@@ -1909,10 +1969,13 @@ func _physics_process(delta: float) -> void:
 	# Every branch below hands control to another body and skips
 	# _compose_body_pose(). Starting one mid-flight must not leave the
 	# human following along with a capsule still posed level.
-	if _player_following_manchego or _piloting_xiao_hou_zi or is_instance_valid(_controlled_generic_member) or _player_following_blorbus:
+	if _player_following_manchego or _piloting_xiao_hou_zi or is_instance_valid(_controlled_generic_member) or _player_following_blorbus or is_instance_valid(_controlled_host):
 		_release_skull_anchor()
 	if _manchego_dismount_elapsed >= 0.0:
 		_update_manchego_dismount(delta)
+		return
+	if is_instance_valid(_controlled_host):
+		_update_controllable_host(delta)
 		return
 	if _player_following_manchego:
 		_update_manchego_control(delta)
@@ -1962,6 +2025,11 @@ func _physics_process(delta: float) -> void:
 	var was_diving := _lake_diving_active
 	_update_lake_buoyancy(delta)
 	_update_breath(delta)
+	# Equipment-derived visuals must reconcile before an environmental mode
+	# can take over the frame. Zero gravity returns early below; when this sat
+	# after that return, crossing the Space portal with Crystal Skates left the
+	# old runners attached forever even though the new suit had Space legs.
+	_update_ice_skate_state()
 	if _update_zero_gravity_movement(delta):
 		return
 	if was_diving and not _lake_diving_active:
@@ -1978,7 +2046,6 @@ func _physics_process(delta: float) -> void:
 	_update_dirtbike_state(delta)
 	_update_snowboard_state()
 	_update_penguin_state()
-	_update_ice_skate_state()
 	_update_limb_power_state(delta)
 	# Jump is the whole vine control: it throws for a support in reach and, on
 	# the next press, opens the hand with the arc's momentum intact. A jump
@@ -3158,9 +3225,19 @@ func restore_for_recovery(minimum_fraction: float = 1.0) -> void:
 	current_hp = maxf(current_hp, MAX_HP * clampf(minimum_fraction, 0.0, 1.0))
 	WorldState.player_current_hp = current_hp
 	hp_changed.emit(current_hp, MAX_HP)
+	# Recovery always wakes the human breathing normally, whether the recovery
+	# path reused this body or reloaded the scene. Reset the emission cache too
+	# so the persistent HUD cannot retain the pre-faint exhausted state.
+	breath = MAX_BREATH
+	_breath_damage_timer = BREATH_DAMAGE_INTERVAL
+	_last_emitted_breath_int = roundi(MAX_BREATH)
+	_last_emitted_breath_full = true
+	breath_changed.emit(breath, MAX_BREATH)
 
 
 func force_human_control(show_feedback: bool = true) -> void:
+	if is_instance_valid(_controlled_host):
+		end_controllable_host()
 	if is_instance_valid(_controlled_manchego):
 		_end_manchego_control()
 	if is_instance_valid(_controlled_xiao_hou_zi):
@@ -3567,7 +3644,7 @@ func start_riding_manchego(manchego: Manchego) -> void:
 		return
 	_controlled_manchego = manchego
 	PartyControl.set_control_override(manchego)
-	_controlled_manchego.begin_ride()
+	_controlled_manchego.begin_ride(_mounted_rider)
 	_player_following_manchego = true
 	# top_level lets _apply_manchego_seated_pose() drive `visuals` off Manchego's own live
 	# seat transform directly every frame instead of this CharacterBody's
@@ -3809,6 +3886,8 @@ func _apply_manchego_seated_pose(delta: float) -> void:
 
 
 func _current_controlled_body() -> Node3D:
+	if is_instance_valid(_controlled_host):
+		return _controlled_host
 	if is_instance_valid(_controlled_giant):
 		return _controlled_giant
 	if is_instance_valid(_controlled_blorbus):
@@ -3927,10 +4006,18 @@ func _follow_controlled_party_body(target: Node3D, delta: float) -> void:
 	elif offset.length() < PLAYER_FOLLOW_ARRIVE_DISTANCE:
 		velocity.x = move_toward(velocity.x, 0.0, move_speed)
 		velocity.z = move_toward(velocity.z, 0.0, move_speed)
-	velocity.y = 0.0
+	var in_pressurized_interior := atmosphere != null and atmosphere.is_pressurized_at(global_position)
+	velocity.y = (
+		HumanoidLocomotion.apply_gravity(velocity.y, delta, _playable_profile, TERMINAL_FALL_SPEED)
+		if in_pressurized_interior
+		else 0.0
+	)
 	var before_move := global_position
 	move_and_slide()
-	if not is_on_floor():
+	# A one-frame floor-contact gap inside an elevated ship must never invoke
+	# the legacy open-world terrain fallback: that used to teleport the human
+	# hundreds of metres down to the planet while another member was controlled.
+	if not is_on_floor() and not in_pressurized_interior:
 		global_position.y = terrain.get_mesh_height(global_position.x, global_position.z) + FOOT_OFFSET
 	var actual_motion := global_position - before_move
 	actual_motion.y = 0.0
@@ -3973,7 +4060,14 @@ func _update_blorbus_control(delta: float) -> void:
 	elif offset.length() < PLAYER_FOLLOW_ARRIVE_DISTANCE:
 		velocity.x = move_toward(velocity.x, 0.0, move_speed)
 		velocity.z = move_toward(velocity.z, 0.0, move_speed)
-	velocity.y = 0.0
+	var human_in_pressurized_interior := (
+		atmosphere != null and atmosphere.is_pressurized_at(global_position)
+	)
+	velocity.y = (
+		HumanoidLocomotion.apply_gravity(velocity.y, delta, _playable_profile, TERMINAL_FALL_SPEED)
+		if human_in_pressurized_interior
+		else 0.0
+	)
 	var before_move := global_position
 	move_and_slide()
 	# Reuses the same lake buoyancy the human's own ordinary control uses, so
@@ -3988,7 +4082,11 @@ func _update_blorbus_control(delta: float) -> void:
 	# follower clipped straight down into the water instead of staying put
 	# on the dock.
 	_update_lake_buoyancy(delta)
-	if not _lake_buoyancy_active and not is_on_floor():
+	if (
+		not _lake_buoyancy_active
+		and not is_on_floor()
+		and not human_in_pressurized_interior
+	):
 		global_position.y = terrain.get_mesh_height(global_position.x, global_position.z) + FOOT_OFFSET
 	# Face the motion that actually occurred, not merely the desired line to
 	# Blorbus. Collision sliding and the 7m/3m follow hysteresis can make
@@ -4020,6 +4118,98 @@ func begin_humongous_mind_merge(giant: Blorb) -> bool:
 	HumongousState.mark_merged()
 	Hud.show_message("Blorbus's mind joined Humongous.")
 	return true
+
+
+## Starts any temporary host without changing the active party roster. The
+## camera already follows PartyControl.active_control_body(), so vehicles and
+## Titans receive the same perspective handoff as mounts and Humongous.
+func begin_controllable_host(host: Node3D, return_body: Node3D = null) -> bool:
+	if host == null or not is_instance_valid(host) or not host.has_method("drive_from_player"):
+		return false
+	if is_instance_valid(_controlled_host):
+		return false
+	_host_return_body = return_body if is_instance_valid(return_body) else PartyControl.active_control_body()
+	_host_control_source = PartyControl.control_source()
+	_controlled_host = host
+	if host.has_method("begin_host_control") and not bool(host.begin_host_control(_host_return_body)):
+		_controlled_host = null
+		_host_return_body = null
+		_host_control_source = null
+		return false
+	_begin_following_as_shell()
+	PartyControl.set_control_override(host, _host_return_body)
+	return true
+
+
+func begin_titan_host_control(host: Node3D, humongous: Blorb, suit: TitanSuitHost) -> bool:
+	if not is_instance_valid(_controlled_giant) or _controlled_giant != humongous:
+		return false
+	if not begin_controllable_host(host, humongous):
+		return false
+	_host_suit = suit
+	suit.form(humongous)
+	humongous.visible = false
+	humongous.end_direct_control()
+	return true
+
+
+func end_controllable_host() -> void:
+	if not is_instance_valid(_controlled_host):
+		return
+	var host := _controlled_host
+	if host.has_method("end_host_control"):
+		host.end_host_control(_host_return_body)
+	if is_instance_valid(_host_suit):
+		_host_suit.release()
+	if is_instance_valid(_controlled_giant) and _host_return_body == _controlled_giant:
+		_controlled_giant.visible = true
+		_controlled_giant.begin_direct_control()
+		_controlled_giant.global_position = host.global_position + host.global_transform.basis.z * (
+			float(host.titan_interaction_radius()) if host.has_method("titan_interaction_radius") else 8.0
+		)
+		PartyControl.set_control_override(_controlled_giant, _controlled_blorbus)
+	elif PartyControl.active_member() == _host_return_body:
+		PartyControl.clear_control_override(host)
+	else:
+		PartyControl.set_control_override(_host_return_body, _host_control_source)
+	_controlled_host = null
+	_host_return_body = null
+	_host_control_source = null
+	_host_suit = null
+
+
+func _show_host_exit_dialog() -> void:
+	if not is_instance_valid(_controlled_host):
+		return
+	var label := "Exit pilot control"
+	if _controlled_host.has_method("host_exit_label"):
+		label = String(_controlled_host.host_exit_label())
+	var actions: Array[Dictionary] = [{"label": label, "callback": _host_exit_action}]
+	DialogUI.show_line("Control", "Release control?", actions, "Cancel", Callable(), true)
+
+
+func _host_exit_action() -> void:
+	DialogUI.hide_dialog()
+	end_controllable_host()
+
+
+func _update_controllable_host(delta: float) -> void:
+	if not is_instance_valid(_controlled_host):
+		end_controllable_host()
+		return
+	var pitched: bool = (
+		_controlled_host.has_method("uses_pitched_movement_input")
+		and bool(_controlled_host.uses_pitched_movement_input())
+	)
+	var input := _get_move_input()
+	var basis: Basis = camera.global_transform.basis if pitched else camera_rig.global_transform.basis
+	var direction := basis.x * input.x + basis.z * input.y
+	if not pitched:
+		direction.y = 0.0
+	if direction.length_squared() > 0.0001:
+		direction = direction.normalized()
+	var jump_pressed := Input.is_action_just_pressed("jump") and not UIState.modal_open
+	_controlled_host.drive_from_player(direction, delta, _is_sprinting(), jump_pressed)
 
 
 func end_humongous_mind_merge() -> void:
@@ -4074,6 +4264,17 @@ func _update_camera_follow(delta: float) -> void:
 		camera_spring_arm.add_excluded_object(get_rid())
 		if subject is CollisionObject3D:
 			camera_spring_arm.add_excluded_object((subject as CollisionObject3D).get_rid())
+		# Vehicles such as the spaceship are Node3D hosts whose solid body is a
+		# hierarchy of collision descendants. Exclude the complete authored
+		# vehicle so a requested exterior chase distance cannot collapse inside
+		# its own hull.
+		if subject.has_method("camera_collision_exclusions"):
+			var exclusions: Array = subject.camera_collision_exclusions()
+			for rid_value in exclusions:
+				if typeof(rid_value) == TYPE_RID:
+					var collision_rid: RID = rid_value
+					if collision_rid.is_valid():
+						camera_spring_arm.add_excluded_object(collision_rid)
 	if _camera_handoff_remaining > 0.0:
 		_camera_handoff_remaining = maxf(_camera_handoff_remaining - delta, 0.0)
 		var handoff := smoothstep(0.0, 1.0, 1.0 - _camera_handoff_remaining / CAMERA_HANDOFF_DURATION)
@@ -4244,12 +4445,10 @@ func _pose_extended_arm(arm_pivot: Node3D, elbow_pivot: Node3D, hand: Node3D, si
 	# before this ever runs).
 	# Final animation layer: it overrides the underlying walk/jump/landing
 	# targets while held, but every joint interpolates to avoid any pop.
-	arm_pivot.rotation.x = lerp_angle(arm_pivot.rotation.x, -ARM_POWER_POSE_ANGLE, weight)
-	arm_pivot.rotation.y = lerp_angle(arm_pivot.rotation.y, 0.0, weight)
-	arm_pivot.rotation.z = lerp_angle(arm_pivot.rotation.z, side * ProceduralFigure.ARM_OUTWARD_ANGLE, weight)
-	elbow_pivot.rotation.x = lerp_angle(elbow_pivot.rotation.x, 0.0, weight)
-	elbow_pivot.rotation.y = lerp_angle(elbow_pivot.rotation.y, 0.0, weight)
-	elbow_pivot.rotation.z = lerp_angle(elbow_pivot.rotation.z, 0.0, weight)
+	PlayableArmPose.apply_forward_raise(
+		arm_pivot, elbow_pivot, side, weight,
+		ProceduralFigure.ARM_OUTWARD_ANGLE, ARM_POWER_POSE_ANGLE
+	)
 	# Use the exact quarter-turn while raised. Keeping the relaxed wrist's
 	# additional inward angle here tilts the supposedly vertical fingertips
 	# back toward the body's centre line.
@@ -7425,7 +7624,7 @@ func _set_ice_skate_visuals_present() -> void:
 	if _ice_skates_active and crystal!=_ice_skate_blades_crystal:
 		for blade in [_ice_skate_left,_ice_skate_right]:
 			if is_instance_valid(blade):
-				(blade as Node).queue_free()
+				(blade as Node).free()
 		_ice_skate_left=null
 		_ice_skate_right=null
 	_ice_skate_blades_crystal=crystal
@@ -7436,9 +7635,9 @@ func _set_ice_skate_visuals_present() -> void:
 			_ice_skate_right=IceSkateMode.build_blade(_sole_right,_toe_right,"RightIceSkate",1.0,-1.0,crystal)
 		return
 	if is_instance_valid(_ice_skate_left):
-		_ice_skate_left.queue_free()
+		_ice_skate_left.free()
 	if is_instance_valid(_ice_skate_right):
-		_ice_skate_right.queue_free()
+		_ice_skate_right.free()
 	_ice_skate_left=null
 	_ice_skate_right=null
 

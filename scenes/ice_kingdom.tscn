@@ -46,6 +46,8 @@ light_angular_distance = 1.5
 
 [node name="DayNightCycle" type="Node" parent="."]
 script = ExtResource("5")
+planetary_ocean_enabled = false
+planetary_ocean_level = -12.0
 
 [node name="Terrain" type="StaticBody3D" parent="."]
 script = ExtResource("3")

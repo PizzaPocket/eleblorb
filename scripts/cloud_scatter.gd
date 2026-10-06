@@ -16,14 +16,23 @@ class_name CloudScatter
 
 ## Dense enough to form a real aerial platforming field rather than a few
 ## distant sky decorations; seeded generation keeps the route repeatable.
-@export var cloud_count: int = 52
+@export var cloud_count: int = 72
 # +25% over the original 70.0/110.0, per direct correction ("raise up the
 # level of the normal clouds as well as the Sky Kingdom because right now
 # it just kind of feels a bit too low to the ground").
 @export var altitude_min: float = 87.5
 @export var altitude_max: float = 137.5
-@export var spread: float = 260.0
+## Ambient weather belongs to the whole kingdom, not merely the neighbourhood
+## around its origin. The ordinary kingdom terrain fields extend roughly
+## 620-900 m from centre, so this reaches their outskirts while still leaving
+## genuinely clear sectors between the clustered banks. Purpose-built fields
+## (the demo's valley layer and authored Sky Kingdom course) override this.
+@export var spread: float = 820.0
 @export var rng_seed: int = 77
+## Ambient clouds are organised into coherent weather banks rather than
+## sampled independently across a square. Zero derives a sensible count.
+@export_range(0, 12, 1) var weather_bank_count: int = 0
+@export_range(0.0, 80.0, 1.0) var ambient_cluster_spacing: float = 18.0
 
 ## How tall a puff is relative to its own horizontal radius -- below 1.0,
 ## since puffs should read as wider than they are tall.
@@ -34,6 +43,8 @@ const NIGHT_COLOR := Color(0.22, 0.25, 0.38)
 
 var _rng := RandomNumberGenerator.new()
 var _material: StandardMaterial3D
+var _ambient_exclusions: Array[Dictionary] = []
+var _ambient_roots: Array[Node3D] = []
 ## Set by build_sky_course() once it actually runs -- see that function's
 ## own comment on _place_air_gem() for why this is the practical way to
 ## find "where the Air Gem cloud actually ended up" from another script.
@@ -50,9 +61,9 @@ func _ready() -> void:
 	add_to_group("cloud_scatters")
 	_rng.seed = rng_seed
 	_ensure_material()
-
-	for i in cloud_count:
-		_place_cloud()
+	# Build now so later-authored cloud routes can clear their exact footprint.
+	# Exclusions registered after this remain safe: they cull ambient roots only.
+	_build_ambient_weather()
 
 
 ## Lets another script (town_generator.gd's own converted sky-stairs steps)
@@ -72,30 +83,146 @@ func _ensure_material() -> void:
 	_material.cull_mode = BaseMaterial3D.CULL_DISABLED
 
 
-func _place_cloud() -> void:
-	var cloud := Node3D.new()
-	cloud.position = Vector3(
-		_rng.randf_range(-spread, spread),
-		_rng.randf_range(altitude_min, altitude_max),
-		_rng.randf_range(-spread, spread)
-	)
-	add_child(cloud)
+## Reserve cylindrical world-space airspace for authored aerial content.
+## Only ambient roots are removed; cloud stairs and platforms are untouched.
+func add_ambient_exclusion(
+	world_center: Vector3, horizontal_radius: float,
+	min_world_y: float = -INF, max_world_y: float = INF
+) -> void:
+	_ambient_exclusions.append({
+		"center": Vector2(world_center.x, world_center.z),
+		"radius": maxf(horizontal_radius, 0.0),
+		"min_y": min_world_y,
+		"max_y": max_world_y,
+	})
+	_cull_ambient_in_exclusions()
 
-	var puff_count := int(_rng.randf_range(4, 8))
+
+func _build_ambient_weather() -> void:
+	if cloud_count <= 0:
+		return
+	_rng.seed = rng_seed
+	var bank_count := weather_bank_count
+	if bank_count <= 0:
+		bank_count = clampi(int(round(sqrt(float(cloud_count)) * 0.48)), 2, 8)
+	var banks: Array[Dictionary] = []
+	var total_weight := 0.0
+	for i in range(bank_count):
+		var angle := TAU * (float(i) / float(bank_count)) + _rng.randf_range(-0.65, 0.65)
+		var distance := spread * _rng.randf_range(0.08, 0.68)
+		var wind_angle := _rng.randf_range(0.0, TAU)
+		var long_axis := spread * _rng.randf_range(0.22, 0.42)
+		var short_axis := long_axis * _rng.randf_range(0.32, 0.68)
+		var weight := long_axis * short_axis * _rng.randf_range(0.7, 1.35)
+		banks.append({
+			"center": Vector2(cos(angle), sin(angle)) * distance,
+			"long_axis": long_axis,
+			"short_axis": short_axis,
+			"wind": Vector2(cos(wind_angle), sin(wind_angle)),
+			"base_y": _rng.randf_range(altitude_min, altitude_max),
+			"weight": weight,
+		})
+		total_weight += weight
+
+	var accepted: Array[Vector2] = []
+	var attempts := 0
+	var max_attempts := maxi(cloud_count * 35, 200)
+	while accepted.size() < cloud_count and attempts < max_attempts:
+		attempts += 1
+		var pick := _rng.randf() * total_weight
+		var bank: Dictionary = banks.back()
+		for candidate in banks:
+			pick -= candidate["weight"] as float
+			if pick <= 0.0:
+				bank = candidate
+				break
+		var wind: Vector2 = bank["wind"]
+		var across := Vector2(-wind.y, wind.x)
+		# Summed-uniform samples approximate a normal distribution: a dense
+		# core that naturally dissipates into wisps, without a hard ellipse edge.
+		var along_n := _normal_sample()
+		var across_n := _normal_sample()
+		var local := wind * along_n * (bank["long_axis"] as float)
+		local += across * across_n * (bank["short_axis"] as float)
+		var flat: Vector2 = (bank["center"] as Vector2) + local
+		if absf(flat.x) > spread or absf(flat.y) > spread:
+			continue
+		var normalized_radius := sqrt(pow(along_n, 2.0) + pow(across_n, 2.0))
+		var edge_factor := clampf(1.0 - normalized_radius / 2.4, 0.18, 1.0)
+		var y := clampf(
+			(bank["base_y"] as float)
+			+ along_n * (altitude_max - altitude_min) * 0.055
+			+ _rng.randf_range(-2.0, 2.0),
+			altitude_min, altitude_max
+		)
+		var local_pos := Vector3(flat.x, y, flat.y)
+		if _is_ambient_excluded(to_global(local_pos)):
+			continue
+		var spacing := ambient_cluster_spacing * lerpf(0.72, 1.2, edge_factor)
+		var too_close := false
+		for prior in accepted:
+			if prior.distance_squared_to(flat) < spacing * spacing:
+				too_close = true
+				break
+		if too_close:
+			continue
+		accepted.append(flat)
+		_place_cloud(local_pos, edge_factor, wind)
+	_puffs_dirty = true
+
+
+func _normal_sample() -> float:
+	var value := 0.0
+	for i in range(6):
+		value += _rng.randf()
+	return (value - 3.0) / 1.2
+
+
+func _place_cloud(local_position: Vector3, edge_factor: float, wind: Vector2) -> void:
+	var cloud := Node3D.new()
+	cloud.name = "AmbientCloud"
+	cloud.set_meta("ambient_cloud", true)
+	cloud.position = local_position
+	add_child(cloud)
+	_ambient_roots.append(cloud)
+
+	var puff_count := maxi(3, int(round(_rng.randf_range(4.0, 8.0) * lerpf(0.65, 1.0, edge_factor))))
+	var across := Vector2(-wind.y, wind.x)
 	for i in puff_count:
-		var puff_radius := _rng.randf_range(3.0, 7.0)
+		var puff_radius := _rng.randf_range(3.0, 7.0) * lerpf(0.62, 1.0, edge_factor)
 		var semi_axes := Vector3(puff_radius, puff_radius * PUFF_HEIGHT_FACTOR, puff_radius)
 		var mesh_instance := MeshInstance3D.new()
 		mesh_instance.mesh = SuperEgg.build_mesh(semi_axes, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
 		mesh_instance.material_override = _material
 		mesh_instance.set_meta("cloud_semi_axes", semi_axes)
 		_puffs_dirty = true
-		mesh_instance.position = Vector3(
-			_rng.randf_range(-8.0, 8.0),
-			_rng.randf_range(-1.5, 1.5),
-			_rng.randf_range(-8.0, 8.0)
-		)
+		var along_offset := _rng.randf_range(-9.5, 9.5)
+		var across_offset := _rng.randf_range(-5.5, 5.5)
+		var flat_offset := wind * along_offset + across * across_offset
+		mesh_instance.position = Vector3(flat_offset.x, _rng.randf_range(-1.5, 1.5), flat_offset.y)
 		cloud.add_child(mesh_instance)
+
+
+func _is_ambient_excluded(world_position: Vector3) -> bool:
+	for exclusion in _ambient_exclusions:
+		if world_position.y < (exclusion["min_y"] as float) or world_position.y > (exclusion["max_y"] as float):
+			continue
+		var center: Vector2 = exclusion["center"]
+		var flat := Vector2(world_position.x, world_position.z)
+		if flat.distance_squared_to(center) <= pow(exclusion["radius"] as float, 2.0):
+			return true
+	return false
+
+
+func _cull_ambient_in_exclusions() -> void:
+	for cloud in _ambient_roots.duplicate():
+		if not is_instance_valid(cloud):
+			_ambient_roots.erase(cloud)
+			continue
+		if _is_ambient_excluded(cloud.global_position):
+			_ambient_roots.erase(cloud)
+			cloud.queue_free()
+			_puffs_dirty = true
 
 
 ## Returns the highest visible puff top at this XZ position, provided that
@@ -316,6 +443,8 @@ func build_sky_course(start: Vector3) -> void:
 	# authored route and make its first landing unreadable.
 	for child in get_children():
 		if child.name == "SkyParkourCourse" or not child is Node3D:
+			continue
+		if not child.has_meta("ambient_cloud"):
 			continue
 		var cloud := child as Node3D
 		var horizontal := Vector2(cloud.global_position.x - start.x, cloud.global_position.z - start.z)

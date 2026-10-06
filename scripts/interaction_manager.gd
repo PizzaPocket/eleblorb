@@ -26,11 +26,11 @@ extends Node
 ## where the player is actually looking, so alignment with the player's own
 ## BODY facing (player.visuals' own rotation, not the camera) discounts the
 ## effective distance of whatever's in front and inflates whatever's behind.
-## Unlike that reference implementation, there's no line-of-sight raycast
-## here -- eleblorb's own interact radii are small enough (see each
-## Interactable.attach() call's own INTERACT_RADIUS) that a candidate being
-## on the other side of a wall within that short a range hasn't come up as a
-## problem; add one here the same way if it ever does.
+## Candidates are revalidated against the actively controlled body's actual
+## three-dimensional position. Trigger overlap alone is not authoritative:
+## an inactive party body can remain inside an Area3D, and a large sphere can
+## overlap a door or chest on the storey above. Horizontal range and a strict
+## vertical allowance therefore gate every prompt before facing bias applies.
 
 ## 0.0 = pure nearest-distance picking, 1.0 = strongly favors whatever the
 ## player's body is currently facing over something merely closer. Alignment
@@ -87,12 +87,11 @@ func _reselect() -> void:
 	_candidates = valid_candidates
 	if _candidates.is_empty():
 		return
-	if _candidates.size() == 1:
-		current = _candidates[0]
-		return
-	var player := PartyControl.active_member()
+	# Rank from the body actually being controlled, not merely the persistent
+	# roster member that owns the perspective. During mounts, vehicle piloting,
+	# and Humongous/Titan control those can be very far apart.
+	var player := PartyControl.active_control_body()
 	if player == null:
-		current = _candidates[0]
 		return
 	# player.visuals (not the CharacterBody3D root, which never itself
 	# rotates -- see player.gd's own _process_walk()/movement code, which
@@ -107,12 +106,22 @@ func _reselect() -> void:
 	var best_score := INF
 	for area in _candidates:
 		var offset := area.global_position - player.global_position
+		var radius := float(area.get_meta("interaction_radius", 3.0))
+		var max_vertical := float(area.get_meta("max_vertical_distance", 1.5))
+		if absf(offset.y) > max_vertical:
+			continue
+		var horizontal := Vector2(offset.x, offset.z)
+		if horizontal.length() > radius:
+			continue
 		var distance := offset.length()
 		var alignment := 0.0
-		var horizontal := Vector2(offset.x, offset.z)
 		if horizontal.length() > 0.01:
 			alignment = body_forward.dot(Vector3(horizontal.x, 0.0, horizontal.y).normalized())
 		var score := distance * (1.0 - FACING_BIAS_STRENGTH * alignment)
+		# A small explicit priority lets a revealed pickup inside an open chest
+		# win over the chest body's overlapping "Close" action. Ordinary world
+		# interactions omit it and retain pure distance/facing behavior.
+		score -= float(area.get_meta("interaction_priority",0.0))
 		if score < best_score:
 			best_score = score
 			best = area

@@ -29,6 +29,9 @@ const RNG_SEED := 4242
 var _material: StandardMaterial3D
 var _player: Node3D
 var _configured_camera: Camera3D
+## CelestialShell owns the shared moving origin. Kept true for compatibility
+## when StarField is used by itself in an isolated scene.
+@export var follow_player := true
 
 
 func _ready() -> void:
@@ -75,9 +78,9 @@ func _process(_delta: float) -> void:
 	if active_camera and active_camera != _configured_camera:
 		active_camera.far = maxf(active_camera.far, REQUIRED_CAMERA_FAR)
 		_configured_camera = active_camera
-	if not is_instance_valid(_player):
+	if follow_player and not is_instance_valid(_player):
 		_player = get_tree().get_first_node_in_group("player") as Node3D
-	if _player:
+	if follow_player and _player:
 		# Preserve the dome's authored world height while keeping its horizontal
 		# center on the player. Following Y would make stars bob when jumping.
 		var player_position := _player.global_position

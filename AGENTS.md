@@ -2,26 +2,30 @@
 
 ## Publishing contract
 
-Treat “push” or “publish” as a complete playable-web release unless the user
-explicitly narrows the request.
+The playable web build is **deprecated for now**. Pushing no longer requires
+regenerating or verifying `build/web`, and a push does not deploy anything:
+`vercel.json` sets `git.deploymentEnabled` to false, and the web-build GitHub
+workflow has been removed. Do not run `tools/export_web.py` or stage `build/web`
+changes unless the user asks for a web release again. The committed `build/web`
+is a stale snapshot and may lag the source.
 
 Before every push:
 
 1. Finish and verify the requested source changes.
-2. Run `python3 tools/export_web.py` from the repository root.
-3. Run `python3 tools/check_web_build.py`.
-4. Stage both the source changes and the resulting `build/web` changes.
-5. Confirm the commit contains `build/web/build-manifest.json` and a current
-   `build/web/index.html`, `.pck`, and `.wasm`.
-6. Commit and push only after those checks pass.
+2. Let the pre-push hook run (`git config core.hooksPath .githooks`): pose
+   owner, power parity, and the Ohio and Snow village validators. The village
+   validators run headless Godot on the project, so close the Godot editor first
+   (the hook fails closed if it sees one running).
+3. Commit and push.
 
-Never hand-edit generated files in `build/web`; regenerate them with the export
-script. Never push changed game or loader source with a stale web build. Keep
-the repository hook enabled with `git config core.hooksPath .githooks`.
+To bring web back: re-add `python3 tools/check_web_build.py` to
+`.githooks/pre-push`, restore `.github/workflows/verify-web-build.yml`, remove
+the `git` block from `vercel.json`, regenerate with `python3 tools/export_web.py`,
+and commit `build/web` with the source.
 
-Vercel serves `build/web` according to `vercel.json`. `main` is the production
-branch; feature branches are preview deployments once the GitHub repository is
-connected in Vercel.
+Project skills live in `.claude/skills` and the settlement, architecture and
+handoff documents live in `docs/`. Both are tracked so work can continue from
+a clone (for example in Claude Code on GitHub).
 
 ## Attribution
 

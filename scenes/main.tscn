@@ -8,7 +8,6 @@
 [ext_resource type="PackedScene" path="res://scenes/blorb.tscn" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/tokoin.tscn" id="7"]
 [ext_resource type="Script" uid="uid://b2xru43bdi30j" path="res://scripts/building_marker.gd" id="8"]
-[ext_resource type="Script" uid="uid://cu1ibnydrnllf" path="res://scripts/stall_marker.gd" id="9"]
 [ext_resource type="Script" uid="uid://bsbtgk7qxvvmo" path="res://scripts/distant_mountains.gd" id="10"]
 [ext_resource type="Script" path="res://scripts/day_night_cycle.gd" id="11"]
 [ext_resource type="Script" path="res://scripts/city_generator.gd" id="12"]
@@ -17,7 +16,6 @@
 [ext_resource type="Script" path="res://scripts/skeleton_spawner.gd" id="15"]
 [ext_resource type="Script" path="res://scripts/chinese_village.gd" id="16"]
 [ext_resource type="Script" path="res://scripts/life_tree.gd" id="17"]
-[ext_resource type="Script" path="res://scripts/crossroads_test_setup.gd" id="18"]
 [ext_resource type="Script" path="res://scripts/sky_kingdom.gd" id="19"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
@@ -52,6 +50,9 @@ light_angular_distance = 1.5
 
 [node name="DayNightCycle" type="Node" parent="."]
 script = ExtResource("11")
+; Below the -400 Abyss of Impending Doom as well as the lake's ~-197 m
+; bottom, so the planetary horizon can never slice through a playable basin.
+planetary_ocean_level = -430.0
 
 [node name="Terrain" type="StaticBody3D" parent="." unique_id=193527827]
 collision_mask = 0
@@ -74,168 +75,8 @@ script = ExtResource("16")
 position = Vector3(8, 0, 5)
 script = ExtResource("17")
 
-[node name="CrossroadsTestSetup" type="Node" parent="."]
-script = ExtResource("18")
-
 [node name="SkyKingdom" type="Node3D" parent="."]
 script = ExtResource("19")
-
-[node name="Buildings" type="Node3D" parent="Town" unique_id=1744102569]
-
-[node name="Building1" type="Marker3D" parent="Town/Buildings" unique_id=819228046]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.7, 0, -17.1)
-script = ExtResource("8")
-size = Vector2(5, 2)
-floors = 2
-
-[node name="Building2" type="Marker3D" parent="Town/Buildings" unique_id=1817075240]
-transform = Transform3D(0.9396926, 0, 0.34202012, 0, 1, 0, -0.34202012, 0, 0.9396926, 20.9, 0, -20.9)
-script = ExtResource("8")
-size = Vector2(3, 2)
-roof_style = "low"
-
-[node name="Building3" type="Marker3D" parent="Town/Buildings" unique_id=733170094]
-transform = Transform3D(0.9659258, 0, -0.25881904, 0, 1, 0, 0.25881904, 0, 0.9659258, -28.5, 0, 17.1)
-script = ExtResource("8")
-floors = 2
-
-[node name="Building4" type="Marker3D" parent="Town/Buildings" unique_id=744013607]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.6, 0, 19)
-script = ExtResource("8")
-size = Vector2(6, 2)
-
-[node name="Building5" type="Marker3D" parent="Town/Buildings" unique_id=1670962624]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -34.2)
-script = ExtResource("8")
-size = Vector2(3, 2)
-roof_style = "low"
-
-[node name="Building6" type="Marker3D" parent="Town/Buildings"]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 34, 0, 0)
-script = ExtResource("8")
-size = Vector2(4, 2)
-floors = 2
-roof_style = "low"
-
-[node name="Building7" type="Marker3D" parent="Town/Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 36)
-script = ExtResource("8")
-size = Vector2(5, 2)
-
-[node name="Building8" type="Marker3D" parent="Town/Buildings"]
-transform = Transform3D(0.9396926, 0, 0.34202012, 0, 1, 0, -0.34202012, 0, 0.9396926, 16, 0, 40)
-script = ExtResource("8")
-size = Vector2(3, 2)
-floors = 2
-roof_style = "low"
-
-[node name="Building9" type="Marker3D" parent="Town/Buildings"]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -38, 0, 3)
-script = ExtResource("8")
-size = Vector2(6, 2)
-
-[node name="Building10" type="Marker3D" parent="Town/Buildings"]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -12, 0, -40)
-script = ExtResource("8")
-size = Vector2(3, 2)
-roof_style = "low"
-
-[node name="Windmill" type="Marker3D" parent="Town"]
-transform = Transform3D(0.76604444, 0, 0.6427876, 0, 1, 0, -0.6427876, 0, 0.76604444, -46, 0, -6)
-
-[node name="Watermill" type="Marker3D" parent="Town"]
-transform = Transform3D(-0.34202006, 0, -0.9396927, 0, 1, 0, 0.9396927, 0, -0.34202006, 44, 0, -8)
-
-[node name="FenceSpots" type="Node3D" parent="Town"]
-
-[node name="FenceSpot1" type="Marker3D" parent="Town/FenceSpots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, 0, -7.9)
-
-[node name="FenceSpot2" type="Marker3D" parent="Town/FenceSpots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, 0, -6)
-
-[node name="FenceSpot3" type="Marker3D" parent="Town/FenceSpots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -42, 0, -4.1)
-
-[node name="FenceSpot4" type="Marker3D" parent="Town/FenceSpots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, -9.9)
-
-[node name="FenceSpot5" type="Marker3D" parent="Town/FenceSpots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, -8)
-
-[node name="FenceSpot6" type="Marker3D" parent="Town/FenceSpots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, -6.1)
-
-[node name="NPCSpots" type="Node3D" parent="Town" unique_id=687278585]
-
-[node name="NPCSpot1" type="Marker3D" parent="Town/NPCSpots" unique_id=1176273725]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8, 0, 3.8)
-
-[node name="NPCSpot2" type="Marker3D" parent="Town/NPCSpots" unique_id=1051349784]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.4, 0, -3.8)
-
-[node name="NPCSmallSpots" type="Node3D" parent="Town" unique_id=1714149626]
-
-[node name="NPCSmallSpot1" type="Marker3D" parent="Town/NPCSmallSpots" unique_id=1397093370]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.4, 0, -11.4)
-
-[node name="NPCSmallSpot2" type="Marker3D" parent="Town/NPCSmallSpots" unique_id=333397108]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.7, 0, 9.5)
-
-[node name="NPCSmallSpot3" type="Marker3D" parent="Town/NPCSmallSpots" unique_id=1704433021]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0, -5.7)
-
-[node name="NPCSmallSpot4" type="Marker3D" parent="Town/NPCSmallSpots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.2, 0, 15.2)
-
-[node name="NPCSmallSpot5" type="Marker3D" parent="Town/NPCSmallSpots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.2, 0, 7.6)
-
-[node name="NPCSmallSpot6" type="Marker3D" parent="Town/NPCSmallSpots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.5, 0, -13.3)
-
-[node name="NPCSmallSpot7" type="Marker3D" parent="Town/NPCSmallSpots"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 15.2)
-
-[node name="LanternSpots" type="Node3D" parent="Town" unique_id=849783528]
-
-[node name="LanternSpot1" type="Marker3D" parent="Town/LanternSpots" unique_id=2003824222]
-transform = Transform3D(0.76604444, 0, 0.6427876, 0, 1, 0, -0.6427876, 0, 0.76604444, -11.4, 0, -5.7)
-
-[node name="LanternSpot2" type="Marker3D" parent="Town/LanternSpots" unique_id=1060405963]
-transform = Transform3D(-0.9396926, 0, 0.3420202, 0, 1, 0, -0.3420202, 0, -0.9396926, 11.4, 0, -5.7)
-
-[node name="LanternSpot3" type="Marker3D" parent="Town/LanternSpots" unique_id=138378584]
-transform = Transform3D(-0.34202006, 0, -0.9396927, 0, 1, 0, 0.9396927, 0, -0.34202006, -11.4, 0, 7.6)
-
-[node name="LanternSpot4" type="Marker3D" parent="Town/LanternSpots" unique_id=351355800]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 11.4, 0, 7.6)
-
-[node name="LanternSpot5" type="Marker3D" parent="Town/LanternSpots" unique_id=634140333]
-transform = Transform3D(0.4999999, 0, -0.86602545, 0, 1, 0, 0.86602545, 0, 0.4999999, 0, 0, 15.2)
-
-[node name="Stalls" type="Node3D" parent="Town" unique_id=968968044]
-
-[node name="Stall3" type="Marker3D" parent="Town/Stalls" unique_id=1659306061]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -17.1, 0, 1.9)
-script = ExtResource("9")
-stall_scene = "stall-bench"
-
-[node name="Stall4" type="Marker3D" parent="Town/Stalls" unique_id=972876178]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 3.8, 0, 17.1)
-script = ExtResource("9")
-
-[node name="GemStallSpot" type="Marker3D" parent="Town" unique_id=28374964]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 17.1, 0, 1.9)
-
-[node name="RedShopSpot" type="Marker3D" parent="Town"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0, -26.6)
-
-[node name="GreenShopSpot" type="Marker3D" parent="Town"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.6, 0, -26.6)
-
-[node name="FalseHeroSpot" type="Marker3D" parent="Town"]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 10)
 
 [node name="Scatter" type="Node3D" parent="." unique_id=1122210399]
 script = ExtResource("2")

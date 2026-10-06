@@ -136,6 +136,7 @@ func _build_lava_fountain(center:Vector2)->void:
 		CollisionPolicy.add_box(fountain,rim,Vector3(chord*1.08,0.76,0.66),pos,basis,true)
 	var lava_mesh:=CylinderMesh.new();lava_mesh.top_radius=RADIUS-0.32;lava_mesh.bottom_radius=RADIUS-0.32;lava_mesh.height=0.08;lava_mesh.radial_segments=36;lava_mesh.material=NatureProps.build_lava_material()
 	var lava:=MeshInstance3D.new();lava.mesh=lava_mesh;lava.position.y=0.58;fountain.add_child(lava)
+	LavaSurfaceFX.attach(fountain,[Vector3(-1.4,0.58,0.5),Vector3(1.25,0.58,-0.65)],20260928)
 	var pedestal:=SuperEgg.build_part(Vector3(0.72,1.0,0.72),Color(0.08,0.06,0.055),SuperEgg.EPSILON_SOFT,SuperEgg.EPSILON_FLAT);pedestal.position.y=1.0;fountain.add_child(pedestal)
 	CollisionPolicy.add_cylinder(fountain,pedestal,0.72,2.0,pedestal.position,true)
 	CollisionPolicy.mark_hazard(lava)

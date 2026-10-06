@@ -1,5 +1,4 @@
 extends Node3D
-
 const NPC_SCENE := preload("res://scenes/npc.tscn")
 const ROOF_SNOW := ElementPalette.SNOW_BODY
 const ROOF_STRUCTURE := Color(0.24, 0.18, 0.15)
@@ -56,29 +55,69 @@ const WINTER_APPEARANCE := {
 	"sleeve_style": ProceduralFigure.SLEEVE_STYLE_LONG,
 }
 const IDENTITIES := [
-	{"name": "Elin", "female": true, "line": "The snow softens every sound in the village."},
-	{"name": "Tomas", "female": false, "line": "The lake sings differently before a storm."},
-	{"name": "Mara", "female": true, "line": "I mend gloves by the stove when the light fades."},
-	{"name": "Soren", "female": false, "line": "Ice blorbs gather where the lake freezes clearest."},
-	{"name": "Anja", "female": true, "line": "The mountain wind carries pine needles for miles."},
-	{"name": "Niko", "female": false, "line": "Our roofs wear winter better than we do."},
-	{"name": "Freya", "female": true, "line": "I saw something silver move beneath the fishing hole."},
+	{"name": "Elin", "female": true, "lines": [
+		"Snow soaks up sound. I listen for the sounds that still carry: a shout, a slab letting go, a chair stopping.",
+		"Tomas gives me the ice and Niko gives me the lift. The bell is mine.",
+	]},
+	{"name": "Tomas", "female": false, "lines": [
+		"The lake groans low before a storm. An hour before it hits, it goes silent. That's the one to worry about.",
+		"Soren cuts only where I've pushed a pole into the ice and it stayed dry. He argues. The pole wins.",
+	]},
+	{"name": "Mara", "female": true, "lines": [
+		"Gloves, boots, lift harnesses. Everyone complains about the gloves. The harness stitching gets the second pass.",
+		"Freya pays for her mittens in smoked trout. I'd rather have coin, but I haven't turned the trout down yet.",
+	]},
+	{"name": "Soren", "female": false, "lines": [
+		"Ice blorbs sit on the clearest freezes. Black ice, no bubbles. When they're there, I cut somewhere else.",
+		"The cold store never gets a flame. Tomas carried a lit lantern in once. I haven't let it go.",
+	]},
+	{"name": "Anja", "female": true, "lines": [
+		"A west wind brings needles off the north ridge. When they come from the south, I wait a day before I mark trails.",
+		"Berries go on Solveig's board, logs go to the stacks, stormfall I clear. The standing wood I leave to itself.",
+	]},
+	{"name": "Niko", "female": false, "lines": [
+		"Our roofs wear winter better than we do. I'm up there with a shovel. They just sit.",
+		"I check every chair bolt before the first run. Elin checks me. She doesn't mention it.",
+	]},
+	{"name": "Freya", "female": true, "lines": [
+		"Something silver moved under the fishing hole yesterday. Ivar says it was my reflection. My reflection isn't that long.",
+		"Rye from Astrid, mittens from Mara, and I pay in smoked trout. Everyone's happy except the trout.",
+	]},
 ]
+
+## The Snow Village, built from SnowPlan (the single authored layout). This node
+## paints the worn ground, raises every building through LogHouse, dresses each
+## by programme (SnowBuildings, NordicHearth, SnowInteriors), lays out the yard's
+## landmarks, lamps and windbreak pines, and reports its layout as plain data
+## for tools/validate_village.gd.
+
+const LANE_SAMPLE_SPACING := 2.4
+const ACCENTS: Array[Color] = [Color(0.52, 0.18, 0.14), Color(0.70, 0.48, 0.18), Color(0.20, 0.44, 0.42)]
+const RESIDENT_IDENTITY := {
+	"Elin": 0, "Tomas": 1, "Mara": 2, "Soren": 3, "Anja": 4, "Niko": 5, "Freya": 6,
+}
 
 var _terrain: Node
 var _rng := RandomNumberGenerator.new()
-## Dedicated to ChimneySmoke's own ongoing per-frame recycling (see
-## _process() below) -- kept separate from _rng so an unrelated future draw
-## against _rng during setup can't shift the smoke plumes' random sequence,
-## or vice versa.
+## Dedicated to ChimneySmoke's own per-frame recycling, so unrelated draws on
+## _rng can never shift the plumes' random sequence.
 var _smoke_rng := RandomNumberGenerator.new()
 var _smoke_puffs: Array[ChimneySmoke.Puff] = []
+var _center := Vector2.ZERO
+var _layout_solids: Array[Dictionary] = []
+var _layout_doors: Array[Dictionary] = []
+var _layout_facing: Array[Dictionary] = []
+var _layout_strokes: Array[Dictionary] = []
+var _layout_blobs: Array[Dictionary] = []
+var _layout_gates: Array[Dictionary] = []
+var _pending_inn: StaticBody3D
 
 
 func _ready() -> void:
 	_terrain = get_node("../Terrain")
 	_rng.seed = 20260911
 	_smoke_rng.seed = 5591
+	_center = _terrain.get_village_center()
 	_build_village()
 	_build_fishing_camp()
 
@@ -87,80 +126,697 @@ func _process(delta: float) -> void:
 	ChimneySmoke.animate(_smoke_puffs, delta, _smoke_rng)
 
 
+## Everything the validator needs, as plain village-local data.
+func layout_report() -> Dictionary:
+	return {
+		"solids": _layout_solids, "doors": _layout_doors, "gates": _layout_gates, "facing": _layout_facing,
+		"strokes": _layout_strokes, "blobs": _layout_blobs, "course": [], "bridge": Vector2(9999.0, 9999.0),
+		"start": SnowPlan.YARD_CENTER + Vector2(5.0, 4.0),
+		"grid_min": Vector2(-70.0, -80.0), "grid_size": Vector2(230.0, 220.0),
+	}
+
+
+func _ground(world: Vector2) -> float:
+	return _terrain.get_mesh_height(world.x, world.y)
+
+
+func _plan_point(at: Vector2, yaw: float, local: Vector2) -> Vector2:
+	return at + Vector2(local.x * cos(yaw) + local.y * sin(yaw), -local.x * sin(yaw) + local.y * cos(yaw))
+
+
+func _plan_direction(yaw: float, local: Vector2) -> Vector2:
+	return Vector2(local.x * cos(yaw) + local.y * sin(yaw), -local.x * sin(yaw) + local.y * cos(yaw))
+
+
+func _record_solid(label: String, kind: String, at: Vector2, half: Vector2, yaw: float, attached: String = "") -> void:
+	_layout_solids.append({"name": label, "kind": kind, "center": at, "half": half, "yaw": yaw, "attached": attached})
+
+
 func _build_village() -> void:
-	var center: Vector2 = _terrain.get_village_center()
-	var offsets: Array[Vector2] = [Vector2(-28,-18),Vector2(0,-25),Vector2(28,-15),Vector2(-31,13),Vector2(2,18),Vector2(31,15),Vector2(-5,40)]
-	for i in offsets.size():
-		var p: Vector2 = center + offsets[i]
-		# Per direct correction ("the walls of the houses to be made out of
-		# what looks like logs so they're more like log cabins") and ("put a
-		# bed in pretty much everyone's home").
-		var house := TownProps.build_building(2,2,1,ROOF_STRUCTURE,WALL_COLORS[i%WALL_COLORS.size()],WALL_COLORS[(i+1)%WALL_COLORS.size()],TownProps.FLOOR_COLOR,Color(-1.0,-1.0,-1.0),"log",true)
-		_add_roof_snow_cap(house, 2, 2, 1)
-		_build_fireplace(house, 2, 2)
-		house.position = Vector3(p.x,_terrain.get_mesh_height(p.x,p.y),p.y)
-		# TownProps puts its doorway on local -Z. Rotate that axis toward the
-		# village centre (not local +Z, which was the recurring inversion).
-		house.rotation.y = atan2(offsets[i].x, offsets[i].y)
-		add_child(house)
-		_spawn_villager(center + offsets[i]*0.62, i)
-	var inn_pos := center + Vector2(13.0, 39.0)
-	VillageInn.create(self, _terrain, Vector3(inn_pos.x, _terrain.get_mesh_height(inn_pos.x, inn_pos.y), inn_pos.y), "ice_kingdom", "snow_village_inn", 20, "Astrid Snowrest", ROOF_STRUCTURE, WALL_COLORS[0], WINTER_APPEARANCE)
-	_build_winter_merchant(center)
+	_build_ground_plan()
+	var index := 0
+	for spec: Dictionary in SnowPlan.BUILDINGS:
+		_build_building(spec, index)
+		index += 1
+	_build_yard_features()
+	_build_grounds()
+	_build_winter_merchant()
+	_build_lamps()
+	_build_windbreak()
+	_build_residents()
 
 
-## A small winter-goods stall makes the Toboggan a normal piece of this
-## village's economy rather than a debug-only object. Its displayed hat is
-## built from the exact same catalog geometry used in hand and inventory.
-func _build_winter_merchant(center: Vector2) -> void:
-	var offset:=Vector2(42.0,-34.0)
-	var position_2d:=center+offset
-	var yaw:=atan2(offset.x,offset.y)
-	var stall_data:=TownProps.build_stall(Color(0.31,0.38,0.58))
-	var stall:=stall_data["body"] as StaticBody3D
-	stall.name="WinterGoodsStall"
-	stall.position=Vector3(position_2d.x,_terrain.get_mesh_height(position_2d.x,position_2d.y),position_2d.y)
-	stall.rotation.y=yaw
-	add_child(stall)
-	# Catalog item scale is already authored as a handheld/wearable object.
-	# The former 1.5 multiplier made the counter model substantially larger
-	# than the same form after a blorb absorbed and wore it.
-	var display:=TobogganHelm.build_visual(1.0)
-	display.name="DisplayToboggan"
-	display.position=Vector3(0.0,float(stall_data["counter_y"])+0.08,0.0)
-	stall.add_child(display)
-	var vendor: Node3D=NPC_SCENE.instantiate()
-	vendor.set_terrain_reference(_terrain)
-	vendor.stationary=true
-	vendor.is_vendor=true
-	vendor.display_name="Solveig Woolcap"
-	vendor.shop_category="snow"
-	var lines: Array[String]=[
-		"A warm crown makes the mountain wind feel almost friendly.",
-		"I knit the cuff thick. Winter always finds the thin places.",
+# ---------------------------------------------------------------------------
+# Ground
+# ---------------------------------------------------------------------------
+
+func _build_ground_plan() -> void:
+	# Paint, not geometry: the yard, plaza and lanes are trodden earth projected
+	# into the terrain (see GroundPaint), so they follow every bump of the ground.
+	var strokes: Array = []
+	for way: Dictionary in SnowPlan.WAYS:
+		var points: Array[Vector2] = []
+		points.assign(way["points"])
+		var world: Array[Vector2] = []
+		for local in GroundPaint.smooth(points, LANE_SAMPLE_SPACING):
+			world.append(_center + local)
+		strokes.append({"points": world, "width": float(way["width"])})
+		_layout_strokes.append({"points": points, "width": float(way["width"])})
+	var blobs: Array = [
+		{"center": _center + SnowPlan.YARD_CENTER, "radii": SnowPlan.YARD_RADII},
+		{"center": _center + SnowPlan.PLAZA_CENTER, "radii": SnowPlan.PLAZA_RADII},
 	]
-	vendor.vendor_lines=lines
-	VillagerAppearance.apply_profile(vendor,IDENTITIES.size()+1,4,true,WINTER_APPEARANCE)
-	var layout:=TownProps.vendor_layout(position_2d,yaw)
-	var vendor_position:=layout["position"] as Vector2
-	vendor.position=Vector3(vendor_position.x,_terrain.get_mesh_height(vendor_position.x,vendor_position.y),vendor_position.y)
-	vendor.facing_degrees=layout["facing_degrees"] as float
+	for wear: Dictionary in SnowPlan.WEAR_BLOBS:
+		blobs.append({"center": _center + (wear["center"] as Vector2), "radii": wear["radii"]})
+		_layout_blobs.append({"center": wear["center"], "radii": wear["radii"]})
+	_layout_blobs.append({"center": SnowPlan.YARD_CENTER, "radii": SnowPlan.YARD_RADII})
+	_layout_blobs.append({"center": SnowPlan.PLAZA_CENTER, "radii": SnowPlan.PLAZA_RADII})
+	GroundPaint.paint(
+		self, strokes, blobs, _ground(_center), "TrodderGround",
+		Color(0.90, 0.82, 0.68), Color(0.97, 0.93, 0.82), 0.8, 20260912
+	)
+
+
+# ---------------------------------------------------------------------------
+# Buildings
+# ---------------------------------------------------------------------------
+
+func _build_building(source: Dictionary, index: int) -> void:
+	var spec := source.duplicate(true)
+	var at: Vector2 = spec["at"]
+	var yaw := deg_to_rad(float(spec["yaw"]))
+	var kind := str(spec["kind"])
+	spec["log_color"] = LogHouse.LOG_COLORS[index % LogHouse.LOG_COLORS.size()]
+	spec["pitch_deg"] = float(spec.get("pitch_deg", 50.0 if kind == "stabbur" else 46.0))
+	spec["bellcast"] = bool(spec.get("bellcast", false))
+	spec["openings"] = SnowBuildings.openings_for(spec)
+	var accent := ACCENTS[index % ACCENTS.size()]
+	for opening: Dictionary in spec["openings"]:
+		opening["accent"] = accent
+	if bool(spec.get("turf", false)):
+		spec["roof_color"] = Color(0.30, 0.34, 0.27)
+	if bool(spec.get("open_front", false)):
+		spec["skip_walls"] = ["front"]
+	var body := LogHouse.build(spec)
+	body.name = str(spec["name"])
+	var lift := 0.0
+	if bool(spec.get("raised", false)):
+		lift = 0.9
+		SnowBuildings.stabbur_piers(body, spec, lift)
+	if spec.has("gallery"):
+		SnowBuildings.gallery(body, spec)
+	if spec.has("lean_to"):
+		var lean: Dictionary = spec["lean_to"]
+		SnowBuildings.lean_to(body, spec, float(lean["side"]), float(lean["depth"]))
+	if bool(spec.get("bell_frame", false)):
+		SnowBuildings.bell_tower(body, spec)
+	NordicHearth.build(body, spec, _smoke_rng, _smoke_puffs)
+	SnowInteriors.build(body, spec)
+	_dress_kind(body, spec)
+	body.position = Vector3(at.x + _center.x, _ground(_center + at) + lift, at.y + _center.y)
+	body.rotation.y = yaw
+	add_child(body)
+	_record_building(spec, at, yaw)
+	if kind == "inn":
+		_pending_inn = body
+	elif kind == "inn_wing" and _pending_inn != null:
+		_open_inn(_pending_inn, body)
+
+
+## Astrid's inn keeps the rest-and-lodging function every inn has: a paid night in
+## a guest bed in the sleeping wing, with the keeper at her counter in the hall.
+func _open_inn(hall: StaticBody3D, wing: StaticBody3D) -> void:
+	var inn := VillageInn.new()
+	inn.world_id = "ice_kingdom"
+	inn.point_id = "snow_village_inn"
+	inn.fee = 20
+	inn.innkeeper_name = "Astrid Snowrest"
+	add_child(inn)
+	var wake := Marker3D.new()
+	wake.position = wing.get_meta("wake_local", Vector3(-6.0, 0.88, 1.6))
+	wing.add_child(wake)
+	var stand := Marker3D.new()
+	stand.position = wing.get_meta("stand_local", Vector3(-3.0, 0.1, -2.1))
+	wing.add_child(stand)
+	inn._wake_marker = wake
+	inn._stand_marker = stand
+	var keeper: Node3D = NPC_SCENE.instantiate()
+	keeper.set_terrain_reference(_terrain)
+	keeper.display_name = "Astrid Snowrest"
+	keeper.stationary = true
+	keeper.fixed_ground_y = hall.global_position.y
+	VillagerAppearance.apply_profile(keeper, 0, 0, true, WINTER_APPEARANCE)
+	var lines: Array[String] = [
+		"Boots in the mudroom, boards in the drying room. The stove dries a mitten in an hour and a boot overnight.",
+		"I bake the rye at four. By five Freya has two loaves under her coat for Solveig, and the rest are still cooling.",
+		"The long room sleeps six. On rescue nights it sleeps nine, and nobody complains about the floor.",
+	]
+	keeper.talk_lines = lines
+	keeper.dialog_actions_provider = inn._rest_actions
+	var keeper_local: Vector3 = hall.get_meta("keeper_local", Vector3(-1.4, 0.0, 3.85))
+	hall.add_child(keeper)
+	keeper.position = keeper_local
+	# Derive the orientation from the place Astrid serves. Her figure's local
+	# +Z is its forward axis, so this continues to work if the counter moves.
+	var room_focus := Vector2(-1.4, 0.0)
+	var keeper_to_room := room_focus - Vector2(keeper_local.x, keeper_local.z)
+	keeper.facing_degrees = rad_to_deg(atan2(keeper_to_room.x, keeper_to_room.y))
+	inn._register.call_deferred()
+
+
+func _dress_kind(body: StaticBody3D, spec: Dictionary) -> void:
+	var cells: Vector2 = spec["cells"]
+	var width := cells.x * LogHouse.CELL
+	var depth := cells.y * LogHouse.CELL
+	match str(spec["kind"]):
+		"icehouse":
+			# Earth banked against the walls: soft mounds, no fire, no window.
+			for side: float in [-1.0, 1.0]:
+				var berm := SuperEgg.build_part(
+					Vector3(0.9, 0.75, depth * 0.5 - 0.3), Color(0.62, 0.68, 0.74), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
+				)
+				berm.position = Vector3(side * (width * 0.5 + 0.55), 0.5, 0.0)
+				body.add_child(berm)
+				CollisionPolicy.add_box(body, berm, Vector3(1.8, 1.5, depth - 0.6), berm.position, Basis(), true)
+			var back_berm := SuperEgg.build_part(
+				Vector3(width * 0.5 - 0.3, 0.75, 0.9), Color(0.62, 0.68, 0.74), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
+			)
+			back_berm.position = Vector3(0.0, 0.5, depth * 0.5 + 0.55)
+			body.add_child(back_berm)
+			CollisionPolicy.add_box(body, back_berm, Vector3(width - 0.6, 1.5, 1.8), back_berm.position, Basis(), true)
+		"woodstore":
+			for row in 3:
+				SnowBuildings.log_stack(body, Vector3(-width * 0.5 + 2.0 + float(row) * 2.9, 0.0, depth * 0.5 - 0.7), 2.4, 4 + row % 2)
+		"forester":
+			SnowBuildings.log_stack(body, Vector3(width * 0.5 - 1.3, 0.0, depth * 0.5 + 0.7), 2.6, 4, 0.0)
+		"bathhouse":
+			SnowBuildings.log_stack(body, Vector3(-1.3, 0.0, depth * 0.5 + 0.7), 2.4, 3, 0.0)
+		"inn":
+			# Benches under the gallery for those waiting, below the common-room windows.
+			Furnishings.bench(body, Vector3(0.4, 0.16, -depth * 0.5 - 0.7), 0.0, 1.7)
+			Furnishings.bench(body, Vector3(-2.8, 0.16, -depth * 0.5 - 0.7), 0.0, 1.7)
+		"rescue":
+			# A rack of rescue sleds at the gallery's far end.
+			for sx: float in [-0.55, 0.55]:
+				var post := SuperEgg.build_part(Vector3(0.06, 0.9, 0.06), SnowGrounds.TIMBER, 4.0, 4.0)
+				post.position = Vector3(width * 0.5 - 1.0 + sx, 0.9, -depth * 0.5 - 0.8)
+				body.add_child(post)
+				CollisionPolicy.add_box(body, post, Vector3(0.12, 1.8, 0.12), post.position, Basis(), false)
+			var sled_colors: Array[Color] = [Color(0.7, 0.28, 0.2), Color(0.2, 0.42, 0.6), Color(0.78, 0.6, 0.2)]
+			for i in 3:
+				var sled := SuperEgg.build_part(Vector3(0.28, 0.025, 0.95), sled_colors[i], 4.0, 4.0)
+				sled.position = Vector3(width * 0.5 - 1.0 - 0.4 + 0.4 * float(i), 1.0, -depth * 0.5 - 0.8)
+				sled.rotation.x = -0.55
+				body.add_child(sled)
+				CollisionPolicy.mark_decorative(sled)
+
+
+func _record_building(spec: Dictionary, at: Vector2, yaw: float) -> void:
+	var cells: Vector2 = spec["cells"]
+	var width := cells.x * LogHouse.CELL
+	var depth := cells.y * LogHouse.CELL
+	var name_text := str(spec["name"])
+	_record_solid(name_text, "building", at, Vector2(width, depth) * 0.5, yaw, str(spec.get("attached_to", "")))
+	for opening: Dictionary in spec["resolved_openings"]:
+		if str(opening["kind"]) != "door":
+			continue
+		if spec.has("passage_x") and absf(float(opening["x"]) - float(spec["passage_x"])) < 0.01 \
+				and str(opening["wall"]) == ("front" if str(spec["kind"]) == "inn_wing" else "back"):
+			continue
+		var x := float(opening["x"])
+		var local_pos := Vector2.ZERO
+		var local_dir := Vector2.ZERO
+		match str(opening["wall"]):
+			"front":
+				local_pos = Vector2(x, -depth * 0.5)
+				local_dir = Vector2(0, -1)
+			"back":
+				local_pos = Vector2(x, depth * 0.5)
+				local_dir = Vector2(0, 1)
+			"west":
+				local_pos = Vector2(-width * 0.5, x)
+				local_dir = Vector2(-1, 0)
+			_:
+				local_pos = Vector2(width * 0.5, x)
+				local_dir = Vector2(1, 0)
+		var label := name_text if str(opening["wall"]) == "front" else name_text + " (back)"
+		_layout_doors.append({
+			"name": label, "kind": "door", "width": float(opening["width"]),
+			"pos": _plan_point(at, yaw, local_pos), "dir": _plan_direction(yaw, local_dir),
+		})
+	if bool(spec.get("open_front", false)):
+		# An open-fronted store is entered along its whole front.
+		_layout_doors.append({
+			"name": name_text, "kind": "door", "width": 3.0,
+			"pos": _plan_point(at, yaw, Vector2(0.0, -depth * 0.5)), "dir": _plan_direction(yaw, Vector2(0, -1)),
+		})
+	if spec.has("lean_to"):
+		var lean: Dictionary = spec["lean_to"]
+		var side := float(lean["side"])
+		var depth_out := float(lean["depth"])
+		_record_solid(
+			name_text + "LeanTo", "shed", _plan_point(at, yaw, Vector2(side * (width * 0.5 + depth_out * 0.5), 0.0)),
+			Vector2(depth_out * 0.5, depth * 0.5), yaw, name_text
+		)
+
+
+
+# ---------------------------------------------------------------------------
+# Grounds: plots, fences, firewood, snow banks
+# ---------------------------------------------------------------------------
+
+func _world3(local: Vector2) -> Vector3:
+	var world := _center + local
+	return Vector3(world.x, _ground(world), world.y)
+
+
+func _building_spec(label: String) -> Dictionary:
+	for spec: Dictionary in SnowPlan.BUILDINGS:
+		if str(spec["name"]) == label:
+			return spec
+	return {}
+
+
+func _build_grounds() -> void:
+	for plot: Dictionary in SnowPlan.PLOTS:
+		_build_plot(plot)
+	for pile: Dictionary in SnowPlan.WOODPILES:
+		_build_woodpile(pile)
+	_build_snow_banks()
+
+
+## One enclosed plot: fence on every side but the house wall it abuts, a gate on the
+## side the lane serves, raised beds, a barrel and a compost heap.
+func _build_plot(plot: Dictionary) -> void:
+	var rect: Rect2 = plot["rect"]
+	var x0 := rect.position.x
+	var z0 := rect.position.y
+	var x1 := x0 + rect.size.x
+	var z1 := z0 + rect.size.y
+	var gate_spec: Dictionary = plot["gate"]
+	var boards: Array = plot["board_sides"]
+	var abuts := str(plot["abuts"])
+	var sides := {
+		"north": [Vector2(x0, z0), Vector2(x1, z0)], "south": [Vector2(x0, z1), Vector2(x1, z1)],
+		"west": [Vector2(x0, z0), Vector2(x0, z1)], "east": [Vector2(x1, z0), Vector2(x1, z1)],
+	}
+	for side: String in sides.keys():
+		var a: Vector2 = sides[side][0]
+		var b: Vector2 = sides[side][1]
+		if side == abuts:
+			# The house is this side. Short returns close any gap to its corners.
+			var spec := _building_spec(str(plot.get("house", "")))
+			if not spec.is_empty():
+				continue
+			continue
+		var segments: Array = [[a, b]]
+		if str(gate_spec["side"]) == side:
+			var at := float(gate_spec["at"])
+			var along := (b - a).normalized()
+			var gate_point := Vector2(at, a.y) if side in ["north", "south"] else Vector2(a.x, at)
+			segments = [[a, gate_point - along * 0.7], [gate_point + along * 0.7, b]]
+			var gate_world := _world3(gate_point)
+			SnowGrounds.gate(self, gate_world, atan2(-(b.y - a.y), b.x - a.x))
+			var inward := Vector2(0, -1) if side == "south" else (Vector2(0, 1) if side == "north" else (Vector2(1, 0) if side == "west" else Vector2(-1, 0)))
+			_layout_gates.append({"pos": gate_point, "dir": inward})
+		for segment: Array in segments:
+			var sa: Vector2 = segment[0]
+			var sb: Vector2 = segment[1]
+			if sa.distance_to(sb) < 0.3:
+				continue
+			SnowGrounds.fence_run(self, _world3(sa), _world3(sb), boards.has(side))
+			var direction := (sb - sa).normalized()
+			_record_solid(str(plot["name"]) + "Fence", "fence", (sa + sb) * 0.5, Vector2(sa.distance_to(sb) * 0.5, 0.12), atan2(-direction.y, direction.x))
+	if str(plot["name"]) == "ForesterYard":
+		# Short returns from the yard's north and south fences to the house corners.
+		for z_pair in [[21.5, 23.2], [32.8, 34.5]]:
+			SnowGrounds.fence_run(self, _world3(Vector2(-31.2, z_pair[0])), _world3(Vector2(-31.2, z_pair[1])), false)
+			_record_solid("ForesterYardReturn", "fence", Vector2(-31.2, (z_pair[0] + z_pair[1]) * 0.5), Vector2(0.12, 0.85), 0.0)
+	var seed_value := 100
+	for bed_spec: Dictionary in plot["beds"]:
+		var at: Vector2 = bed_spec["at"]
+		var size: Vector2 = bed_spec["size"]
+		SnowGrounds.bed(self, _world3(at), size, str(bed_spec["kind"]), seed_value)
+		seed_value += 17
+		_record_solid(str(plot["name"]) + "Bed", "prop", at, size * 0.5, 0.0)
+	SnowGrounds.water_barrel(self, _world3(plot["barrel"]))
+	_record_solid("WaterBarrel", "prop", plot["barrel"], Vector2(0.4, 0.4), 0.0)
+	SnowGrounds.compost(self, _world3(plot["compost"]))
+	_record_solid("CompostHeap", "prop", plot["compost"], Vector2(0.9, 0.75), 0.0)
+	if plot.has("stacks"):
+		for stack: Vector3 in plot["stacks"]:
+			SnowBuildings.log_stack(self, _world3(Vector2(stack.x, stack.y)), 2.4, 4, stack.z)
+			var half := Vector2(1.2, 0.5) if absf(stack.z) < 0.1 else Vector2(0.5, 1.2)
+			_record_solid("YardWoodStack", "prop", Vector2(stack.x, stack.y), half, 0.0)
+		var block: Vector2 = plot["block"]
+		SnowGrounds.chopping_block(self, _world3(block))
+		_record_solid("ChoppingBlock", "prop", block, Vector2(0.3, 0.3), 0.0)
+		var horse: Vector2 = plot["sawhorse"]
+		SnowGrounds.sawhorse(self, _world3(horse), 0.3)
+		_record_solid("Sawhorse", "prop", horse, Vector2(0.7, 0.3), 0.3)
+
+
+## Firewood stacked on a blank back wall, under the eave and below the sills.
+func _build_woodpile(pile: Dictionary) -> void:
+	var spec := _building_spec(str(pile["building"]))
+	if spec.is_empty():
+		return
+	var at: Vector2 = spec["at"]
+	var yaw := deg_to_rad(float(spec["yaw"]))
+	var cells: Vector2 = spec["cells"]
+	var depth := cells.y * LogHouse.CELL
+	var length := float(pile["length"])
+	var local := Vector2(float(pile["x"]), depth * 0.5 + 0.62)
+	var spot := _plan_point(at, yaw, local)
+	SnowBuildings.log_stack(self, _world3(spot), length, int(pile["rows"]), yaw)
+	_record_solid(str(pile["building"]) + "Woodpile", "prop", spot, Vector2(length * 0.5, 0.5), yaw, str(pile["building"]))
+
+
+## Snow drifted against the walls that face the weather (west), below the sills,
+## never across a door, a lane or a gallery.
+func _build_snow_banks() -> void:
+	var counter := 0
+	for spec: Dictionary in SnowPlan.BUILDINGS:
+		var kind := str(spec["kind"])
+		if kind in ["stabbur", "woodstore", "icehouse", "naust"]:
+			continue
+		var at: Vector2 = spec["at"]
+		var yaw := deg_to_rad(float(spec["yaw"]))
+		var cells: Vector2 = spec["cells"]
+		var width := cells.x * LogHouse.CELL
+		var depth := cells.y * LogHouse.CELL
+		var openings := SnowBuildings.openings_for(spec)
+		var walls := {
+			"front": {"normal": Vector2(0, -1), "centre": Vector2(0, -depth * 0.5), "length": width, "turn": 0.0},
+			"back": {"normal": Vector2(0, 1), "centre": Vector2(0, depth * 0.5), "length": width, "turn": 0.0},
+			"west": {"normal": Vector2(-1, 0), "centre": Vector2(-width * 0.5, 0), "length": depth, "turn": PI * 0.5},
+			"east": {"normal": Vector2(1, 0), "centre": Vector2(width * 0.5, 0), "length": depth, "turn": PI * 0.5},
+		}
+		for wall: String in walls.keys():
+			var info: Dictionary = walls[wall]
+			var normal := _plan_direction(yaw, info["normal"])
+			if normal.dot(Vector2(-1, 0)) < 0.7:
+				continue
+			if wall == "front" and spec.has("gallery"):
+				continue
+			var wall_length: float = info["length"]
+			# Intervals along the wall (local coordinate), minus door spans.
+			var intervals: Array[Vector2] = [Vector2(-wall_length * 0.5 + 0.9, wall_length * 0.5 - 0.9)]
+			for opening: Dictionary in openings:
+				if str(opening["wall"]) != wall or str(opening["kind"]) != "door":
+					continue
+				var half_span := float(opening["width"]) * 0.5 + 1.9
+				intervals = TownProps._subtract_interval(intervals, Vector2(float(opening["x"]) - half_span, float(opening["x"]) + half_span))
+			for interval in intervals:
+				if interval.y - interval.x < 1.8:
+					continue
+				# Short drifts rather than one long bank, so a woodpile or a lane
+				# interrupts only the drift it touches.
+				var chunks := maxi(int(ceil((interval.y - interval.x) / 3.4)), 1)
+				for chunk in chunks:
+					var from := lerpf(interval.x, interval.y, float(chunk) / float(chunks))
+					var to := lerpf(interval.x, interval.y, float(chunk + 1) / float(chunks))
+					if to - from < 1.6:
+						continue
+					var middle := (from + to) * 0.5
+					var along_axis := Vector2(1, 0) if wall in ["front", "back"] else Vector2(0, 1)
+					var local_point: Vector2 = (info["centre"] as Vector2) + along_axis * middle + (info["normal"] as Vector2) * 1.3
+					var spot := _plan_point(at, yaw, local_point)
+					if _bank_blocked(spot, to - from - 0.4):
+						continue
+					counter += 1
+					SnowGrounds.snow_bank(self, _world3(spot), to - from - 0.5, yaw + float(info["turn"]), 0.7, 500 + counter)
+
+
+func _bank_blocked(spot: Vector2, length: float) -> bool:
+	for way: Dictionary in SnowPlan.WAYS:
+		var points: Array = way["points"]
+		for i in points.size() - 1:
+			var closest := Geometry2D.get_closest_point_to_segment(spot, points[i], points[i + 1])
+			if spot.distance_to(closest) < float(way["width"]) * 0.5 + length * 0.5 + 0.4:
+				return true
+	for solid: Dictionary in _layout_solids:
+		if str(solid["kind"]) == "building":
+			continue
+		if spot.distance_to(solid["center"]) < (solid["half"] as Vector2).length() + 1.2:
+			return true
+	return false
+
+# ---------------------------------------------------------------------------
+# Yard: communal fire court, cistern, weather mast
+# ---------------------------------------------------------------------------
+
+func _build_yard_features() -> void:
+	for feature: Dictionary in SnowPlan.YARD_FEATURES:
+		var at: Vector2 = feature["at"]
+		var world := _center + at
+		var node := Node3D.new()
+		node.name = str(feature["name"])
+		node.position = Vector3(world.x, _ground(world), world.y)
+		add_child(node)
+		match str(feature["kind"]):
+			"communal_hearth":
+				var radius := float(feature["radius"])
+				SnowGrounds.communal_hearth_court(node, Vector3.ZERO, radius)
+				_record_solid(str(feature["name"]), "prop", at, Vector2(radius, radius), 0.0)
+			"mound":
+				var radii: Vector2 = feature["radii"]
+				var mound := StaticBody3D.new()
+				mound.collision_layer = 1
+				node.add_child(mound)
+				var turf := SuperEgg.build_part(Vector3(radii.x + 0.3, 0.2, radii.y + 0.3), Color(0.40, 0.44, 0.34), 2.4, 2.2)
+				turf.position.y = 0.05
+				mound.add_child(turf)
+				CollisionPolicy.mark_decorative(turf)
+				var mesh := SuperEgg.build_part(Vector3(radii.x, 0.85, radii.y), Color(0.9, 0.93, 0.96), 2.2, 2.0)
+				mesh.position.y = 0.0
+				mound.add_child(mesh)
+				CollisionPolicy.add_box(mound, mesh, Vector3(radii.x * 1.5, 1.2, radii.y * 1.5), Vector3(0, 0.35, 0), Basis(), true)
+				_record_solid(str(feature["name"]), "prop", at, radii * 0.8, 0.0)
+			"stone":
+				var holder := StaticBody3D.new()
+				holder.collision_layer = 1
+				holder.position.y = 0.7
+				# The carved face looks toward the lake road, where travellers arrive.
+				holder.rotation.y = -2.5
+				node.add_child(holder)
+				var height := float(feature["height"])
+				var stone := SuperEgg.build_part(Vector3(0.5, height * 0.5, 0.17), Color(0.50, 0.51, 0.54), 4.6, 3.0)
+				stone.position.y = height * 0.5
+				holder.add_child(stone)
+				CollisionPolicy.add_box(holder, stone, Vector3(1.0, height, 0.36), stone.position, stone.basis, false)
+				# Carved symbols, never letters: three incised bands and a ring.
+				for i in 3:
+					var band := SuperEgg.build_part(Vector3(0.36, 0.03, 0.02), Color(0.22, 0.24, 0.28), 4.0, 4.0)
+					band.position = Vector3(0.0, 0.7 + float(i) * 0.38, -0.175)
+					band.rotation.y = 0.0
+					holder.add_child(band)
+					CollisionPolicy.mark_decorative(band)
+				_record_solid(str(feature["name"]), "prop", at, Vector2(0.55, 0.22), -2.5)
+			"fire_ring":
+				var radius := float(feature["radius"])
+				var holder := StaticBody3D.new()
+				holder.collision_layer = 1
+				node.add_child(holder)
+				for i in 12:
+					var angle := TAU * float(i) / 12.0
+					var rock := SuperEgg.build_part(Vector3(0.24, 0.17, 0.2), Color(0.5, 0.5, 0.52).darkened(0.05 * float(i % 3)), 2.8, 2.8)
+					rock.position = Vector3(cos(angle) * radius * 0.55, 0.15, sin(angle) * radius * 0.55)
+					rock.rotation.y = -angle
+					holder.add_child(rock)
+					CollisionPolicy.mark_decorative(rock)
+				for i in 6:
+					var angle := TAU * (float(i) + 0.5) / 6.0 + 0.3
+					var seat := SuperEgg.build_part(Vector3(0.5, 0.14, 0.14), LogHouse.LOG_COLORS[i % 3], 4.0, 4.0)
+					seat.position = Vector3(cos(angle) * radius, 0.15, sin(angle) * radius)
+					seat.rotation.y = -angle + PI * 0.5
+					holder.add_child(seat)
+					CollisionPolicy.mark_decorative(seat)
+				var embers := ParticleFX.build_flame_particles(9, 0.5, 0.75, 1.5, 2.4, -0.5)
+				embers.position.y = 0.2
+				node.add_child(embers)
+				CollisionPolicy.mark_decorative(embers)
+				var glow := OmniLight3D.new()
+				glow.position.y = 1.0
+				glow.light_color = Color(1.0, 0.55, 0.22)
+				glow.light_energy = 1.1
+				glow.omni_range = 9.0
+				glow.shadow_enabled = false
+				node.add_child(glow)
+				_record_solid(str(feature["name"]), "prop", at, Vector2(radius * 0.6, radius * 0.6), 0.0)
+			"cistern":
+				var radius := float(feature["radius"])
+				var holder := StaticBody3D.new()
+				holder.collision_layer = 1
+				node.add_child(holder)
+				var curb := SuperEgg.build_part(Vector3(radius, 0.4, radius), Color(0.55, 0.55, 0.58), 3.0, 3.0)
+				curb.position.y = 0.4
+				holder.add_child(curb)
+				CollisionPolicy.add_cylinder(holder, curb, radius, 0.8, curb.position, false)
+				var cap := SuperEgg.build_part(Vector3(radius * 0.85, 0.06, radius * 0.85), LogHouse.LOG_COLORS[1], 3.4, 3.4)
+				cap.position.y = 0.84
+				holder.add_child(cap)
+				CollisionPolicy.mark_decorative(cap)
+				_record_solid(str(feature["name"]), "prop", at, Vector2(radius, radius), 0.0)
+			"mast":
+				var height := float(feature["height"])
+				var holder := StaticBody3D.new()
+				holder.collision_layer = 1
+				node.add_child(holder)
+				var pole := SuperEgg.build_part(Vector3(0.1, height * 0.5, 0.1), LogHouse.LOG_COLORS[2], 4.0, 4.0)
+				pole.position.y = height * 0.5
+				holder.add_child(pole)
+				CollisionPolicy.add_box(holder, pole, Vector3(0.2, height, 0.2), pole.position, Basis(), false)
+				# A wind vane and a streamer: Elin reads the weather from them.
+				var vane := SuperEgg.build_part(Vector3(0.5, 0.08, 0.02), Color(0.72, 0.3, 0.2), 4.0, 4.0)
+				vane.position = Vector3(0.45, height - 0.2, 0)
+				holder.add_child(vane)
+				CollisionPolicy.mark_decorative(vane)
+				_record_solid(str(feature["name"]), "prop", at, Vector2(0.3, 0.3), 0.0)
+
+
+## Solveig's winter-goods frontage. The displayed Toboggan is built from the
+## exact catalog geometry used in hand and inventory.
+func _build_winter_merchant() -> void:
+	var position_2d := _center + SnowPlan.WINTER_STALL
+	var yaw := atan2(SnowPlan.YARD_CENTER.x - SnowPlan.WINTER_STALL.x, SnowPlan.YARD_CENTER.y - SnowPlan.WINTER_STALL.y)
+	# Face the yard squarely rather than at a skew angle.
+	yaw = PI * 0.5 * roundf(yaw / (PI * 0.5))
+	var stall_data := TownProps.build_stall(Color(0.31, 0.38, 0.58))
+	var stall := stall_data["body"] as StaticBody3D
+	stall.name = "WinterGoodsStall"
+	stall.position = Vector3(position_2d.x, _ground(position_2d), position_2d.y)
+	stall.rotation.y = yaw
+	add_child(stall)
+	_record_solid("WinterGoodsStall", "stall", SnowPlan.WINTER_STALL, Vector2(1.5, 0.9), yaw)
+	_layout_facing.append({"name": "WinterGoodsStall", "kind": "stall", "pos": SnowPlan.WINTER_STALL, "dir": _plan_direction(yaw, Vector2(0, 1))})
+	var display := TobogganHelm.build_visual(1.0)
+	display.name = "DisplayToboggan"
+	display.position = Vector3(0.0, float(stall_data["counter_y"]) + 0.08, 0.0)
+	stall.add_child(display)
+	var vendor: Node3D = NPC_SCENE.instantiate()
+	vendor.set_terrain_reference(_terrain)
+	vendor.stationary = true
+	vendor.is_vendor = true
+	vendor.display_name = "Solveig Woolcap"
+	vendor.shop_category = "snow"
+	var lines: Array[String] = [
+		"Every Toboggan has a double cuff. The two that came back with frost inside were single.",
+		"Astrid's rye and Anja's berries sit at the end of my board. Neither of them has a stall.",
+	]
+	vendor.vendor_lines = lines
+	VillagerAppearance.apply_profile(vendor, IDENTITIES.size() + 1, 4, true, WINTER_APPEARANCE)
+	var layout := TownProps.vendor_layout(position_2d, yaw)
+	var vendor_position := layout["position"] as Vector2
+	vendor.position = Vector3(vendor_position.x, _ground(vendor_position), vendor_position.y)
+	vendor.facing_degrees = layout["facing_degrees"] as float
 	add_child(vendor)
 
 
-func _spawn_villager(pos: Vector2, index: int) -> void:
+func _build_lamps() -> void:
+	for spot: Vector2 in SnowPlan.LAMPS:
+		var world := _center + spot
+		var lantern := TownProps.build_lantern()
+		lantern.position = Vector3(world.x, _ground(world), world.y)
+		add_child(lantern)
+		_record_solid("Lamp", "prop", spot, Vector2(0.2, 0.2), 0.0)
+
+
+func _build_windbreak() -> void:
+	var grove_rng := RandomNumberGenerator.new()
+	grove_rng.seed = 90210
+	for grove: Dictionary in SnowPlan.PINE_GROVES:
+		var centre: Vector2 = grove["center"]
+		var placed := 0
+		var attempts := 0
+		while placed < int(grove["count"]) and attempts < 60:
+			attempts += 1
+			var angle := grove_rng.randf_range(0.0, TAU)
+			var distance := sqrt(grove_rng.randf()) * float(grove["radius"])
+			var spot := centre + Vector2(cos(angle), sin(angle)) * distance
+			if not _pine_spot_is_clear(spot):
+				continue
+			var world := _center + spot
+			var tree := NatureProps.build_pine_tree(grove_rng.randf_range(6.5, 10.5), ElementPalette.SNOW_BODY)
+			tree.position = Vector3(world.x, _ground(world), world.y)
+			tree.rotation.y = grove_rng.randf_range(0.0, TAU)
+			add_child(tree)
+			_record_solid("Pine", "tree", spot, Vector2(0.5, 0.5), 0.0)
+			placed += 1
+
+
+## A pine never stands on a way, within 4 m of a building or in the yard.
+func _pine_spot_is_clear(spot: Vector2) -> bool:
+	for way: Dictionary in SnowPlan.WAYS:
+		var points: Array = way["points"]
+		for i in points.size() - 1:
+			var closest := Geometry2D.get_closest_point_to_segment(spot, points[i], points[i + 1])
+			if spot.distance_to(closest) < float(way["width"]) * 0.5 + 2.5:
+				return false
+	for blob in [[SnowPlan.YARD_CENTER, SnowPlan.YARD_RADII], [SnowPlan.PLAZA_CENTER, SnowPlan.PLAZA_RADII]]:
+		var offset: Vector2 = spot - (blob[0] as Vector2)
+		var radii: Vector2 = blob[1]
+		if Vector2(offset.x / (radii.x + 2.0), offset.y / (radii.y + 2.0)).length() < 1.0:
+			return false
+	for building: Dictionary in _layout_solids:
+		if str(building["kind"]) != "building":
+			continue
+		var at: Vector2 = building["center"]
+		var half: Vector2 = building["half"]
+		var yaw: float = building["yaw"]
+		var offset := spot - at
+		var local := Vector2(offset.x * cos(yaw) - offset.y * sin(yaw), offset.x * sin(yaw) + offset.y * cos(yaw))
+		if absf(local.x) < half.x + 4.0 and absf(local.y) < half.y + 4.0:
+			return false
+	return true
+
+
+# ---------------------------------------------------------------------------
+# People
+# ---------------------------------------------------------------------------
+
+func _build_residents() -> void:
+	for resident: String in RESIDENT_IDENTITY.keys():
+		if not SnowPlan.HOMES.has(resident):
+			continue
+		var home: Dictionary = SnowPlan.HOMES[resident]
+		_spawn_villager(_center + (home["at"] as Vector2), int(RESIDENT_IDENTITY[resident]), resident)
+
+
+## Local plan entries converted to world coordinates for NPC.
+func _world_schedule(local_entries: Array) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for local_entry: Dictionary in local_entries:
+		var converted := local_entry.duplicate(true)
+		converted["at"] = _center + (local_entry["at"] as Vector2)
+		var route: Array[Vector2] = []
+		for local_point in local_entry.get("route", []):
+			var point: Vector2 = local_point
+			route.append(_center + point)
+		converted["route"] = route
+		result.append(converted)
+	return result
+
+
+func _spawn_villager(pos: Vector2, index: int, resident: String = "") -> void:
 	var npc: Node3D = NPC_SCENE.instantiate()
 	npc.set_terrain_reference(_terrain)
 	var identity: Dictionary = IDENTITIES[index]
 	npc.display_name = identity["name"]
-	var lines: Array[String] = [identity["line"]]
+	var lines: Array[String] = []
+	lines.assign(identity["lines"])
 	npc.talk_lines = lines
 	var gender_index: int = _gender_index_through(index, bool(identity["female"]))
 	VillagerAppearance.apply_profile(npc, index, gender_index, bool(identity["female"]), WINTER_APPEARANCE)
 	npc.wander_boundary_center = _terrain.get_village_center()
 	npc.wander_boundary_radius = _terrain.get_village_radius() - 8.0
 	npc.position = Vector3(pos.x,_terrain.get_mesh_height(pos.x,pos.y),pos.y)
+	if SnowPlan.DAILY_SCHEDULES.has(resident):
+		npc.call("configure_daily_schedule", _world_schedule(SnowPlan.DAILY_SCHEDULES[resident]))
 	add_child(npc)
+
+
+
 
 
 func _build_fishing_camp() -> void:
@@ -168,8 +824,11 @@ func _build_fishing_camp() -> void:
 	var ice_y: float = _terrain.get_ice_level()
 	var fisher_pos := hole + Vector2(3.8, 0.0)
 	var hut_pos := hole + Vector2(7.0,1.5)
-	var hut := TownProps.build_building(1,1,1,ROOF_STRUCTURE,Color(0.45,0.31,0.2))
-	_add_roof_snow_cap(hut, 1, 1, 1)
+	var hut_spec := {
+		"name": "IvarsIceHut", "cells": Vector2(1, 1), "floors": 1, "log_color": LogHouse.LOG_COLORS[3],
+		"openings": [{"wall": "front", "x": 0.0, "width": 1.2, "bottom": 0.0, "top": LogHouse.DOOR_TOP, "kind": "door", "leaves": 1}],
+	}
+	var hut := LogHouse.build(hut_spec)
 	hut.position = Vector3(hut_pos.x,ice_y,hut_pos.y)
 	var hut_to_fisher: Vector2 = fisher_pos - hut_pos
 	# The hut door is local -Z, so its yaw is the negated target heading.
@@ -183,7 +842,10 @@ func _build_fishing_camp() -> void:
 	VillagerAppearance.apply_profile(fisher, IDENTITIES.size(), 3, false, WINTER_APPEARANCE)
 	var fisher_to_hole: Vector2 = hole - fisher_pos
 	fisher.facing_degrees = rad_to_deg(atan2(fisher_to_hole.x, fisher_to_hole.y))
-	var lines: Array[String] = ["The hole stays open if I clear it before dawn.", "Some days the fish watch me more closely than I watch them."]
+	var lines: Array[String] = [
+		"I clear the hole before dawn. By noon it has a skin again.",
+		"The hut is a windbreak and a place for my bait. I sleep at home, next to a stove, like a person.",
+	]
 	fisher.talk_lines = lines
 	fisher.position = Vector3(fisher_pos.x,ice_y+0.08,fisher_pos.y)
 	add_child(fisher)
@@ -201,172 +863,3 @@ func _gender_index_through(population_index: int, female: bool) -> int:
 		if bool(IDENTITIES[i]["female"]) == female:
 			gender_index += 1
 	return gender_index
-
-
-## An interior hearth (a real recessed firebox opening -- back panel + two
-## side cheeks + a hearth floor, not a solid block -- topped by a mantel and
-## a stone chimney breast) whose flue climbs up through the actual sloped
-## roof, per direct instruction: "put a fireplace... with a chimney going up
-## and out through the roof... in the bottom of the fireplace, there should
-## be some actual fire burning." Placed against the north (rear) wall,
-## centered in X so it stays clear of both the south-wall doorway and
-## _build_house_bed()'s own north-WEST corner placement. Height math mirrors
-## _add_roof_snow_cap()'s own peak_y formula so the flue's top lands just
-## above the real roof surface at this same Z, not a guessed constant.
-## Per direct correction ("the fireplace seems a bit too small and the
-## chimney too skinny... the fire element... is not like in an opening like
-## a normal fireplace would have. It's sort of like being smushed") -- the
-## old version was one solid stone block with the flame overlapping it; this
-## builds an actual open recess (like a real fireplace) with the flame
-## genuinely sitting inside it, and every dimension is bigger throughout.
-const FIREPLACE_STONE := Color(0.34, 0.34, 0.36)
-const HEARTH_OPENING_WIDTH := 0.95
-const HEARTH_OPENING_HEIGHT := 0.95
-const HEARTH_DEPTH := 0.55
-const HEARTH_WALL_THICKNESS := 0.13
-func _build_fireplace(house: StaticBody3D, w: int, d: int) -> void:
-	var hearth_z := float(d) * TownProps.CELL_SIZE * 0.5 - 0.5
-	var half_footprint_w := HEARTH_OPENING_WIDTH * 0.5 + HEARTH_WALL_THICKNESS
-	var half_depth_local := HEARTH_DEPTH * 0.5
-
-	var hearth_floor := SuperEgg.build_part(
-		Vector3(half_footprint_w, 0.06, half_depth_local), FIREPLACE_STONE,
-		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-	)
-	hearth_floor.position = Vector3(0.0, 0.06, hearth_z)
-	house.add_child(hearth_floor)
-	CollisionPolicy.add_box(
-		house, hearth_floor, Vector3(half_footprint_w * 2.0, 0.12, half_depth_local * 2.0),
-		hearth_floor.position, Basis(), true
-	)
-	var hearth_top := 0.12
-
-	# Back panel closes the recess at the far (wall) side -- the near side,
-	# toward the room, stays open: that opening is the whole point.
-	var back := SuperEgg.build_part(
-		Vector3(half_footprint_w, HEARTH_OPENING_HEIGHT * 0.5, HEARTH_WALL_THICKNESS * 0.5),
-		FIREPLACE_STONE, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-	)
-	var back_z := hearth_z + half_depth_local - HEARTH_WALL_THICKNESS * 0.5
-	back.position = Vector3(0.0, hearth_top + HEARTH_OPENING_HEIGHT * 0.5, back_z)
-	house.add_child(back)
-	CollisionPolicy.add_box(
-		house, back, Vector3(half_footprint_w * 2.0, HEARTH_OPENING_HEIGHT, HEARTH_WALL_THICKNESS),
-		back.position, Basis(), true
-	)
-
-	var sides: Array[float] = [-1.0, 1.0]
-	for side in sides:
-		var cheek := SuperEgg.build_part(
-			Vector3(HEARTH_WALL_THICKNESS * 0.5, HEARTH_OPENING_HEIGHT * 0.5, half_depth_local),
-			FIREPLACE_STONE, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-		)
-		var cheek_x := side * (HEARTH_OPENING_WIDTH * 0.5 + HEARTH_WALL_THICKNESS * 0.5)
-		cheek.position = Vector3(cheek_x, hearth_top + HEARTH_OPENING_HEIGHT * 0.5, hearth_z)
-		house.add_child(cheek)
-		CollisionPolicy.add_box(
-			house, cheek, Vector3(HEARTH_WALL_THICKNESS, HEARTH_OPENING_HEIGHT, half_depth_local * 2.0),
-			cheek.position, Basis(), true
-		)
-
-	var mantel_thickness := 0.18
-	var mantel := SuperEgg.build_part(
-		Vector3(half_footprint_w + 0.06, mantel_thickness * 0.5, half_depth_local + 0.06),
-		FIREPLACE_STONE.darkened(0.05), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
-	)
-	var mantel_y := hearth_top + HEARTH_OPENING_HEIGHT + mantel_thickness * 0.5
-	mantel.position = Vector3(0.0, mantel_y, hearth_z)
-	house.add_child(mantel)
-	CollisionPolicy.add_box(
-		house, mantel, Vector3((half_footprint_w + 0.06) * 2.0, mantel_thickness, (half_depth_local + 0.06) * 2.0),
-		mantel.position, Basis(), true
-	)
-
-	var breast_height := 1.85
-	var breast := SuperEgg.build_part(
-		Vector3(half_footprint_w * 0.85, breast_height * 0.5, half_depth_local * 0.8),
-		FIREPLACE_STONE.darkened(0.05), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-	)
-	var breast_y := mantel_y + mantel_thickness * 0.5 + breast_height * 0.5
-	breast.position = Vector3(0.0, breast_y, hearth_z)
-	house.add_child(breast)
-	CollisionPolicy.add_box(
-		house, breast, Vector3(half_footprint_w * 1.7, breast_height, half_depth_local * 1.6),
-		breast.position, Basis(), true
-	)
-
-	# Same peak_y derivation _add_roof_snow_cap() uses (this house is always
-	# floors=1), so the flue's own top sits just above the true roof surface
-	# at this exact Z rather than a hand-guessed height.
-	var half_depth := float(d) * TownProps.CELL_SIZE * 0.5 + TownProps.ROOF_OVERHANG
-	var slope_len := half_depth / cos(TownProps.ROOF_PITCH)
-	var peak_y := TownProps.FLOOR_HEIGHT + slope_len * sin(TownProps.ROOF_PITCH)
-	var roof_underside_y := peak_y - tan(TownProps.ROOF_PITCH) * absf(hearth_z)
-	var shaft_base_y := breast_y + breast_height * 0.5
-	var shaft_top_y := roof_underside_y + 0.7
-	var shaft_height := maxf(shaft_top_y - shaft_base_y, 0.3)
-	var shaft_radius := 0.24
-	var shaft := SuperEgg.build_part(
-		Vector3(shaft_radius, shaft_height * 0.5, shaft_radius), FIREPLACE_STONE,
-		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-	)
-	shaft.position = Vector3(0.0, shaft_base_y + shaft_height * 0.5, hearth_z)
-	house.add_child(shaft)
-	CollisionPolicy.add_box(
-		house, shaft, Vector3(shaft_radius * 2.0, shaft_height, shaft_radius * 2.0), shaft.position, Basis(), true
-	)
-
-	var cap := SuperEgg.build_part(
-		Vector3(shaft_radius * 1.35, 0.07, shaft_radius * 1.35), FIREPLACE_STONE.darkened(0.1),
-		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
-	)
-	cap.position = Vector3(0.0, shaft_base_y + shaft_height + 0.07, hearth_z)
-	house.add_child(cap)
-
-	# The real fire model (see ParticleFX.build_flame_particles() -- the
-	# exact same recipe fire_kingdom_village.gd's own braziers use, just
-	# tuned for an indoor hearth), now genuinely sitting inside the open
-	# recess above, not overlapping solid stone.
-	var flame := ParticleFX.build_flame_particles(11, 0.6, 0.85, 1.8, 2.8, -0.6)
-	flame.position = Vector3(0.0, hearth_top + 0.05, hearth_z)
-	house.add_child(flame)
-	CollisionPolicy.mark_decorative(flame)
-	var light := OmniLight3D.new()
-	light.position = Vector3(0.0, hearth_top + 0.35, hearth_z)
-	light.light_color = Color(1.0, 0.42, 0.12)
-	light.light_energy = 1.1
-	light.omni_range = 8.0
-	light.shadow_enabled = false
-	house.add_child(light)
-
-	_smoke_puffs.append_array(
-		ChimneySmoke.spawn(house, Vector3(0.0, shaft_base_y + shaft_height + 0.12, hearth_z), _smoke_rng, 4)
-	)
-
-
-## The structural roof stays dark on its underside. These two very thin
-## panels sit only on the outward/upward faces, like settled snow rather than
-## recolouring the whole solid roof (which made its underside look snowy).
-func _add_roof_snow_cap(building: Node3D, width_cells: int, depth_cells: int, floors: int) -> void:
-	var width: float = float(width_cells) * TownProps.CELL_SIZE + TownProps.ROOF_OVERHANG * 2.0
-	var half_depth: float = float(depth_cells) * TownProps.CELL_SIZE * 0.5 + TownProps.ROOF_OVERHANG
-	var slope_length: float = half_depth / cos(TownProps.ROOF_PITCH)
-	var peak_y: float = float(floors) * TownProps.FLOOR_HEIGHT + slope_length * sin(TownProps.ROOF_PITCH)
-	var ridge := Vector3(0.0, peak_y, 0.0)
-	for north_side in [true, false]:
-		var z_sign := 1.0 if north_side else -1.0
-		var length_direction := Vector3(0.0, -sin(TownProps.ROOF_PITCH), z_sign * cos(TownProps.ROOF_PITCH)).normalized()
-		var width_direction := Vector3.RIGHT
-		var outward_normal := width_direction.cross(length_direction).normalized()
-		if outward_normal.y < 0.0:
-			outward_normal = -outward_normal
-		var snow := SuperEgg.build_part(
-			Vector3(width * 0.5, 0.025, slope_length * 0.5),
-			ROOF_SNOW,
-			SuperEgg.EPSILON_FLAT,
-			SuperEgg.EPSILON_FLAT
-		)
-		snow.name = "RoofSnowCap"
-		snow.basis = Basis(width_direction, outward_normal, length_direction)
-		snow.position = ridge + length_direction * slope_length * 0.5 + outward_normal * 0.035
-		building.add_child(snow)

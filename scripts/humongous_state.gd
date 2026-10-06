@@ -27,6 +27,17 @@ var _interaction_registered := false
 var _transitioning := false
 
 
+func reset_for_new_session() -> void:
+	mode = MODE_RELEASED
+	interaction_unlocked = false
+	has_entered_core = false
+	released_scene = OUTSKIRTS_SCENE
+	_transitioning = false
+	_set_interaction_registered(false)
+	_world_body = null
+	changed.emit()
+
+
 func _ready() -> void:
 	_interaction_area = Area3D.new()
 	_interaction_area.name = "HumongousInteraction"

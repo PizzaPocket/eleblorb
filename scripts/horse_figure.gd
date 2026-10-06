@@ -405,7 +405,7 @@ const EYE_FLATTEN := 0.55
 
 # ---- Tail ----
 const TAIL_BASE_RADIUS := 0.05
-const TAIL_DOME_STEPS := 4
+const TAIL_DOME_STEPS := BlorbSuit.CAPSULE_DOME_STEPS
 const LIMB_RADIAL_SEGMENTS := BlorbSuit.LIMB_RADIAL_SEGMENTS
 const LIMB_RINGS_PER_SEGMENT := BlorbSuit.RINGS_PER_SEGMENT
 ## NO LONGER USED for the legs (see _rebuild_leg_tube()'s own comment for
@@ -419,7 +419,7 @@ const LIMB_CAP_FRACTION := BlorbSuit.TUBE_CAP_FRACTION
 ## same technique and same step count as this file's own tail
 ## (TAIL_DOME_STEPS) and monkey_figure.gd's tail before it -- see
 ## _rebuild_leg_tube()'s own comment for the full reasoning.
-const LEG_HOOF_DOME_STEPS := 4
+const LEG_HOOF_DOME_STEPS := BlorbSuit.CAPSULE_DOME_STEPS
 
 # ---- Gait ----
 ## UNVERIFIED GUESS (per this file's own class doc comment and the
@@ -533,6 +533,17 @@ const HOCK_FLEX_AMOUNT := deg_to_rad(45.0)
 ## First-draft magnitude, unverified in-engine like every other unspecified
 ## number in this rig -- adjustable on report.
 const RUN_BEND_MULTIPLIER := 1.4
+
+## Running needs deeper knee/hock flex, but multiplying the already broad
+## WALK stride arcs by RUN_BEND_MULTIPLIER drove the fore and hind tubes
+## through each other beneath the belly. Keep the expressive 1.4x joint
+## folding above, while giving the long whole-leg sweeps their own bounded
+## gallop arcs. These preserve a clear longitudinal lane between the front
+## and rear limbs even at the closest part of the gallop cycle.
+const RUN_FRONT_STRIDE_FORWARD_AMOUNT := deg_to_rad(42.0)
+const RUN_FRONT_STRIDE_BACKWARD_AMOUNT := deg_to_rad(16.0)
+const RUN_HIND_STRIDE_FORWARD_AMOUNT := deg_to_rad(35.0)
+const RUN_HIND_STRIDE_BACKWARD_AMOUNT := deg_to_rad(16.0)
 
 ## ---- Jump ---- Per direct correction ("we'll want to add a jump ability...
 ## think how the player jumps, that he bends all his leg joints gradually
@@ -1675,20 +1686,24 @@ static func _animate_front_leg(leg: Dictionary, delta: float, moving: bool, phas
 	var knee: Node3D = leg["knee"]
 	var fetlock: Node3D = leg["fetlock"]
 	if moving:
-		var bend_scale := RUN_BEND_MULTIPLIER if running else 1.0
 		var swing := sin(phase)
 		# UNVERIFIED GUESS sign (see class doc/const comments above): negative
 		# rotation.x = forward under this rig's inherited base convention, so
 		# multiplying by -1 makes a positive `swing` move the leg forward.
 		# Swings around FRONT_HUMERUS_REST_ANGLE, not zero. ASYMMETRIC per
 		# direct correction -- see FRONT_STRIDE_FORWARD_AMOUNT's own comment.
-		var front_swing_amount := FRONT_STRIDE_FORWARD_AMOUNT if swing > 0.0 else FRONT_STRIDE_BACKWARD_AMOUNT
-		shoulder.rotation.x = FRONT_HUMERUS_REST_ANGLE - swing * front_swing_amount * bend_scale
+		var front_swing_amount := (
+			(RUN_FRONT_STRIDE_FORWARD_AMOUNT if swing > 0.0 else RUN_FRONT_STRIDE_BACKWARD_AMOUNT)
+			if running
+			else (FRONT_STRIDE_FORWARD_AMOUNT if swing > 0.0 else FRONT_STRIDE_BACKWARD_AMOUNT)
+		)
+		shoulder.rotation.x = FRONT_HUMERUS_REST_ANGLE - swing * front_swing_amount
 		var lift := maxf(swing, 0.0)
 		# See FRONT_CANNON_REST_ANGLE's own comment for why this dynamic term
 		# is POSITIVE (backward) now, reversed from this rig's earlier
 		# "flexes forward" finding -- flexes around FRONT_CANNON_REST_ANGLE.
-		knee.rotation.x = FRONT_CANNON_REST_ANGLE + lift * KNEE_FLEX_AMOUNT * bend_scale
+		var flex_scale := RUN_BEND_MULTIPLIER if running else 1.0
+		knee.rotation.x = FRONT_CANNON_REST_ANGLE + lift * KNEE_FLEX_AMOUNT * flex_scale
 	else:
 		shoulder.rotation.x = lerp_angle(shoulder.rotation.x, FRONT_HUMERUS_REST_ANGLE, LEG_SETTLE_SPEED * delta)
 		knee.rotation.x = lerp_angle(knee.rotation.x, FRONT_CANNON_REST_ANGLE, LEG_SETTLE_SPEED * delta)
@@ -1703,18 +1718,22 @@ static func _animate_hind_leg(leg: Dictionary, delta: float, moving: bool, phase
 	var hip: Node3D = leg["hip"]
 	var hock: Node3D = leg["hock"]
 	if moving:
-		var bend_scale := RUN_BEND_MULTIPLIER if running else 1.0
 		var swing := sin(phase)
 		# ASYMMETRIC per direct correction -- see HIND_STRIDE_BACKWARD_AMOUNT's
 		# own comment ("the swing of the hind legs is swinging way too far
 		# back... cap the backwards swing").
-		var hind_swing_amount := HIND_STRIDE_FORWARD_AMOUNT if swing > 0.0 else HIND_STRIDE_BACKWARD_AMOUNT
-		hip.rotation.x = HIND_FEMUR_REST_ANGLE - swing * hind_swing_amount * bend_scale
+		var hind_swing_amount := (
+			(RUN_HIND_STRIDE_FORWARD_AMOUNT if swing > 0.0 else RUN_HIND_STRIDE_BACKWARD_AMOUNT)
+			if running
+			else (HIND_STRIDE_FORWARD_AMOUNT if swing > 0.0 else HIND_STRIDE_BACKWARD_AMOUNT)
+		)
+		hip.rotation.x = HIND_FEMUR_REST_ANGLE - swing * hind_swing_amount
 		var lift := maxf(swing, 0.0)
 		# Confirmed backwards by earlier direct report ("the knees of his
 		# back legs should angle back not forward") -- POSITIVE (backward),
 		# now flexing around HIND_CANNON_REST_ANGLE instead of zero.
-		hock.rotation.x = HIND_CANNON_REST_ANGLE + lift * HOCK_FLEX_AMOUNT * bend_scale
+		var flex_scale := RUN_BEND_MULTIPLIER if running else 1.0
+		hock.rotation.x = HIND_CANNON_REST_ANGLE + lift * HOCK_FLEX_AMOUNT * flex_scale
 	else:
 		hip.rotation.x = lerp_angle(hip.rotation.x, HIND_FEMUR_REST_ANGLE, LEG_SETTLE_SPEED * delta)
 		hock.rotation.x = lerp_angle(hock.rotation.x, HIND_CANNON_REST_ANGLE, LEG_SETTLE_SPEED * delta)

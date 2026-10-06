@@ -386,6 +386,9 @@ var _heightfield_ready := false
 var _chunks: Array[Dictionary] = []
 var _hills := FastNoiseLite.new()
 var _swell := FastNoiseLite.new()
+## Low-frequency domain warp shared by height and colour ownership. Without
+## this, smooth TerrainWindow blends still terminate on ruler-straight lines.
+var _biome_edges := FastNoiseLite.new()
 var _rng := RandomNumberGenerator.new()
 var _water_lake: NaturalLake
 var _frozen_lake: NaturalLake
@@ -409,6 +412,11 @@ func _init() -> void:
 	_swell.seed = 20260922
 	_swell.frequency = SWELL_FREQUENCY
 	_swell.fractal_octaves = 2
+	_biome_edges.seed = 20261002
+	_biome_edges.noise_type = FastNoiseLite.TYPE_SIMPLEX_SMOOTH
+	_biome_edges.frequency = 0.011
+	_biome_edges.fractal_octaves = 3
+	_biome_edges.fractal_gain = 0.48
 	_water_lake = _channel_lake(
 		border_x("water") + LAKE_SHORE_GAP, border_x("ice") - LAKE_EAST_SHORE_GAP,
 		LAKE_RADIUS, LAKE_EDGE_VARIATION, LAKE_DEPTH, LAKE_SHELF, 20260919, LAKE_SLOPE_WIDTH
@@ -646,7 +654,53 @@ static func world_ocean_height(x: float, z: float) -> float:
 
 ## 1 across the water zone's sea and shores.
 func _ocean_weight(x: float) -> float:
-	return smoothstep(border_x("water") - 40.0, border_x("water"), x) * (1.0 - smoothstep(border_x("ice") - 20.0, border_x("ice"), x))
+	return _organic_band_weight(
+		Vector2(x, path_center_z(x)),
+		border_x("water") - 40.0, border_x("water"),
+		border_x("ice") - 20.0, border_x("ice"), 311.0
+	)
+
+
+## Stable sideways displacement for a biome boundary. `salt` gives adjacent
+## zones independent contours while the low frequency stays geological.
+func _biome_edge_warp(at: Vector2, salt: float, amplitude: float = 24.0) -> float:
+	return _biome_edges.get_noise_2d(at.x + salt, at.y - salt * 0.37) * amplitude
+
+
+func _organic_band_weight(
+	point: Vector2, west_outer: float, west_inner: float,
+	east_inner: float, east_outer: float, salt: float
+) -> float:
+	var west_warp := _biome_edge_warp(Vector2(west_inner, point.y), salt)
+	var east_warp := _biome_edge_warp(Vector2(east_inner, point.y), salt + 719.0)
+	var west := smoothstep(west_outer + west_warp, west_inner + west_warp, point.x)
+	var east := 1.0 - smoothstep(east_inner + east_warp, east_outer + east_warp, point.x)
+	return west * east
+
+
+## One ownership mask for geometry and colour. Plant and Ground are long
+## cross-island biomes, so their imported terrain follows the island crown
+## rather than ending at an obsolete rectangular Z extent when the coast is
+## widened for a titan clearing or lake. Their end contours wander naturally.
+## The volcano remains radial, but its circle is gently domain-warped too.
+func _window_weight(window: TerrainWindow, point: Vector2) -> float:
+	if window == _plant_window or window == _dirt_window:
+		var salt := 101.0 if window == _plant_window else 907.0
+		var left := window.target_center.x - window.half_size.x
+		var right := window.target_center.x + window.half_size.x
+		var left_warp := _biome_edge_warp(Vector2(left, point.y), salt)
+		var right_warp := _biome_edge_warp(Vector2(right, point.y), salt + 463.0)
+		return (
+			smoothstep(left + left_warp, left + window.blend + left_warp, point.x)
+			* (1.0 - smoothstep(right - window.blend + right_warp, right + right_warp, point.x))
+		)
+	if window == _volcano_window:
+		var warped := point + Vector2(
+			_biome_edges.get_noise_2d(point.x + 1703.0, point.y) * 18.0,
+			_biome_edges.get_noise_2d(point.x, point.y - 1703.0) * 18.0
+		)
+		return window.weight(warped)
+	return window.weight(point)
 
 
 ## The Ocean Kingdom's rolling seabed (its _raw_height()'s layered waves).
@@ -710,9 +764,15 @@ func _mountain_profile(x: float) -> float:
 	return MOUNTAIN_PEAK_HEIGHT * pow(1.0 - t, 1.35)
 
 
-## 1 across the mountain (foot to foot), easing off just beyond each foot.
-func _mountain_weight(x: float) -> float:
-	return smoothstep(MOUNTAIN_FOOT_X - 30.0, MOUNTAIN_FOOT_X + 20.0, x) * (1.0 - smoothstep(MOUNTAIN_END_X - 20.0, MOUNTAIN_END_X + 25.0, x))
+## 1 across the mountain (foot to foot), easing off along the same organic
+## contours used by its snow colour. Geometry and albedo must agree here;
+## otherwise a straight mountain toe remains visible even after repainting it.
+func _mountain_weight(point: Vector2) -> float:
+	return _organic_band_weight(
+		point,
+		MOUNTAIN_FOOT_X - 30.0, MOUNTAIN_FOOT_X + 20.0,
+		MOUNTAIN_END_X - 20.0, MOUNTAIN_END_X + 25.0, 1511.0
+	)
 
 
 ## The snowboard course's centreline across the valley at `x`, weaving side to
@@ -792,7 +852,7 @@ func _course_weight(point: Vector2) -> float:
 ## The mountain's full relief at `point`: the profile, rising into the gully
 ## sides, with the course's trough and berms and moguls beyond it.
 func _mountain_height(point: Vector2) -> float:
-	var weight := _mountain_weight(point.x)
+	var weight := _mountain_weight(point)
 	if weight <= 0.0:
 		return 0.0
 	var height := _mountain_profile(point.x)
@@ -838,7 +898,7 @@ func _raw_height(x: float, z: float) -> float:
 	var path_z := path_center_z(x)
 	var start_distance := point.distance_to(START_CENTER)
 	# The groomed course is smooth: no hills or swell underfoot.
-	var roughness := 1.0 - _course_weight(point) * _mountain_weight(x)
+	var roughness := 1.0 - _course_weight(point) * _mountain_weight(point)
 	var height := _hills.get_noise_2d(x, z) * CROSSROADS_HILL_AMPLITUDE * roughness
 	height += _swell.get_noise_2d(x, z) * SWELL_AMPLITUDE * roughness * smoothstep(START_FLATTEN_RADIUS + 20.0, START_FLATTEN_RADIUS + 80.0, start_distance)
 	# The Crossroads' arrival clearing: genuinely level, hills returning only
@@ -846,7 +906,7 @@ func _raw_height(x: float, z: float) -> float:
 	height *= smoothstep(START_FLATTEN_RADIUS, START_FLATTEN_RADIUS + START_FLATTEN_TRANSITION, start_distance)
 	# Kingdom windows replace the valley ground within them.
 	for biome in _windows:
-		var weight := biome.weight(point)
+		var weight := _window_weight(biome, point)
 		if weight > 0.0:
 			height = lerpf(height, biome.height(point), weight)
 	# Clear the imported perpendicular wash across the Ground zone's entrance.
@@ -908,7 +968,7 @@ func _raw_height(x: float, z: float) -> float:
 	# a shelving bed. The volcano owns its own ground: the carve fades out
 	# across its window, so the basin shelves up into the volcanic body
 	# instead of cutting a trough through it.
-	var volcano_weight := _volcano_window.weight(point)
+	var volcano_weight := _window_weight(_volcano_window, point)
 	if volcano_weight < 1.0:
 		height = lerpf(_lava_lake.carve(height, point), height, volcano_weight)
 	height += volcano_weight * VOLCANO_RISE
@@ -943,47 +1003,75 @@ func _raw_height(x: float, z: float) -> float:
 ## 1 on snow: the whole mountain, and the snowfield round the frozen lake.
 func _snow_weight(point: Vector2) -> float:
 	var snowfield := 1.0 - smoothstep(ICE_RADIUS + ICE_SNOWFIELD_WIDTH - 12.0, ICE_RADIUS + ICE_SNOWFIELD_WIDTH, _frozen_lake.local_distance(point))
-	return maxf(snowfield, _mountain_weight(point.x))
+	# The mountain remains fully snowy, but its feet meet neighbouring biomes
+	# along wandering contours instead of two straight lines across the island.
+	var mountain := _mountain_weight(point)
+	return maxf(snowfield, mountain)
 
 
 func _height_color(x: float, z: float, height: float) -> Color:
 	var point := Vector2(x, z)
-	var color := CROSSROADS_GRASS.lerp(OCEAN_KINGDOM_TERRAIN.GRASS_COLOR, _ocean_weight(x))
+	var ocean := _organic_band_weight(
+		point,
+		border_x("water") - 40.0, border_x("water"),
+		border_x("ice") - 20.0, border_x("ice"), 311.0
+	)
+	var color := CROSSROADS_GRASS.lerp(OCEAN_KINGDOM_TERRAIN.GRASS_COLOR, ocean)
 	for biome in _windows:
-		var weight := biome.weight(point)
+		var weight := _window_weight(biome, point)
 		if weight > 0.0:
 			color = color.lerp(biome.color(point), weight)
-	if _frozen_lake.coverage(point) > 0.12:
-		return FROZEN_LAKEBED
 	# Snow is always snow-coloured: the same test decides the colour here and
 	# the snow surface in is_snow_footstep_surface().
 	var snow := _snow_weight(point)
 	if snow > 0.0:
 		color = color.lerp(SNOW, snow)
+	# The bed beneath the visible ice must remain blue-grey rather than inherit
+	# snow white, but its ownership feathers in with the same lake coverage;
+	# the former coverage > 0.12 early return drew a hard shoreline contour.
+	var frozen_bed := smoothstep(0.04, 0.72, _frozen_lake.coverage(point))
+	if frozen_bed > 0.0:
+		color = color.lerp(FROZEN_LAKEBED, frozen_bed)
 	# The pit's wall is bare rock; its floor stays grass.
-	if point.distance_to(START_CENTER) < PIT_RIM_RADIUS + 1.0:
-		var pit := _pit_height(point)
-		if pit > -PIT_DEPTH + 0.3 and pit < -0.2:
-			color = color.lerp(CLIFF_ROCK, 0.85)
+	var pit_distance := point.distance_to(START_CENTER)
+	var pit_wall := smoothstep(PIT_FLOOR_RADIUS - 1.0, PIT_FLOOR_RADIUS + 2.0, pit_distance)
+	pit_wall *= 1.0 - smoothstep(PIT_RIM_RADIUS - 2.0, PIT_RIM_RADIUS + 1.0, pit_distance)
+	color = color.lerp(CLIFF_ROCK, pit_wall * 0.85)
 	# The sea, in the Ocean Kingdom's colours: sandy beaches and island
 	# shores, shallow and deep seabed by depth, island grass above the sand.
 	var beach := 1.0 - smoothstep(LAKE_RADIUS + NaturalLake.BANK_WIDTH - 4.0, LAKE_RADIUS + NaturalLake.BANK_WIDTH + 8.0, _water_lake.local_distance(point))
-	if beach > 0.0 or _island_rise(point) > 0.0:
+	var island_weight := _island_rise(point)
+	if beach > 0.0 or island_weight > 0.0:
 		var sea_color := OCEAN_KINGDOM_TERRAIN.BEACH_COLOR
 		var above_water := height - WATER_LEVEL
-		if above_water > 1.0 and _island_rise(point) > 0.0:
+		if above_water > 1.0 and island_weight > 0.0:
 			sea_color = OCEAN_KINGDOM_TERRAIN.GRASS_COLOR
 		elif above_water < -2.0:
 			sea_color = OCEAN_KINGDOM_TERRAIN.SHALLOW_FLOOR_COLOR.lerp(
 				OCEAN_KINGDOM_TERRAIN.DEEP_FLOOR_COLOR, smoothstep(-6.0, -16.0, above_water)
 			)
-		color = color.lerp(sea_color, maxf(beach, 1.0 if _island_rise(point) > 0.0 else 0.0))
+		color = color.lerp(sea_color, maxf(beach, island_weight))
 	# The high course before the cliff, the cliff and the chasm: bare rock.
-	var rock := smoothstep(DIRT_START_X + DIRT_LENGTH - 20.0, DIRT_START_X + DIRT_LENGTH + 10.0, x)
+	var rock_boundary := DIRT_START_X + DIRT_LENGTH + _biome_edge_warp(
+		Vector2(DIRT_START_X + DIRT_LENGTH, z), 2269.0, 30.0
+	)
+	var rock := smoothstep(rock_boundary - 30.0, rock_boundary + 18.0, x)
 	if rock > 0.0:
 		color = color.lerp(CLIFF_ROCK, rock)
-	if absf(z - path_center_z(x)) > _valley_half_width(x) + 10.0 or x < X_MIN + 70.0 or x > X_MAX - 70.0:
-		color = STONE.lerp(color, 0.35)
+	# Match the same feathered island cliff used by geometry. The prior boolean
+	# test changed colour in one vertex row, leaving a conspicuous outline even
+	# though the physical coast itself descended smoothly.
+	var path_z := path_center_z(x)
+	var side := signf(z - path_z)
+	var half_width := _valley_half_width(x, side)
+	var side_cliff := smoothstep(
+		half_width + 4.0, half_width + ISLAND_CLIFF_WIDTH * 0.8,
+		absf(z - path_z)
+	)
+	var west_cliff := 1.0 - smoothstep(X_MIN + 8.0, X_MIN + 92.0, x)
+	var east_cliff := smoothstep(X_MAX - 105.0, X_MAX - 8.0, x)
+	var cliff_weight := maxf(side_cliff, maxf(west_cliff, east_cliff))
+	color = color.lerp(STONE, cliff_weight * 0.65)
 	return color
 
 
@@ -1114,18 +1202,13 @@ const CRATER_LIP_REACH := 1.45
 const CRATER_LIP_HEIGHT := 0.22
 
 
-## Each biome's own terrain material, as its world builds it: the Crossroads
-## and Primate Kingdom shade ground like their foliage (fully metallic, fully
-## rough); the Ice, Rock/Ground and Fire Kingdoms use plain diffuse ground.
-## Keyed by the x at which each takes over, west to east.
+## One continuous surface material across the island. Switching BRDFs at the
+## portal coordinates produced perfectly straight lighting seams even where
+## vertex colours were already blended organically. Biome identity belongs to
+## the shared colour masks; the subtle snow normal is harmless on rough soil
+## and keeps its former grazing-light definition on the mountain.
 func _terrain_materials() -> Array:
-	return [
-		[X_MIN, _terrain_material(1.0, 1.0)],                  # pit, forest, plant
-		[border_x("water"), _terrain_material(0.0, 0.86)],     # the sea
-		[border_x("ice"), _snow_terrain_material()],           # ice, snow
-		[border_x("ground"), _terrain_material(0.0, 0.94)],    # ground, sky cliff
-		[border_x("fire"), _terrain_material(0.0, 0.96)],      # fire
-	]
+	return [[X_MIN, _snow_terrain_material()]]
 
 
 func _terrain_material(metallic: float, roughness: float) -> StandardMaterial3D:
@@ -1356,6 +1439,31 @@ func _build_liquid_surfaces() -> void:
 	_frozen_lake.build_frozen(self, ICE_SURFACE_LEVEL, ICE_THICKNESS, WATER_LEVEL, false)
 	_build_volcano_lava()
 	_build_chasm_lava()
+	_build_lava_surface_effects()
+
+
+func _build_lava_surface_effects() -> void:
+	var points: Array = []
+	# A sparse set across the long organic lake keeps the feature readable
+	# without turning dozens of off-camera particle systems into background cost.
+	for index in 6:
+		var along := float(index + 1) / 7.0
+		var x := lerpf(
+			_lava_lake.center.x - _lava_lake.half_length,
+			_lava_lake.center.x + _lava_lake.half_length,
+			along
+		)
+		var lateral := sin(float(index) * 2.17) * LAVA_LAKE_RADIUS * 0.34
+		points.append(Vector3(x, CHASM_LAVA_LEVEL, _lava_lake.center.y + lateral))
+	for index in 4:
+		var angle := TAU * (float(index) / 4.0 + 0.1)
+		var radius := FIRE_KINGDOM_TERRAIN.LAVA_MOUTH_RADIUS * (0.28 + 0.1 * float(index % 2))
+		points.append(Vector3(
+			VOLCANO_CENTER.x + cos(angle) * radius,
+			_volcano_lava_level,
+			VOLCANO_CENTER.y + sin(angle) * radius
+		))
+	LavaSurfaceFX.attach(self, points, 20260927)
 
 
 ## The lava lake's own surface sheet, drawn to the same organic outline the
@@ -1421,6 +1529,10 @@ func _lake_basin_footprint() -> Dictionary:
 
 
 func _build_world_ocean() -> void:
+	# DemoWorld owns this custom instance because its deep playable lake needs a
+	# basin-shaped exclusion. Its DayNightCycle therefore has generic planetary
+	# ocean creation disabled; otherwise staging can create an earlier uncut
+	# sphere that remains visible underneath this correctly masked one.
 	# The basin is dug far below this sea, so its surface would otherwise cut
 	# straight across the inside of the lake. The sea is not drawn over the
 	# basin's own footprint, and that footprint stops short of where the

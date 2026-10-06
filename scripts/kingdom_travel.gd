@@ -12,6 +12,12 @@ extends Node
 ## scene's own arrival code, then cleared.
 var pending_gate_id: String = ""
 
+## TEMPORARY: a title-screen test start (see DebugKingdomStart). The kingdom's
+## bootstrap starts the loadout once; `debug_loadout_in_use` stays set for the run
+## so a kingdom's own test scaffold does not add a second party.
+var debug_loadout: String = ""
+var debug_loadout_in_use: bool = false
+
 const TRANSITION_COVER_DURATION := 0.35
 
 

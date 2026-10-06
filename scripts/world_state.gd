@@ -89,6 +89,45 @@ var seed_of_life_planted_day: int = -1
 var life_tree_last_harvest_day: int = -1
 var dinosaur_resurrected: bool = false
 var debug_crossroads_loadout_applied: bool = false
+## Reusable world-door progression. Ordinary doors do not need an id; locked
+## story doors sharing an id unlock together and stay unlocked across travel.
+var _unlocked_door_ids: Dictionary = {}
+var ohio_inn_guest_rewarded: bool = false
+
+
+## A title-screen launch is a genuinely fresh run. Scene replacement alone
+## cannot provide that guarantee because this node persists across Demo,
+## Campaign, kingdom travel, and returning to the title.
+func reset_for_new_game() -> void:
+	_collected_ids.clear()
+	game_time_hours = MORNING_HOUR
+	calendar_day = 0
+	player_current_hp = 100.0
+	manchego_joined = false
+	blorbus_unlocked = false
+	opening_wake_completed = false
+	false_hero_defeated = false
+	player_title = ""
+	ice_kingdom_visited = false
+	chinese_village_farmer_heard = false
+	chinese_village_chef_defeated = false
+	chinese_village_control_granted = false
+	chinese_village_emperor_deposed = false
+	chinese_village_blorbs_taken = false
+	chinese_village_blorbs_rescued = false
+	chinese_village_chef_dialog_beat = 0
+	chinese_village_rule_delegated = false
+	pandy_joined = false
+	sun_wu_kong_freed = false
+	sun_wu_kong_has_jingu_bang = false
+	sun_wu_kong_summon_unlocked = false
+	lava_slide_helm_gifted = false
+	seed_of_life_planted_day = -1
+	life_tree_last_harvest_day = -1
+	dinosaur_resurrected = false
+	debug_crossroads_loadout_applied = false
+	_unlocked_door_ids.clear()
+	ohio_inn_guest_rewarded = false
 
 
 func advance_to_morning() -> void:
@@ -103,6 +142,15 @@ func is_collected(id: String) -> bool:
 func mark_collected(id: String) -> void:
 	if id != "":
 		_collected_ids[id] = true
+
+
+func is_door_unlocked(id: String) -> bool:
+	return id != "" and _unlocked_door_ids.has(id)
+
+
+func unlock_door(id: String) -> void:
+	if id != "":
+		_unlocked_door_ids[id] = true
 
 
 ## False Hero only ever appears once Blorbus has awakened AND the party has

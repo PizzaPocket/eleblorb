@@ -144,26 +144,23 @@ const FUR_PAD_SIDE_INSET := 0.18
 ## Deeper than the side inset -- per direct instruction, "even more inset
 ## on the toes [fingertips]" than on the sides.
 const FUR_PAD_TIP_INSET := 0.35
-## How far the pad's own center bulges out above the bare surface beneath
-## it, tapering to 0 at the pad's own rim -- raised through several rounds
-## now (0.0006, then 0.0031, as a flat constant offset before the pad
-## became a real domed volume; then 0.014 once it was) per repeated direct
-## correction it still wasn't clipping out enough to read as visible.
-## FUR_PAD_DOME_FALLOFF_EXPONENT below also now keeps most of the pad's own
-## area near this full height instead of tapering smoothly from the center
-## outward, so the raised area itself reads bigger too, not just taller.
-const FUR_PAD_DOME_HEIGHT := 0.032
+## A hair patch is a shallow slab following the hand/foot surface, not a
+## second rounded body part.  The old 0.032 rise became a conspicuous convex
+## lump on Da Hou Zi because the entire mesh correctly scales with him.  This
+## much smaller reveal keeps the fur visibly proud of the skin while the low
+## falloff exponent below confines the rounding to a narrow edge shoulder.
+const FUR_PAD_DOME_HEIGHT := 0.007
 ## How far the pad's own back layer recesses just under the bare surface,
 ## so the rim connecting it to the domed front has real (if thin)
 ## thickness instead of a zero-thickness seam.
-const FUR_PAD_BACK_EMBED := 0.0004
+const FUR_PAD_BACK_EMBED := 0.0015
 ## Applied to (1 - radius), not radius^2 like a normal dome -- an exponent
 ## below 1.0 stays close to 1.0 (full FUR_PAD_DOME_HEIGHT) across most of
 ## the radius and only drops toward 0 sharply right near the rim, reading
 ## as a raised flat-ish pad with a small rounded edge bevel rather than a
 ## smooth ball-like bump that only ever reaches full height at one single
 ## center point.
-const FUR_PAD_DOME_FALLOFF_EXPONENT := 0.35
+const FUR_PAD_DOME_FALLOFF_EXPONENT := 0.16
 
 ## Per direct instruction: "eyes should be taking the shape of a
 ## superellipsis more like the human figures, and higher up on the face."
@@ -942,6 +939,11 @@ static func build(
 	if not skeleton_mode:
 		FigureEars.add_ears(head_mesh, head_size_base, fur_color, true, 0.12, marking_color)
 	pivots["eyes"] = eyes
+	# The human head built by ProceduralFigure was freed above; the dictionary
+	# must now name the monkey head that replaced it, or anything reading
+	# pivots["head_mesh"] (e.g. ApeTemplatePreview's parkour collision) gets a
+	# freed object.
+	pivots["head_mesh"] = head_mesh
 
 	# --- Tail, opt-in via "has_tail" (default false) -- per direct
 	# correction, this same template now builds BOTH classes described in

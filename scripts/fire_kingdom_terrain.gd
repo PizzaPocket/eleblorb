@@ -3,6 +3,8 @@ extends StaticBody3D
 const TOKOIN_SCENE: PackedScene = preload("res://scenes/tokoin.tscn")
 const HALF_SIZE := 900.0
 const RESOLUTION := 121
+const DEFAULT_PLANETARY_OCEAN_LEVEL := -30.0
+const ISLAND_SKIRT_BURY_MARGIN := 56.0
 const CRATER_CENTER := Vector2(155.0, 85.0)
 const CRATER_FLOOR_RADIUS := 72.0
 const CRATER_RIM_RADIUS := 112.0
@@ -76,6 +78,7 @@ var _river_segment_allowed:Array[PackedByteArray]=[]
 var _registered_lava_surfaces:Array[Dictionary]=[]
 var _under_lava_environment:Environment
 var _lava_camera:Camera3D
+var _planetary_ocean_level := DEFAULT_PLANETARY_OCEAN_LEVEL
 
 ## Configures the noise every height/colour query depends on. In _init(), not
 ## _ready(), so a detached instance (never added to a tree, so never building
@@ -100,11 +103,21 @@ func sample_color(x:float,z:float)->Color:
 func _ready()->void:
 	collision_layer=1;collision_mask=0
 	_rng.seed=20260912
+	_sync_planetary_ocean_level()
 	_build_river_centerlines()
 	_build_mesh_and_collision();_build_lava_pools();_build_lava_rivers();_build_fire_vents();_scatter_volcanic_rocks()
 	_scatter_volcano_floor_tokoins.call_deferred()
 	_prepare_under_lava_environment()
 	set_process(true)
+
+
+## Keep the terrain skirt tied to the actual shared ocean setting. The scene
+## currently authors -30 m, but reading it here prevents a future ocean-level
+## adjustment from exposing the square edge of the kingdom above the water.
+func _sync_planetary_ocean_level() -> void:
+	var cycle := get_parent().get_node_or_null("DayNightCycle")
+	if cycle != null and cycle.get("planetary_ocean_level") != null:
+		_planetary_ocean_level = float(cycle.get("planetary_ocean_level"))
 
 
 ## Small treasure rings on the true rock floor of every filled volcano.
@@ -124,27 +137,6 @@ func _scatter_volcano_floor_tokoins() -> void:
 
 func _process(delta:float)->void:
 	_update_camera_immersion()
-	for vent in _fire_vents:
-		var timer:float=float(vent["timer"])-delta
-		vent["timer"]=timer
-		var total:float=float(vent["total"])
-		var bubble:=vent["bubble"] as MeshInstance3D
-		var peak:float=float(vent["peak"])
-		# Eased growth (smoothstep, not linear) reads as a bubble actually
-		# swelling under pressure rather than inflating at a constant rate.
-		var progress:=smoothstep(0.0,1.0,clampf(1.0-timer/total,0.0,1.0))
-		var radius:=lerpf(BUBBLE_START_RADIUS,peak,progress)
-		bubble.scale=Vector3.ONE*radius
-		if timer<=0.0:
-			bubble.scale=Vector3.ZERO
-			if peak>=BUBBLE_SPRAY_THRESHOLD:
-				var particles:=vent["particles"] as GPUParticles3D
-				particles.restart()
-				particles.emitting=true
-			var new_total:=_rng.randf_range(2.4,8.5)
-			vent["timer"]=new_total
-			vent["total"]=new_total
-			vent["peak"]=_rng.randf_range(BUBBLE_PEAK_RANGE.x,BUBBLE_PEAK_RANGE.y)
 
 func _prepare_under_lava_environment()->void:
 	_under_lava_environment=Environment.new()
@@ -198,7 +190,58 @@ func _terrain_height(x:float,z:float)->float:
 	var gate_distance:=p.distance_to(GATE_CENTER)
 	if gate_distance<GATE_BLEND_RADIUS:
 		base=lerpf(GATE_GROUND_Y,base,smoothstep(GATE_CLEAR_RADIUS,GATE_BLEND_RADIUS,gate_distance))
+	# Beyond the perimeter mountain crest, continue the volcanic landmass down
+	# beneath the live planetary-ocean level. This is an island flank, not a
+	# square terrain sheet terminating visibly at its final row of vertices.
+	var skirt_bottom := _planetary_ocean_level - ISLAND_SKIRT_BURY_MARGIN
+	base=lerpf(base,skirt_bottom,smoothstep(HALF_SIZE*0.93,HALF_SIZE,p.length()))
 	return base
+
+
+## Ecological suitability for pioneer growth on old, cooled lava. The visual
+## scatter adds its own broad patch noise; this query only answers whether the
+## physical site is plausible. Active lava, volcanic mouths, the inhabited
+## caldera, submerged coast, sheer faces and the arrival clearing stay bare.
+## The buffers are generous enough to keep growth well clear of active lava, but
+## no wider: growth starts within sight of the arrival clearing, on the old
+## flows between the lava pools and the crater's flank.
+func get_regrowth_suitability(p: Vector2) -> float:
+	var height := get_mesh_height(p.x, p.y)
+	if height <= _planetary_ocean_level + 2.0:
+		return 0.0
+	if p.length() >= HALF_SIZE * 0.88:
+		return 0.0
+	if p.distance_to(GATE_CENTER) < GATE_BLEND_RADIUS + 14.0:
+		return 0.0
+	if p.distance_to(CRATER_CENTER) < CRATER_RIM_RADIUS + 40.0:
+		return 0.0
+	for center in LAVA_POOLS:
+		if p.distance_to(center) < LAVA_MOUTH_RADIUS + 60.0:
+			return 0.0
+	for center in SECONDARY_VOLCANO_CENTERS:
+		if p.distance_to(center) < 160.0:
+			return 0.0
+	var river_distance := _distance_to_river_centerlines(p)
+	if river_distance < RIVER_HALF_WIDTH + RIVER_SURFACE_OVERLAP + 26.0:
+		return 0.0
+	var normal_y := get_mesh_normal(p.x, p.y).y
+	if normal_y < 0.62:
+		return 0.0
+	# Gentle shelves hold larger mats. Growth is still possible on uneven
+	# cooled rock, but falls away progressively before a true cliff begins.
+	return smoothstep(0.62, 0.9, normal_y)
+
+
+func _distance_to_river_centerlines(p: Vector2) -> float:
+	var nearest := INF
+	for path_index in _river_centerlines.size():
+		var path := _river_centerlines[path_index]
+		var allowed := _river_segment_allowed[path_index]
+		for segment_index in path.size() - 1:
+			if allowed[segment_index] == 0:
+				continue
+			nearest = minf(nearest, _distance_to_segment(p, path[segment_index], path[segment_index + 1]))
+	return nearest
 
 func _distance_to_segment(point:Vector2,a:Vector2,b:Vector2)->float:
 	var segment:=b-a
@@ -437,17 +480,7 @@ func _build_fire_vents()->void:
 		for fraction in [0.28,0.58,0.82]:
 			var index:=clampi(roundi(float(path.size()-1)*fraction),0,path.size()-1);var p:=path[index]
 			if point_allowed[index]==1:positions.append(Vector3(p.x,RIVER_LAVA_SURFACE_Y,p.y))
-	for pos in positions:
-		var particles:=_make_fire_burst();particles.position=pos;add_child(particles)
-		# Sphere centered exactly on the same surface point the particles use
-		# -- half above, half below the lava surface, per direct instruction.
-		var bubble:=_make_lava_bubble();bubble.position=pos;add_child(bubble)
-		var total:=_rng.randf_range(0.8,6.0)
-		_fire_vents.append({
-			"particles":particles,"bubble":bubble,
-			"timer":total,"total":total,
-			"peak":_rng.randf_range(BUBBLE_PEAK_RANGE.x,BUBBLE_PEAK_RANGE.y),
-		})
+	LavaSurfaceFX.attach(self,positions,20260912)
 
 func _make_lava_bubble()->MeshInstance3D:
 	var bubble:=MeshInstance3D.new()

@@ -76,19 +76,44 @@ var _loop_points: Array[Vector3] = []
 var _chairs: Array[Dictionary] = []
 var _route_length := 0.0
 
+## Lowest point of the occupied chair envelope beneath the cable. The seat's
+## underside is the part most likely to strike a crest between two pylons.
+const CHAIR_ENVELOPE_BELOW_CABLE := CHAIR_DROP + 0.16
+const MIN_TERRAIN_CLEARANCE := 0.12
+
 
 func _ready() -> void:
 	_terrain=get_node("../Terrain")
 	var endpoints: Array[Vector2]=_terrain.get_ski_lift_endpoints()
 	var route_along:=Vector3(endpoints[1].x-endpoints[0].x,0.0,endpoints[1].y-endpoints[0].y).normalized()
 	var route_lateral:=Vector3(-route_along.z,0.0,route_along.x)
+	var lower_ground:float=_terrain.get_mesh_height(endpoints[0].x,endpoints[0].y)
+	var upper_ground:float=_terrain.get_mesh_height(endpoints[1].x,endpoints[1].y)
+	var planar_points: Array[Vector2] = []
+	var ground_heights: Array[float] = []
 	for i in POLE_COUNT:
 		var t:=float(i)/float(POLE_COUNT-1)
 		var planar:=endpoints[0].lerp(endpoints[1],t)
 		var ground_y: float=_terrain.get_mesh_height(planar.x,planar.y)
-		var height:=_lift_height_at(t)
-		var cable_point:=Vector3(planar.x,ground_y+height,planar.y)
-		_cable_points.append(cable_point)
+		# A real cable traces one smooth aerial profile between terminal
+		# elevations. It does not copy every bump of the ground at a constant
+		# offset (which made the old line dive into gullies and crest over ridges).
+		var endpoint_line:=lerpf(lower_ground+TERMINAL_HEIGHT,upper_ground+TERMINAL_HEIGHT,t)
+		var span_lift:=(CRUISE_HEIGHT-TERMINAL_HEIGHT)*sin(PI*t)
+		var cable_y:=endpoint_line+span_lift
+		var height:=maxf(cable_y-ground_y,5.4)
+		planar_points.append(planar)
+		ground_heights.append(ground_y)
+		_cable_points.append(Vector3(planar.x,ground_y+height,planar.y))
+	# A support can be safely above the ground while the straight cable span on
+	# either side still cuts through a crest. Lift the neighbouring support
+	# heads until the whole interpolated span clears the sampled terrain. Keep
+	# terminal heads fixed so boarding height does not change.
+	_raise_spans_over_terrain()
+	for i in POLE_COUNT:
+		var planar := planar_points[i]
+		var ground_y := ground_heights[i]
+		var height := _cable_points[i].y - ground_y
 		# Terminal machinery supports the two ends. Omitting a redundant pole
 		# from the centre of each boarding deck leaves the turnaround and rider
 		# path unobstructed, especially at the steep upper mountain terminal.
@@ -104,6 +129,36 @@ func _ready() -> void:
 			"progress":float(i)/float(CHAIR_COUNT),
 			"initialized":false,
 		})
+
+
+func _raise_spans_over_terrain() -> void:
+	if _cable_points.size() < 2:
+		return
+	for _pass in 5:
+		for segment_index in _cable_points.size() - 1:
+			var a := _cable_points[segment_index]
+			var b := _cable_points[segment_index + 1]
+			var required_raise := 0.0
+			var required_t := 0.5
+			var planar_length := Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))
+			var sample_count := maxi(int(ceil(planar_length / 0.75)), 3)
+			for sample_index in range(1, sample_count):
+				var t := float(sample_index) / float(sample_count)
+				var cable := a.lerp(b, t)
+				var terrain_y: float = _terrain.get_mesh_height(cable.x, cable.z)
+				var deficit := terrain_y + CHAIR_ENVELOPE_BELOW_CABLE + MIN_TERRAIN_CLEARANCE - cable.y
+				if deficit > required_raise:
+					required_raise = deficit
+					required_t = t
+			if required_raise <= 0.0:
+				continue
+			if segment_index == 0:
+				_cable_points[1].y += required_raise / maxf(required_t, 0.1)
+			elif segment_index + 1 == _cable_points.size() - 1:
+				_cable_points[segment_index].y += required_raise / maxf(1.0 - required_t, 0.1)
+			else:
+				_cable_points[segment_index].y += required_raise
+				_cable_points[segment_index + 1].y += required_raise
 
 
 ## Low near both ends (t=0 and t=1, for boarding/alighting), raised to
@@ -193,6 +248,32 @@ func _build_cables() -> void:
 			self,_loop_points[i],_loop_points[(i+1)%_loop_points.size()],
 			0.055,CABLE_COLOR
 		)
+
+
+## Samples every straight span rather than checking pylons alone. This is used
+## by the village validator and can also be called by future terrain tools when
+## rerouting the lift. Each finding contains the world point, terrain height and
+## remaining clearance beneath the moving chair.
+func terrain_clearance_report(sample_spacing: float = 1.5) -> Array[Dictionary]:
+	var findings: Array[Dictionary] = []
+	if _terrain == null or _cable_points.size() < 2:
+		return findings
+	for segment_index in _cable_points.size() - 1:
+		var a := _cable_points[segment_index]
+		var b := _cable_points[segment_index + 1]
+		var planar_length := Vector2(a.x, a.z).distance_to(Vector2(b.x, b.z))
+		var steps := maxi(int(ceil(planar_length / maxf(sample_spacing, 0.25))), 1)
+		for step in steps + 1:
+			var t := float(step) / float(steps)
+			var cable := a.lerp(b, t)
+			var terrain_y: float = _terrain.get_mesh_height(cable.x, cable.z)
+			var clearance := cable.y - CHAIR_ENVELOPE_BELOW_CABLE - terrain_y
+			if clearance < MIN_TERRAIN_CLEARANCE:
+				findings.append({
+					"segment": segment_index, "point": cable,
+					"terrain_y": terrain_y, "clearance": clearance,
+				})
+	return findings
 
 
 ## Builds outbound lane, upper turnaround, return lane, and lower turnaround
@@ -310,7 +391,13 @@ func _build_chair() -> StaticBody3D:
 	var seat:=SuperEgg.build_part(seat_axes,SEAT_COLOR,3.5,3.5)
 	seat.rotation.x=SEAT_BOARDING_PITCH
 	body.add_child(seat)
-	CollisionPolicy.add_box(body,seat,seat_axes*2.0,seat.position,Basis(Vector3.RIGHT,SEAT_BOARDING_PITCH),true)
+	# A rounded cushion falls away slightly before its nominal bounding-box
+	# top. Keep the walkable plane at the visible crown of that cushion rather
+	# than through its middle; otherwise feet visibly sink through the upholstery
+	# even though the chair technically carries the rider.
+	var seat_basis:=Basis(Vector3.RIGHT,SEAT_BOARDING_PITCH)
+	var seat_collider_position:=seat.position+seat_basis*Vector3(0.0,0.075,0.0)
+	CollisionPolicy.add_box(body,seat,seat_axes*2.0,seat_collider_position,seat_basis,true)
 	var back_axes:=Vector3(0.85,0.58,0.10)*CHAIR_SCALE
 	var back:=SuperEgg.build_part(back_axes,SEAT_COLOR,3.5,3.5)
 	back.position=Vector3(0.0,0.55*CHAIR_SCALE,0.48*CHAIR_SCALE)

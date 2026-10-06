@@ -92,7 +92,10 @@ func _raw_height(x: float, z: float) -> float:
 	height = lerpf(height,-12.0,1.0-smoothstep(FOSSIL_BASIN_RADIUS,FOSSIL_BASIN_RADIUS+28.0,point.distance_to(FOSSIL_CENTER)))
 	var edge: float = smoothstep(HALF_SIZE*0.72,HALF_SIZE*0.97,point.length())
 	height += edge * maxf(_broad_noise.get_noise_2d(x+800.0,z-500.0)+0.48,0.0)*86.0
-	return height
+	# Past the rocky perimeter crest, carry the same terrain down below the
+	# world's -25 m planetary ocean. The visible kingdom is therefore the high
+	# part of a landmass rather than a finite square heightfield.
+	return lerpf(height,-80.0,smoothstep(HALF_SIZE*0.93,HALF_SIZE,point.length()))
 
 
 func _halfpipe_height(

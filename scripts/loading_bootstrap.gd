@@ -2,10 +2,9 @@ extends Node
 
 ## Keeps the first scene deliberately tiny, so LoadingScreen can render before
 ## the asset-heavy world scene is read and instantiated.
-## Boots into the demo world: the movement testing ground with a checkpoint
-## portal and biome for every suit (see demo_world.gd). The Crossroads, the
-## story's own starting world, is res://scenes/main.tscn.
-const WORLD_SCENE := "res://scenes/demo_world.tscn"
+## The title chooses either the preserved holistic demo or the canonical
+## campaign. Both use this same staged loading path, so its progress behavior
+## cannot drift between modes.
 
 var _requested := false
 var _changing_scene := false
@@ -27,42 +26,44 @@ func _request_world_load_after_first_draw() -> void:
 	await RenderingServer.frame_post_draw
 	if get_tree().current_scene != self:
 		return
-	var result := ResourceLoader.load_threaded_request(WORLD_SCENE)
+	var world_scene := LoadingScreen.launch_scene()
+	var result := ResourceLoader.load_threaded_request(world_scene)
 	_requested = result == OK
 	if not _requested:
-		_load_world_synchronously()
+		_load_world_synchronously(world_scene)
 
 
 func _process(_delta: float) -> void:
 	if not _requested or _changing_scene:
 		return
 	var progress: Array = []
-	var status := ResourceLoader.load_threaded_get_status(WORLD_SCENE, progress)
+	var world_scene := LoadingScreen.launch_scene()
+	var status := ResourceLoader.load_threaded_get_status(world_scene, progress)
 	if not progress.is_empty():
 		LoadingScreen.set_world_load_progress(float(progress[0]))
 	if status == ResourceLoader.THREAD_LOAD_LOADED:
 		_changing_scene = true
 		LoadingScreen.set_phase("Preparing world data…", 0.65)
-		var world := ResourceLoader.load_threaded_get(WORLD_SCENE) as PackedScene
+		var world := ResourceLoader.load_threaded_get(world_scene) as PackedScene
 		if world != null:
 			get_tree().change_scene_to_packed(world)
 		else:
-			_load_world_synchronously()
+			_load_world_synchronously(world_scene)
 	elif status == ResourceLoader.THREAD_LOAD_FAILED:
 		_changing_scene = true
-		_load_world_synchronously()
+		_load_world_synchronously(world_scene)
 
 
-func _load_world_synchronously() -> void:
+func _load_world_synchronously(world_scene: String) -> void:
 	if get_tree().current_scene != self:
 		return
 	# A failed threaded request can leave a failed entry in ResourceLoader's
 	# cache. Bypass that entry for the recovery load; change_scene_to_file()
 	# would otherwise consult the same poisoned cache and fail a second time.
 	var world := ResourceLoader.load(
-		WORLD_SCENE, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE
+		world_scene, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE
 	) as PackedScene
 	if world != null:
 		get_tree().change_scene_to_packed(world)
 	else:
-		push_error("Unable to load the main world scene: %s" % WORLD_SCENE)
+		push_error("Unable to load the selected world scene: %s" % world_scene)

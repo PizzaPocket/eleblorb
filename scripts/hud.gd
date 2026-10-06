@@ -286,6 +286,13 @@ func _ensure_player_breath_connected() -> void:
 		return
 	_player.breath_changed.connect(_on_player_breath_changed)
 	_breath_connected = true
+	# Hud is an autoload and survives the scene reload used by faint recovery.
+	# Synchronize immediately with the replacement Player instead of waiting
+	# for its first one-point breath change. Otherwise `_breath_active` can
+	# retain the old, exhausted body's state and suppress the next meter reveal.
+	var current_value: Variant = _player.get("breath")
+	if current_value != null:
+		_on_player_breath_changed(float(current_value), Player.MAX_BREATH)
 
 
 ## Rebuilds the meter row in place -- StatMeterBar has no public setter for

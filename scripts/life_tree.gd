@@ -10,7 +10,7 @@ const FLOWER_COLORS := [Color(0.95,0.42,0.55),Color(0.95,0.78,0.25),Color(0.58,0
 const FAIRY_RING_RADIUS := 12.5
 const FAIRY_RING_CLUSTERS := 15
 const SOIL_SURFACE_LIFT := 0.025
-const PETAL_SURFACE_LIFT := 0.018
+const PETAL_SURFACE_LIFT := 0.024
 
 var _growth_root: Node3D
 var _harvest_area: Area3D
@@ -145,7 +145,10 @@ func _build_fairy_ring_petals() -> void:
 			var petal_color: Color = FLOWER_COLORS[(cluster_index+flower_index)%FLOWER_COLORS.size()]
 			var petal_angle: float = rng.randf_range(0.0,TAU)
 			var basis: Basis = Basis(Vector3.UP,-petal_angle)
-			basis = basis.scaled(Vector3(0.09,0.014,0.06)*rng.randf_range(0.84,1.16))
+			# Roughly 1.7x the original petals, which were too small to read at play
+			# distance. Scale in the petal's own frame: scaling a turned basis along
+			# the world axes shears it, which stretched and skewed the flowers.
+			basis = basis.scaled_local(Vector3(0.155,0.024,0.105)*rng.randf_range(0.84,1.16))
 			var world_x: float = position.x+flower_center.x
 			var world_z: float = position.z+flower_center.y
 			var ground_y: float = float(_terrain.get_mesh_height(world_x,world_z))

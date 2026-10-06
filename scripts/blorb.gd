@@ -272,7 +272,12 @@ const SURFACE_TILT_SPEED := 6.0
 ## Maximum new ledge height a grounded blorb can acquire in one glide. This
 ## matches the player's approximate ordinary jump reach and, crucially,
 ## keeps the support ray local instead of selecting arbitrary roofs above.
-const SUPPORT_ACQUIRE_HEIGHT := 1.5
+## Ordinary grounding may only acquire a surface just above the current feet.
+## A taller probe can see the underside/top of furniture, floors and roofs and
+## teleport a controlled Blorbus upward through a multi-storey building.
+## Authored platform calls carry their own exact target height and bypass this
+## ordinary step allowance.
+const SUPPORT_ACQUIRE_HEIGHT := 0.45
 ## A solid support must visibly clear the molten sheet to count as safe.
 ## This is intentionally much smaller than the player's tolerance: blorbs
 ## use an exact downward support probe rather than a capsule/contact test.
@@ -841,6 +846,29 @@ func release_to_wild() -> void:
 		_state = State.IDLE
 		_home = Vector2(global_position.x, global_position.z)
 		_has_wander_target = false
+
+
+## Blorb slime is excretion. Wild blorbs, and only on occasion, leave a puddle
+## where a forager can gather it. Checked about once a minute and only near the
+## player, so the world never fills with it.
+const SLIME_CHECK_SECONDS := 55.0
+const SLIME_CHANCE := 0.04
+const SLIME_MAX_PLAYER_DISTANCE := 70.0
+var _slime_clock := randf_range(20.0, SLIME_CHECK_SECONDS)
+
+
+func _update_slime_excretion(delta: float) -> void:
+	if in_party or is_story_companion() or is_worn:
+		return
+	_slime_clock -= delta
+	if _slime_clock > 0.0:
+		return
+	_slime_clock = SLIME_CHECK_SECONDS * randf_range(0.8, 1.25)
+	if not is_instance_valid(_player) or global_position.distance_to(_player.global_position) > SLIME_MAX_PLAYER_DISTANCE:
+		return
+	if randf() < SLIME_CHANCE:
+		var behind := Vector3(randf_range(-1.0, 1.0), 0.0, randf_range(-1.0, 1.0)).normalized() * 0.9
+		SlimeDrop.leave(get_parent(), global_position + behind)
 
 
 func is_story_companion() -> bool:
@@ -1668,6 +1696,7 @@ func _process(delta: float) -> void:
 		return
 	if _dormant(delta):
 		return
+	_update_slime_excretion(delta)
 	if _platform_aid_time > 0.0 and is_instance_valid(_platform_aid_target):
 		_platform_aid_time -= delta
 		if _platform_aid_time <= 0.0:
@@ -2188,10 +2217,14 @@ func _ground_height_at(x: float, z: float) -> float:
 			var giant_top: Variant = giant.giant_surface_height_at(x, z)
 			if giant_top != null:
 				return maxf(terrain_h, giant_top as float)
-	# Canyon paving and shelves are ordinary ground to blorbs, including on
-	# their first frame after a terrain-height spawn. A terrain-relative probe
-	# catches those supports without searching up through roofs elsewhere.
-	var support_probe_y := maxf(global_position.y + SUPPORT_ACQUIRE_HEIGHT, terrain_h + 4.0)
+	# Canyon paving and shelves are ordinary ground to blorbs, but support
+	# acquisition must remain relative to the blorb's own feet. Starting this
+	# ray several metres above terrain allowed a controlled Blorbus walking
+	# beneath layered Crossroads geometry to select a roof/shelf overhead and
+	# teleport straight up onto its highest hit. get_mesh_height() already owns
+	# the rendered terrain itself; this probe is only for nearby solid props and
+	# ledges that the blorb can genuinely glide up onto in one step.
+	var support_probe_y := global_position.y + SUPPORT_ACQUIRE_HEIGHT
 	if _platform_aid_time > 0.0 and not is_nan(_platform_aid_support_y):
 		support_probe_y = maxf(support_probe_y, _platform_aid_support_y + SUPPORT_ACQUIRE_HEIGHT)
 	var from := Vector3(x, support_probe_y, z)

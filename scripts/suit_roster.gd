@@ -47,6 +47,29 @@ func _suit_for(wearer: Node3D) -> BlorbSuitController:
 	return wearer.get_own_blorb_suit() as BlorbSuitController
 
 
+## Assignment identity, not the last character who happened to cross a gate,
+## determines whether a portal has work to do. Character switching transfers
+## the live suit and its assignments to the new playable body, so `_current`
+## can still name the right set while `_current_wearer` is stale. Comparing
+## the actual slot map prevents a redundant fold-off/fold-on cycle.
+func _wearer_has_set(wearer: Node3D, key: String) -> bool:
+	if not _sets.has(key):
+		return false
+	var suit := _suit_for(wearer)
+	if suit == null:
+		return false
+	var entry: Dictionary = _sets[key]
+	var slots: Array[String] = entry["slots"]
+	var blorbs: Array[Blorb] = entry["blorbs"]
+	if slots.size() != blorbs.size():
+		return false
+	for index in slots.size():
+		var expected := blorbs[index]
+		if not is_instance_valid(expected) or suit.assigned_blorb_in_slot(slots[index]) != expected:
+			return false
+	return true
+
+
 ## Registers a set under `key` (an element, or any label such as "normal").
 func add_set(key: String, blorbs: Array[Blorb], slots: Array[String]) -> void:
 	_sets[key] = {"blorbs": blorbs, "slots": slots}
@@ -91,7 +114,12 @@ func switch_to(key: String) -> void:
 		_pending = key
 		return
 	var wearer := _active_wearer()
-	if key == _current and wearer == _current_wearer:
+	if _wearer_has_set(wearer, key):
+		# Keep bookkeeping aligned with the physical transfer performed by the
+		# playable-character system, but deliberately leave suit visibility and
+		# animation untouched: the portal's requested condition already exists.
+		_current = key
+		_current_wearer = wearer
 		return
 	_switching = true
 	var old_suit := _suit_for(_current_wearer)

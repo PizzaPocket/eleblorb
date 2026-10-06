@@ -23,6 +23,13 @@ func _ready() -> void:
 	_return_portal.gate_id = return_gate_id
 	_return_portal.accent_color = accent_color
 	call_deferred("_finish_arrival")
+	if KingdomTravel.debug_loadout != "":
+		var debug_start := DebugKingdomStart.new()
+		debug_start.name = "DebugKingdomStart"
+		debug_start.loadout_id = KingdomTravel.debug_loadout
+		KingdomTravel.debug_loadout_in_use = true
+		KingdomTravel.debug_loadout = ""
+		add_child(debug_start)
 
 
 func _finish_arrival() -> void:

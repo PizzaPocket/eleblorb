@@ -140,13 +140,15 @@ func _build_figure() -> void:
 	_hips = pivots["hips"]
 
 
-## NMEs walk on the same highest nearby physical support as the player and
-## blorbs, not only the analytic terrain beneath canyon paving or shelves.
+## NMEs walk on nearby physical support, not whichever surface happens to be
+## highest above the terrain. The probe begins just above their current feet;
+## starting it five metres over terrain pulled enemies through ceilings and
+## onto upper floors whenever several storeys shared the same XZ footprint.
 func _ground_support_height(x: float,z: float) -> float:
 	var terrain_height: float = terrain_ref.get_mesh_height(x,z)
 	if not is_inside_tree():
 		return terrain_height
-	var from_y: float = maxf(global_position.y+2.0,terrain_height+5.0)
+	var from_y: float = global_position.y + 0.45
 	var query := PhysicsRayQueryParameters3D.create(Vector3(x,from_y,z),Vector3(x,terrain_height-2.0,z),1|TownProps.BLORB_CLIMBABLE_LAYER)
 	query.exclude = [get_rid()]
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)

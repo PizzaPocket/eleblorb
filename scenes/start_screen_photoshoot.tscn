@@ -1,0 +1,63 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/start_screen_photoshoot.gd" id="1"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_title"]
+sky_top_color = Color(0.22, 0.38, 0.74, 1)
+sky_horizon_color = Color(0.91, 0.58, 0.39, 1)
+sky_curve = 0.2
+ground_bottom_color = Color(0.08, 0.24, 0.34, 1)
+ground_horizon_color = Color(0.72, 0.45, 0.34, 1)
+
+[sub_resource type="Sky" id="Sky_title"]
+sky_material = SubResource("ProceduralSkyMaterial_title")
+
+[sub_resource type="Environment" id="Environment_title"]
+background_mode = 2
+sky = SubResource("Sky_title")
+ambient_light_source = 3
+ambient_light_color = Color(0.75, 0.72, 0.7, 1)
+ambient_light_energy = 0.56
+reflected_light_source = 2
+tonemap_mode = 2
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.84, 0.58, 0.43, 1)
+fog_light_energy = 0.82
+fog_density = 0.012
+fog_depth_begin = 15.0
+fog_depth_end = 430.0
+fog_depth_curve = 1.25
+fog_aerial_perspective = 0.22
+fog_sky_affect = 0.0
+ssao_enabled = true
+ssao_radius = 1.35
+ssao_intensity = 1.45
+ssao_power = 1.2
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributes_title"]
+dof_blur_far_enabled = true
+dof_blur_far_distance = 7.5
+dof_blur_far_transition = 18.0
+dof_blur_amount = 0.035
+
+[node name="StartScreenPhotoShoot" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_title")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-34, 64, 0)
+light_color = Color(1, 0.62, 0.34, 1)
+light_energy = 1.18
+shadow_enabled = true
+directional_shadow_mode = 2
+directional_shadow_max_distance = 380.0
+shadow_blur = 1.5
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.993572, -0.026762, 0.109979, 0, 0.971651, 0.236419, -0.113184, -0.234899, 0.965415, 1.45, 0.68, 11.8)
+current = true
+fov = 48.0
+attributes = SubResource("CameraAttributes_title")

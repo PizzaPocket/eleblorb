@@ -75,6 +75,8 @@ extends StaticBody3D
 ## Uses articulated, pose-following collision shapes so a giant creature is
 ## a traversable piece of the world rather than one oversized blocking pill.
 @export var parkour_collision: bool = false
+## Landmark-scale apes can opt into Humongous's reusable Titan-host system.
+@export var titan_host: bool = false
 
 const INTERACT_RADIUS := 2.0
 const HEAD_YAW_LIMIT := deg_to_rad(70.0)
@@ -175,6 +177,8 @@ var _elbow_rest_x := 0.0
 ## as every other _*_rest_* var above.
 var _elbow_rest_z_left := 0.0
 var _elbow_rest_z_right := 0.0
+var _player_controlled := false
+var _titan_suit_host: TitanSuitHost
 
 
 func _ready() -> void:
@@ -252,6 +256,11 @@ func _ready() -> void:
 			if _look_target == body:
 				_look_target = null
 	)
+	if titan_host:
+		_titan_suit_host = TitanSuitHost.new()
+		_titan_suit_host.name = "TitanSuitHost"
+		add_child(_titan_suit_host)
+		_titan_suit_host.setup(self, display_name)
 
 
 func _on_talk() -> void:
@@ -278,7 +287,9 @@ func unmount() -> void:
 
 func _process(delta: float) -> void:
 	EyeBlink.apply(_eye_blink, delta, _eyes)
-	if is_instance_valid(_mounted_on):
+	if _player_controlled:
+		_update_head_look(delta)
+	elif is_instance_valid(_mounted_on):
 		_apply_mounted_pose()
 	else:
 		var moving := _update_roam(delta)
@@ -289,6 +300,69 @@ func _process(delta: float) -> void:
 		_sync_parkour_collision()
 	if has_tail:
 		MonkeyFigure._rebuild_tail(_pivots["_tail"] as Dictionary, delta)
+
+
+func can_accept_titan_suit() -> bool:
+	return titan_host
+
+
+func titan_interaction_radius() -> float:
+	return 2.4 * display_scale
+
+
+## The separately pivoted ape limbs need a broader envelope so their shared
+## CSG output reads as one joined onesie rather than copied body-part shells.
+func titan_suit_clearance_scale() -> float:
+	return 1.11
+
+
+func begin_host_control(_source: Node3D) -> bool:
+	if not titan_host:
+		return false
+	_player_controlled = true
+	_has_wander_target = false
+	return true
+
+
+func end_host_control(_source: Node3D) -> void:
+	_player_controlled = false
+	_roam_center = Vector2(global_position.x, global_position.z)
+
+
+func host_exit_label() -> String:
+	return "Release %s" % display_name
+
+
+func uses_pitched_movement_input() -> bool:
+	return false
+
+
+func camera_focus_point() -> Vector3:
+	return global_position + Vector3.UP * display_scale * 1.25
+
+
+func camera_follow_distance() -> float:
+	return maxf(8.0, display_scale * 2.8)
+
+
+func drive_from_player(direction: Vector3, delta: float, sprinting: bool, _jump_pressed: bool) -> void:
+	if not _player_controlled:
+		return
+	var planar := Vector2(direction.x, direction.z)
+	var moving := planar.length_squared() > 0.0001
+	if moving:
+		planar = planar.normalized()
+		var speed := _move_speed * (1.65 if sprinting else 1.0)
+		global_position.x += planar.x * speed * delta
+		global_position.z += planar.y * speed * delta
+		var target_angle := atan2(planar.x, planar.y)
+		rotation.y = lerp_angle(rotation.y, target_angle, _turn_speed * delta)
+	if _terrain != null and _terrain.has_method("get_mesh_height"):
+		global_position.y = _terrain.get_mesh_height(global_position.x, global_position.z)
+	_animate_walk(delta, moving, 1.65 if sprinting else 1.0)
+	_ground_feet()
+	if parkour_collision:
+		_sync_parkour_collision()
 
 
 ## Samples each foot's sole: the vertices in the bottom fifth of its mesh,
@@ -457,88 +531,74 @@ func _pick_new_wander_target() -> void:
 	_has_wander_target = true
 
 
-## Kova's collision follows the same articulated landmark body the player
-## sees. Capsule chains give every limb and the torso continuous, standable
-## surfaces while a head sphere supplies the quest's final parkour platform.
-## Lower-arm segments end at "hand_left"/"hand_right" -- ApeTemplate.build()'s
-## own pivots dict has no separate fingertip marker the way ProceduralFigure's
-## human rig does (WristAttach/FingertipAttach), so an earlier pass reaching
-## for "fingertip_left"/"fingertip_right" here was indexing a key that never
-## existed, silently returning null and crashing the very first
-## _sync_parkour_collision() call (global_position on a null Node3D) the
-## instant any ape/monkey set parkour_collision -- confirmed by reading
-## ApeTemplate.build()'s own returned dict, not observed in-engine.
+## Landmark collision is built from the same visible, articulated meshes the
+## player sees.  The earlier chain of capsules was easy to animate but created
+## a large invisible envelope around the torso and spherical bubbles around the
+## hands and feet.  Besides imprecise platforming, VineAnchorSearch quite
+## correctly attached to those physics surfaces and therefore appeared to grab
+## empty air.  Convex hulls retain the inexpensive solid-body behaviour while
+## making platform feet and vine ray hits agree with the rendered silhouette.
 func _build_parkour_collision() -> void:
-	_add_segment_collider("TorsoCollision", _pivots["hips"], _pivots["head"], 0.28 * display_scale)
-	_add_segment_collider("LeftUpperArmCollision", _pivots["arm_left"], _pivots["elbow_left"], 0.10 * display_scale)
-	_add_segment_collider("LeftLowerArmCollision", _pivots["elbow_left"], _pivots["hand_left"], 0.09 * display_scale)
-	_add_segment_collider("RightUpperArmCollision", _pivots["arm_right"], _pivots["elbow_right"], 0.10 * display_scale)
-	_add_segment_collider("RightLowerArmCollision", _pivots["elbow_right"], _pivots["hand_right"], 0.09 * display_scale)
-	_add_segment_collider("LeftUpperLegCollision", _pivots["leg_left"], _pivots["knee_left"], 0.13 * display_scale)
-	_add_segment_collider("LeftLowerLegCollision", _pivots["knee_left"], _pivots["ankle_left"], 0.11 * display_scale)
-	_add_segment_collider("RightUpperLegCollision", _pivots["leg_right"], _pivots["knee_right"], 0.13 * display_scale)
-	_add_segment_collider("RightLowerLegCollision", _pivots["knee_right"], _pivots["ankle_right"], 0.11 * display_scale)
-	_add_point_collider("LeftHandCollision", _pivots["hand_left"], 0.12 * display_scale)
-	_add_point_collider("RightHandCollision", _pivots["hand_right"], 0.12 * display_scale)
-	_add_point_collider("LeftFootCollision", _pivots["ankle_left"], 0.16 * display_scale)
-	_add_point_collider("RightFootCollision", _pivots["ankle_right"], 0.16 * display_scale)
+	_add_mesh_collider("HipsCollision", _pivots.get("hips") as MeshInstance3D)
+	_add_mesh_collider("AbdomenCollision", _pivots.get("abdomen") as MeshInstance3D)
+	_add_mesh_collider("ChestCollision", _pivots.get("chest") as MeshInstance3D)
+	_add_mesh_collider("NeckCollision", _pivots.get("neck_mesh") as MeshInstance3D)
+	_add_mesh_collider("HeadCollision", _pivots.get("head_mesh") as MeshInstance3D)
 
-	var head_mesh := (_pivots["head"] as Node3D).get_child(0) as MeshInstance3D
-	var head_shape := CollisionShape3D.new()
-	head_shape.name = "HeadCollision"
-	var sphere := SphereShape3D.new()
-	var head_box := head_mesh.get_aabb()
-	# Keep the solid surface close to the visible skull rather than using its
-	# longest dimension as a large spherical bubble around the face.
-	sphere.radius = minf(head_box.size.x, minf(head_box.size.y, head_box.size.z)) * 0.52 * display_scale
-	head_shape.shape = sphere
-	add_child(head_shape)
-	_parkour_colliders.append({"shape": head_shape, "point": head_mesh})
+	for side: String in ["left", "right"]:
+		var arm := _pivots["arm_" + side] as Node3D
+		var elbow := _pivots["elbow_" + side] as Node3D
+		var leg := _pivots["leg_" + side] as Node3D
+		var knee := _pivots["knee_" + side] as Node3D
+		var ankle := _pivots["ankle_" + side] as Node3D
+		_add_mesh_collider(side.capitalize() + "UpperArmCollision", arm.get_child(0) as MeshInstance3D)
+		_add_mesh_collider(side.capitalize() + "LowerArmCollision", elbow.get_child(0) as MeshInstance3D)
+		_add_mesh_collider(side.capitalize() + "HandCollision", _pivots["hand_" + side] as MeshInstance3D)
+		var leg_tilt := leg.get_child(0) as Node3D
+		_add_mesh_collider(side.capitalize() + "UpperLegCollision", leg_tilt.get_child(0) as MeshInstance3D)
+		_add_mesh_collider(side.capitalize() + "LowerLegCollision", knee.get_child(0) as MeshInstance3D)
+		_add_mesh_collider(side.capitalize() + "FootCollision", ankle.get_child(0) as MeshInstance3D)
 	_sync_parkour_collision()
 
 
-func _add_point_collider(collider_name: String, point: Node3D, radius: float) -> void:
+func _add_mesh_collider(collider_name: String, visual: MeshInstance3D) -> void:
+	if visual == null or visual.mesh == null:
+		return
+	var points := PackedVector3Array()
+	# Bake the render node's (occasionally non-uniform) hand/foot stretch into
+	# the hull itself. Physics shapes are unreliable under non-uniform node
+	# scale; keeping the CollisionShape basis orthonormal below avoids that
+	# class of mismatch while retaining the exact visible dimensions.
+	var visual_scale := visual.global_basis.get_scale()
+	for surface_index in visual.mesh.get_surface_count():
+		var arrays := visual.mesh.surface_get_arrays(surface_index)
+		if arrays.is_empty():
+			continue
+		var vertices := arrays[Mesh.ARRAY_VERTEX] as PackedVector3Array
+		for vertex in vertices:
+			points.append(vertex * visual_scale)
+	if points.size() < 4:
+		return
 	var collision := CollisionShape3D.new()
 	collision.name = collider_name
-	var sphere := SphereShape3D.new()
-	sphere.radius = radius
-	collision.shape = sphere
+	var hull := ConvexPolygonShape3D.new()
+	hull.points = points
+	collision.shape = hull
 	add_child(collision)
-	_parkour_colliders.append({"shape": collision, "point": point})
-
-
-func _add_segment_collider(collider_name: String, start: Node3D, finish: Node3D, radius: float) -> void:
-	var collision := CollisionShape3D.new()
-	collision.name = collider_name
-	var capsule := CapsuleShape3D.new()
-	capsule.radius = radius
-	capsule.height = radius * 2.0
-	collision.shape = capsule
-	add_child(collision)
-	_parkour_colliders.append({"shape": collision, "start": start, "finish": finish, "radius": radius})
+	_parkour_colliders.append({"shape": collision, "visual": visual})
 
 
 func _sync_parkour_collision() -> void:
 	for entry in _parkour_colliders:
 		var collision := entry["shape"] as CollisionShape3D
-		if entry.has("point"):
-			var point := entry["point"] as Node3D
-			collision.position = to_local(point.global_position)
-			continue
-		var start := entry["start"] as Node3D
-		var finish := entry["finish"] as Node3D
-		var local_start := to_local(start.global_position)
-		var local_finish := to_local(finish.global_position)
-		var span := local_finish - local_start
-		var radius := entry["radius"] as float
-		var capsule := collision.shape as CapsuleShape3D
-		capsule.height = maxf(span.length() + radius * 2.0, radius * 2.0)
-		collision.position = (local_start + local_finish) * 0.5
-		if span.length_squared() > 0.0001:
-			collision.quaternion = Quaternion(Vector3.UP, span.normalized())
+		var visual := entry["visual"] as MeshInstance3D
+		if is_instance_valid(visual):
+			collision.global_transform = Transform3D(
+				visual.global_basis.orthonormalized(), visual.global_position
+			)
 
 
-func _animate_walk(delta: float, moving: bool) -> void:
+func _animate_walk(delta: float, moving: bool, pace_scale := 1.0) -> void:
 	var leg_left := _pivots["leg_left"] as Node3D
 	var leg_right := _pivots["leg_right"] as Node3D
 	var knee_left := _pivots["knee_left"] as Node3D
@@ -551,7 +611,7 @@ func _animate_walk(delta: float, moving: bool) -> void:
 	var elbow_right := _pivots["elbow_right"] as Node3D
 	if moving:
 		var previous_step := floori(_walk_phase / PI)
-		_walk_phase += delta * _swing_speed
+		_walk_phase += delta * _swing_speed * pace_scale
 		if parkour_collision and floori(_walk_phase / PI) != previous_step:
 			UISounds.play_foley(&"giant_step", 0.82, get_instance_id())
 		var swing := sin(_walk_phase) * WALK_SWING_AMOUNT

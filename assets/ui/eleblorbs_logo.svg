@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 107 440 298" role="img" aria-labelledby="title desc">
+  <title id="title">Eleblorbs logo</title>
+  <desc id="desc">A Blorb silhouette filled with the complete elemental Blorb color spectrum and two Blorb eyes.</desc>
+  <defs>
+    <!-- Every stop is one canonical ElementPalette body color. Earth
+         materials lead into the visible spectrum; the sequence then travels
+         warm-to-cool and closes in the darkness of space. -->
+    <linearGradient id="blorb-spectrum" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4d331a"/>
+      <stop offset="7%" stop-color="#6b4226"/>
+      <stop offset="14%" stop-color="#806e5c"/>
+      <stop offset="22%" stop-color="#d9400d"/>
+      <stop offset="31%" stop-color="#ebd126"/>
+      <stop offset="40%" stop-color="#389933"/>
+      <stop offset="49%" stop-color="#9ed6ff"/>
+      <stop offset="56%" stop-color="#c7ebfa"/>
+      <stop offset="62%" stop-color="#f0f5fa"/>
+      <stop offset="69%" stop-color="#2680bf"/>
+      <stop offset="77%" stop-color="#14478c"/>
+      <stop offset="87%" stop-color="#73479e"/>
+      <stop offset="100%" stop-color="#1b0e2e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- This boundary is the front projection of BlorbBodyShape's canonical
+       20-ring profile (BULGE_T=.30, TOP_ROUNDING_BLEND=.22), not a generic
+       teardrop approximation. -->
+  <path fill="url(#blorb-spectrum)" d="M256 385 L145.45 372.10 L106.93 359.20 L82.79 346.30 L67.44 333.40 L58.80 320.50 L56 307.60 L57.09 294.70 L60.36 281.80 L65.78 268.90 L73.28 256 L82.81 243.10 L94.28 230.20 L107.59 217.30 L122.63 204.40 L139.30 191.50 L157.52 178.60 L177.26 165.70 L198.62 152.80 L222.20 139.90 L256 127 L289.80 139.90 L313.38 152.80 L334.74 165.70 L354.48 178.60 L372.70 191.50 L389.37 204.40 L404.41 217.30 L417.72 230.20 L429.19 243.10 L438.72 256 L446.22 268.90 L451.64 281.80 L454.91 294.70 L456 307.60 L453.20 320.50 L444.56 333.40 L429.21 346.30 L405.07 359.20 L366.55 372.10 L256 385 Z"/>
+
+  <!-- Physical Blorb eyes are epsilon-soft supereggs, 1.15x taller than
+       wide, splayed 28 degrees around the eye line. Their 2D projection is
+       the matching exponent-2.5 superellipse rather than an ordinary oval. -->
+  <path fill="#a66f16" d="M165.05 258.82 L169.87 259 L172.63 259.54 L174.81 260.45 L176.59 261.72 L178.03 263.37 L179.13 265.41 L179.92 267.92 L180.39 271.09 L180.55 276.64 L180.39 282.19 L179.92 285.36 L179.13 287.87 L178.03 289.91 L176.59 291.56 L174.81 292.83 L172.63 293.74 L169.87 294.28 L165.05 294.46 L160.23 294.28 L157.47 293.74 L155.29 292.83 L153.51 291.56 L152.07 289.91 L150.97 287.87 L150.18 285.36 L149.71 282.19 L149.55 276.64 L149.71 271.09 L150.18 267.92 L150.97 265.41 L152.07 263.37 L153.51 261.72 L155.29 260.45 L157.47 259.54 L160.23 259 Z"/>
+  <path fill="#a9c8e2" d="M346.95 258.82 L351.77 259 L354.53 259.54 L356.71 260.45 L358.49 261.72 L359.93 263.37 L361.03 265.41 L361.82 267.92 L362.29 271.09 L362.45 276.64 L362.29 282.19 L361.82 285.36 L361.03 287.87 L359.93 289.91 L358.49 291.56 L356.71 292.83 L354.53 293.74 L351.77 294.28 L346.95 294.46 L342.13 294.28 L339.37 293.74 L337.19 292.83 L335.41 291.56 L333.97 289.91 L332.87 287.87 L332.08 285.36 L331.61 282.19 L331.45 276.64 L331.61 271.09 L332.08 267.92 L332.87 265.41 L333.97 263.37 L335.41 261.72 L337.19 260.45 L339.37 259.54 L342.13 259 Z"/>
+</svg>

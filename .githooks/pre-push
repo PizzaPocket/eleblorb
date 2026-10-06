@@ -1,6 +1,7 @@
 #!/bin/sh
 set -eu
 
-python3 tools/check_web_build.py
 python3 tools/check_body_pose_owner.py
 python3 tools/check_power_parity.py
+sh tools/check_village_layout.sh
+VILLAGE=snow sh tools/check_village_layout.sh

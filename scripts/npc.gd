@@ -16,8 +16,11 @@ extends StaticBody3D
 ## NPC_SLEEVELESS_CHANCE/NPC_SHORT_SLEEVE_CHANCE.
 @export var body_scale: float = 1.0
 @export var skin_color: Color = ProceduralFigure.SKIN_COLOR
-@export var shirt_color: Color = ProceduralFigure.SKIN_COLOR
-@export var pants_color: Color = ProceduralFigure.SKIN_COLOR
+## Safe authored clothing defaults. Any caller that does not provide an
+## appearance profile must still produce a dressed person; using SKIN_COLOR
+## here made every newly instanced one-off NPC look naked until configured.
+@export var shirt_color: Color = Color(0.26, 0.42, 0.58)
+@export var pants_color: Color = Color(0.24, 0.20, 0.18)
 @export var shoe_color: Color = Color(0.32, 0.12, 0.06)
 @export var glove_color: Color = Color(0.0, 0.0, 0.0, 0.0)
 ## Fire Kingdom residents use the animated molten material over every body,
@@ -248,6 +251,23 @@ var _walk_phase: float = 0.0
 var _rng := RandomNumberGenerator.new()
 var _held_combat_weapon: Node3D
 var _demon_agent_swinging := false
+## Optional authored daily itinerary. Entries are world-space dictionaries:
+## {"hour", "at", "range", "route"}.  `route` is the street/waypoint chain
+## used to reach that stop from the previous one. The NPC walks every segment;
+## changing the clock never teleports a visible resident through a building.
+var _daily_schedule: Array[Dictionary] = []
+var _schedule_phase := -1
+var _schedule_route: Array[Vector2] = []
+var _schedule_route_index := -1
+var _schedule_anchor := Vector2.ZERO
+var _schedule_roam_radius := WANDER_RADIUS
+
+
+func configure_daily_schedule(entries: Array[Dictionary]) -> void:
+	_daily_schedule.clear()
+	for entry in entries:
+		_daily_schedule.append(entry.duplicate(true))
+	_daily_schedule.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return float(a["hour"]) < float(b["hour"]))
 
 
 func _ready() -> void:
@@ -255,6 +275,7 @@ func _ready() -> void:
 	if terrain_ref == null:
 		terrain_ref = get_node("../../Terrain")
 	_rng.randomize()
+	_ensure_clothed_palette()
 	_build_figure()
 
 	_wander_center = Vector2(position.x, position.z) if deck_wanderer else Vector2(global_position.x, global_position.z)
@@ -266,6 +287,8 @@ func _ready() -> void:
 		position.y = deck_surface_y
 	else:
 		global_position.y = fixed_ground_y if fixed_ground_y < INF else terrain_ref.get_mesh_height(global_position.x, global_position.z)
+	if not _daily_schedule.is_empty() and not deck_wanderer and not stationary:
+		_initialize_daily_schedule()
 
 	Interactable.attach(
 		self,
@@ -292,6 +315,20 @@ func _ready() -> void:
 		return
 
 	_enter_idle()
+
+
+## A procedural caller is allowed to omit appearance data, but never to
+## accidentally turn the garment meshes into more bare skin. The old exported
+## defaults did exactly that, which is why newly authored one-off NPCs kept
+## arriving naked until every caller remembered to paint them. Explicit
+## non-skin palettes remain untouched, including lava people and disguises.
+func _ensure_clothed_palette() -> void:
+	if lava_body:
+		return
+	if shirt_color == skin_color:
+		shirt_color = Color(0.26,0.42,0.58)
+	if not wears_dress and pants_color == skin_color:
+		pants_color = Color(0.24,0.20,0.18)
 
 
 ## Exact gameplay height used when a player or blorb lands on this figure's
@@ -624,6 +661,10 @@ func _roll_idle_pose() -> void:
 
 
 func _enter_walk() -> void:
+	if _schedule_route_index >= 0 and _schedule_route_index < _schedule_route.size():
+		_state = State.WALK
+		_target = _schedule_route[_schedule_route_index]
+		return
 	if deck_wanderer:
 		_state = State.WALK
 		_target = deck_wander_center + Vector2(
@@ -632,9 +673,13 @@ func _enter_walk() -> void:
 		)
 		return
 	var current := Vector2(global_position.x, global_position.z)
+	# The wander distance scales with the stop's own range. A fixed minimum of
+	# 2.7 m made every stop authored with a range under that unable to pick a
+	# target at all, so those residents stood still for hours.
+	var reach := minf(WANDER_RADIUS, wander_boundary_radius)
 	for attempt in PATH_CHECK_ATTEMPTS:
 		var angle := _rng.randf_range(0.0, TAU)
-		var r := _rng.randf_range(WANDER_RADIUS * 0.3, WANDER_RADIUS)
+		var r := _rng.randf_range(reach * 0.3, reach)
 		var candidate := _wander_center + Vector2(cos(angle), sin(angle)) * r
 		if candidate.distance_to(wander_boundary_center) > wander_boundary_radius:
 			continue
@@ -666,6 +711,59 @@ func _path_clear(from: Vector2, to: Vector2) -> bool:
 	return true
 
 
+func _initialize_daily_schedule() -> void:
+	_schedule_phase = _schedule_phase_for_hour(WorldState.game_time_hours)
+	if _schedule_phase < 0:
+		return
+	var entry: Dictionary = _daily_schedule[_schedule_phase]
+	_schedule_anchor = entry["at"]
+	_schedule_roam_radius = float(entry.get("range", 2.5))
+	# Scene construction is not a simulated journey. Spawn at the place this
+	# person belongs at the current hour, then make every later change on foot.
+	global_position.x = _schedule_anchor.x
+	global_position.z = _schedule_anchor.y
+	global_position.y = fixed_ground_y if fixed_ground_y < INF else terrain_ref.get_mesh_height(_schedule_anchor.x, _schedule_anchor.y)
+	_wander_center = _schedule_anchor
+	wander_boundary_center = _schedule_anchor
+	wander_boundary_radius = _schedule_roam_radius
+
+
+func _update_daily_schedule() -> void:
+	if _daily_schedule.is_empty():
+		return
+	var next_phase := _schedule_phase_for_hour(WorldState.game_time_hours)
+	if next_phase == _schedule_phase or next_phase < 0:
+		return
+	_schedule_phase = next_phase
+	var entry: Dictionary = _daily_schedule[_schedule_phase]
+	_schedule_anchor = entry["at"]
+	_schedule_roam_radius = float(entry.get("range", 2.5))
+	_schedule_route.clear()
+	var authored_route: Array = entry.get("route", [])
+	for point in authored_route:
+		var route_point: Vector2 = point
+		_schedule_route.append(route_point)
+	if _schedule_route.is_empty() or _schedule_route.back().distance_to(_schedule_anchor) > 0.05:
+		_schedule_route.append(_schedule_anchor)
+	_schedule_route_index = 0
+	_state = State.WALK
+	_target = _schedule_route[0]
+
+
+func _schedule_phase_for_hour(hour: float) -> int:
+	if _daily_schedule.is_empty():
+		return -1
+	# Before the first authored hour, the final stop from the preceding day is
+	# still in force. This also makes the midnight wrap deterministic.
+	var found := _daily_schedule.size() - 1
+	for index in _daily_schedule.size():
+		if hour >= float(_daily_schedule[index]["hour"]):
+			found = index
+		else:
+			break
+	return found
+
+
 func _physics_process(delta: float) -> void:
 	_settle_dress_pose(delta)
 	if _demon_agent_combat_active:
@@ -691,6 +789,7 @@ func _physics_process(delta: float) -> void:
 		# character that's permanently planted in one spot anyway.
 		_settle_pose(delta)
 		return
+	_update_daily_schedule()
 	match _state:
 		State.IDLE:
 			_state_timer -= delta
@@ -935,6 +1034,16 @@ func _process_walk(delta: float) -> void:
 	var current := Vector2(position.x, position.z) if deck_wanderer else Vector2(global_position.x, global_position.z)
 	var to_target := _target - current
 	if to_target.length() < ARRIVE_DISTANCE:
+		if _schedule_route_index >= 0:
+			_schedule_route_index += 1
+			if _schedule_route_index < _schedule_route.size():
+				_target = _schedule_route[_schedule_route_index]
+				return
+			_schedule_route_index = -1
+			_schedule_route.clear()
+			_wander_center = _schedule_anchor
+			wander_boundary_center = _schedule_anchor
+			wander_boundary_radius = _schedule_roam_radius
 		_enter_idle()
 		return
 

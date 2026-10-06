@@ -32,6 +32,20 @@ var _progress_bar: ProgressBar
 const PROGRESS_BAR_REVEAL_DELAY := 0.6
 
 
+func reset_for_new_session() -> void:
+	_registered_points.clear()
+	_last_rest_by_world.clear()
+	_pending.clear()
+	_recovering = false
+	if is_instance_valid(_overlay):
+		_overlay.visible = false
+		_overlay.modulate.a = 0.0
+	if is_instance_valid(_message):
+		_message.visible = false
+	if is_instance_valid(_progress_bar):
+		_progress_bar.visible = false
+
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_build_overlay()

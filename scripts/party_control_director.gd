@@ -18,6 +18,21 @@ var _control_override: Node3D
 var _control_override_source: Node3D
 
 
+## A title-screen Play is a new control session, unlike an ordinary kingdom
+## scene change.  Autoload state survives both, so without this boundary the
+## playable id selected before returning to the title silently selected that
+## same body again as soon as it registered in the next demo.
+func reset_for_new_session() -> void:
+	var previous := active_member()
+	if previous != null and previous.has_method("end_direct_control"):
+		previous.end_direct_control()
+	_control_override = null
+	_control_override_source = null
+	_active_member = null
+	_active_member_id = HUMAN_ID
+	active_member_changed.emit(previous, null)
+
+
 func register_member(member: Node3D) -> void:
 	if member == null or not member.has_method("playable_id"):
 		return

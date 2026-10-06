@@ -1,6 +1,9 @@
 @tool
 extends StaticBody3D
 
+const OCEAN_KINGDOM_TERRAIN := preload("res://scripts/ocean_kingdom_terrain.gd")
+const OCEAN_WATER_SHADER: Shader = preload("res://scripts/ocean_water.gdshader")
+
 ## Procedurally builds a heightmap terrain: gentle rolling hills in the
 ## playable area, mountains further out, then a plateau rim -- past an
 ## organic (noisy, non-circular) boundary defined by _edge_radius(). Most
@@ -242,6 +245,51 @@ const SKIRT_OUTER_RADIUS := 950.0  # matches distant_mountains.gd's RADIUS
 const SKIRT_SEGMENTS := 96  # matches distant_mountains.gd's SEGMENTS
 
 @export var town_center: Vector2 = Vector2(150, 70)
+## Ohio's water is part of this height field, not a raised prop. The mesh has
+## one vertex every 18 m, so a body of water can only be a real basin if it is
+## authored on that lattice: the tarn is centred ON a vertex (town_center
+## (150,70) puts local (30,-142) on world (180,-72), a lattice point), the ring
+## of vertices around it is dropped below the surface, and the next ring is
+## held above it, so the shore is the crossing of two real triangles and the
+## banks are the hills themselves. If town_center moves, move these with it.
+const TOWN_POND_LOCAL := Vector2(30.0,-142.0)
+const TOWN_POND_WATER_LEVEL := 8.0
+const TOWN_POND_DEPTH := 4.5
+## The water disc stops inside the bank ring; everything beyond it is ground.
+const TOWN_POND_SHORE_RADIUS := 17.5
+const TOWN_POND_BANK_RADIUS := 18.0
+const TOWN_POND_FOOT_RADIUS := 40.0
+## Banks stand this far above the surface, except at the east sill where the
+## water leaves under a stone weir.
+const TOWN_POND_BANK_RISE := 1.6
+## The sill is this far under the surface: the weir stands on it.
+const TOWN_POND_SILL_DEPTH := 0.8
+## Below the sill the ground falls away along the spill at this slope (m per m).
+const TOWN_POND_SPILL_SLOPE := 0.30
+## The mill and the level leat beside it sit on a graded bench cut into the
+## hill's foot (local plan), a capsule between these two points. It covers the
+## whole of the lattice cell it stands in, so the bench is truly level.
+const MILL_PAD_FROM := Vector2(75.0,-142.0)
+const MILL_PAD_TO := Vector2(75.0,-84.0)
+const MILL_PAD_LEVEL := 3.5
+const MILL_PAD_FLAT_RADIUS := 13.0
+const MILL_PAD_TRANSITION := 6.0
+## The water goes over the plateau's rim at this world bearing (degrees from
+## +X toward +Z), through a corridor where the cliff is sheer and the foot of
+## the fall is a deep plunge pool, so the fall is clean and not a slope.
+## Sheer-cliff corridors: {bearing, half, soft}. The first is the waterfall's, the
+## second the overlook's, so the rim there is a clean cliff and not a ragged slope.
+const FALL_CORRIDORS := [
+	{"bearing":-7.8,"half":20.0,"soft":22.0},
+	{"bearing":17.5,"half":14.0,"soft":16.0},
+]
+## The overlook's flat pad (local plan), so the stone terrace stands on level ground.
+const OVERLOOK_PAD_LOCAL := Vector2(78.0,2.0)
+const OVERLOOK_PAD_LEVEL := 2.0
+const OVERLOOK_PAD_FLAT_RADIUS := 10.0
+const OVERLOOK_PAD_TRANSITION := 8.0
+const FALL_SHEER_DISTANCE := 18.0
+const FALL_POOL_DEPTH := 10.0
 ## The city lies far beyond the western canyon and the giant's wasteland
 ## route, deep in the gorge-floor wasteland. Its foundation stays flat and
 ## collision-safe.
@@ -297,6 +345,9 @@ var _hill_noise := FastNoiseLite.new()
 var _mountain_noise := FastNoiseLite.new()
 var _edge_noise := FastNoiseLite.new()
 var _lake_noise := FastNoiseLite.new()
+## Off only for terrain probes that want the natural ground under the pond.
+@export var town_pond_enabled := true
+var _town_pond_noise := FastNoiseLite.new()
 var _jungle_edge_noise := FastNoiseLite.new()
 var _ice_edge_noise := FastNoiseLite.new()
 var _wasteland_noise := FastNoiseLite.new()
@@ -324,6 +375,9 @@ func _init() -> void:
 	_lake_noise.seed = 8420260815
 	_lake_noise.frequency = 0.012
 	_lake_noise.fractal_octaves = 3
+	_town_pond_noise.seed = 202610031
+	_town_pond_noise.frequency = 0.075
+	_town_pond_noise.fractal_octaves = 3
 
 	_jungle_edge_noise.seed = 33720260815
 	_jungle_edge_noise.frequency = 0.05
@@ -374,6 +428,11 @@ func get_height(x: float, z: float) -> float:
 	# hills between the two authored locations.
 	height *= spawn_flatten * minf(town_flatten, city_flatten)
 
+	if town_pond_enabled:
+		height = _tarn_height(x, z, height)
+		height = _mill_pad_height(x, z, height)
+		height = _overlook_pad_height(x, z, height)
+
 	# Plateau rim: outside the eastern lake it remains a hard gorge drop. In
 	# the lake sector, though, the land falls through a broad natural slope
 	# before reaching the submerged basin floor.
@@ -382,7 +441,15 @@ func get_height(x: float, z: float) -> float:
 		var lake_amount := lake_coverage(x, z)
 		if lake_amount > 0.0:
 			var rim_slope := smoothstep(edge_radius, edge_radius + LAKE_RIM_SLOPE_DISTANCE, dist_origin)
-			height = lerpf(height, _lake_floor_height(x, z), rim_slope)
+			var sloped := lerpf(height, _lake_floor_height(x, z), rim_slope)
+			var fall_weight := _fall_corridor_weight(x, z)
+			if town_pond_enabled and fall_weight > 0.0:
+				var beyond := dist_origin - edge_radius
+				var plunge := LAKE_WATER_LEVEL - FALL_POOL_DEPTH
+				var sheer := lerpf(height, plunge, smoothstep(0.0, FALL_SHEER_DISTANCE, beyond))
+				sheer = lerpf(sheer, sloped, smoothstep(40.0, 110.0, beyond))
+				sloped = lerpf(sloped, sheer, fall_weight)
+			height = sloped
 		else:
 			var jungle_amount := jungle_coverage(x, z)
 			if jungle_amount > 0.0:
@@ -406,6 +473,94 @@ func get_height(x: float, z: float) -> float:
 					height = _wasteland_height(x, z)
 
 	return height
+
+
+## Bowl, banks and the east sill of the tarn. Inside TOWN_POND_BANK_RADIUS the
+## ground falls from the bank to the lake bed; outside it the bank relaxes into
+## the natural hills, so the tarn is a basin set in them and not a dish laid on
+## flat ground.
+func _tarn_height(x: float, z: float, natural: float) -> float:
+	var center := town_center + TOWN_POND_LOCAL
+	var delta := Vector2(x, z) - center
+	var distance := delta.length()
+	if distance >= TOWN_POND_FOOT_RADIUS:
+		return natural
+	var bearing := absf(atan2(delta.y, delta.x))
+	var sill := 1.0 - smoothstep(0.30, 0.65, bearing)
+	var bank := TOWN_POND_WATER_LEVEL + TOWN_POND_BANK_RISE
+	var sill_height := TOWN_POND_WATER_LEVEL - TOWN_POND_SILL_DEPTH
+	if distance <= TOWN_POND_BANK_RADIUS:
+		var bed := TOWN_POND_WATER_LEVEL - TOWN_POND_DEPTH
+		return lerpf(bed, lerpf(bank, sill_height, sill), smoothstep(0.0, TOWN_POND_BANK_RADIUS, distance))
+	var relax := smoothstep(TOWN_POND_BANK_RADIUS, TOWN_POND_FOOT_RADIUS, distance)
+	var banked := lerpf(bank, natural, relax)
+	# Where the water leaves, the ground keeps falling from the sill as a
+	# spillway cut through the hill's shoulder.
+	var spill := minf(natural, sill_height - TOWN_POND_SPILL_SLOPE * (distance - TOWN_POND_BANK_RADIUS))
+	return lerpf(banked, spill, sill)
+
+
+## A level bench for the mill, cut into the foot of the hill.
+func _mill_pad_height(x: float, z: float, natural: float) -> float:
+	var point := Vector2(x, z) - town_center
+	var axis := MILL_PAD_TO - MILL_PAD_FROM
+	var along := clampf((point - MILL_PAD_FROM).dot(axis) / axis.length_squared(), 0.0, 1.0)
+	var distance := point.distance_to(MILL_PAD_FROM + axis * along)
+	var blend := smoothstep(MILL_PAD_FLAT_RADIUS, MILL_PAD_FLAT_RADIUS + MILL_PAD_TRANSITION, distance)
+	return lerpf(MILL_PAD_LEVEL, natural, blend)
+
+
+## A level pad for the overlook terrace.
+func _overlook_pad_height(x: float, z: float, natural: float) -> float:
+	var distance := Vector2(x, z).distance_to(town_center + OVERLOOK_PAD_LOCAL)
+	var blend := smoothstep(OVERLOOK_PAD_FLAT_RADIUS, OVERLOOK_PAD_FLAT_RADIUS + OVERLOOK_PAD_TRANSITION, distance)
+	return lerpf(OVERLOOK_PAD_LEVEL, natural, blend)
+
+
+func fall_direction(index: int = 0) -> Vector2:
+	var angle := deg_to_rad(float(FALL_CORRIDORS[index]["bearing"]))
+	return Vector2(cos(angle), sin(angle))
+
+
+## 1 along each corridor's line from the world origin, easing to 0 either side;
+## the strongest corridor wins.
+func _fall_corridor_weight(x: float, z: float) -> float:
+	var best := 0.0
+	for index in FALL_CORRIDORS.size():
+		var corridor: Dictionary = FALL_CORRIDORS[index]
+		var direction := fall_direction(index)
+		if Vector2(x, z).dot(direction) <= 0.0:
+			continue
+		var lateral := absf(Vector2(x, z).cross(direction))
+		var half := float(corridor["half"])
+		best = maxf(best, 1.0 - smoothstep(half, half + float(corridor["soft"]), lateral))
+	return best
+
+
+func get_town_pond_water_level() -> float:
+	return TOWN_POND_WATER_LEVEL
+
+
+## The small Ohio pond and the monumental eastern lake have different water
+## levels. New liquid-aware systems use these position-aware queries; the old
+## get_lake_water_level() remains the eastern lake's public datum for systems
+## which are intentionally tied to that landmark.
+func town_pond_coverage(world_pos: Vector2) -> float:
+	if not town_pond_enabled:
+		return 0.0
+	var center := town_center + TOWN_POND_LOCAL
+	var distance := world_pos.distance_to(center)
+	return 1.0-smoothstep(TOWN_POND_SHORE_RADIUS-3.0,TOWN_POND_SHORE_RADIUS,distance)
+
+
+func is_water_area(world_pos: Vector2) -> bool:
+	return is_lake_area(world_pos) or town_pond_coverage(world_pos)>0.01
+
+
+func get_water_surface_height(world_pos: Vector2) -> float:
+	if town_pond_coverage(world_pos)>0.01:
+		return TOWN_POND_WATER_LEVEL
+	return LAKE_WATER_LEVEL
 
 
 ## Broad, low-amplitude undulation keeps the desert floor from reading as a
@@ -741,28 +896,32 @@ func _ready() -> void:
 	LoadingScreen.enqueue_build_stage("Generating world geometry…",0.73,_rebuild)
 
 
-func _process(delta: float) -> void:
-	for vent in _fire_vents:
-		var timer: float = float(vent["timer"]) - delta
-		vent["timer"] = timer
-		var total: float = float(vent["total"])
-		var bubble := vent["bubble"] as MeshInstance3D
-		var peak: float = float(vent["peak"])
-		# Eased growth (smoothstep, not linear) reads as a bubble actually
-		# swelling under pressure rather than inflating at a constant rate.
-		var progress := smoothstep(0.0, 1.0, clampf(1.0 - timer / total, 0.0, 1.0))
-		var radius := lerpf(BUBBLE_START_RADIUS, peak, progress)
-		bubble.scale = Vector3.ONE * radius
-		if timer <= 0.0:
-			bubble.scale = Vector3.ZERO
-			if peak >= BUBBLE_SPRAY_THRESHOLD:
-				var particles := vent["particles"] as GPUParticles3D
-				particles.restart()
-				particles.emitting = true
-			var new_total := _rng.randf_range(2.4, 8.5)
-			vent["timer"] = new_total
-			vent["total"] = new_total
-			vent["peak"] = _rng.randf_range(BUBBLE_PEAK_RANGE.x, BUBBLE_PEAK_RANGE.y)
+var _underwater_environment: Environment
+var _underwater_camera: Camera3D
+
+
+func _exit_tree() -> void:
+	if is_instance_valid(_underwater_camera) and _underwater_camera.environment == _underwater_environment:
+		_underwater_camera.environment = null
+
+
+func _process(_delta: float) -> void:
+	if Engine.is_editor_hint():
+		return
+	var camera := get_viewport().get_camera_3d()
+	if camera == null:
+		return
+	var at := Vector2(camera.global_position.x,camera.global_position.z)
+	var underwater := is_water_area(at) and camera.global_position.y < get_water_surface_height(at)-0.08
+	if underwater:
+		if _underwater_environment == null:
+			_underwater_environment = OCEAN_KINGDOM_TERRAIN.build_underwater_environment()
+		if camera.environment != _underwater_environment:
+			camera.environment = _underwater_environment
+		_underwater_camera = camera
+	elif is_instance_valid(_underwater_camera) and _underwater_camera.environment == _underwater_environment:
+		_underwater_camera.environment = null
+		_underwater_camera = null
 
 
 func _rebuild() -> void:
@@ -797,7 +956,10 @@ func set_canyon_zone(center: Vector2, radius: float) -> void:
 ## height/past_edge pair for their whole mesh and have no per-vertex position
 ## to give anyway -- the canyon blend only ever applies to _build_mesh()'s
 ## own real per-vertex call, which does have one.
-func _height_color(h: float, past_edge: bool, world_pos: Vector2 = Vector2.INF) -> Color:
+func _height_color(
+	h: float, past_edge: bool, world_pos: Vector2 = Vector2.INF,
+	surface_normal: Vector3 = Vector3.UP
+) -> Color:
 	# Exact hex #13A367, per direct instruction (a more vibrant green than
 	# the earlier #4ACE97).
 	var grass := Color(0.07451, 0.63922, 0.40392)
@@ -813,6 +975,11 @@ func _height_color(h: float, past_edge: bool, world_pos: Vector2 = Vector2.INF) 
 	# a copy of the outer flank's color.
 	var volcano_basalt := Color(0.10, 0.09, 0.09)
 	var volcano_scorched := Color(0.30, 0.14, 0.08)
+	# Colour follows landform as well as altitude. Steep faces expose rock;
+	# gentle plateau tops remain grass. This keeps the rebuilt overlook cliff
+	# from inheriting green merely because its upper vertices are low enough.
+	var slope_ratio := Vector2(surface_normal.x, surface_normal.z).length() / maxf(absf(surface_normal.y), 0.01)
+	var exposed_rock := smoothstep(0.35, 0.90, slope_ratio)
 	# HILL_AMPLITUDE is only 3.0, so grass held pure well past that (to 10.0)
 	# covers the entire hill/spawn/town range with zero dirt blend -- dirt,
 	# rock, and snow are pushed out to only appear well up into the
@@ -829,7 +996,7 @@ func _height_color(h: float, past_edge: bool, world_pos: Vector2 = Vector2.INF) 
 	# whatever the height-only gradient above would say on its own -- an
 	# immediate swap right at the edge (not a gradual blend).
 	if past_edge:
-		var wasteland := dirt.lerp(rock, 0.5)
+		var wasteland := dirt.lerp(rock, lerpf(0.5, 0.94, exposed_rock))
 		# The jungle plateau is a raised, lushly-vegetated landform sitting
 		# out in the wasteland -- checked here, BEFORE the plain bare-dirt/
 		# rock return above takes over, or the whole biome would render as
@@ -881,6 +1048,10 @@ func _height_color(h: float, past_edge: bool, world_pos: Vector2 = Vector2.INF) 
 		if canyon_blend > 0.0:
 			natural = natural.lerp(dirt, canyon_blend)
 
+	# Keep this after biome colour blending: slope is physical exposure, not a
+	# competing biome boundary, and therefore should agree with the final mesh.
+	natural = natural.lerp(rock, exposed_rock * 0.9)
+
 	return natural
 
 
@@ -907,8 +1078,9 @@ func _build_mesh() -> void:
 			var wz := -FIELD_HALF_SIZE + iz * spacing
 			var h := get_height(wx, wz)
 			var past_edge := _past_edge(wx, wz, Vector2(wx, wz).length())
-			st.set_color(_height_color(h, past_edge, Vector2(wx, wz)))
-			st.set_normal(_sample_normal(wx, wz))
+			var normal := _sample_normal(wx, wz)
+			st.set_color(_height_color(h, past_edge, Vector2(wx, wz), normal))
+			st.set_normal(normal)
 			st.add_vertex(Vector3(wx, h, wz))
 
 	for iz in RESOLUTION - 1:
@@ -943,6 +1115,7 @@ func _build_mesh() -> void:
 
 	var mesh_instance := MeshInstance3D.new()
 	mesh_instance.mesh = st.commit()
+	GroundPaint.mark_terrain(mesh_instance)
 	add_child(mesh_instance)
 
 
@@ -987,16 +1160,12 @@ func _build_eastern_lake() -> void:
 			st.set_normal(Vector3.UP)
 			st.add_vertex(Vector3(x1, LAKE_WATER_LEVEL, z1))
 
-	var material := StandardMaterial3D.new()
-	# Render the large lake in the opaque pass. Unlike the small fountain,
-	# transparent blending across a full vista is expensive; the water-blorb
-	# blue stays intact and the deep floor is not needed for gameplay reading.
-	material.albedo_color = Color(
-		TownProps.WATER_COLOR.r, TownProps.WATER_COLOR.g, TownProps.WATER_COLOR.b, 1.0
+	var material := ShaderMaterial.new()
+	material.shader = OCEAN_WATER_SHADER
+	material.set_shader_parameter(
+		"surface_color",
+		Color(TownProps.WATER_COLOR.r,TownProps.WATER_COLOR.g,TownProps.WATER_COLOR.b,0.76)
 	)
-	material.roughness = 0.05
-	material.metallic = 0.15
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	st.set_material(material)
 
 	var lake := MeshInstance3D.new()
@@ -1077,27 +1246,15 @@ const BUBBLE_SPRAY_THRESHOLD := 1.15
 ## safely inside the lava regardless of which way the pool's edge noise
 ## happens to bulge at that angle.
 func _build_fire_vents() -> void:
-	_fire_vents.clear()
+	var positions: Array = []
 	var y := VOLCANO_LAVA_HEIGHT + LAVA_SURFACE_Y_OFFSET
 	for i in FIRE_VENT_COUNT:
 		var angle := _rng.randf_range(0.0, TAU)
 		var max_radius := _volcano_edge_radius(angle) * VOLCANO_LAVA_RADIUS_FRACTION
 		var r := _rng.randf_range(0.0, max_radius * 0.85)
 		var pos := Vector3(VOLCANO_CENTER.x + cos(angle) * r, y, VOLCANO_CENTER.y + sin(angle) * r)
-		var particles := _make_fire_burst()
-		particles.position = pos
-		add_child(particles)
-		# Sphere centered exactly on the same surface point the particles use
-		# -- half above, half below the lava surface, per direct instruction.
-		var bubble := _make_lava_bubble()
-		bubble.position = pos
-		add_child(bubble)
-		var total := _rng.randf_range(0.8, 6.0)
-		_fire_vents.append({
-			"particles": particles, "bubble": bubble,
-			"timer": total, "total": total,
-			"peak": _rng.randf_range(BUBBLE_PEAK_RANGE.x, BUBBLE_PEAK_RANGE.y),
-		})
+		positions.append(pos)
+	LavaSurfaceFX.attach(self, positions, 20260913)
 
 
 func _make_lava_bubble() -> MeshInstance3D:

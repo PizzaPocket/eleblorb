@@ -20,11 +20,17 @@ static func attach(
 	radius: float,
 	on_activate: Callable,
 	on_enter: Callable = Callable(),
-	on_exit: Callable = Callable()
+	on_exit: Callable = Callable(),
+	allow_active_control_body: bool = false,
+	max_vertical_distance: float = 1.5
 ) -> Area3D:
 	var area := Area3D.new()
 	area.collision_layer = 0
-	area.collision_mask = 2  # player only (see player.tscn)
+	area.collision_mask = (
+		2 | 1 | Blorb.GIANT_THROWABLE_LAYER
+		if allow_active_control_body
+		else 2
+	) # ordinary player, or the currently piloted physical body when opted in
 	var shape := CollisionShape3D.new()
 	var sphere := SphereShape3D.new()
 	sphere.radius = radius
@@ -32,16 +38,22 @@ static func attach(
 	area.add_child(shape)
 	area.set_meta("prompt", prompt)
 	area.set_meta("activate", on_activate)
+	area.set_meta("interaction_radius", radius)
+	area.set_meta("max_vertical_distance", max_vertical_distance)
 	area.body_entered.connect(
 		func(body: Node3D) -> void:
-			if body is CharacterBody3D:
+			if body is CharacterBody3D or (
+				allow_active_control_body and body == PartyControl.active_control_body()
+			):
 				InteractionManager.enter(area)
 				if on_enter.is_valid():
 					on_enter.call(body)
 	)
 	area.body_exited.connect(
 		func(body: Node3D) -> void:
-			if body is CharacterBody3D:
+			if body is CharacterBody3D or (
+				allow_active_control_body and body == PartyControl.active_control_body()
+			):
 				InteractionManager.exit(area)
 				if on_exit.is_valid():
 					on_exit.call(body)

@@ -28,9 +28,9 @@ background_mode = 2
 sky = SubResource("Sky_1")
 fog_enabled = true
 fog_light_color = Color(0.5, 0.7, 0.75, 1)
-# A light ocean haze keeps the far horizon soft without erasing islands,
-# ships, or navigation landmarks across ordinary gameplay distances. The
-# visual-only ocean extension still hides the 900-unit wrap boundary.
+; A light ocean haze keeps the far horizon soft without erasing islands,
+; ships, or navigation landmarks across ordinary gameplay distances. The
+; visual-only ocean extension still hides the 900-unit wrap boundary.
 fog_density = 0.002
 
 [node name="OceanKingdom" type="Node3D"]
@@ -49,6 +49,7 @@ light_angular_distance = 1.5
 
 [node name="DayNightCycle" type="Node" parent="."]
 script = ExtResource("6")
+planetary_ocean_level = -0.5
 
 [node name="Terrain" type="StaticBody3D" parent="."]
 script = ExtResource("3")

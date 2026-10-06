@@ -8,27 +8,37 @@ const TIP_INTERVAL := 3.2
 const READY_HOLD_DURATION := 0.18
 const WEB_WORLD_PROGRESS_START := 0.55
 const WEB_WORLD_PROGRESS_END := 0.65
+const DEFAULT_LAUNCH_SCENE := "res://scenes/demo_world.tscn"
 
 const KEYBOARD_TIPS := [
 	"Press F near people, objects, and Blorbs to interact.",
-	"Press Tab to open Items, Blorbs, and your Character.",
-	"Press T to toggle your Blorb suit.",
+	"Press T to equip or remove your Blorb suit.",
+	"Press Tab to open Items, Blorbs, and Character equipment.",
+	"Press B or N to switch between playable party members.",
+	"Press V to call an available Blorb beneath you.",
+	"Hold Alt while moving to run.",
+	"Use Q and E for arm powers; Shift and C for leg powers.",
 	"Bounce off a Blorb and jump as you land to leap higher.",
-	"A compass can point you toward wild Blorbs.",
 ]
 const CONTROLLER_TIPS := [
 	"Press X near people, objects, and Blorbs to interact.",
-	"Use the View button to open Items, Blorbs, and your Character.",
-	"Press D-pad Up to toggle your Blorb suit.",
+	"Press D-pad Up to equip or remove your Blorb suit.",
+	"Use the View button to open Items, Blorbs, and Character equipment.",
+	"Press D-pad Left or Right to switch playable party members.",
+	"Press D-pad Down to call an available Blorb beneath you.",
+	"Hold A while moving to run.",
+	"Use the shoulder buttons and triggers for Blorb powers.",
 	"Bounce off a Blorb and press Y as you land to leap higher.",
-	"A compass can point you toward wild Blorbs.",
 ]
 const TOUCH_TIPS := [
 	"Tap an action when you are close enough to interact.",
 	"Open your inventory to see Items, Blorbs, and your Character.",
 	"Use the Blorb suit action to wear your party Blorbs.",
+	"Use the character arrows to change playable party members.",
+	"Call an available Blorb beneath you for help platforming.",
+	"Hold the run action while moving to travel faster.",
+	"Arm and leg actions activate the powers of worn Blorbs.",
 	"Bounce off a Blorb and jump as you land to leap higher.",
-	"A compass can point you toward wild Blorbs.",
 ]
 
 var _screen: Control
@@ -50,15 +60,41 @@ var _owns_modal_lock := false
 var _build_queue: Array[Dictionary] = []
 var _build_queue_running := false
 var _pending_build_jobs := 0
+var _input_mode := "keyboard"
+var _launch_scene_path := DEFAULT_LAUNCH_SCENE
 
 
 func _ready() -> void:
 	layer = 100
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	_acquire_modal_lock()
 	_web_loader_active = _detect_web_loader()
-	if not _web_loader_active:
-		_build_ui()
+	_input_mode = "touch" if _is_touch_device() else (
+		"controller" if not Input.get_connected_joypads().is_empty() else "keyboard"
+	)
+	# The application now boots into a tiny title scene. Stay dormant until
+	# A title-screen mode is chosen; constructing a full-screen loading overlay here
+	# would cover that start screen before the player could interact with it.
+
+
+## Called once the lightweight start scene has rendered. Native startup has
+## no cover to dismiss; web startup still owns an HTML bootstrap layer, which
+## must be released here rather than waiting for the gameplay world to load.
+func reveal_start_screen() -> void:
+	if _web_loader_active:
+		_web_eval("window.eleblorbWorldReady && window.eleblorbWorldReady();")
+		_web_loader_active = false
+	_initial_boot = false
+
+
+## The title selects a world before entering the one lightweight loading
+## scene. Keeping this choice in the persistent loader avoids separate loading
+## scenes—or a global project boot swap—for Demo and the canonical campaign.
+func set_launch_scene(scene_path: String) -> void:
+	_launch_scene_path = scene_path
+
+
+func launch_scene() -> String:
+	return _launch_scene_path
 
 
 func _process(delta: float) -> void:
@@ -72,6 +108,23 @@ func _process(delta: float) -> void:
 		_elapsed = 0.0
 		_tip_index = (_tip_index + 1) % _tips().size()
 		_show_tip()
+
+
+func _input(event: InputEvent) -> void:
+	var next_mode := _input_mode
+	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
+		next_mode = "controller"
+	elif event is InputEventScreenTouch or event is InputEventScreenDrag:
+		next_mode = "touch"
+	elif event is InputEventKey or event is InputEventMouse:
+		next_mode = "keyboard"
+	if next_mode == _input_mode:
+		return
+	_input_mode = next_mode
+	_tip_index = 0
+	if _primary_hint_label != null:
+		_primary_hint_label.text = _primary_hint()
+	_show_tip()
 
 
 func complete() -> void:
@@ -120,10 +173,16 @@ func begin_transition() -> void:
 
 
 func set_phase(text: String, progress: float = -1.0) -> void:
+	var phase_changed := text != _phase
 	_phase = text
 	if progress >= 0.0:
 		_progress = clampf(progress, 0.0, 1.0)
 	_refresh_ui()
+	# A real construction-stage transition is also a natural tip cadence. This
+	# guarantees useful variety even when one expensive stage dominates the load.
+	if phase_changed and _tip_label != null:
+		_tip_index = (_tip_index + 1) % _tips().size()
+		_show_tip()
 	if _initial_boot and _web_loader_active:
 		var encoded_text := JSON.stringify(_phase)
 		_web_eval("window.eleblorbLoadingPhase && window.eleblorbLoadingPhase(%s, %.4f);" % [encoded_text, _progress])
@@ -157,6 +216,9 @@ func _drain_build_queue() -> void:
 		await get_tree().process_frame
 		var entry: Dictionary = _build_queue.pop_front()
 		set_phase(entry["label"] as String)
+		# Let the newly selected phase and tip reach the display before the
+		# corresponding generator occupies the main thread.
+		await get_tree().process_frame
 		var job: Callable = entry["job"] as Callable
 		if job.is_valid():
 			job.call()
@@ -190,6 +252,9 @@ func _build_ui() -> void:
 	_screen = Control.new()
 	_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_screen.mouse_filter = Control.MOUSE_FILTER_STOP
+	# The loading overlay is an autoload-owned tree rather than a child of a
+	# themed gameplay scene, so it must opt into the shared font explicitly.
+	_screen.theme = UITheme.get_theme()
 	add_child(_screen)
 
 	var backdrop := ColorRect.new()
@@ -268,17 +333,17 @@ func _layout() -> void:
 
 
 func _primary_hint() -> String:
-	if _is_touch_device():
+	if _input_mode == "touch":
 		return "Drag the left control to move · Drag the world to look"
-	if not Input.get_connected_joypads().is_empty():
+	if _input_mode == "controller":
 		return "Left Stick to move · Right Stick to look · Y to jump"
 	return "WASD to move · Mouse to look · Space to jump"
 
 
 func _tips() -> Array:
-	if _is_touch_device():
+	if _input_mode == "touch":
 		return TOUCH_TIPS
-	if not Input.get_connected_joypads().is_empty():
+	if _input_mode == "controller":
 		return CONTROLLER_TIPS
 	return KEYBOARD_TIPS
 

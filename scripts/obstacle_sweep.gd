@@ -41,8 +41,24 @@ static func slide(
 			return moved + remaining
 		if unsafe <= 0.0:
 			# Already overlapping where it starts (spawned or shoved into a
-			# prop). Refusing every move would trap the body, so let it leave.
-			return moved + remaining
+			# prop). The former fallback admitted the whole motion unconditionally,
+			# which made one incidental overlap a licence to pass through every
+			# subsequent wall. Resolve only the component pointing farther into
+			# the contacted surface; motion away from it remains free.
+			query.motion = Vector3.ZERO
+			var overlap_rest := space.get_rest_info(query)
+			if overlap_rest.is_empty():
+				return moved
+			var overlap_normal: Vector3 = overlap_rest["normal"]
+			overlap_normal.y = 0.0
+			if overlap_normal.length_squared() < 0.0001:
+				return moved
+			overlap_normal = overlap_normal.normalized()
+			var into_surface := remaining.dot(overlap_normal)
+			if into_surface >= 0.0:
+				return moved + remaining
+			remaining -= overlap_normal * into_surface
+			continue
 		moved += remaining * safe
 		# Read the surface normal just inside the contact, then flatten it:
 		# a driven body slides along walls, never up or down them.

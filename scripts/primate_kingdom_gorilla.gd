@@ -111,6 +111,7 @@ func _spawn_gorilla() -> void:
 	gorilla.gait_speed_multiplier = GORILLA_GAIT_SPEED_MULTIPLIER
 	gorilla.roam_radius = GORILLA_ROAM_RADIUS
 	gorilla.parkour_collision = true
+	gorilla.titan_host = true
 	gorilla.display_name = GORILLA_NAME
 	var talk_lines: Array[String] = [
 		"%s doesn't seem to notice you -- or much of anything down here." % GORILLA_NAME,

@@ -24,6 +24,9 @@ func _spawn_test_party() -> void:
 	await LoadingScreen.wait_for_world_builds()
 	await get_tree().process_frame
 	await get_tree().process_frame
+	# A title-screen test start brings its own party.
+	if KingdomTravel.debug_loadout_in_use:
+		return
 	for node in get_tree().get_nodes_in_group("blorbs"):
 		var existing:=node as Blorb
 		if existing!=null and existing.in_party:

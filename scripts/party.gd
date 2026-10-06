@@ -30,6 +30,12 @@ var _active_playable_id: String = PartyControl.HUMAN_ID
 var _recovery_health_fraction: float = 1.0
 
 
+func reset_for_new_session() -> void:
+	_roster.clear()
+	_active_playable_id = PartyControl.HUMAN_ID
+	_recovery_health_fraction = 1.0
+
+
 func force_recovery_resources(minimum_fraction: float = 1.0) -> void:
 	_recovery_health_fraction = clampf(minimum_fraction, 0.0, 1.0)
 	_active_playable_id = PartyControl.HUMAN_ID

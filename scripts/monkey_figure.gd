@@ -205,18 +205,17 @@ const FOOT_BOTTOM_RADIUS := 0.013
 ## rather than tapering to a point on the floor.
 const FOOT_TOE_REACH := 1.15
 const FOOT_TOE_PINCH := 0.62
+const HAND_DOME_STEPS := BlorbSuit.CAPSULE_DOME_STEPS
+const FOOT_DOME_STEPS := BlorbSuit.CAPSULE_DOME_STEPS
 
 # Match the blorb suit's noodle tessellation and rounded end treatment so
 # Xiao Hou Zi's limbs share that same smooth, continuous general silhouette.
 const LIMB_RADIAL_SEGMENTS := BlorbSuit.LIMB_RADIAL_SEGMENTS
 const LIMB_RINGS_PER_SEGMENT := BlorbSuit.RINGS_PER_SEGMENT
-## Deliberately NOT hidden inside the body the way the tail's own base point
-## is (see _build_tail) -- per direct instruction the shoulder is allowed a
-## visible pinch where a limb meets the torso (procedural_figure.gd's own
-## _build_arm has the identical exception, "the resulting pinch there is
-## fine"), so the tube's own end-taper landing right at the shoulder/hip
-## pivot is accepted here too rather than adding embed math for a first
-## draft.
+## Retained for tail and legacy callers. Monkey arms and legs now author their
+## own hidden base and rounded terminal stations instead of relying on this
+## generic whole-length taper: anatomical endpoints must remain smooth under
+## articulation and must not collapse to visible points at shoulders or toes.
 const LIMB_CAP_FRACTION := BlorbSuit.TUBE_CAP_FRACTION
 
 ## Tail: a short tube curving up and back from low on the body's back, per
@@ -254,7 +253,7 @@ const TAIL_RADIUS := 0.007
 ## steps means a smoother quarter-circle radius profile (each step is
 ## still linearly interpolated both in position and radius between its
 ## neighbors, so too few would facet the dome into visible flats).
-const TAIL_DOME_STEPS := 4
+const TAIL_DOME_STEPS := BlorbSuit.CAPSULE_DOME_STEPS
 ## Optional tip marking (see _build_tail()'s own `tip_marking_color` param,
 ## added for Yogi -- docs/world_bible.md's own Creatures/Cats entry): how
 ## many alternating marking/fur colinear sub-segments the final real tail
@@ -889,43 +888,16 @@ static func _rebuild_tail(state: Dictionary, delta: float) -> void:
 			colors.insert(insert_at, fur_color if step % 2 == 1 else tip_marking_color)
 			insert_at += 1
 
-	# The rounded tip is a few extra points appended to this SAME point/
-	# radius list, continuing past the real (now-bent) tail geometry along
-	# its own last heading, so build_limb_tube lofts the cap as part of one
-	# unbroken surface instead of a second mesh glued on afterward (see
-	# this file's own class-level comment on _build_tail's history for why
-	# a separate primitive -- even one sized to match exactly -- still
-	# read as "a weird ball" per direct report). Each step moves further
-	# along that heading while its radius follows a quarter-circle profile
-	# (cos/sin of the same angle) down to a true zero-radius point at the
-	# very end, tracing a dome rather than a cone -- a linear taper alone
-	# would pinch to a point in a straight line and look faceted, not
-	# rounded.
-	var tip := points[points.size() - 1]
-	var tail_heading := (tip - points[points.size() - 2]).normalized()
-	# Matches radii's own radius_scale (see _build_tail's own doc comment) --
-	# otherwise a scaled-up tail's dome cap pinches down to MonkeyFigure's
-	# own tiny unscaled TAIL_RADIUS instead of tapering from the actual
-	# (bigger) tail thickness.
-	var dome_radius: float = TAIL_RADIUS * (state.get("radius_scale", 1.0) as float)
-	for step in range(1, TAIL_DOME_STEPS + 1):
-		var theta := (float(step) / TAIL_DOME_STEPS) * (PI * 0.5)
-		points.append(tip + tail_heading * (dome_radius * sin(theta)))
-		radii.append(dome_radius * cos(theta))
-		# The dome cap itself is the solid "cap of the tail" -- entirely
-		# marking-colored, continuing on from the last (marking) ring band
-		# built above with no fur gap in between.
-		if tip_marking_color != null:
-			colors.append(tip_marking_color)
-
 	var mesh_instance := state["mesh"] as MeshInstance3D
 	if tip_marking_color != null:
 		mesh_instance.mesh = BlorbSuit.build_limb_tube(
-			points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, TAIL_CAP_FRACTION, colors
+			points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, TAIL_CAP_FRACTION,
+			colors, true, Vector3.ZERO, 1.0, false, [], TAIL_DOME_STEPS
 		)
 	else:
 		mesh_instance.mesh = BlorbSuit.build_limb_tube(
-			points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, TAIL_CAP_FRACTION
+			points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, TAIL_CAP_FRACTION,
+			[], true, Vector3.ZERO, 1.0, false, [], TAIL_DOME_STEPS
 		)
 
 
@@ -1211,16 +1183,68 @@ static func _add_muzzle_features(
 		)
 	if not has_cheek_dots:
 		return
-	# One warm-yellow cheek dot per side, just under the eye's own radius.
-	# These read as flat pigment spots, not raised bumps, so depth_scale is
-	# cut hard (0.03 -> 0.02 -> 0.006) and surface_offset brought down to a
-	# near-flush sliver (0.00003 -> 0.00002 -> 0.000004) per repeated direct
-	# correction that they still looked like marbles poking off the face.
+	# One warm-yellow cosmetic patch per side.  These used to be extremely
+	# squashed super-eggs, but a squashed solid still has a convex face and
+	# sidewall and therefore continued to read as a tiny marble.  Sample the
+	# actual muzzle surface instead: the patch shares its curvature and has no
+	# volume at all beyond a microscopic anti-z-fighting clearance.
 	for side in [-1.0, 1.0]:
-		_add_muzzle_detail(
-			muzzle, "CheekDot", Vector2(side * 0.0135, -0.0100) * xy_scale, Vector2.ONE * 0.0033 * xy_scale,
-			CHEEK_DOT_COLOR, 0.006, 0.000004 * face_scale.z, head_size, head_epsilon, chin_extend
+		_add_muzzle_surface_patch(
+			muzzle, "CheekDot", Vector2(side * 0.0135, -0.0100) * xy_scale,
+			Vector2.ONE * 0.0033 * xy_scale, CHEEK_DOT_COLOR,
+			0.000006 * face_scale.z, head_size, head_epsilon, chin_extend
 		)
+
+
+static func _add_muzzle_surface_patch(
+	muzzle: MeshInstance3D, patch_name: String, center: Vector2,
+	half_size: Vector2, color: Color, surface_offset: float,
+	head_size: Vector3 = HEAD_SIZE, head_epsilon: float = HEAD_EPSILON,
+	chin_extend: float = 0.0
+) -> void:
+	const RINGS := 3
+	const SEGMENTS := 24
+	var ring_points: Array = []
+	for ring_index in range(RINGS + 1):
+		var radius := float(ring_index) / float(RINGS)
+		var ring: Array[Vector3] = []
+		var count := 1 if ring_index == 0 else SEGMENTS
+		for segment in count:
+			var angle := 0.0 if ring_index == 0 else TAU * float(segment) / float(SEGMENTS)
+			var xy := center + Vector2(cos(angle) * half_size.x, sin(angle) * half_size.y) * radius
+			var z := _muzzle_front_z(xy.x, xy.y, head_size, head_epsilon, chin_extend)
+			var sample_step := 0.00015
+			var dz_dx := (
+				_muzzle_front_z(xy.x + sample_step, xy.y, head_size, head_epsilon, chin_extend)
+				- _muzzle_front_z(xy.x - sample_step, xy.y, head_size, head_epsilon, chin_extend)
+			) / (sample_step * 2.0)
+			var dz_dy := (
+				_muzzle_front_z(xy.x, xy.y + sample_step, head_size, head_epsilon, chin_extend)
+				- _muzzle_front_z(xy.x, xy.y - sample_step, head_size, head_epsilon, chin_extend)
+			) / (sample_step * 2.0)
+			var normal := Vector3(-dz_dx, -dz_dy, 1.0).normalized()
+			ring.append(Vector3(xy.x, xy.y, z) + normal * surface_offset)
+		ring_points.append(ring)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for segment in SEGMENTS:
+		var next := (segment + 1) % SEGMENTS
+		_add_mesh_triangle(st, ring_points[0][0], ring_points[1][segment], ring_points[1][next])
+	for ring_index in range(1, RINGS):
+		for segment in SEGMENTS:
+			var next := (segment + 1) % SEGMENTS
+			var a: Vector3 = ring_points[ring_index][segment]
+			var b: Vector3 = ring_points[ring_index][next]
+			var c: Vector3 = ring_points[ring_index + 1][segment]
+			var d: Vector3 = ring_points[ring_index + 1][next]
+			_add_mesh_triangle(st, a, c, b)
+			_add_mesh_triangle(st, b, c, d)
+	st.generate_normals()
+	var patch := MeshInstance3D.new()
+	patch.name = patch_name
+	patch.mesh = st.commit()
+	patch.material_override = _build_marking_material(color)
+	muzzle.add_child(patch)
 
 
 static func _add_muzzle_detail(
@@ -1467,21 +1491,17 @@ static func rebuild_limbs(pivots: Dictionary, root: Node3D, delta: float = 0.0) 
 	# last stretch, so it bends when the wrist turns. The radius at the wrist
 	# is the old profile's value at that point, which keeps the silhouette.
 	var hand_start_radius := lerpf(ARM_RADIUS_ELBOW, wrist_radius, 1.0 - HAND_FRACTION * 2.0)
-	_rebuild_tube(
+	_rebuild_arm(
 		pivots["_limb_mesh_arm_left"] as MeshInstance3D, root,
-		[
-			pivots["arm_left"] as Node3D, pivots["elbow_left"] as Node3D,
-			pivots["wrist_left"] as Node3D, pivots["fingertip_left"] as Node3D,
-		],
-		[ARM_RADIUS_SHOULDER, ARM_RADIUS_ELBOW, hand_start_radius, wrist_radius]
+		pivots["arm_left"] as Node3D, pivots["elbow_left"] as Node3D,
+		pivots["wrist_left"] as Node3D, pivots["fingertip_left"] as Node3D,
+		hand_start_radius, wrist_radius
 	)
-	_rebuild_tube(
+	_rebuild_arm(
 		pivots["_limb_mesh_arm_right"] as MeshInstance3D, root,
-		[
-			pivots["arm_right"] as Node3D, pivots["elbow_right"] as Node3D,
-			pivots["wrist_right"] as Node3D, pivots["fingertip_right"] as Node3D,
-		],
-		[ARM_RADIUS_SHOULDER, ARM_RADIUS_ELBOW, hand_start_radius, wrist_radius]
+		pivots["arm_right"] as Node3D, pivots["elbow_right"] as Node3D,
+		pivots["wrist_right"] as Node3D, pivots["fingertip_right"] as Node3D,
+		hand_start_radius, wrist_radius
 	)
 	_rebuild_footed_leg(
 		pivots["_limb_mesh_leg_left"] as MeshInstance3D, root,
@@ -1498,14 +1518,43 @@ static func rebuild_limbs(pivots: Dictionary, root: Node3D, delta: float = 0.0) 
 	_rebuild_tail(pivots["_tail"] as Dictionary, delta)
 
 
-static func _rebuild_tube(
-	mesh_instance: MeshInstance3D, root: Node3D, joints: Array[Node3D], radii: Array[float]
+static func _rebuild_arm(
+	mesh_instance: MeshInstance3D, root: Node3D,
+	shoulder: Node3D, elbow: Node3D, wrist: Node3D, fingertip: Node3D,
+	hand_start_radius: float, wrist_radius: float
 ) -> void:
-	var points: Array[Vector3] = []
-	for joint in joints:
-		points.append(root.to_local(joint.global_position))
+	var shoulder_pos := root.to_local(shoulder.global_position)
+	var elbow_pos := root.to_local(elbow.global_position)
+	var wrist_pos := root.to_local(wrist.global_position)
+	var fingertip_pos := root.to_local(fingertip.global_position)
+	var hand_axis := fingertip_pos - wrist_pos
+	if hand_axis.length_squared() < 0.000001:
+		hand_axis = (wrist_pos - elbow_pos).normalized() * 0.001
+	var hand_length := hand_axis.length()
+	hand_axis = hand_axis.normalized()
+	# The actual shoulder joint sits slightly beyond the pear body's surface.
+	# Begin this same loft at a zero-radius point buried toward the torso, then
+	# reach full arm radius at the joint.  The old generic cap instead shrank
+	# to a visible point exactly at the joint; simply disabling it would expose
+	# a flat circular cut.  This hidden shoulder dome gives the arm a smooth,
+	# continuous emergence from the body.
+	var shoulder_side := signf(shoulder_pos.x)
+	var shoulder_inner := shoulder_pos - Vector3.RIGHT * shoulder_side * ARM_RADIUS_SHOULDER * 2.2
+	# The hand remains the same continuous noodle as the arm. Its final body
+	# station is the fingertip marker at a restrained radius; the shared tube
+	# builder adds a true hemisphere beyond it. Previously a full-width dome
+	# was compressed into the last 24% of this very short hand marker, making
+	# the end several times wider than it was long (the reported UFO bell).
+	var points: Array[Vector3] = [
+		shoulder_inner, shoulder_pos, elbow_pos, wrist_pos, fingertip_pos,
+	]
+	var radii: Array[float] = [
+		0.0, ARM_RADIUS_SHOULDER, ARM_RADIUS_ELBOW, hand_start_radius,
+		wrist_radius * 1.04,
+	]
 	mesh_instance.mesh = BlorbSuit.build_limb_tube(
-		points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, LIMB_CAP_FRACTION
+		points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, 0.0,
+		[], false, Vector3.ZERO, 1.0, false, [], HAND_DOME_STEPS
 	)
 
 
@@ -1568,11 +1617,15 @@ static func _rebuild_footed_leg(
 	# sole does, so the whole underside rests on the ground rather than
 	# sinking through it.
 	var toe_radius := sole_radius * FOOT_TOE_PINCH
-	var toe_pos := (
+	var toe_tip_pos := (
 		ankle_pos - lower_up * (ANKLE_HEIGHT - toe_radius)
 		+ lower_forward * (FOOT_BULB_FORWARD + sole_radius * FOOT_TOE_REACH)
 	)
-	var points: Array[Vector3] = [hip_pos, knee_pos, transition_pos, bulb_pos, sole_pos, toe_pos]
+	# The final body station is the dome's equator. The shared tube builder
+	# appends its exact hemisphere after the Catmull-Rom body has finished, so
+	# the cap cannot be re-curved into the small protruding spike seen before.
+	var toe_dome_start := toe_tip_pos - lower_forward * toe_radius
+	var points: Array[Vector3] = [hip_pos, knee_pos, transition_pos, bulb_pos, sole_pos, toe_dome_start]
 	# taper_scale eases the bulge itself (and the point partway toward it)
 	# back toward the knee's own radius -- FOOT_BOTTOM_RADIUS is left alone
 	# since the toe tip's own pinch is a separate detail, not the "widens
@@ -1584,7 +1637,8 @@ static func _rebuild_footed_leg(
 		sole_radius, toe_radius,
 	]
 	mesh_instance.mesh = BlorbSuit.build_limb_tube(
-		points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, LIMB_CAP_FRACTION
+		points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, 0.0,
+		[], false, Vector3.ZERO, 1.0, false, [], FOOT_DOME_STEPS
 	)
 	if has_pad:
 		_rebuild_sole_from_leg_mesh(

@@ -139,6 +139,7 @@ const LEG_REST_SETTLE_SPEED := 6.0
 ## engine like every other unspecified number in this rig -- a much heavier,
 ## slower gait than Manchego's own since this is a titan, not a horse.
 const WANDER_RADIUS := 10.0
+@export var wander_radius := WANDER_RADIUS
 const WANDER_MOVE_SPEED := 1.3
 const WANDER_ARRIVE_DISTANCE := 0.4
 const WANDER_PAUSE_MIN := 3.0
@@ -205,6 +206,9 @@ var _rng := RandomNumberGenerator.new()
 ## placed at, so any slope under him left him treading the air above it or
 ## sunk into it, which his own size made impossible to miss.
 var _terrain: Node = null
+## Stored in world space. Dinosaur is commonly nested under the scaled fossil
+## scene; parent-local distances made a five-metre route become a twenty-five-
+## metre route and let his physical footprint climb out of its basin.
 var _wander_anchor := Vector3.ZERO
 var _wander_target := Vector3.ZERO
 var _has_wander_target := false
@@ -216,13 +220,15 @@ var _wander_pause_timer := 0.0
 ## by hand -- AnimatableBody3D was tried and abandoned elsewhere in this
 ## project for exactly this kind of script-driven movement).
 var _animated_colliders: Array[Dictionary] = []
+var _player_controlled := false
+var _titan_suit_host: TitanSuitHost
 
 
 func _ready() -> void:
 	scale = Vector3.ONE * DISPLAY_SCALE
 	_terrain = _find_terrain()
 	_rng.randomize()
-	_wander_anchor = _turn_pivot_parent_position()
+	_wander_anchor = _turn_pivot_global_position()
 	collision_layer = 1 | TownProps.BLORB_CLIMBABLE_LAYER
 	_build_torso()
 	_build_head()
@@ -232,12 +238,19 @@ func _ready() -> void:
 	for side in [-1.0, 1.0]:
 		_build_leg(Vector3(HIP_X, 0.0, side * LEG_SIDE_Z), HIND_LEG_HALF, true, "Hind")
 		_build_leg(Vector3(SHOULDER_X, 0.0, side * LEG_SIDE_Z), FRONT_LEG_HALF, false, "Front")
+	_titan_suit_host = TitanSuitHost.new()
+	_titan_suit_host.name = "TitanSuitHost"
+	add_child(_titan_suit_host)
+	_titan_suit_host.setup(self, "Dinosaur")
 
 
 func _physics_process(delta: float) -> void:
-	var moving := _update_wander(delta)
-	_settle_to_ground()
-	_animate_gait(delta, moving)
+	if not _player_controlled:
+		var moving := _update_wander(delta)
+		_settle_to_ground()
+		_animate_gait(delta, moving)
+	else:
+		_settle_to_ground()
 
 	for entry in _animated_colliders:
 		var collider := entry["collider"] as CollisionShape3D
@@ -245,6 +258,66 @@ func _physics_process(delta: float) -> void:
 		var local_xform := global_transform.affine_inverse() * mesh.global_transform
 		collider.position = local_xform.origin
 		collider.basis = local_xform.basis
+
+
+func can_accept_titan_suit() -> bool:
+	return WorldState.dinosaur_resurrected
+
+
+func titan_interaction_radius() -> float:
+	return 12.0 * DISPLAY_SCALE
+
+
+func begin_host_control(_source: Node3D) -> bool:
+	_player_controlled = true
+	_has_wander_target = false
+	return true
+
+
+func end_host_control(_source: Node3D) -> void:
+	_player_controlled = false
+	reset_wander_anchor()
+
+
+## The fossil container finishes correcting this child's inherited scale only
+## after add_child() has run _ready(). Let every spawner explicitly recapture
+## the real, final torso location instead of preserving that temporary scale.
+func reset_wander_anchor() -> void:
+	_wander_anchor = _turn_pivot_global_position()
+	_wander_target = _wander_anchor
+	_has_wander_target = false
+	_wander_pause_timer = _rng.randf_range(WANDER_PAUSE_MIN, WANDER_PAUSE_MAX)
+
+
+func host_exit_label() -> String:
+	return "Release Dinosaur"
+
+
+func uses_pitched_movement_input() -> bool:
+	return false
+
+
+func camera_focus_point() -> Vector3:
+	# The historical scene origin sits by the hindquarters. Tether the view to
+	# the actual torso mass, like the mount camera contract, rather than the butt.
+	return to_global(Vector3(TORSO_POS.x, TORSO_POS.y * 0.72, TORSO_POS.z))
+
+
+func camera_follow_distance() -> float:
+	return 72.0
+
+
+func drive_from_player(direction: Vector3, delta: float, sprinting: bool, _jump_pressed: bool) -> void:
+	var planar := Vector3(direction.x, 0.0, direction.z)
+	var moving := planar.length_squared() > 0.0001
+	if moving:
+		planar = planar.normalized()
+		var speed := WANDER_MOVE_SPEED * (1.75 if sprinting else 1.0)
+		global_position += planar * speed * delta
+		var heading := atan2(planar.z, -planar.x)
+		_rotate_around_center_of_mass(lerp_angle(rotation.y, heading, WANDER_ROTATION_SPEED * delta))
+	_settle_to_ground()
+	_animate_gait(delta, moving, 1.75 if sprinting else 1.0)
 
 
 ## Picks a nearby point around _wander_anchor, walks to it, pauses, then
@@ -268,7 +341,10 @@ func _settle_to_ground() -> void:
 	if _terrain == null:
 		return
 	var here := global_position
-	var ground: float = _terrain.get_mesh_height(here.x, here.z)
+	# Sample below the torso/turn pivot, not below the historical rear origin.
+	# This keeps the physical animal planted on the basin it actually occupies.
+	var footprint_center := _turn_pivot_global_position()
+	var ground: float = _terrain.get_mesh_height(footprint_center.x, footprint_center.z)
 	var parent := get_parent() as Node3D
 	var lift: float = ground - here.y
 	if parent != null:
@@ -278,7 +354,7 @@ func _settle_to_ground() -> void:
 
 func _update_wander(delta: float) -> bool:
 	var moving := false
-	var pivot_position := _turn_pivot_parent_position()
+	var pivot_position := _turn_pivot_global_position()
 	if _has_wander_target and pivot_position.distance_to(_wander_target) > WANDER_ARRIVE_DISTANCE:
 		moving = true
 	elif _has_wander_target:
@@ -288,7 +364,7 @@ func _update_wander(delta: float) -> bool:
 		_wander_pause_timer -= delta
 		if _wander_pause_timer <= 0.0:
 			var angle := _rng.randf_range(0.0, TAU)
-			var r := WANDER_RADIUS * sqrt(_rng.randf())
+			var r := wander_radius * sqrt(_rng.randf())
 			_wander_target = _wander_anchor + Vector3(cos(angle), 0.0, sin(angle)) * r
 			_has_wander_target = true
 
@@ -296,7 +372,7 @@ func _update_wander(delta: float) -> bool:
 		var to_target := _wander_target - pivot_position
 		to_target.y = 0.0
 		var step := to_target.limit_length(WANDER_MOVE_SPEED * delta)
-		position += step
+		global_position += step
 		# This body's own forward is local -X (see SNOUT_POS vs TORSO_POS,
 		# and LEG_SWING_SPEED's own comment on rotation.z) rather than the
 		# +Z convention most other rigs in this project use, so the usual
@@ -329,15 +405,25 @@ func _turn_pivot_parent_position() -> Vector3:
 	return transform*TURN_PIVOT_LOCAL
 
 
+func _turn_pivot_global_position() -> Vector3:
+	return to_global(TURN_PIVOT_LOCAL)
+
+
+## Broad procedural parts need slightly more joint overlap than a human-scale
+## rig for the shared Boolean shell to remain one joined outer garment.
+func titan_suit_clearance_scale() -> float:
+	return 1.075
+
+
 ## Gates the leg swing on actually walking -- per direct correction ("proper
 ## walk animation and rest state"), holding still no longer keeps the legs
 ## mid-stride. While moving, _leg_phase advances and each leg's target
 ## follows the usual diagonal-pair sine swing; while resting, the target is
 ## just 0 (straight down) and every leg eases toward it at LEG_REST_SETTLE_
 ## SPEED instead of snapping, so a stop/start never hitches.
-func _animate_gait(delta: float, moving: bool) -> void:
+func _animate_gait(delta: float, moving: bool, pace_scale := 1.0) -> void:
 	if moving:
-		_leg_phase = fmod(_leg_phase + delta * LEG_SWING_SPEED, TAU)
+		_leg_phase = fmod(_leg_phase + delta * LEG_SWING_SPEED * pace_scale, TAU)
 	for leg in get_children():
 		if leg is Node3D and leg.has_meta("leg_phase_offset"):
 			var phase_offset: float = leg.get_meta("leg_phase_offset")

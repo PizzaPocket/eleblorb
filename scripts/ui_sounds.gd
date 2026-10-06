@@ -20,6 +20,7 @@ var enabled: bool = true
 var _selection_player: AudioStreamPlayer
 var _action_player: AudioStreamPlayer
 var _back_player: AudioStreamPlayer
+var _special_find_player: AudioStreamPlayer
 var _crt_off_player: AudioStreamPlayer
 var _crt_on_player: AudioStreamPlayer
 var _blorb_bounce_player: AudioStreamPlayer
@@ -169,6 +170,15 @@ func _ready() -> void:
 	_register_foley_variants(&"weapon_swing_inward", [
 		_make_weapon_swipe(0, true), _make_weapon_swipe(1, true), _make_weapon_swipe(2, true),
 	])
+	# Doors and chests: variants so a row of doors never repeats one waveform.
+	_register_foley_variants(&"door_open", [_make_door_creak(0), _make_door_creak(1), _make_door_creak(2)])
+	_register_foley_variants(&"door_close", [_make_door_shut(0), _make_door_shut(1), _make_door_shut(2)])
+	_register_foley_variants(&"chest_open", [_make_chest_open(0), _make_chest_open(1)])
+	_register_foley_variants(&"chest_close", [_make_chest_close(0), _make_chest_close(1)])
+	# The village bell: a struck bronze bell with a long, slowly beating tail.
+	_register_foley_variants(&"village_bell", [_make_village_bell(0), _make_village_bell(1)])
+	# Non-diegetic: it belongs to the player's moment of discovery, not the world.
+	_special_find_player = _make_player(_make_special_find_sting(), &"UI")
 	get_tree().node_added.connect(_on_node_added)
 	_connect_existing(get_tree().root)
 
@@ -569,7 +579,7 @@ func play_foley(event_name: StringName, intensity: float = 0.5, source_id: int =
 		return
 	var cooldown_key := "%s:%d" % [event_name, source_id]
 	var now := Time.get_ticks_msec()
-	var cooldown := 70 if event_name in [&"player_hurt", &"blorb_hurt", &"damage_dealt"] else (720 if event_name == &"giant_move" else (260 if event_name == &"blorb_glide" else 0))
+	var cooldown := 70 if event_name in [&"player_hurt", &"blorb_hurt", &"damage_dealt"] else (720 if event_name == &"giant_move" else (260 if event_name == &"blorb_glide" else (1400 if event_name == &"village_bell" else 0)))
 	if cooldown > 0 and now - int(_event_last_played.get(cooldown_key, -10000)) < cooldown:
 		return
 	_event_last_played[cooldown_key] = now
@@ -589,7 +599,7 @@ func play_foley(event_name: StringName, intensity: float = 0.5, source_id: int =
 			var distance := source.global_position.distance_to(_listener_position())
 			# Landmark bodies are meant to be perceived at landmark scale. Their
 			# deep, sparse contacts carry farther than ordinary local foley.
-			var max_distance := 82.0 if event_name in [&"giant_step", &"giant_move", &"giant_jump", &"giant_land"] else 28.0
+			var max_distance := 82.0 if event_name in [&"giant_step", &"giant_move", &"giant_jump", &"giant_land"] else (110.0 if event_name == &"village_bell" else 28.0)
 			if distance >= max_distance:
 				return
 			distance_attenuation_db = _world_distance_db_for_distance(distance, max_distance)
@@ -1272,6 +1282,158 @@ func _make_weapon_swipe(variant: int, inward: bool) -> AudioStreamWAV:
 	return stream
 
 
+## A subtle hinge creak: a slow stick-slip sawtooth, band-passed and breathy, whose
+## rate and resonance wander so it never sounds like a held note.
+func _make_door_creak(variant: int) -> AudioStreamWAV:
+	var duration := 0.66 + 0.09 * float(variant)
+	var frames := int(duration * SAMPLE_RATE)
+	var samples := PackedFloat32Array()
+	samples.resize(frames)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7100 + variant * 31
+	var filter := _band_pass(560.0, 6.0)
+	var body := _band_pass(190.0, 2.0)
+	var slip := 0.0
+	for i in frames:
+		var t := float(i) / float(maxi(frames - 1, 1))
+		var rate := 44.0 + 13.0 * sin(t * TAU * 1.35 + float(variant)) + 22.0 * t
+		slip += rate / float(SAMPLE_RATE)
+		if slip >= 1.0:
+			slip -= 1.0
+		var saw := slip * 2.0 - 1.0
+		var grit := rng.randf_range(-1.0, 1.0) * 0.28
+		filter.tune(500.0 + 250.0 * t + 60.0 * float(variant) + 70.0 * sin(t * TAU * 2.1), 6.0)
+		var raw := saw * 0.8 + grit
+		var envelope := smoothstep(0.0, 0.14, t) * pow(1.0 - t, 1.25) * (0.62 + 0.38 * sin(t * PI * 3.0 + 0.6))
+		samples[i] = (filter.step(raw) * 1.0 + body.step(raw) * 0.35) * envelope
+	return _hoof_stream(samples, 0.075)
+
+
+## A door meeting its frame: a low wooden thud, a short knock of grit and, a
+## breath later, the latch.
+func _make_door_shut(variant: int) -> AudioStreamWAV:
+	var duration := 0.46
+	var frames := int(duration * SAMPLE_RATE)
+	var samples := PackedFloat32Array()
+	samples.resize(frames)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7200 + variant * 17
+	var knock_filter := _band_pass(240.0 + 40.0 * float(variant), 1.4)
+	var latch_filter := _band_pass(1850.0 + 160.0 * float(variant), 5.0)
+	var phase := 0.0
+	var latch_at := 0.085 + 0.012 * float(variant)
+	for i in frames:
+		var t := float(i) / float(SAMPLE_RATE)
+		var frequency := lerpf(118.0, 52.0, minf(t / 0.22, 1.0))
+		phase += TAU * frequency / float(SAMPLE_RATE)
+		var thud := sin(phase) * exp(-t * 15.0)
+		var knock := knock_filter.step(rng.randf_range(-1.0, 1.0)) * exp(-t * 58.0) * 1.7
+		var click := 0.0
+		if t > latch_at:
+			click = latch_filter.step(rng.randf_range(-1.0, 1.0)) * exp(-(t - latch_at) * 150.0) * 1.3
+		samples[i] = thud * 0.9 + knock * 0.55 + click * 0.5
+	return _hoof_stream(samples, 0.16)
+
+
+## A chest lid on its hinge: a lighter, higher creak than a door, then the soft
+## knock of the lid reaching its stop.
+func _make_chest_open(variant: int) -> AudioStreamWAV:
+	var duration := 0.62
+	var frames := int(duration * SAMPLE_RATE)
+	var samples := PackedFloat32Array()
+	samples.resize(frames)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7300 + variant * 23
+	var filter := _band_pass(900.0, 7.0)
+	var knock_filter := _band_pass(300.0, 1.6)
+	var slip := 0.0
+	var swing := 0.36
+	var phase := 0.0
+	for i in frames:
+		var t := float(i) / float(SAMPLE_RATE)
+		var u := t / duration
+		var rate := 58.0 + 18.0 * sin(u * TAU * 1.6 + float(variant)) + 30.0 * u
+		slip += rate / float(SAMPLE_RATE)
+		if slip >= 1.0:
+			slip -= 1.0
+		var saw := slip * 2.0 - 1.0
+		filter.tune(780.0 + 420.0 * minf(u / 0.6, 1.0) + 90.0 * float(variant), 7.0)
+		var creak_envelope := smoothstep(0.0, 0.1, u) * (1.0 - smoothstep(0.52, 0.64, u)) * 0.9
+		var creak := filter.step(saw * 0.8 + rng.randf_range(-1.0, 1.0) * 0.22) * creak_envelope
+		var stop := 0.0
+		if t > swing:
+			phase += TAU * 96.0 / float(SAMPLE_RATE)
+			stop = (sin(phase) * 0.8 + knock_filter.step(rng.randf_range(-1.0, 1.0)) * 0.9) * exp(-(t - swing) * 26.0)
+		samples[i] = creak * 0.8 + stop * 0.55
+	return _hoof_stream(samples, 0.09)
+
+
+## A chest lid dropping: a hollow wooden thunk with a faint latch.
+func _make_chest_close(variant: int) -> AudioStreamWAV:
+	var duration := 0.34
+	var frames := int(duration * SAMPLE_RATE)
+	var samples := PackedFloat32Array()
+	samples.resize(frames)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 7400 + variant * 13
+	var hollow := _band_pass(190.0 + 30.0 * float(variant), 2.4)
+	var knock := _band_pass(520.0, 2.0)
+	var latch := _band_pass(2100.0, 6.0)
+	var phase := 0.0
+	for i in frames:
+		var t := float(i) / float(SAMPLE_RATE)
+		phase += TAU * lerpf(150.0, 78.0, minf(t / 0.12, 1.0)) / float(SAMPLE_RATE)
+		var thunk := sin(phase) * exp(-t * 20.0)
+		var noise := rng.randf_range(-1.0, 1.0)
+		var tap := (hollow.step(noise) * 1.5 + knock.step(noise) * 0.8) * exp(-t * 48.0)
+		var click := 0.0
+		if t > 0.06:
+			click = latch.step(noise) * exp(-(t - 0.06) * 170.0)
+		samples[i] = thunk * 0.8 + tap * 0.55 + click * 0.35
+	return _hoof_stream(samples, 0.14)
+
+
+## The special-find sting: a bright bell arpeggio over a soft rising pad, an
+## open-fifth chord that resolves on its top note. Non-diegetic (UI bus).
+func _make_special_find_sting() -> AudioStreamWAV:
+	var duration := 2.5
+	var frames := int(duration * SAMPLE_RATE)
+	var samples := PackedFloat32Array()
+	samples.resize(frames)
+	var notes: Array[float] = [659.25, 830.61, 987.77, 1318.51]
+	var starts: Array[float] = [0.0, 0.11, 0.22, 0.38]
+	var pad_notes: Array[float] = [164.81, 246.94, 329.63]
+	for i in frames:
+		var t := float(i) / float(SAMPLE_RATE)
+		var bells := 0.0
+		for n in notes.size():
+			var local := t - starts[n]
+			if local < 0.0:
+				continue
+			var decay := exp(-local * (1.9 if n == notes.size() - 1 else 3.2))
+			var attack := minf(local / 0.004, 1.0)
+			var f: float = notes[n]
+			bells += (sin(TAU * f * local) + 0.38 * sin(TAU * f * 2.0 * local) * exp(-local * 6.0)
+				+ 0.16 * sin(TAU * f * 3.01 * local) * exp(-local * 9.0)) * decay * attack * (1.0 if n == notes.size() - 1 else 0.7)
+		var pad := 0.0
+		var swell := smoothstep(0.0, 0.7, t) * (1.0 - smoothstep(1.4, 2.4, t))
+		for f_pad: float in pad_notes:
+			pad += sin(TAU * f_pad * t) + 0.5 * sin(TAU * f_pad * 1.003 * t)
+		var shimmer := 0.5 + 0.5 * sin(TAU * 5.5 * t)
+		samples[i] = bells * 0.22 + pad * swell * 0.05 * (0.8 + 0.2 * shimmer)
+	return _hoof_stream(samples, 0.2)
+
+
+## The player's moment of discovering something special (a chest revealing a rare
+## item). Plays on the UI bus, so it is felt rather than heard in the world.
+func play_special_find() -> void:
+	if not enabled or _special_find_player == null:
+		return
+	_special_find_player.pitch_scale = 1.0
+	_special_find_player.volume_db = -3.0
+	_special_find_player.play()
+
+
 func _connect_existing(node: Node) -> void:
 	_connect_control(node)
 	for child in node.get_children():
@@ -1409,3 +1571,34 @@ func play_seed_eject(source_id: int = 0) -> void:
 func pulse_power_loop(kind: StringName, source_id: int) -> void:
 	if kind in _power_loop_claims:
 		(_power_loop_claims[kind] as Dictionary)[source_id] = Time.get_ticks_msec()
+
+
+## A struck bronze bell, about two hundred and sixty hertz at its strike note: the
+## partials of a real bell (hum an octave below, minor third, fifth, octave,
+## then the sharper upper partials) each with its own decay, each pair slightly
+## detuned so the tail beats slowly, and a short bright strike on the attack.
+func _make_village_bell(variant: int) -> AudioStreamWAV:
+	var duration := 5.2
+	var frames := int(duration * SAMPLE_RATE)
+	var samples := PackedFloat32Array()
+	samples.resize(frames)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 8100 + variant * 31
+	var fundamental := 262.0 * (1.0 + 0.012 * float(variant))
+	var ratios: Array[float] = [0.5, 1.0, 1.19, 1.5, 2.0, 2.51, 3.01, 4.16]
+	var weights: Array[float] = [0.55, 1.0, 0.72, 0.5, 0.38, 0.26, 0.18, 0.1]
+	var decays: Array[float] = [4.6, 4.0, 3.2, 2.7, 2.1, 1.5, 1.0, 0.6]
+	var strike_filter := _band_pass(2400.0, 1.4)
+	for i in frames:
+		var t := float(i) / float(SAMPLE_RATE)
+		var bell := 0.0
+		for k in ratios.size():
+			var frequency := fundamental * ratios[k]
+			var beat := 1.0 + 0.0035 * float(k % 2 * 2 - 1)
+			var envelope := exp(-t / decays[k] * 3.2)
+			bell += weights[k] * envelope * (
+				sin(TAU * frequency * t) * 0.6 + sin(TAU * frequency * beat * t + float(k)) * 0.4
+			)
+		var strike := strike_filter.step(rng.randf_range(-1.0, 1.0)) * exp(-t * 45.0) * 0.5
+		samples[i] = (bell * 0.17 + strike) * smoothstep(0.0, 0.004, t)
+	return _hoof_stream(samples, 0.8)

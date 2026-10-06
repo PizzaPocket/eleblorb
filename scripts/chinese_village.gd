@@ -190,6 +190,14 @@ const EMPEROR_LINES := [
 const EMPEROR_LINES_AFTER_DEPOSED := [
 	"朕像做了一场很长的噩梦。如今这座村庄由你作主。",
 ]
+## The inn is the Lin family's own, kept on the island since the first
+## settlers. Lines are Chinese like everyone else's here.
+const INNKEEPER_NAME := "林静"
+const INNKEEPER_LINES := [
+	"这间客栈我家守了三代。床铺的被子,每天都晒。",
+	"陈贩子在楼上住了不少年头,还是爱抢靠窗的那张床。",
+	"夜里灯笼熄得晚,过路的人睡不踏实。我习惯了。",
+]
 const LANTERN_LIGHT_ENABLE_DISTANCE := 46.0
 const LANTERN_LIGHT_UPDATE_INTERVAL := 0.3
 
@@ -239,7 +247,7 @@ const VILLAGER_IDENTITIES := [
 	{
 		"name": "Bo Xiang",
 		"lines": [
-			"天气好的时候,我们会和南边的镇子做买卖。路很远。",
+			"天气好的时候,我走南边那条路去俄亥俄换面粉和盐。路很远。",
 			"我在村里住过三个不同的屋子,各有各的好。",
 		],
 	},
@@ -429,7 +437,9 @@ func _build_village() -> void:
 	_scatter_lanterns(_village_e, VILLAGE_E_RADIUS)
 	_update_proximity_lantern_lights()
 	var inn_world := VILLAGE_CENTER + VILLAGE_E_LOCAL + Vector2(5.0, -5.0)
-	VillageInn.create(self, terrain, Vector3(inn_world.x, _island_surface_y, inn_world.y), "outskirts", "chinese_village_inn", 15, "Lin Quiet-Reed", Color(0.68, 0.08, 0.06), Color(0.48, 0.25, 0.12))
+	var inn_lines: Array[String] = []
+	inn_lines.assign(INNKEEPER_LINES)
+	VillageInn.create(self, terrain, Vector3(inn_world.x, _island_surface_y, inn_world.y), "outskirts", "chinese_village_inn", 15, INNKEEPER_NAME, Color(0.68, 0.08, 0.06), Color(0.48, 0.25, 0.12), {}, false, null, false, "panel", null, inn_lines)
 
 
 func _process(delta: float) -> void:
@@ -614,9 +624,7 @@ func _build_pagoda(island: Node3D, local_pos: Vector2, w: int, d: int, tier_coun
 	# peak -- same rise math _build_roof() itself uses (see town_props.gd's
 	# own comment on that function), reproduced here rather than exposed as
 	# a public helper since only this one caller needs it.
-	var half_depth := d * TownProps.CELL_SIZE * 0.5 + TownProps.ROOF_OVERHANG
-	var slope_len := half_depth / cos(TownProps.ROOF_PITCH)
-	var y := TownProps.FLOOR_HEIGHT * floors + slope_len * sin(TownProps.ROOF_PITCH)
+	var y := TownProps.roof_top_y(TownProps.FLOOR_HEIGHT * floors, d * TownProps.CELL_SIZE * 0.5, 0.0)
 	var tier_half_width := maxf(w, d) * TownProps.CELL_SIZE * 0.5 * EAVE_WIDTH_FRACTION
 	for i in tier_count:
 		var tier := SuperEgg.build_part(
@@ -1112,7 +1120,7 @@ func _append_bamboo_stalk_instances(local_pos: Vector2, segments: Array[Transfor
 	for i in BAMBOO_LEAF_COUNT:
 		var leaf_angle: float = _rng.randf_range(0.0, TAU)
 		var leaf_y: float = y - _rng.randf_range(0.0, BAMBOO_SEGMENT_HEIGHT * 1.5)
-		var leaf_basis := Basis.from_euler(Vector3(0.0, leaf_angle, _rng.randf_range(-0.6, 0.6))).scaled(Vector3(0.02, 0.18, 0.05))
+		var leaf_basis := Basis.from_euler(Vector3(0.0, leaf_angle, _rng.randf_range(-0.6, 0.6))).scaled_local(Vector3(0.02, 0.18, 0.05))
 		var leaf_position := Vector3(cos(leaf_angle) * radius * 1.5, leaf_y, sin(leaf_angle) * radius * 1.5)
 		leaves.append(root_transform * Transform3D(leaf_basis, leaf_position))
 

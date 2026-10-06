@@ -154,6 +154,10 @@ var _is_airborne: bool = false
 var _jump_takeoff_speed: float = JUMP_VELOCITY
 var _landing_timer: float = 0.0
 var _look_target: Node3D = null
+## The body seated on this mount remains a real party body. It must be
+## excluded from the mount's swept-volume query or the sweep begins inside
+## its own rider and mistakes every requested move for overlap recovery.
+var _mounted_rider: Node3D = null
 
 var _rng := RandomNumberGenerator.new()
 var _stride_phase: float = 0.0
@@ -225,8 +229,9 @@ func _on_ride() -> void:
 	(_player as Player).start_riding_manchego(self)
 
 
-func begin_ride() -> void:
+func begin_ride(rider: Node3D = null) -> void:
 	is_player_controlled = true
+	_mounted_rider = rider
 	_interact_area.monitoring = false
 	InteractionManager.exit(_interact_area)
 	_look_target = null
@@ -248,6 +253,7 @@ func begin_ride() -> void:
 
 func end_ride() -> void:
 	is_player_controlled = false
+	_mounted_rider = null
 	_interact_area.monitoring = available_to_player
 
 
@@ -568,6 +574,16 @@ func _sweep_exclusions() -> Array[RID]:
 	var excluded: Array[RID] = [get_rid()]
 	if terrain is CollisionObject3D:
 		excluded.append((terrain as CollisionObject3D).get_rid())
+	# The invisible human shell and the currently seated playable may be the
+	# same body, but are not guaranteed to be (Xiao Hou Zi and future riders
+	# retain their own bodies). Exclude both without weakening collision
+	# against any world prop.
+	if _player is CollisionObject3D:
+		excluded.append((_player as CollisionObject3D).get_rid())
+	if _mounted_rider is CollisionObject3D:
+		var rider_rid := (_mounted_rider as CollisionObject3D).get_rid()
+		if rider_rid not in excluded:
+			excluded.append(rider_rid)
 	for node in get_tree().get_nodes_in_group("blorbs"):
 		var blorb := node as Blorb
 		if blorb != null and blorb.in_party:

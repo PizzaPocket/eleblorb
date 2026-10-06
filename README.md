@@ -6,31 +6,25 @@ Eleblorbs is a Godot 4.7 game about exploring the world with a party of Blorbs.
 
 Open `project.godot` in Godot 4.7 and run the project.
 
-## Web export
+## Web export (deprecated for now)
 
-Run:
+The web build is paused. Pushes do not regenerate `build/web` and do not deploy
+to Vercel (`vercel.json` disables Git deployments, and the web-build workflow is
+removed). `build/web` is a stale snapshot. To bring it back, see the "Publishing
+contract" in `AGENTS.md`. The export and check scripts are still in `tools/`.
 
-```sh
-python3 tools/export_web.py
-```
+## Hooks
 
-This creates the deployable static game in `build/web` and applies Eleblorbs'
-single continuous loading screen across download, engine startup, and world
-construction.
-
-For Vercel, use `build/web` as the Output Directory. No framework build command
-is required when the committed web export is current. The repository's
-`vercel.json` supplies that setting automatically.
-
-Before pushing, verify that the committed deployment matches the game source:
-
-```sh
-python3 tools/check_web_build.py
-```
-
-The versioned pre-push hook and GitHub Actions run the same check. Enable the
-hook in a fresh clone with:
+Enable the versioned pre-push hook in a fresh clone with:
 
 ```sh
 git config core.hooksPath .githooks
 ```
+
+It runs the pose-owner and power-parity checks and the Ohio and Snow village
+validators (close the Godot editor first).
+
+## Skills and documents
+
+Project skills are in `.claude/skills` and the settlement, architecture and
+handoff documents are in `docs/`, so work can continue from a clone.

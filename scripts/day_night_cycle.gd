@@ -22,6 +22,20 @@ const GAME_HOURS_PER_REAL_SECOND := 1.0 / 60.0
 ## test/demo scenes may set an explicit starting hour without changing how
 ## ordinary kingdom travel preserves time of day.
 @export_range(-1.0, 23.99, 0.01) var initial_time_override := -1.0
+## Shared planetary backdrop configuration. Individual worlds only choose the
+## sea altitude and planet centre; construction and rendering stay universal.
+@export var planetary_ocean_enabled := true
+@export var planetary_ocean_level := -25.0
+@export var planetary_ocean_center := Vector2.ZERO
+
+## Shared ambient floor. Direct sunlight still provides the strong daytime
+## modelling, while this keeps shadowed faces and unlit terrain readable.
+## At night it becomes brighter and distinctly blue, giving the world a
+## cinematic moonlit exposure without pretending the sun is still up.
+@export var day_ambient_color := Color(0.74, 0.82, 0.94)
+@export_range(0.0, 2.0, 0.01) var day_ambient_energy := 0.42
+@export var night_ambient_color := Color(0.32, 0.46, 0.78)
+@export_range(0.0, 2.0, 0.01) var night_ambient_energy := 0.72
 
 ## Each entry: game hour, sky top/horizon color, sun color/energy, fog
 ## color, the sun's elevation angle (radians above the horizon, negative =
@@ -88,15 +102,6 @@ const KEYFRAMES := [
 	},
 ]
 
-## How far away the moon disc sits, and how big it is at that distance.
-## Kept inside distant_mountains.gd's RADIUS (950) rather than pushed
-## beyond it -- see star_field.gd's docstring: this project's regular
-## distance fog would otherwise mute a pale, far-away disc down to almost
-## nothing by the time it reaches the camera.
-const MOON_DISTANCE := 900.0
-const MOON_RADIUS := 32.0
-const MOON_COLOR := Color(0.88, 0.9, 0.86)
-
 ## Lantern light/glow energy at full night vs. full day (see LANTERN_GROUP
 ## below) -- lanterns still glow faintly by day rather than looking dead,
 ## per build_lantern()'s original always-on emissive material.
@@ -112,9 +117,7 @@ var game_time_hours: float = WorldState.MORNING_HOUR
 @onready var _world_environment: WorldEnvironment = get_node("../WorldEnvironment")
 var _environment: Environment
 var _sky_material: ProceduralSkyMaterial
-var _moon: MeshInstance3D
-var _moon_material: StandardMaterial3D
-var _star_field: StarField
+var _celestial_shell: CelestialShell
 var _lanterns: Array[Node] = []
 ## How often the sky, fog, clouds and lanterns are re-tinted: about fifteen
 ## times a second, against a day that takes minutes to pass.
@@ -123,7 +126,10 @@ var _presentation_timer := 0.0
 var _cloud_scatters: Array[Node] = []
 var _cloud_refresh_timer := 0.0
 var _lantern_refresh_timer := 0.0
+var _base_fog_enabled := false
 var _base_fog_density := 0.0
+var _base_fog_depth_begin := 0.0
+var _base_fog_depth_end := 0.0
 
 
 func _ready() -> void:
@@ -135,46 +141,40 @@ func _ready() -> void:
 		WorldState.game_time_hours = fposmod(initial_time_override, 24.0)
 	game_time_hours = WorldState.game_time_hours
 	_environment = _world_environment.environment
+	_base_fog_enabled = _environment.fog_enabled
 	_base_fog_density = _environment.fog_density
+	_base_fog_depth_begin = _environment.fog_depth_begin
+	_base_fog_depth_end = _environment.fog_depth_end
 	_sky_material = _environment.sky.sky_material as ProceduralSkyMaterial
+	# Use one predictable shared ambient source in every kingdom. Depending on
+	# the procedural sky radiance alone made the night exposure vary with each
+	# world's authored sky palette and left the Crossroads nearly black.
+	_environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	_environment.ambient_light_sky_contribution = 0.22
 	# See this file's own docstring -- fog no longer touches the sky at all.
 	_environment.fog_sky_affect = 0.0
-	_build_moon()
-	_star_field = StarField.new()
+	_celestial_shell = CelestialShell.new()
+	_celestial_shell.name = "CelestialShell"
 	# Deferred, not called directly -- this _ready() can run while the parent
 	# (the main scene root) is still synchronously working through its own
-	# children's _ready() calls, and add_child() on a node in that state
-	# fails outright (see the identical fix just below in _build_moon()).
-	get_parent().add_child.call_deferred(_star_field)
+	# children's _ready() calls, and add_child() on a node in that state fails.
+	get_parent().add_child.call_deferred(_celestial_shell)
+	call_deferred("_ensure_planetary_ocean")
 	_apply_time()
 
 
-func _build_moon() -> void:
-	var mesh := SphereMesh.new()
-	mesh.radius = MOON_RADIUS
-	mesh.height = MOON_RADIUS * 2.0
-	mesh.radial_segments = 24
-	mesh.rings = 12
-
-	# Plain unshaded StandardMaterial3D, not a custom shader -- see
-	# star_field.gd's own docstring for why: a first attempt at both the
-	# moon and the starfield used hand-written .gdshader files and neither
-	# rendered anything, with no console errors to diagnose from. This is
-	# the same recipe cloud_scatter.gd/town_props.gd's lantern glow use.
-	_moon_material = StandardMaterial3D.new()
-	_moon_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	_moon_material.albedo_color = MOON_COLOR
-	_moon_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_moon_material.emission_enabled = true
-	_moon_material.emission = MOON_COLOR
-	_moon_material.emission_energy_multiplier = 0.6
-
-	_moon = MeshInstance3D.new()
-	_moon.mesh = mesh
-	_moon.material_override = _moon_material
-	_moon.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	# Deferred -- see _ready()'s own identical comment on _star_field.
-	get_parent().add_child.call_deferred(_moon)
+func _ensure_planetary_ocean() -> void:
+	if not planetary_ocean_enabled:
+		return
+	var world := get_parent()
+	# A world may author a special exclusion (the demo's playable lake does).
+	# Respect that configured shared instance rather than layering a duplicate.
+	if world.find_child("SphericalWorldOcean", true, false) != null:
+		return
+	var ocean := PlanetaryOcean.new()
+	ocean.surface_level = planetary_ocean_level
+	ocean.planet_center = planetary_ocean_center
+	world.add_child(ocean)
 
 
 func _process(delta: float) -> void:
@@ -248,8 +248,24 @@ func _apply_time() -> void:
 
 	_environment.fog_light_color = (kf["fog_color"] as Color).lerp(space_black, space_factor)
 	_environment.fog_density = lerpf(_base_fog_density, 0.0, space_factor)
+	# Depth fog gives the long demo course controlled atmospheric perspective
+	# without reducing nearby visibility. As the camera leaves the atmosphere,
+	# move that distance band smoothly beyond the visible world as well as
+	# fading its maximum intensity; at full vacuum disable it altogether.
+	if _environment.fog_mode == Environment.FOG_MODE_DEPTH:
+		var depth_clearance_scale := 1.0 / maxf(1.0 - space_factor, 0.01)
+		_environment.fog_depth_begin = _base_fog_depth_begin * depth_clearance_scale
+		_environment.fog_depth_end = _base_fog_depth_end * depth_clearance_scale
+	_environment.fog_enabled = _base_fog_enabled and space_factor < 0.999
 
 	var night_factor: float = kf["night"]
+	# Preserve enough fill light to read silhouettes, terrain contours and
+	# character colors after sunset. Fade it away with the atmosphere in space;
+	# vacuum should not inherit a terrestrial blue ambient wash.
+	_environment.ambient_light_color = day_ambient_color.lerp(night_ambient_color, night_factor)
+	_environment.ambient_light_energy = lerpf(
+		day_ambient_energy, night_ambient_energy, night_factor
+	) * lerpf(1.0, 0.06, space_factor)
 	# DemoWorld has both ordinary valley clouds and a separate Air-zone layer.
 	# Both are CloudScatter instances and must share the same lighting state.
 	# Cached like the lanterns already are: this allocated a fresh array of
@@ -261,23 +277,8 @@ func _apply_time() -> void:
 	for cloud_scatter in _cloud_scatters:
 		if cloud_scatter is CloudScatter:
 			(cloud_scatter as CloudScatter).set_night_factor(night_factor)
-	_star_field.set_night_factor(maxf(night_factor, space_factor))
-	_apply_moon(sun_dir)
+	_celestial_shell.set_presentation(sun_dir, maxf(night_factor, space_factor))
 	_apply_lanterns(night_factor)
-
-
-func _apply_moon(sun_dir: Vector3) -> void:
-	# The moon rides directly opposite the sun -- as the sun sets in one
-	# direction, the moon rises in the other, sweeping the same continuous
-	# azimuth the sun does. Not real astronomy, just a stylized game clock
-	# (see this file's own docstring).
-	var moon_dir := -sun_dir
-	_moon.position = moon_dir * MOON_DISTANCE
-	# Fades in/out right as it crosses the horizon instead of popping, and
-	# means it doesn't need to rely on terrain geometry to hide it below
-	# ground -- terrain doesn't necessarily extend out to MOON_DISTANCE.
-	var visibility := smoothstep(-0.05, 0.05, moon_dir.y)
-	_moon_material.albedo_color.a = visibility
 
 
 func _apply_lanterns(night_factor: float) -> void:
