@@ -358,7 +358,7 @@ the thorax. Audit of every population (2026-10-06):
 | Sea folk | fixed women's and men's chest and hips | women shorter than men (both use the same height today); abdomen rule |
 | Tempestars | fixed gendered height, chest and hips | abdomen rule |
 | **Pirate crews** | **no genders set**: Mara Reef, Nell Crow and Ada Shoal are male-bodied, and Ada has stubble | set every crew member's gender; beards for men only |
-| Jungle primates | their own rig | not applicable |
+| Jungle primates | their own rig | not applicable: monkey and ape bodies are never gendered (user rule) |
 
 The abdomen rule itself: in `ProceduralFigure`, limit
 `ABDOMEN_FRONT_OVERHANG_MAX` (1.12 times the chest's front depth) to men and

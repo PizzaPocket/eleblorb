@@ -164,6 +164,10 @@ Snow Village and the Fire Kingdom are not split by gender, so a woman can draw
 a large value and show a belly past her chest. Fix: give women an overhang of
 1.0 (flush with the chest), and give them their own narrower abdomen pool.
 
+**Not every people has gendered bodies.** Monkeys and apes (the jungle
+villagers, Xiao Hou Zi's kind, the primate-rig monkeys and apes) never get
+gendered body shapes, by the user's rule. Their genders are identity only.
+
 **Writing gender into a census.** Name each resident's gender in the
 settlement brief when the census is written, and keep it consistent with the
 name and the world bible. Do not infer it from a name in code.
