@@ -52,9 +52,9 @@ deliberate first pass:
 
 The Tempestars are not gods. They are a people of the sky, as the merfolk are
 of the sea and the lava people of the volcano. Their culture draws on the
-human world's images of a heaven above the clouds, led by the Chinese
-Celestial Court because Sun Wu Kong, already part of the game, comes from that
-tradition:
+human world's images of a heaven above the clouds. Greek and Roman heavens are
+the stronger influence; the Chinese Celestial Court is a substantial second,
+carrying Sun Wu Kong's story, since he is already part of the game:
 
 - **The Chinese Celestial Court, as Journey to the West tells it:** the Jade
   Emperor's palace beyond the Southern Heavenly Gate, audiences in the Hall of
@@ -382,28 +382,28 @@ strands, blossom and vines are decorative.
 
 ## 6. Architectural charter (draft)
 
-- **Primary, about 60 percent: the Chinese celestial palace.** The image of
-  heaven's palaces standing on cloud: axial courts entered through gates, halls
-  raised on stepped quartz podiums with balustrades, sweeping eaves with
-  upturned corners floating clear of their columns, covered galleries joining
-  halls, open pavilions (ting), moon gates of set cloud, and the hierarchy of
-  height and roof that the Celestial Court's bureaucracy expresses. This
-  governs Highcloud, the Hollow Cloud, the Orchard Cloud and the Dawn Gate.
-  Quartz replaces red-lacquered timber; gold replaces painted brackets.
-- **Secondary, about 30 percent: Greco-Roman classical.** Limited to the
-  programs it suits: the Drift Cloud's odeon, the Ring Cloud's racing ring and
-  judges' tholos, colonnaded nectar terraces, and the banquet couches.
+- **Primary, about 55 percent: Greco-Roman celestial classical.** Peristyle
+  courts, round tholos pavilions, colonnades and exedrae, porches with
+  pediments reduced to soft SuperEgg forms, an odeon, a racing ring, banquet
+  couches and colonnaded nectar terraces. Quartz shafts, gold capitals and
+  bases, floating roofs. It governs the Anvil, Drift, Hollow and Ring courts,
+  every residence and terrace, and the kingdom's overall feel.
+- **Secondary, about 35 percent: the Chinese celestial palace.** It governs the
+  places that carry Sun Wu Kong's story: the Dawn Gate after the Southern
+  Heavenly Gate, Highcloud's Hall of Mist on its stepped quartz podium with
+  floating double eaves, and the Orchard Cloud's Peach Garden and banquet hall.
+  Elsewhere it appears only as named details: moon gates of set cloud and
+  upturned eave corners on gate pavilions. Quartz replaces red-lacquered
+  timber; gold replaces painted brackets.
 - **Accent, about 10 percent: woven-cloud textiles and drifting gold.** Awnings,
-  sails, wind harps, nectar bowls and tripods: the moving, living layer.
-- **Accent, about 5 percent: woven-cloud textiles and drifting gold.** Awnings,
   sails, wind harps, nectar bowls and tripods: the moving, living layer.
 - **Palette:** 60 percent quartz white and cloud white, 30 percent pale sky
   pastels on woven cloud and Tempestar clothing (the prototype's sky blue,
   dawn pink, gold dawn, lavender, mint and peach), 10 percent gold.
-- **Hierarchy:** podium height, the number of eave tiers and the width of the
-  floating gap show rank, as roof rank did at the Celestial Court. Highcloud's
-  hall has the only double floating eave. Ordinary residences are single-eave
-  pavilions or moored rooms.
+- **Hierarchy:** podium height and the width of the floating gap between
+  columns and roof show rank. Highcloud's Hall of Mist stands highest and has
+  the kingdom's only double floating eave. Ordinary residences are small
+  tholoi or moored rooms.
 - **Exclusions:** no copied real temple, shrine or sacred emblem; no altars,
   statues of gods or worship spaces; no Buddhist imagery from the legend's
   sealing (here the courts themselves sealed him); no heavy masonry walls; no solid gold
@@ -492,7 +492,8 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
   peaches, self-moving golden tripods;
 - Sun Wu Kong's history with the courts: the keeper's post, the empty title,
   the Peach Banquet and the sealing as the Hall of Assembly's last act;
-- the Chinese celestial palace as the primary style;
+- Greco-Roman classical as the primary style, with the Chinese celestial palace
+  a strong second where Sun Wu Kong's story is set;
 - the census of twenty-one in six courts, including the two new courts,
   thirteen new adults and two children;
 - the empty Hall of Assembly on the Hollow Cloud;
@@ -505,6 +506,10 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
 - replacing runtime-resolved island placement with an authored layout.
 
 **Open:**
+
+- The names of the cloud islands. Highcloud, the Anvil, Drift and Hollow
+  Clouds (from the prototype) and the Orchard and Ring Clouds (this brief) are
+  all placeholders.
 
 - The naming scheme. The prototype's six names are weather words with compound
   surnames; this brief's new names follow that pattern as placeholders.
