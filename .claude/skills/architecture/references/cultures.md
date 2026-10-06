@@ -53,15 +53,29 @@ Answer these in writing, in order. Each answer constrains the next.
 - **Palette.** Weathered brown, charcoal, snow white, a single warm accent (red, ochre) on doors; hearth glow.
 - **Silhouette.** Steep dark roofs rimmed with snow, chimneys steaming, long low woodsheds.
 
-### Rock and Ground Kingdom: earth and stone architecture
+### Rock and Ground Kingdom: Western frontier town (cowboy punk)
 
-- **Massing.** Stepped terraces, cubic masses stacked and set into slopes, cliff-cut chambers, plazas and ladders; round kivas or silos as accent.
-- **Roof.** Flat with parapets and scupper spouts, walkable terraces, projecting roof beams (vigas), shade ramadas of poles; low domed ovens.
-- **Walls.** Thick, battered (leaning inward 5 to 10 degrees), rounded rammed-earth or adobe corners, stone footings, buttresses. SuperEgg soft epsilons express rounded mud brick naturally.
-- **Openings.** Small, deep-set, rounded, with thick reveals and painted surrounds; slit windows on exposed faces; ladders to roof entries.
-- **Ornament.** Painted bands, geometric reliefs, inlaid stones, pole ends, drying strings of produce.
-- **Palette.** Terracotta, ochre, sienna, sand, umber, with turquoise or white accents.
-- **Silhouette.** Stepped blocks like rock itself, rounded parapets, a forest of beam ends.
+Direction proposed 2026-10-06 in `docs/architecture/rock_ground_town.md`,
+replacing the earlier earth-and-stone (Pueblo) grammar.
+
+- **Precedents.** Early Texas towns, Nacogdoches and Jefferson, set in a movie
+  Western's desert-canyon landscape. A layered present-day culture, like Ohio.
+- **Massing.** One main street of frame and brick commercial buildings, many
+  with tall square false fronts hiding gabled roofs, a continuous covered
+  boardwalk gallery, and the saloon and hotel at the street's head.
+- **Roof.** Gable or shed roofs behind false fronts; shed-roof galleries; a
+  two-storey cast-iron gallery (Jefferson) on the saloon and hotel.
+- **Walls.** Weathered board, red brick, and stone masonry ground storeys on
+  the sturdiest buildings (the Old Stone Fort precedent).
+- **Openings.** Tall narrow windows, double doors, swinging saloon doors;
+  Greek Revival door cases on the polite buildings.
+- **Ornament.** Painted false-front cornices, hitching rails, the town's
+  shifting hats, cyborg horses at the rails; pictures-only signs.
+- **Modern layer (accent).** A garage bay at the livery, the race barn's
+  timing tower, strung electric bulbs, a radio mast.
+- **Palette.** Weathered greys and browns, faded oxblood, mustard, sage and
+  dusty blue paint, red brick, sandstone, black iron.
+- **Exclusions.** Adobe and pueblo forms, mission churches, neon, glass towers.
 
 ### Fire Kingdom: advanced volcanic modernism
 

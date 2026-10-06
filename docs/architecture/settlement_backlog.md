@@ -440,7 +440,7 @@ open-pavilion treehouse inn.
 | Holt Inn, Ohio | an old English village tradition living in the present day (old-timey town and trades, today's comforts) | modern: the existing **porcelain toilet** in the washroom, with a basin | done; keep as is (user, 2026-10-06) |
 | Snowrest Inn, Snow Village | a modern mountain town on a Norse root | modern: flush toilet with cistern, basin and mirror, shower beside the equipment-drying room | code has the porcelain dry toilet; upgrade to a modern washroom |
 | Ember Rest, Fire caldera | lava people with advanced thermal engineering; guests only | modern: an **incinerating toilet** in insulated basalt, heated by the city's thermal system, with a cool-water basin for guests | washroom in the brief; fixture to build |
-| Rock and Ground inn | Pueblo-style earth and stone | an adobe **privy closet** off the yard: a timber seat over a lined composting vault, ash from the bread oven as cover, a water jar and basin | to add to the brief and code |
+| Rock and Ground inn | Western frontier town, layered present-day (proposed 2026-10-06) | modern: a **porcelain toilet** and basin in the hotel washroom (was the earth closet, from the dropped Pueblo concept) | to add to the brief and code |
 | Chinese village inn | classical Chinese, no modern layer (user, 2026-10-06) | a lidded wooden **mǎtǒng** behind a screen in each guest room, and a latrine closet off the back courtyard; night soil to the fields | in `chinese_village.md` |
 | Primate village inn, on the commons | jungle lashed-vine | a rattan-screened **privy closet** at the deck's edge: bench seat over a sealed clay vat with leaf litter, lowered by rope to the garden compost | in the layout |
 | Sea folk guest hall | Atlantean modern | modern: a **vacuum-flush toilet**, glass basin, shower; sealed holding tank pumped to a treatment vault at the city's edge | in the buildings brief |
@@ -533,4 +533,26 @@ reconciled) join this table when their designs are approved.
   on top and red beneath, twelve strings of jade beads instead of ten
   gold cords, a round-collared robe with gold dragon roundels, a jade hoop belt;
   update the "gold robe" comment in `npc.gd`.
+
+## 15. Rock and Ground Kingdom: the frontier town
+
+Status: concept and settlement brief for review (2026-10-06),
+`docs/architecture/rock_ground_town.md`. A Western frontier town after early
+Texas towns, layered "cowboy punk", replacing the earlier earth-and-stone
+concept.
+
+- Review: the census of sixteen (Dolma kept), the saloon and hotel as the social
+  centre and rest point, the Kane gang, the cyborg horses, the cowboy hat as
+  the Ground suit's helm, the architecture direction, the places list and race
+  course, and the Chihuahuan landscape palette.
+- Then: the dimensioned layout, the style charter, building briefs.
+- Code once approved:
+  - the cyborg horse (a `HorseFigure` variant with cybernetic lower legs and a
+    transform into a bike form);
+  - the shifting hat as a shared item and as the Ground suit's helm, switching
+    to the helmet with `DirtbikeMode` (visor cut by Boolean subtraction, as the
+    Space Helm);
+  - any riding through one shared `TraversalMode` for every character;
+  - the inn's fixture from `earth_closet` to `porcelain`;
+  - the desert planting and wind-blown tumbleweeds.
 
