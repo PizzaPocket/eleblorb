@@ -58,6 +58,8 @@ kingdom's story, as it is in the Sky Kingdom.
    enlargement.
 3. Lay out the sea folk city's rings and air halls.
 4. Build the second ship and the ship interiors.
-5. Lay out the cage island and design the tournament.
-6. The shared systems each needs: the generalised lexicon for Hawaiian, air
+5. Lay out the cage island (now a crescent crater) and design the tournament.
+6. Planting: `ocean_landscape.md` replaces the random island scatter with
+   Hawaiian zonation, per-islet characters and tended settlement planting.
+7. The shared systems each needs: the generalised lexicon for Hawaiian, air
    halls in the liquid system, and a legged sea-folk rig.

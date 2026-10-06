@@ -34,64 +34,91 @@ direction `(0.854, -0.521)`); `v` points to its right (world `(0.521, 0.854)`).
 Local `(0, 0)` is the island centre, world `(-118, 72)`. Heights are metres above
 sea level. In this frame the dock is at `u = 138`.
 
-## 3. Terrain the village needs
+## 3. Geology and terrain
 
-All of it on the dock-facing side, so the rest of the island keeps its present
-shape and dense forest.
+### An old, eroded volcano
 
-1. **Coastal plain:** extend the dry land on the dock side to about `u = 66`
-   across `v = -45..+58`, with a gentle 3 to 5 percent fall from +3.0 m at
-   `u = 38` to +1.2 m at `u = 60`. This is where the village stands.
-2. **Beach:** sand from `u = 60` to `u = 68`, falling from +1.2 m to the
+Like the real Hawaiian islands, the main island is volcanic: an old shield
+volcano, long extinct and worn down by rain. Its windward face has been cut
+into a deep green valley, the kind of amphitheatre-headed valley where Hawaiians
+built their taro terraces (Waipiʻo, Waiʻanae and many others). The young crater
+belongs to the cage island instead (section 9), so the two islands tell one
+geological story: an old island and a young one.
+
+**Trade winds** blow from the world north-east. The dock-facing side (`+u`)
+is windward: wet, lush and cut by the valley. The far side is leeward and drier.
+
+### Terrain changes
+
+The current dome (10.5 m high, dry land to about 55 m) cannot hold a valley.
+Replace the main island's `ISLANDS` dome with an authored island shape:
+
+1. **Crown and ridges:** raise the crown to about **28 m** at local `(0, 0)`,
+   with two forested ridges running toward the sea on either side of the
+   valley, falling to lava-rock **headlands** at the shore near `v = -60` and
+   `v = +62`. Keep the far (leeward) side a broad, gentler slope to about 58 m
+   from the centre.
+2. **The valley:** cut into the windward face between the ridges, its axis along
+   `v = -12`. The head is a steep, fern-hung amphitheatre wall at about
+   `u = 6..12`, with a spring and a thin waterfall at `(8, -18)` dropping from
+   +20 m to a pool at +11 m. The valley floor runs from the pool down to the
+   coastal plain at `u = 38`, about 40 m wide at its mouth and 18 m at its
+   head, its walls rising 10 to 15 m on each side.
+3. **Taro terraces:** six level terraces across the valley floor between
+   `u = 14` and `u = 38`, `v = -35..+5`, each about 4 m deep and 0.8 m above the
+   one below, from +7.4 m down to +3.4 m, held by low lava-rock walls.
+4. **Coastal plain:** at the valley mouth, from `u = 38` to about `u = 60`
+   across `v = -45..+58`, falling gently (3 to 5 percent) from +3.0 m to
+   +1.2 m. This is where the village stands.
+5. **Beach:** sand from `u = 60` to `u = 68` between the two headlands, to the
    waterline at about `u = 66`.
-3. **Reef flat:** a broad shallow shelf 0.5 to 2 m deep from the beach out to
+6. **Reef flat:** a shallow shelf 0.5 to 2 m deep from the beach out to
    `u = 130`, across `v = -60..+45`, ending in a steep reef edge. Hawaiian
-   fishponds were built on exactly this kind of reef flat, and it lets a short
-   pier reach the dock on piles in shallow water.
-4. **Taro terraces:** six level terraces cut into the slope between `u = 14` and
-   `u = 38`, `v = -35..+5`, each about 4 m deep and 0.8 m above the one below,
-   from +7.4 m down to +3.4 m. Low lava-rock walls hold each terrace.
-5. **Spring:** a small spring pool at the edge of the crown forest, `(8, -18)`,
-   +10 m.
-6. **Local mesh detail:** the village area needs finer terrain sampling, or
-   authored ground pieces with their own collision, so terraces, the beach edge
-   and house platforms are not cut by the 10.3 m grid.
+   fishponds were built on reef flats like this, and it lets a short pier reach
+   the dock on piles in shallow water.
+7. **Local mesh detail:** the valley and village need finer terrain sampling,
+   or authored ground pieces with their own collision, so terraces, the beach
+   edge, the stream and house platforms are not cut by the 10.3 m grid.
 
-The dock stays where it is, now standing just beyond the reef edge in deep
-water, so the portal and its return spawn do not move.
+The dock stays where it is, now just beyond the reef edge in deep water, so the
+portal and its return spawn do not move.
 
 ## 4. The ahupuaʻa, crown to reef
 
 | Zone | Local extent | Use |
 |---|---|---|
-| Uplands | `u < 14`, the crown and the island's far side | dense forest left wild; the spring |
-| *Loʻi kalo* | terraces `u = 14..38`, `v = -35..+5` | flooded taro, fed by the *ʻauwai* |
+| Uplands | the crown, the ridges and the leeward side | forest left wild |
+| Valley head | `u = 0..14` | the spring, the waterfall, the fern-hung wall |
+| *Loʻi kalo* | valley floor `u = 14..38`, `v = -35..+5` | flooded taro, fed by the *ʻauwai* |
 | Village | coastal plain `u = 38..60` | homes, green, civic buildings |
 | Beach | `u = 60..68` | canoe launch, pier head, surf access |
 | Reef flat | `u = 68..130` | the fishpond, Makoa's net fishing, the pier |
 | Reef edge and sea | `u > 130` | the dock, the surf break, the sea folk meeting rocks |
 
-**Water:** the spring feeds the *ʻauwai* (an earth-and-stone ditch 0.6 m wide)
-along the contour to the top terrace. Water steps down through the six
-terraces by small spillways, then runs in a second ditch to the fishpond's
-inland side. The taro water brings nutrients into the pond, as it did in
-traditional ahupuaʻa.
+**Water:** the spring and waterfall feed a stream that runs down the valley's
+south side (`v ≈ -36`), crosses the plain at `v = -42` (south of the Kealoha and
+Akana homes) and enters the fishpond's inland side at `(70, -42)`. At the valley
+head, an *ʻauwai* (an earth-and-stone ditch 0.6 m wide) leaves the stream and
+follows the contour to the top terrace. Water steps down through the six
+terraces by small spillways and drains back into the stream, so taro water
+carries nutrients into the pond, as in traditional ahupuaʻa. Small footbridges
+cross the stream where the beach path and terrace paths meet it.
 
 ## 5. Plan
 
 ```
-                         uplands forest (crown, 10.5 m)
-                              spring ●
-          ┌─────────── loʻi kalo, six terraces ───────────┐
-          │  ▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤  │   ʻauwai ~~
-          └──────────────────────┬───────────────────────────┘
+               crown ridge (28 m)                 crown ridge
+                      ╲      valley head: waterfall ● pool     ╱
+                       ╲     ┌─ loʻi kalo, six terraces ─┐    ╱
+              forested  ╲    │ ▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤▤ │   ╱  forested
+               ridge     ╲   │ ▤▤▤▤▤▤ stream ~~ ʻauwai ~~│  ╱    ridge
+                          ╲  └──────────────┬────────────┘ ╱
       Kealoha   Kahananui     HĀLAU (head of green)      Medeiros   Kahale
-                 ╲             │                       ╱
        Akana      ╲      ~ VILLAGE GREEN ~       ╱      Nakamura store
-                   ╲           │             ╱            and shave ice
+   ~stream~        ╲           │             ╱            and shave ice
      Okafor guest   ╲          │          ╱             CANOE HOUSE
-     house           ═════ PIER HEAD ═════                 launch
-   ~~~~~~~~~~~~~~~~~~~~~~~~ beach ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  lava    house      ═════ PIER HEAD ═════                 launch      lava
+  headland ~~~~~~~~~~~~~~~~~~~ beach ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ headland
     FISHPOND (loko kuapā)  ║ pier, 3.6 m        pirates' beach (barred)
      curved lava wall,     ║                       surf break
      two mākāhā gates      ║
@@ -100,10 +127,10 @@ traditional ahupuaʻa.
                         ARRIVAL DOCK (u = 138)
 ```
 
-The arrival view, looking inland from the dock: the pier running across the
-reef flat to the beach, the canoe house to the right, the green and the
-*hālau* framed by homes, and the taro terraces stepping up into the forest
-behind.
+The arrival view, looking inland from the dock: the pier across the reef flat,
+the beach between two dark lava headlands, the village around its green, and
+behind it the valley's taro terraces climbing between steep green walls to a
+waterfall.
 
 ## 6. Footprints
 
@@ -166,21 +193,21 @@ are narrow by nature; one 2 m ramp per terrace keeps the *loʻi* reachable.
 
 ## 9. Cage island terrain (same pass)
 
-The cage island at world `(112, 88)` has only about 10 m of dry radius, too
-small for its 18 m cage and stands. Raising its `ISLANDS` entry from radius 31 m
-and height 3.8 m to radius 70 m and height 5 m gives about 27 m of dry radius,
-enough for the cage, stands and a landing beach. Its centre stays 140 m from
-the arrival dock.
+The cage island at world `(112, 88)` has only about 10 m of dry radius. It
+becomes a young **crescent crater** (a tuff cone, after Molokini off Maui) with
+its rim open toward Kai Mālie and the dock. See `ocean_cage_island.md` for its
+shape. Its terrain is authored rather than the generic dome.
 
 ## Fixed, proposed and open
 
 **Fixed:** the community and charter in `ocean_island_village.md`; the dock and
 portal position.
 
-**Proposed:** the corrected survey; the coastal plain, beach, reef flat, taro
-terraces and spring; the ahupuaʻa water route from spring to fishpond; every
+**Proposed:** the corrected survey; the old eroded volcano raised to 28 m with a
+windward valley, ridges and lava headlands; trade winds from the north-east;
+the coastal plain, beach, reef flat, taro terraces, waterfall and stream; the ahupuaʻa water route from spring to fishpond; every
 footprint and route above; the pier from the dock; Elena's cottage; the cage
-island's enlargement.
+island as a crescent crater.
 
 **Open:** finer terrain sampling or authored ground pieces for the village
 area; the store's stock.

@@ -28,6 +28,30 @@ moving those fixed systems.
 4. **Layer** (section 2) from the biggest structure down to ground cover.
 5. **Review** from eye height at the door, at the window, along the lane and from above.
 
+## 0a. Botany: plant the ecosystem before the garden
+
+Before any settlement planting, work out what would grow there without people,
+then what the people brought and tend.
+
+1. **Climate and exposure.** Prevailing wind, rainfall, sun and salt. Windward
+   and leeward faces differ; so do valley floors, ridges and coasts.
+2. **Geology and soil.** Young lava or tuff carries pioneers and bare rock;
+   old, weathered ground carries forest; sand carries strand plants.
+3. **Zones.** Lay out bands from water to summit (reef, strand, coastal forest,
+   lowland, valley, ridge) and give each a short palette of plants that
+   genuinely grow together.
+4. **People's plants.** Crops, medicine, fibre and ornament belong where people
+   live and farm, and should reflect who brought them and why.
+5. **Status.** Distinguish native plants, plants a people introduced long ago,
+   and modern introductions, and never use species that are invasive in the
+   real ecosystem being modelled.
+6. **Character per place.** Neighbouring islands, slopes or valleys get distinct
+   plant characters, not the same mix.
+
+Regional palettes live in `references/`: `hawaiian_flora.md` for the Ocean
+Kingdom. Add a reference file for any new region rather than inventing plants
+per scene.
+
 ## 1. Principles
 
 - **Mass planting, not scatter.** Plant in clumps and drifts of a single kind (5, 7, 9 or more), with a few companions, never one flower per spot in a grid. Vary spacing and height. Odd numbers read as natural.

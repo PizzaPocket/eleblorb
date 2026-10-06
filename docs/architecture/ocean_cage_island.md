@@ -9,16 +9,30 @@ will supply their direction.
 A smaller island holds a fighting cage and a population of small creatures
 who make the hero fight their cage match tournament.
 
-## 2. Site
+## 2. Site: a crescent crater
 
-The proposed island is the low satellite at world `(112, 88)`, rising to about
-3.8 m (`ocean_kingdom_terrain.gd`, `ISLANDS`). Its listed radius is 31 m, but
-its dry land reaches only about 10 m from the centre, too small for the cage.
-Enlarging the entry to radius 70 m and height 5 m gives about 27 m of dry
-radius (see `ocean_island_village_layout.md`, section 9). It lies
-about 140 m east-northeast of the arrival dock, across open water from Kai
-Mālie, so the cage is visible from the gate and from the village beach. It sits
-inside the ships' route and well inside the Kraken's.
+The island is the low satellite at world `(112, 88)`, about 140 m
+east-northeast of the arrival dock and in plain view of the gate and Kai Mālie's
+beach. Today it is a 3.8 m dome with only about 10 m of dry radius. It becomes
+a young volcanic **crescent crater**, a tuff cone like Molokini off Maui: a ring
+of rim open on one side to the sea, with a sheltered bay inside. The main island
+is old and eroded (see `ocean_island_village_layout.md`); this one is young and
+still crater-shaped.
+
+Local frame: origin at the crater's centre, `w` pointing from the centre
+toward the arrival dock (world direction `(-0.786, -0.618)`).
+
+- **Rim:** a crescent of tuff about 64 m across, its crest rising to **16 m**
+  at the far side (`w = -30`) and falling toward the two horns. Outer slopes
+  are steep and dry; inner slopes step down in natural ledges.
+- **Breach:** the rim is open for about 100° of arc facing the dock (`w > 0`),
+  where the sea has broken in.
+- **Crater floor:** a level floor of packed sand and tuff about 26 m across at
+  +2.5 m, centred slightly away from the breach at `w = -4`.
+- **Bay and beach:** inside the breach, a small sheltered bay shoals onto a
+  landing beach between the horns, rising to the crater floor.
+- **Terrain:** authored, replacing the generic dome. The rim, ledges, floor and
+  beach need finer sampling or authored ground pieces with their own collision.
 
 ## 3. The inhabitants
 
@@ -60,16 +74,24 @@ are open.
 
 ## 5. Settlement structure (pre-layout)
 
-- **The cage:** an octagonal cage at the island's high point, about 18 m
-  across, with one gate and a sand floor ringed in timber.
-- **The stands:** tiered seating around three sides, an announcer's booth over
-  the gate, and a board of rankings (pictures and marks, never words).
-- **The landing:** a beach on the side facing the arrival dock.
-- **Routes:** every public route, the stands' aisles and the cage gate meet the
-  hero's and party's minimums (3 m routes, 3.2 m headroom).
-- **Architecture:** waits on the inhabitants. A salvage vernacular of wreck
-  timber, rope, chain and net suits a population living off what washes
-  ashore, but the charter follows from who they are.
+The crater is the arena; little has to be built.
+
+- **The cage:** an octagonal cage about 18 m across on the crater floor, its
+  gate facing the breach and the landing beach.
+- **The stands:** the rim's inner ledges, around about 260° of the crater,
+  improved with salvaged timber where a ledge needs a seat or an edge. Three
+  ramped aisles (2 m wide, no steeper than 1:4 on the natural slope) climb from
+  the floor to the crest.
+- **Announcer's perch:** on the rim crest opposite the gate, the highest point
+  of the island and visible from the sea.
+- **Board of rankings:** on a flat tuff face beside the gate (pictures and
+  marks, never words).
+- **Landing:** the beach inside the breach; arrivals walk straight up the
+  floor to the cage gate, under the eyes of the whole rim.
+- **Homes:** wait on the inhabitants; the rim's outer ledges and the horns are
+  the natural places for them.
+- **Routes:** every public route, aisle and the cage gate meet the hero's and
+  party's minimums (3 m on the floor and beach, 2 m on aisles, 3.2 m headroom).
 
 ## Fixed, proposed and open
 
@@ -77,7 +99,8 @@ are open.
 inhabitants who make the hero fight; a few opponents, with contenders from the
 kingdom's communities, including an old pirate.
 
-**Proposed:** the island at `(112, 88)`; the four-fight order with Makoa, Tudaro
+**Proposed:** the island at `(112, 88)` as a crescent crater with the rim as
+natural stands; the four-fight order with Makoa, Tudaro
 and Old Kelp; the cage and stands.
 
 **Open:** the inhabitants; how fights work; the prizes; whether the Fortune's

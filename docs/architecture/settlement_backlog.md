@@ -272,7 +272,13 @@ Planning priorities:
   beach, reef flat, taro terraces, a spring and a pier, and enlarges the cage
   island. Then lay out the sea folk city's rings, air halls and tunnels.
 - Build the missing second ship and the ships' priority interiors.
-- Lay out the cage island and decide how tournament fights work.
+- The main island becomes an old, eroded 28 m volcano with a windward valley
+  holding the taro terraces; the cage island becomes a young crescent crater
+  whose rim forms the stands. Review both in the layout and cage briefs.
+- Review the planting plan (`docs/architecture/ocean_landscape.md`): Hawaiian
+  zonation under north-east trade winds, canoe plants around Kai Mālie, natives
+  in the wild, one character per islet, and the new plant builders it needs.
+- Decide how tournament fights work.
 - Shared systems: generalise `ChineseLexicon` into a lexicon per language for
   Hawaiian dialogue; let air halls and glass tunnels answer the liquid system
   as dry volumes, reusing the `pressurized_volumes` approach; add a legged sea-folk rig.
