@@ -132,14 +132,14 @@ metres.
 | 2 | Venn house with lake shop on its front veranda | Nara, Mateo, Lio | `x -34..-25`, `z -20..-13` | piles | shop counter faces the landing |
 | 3 | Boatwright slip, timber rack and tool shelter | Mateo | `x -46..-40`, `z -22..-13`, slip running west into water | piles; slip on the shelf edge | outer west side, off the public deck |
 | 4 | Sen house, clinic and school room | Asha, Rian | `x -20..-11`, `z -20..-10` | piles | clinic door south onto the spine |
-| 5 | Rian's cutting and sealing deck | Rian | `x -11..-8`, `z -18..-11` | piles | side deck, not on the spine |
+| 5 | Rian's shell-works barge (was a piled side deck) | Rian | `x -20..-12`, `z -3..0.5` | floating, moored on lines and a gangway | in the water court south of the spine; the saw and sealing noise leaves the clinic |
 | 6 | Cistern house and shared stores | village; Leena keeps the stores | `x -6..2`, `z -20..-12` | piles, tied into the seep | north to the rock |
 | 7 | Net shed and gear loft | Salim (shared with Jori) | `x 4..12`, `z -20..-12` | piles | south onto the spine |
 | 8 | Communal pavilion | Leena | `x -8..4`, `z -4..+4` | piles | open-sided; the hinge of the spine and court |
 | 9 | Aran house | Mai, Salim, Dala, Pree | `x 6..14`, `z -3..+5` | piles, shelf edge | front west to court; wet stair south |
 | 10 | Pearl and shell yard (clean work) | Mai | `x 6..16`, `z +5..+10` | pontoon moored to Aran piles | grading tables face the house |
 | 11 | Mussel basket lines | Mai | `x 6..16`, `z +14..+30` | buoyed lines in deep water | outside every lane |
-| 12 | Vale house | Jori, Osei, Tavi | `x 24..34`, `z -4..+3` | piles, Heron shelf north | front west to the Heron landing |
+| 12 | Vale family houseboat (was a piled house) | Jori, Osei, Tavi | `x 26..40`, `z -10..-3` | floating, moored to the Heron landing piles | arrival deck west, joined to the Heron landing by a gangway; work deck east |
 | 13 | Catch deck, drying shelter and smokehouse | Osei | `x 36..44`, `z +2..+14` | piles, Heron shelf east | east to open water (downwind) |
 | 14 | Mor guest houseboat | Leena, Ivo, Sela | about 18 × 7 m at `x -26..-8`, `z +8..+15` | floating, moored to arrival and pavilion piles | arrival deck west, cargo deck east |
 | 15 | Ocean portal landing | public | `x 26..35`, `z +16..+24` | piles, Heron shelf south, against the rock | gate faces north-west toward the portal spur; 3 m clear behind |
@@ -170,6 +170,8 @@ every public route is at least 3.2 m, including under eaves and pavilion beams.
 | Jetty spine | arrival landing → Heron landing | `(-28,-6) → (-10,-7) → (6,-7) → (16,-4) → (21,0)` | gentle bends follow the shelf; ends on a 6 × 6 m Heron landing at `(21, 0)` |
 | Pavilion return | pavilion → arrival landing | `(-8,+2) → (-20,+4) → (-28,+2)` | runs along the north edge of the water court; reaches the houseboat gangway |
 | Portal spur | Heron landing → portal landing | `(21,+3) → (20,+10) → (23,+17) → (27,+19)` | along Heron Rock's west foot, clear of the mussel lines |
+| ValeGangway | Heron landing → Vale houseboat | `(24,-2) → (27,-5)` | flexible, 2.6 m; replaces the Vale spur |
+| ShellBargeGangway | spine → Rian's barge | `(-15,-5) → (-15,-3)` | flexible, 2.6 m |
 | Venn spur | landing → Venn front | `(-30,-12) → (-30,-13)` | the shop veranda opens directly onto the landing |
 | Slip work spur | Venn yard → slip | `(-34,-17) → (-40,-17)` | behind the house; customers never cross it |
 | Sen spur | spine → clinic | `(-15,-7) → (-15,-10)` | |
@@ -178,8 +180,7 @@ every public route is at least 3.2 m, including under eaves and pavilion beams.
 | Net shed spur | spine → net shed | `(8,-7) → (8,-12)` | Salim and Jori carry gear here, not through the pavilion |
 | Aran spur | spine → Aran front | `(8,-7) → (8,-3)` | |
 | Aran wet stair | Aran house → pearl yard | `(10,+5)` | private; never crosses a public deck |
-| Vale spur | Heron landing → Vale front | `(23,-1) → (24,-1)` | the Vale veranda opens off the landing |
-| Catch spur | Vale house → catch deck | `(34,0) → (38,+3)` | private work route along Heron Rock's north-east foot |
+| CatchGangway | Vale houseboat work deck → catch deck | `(38,-3) → (38,+2)` | flexible, 2.6 m, private; replaces the Catch spur |
 | Houseboat gangway | pavilion return → arrival deck | `(-22,+4) → (-22,+8)` | flexible, 2.6 m |
 | Cargo gangway | houseboat cargo deck → cargo float | `(-8,+11) → (-4,+11)` | service only |
 
@@ -328,6 +329,35 @@ geometry. Houses sit slightly higher to read as dry.
 4. **Order:** terrain, plan data, validator, circulation and swim exits, then
    the architectural kit proofs (one house, one work deck, one boat), then the
    village, interiors, water work, landscape, schedules and dialogue.
+
+## Corrections found by the plan validator (2026-10-06)
+
+`FishingVillagePlan` and `tools/validate_fishing_plan.gd` (`VILLAGE=fishing
+tools/check_village_layout.sh`) now hold this plan as data. Checking it found
+six places where the approved numbers contradicted each other. Each was
+resolved as follows, so the data and this document agree:
+
+- **Heron shelf radius 14 m to 18 m.** The Vale house, catch deck, portal
+  landing and Heron landing sit 15 to 18 m from Heron Rock's centre, beyond a
+  14 m shelf, so their piles stood in deep water.
+- **Jetty spine bend.** The spine's third and fourth points, `(6,-7)` and
+  `(16,-4)`, cut the corner of the Aran house. They are now `(6,-8)` and
+  `(16,-6)`.
+- **Dive skiff berth** moved from `z -11.7` to `z -9.7` so it opens onto the
+  ferry lane (within 2 m) while remaining the north-west public berth.
+- **Salim's paddle skiff** now has its own 2.4 m `paddle_run` lane at
+  `x 17.4`, `z 7..13`, between the mussel lines and the portal spur. The brief
+  gave a berth but no lane.
+- **Catch deck and portal landing** are 2.2 m apart. Section 8 calls them
+  "apart", not "separated", so only the pearl yard and catch deck carry the
+  separation rule.
+
+- **Saddle between the shelves.** The jetty spine crosses from the Anvil shelf to
+  the Heron shelf at `(17, -5)`, which neither covered. A 10 × 11 m saddle shelf
+  at `x 12..22`, `z -9..2` joins them, as the brief intended ("merging around
+  `(16, 0)`").
+
+The validator also adds the Blorb Slime source (commission, carried by Nara).
 
 ## Fixed, proposed and open
 

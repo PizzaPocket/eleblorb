@@ -107,20 +107,71 @@ Settled:
   brief. Pearls are ordinary cultivated valuables.
 - The Mor houseboat is the rest point at 10 Tokoins.
 
+Done (2026-10-06): `FishingVillagePlan` (`scripts/fishing_village_plan.gd`) holds
+the structures, routes, lanes, berths, swim exits, portal gate and trade ledger,
+and `VILLAGE=fishing tools/check_village_layout.sh` validates it with 0 failures
+(five corrections to the layout are recorded in `fishing_village_layout.md`).
+The validator does not yet check the built village; that mode comes with the
+build.
+
+Quality audit and first building (2026-10-06, later):
+
+- The plan validator had never actually run: under `--script` it failed to
+  compile (autoloads missing) yet exited 0 and printed "0 FAIL". It now runs as
+  `tools/validate_fishing_plan.tscn` and reports what it checked (16 structures,
+  11 routes, 0 FAIL).
+- The islet probe's "hang" was a script error (a Callable compared to a String)
+  that stopped it before `quit()`, not the open editor. Fixed, with a watchdog.
+  It now passes in the world: islets, decks, swim exits, gangway, the Mor rest
+  point (registered, Leena aboard) and Nara.
+- `HOUSEHOLD_COLORS` contradicted the briefs (Sen was green, Mor violet); now
+  Sen violet, Mor terracotta, shared structures green, as approved.
+- **Venn house built** (`FishingBuildings.venn_house()`) from the shared kit
+  `StiltKit` (`scripts/stilt_kit.gd`) and `StiltRoofs` (`scripts/stilt_roofs.gd`),
+  proved in isolation by `tools/fishing_building_proof.tscn` (0 FAIL) and placed in
+  the village in place of its placeholder; Nara sells from the veranda counter.
+  Drawing the brief against itself changed it (no loft, counter and store swapped,
+  threshold ramp, ring beam 3.3 m); see design brief 4.2.
+
+Next: the Sen house (its brief puts the clinic door in the wrong bay and has no
+way to the bedrooms that avoids the clinic; resolve in the drawings first), then
+the cistern house, net shed, pavilion and Aran house, each through the proof
+scene, then the floating structures. Add each to `FishingBuildings.BUILT`.
+
 Next work:
 
-- Review and approve the layout plan: Anvil Rock and Heron Rock, their shelves,
-  footprints, routes, boat lanes, berths, swim exits and the portal's move to
-  Heron Rock.
-- Add the islets and shelves to the lake terrain.
+- Islets built (2026-10-06): `scripts/fishing_islets.gd` makes Anvil Rock and
+  Heron Rock, each one body holding its rock stack and its shelf column from the
+  lake bed to W - 3.2 m, from the plan's own numbers. The 18 m terrain grid cannot
+  hold a shelf, so the shelves are part of the islet bodies, not the height
+  field. `tools/fishing_islet_probe.tscn` confirms the collision heights. Not yet
+  seen in the engine: check the silhouettes, then add ledge planting.
+- **Rework in progress (2026-10-06, after the first walkthrough).** The houses
+  and islets first built were placeholders and are being replaced in the proper
+  order. Done: the fishing style charter (`docs/style_charters.md`), the floating
+  households (Vale houseboat, Rian's barge, Ivo's launch) in the plan and layout,
+  architectural design briefs (`fishing_village_building_designs.md`), interior
+  briefs (`fishing_village_interiors.md`), and the islets rebuilt as one 1 m-grid
+  heightfield mesh with trimesh collision (`scripts/fishing_islets.gd`), not
+  SuperEggs. **Not yet verified in the engine** (editor open). Next, once the
+  design briefs are approved: build one structure at a time in an isolated scene
+  (Venn house first), with real plans, framed openings and interiors, then replace
+  the placeholder solids in `floating_village.gd`.
+- Circulation built (2026-10-06): `scripts/floating_village.gd` now builds only
+  from `FishingVillagePlan`: decks and piles on the shelves, the jetty spine and
+  spurs, the houseboat gangway, three derived swim exits, the portal landing with
+  the gate turned north-west, owned placeholder houses in household colours, and
+  boats at their berths. `tools/fishing_islet_probe.tscn` checks 20 heights and
+  the vendor (Nara Venn). Still placeholders: house forms, the houseboat's
+  interior and rest point, the pavilion's furnishing.
+- Houseboat rest point written (2026-10-06, **not yet run**): the Mor cabin in
+  `floating_village.gd` is a walled room with a doorway, three berths, the marine
+  toilet, Leena Mor as keeper and a 10 Tokoin rest action, with its wake and
+  stand markers aboard. The probe that would check it hung because the editor
+  was open; re-run `tools/fishing_islet_probe.tscn` with the editor closed.
 - Review the architecture briefs (`docs/architecture/fishing_village_buildings.md`):
   the kit of parts, household palettes and every building's form.
-- Author `FishingVillagePlan` as the only source for structures, the public
-  jetty spine and return route, household and work spurs, gangways, boat lanes
-  and berths, swim exits, trade and schedules.
-- Add a fishing-village mode to `tools/validate_village.gd` before populating
-  the plan, including the three-swim-exit and foot-height ramp checks.
-- Then build circulation and swim exits, the architectural kit proofs, the
+- Then the architectural kit proofs, the
   village, interiors, water work and landscape, and finally schedules and
   dialogue.
 
@@ -312,7 +363,7 @@ Planning priorities:
 
 ## 9. Characters: bring every population up to the gendered body rules
 
-Status: not started. The rules (see the `character-design` skill): women's
+Status: in progress (2026-10-06). Done: the abdomen rule (`feminine_torso` in `ProceduralFigure.build`, fed by `NPC`, `Merfolk` and `Tempestar`), keeper gender through `VillageInn.create(..., keeper_is_female)` for Mira Holt, 林静, Dolma and the sea folk keeper, Chinese adults gendered from their identities with gendered pools, pirate crew genders, and women's shorter sea folk height. Remaining: the Ember Rest keeper (last), a visual check in engine, and the per-profile women's abdomen pools. The audit table below is the pre-fix state. The rules (see the `character-design` skill): women's
 height tops out lower; only men get the broad-chested build; women's hips are
 wider, so their legs are set wider; and women's abdomens never protrude past
 the thorax. Audit of every population (2026-10-06):
@@ -320,7 +371,7 @@ the thorax. Audit of every population (2026-10-06):
 | Population | State | Fix |
 |---|---|---|
 | Ohio villagers | gendered height, chest and hip pools | abdomen rule; women's own abdomen pool |
-| **Innkeepers (shared `VillageInn`)** | **every keeper is built male**: `apply_profile(keeper, 0, 0, false, ...)` ignores gender, so Mira Holt, a woman, has a male body and a buzzcut even though her profile carries a woman's proportions and a bun | pass each keeper's gender into `VillageInn.create()`; Mira Holt and Isaro (the sea folk keeper) are women; the genders of 林静, Dolma Hearthstone and Ember Rest are not yet stated and need deciding |
+| **Innkeepers (shared `VillageInn`)** | **every keeper is built male**: `apply_profile(keeper, 0, 0, false, ...)` ignores gender, so Mira Holt, a woman, has a male body and a buzzcut even though her profile carries a woman's proportions and a bun | pass each keeper's gender into `VillageInn.create()`; Mira Holt and Isaro (the sea folk keeper) are women; the genders of 林静 and Dolma Hearthstone are not yet stated and need deciding. Ember Rest is handled last, after every other population update: the Fire City rebuild (item 4) may remove the inn, so do not fix its keeper until then |
 | Snow Village | gendered profile | abdomen rule; women's abdomen pool |
 | Fire Kingdom | gendered profile | abdomen rule; women's abdomen pool |
 | Rock and Ground village | gendered profile | abdomen rule; women's abdomen pool |
@@ -370,9 +421,8 @@ Planning priorities:
 
 Code work once approved (not started):
 
-- Rename the residents in `scripts/jungle_kingdom_village.gd` (both identity
-  rosters and the inn keeper's name in the `VillageInn.create` call) and
-  rewrite Abu's first line.
+- Done (2026-10-06): the residents are renamed in `scripts/jungle_kingdom_village.gd`
+  (both rosters and the innkeeper) and Abu's first line is rewritten.
 - End the river at a plunge pool at `x ≈ -640` in
   `scripts/jungle_kingdom_terrain.gd` (coverage, carving and the water sheet),
   and raise the Flower Fruit Mountain plateau to the west.
@@ -411,10 +461,15 @@ open-pavilion treehouse inn.
 | Mor guest houseboat, fishing village | cosmopolitan lake boat people | a contained marine composting toilet and wash space | already in the brief |
 | Sky Kingdom | — | no rest point yet; any future one gives guests a washroom in cloud and gold | — |
 
-Code work: shared `TownProps` builders for each fixture (earth closet,
-mǎtǒng, composting vault seat, modern flush toilet, vacuum toilet,
-incinerating toilet), a per-inn fixture choice passed to `VillageInn.create`,
-and a real closet with a door for the open-pavilion inn.
+Done (2026-10-06): `scripts/toilet_fixtures.gd` (`ToiletFixtures.build(kind)`)
+builds the earth closet, mǎtǒng, composting seat, vacuum, incinerating and marine
+fixtures, and `VillageInn.create(..., fixture)` places the chosen one in the inn's
+washroom. Rock and Ground, the Chinese village, the sea folk hall, Ember Rest and
+the primate inn now pass theirs. Still to do: the Snowrest Inn's modern washroom
+(cistern flush, basin, mirror, shower), a real door-closed closet for the
+open-pavilion primate inn, per-culture walls and screens around each fixture
+(the mǎtǒng's screen, the privy's yard closet), the Okafor guest house, and the
+Mor houseboat's wash space (`marine` is built but not yet placed).
 
 ## 12. Chinese village: palace brief and the sealing rock
 
@@ -422,10 +477,15 @@ and a real closet with a door for the open-pavilion inn.
   palace's plan and both states (imperial palace and civic centre) in one
   unchanged shell; and the sealing rock's move from the palace crown to
   Lantern Row (`chinese_village.md` 4.6).
-- Code once approved: move `SUN_WU_KONG_LOCAL_POS`/`SUN_WU_KONG_CASTLE_Y` in
-  `scripts/chinese_village.gd` to island A's rim, enlarge the rock in
-  `sun_wu_kong.gd` with the gold band and the split halves, and drop the
-  castle-crown collision cap that existed only for him.
+- Done (2026-10-06): the rock is now `SealingRock` (`scripts/sealing_rock.gd`),
+  built on island A's north rim at island-local `(0, -15.5)`: about 5 × 3.5 × 3 m,
+  moss crown, gold band with six emblems, Mei Lian's red cord, solid collision.
+  Sun Wu Kong stands pinned at its north face. Freeing him calls `split()`: the
+  halves part once, and a freed save builds them already split with the band
+  fallen. The play hut moved to its lee at `(2.5, -10.8)`. The castle-crown
+  collision cap is gone. Still to do: the lantern workshop and homes, when the
+  Chinese plan is authored, must keep clear of the rock; the children's climbing
+  and the changed lines of Mei Lian and the children belong to item 13.
 
 ## 13. Story-state changes on revisit (code required)
 

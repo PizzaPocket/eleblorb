@@ -64,6 +64,25 @@ Shared by all: pitch 38 to 45 degrees, plinth 0.5 m, oak frames, cream and ochre
 
 Both options keep the engine rule: SuperEgg solids, superellipse openings, soft epsilon for turf and snow, square-edged epsilon for logs and beams.
 
+## Crossroads Fishing Village (the lake)
+
+Detail and per-building forms: `docs/architecture/fishing_village_buildings.md`.
+
+- **Primary (70 to 80 percent): Southeast Asian stilt and jetty vernacular**, from the working timber jetty settlement (George Town's Clan Jetties) and Ko Panyi's siting. Light post-and-beam frames on piles, broad hip and gable roofs with deep eaves, open walls of infill panels, and shade as the organising idea. Houseboats are the same vocabulary on a hull.
+- **Secondary (15 to 20 percent): Thai and Malay shutter and veranda joinery**, applied only to the named elements: top-hung prop-open shutters, the deep veranda, carved ridge ends and fascias. Not to roof form and wall system together.
+- **Accent (up to 5 percent): the household colour**, applied to wall panels, shutters, ridge caps and the household's boat, so the village keeps its varied terracotta, teal, ochre, violet, coral and green.
+- **Kit of parts.**
+  - Structural module: the 3.0 m bay, posts on every bay line, ring beam at 3.3 m (revised 2026-10-06 so a veranda pent tucks under the main eave with 2.0 m headroom).
+  - Roofs: hip or gable only, one pitch band (30 to 34 degrees), eaves 0.9 m, pent roofs on verandas (15 to 18 degrees). Built with `StiltRoofs` on `TownProps.roof_slab`/`build_ridge_slab` (the shared Ohio construction: squarish shoulders, ridge cut), never plain slabs. Every building is assembled from `StiltKit` (`scripts/stilt_kit.gd`).
+  - Walls, in order: light timber boards, woven rattan basket-weave panels, hinged shutters. No sealed boxes.
+  - Windows and doors: superellipse openings, piped frames with the reveal in the frame colour (`OpeningTrim`).
+  - Foundation: squarish timber piles 0.3 m with caps, braced in pairs, on the shelves only. Floating hulls are moored by lines to pile clusters, never to the lake bed.
+  - Signature motif: **rope-bound posts at every threshold and work deck**, seen at least three times in the village.
+  - Palette: natural timber and sun-faded shingle (60), household wall colour (30), accent shutters and ridge caps (10).
+- **Hierarchy.** Polite: the communal pavilion and the Mor guest houseboat (largest roofs, ridge vents, fascia carving). Vernacular: homes, work decks, sheds.
+- **Exclusions.** Sealed boxes; Peranakan shophouse facades; clan temples or sacred roofs; brick or masonry walls; lights on poles; uniform brown; plain unclipped roof slabs; SuperEgg props standing in for rock.
+- **Doors and openings face the route that serves them** (the layout's route ledger), the veranda faces the water court or landing, and service sides face outward.
+
 ## Other kingdoms
 
 Draft charters to be added from `references/cultures.md` grammars: Rock and Ground (earthen Pueblo/adobe), Ocean (stilt harbour), Plant (tree-borne and thatch), Sky (drafted in `docs/architecture/sky_kingdom.md` as celestial classical in quartz, gold and cloud: Greco-Roman about 55 percent, Chinese celestial palace about 35 percent by deliberate choice rather than the usual 75/20 split, with the rule that no single building mixes both traditions), the Chinese village (courtyard and tiled hip-and-gable), the Western city (concrete). The Fire Kingdom's draft volcanic-modern charter now lives in `docs/architecture/fire_caldera_city.md`. Each remaining kingdom needs the Ohio-style charter with a primary, one secondary, an accent, a kit of parts, hierarchy and exclusions.

@@ -16,4 +16,10 @@ if [ ! -x "$GODOT_BIN" ]; then
 	exit 1
 fi
 
+# The fishing village is validated from its plan alone, before anything is built.
+if [ "${VILLAGE:-ohio}" = "fishing" ]; then
+	"$GODOT_BIN" --headless --path "$ROOT" tools/validate_fishing_plan.tscn
+	exit $?
+fi
+
 "$GODOT_BIN" --headless --path "$ROOT" tools/validate_village.tscn -- --village="${VILLAGE:-ohio}"

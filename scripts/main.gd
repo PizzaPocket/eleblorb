@@ -86,6 +86,7 @@ func _build_portals() -> void:
 	_add_portal("primate_kingdom", PRIMATE_KINGDOM_SCENE, Vector3(PRIMATE_GATE_XZ.x, primate_h, PRIMATE_GATE_XZ.y), Color(0.36, 0.6, 0.32))
 	var village: Node = get_node("FloatingWaterVillage")
 	_add_portal("ocean_kingdom", OCEAN_KINGDOM_SCENE, village.get_portal_anchor(), Color(0.2, 0.56, 0.66))
+	(_portals_by_gate_id["ocean_kingdom"] as Node3D).rotation.y = village.get_portal_yaw()
 	_add_portal("fire_kingdom", FIRE_KINGDOM_SCENE, fire_anchor, Color(0.85, 0.32, 0.08))
 	_add_portal("ice_kingdom", ICE_KINGDOM_SCENE, Vector3(ICE_GATE_XZ.x, ice_h, ICE_GATE_XZ.y), Color(0.72, 0.88, 0.96))
 	_add_portal("rock_ground_kingdom", ROCK_GROUND_KINGDOM_SCENE, Vector3(CANYON_GATE_XZ.x, canyon_h, CANYON_GATE_XZ.y), Color(0.58, 0.44, 0.28))

@@ -5,6 +5,35 @@ Status: building briefs for review (2026-10-06). Read with `fishing_village.md`
 Footprints, positions and owners come from the layout; this document fixes each
 building's form. Interiors and planting follow.
 
+## 0. Revision (2026-10-06): a village that floats as well as stands
+
+The first draft of this brief had one houseboat among fifteen piled structures,
+so the village read as a pier town. A lake community of boat people should live
+on the water as much as over it. The census, owners and trade stay as approved;
+what changes is how three households are housed.
+
+| Household | Was | Now | Why |
+|---|---|---|---|
+| Vale (Jori, Osei, Tavi) | piled house on the Heron shelf | **family houseboat** moored off the catch deck's west side, with its own working deck | seasonal fishers from the far shore; their home is a boat, which is why the smokehouse deck stays separate and downwind |
+| Sen (Asha, Rian) | one house with Rian's side deck | piled **clinic and school house** as before, plus Rian's **shell-works barge** moored in the water court south of the spine at `x -20..-12, z -3..0.5`, reached by a short gangway from the spine | the saw and sealing noise leaves the clinic; the barge rides on lines and a gangway |
+| Mor (Leena, Ivo, Sela) | one guest houseboat | the **guest houseboat** plus **Ivo's ferry-launch**, a roofed cargo launch with a cabin | the ferry is the village's way out; it becomes a real vessel with a berth and a cabin |
+| Aran (Mai, Salim, Dala, Pree) | piled house and pontoon yard | unchanged, with Pree's **herb floats** as small moored rafts | the oldest house, on the first piles |
+| Venn (Nara, Mateo, Lio) | piled house with shop veranda | unchanged (Lio keeps his loft under the hip) | the shop veranda must meet the landing |
+
+That makes **four floating structures** (the Mor and Vale houseboats, Rian's
+barge, Ivo's launch with a cabin) beside the Aran pontoon, the herb floats and
+the boats, against five piled houses and work decks (Venn, Sen, Aran, the
+cistern house and the net shed) and the pavilion that tie into the islets. Piled buildings
+are the older, fixed heart; floating ones hold the families who came later and
+move seasonally. Floating structures are moored to pile clusters and rock rings
+by lines and flexible gangways, never to the open lake bed.
+
+`FishingVillagePlan` now carries these moorings (2026-10-06): the Vale
+houseboat floats at `x 26..40, z -10..-3` north of Heron Rock, joined to the
+Heron landing by a gangway; Rian's barge sits in the water court on a spine
+gangway; Ivo's launch keeps the ferry berth, with a cabin. Every one still needs a style charter entry in
+`docs/style_charters.md` (it has none for this village yet) before it is built.
+
 ## 1. Kit of parts
 
 The primary influence is the working timber jetty settlement (George Town's
