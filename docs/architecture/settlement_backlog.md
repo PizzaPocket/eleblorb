@@ -230,5 +230,6 @@ Planning priorities:
   staircase landing, Aethra on the arrival axis, the four other courts in a
   ring around Koinon, and every building's footprint and program.
 - Review the kit of parts and architecture briefs in
-  `docs/architecture/sky_kingdom_buildings.md`, then prototype the two proof
-  buildings: the Hall of Mist and a tholos.
+  `docs/architecture/sky_kingdom_buildings.md`, then prototype in order: the
+  upturned swept roof on its own (fallback: straight floating hip-and-gable
+  with raised gold corner finials), the Hall of Mist, and a tholos.

@@ -63,6 +63,37 @@ Hung timber doors, pitched timber roofs, chimneys, heavy masonry walls, solid
 gold walls, round SuperEgg columns, copied temple forms, altars, statues of
 gods, lanterns on posts, Buddhist imagery, banners carrying text.
 
+### Upturned roof: a proof before any building
+
+A SuperEgg is convex and symmetric, so it cannot make the concave sag and
+lifted corners of a Chinese roof, and stacking SuperEgg pieces to fake the lift
+would read as lumps with visible seams. The current Chinese village avoids the
+problem with the ordinary town gable plus stacked eave tiers.
+
+The upturned roof is therefore its own swept-surface primitive, as the
+codebase already does for the spaceship deck, the dinosaur's swept pipe and the
+Nautilus Crown's shell:
+
+- the plan outline is a superellipse, keeping the design language;
+- each slope carries a gentle concave sag;
+- corner lift grows with how far an eave point lies toward the superellipse's
+  corner, so the upturn comes from the outline rather than added pieces;
+- the slab has real thickness with softened edges;
+- collision is a simplified set of convex pieces, since the hero lands on
+  roofs.
+
+**Proof first.** Before the Hall of Mist, build one isolated roof (a single
+eave over a 4 × 3 bay pavilion) and judge it from the Dawn Gate arrival view,
+at eye level and from above in flight. It passes if the eave line reads as one
+continuous curve, the corners lift without kinks or seams, its thickness and
+edge softness match the SuperEgg buildings, and a flier can land on it without
+snagging.
+
+**Fallback if the proof fails:** a straight hip-and-gable floating roof with a
+raised gold ring and finial at each corner to suggest the lift. Only the Dawn
+Gate, the Hall of Mist and its propylon, and Pantao's buildings use this roof,
+so the fallback changes five buildings and nothing else.
+
 ## 2. Style audit of the kit
 
 | Element | Term | Tradition |
