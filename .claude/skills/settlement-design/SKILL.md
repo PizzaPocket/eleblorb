@@ -25,6 +25,10 @@ systems to rescue a weak plan.
 4. **Room and ground:** interiors, planting, work evidence, light, wear, and
    small props. Use the companion skills only after the higher scales are fixed.
 
+Residents' appearance (dress, hair, skin tone, jewellery) follows the census
+through the `character-design` skill: each community gets a dress charter
+beside its architecture charter.
+
 Never solve a higher-scale problem with lower-scale decoration. A lantern does
 not repair a bad route. Furniture does not repair a bad floor plan. A facade
 does not give an anonymous building a purpose.
