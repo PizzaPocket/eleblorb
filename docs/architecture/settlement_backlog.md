@@ -334,3 +334,24 @@ the thorax. Audit of every population (2026-10-06):
 The abdomen rule itself: in `ProceduralFigure`, limit
 `ABDOMEN_FRONT_OVERHANG_MAX` (1.12 times the chest's front depth) to men and
 keep women's abdomen front flush with the chest.
+
+## 10. Plant Kingdom: the primate village
+
+Status: first full planning pass, in review (2026-10-06). See
+`docs/architecture/plant_kingdom_village.md` and
+`docs/architecture/plant_kingdom_village_layout.md`. The current village is a
+prototype: three giant trees with tiny decks and one villager each, the gate in
+the middle, a few roamers.
+
+Planning priorities:
+
+- Approve the community: canopy and floor households, no children because of
+  the curse, roles from the residents' own lines, the fruit stall.
+- Approve the layout: the gate plaza, ground lodges for apes and floor-dwellers,
+  the communal hearth, household rings and rope bridges in the trees, and a
+  32° public switchback on each tree beside the steep climbing ramps.
+- Decide the open questions: whether the curse touches apes, whether the
+  shadows of the ashed are seen, whether to rename the residents, and whether
+  Sun Wu Kong's old seat appears.
+- Then building briefs, interiors, planting and dress charters.
+
