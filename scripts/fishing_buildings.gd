@@ -10,10 +10,10 @@ extends RefCounted
 
 ## Buildings that have left the placeholder stage. FloatingVillage builds these
 ## instead of its owned placeholder boxes.
-const BUILT := ["VennHouse", "SenHouse", "CisternHouse", "NetShed", "Pavilion", "AranHouse", "BoatwrightSlip", "CatchDeck", "ShellBarge", "MorHouseboat"]
+const BUILT := ["VennHouse", "SenHouse", "CisternHouse", "NetShed", "Pavilion", "AranHouse", "BoatwrightSlip", "CatchDeck", "ShellBarge", "MorHouseboat", "ValeHouseboat"]
 ## Decks FloatingVillage builds from the plan that carry furnishings and
 ## shelters from their briefs (`dress()`).
-const DRESSED := ["ArrivalLanding", "HeronLanding", "PortalLanding"]
+const DRESSED := ["ArrivalLanding", "HeronLanding", "PortalLanding", "PearlYard"]
 ## Junction lamps along the jetty spine, at the spur junctions and landings,
 ## each with the side its arm reaches over (plan coordinates).
 const JUNCTION_LAMPS: Array[Dictionary] = [
@@ -53,6 +53,8 @@ static func build(name_text: String) -> StaticBody3D:
 			return shell_barge()
 		"MorHouseboat":
 			return mor_houseboat()
+		"ValeHouseboat":
+			return vale_houseboat()
 	return null
 
 
@@ -73,6 +75,8 @@ static func anchor(name_text: String) -> Vector2:
 			return ARAN_ORIGIN
 		"MorHouseboat":
 			return MOR_ORIGIN
+		"ValeHouseboat":
+			return VALE_ORIGIN
 	# Slip, catch deck and the dressing bodies are drawn in plan coordinates.
 	return Vector2.ZERO
 
@@ -1732,6 +1736,199 @@ static func _mor_interior(body: StaticBody3D, f: float, terracotta: Color) -> vo
 
 
 # ---------------------------------------------------------------------------
+# 4.11 Vale family houseboat (Jori, Osei, Tavi)
+# ---------------------------------------------------------------------------
+# Body frame: origin at the hull's centre, plan (33, -6.5), at W. Hull x -7..7,
+# z -3.5..3.5. North walkway z -3.5..-2.5, cabin block z -2.5..2, south walkway
+# z 2..3.5. West to east: the covered arrival deck x -7..-4.5 (the gangway from
+# the Heron landing lands at (-6, 1.5)); the living room and galley x -4.5..-1;
+# Jori and Osei's cabin (north) and Tavi's (south) x -1..3, each off the living
+# room; the open work deck x 3..7 with the gear store at its north-east, where
+# the catch gangway leaves for the catch deck. A gable over the cabins, ridge
+# east to west, so the smoke from the catch deck slides past. 4.11.
+
+const VALE_ORIGIN := Vector2(33.0, -6.5)
+const VALE_CABIN := Rect2(-4.5, -2.5, 7.5, 4.5)
+const VALE_SPLIT := -0.1
+const VALE_PLATE := 2.9
+
+
+static func vale_houseboat() -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = "ValeHouseboat"
+	var f := FishingVillagePlan.FLOAT_DECK
+	var coral := _household("Jori")
+	var plate := f + VALE_PLATE
+	var x0 := VALE_CABIN.position.x
+	var x1 := VALE_CABIN.end.x
+	var zn := VALE_CABIN.position.y
+	var zs := VALE_CABIN.end.y
+
+	var hull := SuperEgg.build_part(Vector3(7.15, 0.5, 3.6), coral.darkened(0.45), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+	hull.position = Vector3(0.0, f - 0.55, 0.0)
+	body.add_child(hull)
+	CollisionPolicy.add_box(body, hull, Vector3(14.3, 1.0, 7.2), hull.position, Basis(), true)
+	var strake := SuperEgg.build_part(Vector3(7.2, 0.07, 3.65), StiltKit.TIMBER_PALE, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	strake.position = Vector3(0.0, f - 0.12, 0.0)
+	body.add_child(strake)
+	CollisionPolicy.mark_decorative(strake)
+	StiltKit.floor_slab(body, Rect2(-7.0, -3.5, 14.0, 7.0), f, StiltKit.DECK.darkened(0.06))
+
+	# Cabin walls: coral panels, natural shutters.
+	var shutter := StiltKit.TIMBER_PALE
+	StiltKit.wall(body, Vector2(x0, zn), Vector2(x0, zs), Vector2(-1, 0), f, VALE_PLATE,
+		[StiltKit.door(Vector2(x0, (zn + zs) * 0.5))], coral, shutter)
+	StiltKit.wall(body, Vector2(x0, zn), Vector2(x1, zn), Vector2(0, -1), f, VALE_PLATE,
+		[StiltKit.window(Vector2(-2.75, zn)), StiltKit.window(Vector2(1.0, zn))], coral, shutter)
+	StiltKit.wall(body, Vector2(x0, zs), Vector2(x1, zs), Vector2(0, 1), f, VALE_PLATE,
+		[StiltKit.window(Vector2(-3.5, zs)), StiltKit.door(Vector2(-2.0, zs)), StiltKit.window(Vector2(1.0, zs))], coral, shutter)
+	StiltKit.wall(body, Vector2(x1, zn), Vector2(x1, zs), Vector2(1, 0), f, VALE_PLATE,
+		[StiltKit.window(Vector2(x1, -1.3))], coral, shutter)
+	StiltKit.partition(body, Vector2(-1.0, zn), Vector2(-1.0, zs), f, VALE_PLATE, [1.2, 3.45])
+	var no_doors: Array[float] = []
+	StiltKit.partition(body, Vector2(-1.0, VALE_SPLIT), Vector2(x1, VALE_SPLIT), f, VALE_PLATE, no_doors)
+	StiltKit.ceiling(body, VALE_CABIN, plate)
+
+	for x: float in [x0, -1.0, x1]:
+		for z: float in [zn, zs]:
+			StiltKit.post(body, Vector2(x, z), f - StiltKit.FLOOR_THICKNESS, plate)
+	# Arrival deck under its pent, the gangway's posts rope-bound.
+	var pent_high := plate - 0.2
+	for p: Vector2 in [Vector2(-7.0, -3.4), Vector2(-7.0, 0.4), Vector2(-7.0, 3.4)]:
+		StiltKit.post(body, p, f - StiltKit.FLOOR_THICKNESS, pent_high - 2.5 * tan(StiltRoofs.PENT_PITCH) - 0.05, StiltKit.TIMBER, p.y > 0.0 and p.y < 1.0)
+	StiltRoofs.pent(body, Rect2(-7.3, -3.6, 2.8, 7.2), pent_high + StiltRoofs.THICKNESS / cos(StiltRoofs.PENT_PITCH), Vector3(-1, 0, 0), StiltKit.SHINGLE)
+	var roof := StaticBody3D.new()
+	roof.name = "ValeRoof"
+	roof.position = Vector3((x0 + x1) * 0.5, 0.0, (zn + zs) * 0.5)
+	body.add_child(roof)
+	StiltRoofs.gable(roof, Vector2((x1 - x0) * 0.5, (zs - zn) * 0.5), plate, StiltKit.SHINGLE.darkened(0.06), coral)
+	var rise := tan(StiltRoofs.PITCH)
+	var half_d := (zs - zn) * 0.5
+	var peak := half_d * rise + StiltRoofs.PLATE - StiltRoofs.THICKNESS - 0.02
+	for x: float in [x0 - roof.position.x, x1 - roof.position.x]:
+		TownProps._build_panel_facade(roof, half_d * 2.0, Vector3(x, plate, 0.0), -PI * 0.5, coral.darkened(0.1), [], plate, peak + 0.1, TownProps.WALL_THICKNESS, [{"a": peak, "b": rise}, {"a": peak, "b": -rise}])
+
+	_vale_interior(body, f, coral)
+
+	# The work deck: the gear store (2 x 2, door south), cork floats drying on
+	# the east rail, the bait box, the rinse bucket, mooring lines coiled.
+	var store := StaticBody3D.new()
+	store.name = "GearStore"
+	store.position = Vector3(6.0, 0.0, -2.5)
+	body.add_child(store)
+	var no_openings: Array[Dictionary] = []
+	StiltKit.wall(store, Vector2(-1.0, -1.0), Vector2(1.0, -1.0), Vector2(0, -1), f, 2.3, no_openings, coral, shutter)
+	StiltKit.wall(store, Vector2(1.0, -1.0), Vector2(1.0, 1.0), Vector2(1, 0), f, 2.3, no_openings, coral, shutter)
+	StiltKit.wall(store, Vector2(-1.0, -1.0), Vector2(-1.0, 1.0), Vector2(-1, 0), f, 2.3, no_openings, coral, shutter)
+	StiltKit.wall(store, Vector2(-1.0, 1.0), Vector2(1.0, 1.0), Vector2(0, 1), f, 2.3, [StiltKit.door(Vector2(0.0, 1.0), 2.1, 1, 1.0)], coral, shutter)
+	StiltRoofs.pent(store, Rect2(-1.2, -1.2, 2.4, 2.4), f + 2.45 + StiltRoofs.THICKNESS, Vector3(0, 0, 1), StiltKit.SHINGLE)
+	StiltKit.rail(body, Vector2(6.9, -0.9), Vector2(6.9, 2.4), f)
+	for i in 8:
+		Furnishings.piece(body, Vector3(0.08, 0.08, 0.08), Color(0.86, 0.66, 0.36).darkened(0.05 * float(i % 3)), Vector3(6.9, f + StiltKit.RAIL_HEIGHT - 0.12, -0.6 + 0.4 * float(i)), 0.0, false, 2.0)
+	Furnishings.piece(body, Vector3(0.35, 0.22, 0.25), Furnishings.OAK_DARK, Vector3(4.0, f + 0.22, -3.0), 0.0, true)
+	Furnishings.piece(body, Vector3(0.18, 0.18, 0.18), Furnishings.OAK, Vector3(5.6, f + 0.18, 3.0), 0.0, false, 2.2)
+	Furnishings.piece(body, Vector3(0.32, 0.08, 0.32), StiltKit.ROPE, Vector3(3.6, f + 0.08, 3.0), 0.0, false, 2.0)
+
+	ClearZones.add_lane(body, "gangway onto the arrival deck", [Vector3(-6.0, f, 1.4), Vector3(-5.6, f, -0.25)], 0.55)
+	ClearZones.add_lane(body, "into the living room", [Vector3(-5.6, f, -0.25), Vector3(-3.0, f, -0.25)])
+	ClearZones.add_lane(body, "the south walkway", [Vector3(-2.0, f, 2.75), Vector3(4.5, f, 2.75)])
+	ClearZones.add_lane(body, "work deck to the catch gangway", [Vector3(4.0, f, 0.0), Vector3(5.0, f, 3.2)])
+	return body
+
+
+static func _vale_interior(body: StaticBody3D, f: float, coral: Color) -> void:
+	var layout := RoomLayout.new(body, Vector2(7.0, 3.5))
+	var zn := VALE_CABIN.position.y + 0.08
+	var zs := VALE_CABIN.end.y - 0.08
+	var x0 := VALE_CABIN.position.x + 0.08
+	var x1 := VALE_CABIN.end.x - 0.08
+	# Living room and galley: the brazier in the north-west corner, a low table
+	# and mats, rope shelves, oilskins on pegs, the fish-bone chart on a plank;
+	# Jori's old paddle with the far shore carved on it; a jar of smoked fish for
+	# guests; a battered thermos.
+	var brazier_at := Vector2(x0 + 0.42, zn + 0.42)
+	ClearZones.add(body, "Vale brazier", "fire", brazier_at, Vector2(0.7, 0.7), 0.4, 0.7, 0.45, f, f + 1.6)
+	layout.reserve(brazier_at, Vector2(0.38, 0.38))
+	_brazier(body, Vector3(brazier_at.x, f, brazier_at.y), f + VALE_PLATE)
+	_roof_flue(body, brazier_at, f + VALE_PLATE - 0.05, f + VALE_PLATE + StiltRoofs.PLATE + 0.5 * tan(StiltRoofs.PITCH) + 0.6)
+	if not layout.at_any([{"pos": Vector2(-2.85, -1.6), "yaw": 0.0}], 0.45, 0.3, 0.0, "Vale table", 0.5).is_empty():
+		_low_table(body, Vector3(-2.85, f, -1.6), coral)
+	if not layout.at_any([{"pos": Vector2(-1.6, zn + 0.17), "yaw": StiltKit.yaw_back_to(Vector2(0, -1))}], 0.4, 0.17, 0.0, "rope shelf").is_empty():
+		Furnishings.shelf(body, Vector3(-1.6, f, zn + 0.17), StiltKit.yaw_back_to(Vector2(0, -1)), 0.8, 2, "boxes")
+	Furnishings.peg_rail(body, Vector3(-3.9, f, zs - 0.03), PI, 0.7)
+	Furnishings.piece(body, Vector3(0.35, 0.22, 0.012), Color(0.82, 0.76, 0.62), Vector3(-2.75, f + 1.75, zn + 0.02))
+	Furnishings.piece(body, Vector3(0.03, 0.75, 0.06), Furnishings.OAK_LIGHT, Vector3(x0 + 0.03, f + 1.6, 1.4), 0.0, false)
+	Furnishings.piece(body, Vector3(0.08, 0.11, 0.08), Color(0.48, 0.36, 0.24), Vector3(-1.4, f + 1.35, 1.2), 0.0, false, 2.2)
+	Furnishings.piece(body, Vector3(0.05, 0.13, 0.05), Color(0.56, 0.58, 0.60), Vector3(-1.4, f + 0.95, 1.4), 0.0, false, 2.2)
+	Furnishings.hanging_lamp(body, Vector3(-2.75, f + 2.4, -0.3), 0.7, 5.0)
+	# Jori and Osei's cabin: the shared bed head to the east wall, a lamp, the
+	# window onto Heron Rock, a rack of Osei's smoke tools.
+	if not layout.at_any([{"pos": Vector2(x1 - 1.22, zn + 0.8), "yaw": 0.0}], 1.22, 0.8, 0.0, "Jori and Osei's bed", 0.6).is_empty():
+		var bed := TownProps.build_bed(coral.lightened(0.15))
+		bed.position = Vector3(x1 - 1.22, f, zn + 0.8)
+		bed.rotation.y = -PI * 0.5
+		body.add_child(bed)
+	Furnishings.pot_rack(body, Vector3(0.0, f, VALE_SPLIT - 0.12), 0.0, 0.9, 1.8)
+	Furnishings.hanging_lamp(body, Vector3(1.0, f + 2.4, -1.3), 0.5, 4.0)
+	# Tavi's cabin: a narrow bed, cork floats of every size strung across the
+	# ceiling, a shelf of mechanical bits he has taken apart, a stool, a low lamp.
+	if not layout.at_any([{"pos": Vector2(x1 - 1.05, zs - 0.5), "yaw": 0.0}], 1.05, 0.5, 0.0, "Tavi's bed", 0.6).is_empty():
+		_narrow_bed(body, Vector3(x1 - 1.05, f, zs - 0.5), Color(0.42, 0.58, 0.70))
+	for i in 7:
+		Furnishings.piece(body, Vector3(0.05 + 0.02 * float(i % 3), 0.05 + 0.02 * float(i % 3), 0.05 + 0.02 * float(i % 3)), Color(0.86, 0.66, 0.36).darkened(0.05 * float(i % 2)), Vector3(-0.4 + 0.45 * float(i), f + 2.6, 0.95), 0.0, false, 2.0)
+	StiltKit.beam(body, Vector2(-0.9, 0.95), Vector2(2.9, 0.95), f + 2.7, Vector2(0.01, 0.01), StiltKit.ROPE)
+	Furnishings.piece(body, Vector3(0.3, 0.02, 0.1), Furnishings.OAK, Vector3(0.3, f + 1.3, zs - 0.06))
+	for i in 4:
+		Furnishings.piece(body, Vector3(0.04, 0.03, 0.04), Furnishings.IRON.lightened(0.1 * float(i % 2)), Vector3(0.1 + 0.13 * float(i), f + 1.35, zs - 0.08), 0.0, false, 2.2)
+	if not layout.at_any([{"pos": Vector2(1.2, 0.32), "yaw": 0.0}], 0.23, 0.23, 0.0, "Tavi's stool", 0.5).is_empty():
+		Furnishings.stool(body, Vector3(1.2, f, 0.32))
+	Furnishings.hanging_lamp(body, Vector3(1.6, f + 1.9, 1.0), 0.4, 3.5)
+	for failure in layout.failures:
+		push_warning("ValeHouseboat interior: " + failure)
+
+
+## Ivo's ferry launch (4.14): a roofed cargo launch, built at its true size at
+## the ferry berth (length along local x). A forward cargo well of crates and
+## sacks in household colours, a small cab with a pent roof, a chart roll and a
+## brass compass, his coat on a hook and a lamp on the cab; the engine box aft.
+static func ferry_launch(length: float, beam: float) -> Node3D:
+	var boat := Node3D.new()
+	var terracotta := _household("Ivo")
+	var hl := length * 0.5
+	var hb := beam * 0.5
+	var parts: Array = [
+		[Vector3(hl, 0.35, hb), Vector3(0, -0.05, 0), terracotta.darkened(0.25), SuperEgg.EPSILON_SOFT],
+		[Vector3(hl - 0.05, 0.05, hb + 0.03), Vector3(0, 0.3, 0), MOR_TRIM, SuperEgg.EPSILON_FLAT],
+		[Vector3(hl - 0.3, 0.03, hb - 0.15), Vector3(0, 0.28, 0), StiltKit.DECK, SuperEgg.EPSILON_FLAT],
+		[Vector3(0.75, 0.6, hb - 0.2), Vector3(-0.4, 0.9, 0), terracotta.lightened(0.1), SuperEgg.EPSILON_FLAT],
+		[Vector3(0.9, 0.05, hb), Vector3(-0.4, 1.55, 0), StiltKit.SHINGLE, SuperEgg.EPSILON_FLAT],
+		[Vector3(0.45, 0.3, hb - 0.3), Vector3(-hl + 0.6, 0.55, 0), StiltKit.TIMBER_DARK, SuperEgg.EPSILON_FLAT],
+	]
+	for part: Array in parts:
+		var mesh := SuperEgg.build_part(part[0], part[2], part[3], part[3])
+		mesh.position = part[1]
+		boat.add_child(mesh)
+		CollisionPolicy.mark_decorative(mesh)
+	var households := ["Venn", "Aran", "Vale", "Sen"]
+	for i in households.size():
+		var crate := SuperEgg.build_part(Vector3(0.25, 0.2, 0.25), FishingVillagePlan.HOUSEHOLD_COLORS[households[i]].darkened(0.1), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		crate.position = Vector3(hl - 0.6 - 0.55 * float(i / 2), 0.52, -0.3 + 0.6 * float(i % 2))
+		boat.add_child(crate)
+		CollisionPolicy.mark_decorative(crate)
+	var lamp := SuperEgg.build_part(Vector3(0.08, 0.1, 0.08), Color(1.0, 0.75, 0.35), 2.2, 2.2)
+	lamp.position = Vector3(0.4, 1.4, 0.0)
+	boat.add_child(lamp)
+	CollisionPolicy.mark_decorative(lamp)
+	var light := OmniLight3D.new()
+	light.position = lamp.position
+	light.light_color = Color(1.0, 0.78, 0.45)
+	light.omni_range = 4.0
+	light.light_energy = 0.6
+	boat.add_child(light)
+	return boat
+
+
+# ---------------------------------------------------------------------------
 # Landings (4.1, 4.15, 4.16): furnishings on the plan's decks. Plan coordinates.
 # ---------------------------------------------------------------------------
 
@@ -1761,6 +1958,33 @@ static func dress(name_text: String) -> StaticBody3D:
 			# Jori's first-watch lamp.
 			Furnishings.bench(body, Vector3(23.4, f, 0.0), StiltKit.yaw_back_to(Vector2(-1, 0)), 1.6)
 			StiltKit.lamp_post(body, Vector2(23.7, 2.6), f, Vector2(-1, 0))
+		"PearlYard":
+			# Mai's pontoon (4.10): three grading tables under a light shade
+			# canopy, trays by size and colour, the scale and magnifier, basket
+			# racks of mussels, the fresh-water rinse jar, a drying frame for
+			# shell, and the tray of pearls she will not sell, under its cloth.
+			# The Aran wet ramp lands at x 11..13, z 5..6.5: kept clear.
+			var ff := FishingVillagePlan.FLOAT_DECK
+			for p: Vector2 in [Vector2(6.3, 7.0), Vector2(10.3, 7.0), Vector2(6.3, 9.7), Vector2(10.3, 9.7)]:
+				StiltKit.post(body, p, ff, ff + 2.35, StiltKit.TIMBER_PALE)
+			Furnishings.piece(body, Vector3(2.3, 0.02, 1.55), Color(0.90, 0.84, 0.68), Vector3(8.3, ff + 2.38, 8.35), 0.0, false, SuperEgg.EPSILON_SOFT)
+			for x: float in [7.0, 8.3, 9.6]:
+				Furnishings.piece(body, Vector3(0.5, 0.04, 0.4), Furnishings.OAK_LIGHT, Vector3(x, ff + 0.85, 8.6), 0.0, true)
+				for lx: float in [-0.4, 0.4]:
+					Furnishings.piece(body, Vector3(0.04, 0.4, 0.3), Furnishings.OAK_DARK, Vector3(x + lx, ff + 0.4, 8.6))
+				for k in 3:
+					Furnishings.piece(body, Vector3(0.12, 0.015, 0.1), Color(0.86, 0.80, 0.66).darkened(0.05 * float(k)), Vector3(x - 0.3 + 0.3 * float(k), ff + 0.91, 8.55), 0.0, false)
+			Furnishings.piece(body, Vector3(0.14, 0.02, 0.12), Color(0.62, 0.32, 0.30), Vector3(9.9, ff + 0.92, 8.8), 0.0, false, SuperEgg.EPSILON_SOFT)
+			Furnishings.piece(body, Vector3(0.05, 0.1, 0.05), Color(0.72, 0.60, 0.30), Vector3(7.3, ff + 0.98, 8.75), 0.0, false, 2.2)
+			for i in 3:
+				var rack := Vector3(14.8, ff, 6.0 + 1.1 * float(i))
+				Furnishings.piece(body, Vector3(0.45, 0.3, 0.35), Color(0.62, 0.50, 0.32), rack + Vector3(0, 0.3, 0), 0.0, true, SuperEgg.EPSILON_SOFT)
+				for k in 4:
+					Furnishings.piece(body, Vector3(0.08, 0.04, 0.05), Color(0.20, 0.22, 0.24), rack + Vector3(-0.25 + 0.17 * float(k), 0.63, 0.05 * float(k % 2)), 0.3, false, 2.2)
+			StiltKit.rain_jar(body, Vector2(13.8, 9.4), ff, Color(0.30, 0.46, 0.50))
+			StiltKit.beam(body, Vector2(14.3, 9.75), Vector2(15.7, 9.75), ff + 1.3, Vector2(0.03, 0.03), StiltKit.TIMBER)
+			for i in 5:
+				Furnishings.piece(body, Vector3(0.07, 0.01, 0.06), Color(0.90, 0.86, 0.80), Vector3(14.4 + 0.3 * float(i), ff + 1.2, 9.75), 0.0, false, 2.2)
 		"PortalLanding":
 			# Bare deck: a lamp on each of two corner posts, a coil of rope.
 			StiltKit.lamp_post(body, Vector2(26.4, 16.4), f, Vector2(1, 1))

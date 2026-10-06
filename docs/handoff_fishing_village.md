@@ -2,10 +2,13 @@
 
 Status (2026-10-06): plan, islets, circulation, swim exits and the Mor rest
 point are built and verified in the world (`tools/fishing_islet_probe.tscn`, 0
-FAIL). Six buildings are built from their briefs (2026-10-07): the Venn, Sen
-and Aran houses, the cistern house, the net shed and the pavilion. The slip,
-catch deck, landings' furnishings and all floating structures are still owned
-placeholders in `floating_village.gd`. Current state and next
+FAIL). Every structure in the plan is built from its brief (2026-10-07):
+the Venn, Sen and Aran houses, the cistern house, the net shed, the pavilion,
+the slip, the catch deck and smokehouse, Rian's barge, the Mor and Vale
+houseboats, the pearl yard, Ivo's launch and the landings. Decks and ramps are
+planked in sun-bleached hardwood. Remaining: the islets' landscaping, the other
+boats (still generic hulls), an eye-level walk with every playable body, then
+schedules and dialogue. Current state and next
 steps are in `docs/architecture/settlement_backlog.md`, item 3. The Sen house
 brief was redrawn on 2026-10-06 and is ready to build.
 

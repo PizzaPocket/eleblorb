@@ -5,8 +5,9 @@ extends Node3D
 ## pile, jetty, gangway, swim exit and berth is placed from that one data file
 ## (docs/architecture/fishing_village_layout.md). It stands against Anvil Rock
 ## and Heron Rock (FishingIslets) and is reached by swimming to one of three
-## ramps. Houses are owned, programmed placeholders until the architecture kit
-## proofs replace them; nothing here is anonymous.
+## ramps. Every building is built from its design brief by FishingBuildings;
+## this script lays the plan's decks, routes, piles, exits, boats and lines and
+## wires the shop and the rest point.
 
 const CENTER := Vector3(440.0, 0.0, 0.0)
 const NPC_SCENE := "res://scenes/npc.tscn"
@@ -20,8 +21,6 @@ const PILE_EMBED := 0.4
 ## Sun-bleached hardwood on top; only the wet piles stay dark (StiltKit.DECK).
 const DECK_COLOR := StiltKit.DECK
 const PILE_COLOR := Color(0.2, 0.12, 0.07)
-const HOUSE_HEIGHT := 3.0
-const ROOF_PITCH := deg_to_rad(22.0)
 ## The Mor houseboat's rest point: 10 Tokoins, the village's inn rate.
 const REST_FEE := 10
 const REST_WORLD := "outskirts"
@@ -30,7 +29,6 @@ const REST_POINT := "fishing_village_houseboat"
 var _terrain: Node
 var _water := 0.0
 var _pile_positions: Array[Vector2] = []
-var _roof_index := 0
 ## Structures built from their design briefs, by plan name.
 var _built := {}
 
@@ -71,8 +69,6 @@ func _household_color(owner: String) -> Color:
 
 func _build_structure(structure: Dictionary) -> void:
 	var rect: Rect2 = structure["rect"]
-	var owner := str(structure["owner"])
-	var wall := _household_color(owner)
 	var structure_name := str(structure["name"])
 	if structure_name in FishingBuildings.BUILT:
 		# Built from its design brief, on its own piles (FishingBuildings).
@@ -91,25 +87,16 @@ func _build_structure(structure: Dictionary) -> void:
 				var dressing := FishingBuildings.dress(structure_name)
 				add_child(dressing)
 				dressing.global_position = _at(Vector2.ZERO, 0.0)
-		"house":
-			_deck(str(structure["name"]), rect, FishingVillagePlan.DECK_TOP, DECK_COLOR)
-			_house(str(structure["name"]), rect, FishingVillagePlan.DECK_TOP, wall)
-			_queue_piles(rect)
-		"pavilion":
-			_deck(str(structure["name"]), rect, FishingVillagePlan.DECK_TOP, DECK_COLOR)
-			_open_roof(str(structure["name"]), rect, FishingVillagePlan.DECK_TOP, wall)
-			_queue_piles(rect)
-		"deck_shelter":
-			_deck(str(structure["name"]), rect, FishingVillagePlan.DECK_TOP, DECK_COLOR)
-			var shelter := Rect2(rect.position + Vector2(0.0, 0.0), Vector2(rect.size.x, rect.size.y * 0.5))
-			_open_roof(str(structure["name"]) + "Shelter", shelter, FishingVillagePlan.DECK_TOP, wall)
-			_queue_piles(rect)
 		"pontoon":
 			_deck(str(structure["name"]), rect, FishingVillagePlan.FLOAT_DECK, DECK_COLOR.lightened(0.06))
-		"houseboat":
-			_houseboat(str(structure["name"]), rect, wall)
+			if structure_name in FishingBuildings.DRESSED:
+				var yard := FishingBuildings.dress(structure_name)
+				add_child(yard)
+				yard.global_position = _at(Vector2.ZERO, 0.0)
 		"lines":
 			_mussel_lines(rect)
+		_:
+			push_error("FloatingVillage: %s has no builder; add it to FishingBuildings.BUILT" % structure_name)
 
 
 ## A deck of planks over joists, with one box collider through the shared
@@ -121,81 +108,6 @@ func _deck(name_text: String, rect: Rect2, top: float, color: Color) -> StaticBo
 	body.global_position = _at(rect.get_center(), 0.0)
 	StiltKit.floor_slab(body, Rect2(-rect.size * 0.5, rect.size), top, color)
 	return body
-
-
-## A placeholder house: walls, a gabled roof along the long axis and a dark
-## door panel on the south wall, in the household's colour. The architecture
-## kit proofs replace it; its footprint and owner are the plan's.
-func _house(name_text: String, rect: Rect2, floor_top: float, wall_color: Color) -> void:
-	var body := StaticBody3D.new()
-	body.name = name_text + "Walls"
-	add_child(body)
-	body.global_position = _at(rect.get_center(), floor_top)
-	var inner := rect.size - Vector2(1.2, 1.2)
-	var wall_size := Vector3(inner.x, HOUSE_HEIGHT, inner.y)
-	var walls := SuperEgg.build_part(wall_size * 0.5, wall_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-	walls.position.y = HOUSE_HEIGHT * 0.5
-	body.add_child(walls)
-	CollisionPolicy.add_box(body, walls, wall_size, walls.position, Basis(), false)
-	var door := SuperEgg.build_part(Vector3(0.55, 1.05, 0.06), Color(0.16, 0.09, 0.05), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-	door.position = Vector3(0.0, 1.05, inner.y * 0.5 + 0.02)
-	body.add_child(door)
-	CollisionPolicy.mark_decorative(door)
-	_gable_roof(body, inner + Vector2(0.9, 0.9), HOUSE_HEIGHT)
-
-
-func _gable_roof(body: StaticBody3D, footprint: Vector2, base_y: float) -> void:
-	var color: Color = TownProps.ROOF_COLORS[_roof_index % TownProps.ROOF_COLORS.size()]
-	_roof_index += 1
-	var along_x := footprint.x >= footprint.y
-	var span := minf(footprint.x, footprint.y)
-	var length := maxf(footprint.x, footprint.y)
-	var half_width := span * 0.25 / cos(ROOF_PITCH) + 0.25
-	for side: float in [-1.0, 1.0]:
-		var slab := SuperEgg.build_part(Vector3(half_width, 0.14, length * 0.5), color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-		var offset := side * span * 0.25
-		var basis := Basis(Vector3(0, 0, 1), -side * ROOF_PITCH)
-		var at := Vector3(offset, base_y + 0.55 + (span * 0.25) * tan(ROOF_PITCH) * 0.5, 0.0)
-		var full := Basis(Vector3.UP, 0.0 if not along_x else PI * 0.5)
-		slab.transform = Transform3D(full * basis, full * at)
-		body.add_child(slab)
-		CollisionPolicy.add_box(body, slab, Vector3(half_width * 2.0, 0.28, length), slab.position, full * basis, true)
-
-
-## An open-sided roof on four posts: the pavilion and the catch deck's shelter.
-func _open_roof(name_text: String, rect: Rect2, floor_top: float, color: Color) -> void:
-	var body := StaticBody3D.new()
-	body.name = name_text + "Roof"
-	add_child(body)
-	body.global_position = _at(rect.get_center(), floor_top)
-	var post_height := 3.8
-	for corner: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
-		var offset := Vector2(corner.x * (rect.size.x * 0.5 - 0.5), corner.y * (rect.size.y * 0.5 - 0.5))
-		var post := SuperEgg.build_part(Vector3(0.18, post_height * 0.5, 0.18), PILE_COLOR.lightened(0.15), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
-		post.position = Vector3(offset.x, post_height * 0.5, offset.y)
-		body.add_child(post)
-		CollisionPolicy.add_cylinder(body, post, 0.18, post_height, post.position, false)
-	var roof_size := Vector3(rect.size.x + 1.2, 0.5, rect.size.y + 1.2)
-	var roof := SuperEgg.build_part(roof_size * 0.5, color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
-	roof.position.y = post_height + 0.1
-	body.add_child(roof)
-	CollisionPolicy.add_box(body, roof, roof_size, roof.position, Basis(), true)
-
-
-func _houseboat(name_text: String, rect: Rect2, wall_color: Color) -> void:
-	var float_top := FishingVillagePlan.FLOAT_DECK
-	var deck := _deck(name_text, rect, float_top, DECK_COLOR.lightened(0.04))
-	var hull_size := Vector3(rect.size.x + 0.6, 1.3, rect.size.y + 0.4)
-	var hull := SuperEgg.build_part(hull_size * 0.5, wall_color.darkened(0.35), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
-	# The deck body stands at the lake surface; the hull's centre sits 0.4 m
-	# below it, its top just under the planks.
-	hull.position.y = -DECK_THICKNESS - 0.1
-	deck.add_child(hull)
-	CollisionPolicy.add_box(deck, hull, hull_size, hull.position, Basis(), false)
-	# A plain placeholder cabin until this houseboat is built from its brief
-	# (the rest point is the Mor houseboat's alone).
-	var cabin := Rect2(rect.position + Vector2(4.0, 0.6), rect.size - Vector2(8.0, 1.2))
-	_house(name_text, cabin, float_top, wall_color)
 
 
 ## The Mor houseboat's rest point: Leena at her stand in the common cabin, the
@@ -423,6 +335,10 @@ func _build_boats() -> void:
 		node.global_position = _at(berth.get_center(), 0.16)
 		node.rotation.y = 0.0 if long_axis_x else PI * 0.5
 		var length := maxf(berth.size.x, berth.size.y)
+		if boat.get("launch", false):
+			# Ivo's roofed cargo launch, built at its own size (4.14).
+			node.add_child(FishingBuildings.ferry_launch(length, minf(berth.size.x, berth.size.y)))
+			continue
 		node.scale = Vector3.ONE * (length / 7.6)
 		var hull: Color = _household_color(str(boat["owner"]))
 		_build_boat_parts(node, hull)
@@ -452,9 +368,7 @@ func _build_shop() -> void:
 		var stand := venn.get_node("VendorStand") as Node3D
 		_build_vendor(stand.global_position)
 		return
-	var counter_at := Vector2(-31.0, -9.6)
-	_build_lake_shop_display(_at(counter_at, FishingVillagePlan.DECK_TOP + 0.02))
-	_build_vendor(_at(counter_at + Vector2(0.0, -1.6), FishingVillagePlan.DECK_TOP + 0.2))
+	push_error("FloatingVillage: the Venn house is missing, so Nara has no counter")
 
 
 ## World-space spot for the ocean_kingdom portal: the plan's gate on the portal
@@ -469,43 +383,6 @@ func get_portal_anchor() -> Vector3:
 func get_portal_yaw() -> float:
 	var facing: Vector2 = FishingVillagePlan.PORTAL_GATE["facing"]
 	return atan2(facing.x, facing.y)
-
-
-## Every item sold by the lake vendor is represented on a low dock counter,
-## making the shop legible before its dialogue is opened.
-func _build_lake_shop_display(pos: Vector3) -> void:
-	var display := StaticBody3D.new()
-	display.name = "LakeVendorWares"
-	display.position = pos
-	add_child(display)
-	# A two-row display keeps the full lake assortment on the tabletop even
-	# as the catalog grows; the former single row overflowed after four items.
-	const COLUMNS := 3
-	const ITEM_SPACING := 0.82
-	var purchasable_items: Array[Dictionary] = []
-	for raw_item in ShopCatalog.get_items_for_shop("lake"):
-		var item: Dictionary = raw_item
-		if item.get("purchasable", false):
-			purchasable_items.append(item)
-	var rows := maxi(1, int(ceil(float(purchasable_items.size()) / COLUMNS)))
-	var counter_half_width := 1.55
-	var counter_half_depth := maxf(0.68, 0.48 + float(rows - 1) * ITEM_SPACING * 0.5)
-	var counter := SuperEgg.build_part(Vector3(counter_half_width, 0.34, counter_half_depth), Color(0.38, 0.22, 0.1), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-	counter.position.y = 0.34
-	display.add_child(counter)
-	var counter_collision := CollisionShape3D.new()
-	var counter_shape := BoxShape3D.new()
-	counter_shape.size = Vector3(counter_half_width * 2.0, 0.68, counter_half_depth * 2.0)
-	counter_collision.shape = counter_shape
-	counter_collision.position.y = 0.34
-	display.add_child(counter_collision)
-	for item_index in purchasable_items.size():
-		var item: Dictionary = purchasable_items[item_index]
-		var visual: Node3D = (item["build_visual"] as Callable).call(1.0) as Node3D
-		var column := item_index % COLUMNS
-		var row := item_index / COLUMNS
-		visual.position = Vector3((float(column) - 1.0) * ITEM_SPACING, 0.9, (float(row) - float(rows - 1) * 0.5) * ITEM_SPACING)
-		display.add_child(visual)
 
 
 func _build_vendor(pos: Vector3) -> void:

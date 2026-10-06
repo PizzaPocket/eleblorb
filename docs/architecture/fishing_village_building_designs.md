@@ -377,6 +377,12 @@ and the family's rooms at the back.
   tables under a light shade canopy, basket racks and a fresh-water rinse jar.
   Moored to the Aran piles; the wet stair meets it.
 
+- **Dressed (2026-10-07)** by `FishingBuildings.dress("PearlYard")`: three
+  grading tables under a cloth shade on four posts, trays, scale and magnifier,
+  basket racks of mussels on the east, the rinse jar, a drying frame for shell,
+  Mai's covered tray. The Aran wet ramp's landing (`x 11..13, z 5..6.5`) is
+  kept clear.
+
 ### 4.11 Vale family houseboat (Jori, Osei, Tavi)
 
 - **Plan.** A floating hull 14 x 7 m at `x 26..40, z -10..-3`, deck W + 0.35. From
@@ -391,6 +397,16 @@ and the family's rooms at the back.
 - **Roof.** Gable over the cabins, ridge east to west, so smoke from the catch
   deck slides past. Coral red panels, natural shutters, cork floats drying on the
   rails.
+
+- **Built (2026-10-07)** in `FishingBuildings.vale_houseboat()`. The brief's
+  rooms added up to 16.5 m in a 14 m hull. As built, west to east: a 2.5 m
+  covered arrival deck under a pent (the gangway lands on it); the living room
+  and galley (3.5 m, brazier in the north-west corner, its rear door onto the
+  1.5 m south walkway that leads to the work deck); Jori and Osei's cabin (north)
+  and Tavi's (south) side by side, 4 m long, each off the living room; the open
+  work deck (4 m) with the 2 × 2 gear store at its north-east, floats drying on
+  the east rail, and the catch gangway leaving its south-east corner. A gable
+  over the cabins, ridge east to west.
 
 ### 4.12 Catch deck, drying shelter and smokehouse (Osei)
 
@@ -452,6 +468,10 @@ and the family's rooms at the back.
 - **Plan.** A roofed cargo launch 6 x 1.8 m at the ferry berth: a forward cargo well
   (open, crates and sacks), a small cab 2 x 1.5 m amidships with a pent roof, a
   stern engine bay. Terracotta hull, teal trim, a lamp on the cab.
+
+- **Built (2026-10-07)** by `FishingBuildings.ferry_launch()` at the ferry
+  berth, at true size: terracotta hull, teal sheer, a forward well of crates in
+  household colours, the cab under a pent with its lamp lit, the engine box aft.
 
 ### 4.15 Ocean portal landing (public)
 

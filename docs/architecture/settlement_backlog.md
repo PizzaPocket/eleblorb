@@ -153,8 +153,10 @@ will be rideable as a separate project, and players swim until then.
    stair steps through the water, and there are no ledges, waterline notch,
    planting or colour variation. Use the landscaping skill.
 4. Done (2026-10-07): the **Mor guest houseboat**, the rest point, rebuilt from
-   its brief (redrawn to fit its hull; see design brief 4.13). Still to build:
-   the **Vale houseboat**, the **pearl yard pontoon** and **Ivo's launch**.
+   its brief (redrawn to fit its hull; see design brief 4.13); the **Vale
+   houseboat**, the **pearl yard** and **Ivo's launch** too. Every structure in
+   the plan is now built from its brief: `floating_village.gd` keeps no
+   placeholder builder and errors if a plan structure has none.
 5. Interiors, water work (the pearl yard and lines), and ledge planting on the
    islets.
 6. Schedules and dialogue.
