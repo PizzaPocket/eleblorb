@@ -542,4 +542,8 @@ reconciled) join this table when their designs are approved.
   `VillagerAppearance.apply_profile()` replacing the random `SHIRT_COLORS`
   draw (which includes a yellow the charter excludes), and the per-resident
   looks. Liang Zhen's post-quest look joins the revisit states in item 13.
+- Emperor's regalia (once the sense check in 4.7 is approved): crown board black
+  on top and red beneath, twelve (or nine) strings of jade beads instead of ten
+  gold cords, a round-collared robe with gold dragon roundels, a jade hoop belt;
+  update the "gold robe" comment in `npc.gd`.
 

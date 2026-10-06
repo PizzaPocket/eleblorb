@@ -456,13 +456,40 @@ edge binding, on every person in the village.
 - **Tian Bo:** a farmer's straw hat and short jacket. As chief, he wears a
   plain *chángshān* only on civic days in the village hall.
 
+**The Emperor's regalia: sense check (proposed 2026-10-06).** Checked
+against what late-imperial emperors and princes actually wore. What is built
+today (`npc.gd`, `_add_emperor_regalia`; the world bible): a red square crown
+with ten gold cords front and back, a red robe with gold trim, black boots, a
+high bun and a long beard.
+
+| Element | Today | Historically | Recommendation |
+|---|---|---|---|
+| Crown type | a flat-topped *miǎnguān* | right: the board-topped crown with hanging bead strings is the emperor's highest crown | keep: it is his silhouette |
+| Crown colour | red all over | the board (*yán*) is **black on top, red underneath** | black top, red underside and edge |
+| Strands | ten gold cords at front and back | strings of **jade beads** (*liú*), **twelve** at front and back for an emperor; nine for a prince; no rank wore ten | twelve strings of white-and-coloured jade beads; or nine, if his rank should quietly show he is really a small king |
+| Robe colour | red | defensible: Song emperors held court in crimson, and Ming princes wore red dragon robes. Yellow was the Ming and Qing emperors' colour | keep red; the yellow stays on his palace roofs, where it already says "emperor" |
+| Collar | the generic shirt | the dragon robe has a **round collar** (*pánlǐng*) fastening at the right shoulder | a round collar: it sets him apart from the village's standing collars |
+| Motifs | gold trim | **gold dragon roundels** on the chest, back and shoulders | add the roundels; dragons appear only on his robe and the throne screen |
+| Belt | none | the **jade belt** (*yùdài*): a stiff hoop of jade plaques worn loose at the waist, the mark of rank | add it |
+| Boots | black full boots | black court boots (*zàoxuē*) | correct |
+| Hair and beard | a high bun, a long beard | a topknot under the crown; beards were usual | correct |
+
+One liberty stays on purpose: historically the *miǎnguān* was worn only for
+the gravest rites, with its own black-and-red ceremonial robes, while daily
+audiences used a black winged cap (*yìshànguān*). The game keeps the
+*miǎnguān* every day, because it reads at once as "emperor".
+
+The project's notes also disagree on his robe: the world bible says red, but
+the character-design skill and a code comment say gold. It is red.
+
 **Exclusions.**
 - **No t-shirts,** and no fitted modern cuts.
 - **No qipao.** It is a twentieth-century city dress.
 - **No Qing queue.** The shaved-forehead braid was imposed by conquest and
   carries that history.
 - **No imperial yellow, and no dragon or phoenix motifs,** which were reserved
-  for the court.
+  for the court; the Emperor's dragon roundels and the throne screen are the
+  only dragons.
 - **No Japanese or Korean garments** (kimono, hanbok) and no costume-shop
   "Hanfu".
 - **No modern sneakers.**
