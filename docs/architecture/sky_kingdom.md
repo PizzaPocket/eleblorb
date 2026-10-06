@@ -153,10 +153,11 @@ follows his legend closely:
 
 **Now.** The sealing was long ago, within the long memory of the eldest
 Tempestars but before most ground-dwellers' grandparents were born. The Air
-blorbs vanished only recently. The courts believe Sun Wu Kong is still sealed.
-When he arrives alongside the hero, freed by Xiao Hou Zi, they assume he has
-come back for revenge and taken the Air blorbs. The real cause is the Demon
-King. Restoring the Air blorbs clears Sun Wu Kong's name.
+blorbs vanished only recently, and have nothing to do with him. The courts are
+simply furious with him, as heaven is in his legend: he insulted their crowns,
+ate their peaches and ruined their banquet, and they have never forgiven it.
+When he turns up alongside the hero, freed by Xiao Hou Zi, every court is
+outraged that he is loose and in their sky again. He is not sorry.
 
 **The Primate Kingdom.** The jungle monkeys have had no king since he left for
 the clouds. Their villagers still tell of the Monkey King who went up into the
@@ -177,11 +178,9 @@ Who remembers what:
 
 - **Mnesia** keeps his offences in Aethra's ledger, itemised.
 - **Chunlu** still counts the peaches he ate.
-- **Nikandra** has never forgiven the ruined games; **Tachys** secretly wants a
-  rematch.
+- **Nikandra** has never forgiven the ruined games.
+- **Xiangyun** still refuses to say his name at her table.
 - **Archeia** tends the sealing decree in the empty Hall.
-- **Alkis**, a child at the time, remembers him as the only visitor who ever
-  played with the children.
 
 ## 3. Community
 
@@ -576,7 +575,7 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
 **Open:**
 
 - What Tempestar food and gifts do for the hero.
-- How much of the Sun Wu Kong history is quest content: whether the hero must
-  clear his name, and how the courts react to him in the party.
+- How much of the Sun Wu Kong history is quest content, and how the courts'
+  anger shows when he travels in the party.
 - Whether Sun Wu Kong returns to rule the Primate Kingdom's monkeys, and
   whether his absence had any part in the kingdom falling under the curse.
