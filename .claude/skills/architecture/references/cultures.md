@@ -96,15 +96,33 @@ Answer these in writing, in order. Each answer constrains the next.
 - **Palette.** Leaf greens, thatch gold, bark brown, bright flower accents.
 - **Silhouette.** Round roofs among canopy, ropes and bridges, ruins wrapped in vines.
 
-### Sky Kingdom: floating and airy architecture
+### Sky Kingdom: celestial classical in cloud, gold and quartz
 
-- **Massing.** Light, tall, slender, linked by bridges, set on floating islands, with open colonnades.
-- **Roof.** Domes, cones and thin flat caps; wind vanes and sails.
-- **Walls.** White stone, bronze frames, glass panels, cloud-pale plaster.
-- **Openings.** Tall slender superellipse arches, round oculi.
-- **Ornament.** Cloud and wing motifs, filigree, banners.
-- **Palette.** White, pale blue, gold and bronze.
-- **Silhouette.** Spires and domes against the sky, tethered by bridges.
+Full charter: `docs/architecture/sky_kingdom.md`; layout:
+`docs/architecture/sky_kingdom_layout.md`.
+
+- **People.** The Tempestars: a leisured, long-lived sky people with cloud lower
+  bodies, in six rival courts. Not gods; no worship spaces.
+- **Influences.** Greco-Roman celestial classical leads (about 55 percent):
+  peristyles, tholoi, colonnades, odeon, racing ring. The Chinese celestial
+  palace is a strong second (about 35 percent), limited to the Dawn Gate,
+  Aethra's Hall of Mist and Pantao's Peach Garden and banquet hall, where Sun Wu
+  Kong's story is set. Woven cloud and gold are the accent. Never both
+  traditions' roof and wall systems on one building.
+- **Materials.** Cloud gives volume, gold holds it, quartz carries weight. Bank
+  cloud is the ground; woven cloud makes awnings and curtains (no collision);
+  set cloud makes floating couches, steps and moored rooms, held by gold.
+- **Massing and roofs.** Halls on stepped quartz podiums; roofs float a clear gap
+  above their columns; some columns hang short of the floor; drifting stairs of
+  separate slabs with a continuous walking line.
+- **Hierarchy.** Podium height and the width of the floating gap; Aethra's Hall
+  of Mist alone has a double floating eave.
+- **Palette.** 60 percent quartz and cloud white, 30 percent sky pastels on
+  woven cloud and clothing, 10 percent gold.
+- **No bridges.** Tempestars float and the hero flies; courts stand apart in open
+  sky.
+- **Exclusions.** Copied temples or sacred emblems, altars, statues of gods,
+  heavy masonry walls, solid gold buildings, pitched timber roofs, chimneys.
 
 ### The Chinese village: Chinese courtyard and temple architecture
 

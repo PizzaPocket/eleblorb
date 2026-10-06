@@ -225,6 +225,7 @@ Planning priorities:
   before any building is designed.
 - The hero flies between clouds (Air Gem) and Tempestars float, so islands need
   no bridges; spacing can follow composition and each court's separateness.
-- Then author a dimensioned layout with fixed positions for the staircase
-  landing, the Dawn Gate and all six courts, replacing positions resolved from
-  procedural cloud placement.
+- Review the dimensioned layout and building programs in
+  `docs/architecture/sky_kingdom_layout.md`: an authored frame from a fixed
+  staircase landing, Aethra on the arrival axis, the four other courts in a
+  ring around Koinon, and every building's footprint and program.

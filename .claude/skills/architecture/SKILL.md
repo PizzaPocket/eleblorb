@@ -163,8 +163,10 @@ Sizes are interior, in metres. Keep every room at least the minimum.
 - A projecting upper storey is a named jetty, cantilever, bay, gallery, or other
   deliberate mass. Give it joists, brackets, beams, walls, and roof support. An
   unexplained floating oversize floor is not architectural variety.
-- Upper walls bear on walls, columns, or explicit transfer beams below. Avoid
-  unsupported partitions and columns ending on empty ceiling unless the
+- Heavy or load-bearing upper walls (masonry, log cross-walls, walls carrying
+  a roof or floor) bear on walls, columns, or explicit transfer beams below.
+  Light upper partitions may sit on the floor joists with no wall beneath, as
+  they do in real buildings. Columns never end on empty ceiling unless the
   structure visibly explains the transfer.
 - Cut openings once and use the same boundary for visible floor mesh,
   collision, railing, ramp or shaft clearance, and the room plan. Independent
@@ -196,11 +198,12 @@ on one grid, before placing a wall.
    the opening (the inn's rear partition did, for 4.2 m). Size the void so the
    gallery between rail and the nearest wall is at least 1.4 m (1.2 m is the
    minimum, not a design target).
-3. **Carry what has no wall under it.** Where an upper wall crosses an open
-   ground room (a common room, a workshop), give it an exposed summer beam and
-   posts at no more than 5 to 6 m, and draw the posts as obstacles on the lower
-   plan. If that frame would ruin the lower room, move the upper wall to a line
-   that is already carried instead.
+3. **Carry the heavy walls.** A light partition may stand on the floor joists.
+   Where a heavy or load-bearing upper wall crosses an open ground room (a
+   common room, a workshop), give it an exposed summer beam and posts at no
+   more than 5 to 6 m, and draw the posts as obstacles on the lower plan. If
+   that frame would ruin the lower room, move the wall to a line that is
+   already carried instead.
 4. **Check the program against what is left.** After the void, the gallery and
    the structural lines, count the rooms that still fit at their minimum sizes.
    If the program no longer fits, **change the program** (fewer rooms, a
@@ -212,9 +215,10 @@ on one grid, before placing a wall.
    inside rooms, never across a partition.
 
 `ClearZones.audit_stacking` (run by `tools/validate_village.gd`) fails a wall that
-rises into the opening above it, a wall standing over a hole in its own floor, and
-an upper wall with no wall, beam or post below it. TownProps registers walls and
-voids automatically; register beams and posts with `ClearZones.add_support`.
+rises into the opening above it (its top would stand bare in the void) and a wall
+standing over a hole in its own floor. It does not fail an upper partition with
+no wall under it. TownProps registers walls and voids automatically; beams and
+posts can still be recorded with `ClearZones.add_support`.
 
 ### Doors, swing and circulation widths
 
@@ -332,7 +336,7 @@ Architects plan how a building keeps warm and breathes; do the same.
 
 ## 7. Mistakes that have actually shipped
 
-Buildings overlapping or sitting 1 m apart; a door facing a neighbour's wall; a back door opening into another building's only door; a notice board facing a building; a stall jammed between two buildings; a path that stops a few metres short of a worn yard or doorstep, leaving a strip of unworn grass in the line of traffic; a garden of scattered single flowers; a toilet in the middle of a room; a ramp starting against the wall; a counter beside the entry; partitions that stop short of the ceiling; doorways that are bare gaps in a wall or a slab floating over a gap instead of a proper door; rectangular floor holes; a free-standing slab posing as a chimney; round columns; rounded rectangles standing in for SuperEggs, or SuperEgg slabs left with a gap at the ridge; a rectangular stair hole; a roof ornament that does not read as a belfry; an enclosure with no gate or a gate that does not line up with the door. A ground wall running up into a double-height opening so its top stands free in the void; upper partitions with no wall, beam or post under them; upper floors planned without the void, so the gallery beside it is a 1.0 m gap between rail and wall; doors that swing into the corridor; furniture standing in a doorway, a ramp foot or the heat of a fire; door-frame pipes sunk through an upper floor into the room below; a chest at a bed's foot with its hinge turned away from the bed.
+Buildings overlapping or sitting 1 m apart; a door facing a neighbour's wall; a back door opening into another building's only door; a notice board facing a building; a stall jammed between two buildings; a path that stops a few metres short of a worn yard or doorstep, leaving a strip of unworn grass in the line of traffic; a garden of scattered single flowers; a toilet in the middle of a room; a ramp starting against the wall; a counter beside the entry; partitions that stop short of the ceiling; doorways that are bare gaps in a wall or a slab floating over a gap instead of a proper door; rectangular floor holes; a free-standing slab posing as a chimney; round columns; rounded rectangles standing in for SuperEggs, or SuperEgg slabs left with a gap at the ridge; a rectangular stair hole; a roof ornament that does not read as a belfry; an enclosure with no gate or a gate that does not line up with the door. A ground wall running up into a double-height opening so its top stands free in the void; a heavy upper wall standing on nothing; upper floors planned without the void, so the gallery beside it is a 1.0 m gap between rail and wall; doors that swing into the corridor; furniture standing in a doorway, a ramp foot or the heat of a fire; door-frame pipes sunk through an upper floor into the room below; a chest at a bed's foot with its hinge turned away from the bed.
 
 ## 7a. Placement of outside props
 

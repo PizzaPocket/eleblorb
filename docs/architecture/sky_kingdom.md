@@ -1,6 +1,7 @@
 # Sky Kingdom: Courts of the Clouds
 
-Status: concept brief, second pass, in review (2026-10-06). It replaces the
+Status: concept brief, second pass, in review (2026-10-06). The dimensioned
+layout and building programs are in `sky_kingdom_layout.md`. It replaces the
 first-pass prototype's loose cluster of pavilions with a planned celestial
 society, census, material system and architectural charter. No layout
 coordinates are fixed yet; those follow approval of this brief.
@@ -429,6 +430,11 @@ can be climbed or stood on where they visibly could bear weight; foliage, willow
 strands, blossom and vines are decorative.
 
 ## 6. Architectural charter (draft)
+
+This split is deliberately closer than the usual 75/20 charter. Cohesion comes
+from shared invariants instead: quartz shafts, gold capitals and bases, the
+floating roof gap, superellipse openings, the stepped quartz podium and the
+palette. No single building uses both traditions' roof and wall systems.
 
 - **Primary, about 55 percent: Greco-Roman celestial classical.** Peristyle
   courts, round tholos pavilions, colonnades and exedrae, porches with
