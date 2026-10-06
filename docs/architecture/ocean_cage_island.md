@@ -75,9 +75,9 @@ one another, simple sounds rather than words from any human language.
 
 | Name | Gender | In the band |
 |---|---|---|
-| **Vesha** | woman | the leader: the biggest, the most violent, and the one in the Hawaiian shirt; takes the first and best of everything |
+| **Brask** | man | the leader: the biggest, the most violent, and the one in the Hawaiian shirt; takes the first and best of everything |
 | **Kett** | woman | the champion, the tournament's final fight; quick, scarred and unbeaten |
-| **Brask** | man | the loudest: starts the chant from the crest by howling it, and the rest take it up |
+| **Vesha** | woman | the loudest: starts the chant from the crest by howling it, and the rest take it up |
 | **Sorrel** | man | drags the cage gate shut behind each fighter and wedges it |
 | **Pell** | man | the lookout on the crest at dawn: the first to see someone coming, and to screech it |
 | **Quill** | woman | hoards the things taken from beaten fighters on the trophy heap by the gate |
@@ -120,7 +120,7 @@ one another, simple sounds rather than words from any human language.
 - **Bodies:** grizzled brown and grey fur, darker on the legs and tail tip,
   lighter at the muzzle; tall, lean, long-backed; scars and torn ears on the
   fighters.
-- **Vesha:** the Hawaiian shirt, worn open, too small for her, faded and
+- **Brask:** the Hawaiian shirt, worn open, too small for him, faded and
   torn at one sleeve.
 - **Everyone else:** simple clothing of grass and leaves, tied on with vine:
   ragged wraps of *pili* grass and *kī* (ti) leaves at the waist or over a
@@ -187,7 +187,7 @@ The crater is the arena; little has to be built.
   ramped aisles (2 m wide, no steeper than 1:4 on the natural slope) climb from
   the floor to the crest.
 - **Howling rock:** on the rim crest opposite the gate, the highest point of
-  the island and visible from the sea, where Brask starts the chant.
+  the island and visible from the sea, where Vesha starts the chant.
 - **Trophy heap:** beside the gate, outside the cage.
 - **Landing:** the beach inside the breach; arrivals walk straight up the
   floor to the cage gate, under the eyes of the whole rim.
@@ -243,7 +243,7 @@ natural stands; the four-fight order with Makoa, Tudaro
 and Old Kelp; the cage and stands.
 
 **Fixed (user direction, 2026-10-06):** savage fiends who thrive on violence
-and built the cage; base beasts of low intelligence; the leader in a Hawaiian
+and built the cage; base beasts of low intelligence; the leader, a male, in a Hawaiian
 shirt probably taken from Kai Mālie, the rest in simple grass and leaves; out
 of harmony with their place, and able to find peace if things change.
 
@@ -251,5 +251,5 @@ of harmony with their place, and able to find peace if things change.
 howling rock, the crude cage, the look, and the quiet state after harmony.
 
 **Open:** what change brings them into harmony; what happens when the hero
-wins; whose shirt Vesha wears; how fights work; the prizes; whether the Fortune's
+wins; whose shirt Brask wears; how fights work; the prizes; whether the Fortune's
 Rag sends a contender too.
