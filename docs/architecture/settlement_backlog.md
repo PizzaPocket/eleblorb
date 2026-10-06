@@ -315,8 +315,8 @@ Planning priorities:
   glass tunnels, a legged form and renamed residents; the two ships' origins
   and crews; Kai Mālie's community, ahupuaʻa plan and charter, with every
   resident speaking Hawaiian; the cage island and its short tournament (its inhabitants are tall
-  anthropomorphic mongooses, decided 2026-10-06; their culture, census and
-  homes are next).
+  anthropomorphic mongooses, decided 2026-10-06; their culture, census of
+  twelve and the Warren are proposed in `ocean_cage_island.md` section 3).
 - Design the discord the Demon King has sown between the communities and how
   the hero restores harmony.
 - Review Kai Mālie's layout (`docs/architecture/ocean_island_village_layout.md`).
@@ -521,6 +521,7 @@ Rules for every change:
 | The sealing rock splits | Chinese village, Lantern Row | `sun_wu_kong_freed` (exists) | the split halves with the gold band fallen; children climbing them; the children's and Mei Lian's lines about him change |
 | The Water Curtain Cave is reclaimed | Plant Kingdom, Flower Fruit Mountain | a new flag (e.g. `sun_wu_kong_seat_reclaimed`), set by the deferred quest that brings Sun Wu Kong back | the cave's reclaimed dressing (`plant_kingdom_water_curtain_cave.md` section 4): ledge cleared, stoves lit, bowls of fruit, new mats, the red-and-gold banner; Sun Wu Kong on his seat when he is not travelling with the party |
 | Ossian dismounts | Plant Kingdom village | `manchego_joined` (exists) | Ossian roams as an ordinary resident; his lean-to stays; the stable stands empty or holds Manchego when the party leaves him there |
+| The cage becomes a games ground | Ocean Kingdom, cage island | the Ocean Kingdom's reconciliation (flag to be named with its quest) | the grudge board cleared, games gear in the cage, the communities' visitors in the stands, the band's changed lines; the chant stays |
 | The Wood Kingdom appears | Plant Kingdom | `ice_kingdom_visited` (exists) | already coded; listed so it follows the same rules |
 
 Future state changes (the courts meeting again after the Air blorbs return,

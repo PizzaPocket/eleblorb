@@ -50,8 +50,114 @@ best-known invasive animal, brought in the 1800s to kill rats in the cane
 fields and instead devastating native birds. A people of outsiders who thrive
 on everyone else's quarrels fits that history closely.
 
-Still to design: their culture, census, names, dress and homes, and whether
-they speak the common language or something of their own.
+### Culture (proposed 2026-10-06)
+
+The design starts from the real animal and the island's purpose.
+
+**Real mongooses** live in bands that sleep together in one den, sun themselves
+on rocks every morning, post a sentry on high ground, mob any threat together
+in a chattering crowd, and are famous for fearlessly fighting snakes. (Street
+shows of mongoose against cobra were a showman's trade in South Asia for
+centuries.) Banded mongooses raise their pups communally, each pup shadowed by
+one adult "escort".
+
+**The cage island's people** are one such band, turned showmen.
+
+- **Outsiders.** They belong to none of the kingdom's communities. They came
+  ashore long ago from a ship, as rat-catchers (as the real mongoose came to
+  Hawaii), took the empty crater, and never left. Kai Mālie, the sea folk and the
+  pirates all regard them as pests. They do not mind.
+- **The grudge trade.** Their living is other people's quarrels:
+  - A community with a score to settle sends a contender to the cage.
+  - The band hosts the fight, takes a fee and a cut of the wagers, and keeps
+    the tally of who owes whom on the board of rankings.
+  - Lately business has never been better. They have not asked why. (It is
+    the Demon King's discord; they only profit from it.)
+- **Showmanship.** Everything is a show:
+  - The chant is the band's anthem, led from the perch, the whole crowd
+    drumming on the ledges with their palms.
+  - The menace is theatre: they eat seabird eggs, fish and whatever fruit the
+    fees bring, and have never eaten anyone.
+  - When the hero beats their champion, the band mobs the cage cheering, lifts
+    the hero up, and goes on chanting "we'll eat you alive", and nothing
+    happens.
+- **One band, one den.** All twelve sleep together in the Warren, the band's
+  den, and share everything: food, fees and the pups.
+- **Governance by chatter.** The matron keeps the purse and has the last word,
+  but decisions are taken the way the band does everything: by chattering
+  until the loudest view wins. On fight days the band acts as one crowd.
+- **Language:** the common language, spoken fast and clipped, run through with
+  chatter, chirps and the occasional growl.
+- **Names:** short names of their own, not drawn from any human language. The
+  champion fights under a ring name.
+
+### Census (proposed 2026-10-06)
+
+Twelve: ten adults and two pups, one band.
+
+| Name | Gender | Role | Notes |
+|---|---|---|---|
+| **Vesha** | woman | the matron | the eldest; keeps the purse and the last word; grey-muzzled; never misses a fight |
+| **Brask** | man | the announcer | leads the chant from the perch through a brass speaking trumpet salvaged from a wreck |
+| **Quill** | woman | the bookkeeper | keeps the board of rankings and the grudge tallies in chalk and notches; knows who owes whom across the whole kingdom |
+| **Kett** | woman | the champion, ring name **the Last Bite** | the island's champion and the tournament's final fight; quick, scarred, unbeaten |
+| **Sorrel** | man | the gatekeeper | opens and bars the cage gate; enforces the rules, such as they are |
+| **Pell** | man | the sentry | stands watch on the rim crest from dawn, as mongooses do; first to see a contender's boat |
+| **Tolle** | man | the crier and boatman | rows a salvaged dinghy round the kingdom carrying challenges, and fetches contenders |
+| **Dask** | man | rigger | keeps the cage's spars and nets in repair |
+| **Lune** | woman | rigger | Dask's partner on the rigging; climbs the net roof |
+| **Mabby** | woman | the cook | feeds the band on fees, eggs and fish at the fire on the crater floor |
+| **Nib** | girl | pup | escorted by Kett, who is training her |
+| **Tuck** | boy | pup | escorted by Pell, who takes him up to the crest |
+
+### Daily life
+
+- **Dawn:** the whole band sunning on the eastern ledges; Pell on the crest.
+- **Morning:** foraging along the shore and the rim for eggs and fish; the
+  riggers on the cage; Quill at the board.
+- **Fight days:** when Pell sights a boat, Brask takes the perch, the band
+  fills the stands and the chant begins.
+- **Evening:** everyone round Mabby's fire on the crater floor, retelling the
+  day's fight, louder each time.
+- **Night:** all twelve in the Warren.
+
+### Homes and places
+
+- **The Warren:** the band's single den, dug into the rim's outer face below
+  the perch, where the tuff is thickest.
+  - Rounded burrow mouths at least 2.8 m high for their height.
+  - Inside, a big shared sleeping chamber lined with salvaged ship planking
+    and old sails.
+  - Side chambers for the pups, the purse and the salvage store.
+- **Sunning ledges:** the eastern outer ledges, worn smooth.
+- **Mabby's fire:** a stone ring on the crater floor beside the cage, clear of
+  the fighters' route.
+- **The landing:** Tolle's dinghy drawn up on the beach inside the breach.
+
+Water comes from rain caught in a tuff hollow and a salvaged barrel cistern:
+the island is too young for a spring.
+
+### Look (direction for the dress charter, character-design skill)
+
+- **Bodies:** fur in grizzled browns and greys, darker on the legs and tail
+  tip, lighter at the muzzle; tall, lean and long-backed.
+- **Dress:** a magpie showman's look made from wreck salvage: brass buttons,
+  frayed braid, a ship's bell rope as a belt, a sash of faded sailcloth.
+  - Brask carries his speaking trumpet.
+  - Quill carries chalk and a cord of notches.
+  - Kett wears bound wrists and nothing else.
+  - Vesha wears an old captain's coat far too short for her.
+
+**Signature:** a strip of red sailcloth tied round the upper arm, the band's
+colour in the stands.
+
+### After harmony (story state)
+
+When the kingdom's communities are reconciled, the grudge trade dries up. Vesha
+does what showmen do and changes the show: the cage becomes a ground for
+friendly games between the communities, the way the Hawaiian *Makahiki* season
+was a time of peace given over to sport. The chant stays, because they love
+it. This is a revisit state for backlog item 13.
 
 **Scale consequences for the environment:**
 - Seats on the stands are sized for them: ledge seats about 0.6 m high, with
@@ -88,7 +194,7 @@ cycle of grievance, though the reconciliation itself happens elsewhere.
 | 1 | **Makoa Kealoha**, the net fisher | Kai Mālie |
 | 2 | **Tudaro**, the edge warden | the sea folk |
 | 3 | **Old Kelp**, the *Harbinger*'s aged sailing master, the oldest pirate at sea | the pirates |
-| 4 | the island's champion, a mongoose | the cage island (pending) |
+| 4 | **Kett, the Last Bite**, the band's champion | the cage island |
 
 The sea folk contender fights in a half-flooded or flooded cage. How fights
 work (the hero alone, with the party or through bonded blorbs) and the prizes
@@ -162,5 +268,8 @@ kingdom's communities, including an old pirate.
 natural stands; the four-fight order with Makoa, Tudaro
 and Old Kelp; the cage and stands.
 
-**Open:** the mongooses' culture, census, names, dress and homes; how fights work; the prizes; whether the Fortune's
+**Proposed (culture):** the band of twelve and their roles, the grudge trade,
+the Warren, daily life, the look, and the games after harmony.
+
+**Open:** how fights work; the prizes; whether the Fortune's
 Rag sends a contender too.
