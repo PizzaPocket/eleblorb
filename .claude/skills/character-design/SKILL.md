@@ -121,7 +121,7 @@ body and draws from male pools.
 |---|---|---|---|
 | `body_scale` (height) | 0.84 to 0.99 | 0.97 to 1.16 | overlapping at the middle |
 | `chest_build_scale` | 0.86 to 1.0 | 1.01 to 1.18 | only men get broad chests; arms follow the chest |
-| `hip_build_scale` | 0.98 to 1.16 | 0.92 to 1.07 | women tend wider in the hips; legs always follow the hips |
+| `hip_build_scale` | 0.98 to 1.16 | 0.92 to 1.07 | women wider in the hips; the legs attach at a fixed fraction of hip width (`ProceduralFigure`, leg pivots at 0.55 of the hip's half-width plus a shift), so women's legs are set wider apart, and leg thickness follows the hips |
 | `abdomen_width_scale` | should be narrower (see below) | 0.94 to 1.32 | currently one shared pool; 1.0 is the narrow end; front overhang past the chest is for men only |
 
 Per-gender pools need their own counters; a shared counter indexing a gendered
