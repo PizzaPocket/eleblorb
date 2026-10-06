@@ -3,14 +3,13 @@
 Status: concept brief, first planning pass (2026-10-06). **Build the
 environment only:** the crater, cage, stands and landing. Do not build the
 inhabitants or any tournament NPCs, and do not write fight mechanics or
-scripting, until the user confirms their direction. Read with
-`ocean_kingdom.md`. The island's inhabitants are not yet designed: the user
-will supply their direction.
+scripting, until asked. Read with `ocean_kingdom.md`. The inhabitants' species
+is now decided (2026-10-06): tall anthropomorphic mongooses (section 3).
 
 ## 1. Premise
 
-A smaller island holds a fighting cage and a population of small creatures
-who make the hero fight their cage match tournament.
+A smaller island holds a fighting cage and a population of tall
+anthropomorphic mongooses who make the hero fight their cage match tournament.
 
 ## 2. Site: a crescent crater
 
@@ -39,22 +38,42 @@ toward the arrival dock (world direction `(-0.786, -0.618)`).
 
 ## 3. The inhabitants
 
-Pending. They are small creatures who run the tournament. Their species,
-culture, census and names wait on the user's direction. (A hermit-crab
-proposal was rejected.)
+**Anthropomorphic mongooses** (decided 2026-10-06), and **tall**: taller than
+the humans, standing about 2.1 to 2.5 m (proposed) against a tall human man's
+roughly 2 m. Upright, long-bodied and lean, with the mongoose's narrow pointed
+face, small round ears, grizzled fur and long tapering tail, and the quick,
+twitchy alertness of the real animal. They run the tournament and fill the
+stands. (A hermit-crab proposal was rejected earlier.)
+
+A note on the choice: in the real Hawaiian islands, the mongoose is the
+best-known invasive animal, brought in the 1800s to kill rats in the cane
+fields and instead devastating native birds. A people of outsiders who thrive
+on everyone else's quarrels fits that history closely.
+
+Still to design: their culture, census, names, dress and homes, and whether
+they speak the common language or something of their own.
+
+**Scale consequences for the environment:**
+- Seats on the stands are sized for them: ledge seats about 0.6 m high, with
+  1 m of knee room.
+- Any doorway or shelter of theirs is at least 2.8 m high.
+- The cage gate (3 m) and the 3.2 m route headroom already clear them.
 
 ## 3a. The chant
 
 The inhabitants chant at every fight, from the stands and as the hero enters
 the cage. The text is fixed by the user and is used exactly as written:
 
-> Fight. Fight.
-> You must fight.
-> If you win, we kill you.
-> If you lose, you die.
+> Fight, fight.
+> Fight or you'll die.
+> And if you win,
+> We'll eat you alive.
+
+(Updated by the user on 2026-10-06; it replaces the earlier "Fight. Fight. /
+You must fight. / If you win, we kill you. / If you lose, you die.")
 
 It is a crowd chant, not an explanation of the rules: winning does not
-actually lead to the crowd killing the hero. Its menace is the joke.
+actually lead to the crowd eating the hero. Its menace is the joke.
 
 ## 4. The tournament
 
@@ -69,7 +88,7 @@ cycle of grievance, though the reconciliation itself happens elsewhere.
 | 1 | **Makoa Kealoha**, the net fisher | Kai Mālie |
 | 2 | **Tudaro**, the edge warden | the sea folk |
 | 3 | **Old Kelp**, the *Harbinger*'s aged sailing master, the oldest pirate at sea | the pirates |
-| 4 | the island's champion | the cage island (pending) |
+| 4 | the island's champion, a mongoose | the cage island (pending) |
 
 The sea folk contender fights in a half-flooded or flooded cage. How fights
 work (the hero alone, with the party or through bonded blorbs) and the prizes
@@ -91,7 +110,7 @@ The crater is the arena; little has to be built.
   marks, never words).
 - **Landing:** the beach inside the breach; arrivals walk straight up the
   floor to the cage gate, under the eyes of the whole rim.
-- **Homes:** wait on the inhabitants; the rim's outer ledges and the horns are
+- **Homes:** wait on the mongooses' design; the rim's outer ledges and the horns are
   the natural places for them.
 - **Routes:** every public route, aisle and the cage gate meet the hero's and
   party's minimums (3 m on the floor and beach, 2 m on aisles, 3.2 m headroom).
@@ -134,13 +153,14 @@ at the horns, nothing where people sit.
 
 ## Fixed, proposed and open
 
-**Fixed (from direction):** a smaller island with a battle cage; small creature
-inhabitants who make the hero fight; a few opponents, with contenders from the
+**Fixed (from direction):** a smaller island with a battle cage; tall
+anthropomorphic mongooses, taller than humans, who make the hero fight; the
+chant; a few opponents, with contenders from the
 kingdom's communities, including an old pirate.
 
 **Proposed:** the island at `(112, 88)` as a crescent crater with the rim as
 natural stands; the four-fight order with Makoa, Tudaro
 and Old Kelp; the cage and stands.
 
-**Open:** the inhabitants; how fights work; the prizes; whether the Fortune's
+**Open:** the mongooses' culture, census, names, dress and homes; how fights work; the prizes; whether the Fortune's
 Rag sends a contender too.

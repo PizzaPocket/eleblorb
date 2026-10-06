@@ -314,8 +314,9 @@ Planning priorities:
 - Approve the four briefs: the Atlantean-modern sea folk city with air halls,
   glass tunnels, a legged form and renamed residents; the two ships' origins
   and crews; Kai Mālie's community, ahupuaʻa plan and charter, with every
-  resident speaking Hawaiian; the cage island and its short tournament (its creatures await the user's
-  direction).
+  resident speaking Hawaiian; the cage island and its short tournament (its inhabitants are tall
+  anthropomorphic mongooses, decided 2026-10-06; their culture, census and
+  homes are next).
 - Design the discord the Demon King has sown between the communities and how
   the hero restores harmony.
 - Review Kai Mālie's layout (`docs/architecture/ocean_island_village_layout.md`).
