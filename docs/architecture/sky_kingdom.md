@@ -153,11 +153,12 @@ follows his legend closely:
 
 **Now.** The sealing was long ago, within the long memory of the eldest
 Tempestars but before most ground-dwellers' grandparents were born. The Air
-blorbs vanished only recently, and have nothing to do with him. The courts are
-simply furious with him, as heaven is in his legend: he insulted their crowns,
-ate their peaches and ruined their banquet, and they have never forgiven it.
-When he turns up alongside the hero, freed by Xiao Hou Zi, every court is
-outraged that he is loose and in their sky again. He is not sorry.
+blorbs vanished only recently. The courts are furious with him, as heaven is
+in his legend: he insulted their crowns, ate their peaches and ruined their
+banquet, and they have never forgiven it. When he turns up alongside the hero,
+freed by Xiao Hou Zi, every court is outraged that he is loose in their sky
+again, and they blame him for the missing Air blorbs too. They are wrong; the
+Demon King took them. He is not sorry about anything else.
 
 **The Primate Kingdom.** The jungle monkeys have had no king since he left for
 the clouds. Their villagers still tell of the Monkey King who went up into the
