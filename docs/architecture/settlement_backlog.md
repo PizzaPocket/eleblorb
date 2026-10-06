@@ -356,10 +356,11 @@ Planning priorities:
   apes and whether the shadows of the ashed are seen are deferred to the
   storyline.
 - Landscape and planting plan: `docs/architecture/plant_kingdom_landscape.md`.
+- Building briefs: `docs/architecture/plant_kingdom_village_buildings.md`.
 - Approve the residents' new names (Malay and Indonesian single names; Ossian
   Redbrow keeps his) and the Water Curtain Cave brief
   (`docs/architecture/plant_kingdom_water_curtain_cave.md`).
-- Then building briefs, interiors, planting and dress charters.
+- Then interiors and the dress charter.
 
 Code work once approved (not started):
 
