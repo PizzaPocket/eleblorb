@@ -57,9 +57,10 @@ human world's images of a heaven above the clouds. Greek and Roman heavens are
 the stronger influence; the Chinese Celestial Court is a substantial second,
 carrying Sun Wu Kong's story, since he is already part of the game:
 
-- **The Chinese Celestial Court, as Journey to the West tells it:** the Jade
+- **The Chinese Celestial Court, as Journey to the West tells it:** Sun Wukong
+  as king of the monkeys of Flower Fruit Mountain who rose to heaven, the Jade
   Emperor's palace beyond the Southern Heavenly Gate, audiences in the Hall of
-  Miraculous Archeia, a bureaucracy of offices and titles, the lowly post of
+  Miraculous Mist, a bureaucracy of offices and titles, the lowly post of
   keeper of the heavenly horses that Sun Wukong was given and resented, the
   empty title "Great Sage Equal to Heaven" granted to quiet him, the Queen
   Mother of the West's peaches that ripen once in an age, the Peach Banquet he
@@ -129,34 +130,40 @@ elders remember the Hall of Assembly full.
 The Tempestars' long memory includes Sun Wu Kong, and their version of events
 follows his legend closely:
 
-1. **The lowly post.** Long ago he rode the Jindouyun up into the courts
-   uninvited and demanded a place. To be rid of him politely, Aethra made
-   him **Keeper of the Air Blorbs**, herding the wild flocks that drifted
-   between the clouds. It was the humblest office in the kingdom. He did it
-   well, grew fond of the blorbs, and then learned how little the post was
-   worth to anyone else.
-2. **The empty title.** In fury he demanded a rank equal to the rulers. The
-   courts gave him the title **Great Sage Equal to Aethra**, with no cloud,
-   court or duties attached, and set him to guard Pantao's peaches
-   to keep him busy.
+1. **The Monkey King.** Long ago Sun Wu Kong was king of the monkeys of the
+   Primate Kingdom's jungle. He rode the Jindouyun up into the courts uninvited
+   and demanded to be received as a king among kings.
+2. **The empty title.** The cloud rulers would not treat a jungle monkey as
+   their equal. To quiet him they named him **Great Sage Equal to Aethra**, a
+   title with no cloud, court or duties, and set him to guard Pantao's peaches
+   to keep him busy. He took the title at its word until he learned what it was
+   worth.
 3. **The Peach Banquet.** Left off the guest list for Pantao's great
    Peach Banquet, he ate the season's golden peaches, drank the nectar,
    overturned the tables and Dromos's games, and fought the courts'
    champions to a standstill with the Jingu Bang.
-4. **The sealing.** All six courts met in the Hall of Assembly on Koinon, the only time in living memory they acted together, and sealed him
-   beneath a rock on the highest roof below them: the crown of the Emperor's
-   castle in the Chinese village. The sealing decree, inscribed in gold, is the
+4. **The sealing.** All six courts met in the Hall of Assembly on Koinon, the
+   only time in living memory they acted together, and sealed him beneath a
+   rock on the highest roof below them: the crown of the Emperor's castle in
+   the Chinese village. They bound the seal so that only one of his own
+   monkeys could lift it, sure that none would ever come looking for him. That
+   is why Xiao Hou Zi can free him. The sealing decree, inscribed in gold, is the
    last decision on the Hall's walls. With their common trouble gone, the courts
    stopped meeting.
 
 **Now.** The sealing was long ago, within the long memory of the eldest
 Tempestars but before most ground-dwellers' grandparents were born. The Air
-blorbs went on drifting between the clouds without a keeper for all that time,
-and vanished only recently. The courts believe Sun Wu Kong is still sealed. When he arrives alongside the hero, freed by Xiao Hou Zi,
-they assume he has taken the Air blorbs in revenge for his old post. The real
-cause is the Demon King. Restoring the Air blorbs clears Sun Wu Kong's name and
-puts the old question back on the table: what the courts owe the one person
-who ever looked after the blorbs.
+blorbs vanished only recently. The courts believe Sun Wu Kong is still sealed.
+When he arrives alongside the hero, freed by Xiao Hou Zi, they assume he has
+come back for revenge and taken the Air blorbs. The real cause is the Demon
+King. Restoring the Air blorbs clears Sun Wu Kong's name.
+
+**The Primate Kingdom.** The jungle monkeys have had no king since he left for
+the clouds. Their villagers still tell of the Monkey King who went up into the
+sky and never came back; the youngest think it is only a story. Sun Wu Kong's
+return, and Xiao Hou Zi's part in it, connect the two kingdoms' stories. Whether
+he goes home to his people, and whether his long absence had any part in the
+Primate Kingdom falling under the Demon King's curse, are open.
 
 **Resolution.** The return of the Air blorbs restores harmony. Seeing the flocks
 drift between the clouds again makes the courts realise how distant and
@@ -168,13 +175,13 @@ again. How the quest stages that change is not yet designed.
 
 Who remembers what:
 
-- **Mnesia** keeps his offences in Aethra ledger, itemised.
+- **Mnesia** keeps his offences in Aethra's ledger, itemised.
 - **Chunlu** still counts the peaches he ate.
 - **Nikandra** has never forgiven the ruined games; **Tachys** secretly wants a
   rematch.
 - **Archeia** tends the sealing decree in the empty Hall.
-- **Alkis**, who chased Air blorbs as a child, remembers him as the keeper who
-  let the children help.
+- **Alkis**, a child at the time, remembers him as the only visitor who ever
+  played with the children.
 
 ## 3. Community
 
@@ -323,7 +330,6 @@ Olympian contests and the hippodrome.
 |---|---|---|
 | Ceremony, precedence, records of rank | Aristeon, Mnesia | Aethra |
 | News and invitations between clouds | Alkis | everywhere |
-| Keeping the Air blorb flocks | vacant since Sun Wu Kong's sealing | between the clouds |
 | Nectar | Drosia (Aethra); each court sets its own bowls | east terraces |
 | Ambrosia, fruit, banquets | Tianlu, Chunlu, Xiangyun | Pantao |
 | Gold: anchors, pins, vessels, tripods | Aurelia, Kallix | Chrysa |
@@ -551,7 +557,8 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
   cloud lower bodies;
 - the cuisine: dawn nectar on gold, ambrosia baked in sunlight, golden
   peaches, self-moving golden tripods;
-- Sun Wu Kong's history with the courts: the keeper's post, the empty title,
+- Sun Wu Kong's history with the courts: the Monkey King of the Primate
+  Kingdom's jungle, the empty title,
   the Peach Banquet and the sealing as the Hall of Assembly's last act;
 - Greco-Roman classical as the primary style, with the Chinese celestial palace
   a strong second where Sun Wu Kong's story is set;
@@ -570,5 +577,6 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
 
 - What Tempestar food and gifts do for the hero.
 - How much of the Sun Wu Kong history is quest content: whether the hero must
-  clear his name, whether he takes back the keeper's post once the Air blorbs
-  return, and how the courts react to him in the party.
+  clear his name, and how the courts react to him in the party.
+- Whether Sun Wu Kong returns to rule the Primate Kingdom's monkeys, and
+  whether his absence had any part in the kingdom falling under the curse.
