@@ -578,5 +578,7 @@ quartz, gold and pastel; the missing Air blorbs as the central quest.
 - What Tempestar food and gifts do for the hero.
 - How much of the Sun Wu Kong history is quest content, and how the courts'
   anger shows when he travels in the party.
+- Whether the courts ever admit they were wrong to blame him for the Air
+  blorbs.
 - Whether Sun Wu Kong returns to rule the Primate Kingdom's monkeys, and
   whether his absence had any part in the kingdom falling under the curse.
