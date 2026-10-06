@@ -43,6 +43,8 @@ const WINDOW_WIDTH := 0.94
 # ---------------------------------------------------------------------------
 
 ## A door opening at a plan point on a wall. `top` is above the wall's base.
+## Its leaf swings inward, into the room it serves, never across a porch or
+## veranda (TownProps' outside doors swing out; this village's do not).
 static func door(at: Vector2, top: float = DOOR_TOP, leaves: int = 1, width: float = TownProps.DOOR_WIDTH) -> Dictionary:
 	return {"kind": "door", "at": at, "width": width, "rise": top, "leaves": leaves}
 
@@ -104,7 +106,15 @@ static func wall(
 		upper_cuts.append({"a": cut_a - (base_y + BAND), "b": cut_b})
 	TownProps._build_panel_facade(body, length, Vector3(mid.x, base_y + BAND, mid.y), yaw, panel_color, resolved, base_y + BAND, full - BAND, TownProps.WALL_THICKNESS, upper_cuts)
 	for opening in resolved:
-		TownProps._build_panel_opening_trim(body, Vector3(mid.x, base_y, mid.y), yaw, opening, base_y, TIMBER_DARK, TownProps.WALL_THICKNESS, accent)
+		if opening["kind"] == "door":
+			# Built from the inner face (the wall turned half round, so the
+			# opening's position along it mirrors): frames are the same on both
+			# faces, and the leaf now hangs on the inside.
+			var inward := opening.duplicate()
+			inward["center"] = -float(opening["center"])
+			TownProps._build_panel_opening_trim(body, Vector3(mid.x, base_y, mid.y), yaw + PI, inward, base_y, TIMBER_DARK, TownProps.WALL_THICKNESS, accent)
+		else:
+			TownProps._build_panel_opening_trim(body, Vector3(mid.x, base_y, mid.y), yaw, opening, base_y, TIMBER_DARK, TownProps.WALL_THICKNESS, accent)
 	_dado_rail(body, a, dir, length, base_y + BAND, resolved)
 	ClearZones.add_wall(body, "outside wall (%.1f, %.1f) to (%.1f, %.1f)" % [a.x, a.y, b.x, b.y], a, b, base_y, full, TownProps.WALL_THICKNESS, true)
 	var inward := -outward.normalized()

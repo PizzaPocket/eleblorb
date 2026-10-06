@@ -10,7 +10,7 @@ extends RefCounted
 
 ## Buildings that have left the placeholder stage. FloatingVillage builds these
 ## instead of its owned placeholder boxes.
-const BUILT := ["VennHouse"]
+const BUILT := ["VennHouse", "SenHouse", "CisternHouse", "NetShed"]
 
 const SHELF_Y := -3.2 - 0.4
 const HOUSE_FLOOR := FishingVillagePlan.HOUSE_FLOOR
@@ -21,6 +21,12 @@ static func build(name_text: String) -> StaticBody3D:
 	match name_text:
 		"VennHouse":
 			return venn_house()
+		"SenHouse":
+			return sen_house()
+		"CisternHouse":
+			return cistern_house()
+		"NetShed":
+			return net_shed()
 	return null
 
 
@@ -29,6 +35,12 @@ static func anchor(name_text: String) -> Vector2:
 	match name_text:
 		"VennHouse":
 			return VENN_ORIGIN
+		"SenHouse":
+			return SEN_ORIGIN
+		"CisternHouse":
+			return CISTERN_ORIGIN
+		"NetShed":
+			return NET_SHED_ORIGIN
 	return Vector2.ZERO
 
 
@@ -84,7 +96,9 @@ static func venn_house() -> StaticBody3D:
 	# living room; every room has a window; the north wall faces the rock.
 	var no_openings: Array[Dictionary] = []
 	StiltKit.wall(body, Vector2(-hx, hz), Vector2(hx, hz), Vector2(0, 1), f, StiltKit.RING_BEAM,
-		[StiltKit.door(Vector2(0.0, hz)), StiltKit.window(Vector2(-3.0, hz))], teal, VENN_SHUTTER)
+		# A pair of narrow leaves: one 1.2 m leaf swinging in would cross the way to
+		# one of the two side doors in a 3 m living room.
+		[StiltKit.door(Vector2(0.0, hz), StiltKit.DOOR_TOP, 2), StiltKit.window(Vector2(-3.0, hz))], teal, VENN_SHUTTER)
 	StiltKit.wall(body, Vector2(-hx, -hz), Vector2(hx, -hz), Vector2(0, -1), f, StiltKit.RING_BEAM,
 		[StiltKit.window(Vector2(-3.0, -hz)), StiltKit.window(Vector2(-0.75, -hz)), StiltKit.window(Vector2(3.25, -hz))], teal, VENN_SHUTTER)
 	StiltKit.wall(body, Vector2(-hx, -hz), Vector2(-hx, hz), Vector2(-1, 0), f, StiltKit.RING_BEAM,
@@ -112,9 +126,7 @@ static func venn_house() -> StaticBody3D:
 	# The dive-gear store: the veranda's east bay, enclosed, door onto the
 	# veranda. Its walls rise to the pent's underside.
 	var store := Rect2(1.5, hz, 3.0, vz - hz)
-	# Drawn facing into the store so its leaf swings into the room it serves,
-	# not across the veranda.
-	StiltKit.wall(body, Vector2(1.5, hz), Vector2(1.5, vz), Vector2(1, 0), f, VENN_PENT_AT_WALL,
+	StiltKit.wall(body, Vector2(1.5, hz), Vector2(1.5, vz), Vector2(-1, 0), f, VENN_PENT_AT_WALL,
 		[StiltKit.door(Vector2(1.5, (hz + vz) * 0.5), 2.25)], teal, VENN_SHUTTER, pent_plane)
 	StiltKit.wall(body, Vector2(1.5, vz), Vector2(hx, vz), Vector2(0, 1), f, VENN_PENT_AT_WALL,
 		no_openings, teal, VENN_SHUTTER, pent_plane)
@@ -147,13 +159,11 @@ static func venn_house() -> StaticBody3D:
 
 	# Circulation the clearance audit walks: up from the landing, through the
 	# front door, into each room and the store.
-	ClearZones.add_lane(body, "landing to front door", [Vector3(0.0, f, vz - 0.6), Vector3(0.0, f, 4.15)], 0.55)
-	ClearZones.add_lane(body, "through the front door", [Vector3(0.0, f, 4.15), Vector3(0.0, f, hz - 0.5)])
-	ClearZones.add_lane(body, "front door to Lio's door", [Vector3(0.0, f, hz - 0.4), Vector3(-0.9, f, 1.0), Vector3(-2.2, f, 1.0)])
-	ClearZones.add_lane(body, "front door to the bedroom door", [Vector3(0.0, f, hz - 0.4), Vector3(0.9, f, 1.0), Vector3(2.2, f, 1.0)])
-	# The front door's leaf stands open on the veranda (exterior doors open
-	# outward throughout the world), so the way to the store passes south of it.
-	ClearZones.add_lane(body, "veranda to the store", [Vector3(-0.6, f, 4.1), Vector3(0.9, f, 4.0), Vector3(1.0, f, 3.5), Vector3(2.3, f, 3.5)])
+	ClearZones.add_lane(body, "landing to front door", [Vector3(0.0, f, vz - 0.6), Vector3(0.0, f, hz + 0.6)], 0.55)
+	ClearZones.add_lane(body, "through the front door", [Vector3(0.0, f, hz + 0.6), Vector3(0.0, f, 1.2)])
+	ClearZones.add_lane(body, "front door to Lio's door", [Vector3(0.0, f, 1.2), Vector3(-0.9, f, 1.05), Vector3(-2.2, f, 1.0)])
+	ClearZones.add_lane(body, "front door to the bedroom door", [Vector3(0.0, f, 1.2), Vector3(0.9, f, 1.05), Vector3(2.2, f, 1.0)])
+	ClearZones.add_lane(body, "veranda to the store", [Vector3(-0.6, f, 4.1), Vector3(0.9, f, 3.5), Vector3(2.3, f, 3.5)])
 
 	_venn_interior(body, f, teal)
 	_venn_shop(body, f)
@@ -282,6 +292,569 @@ static func lay_out_wares(body: Node3D, at: Vector3, length: float) -> void:
 		var row := i / columns
 		visual.position = at + Vector3((float(column) - float(columns - 1) * 0.5) * spacing, 0.0, (float(row) - 0.5) * 0.3)
 		body.add_child(visual)
+
+
+# ---------------------------------------------------------------------------
+# 4.4 Sen house, clinic and school room (Asha, Rian)
+# ---------------------------------------------------------------------------
+# Body frame: origin at the range's centre, plan (-15.5, -16), at W. Range
+# x -4.5..4.5, z -4..4 under one hip: public front row z 0.4..4 (records,
+# clinic, school room), private corridor z -1.0..0.4, private back row z -4..-1
+# (Asha, Rian, kitchen and wash). Porch z 4..6 under a pent; threshold ramp
+# z 6..7 onto the Sen spur. See the design brief, section 4.4.
+
+const SEN_ORIGIN := Vector2(-15.5, -16.0)
+const SEN_HALF := Vector2(4.5, 4.0)
+const SEN_CORRIDOR := Vector2(-1.0, 0.4)
+const SEN_PORCH_Z := 6.0
+const SEN_SHUTTER := Color(0.90, 0.86, 0.74)
+const SEN_PENT_AT_WALL := 2.75
+## Door and window positions along the front, chosen so every frame clears its
+## neighbour and the bay partitions (the brief's numbers did not; see 4.4).
+const SEN_FAMILY_DOOR := -3.0
+const SEN_CLINIC_DOOR := -0.45
+const SEN_CLINIC_WINDOW := 0.8
+const SEN_SCHOOL_WINDOW := 2.15
+const SEN_SCHOOL_DOOR := 3.5
+
+
+static func sen_house() -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = "SenHouse"
+	var f := HOUSE_FLOOR
+	var violet := _household("Asha")
+	var hx := SEN_HALF.x
+	var hz := SEN_HALF.y
+	var pz := SEN_PORCH_Z
+	var plate := f + StiltKit.RING_BEAM
+	var pent_wall := f + SEN_PENT_AT_WALL
+	var pent_grad := Vector2(0.0, -tan(StiltRoofs.PENT_PITCH))
+	var xs: Array[float] = [-hx, -1.5, 1.5, hx]
+
+	# Substructure: piles at the bay lines on every row the brief gives.
+	var rows: Array = []
+	for z: float in [-hz, SEN_CORRIDOR.x, SEN_CORRIDOR.y, hz, pz]:
+		var row: Array[Vector2] = []
+		for x in xs:
+			row.append(Vector2(x, z))
+		rows.append(row)
+		StiltKit.beam(body, Vector2(-hx - 0.1, z), Vector2(hx + 0.1, z), f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH * 0.5, Vector2(0.11, StiltKit.BEAM_DEPTH * 0.5))
+	StiltKit.piles(body, rows, f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH, SHELF_Y)
+	StiltKit.floor_slab(body, Rect2(-hx, -hz, hx * 2.0, pz + hz), f)
+
+	# Outside walls. Three doors off the porch: the family's, the clinic's
+	# (knot-carved) and the school room's. Back rooms light from the north.
+	var front: Array[Dictionary] = [
+		StiltKit.door(Vector2(SEN_FAMILY_DOOR, hz)), StiltKit.door(Vector2(SEN_CLINIC_DOOR, hz)),
+		StiltKit.window(Vector2(SEN_CLINIC_WINDOW, hz)), StiltKit.window(Vector2(SEN_SCHOOL_WINDOW, hz)),
+		StiltKit.door(Vector2(SEN_SCHOOL_DOOR, hz)),
+	]
+	StiltKit.wall(body, Vector2(-hx, hz), Vector2(hx, hz), Vector2(0, 1), f, StiltKit.RING_BEAM, front, violet, SEN_SHUTTER)
+	StiltKit.wall(body, Vector2(-hx, -hz), Vector2(hx, -hz), Vector2(0, -1), f, StiltKit.RING_BEAM,
+		[StiltKit.window(Vector2(-2.3, -hz)), StiltKit.window(Vector2(0.0, -hz)), StiltKit.window(Vector2(3.0, -hz))], violet, SEN_SHUTTER)
+	StiltKit.wall(body, Vector2(-hx, -hz), Vector2(-hx, hz), Vector2(-1, 0), f, StiltKit.RING_BEAM,
+		[StiltKit.window(Vector2(-hx, 2.4))], violet, SEN_SHUTTER)
+	StiltKit.wall(body, Vector2(hx, -hz), Vector2(hx, hz), Vector2(1, 0), f, StiltKit.RING_BEAM,
+		[StiltKit.window(Vector2(hx, -2.5))], violet, SEN_SHUTTER)
+
+	# Partitions. The corridor's south wall has only the family archway; its
+	# north wall has a door into each back room (drawn west to east, so each
+	# leaf swings north into its room). The two front partitions are drawn
+	# north to south so their doors swing east: records into the clinic, the
+	# clinic into the school room.
+	var cs := SEN_CORRIDOR.y
+	var cn := SEN_CORRIDOR.x
+	var no_doors: Array[float] = []
+	TownProps.build_interior_wall(body, Vector2(-hx, cs), Vector2(hx, cs), f, no_doors, StiltKit.TIMBER_PALE, StiltKit.TIMBER_DARK, StiltKit.RING_BEAM, true, [SEN_FAMILY_DOOR + hx])
+	StiltKit.partition(body, Vector2(-hx, cn), Vector2(hx, cn), f, StiltKit.RING_BEAM, [1.5, 4.5, 7.5])
+	StiltKit.partition(body, Vector2(-1.5, cs), Vector2(-1.5, hz), f, StiltKit.RING_BEAM, [1.8])
+	StiltKit.partition(body, Vector2(1.5, cs), Vector2(1.5, hz), f, StiltKit.RING_BEAM, [1.8])
+	StiltKit.partition(body, Vector2(-1.5, -hz), Vector2(-1.5, cn), f, StiltKit.RING_BEAM, no_doors)
+	StiltKit.partition(body, Vector2(1.5, -hz), Vector2(1.5, cn), f, StiltKit.RING_BEAM, no_doors)
+	StiltKit.ceiling(body, Rect2(-hx, -hz, hx * 2.0, hz * 2.0), plate)
+
+	# Frame: posts on the bay lines front and back and two on each end wall.
+	for x in xs:
+		for z: float in [-hz, hz]:
+			StiltKit.post(body, Vector2(x, z), f - StiltKit.FLOOR_THICKNESS, plate)
+	for x: float in [-hx, hx]:
+		for z: float in [-1.0, 1.4]:
+			StiltKit.post(body, Vector2(x, z), f - StiltKit.FLOOR_THICKNESS, plate)
+	var corners: Array[Vector2] = [Vector2(-hx, -hz), Vector2(hx, -hz), Vector2(hx, hz), Vector2(-hx, hz)]
+	for i in 4:
+		StiltKit.beam(body, corners[i], corners[(i + 1) % 4], plate - 0.1, Vector2(0.12, 0.1))
+
+	# Porch: added later for the clinic queue, its posts paler. The two either
+	# side of the way up from the spur are rope-bound; rails close the open
+	# edges except the ramp's opening.
+	var pent_at_edge := pent_wall + pent_grad.y * (pz - hz)
+	for x in xs:
+		StiltKit.post(body, Vector2(x, pz), f - StiltKit.FLOOR_THICKNESS, pent_at_edge, StiltKit.TIMBER_PALE, absf(x) < 2.0)
+	StiltKit.beam(body, Vector2(-hx, pz), Vector2(hx, pz), pent_at_edge - 0.1, Vector2(0.1, 0.1))
+	StiltKit.rail(body, Vector2(-hx + 0.15, pz), Vector2(-1.65, pz), f)
+	StiltKit.rail(body, Vector2(1.65, pz), Vector2(hx - 0.15, pz), f)
+	StiltKit.rail(body, Vector2(-hx, hz + 0.2), Vector2(-hx, pz - 0.15), f)
+	StiltKit.rail(body, Vector2(hx, hz + 0.2), Vector2(hx, pz - 0.15), f)
+	StiltKit.ramp(body, Vector2(SEN_CLINIC_DOOR + 0.45, pz + 1.0), Vector2(SEN_CLINIC_DOOR + 0.45, pz), DECK_TOP, f, 2.6)
+
+	# Roofs: a hip over the 9 x 8 range (a short ridge, violet cap), the pent
+	# over the porch under its south eave. The kitchen flue leaves by the hip's
+	# east slope.
+	StiltRoofs.hip(body, SEN_HALF, plate, StiltKit.SHINGLE, violet)
+	StiltRoofs.pent(body, Rect2(-hx - 0.3, hz, hx * 2.0 + 0.6, pz - hz + 0.25), pent_wall + StiltRoofs.THICKNESS / cos(StiltRoofs.PENT_PITCH), Vector3(0, 0, 1), StiltKit.SHINGLE.lightened(0.05))
+	var gutter_y := pent_wall + pent_grad.y * (pz + 0.25 - hz) - 0.08
+	var jar_at := Vector2(hx - 0.45, pz - 0.5)
+	StiltKit.gutter(body, Vector2(-hx - 0.3, pz + 0.27), Vector2(hx + 0.3, pz + 0.27), gutter_y, Vector2(hx + 0.2, pz + 0.27), jar_at, f + 0.8)
+	StiltKit.rain_jar(body, jar_at, f, Color(0.42, 0.36, 0.56))
+
+	# The knot mark carved beside the clinic door.
+	var knot := SuperEgg.build_part(Vector3(0.14, 0.14, 0.03), StiltKit.TIMBER_DARK, 2.0, 2.0)
+	knot.position = Vector3(SEN_CLINIC_DOOR - 0.9, f + 1.9, hz + 0.1)
+	body.add_child(knot)
+	CollisionPolicy.mark_decorative(knot)
+	StiltKit.rope_binding(body, Vector2(SEN_CLINIC_DOOR - 0.9, hz + 0.1), f + 1.82, f + 1.98, 0.08)
+
+	# Routes the audit walks: the patient, the pupil and the family's own way.
+	ClearZones.add_lane(body, "spur to the clinic door", [Vector3(0.0, f, pz - 0.6), Vector3(SEN_CLINIC_DOOR, f, hz + 0.8)], 0.55)
+	ClearZones.add_lane(body, "porch to the school door", [Vector3(0.0, f, pz - 0.6), Vector3(2.4, f, pz - 1.0), Vector3(SEN_SCHOOL_DOOR, f, hz + 0.7)])
+	ClearZones.add_lane(body, "porch to the family door", [Vector3(0.0, f, pz - 0.6), Vector3(-2.0, f, pz - 1.0), Vector3(SEN_FAMILY_DOOR, f, hz + 0.7)])
+	ClearZones.add_lane(body, "family door to the corridor", [Vector3(SEN_FAMILY_DOOR, f, hz - 1.4), Vector3(SEN_FAMILY_DOOR, f, (cs + cn) * 0.5)])
+	ClearZones.add_lane(body, "the corridor", [Vector3(-hx + 0.6, f, (cs + cn) * 0.5), Vector3(hx - 0.6, f, (cs + cn) * 0.5)])
+
+	_sen_interior(body, f, violet)
+	return body
+
+
+static func _sen_interior(body: StaticBody3D, f: float, violet: Color) -> void:
+	var layout := RoomLayout.new(body, SEN_HALF - Vector2(0.08, 0.08))
+	var w := SEN_HALF.x - 0.08
+	var n := SEN_HALF.y - 0.08
+	var cs := SEN_CORRIDOR.y + 0.08
+	var cn := SEN_CORRIDOR.x - 0.08
+
+	# Family entry and records room: record shelves of tied bundles, the cord
+	# board of the village's decisions in pictured knots, a low bench, pegs.
+	if not layout.at_any([{"pos": Vector2(-w + 0.17, cs + 0.55), "yaw": StiltKit.yaw_back_to(Vector2(-1, 0))}], 0.45, 0.17, 0.5, "record shelves").is_empty():
+		Furnishings.shelf(body, Vector3(-w + 0.17, f, cs + 0.55), StiltKit.yaw_back_to(Vector2(-1, 0)), 0.9, 3, "boxes")
+	if not layout.at_any([{"pos": Vector2(-1.77, 3.4), "yaw": StiltKit.yaw_back_to(Vector2(1, 0))}], 0.5, 0.19, 0.0, "family bench", 0.5).is_empty():
+		Furnishings.bench(body, Vector3(-1.77, f, 3.4), StiltKit.yaw_back_to(Vector2(1, 0)), 1.0)
+	_cord_board(body, Vector3(-2.2, f, n - 0.02), PI)
+	Furnishings.peg_rail(body, Vector3(-4.0, f, n - 0.03), PI, 0.6)
+	Furnishings.hanging_lamp(body, Vector3(-3.0, f + 2.6, 2.0), 0.6, 4.5)
+
+	# Clinic: the raised cot against the corridor wall with the lamp over it,
+	# corked jars sorted by colour, the washing table, the stool worn smooth.
+	if not layout.at_any([{"pos": Vector2(0.27, cs + 0.42), "yaw": 0.0}], 0.92, 0.4, 0.0, "clinic cot", 0.7).is_empty():
+		_cot(body, Vector3(0.27, f, cs + 0.42))
+	if not layout.at_any([{"pos": Vector2(-1.25, cs + 0.55), "yaw": StiltKit.yaw_back_to(Vector2(-1, 0))}], 0.45, 0.17, 0.4, "jar shelves").is_empty():
+		_jar_shelf(body, Vector3(-1.25, f, cs + 0.55), StiltKit.yaw_back_to(Vector2(-1, 0)))
+	if not layout.at_any([{"pos": Vector2(1.14, 3.4), "yaw": StiltKit.yaw_back_to(Vector2(1, 0))}], 0.4, 0.28, 0.4, "washing table", 0.9).is_empty():
+		Furnishings.washstand(body, Vector3(1.14, f, 3.4), StiltKit.yaw_back_to(Vector2(1, 0)))
+	if not layout.at_any([{"pos": Vector2(0.0, cs + 1.2), "yaw": 0.0}], 0.23, 0.23, 0.0, "Asha's stool", 0.5).is_empty():
+		Furnishings.stool(body, Vector3(0.0, f, cs + 1.2))
+	Furnishings.hanging_lamp(body, Vector3(0.27, f + 2.4, cs + 0.5), 0.7, 4.5)
+	# Cuttings drying from the rafters.
+	for i in 3:
+		Furnishings.piece(body, Vector3(0.05, 0.16, 0.05), Color(0.44, 0.52, 0.30).darkened(0.08 * float(i)), Vector3(-0.8 + 0.3 * float(i), f + 2.95, 2.6), 0.0, false, SuperEgg.EPSILON_SOFT)
+
+	# School room: a low table with three stools (Tavi's floats under his), the
+	# slate wall of chalk marks, shells for counting, the children's boats.
+	if not layout.at_any([{"pos": Vector2(3.35, 1.45), "yaw": 0.0}], 0.6, 0.35, 0.0, "school table", 0.8).is_empty():
+		Furnishings.piece(body, Vector3(0.6, 0.035, 0.35), Furnishings.OAK_LIGHT, Vector3(3.35, f + 0.62, 1.45), 0.0, true)
+		for sx: float in [-1.0, 1.0]:
+			for sz: float in [-1.0, 1.0]:
+				Furnishings.piece(body, Vector3(0.04, 0.3, 0.04), Furnishings.OAK_DARK, Vector3(3.35 + sx * 0.5, f + 0.3, 1.45 + sz * 0.27))
+	for stool: Vector2 in [Vector2(3.0, cs + 0.3), Vector2(3.7, cs + 0.3), Vector2(3.35, 2.15)]:
+		if not layout.at_any([{"pos": stool, "yaw": 0.0}], 0.23, 0.23, 0.0, "school stool", 0.5).is_empty():
+			Furnishings.stool(body, Vector3(stool.x, f, stool.y))
+	Furnishings.piece(body, Vector3(0.1, 0.1, 0.1), Color(0.86, 0.66, 0.30), Vector3(3.35, f + 0.1, 2.15), 0.0, false, 2.0)
+	Furnishings.piece(body, Vector3(0.9, 0.55, 0.012), Color(0.20, 0.22, 0.22), Vector3(3.0, f + 1.55, cs + 0.005))
+	for i in 7:
+		Furnishings.piece(body, Vector3(0.01, 0.07, 0.004), Color(0.92, 0.92, 0.88), Vector3(2.4 + 0.12 * float(i), f + 1.62, cs + 0.02))
+	if not layout.at_any([{"pos": Vector2(w - 0.17, cs + 0.6), "yaw": StiltKit.yaw_back_to(Vector2(1, 0))}], 0.45, 0.17, 0.0, "counting shelf").is_empty():
+		_boat_shelf(body, Vector3(w - 0.17, f, cs + 0.6))
+	Furnishings.rug(body, Vector3(3.35, f, 1.45), 0.0, Vector2(1.9, 1.2), violet.lightened(0.2))
+	Furnishings.hanging_lamp(body, Vector3(3.0, f + 2.6, 1.6), 0.6, 4.5)
+
+	# Asha's room: bed head to the west wall, the writing desk by the window on
+	# the partition, her chest.
+	if not layout.at_any([{"pos": Vector2(-w + 1.27, -n + 0.84), "yaw": 0.0}], 1.23, 0.8, 0.0, "Asha's bed", 0.6).is_empty():
+		var bed := TownProps.build_bed(violet.lightened(0.1))
+		bed.position = Vector3(-w + 1.27, f, -n + 0.84)
+		bed.rotation.y = PI * 0.5
+		body.add_child(bed)
+	# A small writing table on the partition beside the window (a full desk and
+	# chair would not fit beside the bed in a 3 x 3 room).
+	if not layout.at_any([{"pos": Vector2(-1.83, -1.7), "yaw": StiltKit.yaw_back_to(Vector2(1, 0))}], 0.45, 0.25, 0.0, "Asha's writing table", 0.8).is_empty():
+		Furnishings.piece(body, Vector3(0.25, 0.03, 0.45), Furnishings.OAK_LIGHT, Vector3(-1.83, f + 0.76, -1.7), 0.0, true)
+		for sz: float in [-1.0, 1.0]:
+			Furnishings.piece(body, Vector3(0.03, 0.37, 0.03), Furnishings.OAK_DARK, Vector3(-1.95, f + 0.37, -1.7 + sz * 0.38))
+		Furnishings.piece(body, Vector3(0.16, 0.015, 0.2), Color(0.86, 0.80, 0.66), Vector3(-1.85, f + 0.8, -1.8))
+		Furnishings.piece(body, Vector3(0.05, 0.07, 0.05), Color(1.0, 0.82, 0.45), Vector3(-1.8, f + 0.86, -1.4), 0.0, false, 2.2)
+	if not layout.at_any([{"pos": Vector2(-4.0, cn - 0.28), "yaw": StiltKit.yaw_back_to(Vector2(0, 1))}], 0.35, 0.28, 0.0, "Asha's chest", 0.6).is_empty():
+		Furnishings.chest(body, Vector3(-4.0, f, cn - 0.28), StiltKit.yaw_back_to(Vector2(0, 1)), Furnishings.OAK, 0.7)
+	Furnishings.hanging_lamp(body, Vector3(-3.0, f + 2.5, -2.4), 0.5, 4.0)
+
+	# Rian's room: bed head to the west partition, spools and needles on a shelf,
+	# the mother-of-pearl button on its nail by the door.
+	if not layout.at_any([{"pos": Vector2(-0.15, -n + 0.84), "yaw": 0.0}], 1.23, 0.8, 0.0, "Rian's bed", 0.6).is_empty():
+		var rian_bed := TownProps.build_bed(Color(0.30, 0.46, 0.44))
+		rian_bed.position = Vector3(-0.15, f, -n + 0.84)
+		rian_bed.rotation.y = PI * 0.5
+		body.add_child(rian_bed)
+	if not layout.at_any([{"pos": Vector2(1.25, -1.7), "yaw": StiltKit.yaw_back_to(Vector2(1, 0))}], 0.4, 0.17, 0.4, "Rian's shelf").is_empty():
+		Furnishings.shelf(body, Vector3(1.25, f, -1.7), StiltKit.yaw_back_to(Vector2(1, 0)), 0.8, 2, "crocks")
+	Furnishings.piece(body, Vector3(0.04, 0.04, 0.01), Color(0.92, 0.90, 0.86), Vector3(0.75, f + 1.6, cn - 0.02), 0.0, false, 2.0)
+	# His spare coils of rope at the corridor's east end.
+	for i in 2:
+		Furnishings.piece(body, Vector3(0.3, 0.08, 0.3), StiltKit.ROPE.darkened(0.05 * float(i)), Vector3(4.0, f + 0.08 + 0.16 * float(i), (cs + cn) * 0.5), 0.0, false, 2.0)
+	Furnishings.hanging_lamp(body, Vector3(0.0, f + 2.5, -2.4), 0.5, 4.0)
+
+	# Kitchen and wash: the brazier under its hood in the north-east corner, its
+	# flue through the hip; the water jar, the wash basin, the woodbox.
+	var brazier_at := Vector2(w - 0.45, -n + 0.45)
+	ClearZones.add(body, "kitchen brazier", "fire", brazier_at, Vector2(-0.7, 0.7), 0.4, 0.7, 0.45, f, f + 1.6)
+	layout.reserve(brazier_at, Vector2(0.4, 0.4))
+	_brazier(body, Vector3(brazier_at.x, f, brazier_at.y), f + StiltKit.RING_BEAM)
+	_roof_flue(body, brazier_at, f + StiltKit.RING_BEAM, f + StiltKit.RING_BEAM + StiltRoofs.PLATE + 0.45 * tan(StiltRoofs.PITCH) + 0.7)
+	StiltKit.rain_jar(body, Vector2(2.0, -n + 0.35), f, Color(0.30, 0.42, 0.48))
+	if not layout.at_any([{"pos": Vector2(1.86, -1.75), "yaw": StiltKit.yaw_back_to(Vector2(-1, 0))}], 0.4, 0.28, 0.4, "wash basin", 0.9).is_empty():
+		Furnishings.washstand(body, Vector3(1.86, f, -1.75), StiltKit.yaw_back_to(Vector2(-1, 0)))
+		for i in 2:
+			Furnishings.piece(body, Vector3(0.09, 0.03, 0.09), Furnishings.CLAY.lightened(0.1), Vector3(1.86, f + 0.9 + 0.06 * float(i), -1.45), 0.0, false, 2.2)
+	if not layout.at_any([{"pos": Vector2(w - 0.25, -1.75), "yaw": StiltKit.yaw_back_to(Vector2(1, 0))}], 0.35, 0.22, 0.3, "woodbox", 0.5).is_empty():
+		Furnishings.piece(body, Vector3(0.22, 0.22, 0.35), Furnishings.OAK_DARK, Vector3(w - 0.25, f + 0.22, -1.75), 0.0, true)
+		for i in 3:
+			Furnishings.piece(body, Vector3(0.05, 0.05, 0.3), Furnishings.OAK, Vector3(w - 0.33 + 0.08 * float(i), f + 0.46, -1.75), 0.0, false, SuperEgg.EPSILON_SOFT)
+	Furnishings.hanging_lamp(body, Vector3(3.0, f + 2.5, -2.4), 0.5, 4.0)
+
+	for failure in layout.failures:
+		push_warning("SenHouse interior: " + failure)
+
+	# On the porch: the bench for the clinic's queue at the east end, facing the
+	# house, and pegs for hats by the school door.
+	Furnishings.bench(body, Vector3(3.15, f, SEN_PORCH_Z - 0.3), 0.0, 2.0)
+
+
+static func _cot(body: StaticBody3D, at: Vector3) -> void:
+	Furnishings.piece(body, Vector3(0.92, 0.06, 0.4), Furnishings.OAK, at + Vector3(0, 0.62, 0), 0.0, true)
+	Furnishings.piece(body, Vector3(0.88, 0.05, 0.36), Color(0.80, 0.74, 0.58), at + Vector3(0, 0.72, 0), 0.0, false, SuperEgg.EPSILON_SOFT)
+	for sx: float in [-1.0, 1.0]:
+		for sz: float in [-1.0, 1.0]:
+			Furnishings.piece(body, Vector3(0.04, 0.29, 0.04), Furnishings.OAK_DARK, at + Vector3(sx * 0.82, 0.29, sz * 0.32))
+
+
+## Shelves of corked jars sorted by colour.
+static func _jar_shelf(body: StaticBody3D, at: Vector3, yaw: float) -> void:
+	Furnishings.shelf(body, at, yaw, 0.9, 3, "none")
+	var tones: Array[Color] = [Color(0.36, 0.52, 0.30), Color(0.62, 0.32, 0.26), Color(0.30, 0.40, 0.58), Color(0.78, 0.66, 0.34)]
+	for level in 3:
+		for i in 4:
+			var local := Vector3(-0.32 + 0.21 * float(i), 0.55 + 0.5 * float(level) + 0.1, 0.0)
+			Furnishings.piece(body, Vector3(0.06, 0.1, 0.06), tones[(i + level) % 4], Furnishings._at(at, yaw, local), 0.0, false, 2.2)
+
+
+## Counting shells and the row of carved sailing boats on a low shelf.
+static func _boat_shelf(body: StaticBody3D, at: Vector3) -> void:
+	for level: float in [0.7, 1.15]:
+		Furnishings.piece(body, Vector3(0.14, 0.02, 0.45), Furnishings.OAK, at + Vector3(0, level, 0))
+	for i in 4:
+		Furnishings.piece(body, Vector3(0.05, 0.03, 0.1), Color(0.70, 0.52, 0.32).darkened(0.06 * float(i)), at + Vector3(0, 1.2, -0.3 + 0.2 * float(i)), 0.0, false, SuperEgg.EPSILON_SOFT)
+		Furnishings.piece(body, Vector3(0.008, 0.08, 0.008), Furnishings.OAK_DARK, at + Vector3(0, 1.3, -0.3 + 0.2 * float(i)))
+	for i in 8:
+		Furnishings.piece(body, Vector3(0.035, 0.02, 0.035), Color(0.92, 0.86, 0.76), at + Vector3(0, 0.74, -0.35 + 0.1 * float(i)), 0.0, false, 2.2)
+
+
+## The village's decisions, kept as pictured knots on a board of cords.
+static func _cord_board(body: StaticBody3D, at: Vector3, yaw: float) -> void:
+	Furnishings.piece(body, Vector3(0.45, 0.04, 0.02), Furnishings.OAK, Furnishings._at(at, yaw, Vector3(0, 2.05, 0)), yaw)
+	for i in 6:
+		var x := -0.38 + 0.15 * float(i)
+		Furnishings.piece(body, Vector3(0.008, 0.3, 0.008), StiltKit.ROPE, Furnishings._at(at, yaw, Vector3(x, 1.75, -0.02)), yaw)
+		for k in 1 + i % 3:
+			Furnishings.piece(body, Vector3(0.025, 0.025, 0.025), StiltKit.ROPE.darkened(0.2), Furnishings._at(at, yaw, Vector3(x, 1.9 - 0.15 * float(k), -0.02)), yaw, false, 2.0)
+
+
+## A clay flue from the ceiling up through the roof, capped above the slope.
+static func _roof_flue(body: StaticBody3D, at: Vector2, from_y: float, to_y: float) -> void:
+	var pipe := SuperEgg.build_part(Vector3(0.11, (to_y - from_y) * 0.5, 0.11), Furnishings.CLAY.darkened(0.3), 2.4, SuperEgg.EPSILON_FLAT)
+	pipe.position = Vector3(at.x, (from_y + to_y) * 0.5, at.y)
+	body.add_child(pipe)
+	CollisionPolicy.mark_decorative(pipe)
+	var cap := SuperEgg.build_part(Vector3(0.2, 0.05, 0.2), Furnishings.CLAY.darkened(0.4), 2.4, SuperEgg.EPSILON_FLAT)
+	cap.position = Vector3(at.x, to_y + 0.1, at.y)
+	body.add_child(cap)
+	CollisionPolicy.mark_decorative(cap)
+
+
+# ---------------------------------------------------------------------------
+# 4.6 Cistern house and shared stores (village; Leena keeps the stores)
+# ---------------------------------------------------------------------------
+# Body frame: origin at the stores house's centre, plan (-2, -15.9), at W.
+# House x -3..3, z -2.5..2.5 (6 x 5), one room. The covered cistern, a stone
+# tank, stands behind it at z -4.1..-2.6 against Anvil Rock's foot, where the
+# seep leaves the face (the face is sheer at plan z -20.5; the shelf runs to -20).
+# The front threshold ramp z 2.5..3.9 meets the Cistern spur. Section in the
+# design brief, 4.6.
+
+const CISTERN_ORIGIN := Vector2(-2.0, -15.9)
+const CISTERN_HALF := Vector2(3.0, 2.5)
+const CISTERN_TANK := Rect2(-3.0, -4.1, 6.0, 1.5)
+const CISTERN_TANK_TOP := 1.45
+const STONE := Color(0.62, 0.60, 0.55)
+const MOSS := Color(0.32, 0.44, 0.24)
+
+
+static func cistern_house() -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = "CisternHouse"
+	var f := HOUSE_FLOOR
+	var green := _household("village")
+	var hx := CISTERN_HALF.x
+	var hz := CISTERN_HALF.y
+	var plate := f + StiltKit.RING_BEAM
+	var xs: Array[float] = [-hx, 0.0, hx]
+	var rows: Array = []
+	for z: float in [-hz, 0.0, hz]:
+		var row: Array[Vector2] = []
+		for x in xs:
+			row.append(Vector2(x, z))
+		rows.append(row)
+		StiltKit.beam(body, Vector2(-hx - 0.1, z), Vector2(hx + 0.1, z), f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH * 0.5, Vector2(0.11, StiltKit.BEAM_DEPTH * 0.5))
+	StiltKit.piles(body, rows, f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH, SHELF_Y)
+	StiltKit.floor_slab(body, Rect2(-hx, -hz, hx * 2.0, hz * 2.0), f)
+
+	# A store: one public door, no glazing to the front; a small north hatch
+	# over the tank for cleaning it, which also lights the shelves.
+	var no_openings: Array[Dictionary] = []
+	StiltKit.wall(body, Vector2(-hx, hz), Vector2(hx, hz), Vector2(0, 1), f, StiltKit.RING_BEAM,
+		[StiltKit.door(Vector2(0.0, hz))], StiltKit.TIMBER_PALE, green)
+	StiltKit.wall(body, Vector2(-hx, -hz), Vector2(hx, -hz), Vector2(0, -1), f, StiltKit.RING_BEAM,
+		[StiltKit.window(Vector2(-1.2, -hz), false)], StiltKit.TIMBER_PALE, green)
+	StiltKit.wall(body, Vector2(-hx, -hz), Vector2(-hx, hz), Vector2(-1, 0), f, StiltKit.RING_BEAM, no_openings, StiltKit.TIMBER_PALE, green)
+	StiltKit.wall(body, Vector2(hx, -hz), Vector2(hx, hz), Vector2(1, 0), f, StiltKit.RING_BEAM, no_openings, StiltKit.TIMBER_PALE, green)
+	StiltKit.ceiling(body, Rect2(-hx, -hz, hx * 2.0, hz * 2.0), plate)
+	# Posts on the bay lines, except that the front's middle line is the
+	# doorway: two rope-bound posts flank it instead.
+	for x in xs:
+		StiltKit.post(body, Vector2(x, -hz), f - StiltKit.FLOOR_THICKNESS, plate)
+	for x: float in [-hx, -0.85, 0.85, hx]:
+		StiltKit.post(body, Vector2(x, hz), f - StiltKit.FLOOR_THICKNESS, plate, StiltKit.TIMBER, absf(x) < 1.0)
+	var corners: Array[Vector2] = [Vector2(-hx, -hz), Vector2(hx, -hz), Vector2(hx, hz), Vector2(-hx, hz)]
+	for i in 4:
+		StiltKit.beam(body, corners[i], corners[(i + 1) % 4], plate - 0.1, Vector2(0.12, 0.1))
+	StiltRoofs.hip(body, CISTERN_HALF, plate, StiltKit.SHINGLE, green)
+
+	# The cistern: a stone tank from the shelf, damp and mossed at the foot,
+	# under a plank lid; the seep's stone channel from the rock face; the north
+	# gutter's downpipe into it.
+	var tank := CISTERN_TANK
+	var tank_centre := tank.get_center()
+	var tank_height := CISTERN_TANK_TOP - SHELF_Y
+	var stone := SuperEgg.build_part(Vector3(tank.size.x * 0.5, tank_height * 0.5, tank.size.y * 0.5), STONE, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	stone.position = Vector3(tank_centre.x, (CISTERN_TANK_TOP + SHELF_Y) * 0.5, tank_centre.y)
+	body.add_child(stone)
+	CollisionPolicy.add_box(body, stone, Vector3(tank.size.x, tank_height, tank.size.y), stone.position, Basis(), true)
+	var moss := SuperEgg.build_part(Vector3(tank.size.x * 0.5 + 0.03, 0.35, tank.size.y * 0.5 + 0.03), MOSS, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
+	moss.position = Vector3(tank_centre.x, 0.2, tank_centre.y)
+	body.add_child(moss)
+	CollisionPolicy.mark_decorative(moss)
+	for i in 5:
+		var plank := SuperEgg.build_part(Vector3(0.58, 0.04, tank.size.y * 0.5 + 0.06), StiltKit.TIMBER.darkened(0.05 * float(i % 2)), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		plank.position = Vector3(tank.position.x + 0.6 + 1.2 * float(i), CISTERN_TANK_TOP + 0.04, tank_centre.y)
+		body.add_child(plank)
+		CollisionPolicy.mark_decorative(plank)
+	var channel_from := Vector3(-0.6, 2.1, -4.7)
+	var channel_to := Vector3(-0.6, CISTERN_TANK_TOP + 0.12, tank_centre.y)
+	var along := (channel_to - channel_from).normalized()
+	var channel := SuperEgg.build_part(Vector3(0.16, 0.08, channel_from.distance_to(channel_to) * 0.5), STONE.darkened(0.1), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
+	channel.transform = Transform3D(Basis.looking_at(-along, Vector3.UP), (channel_from + channel_to) * 0.5)
+	body.add_child(channel)
+	CollisionPolicy.mark_decorative(channel)
+	var trickle := SuperEgg.build_part(Vector3(0.08, 0.02, channel_from.distance_to(channel_to) * 0.5), Color(0.55, 0.75, 0.85, 0.8), 2.0, 2.0)
+	trickle.transform = Transform3D(Basis.looking_at(-along, Vector3.UP), (channel_from + channel_to) * 0.5 + Vector3(0, 0.07, 0))
+	body.add_child(trickle)
+	CollisionPolicy.mark_decorative(trickle)
+	var north_gutter_y := plate + StiltRoofs.PLATE - StiltRoofs.EAVE * tan(StiltRoofs.PITCH) - 0.1
+	StiltKit.beam(body, Vector2(-hx - 0.9, -hz - 0.92), Vector2(hx + 0.9, -hz - 0.92), north_gutter_y, Vector2(0.06, 0.05))
+	var downpipe := SuperEgg.build_part(Vector3(0.045, (north_gutter_y - CISTERN_TANK_TOP) * 0.5, 0.045), StiltKit.TIMBER_DARK, 2.2, SuperEgg.EPSILON_FLAT)
+	downpipe.position = Vector3(1.6, (north_gutter_y + CISTERN_TANK_TOP) * 0.5, -hz - 0.92)
+	body.add_child(downpipe)
+	CollisionPolicy.mark_decorative(downpipe)
+
+	# The tap: a pipe from the tank along the east wall to a spout on the front,
+	# with the bucket ledge beneath it, over the east part of the apron.
+	var pipe_y := f + 1.25
+	StiltKit.beam(body, Vector2(hx + 0.1, tank.end.y - 0.1), Vector2(hx + 0.1, hz + 0.1), pipe_y, Vector2(0.04, 0.04), Furnishings.CLAY.darkened(0.2))
+	StiltKit.beam(body, Vector2(hx + 0.1, hz + 0.1), Vector2(1.7, hz + 0.1), pipe_y, Vector2(0.04, 0.04), Furnishings.CLAY.darkened(0.2))
+	Furnishings.piece(body, Vector3(0.05, 0.12, 0.05), Color(0.62, 0.50, 0.28), Vector3(1.7, pipe_y - 0.1, hz + 0.16), 0.0, false, 2.2)
+	var ledge := SuperEgg.build_part(Vector3(0.45, 0.04, 0.2), StiltKit.TIMBER, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	ledge.position = Vector3(1.7, f + 0.45, hz + 0.28)
+	body.add_child(ledge)
+	CollisionPolicy.add_box(body, ledge, Vector3(0.9, 0.08, 0.4), ledge.position, Basis(), true)
+	Furnishings.piece(body, Vector3(0.16, 0.14, 0.16), Color(0.50, 0.42, 0.30), Vector3(1.85, f + 0.63, hz + 0.28), 0.0, false, 2.2)
+
+	# The threshold: a broad ramp from the spur up to the door, wide enough for
+	# the tap's queue beside the doorway.
+	StiltKit.ramp(body, Vector2(0.6, hz + 1.4), Vector2(0.6, hz), DECK_TOP, f, 3.6)
+	ClearZones.add_lane(body, "spur to the stores door", [Vector3(0.0, f, hz + 1.2), Vector3(0.0, f, hz + 0.6)], 0.55)
+	ClearZones.add_lane(body, "into the stores", [Vector3(0.0, f, hz + 0.6), Vector3(0.0, f, hz - 1.3)])
+
+	_cistern_interior(body, f)
+	return body
+
+
+static func _cistern_interior(body: StaticBody3D, f: float) -> void:
+	var layout := RoomLayout.new(body, CISTERN_HALF - Vector2(0.08, 0.08))
+	var w := CISTERN_HALF.x - 0.08
+	var n := CISTERN_HALF.y - 0.08
+	# Shelves along three walls: rope and pitch to the north, lamp oil in jars to
+	# the west, dried food in lidded baskets to the east.
+	if not layout.at_any([{"pos": Vector2(1.3, -n + 0.17), "yaw": StiltKit.yaw_back_to(Vector2(0, -1))}], 1.2, 0.17, 0.5, "rope and pitch shelf").is_empty():
+		Furnishings.shelf(body, Vector3(1.3, f, -n + 0.17), StiltKit.yaw_back_to(Vector2(0, -1)), 2.4, 3, "boxes")
+	if not layout.at_any([{"pos": Vector2(-w + 0.17, -0.5), "yaw": StiltKit.yaw_back_to(Vector2(-1, 0))}], 1.2, 0.17, 0.5, "oil jar shelf").is_empty():
+		Furnishings.shelf(body, Vector3(-w + 0.17, f, -0.5), StiltKit.yaw_back_to(Vector2(-1, 0)), 2.4, 3, "crocks")
+	if not layout.at_any([{"pos": Vector2(w - 0.17, -0.5), "yaw": StiltKit.yaw_back_to(Vector2(1, 0))}], 1.2, 0.17, 0.5, "basket shelf").is_empty():
+		Furnishings.shelf(body, Vector3(w - 0.17, f, -0.5), StiltKit.yaw_back_to(Vector2(1, 0)), 2.4, 3, "boxes")
+	# A stack of spare lamps, and Leena's stool by the door where she checks the
+	# jars in the evening, under the ledger of beads on wires, one per household.
+	if not layout.at_any([{"pos": Vector2(-1.4, n - 0.5), "yaw": 0.0}], 0.23, 0.23, 0.0, "Leena's stool", 0.5).is_empty():
+		Furnishings.stool(body, Vector3(-1.4, f, n - 0.5))
+	_bead_ledger(body, Vector3(-1.6, f, n - 0.02))
+	if not layout.at_any([{"pos": Vector2(1.9, n - 0.4), "yaw": 0.0}], 0.35, 0.3, 0.0, "spare lamps", 0.5).is_empty():
+		Furnishings.piece(body, Vector3(0.35, 0.18, 0.3), Furnishings.OAK_DARK, Vector3(1.9, f + 0.18, n - 0.4), 0.0, true)
+		for i in 4:
+			Furnishings.piece(body, Vector3(0.1, 0.09, 0.1), Color(0.9, 0.66, 0.28), Vector3(1.7 + 0.14 * float(i), f + 0.45, n - 0.4 + 0.08 * float(i % 2)), 0.0, false, 2.2)
+	for failure in layout.failures:
+		push_warning("CisternHouse interior: " + failure)
+	Furnishings.hanging_lamp(body, Vector3(0.0, f + 2.6, -0.3), 0.6, 5.0)
+
+
+## Leena's ledger: a board of wires, one per household, with beads for each
+## share drawn from the stores, each household in its own colour.
+static func _bead_ledger(body: StaticBody3D, at: Vector3) -> void:
+	Furnishings.piece(body, Vector3(0.45, 0.32, 0.015), Furnishings.OAK, at + Vector3(0, 1.6, 0))
+	var households := ["Venn", "Aran", "Vale", "Mor", "Sen"]
+	for i in households.size():
+		var y := 1.85 - 0.12 * float(i)
+		Furnishings.piece(body, Vector3(0.4, 0.006, 0.006), Furnishings.IRON, at + Vector3(0, y, -0.03))
+		for b in 2 + i % 3:
+			Furnishings.piece(body, Vector3(0.025, 0.025, 0.025), FishingVillagePlan.HOUSEHOLD_COLORS[households[i]], at + Vector3(-0.32 + 0.06 * float(b), y, -0.035), 0.0, false, 2.0)
+
+
+# ---------------------------------------------------------------------------
+# 4.7 Net shed and gear loft (Salim, shared with Jori)
+# ---------------------------------------------------------------------------
+# Body frame: origin at the shed's centre, plan (8, -16.5), at W. A deck fills
+# the footprint (x -4..4, z -3.5..4.5) at the public deck height, flush with
+# the spur. The shed, x -3..3, z -3..3, is open south, east and west under a
+# high gable; boarded on the north. A loft 2 m deep along the north at 2.6 m,
+# reached by a 32 degree ramp up the west side. See the design brief, 4.7.
+
+const NET_SHED_ORIGIN := Vector2(8.0, -16.5)
+const NET_SHED_HALF := Vector2(3.0, 3.0)
+const NET_SHED_POSTS := 4.8
+const NET_LOFT_RISE := 2.6
+const NET_LOFT_EDGE := -1.0
+const NET_COLOR := Color(0.30, 0.34, 0.28)
+
+
+static func net_shed() -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = "NetShed"
+	var f := DECK_TOP
+	var hx := NET_SHED_HALF.x
+	var hz := NET_SHED_HALF.y
+	var plate := f + NET_SHED_POSTS
+	var loft_y := f + NET_LOFT_RISE
+
+	# The deck and its piles.
+	var rows: Array = []
+	for z: float in [-3.5, -0.5, 2.5, 4.5]:
+		var row: Array[Vector2] = []
+		for x: float in [-4.0, -1.35, 1.35, 4.0]:
+			row.append(Vector2(x, z))
+		rows.append(row)
+		StiltKit.beam(body, Vector2(-4.1, z), Vector2(4.1, z), f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH * 0.5, Vector2(0.11, StiltKit.BEAM_DEPTH * 0.5))
+	StiltKit.piles(body, rows, f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH, SHELF_Y)
+	StiltKit.floor_slab(body, Rect2(-4.0, -3.5, 8.0, 8.0), f)
+
+	# Frame. No post stands in the 6 m front opening where the spur arrives: a
+	# deeper front beam spans it. Tie beams on the bay lines carry the nets.
+	for x: float in [-hx, 0.0, hx]:
+		StiltKit.post(body, Vector2(x, -hz), f - StiltKit.FLOOR_THICKNESS, plate)
+	for x: float in [-hx, hx]:
+		StiltKit.post(body, Vector2(x, 0.0), f - StiltKit.FLOOR_THICKNESS, plate)
+		StiltKit.post(body, Vector2(x, hz), f - StiltKit.FLOOR_THICKNESS, plate, StiltKit.TIMBER, true)
+	StiltKit.beam(body, Vector2(-hx, hz), Vector2(hx, hz), plate - 0.2, Vector2(0.13, 0.2))
+	StiltKit.beam(body, Vector2(-hx, -hz), Vector2(hx, -hz), plate - 0.1, Vector2(0.12, 0.1))
+	for x: float in [-hx, 0.0, hx]:
+		StiltKit.beam(body, Vector2(x, -hz), Vector2(x, hz), plate - 0.1, Vector2(0.1, 0.1))
+
+	# The north wall, boards full height, and the gable ends boarded above the
+	# plate up to the rafters.
+	var no_openings: Array[Dictionary] = []
+	StiltKit.wall(body, Vector2(-hx, -hz), Vector2(hx, -hz), Vector2(0, -1), f, NET_SHED_POSTS, no_openings, StiltKit.TIMBER_PALE, StiltKit.TIMBER_DARK)
+	var rise := tan(StiltRoofs.PITCH)
+	var peak := hz * rise + StiltRoofs.PLATE - StiltRoofs.THICKNESS - 0.02
+	for x: float in [-hx, hx]:
+		var cuts := [{"a": peak, "b": rise}, {"a": peak, "b": -rise}]
+		TownProps._build_panel_facade(body, hz * 2.0, Vector3(x, plate, 0.0), -PI * 0.5, StiltKit.TIMBER_PALE, [], plate, peak + 0.1, TownProps.WALL_THICKNESS, cuts)
+	StiltRoofs.gable(body, NET_SHED_HALF, plate, StiltKit.SHINGLE, _household("village"))
+
+	# The gear loft along the north wall, its edge beam on two posts, a rail
+	# along its open edge except at the ramp's head.
+	StiltKit.slab(body, Rect2(-hx, -hz, hx * 2.0, NET_LOFT_EDGE + hz), loft_y - 0.08, 0.16, StiltKit.PLANK, true)
+	StiltKit.beam(body, Vector2(-hx, NET_LOFT_EDGE), Vector2(hx, NET_LOFT_EDGE), loft_y - 0.26, Vector2(0.1, 0.1))
+	for x: float in [-1.2, 1.5]:
+		StiltKit.post(body, Vector2(x, NET_LOFT_EDGE), f, loft_y - 0.16)
+	StiltKit.rail(body, Vector2(-1.35, NET_LOFT_EDGE), Vector2(hx - 0.15, NET_LOFT_EDGE), loft_y)
+	var ramp_x := -hx + 0.85
+	var ramp_run := NET_LOFT_RISE / tan(TownProps.RAMP_PITCH)
+	StiltKit.ramp(body, Vector2(ramp_x, NET_LOFT_EDGE + ramp_run), Vector2(ramp_x, NET_LOFT_EDGE), f, loft_y, TownProps.RAMP_WIDTH)
+	StiltKit.rail(body, Vector2(ramp_x + 0.75, NET_LOFT_EDGE + ramp_run - 0.4), Vector2(ramp_x + 0.75, NET_LOFT_EDGE + 0.1), f + NET_LOFT_RISE * 0.5)
+	ClearZones.add(body, "loft ramp foot", "door", Vector2(ramp_x, NET_LOFT_EDGE + ramp_run), Vector2(0, -1), 1.2, 0.0, 0.7, f, f + 1.9)
+
+	# Nets hang from the rafters like curtains, down to 2.2 m above the floor.
+	for net: Vector3 in [Vector3(-0.2, 0.0, 1.5), Vector3(1.1, 0.8, 1.2), Vector3(0.4, 1.9, 1.7), Vector3(2.2, -0.2, 1.0)]:
+		var top := plate + 0.2
+		var bottom := f + 2.2
+		var sheet := SuperEgg.build_part(Vector3(net.z * 0.5, (top - bottom) * 0.5, 0.02), NET_COLOR.lightened(0.05 * net.x), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+		sheet.position = Vector3(net.x, (top + bottom) * 0.5, net.y)
+		body.add_child(sheet)
+		CollisionPolicy.mark_decorative(sheet)
+		for k in 4:
+			var float_ball := SuperEgg.build_part(Vector3(0.06, 0.06, 0.06), Color(0.86, 0.62, 0.24), 2.0, 2.0)
+			float_ball.position = Vector3(net.x - net.z * 0.4 + net.z * 0.27 * float(k), bottom + 0.05, net.y)
+			body.add_child(float_ball)
+			CollisionPolicy.mark_decorative(float_ball)
+
+	# Under the loft: the mending bench with a half-tied mesh and the netting
+	# needle, the tar barrel, the cat asleep in its basket. Floats in baskets on
+	# the east side, traps and floats stacked in the loft.
+	Furnishings.bench(body, Vector3(0.6, f, -hz + 0.35), 0.0, 1.8)
+	Furnishings.piece(body, Vector3(0.5, 0.01, 0.25), NET_COLOR, Vector3(0.4, f + 0.5, -hz + 0.35), 0.0, false, SuperEgg.EPSILON_SOFT)
+	Furnishings.piece(body, Vector3(0.12, 0.012, 0.02), Furnishings.OAK_LIGHT, Vector3(1.0, f + 0.52, -hz + 0.35), 0.4)
+	Furnishings.barrel(body, Vector3(2.4, f, -hz + 0.5), 0.45)
+	Furnishings.piece(body, Vector3(0.28, 0.1, 0.22), Color(0.62, 0.50, 0.32), Vector3(-0.6, f + 0.1, -hz + 0.4), 0.0, false, SuperEgg.EPSILON_SOFT)
+	Furnishings.piece(body, Vector3(0.17, 0.09, 0.12), Color(0.28, 0.24, 0.22), Vector3(-0.6, f + 0.2, -hz + 0.4), 0.2, false, 2.2)
+	Furnishings.piece(body, Vector3(0.06, 0.05, 0.06), Color(0.28, 0.24, 0.22), Vector3(-0.42, f + 0.24, -hz + 0.42), 0.0, false, 2.2)
+	for i in 3:
+		var basket := Vector3(hx - 0.45, f, 0.4 + 0.75 * float(i))
+		Furnishings.piece(body, Vector3(0.3, 0.22, 0.3), Color(0.66, 0.52, 0.32), basket + Vector3(0, 0.22, 0), 0.0, true, SuperEgg.EPSILON_SOFT)
+		for k in 3:
+			Furnishings.piece(body, Vector3(0.09, 0.09, 0.09), Color(0.86, 0.62, 0.24).darkened(0.1 * float(k)), basket + Vector3(-0.1 + 0.1 * float(k), 0.48, 0.05 * float(k - 1)), 0.0, false, 2.0)
+	for i in 4:
+		Furnishings.piece(body, Vector3(0.35, 0.22, 0.28), Furnishings.OAK.darkened(0.08 * float(i % 2)), Vector3(-0.2 + 0.8 * float(i), loft_y + 0.22, -hz + 0.5), 0.1 * float(i), true)
+	# Salim's lucky knot, tied off over the opening.
+	StiltKit.rope_binding(body, Vector2(0.0, hz), plate - 0.75, plate - 0.55, 0.06)
+	Furnishings.piece(body, Vector3(0.01, 0.25, 0.01), StiltKit.ROPE, Vector3(0.0, plate - 0.95, hz), 0.0, false)
+	Furnishings.hanging_lamp(body, Vector3(0.0, plate - 1.1, 0.4), 0.7, 6.0)
+
+	ClearZones.add_lane(body, "spur into the shed", [Vector3(0.0, f, 4.2), Vector3(0.0, f, 0.0)], 0.55)
+	ClearZones.add_lane(body, "to the loft ramp", [Vector3(0.0, f, 3.4), Vector3(ramp_x, f, NET_LOFT_EDGE + ramp_run + 0.6)])
+	ClearZones.add_lane(body, "the loft", [Vector3(ramp_x, loft_y, -1.6), Vector3(hx - 0.6, loft_y, -1.4)])
+	return body
 
 
 # ---------------------------------------------------------------------------

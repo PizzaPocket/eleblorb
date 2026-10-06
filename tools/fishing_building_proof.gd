@@ -7,7 +7,9 @@ extends Node3D
 ##   - every solid visual has its collider (CollisionPolicy.validate_body);
 ##   - furniture clear of doors, windows and fires, routes walkable
 ##     (ClearZones.audit) and no wall standing in a void (audit_stacking);
-##   - every pile stands on a shelf (FishingVillagePlan.shelf_distance).
+##   - every pile stands on a shelf (FishingVillagePlan.shelf_distance);
+##   - no rock rises into the structure's plan rect above its floor beams (the
+##     islets are built from the same heightfield the village uses).
 ## Headless, it audits and quits. With a window it also saves renders: aerial,
 ## approach, eye level at the counter, the front, the north side and a roofless
 ## cutaway of the rooms.
@@ -15,7 +17,17 @@ extends Node3D
 ##   Godot --headless --path . tools/fishing_building_proof.tscn -- --building=VennHouse
 ##   Godot --path . tools/fishing_building_proof.tscn -- --building=VennHouse --shots=/abs/dir
 
+## Stands in for the world terrain: the lake surface at 0, the deep bed below.
+class StubTerrain:
+	extends Node
+	func get_lake_water_level() -> float:
+		return 0.0
+	func get_mesh_height(_x: float, _z: float) -> float:
+		return -135.0
+
+
 var _failures := 0
+var _stub := StubTerrain.new()
 var _building := "VennHouse"
 var _shots := ""
 
@@ -72,6 +84,28 @@ func _audit(body: StaticBody3D, anchor: Vector2) -> void:
 			if FishingVillagePlan.shelf_distance(plan) > -0.2:
 				_fail("pile at plan (%.1f, %.1f) is not on a shelf" % [plan.x, plan.y])
 	print("ok   %s: %d piles, %d colliders" % [_building, piles, body.find_children("*", "CollisionShape3D", true, false).size()])
+	# Rock clearance over the plan footprint, at 0.5 m.
+	for structure in FishingVillagePlan.STRUCTURES:
+		if structure["name"] != _building:
+			continue
+		var rect: Rect2 = structure["rect"]
+		var underside := FishingBuildings.HOUSE_FLOOR - 0.6
+		var worst := -INF
+		var worst_at := Vector2.ZERO
+		var x := rect.position.x
+		while x <= rect.end.x + 0.01:
+			var z := rect.position.y
+			while z <= rect.end.y + 0.01:
+				var h := FishingIslets._height(Vector2(x, z), _stub, 0.0)
+				if h > worst:
+					worst = h
+					worst_at = Vector2(x, z)
+				z += 0.5
+			x += 0.5
+		if worst > underside:
+			_fail("rock rises to W%+.2f at plan (%.1f, %.1f), into %s (beams at W%+.2f)" % [worst, worst_at.x, worst_at.y, _building, underside])
+		else:
+			print("ok   rock clearance: highest ground under %s is W%+.2f at (%.1f, %.1f)" % [_building, worst, worst_at.x, worst_at.y])
 
 
 ## The stand-in lake, light and sky, and the arrival landing for scale.
@@ -97,6 +131,11 @@ func _stage() -> void:
 	water.material_override = SolidModel.material(Color(0.16, 0.38, 0.46), 0.2, 0.0)
 	water.position = Vector3(0.0, -0.02, 0.0)
 	add_child(water)
+	add_child(_stub)
+	# The islets are placed at the village's world centre; the proof works in
+	# plan coordinates, so bring them to the origin.
+	for islet in FishingIslets.build(self, _stub):
+		islet.global_position = Vector3(0.0, 0.0, 0.0)
 	for structure in FishingVillagePlan.STRUCTURES:
 		if structure["name"] == "ArrivalLanding":
 			var rect: Rect2 = structure["rect"]
@@ -118,7 +157,7 @@ func _render(body: StaticBody3D, anchor: Vector2) -> void:
 		"approach": [c + Vector3(-9, 2.2, 13), c + Vector3(0, 1.8, 0)],
 		"counter_eye": [c + Vector3(-2.0, 2.1, 9.5), c + Vector3(-3.0, 1.5, 3.0)],
 		"front": [c + Vector3(2, 2.0, 14), c + Vector3(0, 1.8, 0)],
-		"north_side": [c + Vector3(10, 5, -12), c],
+		"north_side": [c + Vector3(14, 7, -5), c + Vector3(0, 0, -2)],
 		"east_side": [c + Vector3(14, 3, 3), c],
 	}
 	for view: String in views:

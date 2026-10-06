@@ -231,6 +231,20 @@ and the family's rooms at the back.
   and Rian stayed after the storm season; the porch was added later for the
   clinic queue, its posts paler.
 
+- **Built (2026-10-07)** in `FishingBuildings.sen_house()`, proved in isolation
+  (0 FAIL) and placed in the village. Three positions moved so every frame
+  clears its neighbour:
+  - the clinic door to `x -15.95` (at `-15.5` its frame touched the clinic
+    window's);
+  - the school door to `x -12.0` (at `-12.5` the school room's south window
+    had no room between the partition and the door);
+  - the porch ramp centred on the clinic door, 2.6 m wide, so it lands on the
+    spur's end and passes between the two rope-bound posts.
+  Every door in the village now swings inward, into the room it serves
+  (`StiltKit.door`): with an outward leaf the clinic door would have filled the
+  2 m porch in front of the ramp. The Venn front door became a pair of narrow
+  leaves for the same reason inside its 3 m living room.
+
 ### 4.5 Rian's shell-works barge
 
 - **Plan.** A floating barge 8 x 3.5 m at `x -20..-12, z -3..0.5`: open work
