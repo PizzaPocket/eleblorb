@@ -38,7 +38,7 @@ kingdom's story, as it is in the Sky Kingdom.
 | Island and pirates | trade for water and food on the beach | the pirates are barred |
 | Sea folk and pirates | avoidance | hatred; the sea folk say the ships foul the reef |
 | The two ships | contempt | open war |
-| The cage island and everyone | — | its mongooses profit from the discord: each community sends a contender to the cage |
+| The cage island and everyone | — | its savage mongooses feed on it from the discord: each community sends a contender to the cage |
 | Everyone and the Kraken | fear | fear |
 
 ## Shared decisions for the kingdom

@@ -46,129 +46,105 @@ twitchy alertness of the real animal. They run the tournament and fill the
 stands. (A hermit-crab proposal was rejected earlier.)
 
 A note on the choice: in the real Hawaiian islands, the mongoose is the
-best-known invasive animal, brought in the 1800s to kill rats in the cane
-fields and instead devastating native birds. A people of outsiders who thrive
-on everyone else's quarrels fits that history closely.
+best-known invasive animal. It was brought in the 1800s to kill rats in the
+cane fields and instead devastated native birds: an animal out of place. That
+is these mongooses too.
 
-### Culture (proposed 2026-10-06)
+### Who they are (user direction, 2026-10-06)
 
-The design starts from the real animal and the island's purpose.
+- **Savage fiends who thrive on violence.** They set up the cage arena for one
+  reason: they love to watch fighting, and to make others fight.
+- **Base beasts of low intelligence.** They have no trade, no records and no
+  plan beyond the next fight. They snarl, shove, squabble over food and mob
+  together in a screeching crowd whenever blood is in the air.
+- **Their leader wears what looks like a Hawaiian shirt,** almost certainly
+  taken from Kai Mālie across the water. It is the only real garment on the
+  island and the mark of who is in charge.
+- **The rest wear simple clothing of grass and leaves.**
+- **Out of harmony with their place.** Their savagery is not the whole of
+  what they are. Right now they are badly out of harmony with their island and
+  with everything around it, and the Demon King's discord feeds it. If things
+  changed, they could finally find that harmony and be at peace (see "When
+  harmony returns", below).
 
-**Real mongooses** live in bands that sleep together in one den, sun themselves
-on rocks every morning, post a sentry on high ground, mob any threat together
-in a chattering crowd, and are famous for fearlessly fighting snakes. (Street
-shows of mongoose against cobra were a showman's trade in South Asia for
-centuries.) Banded mongooses raise their pups communally, each pup shadowed by
-one adult "escort".
+### The band (proposed 2026-10-06)
 
-**The cage island's people** are one such band, turned showmen.
+One band of twelve: ten adults and two pups. As with real mongooses, they
+sleep together in one den and act as one crowd. They have only short names for
+one another, simple sounds rather than words from any human language.
 
-- **Outsiders.** They belong to none of the kingdom's communities. They came
-  ashore long ago from a ship, as rat-catchers (as the real mongoose came to
-  Hawaii), took the empty crater, and never left. Kai Mālie, the sea folk and the
-  pirates all regard them as pests. They do not mind.
-- **The grudge trade.** Their living is other people's quarrels:
-  - A community with a score to settle sends a contender to the cage.
-  - The band hosts the fight, takes a fee and a cut of the wagers, and keeps
-    the tally of who owes whom on the board of rankings.
-  - Lately business has never been better. They have not asked why. (It is
-    the Demon King's discord; they only profit from it.)
-- **Showmanship.** Everything is a show:
-  - The chant is the band's anthem, led from the perch, the whole crowd
-    drumming on the ledges with their palms.
-  - The menace is theatre: they eat seabird eggs, fish and whatever fruit the
-    fees bring, and have never eaten anyone.
-  - When the hero beats their champion, the band mobs the cage cheering, lifts
-    the hero up, and goes on chanting "we'll eat you alive", and nothing
-    happens.
-- **One band, one den.** All twelve sleep together in the Warren, the band's
-  den, and share everything: food, fees and the pups.
-- **Governance by chatter.** The matron keeps the purse and has the last word,
-  but decisions are taken the way the band does everything: by chattering
-  until the loudest view wins. On fight days the band acts as one crowd.
-- **Language:** the common language, spoken fast and clipped, run through with
-  chatter, chirps and the occasional growl.
-- **Names:** short names of their own, not drawn from any human language. The
-  champion fights under a ring name.
+| Name | Gender | In the band |
+|---|---|---|
+| **Vesha** | woman | the leader: the biggest, the most violent, and the one in the Hawaiian shirt; takes the first and best of everything |
+| **Kett** | woman | the champion, the tournament's final fight; quick, scarred and unbeaten |
+| **Brask** | man | the loudest: starts the chant from the crest by howling it, and the rest take it up |
+| **Sorrel** | man | drags the cage gate shut behind each fighter and wedges it |
+| **Pell** | man | the lookout on the crest at dawn: the first to see someone coming, and to screech it |
+| **Quill** | woman | hoards the things taken from beaten fighters on the trophy heap by the gate |
+| **Tolle** | man | a brawler, always first into a scuffle in the stands |
+| **Dask** | man | lashes more wreckage onto the cage whenever it sags |
+| **Lune** | woman | climbs the cage's net roof during fights to scream down at the fighters |
+| **Mabby** | woman | guards the food and bites anyone who reaches for it first |
+| **Nib** | girl | pup; play-fights everything, shadowed by Kett |
+| **Tuck** | boy | pup; copies the chant badly, shadowed by Pell |
 
-### Census (proposed 2026-10-06)
+### How they live
 
-Twelve: ten adults and two pups, one band.
-
-| Name | Gender | Role | Notes |
-|---|---|---|---|
-| **Vesha** | woman | the matron | the eldest; keeps the purse and the last word; grey-muzzled; never misses a fight |
-| **Brask** | man | the announcer | leads the chant from the perch through a brass speaking trumpet salvaged from a wreck |
-| **Quill** | woman | the bookkeeper | keeps the board of rankings and the grudge tallies in chalk and notches; knows who owes whom across the whole kingdom |
-| **Kett** | woman | the champion, ring name **the Last Bite** | the island's champion and the tournament's final fight; quick, scarred, unbeaten |
-| **Sorrel** | man | the gatekeeper | opens and bars the cage gate; enforces the rules, such as they are |
-| **Pell** | man | the sentry | stands watch on the rim crest from dawn, as mongooses do; first to see a contender's boat |
-| **Tolle** | man | the crier and boatman | rows a salvaged dinghy round the kingdom carrying challenges, and fetches contenders |
-| **Dask** | man | rigger | keeps the cage's spars and nets in repair |
-| **Lune** | woman | rigger | Dask's partner on the rigging; climbs the net roof |
-| **Mabby** | woman | the cook | feeds the band on fees, eggs and fish at the fire on the crater floor |
-| **Nib** | girl | pup | escorted by Kett, who is training her |
-| **Tuck** | boy | pup | escorted by Pell, who takes him up to the crest |
-
-### Daily life
-
-- **Dawn:** the whole band sunning on the eastern ledges; Pell on the crest.
-- **Morning:** foraging along the shore and the rim for eggs and fish; the
-  riggers on the cage; Quill at the board.
-- **Fight days:** when Pell sights a boat, Brask takes the perch, the band
-  fills the stands and the chant begins.
-- **Evening:** everyone round Mabby's fire on the crater floor, retelling the
-  day's fight, louder each time.
-- **Night:** all twelve in the Warren.
+- **Speech:** a few rough words of the common language, snarls, chatter and
+  screeches. The chant is the most they ever say together.
+- **Food:** seabird eggs from the rim, fish snatched in the shallows, fruit
+  and anything else they can steal.
+- **The day:** sunning on the eastern ledges at dawn while Pell watches from
+  the crest; squabbling and foraging through the morning. When anyone lands,
+  the whole band piles into the stands and the chant begins.
+- **The night:** all twelve heaped together in their den.
+- **Fights:** they do not referee. They want a fighter to fight, and they
+  howl down anyone who will not.
 
 ### Homes and places
 
-- **The Warren:** the band's single den, dug into the rim's outer face below
-  the perch, where the tuff is thickest.
-  - Rounded burrow mouths at least 2.8 m high for their height.
-  - Inside, a big shared sleeping chamber lined with salvaged ship planking
-    and old sails.
-  - Side chambers for the pups, the purse and the salvage store.
+- **The den:** a burrow dug into the rim's outer face below the crest, where
+  the tuff is thickest. Rough mouths at least 2.8 m high for their height; one
+  big chamber floored with trampled grass, littered with eggshells and fish
+  bones.
 - **Sunning ledges:** the eastern outer ledges, worn smooth.
-- **Mabby's fire:** a stone ring on the crater floor beside the cage, clear of
-  the fighters' route.
-- **The landing:** Tolle's dinghy drawn up on the beach inside the breach.
-
-Water comes from rain caught in a tuff hollow and a salvaged barrel cistern:
-the island is too young for a spring.
+- **The trophy heap:** beside the cage gate, everything taken from beaten
+  fighters: a pirate's hat, a broken fishing spear, a sea folk shell clasp,
+  and things nobody can name.
+- **The cage:** their one great work, a crude ring of wreckage (see section 5).
+- **Water:** rain standing in hollows of the tuff. The island is too young for
+  a spring.
 
 ### Look (direction for the dress charter, character-design skill)
 
-- **Bodies:** fur in grizzled browns and greys, darker on the legs and tail
-  tip, lighter at the muzzle; tall, lean and long-backed.
-- **Dress:** a magpie showman's look made from wreck salvage: brass buttons,
-  frayed braid, a ship's bell rope as a belt, a sash of faded sailcloth.
-  - Brask carries his speaking trumpet.
-  - Quill carries chalk and a cord of notches.
-  - Kett wears bound wrists and nothing else.
-  - Vesha wears an old captain's coat far too short for her.
+- **Bodies:** grizzled brown and grey fur, darker on the legs and tail tip,
+  lighter at the muzzle; tall, lean, long-backed; scars and torn ears on the
+  fighters.
+- **Vesha:** the Hawaiian shirt, worn open, too small for her, faded and
+  torn at one sleeve.
+- **Everyone else:** simple clothing of grass and leaves, tied on with vine:
+  ragged wraps of *pili* grass and *kī* (ti) leaves at the waist or over a
+  shoulder, frayed and uneven.
+- **Care point:** keep these crude and beast-made. They must not copy the
+  shape of a hula skirt (*pāʻū*) or any Hawaiian dress, so that savage
+  animals in leaves never read as a picture of Hawaiian people.
 
-**Signature:** a strip of red sailcloth tied round the upper arm, the band's
-colour in the stands.
+### When harmony returns (story state)
 
-### After harmony (story state)
+Their violence comes from being out of harmony with their place, not from
+their nature. When things change and the discord lifts, they finally find that
+harmony and are at peace:
+- the cage goes quiet and the vines start to take it;
+- the band suns on the ledges and forages the shore without a fight in sight;
+- the chant is heard only from the pups, at play.
 
-When the kingdom's communities are reconciled, the grudge trade dries up. Vesha
-does what showmen do and changes the show: the cage becomes a ground for
-friendly games between the communities, the way the Hawaiian *Makahiki* season
-was a time of peace given over to sport. The chant stays, because they love
-it. This is a revisit state for backlog item 13.
-
-**Scale consequences for the environment:**
-- Seats on the stands are sized for them: ledge seats about 0.6 m high, with
-  1 m of knee room.
-- Any doorway or shelter of theirs is at least 2.8 m high.
-- The cage gate (3 m) and the 3.2 m route headroom already clear them.
+What exactly changes to bring this about is open. This is a revisit state for
+backlog item 13.
 
 ## 3a. The chant
 
-The inhabitants chant at every fight, from the stands and as the hero enters
-the cage. The text is fixed by the user and is used exactly as written:
+The mongooses chant at every fight, from the stands and as the hero enters the
+cage. The text is fixed by the user and is used exactly as written:
 
 > Fight, fight.
 > Fight or you'll die.
@@ -178,13 +154,12 @@ the cage. The text is fixed by the user and is used exactly as written:
 (Updated by the user on 2026-10-06; it replaces the earlier "Fight. Fight. /
 You must fight. / If you win, we kill you. / If you lose, you die.")
 
-It is a crowd chant, not an explanation of the rules: winning does not
-actually lead to the crowd eating the hero. Its menace is the joke.
+They mean it. What actually happens when the hero wins is open.
 
 ## 4. The tournament
 
 A short tournament of a few opponents. The hero fights contenders sent by the
-kingdom's feuding communities, then the island's own champion. The creatures
+kingdom's feuding communities, then the island's own champion. The mongooses
 thrive on the Demon King's discord, which sends each community to settle its
 scores in the cage; beating the contenders is part of how the hero breaks the
 cycle of grievance, though the reconciliation itself happens elsewhere.
@@ -204,20 +179,19 @@ are open.
 
 The crater is the arena; little has to be built.
 
-- **The cage:** an octagonal cage about 18 m across on the crater floor, its
-  gate facing the breach and the landing beach.
+- **The cage:** a crude ring about 18 m across on the crater floor, beast-made
+  from driftwood, wreck spars and old fishing nets lashed with vine, its gate
+  facing the breach and the landing beach.
 - **The stands:** the rim's inner ledges, around about 260° of the crater,
   improved with salvaged timber where a ledge needs a seat or an edge. Three
   ramped aisles (2 m wide, no steeper than 1:4 on the natural slope) climb from
   the floor to the crest.
-- **Announcer's perch:** on the rim crest opposite the gate, the highest point
-  of the island and visible from the sea.
-- **Board of rankings:** on a flat tuff face beside the gate (pictures and
-  marks, never words).
+- **Howling rock:** on the rim crest opposite the gate, the highest point of
+  the island and visible from the sea, where Brask starts the chant.
+- **Trophy heap:** beside the gate, outside the cage.
 - **Landing:** the beach inside the breach; arrivals walk straight up the
   floor to the cage gate, under the eyes of the whole rim.
-- **Homes:** wait on the mongooses' design; the rim's outer ledges and the horns are
-  the natural places for them.
+- **The den:** dug into the rim's outer face below the crest (section 3).
 - **Routes:** every public route, aisle and the cage gate meet the hero's and
   party's minimums (3 m on the floor and beach, 2 m on aisles, 3.2 m headroom).
 
@@ -237,13 +211,13 @@ frame as in section 2: origin at the crater centre, `w` toward the arrival dock,
 | Crater floor | level packed sand and tuff, 26 m across, at +2.5 m, centred at `w = -4` |
 | Stands | three natural ledges on the rim's inner face, at +5, +7.5 and +10 m, each about 2.5 m deep, running about 260° around the crater; timber edges and seats where a ledge needs them |
 | Aisles | three ramped aisles 2 m wide, at bearings 90°, 180° and 270° from `+w`, no steeper than 1:4, from the floor to the top ledge and on to the crest |
-| Announcer's perch | a flat tuff platform 4 × 3 m on the crest at `w = -30`, +16 m, facing the gate |
-| Cage | a regular octagon 18 m across the flats, on the crater floor; walls of salvaged spars and lashed net 4.5 m high; a net roof at 6 m so no fighter leaves by air; one gate 3 m wide facing `+w` and the beach; a sand floor ringed in timber |
-| Board of rankings | a flat tuff face beside the gate, outside the cage |
+| Howling rock | a flat tuff platform 4 × 3 m on the crest at `w = -30`, +16 m, facing the gate |
+| Cage | a crude, lopsided ring about 18 m across on the crater floor; walls of driftwood, wreck spars and fishing net lashed with vine, 4 to 5 m high and uneven; a sagging net roof at about 6 m so no fighter leaves by air; one gate 3 m wide facing `+w` and the beach, dragged shut and wedged; a trampled sand floor |
+| Trophy heap | beside the gate, outside the cage, about 3 m across |
 
 ### Collision and traversal
 
-- The rim, ledges, aisles, perch, floor and beach are solid ground; the outer
+- The rim, ledges, aisles, howling rock, floor and beach are solid ground; the outer
   slopes are steep enough to discourage climbing but not walled.
 - The cage's spars, net walls and net roof are solid; the gate opens and closes.
 - Routes: 3 m on the beach and floor, 2 m on the aisles, 3.2 m headroom
@@ -268,8 +242,14 @@ kingdom's communities, including an old pirate.
 natural stands; the four-fight order with Makoa, Tudaro
 and Old Kelp; the cage and stands.
 
-**Proposed (culture):** the band of twelve and their roles, the grudge trade,
-the Warren, daily life, the look, and the games after harmony.
+**Fixed (user direction, 2026-10-06):** savage fiends who thrive on violence
+and built the cage; base beasts of low intelligence; the leader in a Hawaiian
+shirt probably taken from Kai Mālie, the rest in simple grass and leaves; out
+of harmony with their place, and able to find peace if things change.
 
-**Open:** how fights work; the prizes; whether the Fortune's
+**Proposed (culture):** the band of twelve, the den, the trophy heap, the
+howling rock, the crude cage, the look, and the quiet state after harmony.
+
+**Open:** what change brings them into harmony; what happens when the hero
+wins; whose shirt Vesha wears; how fights work; the prizes; whether the Fortune's
 Rag sends a contender too.
