@@ -291,6 +291,7 @@ Planning priorities:
 - The main island becomes an old, eroded 28 m volcano with a windward valley
   holding the taro terraces; the cage island becomes a young crescent crater
   whose rim forms the stands. Review both in the layout and cage briefs.
+- Review Kai Mālie's architecture briefs (`docs/architecture/ocean_island_village_buildings.md`).
 - Review the planting plan (`docs/architecture/ocean_landscape.md`): Hawaiian
   zonation under north-east trade winds, canoe plants around Kai Mālie, natives
   in the wild, one character per islet, and the new plant builders it needs.
