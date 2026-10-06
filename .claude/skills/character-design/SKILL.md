@@ -107,6 +107,51 @@ When a charter needs a garment the kit lacks (a lei, an aloha shirt, an apron,
 a robe), add it as a reusable option in the shared figure code, as `FigureDress`
 was, with a flag on `npc.gd`, and record it in this section.
 
+## 4a. Gendered bodies and dress
+
+`is_female` drives the rig's proportions and several dress rules. Set it
+explicitly for every named resident; leaving it at the default builds a male
+body and draws from male pools.
+
+**Body proportions.** Height and build come from separate per-gender pools
+(`town_generator.gd`, `NPC_*_SCALES`; mirrored in community profiles such as
+`WINTER_APPEARANCE`):
+
+| Measure | Women | Men | Notes |
+|---|---|---|---|
+| `body_scale` (height) | 0.84 to 0.99 | 0.97 to 1.16 | overlapping at the middle |
+| `chest_build_scale` | 0.86 to 1.0 | 1.01 to 1.18 | only men get broad chests; arms follow the chest |
+| `hip_build_scale` | 0.98 to 1.16 | 0.92 to 1.07 | women tend wider in the hips; legs always follow the hips |
+| `abdomen_width_scale` | 0.94 to 1.32 | same | shared, wide, one-directional: 1.0 is the narrow end |
+
+Per-gender pools need their own counters; a shared counter indexing a gendered
+pool was a real bug. Non-human peoples set fixed gendered proportions in their
+own scripts (sea folk chest 0.90 and hips 1.06 for women, 1.02 and 0.92 for
+men; Tempestar height 1.02 and 1.10, chest 0.88 and 1.02, hips 1.08 and 0.92).
+
+**Hair.** Women draw from a pool that always includes the bun, plus long and
+ponytail; men's pool is buzzcut, afro, flat top, bald and hero. Pigtails appear
+for girls and some women. Deliberate exceptions follow culture and rank, not
+the pool: the Emperor's raised court bun, the Chinese farmer's bald head.
+Beards (`stubble`, `full`) are for men only.
+
+**Dress.**
+- `wears_dress` is for women in ordinary use (Ohio's 32 percent chance, the Snow
+  Village's chosen indices). The dress colour follows the trousers colour, so a
+  woman's look stays in one palette.
+- The same garment serves as a man's **robe** where culture or rank calls for it:
+  the Emperor wears it, in red, with regalia and full boots. Describe it as a
+  robe in briefs.
+- Cold climates cover the legs under every skirt (`dress_has_covered_legs`).
+- Sea folk: cropped tops (`has_midriff`) and hair ornaments (shells, sea
+  flowers) are for women; men wear the full scale top.
+- Sleeve length is not gendered: the sleeveless, short and long split applies
+  to everyone, set by climate and work.
+
+**Writing gender into a census.** Name each resident's gender in the
+settlement brief when the census is written, and keep it consistent with the
+name and the world bible. Do not infer it from a name in code.
+
 ## 5. Individual variation
 
 Residents are siblings, not clones. Vary each person strongly on two or three
@@ -162,6 +207,9 @@ garment colour, hair style, hair colour, build, accessory).
   hairstyles, before `HairOrnaments` read the real hair envelope.
 - New NPCs appearing undressed because the clothing default was skin colour.
 - A winter village in bare legs and bare hands before the winter profile.
+- Pirate crews built without `is_female`: Mara Reef, Nell Crow and Ada Shoal
+  have male bodies and male hair, and the stubble rule (indices 2, 5 and 7)
+  gives Ada stubble. Still to fix in `ocean_kingdom_denizens.gd`.
 
 ## 9. Checklist
 

@@ -102,6 +102,14 @@ stairs, ladders and hatches must carry a standing body; interiors need 2.0 m
 headroom on decks the hero walks; the captain's cabin and galley are the
 priority interiors.
 
+## Known issue in the current crew
+
+`ocean_kingdom_denizens.gd` never sets `is_female`, so **Mara Reef**, **Nell
+Crow** and **Ada Shoal** are built with male bodies and male hair, and the
+stubble rule (crew indices 2, 5 and 7) gives Ada stubble. Fix when the ships
+are rebuilt: set each crew member's gender explicitly and gate beards on it
+(see the `character-design` skill).
+
 ## Fixed, proposed and open
 
 **Fixed:** two three-masted ships, their lanterns, exterior stairs and parkour,
