@@ -291,10 +291,10 @@ place:
 - **A layered culture counts as modern.** Several settlements are old
   traditions living in the present day: quaint old-timey towns with old-timey
   trades whose people wear t-shirts and have today's comforts (Ohio, Kai Mālie,
-  the Snow Village). The Chinese village is the counter-example: genuinely
-  classical, with no modern layer. Their buildings keep their historic style, and their
+  the Snow Village). Their buildings keep their historic style, and their
   bathrooms are modern: a porcelain flush toilet in a half-timbered inn is
-  correct there, not an anachronism.
+  correct there, not an anachronism. The Chinese village is the
+  counter-example: genuinely classical, with no modern layer.
 - **A culture that genuinely lives in the past gets its own tradition's
   fixture,** named by its real term in the brief: a privy or earth closet, a lidded commode, a composting
   vault, a ship's head. It is never a generic modern bowl dropped into a
