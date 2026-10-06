@@ -49,7 +49,7 @@ then what the people brought and tend.
    plant characters, not the same mix.
 
 Regional palettes live in `references/`: `hawaiian_flora.md` for the Ocean
-Kingdom. Add a reference file for any new region rather than inventing plants
+Kingdom, `southeast_asian_rainforest_flora.md` for the Plant Kingdom. Add a reference file for any new region rather than inventing plants
 per scene.
 
 ## 1. Principles

@@ -199,11 +199,15 @@ charter.
 
 **Open:**
 
-- Whether the curse touches apes.
-- Whether the surviving shadows of the ashed are visible in the village.
 - What the village makes of the Water Curtain Cave once Sun Wu Kong reclaims it.
 
+**Deferred to the storyline (2026-10-06):** whether the curse touches apes,
+and whether the surviving shadows of the ashed are visible in the village.
+
 **Resolved (2026-10-06):**
+
+- The inn moves up to the commons' edge beside the East Tree.
+- Landscape and planting: `plant_kingdom_landscape.md`.
 
 - The residents are renamed (section 3, Names).
 - Sun Wu Kong's old seat, the Water Curtain Cave, stands behind the falls at

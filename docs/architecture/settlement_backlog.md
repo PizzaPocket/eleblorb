@@ -352,8 +352,10 @@ Planning priorities:
   with a stable, paddock and gardens; household rings and rope bridges higher
   up; a grand ramp and a 32° public switchback on each tree beside the steep
   climbing ramps.
-- Decide the remaining open questions: whether the curse touches apes, and
-  whether the shadows of the ashed are seen.
+- Approved 2026-10-06: the inn moves to the commons. Whether the curse touches
+  apes and whether the shadows of the ashed are seen are deferred to the
+  storyline.
+- Landscape and planting plan: `docs/architecture/plant_kingdom_landscape.md`.
 - Approve the residents' new names (Malay and Indonesian single names; Ossian
   Redbrow keeps his) and the Water Curtain Cave brief
   (`docs/architecture/plant_kingdom_water_curtain_cave.md`).
@@ -372,3 +374,10 @@ Code work once approved (not started):
   mountain-top stream as its own small water volume.
 - A world-state switch between the cave's forgotten and reclaimed dressing,
   set by the deferred Sun Wu Kong quest.
+- **Jungle density parity with the demo world** (user requirement): at least
+  5.8 trees and 1.5 emergents per 1,000 m² across the whole kingdom, which today
+  has at most 1.2 and 0.3 inside a 420 m disc and nothing beyond it. Requires
+  streaming the scatter by seeded 64 m cells and sharing meshes first, so load
+  time does not regress; then the emergent-first fill, the 24 to 36 m tall
+  tier, the three chained vine routes, and replacing the baobab. The demo
+  window must come out the same. See `plant_kingdom_landscape.md` section 2.

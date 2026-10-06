@@ -76,7 +76,7 @@ reachable by everyone, and directly above the arrival.
 | Market | Delima's fruit stall; Rotan's rope and vine | stalls under a long leaf roof facing the grand ramp's arrival |
 | Rain cistern and washing | shared | the largest leaf roof funnels rain into a lashed barrel cistern; washing basins below it |
 | Food store | shared | hanging baskets and a raised store out of reach of ground pests |
-| Inn (proposed move) | Bima | the inn moves up from the ground to the commons' edge beside the East Tree, same price |
+| Inn | Bima | moved up from the ground to the commons' edge beside the East Tree (approved 2026-10-06), same keeper and price |
 
 ### Getting up
 
@@ -154,13 +154,12 @@ the gathering circle. Bima at the inn. No two residents share a spot.
 ## Fixed, proposed and open
 
 **Fixed:** the three trees and their positions, the gate, the inn's keeper and
-price, Ossian and Manchego, the open treehouse character.
+price, the inn's move to the commons (approved 2026-10-06), Ossian and Manchego, the open treehouse character.
 
 **Proposed:** the commons at 11.4 m with its shared amenities, grand ramp,
 catch nets and the one fire in the trees; the gate plaza beneath it; the ground
 camp with a stable, paddock and gardens; household rings above the commons;
-bridges at 22.8 m; a 32° switchback on each tree; the inn's move to the
-commons; the training grounds' place; the river trail; the wider foliage
+bridges at 22.8 m; a 32° switchback on each tree; the training grounds' place; the river trail; the wider foliage
 clearing.
 
 **Open:** none blocking.
