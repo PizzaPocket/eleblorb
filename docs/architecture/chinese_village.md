@@ -210,6 +210,10 @@ quest. The Chef is never named as the cause by an ordinary resident.
 
 ### 3.8 Decisions (approved 2026-10-04)
 
+0. (2026-10-06) The village is classical rather than present-day: unlike
+   Ohio and Kai Mālie, no modern layer. Dress, fixtures and comforts follow
+   older China.
+
 1. The southern town is Ohio, the starting town. The old line named no one, so
    it now names Ohio. Trade is flour and salt in, lanterns and beans out.
 2. The history in 3.2 stands (broken plateau, three generations, yellow glaze

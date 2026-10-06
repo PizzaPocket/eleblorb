@@ -404,7 +404,7 @@ open-pavilion treehouse inn.
 | Snowrest Inn, Snow Village | a modern mountain town on a Norse root | modern: flush toilet with cistern, basin and mirror, shower beside the equipment-drying room | code has the porcelain dry toilet; upgrade to a modern washroom |
 | Ember Rest, Fire caldera | lava people with advanced thermal engineering; guests only | modern: an **incinerating toilet** in insulated basalt, heated by the city's thermal system, with a cool-water basin for guests | washroom in the brief; fixture to build |
 | Rock and Ground inn | Pueblo-style earth and stone | an adobe **privy closet** off the yard: a timber seat over a lined composting vault, ash from the bread oven as cover, a water jar and basin | to add to the brief and code |
-| Chinese village inn | traditional Chinese | a lidded wooden **mǎtǒng** behind a screen in each guest room, and a latrine closet off the back courtyard; night soil to the fields | in `chinese_village.md` |
+| Chinese village inn | classical Chinese, no modern layer (user, 2026-10-06) | a lidded wooden **mǎtǒng** behind a screen in each guest room, and a latrine closet off the back courtyard; night soil to the fields | in `chinese_village.md` |
 | Primate village inn, on the commons | jungle lashed-vine | a rattan-screened **privy closet** at the deck's edge: bench seat over a sealed clay vat with leaf litter, lowered by rope to the garden compost | in the layout |
 | Sea folk guest hall | Atlantean modern | modern: a **vacuum-flush toilet**, glass basin, shower; sealed holding tank pumped to a treatment vault at the city's edge | in the buildings brief |
 | Okafor guest house, Kai Mālie | modern Hawaiian | modern: flush toilets, basins and a shower, upstairs and down; septic tank | in the buildings brief |
