@@ -152,9 +152,9 @@ will be rideable as a separate project, and players swim until then.
    uniform grey curtains of vertical flutes, the shelf's 1 m grid edge shows as
    stair steps through the water, and there are no ledges, waterline notch,
    planting or colour variation. Use the landscaping skill.
-4. The floating structures still to build: the **Mor guest houseboat** (the
-   rest point; its cabin is a working placeholder), the **Vale houseboat**, the
-   **pearl yard pontoon** and **Ivo's launch**.
+4. Done (2026-10-07): the **Mor guest houseboat**, the rest point, rebuilt from
+   its brief (redrawn to fit its hull; see design brief 4.13). Still to build:
+   the **Vale houseboat**, the **pearl yard pontoon** and **Ivo's launch**.
 5. Interiors, water work (the pearl yard and lines), and ledge planting on the
    islets.
 6. Schedules and dialogue.

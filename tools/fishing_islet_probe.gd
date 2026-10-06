@@ -25,8 +25,9 @@ const PROBES := {
 	"Exit 1 foot": [Vector2(-36.3, 10.2), -1.5],
 	"Exit 2 foot": [Vector2(-2.0, 12.2), -1.5],
 	"Exit 3 foot": [Vector2(29.7, 32.2), -1.5],
-	"Houseboat west deck": [Vector2(-24.5, 11), 0.35],
-	"Gangway mid": [Vector2(-22, 6), 0.43],
+	"Houseboat arrival deck": [Vector2(-24.5, 11), 0.35, 2.5],
+	"Houseboat dormitory": [Vector2(-15.0, 11.5), 0.35, 2.5],
+	"Gangway mid": [Vector2(-23.5, 6), 0.43],
 	"Pavilion floor": [Vector2(-2, 2.5), 0.5, 3.0],
 	"Venn veranda floor": [Vector2(-29.5, -14.0), 0.75, 2.5],
 	"Venn living room floor": [Vector2(-29.5, -16.6), 0.75, 3.0],
@@ -107,12 +108,13 @@ func _ready() -> void:
 	if not RecoveryManager._registered_points.has("outskirts:fishing_village_houseboat"):
 		print("FAIL The Mor houseboat rest point is not registered")
 		_failures += 1
-	var leena_found := false
+	# Exactly one Leena: an earlier placeholder built her on every houseboat.
+	var leenas := 0
 	for node in world.find_children("*", "Node3D", true, false):
 		if str(node.get("display_name")) == "Leena Mor":
-			leena_found = true
-	if not leena_found:
-		print("FAIL Leena Mor is not aboard the houseboat")
+			leenas += 1
+	if leenas != 1:
+		print("FAIL Leena Mor appears %d times (expected once, aboard the Mor houseboat)" % leenas)
 		_failures += 1
 	var vendor_found := false
 	for npc in get_tree().get_nodes_in_group("npcs"):

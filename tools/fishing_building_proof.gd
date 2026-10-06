@@ -165,7 +165,10 @@ func _render(body: StaticBody3D, anchor: Vector2) -> void:
 		camera.look_at(pair[1], Vector3.UP)
 		await _capture("%s/%s_%s.png" % [_shots, _building, view])
 	# Cutaway: hide everything above the ring beam to read the rooms as a plan.
-	var cut_y := FishingBuildings.HOUSE_FLOOR + 2.9
+	# Just under the ceiling of the building's own floor (floating cabins sit
+	# lower than piled houses).
+	var floating := _building in ["MorHouseboat", "ValeHouseboat", "ShellBarge"]
+	var cut_y := (FishingVillagePlan.FLOAT_DECK if floating else FishingBuildings.HOUSE_FLOOR) + 2.7
 	var hidden: Array[Node3D] = []
 	for node in body.find_children("*", "Node3D", true, false):
 		var spatial := node as Node3D

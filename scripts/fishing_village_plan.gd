@@ -119,8 +119,10 @@ const ROUTES: Array[Dictionary] = [
 		"points":[Vector2(38,-3),Vector2(38,2)],"rise":DECK_TOP - FLOAT_DECK},
 	{"name":"ShellBargeGangway","class":"gangway","width":2.6,"ends":["JettySpine","ShellBarge"],
 		"points":[Vector2(-15,-5),Vector2(-15,-3)],"rise":DECK_TOP - FLOAT_DECK},
+	# Lands in the middle of the Mor houseboat's covered arrival deck (it used to
+	# land on the line between that deck and the common cabin).
 	{"name":"HouseboatGangway","class":"gangway","width":2.6,"ends":["PavilionReturn","MorHouseboat"],
-		"points":[Vector2(-22,4),Vector2(-22,8)],"rise":DECK_TOP - FLOAT_DECK},
+		"points":[Vector2(-23.5,3.6),Vector2(-23.5,8)],"rise":DECK_TOP - FLOAT_DECK},
 ]
 
 # ---------------------------------------------------------------------------

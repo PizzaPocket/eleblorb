@@ -432,6 +432,21 @@ and the family's rooms at the back.
 - **Section.** Hull below the waterline, shallow draft, collision on the deck and
   the cabin walls so the rest point and gathering area stay aboard.
 
+- **Built (2026-10-07)** in `FishingBuildings.mor_houseboat()`, the rest point
+  wired by `FloatingVillage._wire_rest_point()`. The brief's program did not fit
+  its own 18 m hull (two guest cabins, a stern cabin and a cargo deck after
+  15 m of other rooms) and landed the gangway on the line between two rooms.
+  As built, west to east: covered **arrival deck** (3.5 m; the gangway now lands
+  at its middle, `x -23.5`), **common cabin and galley** (5.5 m; Leena stands by
+  the door), **party dormitory** (4.5 m; four bunks along the hull sides, the
+  wake marker by the first), then the Mor **stern cabin** (north, entered from
+  the north walkway so the family never crosses the guests' rooms) beside the
+  **wash room** with the marine composting toilet, basin, water jar and vent
+  stack (south, entered from the dormitory), and the open **cargo deck**. The
+  guest cabins are dropped and the south walkway given to the cabins, so they
+  are 6 m deep. One long hip covers it all. The earlier placeholder built Leena
+  and the rest point on every houseboat; she now exists once.
+
 ### 4.14 Ivo's ferry launch
 
 - **Plan.** A roofed cargo launch 6 x 1.8 m at the ferry berth: a forward cargo well

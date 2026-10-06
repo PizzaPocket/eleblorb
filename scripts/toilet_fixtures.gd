@@ -45,8 +45,15 @@ static func _part(body: StaticBody3D, semi: Vector3, at: Vector3, color: Color, 
 	return mesh
 
 
-## Solid collision for the whole fixture: one box matching its envelope.
+## Solid collision for the whole fixture: one box matching its envelope,
+## paired with the fixture's main part (its first mesh) so the collision policy
+## sees one physical visual for its one collider. (It used to tag a throwaway
+## node, which left every fixture failing CollisionPolicy.validate_body.)
 static func _solid(body: StaticBody3D, size: Vector3, at: Vector3) -> void:
+	for child in body.get_children():
+		if child is MeshInstance3D:
+			CollisionPolicy.add_box(body, child as MeshInstance3D, size, at, Basis(), false)
+			return
 	var holder := Node3D.new()
 	CollisionPolicy.add_box(body, holder, size, at, Basis(), false)
 	holder.free()

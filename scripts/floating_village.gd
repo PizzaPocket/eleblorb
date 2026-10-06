@@ -80,6 +80,8 @@ func _build_structure(structure: Dictionary) -> void:
 		add_child(built)
 		built.global_position = _at(FishingBuildings.anchor(structure_name), 0.0)
 		_built[structure_name] = built
+		if structure_name == "MorHouseboat":
+			_wire_rest_point(built)
 		return
 	match str(structure["kind"]):
 		"deck":
@@ -190,77 +192,25 @@ func _houseboat(name_text: String, rect: Rect2, wall_color: Color) -> void:
 	hull.position.y = -DECK_THICKNESS - 0.1
 	deck.add_child(hull)
 	CollisionPolicy.add_box(deck, hull, hull_size, hull.position, Basis(), false)
-	# Cabin between the arrival deck at the west end and the cargo deck at the east.
+	# A plain placeholder cabin until this houseboat is built from its brief
+	# (the rest point is the Mor houseboat's alone).
 	var cabin := Rect2(rect.position + Vector2(4.0, 0.6), rect.size - Vector2(8.0, 1.2))
-	_houseboat_cabin(name_text, cabin, float_top, wall_color)
+	_house(name_text, cabin, float_top, wall_color)
 
 
-## The Mor guest houseboat's cabin: the settlement's rest point. A walled room
-## with a doorway on the south wall, three berths along the north wall, the
-## marine toilet at the south-east corner and Leena by the door. Its wake and
-## stand markers are aboard, so resting never leaves the collidable boat.
-func _houseboat_cabin(name_text: String, rect: Rect2, floor_top: float, wall_color: Color) -> void:
-	const WALL := 0.18
-	const DOOR_WIDTH := 1.6
-	var body := StaticBody3D.new()
-	body.name = name_text + "Cabin"
-	add_child(body)
-	body.global_position = _at(rect.get_center(), floor_top)
-	var half := rect.size * 0.5
-	var door_x := -0.5
-	var panels: Array[Dictionary] = [
-		{"at":Vector3(0.0, HOUSE_HEIGHT * 0.5, -half.y), "size":Vector3(rect.size.x, HOUSE_HEIGHT, WALL)},
-		{"at":Vector3(-half.x, HOUSE_HEIGHT * 0.5, 0.0), "size":Vector3(WALL, HOUSE_HEIGHT, rect.size.y)},
-		{"at":Vector3(half.x, HOUSE_HEIGHT * 0.5, 0.0), "size":Vector3(WALL, HOUSE_HEIGHT, rect.size.y)},
-	]
-	var left_len := (door_x - DOOR_WIDTH * 0.5) + half.x
-	var right_len := half.x - (door_x + DOOR_WIDTH * 0.5)
-	panels.append({"at":Vector3(-half.x + left_len * 0.5, HOUSE_HEIGHT * 0.5, half.y), "size":Vector3(left_len, HOUSE_HEIGHT, WALL)})
-	panels.append({"at":Vector3(half.x - right_len * 0.5, HOUSE_HEIGHT * 0.5, half.y), "size":Vector3(right_len, HOUSE_HEIGHT, WALL)})
-	for panel in panels:
-		var size: Vector3 = panel["size"]
-		var mesh := SuperEgg.build_part(size * 0.5, wall_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-		mesh.position = panel["at"]
-		body.add_child(mesh)
-		CollisionPolicy.add_box(body, mesh, size, mesh.position, Basis(), false)
-	# Lintel over the doorway so the south wall reads as one wall.
-	var lintel_size := Vector3(DOOR_WIDTH, HOUSE_HEIGHT - 2.3, WALL)
-	var lintel := SuperEgg.build_part(lintel_size * 0.5, wall_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-	lintel.position = Vector3(door_x, 2.3 + lintel_size.y * 0.5, half.y)
-	body.add_child(lintel)
-	CollisionPolicy.add_box(body, lintel, lintel_size, lintel.position, Basis(), false)
-	_gable_roof(body, rect.size + Vector2(0.9, 0.9), HOUSE_HEIGHT)
-
-	# Three berths along the north wall, heads to the wall.
-	var berth_colors: Array[Color] = [Color(0.42, 0.35, 0.68), Color(0.32, 0.46, 0.66), Color(0.62, 0.34, 0.30)]
-	var first_bed := Vector3.ZERO
-	for i in 3:
-		var bed := TownProps.build_bed(berth_colors[i])
-		bed.name = "PartyBed%d" % (i + 1)
-		bed.position = Vector3(-half.x + 1.2 + float(i) * 1.6, 0.0, -half.y + 1.28)
-		body.add_child(bed)
-		if i == 0:
-			first_bed = bed.position
-	# The contained marine toilet in the south-east corner, back to the wall.
-	var toilet := ToiletFixtures.build("marine")
-	toilet.name = "MarineToilet"
-	toilet.position = Vector3(half.x - 0.8, 0.0, half.y - 0.55)
-	body.add_child(toilet)
-
-	var wake := Marker3D.new()
-	wake.name = "WakeMarker"
-	wake.position = first_bed + Vector3(0.0, 0.88, 0.0)
-	body.add_child(wake)
-	var stand := Marker3D.new()
-	stand.name = "StandMarker"
-	stand.position = Vector3(door_x, 0.1, half.y - 1.6)
-	body.add_child(stand)
-	_build_keeper(body, wake, stand, Vector3(half.x - 2.4, 0.0, 0.5))
+## The Mor houseboat's rest point: Leena at her stand in the common cabin, the
+## wake marker by the first bunk, the party gathering on the arrival deck.
+func _wire_rest_point(boat: StaticBody3D) -> void:
+	var wake := boat.get_node("WakeMarker") as Marker3D
+	var stand := boat.get_node("StandMarker") as Marker3D
+	var gather := boat.get_node("GatherMarker") as Marker3D
+	var keeper_at := (boat.get_node("KeeperStand") as Node3D).position
+	_build_keeper(boat, wake, stand, keeper_at, gather.global_position)
 
 
 ## Leena keeps the stores and the rest point (10 Tokoins, through the shared
 ## transaction UI, as in every inn).
-func _build_keeper(body: StaticBody3D, wake: Marker3D, stand: Marker3D, local_position: Vector3) -> void:
+func _build_keeper(body: StaticBody3D, wake: Marker3D, stand: Marker3D, local_position: Vector3, gather_at: Vector3 = Vector3.INF) -> void:
 	var packed: PackedScene = load(NPC_SCENE)
 	if packed == null:
 		return
@@ -269,7 +219,7 @@ func _build_keeper(body: StaticBody3D, wake: Marker3D, stand: Marker3D, local_po
 	keeper.stationary = true
 	keeper.is_female = true
 	keeper.facing_degrees = 180.0
-	keeper.fixed_ground_y = body.global_position.y
+	keeper.fixed_ground_y = body.global_position.y + local_position.y
 	keeper.skin_color = Color(0.58, 0.40, 0.28)
 	keeper.shirt_color = FishingVillagePlan.HOUSEHOLD_COLORS["Mor"]
 	keeper.hair_color = Color(0.12, 0.09, 0.07)
@@ -293,7 +243,7 @@ func _build_keeper(body: StaticBody3D, wake: Marker3D, stand: Marker3D, local_po
 	body.add_child(keeper)
 	RecoveryManager.register_rest_point.call_deferred(
 		REST_WORLD, REST_POINT, wake.global_transform, stand.global_transform,
-		stand.global_position + Vector3(0, 0, 2.5)
+		gather_at if gather_at != Vector3.INF else stand.global_position + Vector3(0, 0, 2.5)
 	)
 
 
