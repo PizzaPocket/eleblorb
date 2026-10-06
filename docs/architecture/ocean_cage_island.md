@@ -11,8 +11,11 @@ who make the hero fight their cage match tournament.
 
 ## 2. Site
 
-The proposed island is the low satellite at world `(112, 88)`, radius about
-31 m, rising to about 3.8 m (`ocean_kingdom_terrain.gd`, `ISLANDS`). It lies
+The proposed island is the low satellite at world `(112, 88)`, rising to about
+3.8 m (`ocean_kingdom_terrain.gd`, `ISLANDS`). Its listed radius is 31 m, but
+its dry land reaches only about 10 m from the centre, too small for the cage.
+Enlarging the entry to radius 70 m and height 5 m gives about 27 m of dry
+radius (see `ocean_island_village_layout.md`, section 9). It lies
 about 140 m east-northeast of the arrival dock, across open water from Kai
 Mālie, so the cage is visible from the gate and from the village beach. It sits
 inside the ships' route and well inside the Kraken's.

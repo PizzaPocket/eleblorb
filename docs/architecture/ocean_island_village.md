@@ -36,11 +36,12 @@ opened, a few people from the Crossroads have stayed.
 
 ## 2. What exists now
 
-- The main island: centre world `(-118, 72)`, radius about 116 m, rising to
-  about 10.5 m, with dense Plant-Kingdom-like vegetation
-  (`ocean_kingdom_terrain.gd`, `ISLANDS`).
+- The main island: centre world `(-118, 72)`, rising to about 10.5 m, with
+  dense Plant-Kingdom-like vegetation (`ocean_kingdom_terrain.gd`, `ISLANDS`).
+  Its listed radius is 116 m, but dry land reaches only about 55 m from the
+  centre, with a steep shore and no beach (see `ocean_island_village_layout.md`).
 - The arrival dock and return gate stand on stilts at world `(0, 0)`, about
-  23 m off the island's eastern shore.
+  83 m off the island's nearest shore, over 18 to 40 m of water.
 - No village, residents or language exist on the island yet.
 
 ### Non-regression requirements

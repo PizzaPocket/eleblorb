@@ -266,8 +266,11 @@ Planning priorities:
   direction).
 - Design the discord the Demon King has sown between the communities and how
   the hero restores harmony.
-- Lay out Kai Mālie first, since it frames the arrival view, then the sea folk
-  city's rings and air halls.
+- Review Kai Mālie's layout (`docs/architecture/ocean_island_village_layout.md`).
+  The survey found the island only about 55 m in dry radius, with a steep shore,
+  no beach and the dock 83 m offshore, so the layout adds a coastal plain,
+  beach, reef flat, taro terraces, a spring and a pier, and enlarges the cage
+  island. Then lay out the sea folk city's rings, air halls and tunnels.
 - Build the missing second ship and the ships' priority interiors.
 - Lay out the cage island and decide how tournament fights work.
 - Shared systems: generalise `ChineseLexicon` into a lexicon per language for

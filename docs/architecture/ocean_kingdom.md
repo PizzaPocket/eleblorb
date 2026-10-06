@@ -14,9 +14,11 @@ four populations with separate briefs:
 
 - **Terrain** (`ocean_kingdom_terrain.gd`): a 1,860 m square ocean with the
   water surface at 0 m, falling to 111 m at the edges. Seven islands; the main
-  island at `(-118, 72)` has a radius of about 116 m and rises to 10.5 m.
-- **Arrival:** a stilted dock and the return gate at `(0, 0)`, about 23 m off
-  the main island's eastern shore (`ocean_kingdom_dock.gd`).
+  island at `(-118, 72)` rises to 10.5 m; its listed radius is 116 m, but its
+  dry land reaches only about 55 m from the centre.
+- **Arrival:** a stilted dock and the return gate at `(0, 0)`, about 83 m off
+  the main island's nearest shore over deep water (`ocean_kingdom_dock.gd`).
+  Kai Mālie's layout adds a reef flat and a pier to reach it.
 - **Sea folk city:** centre `(0, -540)` on a levelled shelf at -72 m
   (`ocean_kingdom_city.gd`).
 - **At sea** (`ocean_kingdom_denizens.gd`): the Kraken circles an elliptical
@@ -51,7 +53,9 @@ kingdom's story, as it is in the Sky Kingdom.
 
 1. Approve the three briefs.
 2. Lay out the island village first: it is nearest the arrival dock and
-   frames every visitor's first view.
+   frames every visitor's first view. Done: `ocean_island_village_layout.md`
+   (in review), including the terrain it needs and the cage island's
+   enlargement.
 3. Lay out the sea folk city's rings and air halls.
 4. Build the second ship and the ship interiors.
 5. Lay out the cage island and design the tournament.
