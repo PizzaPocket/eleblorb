@@ -335,11 +335,13 @@ shelf.
   round a low table, the pantry, and a split amethyst geode. **The roof
   terrace** is reached by a lift (the circulation rules allow ramps or
   lifts): a ramp would need about 6.4 m of run the plot cannot spare, so an
-  open platform with dichroic cheeks rises on four steel masts at the east
-  bay's north end from the home's door landing to the roof, waiting at each
-  stop. The terrace is ringed by a cast upstand with a dichroic glass
-  balustrade, open where the lift arrives, with seats and a low table toward
-  the reservoir.
+  open platform with dichroic cheeks runs on four steel masts at the east
+  bay's north end between three stations: the bay's ground, the home's door
+  landing and the roof. It waits where it last stopped; its control on the
+  platform offers the other stations, and a call post at each station brings
+  it there (`CalderaLift`). The terrace has pale pavers and is ringed by a
+  cast upstand with a dichroic glass balustrade, open where the lift arrives,
+  with seats round two low tables and flames in glass toward the reservoir.
 - **Variation:** the only two-storey home over a shop; the most glass at
   ground level.
 
