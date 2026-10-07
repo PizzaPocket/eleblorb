@@ -86,6 +86,16 @@ human city; boxes.
   holding tank in the plinth, which is pumped out to a treatment vault at the
   city's edge, never into the sea.
 - **Variation:** the warmest light; the only dome with rooms partitioned off.
+- **Audit (2026-10-07):**
+  - **Headroom.** A dome 8 m high is low at its rim. Set the four bedrooms
+    and the washroom inside the radius where the shell still clears 2.4 m over
+    the floor, and use the strip between them and the shell for storage under
+    the slope, never as a route.
+  - **Fit.** The rooms ring the dome's interior of about 200 m² with the 4 m
+    moon pool, the ramp out of it and the common room at the centre. That
+    fits.
+  - **Access.** Each bedroom and the washroom opens off the common room, the
+    house's shared hall, which is legitimate.
 
 ### The Glassworks (air hall; Kunei and Damaku)
 

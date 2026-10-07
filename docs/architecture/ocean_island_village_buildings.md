@@ -97,9 +97,18 @@ building fits its approved footprint.
 - 11 × 6.5 m, **two storeys**, double-pitched hip; a ground-floor *lānai* facing
   the pier head and a smaller upper *lānai*.
 - **Ground floor:** reception and common room, a kitchen, Sam's room.
-- **Upper floor:** three guest rooms and the party room where the hero wakes,
+- **Upper floor:** two guest rooms and the party room where the hero wakes,
   reached by an interior ramp (5.2 m run, landings at both ends), and a shared
   **bathroom** off the landing.
+- **Audit (2026-10-07): three guest rooms did not fit.**
+  - The upper floor is 11 × 6.5 m, about 71 m². The ramp's opening and
+    landings take about 11 m², and a 1.4 m landing corridor along the house
+    about 15 m².
+  - That leaves about 45 m² for the party room (about 25 m²), the bathroom
+    (5 m²) and the guest rooms. Two guest rooms at about 2.6 × 3.5 m fit;
+    three do not.
+  - **Revised:** two guest rooms. The ramp runs along the back wall, and every
+    room opens off the landing corridor, so there are no pass-throughs.
 - **Bathrooms (modern):** a flush toilet with a cistern, a washbasin, a mirror
   and a shower upstairs, and a toilet and basin off the common room downstairs
   for day visitors. Both drain to a septic tank behind the house, well away from
