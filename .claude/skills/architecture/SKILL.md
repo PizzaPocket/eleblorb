@@ -463,12 +463,26 @@ These rules catch those failures on paper, before code.
 2. **Draw the section.** Check roof rise against any loft or upper room. A 32°
    hip over a 4.5 m house rises only 1.4 m, so the Venn house's loft could
    never exist.
-3. **Draw the access graph.** Check that every room opens off circulation (a
-   hall, corridor, living room or porch), never through another room.
-   - The Aran kitchen was reachable only through a bedroom.
-   - The Sen family could reach their beds only through the clinic.
-   
-   Public, private and service rooms each get their own way in.
+3. **Draw the access graph, and check it by privacy and ownership.** Passing
+   through one room to reach another is often right. The test is whether the
+   room you pass through belongs to the same person or use, at the same or a
+   more public level of privacy.
+   - **Legitimate:** a suite's own rooms reached through it, such as a
+     bathroom, closet or dressing room off a bedroom, or a nursery off the
+     parents' room. A shop's back store through the shop. A kitchen through
+     the living room it serves. A workshop's store through the workshop.
+   - **Legitimate by tradition:** where a culture really lives that way and
+     the charter says so. Examples are the enfilade of a palace's state rooms,
+     a shotgun house's rooms in a line, a longhouse's gallery, and the
+     sequence of courts and halls in a Chinese courtyard house.
+   - **Wrong:** reaching one person's private room through someone else's,
+     or reaching a private or family room through a public or work room that
+     strangers use. In the fishing village, the Aran kitchen was reachable
+     only through a bedroom, and the Sen family could reach their beds only
+     through the clinic. Each needed its own way in.
+
+   Write down which pass-throughs a building has and why: the charter for
+   cultural ones, the program for suites.
 4. **Check that every named feature exists.** "Pree's corner under the stair"
    had no stair. "The cistern behind the house" was where the rock face stood.
 5. **Check against the real ground.** Take the terrain or rock section from
