@@ -199,7 +199,7 @@ static func _floors(body: StaticBody3D) -> void:
 	CalderaShell._beam(body, Vector3(dock.position.x + 0.1, DOCK + 1.0, dock.end.y), Vector3(ramp.position.x - 0.05, DOCK + 1.0, dock.end.y), Vector2(0.05, 0.05), IRON)
 	CalderaShell._beam(body, Vector3(ramp.end.x + 0.05, DOCK + 1.0, dock.end.y), Vector3(dock.end.x - 0.1, DOCK + 1.0, dock.end.y), Vector2(0.05, 0.05), IRON)
 	# The roof of the back row: the floor of the residence above.
-	FireCalderaOren._block(body, "BackRowRoof", Vector3(4.5, STOREY + 0.1, (BACK_ROW - SIZE.y * 0.5) * 0.5), Vector3(10.2, 0.2, -BACK_ROW + SIZE.y * 0.5 + 0.2), FLOOR.lightened(0.05))
+	CalderaShell.soft_slab(body, "BackRowRoof", Vector3(4.6, STOREY + 0.1, (BACK_ROW - SIZE.y * 0.5) * 0.5 - 0.15), Vector3(5.45, 0.1, (-BACK_ROW + SIZE.y * 0.5) * 0.5 + 0.35), Vector2(5.0, (-BACK_ROW + SIZE.y * 0.5) * 0.5), FLOOR.lightened(0.05))
 
 
 static func _partitions(body: StaticBody3D) -> void:
@@ -273,15 +273,8 @@ static func _sawtooth(body: StaticBody3D) -> void:
 		var high_z: float = tooth[3]
 		var depth := low_z - high_z
 		var angle := atan2(rise, depth)
-		var slab := MeshInstance3D.new()
-		var box := BoxMesh.new()
-		box.size = Vector3(x1 - x0 + 0.3, 0.16, sqrt(depth * depth + rise * rise) + 0.2)
-		slab.mesh = box
-		slab.material_override = SolidModel.material(TEMPER[3].darkened(0.4), 0.4, 0.6)
-		slab.position = Vector3((x0 + x1) * 0.5, STOREY + rise * 0.5 + 0.08, (low_z + high_z) * 0.5)
-		slab.rotation.x = angle
-		body.add_child(slab)
-		CollisionPolicy.add_box(body, slab, box.size, slab.position, Basis(Vector3.RIGHT, angle), true)
+		var length := sqrt(depth * depth + rise * rise)
+		CalderaShell.soft_slab(body, "SawtoothSlope", Vector3((x0 + x1) * 0.5, STOREY + rise * 0.5 + 0.08, (low_z + high_z) * 0.5), Vector3((x1 - x0) * 0.5 + 0.35, 0.09, length * 0.5 + 0.25), Vector2((x1 - x0) * 0.5, length * 0.5), TEMPER[3].darkened(0.4), Basis(Vector3.RIGHT, angle))
 		var panes := int((x1 - x0) / 1.6)
 		for i in panes:
 			var a := lerpf(x0, x1, float(i) / float(panes))
@@ -352,7 +345,7 @@ static func _bridge(body: StaticBody3D) -> void:
 	var head: Rect2 = levels[4]["rect"]
 	var foot := float(levels[3]["from"])
 	FireCalderaOren._wedge(body, "HomeRamp", ramp.position, ramp.end, foot, RESIDENCE, false, FLOOR)
-	FireCalderaOren._block(body, "HomeLanding", Vector3(head.get_center().x, RESIDENCE - 0.1, head.get_center().y), Vector3(head.size.x, 0.2, head.size.y), FLOOR)
+	CalderaShell.soft_slab(body, "HomeLanding", Vector3(head.get_center().x, RESIDENCE - 0.1, head.get_center().y), Vector3(head.size.x * 0.5 + 0.08, 0.1, head.size.y * 0.5 + 0.08), head.size * 0.5, FLOOR)
 	for z: float in [head.position.y + 0.15, head.end.y - 0.15]:
 		CalderaShell._metal(body, Vector3(head.end.x - 0.15, (RESIDENCE - 0.2) * 0.5, z), Vector3(0.14, RESIDENCE - 0.2, 0.14), IRON, true)
 	# The cover: a steel roof following the ramp at 2.6 m, on posts.

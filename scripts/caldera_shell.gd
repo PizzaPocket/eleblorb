@@ -204,6 +204,30 @@ static func _build_corners(body: StaticBody3D, offset: Vector2, hx: float, hz: f
 			_metal(body, Vector3(corner.x, top * 0.5, corner.y), Vector3(POST * 2.0, top, POST * 2.0), STAINLESS, true)
 
 
+## The SuperEgg exponent for a soft slab of half size `slab` that must still
+## cover a rectangle of half size `cover` (centred) at its corners: the lowest
+## of a squarish range that does, so the edges keep as much curve as they can.
+static func soft_epsilon(cover: Vector2, slab: Vector2) -> float:
+	for epsilon: float in [8.0, 10.0, 12.0, 14.0, 17.0, 20.0, 24.0, 30.0]:
+		if pow(cover.x / slab.x, epsilon) + pow(cover.y / slab.y, epsilon) <= 0.92:
+			return epsilon
+	return 30.0
+
+
+## A soft slab: a SuperEgg MeshInstance3D of half size `half` at `at`, its
+## exponent from `soft_epsilon` against `cover`, with a box collider.
+static func soft_slab(body: StaticBody3D, name_text: String, at: Vector3, half: Vector3, cover: Vector2, colour: Color, basis: Basis = Basis()) -> MeshInstance3D:
+	var mesh := MeshInstance3D.new()
+	mesh.name = name_text
+	var epsilon := soft_epsilon(cover, Vector2(half.x, half.z))
+	mesh.mesh = SuperEgg.build_mesh(half, epsilon, epsilon, 10, 96)
+	mesh.material_override = SolidModel.material(colour, 0.4, 0.6)
+	mesh.transform = Transform3D(basis, at)
+	body.add_child(mesh)
+	CollisionPolicy.add_box(body, mesh, half * 2.0, at, basis, true)
+	return mesh
+
+
 ## A straight steel member between two points, `section` (height, depth) its
 ## cross-section: a raked wall head or any sloping beam.
 static func _beam(body: StaticBody3D, from: Vector3, to: Vector3, section: Vector2, colour: Color) -> MeshInstance3D:
@@ -324,10 +348,16 @@ static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top:
 	roof.collision_mask = 0
 	body.add_child(roof)
 	var slab_material := SolidModel.material(colour, 0.38, 0.62 if colour.v < 0.5 else 0.05)
-	SolidModel.add_box(
-		roof, "RoofSlab", Vector3(size.x + west + east, ROOF_DEPTH, (size.y + front + back) / cos(pitch)),
-		CSGShape3D.OPERATION_UNION, slab_material
-	)
+	# A SuperEgg slab, squarish but soft at every edge and corner, its
+	# exponent just high enough that the rounded corners still cover the walls
+	# beneath given the overhang.
+	var slab_half := Vector3(size.x + west + east, ROOF_DEPTH, (size.y + front + back) / cos(pitch)) * 0.5
+	var slab := CSGMesh3D.new()
+	slab.name = "RoofSlab"
+	slab.mesh = SolidModel.super_mesh(slab_half, soft_epsilon(Vector2(size.x, size.y) * 0.5, Vector2(slab_half.x, slab_half.z)), 12, 96)
+	slab.operation = CSGShape3D.OPERATION_UNION
+	slab.material = slab_material
+	roof.add_child(slab)
 	var shift := Vector2((east - west) * 0.5, (front - back) * 0.5)
 	for given: Dictionary in skylights:
 		var skylight := given.duplicate()

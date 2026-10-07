@@ -559,7 +559,7 @@ static func _floors(body: StaticBody3D) -> void:
 	_block(body, "CorridorFloor", Vector3((x0 + RAMP_TOP_X) * 0.5, RAISE * 0.5, (WALL_Z_BACK + WALL_Z_FRONT) * 0.5), Vector3(RAMP_TOP_X - x0, RAISE, WALL_Z_FRONT - WALL_Z_BACK), FLOOR)
 	_wedge(body, "CorridorRamp", Vector2(RAMP_TOP_X, WALL_Z_BACK), Vector2(RAMP_FOOT_X, WALL_Z_FRONT), RAISE, 0.0, true, FLOOR)
 	# The floor between the storeys.
-	_block(body, "UpperSlab", Vector3((x0 + x1) * 0.5, CalderaShell.STOREY + SLAB * 0.5, 0.0), Vector3(x1 - x0 + CalderaShell.WALL, SLAB, SHELL_SIZE.y + CalderaShell.WALL), FLOOR.lightened(0.05))
+	CalderaShell.soft_slab(body, "UpperSlab", Vector3((x0 + x1) * 0.5, CalderaShell.STOREY + SLAB * 0.5, 0.0), Vector3((x1 - x0) * 0.5 + CalderaShell.WALL + 0.12, SLAB * 0.5, SHELL_SIZE.y * 0.5 + CalderaShell.WALL + 0.12), Vector2((x1 - x0) * 0.5 + CalderaShell.WALL * 0.5, SHELL_SIZE.y * 0.5 + CalderaShell.WALL * 0.5), FLOOR.lightened(0.05))
 
 
 ## Partitions below: the corridor's two walls with their doors at the floor
@@ -643,7 +643,7 @@ static func _east_bay(body: StaticBody3D) -> void:
 	var head: Rect2 = levels[6]["rect"]
 	_block(body, "RampFootLanding", Vector3(landing.get_center().x, RAISE * 0.5, landing.get_center().y), Vector3(landing.size.x, RAISE, landing.size.y), FLOOR)
 	_wedge(body, "HomeRamp", ramp.position, ramp.end, RAISE, UPPER, false, FLOOR)
-	_block(body, "RampHeadLanding", Vector3(head.get_center().x, UPPER - SLAB * 0.5, head.get_center().y), Vector3(head.size.x, SLAB, head.size.y), FLOOR)
+	CalderaShell.soft_slab(body, "RampHeadLanding", Vector3(head.get_center().x, UPPER - SLAB * 0.5, head.get_center().y), Vector3(head.size.x * 0.5 + 0.08, SLAB * 0.5, head.size.y * 0.5 + 0.08), head.size * 0.5, FLOOR)
 	for z: float in [head.position.y + 0.2, head.end.y - 0.2]:
 		CalderaShell._metal(body, Vector3(head.end.x - 0.15, (UPPER - SLAB) * 0.5, z), Vector3(0.14, UPPER - SLAB, 0.14), CalderaShell.STEEL_BLUED, true)
 	# The rail along the open side, following the ramp and the landing.
