@@ -181,7 +181,10 @@ const WAYS: Array[Dictionary] = [
 	{"name":"market street","width":3.6,"points":[Vector2(-13,-6.8),Vector2(-4,-8.2),Vector2(8,-8.6),Vector2(25,-8.4),Vector2(38,-9.5)]},
 	{"name":"east road","width":3.5,"points":[Vector2(38,-9.5),Vector2(52,-7),Vector2(63,-3),Vector2(72,0.5),Vector2(75.5,1.5),Vector2(78,2)]},
 	{"name":"mill road","width":2.6,"points":[Vector2(46,-9),Vector2(45,-20),Vector2(46,-34),Vector2(50,-48),Vector2(53,-62),Vector2(58,-74),Vector2(65,-83),Vector2(73,-87.5)]},
-	{"name":"edge walk","width":1.8,"points":[Vector2(74,8),Vector2(71,20),Vector2(64,32),Vector2(56,41),Vector2(50,47)]},
+	# Kept on top of the rim: its old line ran its cliff-side edge out over a
+	# 4 to 6 m drop between z 12 and 29, where the rim is notched; it now curves
+	# inland behind the notch (tools/ohio_cliff_probe.tscn checks every metre).
+	{"name":"edge walk","width":1.8,"points":[Vector2(74,8),Vector2(71,12),Vector2(66.5,16.5),Vector2(63.2,20.5),Vector2(63,26),Vector2(63,32),Vector2(60,36.5),Vector2(56,41),Vector2(50,47)]},
 	{"name":"west lane","width":2.8,"points":[Vector2(-5,8),Vector2(-8.5,16),Vector2(-10.5,24),Vector2(-12.5,32),Vector2(-15.5,40),Vector2(-19.5,45)]},
 	{"name":"east lane","width":2.8,"points":[Vector2(6,8),Vector2(10,15),Vector2(15.5,22),Vector2(21,29),Vector2(24.5,35),Vector2(24.2,38.0)]},
 	{"name":"back lane","width":2.2,"points":[Vector2(-19.5,47.5),Vector2(-8,51),Vector2(8,51),Vector2(23,47.5)]},
