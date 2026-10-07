@@ -215,13 +215,13 @@ static func _guest_hall(body: StaticBody3D) -> void:
 	CalderaFurniture.concealed_light(body, Vector3(6.1, 2.9, 2.8), CalderaFurniture.LED_WARM.lerp(CalderaFurniture.LED_COOL, 0.5), 0.6, 5.0)
 
 
-## The hall's art, commissioned from the Vara studio: Omi's kiln-formed glass
-## in Talen's forged frame. A glass craftsman would not draw a map; she would
+## The hall's art, commissioned from the Vara studio: Omi's kiln-formed glass,
+## hung on Talen's concealed steel pins. A glass craftsman would not draw a map; she would
 ## let the material show its own making. The panel is the caldera in section:
 ## fused strata from basalt black through cooling reds to amber and smoke,
 ## their boundaries flowing the way a slumped sheet does, and set into the
-## amber the reservoir as one polished cobalt inlay ringed in stainless. It is
-## lit from behind by a concealed panel that also haloes the wall.
+## amber the reservoir as one polished cobalt inlay ringed in stainless. It
+## hangs frameless on the stone.
 static func _hall_glass_panel(body: StaticBody3D, at: Vector3) -> void:
 	_fused_glass(body, at, Vector2(1.2, 0.62), [
 		Color(0.10, 0.09, 0.09), Color(0.42, 0.10, 0.06), Color(0.86, 0.32, 0.08),
@@ -247,12 +247,9 @@ static func _hall_studies(body: StaticBody3D) -> void:
 
 ## A fused-glass panel facing +Z: `strata` bottom to top, each a run of
 ## overlapping slumped lozenges whose edges follow a slow wave, so the layers
-## flow into one another; an optional round inlay `inlay` (x, y, radius); a
-## forged blued-steel frame and a concealed backlight that haloes the wall.
+## flow into one another; an optional reservoir lens `inlay` (x, y, size).
+## Hung frameless, straight on the stone: the glass carries its own glow.
 static func _fused_glass(body: StaticBody3D, at: Vector3, half: Vector2, strata: Array, phase: float, inlay: Vector3) -> void:
-	# Backlight and halo.
-	_glow(body, "ArtHalo", Vector3(half.x + 0.1, half.y + 0.1, 0.004), at + Vector3(0, 0, -0.02), CalderaFurniture.LED_WARM.darkened(0.82))
-	_glow(body, "ArtBacklight", Vector3(half.x, half.y, 0.004), at + Vector3(0, 0, -0.006), CalderaFurniture.LED_WARM)
 	# The strata.
 	var count := strata.size()
 	var segments := maxi(int(half.x / 0.12), 3)
@@ -277,10 +274,6 @@ static func _fused_glass(body: StaticBody3D, at: Vector3, half: Vector2, strata:
 		var ring := CalderaFurniture.piece(body, Vector3(inlay.z * 2.4 + 0.015, inlay.z * 0.5 + 0.015, 0.012), CalderaShell.STAINLESS, at + Vector3(inlay.x, inlay.y, 0.03), 0.0, false, 2.4)
 		ring.material_override = SolidModel.material(CalderaShell.STAINLESS, 0.2, 0.9)
 		_art_glass(body, Vector3(inlay.z * 2.4, inlay.z * 0.5, 0.016), Color(0.16, 0.32, 0.80), at + Vector3(inlay.x, inlay.y, 0.04), 2.4)
-	# The frame: four forged bars, square-ended, proud of the glass.
-	for side: float in [-1.0, 1.0]:
-		CalderaShell._metal(body, at + Vector3(0, side * (half.y + 0.025), 0.02), Vector3(half.x * 2.0 + 0.1, 0.05, 0.06), CalderaShell.STEEL_BLUED, false)
-		CalderaShell._metal(body, at + Vector3(side * (half.x + 0.025), 0, 0.02), Vector3(0.05, half.y * 2.0, 0.06), CalderaShell.STEEL_BLUED, false)
 
 
 static func _art_glass(body: StaticBody3D, half: Vector3, colour: Color, at: Vector3, epsilon: float) -> void:

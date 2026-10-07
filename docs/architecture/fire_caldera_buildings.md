@@ -140,12 +140,11 @@ The only building in the city designed for cool bodies.
   at the glass; a rest corner of two armchairs and a low table at the cool
   end.
 - **Art, one piece per room**, made by the city's own craftsmen. The hall's
-  is a commission from the Vara studio: Omi's kiln-formed glass in Talen's
-  forged blued-steel frame, the caldera in section as fused strata from
+  is a commission from the Vara studio: Omi's kiln-formed glass, hung frameless
+  on Talen's concealed steel pins, the caldera in section as fused strata from
   basalt black through cooling reds to amber and smoke, their boundaries
   flowing as slumped glass does, with the reservoir as a flat cobalt lens
-  edged in stainless. It is lit from behind by a concealed panel that haloes
-  the wall. Three small studies for it hang on the hall's free wall lengths,
+  edged in stainless. Three small studies for it hang on the hall's free wall lengths,
   following the colour rule: amber by the door, mixed by the table, cobalt
   at the rest corner. The rooms: three mineral discs,
   gifts from the city (keeper's room); a forged skyline of the rim set with
