@@ -12,18 +12,14 @@ const COOL_STONE := Color(0.46, 0.46, 0.48)
 
 # ---------------------------------------------------------------------------
 # Guest house (brief section 3): a 15.5 x 12 m glass pavilion. The receiving
-# lounge fills the front (z 0.25..6). Behind it four rooms, each fitted to its
-# use, across 3 + 5 + 3.5 + 4 = 15.5 m:
-#   keeper's room x -7.75..-4.75: Eris's provisions and ledger; stone, one
-#     tall glass slot, no skylight; a working room, not a guest room.
-#   rim room      x -4.75..0.25: two beds for the party, full rear glass up to
-#     the crater rim, amber band and an amber-tinted dome (warm light).
-#   washroom      x 0.25..3.75: the lava people's way with water and heat
-#     (see _guest_washroom).
-#   lake room     x 3.75..7.75: one bed under east glass toward the
-#     reservoir's glow, cobalt band and a cobalt-tinted dome (cool light).
-# Partitions are stone to 3.0 m, so every door has a 0.6 m stone lintel, then
-# stained glass to the roof.
+# hall fills the front (z 0.25..6). Behind it four rooms fitted to their use,
+# across 3 + 5 + 3.5 + 4 = 15.5 m: the keeper's room, the rim room, the
+# washroom, the lake room. See the brief for the occupant, the program and
+# the colour rule: amber is welcome and warmth, cobalt is cooling and water;
+# every band takes the colour of the room behind it, so the west half reads
+# warm and the east half cool, and the hall, which faces both, carries amber
+# from its door and cobalt toward the lake end, interleaved in its middle.
+# Nothing is wood or ordinary cloth (CalderaFurniture).
 # ---------------------------------------------------------------------------
 
 const GUEST_SIZE := Vector2(15.5, 12.0)
@@ -31,12 +27,23 @@ const GUEST_FRONT_DOOR := -5.75
 const COBALT := Color(0.16, 0.30, 0.72)
 const AMBER := Color(0.92, 0.60, 0.16)
 const GUEST_STAINED: Array[Color] = [COBALT, AMBER]
+const C := 0
+const A := 1
 const REAR_Z := 0.25
 const PARTITION_SOLID := 3.0
 const INNER_DOOR_WIDTH := 1.2
 const INNER_DOOR_HEIGHT := 2.4
 const WARM_GLASS := Color(0.62, 0.52, 0.40, 0.30)
 const COOL_GLASS := Color(0.30, 0.42, 0.66, 0.32)
+const AMBER_CLOTH := Color(0.74, 0.48, 0.18)
+const COBALT_CLOTH := Color(0.20, 0.30, 0.58)
+## The rooms behind the hall: [x from, x to, door x, band colour].
+const ROOMS := {
+	"keeper": [-7.75, -4.75, -6.25, A],
+	"rim": [-4.75, 0.25, -3.4, A],
+	"washroom": [0.25, 3.75, 2.0, C],
+	"lake": [3.75, 7.75, 5.0, C],
+}
 
 
 static func guest_spec() -> Dictionary:
@@ -47,41 +54,37 @@ static func guest_spec() -> Dictionary:
 		"door_at": GUEST_FRONT_DOOR,
 		"stained": GUEST_STAINED,
 		"walls": {
-			# West to east along the front: a stone pier, the door, then six
-			# full glass panels onto the forecourt.
+			# West to east: amber from the stone pier and the door, interleaved
+			# over the dining table, cobalt toward the lake end.
 			"front": [
-				{"to": 0.70, "kind": "stone", "band": 1}, {"to": 3.30, "kind": "door", "band": 0},
-				{"to": 5.33, "kind": "glass", "tint": clear, "band": 1}, {"to": 7.37, "kind": "glass", "tint": clear, "band": 0},
-				{"to": 9.40, "kind": "glass", "tint": clear, "band": 1}, {"to": 11.43, "kind": "glass", "tint": clear, "band": 0},
-				{"to": 13.47, "kind": "glass", "tint": clear, "band": 1}, {"to": 15.50, "kind": "glass", "tint": clear, "band": 0},
+				{"to": 0.70, "kind": "stone", "band": A}, {"to": 3.30, "kind": "door", "band": A},
+				{"to": 5.33, "kind": "glass", "tint": clear, "band": A}, {"to": 7.37, "kind": "glass", "tint": clear, "band": C},
+				{"to": 9.40, "kind": "glass", "tint": clear, "band": A}, {"to": 11.43, "kind": "glass", "tint": clear, "band": C},
+				{"to": 13.47, "kind": "glass", "tint": clear, "band": C}, {"to": 15.50, "kind": "glass", "tint": clear, "band": C},
 			],
-			# West to east along the back: keeper's stone, the rim room's glass,
-			# the washroom's stone, the lake room's glass.
 			"back": [
-				{"to": 3.0, "kind": "stone", "band": 0},
-				{"to": 5.5, "kind": "glass", "tint": WARM_GLASS, "band": 1}, {"to": 8.0, "kind": "glass", "tint": WARM_GLASS, "band": 1},
-				{"to": 11.5, "kind": "stone", "band": 0},
-				{"to": 13.5, "kind": "glass", "tint": COOL_GLASS, "band": 0}, {"to": 15.5, "kind": "glass", "tint": COOL_GLASS, "band": 0},
+				{"to": 3.0, "kind": "stone", "band": A},
+				{"to": 5.5, "kind": "glass", "tint": WARM_GLASS, "band": A}, {"to": 8.0, "kind": "glass", "tint": WARM_GLASS, "band": A},
+				{"to": 11.5, "kind": "stone", "band": C},
+				{"to": 13.5, "kind": "glass", "tint": COOL_GLASS, "band": C}, {"to": 15.5, "kind": "glass", "tint": COOL_GLASS, "band": C},
 			],
-			# Back to front along the west: the keeper's room with one tall glass
-			# slot at the desk, then the lounge.
 			"west": [
-				{"to": 2.6, "kind": "stone", "band": 0}, {"to": 3.5, "kind": "glass", "tint": smoky, "band": 1},
-				{"to": 6.25, "kind": "stone", "band": 0},
-				{"to": 9.125, "kind": "glass", "tint": clear, "band": 1}, {"to": 12.0, "kind": "glass", "tint": clear, "band": 0},
+				{"to": 2.6, "kind": "stone", "band": A}, {"to": 3.5, "kind": "glass", "tint": smoky, "band": A},
+				{"to": 6.25, "kind": "stone", "band": A},
+				{"to": 9.125, "kind": "glass", "tint": clear, "band": A}, {"to": 12.0, "kind": "glass", "tint": clear, "band": A},
 			],
-			# Back to front along the east: the lake room's glass toward the
-			# reservoir, then the lounge.
 			"east": [
-				{"to": 3.125, "kind": "glass", "tint": COOL_GLASS, "band": 0}, {"to": 6.25, "kind": "glass", "tint": COOL_GLASS, "band": 0},
-				{"to": 9.125, "kind": "glass", "tint": clear, "band": 1}, {"to": 12.0, "kind": "glass", "tint": clear, "band": 0},
+				{"to": 3.125, "kind": "glass", "tint": COOL_GLASS, "band": C}, {"to": 6.25, "kind": "glass", "tint": COOL_GLASS, "band": C},
+				{"to": 9.125, "kind": "glass", "tint": clear, "band": C}, {"to": 12.0, "kind": "glass", "tint": clear, "band": C},
 			],
 		},
+		# Each dome takes the full reach of its room's roof, less a margin.
 		"skylights": [
-			{"name": "Lounge", "at": Vector2(0.7, 2.75), "half": Vector2(2.75, 1.85), "rise": 1.05, "tint": clear},
-			{"name": "RimRoom", "at": Vector2(-2.25, -3.0), "half": Vector2(1.75, 1.6), "rise": 0.82, "tint": Color(0.95, 0.66, 0.30, 0.34)},
-			{"name": "Washroom", "at": Vector2(2.0, -3.0), "half": Vector2(1.0, 0.95), "rise": 0.55, "tint": Color(0.86, 0.88, 0.90, 0.6)},
-			{"name": "LakeRoom", "at": Vector2(5.75, -3.0), "half": Vector2(1.4, 1.6), "rise": 0.75, "tint": Color(0.30, 0.45, 0.88, 0.36)},
+			{"name": "Hall", "at": Vector2(0.0, 3.125), "half": Vector2(7.0, 2.4), "rise": 1.25, "tint": clear},
+			{"name": "KeeperRoom", "at": Vector2(-6.25, -2.875), "half": Vector2(1.05, 2.6), "rise": 0.6, "tint": Color(0.95, 0.70, 0.36, 0.36)},
+			{"name": "RimRoom", "at": Vector2(-2.25, -2.875), "half": Vector2(2.05, 2.7), "rise": 0.95, "tint": Color(0.95, 0.66, 0.30, 0.34)},
+			{"name": "Washroom", "at": Vector2(2.0, -2.875), "half": Vector2(1.3, 2.6), "rise": 0.65, "tint": Color(0.78, 0.84, 0.94, 0.55)},
+			{"name": "LakeRoom", "at": Vector2(5.75, -2.875), "half": Vector2(1.55, 2.7), "rise": 0.85, "tint": Color(0.30, 0.45, 0.88, 0.36)},
 		],
 	}
 
@@ -91,13 +94,7 @@ static func guest_house(parent: Node3D, entry: Dictionary, line: Dictionary) -> 
 	_guest_terrace(body)
 	_guest_entry_fin(body)
 	_guest_partitions(body)
-	# The lounge: Eris's counter facing the door, a cool stone bench, a table.
-	Furnishings.counter(body, Vector3(-5.65, 0.0, 2.35), PI, 1.70, false)
-	_piece(body, Vector3(0.34, 0.22, 1.05), COOL_STONE, Vector3(-7.15, 0.22, 2.55), true)
-	Furnishings.table(body, Vector3(2.35, 0.0, 3.20), 0.0, 3.0, 1.0, "chairs")
-	_marker(body, "StandMarker", Vector3(-5.65, 0.0, 3.45), 0.0)
-	_marker(body, "KeeperStand", Vector3(-5.65, 0.0, 1.35), 0.0)
-	_marker(body, "GatherMarker", Vector3(2.10, 0.0, 1.65), 0.0)
+	_guest_hall(body)
 	_guest_keeper_room(body)
 	_guest_rim_room(body)
 	_guest_washroom(body)
@@ -105,68 +102,49 @@ static func guest_house(parent: Node3D, entry: Dictionary, line: Dictionary) -> 
 	return body
 
 
-## Stone partitions to 3.0 m with a stained band to the roof: the rear wall
-## along the lounge with a door into each room, and the three walls between
-## the rooms.
+## Stone partitions to 3.0 m, each doorway a punched superellipse with its
+## frame and leaf, a stained band to the roof in each room's colour.
 static func _guest_partitions(body: StaticBody3D) -> void:
-	_partition(body, Vector2(-7.75, REAR_Z), Vector2(7.75, REAR_Z), [-6.25, -3.4, 2.0, 5.0], [AMBER, COBALT, AMBER, COBALT])
-	_partition(body, Vector2(-4.75, -6.0), Vector2(-4.75, REAR_Z), [], [COBALT])
-	_partition(body, Vector2(0.25, -6.0), Vector2(0.25, REAR_Z), [], [AMBER])
-	_partition(body, Vector2(3.75, -6.0), Vector2(3.75, REAR_Z), [], [COBALT])
+	# Along the hall: one door into each room.
+	for key: String in ROOMS:
+		var room: Array = ROOMS[key]
+		var x0: float = room[0]
+		var x1: float = room[1]
+		var door: float = room[2]
+		var west := door - INNER_DOOR_WIDTH * 0.5 - 0.35
+		var east := door + INNER_DOOR_WIDTH * 0.5 + 0.35
+		CalderaShell.door_opening(body, Vector3((west + east) * 0.5, 0.0, REAR_Z), 0.0, east - west, PARTITION_SOLID, 0.18, INNER_DOOR_WIDTH, INNER_DOOR_HEIGHT, 1, BASALT_PARTITION)
+		for span: Vector2 in [Vector2(x0, west), Vector2(east, x1)]:
+			if span.y - span.x > 0.05:
+				_slab(body, (span.x + span.y) * 0.5, span.y - span.x, REAR_Z, true, 0.0, PARTITION_SOLID, BASALT_PARTITION)
+		_band(body, x0, x1, REAR_Z, true, GUEST_STAINED[int(room[3])])
+		for direction: Vector2 in [Vector2(0, 1), Vector2(0, -1)]:
+			ClearZones.add(body, "%s door" % key, "door", Vector2(door, REAR_Z), direction, 0.0, 1.0, INNER_DOOR_WIDTH * 0.5, 0.05, 1.9)
+	# Between the rooms: amber where it divides two warm rooms, cobalt from the
+	# washroom east.
+	for wall: Array in [[-4.75, A], [0.25, C], [3.75, C]]:
+		var x: float = wall[0]
+		_slab(body, -2.875, 6.25, x, false, 0.0, PARTITION_SOLID, BASALT_PARTITION)
+		_band(body, -6.0, REAR_Z, x, false, GUEST_STAINED[int(wall[1])])
 
 
-static func _partition(body: StaticBody3D, a: Vector2, b: Vector2, doors: Array, bands: Array) -> void:
-	var along_x := absf(b.x - a.x) > absf(b.y - a.y)
-	var start := minf(a.x, b.x) if along_x else minf(a.y, b.y)
-	var finish := maxf(a.x, b.x) if along_x else maxf(a.y, b.y)
-	var fixed := a.y if along_x else a.x
-	var pieces: Array[Vector2] = []
-	var cursor := start
-	for centre: float in doors:
-		pieces.append(Vector2(cursor, centre - INNER_DOOR_WIDTH * 0.5))
-		cursor = centre + INNER_DOOR_WIDTH * 0.5
-	pieces.append(Vector2(cursor, finish))
-	for piece: Vector2 in pieces:
-		if piece.y - piece.x > 0.05:
-			_slab(body, (piece.x + piece.y) * 0.5, piece.y - piece.x, fixed, along_x, 0.0, PARTITION_SOLID, BASALT_PARTITION)
-	for i in doors.size():
-		var centre: float = doors[i]
-		# A 0.6 m stone lintel over every door: the stained glass starts well
-		# clear of the frame.
-		_slab(body, centre, INNER_DOOR_WIDTH, fixed, along_x, INNER_DOOR_HEIGHT, PARTITION_SOLID, BASALT_PARTITION.darkened(0.08))
-		var door: Node3D = load("res://scripts/world_door.gd").new()
-		door.position = Vector3(centre, 0.0, fixed) if along_x else Vector3(fixed, 0.0, centre)
-		door.rotation.y = 0.0 if along_x else PI * 0.5
-		body.add_child(door)
-		door.configure(INNER_DOOR_WIDTH * 0.5 - 0.04, INNER_DOOR_HEIGHT, 1, CalderaShell.STEEL_BLUED.lightened(0.2))
-		var at2 := Vector2(centre, fixed) if along_x else Vector2(fixed, centre)
-		for direction: Vector2 in ([Vector2(0, 1), Vector2(0, -1)] if along_x else [Vector2(1, 0), Vector2(-1, 0)]):
-			ClearZones.add(body, "inner door", "door", at2, direction, 0.0, 1.0, INNER_DOOR_WIDTH * 0.5, 0.05, 1.9)
-	# The stained band above, one colour per segment between the room walls.
-	var band_height := CalderaShell.STOREY - PARTITION_SOLID
-	var count := bands.size()
-	for i in count:
-		var s0 := lerpf(start, finish, float(i) / float(count))
-		var s1 := lerpf(start, finish, float(i + 1) / float(count))
-		var colour: Color = bands[i]
-		var size := Vector3(s1 - s0 - 0.06, band_height - 0.06, 0.05) if along_x else Vector3(0.05, band_height - 0.06, s1 - s0 - 0.06)
-		var at := Vector3((s0 + s1) * 0.5, PARTITION_SOLID + band_height * 0.5, fixed) if along_x else Vector3(fixed, PARTITION_SOLID + band_height * 0.5, (s0 + s1) * 0.5)
-		var pane := MeshInstance3D.new()
-		pane.name = "PartitionBand"
-		var box := BoxMesh.new()
-		box.size = size
-		pane.mesh = box
-		var material := SolidModel.material(Color(colour, 0.6), 0.06, 0.05)
-		material.cull_mode = BaseMaterial3D.CULL_DISABLED
-		pane.material_override = material
-		pane.position = at
-		body.add_child(pane)
-		CollisionPolicy.add_box(body, pane, size, at, Basis(), false)
-	# A blued-steel bar where stone meets glass, the same seam as the outside.
-	var run := finish - start
-	var bar_size := Vector3(run, 0.08, 0.2) if along_x else Vector3(0.2, 0.08, run)
-	var bar_at := Vector3((start + finish) * 0.5, PARTITION_SOLID, fixed) if along_x else Vector3(fixed, PARTITION_SOLID, (start + finish) * 0.5)
-	CalderaShell._metal(body, bar_at, bar_size, CalderaShell.STEEL_BLUED, false)
+static func _band(body: StaticBody3D, s0: float, s1: float, fixed: float, along_x: bool, colour: Color) -> void:
+	var height := CalderaShell.STOREY - PARTITION_SOLID
+	var size := Vector3(s1 - s0 - 0.06, height - 0.06, 0.05) if along_x else Vector3(0.05, height - 0.06, s1 - s0 - 0.06)
+	var at := Vector3((s0 + s1) * 0.5, PARTITION_SOLID + height * 0.5, fixed) if along_x else Vector3(fixed, PARTITION_SOLID + height * 0.5, (s0 + s1) * 0.5)
+	var pane := MeshInstance3D.new()
+	pane.name = "PartitionBand"
+	var box := BoxMesh.new()
+	box.size = size
+	pane.mesh = box
+	var material := SolidModel.material(Color(colour, 0.6), 0.06, 0.05)
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	pane.material_override = material
+	pane.position = at
+	body.add_child(pane)
+	CollisionPolicy.add_box(body, pane, size, at, Basis(), false)
+	var bar_size := Vector3(s1 - s0, 0.08, 0.2) if along_x else Vector3(0.2, 0.08, s1 - s0)
+	CalderaShell._metal(body, Vector3(at.x, PARTITION_SOLID, at.z), bar_size, CalderaShell.STEEL_BLUED, false)
 
 
 static func _slab(body: StaticBody3D, along: float, length: float, fixed: float, along_x: bool, y0: float, y1: float, colour: Color) -> void:
@@ -183,41 +161,136 @@ static func _slab(body: StaticBody3D, along: float, length: float, fixed: float,
 	CollisionPolicy.add_box(body, mesh, size, at, Basis(), false)
 
 
-## Eris's working room off her counter: the sealed provisions wall (imported
-## food and water for the rare guest), her desk at the glass slot with the
-## guest ledger cast in thin metal plates, hooks for travellers' gear.
-static func _guest_keeper_room(body: StaticBody3D) -> void:
-	Furnishings.shelf(body, Vector3(-6.25, 0.0, -5.6), 0.0, 2.4, 4, "crocks")
-	Furnishings.chest(body, Vector3(-5.35, 0.0, -3.9), PI * 0.5, Furnishings.OAK_DARK, 0.8)
-	Furnishings.desk(body, Vector3(-7.0, 0.0, -2.05), -PI * 0.5)
+## The receiving hall, laid out for hospitality from the door inward:
+##   arrival: a stone bench and a pack rack by the door to set down loads;
+##   welcome: Eris's counter facing the door, a glass carafe of the guests'
+##     imported water and two cups on it (the most precious thing she can
+##     offer a cool body), her ledger plates at her side;
+##   provision: a long stone sideboard of imported food, under a cast-basalt
+##     relief of the caldera with the reservoir picked out in a glowing seam,
+##     so a guest learns where they are without a word;
+##   table: a stone table and six chairs at the reservoir glass;
+##   rest: two armchairs and a low table on a basalt-fibre mat at the cool end;
+##   light: the shell's cove lines, lines under the counter and sideboard,
+##     and three concealed lights, one per group; no visible fittings.
+static func _guest_hall(body: StaticBody3D) -> void:
+	# Arrival.
+	CalderaFurniture.bench(body, Vector3(-7.25, 0.0, 2.45), -PI * 0.5, 1.9)
+	CalderaFurniture.piece(body, Vector3(0.3, 0.35, 0.45), CalderaShell.STEEL_BLUED, Vector3(-7.3, 0.35, 4.25), 0.0, true)
+	CalderaFurniture.piece(body, Vector3(0.22, 0.18, 0.3), CalderaFurniture.FIBRE, Vector3(-7.3, 0.88, 4.15), 0.2, false, SuperEgg.EPSILON_SOFT)
+	# Welcome.
+	CalderaFurniture.counter(body, Vector3(-5.65, 0.0, 2.35), PI, 1.8)
+	CalderaFurniture.jar(body, Vector3(-5.2, 1.03, 2.35), Color(0.30, 0.58, 0.88, 0.6), 0.08)
+	for i in 2:
+		CalderaFurniture.jar(body, Vector3(-4.95 + 0.14 * float(i), 1.03, 2.45), Color(0.80, 0.90, 0.95, 0.2), 0.04)
 	for i in 3:
-		_piece(body, Vector3(0.12, 0.006, 0.16), CalderaShell.STAINLESS.darkened(0.1 * float(i)), Vector3(-7.15, 0.83 + 0.012 * float(i), -2.2 + 0.05 * float(i)), false)
-	Furnishings.peg_rail(body, Vector3(-4.87, 0.0, -1.6), -PI * 0.5, 1.2, 1.75)
+		CalderaFurniture.piece(body, Vector3(0.12, 0.006, 0.16), CalderaShell.STAINLESS.darkened(0.08 * float(i)), Vector3(-6.2, 1.04 + 0.012 * float(i), 2.3 + 0.04 * float(i)))
+	_marker(body, "StandMarker", Vector3(-5.65, 0.0, 3.45), 0.0)
+	_marker(body, "KeeperStand", Vector3(-5.65, 0.0, 1.35), 0.0)
+	CalderaFurniture.concealed_light(body, Vector3(-5.2, 2.9, 2.6), CalderaFurniture.LED_WARM, 0.8, 6.0)
+	# Provision, under the caldera relief.
+	CalderaFurniture.sideboard(body, Vector3(-0.7, 0.0, REAR_Z + 0.36), PI, 3.6)
+	for i in 5:
+		var tones: Array[Color] = [Color(0.72, 0.55, 0.30), Color(0.62, 0.32, 0.30), Color(0.80, 0.70, 0.42)]
+		CalderaFurniture.piece(body, Vector3(0.16, 0.05, 0.16), CalderaFurniture.BASALT.lightened(0.15), Vector3(-2.1 + 0.68 * float(i), 0.95, REAR_Z + 0.36), 0.0, false, 2.4)
+		CalderaFurniture.piece(body, Vector3(0.1, 0.06, 0.1), tones[i % 3], Vector3(-2.1 + 0.68 * float(i), 1.03, REAR_Z + 0.36), 0.0, false, 2.0)
+	_caldera_relief(body, Vector3(-0.7, 1.95, REAR_Z + 0.11))
+	# Table at the glass.
+	CalderaFurniture.table(body, Vector3(2.0, 0.0, 3.6), 0.0, 3.0, 1.0)
+	for i in 3:
+		var x := 1.0 + float(i)
+		CalderaFurniture.chair(body, Vector3(x, 0.0, 2.65), PI, AMBER_CLOTH)
+		CalderaFurniture.chair(body, Vector3(x, 0.0, 4.55), 0.0, COBALT_CLOTH)
+	CalderaFurniture.concealed_light(body, Vector3(1.0, 2.9, 2.4), CalderaFurniture.LED_WARM, 0.7, 6.0)
+	_marker(body, "GatherMarker", Vector3(2.0, 0.0, 1.55), 0.0)
+	# Rest at the cool end.
+	CalderaFurniture.mat(body, Vector3(6.1, 0.0, 3.3), 0.0, Vector2(2.6, 2.2), CalderaFurniture.FIBRE_GREY)
+	CalderaFurniture.chair(body, Vector3(5.1, 0.0, 3.3), -PI * 0.5, COBALT_CLOTH, true)
+	CalderaFurniture.chair(body, Vector3(7.1, 0.0, 3.3), PI * 0.5, COBALT_CLOTH, true)
+	CalderaFurniture.low_table(body, Vector3(6.1, 0.0, 3.3), 0.0)
+	CalderaFurniture.concealed_light(body, Vector3(6.1, 2.9, 2.8), CalderaFurniture.LED_WARM.lerp(CalderaFurniture.LED_COOL, 0.5), 0.6, 5.0)
 
 
-## The rim room: two beds for the party, heads to the lounge wall, feet toward
-## the full rear glass and the crater rim beyond; a cool stone ledge under the
-## glass; amber light from its dome and band.
+## The hall's art: the caldera in relief, cast in basalt, its reservoir a
+## glowing amber seam and its ten plots raised as small stone blocks.
+static func _caldera_relief(body: StaticBody3D, at: Vector3) -> void:
+	CalderaFurniture.piece(body, Vector3(1.2, 0.62, 0.03), CalderaFurniture.BASALT, at)
+	var scale := 1.0 / 70.0
+	var outline := FireCalderaPlan.reservoir_polygon(24)
+	for i in outline.size():
+		var p := outline[i] * scale
+		_glow(body, "ReliefSeam", Vector3(0.025, 0.025, 0.01), at + Vector3(p.x, p.y, 0.04), Color(1.0, 0.5, 0.12))
+	for plot in FireCalderaPlan.PLOTS:
+		var c: Vector2 = (plot["centre"] as Vector2) * scale
+		CalderaFurniture.piece(body, Vector3(0.05, 0.04, 0.02), CalderaFurniture.STONE.lightened(0.15), at + Vector3(c.x, c.y, 0.04))
+
+
+## Eris's working room: the sealed provisions shelves along the back wall, her
+## desk at the glass slot with the ledger plates, hooks for travellers' gear;
+## her own art is a row of three mineral discs, gifts from the city.
+static func _guest_keeper_room(body: StaticBody3D) -> void:
+	CalderaFurniture.shelves(body, Vector3(-6.25, 0.0, -5.75), 0.0, 2.4, 4, func(b: StaticBody3D, p: Vector3, i: int) -> void:
+		CalderaFurniture.jar(b, p, [Color(0.72, 0.55, 0.30), Color(0.30, 0.55, 0.85, 0.6), Color(0.62, 0.32, 0.30)][i % 3], 0.06))
+	CalderaFurniture.chest(body, Vector3(-5.25, 0.0, -4.0), PI * 0.5)
+	CalderaFurniture.table(body, Vector3(-7.25, 0.0, -2.9), PI * 0.5, 1.4, 0.7)
+	for i in 3:
+		CalderaFurniture.piece(body, Vector3(0.12, 0.006, 0.16), CalderaShell.STAINLESS.darkened(0.08 * float(i)), Vector3(-7.25, 0.8 + 0.012 * float(i), -3.1 + 0.05 * float(i)))
+	CalderaFurniture.hooks(body, Vector3(-4.9, 0.0, -1.6), PI * 0.5, 1.2)
+	for i in 3:
+		var disc := CalderaFurniture.piece(body, Vector3(0.16, 0.16, 0.02), [Color(0.55, 0.30, 0.60), Color(0.30, 0.62, 0.55), Color(0.80, 0.55, 0.20)][i], Vector3(-7.55, 1.75, -5.2 + 0.45 * float(i)), PI * 0.5, false, 2.0)
+		disc.material_override = SolidModel.material(disc.get_surface_override_material(0).albedo_color, 0.2, 0.3)
+	CalderaFurniture.concealed_light(body, Vector3(-6.25, 2.9, -3.0), CalderaFurniture.LED_WARM, 0.5, 4.5)
+
+
+## The rim room, for two of the party: both beds head to the west wall side by
+## side, feet toward the room's middle, the full rear glass and the crater rim
+## to the side; a chest at each bed's foot, its back to the bed; an amber mat
+## between; on the east wall, the room's art, a forged steel skyline of the
+## rim set with amber glass; the bed heads washed by their own hidden lines.
 static func _guest_rim_room(body: StaticBody3D) -> void:
 	for i in 2:
-		var bed := TownProps.build_bed(_blanket(i))
-		bed.position = Vector3(-3.55 + 2.3 * float(i), 0.0, -2.25)
-		bed.rotation.y = PI
-		body.add_child(bed)
-	_marker(body, "WakeMarker", Vector3(-3.55, 0.60, -2.25), 0.0)
-	_piece(body, Vector3(2.0, 0.2, 0.28), COOL_STONE, Vector3(-2.25, 0.2, -5.55), true)
-	Furnishings.chest(body, Vector3(-0.35, 0.0, -0.45), 0.0, Furnishings.OAK_DARK, 0.62)
+		var z := -2.0 - 2.55 * float(i)
+		CalderaFurniture.bed(body, Vector3(-3.5, 0.0, z), PI * 0.5, AMBER_CLOTH if i == 0 else CalderaFurniture.FIBRE)
+		CalderaFurniture.chest(body, Vector3(-1.9, 0.0, z), -PI * 0.5, 0.7)
+	_marker(body, "WakeMarker", Vector3(-3.5, 0.60, -2.0), 0.0)
+	CalderaFurniture.mat(body, Vector3(-3.1, 0.0, -3.28), PI * 0.5, Vector2(1.6, 2.4), AMBER_CLOTH.darkened(0.2))
+	_rim_skyline(body, Vector3(0.14, 1.9, -3.2))
+	CalderaFurniture.concealed_light(body, Vector3(-2.6, 2.9, -3.3), CalderaFurniture.LED_WARM, 0.55, 5.0)
 
 
-## The lake room: one bed along the east glass toward the reservoir's glow, a
-## reading chair, cobalt light from its dome and band.
+## A forged steel silhouette of the crater rim, its peaks filled with amber
+## glass.
+static func _rim_skyline(body: StaticBody3D, at: Vector3) -> void:
+	CalderaFurniture.piece(body, Vector3(0.015, 0.5, 1.5), CalderaFurniture.BASALT, at + Vector3(0.005, 0.05, 0))
+	var heights := [0.25, 0.55, 0.35, 0.75, 0.45, 0.3, 0.6, 0.2]
+	for i in heights.size():
+		var z := at.z - 1.2 + 0.34 * float(i)
+		var h: float = heights[i]
+		var pane := CalderaFurniture.piece(body, Vector3(0.015, h * 0.5, 0.18), AMBER, at + Vector3(-0.02, h * 0.5 - 0.3, z - at.z), 0.0, false, 7.0)
+		var glass := SolidModel.material(Color(AMBER, 0.75), 0.06, 0.05)
+		glass.cull_mode = BaseMaterial3D.CULL_DISABLED
+		pane.material_override = glass
+		CalderaFurniture.piece(body, Vector3(0.02, 0.02, 0.18), CalderaShell.STEEL_BLUED, at + Vector3(-0.02, h - 0.3, z - at.z))
+	CalderaFurniture.piece(body, Vector3(0.025, 0.025, 1.4), CalderaShell.STEEL_BLUED, at + Vector3(-0.02, -0.3, 0))
+
+
+## The lake room, for one: the bed's head on the west wall and its foot toward
+## the east glass and the reservoir's glow; a chest at its foot; an armchair
+## in the glass corner facing the water; the room's art, a
+## cobalt glass ripple roundel, above the bed's head.
 static func _guest_lake_room(body: StaticBody3D) -> void:
-	var bed := TownProps.build_bed(_blanket(2))
-	bed.position = Vector3(6.6, 0.0, -3.4)
-	bed.rotation.y = PI * 0.5
-	body.add_child(bed)
-	Furnishings.armchair(body, Vector3(4.6, 0.0, -4.9), StiltKit.yaw_back_to(Vector2(-1, -1).normalized()))
-	Furnishings.chest(body, Vector3(7.1, 0.0, -1.0), -PI * 0.5, Furnishings.OAK_DARK, 0.62)
+	CalderaFurniture.bed(body, Vector3(5.1, 0.0, -3.4), PI * 0.5, COBALT_CLOTH)
+	CalderaFurniture.chest(body, Vector3(6.7, 0.0, -3.4), -PI * 0.5, 0.7)
+	CalderaFurniture.chair(body, Vector3(7.0, 0.0, -1.4), -PI * 0.5, COBALT_CLOTH, true)
+	CalderaFurniture.mat(body, Vector3(6.3, 0.0, -1.5), 0.0, Vector2(1.6, 1.2), COBALT_CLOTH.darkened(0.2))
+	CalderaFurniture.concealed_light(body, Vector3(5.8, 2.9, -3.0), CalderaFurniture.LED_COOL, 0.5, 5.0)
+	for ring in 3:
+		var r := 0.42 - 0.12 * float(ring)
+		var disc := CalderaFurniture.piece(body, Vector3(0.012 + 0.004 * float(ring), r, r), COBALT.lightened(0.15 * float(ring)), Vector3(3.86 + 0.01 * float(ring), 1.9, -3.4), 0.0, false, 2.0)
+		var glass := SolidModel.material(Color(COBALT.lightened(0.15 * float(ring)), 0.7), 0.06, 0.05)
+		glass.cull_mode = BaseMaterial3D.CULL_DISABLED
+		disc.material_override = glass
+	CalderaFurniture.piece(body, Vector3(0.02, 0.46, 0.46), CalderaShell.STEEL_BLUED, Vector3(3.85, 1.9, -3.4), 0.0, false, 2.0)
 
 
 ## The washroom, as the lava people would make one for cool bodies. Water is
@@ -231,6 +304,8 @@ static func _guest_lake_room(body: StaticBody3D) -> void:
 ##   - a gently warmed radiant stone bench dries a bather instead of towels;
 ##   - the basin is a carved basalt bowl, the mirror polished obsidian.
 static func _guest_washroom(body: StaticBody3D) -> void:
+	_washroom_art(body)
+	CalderaFurniture.concealed_light(body, Vector3(2.0, 2.9, -3.0), CalderaFurniture.LED_COOL, 0.45, 4.5)
 	var toilet := ToiletFixtures.build("incinerating")
 	toilet.name = "IncineratingToilet"
 	toilet.position = Vector3(3.0, 0.0, -5.15)
@@ -278,9 +353,19 @@ static func _guest_washroom(body: StaticBody3D) -> void:
 	mirror.position = Vector3(3.64, 1.65, -2.3)
 	body.add_child(mirror)
 	CollisionPolicy.mark_decorative(mirror)
+	# Backlit: a line hidden behind the mirror's top edge haloes the wall.
+	CalderaFurniture.led_line(body, Vector3(3.67, 2.06, -2.3), PI * 0.5, 0.56, CalderaFurniture.LED_COOL)
 	# The radiant drying bench, its heat seam along the front.
 	_piece(body, Vector3(0.26, 0.22, 0.7), CalderaShell.BASALT, Vector3(0.6, 0.22, -1.4), true)
 	_glow(body, "RadiantSeam", Vector3(0.01, 0.015, 0.62), Vector3(0.87, 0.3, -1.4), Color(1.0, 0.45, 0.12))
+
+
+## The washroom's art: a panel of mineral crust, the pale banded deposit a
+## vent leaves, set in a steel frame on the west wall.
+static func _washroom_art(body: StaticBody3D) -> void:
+	CalderaFurniture.piece(body, Vector3(0.02, 0.5, 0.35), CalderaShell.STEEL_BLUED, Vector3(0.36, 1.7, -4.2))
+	for i in 5:
+		CalderaFurniture.piece(body, Vector3(0.025, 0.08, 0.3), Color(0.82, 0.78, 0.66).darkened(0.07 * float(i % 3)), Vector3(0.38, 1.38 + 0.16 * float(i), -4.2), 0.0, false, 3.0)
 
 
 static func _glow(body: StaticBody3D, name_text: String, half: Vector3, at: Vector3, colour: Color) -> void:

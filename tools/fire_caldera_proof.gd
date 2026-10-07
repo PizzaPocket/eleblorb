@@ -261,8 +261,10 @@ func _render() -> void:
 	var rooms := {
 		"guest_lounge_doors": [Vector3(4.5, 1.65, 5.2), Vector3(-2.5, 2.0, 0.25)],
 		"guest_rim_room": [Vector3(-0.6, 1.6, -0.4), Vector3(-3.0, 1.2, -5.8)],
-		"guest_washroom": [Vector3(2.6, 1.6, -0.3), Vector3(1.2, 0.9, -5.2)],
-		"guest_lake_room": [Vector3(4.2, 1.6, -0.4), Vector3(7.5, 1.0, -4.5)],
+		"guest_washroom": [Vector3(1.3, 1.6, -1.2), Vector3(3.1, 0.9, -5.4)],
+		"guest_hall": [Vector3(-7.3, 1.7, 0.9), Vector3(6.0, 1.1, 4.2)],
+		"guest_hall_relief": [Vector3(0.5, 1.6, 4.6), Vector3(-0.7, 1.4, 0.25)],
+		"guest_lake_room": [Vector3(7.3, 1.6, -0.7), Vector3(4.2, 1.1, -4.6)],
 		"guest_keeper_room": [Vector3(-5.2, 1.6, -0.3), Vector3(-6.8, 1.0, -5.0)],
 	}
 	var roof_node := _shell.get_node_or_null("LowPitchSkylightRoof") as Node3D if _shell != null else null

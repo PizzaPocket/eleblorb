@@ -80,6 +80,13 @@ var _registered_lava_surfaces:Array[Dictionary]=[]
 ## then shared with the village builders so shell, floor and terrain exclusion
 ## cannot drift apart.
 var _caldera_surveys:Dictionary={}
+## Every foundation's plan outline, retaining band and floor, in the plan's
+## local frame, with a bounding circle for a cheap first test. The height
+## query answers from these, so walking, landing and snapping all meet the
+## same floor the plinth's collider and the fine mesh show (the player snaps
+## to get_mesh_height(); while it returned the natural slope inside a plot,
+## people hovered at the surrounding ground's height above the floor).
+var _caldera_sockets:Array[Dictionary]=[]
 var _under_lava_environment:Environment
 var _lava_camera:Camera3D
 var _planetary_ocean_level := DEFAULT_PLANETARY_OCEAN_LEVEL
@@ -176,7 +183,15 @@ func _terrain_height(x:float,z:float)->float:
 	var world:=Vector2(x,z)
 	var local:=FireCalderaPlan.to_local(world)
 	if _inside_caldera_patch(local):
-		return FireCalderaGround.blend_height(local,_coarse_mesh_height(x,z))
+		var height:=FireCalderaGround.blend_height(local,_coarse_mesh_height(x,z))
+		for socket in _caldera_sockets:
+			if local.distance_to(socket["centre"])>float(socket["reach"]):
+				continue
+			if Geometry2D.is_point_in_polygon(local,socket["outline"]):
+				return float(socket["datum"])
+			if Geometry2D.is_point_in_polygon(local,socket["band"]):
+				return minf(height,float(socket["datum"])-0.05)
+		return height
 	return _legacy_terrain_height(x,z)
 
 
@@ -519,7 +534,15 @@ func _build_caldera_ground()->void:
 		var line:=FireCalderaGround.survey(entry)
 		_caldera_surveys[str(entry["id"])]=line
 		var key:=SocketPlinth.size_key(entry)
-		sockets.append({"outline":SocketPlinth.exclusion(entry,line,key),"band":SocketPlinth.band(entry,key),"datum":float(line["datum"])})
+		var socket:={"outline":SocketPlinth.exclusion(entry,line,key),"band":SocketPlinth.band(entry,key),"datum":float(line["datum"])}
+		sockets.append(socket)
+		var band:PackedVector2Array=socket["band"]
+		var centre:=Vector2.ZERO
+		for point in band:centre+=point
+		centre/=float(band.size())
+		var reach:=0.0
+		for point in band:reach=maxf(reach,point.distance_to(centre))
+		_caldera_sockets.append({"outline":socket["outline"],"band":band,"datum":socket["datum"],"centre":centre,"reach":reach+0.1})
 	FireCalderaGround.build(frame,sockets,func(local:Vector2)->float:
 		var world:=FireCalderaPlan.to_world(local)
 		return _coarse_mesh_height(world.x,world.y))

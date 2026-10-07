@@ -92,6 +92,21 @@ func _run() -> void:
 			if eris != null:
 				var actions:Array = eris.dialog_actions_provider.call()
 				_expect(actions.size() == 1 and int(actions[0].get("price", -1)) == 25, "Eris offers the 25-Tokoin rest action")
+	# The height query meets every floor: the player snaps to it, so inside a
+	# plot it must return the plinth's top, not the natural slope.
+	for entry in FireCalderaPlan.PLOTS:
+		var line: Dictionary = _terrain.get_caldera_survey(str(entry["id"]))
+		if line.is_empty():
+			continue
+		var worst := 0.0
+		var polygon := FireCalderaPlan.plot_polygon(entry, "footprint")
+		var plot_centre := FireCalderaPlan.mass_centre(entry)
+		for corner in polygon:
+			for t: float in [0.0, 0.5, 0.8]:
+				var local := plot_centre.lerp(corner, t)
+				var world := FireCalderaPlan.to_world(local)
+				worst = maxf(worst, absf(float(_terrain.get_mesh_height(world.x, world.y)) - float(line["datum"])))
+		_expect(worst < 0.02, "the height query inside %s meets its floor (off by %.2f m)" % [entry["id"], worst])
 	var registered:Dictionary = RecoveryManager.get("_registered_points")
 	_expect(registered.has("fire_kingdom:caldera_village_inn"), "the live guest house registers its recovery point")
 	print("---- fire_caldera_world_probe: %d FAIL" % _failures)

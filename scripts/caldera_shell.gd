@@ -92,15 +92,10 @@ static func _build_wall(body: StaticBody3D, start: Vector2, along: Vector2, bays
 			"stone":
 				_stone(body, Vector3(mid.x, TRANSOM * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, TRANSOM, WALL), yaw))
 			"door":
-				# Stone above the door head to the transom: a real lintel, never a
-				# sliver of glass resting on the frame.
-				var lintel := TRANSOM - DOOR_HEIGHT
-				_stone(body, Vector3(mid.x, DOOR_HEIGHT + lintel * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, lintel, WALL), yaw))
-				var door: Node3D = load("res://scripts/world_door.gd").new()
-				door.position = Vector3(mid.x, 0.0, mid.y)
-				door.rotation.y = yaw
-				body.add_child(door)
-				door.configure(DOOR_CLEAR * 0.5, DOOR_HEIGHT, 2, STEEL_BLUED.lightened(0.12))
+				# A stone panel to the transom with the door cut as a superellipse
+				# (square foot, rounded head), framed in stainless and hung with
+				# leaves cut to the same outline: no glass rests on its frame.
+				door_opening(body, Vector3(mid.x, 0.0, mid.y), yaw, width - POST * 0.5, TRANSOM, WALL, DOOR_CLEAR, DOOR_HEIGHT, 2)
 		# The stained band above every bay, alternating as each bay asks.
 		var colour: Color = stained[int(bay.get("band", 0)) % stained.size()]
 		_pane(body, "StainedBand", Vector3(mid.x, (TRANSOM + STOREY) * 0.5, mid.y), Vector2(width * 0.5 - POST * 0.5, (STOREY - TRANSOM) * 0.5 - 0.05), yaw, Color(colour, 0.72))
@@ -114,6 +109,16 @@ static func _build_wall(body: StaticBody3D, start: Vector2, along: Vector2, bays
 	var middle := start + along * length * 0.5
 	_metal(body, Vector3(middle.x, TRANSOM, middle.y), _oriented(Vector3(length, 0.12, 0.16), yaw), STEEL_BLUED, false)
 	_metal(body, Vector3(middle.x, STOREY - 0.06, middle.y), _oriented(Vector3(length + POST, 0.16, 0.26), yaw), STAINLESS, false)
+	# The cove: an LED line on the inner shoulder of the transom bar, hidden
+	# behind a stainless lip, washing up through the stained band and across
+	# the ceiling. The building's light comes from its structure, not fittings.
+	var inward := Vector2(-along.y, along.x)
+	if inward.dot(-middle) < 0.0:
+		inward = -inward
+	var lip := middle + inward * 0.15
+	_metal(body, Vector3(lip.x, TRANSOM + 0.07, lip.y), _oriented(Vector3(length - POST, 0.1, 0.02), yaw), STAINLESS, false)
+	var cove := middle + inward * 0.11
+	CalderaFurniture.led_line(body, Vector3(cove.x, TRANSOM + 0.065, cove.y), yaw, length - POST, CalderaFurniture.LED_WARM)
 
 
 ## Corner posts, wide enough to cap every wall end.
@@ -138,6 +143,19 @@ static func _fork(body: StaticBody3D, at: Vector3, along: Vector2) -> void:
 		branch.transform = Transform3D(Basis(x_axis, up, x_axis.cross(up)), (tip + root) * 0.5)
 		body.add_child(branch)
 		CollisionPolicy.mark_decorative(branch)
+
+
+## A stone wall panel `length` wide and `height` tall at `origin` (its middle,
+## on the floor), turned by `yaw`, with one superellipse doorway in its middle:
+## the punched facade, its piped stainless frame and leaves of the same
+## outline. Shared by outside door bays and inner partitions.
+static func door_opening(body: StaticBody3D, origin: Vector3, yaw: float, length: float, height: float, thickness: float, clear: float, door_height: float, leaves: int, colour: Color = VOLCANIC_STONE) -> void:
+	var opening: Array[Dictionary] = [{
+		"kind": "door", "center": 0.0, "width": clear, "bottom": 0.0, "top": door_height,
+		"leaves": leaves, "exponent": TownProps.OPENING_EXPONENT,
+	}]
+	TownProps._build_panel_facade(body, length, origin, yaw, colour, opening, 0.0, height, thickness)
+	TownProps._build_panel_opening_trim(body, origin, yaw, opening[0], 0.0, STAINLESS_SHADOW, thickness, STEEL_BLUED.lightened(0.12))
 
 
 static func _oriented(size: Vector3, yaw: float) -> Vector3:

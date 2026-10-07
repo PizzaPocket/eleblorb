@@ -28,14 +28,15 @@ unchanged. These are its invariants in buildable terms.
 | Stained glass | abstract mineral and molten-flow patterns only; clear or smoky glass plus **two** stained colours per building, **three** for landmarks (see the matrix) |
 | Forged metal | blackened iron and dark steel, branching like cooled lava veins, for the structure that holds glass, canopies, rails and bridges; heat-blued and enamelled accents; bright steel only on instruments and controls; gold and silver only as thin inlays on cool surfaces |
 | Roofs | restrained low-pitch slabs, shallow walkable shells and folded or catenary canopies with integrated ash gutters to concealed downpipes; glass SuperEgg shells may be clipped and fitted over matching roof apertures as skylights; no gables, no pediments |
-| Doors | broad superellipse openings, at least 2.0 m clear, with pivoting or sliding metal-and-glass leaves; public thresholds 3 m or more |
+| Doors | broad superellipse openings, at least 2.0 m clear, with pivoting or sliding metal-and-glass leaves; public thresholds 3 m or more; front and interior doors alike are a superellipse cut in their stone panel with a piped stainless frame of the same outline (`CalderaShell.door_opening`) |
 | Thermal services | concealed in walls and floors; visible only as **service manifolds**, **inspection hatches** (on service terraces, never in a walkway), **glowing seams** and **temperature controls** where someone uses them |
 | Thermal room types | **immersion well** (a shallow lava pool fed by the duct network, 2 to 3 m across, with a cool perimeter ledge for tools and adornments); **radiant platform** (a hot basalt slab to lie on); **molten-floor room** (the whole floor a thin molten layer, for deep rejuvenation) |
-| Light | only the charter's controlled family: arrival beacons, path capsules, branching wall brackets, civic and workshop clusters, and mineral lenses below the lava |
+| Light | **architectural, not fittings** (revised 2026-10-07): concealed LED coves on the transom bar washing up through the stained band, LED lines under counters, sideboards and shelf edges and behind bed heads and mirrors, a few real lights hidden at cove height; no visible lamps or brackets. Set against that, **open flame and lava light** in the working and thermal buildings, plus the arrival beacons, path capsules and mineral lenses below the lava |
 | Ventilation | every dwelling and workshop has a gas vent stack and a pressure-relief path, venting outward and uphill toward the west and far shelves |
 | Glazed fronts and doors | bays of about 2 m between posts, one panel per bay; never a superellipse cut-out window or a domestic window grid; a door has at least 2.0 m clear, its own bay, and a stone lintel to the transom so no glass rests on its frame; interior doors keep 0.6 m of stone between their head and the stained glass above |
 | Headroom | every canopy, bridge roof, gallery or upper floor a route passes under clears 2.4 m; public halls are taller by program, not by accident |
 | Vertical circulation | ramps, never stairs: 32 degrees at most, 1.4 m wide (2.0 m on public routes), a 1.2 m landing at foot and head; one storey of 3.5 m needs about 5.6 m of run, so about 8 m with landings. Every upper floor names its ramp or lift in its brief |
+| Furniture and textiles | **no wood anywhere**: a lava person would burn it by touching it (`CalderaFurniture`). Cast basalt and stone, blued and stainless steel, glass. Textiles follow real heat-proof cloth: basalt fibre (bronze-gold, used for fire blankets) for guest bedding and mats, silica cloth (to about 1000 °C) for mattresses and anything a lava person touches, mineral-coated glass-fibre cloth for coloured upholstery, ceramic fibre (about 1260 °C) for the hottest work, stainless mesh for drapery; never asbestos or aramid |
 | Collision | shells, plinths, terraces, rails, bridges, counters and instruments solid; molten wells and floors use the hazard and liquid API; sparks and seams decorative |
 
 ### Signature motif
@@ -118,8 +119,31 @@ The only building in the city designed for cool bodies.
   - a gently warmed **radiant stone bench** dries a bather instead of towels
     (the city's radiant-platform room type, at a cool body's temperature);
   - the basin is a carved basalt bowl; the mirror is polished obsidian.
-- **Partitions:** stone to 3.0 m, so every door (2.4 m) has a 0.6 m stone
-  lintel, then stained glass to the roof in the room's colour.
+- **Partitions:** stone to 3.0 m, each door a superellipse opening with a
+  piped frame and a 0.6 m stone lintel, then stained glass to the roof in the
+  room's colour.
+- **Colour rule** (2026-10-07): amber is welcome and warmth, cobalt is cooling
+  and water, and each band takes the colour of the room behind it. The west
+  half (keeper's room, rim room) is amber and the east half (washroom, lake
+  room) cobalt. The front band reads amber at the door, interleaves over the
+  dining table, then turns cobalt toward the lake end, so the building warms
+  you in and cools toward the water.
+- **Skylights at full reach:** each dome fills its room's share of the roof:
+  a long clear dome over the whole hall, amber over the keeper's and rim
+  rooms, frosted over the washroom, cobalt over the lake room.
+- **Hall program** (hospitality, west to east): arrival bench and pack rack
+  beside the door; Eris's counter facing arrivals with water and the ledger
+  plates; a provisions sideboard under the hall's art, a basalt relief of the
+  caldera with the reservoir as a glowing seam; a stone table with six chairs
+  at the glass; a rest corner of two armchairs and a low table at the cool
+  end.
+- **Art, one piece per room:** the caldera relief (hall); three mineral discs,
+  gifts from the city (keeper's room); a forged skyline of the rim set with
+  amber glass (rim room); a cobalt glass ripple roundel (lake room); a panel of
+  banded vent crust (washroom).
+- **Furniture placement:** beds head to a solid wall, feet toward the glass,
+  each with a chest at its foot, back to the bed; the lake room's armchair
+  faces the water; nothing stands in a door's clear zone.
 - **Pass-throughs:** none. All four rooms open from the lounge; the keeper's
   room opens behind Eris's counter.
 - **Glass:** clear panels to the forecourt and lounge sides; warm-tinted panels
