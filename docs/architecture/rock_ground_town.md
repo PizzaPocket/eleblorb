@@ -342,6 +342,44 @@ this is a deliberate fusion.
   Ore travels down the mine road to the assay office on main street. Inside,
   the adit is a real, short tunnel the player can walk into, but the mine's
   depth and any story in it are open.
+
+  **How to build it with this terrain (proposed 2026-10-07).** The kingdom's
+  ground is a heightfield, 141 samples across 1,240 m, so about 8.9 m between
+  samples. A heightfield has one height per point, so it can never hold a
+  tunnel, an overhang or a crisp portal. The mine is therefore authored
+  geometry, as the fishing village's islets and the Water Curtain Cave are:
+  1. **The mine bluff.** A localized rock mass, about 30 × 20 m and 12 m high,
+     set into the canyon wall with its base sunk below the ground. It is built
+     like the Rock half's existing slab and hoodoo clusters (banded sandstone,
+     the same rock props) or as a fine 1 m grid mesh. Its outer faces stay
+     climbable, like the rest of the canyon.
+  2. **The tunnel.** A `SolidModel` Boolean: a solid rock block with a
+     superellipse tunnel volume subtracted, baked once, with trimesh collision
+     from the same mesh.
+     - 3 m wide and 3 m high, its floor on the ground collision layer (not the
+       climbable one).
+     - About 20 m long, with a gentle bend, so the end is out of sight from
+       the portal.
+     - Timber sets (two posts and a cap) every 2 m, the ore-cart rails, and
+       electric lamps on a cable.
+     - The tunnel ends at a working face with Cass's drill and an ore cart.
+       Anything deeper is open.
+  3. **The ground under it.** The heightfield is lowered or excluded under the
+     bluff's footprint, as the fire terrain's exclusion zones do, so no
+     terrain collider pokes up through the tunnel floor.
+  4. **The rest is ordinary props on the heightfield:** the timbered portal,
+     the rails down to the ore house, the winch, the tool shed, the waste rock
+     tips and the mine house.
+  5. **Proof:** build the bluff and tunnel in isolation first, then probe them:
+     - floor heights along the tunnel;
+     - 2.4 m headroom;
+     - no terrain inside;
+     - the rails clear of the walking line.
+
+     Render the portal from the mine road before placing it.
+
+  A cheaper fallback: only the timbered portal and 5 m of tunnel, ending at a
+  barred gate, built the same way.
 - **The water tower and windmill pump** over the existing well, which stays
   where it is.
 - **Hitching rails** outside the saloon, the store and the jail.
