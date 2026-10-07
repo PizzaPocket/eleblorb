@@ -341,6 +341,12 @@ func _build_wilderness() -> void:
 	_scatter_wasteland_rocks()
 	_scatter_lake_gatherables()
 	_scatter_ice_gate_dressing()
+	# Each prop's parts (a tree's trunk and crown blobs, a rock cluster) baked
+	# into a few meshes before the LOD scan registers them; there were some
+	# 6,400 separate meshes here.
+	for child in get_children():
+		if child is Node3D and child.get_script() == null:
+			StaticMerge.merge(child as Node3D)
 	# Wild blorbs and the giant must be children of Main for blorb.gd's
 	# sibling-relative Terrain/Player lookups. During this node's _ready(),
 	# Main is still entering its authored children and rejects add_child().

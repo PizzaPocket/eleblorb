@@ -28,6 +28,9 @@ var _warnings := 0
 
 
 func _ready() -> void:
+	# The audits read every piece (furniture in walls, window zones), so the
+	# village is validated as built, before StaticMerge bakes it.
+	StaticMerge.enabled = false
 	var name := "ohio"
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--village="):

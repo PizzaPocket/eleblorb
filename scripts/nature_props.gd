@@ -85,7 +85,7 @@ static func build_round_tree(height: float, leaf_color: Color) -> StaticBody3D:
 	body.collision_mask = 0
 
 	var trunk_height := height * 0.4
-	var trunk := SuperEgg.build_part(
+	var trunk := _egg(
 		Vector3(0.22, trunk_height * 0.5, 0.22), TRUNK_COLOR, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
 	trunk.position = Vector3(0, trunk_height * 0.5, 0)
@@ -100,7 +100,7 @@ static func build_round_tree(height: float, leaf_color: Color) -> StaticBody3D:
 	]
 	for lobe in lobes:
 		var r: float = canopy_radius * lobe["scale"]
-		var lobe_mesh := SuperEgg.build_part(
+		var lobe_mesh := _egg(
 			Vector3(r, r * 0.88, r), leaf_color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 		)
 		var lobe_pos: Vector3 = Vector3(0, canopy_y, 0) + lobe["offset"]
@@ -125,7 +125,7 @@ static func build_pine_tree(height: float, leaf_color: Color) -> StaticBody3D:
 	body.collision_mask = 0
 
 	var trunk_height := height * 0.22
-	var trunk := SuperEgg.build_part(
+	var trunk := _egg(
 		Vector3(0.18, trunk_height * 0.5, 0.18), TRUNK_COLOR, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
 	trunk.position = Vector3(0, trunk_height * 0.5, 0)
@@ -138,7 +138,7 @@ static func build_pine_tree(height: float, leaf_color: Color) -> StaticBody3D:
 		var t := float(i) / float(TIERS - 1)
 		var tier_radius := lerpf(height * 0.3, height * 0.08, t)
 		var tier_y := trunk_height + tier_span * (float(i) + 0.5)
-		var tier := SuperEgg.build_part(
+		var tier := _egg(
 			Vector3(tier_radius, tier_span * 0.6, tier_radius), leaf_color,
 			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
 		)
@@ -173,7 +173,7 @@ static func build_alpine_cedar_tree(height: float, leaf_color: Color) -> StaticB
 	# -- thicker at the base, narrowing toward the foliage.
 	var trunk_base_radius := 0.16 + height * 0.014
 	var trunk_top_radius := trunk_base_radius * 0.62
-	var trunk := SuperEgg.build_part(
+	var trunk := _egg(
 		Vector3(
 			(trunk_base_radius + trunk_top_radius) * 0.5, trunk_height * 0.5,
 			(trunk_base_radius + trunk_top_radius) * 0.5
@@ -190,7 +190,7 @@ static func build_alpine_cedar_tree(height: float, leaf_color: Color) -> StaticB
 		var t := float(i) / float(TIERS - 1)
 		var tier_radius := lerpf(height * 0.24, height * 0.05, t)
 		var tier_y := trunk_height + tier_span * (float(i) + 0.5)
-		var tier := SuperEgg.build_part(
+		var tier := _egg(
 			Vector3(tier_radius, tier_span * 0.55, tier_radius), leaf_color,
 			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
 		)
@@ -238,7 +238,7 @@ static func build_fruit_tree(height: float, leaf_color: Color, fruit_color: Colo
 		var a := rng.randf_range(0.0, TAU)
 		var r := canopy_radius * rng.randf_range(0.55, 0.95)
 		var y_jitter := rng.randf_range(-0.2, 0.3) * canopy_radius
-		var fruit := SuperEgg.build_part(
+		var fruit := _egg(
 			Vector3.ONE * canopy_radius * FRUIT_RADIUS_FRACTION, fruit_color,
 			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 		)
@@ -332,14 +332,14 @@ static func build_rock(radius: float, collidable: bool = true, color: Color = RO
 	else:
 		root = Node3D.new()
 
-	var main_rock := SuperEgg.build_part(
+	var main_rock := _egg(
 		Vector3(radius, radius * 0.75, radius * 0.9), color, 3.5, 4.0
 	)
 	main_rock.position = Vector3(0, radius * 0.7, 0)
 	root.add_child(main_rock)
 
 	var lump_radius := radius * 0.55
-	var lump := SuperEgg.build_part(
+	var lump := _egg(
 		Vector3(lump_radius, lump_radius * 0.85, lump_radius * 0.9), color.darkened(0.1), 3.5, 4.0
 	)
 	lump.position = Vector3(radius * 0.5, radius * 0.4, radius * 0.2)
@@ -423,7 +423,7 @@ static func build_rock_ramp(width: float, run: float, rise: float) -> StaticBody
 	)
 	var basis := Basis(Vector3.RIGHT, -angle)
 
-	var slab := SuperEgg.build_part(
+	var slab := _egg(
 		Vector3(width * 0.5, THICKNESS * 0.5, slope_length * 0.5), ROCK_COLOR, 3.5, 4.0
 	)
 	slab.transform = Transform3D(basis, center)
@@ -458,7 +458,7 @@ static func build_rock_slab(size: Vector3, color: Color) -> StaticBody3D:
 	body.collision_layer = 1 | TownProps.BLORB_CLIMBABLE_LAYER
 	body.collision_mask = 0
 
-	var slab := SuperEgg.build_part(size * 0.5, color, 3.5, 4.0)
+	var slab := _egg(size * 0.5, color, 3.5, 4.0)
 	slab.position = Vector3(0, size.y * 0.5, 0)
 	body.add_child(slab)
 
@@ -494,7 +494,7 @@ static func build_slab_tower(base_width: float, tiers: int, rng: RandomNumberGen
 
 		var tier_yaw := rng.randf_range(-0.12, 0.12)
 		var tier_pos := Vector3(0, y + height * 0.5, 0) + jitter
-		var tier := SuperEgg.build_part(
+		var tier := _egg(
 			Vector3(width * 0.5, height * 0.5, depth * 0.5), color, 3.5, 4.0
 		)
 		tier.position = tier_pos
@@ -539,7 +539,7 @@ static func build_rock_arch(span: float, rng: RandomNumberGenerator) -> Node3D:
 	const BRIDGE_DEPTH := 3.2
 	var bridge_y: float = maxf(pillar_a["top_height"], pillar_b["top_height"]) + BRIDGE_HEIGHT * 0.5
 	var bridge_length := span + 3.0
-	var bridge := SuperEgg.build_part(
+	var bridge := _egg(
 		Vector3(bridge_length * 0.5, BRIDGE_HEIGHT * 0.5, BRIDGE_DEPTH * 0.5), CANYON_BAND_COLORS[0], 3.5, 4.0
 	)
 	bridge.position = Vector3(0, bridge_y, 0)
@@ -554,7 +554,7 @@ static func build_stump(radius: float, height: float) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
 	body.collision_mask = 0
-	var stump := SuperEgg.build_part(
+	var stump := _egg(
 		Vector3(radius, height * 0.5, radius), TRUNK_COLOR, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT
 	)
 	stump.position = Vector3(0, height * 0.5, 0)
@@ -565,12 +565,12 @@ static func build_stump(radius: float, height: float) -> StaticBody3D:
 
 static func build_flower(petal_color: Color) -> Node3D:
 	var flower := Node3D.new()
-	var stem := SuperEgg.build_part(
+	var stem := _egg(
 		Vector3(0.014, 0.09, 0.014), Color(0.22, 0.5, 0.22), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
 	stem.position = Vector3(0, 0.09, 0)
 	flower.add_child(stem)
-	var bloom := SuperEgg.build_part(
+	var bloom := _egg(
 		Vector3(0.045, 0.03, 0.045), petal_color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
 	bloom.position = Vector3(0, 0.2, 0)
@@ -603,7 +603,7 @@ static func build_grass_tuft(color: Color = Color(0.2, 0.75, 0.42)) -> Node3D:
 		pivot.rotation.z = deg_to_rad(-float(i - 1) * 18.0)
 		tuft.add_child(pivot)
 
-		var blade := SuperEgg.build_part(
+		var blade := _egg(
 			Vector3(0.014, BLADE_HEIGHT * 0.5, 0.014), color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 		)
 		blade.position = Vector3(0, BLADE_HEIGHT * 0.5, 0)
@@ -613,12 +613,12 @@ static func build_grass_tuft(color: Color = Color(0.2, 0.75, 0.42)) -> Node3D:
 
 static func build_mushroom(cap_color: Color) -> Node3D:
 	var mushroom := Node3D.new()
-	var stalk := SuperEgg.build_part(
+	var stalk := _egg(
 		Vector3(0.025, 0.05, 0.025), Color(0.9, 0.88, 0.8), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
 	stalk.position = Vector3(0, 0.05, 0)
 	mushroom.add_child(stalk)
-	var cap := SuperEgg.build_part(
+	var cap := _egg(
 		Vector3(0.06, 0.035, 0.06), cap_color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
 	)
 	cap.position = Vector3(0, 0.105, 0)
@@ -628,12 +628,12 @@ static func build_mushroom(cap_color: Color) -> Node3D:
 
 static func build_bush(color: Color = Color(0.16, 0.68, 0.4)) -> Node3D:
 	var bush := Node3D.new()
-	var main_lobe := SuperEgg.build_part(
+	var main_lobe := _egg(
 		Vector3(0.2, 0.16, 0.2), color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
 	main_lobe.position = Vector3(0, 0.16, 0)
 	bush.add_child(main_lobe)
-	var lump := SuperEgg.build_part(
+	var lump := _egg(
 		Vector3(0.12, 0.1, 0.12), color.darkened(0.08), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
 	lump.position = Vector3(0.12, 0.12, 0.08)
@@ -681,7 +681,7 @@ static func build_palm_tree(height: float, lean_amount: float, rng: RandomNumber
 		var seg_bottom := Vector3(drift0, t0 * trunk_height, 0)
 		var seg_top := Vector3(drift1, t1 * trunk_height, 0)
 		var seg_radius := lerpf(trunk_radius * 1.25, trunk_radius * 0.65, t0)
-		var seg := SuperEgg.build_part(
+		var seg := _egg(
 			Vector3(seg_radius, seg_height * 0.65, seg_radius), TRUNK_COLOR.lightened(0.08),
 			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 		)
@@ -756,7 +756,7 @@ static func build_banana_tree(height: float, rng: RandomNumberGenerator) -> Stat
 	for i in BANANA_STALK_SEGMENTS:
 		var t0 := float(i) / BANANA_STALK_SEGMENTS
 		var seg_radius := lerpf(trunk_radius * 1.15, trunk_radius * 0.72, t0)
-		var seg := SuperEgg.build_part(
+		var seg := _egg(
 			Vector3(seg_radius, seg_height * 0.5, seg_radius), BANANA_STALK_COLOR.lightened(0.05 * i),
 			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 		)
@@ -960,7 +960,7 @@ static func build_durian_fruit(fruit_color: Color, radius: float, item_scale: fl
 	var root := Node3D.new()
 	root.scale = Vector3.ONE * item_scale
 
-	var husk := SuperEgg.build_part(
+	var husk := _egg(
 		Vector3.ONE * radius, fruit_color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
 	husk.position = Vector3(0, radius, 0)
@@ -985,7 +985,7 @@ static func build_durian_fruit(fruit_color: Color, radius: float, item_scale: fl
 			pivot.look_at_from_position(pivot.position, pivot.position + dir, Vector3.UP)
 		root.add_child(pivot)
 
-		var spike := SuperEgg.build_part(
+		var spike := _egg(
 			Vector3(radius * 0.09, spike_length * 0.5, radius * 0.09), fruit_color.darkened(0.1),
 			SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT
 		)
@@ -1021,7 +1021,7 @@ static func build_banyan_tree(height: float, rng: RandomNumberGenerator) -> Stat
 	# the trunk top rather than floating above a visible gap).
 	var trunk_height := height * 0.42
 	var trunk_radius := height * 0.075
-	var trunk := SuperEgg.build_part(
+	var trunk := _egg(
 		Vector3(trunk_radius, trunk_height * 0.5, trunk_radius), TRUNK_COLOR,
 		SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT
 	)
@@ -1038,7 +1038,7 @@ static func build_banyan_tree(height: float, rng: RandomNumberGenerator) -> Stat
 	# itself. canopy_y's margin above guarantees this always overlaps the
 	# trunk top regardless of the random radius drawn.
 	var center_radius: float = canopy_radius * rng.randf_range(0.5, 0.62)
-	var center_lobe := SuperEgg.build_part(
+	var center_lobe := _egg(
 		Vector3(center_radius, center_radius * 0.6, center_radius), leaf_color,
 		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
@@ -1050,7 +1050,7 @@ static func build_banyan_tree(height: float, rng: RandomNumberGenerator) -> Stat
 		var a := (float(i) / BANYAN_LOBE_COUNT) * TAU
 		var r: float = canopy_radius * rng.randf_range(0.32, 0.55)
 		var lobe_radius: float = canopy_radius * rng.randf_range(0.45, 0.62)
-		var lobe := SuperEgg.build_part(
+		var lobe := _egg(
 			Vector3(lobe_radius, lobe_radius * 0.6, lobe_radius), leaf_color,
 			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 		)
@@ -1061,7 +1061,7 @@ static func build_banyan_tree(height: float, rng: RandomNumberGenerator) -> Stat
 		var root_count := rng.randi_range(1, 2)
 		for j in root_count:
 			var root_len: float = canopy_y * rng.randf_range(0.6, 0.95)
-			var tendril := SuperEgg.build_part(
+			var tendril := _egg(
 				Vector3(0.02, root_len * 0.5, 0.02), TRUNK_COLOR.lightened(0.1),
 				SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 			)
@@ -1188,7 +1188,7 @@ static func _add_baobab_branch(
 		# irregular tip clusters leave the branching silhouette plainly visible.
 		if rng.randf() < 0.72:
 			var leaf_radius := height * rng.randf_range(0.035, 0.065)
-			var leaf := SuperEgg.build_part(
+			var leaf := _egg(
 				Vector3(leaf_radius * 1.25, leaf_radius * 0.6, leaf_radius), leaf_color,
 				SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 			)
@@ -1207,7 +1207,7 @@ static func _add_baobab_limb(body: StaticBody3D, start: Vector3, finish: Vector3
 	var axis_x := reference.cross(along).normalized()
 	var axis_z := along.cross(axis_x).normalized()
 	var basis := Basis(axis_x, along, axis_z)
-	var limb := SuperEgg.build_part(
+	var limb := _egg(
 		Vector3(radius, span.length() * 0.54, radius), TRUNK_COLOR.lightened(0.12),
 		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
@@ -1228,7 +1228,7 @@ static func build_hanging_vine(length: float, rng: RandomNumberGenerator) -> Nod
 	for i in segment_count:
 		var y := -seg_spacing * i
 		var sway := sin(float(i) * 0.9 + sway_phase) * 0.03
-		var leaf := SuperEgg.build_part(
+		var leaf := _egg(
 			Vector3(0.035, 0.05, 0.02), JUNGLE_LEAF_COLORS[i % JUNGLE_LEAF_COLORS.size()],
 			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 		)
@@ -1254,7 +1254,7 @@ static func build_flowering_tree(height: float, leaf_color: Color, blossom_color
 		var a := rng.randf_range(0.0, TAU)
 		var r := canopy_radius * rng.randf_range(0.5, 1.0)
 		var y_jitter := rng.randf_range(-0.3, 0.4) * canopy_radius
-		var blossom := SuperEgg.build_part(
+		var blossom := _egg(
 			Vector3.ONE * canopy_radius * 0.05, blossom_color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 		)
 		blossom.position = Vector3(cos(a) * r, canopy_y + y_jitter, sin(a) * r)
@@ -1436,7 +1436,7 @@ static func build_emergent_tree(
 		var t0 := float(i) / EMERGENT_TRUNK_TIERS
 		var t1 := float(i + 1) / EMERGENT_TRUNK_TIERS
 		var tier_radius := lerpf(base_radius, top_radius, (t0 + t1) * 0.5)
-		var tier := SuperEgg.build_part(
+		var tier := _egg(
 			Vector3(tier_radius, tier_height * 0.5, tier_radius), TRUNK_COLOR,
 			SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
 		)
@@ -1447,7 +1447,7 @@ static func build_emergent_tree(
 	var canopy_radius := height * 0.34
 	var canopy_y := trunk_top + canopy_radius * 0.2
 	var leaf_color: Color = JUNGLE_LEAF_COLORS[rng.randi() % JUNGLE_LEAF_COLORS.size()]
-	var center_lobe := SuperEgg.build_part(
+	var center_lobe := _egg(
 		Vector3(canopy_radius * 0.6, canopy_radius * 0.4, canopy_radius * 0.6), leaf_color,
 		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
@@ -1458,7 +1458,7 @@ static func build_emergent_tree(
 		var lobe_a := (float(i) / EMERGENT_LOBE_COUNT) * TAU
 		var lobe_r: float = canopy_radius * rng.randf_range(0.45, 0.7)
 		var lobe_radius: float = canopy_radius * rng.randf_range(0.5, 0.68)
-		var lobe := SuperEgg.build_part(
+		var lobe := _egg(
 			Vector3(lobe_radius, lobe_radius * 0.55, lobe_radius), leaf_color,
 			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 		)
@@ -1578,7 +1578,7 @@ static func _add_emergent_bough(
 	for half in 2:
 		var span := length * 0.5
 		var radius: float = lerpf(root_radius, tip_radius, (float(half) + 0.5) * 0.5)
-		var segment := SuperEgg.build_part(
+		var segment := _egg(
 			Vector3(radius, span * 0.5, radius), TRUNK_COLOR.lightened(0.04),
 			SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
 		)
@@ -1591,7 +1591,7 @@ static func _add_emergent_bough(
 
 	var tip := root + along * length
 	var leaf_radius := rng.randf_range(EMERGENT_BOUGH_LEAF_MIN, EMERGENT_BOUGH_LEAF_MAX)
-	var cluster := SuperEgg.build_part(
+	var cluster := _egg(
 		Vector3(leaf_radius, leaf_radius * 0.62, leaf_radius), leaf_color,
 		SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 	)
@@ -1600,7 +1600,7 @@ static func _add_emergent_bough(
 	CollisionPolicy.mark_decorative(cluster)
 	if rng.randf() < EMERGENT_BOUGH_MID_LEAF_CHANCE:
 		var mid_radius := leaf_radius * rng.randf_range(0.5, 0.78)
-		var mid := SuperEgg.build_part(
+		var mid := _egg(
 			Vector3(mid_radius, mid_radius * 0.62, mid_radius), leaf_color,
 			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 		)
@@ -1648,7 +1648,7 @@ static func _add_emergent_twigs(
 		var side := Vector3.RIGHT if absf(twig_up.dot(Vector3.RIGHT)) < 0.9 else Vector3.FORWARD
 		var twig_x := side.cross(twig_up).normalized()
 		var twig_z := twig_up.cross(twig_x).normalized()
-		var stub := SuperEgg.build_part(
+		var stub := _egg(
 			Vector3(0.08, length * 0.5, 0.08), TRUNK_COLOR.lightened(0.05),
 			SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT
 		)
@@ -1658,7 +1658,7 @@ static func _add_emergent_twigs(
 		body.add_child(stub)
 
 		var leaf_radius := rng.randf_range(EMERGENT_TWIG_LEAF_MIN, EMERGENT_TWIG_LEAF_MAX)
-		var leaf := SuperEgg.build_part(
+		var leaf := _egg(
 			Vector3(leaf_radius, leaf_radius * 0.7, leaf_radius), leaf_color,
 			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
 		)
@@ -1719,7 +1719,7 @@ static func _build_arching_frond(
 		pivot.add_child(seg_pivot)
 
 		var half_width := lerpf(base_half_width, tip_half_width, t0)
-		var seg := SuperEgg.build_part(
+		var seg := _egg(
 			Vector3(half_width, seg_length * 0.5, half_depth), color,
 			SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT
 		)
@@ -1755,7 +1755,7 @@ static func build_ribbon_kelp(height: float, color: Color) -> Node3D:
 		pivot.position = drift
 		pivot.rotation.z = sin(float(segment) * 1.7 + height) * 0.13
 		root.add_child(pivot)
-		var blade: MeshInstance3D = SuperEgg.build_part(
+		var blade: MeshInstance3D = _egg(
 			Vector3(lerpf(0.22, 0.10, progress), segment_height * 0.56, 0.055),
 			color.lightened(progress * 0.08), SuperEgg.EPSILON_SOFT, 2.8
 		)
@@ -1774,7 +1774,7 @@ static func build_fan_seaweed(height: float, color: Color, rng: RandomNumberGene
 		pivot.rotation.z = deg_to_rad(float(blade_index - 2) * 11.0)
 		pivot.rotation.y = rng.randf_range(-0.25, 0.25)
 		root.add_child(pivot)
-		var blade: MeshInstance3D = SuperEgg.build_part(Vector3(0.11, blade_height * 0.5, 0.045), color.lightened(float(blade_index) * 0.025), 2.6, 2.8)
+		var blade: MeshInstance3D = _egg(Vector3(0.11, blade_height * 0.5, 0.045), color.lightened(float(blade_index) * 0.025), 2.6, 2.8)
 		blade.position.y = blade_height * 0.5
 		pivot.add_child(blade)
 	return root
@@ -1783,7 +1783,7 @@ static func build_fan_seaweed(height: float, color: Color, rng: RandomNumberGene
 ## A branching coral: a trunk with alternating side branches.
 static func build_branching_coral(height: float, color: Color) -> Node3D:
 	var root: Node3D = Node3D.new()
-	var trunk: MeshInstance3D = SuperEgg.build_part(Vector3(0.15, height * 0.5, 0.15), color, 2.6, 2.6)
+	var trunk: MeshInstance3D = _egg(Vector3(0.15, height * 0.5, 0.15), color, 2.6, 2.6)
 	trunk.position.y = height * 0.5
 	root.add_child(trunk)
 	# Each sprig begins at its junction on the central stalk, then grows upward
@@ -1802,7 +1802,14 @@ static func build_branching_coral(height: float, color: Color) -> Node3D:
 		# without changing its unmistakably upright growth direction.
 		branch_pivot.rotation = Vector3(0.0, (-0.24 if branch_index % 3 == 0 else 0.24), -side * deg_to_rad(38.0))
 		root.add_child(branch_pivot)
-		var branch: MeshInstance3D = SuperEgg.build_part(Vector3(0.10, branch_height * 0.5, 0.10), color.lightened(0.04 * branch_index), 2.6, 2.6)
+		var branch: MeshInstance3D = _egg(Vector3(0.10, branch_height * 0.5, 0.10), color.lightened(0.04 * branch_index), 2.6, 2.6)
 		branch.position.y = branch_height * 0.5
 		branch_pivot.add_child(branch)
 	return root
+
+
+## A SuperEgg part sampled for its size (SuperEgg.prop_detail): flowers,
+## grass and mushrooms are scattered by the thousand.
+static func _egg(semi_axes: Vector3, color: Color, epsilon_top: float = SuperEgg.EPSILON_SOFT, epsilon_bottom: float = SuperEgg.EPSILON_SOFT) -> MeshInstance3D:
+	var detail := SuperEgg.prop_detail(semi_axes)
+	return SuperEgg.build_part(semi_axes, color, epsilon_top, epsilon_bottom, detail.x, detail.y)

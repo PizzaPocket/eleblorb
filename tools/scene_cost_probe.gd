@@ -15,6 +15,9 @@ const VIEWS := {
 	"fishing landing, eye level": [Vector2(-33.0, -6.0), Vector2(0.0, -10.0), 1.7],
 	"fishing pavilion, eye level": [Vector2(-2.0, 2.0), Vector2(20.0, -6.0), 1.7],
 	"fishing from the water, west": [Vector2(-70.0, 10.0), Vector2(0.0, -6.0), 6.0],
+	# World points, on the ground: Ohio's green and the open field.
+	"ohio green, eye level": [Vector2(140.0, 76.0), Vector2(170.0, 60.0), 1.7, "ground"],
+	"field toward ohio": [Vector2(60.0, 40.0), Vector2(150.0, 70.0), 1.7, "ground"],
 }
 const CENTRE := Vector2(440.0, 0.0)
 
@@ -48,10 +51,14 @@ func _run() -> void:
 	camera.current = true
 	for view_name: String in VIEWS:
 		var view: Array = VIEWS[view_name]
-		var from: Vector2 = CENTRE + (view[0] as Vector2)
-		var to: Vector2 = CENTRE + (view[1] as Vector2)
-		camera.global_position = Vector3(from.x, water + float(view[2]) + 0.5, from.y)
-		camera.look_at(Vector3(to.x, water + 1.5, to.y), Vector3.UP)
+		var on_ground := view.size() > 3
+		var from: Vector2 = (view[0] as Vector2) if on_ground else CENTRE + (view[0] as Vector2)
+		var to: Vector2 = (view[1] as Vector2) if on_ground else CENTRE + (view[1] as Vector2)
+		var terrain: Node = world.get_node("Terrain")
+		var from_y: float = float(terrain.get_mesh_height(from.x, from.y)) if on_ground else water
+		var to_y: float = float(terrain.get_mesh_height(to.x, to.y)) if on_ground else water
+		camera.global_position = Vector3(from.x, from_y + float(view[2]) + 0.5, from.y)
+		camera.look_at(Vector3(to.x, to_y + 1.5, to.y), Vector3.UP)
 		for _i in 30:
 			await get_tree().process_frame
 		var frames := 60

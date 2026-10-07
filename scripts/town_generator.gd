@@ -583,6 +583,33 @@ func _rebuild() -> void:
 	# Worn ground last: it is drawn from the circulation of everything above.
 	_build_ground_plan(generated)
 	_spawn_npcs(generated)
+	_merge_static(generated)
+
+
+## Bakes each finished building's and group's small static pieces into a few
+## meshes (StaticMerge): the village was some 6,600 separate meshes. Anything
+## this script animates (wheels, the saw, smoke, the bell) is kept apart first.
+func _merge_static(generated: Node3D) -> void:
+	for wheel_visual in _water_wheel_visuals:
+		if is_instance_valid(wheel_visual):
+			wheel_visual.set_meta(StaticMerge.NO_MERGE_META, true)
+	for drive in _sawmill_drives:
+		for value in (drive as Dictionary).values():
+			if value is Node:
+				(value as Node).set_meta(StaticMerge.NO_MERGE_META, true)
+	for puff in _smoke_puffs:
+		if is_instance_valid(puff.mesh):
+			puff.mesh.set_meta(StaticMerge.NO_MERGE_META, true)
+	for node in generated.find_children("BellRope", "Node3D", true, false):
+		node.set_meta(StaticMerge.NO_MERGE_META, true)
+	for node in generated.find_children("*", "Node3D", true, false):
+		if node.has_meta("bell_pivot"):
+			var pivot := node.get_meta("bell_pivot") as Node3D
+			if pivot != null:
+				pivot.set_meta(StaticMerge.NO_MERGE_META, true)
+	for child in generated.get_children():
+		if child is Node3D and child.get_script() == null:
+			StaticMerge.merge(child as Node3D)
 
 
 ## The gateway where the arrival road crosses into the village: a pair of

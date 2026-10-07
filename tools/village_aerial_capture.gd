@@ -41,6 +41,8 @@ func _ready() -> void:
 			_shots_only = arg.trim_prefix("--shots=")
 		elif arg.begins_with("--cut="):
 			_cut_height = float(arg.trim_prefix("--cut="))
+			# A cutaway hides pieces by height, so they must stay unmerged.
+			StaticMerge.enabled = false
 	if not TARGETS.has(name):
 		push_error("Unknown village %s" % name)
 		get_tree().quit(1)
