@@ -198,7 +198,7 @@ conversation pit dug 0.5 m into the plinth on the uphill side, its bench clad
 in trencadis with pale olivine cushions, an LED line under its lip and a pale
 dome for its only window. The plan's pit data cuts the plinth, drops the
 hidden ground below it and sets the height query. Its heart is heated stone: a low
-sinter slab with a faint warm line at its foot, not lava. Eris rests in a
+sinter slab, not lava. Eris rests in a
 **lava bed**, between a bed and a bath: a raised superellipse of cast
 forsterite (the refractory made from olivine) with a deep superellipse hollow
 that lava fills from a duct beneath, head to the party wall, a ceramic-fibre

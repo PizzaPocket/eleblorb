@@ -479,10 +479,9 @@ static func _mediation_room(body: StaticBody3D) -> void:
 	# The step down, at the door end.
 	var step := at + Vector2(-half.x + 0.3, 0.0)
 	CalderaFurniture.piece(body, Vector3(0.28, (depth * 0.5) * 0.5, 0.45), SINTER, Vector3(step.x, -depth + depth * 0.25, step.y), 0.0, true, 5.0)
-	# Heated stone at the pit's heart: a low sinter slab, warm to sit beside,
-	# its glow only a faint line where it meets the floor.
+	# Heated stone at the pit's heart: a low sinter slab, warm to sit beside;
+	# its warmth shows only in the light the pit's own lamp gives it.
 	CalderaFurniture.piece(body, Vector3(0.8, 0.05, 0.45), SINTER.darkened(0.04), Vector3(at.x, -depth + 0.05, at.y), 0.0, true, 6.0).name = "HeatedStone"
-	FireCalderaBuildings._glow(body, "HeatedStoneEdge", Vector3(0.82, 0.004, 0.47), Vector3(at.x, -depth + 0.006, at.y), Color(1.0, 0.62, 0.38).darkened(0.35))
 	# A concealed LED line under the pit's lip, lighting the cushions.
 	var lip := PackedVector2Array()
 	for i in 48:
