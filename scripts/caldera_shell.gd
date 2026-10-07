@@ -74,8 +74,13 @@ static func make_body(parent: Node3D, entry: Dictionary, datum: float) -> Static
 ##     none; the roof then keeps the kit's 2-degree pitch);
 ##   overhang: {"front"|"back"|"west"|"east": float} the roof's reach past
 ##     each wall (default 0.35; 0 where it meets a taller neighbour);
+##   roof: false leaves the volume without a roof (a floor stands on it);
+##   pitch: the roof's pitch in degrees (default the kit's 2; 0 for a flat,
+##     walkable roof);
 ##   a bay of kind "open" leaves its wall to the building below the ring beam
-##     (a shared wall), keeping the posts and any clerestory above.
+##     (a shared wall), keeping the posts and any clerestory above;
+##   a bay with "band": -1 is full-height stone with no stained band (a wall
+##     against retained ground); a door bay's "sill" raises its threshold.
 ## Every door bay gets its clear zones; a wall left out of `walls` is not built.
 static func add_volume(body: StaticBody3D, spec: Dictionary) -> void:
 	var offset: Vector2 = spec.get("offset", Vector2.ZERO)
@@ -104,7 +109,8 @@ static func add_volume(body: StaticBody3D, spec: Dictionary) -> void:
 		if walls.has(wall):
 			_build_wall(body, offset, offset + runs[wall][0], runs[wall][1], walls[wall], stained, storey, head)
 	_build_corners(body, offset, hx, hz, head)
-	_build_roof(body, offset, size, storey + clerestory, rake, spec.get("overhang", {}), spec.get("skylights", []))
+	if bool(spec.get("roof", true)):
+		_build_roof(body, offset, size, storey + clerestory, rake, spec.get("overhang", {}), spec.get("skylights", []), STAINLESS_SHADOW.darkened(0.16), deg_to_rad(float(spec.get("pitch", rad_to_deg(ROOF_PITCH)))))
 
 
 static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, along: Vector2, bays: Array, stained: Array, storey: float, head: Callable) -> void:
@@ -124,14 +130,23 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 				# Floor channel: a thin stainless shoe, the panel's only sill.
 				_metal(body, Vector3(mid.x, 0.04, mid.y), _oriented(Vector3(width, 0.08, 0.14), yaw), STAINLESS_SHADOW, false)
 			"stone":
-				_stone(body, Vector3(mid.x, TRANSOM * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, TRANSOM, WALL), yaw))
+				var stone_top := storey if int(bay.get("band", 0)) < 0 else TRANSOM
+				_stone(body, Vector3(mid.x, stone_top * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, stone_top, WALL), yaw))
 			"door":
 				# A stone panel to the transom with the door cut as a superellipse
 				# (square foot, rounded head), framed in stainless and hung with
-				# leaves cut to the same outline: no glass rests on its frame.
-				door_opening(body, Vector3(mid.x, 0.0, mid.y), yaw, width - POST * 0.5, TRANSOM, WALL, DOOR_CLEAR, DOOR_HEIGHT, 2)
-				ClearZones.add(body, str(bay.get("label", "front door")), "door", mid, outward, 1.25, 1.25, DOOR_CLEAR * 0.5 + 0.15, 0.05, 1.95)
-		if kind != "open":
+				# leaves cut to the same outline: no glass rests on its frame. A
+				# raised sill sets the door on a floor above the datum, the panel
+				# then full height, with stone below the sill.
+				var sill := float(bay.get("sill", 0.0))
+				if sill > 0.0:
+					_stone(body, Vector3(mid.x, sill * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, sill, WALL), yaw))
+					door_opening(body, Vector3(mid.x, sill, mid.y), yaw, width - POST * 0.5, storey - sill, WALL, float(bay.get("clear", 2.0)), float(bay.get("height", 2.3)), 1)
+				else:
+					door_opening(body, Vector3(mid.x, 0.0, mid.y), yaw, width - POST * 0.5, TRANSOM, WALL, DOOR_CLEAR, DOOR_HEIGHT, 2)
+				var clear_half := (float(bay.get("clear", DOOR_CLEAR)) if sill > 0.0 else DOOR_CLEAR) * 0.5 + 0.15
+				ClearZones.add(body, str(bay.get("label", "front door")), "door", mid, outward, 1.25, 1.25, clear_half, sill + 0.05, sill + 1.95)
+		if kind != "open" and int(bay.get("band", 0)) >= 0:
 			# The stained band above every bay, alternating as each bay asks.
 			var colour: Color = stained[int(bay.get("band", 0)) % stained.size()]
 			_pane(body, "StainedBand", Vector3(mid.x, (TRANSOM + storey) * 0.5, mid.y), Vector2(width * 0.5 - POST * 0.5, (storey - TRANSOM) * 0.5 - 0.05), yaw, Color(colour, 0.72))
@@ -147,7 +162,7 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 		var edge := start + along * to
 		var top := float(head.call(edge))
 		_metal(body, Vector3(edge.x, top * 0.5, edge.y), Vector3(POST, top, POST), STEEL_BLUED, true)
-		if kind != "open":
+		if kind != "open" and int(bay.get("band", 0)) >= 0:
 			_fork(body, Vector3(edge.x, TRANSOM, edge.y), along)
 		from = to
 	# The transom bar and ring beam along the whole wall; a tall hall's second
@@ -278,7 +293,7 @@ static func _pane(body: StaticBody3D, name_text: String, at: Vector3, half: Vect
 	return pane
 
 
-static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top: float, rake: float, overhang: Dictionary, skylights: Array, colour: Color = STAINLESS_SHADOW.darkened(0.16)) -> CSGCombiner3D:
+static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top: float, rake: float, overhang: Dictionary, skylights: Array, colour: Color = STAINLESS_SHADOW.darkened(0.16), level_pitch: float = ROOF_PITCH) -> CSGCombiner3D:
 	var reach := func(side: String) -> float: return float(overhang.get(side, 0.35))
 	var west: float = reach.call("west")
 	var east: float = reach.call("east")
@@ -287,7 +302,7 @@ static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top:
 	var roof := CSGCombiner3D.new()
 	roof.name = "LowPitchSkylightRoof"
 	# A raked roof rests on its walls' heads, climbing from back to front.
-	var pitch := atan2(rake, size.y) if rake > 0.0 else ROOF_PITCH
+	var pitch := atan2(rake, size.y) if rake > 0.0 else level_pitch
 	var shift_z := (front - back) * 0.5
 	var rise_at_centre := rake * 0.5 + tan(pitch) * shift_z if rake > 0.0 else 0.0
 	roof.position = Vector3(offset.x + (east - west) * 0.5, top + rise_at_centre + 0.10, offset.y + shift_z)

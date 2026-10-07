@@ -123,6 +123,9 @@ func _run() -> void:
 				for pit in pits:
 					if Geometry2D.is_point_in_polygon(local, pit["outline"]):
 						expected -= float(pit["depth"])
+				var raised := FireCalderaPlan.level_height(entry, local)
+				if not is_nan(raised):
+					expected += raised
 				var world := FireCalderaPlan.to_world(local)
 				worst = maxf(worst, absf(float(_terrain.get_mesh_height(world.x, world.y)) - expected))
 		_expect(worst < 0.02, "the height query inside %s meets its floor (off by %.2f m)" % [entry["id"], worst])

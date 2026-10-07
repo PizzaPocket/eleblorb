@@ -111,7 +111,22 @@ const PLOTS: Array[Dictionary] = [
 		# Reached by R3 from the forecourt, not from the promenade.
 		"on_promenade": false},
 	{"id": "OREN", "centre": Vector2(30.0, -34.0), "footprint": Vector2(17.0, 12.0), "reserved": Vector2(22.0, 17.0),
-		"household": "Oren", "program": "mineral counter to the arrival crescent; assay, secure store, preparation and receiving to the service loop", "occupied": true},
+		"household": "Oren", "program": "mineral counter to the arrival crescent; assay, secure store, preparation and receiving to the service loop", "occupied": true,
+		# Split level (approved 2026-10-07): the shop at the promenade's level,
+		# the workshop half 1.35 m up, flush with the service loop, joined by a
+		# ramp along the staff corridor; the home's open-air ramp in the east
+		# bay. Floors above the datum in the building's frame: flat
+		# {"rect", "y"} or ramps {"rect", "from", "to", "axis"} rising from the
+		# rect's low end (x or z) to its high end.
+		"levels": [
+			{"rect": Rect2(-8.5, -6.0, 15.0, 5.6), "y": 1.35},
+			{"rect": Rect2(-8.5, -0.4, 9.7, 1.4), "y": 1.35},
+			{"rect": Rect2(1.2, -0.4, 4.0, 1.4), "from": 1.35, "to": 0.0, "axis": "x"},
+			{"rect": Rect2(-7.0, -6.8, 2.0, 0.8), "y": 1.35},
+			{"rect": Rect2(6.5, -6.8, 2.0, 2.2), "y": 1.35},
+			{"rect": Rect2(6.5, -4.6, 2.0, 4.24), "from": 1.35, "to": 4.0, "axis": "z"},
+			{"rect": Rect2(6.5, -0.36, 2.0, 3.2), "y": 4.0},
+		]},
 	{"id": "KEL", "centre": Vector2(48.2, -4.4), "footprint": Vector2(19.0, 15.0), "reserved": Vector2(24.0, 20.0),
 		"household": "Kel", "program": "armory gallery and receiving bay; residence on the quiet outer edge; protected descent to the deep forge", "occupied": true},
 	{"id": "VARA", "centre": Vector2(32.9, 32.8), "footprint": Vector2(18.0, 14.0), "reserved": Vector2(23.0, 19.0),
@@ -160,6 +175,32 @@ static func shell_to_plan(entry: Dictionary, local: Vector2) -> Vector2:
 	var deep := facing(entry)
 	var turned := Basis(Vector3.UP, atan2(deep.x, deep.y)) * Vector3(local.x, 0.0, local.y)
 	return mass_centre(entry) + Vector2(turned.x, turned.z)
+
+
+## A plan point in a building's own frame (the inverse of shell_to_plan).
+static func plan_to_shell(entry: Dictionary, plan: Vector2) -> Vector2:
+	var deep := facing(entry)
+	var offset := plan - mass_centre(entry)
+	var local := Basis(Vector3.UP, atan2(deep.x, deep.y)).inverse() * Vector3(offset.x, 0.0, offset.y)
+	return Vector2(local.x, local.z)
+
+
+## The height above the datum of a plot's built floor at a plan point (a
+## raised level or a ramp), or NAN where the floor is the plinth's top.
+static func level_height(entry: Dictionary, plan: Vector2) -> float:
+	var levels: Array = entry.get("levels", [])
+	if levels.is_empty():
+		return NAN
+	var local := plan_to_shell(entry, plan)
+	for level: Dictionary in levels:
+		var rect: Rect2 = level["rect"]
+		if not rect.has_point(local):
+			continue
+		if level.has("y"):
+			return float(level["y"])
+		var t := (local.x - rect.position.x) / rect.size.x if str(level["axis"]) == "x" else (local.y - rect.position.y) / rect.size.y
+		return lerpf(float(level["from"]), float(level["to"]), clampf(t, 0.0, 1.0))
+	return NAN
 
 
 ## A plot's sunken pits (conversation pits dug into its plinth) as plan

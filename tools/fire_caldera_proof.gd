@@ -22,6 +22,7 @@ var _plinths := {}
 var _lines := {}
 var _shell: StaticBody3D
 var _nahl: StaticBody3D
+var _oren: StaticBody3D
 
 
 func _ready() -> void:
@@ -53,6 +54,8 @@ func _run() -> void:
 	_shell = FireCalderaBuildings.guest_house(self, guest, _lines["GUEST"])
 	# The second: the Nahl tempering hall and Eris's suite.
 	_nahl = FireCalderaNahl.build(self, FireCalderaPlan.plot("NAHL"), _lines["NAHL"])
+	# The third: the Oren mineral house, split level.
+	_oren = FireCalderaOren.build(self, FireCalderaPlan.plot("OREN"), _lines["OREN"])
 	_stage()
 	for _i in 6:
 		await get_tree().physics_frame
@@ -122,6 +125,7 @@ func _check() -> void:
 		print("ok   %s: %s, datum %.2f, %d uphill wall pieces" % [id, line["foundation"], datum, walled])
 	_check_shell(space)
 	_check_nahl(space)
+	_check_oren(space)
 	# The lava's edge runs under the bank: ground below the lava just inside.
 	for i in 24:
 		var angle := TAU * float(i) / 24.0
@@ -185,13 +189,58 @@ func _check_shell(space: PhysicsDirectSpaceState3D) -> void:
 
 func _building_rids() -> Array:
 	var rids := []
-	for building: StaticBody3D in [_shell, _nahl]:
+	for building: StaticBody3D in [_shell, _nahl, _oren]:
 		if building == null:
 			continue
 		rids.append(building.get_rid())
 		for node in building.find_children("*", "CollisionObject3D", true, false):
 			rids.append((node as CollisionObject3D).get_rid())
 	return rids
+
+
+## The Oren house: each door open through at its own floor, every floor the
+## building's (raised, ramped, upper) meeting the height query, the clear
+## zones of both storeys.
+func _check_oren(space: PhysicsDirectSpaceState3D) -> void:
+	var to_world := _oren.global_transform
+	var datum := float(_lines["OREN"]["datum"])
+	var entry := FireCalderaPlan.plot("OREN")
+	var up := FireCalderaOren.UPPER
+	var raise := FireCalderaOren.RAISE
+	for door: Array in [
+		["shop door", Vector3(-5.0, 1.2, 8.0), Vector3(-5.0, 1.2, 4.0)],
+		["assay door", Vector3(FireCalderaOren.ASSAY_DOOR_X, 1.2, 0.3), Vector3(FireCalderaOren.ASSAY_DOOR_X, 1.2, 1.8)],
+		["receiving door", Vector3(-6.0, raise + 1.2, -7.5), Vector3(-6.0, raise + 1.2, -4.5)],
+		["receiving inner door", Vector3(-6.0, raise + 1.2, -1.2), Vector3(-6.0, raise + 1.2, 0.4)],
+		["stock store door", Vector3(FireCalderaOren.STORE_DOOR_X, raise + 1.2, -1.2), Vector3(FireCalderaOren.STORE_DOOR_X, raise + 1.2, 0.4)],
+		["studio door", Vector3(FireCalderaOren.STUDIO_DOOR_X, raise + 1.2, -1.2), Vector3(FireCalderaOren.STUDIO_DOOR_X, raise + 1.2, 0.4)],
+		["gem store door", Vector3(0.0, 1.2, 1.4), Vector3(0.0, 1.2, 3.0)],
+		["home door", Vector3(7.5, up + 1.2, FireCalderaOren.HOME_DOOR_Z), Vector3(4.5, up + 1.2, FireCalderaOren.HOME_DOOR_Z)],
+	]:
+		var hit := _ray(space, to_world * (door[1] as Vector3), to_world * (door[2] as Vector3), [])
+		if not hit.is_empty():
+			_fail("OREN: the %s is blocked by %s" % [door[0], (hit["collider"] as Node).name])
+	# Each floor is where the height query says it is.
+	for local: Vector2 in [Vector2(-5.0, 3.5), Vector2(4.0, 3.5), Vector2(-5.0, -3.0), Vector2(3.0, -3.0), Vector2(-4.0, 0.3), Vector2(3.2, 0.3), Vector2(7.5, -5.5), Vector2(7.5, -2.5), Vector2(7.5, 1.2), Vector2(-6.0, -6.5)]:
+		var world := to_world * Vector3(local.x, 6.0 if local.x < 6.5 or local.y < -4.6 else 9.0, local.y)
+		var plan := Vector2(world.x, world.z)
+		var hit := _ray(space, world, Vector3(world.x, datum - 1.0, world.z), [])
+		var expected := FireCalderaPlan.level_height(entry, plan)
+		if is_nan(expected):
+			expected = 0.0
+		if hit.is_empty():
+			_fail("OREN: no floor at %s" % str(local))
+		elif absf(float(hit["position"].y) - datum - expected) > 0.05 and not (local.x < 6.5 and float(hit["position"].y) - datum > 3.0):
+			_fail("OREN: the floor at %s is %.2f, the height query %.2f" % [str(local), float(hit["position"].y) - datum, expected])
+	for problem in ClearZones.audit(_oren):
+		_fail("OREN layout: %s" % problem)
+	var home := _oren.get_node_or_null("OrenHome") as StaticBody3D
+	if home == null:
+		_fail("OREN: no home above")
+	else:
+		for problem in ClearZones.audit(home):
+			_fail("OREN home layout: %s" % problem)
+	print("ok   OREN: doors clear at their floors, split levels and ramps meet the height query")
 
 
 ## The Nahl hall: its four doors open clear through, the hall's full height,
@@ -259,7 +308,11 @@ func _floor_ray_past_shell(space: PhysicsDirectSpaceState3D, from: Vector3, to: 
 		if hit.is_empty():
 			return hit
 		var collider := hit["collider"] as Node
-		if collider == _shell or _shell.is_ancestor_of(collider) or (_nahl != null and (collider == _nahl or _nahl.is_ancestor_of(collider))):
+		var ours := false
+		for building: StaticBody3D in [_shell, _nahl, _oren]:
+			if building != null and (collider == building or building.is_ancestor_of(collider)):
+				ours = true
+		if ours:
 			excluded.append(hit["rid"])
 			continue
 		return hit
@@ -334,6 +387,23 @@ func _render() -> void:
 		"guest_wallhead_east": [Vector3(13.0, 4.2, 0.5), Vector3(7.75, 3.85, 0.0)],
 		"guest_wallhead_back": [Vector3(4.0, 4.2, -10.0), Vector3(0.0, 3.8, -6.0)],
 	}
+	var oren := {
+		"oren_front": [Vector3(-1.0, 1.7, 17.0), Vector3(-1.0, 3.5, 0.0)],
+		"oren_back": [Vector3(4.0, 3.2, -16.0), Vector3(0.0, 2.5, -6.0)],
+		"oren_east_ramp": [Vector3(15.0, 4.0, -8.0), Vector3(7.5, 2.5, -2.0)],
+		"oren_counter": [Vector3(-7.6, 1.7, 5.4), Vector3(0.5, 1.0, 1.4)],
+		"oren_corridor": [Vector3(-7.6, 1.35 + 1.6, 0.3), Vector3(6.4, 0.8, 0.3)],
+		"oren_studio": [Vector3(0.6, 1.35 + 1.6, -0.9), Vector3(5.5, 1.6, -5.4)],
+		"oren_home": [Vector3(5.8, 4.0 + 1.6, 1.4), Vector3(-7.0, 4.0 + 1.0, 4.0)],
+	}
+	for name: String in oren:
+		var pose: Array = oren[name]
+		camera.global_position = _oren.global_transform * (pose[0] as Vector3)
+		camera.look_at(_oren.global_transform * (pose[1] as Vector3), Vector3.UP)
+		for _i in 4:
+			await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])
+		print("saved %s/%s.png" % [_shots, name])
 	# The Nahl hall, poses in its own frame.
 	var nahl := {
 		"nahl_front": [Vector3(-1.0, 1.7, 17.0), Vector3(0.0, 3.0, 0.0)],

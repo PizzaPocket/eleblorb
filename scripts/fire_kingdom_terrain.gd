@@ -192,6 +192,10 @@ func _terrain_height(x:float,z:float)->float:
 				for pit:Dictionary in socket["pits"]:
 					if Geometry2D.is_point_in_polygon(local,pit["outline"]):
 						return float(socket["datum"])-float(pit["depth"])
+				# A raised level or ramp built on the plinth: its floor.
+				var raised:=FireCalderaPlan.level_height(socket["entry"],local)
+				if not is_nan(raised):
+					return float(socket["datum"])+raised
 				return float(socket["datum"])
 			if Geometry2D.is_point_in_polygon(local,socket["band"]):
 				return minf(height,float(socket["datum"])-0.05)
@@ -546,7 +550,7 @@ func _build_caldera_ground()->void:
 		centre/=float(band.size())
 		var reach:=0.0
 		for point in band:reach=maxf(reach,point.distance_to(centre))
-		_caldera_sockets.append({"outline":socket["outline"],"band":band,"datum":socket["datum"],"centre":centre,"reach":reach+0.1,"pits":FireCalderaPlan.pit_outlines(entry)})
+		_caldera_sockets.append({"outline":socket["outline"],"band":band,"datum":socket["datum"],"centre":centre,"reach":reach+0.1,"pits":FireCalderaPlan.pit_outlines(entry),"entry":entry})
 	FireCalderaGround.build(frame,sockets,func(local:Vector2)->float:
 		var world:=FireCalderaPlan.to_world(local)
 		return _coarse_mesh_height(world.x,world.y))
