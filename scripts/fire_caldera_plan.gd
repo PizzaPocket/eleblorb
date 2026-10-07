@@ -141,12 +141,23 @@ const PLOTS: Array[Dictionary] = [
 		"household": "Aro", "program": "thermal works and household; public door on the terrace loop, service descent to the manifold", "occupied": true},
 	{"id": "RENEWAL", "centre": Vector2(-33.35, -3.13), "footprint": Vector2(18.0, 14.0), "reserved": Vector2(23.0, 19.0),
 		"household": "", "program": "tempering and gathering terrace above the submerged communal chamber", "occupied": false,
-		# Revised 2026-10-08: moved onto the bank so its front stands out over
-		# the reservoir. The promenade crosses its back as public ground, and its
-		# floor is level with the promenade there (in its own frame, +Z to the
-		# lava); a lava pool is cut into its front, open to the reservoir.
+		# Revised 2026-10-08: a ghat. The terrace stands on the bank, its floor
+		# level with the promenade that crosses its back (in its own frame, +Z
+		# to the lava); in front, a broad flight of steps runs down into the
+		# lava between two arms. Its own foundation (no plinth lip), the ground
+		# cut away beneath it, each step a level for the height query.
 		"crossed": true, "quay": true, "datum_at": Vector2(0.0, -2.8),
-		"pits": [{"at": Vector2(0.0, 5.4), "half": Vector2(4.0, 3.9), "depth": 2.8, "exponent": 6.0}]},
+		"foundation_kind": "ghat", "sink": 6.0,
+		"levels": [
+			{"rect": Rect2(-7.0, 0.3, 14.0, 0.9), "y": -0.45},
+			{"rect": Rect2(-7.0, 1.2, 14.0, 0.9), "y": -0.9},
+			{"rect": Rect2(-7.0, 2.1, 14.0, 0.9), "y": -1.35},
+			{"rect": Rect2(-7.0, 3.0, 14.0, 0.9), "y": -1.8},
+			{"rect": Rect2(-7.0, 3.9, 14.0, 0.9), "y": -2.25},
+			{"rect": Rect2(-7.0, 4.8, 14.0, 0.9), "y": -2.7},
+			{"rect": Rect2(-7.0, 5.7, 14.0, 0.9), "y": -3.15},
+			{"rect": Rect2(-7.0, 6.6, 14.0, 3.0), "y": -6.0},
+		]},
 ]
 
 
@@ -224,7 +235,7 @@ static func pit_outlines(entry: Dictionary) -> Array[Dictionary]:
 			var s := sin(t)
 			var local := at + Vector2(signf(c) * pow(absf(c), 2.0 / exponent) * half.x, signf(s) * pow(absf(s), 2.0 / exponent) * half.y)
 			outline.append(shell_to_plan(entry, local))
-		list.append({"outline": outline, "depth": float(pit["depth"])})
+		list.append({"outline": outline, "depth": float(pit["depth"]), "lava": bool(pit.get("lava", false))})
 	return list
 
 

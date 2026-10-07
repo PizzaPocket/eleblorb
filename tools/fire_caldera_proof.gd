@@ -49,7 +49,10 @@ func _run() -> void:
 	FireCalderaGround.build_lava(self)
 	for entry in FireCalderaPlan.PLOTS:
 		if _lines.has(entry["id"]):
-			_plinths[entry["id"]] = SocketPlinth.build(self, entry, _lines[entry["id"]], SocketPlinth.size_key(entry))
+			if str(entry.get("foundation_kind", "")) == "ghat":
+				_plinths[entry["id"]] = FireCalderaRenewal.build_foundation(self, entry, _lines[entry["id"]])
+			else:
+				_plinths[entry["id"]] = SocketPlinth.build(self, entry, _lines[entry["id"]], SocketPlinth.size_key(entry))
 	# The kit's first shell: the guest house (brief section 3), cobalt and amber.
 	var guest := FireCalderaPlan.plot("GUEST")
 	_shell = FireCalderaBuildings.guest_house(self, guest, _lines["GUEST"])
@@ -80,6 +83,8 @@ func _check() -> void:
 		var line: Dictionary = _lines[id]
 		var datum := float(line["datum"])
 		var plinth: StaticBody3D = _plinths[id]
+		if str(entry.get("foundation_kind", "")) == "ghat":
+			continue
 		var polygon := FireCalderaPlan.plot_polygon(entry, "footprint")
 		var centre: Vector2 = entry["centre"]
 		# Inside the socket: the plinth first, and no ground under it.
@@ -425,8 +430,9 @@ func _render() -> void:
 		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])
 		print("saved %s/%s.png" % [_shots, name])
 	var renewal := {
-		"renewal_promenade": [Vector3(-12.0, 1.7, -2.8), Vector3(0.0, 1.0, 3.0)],
-		"renewal_glass": [Vector3(0.0, 1.7, 0.2), Vector3(0.0, -1.8, 6.5)],
+		"renewal_promenade": [Vector3(-9.0, 1.7, -2.8), Vector3(0.0, -0.5, -2.8)],
+		"renewal_steps": [Vector3(-6.0, 1.7, -0.5), Vector3(1.0, -1.8, 5.0)],
+		"renewal_landing": [Vector3(6.0, 1.7, 5.5), Vector3(-3.0, 0.5, -5.5)],
 		"renewal_aerial": [Vector3(16.0, 15.0, -14.0), Vector3(0.0, 0.0, 3.0)],
 		"renewal_from_lava": [Vector3(0.0, 1.0, 22.0), Vector3(0.0, 1.0, 0.0)],
 	}

@@ -2,58 +2,170 @@ class_name FireCalderaRenewal
 extends RefCounted
 
 ## The Renewal terrace (fire_caldera_buildings.md, section 3; landmark): the
-## open surface of the communal renewal chamber, where the city gathers above
-## the lava, Eris tempers, and the immersion shelf leads down. Its own idea:
-## a catenary canopy of slumped glass. The lava people hang molten glass over
-## chains and let it settle into its own curve, so the roof is drawn by heat
-## and gravity: forged iron ribs follow the same catenary, carried on
-## branching supports, and the panels shade through the landmark's three
-## colours (teal at the springing, garnet, amber at the crown), washing the
-## seats below in coloured light.
+## city's ghat. As on a river ghat, a broad flight of steps runs from the
+## street down into the lava, and the steps are the use: the dry upper steps
+## are seats for resting, talking and watching; on the waterline step people
+## sit half immersed together; the lower steps carry on under the lava as the
+## immersion shelf, the gentlest way down to the renewal chamber. At the foot
+## of the central flight a dark refractory threshold arch stands half sunk,
+## the way down and the place of the coming-of-age descent.
 ##
-## Revised 2026-10-08: the terrace stands on the bank as a quay, its front out
-## over the reservoir, its floor level with the promenade that crosses its
-## back. Cut into its front is the communal lava pool, open to the reservoir,
-## so the lava runs in beneath the terrace: cast glass floors its back half, so
-## people walk over the lava, and from the glass a broad immersion stair
-## descends into it, the gentlest way down to the renewal chamber. Basalt tiers
-## flank the pool on both sides, rising away from it and facing in, under the
-## canopy. Behind the promenade, an arc of cast-basalt memory stones, each
-## with a glowing seam, records people and decisions; windbreaks of veiled
-## fused glass shelter the landward side. Local +Z faces the reservoir.
+## The promenade runs along a level landing at the top, flush with it: that is
+## the arrival. Along the landing's back, the cast-basalt memory stones face
+## the water, the backdrop to every gathering; at its east end, under a veiled
+## glass windbreak, Eris's warm tempering slab, where she helps those too
+## cracked or cooled to walk straight in. Two arms frame the flight and run out
+## over the lava; the canopy's supports stand on them and on the landing.
+##
+## Its own idea above: a catenary canopy of slumped glass. The lava people
+## hang molten glass over chains and let it settle into its own curve, so the
+## roof is drawn by heat and gravity: forged iron ribs on the same catenary on
+## branching supports, the panels shading from teal at the springing through
+## garnet to amber at the crown, washing the steps in coloured light.
+##
+## Its foundation is its own, not a plinth: a U-shaped deck level with the
+## promenade, cut to the plot's outline, open at the front to the steps, with
+## a retaining wall only where the ground behind stands higher. Local +Z faces
+## the reservoir.
 
 const SPAN := 17.0
 const CROWN := 6.2
 const SPRING := 3.0
-const BACK_Z := -0.6
-## Every support's foot bears on the quay's deck: the front rib stands back
-## from the deck's rounded corners, whose walls run down through the lava.
+## The canopy covers the whole deck, the promenade's crossing included; every
+## support's foot bears on the deck, back from its rounded corners.
+const BACK_Z := -6.6
 const FRONT_Z := 6.2
-## Cast forsterite, the refractory made from olivine (melts near 1900 C):
-## anything in the lava, and the shoes that part iron from hot stone.
-const FORSTERITE := Color(0.70, 0.72, 0.62)
-## The lava pool cut into the terrace (the plan names it as a pit).
-const GLASS_Z := Vector2(1.3, 4.0)
-const STEPS := 9
-const RIBS := 4
+## Magnesia-chrome refractory, the near-black brick that lines furnaces
+## against molten slag: whatever contains or stands in the lava (the pool,
+## channel and basin's linings, the immersion stair) and the shoes that part
+## iron from hot stone. Dark, so it reads as part of the basalt quay.
+const REFRACTORY := Color(0.21, 0.18, 0.17)
+const RIBS := 6
 const SEGMENTS := 16
+## The flight: its half width, each step's going and rise, how many.
+const FLIGHT_HALF := 7.0
+const GOING := 0.9
+const RISE := 0.45
+const FLIGHT := 7
+const DEEP := 6.0
+## The deck's front edge, where the flight begins.
+const FLIGHT_START := 0.3
 const TEAL := Color(0.18, 0.60, 0.58, 0.55)
 const GARNET := Color(0.62, 0.14, 0.22, 0.55)
 const AMBER := Color(0.95, 0.58, 0.16, 0.55)
 const IRON := CalderaShell.STEEL_BLUED
-const TIER := Color(0.30, 0.27, 0.26)
 
 
 static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> StaticBody3D:
 	var body := CalderaShell.make_body(parent, entry, float(line["datum"]))
-	_tiers(body)
-	_pool(body)
+	_threshold(body)
 	_canopy(body)
 	_supports(body)
 	_memory_stones(body)
 	_windbreaks(body)
+	_tempering_slab(body)
 	_light(body)
 	return body
+
+
+## The ghat's foundation, in place of a plinth: the U-shaped deck (the plot's
+## outline less the flight), its walls running down into the ground and the
+## lava; the flight of refractory steps; a retaining wall where the ground
+## behind stands above the deck. One body, named as a plinth is.
+static func build_foundation(parent: Node3D, entry: Dictionary, line: Dictionary) -> StaticBody3D:
+	var datum := float(line["datum"])
+	var body := CalderaShell.make_body(parent, entry, datum)
+	body.name = "%sPlinth" % entry["id"]
+	var outline := PackedVector2Array()
+	var plan_outline := SocketPlinth.exclusion(entry, line)
+	for point in plan_outline:
+		outline.append(FireCalderaPlan.plan_to_shell(entry, point))
+	var flight := PackedVector2Array([Vector2(-FLIGHT_HALF, FLIGHT_START), Vector2(FLIGHT_HALF, FLIGHT_START), Vector2(FLIGHT_HALF, 20.0), Vector2(-FLIGHT_HALF, 20.0)])
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var faces := PackedVector3Array()
+	var deck := CalderaShell.BASALT.lightened(0.1)
+	for piece in Geometry2D.clip_polygons(outline, flight):
+		var triangles := Geometry2D.triangulate_polygon(piece)
+		for t in range(0, triangles.size(), 3):
+			var tri := [piece[triangles[t]], piece[triangles[t + 1]], piece[triangles[t + 2]]]
+			_tri(st, faces, Vector3(tri[0].x, 0, tri[0].y), Vector3(tri[1].x, 0, tri[1].y), Vector3(tri[2].x, 0, tri[2].y), Vector3.UP, deck)
+		for i in piece.size():
+			var a: Vector2 = piece[i]
+			var b: Vector2 = piece[(i + 1) % piece.size()]
+			var mid := (a + b) * 0.5
+			var out := Vector2(b.y - a.y, a.x - b.x).normalized()
+			if Geometry2D.is_point_in_polygon(mid + out * 0.05, piece):
+				out = -out
+			var n := Vector3(out.x, 0, out.y)
+			var colour := REFRACTORY if absf(a.x) < FLIGHT_HALF + 0.01 and absf(b.x) < FLIGHT_HALF + 0.01 and a.y > FLIGHT_START - 0.01 and b.y > FLIGHT_START - 0.01 else CalderaShell.BASALT
+			_tri(st, faces, Vector3(a.x, 0, a.y), Vector3(b.x, 0, b.y), Vector3(b.x, -DEEP, b.y), n, colour)
+			_tri(st, faces, Vector3(a.x, 0, a.y), Vector3(b.x, -DEEP, b.y), Vector3(a.x, -DEEP, a.y), n, colour)
+	var mesh := MeshInstance3D.new()
+	mesh.name = "PlinthMesh"
+	mesh.mesh = st.commit()
+	var material := StandardMaterial3D.new()
+	material.vertex_color_use_as_albedo = true
+	material.vertex_color_is_srgb = true
+	material.roughness = 0.9
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mesh.material_override = material
+	body.add_child(mesh)
+	var shape := ConcavePolygonShape3D.new()
+	shape.backface_collision = true
+	shape.set_faces(faces)
+	var collider := CollisionShape3D.new()
+	collider.shape = shape
+	collider.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+	body.add_child(collider)
+	# The flight: refractory steps, each solid down into the lava.
+	for k in FLIGHT:
+		var top := -RISE * float(k + 1)
+		var z0 := FLIGHT_START + GOING * float(k)
+		var step := CalderaFurniture.piece(body, Vector3(FLIGHT_HALF, (DEEP + top) * 0.5, GOING * 0.5 + 0.02), REFRACTORY.lightened(0.03 * float(k % 2)), Vector3(0.0, (top - DEEP) * 0.5, z0 + GOING * 0.5), 0.0, true, 9.0)
+		step.name = "GhatStep"
+	# Where the ground behind stands above the deck, a retaining wall.
+	var retaining := StaticBody3D.new()
+	retaining.name = "%sRetaining" % entry["id"]
+	retaining.collision_layer = 1
+	retaining.collision_mask = 0
+	parent.add_child(retaining)
+	var cap := PackedVector3Array()
+	for point in plan_outline:
+		cap.append(Vector3(point.x, datum, point.y))
+	SocketPlinth._retaining(retaining, cap, FireCalderaPlan.mass_centre(entry), datum)
+	return body
+
+
+static func _tri(st: SurfaceTool, faces: PackedVector3Array, a: Vector3, b: Vector3, c: Vector3, normal: Vector3, colour: Color) -> void:
+	SocketPlinth._triangle(st, a, b, c, normal, colour)
+	faces.append_array([a, b, c])
+
+
+## At the foot of the central flight, half sunk where the waterline step meets
+## the lava, a refractory arch: the way down to the renewal chamber.
+static func _threshold(body: StaticBody3D) -> void:
+	var z := FLIGHT_START + GOING * 4.6
+	var arch := CSGCombiner3D.new()
+	arch.name = "ThresholdArch"
+	arch.use_collision = true
+	arch.collision_layer = 1
+	arch.collision_mask = 0
+	arch.position = Vector3(0.0, -RISE * 5.0, z)
+	body.add_child(arch)
+	var stone := SolidModel.material(REFRACTORY, 0.7, 0.0)
+	var outer := SolidModel.add_profile(arch, "Outer", 0.45, Vector2(2.1, 1.9), 3.2, CSGShape3D.OPERATION_UNION, stone, Vector3(0, 1.0, 0), 72)
+	outer.rotation.y = PI * 0.5
+	var inner := SolidModel.add_profile(arch, "Inner", 1.2, Vector2(1.7, 1.45), 3.2, CSGShape3D.OPERATION_SUBTRACTION, stone, Vector3(0, 0.85, 0), 72)
+	inner.rotation.y = PI * 0.5
+
+
+## Eris's tempering slab at the landing's east end, under the windbreak: warm
+## basalt to lie on, a glowing seam beneath its lip.
+static func _tempering_slab(body: StaticBody3D) -> void:
+	CalderaFurniture.piece(body, Vector3(1.0, 0.24, 0.5), CalderaShell.BASALT, Vector3(5.4, 0.24, -5.5), 0.0, true, 6.0)
+	FireCalderaBuildings._glow(body, "TemperingSeam", Vector3(0.95, 0.012, 0.01), Vector3(5.4, 0.16, -4.99), Color(1.0, 0.5, 0.15))
+	FireCalderaBuildings._marker(body, "ErisRenewalMarker", Vector3(5.4, 0.0, -4.4), PI)
 
 
 ## The catenary's height at x across the span.
@@ -73,60 +185,6 @@ static func _catenary_a() -> float:
 		else:
 			hi = mid
 	return (lo + hi) * 0.5
-
-
-## Basalt tiers either side of the pool, each a seat's height above the one
-## nearer the lava, facing in, warm seams along their inner fronts.
-static func _tiers(body: StaticBody3D) -> void:
-	for side: float in [-1.0, 1.0]:
-		for i in 3:
-			var width := 1.15
-			var x := side * (4.75 + width * float(i))
-			var h := 0.45 * float(i + 1)
-			var block := CalderaFurniture.piece(body, Vector3(width * 0.5, h * 0.5, 3.0), TIER.lightened(0.04 * float(i)), Vector3(x + side * width * 0.5, h * 0.5, 3.7), 0.0, true, 7.0)
-			block.name = "Tier%d" % i
-			FireCalderaBuildings._glow(body, "TierSeam", Vector3(0.01, 0.01, 2.7), Vector3(x + side * 0.05, h - 0.06, 3.7), Color(1.0, 0.5, 0.15))
-
-
-## The pool: a slab of thick cast glass over its back half, level with the
-## terrace, so the lava glows underfoot; from the glass's front edge a broad
-## stair of cast forsterite descends step by step into the lava.
-static func _pool(body: StaticBody3D) -> void:
-	var pit: Dictionary = (FireCalderaPlan.plot("RENEWAL")["pits"] as Array)[0]
-	var half: Vector2 = pit["half"]
-	var depth := float(pit["depth"])
-	var glass := MeshInstance3D.new()
-	glass.name = "GlassFloor"
-	var slab := BoxMesh.new()
-	slab.size = Vector3(half.x * 2.0 + 0.3, 0.12, GLASS_Z.y - GLASS_Z.x + 0.3)
-	glass.mesh = slab
-	var material := SolidModel.material(Color(0.85, 0.80, 0.72, 0.30), 0.04, 0.0)
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	glass.material_override = material
-	glass.position = Vector3(0.0, -0.06, (GLASS_Z.x + GLASS_Z.y) * 0.5 - 0.15)
-	body.add_child(glass)
-	CollisionPolicy.add_box(body, glass, slab.size, glass.position, Basis(), true)
-	# The glass's edge: a forged iron sill along its front.
-	CalderaShell._metal(body, Vector3(0.0, -0.02, GLASS_Z.y), Vector3(half.x * 2.0 + 0.3, 0.06, 0.08), IRON, false)
-	for i in STEPS:
-		var top := -0.3 * float(i + 1)
-		var z := GLASS_Z.y + 0.42 * (float(i) + 0.5)
-		var h := depth + top
-		# In the lava: cast forsterite, which the lava cannot melt.
-		var step := CalderaFurniture.piece(body, Vector3(2.4, h * 0.5, 0.21), FORSTERITE.darkened(0.05 * float(i % 2)), Vector3(0.0, -depth + h * 0.5, z), 0.0, true, 7.0)
-		step.name = "ImmersionStep"
-	# The lava in the pool, level with the reservoir it opens onto.
-	var lava_y := FireCalderaGround.LAVA_Y - body.position.y
-	var lava := MeshInstance3D.new()
-	lava.name = "PoolLava"
-	lava.mesh = SolidModel.extruded_profile_mesh(0.02, Vector2(half.x - 0.02, half.y + 1.5), 6.0, 72)
-	# The reservoir's own lava material, so the pool reads as the same lava.
-	lava.material_override = NatureProps.build_lava_material()
-	lava.position = Vector3(0.0, lava_y + 0.01, (pit["at"] as Vector2).y + 1.5)
-	lava.rotation.z = PI * 0.5
-	body.add_child(lava)
-	CollisionPolicy.mark_decorative(lava)
-	CalderaFurniture.concealed_light(body, Vector3(0.0, -0.8, 2.6), Color(1.0, 0.45, 0.12), 1.6, 6.0)
 
 
 ## The canopy: iron ribs on the catenary across the span, and between each
@@ -189,9 +247,9 @@ static func _supports(body: StaticBody3D) -> void:
 			var z := lerpf(BACK_Z, FRONT_Z, float(i) / float(RIBS - 1))
 			var x := side * SPAN * 0.5
 			var foot := Vector3(x + side * 0.4, 0.42, z)
-			# A forsterite shoe under the iron: the forged supports never touch
+			# A refractory shoe under the iron: the forged supports never touch
 			# lava, and stand off the hot deck on refractory.
-			CalderaFurniture.piece(body, Vector3(0.26, 0.21, 0.26), FORSTERITE, Vector3(foot.x, 0.21, z), 0.0, true, 5.0)
+			CalderaFurniture.piece(body, Vector3(0.26, 0.21, 0.26), REFRACTORY, Vector3(foot.x, 0.21, z), 0.0, true, 5.0)
 			var fork := Vector3(x + side * 0.15, SPRING - 1.0, z)
 			FireCalderaNahl._branch(body, foot, fork, 0.08)
 			FireCalderaNahl._branch(body, fork, Vector3(x, SPRING, z), 0.06)
@@ -204,28 +262,26 @@ static func _supports(body: StaticBody3D) -> void:
 			CollisionPolicy.add_box(body, holder, Vector3(0.2, SPRING, 0.2), Vector3(x + side * 0.3, SPRING * 0.5, z), Basis(), false)
 
 
-## An arc of cast-basalt memory stones behind the promenade, at the west: each a
+## The cast-basalt memory stones along the landing's back, facing the water: each a
 ## different height and lean, each with a seam of the glow it was cast with.
 static func _memory_stones(body: StaticBody3D) -> void:
-	var centre := Vector2(-4.5, -5.3)
 	var heights := [1.4, 1.9, 1.1, 2.3, 1.6, 1.2, 2.0]
 	for i in heights.size():
-		var angle := lerpf(PI * 0.15, PI * 0.85, float(i) / float(heights.size() - 1))
-		var p := centre + Vector2(cos(angle) * 3.0, sin(angle) * 1.2)
+		var x := lerpf(-7.0, -0.6, float(i) / float(heights.size() - 1))
+		var z := -6.2 + 0.25 * sin(float(i) * 1.7)
 		var h: float = heights[i]
-		var stone := CalderaFurniture.piece(body, Vector3(0.22, h * 0.5, 0.16), CalderaShell.BASALT.lightened(0.05 * float(i % 3)), Vector3(p.x, h * 0.5, p.y), angle, true, 3.4)
+		var stone := CalderaFurniture.piece(body, Vector3(0.24, h * 0.5, 0.16), CalderaShell.BASALT.lightened(0.05 * float(i % 3)), Vector3(x, h * 0.5, z), 0.1 * (float(i % 3) - 1.0), true, 3.4)
 		stone.name = "MemoryStone"
-		stone.rotation.z = (float(i % 3) - 1.0) * 0.05
-		FireCalderaBuildings._glow(body, "MemorySeam", Vector3(0.012, h * 0.3, 0.012), Vector3(p.x, h * 0.55, p.y) + Vector3(cos(angle), 0, -sin(angle)) * 0.0 + Vector3(0, 0, 0.17), Color(1.0, 0.5, 0.15))
+		FireCalderaBuildings._glow(body, "MemorySeam", Vector3(0.012, h * 0.3, 0.012), Vector3(x, h * 0.55, z + 0.17), Color(1.0, 0.5, 0.15))
 
 
 ## On the landward side, behind the top tier, windbreaks of fused glass with
 ## basalt veils drawn through it, on iron posts.
 static func _windbreaks(body: StaticBody3D) -> void:
 	var z := -6.6
-	var panels := 3
+	var panels := 2
 	for i in panels:
-		var x := lerpf(1.6, 6.8, float(i) / float(panels - 1))
+		var x := lerpf(4.2, 7.6, float(i) / float(panels - 1))
 		var pane := MeshInstance3D.new()
 		var box := BoxMesh.new()
 		box.size = Vector3(2.3, 2.2, 0.05)
@@ -247,7 +303,9 @@ static func _windbreaks(body: StaticBody3D) -> void:
 static func _light(body: StaticBody3D) -> void:
 	var tints: Array[Color] = [Color(0.4, 0.9, 0.85), Color(0.95, 0.35, 0.4), Color(1.0, 0.7, 0.3), Color(0.95, 0.35, 0.4), Color(0.4, 0.9, 0.85)]
 	for i in tints.size():
-		CalderaFurniture.concealed_light(body, Vector3(lerpf(-6.5, 6.5, float(i) / 4.0), 4.0, 3.5), tints[i], 0.7, 6.0)
-	for x: float in [-7.6, 7.6]:
-		CalderaFurniture.flame_capsule(body, Vector3(x, 0.0, -0.2))
-	FireCalderaBuildings._marker(body, "ErisRenewalMarker", Vector3(0.0, 0.0, 0.6), 0.0)
+		CalderaFurniture.concealed_light(body, Vector3(lerpf(-6.5, 6.5, float(i) / 4.0), 4.0, 0.0), tints[i], 0.7, 6.0)
+	# The lava's own glow up the flight.
+	for x: float in [-4.0, 0.0, 4.0]:
+		CalderaFurniture.concealed_light(body, Vector3(x, -1.4, 4.6), Color(1.0, 0.45, 0.12), 1.2, 5.0)
+	for x: float in [-8.0, 8.0]:
+		CalderaFurniture.flame_capsule(body, Vector3(x, 0.0, 3.0))

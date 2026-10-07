@@ -560,7 +560,10 @@ func _build_caldera_ground()->void:
 	for entry in FireCalderaPlan.PLOTS:
 		var id:=str(entry["id"])
 		if _caldera_surveys.has(id):
-			SocketPlinth.build(frame,entry,_caldera_surveys[id],SocketPlinth.size_key(entry))
+			if str(entry.get("foundation_kind",""))=="ghat":
+				FireCalderaRenewal.build_foundation(frame,entry,_caldera_surveys[id])
+			else:
+				SocketPlinth.build(frame,entry,_caldera_surveys[id],SocketPlinth.size_key(entry))
 	var reservoir_world:=PackedVector2Array()
 	for point in FireCalderaPlan.reservoir_polygon(128):
 		reservoir_world.append(FireCalderaPlan.to_world(point))

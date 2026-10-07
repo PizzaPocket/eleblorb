@@ -37,7 +37,7 @@ unchanged. These are its invariants in buildable terms.
 | Headroom | every canopy, bridge roof, gallery or upper floor a route passes under clears 2.4 m; public halls are taller by program, not by accident |
 | Vertical circulation | ramps, never stairs: 32 degrees at most, 1.4 m wide (2.0 m on public routes), a 1.2 m landing at foot and head; one storey of 3.5 m needs about 5.6 m of run, so about 8 m with landings. Every upper floor names its ramp or lift in its brief |
 | Furniture and textiles | **no wood anywhere**: a lava person would burn it by touching it (`CalderaFurniture`). Cast basalt and stone, blued and stainless steel, glass. Textiles follow real heat-proof cloth: basalt fibre (bronze-gold, used for fire blankets) for guest bedding and mats, silica cloth (to about 1000 °C) for mattresses and anything a lava person touches, mineral-coated glass-fibre cloth for coloured upholstery, ceramic fibre (about 1260 °C) for the hottest work, stainless mesh for drapery; never asbestos or aramid |
-| Against lava | nothing of steel or iron touches lava; whatever stands in it is cast forsterite (the olivine refractory); metal that stands near it bears on refractory shoes |
+| Against lava | nothing of steel or iron touches lava; whatever stands in or contains it is refractory: dark magnesia-chrome on the quays and in the ghat, pale forsterite where a pale interior wants it (Nahl's lava bed); metal near it bears on refractory shoes |
 | Collision | shells, plinths, terraces, rails, bridges, counters and instruments solid; molten wells and floors use the hazard and liquid API; sparks and seams decorative |
 
 ### A culture of original buildings (2026-10-07)
@@ -285,24 +285,37 @@ shelf.
   same catenary (17 m span, 6.2 m crown) on branching supports, the panels
   shading from teal at the springing through garnet to amber at the crown,
   with coloured light under it.
-- **Revised 2026-10-08 (user: the terrace had no connection to the lava):**
-  the plot moved onto the bank as a **quay**, its front 5 to 6 m out over the
-  reservoir, its floor level with the promenade, which now crosses its back as
-  public ground (plan keys `quay`, `crossed`, `datum_at`). Cut into its front
-  is the **communal lava pool**, open to the reservoir so the lava runs in
-  beneath the terrace. **Cast glass** floors the pool's back half, so people
-  walk over the lava; from the glass a broad **immersion stair** descends step
-  by step into the lava, the gentlest way down to the renewal chamber `L0`.
-  Basalt tiers flank the pool on both sides, rising away from it and facing
-  in, under the canopy. Behind the promenade, the arc of seven cast-basalt
-  memory stones and the veiled glass windbreaks.
-- **Materials against lava (2026-10-08):** forged steel and iron never touch
-  lava (steel keeps its form at lava heat but loses its strength and scales
-  away): every canopy support stands on the quay's deck, back from its rounded
-  corners, on a cast **forsterite** shoe (the olivine refractory, melting near
-  1900 C) that parts the iron from the hot stone. Whatever sits in the lava,
-  the immersion stair here, is forsterite too; basalt melts at about lava
-  temperature.
+- **Revised 2026-10-08: the city's ghat.** The first revision piled up moves
+  (a pool, a glass walkway, an inland channel and basin, flanking tiers) with
+  no single purpose; the user asked for a rethink of use and flow. As on a
+  river ghat, a broad flight of steps runs from the street down into the
+  lava, and the steps are the use:
+  1. **Arrival:** the promenade runs along a level landing at the top, flush
+     with it (plan keys `quay`, `crossed`, `datum_at`).
+  2. **The flight:** seven refractory steps between two arms. The dry upper
+     steps are seats for resting, talking and watching; on the waterline step
+     people sit half immersed together; the lower steps carry on under the
+     lava as the immersion shelf. A cool-bodied player can sit on the dry
+     steps; with the Lava Helm they walk on down.
+  3. **The threshold arch:** dark refractory, half sunk at the foot of the
+     central flight: the way down to the renewal chamber `L0` and the place
+     of the coming-of-age descent.
+  4. **The memory stones** stand along the landing's back facing the water,
+     the backdrop to every gathering.
+  5. **Eris's tempering slab** at the landing's east end under a veiled glass
+     windbreak, for those too cracked or cooled to walk straight in.
+  6. **The canopy** covers the whole ghat; its supports stand on the landing
+     and the arms, never over lava, on refractory shoes.
+- **Its own foundation** (`foundation_kind: "ghat"`), not a plinth: a U-shaped
+  deck level with the promenade, cut to the plot's outline and open at the
+  front to the flight, its walls running down into ground and lava; a
+  retaining wall only where the ground behind stands higher; the ground cut
+  away beneath (`sink`); each step a level for the height query.
+- **Materials against lava:** nothing of steel or iron touches lava. What
+  contains or stands in it (the steps, the arch, the shoes under the
+  supports, the flight's side walls) is magnesia-chrome refractory, the
+  near-black brick that lines furnaces against molten slag, so it reads as
+  part of the basalt quay.
 
 ## 4. Exchange and craft
 

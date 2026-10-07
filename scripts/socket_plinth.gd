@@ -167,11 +167,19 @@ static func _pitted_top(st: SurfaceTool, cap: PackedVector3Array, top: float, pi
 			centre += point
 		centre /= float(outline.size())
 		var inside := Vector3(centre.x, top - float(pit["depth"]) * 0.5, centre.y)
-		var wall := finish.darkened(0.12)
+		# A pit that holds lava is lined with near-black refractory.
+		var wall := Color(0.21, 0.18, 0.17) if bool(pit.get("lava", false)) else finish.darkened(0.12)
 		for i in outline.size():
 			var j := (i + 1) % outline.size()
 			var a := outline[i]
 			var b := outline[j]
+			# Where pits join (a channel into a pool) no wall stands between them.
+			var others: Array[Dictionary] = []
+			for other in pits:
+				if other != pit:
+					others.append(other)
+			if _in_pit((a + b) * 0.5, others):
+				continue
 			_quad(st, Vector3(a.x, top, a.y), Vector3(b.x, top, b.y), Vector3(b.x, floor_y, b.y), Vector3(a.x, floor_y, a.y), inside, wall, true)
 			faces.append_array([Vector3(a.x, top, a.y), Vector3(b.x, top, b.y), Vector3(b.x, floor_y, b.y), Vector3(a.x, top, a.y), Vector3(b.x, floor_y, b.y), Vector3(a.x, floor_y, a.y)])
 			_face(st, faces, Vector3(centre.x, floor_y, centre.y), Vector3(a.x, floor_y, a.y), Vector3(b.x, floor_y, b.y), Vector3.UP, finish.darkened(0.04))
@@ -186,7 +194,7 @@ static func _face(st: SurfaceTool, faces: PackedVector3Array, a: Vector3, b: Vec
 ## The depth of the deepest pit dug into a plot's plinth (zero for none), for
 ## the ground hidden under it.
 static func sink(entry: Dictionary) -> float:
-	return _deepest(FireCalderaPlan.pit_outlines(entry))
+	return float(entry.get("sink", _deepest(FireCalderaPlan.pit_outlines(entry))))
 
 
 static func _in_pit(point: Vector2, pits: Array[Dictionary]) -> bool:

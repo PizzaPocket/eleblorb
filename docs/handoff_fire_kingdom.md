@@ -65,9 +65,10 @@ surface foundations, and the finished guest house exist and validate.
   brick front and dichroic fins, a first spare furnishing pass. Next for Oren:
   done: richer interior, lava beds registered, bricks toned down, the roof
   terrace reached by a lift from the home's landing (`CalderaLift`).
-- **Renewal terrace** (`FireCalderaRenewal`): live; a quay over the reservoir
-  with a lava pool, glass floor and immersion stair under a slumped-glass
-  catenary canopy; tiers flanking the pool; memory stones.
+- **Renewal terrace** (`FireCalderaRenewal`): live; the city's ghat, a flight
+  of refractory steps from the promenade into the lava with a half-sunk
+  threshold arch, memory stones, Eris's tempering slab, under the
+  slumped-glass catenary canopy; its own `ghat` foundation.
 - Next buildings by the brief: Kel, Vara, Civic (with the
   terrarium), Iren, Aro, the arrival pylons and the cove bridge. Each gets
   its own original idea (see "A culture of original buildings" in the brief).
