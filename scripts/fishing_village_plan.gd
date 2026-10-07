@@ -112,7 +112,10 @@ const ROUTES: Array[Dictionary] = [
 	{"name":"SenSpur","class":"spur","width":2.4,"ends":["SenHouse"],"points":[Vector2(-15,-7),Vector2(-15,-10)]},
 	{"name":"CisternSpur","class":"spur","width":2.4,"ends":["CisternHouse"],"points":[Vector2(-2,-7),Vector2(-2,-12)]},
 	{"name":"NetShedSpur","class":"spur","width":2.4,"ends":["NetShed"],"points":[Vector2(8,-7),Vector2(8,-12)]},
-	{"name":"AranSpur","class":"spur","width":2.4,"ends":["AranHouse"],"points":[Vector2(8,-7),Vector2(8,-3)]},
+	# On the line of the Aran threshold ramp (x 6..8), which climbs to the
+	# veranda's north end (its deck tucks under the ramp's foot); on x 8 it ran
+	# into the house's corner.
+	{"name":"AranSpur","class":"spur","width":2.4,"ends":["AranHouse"],"points":[Vector2(7,-7.6),Vector2(7,-3.5)]},
 	{"name":"ValeGangway","class":"gangway","width":2.6,"ends":["HeronLanding","ValeHouseboat"],
 		"points":[Vector2(24,-2),Vector2(27,-5)],"rise":DECK_TOP - FLOAT_DECK},
 	{"name":"CatchGangway","class":"gangway","width":2.6,"ends":["ValeHouseboat","CatchDeck"],

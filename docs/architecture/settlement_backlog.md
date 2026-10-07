@@ -210,8 +210,14 @@ will be rideable as a separate project, and players swim until then.
    `Scatter` (6,400) have not been merged yet: the next wins.
 9. Done (2026-10-07): every boat built for its owner's job (`FishingBoats`,
    design brief 4.18), solid and standable; Ivo's launch solid too.
-10. Still open: a walk of every route at human, Blorbus and Xiao Hou Zi
-   scale, the islets' faces up close.
+10. Done (2026-10-07): every route walked at human, Blorbus and Xiao Hou Zi
+   scale (`tools/fishing_route_walk.tscn`: deck underfoot and under both
+   sides, nothing solid in the way). It found a junction lamp standing in the
+   spine where it turns diagonal, the Aran spur running into the house's
+   corner instead of its ramp, and the Vale mooring post 0.7 m from the
+   gangway's line, too close for Blorbus. All moved; 0 FAIL.
+11. Still open: the islets' faces up close; a walk through the buildings'
+   doors at Blorbus scale is not expected (doors are human-sized).
 
 ### How to build one structure
 

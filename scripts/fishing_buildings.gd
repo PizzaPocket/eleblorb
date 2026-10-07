@@ -23,7 +23,10 @@ const JUNCTION_LAMPS: Array[Dictionary] = [
 	{"at": Vector2(-16.7, -8.2), "arm": Vector2(0, 1)},
 	{"at": Vector2(-3.7, -8.95), "arm": Vector2(0, 1)},
 	{"at": Vector2(9.7, -8.8), "arm": Vector2(0, 1)},
-	{"at": Vector2(18.4, -2.6), "arm": Vector2(1, 1)},
+	# Where the spine turns diagonal toward Heron Rock, on its south-east
+	# edge (offset across the diagonal, not north): on the line it stood in
+	# the walkway.
+	{"at": Vector2(19.85, -3.8), "arm": Vector2(-0.77, 0.64)},
 ]
 
 const SHELF_Y := -3.2 - 0.4
@@ -1856,8 +1859,9 @@ static func vale_houseboat() -> StaticBody3D:
 	var roof_x0 := -7.0
 	for z: float in [zn, -0.4]:
 		StiltKit.post(body, Vector2(roof_x0, z), f - StiltKit.FLOOR_THICKNESS, plate)
-	StiltKit.post(body, Vector2(-6.8, 3.3), f - StiltKit.FLOOR_THICKNESS, f + 0.9, StiltKit.TIMBER_DARK, false)
-	StiltKit.rope_binding(body, Vector2(-6.8, 3.3), f + 0.3, f + 0.8)
+	# 1.4 m off the gangway's centre line: at 0.7 m Blorbus could not pass it.
+	StiltKit.post(body, Vector2(-5.9, 3.4), f - StiltKit.FLOOR_THICKNESS, f + 0.9, StiltKit.TIMBER_DARK, false)
+	StiltKit.rope_binding(body, Vector2(-5.9, 3.4), f + 0.3, f + 0.8)
 	for z: float in [zn, zs]:
 		StiltKit.beam(body, Vector2(roof_x0, z), Vector2(x0, z), plate - 0.1, Vector2(0.12, 0.1))
 	StiltKit.beam(body, Vector2(roof_x0, zn), Vector2(roof_x0, zs), plate - 0.1, Vector2(0.12, 0.1))
