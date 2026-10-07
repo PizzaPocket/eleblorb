@@ -192,7 +192,8 @@ shelf.
      - the secure gem store, 3 × 4 m, between the counter and the assay room,
        with a 1 m lobby in front of its forged door;
      - the assay room, 5 m;
-     - a 2 m bay at the east end for the foot of the home's ramp.
+     - a 2 m bay at the east end, the full 12 m depth, open to the air, which
+      holds the home's ramp (see below).
   2. **A 1.4 m staff corridor** across the width. It joins the assay room,
      the receiving bay and the preparation studio. Customers never enter it.
   3. **Back band, 5.6 m deep, facing `R2`:**
@@ -203,9 +204,9 @@ shelf.
   Pela's route is receiving bay → corridor → assay room → gem store. Untested
   ore never enters the studio. Savi takes only assayed material from the
   corridor.
-- **The way up:** an **external ramp** 2 m wide runs along the east end from
-  the service side (`R2`) to the upper floor at +3.5 m: 5.6 m of run, with
-  1.2 m landings, inside the 12 m end. The home therefore has its own door and
+- **The way up:** an **open-air ramp** 2 m wide in the east bay, outside the
+  shop's walls, climbs from the service side (`R2`) to the upper floor at
+  +3.5 m: 5.6 m of run, with 1.2 m landings, inside the 12 m depth. The home therefore has its own door and
   is never reached through the shop.
 - **Pass-throughs:** the gem store is reached only through the assay room and
   counter lobby, and the receiving bay leads through the corridor to the
@@ -259,7 +260,7 @@ shelf.
 | Room | Size | Description |
 |---|---|---|
 | Clean assembly floor | 8 × 7 m | finished panes, frames and screens assembled under daylight, with a design wall of coloured samples |
-| Hot forming bay | 6 × 6 m | glass furnace on the high-temperature branch, a blowing floor, Omi's bench |
+| Hot forming bay | 5 × 6 m | glass furnace on the high-temperature branch, a blowing floor, Omi's bench |
 | Annealing chamber | 3 × 6 m | long cooling ovens |
 | Metal bench | 4 × 5 m | Talen's forge and bending tools for frames and branching supports |
 | Glass rack | along the court | panes stored on edge |
@@ -268,8 +269,9 @@ shelf.
   a **curved clear-glass wall** overlooking the reservoir.
 - **Plan (audited 2026-10-07):**
   - **West wing, the studio, 8 m wide:** the clean assembly floor (8 × 7 m)
-    at the promenade end, then the hot forming bay (6 × 6) with the annealing
-    chamber (3 × 6) beside it. The metal bench (4 × 5) is at the court's
+    at the promenade end, then the hot forming bay (5 × 6, narrowed from 6 so
+    it and the annealing chamber fit the 8 m wing) with the annealing chamber
+    (3 × 6) beside it. The metal bench (4 × 5) is at the court's
     north side.
   - **Centre:** the daylight court, 5 × 8 m, with the glass rack along its
     west wall.
