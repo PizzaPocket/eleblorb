@@ -95,9 +95,11 @@ two beds. The cause:
   wings, lean-tos and vestibules.
 
 Fix:
-1. Test each bank against every building envelope except the one wall it is
-   placed against, using real extents: wings by `attached_to`, `lean_to`
-   depth, `vestibule`, `gallery`.
+1. Done (2026-10-07, not yet run in the engine): `_bank_blocked()` now tests
+   each drift's true rectangle against every recorded building and lean-to
+   rectangle, its own house and the attached inn wing included, instead of
+   skipping buildings. A drift 1.3 m off its wall clears its own house by
+   0.4 m, so only real overlaps are refused.
 2. Add a validator check that fails any decorative dressing (banks, mounds,
    planting) whose bounds enter a building envelope or interior.
 3. Walk every interior once more.

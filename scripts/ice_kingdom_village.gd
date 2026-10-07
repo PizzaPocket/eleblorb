@@ -104,6 +104,10 @@ var _rng := RandomNumberGenerator.new()
 var _smoke_rng := RandomNumberGenerator.new()
 var _smoke_puffs: Array[ChimneySmoke.Puff] = []
 var _center := Vector2.ZERO
+## A snow drift's half depth either side of its line (SnowGrounds.snow_bank's
+## pieces reach about 0.73 m), and the clearance it keeps from any building.
+const BANK_HALF_DEPTH := 0.8
+const BANK_BUILDING_MARGIN := 0.1
 var _layout_solids: Array[Dictionary] = []
 var _layout_doors: Array[Dictionary] = []
 var _layout_facing: Array[Dictionary] = []
@@ -542,25 +546,49 @@ func _build_snow_banks() -> void:
 					var along_axis := Vector2(1, 0) if wall in ["front", "back"] else Vector2(0, 1)
 					var local_point: Vector2 = (info["centre"] as Vector2) + along_axis * middle + (info["normal"] as Vector2) * 1.3
 					var spot := _plan_point(at, yaw, local_point)
-					if _bank_blocked(spot, to - from - 0.4):
+					var bank_yaw := yaw + float(info["turn"])
+					if _bank_blocked(spot, to - from - 0.4, bank_yaw):
 						continue
 					counter += 1
-					SnowGrounds.snow_bank(self, _world3(spot), to - from - 0.5, yaw + float(info["turn"]), 0.7, 500 + counter)
+					SnowGrounds.snow_bank(self, _world3(spot), to - from - 0.5, bank_yaw, 0.7, 500 + counter)
 
 
-func _bank_blocked(spot: Vector2, length: float) -> bool:
+## A drift has no collision, so nothing else would stop it standing inside a
+## room. It used to skip every building here (meant to skip only its own wall),
+## and a drift off the Snowrest Inn's wall stood in the attached guest wing,
+## through two beds. Now its true rectangle is tested against every building,
+## lean-to and prop rectangle, its own house included: a drift hugging its wall
+## sits 1.3 m out, so it clears its own walls and fails only on a real overlap.
+func _bank_blocked(spot: Vector2, length: float, bank_yaw: float) -> bool:
 	for way: Dictionary in SnowPlan.WAYS:
 		var points: Array = way["points"]
 		for i in points.size() - 1:
 			var closest := Geometry2D.get_closest_point_to_segment(spot, points[i], points[i + 1])
 			if spot.distance_to(closest) < float(way["width"]) * 0.5 + length * 0.5 + 0.4:
 				return true
+	# A drift piece is up to about 0.75 m deep either side of its line.
+	var bank := _plan_rect(spot, Vector2(length * 0.5, BANK_HALF_DEPTH), bank_yaw)
 	for solid: Dictionary in _layout_solids:
-		if str(solid["kind"]) == "building":
-			continue
-		if spot.distance_to(solid["center"]) < (solid["half"] as Vector2).length() + 1.2:
+		var kind := str(solid["kind"])
+		if kind in ["building", "shed"]:
+			var half: Vector2 = solid["half"]
+			var footprint := _plan_rect(solid["center"], half + Vector2(BANK_BUILDING_MARGIN, BANK_BUILDING_MARGIN), float(solid["yaw"]))
+			if not Geometry2D.intersect_polygons(bank, footprint).is_empty():
+				return true
+		elif spot.distance_to(solid["center"]) < (solid["half"] as Vector2).length() + 1.2:
 			return true
 	return false
+
+
+## The four corners of a rectangle of half extents `half`, centred at `at` and
+## turned by `yaw`, in plan coordinates (the same mapping as _plan_point).
+func _plan_rect(at: Vector2, half: Vector2, yaw: float) -> PackedVector2Array:
+	return PackedVector2Array([
+		_plan_point(at, yaw, Vector2(-half.x, -half.y)),
+		_plan_point(at, yaw, Vector2(half.x, -half.y)),
+		_plan_point(at, yaw, Vector2(half.x, half.y)),
+		_plan_point(at, yaw, Vector2(-half.x, half.y)),
+	])
 
 # ---------------------------------------------------------------------------
 # Yard: communal fire court, cistern, weather mast
