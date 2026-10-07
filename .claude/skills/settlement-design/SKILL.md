@@ -107,6 +107,37 @@ when the editor is open. Audit arrival, public heart, public and service routes,
 interiors, upper levels, hazard or water level, and night conditions. Staging
 the whole world is a final integration check, not the default inspection tool.
 
+## Lessons from the fishing village build (2026-10-07)
+
+- **One source, checked both ways.** The layout's diagram, its route table and
+  the plan data must agree. The pavilion's spur was drawn in the diagram but
+  missing from the table and the data, so the built pavilion had no way in.
+  The validator should fail:
+  - a structure with no route to it;
+  - a route that ends at nothing built;
+  - a structure kind that no builder handles (the barge's gangway led to
+    nothing because the builder had no case for a barge).
+- **A named resident exists exactly once.** A placeholder spawned the rest
+  point and its keeper on every houseboat. Spawn people and rest points from
+  the census and the plan, never per structure type.
+- **Survey the real ground, not the intended ground.** Section tools that
+  print the actual terrain or rock (`tools/fishing_rock_section.gd`) belong in
+  stage 3. The cistern had been planned where the rock face actually stood.
+- **Edges and drops.** Probe every route edge against the ground beside it.
+  Ohio's rim walk ran out over a 4 to 6 m drop for 17 m.
+- **Water obeys physics.** A fall must leave its lip at a believable speed and
+  fall along a true arc. Ohio's aqueduct threw water out at about 9 m/s to
+  clear a ledge, and it now runs out on a flume to a natural fall.
+- **People stand on what is built.** Residents over water or on raised decks
+  need a ground probe that finds the deck beneath them. The world probe checks
+  each resident is on a deck at spawn and again after walking their day.
+- **Every walkthrough finding becomes a check.** Headroom, rock in a
+  footprint, hull clearance and resident grounding were each found by eye, then
+  added to the proof or world probe so they cannot return.
+- **Look early.** Render the settlement from the air (`tools/village_aerial_capture`,
+  a target per settlement) before detailing. The aerial renders showed the
+  islets needed a full landscaping pass.
+
 ## Approval discipline
 
 End every brief with:

@@ -106,6 +106,33 @@ per scene.
 - Ground paint (worn paths, wear patches) is a decal; use it for worn earth around gates and doors.
 - No text, no instruction.
 
+## 4a. Lessons from the fishing village islets (2026-10-07)
+
+- **Model a real landform, not a generic rock.** The first islets were uniform
+  grey stacks of vertical flutes, and one tall flat-crowned stack read as a
+  column. Rebuilt after Phang Nga tower karst, they have:
+  - clusters of domed towers;
+  - a darker waterline notch;
+  - orange and black runnels down the faces;
+  - soil ledges;
+  - forested crowns;
+  - hanging roots and lianas.
+
+  Write the landform's reference (its geology, zones and plants) in
+  `references/` first, as `southeast_asian_karst_flora.md` was.
+- **Avoid grid artefacts.** A 1 m grid shelf edge showed as stair steps through
+  clear water. Slope or smooth edges that are visible through water or from
+  above.
+- **Plant by zone, in clumps.** Plant each zone that can hold soil (ledge,
+  crown, notch, seep). Never put a lawn on rock, and never space planting
+  evenly along a ledge.
+- **Neighbours differ.** Two islets side by side should each have their own
+  character, from their exposure and size.
+- **Ground is ground.** Rock and terrain bodies go on the ground collision
+  layer, never the climbable layer; the wrong layer broke swimming under the
+  docks.
+- **Review from the air and at eye level** before calling a landscape done.
+
 ## 5. Review checklist
 
 1. Every planting has a job and a tender, and I can say what it is.

@@ -235,6 +235,15 @@ posts can still be recorded with `ClearZones.add_support`.
   draw each partition so its left side is the room the doors belong to
   (`build_interior_wall` from the corridor side outward, or reversed). Check
   the swing arc, not only the clear zone.
+- **Outside doors swing in too.** An outside door opens into the building, not
+  onto the porch, veranda or deck. Outward leaves filled a 2 m porch in front
+  of its ramp in the fishing village, so every door there now swings inward.
+  Where a room is too narrow for one wide leaf, use a pair of narrow leaves.
+- **Not every doorway needs a hard leaf.** The culture decides. Between a
+  home's own rooms, many cultures hang a cloth curtain in a framed opening
+  (the fishing village's *langsir*). Keep hard leaves where something must
+  close: outside doors, toilets, a clinic, stores. Write the door type into
+  the charter.
 - **Every door has a clear zone of about 1.25 m on both sides** (its leaf's
   swing plus a person standing to open it), registered with `ClearZones.add`;
   `TownProps` does this for every exterior and interior door and every window.
@@ -435,3 +444,97 @@ project (`docs/handoff_ohio_village.md`, "Tools you now have") before reporting.
   it; door-frame jambs bury only in their own slab.
 - People stand where they can be seen to be doing something: a stop's wander range
   scales with its size, and two residents never share a stop.
+
+
+## Standing rules from the fishing village build (2026-10-06 and 07)
+
+Every building in the fishing village was drawn as a brief, approved, and then
+built one at a time in an isolated proof scene. Almost every brief failed
+somewhere when it was drawn for real, and the user's walkthrough found more.
+These rules catch those failures on paper, before code.
+
+### Audit every brief before it is approved
+
+1. **Add it up.** Sum the rooms along each axis and check the total against
+   the footprint, hull or plot.
+   - The Vale houseboat's rooms came to 16.5 m in a 14 m hull.
+   - The Mor houseboat's program did not fit its 18 m hull.
+   - The boatwright's slip ran 12 m beyond its own footprint.
+2. **Draw the section.** Check roof rise against any loft or upper room. A 32°
+   hip over a 4.5 m house rises only 1.4 m, so the Venn house's loft could
+   never exist.
+3. **Draw the access graph.** Check that every room opens off circulation (a
+   hall, corridor, living room or porch), never through another room.
+   - The Aran kitchen was reachable only through a bedroom.
+   - The Sen family could reach their beds only through the clinic.
+   
+   Public, private and service rooms each get their own way in.
+4. **Check that every named feature exists.** "Pree's corner under the stair"
+   had no stair. "The cistern behind the house" was where the rock face stood.
+5. **Check against the real ground.** Take the terrain or rock section from
+   the world (`tools/fishing_rock_section.gd` prints a rock face) and place the
+   building against it, not against an assumed flat site.
+6. **Check every route lands.** Each door, ramp and gangway must meet a route,
+   and each route a door.
+   - The barge's gangway led to nothing.
+   - The pavilion had no spur from the spine.
+7. **Check the frames.** Door and window frames on one wall must clear each
+   other and their partitions. Two Sen doors moved because a door's frame
+   touched a window's, or left no room for the window between the partition
+   and the door.
+
+### Rules for the build
+
+- **Headroom under eaves.** Every eave, pent or beam a route passes under
+  clears **2.4 m**. Derive the plate height from the roof's real slab
+  thickness and any pent tucked under the eave, not from a round number. The
+  fishing village's ring beam rose from 2.9 m to 4.0 m. The proof scene fails a
+  route under 2.35 m.
+- **Roof thickness.** Roof slabs use the shared thickness (Ohio's, 0.24 m) so
+  the SuperEgg shoulder reads at the eave. A pent is cut flush where it meets
+  its wall.
+- **No post in a way or a main opening.** A post never stands on a route's line
+  or inside a building's principal opening. Span the gap with a deeper beam
+  instead. Three pavilion posts sat on the way to a swim exit, and the net
+  shed's 6 m front needed a clear span.
+- **Shutters and fittings from the charter.**
+  - Use the culture's own type: the fishing village's top-hung awning
+    shutter, never side-hung pairs that reach the posts.
+  - A window already shaded by a veranda or eave has no shutter.
+  - Lights follow the charter's exclusions. "Post lanterns" were lights on
+    poles, which the charter forbids.
+- **Surfaces are made of their material.**
+  - A deck is planks on joists, never a slab.
+  - A wall shows its boards.
+  - Colour follows how the material really weathers: sun-bleached
+    silver-brown tropical hardwood, not the near-black of creosote. The user
+    reads a slab, or a wrong colour, as a placeholder.
+- **Collision layers match what a thing is.** Rock and ground go on the
+  ground layer. The islets sat on the blorb-climbable layer, so the swim code
+  took every rock shelf for a dock ramp and stopped the hero swimming under
+  the docks.
+- **Moored and parked things clear their surroundings.** A hull clears the
+  slip apron, a stall clears a bridge foot and a shop frontage. Probe each one.
+- **Shared pieces are extracted, not copied.** The inn sign, the junction lamp
+  and the plank surface each became one shared builder (`VillageInn`'s sign,
+  `StiltKit`) once a second place needed it.
+
+### The build pipeline
+
+1. **Approve the brief**, after the audit above.
+2. **Build one structure in isolation** (`tools/fishing_building_proof.tscn
+   --building=Name`) until it reports 0 FAIL. The proof checks:
+   - collision pairing, clear zones, lanes and stacking;
+   - headroom;
+   - piles on the shelf;
+   - no rock in the footprint.
+3. **Render it and look.** Use `--shots`, and also the aerial capture.
+4. **Place it in the world** and run the world probe: every floor's height,
+   every resident on a deck, every hull clear.
+5. **Record in the brief** every change the build forced, under "Built", with
+   the reason.
+
+**There is never a placeholder builder.** A placeholder built the rest point
+and its keeper on every houseboat. The village now refuses to build a plan
+structure that has no real builder.
+

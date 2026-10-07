@@ -66,6 +66,16 @@ them.
    eye level, open and close each door, and look up for anything poking through a
    ceiling.
 
+## 1b. From the fishing village build (2026-10-07)
+
+- **Door type comes from the charter.** A home's inner doorways may be cloth
+  curtains rather than hard leaves; dress them as textiles (a rod, a hem, a
+  colour from the household). Leave hard doors where the charter keeps them.
+- **Keep landings clear.** Furnish a deck or room up to its ramp and gangway
+  landings, never across them (the Aran wet ramp's landing, the slip bridge).
+- **Hang things above headroom.** Nets, lamps and drying lines over a route hang
+  no lower than 2.2 m above the floor (the net shed).
+
 ## 2. The layers
 
 1. **Structure.** Floor finish (boards, flagstones, packed earth in service rooms), skirting, beams, lintels, window seats, alcoves, shelving niches, the hearth surround with a mantel.
