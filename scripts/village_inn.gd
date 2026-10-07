@@ -189,7 +189,7 @@ func _build(
 	if _is_ohio_lodge:
 		inn_lines.assign([
 			"If you need a room, ask before I bank the fire. I won't wake the whole house for late feet.",
-			"Nell says visitors remember her bread. They remember the bed they ate it in.",
+			"Nell's bread came over warm this morning. If you can smell it, it's already half gone.",
 		])
 	elif not keeper_lines.is_empty():
 		inn_lines.assign(keeper_lines)

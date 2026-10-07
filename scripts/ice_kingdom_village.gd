@@ -57,14 +57,14 @@ const WINTER_APPEARANCE := {
 const IDENTITIES := [
 	{"name": "Elin", "female": true, "lines": [
 		"Snow soaks up sound. I listen for the sounds that still carry: a shout, a slab letting go, a chair stopping.",
-		"Tomas gives me the ice and Niko gives me the lift. The bell is mine.",
+		"Bell rope's frozen again. If it rings by itself, that wasn't me.",
 	]},
 	{"name": "Tomas", "female": false, "lines": [
 		"The lake groans low before a storm. An hour before it hits, it goes silent. That's the one to worry about.",
 		"Soren cuts only where I've pushed a pole into the ice and it stayed dry. He argues. The pole wins.",
 	]},
 	{"name": "Mara", "female": true, "lines": [
-		"Gloves, boots, lift harnesses. Everyone complains about the gloves. The harness stitching gets the second pass.",
+		"Hold still, your glove's split at the thumb. Bring it back before dark and I'll stitch it.",
 		"Freya pays for her mittens in smoked trout. I'd rather have coin, but I haven't turned the trout down yet.",
 	]},
 	{"name": "Soren", "female": false, "lines": [
@@ -73,7 +73,7 @@ const IDENTITIES := [
 	]},
 	{"name": "Anja", "female": true, "lines": [
 		"A west wind brings needles off the north ridge. When they come from the south, I wait a day before I mark trails.",
-		"Berries go on Solveig's board, logs go to the stacks, stormfall I clear. The standing wood I leave to itself.",
+		"Mind the stack, it leans. I built it leaning. It's fine.",
 	]},
 	{"name": "Niko", "female": false, "lines": [
 		"Our roofs wear winter better than we do. I'm up there with a shovel. They just sit.",
@@ -81,7 +81,7 @@ const IDENTITIES := [
 	]},
 	{"name": "Freya", "female": true, "lines": [
 		"Something silver moved under the fishing hole yesterday. Ivar says it was my reflection. My reflection isn't that long.",
-		"Rye from Astrid, mittens from Mara, and I pay in smoked trout. Everyone's happy except the trout.",
+		"Smell that? Trout. Don't tell Ivar I'm smoking a second batch.",
 	]},
 ]
 

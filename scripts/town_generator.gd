@@ -201,7 +201,7 @@ const VILLAGER_IDENTITIES := [
 		"female": true,
 		"lines": [
 			"If you need a room, ask before I bank the fire. I won't wake the whole house for late feet.",
-			"Nell says visitors remember her bread. They remember the bed they ate it in.",
+			"Nell's bread came over warm this morning. If you can smell it, it's already half gone.",
 		],
 	},
 	{
@@ -209,14 +209,14 @@ const VILLAGER_IDENTITIES := [
 		"female": false,
 		"lines": [
 			"I don't own the blorb under my porch. It sleeps there when it pleases and leaves without saying goodbye. Sensible creature.",
-			"Ivy can tell you what color means what. I can tell you which hedge will survive winter.",
+			"Mind the hedge by the stile. I laid it last spring and it's still sulking.",
 		],
 	},
 	{
 		"name": "Petra Voss",
 		"female": true,
 		"lines": [
-			"Morning is lessons. Afternoon is Halda's records. If history becomes interesting, I hope it waits until I have fresh ink.",
+			"Has anyone seen my good ink? Somebody keeps borrowing it and returning water.",
 			"You remember nothing, and everyone else has already improved the story. I'm writing down only what you tell me.",
 		],
 	},
@@ -240,15 +240,15 @@ const VILLAGER_IDENTITIES := [
 		"name": "Tam Ruskin",
 		"female": false,
 		"lines": [
-			"Stone tells you where the water has been. Stories tell you where people wish it had been.",
-			"The fountain can keep its secrets. My job is to keep it from leaking.",
+			"Hear that drip? Third time I've sealed that joint. The fountain thinks it's funny.",
+			"Don't lean on the coping, the mortar's still green.",
 		],
 	},
 	{
 		"name": "Halda Prewitt",
 		"female": true,
 		"lines": [
-			"Brinna wants the east pitch wider. Aldren wants hers narrower. This is why markets need records.",
+			"Brinna wants the east pitch wider. Aldren wants hers narrower. Neither of them will say why.",
 			"If Aldren says an object is unique, ask whether he means in Ohio or on his table.",
 		],
 	},
@@ -283,7 +283,7 @@ const VILLAGER_IDENTITIES := [
 		"body_scale": 0.70,
 		"lines": [
 			"Nell gave me six loaves and said not to run. She knows Petra rings the lesson bell early.",
-			"I can carry bread or copy sums. Bread gets fewer red marks.",
+			"If you see Petra, I wasn't late. I was carrying bread.",
 		],
 	},
 	{

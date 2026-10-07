@@ -54,15 +54,15 @@ const PRIMATE_TEMPLATE_IDENTITIES := [
 		"name": "Batu",
 		"has_tail": false,
 		"lines": [
-			"The training dummies out past the clearing used to get more use. Whoever's running that business isn't telling anyone how.",
-			"Elders say a curse doesn't care how careful you are. I try not to think about it before breakfast.",
+			"Sap on my hands again. That's what I get for leaning on the ladder tree.",
+			"Rain's coming. You can hear it on the high leaves first.",
 		],
 	},
 	{
 		"name": "Sari",
 		"has_tail": false,
 		"lines": [
-			"Kova Kong's out past the tree line, if you're brave enough to go looking. Hard to miss him, honestly.",
+			"You're tall. Do you get rained on first?",
 			"I keep my distance from the big one. Doesn't seem to mind either way.",
 		],
 	},
@@ -180,7 +180,7 @@ const JUNGLE_VILLAGER_IDENTITIES := [
 	{
 		"name": "Abu",
 		"lines": [
-			"Abu. Yes, it means ash, and no, I didn't choose it. Ask my grandmother about the joke.",
+			"Don't laugh at my grandmother's jokes. It only encourages her.",
 			"We don't joke about the ashing where the young ones can hear. Elsewhere, though, someone has to.",
 		],
 	},
@@ -194,14 +194,14 @@ const JUNGLE_VILLAGER_IDENTITIES := [
 	{
 		"name": "Jati",
 		"lines": [
-			"Built half these ramps myself, or repaired what the storms took. Bark doesn't hold a nail the way wood does.",
+			"Hold this end? No, flat. Flat. Thank you.",
 			"Xiao Hou Zi used to climb up here and pester me about tools. Miss the racket, honestly.",
 		],
 	},
 	{
 		"name": "Rimba",
 		"lines": [
-			"Something's coming for this world, or so the vines whisper. I've stopped asking which vines. Nobody ever says.",
+			"Pass me that cord? Thanks. The wind keeps stealing it.",
 			"I'd rather not think too hard about the shadows that outlast us. Doesn't change what they are.",
 		],
 	},
@@ -209,20 +209,20 @@ const JUNGLE_VILLAGER_IDENTITIES := [
 		"name": "Intan",
 		"lines": [
 			"The training grounds down below have gone quiet lately. Whoever's running that dummy business isn't telling anyone how.",
-			"Don't wander near the practice dummies after dark. I've heard they don't stay dummies forever.",
+			"Mind the third rung. It's newer than the others and very proud of it.",
 		],
 	},
 	{
 		"name": "Bintang",
 		"lines": [
-			"Down in the lowland jungle, that's where you'll find Xiao Hou Zi, if he hasn't wandered off again.",
-			"He used to visit before he took up with travelers. Good company, when he sat still long enough.",
+			"Did you come up the east ramps? I just swept those. Don't tell me.",
+			"Everyone up here has a favourite branch. A bird has mine this week.",
 		],
 	},
 	{
 		"name": "Sekar",
 		"lines": [
-			"We don't get many visitors up here. Most people can't climb this high, and fewer bother trying.",
+			"Shh. There's a nest just above us. Three eggs, if you count the cracked one.",
 			"I like the quiet more than I like company, if I'm honest. Don't take it personally.",
 		],
 	},
@@ -230,7 +230,7 @@ const JUNGLE_VILLAGER_IDENTITIES := [
 		"name": "Bayu",
 		"lines": [
 			"Every trunk in this village has its own creak. I could find my way home blind, just by listening.",
-			"The wind changes before a storm does, up this high. You learn to read it or you learn to fall.",
+			"Wind's turning. Feel that? Storm by evening.",
 		],
 	},
 	{

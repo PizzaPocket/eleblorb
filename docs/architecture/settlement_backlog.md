@@ -673,10 +673,13 @@ these checks make it mechanical:
 
 User feedback (2026-10-07): NPC lines read like a dump of the character's
 role, name and relationships. The rules are now the `npc-dialogue` skill.
-The fishing village is rewritten. Audit and rewrite the rest against it:
-Ohio (`town_generator.gd`, `VILLAGER_IDENTITIES`: several lines recite
-routines or end on aphorisms), the Snow Village, the Chinese village, the
-Fire caldera, the Ocean Kingdom, the primate village and every vendor's
-`vendor_lines`. Shop item descriptions that explain a mechanic ("Throw it
+Done (2026-10-07): the fishing village; Ohio (six lines that recited
+routines, contrasted roles or ended on a proverb; vendors' sales talk kept);
+the Snow Village (four supply-chain recitals); the jungle (identical lines
+shared by three pairs of residents, two direction hints toward Kova Kong and
+Xiao Hou Zi, a self-introduction). The Chinese village already passes.
+Still to do: the Fire caldera's and the frontier town's lines are generic
+placeholders and are rewritten with those settlements' rebuilds; the Ocean
+Kingdom's residents. Shop item descriptions that explain a mechanic ("Throw it
 into a blorb to bind...") break the same CLAUDE.md rule and need the user's
 call, since the shop UI is where players read what an item is.
