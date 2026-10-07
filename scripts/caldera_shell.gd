@@ -105,6 +105,7 @@ static func build(parent: Node3D, entry: Dictionary, datum: float, size: Vector2
 	# to the back for its ash gutter.
 	var fall := deg_to_rad(3.0)
 	var roof := TownProps.roof_slab(Vector3(hx + 0.6, TownProps.ROOF_THICKNESS * 0.5, hz + 0.6), STEEL.lightened(0.05))
+	roof.name = "Roof"
 	var roof_basis := Basis(Vector3.RIGHT, -fall)
 	var roof_at := Vector3(0.0, wall_top + 0.28 + TownProps.ROOF_THICKNESS * 0.5, 0.0)
 	roof.transform = Transform3D(roof_basis, roof_at)

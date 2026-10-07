@@ -48,8 +48,7 @@ func _run() -> void:
 			_plinths[entry["id"]] = SocketPlinth.build(self, entry, _lines[entry["id"]])
 	# The kit's first shell: the guest house (brief section 3), cobalt and amber.
 	var guest := FireCalderaPlan.plot("GUEST")
-	var stained: Array[Color] = [Color(0.16, 0.30, 0.72), Color(0.92, 0.60, 0.16)]
-	_shell = CalderaShell.build(self, guest, float(_lines["GUEST"]["datum"]), guest["footprint"], -4.0, stained)
+	_shell = FireCalderaBuildings.guest_house(self, guest, _lines["GUEST"])
 	_stage()
 	for _i in 6:
 		await get_tree().physics_frame
@@ -77,7 +76,8 @@ func _check() -> void:
 		# Inside the socket: the plinth first, and no ground under it.
 		for i in 9:
 			var p := centre.lerp(polygon[i % 4], 0.2 + 0.1 * float(i % 5))
-			var hit := _ray(space, Vector3(p.x, datum + 3.0, p.y), Vector3(p.x, float(line["bottom"]) - 2.0, p.y), [])
+			# Past the building and its furniture: the check is of the floor.
+			var hit := _ray(space, Vector3(p.x, datum + 3.0, p.y), Vector3(p.x, float(line["bottom"]) - 2.0, p.y), _building_rids())
 			if hit.is_empty() or hit["collider"] != plinth:
 				_fail("%s: the floor at %s is not the plinth" % [id, str(p.round())])
 				continue
@@ -140,7 +140,25 @@ func _check_shell(space: PhysicsDirectSpaceState3D) -> void:
 	var below := _ray(space, to_world * Vector3(0.0, 0.5, 0.0), to_world * Vector3(0.0, -1.0, 0.0), [])
 	if below.is_empty() or below["collider"] != _plinths["GUEST"]:
 		_fail("GUEST: the shell does not stand on its plinth")
-	print("ok   GUEST shell: door bay clear, roof and plinth in place")
+	# Each inner doorway clear at chest height: party room, washroom, cabinet.
+	for door: Array in [["party room", Vector3(-2.2, 1.2, 2.5), Vector3(-0.8, 1.2, 2.5)], ["washroom", Vector3(-0.8, 1.2, -1.7), Vector3(-2.2, 1.2, -1.7)],
+			["provisions cabinet", Vector3(-5.25, 1.2, -0.3), Vector3(-5.25, 1.2, -1.7)]]:
+		var hit := _ray(space, to_world * (door[1] as Vector3), to_world * (door[2] as Vector3), [])
+		if not hit.is_empty():
+			_fail("GUEST: the %s doorway is blocked by %s" % [door[0], (hit["collider"] as Node).name])
+	for marker in ["WakeMarker", "StandMarker", "GatherMarker"]:
+		if _shell.get_node_or_null(marker) == null:
+			_fail("GUEST: no %s" % marker)
+	print("ok   GUEST: door bay and inner doorways clear, roof, plinth and rest markers in place")
+
+
+func _building_rids() -> Array:
+	var rids := []
+	if _shell != null:
+		rids.append(_shell.get_rid())
+		for node in _shell.find_children("*", "CollisionObject3D", true, false):
+			rids.append((node as CollisionObject3D).get_rid())
+	return rids
 
 
 func _ray(space: PhysicsDirectSpaceState3D, from: Vector3, to: Vector3, exclude: Array) -> Dictionary:
@@ -183,6 +201,7 @@ func _render() -> void:
 		"kel_bank": [Vector2(26.0, -14.0), 1.7, Vector2(48.0, -4.0), 0.5],
 		"guest_front": [Vector2(-18.0, -36.0), 1.7, Vector2(-27.0, -51.0), 1.8],
 		"guest_door": [Vector2(-22.5, -41.0), 1.6, Vector2(-26.5, -48.0), 1.4],
+		"guest_cutaway": [Vector2(-21.0, -40.0), 14.0, Vector2(-27.0, -51.0), 0.0],
 	}
 	DirAccess.make_dir_recursive_absolute(_shots)
 	for name: String in shots:
@@ -193,5 +212,11 @@ func _render() -> void:
 		camera.look_at(Vector3(to.x, FireCalderaGround.blended_height(to, Callable(FireCalderaGround, "crater_wall")) + float(pose[3]), to.y), Vector3.UP)
 		for _i in 4:
 			await RenderingServer.frame_post_draw
+		var roof := _shell.get_node_or_null("Roof") as Node3D if _shell != null else null
+		if roof != null:
+			roof.visible = name != "guest_cutaway"
+		if name == "guest_cutaway":
+			for _i in 3:
+				await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])
 		print("saved %s/%s.png" % [_shots, name])
