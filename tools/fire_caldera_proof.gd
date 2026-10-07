@@ -329,6 +329,10 @@ func _render() -> void:
 		"guest_rim_wash_glass": [Vector3(-1.6, 1.7, -1.2), Vector3(0.25, 3.3, -3.5)],
 		"guest_lake_room": [Vector3(7.3, 1.6, -0.7), Vector3(4.2, 1.1, -4.6)],
 		"guest_keeper_room": [Vector3(-5.2, 1.6, -0.3), Vector3(-6.8, 1.0, -5.0)],
+		# Wall heads against the roof's pitch: the east side at eye level with
+		# the ring beam.
+		"guest_wallhead_east": [Vector3(13.0, 4.2, 0.5), Vector3(7.75, 3.85, 0.0)],
+		"guest_wallhead_back": [Vector3(4.0, 4.2, -10.0), Vector3(0.0, 3.8, -6.0)],
 	}
 	# The Nahl hall, poses in its own frame.
 	var nahl := {
@@ -341,7 +345,9 @@ func _render() -> void:
 		"nahl_pit_top": [Vector3(5.1, 7.0, -2.5), Vector3(5.1, -0.5, -3.5)],
 		"nahl_mediation": [Vector3(2.5, 1.6, -1.6), Vector3(6.2, -0.4, -4.2)],
 		"nahl_suite": [Vector3(7.2, 1.7, 5.2), Vector3(3.0, 0.4, 0.6)],
-		"nahl_keepsakes": [Vector3(4.6, 1.6, 2.6), Vector3(7.6, 1.0, 1.8)],
+		"nahl_wallhead_east": [Vector3(13.0, 4.4, 0.0), Vector3(8.0, 3.9, 0.0)],
+		"nahl_wallhead_west": [Vector3(-14.0, 4.6, 1.0), Vector3(-8.0, 4.8, 0.0)],
+				"nahl_keepsakes": [Vector3(4.6, 1.6, 2.6), Vector3(7.6, 1.0, 1.8)],
 	}
 	var roof_node := _shell.get_node_or_null("LowPitchSkylightRoof") as Node3D if _shell != null else null
 	if roof_node != null:

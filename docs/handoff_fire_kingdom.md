@@ -58,11 +58,20 @@ surface foundations, and the finished guest house exist and validate.
 
 ## Backlog
 
-- **Wall tops against the roof pitch** (user, 2026-10-07). Once a second house
-  is built, so there are two buildings to compare, evaluate how far the tops
-  of the walls (ring beam, stained band, partitions) follow the roof's low
-  pitch, and whether the shell should rake its wall heads or keep them level
-  under a fascia.
+- **Wall tops against the roof pitch: evaluated 2026-10-07** with the guest
+  house and Nahl (renders `guest_wallhead_*`, `nahl_wallhead_*` from the
+  proof). The kit's 2-degree slab is pitched about its centre over level wall
+  heads, so on the guest house and Nahl's wing the back half of the slab sinks
+  up to 0.2 m into the ring beam and stained band, and the front half leaves
+  an open wedge up to 0.22 m above the wall head; the sides show both. Nahl's
+  raked hall is the one case that matches: its wall heads follow the roof
+  (glass wedge, beam on the rake). Options, for the user to choose:
+  1. rest every pitched slab on its low wall and fill the side wedge (glass as
+     on Nahl's hall, or the band raked) so the head follows the roof;
+  2. keep wall heads level and set the slab level, with the fall formed in
+     its top surface and a fascia, which reads as a flat roof;
+  3. keep the pitch but close the gap with a raked fascia upstand.
+  Oren takes option 2 (a walkable roof terrace) meanwhile.
 
 Pause here for the user's next in-game walkthrough. Do not begin another
 building until its stylistic notes have been folded into the shared kit.
