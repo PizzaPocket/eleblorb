@@ -383,6 +383,40 @@ and households, while emergency authority changes according to the hazard at
 hand. This remains a proposal until the exact population and political history
 are approved.
 
+## Jobs and workstations (user direction, 2026-10-07)
+
+Metalworking and glassworking are the city's defining crafts. Every resident
+has an explicit job and a real workstation, more like a modern craft
+workshop than an ancient smithy.
+
+The lava people work hot material with their own hands: a smith can hold a
+glowing bar, and a glassworker can shape a gather with bare fingers. Their
+tools are therefore for **precision and scale**, not protection. There are no
+tongs, aprons or gloves. Instead they use:
+- power hammers and hydraulic presses;
+- welding and fixture tables;
+- kilns, annealing ovens, grinders, lathes and polishing wheels.
+
+| Resident | Job | Workstation and tools |
+|---|---|---|
+| **Daro Kel** | metallurgist and armorer | the alloy lab (crucibles, an assay furnace, a cut-and-etch bench for grain tests) and the fitting stand in the armory gallery |
+| **Vesa Kel** | weaponsmith and fabricator | the fabrication bay: a power hammer, a hydraulic press, a welding and fixture table, a grinder bank, a belt sander, a quench tank of oil |
+| **Ruun Kel** | apprentice smith | the finishing bench: files, polishing wheels and an engraving vise; she runs stock on the overhead rail |
+| **Omi Vara** | structural and scientific glassworker | the hot shop: the glass furnace, a glory hole for reheating, a marver table, his blowing bench, and a lehr (the long annealing oven) for big panes; a lampworking torch bench for laboratory vessels and lenses |
+| **Talen Vara** | stained-glass designer and art metalworker | the cold shop and design wall: a fusing kiln, a cutting table, a lightbox, the leading and soldering bench, and her own forge and bending table for the branching frames |
+| **Miru Aro** | thermal engineer and pipe fitter | the valve and duct workshop off the control gallery: a pipe bender, a welding bay, a pressure-test rig, spare valve bodies on racks |
+| **Tovan Aro** | senior vent steward | the control gallery: the valve wall, gauges and the reservoir window |
+| **Kes Aro** | apprentice engineer | a small bench in the duct workshop for gauge repair, and a sample case |
+| **Selka Iren** | geologist and seismologist | the instrument room under the dome and the deep observatory |
+| **Aru Iren** | teacher and archivist; casts the records | the archive's casting bench: moulds, a small pour furnace and an engraving table for metal pattern plates and basalt records |
+| **Mena Iren** | pupil | a stool and a tray of glass offcuts in the Vara cold shop, where she is allowed after lessons |
+| **Pela Oren** | mineral forager and gem cutter | the assay room and a **lapidary bench**: faceting machine, saw and polishing laps |
+| **Savi Oren** | mineral preparer | the preparation studio: crushers, sieves, heating plates and alloying crucibles |
+| **Eris Nahl** | temperer and mediator | the tempering hall's radiant platforms and her mineral cabinet |
+
+Their work supplies the city's own construction: Vesa's welded steel frames,
+Omi's panes and Talen's stained glass are what its buildings are made of.
+
 ## Cultural practices
 
 These practices grow directly from physiology and place. Their names and exact
@@ -409,11 +443,17 @@ from rustic forge houses.
 
 ### Composition
 
-- **Primary, about 75 percent: invented volcanic modernism.** Continuous
-  asymmetrical shells, terraces, bridges, and cantilevered volumes use cast
-  basalt composite, dark refractory masonry, structural metal, and broad
-  glass. Services are integrated into the construction. Ornament follows the
-  shape and function of the building instead of being pasted onto it.
+- **Primary, about 75 percent: invented volcanic modernism, in steel and
+  glass.** The lava people are masters of heat, so their two great materials
+  are **metal and glass**. **Revised, user direction, 2026-10-07:** the city
+  is built as **exposed structural steel frames** filled with **large glass**.
+  - **The steel:** columns, beams, portal frames and trusses, heat-blued or
+    blackened, their joints welded by hand and left visible.
+  - **The basalt:** cast basalt composite and refractory masonry form the
+    plinths, the heat walls round hot work, and the curved shells of the
+    landmark volumes.
+  - **Services** are integrated into the construction. Ornament follows the
+    shape and function of the building instead of being pasted onto it.
 - **Secondary, about 20 percent: Gaudí-informed organic metal and glass craft.**
   This influence is confined to branching supports, hand-forged screens,
   railings, gates, handles, light fittings, catenary-like spans, colored glass,
@@ -423,8 +463,10 @@ from rustic forge houses.
   molten service indicators, crystal lenses, and small areas of polished
   obsidian mark important thresholds and instruments.
 
-The 60/30/10 material hierarchy is dark basalt or refractory shell, glass and
-forged metal structure, then molten or mineral color. Dark structure is a foil
+The 60/30/10 material hierarchy (revised 2026-10-07) is:
+- **60:** structural steel and large glass;
+- **30:** dark basalt plinths, heat walls and landmark shells;
+- **10:** molten or mineral colour. Dark structure is a foil
 for light and color, not the city's whole visual identity.
 
 ### Color, glass, and metal palette

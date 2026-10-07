@@ -18,7 +18,9 @@ unchanged. These are its invariants in buildable terms.
 
 | Element | Specification |
 |---|---|
-| Shell | continuous asymmetric SuperEgg shells and extruded superellipse plans in **cast basalt composite**, matte charcoal; walls and roof flow into one form, never a box with a lid |
+| Frame | **exposed structural steel** (revised 2026-10-07): squarish SuperEgg columns, I-section and box beams, portal frames and trusses in heat-blued or blackened steel, welded joints left visible; the frame carries roofs and glass |
+| Glass | **large glass** filling the steel frame: full-height curtain walls on public fronts, clerestories and roof lights; clear or smoky, with the stained fields from the matrix |
+| Shell | continuous asymmetric SuperEgg shells and extruded superellipse plans in **cast basalt composite**, matte charcoal, for plinths, heat walls round hot work, and the curved landmark volumes (Civic, Renewal canopy base); never a box with a lid |
 | Foundation | the layout's **socketed plinth** family: a tapered cast-basalt base on the same superellipse plan, embedded 1.5 m below the lowest perimeter ground, a recessed metal-and-glass control joint between base and shell, exposed base under 3 m |
 | Storey | 3.5 m floor to floor; public halls 5 to 7 m |
 | Glazing | broad superellipse panes, clear, smoky or faintly warm, in blackened-steel frames; every occupied room has one strong outlook; glass never runs below grade |
@@ -227,7 +229,7 @@ shelf.
 |---|---|---|
 | Armory gallery | 10 × 8 m | faces `R4` and the promenade; finished armour on stands and weapons on forged racks behind glass; Daro's fitting stool; the counter |
 | Receiving bay | 6 × 7 m | on `R2`, an overhead handling rail, ore and alloy stock |
-| Surface workshop | 9 × 7 m | Vesa's benches for blades, tools, bridge fittings and precise parts |
+| Surface workshop | 9 × 7 m | Vesa's fabrication bay: power hammer, hydraulic press, welding and fixture table, grinder bank and belt sander, oil quench tank; Ruun's finishing bench with polishing wheels and an engraving vise; Daro's alloy lab bench with crucibles and grain-test etching |
 | Secure alloy store | 4 × 4 m | forged door |
 | Descent | lift shaft and protected ramp | to the high-temperature forge `L4`; the third immersion shelf leaves from a protected hot-work landing outside, kept off the visitor gallery |
 
@@ -260,9 +262,9 @@ shelf.
 | Room | Size | Description |
 |---|---|---|
 | Clean assembly floor | 8 × 7 m | finished panes, frames and screens assembled under daylight, with a design wall of coloured samples |
-| Hot forming bay | 5 × 6 m | glass furnace on the high-temperature branch, a blowing floor, Omi's bench |
-| Annealing chamber | 3 × 6 m | long cooling ovens |
-| Metal bench | 4 × 5 m | Talen's forge and bending tools for frames and branching supports |
+| Hot forming bay | 5 × 6 m | the hot shop: glass furnace on the high-temperature branch, a glory hole for reheating, a marver table, Omi's blowing bench, a lampworking torch bench |
+| Annealing chamber | 3 × 6 m | the lehr, a long annealing oven for big panes, and smaller annealers |
+| Metal bench | 4 × 5 m | Talen's cold shop and metal bench: fusing kiln, cutting table and lightbox, leading and soldering bench, her forge and bending table for frames and branching supports |
 | Glass rack | along the court | panes stored on edge |
 
 - **Home:** a receiving and shaping room and a private immersion well, behind
@@ -350,7 +352,7 @@ landmark front facing the reservoir and the arrival view.
 
 | Room | Size | Description |
 |---|---|---|
-| Control gallery | 9 × 7 m | the duct network's valve wall, pressure gauges, a reservoir-height window, the council's emergency bell; bright steel controls |
+| Control gallery | 9 × 7 m | the duct network's valve wall, pressure gauges, a reservoir-height window, the council's emergency bell; bright steel controls; a valve and duct workshop at one end (pipe bender, welding bay, pressure-test rig, spare valve bodies) where Miru and Kes work |
 | Service descent | shaft and ramp | to `L1`; inspection hatches on the service terrace outside |
 
 - **Home:** a receiving and shaping room, a shared immersion room, three
