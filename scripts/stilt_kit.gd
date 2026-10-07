@@ -296,6 +296,8 @@ static func beam(body: StaticBody3D, a: Vector2, b: Vector2, y: float, half_sect
 	mesh.transform = Transform3D(Basis(Vector3.UP, atan2(-dir.y, dir.x)), Vector3(mid.x, y, mid.y))
 	body.add_child(mesh)
 	CollisionPolicy.mark_decorative(mesh)
+	# Not solid, but a lamp or cord may hang from it (reach_hangers).
+	mesh.set_meta("overhead", true)
 
 
 ## A plank floor, top at `top_y`: planks over joists, with one smooth collider
@@ -501,25 +503,35 @@ static func ramp_rails(body: StaticBody3D, low: Vector2, high: Vector2, low_y: f
 	var start := clampf(-low_y / maxf(high_y - low_y, 0.01), 0.0, 1.0)
 	for side: float in [-1.0, 1.0]:
 		var offset := Vector2(-(high - low).normalized().y, (high - low).normalized().x) * side * (width * 0.5 - 0.06)
-		var a := low.lerp(high, start) + offset
-		var b := high + offset
-		var ya := lerpf(low_y, high_y, start)
-		var count := 3
-		for i in count + 1:
-			var t := float(i) / float(count)
-			var p := a.lerp(b, t)
-			var y := lerpf(ya, high_y, t)
-			var baluster := SuperEgg.build_part(Vector3(0.035, RAIL_HEIGHT * 0.5, 0.035), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-			baluster.position = Vector3(p.x, y + RAIL_HEIGHT * 0.5, p.y)
-			body.add_child(baluster)
-			CollisionPolicy.mark_decorative(baluster)
-		var from := Vector3(a.x, ya + RAIL_HEIGHT, a.y)
-		var to := Vector3(b.x, high_y + RAIL_HEIGHT, b.y)
-		var along := (to - from).normalized()
-		var rail_mesh := SuperEgg.build_part(Vector3(0.04, 0.04, from.distance_to(to) * 0.5), TIMBER, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-		# Its long axis (local z) along the rail.
-		rail_mesh.transform = Transform3D(Basis.looking_at(-along, Vector3.UP), (from + to) * 0.5)
-		body.add_child(rail_mesh)
+		sloped_rail(body, low.lerp(high, start) + offset, high + offset, lerpf(low_y, high_y, start), high_y, false)
+
+
+## A handrail that climbs with a ramp: from plan point `a` at walking level
+## `ya` to `b` at `yb`, balusters standing on the slope, the rail parallel to
+## it. With `solid`, a sloped collider keeps people off the open edge.
+static func sloped_rail(body: StaticBody3D, a: Vector2, b: Vector2, ya: float, yb: float, solid: bool = true) -> void:
+	var count := maxi(int(ceil(a.distance_to(b) / 1.2)), 1)
+	for i in count + 1:
+		var t := float(i) / float(count)
+		var p := a.lerp(b, t)
+		var y := lerpf(ya, yb, t)
+		var baluster := SuperEgg.build_part(Vector3(0.035, RAIL_HEIGHT * 0.5, 0.035), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		baluster.position = Vector3(p.x, y + RAIL_HEIGHT * 0.5, p.y)
+		body.add_child(baluster)
+		CollisionPolicy.mark_decorative(baluster)
+	var from := Vector3(a.x, ya + RAIL_HEIGHT, a.y)
+	var to := Vector3(b.x, yb + RAIL_HEIGHT, b.y)
+	var along := (to - from).normalized()
+	var rail_mesh := SuperEgg.build_part(Vector3(0.04, 0.04, from.distance_to(to) * 0.5), TIMBER, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	# Its long axis (local z) along the rail.
+	var basis := Basis.looking_at(-along, Vector3.UP)
+	rail_mesh.transform = Transform3D(basis, (from + to) * 0.5)
+	body.add_child(rail_mesh)
+	if solid:
+		# A slab from the ramp's surface up to the rail, tilted with it.
+		var centre := (from + to) * 0.5 - basis.y * ((RAIL_HEIGHT + 0.08) * 0.5 - 0.04)
+		CollisionPolicy.add_box(body, rail_mesh, Vector3(0.1, RAIL_HEIGHT + 0.08, from.distance_to(to)), centre, basis, false)
+	else:
 		CollisionPolicy.mark_decorative(rail_mesh)
 
 
@@ -569,3 +581,90 @@ static func gutter(body: StaticBody3D, a: Vector2, b: Vector2, y: float, pipe_at
 ## `back_toward` in plan (Furnishings' convention: back +Z, front -Z).
 static func yaw_back_to(back_toward: Vector2) -> float:
 	return atan2(back_toward.x, back_toward.y)
+
+
+## Stretches every hanger in `body` (a node with meta "hanger": a lamp chain,
+## a string, a cord; a thin piece standing on its centre) up to the first
+## solid above it, so nothing hangs from thin air whatever the ceiling height.
+## Measured against the body's own box colliders (ceilings, pents, roof slabs,
+## beams), before the body enters the tree. A hanger with nothing within
+## `reach` above it is left as built and reported.
+static func reach_hangers(body: Node3D, reach: float = 3.5) -> void:
+	var boxes: Array = []
+	var triangles: Array[PackedVector3Array] = []
+	for node in body.find_children("*", "CollisionShape3D", true, false):
+		var shape_node := node as CollisionShape3D
+		if shape_node.disabled or shape_node.shape == null:
+			continue
+		if shape_node.shape is BoxShape3D:
+			boxes.append([_xform_in(body, shape_node), (shape_node.shape as BoxShape3D).size * 0.5])
+		else:
+			# Any other shape (a hip end's convex hull): its faces as triangles.
+			var faces := shape_node.shape.get_debug_mesh().get_faces()
+			var shape_xform := _xform_in(body, shape_node)
+			var world_faces := PackedVector3Array()
+			for point in faces:
+				world_faces.append(shape_xform * point)
+			triangles.append(world_faces)
+	for node in body.find_children("*", "MeshInstance3D", true, false):
+		var member := node as MeshInstance3D
+		if member.has_meta("overhead") and member.mesh != null:
+			var bounds := member.mesh.get_aabb()
+			boxes.append([_xform_in(body, member) * Transform3D(Basis(), bounds.get_center()), bounds.size * 0.5])
+	for node in body.find_children("*", "MeshInstance3D", true, false):
+		var hanger := node as MeshInstance3D
+		if not hanger.has_meta("hanger") or hanger.mesh == null:
+			continue
+		var xform := _xform_in(body, hanger)
+		var aabb := xform * hanger.mesh.get_aabb()
+		var foot_y := aabb.position.y
+		var top := Vector3(aabb.get_center().x, aabb.end.y, aabb.get_center().z)
+		var hit := INF
+		var origin := top - Vector3(0, 0.02, 0)
+		for box: Array in boxes:
+			hit = minf(hit, _ray_up_box(origin, box[0], box[1]))
+		for faces in triangles:
+			for i in range(0, faces.size() - 2, 3):
+				var point: Variant = Geometry3D.ray_intersects_triangle(origin, Vector3.UP, faces[i], faces[i + 1], faces[i + 2])
+				if point != null:
+					hit = minf(hit, (point as Vector3).y - origin.y)
+		if hit == INF or hit > reach:
+			push_warning("%s: hanger %s has nothing above it within %.1f m" % [body.name, hanger.name, reach])
+			continue
+		var target_top := top.y - 0.02 + hit + 0.03
+		var scale_y := (target_top - foot_y) / maxf(aabb.size.y, 0.001)
+		hanger.scale.y *= scale_y
+		var centre_y := (foot_y + target_top) * 0.5
+		hanger.position.y += centre_y - aabb.get_center().y
+		hanger.set_meta("hanger_top", target_top)
+
+
+static func _xform_in(root: Node3D, node: Node3D) -> Transform3D:
+	var xform := Transform3D.IDENTITY
+	var current: Node = node
+	while current != null and current != root:
+		if current is Node3D:
+			xform = (current as Node3D).transform * xform
+		current = current.get_parent()
+	return xform
+
+
+## Distance up from `origin` to the box (`xform`, half extents `half`), or INF.
+static func _ray_up_box(origin: Vector3, xform: Transform3D, half: Vector3) -> float:
+	var inv := xform.affine_inverse()
+	var o := inv * origin
+	var d := inv.basis * Vector3.UP
+	var t_near := -INF
+	var t_far := INF
+	for axis in 3:
+		if absf(d[axis]) < 1e-6:
+			if o[axis] < -half[axis] or o[axis] > half[axis]:
+				return INF
+			continue
+		var t1 := (-half[axis] - o[axis]) / d[axis]
+		var t2 := (half[axis] - o[axis]) / d[axis]
+		t_near = maxf(t_near, minf(t1, t2))
+		t_far = minf(t_far, maxf(t1, t2))
+	if t_near > t_far or t_far < 0.0:
+		return INF
+	return maxf(t_near, 0.0)

@@ -955,6 +955,8 @@ static func _build_open_helmet(
 	material.albedo_color = color
 	material.metallic = metallic
 	material.roughness = roughness
+	# Open at the neck: its inside shows through the opening.
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 
 	var surface := SurfaceTool.new()
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -968,12 +970,14 @@ static func _build_open_helmet(
 			var p01 := _helmet_point(radius, height, theta_0, phi_1)
 			var p10 := _helmet_point(radius, height, theta_1, phi_0)
 			var p11 := _helmet_point(radius, height, theta_1, phi_1)
+			# Clockwise from outside, Godot's front face: the earlier order
+			# showed the shell's inside and culled its outside.
 			_helmet_vertex(surface, p00, radius, height)
-			_helmet_vertex(surface, p11, radius, height)
 			_helmet_vertex(surface, p10, radius, height)
-			_helmet_vertex(surface, p00, radius, height)
-			_helmet_vertex(surface, p01, radius, height)
 			_helmet_vertex(surface, p11, radius, height)
+			_helmet_vertex(surface, p00, radius, height)
+			_helmet_vertex(surface, p11, radius, height)
+			_helmet_vertex(surface, p01, radius, height)
 	var shell := MeshInstance3D.new()
 	shell.name = "Shell"
 	shell.mesh = surface.commit()

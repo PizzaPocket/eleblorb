@@ -174,10 +174,11 @@ const NPC_HAIR_COLORS := [
 ]
 # Used for every non-female resident (see _assign_figure_variant). STYLE_LONG
 # remains female-only; this six-slot pool provides an authored assignment for
-# each of Ohio's men and boys.
+# each of Ohio's men and boys. The hero cut is the player's alone, so no
+# resident draws it.
 const NPC_HAIR_STYLES := [
 	FigureHair.STYLE_BUZZCUT, FigureHair.STYLE_AFRO, FigureHair.STYLE_FLAT_TOP,
-	FigureHair.STYLE_BALD, FigureHair.STYLE_HERO, FigureHair.STYLE_BUZZCUT,
+	FigureHair.STYLE_BALD, FigureHair.STYLE_PONYTAIL, FigureHair.STYLE_BUZZCUT,
 ]
 # Female residents draw from this separate six-entry pool, including every
 # shared style once. This guarantees a bun without repeating a style.

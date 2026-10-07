@@ -23,6 +23,9 @@ const ZONES_META := "clear_zones"
 const LANES_META := "walk_lanes"
 const FURNITURE_META := "furniture"
 const FIRE_OK_META := "fire_ok"
+## A furnishing with no collider (jars, nets, charms, a lamp): it may touch a
+## wall, but it must not stand in front of a window.
+const DECOR_META := "decor_furnishing"
 const WALLS_META := "struct_walls"
 const VOIDS_META := "struct_voids"
 const SUPPORTS_META := "struct_supports"
@@ -122,6 +125,8 @@ static func audit(root: Node3D) -> Array[String]:
 		for shape in shapes:
 			if str(zone["kind"]) == "fire" and bool(shape["fire_ok"]):
 				continue
+			if bool(shape.get("decor", false)) and str(zone["kind"]) != "window":
+				continue
 			if _overlaps(zone, shape):
 				problems.append("%s blocks the %s clear zone '%s' at (%.1f, %.1f)" % [
 					shape["name"], zone["kind"], zone["label"], (zone["polygon"] as PackedVector2Array)[0].x,
@@ -129,7 +134,11 @@ static func audit(root: Node3D) -> Array[String]:
 				])
 	problems.append_array(_audit_lanes(root, lanes))
 	problems.append_array(audit_stacking(root))
-	problems.append_array(_audit_furniture_in_walls(root, shapes))
+	var solid_shapes: Array[Dictionary] = []
+	for shape in shapes:
+		if not bool(shape.get("decor", false)):
+			solid_shapes.append(shape)
+	problems.append_array(_audit_furniture_in_walls(root, solid_shapes))
 	_collect_layout_failures(root, problems)
 	return problems
 
@@ -162,6 +171,8 @@ static func _collect(node: Node, zones: Array[Dictionary], lanes: Array[Dictiona
 		var tagged := shape_node.has_meta(FURNITURE_META) or (parent != null and parent.has_meta(FURNITURE_META))
 		if tagged and shape_node.shape is BoxShape3D and shape_node.is_inside_tree() and not shape_node.disabled:
 			shapes.append(_world_box(shape_node))
+	if node is MeshInstance3D and node.has_meta(DECOR_META) and (node as MeshInstance3D).is_inside_tree():
+		shapes.append(_world_mesh_box(node as MeshInstance3D))
 	for child in node.get_children():
 		_collect(child, zones, lanes, shapes)
 
@@ -227,6 +238,31 @@ static func _world_box(shape_node: CollisionShape3D) -> Dictionary:
 		],
 		"polygon": Geometry2D.convex_hull(points), "y0": y_min, "y1": y_max,
 		"fire_ok": shape_node.has_meta(FIRE_OK_META),
+	}
+
+
+## A decorative furnishing's bounds, shaped like _world_box's result.
+static func _world_mesh_box(mesh_node: MeshInstance3D) -> Dictionary:
+	var bounds := mesh_node.mesh.get_aabb() if mesh_node.mesh != null else AABB()
+	var transform := mesh_node.global_transform
+	var points := PackedVector2Array()
+	var y_min := INF
+	var y_max := -INF
+	for sx in [0.0, 1.0]:
+		for sy in [0.0, 1.0]:
+			for sz in [0.0, 1.0]:
+				var world := transform * (bounds.position + bounds.size * Vector3(sx, sy, sz))
+				points.append(Vector2(world.x, world.z))
+				y_min = minf(y_min, world.y)
+				y_max = maxf(y_max, world.y)
+	var parent := mesh_node.get_parent()
+	return {
+		"ground": _storey_ground(mesh_node),
+		"name": "%s decor (%.2f x %.2f x %.2f) at (%.1f, %.1f, %.1f)" % [
+			parent.name if parent != null else "?", bounds.size.x, bounds.size.y, bounds.size.z, transform.origin.x, transform.origin.y, transform.origin.z,
+		],
+		"polygon": Geometry2D.convex_hull(points), "y0": y_min, "y1": y_max,
+		"fire_ok": false, "decor": true,
 	}
 
 

@@ -33,6 +33,7 @@ static func piece(
 		ClearZones.mark_furniture(collision)
 	else:
 		CollisionPolicy.mark_decorative(mesh)
+		mesh.set_meta(ClearZones.DECOR_META, true)
 	return mesh
 
 
@@ -89,7 +90,10 @@ static func lectern(body: StaticBody3D, at: Vector3, yaw: float = 0.0) -> void:
 ## Warm, low-cost civic/interior lighting: one emissive SuperEgg shade and one
 ## real light per activity group rather than one light per prop.
 static func hanging_lamp(body: StaticBody3D, at: Vector3, energy: float = 0.7, radius: float = 5.0) -> void:
-	piece(body, Vector3(0.018, 0.24, 0.018), IRON, at + Vector3(0, 0.24, 0), 0.0, false)
+	var chain := piece(body, Vector3(0.018, 0.24, 0.018), IRON, at + Vector3(0, 0.24, 0), 0.0, false)
+	# A kit that knows its ceilings (StiltKit.reach_hangers) stretches the
+	# chain up to whatever the lamp hangs from.
+	chain.set_meta("hanger", true)
 	var shade := piece(body, Vector3(0.15, 0.11, 0.15), Color(1.0, 0.72, 0.28), at, 0.0, false, 2.2)
 	var material := shade.get_surface_override_material(0) as StandardMaterial3D
 	if material != null:

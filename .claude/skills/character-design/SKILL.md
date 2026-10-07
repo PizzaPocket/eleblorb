@@ -136,7 +136,8 @@ own scripts (sea folk chest 0.90 and hips 1.06 for women, 1.02 and 0.92 for
 men; Tempestar height 1.02 and 1.10, chest 0.88 and 1.02, hips 1.08 and 0.92).
 
 **Hair.** Women draw from a pool that always includes the bun, plus long and
-ponytail; men's pool is buzzcut, afro, flat top, bald and hero. Pigtails appear
+ponytail; men's pool is buzzcut, afro, flat top, bald and ponytail. The **hero cut
+(`STYLE_HERO`) is the player's alone**: no resident in any population wears it. Pigtails appear
 for girls and some women. Deliberate exceptions follow culture and rank, not
 the pool: the Emperor's raised court bun, the Chinese farmer's bald head.
 Beards (`stubble`, `full`) are for men only.

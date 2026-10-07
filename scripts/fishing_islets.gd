@@ -26,8 +26,12 @@ extends RefCounted
 const SHELF_TOP_DEPTH := 3.2
 ## How far below the lake bed the mesh outside the shelves is sunk, so it hides.
 const BED_SINK := 4.0
-## Beyond the shelf's edge the ground falls at this gradient to the bed.
-const SHELF_FALL := 1.6
+## Beyond the shelf's edge the ground falls at this gradient to the bed: a
+## steep talus, as the submerged shoulders of tower karst drop away.
+const SHELF_FALL := 3.5
+## Over this band inside the mesh's outer edge the ground is drawn down to
+## the bed, so the sheet's edge is buried and nothing can swim beneath it.
+const EDGE_BAND := 8.0
 const CELL := 0.5
 const BOUNDS := Rect2(-50.0, -44.0, 100.0, 76.0)
 const SEED := 20261006
@@ -135,6 +139,9 @@ static func _height(p: Vector2, terrain: Node, water: float) -> float:
 		var at := FishingVillagePlan.WORLD_CENTER + p
 		var bed := float(terrain.get_mesh_height(at.x, at.y)) - water - BED_SINK
 		height = maxf(bed, -SHELF_TOP_DEPTH - beyond * SHELF_FALL)
+		var to_edge := minf(minf(p.x - BOUNDS.position.x, BOUNDS.end.x - p.x), minf(p.y - BOUNDS.position.y, BOUNDS.end.y - p.y))
+		if to_edge < EDGE_BAND:
+			height = lerpf(bed, height, clampf(to_edge / EDGE_BAND, 0.0, 1.0))
 	for lobe: Dictionary in LOBES:
 		height = maxf(height, _lobe_height(p, lobe))
 	return height
@@ -267,7 +274,9 @@ static func _vegetation(body: StaticBody3D, heights: PackedFloat32Array, columns
 				# Crown.
 				if rng.randf() < 0.55:
 					var size := rng.randf_range(1.0, 1.9)
-					_add(parts, "canopy", Transform3D(Basis().scaled(Vector3(size, size * rng.randf_range(0.65, 0.9), size)), at + Vector3(rng.randf_range(-0.5, 0.5), size * 0.4, rng.randf_range(-0.5, 0.5))), FOREST.lerp(MOSS, rng.randf_range(0.0, 0.6)).darkened(rng.randf_range(0.0, 0.15)))
+					var crown := Vector2(p.x + rng.randf_range(-0.5, 0.5), p.y + rng.randf_range(-0.5, 0.5))
+					var crown_y := _ground(heights, columns, rows, crown)
+					_add(parts, "canopy", Transform3D(Basis().scaled(Vector3(size, size * rng.randf_range(0.65, 0.9), size)), Vector3(crown.x, crown_y + size * 0.4, crown.y)), FOREST.lerp(MOSS, rng.randf_range(0.0, 0.6)).darkened(rng.randf_range(0.0, 0.15)))
 				elif rng.randf() < 0.18:
 					_dragon_tree(parts, at, rng.randf_range(3.0, 4.5), rng)
 			elif slope < 1.6 and h > 2.0 and above > h + 2.0:
@@ -275,7 +284,12 @@ static func _vegetation(body: StaticBody3D, heights: PackedFloat32Array, columns
 				if rng.randf() < 0.3:
 					var count := rng.randi_range(3, 5)
 					for i in count:
-						var spot := at + Vector3(rng.randf_range(-0.9, 0.9), 0.0, rng.randf_range(-0.9, 0.9))
+						# Each plant stands on the ground where it is, and only
+						# where that ground is the ledge's step, not the face.
+						var plan := Vector2(p.x + rng.randf_range(-0.9, 0.9), p.y + rng.randf_range(-0.9, 0.9))
+						if _slope(heights, columns, rows, plan) > 1.6:
+							continue
+						var spot := Vector3(plan.x, _ground(heights, columns, rows, plan) - 0.05, plan.y)
 						var pick := rng.randf()
 						if pick < 0.4:
 							_dragon_tree(parts, spot, rng.randf_range(1.6, 3.0), rng)
@@ -287,20 +301,31 @@ static func _vegetation(body: StaticBody3D, heights: PackedFloat32Array, columns
 				# Faces: fig roots and lianas hanging down the rock.
 				if rng.randf() < 0.07:
 					var length := rng.randf_range(2.5, minf(9.0, h))
-					var off := Vector3(downhill.x, 0.0, downhill.y) * 0.25
+					# They lie down the face, not hanging plumb in front of it: a
+					# plumb strand floats at its top and cuts into the rock below.
+					var down := Vector3(downhill.x, -slope, downhill.y).normalized()
+					var normal := Vector3(downhill.x * slope, 1.0, downhill.y * slope).normalized()
+					var across := Vector3(-downhill.y, 0.0, downhill.x)
 					if rng.randf() < 0.5:
 						for strand in 3:
-							var jitter := Vector3(-downhill.y, 0.0, downhill.x) * (float(strand) - 1.0) * 0.18
-							_add(parts, "root", Transform3D(Basis().scaled(Vector3(0.09, length * (0.8 + 0.1 * float(strand)), 0.05)), at + off + jitter + Vector3(0.0, -length * 0.45, 0.0)), Color(0.55, 0.47, 0.38).darkened(0.05 * float(strand)))
+							var strand_length := length * (0.8 + 0.1 * float(strand))
+							var start := at + across * (float(strand) - 1.0) * 0.18 + normal * 0.05
+							_add(parts, "root", Transform3D(_basis_along(down).scaled(Vector3(0.09, strand_length, 0.05)), start + down * strand_length * 0.5), Color(0.55, 0.47, 0.38).darkened(0.05 * float(strand)))
 					else:
-						_add(parts, "liana", Transform3D(Basis().scaled(Vector3(0.16, length, 0.16)), at + off + Vector3(0.0, -length * 0.5, 0.0)), MOSS.darkened(rng.randf_range(0.0, 0.25)))
+						_add(parts, "liana", Transform3D(_basis_along(down).scaled(Vector3(0.16, length, 0.16)), at + normal * 0.09 + down * length * 0.5), MOSS.darkened(rng.randf_range(0.0, 0.25)))
 			elif h < 1.6 and slope > 2.0 and rng.randf() < 0.05:
 				# The notch: a fern tucked into the wet overhang.
 				_fern(parts, at + Vector3(downhill.x, 0.0, downhill.y) * 0.2, 0.7, rng)
 	# The seep behind the cistern: wet moss and ferns at the rock's foot.
+	# Each is set into the face: walk north from the cistern toward the rock
+	# until the ground reaches the fern's height.
 	for i in 9:
-		var seep := Vector3(-1.5 + rng.randf_range(-2.2, 2.2), 0.3 + rng.randf_range(0.0, 1.6), -20.7 - rng.randf_range(0.0, 0.4))
-		_fern(parts, seep, rng.randf_range(0.6, 1.0), rng)
+		var x := -1.5 + rng.randf_range(-2.2, 2.2)
+		var y := 0.3 + rng.randf_range(0.0, 1.6)
+		var z := -18.0
+		while z > -26.0 and _ground(heights, columns, rows, Vector2(x, z)) < y:
+			z -= 0.1
+		_fern(parts, Vector3(x, y, z + 0.08), rng.randf_range(0.6, 1.0), rng)
 	var meshes := {
 		"canopy": SuperEgg.build_mesh(Vector3(1.0, 1.0, 1.0), 2.2, 2.6),
 		"trunk": SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 3.0, 3.0),
@@ -318,6 +343,25 @@ static func _vegetation(body: StaticBody3D, heights: PackedFloat32Array, columns
 			transforms.append(entry[0])
 			tones.append(entry[1])
 		_foliage(body, key.capitalize(), meshes[key], transforms, tones)
+
+
+## The ground height at plan point `p`, interpolated from the heightfield.
+static func _ground(heights: PackedFloat32Array, columns: int, rows: int, p: Vector2) -> float:
+	var g := (p - BOUNDS.position) / CELL
+	var c := clampi(int(floor(g.x)), 0, columns - 2)
+	var r := clampi(int(floor(g.y)), 0, rows - 2)
+	var fx := clampf(g.x - float(c), 0.0, 1.0)
+	var fz := clampf(g.y - float(r), 0.0, 1.0)
+	var top := lerpf(heights[r * columns + c], heights[r * columns + c + 1], fx)
+	var bottom := lerpf(heights[(r + 1) * columns + c], heights[(r + 1) * columns + c + 1], fx)
+	return lerpf(top, bottom, fz)
+
+
+## The ground's gradient magnitude at `p` (rise per metre).
+static func _slope(heights: PackedFloat32Array, columns: int, rows: int, p: Vector2) -> float:
+	var dx := _ground(heights, columns, rows, p + Vector2(CELL, 0)) - _ground(heights, columns, rows, p - Vector2(CELL, 0))
+	var dz := _ground(heights, columns, rows, p + Vector2(0, CELL)) - _ground(heights, columns, rows, p - Vector2(0, CELL))
+	return Vector2(dx, dz).length() / (2.0 * CELL)
 
 
 static func _add(parts: Dictionary, key: String, xform: Transform3D, tone: Color) -> void:

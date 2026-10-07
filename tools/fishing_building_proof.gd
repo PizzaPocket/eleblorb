@@ -7,6 +7,7 @@ extends Node3D
 ##   - every solid visual has its collider (CollisionPolicy.validate_body);
 ##   - furniture clear of doors, windows and fires, routes walkable
 ##     (ClearZones.audit) and no wall standing in a void (audit_stacking);
+##   - every hanging lamp or cord reaches a solid above it;
 ##   - every pile stands on a shelf (FishingVillagePlan.shelf_distance);
 ##   - no rock rises into the structure's plan rect above its floor beams (the
 ##     islets are built from the same heightfield the village uses).
@@ -75,6 +76,10 @@ func _audit(body: StaticBody3D, anchor: Vector2) -> void:
 	for problem in ClearZones.audit_stacking(self):
 		_fail(problem)
 	_audit_headroom(body)
+	# Nothing hangs from thin air: every lamp chain and cord reached a solid.
+	for node in body.find_children("*", "MeshInstance3D", true, false):
+		if node.has_meta("hanger") and not node.has_meta("hanger_top"):
+			_fail("%s: a hanger at %s reaches nothing above it" % [body.name, str((node as Node3D).global_position)])
 	var piles := 0
 	for node in body.find_children("*", "MeshInstance3D", true, false):
 		var mesh := node as MeshInstance3D

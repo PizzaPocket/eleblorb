@@ -17,6 +17,10 @@ const PROBES := {
 	"Heron shelf (catch deck)": [Vector2(42, 10), -3.2],
 	"Heron shelf (portal landing)": [Vector2(30, 22), -3.2],
 	"Open water, no shelf": [Vector2(60, 40), null],
+	# The islet mesh's outer edge lies on the bed, so nothing can swim under it.
+	"Islet mesh edge, west": [Vector2(-49.0, -6.0), null],
+	"Islet mesh edge, north": [Vector2(-10.0, -43.0), null],
+	"Islet mesh edge, east": [Vector2(49.0, 10.0), null],
 	"Jetty spine deck": [Vector2(-10, -7), 0.5],
 	"Heron landing deck": [Vector2(21, 0), 0.5],
 	"Portal gate spot": [Vector2(30, 20), 0.5],
@@ -78,7 +82,8 @@ func _ready() -> void:
 			continue
 		var rel: float = hit["position"].y - water
 		if expected == null:
-			var ok := rel < -20.0
+			# The mesh's edge must reach the bed itself, not stop in mid-water.
+			var ok := rel < (-100.0 if name.begins_with("Islet mesh edge") else -20.0)
 			print("%s %s: hit at W%+.2f (expected the deep lake bed)" % ["ok  " if ok else "FAIL", name, rel])
 			_failures += 0 if ok else 1
 		else:

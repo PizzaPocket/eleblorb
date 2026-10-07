@@ -126,9 +126,9 @@ static var RESIDENTS := {
 			"I captained boats for forty years. Now I sit here and tell people what the sky already told me.",
 		],
 		"schedule": [
-			{"hour": 6.0, "at": Vector2(7.0, -1.0), "range": 0.3, "route": []},
+			{"hour": 6.0, "at": Vector2(7.0, 3.0), "range": 0.3, "route": []},
 			{"hour": 12.0, "at": PAVILION + Vector2(-1.0, -1.6), "range": 0.5, "route": [ARAN_VERANDA, Vector2(7.0, -4.6), SPINE_NET, SPINE_MID, Vector2(-2.0, -5.0), PAVILION]},
-			{"hour": 14.5, "at": Vector2(7.0, -1.0), "range": 0.3, "route": [Vector2(-2.0, -5.0), SPINE_MID, SPINE_NET, Vector2(7.0, -4.6), ARAN_VERANDA, Vector2(7.0, -1.0)]},
+			{"hour": 14.5, "at": Vector2(7.0, 3.0), "range": 0.3, "route": [Vector2(-2.0, -5.0), SPINE_MID, SPINE_NET, Vector2(7.0, -4.6), ARAN_VERANDA, Vector2(7.0, 3.0)]},
 			{"hour": 21.0, "at": Vector2(9.2, 2.9), "range": 0.3, "route": [ARAN_DOOR, Vector2(9.2, 1.6), Vector2(9.2, 2.9)]},
 		]},
 	"Pree Aran": {"female": true, "look": {
@@ -146,7 +146,7 @@ static var RESIDENTS := {
 		]},
 	"Jori Vale": {"female": false, "look": {
 		"skin": Color(0.96, 0.82, 0.69), "shirt": CORAL, "pants": INDIGO, "sleeve": "none", "cropped": true,
-		"hair": FigureHair.STYLE_HERO, "hair_color": Color(0.55, 0.16, 0.08), "body": 0.99, "chest": 1.0, "hips": 1.0, "belly": 1.0},
+		"hair": FigureHair.STYLE_PONYTAIL, "hair_color": Color(0.55, 0.16, 0.08), "body": 0.99, "chest": 1.0, "hips": 1.0, "belly": 1.0},
 		"lines": [
 			"When the weather turns I'm first out. Somebody has to know where every boat is.",
 			"Osei will try to feed you smoked fish. Let him. It's the only way he sits down.",
@@ -171,7 +171,7 @@ static var RESIDENTS := {
 		]},
 	"Tavi Vale": {"female": false, "look": {
 		"skin": Color(0.55, 0.40, 0.28), "shirt": CORAL, "pants": SAND, "sleeve": "short", "cropped": true,
-		"hair": FigureHair.STYLE_HERO, "hair_color": Color(0.16, 0.10, 0.06), "body": 0.70, "chest": 0.92, "hips": 0.95, "belly": 1.0},
+		"hair": FigureHair.STYLE_BUZZCUT, "hair_color": Color(0.16, 0.10, 0.06), "body": 0.70, "chest": 0.92, "hips": 0.95, "belly": 1.0},
 		"lines": [
 			"I can tell every boat by its engine. That one's Ivo. He's late.",
 			"I make the floats. The big ones are for Jori and the small ones are practice.",
