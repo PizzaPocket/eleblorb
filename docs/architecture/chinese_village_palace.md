@@ -154,9 +154,12 @@ Checked against the architecture skill's brief audit.
   - The Chef's quarters, later Liang Zhen's room, open off the kitchen: a
     cook's room off his own kitchen, which is legitimate.
   - The Emperor's bedchamber, study and robe room open into one another. They
-    are his own suite, which is legitimate. In the civic state, the meeting
-    room, records room and reading room each get a door onto the inner court's
-    gallery, so the public never passes through one room to reach another.
+    are his own suite, which is legitimate. For the civic state, each of the
+    three rooms has its own door onto the inner court's gallery **in both
+    states**, because openings never change between states. In the imperial
+    state the Emperor keeps the outer doors shut and uses the doors between
+    the rooms; in the civic state the outer doors stand open, so the public
+    never passes through one room to reach another.
   - The Dining Hall is entered from the front court.
 - **Headroom and frames.**
   - Gallery and eave heights follow the hall storeys, at 2.4 m or more.
