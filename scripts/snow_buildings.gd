@@ -165,15 +165,17 @@ static func lean_to(body: StaticBody3D, spec: Dictionary, side: float, depth_out
 	var centre_x := side * (width * 0.5 + depth_out * 0.5)
 	var tilt := Basis(Vector3.BACK, -side * angle)
 	var drop := depth_out * tan(angle)
-	var roof := TownProps.roof_slab(Vector3(depth_out * 0.5 + 0.35, 0.07, depth * 0.5 + 0.3), LogHouse.ROOF_COLOR)
-	var roof_centre := Vector3(centre_x, wall_y - drop * 0.5 + 0.1, 0.0)
+	# The shared roof thickness; the extra over the old 0.14 m goes upward, so
+	# the posts and beam under it are unchanged.
+	var roof := TownProps.roof_slab(Vector3(depth_out * 0.5 + 0.35, TownProps.ROOF_THICKNESS * 0.5, depth * 0.5 + 0.3), LogHouse.ROOF_COLOR)
+	var roof_centre := Vector3(centre_x, wall_y - drop * 0.5 + 0.1, 0.0) + tilt.y * (TownProps.ROOF_THICKNESS * 0.5 - 0.07)
 	roof.transform = Transform3D(tilt, roof_centre)
 	body.add_child(roof)
-	CollisionPolicy.add_box(body, roof, Vector3(depth_out + 0.7, 0.14, depth + 0.6), roof_centre, tilt, true)
+	CollisionPolicy.add_box(body, roof, Vector3(depth_out + 0.7, TownProps.ROOF_THICKNESS, depth + 0.6), roof_centre, tilt, true)
 	var snow := SuperEgg.build_part(
 		Vector3(depth_out * 0.5 + 0.28, 0.05, depth * 0.5 + 0.22), LogHouse.SNOW, 4.2, 4.2
 	)
-	snow.transform = Transform3D(tilt, roof_centre + tilt.y * 0.12)
+	snow.transform = Transform3D(tilt, roof_centre + tilt.y * (TownProps.ROOF_THICKNESS * 0.5 + 0.05))
 	snow.set_meta(DesignAudit.ROOF_COVER_META, true)
 	body.add_child(snow)
 	CollisionPolicy.mark_decorative(snow)

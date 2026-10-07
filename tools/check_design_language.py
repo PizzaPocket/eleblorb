@@ -12,7 +12,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 NUMBER = r"-?\d+(\.\d+)?"
-ROOF_CONST = re.compile(r"^\s*const\s+(\w*ROOF\w*THICKNESS\w*)\s*:?=\s*" + NUMBER, re.M)
+ROOF_CONST = re.compile(r"^\s*const\s+(\w*ROOF\w*THICKNESS\w*|ROOF_T)\s*:?=\s*" + NUMBER, re.M)
 PLAIN_THICKNESS = re.compile(r"^\s*const\s+(THICKNESS)\s*:?=\s*" + NUMBER, re.M)
 
 failures = []

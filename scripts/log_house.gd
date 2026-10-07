@@ -29,7 +29,8 @@ const WALL_T := 0.30
 const PLINTH_H := 0.42
 const EAVE := 0.8
 const GABLE_OH := 0.6
-const ROOF_T := 0.14
+## The shared roof thickness: every settlement's roofs are the same slab.
+const ROOF_T := TownProps.ROOF_THICKNESS
 const SNOW_T := 0.17
 const ROOF_COLOR := Color(0.25, 0.19, 0.16)
 const SNOW := Color(0.95, 0.97, 1.0)
