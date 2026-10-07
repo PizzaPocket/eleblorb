@@ -264,6 +264,8 @@ func _render() -> void:
 		"guest_washroom": [Vector3(1.3, 1.6, -1.2), Vector3(3.1, 0.9, -5.4)],
 		"guest_hall": [Vector3(-7.3, 1.7, 0.9), Vector3(6.0, 1.1, 4.2)],
 		"guest_hall_relief": [Vector3(0.5, 1.6, 4.6), Vector3(-0.7, 1.4, 0.25)],
+		"guest_hall_studies": [Vector3(4.6, 1.6, 3.8), Vector3(3.5, 1.5, 0.25)],
+		"guest_rim_wash_glass": [Vector3(-1.6, 1.7, -1.2), Vector3(0.25, 3.3, -3.5)],
 		"guest_lake_room": [Vector3(7.3, 1.6, -0.7), Vector3(4.2, 1.1, -4.6)],
 		"guest_keeper_room": [Vector3(-5.2, 1.6, -0.3), Vector3(-6.8, 1.0, -5.0)],
 	}

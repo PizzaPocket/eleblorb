@@ -120,9 +120,10 @@ static func _guest_partitions(body: StaticBody3D) -> void:
 		_band(body, x0, x1, REAR_Z, true, GUEST_STAINED[int(room[3])])
 		for direction: Vector2 in [Vector2(0, 1), Vector2(0, -1)]:
 			ClearZones.add(body, "%s door" % key, "door", Vector2(door, REAR_Z), direction, 0.0, 1.0, INNER_DOOR_WIDTH * 0.5, 0.05, 1.9)
-	# Between the rooms: amber where it divides two warm rooms, cobalt from the
-	# washroom east.
-	for wall: Array in [[-4.75, A], [0.25, C], [3.75, C]]:
+	# Between the rooms: a divider takes its warm side's colour, so the rim
+	# room is amber on every side; only the wall between the two cool rooms is
+	# cobalt.
+	for wall: Array in [[-4.75, A], [0.25, A], [3.75, C]]:
 		var x: float = wall[0]
 		_slab(body, -2.875, 6.25, x, false, 0.0, PARTITION_SOLID, BASALT_PARTITION)
 		_band(body, -6.0, REAR_Z, x, false, GUEST_STAINED[int(wall[1])])
@@ -166,9 +167,11 @@ static func _slab(body: StaticBody3D, along: float, length: float, fixed: float,
 ##   welcome: Eris's counter facing the door, a glass carafe of the guests'
 ##     imported water and two cups on it (the most precious thing she can
 ##     offer a cool body), her ledger plates at her side;
-##   provision: a long stone sideboard of imported food, under a cast-basalt
-##     relief of the caldera with the reservoir picked out in a glowing seam,
-##     so a guest learns where they are without a word;
+##   provision: a long stone sideboard of imported food, under the hall's
+##     great work: a backlit fused-glass panel from the Vara studio, the
+##     caldera's strata in section with the reservoir as a cobalt inlay;
+##   studies: three small panels by the same hands on the free wall lengths,
+##     warm by the door, mixed by the table, cool by the rest corner;
 ##   table: a stone table and six chairs at the reservoir glass;
 ##   rest: two armchairs and a low table on a basalt-fibre mat at the cool end;
 ##   light: the shell's cove lines, lines under the counter and sideboard,
@@ -194,7 +197,8 @@ static func _guest_hall(body: StaticBody3D) -> void:
 		var tones: Array[Color] = [Color(0.72, 0.55, 0.30), Color(0.62, 0.32, 0.30), Color(0.80, 0.70, 0.42)]
 		CalderaFurniture.piece(body, Vector3(0.16, 0.05, 0.16), CalderaFurniture.BASALT.lightened(0.15), Vector3(-2.1 + 0.68 * float(i), 0.95, REAR_Z + 0.36), 0.0, false, 2.4)
 		CalderaFurniture.piece(body, Vector3(0.1, 0.06, 0.1), tones[i % 3], Vector3(-2.1 + 0.68 * float(i), 1.03, REAR_Z + 0.36), 0.0, false, 2.0)
-	_caldera_relief(body, Vector3(-0.7, 1.95, REAR_Z + 0.11))
+	_hall_glass_panel(body, Vector3(-0.7, 1.95, REAR_Z + 0.12))
+	_hall_studies(body)
 	# Table at the glass.
 	CalderaFurniture.table(body, Vector3(2.0, 0.0, 3.6), 0.0, 3.0, 1.0)
 	for i in 3:
@@ -211,18 +215,86 @@ static func _guest_hall(body: StaticBody3D) -> void:
 	CalderaFurniture.concealed_light(body, Vector3(6.1, 2.9, 2.8), CalderaFurniture.LED_WARM.lerp(CalderaFurniture.LED_COOL, 0.5), 0.6, 5.0)
 
 
-## The hall's art: the caldera in relief, cast in basalt, its reservoir a
-## glowing amber seam and its ten plots raised as small stone blocks.
-static func _caldera_relief(body: StaticBody3D, at: Vector3) -> void:
-	CalderaFurniture.piece(body, Vector3(1.2, 0.62, 0.03), CalderaFurniture.BASALT, at)
-	var scale := 1.0 / 70.0
-	var outline := FireCalderaPlan.reservoir_polygon(24)
-	for i in outline.size():
-		var p := outline[i] * scale
-		_glow(body, "ReliefSeam", Vector3(0.025, 0.025, 0.01), at + Vector3(p.x, p.y, 0.04), Color(1.0, 0.5, 0.12))
-	for plot in FireCalderaPlan.PLOTS:
-		var c: Vector2 = (plot["centre"] as Vector2) * scale
-		CalderaFurniture.piece(body, Vector3(0.05, 0.04, 0.02), CalderaFurniture.STONE.lightened(0.15), at + Vector3(c.x, c.y, 0.04))
+## The hall's art, commissioned from the Vara studio: Omi's kiln-formed glass
+## in Talen's forged frame. A glass craftsman would not draw a map; she would
+## let the material show its own making. The panel is the caldera in section:
+## fused strata from basalt black through cooling reds to amber and smoke,
+## their boundaries flowing the way a slumped sheet does, and set into the
+## amber the reservoir as one polished cobalt inlay ringed in stainless. It is
+## lit from behind by a concealed panel that also haloes the wall.
+static func _hall_glass_panel(body: StaticBody3D, at: Vector3) -> void:
+	_fused_glass(body, at, Vector2(1.2, 0.62), [
+		Color(0.10, 0.09, 0.09), Color(0.42, 0.10, 0.06), Color(0.86, 0.32, 0.08),
+		Color(0.98, 0.62, 0.20), Color(0.74, 0.66, 0.56),
+	], 0.0, Vector3(0.35, 0.24, 0.1))
+
+
+## Three studies for the great panel, the kind a glass studio makes first and
+## a host hangs near the work: the same strata cut small, in the hall's colour
+## rule (amber by the door, mixed by the table, cobalt at the cool end).
+static func _hall_studies(body: StaticBody3D) -> void:
+	var face := REAR_Z + 0.11
+	_fused_glass(body, Vector3(-4.85, 1.75, face), Vector2(0.24, 0.36), [
+		Color(0.42, 0.10, 0.06), Color(0.86, 0.32, 0.08), Color(0.98, 0.62, 0.20),
+	], 1.3, Vector3.ZERO)
+	_fused_glass(body, Vector3(3.5, 1.75, face), Vector2(0.3, 0.3), [
+		Color(0.10, 0.09, 0.09), Color(0.98, 0.62, 0.20), Color(0.74, 0.66, 0.56),
+	], 2.6, Vector3(0.0, 0.0, 0.05))
+	_fused_glass(body, Vector3(6.7, 1.75, face), Vector2(0.24, 0.36), [
+		Color(0.10, 0.12, 0.20), Color(0.16, 0.30, 0.72), Color(0.55, 0.72, 0.90),
+	], 4.1, Vector3.ZERO)
+
+
+## A fused-glass panel facing +Z: `strata` bottom to top, each a run of
+## overlapping slumped lozenges whose edges follow a slow wave, so the layers
+## flow into one another; an optional round inlay `inlay` (x, y, radius); a
+## forged blued-steel frame and a concealed backlight that haloes the wall.
+static func _fused_glass(body: StaticBody3D, at: Vector3, half: Vector2, strata: Array, phase: float, inlay: Vector3) -> void:
+	# Backlight and halo.
+	_glow(body, "ArtHalo", Vector3(half.x + 0.1, half.y + 0.1, 0.004), at + Vector3(0, 0, -0.02), CalderaFurniture.LED_WARM.darkened(0.82))
+	_glow(body, "ArtBacklight", Vector3(half.x, half.y, 0.004), at + Vector3(0, 0, -0.006), CalderaFurniture.LED_WARM)
+	# The strata.
+	var count := strata.size()
+	var segments := maxi(int(half.x / 0.12), 3)
+	var span := half.x * 2.0 / float(segments)
+	var boundary := func(k: int, x: float) -> float:
+		if k <= 0:
+			return -half.y
+		if k >= count:
+			return half.y
+		var base := -half.y + 2.0 * half.y * float(k) / float(count)
+		return base + half.y * 0.09 * sin(x / half.x * 2.4 + phase + float(k) * 1.9)
+	for k in count:
+		for j in segments:
+			var x := -half.x + span * (float(j) + 0.5)
+			var lo: float = boundary.call(k, x)
+			var hi: float = boundary.call(k + 1, x)
+			var lozenge := Vector3(span * 0.75, (hi - lo) * 0.5 + 0.015, 0.012)
+			_art_glass(body, lozenge, strata[k], at + Vector3(x, (lo + hi) * 0.5, 0.004 * float(k)), 5.5)
+	if inlay.z > 0.0:
+		# The reservoir: a flat cobalt lens pressed into the top of the strata,
+		# edged with a thin stainless line, as water lies in the caldera floor.
+		var ring := CalderaFurniture.piece(body, Vector3(inlay.z * 2.4 + 0.015, inlay.z * 0.5 + 0.015, 0.012), CalderaShell.STAINLESS, at + Vector3(inlay.x, inlay.y, 0.03), 0.0, false, 2.4)
+		ring.material_override = SolidModel.material(CalderaShell.STAINLESS, 0.2, 0.9)
+		_art_glass(body, Vector3(inlay.z * 2.4, inlay.z * 0.5, 0.016), Color(0.16, 0.32, 0.80), at + Vector3(inlay.x, inlay.y, 0.04), 2.4)
+	# The frame: four forged bars, square-ended, proud of the glass.
+	for side: float in [-1.0, 1.0]:
+		CalderaShell._metal(body, at + Vector3(0, side * (half.y + 0.025), 0.02), Vector3(half.x * 2.0 + 0.1, 0.05, 0.06), CalderaShell.STEEL_BLUED, false)
+		CalderaShell._metal(body, at + Vector3(side * (half.x + 0.025), 0, 0.02), Vector3(0.05, half.y * 2.0, 0.06), CalderaShell.STEEL_BLUED, false)
+
+
+static func _art_glass(body: StaticBody3D, half: Vector3, colour: Color, at: Vector3, epsilon: float) -> void:
+	var part := SuperEgg.build_part(half, colour, epsilon, epsilon)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = colour
+	material.roughness = 0.12
+	material.emission_enabled = true
+	material.emission = colour
+	material.emission_energy_multiplier = 0.7
+	part.material_override = material
+	part.position = at
+	body.add_child(part)
+	CollisionPolicy.mark_decorative(part)
 
 
 ## Eris's working room: the sealed provisions shelves along the back wall, her

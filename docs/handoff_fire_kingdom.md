@@ -56,6 +56,14 @@ surface foundations, and the finished guest house exist and validate.
   fine visual mesh is lifted 1 cm above its matching collider to prevent
   boundary depth flicker without changing floor height.
 
+## Backlog
+
+- **Wall tops against the roof pitch** (user, 2026-10-07). Once a second house
+  is built, so there are two buildings to compare, evaluate how far the tops
+  of the walls (ring beam, stained band, partitions) follow the roof's low
+  pitch, and whether the shell should rake its wall heads or keep them level
+  under a fascia.
+
 Pause here for the user's next in-game walkthrough. Do not begin another
 building until its stylistic notes have been folded into the shared kit.
 After approval, build the remaining briefs plot by plot, beginning with the

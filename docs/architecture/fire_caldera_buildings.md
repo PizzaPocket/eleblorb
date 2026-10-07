@@ -125,7 +125,9 @@ The only building in the city designed for cool bodies.
 - **Colour rule** (2026-10-07): amber is welcome and warmth, cobalt is cooling
   and water, and each band takes the colour of the room behind it. The west
   half (keeper's room, rim room) is amber and the east half (washroom, lake
-  room) cobalt. The front band reads amber at the door, interleaves over the
+  room) cobalt. A divider between a warm and a cool room takes the warm
+  side's amber, so the rim room is amber all round; only the wall between
+  the washroom and lake room is cobalt. The front band reads amber at the door, interleaves over the
   dining table, then turns cobalt toward the lake end, so the building warms
   you in and cools toward the water.
 - **Skylights at full reach:** each dome fills its room's share of the roof:
@@ -137,7 +139,15 @@ The only building in the city designed for cool bodies.
   caldera with the reservoir as a glowing seam; a stone table with six chairs
   at the glass; a rest corner of two armchairs and a low table at the cool
   end.
-- **Art, one piece per room:** the caldera relief (hall); three mineral discs,
+- **Art, one piece per room**, made by the city's own craftsmen. The hall's
+  is a commission from the Vara studio: Omi's kiln-formed glass in Talen's
+  forged blued-steel frame, the caldera in section as fused strata from
+  basalt black through cooling reds to amber and smoke, their boundaries
+  flowing as slumped glass does, with the reservoir as a flat cobalt lens
+  edged in stainless. It is lit from behind by a concealed panel that haloes
+  the wall. Three small studies for it hang on the hall's free wall lengths,
+  following the colour rule: amber by the door, mixed by the table, cobalt
+  at the rest corner. The rooms: three mineral discs,
   gifts from the city (keeper's room); a forged skyline of the rim set with
   amber glass (rim room); a cobalt glass ripple roundel (lake room); a panel of
   banded vent crust (washroom).
