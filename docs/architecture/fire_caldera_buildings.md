@@ -1,6 +1,8 @@
 # Fire Caldera City: Architecture Briefs
 
-Status: building briefs for review (2026-10-06). Read with
+Status: building briefs for review (2026-10-06); audited against the
+architecture skill's brief audit on 2026-10-07 (sizes, sections, access and
+pass-throughs, frames, headroom, ramps). Foundations wait on the plot survey. Read with
 `fire_caldera_city.md` (people, physiology, charter, interiors in principle)
 and `fire_caldera_layout.md` (approved layout: plots, routes, lower city,
 foundations). Plot ids, centres, footprints and routes come from the layout,
@@ -28,6 +30,9 @@ unchanged. These are its invariants in buildable terms.
 | Thermal room types | **immersion well** (a shallow lava pool fed by the duct network, 2 to 3 m across, with a cool perimeter ledge for tools and adornments); **radiant platform** (a hot basalt slab to lie on); **molten-floor room** (the whole floor a thin molten layer, for deep rejuvenation) |
 | Light | only the charter's controlled family: arrival beacons, path capsules, branching wall brackets, civic and workshop clusters, and mineral lenses below the lava |
 | Ventilation | every dwelling and workshop has a gas vent stack and a pressure-relief path, venting outward and uphill toward the west and far shelves |
+| Glazed fronts and doors | branching mullions on a 1.8 to 2.0 m module; a door takes one full mullion bay (3.0 m bay, 2.0 m clear leaf or pair) and no mullion, fin or stained panel runs through its frame; frames of neighbouring openings keep at least 0.4 m of wall or mullion between them |
+| Headroom | every canopy, bridge roof, gallery or upper floor a route passes under clears 2.4 m; public halls are taller by program, not by accident |
+| Vertical circulation | ramps, never stairs: 32 degrees at most, 1.4 m wide (2.0 m on public routes), a 1.2 m landing at foot and head; one storey of 3.5 m needs about 5.6 m of run, so about 8 m with landings. Every upper floor names its ramp or lift in its brief |
 | Collision | shells, plinths, terraces, rails, bridges, counters and instruments solid; molten wells and floors use the hazard and liquid API; sparks and seams decorative |
 
 ### Signature motif
@@ -94,6 +99,19 @@ The only building in the city designed for cool bodies.
 | Washroom | 2.5 × 4 m | modern: an **incinerating toilet** in insulated basalt, heated by the city's thermal system; a cool-water basin and a shower fed from a sealed tank refilled from the provisions; its door opens off the party room, so guests never cross the receiving room to reach it |
 | Party room | 8 × 10 m | eight human-length beds in two rows, a long table, a cool floor, a broad window over the reservoir; the wake marker; the party gathers here and on the terrace |
 
+- **Plan (audited 2026-10-07):** a 5 m west column and the 8 m party room.
+  - The column holds the receiving room at the front (5 × 6), then the
+    provisions cabinet (west) and washroom (east) side by side behind it
+    (2.5 × 4 each).
+  - The party room fills the 8 × 10 m east side. Its door is in the shared
+    wall with the receiving room, and the washroom opens off its west wall.
+  - Totals: 5 + 8 = 13 m by 6 + 4 = 10 m.
+- **Pass-throughs:**
+  - The washroom is reached through the party room: it is the guests' own
+    suite, which is legitimate.
+  - The cabinet opens off the receiving room: it is the keeper's store off
+    her own counter.
+
 - **Glass:** cobalt (cooling) and amber (welcome) in the entry fin and a
   clerestory band.
 - **Variation:** the only cool building; the only beds and the only food in the
@@ -111,12 +129,21 @@ The only building in the city designed for cool bodies.
 |---|---|---|
 | Tempering hall | 10 × 12 m, 6 m high | three radiant platforms for cooled or cracked residents; one molten-floor bay screened by forged panels for deep treatment; a mineral cabinet of corrective samples; Eris's work stool; daylight from a long clerestory |
 | Mediation room | 6 × 5 m | a ring of warm basalt seats for disagreements that have become personal; one window onto the reservoir |
-| Eris's suite | 6 × 7 m | a receiving and shaping room, a private immersion well, a cooler resting niche, her shelf of objects from seventy years, a door to the link |
+| Eris's suite | 6 × 7 m | its own outside door from `R3` into a 1.5 m entry, then a receiving and shaping room, a private immersion well, a cooler resting niche, her shelf of objects from seventy years; a staff door to the hall's link |
 
 - **Glass:** amber and cobalt (the guest house's family, for one household).
 - **Link:** the suite connects toward the guest house only by Eris's own
   service door, so **a visitor never passes through treatment rooms to reach a
   bed**.
+- **Audit (2026-10-07):**
+  - **Sizes:** the 10 m hall plus a 6 m column (mediation 6 × 5 above the
+    suite 6 × 7) make 16 × 12 m.
+  - **Access, revised:** Eris's private suite was reached only through the
+    treatment hall and its link, a home reached through a room patients use.
+    The suite now has its own outside door from `R3`, and the link to the hall
+    becomes her staff door.
+  - **Pass-throughs:** the mediation room opens off the hall. Both are care
+    rooms used the same way, which is legitimate.
 
 ### Renewal terrace (`RENEWAL`, `(-43, -4)`; landmark)
 
@@ -156,6 +183,33 @@ shelf.
 
 - **Upper floor:** a receiving and shaping room, a shared immersion well, two
   resting niches, and the material pantry.
+- **Plan (audited 2026-10-07).** The first brief listed the rooms without a
+  plan, left the upper home with no way up, and could have reached the home
+  only through the shop. As revised, the 17 × 12 m ground floor has three
+  bands:
+  1. **Front band, 5 m deep, facing the arrival crescent:**
+     - the counter, 7 m;
+     - the secure gem store, 3 × 4 m, between the counter and the assay room,
+       with a 1 m lobby in front of its forged door;
+     - the assay room, 5 m;
+     - a 2 m bay at the east end for the foot of the home's ramp.
+  2. **A 1.4 m staff corridor** across the width. It joins the assay room,
+     the receiving bay and the preparation studio. Customers never enter it.
+  3. **Back band, 5.6 m deep, facing `R2`:**
+     - the preparation studio, 7 × 5.6 m, west;
+     - a 3 m tested-stock store between the studio and the receiving bay;
+     - the receiving bay, 5 × 5.6 m.
+
+  Pela's route is receiving bay → corridor → assay room → gem store. Untested
+  ore never enters the studio. Savi takes only assayed material from the
+  corridor.
+- **The way up:** an **external ramp** 2 m wide runs along the east end from
+  the service side (`R2`) to the upper floor at +3.5 m: 5.6 m of run, with
+  1.2 m landings, inside the 12 m end. The home therefore has its own door and
+  is never reached through the shop.
+- **Pass-throughs:** the gem store is reached only through the assay room and
+  counter lobby, and the receiving bay leads through the corridor to the
+  assay room. All are one workshop's own rooms, which is legitimate.
 - **Glass:** teal and violet, the mineral colours, in the display cells' lenses
   and the upper outlook.
 - **Variation:** the only two-storey home over a shop; the most glass at
@@ -179,6 +233,17 @@ shelf.
 - **Residence** (8 × 7 m): a receiving and shaping room, one shared immersion
   well, three resting niches, and a bench where Ruun returns tools to the
   wrong sibling's place.
+- **Plan (audited 2026-10-07):**
+  - **Front row, 8 m deep:** the armory gallery (10 m), then a descent hall
+    (9 m) holding the lift (3 × 3) and the head of the protected ramp to
+    `L4`.
+  - **Back row, 7 m deep:** the workshop (9 m), the receiving bay (6 m) and
+    the alloy store (4 m).
+  - Totals: 10 + 9 = 19 m and 9 + 6 + 4 = 19 m wide, by 8 + 7 = 15 m deep.
+  - **Pass-throughs:** the alloy store and descent hall are reached through
+    the workshop and receiving bay, all the foundry's own work rooms, which is
+    legitimate. Customers stay in the gallery.
+  - **Headroom:** the covered bridge to the residence clears 2.4 m.
 - **Glass:** garnet and amber, the forge colours, in the gallery's high
   clerestory.
 - **Variation:** the longest span; the overhead handling rail; the only
@@ -201,6 +266,19 @@ shelf.
 
 - **Home:** a receiving and shaping room and a private immersion well, behind
   a **curved clear-glass wall** overlooking the reservoir.
+- **Plan (audited 2026-10-07):**
+  - **West wing, the studio, 8 m wide:** the clean assembly floor (8 × 7 m)
+    at the promenade end, then the hot forming bay (6 × 6) with the annealing
+    chamber (3 × 6) beside it. The metal bench (4 × 5) is at the court's
+    north side.
+  - **Centre:** the daylight court, 5 × 8 m, with the glass rack along its
+    west wall.
+  - **East wing, the home, 5 × 14 m:** an entry, the receiving and shaping
+    room, the immersion well, and two resting niches.
+  - Totals: 8 + 5 + 5 = 18 m wide.
+  - **Separate entrances:** the studio's from the promenade, the home's from
+    the east path. The court is shared but entered from the studio, and the
+    home has a glazed door onto it.
 - **Glass:** emerald-teal and amber. Talen holds the building to two colours,
   even here.
 - **Variation:** the only daylight court; the finest glass in the city.
@@ -223,9 +301,23 @@ landmark front facing the reservoir and the arrival view.
 | School room | 7 × 6 m | low benches, slates of cast basalt, a shaping table, a window toward the Vara court |
 | Archive reading room | 7 × 6 m | cast basalt records and metal pattern plates on shelves; the lift down to the fired archive `L3` |
 
+- **Entrance and ramp hall** (7 × 15 m, east end): the public door from `R5`,
+  the way into the council chamber, school room and archive, and the
+  **ramp** to the upper floor. The ramp is 2.0 m wide in two flights round a
+  landing, 5.6 m of run for the 3.5 m storey.
+- **Ground plan (audited 2026-10-07):**
+  - the council chamber, 10 m wide, double height, at the west end;
+  - the school room and archive stacked in the middle 7 m (6 + 6 m deep, with
+    a 3 m lobby between them off the entrance hall);
+  - the entrance and ramp hall, 7 m, at the east end.
+  - Totals: 10 + 7 + 7 = 24 m.
+  - The upper floor (instrument room, dome gallery) covers the middle and
+    east bays, so the chamber stays double height.
 - **Lower observation landing:** against the reservoir wall below the council
   chamber; the second immersion shelf leaves from here, descending to the deep
-  observatory `L2`.
+  observatory `L2`. It is reached by an **outside ramp** from the `R5`
+  landing, down about 4 m along the reservoir-edge foundation, not through the
+  chamber.
 - **Upper floor:** Selka's instrument room under the dome, with gauges from the
   rim, the reservoir wall and the deep vent, and a gallery round the dome.
 - **Glass:** cobalt, amber and teal: a landmark's three, the largest stained
@@ -265,6 +357,28 @@ landmark front facing the reservoir and the arrival view.
   gallery, and the public door faces the annular route.
 - **Glass:** cobalt and teal, the cool colours of instruments.
 - **Variation:** the only bedrock-spine foundation; the valve wall.
+
+### Audit notes for Iren and Aro (2026-10-07)
+
+- **Iren:** single storey; the niches open off the family's own receiving
+  room, which is legitimate in their own home. The glazed passage to Civic has
+  a door the family can close, so the public complex never runs through the
+  home.
+- **Aro:**
+  - **Sizes:** the control gallery is 9 × 7 m, with the home in the
+    remaining 8 × 13 m.
+  - **Separate doors:** the works' public door and the home's door are
+    separate, and the service passage between them is the family's own.
+
+### Foundations: audit step 5 waits on the survey
+
+No building here has yet been placed against its real ground. The localized
+caldera terrain does not exist, and the layout's plot survey (`FireCalderaPlan`
+fields: corner and door heights, floor datum, foundation type) has not been
+run. Every foundation type above is the expected one. Each brief must be
+re-checked against the surveyed section before its proof build. The
+reservoir-edge buildings (Renewal, Civic) and the bedrock spine (Aro) need it
+most.
 
 ## 6. The lower city (after the Lava Helm)
 
