@@ -555,8 +555,9 @@ func _build_snow_banks() -> void:
 
 ## A drift has no collision, so nothing else would stop it standing inside a
 ## room. It used to skip every building here (meant to skip only its own wall),
-## and a drift off the Snowrest Inn's wall stood in the attached guest wing,
-## through two beds. Now its true rectangle is tested against every building,
+## and a walkthrough found a drift inside a Snowrest Inn guest room, through
+## two beds (most likely one placed off the inn's wall into the attached wing).
+## Now its true rectangle is tested against every building,
 ## lean-to and prop rectangle, its own house included: a drift hugging its wall
 ## sits 1.3 m out, so it clears its own walls and fails only on a real overlap.
 func _bank_blocked(spot: Vector2, length: float, bank_yaw: float) -> bool:
