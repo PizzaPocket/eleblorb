@@ -32,18 +32,17 @@ surface foundations, and the finished guest house exist and validate.
 
 - `scripts/caldera_shell.gd` (`CalderaShell`): the kit's first revised shell,
   live as the guest house and isolated in `tools/fire_caldera_proof.tscn`.
-  Continuous punched volcanic-stone wall planes and broad SuperEgg windows
-  sit in a bright stainless and heat-blued frame. Complete ribs visibly carry
-  a superellipse barrel shell with a four-metre smoky-glass crown and glazed
-  curved ends; this replaces the rejected rounded rectangular roof slab.
-  The fitted 2.2 m double door uses the same punched-opening system.
-  `FireCalderaBuildings.guest_house()` now has an open receiving lounge plus
-  provisions, washroom and two private one-bed rooms under a proper rear
-  ceiling. All four inner doors are punched and framed; Eris faces the entry.
-  The raised decorative floor clash was removed, the threshold fin's two
-  glass leaves are real SuperEggs with branches ending on them, and there is
-  deliberately no open fire in this cool-bodied guest building. The proof
-  checks all doorways and layout clear zones (0 FAIL).
+  The second walkthrough rejected the domestic window hardware and ribbed
+  barrel. The current 15.5 × 12 m pavilion instead has one facade-wide clean
+  structural-glass sheet, room-wide side/rear panes, continuous volcanic stone
+  and stainless posts large enough to cap the wall ends. A two-degree metal
+  slab is Boolean-punched for four fitted glass SuperEgg domes: lounge,
+  washroom and one per bedroom. Low stone partitions continue as clean glass
+  clerestories to the roof, sharing daylight rather than making ceilinged
+  cubicles. Supplies became lounge cabinetry, leaving two 5.5 × 6.25 m guest
+  rooms and a 4.5 × 6.25 m washroom. The fitted 2.3 m double door, Eris's
+  orientation and fire-free cool program remain. The cobalt/amber entry fin
+  now uses a squarer SuperEgg exponent.
 
 - `tools/fire_caldera_world_probe.tscn`: instantiates the real terrain and
   checks the fine ground and reservoir exist, live height and lava queries,
@@ -57,7 +56,7 @@ surface foundations, and the finished guest house exist and validate.
   fine visual mesh is lifted 1 cm above its matching collider to prevent
   boundary depth flicker without changing floor height.
 
-Pause here for the user's second in-game walkthrough. Do not begin another
+Pause here for the user's next in-game walkthrough. Do not begin another
 building until its stylistic notes have been folded into the shared kit.
 After approval, build the remaining briefs plot by plot, beginning with the
 arrival forecourt and paired welcome pylons, then Nahl hall and Eris's suite.

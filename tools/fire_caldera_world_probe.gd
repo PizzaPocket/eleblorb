@@ -78,8 +78,16 @@ func _run() -> void:
 		var guest := frame.get_node_or_null("GUESTShell") as StaticBody3D
 		_expect(guest != null, "the live village builds the finished guest house")
 		if guest != null:
-			for child_name in ["DryGuestTerrace", "EntryFin", "WakeMarker", "StandMarker", "GatherMarker", "KeeperStand", "CoolRearCeiling", "SuperellipseBarrelRoof", "ErisNahl"]:
+			for child_name in ["DryGuestTerrace", "EntryFin", "WakeMarker", "StandMarker", "GatherMarker", "KeeperStand", "LowPitchSkylightRoof", "ErisNahl"]:
 				_expect(guest.get_node_or_null(child_name) != null, "the live guest house has %s" % child_name)
+			var guest_plinth := frame.get_node_or_null("GUESTPlinth") as StaticBody3D
+			for local: Vector3 in [
+				Vector3(-7.0, 0.35, 7.1), Vector3(-5.75, 0.35, 7.1), Vector3(0.0, 0.35, 7.1), Vector3(7.0, 0.35, 7.1),
+				Vector3(-5.75, 0.35, 5.5), Vector3(0.0, 0.35, 5.5),
+				Vector3(-5.0, 0.35, -1.0), Vector3(0.0, 0.35, -1.0), Vector3(5.0, 0.35, -1.0),
+			]:
+				var floor_hit := _ray(space, guest.global_transform * local, guest.global_transform * Vector3(local.x, -0.8, local.z), [guest.get_rid()])
+				_expect(not floor_hit.is_empty() and floor_hit["collider"] == guest_plinth, "guest floor lane (%.1f, %.1f) lands on the visible plinth" % [local.x, local.z])
 			var eris := guest.get_node_or_null("ErisNahl")
 			if eris != null:
 				var actions:Array = eris.dialog_actions_provider.call()

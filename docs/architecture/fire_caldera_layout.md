@@ -160,7 +160,7 @@ work within the reserved plot envelope.
 |---|---:|---:|---:|---|
 | `ARRIVAL` | `(0,-46)` | open 16 x 14 m | 24 x 20 m | Forecourt and paired pylons; arrival axis remains 6 m clear. |
 | `NAHL` | `(-38,-28)` | 16 x 12 m | 22 x 18 m | Tempering hall with Eris's suite; public face toward promenade, separate guest entrance toward arrival. |
-| `GUEST` | `(-27,-51)` | 13 x 10 m | 17 x 14 m | Insulated guest house and party rest point; directly visible from arrival, physically separate from treatment rooms. |
+| `GUEST` | `(-27,-51)` | 15.5 x 12 m | 17 x 14 m | Insulated two-room guest pavilion and rest point; directly visible from arrival, physically separate from treatment rooms. |
 | `OREN` | `(30,-34)` | 17 x 12 m | 22 x 17 m | Mineral counter faces arrival crescent; assay, secure store, preparation, and receiving face the outer service route. |
 | `KEL` | `(44,-4)` | 19 x 15 m | 24 x 20 m | Surface armory gallery and receiving bay; residence on quiet outer edge; protected descent to deep forge. |
 | `VARA` | `(28,37)` | 18 x 14 m | 23 x 19 m | Glass and metal studio with daylight court; clean assembly faces promenade, hot forming and deliveries face Kel. |

@@ -289,9 +289,9 @@ Progress (2026-10-07): `FireCalderaPlan`, its validator and plan drawing;
 polygon reservoir (`tools/fire_caldera_world_probe.tscn`, 0 FAIL). The coarse
 flat floor is absent beneath the fine city mesh and their seam agrees exactly.
 All nine socket plinths are now live in the same atomic ground build. The
-revised two-room guest house, its supported dry terrace, Superellipse barrel
-and glass crown, fitted openings and entry fin, Eris Nahl, and the registered
-25-Tokoin rest point are live. Pause for the second walkthrough; the arrival
+revised two-room guest pavilion, its monolithic glass facade, low slab with
+four fitted glass SuperEgg skylights, fitted openings and entry fin, Eris Nahl,
+and the registered 25-Tokoin rest point are live. Pause for the next walkthrough; the arrival
 forecourt follows only after the style is approved.
 See the handoff.
 

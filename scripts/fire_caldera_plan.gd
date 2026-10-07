@@ -98,12 +98,11 @@ const PLOTS: Array[Dictionary] = [
 		"open": true},
 	{"id": "NAHL", "centre": Vector2(-36.5, -30.0), "footprint": Vector2(16.0, 12.0), "reserved": Vector2(22.0, 18.0),
 		"household": "Nahl", "program": "tempering hall and Eris's suite; public face to the promenade, guest entrance toward arrival", "occupied": true},
-	{"id": "GUEST", "centre": Vector2(-27.0, -51.0), "footprint": Vector2(13.0, 10.0), "reserved": Vector2(17.0, 14.0),
+	{"id": "GUEST", "centre": Vector2(-27.0, -51.0), "footprint": Vector2(15.5, 12.0), "reserved": Vector2(17.0, 14.0),
 		"household": "Nahl", "program": "insulated guest house and party rest point, seen from arrival, apart from the treatment rooms", "occupied": true,
-		# The shell sits against the service edge, leaving the full four-metre
-		# public terrace inside the reserved envelope. Its wider foundation
-		# supports both the shifted shell and that terrace.
-		"mass_offset": Vector2(0.0, -2.0), "foundation": Vector2(13.0, 14.0),
+		# The enlarged shell nearly fills its reserved envelope; the foundation
+		# supports it and the shallow public threshold terrace as one floor.
+		"foundation": Vector2(17.0, 14.0),
 		# Reached by R3 from the forecourt, not from the promenade.
 		"on_promenade": false},
 	{"id": "OREN", "centre": Vector2(30.0, -34.0), "footprint": Vector2(17.0, 12.0), "reserved": Vector2(22.0, 17.0),

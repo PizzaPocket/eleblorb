@@ -78,7 +78,7 @@ func _check() -> void:
 		for i in 9:
 			var p := centre.lerp(polygon[i % 4], 0.2 + 0.1 * float(i % 5))
 			# Past the building and its furniture: the check is of the floor.
-			var hit := _ray(space, Vector3(p.x, datum + 3.0, p.y), Vector3(p.x, float(line["bottom"]) - 2.0, p.y), _building_rids())
+			var hit := _floor_ray_past_shell(space, Vector3(p.x, datum + 3.0, p.y), Vector3(p.x, float(line["bottom"]) - 2.0, p.y)) if id == "GUEST" else _ray(space, Vector3(p.x, datum + 3.0, p.y), Vector3(p.x, float(line["bottom"]) - 2.0, p.y), _building_rids())
 			if hit.is_empty() or hit["collider"] != plinth:
 				_fail("%s: the floor at %s is not the plinth" % [id, str(p.round())])
 				continue
@@ -130,7 +130,7 @@ func _check_shell(space: PhysicsDirectSpaceState3D) -> void:
 	var datum := float(_lines["GUEST"]["datum"])
 	var to_world := _shell.global_transform
 	var hz := (entry["footprint"] as Vector2).y * 0.5
-	var through := _ray(space, to_world * Vector3(-4.0, 1.2, hz + 2.0), to_world * Vector3(-4.0, 1.2, hz - 2.0), [])
+	var through := _ray(space, to_world * Vector3(-5.75, 1.2, hz + 2.0), to_world * Vector3(-5.75, 1.2, hz - 2.0), [])
 	if not through.is_empty():
 		_fail("GUEST: the door bay is blocked by %s" % (through["collider"] as Node).name)
 	for x: float in [-4.0, 0.0, 4.0]:
@@ -144,20 +144,33 @@ func _check_shell(space: PhysicsDirectSpaceState3D) -> void:
 		_fail("GUEST: the shell does not stand on its plinth")
 	# Each rear room has a punched, fitted doorway directly off the lounge.
 	for door: Array in [
-		["provisions room", Vector3(-5.0, 1.2, 0.2), Vector3(-5.0, 1.2, -1.2)],
-		["washroom", Vector3(-1.75, 1.2, 0.2), Vector3(-1.75, 1.2, -1.2)],
-		["west guest room", Vector3(1.625, 1.2, 0.2), Vector3(1.625, 1.2, -1.2)],
-		["east guest room", Vector3(4.875, 1.2, 0.2), Vector3(4.875, 1.2, -1.2)],
+		["keeper's room", Vector3(-6.25, 1.2, 0.9), Vector3(-6.25, 1.2, -0.6)],
+		["rim room", Vector3(-3.4, 1.2, 0.9), Vector3(-3.4, 1.2, -0.6)],
+		["washroom", Vector3(2.0, 1.2, 0.9), Vector3(2.0, 1.2, -0.6)],
+		["lake room", Vector3(5.0, 1.2, 0.9), Vector3(5.0, 1.2, -0.6)],
 	]:
 		var hit := _ray(space, to_world * (door[1] as Vector3), to_world * (door[2] as Vector3), [])
 		if not hit.is_empty():
 			_fail("GUEST: the %s doorway is blocked by %s" % [door[0], (hit["collider"] as Node).name])
-	for marker in ["WakeMarker", "StandMarker", "GatherMarker", "KeeperStand", "DryGuestTerrace", "EntryFin", "CoolRearCeiling", "SuperellipseBarrelRoof"]:
+	for marker in ["WakeMarker", "StandMarker", "GatherMarker", "KeeperStand", "DryGuestTerrace", "EntryFin", "LowPitchSkylightRoof"]:
 		if _shell.get_node_or_null(marker) == null:
 			_fail("GUEST: no %s" % marker)
 	for problem in ClearZones.audit(_shell):
 		_fail("GUEST layout: %s" % problem)
-	print("ok   GUEST: fitted doorways clear; two-room plan, roof, plinth and rest markers in place")
+	# At every clear approach and interior lane, the first surface below ankle
+	# height must be the plinth itself. This catches any invisible retained ground
+	# that would make the player hover above the authored foundation.
+	for local: Vector3 in [
+		Vector3(-7.0, 0.35, 7.1), Vector3(-5.75, 0.35, 7.1), Vector3(0.0, 0.35, 7.1), Vector3(7.0, 0.35, 7.1),
+		Vector3(-5.75, 0.35, 5.5), Vector3(0.0, 0.35, 5.5),
+		Vector3(-5.0, 0.35, 1.0), Vector3(0.0, 0.35, 1.0), Vector3(5.0, 0.35, 1.0),
+		Vector3(-6.25, 0.35, -0.8), Vector3(-3.4, 0.35, -0.6), Vector3(2.0, 0.35, -1.6), Vector3(5.0, 0.35, -1.0),
+	]:
+		var floor_hit := _ray(space, to_world * local, to_world * Vector3(local.x, -0.8, local.z), _building_rids())
+		if floor_hit.is_empty() or floor_hit["collider"] != _plinths["GUEST"]:
+			var detail: String = "nothing" if floor_hit.is_empty() else str((floor_hit["collider"] as Node).name)
+			_fail("GUEST: invisible floor at local (%.1f, %.1f) is %s, not the plinth" % [local.x, local.z, detail])
+	print("ok   GUEST: fitted doorways clear; spacious plan, skylight roof, plinth and rest markers in place")
 
 
 func _building_rids() -> Array:
@@ -236,11 +249,30 @@ func _render() -> void:
 		camera.look_at(Vector3(to.x, FireCalderaGround.blended_height(to, Callable(FireCalderaGround, "crater_wall")) + float(pose[3]), to.y), Vector3.UP)
 		for _i in 4:
 			await RenderingServer.frame_post_draw
-		var roof := _shell.get_node_or_null("SuperellipseBarrelRoof") as Node3D if _shell != null else null
+		var roof := _shell.get_node_or_null("LowPitchSkylightRoof") as Node3D if _shell != null else null
 		if roof != null:
 			roof.visible = name != "guest_cutaway"
 		if name == "guest_cutaway":
 			for _i in 3:
 				await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])
+		print("saved %s/%s.png" % [_shots, name])
+	# Inside the guest house, poses in its own frame: (eye, target).
+	var rooms := {
+		"guest_lounge_doors": [Vector3(4.5, 1.65, 5.2), Vector3(-2.5, 2.0, 0.25)],
+		"guest_rim_room": [Vector3(-0.6, 1.6, -0.4), Vector3(-3.0, 1.2, -5.8)],
+		"guest_washroom": [Vector3(2.6, 1.6, -0.3), Vector3(1.2, 0.9, -5.2)],
+		"guest_lake_room": [Vector3(4.2, 1.6, -0.4), Vector3(7.5, 1.0, -4.5)],
+		"guest_keeper_room": [Vector3(-5.2, 1.6, -0.3), Vector3(-6.8, 1.0, -5.0)],
+	}
+	var roof_node := _shell.get_node_or_null("LowPitchSkylightRoof") as Node3D if _shell != null else null
+	if roof_node != null:
+		roof_node.visible = true
+	for name: String in rooms:
+		var pose: Array = rooms[name]
+		camera.global_position = _shell.global_transform * (pose[0] as Vector3)
+		camera.look_at(_shell.global_transform * (pose[1] as Vector3), Vector3.UP)
+		for _i in 4:
+			await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])
 		print("saved %s/%s.png" % [_shots, name])

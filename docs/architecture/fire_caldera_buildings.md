@@ -20,30 +20,33 @@ unchanged. These are its invariants in buildable terms.
 | Element | Specification |
 |---|---|
 | Frame | **exposed structural steel** (revised 2026-10-07): squarish SuperEgg columns, I-section and box beams, portal frames and trusses in heat-blued or blackened steel, welded joints left visible; the frame carries roofs and glass |
-| Glass | **large glass** filling the steel frame: full-height curtain walls on public fronts, clerestories and roof lights; clear or smoky, with the stained fields from the matrix |
+| Glass | **full glass panels**: each wall bay between blued-steel posts is either one full-height glass panel (floor channel to transom, no sill, no punched window) or a continuous stone panel; above the transom runs the building's two-tone stained clerestory band, round the outside and through its partitions |
 | Shell | continuous asymmetric SuperEgg shells and extruded superellipse plans in **cast basalt composite**, matte charcoal, for plinths, heat walls round hot work, and the curved landmark volumes (Civic, Renewal canopy base); never a box with a lid |
 | Foundation | the layout's **socketed plinth** family: a tapered cast-basalt base on the same superellipse plan, embedded 1.5 m below the lowest perimeter ground, a recessed metal-and-glass control joint between base and shell, exposed base under 3 m |
 | Storey | 3.5 m floor to floor; public halls 5 to 7 m |
 | Glazing | broad superellipse panes, clear, smoky or faintly warm, in blackened-steel frames; every occupied room has one strong outlook; glass never runs below grade |
 | Stained glass | abstract mineral and molten-flow patterns only; clear or smoky glass plus **two** stained colours per building, **three** for landmarks (see the matrix) |
 | Forged metal | blackened iron and dark steel, branching like cooled lava veins, for the structure that holds glass, canopies, rails and bridges; heat-blued and enamelled accents; bright steel only on instruments and controls; gold and silver only as thin inlays on cool surfaces |
-| Roofs | shallow walkable shells and folded or catenary canopies with integrated ash gutters to concealed downpipes; no gables, no pediments |
+| Roofs | restrained low-pitch slabs, shallow walkable shells and folded or catenary canopies with integrated ash gutters to concealed downpipes; glass SuperEgg shells may be clipped and fitted over matching roof apertures as skylights; no gables, no pediments |
 | Doors | broad superellipse openings, at least 2.0 m clear, with pivoting or sliding metal-and-glass leaves; public thresholds 3 m or more |
 | Thermal services | concealed in walls and floors; visible only as **service manifolds**, **inspection hatches** (on service terraces, never in a walkway), **glowing seams** and **temperature controls** where someone uses them |
 | Thermal room types | **immersion well** (a shallow lava pool fed by the duct network, 2 to 3 m across, with a cool perimeter ledge for tools and adornments); **radiant platform** (a hot basalt slab to lie on); **molten-floor room** (the whole floor a thin molten layer, for deep rejuvenation) |
 | Light | only the charter's controlled family: arrival beacons, path capsules, branching wall brackets, civic and workshop clusters, and mineral lenses below the lava |
 | Ventilation | every dwelling and workshop has a gas vent stack and a pressure-relief path, venting outward and uphill toward the west and far shelves |
-| Glazed fronts and doors | branching mullions on a 1.8 to 2.0 m module; a door takes one full mullion bay (3.0 m bay, 2.0 m clear leaf or pair) and no mullion, fin or stained panel runs through its frame; frames of neighbouring openings keep at least 0.4 m of wall or mullion between them |
+| Glazed fronts and doors | bays of about 2 m between posts, one panel per bay; never a superellipse cut-out window or a domestic window grid; a door has at least 2.0 m clear, its own bay, and a stone lintel to the transom so no glass rests on its frame; interior doors keep 0.6 m of stone between their head and the stained glass above |
 | Headroom | every canopy, bridge roof, gallery or upper floor a route passes under clears 2.4 m; public halls are taller by program, not by accident |
 | Vertical circulation | ramps, never stairs: 32 degrees at most, 1.4 m wide (2.0 m on public routes), a 1.2 m landing at foot and head; one storey of 3.5 m needs about 5.6 m of run, so about 8 m with landings. Every upper floor names its ramp or lift in its brief |
 | Collision | shells, plinths, terraces, rails, bridges, counters and instruments solid; molten wells and floors use the hazard and liquid API; sparks and seams decorative |
 
 ### Signature motif
 
-**The branching mullion.** Every building's main glazed front is divided by
-forged mullions that fork once or twice as they rise, like veins of cooled
-lava, and the same branching recurs in its rails and wall-light brackets. It
-appears on all ten plots.
+**The forked post and the stained band** (restored 2026-10-07 from the first
+iteration, at the user's walkthrough). Every post meets the transom with a
+forged fork, two short branches like a vein of cooled lava splitting, and
+above the transom runs a two-tone stained band in the building's colours.
+The entry sculpture uses the same steel and the same two glass colours, so it
+belongs to the building. Full glass panels, never subdivided, fill the bays
+below. It appears on all ten plots.
 
 ### Exclusions
 
@@ -87,46 +90,43 @@ Christian, Catalan or classical symbols; copied Gaudí buildings.
 
 The only building in the city designed for cool bodies.
 
-- **Mass:** one low insulated shell 13 × 10 m on a socket plinth, its long
-  glazed side facing the forecourt; a dry guest terrace 13 × 4 m in front,
-  within the 17 × 14 m plot.
-- **Envelope:** double insulated basalt walls with a ventilated cavity, smoky
-  glass to cut the glare of the reservoir, and no thermal services beneath it.
-  The guest wing's floor is cooled. A structural stainless frame carries a
-  true superellipse barrel shell rather than a rounded slab. A four-metre
-  smoky-glass crown and glazed curved ends bring daylight into the lounge;
-  the four rear rooms have a lower cool ceiling which every partition meets.
-- **Rooms:**
+- **Mass:** a 15.5 × 12 m glass pavilion on a socket plinth, its glazed long
+  side facing the forecourt, a shallow dry terrace in front, within the 17 ×
+  14 m plot. Blued-steel posts on a 2 m bay, full glass panels or stone in
+  each bay, a cobalt and amber clerestory band, a 2-degree metal roof slab
+  with fitted glass SuperEgg skylights. No thermal services beneath; the
+  floor is cooled; no open fire.
+- **Rooms** (revised after the third walkthrough, 2026-10-07: each room fitted
+  to its use rather than four copies):
 
 | Room | Size | Description |
 |---|---|---|
-| Receiving lounge | 13 × 5.5 m | the door from the forecourt; Eris's counter facing arrivals; cool stone bench; a small visitor table; broad outlook and the skylight above |
-| Provisions room | 3 × 4.5 m | a sealed, insulated store of imported food and water for rare guests |
-| Washroom | 3.5 × 4.5 m | an **incinerating toilet** in insulated basalt, cool-water basin, and shower fed from a sealed tank |
-| Guest room west | 3.25 × 4.5 m | one human-length bed, small chest, rear window, and the wake marker |
-| Guest room east | 3.25 × 4.5 m | one human-length bed, small chest, and rear window |
+| Receiving lounge | 15.5 × 5.75 m | the door from the forecourt; Eris's counter facing arrivals; cool stone bench; visitor table; six full glass panels onto the forecourt and the largest clear skylight |
+| Keeper's room | 3 × 6.25 m | Eris's working room behind her counter: the sealed provisions wall (imported food and water), her desk at one tall glass slot with the guest ledger in thin cast plates, hooks for travellers' gear; stone, no skylight |
+| Rim room | 5 × 6.25 m | the larger guest room: two beds for the party, heads to the lounge wall, feet toward full rear glass and the crater rim; a cool stone ledge; amber band and amber-tinted dome (warm light); the wake marker |
+| Washroom | 3.5 × 6.25 m | the lava people's way with water and heat (below); stone walls, a small frosted dome |
+| Lake room | 4 × 6.25 m | one bed along the east glass toward the reservoir's glow; a reading chair; cobalt band and cobalt-tinted dome (cool light) |
 
-- **Plan (revised after walkthrough, 2026-10-07):** the front lounge is one
-  generous daylit room. The four rear rooms total 3 + 3.5 + 3.25 + 3.25 =
-  13 m across and open directly from it through punched superellipse doors.
-  The two-bed capacity is intentional: the caldera receives few outsiders.
-- **Pass-throughs:**
-  - None. Both bedrooms, the washroom and provisions room open from the
-    receiving lounge.
-
-- **Glass:** cobalt (cooling) and amber (welcome) in a two-pane SuperEgg entry
-  fin whose forged branches terminate on the pane geometry; broad smoky
-  punched windows; and the glass crown and curved end lights above.
-- **Variation:** the only cool building; the only beds and the only food in the
-  city. It deliberately has no open fire.
-- **Built and revised (2026-10-07):** the shell is offset 2 m toward the service edge so
-  the full 13 × 4 m dry terrace fits on the public side of the 17 × 14 m
-  reserved plot. A single enlarged socket plinth supports both rather than
-  introducing a second floor collider. The cobalt-and-amber entry fin stands
-  beside the fitted 2.2 m clear double doorway. Continuous punched volcanic
-  stone planes replace freestanding wall blobs; stainless and heat-blued
-  metal carry the shell. Eris faces the entrance, and the rest markers and
-  25-Tokoin transaction are wired in the live Fire Kingdom.
+- **Washroom, culturally specific.** To the lava people water is an imported
+  curiosity and heat is how anything is disposed of:
+  - the sealed water supply is a squared glass cylinder between steel bands,
+    displayed like a specimen;
+  - the shower drains into an **evaporation channel**: a stainless grille over
+    a glowing heat seam where spent water flashes to steam;
+  - the **incinerating toilet** stands in a basalt plinth with a small amber
+    inspection port onto its heat, and a vent stack to the roof;
+  - a gently warmed **radiant stone bench** dries a bather instead of towels
+    (the city's radiant-platform room type, at a cool body's temperature);
+  - the basin is a carved basalt bowl; the mirror is polished obsidian.
+- **Partitions:** stone to 3.0 m, so every door (2.4 m) has a 0.6 m stone
+  lintel, then stained glass to the roof in the room's colour.
+- **Pass-throughs:** none. All four rooms open from the lounge; the keeper's
+  room opens behind Eris's counter.
+- **Glass:** clear panels to the forecourt and lounge sides; warm-tinted panels
+  in the rim room, cool-tinted in the lake room; cobalt (cooling) and amber
+  (welcome) in the band, the partitions and the entry fin.
+- **Variation:** the only cool building; the only beds and the only imported
+  food in the city.
 
 ### Nahl tempering hall and Eris's suite (`NAHL`, `(-38, -28)`)
 
