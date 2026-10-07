@@ -43,6 +43,13 @@ const ROOF_DEPTH := 0.18
 ##   skylights: [{"name", "at": Vector2, "half": Vector2, "rise", "tint"}]
 ##   door_at: the front door's centre (x)
 static func build(parent: Node3D, entry: Dictionary, datum: float, spec: Dictionary) -> StaticBody3D:
+	var body := make_body(parent, entry, datum)
+	add_volume(body, spec)
+	return body
+
+
+## An empty building body at a plot's mass centre on its datum, +Z its front.
+static func make_body(parent: Node3D, entry: Dictionary, datum: float) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = "%sShell" % entry["id"]
 	body.collision_layer = 1
@@ -52,7 +59,6 @@ static func build(parent: Node3D, entry: Dictionary, datum: float, spec: Diction
 	var deep := FireCalderaPlan.facing(entry)
 	body.position = Vector3(centre.x, datum, centre.y)
 	body.rotation.y = atan2(deep.x, deep.y)
-	add_volume(body, spec)
 	return body
 
 
@@ -271,7 +277,7 @@ static func _pane(body: StaticBody3D, name_text: String, at: Vector3, half: Vect
 	return pane
 
 
-static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top: float, rake: float, overhang: Dictionary, skylights: Array) -> void:
+static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top: float, rake: float, overhang: Dictionary, skylights: Array, colour: Color = STAINLESS_SHADOW.darkened(0.16)) -> CSGCombiner3D:
 	var reach := func(side: String) -> float: return float(overhang.get(side, 0.35))
 	var west: float = reach.call("west")
 	var east: float = reach.call("east")
@@ -289,7 +295,7 @@ static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top:
 	roof.collision_layer = 1
 	roof.collision_mask = 0
 	body.add_child(roof)
-	var slab_material := SolidModel.material(STAINLESS_SHADOW.darkened(0.16), 0.38, 0.62)
+	var slab_material := SolidModel.material(colour, 0.38, 0.62 if colour.v < 0.5 else 0.05)
 	SolidModel.add_box(
 		roof, "RoofSlab", Vector3(size.x + west + east, ROOF_DEPTH, (size.y + front + back) / cos(pitch)),
 		CSGShape3D.OPERATION_UNION, slab_material
@@ -308,6 +314,7 @@ static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top:
 		)
 		cutter.rotation.z = PI * 0.5
 		_skylight_dome(roof, skylight)
+	return roof
 
 
 static func _skylight_dome(roof: Node3D, skylight: Dictionary) -> void:

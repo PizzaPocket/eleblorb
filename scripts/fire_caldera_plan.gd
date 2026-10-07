@@ -100,7 +100,9 @@ const PLOTS: Array[Dictionary] = [
 		"household": "Nahl", "program": "tempering hall and Eris's suite; public face to the promenade, guest entrance toward arrival", "occupied": true,
 		# The mediation room's conversation pit, dug into the plinth on its
 		# uphill side, where the socket is deepest (in the building's frame).
-		"pits": [{"at": Vector2(5.1, -3.5), "half": Vector2(1.95, 1.55), "depth": 0.5, "exponent": 4.0}]},
+		"pits": [{"at": Vector2(5.1, -3.5), "half": Vector2(1.95, 1.55), "depth": 0.5, "exponent": 4.0}],
+		# A house of care: its plinth's top course is pale hot-spring sinter.
+		"floor_finish": Color(0.90, 0.88, 0.83)},
 	{"id": "GUEST", "centre": Vector2(-27.0, -51.0), "footprint": Vector2(15.5, 12.0), "reserved": Vector2(17.0, 14.0),
 		"household": "Nahl", "program": "insulated guest house and party rest point, seen from arrival, apart from the treatment rooms", "occupied": true,
 		# The enlarged shell nearly fills its reserved envelope; the foundation

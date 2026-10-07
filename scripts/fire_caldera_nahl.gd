@@ -1,118 +1,74 @@
 class_name FireCalderaNahl
 extends RefCounted
 
-## The Nahl tempering hall and Eris's suite (fire_caldera_buildings.md,
-## section 3), the second building of the caldera kit and the first for lava
-## bodies. Two volumes in one body, on its socket plinth:
-##   - the tempering hall, 10 x 12 m, the kit's full glass bays and stained
-##     band, under a roof raked from the back wall up toward the promenade, the
-##     wedge between the level band and the roof filled with clear glass, so
-##     the hall opens into a tall clerestory over the reservoir;
-##   - a 6 m wing at the ring beam's height (3.8 m) on its +X side: Eris's
-##     suite at the front, with its own door at the east end where R3 meets
-##     the promenade, and the mediation room behind it, its conversation pit
-##     dug into the plinth on the uphill side and lit by one cobalt dome.
-## Local +Z faces the promenade (the reservoir); the plot rises toward -Z.
-## A visitor never passes the treatment rooms to reach Eris.
-##
-## The colour rule is the guest house's: amber is warmth, cobalt is cooling.
-## The hall, where cooled and cracked residents are warmed, is amber; the
-## mediation room, where tempers cool, is cobalt; Eris's own rooms are amber.
-## Light here is heat first: the molten floor, the radiant platforms' seams and
-## two glass-enclosed flames, over the kit's concealed cove lines.
+## The Nahl tempering hall and Eris's house (fire_caldera_buildings.md,
+## section 3): where cooled and cracked lava bodies are warmed back to health,
+## disputes are talked through, and Eris lives. A house of care, so it does not
+## share the guest house's sleek, glassy, commercial face: thick walls of pale
+## cream tuff with a few deep superellipse openings, a floor of white
+## hot-spring sinter, no stained band, and the character carried by
+## hand-forged ironwork (window grilles, the clerestory's tracery, the screens
+## round the molten floor, two branching columns carrying the roof). The one
+## strong colour is the lava itself. Two volumes in one body:
+##   - the tempering hall, 10 x 12 m, its roof raked from the back wall up
+##     toward the promenade, the wedge between the level wall head and the roof
+##     glazed behind iron tracery, so the room opens into a tall clerestory;
+##   - a 6 m wing at 3.8 m on its +X side: Eris's suite at the front with its
+##     own door at the east end, where R3 meets the promenade, and the
+##     mediation room behind it, its conversation pit dug into the plinth on
+##     the uphill side and lit by one pale dome.
+## Local +Z faces the promenade (the reservoir); the plot rises toward -Z. A
+## visitor never passes the treatment rooms to reach Eris.
 
 const HALL_SIZE := Vector2(10.0, 12.0)
 const HALL_CENTRE := Vector2(-3.0, 0.0)
 const WING_SIZE := Vector2(6.0, 12.0)
 const WING_CENTRE := Vector2(5.0, 0.0)
+const STOREY := CalderaShell.STOREY
 ## The hall roof's rise from its back wall head to its front.
 const HALL_RAKE := 2.4
-const COBALT := FireCalderaBuildings.COBALT
-const AMBER := FireCalderaBuildings.AMBER
-const C := 0
-const A := 1
-const STAINED: Array[Color] = [COBALT, AMBER]
+const HALF_X := 8.0
+const HALF_Z := 6.0
+const WALL := CalderaShell.WALL
+## The palette of a house of care, from the caldera's own pale rocks.
+const TUFF := Color(0.84, 0.79, 0.70)
+const PUMICE := Color(0.90, 0.88, 0.83)
+const SINTER := Color(0.93, 0.92, 0.88)
+const OLIVINE := Color(0.64, 0.72, 0.50)
+const SULPHUR := Color(0.92, 0.86, 0.62)
+const RHYOLITE := Color(0.80, 0.70, 0.66)
+const IRON := CalderaShell.STEEL_BLUED
+const ROOF := Color(0.82, 0.80, 0.75)
+## Shards for the trencadis: broken pale mineral tile.
+const MOSAIC: Array[Color] = [SINTER, SULPHUR, Color(0.76, 0.82, 0.66), RHYOLITE, Color(0.84, 0.82, 0.78)]
 ## The party wall between hall and wing.
 const PARTY_X := 2.0
 ## The wall between the suite (in front) and the mediation room (behind).
 const SUITE_BACK_Z := -1.0
 const STAFF_DOOR_Z := 4.6
 const MEDIATION_DOOR_Z := -3.5
-const SUITE_DOOR_X := 6.7
+const HALL_DOOR_X := -3.0
+const SUITE_DOOR_X := 6.4
+const DOOR_CLEAR := 2.3
+const DOOR_HEIGHT := 2.75
 const INNER_DOOR_WIDTH := FireCalderaBuildings.INNER_DOOR_WIDTH
 const INNER_DOOR_HEIGHT := FireCalderaBuildings.INNER_DOOR_HEIGHT
-const PARTITION_SOLID := FireCalderaBuildings.PARTITION_SOLID
 ## The molten-floor bay in the hall's west back corner.
-const MOLTEN_BAY := Rect2(Vector2(-7.75, -5.75), Vector2(3.15, 5.25))
+const MOLTEN_BAY := Rect2(Vector2(-7.7, -5.7), Vector2(3.1, 5.2))
 const MOLTEN_Y := 0.03
 const MOLTEN := Color(1.0, 0.42, 0.08)
 ## Eris's immersion well, in the suite's west half.
 const WELL_CENTRE := Vector2(3.6, 1.2)
 const WELL_HALF := Vector2(1.15, 0.95)
-const COOL_LEDGE := Color(0.40, 0.38, 0.37)
-
-
-static func spec_hall() -> Dictionary:
-	var smoky := CalderaShell.SMOKY_GLASS
-	return {
-		"size": HALL_SIZE, "offset": HALL_CENTRE, "stained": STAINED,
-		"rake": HALL_RAKE,
-		"walls": {
-			"front": [
-				{"to": 1.85, "kind": "glass", "tint": smoky, "band": A}, {"to": 3.7, "kind": "glass", "tint": smoky, "band": A},
-				{"to": 6.3, "kind": "door", "band": A, "label": "hall door"},
-				{"to": 8.15, "kind": "glass", "tint": smoky, "band": A}, {"to": 10.0, "kind": "glass", "tint": smoky, "band": A},
-			],
-			# Heat walls behind the molten bay and the platforms, one long pane
-			# between them onto the slope.
-			"back": [
-				{"to": 3.5, "kind": "stone", "band": A}, {"to": 6.5, "kind": "glass", "tint": smoky, "band": A},
-				{"to": 10.0, "kind": "stone", "band": A},
-			],
-			"west": [
-				{"to": 6.0, "kind": "stone", "band": A}, {"to": 9.0, "kind": "glass", "tint": smoky, "band": A},
-				{"to": 12.0, "kind": "stone", "band": A},
-			],
-			# The party wall is the wing's; above the wing's roof the hall's
-			# clerestory wedge runs on.
-			"east": [
-				{"to": 3.0, "kind": "open"}, {"to": 6.0, "kind": "open"}, {"to": 9.0, "kind": "open"}, {"to": 12.0, "kind": "open"},
-			],
-		},
-	}
-
-
-static func spec_wing() -> Dictionary:
-	var smoky := CalderaShell.SMOKY_GLASS
-	return {
-		"size": WING_SIZE, "offset": WING_CENTRE, "stained": STAINED,
-		"overhang": {"west": 0.0},
-		# One cobalt dome over the conversation pit (wing-local).
-		"skylights": [{"name": "Mediation", "at": Vector2(0.1, -3.5), "half": Vector2(2.2, 1.9), "rise": 0.8, "tint": Color(0.30, 0.45, 0.88, 0.40)}],
-		"walls": {
-			# The suite's window onto the reservoir, then its own door at the
-			# east end, nearest R3.
-			"front": [
-				{"to": 1.7, "kind": "glass", "band": A}, {"to": 3.4, "kind": "stone", "band": A},
-				{"to": 6.0, "kind": "door", "band": A, "label": "suite door"},
-			],
-			# Uphill: the mediation room is closed to the slope.
-			"back": [
-				{"to": 3.0, "kind": "stone", "band": C}, {"to": 6.0, "kind": "stone", "band": C},
-			],
-			# Back to front: the mediation room, then the suite, glazed by its
-			# door.
-			"east": [
-				{"to": 2.5, "kind": "stone", "band": C}, {"to": 5.0, "kind": "stone", "band": C},
-				{"to": 9.4, "kind": "stone", "band": A}, {"to": 12.0, "kind": "glass", "tint": smoky, "band": A},
-			],
-		},
-	}
+const COOL_LEDGE := Color(0.62, 0.60, 0.57)
 
 
 static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> StaticBody3D:
-	var body := CalderaShell.build(parent, entry, float(line["datum"]), spec_hall())
-	CalderaShell.add_volume(body, spec_wing())
+	var body := CalderaShell.make_body(parent, entry, float(line["datum"]))
+	_walls(body)
+	_clerestory(body)
+	_roofs(body)
+	_tree_columns(body)
 	_partitions(body)
 	_molten_bay(body)
 	_platforms(body)
@@ -120,6 +76,184 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> Static
 	_mediation_room(body)
 	_suite(body)
 	return body
+
+
+## The hall roof's underside height at a plan depth z.
+static func head(z: float) -> float:
+	return STOREY + HALL_RAKE * clampf((z + HALF_Z) / (2.0 * HALF_Z), 0.0, 1.0)
+
+
+# ---------------------------------------------------------------------------
+# The envelope.
+# ---------------------------------------------------------------------------
+
+## Thick tuff walls, 3.8 m high all round, each punched for its few openings:
+## the hall's door and two tall windows to the promenade, the suite's window
+## and door at the east end, one high window onto the slope behind the
+## platforms, one to the west, one by the suite's entry. Openings are deep
+## superellipses (square foot for doors), framed in forged iron.
+static func _walls(body: StaticBody3D) -> void:
+	var long := HALF_X * 2.0 + WALL
+	var short := HALF_Z * 2.0 - WALL
+	# [name, origin, yaw, length, openings (centre along the wall's local X)]
+	var windows := {
+		"front": [Vector3(0, 0, HALF_Z), 0.0, long, [
+			_window(-6.3, 1.3, 0.6, 2.9), _door(HALL_DOOR_X), _window(0.3, 1.3, 0.6, 2.9),
+			_window(3.5, 1.2, 0.7, 2.8), _door(SUITE_DOOR_X),
+		]],
+		"back": [Vector3(0, 0, -HALF_Z), 0.0, long, [_window(-1.8, 2.6, 1.7, 3.1)]],
+		# Walls along Z turn by PI/2: their local X runs toward -Z.
+		"west": [Vector3(-HALF_X, 0, 0), PI * 0.5, short, [_window(-1.5, 1.3, 0.6, 2.9)]],
+		"east": [Vector3(HALF_X, 0, 0), PI * 0.5, short, [_window(-4.6, 1.0, 0.8, 2.6)]],
+	}
+	for key: String in windows:
+		var wall: Array = windows[key]
+		var origin: Vector3 = wall[0]
+		var yaw: float = wall[1]
+		var openings: Array[Dictionary] = []
+		openings.assign(wall[3])
+		TownProps._build_panel_facade(body, float(wall[2]), origin, yaw, TUFF, openings, 0.0, STOREY, WALL)
+		for opening in openings:
+			if str(opening["kind"]) == "door":
+				TownProps._build_panel_opening_trim(body, origin, yaw, opening, 0.0, IRON, WALL, IRON.lightened(0.08))
+				var along := Vector2(cos(yaw), -sin(yaw))
+				var at := Vector2(origin.x, origin.z) + along * float(opening["center"])
+				var out := Vector2(origin.x, origin.z).normalized() if key != "front" else Vector2(0, 1)
+				ClearZones.add(body, str(opening["label"]), "door", at, out, 1.25, 1.25, DOOR_CLEAR * 0.5 + 0.15, 0.05, 1.95)
+			else:
+				_grille(body, origin, yaw, opening)
+		ClearZones.add_wall(body, key, Vector2(origin.x, origin.z) - Vector2(cos(yaw), -sin(yaw)) * float(wall[2]) * 0.5, Vector2(origin.x, origin.z) + Vector2(cos(yaw), -sin(yaw)) * float(wall[2]) * 0.5, 0.0, STOREY, WALL, true)
+	# A cap of pumice along every wall head, under the roofs.
+	for z: float in [-HALF_Z, HALF_Z]:
+		CalderaShell._metal(body, Vector3(0, STOREY + 0.04, z), Vector3(long + 0.1, 0.08, WALL + 0.1), PUMICE, false).material_override = SolidModel.material(PUMICE, 0.85, 0.0)
+	for x: float in [-HALF_X, HALF_X]:
+		CalderaShell._metal(body, Vector3(x, STOREY + 0.04, 0), Vector3(WALL + 0.1, 0.08, short), PUMICE, false).material_override = SolidModel.material(PUMICE, 0.85, 0.0)
+
+
+static func _door(x: float) -> Dictionary:
+	return {"kind": "door", "center": x, "width": DOOR_CLEAR, "bottom": 0.0, "top": DOOR_HEIGHT, "leaves": 2,
+		"exponent": TownProps.OPENING_EXPONENT, "label": "hall door" if x < PARTY_X else "suite door"}
+
+
+static func _window(x: float, width: float, bottom: float, top: float) -> Dictionary:
+	return {"kind": "window", "center": x, "width": width, "bottom": bottom, "top": top, "exponent": TownProps.OPENING_EXPONENT}
+
+
+## A window's glass and its forged grille: a piped iron frame on the outer
+## face, and inside the reveal three bars that rise and fork like a vein of
+## cooled lava, the middle one twice.
+static func _grille(body: StaticBody3D, origin: Vector3, yaw: float, opening: Dictionary) -> void:
+	var pivot := Node3D.new()
+	pivot.position = origin
+	pivot.rotation.y = yaw
+	body.add_child(pivot)
+	var cx := float(opening["center"])
+	var half_w := float(opening["width"]) * 0.5
+	var bottom := float(opening["bottom"])
+	var top := float(opening["top"])
+	var half_h := (top - bottom) * 0.5
+	var mid := (top + bottom) * 0.5
+	var loop := OpeningTrim.window_loop(half_w, half_h, TownProps.OPENING_EXPONENT)
+	var pane := MeshInstance3D.new()
+	pane.mesh = SolidModel.extruded_profile_mesh(0.03, Vector2(half_h - 0.004, half_w - 0.004), TownProps.OPENING_EXPONENT, 96)
+	pane.material_override = SolidModel.material(Color(0.80, 0.86, 0.84, 0.30), 0.08, 0.0)
+	pane.position = Vector3(cx, mid, 0.0)
+	pane.rotation.y = PI * 0.5
+	pivot.add_child(pane)
+	CollisionPolicy.mark_decorative(pane)
+	var reveal := OpeningTrim.reveal_liner(loop, WALL * 0.5, PUMICE, Vector2.ZERO, 0.995, true)
+	reveal.position = Vector3(cx, mid, 0.0)
+	pivot.add_child(reveal)
+	var frame := OpeningTrim.piped_frame(loop, 0.035, IRON, true)
+	frame.position = Vector3(cx, mid, -WALL * 0.5)
+	frame.rotation.y = PI
+	pivot.add_child(frame)
+	# The bars, just outside the glass.
+	var z := -0.06
+	for i in 3:
+		var x := cx + (float(i) - 1.0) * half_w * 0.5
+		var root := Vector3(x, bottom + 0.05, z)
+		var fork := Vector3(x, mid + half_h * 0.25, z)
+		_branch(pivot, root, fork)
+		for side: float in [-1.0, 1.0]:
+			var tip := Vector3(x + side * half_w * (0.22 if i == 1 else 0.14), top - half_h * (0.18 if i == 1 else 0.32), z)
+			_branch(pivot, fork, tip)
+			if i == 1:
+				_branch(pivot, tip, Vector3(tip.x + side * 0.08, tip.y + half_h * 0.12, z))
+	var sill := SuperEgg.build_part(Vector3(half_w + 0.1, 0.035, WALL * 0.5 + 0.06), SINTER, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	sill.position = Vector3(cx, bottom - 0.02, 0.0)
+	pivot.add_child(sill)
+	CollisionPolicy.mark_decorative(sill)
+
+
+## Above the hall's walls, the wedge of glass under the raked roof, behind a
+## forged tracery: iron mullions every 2 m that fork as they meet the roof, on
+## the front (full height) and the two sides (rising from back to front); the
+## wing's roof covers the lower part on the party side.
+static func _clerestory(body: StaticBody3D) -> void:
+	var glass := Color(0.86, 0.90, 0.88, 0.22)
+	var x0 := -HALF_X
+	var x1 := PARTY_X
+	# Front: a full rectangle.
+	CalderaShell._wedge_pane(body, Vector2(x0, HALF_Z), Vector2(x1, HALF_Z), STOREY + 0.08, head(HALF_Z), head(HALF_Z), glass)
+	var steps := 5
+	for i in steps + 1:
+		var x := lerpf(x0, x1, float(i) / float(steps))
+		_tracery(body, Vector3(x, STOREY + 0.08, HALF_Z), head(HALF_Z), Vector3.RIGHT)
+	# The sides: wedges.
+	for x: float in [x0, x1]:
+		CalderaShell._wedge_pane(body, Vector2(x, -HALF_Z), Vector2(x, HALF_Z), STOREY + 0.08, head(-HALF_Z), head(HALF_Z), glass)
+		for i in 7:
+			var z := lerpf(-HALF_Z, HALF_Z, float(i) / 6.0)
+			if head(z) - STOREY > 0.5:
+				_tracery(body, Vector3(x, STOREY + 0.08, z), head(z), Vector3.BACK)
+		CalderaShell._beam(body, Vector3(x, head(-HALF_Z) - 0.05, -HALF_Z), Vector3(x, head(HALF_Z) - 0.05, HALF_Z), Vector2(0.1, 0.12), IRON)
+	CalderaShell._beam(body, Vector3(x0, head(HALF_Z) - 0.05, HALF_Z), Vector3(x1, head(HALF_Z) - 0.05, HALF_Z), Vector2(0.1, 0.12), IRON)
+
+
+## One clerestory mullion: a forged bar from the wall head up to the roof,
+## forking into two branches at two thirds of its height; `along` is the
+## wall's direction.
+static func _tracery(body: Node3D, foot: Vector3, top: float, along: Vector3) -> void:
+	var height := top - foot.y
+	var fork := foot + Vector3.UP * height * 0.62
+	_branch(body, foot, fork)
+	for side: float in [-1.0, 1.0]:
+		_branch(body, fork, Vector3(fork.x, top - 0.04, fork.z) + along * side * minf(height * 0.32, 0.55))
+
+
+## The roofs: the hall's raked slab and the wing's, both pale, the wing's with
+## one pale olivine dome over the conversation pit.
+static func _roofs(body: StaticBody3D) -> void:
+	CalderaShell._build_roof(body, HALL_CENTRE, HALL_SIZE, STOREY, HALL_RAKE, {"east": 0.0}, [], ROOF)
+	CalderaShell._build_roof(body, WING_CENTRE, WING_SIZE, STOREY, 0.0, {"west": 0.0},
+		[{"name": "Mediation", "at": Vector2(0.1, -3.5), "half": Vector2(2.2, 1.9), "rise": 0.8, "tint": Color(0.82, 0.90, 0.74, 0.38)}], ROOF)
+
+
+## Two branching iron columns down the hall's middle carrying its raked roof,
+## each a trunk that splits into four limbs, like a tree of cooled lava.
+static func _tree_columns(body: StaticBody3D) -> void:
+	for x: float in [-5.4, -0.6]:
+		var foot := Vector3(x, 0.0, 1.2)
+		var crown := Vector3(x, 3.0, 1.2)
+		_branch(body, foot, crown, 0.09)
+		CalderaFurniture.piece(body, Vector3(0.2, 0.06, 0.2), PUMICE, Vector3(x, 0.06, 1.2), 0.0, false, 4.0)
+		var holder := MeshInstance3D.new()
+		body.add_child(holder)
+		CollisionPolicy.add_box(body, holder, Vector3(0.18, 3.0, 0.18), Vector3(x, 1.5, 1.2), Basis(), false)
+		for corner: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
+			var reach := Vector3(x + corner.x * 1.0, 0.0, 1.2 + corner.y * 1.1)
+			var elbow := crown + (reach - Vector3(x, 0.0, 1.2)) * 0.4 + Vector3.UP * 0.7
+			_branch(body, crown, elbow, 0.06)
+			var bearing := Vector3(reach.x, head(reach.z) + 0.06, reach.z)
+			_branch(body, elbow, bearing, 0.045)
+			# A forged plate where the limb takes the roof.
+			var plate := SuperEgg.build_part(Vector3(0.22, 0.03, 0.22), IRON, 2.6, 6.0)
+			plate.material_override = SolidModel.material(IRON, 0.3, 0.85)
+			plate.position = Vector3(reach.x, head(reach.z) + 0.07, reach.z)
+			plate.rotation.x = -atan2(HALL_RAKE, HALF_Z * 2.0)
+			body.add_child(plate)
+			CollisionPolicy.mark_decorative(plate)
 
 
 ## The molten surfaces in the body's plan, for the terrain's lava queries:
@@ -146,11 +280,11 @@ static func register_lava(body: Node3D, terrain: Node) -> void:
 		terrain.register_lava_polygon(world, height)
 
 
-## The party wall: stone to 3.0 m with the staff door into the suite and the
-## mediation door, a band in each side's colour to the wing's roof; the wall
-## between the suite and the mediation room, stone with no door.
+## The party wall, full height in tuff, with the staff door into the suite and
+## the mediation door; the wall between the suite and the mediation room, with
+## no door. Doors are superellipse openings with iron frames and leaves.
 static func _partitions(body: StaticBody3D) -> void:
-	var front := WING_SIZE.y * 0.5
+	var front := HALF_Z - WALL * 0.5
 	var back := -front
 	var doors := [[MEDIATION_DOOR_Z, "mediation door"], [STAFF_DOOR_Z, "staff door"]]
 	var cursor := back
@@ -158,17 +292,26 @@ static func _partitions(body: StaticBody3D) -> void:
 		var z: float = door[0]
 		var south := z - INNER_DOOR_WIDTH * 0.5 - 0.35
 		var north := minf(z + INNER_DOOR_WIDTH * 0.5 + 0.35, front)
-		FireCalderaBuildings._slab(body, (cursor + south) * 0.5, south - cursor, PARTY_X, false, 0.0, PARTITION_SOLID, FireCalderaBuildings.BASALT_PARTITION)
-		CalderaShell.door_opening(body, Vector3(PARTY_X, 0.0, (south + north) * 0.5), PI * 0.5, north - south, PARTITION_SOLID, 0.18, INNER_DOOR_WIDTH, INNER_DOOR_HEIGHT, 1, FireCalderaBuildings.BASALT_PARTITION)
+		_inner(body, Vector3(PARTY_X, STOREY * 0.5, (cursor + south) * 0.5), Vector3(0.22, STOREY, south - cursor))
+		CalderaShell.door_opening(body, Vector3(PARTY_X, 0.0, (south + north) * 0.5), PI * 0.5, north - south, STOREY, 0.22, INNER_DOOR_WIDTH, INNER_DOOR_HEIGHT, 1, TUFF)
 		for direction: Vector2 in [Vector2(1, 0), Vector2(-1, 0)]:
 			ClearZones.add(body, str(door[1]), "door", Vector2(PARTY_X, z), direction, 0.0, 1.0, INNER_DOOR_WIDTH * 0.5, 0.05, 1.9)
 		cursor = north
 	if front - cursor > 0.05:
-		FireCalderaBuildings._slab(body, (cursor + front) * 0.5, front - cursor, PARTY_X, false, 0.0, PARTITION_SOLID, FireCalderaBuildings.BASALT_PARTITION)
-	FireCalderaBuildings._band(body, back, SUITE_BACK_Z, PARTY_X, false, COBALT)
-	FireCalderaBuildings._band(body, SUITE_BACK_Z, front, PARTY_X, false, AMBER)
-	FireCalderaBuildings._slab(body, WING_CENTRE.x, WING_SIZE.x, SUITE_BACK_Z, true, 0.0, PARTITION_SOLID, FireCalderaBuildings.BASALT_PARTITION)
-	FireCalderaBuildings._band(body, PARTY_X, PARTY_X + WING_SIZE.x, SUITE_BACK_Z, true, AMBER)
+		_inner(body, Vector3(PARTY_X, STOREY * 0.5, (cursor + front) * 0.5), Vector3(0.22, STOREY, front - cursor))
+	_inner(body, Vector3(WING_CENTRE.x + 0.11, STOREY * 0.5, SUITE_BACK_Z), Vector3(WING_SIZE.x - WALL * 0.5 - 0.11, STOREY, 0.22))
+
+
+static func _inner(body: StaticBody3D, at: Vector3, size: Vector3) -> void:
+	var mesh := MeshInstance3D.new()
+	mesh.name = "TuffPartition"
+	var box := BoxMesh.new()
+	box.size = size
+	mesh.mesh = box
+	mesh.material_override = SolidModel.material(TUFF, 0.88, 0.0)
+	mesh.position = at
+	body.add_child(mesh)
+	CollisionPolicy.add_box(body, mesh, size, at, Basis(), false)
 
 
 ## The molten-floor room: the whole floor of the bay a thin molten layer for
@@ -233,10 +376,10 @@ static func _forged_screen(body: StaticBody3D, from: Vector2, to: Vector2) -> vo
 	CollisionPolicy.add_box(body, rail, CalderaShell._oriented(Vector3(length, 2.4, 0.1), yaw), Vector3(mid.x, 1.25, mid.y), Basis(), false)
 
 
-static func _branch(body: StaticBody3D, root: Vector3, tip: Vector3) -> void:
+static func _branch(body: Node3D, root: Vector3, tip: Vector3, radius: float = 0.022) -> void:
 	var delta := tip - root
-	var part := SuperEgg.build_part(Vector3(0.022, delta.length() * 0.5 + 0.02, 0.022), CalderaShell.STEEL_BLUED, 6.0, 6.0)
-	part.material_override = SolidModel.material(CalderaShell.STEEL_BLUED, 0.3, 0.85)
+	var part := SuperEgg.build_part(Vector3(radius, delta.length() * 0.5 + radius, radius), IRON, 6.0, 6.0)
+	part.material_override = SolidModel.material(IRON, 0.3, 0.85)
 	var up := delta.normalized()
 	var x_axis := up.cross(Vector3.FORWARD if absf(up.dot(Vector3.FORWARD)) < 0.9 else Vector3.RIGHT).normalized()
 	part.transform = Transform3D(Basis(x_axis, up, x_axis.cross(up)), (root + tip) * 0.5)
@@ -272,9 +415,11 @@ static func _hall_fittings(body: StaticBody3D) -> void:
 	CalderaFurniture.shelves(body, Vector3(-7.62, 0.0, 4.4), -PI * 0.5, 2.4, 4, func(b: StaticBody3D, p: Vector3, i: int) -> void:
 		var minerals: Array[Color] = [Color(0.55, 0.30, 0.60), Color(0.30, 0.62, 0.55), Color(0.80, 0.55, 0.20), Color(0.62, 0.20, 0.18), Color(0.85, 0.82, 0.72)]
 		CalderaFurniture.piece(b, Vector3(0.06, 0.05, 0.06), minerals[(i * 3) % minerals.size()], p + Vector3(0, 0.05, 0), float(i) * 0.7, false, 2.6))
-	CalderaFurniture.bench(body, Vector3(-0.2, 0.0, 3.2), 0.0, 2.2)
+	CalderaFurniture.piece(body, Vector3(1.1, 0.22, 0.26), SINTER.darkened(0.06), Vector3(-0.2, 0.22, 3.2), 0.0, true)
 	for x: float in [-4.6, -1.4]:
-		CalderaFurniture.flame_capsule(body, Vector3(x, 0.0, 5.55))
+		CalderaFurniture.flame_capsule(body, Vector3(x, 0.0, 5.45))
+	for x: float in [-5.4, -0.6]:
+		CalderaFurniture.concealed_light(body, Vector3(x, 3.4, 1.2), CalderaFurniture.LED_WARM, 0.9, 7.0)
 
 
 ## The mediation room: a conversation pit for disagreements that have become
@@ -301,13 +446,14 @@ static func _mediation_room(body: StaticBody3D) -> void:
 		var inward := -rim.normalized()
 		var p := at + rim + inward * 0.26
 		var yaw := atan2(inward.x, inward.y)
-		var seat := CalderaFurniture.piece(body, Vector3(0.3, (seat_top - 0.06 + depth) * 0.5, 0.24), CalderaShell.BASALT.lightened(0.06), Vector3(p.x, -depth + (seat_top - 0.06 + depth) * 0.5, p.y), yaw, true, 5.0)
+		# The bench is clad in trencadis, each block a different broken mineral.
+		var seat := CalderaFurniture.piece(body, Vector3(0.3, (seat_top - 0.06 + depth) * 0.5, 0.24), MOSAIC[(i * 3) % MOSAIC.size()], Vector3(p.x, -depth + (seat_top - 0.06 + depth) * 0.5, p.y), yaw, true, 5.0)
 		seat.name = "PitBench"
 		# A silica-cloth cushion, the one textile a lava body can sit on.
-		CalderaFurniture.piece(body, Vector3(0.28, 0.04, 0.22), CalderaFurniture.SILICA, Vector3(p.x, seat_top - 0.04, p.y), yaw, false, SuperEgg.EPSILON_SOFT)
+		CalderaFurniture.piece(body, Vector3(0.28, 0.04, 0.22), OLIVINE.lightened(0.2), Vector3(p.x, seat_top - 0.04, p.y), yaw, false, SuperEgg.EPSILON_SOFT)
 	# The step down, at the door end.
 	var step := at + Vector2(-half.x + 0.3, 0.0)
-	CalderaFurniture.piece(body, Vector3(0.28, (depth * 0.5) * 0.5, 0.45), CalderaShell.BASALT.lightened(0.06), Vector3(step.x, -depth + depth * 0.25, step.y), 0.0, true, 5.0)
+	CalderaFurniture.piece(body, Vector3(0.28, (depth * 0.5) * 0.5, 0.45), SINTER, Vector3(step.x, -depth + depth * 0.25, step.y), 0.0, true, 5.0)
 	FireCalderaBuildings._glow(body, "PitSeam", Vector3(0.9, 0.01, 0.5), Vector3(at.x, -depth + 0.012, at.y), Color(1.0, 0.45, 0.10))
 	# A concealed LED line under the pit's lip, lighting the cushions.
 	var lip := PackedVector2Array()
@@ -323,7 +469,7 @@ static func _mediation_room(body: StaticBody3D) -> void:
 		CalderaFurniture.led_line(body, Vector3(mid.x, -0.035, mid.y), atan2(-(b - a).y, (b - a).x), a.distance_to(b) + 0.01, CalderaFurniture.LED_WARM)
 	CalderaFurniture.concealed_light(body, Vector3(at.x, -0.1, at.y), Color(1.0, 0.6, 0.3), 0.8, 3.5)
 	FireCalderaBuildings._marker(body, "MediationMarker", Vector3(at.x, -depth, at.y), 0.0)
-	CalderaFurniture.concealed_light(body, Vector3(at.x, 2.9, at.y), CalderaFurniture.LED_WARM.lerp(CalderaFurniture.LED_COOL, 0.5), 0.6, 5.0)
+	CalderaFurniture.concealed_light(body, Vector3(at.x, 3.2, at.y), CalderaFurniture.LED_WARM, 0.9, 6.0)
 
 
 ## Eris's suite: her own door from the promenade's east end into an entry, a
@@ -332,10 +478,10 @@ static func _mediation_room(body: StaticBody3D) -> void:
 ## corner, and along the east wall her shelf of objects from seventy years.
 static func _suite(body: StaticBody3D) -> void:
 	# Entry: a basalt ledge to set things on, by the door.
-	CalderaFurniture.piece(body, Vector3(0.2, 0.45, 0.35), CalderaShell.BASALT, Vector3(7.6, 0.45, 4.0), 0.0, true)
+	CalderaFurniture.piece(body, Vector3(0.18, 0.45, 0.3), SINTER.darkened(0.08), Vector3(7.55, 0.45, 3.55), 0.0, true)
 	# Receiving: two warm seats side by side.
 	for x: float in [5.0, 6.3]:
-		CalderaFurniture.piece(body, Vector3(0.34, 0.22, 0.3), CalderaShell.BASALT.lightened(0.05), Vector3(x, 0.22, 3.4), 0.0, true, SuperEgg.EPSILON_SOFT)
+		CalderaFurniture.piece(body, Vector3(0.34, 0.22, 0.3), RHYOLITE, Vector3(x, 0.22, 3.4), 0.0, true, SuperEgg.EPSILON_SOFT)
 	# Shaping: a tall obsidian glass on the party wall, a line behind its head.
 	var mirror := CalderaFurniture.piece(body, Vector3(0.02, 1.0, 0.5), Color(0.05, 0.05, 0.06), Vector3(PARTY_X + 0.14, 1.25, 2.9), 0.0, false, 7.0)
 	mirror.material_override = SolidModel.material(Color(0.05, 0.05, 0.06), 0.04, 0.5)
@@ -359,7 +505,7 @@ static func _suite(body: StaticBody3D) -> void:
 	CalderaFurniture.concealed_light(body, Vector3(WELL_CENTRE.x, 0.6, WELL_CENTRE.y), Color(1.0, 0.5, 0.18), 1.1, 4.5)
 	# The resting niche: a cooler basalt slab in a stone alcove, back east.
 	CalderaFurniture.piece(body, Vector3(0.9, 0.16, 0.5), COOL_LEDGE, Vector3(6.9, 0.16, -0.35), 0.0, true, SuperEgg.EPSILON_SOFT)
-	CalderaFurniture.piece(body, Vector3(0.08, 1.1, 0.5), CalderaShell.VOLCANIC_STONE, Vector3(5.9, 1.1, -0.4), 0.0, true)
+	CalderaFurniture.piece(body, Vector3(0.08, 1.1, 0.5), TUFF, Vector3(5.9, 1.1, -0.4), 0.0, true)
 	FireCalderaBuildings._marker(body, "ErisRestMarker", Vector3(6.9, 0.32, -0.35), 0.0)
 	# Seventy years of objects: glass and steel shelves on the east wall, each
 	# piece different, gifts and keepsakes from every household.
@@ -367,4 +513,4 @@ static func _suite(body: StaticBody3D) -> void:
 		var keepsakes: Array[Color] = [Color(0.55, 0.30, 0.60), Color(0.82, 0.62, 0.24), Color(0.30, 0.62, 0.55), Color(0.70, 0.73, 0.75), Color(0.62, 0.20, 0.18), Color(0.16, 0.30, 0.72)]
 		var size := 0.04 + 0.03 * float((i * 7) % 3)
 		CalderaFurniture.piece(b, Vector3(size, size * (1.0 + float(i % 2)), size), keepsakes[(i * 5) % keepsakes.size()], p + Vector3(0, size * (1.0 + float(i % 2)), 0), float(i), false, 2.0 + float(i % 4)))
-	CalderaFurniture.concealed_light(body, Vector3(5.0, 2.9, 2.4), CalderaFurniture.LED_WARM, 0.5, 5.0)
+	CalderaFurniture.concealed_light(body, Vector3(5.0, 3.2, 2.4), CalderaFurniture.LED_WARM, 0.9, 6.0)

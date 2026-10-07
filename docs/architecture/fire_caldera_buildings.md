@@ -49,6 +49,28 @@ The entry sculpture uses the same steel and the same two glass colours, so it
 belongs to the building. Full glass panels, never subdivided, fill the bays
 below. It appears on all ten plots.
 
+### Families by program (2026-10-07)
+
+Buildings differ by what they are for, and the kit has two families:
+
+- **Commercial and public: the glass pavilion** (the guest house first). Sleek
+  and themed, inviting people to look in and out: full glass bays between
+  blued-steel posts, the forked post and two-tone stained band, a dark basalt
+  plinth, concealed LED light.
+- **Care and restoration: the tuff house** (Nahl first). Soothing and light
+  rather than sleek: thick walls of pale cream tuff with a few deep
+  superellipse openings, floors of white hot-spring sinter, pumice caps and
+  sills, pale roofs; no stained band and no amber or cobalt. Its accents are
+  the caldera's soft minerals (pale olivine, sulphur cream, rose rhyolite) and
+  trencadis of broken mineral tile. Its character is hand-forged ironwork:
+  branching window grilles, clerestory tracery, screens and branching
+  columns. Lava is the only strong colour. Openings here are punched windows,
+  so the "never a superellipse cut-out window" rule applies to the pavilion
+  family only.
+
+Both share the plinth, the superellipse door, the forged-iron vocabulary and
+the raked clerestory roof where a tall room wants daylight.
+
 ### Exclusions
 
 From the charter: classical columns and pediments, timber gables, shutters,
@@ -162,6 +184,21 @@ The only building in the city designed for cool bodies.
   food in the city.
 
 ### Nahl tempering hall and Eris's suite (`NAHL`, `(-38, -28)`)
+
+**As built (first pass, 2026-10-07; the tuff-house family).** A tempering
+hall under a roof raked up toward the promenade, its wedge of clerestory glass
+behind iron tracery, carried inside by two branching iron columns; the
+molten-floor bay behind forged screens, three radiant platforms, the mineral
+cabinet and two glass-enclosed flames. The wing was swapped after the survey:
+the ground along its back and east sides stands 0.5 to 1.2 m above the floor,
+so **Eris's suite takes the front**, with its own door at the east end where
+R3 meets the promenade (immersion well, cooler resting niche, obsidian
+shaping glass, keepsake shelves), and **the mediation room sits behind** as a
+conversation pit dug 0.5 m into the plinth on the uphill side, its bench clad
+in trencadis with pale olivine cushions, an LED line under its lip and a pale
+dome for its only window. The plan's pit data cuts the plinth, drops the
+hidden ground below it and sets the height query.
+
 
 - **Mass:** a 16 × 12 m shell on a stepped podium. Its public face looks onto
   the promenade (`R1`); a separate guest-side approach runs from `R3`. The hall
@@ -449,7 +486,7 @@ room has two ways out (`fire_caldera_layout.md` section 7).
 |---|---|---|---|---|---|
 | Pylons | sockets | — | — | amber, cobalt | framed air, beacons |
 | Guest house | socket plinth | 1 | shallow shell | cobalt, amber | the cool house |
-| Nahl | stepped podium | 1 | folded | amber, cobalt | radiant platforms |
+| Nahl | socket plinth | 1 | raked clerestory | none (tuff house) | ironwork, conversation pit |
 | Renewal | reservoir edge | open | catenary canopy | amber, garnet, teal | immersion shelf |
 | Oren | socket plinth | 2 | walkable terrace | teal, violet | display cells |
 | Kel | stepped podium | 1 + lift | long span | garnet, amber | handling rail, bridge |

@@ -259,7 +259,7 @@ func _floor_ray_past_shell(space: PhysicsDirectSpaceState3D, from: Vector3, to: 
 		if hit.is_empty():
 			return hit
 		var collider := hit["collider"] as Node
-		if collider == _shell or _shell.is_ancestor_of(collider):
+		if collider == _shell or _shell.is_ancestor_of(collider) or (_nahl != null and (collider == _nahl or _nahl.is_ancestor_of(collider))):
 			excluded.append(hit["rid"])
 			continue
 		return hit

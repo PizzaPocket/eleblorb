@@ -42,7 +42,8 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary, size_key:
 	var rings: Array = [
 		[bottom, height * BATTER], [top - 0.32, 0.0], [top - 0.3, -0.06], [top - 0.14, -0.06], [top - 0.12, 0.0], [top, 0.0],
 	]
-	var colours: Array[Color] = [BASALT.darkened(0.15), BASALT, JOINT_METAL, JOINT_METAL, BASALT.lightened(0.06), BASALT.lightened(0.06)]
+	var top_course: Color = entry.get("floor_finish", BASALT.lightened(0.06))
+	var colours: Array[Color] = [BASALT.darkened(0.15), BASALT, JOINT_METAL, JOINT_METAL, top_course, top_course]
 	var loops: Array = []
 	for ring: Array in rings:
 		loops.append(_loop(centre, across, deep, half + Vector2.ONE * float(ring[1]), float(ring[0])))
@@ -58,12 +59,15 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary, size_key:
 			_quad(st, lower[i], lower[j], upper[j], upper[i], middle, colours[r + 1])
 	var pits := FireCalderaPlan.pit_outlines(entry)
 	var faces := PackedVector3Array()
+	# The top course's finish: basalt, or the plot's own floor (a pale sinter
+	# for a house of care).
+	var finish: Color = entry.get("floor_finish", BASALT.lightened(0.1))
 	if pits.is_empty():
 		# The top, level: one normal straight up.
 		for i in SEGMENTS:
-			_triangle(st, middle, cap[(i + 1) % SEGMENTS], cap[i], Vector3.UP, BASALT.lightened(0.1))
+			_triangle(st, middle, cap[(i + 1) % SEGMENTS], cap[i], Vector3.UP, finish)
 	else:
-		faces = _pitted_top(st, cap, top, pits)
+		faces = _pitted_top(st, cap, top, pits, finish)
 	var mesh := MeshInstance3D.new()
 	mesh.name = "PlinthMesh"
 	mesh.mesh = st.commit()
@@ -107,7 +111,7 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary, size_key:
 ## outlines, each pit's walls and floor, and the outer band of the top course
 ## down to the pits' depth. Adds the surfaces to `st` and returns them as
 ## collision faces (triangles).
-static func _pitted_top(st: SurfaceTool, cap: PackedVector3Array, top: float, pits: Array[Dictionary]) -> PackedVector3Array:
+static func _pitted_top(st: SurfaceTool, cap: PackedVector3Array, top: float, pits: Array[Dictionary], finish: Color) -> PackedVector3Array:
 	var faces := PackedVector3Array()
 	var outer := PackedVector2Array()
 	for point in cap:
@@ -130,7 +134,7 @@ static func _pitted_top(st: SurfaceTool, cap: PackedVector3Array, top: float, pi
 						if remainder.size() >= 3:
 							cut.append(remainder)
 		pieces = cut
-	var lit := BASALT.lightened(0.1)
+	var lit := finish
 	for piece in pieces:
 		var triangles := Geometry2D.triangulate_polygon(piece)
 		for t in range(0, triangles.size(), 3):
@@ -157,14 +161,14 @@ static func _pitted_top(st: SurfaceTool, cap: PackedVector3Array, top: float, pi
 			centre += point
 		centre /= float(outline.size())
 		var inside := Vector3(centre.x, top - float(pit["depth"]) * 0.5, centre.y)
-		var wall := BASALT.darkened(0.1)
+		var wall := finish.darkened(0.12)
 		for i in outline.size():
 			var j := (i + 1) % outline.size()
 			var a := outline[i]
 			var b := outline[j]
 			_quad(st, Vector3(a.x, top, a.y), Vector3(b.x, top, b.y), Vector3(b.x, floor_y, b.y), Vector3(a.x, floor_y, a.y), inside, wall, true)
 			faces.append_array([Vector3(a.x, top, a.y), Vector3(b.x, top, b.y), Vector3(b.x, floor_y, b.y), Vector3(a.x, top, a.y), Vector3(b.x, floor_y, b.y), Vector3(a.x, floor_y, a.y)])
-			_face(st, faces, Vector3(centre.x, floor_y, centre.y), Vector3(a.x, floor_y, a.y), Vector3(b.x, floor_y, b.y), Vector3.UP, BASALT.lightened(0.04))
+			_face(st, faces, Vector3(centre.x, floor_y, centre.y), Vector3(a.x, floor_y, a.y), Vector3(b.x, floor_y, b.y), Vector3.UP, finish.darkened(0.04))
 	return faces
 
 
