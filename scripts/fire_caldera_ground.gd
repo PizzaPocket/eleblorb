@@ -141,6 +141,10 @@ static func survey(entry: Dictionary) -> Dictionary:
 
 ## The ground mesh extends this far from the centre (into the wall blend).
 const EXTENT := 84.0
+## A hidden overlap apron wider than one coarse terrain cell. Coarse triangles
+## are cut at EXTENT - 2, while this identical wall-blended skin continues far
+## enough beneath them that no clipped corner can expose sky.
+const MESH_EXTENT := 90.0
 const CELL := 0.5
 const BASALT := Color(0.13, 0.12, 0.12)
 const TERRACE := Color(0.20, 0.18, 0.17)
@@ -165,14 +169,14 @@ static func crater_wall(local: Vector2) -> float:
 ## collider leaves out every cell touching the plinth itself, so the
 ## foundation is the only floor there.
 static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(FireCalderaGround, "crater_wall")) -> StaticBody3D:
-	var columns := int(EXTENT * 2.0 / CELL) + 1
+	var columns := int(MESH_EXTENT * 2.0 / CELL) + 1
 	var vertices := PackedVector3Array()
 	var inside := PackedByteArray()
 	vertices.resize(columns * columns)
 	inside.resize(columns * columns)
 	for row in columns:
 		for column in columns:
-			var p := Vector2(-EXTENT + float(column) * CELL, -EXTENT + float(row) * CELL)
+			var p := Vector2(-MESH_EXTENT + float(column) * CELL, -MESH_EXTENT + float(row) * CELL)
 			var y := blended_height(p, wall)
 			var socketed := 0
 			for socket: Dictionary in sockets:
@@ -233,6 +237,10 @@ static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(Fire
 	# Seen from above and from inside the basin's banks alike.
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	instance.material_override = material
+	# The coarse triangles that straddle the patch boundary remain underneath
+	# so there can be no hole. Lift only the visible fine skin by one centimetre
+	# to prevent coplanar depth flicker; collision and height queries stay exact.
+	instance.position.y = 0.01
 	body.add_child(instance)
 	var shape := ConcavePolygonShape3D.new()
 	shape.backface_collision = true

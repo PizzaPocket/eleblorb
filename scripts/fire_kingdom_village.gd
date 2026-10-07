@@ -74,7 +74,7 @@ func _build_guest_house()->void:
 	keeper.name="ErisNahl"
 	keeper.display_name="Eris Nahl"
 	keeper.stationary=true
-	keeper.facing_degrees=180.0
+	keeper.facing_degrees=0.0
 	keeper.fixed_ground_y=body.global_position.y+keeper_at.y
 	VillagerAppearance.apply_profile(keeper,6,3,true,FIRE_APPEARANCE)
 	keeper.lava_body=true

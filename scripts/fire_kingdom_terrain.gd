@@ -491,17 +491,18 @@ func _build_mesh_and_collision()->void:
 	var collider:=CollisionShape3D.new();collider.shape=shape;add_child(collider)
 
 
-## The fine mesh is a rotated square. Its outer four metres already equal the
-## coarse surface exactly, so removing coarse triangles by centroid leaves a
-## covered overlap instead of a crack or a second floor under the city.
+## The fine mesh is a rotated square. Its hidden overlap apron reaches eight
+## metres past this cut line, farther than any coarse triangle can extend from
+## its centroid. Thus no cut corner can expose sky, while the two visible skins
+## meet only where their wall-blended heights are identical.
 func _inside_caldera_patch(local:Vector2)->bool:
 	return absf(local.x)<=FireCalderaGround.EXTENT and absf(local.y)<=FireCalderaGround.EXTENT
 
 
 func _coarse_triangle_under_caldera(centre:Vector3)->bool:
 	var local:=FireCalderaPlan.to_local(Vector2(centre.x,centre.z))
-	const SEAM_OVERLAP:=2.0
-	return absf(local.x)<FireCalderaGround.EXTENT-SEAM_OVERLAP and absf(local.y)<FireCalderaGround.EXTENT-SEAM_OVERLAP
+	const CUT_MARGIN:=2.0
+	return absf(local.x)<FireCalderaGround.EXTENT-CUT_MARGIN and absf(local.y)<FireCalderaGround.EXTENT-CUT_MARGIN
 
 
 func _build_caldera_ground()->void:

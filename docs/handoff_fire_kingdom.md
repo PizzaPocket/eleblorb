@@ -30,18 +30,20 @@ surface foundations, and the finished guest house exist and validate.
 - The building briefs (`fire_caldera_buildings.md`) were approved by the user
   on 2026-10-07.
 
-- `scripts/caldera_shell.gd` (`CalderaShell`): the kit's first shell, now live
-  as the guest house as well as prototyped in `tools/fire_caldera_proof.tscn`: steel
-  frame on the 2 m module, smoky glazed front between branching mullions,
-  basalt composite walls, a stained clerestory band, a 3 m door bay with a
-  2 m clear opening and pivoting leaves, a shallow walkable roof slab. The
-  proof checks its door bay is clear, 2.4 m of headroom, and that it stands on
-  its plinth. `FireCalderaBuildings.guest_house()` adds the receiving room,
-  provisions cabinet, washroom, eight-bed party room and rest markers; the
-  proof checks all inner doorways. Its 13 × 4 m dry terrace is supported by
-  the same widened socket, its cobalt-and-amber entry fin keeps clear of the
-  door, and Eris Nahl now offers the registered 25-Tokoin rest point. Not yet:
-  the curved superellipse plan the landmarks need.
+- `scripts/caldera_shell.gd` (`CalderaShell`): the kit's first revised shell,
+  live as the guest house and isolated in `tools/fire_caldera_proof.tscn`.
+  Continuous punched volcanic-stone wall planes and broad SuperEgg windows
+  sit in a bright stainless and heat-blued frame. Complete ribs visibly carry
+  a superellipse barrel shell with a four-metre smoky-glass crown and glazed
+  curved ends; this replaces the rejected rounded rectangular roof slab.
+  The fitted 2.2 m double door uses the same punched-opening system.
+  `FireCalderaBuildings.guest_house()` now has an open receiving lounge plus
+  provisions, washroom and two private one-bed rooms under a proper rear
+  ceiling. All four inner doors are punched and framed; Eris faces the entry.
+  The raised decorative floor clash was removed, the threshold fin's two
+  glass leaves are real SuperEggs with branches ending on them, and there is
+  deliberately no open fire in this cool-bodied guest building. The proof
+  checks all doorways and layout clear zones (0 FAIL).
 
 - `tools/fire_caldera_world_probe.tscn`: instantiates the real terrain and
   checks the fine ground and reservoir exist, live height and lava queries,
@@ -49,11 +51,16 @@ surface foundations, and the finished guest house exist and validate.
   below the city (0 FAIL). `village_aerial_capture.gd -- --village=fire`
   renders the live transition for visual review.
 
-Next, in order: build the remaining briefs plot by plot, beginning with the
-arrival forecourt and its paired welcome pylons so the guest route has its
-authored public approach, then the Nahl tempering hall and Eris's suite.
-Only after their replacements work should the old eight houses, fountain,
-braziers and placeholder residents be removed.
+- Walkthrough correction: the fine wall-blended terrain skin now continues in
+  a hidden eight-metre apron beyond the coarse triangle cut line, farther than
+  a cut triangle can reach, eliminating the rim's blue triangular holes. The
+  fine visual mesh is lifted 1 cm above its matching collider to prevent
+  boundary depth flicker without changing floor height.
+
+Pause here for the user's second in-game walkthrough. Do not begin another
+building until its stylistic notes have been folded into the shared kit.
+After approval, build the remaining briefs plot by plot, beginning with the
+arrival forecourt and paired welcome pylons, then Nahl hall and Eris's suite.
 
 Status: community, civic-system, and architectural brief complete enough for a
 dimensioned layout synthesis; the fourteen-person census was approved on

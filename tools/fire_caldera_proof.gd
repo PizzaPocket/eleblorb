@@ -99,7 +99,7 @@ func _check() -> void:
 				walled += 1
 				var reveal := edge - outward * 0.6
 				# Past any roof overhanging the reveal: the check is of its floor.
-				var hit := _ray(space, Vector3(reveal.x, ground + 2.0, reveal.y), Vector3(reveal.x, datum - 1.0, reveal.y), _building_rids())
+				var hit := _floor_ray_past_shell(space, Vector3(reveal.x, ground + 2.0, reveal.y), Vector3(reveal.x, datum - 1.0, reveal.y))
 				if hit.is_empty() or hit["collider"] != plinth or absf(float(hit["position"].y) - datum) > 0.06:
 					var detail := "no floor" if hit.is_empty() else "%s at %.2f" % [(hit["collider"] as Node).name, float(hit["position"].y)]
 					_fail("%s: the uphill reveal at %s is not clear at the datum (%s)" % [id, str(reveal.round()), detail])
@@ -142,16 +142,22 @@ func _check_shell(space: PhysicsDirectSpaceState3D) -> void:
 	var below := _ray(space, to_world * Vector3(0.0, 0.5, 0.0), to_world * Vector3(0.0, -1.0, 0.0), [])
 	if below.is_empty() or below["collider"] != _plinths["GUEST"]:
 		_fail("GUEST: the shell does not stand on its plinth")
-	# Each inner doorway clear at chest height: party room, washroom, cabinet.
-	for door: Array in [["party room", Vector3(-2.2, 1.2, 2.5), Vector3(-0.8, 1.2, 2.5)], ["washroom", Vector3(-0.8, 1.2, -1.7), Vector3(-2.2, 1.2, -1.7)],
-			["provisions cabinet", Vector3(-5.25, 1.2, -0.3), Vector3(-5.25, 1.2, -1.7)]]:
+	# Each rear room has a punched, fitted doorway directly off the lounge.
+	for door: Array in [
+		["provisions room", Vector3(-5.0, 1.2, 0.2), Vector3(-5.0, 1.2, -1.2)],
+		["washroom", Vector3(-1.75, 1.2, 0.2), Vector3(-1.75, 1.2, -1.2)],
+		["west guest room", Vector3(1.625, 1.2, 0.2), Vector3(1.625, 1.2, -1.2)],
+		["east guest room", Vector3(4.875, 1.2, 0.2), Vector3(4.875, 1.2, -1.2)],
+	]:
 		var hit := _ray(space, to_world * (door[1] as Vector3), to_world * (door[2] as Vector3), [])
 		if not hit.is_empty():
 			_fail("GUEST: the %s doorway is blocked by %s" % [door[0], (hit["collider"] as Node).name])
-	for marker in ["WakeMarker", "StandMarker", "GatherMarker", "KeeperStand", "DryPartyTerrace", "EntryFin"]:
+	for marker in ["WakeMarker", "StandMarker", "GatherMarker", "KeeperStand", "DryGuestTerrace", "EntryFin", "CoolRearCeiling", "SuperellipseBarrelRoof"]:
 		if _shell.get_node_or_null(marker) == null:
 			_fail("GUEST: no %s" % marker)
-	print("ok   GUEST: door bay and inner doorways clear, roof, plinth and rest markers in place")
+	for problem in ClearZones.audit(_shell):
+		_fail("GUEST layout: %s" % problem)
+	print("ok   GUEST: fitted doorways clear; two-room plan, roof, plinth and rest markers in place")
 
 
 func _building_rids() -> Array:
@@ -168,6 +174,22 @@ func _ray(space: PhysicsDirectSpaceState3D, from: Vector3, to: Vector3, exclude:
 	query.collision_mask = 1
 	query.exclude = exclude
 	return space.intersect_ray(query)
+
+
+## CSG walls own physics RIDs that are not the shell body's RID. Skip any such
+## envelope hit when a proof ray is specifically checking the plinth below it.
+func _floor_ray_past_shell(space: PhysicsDirectSpaceState3D, from: Vector3, to: Vector3) -> Dictionary:
+	var excluded := _building_rids()
+	for _i in 16:
+		var hit := _ray(space, from, to, excluded)
+		if hit.is_empty():
+			return hit
+		var collider := hit["collider"] as Node
+		if collider == _shell or _shell.is_ancestor_of(collider):
+			excluded.append(hit["rid"])
+			continue
+		return hit
+	return {}
 
 
 func _stage() -> void:
@@ -214,7 +236,7 @@ func _render() -> void:
 		camera.look_at(Vector3(to.x, FireCalderaGround.blended_height(to, Callable(FireCalderaGround, "crater_wall")) + float(pose[3]), to.y), Vector3.UP)
 		for _i in 4:
 			await RenderingServer.frame_post_draw
-		var roof := _shell.get_node_or_null("Roof") as Node3D if _shell != null else null
+		var roof := _shell.get_node_or_null("SuperellipseBarrelRoof") as Node3D if _shell != null else null
 		if roof != null:
 			roof.visible = name != "guest_cutaway"
 		if name == "guest_cutaway":

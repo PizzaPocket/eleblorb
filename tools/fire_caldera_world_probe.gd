@@ -78,7 +78,7 @@ func _run() -> void:
 		var guest := frame.get_node_or_null("GUESTShell") as StaticBody3D
 		_expect(guest != null, "the live village builds the finished guest house")
 		if guest != null:
-			for child_name in ["DryPartyTerrace", "EntryFin", "WakeMarker", "StandMarker", "GatherMarker", "KeeperStand", "ErisNahl"]:
+			for child_name in ["DryGuestTerrace", "EntryFin", "WakeMarker", "StandMarker", "GatherMarker", "KeeperStand", "CoolRearCeiling", "SuperellipseBarrelRoof", "ErisNahl"]:
 				_expect(guest.get_node_or_null(child_name) != null, "the live guest house has %s" % child_name)
 			var eris := guest.get_node_or_null("ErisNahl")
 			if eris != null:

@@ -88,43 +88,45 @@ Christian, Catalan or classical symbols; copied Gaudí buildings.
 The only building in the city designed for cool bodies.
 
 - **Mass:** one low insulated shell 13 × 10 m on a socket plinth, its long
-  glazed side facing the forecourt; a dry party terrace 13 × 4 m in front,
+  glazed side facing the forecourt; a dry guest terrace 13 × 4 m in front,
   within the 17 × 14 m plot.
 - **Envelope:** double insulated basalt walls with a ventilated cavity, smoky
   glass to cut the glare of the reservoir, and no thermal services beneath it.
-  The guest wing's floor is cooled.
+  The guest wing's floor is cooled. A structural stainless frame carries a
+  true superellipse barrel shell rather than a rounded slab. A four-metre
+  smoky-glass crown and glazed curved ends bring daylight into the lounge;
+  the four rear rooms have a lower cool ceiling which every partition meets.
 - **Rooms:**
 
 | Room | Size | Description |
 |---|---|---|
-| Receiving room | 5 × 6 m | the door from the forecourt; a counter where Eris meets guests; a cool stone bench; a window onto the reservoir |
-| Provisions cabinet | 2.5 × 4 m | a sealed, insulated store of imported food and water for the rare guest, its door off the receiving room |
-| Washroom | 2.5 × 4 m | modern: an **incinerating toilet** in insulated basalt, heated by the city's thermal system; a cool-water basin and a shower fed from a sealed tank refilled from the provisions; its door opens off the party room, so guests never cross the receiving room to reach it |
-| Party room | 8 × 10 m | eight human-length beds in two rows, a long table, a cool floor, a broad window over the reservoir; the wake marker; the party gathers here and on the terrace |
+| Receiving lounge | 13 × 5.5 m | the door from the forecourt; Eris's counter facing arrivals; cool stone bench; a small visitor table; broad outlook and the skylight above |
+| Provisions room | 3 × 4.5 m | a sealed, insulated store of imported food and water for rare guests |
+| Washroom | 3.5 × 4.5 m | an **incinerating toilet** in insulated basalt, cool-water basin, and shower fed from a sealed tank |
+| Guest room west | 3.25 × 4.5 m | one human-length bed, small chest, rear window, and the wake marker |
+| Guest room east | 3.25 × 4.5 m | one human-length bed, small chest, and rear window |
 
-- **Plan (audited 2026-10-07):** a 5 m west column and the 8 m party room.
-  - The column holds the receiving room at the front (5 × 6), then the
-    provisions cabinet (west) and washroom (east) side by side behind it
-    (2.5 × 4 each).
-  - The party room fills the 8 × 10 m east side. Its door is in the shared
-    wall with the receiving room, and the washroom opens off its west wall.
-  - Totals: 5 + 8 = 13 m by 6 + 4 = 10 m.
+- **Plan (revised after walkthrough, 2026-10-07):** the front lounge is one
+  generous daylit room. The four rear rooms total 3 + 3.5 + 3.25 + 3.25 =
+  13 m across and open directly from it through punched superellipse doors.
+  The two-bed capacity is intentional: the caldera receives few outsiders.
 - **Pass-throughs:**
-  - The washroom is reached through the party room: it is the guests' own
-    suite, which is legitimate.
-  - The cabinet opens off the receiving room: it is the keeper's store off
-    her own counter.
+  - None. Both bedrooms, the washroom and provisions room open from the
+    receiving lounge.
 
-- **Glass:** cobalt (cooling) and amber (welcome) in the entry fin and a
-  clerestory band.
+- **Glass:** cobalt (cooling) and amber (welcome) in a two-pane SuperEgg entry
+  fin whose forged branches terminate on the pane geometry; broad smoky
+  punched windows; and the glass crown and curved end lights above.
 - **Variation:** the only cool building; the only beds and the only food in the
-  city.
-- **Built (2026-10-07):** the shell is offset 2 m toward the service edge so
+  city. It deliberately has no open fire.
+- **Built and revised (2026-10-07):** the shell is offset 2 m toward the service edge so
   the full 13 × 4 m dry terrace fits on the public side of the 17 × 14 m
   reserved plot. A single enlarged socket plinth supports both rather than
   introducing a second floor collider. The cobalt-and-amber entry fin stands
-  beside the 2 m clear doorway. Eris, all four rest markers, and the 25-Tokoin
-  transaction are wired in the live Fire Kingdom.
+  beside the fitted 2.2 m clear double doorway. Continuous punched volcanic
+  stone planes replace freestanding wall blobs; stainless and heat-blued
+  metal carry the shell. Eris faces the entrance, and the rest markers and
+  25-Tokoin transaction are wired in the live Fire Kingdom.
 
 ### Nahl tempering hall and Eris's suite (`NAHL`, `(-38, -28)`)
 
