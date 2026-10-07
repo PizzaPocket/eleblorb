@@ -97,7 +97,10 @@ const PLOTS: Array[Dictionary] = [
 		# Open public ground: the arrival routes cross it.
 		"open": true},
 	{"id": "NAHL", "centre": Vector2(-36.5, -30.0), "footprint": Vector2(16.0, 12.0), "reserved": Vector2(22.0, 18.0),
-		"household": "Nahl", "program": "tempering hall and Eris's suite; public face to the promenade, guest entrance toward arrival", "occupied": true},
+		"household": "Nahl", "program": "tempering hall and Eris's suite; public face to the promenade, guest entrance toward arrival", "occupied": true,
+		# The mediation room's conversation pit, dug into the plinth on its
+		# uphill side, where the socket is deepest (in the building's frame).
+		"pits": [{"at": Vector2(5.1, -3.5), "half": Vector2(1.95, 1.55), "depth": 0.5, "exponent": 4.0}]},
 	{"id": "GUEST", "centre": Vector2(-27.0, -51.0), "footprint": Vector2(15.5, 12.0), "reserved": Vector2(17.0, 14.0),
 		"household": "Nahl", "program": "insulated guest house and party rest point, seen from arrival, apart from the treatment rooms", "occupied": true,
 		# The enlarged shell nearly fills its reserved envelope; the foundation
@@ -147,6 +150,33 @@ static func mass_centre(entry: Dictionary) -> Vector2:
 	var across := Vector2(-deep.y, deep.x)
 	var offset: Vector2 = entry.get("mass_offset", Vector2.ZERO)
 	return (entry["centre"] as Vector2) + across * offset.x + deep * offset.y
+
+
+## A point in a building's own frame (CalderaShell's: +Z its front, origin
+## its mass centre) in plan coordinates.
+static func shell_to_plan(entry: Dictionary, local: Vector2) -> Vector2:
+	var deep := facing(entry)
+	var turned := Basis(Vector3.UP, atan2(deep.x, deep.y)) * Vector3(local.x, 0.0, local.y)
+	return mass_centre(entry) + Vector2(turned.x, turned.z)
+
+
+## A plot's sunken pits (conversation pits dug into its plinth) as plan
+## outlines: [{"outline": PackedVector2Array, "depth": float}].
+static func pit_outlines(entry: Dictionary) -> Array[Dictionary]:
+	var list: Array[Dictionary] = []
+	for pit: Dictionary in entry.get("pits", []):
+		var at: Vector2 = pit["at"]
+		var half: Vector2 = pit["half"]
+		var exponent := float(pit.get("exponent", 4.0))
+		var outline := PackedVector2Array()
+		for i in 48:
+			var t := TAU * float(i) / 48.0
+			var c := cos(t)
+			var s := sin(t)
+			var local := at + Vector2(signf(c) * pow(absf(c), 2.0 / exponent) * half.x, signf(s) * pow(absf(s), 2.0 / exponent) * half.y)
+			outline.append(shell_to_plan(entry, local))
+		list.append({"outline": outline, "depth": float(pit["depth"])})
+	return list
 
 
 ## A plot's rectangle (footprint or reserved) as four corners, its depth along

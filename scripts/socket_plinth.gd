@@ -56,9 +56,14 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary, size_key:
 		for i in SEGMENTS:
 			var j := (i + 1) % SEGMENTS
 			_quad(st, lower[i], lower[j], upper[j], upper[i], middle, colours[r + 1])
-	# The top, level: one normal straight up.
-	for i in SEGMENTS:
-		_triangle(st, middle, cap[(i + 1) % SEGMENTS], cap[i], Vector3.UP, BASALT.lightened(0.1))
+	var pits := FireCalderaPlan.pit_outlines(entry)
+	var faces := PackedVector3Array()
+	if pits.is_empty():
+		# The top, level: one normal straight up.
+		for i in SEGMENTS:
+			_triangle(st, middle, cap[(i + 1) % SEGMENTS], cap[i], Vector3.UP, BASALT.lightened(0.1))
+	else:
+		faces = _pitted_top(st, cap, top, pits)
 	var mesh := MeshInstance3D.new()
 	mesh.name = "PlinthMesh"
 	mesh.mesh = st.commit()
@@ -68,10 +73,16 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary, size_key:
 	material.roughness = 0.9
 	mesh.material_override = material
 	body.add_child(mesh)
-	# One convex collider: the battered base from its foot to the datum.
+	# One convex collider: the battered base from its foot to the datum, or,
+	# under a pit, to just below the pit's floor, with the pitted top course
+	# as one concave collider over it.
 	var hull := PackedVector3Array()
 	hull.append_array(loops[0])
-	hull.append_array(cap)
+	if faces.is_empty():
+		hull.append_array(cap)
+	else:
+		for point in cap:
+			hull.append(Vector3(point.x, top - _deepest(pits) - 0.05, point.z))
 	var shape := ConvexPolygonShape3D.new()
 	shape.points = hull
 	var collider := CollisionShape3D.new()
@@ -79,8 +90,100 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary, size_key:
 	body.add_child(collider)
 	mesh.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
 	collider.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+	if not faces.is_empty():
+		var course := ConcavePolygonShape3D.new()
+		course.set_faces(faces)
+		course.backface_collision = true
+		var top_collider := CollisionShape3D.new()
+		top_collider.name = "PittedTopCourse"
+		top_collider.shape = course
+		top_collider.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+		body.add_child(top_collider)
 	_retaining(body, cap, centre, top)
 	return body
+
+
+## The plinth's top with its pits dug in: the level top round the pit
+## outlines, each pit's walls and floor, and the outer band of the top course
+## down to the pits' depth. Adds the surfaces to `st` and returns them as
+## collision faces (triangles).
+static func _pitted_top(st: SurfaceTool, cap: PackedVector3Array, top: float, pits: Array[Dictionary]) -> PackedVector3Array:
+	var faces := PackedVector3Array()
+	var outer := PackedVector2Array()
+	for point in cap:
+		outer.append(Vector2(point.x, point.z))
+	# Cut the top along a line through each pit, so each piece is a simple
+	# polygon once the pit is clipped from it, then triangulate the pieces.
+	var pieces: Array[PackedVector2Array] = [outer]
+	for pit in pits:
+		var outline: PackedVector2Array = pit["outline"]
+		var mid := Vector2.ZERO
+		for point in outline:
+			mid += point
+		mid /= float(outline.size())
+		var cut: Array[PackedVector2Array] = []
+		for piece in pieces:
+			for side: float in [-1.0, 1.0]:
+				var half_plane := PackedVector2Array([mid + Vector2(-500, 0), mid + Vector2(500, 0), mid + Vector2(500, side * 500), mid + Vector2(-500, side * 500)])
+				for part in Geometry2D.intersect_polygons(piece, half_plane):
+					for remainder in Geometry2D.clip_polygons(part, outline):
+						if remainder.size() >= 3:
+							cut.append(remainder)
+		pieces = cut
+	var lit := BASALT.lightened(0.1)
+	for piece in pieces:
+		var triangles := Geometry2D.triangulate_polygon(piece)
+		for t in range(0, triangles.size(), 3):
+			var a := piece[triangles[t]]
+			var b := piece[triangles[t + 1]]
+			var c := piece[triangles[t + 2]]
+			_face(st, faces, Vector3(a.x, top, a.y), Vector3(b.x, top, b.y), Vector3(c.x, top, c.y), Vector3.UP, lit)
+	var deepest := _deepest(pits)
+	var middle := Vector3.ZERO
+	for point in cap:
+		middle += point
+	middle /= float(cap.size())
+	# The top course's outer band, for collision only (the mesh has its rings).
+	for i in cap.size():
+		var j := (i + 1) % cap.size()
+		var low_i := Vector3(cap[i].x, top - deepest - 0.05, cap[i].z)
+		var low_j := Vector3(cap[j].x, top - deepest - 0.05, cap[j].z)
+		faces.append_array([cap[i], cap[j], low_j, cap[i], low_j, low_i])
+	for pit in pits:
+		var outline: PackedVector2Array = pit["outline"]
+		var floor_y := top - float(pit["depth"])
+		var centre := Vector2.ZERO
+		for point in outline:
+			centre += point
+		centre /= float(outline.size())
+		var inside := Vector3(centre.x, top - float(pit["depth"]) * 0.5, centre.y)
+		var wall := BASALT.darkened(0.1)
+		for i in outline.size():
+			var j := (i + 1) % outline.size()
+			var a := outline[i]
+			var b := outline[j]
+			_quad(st, Vector3(a.x, top, a.y), Vector3(b.x, top, b.y), Vector3(b.x, floor_y, b.y), Vector3(a.x, floor_y, a.y), inside, wall, true)
+			faces.append_array([Vector3(a.x, top, a.y), Vector3(b.x, top, b.y), Vector3(b.x, floor_y, b.y), Vector3(a.x, top, a.y), Vector3(b.x, floor_y, b.y), Vector3(a.x, floor_y, a.y)])
+			_face(st, faces, Vector3(centre.x, floor_y, centre.y), Vector3(a.x, floor_y, a.y), Vector3(b.x, floor_y, b.y), Vector3.UP, BASALT.lightened(0.04))
+	return faces
+
+
+static func _face(st: SurfaceTool, faces: PackedVector3Array, a: Vector3, b: Vector3, c: Vector3, normal: Vector3, colour: Color) -> void:
+	_triangle(st, a, b, c, normal, colour)
+	faces.append_array([a, b, c])
+
+
+## The depth of the deepest pit dug into a plot's plinth (zero for none), for
+## the ground hidden under it.
+static func sink(entry: Dictionary) -> float:
+	return _deepest(FireCalderaPlan.pit_outlines(entry))
+
+
+static func _deepest(pits: Array[Dictionary]) -> float:
+	var deepest := 0.0
+	for pit in pits:
+		deepest = maxf(deepest, float(pit["depth"]))
+	return deepest
 
 
 ## Wherever the ground stands above the datum round the plinth, a retaining

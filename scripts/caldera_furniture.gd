@@ -188,6 +188,39 @@ static func concealed_light(body: Node3D, at: Vector3, colour: Color = LED_WARM,
 	return light
 
 
+## A controlled flame in glass, the city's own kind of light: a squared glass
+## capsule on a blued-steel foot with a narrow flame burning inside, and the
+## one real light it casts. Lava people keep fire precise and enclosed; an
+## open brazier belongs to eruption and danger.
+static func flame_capsule(body: Node3D, at: Vector3, height: float = 1.1) -> void:
+	var foot := SuperEgg.build_part(Vector3(0.16, 0.06, 0.16), STEEL, 6.0, 6.0)
+	foot.material_override = SolidModel.material(STEEL, 0.25, 0.85)
+	foot.position = at + Vector3(0, 0.06, 0)
+	body.add_child(foot)
+	CollisionPolicy.mark_decorative(foot)
+	var shell := SuperEgg.build_part(Vector3(0.12, height * 0.5, 0.12), GLASS, 7.0, 7.0)
+	var glass := SolidModel.material(Color(0.85, 0.80, 0.70, 0.22), 0.05, 0.05)
+	glass.cull_mode = BaseMaterial3D.CULL_DISABLED
+	shell.material_override = glass
+	shell.position = at + Vector3(0, 0.12 + height * 0.5, 0)
+	body.add_child(shell)
+	CollisionPolicy.mark_decorative(shell)
+	var flame := SuperEgg.build_part(Vector3(0.035, height * 0.16, 0.035), Color(1.0, 0.6, 0.2), 2.0, 2.0)
+	var fire := StandardMaterial3D.new()
+	fire.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	fire.albedo_color = Color(1.0, 0.62, 0.22)
+	fire.emission_enabled = true
+	fire.emission = Color(1.0, 0.5, 0.12)
+	fire.emission_energy_multiplier = 3.0
+	flame.material_override = fire
+	flame.position = at + Vector3(0, 0.2 + height * 0.3, 0)
+	body.add_child(flame)
+	CollisionPolicy.mark_decorative(flame)
+	concealed_light(body, flame.position, Color(1.0, 0.62, 0.3), 0.6, 4.0).name = "FlameLight"
+	if body is StaticBody3D:
+		CollisionPolicy.add_box(body as StaticBody3D, shell, Vector3(0.26, height + 0.12, 0.26), at + Vector3(0, (height + 0.12) * 0.5, 0), Basis(), false)
+
+
 ## A glass vessel or jar: `colour` its contents.
 static func jar(body: StaticBody3D, at: Vector3, colour: Color, size: float = 0.07) -> void:
 	var shell := piece(body, Vector3(size, size * 1.5, size), GLASS, at + Vector3(0, size * 1.5, 0), 0.0, false, 4.0)

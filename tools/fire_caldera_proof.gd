@@ -21,6 +21,7 @@ var _ground: StaticBody3D
 var _plinths := {}
 var _lines := {}
 var _shell: StaticBody3D
+var _nahl: StaticBody3D
 
 
 func _ready() -> void:
@@ -41,7 +42,7 @@ func _run() -> void:
 		var line := FireCalderaGround.survey(entry)
 		_lines[entry["id"]] = line
 		var key := SocketPlinth.size_key(entry)
-		sockets.append({"outline": SocketPlinth.exclusion(entry, line, key), "band": SocketPlinth.band(entry, key), "datum": float(line["datum"])})
+		sockets.append({"outline": SocketPlinth.exclusion(entry, line, key), "band": SocketPlinth.band(entry, key), "datum": float(line["datum"]), "sink": SocketPlinth.sink(entry)})
 	_ground = FireCalderaGround.build(self, sockets)
 	FireCalderaGround.build_lava(self)
 	for entry in FireCalderaPlan.PLOTS:
@@ -50,6 +51,8 @@ func _run() -> void:
 	# The kit's first shell: the guest house (brief section 3), cobalt and amber.
 	var guest := FireCalderaPlan.plot("GUEST")
 	_shell = FireCalderaBuildings.guest_house(self, guest, _lines["GUEST"])
+	# The second: the Nahl tempering hall and Eris's suite.
+	_nahl = FireCalderaNahl.build(self, FireCalderaPlan.plot("NAHL"), _lines["NAHL"])
 	_stage()
 	for _i in 6:
 		await get_tree().physics_frame
@@ -75,8 +78,14 @@ func _check() -> void:
 		var polygon := FireCalderaPlan.plot_polygon(entry, "footprint")
 		var centre: Vector2 = entry["centre"]
 		# Inside the socket: the plinth first, and no ground under it.
+		var pits := FireCalderaPlan.pit_outlines(entry)
 		for i in 9:
 			var p := centre.lerp(polygon[i % 4], 0.2 + 0.1 * float(i % 5))
+			var pitted := false
+			for pit in pits:
+				pitted = pitted or Geometry2D.is_point_in_polygon(p, pit["outline"])
+			if pitted:
+				continue
 			# Past the building and its furniture: the check is of the floor.
 			var hit := _floor_ray_past_shell(space, Vector3(p.x, datum + 3.0, p.y), Vector3(p.x, float(line["bottom"]) - 2.0, p.y)) if id == "GUEST" else _ray(space, Vector3(p.x, datum + 3.0, p.y), Vector3(p.x, float(line["bottom"]) - 2.0, p.y), _building_rids())
 			if hit.is_empty() or hit["collider"] != plinth:
@@ -112,6 +121,7 @@ func _check() -> void:
 			_fail("%s: the front landing is %.2f m off the floor" % [id, at_landing - datum])
 		print("ok   %s: %s, datum %.2f, %d uphill wall pieces" % [id, line["foundation"], datum, walled])
 	_check_shell(space)
+	_check_nahl(space)
 	# The lava's edge runs under the bank: ground below the lava just inside.
 	for i in 24:
 		var angle := TAU * float(i) / 24.0
@@ -175,11 +185,62 @@ func _check_shell(space: PhysicsDirectSpaceState3D) -> void:
 
 func _building_rids() -> Array:
 	var rids := []
-	if _shell != null:
-		rids.append(_shell.get_rid())
-		for node in _shell.find_children("*", "CollisionObject3D", true, false):
+	for building: StaticBody3D in [_shell, _nahl]:
+		if building == null:
+			continue
+		rids.append(building.get_rid())
+		for node in building.find_children("*", "CollisionObject3D", true, false):
 			rids.append((node as CollisionObject3D).get_rid())
 	return rids
+
+
+## The Nahl hall: its four doors open clear through, the hall's full height,
+## its clear zones, its markers and its molten surfaces.
+func _check_nahl(space: PhysicsDirectSpaceState3D) -> void:
+	var to_world := _nahl.global_transform
+	var datum := float(_lines["NAHL"]["datum"])
+	for door: Array in [
+		["hall door", Vector3(-3.0, 1.2, 8.0), Vector3(-3.0, 1.2, 4.5)],
+		["suite door", Vector3(FireCalderaNahl.SUITE_DOOR_X, 1.2, 8.0), Vector3(FireCalderaNahl.SUITE_DOOR_X, 1.2, 4.6)],
+		["staff door", Vector3(1.2, 1.2, FireCalderaNahl.STAFF_DOOR_Z), Vector3(2.8, 1.2, FireCalderaNahl.STAFF_DOOR_Z)],
+		["mediation door", Vector3(1.2, 1.2, FireCalderaNahl.MEDIATION_DOOR_Z), Vector3(2.8, 1.2, FireCalderaNahl.MEDIATION_DOOR_Z)],
+	]:
+		var hit := _ray(space, to_world * (door[1] as Vector3), to_world * (door[2] as Vector3), [])
+		if not hit.is_empty():
+			_fail("NAHL: the %s is blocked by %s" % [door[0], (hit["collider"] as Node).name])
+	var up := _ray(space, to_world * Vector3(-3.0, 0.6, 5.0), to_world * Vector3(-3.0, 9.0, 5.0), [])
+	if up.is_empty():
+		_fail("NAHL: no roof over the hall")
+	elif float(up["position"].y) - datum < 5.8:
+		_fail("NAHL: the hall is only %.2f m high" % (float(up["position"].y) - datum))
+	var wing := _ray(space, to_world * Vector3(5.0, 0.6, -2.0), to_world * Vector3(5.0, 9.0, -2.0), [])
+	if wing.is_empty() or float(wing["position"].y) - datum < 3.6:
+		_fail("NAHL: the wing's roof is missing or low")
+	for marker in ["ErisWorkMarker", "ErisRestMarker", "MoltenFloor"]:
+		if _nahl.get_node_or_null(marker) == null:
+			_fail("NAHL: no %s" % marker)
+	for problem in ClearZones.audit(_nahl):
+		_fail("NAHL layout: %s" % problem)
+	# The conversation pit: its floor half a metre down in the plinth, and the
+	# floor beside it still the datum.
+	var pit: Dictionary = (FireCalderaPlan.plot("NAHL")["pits"] as Array)[0]
+	var pit_at: Vector2 = pit["at"]
+	var in_pit := _ray(space, to_world * Vector3(pit_at.x, 1.0, pit_at.y), to_world * Vector3(pit_at.x, -2.0, pit_at.y), _building_rids())
+	if in_pit.is_empty() or in_pit["collider"] != _plinths["NAHL"] or absf(float(in_pit["position"].y) - (datum - float(pit["depth"]))) > 0.03:
+		_fail("NAHL: the pit's floor is not the plinth %.2f m down" % float(pit["depth"]))
+	var beside := _ray(space, to_world * Vector3(pit_at.x, 1.0, pit_at.y + 2.1), to_world * Vector3(pit_at.x, -2.0, pit_at.y + 2.1), _building_rids())
+	if beside.is_empty() or absf(float(beside["position"].y) - datum) > 0.03:
+		_fail("NAHL: the floor beside the pit is not the datum")
+	var plinth_mesh := _plinths["NAHL"].get_node("PlinthMesh") as MeshInstance3D
+	var low := 0
+	var tops := 0
+	var arrays := plinth_mesh.mesh.surface_get_arrays(0)
+	for v: Vector3 in arrays[Mesh.ARRAY_VERTEX]:
+		if absf(v.y - (datum - 0.5)) < 0.01: low += 1
+		if absf(v.y - datum) < 0.001: tops += 1
+	if FireCalderaNahl.lava_surfaces().size() != 2:
+		_fail("NAHL: the molten floor and the well are not both registered")
+	print("ok   NAHL: four doors clear, 6 m clerestory front, wing, pit, molten surfaces")
 
 
 func _ray(space: PhysicsDirectSpaceState3D, from: Vector3, to: Vector3, exclude: Array) -> Dictionary:
@@ -269,6 +330,19 @@ func _render() -> void:
 		"guest_lake_room": [Vector3(7.3, 1.6, -0.7), Vector3(4.2, 1.1, -4.6)],
 		"guest_keeper_room": [Vector3(-5.2, 1.6, -0.3), Vector3(-6.8, 1.0, -5.0)],
 	}
+	# The Nahl hall, poses in its own frame.
+	var nahl := {
+		"nahl_front": [Vector3(-1.0, 1.7, 17.0), Vector3(0.0, 3.0, 0.0)],
+		"nahl_suite_side": [Vector3(17.0, 1.7, -6.0), Vector3(7.0, 2.0, -1.0)],
+		"nahl_cutaway": [Vector3(13.0, 17.0, 15.0), Vector3(0.0, 0.0, 0.0)],
+		"nahl_hall": [Vector3(1.0, 1.7, 1.6), Vector3(-6.0, 1.0, -3.5)],
+		"nahl_molten_bay": [Vector3(-3.6, 1.7, 1.2), Vector3(-6.4, 0.4, -3.2)],
+		"nahl_clerestory": [Vector3(-4.0, 1.6, -4.0), Vector3(-2.0, 5.0, 6.0)],
+		"nahl_pit_top": [Vector3(5.1, 7.0, -2.5), Vector3(5.1, -0.5, -3.5)],
+		"nahl_mediation": [Vector3(2.5, 1.6, -1.6), Vector3(6.2, -0.4, -4.2)],
+		"nahl_suite": [Vector3(7.2, 1.7, 5.2), Vector3(3.0, 0.4, 0.6)],
+		"nahl_keepsakes": [Vector3(4.6, 1.6, 2.6), Vector3(7.6, 1.0, 1.8)],
+	}
 	var roof_node := _shell.get_node_or_null("LowPitchSkylightRoof") as Node3D if _shell != null else null
 	if roof_node != null:
 		roof_node.visible = true
@@ -276,6 +350,16 @@ func _render() -> void:
 		var pose: Array = rooms[name]
 		camera.global_position = _shell.global_transform * (pose[0] as Vector3)
 		camera.look_at(_shell.global_transform * (pose[1] as Vector3), Vector3.UP)
+		for _i in 4:
+			await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])
+		print("saved %s/%s.png" % [_shots, name])
+	for name: String in nahl:
+		var pose: Array = nahl[name]
+		for roof in _nahl.find_children("*", "CSGCombiner3D", false, false):
+			(roof as Node3D).visible = name != "nahl_cutaway" and name != "nahl_pit_top"
+		camera.global_position = _nahl.global_transform * (pose[0] as Vector3)
+		camera.look_at(_nahl.global_transform * (pose[1] as Vector3), Vector3.UP)
 		for _i in 4:
 			await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])

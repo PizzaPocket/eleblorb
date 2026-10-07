@@ -294,7 +294,7 @@ static func _art_glass(body: StaticBody3D, half: Vector3, colour: Color, at: Vec
 ## desk at the glass slot with the ledger plates, hooks for travellers' gear;
 ## her own art is a row of three mineral discs, gifts from the city.
 static func _guest_keeper_room(body: StaticBody3D) -> void:
-	CalderaFurniture.shelves(body, Vector3(-6.25, 0.0, -5.75), 0.0, 2.4, 4, func(b: StaticBody3D, p: Vector3, i: int) -> void:
+	CalderaFurniture.shelves(body, Vector3(-6.25, 0.0, -5.75), PI, 2.4, 4, func(b: StaticBody3D, p: Vector3, i: int) -> void:
 		CalderaFurniture.jar(b, p, [Color(0.72, 0.55, 0.30), Color(0.30, 0.55, 0.85, 0.6), Color(0.62, 0.32, 0.30)][i % 3], 0.06))
 	CalderaFurniture.chest(body, Vector3(-5.25, 0.0, -4.0), PI * 0.5)
 	CalderaFurniture.table(body, Vector3(-7.25, 0.0, -2.9), PI * 0.5, 1.4, 0.7)

@@ -188,6 +188,10 @@ func _terrain_height(x:float,z:float)->float:
 			if local.distance_to(socket["centre"])>float(socket["reach"]):
 				continue
 			if Geometry2D.is_point_in_polygon(local,socket["outline"]):
+				# A conversation pit dug into the plinth: its floor.
+				for pit:Dictionary in socket["pits"]:
+					if Geometry2D.is_point_in_polygon(local,pit["outline"]):
+						return float(socket["datum"])-float(pit["depth"])
 				return float(socket["datum"])
 			if Geometry2D.is_point_in_polygon(local,socket["band"]):
 				return minf(height,float(socket["datum"])-0.05)
@@ -534,7 +538,7 @@ func _build_caldera_ground()->void:
 		var line:=FireCalderaGround.survey(entry)
 		_caldera_surveys[str(entry["id"])]=line
 		var key:=SocketPlinth.size_key(entry)
-		var socket:={"outline":SocketPlinth.exclusion(entry,line,key),"band":SocketPlinth.band(entry,key),"datum":float(line["datum"])}
+		var socket:={"outline":SocketPlinth.exclusion(entry,line,key),"band":SocketPlinth.band(entry,key),"datum":float(line["datum"]),"sink":SocketPlinth.sink(entry)}
 		sockets.append(socket)
 		var band:PackedVector2Array=socket["band"]
 		var centre:=Vector2.ZERO
@@ -542,7 +546,7 @@ func _build_caldera_ground()->void:
 		centre/=float(band.size())
 		var reach:=0.0
 		for point in band:reach=maxf(reach,point.distance_to(centre))
-		_caldera_sockets.append({"outline":socket["outline"],"band":band,"datum":socket["datum"],"centre":centre,"reach":reach+0.1})
+		_caldera_sockets.append({"outline":socket["outline"],"band":band,"datum":socket["datum"],"centre":centre,"reach":reach+0.1,"pits":FireCalderaPlan.pit_outlines(entry)})
 	FireCalderaGround.build(frame,sockets,func(local:Vector2)->float:
 		var world:=FireCalderaPlan.to_world(local)
 		return _coarse_mesh_height(world.x,world.y))

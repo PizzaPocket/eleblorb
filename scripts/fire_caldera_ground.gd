@@ -163,7 +163,8 @@ static func crater_wall(local: Vector2) -> float:
 
 ## Builds the ground as one body in `parent`'s frame (local plan coordinates,
 ## world heights). `sockets` are [{"outline": the plinth's plan, "band": the
-## plan grown by its retaining wall, "datum": its floor}]: within the band the
+## plan grown by its retaining wall, "datum": its floor, "sink": optional,
+## the depth of the deepest pit dug into its plinth}]: within the band the
 ## ground lies no higher than just under the floor (inside the plinth or the
 ## wall, out of sight; on the downhill side it is untouched), and the
 ## collider leaves out every cell touching the plinth itself, so the
@@ -184,6 +185,9 @@ static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(Fire
 					y = minf(y, float(socket["datum"]) - 0.05)
 					if Geometry2D.is_point_in_polygon(p, socket["outline"]):
 						socketed = 1
+						# Under a plinth with a pit dug in it, the hidden skin
+						# drops below the pit's floor.
+						y = minf(y, float(socket["datum"]) - 0.1 - float(socket.get("sink", 0.0)))
 					break
 			vertices[row * columns + column] = Vector3(p.x, y, p.y)
 			inside[row * columns + column] = socketed
