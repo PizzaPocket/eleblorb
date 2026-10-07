@@ -133,6 +133,25 @@ func _ready() -> void:
 	if not vendor_found:
 		print("FAIL Nara Venn, the lake vendor, is not in the world")
 		_failures += 1
+	# Every walking resident stands on a deck, at spawn and after walking a
+	# while, never in the lake or on the rock.
+	for pass_index in 2:
+		if pass_index == 1:
+			for _i in 360:
+				await get_tree().physics_frame
+		for name_text in FishingVillagePeople.walkers():
+			var person: Node3D = null
+			for npc in get_tree().get_nodes_in_group("npcs"):
+				if str(npc.get("display_name")) == name_text:
+					person = npc
+			if person == null:
+				print("FAIL resident %s is not in the world" % name_text)
+				_failures += 1
+				continue
+			var rel := person.global_position.y - water
+			var ok := rel > 0.25 and rel < 1.0
+			print("%s resident %s (%s): W%+.2f at %s" % ["ok  " if ok else "FAIL", name_text, "spawn" if pass_index == 0 else "after walking", rel, str(Vector2(person.global_position.x, person.global_position.z) - FishingVillagePlan.WORLD_CENTER)])
+			_failures += 0 if ok else 1
 	# Every boat's hull must sit clear of every deck, ramp, pile and building.
 	var village := world.find_child("FloatingWaterVillage", true, false) as Node3D
 	for boat in FishingVillagePlan.BOATS:

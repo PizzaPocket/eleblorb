@@ -117,6 +117,18 @@ extends StaticBody3D
 @export var shop_category: String = "antique"
 ## Set by floating-platform settlements. Ordinary NPCs keep sampling terrain.
 @export var fixed_ground_y: float = INF
+## For people who live on built floors rather than terrain (decks, jetties and
+## houseboats over water): their footing is found by a short ray down onto the
+## world's collision, climbing at most GROUND_PROBE_STEP per move like a step,
+## so ramps and thresholds carry them while tables and benches do not.
+## `ground_probe_seed_y` is a height just above their starting floor.
+@export var ground_probe := false
+@export var ground_probe_seed_y := 0.0
+const GROUND_PROBE_STEP := 0.4
+## Colliders built in the same frame as this person are not yet in the physics
+## space when _ready probes, so the probe repeats on the first physics frames
+## until it lands on a floor.
+var _ground_settle_frames := 0
 ## Optional circular limit for floating islands and other bounded walkable
 ## spaces. INF preserves ordinary town behavior. Both endpoints of an NPC's
 ## straight walk remain inside the circle, so the whole route stays on land.
@@ -286,7 +298,7 @@ func _ready() -> void:
 	if deck_wanderer:
 		position.y = deck_surface_y
 	else:
-		global_position.y = fixed_ground_y if fixed_ground_y < INF else terrain_ref.get_mesh_height(global_position.x, global_position.z)
+		global_position.y = _ground_height(global_position.x, global_position.z, ground_probe_seed_y)
 	if not _daily_schedule.is_empty() and not deck_wanderer and not stationary:
 		_initialize_daily_schedule()
 
@@ -621,6 +633,24 @@ func _on_talk() -> void:
 	DialogUI.show_line(display_name, line, actions)
 
 
+## Where this person's feet go at plan point (x, z). With `ground_probe`, a ray
+## from `from_y` down onto built floors (keeping the current height where none
+## is found); otherwise the fixed height or the terrain.
+func _ground_height(x: float, z: float, from_y: float) -> float:
+	if ground_probe and is_inside_tree():
+		var query := PhysicsRayQueryParameters3D.create(Vector3(x, from_y, z), Vector3(x, from_y - 6.0, z))
+		query.collision_mask = 1
+		query.exclude = [get_rid()] if has_method("get_rid") else []
+		var hit := get_world_3d().direct_space_state.intersect_ray(query)
+		if not hit.is_empty():
+			return float(hit["position"].y)
+		_ground_settle_frames = 30
+		return global_position.y if global_position.y != 0.0 else from_y
+	if fixed_ground_y < INF:
+		return fixed_ground_y
+	return terrain_ref.get_mesh_height(x, z)
+
+
 func _process(delta: float) -> void:
 	_update_head_look(delta)
 	EyeBlink.apply(_eye_blink, delta, _eyes)
@@ -723,7 +753,7 @@ func _initialize_daily_schedule() -> void:
 	# person belongs at the current hour, then make every later change on foot.
 	global_position.x = _schedule_anchor.x
 	global_position.z = _schedule_anchor.y
-	global_position.y = fixed_ground_y if fixed_ground_y < INF else terrain_ref.get_mesh_height(_schedule_anchor.x, _schedule_anchor.y)
+	global_position.y = _ground_height(_schedule_anchor.x, _schedule_anchor.y, ground_probe_seed_y)
 	_wander_center = _schedule_anchor
 	wander_boundary_center = _schedule_anchor
 	wander_boundary_radius = _schedule_roam_radius
@@ -767,6 +797,16 @@ func _schedule_phase_for_hour(hour: float) -> int:
 
 func _physics_process(delta: float) -> void:
 	_settle_dress_pose(delta)
+	if _ground_settle_frames > 0:
+		_ground_settle_frames -= 1
+		var query := PhysicsRayQueryParameters3D.create(
+			Vector3(global_position.x, ground_probe_seed_y, global_position.z),
+			Vector3(global_position.x, ground_probe_seed_y - 6.0, global_position.z))
+		query.collision_mask = 1
+		var hit := get_world_3d().direct_space_state.intersect_ray(query)
+		if not hit.is_empty():
+			global_position.y = float(hit["position"].y)
+			_ground_settle_frames = 0
 	if _demon_agent_combat_active:
 		_process_demon_agent_combat(delta)
 		return
@@ -1055,7 +1095,7 @@ func _process_walk(delta: float) -> void:
 	else:
 		global_position.x = current.x
 		global_position.z = current.y
-		global_position.y = fixed_ground_y if fixed_ground_y < INF else terrain_ref.get_mesh_height(current.x, current.y)
+		global_position.y = _ground_height(current.x, current.y, global_position.y + GROUND_PROBE_STEP)
 
 	var target_angle := atan2(dir.x, dir.y)
 	visuals.rotation.y = lerp_angle(visuals.rotation.y, target_angle, ROTATION_SPEED * delta)

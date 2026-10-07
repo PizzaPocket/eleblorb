@@ -225,6 +225,37 @@ Their compact house and workroom stand beside the communal pavilion. The clinic
 door faces the public route; Rian's dustier cutting and sealing bench opens onto
 a separate rear deck.
 
+### Dress charter (2026-10-07; the character-design skill)
+
+1. **Environment.** A warm, sunny lake and work on and in the water: short or no
+   sleeves for most people, cropped trousers for anyone who wades, dives or
+   handles boats, bare arms for the divers and the rescuer. Long sleeves only
+   where the work or age asks for them: Dala at 72 in the evening wind, Ivo on
+   the open water all day, Asha in the clinic. Leather sandals, never boots.
+2. **Sources.** None borrowed as costume. The village is cosmopolitan and
+   working; its dress is plain present-day working clothes of the households'
+   many origins, faded by sun and water.
+3. **Skin and hair.** The full human range, because the families came by
+   different water routes; each household is coherent by descent (Dala and
+   Salim, Leena, Ivo and their daughter Sela) and Lio, adopted, differs from his
+   parents. Hair natural black, brown, copper, grey and white.
+4. **Palette.** 60 percent faded neutrals (sand, cream, indigo, charcoal, faded
+   blue); 30 percent secondary; 10 percent the household colour of its houses
+   and boats: Venn teal, Aran ochre (and the green of its shutters), Vale coral,
+   Mor terracotta with its teal trim, Sen violet.
+5. **Kit.** Existing options only: sleeve styles, cropped trousers, dresses for
+   Leena, Dala and Asha, glasses for Asha, beards for Mateo, Salim, Osei and Ivo.
+6. **Hair.** Ponytail, bun, long, pigtails, afro, flat top, buzzcut, hero, bald.
+7. **Signature.** Every household wears its house colour on one garment, so a
+   family reads as one as surely as its walls and boats do.
+8. **Hierarchy.** None: the village has no chief.
+9. **Exclusions.** No sea-folk scale cloth, no pirate dress, no national dress,
+   no boots, no hats a blorb could be mistaken for.
+
+Jori Vale is written with they/them. The figure rig builds one of two body
+types; Jori is built from the middle where the two ranges overlap, with no
+beard or dress. Confirm or correct with the user.
+
 ### Community organization
 
 The village has no hereditary chief. One adult from each household meets at the

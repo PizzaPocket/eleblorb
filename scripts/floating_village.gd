@@ -57,6 +57,7 @@ func _build() -> void:
 	_build_streetlights()
 	_build_boats()
 	_build_shop()
+	_build_residents()
 
 
 # ---------------------------------------------------------------------------
@@ -132,10 +133,7 @@ func _build_keeper(body: StaticBody3D, wake: Marker3D, stand: Marker3D, local_po
 	keeper.is_female = true
 	keeper.facing_degrees = 180.0
 	keeper.fixed_ground_y = body.global_position.y + local_position.y
-	keeper.skin_color = Color(0.58, 0.40, 0.28)
-	keeper.shirt_color = FishingVillagePlan.HOUSEHOLD_COLORS["Mor"]
-	keeper.hair_color = Color(0.12, 0.09, 0.07)
-	keeper.hair_style = FigureHair.STYLE_BUN
+	FishingVillagePeople.apply_look(keeper, "Leena Mor")
 	var lines: Array[String] = [
 		"The kettle never goes cold on this boat.",
 		"Ivo says the ferry knows the weather before Dala does. Don't tell her.",
@@ -385,6 +383,35 @@ func get_portal_yaw() -> float:
 	return atan2(facing.x, facing.y)
 
 
+## The village's walking residents (FishingVillagePeople): each spawns where
+## their day has them now and walks the decks between home and work. They find
+## their footing by probing the decks below them, since the decks stand at
+## several heights over water the terrain knows nothing about.
+func _build_residents() -> void:
+	var packed: PackedScene = load(NPC_SCENE)
+	if packed == null:
+		return
+	var offset := Vector2(CENTER.x, CENTER.z)
+	var hour := 9.0
+	for name_text in FishingVillagePeople.walkers():
+		var resident = packed.instantiate()
+		resident.name = name_text.replace(" ", "")
+		resident.display_name = name_text
+		FishingVillagePeople.apply_look(resident, name_text)
+		var lines: Array[String] = []
+		for line: String in FishingVillagePeople.RESIDENTS[name_text]["lines"]:
+			lines.append(line)
+		resident.talk_lines = lines
+		resident.ground_probe = true
+		resident.ground_probe_seed_y = _water + 1.2 + FishingVillagePlan.HOUSE_FLOOR
+		resident.set_terrain_reference(_terrain)
+		resident.configure_daily_schedule(FishingVillagePeople.world_schedule(name_text, offset))
+		var start := FishingVillagePeople.place_at(name_text, hour) + offset
+		# Placed before entering the tree: its _ready probes the deck under it.
+		resident.position = Vector3(start.x, resident.ground_probe_seed_y, start.y)
+		add_child(resident)
+
+
 func _build_vendor(pos: Vector3) -> void:
 	var packed: PackedScene = load(NPC_SCENE)
 	if packed == null:
@@ -400,9 +427,7 @@ func _build_vendor(pos: Vector3) -> void:
 		"Throw the helmet into a blorb you trust. Wear that blorb on your head, and it will keep the water out.",
 	]
 	vendor.vendor_lines = vendor_lines
-	vendor.skin_color = Color(0.48, 0.31, 0.2)
-	vendor.shirt_color = Color(0.12, 0.35, 0.43)
-	vendor.hair_color = Color(0.08, 0.06, 0.04)
+	FishingVillagePeople.apply_look(vendor, "Nara Venn")
 	vendor.fixed_ground_y = pos.y
 	vendor.position = pos
 	add_child(vendor)
