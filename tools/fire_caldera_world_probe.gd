@@ -92,6 +92,20 @@ func _run() -> void:
 			if eris != null:
 				var actions:Array = eris.dialog_actions_provider.call()
 				_expect(actions.size() == 1 and int(actions[0].get("price", -1)) == 25, "Eris offers the 25-Tokoin rest action")
+	if frame != null:
+		var nahl := frame.get_node_or_null("NAHLShell") as StaticBody3D
+		_expect(nahl != null, "the live village builds the Nahl tempering hall")
+		if nahl != null:
+			for child_name in ["MoltenFloor", "LavaBed", "ErisRestMarker", "ErisWorkMarker", "HeatedStone"]:
+				_expect(nahl.find_child(child_name, false, false) != null, "the live Nahl hall has %s" % child_name)
+			var molten := nahl.global_transform * Vector3(FireCalderaNahl.MOLTEN_BAY.get_center().x, 0.0, FireCalderaNahl.MOLTEN_BAY.get_center().y)
+			_expect(bool(_terrain.is_lava_area(Vector2(molten.x, molten.z))), "the molten floor is lava to the terrain")
+			var hall := nahl.global_transform * Vector3(-1.0, 0.0, 3.0)
+			_expect(not bool(_terrain.is_lava_area(Vector2(hall.x, hall.z))), "the hall's floor is not lava")
+			var pit: Dictionary = (FireCalderaPlan.plot("NAHL")["pits"] as Array)[0]
+			var pit_world := nahl.global_transform * Vector3((pit["at"] as Vector2).x, 0.0, (pit["at"] as Vector2).y)
+			var pit_floor := float(_terrain.get_mesh_height(pit_world.x, pit_world.z))
+			_expect(absf(pit_floor - (nahl.global_position.y - float(pit["depth"]))) < 0.02, "the height query meets the conversation pit's floor")
 	# The height query meets every floor: the player snaps to it, so inside a
 	# plot it must return the plinth's top, not the natural slope.
 	for entry in FireCalderaPlan.PLOTS:
@@ -101,11 +115,16 @@ func _run() -> void:
 		var worst := 0.0
 		var polygon := FireCalderaPlan.plot_polygon(entry, "footprint")
 		var plot_centre := FireCalderaPlan.mass_centre(entry)
+		var pits := FireCalderaPlan.pit_outlines(entry)
 		for corner in polygon:
 			for t: float in [0.0, 0.5, 0.8]:
 				var local := plot_centre.lerp(corner, t)
+				var expected := float(line["datum"])
+				for pit in pits:
+					if Geometry2D.is_point_in_polygon(local, pit["outline"]):
+						expected -= float(pit["depth"])
 				var world := FireCalderaPlan.to_world(local)
-				worst = maxf(worst, absf(float(_terrain.get_mesh_height(world.x, world.y)) - float(line["datum"])))
+				worst = maxf(worst, absf(float(_terrain.get_mesh_height(world.x, world.y)) - expected))
 		_expect(worst < 0.02, "the height query inside %s meets its floor (off by %.2f m)" % [entry["id"], worst])
 	var registered:Dictionary = RecoveryManager.get("_registered_points")
 	_expect(registered.has("fire_kingdom:caldera_village_inn"), "the live guest house registers its recovery point")

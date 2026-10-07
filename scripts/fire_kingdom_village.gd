@@ -55,6 +55,19 @@ func _ready()->void:
 	_build_lava_fountain(center)
 	_spawn_lava_slide()
 	_build_guest_house()
+	_build_nahl()
+
+
+## The Nahl tempering hall and Eris's house, on its surveyed plinth; its
+## molten floor and lava bed join the terrain's lava queries.
+func _build_nahl()->void:
+	var frame:Node3D=_terrain.get_caldera_frame()
+	var line:Dictionary=_terrain.get_caldera_survey("NAHL")
+	if frame==null or line.is_empty():
+		push_error("FireKingdomVillage: live NAHL socket is unavailable")
+		return
+	var body:=FireCalderaNahl.build(frame,FireCalderaPlan.plot("NAHL"),line)
+	FireCalderaNahl.register_lava(body,_terrain)
 
 
 ## First finished building of the replacement city. It is placed in the same

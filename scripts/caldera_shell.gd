@@ -183,7 +183,7 @@ static func _build_corners(body: StaticBody3D, offset: Vector2, hx: float, hz: f
 
 ## A straight steel member between two points, `section` (height, depth) its
 ## cross-section: a raked wall head or any sloping beam.
-static func _beam(body: StaticBody3D, from: Vector3, to: Vector3, section: Vector2, colour: Color) -> void:
+static func _beam(body: StaticBody3D, from: Vector3, to: Vector3, section: Vector2, colour: Color) -> MeshInstance3D:
 	var delta := to - from
 	var part := SuperEgg.build_part(Vector3(delta.length() * 0.5 + section.y * 0.5, section.x * 0.5, section.y * 0.5), colour, 6.0, 6.0)
 	part.material_override = SolidModel.material(colour, 0.20, 0.90)
@@ -192,6 +192,7 @@ static func _beam(body: StaticBody3D, from: Vector3, to: Vector3, section: Vecto
 	part.transform = Transform3D(Basis(x_axis, z_axis.cross(x_axis), z_axis), (from + to) * 0.5)
 	body.add_child(part)
 	CollisionPolicy.mark_decorative(part)
+	return part
 
 
 ## A sheet of glass in a wall's plane from plan point `a` to `b`, its foot at
