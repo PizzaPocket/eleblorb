@@ -107,11 +107,37 @@ their real sizes to keep the proportions right.
 | Lower living deck | berth deck, floor -1.6 (straddles the waterline) | lower deck, floor -0.6 (straddles the waterline) |
 | Main deck | gun deck, floor +1.4 | weather deck, floor +2.4 |
 | Weather deck | spar deck, floor +4.4 | — |
-| Raised aft deck | quarterdeck, +7.0, over a chart room (the coach) at spar-deck level | great cabin floor +2.4; captain's cabin and poop deck, +5.2 |
-| Forecastle | +7.0, over a boatswain's store at spar-deck level | +5.2, over the galley at weather-deck level |
+| Raised aft deck | quarterdeck, +7.2, over a chart room (the coach) at spar-deck level | great cabin floor +2.4; captain's cabin and poop deck, +5.2 |
+| Forecastle | +7.2, over a boatswain's store at spar-deck level | +5.2, over the galley at weather-deck level |
 
 Every deck height leaves at least 2.4 m clear under the deck above. Everything
 below 0 m is inside the hull and must stay dry (section 6).
+
+**Audit (2026-10-07).**
+
+- **Headroom.** The *Harbinger*'s quarterdeck and forecastle stood at +7.0 m,
+  only 2.6 m above the spar deck. With a deck about 0.25 m thick, that left
+  2.35 m clear in the coach and the boatswain's store, under the 2.4 m
+  minimum. Both now stand at **+7.2 m**. Every other step is 2.8 to 3.0 m,
+  floor to floor, and clears.
+- **Rooms against the hull.**
+  - *Harbinger* gun deck, inside about 38 m of usable length: the great cabin
+    (about 8 m), the battery of four guns a side at about 3 m spacing (about
+    14 m), the galley (about 5 m), and two companion ramps (about 7 m each with
+    landings, laid fore and aft beside the centreline). That is about 41 m
+    including the ramps, so the ramps stand beside the battery, not in line
+    with it.
+  - *Harbinger* berth deck: the wardroom's three officer cabins (about
+    2.5 × 2.5 m each round a 3 m table) and the surgery fit within the aft
+    10 m.
+  - *Belle Fortune*: the great cabin as council room (about 8 × 6 m) fits the
+    7 m weather-deck beam only if it narrows with the tumblehome. Draw it 8 m
+    long and 5.5 m wide at its floor, its windows on the stern.
+- **Ramps.** A deck pair 3.0 m apart needs about 4.8 m of 32° ramp plus two
+  1.2 m landings (about 7.2 m) for each companion ramp. Draw them before the
+  rooms.
+- **Still to do before any build:** draw each deck plan at true size. The
+  houseboats each failed their hull when drawn, so expect the same here.
 
 ## 5. Rooms and who uses them
 
