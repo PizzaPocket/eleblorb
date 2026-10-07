@@ -199,6 +199,11 @@ func _terrain_height(x:float,z:float)->float:
 				return float(socket["datum"])
 			if Geometry2D.is_point_in_polygon(local,socket["band"]):
 				return minf(height,float(socket["datum"])-0.05)
+			# A ramp or landing built out beyond the plinth (a covered bridge up
+			# from the ground): its floor wherever it stands above the ground.
+			var outside:=FireCalderaPlan.level_height(socket["entry"],local)
+			if not is_nan(outside) and float(socket["datum"])+outside>height:
+				return float(socket["datum"])+outside
 		return height
 	return _legacy_terrain_height(x,z)
 
@@ -550,6 +555,11 @@ func _build_caldera_ground()->void:
 		centre/=float(band.size())
 		var reach:=0.0
 		for point in band:reach=maxf(reach,point.distance_to(centre))
+		# Reach far enough to cover any level built out beyond the plinth.
+		for level:Dictionary in entry.get("levels",[]):
+			var rect:Rect2=level["rect"]
+			for corner:Vector2 in [rect.position,rect.end,Vector2(rect.position.x,rect.end.y),Vector2(rect.end.x,rect.position.y)]:
+				reach=maxf(reach,FireCalderaPlan.shell_to_plan(entry,corner).distance_to(centre))
 		_caldera_sockets.append({"outline":socket["outline"],"band":band,"datum":socket["datum"],"centre":centre,"reach":reach+0.1,"pits":FireCalderaPlan.pit_outlines(entry),"entry":entry})
 	FireCalderaGround.build(frame,sockets,func(local:Vector2)->float:
 		var world:=FireCalderaPlan.to_world(local)

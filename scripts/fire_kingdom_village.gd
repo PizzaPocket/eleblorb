@@ -58,6 +58,18 @@ func _ready()->void:
 	_build_nahl()
 	_build_oren()
 	_build_renewal()
+	_build_kel()
+
+
+## The Kel foundry with its residence on the back row's roof.
+func _build_kel()->void:
+	var frame:Node3D=_terrain.get_caldera_frame()
+	var line:Dictionary=_terrain.get_caldera_survey("KEL")
+	if frame==null or line.is_empty():
+		push_error("FireKingdomVillage: live KEL socket is unavailable")
+		return
+	var body:=FireCalderaKel.build(frame,FireCalderaPlan.plot("KEL"),line)
+	FireCalderaKel.register_lava(body,_terrain)
 
 
 ## The Renewal terrace and its slumped-glass canopy, on its surveyed plinth.

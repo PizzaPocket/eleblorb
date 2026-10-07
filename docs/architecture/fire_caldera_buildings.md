@@ -414,6 +414,26 @@ shelf.
   - **Headroom:** the covered bridge to the residence clears 2.4 m.
 - **Glass:** garnet and amber, the forge colours, in the gallery's high
   clerestory.
+- **As built (approved 2026-10-08), its own idea: a temper-colour facade.**
+  Heated steel takes oxide colours (straw, bronze, purple, blue) that a smith
+  reads to judge its temper; Kel is clad in heat-tinted steel panels graded
+  along the building from straw at the west to blue at the east, banded by
+  height and shifting with the angle of view. A sawtooth north-light roof of
+  cast rolled glass, garnet to amber, over the front row and the workshop.
+  The overhead handling rail runs from the yard through the back wall over
+  the dock on two columns, with its travelling bridge and hook. The receiving
+  bay is a **loading dock** at the service loop's level (the site rises 1.25
+  m), with a ramp to its lower strip; the alloy store at the dock's level.
+  The gallery shows armour in cast-glass vitrines lit from below. The
+  workshop has a refractory forge, power hammer, press, welding table,
+  grinder bank, oil quench tank, Ruun's finishing bench and Daro's alloy
+  bench. The descent hall holds the lift cage and a refractory portal with a
+  forged gate to the deep forge.
+- **Residence, revised:** the plot leaves no room for a separate house beside
+  the 19 x 15 m hall, so the home (8 x 6.5 m) stands on the back row's roof,
+  reached by a covered ramp-bridge from the uphill ground on the east: three
+  lava beds, a receiving room with Ruun's bench and the three tool racks (one
+  tool on the wrong sibling's rack).
 - **Variation:** the longest span; the overhead handling rail; the only
   covered bridge between two masses on one plot.
 

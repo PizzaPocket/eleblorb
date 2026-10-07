@@ -136,7 +136,7 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 				# Floor channel: a thin stainless shoe, the panel's only sill.
 				_metal(body, Vector3(mid.x, 0.04, mid.y), _oriented(Vector3(width, 0.08, 0.14), yaw), STAINLESS_SHADOW, false)
 			"stone":
-				_stone(body, Vector3(mid.x, panel_top * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, panel_top, WALL), yaw))
+				_stone(body, Vector3(mid.x, panel_top * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, panel_top, WALL), yaw), bay.get("steel", Color(-1, -1, -1)))
 			"door":
 				# A stone panel to the transom with the door cut as a superellipse
 				# (square foot, rounded head), framed in stainless and hung with
@@ -145,10 +145,10 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 				# then full height, with stone below the sill.
 				var sill := float(bay.get("sill", 0.0))
 				if sill > 0.0:
-					_stone(body, Vector3(mid.x, sill * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, sill, WALL), yaw))
-					door_opening(body, Vector3(mid.x, sill, mid.y), yaw, width - POST * 0.5, storey - sill, WALL, float(bay.get("clear", 2.0)), float(bay.get("height", 2.3)), 1)
+					_stone(body, Vector3(mid.x, sill * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, sill, WALL), yaw), bay.get("steel", Color(-1, -1, -1)))
+					door_opening(body, Vector3(mid.x, sill, mid.y), yaw, width - POST * 0.5, storey - sill, WALL, float(bay.get("clear", 2.0)), float(bay.get("height", 2.3)), 1, bay.get("steel", VOLCANIC_STONE))
 				else:
-					door_opening(body, Vector3(mid.x, 0.0, mid.y), yaw, width - POST * 0.5, panel_top, WALL, DOOR_CLEAR, DOOR_HEIGHT, 2)
+					door_opening(body, Vector3(mid.x, 0.0, mid.y), yaw, width - POST * 0.5, panel_top, WALL, DOOR_CLEAR, DOOR_HEIGHT, 2, bay.get("steel", VOLCANIC_STONE))
 				var clear_half := (float(bay.get("clear", DOOR_CLEAR)) if sill > 0.0 else DOOR_CLEAR) * 0.5 + 0.15
 				ClearZones.add(body, str(bay.get("label", "front door")), "door", mid, outward, 1.25, 1.25, clear_half, sill + 0.05, sill + 1.95)
 		if kind != "open" and banded:
@@ -273,13 +273,17 @@ static func _oriented(size: Vector3, yaw: float) -> Vector3:
 	return size if is_zero_approx(yaw) else Vector3(size.z, size.y, size.x)
 
 
-static func _stone(body: StaticBody3D, at: Vector3, size: Vector3) -> void:
+## A solid wall panel: volcanic stone, or (a bay's "steel" colour) a panel of
+## heat-tinted steel.
+static func _stone(body: StaticBody3D, at: Vector3, size: Vector3, steel: Color = Color(-1, -1, -1)) -> void:
 	var mesh := MeshInstance3D.new()
-	mesh.name = "StonePanel"
+	mesh.name = "StonePanel" if steel.r < 0.0 else "SteelPanel"
 	var box := BoxMesh.new()
 	box.size = size
 	mesh.mesh = box
-	mesh.material_override = SolidModel.material(VOLCANIC_STONE, 0.88, 0.0)
+	mesh.material_override = SolidModel.material(VOLCANIC_STONE, 0.88, 0.0) if steel.r < 0.0 else SolidModel.material(steel, 0.32, 0.75)
+	if steel.r >= 0.0:
+		mesh.set_meta("steel_panel", true)
 	mesh.position = at
 	body.add_child(mesh)
 	CollisionPolicy.add_box(body, mesh, size, at, Basis(), false)

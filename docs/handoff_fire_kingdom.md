@@ -69,7 +69,9 @@ surface foundations, and the finished guest house exist and validate.
   of refractory steps from the promenade into the lava with a half-sunk
   threshold arch, memory stones, Eris's tempering slab, under the
   slumped-glass catenary canopy; its own `ghat` foundation.
-- Next buildings by the brief: Kel, Vara, Civic (with the
+- **Kel foundry** (`FireCalderaKel`): live; temper-colour steel facade,
+  sawtooth roof, crane over the loading dock, residence on the roof.
+- Next buildings by the brief: Vara, Civic (with the
   terrarium), Iren, Aro, the arrival pylons and the cove bridge. Each gets
   its own original idea (see "A culture of original buildings" in the brief).
 

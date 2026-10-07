@@ -128,7 +128,18 @@ const PLOTS: Array[Dictionary] = [
 			{"rect": Rect2(6.5, -0.36, 2.0, 3.2), "y": 4.0},
 		]},
 	{"id": "KEL", "centre": Vector2(48.2, -4.4), "footprint": Vector2(19.0, 15.0), "reserved": Vector2(24.0, 20.0),
-		"household": "Kel", "program": "armory gallery and receiving bay; residence on the quiet outer edge; protected descent to the deep forge", "occupied": true},
+		"household": "Kel", "program": "armory gallery and receiving bay; residence on the quiet outer edge; protected descent to the deep forge", "occupied": true,
+		# Approved 2026-10-08: the receiving bay is a loading dock at the service
+		# loop's level, with a ramp down to its lower strip; the alloy store at
+		# the dock's level; the residence on the back row's roof reached by a
+		# covered ramp-bridge from the uphill ground on the east.
+		"levels": [
+			{"rect": Rect2(-0.5, -7.5, 6.0, 4.8), "y": 1.25},
+			{"rect": Rect2(5.5, -7.5, 4.0, 7.0), "y": 1.25},
+			{"rect": Rect2(2.0, -2.7, 1.4, 2.0), "from": 1.25, "to": 0.0, "axis": "z"},
+			{"rect": Rect2(10.1, -10.4, 1.4, 5.5), "from": 1.9, "to": 5.2, "axis": "z"},
+			{"rect": Rect2(9.6, -4.9, 1.9, 1.8), "y": 5.2},
+		]},
 	{"id": "VARA", "centre": Vector2(32.9, 32.8), "footprint": Vector2(18.0, 14.0), "reserved": Vector2(23.0, 19.0),
 		"household": "Vara", "program": "glass and metal studio round a daylight court; clean assembly to the promenade, hot forming toward Kel", "occupied": true},
 	{"id": "CIVIC", "centre": Vector2(0.0, 49.0), "footprint": Vector2(24.0, 15.0), "reserved": Vector2(30.0, 21.0),

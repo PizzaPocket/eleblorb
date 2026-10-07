@@ -24,6 +24,7 @@ var _shell: StaticBody3D
 var _nahl: StaticBody3D
 var _oren: StaticBody3D
 var _renewal: StaticBody3D
+var _kel: StaticBody3D
 
 
 func _ready() -> void:
@@ -61,6 +62,7 @@ func _run() -> void:
 	# The third: the Oren mineral house, split level.
 	_oren = FireCalderaOren.build(self, FireCalderaPlan.plot("OREN"), _lines["OREN"])
 	_renewal = FireCalderaRenewal.build(self, FireCalderaPlan.plot("RENEWAL"), _lines["RENEWAL"])
+	_kel = FireCalderaKel.build(self, FireCalderaPlan.plot("KEL"), _lines["KEL"])
 	_stage()
 	for _i in 6:
 		await get_tree().physics_frame
@@ -196,7 +198,7 @@ func _check_shell(space: PhysicsDirectSpaceState3D) -> void:
 
 func _building_rids() -> Array:
 	var rids := []
-	for building: StaticBody3D in [_shell, _nahl, _oren, _renewal]:
+	for building: StaticBody3D in [_shell, _nahl, _oren, _renewal, _kel]:
 		if building == null:
 			continue
 		rids.append(building.get_rid())
@@ -261,6 +263,36 @@ func _check_oren(space: PhysicsDirectSpaceState3D) -> void:
 				var below := _ray(space, foot + Vector3(0, 0.1, 0), foot - Vector3(0, 0.5, 0), _building_rids())
 				if below.is_empty() or below["collider"] != deck:
 					_fail("RENEWAL: a canopy support at z %.1f has no deck under its foot" % z)
+	# Kel: its doors open at their floors; the dock, ramps and landing meet
+	# the height query; the layout audit of both bodies.
+	if _kel != null:
+		var kel_world := _kel.global_transform
+		var kel_datum := float(_lines["KEL"]["datum"])
+		for door: Array in [
+			["gallery door", Vector3(-3.2, 1.2, 9.0), Vector3(-3.2, 1.2, 5.5)],
+			["dock door", Vector3(FireCalderaKel.DOCK_DOOR_X, FireCalderaKel.DOCK + 1.2, -9.0), Vector3(FireCalderaKel.DOCK_DOOR_X, FireCalderaKel.DOCK + 1.2, -5.0)],
+			["descent door", Vector3(FireCalderaKel.DESCENT_DOOR_X, 1.2, -1.4), Vector3(FireCalderaKel.DESCENT_DOOR_X, 1.2, 0.4)],
+			["staff door", Vector3(FireCalderaKel.STAFF_DOOR_X, 1.2, 0.4), Vector3(FireCalderaKel.STAFF_DOOR_X, 1.2, -1.4)],
+			["home door", Vector3(11.0, FireCalderaKel.RESIDENCE + 1.2, FireCalderaKel.HOME_DOOR_Z), Vector3(8.0, FireCalderaKel.RESIDENCE + 1.2, FireCalderaKel.HOME_DOOR_Z)],
+		]:
+			var through := _ray(space, kel_world * (door[1] as Vector3), kel_world * (door[2] as Vector3), [])
+			if not through.is_empty():
+				_fail("KEL: the %s is blocked by %s" % [door[0], (through["collider"] as Node).name])
+		for local: Vector2 in [Vector2(1.0, -5.0), Vector2(7.5, -4.0), Vector2(2.7, -1.7), Vector2(10.8, -8.0), Vector2(10.5, -4.0), Vector2(-5.0, 3.0)]:
+			var top := kel_world * Vector3(local.x, 12.0 if local.x > 9.5 else 4.6, local.y)
+			var hit := _ray(space, top, Vector3(top.x, kel_datum - 1.0, top.z), [])
+			var expected := FireCalderaPlan.level_height(FireCalderaPlan.plot("KEL"), Vector2(top.x, top.z))
+			if is_nan(expected):
+				expected = 0.0
+			if hit.is_empty() or absf(float(hit["position"].y) - kel_datum - expected) > 0.06:
+				_fail("KEL: the floor at %s is %s, the height query %.2f" % [str(local), "none" if hit.is_empty() else "%.2f" % (float(hit["position"].y) - kel_datum), expected])
+		for problem in ClearZones.audit(_kel):
+			_fail("KEL layout: %s" % problem)
+		var kel_home := _kel.get_node_or_null("KelHome") as StaticBody3D
+		if kel_home != null:
+			for problem in ClearZones.audit(kel_home):
+				_fail("KEL home layout: %s" % problem)
+		print("ok   KEL: doors clear at their floors, dock and bridge meet the height query")
 	if _oren.get_node_or_null("Lift") == null:
 		_fail("OREN: no lift to the terrace")
 	print("ok   OREN: doors clear at their floors, split levels and ramps meet the height query")
@@ -332,7 +364,7 @@ func _floor_ray_past_shell(space: PhysicsDirectSpaceState3D, from: Vector3, to: 
 			return hit
 		var collider := hit["collider"] as Node
 		var ours := false
-		for building: StaticBody3D in [_shell, _nahl, _oren, _renewal]:
+		for building: StaticBody3D in [_shell, _nahl, _oren, _renewal, _kel]:
 			if building != null and (collider == building or building.is_ancestor_of(collider)):
 				ours = true
 		if ours:
@@ -440,6 +472,23 @@ func _render() -> void:
 		var pose: Array = renewal[name]
 		camera.global_position = _renewal.global_transform * (pose[0] as Vector3)
 		camera.look_at(_renewal.global_transform * (pose[1] as Vector3), Vector3.UP)
+		for _i in 4:
+			await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])
+		print("saved %s/%s.png" % [_shots, name])
+	var kel := {
+		"kel_front": [Vector3(-2.0, 1.7, 18.0), Vector3(0.0, 3.5, 0.0)],
+		"kel_back": [Vector3(4.0, 3.5, -18.0), Vector3(2.0, 3.5, -6.0)],
+		"kel_aerial": [Vector3(18.0, 16.0, 14.0), Vector3(0.0, 3.0, -1.0)],
+		"kel_gallery": [Vector3(-0.2, 1.7, 6.5), Vector3(-7.0, 1.4, 2.5)],
+		"kel_workshop": [Vector3(-1.5, 2.0, -1.3), Vector3(-7.5, 1.0, -6.5)],
+		"kel_dock": [Vector3(4.8, 1.25 + 1.7, -1.6), Vector3(1.5, 1.3, -7.0)],
+		"kel_home": [Vector3(8.6, 5.2 + 1.6, -1.6), Vector3(2.5, 5.2 + 0.4, -6.5)],
+	}
+	for name: String in kel:
+		var pose: Array = kel[name]
+		camera.global_position = _kel.global_transform * (pose[0] as Vector3)
+		camera.look_at(_kel.global_transform * (pose[1] as Vector3), Vector3.UP)
 		for _i in 4:
 			await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])
