@@ -169,6 +169,27 @@ work within the reserved plot envelope.
 | `ARO` | `(-39,22)` | 17 x 13 m | 22 x 18 m | Thermal works and household; public entrance on terrace loop, service descent to primary manifold. |
 | `RENEWAL` | `(-43,-4)` | 18 x 14 m | 23 x 19 m | Surface tempering and gathering terrace above the submerged communal chamber; linked to Nahl and Aro without becoming a shortcut through either home. |
 
+**Drawn to scale (2026-10-07).** `scripts/fire_caldera_plan.gd`
+(`FireCalderaPlan`) is now the plan; `tools/validate_fire_plan.tscn` checks it
+(`--svg=path` draws it). Drawing it changed these numbers, without changing an
+adjacency or a route connection:
+
+- Kel `(48.2,-4.4)`, Civic `(0,49)` and Renewal `(-48,-4.5)` move 3 to 6 m
+  outward along their own bearing, and Aro to `(-39.4,27)`: their reserved
+  envelopes reached into the promenade. The reservoir's lobes toward them
+  swell 2 m, not 3.
+- Nahl turns 3 degrees round the bank to `(-36.5,-30)`, Vara 8 degrees to
+  `(32.9,32.8)` and Aro 5 degrees, so no two reserved envelopes touch and each
+  terrace link has 5 m between its neighbours.
+- The promenade (R1) follows the bank 4 m out, but keeps within 4.5 m of the
+  building fronts where the bank pulls back into a cove (Nahl, Oren). It runs
+  from Nahl's south side round to Oren's, broken at the arrival.
+- The terrace loop's links (R6 west, R7 east) are radial links through the
+  gaps between plots, joining the promenade to the service loop; R5 runs
+  straight out to Iren between Civic and Aro. R3 runs from the forecourt to the
+  promenade's west end with a short branch to the guest house's door.
+- The west emergency spoke (E1) leaves through the Aro–Iren gap at 131 degrees.
+
 The six household programs are therefore not six detached suburban houses.
 Each household has a compact private volume joined to the work or civic complex
 that explains its daily life. The plot reservations keep private doors away

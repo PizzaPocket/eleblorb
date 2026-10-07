@@ -22,4 +22,10 @@ if [ "${VILLAGE:-ohio}" = "fishing" ]; then
 	exit $?
 fi
 
+# The Fire caldera city likewise, from FireCalderaPlan.
+if [ "${VILLAGE:-ohio}" = "fire" ]; then
+	"$GODOT_BIN" --headless --path "$ROOT" tools/validate_fire_plan.tscn
+	exit $?
+fi
+
 "$GODOT_BIN" --headless --path "$ROOT" tools/validate_village.tscn -- --village="${VILLAGE:-ohio}"
