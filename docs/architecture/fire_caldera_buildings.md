@@ -119,6 +119,12 @@ The only building in the city designed for cool bodies.
   clerestory band.
 - **Variation:** the only cool building; the only beds and the only food in the
   city.
+- **Built (2026-10-07):** the shell is offset 2 m toward the service edge so
+  the full 13 × 4 m dry terrace fits on the public side of the 17 × 14 m
+  reserved plot. A single enlarged socket plinth supports both rather than
+  introducing a second floor collider. The cobalt-and-amber entry fin stands
+  beside the 2 m clear doorway. Eris, all four rest markers, and the 25-Tokoin
+  transaction are wired in the live Fire Kingdom.
 
 ### Nahl tempering hall and Eris's suite (`NAHL`, `(-38, -28)`)
 

@@ -100,6 +100,10 @@ const PLOTS: Array[Dictionary] = [
 		"household": "Nahl", "program": "tempering hall and Eris's suite; public face to the promenade, guest entrance toward arrival", "occupied": true},
 	{"id": "GUEST", "centre": Vector2(-27.0, -51.0), "footprint": Vector2(13.0, 10.0), "reserved": Vector2(17.0, 14.0),
 		"household": "Nahl", "program": "insulated guest house and party rest point, seen from arrival, apart from the treatment rooms", "occupied": true,
+		# The shell sits against the service edge, leaving the full four-metre
+		# public terrace inside the reserved envelope. Its wider foundation
+		# supports both the shifted shell and that terrace.
+		"mass_offset": Vector2(0.0, -2.0), "foundation": Vector2(13.0, 14.0),
 		# Reached by R3 from the forecourt, not from the promenade.
 		"on_promenade": false},
 	{"id": "OREN", "centre": Vector2(30.0, -34.0), "footprint": Vector2(17.0, 12.0), "reserved": Vector2(22.0, 17.0),
@@ -134,6 +138,16 @@ static func facing(entry: Dictionary) -> Vector2:
 	if entry.has("facing"):
 		return (entry["facing"] as Vector2).normalized()
 	return -(entry["centre"] as Vector2).normalized()
+
+
+## Centre of the occupied shell. Most masses are centred in their reserved
+## plot; an approved brief may offset one to make room for a named exterior
+## use without moving the plot or any route.
+static func mass_centre(entry: Dictionary) -> Vector2:
+	var deep := facing(entry)
+	var across := Vector2(-deep.y, deep.x)
+	var offset: Vector2 = entry.get("mass_offset", Vector2.ZERO)
+	return (entry["centre"] as Vector2) + across * offset.x + deep * offset.y
 
 
 ## A plot's rectangle (footprint or reserved) as four corners, its depth along

@@ -37,7 +37,7 @@ static func build(parent: Node3D, entry: Dictionary, datum: float, size: Vector2
 	body.collision_layer = 1
 	body.collision_mask = 0
 	parent.add_child(body)
-	var centre: Vector2 = entry["centre"]
+	var centre := FireCalderaPlan.mass_centre(entry)
 	var deep := FireCalderaPlan.facing(entry)
 	body.position = Vector3(centre.x, datum, centre.y)
 	body.rotation.y = atan2(deep.x, deep.y)

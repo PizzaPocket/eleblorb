@@ -200,3 +200,10 @@ static func band(entry: Dictionary, size_key: String = "footprint") -> PackedVec
 	for point in _loop(centre, across, deep, half, 0.0):
 		outline.append(Vector2(point.x, point.z))
 	return outline
+
+
+## A plot can name a foundation wider than its occupied shell when the same
+## socket supports an approved terrace. Keeping this choice here makes the
+## ground exclusion, visible plinth and collision use one footprint.
+static func size_key(entry: Dictionary) -> String:
+	return "foundation" if entry.has("foundation") else "footprint"

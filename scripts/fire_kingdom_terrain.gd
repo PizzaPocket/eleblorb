@@ -76,6 +76,10 @@ var _river_segment_allowed:Array[PackedByteArray]=[]
 ## register here so traversal, damage, ambience and immersion all consult the
 ## same lava query instead of each prop inventing a separate contact rule.
 var _registered_lava_surfaces:Array[Dictionary]=[]
+## The live survey is computed once, before the fine ground and its plinths,
+## then shared with the village builders so shell, floor and terrain exclusion
+## cannot drift apart.
+var _caldera_surveys:Dictionary={}
 var _under_lava_environment:Environment
 var _lava_camera:Camera3D
 var _planetary_ocean_level := DEFAULT_PLANETARY_OCEAN_LEVEL
@@ -507,14 +511,36 @@ func _build_caldera_ground()->void:
 	var forward:=FireCalderaPlan.forward()
 	frame.transform=Transform3D(Basis(Vector3(right.x,0.0,right.y),Vector3.UP,Vector3(forward.x,0.0,forward.y)),Vector3(CRATER_CENTER.x,0.0,CRATER_CENTER.y))
 	add_child(frame)
-	FireCalderaGround.build(frame,[],func(local:Vector2)->float:
+	var sockets:Array=[]
+	for entry in FireCalderaPlan.PLOTS:
+		if bool(entry.get("open",false)):
+			continue
+		var line:=FireCalderaGround.survey(entry)
+		_caldera_surveys[str(entry["id"])]=line
+		var key:=SocketPlinth.size_key(entry)
+		sockets.append({"outline":SocketPlinth.exclusion(entry,line,key),"band":SocketPlinth.band(entry,key),"datum":float(line["datum"])})
+	FireCalderaGround.build(frame,sockets,func(local:Vector2)->float:
 		var world:=FireCalderaPlan.to_world(local)
 		return _coarse_mesh_height(world.x,world.y))
 	FireCalderaGround.build_lava(frame)
+	# The holes and the foundations are built in the same synchronous stage:
+	# no frame can expose an open collision socket.
+	for entry in FireCalderaPlan.PLOTS:
+		var id:=str(entry["id"])
+		if _caldera_surveys.has(id):
+			SocketPlinth.build(frame,entry,_caldera_surveys[id],SocketPlinth.size_key(entry))
 	var reservoir_world:=PackedVector2Array()
 	for point in FireCalderaPlan.reservoir_polygon(128):
 		reservoir_world.append(FireCalderaPlan.to_world(point))
 	register_lava_polygon(reservoir_world,FireCalderaGround.LAVA_Y)
+
+
+func get_caldera_frame()->Node3D:
+	return get_node_or_null("CalderaCityGround") as Node3D
+
+
+func get_caldera_survey(id:String)->Dictionary:
+	return _caldera_surveys.get(id,{})
 
 func _build_lava_pools()->void:
 	for center in LAVA_POOLS:

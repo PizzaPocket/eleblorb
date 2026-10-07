@@ -30,6 +30,8 @@ const GUEST_STAINED: Array[Color] = [Color(0.16, 0.30, 0.72), Color(0.92, 0.60, 
 
 static func guest_house(parent: Node3D, entry: Dictionary, line: Dictionary) -> StaticBody3D:
 	var body := CalderaShell.build(parent, entry, float(line["datum"]), GUEST_SIZE, GUEST_FRONT_DOOR, GUEST_STAINED)
+	_guest_terrace(body)
+	_guest_entry_fin(body)
 	var top := CalderaShell.STOREY
 	# Partitions, with their doorways.
 	_partition(body, Vector2(-1.5, -5.0), Vector2(-1.5, 5.0), top, [[2.5, PARTY_DOOR], [-1.7, INNER_DOOR]])
@@ -40,6 +42,7 @@ static func guest_house(parent: Node3D, entry: Dictionary, line: Dictionary) -> 
 	Furnishings.counter(body, Vector3(-4.6, 0.0, 1.0), PI, 1.6, false)
 	_piece(body, Vector3(0.3, 0.22, 0.9), COOL_STONE, Vector3(-6.0, 0.22, 3.2), true)
 	_marker(body, "StandMarker", Vector3(-4.6, 0.0, 0.1), 0.0)
+	_marker(body, "KeeperStand", Vector3(-4.6, 0.0, 1.85), PI)
 	# Provisions cabinet: insulated shelves of imported food and water.
 	Furnishings.shelf(body, Vector3(-5.25, 0.0, -4.6), 0.0, 2.0, 4, "crocks")
 	Furnishings.chest(body, Vector3(-6.0, 0.0, -2.2), PI * 0.5, Furnishings.OAK_DARK, 0.8)
@@ -65,6 +68,49 @@ static func guest_house(parent: Node3D, entry: Dictionary, line: Dictionary) -> 
 	_marker(body, "WakeMarker", Vector3(-0.41, 0.6, -3.47), PI)
 	_marker(body, "GatherMarker", Vector3(2.5, 0.0, 1.9), 0.0)
 	return body
+
+
+## The shell was shifted two metres toward the service edge in the plan, so
+## this full 13 x 4 m terrace occupies the public half of the reserved plot.
+## Its finish is visual cladding flush with the socket plinth: the plinth is
+## deliberately the one and only floor collider.
+static func _guest_terrace(body: StaticBody3D) -> void:
+	var terrace := MeshInstance3D.new()
+	terrace.name = "DryPartyTerrace"
+	var slab := BoxMesh.new()
+	slab.size = Vector3(13.0, 0.08, 4.0)
+	terrace.mesh = slab
+	var material := StandardMaterial3D.new()
+	material.albedo_color = COOL_STONE.darkened(0.12)
+	material.roughness = 0.82
+	terrace.material_override = material
+	terrace.position = Vector3(0.0, -0.04, 7.0)
+	body.add_child(terrace)
+	CollisionPolicy.mark_decorative(terrace)
+
+
+## A cobalt-and-amber threshold fin beside, never in front of, the two-metre
+## door. The forged stem forks like the shell mullions and holds two mineral
+## glass leaves, making the entrance legible from the forecourt.
+static func _guest_entry_fin(body: StaticBody3D) -> void:
+	var fin := Node3D.new()
+	fin.name = "EntryFin"
+	fin.position = Vector3(-6.0, 0.0, 6.2)
+	body.add_child(fin)
+	var stem := SuperEgg.build_part(Vector3(0.11, 1.8, 0.11), CalderaShell.STEEL_BLUED, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	stem.position.y = 1.8
+	fin.add_child(stem)
+	CollisionPolicy.add_box(body, stem, Vector3(0.22, 3.6, 0.22), fin.position + stem.position, Basis(), false)
+	for side: float in [-1.0, 1.0]:
+		var branch := SuperEgg.build_part(Vector3(0.055, 0.72, 0.07), CalderaShell.STEEL, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		branch.position = Vector3(side * 0.22, 2.85, 0.0)
+		branch.rotation.z = side * -0.34
+		fin.add_child(branch)
+		CollisionPolicy.mark_decorative(branch)
+	var cobalt := CalderaShell._pane(body, fin.position + Vector3(-0.43, 1.72, 0.0), Vector2(0.34, 1.45), Color(GUEST_STAINED[0], 0.72))
+	cobalt.name = "CobaltFinGlass"
+	var amber := CalderaShell._pane(body, fin.position + Vector3(0.36, 1.35, 0.0), Vector2(0.27, 1.08), Color(GUEST_STAINED[1], 0.72))
+	amber.name = "AmberFinGlass"
 
 
 static func _blanket(i: int) -> Color:

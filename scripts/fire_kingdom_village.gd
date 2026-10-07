@@ -2,6 +2,8 @@ extends Node3D
 
 const NPC_SCENE:=preload("res://scenes/npc.tscn")
 const LAVA_SLIDE_SCENE := preload("res://scenes/lava_slide.tscn")
+const REST_WORLD := "fire_kingdom"
+const REST_POINT := "caldera_village_inn"
 const NAMES:=["Cindra","Basal","Ember","Scoria","Vesta","Pyra","Cinder","Magmus"]
 const LINES:=["The caldera shelters us from the ash wind.","Every stone here remembers being liquid.","The small cones have been restless tonight.","Fire blorbs sleep closest to the warm cracks.","Our village floor is the oldest part of the crater.","The rim glows before an eruption.","Nothing stays cold for long down here.","I can hear the mountain shifting under us."]
 const LAVA_PERSON_COLOR := Color(0.92, 0.24, 0.04)
@@ -52,8 +54,49 @@ func _ready()->void:
 	_build_village_braziers(center)
 	_build_lava_fountain(center)
 	_spawn_lava_slide()
-	var inn_pos := center + Vector2(14.0, -45.0)
-	VillageInn.create(self,_terrain,Vector3(inn_pos.x,_terrain.get_mesh_height(inn_pos.x,inn_pos.y),inn_pos.y),"fire_kingdom","caldera_village_inn",25,"Ember Rest",Color(0.20,0.06,0.035),Color(0.30,0.10,0.055),FIRE_APPEARANCE,true,null,false,"panel",null,[],false,"incinerating")
+	_build_guest_house()
+
+
+## First finished building of the replacement city. It is placed in the same
+## local frame as its surveyed plinth, and the old generic inn is not built.
+func _build_guest_house()->void:
+	var frame:Node3D=_terrain.get_caldera_frame()
+	var line:Dictionary=_terrain.get_caldera_survey("GUEST")
+	if frame==null or line.is_empty():
+		push_error("FireKingdomVillage: live GUEST socket is unavailable")
+		return
+	var body:=FireCalderaBuildings.guest_house(frame,FireCalderaPlan.plot("GUEST"),line)
+	var wake:=body.get_node("WakeMarker") as Marker3D
+	var stand:=body.get_node("StandMarker") as Marker3D
+	var gather:=body.get_node("GatherMarker") as Marker3D
+	var keeper_at:Vector3=(body.get_node("KeeperStand") as Marker3D).position
+	var keeper:=NPC_SCENE.instantiate()
+	keeper.name="ErisNahl"
+	keeper.display_name="Eris Nahl"
+	keeper.stationary=true
+	keeper.facing_degrees=180.0
+	keeper.fixed_ground_y=body.global_position.y+keeper_at.y
+	VillagerAppearance.apply_profile(keeper,6,3,true,FIRE_APPEARANCE)
+	keeper.lava_body=true
+	var eris_lines:Array[String]=[
+		"The guest rooms stay cool. I check the wall cavities whenever someone arrives.",
+		"If the mountain keeps its temper, so can we.",
+		"Leave the ash on the terrace. It has enough stories already.",
+	]
+	keeper.talk_lines=eris_lines
+	keeper.dialog_actions_provider=func()->Array[Dictionary]:
+		return [TransactionInteraction.paid_action(
+			"Rest for the night",int(FireCalderaPlan.REST_POINT["fee"]),
+			func()->void:
+				if RecoveryManager.begin_paid_rest(REST_WORLD,REST_POINT):
+					DialogUI.hide_dialog(),
+			"Your purse feels too light.",
+			func()->bool:return RecoveryManager.can_rest()
+		)]
+	keeper.set_terrain_reference(_terrain)
+	keeper.position=keeper_at
+	body.add_child(keeper)
+	RecoveryManager.register_rest_point.call_deferred(REST_WORLD,REST_POINT,wake.global_transform,stand.global_transform,gather.global_position)
 
 
 func _spawn_lava_slide() -> void:

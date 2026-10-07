@@ -40,12 +40,13 @@ func _run() -> void:
 			continue
 		var line := FireCalderaGround.survey(entry)
 		_lines[entry["id"]] = line
-		sockets.append({"outline": SocketPlinth.exclusion(entry, line), "band": SocketPlinth.band(entry), "datum": float(line["datum"])})
+		var key := SocketPlinth.size_key(entry)
+		sockets.append({"outline": SocketPlinth.exclusion(entry, line, key), "band": SocketPlinth.band(entry, key), "datum": float(line["datum"])})
 	_ground = FireCalderaGround.build(self, sockets)
 	FireCalderaGround.build_lava(self)
 	for entry in FireCalderaPlan.PLOTS:
 		if _lines.has(entry["id"]):
-			_plinths[entry["id"]] = SocketPlinth.build(self, entry, _lines[entry["id"]])
+			_plinths[entry["id"]] = SocketPlinth.build(self, entry, _lines[entry["id"]], SocketPlinth.size_key(entry))
 	# The kit's first shell: the guest house (brief section 3), cobalt and amber.
 	var guest := FireCalderaPlan.plot("GUEST")
 	_shell = FireCalderaBuildings.guest_house(self, guest, _lines["GUEST"])
@@ -98,9 +99,10 @@ func _check() -> void:
 				walled += 1
 				var reveal := edge - outward * 0.6
 				# Past any roof overhanging the reveal: the check is of its floor.
-				var hit := _ray(space, Vector3(reveal.x, ground + 2.0, reveal.y), Vector3(reveal.x, datum - 1.0, reveal.y), [_shell.get_rid()] if _shell != null else [])
+				var hit := _ray(space, Vector3(reveal.x, ground + 2.0, reveal.y), Vector3(reveal.x, datum - 1.0, reveal.y), _building_rids())
 				if hit.is_empty() or hit["collider"] != plinth or absf(float(hit["position"].y) - datum) > 0.06:
-					_fail("%s: the uphill reveal at %s is not clear at the datum" % [id, str(reveal.round())])
+					var detail := "no floor" if hit.is_empty() else "%s at %.2f" % [(hit["collider"] as Node).name, float(hit["position"].y)]
+					_fail("%s: the uphill reveal at %s is not clear at the datum (%s)" % [id, str(reveal.round()), detail])
 			elif ground < datum - 0.05 and float(line["bottom"]) > ground - 1.0:
 				_fail("%s: daylight under the base at %s" % [id, str(edge.round())])
 		# The front landing meets the floor.
@@ -146,7 +148,7 @@ func _check_shell(space: PhysicsDirectSpaceState3D) -> void:
 		var hit := _ray(space, to_world * (door[1] as Vector3), to_world * (door[2] as Vector3), [])
 		if not hit.is_empty():
 			_fail("GUEST: the %s doorway is blocked by %s" % [door[0], (hit["collider"] as Node).name])
-	for marker in ["WakeMarker", "StandMarker", "GatherMarker"]:
+	for marker in ["WakeMarker", "StandMarker", "GatherMarker", "KeeperStand", "DryPartyTerrace", "EntryFin"]:
 		if _shell.get_node_or_null(marker) == null:
 			_fail("GUEST: no %s" % marker)
 	print("ok   GUEST: door bay and inner doorways clear, roof, plinth and rest markers in place")

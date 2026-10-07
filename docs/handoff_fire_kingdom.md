@@ -1,7 +1,7 @@
 # Handoff: Fire Kingdom Caldera City
 
-**Progress (2026-10-07).** The plan, live caldera ground and reservoir exist
-and validate; the replacement buildings are not yet in the world.
+**Progress (2026-10-07).** The plan, live caldera ground, reservoir, all nine
+surface foundations, and the finished guest house exist and validate.
 
 - `scripts/fire_caldera_plan.gd` (`FireCalderaPlan`): the approved layout as
   data. `VILLAGE=fire tools/check_village_layout.sh` runs
@@ -30,16 +30,18 @@ and validate; the replacement buildings are not yet in the world.
 - The building briefs (`fire_caldera_buildings.md`) were approved by the user
   on 2026-10-07.
 
-- `scripts/caldera_shell.gd` (`CalderaShell`): the kit's first shell,
-  prototyped on the guest house in `tools/fire_caldera_proof.tscn`: steel
+- `scripts/caldera_shell.gd` (`CalderaShell`): the kit's first shell, now live
+  as the guest house as well as prototyped in `tools/fire_caldera_proof.tscn`: steel
   frame on the 2 m module, smoky glazed front between branching mullions,
   basalt composite walls, a stained clerestory band, a 3 m door bay with a
   2 m clear opening and pivoting leaves, a shallow walkable roof slab. The
   proof checks its door bay is clear, 2.4 m of headroom, and that it stands on
   its plinth. `FireCalderaBuildings.guest_house()` adds the receiving room,
   provisions cabinet, washroom, eight-bed party room and rest markers; the
-  proof checks all inner doorways. Not yet: the entry fin, the terrace, live
-  rest-point wiring, and the curved superellipse plan the landmarks need.
+  proof checks all inner doorways. Its 13 × 4 m dry terrace is supported by
+  the same widened socket, its cobalt-and-amber entry fin keeps clear of the
+  door, and Eris Nahl now offers the registered 25-Tokoin rest point. Not yet:
+  the curved superellipse plan the landmarks need.
 
 - `tools/fire_caldera_world_probe.tscn`: instantiates the real terrain and
   checks the fine ground and reservoir exist, live height and lava queries,
@@ -47,10 +49,9 @@ and validate; the replacement buildings are not yet in the world.
   below the city (0 FAIL). `village_aerial_capture.gd -- --village=fire`
   renders the live transition for visual review.
 
-Next, in order: put the surveyed sockets and all nine plinths into the live
-caldera ground as one atomic step (no open collision holes); instantiate the
-guest house on its plinth, finish its entry fin and dry party terrace, and wire
-Eris and the 25-Tokoin rest point; then build the remaining briefs plot by plot.
+Next, in order: build the remaining briefs plot by plot, beginning with the
+arrival forecourt and its paired welcome pylons so the guest route has its
+authored public approach, then the Nahl tempering hall and Eris's suite.
 Only after their replacements work should the old eight houses, fountain,
 braziers and placeholder residents be removed.
 

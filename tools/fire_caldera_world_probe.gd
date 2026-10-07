@@ -10,6 +10,7 @@ extends Node3D
 
 var _failures := 0
 var _terrain: StaticBody3D
+var _village: Node3D
 
 
 func _ready() -> void:
@@ -30,6 +31,9 @@ func _run() -> void:
 	if frame != null:
 		_expect(frame.get_node_or_null("CalderaGround") != null, "the live terrain builds the fine caldera ground")
 		_expect(frame.get_node_or_null("ReservoirLava") != null, "the live terrain builds the reservoir surface")
+		for entry in FireCalderaPlan.PLOTS:
+			if not bool(entry.get("open", false)):
+				_expect(frame.get_node_or_null("%sPlinth" % entry["id"]) != null, "the live terrain builds the %s plinth" % entry["id"])
 	var centre := FireCalderaPlan.CENTRE_WORLD
 	_expect(is_equal_approx(_terrain.get_mesh_height(centre.x, centre.y), FireCalderaGround.height(Vector2.ZERO)), "height queries use the authored reservoir bed")
 	_expect(_terrain.is_lava_area(centre), "the live reservoir is registered as lava")
@@ -53,6 +57,35 @@ func _run() -> void:
 	if ground != null:
 		var beneath := _ray(space, Vector3(centre.x, 0.0, centre.y), Vector3(centre.x, -80.0, centre.y), [ground.get_rid()])
 		_expect(beneath.is_empty(), "the coarse placeholder floor is absent below the city")
+		for entry in FireCalderaPlan.PLOTS:
+			if bool(entry.get("open", false)):
+				continue
+			var datum := float(_terrain.get_caldera_survey(str(entry["id"]))["datum"])
+			var local:Vector2 = entry["centre"]
+			var top := frame.global_transform * Vector3(local.x, datum + 0.25, local.y)
+			var bottom := frame.global_transform * Vector3(local.x, datum - 3.0, local.y)
+			var floor_hit := _ray(space, top, bottom, [])
+			_expect(not floor_hit.is_empty() and (floor_hit["collider"] as Node).name == "%sPlinth" % entry["id"], "%s socket has its plinth as the live floor" % entry["id"])
+	# Add the transitional village only after the terrain rays: its old lava
+	# fountain still occupies the reservoir centre until the remaining city
+	# buildings replace it, and must not masquerade as the basin collider.
+	_village = (load("res://scripts/fire_kingdom_village.gd") as GDScript).new()
+	_village.name = "CalderaVillage"
+	add_child(_village)
+	for _i in 6:
+		await get_tree().physics_frame
+	if frame != null:
+		var guest := frame.get_node_or_null("GUESTShell") as StaticBody3D
+		_expect(guest != null, "the live village builds the finished guest house")
+		if guest != null:
+			for child_name in ["DryPartyTerrace", "EntryFin", "WakeMarker", "StandMarker", "GatherMarker", "KeeperStand", "ErisNahl"]:
+				_expect(guest.get_node_or_null(child_name) != null, "the live guest house has %s" % child_name)
+			var eris := guest.get_node_or_null("ErisNahl")
+			if eris != null:
+				var actions:Array = eris.dialog_actions_provider.call()
+				_expect(actions.size() == 1 and int(actions[0].get("price", -1)) == 25, "Eris offers the 25-Tokoin rest action")
+	var registered:Dictionary = RecoveryManager.get("_registered_points")
+	_expect(registered.has("fire_kingdom:caldera_village_inn"), "the live guest house registers its recovery point")
 	print("---- fire_caldera_world_probe: %d FAIL" % _failures)
 	get_tree().quit(1 if _failures > 0 else 0)
 

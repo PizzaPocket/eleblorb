@@ -288,6 +288,9 @@ Progress (2026-10-07): `FireCalderaPlan`, its validator and plan drawing;
 (`tools/fire_caldera_proof.tscn`); and the live terrain integration with its
 polygon reservoir (`tools/fire_caldera_world_probe.tscn`, 0 FAIL). The coarse
 flat floor is absent beneath the fine city mesh and their seam agrees exactly.
+All nine socket plinths are now live in the same atomic ground build. The
+finished guest house, its supported dry terrace and entry fin, Eris Nahl, and
+the registered 25-Tokoin rest point are live; the arrival forecourt is next.
 See the handoff.
 
 ## 5. Chinese Village
