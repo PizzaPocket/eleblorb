@@ -197,7 +197,16 @@ shaping glass, keepsake shelves), and **the mediation room sits behind** as a
 conversation pit dug 0.5 m into the plinth on the uphill side, its bench clad
 in trencadis with pale olivine cushions, an LED line under its lip and a pale
 dome for its only window. The plan's pit data cuts the plinth, drops the
-hidden ground below it and sets the height query.
+hidden ground below it and sets the height query. Its heart is heated stone: a low
+sinter slab with a faint warm line at its foot, not lava. Eris rests in a
+**lava bed**, between a bed and a bath: a raised superellipse of cast
+forsterite (the refractory made from olivine) with a deep superellipse hollow
+that lava fills from a duct beneath, head to the party wall, a ceramic-fibre
+mat beside it. The alcove holds a day couch under silica cloth with a
+basalt-fibre throw. The house has no stainless steel: its metal is wrought
+iron (a silvered glass in an iron frame for shaping, iron dials, iron shelf
+rails), its textiles undyed heat-proof cloth (silica, ceramic fibre,
+weathered basalt fibre), kept pale and low in contrast.
 
 
 - **Mass:** a 16 × 12 m shell on a stepped podium. Its public face looks onto

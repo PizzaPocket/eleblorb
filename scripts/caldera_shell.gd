@@ -236,13 +236,13 @@ static func _fork(body: StaticBody3D, at: Vector3, along: Vector2) -> void:
 ## on the floor), turned by `yaw`, with one superellipse doorway in its middle:
 ## the punched facade, its piped stainless frame and leaves of the same
 ## outline. Shared by outside door bays and inner partitions.
-static func door_opening(body: StaticBody3D, origin: Vector3, yaw: float, length: float, height: float, thickness: float, clear: float, door_height: float, leaves: int, colour: Color = VOLCANIC_STONE) -> void:
+static func door_opening(body: StaticBody3D, origin: Vector3, yaw: float, length: float, height: float, thickness: float, clear: float, door_height: float, leaves: int, colour: Color = VOLCANIC_STONE, trim: Color = STAINLESS_SHADOW) -> void:
 	var opening: Array[Dictionary] = [{
 		"kind": "door", "center": 0.0, "width": clear, "bottom": 0.0, "top": door_height,
 		"leaves": leaves, "exponent": TownProps.OPENING_EXPONENT,
 	}]
 	TownProps._build_panel_facade(body, length, origin, yaw, colour, opening, 0.0, height, thickness)
-	TownProps._build_panel_opening_trim(body, origin, yaw, opening[0], 0.0, STAINLESS_SHADOW, thickness, STEEL_BLUED.lightened(0.12))
+	TownProps._build_panel_opening_trim(body, origin, yaw, opening[0], 0.0, trim, thickness, STEEL_BLUED.lightened(0.12))
 
 
 static func _oriented(size: Vector3, yaw: float) -> Vector3:

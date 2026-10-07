@@ -57,9 +57,20 @@ const INNER_DOOR_HEIGHT := FireCalderaBuildings.INNER_DOOR_HEIGHT
 const MOLTEN_BAY := Rect2(Vector2(-7.7, -5.7), Vector2(3.1, 5.2))
 const MOLTEN_Y := 0.03
 const MOLTEN := Color(1.0, 0.42, 0.08)
-## Eris's immersion well, in the suite's west half.
-const WELL_CENTRE := Vector2(3.6, 1.2)
-const WELL_HALF := Vector2(1.15, 0.95)
+## Eris's lava bed: a raised bath she rests in, its head to the party wall.
+const BED_CENTRE := Vector2(3.35, 1.0)
+const BED_HALF := Vector2(1.15, 0.6)
+const BED_HEIGHT := 0.55
+const BED_WALL := 0.13
+const BED_LAVA_Y := 0.47
+## Cast forsterite: the refractory made from the caldera's own olivine.
+const FORSTERITE := Color(0.82, 0.83, 0.74)
+## The heat-proof cloths, pale and undyed: silica cloth, ceramic fibre and
+## basalt fibre lightened by weathering. No stainless steel in this house: its
+## metal is wrought iron (stainless belongs to the guest house).
+const SILICA := Color(0.90, 0.87, 0.80)
+const CERAMIC := Color(0.94, 0.93, 0.89)
+const BASALT_FIBRE := Color(0.76, 0.68, 0.55)
 const COOL_LEDGE := Color(0.62, 0.60, 0.57)
 
 
@@ -260,11 +271,13 @@ static func _tree_columns(body: StaticBody3D) -> void:
 ## [{"polygon": PackedVector2Array, "y": float}], local.
 static func lava_surfaces() -> Array[Dictionary]:
 	var bay := PackedVector2Array([MOLTEN_BAY.position, Vector2(MOLTEN_BAY.end.x, MOLTEN_BAY.position.y), MOLTEN_BAY.end, Vector2(MOLTEN_BAY.position.x, MOLTEN_BAY.end.y)])
-	var well := PackedVector2Array()
-	for i in 24:
-		var angle := TAU * float(i) / 24.0
-		well.append(WELL_CENTRE + Vector2(cos(angle) * WELL_HALF.x * 0.9, sin(angle) * WELL_HALF.y * 0.9))
-	return [{"polygon": bay, "y": MOLTEN_Y}, {"polygon": well, "y": 0.04}]
+	var bed := PackedVector2Array()
+	for i in 32:
+		var t := TAU * float(i) / 32.0
+		var c := cos(t)
+		var s := sin(t)
+		bed.append(BED_CENTRE + Vector2(signf(c) * pow(absf(c), 0.5) * (BED_HALF.x - BED_WALL), signf(s) * pow(absf(s), 0.5) * (BED_HALF.y - BED_WALL)))
+	return [{"polygon": bay, "y": MOLTEN_Y}, {"polygon": bed, "y": BED_LAVA_Y}]
 
 
 ## Registers this building's molten surfaces with the live terrain, in its
@@ -293,7 +306,7 @@ static func _partitions(body: StaticBody3D) -> void:
 		var south := z - INNER_DOOR_WIDTH * 0.5 - 0.35
 		var north := minf(z + INNER_DOOR_WIDTH * 0.5 + 0.35, front)
 		_inner(body, Vector3(PARTY_X, STOREY * 0.5, (cursor + south) * 0.5), Vector3(0.22, STOREY, south - cursor))
-		CalderaShell.door_opening(body, Vector3(PARTY_X, 0.0, (south + north) * 0.5), PI * 0.5, north - south, STOREY, 0.22, INNER_DOOR_WIDTH, INNER_DOOR_HEIGHT, 1, TUFF)
+		CalderaShell.door_opening(body, Vector3(PARTY_X, 0.0, (south + north) * 0.5), PI * 0.5, north - south, STOREY, 0.22, INNER_DOOR_WIDTH, INNER_DOOR_HEIGHT, 1, TUFF, IRON)
 		for direction: Vector2 in [Vector2(1, 0), Vector2(-1, 0)]:
 			ClearZones.add(body, str(door[1]), "door", Vector2(PARTY_X, z), direction, 0.0, 1.0, INNER_DOOR_WIDTH * 0.5, 0.05, 1.9)
 		cursor = north
@@ -397,10 +410,20 @@ static func _platforms(body: StaticBody3D) -> void:
 		CalderaFurniture.piece(body, Vector3(0.5, 0.03, 1.08), Color(0.22, 0.12, 0.10), Vector3(x, 0.46, -4.5), 0.0, false, SuperEgg.EPSILON_SOFT)
 		for side: float in [-1.0, 1.0]:
 			FireCalderaBuildings._glow(body, "RadiantSeam", Vector3(0.008, 0.012, 1.0), Vector3(x + side * 0.56, 0.18, -4.5), Color(1.0, 0.45, 0.12))
-		# The control: a stainless dial on a short post at the head.
-		CalderaShell._metal(body, Vector3(x + 0.4, 0.45, -5.75), Vector3(0.06, 0.9, 0.06), CalderaShell.STAINLESS_SHADOW, false)
-		var dial := CalderaFurniture.piece(body, Vector3(0.07, 0.07, 0.02), CalderaShell.STAINLESS, Vector3(x + 0.4, 0.92, -5.72), 0.0, false, 2.0)
-		dial.material_override = SolidModel.material(CalderaShell.STAINLESS, 0.15, 0.95)
+		# The control: a forged iron dial with a sinter face on a short post at
+		# the head.
+		CalderaShell._metal(body, Vector3(x + 0.4, 0.45, -5.75), Vector3(0.06, 0.9, 0.06), IRON, false)
+		var dial := CalderaFurniture.piece(body, Vector3(0.07, 0.07, 0.02), IRON, Vector3(x + 0.4, 0.92, -5.72), 0.0, false, 2.0)
+		dial.material_override = SolidModel.material(IRON, 0.3, 0.85)
+		CalderaFurniture.piece(body, Vector3(0.05, 0.05, 0.01), SINTER, Vector3(x + 0.4, 0.92, -5.695), 0.0, false, 2.0)
+	# A pale silica cloth folded at the foot of each platform, for the patient
+	# to draw over as they cool back into themselves.
+	for x: float in [-3.6, -1.8, 0.0]:
+		CalderaFurniture.piece(body, Vector3(0.42, 0.035, 0.2), SILICA, Vector3(x, 0.5, -3.55), 0.0, false, SuperEgg.EPSILON_SOFT)
+	# Eris's tray of corrective minerals by her stool.
+	CalderaFurniture.piece(body, Vector3(0.24, 0.03, 0.16), PUMICE, Vector3(-2.7, 0.03, -2.35), 0.3, false, 4.0)
+	for i in 3:
+		CalderaFurniture.piece(body, Vector3(0.04, 0.03, 0.04), [OLIVINE, SULPHUR, RHYOLITE][i], Vector3(-2.82 + 0.1 * float(i), 0.08, -2.35 + 0.03 * float(i)), float(i), false, 2.4)
 	CalderaFurniture.concealed_light(body, Vector3(-1.8, 1.2, -4.2), Color(1.0, 0.55, 0.22), 0.7, 5.0)
 	# Eris's stool: a steel pedestal and a basalt seat.
 	CalderaShell._metal(body, Vector3(-2.7, 0.3, -2.9), Vector3(0.08, 0.6, 0.08), CalderaShell.STEEL_BLUED, false)
@@ -414,10 +437,12 @@ static func _platforms(body: StaticBody3D) -> void:
 static func _hall_fittings(body: StaticBody3D) -> void:
 	CalderaFurniture.shelves(body, Vector3(-7.62, 0.0, 4.4), -PI * 0.5, 2.4, 4, func(b: StaticBody3D, p: Vector3, i: int) -> void:
 		var minerals: Array[Color] = [Color(0.55, 0.30, 0.60), Color(0.30, 0.62, 0.55), Color(0.80, 0.55, 0.20), Color(0.62, 0.20, 0.18), Color(0.85, 0.82, 0.72)]
-		CalderaFurniture.piece(b, Vector3(0.06, 0.05, 0.06), minerals[(i * 3) % minerals.size()], p + Vector3(0, 0.05, 0), float(i) * 0.7, false, 2.6))
+		CalderaFurniture.piece(b, Vector3(0.06, 0.05, 0.06), minerals[(i * 3) % minerals.size()], p + Vector3(0, 0.05, 0), float(i) * 0.7, false, 2.6), IRON)
 	CalderaFurniture.piece(body, Vector3(1.1, 0.22, 0.26), SINTER.darkened(0.06), Vector3(-0.2, 0.22, 3.2), 0.0, true)
 	for x: float in [-4.6, -1.4]:
 		CalderaFurniture.flame_capsule(body, Vector3(x, 0.0, 5.45))
+	# A runner of weathered basalt fibre from the door to the platforms.
+	CalderaFurniture.mat(body, Vector3(HALL_DOOR_X, 0.0, 0.9), 0.0, Vector2(1.3, 6.4), BASALT_FIBRE.lightened(0.12))
 	for x: float in [-5.4, -0.6]:
 		CalderaFurniture.concealed_light(body, Vector3(x, 3.4, 1.2), CalderaFurniture.LED_WARM, 0.9, 7.0)
 
@@ -454,7 +479,10 @@ static func _mediation_room(body: StaticBody3D) -> void:
 	# The step down, at the door end.
 	var step := at + Vector2(-half.x + 0.3, 0.0)
 	CalderaFurniture.piece(body, Vector3(0.28, (depth * 0.5) * 0.5, 0.45), SINTER, Vector3(step.x, -depth + depth * 0.25, step.y), 0.0, true, 5.0)
-	FireCalderaBuildings._glow(body, "PitSeam", Vector3(0.9, 0.01, 0.5), Vector3(at.x, -depth + 0.012, at.y), Color(1.0, 0.45, 0.10))
+	# Heated stone at the pit's heart: a low sinter slab, warm to sit beside,
+	# its glow only a faint line where it meets the floor.
+	CalderaFurniture.piece(body, Vector3(0.8, 0.05, 0.45), SINTER.darkened(0.04), Vector3(at.x, -depth + 0.05, at.y), 0.0, true, 6.0).name = "HeatedStone"
+	FireCalderaBuildings._glow(body, "HeatedStoneEdge", Vector3(0.82, 0.004, 0.47), Vector3(at.x, -depth + 0.006, at.y), Color(1.0, 0.62, 0.38).darkened(0.35))
 	# A concealed LED line under the pit's lip, lighting the cushions.
 	var lip := PackedVector2Array()
 	for i in 48:
@@ -477,40 +505,95 @@ static func _mediation_room(body: StaticBody3D) -> void:
 ## silhouette by, a private immersion well, a cooler resting niche in the back
 ## corner, and along the east wall her shelf of objects from seventy years.
 static func _suite(body: StaticBody3D) -> void:
-	# Entry: a basalt ledge to set things on, by the door.
+	# Entry: a sinter ledge to set things on, by the door.
 	CalderaFurniture.piece(body, Vector3(0.18, 0.45, 0.3), SINTER.darkened(0.08), Vector3(7.55, 0.45, 3.55), 0.0, true)
-	# Receiving: two warm seats side by side.
+	# Receiving: two warm seats side by side, a silica cloth over one.
 	for x: float in [5.0, 6.3]:
 		CalderaFurniture.piece(body, Vector3(0.34, 0.22, 0.3), RHYOLITE, Vector3(x, 0.22, 3.4), 0.0, true, SuperEgg.EPSILON_SOFT)
-	# Shaping: a tall obsidian glass on the party wall, a line behind its head.
-	var mirror := CalderaFurniture.piece(body, Vector3(0.02, 1.0, 0.5), Color(0.05, 0.05, 0.06), Vector3(PARTY_X + 0.14, 1.25, 2.9), 0.0, false, 7.0)
-	mirror.material_override = SolidModel.material(Color(0.05, 0.05, 0.06), 0.04, 0.5)
+	CalderaFurniture.piece(body, Vector3(0.3, 0.02, 0.32), SILICA, Vector3(6.3, 0.45, 3.42), 0.15, false, SuperEgg.EPSILON_SOFT)
+	# Shaping: a tall silvered glass on the party wall in a thin forged iron
+	# frame, a line behind its head.
+	var mirror := CalderaFurniture.piece(body, Vector3(0.02, 1.0, 0.5), Color(0.86, 0.87, 0.86), Vector3(PARTY_X + 0.14, 1.25, 2.9), 0.0, false, 7.0)
+	mirror.name = "ShapingGlass"
+	mirror.material_override = SolidModel.material(Color(0.86, 0.87, 0.86), 0.04, 0.8)
+	var frame := SuperEgg.build_part(Vector3(0.015, 1.04, 0.54), IRON, 7.0, 7.0)
+	frame.material_override = SolidModel.material(IRON, 0.3, 0.85)
+	frame.position = Vector3(PARTY_X + 0.125, 1.25, 2.9)
+	body.add_child(frame)
+	CollisionPolicy.mark_decorative(frame)
 	CalderaFurniture.led_line(body, Vector3(PARTY_X + 0.115, 2.27, 2.9), PI * 0.5, 0.9, CalderaFurniture.LED_WARM)
-	# The immersion well: a shallow lava pool within a cool basalt ledge for
-	# her adornments.
-	var lava := SuperEgg.build_part(Vector3(WELL_HALF.x, 0.02, WELL_HALF.y), MOLTEN, 2.6, 2.6)
+	_lava_bed(body)
+	# Beside the bed, a mat of ceramic fibre to step out onto.
+	CalderaFurniture.mat(body, Vector3(BED_CENTRE.x, 0.0, BED_CENTRE.y + BED_HALF.y + 0.5), 0.0, Vector2(1.6, 0.7), CERAMIC.darkened(0.05))
+	# The day couch in the stone alcove, back east: a cool slab under a silica
+	# cover, a basalt-fibre throw folded at one end.
+	CalderaFurniture.piece(body, Vector3(0.9, 0.16, 0.5), COOL_LEDGE, Vector3(6.9, 0.16, -0.35), 0.0, true, SuperEgg.EPSILON_SOFT)
+	CalderaFurniture.piece(body, Vector3(0.86, 0.035, 0.47), SILICA, Vector3(6.9, 0.34, -0.35), 0.0, false, SuperEgg.EPSILON_SOFT)
+	CalderaFurniture.piece(body, Vector3(0.24, 0.05, 0.42), BASALT_FIBRE, Vector3(7.5, 0.41, -0.33), 0.05, false, SuperEgg.EPSILON_SOFT)
+	CalderaFurniture.piece(body, Vector3(0.08, 1.1, 0.5), TUFF, Vector3(5.9, 1.1, -0.4), 0.0, true)
+	# A curtain of silica cloth drawn half across the window onto the
+	# promenade, on a thin iron rod.
+	_curtain(body, Vector3(3.5, 0.0, HALF_Z - 0.3), 1.6, 3.0)
+	# Seventy years of objects: glass and steel shelves on the east wall, each
+	# piece different, gifts and keepsakes from every household.
+	CalderaFurniture.shelves(body, Vector3(7.62, 0.0, 2.0), PI * 0.5, 2.4, 3, func(b: StaticBody3D, p: Vector3, i: int) -> void:
+		var keepsakes: Array[Color] = [Color(0.80, 0.76, 0.70), Color(0.74, 0.78, 0.66), Color(0.82, 0.74, 0.62), Color(0.72, 0.74, 0.76), Color(0.78, 0.68, 0.64), Color(0.86, 0.84, 0.80)]
+		var size := 0.04 + 0.03 * float((i * 7) % 3)
+		CalderaFurniture.piece(b, Vector3(size, size * (1.0 + float(i % 2)), size), keepsakes[(i * 5) % keepsakes.size()], p + Vector3(0, size * (1.0 + float(i % 2)), 0), float(i), false, 2.0 + float(i % 4)), IRON)
+	CalderaFurniture.concealed_light(body, Vector3(5.0, 3.2, 2.4), CalderaFurniture.LED_WARM, 0.9, 6.0)
+
+
+## Eris's lava bed, between a bed and a bath: a raised superellipse of cast
+## forsterite with a deep superellipse hollow punched into it, which the lava
+## fills from a duct beneath. She rests in it. The duct shows only as an iron
+## inspection plate in the floor at the bed's foot.
+static func _lava_bed(body: StaticBody3D) -> void:
+	var solid := CSGCombiner3D.new()
+	solid.name = "LavaBed"
+	solid.use_collision = true
+	solid.collision_layer = 1
+	solid.collision_mask = 0
+	solid.position = Vector3(BED_CENTRE.x, 0.0, BED_CENTRE.y)
+	body.add_child(solid)
+	var stone := SolidModel.material(FORSTERITE, 0.7, 0.0)
+	var shell := SolidModel.add_profile(solid, "Shell", BED_HEIGHT, Vector2(BED_HALF.x, BED_HALF.y), 4.0, CSGShape3D.OPERATION_UNION, stone, Vector3(0, BED_HEIGHT * 0.5, 0), 72)
+	shell.rotation.z = PI * 0.5
+	var hollow := SolidModel.add_profile(solid, "Hollow", BED_HEIGHT, Vector2(BED_HALF.x - BED_WALL, BED_HALF.y - BED_WALL), 4.0, CSGShape3D.OPERATION_SUBTRACTION, stone, Vector3(0, BED_HEIGHT * 0.5 + 0.18, 0), 72)
+	hollow.rotation.z = PI * 0.5
+	var lava := MeshInstance3D.new()
+	lava.name = "BedLava"
+	lava.mesh = SolidModel.extruded_profile_mesh(0.03, Vector2(BED_HALF.x - BED_WALL - 0.005, BED_HALF.y - BED_WALL - 0.005), 4.0, 72)
 	var material := StandardMaterial3D.new()
 	material.albedo_color = MOLTEN
 	material.emission_enabled = true
 	material.emission = MOLTEN
-	material.emission_energy_multiplier = 2.4
+	material.emission_energy_multiplier = 2.2
 	lava.material_override = material
-	lava.position = Vector3(WELL_CENTRE.x, 0.04, WELL_CENTRE.y)
+	lava.position = Vector3(BED_CENTRE.x, BED_LAVA_Y, BED_CENTRE.y)
+	lava.rotation.z = PI * 0.5
 	body.add_child(lava)
 	CollisionPolicy.mark_decorative(lava)
-	for i in 16:
-		var angle := TAU * float(i) / 16.0
-		var at := WELL_CENTRE + Vector2(cos(angle) * (WELL_HALF.x + 0.12), sin(angle) * (WELL_HALF.y + 0.12))
-		CalderaFurniture.piece(body, Vector3(0.2, 0.08, 0.14), COOL_LEDGE, Vector3(at.x, 0.08, at.y), -angle + PI * 0.5, false, 4.0)
-	CalderaFurniture.concealed_light(body, Vector3(WELL_CENTRE.x, 0.6, WELL_CENTRE.y), Color(1.0, 0.5, 0.18), 1.1, 4.5)
-	# The resting niche: a cooler basalt slab in a stone alcove, back east.
-	CalderaFurniture.piece(body, Vector3(0.9, 0.16, 0.5), COOL_LEDGE, Vector3(6.9, 0.16, -0.35), 0.0, true, SuperEgg.EPSILON_SOFT)
-	CalderaFurniture.piece(body, Vector3(0.08, 1.1, 0.5), TUFF, Vector3(5.9, 1.1, -0.4), 0.0, true)
-	FireCalderaBuildings._marker(body, "ErisRestMarker", Vector3(6.9, 0.32, -0.35), 0.0)
-	# Seventy years of objects: glass and steel shelves on the east wall, each
-	# piece different, gifts and keepsakes from every household.
-	CalderaFurniture.shelves(body, Vector3(7.62, 0.0, 2.0), PI * 0.5, 2.4, 3, func(b: StaticBody3D, p: Vector3, i: int) -> void:
-		var keepsakes: Array[Color] = [Color(0.55, 0.30, 0.60), Color(0.82, 0.62, 0.24), Color(0.30, 0.62, 0.55), Color(0.70, 0.73, 0.75), Color(0.62, 0.20, 0.18), Color(0.16, 0.30, 0.72)]
-		var size := 0.04 + 0.03 * float((i * 7) % 3)
-		CalderaFurniture.piece(b, Vector3(size, size * (1.0 + float(i % 2)), size), keepsakes[(i * 5) % keepsakes.size()], p + Vector3(0, size * (1.0 + float(i % 2)), 0), float(i), false, 2.0 + float(i % 4)))
-	CalderaFurniture.concealed_light(body, Vector3(5.0, 3.2, 2.4), CalderaFurniture.LED_WARM, 0.9, 6.0)
+	# The duct's inspection plate in the floor at the bed's foot.
+	var plate := SuperEgg.build_part(Vector3(0.16, 0.006, 0.16), PUMICE.darkened(0.12), 2.4, 6.0)
+	plate.material_override = SolidModel.material(PUMICE.darkened(0.12), 0.8, 0.0)
+	plate.position = Vector3(BED_CENTRE.x + BED_HALF.x + 0.3, 0.008, BED_CENTRE.y)
+	body.add_child(plate)
+	CollisionPolicy.mark_decorative(plate)
+	CalderaFurniture.concealed_light(body, Vector3(BED_CENTRE.x, 0.9, BED_CENTRE.y), Color(1.0, 0.55, 0.22), 1.0, 4.5)
+	FireCalderaBuildings._marker(body, "ErisRestMarker", Vector3(BED_CENTRE.x, BED_LAVA_Y, BED_CENTRE.y), 0.0)
+
+
+## A soft curtain of silica cloth on a thin iron rod: a few hanging folds,
+## faintly translucent, `width` wide, its rod at `height`.
+static func _curtain(body: StaticBody3D, at: Vector3, width: float, height: float) -> void:
+	_branch(body, at + Vector3(-width * 0.55, height, 0), at + Vector3(width * 0.55, height, 0), 0.012)
+	var folds := 5
+	for i in folds:
+		var x := -width * 0.5 + width * (float(i) + 0.5) / float(folds) * 0.6
+		var fold := SuperEgg.build_part(Vector3(width * 0.08, (height - 0.12) * 0.5, 0.025), SILICA, 3.0, 6.0)
+		var cloth := SolidModel.material(Color(SILICA, 0.85), 0.9, 0.0)
+		cloth.cull_mode = BaseMaterial3D.CULL_DISABLED
+		fold.material_override = cloth
+		fold.position = at + Vector3(x, (height - 0.12) * 0.5 + 0.06, 0.03 * float(i % 2))
+		body.add_child(fold)
+		CollisionPolicy.mark_decorative(fold)

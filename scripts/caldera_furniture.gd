@@ -12,7 +12,8 @@ extends RefCounted
 ##   - coated glass-fibre cloth: takes mineral coatings in colour (the amber and
 ##     cobalt upholstery);
 ##   - ceramic fibre (alumina-silica, about 1260 C) for the hottest work, and
-##     stainless-steel mesh for drapery, where a building needs them.
+##     stainless-steel mesh for drapery, where a building needs them (the
+##     glass pavilions; the tuff houses keep to wrought iron).
 ## Never asbestos (toxic), and never aramid (it chars).
 ##
 ## Light here is architectural: concealed LED lines under counters, behind
@@ -116,11 +117,11 @@ static func sideboard(body: StaticBody3D, at: Vector3, yaw: float, length: float
 
 
 ## Steel shelving with glass shelves, back to +Z, each shelf lit by a line
-## under its front edge; `stock` fills it.
-static func shelves(body: StaticBody3D, at: Vector3, yaw: float, length: float, tiers: int, stock: Callable) -> void:
+## under its front edge; `stock` fills it; `base` is its foot rail.
+static func shelves(body: StaticBody3D, at: Vector3, yaw: float, length: float, tiers: int, stock: Callable, base: Color = STAINLESS) -> void:
 	for x: float in [-1.0, 1.0]:
 		_metal(body, Vector3(0.025, 0.95, 0.15), _at(at, yaw, Vector3(x * length * 0.5, 0.95, 0)), yaw)
-	CollisionPolicy.add_box(body, piece(body, Vector3(length * 0.5, 0.02, 0.16), STAINLESS, _at(at, yaw, Vector3(0, 0.1, 0)), yaw), Vector3(length, 1.9, 0.32), _at(at, yaw, Vector3(0, 0.95, 0)), Basis(Vector3.UP, yaw), false)
+	CollisionPolicy.add_box(body, piece(body, Vector3(length * 0.5, 0.02, 0.16), base, _at(at, yaw, Vector3(0, 0.1, 0)), yaw), Vector3(length, 1.9, 0.32), _at(at, yaw, Vector3(0, 0.95, 0)), Basis(Vector3.UP, yaw), false)
 	for t in tiers:
 		var y := 0.45 + 0.42 * float(t)
 		var shelf := piece(body, Vector3(length * 0.5, 0.012, 0.16), GLASS, _at(at, yaw, Vector3(0, y, 0)), yaw)
