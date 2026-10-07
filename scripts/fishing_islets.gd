@@ -50,7 +50,7 @@ const LIMESTONE := Color(0.80, 0.78, 0.71)
 const LIMESTONE_WEATHERED := Color(0.66, 0.64, 0.58)
 const STREAK_IRON := Color(0.72, 0.54, 0.36)
 const STREAK_DARK := Color(0.30, 0.31, 0.29)
-const WATERLINE_STAIN := Color(0.30, 0.31, 0.27)
+const WATERLINE_STAIN := Color(0.18, 0.19, 0.16)
 const SHELF_ROCK := Color(0.45, 0.43, 0.37)
 const MOSS := Color(0.30, 0.44, 0.22)
 const FOREST := Color(0.20, 0.36, 0.16)
@@ -155,6 +155,14 @@ static func _lobe_height(p: Vector2, lobe: Dictionary) -> float:
 	var height := -SHELF_TOP_DEPTH + (top + SHELF_TOP_DEPTH) * profile
 	var face := clampf((1.0 - profile) * 3.0, 0.0, 1.0) * clampf(profile * 4.0, 0.0, 1.0)
 	height += _grain_noise.get_noise_2d(p.x * 2.5, p.y * 2.5) * 0.45 * face
+	# Ledges: soil steps in the face of the taller towers, where the karst's
+	# dragon trees, cycads and ferns root. Heights near each ledge are pressed
+	# together, so the face flattens into a narrow shelf there.
+	if float(lobe["top"]) > 9.0:
+		for fraction: float in [0.38, 0.68]:
+			var ledge := float(lobe["top"]) * fraction + _rock_noise.get_noise_2d(p.x * 0.5 + 9.0, p.y * 0.5) * 0.8
+			if absf(height - ledge) < 1.5:
+				height = ledge + (height - ledge) * 0.3
 	return height
 
 
@@ -212,49 +220,163 @@ static func _color(vertex: Vector3, normal: Vector3) -> Color:
 	var steep := 1.0 - clampf(normal.y, 0.0, 1.0)
 	var color := LIMESTONE.lerp(LIMESTONE_WEATHERED, clampf(steep * 0.8, 0.0, 1.0))
 	# Runnels: streaks that run straight down the face, so plan position alone.
-	var streak := _grain_noise.get_noise_2d(vertex.x * 3.0, vertex.z * 3.0)
-	var band := _rock_noise.get_noise_2d(vertex.x * 0.9 + 70.0, vertex.z * 0.9)
-	if streak > 0.25:
-		color = color.lerp(STREAK_DARK if band > 0.0 else STREAK_IRON, clampf((streak - 0.25) * 2.2, 0.0, 0.7) * steep)
+	# Wide, strong runnels: Phang Nga's towers are banded orange with iron and
+	# black with algae down every face.
+	var streak := _grain_noise.get_noise_2d(vertex.x * 1.3, vertex.z * 1.3)
+	var band := _rock_noise.get_noise_2d(vertex.x * 0.6 + 70.0, vertex.z * 0.6)
+	if streak > 0.05:
+		color = color.lerp(STREAK_DARK if band > 0.05 else STREAK_IRON, clampf((streak - 0.05) * 2.6, 0.0, 0.85) * clampf(steep * 1.4, 0.0, 1.0))
 	# The crowns and any level ledge carry moss and forest.
 	if normal.y > 0.7 and height > 2.0:
 		color = color.lerp(FOREST if height > 6.0 else MOSS, clampf((normal.y - 0.7) * 4.0, 0.0, 0.9))
 	# The notch: a dark band where the lake has eaten into the foot.
-	var notch := 1.0 - smoothstep(-0.6, 1.4, height)
+	var notch := 1.0 - smoothstep(0.2, 2.2, height)
 	return color.lerp(WATERLINE_STAIN, clampf(notch, 0.0, 1.0))
 
 
-## Trees on the domes and vines over their lips, as two MultiMeshes of SuperEgg
-## foliage (decorative: the rock's own collision is the crown).
+## The karst's planting, by zone (see the landscaping skill's
+## southeast_asian_karst_flora.md): low forest on the crowns with dragon trees
+## standing above it; clumps of dragon trees, cycads and ferns on the ledges;
+## fig roots and lianas hanging down the faces from ledge and crown lips;
+## ferns in the waterline notch; moss and ferns at the cistern's seep. Every
+## part is a shared SuperEgg mesh drawn through one MultiMesh, decorative
+## (the rock's own collision is what anyone stands on).
 static func _vegetation(body: StaticBody3D, heights: PackedFloat32Array, columns: int, rows: int) -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = SEED + 7
-	var crowns: Array[Transform3D] = []
-	var crown_tones: Array[Color] = []
-	var vines: Array[Transform3D] = []
-	var stride := int(2.0 / CELL)
-	for row in range(1, rows - 1, stride):
-		for column in range(1, columns - 1, stride):
+	var parts := {}
+	var stride := int(1.0 / CELL)
+	for row in range(6, rows - 6, stride):
+		for column in range(6, columns - 6, stride):
 			var h := heights[row * columns + column]
-			if h < 3.0:
+			if h < 0.3:
 				continue
 			var p := BOUNDS.position + Vector2(column, row) * CELL
 			var dx := heights[row * columns + column + 1] - heights[row * columns + column - 1]
 			var dz := heights[(row + 1) * columns + column] - heights[(row - 1) * columns + column]
-			var slope := Vector2(dx, dz).length() / (2.0 * CELL)
-			var jitter := Vector2(rng.randf_range(-0.8, 0.8), rng.randf_range(-0.8, 0.8))
-			if slope < 0.9 and rng.randf() < 0.85:
-				var size := rng.randf_range(1.1, 2.0)
-				crowns.append(Transform3D(Basis().scaled(Vector3(size, size * rng.randf_range(0.7, 1.0), size)), Vector3(p.x + jitter.x, h + size * 0.45, p.y + jitter.y)))
-				crown_tones.append(FOREST.lerp(MOSS, rng.randf_range(0.0, 0.7)).darkened(rng.randf_range(0.0, 0.15)))
-			elif slope > 2.5 and h > 5.0 and rng.randf() < 0.35:
-				var length := rng.randf_range(2.0, minf(6.0, h - 1.0))
-				vines.append(Transform3D(Basis().scaled(Vector3(0.12, length, 0.12)), Vector3(p.x + jitter.x * 0.3, h - length * 0.5, p.y + jitter.y * 0.3)))
-	_foliage(body, "Treetops", SuperEgg.build_mesh(Vector3(1.0, 1.0, 1.0), 2.2, 2.6), crowns, crown_tones)
-	var vine_tones: Array[Color] = []
-	for i in vines.size():
-		vine_tones.append(MOSS.darkened(0.1 * float(i % 3)))
-	_foliage(body, "Vines", SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 2.0, 2.0), vines, vine_tones)
+			var gradient := Vector2(dx, dz) / (2.0 * CELL)
+			var slope := gradient.length()
+			# The highest ground within three metres: is this a crown or a step?
+			var above := h
+			for oy in range(-6, 7, 3):
+				for ox in range(-6, 7, 3):
+					above = maxf(above, heights[(row + oy) * columns + column + ox])
+			var downhill := -gradient.normalized() if slope > 0.01 else Vector2.ZERO
+			var at := Vector3(p.x, h, p.y)
+			if slope < 0.9 and h > 3.0 and above < h + 1.5:
+				# Crown.
+				if rng.randf() < 0.55:
+					var size := rng.randf_range(1.0, 1.9)
+					_add(parts, "canopy", Transform3D(Basis().scaled(Vector3(size, size * rng.randf_range(0.65, 0.9), size)), at + Vector3(rng.randf_range(-0.5, 0.5), size * 0.4, rng.randf_range(-0.5, 0.5))), FOREST.lerp(MOSS, rng.randf_range(0.0, 0.6)).darkened(rng.randf_range(0.0, 0.15)))
+				elif rng.randf() < 0.18:
+					_dragon_tree(parts, at, rng.randf_range(3.0, 4.5), rng)
+			elif slope < 1.6 and h > 2.0 and above > h + 2.0:
+				# Ledge: a clump of three to five.
+				if rng.randf() < 0.3:
+					var count := rng.randi_range(3, 5)
+					for i in count:
+						var spot := at + Vector3(rng.randf_range(-0.9, 0.9), 0.0, rng.randf_range(-0.9, 0.9))
+						var pick := rng.randf()
+						if pick < 0.4:
+							_dragon_tree(parts, spot, rng.randf_range(1.6, 3.0), rng)
+						elif pick < 0.75:
+							_cycad(parts, spot, rng)
+						else:
+							_fern(parts, spot, 1.0, rng)
+			elif slope > 2.5 and h > 3.0:
+				# Faces: fig roots and lianas hanging down the rock.
+				if rng.randf() < 0.07:
+					var length := rng.randf_range(2.5, minf(9.0, h))
+					var off := Vector3(downhill.x, 0.0, downhill.y) * 0.25
+					if rng.randf() < 0.5:
+						for strand in 3:
+							var jitter := Vector3(-downhill.y, 0.0, downhill.x) * (float(strand) - 1.0) * 0.18
+							_add(parts, "root", Transform3D(Basis().scaled(Vector3(0.09, length * (0.8 + 0.1 * float(strand)), 0.05)), at + off + jitter + Vector3(0.0, -length * 0.45, 0.0)), Color(0.55, 0.47, 0.38).darkened(0.05 * float(strand)))
+					else:
+						_add(parts, "liana", Transform3D(Basis().scaled(Vector3(0.16, length, 0.16)), at + off + Vector3(0.0, -length * 0.5, 0.0)), MOSS.darkened(rng.randf_range(0.0, 0.25)))
+			elif h < 1.6 and slope > 2.0 and rng.randf() < 0.05:
+				# The notch: a fern tucked into the wet overhang.
+				_fern(parts, at + Vector3(downhill.x, 0.0, downhill.y) * 0.2, 0.7, rng)
+	# The seep behind the cistern: wet moss and ferns at the rock's foot.
+	for i in 9:
+		var seep := Vector3(-1.5 + rng.randf_range(-2.2, 2.2), 0.3 + rng.randf_range(0.0, 1.6), -20.7 - rng.randf_range(0.0, 0.4))
+		_fern(parts, seep, rng.randf_range(0.6, 1.0), rng)
+	var meshes := {
+		"canopy": SuperEgg.build_mesh(Vector3(1.0, 1.0, 1.0), 2.2, 2.6),
+		"trunk": SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 3.0, 3.0),
+		"blade": SuperEgg.build_mesh(Vector3(0.05, 0.5, 0.012), 2.4, 2.4),
+		"frond": SuperEgg.build_mesh(Vector3(0.12, 0.5, 0.015), 2.4, 2.4),
+		"fern": SuperEgg.build_mesh(Vector3(0.11, 0.5, 0.02), 2.2, 2.2),
+		"root": SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 2.0, 2.0),
+		"liana": SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 2.0, 2.0),
+	}
+	for key: String in parts:
+		var entries: Array = parts[key]
+		var transforms: Array[Transform3D] = []
+		var tones: Array[Color] = []
+		for entry: Array in entries:
+			transforms.append(entry[0])
+			tones.append(entry[1])
+		_foliage(body, key.capitalize(), meshes[key], transforms, tones)
+
+
+static func _add(parts: Dictionary, key: String, xform: Transform3D, tone: Color) -> void:
+	if not parts.has(key):
+		parts[key] = []
+	(parts[key] as Array).append([xform, tone])
+
+
+## A dragon tree: a grey trunk forking into two or three candelabra branches,
+## each tipped with a tuft of stiff strap leaves.
+static func _dragon_tree(parts: Dictionary, at: Vector3, height: float, rng: RandomNumberGenerator) -> void:
+	var trunk_h := height * 0.55
+	var bark := Color(0.58, 0.56, 0.52).darkened(rng.randf_range(0.0, 0.12))
+	_add(parts, "trunk", Transform3D(Basis().scaled(Vector3(0.14, trunk_h, 0.14)), at + Vector3(0.0, trunk_h * 0.5, 0.0)), bark)
+	var fork := at + Vector3(0.0, trunk_h, 0.0)
+	var branches := rng.randi_range(2, 3)
+	for b in branches:
+		var angle := TAU * float(b) / float(branches) + rng.randf_range(-0.4, 0.4)
+		var lean := rng.randf_range(0.35, 0.6)
+		var length := height * rng.randf_range(0.35, 0.5)
+		var axis := Vector3(cos(angle) * sin(lean), cos(lean), sin(angle) * sin(lean))
+		var basis := _basis_along(axis).scaled(Vector3(0.09, length, 0.09))
+		_add(parts, "trunk", Transform3D(basis, fork + axis * length * 0.5), bark.lightened(0.05))
+		var tip := fork + axis * length
+		var leaf := Color(0.36, 0.50, 0.30).lerp(Color(0.48, 0.56, 0.36), rng.randf())
+		for blade in 9:
+			var blade_angle := TAU * float(blade) / 9.0 + rng.randf_range(-0.2, 0.2)
+			var spread := rng.randf_range(0.25, 0.9)
+			var dir := Vector3(cos(blade_angle) * sin(spread), cos(spread), sin(blade_angle) * sin(spread))
+			_add(parts, "blade", Transform3D(_basis_along(dir).scaled(Vector3(1.0, 0.75, 1.0)), tip + dir * 0.36), leaf)
+
+
+## A cycad: a short stout trunk under a crown of arching fronds.
+static func _cycad(parts: Dictionary, at: Vector3, rng: RandomNumberGenerator) -> void:
+	var trunk_h := rng.randf_range(0.4, 1.1)
+	_add(parts, "trunk", Transform3D(Basis().scaled(Vector3(0.18, trunk_h, 0.18)), at + Vector3(0.0, trunk_h * 0.5, 0.0)), Color(0.40, 0.33, 0.25))
+	var top := at + Vector3(0.0, trunk_h, 0.0)
+	for frond in 10:
+		var angle := TAU * float(frond) / 10.0 + rng.randf_range(-0.15, 0.15)
+		var spread := rng.randf_range(0.9, 1.25)
+		var dir := Vector3(cos(angle) * sin(spread), cos(spread), sin(angle) * sin(spread))
+		_add(parts, "frond", Transform3D(_basis_along(dir).scaled(Vector3(1.0, 1.3, 1.0)), top + dir * 0.62), Color(0.24, 0.42, 0.20).lightened(rng.randf_range(0.0, 0.1)))
+
+
+## A bird's-nest fern: a vase of broad bright leaves.
+static func _fern(parts: Dictionary, at: Vector3, size: float, rng: RandomNumberGenerator) -> void:
+	for leaf in 8:
+		var angle := TAU * float(leaf) / 8.0 + rng.randf_range(-0.2, 0.2)
+		var spread := rng.randf_range(0.45, 0.75)
+		var dir := Vector3(cos(angle) * sin(spread), cos(spread), sin(angle) * sin(spread))
+		_add(parts, "fern", Transform3D(_basis_along(dir).scaled(Vector3(size, size * 0.9, size)), at + dir * 0.4 * size), Color(0.42, 0.62, 0.24).darkened(rng.randf_range(0.0, 0.12)))
+
+
+## A basis whose local y runs along `axis`.
+static func _basis_along(axis: Vector3) -> Basis:
+	var y := axis.normalized()
+	var helper := Vector3.FORWARD if absf(y.dot(Vector3.FORWARD)) < 0.9 else Vector3.RIGHT
+	var x := helper.cross(y).normalized()
+	return Basis(x, y, x.cross(y))
 
 
 static func _foliage(body: StaticBody3D, name_text: String, mesh: Mesh, transforms: Array[Transform3D], tones: Array[Color]) -> void:
