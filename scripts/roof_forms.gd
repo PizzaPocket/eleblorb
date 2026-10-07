@@ -156,6 +156,7 @@ static func cross_gable(
 			to_local * (planes["cross_left" if side < 0.0 else "cross_right"] as Plane),
 		]
 		var slab := MeshInstance3D.new()
+		TownProps.mark_roof_slab(slab)
 		slab.mesh = SuperEgg.build_clipped_mesh(
 			Vector3(depth * 0.5, thickness * 0.5, (slope_len + extension) * 0.5), clip,
 			TownProps.ROOF_EDGE_EPSILON, TownProps.ROOF_EDGE_EPSILON,

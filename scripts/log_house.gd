@@ -447,6 +447,7 @@ static func _build_roof(
 			var snow := SuperEgg.build_part(
 				Vector3(half_length - 0.08, SNOW_T * 0.5, snow_length * 0.5 + overlap), SNOW, 4.2, 4.2
 			)
+			snow.set_meta(DesignAudit.ROOF_COVER_META, true)
 			var shift := (0.14 if front else -0.14) if last_run else 0.0
 			var snow_centre := mid + basis.y * (SNOW_T * 0.5 - 0.01) + basis.z * shift
 			snow.transform = Transform3D(basis, snow_centre)

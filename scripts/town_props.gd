@@ -1831,6 +1831,7 @@ static func _build_hipped_roof(
 		to_local * Plane(-south_mitre.normal, -south_mitre.d),
 	]
 	var facet := MeshInstance3D.new()
+	mark_roof_slab(facet)
 	facet.mesh = SuperEgg.build_clipped_mesh(
 		Vector3(base_z + 0.8, ROOF_THICKNESS * 0.5, length * 0.5), planes, ROOF_EDGE_EPSILON, ROOF_EDGE_EPSILON,
 		ROOF_SEGMENTS, ROOF_RINGS
@@ -1977,6 +1978,7 @@ static func _build_roof_panel(
 	for world_plane in world_planes:
 		planes.append(to_local * world_plane)
 	var panel := MeshInstance3D.new()
+	mark_roof_slab(panel)
 	panel.mesh = SuperEgg.build_clipped_mesh(semi_axes, planes, ROOF_EDGE_EPSILON, ROOF_EDGE_EPSILON, ROOF_SEGMENTS, ROOF_RINGS)
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
@@ -2007,7 +2009,15 @@ static func roof_slab(semi_axes: Vector3, color: Color, planes: Array[Plane] = [
 	material.roughness = 0.82
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	slab.material_override = material
+	mark_roof_slab(slab)
 	return slab
+
+
+## Marks a mesh as a true roof slab (a clipped SuperEgg at the roof epsilon).
+## DesignAudit fails any roof-like slab without this mark: rounded-rectangle
+## roofs from a kit's own slab code have slipped through before.
+static func mark_roof_slab(mesh: MeshInstance3D) -> void:
+	mesh.set_meta(DesignAudit.ROOF_SLAB_META, true)
 
 
 ## A slope slab that meets a ridge. It runs past the ridge by ROOF_CUT_EXTENSION

@@ -14,6 +14,9 @@ extends RefCounted
 const POST_HALF := 0.1
 const SINK := 0.25
 const SLAB_HALF := 0.045
+## How far a full roof slab's centre stands above the thin slab it replaced,
+## so their undersides coincide.
+const ROOF_LIFT := TownProps.ROOF_THICKNESS * 0.5 - SLAB_HALF
 
 
 static func dress(
@@ -89,6 +92,20 @@ static func _span_of(openings: Array[Dictionary], kinds: Array) -> Vector2:
 	return Vector2((low + high) * 0.5, high - low)
 
 
+## A hood, lean-to or portico panel: a true roof slab (TownProps.roof_slab, the
+## shared thickness and squarish edge), never a thin rounded box. Its underside
+## stays where the thin slab's was, so beams and headroom are unchanged; the
+## extra thickness goes up. `half` is (across, along the slope); local y is
+## the slab's normal.
+static func _roof(body: StaticBody3D, half: Vector2, color: Color, position: Vector3, basis: Basis) -> MeshInstance3D:
+	var centre := position + basis.y * ROOF_LIFT
+	var slab := TownProps.roof_slab(Vector3(half.x, TownProps.ROOF_THICKNESS * 0.5, half.y), color)
+	slab.transform = Transform3D(basis, centre)
+	body.add_child(slab)
+	CollisionPolicy.add_box(body, slab, Vector3(half.x * 2.0, TownProps.ROOF_THICKNESS, half.y * 2.0), centre, basis, true)
+	return slab
+
+
 static func _box(
 	body: StaticBody3D, half: Vector3, color: Color, position: Vector3, basis: Basis = Basis(),
 	solid: bool = true, parkour: bool = false
@@ -136,9 +153,9 @@ static func lean_to(
 	var front_y := attach_y - drop
 	var slab_length := run / cos(pitch)
 	var basis := Basis(Vector3.RIGHT, -pitch)
-	_box(
-		building, Vector3(width * 0.5 + 0.15, SLAB_HALF, slab_length * 0.5 + 0.05), roof,
-		Vector3(center_x, attach_y - drop * 0.5, wall_z - run * 0.5), basis, true, true
+	_roof(
+		building, Vector2(width * 0.5 + 0.15, slab_length * 0.5 + 0.05), roof,
+		Vector3(center_x, attach_y - drop * 0.5, wall_z - run * 0.5), basis
 	)
 	# Ledger fixing the high edge to the wall.
 	_box(building, Vector3(width * 0.5, 0.09, 0.06), timber, Vector3(center_x, attach_y - 0.1, wall_z - 0.05), Basis(), false)
@@ -173,14 +190,15 @@ static func gabled_portico(
 	var panel_length := half_roof / cos(pitch)
 	for side: float in [-1.0, 1.0]:
 		var basis := Basis(Vector3.BACK, -pitch * side)
-		_box(
-			building, Vector3(panel_length * 0.5 + 0.03, SLAB_HALF, length * 0.5), roof,
+		_roof(
+			building, Vector2(panel_length * 0.5 + 0.03, length * 0.5), roof,
 			Vector3(center_x + side * half_roof * 0.5, eave_y + half_roof * tan(pitch) * 0.5, centre_z),
-			basis, true, true
+			basis
 		)
 	# Ridge cap.
-	# Seat the ridge cap into the two converging planes.
-	_box(building,Vector3(0.14,0.12,length*0.5),roof.darkened(0.08),Vector3(center_x,ridge_y-0.09,centre_z),Basis(),false)
+	# Seat the ridge cap into the two converging planes, which stand
+	# ROOF_LIFT higher now that they are full roof slabs.
+	_box(building,Vector3(0.14,0.12,length*0.5),roof.darkened(0.08),Vector3(center_x,ridge_y-0.09+ROOF_LIFT/cos(pitch),centre_z),Basis(),false)
 	var front_z := wall_z - run
 	# Entablature beam under the pediment, then the pediment itself.
 	var beam_half := 0.15

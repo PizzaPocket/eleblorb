@@ -668,6 +668,26 @@ concept.
 
 ## 16. Design-language checks in code
 
+Done (2026-10-07): `TownProps.roof_slab` marks its meshes (`DesignAudit.
+ROOF_SLAB_META`); `DesignAudit.untagged_roofs()` finds any broad thin
+generated slab above head height without the mark, and the fishing building
+proof fails on it (proved by removing the mark: every hip slab fails).
+`tools/check_design_language.py`, in the pre-push hook, fails any script but
+`town_props.gd` that sets a roof thickness to a number. Pitch stays a
+charter decision per settlement, so it is not checked. The audit considers
+only pitched slabs (8 to 70 degrees), so walls, floors and landings pass; a
+covering on a roof (snow) carries `ROOF_COVER_META`. `validate_village` now
+fails on it for Ohio and the Snow Village too. Running it found Ohio's porch
+hoods, porticos and lean-tos (`EntryDressing`), the cart shelter and the
+granary built as 9 to 12 cm rounded boxes: all now `TownProps.roof_slab` at
+the shared thickness, undersides unchanged. Open question for the user: the
+Snow Village's log houses (`LogHouse.ROOF_T`, 0.14 m) and lean-tos keep a
+thinner roof than the shared 0.24 m. Still to do: the reference-house
+comparison render.
+
+### Original item
+
+
 The first fishing village pass shipped rounded-rectangle roofs, from the
 placeholder builder and then a kit with its own half-thickness constant,
 because nothing checked form. The architecture skill now forbids it in prose;

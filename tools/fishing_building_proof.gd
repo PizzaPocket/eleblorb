@@ -28,6 +28,8 @@ class StubTerrain:
 
 
 var _failures := 0
+## Above this, in a building's frame, a broad thin slab is a roof or canopy.
+const HOUSE_HEAD_Y := FishingVillagePlan.HOUSE_FLOOR + 2.2
 var _stub := StubTerrain.new()
 var _building := "VennHouse"
 var _shots := ""
@@ -76,6 +78,10 @@ func _audit(body: StaticBody3D, anchor: Vector2) -> void:
 	for problem in ClearZones.audit_stacking(self):
 		_fail(problem)
 	_audit_headroom(body)
+	# Roofs and canopies are SuperEgg roof slabs, never a kit's own rounded
+	# rectangles (DesignAudit).
+	for problem in DesignAudit.untagged_roofs(body, HOUSE_HEAD_Y):
+		_fail(problem)
 	# Nothing hangs from thin air: every lamp chain and cord reached a solid.
 	for node in body.find_children("*", "MeshInstance3D", true, false):
 		if node.has_meta("hanger") and not node.has_meta("hanger_top"):

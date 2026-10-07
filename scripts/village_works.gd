@@ -45,6 +45,18 @@ static func _part(
 	return mesh
 
 
+## A small building's roof as a true roof slab (TownProps.roof_slab, the shared
+## thickness and edge), replacing a thin rounded box of half-thickness
+## `old_half`: its underside stays where that box's was, so the posts and walls
+## cut to meet it still do. `half` is (across, along); `basis` y is its normal.
+static func _roof_slab(body: StaticBody3D, half: Vector2, color: Color, centre: Vector3, basis: Basis, old_half: float) -> void:
+	var at := centre + basis.y * (TownProps.ROOF_THICKNESS * 0.5 - old_half)
+	var slab := TownProps.roof_slab(Vector3(half.x, TownProps.ROOF_THICKNESS * 0.5, half.y), color)
+	slab.transform = Transform3D(basis, at)
+	body.add_child(slab)
+	CollisionPolicy.add_box(body, slab, Vector3(half.x * 2.0, TownProps.ROOF_THICKNESS, half.y * 2.0), at, basis, true)
+
+
 static func _body(parent: Node3D, node_name: String, position: Vector3 = Vector3.ZERO, yaw: float = 0.0) -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = node_name
@@ -621,10 +633,7 @@ static func build_cart_shelter(parent: Node3D, at: Vector2, yaw: float, roof: Co
 	# Derive the roof directly from the support heights. The underside meets
 	# both post pairs rather than floating above one and clipping into the other.
 	var slope:=atan2(back_top-front_top,2.6)
-	_part(
-		body,Vector3(2.35,0.05,1.6),roof,Vector3(0.0,(front_top+back_top)*0.5+0.05,0.0),
-		Basis(Vector3.RIGHT,-slope),true,true
-	)
+	_roof_slab(body,Vector2(2.35,1.6),roof,Vector3(0.0,(front_top+back_top)*0.5+0.05,0.0),Basis(Vector3.RIGHT,-slope),0.05)
 	# Parked handcart.
 	_part(body, Vector3(0.7, 0.08, 1.0), PLANK, Vector3(0.0, 0.62, 0.0), Basis(), true, true)
 	_part(body, Vector3(0.7, 0.2, 0.05), PLANK_DARK, Vector3(0.0, 0.8, 1.0), Basis(), false)
@@ -676,7 +685,7 @@ static func build_granary_shed(
 	var header_bottom:=2.56
 	var header_half:=(front_top-header_bottom)*0.5
 	_part(body,Vector3(0.90,header_half,0.10),PLANK_DARK,Vector3(0,header_bottom+header_half,-1.25),Basis(),true,false)
-	_part(body,Vector3(2.25,slab_half,roof_half_depth),roof.darkened(0.18),Vector3(0,roof_centre_y,0),Basis(Vector3.RIGHT,pitch),true,true)
+	_roof_slab(body,Vector2(2.25,roof_half_depth),roof.darkened(0.18),Vector3(0,roof_centre_y,0),Basis(Vector3.RIGHT,pitch),slab_half)
 
 
 ## The mason's contained yard: rough stone samples and a lime pit.

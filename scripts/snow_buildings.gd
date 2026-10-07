@@ -174,6 +174,7 @@ static func lean_to(body: StaticBody3D, spec: Dictionary, side: float, depth_out
 		Vector3(depth_out * 0.5 + 0.28, 0.05, depth * 0.5 + 0.22), LogHouse.SNOW, 4.2, 4.2
 	)
 	snow.transform = Transform3D(tilt, roof_centre + tilt.y * 0.12)
+	snow.set_meta(DesignAudit.ROOF_COVER_META, true)
 	body.add_child(snow)
 	CollisionPolicy.mark_decorative(snow)
 	var outer_x := side * (width * 0.5 + depth_out)

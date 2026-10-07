@@ -62,6 +62,7 @@ func _run(name: String) -> void:
 		_check_trade(OhioPlan.TRADE, report)
 	_check_overlaps(report)
 	_check_dressing(report)
+	_check_roofs(town)
 	_check_doors(report)
 	_check_facing(report)
 	_check_lanterns(report)
@@ -171,6 +172,19 @@ func _check_trade(ledger: Dictionary, report: Dictionary) -> void:
 ## The Snow Village plan (SnowPlan) is the authority: every building and yard
 ## feature it names must exist, the yard must stay open from the lake road, and
 ## the lift lane must join the plaza to the yard.
+## Roofs and canopies are TownProps roof slabs (DesignAudit): checked on every
+## building body the village built, above a ground-floor head height.
+func _check_roofs(town: Node) -> void:
+	var bodies := 0
+	for node in town.find_children("*", "StaticBody3D", true, false):
+		if node.get_parent() == null or node.get_parent().get_class() == "StaticBody3D":
+			continue
+		bodies += 1
+		for problem in DesignAudit.untagged_roofs(node as Node3D, 2.2):
+			_fail(problem)
+	print("checked roofs on %d bodies" % bodies)
+
+
 ## Decorative dressing (snow banks, mounds) has no collision, so nothing
 ## else stops it standing inside a room: a walkthrough found a drift through
 ## two beds in a Snowrest Inn guest room. Fails any whose rectangle enters a
