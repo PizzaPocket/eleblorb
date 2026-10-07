@@ -95,13 +95,17 @@ two beds. The cause:
   wings, lean-tos and vestibules.
 
 Fix:
-1. Done (2026-10-07, not yet run in the engine): `_bank_blocked()` now tests
+1. Done (2026-10-07; confirmed in the engine by step 2): `_bank_blocked()` now tests
    each drift's true rectangle against every recorded building and lean-to
    rectangle, its own house and the attached inn wing included, instead of
    skipping buildings. A drift 1.3 m off its wall clears its own house by
    0.4 m, so only real overlaps are refused.
-2. Add a validator check that fails any decorative dressing (banks, mounds,
-   planting) whose bounds enter a building envelope or interior.
+2. Done (2026-10-07): the village reports each drift's rectangle
+   (`layout_report()["dressing"]`) and `validate_village` fails any that
+   enters a building or shed footprint. All 19 drifts clear; with the
+   placement guard switched off it catches drifts in the Snowrest Inn and its
+   wing, so the check is live. Ohio has no dressing in the report yet: add
+   its mounds and planting the same way when they gain the same risk.
 3. Walk every interior once more.
 
 ## 3. Crossroads Fishing Village
@@ -522,7 +526,7 @@ open-pavilion treehouse inn.
 | Primate village inn, on the commons | jungle lashed-vine | a rattan-screened **privy closet** at the deck's edge: bench seat over a sealed clay vat with leaf litter, lowered by rope to the garden compost | in the layout |
 | Sea folk guest hall | Atlantean modern | modern: a **vacuum-flush toilet**, glass basin, shower; sealed holding tank pumped to a treatment vault at the city's edge | in the buildings brief |
 | Okafor guest house, Kai Mālie | modern Hawaiian | modern: flush toilets, basins and a shower, upstairs and down; septic tank | in the buildings brief |
-| Mor guest houseboat, fishing village | cosmopolitan lake boat people | a contained marine composting toilet and wash space | already in the brief |
+| Mor guest houseboat, fishing village | cosmopolitan lake boat people | a contained marine composting toilet and wash space | done: own wash room, washstand |
 | Sky Kingdom | — | no rest point yet; any future one gives guests a washroom in cloud and gold | — |
 
 Done (2026-10-06): `scripts/toilet_fixtures.gd` (`ToiletFixtures.build(kind)`)
@@ -532,9 +536,10 @@ washroom. Rock and Ground, the Chinese village, the sea folk hall, Ember Rest an
 the primate inn now pass theirs. Still to do: the Snowrest Inn's modern washroom
 (cistern flush, basin, mirror, shower), a real door-closed closet for the
 open-pavilion primate inn, per-culture walls and screens around each fixture
-(the mǎtǒng's screen, the privy's yard closet), the Okafor guest house, and the
-Mor houseboat's wash space (the `marine` toilet is placed in the houseboat's
-south-east corner by `floating_village.gd`; the basin and screen are not).
+(the mǎtǒng's screen, the privy's yard closet) and the Okafor guest house.
+Done (2026-10-07): the Mor houseboat's wash space, rebuilt with the houseboat
+(`FishingBuildings.mor_houseboat()`): the marine toilet in its own walled wash
+room behind a door, a washstand and water jar, a vent stack through the roof.
 
 ## 12. Chinese village: palace brief and the sealing rock
 

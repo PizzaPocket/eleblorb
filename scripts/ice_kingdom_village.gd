@@ -113,6 +113,9 @@ var _layout_doors: Array[Dictionary] = []
 var _layout_facing: Array[Dictionary] = []
 var _layout_strokes: Array[Dictionary] = []
 var _layout_blobs: Array[Dictionary] = []
+## Decorative dressing with no collision (snow banks), each as a rectangle
+## like a solid's, so the validator can fail any that enters a building.
+var _layout_dressing: Array[Dictionary] = []
 var _layout_gates: Array[Dictionary] = []
 var _pending_inn: StaticBody3D
 
@@ -134,7 +137,7 @@ func _process(delta: float) -> void:
 func layout_report() -> Dictionary:
 	return {
 		"solids": _layout_solids, "doors": _layout_doors, "gates": _layout_gates, "facing": _layout_facing,
-		"strokes": _layout_strokes, "blobs": _layout_blobs, "course": [], "bridge": Vector2(9999.0, 9999.0),
+		"strokes": _layout_strokes, "blobs": _layout_blobs, "dressing": _layout_dressing, "course": [], "bridge": Vector2(9999.0, 9999.0),
 		"start": SnowPlan.YARD_CENTER + Vector2(5.0, 4.0),
 		"grid_min": Vector2(-70.0, -80.0), "grid_size": Vector2(230.0, 220.0),
 	}
@@ -551,6 +554,7 @@ func _build_snow_banks() -> void:
 						continue
 					counter += 1
 					SnowGrounds.snow_bank(self, _world3(spot), to - from - 0.5, bank_yaw, 0.7, 500 + counter)
+					_layout_dressing.append({"name": "SnowBank%d" % counter, "kind": "snow bank", "center": spot, "half": Vector2((to - from - 0.5) * 0.5, BANK_HALF_DEPTH), "yaw": bank_yaw})
 
 
 ## A drift has no collision, so nothing else would stop it standing inside a

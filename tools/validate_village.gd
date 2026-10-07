@@ -61,6 +61,7 @@ func _run(name: String) -> void:
 		_check_plan(report)
 		_check_trade(OhioPlan.TRADE, report)
 	_check_overlaps(report)
+	_check_dressing(report)
 	_check_doors(report)
 	_check_facing(report)
 	_check_lanterns(report)
@@ -170,6 +171,24 @@ func _check_trade(ledger: Dictionary, report: Dictionary) -> void:
 ## The Snow Village plan (SnowPlan) is the authority: every building and yard
 ## feature it names must exist, the yard must stay open from the lake road, and
 ## the lift lane must join the plaza to the yard.
+## Decorative dressing (snow banks, mounds) has no collision, so nothing
+## else stops it standing inside a room: a walkthrough found a drift through
+## two beds in a Snowrest Inn guest room. Fails any whose rectangle enters a
+## building's or shed's footprint, wings and lean-tos included.
+func _check_dressing(report: Dictionary) -> void:
+	var dressing: Array = report.get("dressing", [])
+	var checked := 0
+	for piece: Dictionary in dressing:
+		checked += 1
+		for solid in report["solids"]:
+			if str(solid["kind"]) not in ["building", "shed"]:
+				continue
+			if _polygons_overlap(_corners(piece), _corners(solid)):
+				_fail("%s (%s) stands inside %s" % [piece["name"], piece["kind"], solid["name"]])
+	if checked > 0:
+		print("checked %d pieces of dressing against every building" % checked)
+
+
 func _check_snow_plan(report: Dictionary) -> void:
 	var built := {}
 	for solid in report["solids"]:
