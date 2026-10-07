@@ -325,8 +325,21 @@ shelf.
 - **Pass-throughs:** the gem store is reached only through the assay room and
   counter lobby, and the receiving bay leads through the corridor to the
   assay room. All are one workshop's own rooms, which is legitimate.
-- **Glass:** teal and violet, the mineral colours, in the display cells' lenses
-  and the upper outlook.
+- **Glass:** see "Oren's glass": cast-glass bricks deepening to amethyst (teal
+  over the assay room), cast display cells, dichroic fins on the home.
+- **As built (2026-10-07):** split level as approved; the counter faces the
+  shop door with a glass case of finished stones; the vault's strongbox; the
+  assay lens, balance and heat cell; Savi's stations in working order along
+  the studio's back wall (mortar, sieves, crucible, heat cell, cooling rack,
+  presentation trays); above, a lava bed each (registered as lava), seats
+  round a low table, the pantry, and a split amethyst geode. **The roof
+  terrace** is reached by a lift (the circulation rules allow ramps or
+  lifts): a ramp would need about 6.4 m of run the plot cannot spare, so an
+  open platform with dichroic cheeks rises on four steel masts at the east
+  bay's north end from the home's door landing to the roof, waiting at each
+  stop. The terrace is ringed by a cast upstand with a dichroic glass
+  balustrade, open where the lift arrives, with seats and a low table toward
+  the reservoir.
 - **Variation:** the only two-storey home over a shop; the most glass at
   ground level.
 

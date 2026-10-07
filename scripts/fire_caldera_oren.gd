@@ -90,6 +90,8 @@ static func spec_upper() -> Dictionary:
 	var smoky := CalderaShell.SMOKY_GLASS
 	return {
 		"size": SHELL_SIZE, "offset": SHELL_CENTRE, "stained": STAINED, "pitch": 0.0, "transom": false,
+		# The lift rises past the east wall: no overhang there.
+		"overhang": {"east": 0.0},
 		"walls": {
 			# The home's outlook over the reservoir.
 			"front": [
@@ -125,8 +127,10 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> Static
 	body.add_child(upper)
 	CalderaShell.add_volume(upper, spec_upper())
 	_dichroic_fins(upper)
+	_parapet(upper)
 	_upper_partitions(upper)
 	_east_bay(body)
+	_lift(body)
 	_receiving_bridge(body)
 	_lights(body, upper)
 	_furnish(body, upper)
@@ -168,12 +172,89 @@ static func _furnish(body: StaticBody3D, upper: StaticBody3D) -> void:
 	for side: float in [-1.0, 1.0]:
 		CalderaFurniture.piece(upper, Vector3(0.36, 0.22, 0.3), CalderaShell.BASALT.lightened(0.08), Vector3(-3.0 + side * 1.0, 0.22, 3.4), 0.0, true, SuperEgg.EPSILON_SOFT)
 	# A lava bed each: a cast basalt basin the lava fills from beneath.
-	for x: float in [-6.0, -1.0]:
-		CalderaFurniture.piece(upper, Vector3(1.1, 0.28, 0.55), CalderaShell.BASALT, Vector3(x, 0.28, -3.6), 0.0, true, 4.0)
-		FireCalderaBuildings._glow(upper, "BedLava", Vector3(0.95, 0.02, 0.42), Vector3(x, 0.55, -3.6), Color(1.0, 0.42, 0.08))
-		CalderaFurniture.concealed_light(upper, Vector3(x, 1.0, -3.6), Color(1.0, 0.55, 0.22), 0.8, 4.0)
+	for x: float in BED_XS:
+		CalderaFurniture.piece(upper, Vector3(1.1, 0.28, 0.55), CalderaShell.BASALT, Vector3(x, 0.28, BED_Z), 0.0, true, 4.0)
+		FireCalderaBuildings._glow(upper, "BedLava", Vector3(0.95, 0.02, 0.42), Vector3(x, BED_LAVA, BED_Z), Color(1.0, 0.42, 0.08))
+		CalderaFurniture.concealed_light(upper, Vector3(x, 1.0, BED_Z), Color(1.0, 0.55, 0.22), 0.8, 4.0)
 	# The pantry: shelves of Savi's mineral delicacies.
 	CalderaFurniture.shelves(upper, Vector3(4.0, 0.0, -5.6), PI, 2.4, 3, stones)
+	_furnish_more(body, upper)
+
+
+## The second layer: what tells the rooms apart. A glass case of finished
+## stones in the counter room; the vault's strongbox; the assay room's lens on
+## its stand, balance and small heat cell; Savi's stations along the studio's
+## back wall in working order (crushing, grading, alloying, the heat cell,
+## then the cooling rack and presentation trays on the bench); in the home, a
+## split geode on a plinth, the one stone they kept.
+static func _furnish_more(body: StaticBody3D, upper: StaticBody3D) -> void:
+	var r := RAISE
+	var steel := CalderaShell.STEEL_BLUED
+	var glass := Color(0.86, 0.92, 0.95, 0.22)
+	var gems: Array[Color] = [Color(0.55, 0.30, 0.68), Color(0.25, 0.62, 0.60), Color(0.85, 0.55, 0.20), Color(0.70, 0.20, 0.28)]
+	# Counter room: a glass case of finished stones.
+	CalderaFurniture.piece(body, Vector3(0.7, 0.42, 0.3), CalderaShell.BASALT, Vector3(-2.6, 0.42, 3.9), PI * 0.5, true)
+	var case := CalderaFurniture.piece(body, Vector3(0.68, 0.14, 0.28), glass, Vector3(-2.6, 0.98, 3.9), PI * 0.5, false, 6.0)
+	var case_glass := SolidModel.material(glass, 0.04, 0.05)
+	case_glass.cull_mode = BaseMaterial3D.CULL_DISABLED
+	case.material_override = case_glass
+	for i in 4:
+		CalderaFurniture.piece(body, Vector3(0.04, 0.04, 0.04), gems[i], Vector3(-2.6, 0.9, 3.4 + 0.33 * float(i)), float(i), false, 2.4)
+	CalderaFurniture.led_line(body, Vector3(-2.6, 0.86, 3.9), PI * 0.5, 1.2, CalderaFurniture.LED_WARM)
+	# The vault's strongbox, against its west wall.
+	CalderaFurniture.chest(body, Vector3(-1.05, 0.0, 4.2), PI * 0.5, 0.9)
+	CalderaFurniture.piece(body, Vector3(0.06, 0.08, 0.03), CalderaShell.STAINLESS, Vector3(-0.78, 0.32, 4.2), PI * 0.5, false, 2.0)
+	# Assay: a lens on a steel stand, a balance, a small heat cell.
+	CalderaShell._metal(body, Vector3(3.5, 0.98, 4.5), Vector3(0.025, 0.36, 0.025), steel, false)
+	var lens := CalderaFurniture.piece(body, Vector3(0.09, 0.09, 0.012), glass, Vector3(3.5, 1.18, 4.42), 0.0, false, 2.0)
+	lens.material_override = case_glass
+	CalderaShell._metal(body, Vector3(4.6, 0.95, 4.5), Vector3(0.4, 0.02, 0.02), CalderaShell.STAINLESS, false)
+	for side: float in [-1.0, 1.0]:
+		CalderaFurniture.piece(body, Vector3(0.08, 0.012, 0.08), CalderaShell.STAINLESS, Vector3(4.6 + side * 0.2, 0.88, 4.5), 0.0, false, 2.0)
+	CalderaShell._metal(body, Vector3(4.6, 0.85, 4.5), Vector3(0.025, 0.12, 0.025), steel, false)
+	CalderaFurniture.piece(body, Vector3(0.3, 0.35, 0.3), CalderaShell.BASALT, Vector3(6.1, 0.35, 4.9), 0.0, true)
+	FireCalderaBuildings._glow(body, "AssayCellPort", Vector3(0.1, 0.07, 0.01), Vector3(6.1, 0.45, 4.59), Color(1.0, 0.5, 0.12))
+	# Savi's stations along the studio's back wall, in working order.
+	# Crushing: a heavy basalt mortar and its pestle.
+	CalderaFurniture.piece(body, Vector3(0.3, 0.25, 0.3), CalderaShell.BASALT, Vector3(0.4, r + 0.25, -5.3), 0.0, true, 2.6)
+	CalderaFurniture.piece(body, Vector3(0.05, 0.22, 0.05), CalderaShell.BASALT.lightened(0.1), Vector3(0.45, r + 0.62, -5.3), 0.3, false, 2.2)
+	# Grading: three stacked steel sieves on a stand.
+	CalderaFurniture.piece(body, Vector3(0.3, 0.38, 0.25), CalderaShell.VOLCANIC_STONE, Vector3(1.4, r + 0.38, -5.4), 0.0, true)
+	for i in 3:
+		CalderaFurniture.piece(body, Vector3(0.22, 0.04, 0.22), CalderaShell.STAINLESS, Vector3(1.4, r + 0.82 + 0.09 * float(i), -5.4), 0.0, false, 2.0)
+	# Alloying: a crucible glowing on its steel ring.
+	CalderaShell._metal(body, Vector3(3.6, r + 0.4, -5.3), Vector3(0.5, 0.8, 0.5), steel, true)
+	var crucible := SuperEgg.build_part(Vector3(0.16, 0.14, 0.16), Color(1.0, 0.45, 0.1), 2.4, 2.4)
+	var molten := StandardMaterial3D.new()
+	molten.albedo_color = Color(1.0, 0.45, 0.1)
+	molten.emission_enabled = true
+	molten.emission = Color(1.0, 0.45, 0.1)
+	molten.emission_energy_multiplier = 2.0
+	crucible.material_override = molten
+	crucible.position = Vector3(3.6, r + 0.95, -5.3)
+	body.add_child(crucible)
+	CollisionPolicy.mark_decorative(crucible)
+	CalderaFurniture.concealed_light(body, Vector3(3.6, r + 1.4, -5.0), Color(1.0, 0.55, 0.25), 0.7, 3.5)
+	# Cooling: a steel rack on the east wall; presentation trays on the bench.
+	CalderaFurniture.shelves(body, Vector3(6.15, r, -2.4), -PI * 0.5, 1.6, 2, func(b: StaticBody3D, p: Vector3, i: int) -> void:
+		CalderaFurniture.piece(b, Vector3(0.1, 0.02, 0.1), Color(0.70, 0.62, 0.55), p + Vector3(0, 0.02, 0), 0.0, false, 4.0), CalderaShell.STAINLESS)
+	for i in 3:
+		var tray := Vector3(2.2 + 0.8 * float(i), r + 0.81, -3.4)
+		CalderaFurniture.piece(body, Vector3(0.25, 0.015, 0.18), CalderaShell.BASALT.lightened(0.2), tray, 0.0, false, 5.0)
+		for j in 3:
+			CalderaFurniture.piece(body, Vector3(0.03, 0.025, 0.03), [Color(0.55, 0.62, 0.40), Color(0.80, 0.70, 0.45), Color(0.62, 0.40, 0.36)][(i + j) % 3], tray + Vector3(-0.12 + 0.12 * float(j), 0.035, 0.0), 0.0, false, 2.4)
+	FireCalderaBuildings._marker(body, "SaviStand", Vector3(3.0, r, -2.6), PI)
+	# The home: a split geode on a basalt plinth, amethyst inside.
+	CalderaFurniture.piece(upper, Vector3(0.3, 0.45, 0.3), CalderaShell.BASALT, Vector3(4.6, 0.45, 4.6), 0.0, true)
+	CalderaFurniture.piece(upper, Vector3(0.28, 0.3, 0.1), Color(0.35, 0.32, 0.30), Vector3(4.6, 1.2, 4.62), 0.0, false, 2.2)
+	var crystal := CalderaFurniture.piece(upper, Vector3(0.21, 0.23, 0.02), Color(0.55, 0.32, 0.72), Vector3(4.6, 1.2, 4.52), 0.0, false, 2.2)
+	var amethyst := StandardMaterial3D.new()
+	amethyst.albedo_color = Color(0.55, 0.32, 0.72)
+	amethyst.emission_enabled = true
+	amethyst.emission = Color(0.45, 0.25, 0.62)
+	amethyst.emission_energy_multiplier = 0.5
+	amethyst.roughness = 0.1
+	crystal.material_override = amethyst
 
 
 ## Concealed light, one per room or run, until the rooms are furnished.
@@ -187,13 +268,31 @@ static func _lights(body: StaticBody3D, upper: StaticBody3D) -> void:
 		CalderaFurniture.concealed_light(upper, at, warm, 0.8, 5.5)
 
 
+## The home's two lava beds, in the body's plan at the upper floor: for the
+## terrain's lava queries, as Nahl registers its own.
+const BED_XS: Array[float] = [-6.0, -1.0]
+const BED_Z := -3.6
+const BED_LAVA := 0.55
+
+
+static func register_lava(body: Node3D, terrain: Node) -> void:
+	for x: float in BED_XS:
+		var world := PackedVector2Array()
+		var height := 0.0
+		for corner: Vector2 in [Vector2(-0.9, -0.38), Vector2(0.9, -0.38), Vector2(0.9, 0.38), Vector2(-0.9, 0.38)]:
+			var at := body.global_transform * Vector3(x + corner.x, UPPER + BED_LAVA, BED_Z + corner.y)
+			world.append(Vector2(at.x, at.z))
+			height = at.y
+		terrain.register_lava_polygon(world, height)
+
+
 # ---------------------------------------------------------------------------
 # The glass.
 # ---------------------------------------------------------------------------
 
 const BRICK := Vector3(0.30, 0.15, 0.22)
 const BRICK_JOINT := 0.006
-const CLEAR_CAST := Color(0.70, 0.80, 0.84, 0.16)
+const CLEAR_CAST := Color(0.52, 0.62, 0.66, 0.14)
 const AMETHYST := Color(0.46, 0.24, 0.66, 0.66)
 const TEAL_CAST := Color(0.18, 0.58, 0.58, 0.62)
 
@@ -252,7 +351,7 @@ static func _brick_wall(body: StaticBody3D, from: Vector2, to: Vector2, deep: Co
 	var multimesh := MultiMesh.new()
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
 	multimesh.use_colors = true
-	multimesh.mesh = SuperEgg.build_mesh(BRICK * 0.5, 7.0, 7.0)
+	multimesh.mesh = SuperEgg.build_mesh(BRICK * 0.5, 10.0, 10.0)
 	multimesh.instance_count = transforms.size()
 	for i in transforms.size():
 		multimesh.set_instance_transform(i, transforms[i])
@@ -263,8 +362,8 @@ static func _brick_wall(body: StaticBody3D, from: Vector2, to: Vector2, deep: Co
 	var material := StandardMaterial3D.new()
 	material.vertex_color_use_as_albedo = true
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	material.roughness = 0.03
-	material.metallic_specular = 0.9
+	material.roughness = 0.12
+	material.metallic_specular = 0.35
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	instance.material_override = material
 	body.add_child(instance)
@@ -321,6 +420,101 @@ static func _dichroic_fins(upper: StaticBody3D) -> void:
 	# The fins' heads and feet: two slim blued-steel rails.
 	for y: float in [0.1, CalderaShell.STOREY - 0.2]:
 		CalderaShell._metal(upper, Vector3((x0 + x1) * 0.5, y, SHELL_SIZE.y * 0.5 + 0.4), Vector3(x1 - x0 + 0.3, 0.05, 0.08), CalderaShell.STEEL_BLUED, false)
+
+
+## The roof terrace: a cast upstand round the roof's edge with a balustrade
+## of dichroic glass on it (the fins' glass), open on the east side where the
+## lift arrives; two seats and a low table looking over the reservoir.
+const LIFT_AT := Vector2(7.62, 3.7)
+const LIFT_SIZE := Vector2(1.66, 1.6)
+
+
+static func roof_top() -> float:
+	return CalderaShell.STOREY + 0.10 + CalderaShell.ROOF_DEPTH * 0.5
+
+
+static func _parapet(upper: StaticBody3D) -> void:
+	var top := roof_top()
+	var half := SHELL_SIZE * 0.5 + Vector2.ONE * 0.35
+	var x0 := SHELL_CENTRE.x - half.x
+	var x1 := SHELL_CENTRE.x + SHELL_SIZE.x * 0.5 - 0.08
+	var glass := ShaderMaterial.new()
+	glass.shader = _dichroic_shader()
+	# [from, to] runs of upstand; the east side breaks for the lift's landing.
+	var gap0 := LIFT_AT.y - LIFT_SIZE.y * 0.5 - 0.05
+	var gap1 := LIFT_AT.y + LIFT_SIZE.y * 0.5 + 0.05
+	var runs := [
+		[Vector2(x0, -half.y), Vector2(x1, -half.y)], [Vector2(x0, half.y), Vector2(x1, half.y)],
+		[Vector2(x0, -half.y), Vector2(x0, half.y)],
+		[Vector2(x1, -half.y), Vector2(x1, gap0)], [Vector2(x1, gap1), Vector2(x1, half.y)],
+	]
+	for run: Array in runs:
+		var a: Vector2 = run[0]
+		var b: Vector2 = run[1]
+		var mid := (a + b) * 0.5
+		var along_x := absf(b.x - a.x) > absf(b.y - a.y)
+		var length := a.distance_to(b)
+		var size := Vector3(length, 0.3, 0.16) if along_x else Vector3(0.16, 0.3, length)
+		CalderaShell._metal(upper, Vector3(mid.x, top + 0.15, mid.y), size, CalderaShell.BASALT, true)
+		var pane := MeshInstance3D.new()
+		var box := BoxMesh.new()
+		box.size = Vector3(length, 0.75, 0.03) if along_x else Vector3(0.03, 0.75, length)
+		pane.mesh = box
+		pane.material_override = glass
+		pane.position = Vector3(mid.x, top + 0.3 + 0.375, mid.y)
+		upper.add_child(pane)
+		CollisionPolicy.add_box(upper, pane, box.size, pane.position, Basis(), false)
+		CalderaShell._metal(upper, Vector3(mid.x, top + 1.07, mid.y), size * Vector3(1, 0, 1) + Vector3(0.0, 0.04, 0.0), CalderaShell.STEEL_BLUED, false)
+	# Pale cast pavers over the roof: the terrace's floor.
+	var paving := MeshInstance3D.new()
+	paving.name = "TerracePaving"
+	var slab := BoxMesh.new()
+	slab.size = Vector3(SHELL_SIZE.x - 0.3, 0.02, SHELL_SIZE.y + 0.4)
+	paving.mesh = slab
+	paving.material_override = SolidModel.material(Color(0.58, 0.55, 0.52), 0.85, 0.0)
+	paving.position = Vector3(SHELL_CENTRE.x, top + 0.01, 0.0)
+	upper.add_child(paving)
+	CollisionPolicy.mark_decorative(paving)
+	# Seats round two low tables toward the reservoir, a flame in glass at
+	# each end of the group for the evenings.
+	for x: float in [-4.0, 0.5]:
+		CalderaFurniture.low_table(upper, Vector3(x, top, 4.3), 0.0)
+		for offset: Vector2 in [Vector2(-1.1, 0.0), Vector2(1.1, 0.0), Vector2(0.0, -1.0)]:
+			CalderaFurniture.piece(upper, Vector3(0.4, 0.22, 0.32), CalderaShell.BASALT.lightened(0.1), Vector3(x + offset.x, top + 0.22, 4.3 + offset.y), 0.0 if offset.y == 0.0 else PI * 0.5, true, SuperEgg.EPSILON_SOFT)
+	for x: float in [-6.4, 2.9]:
+		CalderaFurniture.flame_capsule(upper, Vector3(x, top, 5.3))
+
+
+## The lift: three stations, the east bay's floor (the ground), the home's
+## door landing and the roof terrace, on four steel masts at the bay's north
+## end, the platform with dichroic cheeks on its open sides; a call post at
+## each station.
+static func _lift(body: StaticBody3D) -> void:
+	var top := UPPER + roof_top()
+	var glass := ShaderMaterial.new()
+	glass.shader = _dichroic_shader()
+	for corner: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
+		var p := LIFT_AT + Vector2(corner.x * (LIFT_SIZE.x * 0.5 + 0.06), corner.y * (LIFT_SIZE.y * 0.5 + 0.06))
+		CalderaShell._metal(body, Vector3(p.x, (top + 1.2) * 0.5, p.y), Vector3(0.1, top + 1.2, 0.1), CalderaShell.STEEL_BLUED, true)
+	CalderaShell._metal(body, Vector3(LIFT_AT.x, top + 1.2, LIFT_AT.y), Vector3(LIFT_SIZE.x + 0.3, 0.1, LIFT_SIZE.y + 0.3), CalderaShell.STEEL_BLUED, false)
+	var heights: Array[float] = [0.0, UPPER, top]
+	var names: Array[String] = ["Ground", "Home", "Roof terrace"]
+	var lift := CalderaLift.build(body, LIFT_AT, LIFT_SIZE, heights, names, 1, ["east", "north"], glass)
+	# A fixed plate bridging from the roof's edge to the lift at the top stop.
+	var edge := SHELL_CENTRE.x + SHELL_SIZE.x * 0.5
+	var lift_west := LIFT_AT.x - LIFT_SIZE.x * 0.5
+	var plate := CalderaShell._metal(body, Vector3((edge - 0.1 + lift_west - 0.02) * 0.5, top - 0.04, LIFT_AT.y), Vector3(lift_west - 0.02 - edge + 0.1, 0.08, LIFT_SIZE.y), CalderaShell.STEEL_BLUED, false)
+	var holder := MeshInstance3D.new()
+	body.add_child(holder)
+	CollisionPolicy.add_box(body, holder, Vector3(lift_west - 0.02 - edge + 0.1, 0.08, LIFT_SIZE.y), plate.position, Basis(), true)
+	# Call posts: at the ground beside the well, on the home's landing, on
+	# the terrace by the plate.
+	var south := LIFT_AT.y - LIFT_SIZE.y * 0.5 - 0.25
+	CalderaLift.add_call(body, lift, 0, Vector3(LIFT_AT.x + 0.5, 0.0, south))
+	CalderaLift.add_call(body, lift, 1, Vector3(LIFT_AT.x + 0.5, UPPER, south))
+	CalderaLift.add_call(body, lift, 2, Vector3(edge - 0.45, top, south + 0.05))
+	for station: float in heights:
+		ClearZones.add(body, "lift landing", "door", Vector2(LIFT_AT.x, LIFT_AT.y - LIFT_SIZE.y * 0.5), Vector2(0, -1), 0.0, 1.0, LIFT_SIZE.x * 0.5 - 0.3, station + 0.05, station + 1.9)
 
 
 static func _dichroic_shader() -> Shader:

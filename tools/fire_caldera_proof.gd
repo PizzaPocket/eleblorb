@@ -240,6 +240,12 @@ func _check_oren(space: PhysicsDirectSpaceState3D) -> void:
 	else:
 		for problem in ClearZones.audit(home):
 			_fail("OREN home layout: %s" % problem)
+	# The roof terrace stands at its roof's top, and the lift serves it.
+	var roof_hit := _ray(space, to_world * Vector3(-3.0, 12.0, 0.0), to_world * Vector3(-3.0, 6.0, 0.0), [])
+	if roof_hit.is_empty() or absf(float(roof_hit["position"].y) - datum - up - FireCalderaOren.roof_top()) > 0.06:
+		_fail("OREN: the roof terrace is not a floor at its roof's top")
+	if _oren.get_node_or_null("Lift") == null:
+		_fail("OREN: no lift to the terrace")
 	print("ok   OREN: doors clear at their floors, split levels and ramps meet the height query")
 
 
@@ -394,6 +400,8 @@ func _render() -> void:
 		"oren_counter": [Vector3(-7.6, 1.7, 5.4), Vector3(0.5, 1.0, 1.4)],
 		"oren_corridor": [Vector3(-7.6, 1.35 + 1.6, 0.3), Vector3(6.4, 0.8, 0.3)],
 		"oren_studio": [Vector3(0.6, 1.35 + 1.6, -0.9), Vector3(5.5, 1.6, -5.4)],
+		"oren_terrace": [Vector3(6.4, 4.0 + 3.99 + 1.7, -4.5), Vector3(-3.0, 4.0 + 3.99, 4.0)],
+		"oren_lift": [Vector3(13.0, 6.5, 8.0), Vector3(7.6, 5.5, 3.0)],
 		"oren_home": [Vector3(5.8, 4.0 + 1.6, 1.4), Vector3(-7.0, 4.0 + 1.0, 4.0)],
 	}
 	for name: String in oren:
