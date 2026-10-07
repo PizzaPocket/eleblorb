@@ -83,7 +83,7 @@ whether the Demon King's discord is behind it, is open.
 
 ## 3. Community (proposed census, 2026-10-06)
 
-Seventeen residents in eleven households. The eight rock-named residents are
+Eighteen residents in twelve households. The eight rock-named residents are
 replaced: their names belonged to the earlier earth-and-stone concept.
 **Dolma Hearthstone keeps her name and her house**, which becomes the saloon
 and hotel.
@@ -107,7 +107,8 @@ Black cowboys, about one in four of the real trail hands.
 | **Pearl Dunaway** | woman | the assay office | assayer and banker: weighs the prospectors' ore and keeps the town's money |
 | **Hollis Grant** | man | the doctor's | doctor and barber, "Doc" to everyone |
 | **Lark Delgado** | woman | the race barn | the town's champion rider and race marshal |
-| **Gus Pickett** | man | his shack | an old prospector who has walked the fossil basin for fifty years and knows Dinosaur's bones |
+| **Cass Rourke** | woman | the mine house | the town's **miner** and mine foreman: works the Silverback mine in the canyon wall with a drill, a pick and an ore cart, and keeps its timbers sound; added 2026-10-07 |
+| **Gus Pickett** | man | his shack | the **old prospector**: fifty years walking the canyons and the fossil basin, knows Dinosaur's bones; never seen without his battered, sweat-stained **prospector's hat** (a wide, floppy-brimmed slouch hat with a dented crown), a pan and a pickaxe on his mule-sized cyborg burro |
 | **Jessup Kane** | man | the gang | leader of the riders who hang around the saloon |
 | **Dutch Raker** | man | the gang | the gang's muscle |
 | **Sadie Vex** | woman | the gang | the gang's fastest rider, and Lark's rival |
@@ -116,7 +117,19 @@ Black cowboys, about one in four of the real trail hands.
 
 - **Ranching** cyborg horses: breeding, breaking, training, selling.
 - **The livery and garage:** shoeing, repair, tuning.
-- **Prospecting and assay:** ore and gems from the Rock half's canyons.
+- **Mining** (user direction, 2026-10-07): the town's working backbone.
+  - **The mine:** Cass Rourke runs the **Silverback mine**, a timbered tunnel
+    (an adit) into the canyon wall of the Rock half. It yields silver ore
+    and the odd crystal.
+  - **The prospector:** old Gus Pickett prospects alone, panning the washes
+    and chipping the canyons for new seams. He sells what he finds to the
+    assay office.
+  - **The assay office:** Pearl Dunaway assays the ore, pays for it and
+    banks the proceeds.
+  - **The store:** Walt sells the miners' tools, candles and lamp oil. The
+    general store's stock and the assay office's money depend on the mine.
+  - The mine is one more reason for the town's love of machines. Its ore carts
+    run on rails, its lamps are electric, and Mateo maintains its winch.
 - **The saloon and hotel.**
 - **The general store.**
 - **Dirt-bike racing:** the town's passion, run from the race barn.
@@ -296,7 +309,8 @@ this is a deliberate fusion.
 
 - **Main street:** the arrival road becomes the street, with the boardwalk
   along both sides.
-- **The saloon and hotel** at the head of the street, facing down it: the
+- **The saloon and hotel, the town's inn** (confirmed 2026-10-07): the inn is
+  integrated into the saloon, at the head of the street, facing down it: the
   social centre and the rest point.
   - Saloon below, with its bar, piano, card tables and swinging doors.
   - Hotel rooms above, with the party room.
@@ -313,7 +327,21 @@ this is a deliberate fusion.
   where the Ground half's open dirt and the Rock half's canyons both earn their
   place.
 - **The Bell ranch** and corral on the edge of town.
-- **Gus's shack** on the road toward the fossil basin.
+- **Gus's shack** on the road toward the fossil basin, with a sluice box and
+  a panning trough beside it.
+- **The mine** (added 2026-10-07), on the Rock half's canyon wall nearest
+  town, reached by the mine road:
+  - the **adit**: a timbered portal into the rock, with posts, a cap beam and
+    a lantern;
+  - **ore-cart rails** from the portal down to an **ore house**, where ore is
+    sorted and loaded, by the mine road;
+  - a hand **winch** and a tool shed;
+  - **waste rock tips** spilling down the slope below the portal;
+  - **the mine house**, Cass's home, beside the ore house.
+
+  Ore travels down the mine road to the assay office on main street. Inside,
+  the adit is a real, short tunnel the player can walk into, but the mine's
+  depth and any story in it are open.
 - **The water tower and windmill pump** over the existing well, which stays
   where it is.
 - **Hitching rails** outside the saloon, the store and the jail.
@@ -358,13 +386,17 @@ spread.
 - a cowboy hat the player can receive and use as a helm;
 - a mostly bare dirt-and-rock biome with a few cacti, shrubs and tumbleweeds.
 
+**Fixed (user, 2026-10-07):** mining is part of the town's economy and
+function, with a miner and an old prospector in a prospecting hat; the inn is
+integrated into the saloon.
+
 **Fixed (user, 2026-10-06):** no firearms. Nobody in the town carries a gun:
 no holsters, gun belts, rifles on racks or shoot-outs. The Western menace comes
 from horses, riders, stares and races instead.
 
 **Proposed:**
-- the census of sixteen, replacing the eight rock-named residents;
-- Dolma's inn becoming the saloon and hotel;
+- the census of eighteen, replacing the eight rock-named residents;
+- the Silverback mine, Cass Rourke the miner, and Gus's cyborg burro;
 - the Kane gang;
 - Wes Tolliver the saddle maker and the shifting saddle for Manchego;
 - the cowboy hat as the Ground suit's helm, shifting with `DirtbikeMode`;
