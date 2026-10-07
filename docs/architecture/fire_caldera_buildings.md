@@ -1,8 +1,9 @@
 # Fire Caldera City: Architecture Briefs
 
-Status: building briefs for review (2026-10-06); audited against the
+Status: approved by the user (2026-10-07); written 2026-10-06, audited against the
 architecture skill's brief audit on 2026-10-07 (sizes, sections, access and
-pass-throughs, frames, headroom, ramps). Foundations wait on the plot survey. Read with
+pass-throughs, frames, headroom, ramps). Foundations come from the plot survey
+(`FireCalderaGround.survey()`, socketed plinths in `SocketPlinth`). Read with
 `fire_caldera_city.md` (people, physiology, charter, interiors in principle)
 and `fire_caldera_layout.md` (approved layout: plots, routes, lower city,
 foundations). Plot ids, centres, footprints and routes come from the layout,

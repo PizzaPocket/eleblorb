@@ -20,10 +20,20 @@ city is not built.
   isolation and checks each socket with physics (0 FAIL); `--shots=dir`
   renders it.
 
-Next: the building briefs (`fire_caldera_buildings.md`) need the user's
-review; then the shell-with-opening and glass-threshold prototypes, the lava
-API's polygon surfaces for the irregular reservoir, and the ground's seam
-against the real crater wall (the proof uses a stand-in wall).
+- `FireKingdomTerrain.register_lava_polygon()`: irregular lava surfaces for
+  the reservoir, through the same hazard, height and escape queries as the
+  circles (`tools/test_lava_polygon.tscn`, 0 FAIL).
+- The building briefs (`fire_caldera_buildings.md`) were approved by the user
+  on 2026-10-07.
+
+Next, in order: prototype one continuous steel-and-glass shell with a cut
+opening and one glass-and-metal threshold in isolation (a building proof
+scene like `tools/fishing_building_proof.tscn`, on a `SocketPlinth`); close
+the ground's seam against the real crater wall and set `FireCalderaGround`
+into `fire_kingdom_terrain.gd` (excluding the flat placeholder floor inside
+the city); register the reservoir with `register_lava_polygon()`; then build
+the briefs plot by plot, and only then remove the old eight houses, fountain
+and braziers.
 
 Status: community, civic-system, and architectural brief complete enough for a
 dimensioned layout synthesis; the fourteen-person census was approved on

@@ -354,7 +354,7 @@ func get_village_center()->Vector2:return CRATER_CENTER
 func get_village_radius()->float:return VILLAGE_RADIUS
 func is_lava_area(p:Vector2)->bool:
 	for surface in _registered_lava_surfaces:
-		if p.distance_to(surface["center"] as Vector2)<float(surface["radius"]):return true
+		if _in_lava_surface(p,surface):return true
 	for center in LAVA_POOLS:
 		if p.distance_to(center)<LAVA_MOUTH_RADIUS:return true
 	if _river_coverage(p)>0.01:return true
@@ -374,15 +374,27 @@ func is_lava_area(p:Vector2)->bool:
 	return get_mesh_height(p.x,p.y)<RIVER_LAVA_SURFACE_Y+0.15
 func get_lava_surface_height(p:Vector2)->float:
 	for surface in _registered_lava_surfaces:
-		if p.distance_to(surface["center"] as Vector2)<float(surface["radius"]):return float(surface["height"])
+		if _in_lava_surface(p,surface):return float(surface["height"])
 	for center in LAVA_POOLS:
 		if p.distance_to(center)<LAVA_MOUTH_RADIUS:return VOLCANO_LAVA_SURFACE_Y
 	return RIVER_LAVA_SURFACE_Y
 func get_lava_escape_position(p:Vector2)->Vector3:
 	for surface in _registered_lava_surfaces:
+		if surface.has("polygon") and _in_lava_surface(p,surface):
+			# Out across the nearest edge of an irregular surface.
+			var outline:PackedVector2Array=surface["polygon"]
+			var nearest:=p
+			var best:=INF
+			for i in outline.size():
+				var closest:=Geometry2D.get_closest_point_to_segment(p,outline[i],outline[(i+1)%outline.size()])
+				if p.distance_to(closest)<best:
+					best=p.distance_to(closest);nearest=closest
+			var away:Vector2=(nearest-p).normalized() if nearest!=p else (p-(surface["center"] as Vector2)).normalized()
+			var shore:Vector2=nearest+away*0.8
+			return Vector3(shore.x,get_mesh_height(shore.x,shore.y),shore.y)
 		var surface_center:Vector2=surface["center"] as Vector2
 		var surface_radius:float=float(surface["radius"])
-		if p.distance_to(surface_center)<surface_radius:
+		if not surface.has("polygon") and p.distance_to(surface_center)<surface_radius:
 			var outward:Vector2=(p-surface_center).normalized() if p!=surface_center else Vector2.DOWN
 			var edge:Vector2=surface_center+outward*(surface_radius+0.8)
 			return Vector3(edge.x,get_mesh_height(edge.x,edge.y),edge.y)
@@ -403,6 +415,22 @@ func get_lava_escape_position(p:Vector2)->Vector3:
 
 func register_lava_surface(center:Vector2,radius:float,height:float)->void:
 	_registered_lava_surfaces.append({"center":center,"radius":radius,"height":height})
+
+## An irregular lava surface (the caldera city's reservoir): `polygon` is its
+## outline in world plan coordinates. The same hazard, height and escape
+## queries serve it as a circle; nothing else needs to know its shape.
+func register_lava_polygon(polygon:PackedVector2Array,height:float)->void:
+	var centre:=Vector2.ZERO
+	for point in polygon:centre+=point
+	centre/=maxf(float(polygon.size()),1.0)
+	var reach:=0.0
+	for point in polygon:reach=maxf(reach,point.distance_to(centre))
+	_registered_lava_surfaces.append({"center":centre,"radius":reach,"height":height,"polygon":polygon})
+
+func _in_lava_surface(p:Vector2,surface:Dictionary)->bool:
+	if p.distance_to(surface["center"] as Vector2)>=float(surface["radius"]):return false
+	if surface.has("polygon"):return Geometry2D.is_point_in_polygon(p,surface["polygon"])
+	return true
 
 func _color(p:Vector2)->Color:
 	var heat:=0.0
