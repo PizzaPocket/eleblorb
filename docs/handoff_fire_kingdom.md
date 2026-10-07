@@ -56,6 +56,20 @@ surface foundations, and the finished guest house exist and validate.
   fine visual mesh is lifted 1 cm above its matching collider to prevent
   boundary depth flicker without changing floor height.
 
+## Built so far (2026-10-07)
+
+- **Guest house** (`FireCalderaBuildings`): live.
+- **Nahl tempering hall and Eris's house** (`FireCalderaNahl`): live; pale
+  tuff house of care, wrought iron, conversation pit, lava bed.
+- **Oren mineral house** (`FireCalderaOren`): live; split level, cast-glass
+  brick front and dichroic fins, a first spare furnishing pass. Next for Oren:
+  a richer interior pass (display cells' stock, assay tools, Savi's stations),
+  register its lava beds with the terrain, tune the bricks' milkiness in sun,
+  and a way onto the flat roof if it is to be a terrace.
+- Next buildings by the brief: Renewal terrace, Kel, Vara, Civic (with the
+  terrarium), Iren, Aro, the arrival pylons and the cove bridge. Each gets
+  its own original idea (see "A culture of original buildings" in the brief).
+
 ## Backlog
 
 - **Wall tops against the roof pitch: evaluated 2026-10-07** with the guest

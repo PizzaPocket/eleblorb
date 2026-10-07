@@ -129,7 +129,51 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> Static
 	_east_bay(body)
 	_receiving_bridge(body)
 	_lights(body, upper)
+	_furnish(body, upper)
 	return body
+
+
+## The rooms, kept spare: Pela's counter facing the door with stones on the
+## shelves behind; the vault's shelves; the assay bench with lenses; crates in
+## receiving; the tested stock; Savi's bench and heat cell; above, seats round
+## a low table, a lava bed each for Pela and Savi, the pantry's shelves of
+## mineral delicacies.
+static func _furnish(body: StaticBody3D, upper: StaticBody3D) -> void:
+	var stones := func(b: StaticBody3D, p: Vector3, i: int) -> void:
+		var tones: Array[Color] = [Color(0.55, 0.30, 0.68), Color(0.25, 0.62, 0.60), Color(0.85, 0.55, 0.20), Color(0.70, 0.20, 0.28), Color(0.85, 0.85, 0.80)]
+		CalderaFurniture.piece(b, Vector3(0.05, 0.05, 0.05), tones[(i * 3) % tones.size()], p + Vector3(0, 0.05, 0), float(i), false, 2.4)
+	var r := RAISE
+	# Counter room.
+	CalderaFurniture.counter(body, Vector3(-5.0, 0.0, 2.6), PI, 2.4)
+	CalderaFurniture.shelves(body, Vector3(-8.1, 0.0, 3.8), -PI * 0.5, 2.0, 3, stones)
+	FireCalderaBuildings._marker(body, "PelaStand", Vector3(-5.0, 0.0, 1.7), 0.0)
+	# Gem store.
+	CalderaFurniture.shelves(body, Vector3(0.0, 0.0, 5.6), 0.0, 2.2, 4, stones)
+	# Assay room.
+	CalderaFurniture.table(body, Vector3(4.0, 0.0, 4.4), 0.0, 2.0, 0.7)
+	CalderaFurniture.chair(body, Vector3(4.0, 0.0, 3.5), PI, CalderaFurniture.FIBRE_GREY)
+	for i in 3:
+		CalderaFurniture.jar(body, Vector3(3.4 + 0.5 * float(i), 0.8, 4.5), [Color(0.55, 0.30, 0.68), Color(0.25, 0.62, 0.60), Color(0.85, 0.55, 0.20)][i], 0.05)
+	# Receiving: crates of raw ore.
+	for at: Vector3 in [Vector3(-7.9, r, -2.4), Vector3(-7.9, r, -3.4), Vector3(-4.1, r, -2.6)]:
+		CalderaFurniture.chest(body, at, PI * 0.5 if at.x < -6.0 else -PI * 0.5, 0.8)
+	# Tested stock.
+	CalderaFurniture.shelves(body, Vector3(-2.0, r, -5.6), PI, 2.2, 3, stones)
+	# Savi's studio: the bench and a heat cell.
+	CalderaFurniture.table(body, Vector3(3.0, r, -3.4), 0.0, 2.6, 0.8)
+	CalderaFurniture.piece(body, Vector3(0.45, 0.6, 0.4), CalderaShell.BASALT, Vector3(5.7, r + 0.6, -5.2), 0.0, true)
+	FireCalderaBuildings._glow(body, "HeatCellPort", Vector3(0.2, 0.12, 0.01), Vector3(5.7, r + 0.75, -4.79), Color(1.0, 0.5, 0.12))
+	# Above: the front room's seats round a low table.
+	CalderaFurniture.low_table(upper, Vector3(-3.0, 0.0, 3.4), 0.0)
+	for side: float in [-1.0, 1.0]:
+		CalderaFurniture.piece(upper, Vector3(0.36, 0.22, 0.3), CalderaShell.BASALT.lightened(0.08), Vector3(-3.0 + side * 1.0, 0.22, 3.4), 0.0, true, SuperEgg.EPSILON_SOFT)
+	# A lava bed each: a cast basalt basin the lava fills from beneath.
+	for x: float in [-6.0, -1.0]:
+		CalderaFurniture.piece(upper, Vector3(1.1, 0.28, 0.55), CalderaShell.BASALT, Vector3(x, 0.28, -3.6), 0.0, true, 4.0)
+		FireCalderaBuildings._glow(upper, "BedLava", Vector3(0.95, 0.02, 0.42), Vector3(x, 0.55, -3.6), Color(1.0, 0.42, 0.08))
+		CalderaFurniture.concealed_light(upper, Vector3(x, 1.0, -3.6), Color(1.0, 0.55, 0.22), 0.8, 4.0)
+	# The pantry: shelves of Savi's mineral delicacies.
+	CalderaFurniture.shelves(upper, Vector3(4.0, 0.0, -5.6), PI, 2.4, 3, stones)
 
 
 ## Concealed light, one per room or run, until the rooms are furnished.

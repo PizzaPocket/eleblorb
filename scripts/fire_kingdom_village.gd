@@ -56,6 +56,17 @@ func _ready()->void:
 	_spawn_lava_slide()
 	_build_guest_house()
 	_build_nahl()
+	_build_oren()
+
+
+## The Oren mineral house, split level, on its surveyed plinth.
+func _build_oren()->void:
+	var frame:Node3D=_terrain.get_caldera_frame()
+	var line:Dictionary=_terrain.get_caldera_survey("OREN")
+	if frame==null or line.is_empty():
+		push_error("FireKingdomVillage: live OREN socket is unavailable")
+		return
+	FireCalderaOren.build(frame,FireCalderaPlan.plot("OREN"),line)
 
 
 ## The Nahl tempering hall and Eris's house, on its surveyed plinth; its
