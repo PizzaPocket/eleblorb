@@ -53,9 +53,23 @@ wall systems.
 
 The prototype hovers a Tempestar 2.2 m above the cloud surface, and the upper
 body adds about 1.2 m. Every opening a Tempestar uses therefore has at least
-4.0 m clear, and every room they occupy at least 5.0 m to the roof's
-underside. Doorways are generous by necessity, which suits the architecture.
-The hero and party need the ordinary minimums (route 3 m, headroom 3.2 m).
+4.0 m clear **height** (and 2.0 m clear width), and every room they occupy at
+least 5.0 m to the roof's underside. Doorways are generous by necessity, which
+suits the architecture. The hero and party need the ordinary minimums (route
+3 m, headroom 3.2 m).
+
+**Column heights (added by the audit, 2026-10-07).** The briefs gave gaps
+but no column heights, so nothing guaranteed the 5.0 m. The rule: column
+height plus the floating gap is at least 5.0 m above the floor, and at least
+4.0 m under any lintel or cap a Tempestar passes beneath.
+- **Tholoi and pavilions:** columns 4.4 m (with the 0.6 m gap, 5.0 m).
+- **Halls:** columns 5.5 m.
+- **The Hall of Mist:** columns 6.4 m to its lower eave (with the 1.6 m gap,
+  8.0 m).
+
+A 0.7 m column on the 3.2 m module leaves 2.5 m clear between columns, and a
+0.45 m column on a tholos about 2.3 m. Both are enough for a Tempestar's width
+and the party's.
 
 ### Exclusions
 
@@ -139,7 +153,9 @@ interior program, materials and ornament, history and variation.
   kingdom; 1.6 m floating gap to the lower eave, a further 1.0 m between the
   two eaves.
 - **Base:** triple podium, 3.0 m, with gold-railed balustrades; an axial ramp 4
-  m wide in three flights with landings at each tier.
+  m wide in three flights with landings at each tier. At 32° each 1.0 m flight
+  needs about 1.6 m of run, so the ramp with its four landings is about 9.6 m
+  deep; the forecourt in front of the propylon must leave that clear.
 - **Openings:** front fully colonnaded; sides screened by quartz screen walls
   with tall superellipse arches; rear solid behind the throne.
 - **Enclosure:** woven-cloud curtains between front columns, drawn open by day.
@@ -275,8 +291,10 @@ trim darkened by scorch.
 - **Masses:** semicircular auditorium 24 m across; a stage 10 × 5 m with a
   colonnaded back wall (scaenae frons) of six columns.
 - **Roof:** flat cap over the stage only, 1.0 m gap; the seating is open sky.
-- **Seating:** six tiers of set-cloud benches, 0.8 m rise each, with two
-  ramped aisles for walking party members.
+- **Seating:** six tiers of set-cloud benches, **0.7 m** rise each (revised by
+  the audit from 0.8 m: six 0.8 m tiers rise 4.8 m over the 7 m between stage
+  and rim, about 34°, steeper than the aisles may be; at 0.7 m they rise 4.2 m,
+  about 31°), with two ramped aisles for walking party members.
 - **Wind harps:** strings of woven cloud stretched between the stage columns;
   they sound in the breeze.
 - **History:** built for an audience of every court; most seats have not been
@@ -296,7 +314,8 @@ gold-leaf verse in niches; Aulia's practice floor.
 34 m; gold ring markers at quarter points; a finish line inlaid in gold.
 
 **Judges' tholos** (principal; Greco-Roman): 8 m, eight columns, dome with a
-1.0 m gap, on a 2 m podium overlooking the finish; Nikandra's seat and the gold
+1.0 m gap, on a 2 m podium overlooking the finish, reached by a 2 m ramp at
+32° (about 3.2 m of run, with landings) on the side away from the track; Nikandra's seat and the gold
 record of victories on the screen wall.
 
 **Prize pavilion** (Greco-Roman, prostyle): 8 × 6 m, low gable with a
@@ -323,6 +342,35 @@ share more than half their axes.
 | Chrysa residence | rectangle | gable | 0.6 | none | screened | open porch | scorched gold |
 | Poet's residence | rectangle with side wing | gable | 0.6 | none | half screened | porch toward odeon | verse on gold leaf |
 | Dromos residence | peristyle | gable | 0.6 | none | screened | porch to the inner field | trophy rings |
+
+## 4a. Audit (2026-10-07)
+
+Checked against the architecture skill's brief audit.
+
+- **Heights.** Column heights were missing. They are now set so every room
+  clears 5.0 m and every Tempestar opening 4.0 m (section 1).
+- **Ramps.** Every podium now names its ramp: the judges' tholos had none.
+  The Hall of Mist's ramp depth is stated so the forecourt keeps it clear. The
+  odeon's tiers were too steep for their aisles and now rise 0.7 m each.
+- **Sizes.**
+  - Hall of Mist: the 14 m petitioners' floor plus two 2.4 m galleries fits
+    the 22 m hall, and the dais fits in the throne bay.
+  - The tholoi hold their programs: Mnesia's 7 m tholos holds the ledger
+    room, reading table, shelves and robe press, with the sleeping alcove
+    behind a cloud panel.
+  - The peristyle and courtyard houses fit three or four rooms round their
+    courts.
+- **Access and pass-throughs.**
+  - Rooms in the peristyle houses open off their courts, and Pantao's
+    pavilions off theirs. Both follow their tradition, which is legitimate.
+  - Mnesia's sleeping alcove opens off her own ledger room, a suite, which is
+    legitimate.
+  - Cloud floors are one-way from below, so a Tempestar may also rise into a
+    room through its floor. That is the kingdom's own access, recorded here as
+    deliberate.
+  - The hero always has a ramp or open bay.
+- **Still to prove:** the upturned roof (section 1), before any Chinese
+  building.
 
 ## 5. Validation notes
 
