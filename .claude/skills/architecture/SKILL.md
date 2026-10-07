@@ -111,6 +111,13 @@ programs are fixed inputs here.
   embedded foundation, retaining wall, buttress, or engineered cantilever.
 - Build visible foundation, collision, terrain exclusion, retaining edges, and
   drainage from the same authored footprint and site section.
+- `SlopeFoundation` (`scripts/slope_foundation.gd`) is the shared builder: it
+  sets the deck just above the highest ground anywhere under the footprint and
+  carries it on coursed, battered stone that runs down into the ground at every
+  point of the perimeter, embedded past the low side. One low course where the
+  ground is level, a stepped retaining wall where it falls away. Ohio's cliff
+  overlook is the first use; extend it (polygon footprints, building pads) for
+  the fire caldera's terraces rather than writing another.
 
 ## 1a. Design language: SuperEgg and the superellipse, everywhere it is practical
 

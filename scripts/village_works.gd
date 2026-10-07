@@ -234,6 +234,92 @@ static func build_cascade(
 	return water
 
 
+const FALL_SHADER := """
+shader_type spatial;
+render_mode cull_disabled;
+uniform vec4 water_color : source_color = vec4(0.30, 0.52, 0.70, 1.0);
+uniform vec4 foam_color : source_color = vec4(0.95, 0.98, 1.0, 1.0);
+uniform float speed = 3.4;
+void fragment() {
+	// Streaks run down the fall (UV.y is distance fallen) and wrap round it
+	// (UV.x goes once round the cross-section).
+	float wrap = UV.x * 6.2831;
+	// Long streaks down the fall that waver as the water shifts, pulsed by
+	// slugs of white water travelling down them.
+	float lanes = sin(wrap * 9.0 + sin(UV.y * 0.32 - TIME * speed * 0.55 + wrap * 2.0) * 1.6);
+	float lanes2 = sin(wrap * 5.0 - 1.3 + sin(UV.y * 0.21 - TIME * speed * 0.4) * 2.1);
+	float pulses = sin(UV.y * 0.55 - TIME * speed) * 0.5 + 0.5;
+	float foam = smoothstep(0.25, 0.95, lanes * 0.55 + lanes2 * 0.35 + pulses * 0.35);
+	// The water whitens as it falls and breaks up.
+	foam = max(foam, clamp(UV.y * 0.012, 0.0, 0.55));
+	ALBEDO = mix(water_color.rgb, foam_color.rgb, foam);
+	ROUGHNESS = 0.12;
+	METALLIC = 0.05;
+}
+"""
+
+
+## Water leaving a spout at `mouth` (world-frame point in `parent`), moving
+## horizontally along `direction` at `speed` m/s and falling freely to
+## `base_y`: a tube along the true arc, not a flat ribbon. Its cross-section is
+## a flat sheet where it leaves the lip and swells into a rounder, wider column
+## as it falls and breaks up, so it has body from every side.
+static func build_fall(
+	parent: Node3D, mouth: Vector3, direction: Vector2, speed: float, width: float,
+	base_y: float, node_name: String = "WaterFall"
+) -> MeshInstance3D:
+	const RING := 14
+	const SAMPLES := 48
+	var drop := maxf(mouth.y - base_y, 0.5)
+	var fall_time := sqrt(2.0 * drop / 9.81)
+	var dir3 := Vector3(direction.x, 0.0, direction.y).normalized()
+	var side := Vector3(-dir3.z, 0.0, dir3.x)
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var rings: Array = []
+	var travelled := 0.0
+	var previous := mouth
+	for k in SAMPLES + 1:
+		var t := fall_time * float(k) / float(SAMPLES)
+		var at := mouth + dir3 * speed * t + Vector3.DOWN * (0.5 * 9.81 * t * t)
+		var velocity := dir3 * speed + Vector3.DOWN * (9.81 * t)
+		var forward := velocity.normalized()
+		var up := side.cross(forward).normalized()
+		var f := float(k) / float(SAMPLES)
+		var half_w := width * 0.5 * (1.0 + 0.9 * f)
+		var half_d := lerpf(0.14, half_w * 0.75, smoothstep(0.0, 0.6, f))
+		if k > 0:
+			travelled += at.distance_to(previous)
+		previous = at
+		var ring: Array = []
+		for i in RING + 1:
+			var a := TAU * float(i) / float(RING)
+			ring.append({"p": at + side * cos(a) * half_w + up * sin(a) * half_d, "n": (side * cos(a) / half_w + up * sin(a) / half_d).normalized(), "uv": Vector2(float(i) / float(RING), travelled)})
+		rings.append(ring)
+	for k in SAMPLES:
+		for i in RING:
+			var a: Dictionary = rings[k][i]
+			var b: Dictionary = rings[k][i + 1]
+			var c: Dictionary = rings[k + 1][i]
+			var d: Dictionary = rings[k + 1][i + 1]
+			for v: Dictionary in [a, c, b, b, c, d]:
+				tool.set_normal(v["n"])
+				tool.set_uv(v["uv"])
+				tool.add_vertex(v["p"])
+	var shader := Shader.new()
+	shader.code = FALL_SHADER
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	var water := MeshInstance3D.new()
+	water.name = node_name
+	water.mesh = tool.commit()
+	water.material_override = material
+	water.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	parent.add_child(water)
+	CollisionPolicy.mark_decorative(water)
+	return water
+
+
 ## A small spring-fed reservoir: a raised sheet of water held by an earth
 ## berm, with a stone dam where the channel leaves it (toward `outlet`).
 static func build_reservoir(
@@ -832,10 +918,12 @@ static func build_graded_flagstone_terrace(
 ## drop-facing arc and never becomes a perimeter wall.
 static func build_flat_overlook_terrace(
 	parent: Node3D, at: Vector2, radius: float, color: Color, ground: Callable,
-	node_name: String = "FlatOverlookTerrace"
+	node_name: String = "FlatOverlookTerrace", surface_override: float = NAN
 ) -> StaticBody3D:
-	var grade := _ground(ground, at)
-	var surface_y := grade + 0.095
+	# On a slope the deck's level comes from its foundation (SlopeFoundation),
+	# which also supplies the collider; on level ground it sits on the grade.
+	var on_foundation := not is_nan(surface_override)
+	var surface_y := surface_override if on_foundation else _ground(ground, at) + 0.095
 	var body := _body(parent, node_name)
 	var rings := [
 		{"radius":0.0, "count":1, "tangent":0.95, "radial":0.95},
@@ -864,15 +952,16 @@ static func build_flat_overlook_terrace(
 			)
 	# One collider is the exact deck the player sees. Individual dressing stones
 	# are non-colliding so their overlaps cannot produce bumps or snag a wheel.
-	var collision := CollisionShape3D.new()
-	var shape := CylinderShape3D.new()
-	shape.radius = radius * 0.91
-	shape.height = 0.16
-	collision.shape = shape
-	collision.position = Vector3(at.x, surface_y - shape.height * 0.5, at.y)
-	collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
-	body.add_child(collision)
-	body.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+	if not on_foundation:
+		var collision := CollisionShape3D.new()
+		var shape := CylinderShape3D.new()
+		shape.radius = radius * 0.91
+		shape.height = 0.16
+		collision.shape = shape
+		collision.position = Vector3(at.x, surface_y - shape.height * 0.5, at.y)
+		collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+		body.add_child(collision)
+		body.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
 	# Flush, broad stones on the east/drop arc read as a finished edge without
 	# forming the rim wall the overlook explicitly must not have.
 	var coping_count := 9

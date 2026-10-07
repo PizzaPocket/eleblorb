@@ -344,6 +344,8 @@ const GREEN_STALL_POSITIONS := {
 const FALSE_HERO_CHECK_INTERVAL_MS := 4000
 
 var town_center: Vector2
+## The overlook deck's level, set by its slope foundation.
+var _overlook_surface := 0.0
 ## Sampled aqueduct centreline (Town-local), kept for the scatter exclusions.
 var _course: Array[Vector2] = []
 var _generated: Node3D
@@ -631,8 +633,16 @@ func _build_main_street_lamps(parent: Node3D) -> void:
 func _build_overlook(parent: Node3D,ground: Callable) -> void:
 	var at: Vector2 = OhioPlan.OVERLOOK["at"]
 	var radius: float = OhioPlan.OVERLOOK["radius"]
+	# The terrace overhangs the cliff edge on its east side, where the ground
+	# falls nearly 7 m: a level deck set above the highest ground, carried on
+	# coursed stone that runs down into the slope (SlopeFoundation), rather than
+	# flagstones laid along the grade and cutting into it.
+	var foundation := SlopeFoundation.build_round(
+		parent, at, radius, ground, TownProps.FOUNTAIN_STONE.darkened(0.12), "OverlookFoundation"
+	)
+	_overlook_surface = float(foundation["surface_y"])
 	VillageWorks.build_flat_overlook_terrace(
-		parent, at, radius, TownProps.FOUNTAIN_STONE.darkened(0.04), ground, "OverlookTerrace"
+		parent, at, radius, TownProps.FOUNTAIN_STONE.darkened(0.04), ground, "OverlookTerrace", _overlook_surface
 	)
 	_record_solid("OverlookTerrace","yard_prop",at,Vector2(radius,radius),0.0)
 	var toward := at + Vector2(10.0,2.0)
@@ -651,11 +661,10 @@ func _build_overlook(parent: Node3D,ground: Callable) -> void:
 	parent.add_child(tree)
 
 
-func _overlook_surface_y(local_pos: Vector2) -> float:
-	# The overlook is intentionally one level deck. Sampling each bench or lamp
-	# independently reintroduced the cliff pitch that the terrace removes.
-	var centre: Vector2 = OhioPlan.OVERLOOK["at"]
-	return _ground_y(centre) + 0.095
+func _overlook_surface_y(_local_pos: Vector2) -> float:
+	# The overlook is one level deck, set by its foundation. Sampling each bench
+	# or lamp independently reintroduced the cliff pitch that the terrace removes.
+	return _overlook_surface
 
 
 ## The inn's west gable (the hearth wall) is what a traveller sees first: windows
@@ -1475,69 +1484,132 @@ func _plan_waterworks() -> Dictionary:
 	}
 
 
-## The water going over the edge: a cascade ribbon from the aqueduct's end down
-## the slope to the lake's surface.
+## The water going over the edge. The stone channel carries on past the cliff's
+## lip as a flume on raking timber struts braced into the face, until its mouth
+## stands far enough out that water leaving it at a natural speed falls clear
+## of the cliff and its ledge into the lake. (It used to slide to the lip and be
+## thrown out at whatever speed would clear the ledge, about 9 m/s: an arc no
+## water makes.) The fall is a tube with body, not a flat ribbon.
+const FLUME_LAUNCH_SPEED := 2.6
+const FLUME_FALL := 0.012
+const FLUME_STRUT_RAKE := deg_to_rad(38.0)
+
+
 func _build_cascade(parent: Node3D, plan: Dictionary, start: Vector2, start_y: float, ground: Callable) -> void:
 	var direction: Vector2 = plan["dir"]
 	var shore_y: float = terrain.get_lake_water_level()
-	const STEP := 2.0
-	const STEEP_DROP := 1.2
-	var width0 := STREAM_WIDTH + 0.6
-	# Walk out from the aqueduct's end to the cliff's lip (the first step that falls
-	# away steeply) and on to where the ground meets the lake.
-	var lip_step := -1
-	var lake_step := -1
-	var previous_y := _ground_y(start)
-	for step in range(1, 140):
-		var y := _ground_y(start + direction * STEP * float(step))
-		if lip_step < 0 and previous_y - y > STEEP_DROP:
-			lip_step = step - 1
-		previous_y = y
-		if y <= shore_y + 0.3:
-			lake_step = step
-			break
-	if lip_step < 0 or lake_step < 0:
+	var reach := _flume_reach(start, direction, start_y, shore_y)
+	if reach < 0.0:
 		_build_cascade_on_slope(parent, direction, start, start_y, ground)
 		return
-	# The water runs down the slope to the lip as before...
-	var points: Array[Vector2] = [start]
-	var widths: Array[float] = [width0]
-	for step in range(1, lip_step + 1):
-		points.append(start + direction * STEP * float(step))
-		widths.append(width0 + float(step) * 0.07)
-	VillageWorks.build_cascade(parent, points, widths, start_y, shore_y, ground)
-	_add_cascade_spray(parent, points, widths, start_y, shore_y)
-	# ...then leaves the cliff in a free arc, out past its foot until it stands
-	# vertically over the lake, and falls into it.
-	var lip := start + direction * STEP * float(lip_step)
-	var lip_y := maxf(_ground_y(lip) + 0.16, shore_y + 1.0)
-	var drop := lip_y - shore_y
-	var fall_time := sqrt(2.0 * drop / 9.81)
-	var reach := STEP * float(lake_step - lip_step) + 3.0
-	while reach < STEP * float(lake_step - lip_step) + 40.0:
+	var mouth := start + direction * reach
+	var mouth_y := start_y - FLUME_FALL * reach
+	_build_flume(parent, start, direction, reach, start_y)
+	var width := STREAM_WIDTH + 0.2
+	VillageWorks.build_fall(parent, Vector3(mouth.x, mouth_y - 0.05, mouth.y), direction, FLUME_LAUNCH_SPEED, width, shore_y - 0.4, "CascadeFall")
+	var fall_time := sqrt(2.0 * (mouth_y - shore_y) / 9.81)
+	var landing := mouth + direction * FLUME_LAUNCH_SPEED * fall_time
+	_add_mist(parent, Vector3(landing.x, shore_y + 0.3, landing.y), Vector3(4.5, 0.3, 4.5), 80, 2.8, 4.5)
+	_add_mist(parent, Vector3(mouth.x, mouth_y - 0.3, mouth.y), Vector3(width * 0.5, 0.2, 0.5), 14, 1.0, 1.2)
+	# Spray drifting off the column part way down.
+	for f: float in [0.45, 0.75]:
+		var t := fall_time * f
+		var at := mouth + direction * FLUME_LAUNCH_SPEED * t
+		_add_mist(parent, Vector3(at.x, mouth_y - 0.5 * 9.81 * t * t, at.y), Vector3(1.4, 2.0, 1.4), 18, 0.6, 2.4)
+
+
+## The shortest flume whose mouth, with water leaving it at the launch speed,
+## falls clear of the cliff and its ledge into the lake; -1 where no cliff falls
+## away from the aqueduct's end.
+func _flume_reach(start: Vector2, direction: Vector2, start_y: float, shore_y: float) -> float:
+	if _ground_y(start + direction * 6.0) > start_y - 3.0:
+		return -1.0
+	for reach_step in range(4, 60):
+		var reach := float(reach_step)
+		var mouth := start + direction * reach
+		var mouth_y := start_y - FLUME_FALL * reach
+		var fall_time := sqrt(2.0 * maxf(mouth_y - shore_y, 0.5) / 9.81)
 		var clear := true
-		for k in range(1, 31):
-			var t := fall_time * float(k) / 30.0
-			var at := lip + direction * (reach / fall_time * t)
-			if lip_y - 0.5 * 9.81 * t * t < _ground_y(at) + 0.3 and _ground_y(at) > shore_y:
+		for k in range(1, 41):
+			var t := fall_time * float(k) / 40.0
+			var at := mouth + direction * FLUME_LAUNCH_SPEED * t
+			var y := mouth_y - 0.5 * 9.81 * t * t
+			var g := _ground_y(at)
+			if g > shore_y and y < g + 1.0:
 				clear = false
 				break
-		if clear:
-			break
-		reach += 2.0
-	var arc_points: Array[Vector2] = []
-	var arc_widths: Array[float] = []
-	var arc_heights: Array[float] = []
-	const ARC_SAMPLES := 40
-	for k in range(0, ARC_SAMPLES + 1):
-		var t := fall_time * float(k) / float(ARC_SAMPLES)
-		arc_points.append(lip + direction * (reach / fall_time * t))
-		arc_widths.append(width0 + float(lip_step) * 0.07 + 2.5 * float(k) / float(ARC_SAMPLES))
-		arc_heights.append(maxf(lip_y - 0.5 * 9.81 * t * t, shore_y + 0.1))
-	VillageWorks.build_cascade(parent, arc_points, arc_widths, lip_y, shore_y, ground, "CascadeFall", arc_heights)
-	var landing := arc_points[arc_points.size() - 1]
-	_add_mist(parent, Vector3(landing.x, shore_y + 0.3, landing.y), Vector3(5.0, 0.3, 5.0), 70, 2.6, 4.5)
-	_add_mist(parent, Vector3(lip.x, lip_y + 0.2, lip.y), Vector3(width0 * 0.5, 0.2, 0.6), 16, 1.2, 1.4)
+		# The landing itself must be water, with a margin.
+		var landing := mouth + direction * (FLUME_LAUNCH_SPEED * fall_time + 1.5)
+		if clear and _ground_y(landing) < shore_y:
+			return reach
+	return -1.0
+
+
+## The flume: the stone channel continued past the lip, carried on two timber
+## stringers and cross-bearers, each bay held by a raking strut braced back
+## into the cliff face where it meets the rock.
+func _build_flume(parent: Node3D, start: Vector2, direction: Vector2, reach: float, start_y: float) -> void:
+	var body := StaticBody3D.new()
+	body.name = "AqueductFlume"
+	body.collision_layer = 1
+	parent.add_child(body)
+	var yaw := VillageWorks.yaw_along(direction)
+	var basis := Basis(Vector3.UP, yaw)
+	var normal := Vector2(-direction.y, direction.x)
+	var half_width := STREAM_WIDTH * 0.5
+	const SEG := 2.0
+	var segments := int(ceil(reach / SEG))
+	var water_left: Array[Vector2] = []
+	var water_widths: Array[float] = []
+	var water_heights: Array[float] = []
+	for i in segments:
+		var from_d := float(i) * SEG
+		var to_d := minf(from_d + SEG, reach)
+		var mid_d := (from_d + to_d) * 0.5
+		var length := to_d - from_d
+		var mid := start + direction * mid_d
+		var bed := start_y - VillageWorks.WATER_LEVEL - FLUME_FALL * mid_d
+		# Channel floor and curbs, stone like the aqueduct they continue.
+		VillageWorks._part(body, Vector3(half_width + VillageWorks.CURB_THICKNESS, 0.22, length * 0.5 + 0.06), VillageWorks.STONE_DARK, Vector3(mid.x, bed - 0.22, mid.y), basis)
+		for sd: float in [-1.0, 1.0]:
+			var at := mid + normal * sd * (half_width + VillageWorks.CURB_THICKNESS * 0.5)
+			VillageWorks._part(body, Vector3(VillageWorks.CURB_THICKNESS * 0.5, VillageWorks.CURB_HEIGHT * 0.5, length * 0.5 + 0.06), VillageWorks.STONE, Vector3(at.x, bed + VillageWorks.CURB_HEIGHT * 0.5, at.y), basis, true, true, SuperEgg.EPSILON_SOFT)
+			# The stringer under each curb.
+			VillageWorks._part(body, Vector3(0.14, 0.18, length * 0.5 + 0.06), VillageWorks.LOG, Vector3(at.x, bed - 0.62, at.y), basis, false, false)
+		# A cross-bearer under the floor at the bay's outer end.
+		var bearer_at := start + direction * to_d
+		VillageWorks._part(body, Vector3(half_width + VillageWorks.CURB_THICKNESS + 0.25, 0.14, 0.14), VillageWorks.LOG, Vector3(bearer_at.x, bed - 0.62, bearer_at.y), basis, false, false)
+		water_left.append(start + direction * from_d)
+		water_widths.append(STREAM_WIDTH)
+		water_heights.append(start_y - FLUME_FALL * from_d)
+	water_left.append(start + direction * reach)
+	water_widths.append(STREAM_WIDTH)
+	water_heights.append(start_y - FLUME_FALL * reach)
+	VillageWorks.build_cascade(body, water_left, water_widths, start_y, start_y, Callable(self, "_ground_y"), "FlumeWater", water_heights)
+	# Raking struts: from under each bearer past the lip, down and back into the
+	# cliff, one under each stringer, buried where they meet the rock.
+	var lip_d := 0.0
+	while lip_d < reach and _ground_y(start + direction * lip_d) > start_y - 2.5:
+		lip_d += 0.5
+	# Heavy struts every 5 m, the last under the mouth.
+	var d := lip_d + 2.0
+	while d <= reach + 0.01:
+		for sd: float in [-1.0, 1.0]:
+			var top2 := start + direction * d + normal * sd * (half_width + VillageWorks.CURB_THICKNESS * 0.5)
+			var top := Vector3(top2.x, start_y - VillageWorks.WATER_LEVEL - FLUME_FALL * d - 0.75, top2.y)
+			var down := Vector3(-direction.x * sin(FLUME_STRUT_RAKE), -cos(FLUME_STRUT_RAKE), -direction.y * sin(FLUME_STRUT_RAKE))
+			var foot := top
+			var length := 0.0
+			while length < 80.0:
+				length += 0.25
+				foot = top + down * length
+				if foot.y < _ground_y(Vector2(foot.x, foot.z)) - 0.6:
+					break
+			var strut := SuperEgg.build_part(Vector3(0.2, length * 0.5, 0.2), VillageWorks.LOG.darkened(0.08), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+			strut.transform = Transform3D(Basis.looking_at(down, Vector3(direction.x, 0.0, direction.y)) * Basis(Vector3.RIGHT, PI * 0.5), (top + foot) * 0.5)
+			body.add_child(strut)
+			CollisionPolicy.mark_decorative(strut)
+		d += 5.0
 
 
 ## Where there is no cliff to leave, the water simply follows the slope to the lake.
