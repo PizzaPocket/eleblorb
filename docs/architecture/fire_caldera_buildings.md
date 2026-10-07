@@ -278,6 +278,17 @@ shelf.
   inset panels, throwing coloured light on the seats.
 - **Links:** linked to Nahl and Aro along `R6` without passing through either
   home.
+- **As built (2026-10-07), its own idea: a catenary canopy of slumped glass.**
+  The lava people hang molten glass over chains and let it settle into its
+  own curve, so the roof is drawn by heat and gravity: forged iron ribs on the
+  same catenary (16 m span, 6.2 m crown) on branching supports, the panels
+  shading from teal at the springing through garnet to amber at the crown,
+  with coloured light under it. Three basalt tiers climb the uphill slope like
+  a small amphitheatre facing the reservoir, warm seams along their fronts;
+  an arc of seven cast-basalt memory stones with glowing seams at the west
+  front; windbreaks of fused glass with basalt veils behind the top tier;
+  flames in glass at the front corners. The immersion shelf itself is in the
+  reservoir's bank, across the promenade.
 
 ## 4. Exchange and craft
 

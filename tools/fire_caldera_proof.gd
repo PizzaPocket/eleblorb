@@ -23,6 +23,7 @@ var _lines := {}
 var _shell: StaticBody3D
 var _nahl: StaticBody3D
 var _oren: StaticBody3D
+var _renewal: StaticBody3D
 
 
 func _ready() -> void:
@@ -56,6 +57,7 @@ func _run() -> void:
 	_nahl = FireCalderaNahl.build(self, FireCalderaPlan.plot("NAHL"), _lines["NAHL"])
 	# The third: the Oren mineral house, split level.
 	_oren = FireCalderaOren.build(self, FireCalderaPlan.plot("OREN"), _lines["OREN"])
+	_renewal = FireCalderaRenewal.build(self, FireCalderaPlan.plot("RENEWAL"), _lines["RENEWAL"])
 	_stage()
 	for _i in 6:
 		await get_tree().physics_frame
@@ -189,7 +191,7 @@ func _check_shell(space: PhysicsDirectSpaceState3D) -> void:
 
 func _building_rids() -> Array:
 	var rids := []
-	for building: StaticBody3D in [_shell, _nahl, _oren]:
+	for building: StaticBody3D in [_shell, _nahl, _oren, _renewal]:
 		if building == null:
 			continue
 		rids.append(building.get_rid())
@@ -315,7 +317,7 @@ func _floor_ray_past_shell(space: PhysicsDirectSpaceState3D, from: Vector3, to: 
 			return hit
 		var collider := hit["collider"] as Node
 		var ours := false
-		for building: StaticBody3D in [_shell, _nahl, _oren]:
+		for building: StaticBody3D in [_shell, _nahl, _oren, _renewal]:
 			if building != null and (collider == building or building.is_ancestor_of(collider)):
 				ours = true
 		if ours:
@@ -408,6 +410,20 @@ func _render() -> void:
 		var pose: Array = oren[name]
 		camera.global_position = _oren.global_transform * (pose[0] as Vector3)
 		camera.look_at(_oren.global_transform * (pose[1] as Vector3), Vector3.UP)
+		for _i in 4:
+			await RenderingServer.frame_post_draw
+		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])
+		print("saved %s/%s.png" % [_shots, name])
+	var renewal := {
+		"renewal_front": [Vector3(0.0, 1.7, 14.0), Vector3(0.0, 3.0, -2.0)],
+		"renewal_under": [Vector3(-5.0, 1.35 + 1.6, -4.4), Vector3(4.0, 2.5, 3.0)],
+		"renewal_aerial": [Vector3(14.0, 14.0, 16.0), Vector3(0.0, 2.0, -1.0)],
+		"renewal_stones": [Vector3(-1.0, 1.6, 7.5), Vector3(-5.0, 1.0, 4.0)],
+	}
+	for name: String in renewal:
+		var pose: Array = renewal[name]
+		camera.global_position = _renewal.global_transform * (pose[0] as Vector3)
+		camera.look_at(_renewal.global_transform * (pose[1] as Vector3), Vector3.UP)
 		for _i in 4:
 			await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])

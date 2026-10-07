@@ -65,7 +65,9 @@ surface foundations, and the finished guest house exist and validate.
   brick front and dichroic fins, a first spare furnishing pass. Next for Oren:
   done: richer interior, lava beds registered, bricks toned down, the roof
   terrace reached by a lift from the home's landing (`CalderaLift`).
-- Next buildings by the brief: Renewal terrace, Kel, Vara, Civic (with the
+- **Renewal terrace** (`FireCalderaRenewal`): live; slumped-glass catenary
+  canopy, tiers, memory stones.
+- Next buildings by the brief: Kel, Vara, Civic (with the
   terrarium), Iren, Aro, the arrival pylons and the cove bridge. Each gets
   its own original idea (see "A culture of original buildings" in the brief).
 

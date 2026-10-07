@@ -57,6 +57,17 @@ func _ready()->void:
 	_build_guest_house()
 	_build_nahl()
 	_build_oren()
+	_build_renewal()
+
+
+## The Renewal terrace and its slumped-glass canopy, on its surveyed plinth.
+func _build_renewal()->void:
+	var frame:Node3D=_terrain.get_caldera_frame()
+	var line:Dictionary=_terrain.get_caldera_survey("RENEWAL")
+	if frame==null or line.is_empty():
+		push_error("FireKingdomVillage: live RENEWAL socket is unavailable")
+		return
+	FireCalderaRenewal.build(frame,FireCalderaPlan.plot("RENEWAL"),line)
 
 
 ## The Oren mineral house, split level, on its surveyed plinth.
@@ -66,7 +77,8 @@ func _build_oren()->void:
 	if frame==null or line.is_empty():
 		push_error("FireKingdomVillage: live OREN socket is unavailable")
 		return
-	FireCalderaOren.build(frame,FireCalderaPlan.plot("OREN"),line)
+	var body:=FireCalderaOren.build(frame,FireCalderaPlan.plot("OREN"),line)
+	FireCalderaOren.register_lava(body,_terrain)
 
 
 ## The Nahl tempering hall and Eris's house, on its surveyed plinth; its
