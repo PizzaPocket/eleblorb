@@ -606,3 +606,19 @@ concept.
     running session and defaults to chibi on any reset (reload or restart).
   - Mount riding stays one shared mode for every character (traversal parity).
 
+## 16. Design-language checks in code
+
+The first fishing village pass shipped rounded-rectangle roofs, from the
+placeholder builder and then a kit with its own half-thickness constant,
+because nothing checked form. The architecture skill now forbids it in prose;
+these checks make it mechanical:
+
+- `TownProps.roof_slab` and `build_ridge_slab` tag their meshes (for example
+  meta `roof_slab`). The building proof and the village validator fail any
+  roof-like part (a node under a roof or named for one) without the tag.
+- Fail a kit or settlement script that declares its own roof thickness,
+  pitch band or wall thickness instead of reading the `TownProps` constant (a
+  simple scan in the pre-push checks, like `tools/check_power_parity.py`).
+- The proof scene renders the building beside a reference Ohio house at the
+  same scale (`--shots`), so the comparison is one image.
+

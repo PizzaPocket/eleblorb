@@ -548,6 +548,35 @@ These rules catch those failures on paper, before code.
 5. **Record in the brief** every change the build forced, under "Built", with
    the reason.
 
+**Why rounded-rectangle roofs shipped, and the guard against it.** The first
+fishing village pass built its stand-in houses in `floating_village.gd` with
+roofs made the wrong way:
+- each slope a single flat SuperEgg slab (a rectangle with rounded corners)
+  that never met its neighbour at the ridge;
+- the open shelters with one flat rounded slab on posts.
+
+Then the new kit roofs used the correct `TownProps.roof_slab` construction,
+but with their own thickness constant at half Ohio's. Nothing caught either,
+for four reasons:
+1. The design-language rule (section 1a) was prose. No check enforced it.
+2. "Placeholder" was read as permission to skip the rules.
+3. The proof scene checked collision, clearances and stacking, not form.
+4. Nobody looked at a render beside an Ohio house before the user's
+   walkthrough.
+
+The rules now:
+- **Placeholders obey the design language too**, or do not exist. Anything
+  standing in the world is held to section 1a.
+- **Roofs come only from the shared construction:** `TownProps.roof_slab` and
+  `build_ridge_slab`, through a kit such as `StiltRoofs`. Never a bare
+  `SuperEgg.build_part` slab.
+- **A kit never redefines a shared construction constant.** It reads it:
+  `StiltRoofs.THICKNESS` is `TownProps.ROOF_THICKNESS`.
+- **Render each new building beside an Ohio house at the same scale** before
+  placing it, and compare roof thickness, eave shoulder and ridge joint.
+- **The proof should fail a roof that is not shared construction** (see the
+  settlement backlog's code item).
+
 **There is never a placeholder builder.** A placeholder built the rest point
 and its keeper on every houseboat. The village now refuses to build a plan
 structure that has no real builder.
