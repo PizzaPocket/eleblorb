@@ -27,6 +27,24 @@ func _ready() -> void:
 	var centre: Vector2 = OhioPlan.OVERLOOK["at"]
 	var radius: float = OhioPlan.OVERLOOK["radius"]
 	print("overlook at %s radius %.1f centre ground %.2f" % [centre, radius, town._ground_y(centre)])
+	# Where the terrace should stand: moved inland (away from the drop it faces)
+	# until the ground under it varies by no more than 1.2 m, so its foundation
+	# is a course or two at the lip and not a wall down the cliff.
+	var inland := -Vector2(10.0, 2.0).normalized()
+	for step in 49:
+		var trial: Vector2 = centre + inland * 0.25 * float(step)
+		var high := -INF
+		var low := INF
+		for ring: float in [0.0, 0.5, 1.0]:
+			var count := 1 if ring == 0.0 else 16
+			for i in count:
+				var angle := TAU * float(i) / float(count)
+				var y: float = town._ground_y(trial + Vector2(cos(angle), sin(angle)) * radius * ring)
+				high = maxf(high, y)
+				low = minf(low, y)
+		if high - low <= 1.2 or step == 48:
+			print("overlook site: %s (moved %.2f m inland), ground range %.2f m" % [trial, 0.25 * float(step), high - low])
+			break
 	for i in 12:
 		var angle := TAU * float(i) / 12.0
 		for r: float in [radius * 0.5, radius]:

@@ -163,7 +163,10 @@ const ENTRANCE := {
 }
 
 ## A stone terrace on the rim where the east road ends.
-const OVERLOOK := {"at":Vector2(78,2), "radius":5.8, "tree":Vector2(72.0,-2.5)}
+# Its east edge stands at the cliff lip, 1.75 m back from where it first sat
+# overhanging the drop; the ground under it varies by 1.1 m, so its foundation
+# is a course or two, not a wall down the cliff (tools/ohio_cliff_probe.tscn).
+const OVERLOOK := {"at":Vector2(76.3,1.7), "radius":5.8, "tree":Vector2(72.0,-2.5)}
 
 # ---------------------------------------------------------------------------
 # Ways (worn earth painted into the terrain) and trodden ground

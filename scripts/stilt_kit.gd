@@ -168,18 +168,18 @@ static func _awning_shutter(body: StaticBody3D, centre: Vector2, along: Vector2,
 	var across := Vector3(along.x, 0.0, along.y)
 	var normal := across.cross(down).normalized()
 	var basis := Basis(across, down, normal)
-	var panel := SuperEgg.build_part(Vector3(width * 0.5 + 0.08, AWNING_DROP * 0.5, 0.025), accent, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var panel := egg(Vector3(width * 0.5 + 0.08, AWNING_DROP * 0.5, 0.025), accent, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	panel.transform = Transform3D(basis, hinge + down * (AWNING_DROP * 0.5))
 	body.add_child(panel)
 	CollisionPolicy.mark_decorative(panel)
-	var batten := SuperEgg.build_part(Vector3(width * 0.5 + 0.02, 0.025, 0.02), accent.darkened(0.25), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var batten := egg(Vector3(width * 0.5 + 0.02, 0.025, 0.02), accent.darkened(0.25), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	batten.transform = Transform3D(basis, hinge + down * (AWNING_DROP * 0.55) + normal * 0.03)
 	body.add_child(batten)
 	CollisionPolicy.mark_decorative(batten)
 	# The prop stick from the sill to the panel's lower edge.
 	var tip := hinge + down * AWNING_DROP
 	var foot := Vector3(centre.x, top_y - 1.25, centre.y) + out3 * 0.08
-	var stick := SuperEgg.build_part(Vector3(0.015, foot.distance_to(tip) * 0.5, 0.015), TIMBER_DARK, 2.0, 2.0)
+	var stick := egg(Vector3(0.015, foot.distance_to(tip) * 0.5, 0.015), TIMBER_DARK, 2.0, 2.0)
 	var up := (tip - foot).normalized()
 	var side := up.cross(across).normalized()
 	stick.transform = Transform3D(Basis(across, up, side).orthonormalized(), (foot + tip) * 0.5 + across * (width * 0.35))
@@ -200,7 +200,7 @@ static func _dado_rail(body: StaticBody3D, a: Vector2, dir: Vector2, length: flo
 		if run.y - run.x < 0.2:
 			continue
 		var centre := a + dir * ((run.x + run.y) * 0.5)
-		var rail := SuperEgg.build_part(Vector3((run.y - run.x) * 0.5, 0.03, TownProps.WALL_THICKNESS * 0.5 + 0.025), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		var rail := egg(Vector3((run.y - run.x) * 0.5, 0.03, TownProps.WALL_THICKNESS * 0.5 + 0.025), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 		rail.transform = Transform3D(Basis(Vector3.UP, atan2(-dir.y, dir.x)), Vector3(centre.x, y, centre.y))
 		body.add_child(rail)
 		CollisionPolicy.mark_decorative(rail)
@@ -234,22 +234,22 @@ static func partition(body: StaticBody3D, from: Vector2, to: Vector2, base_y: fl
 		var basis := Basis(Vector3.UP, yaw)
 		var at := Vector3(centre.x, 0.0, centre.y)
 		# The rod and a short valance across the head, on the wall's face.
-		var rod := SuperEgg.build_part(Vector3(half + 0.08, 0.02, 0.02), TIMBER_DARK, 2.0, 2.0)
+		var rod := egg(Vector3(half + 0.08, 0.02, 0.02), TIMBER_DARK, 2.0, 2.0)
 		rod.transform = Transform3D(basis, at + Vector3(0.0, top - 0.08, 0.0))
 		body.add_child(rod)
 		CollisionPolicy.mark_decorative(rod)
-		var valance := SuperEgg.build_part(Vector3(half + 0.04, 0.09, 0.025), curtain, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+		var valance := egg(Vector3(half + 0.04, 0.09, 0.025), curtain, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
 		valance.transform = Transform3D(basis, at + Vector3(0.0, top - 0.17, 0.0))
 		body.add_child(valance)
 		CollisionPolicy.mark_decorative(valance)
 		# The cloth drawn back to one jamb and tied, in soft folds.
 		for fold in 3:
 			var x := -half + 0.07 + 0.07 * float(fold)
-			var cloth := SuperEgg.build_part(Vector3(0.05, (top - base_y - 0.3) * 0.5, 0.03), curtain.darkened(0.06 * float(fold % 2)), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+			var cloth := egg(Vector3(0.05, (top - base_y - 0.3) * 0.5, 0.03), curtain.darkened(0.06 * float(fold % 2)), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
 			cloth.transform = Transform3D(basis, at + basis * Vector3(x, 0.0, 0.0) + Vector3(0.0, base_y + 0.15 + (top - base_y - 0.3) * 0.5, 0.0))
 			body.add_child(cloth)
 			CollisionPolicy.mark_decorative(cloth)
-		var tie := SuperEgg.build_part(Vector3(0.14, 0.03, 0.05), curtain.lightened(0.25), 2.0, 2.0)
+		var tie := egg(Vector3(0.14, 0.03, 0.05), curtain.lightened(0.25), 2.0, 2.0)
 		tie.transform = Transform3D(basis, at + basis * Vector3(-half + 0.14, 0.0, 0.0) + Vector3(0.0, base_y + 1.0, 0.0))
 		body.add_child(tie)
 		CollisionPolicy.mark_decorative(tie)
@@ -263,7 +263,7 @@ static func partition(body: StaticBody3D, from: Vector2, to: Vector2, base_y: fl
 ## motif, at every threshold and mooring) carries a close spiral of rope.
 static func post(body: StaticBody3D, at: Vector2, y0: float, y1: float, color: Color = TIMBER, roped: bool = false) -> void:
 	var half := Vector3(POST_HALF, (y1 - y0) * 0.5, POST_HALF)
-	var mesh := SuperEgg.build_part(half, color, TownProps.POST_EPSILON, TownProps.POST_EPSILON)
+	var mesh := egg(half, color, TownProps.POST_EPSILON, TownProps.POST_EPSILON)
 	mesh.position = Vector3(at.x, (y0 + y1) * 0.5, at.y)
 	body.add_child(mesh)
 	CollisionPolicy.add_box(body, mesh, half * 2.0, mesh.position, Basis(), false)
@@ -277,7 +277,7 @@ static func rope_binding(body: StaticBody3D, at: Vector2, y0: float, y1: float, 
 	var y := y0
 	var turn := 0
 	while y <= y1:
-		var ring := SuperEgg.build_part(Vector3(post_half + 0.035, 0.03, post_half + 0.035), ROPE.darkened(0.06 * float(turn % 2)), SuperEgg.EPSILON_SOFT, 2.0)
+		var ring := egg(Vector3(post_half + 0.035, 0.03, post_half + 0.035), ROPE.darkened(0.06 * float(turn % 2)), SuperEgg.EPSILON_SOFT, 2.0)
 		ring.transform = Transform3D(Basis(Vector3.UP, 0.2 * float(turn)) * Basis(Vector3.RIGHT, 0.06), Vector3(at.x, y, at.y))
 		body.add_child(ring)
 		CollisionPolicy.mark_decorative(ring)
@@ -291,7 +291,7 @@ static func beam(body: StaticBody3D, a: Vector2, b: Vector2, y: float, half_sect
 	var length := dir.length()
 	if length < 0.05:
 		return
-	var mesh := SuperEgg.build_part(Vector3(length * 0.5, half_section.y, half_section.x), color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var mesh := egg(Vector3(length * 0.5, half_section.y, half_section.x), color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	var mid := (a + b) * 0.5
 	mesh.transform = Transform3D(Basis(Vector3.UP, atan2(-dir.y, dir.x)), Vector3(mid.x, y, mid.y))
 	body.add_child(mesh)
@@ -388,7 +388,9 @@ const PLANK_EPSILON := 14.0
 
 static func _plank_mesh() -> Mesh:
 	if _plank_mesh_cache == null:
-		_plank_mesh_cache = SuperEgg.build_mesh(Vector3(0.5, PLANK_THICKNESS * 0.5, PLANK_WIDTH * 0.5), PLANK_EPSILON, PLANK_EPSILON)
+		# A plank is a box with softened arrises: 8 x 12 sampling keeps that at
+		# a sixth of the triangles, and it is drawn thousands of times.
+		_plank_mesh_cache = SuperEgg.build_mesh(Vector3(0.5, PLANK_THICKNESS * 0.5, PLANK_WIDTH * 0.5), PLANK_EPSILON, PLANK_EPSILON, 8, 12)
 	return _plank_mesh_cache
 
 
@@ -421,12 +423,12 @@ static func piles(body: StaticBody3D, rows: Array, top_y: float, shelf_y: float)
 	for row: Array in rows:
 		for p: Vector2 in row:
 			var half := Vector3(PILE_HALF, (top_y - shelf_y) * 0.5, PILE_HALF)
-			var mesh := SuperEgg.build_part(half, TIMBER_DARK.darkened(0.15), TownProps.POST_EPSILON, TownProps.POST_EPSILON)
+			var mesh := egg(half, TIMBER_DARK.darkened(0.15), TownProps.POST_EPSILON, TownProps.POST_EPSILON)
 			mesh.position = Vector3(p.x, (top_y + shelf_y) * 0.5, p.y)
 			mesh.set_meta("pile", true)
 			body.add_child(mesh)
 			CollisionPolicy.add_box(body, mesh, half * 2.0, mesh.position, Basis(), false)
-			var cap := SuperEgg.build_part(Vector3(PILE_HALF + 0.04, 0.05, PILE_HALF + 0.04), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+			var cap := egg(Vector3(PILE_HALF + 0.04, 0.05, PILE_HALF + 0.04), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 			cap.position = Vector3(p.x, top_y - 0.04, p.y)
 			body.add_child(cap)
 			CollisionPolicy.mark_decorative(cap)
@@ -438,7 +440,7 @@ static func piles(body: StaticBody3D, rows: Array, top_y: float, shelf_y: float)
 			var from := Vector3(p0.x, top_y - 0.15, p0.y)
 			var to := Vector3(p1.x, maxf(shelf_y, -0.9), p1.y)
 			var length := from.distance_to(to)
-			var brace := SuperEgg.build_part(Vector3(0.06, length * 0.5, 0.06), TIMBER_DARK.darkened(0.1), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+			var brace := egg(Vector3(0.06, length * 0.5, 0.06), TIMBER_DARK.darkened(0.1), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 			var up := (to - from).normalized()
 			var side := up.cross(Vector3.FORWARD if absf(up.z) < 0.9 else Vector3.RIGHT).normalized()
 			brace.transform = Transform3D(Basis(side, up, side.cross(up)), (from + to) * 0.5)
@@ -454,18 +456,18 @@ static func rail(body: StaticBody3D, a: Vector2, b: Vector2, floor_y: float) -> 
 	var length := dir.length()
 	var yaw := atan2(-dir.y, dir.x)
 	var mid := (a + b) * 0.5
-	var top := SuperEgg.build_part(Vector3(length * 0.5, 0.04, 0.05), TIMBER, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var top := egg(Vector3(length * 0.5, 0.04, 0.05), TIMBER, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	top.transform = Transform3D(Basis(Vector3.UP, yaw), Vector3(mid.x, floor_y + RAIL_HEIGHT, mid.y))
 	body.add_child(top)
 	CollisionPolicy.add_box(body, top, Vector3(length, RAIL_HEIGHT + 0.08, 0.1), Vector3(mid.x, floor_y + (RAIL_HEIGHT + 0.08) * 0.5, mid.y), Basis(Vector3.UP, yaw), false)
 	var count := maxi(int(ceil(length / 1.2)), 1)
 	for i in count + 1:
 		var p := a + dir * (float(i) / float(count))
-		var baluster := SuperEgg.build_part(Vector3(0.035, RAIL_HEIGHT * 0.5, 0.035), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		var baluster := egg(Vector3(0.035, RAIL_HEIGHT * 0.5, 0.035), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 		baluster.position = Vector3(p.x, floor_y + RAIL_HEIGHT * 0.5, p.y)
 		body.add_child(baluster)
 		CollisionPolicy.mark_decorative(baluster)
-	var mid_rail := SuperEgg.build_part(Vector3(length * 0.5, 0.025, 0.03), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var mid_rail := egg(Vector3(length * 0.5, 0.025, 0.03), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	mid_rail.transform = Transform3D(Basis(Vector3.UP, yaw), Vector3(mid.x, floor_y + RAIL_HEIGHT * 0.5, mid.y))
 	body.add_child(mid_rail)
 	CollisionPolicy.mark_decorative(mid_rail)
@@ -490,7 +492,7 @@ static func ramp(body: StaticBody3D, low: Vector2, high: Vector2, low_y: float, 
 	var planks := plank_surface(ramp_body, Transform3D(basis, mid), width, slope, color)
 	CollisionPolicy.add_box(ramp_body, planks, Vector3(width, 0.3, slope), mid - basis.y * 0.15, basis, true)
 	for side: float in [-1.0, 1.0]:
-		var stringer := SuperEgg.build_part(Vector3(0.07, 0.11, slope * 0.5), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		var stringer := egg(Vector3(0.07, 0.11, slope * 0.5), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 		stringer.transform = Transform3D(basis, mid + basis * Vector3(side * (width * 0.5 - 0.25), -PLANK_THICKNESS - 0.11, 0.0))
 		ramp_body.add_child(stringer)
 		CollisionPolicy.mark_decorative(stringer)
@@ -515,14 +517,14 @@ static func sloped_rail(body: StaticBody3D, a: Vector2, b: Vector2, ya: float, y
 		var t := float(i) / float(count)
 		var p := a.lerp(b, t)
 		var y := lerpf(ya, yb, t)
-		var baluster := SuperEgg.build_part(Vector3(0.035, RAIL_HEIGHT * 0.5, 0.035), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		var baluster := egg(Vector3(0.035, RAIL_HEIGHT * 0.5, 0.035), TIMBER_DARK, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 		baluster.position = Vector3(p.x, y + RAIL_HEIGHT * 0.5, p.y)
 		body.add_child(baluster)
 		CollisionPolicy.mark_decorative(baluster)
 	var from := Vector3(a.x, ya + RAIL_HEIGHT, a.y)
 	var to := Vector3(b.x, yb + RAIL_HEIGHT, b.y)
 	var along := (to - from).normalized()
-	var rail_mesh := SuperEgg.build_part(Vector3(0.04, 0.04, from.distance_to(to) * 0.5), TIMBER, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var rail_mesh := egg(Vector3(0.04, 0.04, from.distance_to(to) * 0.5), TIMBER, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	# Its long axis (local z) along the rail.
 	var basis := Basis.looking_at(-along, Vector3.UP)
 	rail_mesh.transform = Transform3D(basis, (from + to) * 0.5)
@@ -543,16 +545,18 @@ static func lamp_post(body: StaticBody3D, at: Vector2, floor_y: float, arm: Vect
 	var tip := at + arm.normalized() * 0.65
 	beam(body, at, tip, floor_y + 2.95, Vector2(0.05, 0.06), TIMBER_DARK)
 	# The shade hangs well above head height over the way it lights.
-	Furnishings.hanging_lamp(body, Vector3(tip.x, floor_y + 2.45, tip.y), 0.9, 7.0)
+	# Hung just inside the arm's rounded end, so the chain meets timber.
+	var hook := at + arm.normalized() * 0.56
+	Furnishings.hanging_lamp(body, Vector3(hook.x, floor_y + 2.45, hook.y), 0.9, 7.0)
 
 
 ## A glazed rain jar under a downpipe: every roof drains somewhere.
 static func rain_jar(body: StaticBody3D, at: Vector2, floor_y: float, glaze: Color) -> void:
-	var jar := SuperEgg.build_part(Vector3(0.3, 0.38, 0.3), glaze, 2.2, 2.2)
+	var jar := egg(Vector3(0.3, 0.38, 0.3), glaze, 2.2, 2.2)
 	jar.position = Vector3(at.x, floor_y + 0.38, at.y)
 	body.add_child(jar)
 	CollisionPolicy.add_box(body, jar, Vector3(0.6, 0.76, 0.6), jar.position, Basis(), true)
-	var lip := SuperEgg.build_part(Vector3(0.2, 0.04, 0.2), glaze.darkened(0.2), 2.2, 2.2)
+	var lip := egg(Vector3(0.2, 0.04, 0.2), glaze.darkened(0.2), 2.2, 2.2)
 	lip.position = Vector3(at.x, floor_y + 0.78, at.y)
 	body.add_child(lip)
 	CollisionPolicy.mark_decorative(lip)
@@ -563,7 +567,7 @@ static func rain_jar(body: StaticBody3D, at: Vector2, floor_y: float, glaze: Col
 static func gutter(body: StaticBody3D, a: Vector2, b: Vector2, y: float, pipe_at: Vector2, jar_at: Vector2, jar_top_y: float) -> void:
 	beam(body, a, b, y, Vector2(0.06, 0.05), TIMBER_DARK)
 	var foot_y := jar_top_y + 0.35
-	var pipe := SuperEgg.build_part(Vector3(0.045, (y - foot_y) * 0.5, 0.045), TIMBER_DARK, 2.2, SuperEgg.EPSILON_FLAT)
+	var pipe := egg(Vector3(0.045, (y - foot_y) * 0.5, 0.045), TIMBER_DARK, 2.2, SuperEgg.EPSILON_FLAT)
 	pipe.position = Vector3(pipe_at.x, (y + foot_y) * 0.5, pipe_at.y)
 	body.add_child(pipe)
 	CollisionPolicy.mark_decorative(pipe)
@@ -571,7 +575,7 @@ static func gutter(body: StaticBody3D, a: Vector2, b: Vector2, y: float, pipe_at
 	var to := Vector3(jar_at.x, jar_top_y + 0.05, jar_at.y)
 	var up := (from - to).normalized()
 	var side := up.cross(Vector3.UP if absf(up.y) < 0.95 else Vector3.RIGHT).normalized()
-	var spout := SuperEgg.build_part(Vector3(0.04, from.distance_to(to) * 0.5, 0.04), TIMBER_DARK, 2.2, SuperEgg.EPSILON_FLAT)
+	var spout := egg(Vector3(0.04, from.distance_to(to) * 0.5, 0.04), TIMBER_DARK, 2.2, SuperEgg.EPSILON_FLAT)
 	spout.transform = Transform3D(Basis(side, up, side.cross(up)), (from + to) * 0.5)
 	body.add_child(spout)
 	CollisionPolicy.mark_decorative(spout)
@@ -668,3 +672,10 @@ static func _ray_up_box(origin: Vector3, xform: Transform3D, half: Vector3) -> f
 	if t_near > t_far or t_far < 0.0:
 		return INF
 	return maxf(t_near, 0.0)
+
+
+## A SuperEgg part sampled for its size (SuperEgg.prop_detail): the kit's
+## posts, rails and balusters are drawn by the hundred in every village.
+static func egg(semi_axes: Vector3, color: Color, epsilon_top: float = SuperEgg.EPSILON_SOFT, epsilon_bottom: float = SuperEgg.EPSILON_SOFT) -> MeshInstance3D:
+	var detail := SuperEgg.prop_detail(semi_axes)
+	return SuperEgg.build_part(semi_axes, color, epsilon_top, epsilon_bottom, detail.x, detail.y)

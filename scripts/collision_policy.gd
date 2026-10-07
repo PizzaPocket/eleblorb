@@ -65,7 +65,8 @@ static func validate_body(body: StaticBody3D) -> bool:
 		if node is CollisionShape3D and policy in [SOLID, PARKOUR]:
 			policy_colliders += 1
 		elif node is GeometryInstance3D and policy in [SOLID, PARKOUR]:
-			physical_visuals += 1
+			# A StaticMerge mesh stands for every physical piece folded into it.
+			physical_visuals += int(node.get_meta("merged_physical", 1))
 	if physical_visuals != policy_colliders:
 		push_warning(
 			"Collision policy mismatch on %s: %d physical visuals, %d colliders"

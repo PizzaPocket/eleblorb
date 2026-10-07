@@ -58,31 +58,54 @@ static func _snap(value: float) -> float:
 	return 0.0 if absf(value) < 1e-9 else value
 
 
+## Sampling for a settlement prop of these semi-axes: the full 18 x 24 for
+## anything a hand span or larger, fewer for small things, which cannot show
+## the difference but were each costing 864 triangles (several times over,
+## with the sun's shadow splits). Returns [rings, segments]. Not for figure
+## rigs, whose small parts (eyes, fingers) are seen close up.
+static func prop_detail(semi_axes: Vector3) -> Vector2i:
+	# Rings shape the profile and follow the largest axis; segments go round
+	# the girth and follow the cross-section, so a thin baluster or post needs
+	# few however tall it is.
+	return Vector2i(_samples(maxf(semi_axes.x, maxf(semi_axes.y, semi_axes.z)), RINGS, 6), _samples(maxf(semi_axes.x, semi_axes.z), SEGMENTS, 8))
+
+
+static func _samples(size: float, full: int, least: int) -> int:
+	if size < 0.07:
+		return least
+	if size < 0.2:
+		return maxi(least, full / 2)
+	if size < 0.45:
+		return maxi(least, full * 2 / 3)
+	return full
+
+
 static func _pow_sign(value: float, epsilon: float) -> float:
 	return signf(value) * pow(absf(value), 2.0 / epsilon)
 
 
 static func build_mesh(
-	semi_axes: Vector3, epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT
+	semi_axes: Vector3, epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT,
+	ring_count: int = RINGS, segment_count: int = SEGMENTS
 ) -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 
 	var rings: Array = []
-	for ring_i in RINGS + 1:
-		var v := float(ring_i) / RINGS
+	for ring_i in ring_count + 1:
+		var v := float(ring_i) / ring_count
 		var eta := -PI * 0.5 + v * PI
 		var points: Array[Vector3] = []
-		for seg in SEGMENTS:
-			var omega := (float(seg) / SEGMENTS) * TAU
+		for seg in segment_count:
+			var omega := (float(seg) / segment_count) * TAU
 			points.append(surface_point(semi_axes, eta, omega, epsilon_top, epsilon_bottom))
 		rings.append(points)
 
-	for ring_i in RINGS:
+	for ring_i in ring_count:
 		var ring_a: Array = rings[ring_i]
 		var ring_b: Array = rings[ring_i + 1]
-		for seg in SEGMENTS:
-			var seg_next := (seg + 1) % SEGMENTS
+		for seg in segment_count:
+			var seg_next := (seg + 1) % segment_count
 			var a0: Vector3 = ring_a[seg]
 			var a1: Vector3 = ring_a[seg_next]
 			var b0: Vector3 = ring_b[seg]
@@ -103,10 +126,11 @@ static func build_mesh(
 ## needs.
 static func build_part(
 	semi_axes: Vector3, color: Color,
-	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT
+	epsilon_top: float = EPSILON_SOFT, epsilon_bottom: float = EPSILON_SOFT,
+	ring_count: int = RINGS, segment_count: int = SEGMENTS
 ) -> MeshInstance3D:
 	var mesh_instance := MeshInstance3D.new()
-	mesh_instance.mesh = build_mesh(semi_axes, epsilon_top, epsilon_bottom)
+	mesh_instance.mesh = build_mesh(semi_axes, epsilon_top, epsilon_bottom, ring_count, segment_count)
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
 	material.roughness = 0.6

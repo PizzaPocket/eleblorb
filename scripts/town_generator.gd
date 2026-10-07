@@ -632,12 +632,12 @@ func _build_main_street_lamps(parent: Node3D) -> void:
 ## benches facing the drop, a lantern and one old tree behind them. The village
 ## goes there to watch the evening over the lake; nothing walls the edge.
 func _build_overlook(parent: Node3D,ground: Callable) -> void:
-	var at: Vector2 = OhioPlan.OVERLOOK["at"]
 	var radius: float = OhioPlan.OVERLOOK["radius"]
-	# The terrace overhangs the cliff edge on its east side, where the ground
-	# falls nearly 7 m: a level deck set above the highest ground, carried on
-	# coursed stone that runs down into the slope (SlopeFoundation), rather than
-	# flagstones laid along the grade and cutting into it.
+	var at: Vector2 = OhioPlan.OVERLOOK["at"]
+	# The terrace stands on the rim, its east edge at the lip: a level deck set
+	# just above the highest ground, carried on coursed stone that steps down
+	# into the slope (SlopeFoundation) by a course or two. It no longer
+	# overhangs the drop on a ten-metre wall of stone.
 	var foundation := SlopeFoundation.build_round(
 		parent, at, radius, ground, TownProps.FOUNTAIN_STONE.darkened(0.12), "OverlookFoundation"
 	)
@@ -1205,7 +1205,8 @@ func _build_civic_hall_interior(building: StaticBody3D, half_w: float, half_d: f
 	# Archive: Halda's common accounts, Petra's copied histories, and the dry
 	# strong storage each form a readable activity group.
 	Furnishings.shelf(building, Vector3(half_w - 0.48, 0.0, 3.15), PI * 0.5, 2.6, 4, "boxes")
-	Furnishings.shelf(building, Vector3(5.35, 0.0, half_d - 0.38), 0.0, 3.4, 4, "boxes")
+	# East of the back window (x 4.0), so the archive keeps its daylight.
+	Furnishings.shelf(building, Vector3(5.95, 0.0, half_d - 0.38), 0.0, 1.7, 4, "boxes")
 	Furnishings.desk(building, Vector3(5.35, 0.0, 2.25), PI)
 	Furnishings.strongbox(building, Vector3(half_w - 0.75, 0.0, half_d - 0.75), PI * 0.5)
 

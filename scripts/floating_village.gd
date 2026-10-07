@@ -58,6 +58,7 @@ func _build() -> void:
 	_build_boats()
 	_build_shop()
 	_build_residents()
+	_merge_static()
 
 
 # ---------------------------------------------------------------------------
@@ -381,6 +382,16 @@ func get_portal_anchor() -> Vector3:
 func get_portal_yaw() -> float:
 	var facing: Vector2 = FishingVillagePlan.PORTAL_GATE["facing"]
 	return atan2(facing.x, facing.y)
+
+
+## Bakes each finished structure's small static pieces into a few meshes
+## (StaticMerge): the village was several thousand separate draw calls. Each
+## structure merges on its own, so off-screen buildings are still culled.
+## Residents, doors and anything scripted are left as they are.
+func _merge_static() -> void:
+	for child in get_children():
+		if child is Node3D and child.get_script() == null and child.name != "FishingIslets":
+			StaticMerge.merge(child as Node3D)
 
 
 ## The village's walking residents (FishingVillagePeople): each spawns where

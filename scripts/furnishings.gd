@@ -24,7 +24,8 @@ static func piece(
 	body: StaticBody3D, half: Vector3, color: Color, position: Vector3, yaw: float = 0.0,
 	solid: bool = false, epsilon: float = SuperEgg.EPSILON_FLAT
 ) -> MeshInstance3D:
-	var mesh := SuperEgg.build_part(half, color, epsilon, SuperEgg.EPSILON_FLAT)
+	var detail := SuperEgg.prop_detail(half)
+	var mesh := SuperEgg.build_part(half, color, epsilon, SuperEgg.EPSILON_FLAT, detail.x, detail.y)
 	var basis := Basis(Vector3.UP, yaw)
 	mesh.transform = Transform3D(basis, position)
 	body.add_child(mesh)

@@ -326,14 +326,17 @@ static func _vegetation(body: StaticBody3D, heights: PackedFloat32Array, columns
 		while z > -26.0 and _ground(heights, columns, rows, Vector2(x, z)) < y:
 			z -= 0.1
 		_fern(parts, Vector3(x, y, z + 0.08), rng.randf_range(0.6, 1.0), rng)
+	# Sampled for what each part is: a strap leaf or fern blade is a thin
+	# sliver drawn thousands of times, so a handful of rings and segments; at
+	# full SuperEgg detail the leaves alone were three million triangles.
 	var meshes := {
-		"canopy": SuperEgg.build_mesh(Vector3(1.0, 1.0, 1.0), 2.2, 2.6),
-		"trunk": SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 3.0, 3.0),
-		"blade": SuperEgg.build_mesh(Vector3(0.05, 0.5, 0.012), 2.4, 2.4),
-		"frond": SuperEgg.build_mesh(Vector3(0.12, 0.5, 0.015), 2.4, 2.4),
-		"fern": SuperEgg.build_mesh(Vector3(0.11, 0.5, 0.02), 2.2, 2.2),
-		"root": SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 2.0, 2.0),
-		"liana": SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 2.0, 2.0),
+		"canopy": SuperEgg.build_mesh(Vector3(1.0, 1.0, 1.0), 2.2, 2.6, 10, 14),
+		"trunk": SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 3.0, 3.0, 6, 8),
+		"blade": SuperEgg.build_mesh(Vector3(0.05, 0.5, 0.012), 2.4, 2.4, 6, 4),
+		"frond": SuperEgg.build_mesh(Vector3(0.12, 0.5, 0.015), 2.4, 2.4, 6, 4),
+		"fern": SuperEgg.build_mesh(Vector3(0.11, 0.5, 0.02), 2.2, 2.2, 6, 4),
+		"root": SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 2.0, 2.0, 6, 6),
+		"liana": SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 2.0, 2.0, 6, 6),
 	}
 	for key: String in parts:
 		var entries: Array = parts[key]

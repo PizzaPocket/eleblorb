@@ -480,7 +480,7 @@ static func sen_house() -> StaticBody3D:
 	StiltKit.rain_jar(body, jar_at, f, Color(0.42, 0.36, 0.56))
 
 	# The knot mark carved beside the clinic door.
-	var knot := SuperEgg.build_part(Vector3(0.14, 0.14, 0.03), StiltKit.TIMBER_DARK, 2.0, 2.0)
+	var knot := StiltKit.egg(Vector3(0.14, 0.14, 0.03), StiltKit.TIMBER_DARK, 2.0, 2.0)
 	knot.position = Vector3(SEN_CLINIC_DOOR - 0.9, f + 1.9, hz + 0.1)
 	body.add_child(knot)
 	CollisionPolicy.mark_decorative(knot)
@@ -649,11 +649,11 @@ static func _cord_board(body: StaticBody3D, at: Vector3, yaw: float) -> void:
 
 ## A clay flue from the ceiling up through the roof, capped above the slope.
 static func _roof_flue(body: StaticBody3D, at: Vector2, from_y: float, to_y: float) -> void:
-	var pipe := SuperEgg.build_part(Vector3(0.11, (to_y - from_y) * 0.5, 0.11), Furnishings.CLAY.darkened(0.3), 2.4, SuperEgg.EPSILON_FLAT)
+	var pipe := StiltKit.egg(Vector3(0.11, (to_y - from_y) * 0.5, 0.11), Furnishings.CLAY.darkened(0.3), 2.4, SuperEgg.EPSILON_FLAT)
 	pipe.position = Vector3(at.x, (from_y + to_y) * 0.5, at.y)
 	body.add_child(pipe)
 	CollisionPolicy.mark_decorative(pipe)
-	var cap := SuperEgg.build_part(Vector3(0.2, 0.05, 0.2), Furnishings.CLAY.darkened(0.4), 2.4, SuperEgg.EPSILON_FLAT)
+	var cap := StiltKit.egg(Vector3(0.2, 0.05, 0.2), Furnishings.CLAY.darkened(0.4), 2.4, SuperEgg.EPSILON_FLAT)
 	cap.position = Vector3(at.x, to_y + 0.1, at.y)
 	body.add_child(cap)
 	CollisionPolicy.mark_decorative(cap)
@@ -723,33 +723,33 @@ static func cistern_house() -> StaticBody3D:
 	var tank := CISTERN_TANK
 	var tank_centre := tank.get_center()
 	var tank_height := CISTERN_TANK_TOP - SHELF_Y
-	var stone := SuperEgg.build_part(Vector3(tank.size.x * 0.5, tank_height * 0.5, tank.size.y * 0.5), STONE, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var stone := StiltKit.egg(Vector3(tank.size.x * 0.5, tank_height * 0.5, tank.size.y * 0.5), STONE, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	stone.position = Vector3(tank_centre.x, (CISTERN_TANK_TOP + SHELF_Y) * 0.5, tank_centre.y)
 	body.add_child(stone)
 	CollisionPolicy.add_box(body, stone, Vector3(tank.size.x, tank_height, tank.size.y), stone.position, Basis(), true)
-	var moss := SuperEgg.build_part(Vector3(tank.size.x * 0.5 + 0.03, 0.35, tank.size.y * 0.5 + 0.03), MOSS, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
+	var moss := StiltKit.egg(Vector3(tank.size.x * 0.5 + 0.03, 0.35, tank.size.y * 0.5 + 0.03), MOSS, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
 	moss.position = Vector3(tank_centre.x, 0.2, tank_centre.y)
 	body.add_child(moss)
 	CollisionPolicy.mark_decorative(moss)
 	for i in 5:
-		var plank := SuperEgg.build_part(Vector3(0.58, 0.04, tank.size.y * 0.5 + 0.06), StiltKit.TIMBER.darkened(0.05 * float(i % 2)), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		var plank := StiltKit.egg(Vector3(0.58, 0.04, tank.size.y * 0.5 + 0.06), StiltKit.TIMBER.darkened(0.05 * float(i % 2)), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 		plank.position = Vector3(tank.position.x + 0.6 + 1.2 * float(i), CISTERN_TANK_TOP + 0.04, tank_centre.y)
 		body.add_child(plank)
 		CollisionPolicy.mark_decorative(plank)
 	var channel_from := Vector3(-0.6, 2.1, -4.7)
 	var channel_to := Vector3(-0.6, CISTERN_TANK_TOP + 0.12, tank_centre.y)
 	var along := (channel_to - channel_from).normalized()
-	var channel := SuperEgg.build_part(Vector3(0.16, 0.08, channel_from.distance_to(channel_to) * 0.5), STONE.darkened(0.1), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
+	var channel := StiltKit.egg(Vector3(0.16, 0.08, channel_from.distance_to(channel_to) * 0.5), STONE.darkened(0.1), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
 	channel.transform = Transform3D(Basis.looking_at(-along, Vector3.UP), (channel_from + channel_to) * 0.5)
 	body.add_child(channel)
 	CollisionPolicy.mark_decorative(channel)
-	var trickle := SuperEgg.build_part(Vector3(0.08, 0.02, channel_from.distance_to(channel_to) * 0.5), Color(0.55, 0.75, 0.85, 0.8), 2.0, 2.0)
+	var trickle := StiltKit.egg(Vector3(0.08, 0.02, channel_from.distance_to(channel_to) * 0.5), Color(0.55, 0.75, 0.85, 0.8), 2.0, 2.0)
 	trickle.transform = Transform3D(Basis.looking_at(-along, Vector3.UP), (channel_from + channel_to) * 0.5 + Vector3(0, 0.07, 0))
 	body.add_child(trickle)
 	CollisionPolicy.mark_decorative(trickle)
 	var north_gutter_y := plate + StiltRoofs.PLATE - StiltRoofs.EAVE * tan(StiltRoofs.PITCH) - 0.1
 	StiltKit.beam(body, Vector2(-hx - 0.9, -hz - 0.92), Vector2(hx + 0.9, -hz - 0.92), north_gutter_y, Vector2(0.06, 0.05))
-	var downpipe := SuperEgg.build_part(Vector3(0.045, (north_gutter_y - CISTERN_TANK_TOP) * 0.5, 0.045), StiltKit.TIMBER_DARK, 2.2, SuperEgg.EPSILON_FLAT)
+	var downpipe := StiltKit.egg(Vector3(0.045, (north_gutter_y - CISTERN_TANK_TOP) * 0.5, 0.045), StiltKit.TIMBER_DARK, 2.2, SuperEgg.EPSILON_FLAT)
 	downpipe.position = Vector3(1.6, (north_gutter_y + CISTERN_TANK_TOP) * 0.5, -hz - 0.92)
 	body.add_child(downpipe)
 	CollisionPolicy.mark_decorative(downpipe)
@@ -760,7 +760,7 @@ static func cistern_house() -> StaticBody3D:
 	StiltKit.beam(body, Vector2(hx + 0.1, tank.end.y - 0.1), Vector2(hx + 0.1, hz + 0.1), pipe_y, Vector2(0.04, 0.04), Furnishings.CLAY.darkened(0.2))
 	StiltKit.beam(body, Vector2(hx + 0.1, hz + 0.1), Vector2(1.7, hz + 0.1), pipe_y, Vector2(0.04, 0.04), Furnishings.CLAY.darkened(0.2))
 	Furnishings.piece(body, Vector3(0.05, 0.12, 0.05), Color(0.62, 0.50, 0.28), Vector3(1.7, pipe_y - 0.1, hz + 0.16), 0.0, false, 2.2)
-	var ledge := SuperEgg.build_part(Vector3(0.45, 0.04, 0.2), StiltKit.TIMBER, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var ledge := StiltKit.egg(Vector3(0.45, 0.04, 0.2), StiltKit.TIMBER, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	ledge.position = Vector3(1.7, f + 0.45, hz + 0.28)
 	body.add_child(ledge)
 	CollisionPolicy.add_box(body, ledge, Vector3(0.9, 0.08, 0.4), ledge.position, Basis(), true)
@@ -892,12 +892,12 @@ static func net_shed() -> StaticBody3D:
 	for net: Vector3 in [Vector3(-0.2, 0.0, 1.5), Vector3(1.1, 0.8, 1.2), Vector3(0.4, 1.9, 1.7), Vector3(2.2, -0.2, 1.0)]:
 		var top := plate + 0.2
 		var bottom := f + 2.2
-		var sheet := SuperEgg.build_part(Vector3(net.z * 0.5, (top - bottom) * 0.5, 0.02), NET_COLOR.lightened(0.05 * net.x), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+		var sheet := StiltKit.egg(Vector3(net.z * 0.5, (top - bottom) * 0.5, 0.02), NET_COLOR.lightened(0.05 * net.x), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
 		sheet.position = Vector3(net.x, (top + bottom) * 0.5, net.y)
 		body.add_child(sheet)
 		CollisionPolicy.mark_decorative(sheet)
 		for k in 4:
-			var float_ball := SuperEgg.build_part(Vector3(0.06, 0.06, 0.06), Color(0.86, 0.62, 0.24), 2.0, 2.0)
+			var float_ball := StiltKit.egg(Vector3(0.06, 0.06, 0.06), Color(0.86, 0.62, 0.24), 2.0, 2.0)
 			float_ball.position = Vector3(net.x - net.z * 0.4 + net.z * 0.27 * float(k), bottom + 0.05, net.y)
 			body.add_child(float_ball)
 			CollisionPolicy.mark_decorative(float_ball)
@@ -996,13 +996,13 @@ static func pavilion() -> StaticBody3D:
 	StiltRoofs.gable(vent, vent_half, 0.0, StiltKit.SHINGLE.darkened(0.05), green)
 	for x: float in [-vent_half.x, 0.0, vent_half.x]:
 		for z: float in [-vent_half.y, vent_half.y]:
-			var stub := SuperEgg.build_part(Vector3(0.06, 0.25, 0.06), StiltKit.TIMBER_DARK, TownProps.POST_EPSILON, TownProps.POST_EPSILON)
+			var stub := StiltKit.egg(Vector3(0.06, 0.25, 0.06), StiltKit.TIMBER_DARK, TownProps.POST_EPSILON, TownProps.POST_EPSILON)
 			stub.position = Vector3(x, ridge_y + 0.1, z)
 			body.add_child(stub)
 			CollisionPolicy.mark_decorative(stub)
 	var ridge_half := hx - hz
 	for side: float in [-1.0, 1.0]:
-		var curl := SuperEgg.build_part(Vector3(0.12, 0.32, 0.08), green.darkened(0.15), 2.4, 2.4)
+		var curl := StiltKit.egg(Vector3(0.12, 0.32, 0.08), green.darkened(0.15), 2.4, 2.4)
 		curl.transform = Transform3D(Basis(Vector3(0, 0, 1), side * 0.6), Vector3(side * (ridge_half + 0.2), ridge_y + 0.32, 0.0))
 		body.add_child(curl)
 		CollisionPolicy.mark_decorative(curl)
@@ -1342,7 +1342,7 @@ static func boatwright_slip() -> StaticBody3D:
 	StiltKit.ramp(body, Vector2(-48.0, -16.0), Vector2(-42.0, -16.0), -1.5, f, 4.0)
 	for i in 5:
 		var x := -47.3 + 1.1 * float(i)
-		var roller := SuperEgg.build_part(Vector3(0.07, 0.07, 1.8), StiltKit.TIMBER_DARK, 2.0, 2.0)
+		var roller := StiltKit.egg(Vector3(0.07, 0.07, 1.8), StiltKit.TIMBER_DARK, 2.0, 2.0)
 		roller.position = Vector3(x, -1.5 + (x + 48.0) / 6.0 * (f + 1.5) + 0.05, -16.0)
 		body.add_child(roller)
 		CollisionPolicy.mark_decorative(roller)
@@ -1437,7 +1437,7 @@ static func catch_deck() -> StaticBody3D:
 		for z: float in [-hh, hh]:
 			StiltKit.post(hut, Vector2(x, z), f - StiltKit.FLOOR_THICKNESS, f + 2.8, smoke.darkened(0.2))
 	StiltRoofs.gable(hut, Vector2(hh, hh), f + 2.8, StiltKit.SHINGLE.darkened(0.3), smoke.darkened(0.3))
-	var hearth := SuperEgg.build_part(Vector3(0.55, 0.3, 0.55), STONE.darkened(0.15), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var hearth := StiltKit.egg(Vector3(0.55, 0.3, 0.55), STONE.darkened(0.15), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	hearth.position = Vector3(0.75, f + 0.3, 0.0)
 	hut.add_child(hearth)
 	ClearZones.mark_furniture(CollisionPolicy.add_box(hut, hearth, Vector3(1.1, 0.6, 1.1), hearth.position, Basis(), true), true)
@@ -1464,12 +1464,12 @@ static func _slat_screen(body: StaticBody3D, a: Vector2, b: Vector2, floor_y: fl
 	var count := int(length / 0.18)
 	for i in count:
 		var p := a + dir * (0.09 + float(i) * length / float(count))
-		var slat := SuperEgg.build_part(Vector3(0.03, height * 0.5, 0.03), color.lightened(0.04 * float(i % 2)), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		var slat := StiltKit.egg(Vector3(0.03, height * 0.5, 0.03), color.lightened(0.04 * float(i % 2)), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 		slat.position = Vector3(p.x, floor_y + 0.25 + height * 0.5, p.y)
 		body.add_child(slat)
 		CollisionPolicy.mark_decorative(slat)
 	var mid := (a + b) * 0.5
-	var rail := SuperEgg.build_part(Vector3(length * 0.5, 0.04, 0.05), color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var rail := StiltKit.egg(Vector3(length * 0.5, 0.04, 0.05), color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	rail.transform = Transform3D(Basis(Vector3.UP, atan2(-dir.y, dir.x)), Vector3(mid.x, floor_y + 0.25 + height, mid.y))
 	body.add_child(rail)
 	CollisionPolicy.add_box(body, rail, Vector3(length, height + 0.25, 0.1), Vector3(mid.x, floor_y + (height + 0.25) * 0.5, mid.y), Basis(Vector3.UP, atan2(-dir.y, dir.x)), false)
@@ -1489,11 +1489,11 @@ static func shell_barge() -> StaticBody3D:
 	body.name = "ShellBarge"
 	var f := FishingVillagePlan.FLOAT_DECK
 	var violet := _household("Rian")
-	var hull := SuperEgg.build_part(Vector3(4.15, 0.45, 1.85), StiltKit.TIMBER_DARK.darkened(0.35), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+	var hull := StiltKit.egg(Vector3(4.15, 0.45, 1.85), StiltKit.TIMBER_DARK.darkened(0.35), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
 	hull.position = Vector3(-16.0, f - 0.5, -1.25)
 	body.add_child(hull)
 	CollisionPolicy.add_box(body, hull, Vector3(8.3, 0.9, 3.7), hull.position, Basis(), true)
-	var strake := SuperEgg.build_part(Vector3(4.2, 0.06, 1.9), violet.darkened(0.15), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var strake := StiltKit.egg(Vector3(4.2, 0.06, 1.9), violet.darkened(0.15), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	strake.position = Vector3(-16.0, f - 0.12, -1.25)
 	body.add_child(strake)
 	CollisionPolicy.mark_decorative(strake)
@@ -1521,7 +1521,7 @@ static func shell_barge() -> StaticBody3D:
 		for x: float in [run.x + 0.15, run.y - 0.15]:
 			Furnishings.piece(body, Vector3(0.06, 0.4, 0.3), Furnishings.OAK_DARK, Vector3(x, f + 0.4, -2.55))
 	Furnishings.piece(body, Vector3(0.1, 0.12, 0.16), Furnishings.IRON, Vector3(-19.2, f + 1.0, -2.45), 0.0, false)
-	var wheel := SuperEgg.build_part(Vector3(0.3, 0.3, 0.025), Furnishings.IRON, 2.0, 2.0)
+	var wheel := StiltKit.egg(Vector3(0.3, 0.3, 0.025), Furnishings.IRON, 2.0, 2.0)
 	wheel.position = Vector3(-18.1, f + 1.25, -2.55)
 	body.add_child(wheel)
 	CollisionPolicy.mark_decorative(wheel)
@@ -1552,7 +1552,7 @@ static func shell_barge() -> StaticBody3D:
 		var from := Vector3(p.x, f + 0.3, p.y)
 		var to := Vector3(p.x + signf(-16.0 - p.x) * -0.3, DECK_TOP - 0.25, -4.9)
 		var length := from.distance_to(to)
-		var line := SuperEgg.build_part(Vector3(0.02, length * 0.5, 0.02), StiltKit.ROPE, 2.0, 2.0)
+		var line := StiltKit.egg(Vector3(0.02, length * 0.5, 0.02), StiltKit.ROPE, 2.0, 2.0)
 		var up := (to - from).normalized()
 		var side := up.cross(Vector3.RIGHT).normalized()
 		line.transform = Transform3D(Basis(side.cross(up), up, side), (from + to) * 0.5)
@@ -1594,11 +1594,11 @@ static func mor_houseboat() -> StaticBody3D:
 	var zs := MOR_CABIN.end.y
 
 	# Hull and deck: a shallow-draft hull, a teal sheer strake, plank deck.
-	var hull := SuperEgg.build_part(Vector3(9.2, 0.55, 3.6), terracotta.darkened(0.45), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+	var hull := StiltKit.egg(Vector3(9.2, 0.55, 3.6), terracotta.darkened(0.45), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
 	hull.position = Vector3(0.0, f - 0.6, 0.0)
 	body.add_child(hull)
 	CollisionPolicy.add_box(body, hull, Vector3(18.4, 1.1, 7.2), hull.position, Basis(), true)
-	var strake := SuperEgg.build_part(Vector3(9.25, 0.07, 3.65), MOR_TRIM, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var strake := StiltKit.egg(Vector3(9.25, 0.07, 3.65), MOR_TRIM, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	strake.position = Vector3(0.0, f - 0.12, 0.0)
 	body.add_child(strake)
 	CollisionPolicy.mark_decorative(strake)
@@ -1644,7 +1644,7 @@ static func mor_houseboat() -> StaticBody3D:
 	StiltRoofs.hip(roof, roof_half, plate, StiltKit.SHINGLE.lerp(terracotta, 0.15), MOR_TRIM)
 	var ridge_y := plate + StiltRoofs.PLATE + 3.0 * tan(StiltRoofs.PITCH)
 	for side: float in [-1.0, 1.0]:
-		var curl := SuperEgg.build_part(Vector3(0.12, 0.3, 0.08), MOR_TRIM.darkened(0.2), 2.4, 2.4)
+		var curl := StiltKit.egg(Vector3(0.12, 0.3, 0.08), MOR_TRIM.darkened(0.2), 2.4, 2.4)
 		curl.transform = Transform3D(Basis(Vector3(0, 0, 1), side * 0.6), Vector3((-9.0 + x1) * 0.5 + side * (roof_half.x - 3.0 + 0.2), ridge_y + 0.3, 0.5))
 		body.add_child(curl)
 		CollisionPolicy.mark_decorative(curl)
@@ -1656,7 +1656,7 @@ static func mor_houseboat() -> StaticBody3D:
 		var from := Vector3(p.x, f + 0.3, p.y)
 		var to := Vector3(p.x + 0.4 * signf(p.x), DECK_TOP - 0.2, p.y - 3.4)
 		var length := from.distance_to(to)
-		var line := SuperEgg.build_part(Vector3(0.025, 0.025, length * 0.5), StiltKit.ROPE, 2.0, 2.0)
+		var line := StiltKit.egg(Vector3(0.025, 0.025, length * 0.5), StiltKit.ROPE, 2.0, 2.0)
 		line.transform = Transform3D(Basis.looking_at(from - to, Vector3.UP), (from + to) * 0.5)
 		body.add_child(line)
 		CollisionPolicy.mark_decorative(line)
@@ -1821,11 +1821,11 @@ static func vale_houseboat() -> StaticBody3D:
 	var zn := VALE_CABIN.position.y
 	var zs := VALE_CABIN.end.y
 
-	var hull := SuperEgg.build_part(Vector3(7.15, 0.5, 3.6), coral.darkened(0.45), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+	var hull := StiltKit.egg(Vector3(7.15, 0.5, 3.6), coral.darkened(0.45), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
 	hull.position = Vector3(0.0, f - 0.55, 0.0)
 	body.add_child(hull)
 	CollisionPolicy.add_box(body, hull, Vector3(14.3, 1.0, 7.2), hull.position, Basis(), true)
-	var strake := SuperEgg.build_part(Vector3(7.2, 0.07, 3.65), StiltKit.TIMBER_PALE, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var strake := StiltKit.egg(Vector3(7.2, 0.07, 3.65), StiltKit.TIMBER_PALE, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	strake.position = Vector3(0.0, f - 0.12, 0.0)
 	body.add_child(strake)
 	CollisionPolicy.mark_decorative(strake)
@@ -1971,17 +1971,17 @@ static func ferry_launch(length: float, beam: float) -> Node3D:
 		[Vector3(0.45, 0.3, hb - 0.3), Vector3(-hl + 0.6, 0.55, 0), StiltKit.TIMBER_DARK, SuperEgg.EPSILON_FLAT],
 	]
 	for part: Array in parts:
-		var mesh := SuperEgg.build_part(part[0], part[2], part[3], part[3])
+		var mesh := StiltKit.egg(part[0], part[2], part[3], part[3])
 		mesh.position = part[1]
 		boat.add_child(mesh)
 		CollisionPolicy.mark_decorative(mesh)
 	var households := ["Venn", "Aran", "Vale", "Sen"]
 	for i in households.size():
-		var crate := SuperEgg.build_part(Vector3(0.25, 0.2, 0.25), FishingVillagePlan.HOUSEHOLD_COLORS[households[i]].darkened(0.1), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		var crate := StiltKit.egg(Vector3(0.25, 0.2, 0.25), FishingVillagePlan.HOUSEHOLD_COLORS[households[i]].darkened(0.1), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 		crate.position = Vector3(hl - 0.6 - 0.55 * float(i / 2), 0.52, -0.3 + 0.6 * float(i % 2))
 		boat.add_child(crate)
 		CollisionPolicy.mark_decorative(crate)
-	var lamp := SuperEgg.build_part(Vector3(0.08, 0.1, 0.08), Color(1.0, 0.75, 0.35), 2.2, 2.2)
+	var lamp := StiltKit.egg(Vector3(0.08, 0.1, 0.08), Color(1.0, 0.75, 0.35), 2.2, 2.2)
 	lamp.position = Vector3(0.4, 1.4, 0.0)
 	boat.add_child(lamp)
 	CollisionPolicy.mark_decorative(lamp)

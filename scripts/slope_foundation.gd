@@ -47,9 +47,11 @@ static func build_round(
 		var angle := TAU * (float(i) + 0.5) / float(segments)
 		var out := Vector2(cos(angle), sin(angle))
 		var at := centre + out * (radius - DEPTH * 0.5)
-		# The low point this column must reach: the ground at its face and a
-		# little beyond it, so the foot is buried even on the steepest side.
-		var low := minf(float(ground.call(centre + out * radius)), float(ground.call(centre + out * (radius + 0.8))))
+		# The low point this column must reach: the ground at its face and just
+		# beyond, so the foot is buried on a slope. Not further: at a cliff lip
+		# a wider sample reaches over the drop and stands the column on the
+		# ground ten metres below.
+		var low := minf(float(ground.call(centre + out * radius)), float(ground.call(centre + out * (radius + 0.25))))
 		var foot := low - EMBED
 		var height := surface_y - foot
 		var yaw := atan2(out.x, out.y)

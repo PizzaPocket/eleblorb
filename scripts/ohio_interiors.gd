@@ -273,6 +273,14 @@ static func _shelf(
 		Furnishings.shelf(c["b"], _at3(c, floor_key, pose), float(pose["yaw"]), length, tiers, stock)
 
 
+## A peg rail on the first wall with room for it clear of windows and doors.
+## Its coats hang from rail height to about a metre off the floor.
+static func _pegs(c: Dictionary, walls: Array[String], length: float, rail_y: float) -> void:
+	var pose := _wall(c, "g", walls, length * 0.5, 0.06, 0.3, "peg rail", "center", rail_y + 0.1)
+	if not pose.is_empty():
+		Furnishings.peg_rail(c["b"], _at3(c, "g", pose), float(pose["yaw"]), length, rail_y)
+
+
 static func _chest(
 	c: Dictionary, floor_key: String, walls: Array[String], length: float = 0.9, label: String = "chest"
 ) -> void:
@@ -520,7 +528,7 @@ static func _naturalist(c: Dictionary) -> void:
 	if not rack.is_empty():
 		TradeFurnishings.tool_rack(body, _at3(c, "g", rack), float(rack["yaw"]), 1.4)
 	_shelf(c, "g", ["south", "north"] as Array[String], 1.6, 3, "crocks", "jar shelf")
-	Furnishings.peg_rail(body, Vector3(-2.6, 0.0, -c["inner"].y + 0.05), PI, 1.2, 1.7)
+	_pegs(c, ["south", "west", "north"] as Array[String], 1.2, 1.7)
 	# Upstairs: Ivy's desk by a window, specimen shelf, two beds, the cushion.
 	var desk := _wall(c, "u", ["north"] as Array[String], 0.9, 0.5, 1.1, "Ivy's desk", "center", 0.9)
 	if not desk.is_empty():
@@ -565,7 +573,7 @@ static func _herbalist(c: Dictionary) -> void:
 	TradeFurnishings.herb_rail(body, Vector3(0.8, 0.0, -0.8), 0.0, 1.8)
 	_table(c, [Vector2(half_w - 5.0, 1.2), Vector2(half_w - 5.0, -1.2)] as Array[Vector2], 1.5, 0.8, "stools", "herb table")
 	_shelf(c, "g", ["west", "south", "north"] as Array[String], 2.0, 4, "crocks", "herb shelf")
-	Furnishings.peg_rail(body, Vector3(-2.4, 0.0, -c["inner"].y + 0.05), PI, 1.6, 1.8)
+	_pegs(c, ["south", "west", "north"] as Array[String], 1.6, 1.8)
 	var basket := _wall(c, "g", ["south", "north"] as Array[String], 0.25, 0.25, 0.3, "gathering basket", "center", 0.5)
 	if not basket.is_empty():
 		Furnishings.piece(body, Vector3(0.25, 0.16, 0.25), Color(0.62, 0.46, 0.24), _at3(c, "g", basket, 0.16), 0.0, true, 2.4)

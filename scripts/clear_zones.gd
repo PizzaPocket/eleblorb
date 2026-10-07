@@ -26,6 +26,7 @@ const FIRE_OK_META := "fire_ok"
 ## A furnishing with no collider (jars, nets, charms, a lamp): it may touch a
 ## wall, but it must not stand in front of a window.
 const DECOR_META := "decor_furnishing"
+const DECOR_SILL_ALLOWANCE := 0.12
 const WALLS_META := "struct_walls"
 const VOIDS_META := "struct_voids"
 const SUPPORTS_META := "struct_supports"
@@ -126,6 +127,10 @@ static func audit(root: Node3D) -> Array[String]:
 			if str(zone["kind"]) == "fire" and bool(shape["fire_ok"]):
 				continue
 			if bool(shape.get("decor", false)) and str(zone["kind"]) != "window":
+				continue
+			# A jug or a cup on a washstand under the sill may rise a hand's
+			# breadth past it without blocking the view.
+			if bool(shape.get("decor", false)) and float(shape["y1"]) <= float(zone["y0"]) + DECOR_SILL_ALLOWANCE:
 				continue
 			if _overlaps(zone, shape):
 				problems.append("%s blocks the %s clear zone '%s' at (%.1f, %.1f)" % [

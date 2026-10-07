@@ -925,6 +925,26 @@ static func build_flat_overlook_terrace(
 	var on_foundation := not is_nan(surface_override)
 	var surface_y := surface_override if on_foundation else _ground(ground, at) + 0.095
 	var body := _body(parent, node_name)
+	# The flags are laid as real paving is: on a lime mortar bed over packed
+	# fill, the joints pointed nearly flush. Without it the gaps between the
+	# rounded flags looked straight down into the hollow foundation. A plain
+	# cylinder is right here: it is seen only through the joints and is the
+	# fill the round deck needs.
+	var bed := MeshInstance3D.new()
+	bed.name = "MortarBed"
+	var bed_mesh := CylinderMesh.new()
+	bed_mesh.top_radius = radius * 0.97
+	bed_mesh.bottom_radius = radius * 0.97
+	bed_mesh.height = 0.45
+	bed_mesh.radial_segments = 40
+	bed.mesh = bed_mesh
+	var bed_material := StandardMaterial3D.new()
+	bed_material.albedo_color = color.lerp(Color(0.80, 0.77, 0.70), 0.45).darkened(0.12)
+	bed_material.roughness = 0.95
+	bed.material_override = bed_material
+	bed.position = Vector3(at.x, surface_y - 0.05 - bed_mesh.height * 0.5, at.y)
+	body.add_child(bed)
+	CollisionPolicy.mark_decorative(bed)
 	var rings := [
 		{"radius":0.0, "count":1, "tangent":0.95, "radial":0.95},
 		{"radius":1.55, "count":9, "tangent":0.78, "radial":0.72},
