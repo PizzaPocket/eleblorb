@@ -142,9 +142,9 @@ drawings; the revisions below are what was built, and why.
   flat plank ceiling at the plate, roof space vented at the ridge.
 - **Doors.** Front door south, centred in the living room. Lio's and the bedroom
   doors in the bay-line partitions near the front, each swinging into its room.
-  The store door swings into the store. (Exterior doors open outward throughout
-  the world, so the front door's leaf stands open on the veranda; the way to the
-  store passes south of it.)
+  The store door swings into the store. (Revised 2026-10-07: every door in the
+  village swings inward, into the room it serves; the front door is a pair of
+  narrow leaves opening into the living room.)
 - **Openings.** North wall: three windows, one per room. West: Lio's window with
   his lamp. East: the bedroom's second window. South: Lio's window onto the
   veranda behind the counter. All narrow casements with ochre shutters.
