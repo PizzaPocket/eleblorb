@@ -18,7 +18,7 @@ var _moving := false
 func configure(
 	half_width: float, height: float, leaves: int, color: Color,
 	initially_open: bool = true, locked: bool = false,
-	required_key: String = "", lock_id: String = ""
+	required_key: String = "", lock_id: String = "", hinge_right: bool = false
 ) -> void:
 	_is_open = initially_open
 	_locked = locked and not (lock_id != "" and WorldState.is_door_unlocked(lock_id))
@@ -32,7 +32,11 @@ func configure(
 	var half_leaf := half_width if leaves == 1 else half_width * 0.5
 	var open_angle := deg_to_rad(78.0 if leaves == 1 else 96.0)
 	for index in leaves:
+		# A single leaf hangs on the left jamb unless `hinge_right` asks for the
+		# other: chosen per door so a leaf never swings into the way through.
 		var side := -1.0 if index == 0 else 1.0
+		if leaves == 1 and hinge_right:
+			side = 1.0
 		var hinge := StaticBody3D.new()
 		hinge.collision_layer = 1
 		hinge.collision_mask = 0

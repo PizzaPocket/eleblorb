@@ -3,31 +3,57 @@ extends RefCounted
 
 ## Anvil Rock and Heron Rock, the two limestone islets the Crossroads Fishing
 ## Village stands against (docs/architecture/fishing_village_layout.md, section
-## 2), built as one terrain-grade mesh: a heightfield on a 1 m grid, the same
-## method as the world terrain but sixteen times finer than its 18 m cells, with
-## trimesh collision. It carries both rock stacks (karst: sheer fluted faces, a
-## weathered waterline band, a broad crown) and their submerged shoulder shelves,
-## flat 3.2 m under the surface, beyond which the ground drops to the lake bed.
-## Every extent comes from FishingVillagePlan, so the shelf outline here is the
-## one the plan validator tests piles against.
+## 2), built as one terrain-grade heightfield mesh on a 0.5 m grid with trimesh
+## collision, and their submerged shoulder shelves, flat 3.2 m under the
+## surface, from FishingVillagePlan (so the shelf here is the one the plan
+## validator tests piles against).
 ##
-## These are natural landforms, so they are not SuperEgg props. A heightfield
-## cannot overhang; the undercut karst notch at the waterline is carried by the
-## waterline stain and the sheer face, not by geometry.
+## Revised 2026-10-07 after the walkthrough ("one big pillar... a giant column
+## in the sky... not the Thai-inspired islands"). Each islet is now a cluster of
+## tower-karst lobes after Phang Nga: steep, near-vertical faces that round over
+## into domed, forested crowns of different heights, Anvil Rock to about 21 m
+## and Heron Rock to about 13 m. The faces carry runnel streaks (orange iron and
+## black algae, which run straight down, so they are coloured by plan position
+## alone) and a dark notch band at the waterline; trees crown the domes and
+## vines hang over their lips. Beyond the shelf the ground falls away as a slope
+## rather than a one-cell cliff, so the edge does not read as stair steps.
+##
+## Natural landforms are meshes, not SuperEgg props; the trees and vines on
+## them are SuperEgg foliage. A heightfield cannot overhang, so the undercut
+## notch is carried by the colour band.
 
 ## Shelf top, below the lake surface W: inside the plan's 2.5 to 4.0 m band.
 const SHELF_TOP_DEPTH := 3.2
 ## How far below the lake bed the mesh outside the shelves is sunk, so it hides.
 const BED_SINK := 4.0
-const CELL := 1.0
+## Beyond the shelf's edge the ground falls at this gradient to the bed.
+const SHELF_FALL := 1.6
+const CELL := 0.5
 const BOUNDS := Rect2(-50.0, -44.0, 100.0, 76.0)
 const SEED := 20261006
 
-const LIMESTONE := Color(0.78, 0.75, 0.68)
-const LIMESTONE_WEATHERED := Color(0.60, 0.58, 0.52)
-const WATERLINE_STAIN := Color(0.46, 0.47, 0.40)
-const SHELF_ROCK := Color(0.42, 0.40, 0.36)
-const MOSS := Color(0.34, 0.45, 0.24)
+## The towers: plan centre, plan radii and crown height above W. Each lobe's
+## footprint lies inside its islet's outline in FishingVillagePlan, and every
+## lobe keeps clear of the buildings at its foot (the cistern's tank, the catch
+## deck, the portal spur), which the building proofs check.
+const LOBES: Array[Dictionary] = [
+	{"c": Vector2(-14.0, -31.0), "r": Vector2(6.5, 7.0), "top": 15.0},
+	{"c": Vector2(-4.0, -31.0), "r": Vector2(8.5, 8.0), "top": 21.0},
+	{"c": Vector2(7.0, -31.5), "r": Vector2(7.0, 6.5), "top": 17.0},
+	{"c": Vector2(15.0, -30.0), "r": Vector2(4.0, 4.5), "top": 10.0},
+	{"c": Vector2(-3.0, -24.8), "r": Vector2(5.5, 4.2), "top": 9.0},
+	{"c": Vector2(30.5, 10.5), "r": Vector2(4.8, 4.2), "top": 13.0},
+	{"c": Vector2(26.8, 8.2), "r": Vector2(2.8, 2.6), "top": 8.0},
+]
+
+const LIMESTONE := Color(0.80, 0.78, 0.71)
+const LIMESTONE_WEATHERED := Color(0.66, 0.64, 0.58)
+const STREAK_IRON := Color(0.72, 0.54, 0.36)
+const STREAK_DARK := Color(0.30, 0.31, 0.29)
+const WATERLINE_STAIN := Color(0.30, 0.31, 0.27)
+const SHELF_ROCK := Color(0.45, 0.43, 0.37)
+const MOSS := Color(0.30, 0.44, 0.22)
+const FOREST := Color(0.20, 0.36, 0.16)
 
 static var _edge_noise: FastNoiseLite
 static var _rock_noise: FastNoiseLite
@@ -52,7 +78,10 @@ static func build(parent: Node3D, terrain: Node) -> Array[StaticBody3D]:
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	var body := StaticBody3D.new()
 	body.name = "FishingIslets"
-	body.collision_layer = 1 | TownProps.BLORB_CLIMBABLE_LAYER
+	# Ground, not a ramp: on BLORB_CLIMBABLE_LAYER the player's swim code took
+	# the shelf under every dock for a climbable ramp, stopped swimming and
+	# walked the shelf with no breath. Blorbs treat any layer-1 body as ground.
+	body.collision_layer = 1
 	body.collision_mask = 0
 	parent.add_child(body)
 	body.global_position = Vector3(FishingVillagePlan.WORLD_CENTER.x, water, FishingVillagePlan.WORLD_CENTER.y)
@@ -61,6 +90,7 @@ static func build(parent: Node3D, terrain: Node) -> Array[StaticBody3D]:
 	instance.mesh = mesh
 	var material := StandardMaterial3D.new()
 	material.vertex_color_use_as_albedo = true
+	material.vertex_color_is_srgb = true
 	material.roughness = 0.92
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	instance.material_override = material
@@ -75,6 +105,7 @@ static func build(parent: Node3D, terrain: Node) -> Array[StaticBody3D]:
 	body.add_child(collision)
 	instance.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.SOLID)
 	collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.SOLID)
+	_vegetation(body, heights, columns, rows)
 	var out: Array[StaticBody3D] = [body]
 	return out
 
@@ -96,38 +127,34 @@ static func _make_noise() -> void:
 ## Height of the islet ground at a plan point, relative to the lake surface W.
 static func _height(p: Vector2, terrain: Node, water: float) -> float:
 	# The shelf's edge wanders outward (never inward, so every pile the plan places
-	# on the shelf stands on it).
-	var edge := (_edge_noise.get_noise_2d(p.x, p.y) * 0.5 + 0.5) * 2.0
-	if FishingVillagePlan.shelf_distance(p) > edge:
-		var at := FishingVillagePlan.WORLD_CENTER + p
-		return float(terrain.get_mesh_height(at.x, at.y)) - water - BED_SINK
+	# on the shelf stands on it), then the ground falls away as a slope.
+	var edge := (_edge_noise.get_noise_2d(p.x, p.y) * 0.5 + 0.5) * 1.5
 	var height := -SHELF_TOP_DEPTH + _grain_noise.get_noise_2d(p.x, p.y) * 0.1
-	height = maxf(height, _rock_height(p, FishingVillagePlan.ANVIL_ROCK))
-	height = maxf(height, _rock_height(p, FishingVillagePlan.HERON_ROCK))
+	var beyond := FishingVillagePlan.shelf_distance(p) - edge
+	if beyond > 0.0:
+		var at := FishingVillagePlan.WORLD_CENTER + p
+		var bed := float(terrain.get_mesh_height(at.x, at.y)) - water - BED_SINK
+		height = maxf(bed, -SHELF_TOP_DEPTH - beyond * SHELF_FALL)
+	for lobe: Dictionary in LOBES:
+		height = maxf(height, _lobe_height(p, lobe))
 	return height
 
 
-## One rock stack rising from its shelf: a sheer, fluted face between the waterline
-## and a broad crown, its outline lobed by low-frequency noise.
-static func _rock_height(p: Vector2, rock: Dictionary) -> float:
-	var centre: Vector2 = rock["center"]
-	var half: Vector2 = rock["half"]
-	var crown: float = rock["crown"]
-	var q := (p - centre) / half
+## One karst tower: a superellipse dome, near vertical at its foot and rounding
+## over into a broad crown, its outline lobed by low-frequency noise and its
+## face lightly fluted.
+static func _lobe_height(p: Vector2, lobe: Dictionary) -> float:
+	var q := (p - (lobe["c"] as Vector2)) / (lobe["r"] as Vector2)
 	var d := q.length()
-	d += _rock_noise.get_noise_2d(p.x, p.y) * 0.16
-	d += _grain_noise.get_noise_2d(p.x * 1.4 + 40.0, p.y * 1.4) * 0.03
-	var t := 1.0 - smoothstep(0.74, 1.02, d)
-	if t <= 0.0:
+	d *= 1.0 + _rock_noise.get_noise_2d(p.x * 0.7, p.y * 0.7) * 0.12
+	if d >= 1.0:
 		return -INF
-	# A steeper face than the smoothstep alone gives.
-	t = smoothstep(0.0, 1.0, clampf(t * 1.7, 0.0, 1.0))
-	var top := crown + _rock_noise.get_noise_2d(p.x * 3.0, p.y * 3.0) * 0.5
-	var height := -SHELF_TOP_DEPTH + (top + SHELF_TOP_DEPTH) * t
-	# Strata ribs and vertical fluting on the face.
-	var face := t * (1.0 - t) * 4.0
-	height += sin(height * 1.3 + _rock_noise.get_noise_2d(p.x * 2.0, p.y * 2.0) * 4.0) * 0.35 * face
-	height += _grain_noise.get_noise_2d(p.x * 2.2, p.y * 0.4) * 0.9 * face
+	var top := float(lobe["top"]) + _rock_noise.get_noise_2d(p.x * 1.6 + 30.0, p.y * 1.6) * 1.2
+	# (1 - d^6)^(1/3): flat-ish crown, rounded shoulder, steep wall.
+	var profile := pow(1.0 - pow(d, 6.0), 1.0 / 3.0)
+	var height := -SHELF_TOP_DEPTH + (top + SHELF_TOP_DEPTH) * profile
+	var face := clampf((1.0 - profile) * 3.0, 0.0, 1.0) * clampf(profile * 4.0, 0.0, 1.0)
+	height += _grain_noise.get_noise_2d(p.x * 2.5, p.y * 2.5) * 0.45 * face
 	return height
 
 
@@ -166,7 +193,7 @@ static func _mesh_arrays(heights: PackedFloat32Array, columns: int, rows: int) -
 				normals[i2] += normal
 	for index in normals.size():
 		normals[index] = normals[index].normalized() if normals[index].length() > 0.0 else Vector3.UP
-		colors[index] = _color(vertices[index].y, normals[index])
+		colors[index] = _color(vertices[index], normals[index])
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = vertices
@@ -176,20 +203,81 @@ static func _mesh_arrays(heights: PackedFloat32Array, columns: int, rows: int) -
 	return arrays
 
 
-static func _color(height: float, normal: Vector3) -> Color:
+static func _color(vertex: Vector3, normal: Vector3) -> Color:
+	var height := vertex.y
 	if height < -SHELF_TOP_DEPTH - 0.2:
-		return SHELF_ROCK.darkened(0.15)
-	if height < -0.4:
+		return SHELF_ROCK.darkened(0.2)
+	if height < -0.6:
 		return SHELF_ROCK
 	var steep := 1.0 - clampf(normal.y, 0.0, 1.0)
-	var color := LIMESTONE.lerp(LIMESTONE_WEATHERED, clampf(steep * 1.4, 0.0, 1.0))
-	# Moss and grass hold only on level ledges and the crown, never on the face.
-	if normal.y > 0.88 and height > 2.0:
-		color = color.lerp(MOSS, 0.6)
-	# The lake stains the foot: a darker band from just under the surface to a
-	# little above it.
-	var band := 1.0 - smoothstep(-0.4, 1.8, height)
-	return color.lerp(WATERLINE_STAIN, clampf(band, 0.0, 1.0))
+	var color := LIMESTONE.lerp(LIMESTONE_WEATHERED, clampf(steep * 0.8, 0.0, 1.0))
+	# Runnels: streaks that run straight down the face, so plan position alone.
+	var streak := _grain_noise.get_noise_2d(vertex.x * 3.0, vertex.z * 3.0)
+	var band := _rock_noise.get_noise_2d(vertex.x * 0.9 + 70.0, vertex.z * 0.9)
+	if streak > 0.25:
+		color = color.lerp(STREAK_DARK if band > 0.0 else STREAK_IRON, clampf((streak - 0.25) * 2.2, 0.0, 0.7) * steep)
+	# The crowns and any level ledge carry moss and forest.
+	if normal.y > 0.7 and height > 2.0:
+		color = color.lerp(FOREST if height > 6.0 else MOSS, clampf((normal.y - 0.7) * 4.0, 0.0, 0.9))
+	# The notch: a dark band where the lake has eaten into the foot.
+	var notch := 1.0 - smoothstep(-0.6, 1.4, height)
+	return color.lerp(WATERLINE_STAIN, clampf(notch, 0.0, 1.0))
+
+
+## Trees on the domes and vines over their lips, as two MultiMeshes of SuperEgg
+## foliage (decorative: the rock's own collision is the crown).
+static func _vegetation(body: StaticBody3D, heights: PackedFloat32Array, columns: int, rows: int) -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = SEED + 7
+	var crowns: Array[Transform3D] = []
+	var crown_tones: Array[Color] = []
+	var vines: Array[Transform3D] = []
+	var stride := int(2.0 / CELL)
+	for row in range(1, rows - 1, stride):
+		for column in range(1, columns - 1, stride):
+			var h := heights[row * columns + column]
+			if h < 3.0:
+				continue
+			var p := BOUNDS.position + Vector2(column, row) * CELL
+			var dx := heights[row * columns + column + 1] - heights[row * columns + column - 1]
+			var dz := heights[(row + 1) * columns + column] - heights[(row - 1) * columns + column]
+			var slope := Vector2(dx, dz).length() / (2.0 * CELL)
+			var jitter := Vector2(rng.randf_range(-0.8, 0.8), rng.randf_range(-0.8, 0.8))
+			if slope < 0.9 and rng.randf() < 0.85:
+				var size := rng.randf_range(1.1, 2.0)
+				crowns.append(Transform3D(Basis().scaled(Vector3(size, size * rng.randf_range(0.7, 1.0), size)), Vector3(p.x + jitter.x, h + size * 0.45, p.y + jitter.y)))
+				crown_tones.append(FOREST.lerp(MOSS, rng.randf_range(0.0, 0.7)).darkened(rng.randf_range(0.0, 0.15)))
+			elif slope > 2.5 and h > 5.0 and rng.randf() < 0.35:
+				var length := rng.randf_range(2.0, minf(6.0, h - 1.0))
+				vines.append(Transform3D(Basis().scaled(Vector3(0.12, length, 0.12)), Vector3(p.x + jitter.x * 0.3, h - length * 0.5, p.y + jitter.y * 0.3)))
+	_foliage(body, "Treetops", SuperEgg.build_mesh(Vector3(1.0, 1.0, 1.0), 2.2, 2.6), crowns, crown_tones)
+	var vine_tones: Array[Color] = []
+	for i in vines.size():
+		vine_tones.append(MOSS.darkened(0.1 * float(i % 3)))
+	_foliage(body, "Vines", SuperEgg.build_mesh(Vector3(1.0, 0.5, 1.0), 2.0, 2.0), vines, vine_tones)
+
+
+static func _foliage(body: StaticBody3D, name_text: String, mesh: Mesh, transforms: Array[Transform3D], tones: Array[Color]) -> void:
+	if transforms.is_empty():
+		return
+	var multi := MultiMesh.new()
+	multi.transform_format = MultiMesh.TRANSFORM_3D
+	multi.use_colors = true
+	multi.mesh = mesh
+	multi.instance_count = transforms.size()
+	for i in transforms.size():
+		multi.set_instance_transform(i, transforms[i])
+		multi.set_instance_color(i, tones[i])
+	var instance := MultiMeshInstance3D.new()
+	instance.name = name_text
+	instance.multimesh = multi
+	var material := StandardMaterial3D.new()
+	material.vertex_color_use_as_albedo = true
+	material.vertex_color_is_srgb = true
+	material.roughness = 0.95
+	instance.material_override = material
+	body.add_child(instance)
+	CollisionPolicy.mark_decorative(instance)
 
 
 static func _faces(vertices: PackedVector3Array, indices: PackedInt32Array) -> PackedVector3Array:

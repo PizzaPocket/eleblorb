@@ -143,7 +143,9 @@ const LANES: Array[Dictionary] = [
 const BOATS: Array[Dictionary] = [
 	{"name":"DiveSkiff","owner":"Nara","berth":Rect2(-46.0,-9.7,4.0,1.4),"lane":"ferry"},
 	{"name":"FerryBoat","launch":true,"owner":"Ivo","berth":Rect2(-48.0,-3.8,6.0,1.8),"lane":"ferry"},
-	{"name":"RepairBoat","owner":"Mateo","berth":Rect2(-46.0,-18.0,5.0,1.8),"lane":"slip"},
+	# Afloat at the slipway's foot in the slip lane (its berth used to overlap the
+	# slip's work apron).
+	{"name":"RepairBoat","owner":"Mateo","berth":Rect2(-53.0,-16.9,5.0,1.8),"lane":"slip"},
 	{"name":"WorkPunt","owner":"Mai","berth":Rect2(2.0,6.2,3.6,1.6),"lane":"court_mouth"},
 	{"name":"WorkingBoat","owner":"Jori","berth":Rect2(44.0,6.8,6.0,2.4),"lane":"working_boat"},
 	{"name":"UtilityBoat","owner":"Sela","berth":Rect2(-15.0,16.0,5.0,2.0),"lane":"rescue"},

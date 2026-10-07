@@ -34,10 +34,15 @@ const PLANK_MAX := 3.2
 const SHINGLE := Color(0.47, 0.39, 0.31)
 const ROPE := Color(0.72, 0.62, 0.42)
 
-## Charter module, revised (2026-10-06): the ring beam stands 3.3 m above the
-## floor, so a veranda pent can tuck under the main eave and still leave 2.0 m
-## of headroom at its outer edge.
-const RING_BEAM := 3.3
+## Charter module, revised (2026-10-07, after the walkthrough found eaves
+## "barely above the player's head"): the ring beam stands 4.0 m above the
+## floor, so a veranda pent of Ohio-thick slabs tucks under the main eave and
+## still clears 2.4 m at its outer edge. Every eave a person walks under
+## clears MIN_HEADROOM (the proof scene checks it along every route).
+const RING_BEAM := 4.0
+## Where a veranda or porch pent meets its house wall, above the floor.
+const PENT_AT_WALL := 3.15
+const MIN_HEADROOM := 2.35
 const BAND := 1.0
 const POST_HALF := 0.13
 const PILE_HALF := 0.15
@@ -45,6 +50,7 @@ const FLOOR_THICKNESS := 0.16
 const BEAM_DEPTH := 0.24
 const RAIL_HEIGHT := 0.95
 const DOOR_TOP := 2.4
+const INTERIOR_DOOR_TOP := 2.45
 const WINDOW_SILL := 1.02
 const WINDOW_TOP := 2.42
 const WINDOW_WIDTH := 0.94
@@ -100,7 +106,10 @@ static func wall(
 			entry["bottom"] = base_y + WINDOW_SILL
 			entry["top"] = base_y + WINDOW_TOP
 			entry["leaves"] = 0
-			entry["shutters"] = bool(opening.get("shutters", false))
+			# TownProps' side-hung pairs are not this village's joinery; the
+			# top-hung awning shutter is built below instead.
+			entry["shutters"] = false
+			entry["awning"] = bool(opening.get("shutters", false))
 		resolved.append(entry)
 	var top_at := func(p: Vector2) -> float:
 		if roof_plane.is_empty():
@@ -127,6 +136,9 @@ static func wall(
 			TownProps._build_panel_opening_trim(body, Vector3(mid.x, base_y, mid.y), yaw + PI, inward, base_y, TIMBER_DARK, TownProps.WALL_THICKNESS, accent)
 		else:
 			TownProps._build_panel_opening_trim(body, Vector3(mid.x, base_y, mid.y), yaw, opening, base_y, TIMBER_DARK, TownProps.WALL_THICKNESS, accent)
+	for opening in resolved:
+		if bool(opening.get("awning", false)):
+			_awning_shutter(body, mid + dir * float(opening["center"]), dir, Vector2(dir.y, -dir.x), float(opening["width"]), float(opening["top"]), accent)
 	_dado_rail(body, a, dir, length, base_y + BAND, resolved)
 	ClearZones.add_wall(body, "outside wall (%.1f, %.1f) to (%.1f, %.1f)" % [a.x, a.y, b.x, b.y], a, b, base_y, full, TownProps.WALL_THICKNESS, true)
 	var inward := -outward.normalized()
@@ -137,6 +149,42 @@ static func wall(
 			ClearZones.add(body, "door at (%.1f, %.1f)" % [at.x, at.y], "door", at, inward, 1.3, 1.3, half + 0.2, base_y + 0.05, base_y + 1.9)
 		else:
 			ClearZones.add(body, "window at (%.1f, %.1f)" % [at.x, at.y], "window", at, inward, 0.05, 0.55, half + 0.25, float(opening["bottom"]), float(opening["bottom"]) + 1.4)
+
+
+## The top-hung shutter of the charter's Thai and Malay joinery: one panel
+## hinged at the window head, propped out by a stick as a sunshade. It never
+## reaches sideways, so neighbouring windows, doors and posts keep clear, and
+## its low edge stays above head height.
+const AWNING_DROP := 0.78
+const AWNING_ANGLE := deg_to_rad(64.0)
+
+
+static func _awning_shutter(body: StaticBody3D, centre: Vector2, along: Vector2, outward: Vector2, width: float, top_y: float, accent: Color) -> void:
+	var hinge := Vector3(centre.x, top_y + 0.06, centre.y) + Vector3(outward.x, 0.0, outward.y) * 0.1
+	var out3 := Vector3(outward.x, 0.0, outward.y)
+	# The panel's local y runs from the hinge down its face; turned out by the
+	# prop angle about the wall's line.
+	var down := (Vector3.DOWN * cos(AWNING_ANGLE) + out3 * sin(AWNING_ANGLE)).normalized()
+	var across := Vector3(along.x, 0.0, along.y)
+	var normal := across.cross(down).normalized()
+	var basis := Basis(across, down, normal)
+	var panel := SuperEgg.build_part(Vector3(width * 0.5 + 0.08, AWNING_DROP * 0.5, 0.025), accent, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	panel.transform = Transform3D(basis, hinge + down * (AWNING_DROP * 0.5))
+	body.add_child(panel)
+	CollisionPolicy.mark_decorative(panel)
+	var batten := SuperEgg.build_part(Vector3(width * 0.5 + 0.02, 0.025, 0.02), accent.darkened(0.25), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	batten.transform = Transform3D(basis, hinge + down * (AWNING_DROP * 0.55) + normal * 0.03)
+	body.add_child(batten)
+	CollisionPolicy.mark_decorative(batten)
+	# The prop stick from the sill to the panel's lower edge.
+	var tip := hinge + down * AWNING_DROP
+	var foot := Vector3(centre.x, top_y - 1.25, centre.y) + out3 * 0.08
+	var stick := SuperEgg.build_part(Vector3(0.015, foot.distance_to(tip) * 0.5, 0.015), TIMBER_DARK, 2.0, 2.0)
+	var up := (tip - foot).normalized()
+	var side := up.cross(across).normalized()
+	stick.transform = Transform3D(Basis(across, up, side).orthonormalized(), (foot + tip) * 0.5 + across * (width * 0.35))
+	body.add_child(stick)
+	CollisionPolicy.mark_decorative(stick)
 
 
 ## The rail capping the board band, broken at every door.
@@ -161,8 +209,50 @@ static func _dado_rail(body: StaticBody3D, a: Vector2, dir: Vector2, length: flo
 ## A full-height interior partition of boards, with framed doorways. Draw it so
 ## the room its doors open into lies to the left of `from` -> `to` (TownProps'
 ## rule: a door swings toward the wall's local -Z).
-static func partition(body: StaticBody3D, from: Vector2, to: Vector2, base_y: float, height: float, door_distances: Array[float]) -> void:
-	TownProps.build_interior_wall(body, from, to, base_y, door_distances, TIMBER_PALE, TIMBER_DARK, height)
+## With a `curtain` colour (alpha above zero) its doorways carry no leaf but a
+## cloth curtain (the langsir of Malay and Thai houses): framed openings that
+## anyone walks straight through, the cloth gathered to one jamb. Hard doors
+## stay where something must close: outside doors, toilets, stores.
+static func partition(body: StaticBody3D, from: Vector2, to: Vector2, base_y: float, height: float, door_distances: Array[float], curtain: Color = Color(0, 0, 0, 0)) -> void:
+	# Doorways are as tall as the outside doors (2.45 m), so a route through one
+	# keeps MIN_HEADROOM; the engine's interior default is 2.3 m.
+	var options: Array[Dictionary] = []
+	for i in door_distances.size():
+		var option := {"top": base_y + INTERIOR_DOOR_TOP}
+		if curtain.a > 0.0:
+			option["leaves"] = 0
+		options.append(option)
+	TownProps.build_interior_wall(body, from, to, base_y, door_distances, TIMBER_PALE, TIMBER_DARK, height, true, [], {}, options)
+	if curtain.a <= 0.0:
+		return
+	var dir := (to - from).normalized()
+	var yaw := atan2(-dir.y, dir.x)
+	var half := TownProps.INTERIOR_DOOR_WIDTH * 0.5
+	var top := base_y + INTERIOR_DOOR_TOP
+	for i in door_distances.size():
+		var centre := from + dir * door_distances[i]
+		var basis := Basis(Vector3.UP, yaw)
+		var at := Vector3(centre.x, 0.0, centre.y)
+		# The rod and a short valance across the head, on the wall's face.
+		var rod := SuperEgg.build_part(Vector3(half + 0.08, 0.02, 0.02), TIMBER_DARK, 2.0, 2.0)
+		rod.transform = Transform3D(basis, at + Vector3(0.0, top - 0.08, 0.0))
+		body.add_child(rod)
+		CollisionPolicy.mark_decorative(rod)
+		var valance := SuperEgg.build_part(Vector3(half + 0.04, 0.09, 0.025), curtain, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+		valance.transform = Transform3D(basis, at + Vector3(0.0, top - 0.17, 0.0))
+		body.add_child(valance)
+		CollisionPolicy.mark_decorative(valance)
+		# The cloth drawn back to one jamb and tied, in soft folds.
+		for fold in 3:
+			var x := -half + 0.07 + 0.07 * float(fold)
+			var cloth := SuperEgg.build_part(Vector3(0.05, (top - base_y - 0.3) * 0.5, 0.03), curtain.darkened(0.06 * float(fold % 2)), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+			cloth.transform = Transform3D(basis, at + basis * Vector3(x, 0.0, 0.0) + Vector3(0.0, base_y + 0.15 + (top - base_y - 0.3) * 0.5, 0.0))
+			body.add_child(cloth)
+			CollisionPolicy.mark_decorative(cloth)
+		var tie := SuperEgg.build_part(Vector3(0.14, 0.03, 0.05), curtain.lightened(0.25), 2.0, 2.0)
+		tie.transform = Transform3D(basis, at + basis * Vector3(-half + 0.14, 0.0, 0.0) + Vector3(0.0, base_y + 1.0, 0.0))
+		body.add_child(tie)
+		CollisionPolicy.mark_decorative(tie)
 
 
 # ---------------------------------------------------------------------------
@@ -437,10 +527,11 @@ static func ramp_rails(body: StaticBody3D, low: Vector2, high: Vector2, low_y: f
 ## oil lamp hung from the arm (the charter's "lamps hang under eaves and from
 ## junction posts"; no lights on poles).
 static func lamp_post(body: StaticBody3D, at: Vector2, floor_y: float, arm: Vector2) -> void:
-	post(body, at, floor_y - FLOOR_THICKNESS, floor_y + 2.7, TIMBER, true)
+	post(body, at, floor_y - FLOOR_THICKNESS, floor_y + 3.1, TIMBER, true)
 	var tip := at + arm.normalized() * 0.65
-	beam(body, at, tip, floor_y + 2.55, Vector2(0.05, 0.06), TIMBER_DARK)
-	Furnishings.hanging_lamp(body, Vector3(tip.x, floor_y + 2.05, tip.y), 0.9, 7.0)
+	beam(body, at, tip, floor_y + 2.95, Vector2(0.05, 0.06), TIMBER_DARK)
+	# The shade hangs well above head height over the way it lights.
+	Furnishings.hanging_lamp(body, Vector3(tip.x, floor_y + 2.45, tip.y), 0.9, 7.0)
 
 
 ## A glazed rain jar under a downpipe: every roof drains somewhere.

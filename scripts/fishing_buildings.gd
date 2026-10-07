@@ -100,7 +100,7 @@ const VENN_VERANDA_Z := 4.75
 const VENN_RAMP_Z := 5.75
 const VENN_SHUTTER := Color(0.82, 0.58, 0.22)
 ## The pent's underside where it meets the house wall, above the floor.
-const VENN_PENT_AT_WALL := 2.75
+const VENN_PENT_AT_WALL := StiltKit.PENT_AT_WALL
 
 
 static func venn_house() -> StaticBody3D:
@@ -135,7 +135,7 @@ static func venn_house() -> StaticBody3D:
 	StiltKit.wall(body, Vector2(-hx, hz), Vector2(hx, hz), Vector2(0, 1), f, StiltKit.RING_BEAM,
 		# A pair of narrow leaves: one 1.2 m leaf swinging in would cross the way to
 		# one of the two side doors in a 3 m living room.
-		[StiltKit.door(Vector2(0.0, hz), StiltKit.DOOR_TOP, 2), StiltKit.window(Vector2(-3.0, hz))], teal, VENN_SHUTTER)
+		[StiltKit.door(Vector2(0.0, hz), StiltKit.DOOR_TOP, 2), StiltKit.window(Vector2(-3.0, hz), false)], teal, VENN_SHUTTER)
 	StiltKit.wall(body, Vector2(-hx, -hz), Vector2(hx, -hz), Vector2(0, -1), f, StiltKit.RING_BEAM,
 		[StiltKit.window(Vector2(-3.0, -hz)), StiltKit.window(Vector2(-0.75, -hz)), StiltKit.window(Vector2(3.25, -hz))], teal, VENN_SHUTTER)
 	StiltKit.wall(body, Vector2(-hx, -hz), Vector2(-hx, hz), Vector2(-1, 0), f, StiltKit.RING_BEAM,
@@ -146,8 +146,8 @@ static func venn_house() -> StaticBody3D:
 	# back wall stays free for the brazier and table. Lio's room lies west of
 	# x -1.5 (drawn south to north, so its door swings west into it); Nara and
 	# Mateo's lies east of x 1.5 (drawn north to south).
-	StiltKit.partition(body, Vector2(-1.5, hz), Vector2(-1.5, -hz), f, StiltKit.RING_BEAM, [1.25])
-	StiltKit.partition(body, Vector2(1.5, -hz), Vector2(1.5, hz), f, StiltKit.RING_BEAM, [3.25])
+	StiltKit.partition(body, Vector2(-1.5, hz), Vector2(-1.5, -hz), f, StiltKit.RING_BEAM, [1.25], teal.lightened(0.35))
+	StiltKit.partition(body, Vector2(1.5, -hz), Vector2(1.5, hz), f, StiltKit.RING_BEAM, [3.25], VENN_SHUTTER.lightened(0.2))
 	StiltKit.ceiling(body, Rect2(-hx, -hz, hx * 2.0, hz * 2.0), plate)
 
 	# Frame: posts on every bay line and mid-end, ring beam at the plate.
@@ -308,9 +308,10 @@ static func _venn_shop(body: StaticBody3D, f: float) -> void:
 		Furnishings.piece(body, Vector3(0.012, 0.25, 0.012), StiltKit.ROPE.darkened(0.1), Vector3(-1.5 + 0.03 * float(i - 2), f + 1.55, VENN_VERANDA_Z - 0.16), 0.0, false)
 		Furnishings.piece(body, Vector3(0.03, 0.03, 0.03), StiltKit.ROPE.darkened(0.25), Vector3(-1.5 + 0.03 * float(i - 2), f + 1.38 + 0.06 * float(i % 3), VENN_VERANDA_Z - 0.16), 0.0, false, 2.0)
 	Furnishings.piece(body, Vector3(0.08, 0.09, 0.08), Color(0.78, 0.62, 0.26), Vector3(-1.72, f + 1.75, VENN_VERANDA_Z - 0.3), 0.0, false, 2.0)
-	# Lamps hang from the pent's rafters near the wall, where it is highest.
-	Furnishings.hanging_lamp(body, Vector3(-3.0, f + 1.9, VENN_HALF.y + 0.9), 0.6, 5.0)
-	Furnishings.hanging_lamp(body, Vector3(0.0, f + 1.95, VENN_HALF.y + 0.7), 0.5, 4.5)
+	# Lamps hang high under the pent, off Nara's face and the doorway's line:
+	# one by the west post over the end of the counter, one beside the door.
+	Furnishings.hanging_lamp(body, Vector3(-4.1, f + 2.45, VENN_HALF.y + 1.2), 0.6, 5.0)
+	Furnishings.hanging_lamp(body, Vector3(0.95, f + 2.5, VENN_HALF.y + 0.6), 0.5, 4.5)
 
 
 ## The lake wares laid out on the counter: two rows of three, in catalogue
@@ -345,7 +346,7 @@ const SEN_HALF := Vector2(4.5, 4.0)
 const SEN_CORRIDOR := Vector2(-1.0, 0.4)
 const SEN_PORCH_Z := 6.0
 const SEN_SHUTTER := Color(0.80, 0.73, 0.58)
-const SEN_PENT_AT_WALL := 2.75
+const SEN_PENT_AT_WALL := StiltKit.PENT_AT_WALL
 ## Door and window positions along the front, chosen so every frame clears its
 ## neighbour and the bay partitions (the brief's numbers did not; see 4.4).
 const SEN_FAMILY_DOOR := -3.0
@@ -383,7 +384,7 @@ static func sen_house() -> StaticBody3D:
 	# (knot-carved) and the school room's. Back rooms light from the north.
 	var front: Array[Dictionary] = [
 		StiltKit.door(Vector2(SEN_FAMILY_DOOR, hz)), StiltKit.door(Vector2(SEN_CLINIC_DOOR, hz)),
-		StiltKit.window(Vector2(SEN_CLINIC_WINDOW, hz)), StiltKit.window(Vector2(SEN_SCHOOL_WINDOW, hz)),
+		StiltKit.window(Vector2(SEN_CLINIC_WINDOW, hz), false), StiltKit.window(Vector2(SEN_SCHOOL_WINDOW, hz), false),
 		StiltKit.door(Vector2(SEN_SCHOOL_DOOR, hz)),
 	]
 	StiltKit.wall(body, Vector2(-hx, hz), Vector2(hx, hz), Vector2(0, 1), f, StiltKit.RING_BEAM, front, violet, SEN_SHUTTER)
@@ -403,7 +404,7 @@ static func sen_house() -> StaticBody3D:
 	var cn := SEN_CORRIDOR.x
 	var no_doors: Array[float] = []
 	TownProps.build_interior_wall(body, Vector2(-hx, cs), Vector2(hx, cs), f, no_doors, StiltKit.TIMBER_PALE, StiltKit.TIMBER_DARK, StiltKit.RING_BEAM, true, [SEN_FAMILY_DOOR + hx])
-	StiltKit.partition(body, Vector2(-hx, cn), Vector2(hx, cn), f, StiltKit.RING_BEAM, [1.5, 4.5, 7.5])
+	StiltKit.partition(body, Vector2(-hx, cn), Vector2(hx, cn), f, StiltKit.RING_BEAM, [1.5, 4.5, 7.5], violet.lightened(0.3))
 	StiltKit.partition(body, Vector2(-1.5, cs), Vector2(-1.5, hz), f, StiltKit.RING_BEAM, [1.8])
 	StiltKit.partition(body, Vector2(1.5, cs), Vector2(1.5, hz), f, StiltKit.RING_BEAM, [1.8])
 	StiltKit.partition(body, Vector2(-1.5, -hz), Vector2(-1.5, cn), f, StiltKit.RING_BEAM, no_doors)
@@ -1036,7 +1037,7 @@ const ARAN_NORTH_ROW := -1.05
 const ARAN_SOUTH_ROW := 1.4
 const ARAN_VERANDA_X := -5.0
 const ARAN_SHUTTER := Color(0.30, 0.50, 0.32)
-const ARAN_PENT_AT_WALL := 2.75
+const ARAN_PENT_AT_WALL := StiltKit.PENT_AT_WALL
 ## The kitchen's wet door stands west of the living-room door's line, so the
 ## two leaves (each open 78 degrees, into the kitchen) leave a way between them.
 const ARAN_WET_DOOR := 1.0
@@ -1070,7 +1071,7 @@ static func aran_house() -> StaticBody3D:
 	# Outside walls. The front door opens from the veranda into the living room,
 	# between the two rope-bound posts; every room has its window.
 	StiltKit.wall(body, Vector2(-hx, -hz), Vector2(-hx, hz), Vector2(-1, 0), f, StiltKit.RING_BEAM,
-		[StiltKit.window(Vector2(-hx, -2.55)), StiltKit.door(Vector2(-hx, living_z)), StiltKit.window(Vector2(-hx, 2.65))], ochre, ARAN_SHUTTER)
+		[StiltKit.window(Vector2(-hx, -2.55), false), StiltKit.door(Vector2(-hx, living_z)), StiltKit.window(Vector2(-hx, 2.65), false)], ochre, ARAN_SHUTTER)
 	StiltKit.wall(body, Vector2(hx, -hz), Vector2(hx, hz), Vector2(1, 0), f, StiltKit.RING_BEAM,
 		[StiltKit.window(Vector2(hx, living_z)), StiltKit.window(Vector2(hx, 3.0))], ochre, ARAN_SHUTTER)
 	StiltKit.wall(body, Vector2(-hx, -hz), Vector2(hx, -hz), Vector2(0, -1), f, StiltKit.RING_BEAM,
@@ -1082,8 +1083,8 @@ static func aran_house() -> StaticBody3D:
 	# (drawn west to east, leaves swing north); its south wall a door into
 	# Dala's room and the kitchen (drawn east to west, leaves swing south).
 	var no_doors: Array[float] = []
-	StiltKit.partition(body, Vector2(-hx, nr), Vector2(hx, nr), f, StiltKit.RING_BEAM, [1.5, 4.5])
-	StiltKit.partition(body, Vector2(hx, sr), Vector2(-hx, sr), f, StiltKit.RING_BEAM, [1.5, 4.5])
+	StiltKit.partition(body, Vector2(-hx, nr), Vector2(hx, nr), f, StiltKit.RING_BEAM, [1.5, 4.5], ARAN_SHUTTER.lightened(0.3))
+	StiltKit.partition(body, Vector2(hx, sr), Vector2(-hx, sr), f, StiltKit.RING_BEAM, [1.5, 4.5], ochre.lightened(0.25))
 	StiltKit.partition(body, Vector2(0.0, -hz), Vector2(0.0, nr), f, StiltKit.RING_BEAM, no_doors)
 	StiltKit.partition(body, Vector2(0.0, sr), Vector2(0.0, hz), f, StiltKit.RING_BEAM, no_doors)
 	StiltKit.ceiling(body, Rect2(-hx, -hz, hx * 2.0, hz * 2.0), plate)
@@ -1249,7 +1250,8 @@ static func boatwright_slip() -> StaticBody3D:
 	var body := StaticBody3D.new()
 	body.name = "BoatwrightSlip"
 	var f := DECK_TOP
-	var plate := f + 3.0
+	# High enough that its eaves clear 2.4 m over the open south face.
+	var plate := f + 3.4
 	var beam_y := f - StiltKit.FLOOR_THICKNESS - StiltKit.BEAM_DEPTH * 0.5
 	var rows: Array = []
 	# The shelf's edge is at z -22; the north row stands just inside it.
@@ -1353,7 +1355,7 @@ static func catch_deck() -> StaticBody3D:
 
 	# Drying shelter: posts, a pent falling north, slatted screens on the north
 	# and east sides; open to the deck south and west.
-	var top := f + 2.9
+	var top := f + 3.6
 	for p: Vector2 in [Vector2(39.0, 2.15), Vector2(41.5, 2.15), Vector2(43.85, 2.15), Vector2(39.0, 7.0), Vector2(43.85, 7.0)]:
 		# Each post meets the pent's underside where it stands: the roof is
 		# highest on the south (deck) side and falls north.
@@ -1383,21 +1385,21 @@ static func catch_deck() -> StaticBody3D:
 	hut.position = Vector3(42.5, 0.0, 12.5)
 	body.add_child(hut)
 	var hh := 1.5
-	StiltKit.wall(hut, Vector2(-hh, -hh), Vector2(hh, -hh), Vector2(0, -1), f, 2.4, [], smoke, smoke)
-	StiltKit.wall(hut, Vector2(-hh, hh), Vector2(hh, hh), Vector2(0, 1), f, 2.4, [], smoke, smoke)
-	StiltKit.wall(hut, Vector2(hh, -hh), Vector2(hh, hh), Vector2(1, 0), f, 2.4, [], smoke, smoke)
-	StiltKit.wall(hut, Vector2(-hh, -hh), Vector2(-hh, hh), Vector2(-1, 0), f, 2.4, [StiltKit.door(Vector2(-hh, 0.0), 2.1, 1, 1.0)], smoke, smoke)
+	StiltKit.wall(hut, Vector2(-hh, -hh), Vector2(hh, -hh), Vector2(0, -1), f, 2.8, [], smoke, smoke)
+	StiltKit.wall(hut, Vector2(-hh, hh), Vector2(hh, hh), Vector2(0, 1), f, 2.8, [], smoke, smoke)
+	StiltKit.wall(hut, Vector2(hh, -hh), Vector2(hh, hh), Vector2(1, 0), f, 2.8, [], smoke, smoke)
+	StiltKit.wall(hut, Vector2(-hh, -hh), Vector2(-hh, hh), Vector2(-1, 0), f, 2.8, [StiltKit.door(Vector2(-hh, 0.0), 2.3, 1, 1.0)], smoke, smoke)
 	for x: float in [-hh, hh]:
 		for z: float in [-hh, hh]:
-			StiltKit.post(hut, Vector2(x, z), f - StiltKit.FLOOR_THICKNESS, f + 2.4, smoke.darkened(0.2))
-	StiltRoofs.gable(hut, Vector2(hh, hh), f + 2.4, StiltKit.SHINGLE.darkened(0.3), smoke.darkened(0.3))
+			StiltKit.post(hut, Vector2(x, z), f - StiltKit.FLOOR_THICKNESS, f + 2.8, smoke.darkened(0.2))
+	StiltRoofs.gable(hut, Vector2(hh, hh), f + 2.8, StiltKit.SHINGLE.darkened(0.3), smoke.darkened(0.3))
 	var hearth := SuperEgg.build_part(Vector3(0.55, 0.3, 0.55), STONE.darkened(0.15), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 	hearth.position = Vector3(0.75, f + 0.3, 0.0)
 	hut.add_child(hearth)
 	ClearZones.mark_furniture(CollisionPolicy.add_box(hut, hearth, Vector3(1.1, 0.6, 1.1), hearth.position, Basis(), true), true)
 	Furnishings.piece(hut, Vector3(0.25, 0.04, 0.25), Color(0.95, 0.45, 0.15), Vector3(0.75, f + 0.63, 0.0), 0.0, false, 2.2)
 	ClearZones.add(hut, "smokehouse hearth", "fire", Vector2(0.75, 0.0), Vector2(-1, 0), 0.5, 0.6, 0.6, f, f + 1.6)
-	_roof_flue(hut, Vector2(0.75, 0.0), f + 0.6, f + 2.4 + StiltRoofs.PLATE + 1.5 * tan(StiltRoofs.PITCH) + 0.5)
+	_roof_flue(hut, Vector2(0.75, 0.0), f + 0.6, f + 2.8 + StiltRoofs.PLATE + 1.5 * tan(StiltRoofs.PITCH) + 0.5)
 	for i in 4:
 		StiltKit.beam(hut, Vector2(-0.9, -1.0 + 0.6 * float(i)), Vector2(1.3, -1.0 + 0.6 * float(i)), f + 2.0, Vector2(0.025, 0.025), smoke)
 	# His grandmother's recipe cut into a board by the hearth, in symbols.
@@ -1457,7 +1459,7 @@ static func shell_barge() -> StaticBody3D:
 
 	# The lean-to: high on the north edge, falling south over the bench, its
 	# low eave still 2 m clear.
-	var high := f + 2.9
+	var high := f + 3.3
 	var low := high - 2.5 * tan(StiltRoofs.PENT_PITCH)
 	for x: float in [-19.8, -16.0, -12.2]:
 		StiltKit.post(body, Vector2(x, -2.85), f, high - 0.12, StiltKit.TIMBER, x == -16.0)
@@ -1533,7 +1535,7 @@ static func shell_barge() -> StaticBody3D:
 const MOR_ORIGIN := Vector2(-17.0, 11.5)
 const MOR_TRIM := Color(0.24, 0.55, 0.52)
 const MOR_CABIN := Rect2(-5.5, -2.5, 13.0, 6.0)
-const MOR_PLATE := 2.9
+const MOR_PLATE := 3.4
 
 
 static func mor_houseboat() -> StaticBody3D:
@@ -1563,9 +1565,9 @@ static func mor_houseboat() -> StaticBody3D:
 	# stern cabin's door onto the north walkway; windows on every room.
 	var no_openings: Array[Dictionary] = []
 	StiltKit.wall(body, Vector2(x0, zn), Vector2(x0, zs), Vector2(-1, 0), f, MOR_PLATE,
-		[StiltKit.door(Vector2(x0, 0.5)), StiltKit.window(Vector2(x0, 2.5))], terracotta, MOR_TRIM)
+		[StiltKit.door(Vector2(x0, 0.5)), StiltKit.window(Vector2(x0, 2.5), false)], terracotta, MOR_TRIM)
 	StiltKit.wall(body, Vector2(x0, zn), Vector2(x1, zn), Vector2(0, -1), f, MOR_PLATE,
-		[StiltKit.door(Vector2(-3.9, zn)), StiltKit.window(Vector2(-2.0, zn)), StiltKit.window(Vector2(2.25, zn)), StiltKit.door(Vector2(6.6, zn))], terracotta, MOR_TRIM)
+		[StiltKit.door(Vector2(-3.9, zn)), StiltKit.window(Vector2(-2.0, zn), false), StiltKit.window(Vector2(2.25, zn), false), StiltKit.door(Vector2(6.6, zn))], terracotta, MOR_TRIM)
 	StiltKit.wall(body, Vector2(x0, zs), Vector2(x1, zs), Vector2(0, 1), f, MOR_PLATE,
 		[StiltKit.window(Vector2(-2.75, zs)), StiltKit.window(Vector2(1.2, zs)), StiltKit.window(Vector2(3.3, zs)), StiltKit.window(Vector2(6.0, zs), false)], terracotta, MOR_TRIM)
 	StiltKit.wall(body, Vector2(x1, zn), Vector2(x1, zs), Vector2(1, 0), f, MOR_PLATE,
@@ -1573,7 +1575,7 @@ static func mor_houseboat() -> StaticBody3D:
 	# Partitions: common | dormitory (door swings east into the dormitory);
 	# dormitory | the east rooms, with the wash room's door (swings east); the
 	# wall between the stern cabin and the wash room.
-	StiltKit.partition(body, Vector2(0.0, zn), Vector2(0.0, zs), f, MOR_PLATE, [3.0])
+	StiltKit.partition(body, Vector2(0.0, zn), Vector2(0.0, zs), f, MOR_PLATE, [3.0], MOR_TRIM.lightened(0.3))
 	StiltKit.partition(body, Vector2(4.5, zn), Vector2(4.5, zs), f, MOR_PLATE, [4.0])
 	var no_doors: Array[float] = []
 	StiltKit.partition(body, Vector2(4.5, 0.4), Vector2(x1, 0.4), f, MOR_PLATE, no_doors)
@@ -1629,10 +1631,18 @@ static func mor_houseboat() -> StaticBody3D:
 	gather.name = "GatherMarker"
 	gather.position = Vector3(-7.2, f + 0.05, 0.5)
 	body.add_child(gather)
+	# Leena receives guests on the arrival deck beside the cabin door, facing the
+	# gangway, where anyone coming aboard meets her first.
 	var keeper := Marker3D.new()
 	keeper.name = "KeeperStand"
-	keeper.position = Vector3(-4.75, f, 2.2)
+	keeper.position = Vector3(-7.7, f, 1.0)
 	body.add_child(keeper)
+	# The rest point's mark, the same bed-and-moon sign every inn hangs: from
+	# the arrival deck's north-west post, facing the return route and the
+	# gangway people come aboard by.
+	var sign := VillageInn.build_bed_and_moon_sign(terracotta, StiltKit.TIMBER)
+	sign.position = Vector3(-8.75, f, -3.45)
+	body.add_child(sign)
 
 	ClearZones.add_lane(body, "gangway onto the arrival deck", [Vector3(-6.5, f, -3.3), Vector3(-6.5, f, 0.5)], 0.55)
 	ClearZones.add_lane(body, "arrival deck into the common cabin", [Vector3(-6.5, f, 0.5), Vector3(-4.2, f, 0.5)])
@@ -1750,7 +1760,7 @@ static func _mor_interior(body: StaticBody3D, f: float, terracotta: Color) -> vo
 const VALE_ORIGIN := Vector2(33.0, -6.5)
 const VALE_CABIN := Rect2(-4.5, -2.5, 7.5, 4.5)
 const VALE_SPLIT := -0.1
-const VALE_PLATE := 2.9
+const VALE_PLATE := 3.8
 
 
 static func vale_houseboat() -> StaticBody3D:
@@ -1779,12 +1789,12 @@ static func vale_houseboat() -> StaticBody3D:
 	StiltKit.wall(body, Vector2(x0, zn), Vector2(x0, zs), Vector2(-1, 0), f, VALE_PLATE,
 		[StiltKit.door(Vector2(x0, (zn + zs) * 0.5))], coral, shutter)
 	StiltKit.wall(body, Vector2(x0, zn), Vector2(x1, zn), Vector2(0, -1), f, VALE_PLATE,
-		[StiltKit.window(Vector2(-2.75, zn)), StiltKit.window(Vector2(1.0, zn))], coral, shutter)
+		[StiltKit.window(Vector2(-2.75, zn), false), StiltKit.window(Vector2(1.0, zn), false)], coral, shutter)
 	StiltKit.wall(body, Vector2(x0, zs), Vector2(x1, zs), Vector2(0, 1), f, VALE_PLATE,
 		[StiltKit.window(Vector2(-3.5, zs)), StiltKit.door(Vector2(-2.0, zs)), StiltKit.window(Vector2(1.0, zs))], coral, shutter)
 	StiltKit.wall(body, Vector2(x1, zn), Vector2(x1, zs), Vector2(1, 0), f, VALE_PLATE,
 		[StiltKit.window(Vector2(x1, -1.3))], coral, shutter)
-	StiltKit.partition(body, Vector2(-1.0, zn), Vector2(-1.0, zs), f, VALE_PLATE, [1.2, 3.45])
+	StiltKit.partition(body, Vector2(-1.0, zn), Vector2(-1.0, zs), f, VALE_PLATE, [1.2, 3.45], coral.lightened(0.3))
 	var no_doors: Array[float] = []
 	StiltKit.partition(body, Vector2(-1.0, VALE_SPLIT), Vector2(x1, VALE_SPLIT), f, VALE_PLATE, no_doors)
 	StiltKit.ceiling(body, VALE_CABIN, plate)
@@ -1792,20 +1802,27 @@ static func vale_houseboat() -> StaticBody3D:
 	for x: float in [x0, -1.0, x1]:
 		for z: float in [zn, zs]:
 			StiltKit.post(body, Vector2(x, z), f - StiltKit.FLOOR_THICKNESS, plate)
-	# Arrival deck under its pent, the gangway's posts rope-bound.
-	var pent_high := plate - 0.2
-	for p: Vector2 in [Vector2(-7.0, -3.4), Vector2(-7.0, 0.4), Vector2(-7.0, 3.4)]:
-		StiltKit.post(body, p, f - StiltKit.FLOOR_THICKNESS, pent_high - 2.5 * tan(StiltRoofs.PENT_PITCH) - 0.05, StiltKit.TIMBER, p.y > 0.0 and p.y < 1.0)
-	StiltRoofs.pent(body, Rect2(-7.3, -3.6, 2.8, 7.2), pent_high + StiltRoofs.THICKNESS / cos(StiltRoofs.PENT_PITCH), Vector3(-1, 0, 0), StiltKit.SHINGLE)
+	# The gable runs on over the arrival deck to open posts at its west end (a
+	# pent here could not clear 2.4 m without cutting the gable's eave corners).
+	# The gangway comes in diagonally across the deck's south-west, so the posts
+	# stand north of its way and a rope-bound mooring post marks the landing.
+	var roof_x0 := -7.0
+	for z: float in [zn, -0.4]:
+		StiltKit.post(body, Vector2(roof_x0, z), f - StiltKit.FLOOR_THICKNESS, plate)
+	StiltKit.post(body, Vector2(-6.8, 3.3), f - StiltKit.FLOOR_THICKNESS, f + 0.9, StiltKit.TIMBER_DARK, false)
+	StiltKit.rope_binding(body, Vector2(-6.8, 3.3), f + 0.3, f + 0.8)
+	for z: float in [zn, zs]:
+		StiltKit.beam(body, Vector2(roof_x0, z), Vector2(x0, z), plate - 0.1, Vector2(0.12, 0.1))
+	StiltKit.beam(body, Vector2(roof_x0, zn), Vector2(roof_x0, zs), plate - 0.1, Vector2(0.12, 0.1))
 	var roof := StaticBody3D.new()
 	roof.name = "ValeRoof"
-	roof.position = Vector3((x0 + x1) * 0.5, 0.0, (zn + zs) * 0.5)
+	roof.position = Vector3((roof_x0 + x1) * 0.5, 0.0, (zn + zs) * 0.5)
 	body.add_child(roof)
-	StiltRoofs.gable(roof, Vector2((x1 - x0) * 0.5, (zs - zn) * 0.5), plate, StiltKit.SHINGLE.darkened(0.06), coral)
+	StiltRoofs.gable(roof, Vector2((x1 - roof_x0) * 0.5, (zs - zn) * 0.5), plate, StiltKit.SHINGLE.darkened(0.06), coral)
 	var rise := tan(StiltRoofs.PITCH)
 	var half_d := (zs - zn) * 0.5
 	var peak := half_d * rise + StiltRoofs.PLATE - StiltRoofs.THICKNESS - 0.02
-	for x: float in [x0 - roof.position.x, x1 - roof.position.x]:
+	for x: float in [roof_x0 - roof.position.x, x1 - roof.position.x]:
 		TownProps._build_panel_facade(roof, half_d * 2.0, Vector3(x, plate, 0.0), -PI * 0.5, coral.darkened(0.1), [], plate, peak + 0.1, TownProps.WALL_THICKNESS, [{"a": peak, "b": rise}, {"a": peak, "b": -rise}])
 
 	_vale_interior(body, f, coral)

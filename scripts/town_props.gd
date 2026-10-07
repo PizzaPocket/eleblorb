@@ -904,7 +904,8 @@ static func _build_door_leaves(
 	door.configure(
 		half_w, height, leaves, color,
 		bool(options.get("initially_open", true)), bool(options.get("locked", false)),
-		str(options.get("required_key", "")), str(options.get("lock_id", ""))
+		str(options.get("required_key", "")), str(options.get("lock_id", "")),
+		bool(options.get("hinge_right", false))
 	)
 
 

@@ -226,15 +226,24 @@ func _build_open_inn_shell(roof_color: Color,wood_color: Color) -> StaticBody3D:
 ## no writing, so it remains readable in every kingdom and language. The sign
 ## hangs beside the known local -Z entrance rather than covering the doorway.
 func _build_inn_sign(accent_color: Color, wall_color: Color) -> void:
-	var sign := StaticBody3D.new()
-	sign.name = "InnBedAndMoonSign"
-	sign.collision_layer = 1
 	# Right side of the five-cell-wide south facade, projected far enough past
 	# the wall to read in profile as a hanging place-of-business sign.
 	# Hung beside the door on the left, between it and the common-room window.
-	var sign_x:=-2.7 if _is_lodge else _half_width-1.7
-	var sign_z:=-_half_depth-0.68
-	var bracket_position := Vector3(sign_x,2.42,-_half_depth-0.15)
+	var sign := build_bed_and_moon_sign(accent_color, wall_color)
+	sign.position = Vector3(-2.7 if _is_lodge else _half_width - 1.7, 0.0, -_half_depth)
+	add_child(sign)
+
+
+## The sign itself, shared by every rest point (inns, guest houses, the fishing
+## village's houseboat). Its frame: the wall face it hangs from is local z = 0,
+## the bracket projects toward -Z at 2.42 m, the plaque hangs below its end.
+static func build_bed_and_moon_sign(accent_color: Color, wall_color: Color) -> StaticBody3D:
+	var sign := StaticBody3D.new()
+	sign.name = "InnBedAndMoonSign"
+	sign.collision_layer = 1
+	var sign_x := 0.0
+	var sign_z := -0.68
+	var bracket_position := Vector3(sign_x,2.42,-0.15)
 	var bracket := SuperEgg.build_part(Vector3(0.62,0.055,0.055),wall_color.darkened(0.35),SuperEgg.EPSILON_FLAT,SuperEgg.EPSILON_FLAT)
 	bracket.position = bracket_position+Vector3(0.0,0.0,-0.52)
 	bracket.rotation.y = PI*0.5
@@ -297,7 +306,7 @@ func _build_inn_sign(accent_color: Color, wall_color: Color) -> void:
 	moon.position = plaque_position + Vector3(0.0, 0.25, -0.13)
 	sign.add_child(moon)
 	CollisionPolicy.mark_decorative(moon)
-	add_child(sign)
+	return sign
 
 
 ## A round moon with a smaller offset circle actually subtracted from its
@@ -406,7 +415,10 @@ func _build_ohio_ground_plan(color: Color) -> void:
 	# office and kitchen they serve, never into the common room.
 	TownProps.build_interior_wall(walls,Vector2(9.52,GALLERY_Z),Vector2(-9.52,GALLERY_Z),0.0,[5.52,10.52,15.52],color)
 	# Larder passage and washroom (west), office (middle), kitchen (east).
-	TownProps.build_interior_wall(walls,Vector2(-9.52,5.9),Vector2(OFFICE_WALL_X,5.9),0.0,[4.92],color)
+	# Drawn east to west so the washroom door swings into the washroom, hinged on
+	# its east jamb, folding away from the toilet. It used to swing out into the
+	# 2.3 m larder passage against the larder door's leaf, a zigzag to get past.
+	TownProps.build_interior_wall(walls,Vector2(OFFICE_WALL_X,5.9),Vector2(-9.52,5.9),0.0,[OFFICE_WALL_X+4.6],color)
 	TownProps.build_interior_wall(walls,Vector2(OFFICE_WALL_X,GALLERY_Z),Vector2(OFFICE_WALL_X,7.92),0.0,[],color)
 	TownProps.build_interior_wall(walls,Vector2(KITCHEN_WALL_X,GALLERY_Z),Vector2(KITCHEN_WALL_X,7.92),0.0,[1.8],color)
 	add_child(walls)

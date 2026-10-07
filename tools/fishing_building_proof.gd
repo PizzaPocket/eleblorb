@@ -74,6 +74,7 @@ func _audit(body: StaticBody3D, anchor: Vector2) -> void:
 		_fail(problem)
 	for problem in ClearZones.audit_stacking(self):
 		_fail(problem)
+	_audit_headroom(body)
 	var piles := 0
 	for node in body.find_children("*", "MeshInstance3D", true, false):
 		var mesh := node as MeshInstance3D
@@ -105,6 +106,35 @@ func _audit(body: StaticBody3D, anchor: Vector2) -> void:
 			_fail("rock rises to W%+.2f at plan (%.1f, %.1f), into %s (beams at W%+.2f)" % [worst, worst_at.x, worst_at.y, _building, underside])
 		else:
 			print("ok   rock clearance: highest ground under %s is W%+.2f at (%.1f, %.1f)" % [_building, worst, worst_at.x, worst_at.y])
+
+
+## Headroom along every walking lane: nothing solid within StiltKit.MIN_HEADROOM
+## above the floor (eaves, beams, roofs, lamps' brackets). The walkthrough found
+## eaves "barely above the player's head"; this keeps them clear.
+func _audit_headroom(body: StaticBody3D) -> void:
+	var space := get_world_3d().direct_space_state
+	var worst := INF
+	for node in [body] + body.find_children("*", "Node3D", true, false):
+		var holder := node as Node3D
+		for lane: Dictionary in holder.get_meta(ClearZones.LANES_META, []):
+			var points: Array = lane["points"]
+			for i in points.size() - 1:
+				var a: Vector3 = points[i]
+				var b: Vector3 = points[i + 1]
+				var steps := maxi(int(a.distance_to(b) / 0.3), 1)
+				for k in steps + 1:
+					var at := holder.global_transform * a.lerp(b, float(k) / float(steps))
+					var query := PhysicsRayQueryParameters3D.create(at + Vector3.UP * 0.05, at + Vector3.UP * 3.5)
+					query.collision_mask = 1
+					var hit := space.intersect_ray(query)
+					if hit.is_empty():
+						continue
+					var clear := float(hit["position"].y) - at.y
+					worst = minf(worst, clear)
+					if clear < StiltKit.MIN_HEADROOM:
+						_fail("headroom %.2f m over '%s' at (%.1f, %.1f) under %s" % [clear, lane["label"], at.x, at.z, (hit["collider"] as Node).name])
+						return
+	print("ok   headroom: lowest clearance over any route %.2f m" % worst)
 
 
 ## The stand-in lake, light and sky, and the arrival landing for scale.

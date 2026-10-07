@@ -11,7 +11,9 @@ const PITCH := deg_to_rad(32.0)
 const PENT_PITCH := deg_to_rad(16.0)
 const EAVE := 0.9
 const GABLE_OVERHANG := 0.6
-const THICKNESS := 0.12
+## Ohio's slab thickness: thick enough that the SuperEgg's squarish shoulder
+## reads at the eave as a soft roll, not a cardboard edge.
+const THICKNESS := TownProps.ROOF_THICKNESS
 ## The roof sits this far above the wall plate.
 const PLATE := 0.12
 const MARGIN := 0.8
@@ -106,7 +108,9 @@ static func gable(body: StaticBody3D, half: Vector2, wall_top: float, color: Col
 
 ## A single sloping pent roof, falling toward the horizontal unit direction `fall`,
 ## over the rectangle `rect` (plan, in the body's frame). `high_y` is the height of
-## its high edge's top surface.
+## its high edge's top surface. The slab runs past its high edge and is cut there
+## by the vertical plane of the wall it leans on, so it meets the wall flush (the
+## Ohio construction); the eave and sides keep the SuperEgg's soft shoulder.
 static func pent(body: StaticBody3D, rect: Rect2, high_y: float, fall: Vector3, color: Color) -> void:
 	var c := cos(PENT_PITCH)
 	var s := sin(PENT_PITCH)
@@ -120,8 +124,13 @@ static func pent(body: StaticBody3D, rect: Rect2, high_y: float, fall: Vector3, 
 	var drop := along_fall * tan(PENT_PITCH)
 	var mid := Vector3(centre_xz.x, high_y - drop * 0.5, centre_xz.y)
 	var centre := mid - n * THICKNESS * 0.5
-	var slab := TownProps.roof_slab(Vector3(across * 0.5 + 0.1, THICKNESS * 0.5, length * 0.5), color)
-	slab.transform = Transform3D(basis, centre)
+	var extension := TownProps.ROOF_CUT_EXTENSION
+	var origin := centre - u * (extension * 0.5)
+	var wall_point := Vector3(centre_xz.x, high_y, centre_xz.y) - fall * (along_fall * 0.5)
+	var wall_plane := Plane(-fall, (-fall).dot(wall_point))
+	var planes: Array[Plane] = [Transform3D(basis, origin).affine_inverse() * wall_plane]
+	var slab := TownProps.roof_slab(Vector3(across * 0.5 + 0.1, THICKNESS * 0.5, length * 0.5 + extension * 0.5), color, planes)
+	slab.transform = Transform3D(basis, origin)
 	body.add_child(slab)
 	# The collider shares the slab's underside (a thicker box centred on it would
 	# hang below the visible roof and steal headroom on the veranda beneath).

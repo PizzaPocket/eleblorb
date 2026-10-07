@@ -8,11 +8,11 @@ extends Node
 ##   Godot --headless --path . tools/fishing_islet_probe.tscn
 
 const PROBES := {
-	"Anvil crown": [Vector2(-4, -30), 34.0],
+	"Anvil crown": [Vector2(-4, -31), 21.0, 80.0, 2.0],
 	"Anvil south shelf": [Vector2(-10, 0), -3.2],
 	"Anvil arrival foot": [Vector2(-38, -6), -3.2],
 	"Anvil east shelf end": [Vector2(14, -2), -3.2],
-	"Heron crown": [Vector2(30, 10), 21.0],
+	"Heron crown": [Vector2(30.5, 10.5), 13.0, 80.0, 2.0],
 	"Heron shelf (north, off the Vale houseboat)": [Vector2(28, -2), -3.2],
 	"Heron shelf (catch deck)": [Vector2(42, 10), -3.2],
 	"Heron shelf (portal landing)": [Vector2(30, 22), -3.2],
@@ -82,7 +82,9 @@ func _ready() -> void:
 			print("%s %s: hit at W%+.2f (expected the deep lake bed)" % ["ok  " if ok else "FAIL", name, rel])
 			_failures += 0 if ok else 1
 		else:
-			var ok := absf(rel - float(expected)) < 1.0
+			# A fourth value widens the tolerance (the crowns' tops are noisy).
+			var tolerance: float = float(PROBES[name][3]) if PROBES[name].size() > 3 else 1.0
+			var ok := absf(rel - float(expected)) < tolerance
 			print("%s %s: hit at W%+.2f (expected W%+.1f)" % ["ok  " if ok else "FAIL", name, rel, expected])
 			_failures += 0 if ok else 1
 	for body_name in ["FishingIslets", "Piles", "VennHouse"]:
@@ -131,5 +133,35 @@ func _ready() -> void:
 	if not vendor_found:
 		print("FAIL Nara Venn, the lake vendor, is not in the world")
 		_failures += 1
+	# Every boat's hull must sit clear of every deck, ramp, pile and building.
+	var village := world.find_child("FloatingWaterVillage", true, false) as Node3D
+	for boat in FishingVillagePlan.BOATS:
+		var node := village.get_node_or_null(str(boat["name"])) as Node3D if village != null else null
+		if node == null:
+			print("FAIL boat %s is missing" % boat["name"])
+			_failures += 1
+			continue
+		var box := AABB()
+		var first := true
+		for mesh in node.find_children("*", "MeshInstance3D", true, false):
+			var m := mesh as MeshInstance3D
+			var b: AABB = m.global_transform * m.mesh.get_aabb()
+			box = b if first else box.merge(b)
+			first = false
+		var shape := BoxShape3D.new()
+		shape.size = (box.size - Vector3(0.1, 0.1, 0.1)).max(Vector3(0.05, 0.05, 0.05))
+		var query := PhysicsShapeQueryParameters3D.new()
+		query.shape = shape
+		query.transform = Transform3D(Basis(), box.get_center())
+		query.collision_mask = 1
+		var hits := space.intersect_shape(query, 4)
+		if hits.is_empty():
+			print("ok   boat %s sits clear" % boat["name"])
+		else:
+			var names: Array[String] = []
+			for hit in hits:
+				names.append(str((hit["collider"] as Node).name))
+			print("FAIL boat %s clips %s" % [boat["name"], ", ".join(names)])
+			_failures += 1
 	print("---- fishing_islet_probe: %d FAIL" % _failures)
 	get_tree().quit(1 if _failures > 0 else 0)
