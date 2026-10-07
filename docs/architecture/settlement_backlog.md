@@ -84,6 +84,24 @@ vestibules and gable-end chimney masses. Houses are not cell grids with capped
 log fragments. Snow banks, windbreak pines, wood stacks and hardy service plots
 follow climate and work rather than filling empty space.
 
+## 2a. Snow Village: drifts inside buildings (found 2026-10-07)
+
+A walkthrough found a snow drift inside a Snowrest Inn guest room, through
+two beds. The cause:
+- `_bank_blocked()` in `scripts/ice_kingdom_village.gd` skips every solid of
+  kind "building", so no bank is ever tested against a building, including
+  the attached inn wing.
+- `_build_snow_banks()` places drifts off the nominal `cells` box, which omits
+  wings, lean-tos and vestibules.
+
+Fix:
+1. Test each bank against every building envelope except the one wall it is
+   placed against, using real extents: wings by `attached_to`, `lean_to`
+   depth, `vestibule`, `gallery`.
+2. Add a validator check that fails any decorative dressing (banks, mounds,
+   planting) whose bounds enter a building envelope or interior.
+3. Walk every interior once more.
+
 ## 3. Crossroads Fishing Village
 
 **Current status (2026-10-06).** The plan, islets and circulation are built

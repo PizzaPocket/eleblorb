@@ -134,6 +134,11 @@ the whole world is a final integration check, not the default inspection tool.
 - **Every walkthrough finding becomes a check.** Headroom, rock in a
   footprint, hull clearance and resident grounding were each found by eye, then
   added to the proof or world probe so they cannot return.
+- **Dressing obeys footprints.** Snow banks, drifts, rocks and planting are
+  checked against every building's real envelope (wings, lean-tos, vestibules,
+  galleries included) even though they carry no collision. A Snow Village drift
+  stood inside an inn guest room because its placement check skipped all
+  buildings.
 - **Look early.** Render the settlement from the air (`tools/village_aerial_capture`,
   a target per settlement) before detailing. The aerial renders showed the
   islets needed a full landscaping pass.

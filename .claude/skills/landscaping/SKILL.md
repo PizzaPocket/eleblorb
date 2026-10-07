@@ -106,7 +106,38 @@ per scene.
 - Ground paint (worn paths, wear patches) is a decal; use it for worn earth around gates and doors.
 - No text, no instruction.
 
-## 4a. Lessons from the fishing village islets (2026-10-07)
+## 4a. Ground dressing never enters a building (Snow Village, 2026-10-07)
+
+A walkthrough found a snow drift inside a Snowrest Inn guest room, clipping
+through two beds. The cause was in placement, not in sequence:
+- **The banks ignored every building.** `_bank_blocked()` in
+  `ice_kingdom_village.gd` skips all solids of kind "building" (meant to skip
+  the bank's own house). So a drift placed 1.3 m off one wall could land
+  inside the attached inn wing, or a neighbour.
+- **The banks used the nominal box.** They were placed from the building's
+  `cells` rectangle, which omits attached wings, lean-tos, vestibules and
+  galleries.
+- **Decorative props escaped every audit.** Drifts have no collision, so the
+  clearance audit, which checks solids and furniture, never saw them.
+
+The rules:
+- **Place dressing against the built envelope.** Every drift, bank, mound,
+  rock cluster, planting bed or tree is placed against the real envelope of
+  every structure: its walls, attached wings, lean-tos, vestibules, galleries,
+  stairs, steps and eaves. Never use a nominal box.
+- **Test everything except the one wall it hugs.** Exclude only the wall a
+  piece is placed against.
+- **Decorative is not exempt from clipping.** A piece with no collision still
+  must not overlap a building, a door clear zone, a route or a furniture
+  zone.
+- **Derive dressing from the same plan data as the buildings,** in the same
+  build, never from stored positions. When a building changes, its dressing
+  moves with it.
+- **The validator fails any dressing mesh whose bounds enter a building
+  envelope or interior.** Check from inside every room at eye level as well
+  as from the air.
+
+## 4b. Lessons from the fishing village islets (2026-10-07)
 
 - **Model a real landform, not a generic rock.** The first islets were uniform
   grey stacks of vertical flutes, and one tall flat-crowned stack read as a
