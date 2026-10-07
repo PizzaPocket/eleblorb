@@ -378,8 +378,9 @@ this is a deliberate fusion.
 
      Render the portal from the mine road before placing it.
 
-  A cheaper fallback: only the timbered portal and 5 m of tunnel, ending at a
-  barred gate, built the same way.
+  **Decided (user, 2026-10-07):** build the full 20 m tunnel first and judge
+  how it feels in play. (The fallback of a portal and 5 m of tunnel ending at
+  a barred gate stays in reserve.)
 - **The water tower and windmill pump** over the existing well, which stays
   where it is.
 - **Hitching rails** outside the saloon, the store and the jail.

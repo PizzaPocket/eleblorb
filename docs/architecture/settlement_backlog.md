@@ -608,7 +608,15 @@ concept.
     world's Ground portal so the demo keeps the full bike;
   - any riding through one shared `TraversalMode` for every character;
   - the inn's fixture from `earth_closet` to `porcelain`;
-  - the desert planting and wind-blown tumbleweeds.
+  - the desert planting and wind-blown tumbleweeds;
+  - **the Silverback mine** (approved 2026-10-07; see `rock_ground_town.md`,
+    "How to build it with this terrain"). A rock bluff set into the canyon
+    wall, and a 20 m `SolidModel` Boolean tunnel, 3 × 3 m with a bend, on
+    the ground layer, with timber sets every 2 m, rails, cable lamps and a
+    working face. The heightfield is excluded under the bluff. Prove it in
+    isolation: floor heights, 2.4 m headroom, no terrain inside, rails clear
+    of the walking line. Then render the portal and walk it to judge the
+    feel.
 - **Manchego's sizes and the saddle** (user direction, 2026-10-06):
   - Ossian Redbrow moves from the ape rig to the `JungleVillager` stuffed-monkey
     rig.
