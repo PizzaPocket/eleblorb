@@ -246,6 +246,16 @@ func _check_oren(space: PhysicsDirectSpaceState3D) -> void:
 	var roof_hit := _ray(space, to_world * Vector3(-3.0, 12.0, 0.0), to_world * Vector3(-3.0, 6.0, 0.0), [])
 	if roof_hit.is_empty() or absf(float(roof_hit["position"].y) - datum - up - FireCalderaOren.roof_top()) > 0.06:
 		_fail("OREN: the roof terrace is not a floor at its roof's top")
+	# Renewal: every canopy support stands on the quay's deck, not over lava.
+	if _renewal != null:
+		var deck: StaticBody3D = _plinths["RENEWAL"]
+		for side: float in [-1.0, 1.0]:
+			for i in FireCalderaRenewal.RIBS:
+				var z := lerpf(FireCalderaRenewal.BACK_Z, FireCalderaRenewal.FRONT_Z, float(i) / float(FireCalderaRenewal.RIBS - 1))
+				var foot := _renewal.global_transform * Vector3(side * (FireCalderaRenewal.SPAN * 0.5 + 0.4), 0.0, z)
+				var below := _ray(space, foot + Vector3(0, 0.1, 0), foot - Vector3(0, 0.5, 0), _building_rids())
+				if below.is_empty() or below["collider"] != deck:
+					_fail("RENEWAL: a canopy support at z %.1f has no deck under its foot" % z)
 	if _oren.get_node_or_null("Lift") == null:
 		_fail("OREN: no lift to the terrace")
 	print("ok   OREN: doors clear at their floors, split levels and ramps meet the height query")

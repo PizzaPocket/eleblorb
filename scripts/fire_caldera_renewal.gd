@@ -26,7 +26,12 @@ const SPAN := 17.0
 const CROWN := 6.2
 const SPRING := 3.0
 const BACK_Z := -0.6
-const FRONT_Z := 7.6
+## Every support's foot bears on the quay's deck: the front rib stands back
+## from the deck's rounded corners, whose walls run down through the lava.
+const FRONT_Z := 6.2
+## Cast forsterite, the refractory made from olivine (melts near 1900 C):
+## anything in the lava, and the shoes that part iron from hot stone.
+const FORSTERITE := Color(0.70, 0.72, 0.62)
 ## The lava pool cut into the terrace (the plan names it as a pit).
 const GLASS_Z := Vector2(1.3, 4.0)
 const STEPS := 9
@@ -85,7 +90,7 @@ static func _tiers(body: StaticBody3D) -> void:
 
 ## The pool: a slab of thick cast glass over its back half, level with the
 ## terrace, so the lava glows underfoot; from the glass's front edge a broad
-## basalt stair descends step by step into the lava.
+## stair of cast forsterite descends step by step into the lava.
 static func _pool(body: StaticBody3D) -> void:
 	var pit: Dictionary = (FireCalderaPlan.plot("RENEWAL")["pits"] as Array)[0]
 	var half: Vector2 = pit["half"]
@@ -107,7 +112,8 @@ static func _pool(body: StaticBody3D) -> void:
 		var top := -0.3 * float(i + 1)
 		var z := GLASS_Z.y + 0.42 * (float(i) + 0.5)
 		var h := depth + top
-		var step := CalderaFurniture.piece(body, Vector3(2.4, h * 0.5, 0.21), TIER.darkened(0.1), Vector3(0.0, -depth + h * 0.5, z), 0.0, true, 7.0)
+		# In the lava: cast forsterite, which the lava cannot melt.
+		var step := CalderaFurniture.piece(body, Vector3(2.4, h * 0.5, 0.21), FORSTERITE.darkened(0.05 * float(i % 2)), Vector3(0.0, -depth + h * 0.5, z), 0.0, true, 7.0)
 		step.name = "ImmersionStep"
 	# The lava in the pool, level with the reservoir it opens onto.
 	var lava_y := FireCalderaGround.LAVA_Y - body.position.y
@@ -182,7 +188,10 @@ static func _supports(body: StaticBody3D) -> void:
 		for i in RIBS:
 			var z := lerpf(BACK_Z, FRONT_Z, float(i) / float(RIBS - 1))
 			var x := side * SPAN * 0.5
-			var foot := Vector3(x + side * 0.4, 0.0, z)
+			var foot := Vector3(x + side * 0.4, 0.42, z)
+			# A forsterite shoe under the iron: the forged supports never touch
+			# lava, and stand off the hot deck on refractory.
+			CalderaFurniture.piece(body, Vector3(0.26, 0.21, 0.26), FORSTERITE, Vector3(foot.x, 0.21, z), 0.0, true, 5.0)
 			var fork := Vector3(x + side * 0.15, SPRING - 1.0, z)
 			FireCalderaNahl._branch(body, foot, fork, 0.08)
 			FireCalderaNahl._branch(body, fork, Vector3(x, SPRING, z), 0.06)

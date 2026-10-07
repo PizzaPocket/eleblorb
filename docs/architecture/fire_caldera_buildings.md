@@ -37,6 +37,7 @@ unchanged. These are its invariants in buildable terms.
 | Headroom | every canopy, bridge roof, gallery or upper floor a route passes under clears 2.4 m; public halls are taller by program, not by accident |
 | Vertical circulation | ramps, never stairs: 32 degrees at most, 1.4 m wide (2.0 m on public routes), a 1.2 m landing at foot and head; one storey of 3.5 m needs about 5.6 m of run, so about 8 m with landings. Every upper floor names its ramp or lift in its brief |
 | Furniture and textiles | **no wood anywhere**: a lava person would burn it by touching it (`CalderaFurniture`). Cast basalt and stone, blued and stainless steel, glass. Textiles follow real heat-proof cloth: basalt fibre (bronze-gold, used for fire blankets) for guest bedding and mats, silica cloth (to about 1000 °C) for mattresses and anything a lava person touches, mineral-coated glass-fibre cloth for coloured upholstery, ceramic fibre (about 1260 °C) for the hottest work, stainless mesh for drapery; never asbestos or aramid |
+| Against lava | nothing of steel or iron touches lava; whatever stands in it is cast forsterite (the olivine refractory); metal that stands near it bears on refractory shoes |
 | Collision | shells, plinths, terraces, rails, bridges, counters and instruments solid; molten wells and floors use the hazard and liquid API; sparks and seams decorative |
 
 ### A culture of original buildings (2026-10-07)
@@ -295,6 +296,13 @@ shelf.
   Basalt tiers flank the pool on both sides, rising away from it and facing
   in, under the canopy. Behind the promenade, the arc of seven cast-basalt
   memory stones and the veiled glass windbreaks.
+- **Materials against lava (2026-10-08):** forged steel and iron never touch
+  lava (steel keeps its form at lava heat but loses its strength and scales
+  away): every canopy support stands on the quay's deck, back from its rounded
+  corners, on a cast **forsterite** shoe (the olivine refractory, melting near
+  1900 C) that parts the iron from the hot stone. Whatever sits in the lava,
+  the immersion stair here, is forsterite too; basalt melts at about lava
+  temperature.
 
 ## 4. Exchange and craft
 
