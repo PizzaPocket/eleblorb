@@ -122,7 +122,7 @@ func _check() -> void:
 		# The front landing meets the floor.
 		var landing := FireCalderaPlan.front_point(entry) + FireCalderaPlan.facing(entry) * 2.0
 		var at_landing := FireCalderaGround.height(landing)
-		if absf(at_landing - datum) > 0.15:
+		if absf(at_landing - datum) > 0.15 and not bool(entry.get("quay", false)):
 			_fail("%s: the front landing is %.2f m off the floor" % [id, at_landing - datum])
 		print("ok   %s: %s, datum %.2f, %d uphill wall pieces" % [id, line["foundation"], datum, walled])
 	_check_shell(space)
@@ -415,10 +415,10 @@ func _render() -> void:
 		get_viewport().get_texture().get_image().save_png("%s/%s.png" % [_shots, name])
 		print("saved %s/%s.png" % [_shots, name])
 	var renewal := {
-		"renewal_front": [Vector3(0.0, 1.7, 14.0), Vector3(0.0, 3.0, -2.0)],
-		"renewal_under": [Vector3(-5.0, 1.35 + 1.6, -4.4), Vector3(4.0, 2.5, 3.0)],
-		"renewal_aerial": [Vector3(14.0, 14.0, 16.0), Vector3(0.0, 2.0, -1.0)],
-		"renewal_stones": [Vector3(-1.0, 1.6, 7.5), Vector3(-5.0, 1.0, 4.0)],
+		"renewal_promenade": [Vector3(-12.0, 1.7, -2.8), Vector3(0.0, 1.0, 3.0)],
+		"renewal_glass": [Vector3(0.0, 1.7, 0.2), Vector3(0.0, -1.8, 6.5)],
+		"renewal_aerial": [Vector3(16.0, 15.0, -14.0), Vector3(0.0, 0.0, 3.0)],
+		"renewal_from_lava": [Vector3(0.0, 1.0, 22.0), Vector3(0.0, 1.0, 0.0)],
 	}
 	for name: String in renewal:
 		var pose: Array = renewal[name]

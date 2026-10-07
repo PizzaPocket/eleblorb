@@ -51,13 +51,17 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary, size_key:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var middle := Vector3(centre.x, top, centre.y)
+	var pits := FireCalderaPlan.pit_outlines(entry)
 	for r in loops.size() - 1:
 		var lower: PackedVector3Array = loops[r]
 		var upper: PackedVector3Array = loops[r + 1]
 		for i in SEGMENTS:
 			var j := (i + 1) % SEGMENTS
+			# Where a pit runs out past the plinth's edge (a quay's pool open
+			# to the reservoir) its side stays open.
+			if _in_pit(Vector2(lower[i].x + lower[j].x, lower[i].z + lower[j].z) * 0.5, pits) or _in_pit(Vector2(upper[i].x + upper[j].x, upper[i].z + upper[j].z) * 0.5, pits):
+				continue
 			_quad(st, lower[i], lower[j], upper[j], upper[i], middle, colours[r + 1])
-	var pits := FireCalderaPlan.pit_outlines(entry)
 	var faces := PackedVector3Array()
 	# The top course's finish: basalt, or the plot's own floor (a pale sinter
 	# for a house of care).
@@ -150,6 +154,8 @@ static func _pitted_top(st: SurfaceTool, cap: PackedVector3Array, top: float, pi
 	# The top course's outer band, for collision only (the mesh has its rings).
 	for i in cap.size():
 		var j := (i + 1) % cap.size()
+		if _in_pit(Vector2(cap[i].x + cap[j].x, cap[i].z + cap[j].z) * 0.5, pits):
+			continue
 		var low_i := Vector3(cap[i].x, top - deepest - 0.05, cap[i].z)
 		var low_j := Vector3(cap[j].x, top - deepest - 0.05, cap[j].z)
 		faces.append_array([cap[i], cap[j], low_j, cap[i], low_j, low_i])
@@ -181,6 +187,13 @@ static func _face(st: SurfaceTool, faces: PackedVector3Array, a: Vector3, b: Vec
 ## the ground hidden under it.
 static func sink(entry: Dictionary) -> float:
 	return _deepest(FireCalderaPlan.pit_outlines(entry))
+
+
+static func _in_pit(point: Vector2, pits: Array[Dictionary]) -> bool:
+	for pit in pits:
+		if Geometry2D.is_point_in_polygon(point, pit["outline"]):
+			return true
+	return false
 
 
 static func _deepest(pits: Array[Dictionary]) -> float:

@@ -121,6 +121,10 @@ static func survey(entry: Dictionary) -> Dictionary:
 	# The floor meets its public threshold flush: the datum is the ground at
 	# the front landing (where the promenade arrives), not the plot's average.
 	var datum: float = samples["front landing"]
+	# A terrace that stands out over the reservoir takes its floor from the
+	# route that crosses it (a point in its own frame), not from the lava.
+	if entry.has("datum_at"):
+		datum = height(FireCalderaPlan.shell_to_plan(entry, entry["datum_at"]))
 	var change := high - low
 	var kind := "socket plinth" if change <= SOCKET_MAX else ("stepped podium" if change <= PODIUM_MAX else "bedrock spine")
 	return {

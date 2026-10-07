@@ -139,8 +139,14 @@ const PLOTS: Array[Dictionary] = [
 		"on_promenade": false},
 	{"id": "ARO", "centre": Vector2(-39.4, 27.0), "footprint": Vector2(17.0, 13.0), "reserved": Vector2(22.0, 18.0),
 		"household": "Aro", "program": "thermal works and household; public door on the terrace loop, service descent to the manifold", "occupied": true},
-	{"id": "RENEWAL", "centre": Vector2(-48.0, -4.5), "footprint": Vector2(18.0, 14.0), "reserved": Vector2(23.0, 19.0),
-		"household": "", "program": "tempering and gathering terrace above the submerged communal chamber", "occupied": false},
+	{"id": "RENEWAL", "centre": Vector2(-33.35, -3.13), "footprint": Vector2(18.0, 14.0), "reserved": Vector2(23.0, 19.0),
+		"household": "", "program": "tempering and gathering terrace above the submerged communal chamber", "occupied": false,
+		# Revised 2026-10-08: moved onto the bank so its front stands out over
+		# the reservoir. The promenade crosses its back as public ground, and its
+		# floor is level with the promenade there (in its own frame, +Z to the
+		# lava); a lava pool is cut into its front, open to the reservoir.
+		"crossed": true, "quay": true, "datum_at": Vector2(0.0, -2.8),
+		"pits": [{"at": Vector2(0.0, 5.4), "half": Vector2(4.0, 3.9), "depth": 2.8, "exponent": 6.0}]},
 ]
 
 

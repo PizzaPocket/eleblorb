@@ -55,7 +55,8 @@ func _check_plots() -> void:
 	var plots := FireCalderaPlan.PLOTS
 	for i in plots.size():
 		var a := FireCalderaPlan.plot_polygon(plots[i])
-		if not Geometry2D.intersect_polygons(a, reservoir).is_empty():
+		# A quay (the Renewal terrace) stands out over the lava on purpose.
+		if not Geometry2D.intersect_polygons(a, reservoir).is_empty() and not bool(plots[i].get("quay", false)):
 			_fail("%s's reserved plot reaches into the reservoir" % plots[i]["id"])
 		for point in a:
 			if point.length() > FireCalderaPlan.FLOOR_RADIUS - 2.0:
@@ -81,7 +82,7 @@ func _check_routes() -> void:
 			# A route may end at a plot's edge; only its body counts.
 			var body := _lane(points[i], points[i + 1], half - 0.3)
 			for entry in FireCalderaPlan.PLOTS:
-				if bool(entry.get("open", false)):
+				if bool(entry.get("open", false)) or bool(entry.get("crossed", false)):
 					continue
 				var shrunk := _shrink(FireCalderaPlan.plot_polygon(entry), 0.4)
 				if not Geometry2D.intersect_polygons(body, shrunk).is_empty():
@@ -232,7 +233,8 @@ func _check_survey() -> void:
 		print("%-8s %-14s datum %6.2f  ground %6.2f..%6.2f (change %.2f, grade %.0f%%)  exposed %.2f  retaining %.2f  bottom %6.2f  service landing %6.2f" % [
 			line["id"], line["foundation"], line["datum"], line["low"], line["high"], line["change"], float(line["max_grade"]) * 100.0,
 			line["exposed"], line["retaining"], line["bottom"], line["service_landing"]])
-		if float(line["exposed"]) > FireCalderaGround.EXPOSED_MAX:
+		# A quay's exposed face is its wall rising out of the lava, by design.
+		if float(line["exposed"]) > FireCalderaGround.EXPOSED_MAX and not bool(entry.get("quay", false)):
 			_fail("%s would show %.1f m of blank foundation: step it, split it or move it" % [line["id"], line["exposed"]])
 		if float(line["datum"]) <= FireCalderaGround.LAVA_Y + 0.5:
 			_fail("%s's floor is at the lava" % line["id"])

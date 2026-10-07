@@ -278,17 +278,23 @@ shelf.
   inset panels, throwing coloured light on the seats.
 - **Links:** linked to Nahl and Aro along `R6` without passing through either
   home.
-- **As built (2026-10-07), its own idea: a catenary canopy of slumped glass.**
+- **As built, its own idea: a catenary canopy of slumped glass** (2026-10-07).
   The lava people hang molten glass over chains and let it settle into its
   own curve, so the roof is drawn by heat and gravity: forged iron ribs on the
-  same catenary (16 m span, 6.2 m crown) on branching supports, the panels
+  same catenary (17 m span, 6.2 m crown) on branching supports, the panels
   shading from teal at the springing through garnet to amber at the crown,
-  with coloured light under it. Three basalt tiers climb the uphill slope like
-  a small amphitheatre facing the reservoir, warm seams along their fronts;
-  an arc of seven cast-basalt memory stones with glowing seams at the west
-  front; windbreaks of fused glass with basalt veils behind the top tier;
-  flames in glass at the front corners. The immersion shelf itself is in the
-  reservoir's bank, across the promenade.
+  with coloured light under it.
+- **Revised 2026-10-08 (user: the terrace had no connection to the lava):**
+  the plot moved onto the bank as a **quay**, its front 5 to 6 m out over the
+  reservoir, its floor level with the promenade, which now crosses its back as
+  public ground (plan keys `quay`, `crossed`, `datum_at`). Cut into its front
+  is the **communal lava pool**, open to the reservoir so the lava runs in
+  beneath the terrace. **Cast glass** floors the pool's back half, so people
+  walk over the lava; from the glass a broad **immersion stair** descends step
+  by step into the lava, the gentlest way down to the renewal chamber `L0`.
+  Basalt tiers flank the pool on both sides, rising away from it and facing
+  in, under the canopy. Behind the promenade, the arc of seven cast-basalt
+  memory stones and the veiled glass windbreaks.
 
 ## 4. Exchange and craft
 
