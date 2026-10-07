@@ -80,7 +80,11 @@ static func make_body(parent: Node3D, entry: Dictionary, datum: float) -> Static
 ##   a bay of kind "open" leaves its wall to the building below the ring beam
 ##     (a shared wall), keeping the posts and any clerestory above;
 ##   a bay with "band": -1 is full-height stone with no stained band (a wall
-##     against retained ground); a door bay's "sill" raises its threshold.
+##     against retained ground); a door bay's "sill" raises its threshold;
+##   transom: false drops the guest house's signature (the transom bar, the
+##     stained band, the forked brackets and the transom cove): glass and
+##     stone run full height to the ring beam. The band belongs to the guest
+##     house; other buildings find their own use of coloured glass.
 ## Every door bay gets its clear zones; a wall left out of `walls` is not built.
 static func add_volume(body: StaticBody3D, spec: Dictionary) -> void:
 	var offset: Vector2 = spec.get("offset", Vector2.ZERO)
@@ -107,13 +111,13 @@ static func add_volume(body: StaticBody3D, spec: Dictionary) -> void:
 	}
 	for wall: String in runs:
 		if walls.has(wall):
-			_build_wall(body, offset, offset + runs[wall][0], runs[wall][1], walls[wall], stained, storey, head)
+			_build_wall(body, offset, offset + runs[wall][0], runs[wall][1], walls[wall], stained, storey, head, bool(spec.get("transom", true)))
 	_build_corners(body, offset, hx, hz, head)
 	if bool(spec.get("roof", true)):
 		_build_roof(body, offset, size, storey + clerestory, rake, spec.get("overhang", {}), spec.get("skylights", []), STAINLESS_SHADOW.darkened(0.16), deg_to_rad(float(spec.get("pitch", rad_to_deg(ROOF_PITCH)))))
 
 
-static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, along: Vector2, bays: Array, stained: Array, storey: float, head: Callable) -> void:
+static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, along: Vector2, bays: Array, stained: Array, storey: float, head: Callable, transom: bool = true) -> void:
 	var yaw := 0.0 if along.x != 0.0 else PI * 0.5
 	var outward := Vector2(-along.y, along.x)
 	if outward.dot(start + along - centre) < 0.0:
@@ -124,14 +128,15 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 		var width := to - from
 		var mid := start + along * (from + width * 0.5)
 		var kind := str(bay["kind"])
+		var banded := transom and int(bay.get("band", 0)) >= 0
+		var panel_top := TRANSOM if banded else storey
 		match kind:
 			"glass":
-				_pane(body, "GlassPanel", Vector3(mid.x, TRANSOM * 0.5, mid.y), Vector2(width * 0.5 - POST * 0.5, TRANSOM * 0.5 - 0.06), yaw, bay.get("tint", CLEAR_GLASS))
+				_pane(body, "GlassPanel", Vector3(mid.x, panel_top * 0.5, mid.y), Vector2(width * 0.5 - POST * 0.5, panel_top * 0.5 - 0.06), yaw, bay.get("tint", CLEAR_GLASS))
 				# Floor channel: a thin stainless shoe, the panel's only sill.
 				_metal(body, Vector3(mid.x, 0.04, mid.y), _oriented(Vector3(width, 0.08, 0.14), yaw), STAINLESS_SHADOW, false)
 			"stone":
-				var stone_top := storey if int(bay.get("band", 0)) < 0 else TRANSOM
-				_stone(body, Vector3(mid.x, stone_top * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, stone_top, WALL), yaw))
+				_stone(body, Vector3(mid.x, panel_top * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, panel_top, WALL), yaw))
 			"door":
 				# A stone panel to the transom with the door cut as a superellipse
 				# (square foot, rounded head), framed in stainless and hung with
@@ -143,10 +148,10 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 					_stone(body, Vector3(mid.x, sill * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, sill, WALL), yaw))
 					door_opening(body, Vector3(mid.x, sill, mid.y), yaw, width - POST * 0.5, storey - sill, WALL, float(bay.get("clear", 2.0)), float(bay.get("height", 2.3)), 1)
 				else:
-					door_opening(body, Vector3(mid.x, 0.0, mid.y), yaw, width - POST * 0.5, TRANSOM, WALL, DOOR_CLEAR, DOOR_HEIGHT, 2)
+					door_opening(body, Vector3(mid.x, 0.0, mid.y), yaw, width - POST * 0.5, panel_top, WALL, DOOR_CLEAR, DOOR_HEIGHT, 2)
 				var clear_half := (float(bay.get("clear", DOOR_CLEAR)) if sill > 0.0 else DOOR_CLEAR) * 0.5 + 0.15
 				ClearZones.add(body, str(bay.get("label", "front door")), "door", mid, outward, 1.25, 1.25, clear_half, sill + 0.05, sill + 1.95)
-		if kind != "open" and int(bay.get("band", 0)) >= 0:
+		if kind != "open" and banded:
 			# The stained band above every bay, alternating as each bay asks.
 			var colour: Color = stained[int(bay.get("band", 0)) % stained.size()]
 			_pane(body, "StainedBand", Vector3(mid.x, (TRANSOM + storey) * 0.5, mid.y), Vector2(width * 0.5 - POST * 0.5, (storey - TRANSOM) * 0.5 - 0.05), yaw, Color(colour, 0.72))
@@ -162,14 +167,15 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 		var edge := start + along * to
 		var top := float(head.call(edge))
 		_metal(body, Vector3(edge.x, top * 0.5, edge.y), Vector3(POST, top, POST), STEEL_BLUED, true)
-		if kind != "open" and int(bay.get("band", 0)) >= 0:
+		if kind != "open" and banded:
 			_fork(body, Vector3(edge.x, TRANSOM, edge.y), along)
 		from = to
 	# The transom bar and ring beam along the whole wall; a tall hall's second
 	# beam caps its clerestory.
 	var length := from
 	var middle := start + along * length * 0.5
-	_metal(body, Vector3(middle.x, TRANSOM, middle.y), _oriented(Vector3(length, 0.12, 0.16), yaw), STEEL_BLUED, false)
+	if transom:
+		_metal(body, Vector3(middle.x, TRANSOM, middle.y), _oriented(Vector3(length, 0.12, 0.16), yaw), STEEL_BLUED, false)
 	_metal(body, Vector3(middle.x, storey - 0.06, middle.y), _oriented(Vector3(length + POST, 0.16, 0.26), yaw), STAINLESS, false)
 	var end := start + along * length
 	var head_start := float(head.call(start))
@@ -180,6 +186,8 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 	# The cove: an LED line on the inner shoulder of the transom bar, hidden
 	# behind a stainless lip, washing up through the stained band and across
 	# the ceiling. The building's light comes from its structure, not fittings.
+	if not transom:
+		return
 	var inward := -outward
 	var lip := middle + inward * 0.15
 	_metal(body, Vector3(lip.x, TRANSOM + 0.07, lip.y), _oriented(Vector3(length - POST, 0.1, 0.02), yaw), STAINLESS, false)

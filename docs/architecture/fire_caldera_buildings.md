@@ -39,24 +39,48 @@ unchanged. These are its invariants in buildable terms.
 | Furniture and textiles | **no wood anywhere**: a lava person would burn it by touching it (`CalderaFurniture`). Cast basalt and stone, blued and stainless steel, glass. Textiles follow real heat-proof cloth: basalt fibre (bronze-gold, used for fire blankets) for guest bedding and mats, silica cloth (to about 1000 °C) for mattresses and anything a lava person touches, mineral-coated glass-fibre cloth for coloured upholstery, ceramic fibre (about 1260 °C) for the hottest work, stainless mesh for drapery; never asbestos or aramid |
 | Collision | shells, plinths, terraces, rails, bridges, counters and instruments solid; molten wells and floors use the hazard and liquid API; sparks and seams decorative |
 
-### Signature motif
+### A culture of original buildings (2026-10-07)
+
+The lava people treat every structure as a chance to express themselves.
+Their city holds together through its shared ground (the socket plinth, the
+superellipse door, the city's materials and crafts: cast basalt, steel and
+forged iron, poured and fused glass) and through their heat culture, not
+through a repeated motif. Each household and institution invents its own use
+of these, and a stranger should be able to tell who built what from a single
+facade. When designing a building here, look for an original idea grounded
+in its program and its makers' craft, drawing on the full range of modern
+coloured glass (cast glass bricks, dichroic fins, fused and slumped panels,
+graded and fritted glass, lenses, mosaics), and never copy another
+building's signature.
+
+### The guest house's signature
 
 **The forked post and the stained band** (restored 2026-10-07 from the first
-iteration, at the user's walkthrough). Every post meets the transom with a
-forged fork, two short branches like a vein of cooled lava splitting, and
-above the transom runs a two-tone stained band in the building's colours.
-The entry sculpture uses the same steel and the same two glass colours, so it
-belongs to the building. Full glass panels, never subdivided, fill the bays
-below. It appears on all ten plots.
+iteration, at the user's walkthrough) belong to the guest house alone. Every
+post meets the transom with a forged fork, two short branches like a vein of
+cooled lava splitting, and above the transom runs a two-tone stained band in
+its colours. The entry sculpture uses the same steel and the same two glass
+colours. Full glass panels, never subdivided, fill the bays below.
+`CalderaShell` builds it by default; other buildings pass `"transom": false`.
+
+### Oren's glass (2026-10-07)
+
+A gem dealer's front, made by pouring. The shop's front is a wall of
+hand-cast solid glass bricks (after MVRDV's Crystal Houses), each a little
+different, clear at eye level and deepening toward amethyst at the top like
+the colour zoning in a geode, teal over the assay room; larger cast blocks set
+into it are the display cells, each holding one lit stone. The home above
+looks out through clear glass behind vertical dichroic fins whose colour turns
+teal, violet and gold with the angle, like labradorite or opal.
 
 ### Families by program (2026-10-07)
 
 Buildings differ by what they are for, and the kit has two families:
 
-- **Commercial and public: the glass pavilion** (the guest house first). Sleek
-  and themed, inviting people to look in and out: full glass bays between
-  blued-steel posts, the forked post and two-tone stained band, a dark basalt
-  plinth, concealed LED light.
+- **Commercial and public: the glass pavilion** (the guest house, Oren).
+  Sleek, inviting people to look in and out: glass on a blued-steel frame, a
+  dark basalt plinth, concealed LED light; each building its own glass (the
+  guest house's stained band, Oren's cast bricks and dichroic fins).
 - **Care and restoration: the tuff house** (Nahl first). Soothing and light
   rather than sleek: thick walls of pale cream tuff with a few deep
   superellipse openings, floors of white hot-spring sinter, pumice caps and
@@ -414,6 +438,13 @@ landmark front facing the reservoir and the arrival view.
   rim, the reservoir wall and the deep vent, and a gallery round the dome.
 - **Glass:** cobalt, amber and teal: a landmark's three, the largest stained
   fields in the city across the council chamber's front.
+- **Terrarium (approved 2026-10-07):** a large glass shell, a SuperEgg dome
+  clipped flat at its base, holding a living tree with earth, rock and the
+  small plants found across the world, gathered from beyond the caldera and
+  kept in a sealed, climate-controlled atmosphere. Lava people cannot touch
+  wood or leaf without burning it, so this is how they enjoy them: a living
+  archive of the cool world for the school and the city. The shell was made
+  by the Vara studio. An ordinary tree, never the Tree of Life.
 - **Variation:** the only dome; the widest glass span; the only double-height
   public room.
 
