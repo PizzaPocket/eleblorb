@@ -56,8 +56,11 @@ reachable by everyone, and directly above the arrival.
 
 ### Structure
 
-- **Shape:** a rounded triangle about 30 m across, its three corners wrapping
-  the three trunks; about 350 m² of deck.
+- **Shape:** a rounded triangle wrapping the three trunks, its edge about 3 m
+  outside the line between them: about **520 m²** of deck. (Revised by the
+  building audit, 2026-10-07: the earlier 350 m² was smaller than the
+  triangle between the trunk centres, about 430 m², and could not hold the
+  amenities with their routes.)
 - **Support:** tie beams and vine cables to each trunk, cable stays from higher
   on the trunks, and six timber posts down to the ground placed outside the
   gate plaza's clear zone, so the gate and arrival stay open below with about

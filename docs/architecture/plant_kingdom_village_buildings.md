@@ -1,6 +1,8 @@
 # Plant Kingdom: Primate Village Architecture Briefs
 
-Status: building briefs approved (2026-10-06). Read with
+Status: building briefs approved (2026-10-06); audited 2026-10-07 against the
+architecture skill's brief audit (commons capacity, inn depth and plan, ring
+walkways, headroom, roof construction). Read with
 `plant_kingdom_village.md` (community and charter), `plant_kingdom_village_layout.md`
 (layout) and `plant_kingdom_landscape.md` (planting). Positions, owners and
 footprints come from the layout.
@@ -38,6 +40,8 @@ footprints come from the layout.
 | Roofs | **broad leaf roofs** in the prototype's manner: a soft superellipse dome or cone of layered palm-leaf thatch (*atap*), fresh green on top and older brown layers beneath, eaves deep enough to shed afternoon rain clear of the deck (at least 1.0 m past the posts). Pitch 35° to 45°, one band for the whole village |
 | Walls | none on most buildings. Where privacy, weather or safety needs one: woven bamboo panels or bark panels, with roll-up rattan blinds instead of shutters |
 | Openings | wide round-headed doorways (superellipse), at least 1.5 m clear and 2.4 m high, so the party, blorbs and the apes pass |
+| Headroom | every leaf-roof eave, bridge or deck a route passes under clears 2.4 m above the deck, so the hero and the apes walk upright; roofs over the commons and rings keep their eave at 2.4 m or higher and slope up from there |
+| Roof construction | leaf roofs are the shared thatch-dome construction for the whole village, one builder and one thickness, never a flat slab with rounded corners |
 | Rails | rope rails on posts at 1.1 m, with catch nets slung beneath every deck edge more than 3 m above the ground |
 | Vertical routes | the existing steep branch ramps for climbers; 32° public switchbacks; rope ladders between nest levels; no stairs |
 | Light | resin lamps in gourd shades (*damar* resin), hung from the roof beams; no lights on poles |
@@ -66,7 +70,25 @@ sleeping platforms.
 
 ### Structure
 
-- **Deck:** a rounded triangle about 30 m across, wrapping the three trunks.
+- **Deck:** a rounded triangle wrapping the three trunks. **Revised by the
+  audit (2026-10-07):**
+  - **The old figure was too small.** The layout gave about 350 m², but the
+    triangle between the trunk centres alone is about 430 m², since the
+    trunks stand 30 to 33 m apart.
+  - **The program does not fit 350 m².** The amenities need about 350 m² of
+    footprint before any circulation:
+    - gathering circle about 64 m²;
+    - kitchen 48 m²;
+    - dining 60 m²;
+    - market 48 m² plus 2 m clear in front, about 90 m²;
+    - cistern 36 m²;
+    - workshop 30 m²;
+    - food store 16 m²;
+    - privy 3 m².
+  - **New size:** the deck is about **520 m²**, its edge about 3 m outside
+    the line between the trunks. That leaves 1.5 m routes between every
+    amenity and a 2.4 m route from the grand ramp's head to the gathering
+    circle.
   Main beams run trunk to trunk on ring collars lashed round each trunk, with
   joists across them.
 - **Support:** cable stays from each trunk's 22.8 m ring, and six squared
@@ -153,8 +175,9 @@ sleeping platforms.
 
 ## 3. The inn (Bima; rest point)
 
-**Site:** a lobe of the commons' deck reaching out east of the East Tree, about
-16 × 10 m. Its own two posts go to the ground, and cable stays run to the East
+**Site:** a lobe of the commons' deck reaching out east of the East Tree,
+**16 × 12 m** (revised by the audit from 16 × 10: the house is 8 m deep, the
+veranda 3 m, and a 1 m deck edge with rail must stay outside them). Its own two posts go to the ground, and cable stays run to the East
 Tree. Its entrance faces back onto the commons. It replaces the ground inn at
 `(27, 22)`. The price is unchanged at 15 Tokoins.
 
@@ -171,8 +194,17 @@ bamboo panels and roll-up blinds.
 | **Bima's room** | 3 × 4 m | a hammock, a chest, a shelf of carved fruit-stone tokens from past guests; a basket his sister sends up with spare food |
 | **Washroom** | 2 × 3 m | the privy closet (bench seat over a sealed clay vat, leaf litter and scoop), a log washbasin with a water tube from the commons cistern; vat lowered by rope to the compost |
 
-The party room, guest room and Bima's room open off a 1.4 m passage from the
-veranda. The washroom is reached from that passage, not through anyone's room.
+**Plan (audited 2026-10-07):** the 14 × 8 m house is:
+- a **passage 1.4 m wide** along its veranda side, entered from the veranda
+  by one door;
+- the **party room** (8 × 6.6 m) at the west end;
+- **Bima's room** and the **guest room** (3 × 4 m each) side by side in the
+  east 6 m;
+- behind them, the **washroom** (2 × 2.6 m, trimmed from 2 × 3 to fit) and a
+  linen and lamp store (4 × 2.6 m).
+
+Every room opens off the passage, so nobody passes through another's room, and
+there are no pass-throughs. The veranda's leaf eave clears 2.4 m.
 
 **Roof:** a long hipped leaf roof, the inn's own accent a deep red-brown
 thatch, the darkest in the village.
@@ -186,6 +218,23 @@ counter faces the commons.
 
 - A wrap-around deck about 5 m wide round each trunk, on knee braces from a
   ring collar lashed to the trunk.
+- **Pavilion bays (revised by the audit, 2026-10-07).** A 4 m deep pavilion on
+  a 5 m ring would leave a 1 m walkway, under the 1.5 m minimum, and push
+  neighbours through the household's home. So each pavilion stands on a
+  lashed **bay** that widens the ring locally to about 6.5 m on its outer
+  side. The ring's own 1.5 m walkway runs on the trunk side, past every
+  pavilion and never through one.
+- **Crown deck** on the Elder Tree at 45.6 m: about 10 × 9 m round the trunk,
+  room for the sisters' 7 × 5 m pavilion, the walkway and the basket hoist's
+  landing.
+- **Capacity:** the ring is about 33 m round at its middle. The fullest rings
+  hold:
+  - East Tree, 22.8 m: a couple's pavilion, Dahan's pavilion, the bridge
+    landing and the switchback head, about 16 m of arc in all;
+  - North Tree, 34.2 m: the joined siblings' pavilions, the empty pavilion and
+    the switchback head, about 20 m of arc.
+
+  Both fit with gaps between.
 - Rope rails and catch nets.
 - The 32° public switchback lands on each ring; the steep branch ramps pass
   through.
