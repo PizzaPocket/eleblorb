@@ -29,8 +29,13 @@ const BED_SINK := 4.0
 ## Beyond the shelf's edge the ground falls at this gradient to the bed: a
 ## steep talus, as the submerged shoulders of tower karst drop away.
 const SHELF_FALL := 3.5
-## Over this band inside the mesh's outer edge the ground is drawn down to
-## the bed, so the sheet's edge is buried and nothing can swim beneath it.
+## The talus runs on past the fine grid for SKIRT metres on a coarse grid
+## (SKIRT_CELL), far enough to reach the bed, so the rock's foot fades into
+## the lake floor instead of ending in a wall or a sheet's edge in mid-water.
+const SKIRT := 44.0
+const SKIRT_CELL := 4.0
+## Over this band inside the skirt's outer edge the ground is drawn down to
+## the bed, so the mesh's edge is buried and nothing can swim beneath it.
 const EDGE_BAND := 8.0
 const CELL := 0.5
 const BOUNDS := Rect2(-50.0, -44.0, 100.0, 76.0)
@@ -71,13 +76,22 @@ static func build(parent: Node3D, terrain: Node) -> Array[StaticBody3D]:
 	var water := float(terrain.get_lake_water_level())
 	var columns := int(BOUNDS.size.x / CELL) + 1
 	var rows := int(BOUNDS.size.y / CELL) + 1
+	# One grid, fine (CELL) over the rock and coarse (SKIRT_CELL) round it.
+	var xs := _axis(BOUNDS.position.x, columns)
+	var zs := _axis(BOUNDS.position.y, rows)
+	var skirt_cells := int(SKIRT / SKIRT_CELL)
+	var mesh_heights := PackedFloat32Array()
+	mesh_heights.resize(xs.size() * zs.size())
+	for row in zs.size():
+		for column in xs.size():
+			mesh_heights[row * xs.size() + column] = _height(Vector2(xs[column], zs[row]), terrain, water)
+	# The fine block alone, for the planting.
 	var heights := PackedFloat32Array()
 	heights.resize(columns * rows)
 	for row in rows:
 		for column in columns:
-			var local := BOUNDS.position + Vector2(column, row) * CELL
-			heights[row * columns + column] = _height(local, terrain, water)
-	var arrays := _mesh_arrays(heights, columns, rows)
+			heights[row * columns + column] = mesh_heights[(row + skirt_cells) * xs.size() + column + skirt_cells]
+	var arrays := _mesh_arrays(mesh_heights, xs, zs)
 	var mesh := ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	var body := StaticBody3D.new()
@@ -139,7 +153,8 @@ static func _height(p: Vector2, terrain: Node, water: float) -> float:
 		var at := FishingVillagePlan.WORLD_CENTER + p
 		var bed := float(terrain.get_mesh_height(at.x, at.y)) - water - BED_SINK
 		height = maxf(bed, -SHELF_TOP_DEPTH - beyond * SHELF_FALL)
-		var to_edge := minf(minf(p.x - BOUNDS.position.x, BOUNDS.end.x - p.x), minf(p.y - BOUNDS.position.y, BOUNDS.end.y - p.y))
+		var outer := BOUNDS.grow(SKIRT)
+		var to_edge := minf(minf(p.x - outer.position.x, outer.end.x - p.x), minf(p.y - outer.position.y, outer.end.y - p.y))
 		if to_edge < EDGE_BAND:
 			height = lerpf(bed, height, clampf(to_edge / EDGE_BAND, 0.0, 1.0))
 	for lobe: Dictionary in LOBES:
@@ -173,8 +188,26 @@ static func _lobe_height(p: Vector2, lobe: Dictionary) -> float:
 	return height
 
 
-## Positions, vertex colours, normals and indices for the heightfield.
-static func _mesh_arrays(heights: PackedFloat32Array, columns: int, rows: int) -> Array:
+## Grid lines along one axis: the skirt's coarse steps, the fine run of
+## `count` lines from `start`, then the coarse steps beyond.
+static func _axis(start: float, count: int) -> PackedFloat32Array:
+	var values := PackedFloat32Array()
+	var skirt_cells := int(SKIRT / SKIRT_CELL)
+	for i in skirt_cells:
+		values.append(start - SKIRT + float(i) * SKIRT_CELL)
+	for i in count:
+		values.append(start + float(i) * CELL)
+	var end := start + float(count - 1) * CELL
+	for i in skirt_cells:
+		values.append(end + float(i + 1) * SKIRT_CELL)
+	return values
+
+
+## Positions, vertex colours, normals and indices for the heightfield on the
+## grid lines `xs` by `zs`.
+static func _mesh_arrays(heights: PackedFloat32Array, xs: PackedFloat32Array, zs: PackedFloat32Array) -> Array:
+	var columns := xs.size()
+	var rows := zs.size()
 	var vertices := PackedVector3Array()
 	var normals := PackedVector3Array()
 	var colors := PackedColorArray()
@@ -185,9 +218,7 @@ static func _mesh_arrays(heights: PackedFloat32Array, columns: int, rows: int) -
 	for row in rows:
 		for column in columns:
 			var index := row * columns + column
-			vertices[index] = Vector3(
-				BOUNDS.position.x + float(column) * CELL, heights[index], BOUNDS.position.y + float(row) * CELL
-			)
+			vertices[index] = Vector3(xs[column], heights[index], zs[row])
 	# The same triangle split as the world terrain (a, c, b / b, c, d).
 	for row in rows - 1:
 		for column in columns - 1:
