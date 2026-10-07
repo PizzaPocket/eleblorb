@@ -20,6 +20,7 @@ var _shots := ""
 var _ground: StaticBody3D
 var _plinths := {}
 var _lines := {}
+var _shell: StaticBody3D
 
 
 func _ready() -> void:
@@ -45,6 +46,10 @@ func _run() -> void:
 	for entry in FireCalderaPlan.PLOTS:
 		if _lines.has(entry["id"]):
 			_plinths[entry["id"]] = SocketPlinth.build(self, entry, _lines[entry["id"]])
+	# The kit's first shell: the guest house (brief section 3), cobalt and amber.
+	var guest := FireCalderaPlan.plot("GUEST")
+	var stained: Array[Color] = [Color(0.16, 0.30, 0.72), Color(0.92, 0.60, 0.16)]
+	_shell = CalderaShell.build(self, guest, float(_lines["GUEST"]["datum"]), guest["footprint"], -4.0, stained)
 	_stage()
 	for _i in 6:
 		await get_tree().physics_frame
@@ -92,7 +97,8 @@ func _check() -> void:
 			if ground > datum + 0.3:
 				walled += 1
 				var reveal := edge - outward * 0.6
-				var hit := _ray(space, Vector3(reveal.x, ground + 2.0, reveal.y), Vector3(reveal.x, datum - 1.0, reveal.y), [])
+				# Past any roof overhanging the reveal: the check is of its floor.
+				var hit := _ray(space, Vector3(reveal.x, ground + 2.0, reveal.y), Vector3(reveal.x, datum - 1.0, reveal.y), [_shell.get_rid()] if _shell != null else [])
 				if hit.is_empty() or hit["collider"] != plinth or absf(float(hit["position"].y) - datum) > 0.06:
 					_fail("%s: the uphill reveal at %s is not clear at the datum" % [id, str(reveal.round())])
 			elif ground < datum - 0.05 and float(line["bottom"]) > ground - 1.0:
@@ -103,6 +109,7 @@ func _check() -> void:
 		if absf(at_landing - datum) > 0.15:
 			_fail("%s: the front landing is %.2f m off the floor" % [id, at_landing - datum])
 		print("ok   %s: %s, datum %.2f, %d uphill wall pieces" % [id, line["foundation"], datum, walled])
+	_check_shell(space)
 	# The lava's edge runs under the bank: ground below the lava just inside.
 	for i in 24:
 		var angle := TAU * float(i) / 24.0
@@ -112,6 +119,28 @@ func _check() -> void:
 		var outside := Vector2(cos(angle), sin(angle)) * (FireCalderaPlan.reservoir_radius(angle) + 1.6)
 		if FireCalderaGround.height(outside) < FireCalderaGround.LAVA_Y:
 			_fail("the bank at %s dips below the lava beyond the lava's edge" % str(outside.round()))
+
+
+## The guest house's shell: inside its plinth, its door open clear through,
+## 2.4 m or more of headroom under the roof.
+func _check_shell(space: PhysicsDirectSpaceState3D) -> void:
+	var entry := FireCalderaPlan.plot("GUEST")
+	var datum := float(_lines["GUEST"]["datum"])
+	var to_world := _shell.global_transform
+	var hz := (entry["footprint"] as Vector2).y * 0.5
+	var through := _ray(space, to_world * Vector3(-4.0, 1.2, hz + 2.0), to_world * Vector3(-4.0, 1.2, hz - 2.0), [])
+	if not through.is_empty():
+		_fail("GUEST: the door bay is blocked by %s" % (through["collider"] as Node).name)
+	for x: float in [-4.0, 0.0, 4.0]:
+		var up := _ray(space, to_world * Vector3(x, 0.1, 0.0), to_world * Vector3(x, 6.0, 0.0), [])
+		if up.is_empty():
+			_fail("GUEST: no roof over (%.0f, 0)" % x)
+		elif float(up["position"].y) - datum < 2.4:
+			_fail("GUEST: %.2f m of headroom at (%.0f, 0)" % [float(up["position"].y) - datum, x])
+	var below := _ray(space, to_world * Vector3(0.0, 0.5, 0.0), to_world * Vector3(0.0, -1.0, 0.0), [])
+	if below.is_empty() or below["collider"] != _plinths["GUEST"]:
+		_fail("GUEST: the shell does not stand on its plinth")
+	print("ok   GUEST shell: door bay clear, roof and plinth in place")
 
 
 func _ray(space: PhysicsDirectSpaceState3D, from: Vector3, to: Vector3, exclude: Array) -> Dictionary:
@@ -152,6 +181,8 @@ func _render() -> void:
 		"aro_plinth": [Vector2(-24.0, 36.0), 3.0, Vector2(-39.4, 27.0), 0.0],
 		"civic_back": [Vector2(0.0, 66.0), 4.0, Vector2(0.0, 49.0), 0.0],
 		"kel_bank": [Vector2(26.0, -14.0), 1.7, Vector2(48.0, -4.0), 0.5],
+		"guest_front": [Vector2(-18.0, -36.0), 1.7, Vector2(-27.0, -51.0), 1.8],
+		"guest_door": [Vector2(-22.5, -41.0), 1.6, Vector2(-26.5, -48.0), 1.4],
 	}
 	DirAccess.make_dir_recursive_absolute(_shots)
 	for name: String in shots:

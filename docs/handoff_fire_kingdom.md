@@ -26,9 +26,17 @@ city is not built.
 - The building briefs (`fire_caldera_buildings.md`) were approved by the user
   on 2026-10-07.
 
-Next, in order: prototype one continuous steel-and-glass shell with a cut
-opening and one glass-and-metal threshold in isolation (a building proof
-scene like `tools/fishing_building_proof.tscn`, on a `SocketPlinth`); close
+- `scripts/caldera_shell.gd` (`CalderaShell`): the kit's first shell,
+  prototyped on the guest house in `tools/fire_caldera_proof.tscn`: steel
+  frame on the 2 m module, smoky glazed front between branching mullions,
+  basalt composite walls, a stained clerestory band, a 3 m door bay with a
+  2 m clear opening and pivoting leaves, a shallow walkable roof slab. The
+  proof checks its door bay is clear, 2.4 m of headroom, and that it stands on
+  its plinth. Not yet: its interior partitions and rooms, the entry fin, the
+  terrace, and the curved superellipse plan the landmarks need.
+
+Next, in order: finish the guest house from its brief (rooms, washroom,
+beds, the rest point) as the pattern for the rest; close
 the ground's seam against the real crater wall and set `FireCalderaGround`
 into `fire_kingdom_terrain.gd` (excluding the flat placeholder floor inside
 the city); register the reservoir with `register_lava_polygon()`; then build
