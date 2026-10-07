@@ -208,8 +208,10 @@ will be rideable as a separate project, and players swim until then.
    for their size. Fishing landing: 6,500 to 1,400 draw calls, 20.7 M to
    6.6 M triangles, 25 ms to the 60 fps cap. Ohio (`Town`, 6,600 meshes) and
    `Scatter` (6,400) have not been merged yet: the next wins.
-9. Still open: owner-specific boats, a walk of every route at human, Blorbus
-   and Xiao Hou Zi scale, the islets' faces up close.
+9. Done (2026-10-07): every boat built for its owner's job (`FishingBoats`,
+   design brief 4.18), solid and standable; Ivo's launch solid too.
+10. Still open: a walk of every route at human, Blorbus and Xiao Hou Zi
+   scale, the islets' faces up close.
 
 ### How to build one structure
 

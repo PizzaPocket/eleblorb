@@ -329,33 +329,27 @@ func _build_boats() -> void:
 	for boat in FishingVillagePlan.BOATS:
 		var berth: Rect2 = boat["berth"]
 		var long_axis_x := berth.size.x >= berth.size.y
-		var node := Node3D.new()
-		node.name = str(boat["name"])
-		add_child(node)
-		node.global_position = _at(berth.get_center(), 0.16)
-		node.rotation.y = 0.0 if long_axis_x else PI * 0.5
 		var length := maxf(berth.size.x, berth.size.y)
+		var beam := minf(berth.size.x, berth.size.y)
+		var body: StaticBody3D
 		if boat.get("launch", false):
-			# Ivo's roofed cargo launch, built at its own size (4.14).
-			node.add_child(FishingBuildings.ferry_launch(length, minf(berth.size.x, berth.size.y)))
-			continue
-		node.scale = Vector3.ONE * (length / 7.6)
-		var hull: Color = _household_color(str(boat["owner"]))
-		_build_boat_parts(node, hull)
-
-
-func _build_boat_parts(boat: Node3D, hull_color: Color) -> void:
-	_add_boat_part(boat, Vector3(3.8, 0.32, 0.95), Vector3(0, 0, 0), hull_color, SuperEgg.EPSILON_SOFT)
-	_add_boat_part(boat, Vector3(3.25, 0.08, 1.02), Vector3(0, 0.36, 0), hull_color.lightened(0.14), SuperEgg.EPSILON_FLAT)
-	_add_boat_part(boat, Vector3(0.75, 0.08, 1.12), Vector3(0, 0.48, 0), Color(0.42, 0.25, 0.12), SuperEgg.EPSILON_FLAT)
-	_add_boat_part(boat, Vector3(0.09, 0.82, 0.09), Vector3(-0.75, 0.92, 0), Color(0.3, 0.18, 0.1), SuperEgg.EPSILON_SOFT)
-
-
-func _add_boat_part(parent: Node3D, semi_axes: Vector3, local_pos: Vector3, color: Color, epsilon: float) -> void:
-	var part := SuperEgg.build_part(semi_axes, color, epsilon, epsilon)
-	part.position = local_pos
-	CollisionPolicy.mark_decorative(part)
-	parent.add_child(part)
+			# Ivo's roofed cargo launch (4.14), solid at its hull and cabin.
+			body = StaticBody3D.new()
+			body.name = str(boat["name"])
+			body.collision_layer = 1
+			body.collision_mask = 0
+			var launch := FishingBuildings.ferry_launch(length, beam)
+			body.add_child(launch)
+			CollisionPolicy.add_box(body, launch.get_child(0), Vector3(length * 0.95, 0.7, beam * 0.9), Vector3(0, -0.05, 0), Basis(), true)
+			CollisionPolicy.add_box(body, launch.get_child(3), Vector3(1.5, 1.2, beam - 0.4), Vector3(-0.4, 0.9, 0), Basis(), false)
+			add_child(body)
+			body.global_position = _at(berth.get_center(), 0.16)
+		else:
+			# Each boat built for its owner's job (4.18), its frame on the waterline.
+			body = FishingBoats.build(boat, length, beam)
+			add_child(body)
+			body.global_position = _at(berth.get_center(), 0.0)
+		body.rotation.y = 0.0 if long_axis_x else PI * 0.5
 
 
 ## Nara's counter on the Venn shop veranda, facing the landing. Her wares

@@ -498,6 +498,24 @@ Each 3.4 m wide, timber-planked with cross battens, rails both sides above the
 water, upper end flush with its deck, lower end at the derived height
 (`W - float depth - 0.10`) at 8.5 m run.
 
+### 4.18 The working boats
+
+Every boat has an owner, a berth, a lane and a job, and its kit shows the
+job. Hulls are one soft SuperEgg in the household colour with a flat sheer
+strake (gunwale) in a lighter tone and a planked sole; outboard engines
+hang on the transom of the three that range furthest. Each is solid: one
+box collider from the waterline to the gunwale, a landing for anyone who
+climbs aboard (boat riding itself is a separate project).
+
+| Boat | Owner | Berth (m) | Form | Kit |
+|---|---|---|---|---|
+| Dive skiff | Nara | 4.0 x 1.4 | narrow skiff, teal | a dive ladder hooked over the side, the coiled shot line and its weight, two helmets on the thwart, the dive flag on a short staff, an outboard |
+| Repair boat | Mateo | 5.0 x 1.8 | open boat half replanked | bare timber hull with the teal sheer strake only half repainted, two new strakes in pale wood, a stack of planks across the thwarts, the tool chest |
+| Work punt | Mai | 3.6 x 1.6 | square-ended punt, ochre | the push pole along one side, three shell baskets, the grading sieve |
+| Working boat | Jori | 6.0 x 2.4 | broad fishing boat, coral | the net winch at the bow, the net heaped amidships, fish boxes, the night-fishing lamp on a mast, an inboard engine box aft |
+| Utility boat | Sela | 5.0 x 2.0 | fast utility boat, terracotta with a teal stripe | the rescue float on the foredeck, a boat hook, the coiled tow line, an outboard |
+| Paddle skiff | Salim | 2.4 x 1.0 | narrow skiff, ochre and green | the paddle across the thwart, a bundle of net, one rod |
+
 ## 5. Variation matrix
 
 | Building | Plan | Roof | Veranda | Colour | Mark |

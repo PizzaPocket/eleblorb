@@ -182,6 +182,9 @@ func _ready() -> void:
 		query.shape = shape
 		query.transform = Transform3D(Basis(), box.get_center())
 		query.collision_mask = 1
+		# Boats are solid now; a hull does not clip itself.
+		if node is CollisionObject3D:
+			query.exclude = [(node as CollisionObject3D).get_rid()]
 		var hits := space.intersect_shape(query, 4)
 		if hits.is_empty():
 			print("ok   boat %s sits clear" % boat["name"])
