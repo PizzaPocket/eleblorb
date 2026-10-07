@@ -147,7 +147,18 @@ will be rideable as a separate project, and players swim until then.
    route, gangway, ramp and swim exit is now **planked** (the user's review:
    slabs read as placeholders, and the near-black deck colour was creosote, not
    sun-bleached tropical hardwood); see the charter.
-3. **Islets need a landscaping pass.** Seen at last
+2b. Done (2026-10-07, the user's walkthrough): headroom (ring beam 4.0 m, every
+   route clears 2.4 m, the proof checks it); Ohio-thick roof slabs with pents cut
+   flush; top-hung awning shutters only where unshaded; cloth curtains on a home's
+   inner doors; the Mor houseboat's inn sign and Leena on its arrival deck;
+   swimming under the docks fixed (the islets were on the climbable layer); the
+   repair boat moved clear and every hull probed; the Holt Inn washroom door now
+   swings into the washroom; the islets rebuilt as Phang Nga tower karst.
+3. Partly done: **islets** rebuilt (2026-10-07) as clusters of domed karst towers
+   with streaked faces, a waterline notch, forested crowns and vines, and a
+   sloping shelf edge. Still open: ledge planting at mid height and a closer look
+   at the faces up close.
+   Earlier finding: Seen at last
    (`VILLAGE=fishing` in `tools/village_aerial_capture.tscn`): the faces read as
    uniform grey curtains of vertical flutes, the shelf's 1 m grid edge shows as
    stair steps through the water, and there are no ledges, waterline notch,

@@ -56,11 +56,14 @@ the piles use the only shallow ground, and the village spreads over the water
 because the cliff leaves no level land.
 
 - **Anvil Rock**, the larger islet: centred at local `(-4, -30)`, waterline
-  footprint about 36 × 20 m with its long axis east to west, and a broad,
-  flat-topped crown about W + 34 m. Its south face is the village's back wall.
-  Dala's generation drove the first piles along its foot.
+  footprint about 36 × 20 m with its long axis east to west: a cluster of five
+  tower-karst lobes after Phang Nga, domed and forested, the highest about
+  W + 21 m (revised 2026-10-07 from a single flat-crowned stack of W + 34 m,
+  which read as a column). Its south face is the village's back wall, at about
+  `z -20.5` behind the cistern. Dala's generation drove the first piles along
+  its foot.
 - **Heron Rock**, the smaller islet: centred at local `(30, 10)`, waterline
-  footprint about 12 × 10 m, a slender stack rising about W + 21 m.
+  footprint about 12 × 10 m, two lobes, the higher about W + 13 m.
 - **Shelves** (the only areas where piles are allowed):
   - Anvil south shelf: local `x -30..16`, from the rock face at `z ≈ -20` out
     to `z = +6` west of `x = -8` and `z = +4` east of it.
@@ -103,7 +106,7 @@ Not to scale; local coordinates in metres.
 ```
                        N (−z)
               ┌────────── ANVIL ROCK ──────────┐            open lake
-              │   sheer limestone, crown W+34   │
+              │   karst towers, crowns W+21   │
    z −20 ─────┴──seep──cistern─────────────────┴──────┐
    VENN yard  VENN     SEN house   stores/   net shed  │
    & slip     house    & clinic    cistern             │      HERON

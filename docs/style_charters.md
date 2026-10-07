@@ -72,9 +72,14 @@ Detail and per-building forms: `docs/architecture/fishing_village_buildings.md`.
 - **Secondary (15 to 20 percent): Thai and Malay shutter and veranda joinery**, applied only to the named elements: top-hung prop-open shutters, the deep veranda, carved ridge ends and fascias. Not to roof form and wall system together.
 - **Accent (up to 5 percent): the household colour**, applied to wall panels, shutters, ridge caps and the household's boat, so the village keeps its varied terracotta, teal, ochre, violet, coral and green.
 - **Kit of parts.**
-  - Structural module: the 3.0 m bay, posts on every bay line, ring beam at 3.3 m (revised 2026-10-06 so a veranda pent tucks under the main eave with 2.0 m headroom).
+  - Structural module: the 3.0 m bay, posts on every bay line, ring beam at 4.0 m (revised 2026-10-07 so Ohio-thick roofs and veranda pents clear 2.4 m).
   - Roofs: hip or gable only, one pitch band (30 to 34 degrees), eaves 0.9 m, pent roofs on verandas (15 to 18 degrees). Built with `StiltRoofs` on `TownProps.roof_slab`/`build_ridge_slab` (the shared Ohio construction: squarish shoulders, ridge cut), never plain slabs. Every building is assembled from `StiltKit` (`scripts/stilt_kit.gd`).
-  - Walls, in order: light timber boards, woven rattan basket-weave panels, hinged shutters. No sealed boxes.
+  - Walls, in order: light timber boards, woven rattan basket-weave panels, shutters. No sealed boxes.
+  - Shutters (2026-10-07): the top-hung awning shutter of the secondary joinery, one panel hinged at the window head and propped out as a sunshade (`StiltKit` builds it), never side-hung pairs, which reached the posts and neighbouring openings. Windows already shaded by a veranda, porch or eave have none.
+  - Interior doors: between a home's own rooms, a cloth curtain (langsir) in a framed opening; hard leaves only where something must close (outside doors, toilets, the clinic, stores). Every doorway is 2.45 m tall.
+  - Headroom: every eave or roof a route passes under clears at least 2.4 m (ring beam 4.0 m on houses, pents 3.15 m at the wall); `tools/fishing_building_proof.tscn` fails a route under 2.35 m.
+  - Roof slabs are Ohio-thick (0.24 m), so the SuperEgg shoulder reads at the eave; pents are cut flush where they meet their wall.
+  - Every rest point hangs the shared bed-and-moon sign (`VillageInn.build_bed_and_moon_sign`).
   - Windows and doors: superellipse openings, piped frames with the reveal in the frame colour (`OpeningTrim`).
   - Foundation: squarish timber piles 0.3 m with caps, braced in pairs, on the shelves only. Floating hulls are moored by lines to pile clusters, never to the lake bed.
   - Signature motif: **rope-bound posts at every threshold and work deck**, seen at least three times in the village.
