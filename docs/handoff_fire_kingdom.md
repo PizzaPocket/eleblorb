@@ -1,7 +1,7 @@
 # Handoff: Fire Kingdom Caldera City
 
-**Progress (2026-10-07).** The plan and the ground exist and validate; the
-city is not built.
+**Progress (2026-10-07).** The plan, live caldera ground and reservoir exist
+and validate; the replacement buildings are not yet in the world.
 
 - `scripts/fire_caldera_plan.gd` (`FireCalderaPlan`): the approved layout as
   data. `VILLAGE=fire tools/check_village_layout.sh` runs
@@ -12,7 +12,10 @@ city is not built.
   percent outward and toward the far wall. The plot survey and foundation
   ledger are computed from it and checked by the validator (five socket
   plinths, four stepped podiums; floors flush with their front landings,
-  uphill backs in retaining sockets of 1.2 to 2.4 m, no blank base).
+  uphill backs in retaining sockets of 1.2 to 2.4 m, no blank base). It is now
+  built by `fire_kingdom_terrain.gd` in the plan's rotated world frame. The
+  coarse terrain omits its triangles and collider beneath the city; the fine
+  mesh's outer band samples the coarse wall exactly (measured seam error 0 m).
 - `scripts/socket_plinth.gd` (`SocketPlinth`): the tapered, embedded basalt
   plinth with its control joint, floor-level reveal and continuous uphill
   retaining wall; the ground leaves its collider out under it.
@@ -22,7 +25,8 @@ city is not built.
 
 - `FireKingdomTerrain.register_lava_polygon()`: irregular lava surfaces for
   the reservoir, through the same hazard, height and escape queries as the
-  circles (`tools/test_lava_polygon.tscn`, 0 FAIL).
+  circles (`tools/test_lava_polygon.tscn`, 0 FAIL). The live terrain now builds
+  and registers the reservoir before the placeholder village initializes.
 - The building briefs (`fire_caldera_buildings.md`) were approved by the user
   on 2026-10-07.
 
@@ -32,16 +36,23 @@ city is not built.
   basalt composite walls, a stained clerestory band, a 3 m door bay with a
   2 m clear opening and pivoting leaves, a shallow walkable roof slab. The
   proof checks its door bay is clear, 2.4 m of headroom, and that it stands on
-  its plinth. Not yet: its interior partitions and rooms, the entry fin, the
-  terrace, and the curved superellipse plan the landmarks need.
+  its plinth. `FireCalderaBuildings.guest_house()` adds the receiving room,
+  provisions cabinet, washroom, eight-bed party room and rest markers; the
+  proof checks all inner doorways. Not yet: the entry fin, the terrace, live
+  rest-point wiring, and the curved superellipse plan the landmarks need.
 
-Next, in order: finish the guest house from its brief (rooms, washroom,
-beds, the rest point) as the pattern for the rest; close
-the ground's seam against the real crater wall and set `FireCalderaGround`
-into `fire_kingdom_terrain.gd` (excluding the flat placeholder floor inside
-the city); register the reservoir with `register_lava_polygon()`; then build
-the briefs plot by plot, and only then remove the old eight houses, fountain
-and braziers.
+- `tools/fire_caldera_world_probe.tscn`: instantiates the real terrain and
+  checks the fine ground and reservoir exist, live height and lava queries,
+  the exact seam, the basin collider, and the absence of the old coarse floor
+  below the city (0 FAIL). `village_aerial_capture.gd -- --village=fire`
+  renders the live transition for visual review.
+
+Next, in order: put the surveyed sockets and all nine plinths into the live
+caldera ground as one atomic step (no open collision holes); instantiate the
+guest house on its plinth, finish its entry fin and dry party terrace, and wire
+Eris and the 25-Tokoin rest point; then build the remaining briefs plot by plot.
+Only after their replacements work should the old eight houses, fountain,
+braziers and placeholder residents be removed.
 
 Status: community, civic-system, and architectural brief complete enough for a
 dimensioned layout synthesis; the fourteen-person census was approved on

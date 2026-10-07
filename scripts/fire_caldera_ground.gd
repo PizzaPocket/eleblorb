@@ -8,9 +8,8 @@ extends RefCounted
 ## the source for the ground mesh, its collision, the lava's extent and the
 ## plot survey, so they cannot disagree.
 ##
-## Heights are world Y. The kingdom's terrain keeps its flat placeholder floor
-## (-16 m) under all this until the city is built; the ground replaces it
-## inside FLOOR_RADIUS and blends to the crater wall beyond.
+## Heights are world Y. In the live kingdom this replaces the coarse flat
+## crater floor inside the city and blends back to the original crater wall.
 
 ## The lava surface, a little below the bank's lip.
 const LAVA_Y := FireCalderaPlan.FLOOR_Y - 0.8
@@ -61,11 +60,18 @@ static func _tilt(local: Vector2) -> float:
 ## Ground height including the blend into the existing crater wall, given that
 ## wall's height (`wall`: a Callable taking local Vector2, returning world Y).
 static func blended_height(local: Vector2, wall: Callable) -> float:
+	return blend_height(local, float(wall.call(local)))
+
+
+## The same blend when the caller already sampled its wall. The live kingdom
+## uses this form so its outer edge can agree exactly with the coarse terrain
+## mesh rather than evaluating a second approximation of that mesh.
+static func blend_height(local: Vector2, wall_height: float) -> float:
 	var own := height(local)
 	var t := smoothstep(WALL_BLEND.x, WALL_BLEND.y, local.length())
 	if t <= 0.0:
 		return own
-	return lerpf(own, maxf(float(wall.call(local)), own), t)
+	return lerpf(own, maxf(wall_height, own), t)
 
 
 ## 1 on an immersion shelf's centre line, fading to 0 at its sides.

@@ -5,14 +5,14 @@ const HALF_SIZE := 900.0
 const RESOLUTION := 121
 const DEFAULT_PLANETARY_OCEAN_LEVEL := -30.0
 const ISLAND_SKIRT_BURY_MARGIN := 56.0
-const CRATER_CENTER := Vector2(155.0, 85.0)
-const CRATER_FLOOR_RADIUS := 72.0
-const CRATER_RIM_RADIUS := 112.0
+const CRATER_CENTER := FireCalderaPlan.CENTRE_WORLD
+const CRATER_FLOOR_RADIUS := FireCalderaPlan.FLOOR_RADIUS
+const CRATER_RIM_RADIUS := FireCalderaPlan.RIM_RADIUS
 const CRATER_OUTER_RADIUS := 205.0
-const CRATER_FLOOR_Y := -16.0
+const CRATER_FLOOR_Y := FireCalderaPlan.FLOOR_Y
 const CRATER_RIM_Y := 48.0
-const VILLAGE_RADIUS := 58.0
-const GATE_CENTER := Vector2(0.0, -3.0)
+const VILLAGE_RADIUS := FireCalderaPlan.SAFE_RADIUS
+const GATE_CENTER := FireCalderaPlan.GATE_WORLD
 const GATE_CLEAR_RADIUS := 22.0
 const GATE_BLEND_RADIUS := 38.0
 const GATE_GROUND_Y := 0.0
@@ -105,7 +105,7 @@ func _ready()->void:
 	_rng.seed=20260912
 	_sync_planetary_ocean_level()
 	_build_river_centerlines()
-	_build_mesh_and_collision();_build_lava_pools();_build_lava_rivers();_build_fire_vents();_scatter_volcanic_rocks()
+	_build_mesh_and_collision();_build_caldera_ground();_build_lava_pools();_build_lava_rivers();_build_fire_vents();_scatter_volcanic_rocks()
 	_scatter_volcano_floor_tokoins.call_deferred()
 	_prepare_under_lava_environment()
 	set_process(true)
@@ -169,6 +169,17 @@ func _update_camera_immersion()->void:
 		_lava_camera=null
 
 func _terrain_height(x:float,z:float)->float:
+	var world:=Vector2(x,z)
+	var local:=FireCalderaPlan.to_local(world)
+	if _inside_caldera_patch(local):
+		return FireCalderaGround.blend_height(local,_coarse_mesh_height(x,z))
+	return _legacy_terrain_height(x,z)
+
+
+## The kingdom's original terrain, retained as the wall sampled by the local
+## caldera mesh. Keeping this independent of the city height avoids recursion
+## and gives both meshes one exact seam surface.
+func _legacy_terrain_height(x:float,z:float)->float:
 	var p:=Vector2(x,z)
 	var base:float=_noise.get_noise_2d(x,z)*6.0
 	base*=smoothstep(0.0,38.0,p.length())
@@ -328,6 +339,12 @@ func _river_coverage(p:Vector2)->float:
 	return clampf(1.0-smoothstep(RIVER_HALF_WIDTH-RIVER_SHORE_SOFTNESS,RIVER_HALF_WIDTH,nearest),0.0,1.0)
 
 func get_mesh_height(x:float,z:float)->float:
+	if _inside_caldera_patch(FireCalderaPlan.to_local(Vector2(x,z))):
+		return _terrain_height(x,z)
+	return _coarse_mesh_height(x,z)
+
+
+func _coarse_mesh_height(x:float,z:float)->float:
 	var s:float=HALF_SIZE*2.0/float(RESOLUTION-1)
 	var fx:float=clampf((x+HALF_SIZE)/s,0.0,float(RESOLUTION-1)-0.001);var fz:float=clampf((z+HALF_SIZE)/s,0.0,float(RESOLUTION-1)-0.001)
 	var ix:int=clampi(int(fx),0,RESOLUTION-2);var iz:int=clampi(int(fz),0,RESOLUTION-2)
@@ -336,7 +353,7 @@ func get_mesh_height(x:float,z:float)->float:
 
 func _vertex(ix:int,iz:int,s:float)->Vector3:
 	var x:float=-HALF_SIZE+float(ix)*s;var z:float=-HALF_SIZE+float(iz)*s
-	return Vector3(x,_terrain_height(x,z),z)
+	return Vector3(x,_legacy_terrain_height(x,z),z)
 
 func _plane(a:Vector3,b:Vector3,c:Vector3,x:float,z:float)->float:
 	var den:float=(b.z-c.z)*(a.x-c.x)+(c.x-b.x)*(a.z-c.z)
@@ -346,6 +363,11 @@ func _plane(a:Vector3,b:Vector3,c:Vector3,x:float,z:float)->float:
 func get_mesh_normal(x:float,z:float)->Vector3:
 	const D:=0.5
 	return Vector3(get_mesh_height(x-D,z)-get_mesh_height(x+D,z),D*2.0,get_mesh_height(x,z-D)-get_mesh_height(x,z+D)).normalized()
+
+
+func _coarse_mesh_normal(x:float,z:float)->Vector3:
+	const D:=0.5
+	return Vector3(_coarse_mesh_height(x-D,z)-_coarse_mesh_height(x+D,z),D*2.0,_coarse_mesh_height(x,z-D)-_coarse_mesh_height(x,z+D)).normalized()
 func is_lake_area(_p:Vector2)->bool:return false
 func get_lake_water_level()->float:return 0.0
 func is_safe_zone(p:Vector2)->bool:return p.distance_to(CRATER_CENTER)<VILLAGE_RADIUS+15.0
@@ -442,20 +464,57 @@ func _build_mesh_and_collision()->void:
 	var s:float=HALF_SIZE*2.0/float(RESOLUTION-1);var st:=SurfaceTool.new();st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for iz in RESOLUTION:
 		for ix in RESOLUTION:
-			var v:=_vertex(ix,iz,s);st.set_color(_color(Vector2(v.x,v.z)));st.set_normal(get_mesh_normal(v.x,v.z));st.add_vertex(v)
+			var v:=_vertex(ix,iz,s);st.set_color(_color(Vector2(v.x,v.z)));st.set_normal(_coarse_mesh_normal(v.x,v.z));st.add_vertex(v)
 	for iz in RESOLUTION-1:
 		for ix in RESOLUTION-1:
 			var i:int=iz*RESOLUTION+ix
-			for n in [i,i+RESOLUTION,i+1,i+1,i+RESOLUTION,i+RESOLUTION+1]:st.add_index(n)
+			var a:=_vertex(ix,iz,s);var b:=_vertex(ix+1,iz,s);var c:=_vertex(ix,iz+1,s);var d:=_vertex(ix+1,iz+1,s)
+			if not _coarse_triangle_under_caldera((a+c+b)/3.0):
+				for n in [i,i+RESOLUTION,i+1]:st.add_index(n)
+			if not _coarse_triangle_under_caldera((b+c+d)/3.0):
+				for n in [i+1,i+RESOLUTION,i+RESOLUTION+1]:st.add_index(n)
 	var mat:=StandardMaterial3D.new();mat.vertex_color_use_as_albedo=true;mat.roughness=0.96;mat.cull_mode=BaseMaterial3D.CULL_DISABLED;st.set_material(mat)
 	var mesh:=MeshInstance3D.new();mesh.mesh=st.commit();add_child(mesh)
 	var faces:=PackedVector3Array()
 	for iz in RESOLUTION-1:
 		for ix in RESOLUTION-1:
 			var a:=_vertex(ix,iz,s);var b:=_vertex(ix+1,iz,s);var c:=_vertex(ix,iz+1,s);var d:=_vertex(ix+1,iz+1,s)
-			for v in [a,c,b,b,c,d]:faces.append(v)
+			for tri:Array in [[a,c,b],[b,c,d]]:
+				var centre:Vector3=(tri[0]+tri[1]+tri[2])/3.0
+				if not _coarse_triangle_under_caldera(centre):
+					for v in tri:faces.append(v)
 	var shape:=ConcavePolygonShape3D.new();shape.set_faces(faces);shape.backface_collision=true
 	var collider:=CollisionShape3D.new();collider.shape=shape;add_child(collider)
+
+
+## The fine mesh is a rotated square. Its outer four metres already equal the
+## coarse surface exactly, so removing coarse triangles by centroid leaves a
+## covered overlap instead of a crack or a second floor under the city.
+func _inside_caldera_patch(local:Vector2)->bool:
+	return absf(local.x)<=FireCalderaGround.EXTENT and absf(local.y)<=FireCalderaGround.EXTENT
+
+
+func _coarse_triangle_under_caldera(centre:Vector3)->bool:
+	var local:=FireCalderaPlan.to_local(Vector2(centre.x,centre.z))
+	const SEAM_OVERLAP:=2.0
+	return absf(local.x)<FireCalderaGround.EXTENT-SEAM_OVERLAP and absf(local.y)<FireCalderaGround.EXTENT-SEAM_OVERLAP
+
+
+func _build_caldera_ground()->void:
+	var frame:=Node3D.new()
+	frame.name="CalderaCityGround"
+	var right:=FireCalderaPlan.right()
+	var forward:=FireCalderaPlan.forward()
+	frame.transform=Transform3D(Basis(Vector3(right.x,0.0,right.y),Vector3.UP,Vector3(forward.x,0.0,forward.y)),Vector3(CRATER_CENTER.x,0.0,CRATER_CENTER.y))
+	add_child(frame)
+	FireCalderaGround.build(frame,[],func(local:Vector2)->float:
+		var world:=FireCalderaPlan.to_world(local)
+		return _coarse_mesh_height(world.x,world.y))
+	FireCalderaGround.build_lava(frame)
+	var reservoir_world:=PackedVector2Array()
+	for point in FireCalderaPlan.reservoir_polygon(128):
+		reservoir_world.append(FireCalderaPlan.to_world(point))
+	register_lava_polygon(reservoir_world,FireCalderaGround.LAVA_Y)
 
 func _build_lava_pools()->void:
 	for center in LAVA_POOLS:

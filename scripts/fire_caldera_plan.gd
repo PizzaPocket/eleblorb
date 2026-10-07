@@ -49,6 +49,11 @@ static func to_world(local: Vector2) -> Vector2:
 	return CENTRE_WORLD + right() * local.x + forward() * local.y
 
 
+static func to_local(world: Vector2) -> Vector2:
+	var offset := world - CENTRE_WORLD
+	return Vector2(offset.dot(right()), offset.dot(forward()))
+
+
 # ---------------------------------------------------------------------------
 # Reservoir: an irregular bank about a 30 m mean radius, broad lobes toward
 # Aro, Renewal, Kel and Civic, shallower coves pulled back from the arrival
@@ -418,4 +423,4 @@ const TRADE := {
 }
 
 ## The rest point: the guest house, kept by Eris.
-const REST_POINT := {"plot": "GUEST", "keeper": "Eris Nahl", "fee": 10}
+const REST_POINT := {"plot": "GUEST", "keeper": "Eris Nahl", "fee": 25}

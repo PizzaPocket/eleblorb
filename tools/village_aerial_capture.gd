@@ -4,6 +4,7 @@ extends Node
 ## a top-down orthographic view and a three-quarter view of a village.
 ##   Godot --path . --resolution 1600x1600 tools/village_aerial_capture.tscn -- --village=ohio
 ##   Godot --path . --resolution 1600x1600 tools/village_aerial_capture.tscn -- --village=snow
+##   Godot --path . --resolution 1600x1600 tools/village_aerial_capture.tscn -- --village=fire
 ## Images land in res://wip/village_audit/.
 
 const TARGETS := {
@@ -20,6 +21,11 @@ const TARGETS := {
 	"fishing": {"scene": "res://scenes/main.tscn", "center": Vector2(440.0, 0.0), "extent": 60.0,
 		"eye_from": Vector2(-62.0, 14.0), "eye_to": Vector2(-30.0, -10.0),
 		"ground_node": "FloatingWaterVillage", "ground_prop": "_water"},
+	"fire": {"scene": "res://scenes/fire_kingdom.tscn", "center": Vector2(155.0, 85.0), "extent": 90.0,
+		# From the arrival side, looking through the old village toward the far
+		# civic bank. These remain world-plan offsets because this capture tool
+		# predates FireCalderaPlan's rotated local frame.
+		"eye_from": Vector2(-55.9, -31.7), "eye_to": Vector2(-8.7, -4.9)},
 }
 const OUTPUT_DIR := "res://wip/village_audit"
 

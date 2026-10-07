@@ -285,7 +285,10 @@ Planning priorities:
 
 Progress (2026-10-07): `FireCalderaPlan`, its validator and plan drawing;
 `FireCalderaGround` with the plot survey; `SocketPlinth`; the isolated proof
-(`tools/fire_caldera_proof.tscn`). See the handoff.
+(`tools/fire_caldera_proof.tscn`); and the live terrain integration with its
+polygon reservoir (`tools/fire_caldera_world_probe.tscn`, 0 FAIL). The coarse
+flat floor is absent beneath the fine city mesh and their seam agrees exactly.
+See the handoff.
 
 ## 5. Chinese Village
 
