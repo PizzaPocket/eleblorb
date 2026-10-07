@@ -69,8 +69,9 @@ static var RESIDENTS := {
 		"hair": FigureHair.STYLE_FLAT_TOP, "hair_color": Color(0.28, 0.17, 0.09), "beard": "full", "beard_color": Color(0.28, 0.17, 0.09),
 		"body": 1.08, "chest": 1.14, "hips": 1.0, "belly": 1.12},
 		"lines": [
-			"Every pile out there has my mark on its cap. If one leans, I hear about it before breakfast.",
-			"Rian seals the helmets and I build them. Nara argues with both of us about the straps.",
+			"Hear that creak? Third pile from the end. She'll want a new cap before the rains.",
+			"Hand me that... no, the other one. Never mind, I've got it.",
+			"Sawdust in my tea again. Lio thinks it's hilarious.",
 		],
 		"schedule": [
 			{"hour": 6.5, "at": SLIP_SHELTER, "range": 1.2, "route": [VENN_LIVING, VENN_VERANDA, LANDING, Vector2(-41.0, -11.0), SLIP, SLIP_SHELTER]},
@@ -82,8 +83,9 @@ static var RESIDENTS := {
 		"skin": Color(0.62, 0.45, 0.32), "shirt": CREAM, "pants": TEAL, "sleeve": "short", "cropped": true,
 		"hair": FigureHair.STYLE_AFRO, "hair_color": Color(0.07, 0.05, 0.04), "body": 0.93, "chest": 1.0, "hips": 0.98, "belly": 1.0},
 		"lines": [
-			"I'm meant to be sorting nails. Don't tell Mateo you caught me watching the channel.",
-			"Dala says the lake changes colour before a storm. I've watched for three seasons and I still can't see it.",
+			"You swam here? From the shore? In your clothes?",
+			"Been sorting these nails since breakfast. They're all the same size. I checked.",
+			"See that heron? Same one every day. I call him the inspector.",
 		],
 		"schedule": [
 			{"hour": 8.0, "at": Vector2(-12.6, -14.0), "range": 0.6, "route": [VENN_LIVING, VENN_VERANDA, LANDING] + ROUTE_LANDING_TO_SEN + ROUTE_SEN_TO_SCHOOL},
@@ -95,8 +97,9 @@ static var RESIDENTS := {
 		"skin": Color(0.76, 0.58, 0.42), "shirt": ARAN_GREEN, "pants": INDIGO, "sleeve": "short", "cropped": true,
 		"hair": FigureHair.STYLE_BUN, "hair_color": Color(0.20, 0.12, 0.07), "body": 0.92, "chest": 0.95, "hips": 1.1, "belly": 1.0},
 		"lines": [
-			"Most of what comes up in the baskets is shell. The pearl is the exception, which is why it's worth anything.",
-			"Mind the grading tables. Pree stepped on one last spring and we're still finding the small ones.",
+			"Careful, you're standing on my good basket.",
+			"Four hundred shells this week and one pearl worth the trouble. That's a good week.",
+			"If you find a shell with a pink lip, bring it here. Pree's collecting them, apparently.",
 		],
 		"schedule": [
 			{"hour": 7.0, "at": PEARL_YARD, "range": 1.4, "route": [Vector2(10.0, 1.6)] + ROUTE_ARAN_TO_PEARL.slice(3)},
@@ -109,8 +112,9 @@ static var RESIDENTS := {
 		"hair": FigureHair.STYLE_BUZZCUT, "hair_color": Color(0.32, 0.30, 0.32), "beard": "stubble", "beard_color": Color(0.46, 0.44, 0.44),
 		"body": 1.02, "chest": 1.08, "hips": 1.0, "belly": 1.2},
 		"lines": [
-			"A net remembers every snag. You can read a whole season off the mending.",
-			"Jori fishes the deep water and I fish the edges. We share a winch and not much else.",
+			"Pull that end tight for me? Thank you. Nobody ever offers.",
+			"Something big went through this last night. Look at the size of that hole.",
+			"Wind's off the plateau. They'll be lying deep today.",
 		],
 		"schedule": [
 			{"hour": 6.0, "at": Vector2(8.6, -15.6), "range": 1.2, "route": [ARAN_DOOR, ARAN_VERANDA, Vector2(7.0, -4.6), SPINE_NET, Vector2(8.0, -11.0), Vector2(8.6, -15.6)]},
@@ -122,8 +126,9 @@ static var RESIDENTS := {
 		"skin": Color(0.45, 0.32, 0.22), "shirt": CREAM, "pants": OCHRE.darkened(0.25), "sleeve": "long", "dress": OCHRE.darkened(0.25),
 		"hair": FigureHair.STYLE_BUN, "hair_color": Color(0.88, 0.86, 0.82), "body": 0.86, "chest": 0.9, "hips": 1.06, "belly": 1.0},
 		"lines": [
-			"The wind's come round off the plateau. It'll be flat calm by dark.",
-			"I captained boats for forty years. Now I sit here and tell people what the sky already told me.",
+			"Sit down, you're blocking my sky.",
+			"Clouds stacking up over the plateau. Rain by supper.",
+			"You look like you came a long way. Have you eaten?",
 		],
 		"schedule": [
 			{"hour": 6.0, "at": Vector2(7.0, 3.0), "range": 0.3, "route": []},
@@ -135,8 +140,9 @@ static var RESIDENTS := {
 		"skin": Color(0.62, 0.45, 0.32), "shirt": ARAN_GREEN.lightened(0.25), "pants": OCHRE, "sleeve": "short", "cropped": true,
 		"hair": FigureHair.STYLE_PIGTAILS, "hair_color": Color(0.20, 0.12, 0.07), "body": 0.76, "chest": 0.9, "hips": 1.0, "belly": 1.0},
 		"lines": [
-			"There's a water beetle under the pearl yard bigger than my thumb. I've named it.",
-			"Asha says I can grade shell properly next year. I already know which ones are good.",
+			"Don't move. There's a dragonfly on your shoulder. Oh. It's gone.",
+			"Do you want to see a beetle? It lives under the yard. It's enormous.",
+			"I'm not allowed on the grading table anymore. It wasn't my fault.",
 		],
 		"schedule": [
 			{"hour": 7.5, "at": Vector2(-11.6, -13.4), "range": 0.5, "route": [ARAN_VERANDA, Vector2(7.0, -4.6), SPINE_NET, SPINE_MID, SPINE_SEN] + ROUTE_SEN_TO_SCHOOL.slice(1)},
@@ -148,8 +154,9 @@ static var RESIDENTS := {
 		"skin": Color(0.96, 0.82, 0.69), "shirt": CORAL, "pants": INDIGO, "sleeve": "none", "cropped": true,
 		"hair": FigureHair.STYLE_PONYTAIL, "hair_color": Color(0.55, 0.16, 0.08), "body": 0.99, "chest": 1.0, "hips": 1.0, "belly": 1.0},
 		"lines": [
-			"When the weather turns I'm first out. Somebody has to know where every boat is.",
-			"Osei will try to feed you smoked fish. Let him. It's the only way he sits down.",
+			"Haven't seen you before. Swimmer or ferry?",
+			"Lake's flat as a plate. Won't last.",
+			"Heading out past the rocks? Tell someone first. I mean it.",
 		],
 		"schedule": [
 			{"hour": 5.5, "at": CATCH_DECK + Vector2(2.6, 1.6), "range": 1.0, "route": ROUTE_VALE_TO_CATCH + [CATCH_DECK + Vector2(2.6, 1.6)]},
@@ -162,8 +169,9 @@ static var RESIDENTS := {
 		"hair": FigureHair.STYLE_BALD, "hair_color": Color(0.05, 0.04, 0.03), "beard": "full", "beard_color": Color(0.05, 0.04, 0.03),
 		"body": 1.1, "chest": 1.12, "hips": 1.02, "belly": 1.16},
 		"lines": [
-			"The smokehouse is the only fire in the village, and I keep it that way.",
-			"My grandmother's recipe is cut into the board by the hearth. I still read it every time.",
+			"Smell that? Another hour. Come back then.",
+			"No, you can't help with the fire. Nobody helps with the fire.",
+			"Here, try a piece. Go on. See? Told you.",
 		],
 		"schedule": [
 			{"hour": 6.0, "at": CATCH_DECK + Vector2(2.4, 3.6), "range": 1.2, "route": ROUTE_VALE_TO_CATCH + [CATCH_DECK + Vector2(2.4, 3.6)]},
@@ -173,8 +181,9 @@ static var RESIDENTS := {
 		"skin": Color(0.55, 0.40, 0.28), "shirt": CORAL, "pants": SAND, "sleeve": "short", "cropped": true,
 		"hair": FigureHair.STYLE_BUZZCUT, "hair_color": Color(0.16, 0.10, 0.06), "body": 0.70, "chest": 0.92, "hips": 0.95, "belly": 1.0},
 		"lines": [
-			"I can tell every boat by its engine. That one's Ivo. He's late.",
-			"I make the floats. The big ones are for Jori and the small ones are practice.",
+			"Hear that engine? That's Ivo. He's late. He's always late.",
+			"Want a float? I've got too many. Don't tell Jori.",
+			"I held my breath for a hundred and twelve. Pree says I counted fast.",
 		],
 		"schedule": [
 			{"hour": 7.5, "at": Vector2(-12.0, -13.0), "range": 0.5, "route": [VALE_LIVING, Vector2(28.3, -6.3), VALE_ARRIVAL, Vector2(25.6, -3.9), Vector2(23.0, -1.5), HERON, SPINE_E, SPINE_NET, SPINE_MID, SPINE_SEN] + ROUTE_SEN_TO_SCHOOL.slice(1)},
@@ -189,8 +198,9 @@ static var RESIDENTS := {
 		"hair": FigureHair.STYLE_BUZZCUT, "hair_color": Color(0.78, 0.76, 0.72), "beard": "full", "beard_color": Color(0.80, 0.78, 0.74),
 		"body": 1.04, "chest": 1.08, "hips": 1.0, "belly": 1.24},
 		"lines": [
-			"Bread and pitch from Ohio, smoked fish and buttons back. The lake does the rest.",
-			"Sela thinks I miss the markers. I don't miss them. I just don't look at them.",
+			"Running late. The lake had opinions this morning.",
+			"Mind the crates. The blue ones are bread, and if they get squashed I hear about it all week.",
+			"Anything for the shore? I go back after lunch. Probably.",
 		],
 		"schedule": [
 			{"hour": 6.0, "at": Vector2(-40.6, -3.2), "range": 1.0, "route": [MOR_ARRIVAL, Vector2(-23.5, 8.4), MOR_GANGWAY, Vector2(-28.0, 2.0), Vector2(-35.0, -2.0), Vector2(-40.6, -3.2)]},
@@ -202,8 +212,9 @@ static var RESIDENTS := {
 		"skin": Color(0.70, 0.52, 0.38), "shirt": TERRACOTTA.darkened(0.3), "pants": INDIGO, "sleeve": "none", "cropped": true,
 		"hair": FigureHair.STYLE_LONG, "hair_color": Color(0.06, 0.05, 0.04), "body": 0.98, "chest": 0.98, "hips": 1.04, "belly": 1.0},
 		"lines": [
-			"If anyone goes under near the jetties, I'm usually the one who goes in after them.",
-			"One day the ferry's mine. Dad knows it. He's in no hurry to say so.",
+			"You swam all the way out? Next time wave at the ferry. We do stop.",
+			"Dad says the ferry has moods. The ferry has a loose rudder pin.",
+			"Grab the end of that line? Thanks.",
 		],
 		"schedule": [
 			{"hour": 7.0, "at": LANDING + Vector2(-4.0, 3.0), "range": 1.2, "route": [MOR_ARRIVAL, Vector2(-23.5, 8.4), MOR_GANGWAY, Vector2(-28.0, 2.0), LANDING + Vector2(-4.0, 3.0)]},
@@ -215,8 +226,9 @@ static var RESIDENTS := {
 		"skin": Color(0.33, 0.22, 0.16), "shirt": CREAM, "pants": VIOLET, "sleeve": "long", "dress": VIOLET, "glasses": true,
 		"hair": FigureHair.STYLE_BUN, "hair_color": Color(0.05, 0.04, 0.03), "body": 0.94, "chest": 0.96, "hips": 1.1, "belly": 1.0},
 		"lines": [
-			"Lessons in the morning, cuts and fevers after. The records wait until everyone else is asleep.",
-			"Dive injuries come in pairs: Nara, then whoever followed Nara down.",
+			"Is that a scrape? Let me see. You'll live. Keep it dry tonight.",
+			"Quietly, please. Half of them are reading and the other half are pretending.",
+			"I haven't sat down since sunrise. Tell me something that isn't a fever.",
 		],
 		"schedule": [
 			{"hour": 7.5, "at": Vector2(-12.6, -14.6), "range": 0.5, "route": [Vector2(-18.0, -17.9), Vector2(-18.5, -16.3), Vector2(-18.5, -13.2), Vector2(-18.5, -11.0), Vector2(-12.0, -10.8), Vector2(-12.0, -12.4), Vector2(-12.6, -14.6)]},
@@ -228,8 +240,9 @@ static var RESIDENTS := {
 		"skin": Color(0.33, 0.22, 0.16), "shirt": VIOLET, "pants": OLIVE, "sleeve": "short",
 		"hair": FigureHair.STYLE_LONG, "hair_color": Color(0.05, 0.04, 0.03), "body": 1.04, "chest": 1.05, "hips": 1.0, "belly": 1.04},
 		"lines": [
-			"Every button on this lake started as a shell somebody threw away.",
-			"The barge is loud. That's why it's out on the water and not next to my sister's patients.",
+			"Sorry, can't hear you over the saw. What?",
+			"Look at this one. Same shell, three colours. Some of them I can't bring myself to cut.",
+			"If you see my sister, tell her I ate.",
 		],
 		"schedule": [
 			{"hour": 7.0, "at": Vector2(-16.2, -1.6), "range": 1.0, "route": [Vector2(-15.0, -17.9), Vector2(-15.5, -16.3), Vector2(-18.5, -16.3), Vector2(-18.5, -13.2), Vector2(-18.5, -11.0), SEN_PORCH, Vector2(-15.0, -9.6), SPINE_SEN, Vector2(-15.0, -4.2), Vector2(-16.2, -1.6)]},

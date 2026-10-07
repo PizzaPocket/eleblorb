@@ -136,8 +136,9 @@ func _build_keeper(body: StaticBody3D, wake: Marker3D, stand: Marker3D, local_po
 	keeper.fixed_ground_y = body.global_position.y + local_position.y
 	FishingVillagePeople.apply_look(keeper, "Leena Mor")
 	var lines: Array[String] = [
-		"The kettle never goes cold on this boat.",
+		"Kettle's on. It's always on.",
 		"Ivo says the ferry knows the weather before Dala does. Don't tell her.",
+		"Wipe your feet. I mean it, I just did the floor.",
 	]
 	keeper.talk_lines = lines
 	keeper.dialog_actions_provider = func() -> Array[Dictionary]:
@@ -433,9 +434,12 @@ func _build_vendor(pos: Vector3) -> void:
 	vendor.is_vendor = true
 	vendor.display_name = "Nara Venn"
 	vendor.shop_category = "lake"
+	# In the moment, never a sales pitch or a how-to (npc-dialogue skill;
+	# the old second line explained the helmet's mechanic outright).
 	var vendor_lines: Array[String] = [
-		"The lake keeps what it takes. Best bring a sealed head if you mean to ask it questions.",
-		"Throw the helmet into a blorb you trust. Wear that blorb on your head, and it will keep the water out.",
+		"Mind the edge, the boards are wet. Looking for anything in particular?",
+		"Came up this morning with a bucket of shells and a headache. Good haul, though.",
+		"Don't knock on the helmets. Mateo hears it from the slip and comes running.",
 	]
 	vendor.vendor_lines = vendor_lines
 	FishingVillagePeople.apply_look(vendor, "Nara Venn")

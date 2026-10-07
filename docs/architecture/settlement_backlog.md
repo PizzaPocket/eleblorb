@@ -190,7 +190,26 @@ will be rideable as a separate project, and players swim until then.
    placeholder builder and errors if a plan structure has none.
 5. Interiors, water work (the pearl yard and lines), and ledge planting on the
    islets.
-6. Schedules and dialogue.
+6. Done (2026-10-07): **schedules and dialogue.** Thirteen walking residents
+   (`scripts/fishing_village_people.gd`) dressed to the dress charter, each
+   with a day along the built decks; Nara and Leena take their looks from the
+   same file. NPCs probe the deck under them (`npc.gd`, `ground_probe`). Lines
+   rewritten to the `npc-dialogue` skill after the user's walkthrough: people
+   talk in the moment, never recite their role.
+7. Done (2026-10-07, the user's second walkthrough): lamps and cords reach
+   their supports (`StiltKit.reach_hangers`, failed by the proof otherwise);
+   the window clear zone covers decorative furnishings; the islet mesh reaches
+   the lake bed; plants and roots follow the ground; the net shed's loft rail
+   climbs with its ramp; Nara stands at her counter; the diving helmet's
+   shell faces outward.
+8. Performance (2026-10-07): `tools/scene_cost_probe.tscn` measures draw
+   calls, triangles and frame time from fixed views. `StaticMerge` bakes each
+   structure's static pieces; SuperEgg props, planks and foliage are sampled
+   for their size. Fishing landing: 6,500 to 1,400 draw calls, 20.7 M to
+   6.6 M triangles, 25 ms to the 60 fps cap. Ohio (`Town`, 6,600 meshes) and
+   `Scatter` (6,400) have not been merged yet: the next wins.
+9. Still open: owner-specific boats, a walk of every route at human, Blorbus
+   and Xiao Hou Zi scale, the islets' faces up close.
 
 ### How to build one structure
 
@@ -650,3 +669,14 @@ these checks make it mechanical:
 - The proof scene renders the building beside a reference Ohio house at the
   same scale (`--shots`), so the comparison is one image.
 
+## 17. Dialogue audit in every settlement
+
+User feedback (2026-10-07): NPC lines read like a dump of the character's
+role, name and relationships. The rules are now the `npc-dialogue` skill.
+The fishing village is rewritten. Audit and rewrite the rest against it:
+Ohio (`town_generator.gd`, `VILLAGER_IDENTITIES`: several lines recite
+routines or end on aphorisms), the Snow Village, the Chinese village, the
+Fire caldera, the Ocean Kingdom, the primate village and every vendor's
+`vendor_lines`. Shop item descriptions that explain a mechanic ("Throw it
+into a blorb to bind...") break the same CLAUDE.md rule and need the user's
+call, since the shop UI is where players read what an item is.
