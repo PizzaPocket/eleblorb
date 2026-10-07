@@ -283,6 +283,10 @@ Planning priorities:
   systems. Author higher-resolution local geology rather than enlarging the
   current decorative fountain.
 
+Progress (2026-10-07): `FireCalderaPlan`, its validator and plan drawing;
+`FireCalderaGround` with the plot survey; `SocketPlinth`; the isolated proof
+(`tools/fire_caldera_proof.tscn`). See the handoff.
+
 ## 5. Chinese Village
 
 Status: audit complete and population approved (2026-10-04); see

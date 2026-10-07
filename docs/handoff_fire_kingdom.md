@@ -1,5 +1,30 @@
 # Handoff: Fire Kingdom Caldera City
 
+**Progress (2026-10-07).** The plan and the ground exist and validate; the
+city is not built.
+
+- `scripts/fire_caldera_plan.gd` (`FireCalderaPlan`): the approved layout as
+  data. `VILLAGE=fire tools/check_village_layout.sh` runs
+  `tools/validate_fire_plan.tscn` (also in the pre-push hook); `--svg=path`
+  draws the plan.
+- `scripts/fire_caldera_ground.gd` (`FireCalderaGround`): the city's own
+  ground: reservoir basin and bank, immersion shelves, terraces rising 7
+  percent outward and toward the far wall. The plot survey and foundation
+  ledger are computed from it and checked by the validator (five socket
+  plinths, four stepped podiums; floors flush with their front landings,
+  uphill backs in retaining sockets of 1.2 to 2.4 m, no blank base).
+- `scripts/socket_plinth.gd` (`SocketPlinth`): the tapered, embedded basalt
+  plinth with its control joint, floor-level reveal and continuous uphill
+  retaining wall; the ground leaves its collider out under it.
+- `tools/fire_caldera_proof.tscn`: builds ground, lava and every plinth in
+  isolation and checks each socket with physics (0 FAIL); `--shots=dir`
+  renders it.
+
+Next: the building briefs (`fire_caldera_buildings.md`) need the user's
+review; then the shell-with-opening and glass-threshold prototypes, the lava
+API's polygon surfaces for the irregular reservoir, and the ground's seam
+against the real crater wall (the proof uses a stand-in wall).
+
 Status: community, civic-system, and architectural brief complete enough for a
 dimensioned layout synthesis; the fourteen-person census was approved on
 2026-10-06. The outer-wilds regrowth and island-skirt systems

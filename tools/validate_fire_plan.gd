@@ -32,6 +32,7 @@ func _ready() -> void:
 	_check_sightline()
 	_check_lower_city()
 	_check_people()
+	_check_survey()
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--svg="):
 			_write_svg(argument.trim_prefix("--svg="))
@@ -217,6 +218,37 @@ func _check_people() -> void:
 				_fail("the %s's goods are made at %s, which is not in the plan" % [shop, place])
 	if not names.has(FireCalderaPlan.REST_POINT["keeper"]) or not places.has(FireCalderaPlan.REST_POINT["plot"]):
 		_fail("the rest point names a missing keeper or plot")
+
+
+## The plot survey (layout 1a) from FireCalderaGround: a ledger line per plot,
+## failing where a foundation would show more than EXPOSED_MAX of blank base.
+## Routes must climb at a walkable grade over the terraces.
+func _check_survey() -> void:
+	print("---- plot survey (heights world Y; datum from the public landing)")
+	for entry in FireCalderaPlan.PLOTS:
+		if bool(entry.get("open", false)):
+			continue
+		var line := FireCalderaGround.survey(entry)
+		print("%-8s %-14s datum %6.2f  ground %6.2f..%6.2f (change %.2f, grade %.0f%%)  exposed %.2f  retaining %.2f  bottom %6.2f  service landing %6.2f" % [
+			line["id"], line["foundation"], line["datum"], line["low"], line["high"], line["change"], float(line["max_grade"]) * 100.0,
+			line["exposed"], line["retaining"], line["bottom"], line["service_landing"]])
+		if float(line["exposed"]) > FireCalderaGround.EXPOSED_MAX:
+			_fail("%s would show %.1f m of blank foundation: step it, split it or move it" % [line["id"], line["exposed"]])
+		if float(line["datum"]) <= FireCalderaGround.LAVA_Y + 0.5:
+			_fail("%s's floor is at the lava" % line["id"])
+	for route in FireCalderaPlan.routes():
+		var points: PackedVector2Array = route["points"]
+		var worst := 0.0
+		for i in points.size() - 1:
+			var steps := maxi(int(points[i].distance_to(points[i + 1]) / 2.0), 1)
+			for k in steps:
+				var a := points[i].lerp(points[i + 1], float(k) / float(steps))
+				var b := points[i].lerp(points[i + 1], float(k + 1) / float(steps))
+				if a.length() > FireCalderaPlan.FLOOR_RADIUS or b.length() > FireCalderaPlan.FLOOR_RADIUS:
+					continue
+				worst = maxf(worst, absf(FireCalderaGround.height(a) - FireCalderaGround.height(b)) / a.distance_to(b))
+		if worst > 0.12:
+			_fail("%s climbs at %.0f%% somewhere; ramps are for buildings, routes stay walkable" % [route["id"], worst * 100.0])
 
 
 ## A plan drawing for review: reservoir, plots (reserved and footprint),
