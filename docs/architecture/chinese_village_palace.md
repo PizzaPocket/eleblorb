@@ -1,6 +1,7 @@
 # Chinese Village: The Palace and Its Civic Conversion
 
-Status: building brief approved (2026-10-06). It develops section 4.3 of
+Status: building brief approved (2026-10-06); audited 2026-10-07 (levels and
+ramps, access). It develops section 4.3 of
 `chinese_village.md` (palace restructure, approved in outline) into a full
 brief for both states. The story behind the two states is approved in
 `chinese_village.md` sections 3.8 and 3.9.
@@ -93,12 +94,12 @@ south, toward the gate island and the axial bridge. The axis runs along `x = 0`.
 | **Throne terrace** | `(0, 4)` | 46 × 36 m, three tiers of 1.4 m with marble balustrades; central ramp in three flights, 3.2 m wide, ≤32°, with a landing on each tier | +4.2 | — |
 | **Throne Hall** | `(0, 2)` | 28 × 16 m, seven bays by five, 8 m to the eaves | +4.2 | double-eave *wǔdiàn*, yellow; the tallest roof on the island |
 | **Dining Hall** | `(28, 34)` | 16 × 9 m, just east of the front court, facing west onto it | 0 | single-eave *xiēshān*, yellow |
-| **Inner court** | `(0, -24)` | 36 × 14 m, paved, one step up behind the Throne Hall | +5.6 | — |
+| **Inner court** | `(0, -24)` | 36 × 14 m, paved, 1.4 m above the throne terrace (not "one step": revised by the audit, 2026-10-07): reached by a short ramp flight either side of the Throne Hall, 3.2 m wide, 32°, about 2.2 m of run with a 1.2 m landing at each end, inside the terrace's 8 m strip behind the hall | +5.6 | — |
 | **Inner apartments** | `(-26, -24)` | 14 × 20 m, west wing on the inner court, door facing east | +5.6 | single-eave *xiēshān*, yellow |
-| **Royal Kitchen** | `(32, -22)` | 18 × 12 m on the east, at ground level, reached from the inner court by a ramp down (5.6 m in two flights with a landing) and from the service yard | 0 | *xuánshān*, grey |
+| **Royal Kitchen** | `(32, -22)` | 18 × 12 m on the east, at ground level, reached from the inner court by a ramp down along the court's east edge (5.6 m rise in two flights: about 9 m of run, a 1.2 m mid landing and landings at both ends, about 12.6 m in all, within the court's 14 m depth), landing at the kitchen's west door; and from the service yard | 0 | *xuánshān*, grey |
 | **Chef's quarters** | `(32, -34)` | 8 × 6 m, behind the kitchen | 0 | *xuánshān*, grey |
 | **Service yard** | `(49, -6)` | 16 × 20 m, packed earth, a well, the levy store (10 × 6 m), a latrine closet, a cart turn; its own landing from island B's bridge on the east rim | 0 | store: *xuánshān*, grey |
-| **High pavilion** | `(0, -42)` | 10 × 10 m, two storeys, on a rock-and-marble mound at the head of the axis, overlooking the Abyss; interior ramp 5.2 m run | +9.8 / +13.0 | double-eave *cuánjiān*, yellow, gilded finial |
+| **High pavilion** | `(0, -42)` | 10 × 10 m, two storeys, on a rock-and-marble mound at the head of the axis, overlooking the Abyss, 4.2 m above the inner court, reached by a switchback ramp of two 2.1 m flights (about 3.4 m of run each, with landings) on the mound's south face; interior ramp 5.2 m run | +9.8 / +13.0 | double-eave *cuánjiān*, yellow, gilded finial |
 | **Royal garden** | north and north-west, `z` -34 to -58 | the four framed views from `chinese_village.md` 4.4: moon-gate court with a pomegranate, pond with a zigzag bridge and a small pavilion, rock garden, bamboo screen and bench court | 0 to +5.6, stepped | small pavilion: *cuánjiān*, yellow |
 
 Routes are wide enough for the party, Blorbus and a mount everywhere:
@@ -131,6 +132,36 @@ dining tables, the kitchen counter dressing, the apartment furnishing, the
 notice board, the benches, the kite and festival lanterns, and the moon gate
 leaf. Every one is a prop placed by quest state. **No wall, roof, terrace or
 opening changes.**
+
+### Audit (2026-10-07)
+
+Checked against the architecture skill's brief audit.
+
+- **Levels and ramps.** Every change of level now names its ramp:
+  - the gate base: 1.2 m, front and back;
+  - the throne terrace: three 1.4 m flights. At 32° each needs about 2.2 m of
+    run plus a landing, about 11.5 m in all, which fits the 12 m between the
+    terrace's front edge and the hall.
+  - the inner court: 1.4 m, previously called "one step";
+  - the kitchen descent: 5.6 m;
+  - the high pavilion's mound: 4.2 m.
+- **Sizes.** The kitchen (18 × 12 m) holds its 12 × 8 m fight floor with
+  counters round it. The footprints were already moved apart in the first
+  pass.
+- **Access and pass-throughs:**
+  - The inner court is reached by the side ramps round the Throne Hall, not
+    through it.
+  - The Chef's quarters, later Liang Zhen's room, open off the kitchen: a
+    cook's room off his own kitchen, which is legitimate.
+  - The Emperor's bedchamber, study and robe room open into one another. They
+    are his own suite, which is legitimate. In the civic state, the meeting
+    room, records room and reading room each get a door onto the inner court's
+    gallery, so the public never passes through one room to reach another.
+  - The Dining Hall is entered from the front court.
+- **Headroom and frames.**
+  - Gallery and eave heights follow the hall storeys, at 2.4 m or more.
+  - Door leaves sit in full bays between columns, never in a bay with a
+    window.
 
 ## 5. Systems
 
