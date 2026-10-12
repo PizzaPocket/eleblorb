@@ -93,6 +93,12 @@ the world bible.
   city blorbs simply stay outside the city's outskirts.
 - **No opulent fountains.**
 
+**Seventh revision (user, 2026-10-12):**
+- **No road to a wider world.** There is none: the world ends at the
+  planetary ocean beyond the ring of mountains. So nothing comes in or goes
+  out by road, and Moy feeds and powers itself.
+- **No public bath.**
+
 **Sixth revision (user, 2026-10-12):**
 - **No big empty gaps between buildings.** Real cities don't have them:
   every block is built out to its streets.
@@ -177,14 +183,14 @@ blorbs may not cross. It reads as an edge, never as a sign.
 follow approval):
 - **All round: the city blorbs** stay out in the open desert just beyond the
   outskirts.
-- **West: the goods yard**, at the end of West Street, where **the west
-  road** ends. The road runs out across the desert and through the mountains
-  past the world's edge, to the farmland and the coast that feed Moy; the
-  player never follows it. **No road runs east** (user): that way there is
-  nothing but rock and the main plateau's 60 m cliff.
-- **North-west: the water works** and the water tower.
+- **No roads out** (user). Westward the desert runs to the mountains, and
+  beyond them lies the planetary ocean; eastward there is nothing but rock
+  and the main plateau's 60 m cliff. The streets stop at the Rim Walk.
+- **West: the battery works**, at the end of West Street.
+- **North-west: the water works**, the water tower and the **fish tanks**
+  (below).
 - **Just beyond: the wind farm**, four turbines in two pairs framing the
-  city (below), with the battery works by the goods yard.
+  city (below).
 
 **The wind farm: Moy's power.** The city runs on the wind.
 - **Why here.** The basin between the plateaus funnels a steady wind from
@@ -235,8 +241,7 @@ follow approval):
   - a nacelle with a railed service roof;
   - a door at each tower's foot;
   - a substation beside the **battery works**, which stand at the field's
-    edge nearest Moy, store the wind's power for calm days, and charge the
-    batteries that go out by road;
+    edge nearest Moy and store the wind's power for calm days;
   - cables buried, not modelled;
   - a low, slow whoosh near the towers.
 - **Collision and play:**
@@ -281,8 +286,8 @@ A desert city needs a reason to exist. This one has **the wind.**
 
 1. **Energy, the founding industry.** The **Windworks** company runs the wind
    farm and the battery works. The city was built for the Windworks as Las
-   Vegas was built for its dam. Charged batteries leave by the west road
-   for the wider world.
+   Vegas was built for its dam. Everything in Moy runs on it: the lifts,
+   the lights and signs, the vertical farm, the pumps at the wells.
 2. **Science and technology.** **BLOCK** (renamed from the Lumen Institute,
    user), a research institute with a campus downtown, works on power and on "living current". Start-ups spun out of
    it fill floors of the downtown towers, and Tanglewire recruits for both.
@@ -290,18 +295,25 @@ A desert city needs a reason to exist. This one has **the wind.**
 3. **Professional services.** Law (Raman & Reese: the Windworks's contracts, BLOCK's
    patents and the city's own cases) and finance serve the first
    two.
-4. **Hospitality and spectacle.** People come in from the towns for the
-   Grand Hotel, the cinema and the night market. In a
-   world of villages, the city's lights are themselves the attraction, as Las
-   Vegas's are.
+4. **Hospitality and spectacle.** The Grand Hotel, the cinema and the night
+   market serve Moy itself and the rare traveller who crosses the desert on
+   foot, like the hero. In a world of villages, the city's lights are
+   themselves the sight, as Las Vegas's are.
 5. **The everyday city.** Markets, the hawker centre, shops, the clinic, the
    school and the upkeep crews: the residents serving each other.
 
-**Imports:** almost all the food. Grain, vegetables and fruit come in by the west
-road from the farmland, the Middle of Nowhere among it, and fish come packed in
-ice from the coast. The market lanes are full of crates from elsewhere.
-**Exports:** power (charged batteries), inventions, legal and financial work,
-and hospitality.
+**Moy feeds itself (proposed).** No road leads out (user), so nothing is
+imported or exported. The wind and the wells make a desert city able to
+grow its own food:
+- the **vertical farm**, a windowless tower of lit growing racks in the
+  market lanes, run by Sora Ishida: greens, herbs, vegetables, grain and
+  fruit;
+- **rooftop greenhouses** on the estate's podiums and the market roofs;
+- the **fish tanks** at the water works, fed by the wells, where Rosa's fish
+  are netted each morning.
+
+The market lanes sell what Moy grows. The law firm, the recruiters and
+BLOCK work for the city's own companies.
 
 ### Census (proposed, 2026-10-12)
 
@@ -354,7 +366,7 @@ in character and pointing nowhere:
 | **Mara Quill** | a rooftop studio in Old Moy | novelist | Writes in the library and the café. Says the city mirrors something, and is writing a book to find out what. |
 | **Pia Rowe** | a shared flat over the market | busker on Civic Plaza | Likes the noise at street level; plays where the crowds turn. |
 | **Old Fu** | behind the park's tea house | keeps the tea house and the chess tables in the park | Sweeps the park at dawn, pours tea for the chess players, and can beat everyone in the city except Bea Ho. |
-| **Sora Ishida** | Garden Row, with Ada | runs the Pine Bath, the public bathhouse | Fires the bath's boiler at four every afternoon, the same as her mother did. |
+| **Sora Ishida** | Garden Row, with Ada | runs the vertical farm in the market lanes | Keeps the racks lit and watered through the night; her mother kept the first rooftop greenhouse in Old Moy. |
 
 **Commerce and food**
 
@@ -363,8 +375,8 @@ in character and pointing nowhere:
 | **Sol Brant** | above his café | runs the breakfast café in Old Moy | Up before the sun, which the towers hide until mid-morning. |
 | **Mei Chan** | the market flats, with her daughter Lily | runs the noodle stall at the night market | Cooks at a stall her mother licensed forty years ago. |
 | **Hiro Sato** | above the store | keeps the all-night convenience store | Has not closed in eleven years and knows who comes in at 3 a.m. and why: Pinestein, most nights, for batteries. |
-| **Rosa Delgado** | the market flats | fishmonger at the wet market | Loud, funny, and the best judge of freshness in the city. Her fish come in on ice by the west road, two days from the water, and she will tell you which day. |
-| **Wen Li** | the market flats | greengrocer at the wet market | Grows herbs on the market's roof and sells them below. Her best greens come from a farm in the Middle of Nowhere, and the crates carry its mark: Elizabeth's mother's farm. |
+| **Rosa Delgado** | the market flats | fishmonger at the wet market | Loud, funny, and the best judge of freshness in the city. Her fish come from the tanks at the water works the morning they are netted, and she will tell you which tank. |
+| **Wen Li** | the market flats | greengrocer at the wet market | Grows herbs on the market's roof and sells them below. Her greens come up from Sora's vertical farm before dawn. |
 | **Gideon Hale** | behind his shop | **the Helmsmith** | Makes helms for blorbs and their wearers; gruff, precise, and secretly delighted by every new customer. |
 | **Zara Quinn** | a studio on the market roof | sign painter | Paints the city's picture signs (no lettering, ever) and hangs them herself. |
 | **Siti Rahman** | North Estate, Block 2 | runs the laksa stall at the North Estate hawker centre | The estate's auntie: feeds the shift workers at dawn and the children after school, and knows which flat every lift-button smudge belongs to. |
@@ -468,7 +480,7 @@ city's bounds. **The rest is proposed.**
 | Knowledge | Ada, Nia, Benji | the library |
 | Culture | Imani; Leon; Mara; Pia | the museum; the Moonlight Cinema; the plazas |
 | Food | Sol, Mei, Rosa, Wen, Hiro | the café; the night market; the wet market; the convenience store |
-| Washing and gathering | Sora | the Pine Bath |
+| Food grown in the city | Sora; Rosa's fish from the water works | the vertical farm; rooftop greenhouses; the fish tanks |
 | Health | Dr. Mehta | the clinic |
 | Safety | Kate | the police box |
 | School | Yuki | the primary school |
@@ -484,9 +496,10 @@ city's bounds. **The rest is proposed.**
 
 **Utilities, with no cars:**
 - Water and power arrive underground.
-- Goods arrive by hand truck and cargo trike from a **goods yard** at the
-  west edge, where the west road ends.
-- Waste leaves the same way at dawn.
+- Goods move by hand truck and cargo trike from the vertical farm, the
+  greenhouses and the water works to the markets, at dawn through the back
+  lanes.
+- Waste goes to a recycling works beside the battery works at dawn.
 - Fire safety uses lane-side hydrants and the ramp towers as escape routes.
 
 ## 4. Scale
@@ -515,8 +528,7 @@ hero about 1.9 m. City buildings follow it, on the 3.2 m building cell.
 
 **Precedents:**
 - **Tokyo** (Shimokitazawa, Nakameguro, Yanaka): narrow lanes; pencil
-  buildings; tiled facades; rounded corner buildings; covered shopping arcades (shōtengai); police boxes (kōban); public
-  bathhouses (sentō).
+  buildings; tiled facades; rounded corner buildings; covered shopping arcades (shōtengai); police boxes (kōban).
 - **Hong Kong** (Central, Sheung Wan, Mong Kok): tenement shophouses (tong
   lau) with verandas over the pavement; stacked vertical signs; mansion
   towers on podiums; footbridge networks; the Mid-Levels' sloping covered
@@ -656,14 +668,12 @@ buildings.
    │  point and slab blocks on podiums · Estate Square and the │
    │  hawker centre on North Street                            │
    ├────────────┬─────────────────────────────┬────────────────┤
-   W, outside:
-   goods yard,
-   battery works
-   ◄── the west road, out past the world's edge
+   W, outside: the battery works; then desert, the mountains and, beyond
+   them, the planetary ocean (no roads out)
 W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: desert,
    │  lanes,    │ Square  giant playground Plaza│ Meridian Ave: │  then the
    │  cinema,   │ (library  tea house · chess   │ the Windspire,│  main
-   │  bath,     │  on its   pond          (hotel│ Tanglewire,   │  plateau's
+   │  café,     │  on its   pond          (hotel│ Tanglewire,   │  plateau's
    │  clinic,   │  north)   — the Park Ring —  N, │ BLOCK        │  cliff; no
    │  police box│            museum (S)   hall S)│               │  road
    ├────────────┴─────────────────────────────┴────────────────┤
@@ -698,10 +708,8 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
   - **Estate Square**, on North Street in the North Estate, with the hawker
     centre on its east side and void decks opening onto it.
   - **Cinema Square**, a small square in Old Moy where the Moonlight Cinema
-    and the Pine Bath face each other.
-- **Arrival.** Goods and travellers from the wider world come in by the
-  west road to the goods yard and walk in down West Street. The hero comes
-  on foot across the open desert, and any lane's gap in the Rim Walk lets
+    and Sol's café face each other.
+- **Arrival.** No road reaches Moy. The hero comes on foot across the open desert, and any lane's gap in the Rim Walk lets
   him in. From the plateau side the grand way in is **Meridian Avenue**
   (renamed from Harbour Street: there is no harbour in a desert), the
   palm-lined main street, between the skyscrapers, which opens onto **Civic
@@ -709,8 +717,7 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
 - **The museum** faces the park from the Park Ring's south side.
 - **Old Moy** (west; renamed from Lantern Lane, user) is the old residential
   and craft quarter of lanes and pencil buildings either side of West
-  Street: Sol's café, the Moonlight Cinema and the Pine Bath on Cinema
-  Square, the clinic, the police box, and Pinestein's rooftop laboratory.
+  Street: Sol's café and the Moonlight Cinema on Cinema Square, the clinic, the police box, and Pinestein's rooftop laboratory.
 - **The market lanes** (south) hold Market Square, the wet market, the night
   market, the covered shopping arcade, the Helmsmith, Hiro's store, Wing Fat
   Mansion and the school.
@@ -811,7 +818,7 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the Pine Bath; the family's flat; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's flat; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
 | **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 
@@ -841,6 +848,8 @@ lit crowns.
 - Jammer is at his grandmother's in the Middle of Nowhere.
 - The city's name is **Moy**. No Sign Boneyard: the city blorbs simply stay
   outside the outskirts. No opulent fountains.
+- No road out of Moy to anywhere: the world ends at the planetary ocean
+  beyond the mountains. No public bath.
 - No road from the plateau side: nothing is there but rock. The research
   institute is called **BLOCK**, not Lumen.
 - (sixth revision) Every block built out to its streets, no empty gaps; the
@@ -848,8 +857,8 @@ lit crowns.
   streets without cars; several plazas.
 - Jammer's parents are **Elizabeth Reese** and **Dan Miller**, married
   (user, 2026-10-12), and they can speak of the Middle of Nowhere. Proposed
-  clues: Elizabeth's photograph of the hero as a boy, Jammer's room full of
-  farm drawings, and the farm's mark on Wen Li's crates.
+  clues: Elizabeth's photograph of the hero as a boy, and Jammer's room full
+  of farm drawings.
 - Giant wind turbines, after China's desert wind bases, out in the
   wasteland around the city: **Moy's power source** (fifth revision).
 - The turbines' blades collide with the player.
@@ -870,14 +879,15 @@ lit crowns.
   corridors;
 - the districts;
 - the site at a radius of 200 m;
-- the Pine Bath, the Moonlight Cinema, the museum and the
+- the Moonlight Cinema, the museum and the
   police box;
-- the goods yard at the end of the west road, which leaves through the
-  world's edge (no road east, user);
+- (seventh revision) Moy feeds itself: the vertical farm (Sora), rooftop
+  greenhouses and the fish tanks at the water works; the battery works on
+  the west edge;
 - (third revision) the water story (deep wells, reclaimed water, roof tanks)
   and the water works;
-- the economy: the Windworks, BLOCK, law and finance,
-  hospitality; food imported from the farmland;
+- the economy: the Windworks, BLOCK, law and finance, hospitality, all
+  serving the city itself;
 - the Rim Walk as the bounds; the city blorbs and the City Gem in the desert
   just beyond it;
 - the names **Old Moy** and the **North Estate**; the street names (the Park
