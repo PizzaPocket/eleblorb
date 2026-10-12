@@ -331,7 +331,7 @@ unnamed: these forty-five are the people the hero meets.
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Elizabeth Reese** | the family's flat, Block 3, North Estate, 18th floor | corporate attorney, partner at Raman & Reese, a corporate law firm in the glass tower on Civic Plaza | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. |
+| **Elizabeth Reese** | the Reese–Miller house, an old tower house in Old Moy; she walks to work across the park | corporate attorney, partner at Raman & Reese, a corporate law firm in the glass tower on Civic Plaza | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. |
 | **Dan Miller** | the same apartment | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at BLOCK, the Windworks and the start-ups | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
 | *(Jammer)* | away, at his grandmother's in the Middle of Nowhere | — | Their son; his room in the apartment is full of drawings of the farm. |
 
@@ -751,9 +751,47 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
   tower and BLOCK, to open onto **Civic Plaza** and, past it, the park. The
   Grand Hotel's revolving door is on the plaza.
 - **The museum** faces the park from the Park Ring's south side.
-- **Old Moy** (west; renamed from Lantern Lane, user) is the old residential
-  and craft quarter of lanes and pencil buildings either side of West
-  Street: Sol's café and the Moonlight Cinema on Cinema Square, the clinic, the police box, and Pinestein's rooftop laboratory.
+- **Old Moy** (west; renamed from Lantern Lane, user) is the **well town**,
+  the settlement that was here before the city (user approved, 2026-10-12).
+  It stays tall (user): its buildings are 4 to 9 storeys.
+  - **Why it is tall.** The first settlers drilled down to the old river's
+    water under the gorge floor, and every family wanted to live within
+    reach of the wells. So the town grew up instead of out: narrow **tower
+    houses** of 4 to 9 storeys, shoulder to shoulder, the lanes between
+    them kept cool by their own shade. Precedent: Shibam in Yemen, the
+    sixteenth-century "Manhattan of the desert", and the tower houses of
+    old Sana'a. When the Windworks came, the new city was laid out round
+    this dense old core, and its narrow tall houses became the model for
+    the pencil buildings across Moy.
+  - **How it looks.** Thick, pale lime-plastered lower walls that thin as
+    they rise; small deep windows low down and larger screened windows high
+    up; roof terraces where families sleep on summer nights; later tiled
+    pencil buildings filling the gaps between the old houses.
+  - **Wind towers.** The old houses carry rooftop wind towers that catch
+    the breeze high above the lanes and send it down through the rooms.
+    Moy lived by its wind long before the turbines; the Windworks is the
+    newest form of an old habit.
+  - **The wells.** The first well, capped now, stands on Cinema Square with
+    its stone trough and the oldest shade tree in the city. **Tank Lane** is
+    named for the old water tanks and still leads toward today's water
+    works.
+  - **Where the picture signs began.** Families marked their tower houses
+    with painted pictures instead of names, which is why no sign in Moy
+    has ever carried lettering. Zara's lit signs descend from the old house
+    marks, and the oldest painted marks still show on Old Moy's walls.
+  - **Who lives here.** Elizabeth, Dan and Jammer live in an old tower
+    house on Arcade Street (the Reese–Miller house), with a wind tower and
+    a roof terrace; Jammer's room, full of farm drawings, is at the top.
+    Elizabeth and Dan walk to work downtown every morning, along West
+    Street, across Library Square and the park to Civic Plaza and the glass
+    tower, about 300 m. Pinestein's laboratory sits on one of the tallest
+    tower houses, its antennas beside the old wind tower. Sol's café and the
+    bakery are in tower houses; Sora's mother kept the first rooftop
+    greenhouse on an Old Moy terrace. The Moonlight Cinema was built later,
+    into the old fabric.
+  - **Its places:** Sol's café and the Moonlight Cinema on Cinema Square,
+    the bakery, the clinic, the police box, Pinestein's rooftop laboratory,
+    Mara's rooftop studio, the Reese–Miller house.
 - **The market lanes** (south) hold Market Square, the wet market, the night
   market, the covered shopping arcade, the Helmsmith, Hiro's store, Wing Fat
   Mansion and the school.
@@ -782,8 +820,7 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     floor.
 
   The distances between blocks are compressed for the game; real estates
-  set facing blocks further apart. Jammer's family lives in Block 3, on the
-  Park Ring, overlooking the park. The Housing Board (Juno) runs the estate.
+  set facing blocks further apart. The Housing Board (Juno) runs the estate.
 - **The giant playground**, in the park: the biggest the world has seen
   (after Singapore's mosaic dragon playgrounds and the great net-tower
   playgrounds of Europe and Japan):
@@ -822,7 +859,7 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
 ### Building schedule (proposed, 2026-10-12)
 
 Every building in Moy is planned (user). The plan in the visualization draws
-each one: about 200 ordinary buildings and the 51 numbered buildings
+each one: about 200 ordinary buildings and the 52 numbered buildings
 below.
 - **Old Moy and the market lanes:** street buildings, one per lot, 6 to
   10 m of frontage by about 15 m deep, 4 to 9 storeys, homes over shops.
@@ -866,7 +903,7 @@ round the park and on Civic Plaza.
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
 | 18 | Block 2 | 22 × 22 m | point block, 30 storeys, east precinct | Siti Rahman |
-| 19 | Block 3 | 22 × 22 m | point block, 36 storeys, on the Park Ring | Elizabeth, Dan and Jammer (18th floor); Juno Rell (20th) |
+| 19 | Block 3 | 22 × 22 m | point block, 36 storeys, on the Park Ring | Juno Rell (20th floor) |
 | 20 | Block 4 | 22 × 22 m | twin point block, 40 storeys; sky bridge and sky garden at the 26th floor | homes (no one the hero meets) |
 | 21 | Block 5 | 22 × 22 m | twin point block, 40 storeys | Dr. Imani Osei and Kofi |
 | 22 | Block 6 | 54 × 14 m | slab block, 14 storeys, shops in its void deck on the Park Ring | homes (no one the hero meets) |
@@ -880,19 +917,20 @@ round the park and on Civic Plaza.
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
 | 3 | Library | 45 × 62 m | 5 storeys, terraced atrium | Ada Fong, Nia Calder, Benji Okoro |
-| 5 | Moonlight Cinema | 30 × 28 m | 2 storeys; flat above | Leon Duarte (lives above) |
+| 5 | Moonlight Cinema | 30 × 28 m | 2 storeys, built later into the old town; flat above | Leon Duarte (lives above) |
 | 6 | Police box | 6 × 8 m | 1 storey, back room | Kate Byrne |
 | 7 | Clinic | 14 × 18 m | 3 storeys; flat above | Dr. Arjun Mehta (lives above) |
 | 17 | Block 1 | 22 × 22 m | point block, 32 storeys, west precinct | Tomas Wren |
 | 24 | Garden Row | 23 × 18 m | 3 townhouses, 3 storeys, facing the Park Ring | Teodora Vance; Ada Fong and Sora Ishida; Priya Raman |
-| 25 | Sol's café | 16 × 10 m | 3 storeys; flat above | Sol Brant |
-| 26 | Bakery | 10 × 16 m | 4 storeys; flats above | Felix Tanaka (above) |
-| 27 | Pinestein's building | 9 × 16 m | 7 storeys; rooftop laboratory | Palbert Pinestein (top floor) |
+| 25 | Sol's café | 16 × 10 m | old tower house, 5 storeys; flat above | Sol Brant |
+| 26 | Bakery | 10 × 16 m | old tower house, 6 storeys; flats above | Felix Tanaka (above) |
+| 27 | Pinestein's building | 9 × 16 m | old tower house, 9 storeys; laboratory on the roof beside its wind tower | Palbert Pinestein (top floor) |
 | 28 | Mara's building | 9 × 16 m | 8 storeys; rooftop studio | Mara Quill |
 | 29 | Benji's building | 8 × 16 m | 6 storeys | Benji Okoro |
 | 30 | Theo's building | 8 × 16 m | 6 storeys | Theo Park |
 | 31 | Yuki's building | 8 × 16 m | 6 storeys | Yuki Hayashi |
 | 32 | Suri's building | 8 × 16 m | 7 storeys | Suri Vale |
+| 52 | Reese–Miller house | 10 × 16 m | old tower house, 7 storeys; wind tower and roof terrace | Elizabeth Reese, Dan Miller and Jammer (away at the farm) |
 
 **Market lanes**
 
@@ -981,7 +1019,7 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's flat; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
 | **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 
@@ -1013,7 +1051,10 @@ lit crowns.
 - The city's name is **Moy**. No Sign Boneyard: the city blorbs simply stay
   outside the outskirts. No opulent fountains.
 - Old Moy keeps its tall street buildings, 4 to 9 storeys; it is not to be
-  lowered (user).
+  lowered (user). Its backstory as the well town of tall tower houses, with
+  wind towers, the first well and the house marks that became the picture
+  signs, is approved (user). Elizabeth, Dan and Jammer live in an old tower
+  house in Old Moy and commute downtown (user).
 - Every street is named and planned, with no dead ends; every building
   has a street face; downtown is filled with mid-rise blocks round the
   towers; green on the plan means gardens only (user).
