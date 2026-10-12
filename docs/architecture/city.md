@@ -332,7 +332,7 @@ unnamed: these forty-five are the people the hero meets.
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
 | **Elizabeth Reese** | the Reese–Miller house, an old tower house in Old Moy; she walks to work across the park | corporate attorney, partner at Raman & Reese, a corporate law firm in the glass tower on Civic Plaza | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. |
-| **Dan Miller** | the same apartment | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at BLOCK, the Windworks and the start-ups | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
+| **Dan Miller** | the same house; he walks to work with Elizabeth | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at BLOCK, the Windworks and the start-ups | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
 | *(Jammer)* | away, at his grandmother's in the Middle of Nowhere | — | Their son; his room in the apartment is full of drawings of the farm. |
 
 Raman & Reese is named for its two partners, Priya Raman and Elizabeth.
