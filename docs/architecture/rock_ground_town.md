@@ -482,8 +482,9 @@ this is a deliberate fusion.
 - **Main street:** the arrival road becomes the street, with the boardwalk
   along both sides.
 - **The saloon and hotel, the town's inn** (confirmed 2026-10-07): the inn is
-  integrated into the saloon, at the head of the street, facing down it: the
-  social centre and the rest point.
+  integrated into the saloon, on the well square at the middle of main street,
+  its porch facing the road (revised 2026-10-12; see 6a): the social centre
+  and the rest point.
   - Saloon below, with its bar, piano, card tables and swinging doors.
   - Hotel rooms above, with the party room.
   - A modern washroom with a porcelain toilet: the town is layered present-day,
@@ -572,6 +573,68 @@ this is a deliberate fusion.
 - **The stamp mill** at the ore house, under its own windpump.
 - **Hitching rails** outside the saloon, the store and the jail.
 
+### 6a. Town layout concept: a strip on a through road (2026-10-12)
+
+**Why it changed.** The first sketch put the saloon at the head of main
+street, facing down it. That makes main street a dead end, with the saloon
+blocking it. A town whose culture is dirt bikes and motor horses grows along
+a road that goes somewhere, as the Route 66 and highway towns of Texas did
+along their roads. Traffic passes through it and stops.
+
+**The through road.** One kingdom road links everything the town lives on.
+
+| Section | From | To | Why people use it |
+|---|---|---|---|
+| **Mine road** | the town's west end (-222,100) | the Silverback mine on the canyon's east wall (about (-294,112)) | Cass, the ore carts and the miners; ore comes into town at the west end |
+| **Main street** | west end (-222,100) | east end (-88,100) | the town itself |
+| **Arrival road** | east end (-88,100) | the arrival shelf and the gate at the kingdom's centre | everyone arriving or leaving |
+| **Basin road** | the arrival shelf | Gus's shack and Hazel's bone camp on the fossil basin's rim | Gus, Hazel, supplies out and specimens in |
+
+Main street runs east–west across the shelf, about 8 m south of the old well
+at the shelf's centre. So the well stands on the street's north side, not in
+the road.
+- **Carriageway:** 8 m, wide enough for two bikes or two horses to pass a
+  parked rig.
+- **Boardwalks:** a covered boardwalk on each side, about 3 m.
+- **Total:** about 14 m between building fronts, over a length of about
+  135 m.
+
+**Order along the street, west to east.** Ore and miners come in from the
+west, and travellers from the east.
+
+| | North side | South side |
+|---|---|---|
+| West end, by the mine road | **General store** (Walt): miners' tools and supplies, first stop off the mine road | **Doctor's and barber's** (Hollis) |
+| | **Assay office and bank** (Pearl), with **Tomás's survey room** behind: the ore wagons unload at its side yard off the back lane | a house plot (open, for the census's homes) |
+| | **Jail** (Ruth), with the radio mast and heliograph, looking onto the square | — |
+| Middle | **The well square**: a widening of the north boardwalk around the old well, with hitching rails and bike stands. The **saloon and hotel** fills the square's north side, its two-storey porch facing the square and the road. The gang sits on that porch watching every rider who passes, which gives arrival its dangerous edge without blocking the road. | **The water tower and windpump** opposite the square, its tank shading the street; the lane south to the Bell ranch leaves beside it |
+| | — | **Saddlery** (Wes) |
+| | — | **Hat shop** (Inez) |
+| East end, the town's front door | the east end's north corner stays open as the view into town | **Livery and garage** (Mateo) with its **charging posts** at the kerb: the first thing an arriving rider reaches, like a filling station at a town's edge |
+
+**Behind the street.**
+- **Back lanes** run behind both rows: deliveries, the ore wagons to the
+  assay yard, and the residents' yards and sheds.
+- **The race barn and rodeo arena** (Lark, Della) stand south-east, behind
+  the livery, reached by a side lane at the east end. The race course leaves
+  the arena east and south across the flats and never uses main street.
+- **The Bell ranch and corral** lie south of the shelf, down the lane by the
+  water tower, with their own windpump.
+- **Homes** sit above shops and on the open plots, sized in the measured
+  layout.
+
+**Why this holds together.**
+- Every trade sits where its traffic arrives: the store and the assay office
+  by the mine road, the livery by the arrival road.
+- The saloon is on the square at the centre, where every traveller passes it
+  and where the street widens to let people gather off the carriageway.
+- Nothing blocks the through road, and nothing faces away from it.
+- The race traffic stays off main street.
+
+The measured layout (plots, footprints, yards and lane widths) follows when
+the town brief is approved. The 68 m shelf must be checked against these
+frontages then.
+
 ## 7. Landscape direction
 
 The kingdom stays a **dirt and rock biome**, almost bare. A few desert plants,
@@ -644,7 +707,7 @@ proposed in section 2a.
 - Wes Tolliver the saddle maker and the shifting saddle for Manchego;
 - the cowboy hat as the Ground suit's helm, shifting with `DirtbikeMode`;
 - the architectural charter direction;
-- the places list;
+- the places list, laid out as a strip on the kingdom's through road (6a);
 - the race course;
 - the Chihuahuan palette;
 - the porcelain toilet.
