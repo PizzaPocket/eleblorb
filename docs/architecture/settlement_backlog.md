@@ -95,7 +95,8 @@ computer.
 | Oc2 | Shared dry-volume system (ships below the waterline, air halls, tunnels) | shared | Ready after Oc1 | Oc1 | 8 |
 | Oc3 | How tournament fights work; the mongooses' harmony quest | Ocean | Decide | the user | 8, 13 |
 | **The city** |||||
-| Ci1 | Settlement plan, second pass: no cars or trains, a dense walkable Tokyo and Hong Kong neighbourhood, a census of forty named residents, four movement layers (ground, the Deck, towers, roofs), Leaf Hat swing corridors, site radius 200 m, the Grand Hotel and the library | City | Approve | the user; the city's name | 22 |
+| Ci1 | Settlement plan, third revision: a desert city with no water nearby, its wells and economy, no cars or trains, a dense walkable Tokyo and Hong Kong neighbourhood, a downtown of skyscrapers, Singapore-style public housing, Pinestein and the outcast city blorbs, a census of forty-five named residents, four movement layers (ground, the Deck, towers, roofs), Leaf Hat swing corridors, site radius 200 m, the Grand Hotel and the library | City | Approve | the user; the city's name | 22 |
+| Ci3 | Move the wild city blorbs' spawns and the City Gem outside the city's bounds (the Sign Boneyard and the mirror field), and keep city blorbs' roaming outside the Rim Walk | City | Approve with Ci1 | Ci1's layout | 22 |
 | Ci2 | Prototype the lit-window "interior mapping" shader and one real-size tower with a podium, before any city layout code | City | Ready | — | 22 |
 | **Across the game** |||||
 | X1 | Story-state triggers on revisit (`WorldState` flags read at arrival) | all | Ready | — | 13 |
@@ -1004,8 +1005,29 @@ footprints, on a 156 m pad, with 8 m roads. The rebuild uses real sizes ×
    - instanced facades;
    - the interior-mapping window shader;
    - Level A interiors.
-5. Keep the non-regression list: City blorbs and the Gem, the Helmsmith, the
-   residents' names, the skyline tier, the wake and sleep radii.
+5. Keep the non-regression list: City blorbs and the Gem (moved outside the
+   bounds), the Helmsmith, the residents' names, the skyline tier, the wake
+   and sleep radii.
+
+**Third revision (user, 2026-10-12):** a desert city like Las Vegas or Dubai
+with no water nearby; a downtown of skyscrapers; Singapore-style public
+housing; Palbert Pinestein made the city blorbs, who are outcast and may not
+enter the bounds. The brief adds, for approval:
+- the site and landscape (section 2a);
+- the water (wells, reclamation, roof tanks);
+- the economy;
+- Pinestein's story (section 3b);
+- the Rim Walk as the bounds;
+- the works beyond it: the Sign Boneyard, the Sunwell mirror field and solar
+  tower, and the water works;
+- downtown on Meridian Avenue with the Sunspire (about 280 m);
+- Parkside Estate;
+- five more residents (forty-five in all).
+
+**Ci3 (code, after the layout):** in `wilderness_scatter.gd`,
+`_spawn_city_blorbs()` samples a ring outside the new radius (the Boneyard
+and the mirror field) instead of the city disk, and drops the City Gem in the
+Boneyard. City blorbs' wander targets are clamped outside the Rim Walk.
 
 **Prototype first (Ci2):** the window shader and one real-size tower with a
 two-storey podium, rendered beside an Ohio house, to judge the scale and the
