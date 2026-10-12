@@ -1448,7 +1448,7 @@ The north side of Library Square: 45 m (east–west) × 62 m (north–south).
 |---|---|---|
 | **The heritage room** | −4.5 m to 0, sunk below the atrium's lowest terrace | Old Moy's archive in the old library's timber shelves: the catalogue of house marks, the well records, the city's photographs; **Nia's map room** in a corner, with its drawers |
 | **Ground** | 0 to +6.5 m | The **porch**, a deep shaded loggia on the square; the entrance hall and lending desk; the **children's library** with its **story pit** (west); washrooms; the sorting room and the loading door on Library Lane (north) |
-| **The terraced atrium** | 0 to +15.5 m, the south half | The heart: terraces of bookshelves rising from the heritage room's rim toward the north, each terrace 1.2 m higher and 2.4 m deeper than the last, the shelves forming the risers and the treads wide enough to sit and read on |
+| **The terraced atrium** | 0 to +20 m, the south half | The heart: terraces of bookshelves rising from the heritage room's rim toward the north up to the level-3 gallery at +11 m, each terrace 1.2 m higher and 2.4 m deeper than the last, the shelves forming the risers and the treads wide enough to sit and read on; open above to the reading room's floor at +20 m |
 | **The Books Spiral** | 0 to +20 m | A continuous ramp, 2.8 m wide at about 1 in 20, winding round the atrium's east, north and west sides through four turns, carrying the general collection on both its sides |
 | **Level 2** | +6.5 m, the Deck's level | The Deck door on the south face; the spiral passes; study booths along the north wall |
 | **Levels 3 and 4** | +11 and +15.5 m | The stacks along the spiral; study rooms; Ada's office overlooking the atrium (level 4) |
@@ -1465,9 +1465,10 @@ bearing on those perimeter walls.
 - **Escape:** a ramp tower in the north-west corner (the world's ramp rule).
 
 **The terraces.** The atrium is about 37 m (east–west) by 28 m. The
-terraces rise from the heritage room's rim at 0 to the level-4 floor at
-about +13.2 m: eleven terraces, each 1.2 m up and 2.4 m deep. Their risers
-are bookshelves. People walk the Books Spiral; readers sit on the treads.
+terraces rise from the heritage room's rim at 0 to the level-3 gallery at
++11 m: nine terraces, each 1.2 m up and 2.4 m deep (21.6 m of the atrium's
+28 m depth; the rest is the floor in front of the great window). Their
+risers are bookshelves. People walk the Books Spiral; readers sit on the treads.
 Ramps cut through the terraces in two places so a reader can reach any
 tread without climbing.
 
@@ -1517,8 +1518,9 @@ room, with flush toilets and basins, to the city sewer.
 
 - **The terraces are the city's best indoor climb.** The treads rise 1.2 m
   each, inside the hero's 1.4 m jump, so he can bound straight up the
-  bookshelf hillside that readers walk round by the spiral. At the top,
-  a gap of 3 m to Ada's balcony is a running jump.
+  bookshelf hillside that readers walk round by the spiral, onto the
+  level-3 gallery. From there the spiral's outer rail, stepping up past
+  the stacks, is the way on to the reading room.
 - **The Books Spiral** is a long, gentle ramp for running.
 - **Outside**, the louvres and the frieze over the porch are climbing holds,
   and the roof's scoops are a run of humps toward the park.

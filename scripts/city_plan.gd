@@ -69,7 +69,7 @@ const PRECINCTS := [
 const BUILDINGS := [
 	{"n": 1, "name": "Grand Hotel", "kind": "civic", "rect": Rect2(-483, -98, 52, 60), "size": "podium 4 storeys, guest tower 25 floors (97 m)", "who": "Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work"},
 	{"n": 2, "name": "City hall", "kind": "civic", "rect": Rect2(-431, -30, 34, 60), "size": "4 storeys and a clock tower, at the head of Civic Plaza", "who": "Mayor Teodora Vance, Kenji Mori (clerk)"},
-	{"n": 3, "name": "Library", "kind": "civic", "rect": Rect2(-686, -92, 45, 62), "size": "5 storeys, terraced atrium", "who": "Ada Fong, Nia Calder, Benji Okoro"},
+	{"n": 3, "name": "Library", "kind": "civic", "rect": Rect2(-686, -92, 45, 62), "size": "5 storeys and a sunken heritage room; terraced atrium, Books Spiral, reading room (section 9)", "who": "Ada Fong, Nia Calder, Benji Okoro"},
 	{"n": 4, "name": "Natural history museum", "kind": "civic", "rect": Rect2(-637, 62, 62, 38), "size": "3 storeys, top-lit hall", "who": "Dr. Imani Osei (curator)"},
 	{"n": 5, "name": "Moonlight Cinema", "kind": "civic", "rect": Rect2(-730, 6, 30, 28), "size": "2 storeys, built later into the old town; flat above", "who": "Leon Duarte (lives above)"},
 	{"n": 6, "name": "Police box", "kind": "civic", "rect": Rect2(-652, 30, 6, 8), "size": "1 storey, back room", "who": "Kate Byrne"},

@@ -57,7 +57,7 @@ def b(n,name,r,kind,h,who=''): B.append(dict(n=n,name=name,r=r,kind=kind,h=h,who
 NB=lambda: 'homes (no one the hero meets)'
 b(1,'Grand Hotel',(-483,-98,-431,-38),'civic','podium 4 storeys, guest tower 25 floors (97 m)','Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work')
 b(2,'City hall',(-431,-30,-397,30),'civic','4 storeys and a clock tower, at the head of Civic Plaza','Mayor Teodora Vance, Kenji Mori (clerk)')
-b(3,'Library',(-686,-92,-641,-30),'civic','5 storeys, terraced atrium','Ada Fong, Nia Calder, Benji Okoro')
+b(3,'Library',(-686,-92,-641,-30),'civic','5 storeys and a sunken heritage room; terraced atrium, Books Spiral, reading room (section 9)','Ada Fong, Nia Calder, Benji Okoro')
 b(4,'Natural history museum',(-637,62,-575,100),'civic','3 storeys, top-lit hall','Dr. Imani Osei (curator)')
 b(5,'Moonlight Cinema',(-730,6,-700,34),'civic','2 storeys, built later into the old town; flat above','Leon Duarte (lives above)')
 b(6,'Police box',(-652,30,-646,38),'civic','1 storey, back room','Kate Byrne')
