@@ -1,0 +1,393 @@
+"""Authoring tool for Moy's plan (docs/architecture/city.md, section 7 and the
+building schedule). It holds the named streets, squares, precincts and
+numbered buildings, fills every street block with lots from its street edges
+inward, checks the result, and writes scripts/city_plan.gd, the one plan the
+city builder and tools/validate_city_plan.tscn read.
+
+    python3 tools/city_layout.py [--json out.json]
+
+--json also writes the plan as JSON, for drawings of the plan.
+
+Edit the streets and buildings here, never in city_plan.gd. World metres:
++X east, -Z north; Moy's centre is (-560, 0) and the Rim Walk's radius 200 m.
+"""
+import json, math, os, sys
+CX=-560; R=197
+def inside(x,z):
+    # the whole 1 m cell, not just its centre, lies within the built radius
+    return max(math.hypot(x+dx-CX,z+dz) for dx in (0,1) for dz in (0,1))<=R
+# ---- named streets: (name, kind, x0,z0,x1,z1). kind: main 12, avenue 10, shop 8, lane 4
+STREETS=[
+ ('Park Ring','main',-637,-62,-483,-50),
+ ('Park Ring','main',-637,50,-483,62),
+ ('Park Ring','main',-637,-50,-625,50),
+ ('Park Ring','main',-495,-50,-483,50),
+ ('Meridian Avenue','main',-391,-6,-340,6),
+ ('Meridian North','avenue',-483,-38,-340,-30),
+ ('Meridian South','avenue',-483,30,-340,38),
+ ('Clock Street','lane',-397,-30,-391,30),
+ ('West Street','main',-780,-6,-694,6),
+ ('North Street','main',-566,-220,-554,-62),
+ ('South Street','main',-566,62,-554,220),
+ ('Arcade Street','shop',-694,-220,-686,220),
+ ('Market Street','shop',-780,114,-487,122),
+ ('Cinema Lane','lane',-734,-220,-730,220),
+ ('Tank Lane','lane',-780,-122,-694,-118),
+ ('Pine Lane','lane',-780,-62,-694,-58),
+ ('Clinic Lane','lane',-780,58,-637,62),
+ ('Library Lane','lane',-686,-96,-566,-92),
+ ('Museum Lane','lane',-641,62,-637,114),
+ ('Garden Walk','lane',-641,-92,-637,-30),
+ ('Lamp Lane','lane',-694,170,-487,174),
+ ('Estate Lane','lane',-487,-220,-483,-62),
+ ('Market Lane','lane',-487,62,-483,220),
+ ('Hotel Lane','lane',-483,-102,-340,-98),
+ ('Glass Lane','lane',-483,98,-340,102),
+]
+OPENS=[
+ ('park',-625,-50,-495,50),
+ ('Civic Plaza',-483,-30,-431,30),
+ ('Library Square',-686,-30,-637,30),
+ ('Market Square',-590,122,-530,164),
+ ('Estate Square',-554,-118,-516,-84),
+ ('Cinema Square',-752,6,-734,34),
+]
+B=[]
+def b(n,name,r,kind,h,who=''): B.append(dict(n=n,name=name,r=r,kind=kind,h=h,who=who))
+NB=lambda: 'homes (no one the hero meets)'
+b(1,'Grand Hotel',(-483,-98,-431,-38),'civic','podium 4 storeys, guest tower 25 floors (97 m)','Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work')
+b(2,'City hall',(-431,-30,-397,30),'civic','4 storeys and a clock tower, at the head of Civic Plaza','Mayor Teodora Vance, Kenji Mori (clerk)')
+b(3,'Library',(-686,-92,-641,-30),'civic','5 storeys, terraced atrium','Ada Fong, Nia Calder, Benji Okoro')
+b(4,'Natural history museum',(-637,62,-575,100),'civic','3 storeys, top-lit hall','Dr. Imani Osei (curator)')
+b(5,'Moonlight Cinema',(-730,6,-700,34),'civic','2 storeys, built later into the old town; flat above','Leon Duarte (lives above)')
+b(6,'Police box',(-652,30,-646,38),'civic','1 storey, back room','Kate Byrne')
+b(7,'Clinic',(-712,62,-698,80),'civic','3 storeys; flat above','Dr. Arjun Mehta (lives above)')
+b(8,'Primary school',(-664,122,-641,152),'civic','3 storeys, roof playground','Yuki Hayashi (teacher); Lily, Kofi')
+b(9,'Tea house',(-618,24,-604,36),'civic','1 storey; flat above and keeper\'s room behind','Old Fu (keeper); Kenji Mori (above)')
+b(10,'Park lodge',(-508,30,-498,38),'civic','1 storey','Orin Pike (park keeper)')
+b(11,'Giant playground',None,'play','climbing towers 12–20 m','Lily, Kofi')
+b(12,'Windspire',(-431,-80,-389,-38),'tower','about 70 storeys, 280 m, on a podium','the Windworks (headquarters, observation deck)')
+b(13,'Glass tower',(-483,38,-443,78),'tower','about 45 storeys, 180 m, on a podium','Raman & Reese (Elizabeth, Priya, Venn); Tanglewire (Dan)')
+b(14,'North tower',(-483,-142,-443,-102),'tower','about 45 storeys, 175 m, on a podium','start-up floors (Theo Park)')
+b(15,'South tower',(-483,102,-443,142),'tower','about 40 storeys, 150 m, on a podium','flats over offices; Dr. Vera Kask')
+b(16,'BLOCK',(-431,38,-393,80),'civic','6 storeys, research labs round a court','Dr. Vera Kask (director)')
+b(17,'Block 1',(-679,-151,-657,-129),'estate','point block, 32 storeys, west precinct','Tomas Wren')
+b(18,'Block 2',(-541,-189,-519,-167),'estate','point block, 30 storeys, east precinct','Siti Rahman')
+b(19,'Block 3',(-510,-84,-488,-62),'estate','point block, 36 storeys, on the Park Ring','Juno Rell (20th floor)')
+b(20,'Block 4',(-631,-125,-609,-103),'estate','twin point block, 40 storeys; sky bridge and sky garden at the 26th floor',NB())
+b(21,'Block 5',(-631,-171,-609,-149),'estate','twin point block, 40 storeys','Dr. Imani Osei and Kofi')
+b(22,'Block 6',(-637,-76,-583,-62),'estate','slab block, 14 storeys, shops in its void deck on the Park Ring',NB())
+b(23,'Hawker centre',(-554,-82,-516,-62),'civic','1 storey, open-sided, on the Park Ring and Estate Square','Siti\'s laksa stall')
+b(24,'Garden Row',(-660,40,-637,58),'home','3 townhouses, 3 storeys, facing the Park Ring','Teodora Vance; Ada Fong and Sora Ishida; Priya Raman')
+b(25,"Sol's café",(-750,34,-734,44),'shop','old tower house, 5 storeys; flat above','Sol Brant')
+b(26,'Bakery',(-730,-22,-720,-6),'shop','old tower house, 6 storeys; flats above','Felix Tanaka (above)')
+b(27,"Pinestein's building",(-716,-118,-707,-102),'shop','old tower house, 9 storeys; laboratory on the roof beside its wind tower','Palbert Pinestein (top floor)')
+b(28,"Mara's building",(-716,-58,-707,-42),'shop','8 storeys; rooftop studio','Mara Quill')
+b(29,"Benji's building",(-686,40,-678,56),'shop','6 storeys','Benji Okoro')
+b(30,"Theo's building",(-730,74,-722,90),'shop','6 storeys','Theo Park')
+b(31,"Yuki's building",(-686,62,-678,78),'shop','6 storeys','Yuki Hayashi')
+b(32,"Suri's building",(-702,-112,-694,-96),'shop','7 storeys','Suri Vale')
+b(33,'Wet market',(-530,122,-490,160),'civic','2 storeys; sign studio on the roof','Rosa Delgado, Wen Li; Zara Quinn (roof studio)')
+b(34,'Market flats',(-637,146,-609,170),'shop','tong lau, 8 storeys','Mei and Lily Chan, Rosa, Wen, Pia Rowe')
+b(35,'Wing Fat Mansion',(-637,122,-605,146),'shop','mansion block, 22 storeys on a podium','Ah Keung, Iris Dune, Nia Calder, Venn Harlow, Dax Merrow, Bea and Wilfred Ho')
+b(36,'Vertical farm',(-686,122,-664,146),'civic','windowless, 12 storeys of growing racks','Sora Ishida')
+b(37,'All-night store',(-554,62,-546,74),'shop','5 storeys; flat above','Hiro Sato')
+b(38,'Helmsmith',(-600,174,-590,186),'shop','2 storeys; home behind','Gideon Hale')
+b(39,'City works yard',(-540,174,-514,186),'civic','sheds and a flat','Kade Morrow')
+b(52,'Reese–Miller house',(-704,-40,-694,-24),'home','old tower house, 7 storeys; wind tower and roof terrace','Elizabeth Reese, Dan Miller and Jammer (away at the farm)')
+b(49,'Block 7',(-580,-150,-566,-100),'estate','slab block, 14 storeys, shops in its void deck on North Street',NB())
+b(50,'Block 8',(-509,-146,-487,-124),'estate','point block, 34 storeys, east precinct',NB())
+b(51,'Neighbourhood centre',(-554,-150,-516,-118),'civic','2 storeys: minimart, kindergarten, community club, roof garden','Juno Rell (Housing Board office)')
+for n,name,r,kind,h,who in [
+ (40,'Battery works',(-789,-8,-767,8),'works','2 storeys','Omar Haddad (flat)'),
+ (41,'Recycling works',(-789,14,-771,26),'works','1 storey',''),
+ (42,'Water works',(-700,-226,-680,-212),'works','pump house and keeper\'s house','Rafael Ortiz'),
+ (43,'Water tower',(-722,-226,-712,-216),'works','35 m',''),
+ (44,'Fish tanks',(-676,-206,-656,-190),'works','covered tanks','')]: b(n,name,r,kind,h,who)
+
+# ---- raster
+X0,X1,Z0,Z1=-800,-330,-215,215
+street=set(); opn=set()
+def cells(r):
+    x0,z0,x1,z1=r
+    for x in range(x0,x1):
+        for z in range(z0,z1): yield (x,z)
+for s in STREETS:
+    for p in cells(s[2:]): street.add(p)
+for o in OPENS:
+    for p in cells(o[1:]): opn.add(p)
+def free(p): return inside(*p) and p not in street and p not in opn
+# components
+seen=set(); comps=[]
+for x in range(X0,X1):
+    for z in range(Z0,Z1):
+        p=(x,z)
+        if p in seen or not free(p): continue
+        st=[p]; seen.add(p); px=[]
+        while st:
+            a=st.pop(); px.append(a)
+            for dx,dz in ((1,0),(-1,0),(0,1),(0,-1)):
+                q=(a[0]+dx,a[1]+dz)
+                if q not in seen and free(q): seen.add(q); st.append(q)
+        comps.append(set(px))
+# largest axis-aligned rectangle inside each component (histogram method)
+def maxrect(comp):
+    xs=[p[0] for p in comp]; zs=[p[1] for p in comp]
+    x0,x1,z0,z1=min(xs),max(xs)+1,min(zs),max(zs)+1
+    hgt=[0]*(x1-x0); best=(0,None)
+    for z in range(z0,z1):
+        for i,x in enumerate(range(x0,x1)):
+            hgt[i]=hgt[i]+1 if (x,z) in comp else 0
+        st=[]
+        for i in range(len(hgt)+1):
+            hh=hgt[i] if i<len(hgt) else 0
+            start=i
+            while st and st[-1][1]>=hh:
+                si,sh=st.pop()
+                area=sh*(i-si)
+                if area>best[0]: best=(area,(x0+si,z-sh+1,x0+i,z+1))
+                start=si
+            st.append((start,hh))
+    return best[1]
+blocks=[]
+for comp in comps:
+    if len(comp)<60: continue
+    zs=[p[1] for p in comp]; xs=[p[0] for p in comp]
+    cx,cz=sum(xs)/len(xs),sum(zs)/len(zs)
+    if cx>-487 and cz<-62 and cx<-483: typ='precinct'
+    if cx>-487: typ='midrise'
+    elif cz<-64 and cx>-690 and not (cx<-637 and cz>-96): typ='precinct'
+    else: typ='fabric'
+    r=maxrect(comp)
+    if not r or r[2]-r[0]<6 or r[3]-r[1]<6: continue
+    blocks.append(dict(r=r,type=typ,comp=comp))
+def ov(a,c): return a[0]<c[2] and c[0]<a[2] and a[1]<c[3] and c[1]<a[3]
+named=[x for x in B if x['r']]
+# every named building must have a face on a street, square, park or (estate) its precinct garden
+problems=[]
+def faces(r):
+    x0,z0,x1,z1=r; ring=[]
+    for x in range(x0,x1): ring+= [(x,z0-1),(x,z1)]
+    for z in range(z0,z1): ring+= [(x0-1,z),(x1,z)]
+    return ring
+for nb in named:
+    r=nb['r']
+    if math.hypot((r[0]+r[2])/2-CX,(r[1]+r[3])/2)>200: continue
+    host=[bl for bl in blocks if (int((r[0]+r[2])/2),int((r[1]+r[3])/2)) in bl['comp']]
+    if host and host[0]['type']=='precinct': continue
+    if not any(p in street or p in opn for p in faces(r)): problems.append(('no frontage',nb['n']))
+# lots: fill each whole block from its edges inward; trim each lot to the block's own ground
+def trim(lot,comp):
+    x0,z0,x1,z1=lot
+    for _ in range(60):
+        bad={'w':0,'e':0,'n':0,'s':0}; ok=True
+        for x in range(x0,x1):
+            if (x,z0) not in comp: bad['n']+=1; ok=False
+            if (x,z1-1) not in comp: bad['s']+=1; ok=False
+        for z in range(z0,z1):
+            if (x0,z) not in comp: bad['w']+=1; ok=False
+            if (x1-1,z) not in comp: bad['e']+=1; ok=False
+        if ok: return (x0,z0,x1,z1)
+        k=max(bad,key=bad.get)
+        if k=='n': z0+=1
+        elif k=='s': z1-=1
+        elif k=='w': x0+=1
+        else: x1-=1
+        if x1-x0<3 or z1-z0<3: return None
+    return None
+FW=[8,6,10,7,9,6,8,10]; MW=[24,30,20,34,26,22]
+FH=[6,8,5,9,7,4,6,8]; MH=[14,18,12,20,16,22,12]
+lots=[]; courts=[]; k=0
+for bl in blocks:
+    if bl['type']=='precinct': continue
+    comp=bl['comp']
+    xs=[p[0] for p in comp]; zs=[p[1] for p in comp]
+    x0,x1,z0,z1=min(xs),max(xs)+1,min(zs),max(zs)+1
+    w=x1-x0; h=z1-z0
+    D=15 if bl['type']=='fabric' else 20
+    WID=FW if bl['type']=='fabric' else MW
+    HT=FH if bl['type']=='fabric' else MH
+    dz=min(D,h//2); dx=min(D,w//2)
+    if 0<h-2*dz<7: dz=h//2
+    if 0<w-2*dx<7: dx=w//2
+    cand=[]
+    def run(o,a0,b0,a1,b1):
+        global k
+        pos=a0 if o=='h' else b0; end=a1 if o=='h' else b1
+        while pos<end:
+            ww=WID[k%len(WID)]; ht=HT[k%len(HT)]; k+=1
+            q=min(pos+ww,end)
+            if end-q<5: q=end
+            cand.append(((pos,b0,q,b1) if o=='h' else (a0,pos,a1,q),ht)); pos=q
+    run('h',x0,z0,x1,z0+dz)
+    if z1-dz>=z0+dz: run('h',x0,z1-dz,x1,z1)
+    if h-2*dz>0:
+        run('v',x0,z0+dz,x0+dx,z1-dz)
+        if x1-dx>=x0+dx: run('v',x1-dx,z0+dz,x1,z1-dz)
+    nr=[nb['r'] for nb in named]
+    for lot,ht in cand:
+        t=trim(lot,comp)
+        if not t: continue
+        # carve around named buildings
+        hits=[r for r in nr if ov(r,t)]
+        if hits:
+            r=hits[0]
+            pieces=[(t[0],t[1],r[0],t[3]),(r[2],t[1],t[2],t[3]),(max(t[0],r[0]),t[1],min(t[2],r[2]),r[1]),(max(t[0],r[0]),r[3],min(t[2],r[2]),t[3])]
+            for pcs in pieces:
+                if pcs[2]-pcs[0]>=3 and pcs[3]-pcs[1]>=3 and not any(ov(q,pcs) for q in nr): lots.append(pcs+(ht,bl['type']))
+            continue
+        lots.append(t+(ht,bl['type']))
+    if h-2*dz>0 and w-2*dx>0:
+        inner=trim((x0+dx,z0+dz,x1-dx,z1-dz),comp)
+        if inner:
+            touches_rim=any(not inside(*p) for x in range(inner[0]-1,inner[2]+1) for p in ((x,inner[1]-1),(x,inner[3])))
+            if touches_rim: lots.append(inner+(HT[0],bl['type']))
+            else: courts.append(inner)
+# keep only real buildings with a street face: anything left behind becomes a garden yard
+FRONT_REACH=6  # a face counts if a street, square or the Rim Walk lies within this, across open ground
+def has_front(l,occupied):
+    x0,z0,x1,z1=[int(v) for v in l[:4]]
+    starts=[((x,z0-1),(0,-1)) for x in range(x0,x1)]+[((x,z1),(0,1)) for x in range(x0,x1)]+[((x0-1,z),(-1,0)) for z in range(z0,z1)]+[((x1,z),(1,0)) for z in range(z0,z1)]
+    for (x,z),(dx,dz) in starts:
+        for d in range(FRONT_REACH):
+            p=(x+dx*d,z+dz*d)
+            if p in street or p in opn or not inside(*p): return True
+            if p in occupied: break
+    return False
+lots=[l for l in lots if min(l[2]-l[0],l[3]-l[1])>=3]
+def occ(ls):
+    o=set()
+    for l in ls:
+        for x in range(int(l[0]),int(l[2])):
+            for z in range(int(l[1]),int(l[3])): o.add((x,z))
+    for nb in named:
+        for x in range(nb['r'][0],nb['r'][2]):
+            for z in range(nb['r'][1],nb['r'][3]): o.add((x,z))
+    return o
+while True:
+    o=occ(lots)
+    bad=[l for l in lots if not has_front(l,o)]
+    if not bad: break
+    lots=[l for l in lots if l not in bad]
+# lots must not overlap named buildings (trim leftovers)
+lots=[l for l in lots if not any(ov(l[:4],nr) for nr in [nb['r'] for nb in named])]
+# street connectivity check: each street end must meet street/open/outside
+def end_ok(s):
+    name,kind,x0,z0,x1,z1=s
+    res=[]
+    if x1-x0>=z1-z0:
+        for x in (x0-1,x1):
+            zs=range(z0,z1)
+            res.append(all((not inside(x,z)) or (x,z) in street and not (x0<=x<x1) or (x,z) in opn for z in zs) or any((x,z) in opn or (not inside(x,z)) for z in zs) or all(((x,z) in street) for z in zs))
+    else:
+        for z in (z0-1,z1):
+            xs=range(x0,x1)
+            res.append(any((x,z) in opn or (not inside(x,z)) for x in xs) or all(((x,z) in street) for x in xs))
+    return res
+for s in STREETS:
+    if s[0]=='Park Ring': continue
+    r=end_ok(s)
+    if not all(r): problems.append(('dead end?',s[0],r))
+for bl in blocks: bl.pop('comp')
+
+RESIDENT_HOMES={
+ 'Elizabeth Reese':52,'Dan Miller':52,'Lucinda Wah':1,'Felix Tanaka':26,'Ah Keung':35,'Iris Dune':35,
+ 'Teodora Vance':24,'Kenji Mori':9,'Ada Fong':24,'Nia Calder':35,'Benji Okoro':29,'Imani Osei':21,
+ 'Leon Duarte':5,'Mara Quill':28,'Pia Rowe':34,'Old Fu':9,'Sora Ishida':24,'Sol Brant':25,'Mei Chan':34,
+ 'Hiro Sato':37,'Rosa Delgado':34,'Wen Li':34,'Gideon Hale':38,'Zara Quinn':33,'Siti Rahman':18,
+ 'Tomas Wren':17,'Priya Raman':24,'Venn Harlow':35,'Theo Park':30,'Arjun Mehta':7,'Kate Byrne':6,
+ 'Yuki Hayashi':31,'Juno Rell':19,'Dax Merrow':35,'Kade Morrow':39,'Suri Vale':32,'Orin Pike':10,
+ 'Bea Ho':35,'Wilfred Ho':35,'Lily Chan':34,'Kofi Osei':21,'Palbert Pinestein':27,'Vera Kask':15,
+ 'Omar Haddad':40,'Rafael Ortiz':42,
+}
+## The North Estate's precincts (clipped by the Rim Walk): west of North Street,
+## north of Library Lane plus the strip along the Park Ring; east of it.
+PRECINCTS=[[(-686,-200,-566,-96),(-637,-92,-566,-62)],[(-554,-200,-487,-62)]]
+TURBINES=[(-310,-200),(-310,200),(-740,-270),(-740,270)]
+JUNGLE=(-500,464); ICE=(-450,-480)
+assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)
+nums={b['n'] for b in B}
+for who,n in RESIDENT_HOMES.items():
+    if n not in nums: problems.append(('home missing',who,n))
+for t in TURBINES:
+    if math.hypot(t[0]-JUNGLE[0],t[1]-JUNGLE[1])<280 or math.hypot(t[0]-ICE[0],t[1]-ICE[1])<280: problems.append(('turbine near plateau',t))
+if problems:
+    for p in problems: print('PROBLEM',p)
+    sys.exit(1)
+
+def v2r(r): return "Rect2(%g, %g, %g, %g)" % (r[0], r[1], r[2]-r[0], r[3]-r[1])
+def q(t): return json.dumps(t, ensure_ascii=False)
+out=[]
+w=out.append
+w("class_name CityPlan")
+w("extends RefCounted")
+w("")
+w("## Moy's single plan (docs/architecture/city.md, section 7, the building")
+w("## schedule and the street directory). GENERATED by tools/city_layout.py:")
+w("## edit the streets and buildings there and run it, never here. The city")
+w("## builder and tools/validate_city_plan.tscn read only this.")
+w("##")
+w("## World metres, +X east, -Z north (Rect2 x is world x, y is world z).")
+w("## Every street meets another street, a square, the Park Ring or the Rim")
+w("## Walk at both ends; every building in a street block has a face on a")
+w("## street, square or the Rim Walk; the estate's blocks stand in precinct")
+w("## gardens. The terrain's CITY_CENTER and CITY_FLAT_RADIUS still describe")
+w("## the prototype city and move to these values when the city is rebuilt.")
+w("")
+w("const CENTER := Vector2(-560.0, 0.0)")
+w("## The Rim Walk: the city's bounds. Buildings stay inside BUILT_RADIUS.")
+w("const RIM_RADIUS := 200.0")
+w("const BUILT_RADIUS := %.1f" % R)
+w("const STREET_WIDTHS := {\"main\": 12.0, \"avenue\": 10.0, \"shop\": 8.0, \"lane\": 4.0}")
+w("")
+w("## Named streets. A street with two segments appears twice under one name.")
+w("const STREETS := [")
+for name,kind,x0,z0,x1,z1 in STREETS: w("\t{\"name\": %s, \"kind\": %s, \"rect\": %s}," % (q(name),q(kind),v2r((x0,z0,x1,z1))))
+w("]")
+w("")
+w("## Squares and the park.")
+w("const OPENS := [")
+for name,x0,z0,x1,z1 in OPENS: w("\t{\"name\": %s, \"rect\": %s}," % (q(name),v2r((x0,z0,x1,z1))))
+w("]")
+w("")
+w("## The North Estate's two precincts: blocks stand free in shared gardens.")
+w("const PRECINCTS := [")
+for pr in PRECINCTS: w("\t[%s]," % ", ".join(v2r(r) for r in pr))
+w("]")
+w("")
+w("## The numbered buildings of the schedule. rect is the footprint; null for")
+w("## the giant playground, which the park plan places (section 7b).")
+w("const BUILDINGS := [")
+for b in sorted(B,key=lambda b:b['n']):
+    w("\t{\"n\": %d, \"name\": %s, \"kind\": %s, \"rect\": %s, \"size\": %s, \"who\": %s}," % (b['n'],q(b['name']),q(b['kind']),v2r(b['r']) if b['r'] else "null",q(b['h']),q(b['who'])))
+w("]")
+w("")
+w("## Every ordinary building, one per lot: [rect, storeys, block type].")
+w("## Fabric lots are street buildings (homes over shops); midrise lots are")
+w("## downtown's office and flat blocks round the towers.")
+w("const LOTS := [")
+for l in lots: w("\t[%s, %d, %s]," % (v2r(l[:4]),l[4],q(l[5])))
+w("]")
+w("")
+w("## Shared garden courtyards inside blocks.")
+w("const COURTS: Array[Rect2] = [")
+for c in courts: w("\t%s," % v2r(c))
+w("]")
+w("")
+w("## Where every named resident lives (building number).")
+w("const RESIDENT_HOMES := {")
+for k,v in RESIDENT_HOMES.items(): w("\t%s: %d," % (q(k),v))
+w("}")
+w("")
+w("## The four wind turbines (tower centres), outside the Rim Walk.")
+w("const TURBINES: Array[Vector2] = [")
+for t in TURBINES: w("\tVector2(%g, %g)," % t)
+w("]")
+w("const TURBINE_HUB_HEIGHT := 95.0")
+w("const TURBINE_ROTOR_RADIUS := 65.0")
+root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
+open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
+if '--json' in sys.argv:
+    path=sys.argv[sys.argv.index('--json')+1]
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=B),open(path,'w'))
+print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')
