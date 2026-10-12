@@ -171,7 +171,7 @@ z19.2 └───────┴───────────────�
   in the way. The hall opens onto the corridor.
 - **Party room** (x −9.0 to −4.8, z 0 to 11.4, 48 m²):
   - the rest point's wake room, with **one bed** (user, 2026-10-12): a large
-    double at the world's bed size (mattress 1.6 × 2.5 m, section 10), head to
+    double at the world's bed size (mattress 1.6 × 2.5 m, section 9), head to
     the north wall, with a chest, a washstand, chairs by the French doors, and
     floor room for big companions;
   - a 2.0 m double door from the landing hall;
@@ -331,7 +331,7 @@ Two traditions plus the accent: within the rule.
   - bottles and glasses are decorative.
 - **No text:** signs are pictures only.
 
-## 10. Beds at the world's scale (2026-10-12)
+## 9. Beds at the world's scale (2026-10-12)
 
 The party room's bed follows the world rule now written into the
 architecture skill.
@@ -344,7 +344,7 @@ architecture skill.
 
 The shared bed today is 1.32 × 2.16 m, too short for most of the town's men.
 
-## 9. Fixed, proposed and open
+## 10. Fixed, proposed and open
 
 **Fixed:**
 - the saloon is the town's inn, its social centre and rest point (user,
