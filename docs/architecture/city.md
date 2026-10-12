@@ -1,4 +1,4 @@
-# The City: settlement plan (first real pass)
+# Moy, the city: settlement plan (first real pass)
 
 Status: survey, community brief and settlement concept, second pass, for
 review (2026-10-12; revised the same day: no cars or trains, a dense
@@ -87,6 +87,12 @@ the world bible.
   not allowed inside its bounds.
 - What do the people here do, and what is the economy?
 
+**Fourth revision (user, 2026-10-12):**
+- The city's name is **Moy**.
+- **No Sign Boneyard**, which took too much liberty with the backstory. The
+  city blorbs simply stay outside the city's outskirts.
+- **No opulent fountains.**
+
 ## 2a. The site: a city in the desert
 
 **Yes: a city standing up out of open desert, like Las Vegas or Dubai.** The
@@ -121,15 +127,14 @@ world.
    bounds to the north-west: well heads, a pump house, covered reclamation
    tanks, and a **water tower** about 35 m tall, the first thing the city
    built.
-2. **Every drop used twice.** Grey water is reclaimed for the park, the
-   street trees and the fountains. The pipes are buried and not modelled.
+2. **Every drop used twice.** Grey water is reclaimed for the park and the
+   street trees. The pipes are buried and not modelled.
 3. **Tanks on every roof** (already part of the city's language) hold a
    day's supply.
 
-The city shows off water it does not have, as desert cities do: the plaza's
-fountain show at night, the Grand Hotel's waterfall and the park's pond all
-run on reclaimed water. Rafael Ortiz, who keeps the wells, counts every litre
-and disapproves of the fountain.
+Water is precious, and Moy treats it so: there are no fountains for show.
+The park's trees and its small pond run on reclaimed water. Rafael Ortiz, who
+keeps the wells, counts every litre.
 
 **Built for the heat.** Narrow lanes and close buildings are how desert
 cities have always kept cool: tall walls shade the lanes most of the day. So
@@ -143,8 +148,8 @@ the Tokyo and Hong Kong density already suits the desert. Add:
 - solar panels on the roofs (low, with collision, part of the roof network);
 - misters at the plaza and the hawker centre.
 
-The city is quiet at noon and comes alive after dusk: the night market, the
-lit picture signs and the fountain show.
+The city is quiet at noon and comes alive after dusk: the night market and
+the lit picture signs.
 
 **The bounds: the Rim Walk.** The city ends sharply, with no sprawl. A ring
 promenade runs round the whole edge:
@@ -157,14 +162,13 @@ blorbs may not cross. It reads as an edge, never as a sign.
 
 **Beyond the bounds** (in the ring between 200 and about 300 m; coordinates
 follow approval):
-- **East: the goods yard** where the wasteland road ends, and behind it the
-  **Sign Boneyard**, after Las Vegas's Neon Boneyard: a sprawl of the city's
-  retired picture signs, some still faintly lit. The city blorbs live here,
-  and the City Gem lies among the signs.
+- **All round: the city blorbs** stay out in the open desert just beyond the
+  outskirts.
+- **East: the goods yard** where the wasteland road ends.
 - **South-west: the Sunwell solar field.** Mirrors turning with the sun
   around a **solar tower** about 100 m tall, its receiver glowing white at the
   top (after Ivanpah and Crescent Dunes). The battery works stand at its
-  foot. The city blorbs sun themselves among the mirrors. The tower is a
+  foot. The tower is a
   landmark and the only swing anchor out in the desert.
 - **North-west: the water works** and the water tower.
 
@@ -201,7 +205,7 @@ A desert city needs a reason to exist. This one has **the sun.**
    Institute's patents and the city's own cases) and finance serve the first
    two.
 4. **Hospitality and spectacle.** People come in from the towns for the
-   Grand Hotel, the fountain show, the cinema and the night market. In a
+   Grand Hotel, the cinema and the night market. In a
    world of villages, the city's lights are themselves the attraction, as Las
    Vegas's are.
 5. **The everyday city.** Markets, the hawker centre, shops, the clinic, the
@@ -276,7 +280,7 @@ in character and pointing nowhere:
 | **Rosa Delgado** | the market flats | fishmonger at the wet market | Loud, funny, and the best judge of freshness in the city. Her fish come in on ice by the wasteland road, two days from the water, and she will tell you which day. |
 | **Wen Li** | the market flats | greengrocer at the wet market | Grows herbs on the market's roof and sells them below. Her best greens come from a farm in the Middle of Nowhere, and the crates carry its mark: Elizabeth's mother's farm. |
 | **Gideon Hale** | behind his shop | **the Helmsmith** | Makes helms for blorbs and their wearers; gruff, precise, and secretly delighted by every new customer. |
-| **Zara Quinn** | a studio on the market roof | sign painter | Paints the city's picture signs (no lettering, ever) and hangs them herself. Her retired signs go to the Sign Boneyard, where the city blorbs nest in them, and she visits. |
+| **Zara Quinn** | a studio on the market roof | sign painter | Paints the city's picture signs (no lettering, ever) and hangs them herself. |
 | **Siti Rahman** | Parkside Estate, Block 2 | runs the laksa stall at the Parkside hawker centre | The estate's auntie: feeds the shift workers at dawn and the children after school, and knows which flat every lift-button smudge belongs to. |
 | **Tomas Wren** | Parkside Estate, Block 1 | courier | Carries deliveries floor to floor on a cargo trike and a hand truck, by lift when he trusts it and by ramp when he doesn't. |
 
@@ -294,8 +298,8 @@ in character and pointing nowhere:
 |---|---|---|---|
 | **Palbert Pinestein** | a top-floor flat and laboratory on Lantern Lane, the roof bristling with antennas and coils | none, officially; dismissed from the Lumen Institute | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
 | **Dr. Vera Kask** | a downtown flat | director of the Lumen Institute | Pinestein's oldest colleague, and the one who dismissed Pinestein after the Blackout. Still keeps Pinestein's old notebooks locked in her office. |
-| **Omar Haddad** | a flat at the battery works | chief engineer of the Sunwell solar field | Keeps a thousand mirrors clean in a sandstorm country. The city blorbs sun themselves in his field, and he pretends not to see them. |
-| **Rafael Ortiz** | the keeper's house at the water works | keeper of the wells and the water works | Counts every litre the city uses twice, and thinks the fountain show is a sin. |
+| **Omar Haddad** | a flat at the battery works | chief engineer of the Sunwell solar field | Keeps a thousand mirrors clean in a sandstorm country. |
+| **Rafael Ortiz** | the keeper's house at the water works | keeper of the wells and the water works | Counts every litre the city uses twice, and has never once let the park's pond run dry. |
 
 **Care, safety and teaching**
 
@@ -334,11 +338,10 @@ city's bounds. **The rest is proposed.**
 
 - **The experiment.** Pinestein was the Lumen Institute's brightest
   researcher in "living current", and wanted a creature that could live on
-  the city's own light, so the city would never go dark again. Pinestein ran
-  ordinary blorbs through current and the **City Gem** (gems change a
-  blorb's whole nature, as Ivy Thorne found). They came out a saturated,
-  glassy azure, crackling and hungry for power: the city blorbs, the only
-  blorbs known to have been made rather than born.
+  the city's own light, so the city would never go dark again. The
+  experiment made the city blorbs, saturated glassy azure, crackling and
+  hungry for power: the only blorbs known to have been made rather than
+  born. How it was done is left open.
 - **The Blackout.** They loved the city too much. They fed on the signs, the
   lifts and the grid, and one summer night the whole city went dark:
   - lifts stopped between floors;
@@ -348,19 +351,14 @@ city's bounds. **The rest is proposed.**
   blorbs from inside the bounds. The Institute, under Dr. Vera Kask,
   dismissed Pinestein. Elizabeth Reese defended Pinestein at the inquiry and lost.
 - **Now:**
-  - The city blorbs live in the **Sign Boneyard** beyond the goods yard,
-    among the city's retired picture signs, and sun themselves in the
-    Sunwell's mirror field.
-  - The **City Gem** was carried out in the breakout and lies somewhere in
-    the Boneyard. Pinestein has never found it.
+  - The city blorbs stay outside the city's outskirts, out in the desert
+    beyond the Rim Walk.
   - Pinestein still lives on Lantern Lane and goes out to them at night,
     with batteries bought from Hiro at 3 a.m.
 - **How the city feels about them:**
   - Teodora: defensive.
   - Kate: dutiful but gentle.
   - Lucinda: bitter (her chandelier).
-  - Zara: fond (they nest in her signs).
-  - Omar: tolerant.
   - Lily and Kofi: they sneak out to see them.
 - **Draft lines** (in character, explaining nothing):
   - Pinestein: "They're not pests. They're the first thing this city ever
@@ -369,11 +367,11 @@ city's bounds. **The rest is proposed.**
   - Lucinda: "Three thousand crystals, and every one of them dark. I was
     standing right there."
 - **In play (proposed):**
-  - Wild city blorbs spawn only beyond the bounds (the Boneyard and the
-    mirror field), and their roaming stays outside the Rim Walk.
-  - The City Gem moves from the streets to the Boneyard.
-  - No text states the ban. The Rim Walk's edge, the blorbs' camp and the
-    residents' remarks carry it.
+  - Wild city blorbs spawn only in the desert just outside the outskirts,
+    and their roaming stays outside the Rim Walk.
+  - The City Gem moves from the streets to lie out there among them.
+  - No text states the ban. The Rim Walk's edge, the blorbs waiting beyond
+    it and the residents' remarks carry it.
 
 ### Their needs, and where each is met
 
@@ -441,7 +439,7 @@ hero about 1.9 m. City buildings follow it, on the 3.2 m building cell.
   estates of point and slab blocks on open void decks, covered linkways,
   hawker centres, and sky bridges with sky gardens.
 - **Dubai and Las Vegas:** a downtown of skyscrapers standing up out of the
-  desert; the Dubai Fountain; the lit Strip; the Neon Boneyard.
+  desert; the lit Strip.
 - **Desert old towns:** narrow, shaded lanes as the way to stay cool.
 
 ### Charter (proposed)
@@ -559,20 +557,21 @@ sign gantries and the ramp towers' outsides.
    ├───────────────┬──────────────────────┬────────────────────┤
 W  │ LANTERN LANE  │   CENTRAL PLAZA      │ DOWNTOWN           │ E, outside:
    │ pencil bldgs, │ city hall (N)        │ Meridian Avenue:   │  goods yard,
-   │ café, cinema, │ LIBRARY (W)          │ the Sunspire, the  │  Sign Boneyard
-   │ bath, clinic, │ GRAND HOTEL (E) ─────┼─ glass tower, the  │  (city blorbs)
+   │ café, cinema, │ LIBRARY (W)          │ the Sunspire, the  │
+   │ bath, clinic, │ GRAND HOTEL (E) ─────┼─ glass tower, the  │
    │ police box,   │ museum (S)           │ Lumen Institute    │◄── arrival by
-   │ Pinestein's   │ fountain show        │                    │  the wasteland
+   │ Pinestein's   │ trees, misters       │                    │  the wasteland
    ├───────────────┴──────────────────────┴────────────────────┤  road
    │ THE MARKET LANES: wet market, night market, Helmsmith,    │
    │ the shopping arcade, convenience store, school            │
    └──────────────────────────── S ────────────────────────────┘
-       the Rim Walk rings the whole city: the bounds
+       the Rim Walk rings the whole city: the bounds;
+       the city blorbs stay out in the desert beyond it
        (SW, outside: the Sunwell mirror field and solar tower)
 ```
 
-- **Arrival.** From the east, the wasteland road ends at the goods yard,
-  past the Sign Boneyard. People cross the Rim Walk and walk in down
+- **Arrival.** From the east, the wasteland road ends at the goods yard.
+  People cross the Rim Walk and walk in down
   **Meridian Avenue** (renamed from Harbour Street: there is no harbour in a
   desert), the palm-lined main street, between the skyscrapers, and the
   street opens onto the **central plaza**. The
@@ -581,7 +580,7 @@ W  │ LANTERN LANE  │   CENTRAL PLAZA      │ DOWNTOWN           │ E, outs
 - **The central plaza** is the public heart.
   - **Around it:** city hall to the north, the library to the west, the
     Grand Hotel to the east and the museum to the south.
-  - **On it:** the fountain (its show runs at night), trees, misters,
+  - **On it:** shade trees, misters,
     benches, Pia's spot and the Deck's main ramp tower.
 - **Lantern Lane** (west) is the old residential and craft quarter of lanes
   and pencil buildings: Sol's café, the Moonlight Cinema, the Pine Bath, the
@@ -641,8 +640,8 @@ north-west, inside the 110 to 140 m gaps to the plateaus and the skirt.
 The full building brief follows the layout.
 
 - **Precedents:**
-  - **White Swan Hotel, Guangzhou:** the atrium's indoor rock garden,
-    waterfall and pavilion.
+  - **White Swan Hotel, Guangzhou:** the atrium's indoor rock garden and
+    pavilion (its waterfall left out: Moy has no opulent water).
   - **Peace Hotel, Shanghai:** art deco, with the great chandelier under a
     lantern dome.
   - **Grand Hyatt in the Jin Mao Tower, Shanghai:** guest galleries ringing a
@@ -657,7 +656,7 @@ The full building brief follows the layout.
   - the Deck's entrance at the mezzanine.
 - **The atrium:**
   - the giant chandelier, about 8 m across;
-  - the rock garden and waterfall;
+  - the dry rock garden and pavilion;
   - reception, the concierge desk and Iris's flowers;
   - a grand double ramp to the mezzanine restaurant.
 - **Realised:** the atrium, the mezzanine, one guest gallery, and the party's
@@ -685,7 +684,7 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the Pine Bath; the family's flat; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the Parkside hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Sunspire's lobby, express lift and observation deck; the Sign Boneyard and the mirror field (outside) |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the Pine Bath; the family's flat; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the Parkside hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Sunspire's lobby, express lift and observation deck; the mirror field (outside) |
 | **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 
@@ -713,6 +712,8 @@ lit crowns.
 - Jammer's mother, a lawyer, is the hero's blood relative;
 - Jammer's father is a tech recruiter;
 - Jammer is at his grandmother's in the Middle of Nowhere.
+- The city's name is **Moy**. No Sign Boneyard: the city blorbs simply stay
+  outside the outskirts. No opulent fountains.
 - Jammer's parents are **Elizabeth Reese** and **Dan Miller**, married
   (user, 2026-10-12), and they can speak of the Middle of Nowhere. Proposed
   clues: Elizabeth's photograph of the hero as a boy, Jammer's room full of
@@ -741,22 +742,22 @@ lit crowns.
   and the water works;
 - the economy: the Sunwell, the Lumen Institute, law and finance,
   hospitality; food imported from the farmland;
-- the Rim Walk as the bounds; the Sign Boneyard as the city blorbs' home and
-  the City Gem's new place; the Sunwell mirror field and solar tower;
+- the Rim Walk as the bounds; the city blorbs and the City Gem in the desert
+  just beyond it; the Sunwell mirror field and solar tower;
 - Meridian Avenue (renamed from Harbour Street); Parkside Estate; the
   Sunspire;
 - the five added residents; the Blackout; Elizabeth's defence of Pinestein.
 
 **Open:**
-- the city's name;
 - the hotel's rest price;
 - whether Elizabeth recognises the hero when they meet, and what she tells
   him;
 - the skybridges are folded into the Deck;
+- the park's small pond (kept, as plain reclaimed water, not a display);
 - whether the hero's own city blorbs may follow him inside the bounds.
   Proposed: the ban is the city's law, not a wall, so a party city blorb may
   follow, and the residents react in character (Kate's look, a shopkeeper
   unplugging a sign), never with a stated rule;
-- whether Pinestein has a quest: the lost City Gem, or a case to let the city
-  blorbs back in;
+- whether Pinestein has a quest, such as a case to let the city blorbs back
+  in;
 - the Sunspire's height against the far skyline's draw distance.
