@@ -95,7 +95,7 @@ the world bible.
 
 **Fifth revision (user, 2026-10-12):** a field of giant wind turbines, in the
 Chinese style, out in the wasteland around the city, as **Moy's power
-source.** They must not encroach much on the Jungle and Ice plateaus.
+source.** They must not encroach much on the Jungle and Ice plateaus. A modest number is enough; ten stands.
 
 ## 2a. The site: a city in the desert
 
