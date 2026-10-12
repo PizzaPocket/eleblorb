@@ -128,7 +128,7 @@ Every ramp has a 1.2 m landing at its foot and head.
 | **Dining Hall** | Liang Zhen's **private dining hall**: one table, one chair, the rejected bao trials sent back to Hua Chen, an empty hall for one diner. | The **communal dining hall**: long tables and benches for the whole village, a serving hatch through to the kitchen route, lanterns low over the tables. Lu and Lu Hao serve here on meal nights. |
 | **Inner apartments** | The **Emperor's rooms**: bedchamber, study with the levy ledgers, robe room with the ceremonial crown on its stand. | **Records and meeting rooms.** The bedchamber becomes a small meeting room with a table and six chairs. The study becomes the **records room**, where **Liang Zhen works as Tian Bo's advisor**: the old levy ledgers kept on a shelf as a lesson, beside the new village records, and his writing desk under the window. The robe room becomes a **reading and teaching room** for the five children, with low tables and slates. The crown stays on its stand in a niche, a relic nobody wears. |
 | **Royal Kitchen** | The **Chef's kitchen**: working hearths, bronze pots, bamboo steamers, shelves and preparation counters around a **clear fight floor** of at least 12 × 8 m. The long counter where captured blorbs sit shrunk as buns. | The **community kitchen**: the same hearths and counters, busy. The long counter becomes the serving counter, piled with steamers. **Lu's** kitchen on meal nights: his knives rolled in cloth, his own seasoning jars brought up from the inn, Hua Chen's bao on a rack, which she supplies. The fight floor holds a long prep table, moved aside on the plan so its shell stays the same. |
-| **Chef's quarters** | The Chef's sparse room: a narrow bed, a locked chest, nothing personal. | **Liang Zhen's home** (proposed). The former Emperor chose the humblest room in the palace: a bed, a shelf of borrowed records, a brush stand, a pot of herbs on the sill. Its own door to the service yard means he never passes through Lu's kitchen. |
+| **Chef's quarters** | The Chef's sparse room: a narrow bed, a locked chest, nothing personal. | **Liang Zhen's home** (approved 2026-10-12). The former Emperor chose the humblest room in the palace: a bed, a shelf of borrowed records, a brush stand, a pot of herbs on the sill. Its own door to the service yard means he never passes through Lu's kitchen. |
 | **Service yard** | Levy carts unloading flour and beans; the levy store full and locked; the well; the latrine closet. | The levy store becomes the **village store**, kept for lean seasons, its door unlocked. The well and latrine stay. Bo Xiang's cart still turns here. |
 | **High pavilion** | The Emperor's **private viewing pavilion**: a single chair facing north over the Abyss, a tea table, closed to everyone else. | A **public lookout**. Benches on both floors facing out; children fly kites from the upper gallery. |
 | **Royal garden** | Immaculate and empty; the moon gate shut. | Open, used and a little less immaculate: Tian Bo has planted a clump of bamboo in the bamboo court, and a bench where Liang Zhen sits with Tian Bo over the village's business. |
@@ -216,7 +216,9 @@ inscriptions; a copied real building.
 - the palace's two states and their story (approved);
 - Liang Zhen's audience, the kitchen fight with its clear floor and bun
   counter, and the community kitchen;
-- the yellow glaze reserved for the palace.
+- the yellow glaze reserved for the palace;
+- Liang Zhen living in the Chef's former quarters once the palace is a civic
+  centre (approved 2026-10-12).
 
 **Proposed:**
 - the plan;
@@ -224,9 +226,8 @@ inscriptions; a copied real building.
 - the four levels (gate court, throne terrace, inner court, high pavilion);
 - the roof hierarchy, including grey tile on the service buildings;
 - every room's use in both states;
-- Liang Zhen as advisor, working in the records room and living in the
-  Chef's former quarters; Lu cooking the communal meals in the former Royal
-  Kitchen;
+- Liang Zhen as advisor, working in the records room; Lu cooking the
+  communal meals in the former Royal Kitchen;
 - the children's reading and teaching room.
 
 **Open:** none blocking.

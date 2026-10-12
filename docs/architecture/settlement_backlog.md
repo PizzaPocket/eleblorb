@@ -749,6 +749,11 @@ call, since the shop UI is where players read what an item is.
   hexagonal pavilions. Needs builders in `TownProps`/`NatureProps`: moon gate,
   lattice screen, wave coping, hexagonal pavilion, scholar's rock on plinth,
   cloud-pruned pine, palace lantern, silk table lamp.
-- Open: Lu's given name; Lu Hao's characters (吕浩 assumed); the homes' wall
-  system (mixed brick and plaster proposed).
+- Liang Zhen lives in the Chef's former quarters after the quest (approved).
+- Homes' wall system decided: brick plinth and corner piers with lime-plastered
+  earth panels, dark plain timber, grey hard-gable roofs, a kang in each main
+  room (rank table in `chinese_village.md` 4.2). Needs a kang-and-stove
+  builder.
+- Open: Lu's given name; Lu Hao's characters (吕浩 assumed). The user will
+  supply both.
 

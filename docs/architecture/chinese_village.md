@@ -299,12 +299,34 @@ Bridge hierarchy: entry and palace axis 5 m wide with gate posts, island to
 island 3.2 m, farm and grove path 2.4 m. Every landing gets a paved apron and
 paired deck and apron heights that the validator checks.
 
-### 4.2 Courtyard and hall charter (needs approval)
+### 4.2 Courtyard and hall charter (homes decided 2026-10-12)
 
-- Ordinary homes: white plastered walls on a low stone plinth, red timber
-  columns and eave brackets, grey or green clay tile, hip-and-gable roof with
-  a modest upturn at the corners, door on the south face onto a small
-  courtyard, a wall or screen closing the yard.
+The village reads as three ranks of one tradition, so the palace stands out
+by what the common houses lack. Rank shows in material, colour and
+ornament, as it did under the sumptuary rules of imperial China:
+
+| | Palace | Inn | Homes, shops, workshops |
+|---|---|---|---|
+| Walls | vermilion plaster on white marble terraces | the Shihu Yuan mixed wall: grey brick plinth and piers framing white plaster panels | brick only where weather hits: a grey brick plinth and corner piers, the panels between them of earth or rubble finished in white lime plaster (the northern "gold-framed jade" wall, *jīn xiāng yù*) |
+| Timber | red lacquer, painted *cǎihuà* beams | red lacquer at the front, painted beams in the common room | plain timber oiled dark brown; doors painted black |
+| Roof | yellow glaze, hip and double-eave forms | grey tile with the one green-glazed ridge | grey tile only, hard gable (*yìngshān*) with brick gable ends, an almost straight eave |
+| Eave brackets | full bracket sets (*dǒugǒng*) | simple carved brackets | none; rafters show at the eave |
+| Ceilings | painted beams, lacquered joists | painted beams below, lacquered joists above | plain exposed rafters and purlins, darkened by smoke |
+| Openings | moon gates, round lattice windows | moon gate to the back court, brick lattice screen to the yard | rectangular lattice windows papered on the inside; at most one small round or square opening in a yard wall |
+| Yard wall coping | wave tile | wave tile | plain grey tile ridge |
+
+- **Homes.** A south-facing main room of three bays on its plinth, door in
+  the middle bay onto a small walled court, a side room or shed on the east
+  or west of the court. The heart of the main room is a **kang**, the heated
+  brick sleeping platform of northern China, warmed by the flue of the
+  cooking stove beside it: the family sits, eats and sleeps on it. Colour
+  comes from the people, not the building: red couplet paper either side of
+  the door (pattern only, no readable text), a household's own lanterns,
+  drying chillies or corn on the eaves, a blue cloth door curtain.
+- **One house a little better.** Yun Tao the tiler has laid his own roof
+  better than anyone's, with a short run of wave coping on his yard wall
+  that he made from the palace's broken tiles. It is the one home with a
+  patterned coping.
 - Shops and workshops: the same vocabulary, open front on a timber shopfront,
   ridge ornaments omitted.
 - The inn: two-storey hall with gallery, red lacquer sign, the one ordinary
@@ -429,10 +451,10 @@ decorative with solid trunks.
 from another. The inn (front court, common room, back court) and the palace
 garden follow that chain; homes keep one court each.
 
-**Proposed charter change, for the user to confirm:** the homes adopt the
-mixed wall above (grey brick plinth and piers, white plaster panels, grey
-tile coping) in place of all-white plaster on a stone plinth. Red timber
-columns, grey or green tile and the modest roof curve stay.
+**Who gets what.** The full Shihu Yuan vocabulary belongs to the palace and
+its garden, and in part to the inn, which has earned it over its long life.
+Ordinary homes take only its plainest parts (the brick plinth and piers, grey
+tile, lattice windows); see the rank table in 4.2. Decided 2026-10-12.
 
 ### 4.3 Palace
 
