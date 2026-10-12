@@ -292,7 +292,7 @@ A desert city needs a reason to exist. This one has **the wind.**
    user), a research institute with a campus downtown, works on power and on "living current". Start-ups spun out of
    it fill floors of the downtown towers, and Tanglewire recruits for both.
    Pinestein worked at BLOCK.
-3. **Professional services.** Law (Raman & Reese: the Windworks's contracts, BLOCK's
+3. **Professional services.** Corporate law (Raman & Reese: the Windworks's contracts, BLOCK's
    patents and the city's own cases) and finance serve the first
    two.
 4. **Hospitality and spectacle.** The Grand Hotel, the cinema and the night
@@ -331,7 +331,7 @@ unnamed: these forty-five are the people the hero meets.
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Elizabeth Reese** | the family's flat, Block 3, North Estate, 18th floor | lawyer, partner at Raman & Reese on Meridian Avenue | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. She defended Pinestein at the inquiry after the Blackout, and lost. |
+| **Elizabeth Reese** | the family's flat, Block 3, North Estate, 18th floor | corporate attorney, partner at Raman & Reese, a corporate law firm in the glass tower on Meridian Avenue | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. |
 | **Dan Miller** | the same apartment | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at BLOCK, the Windworks and the start-ups | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
 | *(Jammer)* | away, at his grandmother's in the Middle of Nowhere | — | Their son; his room in the apartment is full of drawings of the farm. |
 
@@ -447,7 +447,7 @@ city's bounds. **The rest is proposed.**
   - the Grand Hotel's chandelier went out for the first time in its history.
 - **The ordinance.** The city council, under Mayor Teodora Vance, banned city
   blorbs from inside the bounds. The Institute, under Dr. Vera Kask,
-  dismissed Pinestein. Elizabeth Reese defended Pinestein at the inquiry and lost.
+  dismissed Pinestein.
 - **Now:**
   - The city blorbs stay outside the city's outskirts, out in the desert
     beyond the Rim Walk.
@@ -843,7 +843,8 @@ lit crowns.
 - the Grand Hotel rest point (atrium, revolving door, giant chandelier,
   after Chinese grand hotels);
 - a library;
-- Jammer's mother, a lawyer, is the hero's blood relative;
+- Jammer's mother, a lawyer, is the hero's blood relative; she is a
+  **corporate attorney**, not a defence lawyer (user);
 - Jammer's father is a tech recruiter;
 - Jammer is at his grandmother's in the Middle of Nowhere.
 - The city's name is **Moy**. No Sign Boneyard: the city blorbs simply stay
@@ -897,7 +898,7 @@ lit crowns.
   Windspire;
 - (fifth revision) the wind farm's size, number and placement; the
   Windworks and the Windspire (renamed from the Sunwell and the Sunspire);
-- the five added residents; the Blackout; Elizabeth's defence of Pinestein.
+- the five added residents; the Blackout.
 
 **Open:**
 - the hotel's rest price;
