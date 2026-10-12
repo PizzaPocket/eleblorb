@@ -174,7 +174,7 @@ changing.
 
 ## 3. Community (proposed census, 2026-10-06)
 
-Eighteen residents in twelve households. The eight rock-named residents are
+Nineteen residents in fourteen households (revised 2026-10-12: the earth-science residents added; Ike Pruett and Dutch Raker cut by the user). The eight rock-named residents are
 replaced: their names belonged to the earlier earth-and-stone concept.
 **Dolma Hearthstone keeps her name and her house**, which becomes the saloon
 and hotel.
@@ -185,8 +185,7 @@ Black cowboys, about one in four of the real trail hands.
 
 | Resident | Gender | Household | Role |
 |---|---|---|---|
-| **Dolma Hearthstone** | woman | the saloon | keeps the saloon and hotel: the town's social centre and its rest point |
-| **Ike Pruett** | man | the saloon | Dolma's husband; tends bar and plays the saloon piano |
+| **Dolma Hearthstone** | woman | the saloon | keeps the saloon and hotel alone: tends the bar, cooks, keeps the desk and the books; the town's social centre and its rest point (building brief: `rock_ground_saloon.md`) |
 | **Ruth Calloway** | woman | the jail | the sheriff, outnumbered by the gang and unbending anyway; lives above the jail |
 | **Amos Bell** | man | the Bell ranch | rancher and wrangler; breaks in young cyborg horses |
 | **Cora Bell** | woman | the Bell ranch | Amos's wife; horse trainer and the best judge of a horse in town |
@@ -203,8 +202,7 @@ Black cowboys, about one in four of the real trail hands.
 | **Dr. Hazel Coleman** | woman | the bone camp | the **paleontologist**, added 2026-10-12: has spent eleven years on Dinosaur's bones at a camp on the fossil basin's rim, measuring, sketching and plastering them; buys her plaster and burlap from Walt and forgives Gus for using the first toe bone he found as a doorstop |
 | **Tomás Reyes** | man | the assay office | the **geologist** and surveyor, added 2026-10-12: Pearl Dunaway's husband; reads the canyon's banded layers like pages, keeps a cabinet of labelled stones, and tells Cass where the silver ought to run |
 | **Della Lusk** | woman | the race barn loft | the **track boss**, added 2026-10-12: builds and grooms the race course and loves dirt: mixes clay for grip and sand for drainage, reads a track by its colour, and rakes out the gang's ruts every morning |
-| **Jessup Kane** | man | the gang | leader of the riders who hang around the saloon |
-| **Dutch Raker** | man | the gang | the gang's muscle |
+| **Jessup Kane** | man | the gang | leader of the two riders who hang around the saloon; he and Sadie rent the hotel's big back room by the week and pay late |
 | **Sadie Vex** | woman | the gang | the gang's fastest rider, and Lark's rival |
 
 ### Livelihood
@@ -700,13 +698,14 @@ proposed in section 2a.
   - the clockwork hat;
   - the line shaft, charging posts, stamp mill, race clock, player piano,
     mechanical bull and heliograph;
-- the census of twenty-one, replacing the eight rock-named residents,
+- the census of nineteen (Ike Pruett and Dutch Raker cut, 2026-10-12), replacing the eight rock-named residents,
   including the earth-science residents added 2026-10-12: Dr. Hazel Coleman
   (paleontologist, the bone camp), Tomás Reyes (geologist, with Pearl at the
   assay office) and Della Lusk (track boss);
 - the bone camp on the fossil basin's rim, and the draft lines in 3a;
 - the Silverback mine, Cass Rourke the miner, and Gus's cyborg burro;
-- the Kane gang;
+- the Kane gang, now two riders: Jessup Kane and Sadie Vex;
+- the saloon and hotel's building brief (`rock_ground_saloon.md`);
 - Wes Tolliver the saddle maker and the shifting saddle for Manchego;
 - the cowboy hat as the Ground suit's helm, shifting with `DirtbikeMode`;
 - the architectural charter direction;

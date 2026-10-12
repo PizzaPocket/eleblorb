@@ -86,6 +86,7 @@ computer.
 | P5 | Jungle density parity with the demo world | Plant | Deferred | the user | 10 |
 | **Rock and Ground** |||||
 | R1 | Census (with Cass Rourke the miner, Gus Pickett the prospector, and the earth-science residents: Hazel Coleman the paleontologist, Tomás Reyes the geologist, Della Lusk the track boss), saloon and hotel, the mechanical and motor-punk layer (open gears, motors and cables; windpumps, stamp mill, race clock), layout, charter, briefs | Rock and Ground | Approve | the user | 15 |
+| R1a | Saloon and hotel building brief: 22.4 × 19.2 m, double-height barroom, hotel lobby with its own door, party room as the wake room, cast-iron gallery | Rock and Ground | Approve | the user; the town's style charter | 15 |
 | R2 | Approved code: cyborg horse, the hat gating the dirt bike's front wheel and sold at Inez's, Manchego's chibi size and the saddle, the Silverback mine tunnel prototype | Rock and Ground, shared | Ready | — | 15 |
 | **Sky Kingdom** |||||
 | Sk1 | Register, materials, interiors, building briefs; swept-roof prototype | Sky | Approve | the user | 6 |
@@ -713,7 +714,8 @@ concept.
   direction 2026-10-12): electric, battery, wind and spring power, with the
   machinery shown open, plus fine watch gears and clockwork (Inez as
   watchmaker, pocket watches, watch-part jewellery for the dress charter).
-- Review: the census of sixteen (Dolma kept; Cass Rourke the miner and Gus
+- Review the saloon and hotel brief (`rock_ground_saloon.md`).
+- Review: the census of nineteen (Ike Pruett and Dutch Raker cut 2026-10-12; Dolma kept; Cass Rourke the miner and Gus
   Pickett the old prospector added 2026-10-07), the saloon and hotel as the social
   centre and rest point, the Kane gang, the cyborg horses, the cowboy hat as
   the Ground suit's helm, the architecture direction, the places list and race

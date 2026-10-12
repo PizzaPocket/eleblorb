@@ -62,7 +62,9 @@ replacing the earlier earth-and-stone (Pueblo) grammar.
   Western's desert-canyon landscape. A layered present-day culture, like Ohio.
 - **Massing.** One main street of frame and brick commercial buildings, many
   with tall square false fronts hiding gabled roofs, a continuous covered
-  boardwalk gallery, and the saloon and hotel at the street's head.
+  boardwalk gallery, laid along a through road (a motor culture's town is a
+  strip on a road that goes somewhere), with the saloon and hotel on a square at
+  the middle of the street, never blocking it.
 - **Roof.** Gable or shed roofs behind false fronts; shed-roof galleries; a
   two-storey cast-iron gallery (Jefferson) on the saloon and hotel.
 - **Walls.** Weathered board, red brick, and stone masonry ground storeys on
