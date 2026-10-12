@@ -617,7 +617,10 @@ west, and travellers from the east.
   assay yard, and the residents' yards and sheds.
 - **The race barn and rodeo arena** (Lark, Della) stand south-east, behind
   the livery, reached by a side lane at the east end. The race course leaves
-  the arena east and south across the flats and never uses main street.
+  the arena across the flats and loops round the fossil basin's far rim,
+  staying south and east of the through road. It never uses main street and
+  never crosses the road. A stage through the southern half-pipe canyon is
+  open: it would have to stay south of the mine road.
 - **The Bell ranch and corral** lie south of the shelf, down the lane by the
   water tower, with their own windpump.
 - **Homes** sit above shops and on the open plots, sized in the measured
