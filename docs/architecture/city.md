@@ -1012,6 +1012,8 @@ lit crowns.
 - Jammer is at his grandmother's in the Middle of Nowhere.
 - The city's name is **Moy**. No Sign Boneyard: the city blorbs simply stay
   outside the outskirts. No opulent fountains.
+- Old Moy keeps its tall street buildings, 4 to 9 storeys; it is not to be
+  lowered (user).
 - Every street is named and planned, with no dead ends; every building
   has a street face; downtown is filled with mid-rise blocks round the
   towers; green on the plan means gardens only (user).
