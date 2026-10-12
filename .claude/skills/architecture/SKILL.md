@@ -366,14 +366,19 @@ Placement and services:
 - **Partitions under a pitched roof.** A partition on an upper floor with an open roof above runs **up to the rafters**: a wall that runs along the ridge rises to the roof's underside where it stands, a cross wall is gable-shaped following both slopes (pass `roof` to `build_interior_wall`). A wall that stops at storey height under an open roof is a cubicle wall and always wrong. The alternative is a flat ceiling at storey height with the roof space above; never both half-done.
 - **Every room is reachable.** No door opens onto a wall, a bench, a bed or another room's door; every room has a door from a circulation space (hall, landing, corridor, or the room it belongs to); check each door's 1.2 m by 2 m clear zone on both sides before placing furniture.
 - **Circulation first, furniture second.** Draw the routes (door to hearth, door to stairs, door to each room) and keep 1.2 m clear on them; then place furniture around the routes against the walls. Nothing blocks a door swing or the foot of a ramp.
-- **Beds are sized for this world's people, not a real-world catalogue.**
-  Figures stand about 2.0 m × their body scale. The hero is about 1.9 m;
-  villagers run from about 1.7 m (women) to about 2.3 m (men). A mattress is
-  at least as long as its tallest likely sleeper plus 0.2 m: 2.5 m for any
-  adult bed, with a double 1.6 m wide and a single 1.05 m. A child's bed is
-  0.9 × 1.9 m. Every culture's bed (stone, rattan, bunk, kang) keeps these
-  lengths. A room that cannot take a 2.65 m frame plus its access is too
-  small for a bedroom.
+- **The world is built at about 1.1 × real size, and so are its people and
+  furniture.** Doors are 2.4 m, storeys 3.25 m and tables 0.80 m. The hero is
+  about 1.9 m (a real 1.73 m), and villagers run from about 1.70 m to 1.93 m
+  (women) and 1.82 m to 2.09 m (men) (user, 2026-10-12). Size furniture at
+  real size × about 1.1, never from a real-world catalogue.
+- **Beds** are at least as long as their tallest likely sleeper plus 0.2 m:
+  - a 2.3 m mattress for any adult bed;
+  - a double 1.55 m wide and a single 1.0 m;
+  - a child's bed 0.9 × 1.9 m.
+
+  Every culture's bed (stone, rattan, bunk, kang) keeps these lengths. A room
+  that cannot take a 2.45 m frame plus its access is too small for a
+  bedroom.
 - **Furniture rules.** Beds: head to the wall, 0.6 m access on at least one long side. Toilets: back to a wall, 0.6 m clear either side and in front. Tables: 0.8 m clear all round. Counters: 1.0 m behind, 1.2 m in front. Hearth: 1.2 m clear in front. A chest or shelf stands against a wall.
 - **A ramp needs the depth for its run.** A 32 degree ramp climbing 3.25 m runs 5.2 m, plus 0.9 m before it and a clear landing of at least 1.2 m (prefer 3 m) at its head, where you step off onto the floor with nothing in the way: a house with a stair is at least three cells (9.6 m) deep. Rails are balustrades (a top rail on slender posts), never slabs, along the sides that are open, **not** across the head; the ramp never ends against a wall.
 - **Stair or ramp placement.** Near the entry or the hearth stack, entered from a hall or lobby, with clear landings. It opens into the upper floor through a **superellipse hole**, rails on the open sides, headroom 2.0 m.
@@ -386,7 +391,7 @@ Placement and services:
 |---|---|
 | Door, clear | 1.2 x 2.4 m (double 2.0, cart 2.8 x 3.0) |
 | Corridor or landing | 1.4 m |
-| Bed (world scale) | mattress 1.6 x 2.5 m double, 1.05 x 2.5 m single; frame about 1.75 x 2.65 m |
+| Bed (world scale) | mattress 1.55 x 2.3 m double, 1.0 x 2.3 m single; frame about 1.7 x 2.45 m |
 | Table for four | 1.7 x 1.0 m, benches 0.4 m |
 | Counter | 0.5 to 1.0 m deep |
 | Hearth opening | 1.05 m wide, breast 1.9 m |

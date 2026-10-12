@@ -171,7 +171,7 @@ z19.2 └───────┴───────────────�
   in the way. The hall opens onto the corridor.
 - **Party room** (x −9.0 to −4.8, z 0 to 11.4, 48 m²):
   - the rest point's wake room, with **one bed** (user, 2026-10-12): a large
-    double at the world's bed size (mattress 1.6 × 2.5 m, section 9), head to
+    double at the world's bed size (mattress 1.55 × 2.3 m, section 9), head to
     the north wall, with a chest, a washstand, chairs by the French doors, and
     floor room for big companions;
   - a 2.0 m double door from the landing hall;
@@ -333,16 +333,17 @@ Two traditions plus the accent: within the rule.
 
 ## 9. Beds at the world's scale (2026-10-12)
 
-The party room's bed follows the world rule now written into the
-architecture skill.
-- **Mattress length:** at least the tallest likely sleeper plus 0.2 m.
-- **Who that is:** the game's people stand about 2.0 m × their body scale.
-  The hero is about 1.9 m, and men run up to about 2.3 m.
+The game's world is built at about 1.1 × real size: doors 2.4 m, storeys
+3.25 m, the hero about 1.9 m. Its furniture follows the same scale (user,
+2026-10-12; rule in the architecture skill).
+- **Mattress length:** the tallest likely sleeper plus 0.2 m.
+- **Who that is:** villagers' heights are being narrowed to about 1.70 to
+  1.93 m for women and 1.82 to 2.09 m for men.
 - **Sizes:**
-  - a double is 1.6 × 2.5 m (frame about 1.75 × 2.65);
-  - a single is 1.05 × 2.5 m.
+  - a double is 1.55 × 2.3 m (frame about 1.7 × 2.45);
+  - a single is 1.0 × 2.3 m.
 
-The shared bed today is 1.32 × 2.16 m, too short for most of the town's men.
+The party room's one bed is a double.
 
 ## 10. Fixed, proposed and open
 

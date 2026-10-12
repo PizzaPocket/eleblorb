@@ -101,7 +101,7 @@ computer.
 | X4 | Boat riding as a shared traversal mode | all | Decide | control design | 7 |
 | X5 | Dialogue: Fire, frontier and Ocean residents rewritten with their rebuilds | all | Ready with each rebuild | — | 17 |
 | X6 | Shop item descriptions that explain mechanics | all | Decide | the user | 17 |
-| X7 | Beds resized to the world's people (sense check 2026-10-12, below) | all | Ready, then Verify | Godot, to re-run the room layouts | 21 |
+| X7 | People and beds at one world scale: narrow the villagers' height ranges, and resize beds to 2.3 m (2026-10-12, below) | all | Ready, then Verify | Godot, to re-run room layouts and compare heights | 21 |
 
 ## 1. Ohio, starting village
 
@@ -924,45 +924,58 @@ over 1,800 m). Code when approved:
 - Survey first: the bed against `_ground_y` along the course, and
   `tools/ohio_cliff_probe` after the overlook and bay changes. Needs Godot.
 
-## 21. Beds are too small for the game's people (2026-10-12)
+## 21. People and beds at one world scale (decided 2026-10-12)
 
-The user felt the beds were small, and they are. People are built about
-2.0 m × their body scale (`ProceduralFigure`: feet to crown about 2.0 m at
-scale 1; `npc.gd` takes 1.9 × scale as head height):
+**What was found.** The user felt the beds were small. The world, including
+its people, is built at about 1.1 to 1.2 × real size:
 
-| Who | Body scale | Height |
-|---|---|---|
-| The hero | 0.95 | about 1.9 m |
-| Ohio men (`NPC_MALE_BODY_SCALES`) | 0.97 to 1.16 | about 1.94 to 2.32 m |
-| Ohio women | 0.84 to 0.99 | about 1.68 to 1.98 m |
-| Fire, Snow and Rock and Ground men | up to 1.15 to 1.17 | up to about 2.34 m |
-
-The beds:
-
-| Builder | Mattress | Used by | Verdict |
+| | In the game | Real | Ratio |
 |---|---|---|---|
-| `TownProps.build_bed` | 1.32 × 2.16 m (frame 1.44 × 2.36) | Ohio, the Snow Village, every `VillageInn` | too short for most men, and for the hero with a pillow |
-| `FishingBuildings._narrow_bed` | 0.88 × 1.96 m | fishing village | shorter than the hero |
-| `CalderaFurniture.bed` | 0.96 × 2.04 m | Fire city | far too short for lava men up to 2.34 m |
-| Nahl's lava bed | 2.04 m inside | Fire city | short |
+| Doors | 2.4 m | 2.0 to 2.1 m | 1.15 to 1.2 |
+| Storeys | 3.25 m | 2.7 to 3.0 m | 1.1 to 1.2 |
+| Tables | 0.80 m | 0.75 m | 1.07 |
+| The hero | about 1.9 m | about 1.73 m | 1.09 |
 
-**The fix (rule in the architecture skill):**
-- a mattress is at least as long as the tallest likely sleeper plus 0.2 m:
-  2.5 m for any adult bed;
-- a double is 1.6 × 2.5 m (frame about 1.75 × 2.65), a single 1.05 × 2.5 m,
-  and a child's bed 0.9 × 1.9 m;
-- each culture's bed keeps its own form at these lengths.
+People are built about 2.0 m × their body scale (`ProceduralFigure`; `npc.gd`
+takes 1.9 × scale as head height). Two things were out of line:
+- **The beds were real size:** 1.32 × 2.16 m, with the fishing village's
+  narrow bed at 1.96 m and the Fire city's at 2.04 m.
+- **The tall ends of the height ranges.** Men reach a body scale of 1.16 to
+  1.17, about 2.32 m tall, like a real 2.1 m person. Women reach about 2.0 m.
+
+**Decision (user, 2026-10-12):** keep the world's scale. Keep the hero and
+the base figure. Narrow the height ranges and resize the beds. Shrinking the
+people to real size was rejected because it would mean retuning the player
+capsule (1.8 m × 0.4 m), jumps, ledges and the demo world's platforming,
+re-judging every building's doors and rooms, and risking every attachment
+built on the figure's metre-sized proportions (hair, hats, helms, dress, the
+blorb suit, held items).
 
 **Code:**
-- Give `TownProps.build_bed` a size (double, single, child), defaulting to
-  the double.
-- Resize `_narrow_bed` and `CalderaFurniture.bed` to the single length, and
-  Nahl's lava bed to 2.5 m inside.
-- Re-run every interior's `RoomLayout` fit: Ohio's upper floors, the Snow
-  Village and every inn. The longer frames need about 0.3 m more room, and
-  some chests at the foot of a bed may move to a wall. Rooms that no longer
-  fit are reported, not squeezed.
-- Related check: doors are 2.4 m clear and the tallest men are about 2.32 m.
-  Check hats and hair against door heads too, though doors are a separate
-  item.
+1. **Height ranges** (real height × 1.1: men about 1.82 to 2.09 m, women
+   about 1.70 to 1.93 m; women stay shorter, per the body rules):
+   - Ohio (`town_generator.gd`):
+     - `NPC_MALE_BODY_SCALES` becomes [0.91, 0.94, 0.965, 0.99, 1.02, 1.045];
+     - `NPC_FEMALE_BODY_SCALES` becomes [0.85, 0.87, 0.895, 0.915, 0.94,
+       0.965].
+   - Fire, Snow and Rock and Ground profiles (`fire_kingdom_village.gd`,
+     `ice_kingdom_village.gd`, `rock_ground_kingdom_village.gd`):
+     - male scales become [0.92, 0.96, 1.0, 1.04];
+     - female scales become [0.86, 0.9, 0.93, 0.96].
+   - Check the other populations against the same band: the Chinese village,
+     the sea folk, Tempestars, pirates and the fishing village.
+   - The hero stays at 0.95 (about 1.9 m), in the middle of the men's range.
+2. **Beds**, at real size × 1.1: a 2.3 m mattress for any adult bed, a
+   double 1.55 m wide, a single 1.0 m, a child's bed 0.9 × 1.9 m.
+   - Give `TownProps.build_bed` sizes (double, single, child), defaulting to
+     the double.
+   - Resize `FishingBuildings._narrow_bed` and `CalderaFurniture.bed` to the
+     single size, and Nahl's lava bed to 2.3 m inside.
+3. **Re-run every interior's `RoomLayout` fit:** Ohio's upper floors, the
+   Snow Village, every inn and the fishing village. Frames grow about 0.1 m;
+   rooms that no longer fit are reported, not squeezed.
+4. **Look at the townspeople side by side** in each settlement after the
+   height change.
 
+Noted, not changed: the player capsule is 1.8 m tall against the hero's
+1.9 m figure.
