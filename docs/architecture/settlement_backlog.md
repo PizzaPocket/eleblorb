@@ -826,5 +826,12 @@ Full brief: `ohio.md` 3.4. Code when approved:
   - arch clearances over ways;
   - nothing in an arch opening or channel;
   - the mouth projects at least 3 m over a vertical face.
+- Household water (`ohio.md` 3.4, "Water for every house"):
+  - mains from the Conduit recorded in `OhioPlan`;
+  - taps, sinks and basins in the interiors, and a roof tank at the inn;
+  - outside taps and water butts;
+  - stopcock and fire-plug cover decals;
+  - septic tanks behind the houses, not modelled;
+  - Tam's dawn valve round.
 - Survey first: ground profiles along the arcade line and across the mill's
   slope, then `tools/ohio_cliff_probe` after the terrain change. Needs Godot.

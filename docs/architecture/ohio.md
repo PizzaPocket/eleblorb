@@ -265,6 +265,51 @@ above the overlook terrace, and is low where it leaves the mill.
   aqueduct's mouth as a thin second spout. The overlook's ground does not
   change.
 
+#### Water for every house (added 2026-10-12)
+
+Ohio is old in style but lives today: houses have kitchen taps, basins and
+flush toilets (bible). The Conduit is also the village's supply. Its cistern
+holds the water at about 6.7 m above the village floor, so buried pipes can
+deliver it under gravity alone, with no pump.
+
+- **Precedent.** London's New River (1613) brought spring water forty miles to
+  a reservoir in Islington. From there, mains of bored elm trunks ran down the
+  streets, with small lead pipes into each house. The man who opened and shut
+  the supply to each street was the *turncock*.
+- **Mains.** From the Conduit, one buried main runs west under the market
+  street and the main street to the meeting house, the Vey house, the inn,
+  the bakehouse and the milling quarter. A second branch runs south from the
+  green down the west lane and the east lane to the cottages and gardens.
+  Every house has a small service pipe and a stopcock.
+- **Pressure.** About 6 m of head gives a steady flow at ground-floor taps.
+  Upstairs fixtures (floor about 3 m) still get about 3 m of head, enough to
+  fill a toilet cistern and a basin. The inn's upstairs washroom is the
+  furthest and highest point, so it gets a tank in the roof space that
+  fills slowly and feeds by gravity.
+- **Heavy users.** Each has its own feed:
+  - the bakehouse (dough, the copper, washing down);
+  - the inn's kitchen, washroom and guest basins;
+  - the smithy, which also dips from the runnel;
+  - Cob's millhouse and grain yard;
+  - the meeting house.
+- **Public water.** The fountain is the public tap. The shared well at the
+  head of the lane stays: it is older than the aqueduct, and people still
+  draw from it out of habit and in a dry spell. The horse trough is by the
+  east road.
+- **Fire.** A fire plug (a valve on the main with an iron cover) stands by the
+  green, and another by the inn.
+- **Rain.** Water butts at the gardens (the kitchen garden and physic garden
+  already have water barrels) catch roof water for watering.
+- **Waste.** Nothing goes into the runnel, the aqueduct or over the cliff.
+  Each house drains to its own septic tank and soakaway in its back garden,
+  as English villages without mains sewers do.
+- **Tam is the turncock.** He opens the Conduit's valves at dawn, knows every
+  stopcock, and is who people fetch when a tap runs dry.
+- **What the player sees.** Kitchen sinks with taps, washroom basins,
+  outside taps by the gardens, and small iron stopcock and fire-plug covers
+  set in the worn ground as decals. Water butts stand by the sheds. The pipes
+  themselves are buried and not modelled.
+
 #### How the village moves around it
 
 | Crossing | How |
