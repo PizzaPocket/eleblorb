@@ -347,7 +347,7 @@ in character and pointing nowhere:
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Lucinda Wah** | the manager's flat on the hotel's top floor | general manager | Third generation to run the hotel her grandfather built. She knows the chandelier's 3,000 crystals by their faults. |
+| **Lucinda Wah** | the manager's flat on the hotel's top floor | general manager; keeps the reception desk herself in the evenings (the rest point's keeper) | Third generation to run the hotel her grandfather built. She knows the chandelier's 3,000 crystals by their faults. |
 | **Felix Tanaka** | Old Moy, above the bakery | concierge | Knows every shortcut, every deck and every noodle stall, and talks as if the city were his own living room. |
 | **Ah Keung** | Wing Fat Mansion | doorman at the revolving door | Forty years at the door. Greets everyone, and has never once let the door stop turning. |
 | **Iris Dune** | Wing Fat Mansion, 11th floor | florist, with a flower stand in the hotel's lobby | Keeps a plant alive on her eleventh-floor sill against all reason, and dresses the atrium every morning. |
@@ -1047,7 +1047,7 @@ that holds its street edge and meets the Deck at +6.5 m.
   climbers and swing anchors along the south of Civic Plaza. Dr. Kask lives
   near the top.
 
-**5. The Grand Hotel's guest tower** (25 floors, 97 m)
+**5. The Grand Hotel's guest tower** (21 floors on a 20 m podium, about 100 m to the lantern; full brief in section 8)
 - **Idea:** the grand old hotel, older than the other towers.
 - **References:**
   - **Peace Hotel, Shanghai:** art deco, with a pyramidal copper roof.
@@ -1097,7 +1097,7 @@ round the park and on Civic Plaza.
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 1 | Grand Hotel | 52 × 60 m | podium 4 storeys, guest tower 25 floors (97 m) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
+| 1 | Grand Hotel | 52 × 60 m | podium of 4 levels round a 20 m atrium; guest tower of 21 floors to a copper crown, about 100 m (section 8) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
 | 2 | City hall | 34 × 60 m | 4 storeys and a clock tower, at the head of Civic Plaza | Mayor Teodora Vance, Kenji Mori (clerk) |
 | 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, twisting, with three wind gaps (7c) | the Windworks (headquarters, observation deck) |
 | 13 | Glass tower | 40 × 40 m | about 45 storeys, 180 m, in moving screens pierced with the house marks (7c) | Raman & Reese (Elizabeth, Priya, Venn); Tanglewire (Dan) |
@@ -1176,33 +1176,189 @@ Downtown and the estate add height, not land, so the radius holds. The works
 beyond the bounds need about 100 m more on the east, south-west and
 north-west, inside the 110 to 140 m gaps to the plateaus and the skirt.
 
-## 8. The Grand Hotel (rest point), outline
+## 8. The Grand Hotel (rest point): building brief (proposed, 2026-10-12)
 
-The full building brief follows the layout.
+### 8.1 People and purposes
 
-- **Precedents:**
-  - **White Swan Hotel, Guangzhou:** the atrium's indoor rock garden and
-    pavilion (its waterfall left out: Moy has no opulent water).
-  - **Peace Hotel, Shanghai:** art deco, with the great chandelier under a
-    lantern dome.
-  - **Grand Hyatt in the Jin Mao Tower, Shanghai:** guest galleries ringing a
-    soaring atrium.
-- **Size:** a podium about 66 × 50 m; an atrium about 33 × 26 m and 26 m high;
-  a guest tower above, about 33 × 55 m and 25 floors.
-- **Arrival:**
-  - a revolving door (a drum about 3.3 m across) flanked by swing doors for
-    the party and big companions;
-  - the doorman, Ah Keung;
-  - a canopy on Civic Plaza;
-  - the Deck's entrance at the mezzanine.
-- **The atrium:**
-  - the giant chandelier, about 8 m across;
-  - the dry rock garden and pavilion;
-  - reception, the concierge desk and Iris's flowers;
-  - a grand double ramp to the mezzanine restaurant.
-- **Realised:** the atrium, the mezzanine, one guest gallery, and the party's
-  suite (one bed at the world's bed size; its own bathroom). Lifts run
-  between them.
+**Why a grand hotel in a city no road reaches.** Moy has almost no outside
+visitors, so the hotel lives on the city itself, the way grand hotels in
+real cities do:
+- **The city's living room:** afternoon tea and drinks under the
+  chandelier, weddings and celebrations in the atrium, dinner in the
+  restaurant on the mezzanine.
+- **Long-stay residences:** five floors of suites let by the year, a
+  tradition of the hotel since Lucinda's grandfather's day, after Raffles
+  in Singapore and the Chelsea in New York.
+- **Guest rooms** for staycations, for families between homes, and for the
+  rare traveller who crosses the desert on foot, like the hero.
+
+**History.** Lucinda Wah's grandfather built it in the Windworks' first
+boom, as the city's first tall building. It is older than every other
+tower, which is why it alone is art deco stone and bronze among the glass.
+The Blackout is the night its chandelier went dark for the first time.
+
+**Who works here** (the people the hero meets):
+
+| Person | Role | Where |
+|---|---|---|
+| Lucinda Wah | general manager; keeps the reception desk herself in the evenings, as her grandfather did, so she is the rest point's keeper | the desk, her office behind it, her flat on the top floor |
+| Felix Tanaka | concierge | the concierge desk by the door |
+| Ah Keung | doorman | the revolving door, forty years |
+| Iris Dune | florist | her flower stand inside the door; she dresses the atrium each morning |
+
+Kitchen, housekeeping and laundry staff work behind service doors and are
+never seen on the public floors.
+
+**What goes in and out.** Guests and visitors by the revolving door on
+Civic Plaza, the Deck door at the mezzanine, and the park terrace. Food,
+linen and stores by cargo trike to the loading door on Hotel Lane at
+dawn; laundry the same way. Waste to the city sewer and on to the water
+works' reclamation (see 2a).
+
+**References:**
+- **Peace Hotel, Shanghai (1929):** art deco stone, bronze and a pyramidal
+  copper roof; its jazz bar.
+- **Raffles Hotel, Singapore:** shaded loggias and verandas, the Long Bar,
+  and long-stay suites.
+- **White Swan Hotel, Guangzhou:** the indoor rock garden and pavilion in
+  its atrium (the waterfall left out: no opulent water).
+- **Chrysler Building, New York:** setbacks and a lit crown.
+- **Old Moy's tower houses and wind towers:** the hotel cools itself the
+  way the old town does.
+
+### 8.2 Site
+
+The north side of Civic Plaza: 52 m (east–west) × 60 m (north–south).
+- **South face, the front:** on Meridian North, facing across it to Civic
+  Plaza and city hall.
+- **West face:** on the Park Ring, facing the park.
+- **North face, service:** on Hotel Lane.
+- **East face:** a party wall with the Windspire's podium.
+- **The Deck** passes along the south face at +6.5 m, along Meridian North.
+
+### 8.3 Program and stacking
+
+A **podium** of four levels round a full-height atrium, with a **guest
+tower** rising from its north half. The structural lines are shared by
+every level: the atrium's edges, the tower's walls and its central core.
+
+| Level | Height | Contents |
+|---|---|---|
+| **Ground** | 0 to +6.5 m (one grand storey) | Loggia and revolving door on the south; vestibule; the **atrium** (26 × 22 m), with the dry rock garden and pavilion at its centre and the **double ramp** up to the mezzanine; reception and Lucinda's office (east); the concierge desk and Iris's flower stand by the door; the **Long Bar**, opening onto the park terrace (west); public washrooms; lift lobby (north); kitchen, stores, staff room and the loading door on Hotel Lane (north-east) |
+| **Mezzanine** | +6.5 m, the Deck's level | A gallery 2.4 m wide round the atrium; the **Chandelier Room** restaurant along the west, with a balcony over the park; the tea lounge and washrooms along the east; the **Deck door** in the south face |
+| **Levels 3 and 4** | +11.5 to +20 m | Galleries round the atrium; function rooms (west), the hotel's offices and the luggage room (east); the chandelier's winch room under the lantern |
+| **Podium roof** | +20 m | The **roof garden**: shade trees in planters, the terrace bar, and two **wind towers** after Old Moy's; the atrium's glass **lantern roof** between them |
+| **Tower floors 1 to 14** | +20 to +68 m | Guest rooms, 12 to a floor round a central core |
+| **Tower floors 15 to 19** | +68 to +85 m | Long-stay residences, 6 suites to a floor |
+| **Tower floor 20** | +85 to +88 m | The grand suites, among them **the party's suite** facing the park |
+| **Tower floor 21** | +88 to +91 m | Lucinda's flat, the manager's flat, with its own terrace |
+| **The crown** | +91 to +100 m, lantern above | The green-copper pyramid, holding the tower's water tanks (filled from the wells, like the roof tanks across the city) and, at its peak, the lit lantern |
+
+**The tower**, 33 × 22 m, stands on the podium's north half. Its walls
+come straight down to the ground as the north band's walls, so nothing
+stands on the atrium. The atrium's lantern roof spans only the podium's
+south half.
+- **Core:** three guest lifts, one service lift, and an escape **ramp tower**
+  (a spiral ramp, by the world's ramp rule), carried from the ground to
+  floor 21.
+- **Corridor:** a ring corridor 1.8 m wide round the core.
+- **Rooms** along all four faces, each with its own bathroom on the
+  corridor side and the window on the outer wall.
+
+**The atrium void** (26 × 22 m) passes through the mezzanine and levels 3
+and 4 up to the lantern at +20 m. Every gallery's rail stands on the void's
+one boundary, and no wall below runs under it. The chandelier hangs from
+the lantern's central truss.
+
+**Circulation:**
+- **Visitors:** revolving door → vestibule → atrium → double ramp or lifts
+  → mezzanine.
+- **Guests:** atrium → lift lobby → tower lifts.
+- **Staff and goods:** Hotel Lane → loading door → kitchen and service lift,
+  never crossing the atrium.
+- **From the Deck:** the mezzanine door → the gallery → the lifts.
+
+**The double ramp.** Two curving ramps rise either side of the rock garden
+from the atrium floor to the mezzanine, 6.5 m. At the world's 32° each
+runs about 10.4 m on plan, curving round the pavilion. Each is 2.4 m wide
+(grand, two people abreast), with a 3 m landing at its foot and its head.
+
+### 8.4 The chandelier
+
+- About **8 m across and 9 m tall**, hung from the lantern truss so its
+  lowest tier is 7 m above the atrium floor.
+- **Three thousand crystals** in tiers round a bronze frame, lit from
+  within. Lucinda knows them by their faults. During the Blackout they went
+  dark for the first time in the hotel's history.
+- **A winch room** under the lantern lets the whole chandelier be lowered
+  for cleaning, once a year, an event the city turns out to watch.
+- **Collision:** solid. Its crown ring at the top is a perch, reached from
+  level 4's gallery by a jump. It is not a swing anchor (not 7 m above
+  anything the hero could swing from).
+
+### 8.5 Facade and massing
+
+The hotel is the city's landmark of the oldest age downtown: polite, stone
+and bronze, the one art deco building, in the charter's 5 % accent for
+landmarks (section 5).
+
+| Element | Term | Tradition |
+|---|---|---|
+| Podium base | rusticated cream stone plinth | art deco, classical base |
+| South and west faces at ground | an **arcaded loggia**, 4 m deep, of superellipse-headed arches | Raffles' verandas, in Moy's superellipse |
+| Entrance | a **marquise** (projecting bronze-and-glass canopy) over the revolving door, with the swing doors either side | art deco |
+| Tower walls | continuous stone **piers** running full height between recessed window bays, with bronze **spandrel panels** between floors | art deco verticality; the piers also shade the windows |
+| Spandrel ornament | Old Moy's **house marks** cast in bronze, one mark per floor | the city's signature motif |
+| Corners | rounded in a superellipse, the streamline corner | art deco and Moy's signature |
+| Top | two **setbacks**, then the **green-copper pyramid** and the lit lantern | Peace Hotel, Chrysler |
+| The sign | no lettering: a bronze **chandelier** picture on a hanging sign over the marquise | Moy's picture signs |
+
+**Palette:** cream stone 60 %; bronze and green copper 30 %; amber light
+and sign colour 10 %.
+
+### 8.6 Heat and air
+
+- The **loggias** shade the ground-floor glass from the sun.
+- The tower's deep **piers** shade its windows.
+- The two **wind towers** on the podium roof catch the west wind and drop
+  cool air into the atrium. Warm air rises and leaves by vents in the
+  **lantern's** clerestory, the old town's way of cooling, at the hotel's
+  scale.
+- Modern air conditioning does the rest. Its plant sits on the podium roof,
+  screened.
+
+### 8.7 The rest point
+
+- **Fixtures (Moy is modern):** every guest room and suite has its own
+  bathroom with a flush toilet, a washbasin and mirror, and a shower; the
+  suites add a bath. Public washrooms open off the atrium and the mezzanine
+  with flush toilets and basins. Waste goes to the city sewer and the water
+  works' reclamation.
+- **How the hero rests:** at the reception desk, with Lucinda in the
+  evening (or Felix by day), then up to the party's suite on floor 20.
+- **The party's suite:** sitting room, one bedroom with a double bed at
+  world scale (mattress 1.55 × 2.3 m), a bathroom, and windows on the park.
+  The swing doors beside the revolving door are 2.8 m wide for big
+  companions and mounts; the lifts take them.
+- **Price:** open.
+
+### 8.8 Play
+
+- The **marquise**, the loggia's arches and the tower's **piers** are climbing
+  holds.
+- The **podium roof garden** is reached by the lifts and from the Deck. It
+  is a landing between the park's swing loop and the downtown towers.
+- The **copper pyramid** and its lantern are a high swing anchor over the
+  park and the plaza.
+- The **chandelier's crown** is a perch above the atrium.
+
+### 8.9 Realised (fidelity A)
+
+The loggia, the vestibule and the atrium with the chandelier, the rock
+garden and the double ramp; reception, the concierge desk and Iris's stand;
+the Long Bar; the mezzanine with the Chandelier Room and the Deck door; the
+lifts; the floor 20 corridor and the party's suite; the podium roof garden.
+The other floors are lit windows only.
 
 ## 9. The library, outline
 
