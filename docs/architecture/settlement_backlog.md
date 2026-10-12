@@ -710,7 +710,8 @@ concept.
 
 - Review the mechanical and motor-punk layer (`rock_ground_town.md` 2a, user
   direction 2026-10-12): electric, battery, wind and spring power, with the
-  machinery shown open.
+  machinery shown open, plus fine watch gears and clockwork (Inez as
+  watchmaker, pocket watches, watch-part jewellery for the dress charter).
 - Review: the census of sixteen (Dolma kept; Cass Rourke the miner and Gus
   Pickett the old prospector added 2026-10-07), the saloon and hotel as the social
   centre and rest point, the Kane gang, the cyborg horses, the cowboy hat as

@@ -138,7 +138,37 @@ excluded, as the interior-design skill already excludes fake pipes.
 - rubber-sleeved cable;
 - timber for frames and housings.
 
-**Sound** is part of it: motors revving at the race barn, ticking clocks,
+**Two scales: heavy machinery and fine clockwork (user, 2026-10-12).** Beside
+the motors, belts and stamp mill, the town loves **watch gears and clockwork**:
+small brass wheels, escapements, balance wheels, mainsprings and jewelled
+pivots, worked under a loupe. The fine scale shows in:
+- **Inez's hat shop**, the town's watchmaker as well as its hatter. Her bench
+  holds a loupe, tweezers, trays of tiny wheels and springs, a hat with its
+  band open to show the winding train, and pocket watches in for repair.
+- **The hats.** Each brim's ratchet and spring is watch-fine work, wound at a
+  small crown on the hat band, and the change runs with a quick tick.
+- **The horses' joints.** The small gear trains seen through the cut-outs at
+  the fetlock are watch-scale, under glass.
+- **Clocks:**
+  - the race clock's visible escapement and swinging pendulum;
+  - a tall case clock in the saloon;
+  - a clock in the assay office's window.
+- **People.** Pocket watches on chains are everyday wear, opened to show their
+  movement. Inez repairs them all. Gus carries one that has not run in
+  twenty years.
+
+**On dress, an honest exception to the rule.** A gear on a machine must
+turn something. A gear worn as **jewellery** is a different thing: a person's
+adornment made from salvaged watch parts. Allowed:
+- a bolo tie slide set with an old balance wheel;
+- cufflinks of watch wheels;
+- spur rowels cut like gear wheels, which click as their wearer walks.
+
+These belong in the town's dress charter when it is written
+(`character-design` skill). They are never glued onto buildings.
+
+**Sound** is part of it: motors revving at the race barn, ticking clocks and
+watches,
 ratchets, the stamp mill's beat, the windpumps' creak, and the click of a hat
 changing.
 
@@ -524,7 +554,8 @@ no holsters, gun belts, rifles on racks or shoot-outs. The Western menace comes
 from horses, riders, stares and races instead.
 
 **Fixed (user, 2026-10-12):** the look is mechanical punk and motor punk as
-well as cowboy punk. Electric and battery power exist, since dirt bikes have
+well as cowboy punk, with watch gears and clockwork as a fine-scale part of
+it. Electric and battery power exist, since dirt bikes have
 motors, but machinery is shown open, with gears in view. The details are
 proposed in section 2a.
 
