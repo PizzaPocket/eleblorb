@@ -785,9 +785,38 @@ Full brief: `chinese_village.md` 4.1. Code when approved:
   dip to -400 m), its NME roster, descent routes, the gate itself, and
   whether anything stops its monsters climbing to the village. The village
   re-fit's parapets and bridge guards already assume a lethal drop.
-- **Sun Wu Kong's prison is reopened**: not a rock, since he was born from
-  one. Options in `chinese_village.md` 4.6 (golden cymbals recommended). The
-  sealing-rock code (`SEALING_ROCK_LOCAL_POS` and the rock build in
-  `scripts/chinese_village.gd`) waits on the decision; items 12 and 13's
-  rock entries follow it.
+- **Sun Wu Kong's sealing rock is kept for now** (user, 2026-10-12). His
+  lore is to be worked out further later; alternatives are parked in
+  `chinese_village.md` 4.6.
+
+## 20. Ohio: the leat through the village (2026-10-12, awaiting approval)
+
+Full brief: `ohio.md` 3.4. Code when approved:
+- `scripts/terrain_generator.gd`:
+  - a **cliff-foot bay** term: bearings about +8° to +32°, water 55 m out,
+    a hard cliff, a floor 12 m deep at the foot shelving to a beach;
+  - the bay included in `lake_coverage` and `_lake_surface_coverage`;
+  - fall corridor 0 moved to about 14.8°;
+  - the overlook pad replaced by an east road grade falling from 0 to
+    −0.5 m.
+- `scripts/ohio_plan.gd`:
+  - a new course from the mill: the wheel to the west end of the north
+    wall, the tailrace, the clapper bridge, the mill road's east side, Tam's
+    slab, the Conduit, the main leat along the east road, the meeting stone
+    and the Lip;
+  - the buried fountain pipe;
+  - the runnel with its dipping place, slabs and culvert;
+  - bed levels at every point.
+- Builders (`VillageWorks`):
+  - a stone channel with an optional arcade;
+  - the clapper bridge and slab crossings;
+  - a hexagonal conduit house;
+  - the kerbed runnel;
+  - the Lip basin with its fall on a true arc.
+- Validator: water falls all the way; every way crossing water has a
+  crossing; nothing stands in a channel.
+- Survey first: a ground profile along the mill road (where the arcade and
+  cuttings go), then `tools/ohio_cliff_probe` after the terrain change. Needs
+  Godot.
+- NPCs: Tam's leat round, Brinna's dipping place, the children's stick race.
 

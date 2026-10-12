@@ -658,12 +658,12 @@ closer together near the base, branching and leaf sprays only in the upper
 third, small young shoots at clump edges. A path, two clearings (the
 farmer's and a resting spot) and sparse understory.
 
-### 4.6 Sun Wu Kong's prison (reopened 2026-10-12)
+### 4.6 Sun Wu Kong's sealing rock (kept for now, 2026-10-12)
 
-**Reopened.** The user: a rock makes no sense as his prison, because a rock
-is where he was born (the split stone egg on Flower Fruit Mountain). The
-text below the options is the 2026-10-06 version, kept until a replacement is
-chosen; its placement (north rim of Lantern Row, the play hut in its lee, the
+**Kept for now.** The user raised that a rock is where he was born (the split
+stone egg on Flower Fruit Mountain), then chose to keep the rock for now and
+work out his lore further later. The alternatives below are parked for that
+conversation. The 2026-10-06 version below them stands; its placement (north rim of Lantern Row, the play hut in its lee, the
 Jingu Bang among the sticks, Mei Lian's red cord) can carry over to whatever
 the prison becomes.
 
@@ -671,9 +671,9 @@ What the prison must do: be made by the sky courts; hold him where the
 children can talk to him; be openable only by one of his own monkeys
 (Xiao Hou Zi); and leave something visible behind once he is free.
 
-Options, each with a root in *Journey to the West*:
+Parked alternatives, each with a root in *Journey to the West*:
 
-1. **The golden cymbals** (recommended). In the novel (chapter 65) a demon
+1. **The golden cymbals.** In the novel (chapter 65) a demon
    traps him between a pair of golden cymbals clapped shut, and he can only
    be freed by prying them apart from outside. Here the Chrysa, the courts'
    goldsmiths, forged a pair of giant gold cymbals and clapped him between
@@ -698,7 +698,7 @@ In the novel the Buddha does pin him under a mountain (Five Elements
 Mountain). Our version drops that, because our Sun Wu Kong's birth from
 stone makes a stone prison read as a homecoming rather than a punishment.
 
-#### The 2026-10-06 version (superseded once a replacement is chosen)
+#### The 2026-10-06 version (current)
 
 
 The rock is older than the palace, older than the village, and older than the

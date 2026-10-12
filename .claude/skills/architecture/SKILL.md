@@ -395,7 +395,7 @@ Every outside prop (woodstack, bench, trellis, barrel, handcart) stands **clear 
 
 ## 7b. Siting a mill
 
-A mill sits **on the settlement's side of the water it uses**, along the course of the leat or aqueduct, and its door faces the way people arrive; nothing (a bridge, the race) lies between the road and the door. Run the water from its source toward the point on the rim nearest the settlement, and place the mill along that run, as close to the settlement as the fall allows.
+A mill sits **on the settlement's side of the water it uses**, along the course of the leat or aqueduct, and its door faces the way people arrive; nothing (a bridge, the race) lies between the road and the door. Run the water from its source toward the point on the rim nearest the settlement, and place the mill along that run, as close to the settlement as the fall allows. Water is part of a settlement's character, not a utility to hide: where people can live with it, bring it through the settlement (a leat beside a road, a conduit fountain, a street runnel) before it leaves. If the only possible outfall is far from the settlement, question the ground before accepting a hidden aqueduct: Ohio's fall was stuck 100 m from the village until the lake was widened along the cliff foot (`docs/architecture/ohio.md` 3.4).
 
 ## 8. Review checklist
 

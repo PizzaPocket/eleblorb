@@ -126,6 +126,171 @@ Organising idea: a **headland village on one axis**. Travellers enter at the wes
 
 Gateway as described under Nodes. Built so far: the lantern piers, the stone-ringed sign island, windows either side of the inn's hearth stack on both floors, a stepped chimney breast, a woodstack, a bench and a trellis with a climber on the inn's roadside gable. Open: lamps along the main street; the inn's roadside forecourt may want its own small cobbled apron.
 
+### 3.4 The leat through the village (proposed 2026-10-12)
+
+**The problem.** The water goes from the tarn to the mill and straight over the
+rim at (83,-102), 100 m north of the green and out of sight of it. It ends
+there because that is the nearest place where the lake lies under the cliff.
+Below the overlook and the rest of the village's rim, the cliff drops to dry
+gorge floor, because the lake begins at world x = 220 and its west end fades
+in over 48 m (`lake_coverage`'s `eastward` ramp). So the water never comes
+near the village, and the aqueduct is something nobody in Ohio sees.
+
+**The fix (user direction).** Widen the lake along the foot of the cliff so
+that it wraps the rim under the village. Then the leat can come down into
+Ohio, feed the fountain, run out along the east road beside the evening
+walkers, and fall from a lip beside the overlook into the lake. The water
+becomes part of the village's character, as it is in the English villages
+below.
+
+#### English precedents
+
+| Precedent | What it gives Ohio |
+|---|---|
+| **Hobson's Conduit, Cambridge** (1610–1614): an open channel bringing spring water about three miles into the town, feeding a conduit fountain on Market Hill and running beside Trumpington Street in stone-kerbed street runnels that still flow | The fountain as the conduit's public outlet; a kerbed runnel beside a street |
+| **Wells, Somerset**: in 1451 Bishop Beckington gave the town water from his springs through a conduit to the market place fountain, and the overflow still runs down the High Street gutters | The fountain's overflow running out along the main street |
+| **Drake's Leat, Plymouth** (1591): about seventeen miles of open channel off Dartmoor into the town, feeding mills and conduits on the way | A long leat with grassy banks and a path beside it, a mill on its course |
+| **Dartmoor clapper bridges**: big granite slabs laid on stone piers | How a road or a doorstep crosses the water |
+| **Bourton-on-the-Water and Bibury**, Cotswolds: water through the middle of the village, low stone footbridges, the mill on the stream, people sitting on the banks | Water as the village's living street furniture |
+| **Conduit houses** (the Great Conduit in Cheapside, Exeter's conduits): small stone houses at the head of the town's supply where the water was divided and the keeper held the key | The Conduit at Tam's door, where the flow divides |
+
+Children everywhere race sticks down a stream (Poohsticks, in English), and
+Pip, Tess and Wick will race them from the fountain to the overlook.
+
+#### The course (local metres; to be surveyed before building)
+
+1. **Tarn to mill, as built:** from the sill (47.5,-142), past the headgate,
+   down the chute to the mill bench (3.5 m).
+2. **The mill.** The leat now has to turn south to the village, and the rim is
+   too close to the mill's east wall for the tailrace to pass that side. So
+   the **wheel moves to the west end of the north wall** (about (69,-102)),
+   the chute turns west along the wall to it, and the tailrace runs south
+   along the mill's west side. The mill's drive gear moves with the wheel.
+3. **Down the mill road.** The tailrace crosses under the mill road once, on a
+   **clapper bridge** below the mill (about (61,-78)), then runs beside the
+   road on its east side down to the village. It is a stone-lined channel
+   about 0.8 m wide and 0.4 m deep, with grass banks, rushes, and a **leat-side
+   path** that is the mill road's verge. Where the ground dips below the
+   channel's grade, it rides a short **arcade of low stone arches**. Where the
+   ground rises above the grade, it runs in a shallow cutting. The ground
+   between the mill bench and the village is hill noise, so the survey decides
+   where each goes. One arcade is the hope: it would be the village's
+   landmark on the walk to the mill.
+4. **Tam's door.** The channel passes between the mill road and the Ruskin
+   house's west front, about (48,-27). A slab bridge crosses it to Tam's door.
+   His house is now literally the house beside the channel.
+5. **The Conduit** (about (50,-15)): a small hexagonal stone conduit house
+   with a stone-slate roof, in Ohio's stone. It stands where the mill road
+   meets the east road, a few steps from Tam's door. Inside are a cistern and
+   a weir plate with timber paddles, and Tam holds the key. The main leat
+   leaves its east side, and a buried lead pipe takes the fountain's share.
+6. **The fountain.** The pipe runs under the market street and rises in the
+   fountain's spout. The fountain stays at the origin with the Water Gem.
+   Its basin overflows from the east side into the **runnel**.
+7. **The runnel.** A stone-kerbed street runnel, about 0.5 m wide and 0.25 m
+   deep, the Hobson and Wells kind:
+   - it leaves the fountain apron eastward and runs along the **south edge
+     of the market street** and the east road;
+   - the stalls are on the north edge, so they are left clear;
+   - there is a dipping place with two stone steps opposite the forge, where
+     Brinna draws quench water;
+   - it is shallow enough to step through; slabs cross it where a path does.
+8. **The east road.** The main leat runs along the road's north edge from the
+   Conduit, passing north of the overlook's old tree at (72,-2.5). The
+   runnel crosses under the east road through a slab culvert at about
+   (66,-2.5) and joins the leat at the **meeting stone** (about (68,-5)).
+9. **The Lip** (about (80,-8)): a dressed stone basin set into the rim just
+   north of the overlook terrace, with a plain projecting stone lip. The water
+   leaves at walking pace (about 1 m/s) and falls about 61 m along a true arc
+   into the lake, beside the terrace and in full view of its benches. The
+   overlook keeps its rule of no rim wall. The basin's kerb is low, and the
+   terrace is not enclosed.
+
+#### Levels
+
+| Point | Water level (m) |
+|---|---|
+| Tarn | 8.0 (sill 7.2) |
+| Mill bench | about 3.8 |
+| The Conduit | about +0.4 |
+| Fountain basin | about +0.3 |
+| Meeting stone | about −0.1 |
+| The Lip | about −0.35 |
+| Lake | −61.65 |
+
+The village floor is 0 within 65 m of the town centre, but the overlook pad
+sits at **+2.0**. Water from the fountain cannot reach it uphill. **Change:**
+replace the overlook pad with an **east road grade**: a level-to-falling
+strip along the east road from (38,-9.5) to the rim at about (82,-3), flat
+across 12 m with an 8 m blend, falling evenly from 0 to −0.5 m. The road and
+the water then fall gently together toward the view. Re-run
+`tools/ohio_cliff_probe` afterwards, because the terrace's foundation, the
+edge walk's line behind the rim notch (z 12 to 29) and the 1.1 m ground
+variation it records all change.
+
+#### The terrain change: a cliff-foot bay
+
+In `scripts/terrain_generator.gd`:
+- **Extent.** Add a bay to the lake that hugs the plateau rim from bearing
+  about +8° (where it joins the existing lake mouth) to about +32° (beyond
+  the orchard end of the edge walk at local (60,46), world bearing 29°).
+  Its water reaches about 55 m out from the cliff, and a beach rises to the
+  gorge floor by 70 m. The overlook is at bearing 17.5° and the Lip at
+  about 14.8°.
+- **Cliff.** Inside the bay the rim stays a **hard cliff wall**, as it is
+  outside the lake now, not the lake sector's 92 m broad slope. The bay is
+  built as its own term in `get_height`. It is not folded into
+  `lake_coverage`'s slope branch.
+- **Depth.** The floor is about 12 m below the water at the cliff foot,
+  shelving to 2 m at the beach.
+- **Swimming and water mesh.** `lake_coverage` (swimming, buoyancy,
+  `is_lake_area`) and `_lake_surface_coverage` (the water mesh) both include
+  the bay. The water level is the lake's, −61.65 m.
+- **Falls.** Fall corridor 0 moves from bearing −7.8° to the Lip, about
+  14.8°, with its plunge pool. It merges with the overlook's corridor at
+  17.5°. The old fall site at −7.8° returns to the lake's ordinary sloped
+  shore.
+- **Sheer face.** At 1 m/s the water travels about 3.5 m out from the lip
+  over 61 m of fall. The corridor's sheer face must be steep enough under
+  the Lip for the water to fall clear. If the cliff probe shows it is not,
+  the water runs as a cascade down the rock, which real cliff falls also do.
+- **Clearances.** Check that nothing placed on the gorge floor between those
+  bearings, within 70 m of the rim, is now under water: wilderness props,
+  spawns and routes.
+
+#### Who it belongs to
+
+- **Tam Ruskin** keeps it all. His dawn walk now runs up the leat-side path
+  to the mill racks and back, and he opens the Conduit's paddles. In autumn
+  he clears leaves from the runnel. This joins the "Tam checks the channel
+  and the fountain" rhythm into one round.
+- **Dorran's saw** still turns on the race.
+- **Brinna** quenches from the runnel's dipping place.
+- **Evening walkers** follow the water out to the overlook to watch it fall.
+- **The children** race sticks from the fountain to the meeting stone. That
+  is a diegetic pull toward the overlook, with no text.
+
+#### Rules it must pass
+
+- One continuous body of water from the tarn to the Lip; every surface uses
+  the liquid surface API and `CollisionPolicy`'s hazard or liquid policy. The
+  channel beds and kerbs are solid. The leat and runnel are shallow enough to
+  wade.
+- Every way that crosses the water does so on a built crossing: the clapper
+  bridge, Tam's slab, the east road culvert, and the slabs where green paths
+  cross the runnel. The validator fails a way that crosses the water without
+  one, and any building, stall, tree or lamp in the channel.
+- Water never flows uphill: the plan records the bed level at each course
+  point, and the validator checks that it falls all the way.
+- Paths stay packed earth (bible). The kerbs, slabs and Conduit are
+  waterworks, not paving.
+- Gameplay anchors stay fixed: the fountain and Water Gem at the origin,
+  the stall spots, the overlook's place.
+
+**Superseded by this:** the aqueduct course in `OhioPlan.AQUEDUCT_COURSE`
+east of the mill (from (78,-102) to the fall at (83.2,-102)), and the fall
+corridor at −7.8°.
+
 ## 4. Building briefs and 5. Variation matrix
 
 Shared by all (the invariants): one pitch band, 0.5 m plinth, plaster over stone on the ground storey and an oak-framed upper storey, cream and ochre walls, tile roofs, a gable-end external stack that steps in as it rises, rolled brackets, superellipse frames. Each building below differs strongly on entry, upper feature and plan, mildly on the rest. The set is built from `FacadeFeatures` and `EntryDressing` and chosen per building in `OhioPlan.BUILDINGS` ("dressing" and "features"). Status column: **built** or **pending**.
