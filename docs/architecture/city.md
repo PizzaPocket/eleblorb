@@ -719,9 +719,10 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
 
 - **The park, at the centre** (user). About 130 × 100 m, ringed by the Park
   Ring, the main street that ties the city together:
-  - the **giant playground** at its heart;
-  - Old Fu's tea house and the chess tables;
-  - the pond, and shade trees on reclaimed water;
+  - the **giant playground** at its heart (section 7b);
+  - four quarters: the dry garden, the reed pond, the parasols with Old Fu's
+    tea house and the chess terrace, and the great lawn (section 7a);
+  - four steel wind trees round the playground;
   - **Garden Row**, a short row of three older townhouses, faces it from
     the west, across the Park Ring from Old Moy.
 
@@ -821,18 +822,7 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
 
   The distances between blocks are compressed for the game; real estates
   set facing blocks further apart. The Housing Board (Juno) runs the estate.
-- **The giant playground**, in the park: the biggest the world has seen
-  (after Singapore's mosaic dragon playgrounds and the great net-tower
-  playgrounds of Europe and Japan):
-  - climbing towers of 12 to 20 m joined by rope bridges and net tunnels;
-  - long tube slides and a spiral slide from the top;
-  - a sand field (desert sand, for once welcome) and a splash pad on
-    reclaimed water;
-  - shade sails over it all, and benches for the parents round the edge.
-
-  It is a real parkour course for the hero, with collision throughout, and a
-  landmark seen from the Deck and every block on the Park Ring. Lily and
-  Kofi rule it.
+- **The giant playground**, in the park: see section 7b.
 - **Downtown** (east) is the city's workplace and its skyline. **The towers
   stand at the centre, not the edge** (user): they take the most central,
   best-connected land, on full-size blocks round Civic Plaza and along the
@@ -855,6 +845,126 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     standing among small buildings (user).
 
   The Grand Hotel's guest tower rises on the plaza's north side.
+
+### 7a. The park and the giant playground (proposed, 2026-10-12)
+
+The park is the city's common ground: about 130 × 100 m at the centre of
+Moy, ringed by the Park Ring, with the Deck running round it at +6.5 m. In a
+desert it has to earn every drop of water, so most of it is shade and dry
+garden, and the one green lawn and the one pond each have a job.
+
+**References:**
+- **The Persian four-part garden (chahar bagh):** a garden quartered by two
+  crossing walks, with shade along every path. Moy's quarters are divided by
+  tree-lined walks instead of water channels.
+- **Gardens by the Bay, Singapore:** the Supertrees, steel trees planted
+  with climbers that shade, light and frame a park.
+- **The Arbre à Vent (wind tree), Paris:** a steel tree whose leaves are
+  small silent wind turbines. Moy's version is the Windworks' gift to the
+  city.
+- **Metropol Parasol, Seville:** a timber canopy of giant parasols shading
+  a public square.
+- **Bishan–Ang Mo Kio Park, Singapore:** a park that cleans water as it goes,
+  with reed beds and boardwalks.
+- **Bryant Park, New York:** a central lawn ringed by a double row of trees,
+  movable chairs and chess tables.
+
+**Plan.** Two walks cross at the centre:
+- the **civic axis**, east to west: from city hall, across Civic Plaza,
+  through the park, to Library Square and the library;
+- the **north–south walk**: from Estate Square on North Street, through
+  the park, to Market Square on South Street.
+
+The giant playground stands where they cross. A double row of shade trees
+(ghaf and neem, both drought-hardy) lines the whole edge inside the Park
+Ring, with benches and movable chairs under them. Each quarter has a job:
+
+| Quarter | What it is | Why it is there |
+|---|---|---|
+| **North-west: the dry garden** | Ghaf groves, agave, aloe, desert marigold and boulder outcrops on gravel; never watered. Orin Pike's teaching garden of the desert's own plants | Next to the old town and its wells: the desert as it was |
+| **North-east: the reed pond** | A shallow pond of reed beds and open water, crossed by boardwalks. It polishes the city's reclaimed water before it goes back to the street trees; dragonflies, frogs, herons | Beside the hotel and Civic Plaza: water working, not for show (user: no opulent fountains) |
+| **South-west: the parasols** | Old Fu's tea house and the chess terrace, under a timber canopy of giant parasols | Facing Old Moy and Garden Row; the Hos play here every afternoon |
+| **South-east: the great lawn** | The one irrigated lawn, for picnics, lying down and evening music; the park lodge on its edge | Facing the market lanes and the glass tower: lunch from the market, and the office workers' hour off |
+
+**The wind trees.** Four steel wind trees, 32 m tall, stand at the corners
+of the playground. Bougainvillea climbs their trunks. Their crowns carry
+hundreds of small leaf-shaped turbines that turn silently in the west wind
+and light the park at night. Misters in the crowns cool the playground
+below. They are also the park's high anchors (see below).
+
+### 7b. The giant playground
+
+**References:**
+- **Monstrum, Copenhagen:** sculpted climbing landscapes that are one big
+  object, not a kit of parts.
+- **The Woods of Net, Hakone Open-Air Museum, and Toshiko Horiuchi
+  MacAdam's knitted nets:** giant hand-knitted nets to climb, roll and
+  bounce on.
+- **Singapore's 1979 mosaic dragon playground, Toa Payoh:** a single strong
+  shape every child in the city knows.
+- **The fuwafuwa domes of Japanese parks:** soft white mounds to jump on.
+- **Berliner Seilfabrik's rope pyramids:** net towers up to 10 m that
+  children climb inside.
+- **BMX pump tracks:** packed-earth loops of rollers and banked turns.
+
+**Shape.** One sculpted object about 56 m across at the crossing of the two
+walks. It is a desert landscape in miniature: sand dunes on the west,
+canyon towers in the middle, a splash pad running toward the reed pond on
+the east. Its towers are pale ochre and terracotta like the desert; the
+nets and slides are the city's sign colours.
+
+**The parts, from the ground up:**
+1. **The pump track:** a 4 m packed-earth loop round the whole playground
+   (radius 24 to 28 m), with rollers, banked turns and one long tabletop
+   jump over the dunes. Children run it and ride it on scooters.
+2. **The dunes:** a sand field of soft mounds on the west, with the long
+   wave slide coming down onto it.
+3. **The bounce court:** a soft rubber floor on the south, ringed by high
+   perches.
+4. **The splash pad:** jets from the ground on the east, draining into the
+   reed pond.
+5. **The canyon towers:** three satellite towers of 12, 14 and 16 m round
+   the central **Lookout**, 20 m tall, joined by rope bridges at 9 m.
+6. **The great net:** a hand-knitted net slung between the towers at 6 to
+   8 m, to climb, roll and bounce on.
+7. **The slides:** a tube slide from the 16 m tower, a spiral slide from the
+   Lookout, and the wave slide onto the dunes.
+8. **The hoops:** eight rings, each 3 m across, hung on cables from the wind
+   trees, spiralling up round the Lookout and down over the splash pad.
+
+**Built for the hero's platforming.** Every route is reachable on foot by
+the residents' children, through nets, ramps and climbing walls (no stairs,
+by the ramp rule). Each suit power also has its own way through, sized to
+the hero's real movement (`player.gd`):
+
+| Movement | The hero's reach | What the playground gives it |
+|---|---|---|
+| Ordinary jump | about 1.4 m up; gaps of about 3 m running, 4.5 m sprinting | The Lookout's spiral of platforms rising 1.2 m at a time; tower-to-tower hops of 2.5 to 4 m |
+| Blorb bounce | about 2.5 m off a called blorb | Shortcuts onto the nets and the lower towers |
+| Blorb super-jump (a timed jump on the bounce) | about 12 m | The bounce court's ring of high perches at 11 to 12 m, reachable only this way, as in the Demo World's pit |
+| Leaf Hat vine swing (rope 12 to 52 m; anchor at least 7 m above) | from tower tops to the wind trees' crowns | The **swing loop**: the four wind trees (32 m, about 52 m apart) and the Lookout (20 m) make a circuit round and over the playground, and out across the park to the towers on the Park Ring |
+| Air: cloud platforms and hover | a cloud ahead at shoulder height or underfoot | The **cloud gap**: a 14 m gap from the Lookout's top to the high deck in a wind tree's crown, too far to jump |
+| Water jets and Fire hover | a level hover, then flight with four limbs | **Hover gates**: rings over the splash pad and a high platform on the 16 m tower reached only from the air |
+| Crystal skates | a self-laid ribbon of ice, anywhere in three dimensions | **The ribbon run**: thread all eight hoops in one flight, up round the Lookout and down over the splash pad |
+| Ground dirt bike | rear wheel on dirt; the full bike with the hat | The pump track and its tabletop jump |
+| Swimming | — | The reed pond, deep enough to swim in its middle |
+
+Every power belongs to every playable character, so the playground's
+features are world-sized and absolute, and Xiao Hou Zi uses the same
+routes as the hero. Nets and climbing walls give a small body a way up
+wherever a big body jumps.
+
+**Collision:** all towers, platforms, nets, slides, perches, hoops and wind
+tree trunks and crown decks are solid; the nets are standable; the hoops'
+rims are solid and their centres open. Sand, water and leaves are not.
+
+**People:** Lily and Kofi play tag across it after school. Jammer's
+favourite perch is the 12 m bounce perch, and he hasn't been on it since he
+left for the farm. Parents sit on the benches round the pump track. No text
+explains any route; the shapes do.
+
+**Open:** whether the Snow snowboard can sandboard down the dunes, and
+whether the Penguin belly slide works on the slides.
 
 ### Building schedule (proposed, 2026-10-12)
 
