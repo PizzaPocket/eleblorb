@@ -776,3 +776,18 @@ Full brief: `chinese_village.md` 4.1. Code when approved:
 - Lian Fu lives above the gatehouse; the well on B.
 - Plan data (`ChinesePlan`) and the validator before any of this.
 
+## 19. The Abyss and Sun Wu Kong's prison (2026-10-12)
+
+- **The Abyss of Impending Doom is the entrance to the Demon King's
+  kingdom**, populated by the strongest NMEs so that venturing in early is
+  fatal. Gate access mechanics are deferred by the user. To design later:
+  the Abyss as a zone (its walls, ledges and floor, now a plain heightfield
+  dip to -400 m), its NME roster, descent routes, the gate itself, and
+  whether anything stops its monsters climbing to the village. The village
+  re-fit's parapets and bridge guards already assume a lethal drop.
+- **Sun Wu Kong's prison is reopened**: not a rock, since he was born from
+  one. Options in `chinese_village.md` 4.6 (golden cymbals recommended). The
+  sealing-rock code (`SEALING_ROCK_LOCAL_POS` and the rock build in
+  `scripts/chinese_village.gd`) waits on the decision; items 12 and 13's
+  rock entries follow it.
+
