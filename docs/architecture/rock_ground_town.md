@@ -68,80 +68,79 @@ The fusion runs through everything:
 - **The livery stable** is also a garage.
 - **The rodeo arena** is also the start of the race.
 
-### 2a. Mechanical technology: gears you can see (user, 2026-10-12)
+### 2a. Mechanical and motor punk (user, 2026-10-12)
 
-The town's technology is **mechanical**: gears, cogs, ratchets, cams, cranks,
-chains, sprockets, flywheels, springs and leather belts. Its machines show how
-they work. This is what makes the town's punk distinct from the Fire city's
-steel and glass and from the sea folk's sealed engineering.
+The town's look is **cowboy punk, mechanical punk and motor punk** together.
+Its technology has real power, electric and battery as much as wind and
+springs, because a dirt bike has a motor. What sets the look is that the
+machinery is **open**:
+- gears, cogs, ratchets, cams, chains and sprockets;
+- finned motor casings, exhausts and heavy cables in braided sleeves;
+- big knife switches and analog gauges with needles;
+- flywheels and leather belts.
 
-**The rule.** Every gear does work. Gears are seen because the machines are
-open, not because cogs are glued onto walls and hats as ornament. A gear that
-turns nothing is excluded, as the interior-design skill already excludes fake
-pipes.
+Nothing hides behind a smooth panel or a screen. This sets the town apart
+from the Fire city's steel and glass and from the sea folk's sealed
+engineering.
 
-**Power comes from wind, muscle and springs, through gearing.**
-- **Wind.** Steel-bladed windpumps, the kind that still stand all over West
-  Texas, stand over the well, the ranch and the ore house. Their geared
-  heads pump water and drive line shafts.
-- **Muscle.** A horse's own strength drives its bike form.
-- **Springs.** Hats and small mechanisms wind like a watch.
+**The rule.** Every gear, motor and cable does work. They are seen because the
+machines are built open, as a garage or a bike shop leaves them, not because
+cogs are glued onto walls and hats as ornament. A gear that turns nothing is
+excluded, as the interior-design skill already excludes fake pipes.
 
-There are no batteries and no charging.
+**Power:**
+- **Batteries and motors** run the dirt bikes and the cyborg horses' bike
+  form. They charge at the livery's charging posts.
+- **Wind.** Steel-bladed windpumps (the kind still standing all over West
+  Texas) pump water, turn line shafts, and drive the dynamos that charge the
+  batteries and light the town.
+- **Springs** wind the hats and the clockwork.
 
-**Where the gears show:**
-- **The horses.** Their mechanical lower legs, the change into bike form, and
-  the drive train (section 4).
+**Where it shows:**
+- **The horses.** Geared joints in the lower legs, and an exposed motor and
+  chain drive in the bike form (section 4).
 - **The hats.** A ratcheting, spring-wound fan of brim segments (section 5).
-- **The livery and garage.** Mateo's workshop runs on an overhead **line
-  shaft** turned by the windpump, with leather belts down to a lathe, a drill
-  press and a grinder. Gears hang on racks by size, chains and sprockets on
-  hooks, a horse leg on the bench with its cover off.
-- **The water tower and windpump.** The geared head turns into the wind; a
-  rod pumps the well into the tank. A second shaft turns a small dynamo,
-  which lights the strings of bulbs over the street at night.
-- **The mine.** A geared hand **hoist** at the portal, ore carts on rails, and
-  at the ore house a small **stamp mill**: a windmill-driven camshaft lifts
-  five iron stamps and drops them to crush the ore, a clatter heard down the
-  mine road. Miners' lamps are **carbide lamps**, a dripping valve on a brass
-  body, which Walt sells.
-- **The race barn.** The **race clock** is a tall clockwork tower with a geared
-  dial and drop numbers. The starting gate is released by a falling weight
-  and a cam, so every race starts with the same clank.
+- **The livery and garage.**
+  - An overhead **line shaft** turned by the windpump, with belts down to a
+    lathe, a drill press and a grinder.
+  - **Charging posts** with knife switches and needle gauges, cables hanging
+    in loops.
+  - Gears racked by size, chains on hooks, a motor stripped on the bench, a
+    horse leg with its cover off.
+- **The water tower and windpump.** The geared head turns into the wind,
+  pumps the well into the tank, and turns the dynamo for the street's strings
+  of bulbs.
+- **The mine.** A geared **hoist** at the portal, ore carts on rails, a small
+  **stamp mill** at the ore house (a camshaft lifting five iron stamps to
+  crush ore, a clatter heard down the mine road), and electric lamps in steel
+  cages on a cable.
+- **The race barn.** Dirt bikes up on stands with their engines open, the
+  smell of oil, and a tall clockwork **race clock** with a geared dial and
+  drop numbers. The starting gate is released by a falling weight and a cam,
+  so every race starts with the same clank.
 - **The saloon.** A **player piano** with its roll turning behind the glass,
-  ceiling fans on a belt from the line shaft, and spring-hinged swinging
-  doors.
-- **The rodeo arena.** A geared **mechanical bull** that the gang cranks for
-  newcomers.
+  ceiling fans on a belt, and spring-hinged swinging doors.
+- **The rodeo arena.** A geared, motor-driven **mechanical bull** that the
+  gang runs for newcomers.
 - **The shops.**
   - The general store's mechanical cash register.
   - The assay office's geared balance.
-  - The jail's cell lock with a heavy key.
+  - The jail's heavy cell lock.
   - Inez's hat shop, with a watchmaker's bench of springs and tiny gears.
-- **Signalling.** A **heliograph** on the jail flashes mirror signals to the
-  ranch and the mine on its geared mount. It replaces the radio mast.
+- **The jail.** A radio mast, and a **heliograph** with geared mirrors for
+  signalling the ranch and the mine when the radio is out.
 
 **Materials:**
-- blackened and oiled iron and steel for working parts;
-- brass only on fine mechanisms (hats, clocks, gauges, carbide lamps);
-- leather for belts and straps;
+- blackened and oiled iron and steel;
+- worn chrome on engines and exhausts;
+- brass on fine mechanisms (hats, clocks, gauges);
+- leather for belts, straps and seats;
+- rubber-sleeved cable;
 - timber for frames and housings.
 
-**Sound** is part of it: ticking clocks, ratchets, the stamp mill's beat, the
-windpumps' creak, and the click of a hat changing.
-
-### The dangerous edge
-
-Arriving should feel like riding into a movie Western: a wide, quiet street, a
-tumbleweed rolling across it, and someone watching from the saloon gallery.
-- **The gang:** a gang of riders (see the census) loiters at the saloon. Their
-  horse-bikes are tied up outside, revving now and then, and they size up every
-  newcomer.
-- **The sheriff** is outnumbered and knows it.
-- **Wanted posters** on the jail's board are pictures only, never words.
-
-Nothing explains the tension; the player reads it. What the gang wants, and
-whether the Demon King's discord is behind it, is open.
+**Sound** is part of it: motors revving at the race barn, ticking clocks,
+ratchets, the stamp mill's beat, the windpumps' creak, and the click of a hat
+changing.
 
 ## 3. Community (proposed census, 2026-10-06)
 
@@ -192,7 +191,8 @@ Black cowboys, about one in four of the real trail hands.
     general store's stock and the assay office's money depend on the mine.
   - The mine is one more reason for the town's love of machines. Its ore carts
     run on rails, a geared hoist and a windmill-driven stamp mill do the heavy
-    work, its lamps are carbide, and Mateo maintains the gearing.
+    work, its lamps are electric in steel cages, and Mateo maintains the
+    machinery.
 - **The saloon and hotel.**
 - **The general store.**
 - **Dirt-bike racing:** the town's passion, run from the race barn.
@@ -217,11 +217,11 @@ racing** they transform into dirt bikes.
     showing at each joint through cut-outs in the plating;
   - piston-and-rod tendons down the back of the legs;
   - hooves with a machined rim;
-  - a faint panel line along the belly, where the bike form's chain and
-    sprockets fold away.
+  - a faint panel line along the belly, where the bike form's motor, battery
+    and chain fold away.
 
-  There are no glowing seams and no lights: the machinery is oiled steel and
-  a little brass.
+  The machinery is oiled steel, a little brass and worn chrome; it is
+  mechanical in look, not glowing or screen-like.
 
   The upper body, neck and head stay fully horse.
 - Tied at hitching rails outside the saloon, at the livery, in the ranch corral.
@@ -238,10 +238,14 @@ When a rider mounts and prepares to race:
 
 The result is a dirt bike with a horse's head, mane flying.
 
-**What drives it: the horse.** The folded legs keep their galloping motion
-inside the frame, turning a crank. A chain and sprockets carry it to the rear
-wheel, and a gear lever by the reins shifts the ratio. A horse still has to
-run for the bike to move: the machine is gearing, not an engine.
+**What drives it: a motor.** In the bike form an electric motor and battery
+pack sit in the horse's barrel, open to view in the motor-punk way:
+- a finned motor casing;
+- heavy cables in braided sleeves;
+- a chain and sprockets to the rear wheel;
+- a needle gauge on the battery's charge by the reins.
+
+The horses charge at the livery's posts.
 
 ### Design notes
 
@@ -370,11 +374,12 @@ this is a deliberate fusion.
   porch.
 - **Accent, about 5 percent: the mechanical layer** (section 2a). It is
   visible but never dominant:
-  - the livery's garage bay with its line shaft and belts;
+  - the livery's garage bay with its line shaft, belts and charging posts;
+  - the race barn's open engines on their stands;
   - the race barn's clockwork race clock;
   - windpumps over the well, the ranch and the ore house;
   - strings of bulbs over the street, lit from the windpump's dynamo;
-  - the heliograph on the jail.
+  - the radio mast and heliograph on the jail.
 - **Palette:** weathered timber greys and browns, faded paint (oxblood, mustard,
   sage, dusty blue) on the false fronts, warm red brick, sandstone, black iron.
 - **Exclusions:**
@@ -383,7 +388,8 @@ this is a deliberate fusion.
   - Spanish mission churches;
   - neon;
   - decorative cogs that turn nothing;
-  - glowing seams, screens and other electronic looks;
+  - screens, glowing panels and smooth sealed casings: power is shown, not
+    hidden;
   - glass towers;
   - anything that makes the modern layer the main look.
 
@@ -443,7 +449,7 @@ this is a deliberate fusion.
      - About 20 m long, with a gentle bend, so the end is out of sight from
        the portal.
      - Timber sets (two posts and a cap) every 2 m, the ore-cart rails, and
-       carbide lamps on hooks.
+       electric lamps in steel cages on a cable.
      - The tunnel ends at a working face with Cass's drill and an ore cart.
        Anything deeper is open.
   3. **The ground under it.** The heightfield is lowered or excluded under the
@@ -464,8 +470,8 @@ this is a deliberate fusion.
   how it feels in play. (The fallback of a portal and 5 m of tunnel ending at
   a barred gate stays in reserve.)
 - **The water tower and windpump** over the existing well, which stays where
-  it is. Its geared head also turns the livery's line shaft and the street
-  lights' dynamo.
+  it is. Its geared head also turns the livery's line shaft and the dynamo that
+  charges batteries and lights the street.
 - **The stamp mill** at the ore house, under its own windpump.
 - **Hitching rails** outside the saloon, the store and the jail.
 
@@ -517,14 +523,19 @@ integrated into the saloon.
 no holsters, gun belts, rifles on racks or shoot-outs. The Western menace comes
 from horses, riders, stares and races instead.
 
-**Fixed (user, 2026-10-12):** an emphasis on mechanical technology, with
-gears. The details are proposed in section 2a.
+**Fixed (user, 2026-10-12):** the look is mechanical punk and motor punk as
+well as cowboy punk. Electric and battery power exist, since dirt bikes have
+motors, but machinery is shown open, with gears in view. The details are
+proposed in section 2a.
 
 **Proposed:**
-- the mechanical layer in section 2a: wind, muscle and spring power through
-  open gearing; the horses' geared legs and chain drive; the clockwork hat;
-  the line shaft, stamp mill, race clock, player piano, mechanical bull and
-  heliograph;
+- the mechanical and motor layer in section 2a:
+  - battery, wind and spring power, shown open;
+  - the horses' geared legs, and their bike form's exposed motor and chain
+    drive;
+  - the clockwork hat;
+  - the line shaft, charging posts, stamp mill, race clock, player piano,
+    mechanical bull and heliograph;
 - the census of eighteen, replacing the eight rock-named residents;
 - the Silverback mine, Cass Rourke the miner, and Gus's cyborg burro;
 - the Kane gang;

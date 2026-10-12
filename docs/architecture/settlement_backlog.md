@@ -85,7 +85,7 @@ computer.
 | P4 | Batu's and Intan's rewritten lines | Plant | Ready | — | 10 |
 | P5 | Jungle density parity with the demo world | Plant | Deferred | the user | 10 |
 | **Rock and Ground** |||||
-| R1 | Census (with Cass Rourke the miner and Gus Pickett the prospector), saloon and hotel, the mechanical layer (gears, windpumps, stamp mill, race clock), layout, charter, briefs | Rock and Ground | Approve | the user | 15 |
+| R1 | Census (with Cass Rourke the miner and Gus Pickett the prospector), saloon and hotel, the mechanical and motor-punk layer (open gears, motors and cables; windpumps, stamp mill, race clock), layout, charter, briefs | Rock and Ground | Approve | the user | 15 |
 | R2 | Approved code: cyborg horse, the hat gating the dirt bike's front wheel and sold at Inez's, Manchego's chibi size and the saddle, the Silverback mine tunnel prototype | Rock and Ground, shared | Ready | — | 15 |
 | **Sky Kingdom** |||||
 | Sk1 | Register, materials, interiors, building briefs; swept-roof prototype | Sky | Approve | the user | 6 |
@@ -708,8 +708,9 @@ Status: concept and settlement brief for review (2026-10-06),
 Texas towns, layered "cowboy punk", replacing the earlier earth-and-stone
 concept.
 
-- Review the mechanical layer (`rock_ground_town.md` 2a, user direction
-  2026-10-12): visible working gears powered by wind, muscle and springs.
+- Review the mechanical and motor-punk layer (`rock_ground_town.md` 2a, user
+  direction 2026-10-12): electric, battery, wind and spring power, with the
+  machinery shown open.
 - Review: the census of sixteen (Dolma kept; Cass Rourke the miner and Gus
   Pickett the old prospector added 2026-10-07), the saloon and hotel as the social
   centre and rest point, the Kane gang, the cyborg horses, the cowboy hat as
@@ -719,8 +720,9 @@ concept.
 - Code once approved:
   - the cyborg horse (a `HorseFigure` variant with plated lower legs, geared
     joints and piston tendons showing through cut-outs, and a ratcheting,
-    linkage-driven transform into a bike form with a chain and sprockets to
-    the rear wheel; no glowing seams);
+    linkage-driven transform into a bike form with an exposed motor and
+    battery in the barrel and a chain to the rear wheel; charging posts at
+    the livery);
   - the hat's change as a clockwork fan of brim segments, with clicks;
   - the shifting hat as a shared item and as the Ground suit's helm, switching
     to the helmet with `DirtbikeMode` (visor cut by Boolean subtraction, as the
