@@ -1141,7 +1141,7 @@ round the park and on Civic Plaza.
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 3 | Library | 45 × 62 m | 5 storeys, terraced atrium | Ada Fong, Nia Calder, Benji Okoro |
+| 3 | Library | 45 × 62 m | 5 storeys and a sunken heritage room; terraced atrium, Books Spiral, reading room (section 9) | Ada Fong, Nia Calder, Benji Okoro |
 | 5 | Moonlight Cinema | 30 × 28 m | 2 storeys, built later into the old town; flat above | Leon Duarte (lives above) |
 | 6 | Police box | 6 × 8 m | 1 storey, back room | Kate Byrne |
 | 7 | Clinic | 14 × 18 m | 3 storeys; flat above | Dr. Arjun Mehta (lives above) |
@@ -1390,21 +1390,148 @@ shader), on solid massing with collision. The roof garden, setbacks and
 copper crown are solid exterior surfaces the hero can still land on and
 swing from, with no interiors behind them.
 
-## 9. The library, outline
+## 9. The library: building brief (proposed, 2026-10-12)
 
-- **Precedents:**
-  - **Tianjin Binhai Library:** a white terraced atrium of stepped
-    bookshelves, which is also the city's best indoor climb.
-  - **The Rose Reading Room, New York Public Library:** the great reading
-    room.
-- **Size:** about 55 × 55 m, five storeys, on the north side of Library
-  Square, west of the park.
-- **Inside:**
-  - the terraced atrium;
-  - the reading room under the roof;
-  - the children's library (Benji);
-  - the map room (Nia);
-  - the Deck entrance on the second floor.
+### 9.1 People and purposes
+
+**What a library is for in Moy.** Moy is a closed city; nothing new
+arrives by road, so the library keeps everything it knows:
+- **Lending and reading** for the whole city.
+- **The city's memory:** Old Moy's history, the wells, and the catalogue
+  of house marks, the painted pictures every Moy sign descends from.
+- **Children's books and stories**, every afternoon after school.
+- **A quiet room** for writers and readers, out of the heat.
+
+**Who works and reads here:**
+
+| Person | Role | Where |
+|---|---|---|
+| Ada Fong | head librarian; moved the library into this building and still misses the old one's creaking floors | her office at the top, over the atrium |
+| Nia Calder | map archivist; counts the towers, reads old maps, keeps a drawer of maps nobody can explain | the map room, in the heritage room below ground |
+| Benji Okoro | children's librarian; Jammer's favourite grown-up after his parents | the children's library and its story pit |
+| Mara Quill | novelist, writing a book to find out what the city mirrors | the reading room, same table every day |
+| Lily, Kofi | after school, and up the terraces when Benji isn't looking | the story pit, the terraces |
+
+**The old library.** Before this building the library filled an old tower
+house in Old Moy. Ada saved its timber shelves and floorboards, and they now
+line the heritage room, so the old floors still creak, below ground.
+
+**What goes in and out.** Readers from Library Square (south) and the Deck
+(+6.5 m); books, returns and deliveries by trike at the loading door on
+Library Lane (north).
+
+**References:**
+- **Tianjin Binhai Library:** a white atrium of terraced bookshelves that
+  are also steps and seats.
+- **Qatar National Library, Doha:** floors terraced like a landscape of
+  shelves, and a **sunken heritage library** of old books and maps set into
+  the floor.
+- **Seattle Central Library:** the **Books Spiral**, a continuous gently
+  sloping ramp through the stacks, so the whole collection is one walk.
+- **The Rose Main Reading Room, New York Public Library:** long tables,
+  lamps and a great ceiling.
+- **Louis Kahn's Exeter library:** daylight reaching the books indirectly.
+
+### 9.2 Site
+
+The north side of Library Square: 45 m (east–west) × 62 m (north–south).
+- **South face, the front:** on Library Square, facing the park across the
+  Park Ring and, on the civic axis, city hall far beyond.
+- **West face:** on Arcade Street.
+- **East face:** on Garden Walk.
+- **North face, service:** on Library Lane.
+- **The Deck** arrives at the south face at +6.5 m.
+
+### 9.3 Program and stacking
+
+| Level | Height | Contents |
+|---|---|---|
+| **The heritage room** | −4.5 m to 0, sunk below the atrium's lowest terrace | Old Moy's archive in the old library's timber shelves: the catalogue of house marks, the well records, the city's photographs; **Nia's map room** in a corner, with its drawers |
+| **Ground** | 0 to +6.5 m | The **porch**, a deep shaded loggia on the square; the entrance hall and lending desk; the **children's library** with its **story pit** (west); washrooms; the sorting room and the loading door on Library Lane (north) |
+| **The terraced atrium** | 0 to +15.5 m, the south half | The heart: terraces of bookshelves rising from the heritage room's rim toward the north, each terrace 1.2 m higher and 2.4 m deeper than the last, the shelves forming the risers and the treads wide enough to sit and read on |
+| **The Books Spiral** | 0 to +20 m | A continuous ramp, 2.8 m wide at about 1 in 20, winding round the atrium's east, north and west sides through four turns, carrying the general collection on both its sides |
+| **Level 2** | +6.5 m, the Deck's level | The Deck door on the south face; the spiral passes; study booths along the north wall |
+| **Levels 3 and 4** | +11 and +15.5 m | The stacks along the spiral; study rooms; Ada's office overlooking the atrium (level 4) |
+| **The reading room** | +20 to +28 m, the whole top floor | One great room under a roof of **north-light scoops**: long tables with green lamps, the reference shelves round the walls, Mara's table by the north window |
+| **Roof** | +28 m | The light scoops, and a small shaded reading terrace facing the park |
+
+**Lines that stack.** The atrium void occupies the south half on every
+level up to +20 m. The spiral and the north band of stacks, study booths,
+offices and services stand on the same perimeter walls on every level. The
+reading room spans the whole building above the void, on deep beams
+bearing on those perimeter walls.
+- **Core:** north-east, with two lifts, the washrooms and the service lift
+  from the sorting room.
+- **Escape:** a ramp tower in the north-west corner (the world's ramp rule).
+
+**The terraces.** The atrium is about 37 m (east–west) by 28 m. The
+terraces rise from the heritage room's rim at 0 to the level-4 floor at
+about +13.2 m: eleven terraces, each 1.2 m up and 2.4 m deep. Their risers
+are bookshelves. People walk the Books Spiral; readers sit on the treads.
+Ramps cut through the terraces in two places so a reader can reach any
+tread without climbing.
+
+**Circulation:**
+- **Readers:** square → porch → entrance hall → the terraces or the
+  spiral → the reading room; or the lifts.
+- **From the Deck:** level 2 → the spiral.
+- **Children:** the entrance hall → the children's library, without
+  crossing the atrium.
+- **Staff and books:** Library Lane → sorting room → service lift.
+
+### 9.4 Facade and massing
+
+A landmark in the 5 % accent of the charter, polite and pale like Old Moy's
+plastered tower houses, whose memory it keeps.
+
+| Element | Term | Tradition |
+|---|---|---|
+| Walls | white lime-plastered masonry, thick | Old Moy's tower houses |
+| South face | one great window showing the terraced atrium, shaded by deep horizontal **louvres** of pale stone, so from the square you see the stepped shelves like a hillside | Binhai's facade, a desert brise-soleil |
+| Porch | a deep **loggia** of superellipse-headed openings across the south face | Moy's superellipse |
+| Outside steps | the terraces spill out as **seating steps** down into Library Square, with a ramp alongside | Binhai; the plaza's sitting steps |
+| Roof | a row of curved **north-light scoops** | Kahn |
+| Signature motif | the house marks, carved in a frieze over the porch | the city's signature |
+| The sign | a picture of an open book, carved, no lettering | Moy's picture signs |
+
+**Palette:** white plaster and pale stone 60 %; timber shelves and floors
+30 %; green reading lamps and the sign's colour 10 %.
+
+### 9.5 Light, heat and the books
+
+- **No sun on the books.** South light passes through the louvres and
+  bounces off the white terraces. The reading room takes only north light,
+  through the scoops.
+- **The heritage room is the coolest place in the city**, sunk in the
+  ground under thick walls, which is why the oldest papers are kept there.
+- **The atrium cools itself** like the hotel: warm air rises and leaves by
+  vents under the scoops, drawing cooler air in through the shaded porch.
+- **Modern air conditioning and dehumidifiers** keep the stacks steady.
+
+### 9.6 Washrooms
+
+Moy is modern: public washrooms on the ground floor and beside the reading
+room, with flush toilets and basins, to the city sewer.
+
+### 9.7 Play
+
+- **The terraces are the city's best indoor climb.** The treads rise 1.2 m
+  each, inside the hero's 1.4 m jump, so he can bound straight up the
+  bookshelf hillside that readers walk round by the spiral. At the top,
+  a gap of 3 m to Ada's balcony is a running jump.
+- **The Books Spiral** is a long, gentle ramp for running.
+- **Outside**, the louvres and the frieze over the porch are climbing holds,
+  and the roof's scoops are a run of humps toward the park.
+
+### 9.8 Realised (fidelity A)
+
+- **Built inside:** the porch, the entrance hall and lending desk, the
+  terraced atrium with the Books Spiral, the children's library and story
+  pit, the heritage room with Nia's map room, and the reading room.
+- **Faux and solid:** the sorting room, the study rooms, Ada's office and
+  the other stacks behind the spiral (closed doors and shelves as a wall).
+- **Lifts** run between the ground floor, the Deck level and the reading
+  room.
 
 ## 10. Fidelity: what is realised
 
@@ -1412,7 +1539,7 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium (with its mezzanine gallery) and floor 20 with the party's suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium (with its mezzanine gallery) and floor 20 with the party's suite; the library's atrium, heritage room, children's library and reading room (section 9.8); city hall's chamber; the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
 | **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 
