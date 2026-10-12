@@ -200,7 +200,11 @@ follow from the grid:
 is east to the cliff by the old fall site. The villagers bring the water about
 130 m further, along the village's edge, so that working water runs where it
 is used, and to the cliff by the overlook. That is the reason Plymouth brought
-Drake's Leat in and Cambridge brought Hobson's Conduit in.
+Drake's Leat in and Cambridge brought Hobson's Conduit in. The leat is
+generations older than the mains, which were laid much later along the same
+course. Ohio is a present-day village on an old tradition: the mains brought
+taps to every house, and the village kept the leat for the mill's tail water,
+the trough, washing down and fire, and because it is Ohio's.
 
 #### Precedents
 
@@ -287,8 +291,13 @@ terrain pad at 0.
   stone-slate roof, just south of where the east road starts, facing the
   green. The buried main from the tarn ends here. Its valves are inside, Tam
   has the key, and a public tap is on its wall.
-- **The forge's dipping place** (44,-20): a stone step on the leat's west
-  side, reached from the mill road.
+- **The forge's dipping place** (44,-20): a stone step on the leat's **west**
+  kerb, the same side of the water as the forge. The forge is at x 22 to 32.
+  Between it and the step lies only the mill road (x 37 to 40), never the
+  water: Brinna carries her pail about 20 m across the road. Her slack tub is
+  filled day to day from her own tap on the main. She uses the leat for the
+  big quenches and for dousing hot iron in the yard, as smiths beside a leat
+  always did.
 - **The horse trough** by the east road, fed by a spout from the leat's south
   kerb.
 - **Tam's step-bridge** (48,-13): two stone steps up, a slab and two steps

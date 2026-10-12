@@ -34,6 +34,73 @@ Every settlement pass follows the same order.
    are stable. Dialogue receives a final `no-ai-slop` pass and remains
    character-specific, diegetic and free of mechanic instructions.
 
+## Implementation index (updated 2026-10-12)
+
+Everything decided so far that still has work to do, in one table. The
+numbered sections below hold the detail. States:
+
+- **Ready**: approved; it can be built now.
+- **Approve**: written up; waiting for the user's approval before any code.
+- **Decide**: blocked on a specific decision from the user.
+- **Verify**: built; needs an in-engine check (Godot).
+- **Deferred**: parked by the user; do not start until asked.
+
+**Blocker for everything marked Verify, and for proving any build:** Godot
+cannot be downloaded in the cloud environment (github.com returns 403). Either
+the environment's network allowlist gains `github.com` and
+`objects.githubusercontent.com`, or verification happens on the user's
+computer.
+
+| # | Item | Where | State | Waiting on | Section |
+|---|---|---|---|---|---|
+| **Ohio** |||||
+| O1 | In-engine walkthrough, then a walked play-test with the human and Blorbus | Ohio | Verify | the user's walkthrough | 1 |
+| O2 | Water system: earth dam, launder and overshot mill, buried mains, raised leat, flume over a new cliff-foot lake bay, Conduit house, the inn's flush toilet on the west main | Ohio + terrain | Approve | approval of `ohio.md` 3.4 (fifth version) | 20 |
+| O3 | Merge `Town` and `Scatter` statics for draw calls | Ohio | Ready | — | 3 (item 8) |
+| O4 | Report Ohio's mounds and planting in the layout report, as the Snow drifts are | Ohio | Ready | — | 2a |
+| O5 | Reference-house comparison render in the building proof | all | Ready | — | 16 |
+| **Snow Village** |||||
+| S1 | Visual check of the snow banks, eye-level audit of every interior, play-test, snow-cap tuning | Snow | Verify | Godot | 2, 2a |
+| S2 | Snowrest Inn's modern washroom (cistern flush, basin, mirror, shower) | Snow | Ready | — | 11 |
+| S3 | Log houses keep 0.14 m roofs, or move to the shared 0.24 m? | Snow | Decide | the user | 16 |
+| **Fishing village** |||||
+| F1 | Islet faces up close, ledge planting at mid height, interiors, pearl yard and lines | Fishing | Ready | — | 3 |
+| **Fire caldera** |||||
+| Fi1 | Arrival forecourt and the rest of the city from the approved briefs (steel frame, full glass panels, no wood) | Fire | Verify, then Ready | the user's walkthrough of the guest pavilion | 4 |
+| Fi2 | Ember Rest keeper's body (Eris Nahl) and the incinerating toilet | Fire | Ready (last of the character fixes) | — | 9, 11 |
+| **Chinese village** |||||
+| C1 | `ChinesePlan` data file and validator | Chinese | Ready | — | 18 |
+| C2 | Settlement re-fit: island sizes and moves, households by island, fields on D, ring of chain, cantilever and arch bridges, parapets | Chinese | Approve | approval of `chinese_village.md` 4.1 | 18 |
+| C3 | Story revision in code: Lu and Lu Hao keep the inn, Lu a man; no romance; Liang Zhen advisor in the records room and the Chef's old room | Chinese | Ready (names pending) | Lu's given name, Lu Hao's characters | 17a |
+| C4 | Palace in both states, with civic dressing on the story flag | Chinese | Ready | C1 | 12, 13 |
+| C5 | Rank-based charter builders: homes (brick plinth and piers, plaster, grey hard gables, kang), the inn's Shihu Yuan pieces, the palace garden (moon gates, lattice screens, wave copings, pavilions, rocks, pines, lanterns) | Chinese | Ready | C2 | 17a |
+| C6 | Dress charter garments and every resident's look | Chinese | Ready | — | 14 |
+| C7 | The sealing rock stays (built); its lore to be revisited | Chinese | Deferred | the user | 19 |
+| **The Abyss** |||||
+| A1 | The Abyss as the Demon King's entrance: zone, strongest NMEs, descent, the gate and how it opens | Chinese village surroundings | Deferred | the user (mechanics later) | 19 |
+| **Plant Kingdom** |||||
+| P1 | Community, layout, residents' names, Water Curtain Cave brief | Plant | Approve | the user | 10 |
+| P2 | Training grounds and the training-dummy NME (inert until left unobserved three nights, then a harder skeleton-like fight) | Plant | Approve | the user | 10 |
+| P3 | River end, Flower Fruit Mountain plateau, the cliff, gorge, falls and cave | Plant | Ready after P1 | P1 | 10 |
+| P4 | Batu's and Intan's rewritten lines | Plant | Ready | — | 10 |
+| P5 | Jungle density parity with the demo world | Plant | Deferred | the user | 10 |
+| **Rock and Ground** |||||
+| R1 | Census (with Cass Rourke the miner and Gus Pickett the prospector), saloon and hotel, layout, charter, briefs | Rock and Ground | Approve | the user | 15 |
+| R2 | Approved code: cyborg horse, the hat gating the dirt bike's front wheel and sold at Inez's, Manchego's chibi size and the saddle, the Silverback mine tunnel prototype | Rock and Ground, shared | Ready | — | 15 |
+| **Sky Kingdom** |||||
+| Sk1 | Register, materials, interiors, building briefs; swept-roof prototype | Sky | Approve | the user | 6 |
+| **Ocean Kingdom** |||||
+| Oc1 | The four briefs, layouts, ships, planting and ocean floor | Ocean | Approve | the user | 8 |
+| Oc2 | Shared dry-volume system (ships below the waterline, air halls, tunnels) | shared | Ready after Oc1 | Oc1 | 8 |
+| Oc3 | How tournament fights work; the mongooses' harmony quest | Ocean | Decide | the user | 8, 13 |
+| **Across the game** |||||
+| X1 | Story-state triggers on revisit (`WorldState` flags read at arrival) | all | Ready | — | 13 |
+| X2 | Toilets true to each culture: the primate inn's closed closet, screens and closets around fixtures, the Okafor guest house | all | Ready | — | 11 |
+| X3 | Character body rules: visual check and women's abdomen pools | all | Verify | Godot | 9 |
+| X4 | Boat riding as a shared traversal mode | all | Decide | control design | 7 |
+| X5 | Dialogue: Fire, frontier and Ocean residents rewritten with their rebuilds | all | Ready with each rebuild | — | 17 |
+| X6 | Shop item descriptions that explain mechanics | all | Decide | the user | 17 |
+
 ## 1. Ohio, starting village
 
 Status: validated and visually audited (2026-10-04). The guarded validator reports
@@ -241,8 +308,9 @@ New `class_name` scripts need one `Godot --headless --path . --import` first.
 
 Status: concept planning complete (2026-10-05); named census and dimensioned
 layout (`fire_caldera_layout.md`) approved (2026-10-06); architecture
-briefs for every plot and the lower city written for review
-(`fire_caldera_buildings.md`, 2026-10-06). The
+briefs for every plot and the lower city approved (`fire_caldera_buildings.md`,
+2026-10-07): an exposed structural steel frame, full-height glass panels,
+modern craft workstations, and no wood anywhere. The
 current implementation is eight generic homes around an 8.4-metre-wide
 decorative lava fountain. The proposed direction replaces it with a terraced
 city around a broad natural magma reservoir, with a second public district
@@ -299,8 +367,10 @@ See the handoff.
 
 Status: audit complete and population approved (2026-10-04); see
 `chinese_village.md` and `docs/handoff_chinese_village.md`. The households,
-history, Ohio trade link and the innkeeper 林静 are canon. The layout re-fit,
-courtyard charter and palace restructure were approved on 2026-10-06. Queue: Ohio walkthrough first, then the layout re-fit.
+history and Ohio trade link are canon. The innkeeper is now Lu (吕), with
+his adult son Lu Hao (2026-10-12, replacing 林静). The courtyard charter and
+palace restructure were approved on 2026-10-06. The settlement re-fit
+(2026-10-12) is in item 18 and awaits approval.
 
 Planning priorities:
 
@@ -312,10 +382,12 @@ Planning priorities:
   Assign each named resident a household, work, daily route and relationship to
   the palace economy. Add residents only where a real civic, agricultural,
   craft, market or service role requires them.
-- Write and approve a Chinese courtyard and hall charter before rebuilding.
-  Ordinary homes use restrained white walls, stone plinths, grey or green tile,
-  red structural timber and appropriate gable roofs. Imperial yellow and the
-  highest roof hierarchy remain exclusive to the palace.
+- The courtyard and hall charter is decided by rank (`chinese_village.md` 4.2,
+  2026-10-12):
+  - homes: brick plinth and corner piers with plastered earth panels, plain
+    dark timber, grey hard-gable roofs and a kang;
+  - the inn: some of the Shihu Yuan finery;
+  - the palace alone: yellow glaze and vermilion walls.
 - Re-plan the palace as an axial complex with public audience, controlled
   service circulation, private or administrative rooms, terraces and working
   ramps. The Royal Kitchen needs a believable delivery route and a clear,
@@ -436,7 +508,7 @@ Planning priorities:
 
 ## 9. Characters: bring every population up to the gendered body rules
 
-Status: in progress (2026-10-06). Done: the abdomen rule (`feminine_torso` in `ProceduralFigure.build`, fed by `NPC`, `Merfolk` and `Tempestar`), keeper gender through `VillageInn.create(..., keeper_is_female)` for Mira Holt, 林静, Dolma and the sea folk keeper, Chinese adults gendered from their identities with gendered pools, pirate crew genders, and women's shorter sea folk height. Remaining: the Ember Rest keeper (last), a visual check in engine, and the per-profile women's abdomen pools. The audit table below is the pre-fix state. The rules (see the `character-design` skill): women's
+Status: in progress (2026-10-06). Done: the abdomen rule (`feminine_torso` in `ProceduralFigure.build`, fed by `NPC`, `Merfolk` and `Tempestar`), keeper gender through `VillageInn.create(..., keeper_is_female)` for Mira Holt, the Chinese inn's keeper (now Lu, a man: switch it from 林静's woman's body; see 17a), Dolma and the sea folk keeper, Chinese adults gendered from their identities with gendered pools, pirate crew genders, and women's shorter sea folk height. Remaining: the Ember Rest keeper (last), a visual check in engine, and the per-profile women's abdomen pools. The audit table below is the pre-fix state. The rules (see the `character-design` skill): women's
 height tops out lower; only men get the broad-chested build; women's hips are
 wider, so their legs are set wider; and women's abdomens never protrude past
 the thorax. Audit of every population (2026-10-06):
@@ -493,7 +565,9 @@ Planning priorities:
 - Training grounds designed (proposed 2026-10-06): moved to `(-48, -48)`, just
   outside the safe zone; eight hand-made dummies round a sparring circle,
   Batu's closed shed, one empty post. Code: build the yard, the dummies as
-  inert props that can become the training-dummy NME, and the shed.
+  inert props that can become the training-dummy NME, and the shed. The NME
+  itself (bible): a dummy left unobserved for three in-game nights comes to
+  life and fights like a skeleton, but harder; it is unlocked by a side quest.
 - Dialogue: replace Batu's and Intan's "whoever's running" lines in
   `scripts/jungle_kingdom_village.gd` with the rewritten lines in
   `plant_kingdom_village.md` (section 3).
@@ -634,7 +708,8 @@ Status: concept and settlement brief for review (2026-10-06),
 Texas towns, layered "cowboy punk", replacing the earlier earth-and-stone
 concept.
 
-- Review: the census of sixteen (Dolma kept), the saloon and hotel as the social
+- Review: the census of sixteen (Dolma kept; Cass Rourke the miner and Gus
+  Pickett the old prospector added 2026-10-07), the saloon and hotel as the social
   centre and rest point, the Kane gang, the cyborg horses, the cowboy hat as
   the Ground suit's helm, the architecture direction, the places list and race
   course, and the Chihuahuan landscape palette.
@@ -728,7 +803,7 @@ Kingdom's residents. Shop item descriptions that explain a mechanic ("Throw it
 into a blorb to bind...") break the same CLAUDE.md rule and need the user's
 call, since the shop UI is where players read what an item is.
 
-## 17. Chinese village story revision (2026-10-12)
+## 17a. Chinese village story revision (2026-10-12)
 
 - No romance between Liang Zhen and Hua Chen. Remove any staged
   relationship states and lines.
