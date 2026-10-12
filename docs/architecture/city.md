@@ -95,7 +95,7 @@ the world bible.
 
 **Fifth revision (user, 2026-10-12):** a field of giant wind turbines, in the
 Chinese style, out in the wasteland around the city, as **Moy's power
-source.**
+source.** They must not encroach much on the Jungle and Ice plateaus.
 
 ## 2a. The site: a city in the desert
 
@@ -107,8 +107,8 @@ about 760 m east, beyond the main plateau and 60 m up its wall.
 The city fills a desert basin ringed by high ground, as Las Vegas fills its
 valley. Measured from the new edge (radius 200 m):
 - the main plateau's wall, about 120 m east;
-- the Jungle plateau's slope, about 120 m north;
-- the Ice plateau's slope, about 140 m south;
+- the Jungle plateau's slope, about 120 m south (the world's north is −Z);
+- the Ice plateau's slope, about 140 m north;
 - the world's skirt, about 110 m west.
 
 From the main plateau's rim the player looks down 60 m onto a skyline that
@@ -169,8 +169,9 @@ follow approval):
   outskirts.
 - **East: the goods yard** where the wasteland road ends.
 - **North-west: the water works** and the water tower.
-- **Further out, north-west and south-west: the wind farm** and its battery
-  works (below).
+- **Further out: the wind farm** and its battery works (below), in two
+  fields beyond the Jungle and Ice plateaus' flanks, kept well clear of
+  both.
 
 **The wind farm: Moy's power.** The city runs on the wind.
 - **Why here.** The basin between the plateaus funnels a steady wind from
@@ -188,11 +189,34 @@ follow approval):
   The newest real Chinese turbines are bigger still, with tips past 250 m.
   This size keeps them giant beside a 1.9 m hero and the 140 to 280 m
   downtown towers, and lets a field of them fit the world's small map.
-- **Number and placement:** about sixteen, in loose lines across the western
-  wasteland arc, north-west and south-west of Moy and on past the Jungle and
-  Ice plateaus. They stand about 200 m apart and at least 100 m clear of the
-  Rim Walk, the plateau slopes, the world's skirt and the wasteland road.
-  Coordinates follow a placement check.
+- **Number and placement: ten**, in two fields (user: they must not encroach
+  on the Jungle and Ice plateaus). Each tower stands at least **280 m from a
+  plateau's centre**. That puts it 140 m beyond the foot of the plateau's
+  slope, with the blade tips still 75 m clear, so each plateau keeps its
+  open desert apron.
+
+  **Other clearances:**
+  - at least 320 m from Moy's centre (120 m beyond the Rim Walk);
+  - at least 360 m from the world's origin (clear of the main plateau's
+    rim);
+  - within 790 m of the origin (the blades clear the world's skirt);
+  - 330 m from the volcano and 300 m from the Chinese village;
+  - over 200 m from the wandering wasteland giant at (0, −330);
+  - west of the lake (x ≤ 150).
+
+  The two fields fill the open desert between the plateaus and their
+  neighbours, as far from both plateaus as the map allows. The proposed
+  sites (world x, z; north is −Z), about 200 m apart:
+
+  | Field | Sites | Nearest plateau centre |
+  |---|---|---|
+  | **South field**, between the Jungle plateau and the volcano | (−220, 340), (−220, 540), (−220, 740), (−50, 440), (−50, 640), (120, 740) | Jungle: 290 m at the closest, (−220, 540) |
+  | **North field**, between the Ice plateau and the Chinese village | (−220, −660), (−50, −560), (−50, −760) | Ice: 292 m, (−220, −660) |
+  | **Moy's own**, between the city and the Ice plateau, near the skirt | (−700, −305) | Ice: 305 m |
+
+  The battery works stand by the lone turbine, the one nearest Moy. Nothing
+  stands west of the city, where the skirt is too close. Heights are checked
+  against the terrain in the placement pass.
 - **Motion and light.** All face west into the wind and turn together,
   slowly, about ten turns a minute. Red aviation lights on the nacelles blink
   in unison at night, a second skyline around the city's.
@@ -606,7 +630,7 @@ W  │ LANTERN LANE  │   CENTRAL PLAZA      │ DOWNTOWN           │ E, outs
    └──────────────────────────── S ────────────────────────────┘
        the Rim Walk rings the whole city: the bounds;
        the city blorbs stay out in the desert beyond it
-       (further out, NW and SW: the wind farm and battery works)
+       (further out, beyond the plateaus' flanks: the wind farm)
 ```
 
 - **Arrival.** From the east, the wasteland road ends at the goods yard.
@@ -806,5 +830,5 @@ lit crowns.
 - the Windspire's height against the far skyline's draw distance;
 - whether a turning blade knocks the hero aside (proposed) or passes
   through him;
-- the turbines' draw cost: sixteen animated rotors seen from across the
+- the turbines' draw cost: ten animated rotors seen from across the
   world (proposed: one shared mesh, instanced, rotors as cheap far LODs).
