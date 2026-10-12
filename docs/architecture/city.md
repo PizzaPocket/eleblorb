@@ -93,6 +93,15 @@ the world bible.
   city blorbs simply stay outside the city's outskirts.
 - **No opulent fountains.**
 
+**Sixth revision (user, 2026-10-12):**
+- **No big empty gaps between buildings.** Real cities don't have them:
+  every block is built out to its streets.
+- **The park is in the city centre.**
+- **New names** for Lantern Lane and Parkside Estate (proposed: **Old Moy**
+  and the **North Estate**).
+- **There are still roads**, even with no cars.
+- **Plazas**: the user likes them, so the city has several.
+
 **Fifth revision (user, 2026-10-12):** a field of giant wind turbines, in the
 Chinese style, out in the wasteland around the city, as **Moy's power
 source.** They must not encroach much on the Jungle and Ice plateaus. A modest number is enough, and only on the city's side of the Crossroads
@@ -150,7 +159,7 @@ the Tokyo and Hong Kong density already suits the desert. Add:
 - the Deck, which shades the street below it;
 - the void decks under the public housing (section 7);
 - pale tile and white roofs that throw back the sun;
-- misters at the plaza and the hawker centre.
+- misters on the plazas and at the hawker centre.
 
 The city is quiet at noon and comes alive after dusk: the night market and
 the lit picture signs.
@@ -307,7 +316,7 @@ unnamed: these forty-five are the people the hero meets.
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Elizabeth Reese** | the family's flat, Block 3, Parkside Estate, 18th floor | lawyer, partner at Raman & Reese on Meridian Avenue | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. She defended Pinestein at the inquiry after the Blackout, and lost. |
+| **Elizabeth Reese** | the family's flat, Block 3, North Estate, 18th floor | lawyer, partner at Raman & Reese on Meridian Avenue | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. She defended Pinestein at the inquiry after the Blackout, and lost. |
 | **Dan Miller** | the same apartment | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at the Institute, the Windworks and the start-ups | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
 | *(Jammer)* | away, at his grandmother's in the Middle of Nowhere | — | Their son; his room in the apartment is full of drawings of the farm. |
 
@@ -324,7 +333,7 @@ in character and pointing nowhere:
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
 | **Lucinda Wah** | the manager's flat on the hotel's top floor | general manager | Third generation to run the hotel her grandfather built. She knows the chandelier's 3,000 crystals by their faults. |
-| **Felix Tanaka** | Lantern Lane, above the bakery | concierge | Knows every shortcut, every deck and every noodle stall, and talks as if the city were his own living room. |
+| **Felix Tanaka** | Old Moy, above the bakery | concierge | Knows every shortcut, every deck and every noodle stall, and talks as if the city were his own living room. |
 | **Ah Keung** | Wing Fat Mansion | doorman at the revolving door | Forty years at the door. Greets everyone, and has never once let the door stop turning. |
 | **Iris Dune** | Wing Fat Mansion, 11th floor | florist, with a flower stand in the hotel's lobby | Keeps a plant alive on her eleventh-floor sill against all reason, and dresses the atrium every morning. |
 
@@ -336,11 +345,11 @@ in character and pointing nowhere:
 | **Kenji Mori** | above the park's tea house | city clerk and registrar | Keeps the city's records, and the births and deaths of everyone in this census. |
 | **Ada Fong** | Garden Row, with her wife Sora | head librarian | Moved the library into its terraced new building, and still misses the old one's creaking floors. |
 | **Nia Calder** | Wing Fat Mansion | the library's map archivist | Counts the towers, reads old maps, and has a drawer of maps nobody can explain. |
-| **Benji Okoro** | Lantern Lane | children's librarian | Jammer's favourite grown-up after his parents. |
-| **Dr. Imani Osei** | Parkside Estate, Block 5, with her son Kofi | curator of the natural history museum | Writes long letters to Dr. Hazel Coleman about Dinosaur's bones, and dreams of mounting a cast of him. |
+| **Benji Okoro** | Old Moy | children's librarian | Jammer's favourite grown-up after his parents. |
+| **Dr. Imani Osei** | North Estate, Block 5, with her son Kofi | curator of the natural history museum | Writes long letters to Dr. Hazel Coleman about Dinosaur's bones, and dreams of mounting a cast of him. |
 | **Leon Duarte** | above the cinema | projectionist of the old Moonlight Cinema | Runs film reels by hand through clockwork projectors he will not let anyone replace. |
-| **Mara Quill** | a rooftop studio on Lantern Lane | novelist | Writes in the library and the café. Says the city mirrors something, and is writing a book to find out what. |
-| **Pia Rowe** | a shared flat over the market | busker on the plaza | Likes the noise at street level; plays where the crowds turn. |
+| **Mara Quill** | a rooftop studio in Old Moy | novelist | Writes in the library and the café. Says the city mirrors something, and is writing a book to find out what. |
+| **Pia Rowe** | a shared flat over the market | busker on Civic Plaza | Likes the noise at street level; plays where the crowds turn. |
 | **Old Fu** | behind the park's tea house | keeps the tea house and the chess tables in the park | Sweeps the park at dawn, pours tea for the chess players, and can beat everyone in the city except Bea Ho. |
 | **Sora Ishida** | Garden Row, with Ada | runs the Pine Bath, the public bathhouse | Fires the bath's boiler at four every afternoon, the same as her mother did. |
 
@@ -348,15 +357,15 @@ in character and pointing nowhere:
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Sol Brant** | above his café | runs the breakfast café on Lantern Lane | Up before the sun, which the towers hide until mid-morning. |
+| **Sol Brant** | above his café | runs the breakfast café in Old Moy | Up before the sun, which the towers hide until mid-morning. |
 | **Mei Chan** | the market flats, with her daughter Lily | runs the noodle stall at the night market | Cooks at a stall her mother licensed forty years ago. |
 | **Hiro Sato** | above the store | keeps the all-night convenience store | Has not closed in eleven years and knows who comes in at 3 a.m. and why: Pinestein, most nights, for batteries. |
 | **Rosa Delgado** | the market flats | fishmonger at the wet market | Loud, funny, and the best judge of freshness in the city. Her fish come in on ice by the wasteland road, two days from the water, and she will tell you which day. |
 | **Wen Li** | the market flats | greengrocer at the wet market | Grows herbs on the market's roof and sells them below. Her best greens come from a farm in the Middle of Nowhere, and the crates carry its mark: Elizabeth's mother's farm. |
 | **Gideon Hale** | behind his shop | **the Helmsmith** | Makes helms for blorbs and their wearers; gruff, precise, and secretly delighted by every new customer. |
 | **Zara Quinn** | a studio on the market roof | sign painter | Paints the city's picture signs (no lettering, ever) and hangs them herself. |
-| **Siti Rahman** | Parkside Estate, Block 2 | runs the laksa stall at the Parkside hawker centre | The estate's auntie: feeds the shift workers at dawn and the children after school, and knows which flat every lift-button smudge belongs to. |
-| **Tomas Wren** | Parkside Estate, Block 1 | courier | Carries deliveries floor to floor on a cargo trike and a hand truck, by lift when he trusts it and by ramp when he doesn't. |
+| **Siti Rahman** | North Estate, Block 2 | runs the laksa stall at the North Estate hawker centre | The estate's auntie: feeds the shift workers at dawn and the children after school, and knows which flat every lift-button smudge belongs to. |
+| **Tomas Wren** | North Estate, Block 1 | courier | Carries deliveries floor to floor on a cargo trike and a hand truck, by lift when he trusts it and by ramp when he doesn't. |
 
 **Work in the towers**
 
@@ -364,13 +373,13 @@ in character and pointing nowhere:
 |---|---|---|---|
 | **Priya Raman** | Garden Row | senior partner, Raman & Reese | Hired Elizabeth straight out of law school and made her a partner. |
 | **Venn Harlow** | Wing Fat Mansion | paralegal at Raman & Reese | Same commute every day, the same fifteen floors; quietly the firm's memory. |
-| **Theo Park** | Lantern Lane | software engineer at a start-up | Dan is trying to place him; he would rather be skateboarding on the decks. |
+| **Theo Park** | Old Moy | software engineer at a start-up | Dan is trying to place him; he would rather be skateboarding on the decks. |
 
 **The wind, the water and the Institute**
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Palbert Pinestein** | a top-floor flat and laboratory on Lantern Lane, the roof bristling with antennas and coils | none, officially; dismissed from the Lumen Institute | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
+| **Palbert Pinestein** | a top-floor flat and laboratory in Old Moy, the roof bristling with antennas and coils | none, officially; dismissed from the Lumen Institute | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
 | **Dr. Vera Kask** | a downtown flat | director of the Lumen Institute | Pinestein's oldest colleague, and the one who dismissed Pinestein after the Blackout. Still keeps Pinestein's old notebooks locked in her office. |
 | **Omar Haddad** | a flat at the battery works | chief engineer of the Windworks wind farm | Climbs ninety-five metres to a nacelle before breakfast and calls it his commute. |
 | **Rafael Ortiz** | the keeper's house at the water works | keeper of the wells and the water works | Counts every litre the city uses twice, and has never once let the park's pond run dry. |
@@ -381,16 +390,16 @@ in character and pointing nowhere:
 |---|---|---|---|
 | **Dr. Arjun Mehta** | above his clinic | the neighbourhood doctor | Treats half the city and remembers all of it. |
 | **Kate Byrne** | the police box's back room | officer at the police box | Gives directions more than anything else. Walks stray city blorbs back out past the Rim Walk, gently, and likes that part least. |
-| **Yuki Hayashi** | Lantern Lane | teacher at the primary school | Jammer's teacher; sends him postcards at the farm. |
+| **Yuki Hayashi** | Old Moy | teacher at the primary school | Jammer's teacher; sends him postcards at the farm. |
 
 **Upkeep**
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Juno Rell** | Parkside Estate, Block 3, 20th floor | estate superintendent for the Housing Board | Takes the ramps twenty floors most mornings "to keep the knees honest". |
+| **Juno Rell** | North Estate, Block 3, 20th floor | estate superintendent for the Housing Board | Takes the ramps twenty floors most mornings "to keep the knees honest". |
 | **Dax Merrow** | Wing Fat Mansion | leasing agent | Has lived on six floors of the same tower: twice for the view, four times for the rent. |
 | **Kade Morrow** | the works yard flat | city works: inspector of the decks, bridges and lifts | Knows every tower's creak. |
-| **Suri Vale** | Lantern Lane | window cleaner on the tower gondolas | Loves the lit windows at dusk; "nobody down there looks up". |
+| **Suri Vale** | Old Moy | window cleaner on the tower gondolas | Loves the lit windows at dusk; "nobody down there looks up". |
 | **Orin Pike** | the park lodge | park keeper | The sky does what it wants, and he plants for it. |
 
 **Elders and children**
@@ -399,7 +408,7 @@ in character and pointing nowhere:
 |---|---|---|---|
 | **Bea Ho** and **Wilfred Ho** | Wing Fat Mansion | retired; chess in the park every afternoon | Married fifty-two years. She wins. |
 | **Lily Chan** (child) | the market flats | school | Mei's daughter; Jammer's best friend, cross that he is away. |
-| **Kofi Osei** (child) | Parkside Estate, Block 5 | school | Imani's son; knows the name of every bone in the museum. |
+| **Kofi Osei** (child) | North Estate, Block 5 | school | Imani's son; knows the name of every bone in the museum. |
 
 The three gate lines among the existing residents are rewritten in the
 dialogue pass (Juno's second, Mara's first and Dax's second).
@@ -427,7 +436,7 @@ city's bounds. **The rest is proposed.**
 - **Now:**
   - The city blorbs stay outside the city's outskirts, out in the desert
     beyond the Rim Walk.
-  - Pinestein still lives on Lantern Lane and goes out to them at night,
+  - Pinestein still lives in Old Moy and goes out to them at night,
     with batteries bought from Hiro at 3 a.m.
 - **How the city feels about them:**
   - Teodora: defensive.
@@ -454,7 +463,7 @@ city's bounds. **The rest is proposed.**
 | Rest and hospitality | Lucinda, Felix, Ah Keung, Iris | the Grand Hotel |
 | Governance and records | Teodora, Kenji | city hall |
 | Knowledge | Ada, Nia, Benji | the library |
-| Culture | Imani; Leon; Mara; Pia | the museum; the Moonlight Cinema; the plaza |
+| Culture | Imani; Leon; Mara; Pia | the museum; the Moonlight Cinema; the plazas |
 | Food | Sol, Mei, Rosa, Wen, Hiro | the café; the night market; the wet market; the convenience store |
 | Washing and gathering | Sora | the Pine Bath |
 | Health | Dr. Mehta | the clinic |
@@ -467,7 +476,7 @@ city's bounds. **The rest is proposed.**
 | Power | Omar | the Windworks wind farm and battery works |
 | Water | Rafael | the wells, the water works and the roof tanks |
 | Research | Vera; Pinestein, alone | the Lumen Institute; Pinestein's rooftop lab |
-| Cheap, good food near home | Siti | the Parkside hawker centre |
+| Cheap, good food near home | Siti | the North Estate hawker centre |
 | Play | Lily, Kofi; the elders; Old Fu | the giant playground in the park; chess tables in the park and on the void decks; the tea house |
 
 **Utilities, with no cars:**
@@ -568,10 +577,19 @@ entrances. The street buildings are vernacular: tile, render, and signs.
 The city is walked in **four layers**. Each has its own job, and they connect
 often.
 
-1. **The ground.** Lanes (3.2 to 4.8 m), shopping streets (6.4 to 8 m) and
-   two tree-lined main streets (9.6 to 12.8 m). The shopping arcade is roofed
-   at about 8 m. Every block is crossed by lanes, so no walk goes round more
-   than about 60 m. In the estate, every block stands on an open void deck
+1. **The ground: streets, without cars.** Moy still has a full street
+   network (user): only the cars are missing. Streets are paved, kerbless
+   shared surfaces for walkers, bikes, cargo trikes and hand trucks, with
+   street trees, lamps, benches and hydrants, and a clear service width
+   down the middle for deliveries and the fire crew's hand carts. The
+   hierarchy:
+   - **main streets** (12 m, tree-lined): the **Park Ring** round the park,
+     and four streets running out from it to the Rim Walk: **Meridian
+     Avenue** east, **West Street**, **North Street** and **South Street**;
+   - **shopping streets** (8 m), some roofed as arcades at about 8 m;
+   - **lanes** (3.2 to 4.8 m) through every block.
+
+   Blocks are 45 to 70 m, so no walk goes round more than about 60 m. In the estate, every block stands on an open void deck
    you can walk straight under, and covered linkways join the blocks to the
    hawker centre, the park and the Deck.
 2. **The Deck, at +6.5 m (two storeys up).** An elevated pedestrian network
@@ -608,12 +626,12 @@ often.
 - The main streets and the shopping streets are **swing corridors**: walls
   of 16 to 40 m (5 to 12 storeys) on both sides, 6 to 13 m apart, with
   cornices, sign gantries and the towers as anchors.
-- The towers (60 to 110 m) are the long anchors that carry a swing across
-  the plaza and the park.
+- The towers round the park (the hotel's, the estate's Block 3, the
+  library's roof) are the long anchors that carry a swing across the park,
+  with the giant playground's 12 to 20 m towers as low anchors in the
+  middle.
 - **Downtown** is the city's great swing: skyscrapers stand 25 to 50 m apart,
-  inside the rope's 52 m, so a wearer can chain from tower to tower. Plazas
-  between them stay under 50 m across.
-- The estate's point blocks anchor swings across the park.
+  inside the rope's 52 m, so a wearer can chain from tower to tower.
 - Out in the desert the only anchors are the wind turbines' towers.
 - The lanes are too tight to swing in and are for walking.
 
@@ -622,60 +640,87 @@ sign gantries and the ramp towers' outsides.
 
 ## 7. Districts (schematic; coordinates follow approval)
 
+**Every block is built out** (user): buildings stand shoulder to shoulder to
+the street line on every side, as in any real city. Open ground is only
+ever a street, a plaza, the park, a courtyard inside a block, or the space
+under an estate block's void deck. There is no leftover ground between
+buildings.
+
 ```
                                    N
              (NW, outside: the water works, wells, water tower)
-   ┌──────────── PARKSIDE ESTATE (public housing) ─────────────┐
-   │ point and slab blocks on void decks · hawker centre ·     │
-   │ the CITY PARK: giant playground, chess, pond · Garden Row │
-   ├───────────────┬──────────────────────┬────────────────────┤
-W  │ LANTERN LANE  │   CENTRAL PLAZA      │ DOWNTOWN           │ E, outside:
-   │ pencil bldgs, │ city hall (N)        │ Meridian Avenue:   │  goods yard,
-   │ café, cinema, │ LIBRARY (W)          │ the Windspire, the  │
-   │ bath, clinic, │ GRAND HOTEL (E) ─────┼─ glass tower, the  │
-   │ police box,   │ museum (S)           │ Lumen Institute    │◄── arrival by
-   │ Pinestein's   │ trees, misters       │                    │  the wasteland
-   ├───────────────┴──────────────────────┴────────────────────┤  road
-   │ THE MARKET LANES: wet market, night market, Helmsmith,    │
-   │ the shopping arcade, convenience store, school            │
+   ┌─────────────────── NORTH ESTATE ──────────────────────────┐
+   │  point and slab blocks on podiums · Estate Square and the │
+   │  hawker centre on North Street                            │
+   ├────────────┬─────────────────────────────┬────────────────┤
+W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E, outside:
+   │  lanes,    │ Square  giant playground Plaza│ Meridian Ave: │  goods yard,
+   │  cinema,   │ (library  tea house · chess   │ the Windspire,│  battery works
+   │  bath,     │  on its   pond          (hotel│ Tanglewire,   │◄── arrival by
+   │  clinic,   │  north)   — the Park Ring —  N, │ Lumen        │  the wasteland
+   │  police box│            museum (S)   hall S)│ Institute     │  road
+   ├────────────┴─────────────────────────────┴────────────────┤
+   │ THE MARKET LANES: Market Square on South Street, the wet  │
+   │ market, the night market, the arcade, Helmsmith, school   │
    └──────────────────────────── S ────────────────────────────┘
        the Rim Walk rings the whole city: the bounds;
        the city blorbs stay out in the desert beyond it
        (just beyond: four wind turbines, two east, two west)
 ```
 
+- **The park, at the centre** (user). About 130 × 100 m, ringed by the Park
+  Ring, the main street that ties the city together:
+  - the **giant playground** at its heart;
+  - Old Fu's tea house and the chess tables;
+  - the pond, and shade trees on reclaimed water;
+  - **Garden Row**, a short row of older townhouses, faces it from the
+    north-west.
+
+  Every district touches the Park Ring, so the park is the city's common
+  ground, and the Deck runs round it.
+- **The plazas** (user: "I like the idea of plazas"):
+  - **Civic Plaza**, on the park's east side where Meridian Avenue arrives.
+    The Grand Hotel stands on its north side and city hall on its south
+    side. Shade trees, misters and benches; Pia busks here; the Deck's main
+    ramp tower.
+  - **Library Square**, on the park's west side where West Street arrives,
+    with the library along its north side and the terraced steps where
+    people sit.
+  - **Market Square**, on South Street, ringed by stalls by day and by the
+    night market after dark, with the wet market hall on its east side.
+  - **Estate Square**, on North Street in the North Estate, with the hawker
+    centre on its east side and void decks opening onto it.
+  - **Cinema Square**, a small square in Old Moy where the Moonlight Cinema
+    and the Pine Bath face each other.
 - **Arrival.** From the east, the wasteland road ends at the goods yard.
-  People cross the Rim Walk and walk in down
-  **Meridian Avenue** (renamed from Harbour Street: there is no harbour in a
-  desert), the palm-lined main street, between the skyscrapers, and the
-  street opens onto the **central plaza**. The
-  Grand Hotel's revolving door is on the plaza, its tower the first landmark
-  seen.
-- **The central plaza** is the public heart.
-  - **Around it:** city hall to the north, the library to the west, the
-    Grand Hotel to the east and the museum to the south.
-  - **On it:** shade trees, misters,
-    benches, Pia's spot and the Deck's main ramp tower.
-- **Lantern Lane** (west) is the old residential and craft quarter of lanes
-  and pencil buildings: Sol's café, the Moonlight Cinema, the Pine Bath, the
-  clinic, the police box, and Pinestein's rooftop laboratory.
-- **The market lanes** (south) hold the wet market, the night market, the
-  covered shopping arcade, the Helmsmith, Hiro's store and the school.
-- **Parkside Estate** (north) is the public housing, after Singapore's:
-  - four point blocks of 30 to 40 storeys, two of them twins joined by sky
-    bridges and a sky garden;
-  - three slab blocks of 12 to 16 storeys;
-  - a void deck under every block: shade, chess tables, letterboxes, a
-    kindergarten, and room for weddings and wakes;
-  - covered linkways to the **neighbourhood centre**: the hawker centre
-    (Siti's stall), a minimart, a playground, a fitness corner and a
-    community garden on the roof, where another estate would have its car
-    park;
-  - the **city park** at its heart, with **Garden Row**, a short lane of
-    older townhouses, along the park's edge.
-- **The city park and its giant playground.** The park holds the pond, Old
-  Fu's tea house and the chess tables, under shade trees on reclaimed water.
-  At its centre stands a **giant playground**, the biggest the world has seen
+  People cross the Rim Walk and walk in down **Meridian Avenue** (renamed
+  from Harbour Street: there is no harbour in a desert), the palm-lined main
+  street, between the skyscrapers, and the avenue opens onto **Civic Plaza**
+  and, past it, the park. The Grand Hotel's revolving door is on the plaza.
+- **The museum** faces the park from the Park Ring's south side.
+- **Old Moy** (west; renamed from Lantern Lane, user) is the old residential
+  and craft quarter of lanes and pencil buildings either side of West
+  Street: Sol's café, the Moonlight Cinema and the Pine Bath on Cinema
+  Square, the clinic, the police box, and Pinestein's rooftop laboratory.
+- **The market lanes** (south) hold Market Square, the wet market, the night
+  market, the covered shopping arcade, the Helmsmith, Hiro's store, Wing Fat
+  Mansion and the school.
+- **The North Estate** (north; renamed from Parkside Estate, user) is the
+  public housing, after Singapore's, built out to its streets like
+  everything else:
+  - point blocks of 30 to 40 storeys rising from two- and three-storey
+    podiums (the void decks, shops, a kindergarten, the clinic's annexe),
+    two of them twins joined by sky bridges and a sky garden;
+  - slab blocks of 12 to 16 storeys lining the streets;
+  - void decks under every block: shade, chess tables, letterboxes, and room
+    for weddings and wakes;
+  - Estate Square and its hawker centre (Siti's stall), with a community
+    garden on the podium roofs where another estate would have its car park;
+  - small courtyards inside the blocks, never open lots.
+
+  Jammer's family lives in Block 3, on the Park Ring, overlooking the park.
+  The Housing Board (Juno) runs the estate.
+- **The giant playground**, in the park: the biggest the world has seen
   (after Singapore's mosaic dragon playgrounds and the great net-tower
   playgrounds of Europe and Japan):
   - climbing towers of 12 to 20 m joined by rope bridges and net tunnels;
@@ -685,17 +730,15 @@ W  │ LANTERN LANE  │   CENTRAL PLAZA      │ DOWNTOWN           │ E, outs
   - shade sails over it all, and benches for the parents round the edge.
 
   It is a real parkour course for the hero, with collision throughout, and a
-  landmark seen from the Deck and the estate's towers. Lily and Kofi rule
-  it.
-
-  Jammer's family lives in Block 3, overlooking the park. The Housing Board
-  (Juno) runs the estate.
-- **Downtown** (east), on **Meridian Avenue**, is the city's workplace and
-  its skyline: six or seven skyscrapers of 140 to 220 m and the **Windspire**,
-  the Windworks' headquarters, about 280 m tall with an observation deck. Here
-  are Raman & Reese, Tanglewire's glass tower, the start-up floors and the
-  Lumen Institute's campus. The Grand Hotel's guest tower stands at
-  downtown's plaza end.
+  landmark seen from the Deck and every block on the Park Ring. Lily and
+  Kofi rule it.
+- **Downtown** (east), on **Meridian Avenue** between Civic Plaza and the
+  Rim Walk, is the city's workplace and its skyline: a tight cluster of
+  skyscrapers of 140 to 220 m on podiums that fill their blocks, and the
+  **Windspire**, the Windworks' headquarters, about 280 m tall with an
+  observation deck. Here are Raman & Reese, Tanglewire's glass tower, the
+  start-up floors and the Lumen Institute. The Grand Hotel's guest tower
+  rises on Civic Plaza at downtown's west end.
 
 ### Site and land
 
@@ -726,7 +769,7 @@ The full building brief follows the layout.
   - a revolving door (a drum about 3.3 m across) flanked by swing doors for
     the party and big companions;
   - the doorman, Ah Keung;
-  - a canopy on the plaza;
+  - a canopy on Civic Plaza;
   - the Deck's entrance at the mezzanine.
 - **The atrium:**
   - the giant chandelier, about 8 m across;
@@ -744,7 +787,8 @@ The full building brief follows the layout.
     bookshelves, which is also the city's best indoor climb.
   - **The Rose Reading Room, New York Public Library:** the great reading
     room.
-- **Size:** about 55 × 55 m, five storeys, on the plaza's west side.
+- **Size:** about 55 × 55 m, five storeys, on the north side of Library
+  Square, west of the park.
 - **Inside:**
   - the terraced atrium;
   - the reading room under the roof;
@@ -758,7 +802,7 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the Pine Bath; the family's flat; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the Parkside hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the Pine Bath; the family's flat; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
 | **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 
@@ -788,6 +832,9 @@ lit crowns.
 - Jammer is at his grandmother's in the Middle of Nowhere.
 - The city's name is **Moy**. No Sign Boneyard: the city blorbs simply stay
   outside the outskirts. No opulent fountains.
+- (sixth revision) Every block built out to its streets, no empty gaps; the
+  park at the centre; new names for Lantern Lane and Parkside Estate; real
+  streets without cars; several plazas.
 - Jammer's parents are **Elizabeth Reese** and **Dan Miller**, married
   (user, 2026-10-12), and they can speak of the Middle of Nowhere. Proposed
   clues: Elizabeth's photograph of the hero as a boy, Jammer's room full of
@@ -821,7 +868,10 @@ lit crowns.
   hospitality; food imported from the farmland;
 - the Rim Walk as the bounds; the city blorbs and the City Gem in the desert
   just beyond it;
-- Meridian Avenue (renamed from Harbour Street); Parkside Estate; the
+- the names **Old Moy** and the **North Estate**; the street names (the Park
+  Ring, West, North and South Streets); the five plazas (Civic Plaza,
+  Library Square, Market Square, Estate Square, Cinema Square);
+- Meridian Avenue (renamed from Harbour Street); the
   Windspire;
 - (fifth revision) the wind farm's size, number and placement; the
   Windworks and the Windspire (renamed from the Sunwell and the Sunspire);

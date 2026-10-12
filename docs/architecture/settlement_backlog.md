@@ -1029,7 +1029,7 @@ fountains. The brief adds, for approval:
   `city.md` 2a)
   with its battery works;
 - downtown on Meridian Avenue with the Windspire (about 280 m);
-- Parkside Estate;
+- the North Estate;
 - five more residents (forty-five in all).
 
 **Ci3 (code, after the layout):** in `wilderness_scatter.gd`,
