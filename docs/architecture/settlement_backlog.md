@@ -94,6 +94,9 @@ computer.
 | Oc1 | The four briefs, layouts, ships, planting and ocean floor | Ocean | Approve | the user | 8 |
 | Oc2 | Shared dry-volume system (ships below the waterline, air halls, tunnels) | shared | Ready after Oc1 | Oc1 | 8 |
 | Oc3 | How tournament fights work; the mongooses' harmony quest | Ocean | Decide | the user | 8, 13 |
+| **The city** |||||
+| Ci1 | Settlement plan at real building sizes: site widened to a radius of 240 m, census of 19 with roles, districts around a central plaza, three fidelity levels, the grand hotel rest point and the library | City | Approve | the user; names (the city, Jammer's parents, the hotel staff) | 22 |
+| Ci2 | Prototype the lit-window "interior mapping" shader and one real-size tower with a podium, before any city layout code | City | Ready | — | 22 |
 | **Across the game** |||||
 | X1 | Story-state triggers on revisit (`WorldState` flags read at arrival) | all | Ready | — | 13 |
 | X2 | Toilets true to each culture: the primate inn's closed closet, screens and closets around fixtures, the Okafor guest house | all | Ready | — | 11 |
@@ -979,3 +982,31 @@ blorb suit, held items).
 
 Noted, not changed: the player capsule is 1.8 m tall against the hero's
 1.9 m figure.
+
+## 22. The city: real-size rebuild (2026-10-12, awaiting approval)
+
+Full brief: `city.md`. The prototype's 24 towers stand on 6.4 to 12.8 m
+footprints, on a 156 m pad, with 8 m roads. The rebuild uses real sizes ×
+1.1.
+
+**Order once approved:**
+1. The measured layout (settlement stage 4): coordinates, blocks, plots and
+   routes.
+2. The style charter (the Western city's concrete-and-glass grammar,
+   developed).
+3. Building briefs: the hotel first (the rest point), then the library.
+4. Code:
+   - widen `CITY_FLAT_RADIUS` in `terrain_generator.gd` (and the matching
+     constant in `wilderness_scatter.gd`);
+   - a `CityPlan` data file and a validator;
+   - block streaming;
+   - instanced facades;
+   - the interior-mapping window shader;
+   - Level A interiors.
+5. Keep the non-regression list: City blorbs and the Gem, the Helmsmith, the
+   residents' names, the skyline tier, the wake and sleep radii.
+
+**Prototype first (Ci2):** the window shader and one real-size tower with a
+two-storey podium, rendered beside an Ohio house, to judge the scale and the
+cost before the layout code.
+
