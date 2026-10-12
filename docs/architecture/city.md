@@ -228,8 +228,21 @@ follow approval):
   - a low, slow whoosh near the towers.
 - **Collision and play:**
   - Towers are solid cylinders, and the nacelle roof is a landing.
-  - Blades are animated solid bodies, so a turning blade sweeps the hero
-    aside.
+  - **The blades collide with the player** (user, 2026-10-12), and with
+    every party member, companion and NME controller, as the collision rule
+    requires.
+    - Each blade is a moving solid body (`AnimatableBody3D`, synced to
+      physics), rotating with the rotor, with a collider of three or four
+      tapering capsules or boxes. It is a blocking surface, not a hazard,
+      and does no damage.
+    - At ten turns a minute a 65 m blade's tip moves at about 68 m/s. The
+      push a blade gives is capped (about 12 m/s, to be tuned in play), so
+      the hero is swept aside or carried round, not flung across the map.
+    - Physics steps are fine enough that a blade cannot pass through a body
+      between frames.
+    - The blades are close to the ground only at the bottom of their sweep,
+      about 30 m up, so walkers never meet them. Swingers, gliders and
+      climbers do.
   - The towers are the only swing anchors out in the desert. There is no
     route up inside them (no ladders, by the ramp rule).
 
@@ -781,6 +794,7 @@ lit crowns.
   farm drawings, and the farm's mark on Wen Li's crates.
 - Giant wind turbines, after China's desert wind bases, out in the
   wasteland around the city: **Moy's power source** (fifth revision).
+- The turbines' blades collide with the player.
 - No mahjong; chess is fine. A giant playground in the park. No Element
   Shrine.
 - (third revision) a city standing up out of the desert, like Las Vegas or
@@ -826,7 +840,5 @@ lit crowns.
 - whether Pinestein has a quest, such as a case to let the city blorbs back
   in;
 - the Windspire's height against the far skyline's draw distance;
-- whether a turning blade knocks the hero aside (proposed) or passes
-  through him;
 - the turbines' draw cost: four animated rotors seen from across the
   world (proposed: one shared mesh, instanced, rotors as cheap far LODs).
