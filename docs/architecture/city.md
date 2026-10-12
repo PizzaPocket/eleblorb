@@ -963,8 +963,105 @@ favourite perch is the 12 m bounce perch, and he hasn't been on it since he
 left for the farm. Parents sit on the benches round the pump track. No text
 explains any route; the shapes do.
 
-**Open:** whether the Snow snowboard can sandboard down the dunes, and
-whether the Penguin belly slide works on the slides.
+**Decided (user):** the Snow snowboard does not sandboard on the dunes, and
+the Penguin belly slide does not work on the slides. The rest of the park
+and playground design is approved.
+
+### 7c. Downtown's towers (proposed, 2026-10-12)
+
+Downtown has five towers. Each answers the same three things in its own
+way: the desert sun, the west wind, and the city's own history. They share
+Moy's language (superellipse corners, pale ceramic, crowns lit at night in
+the picture-sign colours) but no two look alike. Each rises from a podium
+that holds its street edge and meets the Deck at +6.5 m.
+
+**1. The Windspire** (the Windworks' headquarters, about 70 storeys, 280 m)
+- **Idea:** the city's wind made into a building.
+- **References:**
+  - **Shanghai Tower:** a plan that twists as it rises, to shed wind.
+  - **Pearl River Tower, Guangzhou:** a curved facade funnelling wind
+    through openings that hold turbines.
+  - **Burj Khalifa:** a three-lobed plan that steps back as it climbs.
+- **Form:**
+  - a rounded-triangle plan that turns a quarter-turn from base to crown,
+    so its edges spiral up the skyline;
+  - three **wind gaps**, at the sky lobbies on floors 20, 40 and 60: open
+    slots straight through the tower, where large turbines spin in the west
+    wind, visible from the whole city;
+  - pale fritted glass behind vertical terracotta fins, which shade the
+    west face from the afternoon sun.
+- **Crown:** an open steel lattice round the observation deck, with a slow
+  vertical-axis turbine as its spire, lit white at night.
+- **Play:** the fins and the wind-gap ledges are the highest swing anchors
+  and climbing holds in the city. The observation deck is realised.
+
+**2. The glass tower** (Raman & Reese and Tanglewire, about 45 storeys, 180 m)
+- **Idea:** a modern tower veiled in the old town's screens.
+- **References:**
+  - **Al Bahar Towers, Abu Dhabi:** a moving mashrabiya screen of panels
+    that open and close with the sun.
+  - **Doha Tower:** a cylinder wrapped in patterned screens.
+- **Form:**
+  - a round-cornered square tower in clear glass, wrapped by an outer skin
+    of screen panels;
+  - by day the panels close against the sun on the side it strikes; at dusk
+    they fold open and the tower goes from screened to glass;
+  - each panel is pierced with one of **Old Moy's painted house marks**,
+    the pictures the city's signs come from, so the tower carries the old
+    town's history on its face.
+- **Crown:** the screens stop short of the top; a glass crown lit warm
+  amber.
+- **Play:** the screen frames are a climbable lattice from the podium up.
+
+**3. The north tower** (the start-up floors, about 45 storeys, 175 m)
+- **Idea:** a tower that changes as its tenants come and go.
+- **References:**
+  - **Nakagin Capsule Tower, Tokyo:** plug-in capsules on a concrete core.
+  - **CapitaSpring, Singapore:** an open garden floor halfway up.
+- **Form:**
+  - a concrete core with **office capsules** plugged into it, each a
+    start-up's studio, in different sizes and colours of glazed tile, so the
+    tower's outline is stepped and irregular;
+  - start-ups move in and out a capsule at a time, so the tower never looks
+    the same twice;
+  - a **sky garden** open to the air at its middle, on floors 22 and 23,
+    shaded and planted.
+- **Crown:** the topmost capsules, stacked unevenly.
+- **Play:** the city's best climbing tower; the capsules' tops are ledges
+  all the way up. Theo works in one.
+
+**4. The south tower** (flats over offices, about 40 storeys, 150 m)
+- **Idea:** the desert's dunes, built in balconies.
+- **References:**
+  - **Aqua Tower, Chicago:** concrete balconies whose edges ripple across
+    the facade like a landscape.
+  - **The tower houses of Shibam:** deep, shaded openings in pale walls.
+- **Form:**
+  - every floor's balconies reach out a different distance, so the edges
+    ripple across the whole tower like sand dunes seen from above;
+  - deep balconies shade the windows behind them, with screens and potted
+    plants;
+  - pale, sand-coloured concrete and ceramic tile.
+- **Crown:** roof terraces stepping back, the residents' gardens.
+- **Play:** the rippling balcony edges are a staircase of ledges for
+  climbers and swing anchors along the south of Civic Plaza. Dr. Kask lives
+  near the top.
+
+**5. The Grand Hotel's guest tower** (25 floors, 97 m)
+- **Idea:** the grand old hotel, older than the other towers.
+- **References:**
+  - **Peace Hotel, Shanghai:** art deco, with a pyramidal copper roof.
+  - **Chrysler Building, New York:** stepped setbacks and a lit crown.
+- **Form:**
+  - cream stone and bronze art deco, rising in setbacks from the podium;
+  - vertical piers between the windows.
+- **Crown:** a green-copper pyramid with a lantern at its peak, lit at
+  night, the first landmark seen from the plaza.
+
+**The skyline together:** the twisting Windspire with its spinning wind
+gaps is the tallest; the screened glass tower, the plug-in capsule tower and
+the dune-balconied flats step down around it; the old copper-crowned hotel
+stands in front, facing the park.
 
 ### Building schedule (proposed, 2026-10-12)
 
@@ -1002,10 +1099,10 @@ round the park and on Civic Plaza.
 |---|---|---|---|---|
 | 1 | Grand Hotel | 52 × 60 m | podium 4 storeys, guest tower 25 floors (97 m) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
 | 2 | City hall | 34 × 60 m | 4 storeys and a clock tower, at the head of Civic Plaza | Mayor Teodora Vance, Kenji Mori (clerk) |
-| 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, on a podium | the Windworks (headquarters, observation deck) |
-| 13 | Glass tower | 40 × 40 m | about 45 storeys, 180 m, on a podium | Raman & Reese (Elizabeth, Priya, Venn); Tanglewire (Dan) |
-| 14 | North tower | 40 × 40 m | about 45 storeys, 175 m, on a podium | start-up floors (Theo Park) |
-| 15 | South tower | 40 × 40 m | about 40 storeys, 150 m, on a podium | flats over offices; Dr. Vera Kask |
+| 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, twisting, with three wind gaps (7c) | the Windworks (headquarters, observation deck) |
+| 13 | Glass tower | 40 × 40 m | about 45 storeys, 180 m, in moving screens pierced with the house marks (7c) | Raman & Reese (Elizabeth, Priya, Venn); Tanglewire (Dan) |
+| 14 | North tower | 40 × 40 m | about 45 storeys, 175 m, plug-in capsule offices (7c) | start-up floors (Theo Park) |
+| 15 | South tower | 40 × 40 m | about 40 storeys, 150 m, dune balconies (7c) | flats over offices; Dr. Vera Kask |
 | 16 | BLOCK | 38 × 42 m | 6 storeys, research labs round a court | Dr. Vera Kask (director) |
 
 **North Estate**
