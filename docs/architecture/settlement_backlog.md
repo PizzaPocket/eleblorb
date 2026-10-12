@@ -596,8 +596,7 @@ Rules for every change:
 
 | Change | Where | Trigger (flag) | What the village builds afterward |
 |---|---|---|---|
-| Palace becomes the civic centre | Chinese village | `chinese_village_rule_delegated` (exists; Tian Bo made chief) | every room's civic dressing from `chinese_village_palace.md` section 4: gate open, throne gone, village hall benches, communal dining, records and reading rooms, village store, public lookout, open garden; Tian Bo's and the villagers' civic schedules and lines; Liang Zhen in the community kitchen and living in the Chef's old room |
-| Liang Zhen and Hua Chen | Chinese village | a new counter of visits since `chinese_village_rule_delegated` | staged: Hua Chen's bao on the kitchen rack, then her apron beside his, then the two of them on the garden bench; their lines advance with each stage |
+| Palace becomes the civic centre | Chinese village | `chinese_village_rule_delegated` (exists; Tian Bo made chief) | every room's civic dressing from `chinese_village_palace.md` section 4: gate open, throne gone, village hall benches, communal dining, records and reading rooms, village store, public lookout, open garden; Tian Bo's and the villagers' civic schedules and lines; Liang Zhen as advisor in the records room and living in the Chef's old room; Lu cooking the communal meals in the former Royal Kitchen |
 | The sealing rock splits | Chinese village, Lantern Row | `sun_wu_kong_freed` (exists) | the split halves with the gold band fallen; children climbing them; the children's and Mei Lian's lines about him change |
 | The Water Curtain Cave is reclaimed | Plant Kingdom, Flower Fruit Mountain | a new flag (e.g. `sun_wu_kong_seat_reclaimed`), set by the deferred quest that brings Sun Wu Kong back | the cave's reclaimed dressing (`plant_kingdom_water_curtain_cave.md` section 4): ledge cleared, stoves lit, bowls of fruit, new mats, the red-and-gold banner; Sun Wu Kong on his seat when he is not travelling with the party |
 | Ossian dismounts | Plant Kingdom village | `manchego_joined` (exists) | Ossian roams as an ordinary resident; his lean-to stays; the stable stands empty or holds Manchego when the party leaves him there |
@@ -622,7 +621,7 @@ reconciled) join this table when their designs are approved.
   (through `HairOrnaments`). Then a Chinese village profile through
   `VillagerAppearance.apply_profile()` replacing the random `SHIRT_COLORS`
   draw (which includes a yellow the charter excludes), and the per-resident
-  looks. Liang Zhen's post-quest look joins the revisit states in item 13.
+  looks. Liang Zhen's post-quest advisor look joins the revisit states in item 13.
 - Emperor's regalia (approved 2026-10-06): crown board black
   on top and red beneath, twelve strings of jade beads instead of ten
   gold cords, a round-collared robe with gold dragon roundels, a jade hoop belt;
@@ -728,3 +727,18 @@ placeholders and are rewritten with those settlements' rebuilds; the Ocean
 Kingdom's residents. Shop item descriptions that explain a mechanic ("Throw it
 into a blorb to bind...") break the same CLAUDE.md rule and need the user's
 call, since the shop UI is where players read what an item is.
+
+## 17. Chinese village story revision (2026-10-12)
+
+- No romance between Liang Zhen and Hua Chen. Remove any staged
+  relationship states and lines.
+- After the quest Liang Zhen is Tian Bo's **advisor** (records room, advisor's
+  grey gown), not the community chef.
+- The inn and restaurant are kept by **Lu (吕)** and his son **Lu Hao**
+  from the start, replacing 林静. Lu becomes the community chef after the
+  quest.
+- Code: `INNKEEPER_NAME` and the keeper's gender in `scripts/chinese_village.gd`
+  (Lu is a man), Lu Hao as a resident, Liang Zhen's post-quest lines and look,
+  Lu's community-kitchen placement in the civic state.
+- Open: Lu's given name; Lu Hao's characters and age.
+

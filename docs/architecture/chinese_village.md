@@ -21,14 +21,14 @@ Islands (all at one shared surface y, about -61, over the Abyss):
 | Bamboo | (18, 116) | 25 | 34 stalks as multimesh, farmer Tian Bo and Pandy |
 | C | (-118, 42) | 18 | 2 houses, no residents |
 | D | (112, 48) | 19 | 2 houses, no residents |
-| E | (-62, 124) | 17 | 1 house, the inn (innkeeper now 林静), no other residents |
+| E | (-62, 124) | 17 | 1 house, the inn (keeper now Lu 吕 and his son Lu Hao, 2026-10-12; was 林静), no other residents |
 
 Bridges (flat, 3.2 m wide, one deck and two rails each, no gate or landing):
 Palace-A 44 m, Palace-B 44 m, A-C 65 m, B-D 61 m, C-E 67 m, E-Bamboo 42 m, plus
 a 225 m sloped entry bridge running due south from the palace to the mainland.
 
 Residents: Emperor, Royal Chef (hostile agent), farmer Tian Bo, Pandy, vendor
-Chen, innkeeper 林静 (renamed from Lin Quiet-Reed), eight adult villagers (Mei Lian, Wen Zhao, Bo
+Chen, innkeeper Lu (吕) and his son Lu Hao (replacing 林静, 2026-10-12), eight adult villagers (Mei Lian, Wen Zhao, Bo
 Xiang, Hua Chen, Jin Wei, Lian Fu, Yun Tao, Shu Mei), six children (Ting, Xiu,
 Pei, Rong, Bao). Sun Wu Kong is sealed on the castle crown (moving to Lantern
 Row, section 4.6).
@@ -36,8 +36,8 @@ Row, section 4.6).
 Quest chain (must survive any rebuild): Tian Bo's grievance, Liang Zhen's
 audience, blorbs shrunk to buns on the kitchen counter, Chef fight without
 blorbs, cleaver drop, Liang Zhen restored without an Emperor fight, Tian Bo
-made village chief, Pandy joins, palace becomes a civic centre, and Liang Zhen
-becomes the community chef. Jingu Bang hunt at the play hut, Sun Wu Kong freed
+made village chief, Pandy joins, palace becomes a civic centre, Liang Zhen
+becomes Tian Bo's advisor, and Lu the innkeeper becomes the community chef. Jingu Bang hunt at the play hut, Sun Wu Kong freed
 from the sealing rock.
 
 ## 2. Measured defects
@@ -156,9 +156,9 @@ Children are placed in households first, then the adults around them.
 | West end | Shu Mei (elder), Pei (child, her grandchild) | Waymarker, trims the entry bridge lamps | None directly | Counts posts to stay occupied |
 | Roofer | Wen Zhao (adult) | Roofer, finishes his grandfather's work | Palace roof upkeep | Single, the children follow him around |
 | Farm | Tian Bo (elder), Pandy | Beans and bamboo shoots | The land levy | Fears for the island's last terraces |
-| Inn | 林静 (adult), born on the island, the Lin family's inn kept for three generations; Chen lodges here | Innkeeper | None | Few guests, mostly Chen's trade and Bo Xiang's contacts |
+| Inn and restaurant | **Lu (吕)** (adult; given name to choose), proprietor and cook, and his son **Lu Hao** (age to set), who have run the inn and its restaurant from the beginning; Chen lodges here | Innkeeper, cook and restaurant | Before the quest, none; after it, Lu cooks the village's communal meals | Few guests, mostly Chen's trade and Bo Xiang's contacts; the restaurant feeds the village on market days |
 | Stall | Chen (adult) | Peddler and vendor, lives at the inn | Pays nothing, sells only what the village makes | Keeps the village's route open to outsiders |
-| Palace | Liang Zhen (Emperor before the quest), the Royal Chef | Rulership and kitchen before the quest; civic centre and community kitchen after it | The centre of the levy and later the village's shared house | The Chef's secret; Liang Zhen's buried love of cooking |
+| Palace | Liang Zhen (Emperor before the quest), the Royal Chef | Rulership and kitchen before the quest; civic centre and community kitchen after it, with Liang Zhen as advisor | The centre of the levy and later the village's shared house | The Chef's secret; Liang Zhen's long-buried good sense |
 
 The five children and their households are the heart of the population, so the
 play hut, the well and the island with most children are where the village's
@@ -167,8 +167,9 @@ daily noise should sit.
 Palace staff: none added for now. Villagers rotate through palace work by trade
 (Jin Wei with paper, Lian Fu with night lamps, Yun Tao and Wen Zhao with roofs,
 Bo Xiang with deliveries). The near-empty court is part of the Chef's hold over
-Liang Zhen. After the quest, Tian Bo holds village business there and Liang
-Zhen runs the community kitchen; neither role requires adding a palace servant.
+Liang Zhen. After the quest, Tian Bo holds village business there with Liang Zhen as
+his advisor, and Lu cooks the communal meals; neither role requires adding a
+palace servant.
 
 ### 3.4 Trade provenance for Chen's stall
 
@@ -218,8 +219,9 @@ quest. The Chef is never named as the cause by an ordinary resident.
    it now names Ohio. Trade is flour and salt in, lanterns and beans out.
 2. The history in 3.2 stands (broken plateau, three generations, yellow glaze
    reserved for the palace, Chef a few harvests ago).
-3. The innkeeper is 林静, a native resident of the island whose family has
-   kept the inn for three generations. Everyone here speaks Chinese.
+3. The innkeeper is **Lu (吕)**, proprietor of the inn and its restaurant,
+   who has run it with his son **Lu Hao** from the beginning (revised
+   2026-10-12, replacing 林静). Everyone here speaks Chinese.
 4. Palace staff: deferred. Nobody is added for now.
 5. Still open: villagers other than the Emperor, farmer and Chef still carry
    Latin display names (Mei Lian, Wen Zhao and so on) while their dialogue is
@@ -229,8 +231,10 @@ quest. The Chef is never named as the cause by an ordinary resident.
 7. Tian Bo becomes village chief, not Emperor. The palace and gardens become a
    civic centre open to everyone, while Tian Bo continues tending the bamboo.
 8. Hua Chen is a single mother and the village's bao maker. Lian Fu is a
-   separate lamp keeper with his own home. After the quest, Liang Zhen becomes
-   community chef and his relationship with Hua Chen develops over revisits.
+   separate lamp keeper with his own home. (Revised 2026-10-12: there is
+   **no romance** between Liang Zhen and Hua Chen. After the quest Liang Zhen
+   becomes **advisor** to Tian Bo, and **Lu** the innkeeper becomes the
+   **community chef**.)
 
 ### 3.9 Quest and postquest state (approved 2026-10-04)
 
@@ -247,9 +251,11 @@ quest. The Chef is never named as the cause by an ordinary resident.
 6. Liang Zhen relinquishes the imperial title. The hero entrusts Tian Bo with
    the village; he becomes village chief and Pandy joins the party.
 7. On subsequent visits the palace is a public civic centre. Tian Bo divides
-   his time between civic duties and the bamboo grove. Liang Zhen cooks communal
-   meals in the former Royal Kitchen. His affection for Hua Chen grows in
-   visible stages across revisits rather than resolving in one scene.
+   his time between civic duties and the bamboo grove, with **Liang Zhen as
+   his advisor**: the former Emperor knows the levy, the bridges and the
+   palace's records better than anyone, and now puts that to the village's use.
+   **Lu**, the innkeeper, becomes the **community chef** and cooks the
+   village's communal meals (revised 2026-10-12; no romance).
 
 ## 4. Layout (provisional, derived from section 3)
 
@@ -312,6 +318,35 @@ paired deck and apron heights that the validator checks.
 - Everything built from SuperEgg parts, with `CollisionPolicy` on plinths,
   walls, terraces and screens. Fine bracket detail is decorative.
 
+### 4.2a Precedent: Shihu Yuan (十笏园), Weifang (added 2026-10-12)
+
+The user visited Shihu Yuan in Weifang, Shandong, and brought back
+architectural inspiration. It is a small classical garden and residence of
+the late Qing. Its name, "ten tablets", means it is tiny, and it is known for
+fitting a great deal of garden into very little ground. What it offers this
+village, pending the user's own notes and photos:
+
+- **Northern rather than southern character.** Grey brick walls, grey tile,
+  restrained roof curves and plainer timber, unlike Suzhou's white walls and
+  sharp upturns. This suits the village's small scale, and it suits the engine,
+  since gentle eave curves are far easier to build in SuperEgg slabs than
+  dramatic upturned corners.
+- **Much in little.** A pond at the heart with a pavilion over the water,
+  rockeries, a small bridge, and covered corridors (*yóuláng*) running along
+  the walls to link the rooms. Lattice windows (*lòuchuāng*) frame glimpses
+  from one court into the next.
+- **Courts in sequence.** The residence is a chain of small courtyards
+  entered one from another, a legitimate pass-through by tradition.
+
+**Proposed uses:**
+- the royal garden's four framed views (4.4), built as a compact Shihu-style
+  garden around one pond;
+- the inn's courtyard;
+- covered corridors and lattice windows along the island homes' yard walls.
+
+**Proposed charter change, for the user to confirm:** move the homes from
+white plaster to the northern grey brick, with plaster only on inner walls.
+
 ### 4.3 Palace
 
 - A south gate and processional paved axis from the gate island.
@@ -327,7 +362,7 @@ paired deck and apron heights that the validator checks.
   than remaining an imperial apartment.
 - The Royal Kitchen must support two states without rebuilding its shell: the
   Chef encounter with a clear fight floor and captive-blorb counter, then
-  Liang Zhen's welcoming community kitchen with communal preparation and meal
+  Lu's welcoming community kitchen with communal preparation and meal
   service.
 - Sun Wu Kong's sealing rock leaves the palace (section 4.6). Full brief for
   both the imperial and the civic state: `chinese_village_palace.md`.
@@ -415,7 +450,7 @@ worn.
 | Long gown | *chángshān* | older men, the village chief on civic days, the peddler on the road |
 | Half-sleeve jacket | *bànbì* | anyone in hot work: the bao kitchen, the roofer on the ridge |
 | Sleeveless vest | *kǎnjiān* | over a jacket for elders and the cool evening; alone for heavy work |
-| Work apron | *wéiqún* | Hua Chen, 林静, Liang Zhen after the quest |
+| Work apron | *wéiqún* | Hua Chen, Lu and Lu Hao |
 | Waist sash | | every jacket worn open or for work |
 | Cloth shoes | *bùxié*: black uppers, thick white soles | everyone |
 | Conical straw hat | *dǒulì* | the farmer, the carrier, the roofer outdoors |
@@ -445,11 +480,11 @@ grey and green tile.
 edge binding, on every person in the village.
 
 **Hierarchy.**
-- **Emperor Liang Zhen:** his existing regalia (the red robe with gold trim,
-  the ten-corded crown, full boots). After the quest he gives these up for a
-  cook's indigo *duǎndǎ* with rolled sleeves, a white apron and a plain
-  topknot wrap, and the crown stays on its stand in the palace (see the palace
-  brief).
+- **Emperor Liang Zhen:** his regalia (the red robe with gold trim, the
+  twelve-stringed crown, full boots; see the sense check below). After the
+  quest he gives these up for an **advisor's** plain deep-grey *chángshān*
+  (long gown) with a black *kǎnjiān* over it and a plain topknot wrap, and the
+  crown stays on its stand in the palace (revised 2026-10-12).
 - **The Royal Chef:** keeps his existing pale uniform and toque. A foreign,
   court-kitchen look that sits slightly apart from the village is right for
   the Demon Lord's agent.
@@ -498,10 +533,11 @@ the character-design skill and a code comment say gold. It is red.
 
 | Resident | Look |
 |---|---|
-| **Liang Zhen** (Emperor) | regalia as built; after the quest, the cook's look above |
+| **Liang Zhen** (Emperor) | regalia as built; after the quest, the advisor's plain grey gown above |
 | **The Royal Chef** | as built |
 | **Tian Bo** (farmer, elder, later chief) | bald; *dǒulì*; a muted-green short jacket with brown edge binding, rolled sleeves, trousers tied at the ankle; a *chángshān* in grey on civic days |
-| **林静** (innkeeper) | an indigo *ǎo* with red edge binding over a dark *mǎmiànqún*; a white apron; a bun with a silver pin |
+| **Lu (吕)** (innkeeper and cook) | an indigo *duǎndǎ* with sleeves bound back, a long white apron, a cloth over one shoulder; a topknot wrap |
+| **Lu Hao** (his son) | a light-indigo short jacket with red edge binding, the inn's colour; a serving cloth at his sash; a small topknot |
 | **Chen** (peddler) | a travelling *chángshān* in brown, hitched up by a sash; a pack frame; a cloth head wrap |
 | **Mei Lian** (lantern maker, elder) | a black *kǎnjiān* over a grey long-sleeved *ǎo*; a red-paper smudge on her sleeve; grey bun with a wooden pin |
 | **Jin Wei** (her daughter) | a light-indigo *ǎo* with jade binding, trousers; sleeves bound back with a cord for lantern work |
@@ -532,8 +568,8 @@ its tile green), and no two neighbours match.
 4. Palace axis, service yard, kitchen route, garden.
 5. Bamboo groves.
 6. Residents, homes, schedules, quest-state placements and rewritten Chinese
-   dialogue, including staged postquest exchanges between Liang Zhen and Hua
-   Chen.
+   dialogue, including Liang Zhen's postquest lines as advisor and Lu's as
+   community chef.
 7. Traversal validation for the player, Blorbus and a mount on every
    bridge, landing, residence entrance, palace level and kitchen door.
 8. Visual audit by aerial and eye-level capture.
