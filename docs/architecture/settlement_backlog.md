@@ -85,7 +85,7 @@ computer.
 | P4 | Batu's and Intan's rewritten lines | Plant | Done (2026-10-12) | — | 10 |
 | P5 | Jungle density parity with the demo world | Plant | Deferred | the user | 10 |
 | **Rock and Ground** |||||
-| R1 | Census (with Cass Rourke the miner and Gus Pickett the prospector), saloon and hotel, the mechanical and motor-punk layer (open gears, motors and cables; windpumps, stamp mill, race clock), layout, charter, briefs | Rock and Ground | Approve | the user | 15 |
+| R1 | Census (with Cass Rourke the miner, Gus Pickett the prospector, and the earth-science residents: Hazel Coleman the paleontologist, Tomás Reyes the geologist, Della Lusk the track boss), saloon and hotel, the mechanical and motor-punk layer (open gears, motors and cables; windpumps, stamp mill, race clock), layout, charter, briefs | Rock and Ground | Approve | the user | 15 |
 | R2 | Approved code: cyborg horse, the hat gating the dirt bike's front wheel and sold at Inez's, Manchego's chibi size and the saddle, the Silverback mine tunnel prototype | Rock and Ground, shared | Ready | — | 15 |
 | **Sky Kingdom** |||||
 | Sk1 | Register, materials, interiors, building briefs; swept-roof prototype | Sky | Approve | the user | 6 |
@@ -676,6 +676,7 @@ Rules for every change:
 | Ossian dismounts | Plant Kingdom village | `manchego_joined` (exists) | Ossian roams as an ordinary resident; his lean-to stays; the stable stands empty or holds Manchego when the party leaves him there |
 | The mongooses find harmony | Ocean Kingdom, cage island | the change that brings them into harmony (open; flag named with its quest) | the cage quiet and overgrown, the band sunning and foraging in peace, the chant only from the pups at play, changed behaviour and lines |
 | The Wood Kingdom appears | Plant Kingdom | `ice_kingdom_visited` (exists) | already coded; listed so it follows the same rules |
+| Dinosaur rises | Rock and Ground, the bone camp | `dinosaur_resurrected` (exists) | Hazel Coleman's camp with its grid strings down and plaster jackets open and empty; she sketches him alive from the rim; her lines change (`rock_ground_town.md` 3a) |
 
 Future state changes (the courts meeting again after the Air blorbs return,
 the Plant Kingdom after the curse lifts, the Ocean Kingdom's communities

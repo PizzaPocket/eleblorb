@@ -200,6 +200,9 @@ Black cowboys, about one in four of the real trail hands.
 | **Lark Delgado** | woman | the race barn | the town's champion rider and race marshal |
 | **Cass Rourke** | woman | the mine house | the town's **miner** and mine foreman: works the Silverback mine in the canyon wall with a drill, a pick and an ore cart, and keeps its timbers sound; added 2026-10-07 |
 | **Gus Pickett** | man | his shack | the **old prospector**: fifty years walking the canyons and the fossil basin, knows Dinosaur's bones; never seen without his battered, sweat-stained **prospector's hat** (a wide, floppy-brimmed slouch hat with a dented crown), a pan and a pickaxe on his mule-sized cyborg burro |
+| **Dr. Hazel Coleman** | woman | the bone camp | the **paleontologist**, added 2026-10-12: has spent eleven years on Dinosaur's bones at a camp on the fossil basin's rim, measuring, sketching and plastering them; buys her plaster and burlap from Walt and forgives Gus for using the first toe bone he found as a doorstop |
+| **Tomás Reyes** | man | the assay office | the **geologist** and surveyor, added 2026-10-12: Pearl Dunaway's husband; reads the canyon's banded layers like pages, keeps a cabinet of labelled stones, and tells Cass where the silver ought to run |
+| **Della Lusk** | woman | the race barn loft | the **track boss**, added 2026-10-12: builds and grooms the race course and loves dirt: mixes clay for grip and sand for drainage, reads a track by its colour, and rakes out the gang's ruts every morning |
 | **Jessup Kane** | man | the gang | leader of the riders who hang around the saloon |
 | **Dutch Raker** | man | the gang | the gang's muscle |
 | **Sadie Vex** | woman | the gang | the gang's fastest rider, and Lark's rival |
@@ -207,6 +210,14 @@ Black cowboys, about one in four of the real trail hands.
 ### Livelihood
 
 - **Ranching** cyborg horses: breeding, breaking, training, selling.
+- **Earth science** (user direction, 2026-10-12): a town on rock and dirt
+  has people who love them.
+  - **Tomás Reyes**, the geologist, maps the strata and finds the mine its
+    seams.
+  - **Della Lusk**, the track boss, knows every kind of dirt by hand.
+  - **Dr. Hazel Coleman**, the paleontologist, studies Dinosaur's bones.
+  - Pearl's assay office doubles as Tomás's survey office: its back room
+    holds his sample cabinet, maps and a hand lens.
 - **The livery and garage:** shoeing, repair, tuning.
 - **Mining** (user direction, 2026-10-07): the town's working backbone.
   - **The mine:** Cass Rourke runs the **Silverback mine**, a timbered tunnel
@@ -231,6 +242,49 @@ Black cowboys, about one in four of the real trail hands.
 
 Sheriff Calloway keeps the law. Town matters are argued out in the saloon,
 where everyone ends up anyway.
+
+### 3a. Draft lines for the earth-science residents (2026-10-12)
+
+Written to the `npc-dialogue` skill: in the moment, never reciting a role.
+No line hints at how Dinosaur could rise.
+
+**Dr. Hazel Coleman**, before Dinosaur rises:
+- "Don't step on the string. Every square in that grid is a week of my life."
+- "Forty-one ribs so far. Every one of them longer than my wagon."
+- "Bones this old ought to be scattered by floods. His are just lying down,
+  like he got tired."
+- "Gus found the first toe bone fifty years ago and used it as a doorstop. I've
+  forgiven him. Mostly."
+
+**Dr. Hazel Coleman**, after Dinosaur rises (a revisit state, backlog item
+13):
+- "Eleven years I measured his ribs. Now he breathes with them. I can hear it
+  from camp."
+- "My notebooks are all wrong about how he walks. I've never been happier to
+  be wrong."
+- "He stepped over my tent this morning. Carefully. I'm choosing to believe it
+  was carefully."
+
+In that state her camp changes too: the grid strings are down, the plaster
+jackets are open and empty, and she sketches him alive from the rim.
+
+**Tomás Reyes:**
+- "See that pale band halfway up the canyon? Water lay here once. Climb up
+  and you'll find its shells."
+- "Every layer's a page. The canyon's a book with the cover torn off."
+- "Cass wants to know where the silver runs. The rock tells you, if you're
+  patient. Cass isn't patient."
+- "Pick that one up. No, the red one. Feel how heavy? Iron."
+
+**Della Lusk:**
+- "Careful, I just raked the start straight. Give it till sundown and it'll
+  hold."
+- "Clay for grip, sand so it drains, a bit of crushed rock off the mine tips.
+  Don't let anyone tell you dirt's just dirt."
+- "You can read a track by its colour. Dark means wet. Wet means you're going
+  down."
+- "The gang tears it up every night. I fix it every morning. That's the deal
+  nobody agreed to."
 
 ## 4. The cyborg horses
 
@@ -447,6 +501,19 @@ this is a deliberate fusion.
 - **The Bell ranch** and corral on the edge of town.
 - **Gus's shack** on the road toward the fossil basin, with a sluice box and
   a panning trough beside it.
+- **Hazel's bone camp** on the fossil basin's rim, where she can see the
+  whole skeleton (added 2026-10-12):
+  - a canvas wall tent and a plank work shed;
+  - a dig grid of stakes and string over the nearest bones;
+  - plaster-jacketed bones on pallets, sieves, and a hand-cranked sieve shaker
+    on gears;
+  - a drafting table under an awning, weighted with stones, with her bone
+    drawings;
+  - a camera on a tripod;
+  - a water barrel she fills in town.
+- **Della's track gear** at the race barn: a drag rake a cyborg horse pulls, a
+  water cart filled from the windpump tank, and heaps of sorted clay, sand
+  and crushed tip rock.
 - **The mine** (added 2026-10-07), on the Rock half's canyon wall nearest
   town, reached by the mine road:
   - the **adit**: a timbered portal into the rock, with posts, a cap beam and
@@ -567,7 +634,11 @@ proposed in section 2a.
   - the clockwork hat;
   - the line shaft, charging posts, stamp mill, race clock, player piano,
     mechanical bull and heliograph;
-- the census of eighteen, replacing the eight rock-named residents;
+- the census of twenty-one, replacing the eight rock-named residents,
+  including the earth-science residents added 2026-10-12: Dr. Hazel Coleman
+  (paleontologist, the bone camp), Tomás Reyes (geologist, with Pearl at the
+  assay office) and Della Lusk (track boss);
+- the bone camp on the fossil basin's rim, and the draft lines in 3a;
 - the Silverback mine, Cass Rourke the miner, and Gus's cyborg burro;
 - the Kane gang;
 - Wes Tolliver the saddle maker and the shifting saddle for Manchego;
