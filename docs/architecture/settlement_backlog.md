@@ -796,8 +796,8 @@ over 1,800 m). Code when approved:
 - `scripts/terrain_generator.gd` (whole cells only):
   - the tarn's sill moves from east to south;
   - the old mill bench is removed;
-  - a mill capsule at 0 from (30,-100) to (45,-52), flat radius 13, fixing
-    vertex (30,-106) so the earth dam face is one cell;
+  - a mill pad at 0 holding every lattice vertex from x 12 to 48 and z −106
+    to −52, so the earth dam face (crest row z −124) is one cell;
   - the overlook pad lowered from 2.0 to 0;
   - a cliff-foot bay (bearings about +8° to +32°) in `lake_coverage` and
     `_lake_surface_coverage`;

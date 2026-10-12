@@ -342,9 +342,14 @@ east road. It never cuts through a plot, a yard or the green.
    sill's bearing from +X; it becomes about +Z). The crest vertex (30,-124)
    keeps the bank height, with the sill depression for the sluice.
 2. **The old mill bench is removed** (the capsule (75,-142)–(75,-84) at 3.5 m).
-3. **A new mill capsule at 0** from (30,-100) to (45,-52), with a 13 m flat
-   radius. It holds the mill, its yard, the mill road and the leat level,
-   and fixes the vertex (30,-106), so the dam face is exactly one cell.
+3. **A new mill pad at 0.** The tarn's centre is a lattice vertex, so the
+   vertices nearby fall at x = 12, 30, 48 and z = −106, −88, −70, −52. The pad
+   holds every vertex from x 12 to 48 and from z −106 to −52 at 0, so every
+   triangle under the mill, its yard, the mill road and the leat is level.
+   The pad's north row (z −106) is the dam's toe, so the dam face (crest row
+   z −124) is exactly one cell along its whole width. A capsule with a single
+   radius would leave the west cells sloping under the mill's door, so this
+   is a rectangle of cells.
 4. **The overlook pad falls from +2.0 to 0**, so the leat's bed is above the
    ground at the rim. Re-run `tools/ohio_cliff_probe` for the terrace and the
    edge walk.
