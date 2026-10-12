@@ -181,7 +181,7 @@ further than a walk, a lift or a deck away. Life is lived in layers:
 - gardens, laundry and water tanks on the roofs.
 
 People know their lane, their convenience store, their noodle stall and their
-neighbours. The elders play mahjong in the park, and children walk themselves
+neighbours. The elders play chess in the park, and children walk themselves
 to school. The days are hot and the nights are the city's best time.
 
 ### Why a city here: what people do, and how it earns
@@ -197,7 +197,7 @@ A desert city needs a reason to exist. This one has **the sun.**
    downtown, works on power and on "living current". Start-ups spun out of
    it fill floors of the downtown towers, and Tanglewire recruits for both.
    Pinestein worked at the Institute.
-3. **Professional services.** Law (Raman & Lam: the Sunwell's contracts, the
+3. **Professional services.** Law (Raman & Reese: the Sunwell's contracts, the
    Institute's patents and the city's own cases) and finance serve the first
    two.
 4. **Hospitality and spectacle.** People come in from the towns for the
@@ -229,9 +229,17 @@ unnamed: these forty-five are the people the hero meets.
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Celia Lam** | the Lams' flat, Block 3, Parkside Estate, 18th floor | lawyer, partner at Raman & Lam on Meridian Avenue | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. She defended Pinestein at the inquiry after the Blackout, and lost. |
-| **Marcus Lam** | the same apartment | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at the Institute, the Sunwell and the start-ups | Celia's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
+| **Elizabeth Reese** | the family's flat, Block 3, Parkside Estate, 18th floor | lawyer, partner at Raman & Reese on Meridian Avenue | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. She defended Pinestein at the inquiry after the Blackout, and lost. |
+| **Dan Miller** | the same apartment | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at the Institute, the Sunwell and the start-ups | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
 | *(Jammer)* | away, at his grandmother's in the Middle of Nowhere | — | Their son; his room in the apartment is full of drawings of the farm. |
+
+Raman & Reese is named for its two partners, Priya Raman and Elizabeth.
+Elizabeth and Dan speak of the Middle of Nowhere freely (user). Draft lines,
+in character and pointing nowhere:
+- Elizabeth: "Jammer's out at my mother's farm for the summer. We call it the
+  Middle of Nowhere, and we mean it kindly."
+- Dan: "He calls every Sunday and talks about nothing but the goats. I've
+  never been so jealous of a goat."
 
 **The grand hotel (rest point)**
 
@@ -247,7 +255,7 @@ unnamed: these forty-five are the people the hero meets.
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
 | **Teodora Vance** | Garden Row townhouse | mayor | Grew up in the market lanes. Walks the whole city every Sunday to see what's broken. She signed the ordinance that put the city blorbs outside the bounds, and does not like to talk about it. |
-| **Kenji Mori** | above the shrine's tea house | city clerk and registrar | Keeps the city's records, and the births and deaths of everyone in this census. |
+| **Kenji Mori** | above the park's tea house | city clerk and registrar | Keeps the city's records, and the births and deaths of everyone in this census. |
 | **Ada Fong** | Garden Row, with her wife Sora | head librarian | Moved the library into its terraced new building, and still misses the old one's creaking floors. |
 | **Nia Calder** | Wing Fat Mansion | the library's map archivist | Counts the towers, reads old maps, and has a drawer of maps nobody can explain. |
 | **Benji Okoro** | Lantern Lane | children's librarian | Jammer's favourite grown-up after his parents. |
@@ -255,7 +263,7 @@ unnamed: these forty-five are the people the hero meets.
 | **Leon Duarte** | above the cinema | projectionist of the old Moonlight Cinema | Runs film reels by hand through clockwork projectors he will not let anyone replace. |
 | **Mara Quill** | a rooftop studio on Lantern Lane | novelist | Writes in the library and the café. Says the city mirrors something, and is writing a book to find out what. |
 | **Pia Rowe** | a shared flat over the market | busker on the plaza | Likes the noise at street level; plays where the crowds turn. |
-| **Old Fu** | the shrine's keeper's house | keeper of the Element Shrine | Sweeps the shrine's grove at dawn and knows a story for every element. |
+| **Old Fu** | behind the park's tea house | keeps the tea house and the chess tables in the park | Sweeps the park at dawn, pours tea for the chess players, and can beat everyone in the city except Bea Ho. |
 | **Sora Ishida** | Garden Row, with Ada | runs the Pine Bath, the public bathhouse | Fires the bath's boiler at four every afternoon, the same as her mother did. |
 
 **Commerce and food**
@@ -266,7 +274,7 @@ unnamed: these forty-five are the people the hero meets.
 | **Mei Chan** | the market flats, with her daughter Lily | runs the noodle stall at the night market | Cooks at a stall her mother licensed forty years ago. |
 | **Hiro Sato** | above the store | keeps the all-night convenience store | Has not closed in eleven years and knows who comes in at 3 a.m. and why: Pinestein, most nights, for batteries. |
 | **Rosa Delgado** | the market flats | fishmonger at the wet market | Loud, funny, and the best judge of freshness in the city. Her fish come in on ice by the wasteland road, two days from the water, and she will tell you which day. |
-| **Wen Li** | the market flats | greengrocer at the wet market | Grows herbs on the market's roof and sells them below. Her best greens come from a farm in the Middle of Nowhere, and the crates carry its mark: Celia's mother's farm. |
+| **Wen Li** | the market flats | greengrocer at the wet market | Grows herbs on the market's roof and sells them below. Her best greens come from a farm in the Middle of Nowhere, and the crates carry its mark: Elizabeth's mother's farm. |
 | **Gideon Hale** | behind his shop | **the Helmsmith** | Makes helms for blorbs and their wearers; gruff, precise, and secretly delighted by every new customer. |
 | **Zara Quinn** | a studio on the market roof | sign painter | Paints the city's picture signs (no lettering, ever) and hangs them herself. Her retired signs go to the Sign Boneyard, where the city blorbs nest in them, and she visits. |
 | **Siti Rahman** | Parkside Estate, Block 2 | runs the laksa stall at the Parkside hawker centre | The estate's auntie: feeds the shift workers at dawn and the children after school, and knows which flat every lift-button smudge belongs to. |
@@ -276,9 +284,9 @@ unnamed: these forty-five are the people the hero meets.
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Priya Raman** | Garden Row | senior partner, Raman & Lam | Hired Celia straight out of law school and made her a partner. |
-| **Venn Harlow** | Wing Fat Mansion | paralegal at Raman & Lam | Same commute every day, the same fifteen floors; quietly the firm's memory. |
-| **Theo Park** | Lantern Lane | software engineer at a start-up | Marcus is trying to place him; he would rather be skateboarding on the decks. |
+| **Priya Raman** | Garden Row | senior partner, Raman & Reese | Hired Elizabeth straight out of law school and made her a partner. |
+| **Venn Harlow** | Wing Fat Mansion | paralegal at Raman & Reese | Same commute every day, the same fifteen floors; quietly the firm's memory. |
+| **Theo Park** | Lantern Lane | software engineer at a start-up | Dan is trying to place him; he would rather be skateboarding on the decks. |
 
 **The sun, the water and the Institute**
 
@@ -311,7 +319,7 @@ unnamed: these forty-five are the people the hero meets.
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Bea Ho** and **Wilfred Ho** | Wing Fat Mansion | retired; mahjong in the park every afternoon | Married fifty-two years. She wins. |
+| **Bea Ho** and **Wilfred Ho** | Wing Fat Mansion | retired; chess in the park every afternoon | Married fifty-two years. She wins. |
 | **Lily Chan** (child) | the market flats | school | Mei's daughter; Jammer's best friend, cross that he is away. |
 | **Kofi Osei** (child) | Parkside Estate, Block 5 | school | Imani's son; knows the name of every bone in the museum. |
 
@@ -338,7 +346,7 @@ city's bounds. **The rest is proposed.**
   - the Grand Hotel's chandelier went out for the first time in its history.
 - **The ordinance.** The city council, under Mayor Teodora Vance, banned city
   blorbs from inside the bounds. The Institute, under Dr. Vera Kask,
-  dismissed Pinestein. Celia Lam defended Pinestein at the inquiry and lost.
+  dismissed Pinestein. Elizabeth Reese defended Pinestein at the inquiry and lost.
 - **Now:**
   - The city blorbs live in the **Sign Boneyard** beyond the goods yard,
     among the city's retired picture signs, and sun themselves in the
@@ -374,13 +382,13 @@ city's bounds. **The rest is proposed.**
 | Rest and hospitality | Lucinda, Felix, Ah Keung, Iris | the Grand Hotel |
 | Governance and records | Teodora, Kenji | city hall |
 | Knowledge | Ada, Nia, Benji | the library |
-| Culture | Imani; Leon; Old Fu; Mara; Pia | the museum; the Moonlight Cinema; the Element Shrine; the plaza |
+| Culture | Imani; Leon; Mara; Pia | the museum; the Moonlight Cinema; the plaza |
 | Food | Sol, Mei, Rosa, Wen, Hiro | the café; the night market; the wet market; the convenience store |
 | Washing and gathering | Sora | the Pine Bath |
 | Health | Dr. Mehta | the clinic |
 | Safety | Kate | the police box |
 | School | Yuki | the primary school |
-| Work | Celia, Priya, Venn; Marcus, Theo | Raman & Lam; Tanglewire and the start-up floor |
+| Work | Elizabeth, Priya, Venn; Dan, Theo | Raman & Reese; Tanglewire and the start-up floor |
 | Making | Gideon; Zara | the Helmsmith; the sign studio |
 | Upkeep | Juno, Dax, Kade, Suri, Orin | the towers, the decks, the facades, the park |
 | Moving goods without cars | Tomas | cargo trikes, hand trucks and service lifts; deliveries at dawn through the back lanes |
@@ -388,7 +396,7 @@ city's bounds. **The rest is proposed.**
 | Water | Rafael | the wells, the water works and the roof tanks |
 | Research | Vera; Pinestein, alone | the Lumen Institute; Pinestein's rooftop lab |
 | Cheap, good food near home | Siti | the Parkside hawker centre |
-| Play | Lily, Kofi; the elders | the playground and the park; mahjong tables on the void decks |
+| Play | Lily, Kofi; the elders; Old Fu | the giant playground in the park; chess tables in the park and on the void decks; the tea house |
 
 **Utilities, with no cars:**
 - Water and power arrive underground.
@@ -423,8 +431,7 @@ hero about 1.9 m. City buildings follow it, on the 3.2 m building cell.
 
 **Precedents:**
 - **Tokyo** (Shimokitazawa, Nakameguro, Yanaka): narrow lanes; pencil
-  buildings; tiled facades; rounded corner buildings; small shrines among
-  houses; covered shopping arcades (shōtengai); police boxes (kōban); public
+  buildings; tiled facades; rounded corner buildings; covered shopping arcades (shōtengai); police boxes (kōban); public
   bathhouses (sentō).
 - **Hong Kong** (Central, Sheung Wan, Mong Kok): tenement shophouses (tong
   lau) with verandas over the pavement; stacked vertical signs; mansion
@@ -453,7 +460,7 @@ The shares are of the city's land.
   - the library (white terraces);
   - city hall (stone and a clock);
   - the museum;
-  - the Element Shrine's grove.
+  - the giant playground in the park.
 
 **Kit of parts:**
 
@@ -465,7 +472,7 @@ The shares are of the city's land.
 | Openings | punched windows on homes, with bay windows and balconies; ribbon windows on offices; all with superellipse corners |
 | Exterior life | AC units, laundry poles, potted plants, balcony cages, water tanks and dish antennas, each placed where a person would put it |
 | Signs | the signature motif: lit **picture signs** stacked vertically up the facades and hung across the lanes, never lettered; painted by Zara |
-| Roofs | flat, with parapets; rooftop gardens, water tanks, laundry, small shrines, rooftop bars on the hotel and offices |
+| Roofs | flat, with parapets; rooftop gardens, water tanks, laundry, rooftop bars on the hotel and offices |
 | Circulation on the facade | open gallery corridors on the homes; round **ramp towers** in place of stair towers |
 | Downtown | stone-and-glass towers on podiums; setbacks; each tower its own crown, lit at night; sky lobbies; the Sunspire's observation deck |
 | Public housing | point and slab blocks with open void decks at the ground; open corridors; laundry poles out of every window; painted block numbers as big graphic shapes (numerals only, as on any real estate); sky bridges and a sky garden between twin blocks |
@@ -548,7 +555,7 @@ sign gantries and the ramp towers' outsides.
              (NW, outside: the water works, wells, water tower)
    ┌──────────── PARKSIDE ESTATE (public housing) ─────────────┐
    │ point and slab blocks on void decks · hawker centre ·     │
-   │ the CITY PARK and the Element Shrine's grove · Garden Row │
+   │ the CITY PARK: giant playground, chess, pond · Garden Row │
    ├───────────────┬──────────────────────┬────────────────────┤
 W  │ LANTERN LANE  │   CENTRAL PLAZA      │ DOWNTOWN           │ E, outside:
    │ pencil bldgs, │ city hall (N)        │ Meridian Avenue:   │  goods yard,
@@ -585,21 +592,35 @@ W  │ LANTERN LANE  │   CENTRAL PLAZA      │ DOWNTOWN           │ E, outs
   - four point blocks of 30 to 40 storeys, two of them twins joined by sky
     bridges and a sky garden;
   - three slab blocks of 12 to 16 storeys;
-  - a void deck under every block: shade, mahjong tables, letterboxes, a
+  - a void deck under every block: shade, chess tables, letterboxes, a
     kindergarten, and room for weddings and wakes;
   - covered linkways to the **neighbourhood centre**: the hawker centre
     (Siti's stall), a minimart, a playground, a fitness corner and a
     community garden on the roof, where another estate would have its car
     park;
-  - the **city park** and the Element Shrine's grove at its heart, with
-    **Garden Row**, a short lane of older townhouses, along the park's edge.
+  - the **city park** at its heart, with **Garden Row**, a short lane of
+    older townhouses, along the park's edge.
+- **The city park and its giant playground.** The park holds the pond, Old
+  Fu's tea house and the chess tables, under shade trees on reclaimed water.
+  At its centre stands a **giant playground**, the biggest the world has seen
+  (after Singapore's mosaic dragon playgrounds and the great net-tower
+  playgrounds of Europe and Japan):
+  - climbing towers of 12 to 20 m joined by rope bridges and net tunnels;
+  - long tube slides and a spiral slide from the top;
+  - a sand field (desert sand, for once welcome) and a splash pad on
+    reclaimed water;
+  - shade sails over it all, and benches for the parents round the edge.
+
+  It is a real parkour course for the hero, with collision throughout, and a
+  landmark seen from the Deck and the estate's towers. Lily and Kofi rule
+  it.
 
   Jammer's family lives in Block 3, overlooking the park. The Housing Board
   (Juno) runs the estate.
 - **Downtown** (east), on **Meridian Avenue**, is the city's workplace and
   its skyline: six or seven skyscrapers of 140 to 220 m and the **Sunspire**,
   the Sunwell's headquarters, about 280 m tall with an observation deck. Here
-  are Raman & Lam, Tanglewire's glass tower, the start-up floors and the
+  are Raman & Reese, Tanglewire's glass tower, the start-up floors and the
   Lumen Institute's campus. The Grand Hotel's guest tower stands at
   downtown's plaza end.
 
@@ -664,7 +685,7 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the Pine Bath; the Lams' apartment; the Raman & Lam and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the shrine; Pinestein's rooftop laboratory; the Parkside hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Sunspire's lobby, express lift and observation deck; the Sign Boneyard and the mirror field (outside) |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the Pine Bath; the family's flat; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the Parkside hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Sunspire's lobby, express lift and observation deck; the Sign Boneyard and the mirror field (outside) |
 | **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 
@@ -692,6 +713,12 @@ lit crowns.
 - Jammer's mother, a lawyer, is the hero's blood relative;
 - Jammer's father is a tech recruiter;
 - Jammer is at his grandmother's in the Middle of Nowhere.
+- Jammer's parents are **Elizabeth Reese** and **Dan Miller**, married
+  (user, 2026-10-12), and they can speak of the Middle of Nowhere. Proposed
+  clues: Elizabeth's photograph of the hero as a boy, Jammer's room full of
+  farm drawings, and the farm's mark on Wen Li's crates.
+- No mahjong; chess is fine. A giant playground in the park. No Element
+  Shrine.
 - (third revision) a city standing up out of the desert, like Las Vegas or
   Dubai, with no water nearby;
 - a downtown of skyscrapers;
@@ -700,14 +727,14 @@ lit crowns.
   they are outcast and not allowed inside the city's bounds.
 
 **Proposed:**
-- the census of forty and its names, including **Celia and Marcus Lam**;
+- the census of forty-five and its other names;
 - the culture;
 - the charter;
 - the four movement layers (ground, Deck, towers, roofs) and the swing
   corridors;
 - the districts;
 - the site at a radius of 200 m;
-- the Element Shrine, the Pine Bath, the Moonlight Cinema, the museum and the
+- the Pine Bath, the Moonlight Cinema, the museum and the
   police box;
 - the goods yard as the end of the wasteland road;
 - (third revision) the water story (deep wells, reclaimed water, roof tanks)
@@ -718,15 +745,13 @@ lit crowns.
   the City Gem's new place; the Sunwell mirror field and solar tower;
 - Meridian Avenue (renamed from Harbour Street); Parkside Estate; the
   Sunspire;
-- the five added residents; the Blackout; Celia's defence of Pinestein.
+- the five added residents; the Blackout; Elizabeth's defence of Pinestein.
 
 **Open:**
 - the city's name;
 - the hotel's rest price;
-- whether the Element Shrine fits the world's beliefs;
-- how the city points toward the Middle of Nowhere: Celia's photograph of
-  the boy, and Jammer's room full of farm drawings, are proposed as quiet
-  clues;
+- whether Elizabeth recognises the hero when they meet, and what she tells
+  him;
 - the skybridges are folded into the Deck;
 - whether the hero's own city blorbs may follow him inside the bounds.
   Proposed: the ban is the city's law, not a wall, so a party city blorb may
