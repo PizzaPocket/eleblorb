@@ -828,7 +828,12 @@ Full brief: `ohio.md` 3.4. Code when approved:
   - the mouth projects at least 3 m over a vertical face.
 - Household water (`ohio.md` 3.4, "Water for every house"):
   - mains from the Conduit recorded in `OhioPlan`;
-  - taps, sinks and basins in the interiors, and a roof tank at the inn;
+  - taps, sinks and basins in the interiors; the Holt Inn's flush toilet
+    fed from the west main, draining to a septic tank under the inn yard;
+  - `TownProps.build_dry_toilet()`'s doc comment calls the Ohio fixture a dry
+    toilet with a compost vault; Ohio's is a porcelain flush toilet with a
+    cistern (the model already has the tank), so fix the comment and the
+    `DryToilet` node name;
   - outside taps and water butts;
   - stopcock and fire-plug cover decals;
   - septic tanks behind the houses, not modelled;

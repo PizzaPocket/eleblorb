@@ -283,9 +283,15 @@ deliver it under gravity alone, with no pump.
   Every house has a small service pipe and a stopcock.
 - **Pressure.** About 6 m of head gives a steady flow at ground-floor taps.
   Upstairs fixtures (floor about 3 m) still get about 3 m of head, enough to
-  fill a toilet cistern and a basin. The inn's upstairs washroom is the
-  furthest and highest point, so it gets a tank in the roof space that
-  fills slowly and feeds by gravity.
+  fill a basin or a toilet cistern.
+- **The Holt Inn's toilet.** The inn already has a porcelain flush toilet with
+  a cistern, in the ground-floor washroom on the cold west side beside the
+  larder (`village_inn.gd`). It is the village's busiest toilet and the
+  furthest fixture from the supply. The west main reaches it with the full
+  ground-floor head, which refills its cistern quickly. It drains to the
+  inn's own septic tank under the yard north of the inn, the same yard the
+  kitchen's yard door opens onto. Upstairs, the guest rooms keep washstands
+  with a jug and bowl, filled from the kitchen.
 - **Heavy users.** Each has its own feed:
   - the bakehouse (dough, the copper, washing down);
   - the inn's kitchen, washroom and guest basins;
@@ -461,7 +467,8 @@ Replans the inn so both floors agree. Building frame: x east-west (hearth wall a
   upstairs two front guest rooms (two beds each), the key cache at the east end of
   the south range (open east end for the parkour entry), Mira's room, one spare
   guest room and Hollis's locked room on the north range; downstairs the common
-  room, counter, office, kitchen, larder, washroom with the dry toilet.
+  room, counter, office, kitchen, larder, washroom with the porcelain flush
+  toilet.
 - **Doors swing into the room they serve.** The ground rear partition and the
   upper north wall are drawn east to west so the larder, office, kitchen, Mira's,
   spare and Hollis's doors open into their rooms; the south wall opens into the
