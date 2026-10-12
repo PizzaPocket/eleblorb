@@ -789,34 +789,38 @@ Full brief: `chinese_village.md` 4.1. Code when approved:
   lore is to be worked out further later; alternatives are parked in
   `chinese_village.md` 4.6.
 
-## 20. Ohio: the leat through the village (2026-10-12, awaiting approval)
+## 20. Ohio: the aqueduct through the village (2026-10-12, awaiting approval)
 
 Full brief: `ohio.md` 3.4. Code when approved:
 - `scripts/terrain_generator.gd`:
-  - a **cliff-foot bay** term: bearings about +8° to +32°, water 55 m out,
-    a hard cliff, a floor 12 m deep at the foot shelving to a beach;
+  - a **cliff-foot bay**: bearings about +8° to +32°, water 55 m out, a
+    vertical cliff (hard step, no slope or corridor smoothing), a floor 12 m
+    deep at the foot shelving to a beach;
   - the bay included in `lake_coverage` and `_lake_surface_coverage`;
-  - fall corridor 0 moved to about 14.8°;
-  - the overlook pad replaced by an east road grade falling from 0 to
-    −0.5 m.
+  - fall corridor 0 moved to the mouth (about 13°), plunge pool only;
+  - `MILL_PAD_LEVEL` raised from 3.5 to 6.3.
 - `scripts/ohio_plan.gd`:
-  - a new course from the mill: the wheel to the west end of the north
-    wall, the tailrace, the clapper bridge, the mill road's east side, Tam's
-    slab, the Conduit, the main leat along the east road, the meeting stone
-    and the Lip;
-  - the buried fountain pipe;
-  - the runnel with its dipping place, slabs and culvert;
-  - bed levels at every point.
+  - a new course with a water level per point at 0.3% grade;
+  - the wheel at the west end of the mill's north wall;
+  - the arcade west of the mill road, the Conduit tower at (41,-14), the
+    gate arch over the mill road, the east road arcade, and the mouth 3 m
+    beyond the rim at (86,-9);
+  - the fountain pipe, the runnel, the dipping place, the horse trough, and
+    the grate and culvert to a cliff spout.
 - Builders (`VillageWorks`):
-  - a stone channel with an optional arcade;
-  - the clapper bridge and slab crossings;
-  - a hexagonal conduit house;
+  - an aqueduct arcade with piers sized from the ground profile, a string
+    course, a trough and a coped parkour parapet;
+  - a corbelled spout;
+  - a conduit tower;
   - the kerbed runnel;
-  - the Lip basin with its fall on a true arc.
-- Validator: water falls all the way; every way crossing water has a
-  crossing; nothing stands in a channel.
-- Survey first: a ground profile along the mill road (where the arcade and
-  cuttings go), then `tools/ohio_cliff_probe` after the terrain change. Needs
-  Godot.
-- NPCs: Tam's leat round, Brinna's dipping place, the children's stick race.
-
+  - the fall on a true arc;
+  - slab crossings on the bench.
+- Validator:
+  - bed levels fall all the way;
+  - arch clearances over ways (cart 4.5 m, foot 2.6 m);
+  - nothing in an arch opening or channel;
+  - the mouth projects at least 3 m over a vertical face.
+- Survey first: a ground profile along the arcade line (pier heights), then
+  `tools/ohio_cliff_probe` after the terrain change. Needs Godot.
+- NPCs: Tam's round along the arcade, Brinna's dipping place, the children's
+  stick race.
