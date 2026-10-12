@@ -177,7 +177,11 @@ blorbs may not cross. It reads as an edge, never as a sign.
 follow approval):
 - **All round: the city blorbs** stay out in the open desert just beyond the
   outskirts.
-- **East: the goods yard** where the wasteland road ends.
+- **West: the goods yard**, at the end of West Street, where **the west
+  road** ends. The road runs out across the desert and through the mountains
+  past the world's edge, to the farmland and the coast that feed Moy; the
+  player never follows it. **No road runs east** (user): that way there is
+  nothing but rock and the main plateau's 60 m cliff.
 - **North-west: the water works** and the water tower.
 - **Just beyond: the wind farm**, four turbines in two pairs framing the
   city (below), with the battery works by the goods yard.
@@ -203,7 +207,7 @@ follow approval):
   Chinese village, and none crowding the Jungle and Ice plateaus.
 
   They stand in two pairs that frame the city, one pair either side of the
-  axis of the wasteland road:
+  axis of West Street and Meridian Avenue:
   - the **east pair**, between Moy and the main plateau's cliff;
   - the **west pair**, between Moy and the world's skirt.
 
@@ -277,15 +281,14 @@ A desert city needs a reason to exist. This one has **the wind.**
 
 1. **Energy, the founding industry.** The **Windworks** company runs the wind
    farm and the battery works. The city was built for the Windworks as Las
-   Vegas was built for its dam. Charged batteries leave by the wasteland
-   road: the Rock and Ground town's charging posts and motor-horses run on
-   them.
-2. **Science and technology.** The **Lumen Institute**, a research campus
-   downtown, works on power and on "living current". Start-ups spun out of
+   Vegas was built for its dam. Charged batteries leave by the west road
+   for the wider world.
+2. **Science and technology.** **BLOCK** (renamed from the Lumen Institute,
+   user), a research institute with a campus downtown, works on power and on "living current". Start-ups spun out of
    it fill floors of the downtown towers, and Tanglewire recruits for both.
-   Pinestein worked at the Institute.
-3. **Professional services.** Law (Raman & Reese: the Windworks's contracts, the
-   Institute's patents and the city's own cases) and finance serve the first
+   Pinestein worked at BLOCK.
+3. **Professional services.** Law (Raman & Reese: the Windworks's contracts, BLOCK's
+   patents and the city's own cases) and finance serve the first
    two.
 4. **Hospitality and spectacle.** People come in from the towns for the
    Grand Hotel, the cinema and the night market. In a
@@ -294,8 +297,8 @@ A desert city needs a reason to exist. This one has **the wind.**
 5. **The everyday city.** Markets, the hawker centre, shops, the clinic, the
    school and the upkeep crews: the residents serving each other.
 
-**Imports:** almost all the food. Grain, vegetables and fruit come by road
-from the farmland, the Middle of Nowhere among it, and fish come packed in
+**Imports:** almost all the food. Grain, vegetables and fruit come in by the west
+road from the farmland, the Middle of Nowhere among it, and fish come packed in
 ice from the coast. The market lanes are full of crates from elsewhere.
 **Exports:** power (charged batteries), inventions, legal and financial work,
 and hospitality.
@@ -317,7 +320,7 @@ unnamed: these forty-five are the people the hero meets.
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
 | **Elizabeth Reese** | the family's flat, Block 3, North Estate, 18th floor | lawyer, partner at Raman & Reese on Meridian Avenue | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. She defended Pinestein at the inquiry after the Blackout, and lost. |
-| **Dan Miller** | the same apartment | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at the Institute, the Windworks and the start-ups | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
+| **Dan Miller** | the same apartment | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at BLOCK, the Windworks and the start-ups | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
 | *(Jammer)* | away, at his grandmother's in the Middle of Nowhere | — | Their son; his room in the apartment is full of drawings of the farm. |
 
 Raman & Reese is named for its two partners, Priya Raman and Elizabeth.
@@ -360,7 +363,7 @@ in character and pointing nowhere:
 | **Sol Brant** | above his café | runs the breakfast café in Old Moy | Up before the sun, which the towers hide until mid-morning. |
 | **Mei Chan** | the market flats, with her daughter Lily | runs the noodle stall at the night market | Cooks at a stall her mother licensed forty years ago. |
 | **Hiro Sato** | above the store | keeps the all-night convenience store | Has not closed in eleven years and knows who comes in at 3 a.m. and why: Pinestein, most nights, for batteries. |
-| **Rosa Delgado** | the market flats | fishmonger at the wet market | Loud, funny, and the best judge of freshness in the city. Her fish come in on ice by the wasteland road, two days from the water, and she will tell you which day. |
+| **Rosa Delgado** | the market flats | fishmonger at the wet market | Loud, funny, and the best judge of freshness in the city. Her fish come in on ice by the west road, two days from the water, and she will tell you which day. |
 | **Wen Li** | the market flats | greengrocer at the wet market | Grows herbs on the market's roof and sells them below. Her best greens come from a farm in the Middle of Nowhere, and the crates carry its mark: Elizabeth's mother's farm. |
 | **Gideon Hale** | behind his shop | **the Helmsmith** | Makes helms for blorbs and their wearers; gruff, precise, and secretly delighted by every new customer. |
 | **Zara Quinn** | a studio on the market roof | sign painter | Paints the city's picture signs (no lettering, ever) and hangs them herself. |
@@ -379,8 +382,8 @@ in character and pointing nowhere:
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Palbert Pinestein** | a top-floor flat and laboratory in Old Moy, the roof bristling with antennas and coils | none, officially; dismissed from the Lumen Institute | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
-| **Dr. Vera Kask** | a downtown flat | director of the Lumen Institute | Pinestein's oldest colleague, and the one who dismissed Pinestein after the Blackout. Still keeps Pinestein's old notebooks locked in her office. |
+| **Palbert Pinestein** | a top-floor flat and laboratory in Old Moy, the roof bristling with antennas and coils | none, officially; dismissed from BLOCK | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
+| **Dr. Vera Kask** | a downtown flat | director of BLOCK | Pinestein's oldest colleague, and the one who dismissed Pinestein after the Blackout. Still keeps Pinestein's old notebooks locked in her office. |
 | **Omar Haddad** | a flat at the battery works | chief engineer of the Windworks wind farm | Climbs ninety-five metres to a nacelle before breakfast and calls it his commute. |
 | **Rafael Ortiz** | the keeper's house at the water works | keeper of the wells and the water works | Counts every litre the city uses twice, and has never once let the park's pond run dry. |
 
@@ -419,7 +422,7 @@ dialogue pass (Juno's second, Mara's first and Dax's second).
 in an experiment. They have since been outcast and are not allowed inside the
 city's bounds. **The rest is proposed.**
 
-- **The experiment.** Pinestein was the Lumen Institute's brightest
+- **The experiment.** Pinestein was BLOCK's brightest
   researcher in "living current", and wanted a creature that could live on
   the city's own light, so the city would never go dark again. The
   experiment made the city blorbs, saturated glassy azure, crackling and
@@ -475,14 +478,14 @@ city's bounds. **The rest is proposed.**
 | Moving goods without cars | Tomas | cargo trikes, hand trucks and service lifts; deliveries at dawn through the back lanes |
 | Power | Omar | the Windworks wind farm and battery works |
 | Water | Rafael | the wells, the water works and the roof tanks |
-| Research | Vera; Pinestein, alone | the Lumen Institute; Pinestein's rooftop lab |
+| Research | Vera; Pinestein, alone | BLOCK; Pinestein's rooftop lab |
 | Cheap, good food near home | Siti | the North Estate hawker centre |
 | Play | Lily, Kofi; the elders; Old Fu | the giant playground in the park; chess tables in the park and on the void decks; the tea house |
 
 **Utilities, with no cars:**
 - Water and power arrive underground.
 - Goods arrive by hand truck and cargo trike from a **goods yard** at the
-  east edge, where the wasteland road ends.
+  west edge, where the west road ends.
 - Waste leaves the same way at dawn.
 - Fire safety uses lane-side hydrants and the ramp towers as escape routes.
 
@@ -653,12 +656,16 @@ buildings.
    │  point and slab blocks on podiums · Estate Square and the │
    │  hawker centre on North Street                            │
    ├────────────┬─────────────────────────────┬────────────────┤
-W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E, outside:
-   │  lanes,    │ Square  giant playground Plaza│ Meridian Ave: │  goods yard,
-   │  cinema,   │ (library  tea house · chess   │ the Windspire,│  battery works
-   │  bath,     │  on its   pond          (hotel│ Tanglewire,   │◄── arrival by
-   │  clinic,   │  north)   — the Park Ring —  N, │ Lumen        │  the wasteland
-   │  police box│            museum (S)   hall S)│ Institute     │  road
+   W, outside:
+   goods yard,
+   battery works
+   ◄── the west road, out past the world's edge
+W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: desert,
+   │  lanes,    │ Square  giant playground Plaza│ Meridian Ave: │  then the
+   │  cinema,   │ (library  tea house · chess   │ the Windspire,│  main
+   │  bath,     │  on its   pond          (hotel│ Tanglewire,   │  plateau's
+   │  clinic,   │  north)   — the Park Ring —  N, │ BLOCK        │  cliff; no
+   │  police box│            museum (S)   hall S)│               │  road
    ├────────────┴─────────────────────────────┴────────────────┤
    │ THE MARKET LANES: Market Square on South Street, the wet  │
    │ market, the night market, the arcade, Helmsmith, school   │
@@ -692,11 +699,13 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E, out
     centre on its east side and void decks opening onto it.
   - **Cinema Square**, a small square in Old Moy where the Moonlight Cinema
     and the Pine Bath face each other.
-- **Arrival.** From the east, the wasteland road ends at the goods yard.
-  People cross the Rim Walk and walk in down **Meridian Avenue** (renamed
-  from Harbour Street: there is no harbour in a desert), the palm-lined main
-  street, between the skyscrapers, and the avenue opens onto **Civic Plaza**
-  and, past it, the park. The Grand Hotel's revolving door is on the plaza.
+- **Arrival.** Goods and travellers from the wider world come in by the
+  west road to the goods yard and walk in down West Street. The hero comes
+  on foot across the open desert, and any lane's gap in the Rim Walk lets
+  him in. From the plateau side the grand way in is **Meridian Avenue**
+  (renamed from Harbour Street: there is no harbour in a desert), the
+  palm-lined main street, between the skyscrapers, which opens onto **Civic
+  Plaza** and, past it, the park. The Grand Hotel's revolving door is on the plaza.
 - **The museum** faces the park from the Park Ring's south side.
 - **Old Moy** (west; renamed from Lantern Lane, user) is the old residential
   and craft quarter of lanes and pencil buildings either side of West
@@ -737,7 +746,7 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E, out
   skyscrapers of 140 to 220 m on podiums that fill their blocks, and the
   **Windspire**, the Windworks' headquarters, about 280 m tall with an
   observation deck. Here are Raman & Reese, Tanglewire's glass tower, the
-  start-up floors and the Lumen Institute. The Grand Hotel's guest tower
+  start-up floors and BLOCK. The Grand Hotel's guest tower
   rises on Civic Plaza at downtown's west end.
 
 ### Site and land
@@ -832,6 +841,8 @@ lit crowns.
 - Jammer is at his grandmother's in the Middle of Nowhere.
 - The city's name is **Moy**. No Sign Boneyard: the city blorbs simply stay
   outside the outskirts. No opulent fountains.
+- No road from the plateau side: nothing is there but rock. The research
+  institute is called **BLOCK**, not Lumen.
 - (sixth revision) Every block built out to its streets, no empty gaps; the
   park at the centre; new names for Lantern Lane and Parkside Estate; real
   streets without cars; several plazas.
@@ -861,10 +872,11 @@ lit crowns.
 - the site at a radius of 200 m;
 - the Pine Bath, the Moonlight Cinema, the museum and the
   police box;
-- the goods yard as the end of the wasteland road;
+- the goods yard at the end of the west road, which leaves through the
+  world's edge (no road east, user);
 - (third revision) the water story (deep wells, reclaimed water, roof tanks)
   and the water works;
-- the economy: the Windworks, the Lumen Institute, law and finance,
+- the economy: the Windworks, BLOCK, law and finance,
   hospitality; food imported from the farmland;
 - the Rim Walk as the bounds; the city blorbs and the City Gem in the desert
   just beyond it;
