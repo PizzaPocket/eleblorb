@@ -789,49 +789,50 @@ Full brief: `chinese_village.md` 4.1. Code when approved:
   lore is to be worked out further later; alternatives are parked in
   `chinese_village.md` 4.6.
 
-## 20. Ohio's water: tarn, mill, mains and leat (2026-10-12, fourth version, awaiting approval)
+## 20. Ohio's water: tarn, mill, mains and leat (2026-10-12, fifth version, awaiting approval)
 
-Full brief: `ohio.md` 3.4. Code when approved:
-- `scripts/terrain_generator.gd` (terrain only):
+Full brief: `ohio.md` 3.4, built to the 18 m terrain grid (`RESOLUTION` 101
+over 1,800 m). Code when approved:
+- `scripts/terrain_generator.gd` (whole cells only):
   - the tarn's sill moves from east to south;
   - the old mill bench is removed;
-  - a mill pad at 0.5 m at about (32,-104);
-  - a graded mill lane from 0.5 to 0, from the pad to (41,-50);
+  - a mill capsule at 0 from (30,-100) to (45,-52), flat radius 13, fixing
+    vertex (30,-106) so the earth dam face is one cell;
   - the overlook pad lowered from 2.0 to 0;
-  - a cliff-foot bay (bearings about +8° to +32°, vertical cliff, 12 m
-    floor shelving to a beach) included in `lake_coverage` and
+  - a cliff-foot bay (bearings about +8° to +32°) in `lake_coverage` and
     `_lake_surface_coverage`;
-  - fall corridor 0 moved to the Lip (about 13°), plunge pool only.
+  - fall corridor 0 moved to the flume (about 13°), keeping its one-cell
+    sheer face.
 - `scripts/ohio_plan.gd`:
-  - the sawmill at about (30,-104) with its long axis north–south and the
-    door east;
-  - the wheel pit at the north gable, the launder, sluice, spillway and
-    strainer;
-  - the leat course with water levels (0.5%), the slabs, the dipping place,
-    the horse trough, the Conduit house at (41,-15) and the Lip at (86,-9);
-  - the runnel and its culvert;
-  - the mains (recorded, not modelled), stopcock and fire-plug decals;
-  - Dorran's and Pip's spots and schedules; the tarn tree moved; the timber
-    yard moved.
-- Builders (`VillageWorks`):
-  - a masonry dam face with a wheel pit;
-  - an overshot wheel and launder;
-  - a stepped spillway;
-  - a stone leat channel;
-  - slab bridges;
-  - the Conduit house;
-  - the corbelled Lip with its fall on a true arc;
-  - the kerbed runnel.
+  - the sawmill at about (30,-94) with its long axis north–south and the
+    door west;
+  - the wheel race at (30,-104), the launder from the sluice at (30,-124),
+    and the spillway on the dam's east slope;
+  - the leat course with bed levels (0.75 → 0.05, 0.55%);
+  - the dipping place, horse trough and step-bridge;
+  - the Conduit house at about (42,-3);
+  - the mill road re-routed west of the water;
+  - the mains and the fountain drain recorded, not modelled; stopcock and
+    fire-plug decals;
+  - Dorran's and Pip's spots and schedules; the tarn tree and timber yard
+    moved.
+- Builders:
+  - reuse `VillageWorks.build_aqueduct` (a raised channel on footings) and
+    `_build_flume`/`_flume_reach`/`build_fall`;
+  - new: the timber launder on trestles, an above-ground wheel race with an
+    overshot wheel, the stepped spillway on a slope, the step-bridge, and
+    the Conduit house.
 - Interiors:
   - taps, sinks and basins;
   - the Holt Inn's flush toilet on the west main, with a septic tank under
     the inn yard;
   - fix `TownProps.build_dry_toilet()`'s comment and the `DryToilet` node
-    name, since Ohio's is a porcelain flush toilet with a cistern.
+    name.
 - Validator:
-  - bed levels fall all the way and the water stays below the kerbs;
-  - every crossing has a slab;
+  - the leat bed is at or above the ground at every sample and falls all the
+    way;
+  - no road crosses the leat, and footpath crossings have step-bridges;
   - nothing stands in a channel;
-  - the Lip projects at least 3 m over a vertical face.
-- Survey first: the dam face line, the mill lane, and `tools/ohio_cliff_probe`
-  after the overlook and bay changes. Needs Godot.
+  - the flume landing is water.
+- Survey first: the bed against `_ground_y` along the course, and
+  `tools/ohio_cliff_probe` after the overlook and bay changes. Needs Godot.
