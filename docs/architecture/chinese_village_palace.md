@@ -62,6 +62,13 @@ minute.
 - **Swept eave corners:** use the swept-roof prototype planned for the Sky
   Kingdom (see the settlement backlog). If it fails, the fallback is a straight
   hip with raised corner finials.
+- **Shihu Yuan details** (`chinese_village.md` 4.2a, from the user's photos):
+  painted *cǎihuà* beams with exposed rafters in the public halls; lacquered
+  beam-and-joist ceilings in the apartments; any level change inside a hall is
+  a ramp rising through a superellipse ceiling opening; hexagonal palace
+  lanterns with red tassels in the halls; silk lantern lamps on carved stands
+  at the records-room desks; canopy beds, yoke-back chairs and curio shelves in
+  the apartments; the garden entered by a moon gate.
 
 ## 3. Plan
 

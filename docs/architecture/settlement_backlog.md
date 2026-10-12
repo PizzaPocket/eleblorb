@@ -740,5 +740,15 @@ call, since the shop UI is where players read what an item is.
 - Code: `INNKEEPER_NAME` and the keeper's gender in `scripts/chinese_village.gd`
   (Lu is a man), Lu Hao as a resident, Liang Zhen's post-quest lines and look,
   Lu's community-kitchen placement in the civic state.
-- Open: Lu's given name; Lu Hao's characters and age.
+- Lu Hao is an adult son (user, 2026-10-12).
+- Shihu Yuan photos (2026-10-12) are recorded in `chinese_village.md` 4.2a:
+  moon gates and square/octagonal openings as Boolean cuts, mixed brick-pier
+  and plaster walls with wave copings, brick lattice screens, painted beams
+  and lacquered joist ceilings, ramps through superellipse ceiling openings,
+  lantern lamps, canopy beds, yoke-back chairs, rockery, lotus pond and
+  hexagonal pavilions. Needs builders in `TownProps`/`NatureProps`: moon gate,
+  lattice screen, wave coping, hexagonal pavilion, scholar's rock on plinth,
+  cloud-pruned pine, palace lantern, silk table lamp.
+- Open: Lu's given name; Lu Hao's characters (吕浩 assumed); the homes' wall
+  system (mixed brick and plaster proposed).
 

@@ -156,7 +156,7 @@ Children are placed in households first, then the adults around them.
 | West end | Shu Mei (elder), Pei (child, her grandchild) | Waymarker, trims the entry bridge lamps | None directly | Counts posts to stay occupied |
 | Roofer | Wen Zhao (adult) | Roofer, finishes his grandfather's work | Palace roof upkeep | Single, the children follow him around |
 | Farm | Tian Bo (elder), Pandy | Beans and bamboo shoots | The land levy | Fears for the island's last terraces |
-| Inn and restaurant | **Lu (吕)** (adult; given name to choose), proprietor and cook, and his son **Lu Hao** (age to set), who have run the inn and its restaurant from the beginning; Chen lodges here | Innkeeper, cook and restaurant | Before the quest, none; after it, Lu cooks the village's communal meals | Few guests, mostly Chen's trade and Bo Xiang's contacts; the restaurant feeds the village on market days |
+| Inn and restaurant | **Lu (吕)** (adult; given name to choose), proprietor and cook, and his adult son **Lu Hao**, who have run the inn and its restaurant from the beginning; Chen lodges here | Innkeeper, cook and restaurant | Before the quest, none; after it, Lu cooks the village's communal meals | Few guests, mostly Chen's trade and Bo Xiang's contacts; the restaurant feeds the village on market days |
 | Stall | Chen (adult) | Peddler and vendor, lives at the inn | Pays nothing, sells only what the village makes | Keeps the village's route open to outsiders |
 | Palace | Liang Zhen (Emperor before the quest), the Royal Chef | Rulership and kitchen before the quest; civic centre and community kitchen after it, with Liang Zhen as advisor | The centre of the levy and later the village's shared house | The Chef's secret; Liang Zhen's long-buried good sense |
 
@@ -320,32 +320,119 @@ paired deck and apron heights that the validator checks.
 
 ### 4.2a Precedent: Shihu Yuan (十笏园), Weifang (added 2026-10-12)
 
-The user visited Shihu Yuan in Weifang, Shandong, and brought back
-architectural inspiration. It is a small classical garden and residence of
-the late Qing. Its name, "ten tablets", means it is tiny, and it is known for
-fitting a great deal of garden into very little ground. What it offers this
-village, pending the user's own notes and photos:
+The user visited Shihu Yuan in Weifang, Shandong, and brought back thirteen
+photographs. Shihu Yuan is a small classical garden and residence of the late
+Qing. Its name means "ten tablets", a way of saying it is tiny, and it is known
+for fitting a great deal of garden into very little ground. That suits a
+village of small islands. The photographs show the elements below, and each is
+given the place it will be used.
 
-- **Northern rather than southern character.** Grey brick walls, grey tile,
-  restrained roof curves and plainer timber, unlike Suzhou's white walls and
-  sharp upturns. This suits the village's small scale, and it suits the engine,
-  since gentle eave curves are far easier to build in SuperEgg slabs than
-  dramatic upturned corners.
-- **Much in little.** A pond at the heart with a pavilion over the water,
-  rockeries, a small bridge, and covered corridors (*yóuláng*) running along
-  the walls to link the rooms. Lattice windows (*lòuchuāng*) frame glimpses
-  from one court into the next.
-- **Courts in sequence.** The residence is a chain of small courtyards
-  entered one from another, a legitimate pass-through by tradition.
+**Character.** Northern rather than southern: grey brick, grey tile,
+restrained roof curves and plain timber, with colour kept for the beams,
+columns and railings. Gentle eave curves are also far easier to build from
+SuperEgg slabs than Suzhou's sharp upturned corners.
 
-**Proposed uses:**
-- the royal garden's four framed views (4.4), built as a compact Shihu-style
-  garden around one pond;
-- the inn's courtyard;
-- covered corridors and lattice windows along the island homes' yard walls.
+**Walls.** The photographs show a mixed wall, not all brick and not all
+plaster:
+- a grey brick plinth (a dado about 0.9 m high) under every wall;
+- grey brick piers at the corners and openings, framing white plaster panels
+  between them;
+- a grey tile coping along the top of yard walls, laid in wave or scalloped
+  patterns;
+- brick lattice screen walls, where bricks are laid with gaps in a pattern so
+  the wall lets air and glimpses through. These are used for the inn's
+  courtyard and the yard walls between neighbours.
 
-**Proposed charter change, for the user to confirm:** move the homes from
-white plaster to the northern grey brick, with plaster only on inner walls.
+Build: the plinth, piers and coping are squarish SuperEgg slabs with blocking
+collision. A lattice screen is one blocking box collider with a decorative
+mesh of bricks and gaps, so the player cannot snag in the holes. A wave coping
+is decorative trim on top of the wall's collider.
+
+**Gates and openings.** Round and square shapes set into the plaster:
+- **Moon gates** (*yuèdòngmén*), full circles about 2.2 m across with a level
+  threshold cut into the bottom of the circle, so the floor runs through at
+  ground level and the gate is a step-free route (as the ramp convention
+  requires). Used at the royal garden's moon-gate court (4.4), between the inn
+  courtyard and its back court, and as the palace garden's entrance.
+- **Square and octagonal openings** with green-painted frames, set at sill
+  height as windows or at floor level as doorless passages in a garden wall.
+- **Round lattice windows** (*lòuchuāng*) about 1 m across, filled with
+  geometric or plant-pattern lattice, so each court shows a glimpse of the
+  next.
+- Doorways keep their framed superellipse opening and hung leaf (architecture
+  skill); moon gates and garden openings are doorless passages and are the
+  exception, as they are in Shihu Yuan.
+
+Build: every opening is a CSG Boolean cut through the wall's SolidModel, so
+the hole and its collider match. Frames are a ring or square of squarish
+SuperEgg trim.
+
+**Ceilings and structure.** Two kinds appear, and both stay visible rather
+than being hidden behind a flat ceiling:
+- **Painted beams** (*cǎihuà*) in the open halls and corridors: green and blue
+  patterned beams under exposed round rafters and the underside of the tiles.
+  Used in the covered corridors, the garden pavilions, the inn's common room
+  and the palace's public halls.
+- **Lacquered beam-and-joist ceilings** in upper rooms: dark red-brown beams
+  carrying close-set round joists and floorboards. Used in the inn's upper
+  floor, the homes' lofts and the palace apartments.
+
+Build: beams are squarish SuperEggs, rafters and joists round ones in rows
+from one shared mesh. All are decorative except where a beam is low enough to
+be walked into, and nothing hangs below the 2.2 m headroom.
+
+**The stair through the ceiling.** The photographs show a steep wooden stair
+rising straight into a rectangular opening in the beamed ceiling above. Our
+levels use ramps, not stairs. The translation is:
+- a ramp of 32° or less, with landings of 1.2 m or more, along one wall;
+- it rises through a superellipse opening in the upper floor, framed by the
+  joists the way the photo's stair hole is, with a railing on the open sides
+  upstairs;
+- the opening is long enough that a character walking up the ramp keeps
+  2.2 m of headroom the whole way.
+
+Used in the inn (to its upper floor), and any two-storey home or palace
+apartment.
+
+**Interiors.** Furniture and lamps from the photographs, assigned by room:
+
+| Item | Where |
+|---|---|
+| Silk lantern lamps on carved wooden stands (desk and table lamps) | the inn's tables, Mei Lian's workroom, the palace records room and Liang Zhen's desk |
+| Carved hexagonal palace lanterns with red tassels, hung from beams | the palace halls, the inn's common room (one over the counter) |
+| Canopy bed (*jiàzichuáng*) with curtains | the palace apartments; one guest room at the inn; elders' bedrooms |
+| Yoke-back armchairs (*guānmàoyǐ*) in pairs | the palace audience hall and records room; the inn's best table; the chief's receiving room after the quest |
+| Square tables (*bāxiānzhuō*, "eight immortals" tables) with benches or stools | the inn's common room; every home's main room |
+| Curio shelves (*duōbǎogé*) of irregular compartments | the palace records room; Liang Zhen's quarters; Mei Lian's house |
+| Couplet boards (*duìlián*) either side of a door or hearth | painted as pattern only, never readable text (no text in the world) |
+| Lattice windows with cloth curtains and a fringed valance | bedrooms and the inn's guest rooms |
+| Grey brick dado inside, plaster above | main rooms of homes and the inn |
+
+**Garden.** The heart of Shihu Yuan, and the model for the royal garden
+(4.4) and, at smaller scale, the inn's courtyard:
+- a lotus pond with a shelving stone edge, a small bridge, and a pavilion at
+  the water;
+- a rockery (*jiǎshān*) of piled weathered stone with a small waterfall into
+  the pond, and a path that climbs it (a parkour landing on top);
+- small hexagonal pavilions with green columns and red railings;
+- cloud-pruned pines (*yúnsōng*) beside the pavilions and gates;
+- scholar's rocks (*gōngshí*) standing alone on carved stone plinths;
+- paving in hexagonal stone and in pebble mosaic along the paths;
+- covered corridors (*yóuláng*) along the walls linking one court to the next.
+
+Collision: the rockery, plinths, pavilion floors and railings are solid (the
+rockery top and pavilion roofs as parkour landings); the waterfall and the
+pond surface use the hazard/liquid surface API; pine foliage tips are
+decorative with solid trunks.
+
+**Courts in sequence.** Shihu Yuan is a chain of small courts entered one
+from another. The inn (front court, common room, back court) and the palace
+garden follow that chain; homes keep one court each.
+
+**Proposed charter change, for the user to confirm:** the homes adopt the
+mixed wall above (grey brick plinth and piers, white plaster panels, grey
+tile coping) in place of all-white plaster on a stone plinth. Red timber
+columns, grey or green tile and the modest roof curve stay.
 
 ### 4.3 Palace
 
@@ -372,6 +459,10 @@ white plaster to the northern grey brick, with plaster only on inner walls.
 Four framed views along the axis: a moon-gate court with a pomegranate tree, a
 pond with a zigzag bridge and a pavilion, a rock garden of weathered stones, a
 bamboo screen and bench court. Stone paths link them, with one pause each.
+The garden is built in the Shihu Yuan manner (4.2a): the pond gains a rockery
+and waterfall and a hexagonal pavilion, the courts are joined by covered
+corridors and moon gates, and scholar's rocks and cloud-pruned pines mark the
+pauses.
 
 ### 4.5 Bamboo
 
@@ -537,7 +628,7 @@ the character-design skill and a code comment say gold. It is red.
 | **The Royal Chef** | as built |
 | **Tian Bo** (farmer, elder, later chief) | bald; *dǒulì*; a muted-green short jacket with brown edge binding, rolled sleeves, trousers tied at the ankle; a *chángshān* in grey on civic days |
 | **Lu (吕)** (innkeeper and cook) | an indigo *duǎndǎ* with sleeves bound back, a long white apron, a cloth over one shoulder; a topknot wrap |
-| **Lu Hao** (his son) | a light-indigo short jacket with red edge binding, the inn's colour; a serving cloth at his sash; a small topknot |
+| **Lu Hao** (his adult son) | a light-indigo short jacket with red edge binding, the inn's colour; a serving cloth at his sash; a small topknot |
 | **Chen** (peddler) | a travelling *chángshān* in brown, hitched up by a sash; a pack frame; a cloth head wrap |
 | **Mei Lian** (lantern maker, elder) | a black *kǎnjiān* over a grey long-sleeved *ǎo*; a red-paper smudge on her sleeve; grey bun with a wooden pin |
 | **Jin Wei** (her daughter) | a light-indigo *ǎo* with jade binding, trousers; sleeves bound back with a cord for lantern work |
