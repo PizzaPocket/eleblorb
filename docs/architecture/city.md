@@ -690,8 +690,8 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
   - the **giant playground** at its heart;
   - Old Fu's tea house and the chess tables;
   - the pond, and shade trees on reclaimed water;
-  - **Garden Row**, a short row of older townhouses, faces it from the
-    north-west.
+  - **Garden Row**, a short row of three older townhouses, faces it from
+    the north, at the corner of North Street.
 
   Every district touches the Park Ring, so the park is the city's common
   ground, and the Deck runs round it.
@@ -759,12 +759,17 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
 ### Building schedule (proposed, 2026-10-12)
 
 Every building in Moy is planned (user). The plan in the visualization draws
-each one: about 470 ordinary buildings, one per lot, built shoulder to
+each one: about 420 ordinary buildings, one per lot, built shoulder to
 shoulder along the streets (homes over shops in Old Moy and the market
 lanes, podiums and shops round the estate towers, office podiums downtown),
 and the 48 numbered buildings below. Ordinary lots run 6 to 10 m of frontage
 by about 16 m deep, with small garden courtyards inside the deeper blocks.
 Footprints are true; positions are schematic until the measured layout.
+
+**Every building fronts a street** (user): each one, numbered or not, has
+at least one face on a street, lane, square or the Park Ring, where its
+door is. Nothing is landlocked inside a block; the only ground inside a
+block is a courtyard shared by the buildings round it.
 
 Raman & Reese and Tanglewire share the glass tower on Meridian Avenue.
 The start-up floors are in the north tower. Dr. Kask's flat is in the south
@@ -783,13 +788,13 @@ round the park and on Civic Plaza.
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 1 | Grand Hotel | 60 × 66 m | podium 4 storeys, guest tower 25 floors (97 m) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
-| 2 | City hall | 60 × 64 m | 4 storeys and a clock tower | Mayor Teodora Vance, Kenji Mori (clerk) |
+| 1 | Grand Hotel | 60 × 68 m | podium 4 storeys, guest tower 25 floors (97 m) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
+| 2 | City hall | 60 × 68 m | 4 storeys and a clock tower | Mayor Teodora Vance, Kenji Mori (clerk) |
 | 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m | the Windworks (headquarters, observation deck) |
 | 13 | Glass tower | 35 × 35 m | about 45 storeys | Raman & Reese (Elizabeth, Priya, Venn); Tanglewire (Dan) |
 | 14 | North tower | 35 × 35 m | about 45 storeys, 175 m | start-up floors (Theo Park) |
 | 15 | South tower | 35 × 35 m | about 40 storeys | flats over offices; Dr. Vera Kask |
-| 16 | BLOCK | 22 × 38 m | 6 storeys, research labs | Dr. Vera Kask (director) |
+| 16 | BLOCK | 22 × 22 m | 6 storeys, research labs | Dr. Vera Kask (director) |
 
 **North Estate**
 
@@ -800,7 +805,7 @@ round the park and on Civic Plaza.
 | 19 | Block 3 | 22 × 22 m | point block, 36 storeys | Elizabeth, Dan and Jammer (18th floor); Juno Rell (20th) |
 | 20 | Block 4 | 22 × 22 m | twin point block, 40 storeys; sky bridge and sky garden at 26th floor | homes (no one the hero meets) |
 | 21 | Block 5 | 22 × 22 m | twin point block, 40 storeys | Dr. Imani Osei and Kofi |
-| 22 | Block 6 | 40 × 14 m | slab block, 14 storeys | homes (no one the hero meets) |
+| 22 | Block 6 | 14 × 48 m | slab block, 14 storeys, on Estate Square | homes (no one the hero meets) |
 | 23 | Hawker centre | 30 × 28 m | 1 storey, open-sided | Siti's laksa stall |
 | 24 | Garden Row | 21 × 16 m | 3 townhouses, 3 storeys | Teodora Vance; Ada Fong and Sora Ishida; Priya Raman |
 
@@ -808,8 +813,8 @@ round the park and on Civic Plaza.
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 3 | Library | 44 × 49 m | 5 storeys, terraced atrium | Ada Fong, Nia Calder, Benji Okoro |
-| 5 | Moonlight Cinema | 28 × 24 m | 2 storeys; flat above | Leon Duarte (lives above) |
+| 3 | Library | 45 × 55 m | 5 storeys, terraced atrium | Ada Fong, Nia Calder, Benji Okoro |
+| 5 | Moonlight Cinema | 30 × 28 m | 2 storeys; flat above | Leon Duarte (lives above) |
 | 6 | Police box | 6 × 8 m | 1 storey, back room | Kate Byrne |
 | 7 | Clinic | 14 × 18 m | 3 storeys; flat above | Dr. Arjun Mehta (lives above) |
 | 25 | Sol's café | 16 × 10 m | 3 storeys; flat above | Sol Brant |
@@ -825,11 +830,11 @@ round the park and on Civic Plaza.
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 4 | Natural history museum | 60 × 34 m | 3 storeys, top-lit hall | Dr. Imani Osei (curator) |
-| 8 | Primary school | 17 × 28 m | 3 storeys, roof playground | Yuki Hayashi (teacher); Lily, Kofi |
-| 33 | Wet market | 36 × 36 m | 2 storeys; sign studio on the roof | Rosa Delgado, Wen Li; Zara Quinn (roof studio) |
-| 34 | Market flats | 28 × 20 m | tong lau, 8 storeys | Mei and Lily Chan, Rosa, Wen, Pia Rowe |
-| 35 | Wing Fat Mansion | 32 × 24 m | mansion block, 22 storeys on a podium | Ah Keung, Iris Dune, Nia Calder, Venn Harlow, Dax Merrow, Bea and Wilfred Ho |
+| 4 | Natural history museum | 62 × 38 m | 3 storeys, top-lit hall | Dr. Imani Osei (curator) |
+| 8 | Primary school | 19 × 32 m | 3 storeys, roof playground | Yuki Hayashi (teacher); Lily, Kofi |
+| 33 | Wet market | 40 × 40 m | 2 storeys; sign studio on the roof | Rosa Delgado, Wen Li; Zara Quinn (roof studio) |
+| 34 | Market flats | 28 × 28 m | tong lau, 8 storeys | Mei and Lily Chan, Rosa, Wen, Pia Rowe |
+| 35 | Wing Fat Mansion | 32 × 26 m | mansion block, 22 storeys on a podium | Ah Keung, Iris Dune, Nia Calder, Venn Harlow, Dax Merrow, Bea and Wilfred Ho |
 | 36 | Vertical farm | 22 × 24 m | windowless, 12 storeys of growing racks | Sora Ishida |
 | 37 | All-night store | 8 × 12 m | 5 storeys; flat above | Hiro Sato |
 | 38 | Helmsmith | 10 × 12 m | 2 storeys; home behind | Gideon Hale |
