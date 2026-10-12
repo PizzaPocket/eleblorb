@@ -789,38 +789,42 @@ Full brief: `chinese_village.md` 4.1. Code when approved:
   lore is to be worked out further later; alternatives are parked in
   `chinese_village.md` 4.6.
 
-## 20. Ohio: the aqueduct through the village (2026-10-12, awaiting approval)
+## 20. Ohio: the aqueduct through the village (2026-10-12, third version, awaiting approval)
 
 Full brief: `ohio.md` 3.4. Code when approved:
-- `scripts/terrain_generator.gd`:
-  - a **cliff-foot bay**: bearings about +8° to +32°, water 55 m out, a
-    vertical cliff (hard step, no slope or corridor smoothing), a floor 12 m
-    deep at the foot shelving to a beach;
-  - the bay included in `lake_coverage` and `_lake_surface_coverage`;
-  - fall corridor 0 moved to the mouth (about 13°), plunge pool only;
-  - `MILL_PAD_LEVEL` raised from 3.5 to 6.3.
+- `scripts/terrain_generator.gd` (terrain only, no added meshes):
+  - the tarn's sill moves from east to south;
+  - the long mill bench at (75,-142..-84) is removed;
+  - a new mill pad at 3.5 m at the foot of the tarn's south bank, about
+    (34,-111);
+  - a **cliff-foot bay** (bearings about +8° to +32°, water 55 m out, a
+    vertical cliff, a floor 12 m deep shelving to a beach), included in
+    `lake_coverage` and `_lake_surface_coverage`;
+  - fall corridor 0 moved to the mouth (about 13°), plunge pool only.
 - `scripts/ohio_plan.gd`:
-  - a new course with a water level per point at 0.3% grade;
-  - the wheel at the west end of the mill's north wall;
-  - the arcade west of the mill road, the Conduit tower at (41,-14), the
-    gate arch over the mill road, the east road arcade, and the mouth 3 m
-    beyond the rim at (86,-9);
+  - the sawmill moves to about (30,-112) as a bank mill, with its wheel on
+    the west wall and its door east;
+  - the race over the dam;
+  - the arcade from the wheel pit to (41,-60) and down x = 41, the Conduit
+    tower at (41,-15), the gate arch, the east road arcade, and the mouth at
+    (86,-9);
+  - a water level per point at 0.3% grade;
+  - the mill road re-routed north along x ≈ 45 to the mill's east door;
   - the fountain pipe, the runnel, the dipping place, the horse trough, and
-    the grate and culvert to a cliff spout.
+    the culvert to a cliff spout;
+  - Dorran's and Pip's spots and schedules moved; the tarn tree at (22,-120)
+    moved; the old timber yard moved to the new mill.
 - Builders (`VillageWorks`):
-  - an aqueduct arcade with piers sized from the ground profile, a string
-    course, a trough and a coped parkour parapet;
+  - an aqueduct arcade with piers sized from the ground profile;
   - a corbelled spout;
   - a conduit tower;
   - the kerbed runnel;
   - the fall on a true arc;
-  - slab crossings on the bench.
+  - a bank-mill foundation.
 - Validator:
   - bed levels fall all the way;
-  - arch clearances over ways (cart 4.5 m, foot 2.6 m);
+  - arch clearances over ways;
   - nothing in an arch opening or channel;
   - the mouth projects at least 3 m over a vertical face.
-- Survey first: a ground profile along the arcade line (pier heights), then
-  `tools/ohio_cliff_probe` after the terrain change. Needs Godot.
-- NPCs: Tam's round along the arcade, Brinna's dipping place, the children's
-  stick race.
+- Survey first: ground profiles along the arcade line and across the mill's
+  slope, then `tools/ohio_cliff_probe` after the terrain change. Needs Godot.

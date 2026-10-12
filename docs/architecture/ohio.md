@@ -126,7 +126,7 @@ Organising idea: a **headland village on one axis**. Travellers enter at the wes
 
 Gateway as described under Nodes. Built so far: the lantern piers, the stone-ringed sign island, windows either side of the inn's hearth stack on both floors, a stepped chimney breast, a woodstack, a bench and a trellis with a climber on the inn's roadside gable. Open: lamps along the main street; the inn's roadside forecourt may want its own small cobbled apron.
 
-### 3.4 The aqueduct through the village (proposed 2026-10-12, revised)
+### 3.4 The aqueduct through the village (proposed 2026-10-12, third version)
 
 **The problem.** The water goes from the tarn to the mill and straight over the
 rim at (83,-102), 100 m north of the green and out of sight of it. It ends
@@ -135,17 +135,28 @@ Below the overlook and the rest of the village's rim, the cliff drops to dry
 gorge floor, because the lake begins at world x = 220 and its west end fades
 in over 48 m (`lake_coverage`'s `eastward` ramp).
 
-**The fix (user direction).**
-- Widen the lake along the foot of the cliff so that it wraps the rim under
-  the village.
-- Keep the mill out by the tarn.
-- Carry the water into Ohio as a raised aqueduct that holds almost all of
-  its height by falling at a slight grade.
-- Pass it by the fountain and out along the east road.
-- Open its mouth directly over the lake, projecting off the cliff, beside
-  the overlook.
+**What the user asked for:**
+- widen the lake along the cliff foot under the village;
+- bring the water through Ohio as an aqueduct, holding its height with a
+  slight grade;
+- feed the fountain;
+- open the mouth directly over the lake, projecting off the cliff;
+- keep the mill out by the reservoir;
+- make every change of ground in the terrain itself, never with an added
+  mesh.
 
-The aqueduct becomes the village's landmark.
+**Why the second version did not make sense.** It kept the tarn's east sill
+and the mill on the cliff edge at (75,-95). So:
+- the water ran 45 m east to the mill, doubled back 80 m south-west to the
+  village, then went 40 m east again to the same cliff;
+- the mill sat right above the lake, where the water would naturally just
+  fall;
+- it held its height only by raising the mill's ground 2.8 m.
+
+**This version** turns the tarn's outlet to the south, toward the village. It
+puts the mill on the tarn's own south bank, where the ground is already high,
+and runs the water in one plain L: south to the village, then east to the
+cliff.
 
 #### Precedents
 
@@ -159,141 +170,155 @@ The aqueduct becomes the village's landmark.
 | **Drake's Leat, Plymouth** (1591): an open channel off Dartmoor with a mill on its course | The low channel on the mill bench |
 
 **Gradient.** English leats fall about 1 in 1,000 to 1 in 300, and Roman
-aqueducts about 1 in 4,000 to 1 in 200. Ohio's falls **1 in 330 (0.3%)**:
-0.6 m over its whole 200 m. Only the mill's wheel takes a real drop, 0.6 m.
-So water that leaves the tarn at 8 m arrives at the cliff still about 6.6 m
-above the village floor.
+aqueducts about 1 in 4,000 to 1 in 200. Ohio's falls **1 in 330 (0.3%)**,
+about 0.4 m over the 135 m from the mill to the cliff. The wheel is the only
+real drop: 1 m, on a wide low-breast wheel of the kind that ran many English
+low-head mills. Water leaves the tarn at 8 m and arrives at the cliff still
+about 6.5 m above the village floor.
+
+#### The mill moves to the tarn's south bank
+
+- **Where.** The mill stands at about (30,-112), with its north gable 6 m from
+  the water's edge, about 115 m from the green. It is out by the reservoir,
+  and no further from the village than before.
+- **Why there.** The terrain already rises toward the tarn. The bank stands
+  1.6 m above the water and relaxes into the natural hills over 22 m, so the
+  ground under the mill falls about 4 m from north to south.
+- **A bank mill.** It is built into that slope, the English way: its north
+  wall retains the bank, and the dam top runs behind it.
+- **Floors.** The cart floor is at 3.5 m on a terrain pad at the slope's
+  foot, with the door on the east side facing the mill road. The upper floor
+  meets the dam top.
+- **Wheel and race.** A short stone race leaves the tarn's new **south sill**,
+  crosses the dam beside the mill, and drops 1 m over the wheel on the mill's
+  west wall. The tail leaves the wheel already at 6.95 m, high above the
+  falling ground, so the aqueduct starts straight from the wheel pit.
+- **Old site.** The old mill site and its long bench at (75,-95) return to
+  natural hill.
 
 #### Heights along the course (local metres)
 
 | Point | Ground | Water | Structure |
 |---|---|---|---|
-| Tarn sill (47.5,-142) | 7.2 sill | 8.0 | the stone cheeks and headgate |
-| On the mill bench (65,-140) | 6.3 | 7.8 | a stone-kerbed channel in the bench; no chute any more |
-| Above the wheel (70,-104) | 6.3 | 7.6 | a short stone shoot, 0.6 m drop |
-| Below the wheel (69,-102) | 6.3 | 7.0 | tailrace along the mill's north wall, then down its west side |
-| Leaving the bench (61,-86) | about 6 | 7.0 | a low wall about 1 m high |
-| Beside the mill road (50,-55) | 2 to 3, survey | 6.9 | arcade rising to 4–5 m |
-| Village edge (43,-40) | 0 | 6.8 | full arcade |
-| **The Conduit** (41,-14) | 0 | 6.75 | conduit tower at the turn |
-| Arch over the mill road's mouth (45.5,-12.5) | 0 | 6.74 | the gate arch |
-| Along the east road (63,-9) | 0 to 1 | 6.7 | arcade |
-| The rim (83,-9) | about 2 | 6.63 | last pier at the cliff lip |
-| **The mouth** (86,-9) | over the lake | 6.62 | corbelled spout 3 m out from the rim |
+| Tarn | | 8.0 | new south sill at about (30,-124.5) |
+| Race at the wheel (24.5,-114) | bank, about 7 | 7.95 | stone race across the dam |
+| Below the wheel | about 4 to 5 | 6.95 | wheel pit; the arcade starts here |
+| (41,-60) | natural hill, survey | 6.81 | arcade, height set by the survey |
+| **The Conduit** (41,-15) | 0 | 6.67 | conduit tower at the turn |
+| Gate arch over the mill road (45.5,-13) | 0 | 6.66 | 4.5 m arch, 5.3 m clear |
+| Along the east road (63,-9) | 0 to 1 | 6.60 | arcade |
+| The rim (83,-9) | about 2 | 6.54 | last pier at the cliff lip |
+| **The mouth** (86,-9) | over the lake | 6.53 | spout 3 m beyond the rim |
 | Lake | | −61.65 | a fall of about 68 m |
 
-The arcade in the village is therefore about **6 m high to the trough**:
+**In the village the arcade is about 6 m to the trough:**
 - 4 m arches on 1.2 m piers;
-- semicircular arches springing at about 3.6 m, crowns about 5.6 m;
+- semicircular arches springing at 3.5 m, with crowns at 5.5 m;
 - above them a string course, the trough (water 0.4 m deep), and a coped
-  parapet to about 7.2 m.
+  parapet to about 7.1 m.
 
-It stands lower above the overlook terrace (about 4.4 m to the trough) and
-on the mill bench (about 1 m).
-
-**One terrain change at the mill:** the mill bench is raised from 3.5 m to
-**6.3 m** (`MILL_PAD_LEVEL`), so the race runs at ground level past the wheel
-and the water keeps its height. The mill road climbs 6.3 m over about 85 m
-(7.4%, a fair cart grade). The mill stays where it is, about 120 m from the
-green and 65 m from the tarn, out by the water as before.
+A cart 2.6 m wide has 5 m of clearance under any arch. It stands about 4.5 m
+above the overlook terrace, and is low where it leaves the mill.
 
 #### The course
 
-1. **Tarn to mill.** From the sill along the bench in a kerbed channel to the
-   mill. The wheel moves to the west end of the north wall (about (69,-102))
-   and its drive gear moves with it, because the rim is too close to the
-   mill's east side for the water to turn south there.
-2. **Down beside the mill road.** The tailrace runs down the mill's west side,
-   west of the timber yard, and stays **west of the mill road** all the way
-   down. It never has to cross the road while it is low. It rises from a
-   low wall on the bench to an embankment, then to an arcade as the ground
-   falls toward the village. The survey sets each pier's height. Where it
-   stands lower than 2.2 m clear, it is a wall; the hills west of it stay
-   reachable by jumping the low channel, or through a culvert about every
-   40 m.
-3. **The Conduit** (41,-14): a square stone conduit tower at the corner where
-   the market street meets the mill road, opposite Tam's door. It is the
-   aqueduct's turn. A cistern at the top divides the water: the main flow
-   turns east, and a lead pipe drops inside the tower and runs under the
-   market street to the fountain. Tam holds the key.
-4. **The gate arch.** The aqueduct crosses the mill road's mouth on one wider
-   arch, 4.5 m clear across and 5.4 m high. The mill road now begins through
-   an arch, which marks where the village ends and the way to the mill starts.
+1. **The south sill and the mill.** The race leaves the tarn's south side,
+   crosses the dam and turns the wheel on the mill's west wall.
+2. **Down to the village.** From the wheel pit the arcade runs south-south-east
+   to (41,-60), passing south of the mill's gable, then due south along
+   x = 41.
+   - It passes east of the smithy (whose east wall is at x 31.8).
+   - It stays west of the mill road, which keeps its start at Tam's door
+     and now runs north along x ≈ 45 to the mill's east door.
+   - So the road and the water never cross near the mill, where the
+     arcade is low.
+3. **The Conduit** (41,-15): a square stone conduit tower at the turn, at
+   the head of the market street opposite Tam's door. A cistern at the top
+   divides the water. The main flow turns east, and a lead pipe drops inside
+   the tower and runs under the market street to the fountain. Tam holds the
+   key.
+4. **The gate arch.** The aqueduct crosses the mill road's mouth high, on one
+   wider arch. The mill road begins through it.
 5. **The east road.** The arcade runs along the north side of the east road,
    about 3 m back from its edge. It passes north of the overlook's old tree
    at (72,-2.5) and the terrace (whose north edge is at z −4.1), and reaches
    the rim at (83,-9).
-6. **The mouth.** The last pier stands at the cliff lip. Beyond it the trough
-   carries on for 3 m on stepped stone corbels and ends in a plain lip, so
-   the mouth opens directly over the lake. The water leaves at walking pace,
-   about 1 m/s, and falls about 68 m along a true arc. It lands about 6.7 m
-   out from the cliff face, in full view of the overlook's benches. The
-   overlook keeps its rule of no rim wall.
+6. **The mouth.** The last pier stands at the cliff lip. The trough carries on
+   3 m beyond it on stepped stone corbels and ends in a plain lip directly over
+   the lake. The water leaves at about 1 m/s, falls about 68 m along a true
+   arc, and lands about 6.7 m out from a vertical face, in view of the
+   overlook's benches. The overlook keeps its rule of no rim wall.
 
 #### The fountain and the runnel
 
-- **The fountain** is fed by the lead pipe from the Conduit with about 6.5 m
-  of head, enough for a real jet. It stays at the origin with the Water Gem.
+- **The fountain** is fed by the lead pipe from the Conduit, with about
+  6.5 m of head, enough for a real jet. It stays at the origin with the
+  Water Gem.
 - **The runnel.** Its basin overflows into a stone-kerbed street runnel
   (0.5 m wide, 0.25 m deep) along the south side of the market street. The
   stalls are on the north side and are left clear.
-  - A dipping place with two stone steps opposite the forge, where Brinna
-    draws quench water.
+  - A dipping place opposite the forge, where Brinna draws quench water.
   - A horse trough by the east road.
 - **The culvert.** At the end of the runnel the water drops through a grate
   into a buried culvert. The culvert runs under the east road and the
-  overlook at a steady grade, and comes out of the cliff face below the
-  aqueduct's mouth as a thin second spout. The overlook ground does not
-  need to change.
+  overlook at a steady grade and comes out of the cliff face below the
+  aqueduct's mouth as a thin second spout. The overlook's ground does not
+  change.
 
 #### How the village moves around it
 
 | Crossing | How |
 |---|---|
-| Mill road at its mouth | under the gate arch, 4.5 m wide, 5.4 m clear (carts pass) |
-| From the east road to Tam's stone yard and the meadow north of it | under any arch of the east road arcade (4 m wide, about 5 m clear in the middle third) |
-| The village edge along the mill road | under any arch; the arcade is open, not a wall |
-| Mill bench (low channel) | stone-slab crossings at the mill door and timber yard; elsewhere step over |
-| Runnel | step through it, or on slabs where a path crosses |
-| Along the top | the parapet coping is a parkour landing, so a player can walk the aqueduct from the mill to the mouth, and dive 68 m into the lake; the trough water uses the liquid surface API |
+| Mill road at its mouth | under the gate arch, 4.5 m wide and 5.3 m clear, so carts pass |
+| Mill road near the mill | no crossing: the road runs east of the water all the way |
+| East road to Tam's stone yard and the meadow beyond | under any arch of the east road arcade |
+| Behind the smithy and the hall | under any arch; the arcade is open, not a wall |
+| Near the mill, where the arcade is low | it starts at about 2 m clear, so it is a wall for its first few bays; nothing needs to cross there |
+| Runnel | step through, or on slabs where a path crosses |
+| Along the top | the parapet coping is a parkour landing, from the mill to the mouth and a 68 m dive into the lake; the trough water uses the liquid surface API |
 
-Nothing stands under an arch's swing of traffic: no lamps, stalls or trees.
+Nothing stands in an arch's opening: no lamps, stalls or trees.
 
-#### The terrain change: a cliff-foot bay
+#### Terrain changes (all in `scripts/terrain_generator.gd`, no added meshes)
 
-In `scripts/terrain_generator.gd`:
-- **Extent.** Add a bay to the lake that hugs the plateau rim from bearing
-  about +8° (where it joins the existing lake mouth) to about +32° (beyond the
-  orchard end of the edge walk). Its water reaches about 55 m out from the
-  cliff, and a beach rises to the gorge floor by 70 m. The overlook is at
-  bearing 17.5° and the mouth at about 13°.
-- **Cliff.** Inside the bay the rim is a **vertical cliff**: the same hard step
-  at the edge radius that the gorge has outside the lake. It does not use
-  the lake sector's 92 m slope, and it does not use the fall corridor's 18 m
-  smoothing. A water arc that has travelled only 6.7 m out after 68 m of fall
-  would strike a face that is merely steep.
-- **Depth.** The floor is about 12 m below the water at the cliff foot,
-  shelving to 2 m at the beach.
-- **Swimming and water mesh.** `lake_coverage` (swimming, buoyancy,
-  `is_lake_area`) and `_lake_surface_coverage` (the water mesh) both include
-  the bay. The water level is the lake's, −61.65 m.
-- **Plunge pool.** Fall corridor 0 moves from −7.8° to the mouth and keeps
-  only its plunge-pool depth. The old fall site returns to the lake's
-  ordinary sloped shore.
-- **Clearances.** Check that nothing placed on the gorge floor between those
-  bearings, within 70 m of the rim, is now under water.
+1. **The tarn's sill moves from east to south.** `_tarn_height` measures the
+   sill's bearing from +X; it becomes a bearing about +Z (south), with the
+   same weir depth. The spillway slope below it gives way to the mill pad.
+2. **The mill pad moves.** The long bench from (75,-142) to (75,-84) at 3.5 m
+   is removed. A new pad at 3.5 m covers the mill's footprint and east yard,
+   about (34,-111), at the foot of the tarn's south bank. The terrain between
+   the pad and the bank top is the slope the mill's north wall retains;
+   survey it so the wall, not a gap, meets the ground.
+3. **A cliff-foot bay of the lake**, hugging the plateau rim from bearing
+   about +8° (where it joins the existing lake mouth) to about +32° (beyond
+   the orchard end of the edge walk). Its water reaches about 55 m out, with a
+   beach to 70 m.
+   - The rim inside it is a **vertical cliff**: the hard step at the edge
+     radius that the gorge already has, with no 92 m lake slope and no
+     18 m corridor smoothing. A water arc only 6.7 m out after 68 m of fall
+     would strike a face that is merely steep.
+   - The floor is about 12 m deep at the cliff foot, shelving to 2 m at the
+     beach.
+   - Both `lake_coverage` and `_lake_surface_coverage` include it, at the
+     lake's level of −61.65 m.
+4. **The plunge pool.** Fall corridor 0 moves from −7.8° to the mouth (about
+   13°) and keeps only its plunge-pool depth. The old fall site returns to
+   the lake's ordinary sloped shore.
+5. **Clearances.** Check that nothing placed on the gorge floor between those
+   bearings, within 70 m of the rim, is now under water.
+
+The overlook pad, the village floor and the tarn's level are unchanged.
 
 #### Who it belongs to
 
-- **Tam Ruskin** keeps it: his dawn round runs along the arcade to the mill
-  racks, he opens the Conduit's cistern, and he clears the runnel's grate.
-  The arcade is the oldest work in Ohio, built by Tam's forebears, which is
-  why the Ruskin house is the keeper's.
-- **Dorran's saw** turns on the race.
+- **Tam Ruskin** keeps it all. His dawn round runs up the mill road beside the
+  arcade to the sluice on the dam and back, and he opens the Conduit's
+  cistern. The arcade is the oldest work in Ohio, built by Tam's forebears.
+- **Dorran and Pip** work the mill on the tarn's bank. Their daily walk is
+  now the mill road beside the arches.
 - **Brinna** quenches from the dipping place.
 - **Evening walkers** follow the arches out to watch the water fall.
-- **The children** race sticks down the runnel from the fountain to the
-  grate.
+- **The children** race sticks down the runnel from the fountain.
 
 #### Rules it must pass
 
@@ -302,20 +327,25 @@ In `scripts/terrain_generator.gd`:
   falls all the way.
 - **Clearances.** Every way the aqueduct crosses has an arch at least the
   way's width plus 0.6 m. Cart roads get 4.5 m of clear height, foot paths
-  2.6 m. Nothing stands in an arch's opening or the channel.
+  2.6 m. Nothing stands in an arch's opening or in the channel.
 - **Collision.** Piers, arches and trough walls are blocking, with the
   coping as a parkour landing. The water surfaces use the liquid surface
   API.
 - **The mouth** projects at least 3 m beyond the rim over a vertical face.
-- **Paths stay packed earth** (bible). The kerbs, slabs, arches and Conduit
-  are waterworks, not paving.
+- **Ground changes are terrain only.** No mesh fakes a bench, bank or slope.
+- **Paths stay packed earth** (bible).
 - **Gameplay anchors stay fixed:** the fountain and Water Gem, the stall
   spots, and the overlook.
+- **Plan updates.** Move the tarn tree at (22,-120), which would stand by
+  the wheel, and the residents' mill spots and schedules for Dorran and Pip
+  (`OhioPlan` home and schedule entries at (75,-87.5)).
 
-**Superseded by this:** the course in `OhioPlan.AQUEDUCT_COURSE` east of the
-mill and its fall at (83.2,-102); the fall corridor at −7.8°; the mill bench
-at 3.5 m; and the first version of this section, which ran the water at
-ground level and needed the overlook lowered.
+**Superseded by this:**
+- the tarn's east sill;
+- the sawmill at (75,-95.2) and its bench;
+- `OhioPlan.AQUEDUCT_COURSE` and the fall at (83.2,-102);
+- the fall corridor at −7.8°;
+- both earlier versions of this section.
 
 ## 4. Building briefs and 5. Variation matrix
 
