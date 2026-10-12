@@ -519,7 +519,9 @@ hero about 1.9 m. City buildings follow it, on the 3.2 m building cell.
 | Mansion block (housing over a podium, in the market lanes) | 32 × 32 m podium, a 22 × 26 m tower, 18 to 28 storeys |
 | Public housing point block | about 22 × 22 m, 30 to 40 storeys (about 100 to 130 m), on an open void deck |
 | Public housing slab block | 13 to 16 m deep, 60 to 90 m long, 12 to 16 storeys (40 to 52 m), with open corridors |
-| Downtown skyscraper | 35 to 45 m square on a podium, 35 to 55 storeys (140 to 220 m) |
+| Downtown skyscraper | 40 to 45 m square on a podium, 35 to 55 storeys (140 to 220 m) |
+| Downtown mid-rise | 20 to 34 m frontage by about 20 m deep, 10 to 22 storeys, filling the blocks round the towers |
+| Street building (Old Moy, market lanes) | 6 to 10 m frontage by about 15 m deep, 4 to 9 storeys |
 | The Windspire, the tallest | about 45 m square, about 70 storeys, about 280 m with its crown |
 | Wind turbine (outside the bounds) | about 95 m to the hub; rotor 130 m across; about 160 m to the tip |
 | City block | 45 to 70 m, crossed by lanes |
@@ -598,11 +600,41 @@ often.
    street trees, lamps, benches and hydrants, and a clear service width
    down the middle for deliveries and the fire crew's hand carts. The
    hierarchy:
-   - **main streets** (12 m, tree-lined): the **Park Ring** round the park,
-     and four streets running out from it to the Rim Walk: **Meridian
-     Avenue** east, **West Street**, **North Street** and **South Street**;
-   - **shopping streets** (8 m), some roofed as arcades at about 8 m;
-   - **lanes** (3.2 to 4.8 m) through every block.
+   - **main streets** (10 to 12 m, tree-lined): the **Park Ring** round the
+     park, and the streets running out from it to the Rim Walk;
+   - **shopping streets** (8 m), Arcade Street roofed in the market lanes;
+   - **lanes** (4 m) through the blocks.
+
+   **The streets, every one named (user):**
+
+   | Street | Kind | Width | Runs |
+   |---|---|---|---|
+   | Park Ring | main street | 12 m | round the park; every district touches it |
+   | Meridian Avenue | main street | 12 m | from the Rim Walk (east) to Clock Street, behind city hall |
+   | Meridian North | main street | 10 m | from the Park Ring past Civic Plaza, the hotel and the Windspire to the Rim Walk |
+   | Meridian South | main street | 10 m | from the Park Ring past Civic Plaza, the glass tower and BLOCK to the Rim Walk |
+   | Clock Street | lane | 4 m | behind city hall, from Meridian North to Meridian South |
+   | West Street | main street | 12 m | from the Rim Walk (west) to Arcade Street and Library Square |
+   | North Street | main street | 12 m | from the Park Ring to the Rim Walk (north), through the estate |
+   | South Street | main street | 12 m | from the Park Ring to the Rim Walk (south), through Market Square |
+   | Arcade Street | shopping street | 8 m | Rim Walk to Rim Walk, north to south, roofed in the market lanes |
+   | Market Street | shopping street | 8 m | from the Rim Walk (west) to Market Lane |
+   | Cinema Lane | lane | 4 m | Rim Walk to Rim Walk through Old Moy |
+   | Tank Lane | lane | 4 m | from the Rim Walk to Arcade Street |
+   | Pine Lane | lane | 4 m | from the Rim Walk to Arcade Street |
+   | Clinic Lane | lane | 4 m | from the Rim Walk to the Park Ring |
+   | Library Lane | lane | 4 m | from Arcade Street to North Street, behind the library |
+   | Museum Lane | lane | 4 m | from the Park Ring to Market Street |
+   | Garden Walk | lane | 4 m | from Library Lane to Library Square |
+   | Lamp Lane | lane | 4 m | from Arcade Street to Market Lane; the night market |
+   | Estate Lane | lane | 4 m | from the Park Ring to the Rim Walk, east edge of the estate |
+   | Market Lane | lane | 4 m | from the Park Ring to the Rim Walk, east edge of the market lanes |
+   | Hotel Lane | lane | 4 m | from Estate Lane to the Rim Walk, behind the hotel |
+   | Glass Lane | lane | 4 m | from Market Lane to the Rim Walk, behind the glass tower |
+
+   **No dead ends:** every street meets another street, a square, the Park
+   Ring or the Rim Walk at both ends (checked in the layout). Streets that
+   reach the edge open onto the Rim Walk promenade.
 
    Blocks are 45 to 70 m, so no walk goes round more than about 60 m. In the estate, every block stands on an open void deck
    you can walk straight under, and covered linkways join the blocks to the
@@ -773,32 +805,36 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
   park anchor swings across it. Towers are never squeezed onto clipped
   sites at the rim.
   - the **Windspire**, the Windworks' headquarters, about 280 m with an
-    observation deck, on the plaza's north-east corner;
+    observation deck, beside the hotel on Meridian North, facing the plaza;
   - the **glass tower** on the plaza's south side (Raman & Reese and
     Tanglewire);
   - the **north tower** (start-up floors) and **south tower** (flats over
     offices) on the Park Ring's east corners;
-  - **BLOCK**, the research institute, a low building round a court behind
-    the glass tower;
-  - lower buildings toward the Rim Walk, along Meridian Avenue's outer end.
+  - **BLOCK**, the research institute, 6 storeys round a court, beside the
+    glass tower on Meridian South;
+  - **mid-rise blocks of 10 to 22 storeys** filling the rest of downtown
+    round the towers, offices and flats on large footprints (20 to 34 m
+    frontage), so the towers rise out of a solid mid-rise mass instead of
+    standing among small buildings (user).
 
   The Grand Hotel's guest tower rises on the plaza's north side.
 
 ### Building schedule (proposed, 2026-10-12)
 
 Every building in Moy is planned (user). The plan in the visualization draws
-each one: about 320 ordinary buildings, one per lot, built shoulder to
-shoulder along the streets of Old Moy, the market lanes and downtown's
-outer blocks (homes over shops, and low offices toward the Rim Walk), and
-the 51 numbered buildings below. Ordinary lots run 6 to 10 m of frontage
-by about 16 m deep, with small garden courtyards inside the deeper blocks.
-Footprints are true; positions are schematic until the measured layout.
+each one: about 200 ordinary buildings and the 51 numbered buildings
+below.
+- **Old Moy and the market lanes:** street buildings, one per lot, 6 to
+  10 m of frontage by about 15 m deep, 4 to 9 storeys, homes over shops.
+- **Downtown:** mid-rise blocks of 10 to 22 storeys on 20 to 34 m
+  frontages, round the towers.
+- **The North Estate:** no lots; its blocks stand in precinct gardens.
 
-**Every building fronts a street** (user): in the street blocks each one,
-numbered or not, has at least one face on a street, lane, square or the
-Park Ring, where its door is. The estate is planned differently, as
-precincts: its blocks open onto the precinct gardens and covered linkways,
-and its slab blocks hold the street edges.
+**Every building has a street face** (user). Each block is filled from
+its street edges inward, so every building fronts a street, lane, square
+or the Rim Walk. Ground left over inside a block is a shared garden
+courtyard; the leftover strips along the Rim Walk are gardens. Green on
+the plan means gardens and the park only.
 
 Raman & Reese and Tanglewire share the glass tower on Civic Plaza. The
 start-up floors are in the north tower. Dr. Kask's flat is in the south
@@ -817,8 +853,8 @@ round the park and on Civic Plaza.
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 1 | Grand Hotel | 48 × 60 m | podium 4 storeys, guest tower 25 floors (97 m) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
-| 2 | City hall | 40 × 60 m | 4 storeys and a clock tower, at the head of Civic Plaza | Mayor Teodora Vance, Kenji Mori (clerk) |
+| 1 | Grand Hotel | 52 × 60 m | podium 4 storeys, guest tower 25 floors (97 m) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
+| 2 | City hall | 34 × 60 m | 4 storeys and a clock tower, at the head of Civic Plaza | Mayor Teodora Vance, Kenji Mori (clerk) |
 | 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, on a podium | the Windworks (headquarters, observation deck) |
 | 13 | Glass tower | 40 × 40 m | about 45 storeys, 180 m, on a podium | Raman & Reese (Elizabeth, Priya, Venn); Tanglewire (Dan) |
 | 14 | North tower | 40 × 40 m | about 45 storeys, 175 m, on a podium | start-up floors (Theo Park) |
@@ -829,25 +865,25 @@ round the park and on Civic Plaza.
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 17 | Block 1 | 22 × 22 m | point block, 32 storeys, in the west precinct | Tomas Wren |
-| 18 | Block 2 | 22 × 22 m | point block, 30 storeys, in the east precinct | Siti Rahman |
+| 18 | Block 2 | 22 × 22 m | point block, 30 storeys, east precinct | Siti Rahman |
 | 19 | Block 3 | 22 × 22 m | point block, 36 storeys, on the Park Ring | Elizabeth, Dan and Jammer (18th floor); Juno Rell (20th) |
 | 20 | Block 4 | 22 × 22 m | twin point block, 40 storeys; sky bridge and sky garden at the 26th floor | homes (no one the hero meets) |
 | 21 | Block 5 | 22 × 22 m | twin point block, 40 storeys | Dr. Imani Osei and Kofi |
 | 22 | Block 6 | 54 × 14 m | slab block, 14 storeys, shops in its void deck on the Park Ring | homes (no one the hero meets) |
 | 23 | Hawker centre | 38 × 20 m | 1 storey, open-sided, on the Park Ring and Estate Square | Siti's laksa stall |
-| 49 | Block 7 | 14 × 54 m | slab block, 14 storeys, shops in its void deck on North Street | homes (no one the hero meets) |
-| 50 | Block 8 | 22 × 22 m | point block, 34 storeys, in the east precinct | homes (no one the hero meets) |
+| 49 | Block 7 | 14 × 50 m | slab block, 14 storeys, shops in its void deck on North Street | homes (no one the hero meets) |
+| 50 | Block 8 | 22 × 22 m | point block, 34 storeys, east precinct | homes (no one the hero meets) |
 | 51 | Neighbourhood centre | 38 × 32 m | 2 storeys: minimart, kindergarten, community club, roof garden | Juno Rell (Housing Board office) |
 
 **Old Moy**
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 3 | Library | 45 × 55 m | 5 storeys, terraced atrium | Ada Fong, Nia Calder, Benji Okoro |
+| 3 | Library | 45 × 62 m | 5 storeys, terraced atrium | Ada Fong, Nia Calder, Benji Okoro |
 | 5 | Moonlight Cinema | 30 × 28 m | 2 storeys; flat above | Leon Duarte (lives above) |
 | 6 | Police box | 6 × 8 m | 1 storey, back room | Kate Byrne |
 | 7 | Clinic | 14 × 18 m | 3 storeys; flat above | Dr. Arjun Mehta (lives above) |
+| 17 | Block 1 | 22 × 22 m | point block, 32 storeys, west precinct | Tomas Wren |
 | 24 | Garden Row | 23 × 18 m | 3 townhouses, 3 storeys, facing the Park Ring | Teodora Vance; Ada Fong and Sora Ishida; Priya Raman |
 | 25 | Sol's café | 16 × 10 m | 3 storeys; flat above | Sol Brant |
 | 26 | Bakery | 10 × 16 m | 4 storeys; flats above | Felix Tanaka (above) |
@@ -863,10 +899,10 @@ round the park and on Civic Plaza.
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
 | 4 | Natural history museum | 62 × 38 m | 3 storeys, top-lit hall | Dr. Imani Osei (curator) |
-| 8 | Primary school | 19 × 32 m | 3 storeys, roof playground | Yuki Hayashi (teacher); Lily, Kofi |
-| 33 | Wet market | 40 × 40 m | 2 storeys; sign studio on the roof | Rosa Delgado, Wen Li; Zara Quinn (roof studio) |
-| 34 | Market flats | 28 × 28 m | tong lau, 8 storeys | Mei and Lily Chan, Rosa, Wen, Pia Rowe |
-| 35 | Wing Fat Mansion | 32 × 26 m | mansion block, 22 storeys on a podium | Ah Keung, Iris Dune, Nia Calder, Venn Harlow, Dax Merrow, Bea and Wilfred Ho |
+| 8 | Primary school | 23 × 30 m | 3 storeys, roof playground | Yuki Hayashi (teacher); Lily, Kofi |
+| 33 | Wet market | 40 × 38 m | 2 storeys; sign studio on the roof | Rosa Delgado, Wen Li; Zara Quinn (roof studio) |
+| 34 | Market flats | 28 × 24 m | tong lau, 8 storeys | Mei and Lily Chan, Rosa, Wen, Pia Rowe |
+| 35 | Wing Fat Mansion | 32 × 24 m | mansion block, 22 storeys on a podium | Ah Keung, Iris Dune, Nia Calder, Venn Harlow, Dax Merrow, Bea and Wilfred Ho |
 | 36 | Vertical farm | 22 × 24 m | windowless, 12 storeys of growing racks | Sora Ishida |
 | 37 | All-night store | 8 × 12 m | 5 storeys; flat above | Hiro Sato |
 | 38 | Helmsmith | 10 × 12 m | 2 storeys; home behind | Gideon Hale |
@@ -976,6 +1012,9 @@ lit crowns.
 - Jammer is at his grandmother's in the Middle of Nowhere.
 - The city's name is **Moy**. No Sign Boneyard: the city blorbs simply stay
   outside the outskirts. No opulent fountains.
+- Every street is named and planned, with no dead ends; every building
+  has a street face; downtown is filled with mid-rise blocks round the
+  towers; green on the plan means gardens only (user).
 - The North Estate is planned as precincts, the way Singapore's estates
   are: blocks free in shared gardens, not wedged among lots. Skyscrapers
   stand on full-size blocks at the centre, not squeezed onto the rim. City
