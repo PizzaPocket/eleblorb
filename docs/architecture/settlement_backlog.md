@@ -789,54 +789,49 @@ Full brief: `chinese_village.md` 4.1. Code when approved:
   lore is to be worked out further later; alternatives are parked in
   `chinese_village.md` 4.6.
 
-## 20. Ohio: the aqueduct through the village (2026-10-12, third version, awaiting approval)
+## 20. Ohio's water: tarn, mill, mains and leat (2026-10-12, fourth version, awaiting approval)
 
 Full brief: `ohio.md` 3.4. Code when approved:
-- `scripts/terrain_generator.gd` (terrain only, no added meshes):
+- `scripts/terrain_generator.gd` (terrain only):
   - the tarn's sill moves from east to south;
-  - the long mill bench at (75,-142..-84) is removed;
-  - a new mill pad at 3.5 m at the foot of the tarn's south bank, about
-    (34,-111);
-  - a **cliff-foot bay** (bearings about +8° to +32°, water 55 m out, a
-    vertical cliff, a floor 12 m deep shelving to a beach), included in
-    `lake_coverage` and `_lake_surface_coverage`;
-  - fall corridor 0 moved to the mouth (about 13°), plunge pool only.
+  - the old mill bench is removed;
+  - a mill pad at 0.5 m at about (32,-104);
+  - a graded mill lane from 0.5 to 0, from the pad to (41,-50);
+  - the overlook pad lowered from 2.0 to 0;
+  - a cliff-foot bay (bearings about +8° to +32°, vertical cliff, 12 m
+    floor shelving to a beach) included in `lake_coverage` and
+    `_lake_surface_coverage`;
+  - fall corridor 0 moved to the Lip (about 13°), plunge pool only.
 - `scripts/ohio_plan.gd`:
-  - the sawmill moves to about (30,-112) as a bank mill, with its wheel on
-    the west wall and its door east;
-  - the race over the dam;
-  - the arcade from the wheel pit to (41,-60) and down x = 41, the Conduit
-    tower at (41,-15), the gate arch, the east road arcade, and the mouth at
-    (86,-9);
-  - a water level per point at 0.3% grade;
-  - the mill road re-routed north along x ≈ 45 to the mill's east door;
-  - the fountain pipe, the runnel, the dipping place, the horse trough, and
-    the culvert to a cliff spout;
-  - Dorran's and Pip's spots and schedules moved; the tarn tree at (22,-120)
-    moved; the old timber yard moved to the new mill.
+  - the sawmill at about (30,-104) with its long axis north–south and the
+    door east;
+  - the wheel pit at the north gable, the launder, sluice, spillway and
+    strainer;
+  - the leat course with water levels (0.5%), the slabs, the dipping place,
+    the horse trough, the Conduit house at (41,-15) and the Lip at (86,-9);
+  - the runnel and its culvert;
+  - the mains (recorded, not modelled), stopcock and fire-plug decals;
+  - Dorran's and Pip's spots and schedules; the tarn tree moved; the timber
+    yard moved.
 - Builders (`VillageWorks`):
-  - an aqueduct arcade with piers sized from the ground profile;
-  - a corbelled spout;
-  - a conduit tower;
-  - the kerbed runnel;
-  - the fall on a true arc;
-  - a bank-mill foundation.
+  - a masonry dam face with a wheel pit;
+  - an overshot wheel and launder;
+  - a stepped spillway;
+  - a stone leat channel;
+  - slab bridges;
+  - the Conduit house;
+  - the corbelled Lip with its fall on a true arc;
+  - the kerbed runnel.
+- Interiors:
+  - taps, sinks and basins;
+  - the Holt Inn's flush toilet on the west main, with a septic tank under
+    the inn yard;
+  - fix `TownProps.build_dry_toilet()`'s comment and the `DryToilet` node
+    name, since Ohio's is a porcelain flush toilet with a cistern.
 - Validator:
-  - bed levels fall all the way;
-  - arch clearances over ways;
-  - nothing in an arch opening or channel;
-  - the mouth projects at least 3 m over a vertical face.
-- Household water (`ohio.md` 3.4, "Water for every house"):
-  - mains from the Conduit recorded in `OhioPlan`;
-  - taps, sinks and basins in the interiors; the Holt Inn's flush toilet
-    fed from the west main, draining to a septic tank under the inn yard;
-  - `TownProps.build_dry_toilet()`'s doc comment calls the Ohio fixture a dry
-    toilet with a compost vault; Ohio's is a porcelain flush toilet with a
-    cistern (the model already has the tank), so fix the comment and the
-    `DryToilet` node name;
-  - outside taps and water butts;
-  - stopcock and fire-plug cover decals;
-  - septic tanks behind the houses, not modelled;
-  - Tam's dawn valve round.
-- Survey first: ground profiles along the arcade line and across the mill's
-  slope, then `tools/ohio_cliff_probe` after the terrain change. Needs Godot.
+  - bed levels fall all the way and the water stays below the kerbs;
+  - every crossing has a slab;
+  - nothing stands in a channel;
+  - the Lip projects at least 3 m over a vertical face.
+- Survey first: the dam face line, the mill lane, and `tools/ohio_cliff_probe`
+  after the overlook and bay changes. Needs Godot.

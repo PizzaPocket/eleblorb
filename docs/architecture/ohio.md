@@ -126,277 +126,260 @@ Organising idea: a **headland village on one axis**. Travellers enter at the wes
 
 Gateway as described under Nodes. Built so far: the lantern piers, the stone-ringed sign island, windows either side of the inn's hearth stack on both floors, a stepped chimney breast, a woodstack, a bench and a trellis with a climber on the inn's roadside gable. Open: lamps along the main street; the inn's roadside forecourt may want its own small cobbled apron.
 
-### 3.4 The aqueduct through the village (proposed 2026-10-12, third version)
-
-**The problem.** The water goes from the tarn to the mill and straight over the
-rim at (83,-102), 100 m north of the green and out of sight of it. It ends
-there because that is the nearest place where the lake lies under the cliff.
-Below the overlook and the rest of the village's rim, the cliff drops to dry
-gorge floor, because the lake begins at world x = 220 and its west end fades
-in over 48 m (`lake_coverage`'s `eastward` ramp).
+### 3.4 Ohio's water: tarn, mill, mains and the leat (proposed 2026-10-12, fourth version)
 
 **What the user asked for:**
 - widen the lake along the cliff foot under the village;
-- bring the water through Ohio as an aqueduct, holding its height with a
-  slight grade;
+- bring the water through Ohio as part of its character;
 - feed the fountain;
-- open the mouth directly over the lake, projecting off the cliff;
+- open the outfall directly over the lake, projecting off the cliff if
+  needed;
 - keep the mill out by the reservoir;
-- make every change of ground in the terrain itself, never with an added
-  mesh.
+- change ground only in the terrain, never with an added mesh;
+- remember the inn's flush toilet;
+- above all, make the whole design make considered sense. No arches.
 
-**Why the second version did not make sense.** It kept the tarn's east sill
-and the mill on the cliff edge at (75,-95). So:
-- the water ran 45 m east to the mill, doubled back 80 m south-west to the
-  village, then went 40 m east again to the same cliff;
-- the mill sat right above the lake, where the water would naturally just
-  fall;
-- it held its height only by raising the mill's ground 2.8 m.
+**Why the earlier versions failed:**
+- The first two kept the mill on the cliff edge, so the water doubled back
+  through the village to the same cliff.
+- The third raised the water on 6 m arches only to keep its height. Buried
+  pipes do that job, and the mill wasted nearly all its head to serve the
+  arches.
+- Each one was bent to rescue an earlier choice.
 
-**This version** turns the tarn's outlet to the south, toward the village. It
-puts the mill on the tarn's own south bank, where the ground is already high,
-and runs the water in one plain L: south to the village, then east to the
-cliff.
+This version starts again from what each part is for.
+
+#### Every part and its job
+
+| Part | Job |
+|---|---|
+| **Tarn** | the spring-fed reservoir; its 8 m of height drives the wheel and the mains |
+| **South sill, sluice and spillway** | the sluice sends a controlled flow to the wheel; the spillway passes flood water round the mill so the wheel is never flooded |
+| **Overshot wheel and sawmill** | power for Dorran's saw, taking nearly the whole drop |
+| **The main** (buried) | clean water under pressure from the tarn to every house, the fountain and the fire plugs |
+| **The Conduit house** | the main's valve house in the village; the turncock's station and a public tap |
+| **The fountain** | the public tap and a jet, fed from the main |
+| **The runnel** | carries the fountain's overflow to the leat |
+| **The leat** (open, at ground level) | carries the mill's spent water to the lake, and on the way gives the village working water: the forge's dipping place, the horse trough, washing down, and a reserve for fire |
+| **The Lip** | lets the water leave over the lake, clear of the cliff |
+| **Septic tanks** | every house's waste, kept out of all open water |
+
+**Why the leat goes through the village at all.** The shortest outfall from
+the mill is east to the cliff, about 55 m, where the old fall was. The
+villagers chose to bring the mill's water about 150 m further, past the forge,
+the hall and the market, so that working water runs where it is used, and to
+the cliff by the overlook. That is the reason Plymouth brought Drake's Leat
+in and Cambridge brought Hobson's Conduit in. The fall beside the overlook is
+the village's evening sight because of that choice, not as an ornament.
 
 #### Precedents
 
 | Precedent | What it gives Ohio |
 |---|---|
-| **Avoncliff and Dundas aqueducts**, Kennet and Avon Canal (1801, 1805): classical arches in honey Bath stone with a cornice and parapet | The arcade's character: plain round arches, a string course, a coped parapet |
-| **Pontcysyllte**, Wales (1805): a water trough carried on tall slender piers, which you can walk beside | The trough as a walk along the top |
-| **Hobson's Conduit, Cambridge** (1610–1614): spring water carried into the town to a conduit fountain on Market Hill, with street runnels that still flow | The fountain as the conduit's public outlet; the runnel |
-| **Wells, Somerset**: in 1451 Bishop Beckington gave the town water from his springs, piped to the market place fountain, with the overflow running down the High Street gutters | The fountain's overflow along the street |
-| **Conduit houses** (the Great Conduit in Cheapside, Exeter's conduits): small stone houses where a town's water was divided and the keeper held the key | The Conduit at the aqueduct's turn |
-| **Drake's Leat, Plymouth** (1591): an open channel off Dartmoor with a mill on its course | The low channel on the mill bench |
+| **Pond-fed overshot mills** across upland England: a mill at the foot of its pond's dam, fed by a short wooden launder onto a tall wheel | The mill below the tarn's dam, taking the full drop |
+| **The New River**, London (1613): spring water to a reservoir, then mains of bored elm under the streets with small lead pipes to each house; the *turncock* opened and shut each street's supply | The buried main, house supplies, Tam as turncock |
+| **Conduit houses** (the Great Conduit in Cheapside, Exeter's conduits): small stone houses where a town's supply was controlled, with a public tap | The Conduit house |
+| **Hobson's Conduit, Cambridge** (1610–1614) and **Wells, Somerset** (1451): water brought into town for public use, with stone-kerbed runnels beside the streets | The runnel, and water running beside the east road |
+| **Drake's Leat, Plymouth** (1591): an open leat into the town, feeding mills and the town's working water | The leat itself |
+| **Bourton-on-the-Water** and **Bibury**: water beside the village street, crossed by low stone slabs, people sitting on its edge | The slab crossings and the leat's place in village life |
 
-**Gradient.** English leats fall about 1 in 1,000 to 1 in 300, and Roman
-aqueducts about 1 in 4,000 to 1 in 200. Ohio's falls **1 in 330 (0.3%)**,
-about 0.4 m over the 135 m from the mill to the cliff. The wheel is the only
-real drop: 1 m, on a wide low-breast wheel of the kind that ran many English
-low-head mills. Water leaves the tarn at 8 m and arrives at the cliff still
-about 6.5 m above the village floor.
+#### The mill below the dam
 
-#### The mill moves to the tarn's south bank
+- **The tarn's outlet moves to its south side**, facing the village.
+- **The dam.** The tarn's south bank becomes the dam. Its crest is the bank
+  top at 9.6 m. Its downstream face is a battered masonry wall about 9 m
+  high, retaining the terrain behind it, on a line about 26 m south of the
+  tarn's centre (z ≈ −116).
+- **The mill** stands at the dam's foot at about (30,-104):
+  - two storeys, 9.6 m by 16 m, long axis north–south;
+  - its floor on a terrain pad at **0.5 m**;
+  - its cart door on the east side, facing the mill road, with the timber
+    yard east of it.
+- **The wheel.** A 4 m wheel pit separates the dam face from the mill's
+  north gable, and the wheel turns in it:
+  - an overshot wheel about 6.5 m across;
+  - its axle runs into the gable;
+  - a short launder from the sluice on the dam crest drops water onto the
+    wheel's top at about 7.4 m;
+  - the wheel's bottom clears the tail water by about 0.75 m, as an
+    overshot wheel must.
+- **The spillway** leaves the sill's west end and runs down the dam face west
+  of the mill as a stepped stone chute into the tailrace below the wheel. In
+  a flood, water bypasses the mill.
+- The mill is about 105 m from the green. It is out by the reservoir, and
+  the road to it is almost level.
 
-- **Where.** The mill stands at about (30,-112), with its north gable 6 m from
-  the water's edge, about 115 m from the green. It is out by the reservoir,
-  and no further from the village than before.
-- **Why there.** The terrain already rises toward the tarn. The bank stands
-  1.6 m above the water and relaxes into the natural hills over 22 m, so the
-  ground under the mill falls about 4 m from north to south.
-- **A bank mill.** It is built into that slope, the English way: its north
-  wall retains the bank, and the dam top runs behind it.
-- **Floors.** The cart floor is at 3.5 m on a terrain pad at the slope's
-  foot, with the door on the east side facing the mill road. The upper floor
-  meets the dam top.
-- **Wheel and race.** A short stone race leaves the tarn's new **south sill**,
-  crosses the dam beside the mill, and drops 1 m over the wheel on the mill's
-  west wall. The tail leaves the wheel already at 6.95 m, high above the
-  falling ground, so the aqueduct starts straight from the wheel pit.
-- **Old site.** The old mill site and its long bench at (75,-95) return to
-  natural hill.
+#### The levels (local metres; 0.5% fall on the leat)
 
-#### Heights along the course (local metres)
-
-| Point | Ground | Water | Structure |
+| Point | Ground | Water | Notes |
 |---|---|---|---|
-| Tarn | | 8.0 | new south sill at about (30,-124.5) |
-| Race at the wheel (24.5,-114) | bank, about 7 | 7.95 | stone race across the dam |
-| Below the wheel | about 4 to 5 | 6.95 | wheel pit; the arcade starts here |
-| (41,-60) | natural hill, survey | 6.81 | arcade, height set by the survey |
-| **The Conduit** (41,-15) | 0 | 6.67 | conduit tower at the turn |
-| Gate arch over the mill road (45.5,-13) | 0 | 6.66 | 4.5 m arch, 5.3 m clear |
-| Along the east road (63,-9) | 0 to 1 | 6.60 | arcade |
-| The rim (83,-9) | about 2 | 6.54 | last pier at the cliff lip |
-| **The mouth** (86,-9) | over the lake | 6.53 | spout 3 m beyond the rim |
-| Lake | | −61.65 | a fall of about 68 m |
+| Tarn | | 8.0 | crest of dam 9.6 |
+| Wheel top | | about 7.4 | launder from the sluice |
+| Wheel pit, tail (30,-114) | pit floor about −0.5 | 0.15 | tail leaves west |
+| West of the mill (22.5,-94) | 0.5 | 0.0 | |
+| Mill lane (39,-55) | 0.5 → 0, graded | −0.2 | leat beside the road |
+| Village edge (41,-40) | 0 | −0.27 | |
+| **The corner** (41,-15) | 0 | −0.40 | the leat turns east |
+| Mill road slab bridge (45.5,-12.5) | 0 | −0.42 | |
+| Runnel joins (60,-9) | 0 | −0.50 | |
+| The rim (83,-9) | 0 | −0.61 | overlook ground lowered to 0 |
+| **The Lip** (86,-9) | over the lake | −0.63 | spout 3 m beyond the rim |
+| Lake | | −61.65 | a fall of about 61 m |
 
-**In the village the arcade is about 6 m to the trough:**
-- 4 m arches on 1.2 m piers;
-- semicircular arches springing at 3.5 m, with crowns at 5.5 m;
-- above them a string course, the trough (water 0.4 m deep), and a coped
-  parapet to about 7.1 m.
+The leat is a stone-lined channel about 0.8 m wide. Its water is about 0.4 m
+deep and stands 0.3 to 0.6 m below its kerbs, which lie flush with the
+ground. A 0.5% fall gives the gentle, steady flow of a working leat.
 
-A cart 2.6 m wide has 5 m of clearance under any arch. It stands about 4.5 m
-above the overlook terrace, and is low where it leaves the mill.
+**The main** draws from a strainer in the tarn at the south sill, about 2 m
+below the surface. It runs buried beside the mill lane for 110 m to the
+Conduit house, arriving with about 7 m of head.
 
 #### The course
 
-1. **The south sill and the mill.** The race leaves the tarn's south side,
-   crosses the dam and turns the wheel on the mill's west wall.
-2. **Down to the village.** From the wheel pit the arcade runs south-south-east
-   to (41,-60), passing south of the mill's gable, then due south along
-   x = 41.
-   - It passes east of the smithy (whose east wall is at x 31.8).
-   - It stays west of the mill road, which keeps its start at Tam's door
-     and now runs north along x ≈ 45 to the mill's east door.
-   - So the road and the water never cross near the mill, where the
-     arcade is low.
-3. **The Conduit** (41,-15): a square stone conduit tower at the turn, at
-   the head of the market street opposite Tam's door. A cistern at the top
-   divides the water. The main flow turns east, and a lead pipe drops inside
-   the tower and runs under the market street to the fountain. Tam holds the
-   key.
-4. **The gate arch.** The aqueduct crosses the mill road's mouth high, on one
-   wider arch. The mill road begins through it.
-5. **The east road.** The arcade runs along the north side of the east road,
-   about 3 m back from its edge. It passes north of the overlook's old tree
-   at (72,-2.5) and the terrace (whose north edge is at z −4.1), and reaches
-   the rim at (83,-9).
-6. **The mouth.** The last pier stands at the cliff lip. The trough carries on
-   3 m beyond it on stepped stone corbels and ends in a plain lip directly over
-   the lake. The water leaves at about 1 m/s, falls about 68 m along a true
-   arc, and lands about 6.7 m out from a vertical face, in view of the
-   overlook's benches. The overlook keeps its rule of no rim wall.
+1. **Tail water** leaves the wheel pit to the west, runs south along the mill's
+   west side, and turns south-east down the **mill lane**, a graded corridor
+   from the mill to the village. The leat runs on the west side of the lane
+   and the mill road on its east side, so road and water never cross near the
+   mill.
+2. **Down x = 41** into the village, behind the smithy and the hall. There is
+   a slab across it opposite Tam's door, and a dipping place with two stone
+   steps at about (40,-20) for Brinna's forge, ten paces from her yard.
+3. **The corner** (41,-15). The leat turns east. Beside it stands the
+   **Conduit house**:
+   - a small square stone house with a stone-slate roof;
+   - the main's valves inside, and a public tap on its wall;
+   - Tam has the key.
+4. **Under the mill road's mouth.** The road crosses the leat on a broad stone
+   slab bridge, level with the road, 4 m wide.
+5. **Along the east road's north side**, past the horse trough (fed from the
+   leat). The runnel from the fountain crosses under the east road in a short
+   slab culvert and joins the leat at (60,-9).
+6. **The Lip.** At the rim a short masonry headwall carries the leat's stone
+   trough out 3 m on stepped corbels, directly over the lake.
+   - The water leaves at about 1 m/s, falls about 61 m along a true arc, and
+     lands about 6.5 m out from a vertical face, beside the overlook in view
+     of its benches.
+   - The overlook keeps its rule of no rim wall.
+   - The headwall is the spout's support, not a parapet.
 
-#### The fountain and the runnel
+#### The fountain, the runnel and the houses
 
-- **The fountain** is fed by the lead pipe from the Conduit, with about
-  6.5 m of head, enough for a real jet. It stays at the origin with the
-  Water Gem.
-- **The runnel.** Its basin overflows into a stone-kerbed street runnel
-  (0.5 m wide, 0.25 m deep) along the south side of the market street. The
-  stalls are on the north side and are left clear.
-  - A dipping place opposite the forge, where Brinna draws quench water.
-  - A horse trough by the east road.
-- **The culvert.** At the end of the runnel the water drops through a grate
-  into a buried culvert. The culvert runs under the east road and the
-  overlook at a steady grade and comes out of the cliff face below the
-  aqueduct's mouth as a thin second spout. The overlook's ground does not
-  change.
+- **The fountain** is fed by the main from the Conduit house, with about 7 m
+  of head, enough for a real jet. It stays at the origin with the Water Gem.
+  Its basin overflows into the **runnel**, a stone-kerbed street channel along
+  the south side of the market street. The stalls stand on the north side
+  and are left clear.
+- **The mains.** From the Conduit house:
+  - one buried main runs west under the market street and the main street,
+    to the meeting house, the Vey house, the inn, the bakehouse and the
+    milling quarter;
+  - a branch runs south from the green down the west and east lanes.
 
-#### Water for every house (added 2026-10-12)
+  Every house has a service pipe and a stopcock: a kitchen tap, a washroom
+  basin and a flush toilet. About 7 m of head gives ground-floor taps a
+  steady flow, and upstairs about 4 m.
+- **The Holt Inn's toilet.** The inn's porcelain flush toilet stands in the
+  ground-floor washroom on the cold west side beside the larder
+  (`village_inn.gd`). It is the village's busiest toilet:
+  - the west main reaches it with full ground-floor head, so its cistern
+    refills quickly;
+  - it drains to the inn's own septic tank under the yard north of the
+    inn;
+  - upstairs, guest rooms keep washstands with a jug and bowl, filled from
+    the kitchen.
+- **Other fixtures and supplies:**
+  - the bakehouse, the inn's kitchen, Cob's millhouse and the meeting house
+    have their own feeds;
+  - the smithy also dips from the leat;
+  - fire plugs, valves under iron covers, stand by the green and the inn;
+  - water butts at the gardens catch roof water;
+  - the old well at the head of the lane stays in use from habit and in dry
+    spells.
+- **Waste.** Every house drains to its own septic tank and soakaway in its
+  back garden. Nothing goes into the runnel, the leat or over the cliff.
+- **Tam Ruskin is the turncock.** At dawn he walks the mill lane to the sluice
+  and the strainer, opens the Conduit house's valves, clears the leat's
+  racks, and knows every stopcock.
 
-Ohio is old in style but lives today: houses have kitchen taps, basins and
-flush toilets (bible). The Conduit is also the village's supply. Its cistern
-holds the water at about 6.7 m above the village floor, so buried pipes can
-deliver it under gravity alone, with no pump.
-
-- **Precedent.** London's New River (1613) brought spring water forty miles to
-  a reservoir in Islington. From there, mains of bored elm trunks ran down the
-  streets, with small lead pipes into each house. The man who opened and shut
-  the supply to each street was the *turncock*.
-- **Mains.** From the Conduit, one buried main runs west under the market
-  street and the main street to the meeting house, the Vey house, the inn,
-  the bakehouse and the milling quarter. A second branch runs south from the
-  green down the west lane and the east lane to the cottages and gardens.
-  Every house has a small service pipe and a stopcock.
-- **Pressure.** About 6 m of head gives a steady flow at ground-floor taps.
-  Upstairs fixtures (floor about 3 m) still get about 3 m of head, enough to
-  fill a basin or a toilet cistern.
-- **The Holt Inn's toilet.** The inn already has a porcelain flush toilet with
-  a cistern, in the ground-floor washroom on the cold west side beside the
-  larder (`village_inn.gd`). It is the village's busiest toilet and the
-  furthest fixture from the supply. The west main reaches it with the full
-  ground-floor head, which refills its cistern quickly. It drains to the
-  inn's own septic tank under the yard north of the inn, the same yard the
-  kitchen's yard door opens onto. Upstairs, the guest rooms keep washstands
-  with a jug and bowl, filled from the kitchen.
-- **Heavy users.** Each has its own feed:
-  - the bakehouse (dough, the copper, washing down);
-  - the inn's kitchen, washroom and guest basins;
-  - the smithy, which also dips from the runnel;
-  - Cob's millhouse and grain yard;
-  - the meeting house.
-- **Public water.** The fountain is the public tap. The shared well at the
-  head of the lane stays: it is older than the aqueduct, and people still
-  draw from it out of habit and in a dry spell. The horse trough is by the
-  east road.
-- **Fire.** A fire plug (a valve on the main with an iron cover) stands by the
-  green, and another by the inn.
-- **Rain.** Water butts at the gardens (the kitchen garden and physic garden
-  already have water barrels) catch roof water for watering.
-- **Waste.** Nothing goes into the runnel, the aqueduct or over the cliff.
-  Each house drains to its own septic tank and soakaway in its back garden,
-  as English villages without mains sewers do.
-- **Tam is the turncock.** He opens the Conduit's valves at dawn, knows every
-  stopcock, and is who people fetch when a tap runs dry.
-- **What the player sees.** Kitchen sinks with taps, washroom basins,
-  outside taps by the gardens, and small iron stopcock and fire-plug covers
-  set in the worn ground as decals. Water butts stand by the sheds. The pipes
-  themselves are buried and not modelled.
-
-#### How the village moves around it
+#### How the village moves around the water
 
 | Crossing | How |
 |---|---|
-| Mill road at its mouth | under the gate arch, 4.5 m wide and 5.3 m clear, so carts pass |
-| Mill road near the mill | no crossing: the road runs east of the water all the way |
-| East road to Tam's stone yard and the meadow beyond | under any arch of the east road arcade |
-| Behind the smithy and the hall | under any arch; the arcade is open, not a wall |
-| Near the mill, where the arcade is low | it starts at about 2 m clear, so it is a wall for its first few bays; nothing needs to cross there |
-| Runnel | step through, or on slabs where a path crosses |
-| Along the top | the parapet coping is a parkour landing, from the mill to the mouth and a 68 m dive into the lake; the trough water uses the liquid surface API |
+| Mill road over the leat at its mouth | a broad slab bridge level with the road |
+| Mill road near the mill | no crossing: the leat stays west, the road and yard east |
+| Opposite Tam's door, between the smithy yard and the mill road | a slab footbridge |
+| From the east road to Tam's stone yard | a slab |
+| The runnel under the east road | a short slab culvert; the road is unbroken |
+| The runnel elsewhere | step through, or on slabs where a path crosses |
+| Anywhere else along the leat | step or jump over (0.8 m) |
 
-Nothing stands in an arch's opening: no lamps, stalls or trees.
+The leat runs along the village's north-east edge and the north side of the
+east road. It never cuts through a plot, a yard or the green.
 
-#### Terrain changes (all in `scripts/terrain_generator.gd`, no added meshes)
+#### Terrain changes (all in `scripts/terrain_generator.gd`; no added meshes)
 
-1. **The tarn's sill moves from east to south.** `_tarn_height` measures the
-   sill's bearing from +X; it becomes a bearing about +Z (south), with the
-   same weir depth. The spillway slope below it gives way to the mill pad.
-2. **The mill pad moves.** The long bench from (75,-142) to (75,-84) at 3.5 m
-   is removed. A new pad at 3.5 m covers the mill's footprint and east yard,
-   about (34,-111), at the foot of the tarn's south bank. The terrain between
-   the pad and the bank top is the slope the mill's north wall retains;
-   survey it so the wall, not a gap, meets the ground.
-3. **A cliff-foot bay of the lake**, hugging the plateau rim from bearing
-   about +8° (where it joins the existing lake mouth) to about +32° (beyond
-   the orchard end of the edge walk). Its water reaches about 55 m out, with a
-   beach to 70 m.
+1. **The tarn's sill moves from east to south** (`_tarn_height` measures the
+   sill bearing from +X; it becomes about +Z). It holds the sluice, the main's
+   strainer and the spillway.
+2. **The old mill bench is removed**, the capsule from (75,-142) to (75,-84) at
+   3.5 m. That ground returns to natural hill.
+3. **A new mill pad at 0.5 m** at about (32,-104), cut into the foot of the
+   tarn's south bank. The bank between the crest and the pad is the dam,
+   faced by the masonry dam wall. The wall is a built retaining structure
+   with collision, standing on the terrain's own slope, and does not raise
+   anything. Survey it with a probe so the wall meets the ground along its
+   whole length.
+4. **The mill lane**: a graded corridor about 14 m wide from the mill pad to
+   the village edge at (41,-50), falling from 0.5 to 0. It holds the road and
+   the leat clear of the hills' bumps.
+5. **The overlook pad falls from +2.0 to 0**, level with the village, so the
+   leat reaches the rim downhill. Re-run `tools/ohio_cliff_probe` for:
+   - the terrace's foundation;
+   - the edge walk behind the rim notch (z 12 to 29).
+6. **A cliff-foot bay of the lake**, hugging the plateau rim from bearing
+   about +8° (where it joins the existing lake mouth) to about +32°. Its water
+   reaches about 55 m out, with a beach to 70 m.
    - The rim inside it is a **vertical cliff**: the hard step at the edge
-     radius that the gorge already has, with no 92 m lake slope and no
-     18 m corridor smoothing. A water arc only 6.7 m out after 68 m of fall
-     would strike a face that is merely steep.
-   - The floor is about 12 m deep at the cliff foot, shelving to 2 m at the
-     beach.
-   - Both `lake_coverage` and `_lake_surface_coverage` include it, at the
-     lake's level of −61.65 m.
-4. **The plunge pool.** Fall corridor 0 moves from −7.8° to the mouth (about
+     radius that the gorge already has, with no lake slope and no corridor
+     smoothing.
+   - The floor is 12 m deep at the cliff foot, shelving to 2 m at the beach.
+   - It is included in `lake_coverage` and `_lake_surface_coverage` at
+     −61.65 m.
+7. **The plunge pool.** Fall corridor 0 moves from −7.8° to the Lip (about
    13°) and keeps only its plunge-pool depth. The old fall site returns to
    the lake's ordinary sloped shore.
-5. **Clearances.** Check that nothing placed on the gorge floor between those
-   bearings, within 70 m of the rim, is now under water.
-
-The overlook pad, the village floor and the tarn's level are unchanged.
-
-#### Who it belongs to
-
-- **Tam Ruskin** keeps it all. His dawn round runs up the mill road beside the
-  arcade to the sluice on the dam and back, and he opens the Conduit's
-  cistern. The arcade is the oldest work in Ohio, built by Tam's forebears.
-- **Dorran and Pip** work the mill on the tarn's bank. Their daily walk is
-  now the mill road beside the arches.
-- **Brinna** quenches from the dipping place.
-- **Evening walkers** follow the arches out to watch the water fall.
-- **The children** race sticks down the runnel from the fountain.
+8. **Clearances.** Check the gorge floor under the bay for placed things.
 
 #### Rules it must pass
 
-- **One continuous body of water** from the tarn to the mouth, with a bed
-  level recorded at every course point. The validator checks that the bed
-  falls all the way.
-- **Clearances.** Every way the aqueduct crosses has an arch at least the
-  way's width plus 0.6 m. Cart roads get 4.5 m of clear height, foot paths
-  2.6 m. Nothing stands in an arch's opening or in the channel.
-- **Collision.** Piers, arches and trough walls are blocking, with the
-  coping as a parkour landing. The water surfaces use the liquid surface
-  API.
+- **Water levels.** One continuous body of open water from the tarn to the
+  Lip, with a bed level at every course point. The validator checks:
+  - that the bed falls all the way;
+  - that the water stays below its kerbs.
+- **Crossings.** Every way that crosses the leat or runnel does so on a slab.
+  Nothing stands in a channel.
 - **The mouth** projects at least 3 m beyond the rim over a vertical face.
-- **Ground changes are terrain only.** No mesh fakes a bench, bank or slope.
+- **Collision.** The channel beds, kerbs and slabs are solid. The water uses
+  the liquid surface API. The dam wall, the mill and the Conduit house are
+  blocking.
+- **No hidden fakes.** Ground changes are terrain only, and no pipe or
+  machinery is shown that nobody uses.
 - **Paths stay packed earth** (bible).
 - **Gameplay anchors stay fixed:** the fountain and Water Gem, the stall
-  spots, and the overlook.
-- **Plan updates.** Move the tarn tree at (22,-120), which would stand by
-  the wheel, and the residents' mill spots and schedules for Dorran and Pip
-  (`OhioPlan` home and schedule entries at (75,-87.5)).
+  spots, the overlook, and the inn and its keeper.
+- **Plan updates:**
+  - Dorran's and Pip's spots and schedules move to the new mill;
+  - the tarn tree at (22,-120) moves off the tail channel;
+  - the timber yard moves east of the new mill.
 
 **Superseded by this:**
 - the tarn's east sill;
-- the sawmill at (75,-95.2) and its bench;
+- the sawmill at (75,-95.2) and its 3.5 m bench;
 - `OhioPlan.AQUEDUCT_COURSE` and the fall at (83.2,-102);
 - the fall corridor at −7.8°;
-- both earlier versions of this section.
+- the overlook pad at 2.0 m;
+- every earlier version of this section (ground leat to the old mill,
+  arcade with the mill on a raised bench, arcade from a bank mill).
 
 ## 4. Building briefs and 5. Variation matrix
 
