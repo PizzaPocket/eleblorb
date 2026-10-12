@@ -101,6 +101,7 @@ computer.
 | X4 | Boat riding as a shared traversal mode | all | Decide | control design | 7 |
 | X5 | Dialogue: Fire, frontier and Ocean residents rewritten with their rebuilds | all | Ready with each rebuild | — | 17 |
 | X6 | Shop item descriptions that explain mechanics | all | Decide | the user | 17 |
+| X7 | Beds resized to the world's people (sense check 2026-10-12, below) | all | Ready, then Verify | Godot, to re-run the room layouts | 21 |
 
 ## 1. Ohio, starting village
 
@@ -922,3 +923,46 @@ over 1,800 m). Code when approved:
   - the flume landing is water.
 - Survey first: the bed against `_ground_y` along the course, and
   `tools/ohio_cliff_probe` after the overlook and bay changes. Needs Godot.
+
+## 21. Beds are too small for the game's people (2026-10-12)
+
+The user felt the beds were small, and they are. People are built about
+2.0 m × their body scale (`ProceduralFigure`: feet to crown about 2.0 m at
+scale 1; `npc.gd` takes 1.9 × scale as head height):
+
+| Who | Body scale | Height |
+|---|---|---|
+| The hero | 0.95 | about 1.9 m |
+| Ohio men (`NPC_MALE_BODY_SCALES`) | 0.97 to 1.16 | about 1.94 to 2.32 m |
+| Ohio women | 0.84 to 0.99 | about 1.68 to 1.98 m |
+| Fire, Snow and Rock and Ground men | up to 1.15 to 1.17 | up to about 2.34 m |
+
+The beds:
+
+| Builder | Mattress | Used by | Verdict |
+|---|---|---|---|
+| `TownProps.build_bed` | 1.32 × 2.16 m (frame 1.44 × 2.36) | Ohio, the Snow Village, every `VillageInn` | too short for most men, and for the hero with a pillow |
+| `FishingBuildings._narrow_bed` | 0.88 × 1.96 m | fishing village | shorter than the hero |
+| `CalderaFurniture.bed` | 0.96 × 2.04 m | Fire city | far too short for lava men up to 2.34 m |
+| Nahl's lava bed | 2.04 m inside | Fire city | short |
+
+**The fix (rule in the architecture skill):**
+- a mattress is at least as long as the tallest likely sleeper plus 0.2 m:
+  2.5 m for any adult bed;
+- a double is 1.6 × 2.5 m (frame about 1.75 × 2.65), a single 1.05 × 2.5 m,
+  and a child's bed 0.9 × 1.9 m;
+- each culture's bed keeps its own form at these lengths.
+
+**Code:**
+- Give `TownProps.build_bed` a size (double, single, child), defaulting to
+  the double.
+- Resize `_narrow_bed` and `CalderaFurniture.bed` to the single length, and
+  Nahl's lava bed to 2.5 m inside.
+- Re-run every interior's `RoomLayout` fit: Ohio's upper floors, the Snow
+  Village and every inn. The longer frames need about 0.3 m more room, and
+  some chests at the foot of a bed may move to a wall. Rooms that no longer
+  fit are reported, not squeezed.
+- Related check: doors are 2.4 m clear and the tallest men are about 2.32 m.
+  Check hats and hair against door heads too, though doors are a separate
+  item.
+

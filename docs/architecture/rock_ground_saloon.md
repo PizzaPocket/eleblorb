@@ -170,8 +170,10 @@ z19.2 └───────┴───────────────�
   8.2) onto the **landing hall** (z 8.2 to 11.4), a 3.2 m landing with nothing
   in the way. The hall opens onto the corridor.
 - **Party room** (x −9.0 to −4.8, z 0 to 11.4, 48 m²):
-  - the rest point's wake room, with beds for a large party and floor room
-    for a big companion;
+  - the rest point's wake room, with **one bed** (user, 2026-10-12): a large
+    double at the world's bed size (mattress 1.6 × 2.5 m, section 10), head to
+    the north wall, with a chest, a washstand, chairs by the French doors, and
+    floor room for big companions;
   - a 2.0 m double door from the landing hall;
   - French doors to the front balcony;
   - a linen press over the ramp's foot (x −11.2 to −9.0, z 0 to 3.0), opening
@@ -328,6 +330,19 @@ Two traditions plus the accent: within the rule.
     player can climb the gallery to the balcony;
   - bottles and glasses are decorative.
 - **No text:** signs are pictures only.
+
+## 10. Beds at the world's scale (2026-10-12)
+
+The party room's bed follows the world rule now written into the
+architecture skill.
+- **Mattress length:** at least the tallest likely sleeper plus 0.2 m.
+- **Who that is:** the game's people stand about 2.0 m × their body scale.
+  The hero is about 1.9 m, and men run up to about 2.3 m.
+- **Sizes:**
+  - a double is 1.6 × 2.5 m (frame about 1.75 × 2.65);
+  - a single is 1.05 × 2.5 m.
+
+The shared bed today is 1.32 × 2.16 m, too short for most of the town's men.
 
 ## 9. Fixed, proposed and open
 
