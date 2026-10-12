@@ -117,6 +117,18 @@ Routes are wide enough for the party, Blorbus and a mount everywhere:
 
 Every ramp has a 1.2 m landing at its foot and head.
 
+**Bridge landings (from the 2026-10-12 re-fit, `chinese_village.md` 4.1):**
+- The **axis chain bridge** lands at the apron `(0, 58)`; the gate pavilion is
+  its bridge-head house, anchoring the chains, so it is built of masonry at
+  its base.
+- The **service bridge from B** (covered timber cantilever) meets the rim at
+  about `(52, -23)`, north of the service yard as drawn. Stretch the yard
+  north to `z = -26`, or move it, so the landing opens straight into the yard
+  and not beside the kitchen wall.
+- The **chain bridge from A** meets the rim at about `(-50, -27)`, west of
+  the apartments. It lands at a **west garden gate**, a moon gate in the
+  garden wall: shut before the quest, open after it.
+
 ## 4. Two states, room by room
 
 | Space | Imperial palace (default) | Civic centre (after the quest) |

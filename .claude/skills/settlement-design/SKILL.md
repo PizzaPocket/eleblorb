@@ -143,6 +143,28 @@ the whole world is a final integration check, not the default inspection tool.
   a target per settlement) before detailing. The aerial renders showed the
   islets needed a full landscaping pass.
 
+## Lessons from the Chinese village re-fit (2026-10-12)
+
+- **Budget the land before drawing it.** Sum each island's or district's
+  program (plots with their courts and yards, public squares, landings, plus
+  about 15% for lanes), divide by about 0.65 for buildings packed into an
+  irregular site (0.8 for open fields), and compare it with the usable area:
+  the *smallest* rim radius less an edge strip. The Chinese village's islands
+  were half the size their program needed, which is why the old builder
+  could only scatter single boxes.
+- **Every structure must be able to stand.** Check spans against what the
+  culture's real techniques could carry, and show the means: chains and
+  anchorage houses, cantilevered timber, an arch with abutments. A 60 m flat
+  plank over an abyss with no supports is a placeholder, not a bridge.
+- **Guard the drops at a body's height.** A rail by a lethal drop is about
+  1.05 m, not 0.7 m, and its collider is continuous.
+- **Food and the story's grievances need ground.** If the story is about
+  land, fields, or a levy, the land, the fields and the levy must be visible
+  on the map, worked by named people.
+- **Layout tells the story.** Decide which routes are open and shut in each
+  story state; a closed palace in the middle of everyone's daily walk says
+  more than a line of dialogue.
+
 ## Approval discipline
 
 End every brief with:

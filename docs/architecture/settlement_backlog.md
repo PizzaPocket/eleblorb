@@ -757,3 +757,22 @@ call, since the shop UI is where players read what an item is.
 - Open: Lu's given name; Lu Hao's characters (吕浩 assumed). The user will
   supply both.
 
+## 18. Chinese village settlement re-fit (2026-10-12, awaiting approval)
+
+Full brief: `chinese_village.md` 4.1. Code when approved:
+- New radii in `scripts/chinese_village.gd`: A 25, B 27, C 22, D 34, E 27,
+  Gate 18 (new island at (0, 150)), Bamboo 32 moved to (80, 112). Every
+  island stays inside the Abyss's 170 m full-depth radius.
+- Replace the flat plank bridges with three builders: iron chain bridge
+  (sag 1/20, at least eight collision segments on the curve, 1.05 m chain
+  rails with a continuous guard collider, bridge-head houses as anchorages),
+  covered timber cantilever (stepped log brackets, gallery roof, benches),
+  stone arch. Ring network plus the axis; spans listed in 4.1.4.
+- Rim parapets (1.05 m brick with tile coping; marble on the palace; fence on
+  stone kerb on D and Bamboo), open only at landings and lookouts.
+- D becomes the fields: strips, household plots, threshing floor, shed,
+  night-soil pits. Levy boundary stones on Tian Bo's terraces before the
+  quest, stacked by his shed after.
+- Lian Fu lives above the gatehouse; the well on B.
+- Plan data (`ChinesePlan`) and the validator before any of this.
+

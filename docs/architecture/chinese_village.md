@@ -1,8 +1,10 @@
 # Chinese Village: audit and rebuild proposal
 
 Status: population, backstory, quest resolution and postquest civic use are
-approved. The layout re-fit in section 4, with its courtyard charter and palace
-restructure, was approved on 2026-10-06 but is not yet implemented. No building has moved for this pass.
+approved. The courtyard charter and palace restructure were approved on
+2026-10-06. The settlement re-fit in section 4.1 (land budget, island sizes,
+households by island, bridges, fields, public space) was revised on 2026-10-12
+and awaits approval. Nothing is implemented yet.
 
 Source of truth today is `scripts/chinese_village.gd` (1572 lines, no plan data
 file, no validator). Measurements come from `tools/audit_china.tscn` (headless,
@@ -198,8 +200,8 @@ inn lamp last. Concrete times and paths go in the plan data.
 - Palace: service yard (levy deliveries and kitchen) separate from the public
   axis.
 - Bridges with lamp posts that Shu Mei and Lian Fu actually tend.
-- Total eleven or twelve buildings against nine houses now. The layout in section 4
-  is to be re-fitted to this, including how many houses D should hold.
+- Total eleven or twelve buildings against nine houses now. Re-fitted in
+  section 4.1 (2026-10-12): D holds no houses and becomes the village fields.
 
 ### 3.7 Dialogue consequence
 
@@ -259,45 +261,207 @@ quest. The Chef is never named as the cause by an ordinary resident.
 
 ## 4. Layout (provisional, derived from section 3)
 
-### 4.1 Island roles and network
+### 4.1 Settlement re-fit (revised 2026-10-12)
 
-Island roles below are a first guess from the buildings. They are to be
-re-fitted to the households and civic program in section 3.6 once that is
-approved. The first sketch keeps the seven islands and the Abyss, adds one small
-gate island and reroutes the bamboo island so the palace approach is a clear
-axis.
+The first sketch (2026-10-06) kept the existing island sizes and only moved
+islands. This revision applies what the Ohio, Snow, fishing-village and
+Kai Mālie builds taught (see the `settlement-design` skill's lessons): a land
+budget before coordinates, structures that could really stand, real edges at
+real drops, a public heart, ground for the food the story talks about, and
+one plan data source checked both ways.
+
+#### 4.1.1 Survey of what exists (measured from `scripts/chinese_village.gd`)
+
+- Every island is an authored mesh: a flat grass disc whose rim wobbles by up
+  to 8% of the radius, over a hanging cone of rock about 0.75 × radius deep.
+  Nothing holds it up. All share one surface height, sampled where the entry
+  bridge meets the mainland.
+- `walk_radius` is 0.82 × radius. A plot has to fit inside the *smallest* rim
+  radius (0.92 × radius) less a 2.5 m edge strip for the parapet and a walk.
+- The Abyss is full depth (-400 m) out to 170 m from the village centre and
+  rises to ordinary ground by 220 m. Every island must stay inside 170 m.
+- Bridges are flat plank boxes 3.2 m wide with 0.7 m rails, 42 to 67 m long,
+  with no supports, no chains, no cables and no anchorage. Nothing could hold
+  them up, and a 0.7 m rail over a 400 m drop is lower than a hip.
+
+#### 4.1.2 Land budget: the islands are too small
+
+Footprints come from the charter (4.2): a home is a three-bay main room
+(3 × 3.2 m by 2 × 3.2 m, the engine's building cell) with a court in front
+and a side shed, about **11 × 17 m including its yard wall**. Program areas
+are summed, 15% is added for lanes, plus a 6 × 6 m apron per bridge landing,
+and the total is divided by 0.65, because rectangles packed into a disc waste
+about a third of it (0.8 for open fields).
+
+| Island | Program | Needs (m²) | Usable now (m²) | Radius now → new | Usable new (m²) |
+|---|---|---|---|---|---|
+| A, Lantern Row | Lantern home and workshop (14 × 18), Tile home and stack (12 × 18), play hut and yard (12 × 12), sealing rock and lookout (8 × 10) | 1,330 | 890 | 21 → **25** | 1,320 |
+| B, Market | market square with Chen's stall and the well (18 × 18), Bao house with shopfront (12 × 20), Carrier's home and loading shed (12 × 18) | 1,550 | 790 | 20 → **27** | 1,570 |
+| C, Roofers | Roofer's home and roof yard (11 × 17 + 10 × 12), West end home (11 × 17) | 930 | 620 | 18 → **22** | 990 |
+| D, Fields (new role) | threshing floor (15 × 15), field strips (1,600), eight household vegetable plots (8 × 40), field shed | 2,570 | 700 | 19 → **34** | 2,600 |
+| E, Inn | inn with front court, two-storey hall, back court, kitchen, latrine and guest wing (22 × 28), small Shihu-style garden court (150) | 1,470 | 540 | 17 → **27** | 1,570 |
+| Gate | bridge-head gatehouse with Lian Fu's lodge upstairs (12 × 10), arrival forecourt (12 × 12), four landings | 640 | 230 | 12 → **18** | 620 |
+| Bamboo, Farm | clumping grove (900), Tian Bo's home (11 × 17), shed and Pandy's pen (100), bean terraces (600) | 2,230 | 1,320 | 25 → **32** | 2,280 |
+| Palace | per `chinese_village_palace.md` | fits | 9,350 | 62 (unchanged) | 9,350 |
+
+Every island except the palace was short of land, most by about half. With
+the old sizes the eight homes, the inn and the market could not be built
+with their courts, which is why the existing builder drops single boxes at
+random angles. The new radii roughly double the village's land (5,100 m² to
+11,000 m²) and keep every island inside the full-depth Abyss (the outermost,
+Bamboo, reaches 170 m). The palace still holds nearly half the land, which is
+right for the story: the levy is visible in the map.
+
+**Honest compression.** Real households of this size would farm hectares.
+Here the fields are a readable token, and the story already says the village
+lives by its crafts and buys flour and salt from Ohio. The fields only have to
+read as fields, worked by named people.
+
+#### 4.1.3 Island roles and households
+
+| Island | Centre (was) | Radius | Households and places |
+|---|---|---|---|
+| Palace | (0, 0) | 62 | Liang Zhen and the Chef; after the quest the civic centre, Lu's community kitchen and Liang Zhen's room |
+| Gate (new) | (0, 150) | 18 | **Lamp keeper** (Lian Fu) lives above the gatehouse he tends; arrival forecourt |
+| E, Inn | (-62, 124) | 27 | **Inn and restaurant** (Lu, Lu Hao, Chen as lodger) |
+| B, Market | (108, -48) | 27 | **Bao house** (Hua Chen, Ting), **Carrier** (Bo Xiang, Rong); market square, Chen's stall, the well |
+| A, Lantern Row | (-105, -58) | 25 | **Lantern** (Mei Lian, Jin Wei, Xiu), **Tile** (Yun Tao, Bao); play hut; Sun Wu Kong's rock on the north rim |
+| C, Roofers | (-118, 42) | 22 | **Roofer** (Wen Zhao), **West end** (Shu Mei, Pei), at the village's western end as her lines say |
+| D, Fields | (112, 48) | 34 | no dwelling: field strips, household vegetable plots, threshing floor, field shed |
+| Bamboo, Farm | (80, 112) (was (18, 116)) | 32 | **Farm** (Tian Bo, Pandy); grove on the north half, terraces and farmstead on the south |
+
+Eight dwellings plus the inn, each once, each with an owner. The children sit
+on three islands (Xiu and Bao on A by the play hut, Ting and Rong on B by the
+well, Pei on C), so play crosses bridges. The Carrier is on B because B's
+bridge is the palace's service bridge, where the levy goes in.
+
+#### 4.1.4 Network
 
 ```
-                 Palace (0,0)
-                    |  axial bridge, 44 m
- A -- C             |             B -- D
-                    |
-        E (inn) --- Gate (0,170) --- Bamboo (95,125)
-                    |
-              entry bridge to mainland
+                 A ──chain── Palace ──cantilever (service)── B
+                 │              │                            │
+               chain          chain (axis, 5 m)            chain
+                 │              │                            │
+                 C              │                            D (fields)
+                 │              │                            │ stone arch
+               chain            │                            │
+                 │              │                       Bamboo (farm)
+                 E ─cantilever─ Gate ─────────chain──────────┘
+                                │
+                         chain (entry, 5 m)
+                                │
+                       mainland bridge-head
 ```
 
-- **Gate island** (new, radius 12, centre (0, 170)): a roofed bridge gate, a
-  notice post and a lantern pair. The entry bridge lands here. Forks lead to E,
-  to the bamboo island and straight north to the palace's south door.
-- **E, the guest island:** inn, a small tea stall, the one landing a visitor
-  sees first on the left.
-- **Bamboo island moved to (95, 125):** off the axis, reached from the gate
-  island and from D. It becomes the working island: bean terraces, a tool shed,
-  the farmer's cottage and Pandy's pen on the south half, the clumping grove on
-  the north half with a path through it.
-- **A, Lantern Row:** lantern workshop, two homes, the play hut stays, and
-  Sun Wu Kong's sealing rock on the island's north rim (section 4.6).
-- **B, Market Island:** Chen's stall, Hua Chen's bao house and shopfront, two
-  homes. Lian Fu's home must be assigned separately, close enough to the entry
-  bridge for his lamp round to read clearly.
-- **C and D, residential:** two courtyard homes each. C holds the roofer's
-  yard.
-- **Palace island:** axial complex (section 4.3) with a service yard.
+A ring (Gate, E, C, A, Palace, B, D, Bamboo, Gate) with the processional axis
+through its middle. Before the quest the palace's west landing (from A) is a
+shut garden gate and its service landing (from B) is for deliveries, so the
+villagers walk the outer ring; that the palace sits closed in the middle of
+their daily routes is the story told by layout. After the quest both palace
+gates open and the palace becomes the short cut and the meeting place.
 
-Bridge hierarchy: entry and palace axis 5 m wide with gate posts, island to
-island 3.2 m, farm and grove path 2.4 m. Every landing gets a paved apron and
-paired deck and apron heights that the validator checks.
+| Bridge | Span (m) | Type | Deck width | Use |
+|---|---|---|---|---|
+| Entry: mainland to Gate | 59 | iron chain | 5.0 | arrival; Bo Xiang to Ohio |
+| Axis: Gate to Palace | 77 | iron chain | 5.0 | processional |
+| Gate to E | 26 | covered timber cantilever | 3.2 | visitors to the inn |
+| Gate to Bamboo | 43 | iron chain | 2.4 | farm path |
+| Palace to A | 41 | iron chain | 3.2 | garden gate (shut before the quest) |
+| Palace to B | 37 | covered timber cantilever | 3.2 | service: levy, kitchen deliveries, carts |
+| A to C | 58 | iron chain | 3.2 | ring |
+| C to E | 55 | iron chain | 3.2 | ring |
+| B to D | 41 | iron chain | 3.2 | ring; night soil and produce |
+| D to Bamboo | 11.5 | stone arch | 3.2 | ring; the farm pair |
+
+#### 4.1.5 Bridges: what they are and how they stand
+
+Three classical Chinese types, chosen by span, because nothing stands in the
+Abyss to carry a pier:
+
+1. **Iron chain bridges** (*tiěsuǒqiáo*), after the Luding Bridge of 1706 in
+   Sichuan, which crosses about 100 m with thirteen iron chains: nine under
+   the deck and two each side as handrails. Used for every span over 38 m.
+   - **Anchorage.** At each end the chains pass into a stone **bridge-head
+     house** (*qiáotóu bǎo*) and wrap iron posts set in a masonry block. The
+     house is the landing, the gate and the lamp station. Its weight is the
+     visible reason the bridge stays up.
+   - **Deck.** Cross planks laid on the floor chains, a running board of
+     lengthwise planks down the middle, the chain links showing at the edges.
+     A 3.2 m deck has nine floor chains, a 5 m deck fourteen.
+   - **Sag** about 1/20 of the span, so the deck dips 2 to 4 m and meets each
+     landing at about 11°, well inside the 32° ramp limit.
+   - **Guard.** Handrail chains at 1.05 m (the current 0.7 m rail is too low
+     for a 400 m drop), with a vertical chain or rope every 1.2 m. One
+     continuous blocking collider per side fills the gaps, as the current
+     builder already does, so no blorb slips through.
+   - **Collision** follows the sag as at least eight straight box segments
+     with matching ends, so there is no step at a joint. The visible deck and
+     the collider are built from the same curve.
+   - **Rank.** The axis bridge's chains are lacquered black, its bridge-head
+     at the palace end is the yellow-roofed gate pavilion, and lamps stand on
+     every bridge-head. Others are plain iron.
+2. **Covered timber cantilever bridges** (*shēnbì mùqiáo*, roofed as a
+   *lángqiáo*), after the old cantilevered Wo Bridge of Lanzhou and the roofed
+   bridges of Fujian and Zhejiang. Used for spans up to 38 m.
+   - Layers of logs project in steps from each abutment, each layer further
+     out than the one below, their tails weighted down under a masonry
+     abutment house. A short beam span closes the gap in the middle.
+   - A tiled gallery roof keeps the timber dry. Benches with curved backrests
+     (*měirénkào*) line the sides between the posts, so these bridges are
+     sitting places as well as routes.
+   - The deck rises gently to the middle (no more than 8°). The gallery
+     posts, benches and a balustrade below the bench backs form the guard.
+3. **Stone arch** (*shígǒngqiáo*), one segmental arch springing from the rock
+   lips of D and the Bamboo island, 11.5 m, a humpback with a ramped deck no
+   steeper than 15° (classical humpbacks have steps; ours ramp).
+
+Every landing has a paved apron at deck level; the validator checks the deck
+end and the apron share a height and that the apron is clear of buildings.
+
+#### 4.1.6 Public space
+
+- **Before the quest:**
+  - B's **market square** with the well is the public heart: Chen's stall,
+    Hua Chen's shopfront, the children racing to the well, gossip.
+  - The **covered bridges** to the inn and to the palace service yard are
+    sitting places.
+  - The **gate forecourt** is the arrival.
+  - The **threshing floor** on D is where the village gathers for the
+    harvest and for festivals, and where Mei Lian's lanterns are hung for
+    them.
+  - The **play yard** on A.
+- **After the quest** the palace front court becomes the village square, the
+  Dining Hall feeds everyone on meal nights, and the garden is open.
+
+#### 4.1.7 Farmland and the levy, made visible
+
+- **D, the fields:** four long strips of millet, wheat and soybeans laid
+  east to west, eight household vegetable plots by the B bridge (one per
+  household, each kept differently), the threshing floor, a field shed, a
+  compost heap and night-soil pits downwind on the east rim.
+- **Bamboo:** Tian Bo's bean terraces stepping down the south half, his
+  farmstead, shed and Pandy's pen, and the clumping grove on the north half.
+- **The levy:** before the quest a row of palace boundary stones, capped in
+  yellow, cuts across Tian Bo's upper terraces, and those terraces lie
+  fallow. After the quest the stones are pulled up and stacked by his shed,
+  and the terraces are dug again.
+
+#### 4.1.8 Water, waste and edges
+
+- **Water.** The well on B draws from a spring in the island's rock heart,
+  which is why B was settled first (proposed lore). Each courtyard also
+  collects roof water in a cistern jar. The palace has its own well in the
+  service yard.
+- **Waste.** Night soil is carried each morning from the homes, the inn's
+  latrine and the palace service yard to the pits on D, by the ring.
+- **Edges.** The drop is lethal, so every inhabited rim has a 1.05 m grey
+  brick parapet with a tile coping (marble balustrade on the palace), open
+  only at the landings and at chosen lookouts with their own rail. The fields
+  and the farm have a timber fence on a stone kerb. All are blocking
+  collision; the parapet top is a ledge the player may choose to stand on.
+- **Elevation.** The islands keep their one shared surface height, which the
+  NPC, Pandy and Sun Wu Kong ground code depends on. Level change comes from
+  built plinths and terraces, as in the palace.
 
 ### 4.2 Courtyard and hall charter (homes decided 2026-10-12)
 
@@ -676,7 +840,11 @@ its tile green), and no two neighbours match.
    facing, strokes, residents, schedules, ledger) and extend
    `tools/validate_village.gd` to read it: overlaps, facing, door-front paths,
    bridge landing height and clearance, ledger, schedules.
-2. Island and bridge rebuild (gate island, relocated bamboo island, hierarchy).
+2. Prototype the three bridge types in isolation first (chain deck with sag
+   and segmented collision, timber cantilever with its gallery, stone arch),
+   per the settlement skill's rule on unfamiliar systems. Then the island and
+   bridge rebuild: new radii, the gate island, the relocated bamboo island,
+   bridge-head houses and rim parapets.
 3. Courtyard homes, workshops, inn.
 4. Palace axis, service yard, kitchen route, garden.
 5. Bamboo groves.
@@ -689,8 +857,15 @@ its tile green), and no two neighbours match.
 
 ## 6. Decisions needed
 
-1. Population and story state are approved (sections 3.8 and 3.9). Next
-   decision: the layout re-fit to them.
-2. After that: the gate island and bamboo island move, the courtyard charter
-   (4.2), and the palace restructure (4.3), which moves the Royal Kitchen
-   entrance and adds a service yard.
+**Fixed:** population and story state (3.8, 3.9); the courtyard charter by
+rank (4.2); the palace's two states; Liang Zhen's room.
+
+**Proposed (2026-10-12), for approval:**
+1. The new island radii and the two moves (Gate to (0, 150), Bamboo to
+   (80, 112)) in 4.1.2 and 4.1.3.
+2. The households by island in 4.1.3, with D as the fields.
+3. The ring network and bridge types in 4.1.4 and 4.1.5.
+4. Public spaces, farmland and the levy stones (4.1.6, 4.1.7).
+5. The spring well on B, the parapets and the shared surface height (4.1.8).
+
+**Open:** Lu's given name and Lu Hao's characters (the user will supply).
