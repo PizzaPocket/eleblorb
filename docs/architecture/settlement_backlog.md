@@ -95,7 +95,7 @@ computer.
 | Oc2 | Shared dry-volume system (ships below the waterline, air halls, tunnels) | shared | Ready after Oc1 | Oc1 | 8 |
 | Oc3 | How tournament fights work; the mongooses' harmony quest | Ocean | Decide | the user | 8, 13 |
 | **The city** |||||
-| Ci1 | Settlement plan at real building sizes: site widened to a radius of 240 m, census of 19 with roles, districts around a central plaza, three fidelity levels, the grand hotel rest point and the library | City | Approve | the user; names (the city, Jammer's parents, the hotel staff) | 22 |
+| Ci1 | Settlement plan, second pass: no cars or trains, a dense walkable Tokyo and Hong Kong neighbourhood, a census of forty named residents, four movement layers (ground, the Deck, towers, roofs), Leaf Hat swing corridors, site radius 200 m, the Grand Hotel and the library | City | Approve | the user; the city's name | 22 |
 | Ci2 | Prototype the lit-window "interior mapping" shader and one real-size tower with a podium, before any city layout code | City | Ready | — | 22 |
 | **Across the game** |||||
 | X1 | Story-state triggers on revisit (`WorldState` flags read at arrival) | all | Ready | — | 13 |
@@ -990,8 +990,9 @@ footprints, on a 156 m pad, with 8 m roads. The rebuild uses real sizes ×
 1.1.
 
 **Order once approved:**
-1. The measured layout (settlement stage 4): coordinates, blocks, plots and
-   routes.
+1. The measured layout (settlement stage 4): coordinates, blocks, plots, the
+   four movement layers and the swing corridors (vine reach 78 m, rope 12 to
+   52 m, anchors at least 7 m up).
 2. The style charter (the Western city's concrete-and-glass grammar,
    developed).
 3. Building briefs: the hotel first (the rest point), then the library.
