@@ -1335,7 +1335,8 @@ and sign colour 10 %.
   with flush toilets and basins. Waste goes to the city sewer and the water
   works' reclamation.
 - **How the hero rests:** at the reception desk, with Lucinda in the
-  evening (or Felix by day), then up to the party's suite on floor 20.
+  evening (or Felix by day), then up by lift to the party's suite on floor
+  20, the one built guest floor.
 - **The party's suite:** sitting room, one bedroom with a double bed at
   world scale (mattress 1.55 × 2.3 m), a bathroom, and windows on the park.
   The swing doors beside the revolving door are 2.8 m wide for big
@@ -1354,11 +1355,22 @@ and sign colour 10 %.
 
 ### 8.9 Realised (fidelity A)
 
-The loggia, the vestibule and the atrium with the chandelier, the rock
-garden and the double ramp; reception, the concierge desk and Iris's stand;
-the Long Bar; the mezzanine with the Chandelier Room and the Deck door; the
-lifts; the floor 20 corridor and the party's suite; the podium roof garden.
-The other floors are lit windows only.
+**Only two parts are built inside (user):**
+1. **The atrium:** the loggia, vestibule and revolving door; the atrium
+   floor with the rock garden, the chandelier, reception, the concierge desk
+   and Iris's stand; the double ramp and the mezzanine gallery round the
+   void, with the Deck door, because they are part of the atrium's space.
+2. **One guest floor, floor 20:** the lift lobby, the ring corridor and the
+   party's suite.
+
+Lifts run between the atrium's lift lobby and floor 20 only.
+
+**Everything else is faux and solid:** the Long Bar, the Chandelier Room,
+the function rooms, the offices, the kitchen and every other tower floor.
+They are closed doors and lit windows that show rooms (the interior-mapping
+shader), on solid massing with collision. The roof garden, setbacks and
+copper crown are solid exterior surfaces the hero can still land on and
+swing from, with no interiors behind them.
 
 ## 9. The library, outline
 
@@ -1382,7 +1394,7 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium (with its mezzanine gallery) and floor 20 with the party's suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
 | **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 
