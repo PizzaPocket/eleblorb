@@ -82,7 +82,7 @@ computer.
 | P1 | Community, layout, residents' names, Water Curtain Cave brief | Plant | Approve | the user | 10 |
 | P2 | Training grounds and the training-dummy NME (inert until left unobserved three nights, then a harder skeleton-like fight) | Plant | Approve | the user | 10 |
 | P3 | River end, Flower Fruit Mountain plateau, the cliff, gorge, falls and cave | Plant | Ready after P1 | P1 | 10 |
-| P4 | Batu's and Intan's rewritten lines | Plant | Ready | — | 10 |
+| P4 | Batu's and Intan's rewritten lines | Plant | Done (2026-10-12) | — | 10 |
 | P5 | Jungle density parity with the demo world | Plant | Deferred | the user | 10 |
 | **Rock and Ground** |||||
 | R1 | Census (with Cass Rourke the miner and Gus Pickett the prospector), saloon and hotel, the mechanical and motor-punk layer (open gears, motors and cables; windpumps, stamp mill, race clock), layout, charter, briefs | Rock and Ground | Approve | the user | 15 |
@@ -568,7 +568,7 @@ Planning priorities:
   inert props that can become the training-dummy NME, and the shed. The NME
   itself (bible): a dummy left unobserved for three in-game nights comes to
   life and fights like a skeleton, but harder; it is unlocked by a side quest.
-- Dialogue: replace Batu's and Intan's "whoever's running" lines in
+- Done (2026-10-12, approved): replaced Batu's and Intan's "whoever's running" lines in
   `scripts/jungle_kingdom_village.gd` with the rewritten lines in
   `plant_kingdom_village.md` (section 3).
 - Then interiors and the dress charter.
