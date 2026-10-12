@@ -97,6 +97,7 @@ computer.
 | **The city** |||||
 | Ci1 | Settlement plan, third revision: a desert city with no water nearby, its wells and economy, no cars or trains, a dense walkable Tokyo and Hong Kong neighbourhood, a downtown of skyscrapers, Singapore-style public housing, Pinestein and the outcast city blorbs, a census of forty-five named residents, four movement layers (ground, the Deck, towers, roofs), Leaf Hat swing corridors, site radius 200 m, the Grand Hotel and the library | City | Approve | the user | 22 |
 | Ci3 | Move the wild city blorbs' spawns and the City Gem outside the city's bounds (the desert just beyond the outskirts), and keep city blorbs' roaming outside the Rim Walk | City | Approve with Ci1 | Ci1's layout | 22 |
+| Ci4 | Wind farm: one instanced turbine (tapered tower, nacelle, animated three-blade rotor with solid blades, blinking aviation light, far LOD), then about sixteen placed across the western wasteland arc after a clearance check | City | Approve with Ci1 | Ci1 | 22 |
 | Ci2 | Prototype the lit-window "interior mapping" shader and one real-size tower with a podium, before any city layout code | City | Ready | — | 22 |
 | **Across the game** |||||
 | X1 | Story-state triggers on revisit (`WorldState` flags read at arrival) | all | Ready | — | 13 |
@@ -1020,9 +1021,11 @@ fountains. The brief adds, for approval:
 - the economy;
 - Pinestein's story (section 3b);
 - the Rim Walk as the bounds;
-- the works beyond it: the Sunwell mirror field and solar
-  tower, and the water works;
-- downtown on Meridian Avenue with the Sunspire (about 280 m);
+- the works beyond it: the water works and, further out, the wind farm
+  (fifth revision, user: giant Chinese-style turbines in the wasteland as
+  Moy's power source; about sixteen, 95 m to the hub, rotors 130 m across)
+  with its battery works;
+- downtown on Meridian Avenue with the Windspire (about 280 m);
 - Parkside Estate;
 - five more residents (forty-five in all).
 

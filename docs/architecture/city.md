@@ -93,6 +93,10 @@ the world bible.
   city blorbs simply stay outside the city's outskirts.
 - **No opulent fountains.**
 
+**Fifth revision (user, 2026-10-12):** a field of giant wind turbines, in the
+Chinese style, out in the wasteland around the city, as **Moy's power
+source.**
+
 ## 2a. The site: a city in the desert
 
 **Yes: a city standing up out of open desert, like Las Vegas or Dubai.** The
@@ -145,7 +149,6 @@ the Tokyo and Hong Kong density already suits the desert. Add:
 - the Deck, which shades the street below it;
 - the void decks under the public housing (section 7);
 - pale tile and white roofs that throw back the sun;
-- solar panels on the roofs (low, with collision, part of the roof network);
 - misters at the plaza and the hawker centre.
 
 The city is quiet at noon and comes alive after dusk: the night market and
@@ -165,12 +168,48 @@ follow approval):
 - **All round: the city blorbs** stay out in the open desert just beyond the
   outskirts.
 - **East: the goods yard** where the wasteland road ends.
-- **South-west: the Sunwell solar field.** Mirrors turning with the sun
-  around a **solar tower** about 100 m tall, its receiver glowing white at the
-  top (after Ivanpah and Crescent Dunes). The battery works stand at its
-  foot. The tower is a
-  landmark and the only swing anchor out in the desert.
 - **North-west: the water works** and the water tower.
+- **Further out, north-west and south-west: the wind farm** and its battery
+  works (below).
+
+**The wind farm: Moy's power.** The city runs on the wind.
+- **Why here.** The basin between the plateaus funnels a steady wind from
+  the west across the gorge floor; it is the same wind that drifts sand
+  against the city's west edge.
+- **Precedent:** the giant wind bases in China's deserts (Jiuquan in Gansu,
+  Dabancheng in Xinjiang, Inner Mongolia): long lines of huge white
+  three-bladed turbines standing in open desert to the horizon.
+- **Size:**
+  - a tapered white steel tower about 95 m to the hub, about 6 m across at
+    its foot;
+  - a rotor 130 m across (three blades of about 65 m);
+  - about 160 m to the tip of a raised blade.
+
+  The newest real Chinese turbines are bigger still, with tips past 250 m.
+  This size keeps them giant beside a 1.9 m hero and the 140 to 280 m
+  downtown towers, and lets a field of them fit the world's small map.
+- **Number and placement:** about sixteen, in loose lines across the western
+  wasteland arc, north-west and south-west of Moy and on past the Jungle and
+  Ice plateaus. They stand about 200 m apart and at least 100 m clear of the
+  Rim Walk, the plateau slopes, the world's skirt and the wasteland road.
+  Coordinates follow a placement check.
+- **Motion and light.** All face west into the wind and turn together,
+  slowly, about ten turns a minute. Red aviation lights on the nacelles blink
+  in unison at night, a second skyline around the city's.
+- **Detail:**
+  - a nacelle with a railed service roof;
+  - a door at each tower's foot;
+  - a substation beside the **battery works**, which stand at the field's
+    edge nearest Moy, store the wind's power for calm days, and charge the
+    batteries that go out by road;
+  - cables buried, not modelled;
+  - a low, slow whoosh near the towers.
+- **Collision and play:**
+  - Towers are solid cylinders, and the nacelle roof is a landing.
+  - Blades are animated solid bodies, so a turning blade sweeps the hero
+    aside.
+  - The towers are the only swing anchors out in the desert. There is no
+    route up inside them (no ladders, by the ramp rule).
 
 ## 3. Who lives here, and what they need
 
@@ -190,10 +229,10 @@ to school. The days are hot and the nights are the city's best time.
 
 ### Why a city here: what people do, and how it earns
 
-A desert city needs a reason to exist. This one has **the sun.**
+A desert city needs a reason to exist. This one has **the wind.**
 
-1. **Energy, the founding industry.** The **Sunwell** company runs the solar
-   field and the battery works. The city was built for the Sunwell as Las
+1. **Energy, the founding industry.** The **Windworks** company runs the wind
+   farm and the battery works. The city was built for the Windworks as Las
    Vegas was built for its dam. Charged batteries leave by the wasteland
    road: the Rock and Ground town's charging posts and motor-horses run on
    them.
@@ -201,7 +240,7 @@ A desert city needs a reason to exist. This one has **the sun.**
    downtown, works on power and on "living current". Start-ups spun out of
    it fill floors of the downtown towers, and Tanglewire recruits for both.
    Pinestein worked at the Institute.
-3. **Professional services.** Law (Raman & Reese: the Sunwell's contracts, the
+3. **Professional services.** Law (Raman & Reese: the Windworks's contracts, the
    Institute's patents and the city's own cases) and finance serve the first
    two.
 4. **Hospitality and spectacle.** People come in from the towns for the
@@ -234,7 +273,7 @@ unnamed: these forty-five are the people the hero meets.
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
 | **Elizabeth Reese** | the family's flat, Block 3, Parkside Estate, 18th floor | lawyer, partner at Raman & Reese on Meridian Avenue | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. She defended Pinestein at the inquiry after the Blackout, and lost. |
-| **Dan Miller** | the same apartment | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at the Institute, the Sunwell and the start-ups | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
+| **Dan Miller** | the same apartment | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at the Institute, the Windworks and the start-ups | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
 | *(Jammer)* | away, at his grandmother's in the Middle of Nowhere | — | Their son; his room in the apartment is full of drawings of the farm. |
 
 Raman & Reese is named for its two partners, Priya Raman and Elizabeth.
@@ -292,13 +331,13 @@ in character and pointing nowhere:
 | **Venn Harlow** | Wing Fat Mansion | paralegal at Raman & Reese | Same commute every day, the same fifteen floors; quietly the firm's memory. |
 | **Theo Park** | Lantern Lane | software engineer at a start-up | Dan is trying to place him; he would rather be skateboarding on the decks. |
 
-**The sun, the water and the Institute**
+**The wind, the water and the Institute**
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
 | **Palbert Pinestein** | a top-floor flat and laboratory on Lantern Lane, the roof bristling with antennas and coils | none, officially; dismissed from the Lumen Institute | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
 | **Dr. Vera Kask** | a downtown flat | director of the Lumen Institute | Pinestein's oldest colleague, and the one who dismissed Pinestein after the Blackout. Still keeps Pinestein's old notebooks locked in her office. |
-| **Omar Haddad** | a flat at the battery works | chief engineer of the Sunwell solar field | Keeps a thousand mirrors clean in a sandstorm country. |
+| **Omar Haddad** | a flat at the battery works | chief engineer of the Windworks wind farm | Climbs ninety-five metres to a nacelle before breakfast and calls it his commute. |
 | **Rafael Ortiz** | the keeper's house at the water works | keeper of the wells and the water works | Counts every litre the city uses twice, and has never once let the park's pond run dry. |
 
 **Care, safety and teaching**
@@ -390,7 +429,7 @@ city's bounds. **The rest is proposed.**
 | Making | Gideon; Zara | the Helmsmith; the sign studio |
 | Upkeep | Juno, Dax, Kade, Suri, Orin | the towers, the decks, the facades, the park |
 | Moving goods without cars | Tomas | cargo trikes, hand trucks and service lifts; deliveries at dawn through the back lanes |
-| Power | Omar | the Sunwell solar field and battery works |
+| Power | Omar | the Windworks wind farm and battery works |
 | Water | Rafael | the wells, the water works and the roof tanks |
 | Research | Vera; Pinestein, alone | the Lumen Institute; Pinestein's rooftop lab |
 | Cheap, good food near home | Siti | the Parkside hawker centre |
@@ -421,8 +460,8 @@ hero about 1.9 m. City buildings follow it, on the 3.2 m building cell.
 | Public housing point block | about 22 × 22 m, 30 to 40 storeys (about 100 to 130 m), on an open void deck |
 | Public housing slab block | 13 to 16 m deep, 60 to 90 m long, 12 to 16 storeys (40 to 52 m), with open corridors |
 | Downtown skyscraper | 35 to 45 m square on a podium, 35 to 55 storeys (140 to 220 m) |
-| The Sunspire, the tallest | about 45 m square, about 70 storeys, about 280 m with its crown |
-| Solar tower (outside the bounds) | about 100 m |
+| The Windspire, the tallest | about 45 m square, about 70 storeys, about 280 m with its crown |
+| Wind turbine (outside the bounds) | about 95 m to the hub; rotor 130 m across; about 160 m to the tip |
 | City block | 45 to 70 m, crossed by lanes |
 
 ## 5. Architectural language: a layered vertical city
@@ -472,7 +511,7 @@ The shares are of the city's land.
 | Signs | the signature motif: lit **picture signs** stacked vertically up the facades and hung across the lanes, never lettered; painted by Zara |
 | Roofs | flat, with parapets; rooftop gardens, water tanks, laundry, rooftop bars on the hotel and offices |
 | Circulation on the facade | open gallery corridors on the homes; round **ramp towers** in place of stair towers |
-| Downtown | stone-and-glass towers on podiums; setbacks; each tower its own crown, lit at night; sky lobbies; the Sunspire's observation deck |
+| Downtown | stone-and-glass towers on podiums; setbacks; each tower its own crown, lit at night; sky lobbies; the Windspire's observation deck |
 | Public housing | point and slab blocks with open void decks at the ground; open corridors; laundry poles out of every window; painted block numbers as big graphic shapes (numerals only, as on any real estate); sky bridges and a sky garden between twin blocks |
 | Shade | verandas, arcade roofs, shade sails, void decks, the Deck, street trees; pale tile and white roofs; misters |
 | Palette | pale tile (cream, mint, salmon, pale blue and grey); concrete; sand and white against the desert; warm window light; saturated sign colour at night |
@@ -507,7 +546,7 @@ often.
    - the library's second floor;
    - the office towers' lobbies;
    - the market's upper hall;
-   - the downtown podiums and the Sunspire's lobby;
+   - the downtown podiums and the Windspire's lobby;
    - the estate's neighbourhood centre.
 
    It is reached at every node by a **ramp tower** (a round tower with a
@@ -519,7 +558,7 @@ often.
    the realised floors; elsewhere they are facade-only. Homes have open
    gallery corridors and ramp towers outside.
    - **Downtown:** express lifts to sky lobbies every twenty or so floors,
-     then local lifts. The Sunspire's express lift runs to the observation
+     then local lifts. The Windspire's express lift runs to the observation
      deck, which is realised and looks out over the whole world.
    - **The estate:** lifts stop at every floor. The twin point blocks share
      **sky bridges and a sky garden at the 26th floor** (after Pinnacle@Duxton),
@@ -540,7 +579,7 @@ often.
   inside the rope's 52 m, so a wearer can chain from tower to tower. Plazas
   between them stay under 50 m across.
 - The estate's point blocks anchor swings across the park.
-- Out in the desert there is nothing to swing from but the solar tower.
+- Out in the desert the only anchors are the wind turbines' towers.
 - The lanes are too tight to swing in and are for walking.
 
 **Climbing:** the library's terraces, the tong lau verandas, balconies, the
@@ -557,7 +596,7 @@ sign gantries and the ramp towers' outsides.
    ├───────────────┬──────────────────────┬────────────────────┤
 W  │ LANTERN LANE  │   CENTRAL PLAZA      │ DOWNTOWN           │ E, outside:
    │ pencil bldgs, │ city hall (N)        │ Meridian Avenue:   │  goods yard,
-   │ café, cinema, │ LIBRARY (W)          │ the Sunspire, the  │
+   │ café, cinema, │ LIBRARY (W)          │ the Windspire, the  │
    │ bath, clinic, │ GRAND HOTEL (E) ─────┼─ glass tower, the  │
    │ police box,   │ museum (S)           │ Lumen Institute    │◄── arrival by
    │ Pinestein's   │ trees, misters       │                    │  the wasteland
@@ -567,7 +606,7 @@ W  │ LANTERN LANE  │   CENTRAL PLAZA      │ DOWNTOWN           │ E, outs
    └──────────────────────────── S ────────────────────────────┘
        the Rim Walk rings the whole city: the bounds;
        the city blorbs stay out in the desert beyond it
-       (SW, outside: the Sunwell mirror field and solar tower)
+       (further out, NW and SW: the wind farm and battery works)
 ```
 
 - **Arrival.** From the east, the wasteland road ends at the goods yard.
@@ -617,8 +656,8 @@ W  │ LANTERN LANE  │   CENTRAL PLAZA      │ DOWNTOWN           │ E, outs
   Jammer's family lives in Block 3, overlooking the park. The Housing Board
   (Juno) runs the estate.
 - **Downtown** (east), on **Meridian Avenue**, is the city's workplace and
-  its skyline: six or seven skyscrapers of 140 to 220 m and the **Sunspire**,
-  the Sunwell's headquarters, about 280 m tall with an observation deck. Here
+  its skyline: six or seven skyscrapers of 140 to 220 m and the **Windspire**,
+  the Windworks' headquarters, about 280 m tall with an observation deck. Here
   are Raman & Reese, Tanglewire's glass tower, the start-up floors and the
   Lumen Institute's campus. The Grand Hotel's guest tower stands at
   downtown's plaza end.
@@ -684,7 +723,7 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the Pine Bath; the family's flat; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the Parkside hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Sunspire's lobby, express lift and observation deck; the mirror field (outside) |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium, mezzanine, gallery and suite; the library; city hall's chamber; the museum's hall; the Moonlight Cinema; the Pine Bath; the family's flat; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the Parkside hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
 | **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 
@@ -694,7 +733,7 @@ in every lit window at almost no cost. Prototype it first.
 **Performance:** stream the detailed city block by block; merge each
 building's statics; instance the repeated facade parts and signs. People
 simulate only near the player (forty-five named residents are within the
-budget the fishing village proved). The Sunspire and downtown must read in the
+budget the fishing village proved). The Windspire and downtown must read in the
 far skyline from the plateau, so the skyline tier gains their silhouettes and
 lit crowns.
 
@@ -718,6 +757,8 @@ lit crowns.
   (user, 2026-10-12), and they can speak of the Middle of Nowhere. Proposed
   clues: Elizabeth's photograph of the hero as a boy, Jammer's room full of
   farm drawings, and the farm's mark on Wen Li's crates.
+- Giant wind turbines, after China's desert wind bases, out in the
+  wasteland around the city: **Moy's power source** (fifth revision).
 - No mahjong; chess is fine. A giant playground in the park. No Element
   Shrine.
 - (third revision) a city standing up out of the desert, like Las Vegas or
@@ -740,12 +781,14 @@ lit crowns.
 - the goods yard as the end of the wasteland road;
 - (third revision) the water story (deep wells, reclaimed water, roof tanks)
   and the water works;
-- the economy: the Sunwell, the Lumen Institute, law and finance,
+- the economy: the Windworks, the Lumen Institute, law and finance,
   hospitality; food imported from the farmland;
 - the Rim Walk as the bounds; the city blorbs and the City Gem in the desert
-  just beyond it; the Sunwell mirror field and solar tower;
+  just beyond it;
 - Meridian Avenue (renamed from Harbour Street); Parkside Estate; the
-  Sunspire;
+  Windspire;
+- (fifth revision) the wind farm's size, number and placement; the
+  Windworks and the Windspire (renamed from the Sunwell and the Sunspire);
 - the five added residents; the Blackout; Elizabeth's defence of Pinestein.
 
 **Open:**
@@ -760,4 +803,8 @@ lit crowns.
   unplugging a sign), never with a stated rule;
 - whether Pinestein has a quest, such as a case to let the city blorbs back
   in;
-- the Sunspire's height against the far skyline's draw distance.
+- the Windspire's height against the far skyline's draw distance;
+- whether a turning blade knocks the hero aside (proposed) or passes
+  through him;
+- the turbines' draw cost: sixteen animated rotors seen from across the
+  world (proposed: one shared mesh, instanced, rotors as cheap far LODs).
