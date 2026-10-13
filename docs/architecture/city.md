@@ -735,8 +735,8 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     Grand Hotel on the north, the glass tower on the south. Shade trees,
     misters and benches; Pia busks here; the Deck's main ramp tower.
   - **Library Square**, on the park's west side where West Street arrives,
-    with the library along its north side and the terraced steps where
-    people sit.
+    with the library's curved front and its portal along the north side,
+    and broad sitting steps before it.
   - **Market Square**, on South Street, ringed by stalls by day and by the
     night market after dark, with the wet market hall on its east side.
   - **Estate Square**, on North Street in the North Estate: the estate's
@@ -1143,7 +1143,7 @@ round the park and on Civic Plaza.
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 3 | Library | 45 × 62 m | 5 storeys and a sunken heritage room; terraced atrium, Books Spiral, reading room (section 9) | Ada Fong, Nia Calder, Benji Okoro |
+| 3 | Library | 45 × 62 m | art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9) | Ada Fong, Nia Calder, Benji Okoro |
 | 5 | Moonlight Cinema | 30 × 28 m | 2 storeys, built later into the old town; flat above | Leon Duarte (lives above) |
 | 6 | Police box | 6 × 8 m | 1 storey, back room | Kate Byrne |
 | 7 | Clinic | 14 × 18 m | 3 storeys; flat above | Dr. Arjun Mehta (lives above) |
