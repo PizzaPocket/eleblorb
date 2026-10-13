@@ -277,6 +277,42 @@ House workshop docks the same way. Crown halls are 12 m across.
 On approval this data replaces the second pass in `tools/sea_folk_layout.py`
 and `SeaFolkPlan`, and the validator takes the same checks.
 
+## 11. The walls, the roof and the civic hall (proposed, 2026-10-13)
+
+The city is enclosed (culture brief section 4a). Everything below is in
+`tools/sea_folk_third_pass.py` and drawn in the floor plans and the 3D model.
+
+| Element | Where | Size |
+|---|---|---|
+| Walls | octagon; inner faces of the sides 135 m out, the mitres' 166 m | sides 199 m, mitres 50 m, 8 m thick; seabed to 96 m (24 m above the sea); 76 to 120 m tall from their foot |
+| Dark course / light course | below / above 74.5 m | the first city's sea wall / the closing walls and roof |
+| Roof | slab 90 to 96 m, vault soffit 88 m | air hall 16 m high over the water at 72 m |
+| Piers | eight at 100 m (22.5 + 45k degrees); four at 60 m (67.5, 157.5, 247.5, 337.5) | 6 m and 5.2 m across |
+| Light wells | 60 m out over the eight avenues | 8 m square, glass-capped |
+| Sea gates | the sides' middles, on the avenues at 0, 90, 180, 270 | 14 m wide, 24 m tall, shut; swim-wickets |
+| Fountain | roof centre | basins 40, 26, 14, 6 m across; rims 0.9 to 12 m up; jet 16 m; glass floor 6.5 to 14 m out |
+| Secret stair | pedestal, door at 270 degrees behind the second tier's curtain | shaft 6.8 m across, from the roof to the waterline landing at 73 m |
+| Central trunk | the column, centre | 8 m across, glass, 74 m down to the palace roof at 19 m |
+| Civic hall | over the mound, round Tidehall | glass SuperEgg 44 x 41 x 32 m, epsilon 2.6; floor 2 m (the old terrace); pool locks at the four avenue feet |
+| Civic link | from the ring at 92 degrees in to the civic hall's gallery | tunnel 21 m; a ramp from the terrace up to the gallery at 4.4 m |
+| Kraken lookout | on the parapet over the main gate | 10 x 7 m glass room |
+| Ancient spires | (r, bearing): (96, 8), (95, 60), (88, 152), (97, 214), (90, 265), (99, 328), (64, 174) | 46, 28 broken, 38, 22 broken, 48, 34 broken, 18 broken m |
+
+Circulation: the secret way in is roof, door, stair, landing, central trunk,
+civic hall. Ikara reaches the lookout across the roof. Swimmers enter by the
+gates' wickets and the pool locks. Visitors on legs reach the civic hall by
+the civic link from the ring.
+
+Checks added:
+- everything at least 6 m inside the walls, and under the water but the trunk;
+- the mitres shorter than a third of a side;
+- the light wells clear of the piers;
+- the gates on the sides;
+- the fountain's glass floor between the shaft and the rim;
+- the trunk reaching the shaft;
+- the walls at least 40 m clear of the Kraken's water (they are 47 m);
+- the spires and piers 3 m clear of everything.
+
 ## Fixed, proposed and open
 
 **Fixed:** the city centre, floor and flat radius; the castle, homes and
@@ -292,6 +328,11 @@ every footprint above.
 - the glass network and the four trunks in section 10;
 - the light pipes removed.
 
+**Proposed (enclosure, section 11):** the walls, roof, piers, wells, gates,
+fountain and secret stair; the civic hall and central trunk; the civic link;
+the ancient spires; the lookout moved to the wall.
+
 **Open:**
-- names for the two eras and the Strangers' Houses;
+- names for the three eras and the Strangers' Houses;
+- whether the first city built the sea wall (proposed);
 - the crown halls' programs.

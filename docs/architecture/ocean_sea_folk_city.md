@@ -55,6 +55,11 @@ folk swim in three dimensions; nothing ties them to the floor except habit and
 history. The city now shows both: an old city on the floor and a new one
 risen into the water above it.
 
+Under both lies a third layer, older than anything the classical city kept:
+**the first city**. Its spires still stand here and there inside the walls,
+some whole and some broken off, never restored and never taken down. Its sea
+wall is the dark lower course of the city walls (section 4a).
+
 ### The classical city: the floor
 
 What the sea folk built before air halls: **Tidehall**, the **Ring Current**, the
@@ -123,13 +128,20 @@ Two kinds of work, both in SuperEggs (revised 2026-10-13 after review):
 3. **Height is age.** The floor is the oldest; the higher the structure, the
    newer. A visitor sinking from the surface passes from the newest city to the
    oldest.
-4. **The column over Tidehall stays open.** Nothing modern stands over the
-   mound (within 24 m of the centre) at any height. Tidehall stays wet, open
-   and unwrapped: the living palace, not an exhibit. Its oculus looks straight
-   up a clear well of water to the crown ring's lights and the faint surface.
+4. **Tidehall under glass: the civic hall.** The palace is kept whole inside
+   one glass SuperEgg 44 m across and 32 m high, and is dry. The city's
+   business is done there: audiences in the old hall, the assembly on the
+   palace roof terrace under the crown of the glass, hearings round its feet.
+   Over the mound nothing else modern stands but the central trunk, which
+   drops into the civic hall from the fountain's shaft. Daylight falls down
+   the column through the fountain's glass floor.
 5. **The Glassworks is the hinge.** It is the first glass bubble, socketed by
    the warm vent that heats its furnace, and is where the new era began. The
    avenue tunnel joins it to the network.
+6. **Enclosed.** The modern city closed itself in. It raised the first city's
+   sea wall above the water in a lighter stone and roofed the whole city
+   (section 4a). It built them in the classical manner, so from outside the city
+   reads as one old fortress.
 
 ### Shared between the eras
 
@@ -231,10 +243,24 @@ several existing lines refer to them.
 
 ### Governance
 
+The city's business is done in the civic hall, the palace kept dry under glass:
+audiences in the old hall, the assembly on the palace roof terrace.
+
 The Tidekeeper rules, but as a listener and judge. Each household speaks for
 itself in the audience hall. The hero fights the Tidekeeper because fighting to
 test a visitor's mettle is part of sea folk culture: a challenge of respect,
 not hostility.
+
+### Isolation
+
+The sea folk are protective, and by choice isolationist. They walled and
+roofed their city, and they keep its four sea gates shut. The city's own come
+and go by a small swim-wicket in each gate. To ships and swimmers the city is a
+stone fortress standing out of the sea, with a fountain on its roof and no door
+at the waterline. The way in that the city does not advertise runs through the
+fountain. The luminous trail across the seabed still leads to the main gate; it
+is older than the walls. This sharpens the discord below: a people already
+inclined to close their gates find every reason to keep them closed.
 
 ### Relations: discord now, harmony later
 
@@ -326,9 +352,39 @@ legs and an unhelmeted hero can walk the city without entering the water.
 - **Air:** the whole network is one sealed volume, as the spaceship's cabin and
   docking neck are.
 
+## 4a. The walls and the roof (proposed, 2026-10-13)
+
+- **Plan:** an octagon that reads as a square with short mitred corners. The
+  inner faces of the sides are 135 m from the centre, so each side is 199 m and
+  each mitre 50 m. The walls are 8 m thick. The four avenues at 0, 90, 180 and
+  270 degrees meet the middles of the sides; the diagonal avenues meet the
+  mitres.
+- **Height:** from the seabed, 72 m down, to a flat roof 24 m above the sea,
+  about a third again above the water.
+- **Stone:** to 2.5 m above the waterline, the first city's sea wall, a dark,
+  sturdy stone in heavy rusticated courses. Above it, a lighter stone with
+  pilasters every 20 m, string courses, a cornice and a parapet. The string
+  courses and rustication give a climber holds.
+- **Inside:** the sea up to the waterline, then 16 m of air under a coffered
+  vault. Eight piers at 100 m and four at 60 m carry the vault, in the dark
+  stone below the water and the light stone above it. Lamps hang over the
+  water.
+- **Light:** eight glass-capped wells in the roof at 60 m over the avenues, and
+  a glass ring in the floor of the fountain's lowest basin over the open
+  column.
+- **Gates:** four sea gates, 14 m wide and 24 m tall, on the seabed where the
+  avenues meet the sides. They are shut, and each leaf has a swim-wicket.
+- **The roof:** a stone plaza. At its centre is a four-tiered working fountain,
+  its basins 40, 26, 14 and 6 m across, with a jet at the top. Behind the curtain
+  from the second tier a pivoting stone in the pedestal opens on a stone stair.
+  The stair runs down a shaft through the roof to a landing at the waterline,
+  where the glass central trunk takes over and descends into the civic hall.
+- **The Kraken lookout:** a glass watch room on the parapet over the main gate,
+  facing the islands. It replaces the lookout bubble on the 112.5 trunk.
+
 ## 5. Architectural charter (third pass, proposed)
 
-Two eras, each a closed kit (section 2a).
+Two eras, each a closed kit (section 2a), over the remnants of a third.
 
 | | **Classical: the heritage** | **Modern: the glass** |
 |---|---|---|
@@ -346,6 +402,8 @@ Two eras, each a closed kit (section 2a).
   building of both eras; pearl lamps (the accent, about 5 percent); SuperEggs
   and superellipses throughout.
 - **Hierarchy:**
+  - The civic hall, with Tidehall inside it, is the polite building of the
+    city.
   - Tidehall is the polite building of the classical city.
   - The Exchange is the polite building of the modern one.
   - The Glassworks is the hinge between the eras.
@@ -355,7 +413,10 @@ Two eras, each a closed kit (section 2a).
   - from other traditions: Greek temple orders and pediments (they belong to
     the Sky Kingdom); Minoan horns of consecration, double axes and other
     sacred emblems;
-  - from the wrong mood: ruins and broken columns; anything that reads as a
+  - from the wrong mood: picturesque ruins and scattered broken columns (the
+    first city's spires are the one exception: real remnants kept where they
+    stand, never restored, never added to, and nothing new touching them);
+    anything that reads as a
     sunken human city; boxes;
   - from earlier passes: light pipes; cables and stalks; anything standing on
     legs or stilts; bird-cage ribs or fine metal grids on glass; columns in the
@@ -419,6 +480,10 @@ written explicitly.
 
 **Fixed:** the castle, homes, paths, lamps, gardens and twenty residents
 already built; merfolk bodies; the merchants; the Tidekeeper and Nautilus Crown.
+
+**Proposed (2026-10-13):** the walls and roof (section 4a); the civic hall
+round Tidehall; the first city and its spires; the fountain and the secret way
+down; the sea folk's isolationism; the lookout on the wall.
 
 **Proposed:** the Atlantis and Minoan influences with modern technology;
 orichalcum; air halls entered by moon pool, where the sea folk walk on legs;

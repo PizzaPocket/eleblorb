@@ -13,8 +13,8 @@ Edit here and republish; the tools in `tools/*_layout.py` and
 | `chinese_village_plan.html` | the Chinese village |
 | `ohio_aqueduct.html` | Ohio's water system |
 | `ocean_plan.html` | the Ocean Kingdom chart, Kai Mālie, the sea folk city, the pirate ships |
-| `sea_city_3d.html` | the sea folk city 3D model (superseded first draft of the third pass) |
-| `sea_plans.html` | the sea folk city third-pass floor plans |
+| `sea_city_3d.html` | the sea folk city in 3D: third pass with its walls, roof and fountain. Rebuild with `python3 tools/sea_folk_third_pass.py --json data.json` then `python3 tools/embed_drawing_data.py docs/drawings/sea_city_3d.html data.json` |
+| `sea_plans.html` | the sea folk city third-pass floor plans, with the walls and roof; rebuilt the same way as `sea_city_3d.html` |
 | `plant_village_3d.html` | the Plant Kingdom and its village in 3D, planned and built today. Its data comes from `python3 tools/plant_village_layout.py --json`, pasted in place of `/*DATA*/` before publishing |
 
 Every drawing is updated whenever the plan it shows changes.

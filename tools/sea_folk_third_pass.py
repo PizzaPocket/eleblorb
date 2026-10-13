@@ -296,7 +296,7 @@ SPIRES = [(96.0, 8.0, 46.0, 3.4, False), (95.0, 60.0, 28.0, 3.0, True), (88.0, 1
           (64.0, 174.0, 18.0, 2.6, True)]
 for i, (r, b, h, br, broken) in enumerate(SPIRES):
     c = at(r, b)
-    egg('spire_%d' % (i + 1), 'Ancient spire' + (', broken' if broken else ''), 'ancient', (c[0], h / 2, c[2]), (br, h / 2, br), 2.6, b,
+    egg('spire_%d' % (i + 1), 'Ancient spire' + (', broken' if broken else ''), 'ancient', (c[0], 0.0, c[2]), (br, h, br), 2.6, b,
         False, 'spire', cut=0.0, height=h, broken=broken, note='the first city\'s; never restored, never taken down')
 LIGHT_WELLS = [dict(bearing=b, r=60.0, half=4.0) for b in AVENUES]   # glass-capped shafts in the roof over the avenues
 GATES = [dict(bearing=b, width=14.0, height=24.0, wicket=(3.0, 4.0)) for b in (0.0, 90.0, 180.0, 270.0)]

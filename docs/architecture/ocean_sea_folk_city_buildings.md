@@ -66,8 +66,11 @@ human city; boxes.
 - **Change:** rebuilt as continuous nacre-and-teal shells on a 2 m mound, its
   entrance turned to `+z`, approached up a broad ramp between two Minoan
   columns.
-- **Audience hall:** a tall wet hall with a central light well rising to a glass
-  oculus open to the clear column above; Asaru's seat of nacre at the far end; dolphin
+- **Under glass (third pass):** kept whole and dry inside the civic hall, a
+  glass SuperEgg 44 by 41 m and 32 m high on the mound. The assembly meets on its
+  roof terrace, where the central trunk lands from the fountain.
+- **Audience hall:** a tall hall with a central light well rising to a glass
+  oculus under the civic hall's crown; Asaru's seat of nacre at the far end; dolphin
   frescoes along the walls; room enough for the Tidekeeper's challenge fight.
 - **Rooms:** Asaru's chambers behind the hall; Ikara's and Tudaro's rooms in two
   of the towers; a guard post at the entrance.
@@ -153,8 +156,48 @@ human city; boxes.
 
 ### Kraken lookout (Ikara)
 
-- A slender tower 14 m tall at the city's edge, with a glazed watch chamber at
-  the top facing the Kraken's route.
+- A glass watch room (10 by 7 m) on the parapet over the main sea gate, facing
+  the islands and the Kraken's water. It is reached across the roof from the
+  fountain. Ikara keeps the rota from the Watch Room, the crown hall on the
+  112.5 trunk.
+
+### The walls and the roof
+
+- Two stones, one manner. Below 74.5 m (2.5 m above the waterline) is the dark
+  sea-wall stone in rusticated courses 11 m apart. Above it is the lighter stone
+  with pilasters every 20 m, string courses every 6 m, a cornice and a 1.2 m
+  parapet.
+- The sea gates are SuperEgg leaves (epsilon 4.5) in a dark-stone frame,
+  banded in orichalcum, each with a swim-wicket.
+- The vault is coffered on an 18 m grid, from the soffit at 88 m to the slab at
+  90 m. The piers are 6 m across, dark stone below the water and light above,
+  with flared capitals.
+- **Collision:** walls, parapet, piers, roof slab, basins and pedestals are
+  solid; the roof is a parkour landing surface; the light-well caps and the
+  fountain's glass floor are solid glass. Water sheets and the jet are
+  decorative.
+
+### The fountain
+
+- Four basins in the lighter stone, 40, 26, 14 and 6 m across, on stacked
+  pedestals, with a jet 16 m above the roof. Water falls in a sheet from each
+  lip into the basin below.
+- The lowest basin's floor is glass between 6.5 and 14 m from the centre, over
+  the open column.
+- A line of stepping stones crosses the lowest basin on the north side to the
+  curtain from the second tier. Behind the curtain is a pivoting stone in the
+  pedestal, 2.2 by 3.4 m. No mark shows it.
+- The stone stair winds down a shaft 6.8 m across inside the pedestal and the
+  roof to a landing at the waterline. There the glass central trunk begins.
+
+### The ancient spires
+
+- Seven SuperEgg spires (epsilon 2.6, tapering from a square plinth) in the
+  dark weathered stone, 18 to 48 m tall. Four are broken off at about
+  three-quarters of their height, with a slanted break. Three dark bands are
+  carved round each.
+- They stand where they always stood, at least 3 m clear of everything new.
+  Kelp and sponges may grow on them; no lamp or fitting is fixed to them.
 
 ### Homes (sixteen)
 

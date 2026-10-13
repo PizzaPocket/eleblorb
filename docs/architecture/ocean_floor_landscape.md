@@ -48,7 +48,9 @@ the floor from the slope below the arrival dock, `(0, 0)`, toward the sea folk
 city, `(0, -540)`, spaced about 25 to 40 m apart and growing brighter and
 closer together as they near the city. A swimmer who follows the lights finds
 the city without being told. The trail bends around the Kraken's usual water
-rather than crossing it head on.
+rather than crossing it head on. It ends at the city's main sea gate, in the
+island-side wall, which is shut (proposed, 2026-10-13; see the sea folk city's
+walls in `ocean_sea_folk_city.md` 4a).
 
 ### Wreck sites
 

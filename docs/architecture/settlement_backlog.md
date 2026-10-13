@@ -491,7 +491,18 @@ into the column as four trunks with landing halls, docked homes and a crown
 ring (`ocean_sea_folk_city.md` 2a and 5, `ocean_sea_folk_city_layout.md` 10).
 The floor plans are checked by `tools/sea_folk_third_pass.py` and drawn in the
 Sea Folk City Floor Plans artifact. On approval, the data replaces the second
-pass in `SeaFolkPlan` and its validator, and the 3D model is rebuilt.
+pass in `SeaFolkPlan` and its validator.
+
+**Sea folk city walls (2026-10-13, proposed).** The whole city is enclosed in
+an octagon of stone with a roof, from the seabed to 24 m above the sea, with a
+four-tiered fountain on top and a secret stair down through it. Tidehall is
+under glass as the civic hall. Seven of the first city's spires stand inside.
+The lookout moves to the wall (`ocean_sea_folk_city.md` 4a,
+`ocean_sea_folk_city_layout.md` 11). The tool checks it, and the floor plans
+and 3D model are rebuilt from its data. To build in Godot: walls and roof
+through `CollisionPolicy` (the roof as a parkour surface); the fountain's
+water as a hazard-free decorative sheet; the pivoting door as an interactable
+with no text.
 
 **Pirate ships plan (2026-10-13).** Both ships drawn at true size and
 code-ready: `tools/pirate_ships_layout.py` writes `PirateShipsPlan` (hull
