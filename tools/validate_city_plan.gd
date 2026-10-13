@@ -18,7 +18,8 @@ extends Node
 ##   - building numbers are unique, every resident's home exists;
 ##   - the turbines keep clear of the Jungle and Ice plateaus;
 ##   - Old Moy's tower houses stand on lots wide enough for their ramp core,
-##     with an earth base of 2 storeys up to two-thirds of the height
+##     on a stone base of 1 to 3 storeys or an earth base of 2 storeys up to
+##     two-thirds of the height
 ##     (docs/architecture/moy_tower_house.md).
 
 const TerrainGen := preload("res://scripts/terrain_generator.gd")
@@ -270,8 +271,15 @@ func _check_tower_kit(label: String, kit: Dictionary, r: Rect2) -> void:
 		_fail("%s is a tower house on a lot narrower than %.0f m" % [label, TOWER_MIN_WIDTH])
 	var storeys := int(kit["storeys"])
 	var base := int(kit["base"])
-	if base < 2 or base > maxi(2, (2 * storeys) / 3):
-		_fail("%s has an earth base of %d storeys in %d" % [label, base, storeys])
+	match kit["base_kind"]:
+		"earth":
+			if base < 2 or base > maxi(2, (2 * storeys) / 3):
+				_fail("%s has an earth base of %d storeys in %d" % [label, base, storeys])
+		"stone":
+			if base < 1 or base > 3:
+				_fail("%s has a stone base of %d storeys" % [label, base])
+		_:
+			_fail("%s has an unknown base %s" % [label, kit["base_kind"]])
 
 
 func _check_tower_kits() -> void:

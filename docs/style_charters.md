@@ -96,12 +96,12 @@ Detail and per-building forms: `docs/architecture/fishing_village_buildings.md`.
 **Status: proposed, 2026-10-13.** Brief: `docs/architecture/moy_tower_house.md`.
 Precedent: the highland Yemeni tower house (old Sana'a, Wadi Dhahr, Sa'dah's
 coursed-earth houses) and Shibam's close-packed towers (user's reference
-photo, 2026-10-13).
+photos, 2026-10-13: a single Wadi Dhahr tower and a view of old Sana'a).
 
 - **Primary (about 75 percent): highland Yemeni tower house.** Narrow towers
-  of 4 to 9 storeys: a battered base of coursed rammed earth (*zabur*) with
-  rounded corners, a white gypsum cornice, then upper storeys of fired brick
-  laid in relief patterns, with white-outlined windows under semicircular
+  of 4 to 9 storeys on a base of dark stone (most) or of battered,
+  round-cornered rammed earth (*zabur*, the oldest), with upper storeys of
+  fired brick banded at every floor in white gypsum friezes, with white-outlined windows under semicircular
   fanlights (*qamariya*), and a flat roof terrace behind a crenellated
   parapet with horned corners.
 - **Secondary (about 20 percent): the Persian wind tower (*badgir*), on the
@@ -114,15 +114,17 @@ photo, 2026-10-13).
   - Roof: **flat terrace only**, drained by projecting spouts (*mizab*);
     parapet 1.2 m, crenellated, whitewashed horns at the corners; a roof
     kiosk over the ramp core; optionally a *manzar* (rooftop room).
-  - Walls: **stone plinth 0.9 m; zabur base** in 0.65 m lifts (five to a
-    storey), battered about 1.5 degrees, 0.9 m thick at the ground, its
-    corners rounded (superellipse) and each lift's ends turned up at the
-    corners; **fired brick above**, 0.45 m, plumb, corbelled out 0.3 m over
-    the cornice.
-  - Bands: a white gypsum (*nura*) cornice where earth meets brick; a white
-    string course at every brick floor; relief brick panels (zigzag and
-    diamond) under each brick window row.
-  - Windows: small deep square lights in the earth base; in the brick, a
+  - Walls: **stone plinth 0.9 m**, then one of two bases: **stone** (most
+    houses), coursed dark basalt with pale ashlar bands, 0.7 m, plumb,
+    square corners, 1 to 3 storeys; or **zabur** (the oldest, about one in
+    five), 0.65 m lifts battered about 1.5 degrees, 0.9 m thick at the
+    ground, free corners rounded (superellipse) with each lift's ends turned
+    up, 2 to 4 storeys, under a white gypsum cornice. **Fired brick above**,
+    0.45 m, plumb.
+  - Bands: white gypsum (*nura*) friezes at every brick floor from a closed
+    set (zigzag, chevron chain, roundel row, dentil course); roundel panels
+    between windows on polite houses.
+  - Windows: small deep square lights in the base; in the brick, a
     tall window (1.0 × 1.6 m) under a qamariya fanlight (0.5 m radius), every
     one outlined in white gypsum; the top floor (*mafraj*) has low wide
     windows, sills at 0.4 m, for sitting on floor cushions.
@@ -132,11 +134,11 @@ photo, 2026-10-13).
     spouts.
   - Doors: a heavy carved timber house door in a superellipse-headed
     opening with a gypsum surround and the **house mark** painted above it;
-    painted leaves in blue, green or ochre. Shopfronts cut into the earth
-    base later: a wide opening on a timber lintel with folding shutters.
+    painted leaves in blue, green or ochre. Shopfronts cut into the base
+    later: a wide opening on a timber lintel with folding shutters.
   - Signature motif: **white gypsum outlines on every opening and band,
     and the painted house mark over every door.**
-  - Palette: earth ochre and brick red-brown (60 percent), gypsum white
+  - Palette: basalt grey-brown, earth ochre and brick red-brown (60 percent), gypsum white
     (30 percent), accents (10 percent): painted doors, coloured fanlight
     glass, the house marks.
 - **Hierarchy.** Polite: the old merchant houses on squares and main
@@ -151,8 +153,9 @@ photo, 2026-10-13).
 | Axis | Range | Reason it varies |
 |---|---|---|
 | Storeys | 4 to 9 | how much the family built, and when |
-| Earth base | 2 to 4 storeys, never above two-thirds of the height | older houses were raised in earth for longer before brick |
-| Corner | rounded bastion corner where two faces are free, plumb party walls elsewhere | corner lots stand free on two sides |
+| Base | stone, 1 to 3 storeys (most); earth, 2 to 4 storeys and never above two-thirds of the height (about one in four) | the oldest houses, round the first well, were raised in earth; later ones on stone |
+| Corner | rounded only on earth bases where two faces are free; square on stone | how each material is built |
+| Friezes | four band patterns, one or two a floor | each family's ornament |
 | Kishk | 0 to 2, upper floors only | wealth and which rooms face the street |
 | Wind tower | on the core, mouth west; at the front or back of the roof | follows where the core stands |
 | Manzar | about one house in four | a later rooftop room |

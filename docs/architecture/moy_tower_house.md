@@ -7,8 +7,17 @@ charter in `docs/style_charters.md`. The plan data is in
 
 ## 1. Precedent
 
-**The user's reference (2026-10-13):** a highland Yemeni tower house, of the
-Sana'a and Wadi Dhahr type. Reading it from the ground up:
+**The user's references (2026-10-13).** Two photographs:
+- **A single tower** of the Wadi Dhahr and Sa'dah type, on a battered base of
+  coursed earth with rounded corners. This is *one* kind of base, not the
+  rule (user): in Old Moy it marks the oldest houses.
+- **Old Sana'a**: the common type, and the model for most of Old Moy.
+  Tower houses packed shoulder to shoulder, rectangular and plumb, on ground
+  storeys of dark stone, with fired brick above, every storey banded in
+  white gypsum friezes (zigzags, chevrons, roundels), paired qamariya
+  windows, and modern water tanks and dishes on the roofs.
+
+Reading the single tower from the ground up:
 
 | Element | Term | What it does |
 |---|---|---|
@@ -22,9 +31,19 @@ Sana'a and Wadi Dhahr type. Reading it from the ground up:
 | A crenellated top with raised corners | **parapet** with merlons and corner horns | Shelters the roof terrace |
 | A low walled court with a painted door | the **court wall** | The household's own ground |
 
-Shibam adds the town: towers of 5 to 9 storeys packed shoulder to shoulder,
-some linked by bridges between upper floors. Old Moy is that town, kept tall
-(user, 2026-10-12).
+Reading old Sana'a:
+
+| Element | Term | What it does |
+|---|---|---|
+| Ground storeys of dark basalt and pale squared stone, plumb, square corners | **stone base**, coursed rubble and ashlar | Hard, fireproof, defensive at street level |
+| Brick storeys flush above, no batter | fired brick on the stone | Lighter walls for the living floors |
+| White bands at every floor: zigzags, chevron chains, rows of roundels | **gypsum (*nura*) friezes** in relief | Each house's ornament; seals the joints; reads from far off |
+| Windows in pairs under twin fanlights, white blind arches between them | paired **qamariya** | The living rooms' light |
+| Tanks and dishes on the roofs | the modern layer | Today's services on old roofs |
+
+Shibam adds the town plan: towers of 5 to 9 storeys packed shoulder to
+shoulder, some linked by bridges between upper floors. Old Moy is that
+town, kept tall (user, 2026-10-12).
 
 ## 2. How a tower house is lived in now (proposed)
 
@@ -60,9 +79,11 @@ section). The numbered old buildings (25 to 32, 52) are tower houses.
 | Part | Height | Construction |
 |---|---|---|
 | **Plinth** | 0 to 0.9 m | Basalt courses, the hard base at the street |
-| **Earth base** | 2 to 4 storeys, at most two-thirds of the height | Zabur in 0.65 m lifts (five to a storey). Battered 1.5°: 0.9 m thick at the ground, about 0.6 m at its top. The outer face steps back about 0.26 m over three storeys. Corners free of a neighbour are rounded (superellipse plan, exponent about 4) and each lift's ends turn up slightly at the corner (the Sa'dah "horns") |
-| **Cornice** | 0.5 m at the top of the base | White gypsum, projecting 0.3 m |
-| **Brick storeys** | the rest | Fired brick, 0.45 m, plumb, corbelled out 0.3 m over the cornice so the face returns to the lot line. A white string course at every floor. A relief panel of zigzag and diamond brick under each window row (every storey on polite houses, the top storey only on vernacular ones) |
+| **Base: stone** (most houses) | 1 to 3 storeys | Coursed dark basalt with pale ashlar quoins and bands, 0.7 m thick, plumb, square corners. The brick rises flush above it, with a white frieze at the joint |
+| **Base: earth** (the oldest houses, about one in four, most of them round the first well on Cinema Square) | 2 to 4 storeys, at most two-thirds of the height | Zabur in 0.65 m lifts (five to a storey). Battered 1.5°: 0.9 m thick at the ground, about 0.6 m at its top. The outer face steps back about 0.26 m over three storeys. Corners free of a neighbour are rounded (superellipse plan, exponent about 4) and each lift's ends turn up slightly at the corner (the Sa'dah "horns") |
+| **Cornice** (earth bases) | 0.5 m at the top of the base | White gypsum, projecting 0.3 m |
+| **Brick storeys** | the rest | Fired brick, 0.45 m, plumb (over an earth base, corbelled out 0.3 m over the cornice so the face returns to the lot line) |
+| **Friezes** | at every brick floor | White gypsum bands in relief, from a closed set: zigzag, chevron chain, a row of roundels, a dentil course. Polite houses carry two bands a floor and roundel panels between the windows; vernacular houses one band a floor, panels on the top storey only |
 | **Parapet** | 1.2 m above the roof | Brick, crenellated in one of three family patterns, whitewashed horns at the corners |
 | **Roof kiosk** | one storey over the core | Where the ramp arrives on the roof; carries the wind tower |
 | **Wind tower** | 4 to 5 m above the roof | A one-sided catcher, mouth turned west to the steady wind, its shaft the ramp core itself |
@@ -70,18 +91,19 @@ section). The numbered old buildings (25 to 32, 52) are tower houses.
 
 ### 3.2 Openings
 
-- **Earth base:** small square lights, 0.6 × 0.8 m, deep in the thick wall,
-  splayed inside; vents under the cornice.
+- **Base (stone or earth):** small square lights, 0.6 × 0.8 m, deep in
+  the thick wall, splayed inside; vents under the cornice or frieze.
 - **Brick storeys:** a tall window, 1.0 × 1.6 m, sill 0.9 m, under a
   **qamariya** (semicircle, 0.5 m radius), every one outlined in white
-  gypsum. The qamariya is the kit's superellipse head.
+  gypsum; on polite houses often in pairs under twin fanlights with a
+  white blind arch between. The qamariya is the kit's superellipse head.
 - **The mafraj (top floor):** low wide windows, sill 0.4 m, in a row of two
   or three, for sitting on floor cushions.
 - **The house door:** 1.2 × 2.4 m in a superellipse-headed opening with a
   gypsum surround; a carved timber leaf painted blue, green or ochre; the
   **house mark** painted above it.
 - **The shopfront** (main and shopping streets only): a later opening cut
-  in the earth base, 2.4 to 3.2 m wide, on a timber lintel, with folding
+  in the base, 2.4 to 3.2 m wide, on a timber lintel, with folding
   timber shutters. It sits beside the house door, never instead of it.
 - **Kishk:** 0 to 2 per house, on the brick storeys, 1.2 wide × 1.6 tall ×
   0.6 m deep on two brackets, plastered white, latticed panels.
@@ -110,10 +132,10 @@ section). The numbered old buildings (25 to 32, 52) are tower houses.
 
 ### 3.4 Neighbours and the roofs
 
-- **Party walls.** Where houses share a side, the earth bases stand wall to
-  wall at the ground. The batter opens a slot of up to 0.3 m between them as
-  they rise, and the corbelled brick closes it again: each house still reads
-  as its own tower.
+- **Party walls.** Stone-based houses stand wall to wall, plumb, and read
+  as separate towers by their own frieze patterns and heights. Where an
+  earth base meets a neighbour, its batter opens a slot of up to 0.3 m as it
+  rises, and the corbelled brick closes it again.
 - **The roof route** (city.md 6) crosses Old Moy on the terraces. Where two
   neighbours' roofs differ by **one storey**, the lower parapet carries a
   short timber ramp up to the higher one. Where they differ by more, **a
@@ -121,8 +143,9 @@ section). The numbered old buildings (25 to 32, 52) are tower houses.
   the taller house to the lower roof, or the climb goes by the holds below.
 - **Holds.** Window sills, qamariya heads, string courses and the kishk
   brackets give holds at most 2.4 m apart up every brick face, within a blorb
-  bounce. The earth base is smooth: it is climbed only at its rounded
-  corners, where the turned-up lift ends give holds every 0.65 m.
+  bounce. Stone bases give holds at their ashlar bands and lights. An earth
+  base is smooth: it is climbed only at its rounded corners, where the
+  turned-up lift ends give holds every 0.65 m.
 
 ### 3.5 Collision
 
@@ -137,7 +160,7 @@ the relief panels, drainpipes, lifts' upturned ends beyond 0.1 m.
 its size and street, and the numbered tower houses explicitly:
 
 - `kit`: `tower` or `infill`;
-- `storeys`, and `base` (earth storeys);
+- `storeys`, `base_kind` (`stone` or `earth`) and `base` (its storeys);
 - `front`: the face on a street (`n`, `s`, `e` or `w`);
 - `shop`: whether the ground floor has a shopfront;
 - `kishk` (0 to 2), `manzar`, `parapet` (pattern 0 to 2), `polite`.

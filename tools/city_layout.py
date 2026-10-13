@@ -397,6 +397,7 @@ TURBINES=[(-310,-200),(-310,200),(-740,-270),(-740,270)]
 ## Moy lot gets a kit: a tower house where the short side is 6 m or more
 ## (room for the 3.4 m ramp core inside 0.9 m earth walls), the later pencil infill
 ## where it is narrower. Variants come from a fixed hash of the lot.
+FIRST_WELL=(-743,20)  # on Cinema Square (city.md 7)
 def old_moy(x,z):
     if math.hypot(x-CX,z)>200 or x>-487: return False
     if z>=114 or (z>62 and x>-641): return False
@@ -421,8 +422,13 @@ def kit_for(r,storeys,named_n=None):
     tower=min(x1-x0,z1-z0)>=6 or named_n is not None
     k={'kit':'tower' if tower else 'infill','storeys':storeys,'front':side or 'n','shop':kind in ('main','shop')}
     if tower:
-        k.update(base=max(2,min(2+h%3,(2*storeys)//3)),kishk=(h//3)%3 if storeys>=6 else 0,
-                 manzar=(h//9)%4==0,parapet=(h//36)%3,polite=kind in ('main','shop','open'))
+        # earth bases are the oldest houses, most of them round the first well
+        # on Cinema Square; the rest stand on stone
+        cx_,cz_=(x0+x1)/2,(z0+z1)/2
+        earth=(h//144)%3==0 if math.hypot(cx_-FIRST_WELL[0],cz_-FIRST_WELL[1])<60 else (h//144)%9==0
+        base=max(2,min(2+h%3,(2*storeys)//3)) if earth else 1+h%3 if storeys>=6 else 1+h%2
+        k.update(base_kind='earth' if earth else 'stone',base=base,kishk=(h//3)%3 if storeys>=6 else 0,
+                 manzar=(h//9)%4==0,parapet=(h//36)%3,frieze=(h//108)%4,polite=kind in ('main','shop','open'))
     return k
 LOT_KITS=[kit_for(tuple(int(v) for v in l[:4]),l[4]) if old_moy((l[0]+l[2])/2,(l[1]+l[3])/2) else None for l in lots]
 ## the numbered tower houses (city.md schedule), and the Reese-Miller house
@@ -431,7 +437,7 @@ BUILDING_KITS={}
 for nb in B:
     if nb['n'] in (25,26,27,28,29,30,31,32,52):
         BUILDING_KITS[nb['n']]=kit_for(nb['r'],round(HEIGHTS[nb['n']]/3.25),nb['n'])
-BUILDING_KITS[52].update(storeys=7,base=3,front='e',shop=True,kishk=1,manzar=True,polite=True)
+BUILDING_KITS[52].update(storeys=7,base_kind='earth',base=3,front='e',shop=True,kishk=1,manzar=True,polite=True)
 BUILDING_KITS[27].update(polite=True); BUILDING_KITS[25].update(polite=True)
 # two neighbours never share both parapet pattern and base height
 def touching(a,b_): return a[0]<=b_[2] and b_[0]<=a[2] and a[1]<=b_[3] and b_[1]<=a[3]
@@ -439,12 +445,13 @@ for i,ki in enumerate(LOT_KITS):
     if not ki or ki['kit']!='tower': continue
     for j in range(i):
         kj=LOT_KITS[j]
-        if kj and kj['kit']=='tower' and touching(lots[i],lots[j]) and (ki['parapet'],ki['base'])==(kj['parapet'],kj['base']):
+        if kj and kj['kit']=='tower' and touching(lots[i],lots[j]) and (ki['parapet'],ki['base'],ki['frieze'])==(kj['parapet'],kj['base'],kj['frieze']):
             ki['parapet']=(ki['parapet']+1)%3
 for i,ki in enumerate(LOT_KITS):
     if not ki or ki['kit']!='tower': continue
     if min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<6: problems.append(('tower house on a narrow lot',i))
-    if not 2<=ki['base']<=max(2,(2*ki['storeys'])//3): problems.append(('earth base out of range',i))
+    lo,hi=(2,max(2,(2*ki['storeys'])//3)) if ki['base_kind']=='earth' else (1,3)
+    if not lo<=ki['base']<=hi: problems.append(('base out of range',i))
 JUNGLE=(-500,464); ICE=(-450,-480)
 assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)
 nums={b['n'] for b in B}
@@ -518,7 +525,8 @@ def kit_gd(k):
 w("")
 w("## Old Moy's kits, one per lot, in the same order as LOTS (null outside Old")
 w("## Moy): kit (tower or infill), storeys, front (n, s, e, w), shop, and for")
-w("## tower houses base (earth storeys), kishk, manzar, parapet, polite.")
+w("## tower houses base_kind (stone or earth), base (its storeys), kishk,")
+w("## manzar, parapet (pattern 0 to 2), frieze (pattern 0 to 3), polite.")
 w("## docs/architecture/moy_tower_house.md.")
 w("const LOT_KITS := [")
 for k_ in LOT_KITS: w("\t%s," % kit_gd(k_))
