@@ -460,6 +460,18 @@ Status: first planning pass, in review (2026-10-06). See
 implementation has the merfolk city with twenty residents, one of the two
 pirate ships, and no island village.
 
+**Kingdom survey (2026-10-13).** A chart of the whole kingdom from the
+terrain code with every brief's proposals drawn on it is published as the
+Ocean Kingdom Chart artifact. It found:
+- the cage island lies east-south-east of the dock (z = +88 is south), not
+  east-north-east; fixed in the bible and briefs;
+- **conflict:** the ships' route (285 to 350 m out) never passes the three
+  wrecks they salvage daily (184 to 202 m out) or Kai Mālie's beach; either
+  the ships leave the route to heave to, or the wrecks move out to it;
+- **conflict:** the luminous trail cannot bend round the Kraken's water,
+  since the Kraken circles the dock; it must cross the route once, and its
+  straight line runs over the coastal-forest islet's slope at (−34, −154).
+
 Planning priorities:
 
 - Approve the four briefs: the Atlantean-modern sea folk city with air halls,

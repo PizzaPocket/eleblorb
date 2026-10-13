@@ -8,7 +8,7 @@ four populations with separate briefs:
 | The sea folk (merfolk) | `ocean_sea_folk_city.md` | the deep-sea city at world `(0, -540)`, 72 m down |
 | The pirates of two ships | `ocean_pirate_ships.md` | at sea, on the route around the kingdom's centre |
 | Kai Mālie, the island village | `ocean_island_village.md` | the eastern shore of the main island, facing the arrival dock |
-| The cage island's mongooses (species decided; culture pending) | `ocean_cage_island.md` | the small island at `(112, 88)`, east-northeast of the dock |
+| The cage island's mongooses (species decided; culture pending) | `ocean_cage_island.md` | the small island at `(112, 88)`, east-south-east of the dock |
 
 ## Survey (from the current code)
 
