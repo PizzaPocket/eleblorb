@@ -16,7 +16,10 @@ extends Node
 ##   - every street meets another street, a square or the Rim Walk at both
 ##     ends (no dead ends);
 ##   - building numbers are unique, every resident's home exists;
-##   - the turbines keep clear of the Jungle and Ice plateaus.
+##   - the turbines keep clear of the Jungle and Ice plateaus;
+##   - Old Moy's tower houses stand on lots wide enough for their ramp core,
+##     with an earth base of 2 storeys up to two-thirds of the height
+##     (docs/architecture/moy_tower_house.md).
 
 const TerrainGen := preload("res://scripts/terrain_generator.gd")
 
@@ -39,6 +42,7 @@ func _ready() -> void:
 	_check_frontage()
 	_check_streets()
 	_check_turbines()
+	_check_tower_kits()
 	print("---- validate_city_plan: %d streets, %d buildings, %d lots, %d FAIL" % [CityPlan.STREETS.size(), CityPlan.BUILDINGS.size(), CityPlan.LOTS.size(), _failures])
 	get_tree().quit(1 if _failures > 0 else 0)
 
@@ -253,3 +257,29 @@ func _check_turbines() -> void:
 			_fail("turbine at %s is too close to the Ice plateau" % str(t))
 		if t.distance_to(CityPlan.CENTER) < CityPlan.RIM_RADIUS + CityPlan.TURBINE_ROTOR_RADIUS:
 			_fail("turbine at %s sweeps over the Rim Walk" % str(t))
+
+
+## Tower houses need 6 m across for the 3.4 m ramp core inside their walls.
+const TOWER_MIN_WIDTH := 6.0
+
+
+func _check_tower_kit(label: String, kit: Dictionary, r: Rect2) -> void:
+	if kit["kit"] != "tower":
+		return
+	if minf(r.size.x, r.size.y) < TOWER_MIN_WIDTH and not label.begins_with("building"):
+		_fail("%s is a tower house on a lot narrower than %.0f m" % [label, TOWER_MIN_WIDTH])
+	var storeys := int(kit["storeys"])
+	var base := int(kit["base"])
+	if base < 2 or base > maxi(2, (2 * storeys) / 3):
+		_fail("%s has an earth base of %d storeys in %d" % [label, base, storeys])
+
+
+func _check_tower_kits() -> void:
+	if CityPlan.LOT_KITS.size() != CityPlan.LOTS.size():
+		_fail("LOT_KITS has %d entries for %d lots" % [CityPlan.LOT_KITS.size(), CityPlan.LOTS.size()])
+		return
+	for i in CityPlan.LOTS.size():
+		if CityPlan.LOT_KITS[i] != null:
+			_check_tower_kit("lot %d" % i, CityPlan.LOT_KITS[i], CityPlan.LOTS[i][0])
+	for n in CityPlan.BUILDING_KITS:
+		_check_tower_kit("building %d" % n, CityPlan.BUILDING_KITS[n], _numbers[n]["rect"])

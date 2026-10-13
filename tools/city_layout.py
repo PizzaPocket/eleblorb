@@ -393,6 +393,58 @@ for nb in [x for x in B if x['n'] in ANGLE]:
         if other is nb: continue
         if poly_gap(P,corners_of(other))<8: problems.append(('turned block within 8 m of',nb['n'],other['n']))
 TURBINES=[(-310,-200),(-310,200),(-740,-270),(-740,270)]
+## Old Moy's tower houses (docs/architecture/moy_tower_house.md). Every Old
+## Moy lot gets a kit: a tower house where the short side is 6 m or more
+## (room for the 3.4 m ramp core inside 0.9 m earth walls), the later pencil infill
+## where it is narrower. Variants come from a fixed hash of the lot.
+def old_moy(x,z):
+    if math.hypot(x-CX,z)>200 or x>-487: return False
+    if z>=114 or (z>62 and x>-641): return False
+    return x<-637
+STREET_KIND={}
+for st in STREETS:
+    for p_ in cells(st[2:]): STREET_KIND.setdefault(p_,st[1])
+def front_of(r):
+    x0,z0,x1,z1=r; best=None
+    rank={'main':0,'shop':1,'avenue':2,'lane':3,'open':4}
+    for side,ring in (('n',[(x,z0-1) for x in range(x0,x1)]),('s',[(x,z1) for x in range(x0,x1)]),('w',[(x0-1,z) for z in range(z0,z1)]),('e',[(x1,z) for z in range(z0,z1)])):
+        kinds=[STREET_KIND[c] if c in STREET_KIND else ('open' if c in opn else None) for c in ring]
+        kinds=[k_ for k_ in kinds if k_]
+        if kinds:
+            k_=min(kinds,key=lambda t: rank[t]); cand=(rank[k_],-len(kinds),side,k_)
+            if best is None or cand<best: best=cand
+    return (best[2],best[3]) if best else (None,None)
+def kit_for(r,storeys,named_n=None):
+    x0,z0,x1,z1=r
+    h=(abs(x0)*73856093 ^ abs(z0)*19349663 ^ abs(x1)*83492791) & 0xffff
+    side,kind=front_of(r)
+    tower=min(x1-x0,z1-z0)>=6 or named_n is not None
+    k={'kit':'tower' if tower else 'infill','storeys':storeys,'front':side or 'n','shop':kind in ('main','shop')}
+    if tower:
+        k.update(base=max(2,min(2+h%3,(2*storeys)//3)),kishk=(h//3)%3 if storeys>=6 else 0,
+                 manzar=(h//9)%4==0,parapet=(h//36)%3,polite=kind in ('main','shop','open'))
+    return k
+LOT_KITS=[kit_for(tuple(int(v) for v in l[:4]),l[4]) if old_moy((l[0]+l[2])/2,(l[1]+l[3])/2) else None for l in lots]
+## the numbered tower houses (city.md schedule), and the Reese-Miller house
+## as briefed (moy_tower_house.md 4)
+BUILDING_KITS={}
+for nb in B:
+    if nb['n'] in (25,26,27,28,29,30,31,32,52):
+        BUILDING_KITS[nb['n']]=kit_for(nb['r'],round(HEIGHTS[nb['n']]/3.25),nb['n'])
+BUILDING_KITS[52].update(storeys=7,base=3,front='e',shop=True,kishk=1,manzar=True,polite=True)
+BUILDING_KITS[27].update(polite=True); BUILDING_KITS[25].update(polite=True)
+# two neighbours never share both parapet pattern and base height
+def touching(a,b_): return a[0]<=b_[2] and b_[0]<=a[2] and a[1]<=b_[3] and b_[1]<=a[3]
+for i,ki in enumerate(LOT_KITS):
+    if not ki or ki['kit']!='tower': continue
+    for j in range(i):
+        kj=LOT_KITS[j]
+        if kj and kj['kit']=='tower' and touching(lots[i],lots[j]) and (ki['parapet'],ki['base'])==(kj['parapet'],kj['base']):
+            ki['parapet']=(ki['parapet']+1)%3
+for i,ki in enumerate(LOT_KITS):
+    if not ki or ki['kit']!='tower': continue
+    if min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<6: problems.append(('tower house on a narrow lot',i))
+    if not 2<=ki['base']<=max(2,(2*ki['storeys'])//3): problems.append(('earth base out of range',i))
 JUNGLE=(-500,464); ICE=(-450,-480)
 assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)
 nums={b['n'] for b in B}
@@ -460,6 +512,22 @@ w("## downtown's office and flat blocks round the towers.")
 w("const LOTS := [")
 for l in lots: w("\t[%s, %d, %s]," % (v2r(l[:4]),l[4],q(l[5])))
 w("]")
+def kit_gd(k):
+    if k is None: return "null"
+    return "{" + ", ".join("%s: %s" % (q(a_), ("true" if v is True else "false" if v is False else q(v) if isinstance(v,str) else str(v))) for a_,v in k.items()) + "}"
+w("")
+w("## Old Moy's kits, one per lot, in the same order as LOTS (null outside Old")
+w("## Moy): kit (tower or infill), storeys, front (n, s, e, w), shop, and for")
+w("## tower houses base (earth storeys), kishk, manzar, parapet, polite.")
+w("## docs/architecture/moy_tower_house.md.")
+w("const LOT_KITS := [")
+for k_ in LOT_KITS: w("\t%s," % kit_gd(k_))
+w("]")
+w("")
+w("## The numbered tower houses' kits, by building number.")
+w("const BUILDING_KITS := {")
+for n_,k_ in sorted(BUILDING_KITS.items()): w("\t%d: %s," % (n_,kit_gd(k_)))
+w("}")
 w("")
 w("## Storey heights for the lots (m).")
 w("const STOREY := {\"fabric\": 3.25, \"midrise\": 3.6}")
@@ -501,5 +569,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

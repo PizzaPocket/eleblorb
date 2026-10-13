@@ -91,6 +91,76 @@ Detail and per-building forms: `docs/architecture/fishing_village_buildings.md`.
 - **Exclusions.** Sealed boxes; Peranakan shophouse facades; clan temples or sacred roofs; brick or masonry walls; lights on poles; uniform brown; plain unclipped roof slabs; SuperEgg props standing in for rock.
 - **Doors and openings face the route that serves them** (the layout's route ledger), the veranda faces the water court or landing, and service sides face outward.
 
+## Moy: Old Moy (the well town)
+
+**Status: proposed, 2026-10-13.** Brief: `docs/architecture/moy_tower_house.md`.
+Precedent: the highland Yemeni tower house (old Sana'a, Wadi Dhahr, Sa'dah's
+coursed-earth houses) and Shibam's close-packed towers (user's reference
+photo, 2026-10-13).
+
+- **Primary (about 75 percent): highland Yemeni tower house.** Narrow towers
+  of 4 to 9 storeys: a battered base of coursed rammed earth (*zabur*) with
+  rounded corners, a white gypsum cornice, then upper storeys of fired brick
+  laid in relief patterns, with white-outlined windows under semicircular
+  fanlights (*qamariya*), and a flat roof terrace behind a crenellated
+  parapet with horned corners.
+- **Secondary (about 20 percent): the Persian wind tower (*badgir*), on the
+  roof only.** One-sided catchers turned to the steady west wind, standing
+  over each house's ramp core, which serves as the house's air shaft.
+- **Accent (about 5 percent, landmarks only):** stained-glass qamariya lit
+  from within at night, on the oldest houses facing squares (the first-well
+  house on Cinema Square, Pinestein's building, Sol's café).
+- **Kit of parts.**
+  - Roof: **flat terrace only**, drained by projecting spouts (*mizab*);
+    parapet 1.2 m, crenellated, whitewashed horns at the corners; a roof
+    kiosk over the ramp core; optionally a *manzar* (rooftop room).
+  - Walls: **stone plinth 0.9 m; zabur base** in 0.65 m lifts (five to a
+    storey), battered about 1.5 degrees, 0.9 m thick at the ground, its
+    corners rounded (superellipse) and each lift's ends turned up at the
+    corners; **fired brick above**, 0.45 m, plumb, corbelled out 0.3 m over
+    the cornice.
+  - Bands: a white gypsum (*nura*) cornice where earth meets brick; a white
+    string course at every brick floor; relief brick panels (zigzag and
+    diamond) under each brick window row.
+  - Windows: small deep square lights in the earth base; in the brick, a
+    tall window (1.0 × 1.6 m) under a qamariya fanlight (0.5 m radius), every
+    one outlined in white gypsum; the top floor (*mafraj*) has low wide
+    windows, sills at 0.4 m, for sitting on floor cushions.
+  - Projections: the *kishk*, a plastered box window on brackets
+    (1.2 × 1.6 × 0.6 m); the old latrine shaft, a plastered chute up a side
+    or back face, now carrying the soil stack; white drainpipes from the
+    spouts.
+  - Doors: a heavy carved timber house door in a superellipse-headed
+    opening with a gypsum surround and the **house mark** painted above it;
+    painted leaves in blue, green or ochre. Shopfronts cut into the earth
+    base later: a wide opening on a timber lintel with folding shutters.
+  - Signature motif: **white gypsum outlines on every opening and band,
+    and the painted house mark over every door.**
+  - Palette: earth ochre and brick red-brown (60 percent), gypsum white
+    (30 percent), accents (10 percent): painted doors, coloured fanlight
+    glass, the house marks.
+- **Hierarchy.** Polite: the old merchant houses on squares and main
+  streets (brick relief panels on every storey, a kishk, stained glass).
+  Vernacular: the rest (relief on the top storey only, plain glass).
+- **Exclusions.** No pitched roofs or roof tiles (tiles belong to the later
+  pencil infill, a separate kit), no domes or horseshoe arches, no Cairene
+  timber mashrabiya, no lettering on any sign or house.
+
+### Old Moy variation matrix (the shared language above is fixed)
+
+| Axis | Range | Reason it varies |
+|---|---|---|
+| Storeys | 4 to 9 | how much the family built, and when |
+| Earth base | 2 to 4 storeys, never above two-thirds of the height | older houses were raised in earth for longer before brick |
+| Corner | rounded bastion corner where two faces are free, plumb party walls elsewhere | corner lots stand free on two sides |
+| Kishk | 0 to 2, upper floors only | wealth and which rooms face the street |
+| Wind tower | on the core, mouth west; at the front or back of the roof | follows where the core stands |
+| Manzar | about one house in four | a later rooftop room |
+| Parapet | three crenellation patterns | each builder's family pattern |
+| Ground floor | shopfront on main and shopping streets, house door only on lanes | the modern layer |
+| Kit | tower house on lots 6 m or more across; the tiled pencil infill on narrower ones | the narrowest lots were filled last |
+| Age marks | fresh or faded whitewash, a brick storey added in a different brick, an infilled window | each house's history |
+
 ## Other kingdoms
 
 Draft charters to be added from `references/cultures.md` grammars: Rock and Ground (earthen Pueblo/adobe), Ocean (stilt harbour), Plant (tree-borne and thatch), Sky (drafted in `docs/architecture/sky_kingdom.md` as celestial classical in quartz, gold and cloud: Greco-Roman about 55 percent, Chinese celestial palace about 35 percent by deliberate choice rather than the usual 75/20 split, with the rule that no single building mixes both traditions), the Chinese village (courtyard and tiled hip-and-gable), the Western city (concrete). The Fire Kingdom's draft volcanic-modern charter now lives in `docs/architecture/fire_caldera_city.md`. Each remaining kingdom needs the Ohio-style charter with a primary, one secondary, an accent, a kit of parts, hierarchy and exclusions.

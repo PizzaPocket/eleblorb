@@ -764,10 +764,16 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     old Sana'a. When the Windworks came, the new city was laid out round
     this dense old core, and its narrow tall houses became the model for
     the pencil buildings across Moy.
-  - **How it looks.** Thick, pale lime-plastered lower walls that thin as
-    they rise; small deep windows low down and larger screened windows high
-    up; roof terraces where families sleep on summer nights; later tiled
-    pencil buildings filling the gaps between the old houses.
+  - **How it looks** (the tower house kit, `moy_tower_house.md`, after the
+    user's reference photo of a highland Yemeni tower house, 2026-10-13):
+    battered bases of coursed rammed earth with rounded corners, a white
+    gypsum cornice, brick storeys above with white-outlined windows under
+    semicircular fanlights, projecting box windows, crenellated parapets
+    with horned corners, roof terraces where families sleep on summer
+    nights; later tiled pencil buildings fill the narrowest lots.
+  - **How it is lived in now** (proposed): built as one family's house
+    each, most towers are now a ground-floor shop and a flat on each floor
+    above, sharing the ramp core and the roof; a few are still whole.
   - **Wind towers.** The old houses carry rooftop wind towers that catch
     the breeze high above the lanes and send it down through the rooms.
     Moy lived by its wind long before the turbines; the Windworks is the
@@ -1270,7 +1276,6 @@ round the park and on Civic Plaza.
 | 5 | Moonlight Cinema | 30 × 28 m | 2 storeys, built later into the old town; flat above | Leon Duarte (lives above) |
 | 6 | Police box | 6 × 8 m | 1 storey, back room | Kate Byrne |
 | 7 | Clinic | 14 × 18 m | 3 storeys; flat above | Dr. Arjun Mehta (lives above) |
-| 17 | Block 1 | 22 × 22 m | point block, 32 storeys, west precinct | Tomas Wren |
 | 24 | Garden Row | 23 × 18 m | 3 townhouses, 3 storeys, facing the Park Ring | Teodora Vance; Ada Fong and Sora Ishida; Priya Raman |
 | 25 | Sol's café | 16 × 10 m | old tower house, 5 storeys; flat above | Sol Brant |
 | 26 | Bakery | 10 × 16 m | old tower house, 6 storeys; flats above | Felix Tanaka (above) |
@@ -1280,7 +1285,7 @@ round the park and on Civic Plaza.
 | 30 | Theo's building | 8 × 16 m | 6 storeys | Theo Park |
 | 31 | Yuki's building | 8 × 16 m | 6 storeys | Yuki Hayashi |
 | 32 | Suri's building | 8 × 16 m | 7 storeys | Suri Vale |
-| 52 | Reese–Miller house | 10 × 16 m | old tower house, 7 storeys; wind tower and roof terrace | Elizabeth Reese, Dan Miller and Jammer (away at the farm) |
+| 52 | Reese–Miller house | 10 × 16 m | old tower house, 7 storeys; a tailor's shop and three let flats below, the family on the top three floors, Jammer's room the manzar on the roof (moy_tower_house.md 4) | Elizabeth Reese, Dan Miller and Jammer (away at the farm) |
 
 **Market lanes**
 
