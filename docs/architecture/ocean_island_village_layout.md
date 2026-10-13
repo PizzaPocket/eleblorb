@@ -189,6 +189,18 @@ plan file:
     green;
   - every resident has a building, and the rest point has a toilet.
 
+**An organic shore, not boxes (user, 2026-10-13).** The first drawing of
+the plan file was all rectangles. The plan now holds every zone as a smoothed
+curve: the beach is a bay between two dark lava headlands, its waterline and
+the top of the sand bowed with the bay; the reef flat's edge is irregular,
+reaching furthest out at the dock; the terraces' bunds follow the valley's
+contours, bowed upslope where the floor dips to the stream; the stream runs
+along the plain's western foot to the fishpond; the green is a rounded,
+irregular lawn; the paths follow the ways people walk. Each house turns up to
+12 degrees off the island's frame to face the green or the curve of its
+lane, as houses do round a real bay. The validator tests the true curved and
+turned shapes.
+
 The second-pass footprints (local centre of the walls; walls and footprint
 as width along `v` × depth along `u`; the footprint adds *lānai* and eaves):
 

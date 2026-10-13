@@ -6,11 +6,14 @@ extends Node
 ##   Godot --headless --path . tools/validate_kai_malie_plan.tscn
 ##
 ## Exit code 1 if anything FAILs. The rules are
-## docs/architecture/ocean_island_village_layout.md and _buildings.md:
+## docs/architecture/ocean_island_village_layout.md and _buildings.md. The shore
+## and zones are curved polygons and the houses are turned, so every test is
+## made on the true shapes:
 ##   - every building's rooms add up to its walls, floor by floor, and every
 ##     room meets the world-scale minimum for its kind;
-##   - buildings stand on the coastal plain (the canoe house on the beach), off
-##     the taro terraces, the stream, the green and the pier head;
+##   - buildings stand on the coastal plain (the canoe house down the beach),
+##     clear of the taro terraces, the green and the pier head, 3 m from the
+##     stream, turned no more than 12 degrees;
 ##   - neighbours stand at least 3 m apart at the eaves;
 ##   - no path runs through a wall or a lānai, and every front faces a path or
 ##     the green;
@@ -19,7 +22,7 @@ extends Node
 const EPS := 0.05
 const MIN_GAP := 2.99
 const FRONT_REACH := 8.0
-const STREAM_BAND := 3.0
+const MAX_TURN := 12.0
 ## Room minimums at world scale: kind -> (short side, long side).
 const MIN_ROOM := {
 	"bed2": Vector2(3.2, 3.4), "bed1": Vector2(3.0, 3.2), "living": Vector2(3.2, 3.6),
@@ -45,24 +48,31 @@ func _fail(message: String) -> void:
 	print("FAIL ", message)
 
 
-## Walls plus lānai: the solid body a path may not cross.
-func _body(b: Dictionary) -> Rect2:
-	var r: Rect2 = b["walls"]
-	var lanai: Dictionary = b["lanai"]
-	for side in lanai:
-		var d := float(lanai[side])
-		match side:
-			"u+": r.size.x += d
-			"u-": r.position.x -= d; r.size.x += d
-			"v+": r.size.y += d
-			"v-": r.position.y -= d; r.size.y += d
-	return r
+func _meet(a: PackedVector2Array, b: PackedVector2Array) -> bool:
+	return not Geometry2D.intersect_polygons(a, b).is_empty()
 
 
-func _gap(a: Rect2, b: Rect2) -> float:
-	var du := maxf(maxf(b.position.x - a.end.x, a.position.x - b.end.x), 0.0)
-	var dv := maxf(maxf(b.position.y - a.end.y, a.position.y - b.end.y), 0.0)
-	return Vector2(du, dv).length()
+## Least distance from a polygon to a polyline (0 where they cross).
+func _distance_to_line(poly: PackedVector2Array, line: PackedVector2Array) -> float:
+	var best := INF
+	for p in line:
+		if Geometry2D.is_point_in_polygon(p, poly):
+			return 0.0
+	for i in poly.size():
+		var a := poly[i]
+		var b := poly[(i + 1) % poly.size()]
+		for k in range(line.size() - 1):
+			if Geometry2D.segment_intersects_segment(a, b, line[k], line[k + 1]) != null:
+				return 0.0
+			best = minf(best, a.distance_to(Geometry2D.get_closest_point_to_segment(a, line[k], line[k + 1])))
+			best = minf(best, line[k].distance_to(Geometry2D.get_closest_point_to_segment(line[k], a, b)))
+	return best
+
+
+func _closed(poly: PackedVector2Array) -> PackedVector2Array:
+	var out := poly.duplicate()
+	out.append(poly[0])
+	return out
 
 
 func _check_rooms() -> void:
@@ -89,61 +99,75 @@ func _check_rooms() -> void:
 
 
 func _check_sites() -> void:
-	var plain: Rect2 = KaiMaliePlan.PLAIN
 	for b in KaiMaliePlan.BUILDINGS:
-		var fp: Rect2 = b["footprint"]
-		var reach_u := plain.end.x + 0.8
+		var body: PackedVector2Array = b["body"]
+		var fp: PackedVector2Array = b["footprint"]
 		if b["key"] == "canoe_house":
-			reach_u = KaiMaliePlan.BEACH.end.x + 0.8
-		if fp.position.x < plain.position.x - 1.4 or fp.end.x > reach_u or fp.position.y < plain.position.y or fp.end.y > plain.end.y:
-			_fail("%s stands outside the coastal plain" % b["name"])
-		if fp.intersects(KaiMaliePlan.TERRACES):
+			for p in body:
+				if not Geometry2D.is_point_in_polygon(p, KaiMaliePlan.PLAIN) and not Geometry2D.is_point_in_polygon(p, KaiMaliePlan.BEACH):
+					_fail("%s stands off the plain and the beach" % b["name"])
+					break
+		else:
+			for p in body:
+				if not Geometry2D.is_point_in_polygon(p, KaiMaliePlan.PLAIN):
+					_fail("%s stands outside the coastal plain" % b["name"])
+					break
+		if _meet(fp, KaiMaliePlan.TERRACES):
 			_fail("%s stands on the taro terraces" % b["name"])
-		if fp.position.y < KaiMaliePlan.STREAM_V + STREAM_BAND and fp.end.y > KaiMaliePlan.STREAM_V - STREAM_BAND:
-			_fail("%s stands in the stream" % b["name"])
-		if fp.intersects(KaiMaliePlan.GREEN):
+		if _meet(fp, KaiMaliePlan.GREEN):
 			_fail("%s stands on the green" % b["name"])
-		if fp.intersects(KaiMaliePlan.PIER_HEAD):
+		if _meet(fp, KaiMaliePlan.PIER_HEAD):
 			_fail("%s stands on the pier head" % b["name"])
+		if _distance_to_line(fp, KaiMaliePlan.STREAM) < KaiMaliePlan.STREAM_CLEAR:
+			_fail("%s stands within %.0f m of the stream" % [b["name"], KaiMaliePlan.STREAM_CLEAR])
+		if absf(float(b["turn"])) > MAX_TURN:
+			_fail("%s turns %.0f degrees off the island's frame" % [b["name"], b["turn"]])
 
 
 func _check_spacing() -> void:
 	var list := KaiMaliePlan.BUILDINGS
 	for i in list.size():
 		for j in range(i + 1, list.size()):
-			var g := _gap(list[i]["footprint"], list[j]["footprint"])
+			var g := _distance_to_line(list[i]["footprint"], _closed(list[j]["footprint"]))
 			if g < MIN_GAP:
 				_fail("%s and %s are only %.1f m apart at the eaves" % [list[i]["name"], list[j]["name"], g])
 
 
-func _segment_distance(p: Vector2, a: Vector2, b: Vector2) -> float:
-	return p.distance_to(Geometry2D.get_closest_point_to_segment(p, a, b))
+## The middle of a building's front edge, turned with the building.
+func _front(b: Dictionary) -> Vector2:
+	var walls: Rect2 = b["walls"]
+	var r := walls
+	var lanai: Dictionary = b["lanai"]
+	for side in lanai:
+		var d := float(lanai[side])
+		match side:
+			"u+": r.size.x += d
+			"u-": r.position.x -= d; r.size.x += d
+			"v+": r.size.y += d
+			"v-": r.position.y -= d; r.size.y += d
+	var mid := r.get_center()
+	match b["front"]:
+		"u+": mid.x = r.end.x
+		"u-": mid.x = r.position.x
+		"v+": mid.y = r.end.y
+		"v-": mid.y = r.position.y
+	var c := walls.get_center()
+	return c + (mid - c).rotated(deg_to_rad(float(b["turn"])))
 
 
 func _check_paths() -> void:
 	for path in KaiMaliePlan.PATHS:
 		var half := float(path[1]) * 0.5
-		var pts: Array = path[2]
-		for k in range(pts.size() - 1):
-			var a: Vector2 = pts[k]
-			var c: Vector2 = pts[k + 1]
-			var seg := Rect2(a, Vector2.ZERO).expand(c).grow(half)
-			for b in KaiMaliePlan.BUILDINGS:
-				if seg.intersects(_body(b)):
-					_fail("%s runs through %s" % [path[0], b["name"]])
+		for b in KaiMaliePlan.BUILDINGS:
+			if _distance_to_line(b["body"], path[2]) < half:
+				_fail("%s runs through %s" % [path[0], b["name"]])
 	for b in KaiMaliePlan.BUILDINGS:
-		var body := _body(b)
-		var front := body.get_center()
-		match b["front"]:
-			"u+": front.x = body.end.x
-			"u-": front.x = body.position.x
-			"v+": front.y = body.end.y
-			"v-": front.y = body.position.y
-		var served := Rect2(front - Vector2(3, 3), Vector2(6, 6)).intersects(KaiMaliePlan.GREEN)
+		var front := _front(b)
+		var served := _distance_to_line(PackedVector2Array([front - Vector2(0.01, 0), front + Vector2(0.01, 0), front + Vector2(0, 0.01)]), _closed(KaiMaliePlan.GREEN)) <= FRONT_REACH
 		for path in KaiMaliePlan.PATHS:
-			var pts: Array = path[2]
-			for k in range(pts.size() - 1):
-				if _segment_distance(front, pts[k], pts[k + 1]) <= FRONT_REACH + float(path[1]) * 0.5:
+			var line: PackedVector2Array = path[2]
+			for k in range(line.size() - 1):
+				if front.distance_to(Geometry2D.get_closest_point_to_segment(front, line[k], line[k + 1])) <= FRONT_REACH + float(path[1]) * 0.5:
 					served = true
 		if not served:
 			_fail("%s faces no path or the green" % b["name"])
