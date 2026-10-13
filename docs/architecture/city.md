@@ -801,7 +801,13 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     Mara's rooftop studio, the Reese–Miller house.
 - **The market lanes** (south) hold Market Square, the wet market, the night
   market, the covered shopping arcade, the Helmsmith, Hiro's store, Wing Fat
-  Mansion and the school.
+  Mansion and the school. Their street buildings are Hong Kong tong lau
+  (`moy_market_lanes.md`, proposed 2026-10-13): four- and five-storey
+  **boom houses** with verandas over the pavements, built for the
+  Windworks' first workers, and six- to nine-storey **tile houses** with
+  balconies and rounded corners, built as the city grew; narrow pairs share
+  one ramp core on their party wall; slivers hold two-storey lock-up shops;
+  Arcade Street is roofed in the shōtengai manner.
 - **The North Estate** (north; renamed from Parkside Estate, user) is the
   public housing, planned the way Singapore's estates are (user): as
   **precincts**, not as lots. North Street divides it into a west and an

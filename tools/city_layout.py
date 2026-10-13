@@ -439,6 +439,10 @@ for nb in B:
         BUILDING_KITS[nb['n']]=kit_for(nb['r'],round(HEIGHTS[nb['n']]/3.25),nb['n'])
 BUILDING_KITS[52].update(storeys=7,base_kind='earth',base=3,front='e',shop=True,kishk=1,manzar=True,polite=True)
 BUILDING_KITS[27].update(polite=True); BUILDING_KITS[25].update(polite=True)
+# the market flats: four tile houses built as one terrace, rounded at the
+# corner of Market Street and Museum Lane (moy_market_lanes.md 4)
+BUILDING_KITS[34]={'kit':'tong_lau','storeys':8,'front':'s','shop':True,'gen':'tile','veranda':False,
+                   'corner':True,'colour':1,'signs':3,'roof':'laundry','core':'own','pair':-1,'lift':True,'units':4}
 # two neighbours never share both parapet pattern and base height
 def touching(a,b_): return a[0]<=b_[2] and b_[0]<=a[2] and a[1]<=b_[3] and b_[1]<=a[3]
 for i,ki in enumerate(LOT_KITS):
@@ -452,6 +456,81 @@ for i,ki in enumerate(LOT_KITS):
     if min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<6: problems.append(('tower house on a narrow lot',i))
     lo,hi=(2,max(2,(2*ki['storeys'])//3)) if ki['base_kind']=='earth' else (1,3)
     if not lo<=ki['base']<=hi: problems.append(('base out of range',i))
+## The market lanes' tong lau (docs/architecture/moy_market_lanes.md). Every
+## market-lane lot gets a tenement shophouse: a boom house (4 or 5 storeys,
+## a veranda on main streets and squares) or a tile house (6 to 9, rounded
+## corner on corner lots). Narrow houses share a ramp core with the
+## neighbour across their party wall, as tong lau pairs share a stair.
+def market_lane(x,z):
+    if math.hypot(x-CX,z)>200 or x>-487: return False
+    return z>=114 or (z>62 and x>-641)
+def street_sides(r):
+    x0,z0,x1,z1=r; out={}
+    for side,ring in (('n',[(x,z0-1) for x in range(x0,x1)]),('s',[(x,z1) for x in range(x0,x1)]),('w',[(x0-1,z) for z in range(z0,z1)]),('e',[(x1,z) for z in range(z0,z1)])):
+        hits=[c for c in ring if c in STREET_KIND or c in opn]
+        if len(hits)>=max(2,len(ring)//3): out[side]=True
+    return out
+PERP={'n':'ew','s':'ew','e':'ns','w':'ns'}
+def market_kit_for(r,storeys):
+    x0,z0,x1,z1=r
+    h=(abs(x0)*2654435761 ^ abs(z0)*40503 ^ abs(z1)*97) & 0xffff
+    side,kind=front_of(r)
+    side=side or 'n'
+    boom=storeys<=5
+    sides=street_sides(r)
+    corner=any(sd in sides for sd in PERP[side])
+    k={'kit':'tong_lau','storeys':storeys,'front':side,'shop':True,'gen':'boom' if boom else 'tile',
+       'veranda':boom and kind in ('main','open'),'corner':(not boom) and corner,
+       'colour':h%5,'signs':(2+h%2) if kind in ('main','shop','open') else h%2,
+       'roof':['tanks','laundry','greenhouse','garden'][(h//5)%4] if boom or (h//5)%4!=2 else 'tanks',
+       'core':'own','pair':-1,'lift':storeys>=7}
+    return k
+for i,l in enumerate(lots):
+    if market_lane((l[0]+l[2])/2,(l[1]+l[3])/2):
+        LOT_KITS[i]=market_kit_for(tuple(int(v) for v in l[:4]),l[4])
+# pairs share a ramp core on their party wall: narrow houses (under 9 m
+# across) with the same front, touching along a wall at least 5 m long
+def party_wall(a,b_,front):
+    if front in 'ns':
+        if a[2]==b_[0] or b_[2]==a[0]: return min(a[3],b_[3])-max(a[1],b_[1])
+    else:
+        if a[3]==b_[1] or b_[3]==a[1]: return min(a[2],b_[2])-max(a[0],b_[0])
+    return 0
+TL=[i for i,k_ in enumerate(LOT_KITS) if k_ and k_['kit']=='tong_lau']
+narrow=lambda i: min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<9
+for i in sorted(TL,key=lambda i: min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])):
+    ki=LOT_KITS[i]
+    if ki['pair']>=0 or not narrow(i): continue
+    best=None
+    for j in TL:
+        kj=LOT_KITS[j]
+        if j==i or kj['pair']>=0 or kj['front']!=ki['front']: continue
+        w_=party_wall(lots[i],lots[j],ki['front'])
+        if w_>=5 and (best is None or w_>best[0]): best=(w_,j)
+    if best:
+        j=best[1]; ki['pair']=j; LOT_KITS[j]['pair']=i; ki['core']=LOT_KITS[j]['core']='shared'
+# a sliver with no neighbour to share a core becomes a two-storey lock-up
+# shop: a shop below and its store or a small flat above, reached by the
+# shop's own ladder ramp (moy_market_lanes.md 3)
+for i in TL:
+    ki=LOT_KITS[i]
+    if min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<6 and ki['core']!='shared':
+        LOT_KITS[i]={'kit':'lockup','storeys':2,'front':ki['front'],'shop':True,'colour':ki['colour'],'signs':ki['signs']}
+        lots[i]=lots[i][:4]+(2,)+lots[i][5:]
+TL=[i for i in TL if LOT_KITS[i]['kit']=='tong_lau']
+# neighbours differ in colour
+for i in TL:
+    for j in TL:
+        if j<i and touching(lots[i],lots[j]) and LOT_KITS[i]['colour']==LOT_KITS[j]['colour']:
+            LOT_KITS[i]['colour']=(LOT_KITS[i]['colour']+1)%5
+for i in TL:
+    ki=LOT_KITS[i]
+    if (ki['gen']=='boom')!=(ki['storeys']<=5): problems.append(('tong lau generation does not fit its storeys',i))
+    if ki['veranda'] and ki['gen']!='boom': problems.append(('veranda on a tile house',i))
+    if ki['pair']>=0 and LOT_KITS[ki['pair']]['pair']!=i: problems.append(('core pair not mutual',i))
+    if min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<6 and ki['core']!='shared': problems.append(('narrow tong lau without a shared core',i,lots[i]))
+for i,ki in enumerate(LOT_KITS):
+    if ki and ki['kit']=='lockup' and lots[i][4]!=2: problems.append(('lock-up shop not two storeys',i))
 JUNGLE=(-500,464); ICE=(-450,-480)
 assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)
 nums={b['n'] for b in B}
@@ -523,11 +602,14 @@ def kit_gd(k):
     if k is None: return "null"
     return "{" + ", ".join("%s: %s" % (q(a_), ("true" if v is True else "false" if v is False else q(v) if isinstance(v,str) else str(v))) for a_,v in k.items()) + "}"
 w("")
-w("## Old Moy's kits, one per lot, in the same order as LOTS (null outside Old")
-w("## Moy): kit (tower or infill), storeys, front (n, s, e, w), shop, and for")
+w("## Kits, one per lot, in the same order as LOTS (null outside Old Moy and")
+w("## the market lanes). Old Moy (moy_tower_house.md): kit (tower or infill),")
+w("## storeys, front (n, s, e, w), shop, and for")
 w("## tower houses base_kind (stone or earth), base (its storeys), kishk,")
 w("## manzar, parapet (pattern 0 to 2), frieze (pattern 0 to 3), polite.")
-w("## docs/architecture/moy_tower_house.md.")
+w("## The market lanes (moy_market_lanes.md): kit tong_lau, gen (boom or")
+w("## tile), veranda, corner, colour (0 to 4), signs, roof, core (own or shared),")
+w("## pair (the LOTS index sharing the core, or -1), lift.")
 w("const LOT_KITS := [")
 for k_ in LOT_KITS: w("\t%s," % kit_gd(k_))
 w("]")

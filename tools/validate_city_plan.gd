@@ -265,6 +265,11 @@ const TOWER_MIN_WIDTH := 6.0
 
 
 func _check_tower_kit(label: String, kit: Dictionary, r: Rect2) -> void:
+	if kit["kit"] == "tong_lau":
+		_check_tong_lau(label, kit, r)
+		return
+	if kit["kit"] == "lockup" and int(kit["storeys"]) != 2:
+		_fail("%s is a lock-up shop of %d storeys" % [label, kit["storeys"]])
 	if kit["kit"] != "tower":
 		return
 	if minf(r.size.x, r.size.y) < TOWER_MIN_WIDTH and not label.begins_with("building"):
@@ -291,3 +296,21 @@ func _check_tower_kits() -> void:
 			_check_tower_kit("lot %d" % i, CityPlan.LOT_KITS[i], CityPlan.LOTS[i][0])
 	for n in CityPlan.BUILDING_KITS:
 		_check_tower_kit("building %d" % n, CityPlan.BUILDING_KITS[n], _numbers[n]["rect"])
+
+
+## Market lanes (docs/architecture/moy_market_lanes.md): boom houses are 4 or
+## 5 storeys and only they have verandas; tile houses are 6 to 9; a house
+## under 6 m across shares its ramp core, and core pairs are mutual.
+func _check_tong_lau(label: String, kit: Dictionary, r: Rect2) -> void:
+	var storeys := int(kit["storeys"])
+	if (kit["gen"] == "boom") != (storeys <= 5):
+		_fail("%s is a %s house of %d storeys" % [label, kit["gen"], storeys])
+	if kit["veranda"] and kit["gen"] != "boom":
+		_fail("%s has a veranda on a tile house" % label)
+	if minf(r.size.x, r.size.y) < 6.0 and kit["core"] != "shared" and not kit.has("units"):
+		_fail("%s is under 6 m across without a shared ramp core" % label)
+	var pair := int(kit["pair"])
+	if pair >= 0:
+		var other = CityPlan.LOT_KITS[pair]
+		if other == null or int(other["pair"]) != int(label.get_slice(" ", 1)):
+			_fail("%s shares a ramp core with lot %d, which does not share back" % [label, pair])

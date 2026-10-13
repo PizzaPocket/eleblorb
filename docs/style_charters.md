@@ -164,6 +164,66 @@ photos, 2026-10-13: a single Wadi Dhahr tower and a view of old Sana'a).
 | Kit | tower house on lots 6 m or more across; the tiled pencil infill on narrower ones | the narrowest lots were filled last |
 | Age marks | fresh or faded whitewash, a brick storey added in a different brick, an infilled window | each house's history |
 
+## Moy: the market lanes
+
+**Status: proposed, 2026-10-13.** Brief: `docs/architecture/moy_market_lanes.md`.
+Precedent: Hong Kong's tenement shophouses (*tong lau*) in Sheung Wan, Mong
+Kok and Sham Shui Po, and Tokyo's covered shopping streets (*shōtengai*).
+
+- **Primary (about 75 percent): the Hong Kong tong lau,** in two
+  generations:
+  - **Boom houses** (4 and 5 storeys), built for the Windworks' first
+    workers: rendered walls, a **veranda** on square columns over the
+    pavement on main streets and squares, stacked verandas above it, tall
+    French windows.
+  - **Tile houses** (6 to 9 storeys), built as the city grew: mosaic tile,
+    cantilevered balconies, a concrete canopy over the shopfront, and on
+    corner lots the rounded **Streamline Moderne corner** with curved
+    balconies wrapping it.
+- **Secondary (about 20 percent): the Tokyo shōtengai,** at street level
+  only: the arched translucent roof over Arcade Street through the market
+  lanes, roll shutters and cloth door curtains (*noren*) on the shopfronts.
+- **Accent (about 5 percent):** the night market's lantern strings over
+  Lamp Lane; Wing Fat Mansion as the district's one tall landmark.
+- **Kit of parts.**
+  - Roof: **flat**, a 1.1 m parapet; on it water tanks on stands, laundry
+    frames, a rooftop greenhouse (the boom houses), or a roof garden.
+  - Walls: **render** on boom houses, **mosaic tile** on tile houses, both
+    from one palette; a plinth of granite-grey tile 0.6 m.
+  - Windows: boom houses, tall French windows (1.0 × 2.2 m) onto the
+    verandas; tile houses, wide steel windows (2.0 × 1.4 m) behind the
+    balconies; superellipse corners on all.
+  - Balconies: the veranda (boom), the cantilevered balcony with a steel
+    rail (tile), later enclosures and plant cages on some.
+  - Ground: a shopfront the full width but for the house door; roll
+    shutter, noren or a counter to the pavement.
+  - Signs, the signature motif: **lit picture signs stacked up the facades
+    and hung across the lanes, never lettered** (Zara's).
+  - Exterior life: AC units, laundry poles, potted plants, each where a
+    person would put it.
+  - Circulation: a switchback **ramp core shared by two houses** on their
+    party wall, as tong lau pairs share a stair; houses of 7 or more
+    storeys add a lift in a glass shaft at the back.
+  - Palette: tile and render in cream, mint, salmon, pale blue or grey (60
+    percent); white and grey trim, rails and canopies (30 percent); sign
+    colour, noren and lanterns (10 percent).
+- **Hierarchy.** Polite: houses on Market Square and the main streets
+  (verandas, rounded corners, more signs). Vernacular: the lanes.
+- **Exclusions.** No pitched roofs, no Old Moy gypsum friezes or qamariya
+  (they belong to the well town), no glass curtain walls, no lettering.
+
+### Market lanes variation matrix
+
+| Axis | Range | Reason it varies |
+|---|---|---|
+| Generation | boom house (4 to 5 storeys) or tile house (6 to 9) | when it was built |
+| Veranda | boom houses on main streets and squares | the boom streets had them by rule |
+| Corner | rounded Streamline corner on tile houses with two street faces | corner lots |
+| Colour | five tile and render colours; neighbours differ | each owner's choice |
+| Signs | 0 to 3 stacked picture signs | busier streets carry more |
+| Roof | tanks, laundry, greenhouse or garden | how the residents use it |
+| Core | shared with a neighbour or the house's own | narrow lots share |
+
 ## Other kingdoms
 
 Draft charters to be added from `references/cultures.md` grammars: Rock and Ground (earthen Pueblo/adobe), Ocean (stilt harbour), Plant (tree-borne and thatch), Sky (drafted in `docs/architecture/sky_kingdom.md` as celestial classical in quartz, gold and cloud: Greco-Roman about 55 percent, Chinese celestial palace about 35 percent by deliberate choice rather than the usual 75/20 split, with the rule that no single building mixes both traditions), the Chinese village (courtyard and tiled hip-and-gable), the Western city (concrete). The Fire Kingdom's draft volcanic-modern charter now lives in `docs/architecture/fire_caldera_city.md`. Each remaining kingdom needs the Ohio-style charter with a primary, one secondary, an accent, a kit of parts, hierarchy and exclusions.
