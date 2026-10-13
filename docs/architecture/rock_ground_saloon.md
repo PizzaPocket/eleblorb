@@ -1,4 +1,4 @@
-# Rock and Ground: the Saloon and Hotel (architecture brief)
+# Tennison, Rock and Ground: the Saloon and Hotel (architecture brief)
 
 Status: building brief for review (2026-10-12). Read with
 `rock_ground_town.md`: community (3), the mechanical and motor layer (2a), the

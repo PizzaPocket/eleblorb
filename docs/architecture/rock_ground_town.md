@@ -1,4 +1,4 @@
-# Rock and Ground Kingdom: The Frontier Town
+# Rock and Ground Kingdom: Tennison, the Frontier Town
 
 Status: concept and settlement brief, first pass, for review (2026-10-06).
 Settlement-design stages 1 and 2 (survey and community brief), with the

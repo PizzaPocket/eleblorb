@@ -120,7 +120,7 @@ washstand, rug, peg rail, lamp; `upper_beds` in `OhioPlan`). Remaining: the user
 in-engine walkthrough, then a walked play-test with the human and Blorbus (doors,
 locked-room sequence, ramps). See `docs/handoff_ohio_village.md`.
 
-## 2. Snow Village, Ice Kingdom
+## 2. Snowhio (the Snow Village), Ice Kingdom
 
 Status (2026-10-04): rebuilt. The single plan is `scripts/snow_plan.gd`; the
 laft log module is `scripts/log_house.gd`; hearths are `scripts/nordic_hearth.gd`;
@@ -709,7 +709,7 @@ reconciled) join this table when their designs are approved.
   gold cords, a round-collared robe with gold dragon roundels, a jade hoop belt;
   update the "gold robe" comment in `npc.gd`.
 
-## 15. Rock and Ground Kingdom: the frontier town
+## 15. Rock and Ground Kingdom: Tennison, the frontier town
 
 Status: concept and settlement brief for review (2026-10-06),
 `docs/architecture/rock_ground_town.md`. A Western frontier town after early

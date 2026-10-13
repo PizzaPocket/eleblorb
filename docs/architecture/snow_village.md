@@ -1,4 +1,4 @@
-# Snow Village (Ice Kingdom): architecture, plan, landscape and interiors
+# Snowhio, the Snow Village (Ice Kingdom): architecture, plan, landscape and interiors
 
 Status: APPROVED IMPLEMENTATION CHARTER. Bible entry: `docs/world_bible.md`, Ice Kingdom, "The snow village" and its residents.
 
