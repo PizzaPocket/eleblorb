@@ -12,7 +12,7 @@ world axes, +z toward the river (south). Heights are metres above the village
 floor. Bearings are degrees from +x toward +z.
 """
 import json, math, sys
-from shapely.geometry import Polygon, Point
+from shapely.geometry import Polygon, Point, LineString, box
 from shapely.ops import unary_union   # pip install shapely
 
 def rad(b): return math.radians(b)
@@ -128,13 +128,20 @@ for k, n_, w_, e, t, w, d, r, front in AMENITY_SPEC:
 ## platform, so it takes no room from the deck and its vat lowers straight to the ground
 PRIVY_C, PRIVY_YAW = on_edge('NE', 0.33, 1.4, -1.6)
 PRIVY = ('privy', 'Public privy', 'shared', PRIVY_C, 1.8, 1.4, PRIVY_YAW, 'rattan closet on a bracketed platform')
-## the inn: a lobe east of the East Tree, its veranda facing the commons
-INN = dict(c=(20.0, 12.0), w=20.0, d=16.0, yaw=0.0, house=(14.0, 8.0), veranda=3.0, keeper='Bima', price=15)   # the lobe reaches round the East Tree's well to the commons
-## the grand ramp: a switchback of three 32 deg flights from the plaza's south up to the deck's south edge
+## the inn: a rounded lobe of deck east of the East Tree, one piece with the commons, the house on
+## its east part with its veranda facing the commons, carried by six posts under the house's walls
+INN = dict(lobe=(14.0, 3.5, 30.0, 20.5), round=3.0, house_c=(24.1, 12.0), house=(14.0, 8.0), veranda=3.0, keeper='Bima', price=15)
+## the grand ramp: a 32 deg spiral wound round a living column (a strangler fig grown on a post)
+## just south of the deck's south edge, arriving at the edge beside the market
 S_EDGE, _ = on_edge('S', 0.5, 0.0, 0.0)
-GRAND = dict(head=S_EDGE, width=2.4, flights=3, yaw=95.7)
-## six posts to the ground, 1 m inside the deck edge, outside the gate plaza's clear zone
-POSTS = [on_edge(e, t, 2.0, 0.0)[0] for e, t in (('S', 0.25), ('S', 0.75), ('NW', 0.2), ('NW', 0.9), ('NE', 0.1), ('NE', 0.85))]
+GRAND = dict(head=S_EDGE, width=2.4, column_r=1.6, landing=LANDING)
+GRAND['r'] = GRAND['column_r'] + 0.2 + GRAND['width'] / 2          # the ramp's centreline radius
+GRAND['c'] = (S_EDGE[0], S_EDGE[1] + GRAND['column_r'] + 0.2 + GRAND['width'] + 0.2)
+## posts to the ground: six under the commons' edges, one under the market's side of the south edge,
+## six under the inn house's walls. None stands in the gate plaza.
+POSTS = [on_edge(e, t, 2.0, 0.0)[0] for e, t in (('S', 0.25), ('S', 0.75), ('NW', 0.2), ('NE', 0.85))]
+POSTS += [(S_EDGE[0] + 0.3, S_EDGE[1] - 1.0)]
+POSTS += [(INN['house_c'][0] + sx * (INN['house'][1] / 2 - 0.5), INN['house_c'][1] + sz * (INN['house'][0] / 2 - 0.5)) for sx in (-1, 1) for sz in (-1, 0, 1)]
 
 ## ---- household rings and pavilions: tree, ring height, bearing round the trunk, kind, who
 PAVILIONS = [
@@ -198,18 +205,22 @@ for i in range(len(ks)):
 # the gate plaza stays open below; the posts stand outside it and outside the buildings
 for i, p in enumerate(POSTS):
     if dist(p, GATE) < PLAZA_CLEAR: problems.append(('post %d stands in the gate plaza' % i,))
-    if not inside(p, COMMONS): problems.append(('post %d stands outside the deck it carries' % i,))
 # the inn lobe joins the deck and clears the East Tree
-inn_poly = rect(INN['c'], INN['w'], INN['d'], INN['yaw'])
-house_poly = rect((INN['c'][0] + INN['w'] / 2 - 0.5 - INN['house'][1] / 2, INN['c'][1]), INN['house'][1], INN['house'][0], 0)
+INN_LOBE = box(*INN['lobe']).buffer(-INN['round']).buffer(INN['round'], 16)
+inn_poly = list(INN_LOBE.exterior.coords)[:-1]
+house_poly = rect(INN['house_c'], INN['house'][1], INN['house'][0], 0)
+if not INN_LOBE.buffer(-0.9).contains(Polygon(house_poly)): problems.append(('the inn house stands within 0.9 m of its lobe\'s edge',))
 
 if gap(house_poly, trunks11['east']) < ROUTE: problems.append(('the inn house crowds the East Tree\'s well',))
-# the grand ramp: its footprint south of the deck, clear of trunks and buildings, its head at the deck's edge
+# the grand ramp: one turn and a bit round its column, a landing half way, arriving at the deck's edge
 G_RUN = COMMONS_Y / math.tan(rad(RAMP_ANGLE))
-g_len = G_RUN / GRAND['flights'] + 2 * LANDING
-g_w = GRAND['width'] * GRAND['flights'] + 0.4 * (GRAND['flights'] - 1)
-head = GRAND['head']
-g_poly = rect((head[0] - 0.1 * g_len / 2, head[1] + g_len / 2 + 0.2), g_w, g_len, 5.7)
+G_TURN = math.degrees((G_RUN + LANDING) / GRAND['r'])               # degrees wound from foot to head
+GRAND['top_b'] = bearing(GRAND['c'], S_EDGE); GRAND['foot_b'] = GRAND['top_b'] - G_TURN; GRAND['turn'] = G_TURN
+GRAND['turn_rise'] = COMMONS_Y * 360 / G_TURN
+if GRAND['turn_rise'] < HEADROOM + 0.6: problems.append(('the grand spiral\'s turns leave too little headroom',))
+g_poly = [pol(GRAND['c'], GRAND['column_r'] + 0.2 + GRAND['width'] + 0.2, b) for b in range(0, 360, 15)]
+if dist(GRAND['c'], GATE) - GRAND['column_r'] - GRAND['width'] < PLAZA_CLEAR: problems.append(('the grand spiral stands in the gate plaza',))
+if Polygon(g_poly).intersects(Polygon(COMMONS).buffer(-0.2)): problems.append(('the grand spiral runs under the commons',))
 # rings: pavilions on bays fit round each ring with the walkway, the switchback and the bridge landings
 def ring_arc(t, y, b0, width):
     r = trunk_r(t, y) + WELL + RING_WIDTH      # pavilions, bridges and switchbacks meet the ring at its outer edge
@@ -306,10 +317,16 @@ for t, h in HELIX.items():
     # a full turn rises far more than the headroom a climber needs under the turn above
     turn = 360 / ((h['steps'][0]['a2'] - h['steps'][0]['a0'])) * STOREY
     if turn < 2.4 + 0.4: problems.append((t, 'the spiral leaves too little headroom'))
-## the deck as built: the commons and the inn's lobe, less the three wells.
+## the deck as built: the commons, a collar wrapping each trunk so its well is a closed hole with a
+## walk all round it, and the inn's lobe, filleted into one outline, less the three wells.
 ## It must be one piece, so everything on it is reachable without crossing a well.
+COLLAR = 2.6                  # deck beyond each well: a 1.5 m route and the rail
 WELLS = {k: Point(t['c']).buffer(trunk_r(k, COMMONS_Y) + WELL, 48) for k, t in TREES.items()}
-DECK = unary_union([Polygon(COMMONS), Polygon(inn_poly)]).difference(unary_union(list(WELLS.values())))
+COLLARS = [Point(t['c']).buffer(trunk_r(k, COMMONS_Y) + WELL + COLLAR, 48) for k, t in TREES.items()]
+DECK = unary_union([Polygon(COMMONS), INN_LOBE] + COLLARS).buffer(1.5, 16).buffer(-1.5, 16).difference(unary_union(list(WELLS.values())))
+if DECK.geom_type == 'Polygon' and len(DECK.interiors) != 3: problems.append(('a well breaks through the deck\'s edge',))
+for i, p in enumerate(POSTS):
+    if not DECK.buffer(-0.3).contains(Point(p)): problems.append(('post %d stands outside the deck it carries' % i,))
 if DECK.geom_type != 'Polygon': problems.append(('the commons deck is in %d pieces once the wells are cut' % len(DECK.geoms),))
 DECK_POLYS = [DECK] if DECK.geom_type == 'Polygon' else list(DECK.geoms)
 if Polygon(house_poly).intersects(unary_union(list(WELLS.values())).buffer(ROUTE)): problems.append(('the inn house crowds a well',))
@@ -353,6 +370,129 @@ for t in TREES:
         st = best[2]; per = sum(x['a2'] - x['a0'] for x in st) / len(st)
         if 11.4 * 360 / per < HEADROOM + 0.4: problems.append((t, 'the public spiral\'s turns are too close'))
 
+
+## ---- structure: what carries every deck (layout section 10)
+## The commons, at 11.4 m, is below the trees' first limbs. It stands on timber bearers bracketed to
+## each trunk across its well, and on posts. Its middle is over the gate plaza, where no post may
+## stand, so it hangs: each tree grows two limbs at about 20 m toward the commons' middle, and their
+## tips carry a hung ring beam round the gathering circle. The rings and the crown deck sit on
+## bearers too: a living limb under every pavilion and every bridge landing, timber bearers between.
+## No bearer or limb crosses the climbers' spiral or the public spiral within a walker's headroom.
+BEARER_TOP, BEARER_BOTTOM = 0.35, 1.3   # a bearer fills y - 1.3 .. y - 0.35 under its deck
+BEARER_REACH = 6.0            # with its knee brace a bearer carries the deck this far beyond the well
+POST_REACH = 6.0              # beams from a post's head
+HANG_REACH = 4.5              # joists between hung beams
+MAX_BAY = 7.0                 # bearers no further apart than this at a deck's outer edge
+LIMB_MAX = 11.5               # nature_props.gd EMERGENT_BOUGH_LENGTH_MAX
+COMMONS_LIMB_SPREAD = 25.0    # each tree's two commons limbs, either side of the line to the middle
+def walk_heights(t, b):
+    """Heights of the climbers' and the public spiral's walking surfaces at bearing b round tree t."""
+    hs = []
+    for st in HELIX[t]['steps'] + PUBLIC[t]['steps']:
+        d = (b - st['a0']) % 360
+        if d <= st['a1'] - st['a0']: hs.append(st['y0'] + (st['y1'] - st['y0']) * d / (st['a1'] - st['a0']))
+        elif d <= st['a2'] - st['a0']: hs.append(st['y1'])
+    return hs
+def clear_of_walks(t, b, y_lo, y_hi):
+    return all(y_hi < h - 0.3 or y_lo > h + HEADROOM for h in walk_heights(t, b))
+def nearest_clear(t, b, y_lo, y_hi, within):
+    for d in sorted(range(-int(within), int(within) + 1), key=abs):
+        if clear_of_walks(t, (b + d) % 360, y_lo, y_hi): return (b + d) % 360
+    return None
+def fill_bearers(t, y, r_out, fixed, hung=None):
+    """Timber bearers between the fixed ones, so no bay at the outer edge exceeds MAX_BAY. Where the
+    spirals rise under a deck no bearer can cross them, and that bay is hung from above instead
+    (listed in `hung`); with no `hung` list, such a bay is left to the coverage check."""
+    bs = sorted(b % 360 for b in fixed); out = []; settled = set()
+    cands = [b for b in range(0, 360, 2) if clear_of_walks(t, b, y - BEARER_BOTTOM, y - BEARER_TOP)]
+    if not bs and cands: out.append(cands[0])
+    changed = True
+    while changed:
+        changed = False
+        allb = sorted(set(bs + out))
+        for i, b0 in enumerate(allb):
+            b1 = allb[(i + 1) % len(allb)] + (360 if i + 1 == len(allb) else 0)
+            if math.radians(b1 - b0) * r_out <= MAX_BAY + 1e-6 or (b0, b1 % 360) in settled: continue
+            mid = (b0 + b1) / 2
+            pick = [c for c in cands if b0 < c < b1 or b0 < c + 360 < b1]
+            if not pick:
+                settled.add((b0, b1 % 360))
+                if hung is not None: hung.append((b0, b1 % 360))
+                continue
+            out.append(min(pick, key=lambda c: abs(((c - mid + 180) % 360) - 180))); changed = True; break
+    return out
+SUPPORT = dict(bearers=[], limbs=[], commons_limbs=[], hung=[])
+# the commons: timber bearers round each well
+for t in TREES:
+    r_out = trunk_r(t, COMMONS_Y) + WELL + BEARER_REACH
+    for b in fill_bearers(t, COMMONS_Y, r_out, [], []):
+        # a bearer runs out across the well to the deck's edge, or its reach, whichever is nearer
+        c = TREES[t]['c']; r_in = trunk_r(t, COMMONS_Y) + WELL
+        ray = LineString([pol(c, r_in + 0.05, b), pol(c, r_out, b)]).intersection(DECK)
+        seg = ray if ray.geom_type == 'LineString' else min(ray.geoms, key=lambda g: Point(c).distance(g))
+        end = max(seg.coords, key=lambda q: dist(q, c)) if not seg.is_empty else pol(c, r_in, b)
+        SUPPORT['bearers'].append(dict(tree=t, y=COMMONS_Y, b=b, r0=trunk_r(t, COMMONS_Y), r1=round(dist(end, c) - 0.3, 2)))
+# the commons limbs and their hung ring
+for t, tr in TREES.items():
+    for sgn in (-1, 1):
+        b = (bearing(tr['c'], CEN) + sgn * COMMONS_LIMB_SPREAD) % 360
+        y = next((y for y in [round(18.5 + 0.1 * i, 1) for i in range(31)] if clear_of_walks(t, b, y - 0.6, y + 0.6)), None)
+        if y is None: problems.append((t, 'no height for a commons limb at %.0f' % b)); continue
+        r0 = trunk_r(t, y); tip = pol(tr['c'], r0 + LIMB_MAX, b)
+        SUPPORT['commons_limbs'].append(dict(tree=t, b=b, y=y, r0=r0, length=LIMB_MAX, tip=tip))
+tips = sorted((l['tip'] for l in SUPPORT['commons_limbs']), key=lambda q: math.atan2(q[1] - CEN[1], q[0] - CEN[0]))
+SUPPORT['hung'] = tips
+HUNG = Polygon(tips)
+carried = [HUNG.buffer(HANG_REACH)]
+carried += [Point(t['c']).buffer(trunk_r(k, COMMONS_Y) + WELL + BEARER_REACH) for k, t in TREES.items()]
+carried += [Point(p).buffer(POST_REACH) for p in POSTS]
+for l in SUPPORT['commons_limbs']:
+    c = TREES[l['tree']]['c']
+    carried.append(LineString([pol(c, l['r0'] + WELL + 1.0, l['b']), l['tip']]).buffer(HANG_REACH))
+UNCARRIED = DECK.difference(unary_union(carried))
+if UNCARRIED.area > 0.5: problems.append(('%.1f m2 of the commons has nothing under or over it' % UNCARRIED.area, [tuple(round(v, 1) for v in g.centroid.coords[0]) for g in getattr(UNCARRIED, 'geoms', [UNCARRIED]) if g.area > 0.2]))
+if any(HUNG.buffer(0.1).contains(Point(p)) for p in POSTS): problems.append(('a post stands under the hung ring',))
+# rings and the crown: a living limb under every pavilion and bridge landing, timber bearers between
+for t in TREES:
+    for y in DECKS[t][1:]:
+        width = 5.5 if y == CROWN_Y else RING_WIDTH
+        r_in = trunk_r(t, y) + WELL; r_out = r_in + width; fixed = []
+        loads = [(pb, PAV_SIZE[k][0], PAV_SIZE[k][1], who) for tt, yy, pb, k, who in PAVILIONS if tt == t and yy == y]
+        if y == BRIDGE_Y:
+            for a_, b_ in BRIDGES:
+                if t in (a_, b_): loads.append((bearing(TREES[t]['c'], TREES[b_ if t == a_ else a_]['c']), 3.0, 0.0, 'bridge'))
+        for pb, w, d, who in loads:
+            half = math.degrees((w / 2 - 0.5) / r_out)
+            b = nearest_clear(t, pb, y - BEARER_BOTTOM, y - BEARER_TOP, half)
+            if b is None: problems.append((t, y, who, 'no clear bearing for the limb under it')); continue
+            reach = r_out + max(0.0, d - 0.6) - 1.0 - trunk_r(t, y)     # to a metre short of the pavilion's outer edge
+            if reach > LIMB_MAX: problems.append((t, y, who, 'needs a %.1f m limb' % reach))
+            SUPPORT['limbs'].append(dict(tree=t, y=y, b=b, r0=trunk_r(t, y), length=round(min(reach, LIMB_MAX), 2), carries=who)); fixed.append(b)
+        hung = []
+        for b in fill_bearers(t, y, r_out, fixed, hung):
+            SUPPORT['bearers'].append(dict(tree=t, y=y, b=b, r0=trunk_r(t, y), r1=r_out))
+        for b0, b1 in hung:
+            # a hung bay: hangers at its inner and outer edges, outside the public spiral's 1.5 m, from a
+            # hanger limb grown 3.5 to 7 m above the deck over the bay's middle
+            mid = (b0 + ((b1 - b0) % 360) / 2) % 360
+            yh = next((yy for yy in [round(y + 3.5 + 0.1 * i, 1) for i in range(36)]
+                       if clear_of_walks(t, mid, yy - 0.6, yy + 0.6) and all(abs(yy - dy) > 1.6 for dy in DECKS[t])), None)
+            if yh is None: problems.append((t, y, 'no hanger limb over the bay %.0f-%.0f' % (b0, b1))); continue
+            SUPPORT.setdefault('hangers', []).append(dict(tree=t, y=y, b0=b0, b1=b1, limb_y=yh, b=mid, r0=trunk_r(t, yh),
+                                                         length=round(r_out + 0.5 - trunk_r(t, yh), 2), r_in=r_in + PUBLIC_W + 0.1, r_out=r_out))
+# the rest of each crown: limbs as nature_props.gd grows them (from 0.4 of the trunk, every 6.2 m, by
+# the golden angle), skipped near a deck and wherever they would cross a walk
+GOLDEN_B = 360 * 0.6180339887498949
+BOUGHS = []
+for t, tr in TREES.items():
+    top = 0.86 * tr['h']; y = top * 0.40; a = {'east': 40.0, 'elder': 160.0, 'north': 280.0}[t]
+    while y < top * 0.97:
+        near = any(abs(y - dy) < 3.4 for dy in DECKS[t]) or any(abs(y - l['y']) < 2.0 for l in SUPPORT['commons_limbs'] if l['tree'] == t)
+        if not near and clear_of_walks(t, a % 360, y - 0.6, y + 0.6):
+            hf = y / top
+            BOUGHS.append(dict(tree=t, y=round(y, 2), b=round(a % 360, 1), r0=trunk_r(t, y), length=round(11.5 + (5.0 - 11.5) * hf, 2), pitch=0.26))
+        a += GOLDEN_B; y += 6.2
+
 ## the commons hoist: a basket on a pulley over the deck's edge beside the food store, so food, water
 ## and firewood come up from the floor without being carried up the ramps
 STORE = next(a for a in AMENITIES if a[0] == 'store')
@@ -387,7 +527,7 @@ data = dict(
                    chain=branch_chain(k, {'east': 30, 'elder': 200, 'north': 290}[k])) for k, v in TREES.items()},
     gate=GATE, plaza=PLAZA_CLEAR, commons=COMMONS, commons_y=COMMONS_Y, commons_area=round(A), centroid=CEN,
     amenities=[dict(key=k, name=n, who=w_, c=c, w=w, d=d, yaw=y, roof=r) for k, n, w_, c, w, d, y, r in AMENITIES + [PRIVY]],
-    inn=INN, grand=dict(GRAND, run=G_RUN, flight_len=g_len, poly=g_poly), posts=POSTS, sbpoly=SBPOLY, lobes=LOBES, inn_house=house_poly,
+    inn=INN, inn_lobe=inn_poly, grand=dict(GRAND, run=G_RUN, poly=g_poly), posts=POSTS, support=SUPPORT, boughs=BOUGHS, sbpoly=SBPOLY, lobes=LOBES, inn_house=house_poly,
     rings=dict(ys=RING_YS, crown=CROWN_Y, width=RING_WIDTH, bay=BAY_WIDTH),
     pavilions=[dict(tree=t, y=y, b=b, kind=k, who=w_, size=PAV_SIZE[k]) for t, y, b, k, w_ in PAVILIONS],
     public=PUBLIC, public_w=PUBLIC_W, decks=DECKS,
@@ -397,6 +537,6 @@ data = dict(
     trunk_r_fn='0.045h at the base to 0.02h at 0.86h', problems=[list(map(str, p)) for p in problems])
 if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
-print('commons %.0f m2 gross, %.0f net of wells (offset %.1f m); grand ramp run %.1f m in %d flights; bridges %s; %d problems' % (
-    A, A_NET, COMMONS_OFFSET, G_RUN, GRAND['flights'], ', '.join('%s-%s %.1f m' % (b['a'], b['b'], b['span']) for b in BR), len(problems)))
+print('commons %.0f m2 gross, %.0f net of wells, deck %.0f m2 with the inn lobe; grand spiral %.0f deg round its column (%.1f m a turn); %d bearers, %d deck limbs, %d commons limbs, %d posts; bridges %s; %d problems' % (
+    A, A_NET, DECK.area, G_TURN, GRAND['turn_rise'], len(SUPPORT['bearers']), len(SUPPORT['limbs']), len(SUPPORT['commons_limbs']), len(POSTS), ', '.join('%s-%s %.1f m' % (b['a'], b['b'], b['span']) for b in BR), len(problems)))
 if problems: sys.exit(1)

@@ -62,10 +62,10 @@ reachable by everyone, and directly above the arrival.
   building audit, 2026-10-07: the earlier 350 m² was smaller than the
   triangle between the trunk centres, about 430 m², and could not hold the
   amenities with their routes.)
-- **Support:** tie beams and vine cables to each trunk, cable stays from higher
-  on the trunks, and six timber posts down to the ground placed outside the
-  gate plaza's clear zone, so the gate and arrival stay open below with about
-  11 m of headroom and shade.
+- **Support** (revised, section 10): timber bearers bracketed to each trunk
+  across its well; posts to the ground outside the gate plaza's clear zone; and
+  over the plaza, where no post may stand, the middle hangs from six limbs. The
+  gate and arrival stay open below with about 11 m of headroom and shade.
 - **Edges:** rope rails all round, with **catch nets** slung beneath the edges,
   as monkeys would.
 - **Roofs:** several broad leaf roofs on posts, in the treehouse style, over the
@@ -86,9 +86,9 @@ reachable by everyone, and directly above the arrival.
 
 ### Getting up
 
-- **Grand ramp:** a broad switchback ramp, 2.4 m wide, no steeper than 32°,
-  rising from the gate plaza between the Elder and East trees to the commons'
-  southern edge (about 18 m of run in three flights with landings).
+- **Grand ramp** (revised, section 10): the grand spiral, a 32° ramp 2.4 m
+  wide wound once round a living column south of the deck, with a landing
+  halfway, arriving at the commons' southern edge beside the market.
 - **Tree switchbacks** (superseded by the public spiral, section 9): each tree's 32° public switchback reaches the commons at
   its 11.4 m corner, then continues to the higher rings.
 - **Climbing:** the trees' steep branch ramps and rope ladders, for climbers.
@@ -210,12 +210,10 @@ size changed the following.
     bracketed platform, its vat lowered straight to the ground;
   - the gathering circle at the middle, 7.2 m across rather than 9 m, so it
     keeps its routes.
-- **The inn** stands on a 20 × 16 m lobe that reaches round the East Tree's well
-  to join the commons, its house at least 1.5 m from the well.
-- **The six posts** stand 1 m inside the deck's edge, all outside the gate
-  plaza.
-- **The grand ramp** climbs in three 32° flights (18.2 m of run) from the
-  plaza's south side to the market.
+- **The inn** stands on a rounded lobe east of the East Tree, one piece with
+  the commons, its house at least 1.5 m from the well (revised, section 10).
+- **The posts** stand outside the gate plaza (revised, section 10).
+- **The grand ramp** is now the grand spiral (section 10).
 
 The checks:
 - every amenity on the deck, clear of the rail, the trunks and each other;
@@ -267,7 +265,7 @@ ramps.
 
 | Route | For | Where | Form |
 |---|---|---|---|
-| **Grand ramp** | everyone, from the floor | the plaza's south side to the market | three 32° flights, 2.4 m wide, 18.2 m of run |
+| **Grand spiral** | everyone, from the floor | south of the deck, up to the market | a 32° ramp 2.4 m wide, one turn (371°) round a living column 3.2 m across, a landing halfway, 18.2 m of run; 11 m between its turns |
 | **Public spiral** | the hero, the party, visitors, the elders | round each trunk just outside its well, under the rings, from the commons to every ring and (Elder Tree) the crown | a 32° ramp 1.5 m wide with a rope rail, a 1.2 m landing at each deck; it comes up through an opening in each ring, where the ring above would cut its 2.4 m headroom |
 | **Climbers' spiral** | canopy residents and anyone who can climb | in each trunk's well, from the ground to the canopy | the trees' own 46° ramps (3.8 m rise over 3.6 m) as a tight spiral, a 2.3 m landing each storey, with a short arm across the well to every deck |
 | **Rope bridges** | everyone | between the trees at 22.8 m | 2 m wide, rope rails, nets beneath, 12 to 14.5 m spans |
@@ -297,10 +295,79 @@ so that its commons landing falls on open deck, and so that the public
 spiral's openings stand at least 1.5 m clear of the climbers' arms on every
 ring.
 
+## 10. Structure: what carries every deck (2026-10-13, proposed)
+
+The review found three faults in the 3D model:
+- The trees had no limbs.
+- The inn's lobe ran 16 m past the East Tree on nothing.
+- Each well broke through the commons' edge in a half-circle bite, because
+  the deck reached 3.5 m past each trunk but the well's edge is 4.2 to 4.5 m
+  out.
+
+The plan file now carries the structure and checks it.
+
+- **One deck, closed wells.** A collar of deck runs 2.6 m beyond each well (a
+  1.5 m route and the rail), filleted into the commons. Each spiral rises
+  through a closed hole with a walk all round it. The inn's lobe is a rounded
+  rectangle from (14, 3.5) to (30, 20.5), one piece with the commons. The deck
+  is about 1,018 m² with the lobe, 657 m² of it the commons net of wells.
+- **The commons (11.4 m)** is below the trees' first limbs, which grow from
+  about 0.4 of the trunk:
+  - **Timber bearers** are bracketed to each trunk and cross the well to the
+    deck's edge or 6 m beyond the well, whichever is nearer. They are no more
+    than 7 m apart at their ends: 14 or 15 round each tree.
+  - **Eleven posts** stand outside the gate plaza: four under the commons'
+    edges, one under the market's side of the south edge, and six under the
+    inn house's walls.
+  - **The hung middle.** The middle is over the gate plaza, where no post may
+    stand. Each tree grows two limbs at 18.5 m, 25° either side of the line
+    to the commons' middle, 11.5 m long (the game's longest limb). Hangers
+    drop from each limb every 3 m. The six tips carry a hung ring beam round
+    the gathering circle. Joists span 4.5 m from any hung beam.
+- **Rings (22.8, 34.2 m) and the Elder Tree's crown (45.6 m):**
+  - A **living limb** runs under every pavilion and every bridge landing, out
+    to a metre short of the pavilion's outer edge: 16 limbs in all.
+  - **Timber bearers** stand between them, no more than 7 m apart at the
+    ring's outer edge.
+  - Where the public spiral rises under a ring, no bearer may cross it. That
+    bay, 12 in all, **hangs** from a limb grown 3.5 to 7 m above it, with
+    hangers to the bay's inner edge (outside the spiral's 1.5 m) and outer
+    edge.
+- **No limb or bearer crosses a walk.** Every bearer, limb and hanger limb is
+  checked against the climbers' spiral and the public spiral. Each walker on
+  them keeps 2.4 m of headroom and 0.3 m beneath their feet.
+- **The rest of each crown** grows as the game grows it: from 0.4 of the
+  trunk, about every 6.2 m by the golden angle. Those near a deck or a walk
+  are left out.
+- **The grand spiral** replaces the three-flight grand ramp. It is a 32° ramp
+  2.4 m wide, wound 371° round a strangler fig grown on a post south of the
+  deck (centre (−1.3, 18.4), column 3.2 m across), with a 1.2 m landing
+  halfway. It stays clear of the gate plaza and arrives beside the market.
+  This follows the user's direction that the village's ramps take the curved,
+  spiralling form.
+
+Checks added:
+- every post on the deck it carries and outside the plaza;
+- no well breaking the deck's edge;
+- the inn house 0.9 m inside its lobe;
+- no part of the commons without something under or over it;
+- a clear bearing for every pavilion's and bridge's limb, within the limb
+  length the game grows;
+- every bay either within 7 m or hung;
+- the grand spiral clear of the plaza and the commons, with headroom between
+  its turns.
+
+For the game: P7 grows the village trees with these limbs, at these heights
+and bearings, instead of the random limbs that avoid every landing.
+
 ## Fixed, proposed and open
 
 **Fixed:** the three trees and their positions, the gate, the inn's keeper and
 price, the inn's move to the commons (approved 2026-10-06), Ossian and Manchego, the open treehouse character.
+
+**Proposed (2026-10-13, structure):** section 10, covering the closed wells,
+the inn's rounded lobe and posts, bearers, deck limbs, hung bays, the
+commons' hung ring, and the grand spiral.
 
 **Proposed (2026-10-13):** the circulation in section 9 (climbing wells, the
 two spirals, the hoist), replacing the switchbacks, the rope ladders and the

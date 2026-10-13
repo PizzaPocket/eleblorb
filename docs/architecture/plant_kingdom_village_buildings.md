@@ -91,10 +91,17 @@ sleeping platforms.
     circle.
   Main beams run trunk to trunk on ring collars lashed round each trunk, with
   joists across them.
-- **Support:** cable stays from each trunk's 22.8 m ring, and six squared
-  timber posts to the ground standing outside the gate plaza's clear zone,
-  each on a stone pad. The posts carry cross-braces lashed in an X up to 4 m,
-  then stand clear above.
+- **Support** (revised 2026-10-13, layout section 10):
+  - timber bearers bracketed to each trunk across its well;
+  - squared timber posts to the ground outside the gate plaza's clear zone,
+    each on a stone pad, with cross-braces lashed in an X up to 4 m;
+  - over the plaza, a hung ring beam round the gathering circle, carried by
+    rope hangers from six limbs, two from each tree, at 18.5 m. No cable
+    stays.
+- **Grand spiral:** a 32° plank ramp 2.4 m wide with a rope rail, wound once
+  round a strangler fig grown on a post (a living column 3.2 m across, its
+  aerial roots braiding the post). It has a landing halfway and arrives
+  beside the market.
 - **Edge:** rope rails all round, with catch nets 2 m wide beneath.
 - **Placement on the deck:**
   - the gathering circle at the centre;
@@ -175,10 +182,12 @@ sleeping platforms.
 
 ## 3. The inn (Bima; rest point)
 
-**Site:** a lobe of the commons' deck reaching out east of the East Tree,
-**16 × 12 m** (revised by the audit from 16 × 10: the house is 8 m deep, the
-veranda 3 m, and a 1 m deck edge with rail must stay outside them). Its own two posts go to the ground, and cable stays run to the East
-Tree. Its entrance faces back onto the commons. It replaces the ground inn at
+**Site:** a rounded lobe of the commons' deck east of the East Tree,
+16 × 17 m with 3 m corner radii, one piece with the commons (revised
+2026-10-13). The house is 8 m deep with its veranda on the commons side, and a
+deck edge with rail stays outside it. Six posts carry the house's walls down
+to the ground; no cable stays. The walls are woven rattan panels with a wide
+door and windows onto the veranda. Its entrance faces back onto the commons. It replaces the ground inn at
 `(27, 22)`. The price is unchanged at 15 Tokoins.
 
 **Masses:** one long house 14 × 8 m with a deep leaf-thatched roof, and an open
