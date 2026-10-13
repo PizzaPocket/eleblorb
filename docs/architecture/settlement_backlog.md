@@ -465,9 +465,11 @@ terrain code with every brief's proposals drawn on it is published as the
 Ocean Kingdom Chart artifact. It found:
 - the cage island lies east-south-east of the dock (z = +88 is south), not
   east-north-east; fixed in the bible and briefs;
-- **conflict:** the ships' route (285 to 350 m out) never passes the three
-  wrecks they salvage daily (184 to 202 m out) or Kai Mālie's beach; either
-  the ships leave the route to heave to, or the wrecks move out to it;
+- **conflict (resolved 2026-10-13):** the ships' route (285 to 350 m out)
+  never passed the three wrecks they salvage daily (184 to 202 m out). The
+  ships now sail two nested loops that pass them (pirate ships plan, below).
+  Kai Mālie's beach trade after harmony goes by boat from the inner loop,
+  which passes about 120 m off the pirates' stretch of beach;
 - **conflict:** the luminous trail cannot bend round the Kraken's water,
   since the Kraken circles the dock; it must cross the route once, and its
   straight line runs over the coastal-forest islet's slope at (−34, −154).
@@ -479,6 +481,15 @@ The audit moved the Exchange off the main avenue, grew the guest hall to 20 m
 so its rooms fit at world scale, and moved three light pipes out of the
 avenues (`ocean_sea_folk_city_layout.md` 9, with what the rebuild changes in
 `ocean_kingdom_city.gd`).
+
+**Pirate ships plan (2026-10-13).** Both ships drawn at true size and
+code-ready: `tools/pirate_ships_layout.py` writes `PirateShipsPlan` (hull
+shape, decks, rooms, ramps, dry volumes, crew work spots, routes and daily
+timetables), checked by `tools/validate_pirate_ships_plan.tscn` in the
+pre-push hook (`VILLAGE=pirate_ships`). Rooms narrowed to fit both hulls'
+taper; the *Belle Fortune*'s stern made fuller for its council room; the
+routes replaced by two nested loops past the wrecks, phased never to meet
+(`ocean_pirate_ships_design.md` 9).
 
 **Kai Mālie second pass (2026-10-13).** Every home re-sized from its rooms at
 world scale (the first pass did not add up), the coastal plain deepened to
@@ -513,7 +524,7 @@ Planning priorities:
   the ocean surface shader discards fragments inside them; the underwater view
   does not switch on inside them. It serves the ships below the waterline and
   the sea folk's air halls and tunnels.
-- Then build the second ship and the ships' interiors.
+- Then build the second ship and the ships' interiors from `PirateShipsPlan`.
 - Give each crew member the watch schedule and work spots in
   `ocean_pirate_ships.md`, section 4, and author two or three wreck sites on the
   seabed for the daily salvage stop.

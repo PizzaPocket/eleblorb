@@ -14,7 +14,9 @@ Status: concept brief, first planning pass, in review (2026-10-06). Read with
   `AnimatableBody3D` hull 11 × 29 m with a raised helm deck aft, three masts,
   side stairs, a wheel, lanterns, and eight crew. Its captain, **Captain
   Brine**, is black-bearded and wears the bicorne (hat variant 0). The ship
-  follows an elliptical route (350 × 285 m) around the kingdom's centre.
+  follows an elliptical route (350 × 285 m) around the kingdom's centre. The
+  plan replaces it with two loops past the wrecks (`ocean_pirate_ships_design.md`,
+  section 9).
 - The orange-bearded captain and the tricorn (hat variant 1) exist in the rig
   but not on a ship. The second ship is missing.
 
@@ -184,9 +186,13 @@ shut both crews out of Kai Mālie's beach. They live on:
 - **Beach trade, after harmony.** Once the discord ends, both crews trade
   salvage and fish at Kai Mālie's beach for water, fruit and taro again.
 
-The ships still sail their routes continuously, as now; heaving to over a wreck
-is the one daily pause, and it should be brief enough that the ships remain
-moving landmarks.
+The ships still sail continuously; heaving to over a wreck is the one daily
+pause, and it is brief enough that the ships remain moving landmarks. Each now
+sails a loop that passes its own wreck and the contested galleon, in opposite
+directions: the *Harbinger* the outer loop, hove to over the brig from 14:42 to
+15:42; the *Belle Fortune* the inner loop round the main island, hove to over
+the schooner from 12:00 to 13:00. Their timetables repeat daily and never bring
+them within 60 m of each other (`ocean_pirate_ships_design.md`, section 9).
 
 ### Watches
 
@@ -220,13 +226,12 @@ places where work happens. Two residents never share a spot.
 The captains: Brine at the wheel or in the great cabin, by the clock; Souci at
 the wheel by day and in the council room at dusk.
 
-## Known issue in the current crew
+## Resolved: the crew's genders
 
-`ocean_kingdom_denizens.gd` never sets `is_female`, so **Mara Reef**, **Nell
-Crow** and **Ada Shoal** are built with male bodies and male hair, and the
-stubble rule (crew indices 2, 5 and 7) gives Ada stubble. Fix when the ships
-are rebuilt: set each crew member's gender explicitly and gate beards on it
-(see the `character-design` skill).
+`ocean_kingdom_denizens.gd` once never set `is_female`, so **Mara Reef**,
+**Nell Crow** and **Ada Shoal** were built with male bodies and Ada had
+stubble. It now sets `is_female` for all three (crew indices 1, 3 and 7), and
+every crew member's gender is in `PirateShipsPlan` for the rebuild.
 
 ## Fixed, proposed and open
 
