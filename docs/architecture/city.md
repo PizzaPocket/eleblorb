@@ -1940,9 +1940,12 @@ lit crowns.
   park at the centre; new names for Lantern Lane and Parkside Estate; real
   streets without cars; several plazas.
 - Jammer's parents are **Elizabeth Reese** and **Dan Miller**, married
-  (user, 2026-10-12), and they can speak of the Middle of Nowhere. Proposed
-  clues: Elizabeth's photograph of the hero as a boy, and Jammer's room full
-  of farm drawings.
+  (user, 2026-10-12), and they can speak of the Middle of Nowhere. The
+  family is **a small Easter egg, not a plot point** (user, 2026-10-13):
+  no recognition scene and no quest. Elizabeth does not single the hero
+  out; the connection is left for observant players in her photograph of
+  him as a boy, Jammer's farm drawings, and the family's passing talk of
+  the farm.
 - Giant wind turbines, after China's desert wind bases, out in the
   wasteland around the city: **Moy's power source** (fifth revision).
 - The turbines' blades collide with the player.
@@ -1985,8 +1988,6 @@ lit crowns.
 
 **Open:**
 - the hotel's rest price;
-- whether Elizabeth recognises the hero when they meet, and what she tells
-  him;
 - the skybridges are folded into the Deck;
 - the park's small pond (kept, as plain reclaimed water, not a display);
 - whether the hero's own city blorbs may follow him inside the bounds.
