@@ -356,8 +356,8 @@ in character and pointing nowhere:
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Teodora Vance** | Garden Row townhouse | mayor | Grew up in the market lanes. Walks the whole city every Sunday to see what's broken. She signed the ordinance that put the city blorbs outside the bounds, and does not like to talk about it. |
-| **Kenji Mori** | above the park's tea house | city clerk and registrar | Keeps the city's records, and the births and deaths of everyone in this census. |
+| **Teodora Vance** | Garden Row townhouse | mayor; chairs the council | Grew up in the market lanes. Walks the whole city every Sunday to see what's broken. She signed the ordinance that put the city blorbs outside the bounds, and does not like to talk about it. |
+| **Kenji Mori** | above the park's tea house | city clerk and registrar | Keeps the city's records, the births and deaths of everyone in this census, and the register of house marks. |
 | **Ada Fong** | Garden Row, with her wife Sora | head librarian | Led the library's latest renovation, and still misses the Great Hall's creaking floorboards it replaced. |
 | **Nia Calder** | Wing Fat Mansion | the library's map archivist | Counts the towers, reads old maps, and has a drawer of maps nobody can explain. |
 | **Benji Okoro** | Old Moy | children's librarian | Jammer's favourite grown-up after his parents. |
@@ -1118,7 +1118,7 @@ round the park and on Civic Plaza.
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
 | 1 | Grand Hotel | 52 × 60 m | podium of 4 levels round a 20 m atrium; guest tower of 21 floors to a copper crown, about 100 m (section 8) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
-| 2 | City hall | 34 × 60 m | 4 storeys and a clock tower, at the head of Civic Plaza | Mayor Teodora Vance, Kenji Mori (clerk) |
+| 2 | City hall | 34 × 60 m | Hall of the City, council chamber and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a) | Mayor Teodora Vance, Kenji Mori (clerk) |
 | 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, twisting, with three wind gaps (7c) | the Windworks (headquarters, observation deck) |
 | 13 | Glass tower | 40 × 40 m | about 45 storeys, 180 m, in moving screens pierced with the house marks (7c) | Raman & Reese (Elizabeth, Priya, Venn); Tanglewire (Dan) |
 | 14 | North tower | 40 × 40 m | about 45 storeys, 175 m, plug-in capsule offices (7c) | start-up floors (Theo Park) |
@@ -1394,6 +1394,135 @@ shader), on solid massing with collision. The roof garden, setbacks and
 copper crown are solid exterior surfaces the hero can still land on and
 swing from, with no interiors behind them.
 
+## 8a. City hall: building brief (proposed, 2026-10-13)
+
+### 8a.1 People and purposes
+
+**What city hall is for.** Moy governs itself; no one outside it ever
+arrives to do so. City hall is where the city:
+- **decides:** the council meets in public, and anyone may come and
+  listen;
+- **records:** births, marriages and deaths, homes, and the **register of
+  house marks**, every picture sign in the city, each registered when it is
+  first hung;
+- **marries:** weddings in the marriage room, with the party moving on to
+  the Grand Hotel's atrium across the plaza;
+- **is met:** the mayor's door is open on weekday mornings.
+
+**Who works here:**
+
+| Person | Role | Where |
+|---|---|---|
+| Teodora Vance | mayor; walks the whole city every Sunday to see what's broken; signed the ordinance that put the city blorbs outside the bounds and does not like to talk about it | her office over the portico, its window on the plaza |
+| Kenji Mori | city clerk and registrar; keeps the births and deaths of everyone in the census, and the register of house marks | the registry counter in the Hall of the City; the strongroom below |
+| Zara Quinn | registers every new picture sign she paints | at Kenji's counter, often |
+
+**The council** (proposed): seven residents elected by the city, who meet
+in the council chamber. Teodora chairs. The other six are drawn from the
+census: Priya Raman, Dr. Arjun Mehta, Rafael Ortiz, Juno Rell, Sol Brant and
+Ada Fong. It was this council that voted the city blorbs out after the
+Blackout.
+
+**History.** The third of the boom's civic buildings, with the Grand Hotel
+and the library, built to face the park down the civic axis from the head
+of Civic Plaza. Its clock was the first public clock in Moy; Old Moy had
+told the hour by the shadow of its wind towers.
+
+**References:**
+- **Hilversum Town Hall (Willem Dudok, 1931):** interlocking horizontal
+  masses and one tall clock tower, of the same era as the hotel and the
+  library.
+- **Stockholm City Hall:** the **Blue Hall**, a great covered courtyard used
+  as the city's public room, and the **Golden Hall**, a council hall walled
+  in gold mosaic telling the city's story.
+- **The Spanish ayuntamiento:** a balcony over the main square from which
+  the city is addressed.
+
+### 8a.2 Site
+
+The head of Civic Plaza: 34 m (east–west) × 60 m (north–south).
+- **West face, the front:** on Civic Plaza, facing across it and the park to
+  the library at the other end of the civic axis.
+- **North and south faces:** on Meridian North and Meridian South, the two
+  branches of Meridian Avenue.
+- **East face, the back:** on Clock Street, where Meridian Avenue arrives
+  head-on. The **clock tower** stands here, so it closes the long view up
+  Meridian Avenue from the east, and rises over the roof seen from the
+  plaza and the park.
+- **The Deck** runs along Meridian North at +6.5 m; city hall's north door
+  meets it.
+
+### 8a.3 Program and stacking
+
+| Level | Height | Contents |
+|---|---|---|
+| **Strongroom** | −4.5 m to 0 | The records: registers of births, marriages and deaths, the deeds of homes, and the original **register of house marks**; cool, dry, fireproof, behind a steel door, reached only by Kenji's ramp |
+| **Ground** | 0 to +6.5 m | The **portico** on the plaza; the entrance hall; the **Hall of the City** (below); the registry counter (north side); the **marriage room** (south side); washrooms; the staff door and the clock tower's base on Clock Street (east) |
+| **The Hall of the City** | 0 to +14 m | A great covered courtyard, about 20 × 30 m, after Stockholm's Blue Hall: arcades round the ground floor, a gallery round it at +6.5 m, a louvred clerestory roof. The city's public room: open all day, used for elections, exhibitions, the annual chandelier-lowering supper and anything else the city gathers for. One wall is the **wall of house marks**, a bronze plaque for every registered sign in Moy |
+| **First floor** | +6.5 m, the Deck's level | The gallery round the hall; the **mayor's office** over the portico, its window on the plaza and the park; committee rooms; the Deck door (north face) |
+| **The council chamber** | +11 to +20 m, the west front | Over the mayor's office, the full width of the front: a double-height chamber, after Stockholm's Golden Hall, walled in **gold mosaic** of the city's story in pictures (the first wells, the tower houses, the wind towers, the Windworks, the Blackout); the council's horseshoe of seats; a public gallery; tall doors onto the **balcony** over the portico, on the civic axis |
+| **Roof** | +22 m | A flat roof behind a plain parapet |
+| **The clock tower** | to +45 m | Rises from the east (Clock Street) face, 8 × 8 m: four clock faces at about +34 m, the belfry above with its bell, and a lantern cap lit at night |
+
+**Lines that stack.** The Hall of the City's void runs from the ground to
+its roof at +14 m, bounded by the arcades' piers on every level. The
+council chamber sits on the west range, outside the void, over the mayor's
+office and the portico's back wall. The clock tower stands on its own
+walls from the strongroom to the bell. Its shaft holds the lift and the
+escape ramp (the world's ramp rule) and the clock's weights.
+
+**Circulation:**
+- **Citizens:** plaza → portico → entrance hall → the Hall of the City →
+  the counter, the marriage room, or the ramp to the gallery and the
+  council chamber's public gallery.
+- **From the Deck:** the north door at +6.5 m → the gallery.
+- **Staff:** Clock Street → staff door → the tower's lift.
+- **Records:** Kenji's ramp from behind the counter to the strongroom.
+
+### 8a.4 Facade
+
+| Element | Term | Tradition |
+|---|---|---|
+| Massing | interlocking horizontal blocks, the tower the one vertical | Dudok |
+| Walls | pale limestone, matching the library and the hotel | the boom's civic set |
+| Front | a **portico** of six square stone piers, the full height of the ground floor, on the axis | civic dignity |
+| Balcony | the council chamber's **balcony** over the portico, with a bronze rail | the ayuntamiento |
+| Windows | long horizontal bands on the ranges; tall narrow ones lighting the chamber | Dudok; art deco |
+| Tower | plain stone shaft, the clock faces in bronze rings, the belfry open on four sides, the lantern cap | Dudok's tower |
+| Signature motif | the house marks, in the bronze of the balcony rail | the city's signature |
+| The sign | a picture of the clock tower in bronze by the door, no lettering | Moy's picture signs |
+
+**Palette:** limestone 60 %; bronze and gold 30 %; the mosaic's colours and
+the lantern's light 10 %.
+
+### 8a.5 Heat, air and washrooms
+
+- The **portico** and the deep window reveals shade the glass.
+- The Hall of the City cools itself: warm air leaves through its louvred
+  clerestory, drawing air in through the shaded portico.
+- Modern air conditioning in the offices and the chamber.
+- **Washrooms** (Moy is modern) off the entrance hall and the gallery, with
+  flush toilets and basins, to the city sewer.
+
+### 8a.6 Play
+
+- **The clock tower** is a landmark climb: the piers of the belfry, the
+  clock faces' bronze rings, and the lantern at +45 m, a swing anchor over
+  Civic Plaza and Meridian Avenue.
+- **The portico's piers and the balcony** are the way up the front, onto
+  the roof.
+- **The Hall of the City's arcades** carry a gallery the hero can reach from
+  the arcade tops.
+
+### 8a.7 Realised (fidelity A)
+
+- **Built inside:** the portico, the entrance hall, the Hall of the City
+  with its arcades, gallery and wall of house marks, Kenji's registry
+  counter, and the council chamber with its balcony.
+- **Faux and solid:** the mayor's office (Teodora meets the hero in the
+  Hall or the chamber), the marriage room, the committee rooms and the
+  strongroom.
+
 ## 9. The library: building brief (proposed, 2026-10-13)
 
 **Direction (user):** a classic building renovated over the years, after
@@ -1564,7 +1693,7 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium (with its mezzanine gallery) and floor 20 with the party's suite; the library's welcome hall, Great Hall and galleries, children's library and heritage room (section 9.8); city hall's chamber; the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium (with its mezzanine gallery) and floor 20 with the party's suite; the library's welcome hall, Great Hall and galleries, children's library and heritage room (section 9.8); city hall's Hall of the City and council chamber (section 8a.7); city hall's chamber; the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
 | **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 

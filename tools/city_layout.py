@@ -56,7 +56,7 @@ B=[]
 def b(n,name,r,kind,h,who=''): B.append(dict(n=n,name=name,r=r,kind=kind,h=h,who=who))
 NB=lambda: 'homes (no one the hero meets)'
 b(1,'Grand Hotel',(-483,-98,-431,-38),'civic','podium 4 storeys, guest tower 25 floors (97 m)','Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work')
-b(2,'City hall',(-431,-30,-397,30),'civic','4 storeys and a clock tower, at the head of Civic Plaza','Mayor Teodora Vance, Kenji Mori (clerk)')
+b(2,'City hall',(-431,-30,-397,30),'civic','Hall of the City, council chamber and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a)','Mayor Teodora Vance, Kenji Mori (clerk)')
 b(3,'Library',(-686,-92,-641,-30),'civic','art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)','Ada Fong, Nia Calder, Benji Okoro')
 b(4,'Natural history museum',(-637,62,-575,100),'civic','3 storeys, top-lit hall','Dr. Imani Osei (curator)')
 b(5,'Moonlight Cinema',(-730,6,-700,34),'civic','2 storeys, built later into the old town; flat above','Leon Duarte (lives above)')
@@ -313,7 +313,7 @@ CROWNS={1:104,2:45,3:26,12:280}
 FORMS={12:'twist',13:'screen',14:'capsule',15:'dune',1:'deco',2:'clock'}
 ## Sub-footprints that rise above their building's podium: the hotel's guest
 ## tower and city hall's clock tower.
-TOWER_PART={1:(-473,-96,-441,-74),2:(-417,-3,-411,3)}
+TOWER_PART={1:(-473,-96,-441,-74),2:(-405,-4,-397,4)}
 PODIUM_HEIGHT={1:20}
 ## Fabric storeys are 3.25 m, downtown mid-rise storeys 3.6 m.
 STOREY={'fabric':3.25,'midrise':3.6}
