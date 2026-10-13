@@ -98,6 +98,34 @@ for i, (seed, dist, off, turn, dy) in enumerate(SHARDS):
     pc = part.centroid; h = rad(math.degrees(math.atan2(pc.y - pc0.y, pc.x - pc0.x)) + off)
     moved = affinity.translate(affinity.rotate(part, turn, origin=pc), dist * math.cos(h), dist * math.sin(h))
     FRAGMENTS.append(dict(key='shard%d' % (i + 1), poly=moved.buffer(0.6, 4).buffer(-0.6, 4), dy=dy))
+## ---- the Abyss's rim: no longer a circle. The ground broke back from the islands as they parted:
+## the rim keeps 24 to 40 m from them, with long bays and points of its own (torn the same way as the
+## islands' edges), and the full depth runs right to it.
+RIM_CLEAR = 24.0
+def rim_outline():
+    pieces = list(ISLANDS.values()) + [f['poly'] for f in FRAGMENTS]
+    need = []
+    for i in range(240):
+        th = 2 * math.pi * i / 240; ux, uz = math.cos(th), math.sin(th); r = 0.0
+        for g in pieces:
+            for x, z in g.exterior.coords:
+                a = math.atan2(z, x); d = abs((a - th + math.pi) % (2 * math.pi) - math.pi)
+                if d < rad(14): r = max(r, math.hypot(x, z) * math.cos(d))
+        need.append(r + RIM_CLEAR)
+    sm = [max(need[(i + k) % 240] for k in range(-6, 7)) for i in range(240)]          # never inside what it must clear
+    sm = [sum(sm[(i + k) % 240] for k in range(-5, 6)) / 11 for i in range(240)]      # and no sharp kinks
+    pts = []
+    for i in range(240):
+        th = 2 * math.pi * i / 240
+        bay = 9 * max(0, math.sin(3 * th + 0.8)) ** 2 + 6 * math.sin(5 * th + 2.2) + 3 * math.sin(11 * th + 0.3)
+        r = max(sm[i] + bay, need[i])
+        pts.append(warp(r * math.cos(th), r * math.sin(th), amp=5.0))
+    return Polygon(pts).buffer(3, 4).buffer(-3, 4)
+RIM = rim_outline()
+gc = ISLANDS['gate'].centroid
+ray = LineString([(gc.x, gc.y), (gc.x, gc.y + 400)]).intersection(RIM.exterior)
+RIM_LANDING = (round(gc.x, 2), round((ray if ray.geom_type == 'Point' else min(ray.geoms, key=lambda q: q.y)).y + 1.0, 2))
+
 ## ---- bridges (chinese_village.md 4.1.4 and 4.1.5)
 BRIDGES = [  # a, b, deck width, use
     ('rim', 'gate', 5.0, 'entry; Bo Xiang to Ohio'), ('gate', 'palace', 5.0, 'processional axis'),
@@ -116,20 +144,15 @@ pal_c = ISLANDS['palace'].centroid
 pal_plan = affinity.translate(blob(0, 0, 44, 55, amp=(0, 0, 0)), pal_c.x, pal_c.y)
 if not ISLANDS['palace'].buffer(-2).contains(pal_plan): problems.append(('palace', 'its piece cannot hold the palace plan with the axis north-south'))
 # 2. inside the Abyss, and genuinely apart
-for k, g in ISLANDS.items():
-    reach = max(math.hypot(x, z) for x, z in g.exterior.coords)
-    if reach > ABYSS_FULL - EDGE_CLEAR: problems.append((k, 'reaches %.0f m out, past the full-depth Abyss (%.0f)' % (reach, ABYSS_FULL)))
 allp = [(k, g) for k, g in ISLANDS.items()] + [(f['key'], f['poly']) for f in FRAGMENTS]
 for i in range(len(allp)):
     for j in range(i + 1, len(allp)):
         g = allp[i][1].distance(allp[j][1])
         if g < ISLAND_GAP: problems.append((allp[i][0], allp[j][0], 'only %.1f m apart' % g))
-for f in FRAGMENTS:
-    if max(math.hypot(x, z) for x, z in f['poly'].exterior.coords) > ABYSS_FULL + 30: problems.append((f['key'], 'drifts out over the rim'))
+for k, g in allp:
+    if g.distance(RIM.exterior) < RIM_CLEAR - 4 or not RIM.contains(g): problems.append((k, 'stands %.0f m from the rim' % g.distance(RIM.exterior)))
 # 3. bridges: each spans what its type can, and passes over nothing
 BR = []
-gate_c = ISLANDS['gate'].centroid
-RIM_LANDING = (round(gate_c.x * 0.25, 2), ABYSS_RIM)        # the entry lands south of the gate, on ordinary ground
 for a, b, w, use in BRIDGES:
     pa = RIM_LANDING if a == 'rim' else (ISLANDS[a].centroid.x, ISLANDS[a].centroid.y); pb = (ISLANDS[b].centroid.x, ISLANDS[b].centroid.y)
     line = LineString([pa, pb])
@@ -157,7 +180,7 @@ def plot_svg(path):
     """A plan for checking by eye: the original plateau dashed, the islands, fragments and bridges."""
     S_ = 1.9; o = []
     o.append('<svg xmlns="http://www.w3.org/2000/svg" viewBox="-240 -240 480 480" width="900" height="900"><rect x="-240" y="-240" width="480" height="480" fill="#d9d4c7"/>')
-    o.append('<circle r="%g" fill="#4a4540"/><circle r="%g" fill="none" stroke="#999" stroke-dasharray="3 3"/>' % (ABYSS_FULL, ABYSS_RIM))
+    o.append('<polygon points="%s" fill="#4a4540"/>' % ' '.join('%.1f,%.1f' % tuple(q) for q in out_poly(RIM)))
     pts = lambda g: ' '.join('%.1f,%.1f' % (x, z) for x, z in (g if isinstance(g, list) else out_poly(g)))
     for k, g in ORIGINAL.items(): o.append('<polygon points="%s" fill="none" stroke="#bbb" stroke-width="0.6" stroke-dasharray="2 2"/>' % pts(g))
     for k, g in ISLANDS.items(): o.append('<polygon points="%s" fill="#7da35a" stroke="#3b3022" stroke-width="0.8"/><text x="%.1f" y="%.1f" font-size="7" text-anchor="middle">%s %d</text>' % (pts(g), g.centroid.x, g.centroid.y, k, g.area))
@@ -167,7 +190,7 @@ def plot_svg(path):
 def out_poly(p):
     if p.geom_type != 'Polygon': p = max(p.geoms, key=lambda q: q.area)
     return [[round(x, 2), round(z, 2)] for x, z in p.exterior.coords]
-data = dict(abyss_full=ABYSS_FULL, abyss_rim=ABYSS_RIM, floor=ABYSS_FLOOR, rim_landing=RIM_LANDING,
+data = dict(abyss_full=ABYSS_FULL, abyss_rim=ABYSS_RIM, floor=ABYSS_FLOOR, rim_landing=RIM_LANDING, rim=out_poly(RIM),
             plateau=out_poly(PLATEAU), original={k: out_poly(v) for k, v in ORIGINAL.items()},
             islands=[dict(key=k, name=NAMES[k], outline=out_poly(g), area=round(g.area), need=NEED[k], c=[round(g.centroid.x, 2), round(g.centroid.y, 2)],
                           size=round(math.sqrt(g.area), 1)) for k, g in ISLANDS.items()],
@@ -175,6 +198,7 @@ data = dict(abyss_full=ABYSS_FULL, abyss_rim=ABYSS_RIM, floor=ABYSS_FLOOR, rim_l
             bridges=BR, built=BUILT, built_bridges=BUILT_BRIDGES, problems=[list(map(str, p)) for p in problems])
 if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
+print('rim %.0f to %.0f m from the centre; ' % (min(math.hypot(x, z) for x, z in RIM.exterior.coords), max(math.hypot(x, z) for x, z in RIM.exterior.coords)), end='')
 print('%d islands, %d floating fragments; bridges %s; %d problems' % (len(ISLANDS), len(FRAGMENTS), ', '.join('%s-%s %.0f %s' % (b['a'], b['b'], b['span'], b['kind']) for b in BR), len(problems)))
 if '--plot' in sys.argv:
     plot_svg(sys.argv[sys.argv.index('--plot') + 1])
