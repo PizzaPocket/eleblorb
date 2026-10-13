@@ -482,16 +482,118 @@ for t in TREES:
                                                          length=round(r_out + 0.5 - trunk_r(t, yh), 2), r_in=r_in + PUBLIC_W + 0.1, r_out=r_out))
 # the rest of each crown: limbs as nature_props.gd grows them (from 0.4 of the trunk, every 6.2 m, by
 # the golden angle), skipped near a deck and wherever they would cross a walk
+## ---- the crowns: every limb as the model draws it, with its side branches and leaves.
+## A limb's path (as the 3D model draws it): from 0.8 of the trunk's radius out along its bearing,
+## rising by its pitch, arched by `arch` (it leaves the trunk climbing, then levels).
 GOLDEN_B = 360 * 0.6180339887498949
-BOUGHS = []
+def limb_path(t, y, b, r0, length, pitch, arch, n=8):
+    c = TREES[t]['c']; d = (math.cos(rad(b)), math.sin(rad(b))); out = []
+    for i in range(n + 1):
+        u = i / n; s_ = length * u
+        rise = length * math.sin(pitch) * u + arch * (math.sin(math.pi * min(1, u * 1.6) / 2) - 0.5)
+        out.append((c[0] + d[0] * (r0 * 0.8 + s_), y + rise, c[1] + d[1] * (r0 * 0.8 + s_)))
+    return out
+# what a branch or a leaf may not pass through: every deck with the room people stand in over it
+# (pavilion roofs included), the bridges, and the spirals' headroom
+SLABS = [(COMMONS_Y, DECK.buffer(0.5))]
+for t in TREES:
+    for y in DECKS[t][1:]:
+        width = 5.5 if y == CROWN_Y else RING_WIDTH
+        r_in = trunk_r(t, y) + WELL; r_out = r_in + width
+        shp = Point(TREES[t]['c']).buffer(r_out + 0.5).difference(Point(TREES[t]['c']).buffer(max(0.1, r_in - 0.5)))
+        for tt, yy, pb, k, who in PAVILIONS:
+            if tt == t and yy == y:
+                w_, d_ = PAV_SIZE[k]; pc = pol(TREES[t]['c'], r_out + d_ / 2 - 0.6, pb)
+                shp = shp.union(Polygon(rect(pc, d_ + 1.5, w_ + 1.5, pb)))
+        SLABS.append((y, shp))
+for br in BR:
+    a_, b_ = TREES[br['a']]['c'], TREES[br['b']]['c']
+    SLABS.append((BRIDGE_Y, LineString([a_, b_]).buffer(2.0)))
+def blocked(p, rad_=0.0):
+    x, y, z = p; q = Point(x, z).buffer(rad_) if rad_ else Point(x, z)
+    for yd, shp in SLABS:
+        if yd - 1.5 - rad_ < y < yd + 4.2 + rad_ and shp.intersects(q): return True
+    for t, tr in TREES.items():
+        d = dist((x, z), tr['c'])
+        if d < trunk_r(t, y) - 0.2 + 0.0: return False          # inside the trunk itself: the branch's root
+        if d < trunk_r(t, y) + WELL + PUBLIC_W + 0.4 + rad_ and not clear_of_walks(t, bearing(tr['c'], (x, z)), y - 0.6 - rad_, y + 0.6 + rad_): return True
+    return False
+def rng_(seed):
+    st = [seed]
+    def r():
+        st[0] = (st[0] * 16807) % 2147483647; return st[0] / 2147483647
+    return r
+BRANCHES = []      # dict(pts, r0, r1, kind)
+LEAVES = []        # (x, y, z, radius)
+def grow_side_branches(path, thick, length, kind, rnd, outer_from=0.45, n_try=6, structural=False):
+    """Side branches off the outer part of a limb, each forking once, every tip in leaf. A side branch
+    that would pass through a deck, a bridge or a walk's headroom is not grown."""
+    grown = 0
+    for k in range(n_try):
+        u = outer_from + (1 - outer_from) * (k + 0.5) / n_try + (rnd() - 0.5) * 0.08
+        u = min(1.0, max(outer_from, u)); i = u * (len(path) - 1); i0 = int(min(len(path) - 2, i)); f = i - i0
+        base = tuple(path[i0][j] + (path[i0 + 1][j] - path[i0][j]) * f for j in range(3))
+        dx, dz = path[-1][0] - path[0][0], path[-1][2] - path[0][2]; L = math.hypot(dx, dz) or 1
+        side = 1 if k % 2 == 0 else -1
+        yaw = math.atan2(dz, dx) + side * rad(35 + 30 * rnd())
+        up = rad(28 + 22 * rnd()); sl = max(1.6, length * (0.28 + 0.14 * rnd()))
+        tip = (base[0] + math.cos(yaw) * math.cos(up) * sl, base[1] + math.sin(up) * sl, base[2] + math.sin(yaw) * math.cos(up) * sl)
+        mid = tuple((base[j] + tip[j]) / 2 + (0.3 if j == 1 else 0) for j in range(3))
+        leaf_r = 1.4 + 1.0 * rnd()
+        if any(blocked(q) for q in (mid, tip)) or blocked((tip[0], tip[1] + 0.4, tip[2]), leaf_r): continue
+        BRANCHES.append(dict(pts=[base, mid, tip], r0=round(thick * (1 - 0.6 * u) * 0.55, 3), r1=0.08, kind='twig'))
+        LEAVES.append((tip[0], tip[1] + 0.4, tip[2], round(leaf_r, 2)))
+        # one fork off each side branch, with its own leaves
+        fy = yaw - side * rad(40); fl = sl * 0.55
+        ftip = (mid[0] + math.cos(fy) * fl * 0.8, mid[1] + fl * 0.6, mid[2] + math.sin(fy) * fl * 0.8)
+        if not blocked(ftip) and not blocked((ftip[0], ftip[1] + 0.3, ftip[2]), leaf_r * 0.7):
+            BRANCHES.append(dict(pts=[mid, ftip], r0=round(thick * 0.22, 3), r1=0.06, kind='twig'))
+            LEAVES.append((ftip[0], ftip[1] + 0.3, ftip[2], round(leaf_r * 0.7, 2)))
+        grown += 1
+    return grown
+rnd = rng_(20261013)
+# the structural limbs: their working length carries a deck, so their side branches grow from beyond it
+for l in SUPPORT['limbs']:
+    p_ = limb_path(l['tree'], l['y'] - 0.8, l['b'], l['r0'], l['length'], 0.0, 0.4)
+    BRANCHES.append(dict(pts=p_, r0=0.5, r1=0.22, kind='deck limb'))
+    # past the pavilion the limb runs on and up as a living branch, in leaf
+    ext = limb_path(l['tree'], l['y'] - 0.8, l['b'], l['r0'], l['length'] + 4.0, 0.0, 0.4, 10)[-3:]
+    ext = [p_[-1]] + [(q[0], q[1] + 1.4 * (i + 1), q[2]) for i, q in enumerate(ext[1:])]
+    if not any(blocked(q) for q in ext[1:]) and not blocked((ext[-1][0], ext[-1][1] + 0.6, ext[-1][2]), 1.6):
+        BRANCHES.append(dict(pts=ext, r0=0.22, r1=0.1, kind='twig')); LEAVES.append((ext[-1][0], ext[-1][1] + 0.6, ext[-1][2], 2.0))
+    grow_side_branches(p_, 0.5, l['length'], 'deck limb', rnd, 0.75, 4, True)
+for h in SUPPORT['hangers']:
+    p_ = limb_path(h['tree'], h['limb_y'], h['b'], h['r0'], h['length'], 0.0, 1.0)
+    BRANCHES.append(dict(pts=p_, r0=0.45, r1=0.2, kind='hanger limb'))
+    grow_side_branches(p_, 0.45, h['length'], 'hanger limb', rnd, 0.6, 5)
+for l in SUPPORT['commons_limbs']:
+    p_ = limb_path(l['tree'], l['y'], l['b'], l['r0'], l['length'], 0.0, 1.0)
+    BRANCHES.append(dict(pts=p_, r0=0.6, r1=0.26, kind='commons limb'))
+    grow_side_branches(p_, 0.6, l['length'], 'commons limb', rnd, 0.5, 6)
+# the crown: limbs as nature_props.gd grows them, from 0.4 of the trunk by the golden angle, but
+# twice as close (every 3.1 m), wherever a limb's whole path is clear of decks, bridges and walks
+BOUGH_SPACING = 2.4
 for t, tr in TREES.items():
     top = 0.86 * tr['h']; y = top * 0.40; a = {'east': 40.0, 'elder': 160.0, 'north': 280.0}[t]
     while y < top * 0.97:
-        near = any(abs(y - dy) < 3.4 for dy in DECKS[t]) or any(abs(y - l['y']) < 2.0 for l in SUPPORT['commons_limbs'] if l['tree'] == t)
-        if not near and clear_of_walks(t, a % 360, y - 0.6, y + 0.6):
-            hf = y / top
-            BOUGHS.append(dict(tree=t, y=round(y, 2), b=round(a % 360, 1), r0=trunk_r(t, y), length=round(11.5 + (5.0 - 11.5) * hf, 2), pitch=0.26))
-        a += GOLDEN_B; y += 6.2
+        hf = y / top; length = 11.5 + (5.0 - 11.5) * hf; pitch = 0.18 + 0.22 * rnd()
+        for a2 in (a, a + 180.0):         # two limbs a level, opposite, as a crown spreads
+            for trial in range(8):       # turn the limb, then shorten it, to find clear air
+                bb = (a2 + (trial % 4) * 23.0 * (1 if trial % 2 else -1)) % 360
+                ln = length * (1.0 if trial < 4 else 0.7)
+                p_ = limb_path(t, y, bb, trunk_r(t, y), ln, pitch, 1.0)
+                if not any(blocked(q) for q in p_[1:]): break
+            else:
+                p_ = None
+            if p_:
+                BRANCHES.append(dict(pts=p_, r0=round(0.55 * (1 - 0.4 * hf), 3), r1=0.18, kind='bough'))
+                lr = 2.0 + 1.4 * rnd(); tipl = (p_[-1][0], p_[-1][1] + 0.8, p_[-1][2])
+                if not blocked(tipl, lr * 0.8): LEAVES.append(tipl + (round(lr, 2),))
+                grow_side_branches(p_, 0.55 * (1 - 0.4 * hf), ln, 'bough', rnd, 0.4, 5)
+        a += GOLDEN_B; y += BOUGH_SPACING
+for (x, y, z, r) in LEAVES:
+    if blocked((x, y, z), r * 0.8): problems.append(('a leaf cluster at (%.1f, %.1f, %.1f) stands in a deck or a walk' % (x, y, z),))
+BOUGHS = [b_ for b_ in BRANCHES if b_['kind'] == 'bough']
 
 ## the commons hoist: a basket on a pulley over the deck's edge beside the food store, so food, water
 ## and firewood come up from the floor without being carried up the ramps
@@ -527,7 +629,7 @@ data = dict(
                    chain=branch_chain(k, {'east': 30, 'elder': 200, 'north': 290}[k])) for k, v in TREES.items()},
     gate=GATE, plaza=PLAZA_CLEAR, commons=COMMONS, commons_y=COMMONS_Y, commons_area=round(A), centroid=CEN,
     amenities=[dict(key=k, name=n, who=w_, c=c, w=w, d=d, yaw=y, roof=r) for k, n, w_, c, w, d, y, r in AMENITIES + [PRIVY]],
-    inn=INN, inn_lobe=inn_poly, grand=dict(GRAND, run=G_RUN, poly=g_poly), posts=POSTS, support=SUPPORT, boughs=BOUGHS, sbpoly=SBPOLY, lobes=LOBES, inn_house=house_poly,
+    inn=INN, inn_lobe=inn_poly, grand=dict(GRAND, run=G_RUN, poly=g_poly), posts=POSTS, support=SUPPORT, branches=[dict(b_, pts=[[round(v, 2) for v in q] for q in b_['pts']]) for b_ in BRANCHES], leaves=[[round(v, 2) for v in q] for q in LEAVES], sbpoly=SBPOLY, lobes=LOBES, inn_house=house_poly,
     rings=dict(ys=RING_YS, crown=CROWN_Y, width=RING_WIDTH, bay=BAY_WIDTH),
     pavilions=[dict(tree=t, y=y, b=b, kind=k, who=w_, size=PAV_SIZE[k]) for t, y, b, k, w_ in PAVILIONS],
     public=PUBLIC, public_w=PUBLIC_W, decks=DECKS,
@@ -537,6 +639,7 @@ data = dict(
     trunk_r_fn='0.045h at the base to 0.02h at 0.86h', problems=[list(map(str, p)) for p in problems])
 if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
+print('crowns: %d limbs and branches (%d crown limbs), %d leaf clusters' % (len(BRANCHES), len(BOUGHS), len(LEAVES)))
 print('commons %.0f m2 gross, %.0f net of wells, deck %.0f m2 with the inn lobe; grand spiral %.0f deg round its column (%.1f m a turn); %d bearers, %d deck limbs, %d commons limbs, %d posts; bridges %s; %d problems' % (
     A, A_NET, DECK.area, G_TURN, GRAND['turn_rise'], len(SUPPORT['bearers']), len(SUPPORT['limbs']), len(SUPPORT['commons_limbs']), len(POSTS), ', '.join('%s-%s %.1f m' % (b['a'], b['b'], b['span']) for b in BR), len(problems)))
 if problems: sys.exit(1)

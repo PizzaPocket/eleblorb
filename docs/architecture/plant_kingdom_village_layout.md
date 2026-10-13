@@ -339,9 +339,21 @@ The plan file now carries the structure and checks it.
 - **No limb or bearer crosses a walk.** Every bearer, limb and hanger limb is
   checked against the climbers' spiral and the public spiral. Each walker on
   them keeps 2.4 m of headroom and 0.3 m beneath their feet.
-- **The rest of each crown** grows as the game grows it: from 0.4 of the
-  trunk, about every 6.2 m by the golden angle. Those near a deck or a walk
-  are left out.
+- **The rest of each crown** is grown by the plan file, starting from how
+  the game grows it (from 0.4 of the trunk, by the golden angle). Revised
+  after review, when the trees read light in branches:
+  - two limbs a level, opposite each other, every 2.4 m;
+  - each limb turned or shortened until its whole path clears every deck,
+    pavilion roof, bridge and spiral headroom.
+  The current plan has 28 such crown limbs.
+- **Every limb branches and leafs,** the structural ones included:
+  - side branches 28 to 50° upward from the limb's outer part, each forking
+    once, with a leaf cluster at every tip;
+  - a limb carrying a pavilion runs on past it and turns up into leaf, so the
+    house sits in the crook of a living branch.
+  No side branch or leaf cluster may stand in a deck, a pavilion, a bridge or
+  a walk's headroom; the plan file checks every one. In all there are 238
+  limbs and branches and 201 leaf clusters.
 - **The grand spiral** replaces the three-flight grand ramp. It is a 32° ramp
   2.4 m wide, wound 371° round a strangler fig grown on a post south of the
   deck (centre (−1.3, 18.4), column 3.2 m across), with a 1.2 m landing
