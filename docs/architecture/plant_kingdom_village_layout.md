@@ -313,9 +313,9 @@ The plan file now carries the structure and checks it.
   is about 1,018 m² with the lobe, 657 m² of it the commons net of wells.
 - **The commons (11.4 m)** is below the trees' first limbs, which grow from
   about 0.4 of the trunk:
-  - **Timber bearers** are bracketed to each trunk and cross the well to the
-    deck's edge or 6 m beyond the well, whichever is nearer. They are no more
-    than 7 m apart at their ends: 14 or 15 round each tree.
+  - **Timber bearers**, four or five per tree, are bracketed to the trunk and
+    cross the well to a curved ring beam round the collar. The deck beyond is
+    joisted off that ring, up to 6 m past the well.
   - **Eleven posts** stand outside the gate plaza: four under the commons'
     edges, one under the market's side of the south edge, and six under the
     inn house's walls.
@@ -327,10 +327,13 @@ The plan file now carries the structure and checks it.
 - **Rings (22.8, 34.2 m) and the Elder Tree's crown (45.6 m):**
   - A **living limb** runs under every pavilion and every bridge landing, out
     to a metre short of the pavilion's outer edge: 16 limbs in all.
-  - **Timber bearers** stand between them, no more than 7 m apart at the
-    ring's outer edge.
+  - **Ring beams.** Each deck's inner and outer edges are curved beams of
+    laminated bamboo, with the joists between them hidden under the planks.
+    They are carried at points no more than 12 m apart, so only a few **timber
+    bearers** are needed between the limbs: 40 bearers in all across the
+    commons, rings and crown (revised after review from 98).
   - Where the public spiral rises under a ring, no bearer may cross it. That
-    bay, 12 in all, **hangs** from a limb grown 3.5 to 7 m above it, with
+    bay, 4 in all, **hangs** from a limb grown 3.5 to 7 m above it, with
     hangers to the bay's inner edge (outside the spiral's 1.5 m) and outer
     edge.
 - **No limb or bearer crosses a walk.** Every bearer, limb and hanger limb is
@@ -353,7 +356,7 @@ Checks added:
 - no part of the commons without something under or over it;
 - a clear bearing for every pavilion's and bridge's limb, within the limb
   length the game grows;
-- every bay either within 7 m or hung;
+- every ring beam carried at least every 12 m, or hung;
 - the grand spiral clear of the plaza and the commons, with headroom between
   its turns.
 

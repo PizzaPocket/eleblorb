@@ -382,7 +382,8 @@ BEARER_TOP, BEARER_BOTTOM = 0.35, 1.3   # a bearer fills y - 1.3 .. y - 0.35 und
 BEARER_REACH = 6.0            # with its knee brace a bearer carries the deck this far beyond the well
 POST_REACH = 6.0              # beams from a post's head
 HANG_REACH = 4.5              # joists between hung beams
-MAX_BAY = 7.0                 # bearers no further apart than this at a deck's outer edge
+MAX_BAY = 12.0                # each deck's edges are curved ring beams (laminated bamboo), carried at
+                              # points no more than this apart; the joists between lie hidden under the planks
 LIMB_MAX = 11.5               # nature_props.gd EMERGENT_BOUGH_LENGTH_MAX
 COMMONS_LIMB_SPREAD = 25.0    # each tree's two commons limbs, either side of the line to the middle
 def walk_heights(t, b):
@@ -413,25 +414,23 @@ def fill_bearers(t, y, r_out, fixed, hung=None):
         for i, b0 in enumerate(allb):
             b1 = allb[(i + 1) % len(allb)] + (360 if i + 1 == len(allb) else 0)
             if math.radians(b1 - b0) * r_out <= MAX_BAY + 1e-6 or (b0, b1 % 360) in settled: continue
-            mid = (b0 + b1) / 2
-            pick = [c for c in cands if b0 < c < b1 or b0 < c + 360 < b1]
+            reach = b0 + math.degrees(MAX_BAY / r_out)       # as far round as one span reaches
+            pick = sorted(c if c > b0 else c + 360 for c in cands if b0 < c < b1 or b0 < c + 360 < b1)
             if not pick:
                 settled.add((b0, b1 % 360))
                 if hung is not None: hung.append((b0, b1 % 360))
                 continue
-            out.append(min(pick, key=lambda c: abs(((c - mid + 180) % 360) - 180))); changed = True; break
+            within = [c for c in pick if c <= reach]
+            out.append((within[-1] if within else pick[0]) % 360); changed = True; break
     return out
 SUPPORT = dict(bearers=[], limbs=[], commons_limbs=[], hung=[])
 # the commons: timber bearers round each well
 for t in TREES:
-    r_out = trunk_r(t, COMMONS_Y) + WELL + BEARER_REACH
+    r_out = trunk_r(t, COMMONS_Y) + WELL + COLLAR
     for b in fill_bearers(t, COMMONS_Y, r_out, [], []):
-        # a bearer runs out across the well to the deck's edge, or its reach, whichever is nearer
-        c = TREES[t]['c']; r_in = trunk_r(t, COMMONS_Y) + WELL
-        ray = LineString([pol(c, r_in + 0.05, b), pol(c, r_out, b)]).intersection(DECK)
-        seg = ray if ray.geom_type == 'LineString' else min(ray.geoms, key=lambda g: Point(c).distance(g))
-        end = max(seg.coords, key=lambda q: dist(q, c)) if not seg.is_empty else pol(c, r_in, b)
-        SUPPORT['bearers'].append(dict(tree=t, y=COMMONS_Y, b=b, r0=trunk_r(t, COMMONS_Y), r1=round(dist(end, c) - 0.3, 2)))
+        # a bearer crosses the well to the collar's ring beam; the deck beyond is joisted off that ring
+        SUPPORT['bearers'].append(dict(tree=t, y=COMMONS_Y, b=b, r0=trunk_r(t, COMMONS_Y), r1=round(trunk_r(t, COMMONS_Y) + WELL + COLLAR - 0.3, 2)))
+    SUPPORT.setdefault('ring_beams', []).append(dict(tree=t, y=COMMONS_Y, r=[round(trunk_r(t, COMMONS_Y) + WELL + 0.15, 2), round(trunk_r(t, COMMONS_Y) + WELL + COLLAR - 0.3, 2)]))
 # the commons limbs and their hung ring
 for t, tr in TREES.items():
     for sgn in (-1, 1):
@@ -469,6 +468,7 @@ for t in TREES:
             if reach > LIMB_MAX: problems.append((t, y, who, 'needs a %.1f m limb' % reach))
             SUPPORT['limbs'].append(dict(tree=t, y=y, b=b, r0=trunk_r(t, y), length=round(min(reach, LIMB_MAX), 2), carries=who)); fixed.append(b)
         hung = []
+        SUPPORT.setdefault('ring_beams', []).append(dict(tree=t, y=y, r=[round(r_in + 0.15, 2), round(r_out - 0.15, 2)]))
         for b in fill_bearers(t, y, r_out, fixed, hung):
             SUPPORT['bearers'].append(dict(tree=t, y=y, b=b, r0=trunk_r(t, y), r1=r_out))
         for b0, b1 in hung:
