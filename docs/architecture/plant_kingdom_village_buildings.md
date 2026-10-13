@@ -43,7 +43,7 @@ footprints come from the layout.
 | Headroom | every leaf-roof eave, bridge or deck a route passes under clears 2.4 m above the deck, so the hero and the apes walk upright; roofs over the commons and rings keep their eave at 2.4 m or higher and slope up from there |
 | Roof construction | leaf roofs are the shared thatch-dome construction for the whole village, one builder and one thickness, never a flat slab with rounded corners |
 | Rails | rope rails on posts at 1.1 m, with catch nets slung beneath every deck edge more than 3 m above the ground |
-| Vertical routes | the climbers' spiral (the trees' own 46° ramps wound tight round each trunk in a 2 m well), the 32° public spiral just outside the well, the grand ramp, the commons hoist; no stairs, no ladders (layout 9) |
+| Vertical routes | one 32° trunk spiral per tree, from the roots to its highest deck, hung on brackets from the bark; the commons hoist; lianas for the climbers; no stairs, no ladders (layout 11) |
 | Light | resin lamps in gourd shades (*damar* resin), hung from the roof beams; no lights on poles |
 | Water | every roof drains by a bamboo gutter into a gourd or a bamboo tube |
 | Palette | 60 percent living bark and lashed timber; 30 percent leaf-green and thatch-brown roofs (the prototype's varied roof colours kept as one household accent each); 10 percent vine rope, rattan and warm fruit colours |
@@ -87,25 +87,24 @@ sleeping platforms.
     - privy 3 m².
   - **New size:** the deck is about **520 m²**, its edge about 3 m outside
     the line between the trunks. That leaves 1.5 m routes between every
-    amenity and a 2.4 m route from the grand ramp's head to the gathering
+    amenity and a 2.4 m route from each trunk spiral's landing to the gathering
     circle.
   Main beams run trunk to trunk on ring collars lashed round each trunk, with
   joists across them.
-- **Support** (revised 2026-10-13, layout section 10):
-  - timber bearers bracketed to each trunk across its well;
-  - squared timber posts to the ground outside the gate plaza's clear zone,
-    each on a stone pad, with cross-braces lashed in an X up to 4 m;
+- **Support** (revised 2026-10-13, layout section 11; no posts):
+  - a bracket collar round each trunk, 0.3 m off the bark: knee-braced
+    bearers to a curved ring beam, joisted beyond;
   - over the plaza, a hung ring beam round the gathering circle, carried by
-    rope hangers from six limbs, two from each tree, at 18.5 m. No cable
+    rope hangers from six limbs, two from each tree, at about 19 m. No cable
     stays.
-- **Grand spiral:** a 32° plank ramp 2.4 m wide with a rope rail, wound once
-  round a strangler fig grown on a post (a living column 3.2 m across, its
-  aerial roots braiding the post). It has a landing halfway and arrives
-  beside the market.
+- **Trunk spirals:** each tree's 32° plank ramp, 2.4 m wide up to the
+  commons and 1.5 m above, with a rope rail, wound round its trunk on
+  knee-braced brackets. Each lands on the commons through an opening beside
+  the bark, facing the deck's middle (layout 11).
 - **Edge:** rope rails all round, with catch nets 2 m wide beneath.
 - **Placement on the deck:**
   - the gathering circle at the centre;
-  - the market along the south edge, facing the grand ramp's head;
+  - the market along the south edge;
   - the kitchen and dining terrace at the north-west, between the Elder and
     North trees, on the edge, so smoke leaves over open ground;
   - the cistern pavilion at the north-east;
@@ -183,14 +182,15 @@ sleeping platforms.
 ## 3. The inn (Bima; rest point)
 
 **Site:** a rounded lobe of the commons' deck east of the East Tree,
-16 × 17 m with 3 m corner radii, one piece with the commons (revised
-2026-10-13). The house is 8 m deep with its veranda on the commons side, and a
-deck edge with rail stays outside it. Six posts carry the house's walls down
-to the ground; no cable stays. The walls are woven rattan panels with a wide
+about 15 × 17 m with 3 m corner radii, one piece with the commons (revised
+2026-10-13, review 2). The house is 6.5 m deep with its veranda on the commons
+side, and a deck edge with rail stays outside it. It sits in the East Tree's
+arms: three saddle limbs, grown just under the deck at −24°, 0° and +24°,
+carry the lobe's joists. No posts, no cable stays (layout 11). The walls are woven rattan panels with a wide
 door and windows onto the veranda. Its entrance faces back onto the commons. It replaces the ground inn at
 `(27, 22)`. The price is unchanged at 15 Tokoins.
 
-**Masses:** one long house 14 × 8 m with a deep leaf-thatched roof, and an open
+**Masses:** one long house 14 × 6.5 m with a deep leaf-thatched roof, and an open
 veranda 3 m deep along its commons-facing side. It is **the one house on the
 commons with walls**, because guests need privacy and a dry night: woven
 bamboo panels and roll-up blinds.
@@ -239,15 +239,15 @@ counter faces the commons.
 - **Capacity:** the ring is about 33 m round at its middle. The fullest rings
   hold:
   - East Tree, 22.8 m: a couple's pavilion, Dahan's pavilion, the bridge
-    landing, about 16 m of arc in all (the switchback has given way to the public spiral, layout 9);
+    landing, about 16 m of arc in all;
   - North Tree, 34.2 m: the joined siblings' pavilions, the empty pavilion and
     about 20 m of arc.
 
   Both fit with gaps between.
 - Rope rails and catch nets.
-- The 32° public spiral comes up through an opening in each ring; the
-  climbers' spiral rises in the 2 m well between the ring and the trunk, with
-  an arm across to the ring's walkway (layout 9).
+- The ring bears on its trunk's bracket collar. The tree's 32° spiral comes
+  up through one opening beside the bark, and lianas hang from the outer edge
+  for the climbers (layout 11).
 
 ### The household pavilion
 

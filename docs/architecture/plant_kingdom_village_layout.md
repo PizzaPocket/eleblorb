@@ -40,7 +40,7 @@ the households' rings and bridges higher in the trees.
      W                       ╱   the three trees;      ╲    (38,-14)      E
                             ╱    gate plaza beneath)     ╲
      garden house  ELDER TREE ●──────────────────────────● EAST TREE
-     (-38,14)      (-16,9), 62 m      grand ramp         (14,12), 56 m
+     (-38,14)      (-16,9), 62 m                         (14,12), 56 m
        gardens                     ▲ from the plaza
        Damar and Wangi's hut (-24,34)
                           │ river trail from the plaza
@@ -86,12 +86,12 @@ reachable by everyone, and directly above the arrival.
 
 ### Getting up
 
-- **Grand ramp** (revised, section 10): the grand spiral, a 32° ramp 2.4 m
-  wide wound once round a living column south of the deck, with a landing
-  halfway, arriving at the commons' southern edge beside the market.
-- **Tree switchbacks** (superseded by the public spiral, section 9): each tree's 32° public switchback reaches the commons at
-  its 11.4 m corner, then continues to the higher rings.
-- **Climbing:** the trees' steep branch ramps and rope ladders, for climbers.
+Revised by section 11 (review 2, 2026-10-13):
+- **Trunk spirals:** one 32° ramp per tree, wound round its trunk from the
+  roots to its highest deck. It is 2.4 m wide up to the commons and lands on
+  the commons beside the bark, facing the deck's middle.
+- **The hoist** for goods.
+- **Climbing:** the canopy households climb the bark and the lianas.
 
 ## 4. The ground camp
 
@@ -99,7 +99,7 @@ A small camp for the households who live on the floor, around the gate plaza.
 
 | Place | Owner | Centre | Size | Notes |
 |---|---|---|---|---|
-| Gate plaza | public | `(0, 0)` | an irregular clearing about 24 m across, under the commons | the arrival; the grand ramp starts here; nothing in front of the gate |
+| Gate plaza | public | `(0, 0)` | an irregular clearing about 24 m across, under the commons | the arrival; paths lead from it to the three trunk spirals; nothing in front of the gate |
 | Ape lodge | Batu, Sari, Teguh | `(38, -14)` | 14 × 7 m long lodge on short stilts | built heavy for apes |
 | Stable, paddock and Ossian's camp | Ossian Redbrow; Manchego | `(24, -30)` | a roofed stall 6 × 4 m, a paddock 12 × 10 m with a gate, a hitching rail, a water trough fed by a rain barrel, a feed rack with hay; Ossian's lean-to 5 × 3 m | the horse's home; the gate lines up with the path to the plaza |
 | Tailed monkeys' house | Rotan, Kilat, Akar | `(-34, -16)` | 10 × 6 m raised hut | vine rope coiled under the floor |
@@ -232,6 +232,8 @@ the ground at (27, 22). Nothing else in this plan exists yet.
 
 ## 9. Circulation: who goes up, and how (2026-10-13)
 
+**Superseded in part by section 11 (review 2):** the climbers' spiral, the public spiral, the climbing wells and the grand spiral are replaced by one trunk spiral per tree. Who moves and why still stands.
+
 Designed from the people who use each level, not from the trees' prototype
 ramps.
 
@@ -296,6 +298,8 @@ spiral's openings stand at least 1.5 m clear of the climbers' arms on every
 ring.
 
 ## 10. Structure: what carries every deck (2026-10-13, proposed)
+
+**Superseded in part by section 11 (review 2):** the posts, the wells and the grand spiral are gone; the inn sits on saddle limbs. The limbs, ring beams, hung bays and the commons' hung ring still stand.
 
 The review found three faults in the 3D model:
 - The trees had no limbs.
@@ -375,12 +379,112 @@ Checks added:
 For the game: P7 grows the village trees with these limbs, at these heights
 and bearings, instead of the random limbs that avoid every landing.
 
+## 11. Build with the trees: review 2 (2026-10-13, proposed)
+
+The user found the village standing on stilts. Eleven timber posts 11 m tall
+carried the commons' edges and the inn, and none of it came from the trees. The
+user also asked whether every ramp was needed and well integrated. There were
+seven: a climbers' spiral and a public spiral on every trunk, and the grand
+spiral round its own post, 366 m of ramp in all. The direction: structure is
+what the builders think about first; a deck goes where the tree offers support,
+or engineering joins it to the tree intelligently. Stilts are allowed, but not
+as the default.
+
+This section supersedes section 9's routes and section 10's posts, wells and
+grand spiral. The plan file carries it and checks it.
+
+### How a monkey builds in a tree
+
+- **Bear on the trunk.** The trunk is the strongest support a tree offers.
+  Every deck bears on a **bracket collar** standing 0.3 m off the bark, which
+  leaves room for the tree to thicken and sway. Knee-braced bearers run from
+  the bark to a curved ring beam, and the deck is joisted beyond it.
+- **Sit in the arms.** Where a deck reaches past what a collar carries, it
+  sits on a living limb grown under it. Each pavilion and bridge landing
+  already has one (section 10). The inn now has three.
+- **Hang from above.** Where nothing can be grown under a deck, it hangs from
+  a limb grown above it:
+  - the commons' middle, over the gate plaza, from six limbs at about 19 m;
+  - seven bays of the rings, where the spiral rises beneath them.
+- **Nothing stands on the ground.** Posts: 11 before, none now.
+
+### What changed
+
+- **The commons** bears on the three trunks' collars and hangs in the
+  middle. Its edges were the posts' job; a collar reaches about 9 m from its
+  trunk's centre, and the commons limbs now spread 30° either side of the
+  line to the middle (was 25°), so their hung beams reach the edges' middles.
+  No part of the deck is left without something under or over it.
+- **The inn** sits in the East Tree's arms. Three **saddle limbs** grow at
+  bearings of −24°, 0° and +24° just under the deck, each up to the game's
+  11.5 m limb, and the lobe is joisted across them. To keep within that
+  reach, the house moved 0.4 m east and is 6.5 m deep (was 8 m): 14 × 6.5 m,
+  its veranda still facing the commons. The lobe runs from (14, 3.5) to
+  (28.9, 20.5).
+- **The climbing wells go.** They existed only for the climbers' spiral.
+  Every deck now reaches the bark.
+
+### One ramp per tree
+
+| | Before | Now |
+|---|---|---|
+| Ramps | 7: three climbers' spirals (46°), three public spirals (32°), the grand spiral | 3 trunk spirals (32°) |
+| Length | 366 m | 215 m |
+| Posts | 11 | 0 |
+
+- **The trunk spiral.** Each tree has one 32° ramp hugging its trunk from
+  the roots to its highest deck: the East and North Trees to 34.2 m, the
+  Elder Tree to its crown at 45.6 m.
+  - It hangs on its own knee-braced brackets from the bark.
+  - It is 2.4 m wide up to the commons, which everyone and the goods use,
+    and 1.5 m above.
+  - Each storey of 11.4 m is two flights of 5.7 m with a 1.2 m landing
+    between. It lands on every deck it passes.
+  - It comes up through one opening beside the bark, cut for the 4.3 m in
+    which the ramp is within a walker's headroom below the deck.
+  - A turn rises about 13 m, so the turns never crowd each other's
+    headroom.
+- **Why all three trees keep a ground leg.** The ground legs are the only
+  optional part. Each one serves its own side of the floor:
+  - the gardens and the floor hut by the Elder Tree;
+  - the tailed monkeys and the stable by the North Tree;
+  - the apes and the river trail by the East Tree.
+
+  And each tree then reads as one ribbon from root to crown. One trunk with a
+  ground leg would leave the other two looking unfinished.
+- **The start of each spiral** is chosen by the plan file so that:
+  - its commons landing faces the commons' middle;
+  - its opening and landing stand clear of every amenity;
+  - every pavilion and bridge landing above it keeps a clear bearing for its
+    limb;
+  - on the East Tree, no flight crosses the inn's saddle limbs.
+
+  The foot stays out of the gate plaza.
+- **The climbers climb.** The canopy households go up and down the bark and
+  the lianas hanging from each ring's outer edge: two lianas a tree. It is
+  their quick way, and it needs nothing built. NPC routes use the spirals.
+- **The hoist** stays: goods go up by basket, not by ramp.
+- The bridges now span 15.6 to 17.9 m, because the rings start at the bark.
+- The commons is 630 m² net of the trunks and their spirals, still more than
+  the 520 m² its program needs. Three amenities on the north-east edge moved
+  slightly to keep their 1.5 m routes:
+  - the food store to 0.272 of the edge;
+  - the cistern to 0.473, now 5.5 m wide;
+  - Jati's workshop to 0.695, now 5.5 m wide.
+
+**For the game (P7):**
+- The village trees are grown with this spiral and these limbs. They get no
+  wandering branch-ramp chain and no 46° helix.
+- The wild giant trees keep their chain.
+
 ## Fixed, proposed and open
 
 **Fixed:** the three trees and their positions, the gate, the inn's keeper and
 price, the inn's move to the commons (approved 2026-10-06), Ossian and Manchego, the open treehouse character.
 
-**Proposed (2026-10-13, structure):** section 10, covering the closed wells,
+**Proposed (2026-10-13, review 2):** section 11: every deck carried by its trees, no posts; the inn on three saddle limbs; one 32° trunk spiral per tree, replacing the climbers' and public spirals, the climbing wells and the grand spiral.
+
+**Proposed (2026-10-13, structure):** section 10, as amended by section 11: covering the closed wells,
 the inn's rounded lobe and posts, bearers, deck limbs, hung bays, the
 commons' hung ring, and the grand spiral.
 
