@@ -472,6 +472,14 @@ Ocean Kingdom Chart artifact. It found:
   since the Kraken circles the dock; it must cross the route once, and its
   straight line runs over the coastal-forest islet's slope at (−34, −154).
 
+**Sea folk city second pass (2026-10-13).** The layout is code-ready:
+`tools/sea_folk_layout.py` writes `SeaFolkPlan`, checked by
+`tools/validate_sea_folk_plan.tscn` in the pre-push hook (`VILLAGE=sea_folk`).
+The audit moved the Exchange off the main avenue, grew the guest hall to 20 m
+so its rooms fit at world scale, and moved three light pipes out of the
+avenues (`ocean_sea_folk_city_layout.md` 9, with what the rebuild changes in
+`ocean_kingdom_city.gd`).
+
 **Kai Mālie second pass (2026-10-13).** Every home re-sized from its rooms at
 world scale (the first pass did not add up), the coastal plain deepened to
 30 m, and the layout made code-ready: `tools/kai_malie_layout.py` writes

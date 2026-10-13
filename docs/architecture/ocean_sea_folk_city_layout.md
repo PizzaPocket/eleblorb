@@ -1,6 +1,7 @@
 # The Sea Folk City: Civic Layout Plan
 
-Status: dimensioned schematic for review (2026-10-06). Read with
+Status: dimensioned schematic for review (2026-10-06); **second pass,
+code-ready, 2026-10-13** (section 9). Read with
 `ocean_sea_folk_city.md`, which owns the community, culture, air halls and
 charter. This document places them on the seabed.
 
@@ -128,6 +129,63 @@ Homes face the avenue or ring path nearest them, not all toward the centre.
   helmet.
 - The Tidekeeper's audience hall stays open and traversable.
 - Protected bounds: the whole city out to 120 m; Fish Goblins stay outside.
+
+## 9. Second pass: the plan file (2026-10-13)
+
+The layout now lives in one plan file. `tools/sea_folk_layout.py` holds the
+rings, avenues, air halls, tunnels, every building and home, and the guest
+hall's rooms, checks them and writes `scripts/sea_folk_plan.gd`
+(`SeaFolkPlan`). `tools/validate_sea_folk_plan.tscn` checks the plan before
+the city is rebuilt and runs in the pre-push hook (`VILLAGE=sea_folk`). The
+audit found three faults in the first pass, now fixed:
+
+- **The Exchange stood on the main avenue.** At `(0, 34)`, its 18 m dome sat
+  across the avenue the castle's new door looks down, blocking both. It moves
+  beside the avenue, at bearing 69° on the civic ring, `(12.2, 31.7)`, and the
+  castle looks straight down the avenue to the arrivals.
+- **The guest hall was too small for its rooms.** Under a 16 m dome, the
+  party room, three guest rooms, Isaro's room and the washroom at world scale
+  (2.3 m beds) left no floor round the moon pool. It grows to **20 m across,
+  8.5 m high**, at bearing 22.5°, `(32.3, 13.4)`, near the old inn's place:
+  a ring of rooms 3.4 m deep under the shell, and between them and the 4 m
+  moon pool, 4.1 m of common-room floor for the ramp out of the pool and its
+  landing.
+- **Three light pipes stood in avenues** (bearings 0°, 180° and 300° were on
+  or beside them). The four pipes now stand on the civic ring between
+  avenues, at 202.5°, 247.5°, 292.5° and 337.5°, round the castle's back.
+
+Other placements, all checked:
+- the Lamp House at bearing 112.5° and the school court at 157.5° on the civic
+  ring, each between avenues;
+- the Reef House workshop at 202.5° in the garden ring;
+- the Kraken lookout at bearing 112°, 104 m out;
+- the Glassworks at the head of the main avenue, 118 m out, beside the warm
+  vent at 124 m;
+- the sixteen homes in their households' sectors, between avenues, each
+  facing the ring path between the rows (the inner row outward, the outer
+  row inward);
+- the civic tunnel along the ring from the Exchange to the guest hall;
+- the avenue tunnel from the Exchange out alongside the main avenue to the
+  Glassworks, with its junction moon pool between the rows.
+
+The rings stay circles: Plato's concentric plan is Atlantis's deliberate
+civic geometry. Everything beyond the homes is organic: kelp groves and
+sea-flower beds as irregular patches in the garden ring, and the city's edge,
+where the levelled shelf meets the natural floor and the reef, as a wandering
+line.
+
+### What the rebuild changes in `ocean_kingdom_city.gd`
+
+| Today | The plan |
+|---|---|
+| castle door faces `-z` | faces `+z`, down the main avenue to the arrivals |
+| inner homes at 49 m (in the Ring Current's place) | at 60 m; the outer row stays at 82 m |
+| homes all face the centre | each faces the ring path between the rows |
+| sixteen identical box homes | three home types (single, double, workshop), each household's own |
+| eight spokes of stepping stones | eight sunken avenues, 4 m wide, lit by the stones |
+| `seafolk_village_inn` at `(24, 18)`, keeper Nerissa Stillwater | the guest hall air hall at `(32.3, 13.4)`, keeper Isaro, still 25 Tokoins |
+| prototype names | the Linear A-sounding names (`ocean_sea_folk_city.md` 3a) |
+| no Ring Current, air halls, tunnels or light pipes | all of them |
 
 ## Fixed, proposed and open
 

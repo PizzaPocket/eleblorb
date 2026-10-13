@@ -75,7 +75,8 @@ human city; boxes.
 
 ### The guest hall (air hall; Isaro; rest point)
 
-- A dome 16 m across, 8 m high, on a 3 m plinth.
+- A dome **20 m across, 8.5 m high** (second pass, 2026-10-13: 16 m could not
+  hold its rooms at world scale), on a 3 m plinth.
 - **Inside:** the moon pool; a common room with low couches; four dry bedrooms
   around the dome's edge, one large enough for the party, where the hero wakes;
   Isaro's counter by the pool; a **washroom** between two of the bedrooms,
@@ -85,6 +86,11 @@ human city; boxes.
   glass washbasin with a tap and a mirror; a shower. Waste goes to a sealed
   holding tank in the plinth, which is pumped out to a treatment vault at the
   city's edge, never into the sea.
+- **Rooms (second pass):** a ring 3.4 m deep under the shell: the party room
+  (6.0 m of arc), three guest rooms (3.6 m each), Isaro's room (3.2 m) and
+  the washroom (2.4 m), each opening off the common room. Between the rooms
+  and the 4 m moon pool, 4.1 m of floor holds the ramp out of the pool and its
+  landing. The plan file checks the fit and the headroom.
 - **Variation:** the warmest light; the only dome with rooms partitioned off.
 - **Audit (2026-10-07):**
   - **Headroom.** A dome 8 m high is low at its rim. Set the four bedrooms
