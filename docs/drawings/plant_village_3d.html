@@ -80,6 +80,7 @@ p { margin: 0; max-width: 72ch; }
         <button class="chip" id="t_labels" aria-pressed="true">Labels</button>
         <button class="chip" id="t_canopy" aria-pressed="true">Canopy</button>
         <button class="chip" id="t_forest" aria-pressed="true">Forest</button>
+        <button class="chip" id="t_ramps" aria-pressed="true">Branch ramps</button>
       </div>
     </div>
     <div class="places" id="places" role="list"></div>
@@ -94,6 +95,7 @@ p { margin: 0; max-width: 72ch; }
     <div class="find"><b>Brief error</b><div><p>The rope bridges span 16 to 18.5 m, not 30 to 32 m. The trunks stand 30 to 34 m apart, but each household ring reaches 7 m out from its trunk, so the bridges only cross the gap between rings.</p></div></div>
     <div class="find"><b>Conflict</b><div><p>The brief puts each tree's 32° public switchback on the commons beside its trunk. There it lands on the kitchen, dining terrace, store or workshop, and its head meets the bridges on the 22.8 m rings. The plan moves each switchback to its own small deck lobe on the tree's outer side, away from the bridges. Several ring homes then turn to new bearings:</p><ul><li>Abu: 40°;</li><li>Senja and Rimba: 225°;</li><li>Dahan and Bayu: 50°;</li><li>Intan and Murai: 20°;</li><li>the empty pavilion: 180°.</li></ul></div></div>
     <div class="find"><b>Placed</b><div><p>The brief gave no positions for the amenities on the commons. They now stand along the deck's edges with 1.5 m routes between them:</p><ul><li>the market on the south edge, facing the grand ramp's head;</li><li>the kitchen and dining terrace on the north-west edge;</li><li>the store, privy, cistern and Jati's workshop on the north-east edge;</li><li>the gathering circle, 7.2 m across, at the middle;</li><li>the inn on its lobe east of the East Tree.</li></ul><p>The six posts stand 1 m inside the deck edge, all outside the gate plaza.</p></div></div>
+    <div class="find"><b>Conflict</b><div><p>The briefs keep the trees' existing steep branch ramps as the climbers' route through the new village, and say they "pass through" the rings. Drawn at true size, they do more than pass through. Each landing sits 3 to 9 m from its trunk, so the ramps cut through the commons deck, the 5 m rings and the pavilion bays. That is why they show in the planned view. Use the Branch ramps switch to see the plan without them. The plan needs a decision on how climbers go up.</p></div></div>
     <div class="find"><b>Built today</b><div><p>The game still has the prototype village:</p><ul><li>the three giant trees with their steep branch ramps;</li><li>a 3.6 m treehouse deck on every fourth landing;</li><li>the inn on the ground at (27, 22).</li></ul><p>None of the commons, rings, bridges, ground camp or switchbacks exist yet. The trees' branch ramps climb at 46°, and the model draws their chain from the same rule as <code>nature_props.gd</code>. Their starting directions are random in the game, so the model's are approximate.</p></div></div>
     <div class="find"><b>Approximate</b><div><p>The terrain's hills and the river's wander come from Godot noise that the page cannot reproduce exactly. Their sizes match the code; their exact shapes do not. The village clearing, the river's depth and level, and every landmark position are exact.</p></div></div>
   </section>
@@ -190,8 +192,8 @@ function eggGeo(ax, ay, az, et = 3, eb = et, rings = 16, segs = 24) {
 const egg = (ax, ay, az, et, eb, m, x, y, z, parent = scene) => add(eggGeo(ax, ay, az, et, eb), m, x, y, z, parent);
 const labels = [];
 const label = (text, sub, x, y, z, cls = "", near = 0, group = "all") => labels.push({ text, sub, p: new THREE.Vector3(x, y, z), cls, near, group });
-const G = { plan: new THREE.Group(), built: new THREE.Group(), forest: new THREE.Group(), canopy: [] };
-scene.add(G.plan, G.built, G.forest);
+const G = { plan: new THREE.Group(), built: new THREE.Group(), forest: new THREE.Group(), ramps: new THREE.Group(), canopy: [] };
+scene.add(G.plan, G.built, G.forest, G.ramps);
 
 // ---------- terrain: one coarse grid for the kingdom and a fine one for the village
 function terrain(size, n, cx, cz) {
@@ -230,10 +232,11 @@ function giantTree(k, parent) {
   egg(cr * 0.6, cr * 0.4, cr * 0.6, 3, 3, M.leaf, 0, cy, 0, cg);
   for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2, lr = cr * (0.5 + 0.1 * Math.sin(i * 7.1)), rr = cr * (0.58 + 0.06 * Math.cos(i * 3.3)); egg(rr, rr * 0.55, rr, 3, 3, i % 2 ? M.leaf2 : M.leaf, Math.cos(a) * lr, cy, Math.sin(a) * lr, cg); }
   // the branch-ramp chain (nature_props.gd): 3.8 m over 3.6 m from each landing, turning by the golden angle
+  const rg = new THREE.Group(); rg.position.copy(g.position); G.ramps.add(rg);
   t.chain.forEach((s, i) => {
     const a = new THREE.Vector3(s.a[0], s.y0, s.a[1]), b = new THREE.Vector3(s.b[0], s.y1, s.b[1]), d = b.clone().sub(a), L = d.length();
-    const r = add(new THREE.BoxGeometry(1.5, 0.25, L), M.ramp, 0, 0, 0, g); r.position.copy(a.clone().add(b).multiplyScalar(0.5)); r.lookAt(g.localToWorld(b.clone()));
-    egg(1.15, 0.15, 1.15, 5.5, 5.5, M.barkDark, s.land[0], s.y1 - 0.15, s.land[1], g);
+    const r = add(new THREE.BoxGeometry(1.5, 0.25, L), M.ramp, 0, 0, 0, rg); r.position.copy(a.clone().add(b).multiplyScalar(0.5)); r.lookAt(b.clone().add(rg.position));
+    egg(1.15, 0.15, 1.15, 5.5, 5.5, M.barkDark, s.land[0], s.y1 - 0.15, s.land[1], rg);
   });
   return g;
 }
@@ -435,6 +438,7 @@ const tog = (id, fn) => { const b = document.getElementById(id); b.addEventListe
 tog("t_labels", v => { showLabels = v; labelBox.hidden = !v; });
 tog("t_canopy", v => G.canopy.forEach(c => c.visible = v));
 tog("t_forest", v => G.forest.visible = v);
+tog("t_ramps", v => G.ramps.visible = v);
 function setMode(m) { mode = m; G.plan.visible = m === "plan"; G.built.visible = m === "built"; document.getElementById("m_plan").setAttribute("aria-pressed", m === "plan"); document.getElementById("m_built").setAttribute("aria-pressed", m === "built"); }
 document.getElementById("m_plan").addEventListener("click", () => setMode("plan"));
 document.getElementById("m_built").addEventListener("click", () => setMode("built"));
