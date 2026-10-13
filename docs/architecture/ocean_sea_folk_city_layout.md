@@ -187,84 +187,95 @@ line.
 | prototype names | the Linear A-sounding names (`ocean_sea_folk_city.md` 3a) |
 | no Ring Current, air halls or tunnels | all of them (third pass: section 10) |
 
-## 10. Third pass: the vertical city (proposed, 2026-10-13)
+## 10. Third pass: two eras, heritage under glass, and the column (proposed, 2026-10-13)
 
-The user's direction: the sea folk are not bound to the seabed, and the city
-should use their three-dimensional mobility. Its architecture should merge two
-eras, the classical city preserved on the floor and the modern city of air
-bells and pods risen into the water column. All of it stays in the SuperEgg
-language. The concept is in `ocean_sea_folk_city.md` 2a; this section places
-it. Heights are metres above the city floor (−72 m); the surface is at +72.
+The user's direction:
+- the sea folk are not bound to the seabed, and the city should use their
+  three-dimensional mobility;
+- the architecture merges two eras, the classical city preserved and the
+  modern city of glass;
+- the glass should take up the heritage in considered ways, after the British
+  Museum's Great Court and the Singapore National Gallery;
+- the bubbles in the water are whole SuperEggs with floors: no domes on
+  cables, no legs, no bird-cage ribs, no stalks;
+- more glass tunnels, organised as circulation.
 
-**Removed:** the four light pipes and their surface collectors. Kaluja becomes
-the rigger of the stalks.
+The concept is in `ocean_sea_folk_city.md` 2a; this section is the floor plan.
+The data and its checks are in `tools/sea_folk_third_pass.py`. The drawings
+(key plans, the circulation, building plans and sections) are the Sea Folk
+City Floor Plans artifact. Heights are metres above the city floor (−72 m).
 
-### Depth bands
+**Removed:** the light pipes, and the first draft of this pass (stalks on
+cables, air bells moored on cables, lamp lines).
 
-| Band | Height | What is there | Era |
-|---|---|---|---|
-| The floor | 0 to 20 m | Tidehall (towers to 19 m), the Ring Current, the avenues, the Lamp House, the school court, the Current House homes, the Glassworks at the vent, kelp forests rising to 30 m | classical; the Glassworks is the hinge |
-| The low column | 8 to 34 m | household stalks and their pods; the lamp-line ring at 20 m | modern |
-| The air level | 30 to 40 m | the Exchange and the guest hall, air bells with their pools at 30 m, and the glass tunnel between them | modern |
-| The high column | 40 to 64 m | crown floats; the Kraken lookout's watch pod at 56 m | modern |
-| Above | 64 to 72 m | open water to the surface | — |
+### The floor (classical, with glass brought to the heritage)
 
-The open column: nothing modern stands over the mound (within 24 m of the
-centre) at any height, so Tidehall's oculus looks up a clear well of water.
-
-### Stalks
-
-Every holdfast stands on the ring path (71 m) between avenues, at bearings
-22.5° + 45° steps, except the lookout's at the edge. Pods hang 2.5 m off their
-stalk, turned to face the open side.
-
-| Stalk | Bearing, radius | Pods (height) | Crown float | Who |
-|---|---|---|---|---|
-| Garden House | 22.5°, 71 m | three double pods (10, 17, 24 m) | 38 m | Nesaja, Rodasu, Kasuno and Tami |
-| Glassworks household | 67.5°, 71 m | two workshop pods (9, 15 m) | 26 m | Kunei, Damaku |
-| Kraken lookout | 112.5°, 100 m | the watch pod (56 m), a glazed egg facing south over the Kraken's water | 64 m | Ikara |
-| Exchange household | 157.5°, 71 m | three single pods (12, 18, 25 m) | 36 m | Maresa, Pelaju, Sujira |
-| Reef House | 292.5°, 71 m | three single pods (10, 16, 22 m) and the Reef House workshop pod (30 m, 12 × 9 m) | 44 m | Talisa, Arimu, Kaluja |
-| Lamp stalks | 112.5° (71 m), 202.5°, 247.5°, 337.5° | none; they carry the lamp-line ring | 26 m | Lunira's lamps; Kaluja rigs them |
-
-Pod sizes are the second pass's home types (single 8 × 7 m, 5 m tall; double
-two eggs of 6 × 6 m; workshop a 7 × 8 m resting egg and a 6 × 7 m work egg).
-Pods on one stalk keep 3 m clear of one another vertically.
-
-### On the floor
-
-| Building | Where | Change from the second pass |
+| Place | Where | What it is |
 |---|---|---|
-| Tidehall | centre | its oculus is open to the clear column above |
-| Lamp House and the Lamp House family's home | 112.5° on the civic ring and inner terrace | stay on the floor: classical, the oldest craft |
-| School court | 157.5° on the civic ring | stays: a classical colonnade |
-| Current House homes (four) | outer terrace, 193° to 257° | stay on the floor beside the current they work: the city's oldest family, in classical homes |
-| Glassworks | (0, 118) by the vent | stays; no longer joined by a tunnel |
-| Garden, Exchange, Reef and Glassworks households' homes (eleven) | — | move up into pods on their stalks |
-| Reef House workshop | — | moves up into a pod on the Reef House stalk |
-| Avenue tunnel | — | removed: the Glassworks' pool lies 27 m deeper than the air level's |
+| Tidehall | centre, on the mound | the palace, wet and unwrapped; nothing modern over the mound at any height |
+| The Exchange (wrap) | 67.5°, 33 m | a glass bubble 17.6 × 17 m, 12 m high, over the preserved **Hall of Records** (10 × 6 m), now dry: the archive and Dakuro's charts. Trading floor at 0.6 m round it, gallery at 4.4 m joining the ring tunnel, a ramp between them, a pool lock |
+| The guest hall (join) | either side of the 0° avenue, 36 m | the **West** and **East Strangers' Houses** (8.2 × 9.2 m each), preserved and each wrapped in glass, joined by a glass **common room** bridging the avenue at 4.4 m. A swimmer rises into the common room from the avenue below by its pool lock |
+| Lamp House | 112.5°, 31 m | classical, wet |
+| School court | 157.5°, 30 m | classical colonnade, wet |
+| Current House homes (4) and the Lamp House family's home | outer terrace 193° to 257°; 124° at 60 m | classical, wet |
+| Ring-tower stumps (4) | 22.5°, 112.5°, 202.5°, 292.5° on the ring path (71 m) | preserved bases of the old ring towers; each holds a trunk's foot and a pool lock |
+| The Glassworks | (0, 118) by the vent | the first glass bubble, socketed in the slope, smoked glass, the furnace over the vent |
 
-### Air level
+**Rooms in the Strangers' Houses** (world scale, inside the old walls):
 
-- **The Exchange** at `(12.2, 31.7)` and **the guest hall** at `(32.3, 13.4)`,
-  as in the second pass, now buoyant bells with their open rims and pools at
-  30 m.
-- Each hangs on four cables to holdfasts on the civic ring floor.
-- The **civic tunnel** joins them level, at 30.6 m floor height.
-- The hero rests 42 m below the surface instead of 72 m.
+| House | Rooms |
+|---|---|
+| East | three guest rooms, 3.8 × 3.6 m; Isaro's room, 3.8 × 3.6 m; a central corridor 1.5 m |
+| West | the party room, 7.7 × 5.45 m; the washroom, 2.85 × 1.85 m, with a flush toilet, basin and shower (waste to a sealed tank, as before); a linen store |
 
-### What the plan file gains when this is approved
+Each house's wrap holds a switchback ramp (two flights at 32°, 1.4 m wide)
+from the old floor at 0.6 m up to the tunnels' level at 4.4 m.
 
-`SeaFolkPlan` holds the second pass less the light pipes. On approval it gains
-a height for every structure, the stalks with their holdfasts, pods and crown
-floats, the air level, and the lamp-line ring. The validator then also
-checks:
+### The glass network
 
-- the open column over the mound;
-- that every holdfast stands on a classical ring or beside an avenue;
-- 3 m clearance in three dimensions between pods, bells, cables and floats;
-- that tunnel-joined bells share one pool depth;
-- that nothing in the column stands on the floor except at a holdfast.
+| Tunnel | Route | Level | Carried by |
+|---|---|---|---|
+| Civic ring | round the open column at 40 m, threading the Exchange and the guest hall | 4.4 m | the classical ring arcade; arches over every avenue |
+| Spokes (4) | from the ring out over the Ring Current to the four trunk feet | 4.4 m | the arcade and the old bridges |
+| Avenue tunnel | beside the main avenue, from the ring to the Glassworks | 4.4 m | the classical avenue colonnade |
+| Trunks (4) | vertical glass shafts 8 m across with a spiral ramp (11.8 m a turn) | 4.4 to 33 m (the lookout's to 57 m) | the ring-tower stumps |
+| Crown ring | joining the trunk tops at 71 m from the centre | 30 m | braced between the trunks |
+
+Swimmers pass under every floor-level tunnel with 3.75 m clear. Total tunnel
+length about 770 m.
+
+### The column
+
+| Trunk | Bearing | Landing hall and the homes docked to it | Crown hall, 30 m |
+|---|---|---|---|
+| Garden House | 22.5°, 71 m | 16 m: Nesaja (double), Rodasu (double), Kasuno and Tami (double) | the Walking Room: where Munaja teaches the young to walk on new legs |
+| Glassworks household | 112.5°, 71 m | 15 m: Kunei (workshop), Damaku (workshop) | the trunk climbs on to the Kraken lookout, 54 m |
+| Exchange household | 202.5°, 71 m | 18 m: Maresa (single), Pelaju (single), Sujira (single) | the Listening Room: Pelaju listens up toward the surface and the ships |
+| Reef House | 292.5°, 71 m | 20 m: Talisa (single), Arimu (single), Kaluja (single), Reef House workshop (reef) | the Reef House laboratory: Talisa's specimens, dry |
+
+A landing hall is a glass SuperEgg 14 m across and 8 m tall, threaded on its
+trunk, with a walkable ring at least 1.6 m wide round the trunk. Each home is a
+wet SuperEgg docked to the hall's rim with a pool lock between them; the Reef
+House workshop docks the same way. Crown halls are 12 m across.
+
+### Checks (`tools/sea_folk_third_pass.py`)
+
+- nothing modern over the mound;
+- the avenues and the Ring Current open at the floor, with swimmers' clearance
+  under tunnels;
+- 3 m between volumes that are not joined;
+- every tunnel reaches what it joins, at 1:6 or gentler;
+- one connected dry network;
+- heritage at least 1.5 m inside its glass, with headroom over it;
+- every room at its minimum size and inside the old walls;
+- every ramp fitting with 2.4 m headroom and clear of the heritage;
+- landing halls' walkable rings;
+- the trunk ramps' headroom;
+- sixteen homes and every resident housed;
+- pool locks where swimmers arrive.
+
+On approval this data replaces the second pass in `tools/sea_folk_layout.py`
+and `SeaFolkPlan`, and the validator takes the same checks.
 
 ## Fixed, proposed and open
 
@@ -276,7 +287,11 @@ Current; homes moved from 49 m to 60 m; the three air halls and two tunnels;
 Isaro as the inn's renamed keeper;
 every footprint above.
 
-**Proposed (third pass):** the two eras and the vertical city in section 10;
-the light pipes removed.
+**Proposed (third pass):**
+- the two eras and the heritage moves (wrap, join, graft);
+- the glass network and the four trunks in section 10;
+- the light pipes removed.
 
-**Open:** names for the two eras, if the sea folk have them.
+**Open:**
+- names for the two eras and the Strangers' Houses;
+- the crown halls' programs.

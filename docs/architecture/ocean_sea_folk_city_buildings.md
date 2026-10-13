@@ -5,12 +5,13 @@ proposed):** the city now has two eras, the classical floor and the modern
 column (`ocean_sea_folk_city.md` 2a and 5, `ocean_sea_folk_city_layout.md` 10).
 The two-era charter there supersedes the kit below where they differ:
 - the Tidehall, Lamp House, school court and Current House homes are classical;
-- the Exchange and guest hall become hung air bells (no plinth, an open rim
-  as the moon pool);
-- the Reef House workshop and eleven homes become pods on stalks;
+- the Exchange wraps the old Hall of Records, and the guest hall joins the two
+  old Strangers' Houses;
+- the Reef House workshop and eleven homes dock round landing halls on four
+  glass trunks;
 - the light pipes are removed.
 
-The new modern briefs are in section 2a. Read with
+The new modern kit is in section 2a; the plans are in the layout brief, section 10. Read with
 `ocean_sea_folk_city.md` (community, culture, charter, dress) and
 `ocean_sea_folk_city_layout.md` (layout). Positions and owners come from the
 layout.
@@ -172,43 +173,58 @@ Each household's homes share a type; individual homes vary within it.
   the tail colours of its residents echoed in a band at the door, and its trade
   at the entrance (sea flowers, shells, charts, scale cloth).
 
-## 2a. The column's kit (third pass, proposed)
+## 2a. The modern kit (third pass, proposed)
 
-### Stalk
+Revised after review on 2026-10-13: no cables, stalks, moored bells, legs or
+bird-cage ribs. The modern work is whole bubbles, tunnels and trunks.
 
-- **Holdfast:** a squat orichalcum-and-nacre SuperEgg, about 3 × 1.2 × 3 m at
-  epsilon 3, its ring set into the classical floor's plating.
-- **Stipe:** one to three orichalcum cables, 0.2 m thick, with an orichalcum
-  collar at each pod's arm.
-- **Crown float:** a sealed glass-and-nacre SuperEgg bladder, 4 to 6 m long at
-  epsilon 2.2, with an orichalcum rim band and a pearl lamp at its tip. It is
-  the stalk's landmark from below.
+### Bubble (landing hall, crown hall, the lookout)
 
-### Pod (wet home or workshop)
+- **Shell:** a whole glass SuperEgg (epsilon about 2.4) with a floor inside.
+- **Glass:** frameless and curved; a broad nacre band at the floor line, which
+  carries the spiral and wave band.
+- **Keel:** a nacre ballast keel under the floor that holds the bubble level and
+  still in the water; nothing hangs it or holds it down.
+- **Floor:** a deck about 1.2 m below the bubble's girth, so the walls lean out
+  above the walking ring.
+- **Entry:** a pool lock in the floor.
 
-- **Shell:** a SuperEgg, its lower half rounder than its upper (epsilon about
-  2.0 below and 2.6 above), so it hangs like a seed.
-- **Front:** a wide glazed front between orichalcum ribs, facing open water.
-- **Openings:** a swim-in opening at least 3 m clear in the underside or side.
-- **Interior:** rooms at least 4 m tall, with woven-kelp screens.
-- **Band:** the orichalcum band at the widest girth, with the household's
-  tail colour echoed in it.
-- **Hanging:** on an arm from its stalk's collar.
+### Wrap (the Exchange; each Strangers' House)
 
-### Air bell (the Exchange, the guest hall)
+- **Shell:** a glass SuperEgg socketed into a nacre ring on the floor, standing
+  at least 1.5 m clear of the heritage it covers. It meets the old work only
+  at a removable nacre collar.
+- **Inside:** the old building stands whole and is used again, dry. Round it
+  are the new floor at 0.6 m and a gallery at 4.4 m where the tunnels arrive,
+  with ramps between them.
 
-- **Dome:** a glass SuperEgg cut level at its open rim (`build_clipped_part`),
-  on orichalcum ribs at 3.2 m centres.
-- **Rim:** a nacre skirt, carrying the spiral band in orichalcum.
-- **Floor:** a deck ring 0.6 m above the pool's surface round the open centre,
-  which is the moon pool.
-- **Mooring:** four cables from the skirt to holdfasts on the floor.
-- **Inside:** the second pass's rooms, counters and frescoes.
+### Join (the guest hall)
 
-### Lamp lines
+- Two wraps linked by a new glass room: the common room, a SuperEgg cut level
+  beneath its floor, bridging the avenue at 4.4 m with swimmers passing under
+  it.
+- A pool lock in its floor opens down into the avenue.
 
-- Cables strung between stalks at 20 m, hung with pearl lamps every 4 m.
-- They are the column's streets, echoing the ring path on the floor beneath.
+### Trunk
+
+- A vertical glass shaft 8 m across, its foot set in an old ring-tower stump.
+- Inside: a spiral ramp 1.4 m wide at 32° round a nacre core, with landings at
+  the landing hall and the crown hall.
+- Broad nacre collars at the landing levels; no ribs.
+
+### Home (wet)
+
+- A nacre SuperEgg (epsilon about 2.0 below, 2.6 above) with a wide glazed
+  front, docked to its landing hall's rim.
+- A pool lock leads from the home into the hall. Swim-in openings at least
+  3 m clear face the open water. Rooms are at least 4 m tall, with woven-kelp
+  screens.
+
+### Tunnel
+
+- A frameless glass tube 4.5 m across with a 3 m flat floor and 3.2 m headroom.
+- A broad nacre collar every 12.8 m.
+- On the floor it rests on the old arcades and bridges.
 
 ## 3. Variation matrix
 

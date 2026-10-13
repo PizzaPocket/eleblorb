@@ -482,12 +482,14 @@ so its rooms fit at world scale, and moved three light pipes out of the
 avenues (`ocean_sea_folk_city_layout.md` 9, with what the rebuild changes in
 `ocean_kingdom_city.gd`).
 
-**Sea folk city third pass (2026-10-13, proposed).** The light pipes are
-removed. The city becomes two eras: the classical city preserved on the floor,
-and a modern city of air bells and hung pods risen into the water column on
-kelp-like stalks (`ocean_sea_folk_city.md` 2a and 5,
-`ocean_sea_folk_city_layout.md` 10). On approval, `SeaFolkPlan` and its
-validator gain heights, stalks, the air level and the 3D clearance checks.
+**Sea folk city third pass (2026-10-13, proposed, revised after review).**
+The light pipes are removed. The city is two eras: the classical heritage on
+the floor, and modern glass that wraps, joins and grows from it, then rises
+into the column as four trunks with landing halls, docked homes and a crown
+ring (`ocean_sea_folk_city.md` 2a and 5, `ocean_sea_folk_city_layout.md` 10).
+The floor plans are checked by `tools/sea_folk_third_pass.py` and drawn in the
+Sea Folk City Floor Plans artifact. On approval, the data replaces the second
+pass in `SeaFolkPlan` and its validator, and the 3D model is rebuilt.
 
 **Pirate ships plan (2026-10-13).** Both ships drawn at true size and
 code-ready: `tools/pirate_ships_layout.py` writes `PirateShipsPlan` (hull
