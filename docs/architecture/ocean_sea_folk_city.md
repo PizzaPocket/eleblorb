@@ -1,6 +1,8 @@
 # Ocean Kingdom: The Sea Folk City
 
-Status: concept brief, first planning pass, in review (2026-10-06). Read with
+Status: concept brief, first planning pass, in review (2026-10-06); **third
+pass, proposed 2026-10-13: two eras and a vertical city** (section 2a), which
+supersedes the seabed-bound plan where they differ. Read with
 `ocean_kingdom.md` (the kingdom overview) and the world bible's Ocean Kingdom
 entry.
 
@@ -39,10 +41,114 @@ spiral bands and frescoes of dolphins and octopus.
 
 Like the lava people, the sea folk are scientifically advanced. Their
 architecture is modern rather than ruined or ancient: continuous nacre shells,
-orichalcum structure, large curved glass, daylight piped down from the
-surface, and pressurised **air halls** in which they walk on legs.
+orichalcum structure, large curved glass, and pressurised **air halls** in
+which they walk on legs.
 
 They are a people, not gods, and nothing in their city is a temple.
+
+## 2a. Two eras, and a city in the water column (third pass, proposed)
+
+The first plans built everything on the seabed, as a land people would. The sea
+folk swim in three dimensions; nothing ties them to the floor except habit and
+history. The city now shows both: an old city on the floor and a new one
+risen into the water above it.
+
+### The classical city: the floor
+
+What the sea folk built before air halls: **Tidehall**, the **Ring Current**, the
+eight sunken **avenues**, the **school court**, the **Lamp House** and the
+**Current House**'s old family homes beside the current. It is preserved, not
+ruined: kept, cleaned and still used, the city's ceremonial ground.
+
+- **Grounded and heavy.** Masonry-like nacre shells on socketed plinths,
+  symmetrical, on the avenues' axes. Built up from the seabed, as land
+  architecture is.
+- **Atlantean and Minoan.** Plato's concentric rings and radial canals; Minoan
+  columns tapering downward with cushion capitals, light wells, spiral and wave
+  bands, frescoes of dolphins and octopus; orichalcum as *plating* on the ring
+  walls, as Plato describes, never as structure.
+- **SuperEggs at the square end.** Epsilon about 4.5 to 5.5: blocky, softened
+  masses that read as carved and stacked. Openings are tall superellipse arches
+  (exponent about 4).
+- **Lit from within.** At 72 m almost no daylight arrives. The floor lives by
+  living pearl lamps, which is why the Lamp House is one of its oldest crafts.
+
+### The modern city: the column
+
+What the sea folk build now, since the Glassworks learned to make air bells. It
+rises from the old city's rings into the water above it, between 8 m and 60 m
+over the floor.
+
+- **Hung, not built up.** Every modern structure is buoyant or hung from
+  something buoyant, and tethered down. The pattern is the kelp plant's own:
+  - a **holdfast** set into the floor;
+  - an orichalcum **stipe** (one to three cables) rising from it;
+  - a **crown float**, a sealed air bladder, at the top that holds it taut;
+  - **pods**, the wet homes and workshops, hung along the stipe at different heights.
+
+  A household's homes cluster on its own stalk, like blades on one kelp.
+- **Air bells.** The air halls are diving bells: buoyant glass domes, open
+  underneath, held down by cables. The open bottom is the moon pool. A swimmer
+  rises into it from below, and the air pressure holds the water at the pool's
+  surface. The Exchange and the guest hall hang over the civic ring at one depth,
+  **the air level**, 30 m above the floor (42 m below the surface).
+- **Why up.** Light and room. Higher water is brighter and warmer, and a family
+  can add a pod above its others without taking anyone's floor. Kaluja's
+  "Sunlight reaches us in ribbons" is literal: the higher pods catch it.
+- **SuperEggs at the round end.** Epsilon about 2 to 2.6: eggs, bells, bladders
+  and pods, glass and nacre on orichalcum ribs. Asymmetric clusters rather than
+  axes. No columns, no plinths: nothing in the column stands on anything.
+
+### How the two eras map onto each other
+
+1. **The old plan is the new city's foundation.** Every holdfast stands on a
+   line of the classical plan: on a ring or beside an avenue. Seen from the
+   air level, Plato's rings still organise everything, and the stalks rise
+   in rings over the rings.
+2. **Height is age.** The floor is the oldest; the higher the structure, the
+   newer. A visitor sinking from the surface passes from the newest city to the
+   oldest.
+3. **The column over Tidehall stays open.** Nothing modern stands within 26 m
+   of the castle's centre at any height. Tidehall's oculus looks straight up a
+   clear well of water to the lamps of the air level and the faint surface,
+   and the castle stays the brightest landmark from above.
+4. **The eras touch only at holdfasts and moon pools.** No building mixes the
+   two massings. A holdfast is the one place a modern cable meets classical
+   stone, and it is a deliberate fitting: a ring of orichalcum set into the
+   old wall's plating.
+5. **Rings echo upward.** The floor's ring path between the home terraces is
+   echoed by a ring of **lamp lines**, pearl lamps strung on cables between the
+   stalks 20 m up. These are the modern city's streets, where the floor's are
+   its avenues.
+6. **The Glassworks is the hinge.** It is the one modern building on the floor,
+   because the warm vent that heats its furnace is there. It is the first air
+   bell, socketed in the seabed before bells learned to float, and is where the
+   new era began.
+
+### Shared between the eras
+
+- **Materials:** nacre and orichalcum.
+- **Signature band:** the spiral and wave band. On the floor it is carved at
+  a shell's springing line; in the column it is an orichalcum band round a
+  bell's or pod's rim.
+- **Light:** pearl lamps.
+- **Design language:** SuperEggs and superellipse openings throughout. The eras
+  differ in epsilon, proportion and arrangement, never in vocabulary.
+
+### Physics the plan respects
+
+- **Air is buoyant,** so a bell pulls up on its cables. It needs no support
+  beneath it and must never be shown standing on legs.
+- **A moon pool's water surface sits at the depth of the bell's open rim.**
+  Two bells can share a glass tunnel only if their pools lie at the same
+  depth. Otherwise one would blow its air out through the other. So the
+  dry network lies on one level, the air level, and the Glassworks on the
+  floor is a separate bell, not joined to it.
+- **Pods are wet and near neutral,** hung from their stalk, with openings at
+  least 3 m clear. Sea folk swim in from any side; there are no stairs and no
+  doors.
+- **The hero swims.** Every place in the column is reached by swimming, as the
+  sea folk reach it. The rest point at the air level is 42 m down, not 72 m.
 
 ### Air halls and the change to legs
 
@@ -75,7 +181,7 @@ says. Every resident is renamed (section 3a).
 | **The Lamp House** | **Lunira**; **Korasi**; their daughter **Mira** (child) | Lunira grows and sings to the living pearl lamps; Korasi reads storms in them |
 | **The Garden House** | **Nesaja**; **Rodasu**; **Kasuno**; Kasuno's son **Tami** (child) | Nesaja's sea flowers; Rodasu sells Watering Cans and tends the link to the Seed of Life; Kasuno braids the kelp that grows around the homes |
 | **The Exchange** | **Maresa**; **Pelaju**; **Sujira** | Maresa keeps the trading hall and sells Nautilus Shells; Pelaju listens to the surface and deals with the island and the ships; Sujira makes scale clothing |
-| **The Reef House** | **Talisa**; **Arimu**; **Kaluja** | Talisa studies the reef's smallest life; Arimu records the night reef; Kaluja keeps the light pipes that bring daylight down |
+| **The Reef House** | **Talisa**; **Arimu**; **Kaluja** | Talisa studies the reef's smallest life; Arimu records the night reef; Kaluja rigs the stalks: she sets the holdfasts, cables and crown floats, and knows where the light falls in the column |
 | **The guest hall** | **Isaro** | keeps the guest hall, the city's inn and rest point |
 | **The Current House** | **Oruko**; **Dakuro**; **Sekira**; **Munaja** | Oruko carries messages on the ring current; Dakuro charts the deep edge; Sekira makes shell ornaments; Munaja teaches the young |
 
@@ -108,7 +214,7 @@ translated meanings: a sound palette of *a*, *i* and *u*, with *k*, *d*, *t*,
 | Sujira | scale clothier | Ondine Silvergill |
 | Talisa | reef scientist | Thalina Foamcrest |
 | Arimu | night reef recorder | Maris Coralglow |
-| Kaluja | light pipe keeper | Calypso Sunkenstar |
+| Kaluja | rigger of the stalks | Calypso Sunkenstar |
 | Oruko | courier on the Ring Current | Orin Redfin |
 | Dakuro | deep edge cartographer | Delmar Deepcurrent |
 | Sekira | shell jeweller | Selkie Seabloom |
@@ -139,27 +245,37 @@ harmony between them is the kingdom's story, as it is in the Sky Kingdom.
 - **The Kraken and Fish Goblins:** a danger Ikara and Tudaro watch. The goblins
   serve the Kraken, not the city.
 
-## 4. Settlement structure (pre-layout)
+## 4. Settlement structure
 
-The existing two-ring plan becomes Plato's concentric city:
+Third pass (section 2a). On the floor, the classical city:
 
-1. **The central mound:** the castle (Tidehall), with its open audience hall.
-2. **The civic ring:** a raised terrace around the castle with the Exchange air
-   hall, the Lamp House and the school court.
+1. **The central mound:** Tidehall, with its open audience hall, under an open
+   column of water kept clear to the surface.
+2. **The civic ring:** the Lamp House and the school court.
 3. **The Ring Current:** a channel of fast-moving water circling the civic
    ring, a real swimming lane that carries a swimmer around the city. This is
    the "copper current" Oruko raced.
-4. **The home ring:** the households on a second terrace, with braided kelp
-   around their walls.
-5. **The garden ring:** kelp gardens, sea-flower beds and the reef workshops.
-6. **Radial canals:** the existing eight luminous spokes become sunken avenues
+4. **The home terraces:** the Current House's four classical homes beside the
+   current; the rest of the terraces hold the holdfasts of the modern stalks.
+5. **The garden ring:** kelp forests and sea-flower beds, the kelp rising 20 to
+   30 m into the column.
+6. **Radial avenues:** the existing eight luminous spokes become sunken avenues
    crossing the rings, joining the edge to the castle.
-7. **The vent edge:** the Glassworks sits beside a warm vent at the city's
-   edge, the "hot spring" of Plato's account, where its air hall has heat for
-   glass.
+7. **The vent edge:** the Glassworks beside the warm vent, the "hot spring" of
+   Plato's account, the first air bell.
 
-Air halls: the Exchange (trade and the hero's meeting place), the guest hall
-and the Glassworks. Homes stay wet.
+In the column, the modern city:
+
+- **The air level**, 30 m up: the Exchange and the guest hall, air bells over
+  the civic ring, joined by a glass tunnel.
+- **Household stalks** rising from the home terraces, their pods at 8 to 34 m:
+  - the Garden House;
+  - the Exchange household;
+  - the Reef House, with its workshop pod;
+  - the Glassworks household, by the vent.
+- **The lamp lines**, a ring of pearl lamps strung between the stalks 20 m up.
+- **The Kraken lookout**, the tallest stalk, at the south edge, its watch pod
+  56 m up and 16 m below the surface, facing the Kraken's water.
 
 ### The guest hall: the city's rest point
 
@@ -174,18 +290,18 @@ through the shared transaction interface.
 
 ### Glass tunnels
 
-Compressed-air **glass tunnels** join the air halls into one dry network, so
-sea folk on legs and an unhelmeted hero can walk between them without
-entering the water.
+Compressed-air **glass tunnels** join the air bells on the air level into one
+dry network, so sea folk on legs and an unhelmeted hero can walk between them
+without entering the water. A tunnel joins only bells whose pools lie at the
+same depth (section 2a).
 
 - **Form:** a superellipse tube of curved glass on orichalcum ribs, its floor
-  flat and its walls clear, running a little above the seabed on slender
-  supports. Fish, kelp and the city's lights pass on the other side of the
+  flat and its walls clear, hung level between the bells and tethered down
+  like them. Fish, kelp and the city's lights pass on the other side of the
   glass.
-- **Routes:** the Exchange to the guest hall around the civic ring; one tunnel
-  out along a radial avenue to the Glassworks at the vent; short branches to
-  any later air hall. Tunnels cross over the Ring Current and the avenues so
-  swimmers pass beneath them.
+- **Routes:** the Exchange to the guest hall along the civic ring; short
+  branches to any later bell on the air level. The Glassworks, on the floor,
+  is not on the network.
 - **Entry:** every junction has a moon pool, so a swimmer can come up into
   the network anywhere it branches.
 - **Dimensions:** walking floor at least 3 m wide, headroom at least 3.2 m,
@@ -193,21 +309,35 @@ entering the water.
 - **Air:** the whole network is one pressurised volume, as the spaceship's
   cabin and docking neck are.
 
-## 5. Architectural charter (draft)
+## 5. Architectural charter (third pass, proposed)
 
-- **Primary, about 70 percent: Atlantean modern** (invented). Continuous
-  superellipse shells finished in nacre, orichalcum ribs and frames, large
-  curved glass, ring and crescent plans, sunken avenues.
-- **Secondary, about 25 percent: Minoan Bronze Age.** Named elements only:
-  columns tapering downward with cushion capitals, light wells, spiral and
-  wave bands, and fresco bands of dolphins and octopus inside the air halls.
-- **Accent, about 5 percent:** living pearl lamps and braided kelp.
-- **Palette:** nacre white and teal 60 percent; prism green, ocean blue and
-  violet light 30 percent; orichalcum red-gold 10 percent.
-- **Exclusions:** Greek temple orders and pediments (which belong to the Sky
-  Kingdom); Minoan horns of consecration, double axes and other sacred
-  emblems; ruins and broken columns; anything that reads as a sunken human
-  city.
+Two eras, each a closed kit, with the rule that no building mixes them
+(section 2a).
+
+| | **Classical: the floor** | **Modern: the column** |
+|---|---|---|
+| Share of the city | about 40 percent of the built mass | about 60 percent |
+| Sources | Atlantean (Plato's rings and canals) with Minoan named elements | invented, from kelp anatomy and the diving bell |
+| Massing | grounded, symmetrical, on axes; shells on socketed nacre plinths | hung and buoyant; clusters on stalks; bells open beneath |
+| SuperEgg epsilon | 4.5 to 5.5 (carved, stacked) | 2.0 to 2.6 (eggs, bells, bladders) |
+| Openings | tall superellipse arches, exponent about 4 | round and oval portholes, exponent 2 to 2.5, and wide glazed fronts |
+| Structure | the shell itself; Minoan columns tapering downward, with cushion capitals, red or ocean blue | orichalcum ribs on 3.2 m centres; cables; holdfasts; crown floats |
+| Orichalcum | plating on the ring walls and the band | structure: ribs, cables, rims |
+| Glass | small: light wells and the oculus | large curved panes between ribs |
+| Ornament | spiral and wave bands carved at the springing line; frescoes of dolphins and octopus | the spiral and wave band as an orichalcum rim; nothing else |
+| Palette | nacre white and teal; prism green crowns; column red and blue | glass, nacre and orichalcum red-gold; violet and blue lamp light |
+
+- **Shared invariants:** nacre and orichalcum; the spiral and wave band as the
+  signature motif on every building of both eras; pearl lamps (the accent, about
+  5 percent); SuperEggs and superellipses throughout.
+- **Hierarchy:** Tidehall is the polite building of the floor, the Exchange the
+  polite building of the column. The Glassworks, the hinge between them, is
+  the one landmark that breaks a rule: a modern bell grounded on the floor.
+- **Exclusions:** Greek temple orders and pediments, which belong to the Sky
+  Kingdom; Minoan horns of consecration, double axes and other sacred emblems;
+  ruins and broken columns; anything that reads as a sunken human city;
+  boxes; light pipes; anything in the column standing on legs or stilts;
+  columns in the column.
 
 ## 5a. Dress charter
 
@@ -256,7 +386,7 @@ written explicitly.
 | Kunei | man | brown, scorched at the edges | glassblower's armguards |
 | Ikara | woman | dark blue | lookout's lens on a cord |
 | Damaku | man | brown | tool belt |
-| Kaluja | woman | silver | a sliver of light-pipe glass as a pendant |
+| Kaluja | woman | silver | an orichalcum shackle pin as a pendant; a coil of line at her belt |
 | Munaja | man | dark blue | — |
 | Rodasu | woman | brown (garden) | a small watering can on her belt |
 | Isaro | woman | silver | the innkeeper's orichalcum keys |

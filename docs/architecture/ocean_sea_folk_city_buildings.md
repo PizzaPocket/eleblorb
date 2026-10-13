@@ -1,6 +1,16 @@
 # The Sea Folk City: Architecture Briefs
 
-Status: building briefs for review (2026-10-06). Read with
+Status: building briefs for review (2026-10-06). **Third pass (2026-10-13,
+proposed):** the city now has two eras, the classical floor and the modern
+column (`ocean_sea_folk_city.md` 2a and 5, `ocean_sea_folk_city_layout.md` 10).
+The two-era charter there supersedes the kit below where they differ:
+- the Tidehall, Lamp House, school court and Current House homes are classical;
+- the Exchange and guest hall become hung air bells (no plinth, an open rim
+  as the moon pool);
+- the Reef House workshop and eleven homes become pods on stalks;
+- the light pipes are removed.
+
+The new modern briefs are in section 2a. Read with
 `ocean_sea_folk_city.md` (community, culture, charter, dress) and
 `ocean_sea_folk_city_layout.md` (layout). Positions and owners come from the
 layout.
@@ -24,7 +34,7 @@ building uses Greek temple forms; those belong to the Sky Kingdom.
 | Columns | Minoan form: wider at the top than the base, with a round cushion capital; painted deep red or ocean blue; squarish SuperEgg shafts as the engine's language requires |
 | Bands | a spiral or wave band at the shell's springing line on every building, the signature motif |
 | Frescoes | dolphins, octopus, fish and sea flowers, inside air halls and the castle only |
-| Light | living pearl lamps at every door and junction; light pipes bring daylight down to the civic ring |
+| Light | living pearl lamps at every door and junction, and strung on the lamp lines in the column |
 | Palette | nacre white and teal 60 percent; prism green, ocean blue and violet light 30 percent; orichalcum 10 percent |
 
 ### Wet and dry buildings
@@ -56,7 +66,7 @@ human city; boxes.
   entrance turned to `+z`, approached up a broad ramp between two Minoan
   columns.
 - **Audience hall:** a tall wet hall with a central light well rising to a glass
-  oculus fed by a light pipe; Asaru's seat of nacre at the far end; dolphin
+  oculus open to the clear column above; Asaru's seat of nacre at the far end; dolphin
   frescoes along the walls; room enough for the Tidekeeper's challenge fight.
 - **Rooms:** Asaru's chambers behind the hall; Ikara's and Tudaro's rooms in two
   of the towers; a guard post at the entrance.
@@ -134,12 +144,6 @@ human city; boxes.
 - **Use:** where the young practise balance and swimming before the open sea;
   a few floating rings and markers.
 
-### Light pipes (Kaluja)
-
-- Four shafts 1.6 m across of orichalcum and glass rising from the civic ring to
-  floating glass collectors at the surface; the lower 6 m of each glows with
-  piped daylight.
-
 ### Reef House workshop (Talisa, Arimu, Kaluja)
 
 - A wet building 12 × 9 m in the garden ring.
@@ -167,6 +171,44 @@ Each household's homes share a type; individual homes vary within it.
 - **Variation axes:** type, the colour of its pearl lamp, the kelp on its shell,
   the tail colours of its residents echoed in a band at the door, and its trade
   at the entrance (sea flowers, shells, charts, scale cloth).
+
+## 2a. The column's kit (third pass, proposed)
+
+### Stalk
+
+- **Holdfast:** a squat orichalcum-and-nacre SuperEgg, about 3 × 1.2 × 3 m at
+  epsilon 3, its ring set into the classical floor's plating.
+- **Stipe:** one to three orichalcum cables, 0.2 m thick, with an orichalcum
+  collar at each pod's arm.
+- **Crown float:** a sealed glass-and-nacre SuperEgg bladder, 4 to 6 m long at
+  epsilon 2.2, with an orichalcum rim band and a pearl lamp at its tip. It is
+  the stalk's landmark from below.
+
+### Pod (wet home or workshop)
+
+- **Shell:** a SuperEgg, its lower half rounder than its upper (epsilon about
+  2.0 below and 2.6 above), so it hangs like a seed.
+- **Front:** a wide glazed front between orichalcum ribs, facing open water.
+- **Openings:** a swim-in opening at least 3 m clear in the underside or side.
+- **Interior:** rooms at least 4 m tall, with woven-kelp screens.
+- **Band:** the orichalcum band at the widest girth, with the household's
+  tail colour echoed in it.
+- **Hanging:** on an arm from its stalk's collar.
+
+### Air bell (the Exchange, the guest hall)
+
+- **Dome:** a glass SuperEgg cut level at its open rim (`build_clipped_part`),
+  on orichalcum ribs at 3.2 m centres.
+- **Rim:** a nacre skirt, carrying the spiral band in orichalcum.
+- **Floor:** a deck ring 0.6 m above the pool's surface round the open centre,
+  which is the moon pool.
+- **Mooring:** four cables from the skirt to holdfasts on the floor.
+- **Inside:** the second pass's rooms, counters and frescoes.
+
+### Lamp lines
+
+- Cables strung between stalks at 20 m, hung with pearl lamps every 4 m.
+- They are the column's streets, echoing the ring path on the floor beneath.
 
 ## 3. Variation matrix
 

@@ -482,6 +482,13 @@ so its rooms fit at world scale, and moved three light pipes out of the
 avenues (`ocean_sea_folk_city_layout.md` 9, with what the rebuild changes in
 `ocean_kingdom_city.gd`).
 
+**Sea folk city third pass (2026-10-13, proposed).** The light pipes are
+removed. The city becomes two eras: the classical city preserved on the floor,
+and a modern city of air bells and hung pods risen into the water column on
+kelp-like stalks (`ocean_sea_folk_city.md` 2a and 5,
+`ocean_sea_folk_city_layout.md` 10). On approval, `SeaFolkPlan` and its
+validator gain heights, stalks, the air level and the 3D clearance checks.
+
 **Pirate ships plan (2026-10-13).** Both ships drawn at true size and
 code-ready: `tools/pirate_ships_layout.py` writes `PirateShipsPlan` (hull
 shape, decks, rooms, ramps, dry volumes, crew work spots, routes and daily
@@ -514,7 +521,7 @@ Planning priorities:
   island. The sea folk city's layout is in
   `docs/architecture/ocean_sea_folk_city_layout.md` (in review): the castle
   turned to face arrivals, the rings and Ring Current, three air halls, two glass
-  tunnels, light pipes, and the existing inn rebuilt as Isaro's guest hall at
+  tunnels, and the existing inn rebuilt as Isaro's guest hall at
   25 Tokoins.
 - Review the ship design (`docs/architecture/ocean_pirate_ships_design.md`):
   the *Harbinger* as a sloop-of-war and the *Belle Fortune* as a Dutch fluyt,

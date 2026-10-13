@@ -22,7 +22,7 @@ FLAT_RADIUS = 105.0
 ## Atlantis's civic geometry. The gardens and the edge beyond are not.
 RINGS = {
     'mound': (0.0, 24.0),      # the castle, raised 2 m
-    'civic': (24.0, 46.0),     # air halls, the Lamp House, the school court, light pipes
+    'civic': (24.0, 46.0),     # air halls, the Lamp House, the school court
     'current': (46.0, 52.0),   # the Ring Current, 2 m below the civic ring, running clockwise
     'homes': (52.0, 90.0),     # two rows of homes and the ring path between them
     'gardens': (90.0, 105.0),  # kelp, sea flowers, the Reef House workshop
@@ -63,9 +63,6 @@ WET = [  # key, name, who, centre, along, across, facing bearing, ring
 ]
 CASTLE = dict(key='tidehall', name='Tidehall', who=['Tidekeeper Asaru', 'Ikara', 'Tudaro'], size=(34.0, 30.0), facing=90.0, mound=24.0)
 LOOKOUT = dict(key='lookout', name='Kraken lookout', who=['Ikara (watches)'], at=at(104.0, 112.0), size=5.0, height=14.0)
-## Light pipes stand on the civic ring between avenues, clear of every building.
-LIGHT_PIPES = [at(40.0, b) for b in (202.5, 247.5, 292.5, 337.5)]
-LIGHT_PIPE_DIAMETER = 1.6
 ## The warm vent that heats the Glassworks, at the head of the main avenue.
 VENT = at(124.0, 90.0)
 
@@ -150,9 +147,6 @@ for i, (house, typ, row, b, who) in enumerate(HOMES):
     facing = b if row == 0 else b + 180.0
     items.append(dict(key='home_%02d' % (i + 1), name='%s home' % house, kind='home', ring='homes', centre=c,
                       poly=orect(c, along, across, facing), who=who, extra=dict(type=typ, row=row, bearing=b, facing=facing % 360, household=house)))
-for i, p in enumerate(LIGHT_PIPES):
-    items.append(dict(key='light_pipe_%d' % (i + 1), name='Light pipe', kind='light pipe', ring='civic', centre=p,
-                      poly=circle(p, LIGHT_PIPE_DIAMETER / 2, 10), who=['Kaluja (keeps)'], extra={}))
 
 # ---- geometry
 def inside(pt, poly):
@@ -261,7 +255,7 @@ w_('const MAIN_AVENUE := %g' % MAIN_AVENUE)
 w_('const CLEAR := %g' % CLEAR)
 w_('const VENT := %s' % v2(VENT))
 w_('')
-w_('## Every structure: key, name, kind (air hall, wet, castle, home, light pipe),')
+w_('## Every structure: key, name, kind (air hall, wet, castle, home),')
 w_('## ring, centre, footprint polygon, who, and kind-specific details.')
 w_('const STRUCTURES := [')
 for it in items:

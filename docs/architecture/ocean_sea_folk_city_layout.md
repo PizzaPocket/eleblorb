@@ -1,7 +1,9 @@
 # The Sea Folk City: Civic Layout Plan
 
 Status: dimensioned schematic for review (2026-10-06); **second pass,
-code-ready, 2026-10-13** (section 9). Read with
+code-ready, 2026-10-13** (section 9); **third pass, proposed 2026-10-13: the
+vertical city** (section 10), which supersedes the earlier sections where they
+differ. Read with
 `ocean_sea_folk_city.md`, which owns the community, culture, air halls and
 charter. This document places them on the seabed.
 
@@ -45,7 +47,7 @@ are metres above the city floor (-72 m).
 | Ring | Radius | Contents |
 |---|---|---|
 | Central mound | 0 to 24 m | the castle (Tidehall) on a mound raised 2 m |
-| Civic ring | 24 to 46 m | the Exchange and guest hall air halls, the Lamp House, the school court, the four light pipes |
+| Civic ring | 24 to 46 m | the Exchange and guest hall air halls, the Lamp House, the school court |
 | Ring Current | 46 to 52 m | a channel 2 m below the civic ring, its water running clockwise at a strong swimming pace |
 | Home ring | 52 to 90 m | sixteen homes in two rows, at 60 m and 82 m |
 | Garden ring | 90 to 105 m | kelp gardens, sea-flower beds, the Reef House workshop |
@@ -91,7 +93,6 @@ on a short span.
 | Castle (Tidehall) | Asaru, Ikara, Tudaro | `(0, 0)` | 34 × 30 m on a 48 m mound | entrance turned to `+z`; audience hall unchanged in character |
 | Lamp House | Lunira, Korasi, Mira | `(-26, 22)` | 12 × 10 m | living pearl lamps cultivated in open trays |
 | School court | Munaja | `(-30, -18)` | 16 × 12 m open court | where the young learn balance before the open sea |
-| Light pipes | Kaluja | civic ring at 40 m, at bearings 0°, 65°, 180° and 300° (measured from `+x` toward `+z`), clear of the air halls and tunnels | 1.6 m shafts rising to floating glass collectors at the surface | daylight piped down; the collectors are visible from boats and the islands |
 | Reef House workshop | Talisa, Arimu, Kaluja | `(-70, -70)` | 12 × 9 m | specimens, night-reef records |
 | Kraken lookout | Ikara | `(-30, 100)` | slender tower 14 m tall | faces the Kraken's route |
 | Edge posts | Tudaro | the 105 m edge on each avenue | — | markers where the city ends |
@@ -150,9 +151,8 @@ audit found three faults in the first pass, now fixed:
   a ring of rooms 3.4 m deep under the shell, and between them and the 4 m
   moon pool, 4.1 m of common-room floor for the ramp out of the pool and its
   landing.
-- **Three light pipes stood in avenues** (bearings 0°, 180° and 300° were on
-  or beside them). The four pipes now stand on the civic ring between
-  avenues, at 202.5°, 247.5°, 292.5° and 337.5°, round the castle's back.
+- **Three light pipes stood in avenues.** (The light pipes were removed in
+  the third pass.)
 
 Other placements, all checked:
 - the Lamp House at bearing 112.5° and the school court at 157.5° on the civic
@@ -185,7 +185,86 @@ line.
 | eight spokes of stepping stones | eight sunken avenues, 4 m wide, lit by the stones |
 | `seafolk_village_inn` at `(24, 18)`, keeper Nerissa Stillwater | the guest hall air hall at `(32.3, 13.4)`, keeper Isaro, still 25 Tokoins |
 | prototype names | the Linear A-sounding names (`ocean_sea_folk_city.md` 3a) |
-| no Ring Current, air halls, tunnels or light pipes | all of them |
+| no Ring Current, air halls or tunnels | all of them (third pass: section 10) |
+
+## 10. Third pass: the vertical city (proposed, 2026-10-13)
+
+The user's direction: the sea folk are not bound to the seabed, and the city
+should use their three-dimensional mobility. Its architecture should merge two
+eras, the classical city preserved on the floor and the modern city of air
+bells and pods risen into the water column. All of it stays in the SuperEgg
+language. The concept is in `ocean_sea_folk_city.md` 2a; this section places
+it. Heights are metres above the city floor (−72 m); the surface is at +72.
+
+**Removed:** the four light pipes and their surface collectors. Kaluja becomes
+the rigger of the stalks.
+
+### Depth bands
+
+| Band | Height | What is there | Era |
+|---|---|---|---|
+| The floor | 0 to 20 m | Tidehall (towers to 19 m), the Ring Current, the avenues, the Lamp House, the school court, the Current House homes, the Glassworks at the vent, kelp forests rising to 30 m | classical; the Glassworks is the hinge |
+| The low column | 8 to 34 m | household stalks and their pods; the lamp-line ring at 20 m | modern |
+| The air level | 30 to 40 m | the Exchange and the guest hall, air bells with their pools at 30 m, and the glass tunnel between them | modern |
+| The high column | 40 to 64 m | crown floats; the Kraken lookout's watch pod at 56 m | modern |
+| Above | 64 to 72 m | open water to the surface | — |
+
+The open column: nothing modern stands over the mound (within 24 m of the
+centre) at any height, so Tidehall's oculus looks up a clear well of water.
+
+### Stalks
+
+Every holdfast stands on the ring path (71 m) between avenues, at bearings
+22.5° + 45° steps, except the lookout's at the edge. Pods hang 2.5 m off their
+stalk, turned to face the open side.
+
+| Stalk | Bearing, radius | Pods (height) | Crown float | Who |
+|---|---|---|---|---|
+| Garden House | 22.5°, 71 m | three double pods (10, 17, 24 m) | 38 m | Nesaja, Rodasu, Kasuno and Tami |
+| Glassworks household | 67.5°, 71 m | two workshop pods (9, 15 m) | 26 m | Kunei, Damaku |
+| Kraken lookout | 112.5°, 100 m | the watch pod (56 m), a glazed egg facing south over the Kraken's water | 64 m | Ikara |
+| Exchange household | 157.5°, 71 m | three single pods (12, 18, 25 m) | 36 m | Maresa, Pelaju, Sujira |
+| Reef House | 292.5°, 71 m | three single pods (10, 16, 22 m) and the Reef House workshop pod (30 m, 12 × 9 m) | 44 m | Talisa, Arimu, Kaluja |
+| Lamp stalks | 112.5° (71 m), 202.5°, 247.5°, 337.5° | none; they carry the lamp-line ring | 26 m | Lunira's lamps; Kaluja rigs them |
+
+Pod sizes are the second pass's home types (single 8 × 7 m, 5 m tall; double
+two eggs of 6 × 6 m; workshop a 7 × 8 m resting egg and a 6 × 7 m work egg).
+Pods on one stalk keep 3 m clear of one another vertically.
+
+### On the floor
+
+| Building | Where | Change from the second pass |
+|---|---|---|
+| Tidehall | centre | its oculus is open to the clear column above |
+| Lamp House and the Lamp House family's home | 112.5° on the civic ring and inner terrace | stay on the floor: classical, the oldest craft |
+| School court | 157.5° on the civic ring | stays: a classical colonnade |
+| Current House homes (four) | outer terrace, 193° to 257° | stay on the floor beside the current they work: the city's oldest family, in classical homes |
+| Glassworks | (0, 118) by the vent | stays; no longer joined by a tunnel |
+| Garden, Exchange, Reef and Glassworks households' homes (eleven) | — | move up into pods on their stalks |
+| Reef House workshop | — | moves up into a pod on the Reef House stalk |
+| Avenue tunnel | — | removed: the Glassworks' pool lies 27 m deeper than the air level's |
+
+### Air level
+
+- **The Exchange** at `(12.2, 31.7)` and **the guest hall** at `(32.3, 13.4)`,
+  as in the second pass, now buoyant bells with their open rims and pools at
+  30 m.
+- Each hangs on four cables to holdfasts on the civic ring floor.
+- The **civic tunnel** joins them level, at 30.6 m floor height.
+- The hero rests 42 m below the surface instead of 72 m.
+
+### What the plan file gains when this is approved
+
+`SeaFolkPlan` holds the second pass less the light pipes. On approval it gains
+a height for every structure, the stalks with their holdfasts, pods and crown
+floats, the air level, and the lamp-line ring. The validator then also
+checks:
+
+- the open column over the mound;
+- that every holdfast stands on a classical ring or beside an avenue;
+- 3 m clearance in three dimensions between pods, bells, cables and floats;
+- that tunnel-joined bells share one pool depth;
+- that nothing in the column stands on the floor except at a holdfast.
 
 ## Fixed, proposed and open
 
@@ -194,7 +273,10 @@ two-ring plan; the existing inn as the city's rest point at 25 Tokoins.
 
 **Proposed:** the castle turned to face arrivals; the ring radii; the Ring
 Current; homes moved from 49 m to 60 m; the three air halls and two tunnels;
-the light pipes with surface collectors; Isaro as the inn's renamed keeper;
+Isaro as the inn's renamed keeper;
 every footprint above.
 
-**Open:** none blocking.
+**Proposed (third pass):** the two eras and the vertical city in section 10;
+the light pipes removed.
+
+**Open:** names for the two eras, if the sea folk have them.
