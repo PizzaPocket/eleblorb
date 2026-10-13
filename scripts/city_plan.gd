@@ -68,7 +68,7 @@ const PRECINCTS := [
 ## the giant playground, which the park plan places (section 7b).
 const BUILDINGS := [
 	{"n": 1, "name": "Grand Hotel", "kind": "civic", "rect": Rect2(-483, -98, 52, 60), "height": 91.0, "form": "deco", "size": "podium 4 storeys, guest tower 25 floors (97 m)", "who": "Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work"},
-	{"n": 2, "name": "City hall", "kind": "civic", "rect": Rect2(-431, -30, 34, 60), "height": 22.0, "form": "clock", "size": "Hall of the City, council chamber and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a)", "who": "Mayor Teodora Vance, Kenji Mori (clerk)"},
+	{"n": 2, "name": "City hall", "kind": "civic", "rect": Rect2(-431, -30, 34, 60), "height": 22.0, "form": "clock", "size": "exterior only: portico, balcony, side wings and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a)", "who": "Mayor Teodora Vance, Kenji Mori (clerk)"},
 	{"n": 3, "name": "Library", "kind": "civic", "rect": Rect2(-686, -92, 45, 62), "height": 22.0, "form": "block", "size": "art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)", "who": "Ada Fong, Nia Calder, Benji Okoro"},
 	{"n": 4, "name": "Natural history museum", "kind": "civic", "rect": Rect2(-637, 62, 62, 38), "height": 16.0, "form": "block", "size": "3 storeys, top-lit hall", "who": "Dr. Imani Osei (curator)"},
 	{"n": 5, "name": "Moonlight Cinema", "kind": "civic", "rect": Rect2(-730, 6, 30, 28), "height": 9.0, "form": "block", "size": "2 storeys, built later into the old town; flat above", "who": "Leon Duarte (lives above)"},
@@ -83,12 +83,12 @@ const BUILDINGS := [
 	{"n": 14, "name": "North tower", "kind": "tower", "rect": Rect2(-483, -142, 40, 40), "height": 175.0, "form": "capsule", "size": "about 45 storeys, 175 m, on a podium", "who": "start-up floors (Theo Park)"},
 	{"n": 15, "name": "South tower", "kind": "tower", "rect": Rect2(-483, 102, 40, 40), "height": 150.0, "form": "dune", "size": "about 40 storeys, 150 m, on a podium", "who": "flats over offices; Dr. Vera Kask"},
 	{"n": 16, "name": "BLOCK", "kind": "civic", "rect": Rect2(-431, 38, 38, 42), "height": 22.0, "form": "block", "size": "6 storeys, research labs round a court", "who": "Dr. Vera Kask (director)"},
-	{"n": 17, "name": "Block 1", "kind": "estate", "rect": Rect2(-679, -151, 22, 22), "height": 104.0, "form": "block", "size": "point block, 32 storeys, west precinct", "who": "Tomas Wren"},
-	{"n": 18, "name": "Block 2", "kind": "estate", "rect": Rect2(-541, -189, 22, 22), "height": 98.0, "form": "block", "size": "point block, 30 storeys, east precinct", "who": "Siti Rahman"},
-	{"n": 19, "name": "Block 3", "kind": "estate", "rect": Rect2(-510, -84, 22, 22), "height": 117.0, "form": "block", "size": "point block, 36 storeys, on the Park Ring", "who": "Juno Rell (20th floor)"},
-	{"n": 20, "name": "Block 4", "kind": "estate", "rect": Rect2(-631, -125, 22, 22), "height": 130.0, "form": "block", "size": "twin point block, 40 storeys; sky bridge and sky garden at the 26th floor", "who": "homes (no one the hero meets)"},
-	{"n": 21, "name": "Block 5", "kind": "estate", "rect": Rect2(-631, -171, 22, 22), "height": 130.0, "form": "block", "size": "twin point block, 40 storeys", "who": "Dr. Imani Osei and Kofi"},
-	{"n": 22, "name": "Block 6", "kind": "estate", "rect": Rect2(-637, -76, 54, 14), "height": 46.0, "form": "block", "size": "slab block, 14 storeys, shops in its void deck on the Park Ring", "who": "homes (no one the hero meets)"},
+	{"n": 17, "name": "Block 1", "kind": "estate", "rect": Rect2(-684, -150, 14, 46), "height": 91.0, "form": "block", "size": "slab block, 28 storeys, west side of the west court", "who": "Tomas Wren"},
+	{"n": 18, "name": "Block 2", "kind": "estate", "rect": Rect2(-550, -186, 44, 22), "height": 98.0, "form": "block", "size": "slab block, 30 storeys, north side of the east court", "who": "Siti Rahman"},
+	{"n": 19, "name": "Block 3", "kind": "estate", "rect": Rect2(-512, -94, 25, 32), "height": 117.0, "form": "block", "size": "broad point block, 36 storeys, on the Park Ring", "who": "Juno Rell (20th floor)"},
+	{"n": 20, "name": "Block 4", "kind": "estate", "rect": Rect2(-658, -124, 26, 22), "height": 130.0, "form": "block", "size": "twin broad point block, 40 storeys, on Library Lane; sky bridge and sky garden at the 26th floor", "who": "homes (no one the hero meets)"},
+	{"n": 21, "name": "Block 5", "kind": "estate", "rect": Rect2(-616, -124, 26, 22), "height": 130.0, "form": "block", "size": "twin broad point block, 40 storeys, on Library Lane", "who": "Dr. Imani Osei and Kofi"},
+	{"n": 22, "name": "Block 6", "kind": "estate", "rect": Rect2(-635, -78, 67, 16), "height": 46.0, "form": "block", "size": "slab block, 14 storeys, shops in its void deck on the Park Ring", "who": "homes (no one the hero meets)"},
 	{"n": 23, "name": "Hawker centre", "kind": "civic", "rect": Rect2(-554, -82, 38, 20), "height": 6.0, "form": "block", "size": "1 storey, open-sided, on the Park Ring and Estate Square", "who": "Siti's laksa stall"},
 	{"n": 24, "name": "Garden Row", "kind": "home", "rect": Rect2(-660, 40, 23, 18), "height": 11.0, "form": "block", "size": "3 townhouses, 3 storeys, facing the Park Ring", "who": "Teodora Vance; Ada Fong and Sora Ishida; Priya Raman"},
 	{"n": 25, "name": "Sol's café", "kind": "shop", "rect": Rect2(-750, 34, 16, 10), "height": 17.0, "form": "block", "size": "old tower house, 5 storeys; flat above", "who": "Sol Brant"},
@@ -111,10 +111,11 @@ const BUILDINGS := [
 	{"n": 42, "name": "Water works", "kind": "works", "rect": Rect2(-700, -226, 20, 14), "height": 6.0, "form": "block", "size": "pump house and keeper's house", "who": "Rafael Ortiz"},
 	{"n": 43, "name": "Water tower", "kind": "works", "rect": Rect2(-722, -226, 10, 10), "height": 35.0, "form": "block", "size": "35 m", "who": ""},
 	{"n": 44, "name": "Fish tanks", "kind": "works", "rect": Rect2(-676, -206, 20, 16), "height": 3.0, "form": "block", "size": "covered tanks", "who": ""},
-	{"n": 49, "name": "Block 7", "kind": "estate", "rect": Rect2(-580, -150, 14, 50), "height": 46.0, "form": "block", "size": "slab block, 14 storeys, shops in its void deck on North Street", "who": "homes (no one the hero meets)"},
-	{"n": 50, "name": "Block 8", "kind": "estate", "rect": Rect2(-509, -146, 22, 22), "height": 110.0, "form": "block", "size": "point block, 34 storeys, east precinct", "who": "homes (no one the hero meets)"},
+	{"n": 49, "name": "Block 7", "kind": "estate", "rect": Rect2(-580, -176, 14, 74), "height": 52.0, "form": "block", "size": "slab block, 16 storeys, shops in its void deck on North Street", "who": "homes (no one the hero meets)"},
+	{"n": 50, "name": "Block 8", "kind": "estate", "rect": Rect2(-508, -150, 21, 44), "height": 110.0, "form": "block", "size": "slab block, 34 storeys, east side of the east court", "who": "homes (no one the hero meets)"},
 	{"n": 51, "name": "Neighbourhood centre", "kind": "civic", "rect": Rect2(-554, -150, 38, 32), "height": 8.0, "form": "block", "size": "2 storeys: minimart, kindergarten, community club, roof garden", "who": "Juno Rell (Housing Board office)"},
 	{"n": 52, "name": "Reese–Miller house", "kind": "home", "rect": Rect2(-704, -40, 10, 16), "height": 23.0, "form": "block", "size": "old tower house, 7 storeys; wind tower and roof terrace", "who": "Elizabeth Reese, Dan Miller and Jammer (away at the farm)"},
+	{"n": 53, "name": "Block 9", "kind": "estate", "rect": Rect2(-656, -160, 62, 16), "height": 72.0, "form": "block", "size": "slab block, 22 storeys, north side of the west court", "who": "homes (no one the hero meets)"},
 ]
 
 ## Every ordinary building, one per lot: [rect, storeys, block type].

@@ -799,12 +799,13 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
 - **The North Estate** (north; renamed from Parkside Estate, user) is the
   public housing, planned the way Singapore's estates are (user): as
   **precincts**, not as lots. North Street divides it into a west and an
-  east precinct, each a single site with no private lots in it.
-  - **Blocks stand free in shared gardens.** Point blocks of 30 to 40
-    storeys stand well apart round landscaped courts, so every flat has
-    light, air and a view: lawns and shade trees on reclaimed water, a
-    playground and a fitness corner in each precinct, chess pavilions, and a
-    community garden. This open ground is designed and used, not left over.
+  east precinct, each a single site with no private lots in it. Section 7d
+  has the full plan.
+  - **Broad blocks, close together, round a court** (user, 2026-10-13).
+    Each precinct is a ring of broad slab and point blocks, 10 to 20 m
+    apart, enclosing a shared court, after the precinct plans of
+    Singapore's 1980s estates and the linked blocks of Pinnacle@Duxton.
+    The blocks form the precinct's walls; the court is its living room.
   - **Slab blocks hold the street edges.** Block 6 lines the Park Ring and
     Block 7 lines North Street, with shops in their void decks, so the
     streets keep a built frontage.
@@ -816,9 +817,9 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     hawker centre (Siti's stall) on its south side, facing the park, and the
     centre building on its north (minimart, kindergarten, community club,
     the Housing Board office, a roof garden). There is no car park.
-  - **The twins**, Blocks 4 and 5, stand on either side of the west
-    precinct's court, joined by a sky bridge and sky garden at the 26th
-    floor.
+  - **The twins**, Blocks 4 and 5, stand side by side on Library Lane,
+    joined by a sky bridge and sky garden at the 26th floor over the gap
+    between them, which is the west court's gate.
 
   The distances between blocks are compressed for the game; real estates
   set facing blocks further apart. The Housing Board (Juno) runs the estate.
@@ -1063,6 +1064,87 @@ gaps is the tallest; the screened glass tower, the plug-in capsule tower and
 the dune-balconied flats step down around it; the old copper-crowned hotel
 stands in front, facing the park.
 
+### 7d. The North Estate: precinct plan (proposed, 2026-10-13)
+
+**The direction (user, 2026-10-13):** the blocks are broader and closer
+together. The first plan stood slim 22 m point blocks well apart in open
+gardens. It read as scattered towers in leftover ground, unlike the dense
+city round it.
+
+**The model: the precinct round a court.** From the late 1970s Singapore's
+Housing Board stopped lining blocks up in parallel rows and grouped them
+into **precincts**: six to eight blocks round a shared court, small enough
+for neighbours to know each other, each with its own playground, pavilion
+and void decks (Tampines, and the later precincts of Toa Payoh and Ang Mo
+Kio). Pinnacle@Duxton (2009) adds the second idea: broad blocks linked by
+sky bridges into one building. The North Estate takes both. Each precinct
+is **one near-continuous wall of broad blocks round a court**, with gaps at
+the corners for light, wind and the linkways.
+
+**Why broad and close suits Moy:**
+- It matches the city: Old Moy's walls and downtown's mid-rise mass are
+  continuous, and now the estate is too.
+- A broad block puts many flats on each floor along an open corridor
+  (laundry poles out of every window), so fewer, broader blocks house the
+  same people.
+- The gaps between blocks, 10 to 20 m, are **swing gaps**: a Leaf Hat rope
+  (12 to 52 m) spans them, so the courts are walls to swing between,
+  corridor rail to corridor rail. The old gaps of 30 to 40 m were too wide
+  to play.
+- Closeness is shade: a desert court between tall walls is in shadow most
+  of the day.
+
+**The west precinct** (west of North Street, north of Library Lane):
+
+| No. | Block | Footprint | Height | Place in the ring |
+|---|---|---|---|---|
+| 17 | Block 1 | 14 × 46 m | slab, 28 storeys | the west wall, its back to Arcade Street; Tomas Wren |
+| 20 | Block 4 | 26 × 22 m | broad point block, 40 storeys | the twins: the south wall, on Library Lane |
+| 21 | Block 5 | 26 × 22 m | broad point block, 40 storeys | the twins; Dr. Imani Osei and Kofi |
+| 53 | Block 9 | 62 × 16 m | slab, 22 storeys | the north wall, its back to the community garden and the Rim Walk |
+| 49 | Block 7 | 14 × 74 m | slab, 16 storeys | the east wall, shops in its void deck on North Street |
+| 22 | Block 6 | 67 × 16 m | slab, 14 storeys | outside the ring, south of Library Lane, shops in its void deck on the Park Ring |
+
+- **The west court**, about 90 × 20 m between the blocks, opens south
+  through the 16 m gap between the twins onto Library Lane, facing the
+  library. In it: the precinct playground, a chess pavilion, shade trees on
+  reclaimed water, and the fitness corner.
+- **The twins' sky bridge and sky garden** span that gap at the 26th
+  floor, so the court's gate is a bridge 85 m up.
+- **Behind Block 9**, the strip to the Rim Walk is the **community
+  garden**, residents' plots on reclaimed water.
+- Block 6 keeps a 14 m garden on its north side, along Library Lane.
+
+**The east precinct** (east of North Street, round Estate Square):
+
+| No. | Block | Footprint | Height | Place in the ring |
+|---|---|---|---|---|
+| 19 | Block 3 | 25 × 32 m | broad point block, 36 storeys | the south corner, on the Park Ring; Juno Rell, 20th floor |
+| 50 | Block 8 | 21 × 44 m | slab, 34 storeys | the east wall, on Estate Lane |
+| 18 | Block 2 | 44 × 22 m | slab, 30 storeys | the north wall, toward the Rim Walk; Siti Rahman |
+| 51 | Neighbourhood centre | 38 × 32 m | 2 storeys, roof garden | the west side, on Estate Square |
+| 23 | Hawker centre | 38 × 20 m | 1 storey, open-sided | on the Park Ring and Estate Square |
+
+- **The east court**, about 60 × 14 m, lies between Block 2 on the north
+  and the neighbourhood centre and Block 8 on the south, overlooked by the
+  centre's roof garden. The second playground and chess pavilion are here.
+  An 8 m linkway passage between the centre and Block 8 joins it to Estate
+  Square.
+- Estate Square is the precinct's front; Block 3 and Block 8 stand 12 m
+  apart on its east side.
+
+**Spacing.** Blocks stand 10 to 20 m apart, the twins 16 m. Flats face out
+of the ring, over the city, the park or the desert, and the open corridors
+face the court, so no window looks straight into another across 10 m.
+
+**Linkways.** A covered linkway runs round the inside of each ring from void
+deck to void deck, and out through the gaps to North Street, Estate Square
+and the Deck, so no one crosses the estate in the sun.
+
+**Play.** Swing corridor rail to corridor rail across the courts. The sky
+bridge is a realised route between the twins. The linkway roofs, 3 m up,
+are a low run round each court, within a blorb bounce of the ground.
+
 ### The plan file
 
 The layout above is code-ready (2026-10-12): `scripts/city_plan.gd`
@@ -1086,13 +1168,14 @@ plan before anything is built, and runs in the pre-push hook
 ### Building schedule (proposed, 2026-10-12)
 
 Every building in Moy is planned (user). The plan in the visualization draws
-each one: about 190 ordinary buildings and the 52 numbered buildings
+each one: about 190 ordinary buildings and the 53 numbered buildings
 below.
 - **Old Moy and the market lanes:** street buildings, one per lot, 6 to
   10 m of frontage by about 15 m deep, 4 to 9 storeys, homes over shops.
 - **Downtown:** mid-rise blocks of 10 to 22 storeys on 20 to 34 m
   frontages, round the towers.
-- **The North Estate:** no lots; its blocks stand in precinct gardens.
+- **The North Estate:** no lots; broad blocks stand in a ring round each
+  precinct's court (7d).
 
 **Every building has a street face** (user). Each block is filled from
 its street edges inward, so every building fronts a street, lane, square
@@ -1118,7 +1201,7 @@ round the park and on Civic Plaza.
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
 | 1 | Grand Hotel | 52 × 60 m | podium of 4 levels round a 20 m atrium; guest tower of 21 floors to a copper crown, about 100 m (section 8) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
-| 2 | City hall | 34 × 60 m | Hall of the City, council chamber and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a) | Mayor Teodora Vance, Kenji Mori (clerk) |
+| 2 | City hall | 34 × 60 m | exterior only: portico, balcony, side wings and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a) | Mayor Teodora Vance, Kenji Mori (clerk) |
 | 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, twisting, with three wind gaps (7c) | the Windworks (headquarters, observation deck) |
 | 13 | Glass tower | 40 × 40 m | about 45 storeys, 180 m, in moving screens pierced with the house marks (7c) | Raman & Reese (Elizabeth, Priya, Venn); Tanglewire (Dan) |
 | 14 | North tower | 40 × 40 m | about 45 storeys, 175 m, plug-in capsule offices (7c) | start-up floors (Theo Park) |
@@ -1129,14 +1212,16 @@ round the park and on Civic Plaza.
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 18 | Block 2 | 22 × 22 m | point block, 30 storeys, east precinct | Siti Rahman |
-| 19 | Block 3 | 22 × 22 m | point block, 36 storeys, on the Park Ring | Juno Rell (20th floor) |
-| 20 | Block 4 | 22 × 22 m | twin point block, 40 storeys; sky bridge and sky garden at the 26th floor | homes (no one the hero meets) |
-| 21 | Block 5 | 22 × 22 m | twin point block, 40 storeys | Dr. Imani Osei and Kofi |
-| 22 | Block 6 | 54 × 14 m | slab block, 14 storeys, shops in its void deck on the Park Ring | homes (no one the hero meets) |
+| 17 | Block 1 | 14 × 46 m | slab block, 28 storeys, west side of the west court | Tomas Wren |
+| 18 | Block 2 | 44 × 22 m | slab block, 30 storeys, north side of the east court | Siti Rahman |
+| 19 | Block 3 | 25 × 32 m | broad point block, 36 storeys, on the Park Ring | Juno Rell (20th floor) |
+| 20 | Block 4 | 26 × 22 m | twin broad point block, 40 storeys, on Library Lane; sky bridge and sky garden at the 26th floor | homes (no one the hero meets) |
+| 21 | Block 5 | 26 × 22 m | twin broad point block, 40 storeys, on Library Lane | Dr. Imani Osei and Kofi |
+| 22 | Block 6 | 67 × 16 m | slab block, 14 storeys, shops in its void deck on the Park Ring | homes (no one the hero meets) |
 | 23 | Hawker centre | 38 × 20 m | 1 storey, open-sided, on the Park Ring and Estate Square | Siti's laksa stall |
-| 49 | Block 7 | 14 × 50 m | slab block, 14 storeys, shops in its void deck on North Street | homes (no one the hero meets) |
-| 50 | Block 8 | 22 × 22 m | point block, 34 storeys, east precinct | homes (no one the hero meets) |
+| 49 | Block 7 | 14 × 74 m | slab block, 16 storeys, shops in its void deck on North Street | homes (no one the hero meets) |
+| 50 | Block 8 | 21 × 44 m | slab block, 34 storeys, east side of the east court | homes (no one the hero meets) |
+| 53 | Block 9 | 62 × 16 m | slab block, 22 storeys, north side of the west court | homes (no one the hero meets) |
 | 51 | Neighbourhood centre | 38 × 32 m | 2 storeys: minimart, kindergarten, community club, roof garden | Juno Rell (Housing Board office) |
 
 **Old Moy**
@@ -1452,80 +1537,142 @@ The head of Civic Plaza: 34 m (east–west) × 60 m (north–south).
 - **The Deck** runs along Meridian North at +6.5 m; city hall's north door
   meets it.
 
-### 8a.3 Program and stacking
+**The hero never goes inside** (user, 2026-10-13). City hall is built as an
+exterior only: a landmark, a climb, and the face of the city's government
+on its main square. Its doors stay shut. Everything below is designed so
+the outside tells the story of the rooms behind it without them being
+built.
 
-| Level | Height | Contents |
-|---|---|---|
-| **Strongroom** | −4.5 m to 0 | The records: registers of births, marriages and deaths, the deeds of homes, and the original **register of house marks**; cool, dry, fireproof, behind a steel door, reached only by Kenji's ramp |
-| **Ground** | 0 to +6.5 m | The **portico** on the plaza; the entrance hall; the **Hall of the City** (below); the registry counter (north side); the **marriage room** (south side); washrooms; the staff door and the clock tower's base on Clock Street (east) |
-| **The Hall of the City** | 0 to +14 m | A great covered courtyard, about 16 × 30 m, after Stockholm's Blue Hall: arcades round the ground floor, a gallery round it at +6.5 m, a louvred clerestory roof. The city's public room: open all day, used for elections, exhibitions, the annual chandelier-lowering supper and anything else the city gathers for. One wall is the **wall of house marks**, a bronze plaque for every registered sign in Moy |
-| **First floor** | +6.5 m, the Deck's level | The gallery round the hall; the **mayor's office** over the portico, its window on the plaza and the park; committee rooms; the Deck door (north face) |
-| **The council chamber** | +11 to +20 m, the west front | Over the mayor's office and the portico: a double-height chamber about 10 × 30 m, after Stockholm's Golden Hall, walled in **gold mosaic** of the city's story in pictures (the first wells, the tower houses, the wind towers, the Windworks, the Blackout); the council's horseshoe of seats; a public gallery; tall doors onto the **balcony** over the portico, on the civic axis |
-| **Roof** | +22 m | A flat roof behind a plain parapet |
-| **The clock tower** | to +45 m | Rises from the east (Clock Street) face, 8 × 8 m: four clock faces at about +34 m, the belfry above with its bell, and a lantern cap lit at night |
+### 8a.3 Behind the facade (not built)
 
-**Lines that stack.** Across the 34 m depth: the west range 10 m (the
-portico 4 m and the entrance hall and mayor's office 6 m, with the chamber
-above both), the hall 16 m, and the east range 8 m with the clock tower.
-Along the 60 m front: the north range 15 m (the registry and the Deck door),
-the hall 30 m, the south range 15 m (the marriage room). The Hall of the
-City's void runs from the ground to its roof at +14 m, bounded by the arcades' piers on every level. The
-council chamber sits on the west range, outside the void, over the mayor's
-office and the portico's back wall. The clock tower stands on its own
-walls from the strongroom to the bell. Its shaft holds the lift and the
-escape ramp (the world's ramp rule) and the clock's weights.
+What the elevations express, west to east across the 34 m depth:
+- **the west range**, 10 m deep: the portico and entrance hall on the
+  ground floor, the mayor's office above them, and the **council chamber**
+  above that, from +11 to +20 m, walled in gold mosaic of the city's story
+  (after Stockholm's Golden Hall), opening onto the balcony;
+- **the Hall of the City**, 16 × 30 m, the city's covered public room
+  (after Stockholm's Blue Hall), with the wall of house marks; its roof is
+  the louvred clerestory seen above the side ranges;
+- **the east range**, 8 m deep on Clock Street, with the clock tower;
+- **the north and south ranges**, 15 m each along the front: the registry
+  (north, with the Deck door) and the marriage room (south);
+- **the strongroom** below ground, holding the registers.
 
-**Circulation:**
-- **Citizens:** plaza → portico → entrance hall → the Hall of the City →
-  the counter, the marriage room, or the ramp to the gallery and the
-  council chamber's public gallery.
-- **From the Deck:** the north door at +6.5 m → the gallery.
-- **Staff:** Clock Street → staff door → the tower's lift.
-- **Records:** Kenji's ramp from behind the counter to the strongroom.
+None of these rooms is built. Their story reaches the player through the
+exterior, the people on the plaza, and the lore (the register of house
+marks is Kenji's; Zara registers each new sign with him).
 
-### 8a.4 Facade
+### 8a.4 Massing
 
-| Element | Term | Tradition |
-|---|---|---|
-| Massing | interlocking horizontal blocks, the tower the one vertical | Dudok |
-| Walls | pale limestone, matching the library and the hotel | the boom's civic set |
-| Front | a **portico** of six square stone piers, the full height of the ground floor, on the axis | civic dignity |
-| Balcony | the council chamber's **balcony** over the portico, with a bronze rail | the ayuntamiento |
-| Windows | long horizontal bands on the ranges; tall narrow ones lighting the chamber | Dudok; art deco |
-| Tower | plain stone shaft, the clock faces in bronze rings, the belfry open on four sides, the lantern cap | Dudok's tower |
-| Signature motif | the house marks, in the bronze of the balcony rail | the city's signature |
-| The sign | a picture of the clock tower in bronze by the door, no lettering | Moy's picture signs |
+Interlocking horizontal masses with one vertical, after Dudok:
 
-**Palette:** limestone 60 %; bronze and gold 30 %; the mosaic's colours and
-the lantern's light 10 %.
+| Mass | Plan (west to east, north to south) | Height | Reads as |
+|---|---|---|---|
+| **The front block** | the west range, the middle 30 m of the front | +22 m to its parapet | the council chamber over the portico: the tallest of the low masses, on the civic axis |
+| **The side ranges** | north and south, 15 m of front each, the full depth less the east range | +14 m | two long low wings with window bands, stepping down either side of the front |
+| **The clerestory** | the hall, 16 × 30 m, behind the front block | +16.5 m | a long louvred lantern seen over the side ranges from Meridian North and South |
+| **The east range** | the full 60 m on Clock Street, 8 m deep | +18 m | the back wall, plain, the tower rising from its middle |
+| **The clock tower** | 8 × 8 m, middle of the east range | shaft to +42 m, lantern to +45 m | the one vertical: seen over the front block from the plaza, closing Meridian Avenue from the east |
 
-### 8a.5 Heat, air and washrooms
+From the plaza the composition steps: the wings at 14 m, the front block at
+22 m, the clock rising behind it to 45 m.
 
-- The **portico** and the deep window reveals shade the glass.
-- The Hall of the City cools itself: warm air leaves through its louvred
-  clerestory, drawing air in through the shaded portico.
-- Modern air conditioning in the offices and the chamber.
-- **Washrooms** (Moy is modern) off the entrance hall and the gallery, with
-  flush toilets and basins, to the city sewer.
+### 8a.5 Facades
+
+**West front, on Civic Plaza (the civic axis):**
+- **Steps:** three broad steps, 1.2 m in all, the full 30 m of the front
+  block, where people sit in the evening; a ramp at each end (the world's
+  ramp rule).
+- **The portico:** six square limestone piers, 1.4 m square, 6.5 m
+  tall and about 4 m apart, under an entablature to +8.8 m; the portico
+  is 4 m deep and carries the balcony. Behind it, three pairs of tall
+  **bronze doors**, shut, their panels cast with house marks; deep shadow
+  and warm light round their edges.
+- **The balcony:** at +11 m across the middle 18 m of the front block,
+  with a bronze rail whose balusters are the house marks. Three tall doors
+  open onto it from the chamber, their glass glowing gold.
+- **The chamber windows:** five tall narrow windows, +11 to +20 m, between
+  plain piers, gold-lit at night: the mosaic glimpsed, not shown.
+- **The parapet:** a plain limestone band at +22 m with a thin bronze
+  coping; no ornament on the skyline but the tower.
+- **The sign:** a picture of the clock tower cast in bronze beside the
+  middle doors, no lettering.
+
+**North and south faces (Meridian North and South):**
+- Two long horizontal **window bands**, one per storey (0 to 6.5 m and 6.5
+  to 14 m), in bronze frames, Dudok's signature, with a deep flat stone
+  canopy at +6.5 m.
+- On the north face, the **Deck door**: a bronze-framed opening at +6.5 m
+  where the Deck arrives, under the canopy (shut, like the rest).
+- Above the wings, the clerestory's **louvres**: tall bronze blades
+  between stone fins, angled to throw the hall's warm air out.
+
+**East face, on Clock Street:** the plain back wall of the east range,
+with narrow vertical windows and the staff door. The tower stands proud of
+it by 1 m, its base on Clock Street at the end of Meridian Avenue, so a
+walker coming up the avenue from the Rim Walk sees the tower grow for
+350 m.
+
+**The clock tower:**
+- A plain limestone shaft, its corners set back in small steps (Dudok), a
+  thin vertical slit of windows lighting the stair-ramp up each face.
+- **Four clock faces**, 5 m across, at +34 m: bronze rings and hands on a
+  pale ground, lit from behind at night. They keep the real game time.
+- **The belfry**, +37 to +42 m, open on four sides between corner piers, the
+  bell visible.
+- **The lantern**, a stepped stone cap to +45 m with a lit glass light: the
+  city's night landmark from the park and the Deck.
+- The bell strikes the hours (audio), the one public clock Moy has.
+
+**Materials and palette:** pale limestone 60 % (the same stone as the
+library and the hotel); bronze and gold 30 % (doors, frames, rail, clock
+rings, louvres); the gold glow of the chamber and the lantern's light 10 %.
+
+**At night:** the chamber's windows and balcony doors glow gold, the window
+bands warm white, the clock faces pale, the lantern bright. Lit windows are
+emissive panels; no room is built behind them.
 
 ### 8a.6 Play
 
-- **The clock tower** is a landmark climb: the piers of the belfry, the
-  clock faces' bronze rings, and the lantern at +45 m, a swing anchor over
-  Civic Plaza and Meridian Avenue.
-- **The portico's piers and the balcony** are the way up the front, onto
-  the roof.
-- **The Hall of the City's arcades** carry a gallery the hero can reach from
-  the arcade tops.
+The outside is a climb from the plaza to the top of the city's clock:
+- **Onto the portico:** its roof, the entablature over the piers at
+  +8.8 m, is the first landing: a super jump from the steps, or along the
+  wings' canopies (+6.5 m, reached from the Deck) and a blorb bounce up.
+- **Portico to balcony:** the balcony floor at +11 m is one more bounce.
+- **Balcony to roof:** the chamber's piers carry stone bands every 2.4 m
+  (+13.4, +15.8, +18.2, +20.6), each within a blorb bounce, to the parapet
+  at +22 m.
+- **The wings:** the side ranges' window-band canopies at +6.5 m are ledges
+  the full 60 m of each side, reachable from the Deck on the north; their
+  roofs at +14 m are the way round to the clerestory and the back.
+- **Up the tower:** from the east range's roof (+18), the tower's stepped
+  corners carry stone bands every 2.4 m (within a blorb bounce) to the
+  clock at +34 m. Stand on the hands' axle boss; climb into the open
+  belfry at +37; the lantern's cap at +45 m is the top.
+- **The lantern as anchor:** a Leaf Hat swing anchor 45 m up over Civic
+  Plaza, Clock Street and Meridian Avenue, and the high point from which
+  the swing across the plaza to the hotel and the Windspire's podium
+  begins.
 
-### 8a.7 Realised (fidelity A)
+**Collision:** the whole massing is solid (`CollisionPolicy` blocking);
+the steps, pier tops, entablature, balcony and its rail, parapets, canopies,
+roofs, tower bands, clock bosses and belfry floor are parkour landings; the
+louvre blades, clock hands, bell and lantern glass are decorative on solid
+backing. The doors are part of the solid wall.
 
-- **Built inside:** the portico, the entrance hall, the Hall of the City
-  with its arcades, gallery and wall of house marks, Kenji's registry
-  counter, and the council chamber with its balcony.
-- **Faux and solid:** the mayor's office (Teodora meets the hero in the
-  Hall or the chamber), the marriage room, the committee rooms and the
-  strongroom.
+### 8a.7 Realised: the exterior only
+
+- **Built:** the full exterior at street fidelity: the steps, portico,
+  bronze doors, balcony, chamber windows, window bands, canopies, the Deck
+  door, the clerestory, the east range, and the clock tower with working
+  clock faces, the belfry with its bell, and the lit lantern. Every roof
+  and ledge on the climb is walkable.
+- **Not built:** every room. The doors stay shut; the windows are lit
+  panels.
+- **People:** Teodora is met on the portico steps on weekday mornings (the
+  mayor's door is open, in the city's phrase, but she holds it on the
+  steps); Kenji crosses the plaza to the tea house at noon; on council
+  evenings the plaza fills to hear the meeting from the balcony.
 
 ## 9. The library: building brief (proposed, 2026-10-13)
 
@@ -1697,8 +1844,8 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium (with its mezzanine gallery) and floor 20 with the party's suite; the library's welcome hall, Great Hall and galleries, children's library and heritage room (section 9.8); city hall's Hall of the City and council chamber (section 8a.7); city hall's chamber; the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
-| **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium (with its mezzanine gallery) and floor 20 with the party's suite; the library's welcome hall, Great Hall and galleries, children's library and heritage room (section 9.8); the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
+| **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings; city hall, exterior only, its doors shut (section 8a.7) |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 
 **Windows that look like rooms:** an "interior mapping" shader draws a room
@@ -1737,7 +1884,8 @@ lit crowns.
   has a street face; downtown is filled with mid-rise blocks round the
   towers; green on the plan means gardens only (user).
 - The North Estate is planned as precincts, the way Singapore's estates
-  are: blocks free in shared gardens, not wedged among lots. Skyscrapers
+  are, not wedged among lots; its blocks are broad and close together round
+  each precinct's court (user, 2026-10-13). Skyscrapers
   stand on full-size blocks at the centre, not squeezed onto the rim. City
   hall and the hotel are not a symmetrical pair: city hall heads Civic
   Plaza, and the private hotel takes a side (user).

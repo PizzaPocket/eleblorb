@@ -56,7 +56,7 @@ B=[]
 def b(n,name,r,kind,h,who=''): B.append(dict(n=n,name=name,r=r,kind=kind,h=h,who=who))
 NB=lambda: 'homes (no one the hero meets)'
 b(1,'Grand Hotel',(-483,-98,-431,-38),'civic','podium 4 storeys, guest tower 25 floors (97 m)','Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work')
-b(2,'City hall',(-431,-30,-397,30),'civic','Hall of the City, council chamber and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a)','Mayor Teodora Vance, Kenji Mori (clerk)')
+b(2,'City hall',(-431,-30,-397,30),'civic','exterior only: portico, balcony, side wings and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a)','Mayor Teodora Vance, Kenji Mori (clerk)')
 b(3,'Library',(-686,-92,-641,-30),'civic','art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)','Ada Fong, Nia Calder, Benji Okoro')
 b(4,'Natural history museum',(-637,62,-575,100),'civic','3 storeys, top-lit hall','Dr. Imani Osei (curator)')
 b(5,'Moonlight Cinema',(-730,6,-700,34),'civic','2 storeys, built later into the old town; flat above','Leon Duarte (lives above)')
@@ -71,12 +71,12 @@ b(13,'Glass tower',(-483,38,-443,78),'tower','about 45 storeys, 180 m, on a podi
 b(14,'North tower',(-483,-142,-443,-102),'tower','about 45 storeys, 175 m, on a podium','start-up floors (Theo Park)')
 b(15,'South tower',(-483,102,-443,142),'tower','about 40 storeys, 150 m, on a podium','flats over offices; Dr. Vera Kask')
 b(16,'BLOCK',(-431,38,-393,80),'civic','6 storeys, research labs round a court','Dr. Vera Kask (director)')
-b(17,'Block 1',(-679,-151,-657,-129),'estate','point block, 32 storeys, west precinct','Tomas Wren')
-b(18,'Block 2',(-541,-189,-519,-167),'estate','point block, 30 storeys, east precinct','Siti Rahman')
-b(19,'Block 3',(-510,-84,-488,-62),'estate','point block, 36 storeys, on the Park Ring','Juno Rell (20th floor)')
-b(20,'Block 4',(-631,-125,-609,-103),'estate','twin point block, 40 storeys; sky bridge and sky garden at the 26th floor',NB())
-b(21,'Block 5',(-631,-171,-609,-149),'estate','twin point block, 40 storeys','Dr. Imani Osei and Kofi')
-b(22,'Block 6',(-637,-76,-583,-62),'estate','slab block, 14 storeys, shops in its void deck on the Park Ring',NB())
+b(17,'Block 1',(-684,-150,-670,-104),'estate','slab block, 28 storeys, west side of the west court','Tomas Wren')
+b(18,'Block 2',(-550,-186,-506,-164),'estate','slab block, 30 storeys, north side of the east court','Siti Rahman')
+b(19,'Block 3',(-512,-94,-487,-62),'estate','broad point block, 36 storeys, on the Park Ring','Juno Rell (20th floor)')
+b(20,'Block 4',(-658,-124,-632,-102),'estate','twin broad point block, 40 storeys, on Library Lane; sky bridge and sky garden at the 26th floor',NB())
+b(21,'Block 5',(-616,-124,-590,-102),'estate','twin broad point block, 40 storeys, on Library Lane','Dr. Imani Osei and Kofi')
+b(22,'Block 6',(-635,-78,-568,-62),'estate','slab block, 14 storeys, shops in its void deck on the Park Ring',NB())
 b(23,'Hawker centre',(-554,-82,-516,-62),'civic','1 storey, open-sided, on the Park Ring and Estate Square','Siti\'s laksa stall')
 b(24,'Garden Row',(-660,40,-637,58),'home','3 townhouses, 3 storeys, facing the Park Ring','Teodora Vance; Ada Fong and Sora Ishida; Priya Raman')
 b(25,"Sol's café",(-750,34,-734,44),'shop','old tower house, 5 storeys; flat above','Sol Brant')
@@ -95,8 +95,9 @@ b(37,'All-night store',(-554,62,-546,74),'shop','5 storeys; flat above','Hiro Sa
 b(38,'Helmsmith',(-600,174,-590,186),'shop','2 storeys; home behind','Gideon Hale')
 b(39,'City works yard',(-540,174,-514,186),'civic','sheds and a flat','Kade Morrow')
 b(52,'Reese–Miller house',(-704,-40,-694,-24),'home','old tower house, 7 storeys; wind tower and roof terrace','Elizabeth Reese, Dan Miller and Jammer (away at the farm)')
-b(49,'Block 7',(-580,-150,-566,-100),'estate','slab block, 14 storeys, shops in its void deck on North Street',NB())
-b(50,'Block 8',(-509,-146,-487,-124),'estate','point block, 34 storeys, east precinct',NB())
+b(49,'Block 7',(-580,-176,-566,-102),'estate','slab block, 16 storeys, shops in its void deck on North Street',NB())
+b(50,'Block 8',(-508,-150,-487,-106),'estate','slab block, 34 storeys, east side of the east court',NB())
+b(53,'Block 9',(-656,-160,-594,-144),'estate','slab block, 22 storeys, north side of the west court',NB())
 b(51,'Neighbourhood centre',(-554,-150,-516,-118),'civic','2 storeys: minimart, kindergarten, community club, roof garden','Juno Rell (Housing Board office)')
 for n,name,r,kind,h,who in [
  (40,'Battery works',(-789,-8,-767,8),'works','2 storeys','Omar Haddad (flat)'),
@@ -304,8 +305,8 @@ RESIDENT_HOMES={
 ## the plan forms of the towers (city.md 7c, 8): one source for the plan, the
 ## skyline and the elevations.
 HEIGHTS={1:91,2:22,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:180,14:175,15:150,16:22,
- 17:104,18:98,19:117,20:130,21:130,22:46,23:6,24:11,25:17,26:20,27:29,28:26,29:20,30:20,31:20,
- 32:23,33:9,34:26,35:72,36:42,37:17,38:7,39:6,49:46,50:110,51:8,52:23,40:8,41:4,42:6,43:35,44:3}
+ 17:91,18:98,19:117,20:130,21:130,22:46,23:6,24:11,25:17,26:20,27:29,28:26,29:20,30:20,31:20,
+ 32:23,33:9,34:26,35:72,36:42,37:17,38:7,39:6,49:52,50:110,51:8,52:23,53:72,40:8,41:4,42:6,43:35,44:3}
 CROWNS={1:104,2:45,3:26,12:280}
 ## Plan forms: twist (a rounded triangle turning as it rises), screen (round-
 ## cornered square in a screen), capsule (core with plug-in capsules), dune
@@ -334,6 +335,24 @@ PARK={
 ## The North Estate's precincts (clipped by the Rim Walk): west of North Street,
 ## north of Library Lane plus the strip along the Park Ring; east of it.
 PRECINCTS=[[(-686,-200,-566,-96),(-637,-92,-566,-62)],[(-554,-200,-487,-62)]]
+## The North Estate's courts and grounds (city.md 7d), for the drawings:
+## courts, the twins' gate and sky bridge, the community garden,
+## playgrounds, chess pavilions and covered linkways (polylines).
+ESTATE={
+ 'courts':[(-670,-144,-580,-124),(-550,-164,-487,-150)],
+ 'gate':(-632,-124,-616,-102),
+ 'sky_bridge':(-632,-114,-616,-112),
+ 'garden':(-644,-174,-598,-164),
+ 'playgrounds':[(-648,-134),(-528,-157)],
+ 'pavilions':[(-600,-134),(-500,-157)],
+ 'linkways':[
+  [(-668,-126),(-668,-142),(-582,-142),(-582,-126),(-668,-126)],
+  [(-624,-126),(-624,-78)],
+  [(-582,-134),(-566,-134)],
+  [(-552,-157),(-489,-157)],
+  [(-512,-157),(-512,-98),(-500,-98),(-500,-94)],
+ ],
+}
 TURBINES=[(-310,-200),(-310,200),(-740,-270),(-740,270)]
 JUNGLE=(-500,464); ICE=(-450,-480)
 assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)
@@ -427,5 +446,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')
