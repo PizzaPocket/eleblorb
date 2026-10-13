@@ -1,0 +1,479 @@
+<title>Plant Kingdom in 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Karla:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a field naturalist's notebook. The explorable model fills the top, places to visit beside it, then what the model turned up. One deliberate world: the forest under its canopy, so a single dark green palette. */
+:root {
+  --deep: #0d1a13; --panel: #13261b; --line: #284634; --ink: #eaf2e6; --muted: #9db8a2;
+  --leaf: #7fcf7a; --bark: #c49a6c; --amber: #f0b45c; --plan: #f0b45c; --built: #8fd0ff;
+  --display: "Fraunces", Georgia, serif;
+  --body: "Karla", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+html { background: var(--deep); }
+body { background: var(--deep); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 56px; display: grid; gap: 22px; }
+header { display: grid; gap: 6px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(32px, 4.6vw, 52px); line-height: 1.05; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 600; font-size: 26px; margin: 0; text-wrap: balance; }
+h3 { font-size: 17px; margin: 0; }
+p { margin: 0; max-width: 72ch; }
+.lede { color: var(--muted); }
+.explore { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .explore { grid-template-columns: 1fr; } }
+.viewer { position: relative; aspect-ratio: 16 / 10; max-width: 100%; background: #10241a; border: 1px solid var(--line); overflow: hidden; touch-action: none; }
+@media (max-width: 600px) { .viewer { aspect-ratio: 4 / 5; } }
+.viewer canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lab { position: absolute; transform: translate(-50%, -100%); white-space: nowrap; font-family: var(--mono); font-size: 11.5px; color: var(--ink); text-shadow: 0 0 3px #000, 0 0 6px #000; padding-bottom: 4px; }
+.lab b { display: block; font-family: var(--body); font-size: 13px; font-weight: 700; }
+.lab.small { font-size: 10.5px; color: var(--muted); }
+.lab.plan b { color: var(--plan); }
+.lab::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 4px; background: var(--muted); }
+.hud { position: absolute; left: 10px; bottom: 10px; right: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--mono); font-size: 12px; color: var(--ink); background: rgba(13, 26, 19, .8); border: 1px solid var(--line); padding: 5px 10px; cursor: pointer; }
+.chip[aria-pressed="true"] { border-color: var(--leaf); color: var(--leaf); }
+.chip:focus-visible, .place:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
+.seg { display: inline-flex; border: 1px solid var(--line); }
+.seg .chip { border: 0; }
+.seg .chip[aria-pressed="true"] { background: var(--panel); }
+.hint { position: absolute; top: 10px; right: 10px; font-family: var(--mono); font-size: 11px; color: var(--muted); background: rgba(13, 26, 19, .7); padding: 4px 8px; }
+.height { position: absolute; top: 10px; left: 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); background: rgba(13, 26, 19, .7); padding: 4px 8px; font-variant-numeric: tabular-nums; }
+.places { display: grid; gap: 6px; }
+.place { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); padding: 9px 12px; cursor: pointer; display: grid; gap: 2px; }
+.place span { font-size: 14px; color: var(--muted); }
+.place[aria-current="true"] { border-color: var(--leaf); }
+.place[aria-current="true"] h3 { color: var(--leaf); }
+.note { background: var(--panel); border: 1px solid var(--line); padding: 14px 16px; display: grid; gap: 8px; }
+.note p { font-size: 15px; }
+.who { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.finds { display: grid; gap: 10px; }
+.find { display: grid; grid-template-columns: 120px 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.find b { font-family: var(--mono); font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: var(--amber); }
+.find div { min-width: 0; }
+.find ul { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 3px; max-width: 70ch; }
+@media (max-width: 560px) { .find { grid-template-columns: 1fr; gap: 4px; } }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 14px; height: 10px; margin-right: 6px; vertical-align: -1px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Eleblorb · Plant Kingdom · the primate village and the kingdom round it</div>
+    <h1>Plant Kingdom in 3D</h1>
+    <p class="lede">The kingdom as the terrain code shapes it and the village as its briefs plan it, at true size: three giant tualang trees with a shared deck, the commons, 11.4 m up, household rings and rope bridges above it, and a small camp on the floor. Drag to look around, scroll or pinch to zoom from the whole kingdom down to a single pavilion, or pick a place. The switch shows what the game builds today against what the briefs plan.</p>
+  </header>
+
+  <div class="explore">
+    <div class="viewer" id="viewer">
+      <canvas id="gl" aria-label="Explorable 3D model of the Plant Kingdom and its primate village"></canvas>
+      <div class="labels" id="labels"></div>
+      <div class="height" id="height"></div>
+      <div class="hint">drag · scroll · right-drag to pan</div>
+      <div class="hud">
+        <div class="seg" role="group" aria-label="Which village to show">
+          <button class="chip" id="m_plan" aria-pressed="true">Planned</button>
+          <button class="chip" id="m_built" aria-pressed="false">Built today</button>
+        </div>
+        <button class="chip" id="t_labels" aria-pressed="true">Labels</button>
+        <button class="chip" id="t_canopy" aria-pressed="true">Canopy</button>
+        <button class="chip" id="t_forest" aria-pressed="true">Forest</button>
+      </div>
+    </div>
+    <div class="places" id="places" role="list"></div>
+  </div>
+  <div class="note" id="note" aria-live="polite"></div>
+  <div class="legend"><span><i style="background:var(--plan)"></i>planned (labels in amber)</span><span><i style="background:var(--bark)"></i>the trees' existing branch ramps</span><span><i style="background:var(--built)"></i>built today, in the switch's other setting</span></div>
+
+  <section class="finds">
+    <h2>What building the model turned up</h2>
+    <p>The village layout is now data with checks (<code>tools/plant_village_layout.py</code>), and the model is drawn from it. Placing everything at true size exposed these.</p>
+    <div class="find"><b>Brief error</b><div><p>The commons cannot be 520 m². The triangle between the three trunk centres is already 432 m². A deck that wraps the trunks with 3.5 m to spare is about 800 m². That is more room, not less, so the amenities fit with routes between them.</p></div></div>
+    <div class="find"><b>Brief error</b><div><p>The rope bridges span 16 to 18.5 m, not 30 to 32 m. The trunks stand 30 to 34 m apart, but each household ring reaches 7 m out from its trunk, so the bridges only cross the gap between rings.</p></div></div>
+    <div class="find"><b>Conflict</b><div><p>The brief puts each tree's 32° public switchback on the commons beside its trunk. There it lands on the kitchen, dining terrace, store or workshop, and its head meets the bridges on the 22.8 m rings. The plan moves each switchback to its own small deck lobe on the tree's outer side, away from the bridges. Several ring homes then turn to new bearings:</p><ul><li>Abu: 40°;</li><li>Senja and Rimba: 225°;</li><li>Dahan and Bayu: 50°;</li><li>Intan and Murai: 20°;</li><li>the empty pavilion: 180°.</li></ul></div></div>
+    <div class="find"><b>Placed</b><div><p>The brief gave no positions for the amenities on the commons. They now stand along the deck's edges with 1.5 m routes between them:</p><ul><li>the market on the south edge, facing the grand ramp's head;</li><li>the kitchen and dining terrace on the north-west edge;</li><li>the store, privy, cistern and Jati's workshop on the north-east edge;</li><li>the gathering circle, 7.2 m across, at the middle;</li><li>the inn on its lobe east of the East Tree.</li></ul><p>The six posts stand 1 m inside the deck edge, all outside the gate plaza.</p></div></div>
+    <div class="find"><b>Built today</b><div><p>The game still has the prototype village:</p><ul><li>the three giant trees with their steep branch ramps;</li><li>a 3.6 m treehouse deck on every fourth landing;</li><li>the inn on the ground at (27, 22).</li></ul><p>None of the commons, rings, bridges, ground camp or switchbacks exist yet. The trees' branch ramps climb at 46°, and the model draws their chain from the same rule as <code>nature_props.gd</code>. Their starting directions are random in the game, so the model's are approximate.</p></div></div>
+    <div class="find"><b>Approximate</b><div><p>The terrain's hills and the river's wander come from Godot noise that the page cannot reproduce exactly. Their sizes match the code; their exact shapes do not. The village clearing, the river's depth and level, and every landmark position are exact.</p></div></div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+/*DATA*/
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const rad = b => b * Math.PI / 180;
+// the river: z = 150 + wander, 16 m wide, 14 m deep, water at -3 (the wander is approximate)
+const riverZ = x => 150 + 38 * Math.sin(x / 240 + 0.6) + 18 * Math.sin(x / 91 + 1.7);
+const RIVER_START = -640;
+function riverCover(x, z) { if (x < RIVER_START - 14) return 0; const d = Math.abs(z - riverZ(x)); const c = 1 - smooth(3, 8, d); return x < RIVER_START ? c * smooth(RIVER_START - 14, RIVER_START, x) : c; }
+function ground(x, z) {
+  const r = Math.hypot(x, z);
+  let hills = 5 * (Math.sin(x * 0.021) * Math.cos(z * 0.017) * 0.7 + Math.sin((x + z) * 0.013) * 0.5);
+  hills *= smooth(55, 77, r);
+  const dz = Math.abs(z - riverZ(x)), influence = x < RIVER_START - 20 ? 0 : 1 - smooth(8, 32, dz);
+  let h = hills * (1 - influence) - 14 * riverCover(x, z);
+  // Flower Fruit Mountain: a limestone escarpment 38 m high at the falls, curving round the head of the gorge
+  const cliffX = RIVER_START - 18 + Math.min(70, 0.0016 * Math.pow(z - 150, 2));
+  const top = 30 + smooth(cliffX, cliffX - 200, x) * 22 + 4 * Math.sin(z * 0.02);
+  h = Math.max(h, top * smooth(cliffX + 6, cliffX - 2, x));
+  // the ring of distant mountains
+  h += 160 * smooth(860, 990, r);
+  return h;
+}
+const TR = Object.fromEntries(Object.entries(D.trees).map(([k, v]) => [k, v]));
+const trunkR = (k, y) => { const t = TR[k]; return t.base_r + (t.top_r - t.base_r) * Math.min(1, y / t.trunk_top); };
+
+// ---------- places
+const PLACES = [
+  { id: "kingdom", t: "The whole kingdom", s: "from the falls to Kova Kong", cam: [180, 520, 760], at: [-60, 0, -40], far: true,
+    p: "A lowland rainforest ringed by mountains. The river rises at the falls under Flower Fruit Mountain in the far west and runs east across the whole kingdom. The village stands on its flat clearing about 150 m north of the river. Kova Kong roams the north-east. The abandoned Wood Kingdom lies to the north-west and appears only after a visit to the Ice Kingdom.", who: "the village, 26 residents · Kova Kong · the Wood Kingdom · the falls" },
+  { id: "village", t: "The village", s: "three giant trees and the commons", cam: [92, 74, 104], at: [0, 16, 0],
+    p: "Three tualang trees, 56 to 62 m tall, stand 30 to 34 m apart round the gate. Between them, 11.4 m up, the commons spans all three trunks: the deck where canopy and floor households meet. Above it, each tree carries household rings at 22.8 m and 34.2 m, joined by rope bridges at 22.8 m. The elders' crown deck is at 45.6 m on the Elder Tree.", who: "26 residents in 14 households" },
+  { id: "gate", t: "Arriving", s: "the gate plaza, under the commons", cam: [6, 4, 30], at: [0, 9, -2],
+    p: "You arrive at the gate in a clearing about 24 m across, shaded by the commons 11 m overhead. Nothing stands in the plaza; the deck's six posts stand outside it. The grand ramp climbs from the plaza's south side in three 32° flights to the market at the commons' edge.", who: "" },
+  { id: "commons", t: "The commons", s: "the deck between the three trees, 11.4 m", cam: [26, 34, 34], at: [0, 11.4, 0],
+    p: "About 800 m² of deck lashed between the trunks. On it: the gathering circle at the middle; the market facing the grand ramp; Wangi's kitchen, with the one fire in the trees, and the dining terrace on the north-west edge; the store, privy, cistern and Jati's workshop on the north-east edge. Rope rails and catch nets run round the edge.", who: "Wangi · Delima · Rotan · Jati · the elders" },
+  { id: "inn", t: "Bima's inn", s: "the rest point, on its lobe of deck", cam: [44, 22, 26], at: [22, 13, 12],
+    p: "The one house on the commons with walls: a long house 14 × 8 m with a deep red-brown leaf roof and a veranda facing the commons. It stands on its own lobe of deck east of the East Tree. The party wakes in its party room. A night costs 15 Tokoins.", who: "Bima keeps it" },
+  { id: "rings", t: "Rings and bridges", s: "the households in the canopy", cam: [-38, 40, -44], at: [0, 26, 0],
+    p: "Each tree carries wrap-around decks 5 m wide, with each household's open pavilion on a bay at its outer edge. Each pavilion is round its own central pillar under a broad leaf roof. Rope-and-plank bridges join the trees at 22.8 m, so the canopy households are one neighbourhood. Each tree's public switchback, a tower of 32° flights on its own deck lobe, climbs from the commons to the rings.", who: "Abu · Jati and Embun · Dahan · Tirta and Bintang · Senja and Rimba · Tunas · Bayu · Intan and Murai" },
+  { id: "crown", t: "The Elder Tree's crown", s: "Purnama and Sekar, 45.6 m", cam: [-6, 52, 6], at: [-16, 44, 9],
+    p: "The sisters' crown deck, the highest home in the village. A basket hoist from the ring below brings their supplies up, and Abu carries his grandmother's supper up every evening.", who: "Purnama · Sekar" },
+  { id: "camp", t: "The ground camp", s: "the floor households", cam: [-70, 26, 52], at: [-20, 2, 0],
+    p: "The households who live on the floor:\n• the apes' long lodge, built heavy;\n• the stable and paddock where Ossian keeps Manchego;\n• the tailed monkeys' raised house with its coils of vine rope;\n• Melati's garden house with its beds;\n• Damar and Wangi's hut.\nBatu's training grounds sit just outside the safe zone to the north-west.", who: "Batu · Sari · Teguh · Ossian · Rotan · Kilat · Akar · Delima · Melati · Damar" },
+  { id: "river", t: "The river", s: "the trail to Tirta's landing", cam: [40, 18, 190], at: [0, -2, 120],
+    p: "A trail runs south from the plaza to the river, 16 m wide and 14 m deep, its water held at 3 m below the village floor. Tirta fishes from a small jetty on the bank. Follow the river upstream about 650 m and you reach the falls.", who: "Tirta" },
+  { id: "falls", t: "The falls and Flower Fruit Mountain", s: "where the river begins", cam: [-555, 42, 228], at: [-660, 22, 150], far: true,
+    p: "A 38 m crescent of grey limestone with a curtain of water pouring from a notch in its lip into a round plunge pool. Behind the water is the Water Curtain Cave, Sun Wu Kong's old seat, forgotten. Above, Flower Fruit Mountain rises westward: wild fruit trees, the kingdom's only peaches, and the split stone egg where Sun Wu Kong was born.", who: "nobody, until Sun Wu Kong returns" },
+  { id: "kong", t: "Kova Kong", s: "the giant gorilla, north-east", cam: [300, 90, -150], at: [400, 40, -280], far: true,
+    p: "A gorilla about 80 m tall, whose real name is Da Hou Zi, Xiao Hou Zi's big brother. He is under the Demon Lord's control, his eyes purple. His body is climbable terrain, and the Special Banana sits on top of his head.", who: "Da Hou Zi" },
+  { id: "wood", t: "The Wood Kingdom", s: "abandoned treehouses, north-west", cam: [-200, 60, -230], at: [-250, 14, -300], far: true,
+    p: "Four weathered trees with long-empty treehouses, greyed and dulled. Wild Wood blorbs live there. It appears only after you have visited the Ice Kingdom and come back.", who: "Wood blorbs" },
+];
+
+// ---------- scene
+const viewer = document.getElementById("viewer"), canvas = document.getElementById("gl");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, logarithmicDepthBuffer: true });
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); renderer.outputEncoding = THREE.sRGBEncoding;
+const scene = new THREE.Scene();
+const SKY = new THREE.Color("#a8d0c0"); scene.background = SKY; scene.fog = new THREE.Fog(SKY, 650, 2600);
+const camera = new THREE.PerspectiveCamera(50, 1.6, 0.4, 6000);
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.08; controls.maxPolarAngle = Math.PI * 0.49; controls.maxDistance = 2600; controls.minDistance = 4;
+scene.add(new THREE.HemisphereLight(0xf2f6dc, 0x2f4a2a, 0.85));
+const sun = new THREE.DirectionalLight(0xfff1d0, 0.85); sun.position.set(300, 500, 200); scene.add(sun);
+
+const mat = (c, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.85 }, o));
+const M = {
+  ground: mat(0xffffff, { vertexColors: true, roughness: 1 }),
+  bark: mat(0xb9b2a4), barkDark: mat(0x8f7a5c), ramp: mat(0x9a7652), deck: mat(0xa77b4f), plank: mat(0x8c6a45),
+  leaf: mat(0x3f7f3a), leaf2: mat(0x2f6a33), leaf3: mat(0x5a8f3c), roof: mat(0x4f8a3e), roofInn: mat(0x6b3a24), roofEmpty: mat(0x7d7a62),
+  rope: mat(0xd8c49a), net: mat(0xd8c49a, { transparent: true, opacity: 0.35, side: THREE.DoubleSide }),
+  water: new THREE.MeshStandardMaterial({ color: 0x3d7f8c, roughness: 0.15, transparent: true, opacity: 0.85 }),
+  stone: mat(0xb8b4a8), lime: mat(0xc9c5b6), fire: mat(0xffa040, { emissive: 0xff7a20, emissiveIntensity: 0.9 }),
+  fur: mat(0x3a3330), eye: mat(0xb06cff, { emissive: 0x8a3cff, emissiveIntensity: 1 }), banana: mat(0xf2d34a, { emissive: 0x6a5400 }),
+  grey: mat(0x8a8274), greyLeaf: mat(0x6f7860), fence: mat(0xc2a878), bed: mat(0x6b4a2c), crop: mat(0x5aa04a),
+  built: mat(0x8fd0ff), plan: mat(0xf0b45c),
+};
+const add = (geo, m, x = 0, y = 0, z = 0, parent = scene) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); parent.add(o); return o; };
+// SuperEgg: a port of scripts/superegg.gd's surface_point
+function eggGeo(ax, ay, az, et = 3, eb = et, rings = 16, segs = 24) {
+  const ps = (v, e) => Math.sign(v) * Math.pow(Math.abs(v), 2 / e), sn = v => Math.abs(v) < 1e-9 ? 0 : v; const pos = [], idx = [];
+  for (let i = 0; i <= rings; i++) { const eta = -Math.PI / 2 + Math.PI * i / rings, le = eta < 0 ? eb : et, ce = ps(sn(Math.cos(eta)), le), se = ps(sn(Math.sin(eta)), le);
+    for (let j = 0; j <= segs; j++) { const om = 2 * Math.PI * j / segs; pos.push(ax * ce * ps(sn(Math.sin(om)), et), ay * se, az * ce * ps(sn(Math.cos(om)), et)); } }
+  for (let i = 0; i < rings; i++) for (let j = 0; j < segs; j++) { const a = i * (segs + 1) + j, b = a + segs + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+const egg = (ax, ay, az, et, eb, m, x, y, z, parent = scene) => add(eggGeo(ax, ay, az, et, eb), m, x, y, z, parent);
+const labels = [];
+const label = (text, sub, x, y, z, cls = "", near = 0, group = "all") => labels.push({ text, sub, p: new THREE.Vector3(x, y, z), cls, near, group });
+const G = { plan: new THREE.Group(), built: new THREE.Group(), forest: new THREE.Group(), canopy: [] };
+scene.add(G.plan, G.built, G.forest);
+
+// ---------- terrain: one coarse grid for the kingdom and a fine one for the village
+function terrain(size, n, cx, cz) {
+  const g = new THREE.PlaneGeometry(size, size, n, n); g.rotateX(-Math.PI / 2); g.translate(cx, 0, cz);
+  const pos = g.attributes.position, col = [];
+  const cF = new THREE.Color("#3f6a35"), cF2 = new THREE.Color("#55783c"), cClear = new THREE.Color("#8a6d48"), cSand = new THREE.Color("#c2ad80"), cRock = new THREE.Color("#7a756a"), cMtn = new THREE.Color("#6e7c6a");
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i), h = ground(x, z), r = Math.hypot(x, z); pos.setY(i, h);
+    let c = cF.clone().lerp(cF2, 0.5 + 0.5 * Math.sin(x * 0.05) * Math.cos(z * 0.04));
+    if (r < 60) c = cClear.clone().lerp(cF, smooth(40, 60, r));
+    const rc = riverCover(x, z); if (rc > 0.01) c.lerp(cSand, Math.min(1, rc * 1.4));
+    if (h > 4 && x < RIVER_START + 4 && x > RIVER_START - 130) c.lerp(cRock, smooth(4, 20, h) * (1 - smooth(RIVER_START - 60, RIVER_START - 130, x)));
+    if (r > 860) c.lerp(cMtn, smooth(860, 990, r));
+    col.push(c.r, c.g, c.b);
+  }
+  g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3)); g.computeVertexNormals(); return add(g, M.ground);
+}
+const farTerrain = terrain(2200, 170, 0, 0); farTerrain.position.y = -0.4;
+terrain(260, 130, 0, 30);
+// the river's water, from the pool at the falls east to the kingdom's edge
+(function () {
+  const pts = []; for (let x = RIVER_START - 8; x <= 1000; x += 8) pts.push(x);
+  const pos = [], idx = []; pts.forEach((x, i) => { const z = riverZ(x); pos.push(x, -3, z - 9, x, -3, z + 9); if (i) { const a = (i - 1) * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } });
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); add(g, M.water);
+  add(new THREE.CircleGeometry(18, 40), M.water, RIVER_START, -2.9, riverZ(RIVER_START)).rotation.x = -Math.PI / 2;
+})();
+label("the river", "16 m wide, 14 m deep", 120, 2, riverZ(120), "small", 900);
+
+// ---------- the giant trees: SuperEgg trunk tiers, canopy lobes, and the existing branch-ramp chain
+function giantTree(k, parent) {
+  const t = TR[k], [x, z] = t.c, g = new THREE.Group(); g.position.set(x, 0, z); parent.add(g);
+  const tiers = 7, th = t.trunk_top / tiers;
+  for (let i = 0; i < tiers; i++) { const r = t.base_r + (t.top_r - t.base_r) * (i + 0.5) / tiers; egg(r, th / 2, r, 5.5, 5.5, M.bark, 0, th * (i + 0.5), 0, g); }
+  for (const [a, s] of [[0, 1], [120, 0.8], [240, 0.9]]) { const b = egg(1.2 * s, 2.6 * s, t.base_r * 1.4, 5, 5, M.bark, 0, 2.2 * s, 0, g); b.rotation.y = rad(a); b.position.set(Math.cos(rad(a)) * t.base_r, 2.2 * s, Math.sin(rad(a)) * t.base_r); }
+  const cr = t.canopy_r, cy = t.trunk_top + cr * 0.2, cg = new THREE.Group(); g.add(cg); G.canopy.push(cg);
+  egg(cr * 0.6, cr * 0.4, cr * 0.6, 3, 3, M.leaf, 0, cy, 0, cg);
+  for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2, lr = cr * (0.5 + 0.1 * Math.sin(i * 7.1)), rr = cr * (0.58 + 0.06 * Math.cos(i * 3.3)); egg(rr, rr * 0.55, rr, 3, 3, i % 2 ? M.leaf2 : M.leaf, Math.cos(a) * lr, cy, Math.sin(a) * lr, cg); }
+  // the branch-ramp chain (nature_props.gd): 3.8 m over 3.6 m from each landing, turning by the golden angle
+  t.chain.forEach((s, i) => {
+    const a = new THREE.Vector3(s.a[0], s.y0, s.a[1]), b = new THREE.Vector3(s.b[0], s.y1, s.b[1]), d = b.clone().sub(a), L = d.length();
+    const r = add(new THREE.BoxGeometry(1.5, 0.25, L), M.ramp, 0, 0, 0, g); r.position.copy(a.clone().add(b).multiplyScalar(0.5)); r.lookAt(g.localToWorld(b.clone()));
+    egg(1.15, 0.15, 1.15, 5.5, 5.5, M.barkDark, s.land[0], s.y1 - 0.15, s.land[1], g);
+  });
+  return g;
+}
+for (const k of Object.keys(TR)) giantTree(k, scene);
+label("East Tree", "tualang, 56 m", TR.east.c[0], TR.east.h + 4, TR.east.c[1], "", 700);
+label("Elder Tree", "tualang, 62 m", TR.elder.c[0], TR.elder.h + 4, TR.elder.c[1], "", 700);
+label("North Tree", "tualang, 58 m", TR.north.c[0], TR.north.h + 4, TR.north.c[1], "", 700);
+
+// an open pavilion round a central pillar, under a broad leaf roof
+function pavilion(parent, x, y, z, w, d, yaw, roofM = M.roof, h = 2.8) {
+  const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = -rad(yaw); parent.add(g);
+  egg(w / 2 + 0.2, 0.18, d / 2 + 0.2, 5.5, 5.5, M.deck, 0, 0.05, 0, g);
+  egg(0.2, h / 2, 0.2, 5.5, 5.5, M.barkDark, 0, h / 2, 0, g);
+  for (const [sx, sz] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) egg(0.1, h / 2 - 0.2, 0.1, 5.5, 5.5, M.plank, sx * (w / 2 - 0.2), h / 2 - 0.2, sz * (d / 2 - 0.2), g);
+  egg(w / 2 + 0.7, 0.45, d / 2 + 0.7, 3.4, 3.4, roofM, 0, h + 0.3, 0, g);
+  return g;
+}
+// a deck slab from a polygon, at height y
+function slab(poly, y, m, parent, th = 0.35) {
+  const sh = new THREE.Shape(poly.map(p => new THREE.Vector2(p[0], p[1])));
+  const g = new THREE.ExtrudeGeometry(sh, { depth: th, bevelEnabled: false }); g.rotateX(Math.PI / 2); g.translate(0, y, 0);
+  // ExtrudeGeometry's shape y becomes -z after the rotation; flip z back
+  const pos = g.attributes.position; for (let i = 0; i < pos.count; i++) pos.setZ(i, -pos.getZ(i)); g.computeVertexNormals();
+  const o = add(g, m, 0, 0, 0, parent); o.material.side = THREE.DoubleSide; return o;
+}
+function rail(poly, y, parent, closed = true) {
+  const pts = poly.map(p => new THREE.Vector3(p[0], y + 1.1, p[1])); if (closed) pts.push(pts[0].clone());
+  add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false, "centripetal"), pts.length * 3, 0.05, 4), M.rope, 0, 0, 0, parent);
+}
+const boxPoly = p => { const xs = p.map(q => q[0]), zs = p.map(q => q[1]); return [Math.min(...xs), Math.max(...xs), Math.min(...zs), Math.max(...zs)]; };
+
+// ---------- the planned village
+(function planned() {
+  const P = G.plan, cy = D.commons_y;
+  slab(D.commons, cy, M.deck, P); rail(D.commons, cy, P);
+  // catch nets beneath the edge
+  const net = D.commons.map(p => { const dx = p[0] - D.centroid[0], dz = p[1] - D.centroid[1], n = Math.hypot(dx, dz); return [p[0] + dx / n * 2, p[1] + dz / n * 2]; });
+  for (let i = 0; i < D.commons.length; i += 3) { const a = D.commons[i], b = net[i]; }
+  slab(D.inn ? [[D.inn.c[0] - D.inn.w / 2, D.inn.c[1] - D.inn.d / 2], [D.inn.c[0] + D.inn.w / 2, D.inn.c[1] - D.inn.d / 2], [D.inn.c[0] + D.inn.w / 2, D.inn.c[1] + D.inn.d / 2], [D.inn.c[0] - D.inn.w / 2, D.inn.c[1] + D.inn.d / 2]] : [], cy, M.deck, P);
+  for (const k in D.lobes) slab(D.lobes[k], cy, M.deck, P);
+  for (const p of D.posts) { egg(0.28, cy / 2, 0.28, 5.5, 5.5, M.barkDark, p[0], cy / 2, p[1], P); egg(0.6, 0.2, 0.6, 5.5, 5.5, M.stone, p[0], 0.1, p[1], P); }
+  // amenities
+  for (const a of D.amenities) {
+    if (a.key === "circle") {
+      for (const [r, n] of [[1.7, 8], [3.0, 13]]) for (let i = 0; i < n; i++) { const t = i / n * Math.PI * 2; const s = egg(0.7, 0.22, 0.25, 4, 4, M.plank, a.c[0] + Math.cos(t) * r, cy + 0.22, a.c[1] + Math.sin(t) * r, P); s.rotation.y = -t + Math.PI / 2; }
+      label("Gathering circle", "the elders preside", a.c[0], cy + 3, a.c[1], "plan", 120); continue;
+    }
+    const h = a.key === "store" ? 3.6 : a.key === "privy" ? 2.2 : 2.9;
+    if (a.key === "privy") { const g = egg(a.w / 2, 1.1, a.d / 2, 5, 5, M.fence, a.c[0], cy + 1.1, a.c[1], P); g.rotation.y = -rad(a.yaw); }
+    else pavilion(P, a.c[0], cy, a.c[1], a.w, a.d, a.yaw, a.key === "kitchen" ? M.leaf3 : M.roof, h);
+    if (a.key === "kitchen") { egg(1.4, 0.35, 1.4, 4, 4, M.stone, a.c[0], cy + 0.35, a.c[1], P); egg(0.5, 0.4, 0.5, 2.2, 2.2, M.fire, a.c[0], cy + 0.8, a.c[1], P); }
+    label(a.name, a.who, a.c[0], cy + h + 1.6, a.c[1], "plan small", 90);
+  }
+  // the inn: a long house with walls on its lobe, its veranda facing the commons
+  const ih = D.inn_house, [x0, x1, z0, z1] = boxPoly(ih), icx = (x0 + x1) / 2, icz = (z0 + z1) / 2;
+  egg((x1 - x0) / 2, 1.6, (z1 - z0) / 2, 5.5, 5.5, M.plank, icx, cy + 1.6, icz, P);
+  egg((x1 - x0) / 2 + 2.6, 1.3, (z1 - z0) / 2 + 1.0, 3.2, 3.2, M.roofInn, icx - 1.2, cy + 3.9, icz, P);
+  label("Bima's inn", "rest point · 15 Tokoins", icx, cy + 7, icz, "plan", 160);
+  // the grand ramp: three 32 deg flights
+  const gp = D.grand.poly, [gx0, gx1, gz0, gz1] = boxPoly(gp), fl = D.grand.flights, fw = (gx1 - gx0) / fl, rise = cy / fl;
+  for (let i = 0; i < fl; i++) {
+    const x = gx0 + fw * (i + 0.5), y0 = rise * i, y1 = rise * (i + 1), up = i % 2 === 0;
+    const za = up ? gz1 - 1.2 : gz0 + 1.2, zb = up ? gz0 + 1.2 : gz1 - 1.2;
+    const a = new THREE.Vector3(x, y0, za), b = new THREE.Vector3(x, y1, zb), d = b.clone().sub(a);
+    const r = add(new THREE.BoxGeometry(2.4, 0.3, d.length()), M.plank, 0, 0, 0, P); r.position.copy(a.clone().add(b).multiplyScalar(0.5)); r.lookAt(b);
+    egg(1.6, 0.15, 1.0, 5.5, 5.5, M.deck, x, y1, zb + (up ? -0.6 : 0.6), P);
+    egg(0.15, y1 / 2, 0.15, 5.5, 5.5, M.barkDark, x, y1 / 2, zb, P);
+  }
+  label("grand ramp", "three 32° flights", (gx0 + gx1) / 2, cy + 2, gz1, "plan small", 100);
+  // household rings, the crown deck, pavilions on bays, switchbacks, bridges
+  const ringAt = (k, y, w = D.rings.width) => { const t = TR[k], r0 = trunkR(k, y) + 0.2, r1 = trunkR(k, y) + w; const g = add(new THREE.RingGeometry(r0, r1, 40), M.deck, t.c[0], y, t.c[1], P); g.rotation.x = -Math.PI / 2; g.material.side = THREE.DoubleSide;
+    const o = []; for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2; o.push([t.c[0] + Math.cos(a) * r1, t.c[1] + Math.sin(a) * r1]); } rail(o, y, P, false); };
+  for (const k of Object.keys(TR)) for (const y of D.rings.ys) ringAt(k, y);
+  ringAt("elder", D.rings.crown, 5.5);
+  for (const pv of D.pavilions) {
+    const t = TR[pv.tree], r = trunkR(pv.tree, pv.y) + D.rings.width + pv.size[1] / 2 - 0.6, x = t.c[0] + Math.cos(rad(pv.b)) * r, z = t.c[1] + Math.sin(rad(pv.b)) * r;
+    pavilion(P, x, pv.y, z, pv.size[0], pv.size[1], pv.b + 90, pv.kind === "empty" ? M.roofEmpty : M.roof, pv.kind === "crown" ? 3.2 : 2.8);
+    label(pv.who, `${pv.tree} tree · ${pv.y} m`, x, pv.y + 4.6, z, "plan small", 60);
+  }
+  for (const k in D.sbpoly) {
+    const p = D.sbpoly[k], sb = D.switchbacks[k], c = p.reduce((m, q) => [m[0] + q[0] / 4, m[1] + q[1] / 4], [0, 0]);
+    const along = [p[1][0] - p[0][0], p[1][1] - p[0][1]], L = Math.hypot(...along), u = [along[0] / L, along[1] / L], across = [p[3][0] - p[0][0], p[3][1] - p[0][1]], W = Math.hypot(...across), v = [across[0] / W, across[1] / W];
+    let y = D.commons_y, i = 0;
+    while (y < sb.top - 0.1) {
+      const lane = (i % 2 ? 1 : -1) * (sb.lane / 2 + 0.2), s0 = (i % 2 ? 1 : -1) * (L / 2 - 1.2), s1 = -s0;
+      const a = new THREE.Vector3(c[0] + u[0] * s0 + v[0] * lane, y, c[1] + u[1] * s0 + v[1] * lane), b = new THREE.Vector3(c[0] + u[0] * s1 + v[0] * lane, y + 3.8, c[1] + u[1] * s1 + v[1] * lane);
+      const r = add(new THREE.BoxGeometry(sb.lane, 0.22, a.distanceTo(b)), M.plank, 0, 0, 0, P); r.position.copy(a.clone().add(b).multiplyScalar(0.5)); r.lookAt(b);
+      y += 3.8; i++;
+    }
+    for (const q of p) egg(0.16, (sb.top - cy) / 2, 0.16, 5.5, 5.5, M.barkDark, q[0], cy + (sb.top - cy) / 2, q[1], P);
+    label("public switchback", "32°, commons to the rings", c[0], sb.top + 2, c[1], "plan small", 70);
+  }
+  const by = D.bridge_y;
+  for (const br of D.bridges) {
+    const a = TR[br.a], b = TR[br.b], d = [b.c[0] - a.c[0], b.c[1] - a.c[1]], L = Math.hypot(...d), u = [d[0] / L, d[1] / L];
+    const ra = trunkR(br.a, by) + D.rings.width - 0.3, rb = trunkR(br.b, by) + D.rings.width - 0.3, pts = [];
+    for (let i = 0; i <= 16; i++) { const t = i / 16, s = ra + (L - ra - rb) * t; pts.push(new THREE.Vector3(a.c[0] + u[0] * s, by - Math.sin(Math.PI * t) * 0.9, a.c[1] + u[1] * s)); }
+    const curve = new THREE.CatmullRomCurve3(pts);
+    for (let i = 0; i < 16; i++) { const p0 = curve.getPointAt(i / 16), p1 = curve.getPointAt((i + 1) / 16); const pl = add(new THREE.BoxGeometry(2, 0.12, p0.distanceTo(p1) * 0.92), M.plank, 0, 0, 0, P); pl.position.copy(p0.clone().add(p1).multiplyScalar(0.5)); pl.lookAt(p1); }
+    for (const side of [-1, 1]) { const rp = pts.map(p => p.clone().add(new THREE.Vector3(-u[1] * side, 1.1, u[0] * side))); add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rp), 24, 0.05, 4), M.rope, 0, 0, 0, P); }
+  }
+  label("rope bridges", "at 22.8 m, 16 to 18.5 m spans", (TR.elder.c[0] + TR.east.c[0]) / 2, by + 3, (TR.elder.c[1] + TR.east.c[1]) / 2, "plan small", 120);
+  label("The commons", "11.4 m · about 800 m²", D.centroid[0] + 6, cy + 9, D.centroid[1] - 6, "plan", 320);
+  // the ground camp
+  for (const gnd of D.ground) {
+    const [x, z] = gnd.c, y = ground(x, z);
+    if (gnd.key === "training") {
+      const o = []; for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { const a = rad(gnd.yaw), lx = sx * gnd.w / 2, lz = sz * gnd.d / 2; o.push([x + lx * Math.cos(a) - lz * Math.sin(a), z + lx * Math.sin(a) + lz * Math.cos(a)]); }
+      rail(o.map(q => q), y - 0.1, P); for (let i = 0; i < 8; i++) { const t = (i + 0.5) / 8; const p = [o[0][0] + (o[1][0] - o[0][0]) * t * 0.9 + (o[3][0] - o[0][0]) * 0.35, o[0][1] + (o[1][1] - o[0][1]) * t * 0.9 + (o[3][1] - o[0][1]) * 0.35]; egg(0.3, 0.9, 0.3, 3, 3, M.fence, p[0], y + 0.9, p[1], P); egg(0.32, 0.3, 0.32, 2.2, 2.2, M.fence, p[0], y + 2.0, p[1], P); }
+      pavilion(P, o[2][0] - 3, y, o[2][1] - 2, 5, 4, gnd.yaw, M.roofEmpty, 2.4);
+    } else if (gnd.key === "stable") {
+      const o = [[x - 6, z - 5], [x + 6, z - 5], [x + 6, z + 5], [x - 6, z + 5]]; rail(o, y + 0.2 - 1.1 + 0.2, P);
+      pavilion(P, x - 6 - 3.5, y, z, 6, 4, 0, M.roof, 2.6);
+      egg(0.8, 0.9, 0.35, 2.6, 2.6, mat(0x8a5a32), x, y + 1.1, z, P);
+    } else if (gnd.key === "garden") {
+      pavilion(P, x, y + 1.2, z, gnd.w, gnd.d, 0, M.roof, 2.8); egg(gnd.w / 2, 0.6, gnd.d / 2, 5.5, 5.5, M.plank, x, y + 0.6, z, P);
+      for (let i = 0; i < 5; i++) { egg(1.0, 0.25, 3.2, 5, 5, M.bed, x - 9 - i * 2.4, y + 0.25, z, P); egg(0.8, 0.3, 2.9, 3, 3, M.crop, x - 9 - i * 2.4, y + 0.55, z, P); }
+    } else if (gnd.key === "ape_lodge") {
+      egg(gnd.w / 2, 1.8, gnd.d / 2, 5.5, 5.5, M.plank, x, y + 2.2, z, P); egg(gnd.w / 2 + 1.2, 1.2, gnd.d / 2 + 1.2, 3.4, 3.4, M.roof, x, y + 4.6, z, P);
+    } else {
+      pavilion(P, x, y + 1.2, z, gnd.w, gnd.d, 0, M.roof, 2.8); egg(gnd.w / 2, 0.6, gnd.d / 2, 5.5, 5.5, M.plank, x, y + 0.6, z, P);
+    }
+    label(gnd.name, gnd.who, x, y + 7, z, "plan small", 140);
+  }
+  // the river trail and Tirta's landing
+  const trail = []; for (let z = 22; z <= riverZ(0) - 9; z += 4) trail.push(new THREE.Vector3(Math.sin(z * 0.05) * 4, ground(Math.sin(z * 0.05) * 4, z) + 0.15, z));
+  add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(trail), 40, 1.2, 4), mat(0x9a7c56), 0, 0, 0, P).scale.y = 0.15;
+  egg(1.2, 0.2, 3.2, 5.5, 5.5, M.plank, 0, -2.4, riverZ(0) - 8, P);
+  label("Tirta's landing", "the river trail's end", 0, 2, riverZ(0) - 8, "plan small", 260);
+})();
+
+// ---------- the village as the game builds it today
+(function built() {
+  const B = G.built;
+  for (const k of Object.keys(TR)) {
+    const t = TR[k];
+    t.chain.forEach((s, i) => { if (i % 4) return; const x = t.c[0] + s.land[0], z = t.c[1] + s.land[1]; egg(1.8, 0.15, 1.8, 5.5, 5.5, M.built, x, s.y1 - 0.1, z, B); pavilion(B, x, s.y1, z, 3.2, 3.2, 0, M.roof, 2.6); });
+  }
+  const iy = ground(27, 22); egg(5, 2, 4, 5.5, 5.5, M.built, 27, iy + 2, 22, B); egg(6, 1.2, 5, 3.2, 3.2, M.roofInn, 27, iy + 4.6, 22, B);
+  label("Bima's inn (today)", "on the ground at (27, 22)", 27, iy + 7, 22, "small", 160, "built");
+  label("treehouses (today)", "a 3.6 m deck on every fourth landing", TR.east.c[0] + 3, 20, TR.east.c[1] + 3, "small", 160, "built");
+})();
+G.built.visible = false;
+
+// ---------- the forest beyond the clearing, and the kingdom's landmarks
+let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+(function forest() {
+  const em = [], cp = [];
+  for (let i = 0; i < 2600; i++) {
+    const r = 62 + Math.pow(rnd(), 0.75) * 760, a = rnd() * Math.PI * 2, x = Math.cos(a) * r, z = Math.sin(a) * r;
+    if (PLACES.some(pl => Math.hypot(x - pl.cam[0], z - pl.cam[2]) < 45 && pl.cam[1] < ground(x, z) + 95) ||
+        riverCover(x, z) > 0.01 || Math.abs(z - riverZ(x)) < 12 || x < RIVER_START - 10 || Math.hypot(x + 250, z + 300) < 40 || Math.hypot(x - 400, z + 280) < 70) continue;
+    const y = ground(x, z); if (rnd() < 0.12 && r > 120) em.push([x, y, z, 42 + rnd() * 40]); else cp.push([x, y, z, 15 + rnd() * 18]);
+  }
+  for (let i = 0; i < 260; i++) { const x = RIVER_START - 40 - rnd() * 240, z = 150 + (rnd() - 0.5) * 420; cp.push([x, ground(x, z), z, 9 + rnd() * 8, 1]); }
+  const trunkG = new THREE.CylinderGeometry(0.5, 1, 1, 6), crownG = eggGeo(1, 0.55, 1, 3, 3, 8, 12);
+  const mk = (n, g, m) => { const o = new THREE.InstancedMesh(g, m, n); G.forest.add(o); return o; };
+  const et = mk(em.length, trunkG, M.bark), ec = mk(em.length, crownG, M.leaf2), ct = mk(cp.length, trunkG, M.barkDark), cc = mk(cp.length, crownG, M.leaf);
+  const mx = new THREE.Matrix4(), q = new THREE.Quaternion(), s = new THREE.Vector3(), p = new THREE.Vector3();
+  em.forEach(([x, y, z, h], i) => { mx.compose(p.set(x, y + h * 0.43, z), q, s.set(h * 0.035, h * 0.86, h * 0.035)); et.setMatrixAt(i, mx); mx.compose(p.set(x, y + h * 0.9, z), q, s.set(h * 0.22, h * 0.22, h * 0.22)); ec.setMatrixAt(i, mx); });
+  cp.forEach(([x, y, z, h, fruit], i) => { mx.compose(p.set(x, y + h * 0.35, z), q, s.set(h * 0.03, h * 0.7, h * 0.03)); ct.setMatrixAt(i, mx); mx.compose(p.set(x, y + h * 0.8, z), q, s.set(h * 0.38, h * 0.38, h * 0.38)); cc.setMatrixAt(i, mx); cc.setColorAt(i, new THREE.Color(fruit ? 0x7fae4a : [0x3f7f3a, 0x4a8a3c, 0x356f34][i % 3])); });
+  em.forEach((e, i) => ec.setColorAt(i, new THREE.Color([0x2f6a33, 0x3a7a36][i % 2])));
+})();
+// the falls: a curtain of water from the cliff's lip into the pool, and the stone egg on the highest knoll
+(function () {
+  const fx = RIVER_START - 18, fz = riverZ(RIVER_START);
+  add(new THREE.PlaneGeometry(14, 33), new THREE.MeshStandardMaterial({ color: 0xdff4f6, transparent: true, opacity: 0.7, side: THREE.DoubleSide, emissive: 0x334448 }), fx + 1, 13.5, fz).rotation.y = Math.PI / 2;
+  const ex = -820, ez = 160, ey = ground(ex, ez);
+  for (const s of [-1, 1]) { const h = egg(1.6, 2.2, 1.0, 2.2, 2.2, M.lime, ex + s * 1.1, ey + 2, ez, scene); h.rotation.z = s * 0.35; }
+  label("The falls", "38 m · the Water Curtain Cave behind", fx, 42, fz, "", 1500);
+  label("Flower Fruit Mountain", "wild fruit, the only peaches", -760, 70, 120, "", 2600);
+  label("the stone egg", "where Sun Wu Kong was born", ex, ey + 6, ez, "small", 420);
+})();
+// Kova Kong: about 80 m tall, under the Demon Lord's control
+(function () {
+  const [x, z] = D.landmarks.kova_kong.c, y = ground(x, z), g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = -0.6; scene.add(g);
+  egg(16, 20, 12, 3, 3, M.fur, 0, 46, 0, g); egg(9, 9, 8, 3, 3, M.fur, 0, 72, 4, g);
+  for (const s of [-1, 1]) { egg(5, 22, 5, 3, 3, M.fur, s * 17, 30, 6, g); egg(5.5, 14, 5.5, 3, 3, M.fur, s * 8, 14, -2, g); egg(1.4, 1.4, 1, 2, 2, M.eye, s * 3.2, 74, 11.5, g); }
+  const b = egg(1.6, 4, 1.6, 2.2, 2.2, M.banana, 0, 84, 3, g); b.rotation.z = 0.5;
+  label("Kova Kong", "Da Hou Zi, about 80 m", x, y + 92, z, "", 2600);
+})();
+// the Wood Kingdom: four weathered trees and their empty treehouses
+(function () {
+  const [cx, cz] = D.landmarks.wood_kingdom.c;
+  for (const [ox, oz, h] of [[-14, 10, 36], [12, 16, 40], [6, -14, 34], [-16, -8, 38]]) {
+    const x = cx + ox, z = cz + oz, y = ground(x, z);
+    egg(h * 0.03, h * 0.43, h * 0.03, 5.5, 5.5, M.grey, x, y + h * 0.43, z); egg(h * 0.22, h * 0.13, h * 0.22, 3, 3, M.greyLeaf, x, y + h * 0.88, z);
+    for (const hy of [10, 18, 26]) pavilion(scene, x + 3, y + hy, z + 1, 3.2, 3.2, hy * 10, M.roofEmpty, 2.4);
+  }
+  label("The Wood Kingdom", "after the Ice Kingdom", cx, 60, cz, "", 1600);
+})();
+label("The village", "three giant trees", 0, 80, 0, "", 2600);
+
+// ---------- labels, toggles, camera moves
+const labelBox = document.getElementById("labels");
+for (const l of labels) { const d = document.createElement("div"); d.className = "lab " + l.cls; d.innerHTML = `<b>${l.text}</b>${l.sub || ""}`; labelBox.appendChild(d); l.el = d; }
+let showLabels = true, mode = "plan";
+const tog = (id, fn) => { const b = document.getElementById(id); b.addEventListener("click", () => { const v = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", v); fn(v); }); };
+tog("t_labels", v => { showLabels = v; labelBox.hidden = !v; });
+tog("t_canopy", v => G.canopy.forEach(c => c.visible = v));
+tog("t_forest", v => G.forest.visible = v);
+function setMode(m) { mode = m; G.plan.visible = m === "plan"; G.built.visible = m === "built"; document.getElementById("m_plan").setAttribute("aria-pressed", m === "plan"); document.getElementById("m_built").setAttribute("aria-pressed", m === "built"); }
+document.getElementById("m_plan").addEventListener("click", () => setMode("plan"));
+document.getElementById("m_built").addEventListener("click", () => setMode("built"));
+const placesEl = document.getElementById("places"), note = document.getElementById("note");
+let anim = null;
+function go(pl, instant) {
+  for (const b of placesEl.children) b.setAttribute("aria-current", b.dataset.id === pl.id);
+  note.innerHTML = `<h3>${pl.t}</h3>${pl.p.split("\n").map(l => `<p>${l}</p>`).join("")}${pl.who ? `<div class="who">${pl.who}</div>` : ""}`;
+  const to = new THREE.Vector3(...pl.cam), at = new THREE.Vector3(...pl.at);
+  if (instant || matchMedia("(prefers-reduced-motion: reduce)").matches) { camera.position.copy(to); controls.target.copy(at); controls.update(); anim = null; return; }
+  anim = { t0: performance.now(), from: camera.position.clone(), fromAt: controls.target.clone(), to, at };
+}
+for (const pl of PLACES) { const b = document.createElement("button"); b.className = "place"; b.dataset.id = pl.id; b.setAttribute("role", "listitem"); b.innerHTML = `<h3>${pl.t}</h3><span>${pl.s}</span>`; b.addEventListener("click", () => go(pl)); placesEl.appendChild(b); }
+controls.addEventListener("start", () => { anim = null; });
+function resize() { const w = viewer.clientWidth, h = viewer.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(viewer); resize();
+go(PLACES.find(p => p.id === (location.hash || "").slice(1)) || PLACES[1], true);
+const v3 = new THREE.Vector3(), hEl = document.getElementById("height");
+function frame(now) {
+  if (anim) { const t = Math.min(1, (now - anim.t0) / 1500), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; camera.position.lerpVectors(anim.from, anim.to, e); controls.target.lerpVectors(anim.fromAt, anim.at, e); if (t >= 1) anim = null; }
+  controls.update();
+  const gy = ground(camera.position.x, camera.position.z); if (camera.position.y < gy + 1.6) camera.position.y = gy + 1.6;
+  hEl.textContent = `${Math.round(camera.position.y)} m up · ${Math.round(Math.hypot(camera.position.x, camera.position.z))} m from the gate`;
+  renderer.render(scene, camera);
+  if (showLabels) {
+    const w = viewer.clientWidth, h = viewer.clientHeight, placed = [];
+    for (const l of labels) l.d = camera.position.distanceTo(l.p);
+    const order = labels.slice().sort((a, b) => (a.cls.includes("small") - b.cls.includes("small")) || a.d - b.d);
+    for (const l of order) {
+      v3.copy(l.p).project(camera);
+      const vis = (l.group === "all" || l.group === mode) && v3.z < 1 && Math.abs(v3.x) < 1.1 && Math.abs(v3.y) < 1.1 && (!l.near || l.d < l.near) && (l.group === "built" || !l.cls.includes("plan") || mode === "plan");
+      if (!vis) { l.el.hidden = true; continue; }
+      const x = (v3.x + 1) / 2 * w, y = (1 - v3.y) / 2 * h; l.el.hidden = false;
+      const bw = l.w || (l.w = l.el.offsetWidth), bh = l.h || (l.h = l.el.offsetHeight), box = [x - bw / 2 - 4, y - bh - 2, x + bw / 2 + 4, y];
+      if (placed.some(q => box[0] < q[2] && q[0] < box[2] && box[1] < q[3] && q[1] < box[3])) { l.el.hidden = true; continue; }
+      placed.push(box); l.el.style.left = x.toFixed(1) + "px"; l.el.style.top = y.toFixed(1) + "px";
+    }
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>

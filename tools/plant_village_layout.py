@@ -111,8 +111,8 @@ AMENITY_SPEC = [
     ('cistern', 'Cistern pavilion', 'shared', 'NE', 0.45, 6.0, 6.0, 'the largest leaf roof', 0.1),
     ('workshop', "Jati's workshop", 'Jati', 'NE', 0.73, 6.0, 5.0, 'half-open', 0.1),
 ]
-CIRCLE = (CEN[0] - 0.4, CEN[1] + 0.9)
-AMENITIES = [('circle', 'Gathering circle', 'the elders; Purnama presides', CIRCLE, 8.0, 8.0, 0, 'open to the sky')]
+CIRCLE = (CEN[0] - 0.4, CEN[1] + 0.8)
+AMENITIES = [('circle', 'Gathering circle', 'the elders; Purnama presides', CIRCLE, 7.2, 7.2, 0, 'open to the sky')]
 for k, n_, w_, e, t, w, d, r, front in AMENITY_SPEC:
     c, y = on_edge(e, t, d, 0.9 + front)
     AMENITIES.append((k, n_, w_, c, w, d, y, r))
@@ -169,7 +169,7 @@ problems = []
 A = area(COMMONS)
 if A < 520: problems.append(('the commons is only %.0f m2, under the 520 m2 its program needs' % A,))
 amen = {k: rect(c, w, d, y) for k, _, _, c, w, d, y, _ in AMENITIES}
-amen['circle'] = [pol(CIRCLE, 4.0, b) for b in range(0, 360, 20)]
+amen['circle'] = [pol(CIRCLE, 3.6, b) for b in range(0, 360, 20)]
 trunks11 = {k: [pol(t['c'], trunk_r(k, COMMONS_Y) + 0.3, b) for b in range(0, 360, 20)] for k, t in TREES.items()}
 for k, poly in amen.items():
     if not all(inside(p, COMMONS) for p in poly): problems.append((k, 'reaches off the commons deck'))
@@ -293,3 +293,4 @@ if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
 print('commons %.0f m2 (offset %.1f m); grand ramp run %.1f m in %d flights; bridges %s; %d problems' % (
     A, COMMONS_OFFSET, G_RUN, GRAND['flights'], ', '.join('%s-%s %.1f m' % (b['a'], b['b'], b['span']) for b in BR), len(problems)))
+if problems: sys.exit(1)

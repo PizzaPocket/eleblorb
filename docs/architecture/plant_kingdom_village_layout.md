@@ -1,6 +1,7 @@
 # Plant Kingdom: Primate Village Layout
 
-Status: dimensioned schematic for review (2026-10-06). Building briefs:
+Status: dimensioned schematic for review (2026-10-06); **plan file and audit,
+2026-10-13** (section 8). Building briefs:
 `plant_kingdom_village_buildings.md`. Read with
 `plant_kingdom_village.md` (community and charter). Local frame: origin at the
 village centre (the kingdom origin); `x` and `z` follow world axes, `+z` toward
@@ -157,6 +158,79 @@ evening. At dusk everyone gathers on the commons to eat, and the elders sit in
 the gathering circle; Abu carries his grandmother's supper up to the crown deck
 afterward, and Bima walks over from the inn to eat at his sister Wangi's
 kitchen. Bima at the inn. No two residents share a spot.
+
+## 8. The plan file and what it changed (2026-10-13)
+
+The layout is now data with checks: `tools/plant_village_layout.py` holds:
+- the trees;
+- the commons and everything on it;
+- the inn;
+- the grand ramp and the posts;
+- the rings, pavilions, switchbacks and bridges;
+- the ground camp;
+- the kingdom's landmarks.
+
+The Plant Kingdom in 3D artifact (`docs/drawings/plant_village_3d.html`) is drawn
+from it, zoomable from the whole kingdom to one pavilion. It has a switch
+between what the game builds today and this plan. Placing everything at true
+size changed the following.
+
+- **The commons is about 800 m², not 520.**
+  - The triangle between the three trunk centres alone is 432 m².
+  - The deck's edge stands 3.5 m beyond the lines between the trunks, so that
+    it wraps each trunk.
+- **The bridges span 16 to 18.5 m, not 30 to 32.** The rings reach 7 m out from
+  each trunk, so the bridges cross only the gap between rings.
+- **The public switchbacks move to the trees' outer sides.**
+  - On the commons beside their trunks, as section 3 had it, they landed on the
+    kitchen, dining terrace, store and workshop. Their heads also met the
+    bridges on the 22.8 m rings.
+  - Each now stands on its own lobe of deck at its tree's outer side: the
+    East Tree at 135°, the Elder Tree at 153°, the North Tree at 276°. Each is
+    a tower of 32° flights, one flight per 3.8 m storey.
+- **Ring homes take new bearings round their trunks,** clear of the bridges and
+  switchbacks:
+
+  | Tree | Ring | Home | Bearing |
+  |---|---|---|---|
+  | Elder | 22.8 m | Abu | 40° |
+  | Elder | 34.2 m | Senja and Rimba | 225° |
+  | Elder | crown, 45.6 m | the sisters | 225° |
+  | East | 22.8 m | Jati and Embun | 300° |
+  | East | 22.8 m | Dahan | 50° |
+  | East | 34.2 m | Tunas | 300° |
+  | East | 34.2 m | Bayu | 50° |
+  | North | 22.8 m | Tirta and Bintang | 165° |
+  | North | 34.2 m | Intan and Murai | 20° |
+  | North | 34.2 m | the empty pavilion | 180° |
+
+- **The amenities have places on the deck** (the brief gave none). Each stands
+  1 m in from the rail, with 1.5 m routes between them:
+  - the market on the south edge, set back 2 m to face the grand ramp's head;
+  - the kitchen and dining terrace on the north-west edge;
+  - the store, privy, cistern and Jati's workshop on the north-east edge;
+  - the gathering circle at the middle, 7.2 m across rather than 9 m, so it
+    keeps its routes.
+- **The inn** stands on a 12 × 16 m lobe east of the East Tree, its house at least
+  3 m from the trunk.
+- **The six posts** stand 1 m inside the deck's edge, all outside the gate
+  plaza.
+- **The grand ramp** climbs in three 32° flights (18.2 m of run) from the
+  plaza's south side to the market.
+
+The checks:
+- every amenity on the deck, clear of the rail, the trunks and each other;
+- the posts outside the plaza;
+- the inn clear of the East Tree;
+- the ring capacity at every bearing;
+- the bridge spans;
+- the switchbacks clear of the amenities;
+- the ground buildings 3 m apart, 8 m from trunks and out of the plaza;
+- the training grounds outside the safe zone.
+
+**Built today** (`jungle_kingdom_village.gd`): the three trees with their steep
+branch ramps, a 3.6 m treehouse deck on every fourth landing, and the inn on
+the ground at (27, 22). Nothing else in this plan exists yet.
 
 ## Fixed, proposed and open
 
