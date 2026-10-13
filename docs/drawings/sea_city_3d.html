@@ -1,0 +1,611 @@
+<title>Sea Folk City in Depth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Karla:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a diver's field guide. The explorable model fills the top, a list of places to visit sits beside it, and a measured section below gives the heights. One deliberate world: deep water, so a single dark palette. */
+:root {
+  --water: #0a2f3a; --deep: #061c24; --panel: #0e3743; --line: #1f5563;
+  --ink: #e6f3f1; --muted: #93b9b8; --glow: #59e3cf; --gold: #e0975a; --nacre: #ece6f2; --air: #9fe8ff;
+  --display: "Marcellus", "Palatino Linotype", Palatino, serif;
+  --body: "Karla", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+html { background: var(--deep); }
+body { background: var(--deep); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 56px; display: grid; gap: 22px; }
+header { display: grid; gap: 6px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 4.6vw, 52px); line-height: 1.05; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 400; font-size: 26px; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--body); font-weight: 700; font-size: 17px; margin: 0; }
+p { margin: 0; max-width: 70ch; }
+.lede { color: var(--muted); }
+.explore { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .explore { grid-template-columns: 1fr; } }
+.viewer { position: relative; aspect-ratio: 16 / 10; max-width: 100%; background: var(--water); border: 1px solid var(--line); overflow: hidden; touch-action: none; }
+@media (max-width: 600px) { .viewer { aspect-ratio: 4 / 5; } }
+.viewer canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lab { position: absolute; transform: translate(-50%, -100%); white-space: nowrap; font-family: var(--mono); font-size: 11.5px; color: var(--ink); text-shadow: 0 0 3px #000, 0 0 6px #000; padding-bottom: 4px; }
+.lab b { display: block; font-family: var(--body); font-size: 13px; font-weight: 700; }
+.lab.small { font-size: 10.5px; color: var(--muted); }
+.lab.dry b { color: var(--air); }
+.lab::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 4px; background: var(--muted); }
+.hud { position: absolute; left: 10px; bottom: 10px; right: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--mono); font-size: 12px; color: var(--ink); background: rgba(6, 28, 36, .78); border: 1px solid var(--line); padding: 5px 10px; cursor: pointer; }
+.chip[aria-pressed="true"] { border-color: var(--glow); color: var(--glow); }
+.chip:focus-visible, .place:focus-visible { outline: 2px solid var(--glow); outline-offset: 2px; }
+.hint { position: absolute; top: 10px; right: 10px; font-family: var(--mono); font-size: 11px; color: var(--muted); background: rgba(6, 28, 36, .7); padding: 4px 8px; }
+.depth { position: absolute; top: 10px; left: 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); background: rgba(6, 28, 36, .7); padding: 4px 8px; font-variant-numeric: tabular-nums; }
+.places { display: grid; gap: 6px; }
+.place { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); padding: 10px 12px; cursor: pointer; display: grid; gap: 2px; }
+.place span { font-size: 14px; color: var(--muted); }
+.place[aria-current="true"] { border-color: var(--glow); }
+.place[aria-current="true"] h3 { color: var(--glow); }
+.note { background: var(--panel); border: 1px solid var(--line); padding: 14px 16px; display: grid; gap: 8px; }
+.note p { font-size: 15px; }
+.who { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.section { background: var(--water); border: 1px solid var(--line); overflow-x: auto; }
+.section svg { display: block; width: 100%; min-width: 760px; height: auto; }
+svg text { font-family: var(--mono); fill: var(--ink); }
+.tbl { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; min-width: 620px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+td:first-child { font-family: var(--mono); font-size: 12px; color: var(--muted); white-space: nowrap; }
+.key { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+.key div { display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; font-size: 15px; }
+.key i { width: 18px; height: 18px; display: block; margin-top: 3px; }
+.key div > span { min-width: 0; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Eleblorb · Ocean Kingdom · the sea folk city, third pass (proposed)</div>
+    <h1>Sea Folk City in Depth</h1>
+    <p class="lede">Two cities, one over the other, 540 m north of the arrival dock. The classical city is preserved on the seabed, 72 m down. The modern city hangs in the water above it, because the sea folk swim in three dimensions and are not bound to the floor. Every form is a SuperEgg: square-ended and grounded for the old city, round-ended and buoyant for the new. Drag to look around, scroll or pinch to move closer, or pick a place to be taken there.</p>
+  </header>
+
+  <div class="explore">
+    <div class="viewer" id="viewer">
+      <canvas id="gl" aria-label="Explorable 3D model of the sea folk city"></canvas>
+      <div class="labels" id="labels"></div>
+      <div class="depth" id="depth">72 m down</div>
+      <div class="hint">drag · scroll · right-drag to pan</div>
+      <div class="hud">
+        <button class="chip" id="t_labels" aria-pressed="true">Labels</button>
+        <button class="chip" id="t_clear" aria-pressed="false">Clear water</button>
+        <button class="chip" id="t_cut" aria-pressed="false">Cut away the glass</button>
+        <button class="chip" id="t_flow" aria-pressed="true">Moving water</button>
+      </div>
+    </div>
+    <div style="display:grid;gap:12px;min-width:0">
+      <div class="places" id="places" role="list"></div>
+    </div>
+  </div>
+  <div class="note" id="note" aria-live="polite"></div>
+
+  <section style="display:grid;gap:12px">
+    <h2>Half-section, centre to edge</h2>
+    <p>From Tidehall at the centre out to the city's edge, at true heights and radii. The classical city keeps the floor. The modern city fills the water from 8 m to 64 m up. The well of water over the mound stays open to the surface.</p>
+    <div class="section"><svg id="sect" role="img" aria-label="Section through the sea folk city along the main avenue"></svg></div>
+  </section>
+
+  <section style="display:grid;gap:12px">
+    <h2>Two eras, one vocabulary</h2>
+    <div class="tbl"><table>
+      <thead><tr><th></th><th>Classical: the floor</th><th>Modern: the column</th></tr></thead>
+      <tbody>
+        <tr><td>Buildings</td><td>Tidehall, the Lamp House, the school court, the Current House homes, the Ring Current and avenues</td><td>air bells (the Exchange, the guest hall), household stalks and pods, crown floats, the lamp lines, the lookout</td></tr>
+        <tr><td>How it stands</td><td>built up from the seabed on socketed plinths, symmetrical, on the avenues' axes</td><td>buoyant or hung from something buoyant, tethered down; clusters, not axes</td></tr>
+        <tr><td>SuperEggs</td><td>square-ended, epsilon 4.5 to 5.5: carved and stacked</td><td>round-ended, epsilon 2 to 2.6: eggs, bells, bladders</td></tr>
+        <tr><td>Openings</td><td>tall superellipse arches</td><td>portholes, glazed fronts, and swim-in openings below</td></tr>
+        <tr><td>Orichalcum</td><td>plating and the carved band</td><td>structure: ribs, cables, rims</td></tr>
+        <tr><td>Light</td><td>pearl lamps; almost no daylight 72 m down</td><td>brighter water higher up; pearl lamps on the stalks and lamp lines</td></tr>
+        <tr><td>Where they meet</td><td colspan="2">only at holdfasts, set into the old rings, and at moon pools. Nothing modern stands over the mound. The Glassworks, the first air bell, is the one modern building on the floor, because the vent that heats it is there.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const CITY = {"structures":[{"key":"exchange","name":"The Exchange","kind":"air hall","ring":"civic","c":[12.19,31.74],"x":{"diameter":18.0,"height":9.0,"plinth":3.0,"moon_pool":4.0},"who":["Maresa"]},{"key":"guest_hall","name":"The guest hall","kind":"air hall","ring":"civic","c":[32.34,13.39],"x":{"diameter":20.0,"height":8.5,"plinth":3.0,"moon_pool":4.0},"who":["Isaro"]},{"key":"glassworks","name":"The Glassworks","kind":"air hall","ring":"edge","c":[0.0,118.0],"x":{"diameter":16.0,"height":8.0,"plinth":3.0,"moon_pool":4.0},"who":["Kunei and Damaku"]},{"key":"lamp_house","name":"Lamp House","kind":"wet","ring":"civic","c":[-13.01,31.41],"x":{"along":12.0,"across":10.0,"facing":292.5},"who":["Lunira","Korasi","Mira"]},{"key":"school_court","name":"School court","kind":"wet","ring":"civic","c":[-31.41,13.01],"x":{"along":16.0,"across":12.0,"facing":337.5},"who":["Munaja (teaches)"]},{"key":"reef_house","name":"Reef House workshop","kind":"wet","ring":"gardens","c":[-89.62,-37.12],"x":{"along":12.0,"across":9.0,"facing":382.5},"who":["Talisa","Arimu","Kaluja"]},{"key":"tidehall","name":"Tidehall","kind":"castle","ring":"mound","c":[0.0,0.0],"x":{"facing":90.0,"mound":24.0},"who":["Tidekeeper Asaru","Ikara","Tudaro"]},{"key":"lookout","name":"Kraken lookout","kind":"wet","ring":"edge","c":[-38.96,96.43],"x":{"height":14.0},"who":["Ikara (watches)"]},{"key":"home_01","name":"Garden House home","kind":"home","ring":"homes","c":[58.69,12.47],"x":{"type":"double","row":0,"bearing":12.0,"facing":12.0,"household":"Garden House"},"who":["Nesaja"]},{"key":"home_02","name":"Garden House home","kind":"home","ring":"homes","c":[50.32,32.68],"x":{"type":"double","row":0,"bearing":33.0,"facing":33.0,"household":"Garden House"},"who":["Rodasu"]},{"key":"home_03","name":"Garden House home","kind":"home","ring":"homes","c":[50.32,-32.68],"x":{"type":"double","row":0,"bearing":327.0,"facing":327.0,"household":"Garden House"},"who":["Kasuno","Tami"]},{"key":"home_04","name":"Exchange home","kind":"home","ring":"homes","c":[-49.74,33.55],"x":{"type":"single","row":0,"bearing":146.0,"facing":146.0,"household":"Exchange"},"who":["Maresa"]},{"key":"home_05","name":"Exchange home","kind":"home","ring":"homes","c":[-55.43,22.96],"x":{"type":"single","row":0,"bearing":157.5,"facing":157.5,"household":"Exchange"},"who":["Pelaju"]},{"key":"home_06","name":"Exchange home","kind":"home","ring":"homes","c":[-58.9,11.45],"x":{"type":"single","row":0,"bearing":169.0,"facing":169.0,"household":"Exchange"},"who":["Sujira"]},{"key":"home_07","name":"Lamp House home","kind":"home","ring":"homes","c":[-22.96,55.43],"x":{"type":"workshop","row":0,"bearing":112.5,"facing":112.5,"household":"Lamp House"},"who":["Lunira","Korasi","Mira"]},{"key":"home_08","name":"Current House home","kind":"home","ring":"homes","c":[-79.9,-18.45],"x":{"type":"double","row":1,"bearing":193.0,"facing":13.0,"household":"Current House"},"who":["Oruko"]},{"key":"home_09","name":"Current House home","kind":"home","ring":"homes","c":[-68.77,-44.66],"x":{"type":"double","row":1,"bearing":213.0,"facing":33.0,"household":"Current House"},"who":["Dakuro"]},{"key":"home_10","name":"Current House home","kind":"home","ring":"homes","c":[-44.66,-68.77],"x":{"type":"double","row":1,"bearing":237.0,"facing":57.0,"household":"Current House"},"who":["Sekira"]},{"key":"home_11","name":"Current House home","kind":"home","ring":"homes","c":[-18.45,-79.9],"x":{"type":"double","row":1,"bearing":257.0,"facing":77.0,"household":"Current House"},"who":["Munaja"]},{"key":"home_12","name":"Reef House home","kind":"home","ring":"homes","c":[14.24,-80.75],"x":{"type":"single","row":1,"bearing":280.0,"facing":100.0,"household":"Reef House"},"who":["Talisa"]},{"key":"home_13","name":"Reef House home","kind":"home","ring":"homes","c":[30.72,-76.03],"x":{"type":"single","row":1,"bearing":292.0,"facing":112.0,"household":"Reef House"},"who":["Arimu"]},{"key":"home_14","name":"Reef House home","kind":"home","ring":"homes","c":[45.85,-67.98],"x":{"type":"single","row":1,"bearing":304.0,"facing":124.0,"household":"Reef House"},"who":["Kaluja"]},{"key":"home_15","name":"Glassworks home","kind":"home","ring":"homes","c":[33.35,74.91],"x":{"type":"workshop","row":1,"bearing":66.0,"facing":246.0,"household":"Glassworks"},"who":["Kunei"]},{"key":"home_16","name":"Glassworks home","kind":"home","ring":"homes","c":[19.84,79.56],"x":{"type":"workshop","row":1,"bearing":76.0,"facing":256.0,"household":"Glassworks"},"who":["Damaku"]}],"tunnels":[["civic tunnel",[[16.99,30.03],[18.46,29.14],[19.89,28.19],[21.26,27.17],[22.59,26.08],[23.86,24.92],[25.07,23.7],[26.21,22.43],[27.3,21.1],[28.31,19.71],[29.26,18.28]]]],"kelp":[[[97.21,33.35],[96.88,35.88],[93.79,36.06],[93.04,39.59],[90.51,38.21],[89.27,36.3],[85.43,36.33],[87.57,33.35],[87.53,31.37],[87.38,28.03],[90.88,30.08],[92.85,27.95],[95.49,28.49],[94.44,31.99]],[[58.44,82.69],[55.44,84.5],[54.53,86.27],[53.11,89.03],[50.84,86.3],[48.26,86.95],[46.41,85.21],[47.91,82.69],[46.22,80.06],[48.54,78.77],[50.72,78.53],[53.04,76.67],[54.39,79.27],[56.18,80.51]],[[-47.18,82.69],[-47.35,84.76],[-47.86,87.46],[-50.8,86.48],[-52.91,88.13],[-55.19,87.1],[-55.0,84.29],[-58.0,82.69],[-56.02,80.59],[-54.18,79.53],[-53.16,76.13],[-50.79,78.82],[-48.67,78.93],[-45.73,79.82]],[[-81.21,48.75],[-78.39,51.66],[-81.45,52.49],[-83.59,52.48],[-85.98,55.5],[-86.88,51.82],[-88.7,50.8],[-91.02,48.75],[-87.57,47.24],[-87.96,44.33],[-85.74,43.06],[-83.64,45.28],[-80.54,43.86],[-79.97,46.6]],[[-91.11,13.57],[-91.69,15.91],[-93.91,16.88],[-95.23,19.35],[-97.59,18.12],[-99.51,17.28],[-101.94,16.17],[-100.64,13.57],[-101.5,11.19],[-100.01,9.23],[-97.42,9.75],[-95.18,7.55],[-93.57,9.83],[-92.72,11.73]],[[-53.67,-76.83],[-57.17,-75.45],[-56.15,-71.97],[-58.8,-71.45],[-60.77,-73.58],[-64.3,-71.47],[-64.09,-74.87],[-64.03,-76.83],[-66.32,-79.86],[-62.32,-79.7],[-61.13,-81.67],[-58.57,-83.23],[-57.98,-79.39],[-54.71,-79.39]],[[-9.0,-96.55],[-9.45,-94.57],[-9.73,-91.73],[-12.66,-92.55],[-14.76,-91.34],[-17.05,-92.18],[-17.29,-94.76],[-19.44,-96.55],[-17.94,-98.65],[-16.44,-100.15],[-14.89,-102.35],[-12.62,-100.71],[-10.25,-100.72],[-8.56,-98.96]],[[69.82,-72.46],[71.14,-69.61],[67.48,-69.64],[66.46,-67.13],[63.88,-66.51],[63.19,-69.89],[59.52,-69.7],[60.0,-72.46],[62.07,-73.99],[60.93,-77.86],[64.29,-76.61],[66.19,-76.6],[69.57,-77.89],[68.37,-73.96]],[[100.4,-25.23],[98.92,-22.95],[96.51,-22.31],[95.64,-18.84],[93.19,-20.92],[91.36,-21.7],[88.45,-22.47],[90.24,-25.23],[89.37,-27.55],[90.59,-29.73],[93.3,-29.09],[95.49,-30.99],[97.28,-29.13],[98.17,-27.16]]],"flowers":[[[97.89,8.37],[99.06,10.34],[97.72,11.98],[95.64,10.6],[93.39,12.25],[92.6,10.12],[93.06,8.37],[91.58,6.02],[94.18,5.85],[95.64,5.21],[97.89,4.46],[97.86,7.08]],[[82.0,55.06],[82.14,57.08],[80.08,57.57],[78.64,58.93],[76.82,58.22],[76.09,56.53],[74.44,55.06],[75.94,53.5],[76.99,52.2],[78.64,50.83],[79.99,52.72],[81.97,53.14]],[[87.94,-48.0],[85.33,-46.73],[84.87,-45.01],[83.14,-43.43],[82.04,-46.1],[79.55,-45.93],[79.12,-48.0],[81.21,-49.12],[80.82,-52.02],[83.14,-51.33],[84.46,-50.28],[87.29,-50.4]]],"avenues":[0.0,45.0,90.0,135.0,180.0,225.0,270.0,315.0],"vent":[0.0,124.0],"guest_rooms":[["party room","bed2",3.4,6.0],["guest room","bed2",3.4,3.6],["guest room","bed2",3.4,3.6],["guest room","bed2",3.4,3.6],["washroom","bath",3.4,2.4],["Isaro's room","bed1",3.4,3.2]]};
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+// ocean_kingdom_terrain.gd's _raw_height near the city, in city metres (y up from the city floor at -72 m)
+function natural(xw, zw) {
+  const r = Math.hypot(xw, zw);
+  let base = -42 + (-110 + 42) * smooth(250, 930 * 0.94, r);
+  base += Math.sin(xw * 0.010) * 3.2 + Math.cos(zw * 0.012) * 2.5 + Math.sin((xw + zw) * 0.006) * 2.0 + Math.sin(xw * 0.034) * Math.cos(zw * 0.029) * 0.9;
+  for (const [tx, tz, tr] of [[420, 250, 150], [-380, -330, 190]]) base -= Math.exp(-Math.pow(Math.hypot(xw - tx, zw - tz) / tr, 2)) * 24;
+  return base;
+}
+const MOUND = 2, CHANNEL = 2;
+function ground(x, z) {
+  const d = Math.hypot(x, z), nat = smooth(105, 150, d);
+  let h = (natural(x, z - 540) + 72) * nat;
+  h += MOUND * (1 - smooth(20, 25, d));
+  h -= CHANNEL * smooth(45, 46.6, d) * (1 - smooth(51.4, 53, d));
+  return h;
+}
+const byKey = Object.fromEntries(CITY.structures.map(s => [s.key, s]));
+const rad = b => b * Math.PI / 180;
+const dir = b => [Math.cos(rad(b)), Math.sin(rad(b))];
+
+// ---------- the places to visit
+const PLACES = [
+  { id: "overview", t: "The two cities", s: "the classical floor and the modern column", cam: [150, 62, 150], at: [0, 22, 0],
+    p: "Two cities, one over the other. On the seabed is the classical city, kept as it was built: Tidehall on its mound, the Ring Current, the avenues and the oldest homes. Above it the modern city hangs in the water: household stalks with their pods, and the air bells of the Exchange and the guest hall moored at one level. The column of water over Tidehall is kept open to the surface.", who: "23 residents · 7 households" },
+  { id: "descend", t: "Sinking into the city", s: "how a visitor arrives from the surface", cam: [26, 68, 74], at: [0, 24, 6],
+    p: "Coming down from the surface you meet the newest city first: the glowing crown floats at the tops of the stalks and the lookout's watch pod, then the air bells at 42 m down, then the lamp-line ring. Below them, at the bottom of the open column, Tidehall's prism crowns. Height is age; you sink from the newest city to the oldest.", who: "the hero's way in" },
+  { id: "tidehall", t: "Tidehall and the open column", s: "the classical heart", cam: [34, 9, 46], at: [0, 10, 0],
+    p: "The castle is preserved from the classical era: blocky, square-ended SuperEgg shells on a 2 m mound, four towers with prism crowns, and the main door facing the main avenue between two red Minoan columns. Nothing modern stands over the mound at any height, so the audience hall's oculus looks straight up a clear well of water to the lamps above.", who: "Tidekeeper Asaru · Ikara · Tudaro" },
+  { id: "air", t: "The air level", s: "the Exchange and the guest hall, 42 m down", cam: [70, 44, 64], at: [20, 32, 22],
+    p: "The modern civic tier. The air halls are diving bells: buoyant glass domes, open underneath, held down by four cables each. A swimmer rises into the open bottom, which is the moon pool, and the air pressure holds the water there. Both bells hang with their pools at the same depth, so a glass tunnel can join them; a bell at any other depth would push its air out through the other.", who: "Maresa · Isaro" },
+  { id: "guest", t: "Inside the guest hall", s: "where the party sleeps", cam: [48, 41, 31], at: [32, 31, 13], cut: true,
+    p: "A bell 20 m across. Its floor is a deck ring 0.6 m above the moon pool's water. The guest rooms ring the edge under the shell: a party room, three guest rooms, a washroom and Isaro's own room, with the common room round the pool. It is the city's rest point, 42 m down instead of 72.", who: "Isaro keeps it · 25 Tokoins" },
+  { id: "stalk", t: "A household stalk", s: "the Garden House", cam: [104, 24, 58], at: [64, 19, 26],
+    p: "A stalk is built like a kelp plant. An orichalcum holdfast is set into the old ring path. Cables rise from it to a buoyant crown float that holds them taut. The family's homes hang along it as pods at different heights, each with a glazed front facing open water and a swim-in opening below. A growing family adds a pod higher up.", who: "Nesaja · Rodasu · Kasuno and Tami" },
+  { id: "floor", t: "The classical floor", s: "the Ring Current and the Current House", cam: [-28, 9, -26], at: [-58, 4, -50],
+    p: "The oldest family still lives on the floor, in classical homes beside the Ring Current they work as couriers. The current runs clockwise in its channel 2 m deep. Overhead, the modern stalks rise from holdfasts set into the old ring path, and the lamp lines hang between them.", who: "Oruko · Dakuro · Sekira · Munaja" },
+  { id: "up", t: "Looking up from the floor", s: "the two eras together", cam: [6, 3, 66], at: [10, 32, 10],
+    p: "From the floor the modern city is overhead: bells, pods and floats lit by pearl lamps against the faint surface. The classical city keeps the ground.", who: "" },
+  { id: "glassworks", t: "The Glassworks", s: "the hinge between the eras", cam: [44, 34, 162], at: [0, 8, 114],
+    p: "The one modern building on the floor, because the warm vent that heats its furnace is here. It is the first air bell, socketed in the seabed before bells learned to float, and where the new era began. Its pool is 27 m deeper than the air level's, so no tunnel joins it.", who: "Kunei · Damaku" },
+  { id: "lookout", t: "The Kraken lookout", s: "the tallest stalk", cam: [-4, 62, 150], at: [-38, 54, 92],
+    p: "Ikara's watch pod hangs 56 m up, 16 m below the surface, at the city's south edge. It is a glazed egg facing south, toward the Kraken's water.", who: "Ikara watches" },
+];
+
+// ---------- the modern city's stalks (layout 10)
+const STALKS = [
+  { name: "Garden House", b: 22.5, r: 71, crown: 38, lamp: 0x7fe39a, pods: [["double", 10, "Nesaja"], ["double", 17, "Rodasu"], ["double", 24, "Kasuno and Tami"]] },
+  { name: "Glassworks household", b: 67.5, r: 71, crown: 26, lamp: 0xff9a5a, pods: [["workshop", 9, "Kunei"], ["workshop", 15, "Damaku"]] },
+  { name: "Kraken lookout", b: 112.5, r: 100, crown: 64, lamp: 0xbfe0ff, pods: [["watch", 56, "Ikara"]] },
+  { name: "Exchange household", b: 157.5, r: 71, crown: 36, lamp: 0xffd36b, pods: [["single", 12, "Maresa"], ["single", 18, "Pelaju"], ["single", 25, "Sujira"]] },
+  { name: "Reef House", b: 292.5, r: 71, crown: 44, lamp: 0xff8fa6, pods: [["single", 10, "Talisa"], ["single", 16, "Arimu"], ["single", 22, "Kaluja"], ["reef", 30, "Reef House workshop"]] },
+  { name: "", b: 112.5, r: 71, crown: 26, lamp: 0xa9c8ff, pods: [] },
+  { name: "", b: 202.5, r: 71, crown: 26, lamp: 0xa9c8ff, pods: [] },
+  { name: "", b: 247.5, r: 71, crown: 26, lamp: 0xa9c8ff, pods: [] },
+  { name: "", b: 337.5, r: 71, crown: 26, lamp: 0xa9c8ff, pods: [] },
+];
+const AIR_LEVEL = 30, LAMP_RING = 20, OPEN_COLUMN = 24;
+const CLASSICAL_HOMES = ["home_07", "home_08", "home_09", "home_10", "home_11"];
+
+// ---------- scene
+const airHalls = {};
+const viewer = document.getElementById("viewer"), canvas = document.getElementById("gl");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+renderer.outputEncoding = THREE.sRGBEncoding;
+const scene = new THREE.Scene();
+const WATER = new THREE.Color("#0b4250");
+scene.background = WATER;
+scene.fog = new THREE.FogExp2(WATER, 0.0038);
+const camera = new THREE.PerspectiveCamera(50, 1.6, 0.5, 2000);
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.08; controls.maxDistance = 420; controls.minDistance = 6;
+
+scene.add(new THREE.HemisphereLight(0xa8ecf2, 0x0b2a30, 0.7));
+const sun = new THREE.DirectionalLight(0xcff6ff, 0.6); sun.position.set(40, 140, 30); scene.add(sun);
+const glow = (c, i, d, p) => { const l = new THREE.PointLight(c, i, d, 2); l.position.set(...p); scene.add(l); return l; };
+glow(0x5cf2d6, 2.2, 60, [0, 16, 0]);
+glow(0xffc070, 1.4, 30, [-13, 5, 31]);
+glow(0xff8a3a, 2.4, 40, [0, 3, 124]);
+glow(0xaee8ff, 1.6, 40, [22, 36, 22]);
+
+const M = {
+  sand: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 }),
+  stone: new THREE.MeshStandardMaterial({ color: 0xcfc6d6, roughness: 0.55, emissive: 0x0a1218 }),
+  nacre: new THREE.MeshStandardMaterial({ color: 0xdcd6ea, roughness: 0.3, metalness: 0.15, emissive: 0x0c151b }),
+  teal: new THREE.MeshStandardMaterial({ color: 0x3fc4b4, roughness: 0.45, metalness: 0.1, emissive: 0x06433e }),
+  crown: new THREE.MeshStandardMaterial({ color: 0x8dffb0, emissive: 0x2cd07a, emissiveIntensity: 0.9, roughness: 0.2 }),
+  gold: new THREE.MeshStandardMaterial({ color: 0xc8703f, metalness: 0.75, roughness: 0.35, emissive: 0x2a0f04 }),
+  cable: new THREE.MeshStandardMaterial({ color: 0xd88a52, metalness: 0.6, roughness: 0.4, emissive: 0x3a1806 }),
+  glass: new THREE.MeshStandardMaterial({ color: 0xbff4ea, transparent: true, opacity: 0.26, roughness: 0.05, metalness: 0.2, side: THREE.DoubleSide, depthWrite: false }),
+  smoked: new THREE.MeshStandardMaterial({ color: 0x8a7a6a, transparent: true, opacity: 0.45, roughness: 0.1, side: THREE.DoubleSide, depthWrite: false }),
+  air: new THREE.MeshBasicMaterial({ color: 0x9fe8ff, transparent: true, opacity: 0.12, depthWrite: false, side: THREE.DoubleSide }),
+  floor: new THREE.MeshStandardMaterial({ color: 0xcfc8bf, roughness: 0.4, side: THREE.DoubleSide }),
+  pool: new THREE.MeshStandardMaterial({ color: 0x3fb6d0, emissive: 0x0a4a58, roughness: 0.1, transparent: true, opacity: 0.8, side: THREE.DoubleSide }),
+  red: new THREE.MeshStandardMaterial({ color: 0x9a2f2c, roughness: 0.5 }),
+  blue: new THREE.MeshStandardMaterial({ color: 0x2a5f9e, roughness: 0.5 }),
+  warm: new THREE.MeshStandardMaterial({ color: 0xffd9a0, emissive: 0xffa040, emissiveIntensity: 0.9 }),
+  room: new THREE.MeshStandardMaterial({ color: 0xd9cfc0, roughness: 0.6, transparent: true, opacity: 0.6 }),
+  bed: new THREE.MeshStandardMaterial({ color: 0x5d7fa8, roughness: 0.8 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x08262c, emissive: 0x0d3a40 }),
+  avenue: new THREE.MeshStandardMaterial({ color: 0x9ffff0, emissive: 0x39d9c2, emissiveIntensity: 1 }),
+  path: new THREE.MeshStandardMaterial({ color: 0xe8e2cf, emissive: 0x5a5440, roughness: 0.8 }),
+  rock: new THREE.MeshStandardMaterial({ color: 0x3a3330, roughness: 1 }),
+  lava: new THREE.MeshStandardMaterial({ color: 0xff7a2a, emissive: 0xff5a10, emissiveIntensity: 1.2 }),
+  kelp: new THREE.MeshStandardMaterial({ color: 0x3f8a46, roughness: 0.8, emissive: 0x0b2a12 }),
+  surface: new THREE.MeshBasicMaterial({ color: 0xbff4ff, transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false }),
+};
+const glassMats = [M.glass, M.smoked];
+const lampMat = c => new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: 1 });
+const add = (geo, mat, x = 0, y = 0, z = 0, parent = scene) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; };
+const labels = [];
+const label = (text, sub, x, y, z, cls = "", near = 0) => labels.push({ text, sub, p: new THREE.Vector3(x, y, z), cls, near });
+
+// SuperEgg: a port of scripts/superegg.gd's surface_point. Omega 0 is local +Z.
+// upper = true keeps only the top half (an open bell).
+function eggGeo(ax, ay, az, et = 3, eb = et, upper = false, rings = 22, segs = 32) {
+  const ps = (v, e) => Math.sign(v) * Math.pow(Math.abs(v), 2 / e), snap = v => Math.abs(v) < 1e-9 ? 0 : v;
+  const pos = [], idx = [], r0 = upper ? rings / 2 : 0;
+  for (let i = r0; i <= rings; i++) {
+    const eta = -Math.PI / 2 + Math.PI * i / rings, le = eta < 0 ? eb : et;
+    const ce = ps(snap(Math.cos(eta)), le), se = ps(snap(Math.sin(eta)), le);
+    for (let j = 0; j <= segs; j++) { const om = Math.PI * 2 * j / segs; pos.push(ax * ce * ps(snap(Math.sin(om)), et), ay * se, az * ce * ps(snap(Math.cos(om)), et)); }
+  }
+  const n = rings - r0;
+  for (let i = 0; i < n; i++) for (let j = 0; j < segs; j++) { const a = i * (segs + 1) + j, b = a + segs + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+const egg = (ax, ay, az, et, eb, mat, x, y, z, upper = false, parent = scene) => add(eggGeo(ax, ay, az, et, eb, upper), mat, x, y, z, parent);
+function cable(a, b, mat = M.cable, r = 0.12) {
+  const va = new THREE.Vector3(...a), vb = new THREE.Vector3(...b), d = vb.clone().sub(va), L = d.length();
+  const m = add(new THREE.CylinderGeometry(r, r, L, 5), mat); m.position.copy(va).add(d.multiplyScalar(0.5)); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), vb.clone().sub(va).normalize()); return m;
+}
+// a horizontal ring band (the spiral band's orichalcum rim)
+function band(rx, rz, y, x, z, parent = scene, t = 0.16) { const pts = []; for (let i = 0; i < 48; i++) { const u = i / 48 * Math.PI * 2; pts.push(new THREE.Vector3(Math.cos(u) * rx, 0, Math.sin(u) * rz)); } return add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true), 64, t, 6, true), M.gold, x, y, z, parent); }
+
+// ground: the levelled floor, the mound, the current channel and the slope beyond
+(function () {
+  const size = 460, n = 184, g = new THREE.PlaneGeometry(size, size, n, n); g.rotateX(-Math.PI / 2);
+  const pos = g.attributes.position, col = [];
+  const cSand = new THREE.Color("#9c9272"), cMound = new THREE.Color("#bdb495"), cChan = new THREE.Color("#3e8fb0"), cWild = new THREE.Color("#6f7a5c"), cGard = new THREE.Color("#8f9a6b"), cTerr = new THREE.Color("#a99f80");
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i), d = Math.hypot(x, z);
+    pos.setY(i, ground(x, z));
+    let c = cSand.clone();
+    if (d < 24) c = cMound.clone(); else if (d > 46 && d < 52) c = cChan.clone(); else if (d > 52 && d < 90) c = cTerr.clone(); else if (d > 90 && d < 105) c.lerp(cGard, 0.5);
+    c.lerp(cWild, smooth(105, 150, d)); col.push(c.r, c.g, c.b);
+  }
+  g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3)); g.computeVertexNormals(); add(g, M.sand);
+  const s = add(new THREE.PlaneGeometry(1200, 1200), M.surface, 0, 72, 0); s.rotation.x = -Math.PI / 2;
+  label("The surface", "72 m above the floor", 0, 72, -40, "small", 0);
+})();
+
+// avenues of luminous stones and the ring path (classical)
+(function () {
+  const pts = [];
+  for (const b of CITY.avenues) { const [c, s] = dir(b); for (let r = 25; r <= 104; r += 4.5) for (const side of [-2.2, 2.2]) { if (r > 45.5 && r < 52.5) continue; const x = c * r - s * side, z = s * r + c * side; pts.push([x, ground(x, z) + 0.15, z, 0.28, 0]); } }
+  for (let a = 0; a < 360; a += 1.6) { const x = Math.cos(rad(a)) * 71, z = Math.sin(rad(a)) * 71; pts.push([x, ground(x, z) + 0.1, z, 0.22, 1]); }
+  const geo = new THREE.SphereGeometry(1, 8, 6), na = pts.filter(p => !p[4]).length;
+  const im = new THREE.InstancedMesh(geo, M.avenue, na), ip = new THREE.InstancedMesh(geo, M.path, pts.length - na), mx = new THREE.Matrix4(); let a = 0, b = 0;
+  for (const p of pts) { mx.makeScale(p[3], p[3] * 0.6, p[3]); mx.setPosition(p[0], p[1], p[2]); if (p[4]) ip.setMatrixAt(b++, mx); else im.setMatrixAt(a++, mx); }
+  scene.add(im, ip);
+  label("main avenue", "classical", 0, 1, 88, "small", 140);
+})();
+
+// ---------- the classical city: square-ended SuperEggs (epsilon 4.5 to 5.5), grounded, on axes
+(function tidehall() {
+  const g = new THREE.Group(); g.position.set(0, MOUND, 0); scene.add(g);
+  egg(16, 1.2, 14, 5.5, 5.5, M.stone, 0, 0.2, 0, false, g);
+  egg(10.5, 11, 12.5, 4.2, 5.5, M.teal, 0, 0, -1.5, false, g);
+  egg(13.5, 6.5, 8, 4.8, 5.5, M.nacre, 0, 0, -7, false, g);
+  band(10.6, 12.6, 3.2, 0, -1.5, g, 0.22);
+  egg(2.2, 0.5, 2.2, 2.4, 2.4, M.dark, 0, 10.8, -1.5, false, g);
+  for (const [x, z] of [[-13, -11], [13, -11], [-13, 11], [13, 11]]) {
+    egg(3, 1.2, 3, 5.5, 5.5, M.stone, x, 0.6, z, false, g);
+    egg(2.6, 9, 2.6, 5, 5.5, M.teal, x, 9, z, false, g);
+    band(2.62, 2.62, 12, x, z, g, 0.14);
+    egg(3.1, 0.9, 3.1, 5.5, 5.5, M.stone, x, 18, z, false, g);
+    const c = add(new THREE.OctahedronGeometry(1.4), M.crown, x, 20.5, z, g); c.scale.y = 2.2;
+  }
+  egg(2.6, 3.6, 0.5, 4, 5.5, M.dark, 0, 3.6, 11.1, false, g);
+  for (const x of [-4, 4]) { egg(0.5, 3.4, 0.5, 5.5, 5.5, M.red, x, 3.4, 15, false, g); egg(0.95, 0.45, 0.95, 2.2, 2.2, M.red, x, 7.1, 15, false, g); }
+  egg(4, 0.4, 6, 5.5, 5.5, M.stone, 0, 0, 18.5, false, g);
+  label("Tidehall", "classical · the castle · Tidekeeper Asaru", 0, MOUND + 24, 0);
+  label("the open column", "kept clear to the surface", 0, 46, 0, "small", 260);
+})();
+// a classical shell on a plinth
+function classical(w, h, d, x, z, facing, mat = M.nacre) {
+  const y = ground(x, z), g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = -rad(facing) + Math.PI / 2; scene.add(g);
+  egg(w / 2 + 0.8, 0.45, d / 2 + 0.8, 5.5, 5.5, M.stone, 0, 0.1, 0, false, g);
+  egg(w / 2, h, d / 2, 4.5, 5.5, mat, 0, 0.3, 0, false, g);
+  band(w / 2 + 0.02, d / 2 + 0.02, 0.3 + h * 0.35, 0, 0, g, 0.14);
+  egg(1.4, 2.4, 0.4, 4, 5.5, M.dark, 0, 0.3 + 1.6, d / 2 - 0.15, false, g);
+  return g;
+}
+(function () {
+  const lh = byKey.lamp_house; classical(12, 6, 10, lh.c[0], lh.c[1], lh.x.facing);
+  const w = M.warm.clone(); w.transparent = true; w.opacity = 0.6; egg(4, 1.4, 3, 2.4, 2.4, w, lh.c[0], 1.4, lh.c[1]);
+  label("Lamp House", "classical · pearl lamps grown", lh.c[0], 9, lh.c[1]);
+  const sc = byKey.school_court, [c, s] = dir(sc.x.facing);
+  egg(8.6, 0.4, 6.6, 5.5, 5.5, M.stone, sc.c[0], 0.2, sc.c[1]).rotation.y = -rad(sc.x.facing) + Math.PI / 2;
+  for (let i = 0; i < 14; i++) { const t = i / 14 * Math.PI * 2, lx = Math.cos(t) * 7.2, lz = Math.sin(t) * 5.2; const x = sc.c[0] + lx * c - lz * s, z = sc.c[1] + lx * s + lz * c; egg(0.42, 2.2, 0.42, 5.5, 5.5, i % 2 ? M.red : M.blue, x, 2.6, z); egg(0.7, 0.35, 0.7, 2.2, 2.2, i % 2 ? M.red : M.blue, x, 4.9, z); }
+  const can = egg(8.6, 1.0, 6.6, 3, 3, M.nacre, sc.c[0], 5.2, sc.c[1], true); can.rotation.y = -rad(sc.x.facing) + Math.PI / 2;
+  label("School court", "classical colonnade · Munaja teaches", sc.c[0], 8.5, sc.c[1]);
+  for (const k of CLASSICAL_HOMES) { const h = byKey[k]; classical(h.x.type === "workshop" ? 10 : 8, 4.2, 7, h.c[0], h.c[1], h.x.facing); label(h.who.join(", "), "classical home", h.c[0], ground(h.c[0], h.c[1]) + 6, h.c[1], "small", 80); }
+  label("Current House", "the oldest family, on the floor", -66, 9, -60, "", 260);
+})();
+
+// ---------- the hinge: the Glassworks, a grounded bell at the vent
+(function () {
+  const s = byKey.glassworks, R = s.x.diameter / 2, H = s.x.height, b = ground(s.c[0], s.c[1]);
+  const g = new THREE.Group(); g.position.set(s.c[0], b, s.c[1]); scene.add(g);
+  egg(R + 1.2, 2.6, R + 1.2, 5.5, 5.5, M.stone, 0, 0.2, 0, false, g);
+  add(new THREE.CircleGeometry(R, 40), M.floor, 0, 2.85, 0, g).rotation.x = -Math.PI / 2;
+  const dome = egg(R, H, R, 2.4, 2.4, M.smoked, 0, 2.8, 0, true, g);
+  ribsEgg(R, H, 2.8, g);
+  band(R, R, 2.85, 0, 0, g, 0.2);
+  egg(1.4, 1.4, 1.4, 2, 2, M.lava, 3, 4.4, 2, false, g);
+  label("The Glassworks", "the hinge · the first air bell · Kunei, Damaku", s.c[0], b + H + 5, s.c[1], "dry");
+  airHalls.glassworks = { g, dome };
+})();
+function ribsEgg(R, H, y0, parent, et = 2.4) {
+  const count = Math.round(2 * Math.PI * R / 3.2), ps = (v, e) => Math.sign(v) * Math.pow(Math.abs(v), 2 / e);
+  for (let k = 0; k < count; k++) {
+    const om = k / count * Math.PI * 2, pts = [];
+    for (let i = 0; i <= 14; i++) { const eta = Math.PI / 2 * i / 14, ce = ps(Math.cos(eta), et), se = ps(Math.sin(eta), et); pts.push(new THREE.Vector3(R * ce * ps(Math.sin(om), et) * 1.005, y0 + H * se * 1.005, R * ce * ps(Math.cos(om), et) * 1.005)); }
+    add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 14, 0.09, 4), M.gold, 0, 0, 0, parent);
+  }
+}
+
+// ---------- the modern city: round-ended SuperEggs (epsilon 2 to 2.6), hung and buoyant
+// air bells on the air level, moored to holdfasts on the civic ring
+for (const key of ["exchange", "guest_hall"]) {
+  const s = byKey[key], R = s.x.diameter / 2, H = s.x.height, g = new THREE.Group();
+  g.position.set(s.c[0], AIR_LEVEL, s.c[1]); scene.add(g);
+  const dome = egg(R, H, R, 2.4, 2.4, M.glass, 0, 0, 0, true, g);
+  egg(R + 0.5, 0.9, R + 0.5, 3, 2.2, M.nacre, 0, 0.1, 0, true, g);
+  band(R + 0.5, R + 0.5, 0.35, 0, 0, g, 0.22);
+  ribsEgg(R, H, 0, g);
+  const deck = add(new THREE.RingGeometry(s.x.moon_pool / 2 + 0.2, R - 0.2, 48), M.floor, 0, 0.6, 0, g); deck.rotation.x = -Math.PI / 2;
+  const pool = add(new THREE.CircleGeometry(s.x.moon_pool / 2 + 0.2, 32), M.pool, 0, 0.02, 0, g); pool.rotation.x = -Math.PI / 2;
+  egg(R - 0.4, H - 0.4, R - 0.4, 2.4, 2.4, M.air, 0, 0, 0, true, g);
+  for (let k = 0; k < 4; k++) { const t = rad(45 + k * 90), x = s.c[0] + Math.cos(t) * (R + 0.3), z = s.c[1] + Math.sin(t) * (R + 0.3), fx = s.c[0] + Math.cos(t) * (R + 4), fz = s.c[1] + Math.sin(t) * (R + 4); cable([x, AIR_LEVEL, z], [fx, ground(fx, fz) + 0.6, fz]); egg(1.2, 0.6, 1.2, 3, 3, M.gold, fx, ground(fx, fz) + 0.2, fz); }
+  airHalls[key] = { g, dome, R, H };
+  label(s.name, key === "exchange" ? "air bell · Maresa trades" : "air bell · the rest point · Isaro", s.c[0], AIR_LEVEL + H + 2, s.c[1], "dry");
+}
+(function () {
+  const { g, R } = airHalls.guest_hall, depth = 3.4, rm = R - 0.3 - depth / 2; let a = 0.35;
+  for (const [name, kind, d, w] of CITY.guest_rooms) {
+    const da = w / rm, mid = a + da / 2;
+    const box = add(new THREE.BoxGeometry(depth, 2.4, w - 0.15), M.room, Math.cos(mid) * rm, 0.6 + 1.2, Math.sin(mid) * rm, g); box.rotation.y = -mid;
+    if (kind.startsWith("bed")) { const nb = name === "party room" ? 3 : 1; for (let k = 0; k < nb; k++) { const t = mid + (nb === 1 ? 0 : (k - 1) * 1.8) / rm; add(new THREE.BoxGeometry(2.2, 0.5, 1.4), M.bed, Math.cos(t) * (rm + 0.3), 0.9, Math.sin(t) * (rm + 0.3), g).rotation.y = -t; } }
+    a += da + 0.02;
+  }
+  egg(0.35, 0.35, 0.35, 2, 2, M.warm, 0, 4.5, 0, false, g);
+  label("guest rooms", "party room · 3 guest rooms · Isaro's room · washroom", byKey.guest_hall.c[0], AIR_LEVEL + 3.5, byKey.guest_hall.c[1] + 7, "small", 40);
+  egg(2.4, 0.55, 0.5, 5.5, 5.5, M.gold, byKey.exchange.c[0] - 3, AIR_LEVEL + 1.2, byKey.exchange.c[1] + 2);
+})();
+// the civic tunnel, level between the bells' decks
+(function () {
+  const pts = CITY.tunnels[0][1].map(p => new THREE.Vector3(p[0], AIR_LEVEL + 2.2, p[1]));
+  const curve = new THREE.CatmullRomCurve3(pts), L = curve.getLength();
+  add(new THREE.TubeGeometry(curve, Math.ceil(L), 2.25, 16), M.glass); add(new THREE.TubeGeometry(curve, Math.ceil(L), 2.1, 12), M.air);
+  for (let s = 0; s < L; s += 3.2) { const u = s / L, p = curve.getPointAt(u), tg = curve.getTangentAt(u); const r = new THREE.Mesh(new THREE.TorusGeometry(2.25, 0.08, 4, 20), M.gold); r.position.copy(p); r.lookAt(p.clone().add(tg)); scene.add(r); }
+  const m = curve.getPointAt(0.5); cable([m.x, m.y - 2.2, m.z], [m.x, ground(m.x, m.z) + 0.6, m.z]);
+  label("glass tunnel", "dry · bells at one pool depth", m.x, m.y + 4, m.z, "small dry", 90);
+})();
+
+// stalks: holdfast, stipe, crown float, pods
+const POD = { single: [3.6, 3.2, 3.2], double: [2.8, 3.2, 2.8], workshop: [3.2, 3.2, 3.6], reef: [5.2, 3.6, 4], watch: [2.8, 3, 2.8] };
+const lampPoints = [];
+for (const st of STALKS) {
+  const [c, s] = dir(st.b), x = c * st.r, z = s * st.r, gy = ground(x, z);
+  egg(1.7, 0.8, 1.7, 3, 3, M.gold, x, gy + 0.2, z);
+  egg(2.4, 0.35, 2.4, 5.5, 5.5, M.stone, x, gy, z);
+  for (const off of st.pods.length ? [-0.35, 0.35] : [0]) cable([x + off, gy + 0.8, z], [x + off * 0.4, st.crown - 2.6, z], M.cable, 0.13);
+  const fl = egg(1.9, 3, 1.9, 2.2, 2.6, M.glass, x, st.crown, z); egg(1.5, 2.5, 1.5, 2.2, 2.6, lampMat(st.lamp), x, st.crown, z).material.emissiveIntensity = 0.35;
+  band(1.95, 1.95, st.crown, x, z, scene, 0.12);
+  egg(0.4, 0.4, 0.4, 2, 2, lampMat(st.lamp), x, st.crown + 3.2, z);
+  for (let y = 6; y < st.crown - 3; y += 5) egg(0.3, 0.3, 0.3, 2, 2, lampMat(st.lamp), x + 0.5, y, z);
+  st.pods.forEach(([type, py, who], k) => {
+    const [a, hh, b] = POD[type], out = st.name === "Kraken lookout" ? rad(90) : rad(st.b) + (k % 3 - 1) * 2.1, arm = 2.4 + a;
+    const px = x + Math.cos(out) * arm, pz = z + Math.sin(out) * arm;
+    cable([x, py + hh * 0.4, z], [px - Math.cos(out) * a * 0.8, py + hh * 0.4, pz - Math.sin(out) * a * 0.8], M.gold, 0.18);
+    const g = new THREE.Group(); g.position.set(px, py, pz); g.rotation.y = -out + Math.PI / 2; scene.add(g);
+    if (type === "double" || type === "workshop") {
+      const second = type === "double" ? [a, hh * 0.85, b] : [a * 0.85, hh * 0.9, b * 0.9];
+      egg(a, hh, b, 2.6, 2.0, M.nacre, -a * 0.75, 0, 0, false, g); egg(...second, 2.6, 2.0, M.nacre, a * 0.75, -0.6, 0.4, false, g);
+      band(a, b, 0, -a * 0.75, 0, g); band(second[0], second[2], -0.6, a * 0.75, 0.4, g);
+      egg(a * 0.7, hh * 0.6, 0.6, 2.4, 2.4, M.glass, -a * 0.75, 0.4, b - 0.35, false, g);
+    } else {
+      egg(a, hh, b, 2.6, 2.0, M.nacre, 0, 0, 0, false, g); band(a, b, 0, 0, 0, g);
+      egg(a * 0.75, hh * 0.65, 0.7, 2.4, 2.4, type === "watch" ? lampMat(0xbfe0ff) : M.glass, 0, 0.4, b - 0.4, false, g);
+    }
+    egg(1.3, 0.4, 1.3, 2, 2, M.dark, 0, -hh * 0.92, 0, false, g);
+    egg(0.35, 0.35, 0.35, 2, 2, lampMat(st.lamp), 0, -hh - 0.6, 0, false, g);
+    label(who, type === "reef" ? "workshop pod" : type === "watch" ? "watch pod, 16 m below the surface" : type + " pod", px, py + hh + 1.4, pz, "small", 90);
+  });
+  if (st.name) label(st.name, st.name === "Kraken lookout" ? "the tallest stalk" : "household stalk", x, st.crown + 5, z, "", 300);
+  if (st.r === 71) lampPoints.push([x, z, st.b]);
+}
+// the lamp lines: a ring of pearl lamps strung between the stalks at 20 m
+(function () {
+  lampPoints.sort((p, q) => p[2] - q[2]);
+  const lamps = [];
+  for (let i = 0; i < lampPoints.length; i++) {
+    const a = lampPoints[i], b = lampPoints[(i + 1) % lampPoints.length], pts = [];
+    for (let k = 0; k <= 16; k++) { const t = k / 16, ang = rad(a[2] + ((b[2] - a[2] + 360) % 360) * t), sag = Math.sin(Math.PI * t) * 1.6; pts.push(new THREE.Vector3(Math.cos(ang) * 71, LAMP_RING - sag, Math.sin(ang) * 71)); }
+    const curve = new THREE.CatmullRomCurve3(pts); add(new THREE.TubeGeometry(curve, 24, 0.06, 4), M.cable);
+    const L = curve.getLength(); for (let s = 2; s < L; s += 4) lamps.push(curve.getPointAt(s / L));
+  }
+  const im = new THREE.InstancedMesh(new THREE.SphereGeometry(0.32, 10, 8), lampMat(0xb8d4ff), lamps.length), mx = new THREE.Matrix4();
+  lamps.forEach((p, i) => { mx.makeTranslation(p.x, p.y - 0.4, p.z); im.setMatrixAt(i, mx); }); scene.add(im);
+  label("lamp lines", "the column's streets, 20 m up", Math.cos(rad(270)) * 71, LAMP_RING + 2, Math.sin(rad(270)) * 71, "small", 200);
+})();
+
+// kelp forests: tall, rising into the column
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+function inPoly(p, poly) { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const a = poly[i], b = poly[j]; if ((a[1] > p[1]) !== (b[1] > p[1]) && p[0] < (b[0] - a[0]) * (p[1] - a[1]) / (b[1] - a[1]) + a[0]) c = !c; } return c; }
+const kelp = [];
+for (const poly of CITY.kelp) { const xs = poly.map(p => p[0]), zs = poly.map(p => p[1]); let k = 0, tries = 0; while (k < 30 && tries++ < 600) { const x = Math.min(...xs) + rnd() * (Math.max(...xs) - Math.min(...xs)), z = Math.min(...zs) + rnd() * (Math.max(...zs) - Math.min(...zs)); if (!inPoly([x, z], poly)) continue; kelp.push([x, ground(x, z), z, 14 + rnd() * 16, rnd() * 6.28]); k++; } }
+const kelpGeo = new THREE.CylinderGeometry(0.08, 0.3, 1, 5, 1); kelpGeo.translate(0, 0.5, 0);
+const kelpMesh = new THREE.InstancedMesh(kelpGeo, M.kelp, kelp.length); scene.add(kelpMesh);
+const fl = []; for (const poly of CITY.flowers) { const xs = poly.map(p => p[0]), zs = poly.map(p => p[1]); let k = 0, tries = 0; while (k < 26 && tries++ < 400) { const x = Math.min(...xs) + rnd() * (Math.max(...xs) - Math.min(...xs)), z = Math.min(...zs) + rnd() * (Math.max(...zs) - Math.min(...zs)); if (inPoly([x, z], poly)) { fl.push([x, ground(x, z), z]); k++; } } }
+const flowerMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.5, 8, 6), new THREE.MeshStandardMaterial({ roughness: 0.6, emissive: 0x220818 }), fl.length);
+const fcols = [0xff7fb0, 0xffa65a, 0xc58bff, 0xff5f6d]; const mx = new THREE.Matrix4();
+fl.forEach((p, i) => { const sc = 0.6 + rnd(); mx.makeScale(sc, sc * 0.7, sc); mx.setPosition(p[0], p[1] + 0.3, p[2]); flowerMesh.setMatrixAt(i, mx); flowerMesh.setColorAt(i, new THREE.Color(fcols[i % 4])); });
+scene.add(flowerMesh);
+label("kelp forests", "rising 15 to 30 m", -96, 26, 14, "small", 220);
+
+// the warm vent and its bubbles
+(function () { const [x, z] = CITY.vent, y = ground(x, z); egg(4, 2.4, 4, 2.6, 2.6, M.rock, x, y, z); egg(1.2, 0.5, 1.2, 2, 2, M.lava, x, y + 2.3, z); label("warm vent", "heats the Glassworks", x + 6, y + 4, z + 4, "small", 120); })();
+const bubbles = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0xdff8ff, size: 0.35, transparent: true, opacity: 0.7, depthWrite: false }));
+const BN = 160, bpos = new Float32Array(BN * 3); for (let i = 0; i < BN; i++) { bpos[i * 3] = CITY.vent[0] + (rnd() - 0.5) * 2; bpos[i * 3 + 1] = rnd() * 40; bpos[i * 3 + 2] = CITY.vent[1] + (rnd() - 0.5) * 2; }
+bubbles.geometry.setAttribute("position", new THREE.BufferAttribute(bpos, 3)); scene.add(bubbles);
+
+// the Ring Current: drift motes that run clockwise round the channel
+const CN = 900, cdata = [], cpos = new Float32Array(CN * 3);
+for (let i = 0; i < CN; i++) cdata.push([rnd() * Math.PI * 2, 46.6 + rnd() * 4.8, -1.6 + rnd() * 2.8, 0.6 + rnd() * 0.5]);
+const current = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0xbff7ff, size: 0.45, transparent: true, opacity: 0.85, depthWrite: false }));
+current.geometry.setAttribute("position", new THREE.BufferAttribute(cpos, 3)); scene.add(current);
+label("Ring Current", "classical · runs clockwise", Math.cos(rad(200)) * 49, 2, Math.sin(rad(200)) * 49, "", 160);
+
+// a sea folk swimmer for scale, rising toward the air level, and the hero in the Exchange
+(function () {
+  const sf = new THREE.Group(); sf.position.set(18, 22, 44); scene.add(sf);
+  egg(0.3, 0.75, 0.3, 2.6, 2.6, new THREE.MeshStandardMaterial({ color: 0x9fd3c8 }), 0, 0.6, 0, false, sf);
+  egg(0.3, 0.9, 0.25, 2.2, 2.2, new THREE.MeshStandardMaterial({ color: 0x2f9e8f }), 0, -0.8, 0.1, false, sf);
+  egg(0.25, 0.9, 0.25, 2.6, 2.6, new THREE.MeshStandardMaterial({ color: 0xffd27a }), byKey.exchange.c[0] - 2, AIR_LEVEL + 1.5, byKey.exchange.c[1] + 4.5);
+})();
+
+// ---------- labels, toggles, camera moves
+const labelBox = document.getElementById("labels");
+for (const l of labels) { const d = document.createElement("div"); d.className = "lab " + l.cls; d.innerHTML = `<b>${l.text}</b>${l.sub ? l.sub : ""}`; labelBox.appendChild(d); l.el = d; }
+let showLabels = true, cut = false;
+const tog = (id, fn) => { const b = document.getElementById(id); b.addEventListener("click", () => { const v = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", v); fn(v); }); return b; };
+tog("t_labels", v => { showLabels = v; labelBox.hidden = !v; });
+const clearBtn = tog("t_clear", v => { scene.fog.density = v ? 0.0012 : 0.0038; });
+const cutBtn = tog("t_cut", v => setCut(v));
+let flowing = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+const flowBtn = tog("t_flow", v => { flowing = v; }); flowBtn.setAttribute("aria-pressed", flowing);
+function setCut(v) { cut = v; cutBtn.setAttribute("aria-pressed", v); for (const m of glassMats) m.opacity = v ? 0.06 : (m === M.smoked ? 0.45 : 0.26); M.air.opacity = v ? 0.03 : 0.12; }
+function setClear(v) { clearBtn.setAttribute("aria-pressed", v); scene.fog.density = v ? 0.0012 : 0.0038; }
+
+const placesEl = document.getElementById("places"), note = document.getElementById("note");
+let anim = null;
+function go(pl, instant) {
+  for (const b of placesEl.children) b.setAttribute("aria-current", b.dataset.id === pl.id);
+  note.innerHTML = `<h3>${pl.t}</h3><p>${pl.p}</p>${pl.who ? `<div class="who">${pl.who}</div>` : ""}`;
+  setCut(!!pl.cut); setClear(!!pl.clear);
+  const to = new THREE.Vector3(...pl.cam), at = new THREE.Vector3(...pl.at);
+  if (instant || matchMedia("(prefers-reduced-motion: reduce)").matches) { camera.position.copy(to); controls.target.copy(at); controls.update(); anim = null; return; }
+  anim = { t0: performance.now(), from: camera.position.clone(), fromAt: controls.target.clone(), to, at };
+}
+for (const pl of PLACES) { const b = document.createElement("button"); b.className = "place"; b.dataset.id = pl.id; b.setAttribute("role", "listitem"); b.innerHTML = `<h3>${pl.t}</h3><span>${pl.s}</span>`; b.addEventListener("click", () => go(pl)); placesEl.appendChild(b); }
+controls.addEventListener("start", () => { anim = null; });
+
+function resize() { const w = viewer.clientWidth, h = viewer.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(viewer); resize();
+let start = (location.hash || "").slice(1); go(PLACES.find(p => p.id === start) || PLACES[0], true);
+
+const v3 = new THREE.Vector3(), depthEl = document.getElementById("depth");
+let last = performance.now(), time = 0;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now; if (flowing) time += dt;
+  if (anim) { const t = Math.min(1, (now - anim.t0) / 1400), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; camera.position.lerpVectors(anim.from, anim.to, e); controls.target.lerpVectors(anim.fromAt, anim.at, e); if (t >= 1) anim = null; }
+  controls.update();
+  if (camera.position.y < ground(camera.position.x, camera.position.z) + 1.5) camera.position.y = ground(camera.position.x, camera.position.z) + 1.5;
+  depthEl.textContent = `${Math.max(0, 72 - camera.position.y).toFixed(0)} m down`;
+  // kelp sway
+  kelp.forEach((k, i) => { const sw = Math.sin(time * 0.9 + k[4]) * 0.12; mx.makeRotationFromEuler(new THREE.Euler(sw, k[4], sw * 0.6)); mx.scale(new THREE.Vector3(1, k[3], 1)); mx.setPosition(k[0], k[1], k[2]); kelpMesh.setMatrixAt(i, mx); });
+  kelpMesh.instanceMatrix.needsUpdate = true;
+  // the current, clockwise seen from above (angle increasing from +x toward +z)
+  for (let i = 0; i < CN; i++) { const d = cdata[i]; if (flowing) d[0] += dt * d[3] * 4 / d[1]; cpos[i * 3] = Math.cos(d[0]) * d[1]; cpos[i * 3 + 1] = d[2]; cpos[i * 3 + 2] = Math.sin(d[0]) * d[1]; }
+  current.geometry.attributes.position.needsUpdate = true;
+  for (let i = 0; i < BN; i++) { if (flowing) bpos[i * 3 + 1] += dt * (1.5 + (i % 5) * 0.3); if (bpos[i * 3 + 1] > 40) bpos[i * 3 + 1] = ground(CITY.vent[0], CITY.vent[1]) + 2; }
+  bubbles.geometry.attributes.position.needsUpdate = true;
+  renderer.render(scene, camera);
+  if (showLabels) {
+    const w = viewer.clientWidth, h = viewer.clientHeight, placed = [];
+    for (const l of labels) l.d = camera.position.distanceTo(l.p);
+    const order = labels.slice().sort((a, b) => (a.cls.includes("small") - b.cls.includes("small")) || a.d - b.d);
+    for (const l of order) {
+      const dist = l.d;
+      v3.copy(l.p).project(camera);
+      const vis = v3.z < 1 && v3.x > -1.1 && v3.x < 1.1 && v3.y > -1.1 && v3.y < 1.1 && (!l.near || dist < l.near) && dist < 330;
+      l.el.hidden = !vis;
+      if (vis) {
+        const x = (v3.x + 1) / 2 * w, y = (1 - v3.y) / 2 * h, bw = l.w || (l.w = l.el.offsetWidth), bh = l.h || (l.h = l.el.offsetHeight);
+        const box = [x - bw / 2 - 4, y - bh - 2, x + bw / 2 + 4, y];
+        if (placed.some(q => box[0] < q[2] && q[0] < box[2] && box[1] < q[3] && q[1] < box[3])) { l.el.hidden = true; continue; }
+        placed.push(box);
+        l.el.style.left = x.toFixed(1) + "px"; l.el.style.top = y.toFixed(1) + "px"; l.el.style.opacity = Math.max(0.35, Math.min(1, 1.6 - dist / 220)).toFixed(2); }
+    }
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// ---------- a half-section from the centre out along the main avenue: true heights, true radii
+(function () {
+  const svg = document.getElementById("sect"), NS = "http://www.w3.org/2000/svg";
+  const el = (t, a, txt) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; svg.appendChild(e); return e; };
+  const X0 = -8, X1 = 136, Y0 = -8, Y1 = 80, padR = 30;
+  svg.setAttribute("viewBox", `${X0 - 2} ${-Y1 - 2} ${X1 - X0 + padR + 2} ${Y1 - Y0 + 6}`);
+  const Y = y => -y, T = (x, y, t, o = {}) => el("text", Object.assign({ x, y: Y(y), "font-size": 2.4, "text-anchor": "middle" }, o), t);
+  const ps = (v, e) => Math.sign(v) * Math.pow(Math.abs(v), 2 / e);
+  const eggPath = (cx, cy, a, b, et, eb, upper = false) => { const d = []; for (let i = 0; i <= 64; i++) { const t = Math.PI * 2 * i / 64, s = Math.sin(t); if (upper && s < 0) continue; const e = s >= 0 ? et : eb; d.push(`${cx + a * ps(Math.cos(t), e)},${Y(cy + b * ps(s, e))}`); } return "M" + d.join(" L") + " Z"; };
+  el("rect", { x: X0 - 2, y: -Y1 - 2, width: X1 - X0 + padR + 2, height: Y1 - Y0 + 6, fill: "#0a2f3a" });
+  el("rect", { x: X0, y: Y(72), width: X1 - X0, height: 72 - Y0, fill: "#0e4250" });
+  // the two eras as bands
+  el("rect", { x: X0, y: Y(20), width: X1 - X0, height: 20, fill: "#e0975a", "fill-opacity": 0.06 });
+  el("rect", { x: X0, y: Y(66), width: X1 - X0, height: 46, fill: "#9fe8ff", "fill-opacity": 0.05 });
+  T(40, 16, "THE CLASSICAL FLOOR", { "text-anchor": "start", fill: "#e0b48a", "font-size": 2.3, "letter-spacing": 0.3 });
+  T(X1 - 1, 68.5, "THE MODERN COLUMN", { "text-anchor": "end", fill: "#9fe8ff", "font-size": 2.3, "letter-spacing": 0.3 });
+  el("line", { x1: X0, y1: Y(72), x2: X1, y2: Y(72), stroke: "#bff4ff", "stroke-width": 0.5 }); T(30, 73.5, "the surface", { "text-anchor": "start", fill: "#bff4ff" });
+  for (let d = 0; d <= 72; d += 12) { const y = 72 - d; el("line", { x1: X1, y1: Y(y), x2: X1 + 2, y2: Y(y), stroke: "#93b9b8", "stroke-width": 0.3 }); T(X1 + 3, y - 0.8, `${d} m`, { "text-anchor": "start", fill: "#93b9b8", "font-size": 2.2 }); }
+  T(X1 + 3, 76, "depth", { "text-anchor": "start", fill: "#93b9b8", "font-size": 2.2 });
+  // the open column over the mound
+  el("rect", { x: X0, y: Y(72), width: OPEN_COLUMN - X0, height: 72 - 22, fill: "#bff4ff", "fill-opacity": 0.05, stroke: "#bff4ff", "stroke-width": 0.25, "stroke-dasharray": "1 1" });
+  T(8, 48, "the open column", { "font-size": 2.3, fill: "#bff4ff" }); T(8, 45.4, "nothing modern", { "font-size": 2, fill: "#93b9b8" }); T(8, 43.2, "over the mound", { "font-size": 2, fill: "#93b9b8" });
+  // the air level
+  el("line", { x1: X0, y1: Y(AIR_LEVEL), x2: X1, y2: Y(AIR_LEVEL), stroke: "#9fe8ff", "stroke-width": 0.3, "stroke-dasharray": "2 1.2" });
+  T(X1 - 1, AIR_LEVEL + 1, "the air level · pools 42 m down", { "text-anchor": "end", fill: "#9fe8ff", "font-size": 2.1 });
+  el("line", { x1: 52, y1: Y(LAMP_RING), x2: X1, y2: Y(LAMP_RING), stroke: "#b8d4ff", "stroke-width": 0.2, "stroke-dasharray": "0.6 1.4" });
+  // the seabed along the main avenue
+  const pts = []; for (let r = X0; r <= X1; r += 1) pts.push([r, ground(0, Math.max(0, r))]);
+  el("path", { d: "M" + pts.map(p => `${p[0]},${Y(p[1])}`).join(" L") + ` L${X1},${-Y0} L${X0},${-Y0} Z`, fill: "#b3a682" });
+  T(49, -5.6, "Ring Current", { fill: "#bff7ff", "font-size": 2 });
+  // Tidehall (classical, square-ended)
+  el("path", { d: eggPath(0, MOUND, 12.5, 11, 4.2, 5.5, true), fill: "#45d6c4" });
+  el("path", { d: eggPath(-1, MOUND, 16, 1.2, 5.5, 5.5), fill: "#cfc6d6" });
+  el("path", { d: eggPath(11, MOUND + 9, 2.6, 9, 5, 5.5), fill: "#3cc0b0" }); el("path", { d: `M9.6,${Y(MOUND + 21.5)} L11,${Y(MOUND + 26)} L12.4,${Y(MOUND + 21.5)} L11,${Y(MOUND + 19.6)} Z`, fill: "#8dffb0" });
+  el("rect", { x: 14.5, y: Y(MOUND + 7), width: 1, height: 7, rx: 0.4, fill: "#9a2f2c" });
+  T(4, MOUND + 28.5, "Tidehall", { "font-size": 2.8 }); T(4, MOUND + 26, "classical", { fill: "#e0b48a", "font-size": 2.1 });
+  // a classical civic building (the Lamp House, at 34 m)
+  el("path", { d: eggPath(34, 0.4, 6, 6, 4.5, 5.5, true), fill: "#dcd6ea", "fill-opacity": 0.85 }); T(34, 8.6, "Lamp House", { "font-size": 2.1 });
+  // an air bell (the guest hall, 35 m out) moored above
+  el("path", { d: eggPath(35, AIR_LEVEL, 10, 8.5, 2.4, 2.4, true), fill: "#9fe8ff", "fill-opacity": 0.45, stroke: "#c8703f", "stroke-width": 0.4 });
+  el("line", { x1: 25.5, y1: Y(AIR_LEVEL), x2: 44.5, y2: Y(AIR_LEVEL), stroke: "#dcd6ea", "stroke-width": 0.9 });
+  for (const x of [26, 44]) el("line", { x1: x, y1: Y(AIR_LEVEL), x2: x + (x < 35 ? -3 : 3), y2: Y(ground(0, x + (x < 35 ? -3 : 3))), stroke: "#d88a52", "stroke-width": 0.3 });
+  T(35, AIR_LEVEL + 12.2, "air bells", { "font-size": 2.6 }); T(35, AIR_LEVEL + 9.8, "Exchange, guest hall", { fill: "#9fe8ff", "font-size": 2.1 });
+  T(35, AIR_LEVEL - 2.6, "open beneath: the moon pool", { fill: "#93b9b8", "font-size": 1.9 });
+  // a household stalk at 71 m
+  const sx = 71, gy = ground(0, sx);
+  el("line", { x1: sx, y1: Y(gy), x2: sx, y2: Y(38 - 3), stroke: "#d88a52", "stroke-width": 0.35 });
+  el("path", { d: eggPath(sx, gy + 0.3, 1.7, 0.8, 3, 3), fill: "#c8703f" });
+  el("path", { d: eggPath(sx, 38, 1.9, 3, 2.2, 2.6), fill: "#7fe39a", "fill-opacity": 0.55, stroke: "#c8703f", "stroke-width": 0.3 });
+  [[10, -1], [17, 1], [24, -1]].forEach(([y, s]) => { el("line", { x1: sx, y1: Y(y + 1), x2: sx + s * 3, y2: Y(y + 1), stroke: "#c8703f", "stroke-width": 0.4 }); el("path", { d: eggPath(sx + s * 6, y, 3.4, 3, 2.6, 2.0), fill: "#dcd6ea", "fill-opacity": 0.85 }); });
+  T(sx, 44, "a household stalk", { "font-size": 2.6 }); T(sx, 41.6, "pods hung 8 to 34 m up", { fill: "#9fe8ff", "font-size": 2.1 });
+  T(sx - 6, gy + 3, "holdfast", { "font-size": 1.9, fill: "#e0b48a", "text-anchor": "end" });
+  T(sx + 14, LAMP_RING + 1, "lamp lines", { "font-size": 2, fill: "#b8d4ff" });
+  // a classical home on the floor
+  el("path", { d: eggPath(84, gy + 0.3, 4.5, 4.2, 4.5, 5.5, true), fill: "#dcd6ea", "fill-opacity": 0.75 }); T(84, gy + 7, "Current House", { "font-size": 1.9 }); T(84, gy + 5.2, "classical home", { "font-size": 1.7, fill: "#e0b48a" });
+  // the lookout stalk at 100 m
+  const ly = ground(0, 100);
+  el("line", { x1: 100, y1: Y(ly), x2: 100, y2: Y(61), stroke: "#d88a52", "stroke-width": 0.35 });
+  el("path", { d: eggPath(100, 64, 1.9, 3, 2.2, 2.6), fill: "#bfe0ff", "fill-opacity": 0.55, stroke: "#c8703f", "stroke-width": 0.3 });
+  el("path", { d: eggPath(104, 56, 3, 2.6, 2.6, 2.0), fill: "#dcd6ea" }); el("path", { d: eggPath(106.4, 56.4, 0.8, 1.6, 2.4, 2.4), fill: "#bfe0ff" });
+  T(107, 61.4, "Kraken lookout", { "font-size": 2.3, "text-anchor": "start" }); T(108, 59, "watch pod, 16 m down", { "font-size": 1.9, fill: "#9fe8ff", "text-anchor": "start" });
+  // kelp forests
+  for (const r of [91, 94, 97, 101, 104]) { const b = ground(0, r); el("path", { d: `M${r},${Y(b)} q1.5,-8 -0.5,-15 q-1.6,-6 0.8,-12`, fill: "none", stroke: "#3f8a46", "stroke-width": 0.6 }); }
+  T(91, 32, "kelp forests", { "font-size": 2.1, fill: "#7fc58a", "text-anchor": "end" });
+  // the Glassworks at the vent: the hinge
+  const gb = ground(0, 118);
+  el("path", { d: eggPath(118, gb + 0.2, 9.2, 2.6, 5.5, 5.5, true), fill: "#cfc6d6" });
+  el("path", { d: eggPath(118, gb + 2.8, 8, 8, 2.4, 2.4, true), fill: "#8a7a6a", "fill-opacity": 0.6, stroke: "#c8703f", "stroke-width": 0.4 });
+  T(118, gb + 14.2, "Glassworks", { "font-size": 2.4 }); T(118, gb + 11.8, "modern, on the floor: the hinge", { "font-size": 1.9, fill: "#ffb07a" });
+  el("path", { d: `M122,${Y(ground(0, 122))} L124,${Y(ground(0, 124) + 2.5)} L127,${Y(ground(0, 127))} Z`, fill: "#ff7a2a" });
+  // figures and scale
+  el("rect", { x: 20 - 0.25, y: Y(MOUND + 1.8), width: 0.5, height: 1.8, fill: "#ffd27a" });
+  el("line", { x1: X0 + 4, y1: Y(-5.5), x2: X0 + 24, y2: Y(-5.5), stroke: "#e6f3f1", "stroke-width": 0.5 }); T(X0 + 14, -4.6, "20 m", { "font-size": 2.1 });
+  T(X0 + 1, 76, "centre ←", { "text-anchor": "start", "font-size": 2.2 }); T(X1 - 1, 76, "→ the edge, toward the islands", { "text-anchor": "end", "font-size": 2.2 });
+})();
+</script>

@@ -1,0 +1,282 @@
+<title>Ohio Water Plan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a surveyor's sheet. Plan first, then the long section along the water, then two true-scale details */
+:root{
+  --bg:#f1efe8; --paper:#fbfaf6; --ink:#24221d; --muted:#6a655a; --rule:#d6d1c4;
+  --grass:#b9cf9a; --grass2:#a5c184; --gorge:#cbb894; --lake:#6f9fc0; --lake2:#4f86ad;
+  --water:#2f7fb8; --stone:#a39478; --stone-dk:#6e6250; --bldg:#e3d6bd; --bldg-edge:#7b6a50;
+  --road:#d9c7a1; --accent:#b3542e; --old:#9a3b2a;
+  --display:"Libre Caslon Text", Georgia, serif;
+  --body:"Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#16181a; --paper:#1d2023; --ink:#ebe7dc; --muted:#a39d90; --rule:#383b3f;
+  --grass:#3f5537; --grass2:#4a643f; --gorge:#4d4434; --lake:#2c4c63; --lake2:#355d7a;
+  --water:#6fb6e6; --stone:#b5a88d; --stone-dk:#d0c4a8; --bldg:#5a5142; --bldg-edge:#c9b896;
+  --road:#6b5f48; --accent:#e08a5c; --old:#e07a62; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#16181a; --paper:#1d2023; --ink:#ebe7dc; --muted:#a39d90; --rule:#383b3f;
+  --grass:#3f5537; --grass2:#4a643f; --gorge:#4d4434; --lake:#2c4c63; --lake2:#355d7a;
+  --water:#6fb6e6; --stone:#b5a88d; --stone-dk:#d0c4a8; --bldg:#5a5142; --bldg-edge:#c9b896;
+  --road:#6b5f48; --accent:#e08a5c; --old:#e07a62; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:grid;gap:30px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,4vw,38px);margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0 0 6px}
+.lede{color:var(--muted);max-width:70ch;margin:6px 0 0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.sheet{background:var(--paper);border:1px solid var(--rule);border-radius:4px}
+.scroll{overflow-x:auto}
+.scroll svg{display:block;width:100%;height:auto}
+#plan{min-width:680px} #profile{min-width:720px}
+.cap{font-size:13px;color:var(--muted);padding:10px 16px;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:8px 20px}
+.cap span{display:inline-flex;align-items:center;gap:7px}
+.cap svg{flex:none}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:24px}
+.pair>*{min-width:0}
+.note{font-size:14px;color:var(--muted);max-width:75ch;margin:4px 0 0}
+section>p{margin:0}
+text{font-family:var(--body)}
+.lbl{fill:var(--ink)} .dim{fill:var(--muted);font-family:var(--mono)} .acc{fill:var(--accent);font-weight:600}
+.wlbl{fill:var(--water);font-weight:600}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Eleblorb · Ohio · water works, fifth version, proposed 12 Oct 2026</div>
+    <h1>Ohio Water Plan</h1>
+    <p class="lede">The terrain has a vertex only every 18 m (the grey dots), so it can level whole cells but cannot cut a channel. Everything here is built on the ground.
+      <br>• <strong>The dam:</strong> the tarn's south bank is an earth dam exactly one cell wide.
+      <br>• <strong>The mill:</strong> a timber launder carries water from the sluice to an overshot wheel at the dam's foot.
+      <br>• <strong>The leat:</strong> the mill's spent water runs in a raised stone channel along the village's north-east edge and the east road. It goes out over the lake on a timber flume.
+      <br>• <strong>Roads:</strong> no road crosses the water.
+      <br>• <strong>Clean water:</strong> a buried main brings it to the Conduit house, then to every house and the fountain.
+      <br>The plan is in town metres, with the fountain at the origin and north at the top.</p>
+  </header>
+
+  <figure class="sheet" style="margin:0">
+    <div class="scroll"><svg id="plan" viewBox="-70 -172 215 236" role="img" aria-label="Plan of Ohio's water system on the terrain grid"></svg></div>
+    <figcaption class="cap">
+      <span><svg width="28" height="12"><rect x="1" y="3" width="26" height="6" fill="var(--stone)"/><line x1="1" y1="6" x2="27" y2="6" stroke="var(--water)" stroke-width="2"/></svg>Raised stone leat</span>
+      <span><svg width="28" height="10"><line x1="1" y1="5" x2="27" y2="5" stroke="var(--accent)" stroke-width="1.4" stroke-dasharray="3 2"/></svg>Buried main (not modelled)</span>
+      <span><svg width="28" height="10"><line x1="1" y1="5" x2="27" y2="5" stroke="var(--bldg-edge)" stroke-width="2"/></svg>Timber launder or flume</span>
+      <span><svg width="14" height="14"><circle cx="7" cy="7" r="2" fill="var(--muted)"/></svg>Terrain vertex (18 m)</span>
+      <span><svg width="22" height="12"><rect x="1" y="1" width="20" height="10" fill="var(--road)" opacity=".6"/></svg>Terrain pad at 0</span>
+      <span><svg width="14" height="14"><path d="M2 2 L12 12 M12 2 L2 12" stroke="var(--old)" stroke-width="2"/></svg>Retired</span>
+    </figcaption>
+  </figure>
+
+  <section class="sheet">
+    <div style="padding:14px 16px 0"><h2>The leat from the wheel to the rim</h2>
+    <p class="note">Heights are stretched about 18 times. The channel stands on the ground: its bed is always at or above the ground, falling 0.55% from 0.75 m to 0.05 m, with water 0.3 m deep and kerbs 0.5 m above the bed. So it is a low stone wall, 1.25 m high at the mill and 0.55 m at the rim, and it never needs the terrain cut.</p></div>
+    <div class="scroll"><svg id="profile" viewBox="0 0 980 318" role="img" aria-label="Long section of the raised leat" style="overflow:visible"></svg></div>
+  </section>
+
+  <div class="pair">
+    <section class="sheet">
+      <div style="padding:14px 16px 0"><h2>Dam, launder and mill, true scale</h2>
+      <p class="note">The earth dam falls 9.6 m across exactly one terrain cell, from the crest vertex to the pad. A timber launder on trestles carries water 20 m from the sluice to the top of a 6 m overshot wheel, which stands in a masonry race on level ground beside the mill's north gable.</p></div>
+      <div class="scroll"><svg id="mill" viewBox="-2 -14 52 17" role="img" aria-label="Section through tarn, earth dam, launder, wheel and mill"></svg></div>
+    </section>
+    <section class="sheet">
+      <div style="padding:14px 16px 0"><h2>The flume, true scale</h2>
+      <p class="note">On the grid the cliff falls across one 18 m cell, so it is never vertical. The leat continues about 7 m past the lip on a timber flume with raking struts, the length the existing <code>_flume_reach</code> finds. Water leaving at 2.6 m/s falls about 62 m and lands about 16 m out, in the bay.</p></div>
+      <div class="scroll"><svg id="mouth" viewBox="-12 -6 40 76" role="img" aria-label="Section through the cliff at the flume" style="max-height:640px"></svg></div>
+    </section>
+  </div>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+function el(p,tag,a){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e}
+function tx(p,x,y,s,cls,size,anchor="middle",extra={}){const t=el(p,"text",Object.assign({x,y,class:cls,"font-size":size,"text-anchor":anchor},extra));t.textContent=s;return t}
+const poly=pts=>pts.map(p=>p.join(",")).join(" ");
+
+/* PLAN */
+(function(){
+const s=document.getElementById("plan");
+const R=242, cx=-150, cz=-70;
+const defs=el(s,"defs",{});
+el(s,"rect",{x:-70,y:-172,width:215,height:236,fill:"var(--gorge)"});
+const cp=el(defs,"clipPath",{id:"outsideRim"});
+el(cp,"path",{d:`M-70 -172 H145 V64 H-70 Z M ${cx+R} ${cz} A ${R} ${R} 0 1 0 ${cx-R} ${cz} A ${R} ${R} 0 1 0 ${cx+R} ${cz} Z`,"clip-rule":"evenodd"});
+const g=el(s,"g",{"clip-path":"url(#outsideRim)"});
+el(g,"rect",{x:72,y:-142,width:80,height:144,fill:"var(--lake)"});
+function sector(r0,r1,a0,a1){const p=[];for(let a=a0;a<=a1+0.01;a+=1){const t=a*Math.PI/180;p.push([cx+r1*Math.cos(t),cz+r1*Math.sin(t)])}for(let a=a1;a>=a0-0.01;a-=1){const t=a*Math.PI/180;p.push([cx+r0*Math.cos(t),cz+r0*Math.sin(t)])}return poly(p)}
+el(g,"polygon",{points:sector(R-2,R+70,8,32),fill:"#e6d6ae",opacity:.55});
+el(g,"polygon",{points:sector(R-2,R+55,6,33),fill:"var(--lake2)"});
+el(s,"circle",{cx,cy:cz,r:R,fill:"var(--grass)"});
+el(s,"circle",{cx,cy:cz,r:R,fill:"none",stroke:"var(--stone-dk)","stroke-width":.6});
+tx(s,118,-60,"great lake","wlbl",4.6);
+tx(s,112,32,"new bay","wlbl",4.6);
+// tarn
+el(s,"circle",{cx:30,cy:-142,r:24,fill:"var(--grass2)",opacity:.8});
+el(s,"circle",{cx:30,cy:-142,r:17.5,fill:"var(--lake2)",stroke:"var(--stone-dk)","stroke-width":.4});
+tx(s,30,-145,"tarn","lbl",4,"middle",{style:"fill:#fff"});tx(s,30,-140.5,"water 8.0 m","dim",2.6,"middle",{style:"fill:#e9f2f8"});
+// earth dam face band z -124..-106
+el(s,"rect",{x:12,y:-124,width:36,height:18,fill:"var(--grass2)",opacity:.9});
+for(let x=14;x<48;x+=3) el(s,"line",{x1:x,y1:-123,x2:x,y2:-118,stroke:"var(--stone-dk)","stroke-width":.25});
+tx(s,4,-113,"earth dam","lbl",2.8,"end");tx(s,4,-110,"one cell, 9.6 m","dim",2.4,"end");
+// mill pad cells
+el(s,"rect",{x:12,y:-106,width:36,height:54,fill:"var(--road)",opacity:.45});
+// ways
+const ways=[
+ [4.8,[[-60,-21.5],[-52,-18.3],[-44,-15.6],[-36,-13.4],[-28,-11.6],[-20,-8.6],[-12,-5],[-7,-2]]],
+ [3.6,[[-13,-6.8],[-4,-8.2],[8,-8.6],[25,-8.4],[38,-9.5]]],
+ [3.5,[[38,-9.5],[52,-7],[63,-3],[72,.5],[75.5,1.5],[78,2]]],
+ [2.6,[[38,-9.5],[38.5,-30],[38.5,-50],[30,-70],[22,-84],[22,-94]]],
+ [1.8,[[74,8],[71,12],[66.5,16.5],[63.2,20.5],[63,26],[63,32],[60,36.5],[56,41],[50,47]]],
+ [2.8,[[-5,8],[-8.5,16],[-10.5,24],[-12.5,32],[-15.5,40],[-19.5,45]]],
+ [2.8,[[6,8],[10,15],[15.5,22],[21,29],[24.5,35],[24.2,38]]],
+ [2.2,[[-19.5,47.5],[-8,51],[8,51],[23,47.5]]],
+];
+for(const [w,p] of ways) el(s,"polyline",{points:poly(p),fill:"none",stroke:"var(--road)","stroke-width":w,"stroke-linecap":"round","stroke-linejoin":"round"});
+tx(s,34.5,-40,"mill road","dim",2.8,"middle",{transform:"rotate(-90 34.5 -40)"});
+tx(s,-40,-18,"main street","dim",2.8,"middle",{transform:"rotate(18 -40 -18)"});
+tx(s,58,0,"east road","dim",2.8,"middle",{transform:"rotate(20 58 0)"});
+el(s,"ellipse",{cx:0,cy:0,rx:15,ry:11,fill:"var(--grass2)"});
+const B=[[-19.5,28,-90,4,3],[53,-27,90,3,2],[19,38,-90,3,3],[9,-18.5,180,5,3],[-25,2,-90,3,2],[-7.5,-19.6,180,3,3],[27,-18.6,180,3,3],[-40,16,90,6,2],[-27,43,-90,3,2]];
+for(const [x,z,yaw,cw,cd] of B){let w=cw*3.2,d=cd*3.2;if(Math.abs(yaw)===90){[w,d]=[d,w]}el(s,"rect",{x:x-w/2,y:z-d/2,width:w,height:d,fill:"var(--bldg)",stroke:"var(--bldg-edge)","stroke-width":.35});}
+el(s,"rect",{x:25.2,y:-102,width:9.6,height:16,fill:"var(--bldg)",stroke:"var(--bldg-edge)","stroke-width":.5});
+el(s,"rect",{x:-39.6,y:-34,width:19.2,height:16,fill:"var(--bldg)",stroke:"var(--bldg-edge)","stroke-width":.35});
+el(s,"circle",{cx:-44,cy:-2.5,r:3.2,fill:"var(--bldg)",stroke:"var(--bldg-edge)","stroke-width":.35});
+el(s,"rect",{x:56.8,y:-30.7,width:8.4,height:6.4,rx:2,fill:"var(--road)",opacity:.8});
+for(const [n,x,z] of [["Holt Inn",-30,-26],["Sawmill",30,-93],["Tam Ruskin",53,-26.2],["Smithy",27,-17.8],["Meeting house",9,-17.7],["Vey",-7.5,-18.8]]) tx(s,x,z,n,"lbl",2.7);
+for(const [x,z] of [[-3.4,-12.4],[24.9,-10.4],[-10.8,-12.2]]) el(s,"rect",{x:x-1.4,y:z-.9,width:2.8,height:1.8,fill:"var(--accent)",opacity:.7});
+el(s,"circle",{cx:76.3,cy:1.7,r:5.8,fill:"#ddd3bd",stroke:"var(--stone-dk)","stroke-width":.4});
+el(s,"circle",{cx:72,cy:-2.5,r:2.6,fill:"#6f9a5a",opacity:.85});
+tx(s,76.3,11,"overlook (now 0 m)","lbl",3);
+// retired
+el(s,"rect",{x:67,y:-100,width:16,height:9.6,fill:"none",stroke:"var(--old)","stroke-width":.5,"stroke-dasharray":"1.4 1"});
+el(s,"polyline",{points:poly([[47.5,-142],[58.5,-142.1],[66,-140.5],[70,-136],[72.4,-124],[72.9,-107],[74.6,-103.4],[78,-102],[83.2,-102]]),fill:"none",stroke:"var(--old)","stroke-width":.6,"stroke-dasharray":"1.4 1"});
+el(s,"path",{d:"M81.7 -103.5 L84.7 -100.5 M84.7 -103.5 L81.7 -100.5",stroke:"var(--old)","stroke-width":.8});
+tx(s,76,-86,"old mill, east sill, fall: retired","acc",2.6);
+// launder
+el(s,"line",{x1:30,y1:-124,x2:30,y2:-105,stroke:"var(--bldg-edge)","stroke-width":1.4});
+el(s,"rect",{x:27,y:-106,width:6,height:3,fill:"var(--stone-dk)"});
+// spillway
+el(s,"line",{x1:40,y1:-124,x2:38,y2:-106,stroke:"var(--water)","stroke-width":.8,"stroke-dasharray":"1 .6"});
+// main
+el(s,"polyline",{points:poly([[30,-124],[36,-108],[40,-60],[40,-12],[42,-3]]),fill:"none",stroke:"var(--accent)","stroke-width":.8,"stroke-dasharray":"1.8 1.2"});
+el(s,"polyline",{points:poly([[42,-3],[20,-3],[3,-2],[0,0]]),fill:"none",stroke:"var(--accent)","stroke-width":.7,"stroke-dasharray":"1.8 1.2"});
+el(s,"polyline",{points:poly([[20,-3],[12,-7],[-4,-6.5],[-14,-5],[-28,-10.5],[-44,-14.5],[-48,-8],[-44,10]]),fill:"none",stroke:"var(--accent)","stroke-width":.6,"stroke-dasharray":"1.8 1.2"});
+el(s,"polyline",{points:poly([[-5,8],[-12.5,32],[-19.5,45]]),fill:"none",stroke:"var(--accent)","stroke-width":.6,"stroke-dasharray":"1.8 1.2"});
+el(s,"polyline",{points:poly([[6,8],[21,29],[24,38]]),fill:"none",stroke:"var(--accent)","stroke-width":.6,"stroke-dasharray":"1.8 1.2"});
+// leat (raised)
+const L=[[33,-104.5],[37,-102],[37,-86],[45,-55],[45,-15],[48,-13],[83,-9]];
+el(s,"polyline",{points:poly(L),fill:"none",stroke:"var(--stone)","stroke-width":2.6,"stroke-linejoin":"round"});
+el(s,"polyline",{points:poly(L),fill:"none",stroke:"var(--water)","stroke-width":1,"stroke-linejoin":"round"});
+// flume
+el(s,"line",{x1:83,y1:-9,x2:90,y2:-9,stroke:"var(--bldg-edge)","stroke-width":1.6});
+el(s,"circle",{cx:99,cy:-9,r:2,fill:"#fff",opacity:.85});el(s,"circle",{cx:99,cy:-9,r:2,fill:"none",stroke:"var(--water)","stroke-width":.6});
+// conduit house, step-bridge, dipping place, trough
+el(s,"rect",{x:40,y:-5,width:4,height:4,fill:"var(--stone-dk)"});
+el(s,"rect",{x:46.8,y:-14.6,width:2.4,height:3.4,fill:"var(--stone-dk)"});
+el(s,"rect",{x:43.2,y:-21,width:1.2,height:2,fill:"var(--water)"});
+el(s,"rect",{x:66,y:-9.4,width:3.4,height:1.3,fill:"var(--stone)",stroke:"var(--stone-dk)","stroke-width":.3});
+el(s,"circle",{cx:0,cy:0,r:2.4,fill:"var(--water)",stroke:"var(--stone-dk)","stroke-width":.4});
+// lattice vertices (x = 30+18k, z = -142+18k)
+for(let x=-60;x<=140;x+=18) for(let z=-160;z<=60;z+=18){ el(s,"circle",{cx:x,cy:z,r:.55,fill:"var(--muted)",opacity:.55}); }
+const C=[
+ [30,-124,  -6,-132,"South sill and sluice on the dam crest"],
+ [30,-115,  56,-128,"Timber launder on trestles, 20 m"],
+ [30,-104.5,-6,-100,"Overshot wheel in a masonry race"],
+ [25.2,-94, -6,-90,"Mill door west, onto the mill road"],
+ [37,-90,   58,-112,"Leat leaves east of the mill"],
+ [43.8,-20, 6,-44,"Dipping place for the forge"],
+ [48,-13,   64,-24,"Tam's step-bridge"],
+ [42,-3,    30,14,"Conduit house · valves, public tap"],
+ [0,0,      -8,34,"Fountain jet on the main · Water Gem"],
+ [67.7,-8.7,96,-30,"Horse trough"],
+ [88,-9,    104,-18,"Flume about 7 m past the lip"],
+];
+for(const [x,z,lx,lz,t] of C){ el(s,"line",{x1:x,y1:z,x2:lx,y2:lz+1,stroke:"var(--ink)","stroke-width":.25}); el(s,"circle",{cx:x,cy:z,r:.7,fill:"var(--ink)"}); tx(s,lx,lz,t,"lbl",2.8,lx>x?"start":"end"); }
+tx(s,-66,-166,"N ↑ · metres from the fountain","dim",3,"start");
+el(s,"line",{x1:-62,y1:58,x2:-42,y2:58,stroke:"var(--ink)","stroke-width":.6});
+for(const x of [-62,-52,-42]) el(s,"line",{x1:x,y1:56.8,x2:x,y2:59.2,stroke:"var(--ink)","stroke-width":.5});
+tx(s,-52,55.6,"20 m","dim",2.8);
+tx(s,128,58,"rim drawn approximately","dim",2.5,"end");
+})();
+
+/* PROFILE */
+(function(){
+const s=document.getElementById("profile");
+const X=d=>70+d*6.6, Y=h=>200-h*100;
+for(const h of [-0.5,0,0.5,1,1.5]){el(s,"line",{x1:X(0),y1:Y(h),x2:X(130),y2:Y(h),stroke:"var(--rule)","stroke-width":.6});tx(s,62,Y(h)+4,(h>0?"+":"")+h+" m","dim",11,"end")}
+el(s,"rect",{x:X(0),y:Y(0),width:X(127)-X(0),height:Y(-0.7)-Y(0),fill:"var(--grass)"});
+el(s,"line",{x1:X(0),y1:Y(0),x2:X(127),y2:Y(0),stroke:"var(--stone-dk)","stroke-width":1.4});
+const bed=d=>0.75-0.0055*d;
+const pts=[];for(let d=0;d<=127;d+=1)pts.push(d);
+// footing + kerb body
+el(s,"polygon",{points:poly([...pts.map(d=>[X(d),Y(bed(d)+0.5)]),...pts.slice().reverse().map(d=>[X(d),Y(0)])]),fill:"var(--stone)",opacity:.85});
+// channel interior
+el(s,"polygon",{points:poly([...pts.map(d=>[X(d),Y(bed(d)+0.3)]),...pts.slice().reverse().map(d=>[X(d),Y(bed(d))])]),fill:"var(--water)",opacity:.75});
+el(s,"polyline",{points:poly(pts.map(d=>[X(d),Y(bed(d)+0.3)])),fill:"none",stroke:"var(--water)","stroke-width":2});
+el(s,"polyline",{points:poly(pts.map(d=>[X(d),Y(bed(d))])),fill:"none",stroke:"var(--stone-dk)","stroke-width":1});
+el(s,"line",{x1:X(127),y1:Y(0),x2:X(127),y2:Y(-0.7),stroke:"var(--stone-dk)","stroke-width":2.4});
+el(s,"line",{x1:X(127),y1:Y(0.33),x2:X(132),y2:Y(0.3),stroke:"var(--bldg-edge)","stroke-width":4});
+const A=[[0,1.25,"kerb 1.25 m above ground at the mill","start",2,-10],[0,0.75,"bed 0.75","start",6,16],[88,0.77,"corner","middle",0,-14],[127,0.55,"rim: kerb 0.55","end",-6,-12],[127,0.35,"flume →","start",30,-8],[60,0,"ground 0 the whole way (terrain pads)","middle",0,24]];
+for(const [d,h,t,an,dx,dy] of A) tx(s,X(d)+dx,Y(h)+dy,t,"lbl",12,an);
+tx(s,X(64),Y(1.42),"bed falls 0.55%: 0.75 → 0.05 m over 127 m · water 0.3 m deep","wlbl",12);
+for(const d of [0,50,100]){el(s,"line",{x1:X(d),y1:Y(-0.7),x2:X(d),y2:Y(-0.7)+5,stroke:"var(--muted)"});tx(s,X(d),Y(-0.7)+18,d+" m","dim",11)}
+tx(s,X(64),Y(-0.7)+34,"distance along the leat from the wheel race","dim",11);
+})();
+
+/* DAM, LAUNDER, MILL (x = metres south of the tarn centre) */
+(function(){
+const s=document.getElementById("mill");
+const Y=h=>-h;
+el(s,"polygon",{points:poly([[-2,Y(3.5)],[17.5,Y(3.5)],[17.5,Y(9.6)],[18,Y(9.6)],[36,Y(0)],[50,Y(0)],[50,Y(-2)],[-2,Y(-2)]]),fill:"var(--grass)"});
+el(s,"rect",{x:-2,y:Y(8),width:19.5,height:4.5,fill:"var(--lake2)"});
+for(const x of [18,36]) {el(s,"circle",{cx:x,cy:x===18?Y(9.6):Y(0),r:.3,fill:"var(--ink)"});}
+tx(s,18,Y(10.4),"crest vertex 9.6","lbl",.75);tx(s,33.5,Y(-1.7),"toe vertex 0","lbl",.75);
+// sluice
+el(s,"rect",{x:17.6,y:Y(10.2),width:.8,height:2.6,fill:"var(--stone-dk)"});
+// launder on trestles from 18 to 38
+el(s,"line",{x1:18.4,y1:Y(7.95),x2:38,y2:Y(7.6),stroke:"var(--bldg-edge)","stroke-width":.35});
+el(s,"line",{x1:18.4,y1:Y(7.8),x2:38,y2:Y(7.45),stroke:"var(--water)","stroke-width":.14});
+for(const x of [22,26,30,34]){const gy=x<36?9.6-(x-18)*9.6/18:0;el(s,"line",{x1:x,y1:Y(gy),x2:x,y2:Y(7.8),stroke:"var(--bldg-edge)","stroke-width":.12});}
+// wheel race and wheel at 38 (centre 4.4, r 3)
+el(s,"rect",{x:36.6,y:Y(1.4),width:2.8,height:1.4,fill:"var(--stone)"});
+el(s,"circle",{cx:38,cy:Y(4.4),r:3,fill:"none",stroke:"var(--bldg-edge)","stroke-width":.22});
+for(let a=0;a<12;a++){const t=a*Math.PI/6;el(s,"line",{x1:38,y1:Y(4.4),x2:38+3*Math.cos(t),y2:Y(4.4)+3*Math.sin(t),stroke:"var(--stone-dk)","stroke-width":.05})}
+// mill
+el(s,"polygon",{points:poly([[40,Y(0)],[40,Y(7)],[45,Y(9.6)],[50,Y(7)],[50,Y(0)]]),fill:"var(--bldg)",stroke:"var(--bldg-edge)","stroke-width":.1});
+el(s,"rect",{x:46.5,y:Y(1.8),width:.42,height:1.8,rx:.2,fill:"var(--ink)"});
+tx(s,8,Y(10.4),"tarn 8.0 m","wlbl",.9);
+tx(s,28,Y(8.6),"launder 7.8 → 7.45","lbl",.75);
+tx(s,27,Y(3.2),"earth dam, one cell","dim",.75);
+tx(s,38.5,Y(-0.9),"wheel 6 m","lbl",.7);
+tx(s,45,Y(5),"sawmill","lbl",.9);
+tx(s,45,Y(-0.9),"pad at 0","dim",.7);
+})();
+
+/* FLUME (y down; 0 = ground at the rim) */
+(function(){
+const s=document.getElementById("mouth");
+const L=61.65;
+const face=x=>63.65*(t=>t*t*(3-2*t))(Math.min(Math.max(x/18,0),1));
+const pts=[[-12,0],[0,0]];for(let x=0;x<=18;x+=.5)pts.push([x,face(x)]);pts.push([18,76],[-12,76]);
+el(s,"polygon",{points:poly(pts),fill:"var(--gorge)"});
+el(s,"rect",{x:-12,y:-.9,width:12,height:.9,fill:"var(--grass)"});
+el(s,"rect",{x:0,y:L,width:28,height:14,fill:"var(--lake2)"});
+el(s,"polygon",{points:poly(pts.slice(1,-2).concat([[18,L],[0,L]])),fill:"var(--gorge)"});
+// channel on ground
+el(s,"rect",{x:-12,y:-.55,width:12,height:.55,fill:"var(--stone)"});
+el(s,"rect",{x:-12,y:-.35,width:12,height:.3,fill:"var(--water)"});
+// flume and struts
+el(s,"rect",{x:0,y:-.4,width:7,height:.35,fill:"var(--bldg-edge)"});
+for(const x of [2.4,4.8,6.8]){const fy=face(x*0.55);el(s,"line",{x1:x,y1:0,x2:x*0.55,y2:fy,stroke:"var(--bldg-edge)","stroke-width":.18});}
+let d="M7 -0.27";for(let t=0;t<=3.57;t+=0.05){d+=` L${7+2.6*t} ${-0.27+4.905*t*t}`}
+el(s,"path",{d,fill:"none",stroke:"var(--water)","stroke-width":.45});
+tx(s,-6,-2,"leat on the ground","wlbl",1.7);
+tx(s,4,-2,"7 m flume","lbl",1.7);
+tx(s,7,22,"cliff over one 18 m cell","dim",1.6,"start");
+tx(s,18,32,"62 m fall at 2.6 m/s","wlbl",1.7,"start");
+tx(s,16.2,L+4.4,"lands about 16 m out","lbl",1.7);
+tx(s,16,L+9,"lake −61.65","dim",1.6,"middle",{style:"fill:#e9f2f8"});
+})();
+</script>

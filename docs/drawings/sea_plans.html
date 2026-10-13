@@ -1,0 +1,365 @@
+<title>Sea Folk City Floor Plans</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Karla:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: an architect's drawing set on drafting paper. Key plans first, then the circulation, then building plans with their sections. Ink for heritage, sea-glass for the new. */
+:root {
+  --paper: #eef2ef; --sheet: #fbfcfa; --ink: #1d2f33; --muted: #5b7176; --rule: #cdd8d5;
+  --stone: #cbbfa6; --stone-ink: #6f604a; --glass: #8fd6e6; --glass-ink: #1f8fa8; --air: #d4f2f7;
+  --water: #dbe9ea; --current: #9cc9d8; --avenue: #b8d9cf; --kelp: #9db892; --wet: #e6e0ee; --accent: #c8703f;
+  --display: "Marcellus", "Palatino Linotype", Palatino, serif;
+  --body: "Karla", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0c1a1e; --sheet: #112328; --ink: #e2eeec; --muted: #94adb1; --rule: #22393f;
+  --stone: #7b6f58; --stone-ink: #d8c7a4; --glass: #2f8aa0; --glass-ink: #7fdcf0; --air: #17414b;
+  --water: #13303a; --current: #24566a; --avenue: #1f4a45; --kelp: #3f5e3d; --wet: #3a3448; --accent: #e08a55; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #0c1a1e; --sheet: #112328; --ink: #e2eeec; --muted: #94adb1; --rule: #22393f;
+  --stone: #7b6f58; --stone-ink: #d8c7a4; --glass: #2f8aa0; --glass-ink: #7fdcf0; --air: #17414b;
+  --water: #13303a; --current: #24566a; --avenue: #1f4a45; --kelp: #3f5e3d; --wet: #3a3448; --accent: #e08a55; color-scheme: dark; }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 26px 60px; display: grid; gap: 30px; }
+header { display: grid; gap: 8px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 4.6vw, 50px); line-height: 1.05; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 400; font-size: 27px; margin: 0; text-wrap: balance; }
+h3 { font-size: 17px; margin: 0; }
+p { margin: 0; max-width: 72ch; }
+.lede { color: var(--muted); }
+section { display: grid; gap: 14px; }
+.moves { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 14px; }
+.move { background: var(--sheet); border: 1px solid var(--rule); padding: 16px; display: grid; gap: 6px; align-content: start; }
+.move b { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--glass-ink); }
+.move p { font-size: 15px; }
+.ref { font-size: 13px; color: var(--muted); }
+.sheets { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 540px), 1fr)); gap: 18px; }
+figure { margin: 0; background: var(--sheet); border: 1px solid var(--rule); display: grid; min-width: 0; }
+figure .hd { padding: 14px 16px 4px; display: grid; gap: 4px; }
+figure .note { font-size: 14px; color: var(--muted); }
+.draw { overflow-x: auto; }
+.draw svg { display: block; width: 100%; height: auto; min-width: 480px; }
+svg text { font-family: var(--mono); fill: var(--ink); paint-order: stroke; stroke: var(--sheet); stroke-linejoin: round; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px 14px; font-family: var(--mono); font-size: 12px; color: var(--muted); border-top: 1px solid var(--rule); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 18px; height: 11px; display: inline-block; border: 1px solid var(--muted); }
+.tbl { overflow-x: auto; background: var(--sheet); border: 1px solid var(--rule); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; min-width: 640px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+td:first-child { font-weight: 700; white-space: nowrap; }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; max-width: 74ch; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Eleblorb · Ocean Kingdom · sea folk city · third pass, floor plans for review</div>
+    <h1>Sea Folk City Floor Plans</h1>
+    <p class="lede">The classical city stays on the seabed, and its heritage is kept, used and in places brought into the dry under new glass. The modern city is whole SuperEgg bubbles with floors, held in the water by their own ballast, and joined by glass tunnels into one network you can walk from the floor up to the crown ring 30 m above it. No cables, no legs, no bird-cage ribs. Every drawing here is generated from <code>tools/sea_folk_third_pass.py</code>, which checks the fits, clearances and circulation.</p>
+  </header>
+
+  <section>
+    <h2>Three ways the new meets the old</h2>
+    <div class="moves">
+      <div class="move"><b>Wrap</b><h3>The Exchange</h3><p>A glass bubble set over the preserved Hall of Records. The old hall stands free inside, now dry, as the city's archive and Dakuro's chart room. The trading floor runs round it, and a gallery at the tunnels' level looks down into the court.</p><div class="ref">After the British Museum's Great Court: a new glazed court round the old Reading Room.</div></div>
+      <div class="move"><b>Join</b><h3>The guest hall</h3><p>Two preserved Strangers' Houses, where the classical city lodged visitors, stand either side of an avenue. Each is wrapped close in glass. A new glass common room bridges the avenue between them, and the guest rooms are inside the old walls.</p><div class="ref">After the Singapore National Gallery: two heritage buildings joined by a new roof and bridges.</div></div>
+      <div class="move"><b>Graft</b><h3>Tunnels and trunks</h3><p>The floor-level tunnels lie on the old ring arcade, its bridges over the Ring Current, and the avenue colonnade, so swimmers still pass beneath through the arches. The four glass trunks rise from the stumps of the old ring towers.</p><div class="ref">New glass carried on old masonry, kept distinct from it and never cutting into it.</div></div>
+    </div>
+    <ul>
+      <li><b>The old is never altered.</b> New glass stands at least 1.5 m clear of a heritage wall and touches old work only at a nacre collar that could be taken off again. Old and new stay easy to tell apart.</li>
+      <li><b>Tidehall stays as it is:</b> wet, open, the palace. Nothing modern stands over its mound.</li>
+      <li><b>The new structure language:</b> whole SuperEgg bubbles; frameless curved glass; a few broad nacre bands at floor lines; a nacre ballast keel under each bubble in the water. That keel holds it steady, so nothing hangs on cables or stands on legs.</li>
+      <li><b>One network at one pressure.</b> The bubbles are sealed, so dry spaces at different depths can be joined. Swimmers enter through pool locks: they rise into a pool in the floor and step out.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Key plans</h2>
+    <div class="sheets">
+      <figure><div class="hd"><h3>The floor, cut at 2 m</h3><p class="note">The classical city on the seabed, the glass that wraps and joins its heritage, and the floor-level tunnels on the old arcade, 4.4 m up, which swimmers pass beneath.</p></div><div class="draw"><svg id="pf" role="img" aria-label="Plan of the city floor"></svg></div></figure>
+      <figure><div class="hd"><h3>The column, 15 to 58 m up</h3><p class="note">Four glass trunks, each threading its household's landing hall with the family's wet homes docked round it. A crown hall stands where the crown ring meets each trunk. One trunk climbs on to the Kraken lookout.</p></div><div class="draw"><svg id="pc" role="img" aria-label="Plan of the column"></svg></div></figure>
+    </div>
+    <div class="legend" style="background:var(--sheet);border:1px solid var(--rule)">
+      <span><i class="sw" style="background:var(--stone)"></i>classical heritage</span>
+      <span><i class="sw" style="background:var(--wet)"></i>wet (water inside)</span>
+      <span><i class="sw" style="background:var(--air);border-color:var(--glass-ink)"></i>dry, under glass</span>
+      <span><i class="sw" style="background:var(--glass)"></i>glass tunnel</span>
+      <span><i class="sw" style="background:var(--current)"></i>Ring Current</span>
+      <span><i class="sw" style="background:var(--avenue)"></i>avenue</span>
+      <span>◎ pool lock</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Circulation</h2>
+    <p>Plato's rings, built twice. On the floor, the civic ring tunnel runs on the old arcade round the open column and threads the Exchange and the guest hall. It has four spokes out over the Ring Current to the trunks, and the avenue tunnel runs out to the Glassworks. Thirty metres up, the crown ring joins the four trunks. You can walk up any trunk, round the crown ring and down another without touching water. Swimmers come and go through a pool lock in every building and at every trunk foot.</p>
+    <figure><div class="hd"><h3>The dry network, seen from the south-east</h3><p class="note">Heights drawn at true scale. Tunnels are blue lines, bubbles are their outlines, heritage is the stone colour.</p></div><div class="draw"><svg id="axo" role="img" aria-label="Axonometric diagram of the dry network"></svg></div></figure>
+  </section>
+
+  <section>
+    <h2>Building plans</h2>
+    <div class="sheets">
+      <figure><div class="hd"><h3>The Exchange: a wrap</h3><p class="note">Plan at the trading floor (0.6 m), with the gallery at 4.4 m dashed, and a section across the ring.</p></div><div class="draw"><svg id="bx" role="img" aria-label="Plan of the Exchange"></svg></div></figure>
+      <figure><div class="hd"><h3>The guest hall: a join</h3><p class="note">The two Strangers' Houses with their rooms, the switchback ramps up to the tunnels, and the common room bridging the avenue. Swimmers rise into it from the avenue below.</p></div><div class="draw"><svg id="bg" role="img" aria-label="Plan of the guest hall"></svg></div></figure>
+      <figure><div class="hd"><h3>A household trunk: the Garden House</h3><p class="note">Plan at the landing hall (16 m), and a section from the ring-tower stump up to the crown ring.</p></div><div class="draw"><svg id="bt" role="img" aria-label="Plan and section of the Garden House trunk"></svg></div></figure>
+      <figure><div class="hd"><h3>What each bubble holds</h3><p class="note">The column's program.</p></div><div class="tbl" id="prog" style="border:0"></div></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Before the 3D model</h2>
+    <ul>
+      <li>All the drawings above come from data that passes its checks:
+        <ul>
+          <li>nothing over the mound;</li>
+          <li>avenues and the Ring Current open to swimmers, with 3.75 m under every floor-level tunnel;</li>
+          <li>3 m between volumes that are not joined;</li>
+          <li>every tunnel reaching what it joins, at 1:6 or gentler;</li>
+          <li>one connected dry network;</li>
+          <li>heritage 1.5 m clear inside its glass;</li>
+          <li>every room at its minimum size;</li>
+          <li>ramps fitting with 2.4 m headroom;</li>
+          <li>sixteen homes, and everyone housed.</li>
+        </ul>
+      </li>
+      <li>Still open: names for the two eras and for the Strangers' Houses, and whether the crown halls' programs are right.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+const D = {"volumes":[{"key":"tidehall","name":"Tidehall","era":"classical","c":[0.0,8.0,-1.0],"semi":[16.0,11.0,14.0],"eps":5.0,"facing":90.0,"dry":false,"kind":"castle","cut":2.0,"floor":null,"note":"preserved and still the palace; wet; nothing over it"},{"key":"lamp_house","name":"Lamp House","era":"classical","c":[-11.863,2.5,28.64],"semi":[5.0,3.5,4.0],"eps":5.0,"facing":112.5,"dry":false,"kind":"classical","cut":0.0,"floor":null,"note":"pearl lamps grown in open trays"},{"key":"school_court","name":"School court","era":"classical","c":[-27.716,2.6,11.481],"semi":[7.0,2.6,4.5],"eps":5.0,"facing":157.5,"dry":false,"kind":"colonnade","cut":0.0,"floor":null,"note":"a Minoan colonnade round an open court"},{"key":"home_floor_1","name":"Current House home","era":"classical","c":[-79.898,2.2,-18.446],"semi":[5.5,3.0,3.6],"eps":5.0,"facing":373.0,"dry":false,"kind":"home","cut":0.0,"floor":null,"who":"Oruko","home":"double","household":"Current House"},{"key":"home_floor_2","name":"Current House home","era":"classical","c":[-68.771,2.2,-44.66],"semi":[5.5,3.0,3.6],"eps":5.0,"facing":393.0,"dry":false,"kind":"home","cut":0.0,"floor":null,"who":"Dakuro","home":"double","household":"Current House"},{"key":"home_floor_3","name":"Current House home","era":"classical","c":[-44.66,2.2,-68.771],"semi":[5.5,3.0,3.6],"eps":5.0,"facing":417.0,"dry":false,"kind":"home","cut":0.0,"floor":null,"who":"Sekira","home":"double","household":"Current House"},{"key":"home_floor_4","name":"Current House home","era":"classical","c":[-18.446,2.2,-79.898],"semi":[5.5,3.0,3.6],"eps":5.0,"facing":437.0,"dry":false,"kind":"home","cut":0.0,"floor":null,"who":"Munaja","home":"double","household":"Current House"},{"key":"home_floor_5","name":"Lamp House home","era":"classical","c":[-33.552,2.2,49.742],"semi":[5.0,3.0,3.6],"eps":5.0,"facing":124.0,"dry":false,"kind":"home","cut":0.0,"floor":null,"who":"Lunira, Korasi and Mira","home":"workshop","household":"Lamp House"},{"key":"exchange","name":"The Exchange","era":"modern","c":[12.629,-3.0,30.488],"semi":[8.8,15.0,8.5],"eps":2.4,"facing":67.5,"dry":true,"kind":"wrap","cut":0.0,"floor":0.6,"wraps":"hall_of_records","keeper":"Maresa","lock":true,"program":"trading floor round the old hall; Maresa's Nautilus Shell counter; Rodasu's Watering Can counter; a gallery at 5 m joining the ring tunnel; Dakuro's charts in the old hall"},{"key":"hall_of_records","name":"Hall of Records","era":"classical","c":[12.055,3.6,29.102],"semi":[5.0,3.6,3.0],"eps":5.0,"facing":67.5,"dry":true,"kind":"heritage","cut":0.6,"floor":null,"inside":"exchange","note":"preserved classical hall, now dry: the city archive and Dakuro's chart room"},{"key":"west_house_wrap","name":"The guest hall, west house","era":"modern","c":[33.26,-6.0,-13.777],"semi":[10.5,20.0,9.0],"eps":2.4,"facing":337.5,"dry":true,"kind":"wrap","cut":0.0,"floor":0.6,"wraps":"west_house","lock":false},{"key":"west_house","name":"West Strangers' House","era":"classical","c":[33.26,2.85,-13.777],"semi":[4.1,2.25,4.6],"eps":5.0,"facing":337.5,"dry":true,"kind":"heritage","cut":0.6,"floor":null,"inside":"west_house_wrap","note":"preserved guest house of the classical city, now dry"},{"key":"east_house_wrap","name":"The guest hall, east house","era":"modern","c":[33.26,-6.0,13.777],"semi":[10.5,20.0,9.0],"eps":2.4,"facing":22.5,"dry":true,"kind":"wrap","cut":0.0,"floor":0.6,"wraps":"east_house","lock":false},{"key":"east_house","name":"East Strangers' House","era":"classical","c":[33.26,2.85,13.777],"semi":[4.1,2.25,4.6],"eps":5.0,"facing":22.5,"dry":true,"kind":"heritage","cut":0.6,"floor":null,"inside":"east_house_wrap","note":"preserved guest house of the classical city, now dry"},{"key":"common_room","name":"The guest hall, common room","era":"modern","c":[40.0,5.4,0.0],"semi":[8.0,5.0,5.0],"eps":2.4,"facing":0.0,"dry":true,"kind":"bridge","cut":3.8000000000000003,"floor":4.4,"keeper":"Isaro","lock":true,"program":"Isaro's counter, the common room and the party's gathering floor, the pool lock; a glass bridge over the avenue with Tidehall straight down it"},{"key":"glassworks","name":"The Glassworks","era":"modern","c":[0.0,1.98,118.0],"semi":[8.0,10.0,8.0],"eps":2.4,"facing":90.0,"dry":true,"kind":"grounded","cut":3.38,"floor":3.98,"keeper":"Kunei and Damaku","lock":true,"smoked":true,"program":"the furnace over the vent, the blowing floor, the cooling racks; the first air bubble"},{"key":"stump_22.5","name":"Ring tower stump","era":"classical","c":[65.595,2.6,27.171],"semi":[5.2,2.6,5.2],"eps":5.0,"facing":22.5,"dry":true,"kind":"stump","cut":0.0,"floor":0.6,"note":"the preserved base of an old ring tower; the trunk rises from it","lock":true},{"key":"trunk_22.5","name":"Garden House trunk","era":"modern","kind":"trunk","dry":true,"c":[65.595,0.0,27.171],"r":4.0,"y0":4.4,"y1":33.0,"facing":22.5},{"key":"hall_22.5","name":"Garden House landing hall","era":"modern","c":[65.595,17.2,27.171],"semi":[7.0,4.0,7.0],"eps":2.4,"facing":22.5,"dry":true,"kind":"landing","cut":null,"floor":16.0,"household":"Garden House","lock":true,"ballast":true,"program":"the household's dry hall on its trunk: where they meet visitors on legs; a pool lock to each home"},{"key":"pod_22.5_0","name":"Garden House home","era":"modern","c":[64.186,17.2,16.463],"semi":[5.0,3.0,4.2],"eps":2.4,"facing":-97.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Garden House","who":"Nesaja","home":"double","docks":"hall_22.5","ballast":true},{"key":"pod_22.5_1","name":"Garden House home","era":"modern","c":[75.573,17.2,31.304],"semi":[5.0,3.0,4.2],"eps":2.4,"facing":22.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Garden House","who":"Rodasu","home":"double","docks":"hall_22.5","ballast":true},{"key":"pod_22.5_2","name":"Garden House home","era":"modern","c":[57.027,17.2,33.745],"semi":[5.0,3.0,4.2],"eps":2.4,"facing":142.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Garden House","who":"Kasuno and Tami","home":"double","docks":"hall_22.5","ballast":true},{"key":"crown_22.5","name":"Crown hall","era":"modern","c":[65.595,31.2,27.171],"semi":[6.0,3.6,6.0],"eps":2.4,"facing":22.5,"dry":true,"kind":"crown","cut":null,"floor":30.0,"lock":true,"ballast":true,"program":"the Walking Room: where Munaja teaches the young to walk on new legs"},{"key":"stump_112.5","name":"Ring tower stump","era":"classical","c":[-27.171,2.6,65.595],"semi":[5.2,2.6,5.2],"eps":5.0,"facing":112.5,"dry":true,"kind":"stump","cut":0.0,"floor":0.6,"note":"the preserved base of an old ring tower; the trunk rises from it","lock":true},{"key":"trunk_112.5","name":"Glassworks household trunk","era":"modern","kind":"trunk","dry":true,"c":[-27.171,0.0,65.595],"r":4.0,"y0":4.4,"y1":57.0,"facing":112.5},{"key":"hall_112.5","name":"Glassworks household landing hall","era":"modern","c":[-27.171,16.2,65.595],"semi":[7.0,4.0,7.0],"eps":2.4,"facing":112.5,"dry":true,"kind":"landing","cut":null,"floor":15.0,"household":"Glassworks household","lock":true,"ballast":true,"program":"the household's dry hall on its trunk: where they meet visitors on legs; a pool lock to each home"},{"key":"pod_112.5_0","name":"Glassworks household home","era":"modern","c":[-17.008,16.2,69.805],"semi":[4.6,3.0,4.4],"eps":2.4,"facing":22.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Glassworks household","who":"Kunei","home":"workshop","docks":"hall_112.5","ballast":true},{"key":"pod_112.5_1","name":"Glassworks household home","era":"modern","c":[-37.333,16.2,61.386],"semi":[4.6,3.0,4.4],"eps":2.4,"facing":202.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Glassworks household","who":"Damaku","home":"workshop","docks":"hall_112.5","ballast":true},{"key":"lookout","name":"Kraken lookout","era":"modern","c":[-27.171,55.0,65.595],"semi":[4.2,3.2,4.2],"eps":2.4,"facing":90.0,"dry":true,"kind":"watch","cut":null,"floor":54.0,"who":"Ikara","lock":false,"ballast":true,"program":"a glass watch room 18 m below the surface, looking south over the Kraken's water"},{"key":"stump_202.5","name":"Ring tower stump","era":"classical","c":[-65.595,2.6,-27.171],"semi":[5.2,2.6,5.2],"eps":5.0,"facing":202.5,"dry":true,"kind":"stump","cut":0.0,"floor":0.6,"note":"the preserved base of an old ring tower; the trunk rises from it","lock":true},{"key":"trunk_202.5","name":"Exchange household trunk","era":"modern","kind":"trunk","dry":true,"c":[-65.595,0.0,-27.171],"r":4.0,"y0":4.4,"y1":33.0,"facing":202.5},{"key":"hall_202.5","name":"Exchange household landing hall","era":"modern","c":[-65.595,19.2,-27.171],"semi":[7.0,4.0,7.0],"eps":2.4,"facing":202.5,"dry":true,"kind":"landing","cut":null,"floor":18.0,"household":"Exchange household","lock":true,"ballast":true,"program":"the household's dry hall on its trunk: where they meet visitors on legs; a pool lock to each home"},{"key":"pod_202.5_0","name":"Exchange household home","era":"modern","c":[-64.212,19.2,-16.661],"semi":[3.6,2.8,4.0],"eps":2.4,"facing":82.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Exchange household","who":"Maresa","home":"single","docks":"hall_202.5","ballast":true},{"key":"pod_202.5_1","name":"Exchange household home","era":"modern","c":[-75.389,19.2,-31.227],"semi":[3.6,2.8,4.0],"eps":2.4,"facing":202.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Exchange household","who":"Pelaju","home":"single","docks":"hall_202.5","ballast":true},{"key":"pod_202.5_2","name":"Exchange household home","era":"modern","c":[-57.186,19.2,-33.623],"semi":[3.6,2.8,4.0],"eps":2.4,"facing":322.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Exchange household","who":"Sujira","home":"single","docks":"hall_202.5","ballast":true},{"key":"crown_202.5","name":"Crown hall","era":"modern","c":[-65.595,31.2,-27.171],"semi":[6.0,3.6,6.0],"eps":2.4,"facing":202.5,"dry":true,"kind":"crown","cut":null,"floor":30.0,"lock":true,"ballast":true,"program":"the Listening Room: Pelaju listens up toward the surface and the ships"},{"key":"stump_292.5","name":"Ring tower stump","era":"classical","c":[27.171,2.6,-65.595],"semi":[5.2,2.6,5.2],"eps":5.0,"facing":292.5,"dry":true,"kind":"stump","cut":0.0,"floor":0.6,"note":"the preserved base of an old ring tower; the trunk rises from it","lock":true},{"key":"trunk_292.5","name":"Reef House trunk","era":"modern","kind":"trunk","dry":true,"c":[27.171,0.0,-65.595],"r":4.0,"y0":4.4,"y1":33.0,"facing":292.5},{"key":"hall_292.5","name":"Reef House landing hall","era":"modern","c":[27.171,21.2,-65.595],"semi":[7.0,4.0,7.0],"eps":2.4,"facing":292.5,"dry":true,"kind":"landing","cut":null,"floor":20.0,"household":"Reef House","lock":true,"ballast":true,"program":"the household's dry hall on its trunk: where they meet visitors on legs; a pool lock to each home"},{"key":"pod_292.5_0","name":"Reef House home","era":"modern","c":[17.377,21.2,-61.539],"semi":[3.6,2.8,4.0],"eps":2.4,"facing":157.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Reef House","who":"Talisa","home":"single","docks":"hall_292.5","ballast":true},{"key":"pod_292.5_1","name":"Reef House home","era":"modern","c":[23.114,21.2,-75.389],"semi":[3.6,2.8,4.0],"eps":2.4,"facing":247.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Reef House","who":"Arimu","home":"single","docks":"hall_292.5","ballast":true},{"key":"pod_292.5_2","name":"Reef House home","era":"modern","c":[36.964,21.2,-69.652],"semi":[3.6,2.8,4.0],"eps":2.4,"facing":337.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Reef House","who":"Kaluja","home":"single","docks":"hall_292.5","ballast":true},{"key":"pod_292.5_3","name":"Reef House workshop","era":"modern","c":[31.457,21.2,-55.248],"semi":[5.6,3.2,4.6],"eps":2.4,"facing":427.5,"dry":false,"kind":"pod","cut":null,"floor":null,"household":"Reef House","who":"Reef House workshop","home":"reef","docks":"hall_292.5","ballast":true},{"key":"crown_292.5","name":"Crown hall","era":"modern","c":[27.171,31.2,-65.595],"semi":[6.0,3.6,6.0],"eps":2.4,"facing":292.5,"dry":true,"kind":"crown","cut":null,"floor":30.0,"lock":true,"ballast":true,"program":"the Reef House laboratory: Talisa's specimens, dry"}],"tunnels":[{"key":"ring_0","name":"Civic ring tunnel","pts":[[39.514,4.4,6.215],[39.41,4.4,6.845],[39.296,4.4,7.474]],"joins":["common_room","east_house_wrap"],"carried":"the classical ring arcade"},{"key":"ring_1","name":"Civic ring tunnel","pts":[[33.071,4.4,22.501],[30.601,4.4,25.76],[27.812,4.4,28.749],[24.731,4.4,31.438],[21.393,4.4,33.799]],"joins":["east_house_wrap","exchange"],"carried":"the classical ring arcade"},{"key":"ring_2","name":"Civic ring tunnel","pts":[[8.772,4.4,39.026],[4.741,4.4,39.718],[0.66,4.4,39.995],[-3.428,4.4,39.853],[-7.48,4.4,39.294],[-11.453,4.4,38.325],[-15.307,4.4,36.955]],"joins":["exchange"],"carried":"the classical ring arcade"},{"key":"ring_3","name":"Civic ring tunnel","pts":[[-15.307,4.4,36.955],[-19.349,4.4,35.009],[-23.147,4.4,32.622],[-26.654,4.4,29.826],[-29.826,4.4,26.654],[-32.622,4.4,23.147],[-35.009,4.4,19.349],[-36.955,4.4,15.307]],"joins":[],"carried":"the classical ring arcade"},{"key":"ring_4","name":"Civic ring tunnel","pts":[[-36.955,4.4,15.307],[-38.437,4.4,11.073],[-39.435,4.4,6.7],[-39.937,4.4,2.243],[-39.937,4.4,-2.243],[-39.435,4.4,-6.7],[-38.437,4.4,-11.073],[-36.955,4.4,-15.307]],"joins":[],"carried":"the classical ring arcade"},{"key":"ring_5","name":"Civic ring tunnel","pts":[[-36.955,4.4,-15.307],[-35.009,4.4,-19.349],[-32.622,4.4,-23.147],[-29.826,4.4,-26.654],[-26.654,4.4,-29.826],[-23.147,4.4,-32.622],[-19.349,4.4,-35.009],[-15.307,4.4,-36.955]],"joins":[],"carried":"the classical ring arcade"},{"key":"ring_6","name":"Civic ring tunnel","pts":[[-15.307,4.4,-36.955],[-11.073,4.4,-38.437],[-6.7,4.4,-39.435],[-2.243,4.4,-39.937],[2.243,4.4,-39.937],[6.7,4.4,-39.435],[11.073,4.4,-38.437],[15.307,4.4,-36.955]],"joins":[],"carried":"the classical ring arcade"},{"key":"ring_7","name":"Civic ring tunnel","pts":[[15.307,4.4,-36.955],[19.486,4.4,-34.933],[23.403,4.4,-32.439],[27.004,4.4,-29.509],[30.241,4.4,-26.182],[33.071,4.4,-22.501]],"joins":["west_house_wrap"],"carried":"the classical ring arcade"},{"key":"ring_8","name":"Civic ring tunnel","pts":[[39.296,4.4,-7.474],[39.41,4.4,-6.845],[39.514,4.4,-6.215]],"joins":["west_house_wrap","common_room"],"carried":"the classical ring arcade"},{"key":"spoke_22.5","name":"Spoke to the Garden House trunk","pts":[[41.113,4.4,17.029],[42.498,4.4,17.603],[48.042,4.4,19.9],[61.253,4.4,25.372]],"joins":["stump_22.5","east_house_wrap"],"carried":"the classical arcade and the old bridge over the Ring Current"},{"key":"spoke_112.5","name":"Spoke to the Glassworks household trunk","pts":[[-15.307,4.4,36.955],[-17.603,4.4,42.498],[-19.9,4.4,48.042],[-25.372,4.4,61.253]],"joins":["stump_112.5"],"carried":"the classical arcade and the old bridge over the Ring Current"},{"key":"spoke_202.5","name":"Spoke to the Exchange household trunk","pts":[[-36.955,4.4,-15.307],[-42.498,4.4,-17.603],[-48.042,4.4,-19.9],[-61.253,4.4,-25.372]],"joins":["stump_202.5"],"carried":"the classical arcade and the old bridge over the Ring Current"},{"key":"spoke_292.5","name":"Spoke to the Reef House trunk","pts":[[15.307,4.4,-36.955],[17.603,4.4,-42.498],[19.9,4.4,-48.042],[25.372,4.4,-61.253]],"joins":["stump_292.5"],"carried":"the classical arcade and the old bridge over the Ring Current"},{"key":"avenue","name":"Avenue tunnel","pts":[[5.55,4.4,39.613],[5.55,4.4,70.0],[5.55,4.4,100.0],[5.55,4.4,111.0]],"joins":["glassworks"],"carried":"the classical avenue colonnade"},{"key":"crown_0","name":"Crown ring","pts":[[63.341,30.0,32.076],[60.252,30.0,37.559],[56.689,30.0,42.747],[52.681,30.0,47.599],[48.26,30.0,52.077],[43.458,30.0,56.146],[38.316,30.0,59.774],[32.872,30.0,62.932],[27.171,30.0,65.595],[21.255,30.0,67.744],[15.173,30.0,69.36],[8.971,30.0,70.431],[2.699,30.0,70.949],[-3.594,30.0,70.909],[-9.859,30.0,70.312],[-16.046,30.0,69.163],[-22.108,30.0,67.47]],"joins":["crown_22.5","trunk_112.5"],"carried":"free in the water, held level by the trunks and the halls' ballast"},{"key":"crown_1","name":"Crown ring","pts":[[-32.076,30.0,63.341],[-37.559,30.0,60.252],[-42.747,30.0,56.689],[-47.599,30.0,52.681],[-52.077,30.0,48.26],[-56.146,30.0,43.458],[-59.774,30.0,38.316],[-62.932,30.0,32.872],[-65.595,30.0,27.171],[-67.744,30.0,21.255],[-69.36,30.0,15.173],[-70.431,30.0,8.971],[-70.949,30.0,2.699],[-70.909,30.0,-3.594],[-70.312,30.0,-9.859],[-69.163,30.0,-16.046],[-67.47,30.0,-22.108]],"joins":["trunk_112.5","crown_202.5"],"carried":"free in the water, held level by the trunks and the halls' ballast"},{"key":"crown_2","name":"Crown ring","pts":[[-63.341,30.0,-32.076],[-60.252,30.0,-37.559],[-56.689,30.0,-42.747],[-52.681,30.0,-47.599],[-48.26,30.0,-52.077],[-43.458,30.0,-56.146],[-38.316,30.0,-59.774],[-32.872,30.0,-62.932],[-27.171,30.0,-65.595],[-21.255,30.0,-67.744],[-15.173,30.0,-69.36],[-8.971,30.0,-70.431],[-2.699,30.0,-70.949],[3.594,30.0,-70.909],[9.859,30.0,-70.312],[16.046,30.0,-69.163],[22.108,30.0,-67.47]],"joins":["crown_202.5","crown_292.5"],"carried":"free in the water, held level by the trunks and the halls' ballast"},{"key":"crown_3","name":"Crown ring","pts":[[32.076,30.0,-63.341],[37.559,30.0,-60.252],[42.747,30.0,-56.689],[47.599,30.0,-52.681],[52.077,30.0,-48.26],[56.146,30.0,-43.458],[59.774,30.0,-38.316],[62.932,30.0,-32.872],[65.595,30.0,-27.171],[67.744,30.0,-21.255],[69.36,30.0,-15.173],[70.431,30.0,-8.971],[70.949,30.0,-2.699],[70.909,30.0,3.594],[70.312,30.0,9.859],[69.163,30.0,16.046],[67.47,30.0,22.108]],"joins":["crown_292.5","crown_22.5"],"carried":"free in the water, held level by the trunks and the halls' ballast"}],"rooms":{"east_house":[["guest room","bed2",[-3.85,-0.05],[-4.35,-0.75]],["guest room","bed2",[0.05,3.85],[-4.35,-0.75]],["guest room","bed2",[-3.85,-0.05],[0.75,4.35]],["Isaro's room","bed1",[0.05,3.85],[0.75,4.35]]],"west_house":[["party room","party",[-3.85,3.85],[-4.35,1.1]],["washroom","bath",[-3.85,-1.0],[2.5,4.35]],["linen store","store",[1.0,3.85],[2.5,4.35]]]},"corridor":{"east_house":1.4,"west_house":1.3},"ramps":{"exchange":[["u",4.0,-4.6,1,0.6,4.4]],"east_house_wrap":[["w",5.1,-3.0,1,0.6,2.5],["w",6.55,0.04,-1,2.5,4.4]],"west_house_wrap":[["w",-5.1,-3.0,1,0.6,2.5],["w",-6.55,0.04,-1,2.5,4.4]]},"tan":0.6248693519093275,"trunks":[{"bearing":22.5,"household":"Garden House","landing":16.0,"homes":[["double","Nesaja"],["double","Rodasu"],["double","Kasuno and Tami"]],"crown":"the Walking Room: where Munaja teaches the young to walk on new legs","top":30.0},{"bearing":112.5,"household":"Glassworks household","landing":15.0,"homes":[["workshop","Kunei"],["workshop","Damaku"]],"crown":"the lookout trunk climbs on from here","top":54.0},{"bearing":202.5,"household":"Exchange household","landing":18.0,"homes":[["single","Maresa"],["single","Pelaju"],["single","Sujira"]],"crown":"the Listening Room: Pelaju listens up toward the surface and the ships","top":30.0},{"bearing":292.5,"household":"Reef House","landing":20.0,"homes":[["single","Talisa"],["single","Arimu"],["single","Kaluja"],["reef","Reef House workshop"]],"crown":"the Reef House laboratory: Talisa's specimens, dry","top":30.0}],"ring_r":40.0,"net_floor":4.4,"crown":30.0,"turn_rise":11.77850979247055,"avenues":[0.0,45.0,90.0,135.0,180.0,225.0,270.0,315.0],"ground_main":[[0,2.0],[2,2.0],[4,2.0],[6,2.0],[8,2.0],[10,2.0],[12,2.0],[14,2.0],[16,2.0],[18,2.0],[20,2.0],[22,1.3],[24,0.21],[26,0.0],[28,0.0],[30,0.0],[32,0.0],[34,0.0],[36,0.0],[38,0.0],[40,0.0],[42,0.0],[44,0.0],[46,-1.37],[48,-2.0],[50,-2.0],[52,-1.37],[54,0.0],[56,0.0],[58,0.0],[60,0.0],[62,0.0],[64,0.0],[66,0.0],[68,0.0],[70,0.0],[72,0.0],[74,0.0],[76,0.0],[78,0.0],[80,0.0],[82,0.0],[84,0.0],[86,0.0],[88,0.0],[90,0.0],[92,0.0],[94,0.0],[96,0.0],[98,0.0],[100,0.0],[102,0.0],[104,0.0],[106,0.02],[108,0.2],[110,0.55],[112,1.05],[114,1.7],[116,2.48],[118,3.38],[120,4.38],[122,5.47],[124,6.63],[126,7.85],[128,9.1],[130,10.36],[132,11.63],[134,12.87],[136,14.07],[138,15.2],[140,16.24]],"ground_22":[[0,2.0],[2,2.0],[4,2.0],[6,2.0],[8,2.0],[10,2.0],[12,2.0],[14,2.0],[16,2.0],[18,2.0],[20,2.0],[22,1.3],[24,0.21],[26,0.0],[28,0.0],[30,0.0],[32,0.0],[34,0.0],[36,0.0],[38,0.0],[40,0.0],[42,0.0],[44,0.0],[46,-1.37],[48,-2.0],[50,-2.0],[52,-1.37],[54,0.0],[56,0.0],[58,0.0],[60,0.0],[62,0.0],[64,0.0],[66,0.0],[68,0.0],[70,0.0],[72,0.0],[74,0.0],[76,0.0],[78,0.0],[80,0.0],[82,0.0],[84,0.0],[86,0.0],[88,0.0],[90,0.0],[92,0.0],[94,0.0],[96,0.0],[98,0.0],[100,0.0],[102,0.0],[104,0.0],[106,0.01],[108,0.11],[110,0.29],[112,0.56],[114,0.9],[116,1.31],[118,1.77],[120,2.29],[122,2.84],[124,3.42],[126,4.02],[128,4.64],[130,5.25],[132,5.85],[134,6.44],[136,6.99],[138,7.5],[140,7.96]]};
+const KELP = [[[97.2,33.4],[96.9,35.9],[93.8,36.1],[93.0,39.6],[90.5,38.2],[89.3,36.3],[85.4,36.3],[87.6,33.4],[87.5,31.4],[87.4,28.0],[90.9,30.1],[92.8,27.9],[95.5,28.5],[94.4,32.0]],[[58.4,82.7],[55.4,84.5],[54.5,86.3],[53.1,89.0],[50.8,86.3],[48.3,87.0],[46.4,85.2],[47.9,82.7],[46.2,80.1],[48.5,78.8],[50.7,78.5],[53.0,76.7],[54.4,79.3],[56.2,80.5]],[[-47.2,82.7],[-47.4,84.8],[-47.9,87.5],[-50.8,86.5],[-52.9,88.1],[-55.2,87.1],[-55.0,84.3],[-58.0,82.7],[-56.0,80.6],[-54.2,79.5],[-53.2,76.1],[-50.8,78.8],[-48.7,78.9],[-45.7,79.8]],[[-81.2,48.8],[-78.4,51.7],[-81.5,52.5],[-83.6,52.5],[-86.0,55.5],[-86.9,51.8],[-88.7,50.8],[-91.0,48.8],[-87.6,47.2],[-88.0,44.3],[-85.7,43.1],[-83.6,45.3],[-80.5,43.9],[-80.0,46.6]],[[-91.1,13.6],[-91.7,15.9],[-93.9,16.9],[-95.2,19.4],[-97.6,18.1],[-99.5,17.3],[-101.9,16.2],[-100.6,13.6],[-101.5,11.2],[-100.0,9.2],[-97.4,9.8],[-95.2,7.5],[-93.6,9.8],[-92.7,11.7]],[[-53.7,-76.8],[-57.2,-75.5],[-56.1,-72.0],[-58.8,-71.5],[-60.8,-73.6],[-64.3,-71.5],[-64.1,-74.9],[-64.0,-76.8],[-66.3,-79.9],[-62.3,-79.7],[-61.1,-81.7],[-58.6,-83.2],[-58.0,-79.4],[-54.7,-79.4]],[[-9.0,-96.5],[-9.4,-94.6],[-9.7,-91.7],[-12.7,-92.5],[-14.8,-91.3],[-17.1,-92.2],[-17.3,-94.8],[-19.4,-96.5],[-17.9,-98.7],[-16.4,-100.2],[-14.9,-102.3],[-12.6,-100.7],[-10.2,-100.7],[-8.6,-99.0]],[[69.8,-72.5],[71.1,-69.6],[67.5,-69.6],[66.5,-67.1],[63.9,-66.5],[63.2,-69.9],[59.5,-69.7],[60.0,-72.5],[62.1,-74.0],[60.9,-77.9],[64.3,-76.6],[66.2,-76.6],[69.6,-77.9],[68.4,-74.0]],[[100.4,-25.2],[98.9,-22.9],[96.5,-22.3],[95.6,-18.8],[93.2,-20.9],[91.4,-21.7],[88.5,-22.5],[90.2,-25.2],[89.4,-27.6],[90.6,-29.7],[93.3,-29.1],[95.5,-31.0],[97.3,-29.1],[98.2,-27.2]]];
+const NS = "http://www.w3.org/2000/svg";
+const el = (p, t, a, txt) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; p.appendChild(e); return e; };
+const V = n => `var(${n})`, rad = b => b * Math.PI / 180;
+const VOL = Object.fromEntries(D.volumes.map(v => [v.key, v]));
+const ps = (x, e) => Math.sign(x) * Math.pow(Math.abs(x), 2 / e);
+function frame(v) { const f = rad(v.facing); return { w: [Math.cos(f), Math.sin(f)], u: [-Math.sin(f), Math.cos(f)] }; }
+// horizontal section of a SuperEgg at height y, as plan points (x, z)
+function section(v, y, n = 64) {
+  if (v.kind === "trunk") { const o = []; for (let i = 0; i < n; i++) { const t = 2 * Math.PI * i / n; o.push([v.c[0] + v.r * Math.cos(t), v.c[2] + v.r * Math.sin(t)]); } return o; }
+  const [a, b, c] = v.semi, e = v.eps, dy = Math.abs(y - v.c[1]) / b; if (dy >= 1) return null;
+  const k = Math.pow(1 - Math.pow(dy, e), 1 / e), { u, w } = frame(v), o = [];
+  n = 128; for (let i = 0; i < n; i++) { const t = 2 * Math.PI * i / n, lu = a * k * ps(Math.sin(t), e), lw = c * k * ps(Math.cos(t), e); o.push([v.c[0] + lu * u[0] + lw * w[0], v.c[2] + lu * u[1] + lw * w[1]]); }
+  return o;
+}
+// the widest section within a band of heights
+function widest(v, y0, y1) { if (v.kind === "trunk") return section(v, 0); let y = Math.min(Math.max(v.c[1], y0), y1); if (v.cut != null) y = Math.max(y, v.cut + 0.05); return section(v, y); }
+const P = pts => "M" + pts.map(p => p.map(x => x.toFixed(2)).join(",")).join(" L") + " Z";
+const L = pts => "M" + pts.map(p => p.map(x => x.toFixed(2)).join(",")).join(" L");
+const loc = (v, lu, lw) => { const { u, w } = frame(v); return [v.c[0] + lu * u[0] + lw * w[0], v.c[2] + lu * u[1] + lw * w[1]]; };
+function T(s, x, y, t, sz, o = {}) { return el(s, "text", Object.assign({ x, y, "font-size": sz, "text-anchor": "middle", "dominant-baseline": "middle", "stroke-width": sz * 0.28 }, o), t); }
+
+function base(s, r0, r1) {
+  el(s, "rect", { x: r0, y: r0, width: r1 - r0, height: r1 - r0, fill: V("--water") });
+  for (const [r, f] of [[105, V("--sheet")], [90, V("--sheet")]]) el(s, "circle", { cx: 0, cy: 0, r, fill: f, opacity: 0.35 });
+  el(s, "path", { d: `M0,0 m-52,0 a52,52 0 1,0 104,0 a52,52 0 1,0 -104,0 M0,0 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0`, fill: V("--current"), "fill-rule": "evenodd" });
+  for (const b of D.avenues) { const c = Math.cos(rad(b)), sn = Math.sin(rad(b)); el(s, "line", { x1: 24 * c, y1: 24 * sn, x2: 105 * c, y2: 105 * sn, stroke: V("--avenue"), "stroke-width": 4, opacity: 0.9 }); }
+  el(s, "circle", { cx: 0, cy: 0, r: 24, fill: V("--stone"), opacity: 0.35 });
+  el(s, "circle", { cx: 0, cy: 0, r: 71, fill: "none", stroke: V("--stone-ink"), "stroke-width": 0.4, "stroke-dasharray": "1 1.4", opacity: 0.7 });
+}
+function tube(s, t, w = 4.5, op = 1) {
+  el(s, "path", { d: L(t.pts.map(p => [p[0], p[2]])), fill: "none", stroke: V("--glass-ink"), "stroke-width": w, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: op });
+  el(s, "path", { d: L(t.pts.map(p => [p[0], p[2]])), fill: "none", stroke: V("--glass"), "stroke-width": w - 1.2, "stroke-linecap": "round", "stroke-linejoin": "round", opacity: op });
+}
+function vol(s, v, y0, y1, o = {}) {
+  const sec = widest(v, y0, y1); if (!sec) return;
+  const fill = v.era === "classical" ? (v.dry ? V("--stone") : V("--stone")) : v.dry ? V("--air") : V("--wet");
+  const stroke = v.era === "classical" ? V("--stone-ink") : v.dry ? V("--glass-ink") : V("--muted");
+  el(s, "path", Object.assign({ d: P(sec), fill, stroke, "stroke-width": 0.5 }, o));
+}
+const lockMark = (s, x, z, r = 1.6) => { el(s, "circle", { cx: x, cy: z, r, fill: V("--water"), stroke: V("--glass-ink"), "stroke-width": 0.35 }); el(s, "circle", { cx: x, cy: z, r: r * 0.45, fill: V("--glass-ink") }); };
+
+// ---------- the floor plan
+(function () {
+  const s = document.getElementById("pf"); s.setAttribute("viewBox", "-132 -132 264 264"); base(s, -132, 132);
+  for (const poly of KELP) el(s, "path", { d: P(poly), fill: V("--kelp"), opacity: 0.8 });
+  // the arcade under the floor tunnels, then the tunnels
+  for (const t of D.tunnels) if (t.pts[0][1] < 10) el(s, "path", { d: L(t.pts.map(p => [p[0], p[2]])), fill: "none", stroke: V("--stone-ink"), "stroke-width": 6.2, "stroke-dasharray": "2.4 1.2", opacity: 0.55 });
+  const order = ["tidehall", "lamp_house", "school_court", "home_floor_1", "home_floor_2", "home_floor_3", "home_floor_4", "home_floor_5", "stump_22.5", "stump_112.5", "stump_202.5", "stump_292.5",
+    "exchange", "west_house_wrap", "east_house_wrap", "common_room", "glassworks", "hall_of_records", "west_house", "east_house"];
+  for (const k of order) vol(s, VOL[k], 0, 3);
+  for (const t of D.tunnels) if (t.pts[0][1] < 10) tube(s, t);
+  for (const k of ["exchange", "common_room", "glassworks"]) { const v = VOL[k]; const p = k === "exchange" ? loc(v, -6.2, 2) : k === "common_room" ? [v.c[0], v.c[2]] : loc(v, -3.5, 3.5); lockMark(s, ...p); }
+  for (const tr of D.trunks) { const v = VOL["stump_" + tr.bearing]; lockMark(s, ...loc(v, 0, 2.6), 1.3); }
+  const lab = [["Tidehall", 0, 0, 5, 1], ["Exchange", ...loc(VOL.exchange, 0, -5.8), 3.6, 0], ["Hall of Records", ...loc(VOL.hall_of_records, 0, 0), 2.4, 1], ["guest hall", 40, 0, 3.2, 0],
+    ["Lamp House", ...loc(VOL.lamp_house, 0, 0), 2.6, 1], ["school court", ...loc(VOL.school_court, 0, 0), 2.6, 1], ["Glassworks", 0, 118, 3.4, 0], ["Ring Current", -49 * Math.cos(rad(40)), -49 * Math.sin(rad(40)), 2.6, 0],
+    ["Current House", -70, -60, 3, 1], ["main avenue", 0, 92, 2.6, 0], ["avenue tunnel", 14, 82, 2.6, 0], ["ring tower stumps", 71 * Math.cos(rad(292.5)) + 12, 71 * Math.sin(rad(292.5)) - 8, 2.6, 1], ["civic ring tunnel", -45 * Math.cos(rad(60)) + 2, 45 * Math.sin(rad(60)) + 10, 2.6, 0]];
+  for (const [t, x, z, sz, b] of lab) T(s, x, z, t, sz, b ? { "font-weight": 500 } : {});
+  T(s, -124, -124, "N ↑", 4.4, { "text-anchor": "start" });
+  el(s, "line", { x1: -124, y1: 124, x2: -104, y2: 124, stroke: V("--ink"), "stroke-width": 0.8 }); T(s, -114, 120, "20 m", 3);
+})();
+
+// ---------- the column plan
+(function () {
+  const s = document.getElementById("pc"); s.setAttribute("viewBox", "-132 -132 264 264"); base(s, -132, 132);
+  el(s, "rect", { x: -132, y: -132, width: 264, height: 264, fill: V("--sheet"), opacity: 0.55 });
+  vol(s, VOL.tidehall, 0, 3, { opacity: 0.35 });
+  el(s, "circle", { cx: 0, cy: 0, r: 24, fill: "none", stroke: V("--glass-ink"), "stroke-width": 0.6, "stroke-dasharray": "2 1.5" }); T(s, 0, -28, "the open column", 3);
+  for (const t of D.tunnels) if (t.pts[0][1] > 10) tube(s, t);
+  for (const v of D.volumes) if (["trunk", "landing", "pod", "crown", "watch"].includes(v.kind)) vol(s, v, 10, 60);
+  for (const v of D.volumes) if (v.kind === "trunk") el(s, "circle", { cx: v.c[0], cy: v.c[2], r: 4, fill: V("--glass"), stroke: V("--glass-ink"), "stroke-width": 0.5 });
+  for (const v of D.volumes) if (v.kind === "pod") { const h = VOL[v.docks], d = [v.c[0] - h.c[0], v.c[2] - h.c[2]], n = Math.hypot(...d); lockMark(s, h.c[0] + d[0] / n * 6.2, h.c[2] + d[1] / n * 6.2, 1.1); }
+  for (const tr of D.trunks) {
+    const v = VOL["hall_" + tr.bearing], out = [Math.cos(rad(tr.bearing)), Math.sin(rad(tr.bearing))];
+    T(s, v.c[0] + out[0] * 22, v.c[2] + out[1] * 22, tr.household, 3.2, { "font-weight": 500 });
+    T(s, v.c[0] + out[0] * 22, v.c[2] + out[1] * 22 + 4, `landing ${tr.landing} m · ${tr.homes.length} homes`, 2.4);
+  }
+  for (const tr of D.trunks) if (tr.bearing !== 112.5) { const v = VOL["crown_" + tr.bearing]; T(s, v.c[0] - Math.cos(rad(tr.bearing)) * 11, v.c[2] - Math.sin(rad(tr.bearing)) * 11, "crown hall, 30 m", 2.4); }
+  T(s, VOL.lookout.c[0] + 9, VOL.lookout.c[2] + 16, "Kraken lookout, 54 m", 2.6, { "text-anchor": "start" });
+  T(s, 71 * Math.cos(rad(160)) + 4, 71 * Math.sin(rad(160)) + 6, "crown ring, 30 m", 2.8);
+})();
+
+// ---------- the dry network, axonometric from the south-east
+(function () {
+  const s = document.getElementById("axo");
+  const c30 = Math.cos(Math.PI / 6), s30 = 0.5;
+  const pr = (x, y, z) => [(x - z) * c30, (x + z) * s30 - y];
+  let mn = [1e9, 1e9], mx = [-1e9, -1e9];
+  const grow = p => { mn = [Math.min(mn[0], p[0]), Math.min(mn[1], p[1])]; mx = [Math.max(mx[0], p[0]), Math.max(mx[1], p[1])]; };
+  // floor rings for reference
+  const ring = (r, y) => { const o = []; for (let i = 0; i <= 96; i++) { const t = 2 * Math.PI * i / 96; o.push(pr(r * Math.cos(t), y, r * Math.sin(t))); } o.forEach(grow); return o; };
+  const g0 = ring(105, 0); grow(pr(0, 60, 0));
+  function hull(pts) { pts = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]); const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]); const lo = [], up = []; for (const p of pts) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); } for (const p of pts.slice().reverse()) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); } return lo.slice(0, -1).concat(up.slice(0, -1)); }
+  function outline(v) {
+    const pts = [];
+    if (v.kind === "trunk") { for (const y of [v.y0, v.y1]) for (let i = 0; i < 24; i++) { const t = 2 * Math.PI * i / 24; pts.push(pr(v.c[0] + 4 * Math.cos(t), y, v.c[2] + 4 * Math.sin(t))); } return hull(pts); }
+    const { u, w } = frame(v), [a, b, c] = v.semi, e = v.eps;
+    for (let i = 0; i <= 12; i++) for (let j = 0; j < 20; j++) {
+      const eta = -Math.PI / 2 + Math.PI * i / 12, om = 2 * Math.PI * j / 20;
+      const lu = a * ps(Math.cos(eta), e) * ps(Math.sin(om), e), ly = b * ps(Math.sin(eta), e), lw = c * ps(Math.cos(eta), e) * ps(Math.cos(om), e);
+      const y = Math.max(v.c[1] + ly, v.cut != null ? v.cut : -99);
+      pts.push(pr(v.c[0] + lu * u[0] + lw * w[0], y, v.c[2] + lu * u[1] + lw * w[1]));
+    }
+    return hull(pts);
+  }
+  const pad = 8; s.setAttribute("viewBox", `${mn[0] - pad} ${mn[1] - pad - 10} ${mx[0] - mn[0] + 2 * pad} ${mx[1] - mn[1] + 2 * pad + 10}`);
+  el(s, "path", { d: P(g0), fill: V("--water"), stroke: V("--rule"), "stroke-width": 0.4 });
+  el(s, "path", { d: P(ring(52, 0)), fill: V("--current") }); el(s, "path", { d: P(ring(46, 0)), fill: V("--water") });
+  el(s, "path", { d: P(ring(24, 0)), fill: V("--stone"), opacity: 0.5 });
+  // draw back to front: sort by x + z
+  const items = [];
+  for (const v of D.volumes) items.push({ d: v.c[0] + v.c[2], draw: () => { const o = outline(v); const fill = v.era === "classical" ? V("--stone") : v.dry ? V("--air") : V("--wet"); el(s, "path", { d: P(o), fill, stroke: v.era === "classical" ? V("--stone-ink") : v.dry ? V("--glass-ink") : V("--muted"), "stroke-width": 0.45, "fill-opacity": v.dry && v.era === "modern" ? 0.75 : 0.95 }); } });
+  for (const t of D.tunnels) { const avg = t.pts.reduce((m, p) => m + p[0] + p[2], 0) / t.pts.length; items.push({ d: avg, draw: () => { const p = t.pts.map(q => pr(q[0], q[1] + 1.6, q[2])); el(s, "path", { d: L(p), fill: "none", stroke: V("--glass-ink"), "stroke-width": 4.6, "stroke-linecap": "round", "stroke-linejoin": "round" }); el(s, "path", { d: L(p), fill: "none", stroke: V("--glass"), "stroke-width": 3.4, "stroke-linecap": "round", "stroke-linejoin": "round" }); } }); }
+  items.sort((a, b) => a.d - b.d).forEach(i => i.draw());
+  const lab = (x, y, z, t, sz = 3.2, o = {}) => { const p = pr(x, y, z); T(s, p[0], p[1], t, sz, o); };
+  lab(0, 26, 0, "Tidehall", 3.4); lab(40, 16, 30, "Exchange", 3); lab(44, 15, -2, "guest hall", 3);
+  lab(0, 14, 118, "Glassworks", 3); lab(80, 36, 0, "crown ring, 30 m", 3); lab(-40, 62, 70, "Kraken lookout", 3);
+  lab(-30, 9, -45, "civic ring tunnel, 4.4 m", 2.8); lab(0, -6, 60, "Ring Current", 2.6);
+})();
+
+// ---------- building plans
+function zoom(id, cx, cz, half, wide = 0) { const s = document.getElementById(id); s.setAttribute("viewBox", `${cx - half} ${cz - half} ${half * 2 + wide} ${half * 2}`); el(s, "rect", { x: cx - half, y: cz - half, width: half * 2 + wide, height: half * 2, fill: V("--water") }); return s; }
+function flights(s, key) {
+  const v = VOL[key], { u, w } = frame(v);
+  for (const [axis, lane, start, sign, y0, y1] of D.ramps[key]) {
+    const run = (y1 - y0) / D.tan, a = start, b = start + sign * run, lo = lane - 0.7, hi = lane + 0.7;
+    const corners = axis === "u" ? [[a, lo], [b, lo], [b, hi], [a, hi]] : [[lo, a], [lo, b], [hi, b], [hi, a]];
+    el(s, "path", { d: P(corners.map(([lu, lw]) => loc(v, lu, lw))), fill: V("--sheet"), stroke: V("--ink"), "stroke-width": 0.12 });
+    const n = 8; for (let i = 1; i < n; i++) { const t = a + (b - a) * i / n; const seg = axis === "u" ? [[t, lo], [t, hi]] : [[lo, t], [hi, t]]; el(s, "path", { d: L(seg.map(([lu, lw]) => loc(v, lu, lw))), stroke: V("--muted"), "stroke-width": 0.06 }); }
+    const m0 = axis === "u" ? [a, lane] : [lane, a], m1 = axis === "u" ? [b, lane] : [lane, b];
+    const p0 = loc(v, ...m0), p1 = loc(v, ...m1); el(s, "line", { x1: p0[0], y1: p0[1], x2: p1[0], y2: p1[1], stroke: V("--accent"), "stroke-width": 0.14, "marker-end": "url(#arr)" });
+  }
+}
+function arrowDef(s) { const d = el(s, "defs", {}); const m = el(d, "marker", { id: "arr", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 5, markerHeight: 5, orient: "auto" }); el(m, "path", { d: "M0,0 L10,5 L0,10 z", fill: V("--accent") }); }
+
+(function exchange() {
+  const v = VOL.exchange, s = zoom("bx", v.c[0], v.c[2] + 4, 17); arrowDef(s);
+  for (const b of [45, 90]) { const c = Math.cos(rad(b)), sn = Math.sin(rad(b)); el(s, "line", { x1: 20 * c, y1: 20 * sn, x2: 60 * c, y2: 60 * sn, stroke: V("--avenue"), "stroke-width": 4 }); }
+  for (const t of D.tunnels) if (t.key.startsWith("ring") || t.key === "avenue") tube(s, t, 4.5, 0.9);
+  el(s, "path", { d: P(section(v, 0.6)), fill: V("--air"), stroke: V("--glass-ink"), "stroke-width": 0.25 });
+  el(s, "path", { d: P(section(v, 4.4)), fill: "none", stroke: V("--glass-ink"), "stroke-width": 0.15, "stroke-dasharray": "0.6 0.4" });
+  // the gallery ring at 4.4: between the glass at 4.4 and a rail 2.2 m in
+  const g = section(v, 4.4).map(([x, z]) => { const dx = x - v.c[0], dz = z - v.c[2], n = Math.hypot(dx, dz); return [v.c[0] + dx * (1 - 2.2 / n), v.c[2] + dz * (1 - 2.2 / n)]; });
+  el(s, "path", { d: P(g), fill: "none", stroke: V("--muted"), "stroke-width": 0.12, "stroke-dasharray": "0.3 0.3" });
+  const h = VOL.hall_of_records; el(s, "path", { d: P(section(h, 1.5)), fill: V("--stone"), stroke: V("--stone-ink"), "stroke-width": 0.2 });
+  T(s, h.c[0], h.c[2] - 0.6, "Hall of Records", 0.9, { "font-weight": 500 }); T(s, h.c[0], h.c[2] + 0.7, "archive · Dakuro's charts", 0.65);
+  flights(s, "exchange");
+  // counters and the pool lock
+  for (const [lu, lw, len, lab] of [[-6.4, -2.2, 3.2, "Nautilus Shells"], [5.6, -4.6, 2.6, "Watering Cans"]]) { const a = loc(v, lu - len / 2, lw), b = loc(v, lu + len / 2, lw); el(s, "line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: V("--accent"), "stroke-width": 0.6, "stroke-linecap": "round" }); const m = loc(v, lu, lw - 1); T(s, m[0], m[1], lab, 0.6); }
+  lockMark(s, ...loc(v, -6.2, 2), 1.4);
+  const t1 = loc(v, -6.2, 4.1); T(s, t1[0], t1[1], "pool lock", 0.65);
+  const t2 = loc(v, 0.4, 2.55); T(s, t2[0], t2[1], "ramp up to the gallery, 4.4 m", 0.62);
+  const t3 = loc(v, 0, 7.8); T(s, t3[0], t3[1], "gallery and the civic ring tunnel", 0.7);
+  T(s, 5.6, v.c[2] + 15, "avenue tunnel to the Glassworks ↓", 0.75);
+  // section across the ring, inset
+  const ox = v.c[0] - 9, oz = v.c[2] - 10, sc = 0.32;
+  el(s, "rect", { x: ox - 7.5, y: oz - 2.6, width: 15, height: 6.6, fill: V("--sheet"), stroke: V("--rule"), "stroke-width": 0.1 });
+  const prof = []; for (let i = 0; i <= 60; i++) { const t = Math.PI * i / 60; const lw = v.semi[2] * ps(Math.cos(t), v.eps), ly = v.semi[1] * ps(Math.sin(t) * 1, v.eps); const y = v.c[1] + ly; if (y >= 0) prof.push([ox + lw * sc, oz + 3 - y * sc]); }
+  el(s, "path", { d: L(prof), fill: V("--air"), stroke: V("--glass-ink"), "stroke-width": 0.08 });
+  el(s, "line", { x1: ox - 7, y1: oz + 3, x2: ox + 7, y2: oz + 3, stroke: V("--stone-ink"), "stroke-width": 0.1 });
+  el(s, "rect", { x: ox + (-1.5 - 3) * sc, y: oz + 3 - 7.2 * sc, width: 6 * sc, height: 7.2 * sc, fill: V("--stone") });
+  el(s, "circle", { cx: ox + 7 * sc, cy: oz + 3 - 6 * sc, r: 2.25 * sc, fill: V("--glass") });
+  el(s, "line", { x1: ox + 4.5 * sc, y1: oz + 3 - 4.4 * sc, x2: ox + 8.2 * sc, y2: oz + 3 - 4.4 * sc, stroke: V("--ink"), "stroke-width": 0.06 });
+  T(s, ox, oz - 2, "section: hall, gallery, ring tunnel", 0.6);
+})();
+
+(function guest() {
+  const s = zoom("bg", 37, 0, 22); arrowDef(s);
+  el(s, "line", { x1: 15, y1: 0, x2: 60, y2: 0, stroke: V("--avenue"), "stroke-width": 4 });
+  for (const t of D.tunnels) if (t.key.startsWith("ring") || t.key === "spoke_22.5") tube(s, t, 4.5, 0.9);
+  for (const k of ["west_house_wrap", "east_house_wrap"]) el(s, "path", { d: P(section(VOL[k], 0.6)), fill: V("--air"), stroke: V("--glass-ink"), "stroke-width": 0.25 });
+  const cr = VOL.common_room; el(s, "path", { d: P(section(cr, 5.4)), fill: V("--air"), stroke: V("--glass-ink"), "stroke-width": 0.25, "fill-opacity": 0.85 });
+  for (const k of ["west_house", "east_house"]) {
+    const h = VOL[k]; el(s, "path", { d: P(section(h, 1.5)), fill: V("--stone"), stroke: V("--stone-ink"), "stroke-width": 0.22 });
+    for (const [name, kind, [u0, u1], [w0, w1]] of D.rooms[k]) {
+      el(s, "path", { d: P([[u0, w0], [u1, w0], [u1, w1], [u0, w1]].map(([a, b]) => loc(h, a, b))), fill: V("--sheet"), stroke: V("--stone-ink"), "stroke-width": 0.1 });
+      const m = loc(h, (u0 + u1) / 2, (w0 + w1) / 2); T(s, m[0], m[1], name, 0.62);
+    }
+    flights(s, k + "_wrap");
+  }
+  lockMark(s, cr.c[0], cr.c[2], 1.6);
+  T(s, cr.c[0] + 4.4, cr.c[2] - 2.6, "common room", 0.85, { "font-weight": 500 }); T(s, cr.c[0] + 4.4, cr.c[2] - 1.6, "Isaro's counter", 0.62);
+  T(s, cr.c[0] - 3.8, cr.c[2] + 2.6, "pool lock from the avenue", 0.6);
+  T(s, 20, -1.4, "avenue → Tidehall", 0.75, { "text-anchor": "start" });
+  const e = loc(VOL.east_house, 0, -6.4), w_ = loc(VOL.west_house, 0, -6.4);
+  T(s, e[0], e[1], "East Strangers' House", 0.8, { "font-weight": 500 }); T(s, w_[0], w_[1], "West Strangers' House", 0.8, { "font-weight": 500 });
+  const sp = loc(VOL.east_house_wrap, 0, 11.5); T(s, sp[0] + 3, sp[1], "spoke to the Garden House trunk →", 0.62);
+  el(s, "line", { x1: 16, y1: 20, x2: 21, y2: 20, stroke: V("--ink"), "stroke-width": 0.15 }); T(s, 18.5, 19.2, "5 m", 0.7);
+})();
+
+(function trunk() {
+  const tr = D.trunks[0], hv = VOL["hall_" + tr.bearing], s = zoom("bt", hv.c[0], hv.c[2], 22, 28); arrowDef(s);
+  // plan at the landing
+  el(s, "path", { d: P(section(hv, tr.landing + 0.05)), fill: V("--air"), stroke: V("--glass-ink"), "stroke-width": 0.25 });
+  for (const v of D.volumes) if (v.docks === hv.key) {
+    el(s, "path", { d: P(section(v, v.c[1])), fill: V("--wet"), stroke: V("--muted"), "stroke-width": 0.2 });
+    const d = [v.c[0] - hv.c[0], v.c[2] - hv.c[2]], n = Math.hypot(...d); lockMark(s, hv.c[0] + d[0] / n * 6.1, hv.c[2] + d[1] / n * 6.1, 0.9);
+    T(s, v.c[0] + d[0] / n * 1.4, v.c[2] + d[1] / n * 1.4 - 0.6, v.who, 0.8, { "font-weight": 500 }); T(s, v.c[0] + d[0] / n * 1.4, v.c[2] + d[1] / n * 1.4 + 0.5, "wet home", 0.6);
+  }
+  el(s, "circle", { cx: hv.c[0], cy: hv.c[2], r: 4, fill: V("--glass"), stroke: V("--glass-ink"), "stroke-width": 0.25 });
+  el(s, "circle", { cx: hv.c[0], cy: hv.c[2], r: 1.9, fill: V("--sheet"), stroke: V("--ink"), "stroke-width": 0.1 });
+  const sp = []; for (let i = 0; i <= 40; i++) { const t = 2 * Math.PI * i / 40; sp.push([hv.c[0] + 2.9 * Math.cos(t), hv.c[2] + 2.9 * Math.sin(t)]); }
+  el(s, "path", { d: L(sp), fill: "none", stroke: V("--accent"), "stroke-width": 0.12, "stroke-dasharray": "0.3 0.2" });
+  T(s, hv.c[0], hv.c[2] - 5.3, "trunk: spiral ramp, 11.8 m a turn", 0.6);
+  T(s, hv.c[0] - 3.5, hv.c[2] + 5.8, "landing hall, 16 m", 0.8, { "font-weight": 500 });
+  // section beside it
+  const ox = hv.c[0] + 30, oz = hv.c[2] + 19, sc = 0.42;
+  el(s, "rect", { x: ox - 7.2, y: oz - 17.5, width: 14.4, height: 18.6, fill: V("--sheet"), stroke: V("--rule"), "stroke-width": 0.1 });
+  const Y = y => oz - y * sc, X = r => ox + r * sc;
+  el(s, "rect", { x: X(-15), y: Y(0), width: 30 * sc, height: 0.6, fill: V("--stone") });
+  el(s, "rect", { x: X(-5.2), y: Y(5.2), width: 10.4 * sc, height: 5.2 * sc, rx: 1, fill: V("--stone"), stroke: V("--stone-ink"), "stroke-width": 0.06 });
+  el(s, "rect", { x: X(-4), y: Y(33), width: 8 * sc, height: (33 - 4.4) * sc, fill: V("--glass"), "fill-opacity": 0.6, stroke: V("--glass-ink"), "stroke-width": 0.06 });
+  const eggProf = (cy, a, b, e, fill, stroke) => { const o = []; for (let i = 0; i < 64; i++) { const t = 2 * Math.PI * i / 64; o.push([X(a * ps(Math.cos(t), e)), Y(cy + b * ps(Math.sin(t), e))]); } el(s, "path", { d: P(o), fill, stroke, "stroke-width": 0.06, "fill-opacity": 0.8 }); };
+  eggProf(hv.c[1], 7, 4, 2.4, V("--air"), V("--glass-ink"));
+  for (const sgn of [-1, 1]) { const o = []; for (let i = 0; i < 64; i++) { const t = 2 * Math.PI * i / 64; o.push([X(sgn * 11.4 + 4.2 * ps(Math.cos(t), 2.4)), Y(hv.c[1] + 3 * ps(Math.sin(t), 2.4))]); } el(s, "path", { d: P(o), fill: V("--wet"), stroke: V("--muted"), "stroke-width": 0.06 }); }
+  eggProf(31.2, 6, 3.6, 2.4, V("--air"), V("--glass-ink"));
+  el(s, "line", { x1: X(-7), y1: Y(tr.landing), x2: X(7), y2: Y(tr.landing), stroke: V("--ink"), "stroke-width": 0.08 });
+  el(s, "line", { x1: X(-6), y1: Y(30), x2: X(6), y2: Y(30), stroke: V("--ink"), "stroke-width": 0.08 });
+  for (const sgn of [-1, 1]) el(s, "circle", { cx: X(sgn * 9.5), cy: Y(31.6), r: 2.25 * sc, fill: V("--glass"), stroke: V("--glass-ink"), "stroke-width": 0.06 });
+  el(s, "circle", { cx: X(-9), cy: Y(6), r: 2.25 * sc, fill: V("--glass"), stroke: V("--glass-ink"), "stroke-width": 0.06 });
+  let z = 4.4, side = 1; while (z < 30) { el(s, "line", { x1: X(-2.9 * side), y1: Y(z), x2: X(2.9 * side), y2: Y(Math.min(30, z + D.turn_rise / 2)), stroke: V("--accent"), "stroke-width": 0.07 }); z += D.turn_rise / 2; side = -side; }
+  const t = (y, txt) => T(s, X(7.6), Y(y), txt, 0.55, { "text-anchor": "start" });
+  t(31.6, "crown hall and ring, 30 m"); t(tr.landing + 1.5, "landing hall, " + tr.landing + " m"); t(tr.landing - 1.5, "homes docked, wet"); t(6, "spoke, 4.4 m"); t(2.6, "ring-tower stump");
+  T(s, ox, oz - 16.6, "section", 0.6);
+})();
+
+// ---------- program table
+(function () {
+  const rows = D.trunks.map(t => `<tr><td>${t.household}</td><td>${t.landing} m: ${t.homes.map(h => h[1] + " (" + h[0] + ")").join(", ")}</td><td>${t.bearing === 112.5 ? "the trunk climbs on to the Kraken lookout, 54 m: Ikara's glass watch room" : t.crown}</td></tr>`).join("");
+  document.getElementById("prog").innerHTML = `<table><thead><tr><th>Trunk</th><th>Landing hall and the homes docked to it</th><th>Crown hall, 30 m</th></tr></thead><tbody>${rows}
+  <tr><td>On the floor</td><td colspan="2">The Exchange (wrap) and the guest hall (join) at 0.6 m with galleries at 4.4 m; the Glassworks at the vent; the Current House and the Lamp House family in classical homes, wet.</td></tr></tbody></table>`;
+})();
+</script>

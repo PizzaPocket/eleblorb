@@ -1,0 +1,225 @@
+<title>Tennison Town Plan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a surveyor's sheet in desert colours. Kingdom map at true scale, then the town arrangement, then a places ledger */
+:root{
+  --bg:#f3ece0; --paper:#fbf7ef; --ink:#2b2219; --muted:#7a6a58; --rule:#dccfbb;
+  --dirt:#d9bf94; --rock:#b9805a; --rock2:#9a6446; --shelf:#efe2c6; --basin:#c9b49a;
+  --road:#8c6a46; --race:#b2452e; --iron:#3a3633; --brass:#b08a2e; --water:#3f7fa8;
+  --display:"Rye", Georgia, serif;
+  --body:"Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#18140f; --paper:#201b15; --ink:#efe6d8; --muted:#b3a38f; --rule:#3d342a;
+  --dirt:#5e4a31; --rock:#7d4f36; --rock2:#93604a; --shelf:#3f3426; --basin:#4c4031;
+  --road:#c9a57a; --race:#e07a5c; --iron:#d8d2c8; --brass:#d6ad55; --water:#7bb8e0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#18140f; --paper:#201b15; --ink:#efe6d8; --muted:#b3a38f; --rule:#3d342a;
+  --dirt:#5e4a31; --rock:#7d4f36; --rock2:#93604a; --shelf:#3f3426; --basin:#4c4031;
+  --road:#c9a57a; --race:#e07a5c; --iron:#d8d2c8; --brass:#d6ad55; --water:#7bb8e0; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:grid;gap:28px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,42px);margin:0;letter-spacing:.01em;text-wrap:balance}
+h2{font-family:var(--display);font-weight:400;font-size:21px;margin:0 0 6px}
+.lede{color:var(--muted);max-width:72ch;margin:6px 0 0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.sheet{background:var(--paper);border:1px solid var(--rule);border-radius:4px}
+.sheet>.hd{padding:14px 16px 0}
+.note{font-size:14px;color:var(--muted);max-width:78ch;margin:0}
+.scroll{overflow-x:auto}
+.scroll svg{display:block;width:100%;height:auto}
+#kingdom{min-width:620px} #town{min-width:660px}
+.cap{font-size:13px;color:var(--muted);padding:10px 16px;border-top:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:8px 20px}
+.cap span{display:inline-flex;align-items:center;gap:7px}
+.cap svg{flex:none}
+.tbl{overflow-x:auto;padding:0 16px 16px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tag{font-family:var(--mono);font-size:12px;color:var(--muted)}
+text{font-family:var(--body)}
+.lbl{fill:var(--ink)} .dim{fill:var(--muted);font-family:var(--mono)} .big{fill:var(--ink);font-family:var(--display)}
+.racel{fill:var(--race);font-weight:600} .mech{fill:var(--brass);font-weight:600}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Eleblorb · Rock and Ground Kingdom · Tennison, the frontier town · concept for review, 12 Oct 2026</div>
+    <h1>Tennison Town Plan</h1>
+    <p class="lede">A Western main street in the manner of Nacogdoches and Jefferson, set on a level shelf in the Rock half of a 1,240 m kingdom. The look is cowboy, mechanical and motor punk: cyborg horses that become dirt bikes, clockwork hats, windpumps and open machinery. The kingdom map is true scale and taken from the terrain code. The town arrangement below it is a first sketch of the brief's places list; it is not yet a measured layout.</p>
+  </header>
+
+  <figure class="sheet" style="margin:0">
+    <div class="hd"><h2>The kingdom, true scale</h2>
+    <p class="note">Coordinates are kingdom metres, north at the top. The divide between the Rock and Ground halves runs at x = 25. The shelves, the fossil basin and the two half-pipe canyons are where the terrain code puts them. The race course and the roads are proposals.</p></div>
+    <div class="scroll"><svg id="kingdom" viewBox="-640 -640 1280 1280" role="img" aria-label="Map of the Rock and Ground Kingdom"></svg></div>
+    <figcaption class="cap">
+      <span><svg width="28" height="10"><line x1="1" y1="5" x2="27" y2="5" stroke="var(--road)" stroke-width="3"/></svg>Road</span>
+      <span><svg width="28" height="10"><line x1="1" y1="5" x2="27" y2="5" stroke="var(--race)" stroke-width="2.4" stroke-dasharray="5 3"/></svg>Race course (proposed)</span>
+      <span><svg width="16" height="14"><path d="M8 1 L15 13 L1 13 Z" fill="var(--brass)"/></svg>Windpump</span>
+      <span><svg width="22" height="12"><rect x="1" y="1" width="20" height="10" fill="var(--rock)"/></svg>Rock half</span>
+      <span><svg width="22" height="12"><rect x="1" y="1" width="20" height="10" fill="var(--dirt)"/></svg>Ground half</span>
+    </figcaption>
+  </figure>
+
+  <figure class="sheet" style="margin:0">
+    <div class="hd"><h2>The town, a strip on the through road</h2>
+    <p class="note">Main street is a stretch of the kingdom's through road, which runs from the mine in the west to the arrival point and the fossil basin in the east.
+      <br>• <strong>West end:</strong> the general store and the assay office, where the ore wagons come in off the mine road.
+      <br>• <strong>East end:</strong> the livery's garage and charging posts greet arriving riders.
+      <br>• <strong>The centre:</strong> the street widens into a square around the old well. The saloon and hotel face it, with the gang on the porch watching everyone who passes, and the water tower stands opposite.
+      <br>• <strong>Racing</strong> leaves from the arena behind the livery and never uses the street.
+      <br>Positions show what stands beside what, not measured footprints.</p></div>
+    <div class="scroll"><svg id="town" viewBox="-250 15 190 160" role="img" aria-label="Arrangement of Tennison's places"></svg></div>
+  </figure>
+
+  <section class="sheet">
+    <div class="hd"><h2>Places and people</h2></div>
+    <div class="tbl"><table>
+      <thead><tr><th>Place</th><th>Who</th><th>Mechanical and motor layer</th></tr></thead>
+      <tbody>
+        <tr><td>Saloon and hotel <span class="tag">rest point</span></td><td>Dolma Hearthstone, who keeps it alone; Jessup Kane and Sadie Vex, the gang, on the porch and in the back room</td><td>player piano, belt-driven ceiling fans, spring-hinged doors, a case clock; porcelain toilet upstairs</td></tr>
+        <tr><td>Jail and sheriff's office</td><td>Ruth Calloway, the sheriff</td><td>radio mast, a heliograph with geared mirrors, a heavy cell lock</td></tr>
+        <tr><td>General store</td><td>Walt Beasley</td><td>mechanical cash register; miners' tools and supplies</td></tr>
+        <tr><td>Assay office and bank</td><td>Pearl Dunaway; Tomás Reyes in the back room</td><td>geared balance, a window clock</td></tr>
+        <tr><td>Doctor's and barber's</td><td>Hollis Grant</td><td>—</td></tr>
+        <tr><td>Livery and garage</td><td>Mateo Villanueva, farrier and mechanic</td><td>line shaft and belts from the windpump, charging posts with knife switches and gauges, a stripped motor on the bench</td></tr>
+        <tr><td>Hat shop</td><td>Inez Villanueva, hatter and watchmaker</td><td>watchmaker's bench; clockwork hats that fan into helmets</td></tr>
+        <tr><td>Saddlery</td><td>Wes Tolliver</td><td>the saddle that lets Manchego change size</td></tr>
+        <tr><td>Race barn, rodeo arena, race course</td><td>Lark Delgado; Sadie Vex rides against her</td><td>bikes on stands with engines open, clockwork race clock, weight-and-cam start gate, mechanical bull</td></tr>
+        <tr><td>Bell ranch and corral</td><td>Amos, Cora and Josie Bell</td><td>windpump; the cyborg horses at rest</td></tr>
+        <tr><td>Silverback mine</td><td>Cass Rourke, miner</td><td>geared hoist, ore-cart rails, stamp mill under its own windpump, caged electric lamps; a 20 m tunnel the player can walk</td></tr>
+        <tr><td>Gus's shack</td><td>Gus Pickett, the old prospector</td><td>sluice box and panning trough; his cyborg burro; a pocket watch that stopped twenty years ago</td></tr>
+        <tr><td>Bone camp, on the fossil basin's rim</td><td>Dr. Hazel Coleman, paleontologist</td><td>dig grid of stakes and string, plaster-jacketed bones, a hand-cranked sieve shaker, a camera on a tripod; after Dinosaur rises, she sketches him alive</td></tr>
+        <tr><td>Survey room, behind the assay office</td><td>Tomás Reyes, geologist and surveyor (Pearl's husband)</td><td>sample cabinet of labelled stones, strata maps, a hand lens</td></tr>
+        <tr><td>Race course and track gear</td><td>Della Lusk, track boss (race barn loft)</td><td>a drag rake pulled by a cyborg horse, a water cart from the windpump tank, sorted heaps of clay, sand and crushed tip rock</td></tr>
+        <tr><td>Water tower and windpump</td><td>the town; kept by Mateo</td><td>geared head over the old well; the dynamo for the street bulbs</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+function el(p,tag,a){const e=document.createElementNS(NS,tag);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e}
+function tx(p,x,y,s,cls,size,anchor="middle",extra={}){const t=el(p,"text",Object.assign({x,y,class:cls,"font-size":size,"text-anchor":anchor},extra));t.textContent=s;return t}
+const poly=pts=>pts.map(p=>p.join(",")).join(" ");
+function pump(p,x,y,sz){el(p,"path",{d:`M${x} ${y-sz} L${x+sz*.8} ${y+sz*.6} L${x-sz*.8} ${y+sz*.6} Z`,fill:"var(--brass)"})}
+
+/* KINGDOM */
+(function(){
+const s=document.getElementById("kingdom");
+el(s,"rect",{x:-640,y:-640,width:1280,height:1280,fill:"var(--water)",opacity:.25});
+el(s,"rect",{x:-620,y:-620,width:645,height:1240,fill:"var(--rock)"});
+el(s,"rect",{x:25,y:-620,width:595,height:1240,fill:"var(--dirt)"});
+// perimeter crest ring (0.72..0.97 of 620)
+el(s,"circle",{cx:0,cy:0,r:540,fill:"none",stroke:"var(--rock2)","stroke-width":60,opacity:.55});
+// rock clusters hint
+for(const [x,y] of [[-480,-300],[-420,40],[-520,260],[-200,-440],[-120,-200],[-380,420],[-60,330],[-260,-120],[-470,-480]]) el(s,"circle",{cx:x,cy:y,r:39,fill:"var(--rock2)",opacity:.7});
+// half-pipe canyons
+function canyon(cx,cy,ang,half){const g=el(s,"g",{transform:`translate(${cx} ${cy}) rotate(${ang*180/Math.PI})`});el(g,"rect",{x:-27,y:-half,width:54,height:half*2,rx:20,fill:"var(--dirt)",stroke:"var(--rock2)","stroke-width":6})}
+canyon(-330,155,0.08,150); canyon(-270,-285,0.58,118);
+tx(s,-330,330,"half-pipe canyon","dim",15);
+tx(s,-180,-410,"half-pipe canyon","dim",15);
+// shelves
+el(s,"circle",{cx:0,cy:0,r:52,fill:"var(--shelf)",stroke:"var(--ink)","stroke-width":1.5});
+tx(s,0,6,"arrival","lbl",17);
+el(s,"circle",{cx:-155,cy:92,r:68,fill:"var(--shelf)",stroke:"var(--ink)","stroke-width":2});
+el(s,"circle",{cx:185,cy:-145,r:72,fill:"var(--basin)",stroke:"var(--ink)","stroke-width":1.5,"stroke-dasharray":"8 5"});
+tx(s,185,-150,"Dinosaur's","lbl",17);tx(s,185,-130,"fossil basin","lbl",17);
+// the through road: mine - town - arrival - basin
+el(s,"polyline",{points:poly([[-294,112],[-222,100],[-88,100],[-45,58],[0,0],[84,-86],[106,-164]]),fill:"none",stroke:"var(--road)","stroke-width":7,"stroke-linecap":"round","stroke-linejoin":"round"});
+tx(s,-30,84,"through road","lbl",16,"start");
+// race course loop
+el(s,"path",{d:"M-118 150 C -60 260, 140 260, 300 160 S 380 -120, 300 -220 S 200 -130, 210 -40 S 120 60, 40 110 S -80 140, -118 150",fill:"none",stroke:"var(--race)","stroke-width":7,"stroke-dasharray":"18 10"});
+tx(s,330,200,"race course","racel",20,"start");
+tx(s,330,222,"flats and basin rim; stays south","dim",14,"start");tx(s,330,240,"of the through road","dim",14,"start");
+// mine on the canyon's east wall
+el(s,"rect",{x:-312,y:96,width:26,height:30,fill:"var(--iron)"});
+pump(s,-270,128,11);
+tx(s,-318,82,"Silverback mine","lbl",17,"end");
+// Gus
+el(s,"rect",{x:84,y:-92,width:14,height:12,fill:"var(--iron)"});
+tx(s,104,-96,"Gus's shack","lbl",16,"start");
+el(s,"rect",{x:100,y:-176,width:14,height:12,fill:"var(--iron)"});tx(s,96,-180,"Hazel's bone camp","lbl",16,"end");
+// ranch
+el(s,"rect",{x:-176,y:178,width:40,height:26,fill:"none",stroke:"var(--ink)","stroke-width":2});
+pump(s,-130,182,9);
+tx(s,-156,226,"Bell ranch","lbl",16);
+pump(s,-155,86,9);
+tx(s,-155,46,"Tennison","big",30);
+// gate note
+tx(s,60,30,"gate from the Crossroads canyon","dim",14,"start");
+// divide
+el(s,"line",{x1:25,y1:-620,x2:25,y2:620,stroke:"var(--ink)","stroke-width":1.5,"stroke-dasharray":"10 8",opacity:.5});
+tx(s,-30,-590,"ROCK","big",26,"end");tx(s,80,-590,"GROUND","big",26,"start");
+// scale
+el(s,"line",{x1:-600,y1:600,x2:-400,y2:600,stroke:"var(--ink)","stroke-width":3});
+tx(s,-500,588,"200 m","dim",16);
+tx(s,-600,-600,"N ↑","dim",18,"start");
+})();
+
+/* TOWN */
+(function(){
+const s=document.getElementById("town");
+el(s,"rect",{x:-250,y:15,width:190,height:160,fill:"var(--rock)",opacity:.35});
+el(s,"circle",{cx:-155,cy:92,r:68,fill:"var(--shelf)",stroke:"var(--ink)","stroke-width":.5});
+// through road
+el(s,"polyline",{points:poly([[-250,104],[-222,100],[-88,100],[-62,74]]),fill:"none",stroke:"var(--dirt)","stroke-width":8,"stroke-linejoin":"round"});
+el(s,"rect",{x:-222,y:93,width:134,height:3,fill:"var(--road)",opacity:.45});
+el(s,"rect",{x:-222,y:104,width:134,height:3,fill:"var(--road)",opacity:.45});
+tx(s,-190,101.2,"MAIN STREET · through road","dim",3);
+tx(s,-247,110,"← mine road","dim",3,"start");
+tx(s,-64,70,"arrival road →","dim",3,"end");
+// back lanes
+el(s,"line",{x1:-218,y1:66,x2:-120,y2:66,stroke:"var(--road)","stroke-width":1.6,opacity:.6});
+el(s,"line",{x1:-218,y1:132,x2:-112,y2:132,stroke:"var(--road)","stroke-width":1.6,opacity:.6});
+tx(s,-120,63.6,"back lane","dim",2.5,"end");tx(s,-176,136,"back lane","dim",2.5,"end");
+// well square
+el(s,"rect",{x:-167,y:84,width:24,height:9,fill:"var(--dirt)",opacity:.7});
+el(s,"circle",{cx:-155,cy:89,r:2.4,fill:"var(--water)",stroke:"var(--ink)","stroke-width":.4});
+tx(s,-155,87.2,"","dim",2);
+tx(s,-150,91.4,"old well","dim",2.3,"start");
+// buildings [x,y,w,h,label,sub]
+const B=[
+ [-218,74,13,18,"General","store"],
+ [-204,74,13,18,"Assay office","& bank"],
+ [-190,76,13,16,"Jail",""],
+ [-168,68,26,15,"Saloon & hotel",""],
+ [-218,108,13,16,"Doctor","& barber"],
+ [-204,108,13,16,"house",""],
+ [-141,108,10,14,"Saddles",""],
+ [-130,108,10,14,"Hats",""],
+ [-119,108,24,18,"Livery","& garage"],
+ [-140,76,13,16,"house",""],
+];
+for(const [x,y,w,h,a,b] of B){el(s,"rect",{x,y,width:w,height:h,fill:"var(--paper)",stroke:"var(--ink)","stroke-width":.5});tx(s,x+w/2,y+h/2+(b?-0.6:1.1),a,"lbl",2.8);if(b)tx(s,x+w/2,y+h/2+2.9,b,"lbl",2.8)}
+// saloon porch facing square
+el(s,"rect",{x:-168,y:82.4,width:26,height:1.6,fill:"var(--road)"});
+for(const x of [-163,-157,-150]) el(s,"circle",{cx:x,cy:83.2,r:.8,fill:"var(--race)"});
+tx(s,-155,61,"gang on the saloon porch","racel",2.6);
+el(s,"line",{x1:-155,y1:62.5,x2:-157,y2:82,stroke:"var(--race)","stroke-width":.25});
+// water tower opposite square
+pump(s,-155,112,3.6);tx(s,-155,119.5,"water tower,","mech",2.5);tx(s,-155,122.6,"windpump","mech",2.5);
+// charging posts at the livery kerb
+for(const x of [-116,-111,-106,-101]) el(s,"rect",{x,y:104.6,width:1,height:2.2,fill:"var(--iron)"});
+tx(s,-104,103,"charging posts","mech",2.4,"middle");
+// tomas survey room behind assay
+tx(s,-219,62,"Tomás's survey room behind the assay office","dim",2.2,"start");
+// lanes south: ranch by the water tower, race barn by the east end
+el(s,"polyline",{points:poly([[-162,107],[-166,140],[-160,172]]),fill:"none",stroke:"var(--road)","stroke-width":2.4});
+tx(s,-168,166,"to the Bell ranch","dim",3,"end");
+el(s,"polyline",{points:poly([[-92,107],[-96,128]]),fill:"none",stroke:"var(--road)","stroke-width":2.4});
+el(s,"rect",{x:-118,y:130,width:18,height:12,fill:"var(--paper)",stroke:"var(--ink)","stroke-width":.5});tx(s,-109,137,"Race barn","lbl",2.8);
+el(s,"ellipse",{cx:-90,cy:150,rx:15,ry:10,fill:"none",stroke:"var(--ink)","stroke-width":.6});
+tx(s,-90,149.5,"Rodeo arena","lbl",2.8);tx(s,-90,153.4,"race start","racel",2.4);
+el(s,"path",{d:"M-76 154 C -70 158, -66 162, -62 168",fill:"none",stroke:"var(--race)","stroke-width":1.4,"stroke-dasharray":"3 2"});
+tx(s,-64,172,"race course → flats","racel",2.6,"end");
+// ore wagons
+tx(s,-247,92,"ore wagons","dim",2.4,"start");
+el(s,"path",{d:"M-236 94 Q -215 70 -199 70",fill:"none",stroke:"var(--road)","stroke-width":.5,"stroke-dasharray":"1 1"});
+tx(s,-245,22,"N ↑ · arrangement, not yet measured · shelf radius 68 m · street about 14 m between fronts","dim",3,"start");
+})();
+</script>

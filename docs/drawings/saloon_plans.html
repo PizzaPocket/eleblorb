@@ -1,0 +1,344 @@
+<title>Tennison Saloon Plans</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: architect's sheet — two plans side by side, then section and elevation */
+:root{
+  --bg:#f3ece0; --paper:#fbf7ef; --ink:#2b2219; --muted:#7a6a58; --rule:#dccfbb;
+  --wall:#3b2f25; --stone:#9b8466; --brick:#a24e35; --floor:#efe2c6; --void:#e3d3b3;
+  --wood:#8c6a46; --iron:#2f2c2a; --brass:#a9822b; --water:#3f7fa8; --race:#b2452e; --sky:#e6eef2;
+  --display:"Rye", Georgia, serif;
+  --body:"Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#18140f; --paper:#201b15; --ink:#efe6d8; --muted:#b3a38f; --rule:#3d342a;
+  --wall:#e8dcc8; --stone:#8d7a60; --brick:#c0674b; --floor:#2d261d; --void:#3a3125;
+  --wood:#c9a57a; --iron:#d8d2c8; --brass:#d6ad55; --water:#7bb8e0; --race:#e07a5c; --sky:#1f262b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#18140f; --paper:#201b15; --ink:#efe6d8; --muted:#b3a38f; --rule:#3d342a;
+  --wall:#e8dcc8; --stone:#8d7a60; --brick:#c0674b; --floor:#2d261d; --void:#3a3125;
+  --wood:#c9a57a; --iron:#d8d2c8; --brass:#d6ad55; --water:#7bb8e0; --race:#e07a5c; --sky:#1f262b; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:16px;padding-block:28px 56px;display:grid;gap:26px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4.4vw,42px);margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:400;font-size:20px;margin:0 0 4px}
+.lede{color:var(--muted);max-width:74ch;margin:6px 0 0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:22px}
+.pair>*{min-width:0}
+.sheet{background:var(--paper);border:1px solid var(--rule);border-radius:4px}
+.sheet>.hd{padding:14px 16px 0}
+.note{font-size:14px;color:var(--muted);margin:0;max-width:72ch}
+.scroll{overflow-x:auto}
+.scroll svg{display:block;width:100%;height:auto;min-width:480px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px 22px;padding:16px}
+.facts div{min-width:0}
+.facts b{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+text{font-family:var(--body)}
+.l{fill:var(--ink)} .d{fill:var(--muted);font-family:var(--mono)} .h{fill:var(--ink);font-family:var(--display)} .m{fill:var(--brass);font-weight:600} .r{fill:var(--race);font-weight:600}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Eleblorb · Tennison, Rock and Ground · building brief for review, 12 Oct 2026 · <span>rock_ground_saloon.md</span></div>
+    <h1>Tennison Saloon and Hotel</h1>
+    <p class="lede">The town's largest building, on the north side of the well square, facing the through road. It is 22.4 × 19.2 m (7 × 6 cells of 3.2 m) on two storeys. The barroom rises the full height to the roof trusses, and the hotel has its own door. Dolma Hearthstone keeps it all alone. The plans are drawn true scale with the street at the bottom and north at the top.</p>
+  </header>
+
+  <div class="pair">
+    <figure class="sheet" style="margin:0">
+      <div class="hd"><h2>Ground floor</h2><p class="note">Dolma moves between the bar, the office and the lobby desk without crossing the barroom. Guests reach the ramp and the washroom from the lobby.</p></div>
+      <div class="scroll"><svg id="g" viewBox="-13.2 -21.4 26.4 26.2" role="img" aria-label="Ground floor plan"></svg></div>
+    </figure>
+    <figure class="sheet" style="margin:0">
+      <div class="hd"><h2>Upper floor (+3.25 m)</h2><p class="note">The barroom stays open to the roof. A gallery over the bar and a back gallery run along its edge. The party room is the rest point's wake room.</p></div>
+      <div class="scroll"><svg id="u" viewBox="-13.2 -21.4 26.4 26.2" role="img" aria-label="Upper floor plan"></svg></div>
+    </figure>
+  </div>
+
+  <div class="pair">
+    <figure class="sheet" style="margin:0">
+      <div class="hd"><h2>Section across the barroom, looking north</h2><p class="note">Cut 6 m in from the front. Timber Howe trusses with iron rods span 22.4 m under a low gable, and belt-driven fans hang from their bottom chords.</p></div>
+      <div class="scroll"><svg id="s" viewBox="-13.2 -12.6 26.4 14.4" role="img" aria-label="Cross section through the barroom"></svg></div>
+    </figure>
+    <figure class="sheet" style="margin:0">
+      <div class="hd"><h2>Front elevation, onto the square</h2><p class="note">A two-storey cast-iron gallery after the Jefferson commercial blocks, with a stepped brick parapet hiding the roof. The hotel door has the building's one Greek Revival door case. The sign is a picture only.</p></div>
+      <div class="scroll"><svg id="e" viewBox="-13.2 -12.8 26.4 14.6" role="img" aria-label="Front elevation"></svg></div>
+    </figure>
+  </div>
+
+  <section class="sheet">
+    <div class="facts">
+      <div><b>Footprint</b>22.4 × 19.2 m, about 430 m² a floor (the Holt Inn is 19.2 × 16)</div>
+      <div><b>Barroom</b>16 × 12.8 m, double height, about 60 seats</div>
+      <div><b>Rest point</b>party room 4.2 × 11.4 m with one double bed (1.55 × 2.3 m mattress, the world's bed size), 2 m double door, 20 Tokoins</div>
+      <div><b>Widths</b>ramp 2.0 m, corridors and galleries 1.4 m, front doors 2.4 m</div>
+      <div><b>Toilets</b>two flush closets downstairs, toilet and shower upstairs, septic tank in the yard</div>
+      <div><b>Waiting on</b>the town's style charter (roof pitch about 20°) and the measured town layout</div>
+    </div>
+  </section>
+</div>
+
+<script>
+const NS="http://www.w3.org/2000/svg";
+function el(p,t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e}
+function tx(p,x,y,s,c,sz,an="middle",ex={}){const t=el(p,"text",Object.assign({x,y,class:c,"font-size":sz,"text-anchor":an},ex));t.textContent=s;return t}
+const Y=z=>-z; // plan: z up the page (front at bottom)
+function rect(p,x0,z0,x1,z1,a){return el(p,"rect",Object.assign({x:Math.min(x0,x1),y:Y(Math.max(z0,z1)),width:Math.abs(x1-x0),height:Math.abs(z1-z0)},a))}
+function wallH(p,z,x0,x1,th,gaps=[]){ // horizontal wall with gaps [[a,b]]
+  let segs=[[x0,x1]];for(const [a,b] of gaps){segs=segs.flatMap(([s,e])=>(b<=s||a>=e)?[[s,e]]:[[s,a],[b,e]].filter(([u,v])=>v-u>0.01))}
+  for(const [s,e] of segs) rect(p,s,z-th/2,e,z+th/2,{fill:"var(--wall)"})}
+function wallV(p,x,z0,z1,th,gaps=[]){
+  let segs=[[z0,z1]];for(const [a,b] of gaps){segs=segs.flatMap(([s,e])=>(b<=s||a>=e)?[[s,e]]:[[s,a],[b,e]].filter(([u,v])=>v-u>0.01))}
+  for(const [s,e] of segs) rect(p,x-th/2,s,x+th/2,e,{fill:"var(--wall)"})}
+function doorSwingH(p,x0,x1,z,dir){ // leaf hinged at x0, swinging toward z+dir
+  const w=x1-x0;el(p,"path",{d:`M${x0} ${Y(z)} L${x0} ${Y(z+dir*w)} A ${w} ${w} 0 0 ${dir>0?1:0} ${x1} ${Y(z)}`,fill:"none",stroke:"var(--muted)","stroke-width":.05})}
+function frame(p){
+  rect(p,-13.2,-3.4,13.2,20.4,{fill:"var(--paper)"});
+}
+function base(p){
+  rect(p,-11.2,-3.0,11.2,0,{fill:"var(--void)",opacity:.6});
+  tx(p,0,2.4,"THE WELL SQUARE · through road","d",.62);
+  // gallery columns
+  for(let i=0;i<8;i++){const x=-11.2+3.2*i;rect(p,x-.12,-3.0,x+.12,-2.76,{fill:"var(--iron)"})}
+  rect(p,-11.2,0,11.2,19.2,{fill:"var(--floor)"});
+}
+function scale(p){el(p,"line",{x1:-11.2,y1:Y(-4.2),x2:-6.2,y2:Y(-4.2),stroke:"var(--ink)","stroke-width":.1});for(const x of [-11.2,-6.2]) el(p,"line",{x1:x,y1:Y(-4.0),x2:x,y2:Y(-4.4),stroke:"var(--ink)","stroke-width":.08});tx(p,-8.7,Y(-3.75),"5 m","d",.55);tx(p,11.2,Y(20.2),"N ↑","d",.6,"end")}
+
+/* GROUND */
+(function(){
+const p=document.getElementById("g");frame(p);base(p);
+tx(p,-9.2,1.6,"porch","d",.55);tx(p,6.5,1.6,"porch, under the cast-iron gallery","d",.55);
+// rooms fills
+rect(p,-11.2,12.8,-6.4,19.2,{fill:"var(--sky)"});
+// ramp
+rect(p,-11.0,3.0,-9.0,8.2,{fill:"var(--void)",stroke:"var(--wood)","stroke-width":.06});
+for(let z=3.4;z<8.2;z+=0.5) el(p,"line",{x1:-11.0,y1:Y(z),x2:-9.0,y2:Y(z),stroke:"var(--wood)","stroke-width":.03});
+el(p,"path",{d:`M-10 ${Y(3.4)} L-10 ${Y(7.6)} M-10.35 ${Y(7.1)} L-10 ${Y(7.6)} L-9.65 ${Y(7.1)}`,fill:"none",stroke:"var(--ink)","stroke-width":.07});
+tx(p,-10,Y(2.4),"ramp foot","d",.42);tx(p,-8.6,Y(5.6),"ramp up, 2 m wide","l",.5,"start",{transform:`rotate(-90 -8.6 ${Y(5.6)})`});
+// outer walls
+const T=.36;
+wallH(p,0,-11.2,11.2,T,[[-7.6,-5.2],[2.0,4.4],[-2.6,-1.0],[6.0,7.6],[8.8,10.4],[-10.6,-9.4]]);
+wallH(p,19.2,-11.2,11.2,T,[[-0.4,0.8],[8.2,10.2],[-10.4,-9.6],[-4.8,-3.4],[3.6,5.0]]);
+wallV(p,-11.2,0,19.2,.5,[[9.0,11.0]]);wallV(p,11.2,0,19.2,.5,[[1.6,3.6],[10.2,12.0],[15,16.6]]);
+// window glazing marks
+for(const [a,b] of [[-2.6,-1.0],[6.0,7.6],[8.8,10.4],[-10.6,-9.4]]) el(p,"line",{x1:a,y1:Y(0),x2:b,y2:Y(0),stroke:"var(--water)","stroke-width":.08});
+for(const [a,b] of [[-10.4,-9.6],[-4.8,-3.4],[3.6,5.0]]) el(p,"line",{x1:a,y1:Y(19.2),x2:b,y2:Y(19.2),stroke:"var(--water)","stroke-width":.08});
+for(const [a,b] of [[1.6,3.6],[10.2,12.0],[15,16.6]]) el(p,"line",{x1:11.2,y1:Y(a),x2:11.2,y2:Y(b),stroke:"var(--water)","stroke-width":.08});
+el(p,"line",{x1:-11.2,y1:Y(9),x2:-11.2,y2:Y(11),stroke:"var(--water)","stroke-width":.08});
+// partitions
+wallV(p,-4.8,0,12.8,.18,[[1.0,2.7],[9.6,10.4]]);
+wallH(p,12.8,-11.2,11.2,.24,[[-9.3,-8.3],[-6.0,-5.0],[-4.6,-3.9],[-1.2,-0.2],[0.2,1.4]]);
+wallV(p,-6.4,12.8,19.2,.18);wallV(p,-1.6,12.8,19.2,.18);wallV(p,6.4,12.8,19.2,.18,[[15.5,16.5]]);
+// hatch marker
+el(p,"line",{x1:0.2,y1:Y(12.8),x2:1.4,y2:Y(12.8),stroke:"var(--brass)","stroke-width":.12});
+// stack + stove breast
+rect(p,2.2,12.2,4.2,13.6,{fill:"var(--brick)"});
+el(p,"path",{d:`M2.6 ${Y(12.2)} A .6 .45 0 0 0 3.8 ${Y(12.2)}`,fill:"var(--iron)"});
+rect(p,2.0,10.85,4.4,12.2,{fill:"none",stroke:"var(--race)","stroke-width":.04,"stroke-dasharray":".15 .1"});
+tx(p,3.2,Y(10.3),"stove (iron) · 1.35 m clear","d",.42);
+rect(p,2.4,13.6,4.0,14.3,{fill:"var(--iron)"});tx(p,3.2,Y(14.9),"range","d",.42);
+// washroom closets
+wallV(p,-9.8,16.8,19.2,.1,[]);wallH(p,16.8,-11.2,-8.4,.1,[[-10.9,-10.1],[-9.5,-8.7]]);wallV(p,-8.4,16.8,19.2,.1);
+for(const x of [-10.5,-9.1]) el(p,"ellipse",{cx:x,cy:Y(18.4),rx:.25,ry:.35,fill:"#fff",stroke:"var(--muted)","stroke-width":.04});
+for(const x of [-7.6,-7.0]) rect(p,x-.25,12.95,x+.25,13.4,{fill:"#fff",stroke:"var(--muted)","stroke-width":.04});
+// bar
+rect(p,-3.8,3.2,-3.2,11.2,{fill:"var(--wood)"});
+rect(p,-4.8,3.2,-4.55,11.2,{fill:"var(--brass)",opacity:.6});
+tx(p,-3.5,Y(7.2),"BAR","l",.5,"middle",{transform:`rotate(-90 -3.5 ${Y(7.2)})`,fill:"#fff"});
+// stage + piano
+rect(p,8.6,4.0,11.2,9.0,{fill:"var(--void)",stroke:"var(--wood)","stroke-width":.06});
+rect(p,10.1,5.6,10.95,7.4,{fill:"var(--iron)"});
+tx(p,9.3,Y(6.5),"stage","l",.48,"middle",{transform:`rotate(-90 9.3 ${Y(6.5)})`});
+// tables
+for(const [x,z] of [[-0.6,4.6],[-0.6,8.8],[0.6,2.4],[6.4,4.6],[6.4,8.8],[6.0,2.2]]){el(p,"circle",{cx:x,cy:Y(z),r:.55,fill:"var(--wood)"});for(let a=0;a<4;a++){const t=a*Math.PI/2+.4;el(p,"circle",{cx:x+Math.cos(t)*.95,cy:Y(z)+Math.sin(t)*.95,r:.2,fill:"var(--wood)",opacity:.7})}}
+// desk
+rect(p,-7.4,9.6,-5.2,10.2,{fill:"var(--wood)"});tx(p,-6.3,Y(9.0),"desk","d",.45);
+// stores
+for(const [x,z] of [[8,15],[8.9,15],[9.8,15],[8,16.6],[8.9,16.6],[10.3,17.6]]) el(p,"circle",{cx:x,cy:Y(z),r:.38,fill:"var(--wood)",opacity:.8});
+// doors swings (inward)
+doorSwingH(p,-7.6,-6.4,0,1);doorSwingH(p,-5.2,-6.4,0,1);
+el(p,"path",{d:`M2.0 ${Y(0)} L2.0 ${Y(1.2)} M4.4 ${Y(0)} L4.4 ${Y(1.2)}`,stroke:"var(--brass)","stroke-width":.08});
+tx(p,3.2,Y(1.7),"batwings","m",.45);
+// labels
+tx(p,-8.0,Y(11.6),"HOTEL LOBBY","l",.62);
+tx(p,3.4,Y(6.9),"BARROOM","h",1.0);tx(p,3.4,Y(5.9),"double height · 16 × 12.8 m","d",.5);
+tx(p,-8.8,Y(15.4),"WASHROOM","l",.5);tx(p,-8.8,Y(14.7),"2 flush closets","d",.4);
+tx(p,-4.0,Y(16.2),"OFFICE","l",.55);tx(p,-4.0,Y(15.5),"strongbox · switches","d",.4);
+tx(p,1.4,Y(17.0),"KITCHEN","l",.55);tx(p,8.8,Y(18.4),"STORES","l",.5);
+tx(p,-4.85,Y(1.85),"arch","d",.4,"end");
+tx(p,-6.4,Y(-0.75),"hotel door","d",.45);
+tx(p,0,Y(20.2),"back lane and service yard ↑","d",.5);
+scale(p);
+})();
+
+/* UPPER */
+(function(){
+const p=document.getElementById("u");frame(p);
+rect(p,-11.2,-3.0,11.2,0,{fill:"var(--void)",opacity:.6});
+tx(p,4,1.6,"balcony, iron lace railing","d",.55);
+for(let i=0;i<8;i++){const x=-11.2+3.2*i;rect(p,x-.12,-3.0,x+.12,-2.76,{fill:"var(--iron)"})}
+el(p,"line",{x1:-11.2,y1:Y(-2.9),x2:11.2,y2:Y(-2.9),stroke:"var(--iron)","stroke-width":.08});
+rect(p,-11.2,0,11.2,19.2,{fill:"var(--floor)"});
+// void
+rect(p,-3.4,0,11.2,11.4,{fill:"var(--void)"});
+for(let x=-3;x<6.2;x+=1.2) el(p,"line",{x1:x,y1:Y(0),x2:x+5,y2:Y(5.0),stroke:"var(--rule)","stroke-width":.04});
+tx(p,4,Y(6.4),"OPEN TO THE ROOF","h",.8);tx(p,4,Y(5.5),"barroom below","d",.5);
+// rails
+el(p,"polyline",{points:`-3.4,${Y(0)} -3.4,${Y(11.4)} 11.2,${Y(11.4)}`,fill:"none",stroke:"var(--iron)","stroke-width":.1});
+// ramp hole (superellipse-ish)
+el(p,"rect",{x:-11.0,y:Y(8.2),width:2.0,height:5.2,rx:.6,fill:"var(--void)",stroke:"var(--wood)","stroke-width":.06});
+tx(p,-10,Y(5.6),"ramp","l",.5,"middle",{transform:`rotate(-90 -10 ${Y(5.6)})`});
+const T=.36;
+wallH(p,0,-11.2,11.2,T,[[-7.6,-6.2],[-4.6,-3.6],[0,1.4],[5.0,6.4],[8.4,9.8]]);
+wallH(p,19.2,-11.2,11.2,T,[[-10.4,-9.6],[-5.6,-4.0],[1.0,2.6],[5.0,6.0],[8.2,9.8]]);
+wallV(p,-11.2,0,19.2,.5,[[14,15.6]]);wallV(p,11.2,0,19.2,.5,[[1.6,3.6],[6,8],[15,16.6]]);
+// partitions upper
+wallV(p,-9.0,0,11.4,.16,[[1.0,2.0],[9.2,11.2]]);
+wallH(p,3.0,-11.2,-9.0,.12);
+wallV(p,-4.8,0,11.4,.18,[]);
+wallH(p,11.4,-9.0,-4.8,.16);
+wallH(p,12.8,-11.2,11.2,.22,[[-10.2,-9.2],[-5.6,-4.6],[0.6,1.6],[8.0,9.0]]);
+wallV(p,-8.0,12.8,19.2,.16);wallV(p,-1.6,12.8,19.2,.18);wallV(p,6.4,12.8,19.2,.18);
+rect(p,2.2,12.8,4.2,13.6,{fill:"var(--brick)"});
+// beds (world scale: frame 1.7 x 2.45)
+function bed(x,z,rot=0){const g=el(p,"g",{transform:`translate(${x} ${Y(z)}) rotate(${rot})`});el(g,"rect",{x:-.85,y:-1.225,width:1.7,height:2.45,rx:.25,fill:"var(--wood)",opacity:.75});el(g,"rect",{x:-.75,y:-1.2,width:1.5,height:.5,rx:.15,fill:"var(--paper)"})}
+// one double bed at world scale (frame 1.75 x 2.65), head to the north wall
+(function(){const g=el(p,"g",{});el(g,"rect",{x:-6.6,y:Y(11.25),width:1.7,height:2.45,rx:.25,fill:"var(--wood)",opacity:.8});el(g,"rect",{x:-6.525,y:Y(11.1),width:1.5,height:.5,rx:.15,fill:"var(--paper)"});
+rect(p,-6.35,8.2,-5.15,8.7,{fill:"var(--wood)"});tx(p,-5.775,Y(7.5),"chest","d",.36);
+rect(p,-8.95,6.0,-8.5,6.8,{fill:"var(--wood)",opacity:.7});tx(p,-8.3,Y(6.4),"wash","d",.32,"start");
+for(const x of [-7.4,-6.0]) el(p,"circle",{cx:x,cy:Y(1.4),r:.32,fill:"var(--wood)",opacity:.7});
+el(p,"ellipse",{cx:-6.7,cy:Y(5.0),rx:1.3,ry:2.2,fill:"var(--race)",opacity:.15});tx(p,-6.7,Y(4.9),"floor room","d",.36);tx(p,-6.7,Y(4.45),"for companions","d",.36);})();
+bed(-0.4,17.8,0);bed(5.4,17.8,0);bed(9.6,17.8,0);bed(-4.8,17.8,0);
+// washroom upstairs
+el(p,"ellipse",{cx:-10.6,cy:Y(18.4),rx:.25,ry:.35,fill:"#fff",stroke:"var(--muted)","stroke-width":.04});
+rect(p,-9.4,17.6,-8.2,19.0,{fill:"var(--sky)",stroke:"var(--muted)","stroke-width":.04});tx(p,-8.8,Y(18.1),"shower","d",.32);
+// labels
+tx(p,-6.9,Y(7.0),"PARTY ROOM","l",.55);tx(p,-6.9,Y(6.4),"wake room · one bed","d",.38);
+tx(p,-10.1,Y(1.4),"linen","d",.4);
+tx(p,-10.1,Y(9.9),"landing","d",.42);
+el(p,"path",{d:`M-9.0 ${Y(9.2)} A 1 1 0 0 1 -8.0 ${Y(10.2)}`,fill:"none",stroke:"var(--muted)","stroke-width":.05});
+tx(p,-4.1,Y(6.2),"gallery over the bar","r",.42,"middle",{transform:`rotate(-90 -4.1 ${Y(6.2)})`});
+tx(p,4,Y(12.15),"corridor and back gallery · 1.4 m","d",.45);
+tx(p,-9.6,Y(15.6),"WASH","l",.45);tx(p,-4.8,Y(15.6),"DOLMA","l",.5);tx(p,2.4,Y(15.6),"GANG'S ROOM","l",.5);tx(p,2.4,Y(15.0),"stack warms it","d",.38);tx(p,8.8,Y(15.6),"CORNER ROOM","l",.45);tx(p,8.8,Y(15.0),"travellers","d",.38);
+tx(p,-6.9,Y(-0.75),"French doors","d",.42);
+scale(p);
+})();
+
+/* SECTION across x at z=6, looking north; y = -height */
+(function(){
+const p=document.getElementById("s");
+el(p,"rect",{x:-13.2,y:-12.6,width:26.4,height:14.4,fill:"var(--sky)"});
+el(p,"rect",{x:-13.2,y:0.5,width:26.4,height:1.3,fill:"var(--stone)",opacity:.6});
+const H=h=>-h;
+// plinth + floor
+el(p,"rect",{x:-11.4,y:H(0),width:22.8,height:.5,fill:"var(--stone)"});
+// walls
+el(p,"rect",{x:-11.45,y:H(6.9),width:.5,height:6.9,fill:"var(--wall)"});
+el(p,"rect",{x:10.95,y:H(6.9),width:.5,height:6.9,fill:"var(--wall)"});
+// roof gable
+const pl=6.9,rd=pl+4.08;
+el(p,"polygon",{points:`-11.7,${H(pl-.1)} 0,${H(rd)} 11.7,${H(pl-.1)} 11.7,${H(pl+.15)} 0,${H(rd+.28)} -11.7,${H(pl+.15)}`,fill:"var(--brick)",opacity:.85});
+// truss: bottom chord, verticals, diagonals
+el(p,"line",{x1:-10.95,y1:H(pl),x2:10.95,y2:H(pl),stroke:"var(--wood)","stroke-width":.22});
+for(let i=-4;i<=4;i++){const x=i*2.44;const top=rd-Math.abs(x)*Math.tan(20*Math.PI/180);el(p,"line",{x1:x,y1:H(pl),x2:x,y2:H(top),stroke:"var(--iron)","stroke-width":.06});
+ if(i!==0){const x2=x-Math.sign(x)*2.44;const top2=rd-Math.abs(x2)*Math.tan(20*Math.PI/180);el(p,"line",{x1:x,y1:H(pl),x2:x2,y2:H(top2),stroke:"var(--wood)","stroke-width":.14})}}
+// upper floor west block + gallery
+el(p,"rect",{x:-10.95,y:H(3.25),width:7.55,height:.3,fill:"var(--wood)"});
+el(p,"rect",{x:-9.08,y:H(6.5),width:.16,height:3.25,fill:"var(--wall)"});
+el(p,"rect",{x:-4.88,y:H(6.5),width:.16,height:3.25,fill:"var(--wall)"});
+el(p,"rect",{x:-10.95,y:H(6.55),width:6.15,height:.12,fill:"var(--wood)"});
+el(p,"rect",{x:-4.88,y:H(3.0),width:.16,height:3.0,fill:"var(--wall)"});
+// gallery rail
+el(p,"line",{x1:-3.4,y1:H(3.25),x2:-3.4,y2:H(4.3),stroke:"var(--iron)","stroke-width":.08});
+el(p,"line",{x1:-4.8,y1:H(4.3),x2:-3.4,y2:H(4.3),stroke:"var(--iron)","stroke-width":.08});
+// ramp cut (at z=6, ramp height ~1.9)
+el(p,"polygon",{points:`-11.0,${H(0)} -9.0,${H(0)} -9.0,${H(1.9)} -11.0,${H(1.9)}`,fill:"var(--wood)",opacity:.55});
+// bar + keeper
+el(p,"rect",{x:-3.8,y:H(1.1),width:.6,height:1.1,fill:"var(--wood)"});
+el(p,"rect",{x:-4.75,y:H(2.4),width:.2,height:1.6,fill:"var(--brass)",opacity:.7});
+// stage + piano
+el(p,"rect",{x:8.6,y:H(.3),width:2.4,height:.3,fill:"var(--wood)"});
+el(p,"rect",{x:9.6,y:H(1.6),width:1.2,height:1.3,fill:"var(--iron)"});
+// tables
+for(const x of [-0.6,6.4]) {el(p,"rect",{x:x-.5,y:H(.75),width:1,height:.08,fill:"var(--wood)"});el(p,"rect",{x:x-.04,y:H(.75),width:.08,height:.75,fill:"var(--wood)"})}
+// people
+function person(x,h0,c="var(--ink)"){el(p,"rect",{x:x-.2,y:H(h0+1.5),width:.4,height:1.5,rx:.18,fill:c});el(p,"circle",{cx:x,cy:H(h0+1.72),r:.2,fill:c})}
+person(-4.3,0);person(-2.6,0);person(-4.1,3.25,"var(--race)");person(4.0,0);person(-7,3.25);
+// fans & belt
+for(const x of [-1.5,3.5,8.0]){el(p,"line",{x1:x,y1:H(pl),x2:x,y2:H(5.3),stroke:"var(--iron)","stroke-width":.05});el(p,"line",{x1:x-.8,y1:H(5.3),x2:x+.8,y2:H(5.3),stroke:"var(--iron)","stroke-width":.08})}
+el(p,"line",{x1:-1.5,y1:H(6.6),x2:10.5,y2:H(6.6),stroke:"var(--brass)","stroke-width":.04});
+// stack beyond (dashed)
+el(p,"rect",{x:2.2,y:H(rd+.9),width:2,height:rd+.9,fill:"none",stroke:"var(--brick)","stroke-width":.08,"stroke-dasharray":".3 .2"});
+// labels
+tx(p,-7.8,H(5.6),"party room","l",.5);
+tx(p,-10,H(2.4),"ramp (cut)","d",.4);
+tx(p,-4.1,H(5.3),"gallery","r",.42);
+tx(p,-3.5,H(-1.0),"bar","d",.45);
+tx(p,9.8,H(-1.0),"stage, piano","d",.45);
+tx(p,-5.2,H(8.6),"Howe truss, iron rods","m",.5);
+tx(p,5.6,H(6.85)-0.15,"belt line to the fans","m",.4,"start");
+tx(p,3.2,H(rd+1.3),"stack behind","d",.42);
+tx(p,0,H(rd+.6),"ridge","d",.42);
+tx(p,12.7,H(pl),"plate +6.9","d",.42,"end");
+tx(p,12.7,H(3.25),"+3.25","d",.42,"end");
+tx(p,12.7,H(0),"0 (8.5 m)","d",.42,"end");
+tx(p,-12.9,H(-1.3),"west","d",.45,"start");tx(p,12.9,H(-1.3),"east","d",.45,"end");
+})();
+
+/* ELEVATION */
+(function(){
+const p=document.getElementById("e");
+const H=h=>-h;
+el(p,"rect",{x:-13.2,y:-12.8,width:26.4,height:14.6,fill:"var(--sky)"});
+el(p,"rect",{x:-13.2,y:H(-0.5),width:26.4,height:2.3,fill:"var(--stone)",opacity:.5});
+// building body brick
+el(p,"rect",{x:-11.2,y:H(6.9),width:22.4,height:6.9,fill:"var(--brick)",opacity:.9});
+// stepped parapet
+el(p,"polygon",{points:`-11.2,${H(6.9)} -11.2,${H(8.6)} -9.6,${H(8.6)} -9.6,${H(9.9)} -5.6,${H(9.9)} -5.6,${H(11.0)} -2.4,${H(11.0)} -2.4,${H(11.4)} 2.4,${H(11.4)} 2.4,${H(11.0)} 5.6,${H(11.0)} 5.6,${H(9.9)} 9.6,${H(9.9)} 9.6,${H(8.6)} 11.2,${H(8.6)} 11.2,${H(6.9)}`,fill:"var(--brick)"});
+for(const [x0,x1,h] of [[-11.4,-9.6,8.6],[-9.8,-5.6,9.9],[-5.8,-2.4,11.0],[-2.6,2.6,11.4],[2.4,5.8,11.0],[5.6,9.8,9.9],[9.6,11.4,8.6]]) el(p,"rect",{x:x0,y:H(h+.18),width:x1-x0,height:.3,fill:"var(--wall)",opacity:.85});
+// sign board (picture: glass + horse head)
+el(p,"rect",{x:-2.0,y:H(10.6),width:4,height:1.6,fill:"var(--paper)",stroke:"var(--wall)","stroke-width":.08});
+el(p,"path",{d:`M-1.4 ${H(10.4)} L-0.7 ${H(10.4)} L-0.85 ${H(9.4)} L-1.25 ${H(9.4)} Z`,fill:"var(--brass)"});
+el(p,"path",{d:`M0.3 ${H(9.3)} Q 0.4 ${H(10.3)} 1.0 ${H(10.45)} L 1.5 ${H(10.2)} L1.3 ${H(9.9)} L 0.9 ${H(9.95)} L 0.9 ${H(9.3)} Z`,fill:"var(--wall)"});
+// plinth
+el(p,"rect",{x:-11.2,y:H(0),width:22.4,height:.5,fill:"var(--stone)"});
+// openings ground
+function opening(x0,x1,h0,h1,glass=true){el(p,"rect",{x:x0,y:H(h1),width:x1-x0,height:h1-h0,rx:Math.min(.5,(x1-x0)/2),fill:glass?"var(--water)":"var(--wall)",opacity:glass?.55:.9})}
+opening(-10.6,-9.4,0.9,2.8);opening(-2.6,-1.0,0.9,2.8);opening(6.0,7.6,0.9,2.8);opening(8.8,10.4,0.9,2.8);
+opening(2.0,4.4,0,3.0,false);
+el(p,"rect",{x:2.1,y:H(2.1),width:2.2,height:1.1,fill:"var(--wood)"});el(p,"line",{x1:3.2,y1:H(2.1),x2:3.2,y2:H(1.0),stroke:"var(--paper)","stroke-width":.05});
+opening(-7.6,-5.2,0,2.8,false);
+// greek revival case
+el(p,"rect",{x:-8.0,y:H(3.0),width:.35,height:3.0,fill:"var(--paper)"});el(p,"rect",{x:-5.15,y:H(3.0),width:.35,height:3.0,fill:"var(--paper)"});
+el(p,"rect",{x:-8.15,y:H(3.25),width:3.5,height:.32,fill:"var(--paper)"});
+// upper openings
+opening(-7.6,-6.2,3.5,6.1,true);opening(-4.6,-3.6,3.5,6.0,false);
+for(const [a,b] of [[0,1.4],[5.0,6.4],[8.4,9.8]]) opening(a,b,3.7,6.2,true);
+opening(-10.6,-9.4,4.0,6.0,true);
+// gallery: columns, balcony, shed roof
+for(let i=0;i<8;i++){const x=-11.2+3.2*i;el(p,"rect",{x:x-.1,y:H(6.9),width:.2,height:6.9,fill:"var(--iron)"});el(p,"rect",{x:x-.22,y:H(3.45),width:.44,height:.2,fill:"var(--iron)"})}
+el(p,"rect",{x:-11.4,y:H(3.4),width:22.8,height:.2,fill:"var(--iron)"});
+el(p,"rect",{x:-11.4,y:H(4.35),width:22.8,height:.08,fill:"var(--iron)"});
+for(let x=-11.2;x<11.2;x+=0.4) el(p,"circle",{cx:x+.2,cy:H(3.9),r:.13,fill:"none",stroke:"var(--iron)","stroke-width":.04});
+el(p,"polygon",{points:`-11.6,${H(6.6)} 11.6,${H(6.6)} 11.6,${H(7.0)} -11.6,${H(7.0)}`,fill:"var(--iron)",opacity:.85});
+// people & gang on porch
+function person(x,h0,c="var(--ink)"){el(p,"rect",{x:x-.2,y:H(h0+1.5),width:.4,height:1.5,rx:.18,fill:c});el(p,"circle",{cx:x,cy:H(h0+1.72),r:.2,fill:c})}
+person(-1.8,0,"var(--race)");person(-0.9,0,"var(--race)");person(5.2,3.4,"var(--race)");person(-6.4,0);
+// hitching rail, bike stand
+el(p,"line",{x1:-10.5,y1:H(0.9),x2:-8.6,y2:H(0.9),stroke:"var(--wood)","stroke-width":.14});
+el(p,"line",{x1:7.0,y1:H(0.6),x2:9.0,y2:H(0.6),stroke:"var(--iron)","stroke-width":.1});
+el(p,"rect",{x:10.2,y:H(1.3),width:.3,height:1.3,fill:"var(--iron)"});
+// labels
+tx(p,0,H(12.1),"stepped brick parapet hides the roof","d",.48);
+tx(p,-6.4,H(-0.9),"hotel door, Greek Revival case","l",.4);
+tx(p,3.2,H(3.35),"batwings","m",.42);
+tx(p,0,H(4.8),"cast-iron gallery, lace railing","l",.45);
+tx(p,-1.35,H(-1.5),"the gang","r",.42);
+tx(p,10.35,H(-0.9),"charging post","m",.38);
+tx(p,8,H(-0.9),"bike stand","d",.38);tx(p,-11.0,H(-0.9),"hitching rail","d",.38,"start");
+// scale
+el(p,"line",{x1:-11.2,y1:H(-1.5),x2:-6.2,y2:H(-1.5),stroke:"var(--ink)","stroke-width":.1});tx(p,-8.7,H(-1.25),"5 m","d",.5);
+})();
+</script>

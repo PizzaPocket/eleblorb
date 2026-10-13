@@ -1,0 +1,1638 @@
+<title>Moy City Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a single reading column of plates; each plate is a to-scale drawing with its key beside it, stacking at phone width. */
+:root {
+  --paper: #eef0ee;      /* cool hardpan grey: the page */
+  --sand: #e3d6bb;       /* open desert */
+  --ink: #1d2833;        /* lines and text */
+  --muted: #5b6672;      /* secondary text */
+  --rule: #c9cdc8;
+  --city: #fbfbf8;       /* paved city ground */
+  --lantern: #f0d9c4;    /* Lantern Lane */
+  --market: #f2e2a8;     /* market lanes */
+  --estate: #dcd5ea;     /* North Estate (violet; green is for gardens only) */
+  --lawn: #cfe3c4;       /* gardens: courtyards, precinct gardens, rim gardens */
+  --down: #cfd9e6;       /* downtown */
+  --civic: #e6e1d6;      /* landmarks */
+  --park: #9fc89a;
+  --plateau: #c9b48d;
+  --deck: #d1460f;       /* the Deck at +6.5 m */
+  --blorb: #1479e0;      /* city blorbs: saturated glassy azure */
+  --sign: #c2187a;       /* picture-sign colour, used once */
+  --earth: #cfa77a; --brick: #a8603f; --gypsum: #fbf8f0; --door: #2f6f8f; --glass: #8fbccb; --basalt: #6f6258; --ashlar: #c8b8a0;  /* Old Moy tower houses */
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #13181d; --sand: #2e2a21; --ink: #e4e8ea; --muted: #9aa5ad; --rule: #2d353c;
+  --city: #1d242b; --lantern: #4a3628; --market: #4a4220; --estate: #37304d; --lawn: #24372a; --down: #233246;
+  --civic: #353530; --park: #3f6b3b; --plateau: #4d4330; --deck: #ff7a3d; --blorb: #4aa8ff; --sign: #ff4fa8;
+  --earth: #7a5c3c; --brick: #874a31; --gypsum: #d9d3c6; --door: #4a90b8; --glass: #2f5866; --basalt: #4a4038; --ashlar: #8a7c68;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #13181d; --sand: #2e2a21; --ink: #e4e8ea; --muted: #9aa5ad; --rule: #2d353c;
+  --city: #1d242b; --lantern: #4a3628; --market: #4a4220; --estate: #37304d; --lawn: #24372a; --down: #233246;
+  --civic: #353530; --park: #3f6b3b; --plateau: #4d4330; --deck: #ff7a3d; --blorb: #4aa8ff; --sign: #ff4fa8;
+  --earth: #7a5c3c; --brick: #874a31; --gypsum: #d9d3c6; --door: #4a90b8; --glass: #2f5866; --basalt: #4a4038; --ashlar: #8a7c68;
+  color-scheme: dark; }
+
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1060px; margin: 0 auto; padding-inline: 20px; padding-block: 36px 64px; display: grid; gap: 56px; }
+header { display: grid; gap: 14px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(64px, 12vw, 128px); line-height: .9; margin: 0; letter-spacing: .01em; }
+h1 span { color: var(--sign); }
+h2 { font-family: var(--display); font-weight: 600; font-size: 34px; line-height: 1.05; margin: 0; text-wrap: balance; letter-spacing: .01em; }
+p { margin: 0; max-width: 66ch; }
+.lead { font-size: 18px; max-width: 60ch; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 28px; font-family: var(--mono); font-size: 13px; color: var(--muted); padding-top: 6px; border-top: 1px solid var(--rule); }
+.facts b { color: var(--ink); font-weight: 600; }
+section { display: grid; gap: 18px; }
+.plate { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; align-items: start; }
+.plate.wide { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 820px) { .plate { grid-template-columns: minmax(0, 1fr); } }
+.fig { overflow-x: auto; min-width: 0; }
+.fig svg { display: block; width: 100%; height: auto; min-width: 560px; }
+.side { display: grid; gap: 16px; min-width: 0; font-size: 14px; }
+.key { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.key li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; }
+.sw { width: 16px; height: 12px; margin-top: 4px; border: 1px solid var(--ink); }
+.sw.line { height: 0; border: 0; border-top: 3px dashed var(--deck); margin-top: 10px; }
+.sw.dot { width: 10px; height: 10px; border-radius: 50%; border: 0; background: var(--blorb); margin: 5px 3px 0; }
+.note { font-size: 13px; color: var(--muted); }
+.districts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 22px 28px; }
+.districts div { display: grid; gap: 4px; align-content: start; border-top: 2px solid var(--ink); padding-top: 10px; }
+.districts h3 { font-family: var(--display); font-weight: 600; font-size: 22px; margin: 0; letter-spacing: .02em; }
+.districts p { font-size: 14px; }
+.who { font-size: 13px; color: var(--muted); }
+.layers { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px 28px; margin: 0; padding: 0; list-style: none; counter-reset: l; }
+.layers li { display: grid; gap: 4px; font-size: 14px; }
+.layers b { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+.open { margin: 0; padding-left: 18px; display: grid; gap: 6px; max-width: 70ch; }
+
+.schedule { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 24px 32px; }
+.sched-group { min-width: 0; overflow-x: auto; }
+.subhead { font-family: var(--display); font-weight: 600; font-size: 24px; margin: 8px 0 0; }
+.streets { display: block; overflow-x: auto; }
+.sched-group h3 { font-family: var(--display); font-weight: 600; font-size: 22px; margin: 0 0 6px; letter-spacing: .02em; }
+.schedule table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.schedule th { text-align: left; font-family: var(--mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); font-weight: 400; padding: 4px 8px 4px 0; border-bottom: 1px solid var(--ink); }
+.schedule td { padding: 5px 8px 5px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.schedule td.num { font-family: var(--mono); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+#buildings svg { min-width: 760px; }
+#parkplan svg, #parksection svg, #towers svg { min-width: 720px; }
+.hotel-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: end; }
+@media (max-width: 820px) { .hotel-grid { grid-template-columns: minmax(0, 1fr); } }
+#hotelplan svg, #hotelsection svg, #libplan svg, #libsection svg, #chwest svg, #chnorth svg, #towerfront svg, #towerstack svg, #tonglau svg, #tonglaupair svg { min-width: 340px; }
+/* SVG */
+svg text { font-family: var(--mono); fill: var(--ink); }
+svg .lbl { paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round; }
+svg .dist { font-family: var(--display); font-weight: 800; letter-spacing: .06em; }
+svg .mut { fill: var(--muted); }
+svg .ink { stroke: var(--ink); }
+svg .deck { stroke: var(--deck); fill: none; stroke-width: 2.4; stroke-dasharray: 6 4; }
+@media (prefers-reduced-motion: no-preference) {
+  .rotor { transform-box: fill-box; transform-origin: center; animation: spin 6s linear infinite; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Eleblorb · settlement plan · in review</div>
+    <h1>Moy<span>.</span></h1>
+    <p class="lead">A dense, walkable city standing up out of the desert on the west side of the Crossroads. It has no cars, no trains, no roads out and no water nearby. Four giant turbines power it, and it grows its own food.</p>
+    <div class="facts">
+      <span><b>400 m</b> across, Rim Walk to Rim Walk</span>
+      <span><b>45</b> named residents</span>
+      <span><b>280 m</b> Windspire</span>
+      <span><b>4</b> turbines, 160 m to the tip</span>
+      <span><b>+6.5 m</b> the Deck</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Where Moy stands</h2>
+    <div class="plate">
+      <div class="fig" id="locator"></div>
+      <div class="side">
+        <p>Moy sits on the gorge floor, 60 m below the main plateau, in a desert basin ringed by the main plateau's cliff, the Jungle and Ice plateaus, and the world's edge. The nearest open water is the eastern lake, about 760 m away and 60 m up.</p>
+        <p class="note">North is up (−Z in the game). The turbines stay on the city's side of the Crossroads.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Moy and its surroundings</h2>
+    <div class="plate">
+      <div class="fig" id="plan"></div>
+      <div class="side">
+        <ul class="key">
+          <li><span class="sw" style="background:var(--lantern)"></span><span>Old Moy</span></li>
+          <li><span class="sw" style="background:var(--market)"></span><span>The market lanes</span></li>
+          <li><span class="sw" style="background:var(--estate)"></span><span>North Estate</span></li>
+          <li><span class="sw" style="background:var(--down)"></span><span>Downtown</span></li>
+          <li><span class="sw" style="background:var(--civic)"></span><span>Public buildings</span></li>
+          <li><span class="sw" style="background:var(--park)"></span><span>Green: the park, gardens and courtyards only</span></li>
+          <li><span class="sw" style="background:var(--city)"></span><span>Streets and squares (dashed edge)</span></li>
+          <li><span class="sw" style="background:linear-gradient(90deg, var(--down) 0 25%, color-mix(in srgb, var(--down), var(--ink) 18%) 25% 50%, color-mix(in srgb, var(--down), var(--ink) 30%) 50% 75%, color-mix(in srgb, var(--down), var(--ink) 45%) 75%)"></span><span>Darker is taller: 2–4, 5–9, 10–22 storeys, then towers</span></li>
+          <li><span class="sw line"></span><span>The Deck at +6.5 m</span></li>
+          <li><span class="sw dot"></span><span>City blorbs, outside the Rim Walk</span></li>
+        </ul>
+        <p class="note">Every block is built out to its streets: each small rectangle is one building. Bold squares are towers. Sizes are true; positions are schematic until the measured layout.</p>
+        <p class="note">A turbine seen from above is its rotor edge-on: a 130 m line across the west wind.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Every building</h2>
+    <p>Each rectangle is one building, shoulder to shoulder along the streets: homes over shops in Old Moy and the market lanes, podiums and shops round the estate towers, office podiums downtown. The numbered buildings are the planned ones, listed below with who lives or works in each. Every street is named and listed below. In the street blocks every building fronts a street, lane or square, and the only ground inside a block is a shared garden courtyard. Downtown is filled with mid-rise blocks of 10 to 22 storeys round the towers. The North Estate is two precincts: broad blocks close together in a ring round each precinct's court, joined by covered linkways (dashed). Green marks gardens and the park only.</p>
+    <div class="plate wide"><div class="fig" id="buildings"></div></div>
+    <h3 class="subhead">Streets</h3>
+    <p class="note">Every street joins another street, a square, the Park Ring or the Rim Walk at both ends. There are no dead ends.</p>
+    <div id="streets" class="schedule streets"></div>
+    <div id="schedule" class="schedule"></div>
+  </section>
+
+  <section>
+    <h2>The park and the giant playground</h2>
+    <p>A four-part garden at the centre of the city, after the Persian chahar bagh: a dry garden of desert plants, a reed pond that cleans the city's reclaimed water, Old Fu's tea house and chess terrace under timber parasols (after Seville's Metropol Parasol), and one irrigated great lawn. Four steel wind trees, after the Arbre à Vent and Singapore's Supertrees, light it at night with their leaf turbines. The playground sits where the civic axis and the north–south walk cross.</p>
+    <div class="plate wide"><div class="fig" id="parkplan"></div></div>
+    <p>The playground is one sculpted desert landscape, after Monstrum's climbing worlds, the knitted Woods of Net in Hakone and Toa Payoh's mosaic dragon. Children reach every part by nets, ramps and climbing walls. The hero gets a route for each power, sized to his real reach: 1.2 m steps for an ordinary jump, perches at 12 m for a blorb super-jump, the wind trees as Leaf Hat anchors, a 14 m cloud gap for the Air suit, hover gates over the splash pad, eight hoops for the crystal skates' ribbon, and the pump track for the dirt bike.</p>
+    <div class="plate wide"><div class="fig" id="parksection"></div></div>
+  </section>
+
+  <section>
+    <div class="districts">
+      <div><h3>The park</h3><p>At the centre, about 130 by 100 m, inside the Park Ring. The giant playground, the tea house and chess tables, the pond, shade trees. Garden Row faces it.</p><p class="who">Old Fu, Lily and Kofi, the Hos at chess, Orin.</p></div>
+      <div><h3>Streets and plazas</h3><p>Real streets with no cars: the Park Ring, Meridian Avenue, West, North and South Streets, then shopping streets and lanes. Five plazas: Civic, Library, Market, Estate and Cinema.</p><p class="who">Pia busks on Civic Plaza.</p></div>
+      <div><h3>North Estate</h3><p>Two housing precincts, after Singapore's: broad slab and point blocks 10 to 20 m apart, the inner ones turned 30° off the grid to the wind, in a ring round a shared court with its playground and chess pavilion, slab blocks lining the Park Ring and North Street, and a neighbourhood centre on Estate Square with the hawker centre. Twin blocks share a sky bridge.</p><p class="who">Imani and Kofi, Siti, Juno, Tomas.</p></div>
+      <div><h3>Old Moy</h3><p>The well town, older than the city: tall, narrow tower houses of 4 to 9 storeys with lime-plastered walls, roof terraces and rooftop wind towers, round the first well on Cinema Square. Its painted house marks were the first picture signs.</p><p class="who">Elizabeth, Dan and Jammer (they walk across the park to work), Sol, Leon, Dr. Mehta, Kate, Mara, Pinestein in the rooftop lab.</p></div>
+      <div><h3>Downtown</h3><p>Full-size towers on podium blocks round Civic Plaza and the park, tallest at the centre: the Windspire, about 280 m, beside the plaza. City hall heads the plaza on its axis; the Grand Hotel and the glass tower take its sides. BLOCK, the research institute, sits behind.</p><p class="who">Lucinda, Ah Keung, Teodora, Kenji, Priya, Venn, Dan, Theo, Dr. Kask.</p></div>
+      <div><h3>The market lanes</h3><p>Market Square on South Street, the wet market, the night market, the roofed arcade, the vertical farm that feeds the city, the Helmsmith, the all-night store, the school, Wing Fat Mansion, the museum on the Park Ring.</p><p class="who">Mei, Rosa, Wen, Sora, Hiro, Gideon, Zara, Yuki, Imani.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Skyline, west to east</h2>
+    <div class="plate wide">
+      <div class="fig" id="skyline"></div>
+    </div>
+    <p class="note">Computed from the plan: every building north of the line through West Street, the park and Meridian Avenue, at its planned height, looking north, one scale both ways. Nearer buildings are stronger, farther ones paler. The hero, at 1.9 m, would be less than a pixel here.</p>
+  </section>
+
+  <section>
+    <h2>Downtown's towers</h2>
+    <p>Each tower answers the desert sun, the west wind and the city's history in its own way. The <b>Windspire</b> twists a quarter-turn as it rises, after the Shanghai Tower, and turbines spin through three wind gaps, after Guangzhou's Pearl River Tower. The <b>glass tower</b> wears a moving screen, after Abu Dhabi's Al Bahar Towers, pierced with Old Moy's painted house marks; it closes against the sun and opens at dusk. The <b>north tower</b> is plug-in start-up capsules on a concrete core, after Tokyo's Nakagin Capsule Tower, with an open sky garden halfway up. The <b>south tower</b>'s balconies ripple like dunes, after Chicago's Aqua Tower. The <b>Grand Hotel</b> is the old one: art deco setbacks and a green-copper crown, after Shanghai's Peace Hotel.</p>
+    <div class="plate wide"><div class="fig" id="towers"></div></div>
+    <p class="note">True scale, side by side. The capsules, balconies, screens and fins are also the city's best climbing holds and swing anchors.</p>
+  </section>
+
+  <section>
+    <h2>The Grand Hotel</h2>
+    <p>The city's first tall building and its living room. With almost no outside visitors, it lives on Moy itself: tea and weddings under the chandelier, dinner in the Chandelier Room, five floors of long-stay residences, and guest rooms for the rare traveller like the hero. A podium of four levels wraps a 20 m atrium with a dry rock garden, after Guangzhou's White Swan, and a double ramp up to the mezzanine, where the Deck comes in. The guest tower rises from the north half to a green-copper pyramid that hides the water tanks, after Shanghai's Peace Hotel. Shaded loggias run along the plaza and the park, after Raffles. Two wind towers on the podium roof cool the atrium the old town's way. Lucinda keeps the desk herself in the evenings, and the party's suite is on floor 20, facing the park.</p>
+    <div class="hotel-grid">
+      <div class="fig" id="hotelplan"></div>
+      <div class="fig" id="hotelsection"></div>
+    </div>
+    <p class="note">Ground floor plan (left) and north–south section (right), true scale. The chandelier, about 8 m across with three thousand crystals, is lowered for cleaning once a year. Only the atrium (with its mezzanine gallery) and floor 20, with the party's suite, are built inside; every other room is faux behind lit windows, on solid massing.</p>
+  </section>
+
+  <section>
+    <h2>City hall</h2>
+    <p>The third of the boom's civic buildings, at the head of Civic Plaza, facing the library down the civic axis across the park. The hero never goes inside: city hall is a landmark and a climb, built as an exterior. Low interlocking stone masses and one clock tower, after Willem Dudok's Hilversum Town Hall. The wings step down either side at 14 m with long bronze window bands; the front block rises to 22 m over a portico of six square piers and three pairs of bronze doors cast with house marks, which stay shut. The council chamber behind the five tall windows, walled in gold mosaic after Stockholm's Golden Hall, is only glimpsed as a gold glow at night, and its balcony over the plaza has a rail of house marks, where the city is addressed after the Spanish town hall. Behind it all, the 45 m clock tower on Clock Street closes the view up Meridian Avenue; its lit lantern is the plaza's highest swing anchor.</p>
+    <div class="hotel-grid">
+      <div class="fig" id="chwest"></div>
+      <div class="fig" id="chnorth"></div>
+    </div>
+    <p class="note">West front on Civic Plaza (left) and north side on Meridian North (right), true scale. Dotted: the climb, from the steps to the portico roof, the balcony, the parapet, then up the tower's stone bands to the clock, the belfry and the lantern. Lit windows are panels; no room is built behind them.</p>
+  </section>
+
+  <section>
+    <h2>The North Estate</h2>
+    <p>Public housing planned the way Singapore's Housing Board has since the late 1970s: not rows of blocks but precincts, each a ring of blocks round a shared court small enough for neighbours to know each other. The blocks are broad and close together, 10 to 20 m apart: slabs and broad point blocks with open corridors facing the court and the flats facing out, like Pinnacle@Duxton's linked blocks. The blocks that hold the street edges keep the city grid; behind them the blocks standing back in the gardens turn 30° together onto the estate's own lines, so the gaps meet the west wind on the diagonal and draw it through the courts, the long faces turn from the low western sun, and every flat looks out on a diagonal rather than down a street. In the west precinct the twins face the library, and the 10 m gap between them is the court's gate, spanned by their sky bridge and sky garden on the 26th floor. Each court has a playground, a chess pavilion and shade trees; a covered linkway runs round it from void deck to void deck; behind Block 9 the residents keep a community garden. The east precinct rings Estate Square with the neighbourhood centre and the hawker centre. The gaps are swing gaps: corridor rail to corridor rail with the Leaf Hat.</p>
+    <div class="plate wide"><div class="fig" id="estateplan"></div></div>
+    <p class="note">From the plan file, true scale. Blocks are marked with their storeys. Dashed: covered linkways, through the void decks.</p>
+  </section>
+
+  <section>
+    <h2>The Old Moy tower house</h2>
+    <p>The kit for Old Moy, after the tower houses of old Sana'a: most stand on plumb ground storeys of dark stone, the oldest (about one in four, most of them round the first well) on a battered base of coursed rammed earth with rounded corners under a white gypsum cornice. Above either rise brick storeys banded at every floor in white gypsum friezes, every window outlined in white under a semicircular fanlight (the <i>qamariya</i>), box windows (the <i>kishk</i>) on brackets, and a crenellated parapet with whitewashed horns at the corners. The roof is a terrace: a kiosk where the ramp arrives, a wind tower turned to the west wind over it, and on some houses a rooftop room (the <i>manzar</i>). Inside, a switchback ramp core runs the full height and doubles as the house's air shaft. Each tower was built for one family; most are now a shop below and a flat on each floor above. Every Old Moy lot 6 m or more across takes the tower house; narrower lots hold the later tiled pencil infill.</p>
+    <div class="hotel-grid">
+      <div class="fig" id="towerfront"></div>
+      <div class="fig" id="towerstack"></div>
+    </div>
+    <p class="note">The Reese–Miller house on Arcade Street, true scale: its street front (left) and who lives on each floor (right). A tailor's shop and three let flats below; Elizabeth and Dan on the top three floors, with the mafraj, the best room, at the top; Jammer's room is the manzar on the roof.</p>
+    <div class="plate wide"><div class="fig" id="towerrow"></div></div>
+    <p class="note">Arcade Street's west side through Old Moy, drawn from the plan: every house from its lot's kit, siblings and not clones. Storeys, stone or earth base, frieze and parapet patterns, box windows, the manzar and the side of the core all vary; the earth, the cornice, the white outlines and the house marks never do. Pale blocks are the later pencil infill.</p>
+  </section>
+
+  <section>
+    <h2>The market lanes</h2>
+    <p>Moy's first growth outside the well town, after Hong Kong's tenement shophouses (tong lau): a shop at the ground and flats above, shoulder to shoulder. The <b>boom houses</b>, four and five storeys, were built for the Windworks' first workers: rendered fronts, French windows with shutters, and on the main streets a veranda on square columns over the pavement, stacked floor on floor. The <b>tile houses</b>, six to nine storeys, came as the city grew: mosaic tile, balconies, a canopy over the shop, and on corners the rounded Streamline corner with balconies wrapping it. Narrow pairs share one ramp core on their party wall, the way tong lau pairs share a stair; slivers too narrow for a house hold two-storey lock-up shops. Arcade Street is roofed in the manner of a Tokyo shōtengai, and the night market fills Lamp Lane under strings of lanterns.</p>
+    <div class="hotel-grid">
+      <div class="fig" id="tonglau"></div>
+      <div class="fig" id="tonglaupair"></div>
+    </div>
+    <p class="note">The kit, true scale (left): a boom house with its veranda, a plain boom house, a nine-storey tile house on a corner, and a lock-up shop. A pair of narrow houses sharing a ramp core across their party wall (right).</p>
+    <div class="plate wide"><div class="fig" id="lanesrow"></div></div>
+    <p class="note">South Street's west side through the market lanes, drawn from the plan: every house from its lot's kit, with its generation, colour, signs and roof.</p>
+  </section>
+
+  <section>
+    <h2>The library</h2>
+    <p>A classic building renovated over the years, after Brooklyn's Central Library. Built in the same boom as the Grand Hotel, in art deco limestone and bronze, its front curves round Library Square like an open book, with a 15 m portal at the spine framed in gilded bronze figures from Moy's stories. Inside is the Great Hall, after Baltimore's George Peabody Library and Trinity College's Long Room: reading tables with green lamps on the floor, four tiers of cast-iron galleries round every wall, every wall shelved, every shelf reachable from its gallery, all under a louvred skylight. Ada's renovation opened the ground floor in glass behind the old stone, moved the children's library round a garden court, joined the Deck, and turned the old basement stacks into the heritage room, where the Great Hall's creaking floorboards are relaid and Nia keeps her drawer of maps nobody can explain. The hero climbs the hall through its iron: rail to rail through the gaps where the rolling ladders hang.</p>
+    <div class="hotel-grid">
+      <div class="fig" id="libplan"></div>
+      <div class="fig" id="libsection"></div>
+    </div>
+    <p class="note">Ground floor plan (left) and north–south section (right), true scale. Built inside: the portal and welcome hall, the Great Hall and its galleries, the children's library and the heritage room; the rest is faux.</p>
+  </section>
+
+  <section>
+    <h2>Four layers of movement</h2>
+    <div class="plate">
+      <div class="fig" id="street"></div>
+      <div class="side">
+        <ul class="layers">
+          <li><b>1 · Ground</b>Lanes 3.2 to 4.8 m, shopping streets 6.4 to 8 m, main streets 9.6 to 12.8 m. No walk goes round more than about 60 m.</li>
+          <li><b>2 · The Deck</b>A walkway at +6.5 m over the podiums and across the streets. Reached by ramp towers, glass lifts and travelators at about 12°.</li>
+          <li><b>3 · Towers</b>Lifts in every lobby. Downtown has sky lobbies; the estate's twin blocks share a sky garden on the 26th floor.</li>
+          <li><b>4 · Roofs</b>Roofs step by at most one storey, with 2 to 4 m gaps across lanes, so the hero can cross the city roof to roof.</li>
+        </ul>
+        <p class="note">Streets of 6 to 13 m between walls of 16 to 40 m are swing corridors for the Leaf Hat: the rope runs 12 to 52 m, and an anchor must be at least 7 m up.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Still open</h2>
+    <ul class="open">
+      <li>Whether the hero's own city blorbs may follow him inside the Rim Walk.</li>
+      <li>Whether Elizabeth recognises the hero, and what she tells him.</li>
+      <li>Whether Pinestein has a quest.</li>
+      <li>The hotel's rest price.</li>
+      <li>Whether the Windspire reads in the far skyline at the game's draw distance.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function svg(id, vb, label) {
+  const s = el("svg", { viewBox: vb, role: "img", "aria-label": label });
+  document.getElementById(id).appendChild(s);
+  return s;
+}
+const V = n => `var(--${n})`;
+function rectC(p, cx, cz, w, h, fill, extra = {}) {
+  return el("rect", Object.assign({ x: cx - w / 2, y: cz - h / 2, width: w, height: h, fill, stroke: V("ink"), "stroke-width": 0.8 }, extra), p);
+}
+function label(p, x, y, t, size, opts = {}) {
+  const o = Object.assign({}, opts);
+  if (o.fill) { o.style = `fill:${o.fill};` + (o.style || ""); delete o.fill; }
+  return el("text", Object.assign({ x, y, "font-size": size, "text-anchor": "middle", "dominant-baseline": "middle", class: "lbl" }, o), p, t);
+}
+function arcPath(cx, cz, r, a0, a1) {
+  const p = a => [cx + r * Math.cos(a), cz + r * Math.sin(a)];
+  const [x0, y0] = p(a0), [x1, y1] = p(a1);
+  return `M${x0},${y0} A${r},${r} 0 ${a1 - a0 > Math.PI ? 1 : 0} 1 ${x1},${y1}`;
+}
+const TURBINES = [[-310, -200], [-310, 200], [-740, -270], [-740, 270]];
+const MOY = [-560, 0];
+
+/* ---------- Locator: the whole Crossroads ---------- */
+(() => {
+  const s = svg("locator", "-910 -910 1820 1820", "Map of the Crossroads with Moy on the west side");
+  el("circle", { cx: 0, cy: 0, r: 870, fill: V("sand"), stroke: V("ink"), "stroke-width": 3 }, s);
+  // west half: the city's side
+  el("path", { d: "M0,-870 A870,870 0 0 0 0,870 Z", fill: V("blorb"), opacity: 0.07 }, s);
+  el("line", { x1: 0, y1: -870, x2: 0, y2: 870, stroke: V("muted"), "stroke-width": 2, "stroke-dasharray": "14 10" }, s);
+  // eastern lake (approximate)
+  el("path", { d: "M220,-72 C330,-90 400,-300 560,-330 L760,-420 A870,870 0 0 1 760,420 L560,330 C400,300 330,90 220,72 Z", fill: V("blorb"), opacity: 0.35 }, s);
+  // main plateau
+  el("circle", { cx: 0, cy: 0, r: 255, fill: V("plateau"), stroke: V("ink"), "stroke-width": 3 }, s);
+  // other features
+  el("circle", { cx: -500, cy: 464, r: 140, fill: V("plateau"), stroke: V("ink"), "stroke-width": 2 }, s);
+  el("circle", { cx: -450, cy: -480, r: 140, fill: V("plateau"), stroke: V("ink"), "stroke-width": 2 }, s);
+  el("circle", { cx: 300, cy: 450, r: 180, fill: V("plateau"), stroke: V("ink"), "stroke-width": 2 }, s);
+  el("circle", { cx: 250, cy: -650, r: 150, fill: "none", stroke: V("ink"), "stroke-width": 2, "stroke-dasharray": "10 8" }, s);
+  el("circle", { cx: MOY[0], cy: MOY[1], r: 200, fill: V("city"), stroke: V("sign"), "stroke-width": 6 }, s);
+  for (const [x, z] of TURBINES) {
+    el("line", { x1: x, y1: z - 65, x2: x, y2: z + 65, stroke: V("ink"), "stroke-width": 7 }, s);
+    el("circle", { cx: x, cy: z, r: 11, fill: V("paper"), stroke: V("ink"), "stroke-width": 4 }, s);
+  }
+  const L = (x, y, t, sz = 46, o = {}) => label(s, x, y, t, sz, o);
+  L(-560, -10, "MOY", 92, { class: "lbl dist" });
+  L(-560, 70, "the city", 40, { class: "lbl mut" });
+  L(0, 0, "main plateau", 44);
+  L(0, 50, "Ohio town", 34, { class: "lbl mut" });
+  L(-500, 464, "Jungle", 40);
+  L(-450, -480, "Ice", 40);
+  L(300, 450, "volcano", 40);
+  L(250, -650, "Chinese village", 36);
+  L(560, 0, "eastern lake", 40);
+  L(-430, -800, "the city's side", 40, { class: "lbl mut" });
+  L(0, -890, "N", 44, { "font-weight": 600 });
+})();
+
+const STREET_RUNS = {
+  "Park Ring": "round the park; every district touches it",
+  "Meridian Avenue": "from the Rim Walk (east) to Clock Street, behind city hall",
+  "Meridian North": "from the Park Ring past Civic Plaza, the hotel and the Windspire to the Rim Walk",
+  "Meridian South": "from the Park Ring past Civic Plaza, the glass tower and BLOCK to the Rim Walk",
+  "Clock Street": "behind city hall, from Meridian North to Meridian South",
+  "West Street": "from the Rim Walk (west) to Arcade Street and Library Square",
+  "North Street": "from the Park Ring to the Rim Walk (north), through the estate",
+  "South Street": "from the Park Ring to the Rim Walk (south), through Market Square",
+  "Arcade Street": "Rim Walk to Rim Walk, north to south, roofed in the market lanes",
+  "Market Street": "from the Rim Walk (west) to Market Lane",
+  "Cinema Lane": "Rim Walk to Rim Walk through Old Moy",
+  "Tank Lane": "from the Rim Walk to Arcade Street",
+  "Pine Lane": "from the Rim Walk to Arcade Street",
+  "Clinic Lane": "from the Rim Walk to the Park Ring",
+  "Library Lane": "from Arcade Street to North Street, behind the library",
+  "Garden Walk": "from Library Lane to Library Square",
+  "Museum Lane": "from the Park Ring to Market Street",
+  "Lamp Lane": "from Arcade Street to Market Lane; the night market",
+  "Estate Lane": "from the Park Ring to the Rim Walk, east edge of the estate",
+  "Market Lane": "from the Park Ring to the Rim Walk, east edge of the market lanes",
+  "Hotel Lane": "from Estate Lane to the Rim Walk, behind the hotel",
+  "Glass Lane": "from Market Lane to the Rim Walk, behind the glass tower",
+};
+/* ---------- The plan: every building ---------- */
+const LAYOUT = {"streets": [["Park Ring", "main", -637, -62, -483, -50], ["Park Ring", "main", -637, 50, -483, 62], ["Park Ring", "main", -637, -50, -625, 50], ["Park Ring", "main", -495, -50, -483, 50], ["Meridian Avenue", "main", -391, -6, -340, 6], ["Meridian North", "avenue", -483, -38, -340, -30], ["Meridian South", "avenue", -483, 30, -340, 38], ["Clock Street", "lane", -397, -30, -391, 30], ["West Street", "main", -780, -6, -694, 6], ["North Street", "main", -566, -220, -554, -62], ["South Street", "main", -566, 62, -554, 220], ["Arcade Street", "shop", -694, -220, -686, 220], ["Market Street", "shop", -780, 114, -487, 122], ["Cinema Lane", "lane", -734, -220, -730, 220], ["Tank Lane", "lane", -780, -122, -694, -118], ["Pine Lane", "lane", -780, -62, -694, -58], ["Clinic Lane", "lane", -780, 58, -637, 62], ["Library Lane", "lane", -686, -96, -566, -92], ["Museum Lane", "lane", -641, 62, -637, 114], ["Garden Walk", "lane", -641, -92, -637, -30], ["Lamp Lane", "lane", -694, 170, -487, 174], ["Estate Lane", "lane", -487, -220, -483, -62], ["Market Lane", "lane", -487, 62, -483, 220], ["Hotel Lane", "lane", -483, -102, -340, -98], ["Glass Lane", "lane", -483, 98, -340, 102]], "opens": [["park", -625, -50, -495, 50], ["Civic Plaza", -483, -30, -431, 30], ["Library Square", -686, -30, -637, 30], ["Market Square", -590, 122, -530, 164], ["Estate Square", -554, -118, -516, -84], ["Cinema Square", -752, 6, -734, 34]], "lots": [[-748, -58, -742, -43, 8, "fabric"], [-742, -58, -734, -43, 5, "fabric"], [-755, -21, -749, -6, 9, "fabric"], [-749, -21, -740, -6, 7, "fabric"], [-740, -21, -734, -6, 4, "fabric"], [-752, -43, -745, -35, 6, "fabric"], [-753, -35, -745, -21, 8, "fabric"], [-745, -43, -734, -35, 6, "fabric"], [-745, -35, -734, -29, 8, "fabric"], [-745, -29, -734, -21, 5, "fabric"], [-755, 6, -752, 21, 9, "fabric"], [-748, 44, -734, 58, 8, "fabric"], [-741, -76, -734, -62, 8, "fabric"], [-741, 62, -734, 76, 6, "fabric"], [-700, -118, -694, -112, 8, "fabric"], [-730, -77, -722, -62, 6, "fabric"], [-722, -77, -716, -62, 8, "fabric"], [-716, -77, -706, -62, 5, "fabric"], [-706, -77, -699, -62, 9, "fabric"], [-699, -77, -694, -62, 7, "fabric"], [-727, -103, -716, -97, 4, "fabric"], [-730, -97, -712, -89, 6, "fabric"], [-730, -89, -712, -77, 8, "fabric"], [-712, -95, -694, -89, 8, "fabric"], [-712, -89, -694, -77, 5, "fabric"], [-730, -58, -723, -43, 9, "fabric"], [-723, -58, -716, -43, 7, "fabric"], [-707, -58, -700, -43, 6, "fabric"], [-700, -58, -694, -43, 8, "fabric"], [-720, -21, -716, -6, 8, "fabric"], [-716, -21, -706, -6, 5, "fabric"], [-706, -21, -699, -6, 9, "fabric"], [-699, -21, -694, -6, 7, "fabric"], [-730, -43, -716, -37, 4, "fabric"], [-730, -37, -712, -29, 6, "fabric"], [-730, -29, -720, -22, 8, "fabric"], [-704, -24, -694, -21, 5, "fabric"], [-700, 6, -694, 21, 8, "fabric"], [-730, 43, -722, 58, 6, "fabric"], [-722, 43, -716, 58, 8, "fabric"], [-716, 43, -706, 58, 5, "fabric"], [-706, 43, -699, 58, 9, "fabric"], [-699, 43, -694, 58, 7, "fabric"], [-730, 35, -712, 43, 8, "fabric"], [-700, 21, -694, 29, 6, "fabric"], [-700, 29, -694, 35, 8, "fabric"], [-712, 35, -694, 43, 5, "fabric"], [-730, 62, -723, 74, 9, "fabric"], [-722, 62, -714, 77, 7, "fabric"], [-698, 62, -694, 77, 8, "fabric"], [-720, 99, -716, 114, 8, "fabric"], [-716, 99, -706, 114, 5, "fabric"], [-706, 99, -699, 114, 9, "fabric"], [-699, 99, -694, 114, 7, "fabric"], [-730, 91, -712, 99, 8, "fabric"], [-698, 77, -694, 85, 6, "fabric"], [-712, 85, -694, 91, 8, "fabric"], [-712, 91, -694, 99, 5, "fabric"], [-706, -132, -699, -122, 6, "fabric"], [-699, -132, -694, -122, 8, "fabric"], [-706, 122, -703, 132, 2, "fabric"], [-703, 122, -694, 132, 9, "fabric"], [-686, 30, -679, 40, 9, "fabric"], [-678, 30, -670, 44, 7, "fabric"], [-670, 30, -664, 44, 4, "fabric"], [-664, 30, -660, 44, 6, "fabric"], [-660, 30, -656, 40, 6, "fabric"], [-646, 30, -637, 40, 6, "fabric"], [-678, 44, -670, 58, 5, "fabric"], [-670, 44, -663, 58, 9, "fabric"], [-663, 44, -660, 58, 7, "fabric"], [-676, 62, -668, 77, 6, "fabric"], [-668, 62, -662, 77, 8, "fabric"], [-662, 62, -652, 77, 5, "fabric"], [-652, 62, -641, 77, 9, "fabric"], [-686, 99, -677, 114, 7, "fabric"], [-677, 99, -671, 114, 4, "fabric"], [-671, 99, -663, 114, 6, "fabric"], [-663, 99, -653, 114, 8, "fabric"], [-653, 99, -641, 114, 6, "fabric"], [-686, 78, -678, 83, 8, "fabric"], [-686, 83, -671, 93, 5, "fabric"], [-686, 93, -671, 99, 9, "fabric"], [-656, 77, -641, 86, 7, "fabric"], [-656, 86, -641, 92, 4, "fabric"], [-656, 92, -641, 99, 6, "fabric"], [-604, 122, -598, 137, 8, "fabric"], [-598, 122, -590, 137, 5, "fabric"], [-666, 155, -660, 166, 6, "fabric"], [-659, 155, -654, 170, 8, "fabric"], [-654, 155, -644, 170, 5, "fabric"], [-644, 155, -637, 170, 9, "fabric"], [-609, 155, -604, 170, 8, "fabric"], [-604, 155, -596, 170, 6, "fabric"], [-596, 155, -590, 170, 8, "fabric"], [-590, 164, -580, 170, 5, "fabric"], [-684, 146, -671, 153, 6, "fabric"], [-644, 174, -634, 178, 2, "fabric"], [-634, 174, -627, 182, 9, "fabric"], [-627, 174, -618, 185, 7, "fabric"], [-618, 174, -612, 185, 4, "fabric"], [-612, 174, -604, 185, 6, "fabric"], [-604, 174, -600, 185, 8, "fabric"], [-590, 174, -586, 185, 6, "fabric"], [-586, 174, -580, 185, 8, "fabric"], [-580, 174, -566, 185, 5, "fabric"], [-610, 185, -602, 190, 2, "fabric"], [-600, 186, -596, 192, 8, "fabric"], [-590, 185, -586, 193, 5, "fabric"], [-596, 186, -590, 193, 5, "fabric"], [-586, 185, -579, 195, 9, "fabric"], [-579, 185, -566, 196, 7, "fabric"], [-573, 62, -566, 77, 4, "fabric"], [-637, 100, -629, 114, 6, "fabric"], [-629, 100, -619, 114, 8, "fabric"], [-619, 100, -611, 114, 6, "fabric"], [-611, 100, -605, 114, 8, "fabric"], [-605, 100, -595, 114, 5, "fabric"], [-595, 100, -588, 114, 9, "fabric"], [-588, 100, -579, 114, 7, "fabric"], [-579, 100, -575, 114, 4, "fabric"], [-573, 99, -566, 114, 6, "fabric"], [-575, 77, -566, 83, 8, "fabric"], [-575, 83, -566, 93, 5, "fabric"], [-575, 93, -566, 99, 9, "fabric"], [-554, 74, -546, 77, 7, "fabric"], [-545, 62, -539, 77, 4, "fabric"], [-539, 62, -531, 77, 6, "fabric"], [-531, 62, -521, 77, 8, "fabric"], [-521, 62, -513, 77, 6, "fabric"], [-513, 62, -507, 77, 8, "fabric"], [-507, 62, -497, 77, 5, "fabric"], [-497, 62, -487, 77, 9, "fabric"], [-554, 99, -545, 114, 7, "fabric"], [-545, 99, -539, 114, 4, "fabric"], [-539, 99, -531, 114, 6, "fabric"], [-531, 99, -521, 114, 8, "fabric"], [-521, 99, -513, 114, 6, "fabric"], [-513, 99, -507, 114, 8, "fabric"], [-507, 99, -497, 114, 5, "fabric"], [-497, 99, -487, 114, 9, "fabric"], [-554, 77, -539, 86, 7, "fabric"], [-554, 86, -539, 92, 4, "fabric"], [-554, 92, -539, 99, 6, "fabric"], [-502, 77, -487, 87, 8, "fabric"], [-502, 87, -487, 99, 6, "fabric"], [-490, 122, -487, 137, 2, "fabric"], [-548, 164, -538, 170, 5, "fabric"], [-530, 160, -522, 170, 7, "fabric"], [-522, 160, -516, 170, 4, "fabric"], [-516, 160, -508, 170, 6, "fabric"], [-508, 160, -498, 170, 8, "fabric"], [-490, 155, -487, 170, 2, "fabric"], [-498, 160, -490, 170, 6, "fabric"], [-490, 137, -487, 144, 2, "fabric"], [-490, 144, -487, 155, 2, "fabric"], [-554, 174, -548, 185, 4, "fabric"], [-548, 174, -540, 185, 6, "fabric"], [-514, 174, -506, 185, 5, "fabric"], [-506, 174, -499, 185, 9, "fabric"], [-499, 174, -488, 183, 7, "fabric"], [-554, 185, -548, 196, 4, "fabric"], [-548, 185, -541, 196, 6, "fabric"], [-540, 186, -530, 194, 8, "fabric"], [-530, 186, -522, 193, 6, "fabric"], [-522, 186, -516, 192, 8, "fabric"], [-514, 185, -506, 189, 2, "fabric"], [-483, -164, -451, -160, 22, "midrise"], [-443, -122, -433, -102, 20, "midrise"], [-433, -122, -406, -102, 16, "midrise"], [-483, -160, -463, -142, 12, "midrise"], [-423, -98, -401, -80, 22, "midrise"], [-401, -98, -390, -80, 12, "midrise"], [-389, -58, -381, -38, 16, "midrise"], [-381, -58, -372, -38, 22, "midrise"], [-387, -78, -380, -58, 14, "midrise"], [-393, 38, -377, 58, 16, "midrise"], [-377, 38, -372, 58, 22, "midrise"], [-483, 78, -463, 98, 12, "midrise"], [-463, 78, -431, 98, 14, "midrise"], [-429, 80, -403, 98, 18, "midrise"], [-393, 78, -390, 98, 12, "midrise"], [-403, 80, -393, 98, 12, "midrise"], [-387, 58, -380, 78, 22, "midrise"], [-443, 102, -423, 122, 14, "midrise"], [-423, 102, -406, 122, 18, "midrise"], [-483, 160, -454, 166, 20, "midrise"], [-483, 144, -463, 160, 18, "midrise"], [-391, -30, -371, -18, 12, "midrise"], [-371, -30, -366, -18, 20, "midrise"], [-391, -18, -364, -6, 16, "midrise"], [-391, 6, -369, 18, 22, "midrise"], [-369, 6, -364, 18, 12, "midrise"], [-391, 18, -366, 30, 14, "midrise"]], "courts": [[-671, -77, -656, -45], [-671, 77, -656, 99], [-671, 137, -590, 155], [-622, 77, -581, 99], [-539, 77, -502, 99], [-530, 137, -502, 155], [-463, -78, -387, -58], [-463, 58, -387, 78]], "buildings": [{"n": 1, "name": "Grand Hotel", "r": [-483, -98, -431, -38], "kind": "civic", "h": "podium 4 storeys, guest tower 25 floors (97 m)", "who": "Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work", "angle": 0, "corners": [[-483.0, -98.0], [-431.0, -98.0], [-431.0, -38.0], [-483.0, -38.0]], "height": 91, "crown": 104, "form": "deco", "part": [-473, -96, -441, -74], "podium": 20}, {"n": 2, "name": "City hall", "r": [-431, -30, -397, 30], "kind": "civic", "h": "exterior only: portico, balcony, side wings and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a)", "who": "Mayor Teodora Vance, Kenji Mori (clerk)", "angle": 0, "corners": [[-431.0, -30.0], [-397.0, -30.0], [-397.0, 30.0], [-431.0, 30.0]], "height": 22, "crown": 45, "form": "clock", "part": [-405, -4, -397, 4], "podium": null}, {"n": 3, "name": "Library", "r": [-686, -92, -641, -30], "kind": "civic", "h": "art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)", "who": "Ada Fong, Nia Calder, Benji Okoro", "angle": 0, "corners": [[-686.0, -92.0], [-641.0, -92.0], [-641.0, -30.0], [-686.0, -30.0]], "height": 22, "crown": 26, "form": "block", "part": null, "podium": null}, {"n": 4, "name": "Natural history museum", "r": [-637, 62, -575, 100], "kind": "civic", "h": "3 storeys, top-lit hall", "who": "Dr. Imani Osei (curator)", "angle": 0, "corners": [[-637.0, 62.0], [-575.0, 62.0], [-575.0, 100.0], [-637.0, 100.0]], "height": 16, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 5, "name": "Moonlight Cinema", "r": [-730, 6, -700, 34], "kind": "civic", "h": "2 storeys, built later into the old town; flat above", "who": "Leon Duarte (lives above)", "angle": 0, "corners": [[-730.0, 6.0], [-700.0, 6.0], [-700.0, 34.0], [-730.0, 34.0]], "height": 9, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 6, "name": "Police box", "r": [-652, 30, -646, 38], "kind": "civic", "h": "1 storey, back room", "who": "Kate Byrne", "angle": 0, "corners": [[-652.0, 30.0], [-646.0, 30.0], [-646.0, 38.0], [-652.0, 38.0]], "height": 4, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 7, "name": "Clinic", "r": [-712, 62, -698, 80], "kind": "civic", "h": "3 storeys; flat above", "who": "Dr. Arjun Mehta (lives above)", "angle": 0, "corners": [[-712.0, 62.0], [-698.0, 62.0], [-698.0, 80.0], [-712.0, 80.0]], "height": 11, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 8, "name": "Primary school", "r": [-664, 122, -641, 152], "kind": "civic", "h": "3 storeys, roof playground", "who": "Yuki Hayashi (teacher); Lily, Kofi", "angle": 0, "corners": [[-664.0, 122.0], [-641.0, 122.0], [-641.0, 152.0], [-664.0, 152.0]], "height": 12, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 9, "name": "Tea house", "r": [-618, 24, -604, 36], "kind": "civic", "h": "1 storey; flat above and keeper's room behind", "who": "Old Fu (keeper); Kenji Mori (above)", "angle": 0, "corners": [[-618.0, 24.0], [-604.0, 24.0], [-604.0, 36.0], [-618.0, 36.0]], "height": 4, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 10, "name": "Park lodge", "r": [-508, 30, -498, 38], "kind": "civic", "h": "1 storey", "who": "Orin Pike (park keeper)", "angle": 0, "corners": [[-508.0, 30.0], [-498.0, 30.0], [-498.0, 38.0], [-508.0, 38.0]], "height": 4, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 11, "name": "Giant playground", "r": null, "kind": "play", "h": "climbing towers 12\u201320 m", "who": "Lily, Kofi", "angle": 0, "corners": null, "height": 0, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 12, "name": "Windspire", "r": [-431, -80, -389, -38], "kind": "tower", "h": "about 70 storeys, 280 m, on a podium", "who": "the Windworks (headquarters, observation deck)", "angle": 0, "corners": [[-431.0, -80.0], [-389.0, -80.0], [-389.0, -38.0], [-431.0, -38.0]], "height": 262, "crown": 280, "form": "twist", "part": null, "podium": null}, {"n": 13, "name": "Glass tower", "r": [-483, 38, -443, 78], "kind": "tower", "h": "about 45 storeys, 180 m, on a podium", "who": "Raman & Reese (Elizabeth, Priya, Venn); Tanglewire (Dan)", "angle": 0, "corners": [[-483.0, 38.0], [-443.0, 38.0], [-443.0, 78.0], [-483.0, 78.0]], "height": 180, "crown": null, "form": "screen", "part": null, "podium": null}, {"n": 14, "name": "North tower", "r": [-483, -142, -443, -102], "kind": "tower", "h": "about 45 storeys, 175 m, on a podium", "who": "start-up floors (Theo Park)", "angle": 0, "corners": [[-483.0, -142.0], [-443.0, -142.0], [-443.0, -102.0], [-483.0, -102.0]], "height": 175, "crown": null, "form": "capsule", "part": null, "podium": null}, {"n": 15, "name": "South tower", "r": [-483, 102, -443, 142], "kind": "tower", "h": "about 40 storeys, 150 m, on a podium", "who": "flats over offices; Dr. Vera Kask", "angle": 0, "corners": [[-483.0, 102.0], [-443.0, 102.0], [-443.0, 142.0], [-483.0, 142.0]], "height": 150, "crown": null, "form": "dune", "part": null, "podium": null}, {"n": 16, "name": "BLOCK", "r": [-431, 38, -393, 80], "kind": "civic", "h": "6 storeys, research labs round a court", "who": "Dr. Vera Kask (director)", "angle": 0, "corners": [[-431.0, 38.0], [-393.0, 38.0], [-393.0, 80.0], [-431.0, 80.0]], "height": 22, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 17, "name": "Block 1", "r": [-674, -143, -660, -109], "kind": "estate", "h": "slab block, 28 storeys, west side of the west court, turned 30\u00b0 off the grid", "who": "Tomas Wren", "angle": -30, "corners": [[-681.6, -137.2], [-669.4, -144.2], [-652.4, -114.8], [-664.6, -107.8]], "height": 91, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 18, "name": "Block 2", "r": [-547, -184, -511, -166], "kind": "estate", "h": "slab block, 32 storeys, north side of the east court, turned 30\u00b0 off the grid", "who": "Siti Rahman", "angle": -30, "corners": [[-549.1, -173.8], [-517.9, -191.8], [-508.9, -176.2], [-540.1, -158.2]], "height": 104, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 19, "name": "Block 3", "r": [-512, -94, -487, -62], "kind": "estate", "h": "broad point block, 36 storeys, on the Park Ring", "who": "Juno Rell (20th floor)", "angle": 0, "corners": [[-512.0, -94.0], [-487.0, -94.0], [-487.0, -62.0], [-512.0, -62.0]], "height": 117, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 20, "name": "Block 4", "r": [-643, -131, -621, -111], "kind": "estate", "h": "twin broad point block, 40 storeys, turned 30\u00b0 off the grid; sky bridge and sky garden at the 26th floor", "who": "homes (no one the hero meets)", "angle": -30, "corners": [[-646.5, -124.2], [-627.5, -135.2], [-617.5, -117.8], [-636.5, -106.8]], "height": 130, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 21, "name": "Block 5", "r": [-615, -147, -593, -127], "kind": "estate", "h": "twin broad point block, 40 storeys, turned 30\u00b0 off the grid", "who": "Dr. Imani Osei and Kofi", "angle": -30, "corners": [[-618.5, -140.2], [-599.5, -151.2], [-589.5, -133.8], [-608.5, -122.8]], "height": 130, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 22, "name": "Block 6", "r": [-635, -78, -568, -62], "kind": "estate", "h": "slab block, 14 storeys, shops in its void deck on the Park Ring", "who": "homes (no one the hero meets)", "angle": 0, "corners": [[-635.0, -78.0], [-568.0, -78.0], [-568.0, -62.0], [-635.0, -62.0]], "height": 46, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 23, "name": "Hawker centre", "r": [-554, -82, -516, -62], "kind": "civic", "h": "1 storey, open-sided, on the Park Ring and Estate Square", "who": "Siti's laksa stall", "angle": 0, "corners": [[-554.0, -82.0], [-516.0, -82.0], [-516.0, -62.0], [-554.0, -62.0]], "height": 6, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 24, "name": "Garden Row", "r": [-660, 40, -637, 58], "kind": "home", "h": "3 townhouses, 3 storeys, facing the Park Ring", "who": "Teodora Vance; Ada Fong and Sora Ishida; Priya Raman", "angle": 0, "corners": [[-660.0, 40.0], [-637.0, 40.0], [-637.0, 58.0], [-660.0, 58.0]], "height": 11, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 25, "name": "Sol's caf\u00e9", "r": [-750, 34, -734, 44], "kind": "shop", "h": "old tower house, 5 storeys; flat above", "who": "Sol Brant", "angle": 0, "corners": [[-750.0, 34.0], [-734.0, 34.0], [-734.0, 44.0], [-750.0, 44.0]], "height": 17, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 26, "name": "Bakery", "r": [-730, -22, -720, -6], "kind": "shop", "h": "old tower house, 6 storeys; flats above", "who": "Felix Tanaka (above)", "angle": 0, "corners": [[-730.0, -22.0], [-720.0, -22.0], [-720.0, -6.0], [-730.0, -6.0]], "height": 20, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 27, "name": "Pinestein's building", "r": [-716, -118, -707, -102], "kind": "shop", "h": "old tower house, 9 storeys; laboratory on the roof beside its wind tower", "who": "Palbert Pinestein (top floor)", "angle": 0, "corners": [[-716.0, -118.0], [-707.0, -118.0], [-707.0, -102.0], [-716.0, -102.0]], "height": 29, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 28, "name": "Mara's building", "r": [-716, -58, -707, -42], "kind": "shop", "h": "8 storeys; rooftop studio", "who": "Mara Quill", "angle": 0, "corners": [[-716.0, -58.0], [-707.0, -58.0], [-707.0, -42.0], [-716.0, -42.0]], "height": 26, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 29, "name": "Benji's building", "r": [-686, 40, -678, 56], "kind": "shop", "h": "6 storeys", "who": "Benji Okoro", "angle": 0, "corners": [[-686.0, 40.0], [-678.0, 40.0], [-678.0, 56.0], [-686.0, 56.0]], "height": 20, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 30, "name": "Theo's building", "r": [-730, 74, -722, 90], "kind": "shop", "h": "6 storeys", "who": "Theo Park", "angle": 0, "corners": [[-730.0, 74.0], [-722.0, 74.0], [-722.0, 90.0], [-730.0, 90.0]], "height": 20, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 31, "name": "Yuki's building", "r": [-686, 62, -678, 78], "kind": "shop", "h": "6 storeys", "who": "Yuki Hayashi", "angle": 0, "corners": [[-686.0, 62.0], [-678.0, 62.0], [-678.0, 78.0], [-686.0, 78.0]], "height": 20, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 32, "name": "Suri's building", "r": [-702, -112, -694, -96], "kind": "shop", "h": "7 storeys", "who": "Suri Vale", "angle": 0, "corners": [[-702.0, -112.0], [-694.0, -112.0], [-694.0, -96.0], [-702.0, -96.0]], "height": 23, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 33, "name": "Wet market", "r": [-530, 122, -490, 160], "kind": "civic", "h": "2 storeys; sign studio on the roof", "who": "Rosa Delgado, Wen Li; Zara Quinn (roof studio)", "angle": 0, "corners": [[-530.0, 122.0], [-490.0, 122.0], [-490.0, 160.0], [-530.0, 160.0]], "height": 9, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 34, "name": "Market flats", "r": [-637, 146, -609, 170], "kind": "shop", "h": "tong lau, 8 storeys", "who": "Mei and Lily Chan, Rosa, Wen, Pia Rowe", "angle": 0, "corners": [[-637.0, 146.0], [-609.0, 146.0], [-609.0, 170.0], [-637.0, 170.0]], "height": 26, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 35, "name": "Wing Fat Mansion", "r": [-637, 122, -605, 146], "kind": "shop", "h": "mansion block, 22 storeys on a podium", "who": "Ah Keung, Iris Dune, Nia Calder, Venn Harlow, Dax Merrow, Bea and Wilfred Ho", "angle": 0, "corners": [[-637.0, 122.0], [-605.0, 122.0], [-605.0, 146.0], [-637.0, 146.0]], "height": 72, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 36, "name": "Vertical farm", "r": [-686, 122, -664, 146], "kind": "civic", "h": "windowless, 12 storeys of growing racks", "who": "Sora Ishida", "angle": 0, "corners": [[-686.0, 122.0], [-664.0, 122.0], [-664.0, 146.0], [-686.0, 146.0]], "height": 42, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 37, "name": "All-night store", "r": [-554, 62, -546, 74], "kind": "shop", "h": "5 storeys; flat above", "who": "Hiro Sato", "angle": 0, "corners": [[-554.0, 62.0], [-546.0, 62.0], [-546.0, 74.0], [-554.0, 74.0]], "height": 17, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 38, "name": "Helmsmith", "r": [-600, 174, -590, 186], "kind": "shop", "h": "2 storeys; home behind", "who": "Gideon Hale", "angle": 0, "corners": [[-600.0, 174.0], [-590.0, 174.0], [-590.0, 186.0], [-600.0, 186.0]], "height": 7, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 39, "name": "City works yard", "r": [-540, 174, -514, 186], "kind": "civic", "h": "sheds and a flat", "who": "Kade Morrow", "angle": 0, "corners": [[-540.0, 174.0], [-514.0, 174.0], [-514.0, 186.0], [-540.0, 186.0]], "height": 6, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 52, "name": "Reese\u2013Miller house", "r": [-704, -40, -694, -24], "kind": "home", "h": "old tower house, 7 storeys; wind tower and roof terrace", "who": "Elizabeth Reese, Dan Miller and Jammer (away at the farm)", "angle": 0, "corners": [[-704.0, -40.0], [-694.0, -40.0], [-694.0, -24.0], [-704.0, -24.0]], "height": 23, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 49, "name": "Block 7", "r": [-580, -176, -566, -102], "kind": "estate", "h": "slab block, 16 storeys, shops in its void deck on North Street", "who": "homes (no one the hero meets)", "angle": 0, "corners": [[-580.0, -176.0], [-566.0, -176.0], [-566.0, -102.0], [-580.0, -102.0]], "height": 52, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 50, "name": "Block 8", "r": [-508, -150, -487, -106], "kind": "estate", "h": "slab block, 34 storeys, east side of the east court", "who": "homes (no one the hero meets)", "angle": 0, "corners": [[-508.0, -150.0], [-487.0, -150.0], [-487.0, -106.0], [-508.0, -106.0]], "height": 110, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 53, "name": "Block 9", "r": [-658, -170, -612, -154], "kind": "estate", "h": "slab block, 24 storeys, north side of the west court, turned 30\u00b0 off the grid", "who": "homes (no one the hero meets)", "angle": -30, "corners": [[-658.9, -157.4], [-619.1, -180.4], [-611.1, -166.6], [-650.9, -143.6]], "height": 78, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 51, "name": "Neighbourhood centre", "r": [-554, -150, -516, -118], "kind": "civic", "h": "2 storeys: minimart, kindergarten, community club, roof garden", "who": "Juno Rell (Housing Board office)", "angle": 0, "corners": [[-554.0, -150.0], [-516.0, -150.0], [-516.0, -118.0], [-554.0, -118.0]], "height": 8, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 40, "name": "Battery works", "r": [-789, -8, -767, 8], "kind": "works", "h": "2 storeys", "who": "Omar Haddad (flat)", "angle": 0, "corners": [[-789.0, -8.0], [-767.0, -8.0], [-767.0, 8.0], [-789.0, 8.0]], "height": 8, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 41, "name": "Recycling works", "r": [-789, 14, -771, 26], "kind": "works", "h": "1 storey", "who": "", "angle": 0, "corners": [[-789.0, 14.0], [-771.0, 14.0], [-771.0, 26.0], [-789.0, 26.0]], "height": 4, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 42, "name": "Water works", "r": [-700, -226, -680, -212], "kind": "works", "h": "pump house and keeper's house", "who": "Rafael Ortiz", "angle": 0, "corners": [[-700.0, -226.0], [-680.0, -226.0], [-680.0, -212.0], [-700.0, -212.0]], "height": 6, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 43, "name": "Water tower", "r": [-722, -226, -712, -216], "kind": "works", "h": "35 m", "who": "", "angle": 0, "corners": [[-722.0, -226.0], [-712.0, -226.0], [-712.0, -216.0], [-722.0, -216.0]], "height": 35, "crown": null, "form": "block", "part": null, "podium": null}, {"n": 44, "name": "Fish tanks", "r": [-676, -206, -656, -190], "kind": "works", "h": "covered tanks", "who": "", "angle": 0, "corners": [[-676.0, -206.0], [-656.0, -206.0], [-656.0, -190.0], [-676.0, -190.0]], "height": 3, "crown": null, "form": "block", "part": null, "podium": null}], "storey": {"fabric": 3.25, "midrise": 3.6}, "park": {"rect": [-625, -50, -495, 50], "walks": [[-625, -3, -495, 3], [-563, -50, -557, 50]], "dry_garden": [-620, -45, -568, -6], "pond": {"c": [-522, -26], "r": [22, 15]}, "lawn": [-552, 8, -500, 46], "parasols": [[-612, 12], [-598, 14], [-586, 22], [-596, 32], [-584, 40], [-612, 44]], "playground": {"c": [-560, 0], "track": [24, 28], "towers": [[-560, 0, 20, 4.5, "Lookout"], [-548, -7, 16, 3.5, ""], [-574, -4, 14, 3.2, ""], [-560, 14, 12, 3, ""]], "perches": [[-566, 18], [-554, 18], [-560, 21]], "perch_height": 12, "hoops": [[-560.0, -9.0], [-552.7746291437527, -7.755902010062501], [-547.8305611634305, -0.8629938603459747], [-549.2625898829467, 8.6687959935738], [-557.826751875878, 15.24588444764686], [-569.7165424186198, 13.94950907477253], [-578.1820601885709, 3.9208018694125015], [-577.3504767672172, -10.344126640285184]]}, "wind_trees": [[-526, -26], [-594, -26], [-526, 26], [-594, 26]], "wind_tree_height": 32}, "turbines": [[-310, -200], [-310, 200], [-740, -270], [-740, 270]], "precincts": [[[-686, -200, -566, -96], [-637, -92, -566, -62]], [[-554, -200, -487, -62]]], "estate": {"courts": [[[-664.5, -135.3], [-609.1, -167.3], [-599.6, -150.8], [-655.0, -118.8]], [[-552, -158], [-487, -158], [-487, -150], [-552, -150]], [[-509, -158], [-487, -170], [-487, -158]]], "gate": [[-627.3, -134.8], [-618.7, -139.8], [-608.7, -122.5], [-617.3, -117.5]], "sky_bridge": [[-622.8, -127.0], [-614.2, -132.0], [-613.2, -130.3], [-621.8, -125.3]], "garden": [[-660.1, -165.6], [-627.2, -184.6], [-624.2, -179.4], [-657.1, -160.4]], "playgrounds": [[-647.1, -135.0], [-498, -163]], "pavilions": [[-617.6, -152.0], [-542, -154]], "linkways": [[[-661.8, -134.6], [-609.8, -164.6], [-602.3, -151.6], [-654.3, -121.6], [-661.8, -134.6]], [[-624.0, -139.1], [-613.0, -120.0], [-608, -96], [-608, -78]], [[-606.3, -158.5], [-566, -158.5]], [[-552, -154], [-489, -154]], [[-512, -154], [-512, -98], [-500, -98], [-500, -94]]]}, "lot_kits": [{"kit": "tower", "storeys": 8, "front": "n", "shop": false, "base_kind": "stone", "base": 1, "kishk": 0, "manzar": true, "parapet": 0, "frieze": 0, "polite": false}, {"kit": "tower", "storeys": 5, "front": "e", "shop": false, "base_kind": "stone", "base": 1, "kishk": 0, "manzar": false, "parapet": 0, "frieze": 3, "polite": false}, {"kit": "tower", "storeys": 9, "front": "s", "shop": true, "base_kind": "earth", "base": 2, "kishk": 2, "manzar": false, "parapet": 2, "frieze": 0, "polite": true}, {"kit": "tower", "storeys": 7, "front": "s", "shop": true, "base_kind": "stone", "base": 1, "kishk": 2, "manzar": true, "parapet": 1, "frieze": 3, "polite": true}, {"kit": "tower", "storeys": 4, "front": "s", "shop": true, "base_kind": "stone", "base": 2, "kishk": 0, "manzar": true, "parapet": 1, "frieze": 2, "polite": true}, {"kit": "tower", "storeys": 6, "front": "n", "shop": false, "base_kind": "stone", "base": 1, "kishk": 1, "manzar": false, "parapet": 2, "frieze": 3, "polite": false}, {"kit": "tower", "storeys": 8, "front": "n", "shop": false, "base_kind": "stone", "base": 2, "kishk": 1, "manzar": false, "parapet": 1, "frieze": 1, "polite": false}, {"kit": "tower", "storeys": 6, "front": "e", "shop": false, "base_kind": "earth", "base": 3, "kishk": 0, "manzar": false, "parapet": 2, "frieze": 0, "polite": false}, {"kit": "tower", "storeys": 8, "front": "e", "shop": false, "base_kind": "stone", "base": 1, "kishk": 1, "manzar": false, "parapet": 0, "frieze": 3, "polite": false}, {"kit": "tower", "storeys": 5, "front": "e", "shop": false, "base_kind": "stone", "base": 1, "kishk": 0, "manzar": true, "parapet": 1, "frieze": 3, "polite": false}, {"kit": "infill", "storeys": 9, "front": "n", "shop": true}, {"kit": "tower", "storeys": 8, "front": "e", "shop": false, "base_kind": "stone", "base": 2, "kishk": 2, "manzar": false, "parapet": 1, "frieze": 3, "polite": false}, {"kit": "tower", "storeys": 8, "front": "e", "shop": false, "base_kind": "stone", "base": 3, "kishk": 2, "manzar": false, "parapet": 0, "frieze": 3, "polite": false}, {"kit": "tower", "storeys": 6, "front": "e", "shop": false, "base_kind": "stone", "base": 3, "kishk": 1, "manzar": true, "parapet": 1, "frieze": 2, "polite": false}, {"kit": "tower", "storeys": 8, "front": "e", "shop": true, "base_kind": "stone", "base": 1, "kishk": 1, "manzar": false, "parapet": 0, "frieze": 0, "polite": true}, {"kit": "tower", "storeys": 6, "front": "w", "shop": false, "base_kind": "stone", "base": 3, "kishk": 1, "manzar": false, "parapet": 0, "frieze": 2, "polite": false}, {"kit": "tower", "storeys": 8, "front": "s", "shop": false, "base_kind": "stone", "base": 3, "kishk": 0, "manzar": false, "parapet": 2, "frieze": 2, "polite": false}, {"kit": "tower", "storeys": 5, "front": "s", "shop": false, "base_kind": "stone", "base": 2, "kishk": 0, "manzar": false, "parapet": 1, "frieze": 3, "polite": false}, {"kit": "tower", "storeys": 9, "front": "s", "shop": false, "base_kind": "stone", "base": 1, "kishk": 1, "manzar": false, "parapet": 2, "frieze": 0, "polite": false}, {"kit": "infill", "storeys": 7, "front": "e", "shop": true}, {"kit": "tower", "storeys": 4, "front": "n", "shop": false, "base_kind": "earth", "base": 2, "kishk": 0, "manzar": false, "parapet": 0, "frieze": 1, "polite": false}, {"kit": "tower", "storeys": 6, "front": "w", "shop": false, "base_kind": "stone", "base": 3, "kishk": 0, "manzar": false, "parapet": 2, "frieze": 0, "polite": false}, {"kit": "tower", "storeys": 8, "front": "w", "shop": false, "base_kind": "stone", "base": 3, "kishk": 1, "manzar": true, "parapet": 1, "frieze": 3, "polite": false}, {"kit": "tower", "storeys": 8, "front": "e", "shop": true, "base_kind": "stone", "base": 3, "kishk": 2, "manzar": false, "parapet": 0, "frieze": 0, "polite": true}, {"kit": "tower", "storeys": 5, "front": "e", "shop": true, "base_kind": "stone", "base": 2, "kishk": 0, "manzar": false, "parapet": 2, "frieze": 0, "polite": true}, {"kit": "tower", "storeys": 9, "front": "w", "shop": false, "base_kind": "stone", "base": 3, "kishk": 0, "manzar": false, "parapet": 0, "frieze": 3, "polite": false}, {"kit": "tower", "storeys": 7, "front": "n", "shop": false, "base_kind": "stone", "base": 2, "kishk": 1, "manzar": false, "parapet": 0, "frieze": 2, "polite": false}, {"kit": "tower", "storeys": 6, "front": "n", "shop": false, "base_kind": "stone", "base": 3, "kishk": 1, "manzar": true, "parapet": 1, "frieze": 1, "polite": false}, {"kit": "tower", "storeys": 8, "front": "e", "shop": true, "base_kind": "stone", "base": 2, "kishk": 0, "manzar": false, "parapet": 2, "frieze": 1, "polite": true}, {"kit": "infill", "storeys": 8, "front": "s", "shop": true}, {"kit": "tower", "storeys": 5, "front": "s", "shop": true, "base_kind": "earth", "base": 3, "kishk": 0, "manzar": false, "parapet": 0, "frieze": 1, "polite": true}, {"kit": "tower", "storeys": 9, "front": "s", "shop": true, "base_kind": "stone", "base": 3, "kishk": 0, "manzar": false, "parapet": 0, "frieze": 2, "polite": true}, {"kit": "infill", "storeys": 7, "front": "s", "shop": true}, {"kit": "tower", "storeys": 4, "front": "w", "shop": false, "base_kind": "stone", "base": 2, "kishk": 0, "manzar": false, "parapet": 1, "frieze": 1, "polite": false}, {"kit": "tower", "storeys": 6, "front": "w", "shop": false, "base_kind": "earth", "base": 2, "kishk": 0, "manzar": false, "parapet": 2, "frieze": 0, "polite": false}, {"kit": "tower", "storeys": 8, "front": "w", "shop": false, "base_kind": "earth", "base": 2, "kishk": 0, "manzar": false, "parapet": 0, "frieze": 0, "polite": false}, {"kit": "infill", "storeys": 5, "front": "e", "shop": true}, {"kit": "tower", "storeys": 8, "front": "n", "shop": true, "base_kind": "earth", "base": 2, "kishk": 1, "manzar": false, "parapet": 0, "frieze": 0, "polite": true}, {"kit": "tower", "storeys": 6, "front": "w", "shop": false, "base_kind": "earth", "base": 2, "kishk": 1, "manzar": false, "parapet": 1, "frieze": 0, "polite": false}, {"kit": "tower", "storeys": 8, "front": "s", "shop": false, "base_kind": "earth", "base": 4, "kishk": 0, "manzar": false, "parapet": 0, "frieze": 0, "polite": false}, {"kit": "tower", "storeys": 5, "front": "s", "shop": false, "base_kind": "earth", "base": 2, "kishk": 0, "manzar": true, "parapet": 1, "frieze": 0, "polite": false}, {"kit": "tower", "storeys": 9, "front": "s", "shop": false, "base_kind": "earth", "base": 2, "kishk": 1, "manzar": false, "parapet": 2, "frieze": 0, "polite": false}, {"kit": "infill", "storeys": 7, "front": "e", "shop": true}, {"kit": "tower", "storeys": 8, "front": "w", "shop": false, "base_kind": "stone", "base": 3, "kishk": 1, "manzar": false, "parapet": 2, "frieze": 2, "polite": false}, {"kit": "tower", "storeys": 6, "front": "e", "shop": true, "base_kind": "stone", "base": 3, "kishk": 2, "manzar": false, "parapet": 2, "frieze": 3, "polite": true}, {"kit": "tower", "storeys": 8, "front": "e", "shop": true, "base_kind": "stone", "base": 3, "kishk": 1, "manzar": true, "parapet": 2, "frieze": 2, "polite": true}, {"kit": "tower", "storeys": 5, "front": "e", "shop": true, "base_kind": "stone", "base": 2, "kishk": 0, "manzar": false, "parapet": 1, "frieze": 2, "polite": true}, {"kit": "tower", "storeys": 9, "front": "w", "shop": false, "base_kind": "stone", "base": 1, "kishk": 1, "manzar": false, "parapet": 2, "frieze": 2, "polite": false}, {"kit": "tower", "storeys": 7, "front": "n", "shop": false, "base_kind": "stone", "base": 3, "kishk": 2, "manzar": false, "parapet": 0, "frieze": 3, "polite": false}, {"kit": "infill", "storeys": 8, "front": "e", "shop": true}, {"kit": "infill", "storeys": 8, "front": "s", "shop": true}, {"kit": "tower", "storeys": 5, "front": "s", "shop": true, "base_kind": "stone", "base": 2, "kishk": 0, "manzar": false, "parapet": 1, "frieze": 2, "polite": true}, {"kit": "tower", "storeys": 9, "front": "s", "shop": true, "base_kind": "earth", "base": 4, "kishk": 2, "manzar": false, "parapet": 0, "frieze": 0, "polite": true}, {"kit": "infill", "storeys": 7, "front": "e", "shop": true}, {"kit": "tower", "storeys": 8, "front": "w", "shop": false, "base_kind": "stone", "base": 1, "kishk": 2, "manzar": false, "parapet": 1, "frieze": 1, "polite": false}, {"kit": "infill", "storeys": 6, "front": "e", "shop": true}, {"kit": "tower", "storeys": 8, "front": "e", "shop": true, "base_kind": "stone", "base": 1, "kishk": 1, "manzar": false, "parapet": 1, "frieze": 0, "polite": true}, {"kit": "tower", "storeys": 5, "front": "e", "shop": true, "base_kind": "earth", "base": 3, "kishk": 0, "manzar": true, "parapet": 0, "frieze": 0, "polite": true}, {"kit": "tower", "storeys": 6, "front": "s", "shop": false, "base_kind": "stone", "base": 2, "kishk": 0, "manzar": false, "parapet": 0, "frieze": 2, "polite": false}, {"kit": "infill", "storeys": 8, "front": "e", "shop": true}, {"kit": "lockup", "storeys": 2, "front": "n", "shop": true, "colour": 2, "signs": 2}, {"kit": "tong_lau", "storeys": 9, "front": "e", "shop": true, "gen": "tile", "veranda": false, "corner": true, "colour": 2, "signs": 3, "roof": "garden", "core": "own", "pair": -1, "lift": true}, {"kit": "tower", "storeys": 9, "front": "w", "shop": true, "base_kind": "stone", "base": 2, "kishk": 2, "manzar": false, "parapet": 1, "frieze": 2, "polite": true}, {"kit": "tower", "storeys": 7, "front": "n", "shop": false, "base_kind": "stone", "base": 1, "kishk": 1, "manzar": false, "parapet": 1, "frieze": 1, "polite": true}, {"kit": "tower", "storeys": 4, "front": "n", "shop": false, "base_kind": "earth", "base": 2, "kishk": 0, "manzar": true, "parapet": 2, "frieze": 0, "polite": true}, {"kit": "infill", "storeys": 6, "front": "n", "shop": false}, {"kit": "infill", "storeys": 6, "front": "n", "shop": false}, {"kit": "tower", "storeys": 6, "front": "e", "shop": true, "base_kind": "stone", "base": 3, "kishk": 2, "manzar": false, "parapet": 2, "frieze": 1, "polite": true}, {"kit": "tower", "storeys": 5, "front": "s", "shop": false, "base_kind": "stone", "base": 1, "kishk": 0, "manzar": false, "parapet": 1, "frieze": 3, "polite": false}, {"kit": "tower", "storeys": 9, "front": "s", "shop": false, "base_kind": "stone", "base": 1, "kishk": 0, "manzar": false, "parapet": 2, "frieze": 3, "polite": false}, {"kit": "infill", "storeys": 7, "front": "s", "shop": false}, {"kit": "tower", "storeys": 6, "front": "n", "shop": false, "base_kind": "stone", "base": 3, "kishk": 0, "manzar": true, "parapet": 1, "frieze": 1, "polite": false}, {"kit": "tower", "storeys": 8, "front": "n", "shop": false, "base_kind": "earth", "base": 3, "kishk": 2, "manzar": false, "parapet": 1, "frieze": 0, "polite": false}, {"kit": "tower", "storeys": 5, "front": "n", "shop": false, "base_kind": "stone", "base": 1, "kishk": 0, "manzar": false, "parapet": 0, "frieze": 1, "polite": false}, {"kit": "tower", "storeys": 9, "front": "e", "shop": false, "base_kind": "stone", "base": 3, "kishk": 0, "manzar": false, "parapet": 0, "frieze": 1, "polite": false}, {"kit": "tower", "storeys": 7, "front": "w", "shop": true, "base_kind": "stone", "base": 2, "kishk": 1, "manzar": true, "parapet": 1, "frieze": 0, "polite": true}, {"kit": "tower", "storeys": 4, "front": "s", "shop": true, "base_kind": "earth", "base": 2, "kishk": 0, "manzar": false, "parapet": 0, "frieze": 1, "polite": true}, {"kit": "tower", "storeys": 6, "front": "s", "shop": true, "base_kind": "stone", "base": 2, "kishk": 0, "manzar": false, "parapet": 2, "frieze": 3, "polite": true}, {"kit": "tower", "storeys": 8, "front": "s", "shop": true, "base_kind": "stone", "base": 3, "kishk": 1, "manzar": true, "parapet": 0, "frieze": 2, "polite": true}, {"kit": "tower", "storeys": 6, "front": "s", "shop": true, "base_kind": "stone", "base": 3, "kishk": 1, "manzar": false, "parapet": 2, "frieze": 3, "polite": true}, {"kit": "infill", "storeys": 8, "front": "w", "shop": true}, {"kit": "tower", "storeys": 5, "front": "w", "shop": true, "base_kind": "stone", "base": 1, "kishk": 0, "manzar": false, "parapet": 1, "frieze": 0, "polite": true}, {"kit": "tower", "storeys": 9, "front": "w", "shop": true, "base_kind": "stone", "base": 1, "kishk": 1, "manzar": false, "parapet": 2, "frieze": 2, "polite": true}, {"kit": "tower", "storeys": 7, "front": "e", "shop": false, "base_kind": "stone", "base": 3, "kishk": 1, "manzar": false, "parapet": 1, "frieze": 0, "polite": false}, {"kit": "tower", "storeys": 4, "front": "e", "shop": false, "base_kind": "stone", "base": 2, "kishk": 0, "manzar": false, "parapet": 2, "frieze": 1, "polite": false}, {"kit": "tower", "storeys": 6, "front": "e", "shop": false, "base_kind": "stone", "base": 3, "kishk": 0, "manzar": false, "parapet": 1, "frieze": 3, "polite": false}, {"kit": "tong_lau", "storeys": 8, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 4, "signs": 3, "roof": "garden", "core": "shared", "pair": 87, "lift": true}, {"kit": "tong_lau", "storeys": 5, "front": "n", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 1, "signs": 3, "roof": "tanks", "core": "shared", "pair": 86, "lift": false}, {"kit": "tong_lau", "storeys": 6, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 3, "signs": 1, "roof": "tanks", "core": "own", "pair": -1, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 3, "signs": 0, "roof": "laundry", "core": "shared", "pair": 90, "lift": true}, {"kit": "tong_lau", "storeys": 5, "front": "s", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 4, "signs": 1, "roof": "laundry", "core": "shared", "pair": 89, "lift": false}, {"kit": "tong_lau", "storeys": 9, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 0, "signs": 1, "roof": "garden", "core": "own", "pair": -1, "lift": true}, {"kit": "tong_lau", "storeys": 8, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 4, "signs": 0, "roof": "tanks", "core": "shared", "pair": 93, "lift": true}, {"kit": "tong_lau", "storeys": 6, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 2, "signs": 1, "roof": "laundry", "core": "shared", "pair": 92, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": true, "colour": 0, "signs": 1, "roof": "garden", "core": "shared", "pair": 95, "lift": true}, {"kit": "tong_lau", "storeys": 5, "front": "s", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 4, "signs": 0, "roof": "tanks", "core": "shared", "pair": 94, "lift": false}, {"kit": "tong_lau", "storeys": 6, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 3, "signs": 1, "roof": "tanks", "core": "own", "pair": -1, "lift": false}, {"kit": "lockup", "storeys": 2, "front": "n", "shop": true, "colour": 4, "signs": 0}, {"kit": "tong_lau", "storeys": 9, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 4, "signs": 0, "roof": "tanks", "core": "own", "pair": -1, "lift": true}, {"kit": "tong_lau", "storeys": 7, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 3, "signs": 0, "roof": "laundry", "core": "shared", "pair": 100, "lift": true}, {"kit": "tong_lau", "storeys": 4, "front": "n", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 4, "signs": 1, "roof": "laundry", "core": "shared", "pair": 99, "lift": false}, {"kit": "tong_lau", "storeys": 6, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 1, "signs": 1, "roof": "tanks", "core": "shared", "pair": 102, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 2, "signs": 1, "roof": "tanks", "core": "shared", "pair": 101, "lift": true}, {"kit": "tong_lau", "storeys": 6, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 0, "signs": 1, "roof": "laundry", "core": "shared", "pair": 104, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 1, "signs": 1, "roof": "laundry", "core": "shared", "pair": 103, "lift": true}, {"kit": "tong_lau", "storeys": 5, "front": "e", "shop": true, "gen": "boom", "veranda": true, "corner": false, "colour": 4, "signs": 3, "roof": "garden", "core": "own", "pair": -1, "lift": false}, {"kit": "lockup", "storeys": 2, "front": "n", "shop": true, "colour": 0, "signs": 1}, {"kit": "tong_lau", "storeys": 8, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 4, "signs": 0, "roof": "tanks", "core": "shared", "pair": 109, "lift": true}, {"kit": "tong_lau", "storeys": 5, "front": "n", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 2, "signs": 0, "roof": "greenhouse", "core": "shared", "pair": 110, "lift": false}, {"kit": "tong_lau", "storeys": 5, "front": "n", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 0, "signs": 1, "roof": "garden", "core": "shared", "pair": 107, "lift": false}, {"kit": "tong_lau", "storeys": 9, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 3, "signs": 0, "roof": "tanks", "core": "shared", "pair": 108, "lift": true}, {"kit": "tong_lau", "storeys": 7, "front": "e", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 0, "signs": 2, "roof": "tanks", "core": "own", "pair": -1, "lift": true}, {"kit": "tong_lau", "storeys": 4, "front": "e", "shop": true, "gen": "boom", "veranda": true, "corner": false, "colour": 2, "signs": 2, "roof": "tanks", "core": "own", "pair": -1, "lift": false}, {"kit": "tong_lau", "storeys": 6, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": true, "colour": 3, "signs": 3, "roof": "tanks", "core": "shared", "pair": 114, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 1, "signs": 3, "roof": "tanks", "core": "shared", "pair": 113, "lift": true}, {"kit": "tong_lau", "storeys": 6, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 2, "signs": 3, "roof": "garden", "core": "shared", "pair": 116, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 3, "signs": 3, "roof": "garden", "core": "shared", "pair": 115, "lift": true}, {"kit": "tong_lau", "storeys": 5, "front": "s", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 1, "signs": 3, "roof": "greenhouse", "core": "shared", "pair": 118, "lift": false}, {"kit": "tong_lau", "storeys": 9, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 3, "signs": 3, "roof": "tanks", "core": "shared", "pair": 117, "lift": true}, {"kit": "tong_lau", "storeys": 7, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 4, "signs": 2, "roof": "tanks", "core": "shared", "pair": 120, "lift": true}, {"kit": "tong_lau", "storeys": 4, "front": "s", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 0, "signs": 3, "roof": "laundry", "core": "shared", "pair": 119, "lift": false}, {"kit": "tong_lau", "storeys": 6, "front": "e", "shop": true, "gen": "tile", "veranda": false, "corner": true, "colour": 1, "signs": 2, "roof": "laundry", "core": "shared", "pair": 124, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "e", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 0, "signs": 3, "roof": "garden", "core": "shared", "pair": 123, "lift": true}, {"kit": "tong_lau", "storeys": 5, "front": "e", "shop": true, "gen": "boom", "veranda": true, "corner": false, "colour": 3, "signs": 3, "roof": "tanks", "core": "shared", "pair": 122, "lift": false}, {"kit": "tong_lau", "storeys": 9, "front": "e", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 0, "signs": 3, "roof": "garden", "core": "shared", "pair": 121, "lift": true}, {"kit": "tong_lau", "storeys": 7, "front": "w", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 3, "signs": 3, "roof": "tanks", "core": "shared", "pair": 141, "lift": true}, {"kit": "tong_lau", "storeys": 4, "front": "n", "shop": true, "gen": "boom", "veranda": true, "corner": false, "colour": 2, "signs": 2, "roof": "tanks", "core": "shared", "pair": 127, "lift": false}, {"kit": "tong_lau", "storeys": 6, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 0, "signs": 2, "roof": "tanks", "core": "shared", "pair": 126, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 1, "signs": 2, "roof": "tanks", "core": "own", "pair": -1, "lift": true}, {"kit": "tong_lau", "storeys": 6, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 4, "signs": 2, "roof": "tanks", "core": "shared", "pair": 130, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 2, "signs": 2, "roof": "tanks", "core": "shared", "pair": 129, "lift": true}, {"kit": "tong_lau", "storeys": 5, "front": "n", "shop": true, "gen": "boom", "veranda": true, "corner": false, "colour": 1, "signs": 2, "roof": "garden", "core": "own", "pair": -1, "lift": false}, {"kit": "tong_lau", "storeys": 9, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": true, "colour": 4, "signs": 2, "roof": "tanks", "core": "own", "pair": -1, "lift": true}, {"kit": "tong_lau", "storeys": 7, "front": "w", "shop": true, "gen": "tile", "veranda": false, "corner": true, "colour": 3, "signs": 3, "roof": "tanks", "core": "own", "pair": -1, "lift": true}, {"kit": "tong_lau", "storeys": 4, "front": "s", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 2, "signs": 2, "roof": "tanks", "core": "shared", "pair": 135, "lift": false}, {"kit": "tong_lau", "storeys": 6, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 1, "signs": 2, "roof": "garden", "core": "shared", "pair": 134, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 4, "signs": 2, "roof": "tanks", "core": "own", "pair": -1, "lift": true}, {"kit": "tong_lau", "storeys": 6, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 1, "signs": 2, "roof": "laundry", "core": "shared", "pair": 138, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 2, "signs": 2, "roof": "laundry", "core": "shared", "pair": 137, "lift": true}, {"kit": "tong_lau", "storeys": 5, "front": "s", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 3, "signs": 2, "roof": "greenhouse", "core": "own", "pair": -1, "lift": false}, {"kit": "tong_lau", "storeys": 9, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": true, "colour": 2, "signs": 2, "roof": "tanks", "core": "own", "pair": -1, "lift": true}, {"kit": "tong_lau", "storeys": 7, "front": "w", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 3, "signs": 3, "roof": "laundry", "core": "shared", "pair": 125, "lift": true}, {"kit": "tong_lau", "storeys": 4, "front": "w", "shop": true, "gen": "boom", "veranda": true, "corner": false, "colour": 0, "signs": 2, "roof": "tanks", "core": "shared", "pair": 143, "lift": false}, {"kit": "tong_lau", "storeys": 6, "front": "w", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 4, "signs": 3, "roof": "laundry", "core": "shared", "pair": 142, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "e", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 0, "signs": 0, "roof": "tanks", "core": "own", "pair": -1, "lift": true}, {"kit": "tong_lau", "storeys": 6, "front": "e", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 1, "signs": 0, "roof": "tanks", "core": "own", "pair": -1, "lift": false}, {"kit": "lockup", "storeys": 2, "front": "n", "shop": true, "colour": 1, "signs": 3}, {"kit": "tong_lau", "storeys": 5, "front": "s", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 4, "signs": 0, "roof": "greenhouse", "core": "own", "pair": -1, "lift": false}, {"kit": "tong_lau", "storeys": 7, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": true, "colour": 2, "signs": 0, "roof": "tanks", "core": "shared", "pair": 149, "lift": true}, {"kit": "tong_lau", "storeys": 4, "front": "s", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 3, "signs": 0, "roof": "greenhouse", "core": "shared", "pair": 148, "lift": false}, {"kit": "tong_lau", "storeys": 6, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 0, "signs": 0, "roof": "tanks", "core": "shared", "pair": 151, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 1, "signs": 0, "roof": "laundry", "core": "shared", "pair": 150, "lift": true}, {"kit": "lockup", "storeys": 2, "front": "e", "shop": true, "colour": 0, "signs": 1}, {"kit": "tong_lau", "storeys": 6, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 2, "signs": 0, "roof": "tanks", "core": "own", "pair": -1, "lift": false}, {"kit": "lockup", "storeys": 2, "front": "e", "shop": true, "colour": 1, "signs": 1}, {"kit": "lockup", "storeys": 2, "front": "e", "shop": true, "colour": 4, "signs": 1}, {"kit": "tong_lau", "storeys": 4, "front": "w", "shop": true, "gen": "boom", "veranda": true, "corner": false, "colour": 3, "signs": 3, "roof": "greenhouse", "core": "shared", "pair": 161, "lift": false}, {"kit": "tong_lau", "storeys": 6, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 1, "signs": 1, "roof": "tanks", "core": "own", "pair": -1, "lift": false}, {"kit": "tong_lau", "storeys": 5, "front": "n", "shop": true, "gen": "boom", "veranda": false, "corner": false, "colour": 4, "signs": 1, "roof": "laundry", "core": "shared", "pair": 159, "lift": false}, {"kit": "tong_lau", "storeys": 9, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 3, "signs": 1, "roof": "tanks", "core": "shared", "pair": 158, "lift": true}, {"kit": "tong_lau", "storeys": 7, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 2, "signs": 0, "roof": "tanks", "core": "own", "pair": -1, "lift": true}, {"kit": "tong_lau", "storeys": 4, "front": "w", "shop": true, "gen": "boom", "veranda": true, "corner": false, "colour": 2, "signs": 3, "roof": "tanks", "core": "shared", "pair": 156, "lift": false}, {"kit": "tong_lau", "storeys": 6, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 4, "signs": 1, "roof": "tanks", "core": "own", "pair": -1, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 1, "signs": 0, "roof": "garden", "core": "own", "pair": -1, "lift": true}, {"kit": "tong_lau", "storeys": 6, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 4, "signs": 1, "roof": "laundry", "core": "shared", "pair": 165, "lift": false}, {"kit": "tong_lau", "storeys": 8, "front": "n", "shop": true, "gen": "tile", "veranda": false, "corner": false, "colour": 3, "signs": 0, "roof": "laundry", "core": "shared", "pair": 164, "lift": true}, {"kit": "lockup", "storeys": 2, "front": "n", "shop": true, "colour": 0, "signs": 0}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], "building_kits": {"25": {"kit": "tower", "storeys": 5, "front": "e", "shop": false, "base_kind": "stone", "base": 1, "kishk": 0, "manzar": false, "parapet": 2, "frieze": 2, "polite": true}, "26": {"kit": "tower", "storeys": 6, "front": "s", "shop": true, "base_kind": "earth", "base": 2, "kishk": 1, "manzar": false, "parapet": 0, "frieze": 1, "polite": true}, "27": {"kit": "tower", "storeys": 9, "front": "n", "shop": false, "base_kind": "stone", "base": 2, "kishk": 1, "manzar": false, "parapet": 2, "frieze": 1, "polite": true}, "28": {"kit": "tower", "storeys": 8, "front": "n", "shop": false, "base_kind": "stone", "base": 1, "kishk": 1, "manzar": true, "parapet": 1, "frieze": 2, "polite": false}, "29": {"kit": "tower", "storeys": 6, "front": "w", "shop": true, "base_kind": "stone", "base": 1, "kishk": 1, "manzar": false, "parapet": 0, "frieze": 2, "polite": true}, "30": {"kit": "tower", "storeys": 6, "front": "w", "shop": false, "base_kind": "stone", "base": 3, "kishk": 2, "manzar": false, "parapet": 2, "frieze": 2, "polite": false}, "31": {"kit": "tower", "storeys": 6, "front": "w", "shop": true, "base_kind": "stone", "base": 2, "kishk": 2, "manzar": false, "parapet": 0, "frieze": 1, "polite": true}, "32": {"kit": "tower", "storeys": 7, "front": "e", "shop": true, "base_kind": "stone", "base": 2, "kishk": 2, "manzar": false, "parapet": 2, "frieze": 3, "polite": true}, "52": {"kit": "tower", "storeys": 7, "front": "e", "shop": true, "base_kind": "earth", "base": 3, "kishk": 1, "manzar": true, "parapet": 2, "frieze": 3, "polite": true}, "34": {"kit": "tong_lau", "storeys": 8, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": true, "colour": 1, "signs": 3, "roof": "laundry", "core": "own", "pair": -1, "lift": true, "units": 4}}};
+const BN = n => LAYOUT.buildings.find(b => b.n === n);
+const PARK = LAYOUT.park;
+const lotHeight = l => l[4] * LAYOUT.storey[l[5]];
+const topOf = b => (b.crown || b.height);
+
+/* the park and the playground, drawn from the plan in world metres */
+function drawPark(p, detail) {
+  const P = PARK, sw = 0.25 * detail + 0.15;
+  const R = (r, fill, o = {}) => el("rect", Object.assign({ x: r[0], y: r[1], width: r[2] - r[0], height: r[3] - r[1], fill }, o), p);
+  const C = (x, z, r, fill, o = {}) => el("circle", Object.assign({ cx: x, cy: z, r, fill }, o), p);
+  R(P.rect, V("park"), { stroke: V("ink"), "stroke-width": 0.6 });
+  R(P.dry_garden, V("sand"));
+  if (detail >= 1) for (let i = 0; i < 26; i++) { const x = P.dry_garden[0] + 4 + (i * 7.3) % 46, z = P.dry_garden[1] + 3 + ((i * 11.7) % 33); C(x, z, i % 3 ? 0.9 : 1.6, i % 3 ? V("park") : V("plateau"), { stroke: V("ink"), "stroke-width": 0.15 }); }
+  el("ellipse", { cx: P.pond.c[0], cy: P.pond.c[1], rx: P.pond.r[0], ry: P.pond.r[1], fill: V("blorb"), opacity: 0.45 }, p);
+  R(P.lawn, V("lawn"), { stroke: V("ink"), "stroke-width": 0.2 });
+  P.parasols.forEach(([x, z]) => C(x, z, 5.5, V("market"), { opacity: 0.55, stroke: V("ink"), "stroke-width": 0.2 }));
+  P.walks.forEach(w => R(w, V("city")));
+  const [cx, cz] = P.playground.c, [r0, r1] = P.playground.track;
+  C(cx, cz, r1, V("plateau"), { stroke: V("ink"), "stroke-width": sw });
+  C(cx, cz, r0, V("lawn"), { stroke: V("ink"), "stroke-width": sw });
+  el("path", { d: `M${cx},${cz} L${cx - r0},${cz} A${r0},${r0} 0 0 1 ${cx - r0 / 2},${cz - r0 * 0.866} Z M${cx},${cz} L${cx - r0},${cz} A${r0},${r0} 0 0 0 ${cx - r0 / 2},${cz + r0 * 0.866} Z`, fill: V("sand") }, p);
+  el("path", { d: `M${cx},${cz} L${cx - r0 / 2},${cz + r0 * 0.866} A${r0},${r0} 0 0 0 ${cx + r0 / 2},${cz + r0 * 0.866} Z`, fill: V("sign"), opacity: 0.35 }, p);
+  el("path", { d: `M${cx},${cz} L${cx + r0 / 2},${cz - r0 * 0.866} A${r0},${r0} 0 0 1 ${cx + r0 / 2},${cz + r0 * 0.866} Z`, fill: V("blorb"), opacity: 0.3 }, p);
+  const tw = P.playground.towers;
+  el("polygon", { points: tw.slice(1).map(t => t[0] + "," + t[1]).join(" "), fill: V("sign"), opacity: 0.12, stroke: V("sign"), "stroke-width": 0.5, "stroke-dasharray": "1 0.8" }, p);
+  tw.slice(1).forEach(t => el("line", { x1: tw[0][0], y1: tw[0][1], x2: t[0], y2: t[1], stroke: V("ink"), "stroke-width": 0.5 }, p));
+  tw.forEach(([x, z, , r]) => C(x, z, r, V("market"), { stroke: V("ink"), "stroke-width": 0.6 }));
+  P.playground.perches.forEach(([x, z]) => C(x, z, 1.1, V("civic"), { stroke: V("ink"), "stroke-width": 0.4 }));
+  if (detail >= 1) P.playground.hoops.forEach(([x, z]) => C(x, z, 1.5, "none", { stroke: V("deck"), "stroke-width": 0.5 }));
+  P.wind_trees.forEach(([x, z]) => { C(x, z, 5, "none", { stroke: V("ink"), "stroke-width": 0.4, "stroke-dasharray": "1 1" }); C(x, z, 1.4, V("ink")); });
+}
+
+/* a numbered building in its plan form */
+function drawForm(p, b, k) {
+  const [x0, z0, x1, z1] = b.r, w = x1 - x0, h = z1 - z0, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+  const base = b.kind === "civic" || b.kind === "works" ? V("civic") : (b.kind === "tower") ? V("down") : b.kind === "estate" ? V("estate") : V(DFILL[k]);
+  const shade = (o) => o;
+  const box = (r, fill, o = {}) => el("rect", Object.assign({ x: r[0], y: r[1], width: r[2] - r[0], height: r[3] - r[1], fill, stroke: V("ink"), "stroke-width": 1.1 }, o), p);
+  const ink = (d, op) => el("path", { d, fill: V("ink"), opacity: op, stroke: "none" }, p);
+  if (b.form === "twist") {
+    box(b.r, base, { opacity: 0.6 });
+    const d = `M${cx},${z0 + 2} Q${x1 - 1},${z0 + 2} ${x1 - 3},${z1 - 6} Q${x1 - 6},${z1 - 1} ${cx},${z1 - 3} Q${x0 + 6},${z1 - 1} ${x0 + 3},${z1 - 6} Q${x0 + 1},${z0 + 2} ${cx},${z0 + 2} Z`;
+    el("path", { d, fill: V("city"), stroke: V("ink"), "stroke-width": 1.8 }, p); ink(d, 0.4);
+    el("path", { d: `M${cx},${z0 + 9} L${x1 - 9},${z1 - 9} L${x0 + 9},${z1 - 9} Z`, fill: "none", stroke: V("paper"), "stroke-width": 0.8, transform: `rotate(30 ${cx} ${cz + 3})` }, p);
+  } else if (b.form === "screen") {
+    box(b.r, base, { opacity: 0.6 });
+    el("rect", { x: x0 + 2, y: z0 + 2, width: w - 4, height: h - 4, rx: 7, fill: V("city"), stroke: V("ink"), "stroke-width": 1.8 }, p);
+    el("rect", { x: x0 + 2.6, y: z0 + 2.6, width: w - 5.2, height: h - 5.2, rx: 6.5, fill: V("ink"), opacity: 0.38 }, p);
+    el("rect", { x: x0 + 0.8, y: z0 + 0.8, width: w - 1.6, height: h - 1.6, rx: 8, fill: "none", stroke: V("sign"), "stroke-width": 0.8, "stroke-dasharray": "1.2 0.8" }, p);
+  } else if (b.form === "capsule") {
+    box(b.r, base, { opacity: 0.6 });
+    let seed = 11; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    for (let i = 0; i < 14; i++) {
+      const a = i / 14 * Math.PI * 2, rr = 9 + rnd() * 8, sz = 5 + rnd() * 4;
+      const x = cx + Math.cos(a) * rr - sz / 2, z = cz + Math.sin(a) * rr - sz / 2;
+      el("rect", { x: Math.max(x0, Math.min(x1 - sz, x)), y: Math.max(z0, Math.min(z1 - sz, z)), width: sz, height: sz, fill: V(["down", "market", "lantern", "estate"][i % 4]), stroke: V("ink"), "stroke-width": 0.5 }, p);
+    }
+    el("rect", { x: cx - 7, y: cz - 7, width: 14, height: 14, fill: V("civic"), stroke: V("ink"), "stroke-width": 1.6 }, p);
+    el("rect", { x: cx - 6.4, y: cz - 6.4, width: 12.8, height: 12.8, fill: V("ink"), opacity: 0.38 }, p);
+  } else if (b.form === "dune") {
+    box(b.r, base, { opacity: 0.6 });
+    let d = "";
+    const N = 28;
+    for (let i = 0; i <= N; i++) { const t = i / N; d += (i ? "L" : "M") + (x0 + 1 + t * (w - 2)) + "," + (z0 + 2.5 + 1.8 * Math.sin(t * 9)) + " "; }
+    for (let i = 0; i <= N; i++) { const t = i / N; d += "L" + (x1 - 2.5 - 1.8 * Math.sin(t * 7 + 1)) + "," + (z0 + 1 + t * (h - 2)) + " "; }
+    for (let i = 0; i <= N; i++) { const t = i / N; d += "L" + (x1 - 1 - t * (w - 2)) + "," + (z1 - 2.5 - 1.8 * Math.sin(t * 8 + 2)) + " "; }
+    for (let i = 0; i <= N; i++) { const t = i / N; d += "L" + (x0 + 2.5 + 1.8 * Math.sin(t * 6 + 3)) + "," + (z1 - 1 - t * (h - 2)) + " "; }
+    el("path", { d: d + "Z", fill: V("lantern"), stroke: V("ink"), "stroke-width": 1.6 }, p); ink(d + "Z", 0.32);
+  } else if (b.form === "deco") {
+    box(b.r, V("civic"));
+    const t = b.part;
+    box(t, V("civic"), { "stroke-width": 1.6 });
+    el("rect", { x: t[0] + 0.5, y: t[1] + 0.5, width: t[2] - t[0] - 1, height: t[3] - t[1] - 1, fill: V("ink"), opacity: 0.3 }, p);
+    const tcx = (t[0] + t[2]) / 2, tcz = (t[1] + t[3]) / 2;
+    [[t[0], t[1]], [t[2], t[1]], [t[0], t[3]], [t[2], t[3]]].forEach(([x, z]) => el("line", { x1: x, y1: z, x2: tcx, y2: tcz, stroke: V("park"), "stroke-width": 1 }, p));
+    el("rect", { x: x0 + 13, y: z0 + 32, width: 26, height: 22, fill: V("city"), stroke: V("ink"), "stroke-width": 0.5, "stroke-dasharray": "1.5 1" }, p);
+  } else if (b.form === "clock") {
+    box(b.r, V("civic"));
+    const t = b.part;
+    box(t, V("civic"), { "stroke-width": 1.4 });
+    el("circle", { cx: (t[0] + t[2]) / 2, cy: (t[1] + t[3]) / 2, r: 1.6, fill: "none", stroke: V("ink"), "stroke-width": 0.5 }, p);
+  } else {
+    const turn = b.angle ? { transform: `rotate(${b.angle} ${cx} ${cz})` } : {};
+    box(b.r, base, turn);
+    if (b.kind === "estate") el("rect", Object.assign({ x: x0 + 0.6, y: z0 + 0.6, width: w - 1.2, height: h - 1.2, fill: V("ink"), opacity: 0.26 }, turn), p);
+  }
+}
+
+function district(x, z) {
+  if (Math.hypot(x - MOY[0], z) > 200) return "out";
+  if (x > -487) return "down";
+  if (z >= 114 || (z > 62 && x > -641)) return "market";
+  if (x < -637) return "old";
+  if (z < -62) return "estate";
+  return "park";
+}
+const DFILL = { down: "down", old: "lantern", estate: "estate", market: "market", park: "civic", out: "civic" };
+const DNAME = { down: "Downtown", old: "Old Moy", estate: "North Estate", market: "Market lanes", park: "The park", out: "Beyond the Rim Walk" };
+const HSHADE = h => h >= 17 ? 0.3 : h >= 10 ? 0.18 : h >= 5 ? 0.07 : 0;
+
+function drawCity(s, mode) {
+  const defs = el("defs", {}, s);
+  const cid = "clip-" + mode;
+  el("circle", { cx: MOY[0], cy: 0, r: 200 }, el("clipPath", { id: cid }, defs));
+  const g = el("g", {}, s);
+  el("rect", { x: -940, y: -400, width: 760, height: 800, fill: V("sand") }, g);
+  el("circle", { cx: 0, cy: 0, r: 870, fill: "none", stroke: V("ink"), "stroke-width": 2 }, g);
+  el("path", { d: "M-940,-400 L-940,400 L-870,400 A870,870 0 0 1 -870,-400 Z", fill: V("paper") }, g);
+  el("circle", { cx: 0, cy: 0, r: 265, fill: V("plateau"), stroke: V("ink"), "stroke-width": 1.6 }, g);
+  el("circle", { cx: -500, cy: 464, r: 140, fill: V("plateau"), stroke: V("ink"), "stroke-width": 1.2 }, g);
+  el("circle", { cx: -450, cy: -480, r: 140, fill: V("plateau"), stroke: V("ink"), "stroke-width": 1.2 }, g);
+  // ground inside the Rim Walk is garden wherever nothing is built or paved
+  el("circle", { cx: MOY[0], cy: 0, r: 200, fill: V("lawn") }, g);
+  const d = el("g", { "clip-path": `url(#${cid})` }, g);
+  const R = (x0, z0, x1, z1, fill, extra = {}) => el("rect", Object.assign({ x: x0, y: z0, width: x1 - x0, height: z1 - z0, fill }, extra), d);
+  // streets
+  for (const [, , x0, z0, x1, z1] of LAYOUT.streets) R(x0, z0, x1, z1, V("city"));
+  // squares and the park
+  for (const [name, x0, z0, x1, z1] of LAYOUT.opens) {
+    if (name === "park") R(x0, z0, x1, z1, V("park"), { stroke: V("ink"), "stroke-width": 0.8 });
+    else R(x0, z0, x1, z1, V("city"), { stroke: V("ink"), "stroke-width": 0.6, "stroke-dasharray": "2 1.5" });
+  }
+  // courtyard gardens
+  for (const [x0, z0, x1, z1] of LAYOUT.courts) R(x0, z0, x1, z1, V("lawn"), { stroke: V("ink"), "stroke-width": 0.3 });
+  // every ordinary building, shaded by height
+  for (const [x0, z0, x1, z1, h] of LAYOUT.lots) {
+    const k = district((x0 + x1) / 2, (z0 + z1) / 2);
+    R(x0, z0, x1, z1, V(DFILL[k]), { stroke: V("ink"), "stroke-width": mode === "zoom" ? 0.4 : 0.3 });
+    const sh = HSHADE(h);
+    if (sh) R(x0 + 0.4, z0 + 0.4, x1 - 0.4, z1 - 0.4, V("ink"), { opacity: sh });
+  }
+  // trees on the plazas and squares
+  [[-474, -21], [-440, -21], [-474, 21], [-440, 21], [-677, -21], [-646, -21], [-677, 21], [-646, 21], [-582, 130], [-538, 130], [-582, 156], [-538, 156], [-548, -110], [-522, -110], [-548, -91]]
+    .forEach(([x, z]) => el("circle", { cx: x, cy: z, r: 2.6, fill: V("park"), stroke: V("ink"), "stroke-width": 0.25 }, d));
+  // the park and playground, from the plan
+  drawPark(d, mode === "zoom" ? 1 : 0.6);
+  // estate: courts, community garden, play and covered linkways, from the plan
+  const E = LAYOUT.estate;
+  const poly = (pts, fill, o = {}) => el("polygon", Object.assign({ points: pts.map(q => q.join(",")).join(" "), fill }, o), d);
+  E.courts.forEach(c => poly(c, V("lawn")));
+  poly(E.garden, V("park"), { opacity: 0.7 });
+  const link = pts => el("polyline", { points: pts.map(p => p.join(",")).join(" "), fill: "none", stroke: V("ink"), "stroke-width": 1.1, "stroke-dasharray": "3 1.6", opacity: 0.75 }, d);
+  E.linkways.forEach(link);
+  E.playgrounds.forEach(([x, z]) => el("circle", { cx: x, cy: z, r: 5, fill: V("market"), stroke: V("ink"), "stroke-width": 0.6 }, d));
+  E.pavilions.forEach(([x, z]) => el("rect", { x: x - 4, y: z - 3, width: 8, height: 6, fill: V("civic"), stroke: V("ink"), "stroke-width": 0.5 }, d));
+  // named buildings, in their plan forms
+  for (const b of LAYOUT.buildings) {
+    if (!b.r) continue;
+    const k = district((b.r[0] + b.r[2]) / 2, (b.r[1] + b.r[3]) / 2);
+    drawForm(k === "out" ? g : d, b, k);
+  }
+  [46, 52].forEach(z => el("line", { x1: -660, y1: z, x2: -637, y2: z, stroke: V("ink"), "stroke-width": 0.6 }, d));
+  el("polygon", { points: LAYOUT.estate.sky_bridge.map(q => q.join(",")).join(" "), fill: V("ink"), stroke: V("ink"), "stroke-width": 0.8 }, d);
+  // the Deck
+  const deck = pts => el("polyline", { points: pts.map(p => p.join(",")).join(" "), class: "deck" }, d);
+  deck([[-631, -56], [-489, -56], [-489, 56], [-631, 56], [-631, -56]]);
+  deck([[-489, -34], [-410, -34], [-410, -38]]);
+  deck([[-489, 34], [-463, 34], [-463, 38]]);
+  deck([[-560, -56], [-560, -100], [-554, -100]]);
+  deck([[-560, 56], [-560, 122]]);
+  deck([[-631, -12], [-663, -12], [-663, -30]]);
+  for (const [x, z] of [[-631, -56], [-489, -56], [-489, 56], [-631, 56], [-457, -20]]) el("circle", { cx: x, cy: z, r: 3.5, fill: V("paper"), stroke: V("deck"), "stroke-width": 1.8 }, d);
+  // Rim Walk
+  el("circle", { cx: MOY[0], cy: 0, r: 200, fill: "none", stroke: V("ink"), "stroke-width": 2.4 }, g);
+  for (let a = 0; a < Math.PI * 2; a += Math.PI / 36) el("circle", { cx: MOY[0] + 198 * Math.cos(a), cy: 198 * Math.sin(a), r: 1.3, fill: V("park") }, g);
+  [[-670, -198], [-662, -198]].forEach(([x, z]) => el("circle", { cx: x, cy: z, r: 3.5, fill: V("blorb"), opacity: 0.5 }, g));
+  [[-800, -85], [-772, 92], [-640, 228], [-470, 222], [-345, 96], [-350, -110], [-470, -224], [-610, -236], [-805, 55], [-758, -130], [-700, 200], [-405, 175], [-340, 10]]
+    .forEach(([x, z]) => el("circle", { cx: x, cy: z, r: 3.4, fill: V("blorb") }, g));
+  for (const [x, z] of TURBINES) {
+    el("line", { x1: x, y1: z - 65, x2: x, y2: z + 65, stroke: V("ink"), "stroke-width": 3 }, g);
+    el("circle", { cx: x, cy: z, r: 65, fill: "none", stroke: V("ink"), "stroke-width": 0.6, "stroke-dasharray": "2 4", opacity: 0.6 }, g);
+    el("rect", { x: x - 2, y: z - 5, width: 9, height: 10, fill: V("paper"), stroke: V("ink"), "stroke-width": 1.4 }, g);
+  }
+  return { g, d };
+}
+
+/* context map */
+(() => {
+  const s = svg("plan", "-925 -385 730 770", "Moy and its surroundings at true scale");
+  drawCity(s, "context");
+  const T = (x, y, t, sz, o = {}) => label(s, x, y, t, sz, o);
+  T(-585, -232, "NORTH ESTATE", 15, { class: "lbl dist" });
+  T(-842, 104, "OLD", 15, { class: "lbl dist" });
+  T(-842, 120, "MOY", 15, { class: "lbl dist" });
+  T(-585, 232, "MARKET LANES", 15, { class: "lbl dist" });
+  T(-430, -208, "DOWNTOWN", 15, { class: "lbl dist" });
+  T(-560, -32, "THE PARK", 10, { class: "lbl dist" });
+  T(-778, -18, "battery works", 7);
+  T(-700, -238, "water works", 7);
+  T(-300, -8, "no roads out:", 6, { class: "lbl mut" });
+  T(-300, 2, "rock and cliff", 6, { class: "lbl mut" });
+  T(-755, 176, "Rim Walk", 8, { "text-anchor": "end" });
+  T(-810, -96, "city blorbs", 8, { fill: V("blorb"), "font-weight": 600 });
+  T(-728, -296, "turbine", 8, { "text-anchor": "start" });
+  T(-728, -285, "130 m rotor", 7, { "text-anchor": "start", class: "lbl mut" });
+  T(-298, 214, "turbine", 8, { "text-anchor": "start" });
+  T(-500, 365, "Jungle plateau slope", 9);
+  T(-450, -360, "Ice plateau slope", 9);
+  T(-226, -170, "main plateau", 9, { transform: "rotate(-90 -226 -170)" });
+  T(-212, -170, "cliff, 60 m up", 7, { transform: "rotate(-90 -212 -170)", class: "lbl mut" });
+  T(-900, -150, "world's edge: mountains, then the planetary ocean", 7, { transform: "rotate(-90 -900 -150)" });
+  T(-895, -360, "N ↑", 11, { "font-weight": 600 });
+  el("line", { x1: -905, y1: 365, x2: -805, y2: 365, stroke: V("ink"), "stroke-width": 2 }, s);
+  [-905, -855, -805].forEach(x => el("line", { x1: x, y1: 360, x2: x, y2: 370, stroke: V("ink"), "stroke-width": 1.5 }, s));
+  T(-855, 352, "100 m", 8);
+})();
+
+/* every building, numbered, every street named */
+(() => {
+  const s = svg("buildings", "-803 -240 466 470", "Building plan of Moy with every street named and every building drawn");
+  drawCity(s, "zoom");
+  const T = (x, y, t, sz, o = {}) => label(s, x, y, t, sz, o);
+  // street names, placed along each street inside the Rim Walk
+  const placed = {};
+  for (const [name, kind, x0, z0, x1, z1] of LAYOUT.streets) {
+    if (name === "Park Ring") continue;
+    const vert = (z1 - z0) > (x1 - x0);
+    let cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+    // pull the label inside the disc
+    if (vert) { const lim = Math.sqrt(190 * 190 - (cx - MOY[0]) ** 2); cz = Math.max(-lim + 30, Math.min(lim - 30, cz)); if (name === "North Street" || name === "Estate Lane") cz = -180 + 20; if (name === "South Street" || name === "Market Lane") cz = 160; if (name === "Arcade Street") cz = -6 - 50; if (name === "Cinema Lane") cz = -80; }
+    else { const lim = Math.sqrt(190 * 190 - cz * cz); cx = Math.max(MOY[0] - lim + 34, Math.min(MOY[0] + lim - 34, cx)); if (name === "Meridian Avenue") cx = -372; if (name === "Tank Lane") cx = -722; if (name === "West Street") cx = -742; }
+    const key = name + (vert ? "v" : "h");
+    if (placed[key]) continue; placed[key] = 1;
+    const fs = kind === "lane" ? 3.1 : 3.8;
+    T(cx, cz + (vert ? 0 : 0.3), name, fs, Object.assign({ class: "lbl mut" }, vert ? { transform: `rotate(-90 ${cx} ${cz})` } : {}));
+  }
+  T(-560, -57, "Park Ring", 3.8, { class: "lbl mut" });
+  T(-457, 22, "Civic Plaza", 4.4, { class: "lbl mut" });
+  T(-661, 22, "Library Sq.", 4.2, { class: "lbl mut" });
+  T(-560, 160, "Market Sq.", 4.2, { class: "lbl mut" });
+  T(-535, -96, "Estate Sq.", 4.2, { class: "lbl mut" });
+  T(-743, 24, "Cinema", 3.2, { class: "lbl mut" });
+  T(-743, 28.5, "Sq.", 3.2, { class: "lbl mut" });
+  T(-560, -40, "THE PARK", 7, { class: "lbl dist" });
+  T(-640, -188, "west precinct", 4, { class: "lbl mut" });
+  T(-505, -192, "east precinct", 4, { class: "lbl mut" });
+  const pin = (x, z, n) => {
+    el("circle", { cx: x, cy: z, r: 4.2, fill: V("ink") }, s);
+    el("text", { x, y: z + 0.3, "font-size": 4.6, "text-anchor": "middle", "dominant-baseline": "middle", style: "fill:var(--paper)", "font-weight": 600 }, s, n);
+  };
+  const off = { 6: [0, -8], 10: [0, -8], 9: [0, 9], 37: [8, 0], 38: [0, 9], 25: [0, 9], 39: [0, 9] };
+  for (const b of LAYOUT.buildings) {
+    let x, z;
+    if (b.n === 11) { x = -560; z = 2; }
+    else if (!b.r) continue;
+    else { x = (b.r[0] + b.r[2]) / 2; z = (b.r[1] + b.r[3]) / 2; }
+    const o = off[b.n] || [0, 0];
+    pin(x + o[0], z + o[1], b.n);
+  }
+  for (const [x, z] of [[-631, -56], [-489, -56], [-489, 56], [-631, 56], [-457, -20]]) T(x + 7, z - 5, "R", 4.4, { fill: V("deck"), "font-weight": 600 });
+  T(-795, -232, "N ↑", 7, { "font-weight": 600, "text-anchor": "start" });
+  el("line", { x1: -795, y1: 222, x2: -745, y2: 222, stroke: V("ink"), "stroke-width": 1.4 }, s);
+  [-795, -770, -745].forEach(x => el("line", { x1: x, y1: 219, x2: x, y2: 225, stroke: V("ink"), "stroke-width": 1 }, s));
+  T(-770, 214, "50 m", 5.5);
+})();
+
+/* schedule */
+(() => {
+  const host = document.getElementById("schedule");
+  const groups = {};
+  for (const b of [...LAYOUT.buildings].sort((a, c) => a.n - c.n)) {
+    const k = b.n === 11 ? "park" : district((b.r[0] + b.r[2]) / 2, (b.r[1] + b.r[3]) / 2);
+    (groups[k] = groups[k] || []).push(b);
+  }
+  groups.out.push({ n: "45–48", name: "Wind turbines (4)", h: "95 m to the hub, 160 m to the tip", who: "the Windworks; Omar Haddad" });
+  groups.civic = [{ n: "R", name: "Ramp towers (5)", h: "spiral ramps up to the Deck at +6.5 m", who: "" }];
+  const order = ["park", "down", "estate", "old", "market", "civic", "out"];
+  const names = Object.assign({}, DNAME, { park: "The park and the Park Ring", civic: "The Deck" });
+  for (const k of order) {
+    if (!groups[k]) continue;
+    const sec = document.createElement("div"); sec.className = "sched-group";
+    host.appendChild(sec);
+    const h = document.createElement("h3"); h.textContent = names[k]; sec.appendChild(h);
+    const t = document.createElement("table"); sec.appendChild(t);
+    const thead = t.createTHead().insertRow();
+    ["No.", "Building", "Size", "Who lives or works here"].forEach(c => { const th = document.createElement("th"); th.textContent = c; thead.appendChild(th); });
+    const tb = t.createTBody();
+    for (const b of groups[k]) {
+      const r = tb.insertRow();
+      [b.n, b.name, b.h, b.who || "—"].forEach((c, i) => { const td = r.insertCell(); td.textContent = c; if (i === 0) td.className = "num"; });
+    }
+  }
+})();
+
+/* street directory */
+(() => {
+  const host = document.getElementById("streets");
+  const W = { main: "12 m", avenue: "10 m", shop: "8 m", lane: "4 m" };
+  const KIND = { main: "main street", avenue: "main street", shop: "shopping street", lane: "lane" };
+  const seen = new Set();
+  const t = document.createElement("table"); host.appendChild(t);
+  const th = t.createTHead().insertRow();
+  ["Street", "Kind", "Width", "Runs"].forEach(c => { const e = document.createElement("th"); e.textContent = c; th.appendChild(e); });
+  const tb = t.createTBody();
+  for (const [name, kind] of LAYOUT.streets) {
+    if (seen.has(name)) continue; seen.add(name);
+    const r = tb.insertRow();
+    [name, KIND[kind], W[kind], STREET_RUNS[name] || ""].forEach(c => { const td = r.insertCell(); td.textContent = c; });
+  }
+})();
+
+/* ---------- The park and the playground ---------- */
+(() => {
+  const P = PARK, [px0, pz0, px1, pz1] = P.rect;
+  const s = svg("parkplan", `${px0 - 15} ${pz0 - 16} ${px1 - px0 + 30} ${pz1 - pz0 + 32}`, "Plan of the park and the giant playground, from the city plan, true scale");
+  const C = (x, z, r, fill, o = {}) => el("circle", Object.assign({ cx: x, cy: z, r, fill }, o), s);
+  const T = (x, y, t, sz, o = {}) => label(s, x, y, t, sz, Object.assign({ style: "stroke-width:0.9px" }, o));
+  el("rect", { x: px0 - 15, y: pz0 - 16, width: px1 - px0 + 30, height: pz1 - pz0 + 32, fill: V("city") }, s);
+  drawPark(s, 1);
+  // the edge allée
+  for (let x = px0 + 5; x <= px1 - 5; x += 6) { C(x, pz0 + 1.5, 1.3, V("park"), { stroke: V("ink"), "stroke-width": 0.15 }); C(x, pz1 - 1.5, 1.3, V("park"), { stroke: V("ink"), "stroke-width": 0.15 }); }
+  for (let z = pz0 + 6; z <= pz1 - 6; z += 6) { C(px0 + 1.5, z, 1.3, V("park"), { stroke: V("ink"), "stroke-width": 0.15 }); C(px1 - 1.5, z, 1.3, V("park"), { stroke: V("ink"), "stroke-width": 0.15 }); }
+  // the tea house and lodge, from the building schedule
+  for (const n of [9, 10]) { const r = BN(n).r; el("rect", { x: r[0], y: r[1], width: r[2] - r[0], height: r[3] - r[1], fill: V("civic"), stroke: V("ink"), "stroke-width": 0.4 }, s); }
+  const [cx, cz] = P.playground.c, r1 = P.playground.track[1], dg = P.dry_garden, lw = P.lawn;
+  P.playground.towers.forEach(([x, z, h, r, name]) => T(x, z, String(h), 2.4, { "font-weight": 600 }));
+  T((dg[0] + dg[2]) / 2, dg[1] + 3, "dry garden", 2.8, { "font-weight": 600 });
+  T(P.pond.c[0], P.pond.c[1] - P.pond.r[1] - 2, "reed pond", 2.8, { "font-weight": 600 });
+  T((px0 + cx) / 2 - 5, pz1 + 2.5, "parasols · tea house · chess", 2.6, { "font-weight": 600 });
+  T((lw[0] + lw[2]) / 2, lw[3] - 2, "great lawn", 2.8, { "font-weight": 600 });
+  const lodge = BN(10).r, tea = BN(9).r;
+  T((lodge[0] + lodge[2]) / 2, lodge[3] + 2, "lodge", 2); T((tea[0] + tea[2]) / 2, (tea[1] + tea[3]) / 2, "tea", 2);
+  T(cx, cz - r1 - 3.5, "pump track", 2.2); T(cx - 19, cz + 2.4, "dunes", 2.2); T(cx, cz + r1 - 4.5, "bounce court", 2.1); T(cx + 17, cz + 4, "splash pad", 2.1);
+  P.wind_trees.forEach(([x, z]) => T(x, z + (z < 0 ? -7 : 7), `wind tree ${P.wind_tree_height} m`, 2));
+  T(px0 - 8, cz, "Library Sq. ←", 2.4, { transform: `rotate(-90 ${px0 - 8} ${cz})` }); T(px1 + 8, cz, "→ Civic Plaza", 2.4, { transform: `rotate(-90 ${px1 + 8} ${cz})` });
+  T(cx, pz0 - 8, "↑ Estate Square, North Street", 2.4); T(cx, pz1 + 8, "↓ Market Square, South Street", 2.4);
+  T(px0 - 9, pz0 - 11, "N ↑", 3, { "font-weight": 600, "text-anchor": "start" });
+  el("line", { x1: px0 - 9, y1: pz1 + 11, x2: px0 + 11, y2: pz1 + 11, stroke: V("ink"), "stroke-width": 0.6 }, s);
+  T(px0 + 1, pz1 + 8.6, "20 m", 2.2);
+})();
+
+(() => {
+  const s = svg("parksection", "-632 -40 140 46", "Section through the playground showing heights against the hero's jumps and powers");
+  const y = h => -h;
+  const T = (x, yy, t, sz, o = {}) => label(s, x, yy, t, sz, Object.assign({ style: "stroke-width:0.8px" }, o));
+  el("rect", { x: -632, y: -40, width: 140, height: 46, fill: V("paper") }, s);
+  el("rect", { x: -632, y: 0, width: 140, height: 6, fill: V("lawn") }, s);
+  el("rect", { x: -588, y: 0, width: 56, height: 1.2, fill: V("plateau") }, s);
+  // wind trees
+  const WT = PARK.wind_tree_height;
+  for (const x of [...new Set(PARK.wind_trees.map(t => t[0]))]) {
+    el("path", { d: `M${x - 0.8},0 L${x - 0.5},${y(WT - 4)} L${x + 0.5},${y(WT - 4)} L${x + 0.8},0 Z`, fill: V("civic"), stroke: V("ink"), "stroke-width": 0.2 }, s);
+    el("ellipse", { cx: x, cy: y(WT - 2), rx: 6, ry: 3, fill: V("park"), opacity: 0.7, stroke: V("ink"), "stroke-width": 0.2 }, s);
+    el("rect", { x: x - 3, y: y(24.3), width: 6, height: 0.6, fill: V("ink") }, s);
+  }
+  // towers
+  const tw = (x, h, w) => el("rect", { x: x - w / 2, y: y(h), width: w, height: h, fill: V("market"), stroke: V("ink"), "stroke-width": 0.25 }, s);
+  PARK.playground.towers.filter(t => t[1] <= 0).forEach(([x, z, h, r]) => tw(x, h, h === 20 ? 7 : 5));
+  for (let h = 1.2; h < 20; h += 1.2) el("line", { x1: -563.5, y1: y(h), x2: -556.5, y2: y(h), stroke: V("ink"), "stroke-width": 0.08, opacity: 0.6 }, s);
+  // net and bridges
+  el("path", { d: `M-571.5,${y(8)} Q-566,${y(5.5)} -563.5,${y(7)} M-556.5,${y(7)} Q-553,${y(5.5)} -550.5,${y(8)}`, fill: "none", stroke: V("sign"), "stroke-width": 0.5 }, s);
+  el("line", { x1: -571.5, y1: y(9), x2: -563.5, y2: y(9), stroke: V("ink"), "stroke-width": 0.3 }, s);
+  el("line", { x1: -556.5, y1: y(9), x2: -550.5, y2: y(9), stroke: V("ink"), "stroke-width": 0.3 }, s);
+  // slides
+  el("path", { d: `M-545.5,${y(15)} Q-538,${y(8)} -534,${y(0.6)}`, fill: "none", stroke: V("blorb"), "stroke-width": 0.9 }, s);
+  el("path", { d: `M-576.5,${y(12)} Q-582,${y(4)} -587,${y(1)}`, fill: "none", stroke: V("sign"), "stroke-width": 0.9 }, s);
+  // super-jump perch and arc
+  el("rect", { x: -541, y: y(PARK.playground.perch_height), width: 3, height: 0.5, fill: V("ink") }, s);
+  el("line", { x1: -539.5, y1: y(11.5), x2: -539.5, y2: 0, stroke: V("ink"), "stroke-width": 0.25 }, s);
+  el("ellipse", { cx: -537, cy: y(0.6), rx: 0.8, ry: 0.6, fill: V("blorb") }, s);
+  el("path", { d: `M-537,${y(1.2)} Q-537.5,${y(14)} -539.5,${y(12.4)}`, fill: "none", stroke: V("deck"), "stroke-width": 0.35, "stroke-dasharray": "0.8 0.5" }, s);
+  // swing arc from wind tree crown to the Lookout
+  el("line", { x1: -594, y1: y(28), x2: -580, y2: y(21), stroke: V("ink"), "stroke-width": 0.2 }, s);
+  el("path", { d: `M-563.5,${y(20.5)} Q-590,${y(2)} -606,${y(14)}`, fill: "none", stroke: V("park"), "stroke-width": 0.5, "stroke-dasharray": "1 0.6" }, s);
+  // cloud gap
+  [-552, -545, -538].forEach((x, i) => el("ellipse", { cx: x, cy: y(21 + i * 1.2), rx: 2.2, ry: 0.8, fill: V("city"), stroke: V("ink"), "stroke-width": 0.15 }, s));
+  // hoops
+  [[-565, 23], [-552, 26], [-541, 18], [-534, 10]].forEach(([x, h]) => el("ellipse", { cx: x, cy: y(h), rx: 0.5, ry: 1.5, fill: "none", stroke: V("deck"), "stroke-width": 0.35 }, s));
+  // hero for scale
+  el("rect", { x: -584.3, y: y(1.9), width: 0.6, height: 1.9, rx: 0.3, fill: V("ink") }, s);
+  // labels
+  T(-560, -21.6, "Lookout 20 m", 1.9, { "font-weight": 600 }); T(-574, -15.5, "14 m", 1.8); T(-548, -17.5, "16 m", 1.8);
+  T(-594, y(WT + 2.5), `wind tree ${WT} m`, 1.9); T(-526, y(WT + 2.5), `wind tree ${WT} m`, 1.9);
+  T(-567, -5, "great net 6–8 m", 1.6, { fill: V("sign") });
+  T(-537, -14, `super-jump perch ${PARK.playground.perch_height} m`, 1.6);
+  T(-545, -27.5, "cloud gap, 14 m", 1.6); T(-528, -12, "hoops", 1.6, { fill: V("deck") });
+  T(-603, -18, "vine swing", 1.7, { fill: V("park") });
+  T(-584, -3.4, "hero 1.9 m", 1.4); T(-560, 3.6, "pump track · dunes · bounce court · splash pad", 1.7, { class: "lbl mut" });
+  for (let h = 0; h <= 30; h += 10) { el("line", { x1: -630, y1: y(h), x2: -628, y2: y(h), stroke: V("ink"), "stroke-width": 0.2 }, s); T(-626, y(h), h + " m", 1.5, { "text-anchor": "start" }); }
+})();
+
+/* ---------- Skyline section ---------- */
+/* Computed from the plan: every building north of the cut along z = 0 (West
+   Street, the park, Meridian Avenue), looking north, far ones paler. */
+(() => {
+  const W = [-920, -200], H = 300, top = 34, bot = 26;
+  const s = svg("skyline", `${W[0]} ${-H - top} ${W[1] - W[0]} ${H + top + bot}`, "West to east skyline of Moy, computed from the plan, true scale");
+  const y = h => -h;
+  el("rect", { x: W[0], y: -H - top, width: W[1] - W[0], height: H + top, fill: V("paper") }, s);
+  // what stands north of the cut, nearest last
+  const items = [];
+  for (const l of LAYOUT.lots) if (l[1] < 0) items.push({ x0: l[0], x1: l[2], z: Math.min(l[3], 0), h: lotHeight(l), fill: V(DFILL[district((l[0] + l[2]) / 2, (l[1] + l[3]) / 2)]) });
+  for (const b of LAYOUT.buildings) {
+    if (!b.r || b.r[1] >= 0 || Math.hypot((b.r[0] + b.r[2]) / 2 - MOY[0], (b.r[1] + b.r[3]) / 2) > 200) continue;
+    const k = district((b.r[0] + b.r[2]) / 2, (b.r[1] + b.r[3]) / 2);
+    const fill = b.kind === "civic" ? V("civic") : b.kind === "tower" ? V("down") : b.kind === "estate" ? V("estate") : V(DFILL[k]);
+    if (b.part) {
+      items.push({ x0: b.r[0], x1: b.r[2], z: Math.min(b.r[3], 0), h: b.podium || b.height, fill, b });
+      items.push({ x0: b.part[0], x1: b.part[2], z: Math.min(b.part[3], 0), h: b.n === 2 ? b.crown : b.height, fill, b, part: true });
+    } else if (b.angle) {
+      const xs = b.corners.map(c => c[0]), zs = b.corners.map(c => c[1]);
+      items.push({ x0: Math.min(...xs), x1: Math.max(...xs), z: Math.min(Math.max(...zs), 0), h: b.height, fill, b });
+    } else items.push({ x0: b.r[0], x1: b.r[2], z: Math.min(b.r[3], 0), h: b.height, fill, b });
+  }
+  for (const [x, z, h] of PARK.playground.towers) if (z <= 0) items.push({ x0: x - 2.5, x1: x + 2.5, z, h, fill: V("market") });
+  items.sort((a, c) => a.z - c.z);
+  const fade = z => Math.max(0.35, 1 + z / 230);   // z <= 0: nearer is stronger
+  for (const it of items) {
+    const g = el("g", { opacity: fade(it.z) }, s);
+    el("rect", { x: it.x0, y: y(it.h), width: it.x1 - it.x0, height: it.h, fill: it.fill, stroke: V("ink"), "stroke-width": it.z > -8 ? 0.8 : 0.4 }, g);
+    const b = it.b;
+    if (b && b.form === "twist") {
+      el("path", { d: `M${it.x0},${y(it.h)} L${it.x0 + 7},${y(it.h)} L${(it.x0 + it.x1) / 2},${y(b.crown)} L${it.x1 - 7},${y(it.h)} L${it.x1},${y(it.h)}`, fill: V("down"), stroke: V("ink"), "stroke-width": 0.8 }, g);
+      for (const gap of [80, 160, 240]) el("rect", { x: it.x0 + 4, y: y(gap + 9), width: it.x1 - it.x0 - 8, height: 9, fill: V("paper"), stroke: V("ink"), "stroke-width": 0.4 }, g);
+    }
+    if (b && b.form === "deco" && it.part) el("path", { d: `M${it.x0 + 2},${y(it.h)} L${(it.x0 + it.x1) / 2},${y(b.crown - 4)} L${it.x1 - 2},${y(it.h)} Z`, fill: V("park"), stroke: V("ink"), "stroke-width": 0.6 }, g);
+    if (b && b.n === 3) for (let x = it.x0 + 2; x < it.x1 - 4; x += 7) el("path", { d: `M${x},${y(it.h)} Q${x + 1},${y(b.crown)} ${x + 6},${y(b.crown - 0.5)} L${x + 6},${y(it.h)} Z`, fill: V("civic"), stroke: V("ink"), "stroke-width": 0.4 }, g);
+  }
+  // wind trees in the park (north pair)
+  for (const [x, z] of PARK.wind_trees) if (z < 0) {
+    const h = PARK.wind_tree_height;
+    el("line", { x1: x, y1: 0, x2: x, y2: y(h - 3), stroke: V("ink"), "stroke-width": 1 }, s);
+    el("ellipse", { cx: x, cy: y(h - 2), rx: 6, ry: 3, fill: V("park"), stroke: V("ink"), "stroke-width": 0.4 }, s);
+  }
+  // ground, plateau, world's edge
+  el("rect", { x: W[0], y: 0, width: W[1] - W[0], height: bot, fill: V("sand") }, s);
+  el("path", { d: `M-265,0 L-262,-60 L-200,-60 L-200,${bot} L-265,${bot} Z`, fill: V("plateau"), stroke: V("ink"), "stroke-width": 1 }, s);
+  el("line", { x1: -870, y1: -H - top, x2: -870, y2: bot, stroke: V("muted"), "stroke-dasharray": "4 4" }, s);
+  el("line", { x1: -685, y1: y(6.5), x2: -637, y2: y(6.5), class: "deck" }, s);
+  el("line", { x1: -483, y1: y(6.5), x2: -431, y2: y(6.5), class: "deck" }, s);
+  // the two turbines north of the cut
+  const turbine = (tx, phase, op) => {
+    const g = el("g", { opacity: op }, s);
+    el("path", { d: `M${tx - 3},0 L${tx - 1.6},${y(95)} L${tx + 1.6},${y(95)} L${tx + 3},0 Z`, fill: V("city"), stroke: V("ink"), "stroke-width": 0.8 }, g);
+    const r = el("g", { class: "rotor" }, g);
+    el("circle", { cx: tx, cy: y(95), r: 65, fill: "none", opacity: 0 }, r);
+    for (let k = 0; k < 3; k++) {
+      const a = phase + k * 2 * Math.PI / 3, ex = tx + 65 * Math.cos(a), ey = y(95) + 65 * Math.sin(a), nx = -Math.sin(a) * 2.2, ny = Math.cos(a) * 2.2;
+      el("path", { d: `M${tx + nx},${y(95) + ny} L${ex},${ey} L${tx - nx},${y(95) - ny} Z`, fill: V("city"), stroke: V("ink"), "stroke-width": 0.7 }, r);
+    }
+    el("circle", { cx: tx, cy: y(95), r: 2.4, fill: V("sign") }, g);
+  };
+  LAYOUT.turbines.filter(([, z]) => z < 0).forEach(([x, z], i) => turbine(x, -Math.PI / 2 + i * 0.5, 0.75));
+  // labels from the plan
+  const T = (x, yy, t, sz = 8, o = {}) => label(s, x, yy, t, sz, o);
+  const at = n => { const b = BN(n); return [(b.r[0] + b.r[2]) / 2, topOf(b)]; };
+  for (const [n, txt] of [[12, "Windspire"], [14, "north tower"], [1, "Grand Hotel"], [2, "city hall"], [3, "library"], [20, "estate twins"], [19, "Block 3"], [35, "Wing Fat"]]) {
+    const b = BN(n); if (b.r[1] >= 0) continue;
+    const [x, h] = at(n);
+    T(x, y(h + 8), `${txt} · ${Math.round(topOf(b))} m`, n === 12 ? 8.5 : 6.8, n === 12 ? { "font-weight": 600 } : {});
+  }
+  T(-740, -172, "turbine: hub 95 m, tip 160 m", 7.5);
+  T(-232, -70, "main plateau", 7.5);
+  T(-865, -310, "world's edge", 7, { "text-anchor": "start", class: "lbl mut" });
+  T(-560, 14, "W ←   Moy, 400 m, looking north from West Street and Meridian Avenue   → E", 7, { class: "lbl mut" });
+  [-760, -360].forEach(r => { el("line", { x1: r, y1: 0, x2: r, y2: 6, stroke: V("ink"), "stroke-width": 1.2 }, s); T(r, 14, "Rim Walk", 7); });
+  for (let h = 0; h <= 300; h += 50) { el("line", { x1: -915, y1: y(h), x2: -905, y2: y(h), stroke: V("ink"), "stroke-width": 1 }, s); T(-900, y(h), `${h}`, 7, { "text-anchor": "start" }); }
+})();
+
+/* ---------- Downtown's towers ---------- */
+(() => {
+  const s = svg("towers", "0 -318 400 340", "Elevations of the five downtown towers at true scale");
+  const y = h => -h;
+  const T = (x, yy, t, sz, o = {}) => label(s, x, yy, t, sz, Object.assign({ style: "stroke-width:2px" }, o));
+  el("rect", { x: 0, y: -318, width: 400, height: 340, fill: V("paper") }, s);
+  el("rect", { x: 0, y: 0, width: 400, height: 22, fill: V("sand") }, s);
+  const P = (d, fill, o = {}) => el("path", Object.assign({ d, fill, stroke: V("ink"), "stroke-width": 0.7 }, o), s);
+  const L = (x1, y1, x2, y2, st, w = 0.4, o = {}) => el("line", Object.assign({ x1, y1, x2, y2, stroke: st, "stroke-width": w }, o), s);
+  // 1. Windspire: twisting, tapering, three wind gaps, lattice crown
+  { const cx = 50, H = BN(12).height;
+    const half = h => 21 - 7 * (h / H);
+    P(`M${cx - 21},0 L${cx - half(H)},${y(H)} L${cx + half(H)},${y(H)} L${cx + 21},0 Z`, V("down"));
+    for (let k = 0; k < 12; k++) {               // fins spiralling a quarter-turn up the tower
+      let pts = [], prev = null;
+      for (let h = 0; h <= H; h += 4) {
+        const t = h / H, ph = (k / 12) * Math.PI * 2 + t * Math.PI / 2;
+        const u = Math.cos(ph), front = Math.sin(ph) > 0;
+        if (!front) { if (pts.length > 1) el("polyline", { points: pts.join(" "), fill: "none", stroke: V("plateau"), "stroke-width": 0.9 }, s); pts = []; continue; }
+        pts.push(`${cx + u * half(h)},${y(h)}`);
+      }
+      if (pts.length > 1) el("polyline", { points: pts.join(" "), fill: "none", stroke: V("plateau"), "stroke-width": 0.9 }, s);
+    }
+    for (const g of [80, 160, 240]) {
+      el("rect", { x: cx - half(g) + 3, y: y(g + 9), width: 2 * half(g) - 6, height: 9, fill: V("paper"), stroke: V("ink"), "stroke-width": 0.5 }, s);
+      const r = el("g", { class: "rotor" }, s);
+      el("circle", { cx, cy: y(g + 4.5), r: 4.2, fill: "none", opacity: 0 }, r);
+      for (let i = 0; i < 3; i++) { const a = i * 2.094; L(cx, y(g + 4.5), cx + 4.2 * Math.cos(a), y(g + 4.5) + 4.2 * Math.sin(a), V("ink"), 0.8).remove(); el("line", { x1: cx, y1: y(g + 4.5), x2: cx + 4.2 * Math.cos(a), y2: y(g + 4.5) + 4.2 * Math.sin(a), stroke: V("ink"), "stroke-width": 0.8 }, r); }
+    }
+    for (let i = 0; i <= 6; i++) L(cx - 14 + i * 4.7, y(H), cx - 3 + i * 1, y(H + 12), V("ink"), 0.4);
+    L(cx - 14, y(H), cx + 14, y(H), V("ink"), 0.6); L(cx - 4, y(H + 12), cx + 4, y(H + 12), V("ink"), 0.6);
+    el("rect", { x: cx - 1.6, y: y(H + 18), width: 3.2, height: 6, fill: V("city"), stroke: V("ink"), "stroke-width": 0.4 }, s);
+    T(cx, y(BN(12).crown + 16), "Windspire", 6.5, { "font-weight": 600 }); T(cx, y(BN(12).crown + 8), `${BN(12).crown} m`, 5, { class: "lbl mut" });
+    T(cx, 9, "twist · wind gaps · lattice crown", 3.6, { class: "lbl mut" });
+  }
+  // 2. Glass tower: screened, house-mark panels, amber glass crown
+  { const cx = 128, w = 40, H = BN(13).height;
+    P(`M${cx - w / 2},0 L${cx - w / 2},${y(H)} L${cx + w / 2},${y(H)} L${cx + w / 2},0 Z`, V("city"));
+    el("rect", { x: cx - w / 2, y: y(H), width: w, height: 14, fill: V("market"), opacity: 0.7 }, s);
+    for (let h = 4; h < H - 16; h += 7) for (let i = 0; i < 6; i++) {
+      const x = cx - w / 2 + 3.4 + i * 6.6; const open = (h > 110) ? 0.25 : 0.85;
+      el("rect", { x: x - 2.6, y: y(h + 6), width: 5.2, height: 6, fill: V("civic"), opacity: open, stroke: V("ink"), "stroke-width": 0.15 }, s);
+      if ((i + h) % 3 === 0) el("circle", { cx: x, cy: y(h + 3), r: 1.1, fill: V("sign"), opacity: open }, s);
+    }
+    T(cx, y(H + 16), "Glass tower", 6.5, { "font-weight": 600 }); T(cx, y(H + 8), `${H} m`, 5, { class: "lbl mut" });
+    T(cx, 9, "moving screens · house marks", 3.6, { class: "lbl mut" });
+  }
+  // 3. North tower: core with plug-in capsules and a sky garden
+  { const cx = 200, H = BN(14).height;
+    el("rect", { x: cx - 7, y: y(H), width: 14, height: H, fill: V("civic"), stroke: V("ink"), "stroke-width": 0.6 }, s);
+    let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    const tiles = ["down", "market", "lantern", "city", "estate"];
+    for (let h = 4; h < H - 2; h += 7) {
+      if (h > 84 && h < 96) continue;
+      for (const side of [-1, 1]) {
+        const w = 8 + rnd() * 9, hh = 5 + rnd() * 2.5;
+        const x = side < 0 ? cx - 7 - w : cx + 7;
+        el("rect", { x, y: y(h + hh), width: w, height: hh, fill: V(tiles[Math.floor(rnd() * 5)]), stroke: V("ink"), "stroke-width": 0.4 }, s);
+        el("rect", { x: x + (side < 0 ? 1 : w - 3), y: y(h + hh - 1.5), width: 2, height: 2, fill: V("ink"), opacity: 0.5 }, s);
+      }
+    }
+    [cx - 12, cx - 5, cx + 4, cx + 11].forEach(x => el("circle", { cx: x, cy: y(89), r: 2.4, fill: V("park"), stroke: V("ink"), "stroke-width": 0.2 }, s));
+    T(cx + 26, y(90), "sky garden", 3.6, { class: "lbl mut", "text-anchor": "start" });
+    T(cx, y(H + 15), "North tower", 6.5, { "font-weight": 600 }); T(cx, y(H + 7), `${H} m`, 5, { class: "lbl mut" });
+    T(cx, 9, "plug-in capsules", 3.6, { class: "lbl mut" });
+  }
+  // 4. South tower: dune balconies
+  { const cx = 272, w = 34, H = BN(15).height;
+    el("rect", { x: cx - w / 2, y: y(H), width: w, height: H, fill: V("lantern"), stroke: V("ink"), "stroke-width": 0.6 }, s);
+    for (let h = 4; h < H; h += 3.75) {
+      const t = h / H;
+      const l = 3 + 3 * Math.sin(t * 9 + 1) + 1.5 * Math.sin(t * 23);
+      const r = 3 + 3 * Math.sin(t * 9 + 2.6) + 1.5 * Math.sin(t * 19 + 1);
+      L(cx - w / 2 - l, y(h), cx + w / 2 + r, y(h), V("ink"), 0.55);
+    }
+    [cx - 8, cx + 2, cx + 10].forEach(x => el("circle", { cx: x, cy: y(H + 2), r: 2, fill: V("park") }, s));
+    T(cx, y(H + 16), "South tower", 6.5, { "font-weight": 600 }); T(cx, y(H + 8), `${H} m`, 5, { class: "lbl mut" });
+    T(cx, 9, "dune balconies", 3.6, { class: "lbl mut" });
+  }
+  // 5. Grand Hotel guest tower: art deco setbacks, copper pyramid and lantern
+  { const cx = 352, PH = BN(1).podium, TH = BN(1).height, CR = BN(1).crown;
+    el("rect", { x: cx - 26, y: y(PH), width: 52, height: PH, fill: V("civic"), stroke: V("ink"), "stroke-width": 0.6 }, s);
+    P(`M${cx - 16.5},${y(PH)} L${cx - 16.5},${y(TH - 21)} L${cx - 13},${y(TH - 21)} L${cx - 13},${y(TH - 9)} L${cx - 10},${y(TH - 9)} L${cx - 10},${y(TH)} L${cx + 10},${y(TH)} L${cx + 10},${y(TH - 9)} L${cx + 13},${y(TH - 9)} L${cx + 13},${y(TH - 21)} L${cx + 16.5},${y(TH - 21)} L${cx + 16.5},${y(PH)} Z`, V("civic"));
+    for (let x = cx - 14; x <= cx + 14; x += 4) L(x, y(PH), x, y(x > cx - 11 && x < cx + 11 ? TH - 9 : TH - 21), V("ink"), 0.25);
+    P(`M${cx - 10},${y(TH)} L${cx},${y(CR - 4)} L${cx + 10},${y(TH)} Z`, V("park"));
+    el("rect", { x: cx - 1.4, y: y(CR), width: 2.8, height: 4, fill: V("market"), stroke: V("ink"), "stroke-width": 0.3 }, s);
+    T(cx, y(BN(1).crown + 14), "Grand Hotel", 6.5, { "font-weight": 600 }); T(cx, y(BN(1).crown + 6), `${BN(1).crown} m to the lantern`, 5, { class: "lbl mut" });
+    T(cx, 9, "art deco · copper crown", 3.6, { class: "lbl mut" });
+  }
+  for (let h = 0; h <= 300; h += 50) { L(392, y(h), 398, y(h), V("ink"), 0.5); T(390, y(h), h + "", 4, { "text-anchor": "end", class: "lbl mut" }); }
+})();
+
+/* ---------- The Grand Hotel ---------- */
+(() => {
+  // ground floor plan; local x 0..52 west to east, z 0..60 north to south
+  const s = svg("hotelplan", "-12 -12 76 86", "Ground floor plan of the Grand Hotel");
+  const R = (x, z, w, h, fill, o = {}) => el("rect", Object.assign({ x, y: z, width: w, height: h, fill, stroke: V("ink"), "stroke-width": 0.25 }, o), s);
+  const T = (x, y, t, sz, o = {}) => label(s, x, y, t, sz, Object.assign({ style: "stroke-width:0.6px" }, o));
+  el("rect", { x: -12, y: -12, width: 76, height: 86, fill: V("paper") }, s);
+  R(-12, -6, 76, 6, V("city"), { stroke: "none" }); R(-12, 60, 76, 8, V("city"), { stroke: "none" }); R(-12, -6, 8, 74, V("city"), { stroke: "none" });
+  R(-12, 68, 76, 6, V("civic"), { stroke: "none", opacity: 0.6 });
+  R(0, 0, 52, 60, V("civic"), { "stroke-width": 0.6 });
+  R(52, 0, 6, 60, V("down"), { stroke: "none", opacity: 0.5 });
+  // tower outline above (dashed)
+  R(9.5, 2, 33, 22, "none", { "stroke-dasharray": "1 0.6", "stroke-width": 0.35 });
+  // north band rooms
+  R(0, 0, 13, 22, V("lantern"), { opacity: 0.5 }); R(39, 0, 13, 22, V("market"), { opacity: 0.6 });
+  R(20, 8, 12, 9, V("down"), { opacity: 0.8 });
+  el("circle", { cx: 29, cy: 12.5, r: 2.6, fill: "none", stroke: V("ink"), "stroke-width": 0.3 }, s);
+  R(13, 22, 26, 8, V("city"));
+  // atrium
+  R(13, 30, 26, 22, V("city"), { "stroke-width": 0.5 });
+  el("ellipse", { cx: 26, cy: 41, rx: 5, ry: 4, fill: V("plateau"), stroke: V("ink"), "stroke-width": 0.25 }, s);
+  R(24, 39.5, 4, 3, V("civic"));
+  el("path", { d: "M21,50 Q15,44 17,34 L19,34 Q17.5,44 23,50 Z M31,50 Q37,44 35,34 L33,34 Q34.5,44 29,50 Z", fill: V("market"), stroke: V("ink"), "stroke-width": 0.25 }, s);
+  el("circle", { cx: 26, cy: 41, r: 4, fill: "none", stroke: V("sign"), "stroke-width": 0.35, "stroke-dasharray": "0.6 0.5" }, s);
+  // east band: reception, office, concierge; west band: Long Bar
+  R(39, 22, 13, 30, V("civic")); R(41, 32, 2, 12, V("plateau")); R(44, 26, 8, 6, V("estate"), { opacity: 0.7 });
+  R(0, 22, 13, 30, V("lantern"), { opacity: 0.6 }); R(3, 26, 2, 22, V("plateau"));
+  // loggias and vestibule
+  R(0, 56, 52, 4, V("city"), { "stroke-dasharray": "0.8 0.5" }); R(0, 22, 4, 38, "none", { "stroke-dasharray": "0.8 0.5" });
+  for (let x = 2; x < 52; x += 4) el("circle", { cx: x, cy: 58, r: 0.45, fill: V("ink") }, s);
+  R(20, 52, 12, 4, V("city"));
+  el("circle", { cx: 26, cy: 56, r: 1.65, fill: V("paper"), stroke: V("ink"), "stroke-width": 0.35 }, s);
+  [21.2, 30.8].forEach(x => R(x - 1.4, 55.6, 2.8, 0.8, V("deck"), { stroke: "none" }));
+  R(18, 59.5, 16, 2.2, V("plateau"), { opacity: 0.8 });
+  el("circle", { cx: 34, cy: 54, r: 1.2, fill: V("park") }, s);
+  // labels
+  T(26, -3, "Hotel Lane · loading door", 2.2, { class: "lbl mut" });
+  T(26, 64, "Meridian North (the Deck above)", 2.2, { class: "lbl mut" });
+  T(26, 71, "Civic Plaza →  city hall", 2.2, { class: "lbl mut" });
+  T(-8, 30, "Park Ring · the park", 2.2, { class: "lbl mut", transform: "rotate(-90 -8 30)" });
+  T(55, 30, "Windspire podium", 2.2, { class: "lbl mut", transform: "rotate(-90 55 30)" });
+  T(26, 4, "tower above (dashed)", 1.8, { class: "lbl mut" });
+  T(6.5, 11, "bar back", 1.8); T(45.5, 11, "kitchen", 2); T(26, 15, "lifts", 1.9); T(29, 16.6, "ramp", 1.5);
+  T(26, 26, "lift lobby", 2);
+  T(26, 33, "ATRIUM", 2.4, { "font-weight": 600 }); T(26, 46.6, "rock garden", 1.6); T(26, 38.2, "chandelier above", 1.5, { fill: V("sign") });
+  T(17, 47, "ramp", 1.5); T(35, 47, "ramp", 1.5);
+  T(46.5, 38, "reception", 1.9, { transform: "rotate(-90 46.5 38)" }); T(48, 29, "office", 1.7);
+  T(8.5, 37, "Long Bar", 2.2, { transform: "rotate(-90 8.5 37)" });
+  T(26, 53.8, "vestibule", 1.6); T(26, 60.9, "marquise", 1.6);
+  T(36.5, 54.4, "Iris", 1.5); T(10, 58, "loggia", 1.7); T(2, 45, "loggia", 1.5, { transform: "rotate(-90 2 45)" });
+  T(-9, -9, "N ↑", 2.6, { "font-weight": 600, "text-anchor": "start" });
+  el("line", { x1: 40, y1: 72, x2: 50, y2: 72, stroke: V("ink"), "stroke-width": 0.4 }, s); T(45, 70.4, "10 m", 1.7);
+})();
+
+(() => {
+  // north-south section: local z 0 (north, Hotel Lane) .. 60 (south, plaza), heights 0..106
+  const s = svg("hotelsection", "-14 -110 92 118", "North-south section through the Grand Hotel");
+  const y = h => -h;
+  const R = (x, h0, w, h, fill, o = {}) => el("rect", Object.assign({ x, y: y(h0 + h), width: w, height: h, fill, stroke: V("ink"), "stroke-width": 0.25 }, o), s);
+  const T = (x, yy, t, sz, o = {}) => label(s, x, yy, t, sz, Object.assign({ style: "stroke-width:0.6px" }, o));
+  el("rect", { x: -14, y: -110, width: 92, height: 118, fill: V("paper") }, s);
+  el("rect", { x: -14, y: 0, width: 92, height: 8, fill: V("sand") }, s);
+  // podium north band (levels) and south loggia
+  R(0, 0, 30, 6.5, V("civic")); R(0, 6.5, 30, 5, V("civic")); R(0, 11.5, 30, 4.25, V("civic")); R(0, 15.75, 30, 4.25, V("civic"));
+  R(52, 0, 8, 6.5, V("city"), { "stroke-dasharray": "0.6 0.4" }); R(52, 6.5, 8, 13.5, V("civic"));
+  // atrium void with galleries
+  R(30, 0, 22, 20, V("city"), { "stroke-width": 0.2 });
+  [6.5, 11.5, 15.75].forEach(h => { R(30, h, 2.4, 0.4, V("ink")); R(49.6, h, 2.4, 0.4, V("ink")); });
+  // lantern roof
+  el("path", { d: `M30,${y(20)} L33,${y(24)} L49,${y(24)} L52,${y(20)} Z`, fill: V("blorb"), opacity: 0.3, stroke: V("ink"), "stroke-width": 0.3 }, s);
+  // chandelier
+  el("line", { x1: 41, y1: y(24), x2: 41, y2: y(16), stroke: V("ink"), "stroke-width": 0.2 }, s);
+  el("path", { d: `M37,${y(16)} L45,${y(16)} L43.5,${y(11)} L42,${y(7)} L40,${y(7)} L38.5,${y(11)} Z`, fill: V("market"), stroke: V("sign"), "stroke-width": 0.3 }, s);
+  // rock garden and ramp
+  el("ellipse", { cx: 41, cy: y(0.8), rx: 4, ry: 0.8, fill: V("plateau") }, s);
+  el("path", { d: `M35,${y(0)} Q42,${y(3)} 49.6,${y(6.5)}`, fill: "none", stroke: V("ink"), "stroke-width": 0.5 }, s);
+  // roof garden and wind tower
+  R(2, 20, 3, 6, V("civic")); R(53, 20, 3, 6, V("civic"));
+  [10, 20, 56.5].forEach(z => el("circle", { cx: z, cy: y(21.8), r: 1.6, fill: V("park") }, s));
+  // tower: 21 floors 20..91 on the north band (z 2..24)
+  for (let f = 0; f < 21; f++) R(2, 20 + f * 3.4, 22, 3.4, f === 19 ? V("market") : f === 20 ? V("lantern") : f >= 14 ? V("estate") : V("city"), { "stroke-width": 0.15 });
+  R(10, 20, 6, 71.4, V("down"), { opacity: 0.6, "stroke-width": 0.2 });
+  // setbacks and crown
+  R(3.5, 91.4, 19, 2, V("civic")); el("path", { d: `M4.5,${y(93.4)} L13,${y(102)} L21.5,${y(93.4)} Z`, fill: V("park"), stroke: V("ink"), "stroke-width": 0.3 }, s);
+  R(11.8, 102, 2.4, 3, V("market"));
+  R(8, 94, 10, 3.5, V("blorb"), { opacity: 0.35 });
+  // labels
+  T(13, -1.5, "Hotel Lane", 1.7, { class: "lbl mut" }); T(56, 3, "loggia", 1.6); T(56, -1.5, "plaza →", 1.7, { class: "lbl mut" });
+  T(15, 3.2, "kitchen · lifts · lift lobby", 1.6); T(15, y(9), "mezzanine +6.5 (the Deck)", 1.6); T(15, y(13.6), "function rooms", 1.5); T(15, y(17.9), "offices", 1.5);
+  T(41, 3.2, "atrium · rock garden", 1.6); T(46, y(13.5), "chandelier", 1.6, { fill: V("sign") }); T(41, y(26), "lantern roof", 1.6);
+  T(30, y(22.5), "roof garden · wind towers", 1.6);
+  T(28, y(45), "guest rooms, floors 1–14", 1.7, { "text-anchor": "start" }); T(28, y(77), "long-stay residences, 15–19", 1.7, { "text-anchor": "start" });
+  T(28, y(86.8), "floor 20: the party's suite", 1.7, { "text-anchor": "start", "font-weight": 600 }); T(28, y(90.2), "floor 21: Lucinda's flat", 1.7, { "text-anchor": "start" });
+  T(13, y(70), "core", 1.6, { transform: "rotate(-90 13 -70)" });
+  T(28, y(97), "copper crown · water tanks · lantern", 1.7, { "text-anchor": "start" });
+  for (let h = 0; h <= 100; h += 20) { el("line", { x1: -10, y1: y(h), x2: -8, y2: y(h), stroke: V("ink"), "stroke-width": 0.25 }, s); T(-7, y(h), h + " m", 1.6, { "text-anchor": "start" }); }
+})();
+
+/* ---------- The library ---------- */
+(() => {
+  // ground plan; local x 0..45 west to east, z 0..62 north to south
+  const s = svg("libplan", "-12 -12 69 88", "Ground floor plan of the library");
+  const R = (x, z, w, h, fill, o = {}) => el("rect", Object.assign({ x, y: z, width: w, height: h, fill, stroke: V("ink"), "stroke-width": 0.25 }, o), s);
+  const T = (x, y, t, sz, o = {}) => label(s, x, y, t, sz, Object.assign({ style: "stroke-width:0.6px" }, o));
+  el("rect", { x: -12, y: -12, width: 69, height: 88, fill: V("paper") }, s);
+  R(-12, -6, 69, 6, V("city"), { stroke: "none" }); R(-12, 0, 8, 76, V("city"), { stroke: "none" }); R(45, 0, 4, 76, V("city"), { stroke: "none" });
+  R(-4, 46, 49, 30, V("city"), { stroke: "none" });
+  // the building: an open book, concave to the square
+  el("path", { d: "M0,0 H45 V62 Q22.5,46 0,62 Z", fill: V("civic"), stroke: V("ink"), "stroke-width": 0.6 }, s);
+  // north band
+  R(0, 0, 8, 8, V("civic")); el("circle", { cx: 4, cy: 4, r: 2.6, fill: "none", stroke: V("ink"), "stroke-width": 0.3 }, s);
+  R(10, 0, 25, 8, V("market"), { opacity: 0.6 }); R(37, 0, 8, 8, V("down"), { opacity: 0.7 });
+  // west wing: children's library and garden court
+  R(0, 10, 10, 30, V("lantern"), { opacity: 0.6 }); R(2, 28, 6, 9, V("lawn"));
+  // east wing: lifts and washrooms
+  R(35, 10, 10, 30, V("civic")); R(37, 26, 6, 8, V("down"), { opacity: 0.7 });
+  // the Great Hall with its gallery ring, columns, corner ramps and tables
+  R(10, 8, 25, 32, V("city"), { "stroke-width": 0.5 });
+  R(12.5, 10.5, 20, 27, "none", { "stroke-dasharray": "0.8 0.5", "stroke-width": 0.3 });
+  for (let x = 12.5; x <= 32.6; x += 5) [10.5, 37.5].forEach(z => el("circle", { cx: x, cy: z, r: 0.35, fill: V("ink") }, s));
+  for (let z = 15.5; z <= 32.6; z += 5.5) [12.5, 32.5].forEach(x => el("circle", { cx: x, cy: z, r: 0.35, fill: V("ink") }, s));
+  el("path", { d: "M10.4,13.5 Q10.4,8.4 15.5,8.4", fill: "none", stroke: V("market"), "stroke-width": 1.6 }, s);
+  el("path", { d: "M34.6,13.5 Q34.6,8.4 29.5,8.4", fill: "none", stroke: V("market"), "stroke-width": 1.6 }, s);
+  for (let z = 14; z < 36; z += 4.5) { R(16, z, 13, 1.8, V("plateau")); [17.5, 22.5, 27.5].forEach(x => el("circle", { cx: x, cy: z + 0.9, r: 0.45, fill: V("park") }, s)); }
+  R(13, 12, 19, 24, "none", { stroke: V("lantern"), "stroke-width": 0.2, "stroke-dasharray": "1 0.7" });
+  // welcome hall behind the stone front, the portal at the spine
+  el("path", { d: "M0,40 H45 V62 Q22.5,46 0,62 Z", fill: V("blorb"), opacity: 0.12, stroke: "none" }, s);
+  R(18, 44, 9, 2, V("plateau"));
+  for (const x of [3, 8, 13, 32, 37, 42]) { const z = 62 - 16 * (1 - Math.pow((x - 22.5) / 22.5, 2)) / 2; el("rect", { x: x - 0.7, y: z - 0.7, width: 1.4, height: 1.4, fill: V("civic"), stroke: V("ink"), "stroke-width": 0.2 }, s); }
+  el("path", { d: "M17.5,54.2 L18.5,51 L26.5,51 L27.5,54.2", fill: "none", stroke: V("market"), "stroke-width": 0.8 }, s);
+  // sitting steps on the square, following the curve
+  for (let i = 1; i <= 3; i++) el("path", { d: `M${-2 - i},${62 + i * 1.6} Q22.5,${46 + i * 1.6 + 2} ${47 + i},${62 + i * 1.6}`, fill: "none", stroke: V("ink"), "stroke-width": 0.25 }, s);
+  // labels
+  T(22.5, -3, "Library Lane · loading door", 2.2, { class: "lbl mut" });
+  T(-8, 30, "Arcade Street", 2.2, { class: "lbl mut", transform: "rotate(-90 -8 30)" });
+  T(47, 30, "Garden Walk", 2, { class: "lbl mut", transform: "rotate(-90 47 30)" });
+  T(22.5, 73, "Library Square · the park beyond", 2.2, { class: "lbl mut" });
+  T(4, 9.6, "ramp", 1.4); T(22.5, 4, "sorting · stacks above", 1.9); T(41, 4, "service", 1.6);
+  T(5, 18, "children's", 1.7); T(5, 20.4, "library", 1.7); T(5, 32.5, "garden", 1.5); T(5, 34.5, "court", 1.5);
+  T(40, 20, "lifts", 1.7); T(40, 36.5, "WC", 1.6);
+  T(22.5, 11.2, "galleries above (dashed)", 1.5, { class: "lbl mut" });
+  T(22.5, 25, "GREAT HALL", 2.4, { "font-weight": 600 }); T(14.5, 9.6, "ramp", 1.3); T(30.5, 9.6, "ramp", 1.3);
+  T(22.5, 39, "heritage room below", 1.5, { class: "lbl mut" });
+  T(22.5, 43, "lending desk", 1.6); T(8, 46, "welcome hall", 1.8); T(37, 46, "welcome hall", 1.8);
+  T(22.5, 49.4, "portal", 1.8, { "font-weight": 600 }); T(22.5, 65, "sitting steps", 1.7);
+  T(-9, -9, "N ↑", 2.6, { "font-weight": 600, "text-anchor": "start" });
+  el("line", { x1: -10, y1: 74, x2: 0, y2: 74, stroke: V("ink"), "stroke-width": 0.4 }, s); T(-5, 72.4, "10 m", 1.7);
+})();
+
+(() => {
+  // north-south section: z 0 (north) .. 62 (south); heights -5..27
+  const s = svg("libsection", "-12 -32 86 44", "North-south section through the library");
+  const y = h => -h;
+  const R = (x, h0, w, h, fill, o = {}) => el("rect", Object.assign({ x, y: y(h0 + h), width: w, height: h, fill, stroke: V("ink"), "stroke-width": 0.25 }, o), s);
+  const T = (x, yy, t, sz, o = {}) => label(s, x, yy, t, sz, Object.assign({ style: "stroke-width:0.6px" }, o));
+  el("rect", { x: -12, y: -32, width: 86, height: 44, fill: V("paper") }, s);
+  el("rect", { x: -12, y: 0, width: 86, height: 12, fill: V("sand") }, s);
+  // heritage room under the hall
+  R(8, -4.5, 32, 4.5, V("lantern"), { opacity: 0.8 });
+  for (let x = 9; x < 40; x += 2) el("line", { x1: x, y1: y(-0.6), x2: x, y2: y(-4.2), stroke: V("plateau"), "stroke-width": 0.5 }, s);
+  // north band floors
+  [[0, 6.5], [6.5, 4.5], [11, 4.5], [15.5, 6.5]].forEach(([h0, hh]) => R(0, h0, 8, hh, V("civic")));
+  // front: welcome hall and upper floors
+  R(40, 0, 14, 6.5, V("blorb"), { opacity: 0.18 }); R(40, 6.5, 14, 15.5, V("civic"));
+  // the Great Hall: walls of shelves and four galleries each side
+  R(8, 0, 32, 22, V("city"), { "stroke-width": 0.3 });
+  R(8, 0, 0.6, 22, V("plateau"), { stroke: "none" }); R(39.4, 0, 0.6, 22, V("plateau"), { stroke: "none" });
+  [6.5, 9, 11.5, 14].forEach(h => {
+    R(8, h, 2.5, 0.35, V("ink")); R(37.5, h, 2.5, 0.35, V("ink"));
+    el("line", { x1: 10.5, y1: y(h), x2: 10.5, y2: y(h + 1.1), stroke: V("ink"), "stroke-width": 0.2 }, s);
+    el("line", { x1: 37.5, y1: y(h), x2: 37.5, y2: y(h + 1.1), stroke: V("ink"), "stroke-width": 0.2 }, s);
+  });
+  el("line", { x1: 10.5, y1: 0, x2: 10.5, y2: y(14), stroke: V("ink"), "stroke-width": 0.3 }, s);
+  el("line", { x1: 37.5, y1: 0, x2: 37.5, y2: y(14), stroke: V("ink"), "stroke-width": 0.3 }, s);
+  for (let z = 16; z < 34; z += 4.5) { R(z, 0.75, 3, 0.25, V("plateau")); el("circle", { cx: z + 1.5, cy: y(1.4), r: 0.35, fill: V("park") }, s); }
+  // skylight and lantern
+  el("path", { d: `M8,${y(22)} L12,${y(24)} L36,${y(24)} L40,${y(22)} Z`, fill: V("blorb"), opacity: 0.3, stroke: V("ink"), "stroke-width": 0.3 }, s);
+  R(16, 24, 16, 2, V("civic")); for (let x = 17; x < 32; x += 1.5) el("line", { x1: x, y1: y(24.2), x2: x + 0.6, y2: y(25.8), stroke: V("ink"), "stroke-width": 0.15 }, s);
+  // the portal at the spine (front), the parapet
+  R(54, 0, 0.6, 15, V("market"), { stroke: "none" }); R(40, 22, 14, 1.2, V("civic")); R(43, 23.2, 8, 0.8, V("civic"));
+  el("line", { x1: 54, y1: y(6.5), x2: 66, y2: y(6.5), class: "deck", style: "stroke-width:0.7px;stroke-dasharray:1.5 1" }, s);
+  // labels
+  T(3, 7.5, "← Library Lane", 1.6, { class: "lbl mut" }); T(64, 3, "→ Library Square", 1.7, { class: "lbl mut" });
+  T(24, y(-2.3), "heritage room · old floorboards · Nia's maps", 1.5);
+  T(4, y(3.2), "sorting", 1.4); T(4, y(13.2), "stacks", 1.4);
+  T(24, y(3.2), "GREAT HALL · tables · green lamps", 1.7, { "font-weight": 600 });
+  T(24, y(10), "four tiers of galleries, shelved walls", 1.6);
+  T(24, y(27.6), "louvred lantern · skylight", 1.6);
+  T(47, y(3.2), "welcome hall", 1.6); T(47, y(13), "upper floors", 1.5); T(57.5, y(16), "portal 15 m", 1.5, { fill: V("market") });
+  T(62, y(8.2), "Deck", 1.5, { fill: V("deck") });
+  for (let h = 0; h <= 25; h += 5) { el("line", { x1: -10, y1: y(h), x2: -8, y2: y(h), stroke: V("ink"), "stroke-width": 0.25 }, s); T(-7, y(h), h + " m", 1.5, { "text-anchor": "start" }); }
+})();
+
+/* ---------- City hall: the exterior ---------- */
+// massing (city.md 8a.4): wings +14, front block +22, clerestory +16.5,
+// east range +18, tower 8 x 8 m to +42 with its lantern to +45
+const CH = { wing: 14, front: 22, clere: 16.5, east: 18, shaft: 42, top: 45, clock: 34, entab: 8.8, balcony: 11, bands: [13.4, 15.8, 18.2, 20.6] };
+function chClimb(s, pts) {
+  el("polyline", { points: pts.map(([x, h]) => x + "," + (-h)).join(" "), fill: "none", stroke: V("blorb"), "stroke-width": 0.35, "stroke-dasharray": "0.7 0.6" }, s);
+  pts.forEach(([x, h]) => el("circle", { cx: x, cy: -h, r: 0.45, fill: V("blorb") }, s));
+}
+function chHero(s, x, h0) { el("rect", { x: x - 0.3, y: -(h0 + 1.9), width: 0.6, height: 1.9, rx: 0.3, fill: V("ink") }, s); }
+
+(() => {
+  // west front on Civic Plaza, looking east: across the page z 0 (north, left) .. 60 (south)
+  const s = svg("chwest", "-10 -50 80 58", "West front of city hall on Civic Plaza");
+  const y = h => -h;
+  const R = (x, h0, w, h, fill, o = {}) => el("rect", Object.assign({ x, y: y(h0 + h), width: w, height: h, fill, stroke: V("ink"), "stroke-width": 0.25 }, o), s);
+  const T = (x, yy, t, sz, o = {}) => label(s, x, yy, t, sz, Object.assign({ style: "stroke-width:0.6px" }, o));
+  el("rect", { x: -10, y: -50, width: 80, height: 58, fill: V("paper") }, s);
+  el("rect", { x: -10, y: 0, width: 80, height: 8, fill: V("city") }, s);
+  // the clock tower behind, z 26..34
+  R(26, CH.front, 8, CH.clock - 3 - CH.front, V("civic"));
+  R(26.6, CH.clock - 3, 6.8, 6, V("civic"));
+  el("circle", { cx: 30, cy: y(CH.clock), r: 2.5, fill: V("paper"), stroke: V("market"), "stroke-width": 0.7 }, s);
+  el("line", { x1: 30, y1: y(CH.clock), x2: 30, y2: y(CH.clock + 1.8), stroke: V("ink"), "stroke-width": 0.3 }, s);
+  el("line", { x1: 30, y1: y(CH.clock), x2: 31.3, y2: y(CH.clock - 0.5), stroke: V("ink"), "stroke-width": 0.3 }, s);
+  R(26.6, CH.clock + 3, 6.8, 37 - CH.clock - 3, V("civic"));
+  R(26.6, 37, 6.8, 5, V("ink"), { opacity: 0.55 }); [26.6, 32.4].forEach(x => R(x, 37, 1, 5, V("civic")));
+  el("path", { d: `M29,${y(38.2)} Q30,${y(41.4)} 31,${y(38.2)} Z`, fill: V("market"), stroke: V("ink"), "stroke-width": 0.2 }, s);
+  el("path", { d: `M26,${y(42)} L34,${y(42)} L34,${y(42.8)} L32.6,${y(42.8)} L32.6,${y(43.8)} L31,${y(43.8)} L31,${y(45)} L29,${y(45)} L29,${y(43.8)} L27.4,${y(43.8)} L27.4,${y(42.8)} L26,${y(42.8)} Z`, fill: V("civic"), stroke: V("ink"), "stroke-width": 0.25 }, s);
+  el("circle", { cx: 30, cy: y(44.3), r: 0.6, fill: V("sign") }, s);
+  for (const h of [24.4, 26.8, 29.2]) el("line", { x1: 26, y1: y(h), x2: 34, y2: y(h), stroke: V("ink"), "stroke-width": 0.15 }, s);
+  // the wings, north (z 0..15) and south (z 45..60)
+  for (const z0 of [0, 45]) {
+    R(z0, 0, 15, CH.wing, V("civic"));
+    [[2.2, 3.2], [8.8, 3.2]].forEach(([h, hh]) => R(z0 + 1, h, 13, hh, V("market"), { opacity: 0.55, "stroke-width": 0.15 }));
+    R(z0 - (z0 ? 0 : 0.6), 6.5, 15.6, 0.45, V("civic"), { "stroke-width": 0.3 });
+    R(z0, CH.wing - 0.5, 15, 0.5, V("market"), { opacity: 0.7, "stroke-width": 0.1 });
+  }
+  // the front block, z 15..45
+  R(15, 0, 30, CH.front, V("civic"), { "stroke-width": 0.4 });
+  R(15, CH.front - 0.8, 30, 0.8, V("market"), { opacity: 0.7, "stroke-width": 0.1 });
+  // portico: shadow, three pairs of bronze doors, six piers, entablature
+  R(15.6, 1.2, 28.8, 5.3, V("ink"), { opacity: 0.6, stroke: "none" });
+  for (const zc of [25, 30, 35]) {
+    R(zc - 1.6, 1.2, 3.2, 4.4, V("market"), { "stroke-width": 0.2 });
+    el("line", { x1: zc, y1: y(1.2), x2: zc, y2: y(5.6), stroke: V("ink"), "stroke-width": 0.15 }, s);
+    [[zc - 0.8, 3.4], [zc + 0.8, 3.4]].forEach(([x, h]) => el("circle", { cx: x, cy: y(h), r: 0.35, fill: "none", stroke: V("ink"), "stroke-width": 0.12 }, s));
+  }
+  for (let i = 0; i < 6; i++) R(16.3 + i * 5.48, 1.2, 1.4, 5.3, V("civic"));
+  R(15, 6.5, 30, CH.entab - 6.5, V("civic"), { "stroke-width": 0.3 });
+  R(21.6, 2.4, 1.2, 1.2, V("market"), { "stroke-width": 0.15 });
+  // steps
+  [[14.4, 0, 31.2], [14.8, 0.4, 30.4], [15.2, 0.8, 29.6]].forEach(([x, h, w]) => R(x, h, w, 0.4, V("civic"), { "stroke-width": 0.15 }));
+  // chamber: five tall windows, the middle three the balcony doors; bands on the piers
+  for (let i = 0; i < 5; i++) {
+    const zc = 18.8 + i * 5.6, mid = i > 0 && i < 4;
+    R(zc - 1, mid ? CH.balcony : CH.balcony + 0.4, 2, 19.6 - (mid ? CH.balcony : CH.balcony + 0.4), V("market"), { "stroke-width": 0.2 });
+  }
+  for (const h of CH.bands) el("line", { x1: 15, y1: y(h), x2: 45, y2: y(h), stroke: V("ink"), "stroke-width": 0.12, opacity: 0.6 }, s);
+  // balcony with its rail of house marks
+  R(21, CH.balcony - 0.4, 18, 0.4, V("civic"), { "stroke-width": 0.3 });
+  R(21, CH.balcony, 18, 1.1, "none", { stroke: V("market"), "stroke-width": 0.3 });
+  for (let z = 21.8; z < 39; z += 1.3) el("circle", { cx: z, cy: y(CH.balcony + 0.55), r: 0.3, fill: "none", stroke: V("market"), "stroke-width": 0.15 }, s);
+  // climb and hero
+  chClimb(s, [[13, 1.2], [13.5, 6.5], [15.4, CH.entab], [19, CH.balcony], [18, CH.bands[0]], [16.6, CH.bands[1]], [18, CH.bands[2]], [16.6, CH.bands[3]], [17.4, CH.front]]);
+  chHero(s, 11, 0);
+  // labels
+  const L = (x, h, t, sz = 1.5, o = {}) => T(x, y(h), t, sz, o);
+  L(7.5, -2.4, "Meridian North ←", 1.5, { class: "lbl mut" }); L(52.5, -2.4, "→ Meridian South", 1.5, { class: "lbl mut" });
+  L(30, -5.5, "Civic Plaza · the civic axis to the park and the library", 1.6, { class: "lbl mut" });
+  L(7.5, 16, "wing +14", 1.5); L(52.5, 16, "wing +14", 1.5);
+  
+  L(30, 23.3, "parapet +22", 1.3); L(36.5, 46.6, "lantern 45 m", 1.5, { "text-anchor": "start" });
+  L(35.2, CH.clock, "clock", 1.5, { "text-anchor": "start" }); L(35.2, 39.5, "belfry", 1.5, { "text-anchor": "start" });
+  L(46.5, CH.balcony + 0.6, "balcony", 1.4, { "text-anchor": "start" }); L(46.5, 19, "chamber", 1.4, { "text-anchor": "start" });
+  L(11, 2.6, "hero", 1.3); L(10.5, 10, "climb", 1.4, { fill: V("blorb"), "text-anchor": "end" });
+  for (let h = 0; h <= 40; h += 10) { el("line", { x1: -8, y1: y(h), x2: -6.5, y2: y(h), stroke: V("ink"), "stroke-width": 0.25 }, s); T(-6, y(h), h + " m", 1.5, { "text-anchor": "start" }); }
+})();
+
+(() => {
+  // north side on Meridian North, looking south: x 0 (plaza, left) .. 34 (Clock Street)
+  const s = svg("chnorth", "-16 -50 74 58", "North side of city hall on Meridian North");
+  const y = h => -h;
+  const R = (x, h0, w, h, fill, o = {}) => el("rect", Object.assign({ x, y: y(h0 + h), width: w, height: h, fill, stroke: V("ink"), "stroke-width": 0.25 }, o), s);
+  const T = (x, yy, t, sz, o = {}) => label(s, x, yy, t, sz, Object.assign({ style: "stroke-width:0.6px" }, o));
+  el("rect", { x: -16, y: -50, width: 74, height: 58, fill: V("paper") }, s);
+  el("rect", { x: -16, y: 0, width: 74, height: 8, fill: V("city") }, s);
+  // behind: the front block's side to +22, the clerestory to +16.5
+  R(0, CH.wing, 10, CH.front - CH.wing, V("civic"), { opacity: 0.85 });
+  R(10, CH.wing, 16, CH.clere - CH.wing, V("civic"), { opacity: 0.85 });
+  for (let x = 10.8; x < 26; x += 0.9) el("line", { x1: x, y1: y(CH.wing + 0.2), x2: x, y2: y(CH.clere - 0.3), stroke: V("market"), "stroke-width": 0.3 }, s);
+  // the tower, set back on the east range
+  R(26, CH.east, 8, CH.clock - 3 - CH.east, V("civic"));
+  R(26.6, CH.clock - 3, 6.8, 6, V("civic"));
+  el("circle", { cx: 30, cy: y(CH.clock), r: 2.5, fill: V("paper"), stroke: V("market"), "stroke-width": 0.7 }, s);
+  el("line", { x1: 30, y1: y(CH.clock), x2: 30, y2: y(CH.clock + 1.8), stroke: V("ink"), "stroke-width": 0.3 }, s);
+  el("line", { x1: 30, y1: y(CH.clock), x2: 31.3, y2: y(CH.clock - 0.5), stroke: V("ink"), "stroke-width": 0.3 }, s);
+  R(26.6, CH.clock + 3, 6.8, 37 - CH.clock - 3, V("civic"));
+  R(26.6, 37, 6.8, 5, V("ink"), { opacity: 0.55 }); [26.6, 32.4].forEach(x => R(x, 37, 1, 5, V("civic")));
+  el("path", { d: `M29,${y(38.2)} Q30,${y(41.4)} 31,${y(38.2)} Z`, fill: V("market"), stroke: V("ink"), "stroke-width": 0.2 }, s);
+  el("path", { d: `M26,${y(42)} L34,${y(42)} L34,${y(42.8)} L32.6,${y(42.8)} L32.6,${y(43.8)} L31,${y(43.8)} L31,${y(45)} L29,${y(45)} L29,${y(43.8)} L27.4,${y(43.8)} L27.4,${y(42.8)} L26,${y(42.8)} Z`, fill: V("civic"), stroke: V("ink"), "stroke-width": 0.25 }, s);
+  el("circle", { cx: 30, cy: y(44.3), r: 0.6, fill: V("sign") }, s);
+  for (let h = CH.east + 2.4; h < CH.clock - 3; h += 2.4) el("line", { x1: 26, y1: y(h), x2: 34, y2: y(h), stroke: V("ink"), "stroke-width": 0.15 }, s);
+  // front plane: the north wing and the east range
+  R(0, 0, 26, CH.wing, V("civic"), { "stroke-width": 0.4 });
+  [[2.2, 3.2], [8.8, 3.2]].forEach(([h, hh]) => R(1, h, 24, hh, V("market"), { opacity: 0.55, "stroke-width": 0.15 }));
+  R(-0.6, 6.5, 27, 0.45, V("civic"), { "stroke-width": 0.3 });
+  R(15.5, 6.95, 4, 3.4, V("market"), { "stroke-width": 0.25 });
+  R(26, 0, 8, CH.east, V("civic"), { "stroke-width": 0.4 });
+  for (const x of [27.6, 30, 32.4]) R(x - 0.3, 2, 0.6, 14, V("market"), { opacity: 0.55, "stroke-width": 0.1 });
+  // the portico seen side-on at the west end
+  R(0, 1.2, 4, 5.3, V("ink"), { opacity: 0.35, stroke: "none" });
+  // the Deck at +6.5 arriving at the door
+  el("rect", { x: -16, y: y(6.9), width: 33.5, height: 0.6, fill: V("deck") }, s);
+  // climb up the tower
+  chClimb(s, [[35, CH.east], [35.4, CH.east + 2.4], [34.6, CH.east + 4.8], [35.4, CH.east + 7.2], [34.6, CH.east + 9.6], [35.4, CH.east + 12], [34.6, CH.east + 14.4], [33.6, CH.clock - 1.4], [32.8, 37], [30, CH.top]]);
+  // labels
+  const L = (x, h, t, sz = 1.5, o = {}) => T(x, y(h), t, sz, o);
+  L(-6, -2.4, "← Civic Plaza", 1.5, { class: "lbl mut" }); L(40, -2.4, "Clock Street →", 1.5, { class: "lbl mut" });
+  L(-8, 8.2, "the Deck +6.5", 1.5, { fill: V("deck") }); L(17.5, 11.6, "Deck door", 1.3);
+  L(13, 5.8, "window bands", 1.3); L(18, 15.4, "louvred clerestory", 1.3);
+  L(5, 18, "front block", 1.3); L(30, 9, "east range", 1.3, { transform: `rotate(-90 30 ${y(9)})` });
+  L(36.5, CH.clock, "clock 34 m", 1.4, { "text-anchor": "start" }); L(37.2, 24, "bands every 2.4 m", 1.3, { "text-anchor": "start", fill: V("blorb") });
+  L(36.5, 39.5, "belfry", 1.4, { "text-anchor": "start" }); L(32, 46.8, "lantern: swing anchor", 1.4, { "text-anchor": "start" });
+  for (let h = 0; h <= 40; h += 10) { el("line", { x1: -14, y1: y(h), x2: -12.5, y2: y(h), stroke: V("ink"), "stroke-width": 0.25 }, s); T(-12, y(h), h + " m", 1.5, { "text-anchor": "start" }); }
+})();
+
+/* ---------- The North Estate ---------- */
+(() => {
+  const s = svg("estateplan", "-700 -206 226 152", "Plan of the North Estate's two precincts");
+  drawCity(s, "zoom");
+  const T = (x, y, t, sz, o = {}) => label(s, x, y, t, sz, Object.assign({ style: "stroke-width:0.8px" }, o));
+  const E = LAYOUT.estate;
+  for (const b of LAYOUT.buildings) {
+    if (!b.r || (b.kind !== "estate" && ![23, 51, 3].includes(b.n))) continue;
+    const cx = (b.r[0] + b.r[2]) / 2, cz = (b.r[1] + b.r[3]) / 2, vert = (b.r[3] - b.r[1]) > (b.r[2] - b.r[0]) * 1.6;
+    const st = (b.h.match(/(\d+) storey/) || [])[1];
+    const rot = vert ? { transform: `rotate(-90 ${cx} ${cz})` } : {};
+    if (b.kind === "estate" && b.angle) {
+      let a = b.angle + (vert ? -90 : 0); if (a < -90) a += 180; const t = a * Math.PI / 180, off = (k) => [cx - Math.sin(t) * k, cz + Math.cos(t) * k];
+      const [nx, nz] = off(-2.2), [sx, sz] = off(2.6);
+      T(nx, nz, b.name, 3.6, { "font-weight": 600, transform: `rotate(${a} ${nx} ${nz})` });
+      T(sx, sz, st + " storeys", 2.8, { transform: `rotate(${a} ${sx} ${sz})` });
+    } else if (b.kind === "estate") {
+      T(cx, cz - (vert ? 0 : 2.4), b.name, 3.6, Object.assign({ "font-weight": 600 }, vert ? { transform: `rotate(-90 ${cx} ${cz})`, x: cx - 3, y: cz } : {}));
+      T(vert ? cx + 3.2 : cx, cz + (vert ? 0 : 2.6), st + " storeys", 2.8, Object.assign({}, vert ? { transform: `rotate(-90 ${cx + 3.2} ${cz})` } : {}));
+    } else {
+      T(cx, cz, { 23: "hawker centre", 51: "centre", 3: "library" }[b.n], 3.2, rot);
+    }
+  }
+  const mid = pts => [pts.reduce((a, q) => a + q[0], 0) / pts.length, pts.reduce((a, q) => a + q[1], 0) / pts.length];
+  const turnT = (pts, t, sz, o = {}) => { const [x, z] = mid(pts); T(x, z, t, sz, Object.assign({ transform: `rotate(-30 ${x} ${z})` }, o)); };
+  { const [x, z] = mid(E.courts[0]); T(x + 4, z - 3, "WEST COURT", 3.6, { "font-weight": 600, transform: `rotate(-30 ${x + 4} ${z - 3})` }); }
+  T(-522, -154, "EAST COURT", 3, { "font-weight": 600 });
+  turnT(E.garden, "community garden", 3);
+  { const [x, z] = mid(E.sky_bridge); T(x + 10, z + 3, "sky bridge, 26th fl.", 2.2, { "text-anchor": "start" }); }
+  { const [x, z] = mid(E.gate); T(x + 3, z + 8, "gate", 2.6); }
+  E.playgrounds.forEach(([x, z]) => T(x, z + 7.6, "play", 2.6));
+  E.pavilions.forEach(([x, z]) => T(x, z + 5.6, "chess", 2.6));
+  T(-535, -101, "Estate Square", 3.2, { class: "lbl mut" });
+  T(-600, -94, "Library Lane", 2.6, { class: "lbl mut" });
+  T(-560, -186, "North Street", 3, { class: "lbl mut", transform: "rotate(-90 -560 -186)" });
+  T(-485, -186, "Estate Lane", 2.6, { class: "lbl mut", transform: "rotate(-90 -485 -186)" });
+  T(-690, -175, "Arcade St.", 2.6, { class: "lbl mut", transform: "rotate(-90 -690 -175)" });
+  T(-560, -56, "Park Ring", 3, { class: "lbl mut" });
+  T(-693, -200, "N ↑", 4, { "font-weight": 600 });
+  el("line", { x1: -695, y1: -62, x2: -675, y2: -62, stroke: V("ink"), "stroke-width": 0.8 }, s); T(-685, -65, "20 m", 3);
+})();
+
+/* ---------- The Old Moy tower house kit ---------- */
+// one tower house in elevation, from its kit (moy_tower_house.md 3):
+// u0..u1 along the face, heights in metres (y = -h)
+const ST = 3.25;
+function drawTowerHouse(p, u0, u1, k, o = {}) {
+  const y = h => -h, w = u1 - u0, H = k.storeys * ST, B = k.base * ST, det = o.detail;
+  const R = (x, h0, ww, hh, fill, a = {}) => el("rect", Object.assign({ x, y: y(h0 + hh), width: ww, height: hh, fill }, a), p);
+  const line = (x1, h1, x2, h2, stroke, sw, a = {}) => el("line", Object.assign({ x1, y1: y(h1), x2, y2: y(h2), stroke, "stroke-width": sw }, a), p);
+  const earthBase = k.base_kind === "earth", bat = earthBase ? 0.26 * B / 9.75 : 0;
+  if (earthBase) {
+    // earth base: battered, coursed in 0.65 m lifts, rounded free corners shaded
+    el("polygon", { points: `${u0},0 ${u1},0 ${u1 - bat},${y(B)} ${u0 + bat},${y(B)}`, fill: V("earth"), stroke: V("ink"), "stroke-width": det ? 0.08 : 0.15 }, p);
+    if (det) for (let h = 0.65; h < B; h += 0.65) { const b = 0.26 * h / 9.75; line(u0 + b, h, u1 - b, h, V("ink"), 0.03, { opacity: 0.35 }); }
+    if (o.round !== false) [[u0, 1], [u1, -1]].forEach(([u, sgn]) => el("polygon", { points: `${u},0 ${u + sgn * 0.7},0 ${u + sgn * (0.7 + bat)},${y(B)} ${u + sgn * bat},${y(B)}`, fill: V("ink"), opacity: 0.12 }, p));
+  } else {
+    // stone base: plumb, dark basalt with pale ashlar bands and quoins
+    R(u0, 0, w, B, V("basalt"), { stroke: V("ink"), "stroke-width": det ? 0.08 : 0.15 });
+    for (let h = 1.6; h < B; h += 1.6) R(u0, h, w, 0.22, V("ashlar"));
+    for (let h = 0; h < B; h += 0.9) [u0, u1 - 0.6].forEach((u, i) => R(u, h + (i ? 0.45 : 0), 0.6, 0.45, V("ashlar")));
+  }
+  R(u0, 0, w, 0.9, V("plateau"), { stroke: V("ink"), "stroke-width": 0.04 });
+  // the brick storeys; a cornice over earth, a frieze over stone
+  R(u0, B + (earthBase ? 0.5 : 0), w, H - B - (earthBase ? 0.5 : 0), V("brick"), { stroke: V("ink"), "stroke-width": det ? 0.08 : 0.15 });
+  if (earthBase) R(u0 - 0.3, B, w + 0.6, 0.5, V("gypsum"), { stroke: V("ink"), "stroke-width": 0.05 });
+  // white gypsum friezes at every brick floor, from the family's pattern
+  const frieze = (h0, pat) => {
+    const hb = 0.55, n = Math.max(4, Math.round(w / 0.55)), st = w / n;
+    R(u0, h0 - 0.06, w, 0.06, V("gypsum")); R(u0, h0 + hb, w, 0.06, V("gypsum"));
+    let d = "";
+    for (let i = 0; i < n; i++) {
+      const a = u0 + i * st;
+      if (pat === 0) d += `M${a},${y(h0 + 0.05)} L${a + st / 2},${y(h0 + hb - 0.05)} L${a + st},${y(h0 + 0.05)} `;
+      else if (pat === 1) d += `M${a},${y(h0 + hb / 2)} L${a + st / 2},${y(h0 + hb - 0.05)} L${a + st},${y(h0 + hb / 2)} M${a},${y(h0 + 0.05)} L${a + st / 2},${y(h0 + hb / 2)} L${a + st},${y(h0 + 0.05)} `;
+      else if (pat === 2) el("circle", { cx: a + st / 2, cy: y(h0 + hb / 2), r: Math.min(st, hb) * 0.36, fill: "none", stroke: V("gypsum"), "stroke-width": 0.07 }, p);
+      else if (i % 2 === 0) R(a, h0 + 0.12, st, hb - 0.24, V("gypsum"));
+    }
+    if (d) el("path", { d, fill: "none", stroke: V("gypsum"), "stroke-width": det ? 0.08 : 0.12 }, p);
+  };
+  const fpat = k.frieze || 0;
+  for (let f = k.base; f < k.storeys; f++) {
+    if (f === k.base && earthBase) continue;
+    frieze(f * ST + (f === k.base ? 0.05 : 0.15), fpat);
+    if (k.polite && f > k.base) frieze(f * ST + 2.55, (fpat + 2) % 4);
+  }
+  // openings: small deep lights in the earth, qamariya windows in the brick
+  const bays = Math.max(1, Math.floor(w / 3.2)), bx = i => u0 + w * (i + 0.5) / bays;
+  for (let f = 0; f < k.storeys; f++) {
+    const top = f === k.storeys - 1, earth = f < k.base;
+    for (let i = 0; i < bays; i++) {
+      const cx = bx(i);
+      if (f === 0) continue;
+      if (earth) { R(cx - 0.3, f * ST + 1.1, 0.6, 0.8, V("ink"), { opacity: 0.75 }); continue; }
+      const ww = top ? 1.6 : 1.0, sill = f * ST + (top ? 0.4 : 0.9), hh = top ? 1.3 : 1.6, r = ww / 2;
+      el("path", { d: `M${cx - ww / 2},${y(sill)} L${cx - ww / 2},${y(sill + hh)} A${r},${r} 0 0 1 ${cx + ww / 2},${y(sill + hh)} L${cx + ww / 2},${y(sill)} Z`, fill: V("glass"), stroke: V("gypsum"), "stroke-width": det ? 0.16 : 0.22 }, p);
+      if (det) line(cx - ww / 2, sill + hh, cx + ww / 2, sill + hh, V("gypsum"), 0.08);
+      if (k.polite && i < bays - 1 && !earth) el("circle", { cx: cx + w / bays / 2, cy: y(sill + 1.1), r: 0.32, fill: "none", stroke: V("gypsum"), "stroke-width": 0.08 }, p);
+    }
+  }
+  // kishk box windows on the upper brick storeys
+  for (let j = 0; j < (k.kishk || 0); j++) {
+    const f = k.storeys - 2 - j, cx = bx(j % bays);
+    if (f <= k.base) continue;
+    R(cx - 0.6, f * ST + 0.7, 1.2, 1.6, V("gypsum"), { stroke: V("ink"), "stroke-width": 0.05 });
+    if (det) for (let q = 0; q < 3; q++) line(cx - 0.4 + q * 0.4, f * ST + 0.9, cx - 0.4 + q * 0.4, f * ST + 2.1, V("ink"), 0.03, { opacity: 0.5 });
+    [cx - 0.45, cx + 0.45].forEach(bx_ => el("path", { d: `M${bx_ - 0.1},${y(f * ST + 0.7)} L${bx_},${y(f * ST + 0.25)} L${bx_ + 0.1},${y(f * ST + 0.7)} Z`, fill: V("gypsum") }, p));
+  }
+  // ground floor: the house door with its mark, and a shopfront on shopping streets
+  const doorX = o.doorAt != null ? o.doorAt : u1 - 2.2;
+  el("path", { d: `M${doorX - 0.6},0 L${doorX - 0.6},${y(1.8)} A0.6,0.6 0 0 1 ${doorX + 0.6},${y(1.8)} L${doorX + 0.6},0 Z`, fill: V("door"), stroke: V("gypsum"), "stroke-width": 0.2 }, p);
+  el("circle", { cx: doorX, cy: y(3.0), r: 0.32, fill: V("sign") }, p);
+  if (k.shop && w >= 7) { const sx = u0 + 1.4; R(sx, 0, Math.min(3.2, w - 5), 2.8, V("ink"), { opacity: 0.55 }); R(sx - 0.2, 2.8, Math.min(3.2, w - 5) + 0.4, 0.3, V("plateau")); }
+  // parapet in the family pattern, horns at the corners
+  let d = `M${u0},${y(H)}`;
+  const n = Math.max(3, Math.round(w / 1.1)), step = w / n;
+  for (let i = 0; i < n; i++) {
+    const a = u0 + i * step, b = a + step;
+    if (k.parapet === 0) d += ` L${a},${y(H + 1.2)} L${a + step * 0.5},${y(H + 1.2)} L${a + step * 0.5},${y(H + 0.8)} L${b},${y(H + 0.8)}`;
+    else if (k.parapet === 1) d += ` L${a + step * 0.5},${y(H + 1.25)} L${b},${y(H + 0.75)}`;
+    else d += ` L${a},${y(H + 0.85)} L${a + step * 0.25},${y(H + 1.25)} L${a + step * 0.75},${y(H + 1.25)} L${b},${y(H + 0.85)}`;
+  }
+  d += ` L${u1},${y(H)} Z`;
+  el("path", { d, fill: V("brick"), stroke: V("ink"), "stroke-width": 0.06 }, p);
+  R(u0, H, w, 0.12, V("gypsum"));
+  [u0, u1].forEach(u => el("path", { d: `M${u - 0.25},${y(H)} L${u},${y(H + 1.9)} L${u + 0.25},${y(H)} Z`, fill: V("gypsum"), stroke: V("ink"), "stroke-width": 0.04 }, p));
+  // roof: the kiosk over the core with the wind tower, and a manzar
+  const coreRight = o.coreRight !== false, kw = Math.min(3.4, w * 0.4);
+  const kx = coreRight ? u1 - kw - 0.3 : u0 + 0.3;
+  R(kx, H, kw, ST, V("brick"), { stroke: V("ink"), "stroke-width": 0.06 });
+  R(kx + kw / 2 - 0.8, H + ST, 1.6, 2.0, V("brick"), { stroke: V("ink"), "stroke-width": 0.06 });
+  el("path", { d: `M${kx + kw / 2 - 0.5},${y(H + ST + 0.4)} L${kx + kw / 2 - 0.5},${y(H + ST + 1.3)} A0.5,0.5 0 0 1 ${kx + kw / 2 + 0.5},${y(H + ST + 1.3)} L${kx + kw / 2 + 0.5},${y(H + ST + 0.4)} Z`, fill: V("ink"), opacity: 0.7 }, p);
+  R(kx + kw / 2 - 1.0, H + ST + 2.0, 2.0, 0.25, V("gypsum"));
+  if (k.manzar) {
+    const mw = Math.min(5.2, w - kw - 1.2), mx = coreRight ? kx - mw : kx + kw;
+    R(mx, H, mw, ST, V("brick"), { stroke: V("ink"), "stroke-width": 0.06 });
+    R(mx, H + ST, mw, 0.5, V("gypsum"), { stroke: V("ink"), "stroke-width": 0.04 });
+    const nw = Math.max(1, Math.floor(mw / 2));
+    for (let i = 0; i < nw; i++) { const cx = mx + mw * (i + 0.5) / nw; el("path", { d: `M${cx - 0.5},${y(H + 0.9)} L${cx - 0.5},${y(H + 2.2)} A0.5,0.5 0 0 1 ${cx + 0.5},${y(H + 2.2)} L${cx + 0.5},${y(H + 0.9)} Z`, fill: k.polite ? V("sign") : V("glass"), opacity: k.polite ? 0.6 : 1, stroke: V("gypsum"), "stroke-width": 0.16 }, p); }
+  }
+}
+// the later pencil infill: plumb, tiled, a lift instead of a ramp core
+function drawInfill(p, u0, u1, storeys) {
+  const H = storeys * ST;
+  el("rect", { x: u0, y: -H, width: u1 - u0, height: H, fill: V("lantern"), stroke: V("ink"), "stroke-width": 0.15 }, p);
+  for (let f = 1; f < storeys; f++) el("line", { x1: u0, y1: -f * ST, x2: u1, y2: -f * ST, stroke: V("ink"), "stroke-width": 0.04, opacity: 0.4 }, p);
+  for (let f = 1; f < storeys; f++) el("rect", { x: u0 + 0.8, y: -(f * ST + 2.4), width: u1 - u0 - 1.6, height: 1.4, fill: V("glass"), opacity: 0.8 }, p);
+}
+
+(() => {
+  // the Reese-Miller house, street front on Arcade Street, looking west: south left, north right
+  const b = BN(52), k = LAYOUT.building_kits["52"];
+  const s = svg("towerfront", "-9 -32 40 35", "Street front of the Reese–Miller house on Arcade Street");
+  el("rect", { x: -9, y: -32, width: 40, height: 35, fill: V("paper") }, s);
+  el("rect", { x: -9, y: 0, width: 40, height: 3, fill: V("city") }, s);
+  // the narrow infill neighbour against the south end
+  drawInfill(s, -3, 0, 5);
+  drawTowerHouse(s, 0, 16, k, { detail: true, doorAt: 14.2 });
+  el("rect", { x: 21.6, y: -1.9, width: 0.6, height: 1.9, rx: 0.3, fill: V("ink") }, s);
+  const T = (x, yy, t, sz, o = {}) => label(s, x, yy, t, sz, Object.assign({ style: "stroke-width:0.5px" }, o));
+  T(-1.5, -17.5, "infill", 1.1, { transform: "rotate(-90 -1.5 -17.5)" });
+  T(17.5, -4.6, "house door", 1.1, { "text-anchor": "start" }); T(17.5, -3.2, "and house mark", 1.1, { "text-anchor": "start" });
+  T(3, -3.6, "tailor's shop", 1.0);
+  T(17.5, -8, "earth base, 3 storeys", 1.1, { "text-anchor": "start" }); T(17.5, -9.9, "cornice", 1.1, { "text-anchor": "start" });
+  T(17.5, -15, "brick storeys", 1.1, { "text-anchor": "start" }); T(17.5, -21, "mafraj", 1.1, { "text-anchor": "start" });
+  T(10.2, -27.9, "manzar: Jammer's room", 1.1); T(14.3, -30.4, "wind tower", 1.1);
+  T(5, -24.9, "parapet", 1.0);
+  T(22, 1.4, "hero", 1.0); T(8, 1.6, "Arcade Street", 1.2, { class: "lbl mut" });
+  T(-8.5, 1.6, "S", 1.2, { "text-anchor": "start" }); T(24.5, 1.6, "N", 1.2, { "text-anchor": "end" });
+  for (let h = 0; h <= 25; h += 5) { el("line", { x1: -9, y1: -h, x2: -8.2, y2: -h, stroke: V("ink"), "stroke-width": 0.1 }, s); T(-7.9, -h, h + " m", 0.9, { "text-anchor": "start" }); }
+})();
+
+(() => {
+  // who lives where: the stack, cut along the street, looking west
+  const s = svg("towerstack", "-9 -32 34 35", "Section through the Reese–Miller house showing each floor");
+  el("rect", { x: -9, y: -32, width: 34, height: 35, fill: V("paper") }, s);
+  el("rect", { x: -9, y: 0, width: 34, height: 3, fill: V("sand") }, s);
+  const y = h => -h;
+  const R = (x, h0, w, h, fill, a = {}) => el("rect", Object.assign({ x, y: y(h0 + h), width: w, height: h, fill, stroke: V("ink"), "stroke-width": 0.08 }, a), s);
+  const T = (x, yy, t, sz, o = {}) => label(s, x, yy, t, sz, Object.assign({ style: "stroke-width:0.5px" }, o));
+  const fam = V("lantern"), let_ = V("civic");
+  const floors = [
+    [0, let_, "tailor's shop, store"], [1, let_, "flat"], [2, let_, "flat"], [3, let_, "flat"],
+    [4, fam, "bedroom, bath, study"], [5, fam, "kitchen, living"], [6, fam, "mafraj"]];
+  for (const [f, fill, t] of floors) { R(0, f * ST, 12.6, ST, fill); T(6.3, y(f * ST + 1.6), t, 0.95); }
+  // walls: earth base thick, brick thinner
+  R(-0.9, 0, 0.9, 3 * ST, V("earth")); R(-0.45, 3 * ST, 0.45, 4 * ST, V("brick"));
+  R(16, 0, 0.9, 3 * ST, V("earth")); R(16, 3 * ST, 0.45, 4 * ST, V("brick"));
+  // the core with its switchback ramps, the north end
+  R(12.6, 0, 3.4, 7 * ST + ST, V("city"));
+  for (let f = 0; f < 8; f++) {
+    el("polyline", { points: `12.8,${y(f * ST + 0.1)} 15.8,${y(f * ST + 1.625)} 12.8,${y(f * ST + 3.25)}`, fill: "none", stroke: V("ink"), "stroke-width": 0.12 }, s);
+  }
+  // roof: kiosk, wind tower, manzar, terrace
+  R(12.6, 7 * ST, 3.4, ST, V("brick")); R(13.5, 8 * ST, 1.6, 2.0, V("brick"));
+  R(7.4, 7 * ST, 5.2, ST, fam); T(10, y(7 * ST + 1.6), "Jammer", 0.95);
+  R(0, 7 * ST, 7.4, 1.2, "none", { stroke: V("ink"), "stroke-dasharray": "0.4 0.3" }); T(3.7, y(7 * ST + 0.6), "terrace", 1.0);
+  // the west wind down the core
+  el("path", { d: `M18.8,${y(8 * ST + 1.2)} L15.4,${y(8 * ST + 1.2)} L14.3,${y(8 * ST + 0.8)} L14.3,${y(2)}`, fill: "none", stroke: V("blorb"), "stroke-width": 0.18, "stroke-dasharray": "0.5 0.35" }, s);
+  el("path", { d: `M13.9,${y(2.6)} L14.3,${y(2)} L14.7,${y(2.6)}`, fill: "none", stroke: V("blorb"), "stroke-width": 0.18 }, s);
+  T(19.2, y(8 * ST + 1.2), "west wind", 1.0, { "text-anchor": "start", fill: V("blorb") });
+  T(14.3, y(4.6), "ramp core", 1.0, { transform: `rotate(-90 14.3 ${y(4.6)})` });
+  T(17.4, y(5), "earth", 0.95, { "text-anchor": "start" }); T(17.0, y(15), "brick", 0.95, { "text-anchor": "start" });
+  T(-3, y(19.5), "the family", 1.0, { "font-weight": 600, transform: `rotate(-90 -3 ${y(19.5)})` }); T(-3, y(6.5), "let", 1.0, { "font-weight": 600, transform: `rotate(-90 -3 ${y(6.5)})` });
+  el("line", { x1: -2, y1: y(13.1), x2: -2, y2: y(26), stroke: V("ink"), "stroke-width": 0.12 }, s);
+  el("line", { x1: -2, y1: y(0), x2: -2, y2: y(12.9), stroke: V("muted"), "stroke-width": 0.12 }, s);
+  for (let h = 0; h <= 25; h += 5) { el("line", { x1: -9, y1: -h, x2: -8.2, y2: -h, stroke: V("ink"), "stroke-width": 0.1 }, s); T(-7.9, -h, h + " m", 0.9, { "text-anchor": "start" }); }
+})();
+
+(() => {
+  // Arcade Street's west side, the Old Moy stretch, every house from the plan's kits
+  const row = [];
+  LAYOUT.lots.forEach((l, i) => { const k = LAYOUT.lot_kits[i]; if (k && l[2] === -694 && l[1] > -125 && l[3] < 62) row.push({ z0: l[1], z1: l[3], k }); });
+  for (const [n, k] of Object.entries(LAYOUT.building_kits)) { const b = BN(+n); if (b.r[2] === -694 && b.r[1] > -125 && b.r[3] < 62) row.push({ z0: b.r[1], z1: b.r[3], k, n: +n }); }
+  // looking west: north to the right, so the page runs from south (+z) to north
+  const zmax = Math.max(...row.map(r => r.z1)), zmin = Math.min(...row.map(r => r.z0));
+  const s = svg("towerrow", `${-zmax - 4} -36 ${zmax - zmin + 8} 40`, "Street elevation of Arcade Street's Old Moy houses");
+  el("rect", { x: -zmax - 4, y: -36, width: zmax - zmin + 8, height: 40, fill: V("paper") }, s);
+  el("rect", { x: -zmax - 4, y: 0, width: zmax - zmin + 8, height: 4, fill: V("city") }, s);
+  row.sort((a, c) => c.z1 - a.z1);
+  for (const r of row) {
+    const u0 = -r.z1, u1 = -r.z0;
+    if (r.k.kit === "tower") drawTowerHouse(s, u0, u1, r.k, { detail: false, coreRight: (r.z0 * 7) % 2 === 0 });
+    else drawInfill(s, u0, u1, r.k.storeys);
+    if (r.n) label(s, (u0 + u1) / 2, 2.2, { 52: "Reese–Miller", 32: "Suri's" }[r.n] || "", 1.6, { "font-weight": 600 });
+  }
+  for (const [name, , , z0, , z1] of LAYOUT.streets) if (z1 - z0 < 15 && z1 > zmin && z0 < zmax && ["Tank Lane", "Pine Lane", "West Street", "Clinic Lane"].includes(name)) label(s, -(z0 + z1) / 2, 2.2, name, 1.4, { class: "lbl mut" });
+  label(s, -zmax - 2, 3.3, "S", 1.6, { "text-anchor": "start" }); label(s, -zmin + 2, 3.3, "N", 1.6, { "text-anchor": "end" });
+})();
+
+/* ---------- The market lanes' tong lau ---------- */
+const TILE = ["#efe3c6", "#bfe0cf", "#efc2ae", "#bcd6ea", "#cfd2d4"];
+// one tong lau in elevation from its kit: u0..u1 along the face, heights up (y = -h)
+function drawTongLau(p, u0, u1, k, o = {}) {
+  const y = h => -h, w = u1 - u0, H = k.storeys * ST, det = o.detail;
+  const R = (x, h0, ww, hh, fill, a = {}) => el("rect", Object.assign({ x, y: y(h0 + hh), width: ww, height: hh, fill }, a), p);
+  const col = TILE[k.colour || 0], rx = k.corner ? Math.min(3.5, w * 0.35) : 0;
+  if (k.kit === "lockup") {
+    R(u0, 0, w, 2 * ST, col, { stroke: V("ink"), "stroke-width": 0.12 });
+    R(u0 + 0.4, 0, w - 0.8, 2.6, V("ink"), { opacity: 0.55 });
+    for (let x = u0 + 0.6; x < u1 - 0.5; x += 0.3) el("line", { x1: x, y1: y(0.1), x2: x, y2: y(2.5), stroke: V("muted"), "stroke-width": 0.04 }, p);
+    R(u0 + 0.6, ST + 0.9, w - 1.2, 1.2, V("glass"));
+    R(u0 - 0.2, 2 * ST, w + 0.4, 0.3, V("civic"));
+    return;
+  }
+  // the body; a rounded corner shows as a curved shoulder on the corner side
+  el("path", { d: rx ? `M${u0},0 L${u0},${y(H)} L${u1 - rx},${y(H)} Q${u1},${y(H)} ${u1},${y(H - rx * 0.4)} L${u1},0 Z` : `M${u0},0 L${u0},${y(H)} L${u1},${y(H)} L${u1},0 Z`, fill: col, stroke: V("ink"), "stroke-width": det ? 0.08 : 0.15 }, p);
+  if (rx) el("rect", { x: u1 - rx, y: y(H), width: rx, height: H, fill: V("ink"), opacity: 0.07 }, p);
+  if (det && k.gen === "tile") for (let x = u0 + 0.3; x < u1; x += 0.3) el("line", { x1: x, y1: y(0.6), x2: x, y2: y(H), stroke: V("ink"), "stroke-width": 0.012, opacity: 0.25 }, p);
+  R(u0, 0, w, 0.6, V("muted"), { opacity: 0.5 });
+  // ground: the shopfront and the house door
+  R(u0 + 0.5, 0, w - 2.2, 2.9, V("ink"), { opacity: 0.6 });
+  if (det) for (let x = u0 + 0.8; x < u1 - 1.8; x += 0.9) R(x, 2.1, 0.7, 0.8, V("sign"), { opacity: 0.55 });
+  el("path", { d: `M${u1 - 1.5},0 L${u1 - 1.5},${y(2.0)} A0.5,0.5 0 0 1 ${u1 - 0.5},${y(2.0)} L${u1 - 0.5},0 Z`, fill: V("door"), stroke: V("ink"), "stroke-width": 0.05 }, p);
+  // the upper floors
+  const bays = Math.max(1, Math.floor(w / 3)), bx = i => u0 + w * (i + 0.5) / bays;
+  for (let f = 1; f < k.storeys; f++) {
+    const h0 = f * ST;
+    for (let i = 0; i < bays; i++) {
+      const cx = bx(i);
+      if (k.gen === "boom") {
+        R(cx - 0.5, h0 + 0.2, 1.0, 2.2, V("glass"), { rx: 0.25, stroke: V("ink"), "stroke-width": 0.04 });
+        [cx - 0.95, cx + 0.55].forEach(sx => R(sx, h0 + 0.3, 0.4, 2.0, V("brick"), { opacity: 0.6 }));
+      } else R(cx - 1.0, h0 + 0.8, 2.0, 1.4, V("glass"), { rx: 0.3, stroke: V("ink"), "stroke-width": 0.04 });
+    }
+    // balcony or veranda rail
+    if (k.gen === "tile") { R(u0 + 0.3, h0 - 0.15, w - 0.6, 0.2, V("civic")); el("line", { x1: u0 + 0.3, y1: y(h0 + 1.1), x2: u1 - 0.3, y2: y(h0 + 1.1), stroke: V("ink"), "stroke-width": 0.08 }, p); }
+    else if (!k.veranda) { R(u0 + 0.6, h0 - 0.1, w - 1.2, 0.15, V("civic")); el("line", { x1: u0 + 0.6, y1: y(h0 + 1.0), x2: u1 - 0.6, y2: y(h0 + 1.0), stroke: V("ink"), "stroke-width": 0.06 }, p); }
+    // the odd AC unit and laundry pole
+    if (det && (f + (k.colour || 0)) % 3 === 0) R(u1 - 1.4, h0 + 0.3, 0.7, 0.5, V("civic"), { stroke: V("ink"), "stroke-width": 0.03 });
+    if (det && (f + (k.colour || 0)) % 4 === 1) { el("line", { x1: u0 + 0.4, y1: y(h0 + 2.4), x2: u0 - 1.2, y2: y(h0 + 2.5), stroke: V("ink"), "stroke-width": 0.05 }, p); [0, 0.5, 1.0].forEach(d_ => R(u0 - 1.1 + d_, h0 + 1.6, 0.35, 0.8, V("sign"), { opacity: 0.4 })); }
+  }
+  // the veranda: columns at the front and a deck each floor, seen face on
+  if (k.veranda) {
+    for (let i = 0; i <= bays; i++) R(u0 + w * i / bays - 0.25, 0, 0.5, H, V("civic"), { stroke: V("ink"), "stroke-width": 0.04 });
+    for (let f = 1; f <= k.storeys; f++) { R(u0, f * ST - 0.3, w, 0.3, V("civic"), { stroke: V("ink"), "stroke-width": 0.04 }); if (f < k.storeys) for (let x = u0 + 0.4; x < u1 - 0.2; x += 0.35) el("line", { x1: x, y1: y(f * ST), x2: x, y2: y(f * ST + 1.0), stroke: V("ink"), "stroke-width": 0.04 }, p); }
+  }
+  if (k.gen === "tile") R(u0 - 0.3, 3.4, w + 0.3, 0.25, V("civic"), { stroke: V("ink"), "stroke-width": 0.04 });
+  // stacked picture signs
+  for (let j = 0; j < (k.signs || 0); j++) R(u0 + 0.3 + j * 0.2, ST + 0.4 + j * 3.3, 0.6, 2.4, V("sign"), { opacity: 0.85, rx: 0.15 });
+  // parapet and roof life
+  R(u0, H, w - rx * 0.6, 1.1, col, { stroke: V("ink"), "stroke-width": 0.05 });
+  if (k.roof === "tanks") { R(u0 + 1, H + 1.1, 1.6, 1.4, V("civic"), { stroke: V("ink"), "stroke-width": 0.04 }); R(u0 + 0.9, H + 2.5, 1.8, 0.2, V("muted")); }
+  if (k.roof === "greenhouse") el("path", { d: `M${u0 + 0.8},${y(H + 1.1)} L${u0 + 0.8},${y(H + 2.6)} Q${u0 + w / 2},${y(H + 3.6)} ${u1 - 0.8},${y(H + 2.6)} L${u1 - 0.8},${y(H + 1.1)} Z`, fill: V("glass"), opacity: 0.7, stroke: V("ink"), "stroke-width": 0.04 }, p);
+  if (k.roof === "laundry") { el("line", { x1: u0 + 0.6, y1: y(H + 2.4), x2: u1 - 0.6, y2: y(H + 2.4), stroke: V("ink"), "stroke-width": 0.04 }, p); for (let x = u0 + 1; x < u1 - 1; x += 0.8) R(x, H + 1.6, 0.4, 0.8, V("sign"), { opacity: 0.35 }); }
+  if (k.roof === "garden") for (let x = u0 + 1; x < u1 - 0.5; x += 1.4) el("circle", { cx: x, cy: y(H + 1.6), r: 0.6, fill: V("park") }, p);
+  if (k.lift) R(u0 + 0.2, H, 1.2, 1.8, V("glass"), { opacity: 0.6, stroke: V("ink"), "stroke-width": 0.03 });
+}
+
+(() => {
+  // a boom house with its veranda, and a tile house on a corner, side by side
+  const s = svg("tonglau", "-4 -34 44 37", "Front elevations of a boom house with a veranda and a tile house on a corner");
+  el("rect", { x: -4, y: -34, width: 44, height: 37, fill: V("paper") }, s);
+  el("rect", { x: -4, y: 0, width: 44, height: 3, fill: V("city") }, s);
+  drawTongLau(s, 0, 9, { kit: "tong_lau", storeys: 5, gen: "boom", veranda: true, colour: 2, signs: 2, roof: "greenhouse" }, { detail: true });
+  drawTongLau(s, 9, 15, { kit: "tong_lau", storeys: 4, gen: "boom", veranda: false, colour: 1, signs: 1, roof: "laundry" }, { detail: true });
+  drawTongLau(s, 18, 30, { kit: "tong_lau", storeys: 9, gen: "tile", corner: true, colour: 3, signs: 3, roof: "tanks", lift: true }, { detail: true });
+  drawTongLau(s, 30, 34, { kit: "lockup", storeys: 2, colour: 4 }, { detail: true });
+  el("rect", { x: 36.2, y: -1.9, width: 0.6, height: 1.9, rx: 0.3, fill: V("ink") }, s);
+  const T = (x, yy, t, sz, o = {}) => label(s, x, yy, t, sz, Object.assign({ style: "stroke-width:0.5px" }, o));
+  T(4.5, -22.6, "boom house, veranda", 1.1); T(12, -16.4, "boom house", 1.1);
+  T(24, -33.2, "tile house, rounded corner", 1.1); T(32, -8.0, "lock-up", 1.0);
+  T(16.5, 1.6, "a lane", 1.0, { class: "lbl mut" }); T(36.5, 1.5, "hero", 0.9);
+  T(4.5, 1.6, "covered walkway", 1.0, { class: "lbl mut" });
+  for (let h = 0; h <= 30; h += 10) { el("line", { x1: -4, y1: -h, x2: -3.2, y2: -h, stroke: V("ink"), "stroke-width": 0.1 }, s); T(-2.9, -h, h + " m", 0.9, { "text-anchor": "start" }); }
+})();
+
+(() => {
+  // plan of a pair sharing one ramp core on their party wall
+  const s = svg("tonglaupair", "-3 -3 18 22", "Ground plan of two tong lau sharing a ramp core");
+  el("rect", { x: -3, y: -3, width: 18, height: 22, fill: V("paper") }, s);
+  el("rect", { x: -3, y: 15, width: 18, height: 4, fill: V("city") }, s);
+  const R = (x, z, w, h, fill, a = {}) => el("rect", Object.assign({ x, y: z, width: w, height: h, fill, stroke: V("ink"), "stroke-width": 0.06 }, a), s);
+  R(0, 0, 6, 15, TILE[2]); R(6, 0, 6, 15, TILE[1]);
+  R(0.25, 0.25, 5.5, 14.5, V("city")); R(6.25, 0.25, 5.5, 14.5, V("city"));
+  // the core straddling the party wall, 3.4 wide
+  // shops either side of the core and through to the back, then the core at the front
+  R(0.25, 6.0, 5.5, 8.75, V("sign"), { opacity: 0.18 }); R(6.25, 6.0, 5.5, 8.75, V("sign"), { opacity: 0.18 });
+  R(4.3, 8.95, 3.4, 5.8, V("civic"), { "stroke-width": 0.1 });
+  el("line", { x1: 6, y1: 9.3, x2: 6, y2: 13.3, stroke: V("ink"), "stroke-width": 0.15 }, s);
+  el("polyline", { points: "5.1,13.3 5.1,9.6 6.9,9.6 6.9,13.3", fill: "none", stroke: V("ink"), "stroke-width": 0.08, "stroke-dasharray": "0.3 0.2" }, s);
+  R(5.3, 14.6, 1.4, 0.3, V("door"));
+  const T = (x, yy, t, sz, o = {}) => label(s, x, yy, t, sz, Object.assign({ style: "stroke-width:0.4px" }, o));
+  T(2.1, 11.4, "shop", 0.9); T(9.9, 11.4, "shop", 0.9); T(6, 11.0, "shared", 0.75); T(6, 11.9, "ramp core", 0.75);
+  T(2.1, 2.5, "back room", 0.8); T(9.9, 2.5, "back room", 0.8); T(6, 16.6, "the street", 0.9, { class: "lbl mut" });
+  T(6, -1.6, "party wall", 0.75); el("line", { x1: 6, y1: -1.1, x2: 6, y2: 0, stroke: V("ink"), "stroke-width": 0.05 }, s);
+  T(6, 18.2, "the shared house door", 0.75);
+})();
+
+(() => {
+  // South Street's west side through the market lanes, every house from the plan's kits
+  const row = [];
+  LAYOUT.lots.forEach((l, i) => { const k = LAYOUT.lot_kits[i]; if (k && (k.kit === "tong_lau" || k.kit === "lockup") && l[2] === -566 && l[1] >= 62) row.push({ z0: l[1], z1: l[3], k }); });
+  const zmin = Math.min(...row.map(r => r.z0)), zmax = Math.max(...row.map(r => r.z1));
+  // looking west from South Street: north to the right
+  const s = svg("lanesrow", `${-zmax - 4} -34 ${zmax - zmin + 8} 38`, "Street elevation of South Street's market lane houses");
+  el("rect", { x: -zmax - 4, y: -34, width: zmax - zmin + 8, height: 38, fill: V("paper") }, s);
+  el("rect", { x: -zmax - 4, y: 0, width: zmax - zmin + 8, height: 4, fill: V("city") }, s);
+  for (const r of row) drawTongLau(s, -r.z1, -r.z0, r.k, { detail: false });
+  for (const [name, , , z0, , z1] of LAYOUT.streets) if (z1 - z0 < 15 && z1 > zmin && z0 < zmax && name !== "Park Ring") label(s, -(z0 + z1) / 2, 2.2, name, 1.4, { class: "lbl mut" });
+  for (const [name, z0, z1] of LAYOUT.opens.filter(o => o[0] === "Market Square").map(o => [o[0], o[2], o[4]])) label(s, -(z0 + z1) / 2, 2.2, name, 1.4, { class: "lbl mut" });
+  label(s, -zmax - 2, 3.3, "S", 1.6, { "text-anchor": "start" }); label(s, -zmin + 2, 3.3, "N", 1.6, { "text-anchor": "end" });
+})();
+
+/* ---------- Street section: four layers ---------- */
+(() => {
+  const s = svg("street", "-16 -54 86 64", "Street section showing ground, the Deck, towers and roofs");
+  const y = h => -h;
+  el("rect", { x: -16, y: -54, width: 86, height: 64, fill: V("paper") }, s);
+  el("rect", { x: -16, y: 0, width: 86, height: 10, fill: V("sand") }, s);
+  const B = (x0, x1, h, fill) => el("rect", { x: x0, y: y(h), width: x1 - x0, height: h, fill, stroke: V("ink"), "stroke-width": 0.25 }, s);
+  // ramp tower
+  el("rect", { x: -13, y: y(9), width: 8, height: 9, rx: 3.6, fill: V("civic"), stroke: V("ink"), "stroke-width": 0.25 }, s);
+  for (let k = 0; k < 4; k++) el("line", { x1: -12.5, y1: y(1 + k * 2.2), x2: -5.5, y2: y(2.1 + k * 2.2), stroke: V("ink"), "stroke-width": 0.2 }, s);
+  // tong lau with veranda
+  B(0, 20, 33, V("lantern"));
+  el("rect", { x: 20, y: y(4.4), width: 3, height: 0.5, fill: V("ink") }, s);
+  el("line", { x1: 22.8, y1: 0, x2: 22.8, y2: y(4.4), stroke: V("ink"), "stroke-width": 0.3 }, s);
+  for (let f = 4; f < 33; f += 3.25) el("line", { x1: 0, y1: y(f), x2: 20, y2: y(f), stroke: V("muted"), "stroke-width": 0.08 }, s);
+  // pencil building with lift
+  B(28, 44, 39, V("down"));
+  el("rect", { x: 40, y: y(39), width: 2.4, height: 39, fill: V("civic"), stroke: V("ink"), "stroke-width": 0.15 }, s);
+  el("rect", { x: 40.3, y: y(22), width: 1.8, height: 2.4, fill: V("sign") }, s);
+  // lane and neighbour
+  B(47.2, 66, 36, V("market"));
+  // the Deck
+  el("rect", { x: -5, y: y(7), width: 5, height: 0.6, fill: V("deck") }, s);
+  el("rect", { x: 20, y: y(7), width: 8, height: 0.6, fill: V("deck") }, s);
+  // roof hop
+  el("path", { d: `M42,${y(39.6)} Q45.6,${y(43)} 49,${y(36.6)}`, fill: "none", stroke: V("ink"), "stroke-width": 0.3, "stroke-dasharray": "0.8 0.6" }, s);
+  // swing rope from cornice across the street
+  el("line", { x1: 28, y1: y(36), x2: 23, y2: y(19), stroke: V("ink"), "stroke-width": 0.25 }, s);
+  el("circle", { cx: 23, cy: y(18.2), r: 0.8, fill: V("blorb") }, s);
+  el("path", { d: `M14,${y(14)} Q23,${y(16)} 33,${y(14)}`, fill: "none", stroke: V("muted"), "stroke-width": 0.2, "stroke-dasharray": "0.6 0.6" }, s);
+  // hero on the street, 1.9 m
+  el("rect", { x: 24.6, y: y(1.9), width: 0.7, height: 1.9, rx: 0.35, fill: V("ink") }, s);
+  // labels
+  const T = (x, yy, t, sz = 1.9, o = {}) => label(s, x, yy, t, sz, Object.assign({ style: "stroke-width:0.7px" }, o));
+  T(24, 3.2, "street 8 m", 1.6);
+  T(45.6, 3.2, "lane 3.2 m", 1.6);
+  T(24.7, y(3), "hero", 1.4);
+  T(-9, y(11), "ramp tower", 1.6);
+  T(24, y(8.8), "the Deck +6.5 m", 1.8, { fill: V("deck") });
+  T(10, y(35), "tong lau, 33 m", 1.7);
+  T(36, y(41), "pencil bldg, 39 m", 1.7);
+  T(56.6, y(38), "36 m", 1.7);
+  T(46, y(45), "roof to roof", 1.6);
+  T(37.5, y(24.6), "lift", 1.5, { "text-anchor": "end" });
+  T(18, y(21), "swing", 1.6, { "text-anchor": "end" });
+  T(19, y(3.4), "veranda", 1.4, { "text-anchor": "end" });
+})();
+</script>
