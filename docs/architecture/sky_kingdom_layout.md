@@ -252,6 +252,76 @@ can reach every tier.
    routes, one proof building of each style (the Hall of Mist and a tholos),
    then the courts, interiors, flora, residents and schedules.
 
+## 8. The plan file and what it changed (2026-10-13, proposed)
+
+`tools/sky_kingdom_layout.py` now holds this layout as data, the seed of
+`SkyKingdomPlan`. It holds the frame, the islands, every building with its
+podium, ramp, column height and floating gap, each court's landing forecourt,
+the walking routes from it, and the groves. It checks them and writes JSON for
+the 3D model (`docs/drawings/sky_kingdom_3d.html`).
+
+**Checks:**
+- islands inside the ambient band and at least 60 m apart;
+- every building on its cloud, with its podium and ramp, at least 3 m from
+  the next;
+- every room at least 5.0 m to the roof's underside;
+- forecourts at least 12 × 12 m and clear;
+- a 3 m route from each forecourt to every door, clear of every building and
+  at least 1.5 m from the cloud's edge;
+- every podium with a ramp;
+- the nectar terrace on the east rim;
+- the herald's room moored at the edge;
+- every tree clear of routes, forecourts and buildings.
+
+**What the checks changed:**
+- **Dawn Gate cloud:** radius 16 → 20 m (the gate, its ramp and a 12 m
+  forecourt); forecourt at (0, −11).
+- **Aethra:**
+  - Mnesia's tholos moves to (−20, −6), clear of the Hall of Mist's base.
+  - Aristeon's tholos moves to (−10, 31), its ramp turned east.
+  - Drosia's tholos is placed at (11, 29); the brief gave no position.
+  - The herald's room is moored off the west rim at (−43, −6), reached by a
+    gangway from its pier. The layout had put it 21 m inside the cloud.
+  - The propylon has no base platform: its ramp took the forecourt. The
+    forecourt is 16 × 13 m at (0, −32).
+  - Every route passes through the propylon, then branches. The axis's tier
+    pines flank the hall's ramp.
+- **Koinon:**
+  - Radius 36 → 40 m.
+  - The observatory moves to (0, 29), clear of the hall with its spiral ramp.
+  - The archive moves to (−27, 8), its door to −z, so its ramp no longer
+    runs into the hall.
+  - The philosopher's house moves to (25, 10).
+  - Routes cross the Hall of Assembly's colonnade round the void.
+  - Six seat pines stand at 20.5 m on clear bearings.
+- **Pantao:**
+  - The banquet hall moves to (0, 4); its serving passage ran into the
+    garden.
+  - The Peach Garden becomes 26 × 18 m at (0, 26).
+  - The kitchen moves to (−20, −4), 0.7 m → 4.7 m from the hall.
+- **Chrysa:** the apprentice's bench moves to (15, 4), 3 m from the forge's
+  base.
+- **Dromos:** the judges' tholos moves to (0, −27.5); its base reached onto
+  the racing track.
+
+**Decide:**
+- **The arrival view.** From the Dawn Gate the Hall of Mist cannot be seen.
+  Aethra's cloud is 28 m up, and the eye line to the hall's roof passes about
+  5 m below the cloud's near rim. Recommended: terrace Aethra, with the
+  forecourt and propylon on a lower cloud terrace at about +16 m and the
+  hall's base at +28 m. The whole hall then stands in view, and Aethra keeps
+  its rank.
+  Alternatives:
+  - lower Aethra to about +12 m (it would no longer be highest);
+  - keep the hall as a reveal on the way up.
+  In every case the gate's central bay frames Koinon, low and far, not
+  Aethra.
+- **The kingdom's heading.** Fix the staircase on Ohio's north side and point
+  u north, so world east (for the nectar terraces) is +v.
+- **Dromos's crossing.** The forecourt is inside the racing ring, so walkers
+  never cross the track. Drop the crossing, or move the forecourt outside the
+  ring.
+
 ## Fixed, proposed and open
 
 **Fixed:** the Bird Helm gate and staircase entrance; islands within the

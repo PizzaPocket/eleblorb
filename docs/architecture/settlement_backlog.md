@@ -92,6 +92,7 @@ computer.
 | R2 | Approved code: cyborg horse, the hat gating the dirt bike's front wheel and sold at Inez's, Manchego's chibi size and the saddle, the Silverback mine tunnel prototype | Rock and Ground, shared | Ready | — | 15 |
 | **Sky Kingdom** |||||
 | Sk1 | Register, materials, interiors, building briefs; swept-roof prototype | Sky | Approve | the user | 6 |
+| Sk2 | Plan file and audit: `tools/sky_kingdom_layout.py` (podiums, ramps, forecourts, 3 m routes, groves) and the 3D model; the arrival view (terrace Aethra?), the heading, Dromos's crossing (`sky_kingdom_layout.md` 8) | Sky | Decide | the user | 6 |
 | **Ocean Kingdom** |||||
 | Oc1 | The four briefs, layouts, ships, planting and ocean floor | Ocean | Approve | the user | 8 |
 | Oc2 | Shared dry-volume system (ships below the waterline, air halls, tunnels) | shared | Ready after Oc1 | Oc1 | 8 |
