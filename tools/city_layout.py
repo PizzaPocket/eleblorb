@@ -300,6 +300,37 @@ RESIDENT_HOMES={
  'Bea Ho':35,'Wilfred Ho':35,'Lily Chan':34,'Kofi Osei':21,'Palbert Pinestein':27,'Vera Kask':15,
  'Omar Haddad':40,'Rafael Ortiz':42,
 }
+## Heights (m, to the main roof) and crowns of the numbered buildings, and
+## the plan forms of the towers (city.md 7c, 8): one source for the plan, the
+## skyline and the elevations.
+HEIGHTS={1:91,2:22,3:28,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:180,14:175,15:150,16:22,
+ 17:104,18:98,19:117,20:130,21:130,22:46,23:6,24:11,25:17,26:20,27:29,28:26,29:20,30:20,31:20,
+ 32:23,33:9,34:26,35:72,36:42,37:17,38:7,39:6,49:46,50:110,51:8,52:23,40:8,41:4,42:6,43:35,44:3}
+CROWNS={1:104,2:45,3:32,12:280}
+## Plan forms: twist (a rounded triangle turning as it rises), screen (round-
+## cornered square in a screen), capsule (core with plug-in capsules), dune
+## (rippling balconies), deco (podium with a set-back tower: TOWER_PART).
+FORMS={12:'twist',13:'screen',14:'capsule',15:'dune',1:'deco',2:'clock'}
+## Sub-footprints that rise above their building's podium: the hotel's guest
+## tower and city hall's clock tower.
+TOWER_PART={1:(-473,-96,-441,-74),2:(-417,-3,-411,3)}
+PODIUM_HEIGHT={1:20}
+## Fabric storeys are 3.25 m, downtown mid-rise storeys 3.6 m.
+STOREY={'fabric':3.25,'midrise':3.6}
+## The park and the giant playground (city.md 7a, 7b), world metres.
+PARK={
+ 'rect':(-625,-50,-495,50),
+ 'walks':[(-625,-3,-495,3),(-563,-50,-557,50)],
+ 'dry_garden':(-620,-45,-568,-6),
+ 'pond':{'c':(-522,-26),'r':(22,15)},
+ 'lawn':(-552,8,-500,46),
+ 'parasols':[(-612,12),(-598,14),(-586,22),(-596,32),(-584,40),(-612,44)],
+ 'playground':{'c':(-560,0),'track':(24,28),
+   'towers':[(-560,0,20,4.5,'Lookout'),(-548,-7,16,3.5,''),(-574,-4,14,3.2,''),(-560,14,12,3,'')],
+   'perches':[(-566,18),(-554,18),(-560,21)],'perch_height':12,
+   'hoops':[[-560+(9+i*1.6)*math.cos(-math.pi/2+i*0.75),(9+i*1.6)*math.sin(-math.pi/2+i*0.75)] for i in range(8)]},
+ 'wind_trees':[(-526,-26),(-594,-26),(-526,26),(-594,26)],'wind_tree_height':32,
+}
 ## The North Estate's precincts (clipped by the Rim Walk): west of North Street,
 ## north of Library Lane plus the strip along the Park Ring; east of it.
 PRECINCTS=[[(-686,-200,-566,-96),(-637,-92,-566,-62)],[(-554,-200,-487,-62)]]
@@ -359,7 +390,7 @@ w("## The numbered buildings of the schedule. rect is the footprint; null for")
 w("## the giant playground, which the park plan places (section 7b).")
 w("const BUILDINGS := [")
 for b in sorted(B,key=lambda b:b['n']):
-    w("\t{\"n\": %d, \"name\": %s, \"kind\": %s, \"rect\": %s, \"size\": %s, \"who\": %s}," % (b['n'],q(b['name']),q(b['kind']),v2r(b['r']) if b['r'] else "null",q(b['h']),q(b['who'])))
+    w("\t{\"n\": %d, \"name\": %s, \"kind\": %s, \"rect\": %s, \"height\": %s, \"form\": %s, \"size\": %s, \"who\": %s}," % (b['n'],q(b['name']),q(b['kind']),v2r(b['r']) if b['r'] else "null","%.1f" % HEIGHTS[b['n']] if b['n'] in HEIGHTS else "0.0",q(FORMS.get(b['n'],'block')),q(b['h']),q(b['who'])))
 w("]")
 w("")
 w("## Every ordinary building, one per lot: [rect, storeys, block type].")
@@ -368,6 +399,13 @@ w("## downtown's office and flat blocks round the towers.")
 w("const LOTS := [")
 for l in lots: w("\t[%s, %d, %s]," % (v2r(l[:4]),l[4],q(l[5])))
 w("]")
+w("")
+w("## Storey heights for the lots (m).")
+w("const STOREY := {\"fabric\": 3.25, \"midrise\": 3.6}")
+w("## Crowns above the main roof (m), and parts that rise above a podium.")
+w("const CROWNS := {%s}" % ", ".join("%d: %.1f" % (k,v) for k,v in CROWNS.items()))
+w("const TOWER_PART := {%s}" % ", ".join("%d: %s" % (k,v2r(v)) for k,v in TOWER_PART.items()))
+w("const PODIUM_HEIGHT := {%s}" % ", ".join("%d: %.1f" % (k,v) for k,v in PODIUM_HEIGHT.items()))
 w("")
 w("## Shared garden courtyards inside blocks.")
 w("const COURTS: Array[Rect2] = [")
@@ -389,5 +427,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=B),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')
