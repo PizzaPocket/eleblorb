@@ -1458,14 +1458,18 @@ The head of Civic Plaza: 34 m (east–west) × 60 m (north–south).
 |---|---|---|
 | **Strongroom** | −4.5 m to 0 | The records: registers of births, marriages and deaths, the deeds of homes, and the original **register of house marks**; cool, dry, fireproof, behind a steel door, reached only by Kenji's ramp |
 | **Ground** | 0 to +6.5 m | The **portico** on the plaza; the entrance hall; the **Hall of the City** (below); the registry counter (north side); the **marriage room** (south side); washrooms; the staff door and the clock tower's base on Clock Street (east) |
-| **The Hall of the City** | 0 to +14 m | A great covered courtyard, about 20 × 30 m, after Stockholm's Blue Hall: arcades round the ground floor, a gallery round it at +6.5 m, a louvred clerestory roof. The city's public room: open all day, used for elections, exhibitions, the annual chandelier-lowering supper and anything else the city gathers for. One wall is the **wall of house marks**, a bronze plaque for every registered sign in Moy |
+| **The Hall of the City** | 0 to +14 m | A great covered courtyard, about 16 × 30 m, after Stockholm's Blue Hall: arcades round the ground floor, a gallery round it at +6.5 m, a louvred clerestory roof. The city's public room: open all day, used for elections, exhibitions, the annual chandelier-lowering supper and anything else the city gathers for. One wall is the **wall of house marks**, a bronze plaque for every registered sign in Moy |
 | **First floor** | +6.5 m, the Deck's level | The gallery round the hall; the **mayor's office** over the portico, its window on the plaza and the park; committee rooms; the Deck door (north face) |
-| **The council chamber** | +11 to +20 m, the west front | Over the mayor's office, the full width of the front: a double-height chamber, after Stockholm's Golden Hall, walled in **gold mosaic** of the city's story in pictures (the first wells, the tower houses, the wind towers, the Windworks, the Blackout); the council's horseshoe of seats; a public gallery; tall doors onto the **balcony** over the portico, on the civic axis |
+| **The council chamber** | +11 to +20 m, the west front | Over the mayor's office and the portico: a double-height chamber about 10 × 30 m, after Stockholm's Golden Hall, walled in **gold mosaic** of the city's story in pictures (the first wells, the tower houses, the wind towers, the Windworks, the Blackout); the council's horseshoe of seats; a public gallery; tall doors onto the **balcony** over the portico, on the civic axis |
 | **Roof** | +22 m | A flat roof behind a plain parapet |
 | **The clock tower** | to +45 m | Rises from the east (Clock Street) face, 8 × 8 m: four clock faces at about +34 m, the belfry above with its bell, and a lantern cap lit at night |
 
-**Lines that stack.** The Hall of the City's void runs from the ground to
-its roof at +14 m, bounded by the arcades' piers on every level. The
+**Lines that stack.** Across the 34 m depth: the west range 10 m (the
+portico 4 m and the entrance hall and mayor's office 6 m, with the chamber
+above both), the hall 16 m, and the east range 8 m with the clock tower.
+Along the 60 m front: the north range 15 m (the registry and the Deck door),
+the hall 30 m, the south range 15 m (the marriage room). The Hall of the
+City's void runs from the ground to its roof at +14 m, bounded by the arcades' piers on every level. The
 council chamber sits on the west range, outside the void, over the mayor's
 office and the portico's back wall. The clock tower stands on its own
 walls from the strongroom to the bell. Its shaft holds the lift and the
