@@ -69,7 +69,7 @@ const PRECINCTS := [
 const BUILDINGS := [
 	{"n": 1, "name": "Grand Hotel", "kind": "civic", "rect": Rect2(-483, -98, 52, 60), "height": 91.0, "form": "deco", "size": "podium 4 storeys, guest tower 25 floors (97 m)", "who": "Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work"},
 	{"n": 2, "name": "City hall", "kind": "civic", "rect": Rect2(-431, -30, 34, 60), "height": 22.0, "form": "clock", "size": "4 storeys and a clock tower, at the head of Civic Plaza", "who": "Mayor Teodora Vance, Kenji Mori (clerk)"},
-	{"n": 3, "name": "Library", "kind": "civic", "rect": Rect2(-686, -92, 45, 62), "height": 28.0, "form": "block", "size": "5 storeys and a sunken heritage room; terraced atrium, Books Spiral, reading room (section 9)", "who": "Ada Fong, Nia Calder, Benji Okoro"},
+	{"n": 3, "name": "Library", "kind": "civic", "rect": Rect2(-686, -92, 45, 62), "height": 22.0, "form": "block", "size": "art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)", "who": "Ada Fong, Nia Calder, Benji Okoro"},
 	{"n": 4, "name": "Natural history museum", "kind": "civic", "rect": Rect2(-637, 62, 62, 38), "height": 16.0, "form": "block", "size": "3 storeys, top-lit hall", "who": "Dr. Imani Osei (curator)"},
 	{"n": 5, "name": "Moonlight Cinema", "kind": "civic", "rect": Rect2(-730, 6, 30, 28), "height": 9.0, "form": "block", "size": "2 storeys, built later into the old town; flat above", "who": "Leon Duarte (lives above)"},
 	{"n": 6, "name": "Police box", "kind": "civic", "rect": Rect2(-652, 30, 6, 8), "height": 4.0, "form": "block", "size": "1 storey, back room", "who": "Kate Byrne"},
@@ -320,7 +320,7 @@ const LOTS := [
 ## Storey heights for the lots (m).
 const STOREY := {"fabric": 3.25, "midrise": 3.6}
 ## Crowns above the main roof (m), and parts that rise above a podium.
-const CROWNS := {1: 104.0, 2: 45.0, 3: 32.0, 12: 280.0}
+const CROWNS := {1: 104.0, 2: 45.0, 3: 26.0, 12: 280.0}
 const TOWER_PART := {1: Rect2(-473, -96, 32, 22), 2: Rect2(-417, -3, 6, 6)}
 const PODIUM_HEIGHT := {1: 20.0}
 

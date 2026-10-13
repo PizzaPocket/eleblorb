@@ -57,7 +57,7 @@ def b(n,name,r,kind,h,who=''): B.append(dict(n=n,name=name,r=r,kind=kind,h=h,who
 NB=lambda: 'homes (no one the hero meets)'
 b(1,'Grand Hotel',(-483,-98,-431,-38),'civic','podium 4 storeys, guest tower 25 floors (97 m)','Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work')
 b(2,'City hall',(-431,-30,-397,30),'civic','4 storeys and a clock tower, at the head of Civic Plaza','Mayor Teodora Vance, Kenji Mori (clerk)')
-b(3,'Library',(-686,-92,-641,-30),'civic','5 storeys and a sunken heritage room; terraced atrium, Books Spiral, reading room (section 9)','Ada Fong, Nia Calder, Benji Okoro')
+b(3,'Library',(-686,-92,-641,-30),'civic','art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)','Ada Fong, Nia Calder, Benji Okoro')
 b(4,'Natural history museum',(-637,62,-575,100),'civic','3 storeys, top-lit hall','Dr. Imani Osei (curator)')
 b(5,'Moonlight Cinema',(-730,6,-700,34),'civic','2 storeys, built later into the old town; flat above','Leon Duarte (lives above)')
 b(6,'Police box',(-652,30,-646,38),'civic','1 storey, back room','Kate Byrne')
@@ -303,10 +303,10 @@ RESIDENT_HOMES={
 ## Heights (m, to the main roof) and crowns of the numbered buildings, and
 ## the plan forms of the towers (city.md 7c, 8): one source for the plan, the
 ## skyline and the elevations.
-HEIGHTS={1:91,2:22,3:28,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:180,14:175,15:150,16:22,
+HEIGHTS={1:91,2:22,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:180,14:175,15:150,16:22,
  17:104,18:98,19:117,20:130,21:130,22:46,23:6,24:11,25:17,26:20,27:29,28:26,29:20,30:20,31:20,
  32:23,33:9,34:26,35:72,36:42,37:17,38:7,39:6,49:46,50:110,51:8,52:23,40:8,41:4,42:6,43:35,44:3}
-CROWNS={1:104,2:45,3:32,12:280}
+CROWNS={1:104,2:45,3:26,12:280}
 ## Plan forms: twist (a rounded triangle turning as it rises), screen (round-
 ## cornered square in a screen), capsule (core with plug-in capsules), dune
 ## (rippling balconies), deco (podium with a set-back tower: TOWER_PART).
