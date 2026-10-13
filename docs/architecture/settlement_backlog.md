@@ -911,10 +911,11 @@ call, since the shop UI is where players read what an item is.
 
 ## 18. Chinese village settlement re-fit (2026-10-12, awaiting approval)
 
-Full brief: `chinese_village.md` 4.1, with the islands revised in 4.0 (2026-10-13, proposed): each island a torn piece of one broken plateau, drifted apart asymmetrically with torn keels, and the north piece's shards floating bare; `tools/chinese_village_gorge.py` and `docs/drawings/chinese_gorge_3d.html`. The positions below are superseded by 4.0. Code when approved:
+Full brief: `chinese_village.md` 4.1, with the islands revised in 4.0 (2026-10-13, proposed): each island a torn piece of one broken plateau, drifted apart asymmetrically with torn keels, and the north piece's shards floating bare, inside a ragged rim 170 to 216 m out; `tools/chinese_village_gorge.py`. Every placement on the islands is in 4.0a, from `tools/chinese_village_plan.py` (54 items, 28 routes, all checks passing), drawn by rank and in the Shihu Yuan manner in `docs/drawings/chinese_gorge_3d.html`; `ChinesePlan` should be generated from that tool's JSON. The positions below are superseded by 4.0 and 4.0a. Code when approved:
 - New radii in `scripts/chinese_village.gd`: A 25, B 27, C 22, D 34, E 27,
   Gate 18 (new island at (0, 150)), Bamboo 32 moved to (80, 112). Every
-  island stays inside the Abyss's 170 m full-depth radius.
+  island stays inside the Abyss's 170 m full-depth radius. (Superseded: island
+  outlines from plan data, and the terrain's pit follows the ragged rim.)
 - Replace the flat plank bridges with three builders: iron chain bridge
   (sag 1/20, at least eight collision segments on the curve, 1.05 m chain
   rails with a continuous guard collider, bridge-head houses as anchorages),

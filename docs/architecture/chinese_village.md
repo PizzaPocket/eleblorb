@@ -294,6 +294,12 @@ them on stone pillars, and the user rejected it. This version is in
 - **One surface height.** The lived-on islands keep the village's one
   surface height, which the NPC, Pandy and Sun Wu Kong code relies on. Only
   the bare shards float above and below it.
+- **A ragged rim** (asked by the user, 2026-10-13). The Abyss is no longer a
+  circular pit. Its rim runs 170 to 216 m from the centre, at least 24 m
+  clear of every island. It follows the islands round at that distance, is
+  smoothed, bitten back in bays where more ground fell away, and roughened
+  with the same fracture noise as the islands' broken edges. The entry from
+  Ohio comes straight up from the south to where the rim is nearest the gate.
 
 | Island | Centre | Area m² (needs) |
 |---|---|---|
@@ -308,7 +314,7 @@ them on stone pillars, and the user rejected it. This version is in
 
 | Bridge | Span m | Type |
 |---|---|---|
-| Rim to Gate | 68 | iron chain |
+| Rim to Gate | 27 | covered timber cantilever |
 | Gate to Palace | 59 | iron chain |
 | Gate to Inn | 39 | iron chain |
 | Gate to Bamboo | 19 | covered timber cantilever |
@@ -322,12 +328,47 @@ them on stone pillars, and the user rejected it. This version is in
 **Checks:**
 - every island at least its program's land;
 - the palace's piece holds its plan with the axis north–south;
-- everything inside the Abyss's full-depth radius;
+- every island at least 20 m in from the ragged rim (24 m as drawn);
 - every pair of pieces at least 12 m apart;
 - every bridge within its type's span, and over open air only.
 
 The network in 4.1.4 stands. The coordinates in 4.1.3 are superseded by the
-table above.
+table above, and the placements by 4.0a.
+
+### 4.0a Placements on the islands (proposed, 2026-10-13)
+
+Every compound, building, court, field and garden is placed on its island by
+`tools/chinese_village_plan.py`, which reads the islands, rim and bridges from
+the gorge tool. It is drawn in `docs/drawings/chinese_gorge_3d.html`, which
+builds each item by its rank (4.2) in the Shihu Yuan manner (4.2a).
+Coordinates are each island's own, from its centroid, `+z` south.
+
+| Island | Placed |
+|---|---|
+| Gate | the gatehouse (12 × 10, two storeys, the passage through it, Lian Fu above); the arrival forecourt where the four landings meet |
+| E, Inn | the inn compound (22 × 28): front court with a brick lattice screen behind the gate, a guest wing on its west; the two-storey hall with its gallery and the one green ridge; a partition with a moon gate between the front and back courts; the back court with the kitchen, latrine closet and water jars; a moon gate in the east wall to the inn's garden court (13 × 13: lotus pond, rockery and waterfall, a grey-tiled hexagonal pavilion, a scholar's rock, a cloud-pruned pine) |
+| C, Roofers | Wen Zhao's home; the roof yard (tile and timber stacks, a practice roof frame); Shu Mei's home |
+| A, Lantern Row | Sun Wu Kong's rock on the north rim with its lookout; the play hut and yard in its lee; the lantern home and workshop; Yun Tao's tile home (the one wave coping) |
+| B, Market | the market square with Chen's stall and the well; the bao house, its shopfront on the square; the carrier's home and loading shed |
+| D, Fields | the threshing floor; eight household plots by the market bridge; four field strips with a lane down the west side (1,578 m² as clipped by the island's edge); the field shed; the pits on the east rim |
+| Bamboo, Farm | the grove across the north (nine clumps, a path); Tian Bo's home; the shed and Pandy's pen; three bean terraces stepping down to the south, the levy's boundary stones on the top one |
+| Palace | as `chinese_village_palace.md` 3, with the Dining Hall turned to 9 × 16 so its long front faces west onto the front court; the garden's covered corridors run along its south side at `z` -37 |
+
+**Checks** (all passing):
+- everything 2.5 m in from its island's edge, for the parapet and a walk;
+- buildings and compounds at least 1.5 m apart;
+- every bridge landing's 6 × 6 m apron clear;
+- a 3 m route (2 m in gardens) from the first landing on each island to every
+  door, and to every other landing: 28 routes;
+- field strips at least 1,550 m², bean terraces at least 580 m².
+
+**Parapets** stand 1 m in from every edge, open at the landings: white marble
+balustrades round the palace, timber fences round the fields and the farm,
+brick with a tile coping elsewhere.
+
+**Not yet drawn:** the ramp from the inner court down to the kitchen (it needs
+a section), and the interiors. Eave corners use the brief's fallback, straight
+hips with raised tips, until the swept-roof prototype exists.
 
 **For the code (when approved):** each island's outline and keel come from
 plan data (`ChinesePlan`) instead of a radius. The keel is built as stacked

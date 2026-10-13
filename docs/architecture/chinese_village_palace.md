@@ -101,7 +101,7 @@ south, toward the gate island and the axial bridge. The axis runs along `x = 0`.
 | **Front court** | `(0, 34)` | 40 × 24 m, paved, axis of white stone | 0 | — |
 | **Throne terrace** | `(0, 4)` | 46 × 36 m, three tiers of 1.4 m with marble balustrades; central ramp in three flights, 3.2 m wide, ≤32°, with a landing on each tier | +4.2 | — |
 | **Throne Hall** | `(0, 2)` | 28 × 16 m, seven bays by five, 8 m to the eaves | +4.2 | double-eave *wǔdiàn*, yellow; the tallest roof on the island |
-| **Dining Hall** | `(28, 34)` | 16 × 9 m, just east of the front court, facing west onto it | 0 | single-eave *xiēshān*, yellow |
+| **Dining Hall** | `(28, 34)` | 9 × 16 m (turned 2026-10-13 so its long front faces the court), just east of the front court, facing west onto it | 0 | single-eave *xiēshān*, yellow |
 | **Inner court** | `(0, -24)` | 36 × 14 m, paved, 1.4 m above the throne terrace (not "one step": revised by the audit, 2026-10-07): reached by a short ramp flight either side of the Throne Hall, 3.2 m wide, 32°, about 2.2 m of run with a 1.2 m landing at each end, inside the terrace's 8 m strip behind the hall | +5.6 | — |
 | **Inner apartments** | `(-26, -24)` | 14 × 20 m, west wing on the inner court, door facing east | +5.6 | single-eave *xiēshān*, yellow |
 | **Royal Kitchen** | `(32, -22)` | 18 × 12 m on the east, at ground level, reached from the inner court by a ramp down along the court's east edge (5.6 m rise in two flights: about 9 m of run, a 1.2 m mid landing and landings at both ends, about 12.6 m in all, within the court's 14 m depth), landing at the kitchen's west door; and from the service yard | 0 | *xuánshān*, grey |

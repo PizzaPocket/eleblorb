@@ -101,7 +101,7 @@ P_ = [
     ('palace_apron', 'Axis landing apron', 'court', (0, 55, 8, 6, 0), {}),
     ('gate_pavilion', 'Gate pavilion', 'building', (0, 47.5, 16, 7, 0), dict(style='palace', roof='xieshan', through=True, door='+z', program='the axis bridge-head: chains anchored in its base')),
     ('front_court', 'Front court', 'court', (0, 32, 40, 22, 0), dict(style='palace', program='paved, an axis of white stone; the village square after the quest', public=True)),
-    ('dining_hall', 'Dining Hall', 'building', (28, 32, 16, 9, 0), dict(style='palace', roof='xieshan', door='-x', program='communal dining after the quest')),
+    ('dining_hall', 'Dining Hall', 'building', (28, 32, 9, 16, 0), dict(style='palace', roof='xieshan', door='-x', program='communal dining after the quest')),
     ('throne_terrace', 'Throne terrace', 'platform', (0, 3, 46, 34, 0), dict(style='marble', program='three tiers of 1.4 m with balustrades; a central ramp in three flights', height=4.2)),
     ('throne_hall', 'Throne Hall', 'building', (0, 1, 28, 16, 0), dict(style='palace', roof='wudian2', on='throne_terrace', door='+z', program='the throne; the village hall after the quest', height=4.2)),
     ('inner_court', 'Inner court', 'platform', (0, -24, 36, 14, 0), dict(style='marble', program='1.4 m above the throne terrace', height=5.6)),
@@ -208,12 +208,23 @@ if strips < 1550: problems.append(('fields', 'strips are %.0f m2, under 1,550' %
 terr = sum(it['poly'].area for it in I if it['style'] == 'terrace')
 if terr < 580: problems.append(('bamboo', 'terraces are %.0f m2, under 600' % terr))
 
+# 6. parapets 1 m in from every edge, open at the bridge landings: marble round the palace,
+# fences round worked ground, brick with a tile coping elsewhere
+PARAPET_KIND = {'palace': 'marble', 'fields': 'fence', 'bamboo': 'fence'}
+PARAPETS = []
+for k, g in ISL.items():
+    ring = g.buffer(-1.0, 4).exterior
+    gaps = unary_union([ap.buffer(1.2) for (kk, t), ap in APRONS.items() if kk == k])
+    rest = ring.difference(gaps) if not gaps.is_empty else ring
+    for ln in (rest.geoms if hasattr(rest, 'geoms') else [rest]):
+        if ln.length > 1.0: PARAPETS.append(dict(island=k, kind=PARAPET_KIND.get(k, 'brick'), pts=[[round(x, 2), round(z, 2)] for x, z in ln.simplify(0.4).coords]))
+
 for p in problems: print('PROBLEM', p)
 def out(p):
     if p.geom_type != 'Polygon': p = max(p.geoms, key=lambda q: q.area)
     return [[round(x, 2), round(z, 2)] for x, z in p.exterior.coords]
 data = dict(G['data'], items=[dict({k: v for k, v in it.items() if k != 'poly'}, outline=out(it['poly']), door_at=door_point(it), centre=[round(CEN[it['island']][0] + it['rect'][0], 2), round(CEN[it['island']][1] + it['rect'][1], 2)]) for it in I],
-            routes=ROUTES, aprons=[dict(island=k, to=t, outline=out(p)) for (k, t), p in APRONS.items()], tops={k: out(v) for k, v in TOP.items()},
+            routes=ROUTES, parapets=PARAPETS, aprons=[dict(island=k, to=t, outline=out(p)) for (k, t), p in APRONS.items()], tops={k: out(v) for k, v in TOP.items()},
             plan_problems=[list(map(str, p)) for p in problems])
 if '--json' in sys.argv: json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
 print('%d items on %d islands; %d routes; strips %.0f m2, terraces %.0f m2; %d problems' % (len(I), len(by), len(ROUTES), strips, terr, len(problems)))
