@@ -261,102 +261,78 @@ quest. The Chef is never named as the cause by an ordinary resident.
 
 ## 4. Layout (provisional, derived from section 3)
 
-### 4.0 The ground: a gorge of stone pillars (proposed, 2026-10-13)
+### 4.0 The islands: pieces of one broken plateau (proposed, 2026-10-13)
 
-The user found the island arrangement unnatural and inorganic. Measured from
-the code:
-- the Abyss is a perfect circular pit with smooth walls;
-- the islands are round discs over cones, all at one height, spaced evenly
-  round the palace;
-- nothing holds them up.
+The user found the island arrangement unnatural and inorganic:
+- every island is a round disc;
+- the islands are set evenly in a ring round the palace;
+- every gap and bridge reads alike.
 
-This section gives the village the ground nature would. Everything below is
-in `tools/chinese_village_gorge.py`, checked, and drawn in
-`docs/drawings/chinese_gorge_3d.html`.
+The islands still float, as the world bible has it. A first proposal stood
+them on stone pillars, and the user rejected it. This version is in
+`tools/chinese_village_gorge.py`, checked, and drawn in
+`docs/drawings/chinese_gorge_3d.html` (with a toggle for today's layout).
 
-**How it formed.** The plateau was quartz sandstone crossed by two sets of
-near-vertical joints: one along the gorge, about 15° east of north, and one
-across it. Water worked down the joints for an age, widened them into the
-Abyss, and left the blocks between standing as pillars. This is the process
-behind Zhangjiajie's stone forest and the great karst sinkholes (*tiānkēng*),
-and it fits the lore that the islands are pieces of one plateau. Mist fills
-the Abyss from about 60 m below the village. Across the gorge the pillars read
-as floating; looking down, they plunge into the mist. Every one stands on the
-floor 400 m down.
+**How the pieces came to be:**
+- **One plateau broke.** It was a rounded mass about 210 m across. The
+  palace's island is its biggest remnant, which broke out whole.
+- **The rest of the rim shattered round it.** It broke into a ring of smaller
+  pieces along jagged fracture lines: long bends with smaller teeth, the same
+  fracture field on both sides of a break, so neighbouring broken edges
+  still roughly match. Each piece's outer edge is the old rim: rounded and
+  weathered. Each is sized to its program's land (4.1.2).
+- **The pieces drifted apart.** Each moved out from the palace by its own
+  distance, 26 to 52 m, and turned by its own angle, up to 18°. All of them
+  swung slightly the same way as they parted, about 20°. No two gaps are
+  alike, and the arrangement is not a ring of equal steps.
+- **The north piece shattered.** It stood behind the palace. Four bare shards
+  are left, floating at their own heights from 26 m below the village to 7 m
+  above it. Lantern Row and the market face each other across the gap.
+- **Torn undersides.** Each island hangs a rock keel of its own depth, about
+  0.9 to 1.4 times its size, banded by its strata. It tapers unevenly to a
+  point off its centre: a torn piece of one mass, not a cone.
+- **One surface height.** The lived-on islands keep the village's one
+  surface height, which the NPC, Pandy and Sun Wu Kong code relies on. Only
+  the bare shards float above and below it.
 
-**The rules it follows:**
-- **A gorge, not a pit.** About 450 × 560 m, long along the main joint, with
-  a bay to the west, narrowing south to the entry from Ohio. The walls are
-  sheer, banded sandstone. The outline replaces the terrain's circle of
-  radius 170 m.
-- **Blocky pillars.** Each is a rounded-corner rectangle (a superellipse,
-  epsilon 3.4 for lived-on pillars, 2.8 for bare ones) turned with the
-  joints. Its edge is roughened, and the bamboo pillar has a notch where a
-  joint bit in.
-- **Rows along the joints.** Pillars stand close across the gorge and
-  wider along it.
-- **Accordant tops.** The tops are the old plateau surface, tilting gently
-  down to the south. The palace's pillar is the biggest remnant and the
-  highest, +4 m; the gate's is lowest, −2.2 m. Every bridge climbs no more
-  than 1 in 8.
-- **Bare pillars.** Twenty pillars too small to live on, 12 to 28 m across,
-  stand between the lived-on ones from 35 m below the village to 26 m above
-  it, with cloud-pruned pines on their tops. Pines also lean from the rim.
-- **Piers.** Two small pillars carry bridge-heads, one on the processional
-  axis and one on the west ring. The longest bridge drops from 77 m to 59 m.
-
-| Pillar | Centre (plan) | Half-widths, turn | Top | Area (needs) |
-|---|---|---|---|---|
-| Palace | (0, 0) | 56 × 62, 0° | +4.0 | 12,561 (12,076) |
-| Gate | (6, 176) | 18 × 17, 4° | −2.2 | 1,107 (1,018) |
-| E, Inn | (−72, 128) | 26 × 25, −7° | −1.8 | 2,352 (2,290) |
-| C, Roofers | (−140, 50) | 22 × 21, 9° | +0.6 | 1,671 (1,521) |
-| A, Lantern Row | (−104, −66) | 25 × 23, −4° | +2.6 | 2,080 (1,963) |
-| B, Market | (104, −52) | 26 × 25, 6° | +2.4 | 2,351 (2,290) |
-| D, Fields | (110, 54) | 34 × 30, 3° | +0.4 | 3,690 (3,632) |
-| Bamboo, Farm | (88, 132) | 32 × 29, −5° | −1.2 | 3,335 (3,217) |
-| Axis pier | (0, 104) | 9 × 8 | +1.0 | bridge-head |
-| West pier | (−122, −8) | 8 × 9 | +1.0 | bridge-head |
-
-The plan frame is x across the gorge and z along it (+z south, toward the
-entry), origin at the palace pillar. The world frame is this turned 15°.
-
-| Bridge | Span | Type |
+| Island | Centre | Area m² (needs) |
 |---|---|---|
-| Rim to Gate | 59 | chain, 5 m |
-| Gate to axis pier | 47 | chain, 5 m |
-| Axis pier to Palace | 35 | covered cantilever, 5 m |
-| Gate to Inn | 43 | chain |
-| Gate to Bamboo | 39 | chain, 2.4 m |
-| Palace to Lantern Row | 30 | covered cantilever (garden gate) |
-| Palace to Market | 24 | covered cantilever (service) |
-| Lantern Row to west pier | 27 | covered cantilever |
-| West pier to Roofers | 30 | covered cantilever |
-| Roofers to Inn | 50 | chain |
-| Market to Fields | 51 | chain |
-| Fields to Bamboo | 20 | covered cantilever (was a stone arch: the gap is now 20 m) |
+| Palace | (-10, -12) | 12,269 (12,076) |
+| Gate | (-14, 138) | 1,191 (1,018) |
+| E, Inn | (-90, 93) | 2,817 (2,290) |
+| C, Roofers | (-131, 11) | 2,244 (1,521) |
+| A, Lantern Row | (-99, -80) | 2,713 (1,963) |
+| B, Market | (97, -77) | 2,879 (2,290) |
+| D, Fields | (117, 40) | 4,531 (3,632) |
+| Bamboo, Farm | (43, 105) | 4,092 (3,217) |
+
+| Bridge | Span m | Type |
+|---|---|---|
+| Rim to Gate | 68 | iron chain |
+| Gate to Palace | 59 | iron chain |
+| Gate to Inn | 39 | iron chain |
+| Gate to Bamboo | 19 | covered timber cantilever |
+| Palace to Lantern | 32 | covered timber cantilever |
+| Palace to Market | 44 | iron chain |
+| Lantern to Roofers | 34 | covered timber cantilever |
+| Roofers to Inn | 37 | covered timber cantilever |
+| Market to Fields | 34 | covered timber cantilever |
+| Fields to Bamboo | 26 | covered timber cantilever |
 
 **Checks:**
-- every pillar inside the gorge;
-- lived-on pillars at least 18 m from the rim;
-- pillars at least 8 m apart, or they would be one rock;
-- every lived-on top at least the area its program needs (4.1.2);
-- every bridge within its type's span (chain 100 m, cantilever 38 m, arch
-  15 m) and its grade;
-- no bridge through another pillar;
-- every lived-on pillar reached from the rim.
+- every island at least its program's land;
+- the palace's piece holds its plan with the axis north–south;
+- everything inside the Abyss's full-depth radius;
+- every pair of pieces at least 12 m apart;
+- every bridge within its type's span, and over open air only.
 
-**For the code (when approved):**
-- the terrain's Abyss becomes this outline, signed-distance based, at the
-  same depth;
-- the islands become pillars to the floor, with collision on their walls;
-- each island gets its own top height, which replaces today's one shared
-  surface height for NPCs, Pandy and Sun Wu Kong;
-- the bare pillars and pines are built;
-- the mist is a volume or a stack of soft planes.
+The network in 4.1.4 stands. The coordinates in 4.1.3 are superseded by the
+table above.
 
-The coordinates in 4.1.3 and the network in 4.1.4 are superseded by these
-tables. The roles, households and bridge types stand.
+**For the code (when approved):** each island's outline and keel come from
+plan data (`ChinesePlan`) instead of a radius. The keel is built as stacked
+rings tapering to an offset tip, with simplified convex collision for the
+top. The shards are built bare, with pines.
 
 ### 4.1 Settlement re-fit (revised 2026-10-12)
 
