@@ -817,7 +817,10 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     hawker centre (Siti's stall) on its south side, facing the park, and the
     centre building on its north (minimart, kindergarten, community club,
     the Housing Board office, a roof garden). There is no car park.
-  - **The twins**, Blocks 4 and 5, stand side by side on Library Lane,
+  - **Turned off the grid:** the blocks standing back from the streets
+    turn 30° together onto the estate's own grid; the street-edge blocks
+    keep the city's (7d).
+  - **The twins**, Blocks 4 and 5, stand side by side facing the library,
     joined by a sky bridge and sky garden at the 26th floor over the gap
     between them, which is the west court's gate.
 
@@ -1081,6 +1084,32 @@ sky bridges into one building. The North Estate takes both. Each precinct
 is **one near-continuous wall of broad blocks round a court**, with gaps at
 the corners for light, wind and the linkways.
 
+**Turned off the grid (user, 2026-10-13).** The blocks that stand back
+from the streets turn **30° anticlockwise** off the city grid together,
+so each precinct's ring sits on its own grid, running west-south-west to
+east-north-east. The blocks that hold a street edge keep the city grid:
+Block 6 on the Park Ring, Block 7 on North Street, Block 3 on the corner of
+the Park Ring and Estate Lane, and Block 8 on Estate Lane. Behind that
+street wall the turned blocks stand in their gardens, the way Singapore's
+new towns were laid out on their own lines, regardless of any older grid.
+- **Wind.** The west wind funnels through the basin. Turned, the gaps
+  between blocks meet it on the diagonal and draw it through the courts,
+  instead of letting it skim past slabs parallel to it. Singapore's Housing
+  Board orients its blocks by wind studies for the same reason.
+- **Sun.** The long faces look north-north-west and south-south-east, away
+  from the low western sun.
+- **Views.** Flats face out on diagonals, over the city, the park or the
+  desert, so no window looks straight down a street or into a neighbour.
+- **Character.** The estate reads as its own place, a later layer on the
+  old grid. The triangles left between the street-edge blocks and the
+  turned ones become planting and play pockets.
+- **Play.** Diagonal gaps give long swing lines across the courts that
+  the street grid never offers.
+
+The plan stores each turned block as its footprint plus an angle
+(`CityPlan.corners()` gives the true outline), and the validator tests the
+true outlines.
+
 **Why broad and close suits Moy:**
 - It matches the city: Old Moy's walls and downtown's mid-rise mass are
   continuous, and now the estate is too.
@@ -1094,46 +1123,53 @@ the corners for light, wind and the linkways.
 - Closeness is shade: a desert court between tall walls is in shadow most
   of the day.
 
-**The west precinct** (west of North Street, north of Library Lane):
+**The west precinct** (west of North Street, north of Library Lane). The
+ring of Blocks 1, 4, 5 and 9 is turned 30° about the west court's centre:
 
 | No. | Block | Footprint | Height | Place in the ring |
 |---|---|---|---|---|
-| 17 | Block 1 | 14 × 46 m | slab, 28 storeys | the west wall, its back to Arcade Street; Tomas Wren |
-| 20 | Block 4 | 26 × 22 m | broad point block, 40 storeys | the twins: the south wall, on Library Lane |
-| 21 | Block 5 | 26 × 22 m | broad point block, 40 storeys | the twins; Dr. Imani Osei and Kofi |
-| 53 | Block 9 | 62 × 16 m | slab, 22 storeys | the north wall, its back to the community garden and the Rim Walk |
-| 49 | Block 7 | 14 × 74 m | slab, 16 storeys | the east wall, shops in its void deck on North Street |
-| 22 | Block 6 | 67 × 16 m | slab, 14 storeys | outside the ring, south of Library Lane, shops in its void deck on the Park Ring |
+| 17 | Block 1 | 14 × 34 m, turned | slab, 28 storeys | the west-south-west end, backing onto Arcade Street; Tomas Wren |
+| 53 | Block 9 | 46 × 16 m, turned | slab, 24 storeys | the north-north-west wall, its back to the community garden and the Rim Walk |
+| 20 | Block 4 | 22 × 20 m, turned | broad point block, 40 storeys | the twins: the south-south-east wall, facing the library and the park |
+| 21 | Block 5 | 22 × 20 m, turned | broad point block, 40 storeys | the twins; Dr. Imani Osei and Kofi |
+| 49 | Block 7 | 14 × 74 m, on the grid | slab, 16 storeys | the east side, shops in its void deck on North Street |
+| 22 | Block 6 | 67 × 16 m, on the grid | slab, 14 storeys | outside the ring, south of Library Lane, shops in its void deck on the Park Ring |
 
-- **The west court**, about 90 × 20 m between the blocks, opens south
-  through the 16 m gap between the twins onto Library Lane, facing the
-  library. In it: the precinct playground, a chess pavilion, shade trees on
-  reclaimed water, and the fitness corner.
-- **The twins' sky bridge and sky garden** span that gap at the 26th
+- **The west court**, about 64 × 19 m inside the turned ring, opens at its
+  east end toward Block 7 and North Street, and south-south-east through
+  the 10 m gap between the twins, the court's gate, toward Library Lane,
+  the library and the park. In it: the precinct playground, a chess
+  pavilion, shade trees on reclaimed water, and the fitness corner.
+- **The twins' sky bridge and sky garden** span the gate at the 26th
   floor, so the court's gate is a bridge 85 m up.
-- **Behind Block 9**, the strip to the Rim Walk is the **community
+- **Behind Block 9**, the ground to the Rim Walk is the **community
   garden**, residents' plots on reclaimed water.
-- Block 6 keeps a 14 m garden on its north side, along Library Lane.
+- Between the turned ring and Library Lane lies a triangle of garden;
+  Block 6 keeps a 14 m garden on its north side.
 
 **The east precinct** (east of North Street, round Estate Square):
 
 | No. | Block | Footprint | Height | Place in the ring |
 |---|---|---|---|---|
-| 19 | Block 3 | 25 × 32 m | broad point block, 36 storeys | the south corner, on the Park Ring; Juno Rell, 20th floor |
-| 50 | Block 8 | 21 × 44 m | slab, 34 storeys | the east wall, on Estate Lane |
-| 18 | Block 2 | 44 × 22 m | slab, 30 storeys | the north wall, toward the Rim Walk; Siti Rahman |
+| 19 | Block 3 | 25 × 32 m, on the grid | broad point block, 36 storeys | the south corner, on the Park Ring; Juno Rell, 20th floor |
+| 50 | Block 8 | 21 × 44 m, on the grid | slab, 34 storeys | the east wall, on Estate Lane |
+| 18 | Block 2 | 36 × 18 m, turned | slab, 32 storeys | the north wall, toward the Rim Walk; Siti Rahman |
 | 51 | Neighbourhood centre | 38 × 32 m | 2 storeys, roof garden | the west side, on Estate Square |
 | 23 | Hawker centre | 38 × 20 m | 1 storey, open-sided | on the Park Ring and Estate Square |
 
-- **The east court**, about 60 × 14 m, lies between Block 2 on the north
-  and the neighbourhood centre and Block 8 on the south, overlooked by the
+- **The east precinct is too narrow to turn its street-edge blocks**, so
+  only Block 2, standing back toward the Rim Walk, turns with the west
+  ring.
+- **The east court**, 8 m wide along the centre's north side and opening
+  to about 20 m at its east end beside the turned Block 2, lies between Block 2 on the north and the
+  neighbourhood centre and Block 8 on the south, overlooked by the
   centre's roof garden. The second playground and chess pavilion are here.
   An 8 m linkway passage between the centre and Block 8 joins it to Estate
   Square.
 - Estate Square is the precinct's front; Block 3 and Block 8 stand 12 m
   apart on its east side.
 
-**Spacing.** Blocks stand 10 to 20 m apart, the twins 16 m. Flats face out
+**Spacing.** Blocks stand 10 to 20 m apart, the twins 10 m. Flats face out
 of the ring, over the city, the park or the desert, and the open corridors
 face the court, so no window looks straight into another across 10 m.
 
@@ -1157,7 +1193,8 @@ skyline and the tower elevations, so they always agree. `tools/validate_city_pla
 plan before anything is built, and runs in the pre-push hook
 (`VILLAGE=city sh tools/check_village_layout.sh`):
 - everything built stands inside the Rim Walk, and the works outside it;
-- no footprints overlap, and nothing is built on a street or square;
+- no footprints overlap, and nothing is built on a street or square,
+  tested on the true outlines of turned blocks;
 - every building in a street block has a face on a street, square, the park
   or the Rim Walk, within 6 m across open ground (a front garden or yard);
   estate blocks stand in a precinct instead;
@@ -1175,7 +1212,8 @@ below.
 - **Downtown:** mid-rise blocks of 10 to 22 storeys on 20 to 34 m
   frontages, round the towers.
 - **The North Estate:** no lots; broad blocks stand in a ring round each
-  precinct's court (7d).
+  precinct's court, the ones back from the streets turned 30° off the grid
+  (7d).
 
 **Every building has a street face** (user). Each block is filled from
 its street edges inward, so every building fronts a street, lane, square
@@ -1212,16 +1250,16 @@ round the park and on Civic Plaza.
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 17 | Block 1 | 14 × 46 m | slab block, 28 storeys, west side of the west court | Tomas Wren |
-| 18 | Block 2 | 44 × 22 m | slab block, 30 storeys, north side of the east court | Siti Rahman |
+| 17 | Block 1 | 14 × 34 m, turned 30° | slab block, 28 storeys, west side of the west court | Tomas Wren |
+| 18 | Block 2 | 36 × 18 m, turned 30° | slab block, 32 storeys, north side of the east court | Siti Rahman |
 | 19 | Block 3 | 25 × 32 m | broad point block, 36 storeys, on the Park Ring | Juno Rell (20th floor) |
-| 20 | Block 4 | 26 × 22 m | twin broad point block, 40 storeys, on Library Lane; sky bridge and sky garden at the 26th floor | homes (no one the hero meets) |
-| 21 | Block 5 | 26 × 22 m | twin broad point block, 40 storeys, on Library Lane | Dr. Imani Osei and Kofi |
+| 20 | Block 4 | 22 × 20 m, turned 30° | twin broad point block, 40 storeys; sky bridge and sky garden at the 26th floor | homes (no one the hero meets) |
+| 21 | Block 5 | 22 × 20 m, turned 30° | twin broad point block, 40 storeys | Dr. Imani Osei and Kofi |
 | 22 | Block 6 | 67 × 16 m | slab block, 14 storeys, shops in its void deck on the Park Ring | homes (no one the hero meets) |
 | 23 | Hawker centre | 38 × 20 m | 1 storey, open-sided, on the Park Ring and Estate Square | Siti's laksa stall |
 | 49 | Block 7 | 14 × 74 m | slab block, 16 storeys, shops in its void deck on North Street | homes (no one the hero meets) |
 | 50 | Block 8 | 21 × 44 m | slab block, 34 storeys, east side of the east court | homes (no one the hero meets) |
-| 53 | Block 9 | 62 × 16 m | slab block, 22 storeys, north side of the west court | homes (no one the hero meets) |
+| 53 | Block 9 | 46 × 16 m, turned 30° | slab block, 24 storeys, north side of the west court | homes (no one the hero meets) |
 | 51 | Neighbourhood centre | 38 × 32 m | 2 storeys: minimart, kindergarten, community club, roof garden | Juno Rell (Housing Board office) |
 
 **Old Moy**
@@ -1885,7 +1923,7 @@ lit crowns.
   towers; green on the plan means gardens only (user).
 - The North Estate is planned as precincts, the way Singapore's estates
   are, not wedged among lots; its blocks are broad and close together round
-  each precinct's court (user, 2026-10-13). Skyscrapers
+  each precinct's court, and angled off the city grid (user, 2026-10-13). Skyscrapers
   stand on full-size blocks at the centre, not squeezed onto the rim. City
   hall and the hotel are not a symmetrical pair: city hall heads Civic
   Plaza, and the private hotel takes a side (user).

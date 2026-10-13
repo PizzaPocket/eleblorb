@@ -9,7 +9,8 @@ extends Node
 ## Exit code 1 if anything FAILs. The rules are docs/architecture/city.md,
 ## section 7 and the building schedule:
 ##   - everything built stands inside the Rim Walk; the works stand outside it;
-##   - no two footprints overlap, and nothing is built on a street or square;
+##   - no two footprints overlap, and nothing is built on a street or square
+##     (turned estate blocks are tested by their true outline, corners());
 ##   - every building in a street block has a face on a street, square, the
 ##     park or the Rim Walk; estate blocks stand in a precinct instead;
 ##   - every street meets another street, a square or the Rim Walk at both
@@ -51,15 +52,30 @@ func _inside_built(p: Vector2) -> bool:
 	return p.distance_to(CityPlan.CENTER) <= CityPlan.BUILT_RADIUS
 
 
-func _corners(r: Rect2) -> Array[Vector2]:
-	var out: Array[Vector2] = [r.position, Vector2(r.end.x, r.position.y), Vector2(r.position.x, r.end.y), r.end]
-	return out
+func _corners(r: Rect2) -> PackedVector2Array:
+	return PackedVector2Array([r.position, Vector2(r.end.x, r.position.y), r.end, Vector2(r.position.x, r.end.y)])
 
 
-## True when two rectangles share area (touching edges do not count).
-func _overlap(a: Rect2, b: Rect2) -> bool:
-	return a.position.x < b.end.x - EPS and b.position.x < a.end.x - EPS \
-		and a.position.y < b.end.y - EPS and b.position.y < a.end.y - EPS
+## True when two convex outlines share area (touching edges do not count):
+## no edge normal of either separates them.
+func _polys_overlap(a: PackedVector2Array, b: PackedVector2Array) -> bool:
+	for poly in [a, b]:
+		for i in poly.size():
+			var e: Vector2 = poly[(i + 1) % poly.size()] - poly[i]
+			var axis := Vector2(-e.y, e.x).normalized()
+			var amin := INF
+			var amax := -INF
+			var bmin := INF
+			var bmax := -INF
+			for p in a:
+				amin = minf(amin, p.dot(axis))
+				amax = maxf(amax, p.dot(axis))
+			for p in b:
+				bmin = minf(bmin, p.dot(axis))
+				bmax = maxf(bmax, p.dot(axis))
+			if amax <= bmin + EPS or bmax <= amin + EPS:
+				return false
+	return true
 
 
 func _in_street_or_open(p: Vector2) -> bool:
@@ -84,9 +100,9 @@ func _footprints() -> Array:
 	var out := []
 	for b in CityPlan.BUILDINGS:
 		if b["rect"] != null and not OUTSIDE.has(int(b["n"])):
-			out.append({"label": "building %d %s" % [b["n"], b["name"]], "rect": b["rect"], "kind": b["kind"]})
+			out.append({"label": "building %d %s" % [b["n"], b["name"]], "rect": b["rect"], "outline": CityPlan.corners(b), "kind": b["kind"]})
 	for i in CityPlan.LOTS.size():
-		out.append({"label": "lot %d" % i, "rect": CityPlan.LOTS[i][0], "kind": "lot"})
+		out.append({"label": "lot %d" % i, "rect": CityPlan.LOTS[i][0], "outline": _corners(CityPlan.LOTS[i][0]), "kind": "lot"})
 	return out
 
 
@@ -103,7 +119,7 @@ func _check_numbers_and_homes() -> void:
 
 func _check_inside_rim() -> void:
 	for f in _footprints():
-		for c in _corners(f["rect"]):
+		for c in f["outline"]:
 			if not _inside_built(c):
 				_fail("%s reaches beyond the Rim Walk" % f["label"])
 				break
@@ -116,18 +132,18 @@ func _check_inside_rim() -> void:
 func _check_overlaps() -> void:
 	var fps := _footprints()
 	for i in fps.size():
-		var a: Rect2 = fps[i]["rect"]
+		var a: PackedVector2Array = fps[i]["outline"]
 		for j in range(i + 1, fps.size()):
-			if _overlap(a, fps[j]["rect"]):
+			if _polys_overlap(a, fps[j]["outline"]):
 				_fail("%s overlaps %s" % [fps[i]["label"], fps[j]["label"]])
 		for s in CityPlan.STREETS:
-			if _overlap(a, s["rect"]):
+			if _polys_overlap(a, _corners(s["rect"])):
 				_fail("%s is built on %s" % [fps[i]["label"], s["name"]])
 		for o in CityPlan.OPENS:
 			# The park's tea house and lodge stand in the park by design.
 			if o["name"] == "park" and fps[i]["kind"] == "civic":
 				continue
-			if _overlap(a, o["rect"]):
+			if _polys_overlap(a, _corners(o["rect"])):
 				_fail("%s is built on %s" % [fps[i]["label"], o["name"]])
 
 
@@ -136,12 +152,12 @@ func _check_overlaps() -> void:
 ## the park, or the Rim Walk's garden edge beyond the built radius.
 const FRONT_REACH := 6
 
-var _all_footprints: Array[Rect2] = []
+var _all_footprints: Array[PackedVector2Array] = []
 
 
 func _occupied(p: Vector2) -> bool:
-	for r in _all_footprints:
-		if r.has_point(p):
+	for outline in _all_footprints:
+		if Geometry2D.is_point_in_polygon(p, outline):
 			return true
 	return false
 
@@ -173,7 +189,7 @@ func _has_frontage(r: Rect2) -> bool:
 func _check_frontage() -> void:
 	_all_footprints.clear()
 	for f in _footprints():
-		_all_footprints.append(f["rect"])
+		_all_footprints.append(f["outline"])
 	for f in _footprints():
 		var r: Rect2 = f["rect"]
 		if f["kind"] == "estate" or (f["kind"] == "civic" and _in_precinct(r.get_center())):

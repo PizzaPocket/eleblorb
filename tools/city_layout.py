@@ -71,11 +71,11 @@ b(13,'Glass tower',(-483,38,-443,78),'tower','about 45 storeys, 180 m, on a podi
 b(14,'North tower',(-483,-142,-443,-102),'tower','about 45 storeys, 175 m, on a podium','start-up floors (Theo Park)')
 b(15,'South tower',(-483,102,-443,142),'tower','about 40 storeys, 150 m, on a podium','flats over offices; Dr. Vera Kask')
 b(16,'BLOCK',(-431,38,-393,80),'civic','6 storeys, research labs round a court','Dr. Vera Kask (director)')
-b(17,'Block 1',(-684,-150,-670,-104),'estate','slab block, 28 storeys, west side of the west court','Tomas Wren')
-b(18,'Block 2',(-550,-186,-506,-164),'estate','slab block, 30 storeys, north side of the east court','Siti Rahman')
+b(17,'Block 1',(-674,-143,-660,-109),'estate','slab block, 28 storeys, west side of the west court, turned 30° off the grid','Tomas Wren')
+b(18,'Block 2',(-547,-184,-511,-166),'estate','slab block, 32 storeys, north side of the east court, turned 30° off the grid','Siti Rahman')
 b(19,'Block 3',(-512,-94,-487,-62),'estate','broad point block, 36 storeys, on the Park Ring','Juno Rell (20th floor)')
-b(20,'Block 4',(-658,-124,-632,-102),'estate','twin broad point block, 40 storeys, on Library Lane; sky bridge and sky garden at the 26th floor',NB())
-b(21,'Block 5',(-616,-124,-590,-102),'estate','twin broad point block, 40 storeys, on Library Lane','Dr. Imani Osei and Kofi')
+b(20,'Block 4',(-643,-131,-621,-111),'estate','twin broad point block, 40 storeys, turned 30° off the grid; sky bridge and sky garden at the 26th floor',NB())
+b(21,'Block 5',(-615,-147,-593,-127),'estate','twin broad point block, 40 storeys, turned 30° off the grid','Dr. Imani Osei and Kofi')
 b(22,'Block 6',(-635,-78,-568,-62),'estate','slab block, 14 storeys, shops in its void deck on the Park Ring',NB())
 b(23,'Hawker centre',(-554,-82,-516,-62),'civic','1 storey, open-sided, on the Park Ring and Estate Square','Siti\'s laksa stall')
 b(24,'Garden Row',(-660,40,-637,58),'home','3 townhouses, 3 storeys, facing the Park Ring','Teodora Vance; Ada Fong and Sora Ishida; Priya Raman')
@@ -97,7 +97,7 @@ b(39,'City works yard',(-540,174,-514,186),'civic','sheds and a flat','Kade Morr
 b(52,'Reese–Miller house',(-704,-40,-694,-24),'home','old tower house, 7 storeys; wind tower and roof terrace','Elizabeth Reese, Dan Miller and Jammer (away at the farm)')
 b(49,'Block 7',(-580,-176,-566,-102),'estate','slab block, 16 storeys, shops in its void deck on North Street',NB())
 b(50,'Block 8',(-508,-150,-487,-106),'estate','slab block, 34 storeys, east side of the east court',NB())
-b(53,'Block 9',(-656,-160,-594,-144),'estate','slab block, 22 storeys, north side of the west court',NB())
+b(53,'Block 9',(-658,-170,-612,-154),'estate','slab block, 24 storeys, north side of the west court, turned 30° off the grid',NB())
 b(51,'Neighbourhood centre',(-554,-150,-516,-118),'civic','2 storeys: minimart, kindergarten, community club, roof garden','Juno Rell (Housing Board office)')
 for n,name,r,kind,h,who in [
  (40,'Battery works',(-789,-8,-767,8),'works','2 storeys','Omar Haddad (flat)'),
@@ -305,8 +305,8 @@ RESIDENT_HOMES={
 ## the plan forms of the towers (city.md 7c, 8): one source for the plan, the
 ## skyline and the elevations.
 HEIGHTS={1:91,2:22,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:180,14:175,15:150,16:22,
- 17:91,18:98,19:117,20:130,21:130,22:46,23:6,24:11,25:17,26:20,27:29,28:26,29:20,30:20,31:20,
- 32:23,33:9,34:26,35:72,36:42,37:17,38:7,39:6,49:52,50:110,51:8,52:23,53:72,40:8,41:4,42:6,43:35,44:3}
+ 17:91,18:104,19:117,20:130,21:130,22:46,23:6,24:11,25:17,26:20,27:29,28:26,29:20,30:20,31:20,
+ 32:23,33:9,34:26,35:72,36:42,37:17,38:7,39:6,49:52,50:110,51:8,52:23,53:78,40:8,41:4,42:6,43:35,44:3}
 CROWNS={1:104,2:45,3:26,12:280}
 ## Plan forms: twist (a rounded triangle turning as it rises), screen (round-
 ## cornered square in a screen), capsule (core with plug-in capsules), dune
@@ -335,24 +335,63 @@ PARK={
 ## The North Estate's precincts (clipped by the Rim Walk): west of North Street,
 ## north of Library Lane plus the strip along the Park Ring; east of it.
 PRECINCTS=[[(-686,-200,-566,-96),(-637,-92,-566,-62)],[(-554,-200,-487,-62)]]
-## The North Estate's courts and grounds (city.md 7d), for the drawings:
-## courts, the twins' gate and sky bridge, the community garden,
-## playgrounds, chess pavilions and covered linkways (polylines).
+## Turned footprints (city.md 7d). A building with an angle stands on its
+## rect turned about the rect's centre by that many degrees, positive
+## clockwise on the plan with north up (from +X toward +Z). The estate's
+## blocks standing back from the streets share one turn, ESTATE_TURN; the
+## blocks that hold a street edge keep the city grid.
+ESTATE_TURN=-30
+ANGLE={17:ESTATE_TURN,20:ESTATE_TURN,21:ESTATE_TURN,53:ESTATE_TURN,18:ESTATE_TURN}
+def turn(cx,cz,a,pts):
+    t=math.radians(a); c,s_=math.cos(t),math.sin(t)
+    return [(round(cx+u*c-v*s_,1),round(cz+u*s_+v*c,1)) for u,v in pts]
+def corners_of(b):
+    x0,z0,x1,z1=b['r']; cx,cz=(x0+x1)/2,(z0+z1)/2; hw,hd=(x1-x0)/2,(z1-z0)/2
+    return turn(cx,cz,ANGLE.get(b['n'],0),[(-hw,-hd),(hw,-hd),(hw,hd),(-hw,hd)])
+## The west precinct's turned frame: the ring of Blocks 1, 4, 5 and 9 is laid
+## out in local (u, v) metres about the west court's centre.
+WEST_FRAME=(-628,-146)
+def west(pts): return turn(WEST_FRAME[0],WEST_FRAME[1],ESTATE_TURN,pts)
+def box(u0,v0,u1,v1): return [(u0,v0),(u1,v0),(u1,v1),(u0,v1)]
+## The North Estate's courts and grounds (city.md 7d), for the drawings, as
+## world polygons and polylines: courts, the twins' gate and sky bridge, the
+## community garden, playgrounds, chess pavilions and covered linkways.
 ESTATE={
- 'courts':[(-670,-144,-580,-124),(-550,-164,-487,-150)],
- 'gate':(-632,-124,-616,-102),
- 'sky_bridge':(-632,-114,-616,-112),
- 'garden':(-644,-174,-598,-164),
- 'playgrounds':[(-648,-134),(-528,-157)],
- 'pavilions':[(-600,-134),(-500,-157)],
+ 'courts':[west(box(-37,-9,27,10)),[(-552,-158),(-487,-158),(-487,-150),(-552,-150)],[(-509,-158),(-487,-170),(-487,-158)]],
+ 'gate':west(box(-5,10,5,30)),
+ 'sky_bridge':west(box(-5,19,5,21)),
+ 'garden':west(box(-18,-33,20,-27)),
+ 'playgrounds':west([(-22,0)])+[(-498,-163)],
+ 'pavilions':west([(12,0)])+[(-542,-154)],
  'linkways':[
-  [(-668,-126),(-668,-142),(-582,-142),(-582,-126),(-668,-126)],
-  [(-624,-126),(-624,-78)],
-  [(-582,-134),(-566,-134)],
-  [(-552,-157),(-489,-157)],
-  [(-512,-157),(-512,-98),(-500,-98),(-500,-94)],
+  west([(-35,-7),(25,-7),(25,8),(-35,8),(-35,-7)]),
+  west([(0,8),(0,30)])+[(-608,-96),(-608,-78)],
+  west([(25,0)])+[(-566,west([(25,0)])[0][1])],
+  [(-552,-154),(-489,-154)],
+  [(-512,-154),(-512,-98),(-500,-98),(-500,-94)],
  ],
 }
+def _axes(P):
+    for i in range(len(P)):
+        a,b_=P[i],P[(i+1)%len(P)]; yield (-(b_[1]-a[1]),b_[0]-a[0])
+def poly_gap(P,Q):
+    best=-1e9
+    for ax in list(_axes(P))+list(_axes(Q)):
+        n=math.hypot(*ax); ax=(ax[0]/n,ax[1]/n)
+        pa=[p[0]*ax[0]+p[1]*ax[1] for p in P]; qa=[q_[0]*ax[0]+q_[1]*ax[1] for q_ in Q]
+        best=max(best,min(qa)-max(pa),min(pa)-max(qa))
+    return best
+def rpoly(r): return [(r[0],r[1]),(r[2],r[1]),(r[2],r[3]),(r[0],r[3])]
+for nb in [x for x in B if x['n'] in ANGLE]:
+    P=corners_of(nb)
+    if any(math.hypot(x-CX,z)>R for x,z in P): problems.append(('turned block past the Rim Walk',nb['n']))
+    for st in STREETS:
+        if poly_gap(P,rpoly(st[2:]))<0: problems.append(('turned block on a street',nb['n'],st[0]))
+    for o in OPENS:
+        if poly_gap(P,rpoly(o[1:]))<0: problems.append(('turned block on a square',nb['n'],o[0]))
+    for other in named:
+        if other is nb: continue
+        if poly_gap(P,corners_of(other))<8: problems.append(('turned block within 8 m of',nb['n'],other['n']))
 TURBINES=[(-310,-200),(-310,200),(-740,-270),(-740,270)]
 JUNGLE=(-500,464); ICE=(-450,-480)
 assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)
@@ -406,10 +445,13 @@ for pr in PRECINCTS: w("\t[%s]," % ", ".join(v2r(r) for r in pr))
 w("]")
 w("")
 w("## The numbered buildings of the schedule. rect is the footprint; null for")
-w("## the giant playground, which the park plan places (section 7b).")
+w("## the giant playground, which the park plan places (section 7b). angle")
+w("## turns the footprint about the rect's centre, in degrees, positive")
+w("## clockwise on the plan with north up (from +X toward +Z); in Godot that")
+w("## is rotation.y = deg_to_rad(-angle). Use corners() for the true outline.")
 w("const BUILDINGS := [")
 for b in sorted(B,key=lambda b:b['n']):
-    w("\t{\"n\": %d, \"name\": %s, \"kind\": %s, \"rect\": %s, \"height\": %s, \"form\": %s, \"size\": %s, \"who\": %s}," % (b['n'],q(b['name']),q(b['kind']),v2r(b['r']) if b['r'] else "null","%.1f" % HEIGHTS[b['n']] if b['n'] in HEIGHTS else "0.0",q(FORMS.get(b['n'],'block')),q(b['h']),q(b['who'])))
+    w("\t{\"n\": %d, \"name\": %s, \"kind\": %s, \"rect\": %s, \"angle\": %.1f, \"height\": %s, \"form\": %s, \"size\": %s, \"who\": %s}," % (b['n'],q(b['name']),q(b['kind']),v2r(b['r']) if b['r'] else "null",ANGLE.get(b['n'],0),"%.1f" % HEIGHTS[b['n']] if b['n'] in HEIGHTS else "0.0",q(FORMS.get(b['n'],'block')),q(b['h']),q(b['who'])))
 w("]")
 w("")
 w("## Every ordinary building, one per lot: [rect, storeys, block type].")
@@ -442,9 +484,22 @@ for t in TURBINES: w("\tVector2(%g, %g)," % t)
 w("]")
 w("const TURBINE_HUB_HEIGHT := 95.0")
 w("const TURBINE_ROTOR_RADIUS := 65.0")
+w("")
+w("")
+w("## A building's true outline: its rect turned by its angle about the rect's")
+w("## centre, as four world (x, z) corners.")
+w("static func corners(b: Dictionary) -> PackedVector2Array:")
+w("\tvar r: Rect2 = b[\"rect\"]")
+w("\tvar c := r.get_center()")
+w("\tvar h := r.size * 0.5")
+w("\tvar a := deg_to_rad(float(b.get(\"angle\", 0.0)))")
+w("\tvar out := PackedVector2Array()")
+w("\tfor l in [Vector2(-h.x, -h.y), Vector2(h.x, -h.y), Vector2(h.x, h.y), Vector2(-h.x, h.y)]:")
+w("\t\tout.append(c + (l as Vector2).rotated(a))")
+w("\treturn out")
 root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')
