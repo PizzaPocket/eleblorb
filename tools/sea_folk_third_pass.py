@@ -23,7 +23,8 @@ import numpy as np
 AVENUES = [b * 45.0 for b in range(8)]
 AVENUE_HALF = 2.0
 MAIN_AVENUE = 90.0
-MOUND = 24.0                 # the open column: nothing modern over the mound
+MOUND = 24.0                 # the open column: nothing modern over the mound but the civic hall and the way down
+MOUND_OK = ('civic_hall', 'trunk_c', 'civic_link')
 CURRENT = (46.0, 52.0)       # the Ring Current's channel
 SWIM_CLEAR = 3.6             # clear height a swimmer needs under a tunnel at the floor
 CLEAR = 3.0                  # between volumes that are not joined
@@ -52,8 +53,16 @@ def egg(key, name, era, centre, semi, eps, facing, dry, kind, cut=None, floor=No
                   cut=cut, floor=floor, **extra)
 
 # Classical heritage on the floor
-egg('tidehall', 'Tidehall', 'classical', (0, 8.0, -1.0), (16, 11, 14), 5.0, 90.0, False, 'castle', cut=2.0,
-    note='preserved and still the palace; wet; nothing over it')
+egg('tidehall', 'Tidehall', 'classical', (0, 8.0, -1.0), (16, 11, 14), 5.0, 90.0, True, 'castle', cut=2.0, inside='civic_hall',
+    note='preserved and still the palace; now dry inside the civic hall, its roof the floor of the assembly')
+# 0. The civic hall (a wrap): the whole palace under one glass egg. The city's
+# business is done in it: the Tidekeeper's audiences in the old palace, the
+# assembly on the palace roof terrace, the hearings round its feet. The secret
+# way down from the fountain lands here, on the roof terrace.
+egg('civic_hall', 'The civic hall', 'modern', (0, 0.6, -1.0), (22.0, 32.0, 20.5), 2.6, 90.0, True, 'wrap', cut=0.6, floor=2.0,
+    wraps='tidehall', keeper='Tidekeeper Asaru', lock=True,
+    program='the palace kept whole and dry; the assembly floor on its roof terrace under the crown of the glass; '
+            'hearing benches round its feet on the old terrace; a pool lock at the foot of each avenue')
 egg('lamp_house', 'Lamp House', 'classical', at(31, 112.5, 2.5), (5, 3.5, 4), 5.0, 112.5, False, 'classical',
     cut=0.0, note='pearl lamps grown in open trays')
 egg('school_court', 'School court', 'classical', at(30, 157.5, 2.6), (7, 2.6, 4.5), 5.0, 157.5, False, 'colonnade',
@@ -123,7 +132,7 @@ TRUNKS = [  # bearing, household, landing floor, homes (type, who), crown hall p
     (22.5, 'Garden House', 16.0, [('double', 'Nesaja'), ('double', 'Rodasu'), ('double', 'Kasuno and Tami')],
      'the Walking Room: where Munaja teaches the young to walk on new legs'),
     (112.5, 'Glassworks household', 15.0, [('workshop', 'Kunei'), ('workshop', 'Damaku')],
-     'the lookout trunk climbs on from here'),
+     'the Watch Room: Ikara keeps the rota for the wall lookout and the four sea gates'),
     (202.5, 'Exchange household', 18.0, [('single', 'Maresa'), ('single', 'Pelaju'), ('single', 'Sujira')],
      'the Listening Room: Pelaju listens up toward the surface and the ships'),
     (292.5, 'Reef House', 20.0, [('single', 'Talisa'), ('single', 'Arimu'), ('single', 'Kaluja'), ('reef', 'Reef House workshop')],
@@ -131,7 +140,7 @@ TRUNKS = [  # bearing, household, landing floor, homes (type, who), crown hall p
 ]
 POD = {'single': (3.6, 2.8, 4.0), 'double': (5.0, 3.0, 4.2), 'workshop': (4.6, 3.0, 4.4), 'reef': (5.6, 3.2, 4.6)}
 HALL = (7.0, 4.0, 7.0)         # a landing hall: 14 m across, 8 m tall, floor 1.2 m below its girth
-TRUNK_TOP = {112.5: 54.0}
+TRUNK_TOP = {}                 # the Kraken lookout has moved to the wall top (the enclosure)
 for b, house, lf, homes, crown_prog in TRUNKS:
     tc = at(71.0, b)
     egg('stump_%g' % b, 'Ring tower stump', 'classical', (tc[0], 2.6, tc[2]), (5.2, 2.6, 5.2), 5.0, b, True, 'stump', cut=0.0,
@@ -155,7 +164,7 @@ for b, house, lf, homes, crown_prog in TRUNKS:
             program='a glass watch room 18 m below the surface, looking south over the Kraken\'s water')
     else:
         egg('crown_%g' % b, 'Crown hall', 'modern', (tc[0], CROWN + 1.2, tc[2]), (6.0, 3.6, 6.0), 2.4, b, True, 'crown',
-            floor=CROWN, lock=True, ballast=True, program=crown_prog)
+            floor=CROWN, lock=True, ballast=True, program=crown_prog, **({'who': 'Ikara'} if 'Ikara' in crown_prog else {}))
 
 ## ---- glass tunnels: polylines of walking-floor points (x, floor y, z).
 ## Floor-level ones lie on the classical ring arcade, its old bridges over the
@@ -194,6 +203,16 @@ ax = AVENUE_HALF + 1.0 + TUBE_R + 0.3
 z0 = math.sqrt(RING_R ** 2 - ax ** 2)
 tunnel('avenue', 'Avenue tunnel', [(ax, NET_FLOOR, z0), (ax, NET_FLOOR, 70.0), (ax, NET_FLOOR, 100.0), (ax, NET_FLOOR, 111.0)],
        ['glassworks'], 'the classical avenue colonnade')
+# the civic link: from the ring's junction with the avenue tunnel in to the civic hall's gallery
+CX = -1.3                                     # between the Exchange and the Lamp House, over the avenue
+tunnel('civic_link', 'Civic link', [(CX, NET_FLOOR, math.sqrt(RING_R ** 2 - CX ** 2)), (CX, NET_FLOOR, 30.0), (CX, NET_FLOOR, 18.6)], ['civic_hall'],
+       'the classical avenue colonnade, over the old palace steps')
+# the central trunk: the secret way down. It hangs from the stone shaft under
+# the fountain, through the roof's air and the open column, into the crown of
+# the civic hall, and lands on the palace roof terrace.
+V['trunk_c'] = dict(key='trunk_c', name='Central trunk', era='modern', kind='trunk', dry=True, c=(0.0, 0, 0.0), r=TRUNK_R,
+                    y0=19.0, y1=74.0, facing=90.0, secret=True,
+                    note='glass from the waterline to the civic hall; an open spiral inside the hall down to the palace roof')
 # the crown ring joins the trunk tops, 30 m up
 crowns = [t[0] for t in TRUNKS]
 for i, b in enumerate(crowns):
@@ -218,7 +237,76 @@ RAMPS = {
     'exchange': [('u', 4.0, -4.6, 1, 0.6, NET_FLOOR)],
     'east_house_wrap': [('w', 5.1, -3.0, 1, 0.6, H1), ('w', 6.55, 0.04, -1, H1, NET_FLOOR)],   # a switchback beside the old house
     'west_house_wrap': [('w', -5.1, -3.0, 1, 0.6, H1), ('w', -6.55, 0.04, -1, H1, NET_FLOOR)],
+    'civic_hall': [('u', 17.4, 5.3, -1, 2.0, NET_FLOOR)],       # from the old terrace up to the civic link's gallery
 }
+
+
+## ---- the enclosure: the city walls with a roof (section 11). An octagon that
+## reads as a square with short mitred corners. The lower course is the first
+## city's sea wall in a dark sturdy stone, up to just above the water; the
+## upper course and the roof, built when the city closed itself, are a lighter
+## stone in the same classical manner. Inside: the sea up to the waterline, then
+## an air hall under a coffered vault. On top: a walkable stone roof with the
+## fountain at its centre, whose pedestal hides the stair down.
+WATER = 72.0                 # sea level above the city floor
+WALL_IN = 135.0              # inner face of a side, from the centre
+CHAMFER = 50.0               # inner length of a mitred corner (a side is ~199 m)
+WALL_T = 8.0
+WALL_CLEAR = 6.0             # nothing of the city closer than this to the inner face
+DARK_TOP = WATER + 2.5       # the sturdy dark course ends just above the water
+ROOF_TOP = 96.0              # a third above the water: 24 m of wall stands out of the sea
+ROOF_SOFFIT = 88.0           # the vault's springing at the walls and piers; 16 m of air over the water
+PARAPET = 1.2
+def octagon(half, cut):
+    """Corners of an octagon with apothem `half` on the sides and `cut` the
+    chamfer face's apothem (distance of the mitred face from the centre)."""
+    pts = []
+    for k in range(8):
+        th = rad(k * 45.0)
+        a = half if k % 2 == 0 else cut           # apothem of the face whose normal is at k * 45
+        pts.append((a, th))
+    # vertices are the intersections of consecutive face lines
+    out = []
+    for k in range(8):
+        a1, t1 = pts[k]; a2, t2 = pts[(k + 1) % 8]
+        n1 = np.array([math.cos(t1), math.sin(t1)]); n2 = np.array([math.cos(t2), math.sin(t2)])
+        out.append(tuple(np.linalg.solve(np.array([n1, n2]), np.array([a1, a2]))))
+    return out
+MITRE_IN = (2 * WALL_IN - CHAMFER / math.sqrt(2)) / math.sqrt(2)     # apothem of a mitred face, inside
+INNER = octagon(WALL_IN, MITRE_IN)
+OUTER = octagon(WALL_IN + WALL_T, MITRE_IN + WALL_T)
+FACES = [(WALL_IN if k % 2 == 0 else MITRE_IN, k * 45.0) for k in range(8)]
+def wall_dist(x, z):
+    """Distance from the inner face of the walls, positive inside."""
+    return min(a - (x * math.cos(rad(b)) + z * math.sin(rad(b))) for a, b in FACES)
+# the roof's piers: eight at 100 m between the avenues, four at 60 m inside the
+# trunks' quarters; stone, from the seabed to the vault
+for b in [22.5 + 45 * k for k in range(8)]:
+    c = at(100.0, b)
+    V['pier_%g' % b] = dict(key='pier_%g' % b, name='Roof pier', era='enclosure', kind='pier', dry=False, c=(c[0], 0, c[2]), r=3.0,
+                            y0=min(0.0, round(ground(c[0], c[2]), 2)), y1=ROOF_SOFFIT, facing=b)
+for b in (67.5, 157.5, 247.5, 337.5):
+    c = at(60.0, b)
+    V['pier_in_%g' % b] = dict(key='pier_in_%g' % b, name='Roof pier', era='enclosure', kind='pier', dry=False, c=(c[0], 0, c[2]), r=2.6,
+                               y0=0.0, y1=ROOF_SOFFIT, facing=b)
+# the ancient spires: the first city's, older than anything preserved, left
+# standing where they stood; some whole, some broken off (r, bearing, height, base radius, broken)
+SPIRES = [(96.0, 8.0, 46.0, 3.4, False), (95.0, 60.0, 28.0, 3.0, True), (88.0, 152.0, 38.0, 3.2, False),
+          (97.0, 214.0, 22.0, 3.0, True), (90.0, 265.0, 48.0, 3.6, False), (99.0, 328.0, 34.0, 3.2, True),
+          (64.0, 174.0, 18.0, 2.6, True)]
+for i, (r, b, h, br, broken) in enumerate(SPIRES):
+    c = at(r, b)
+    egg('spire_%d' % (i + 1), 'Ancient spire' + (', broken' if broken else ''), 'ancient', (c[0], h / 2, c[2]), (br, h / 2, br), 2.6, b,
+        False, 'spire', cut=0.0, height=h, broken=broken, note='the first city\'s; never restored, never taken down')
+LIGHT_WELLS = [dict(bearing=b, r=60.0, half=4.0) for b in AVENUES]   # glass-capped shafts in the roof over the avenues
+GATES = [dict(bearing=b, width=14.0, height=24.0, wicket=(3.0, 4.0)) for b in (0.0, 90.0, 180.0, 270.0)]
+FOUNTAIN = dict(tiers=[  # basin radius, rim height above the roof, pedestal radius under it
+    dict(r=20.0, y=0.9, ped=6.0), dict(r=13.0, y=5.0, ped=3.6), dict(r=7.0, y=9.0, ped=2.0), dict(r=3.0, y=12.0, ped=1.0)],
+    jet=16.0, oculus=(6.5, 14.0),        # the lowest basin's floor is glass between these radii: daylight falls through it down the column
+    door_bearing=270.0)                  # behind the curtain from the second tier, a pivoting stone in the pedestal
+SHAFT = dict(r=3.4, wall=1.6, y0=WATER + 1.0, y1=ROOF_TOP)   # a stone stair down the pedestal and through the roof to the waterline
+LOOKOUT = dict(bearing=90.0, c=(0.0, ROOF_TOP, WALL_IN + WALL_T / 2), semi=(5.0, 3.4, 3.6), who='Ikara',
+               program='the Kraken lookout: a glass watch room on the wall over the main gate, facing the islands')
 
 ## ---- checks
 problems = []
@@ -232,7 +320,7 @@ def to_local(v, p):
 def inside(v, p, shrink=0.0):
     """True where p is inside v (shrunk by `shrink` metres) and above its cut."""
     p = np.atleast_2d(np.asarray(p, float))
-    if v['kind'] == 'trunk':
+    if v['kind'] in ('trunk', 'pier'):
         r = np.hypot(p[:, 0] - v['c'][0], p[:, 2] - v['c'][2])
         return (r <= v['r'] - shrink) & (p[:, 1] >= v['y0']) & (p[:, 1] <= v['y1'])
     l = to_local(v, p); a = np.maximum(np.array(v['semi'], float) - shrink, 0.01)
@@ -240,7 +328,7 @@ def inside(v, p, shrink=0.0):
     if v.get('cut') is not None: ok &= p[:, 1] >= v['cut']
     return ok
 def surface(v, n=28):
-    if v['kind'] == 'trunk':
+    if v['kind'] in ('trunk', 'pier'):
         t = np.linspace(0, 2 * np.pi, n, endpoint=False); ys = np.linspace(v['y0'], v['y1'], n)
         T_, Y_ = np.meshgrid(t, ys)
         return np.stack([v['c'][0] + v['r'] * np.cos(T_.ravel()), Y_.ravel(), v['c'][2] + v['r'] * np.sin(T_.ravel())], -1)
@@ -276,7 +364,7 @@ TSHELL = {t['key']: tube_shell(t) for t in T}
 # 1. The open column: nothing modern over the mound, at any height.
 for k, s in list(SHELL.items()) + list(TSHELL.items()):
     era = V[k]['era'] if k in V else 'modern'
-    if era == 'modern' and (np.hypot(s[:, 0], s[:, 2]) < MOUND).any():
+    if era == 'modern' and k not in MOUND_OK and (np.hypot(s[:, 0], s[:, 2]) < MOUND).any():
         problems.append((k, 'stands over the mound, in the open column'))
 # 2. Avenues stay open at the floor; 3. nothing stands in the Ring Current.
 def low_points(s): return s[s[:, 1] < SWIM_CLEAR]
@@ -305,7 +393,8 @@ for b, *_ in TRUNKS:
         if t['key'] == 'spoke_%g' % b or ('trunk_%g' % b) in t['joins'] or ('crown_%g' % b) in t['joins']:
             joined.add(frozenset(('trunk_%g' % b, t['key'])))
 joined |= {frozenset(('common_room', 'east_house_wrap')), frozenset(('common_room', 'west_house_wrap')),
-           frozenset(('avenue', 'exchange'))}   # the avenue tunnel branches from the ring at the Exchange's door
+           frozenset(('avenue', 'exchange')), frozenset(('trunk_c', 'civic_hall')), frozenset(('trunk_c', 'tidehall')),
+           frozenset(('avenue', 'civic_link'))}   # both leave the ring at the same junction   # the avenue tunnel branches from the ring at the Exchange's door
 for t in T:
     for j in t['joins']: joined.add(frozenset((t['key'], j)))
 for i in range(len(T)):        # ring and crown segments meet one another at their ends
@@ -316,7 +405,7 @@ for i in range(len(T)):        # ring and crown segments meet one another at the
             joined.add(frozenset((T[i]['key'], T[k]['key'])))
 # a spoke leaves the ring where the ring passes; the avenue tunnel likewise
 for t in T:
-    if t['key'].startswith('spoke') or t['key'] == 'avenue':
+    if t['key'].startswith('spoke') or t['key'] in ('avenue', 'civic_link'):
         for r in T:
             if r['key'].startswith('ring') and np.min(np.linalg.norm(np.array(r['pts']) - np.array(t['pts'][0]), axis=1)) < 3.0:
                 joined.add(frozenset((t['key'], r['key'])))
@@ -425,6 +514,37 @@ locks = [k for k, v in V.items() if v.get('lock')]
 for k in ('exchange', 'common_room', 'glassworks'):
     if k not in locks: problems.append((k, 'has no pool lock for swimmers'))
 
+# 11. The enclosure: everything stands inside the walls with room, under the
+# water (but the way down), and the walls keep out of the Kraken's water.
+for k, s_ in ALL.items():
+    d = min(wall_dist(p[0], p[2]) for p in s_)
+    if d < WALL_CLEAR: problems.append((k, 'stands %.1f m from the walls' % d))
+    if k not in ('trunk_c',) and not k.startswith('pier') and s_[:, 1].max() > WATER - 4: problems.append((k, 'rises within 4 m of the waterline'))
+KRAKEN = (430.0, 350.0); CITY_Z = -540.0
+k_min = min(math.hypot(x / KRAKEN[0], (z + CITY_Z) / KRAKEN[1]) for x, z in OUTER)
+for i in range(8):        # along each face too
+    (x0, z0_), (x1, z1) = OUTER[i], OUTER[(i + 1) % 8]
+    for t in np.linspace(0, 1, 40): k_min = min(k_min, math.hypot((x0 + (x1 - x0) * t) / KRAKEN[0], (z0_ + (z1 - z0_) * t + CITY_Z) / KRAKEN[1]))
+KRAKEN_GAP = (k_min - 1) * KRAKEN[1]
+if KRAKEN_GAP < 40: problems.append(('the walls come within %.0f m of the Kraken\'s water' % KRAKEN_GAP,))
+mitre = math.dist(INNER[0], INNER[1]); side = math.dist(INNER[1], INNER[2])
+if not (mitre < side / 3): problems.append(('the mitred corners are not short against the sides', side, mitre))
+# the light wells and the shaft keep off the piers; the gates stand on the avenues' ends
+for w in LIGHT_WELLS:
+    c = at(w['r'], w['bearing'])
+    for v in V.values():
+        if v['kind'] == 'pier' and math.hypot(c[0] - v['c'][0], c[2] - v['c'][2]) < w['half'] + v['r'] + 4: problems.append(('light well', w['bearing'], 'on', v['key']))
+for g in GATES:
+    gc = at(WALL_IN, g['bearing'])
+    if abs(wall_dist(gc[0], gc[2])) > 1e-6: problems.append(('gate', g['bearing'], 'is not on a side'))
+if FOUNTAIN['oculus'][0] < SHAFT['r'] + SHAFT['wall'] + 1.0 or FOUNTAIN['oculus'][1] > FOUNTAIN['tiers'][0]['r'] - 3:
+    problems.append(('the fountain\'s glass floor does not fit between the shaft and the rim',))
+if V['trunk_c']['y1'] < SHAFT['y0']: problems.append(('the central trunk does not reach the shaft',))
+WALL_GROUND = []
+for i in range(8):
+    (x0, z0_), (x1, z1) = INNER[i], INNER[(i + 1) % 8]
+    for t in np.linspace(0, 1, 9): WALL_GROUND.append(round(ground(x0 + (x1 - x0) * t, z0_ + (z1 - z0_) * t), 2))
+
 if problems:
     for p in problems: print('PROBLEM', p)
     sys.exit(1)
@@ -435,11 +555,18 @@ def jv(v):
     return out
 data = dict(volumes=[jv(v) for v in V.values()], tunnels=T, rooms=ROOMS, corridor=CORRIDOR, ramps=RAMPS, tan=math.tan(rad(RAMP_ANGLE)),
             trunks=[dict(bearing=b, household=h, landing=lf, homes=hm, crown=cp, top=TRUNK_TOP.get(b, CROWN)) for b, h, lf, hm, cp in TRUNKS],
-            ring_r=RING_R, net_floor=NET_FLOOR, crown=CROWN, turn_rise=TURN_RISE, avenues=AVENUES,
+            enclosure=dict(inner=[list(map(lambda v: round(float(v), 3), p)) for p in INNER],
+                           outer=[list(map(lambda v: round(float(v), 3), p)) for p in OUTER], water=WATER, dark_top=DARK_TOP,
+                           roof_top=ROOF_TOP, roof_soffit=ROOF_SOFFIT, parapet=PARAPET, wall_t=WALL_T, side=side, mitre=mitre,
+                           wells=LIGHT_WELLS, gates=GATES, fountain=FOUNTAIN, shaft=SHAFT, lookout=LOOKOUT, kraken_gap=KRAKEN_GAP,
+                           ground=[min(WALL_GROUND), max(WALL_GROUND)]),
+            spires=SPIRES, ring_r=RING_R, net_floor=NET_FLOOR, crown=CROWN, turn_rise=TURN_RISE, avenues=AVENUES,
             ground_main=[(r, round(ground(0, r), 2)) for r in range(0, 141, 2)],
             ground_22=[(r, round(ground(r * math.cos(rad(22.5)), r * math.sin(rad(22.5))), 2)) for r in range(0, 141, 2)])
 if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
 dryv = [v for v in V.values() if v['dry']]
+print('enclosure: sides %.0f m, mitres %.0f m, walls %.0f to %.0f m over the floor at their foot, %.0f m clear of the Kraken' % (
+    side, mitre, ROOF_TOP - max(WALL_GROUND), ROOF_TOP - min(WALL_GROUND), KRAKEN_GAP))
 print('third pass: %d volumes (%d dry), %d tunnels (%.0f m), %d homes, trunk ramp %.1f m a turn' % (
     len(V), len(dryv), len(T), sum(sum(math.dist(p, q) for p, q in zip(t['pts'], t['pts'][1:])) for t in T), len(homes), TURN_RISE))
