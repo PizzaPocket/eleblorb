@@ -358,9 +358,51 @@ Coordinates are each island's own, from its centroid, `+z` south.
 - everything 2.5 m in from its island's edge, for the parapet and a walk;
 - buildings and compounds at least 1.5 m apart;
 - every bridge landing's 6 × 6 m apron clear;
-- a 3 m route (2 m in gardens) from the first landing on each island to every
-  door, and to every other landing: 28 routes;
+- every opening opens onto ground a person can stand on, or onto its
+  building's raised level (below);
+- one path network on each island reaches every landing, door, gate, garden
+  opening, ramp foot, yard and field (below);
 - field strips at least 1,550 m², bean terraces at least 580 m².
+
+**Openings and paths** (revised 2026-10-13, after the user found the paths
+coarse and doubted that the ways in and out added up):
+- **Openings are data.** Every gate, door, through passage, moon gate,
+  octagonal and square opening and window is one list in the plan, and the
+  drawing builds its walls from it: 34 passages and 4 windows. Each passage
+  must open onto ground or its building's level, never into a wall, a field,
+  another building or the drop. Two openings facing each other across a gap
+  of under 5 m are joined directly, as courts in sequence.
+- **The palace's levels** are checked as a graph: the terrace (4.2 m), the
+  inner court and the high pavilion's plinth (5.6 m) and the mound (9.8 m)
+  must each be reached by a ramp from the ground.
+- **The path network.** A spine 3 m wide joins each island's landings. A
+  branch 2.4 m wide joins every passage, ramp foot, yard, field and the
+  sealing rock to the nearest point of the network. Fields, plots and pits
+  get earth bunds 1.6 m wide. Paths are found on a 0.5 m grid round
+  everything solid, kept off walls, then straightened, given a slight wander
+  and rounded: 64 paths, about 1,070 m. Paving is stone in the palace and
+  between facing gates, trodden earth elsewhere.
+- **What the check found, all fixed:**
+  - the entry bridge landed 1 m off the gatehouse's passage, so the
+    gatehouse and forecourt moved 1 m west;
+  - the gatehouse, the gate pavilion and the chain bridges' bridge-head
+    houses were drawn closed; each now has an open passage;
+  - the bamboo court's moon gate opened into the apartments, so it now faces
+    north;
+  - the pond court's west opening opened onto the high pavilion's mound, so
+    it now faces east;
+  - the moon-gate court's and rock garden's facing gates were out of line and
+    1.5 m apart, so the rock garden moved 1 m west; the inn's two moon gates
+    were 4.5 m out of line and now face each other;
+  - the apartments stood 1 m off the inner court above a 5.6 m drop, so they
+    moved 1 m east to meet it;
+  - nothing led down from the inner court to the garden, so a ramp now runs
+    from the plinth, east of the mound, down to the east corridor;
+  - both corridors ran blind into the plinth and now end on open ground;
+  - the field shed blocked the farm lane and now stands on the threshing
+    floor's corner;
+  - the bottom field strip could not be reached; its west end is 3 m
+    shorter, leaving a bund.
 
 **Parapets** stand 1 m in from every edge, open at the landings: white marble
 balustrades round the palace, timber fences round the fields and the farm,
