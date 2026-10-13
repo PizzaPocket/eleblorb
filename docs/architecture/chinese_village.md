@@ -261,6 +261,103 @@ quest. The Chef is never named as the cause by an ordinary resident.
 
 ## 4. Layout (provisional, derived from section 3)
 
+### 4.0 The ground: a gorge of stone pillars (proposed, 2026-10-13)
+
+The user found the island arrangement unnatural and inorganic. Measured from
+the code:
+- the Abyss is a perfect circular pit with smooth walls;
+- the islands are round discs over cones, all at one height, spaced evenly
+  round the palace;
+- nothing holds them up.
+
+This section gives the village the ground nature would. Everything below is
+in `tools/chinese_village_gorge.py`, checked, and drawn in
+`docs/drawings/chinese_gorge_3d.html`.
+
+**How it formed.** The plateau was quartz sandstone crossed by two sets of
+near-vertical joints: one along the gorge, about 15° east of north, and one
+across it. Water worked down the joints for an age, widened them into the
+Abyss, and left the blocks between standing as pillars. This is the process
+behind Zhangjiajie's stone forest and the great karst sinkholes (*tiānkēng*),
+and it fits the lore that the islands are pieces of one plateau. Mist fills
+the Abyss from about 60 m below the village. Across the gorge the pillars read
+as floating; looking down, they plunge into the mist. Every one stands on the
+floor 400 m down.
+
+**The rules it follows:**
+- **A gorge, not a pit.** About 450 × 560 m, long along the main joint, with
+  a bay to the west, narrowing south to the entry from Ohio. The walls are
+  sheer, banded sandstone. The outline replaces the terrain's circle of
+  radius 170 m.
+- **Blocky pillars.** Each is a rounded-corner rectangle (a superellipse,
+  epsilon 3.4 for lived-on pillars, 2.8 for bare ones) turned with the
+  joints. Its edge is roughened, and the bamboo pillar has a notch where a
+  joint bit in.
+- **Rows along the joints.** Pillars stand close across the gorge and
+  wider along it.
+- **Accordant tops.** The tops are the old plateau surface, tilting gently
+  down to the south. The palace's pillar is the biggest remnant and the
+  highest, +4 m; the gate's is lowest, −2.2 m. Every bridge climbs no more
+  than 1 in 8.
+- **Bare pillars.** Twenty pillars too small to live on, 12 to 28 m across,
+  stand between the lived-on ones from 35 m below the village to 26 m above
+  it, with cloud-pruned pines on their tops. Pines also lean from the rim.
+- **Piers.** Two small pillars carry bridge-heads, one on the processional
+  axis and one on the west ring. The longest bridge drops from 77 m to 59 m.
+
+| Pillar | Centre (plan) | Half-widths, turn | Top | Area (needs) |
+|---|---|---|---|---|
+| Palace | (0, 0) | 56 × 62, 0° | +4.0 | 12,561 (12,076) |
+| Gate | (6, 176) | 18 × 17, 4° | −2.2 | 1,107 (1,018) |
+| E, Inn | (−72, 128) | 26 × 25, −7° | −1.8 | 2,352 (2,290) |
+| C, Roofers | (−140, 50) | 22 × 21, 9° | +0.6 | 1,671 (1,521) |
+| A, Lantern Row | (−104, −66) | 25 × 23, −4° | +2.6 | 2,080 (1,963) |
+| B, Market | (104, −52) | 26 × 25, 6° | +2.4 | 2,351 (2,290) |
+| D, Fields | (110, 54) | 34 × 30, 3° | +0.4 | 3,690 (3,632) |
+| Bamboo, Farm | (88, 132) | 32 × 29, −5° | −1.2 | 3,335 (3,217) |
+| Axis pier | (0, 104) | 9 × 8 | +1.0 | bridge-head |
+| West pier | (−122, −8) | 8 × 9 | +1.0 | bridge-head |
+
+The plan frame is x across the gorge and z along it (+z south, toward the
+entry), origin at the palace pillar. The world frame is this turned 15°.
+
+| Bridge | Span | Type |
+|---|---|---|
+| Rim to Gate | 59 | chain, 5 m |
+| Gate to axis pier | 47 | chain, 5 m |
+| Axis pier to Palace | 35 | covered cantilever, 5 m |
+| Gate to Inn | 43 | chain |
+| Gate to Bamboo | 39 | chain, 2.4 m |
+| Palace to Lantern Row | 30 | covered cantilever (garden gate) |
+| Palace to Market | 24 | covered cantilever (service) |
+| Lantern Row to west pier | 27 | covered cantilever |
+| West pier to Roofers | 30 | covered cantilever |
+| Roofers to Inn | 50 | chain |
+| Market to Fields | 51 | chain |
+| Fields to Bamboo | 20 | covered cantilever (was a stone arch: the gap is now 20 m) |
+
+**Checks:**
+- every pillar inside the gorge;
+- lived-on pillars at least 18 m from the rim;
+- pillars at least 8 m apart, or they would be one rock;
+- every lived-on top at least the area its program needs (4.1.2);
+- every bridge within its type's span (chain 100 m, cantilever 38 m, arch
+  15 m) and its grade;
+- no bridge through another pillar;
+- every lived-on pillar reached from the rim.
+
+**For the code (when approved):**
+- the terrain's Abyss becomes this outline, signed-distance based, at the
+  same depth;
+- the islands become pillars to the floor, with collision on their walls;
+- each island gets its own top height, which replaces today's one shared
+  surface height for NPCs, Pandy and Sun Wu Kong;
+- the bare pillars and pines are built;
+- the mist is a volume or a stack of soft planes.
+
+The coordinates in 4.1.3 and the network in 4.1.4 are superseded by these
+tables. The roles, households and bridge types stand.
+
 ### 4.1 Settlement re-fit (revised 2026-10-12)
 
 The first sketch (2026-10-06) kept the existing island sizes and only moved

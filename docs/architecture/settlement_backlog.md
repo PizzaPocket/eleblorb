@@ -911,7 +911,7 @@ call, since the shop UI is where players read what an item is.
 
 ## 18. Chinese village settlement re-fit (2026-10-12, awaiting approval)
 
-Full brief: `chinese_village.md` 4.1. Code when approved:
+Full brief: `chinese_village.md` 4.1, with the ground revised in 4.0 (2026-10-13, proposed): the Abyss becomes a jointed gorge, the islands become stone pillars at their own heights with twenty bare pillars and two bridge-head piers, mist below; `tools/chinese_village_gorge.py` and `docs/drawings/chinese_gorge_3d.html`. The positions below are superseded by 4.0. Code when approved:
 - New radii in `scripts/chinese_village.gd`: A 25, B 27, C 22, D 34, E 27,
   Gate 18 (new island at (0, 150)), Bamboo 32 moved to (80, 112). Every
   island stays inside the Abyss's 170 m full-depth radius.
