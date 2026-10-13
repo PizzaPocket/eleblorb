@@ -69,6 +69,9 @@ the world bible.
 - **Real building sizes**, with only some floors realised.
 - **The rest point** is a grand hotel with an atrium, a revolving door and a
   giant chandelier, after the great hotels of China.
+- **The hotel follows John Portman** (user, 2026-10-13): "I'm very inspired
+  by John Portman architecture, could we shift the Moy hotel to be in his
+  style?" (section 8).
 - **A library**, and the other civic, cultural and public places a city has.
 - **The family.**
   - **Jammer's mother** is a lawyer and the hero's blood relative.
@@ -442,7 +445,9 @@ city's bounds. **The rest is proposed.**
   born. How it was done is left open.
 - **The Blackout.** They loved the city too much. They fed on the signs, the
   lifts and the grid, and one summer night the whole city went dark:
-  - lifts stopped between floors;
+  - lifts stopped between floors, and the Grand Hotel's glass capsule
+    lifts stopped halfway up its atrium with guests inside, in sight of
+    every gallery;
   - the Deck's moving walkways froze;
   - the Grand Hotel's chandelier went out for the first time in its history.
 - **The ordinance.** The city council, under Mayor Teodora Vance, banned city
@@ -554,7 +559,8 @@ The shares are of the city's land.
 - **About 20 percent: downtown.** Skyscrapers of 35 to 70 storeys on two- or
   three-storey podiums, whose roofs carry the Deck.
 - **Accent, about 5 percent: the civic landmarks.**
-  - the Grand Hotel (art deco grandeur);
+  - the Grand Hotel (John Portman's atrium modernism: white ribbed
+    concrete, bronze glass and glass lifts);
   - the library (white terraces);
   - city hall (stone and a clock);
   - the museum;
@@ -577,8 +583,8 @@ The shares are of the city's land.
 | Shade | verandas, arcade roofs, shade sails, void decks, the Deck, street trees; pale tile and white roofs; misters |
 | Palette | pale tile (cream, mint, salmon, pale blue and grey); concrete; sand and white against the desert; warm window light; saturated sign colour at night |
 
-**Hierarchy.** The landmarks are polite: stone, bronze and generous
-entrances. The street buildings are vernacular: tile, render, and signs.
+**Hierarchy.** The landmarks are polite: stone (or, at the hotel, white
+concrete), bronze and generous entrances. The street buildings are vernacular: tile, render, and signs.
 
 **Exclusions:**
 - cars, roads, car parks (the estate has none), garages, traffic lights and
@@ -666,7 +672,7 @@ often.
 4. **The roofs.** A designed roof network. Neighbouring street buildings step
    by up to one storey, with gaps of 2 to 4 m across lanes, so a player can
    cross the city roof to roof: gardens, water tanks, laundry lines and the
-   rooftop bars on the way. Ramp towers and the hotel's roof lift reach it.
+   rooftop bars on the way. Ramp towers and the hotel's glass lifts reach it.
 
 **Swinging with the Leaf Hat** (the vine reaches 78 m; its rope runs 12 to
 52 m; an anchor must stand at least 7 m above the swinger):
@@ -898,7 +904,7 @@ Ring, with benches and movable chairs under them. Each quarter has a job:
 | Quarter | What it is | Why it is there |
 |---|---|---|
 | **North-west: the dry garden** | Ghaf groves, agave, aloe, desert marigold and boulder outcrops on gravel; never watered. Orin Pike's teaching garden of the desert's own plants | Next to the old town and its wells: the desert as it was |
-| **North-east: the reed pond** | A shallow pond of reed beds and open water, crossed by boardwalks. It polishes the city's reclaimed water before it goes back to the street trees; dragonflies, frogs, herons | Beside the hotel and Civic Plaza: water working, not for show (user: no opulent fountains) |
+| **North-east: the reed pond** | A shallow pond of reed beds and open water, crossed by boardwalks. It polishes the city's reclaimed water before it goes back to the street trees; dragonflies, frogs, herons | Beside the hotel and Civic Plaza: water working, not for show (user: no opulent fountains). The reclaimed water reaches it through the open runnel across the hotel's atrium floor (8.8) |
 | **South-west: the parasols** | Old Fu's tea house and the chess terrace, under a timber canopy of giant parasols | Facing Old Moy and Garden Row; the Hos play here every afternoon |
 | **South-east: the great lawn** | The one irrigated lawn, for picnics, lying down and evening music; the park lodge on its edge | Facing the market lanes and the glass tower: lunch from the market, and the office workers' hour off |
 
@@ -1063,21 +1069,28 @@ that holds its street edge and meets the Deck at +6.5 m.
   climbers and swing anchors along the south of Civic Plaza. Dr. Kask lives
   near the top.
 
-**5. The Grand Hotel's guest tower** (21 floors on a 20 m podium, about 100 m to the lantern; full brief in section 8)
-- **Idea:** the grand old hotel, older than the other towers.
+**5. The Grand Hotel's guest tower** (28 levels, 96 m, and the drum to 108 m, rising from a 44 m atrium block; full brief in section 8, proposed 2026-10-13 after the user's direction to follow John Portman)
+- **Idea:** the oldest tower downtown, the boom's idea of the future: a
+  white cylinder with glass lifts running up its face.
 - **References:**
-  - **Peace Hotel, Shanghai:** art deco, with a pyramidal copper roof.
-  - **Chrysler Building, New York:** stepped setbacks and a lit crown.
+  - **Westin Peachtree Plaza, Atlanta, and Westin Bonaventure, Los
+    Angeles (John Portman):** the cylinder tower, the revolving restaurant
+    at the top, and outside lifts that climb the face.
+  - **Hyatt Regency Atlanta (Portman):** the atrium, the bulb-lit capsule
+    lifts and the revolving Polaris lounge.
 - **Form:**
-  - cream stone and bronze art deco, rising in setbacks from the podium;
-  - vertical piers between the windows.
-- **Crown:** a green-copper pyramid with a lantern at its peak, lit at
+  - a cylinder 28 m across in white board-formed concrete, ribbed every
+    2.2 m round its face, with bronze glass recessed between the ribs;
+  - four glass capsule lifts, outlined in bulbs, riding up its south face
+    from the atrium to the crown.
+- **Crown:** the drum: a ribbed ring hiding the water tanks, the Windrose
+  revolving lounge in bronze glass over it, and a shallow dome lit at
   night, the first landmark seen from the plaza.
 
 **The skyline together:** the twisting Windspire with its spinning wind
 gaps is the tallest; the screened glass tower, the plug-in capsule tower and
-the dune-balconied flats step down around it; the old copper-crowned hotel
-stands in front, facing the park.
+the dune-balconied flats step down around it; the old white drum of the
+hotel, its glass lifts climbing it, stands in front, facing the park.
 
 ### 7d. The North Estate: precinct plan (proposed, 2026-10-13)
 
@@ -1250,7 +1263,7 @@ round the park and on Civic Plaza.
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
-| 1 | Grand Hotel | 52 × 60 m | podium of 4 levels round a 20 m atrium; guest tower of 21 floors to a copper crown, about 100 m (section 8) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
+| 1 | Grand Hotel | 52 × 60 m | atrium block of 12 levels (44 m) round its void; cylinder guest tower of 28 levels (96 m) with the revolving drum to 108 m (section 8) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
 | 2 | City hall | 34 × 60 m | exterior only: portico, balcony, side wings and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a) | Mayor Teodora Vance, Kenji Mori (clerk) |
 | 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, twisting, with three wind gaps (7c) | the Windworks (headquarters, observation deck) |
 | 13 | Glass tower | 40 × 40 m | about 45 storeys, 180 m, in moving screens pierced with the house marks (7c) | Raman & Reese (Elizabeth, Priya, Venn); Tanglewire (Dan) |
@@ -1330,203 +1343,335 @@ Downtown and the estate add height, not land, so the radius holds. The works
 beyond the bounds need about 100 m more on the east, south-west and
 north-west, inside the 110 to 140 m gaps to the plateaus and the skirt.
 
-## 8. The Grand Hotel (rest point): building brief (proposed, 2026-10-12)
+## 8. The Grand Hotel (rest point): building brief (proposed, 2026-10-13, after the user's direction to follow John Portman)
+
+**The direction (user, 2026-10-13):** "I'm very inspired by John Portman
+architecture, could we shift the Moy hotel to be in his style?" This brief
+replaces the art deco design of 2026-10-12 (stone, bronze and a copper
+pyramid). The people, the program and the hotel's story stay; the building
+is redesigned in the manner of Portman's atrium hotels. The 3D drawing is
+`docs/drawings/moy_grand_hotel_3d.html`.
 
 ### 8.1 People and purposes
 
 **Why a grand hotel in a city no road reaches.** Moy has almost no outside
 visitors, so the hotel lives on the city itself, the way grand hotels in
-real cities do:
-- **The city's living room:** afternoon tea and drinks under the
-  chandelier, weddings and celebrations in the atrium, dinner in the
-  restaurant on the mezzanine.
-- **Long-stay residences:** five floors of suites let by the year, a
-  tradition of the hotel since Lucinda's grandfather's day, after Raffles
-  in Singapore and the Chelsea in New York.
+real cities do. Portman called his atria "people space": a public room so
+big and so full of light that the city comes in to sit in it. That is what
+the hotel is for Moy:
+- **The city's living room:** afternoon tea and drinks on the atrium floor
+  under the chandelier, weddings and celebrations in the atrium, with the
+  guests watching from the galleries, dinner in the Chandelier Room on the
+  mezzanine, and a drink at the top in the Windrose, the revolving lounge.
+- **Long-stay residences:** five floors of suites let by the year, round
+  the top of the atrium, a tradition of the hotel since Lucinda's
+  grandfather's day, after Raffles in Singapore and the Chelsea in New
+  York. The residents tend the planters on their galleries, so the green
+  that hangs down the void is their window boxes.
 - **Guest rooms** for staycations, for families between homes, and for the
   rare traveller who crosses the desert on foot, like the hero.
 
 **History.** Lucinda Wah's grandfather built it in the Windworks' first
-boom, as the city's first tall building. It is older than every other
-tower, which is why it is art deco stone and bronze among the glass; the
-library is from the same boom (section 9.4).
-The Blackout is the night its chandelier went dark for the first time.
+boom, as the city's first tall building. The boom built its gifts to
+itself, the library and city hall, in limestone and bronze. He built what
+the boom thought the future looked like: a white concrete tower with glass
+lifts running up its face, and a room 44 m high where the whole city could
+sit indoors out of the sun. It is still the oldest tower downtown, and the
+one that taught Moy to build tall. The Blackout is the night its glass
+lifts stopped halfway up the atrium and its chandelier went dark for the
+first time.
 
 **Who works here** (the people the hero meets):
 
 | Person | Role | Where |
 |---|---|---|
-| Lucinda Wah | general manager; keeps the reception desk herself in the evenings, as her grandfather did, so she is the rest point's keeper | the desk, her office behind it, her flat on the top floor |
-| Felix Tanaka | concierge | the concierge desk by the door |
+| Lucinda Wah | general manager; keeps the reception desk herself in the evenings, as her grandfather did, so she is the rest point's keeper | the desk, her office behind it, her flat on the tower's top floor |
+| Felix Tanaka | concierge | the concierge desk in the entrance hall |
 | Ah Keung | doorman | the revolving door, forty years |
-| Iris Dune | florist | her flower stand inside the door; she dresses the atrium each morning |
+| Iris Dune | florist | her flower stand in the entrance hall; she dresses the atrium each morning |
 
 Kitchen, housekeeping and laundry staff work behind service doors and are
 never seen on the public floors.
 
-**What goes in and out.** Guests and visitors by the revolving door on
-Civic Plaza, the Deck door at the mezzanine, and the park terrace. Food,
-linen and stores by cargo trike to the loading door on Hotel Lane at
-dawn; laundry the same way. Waste to the city sewer and on to the water
-works' reclamation (see 2a).
+**What goes in and out.** Guests and visitors cross the forecourt to the
+revolving door, facing Civic Plaza; walkers on the Deck come in by the
+skybridge to the mezzanine; the park's people come in through the Long
+Bar's terrace. Food, linen and stores come by cargo trike to the loading
+door on Hotel Lane at dawn; laundry goes the same way. Waste goes to the
+city sewer and on to the water works' reclamation (see 2a).
 
 **References:**
-- **Peace Hotel, Shanghai (1929):** art deco stone, bronze and a pyramidal
-  copper roof; its jazz bar.
-- **Raffles Hotel, Singapore:** shaded loggias and verandas, the Long Bar,
-  and long-stay suites.
-- **White Swan Hotel, Guangzhou:** the indoor rock garden and pavilion in
-  its atrium (the waterfall left out: no opulent water).
-- **Chrysler Building, New York:** setbacks and a lit crown.
-- **Old Moy's tower houses and wind towers:** the hotel cools itself the
-  way the old town does.
+- **Hyatt Regency Atlanta (John Portman, 1967):** the first modern atrium
+  hotel. Guest rooms open off galleries round a 22-storey void; glass
+  capsule lifts outlined in bulbs ride up it; a revolving lounge in a dome
+  (the Polaris) crowns the roof, and a lounge hangs out over the atrium
+  floor.
+- **Hyatt Regency San Francisco (Embarcadero Center, 1973):** a 17-storey
+  atrium whose galleries step out into the void storey by storey, so its
+  wall leans; planting cascades down the slope; a great sculpture hangs
+  in the void.
+- **Marriott Marquis, Atlanta (1985):** the white ribbed concrete of the
+  void, its gallery fronts read as continuous curving bands.
+- **Westin Peachtree Plaza, Atlanta, and Westin Bonaventure, Los Angeles
+  (both 1976):** the cylinder tower, the revolving restaurant at its top,
+  and outside lifts that rise from the lobby, pass through the roof and
+  climb the face of the tower.
+- **White Swan Hotel, Guangzhou:** the indoor rock garden and pavilion,
+  the "great hotels of China" in the original direction (its waterfall is
+  left out: no opulent water).
+- **Old Moy's wind towers:** the atrium cools itself the way the old town
+  does.
 
 ### 8.2 Site
 
-The north side of Civic Plaza: 52 m (east–west) × 60 m (north–south).
+The north side of Civic Plaza: 52 m (east–west) × 60 m (north–south), world
+(−483, −98) to (−431, −38). Local coordinates below run x from the west
+face (0) to the east (52) and z from the north face (0) to the south (60).
 - **South face, the front:** on Meridian North, facing across it to Civic
-  Plaza and city hall.
-- **West face:** on the Park Ring, facing the park.
+  Plaza and city hall. The ground floor stands back behind a **forecourt**.
+- **West face:** on the Park Ring, facing the park; the Long Bar's terrace.
 - **North face, service:** on Hotel Lane.
 - **East face:** a party wall with the Windspire's podium.
-- **The Deck** passes along the south face at +6.5 m, along Meridian North.
+- **The Deck** runs along Civic Plaza's north edge at +6.5 m. A glazed
+  **skybridge** carries it over Meridian North into the mezzanine, and the
+  Deck's walkway through the Windspire's podium joins the mezzanine's east
+  gallery, so the hotel is a room on the Deck, a city within the city, the
+  way Portman's hotels are joined to their neighbours.
 
-### 8.3 Program and stacking
+**No porte-cochère.** Portman's hotels open on a drive for cars; Moy has
+none. The front is a **pedestrian forecourt**, 52 × 6 m, under the
+mezzanine's ribbed soffit, carried on a row of ribbed concrete columns at
+the street line. Cargo trikes never use it.
 
-A **podium** of four levels round a full-height atrium, with a **guest
-tower** rising from its north half. The structural lines are shared by
-every level: the atrium's edges, the tower's walls and its central core.
+### 8.3 Massing
+
+Two masses, Portman's pair:
+- **The Court:** the atrium block, the whole 52 × 60 m site, twelve levels
+  to a roof at +44 m, its rooms on open galleries round the void.
+- **The tower:** a cylinder 28 m across, centred at (26, 14) on the
+  site's north half, rising from the ground to +96 m and carrying the
+  **drum** crown to +108 m. Its walls come straight down to the ground, so
+  nothing stands on the atrium; its curved south face is the atrium's north
+  wall, and the glass lifts ride up it.
+
+**The leaning front.** From level 3 up, each level of the Court's south
+range stands 0.8 m north of the one below, 8 m over ten levels, after
+Hyatt Regency San Francisco. Outside, the front steps back from the plaza
+in planted terraces; inside, its galleries lean out over the void.
+
+**Levels.** The ground is one grand storey of 6.5 m, up to the Deck; the
+mezzanine 5 m; every level above 3.25 m. Level n starts at
++11.5 + (n − 3) × 3.25 m.
 
 | Level | Height | Contents |
 |---|---|---|
-| **Ground** | 0 to +6.5 m (one grand storey) | Loggia and revolving door on the south; vestibule; the **atrium** (26 × 22 m), with the dry rock garden and pavilion at its centre and the **double ramp** up to the mezzanine; reception and Lucinda's office (east); the concierge desk and Iris's flower stand by the door; the **Long Bar**, opening onto the park terrace (west); public washrooms; lift lobby (north); kitchen, stores, staff room and the loading door on Hotel Lane (north-east) |
-| **Mezzanine** | +6.5 m, the Deck's level | A gallery 2.4 m wide round the atrium; the **Chandelier Room** restaurant along the west, with a balcony over the park; the tea lounge and washrooms along the east; the **Deck door** in the south face |
-| **Levels 3 and 4** | +11.5 to +20 m | Galleries round the atrium; function rooms (west), the hotel's offices and the luggage room (east); the chandelier's winch room under the lantern |
-| **Podium roof** | +20 m | The **roof garden**: shade trees in planters, the terrace bar, and two **wind towers** after Old Moy's; the atrium's glass **lantern roof** between them |
-| **Tower floors 1 to 14** | +20 to +68 m | Guest rooms, 12 to a floor round a central core |
-| **Tower floors 15 to 19** | +68 to +85 m | Long-stay residences, 6 suites to a floor |
-| **Tower floor 20** | +85 to +88 m | The grand suites, among them **the party's suite** facing the park |
-| **Tower floor 21** | +88 to +91 m | Lucinda's flat, the manager's flat, with its own terrace |
-| **The crown** | +91 to +100 m, lantern above | The green-copper pyramid, holding the tower's water tanks (filled from the wells, like the roof tanks across the city) and, at its peak, the lit lantern |
+| **Ground** | 0 to +6.5 m | The **forecourt** (z 54 to 60) under the mezzanine; the **revolving door** at its centre between two 2.8 m swing doors; the **entrance hall** (z 48 to 54) with Felix's concierge desk and Iris's flower stand; the **atrium floor**, with the dry **rock garden and pavilion** at its centre, the runnel, trees in planters, the feet of the **double ramp** and of the four **capsule lifts**; reception and Lucinda's office (east range); the **Long Bar**, opening onto the park terrace (west range); public washrooms; kitchen, stores, staff room and the loading door on Hotel Lane (the north corners, either side of the tower) |
+| **Mezzanine** | +6.5 m, the Deck's level | The gallery round the void, 2.4 m wide; the **Chandelier Room** restaurant along the west, with a round terrace cantilevered 5 m into the void beside the chandelier, after Portman's lounge pods; the tea lounge along the east; the **Deck door** and the skybridge in the south; the link to the Windspire's podium in the east; washrooms |
+| **Levels 3 and 4** | +11.5 to +18 m | Galleries round the void; the ballroom and function rooms (west), the hotel's offices and the luggage room (east) |
+| **Levels 5 to 7** | +18 to +27.75 m | Guest rooms on the galleries |
+| **Levels 8 to 12** | +27.75 to +44 m | The **long-stay residences**, about 8 suites a floor on the galleries, their planters hanging over the void |
+| **Court roof** | +44 m | The **roof garden**: shade trees in planters, the terrace bar, the two **wind towers** after Old Moy's, the air plant behind a screen; the atrium's **skylight** between them, rising to +48 m |
+| **Tower, levels 3 to 12** | +11.5 to +44 m | Guest rooms round the north of its core; its south arc is the lift lobby, open to the atrium, joined to the Court's galleries at the north corners |
+| **Tower, levels 13 to 26** | +44 to +89.5 m | Guest rooms, 16 a floor round the core |
+| **Level 27** | +89.5 to +92.75 m | The grand suites, among them **the party's suite**, facing the park |
+| **Level 28** | +92.75 to +96 m | Lucinda's flat, the manager's flat, with its terrace under the drum's overhang |
+| **The drum** | +96 to +108 m | The **tank ring**, +96 to +101 m: the hotel's water tanks, filled from the wells like the roof tanks across the city, behind a ribbed concrete band 32 m across; the **Windrose**, +101 to +105.5 m, the revolving lounge in bronze glass, turning once an hour; a shallow dome to +108 m, lit at night |
 
-**The tower**, 33 × 22 m, stands on the podium's north half. Its walls
-come straight down to the ground as the north band's walls, so nothing
-stands on the atrium. The atrium's lantern roof spans only the podium's
-south half.
-- **Core:** three guest lifts, one service lift, and an escape **ramp tower**
-  (a spiral ramp, by the world's ramp rule), carried from the ground to
-  floor 21.
+**The tower.**
+- **Core:** 11 m across: a service lift, a firefighting lift and the
+  escape **ramp tower** (a spiral ramp, by the world's ramp rule), from the
+  ground to level 28 and the drum. The guests' lifts are the glass
+  capsules outside.
 - **Corridor:** a ring corridor 1.8 m wide round the core.
-- **Rooms** along all four faces, each with its own bathroom on the
-  corridor side and the window on the outer wall.
+- **Rooms:** wedges round the ring, about 6.7 m deep, each with its own
+  bathroom on the corridor side and its window between two ribs.
 
-**The atrium void** (26 × 22 m) passes through the mezzanine and levels 3
-and 4 up to the lantern at +20 m. Every gallery's rail stands on the void's
-one boundary, and no wall below runs under it. The chandelier hangs from
-the lantern's central truss.
+### 8.4 The atrium
+
+**The void.** 32 m east–west (x 10 to 42) at every level. North–south it
+runs from the north corners (z 22) and the tower's curved face (z 28 at
+its centre) to the south galleries, which lean in: z 48 at the floor and
+the mezzanine, z 40 at level 12. So the void is about 32 × 26 m at the
+floor and 32 × 18 m at the top, and 48 m from the floor to the
+skylight's ridge.
+
+**The galleries.** Every level's gallery is 2.4 m wide, cantilevered from
+the column line, with a solid board-formed parapet 1.1 m high whose top
+is a planter trough. Creeping fig and pothos trail from the troughs, the
+longest strands three storeys down, so the walls of the void are green
+from the top. Every rail stands on the void's one boundary for its
+level, and no wall below runs under it.
+
+**The floor.** The dry **rock garden** at the centre, about 12 m across
+round (26, 37): raked gravel, upright stones and the timber **pavilion**,
+5 × 4 m, where tea is served. Trees stand in planters round it (olive
+and ficus, which take the indoor light). The **runnel** crosses the floor
+(8.8). The **double ramp** rises at the south. The four **capsule lifts**
+land on the north, at the foot of the tower.
+
+**The skylight.** White-cased steel trusses at 4 m centres span the void
+east–west, with bronze glass between, rising to +48 m along the void's
+middle. The central truss carries the chandelier's **winch room**. A
+clerestory of louvres runs round the skylight's edge. The lift rails pass
+up through glazed sleeves at the skylight's north edge.
+
+**The double ramp.** Two board-formed concrete ramps curve out either
+side of the rock garden, from feet at (18, 38) and (34, 38) on the
+atrium floor to heads on the mezzanine's south gallery at (12, 48) and
+(40, 48). Each rises 6.5 m along about 12.5 m of curve, at about 28°,
+inside the world's 32°. Each is 2.4 m wide (two people abreast) with a
+3 m landing at its foot and its head. Their undersides are open and
+smooth, sculpture as much as route, in Portman's way.
+
+**The capsule lifts.** Four glass capsules, 2.6 m across, in bronze frames
+outlined in bulbs, ride rails on the tower's south face at 12° and 36°
+either side of due south. They rise from the atrium floor, stop at the
+mezzanine (by a short bridge) and every level, pass up through the
+skylight and climb the outside of the tower, in full view of the plaza,
+to the Windrose at +101 m. At night the four lit capsules moving up the
+white tower are the hotel's sign.
 
 **Circulation:**
-- **Visitors:** revolving door → vestibule → atrium → double ramp or lifts
-  → mezzanine.
-- **Guests:** atrium → lift lobby → tower lifts.
-- **Staff and goods:** Hotel Lane → loading door → kitchen and service lift,
-  never crossing the atrium.
-- **From the Deck:** the mezzanine door → the gallery → the lifts.
+- **Visitors:** forecourt → revolving door → entrance hall → atrium floor →
+  double ramp or capsule lifts → mezzanine.
+- **Guests:** atrium floor → capsule lifts → their level: the galleries
+  through the north corners below +44 m, the tower's lift lobby above.
+- **From the Deck:** skybridge → Deck door → mezzanine gallery → ramps or
+  lifts.
+- **Staff and goods:** Hotel Lane → loading door → kitchen and the core's
+  service lift, never crossing the atrium floor.
 
-**The double ramp.** Two curving ramps rise either side of the rock garden
-from the atrium floor to the mezzanine, 6.5 m. At the world's 32° each
-runs about 10.4 m on plan, curving round the pavilion. Each is 2.4 m wide
-(grand, two people abreast), with a 3 m landing at its foot and its head.
+### 8.5 The chandelier
 
-### 8.4 The chandelier
+- About **8 m across and 16 m tall**: a column of crystal in five tiers on
+  bronze rings, hung on cables over the rock garden, down the middle of
+  the void, from the winch room in the skylight's central truss, after the
+  great sculptures Portman hung in his atria. Its lowest tier is at +15 m, above the mezzanine and
+  the level 3 galleries; its crown ring is at +31 m.
+- **Three thousand crystals** in strands round the rings, lit from within.
+  Lucinda knows them by their faults. During the Blackout they went dark
+  for the first time in the hotel's history.
+- **Lowered once a year** for cleaning: the winch lets it down 10 m
+  through the void until its lowest tier hangs just over the pavilion's
+  roof, and it is cleaned from the atrium floor. The city fills the
+  galleries and the ramps to watch.
+- **Collision:** solid. Its crown ring is a perch, and its crown and
+  cables are a Leaf Hat **swing anchor** inside the atrium, 24.5 m above
+  the mezzanine, for swinging from gallery to gallery across the void.
 
-- About **8 m across and 9 m tall**, hung from the lantern truss so its
-  lowest tier is 7 m above the atrium floor.
-- **Three thousand crystals** in tiers round a bronze frame, lit from
-  within. Lucinda knows them by their faults. During the Blackout they went
-  dark for the first time in the hotel's history.
-- **A winch room** under the lantern lets the whole chandelier be lowered
-  for cleaning, once a year, an event the city turns out to watch.
-- **Collision:** solid. Its crown ring at the top is a perch, reached from
-  level 4's gallery by a jump. It is not a swing anchor (not 7 m above
-  anything the hero could swing from).
+### 8.6 Facade, materials and style
 
-### 8.5 Facade and massing
-
-The hotel is the city's landmark of the oldest age downtown: polite, stone
-and bronze, art deco like its contemporary the library across the park, in
-the charter's 5 % accent for
-landmarks (section 5).
+The hotel takes the charter's 5 % accent for landmarks (section 5): the
+city's one building in Portman's atrium modernism, white and ribbed among
+the tile and glass, and the oldest tower downtown.
 
 | Element | Term | Tradition |
 |---|---|---|
-| Podium base | rusticated cream stone plinth | art deco, classical base |
-| South and west faces at ground | an **arcaded loggia**, 4 m deep, of superellipse-headed arches | Raffles' verandas, in Moy's superellipse |
-| Entrance | a **marquise** (projecting bronze-and-glass canopy) over the revolving door, with the swing doors either side | art deco |
-| Tower walls | continuous stone **piers** running full height between recessed window bays, with bronze **spandrel panels** between floors | art deco verticality; the piers also shade the windows |
-| Spandrel ornament | Old Moy's **house marks** cast in bronze, one mark per floor | the city's signature motif |
-| Corners | rounded in a superellipse, the streamline corner | art deco and Moy's signature |
-| Top | two **setbacks**, then the **green-copper pyramid** and the lit lantern | Peace Hotel, Chrysler |
-| The sign | no lettering: a bronze **chandelier** picture on a hanging sign over the marquise | Moy's picture signs |
+| Massing | a hollow **atrium block** (the Court) and a **cylinder tower** with a drum crown | Portman: Hyatt Regency Atlanta, Westin Peachtree Plaza |
+| Front | the south range **stepping back in terraces**, 0.8 m a storey, its galleries leaning into the void | Hyatt Regency San Francisco |
+| Walls | white **board-formed concrete**; on the tower, **ribs** 0.6 m wide and 0.9 m deep every 2.2 m round the cylinder | Marriott Marquis; the ribs shade the glass |
+| Glass | **bronze-tinted**, recessed 0.9 m between the ribs, and under 1.2 m concrete **hoods** on the terraces | Portman; the desert's shade |
+| Ground | the **forecourt**: ribbed concrete columns carrying the mezzanine, the revolving door between two 2.8 m swing doors | Portman's entrance, without the drive |
+| Lifts | glass **capsules** outlined in bulbs, riding the tower's face | Hyatt Regency Atlanta, Westin Bonaventure |
+| Crown | the **drum**: a ribbed tank ring, the revolving Windrose in bronze glass, a shallow lit dome | the Polaris, Peachtree's revolving restaurant |
+| Corners | the Court's corners rounded in a superellipse | Moy's signature |
+| Signature motif | Old Moy's **house marks**, cast into the forecourt's columns, one to a column | the city's signature |
+| The sign | no lettering: a bronze **chandelier** picture sign hung in the forecourt over the revolving door | Moy's picture signs |
 
-**Palette:** cream stone 60 %; bronze and green copper 30 %; amber light
-and sign colour 10 %.
+**Palette:** white concrete 60 %; bronze glass and bronze 30 %; the
+galleries' green, the lifts' bulbs and the warm light of the void at
+night 10 %.
 
-### 8.6 Heat and air
+**At night** the atrium glows through the skylight and the terraces, the
+four capsules climb the tower, the Windrose turns its ring of light at the
+top, and the chandelier is lit in the middle of it all.
 
-- The **loggias** shade the ground-floor glass from the sun.
-- The tower's deep **piers** shade its windows.
-- The two **wind towers** on the podium roof catch the west wind and drop
-  cool air into the atrium. Warm air rises and leaves by vents in the
-  **lantern's** clerestory, the old town's way of cooling, at the hotel's
-  scale.
-- Modern air conditioning does the rest. Its plant sits on the podium roof,
-  screened.
+### 8.7 Structure
 
-### 8.7 The rest point
+- **The tower** is a concrete tube: the ribs are its columns, joined by
+  the floor edges into one wall, round a concrete core. The floors span
+  from the ribs to the core. The drum's tank ring cantilevers 2 m beyond
+  the tube on brackets from the ribs.
+- **The Court** is a concrete frame. One column line stands behind each
+  gallery; the gallery slabs cantilever 2.4 m from it. The south range's
+  columns rake, leaning 0.8 m a storey, and each floor ties them back to
+  the east and west ranges.
+- **The skylight's** trusses bear on the Court's ring beam at +44 m.
+- **The ramps** are board-formed concrete, cantilevered from the
+  mezzanine's edge, each with one support at its foot landing.
+
+### 8.8 Heat, air and water
+
+- **The cool well.** The two **wind towers** on the Court roof catch the
+  west wind and drop it down shafts in the west range to grilles at the
+  foot of the atrium. The air crosses the atrium floor over the runnel and
+  the planting, warms, and rises the 44 m of the void to leave by the
+  skylight's louvres. The stack draws even on still days. It is Old Moy's
+  way of cooling, at the hotel's scale.
+- **Working water, not a fountain.** The city's **reclaimed water**, on
+  its way from the water works to the park's reed pond, crosses the
+  atrium floor in an open stone **runnel** 0.6 m wide and leaves under
+  the west wall for the pond. The air drawn over it is cooled. There is no
+  fountain (user: no opulent fountains).
+- **Shade.** The tower's ribs keep out the low east and west sun; the
+  terraces' hoods and planters shade the south; the skylight is bronze
+  glass between deep trusses.
+- Modern air conditioning does the rest. Its plant sits on the Court
+  roof, screened.
+
+### 8.9 The rest point
 
 - **Fixtures (Moy is modern):** every guest room and suite has its own
   bathroom with a flush toilet, a washbasin and mirror, and a shower; the
-  suites add a bath. Public washrooms open off the atrium and the mezzanine
-  with flush toilets and basins. Waste goes to the city sewer and the water
-  works' reclamation.
+  suites add a bath. Public washrooms open off the atrium floor and the
+  mezzanine with flush toilets and basins. Waste goes to the city sewer
+  and the water works' reclamation.
 - **How the hero rests:** at the reception desk, with Lucinda in the
-  evening (or Felix by day), then up by lift to the party's suite on floor
-  20, the one built guest floor.
+  evening (or Felix by day), then up by capsule lift, through the
+  skylight and up the outside of the tower, to the party's suite on
+  level 27, the one built guest floor.
 - **The party's suite:** sitting room, one bedroom with a double bed at
-  world scale (mattress 1.55 × 2.3 m), a bathroom, and windows on the park.
-  The swing doors beside the revolving door are 2.8 m wide for big
-  companions and mounts; the lifts take them.
+  world scale (mattress 1.55 × 2.3 m), a bathroom, and windows on the
+  park. The swing doors beside the revolving door are 2.8 m wide for big
+  companions and mounts; the capsules, 2.6 m across, take them.
 - **Price:** open.
 
-### 8.8 Play
+### 8.10 Play
 
-- The **marquise**, the loggia's arches and the tower's **piers** are climbing
-  holds.
-- The **podium roof garden** is reached by the lifts and from the Deck. It
-  is a landing between the park's swing loop and the downtown towers.
-- The **copper pyramid** and its lantern are a high swing anchor over the
-  park and the plaza.
-- The **chandelier's crown** is a perch above the atrium.
+- **The terraces** of the leaning front are a staircase of ledges, 0.8 m
+  deep every 3.25 m (each within a blorb bounce), from the skybridge's
+  roof to the Court roof at +44 m.
+- **The tower's ribs** are climbing holds all the way up the cylinder.
+- **The Court roof garden** is reached by the terraces, the lifts and
+  the Deck. It is a landing between the park's swing loop and the
+  downtown towers.
+- **The drum**, at +108 m, is a high swing anchor over the park and the
+  plaza.
+- **The chandelier's crown** is a perch and a swing anchor above the
+  atrium (8.5); the galleries are its landings.
 
-### 8.9 Realised (fidelity A)
+### 8.11 Realised (fidelity A)
 
 **Only two parts are built inside (user):**
-1. **The atrium:** the loggia, vestibule and revolving door; the atrium
-   floor with the rock garden, the chandelier, reception, the concierge desk
-   and Iris's stand; the double ramp and the mezzanine gallery round the
-   void, with the Deck door, because they are part of the atrium's space.
-2. **One guest floor, floor 20:** the lift lobby, the ring corridor and the
-   party's suite.
+1. **The atrium:** the forecourt, the revolving door and the entrance
+   hall; the atrium floor with the rock garden and pavilion, the runnel,
+   the chandelier, reception, the concierge desk and Iris's stand; the
+   double ramp and the mezzanine gallery round the void, with the Deck
+   door and the skybridge; and the galleries of levels 3 to 12, as
+   walkable ledges round the void with closed room doors, because they
+   are the atrium's walls.
+2. **One guest floor, level 27:** the capsules' lobby, the ring corridor
+   and the party's suite.
 
-Lifts run between the atrium's lift lobby and floor 20 only.
+The capsule lifts run between the atrium floor, the mezzanine and level
+27 only, and the ride up the outside of the tower is real.
 
 **Everything else is faux and solid:** the Long Bar, the Chandelier Room,
-the function rooms, the offices, the kitchen and every other tower floor.
-They are closed doors and lit windows that show rooms (the interior-mapping
-shader), on solid massing with collision. The roof garden, setbacks and
-copper crown are solid exterior surfaces the hero can still land on and
-swing from, with no interiors behind them.
+the function rooms, the offices, the kitchen, the Windrose and every
+other floor. They are closed doors and lit windows that show rooms (the
+interior-mapping shader), on solid massing with collision. The terraces,
+the Court roof and the drum are solid exterior surfaces the hero can
+still land on and swing from, with no interiors behind them.
 
 ## 8a. City hall: building brief (proposed, 2026-10-13)
 
@@ -1564,8 +1709,7 @@ told the hour by the shadow of its wind towers.
 
 **References:**
 - **Hilversum Town Hall (Willem Dudok, 1931):** interlocking horizontal
-  masses and one tall clock tower, of the same era as the hotel and the
-  library.
+  masses and one tall clock tower, of the same era as the library.
 - **Stockholm City Hall:** the **Blue Hall**, a great covered courtyard used
   as the city's public room, and the **Golden Hall**, a council hall walled
   in gold mosaic telling the city's story.
@@ -1674,7 +1818,7 @@ walker coming up the avenue from the Rim Walk sees the tower grow for
 - The bell strikes the hours (audio), the one public clock Moy has.
 
 **Materials and palette:** pale limestone 60 % (the same stone as the
-library and the hotel); bronze and gold 30 % (doors, frames, rail, clock
+library); bronze and gold 30 % (doors, frames, rail, clock
 rings, louvres); the gold glow of the chamber and the lantern's light 10 %.
 
 **At night:** the chamber's windows and balcony doors glow gold, the window
@@ -1753,7 +1897,7 @@ arrives by road, the library keeps everything the city knows:
 
 **History: three layers, like Brooklyn's.**
 1. **The boom building.** Built in the Windworks' first boom, the same
-   years as the Grand Hotel: limestone and bronze, art deco, the city's gift
+   years as the Grand Hotel but in limestone and bronze, art deco, the city's gift
    to itself. Its heart was the galleried **Great Hall**.
 2. **The middle renovation.** Lifts, air conditioning, and the deep stacks
    wing behind the hall.
@@ -1841,11 +1985,12 @@ along the gallery rails.
 | Signature motif | the house marks, cast in bronze in the portal's frame | the city's signature |
 | The sign | an open book in gilded bronze over the portal, no lettering | Moy's picture signs |
 
-**The civic set.** The library and the Grand Hotel come from the same boom
-and share their art deco stone and bronze; they face each other across the
-park, the library at the west end of the civic axis and city hall at its
-east end. (The hotel's brief, section 8.5, is amended: it is no longer the
-only art deco building.)
+**The civic set.** The library and city hall come from the same boom and
+share their art deco stone and bronze; they face each other down the civic
+axis across the park, the library at its west end and city hall at its
+east. The Grand Hotel is of the same boom but not of the set: its builder
+chose the boom's daring over its stone (section 8.1, revised 2026-10-13
+in John Portman's manner).
 
 **Palette:** limestone 60 %; bronze, timber and cast iron 30 %; gilding,
 green lamps and sign colour 10 %.
@@ -1893,7 +2038,7 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium (with its mezzanine gallery) and floor 20 with the party's suite; the library's welcome hall, Great Hall and galleries, children's library and heritage room (section 9.8); the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium (with its mezzanine and galleries) and level 27 with the party's suite; the library's welcome hall, Great Hall and galleries, children's library and heritage room (section 9.8); the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
 | **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings; city hall, exterior only, its doors shut (section 8a.7) |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 
@@ -1916,7 +2061,8 @@ lit crowns.
 - a dense Tokyo or Hong Kong neighbourhood;
 - every resident named, with a backstory;
 - the Grand Hotel rest point (atrium, revolving door, giant chandelier,
-  after Chinese grand hotels);
+  after Chinese grand hotels), in John Portman's style (user,
+  2026-10-13);
 - a library;
 - Jammer's mother, a lawyer, is the hero's blood relative; she is a
   **corporate attorney**, not a defence lawyer (user);
@@ -1990,7 +2136,12 @@ lit crowns.
   Windspire;
 - (fifth revision) the wind farm's size, number and placement; the
   Windworks and the Windspire (renamed from the Sunwell and the Sunspire);
-- the five added residents; the Blackout.
+- the five added residents; the Blackout;
+- (2026-10-13) the Grand Hotel's design after Portman (section 8): the
+  atrium block and cylinder tower, the leaning front, the capsule lifts
+  up the outside of the tower, the chandelier hung down the void, the
+  Windrose revolving lounge, the runnel of reclaimed water and the
+  skybridge to the Deck.
 
 **Open:**
 - the hotel's rest price;

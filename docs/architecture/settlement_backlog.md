@@ -84,8 +84,8 @@ computer.
 | P3 | River end, Flower Fruit Mountain plateau, the cliff, gorge, falls and cave | Plant | Ready after P1 | P1 | 10 |
 | P4 | Batu's and Intan's rewritten lines | Plant | Done (2026-10-12) | — | 10 |
 | P5 | Jungle density parity with the demo world | Plant | Deferred | the user | 10 |
-| P6 | Village plan file and audit: commons about 800 m² (660 net of wells), bridges 12 to 14.5 m, ring bearings, amenity places, the circulation (climbing wells, the climbers' and public spirals, the hoist), and the structure (closed wells, bearers, limbs, hung bays, the commons' hung ring, the grand spiral) (`plant_kingdom_village_layout.md` 8 to 10); 3D model | Plant | Approve | the user | 10 |
-| P7 | `NatureProps.build_emergent_tree`: a helical climb option (tight 46° spiral in a 2 m well) for the village trees, and limbs grown where the plan's structure puts them (deck limbs, hanger limbs, the commons limbs) instead of avoiding every landing, denser crowns, and side branches with forks and leaves on every limb (the game's limbs today have only a leaf cluster at the tip) (layout section 10); wild trees keep the wandering chain | Plant | Ready after P6 | P6 | 10 |
+| P6 | Village plan file and audit: commons about 800 m² (630 net of the trunks and their spirals), bridges 15.6 to 17.9 m, ring bearings, amenity places, the circulation (one 32° trunk spiral per tree, the hoist, lianas), and the structure (bracket collars, deck limbs, the inn's saddle limbs, hung bays, the commons' hung ring; no posts) (`plant_kingdom_village_layout.md` 8 to 11, review 2 in 11); 3D model | Plant | Approve | the user | 10 |
+| P7 | `NatureProps.build_emergent_tree`: for the village trees, the 32° trunk spiral on bracket collars in place of the wandering chain, and limbs grown where the plan's structure puts them (deck limbs, the inn's saddle limbs, hanger limbs, the commons limbs) instead of avoiding every landing, denser crowns, and side branches with forks and leaves on every limb (the game's limbs today have only a leaf cluster at the tip) (layout sections 10 and 11); wild trees keep the wandering chain | Plant | Ready after P6 | P6 | 10 |
 | **Rock and Ground** |||||
 | R1 | Census (with Cass Rourke the miner, Gus Pickett the prospector, and the earth-science residents: Hazel Coleman the paleontologist, Tomás Reyes the geologist, Della Lusk the track boss), saloon and hotel, the mechanical and motor-punk layer (open gears, motors and cables; windpumps, stamp mill, race clock), layout, charter, briefs | Rock and Ground | Approve | the user | 15 |
 | R1a | Saloon and hotel building brief: 22.4 × 19.2 m, double-height barroom, hotel lobby with its own door, party room as the wake room, cast-iron gallery | Rock and Ground | Approve | the user; the town's style charter | 15 |
@@ -613,8 +613,9 @@ Planning priorities:
 - Approve the layout: the commons, a large shared deck at 11.4 m spanning the
   three trees above the gate with the shared amenities; a small ground camp
   with a stable, paddock and gardens; household rings and rope bridges higher
-  up; a grand ramp and a 32° public switchback on each tree beside the steep
-  climbing ramps.
+  up; one 32° trunk spiral per tree from the roots to its highest deck, and
+  every deck carried by its trees, with no posts (revised 2026-10-13,
+  layout 11).
 - Approved 2026-10-06: the inn moves to the commons. Whether the curse touches
   apes and whether the shadows of the ashed are seen are deferred to the
   storyline.

@@ -55,7 +55,7 @@ OPENS=[
 B=[]
 def b(n,name,r,kind,h,who=''): B.append(dict(n=n,name=name,r=r,kind=kind,h=h,who=who))
 NB=lambda: 'homes (no one the hero meets)'
-b(1,'Grand Hotel',(-483,-98,-431,-38),'civic','podium 4 storeys, guest tower 25 floors (97 m)','Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work')
+b(1,'Grand Hotel',(-483,-98,-431,-38),'civic','atrium block of 12 levels (44 m) round its void; cylinder guest tower of 28 levels (96 m), drum to 108 m (after John Portman)','Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work')
 b(2,'City hall',(-431,-30,-397,30),'civic','exterior only: portico, balcony, side wings and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a)','Mayor Teodora Vance, Kenji Mori (clerk)')
 b(3,'Library',(-686,-92,-641,-30),'civic','art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)','Ada Fong, Nia Calder, Benji Okoro')
 b(4,'Natural history museum',(-637,62,-575,100),'civic','3 storeys, top-lit hall','Dr. Imani Osei (curator)')
@@ -304,18 +304,77 @@ RESIDENT_HOMES={
 ## Heights (m, to the main roof) and crowns of the numbered buildings, and
 ## the plan forms of the towers (city.md 7c, 8): one source for the plan, the
 ## skyline and the elevations.
-HEIGHTS={1:91,2:22,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:180,14:175,15:150,16:22,
+HEIGHTS={1:96,2:22,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:180,14:175,15:150,16:22,
  17:91,18:104,19:117,20:130,21:130,22:46,23:6,24:11,25:17,26:20,27:29,28:26,29:20,30:20,31:20,
  32:23,33:9,34:26,35:72,36:42,37:17,38:7,39:6,49:52,50:110,51:8,52:23,53:78,40:8,41:4,42:6,43:35,44:3}
-CROWNS={1:104,2:45,3:26,12:280}
+CROWNS={1:108,2:45,3:26,12:280}
 ## Plan forms: twist (a rounded triangle turning as it rises), screen (round-
 ## cornered square in a screen), capsule (core with plug-in capsules), dune
-## (rippling balconies), deco (podium with a set-back tower: TOWER_PART).
-FORMS={12:'twist',13:'screen',14:'capsule',15:'dune',1:'deco',2:'clock'}
+## (rippling balconies), atrium (the Grand Hotel: an atrium block with a
+## cylinder tower, whose rect is TOWER_PART; see HOTEL), clock (city hall).
+FORMS={12:'twist',13:'screen',14:'capsule',15:'dune',1:'atrium',2:'clock'}
 ## Sub-footprints that rise above their building's podium: the hotel's guest
-## tower and city hall's clock tower.
-TOWER_PART={1:(-473,-96,-441,-74),2:(-405,-4,-397,4)}
-PODIUM_HEIGHT={1:20}
+## tower (the square round its cylinder) and city hall's clock tower.
+TOWER_PART={1:(-471,-98,-443,-70),2:(-405,-4,-397,4)}
+PODIUM_HEIGHT={1:44}
+## The Grand Hotel after John Portman (city.md 8, proposed 2026-10-13), for
+## the drawings and the builder. Local metres: x east from the west face, z
+## south from the north face, y up from the atrium floor; world = origin + (x, z).
+HOTEL={
+ 'origin':(-483,-98),'size':(52,60),
+ 'ground':6.5,'mezzanine':5.0,'storey':3.25,'court_levels':12,'top_level':28,
+ 'court_roof':44.0,'skylight_ridge':48.0,
+ # the void: x range at every level; the north corners' edge; the south
+ # galleries' edge at the floor and mezzanine, leaning 'lean' m north a level
+ # from level 3 (Hyatt Regency San Francisco)
+ 'void':{'x':(10,42),'z_north':22,'z_south':48,'lean':0.8},
+ 'gallery':2.4,'range':10,'south_range':12,
+ 'forecourt':(0,54,52,60),'entrance_hall':(0,48,52,54),
+ 'tower':{'c':(26,14),'r':14,'core_r':5.5,'top':96.0,'ribs':40,'rib':(0.6,0.9)},
+ 'drum':{'r':16,'tank':(96.0,101.0),'lounge':(101.0,105.5),'dome_top':108.0},
+ # four glass capsules on the tower's south face, bearings from due south
+ 'lifts':{'bearings':[-36,-12,12,36],'r':1.3,'track':15.4,'top':101.0},
+ 'chandelier':{'c':(26,37),'r':4.0,'bottom':15.0,'top':31.0,'tiers':5,'crystals':3000,'lowered':10.0},
+ 'rock_garden':{'c':(26,37),'r':6.0,'pavilion':(5.0,4.0,4.5)},
+ 'pod':{'c':(12.5,36),'r':2.5},
+ # the double ramp: foot, bend, head on the mezzanine's south gallery
+ 'ramps':[[(18,38),(13,41),(12,48)],[(34,38),(39,41),(40,48)]],'ramp_width':2.4,'landing':3.0,
+ 'runnel':[(42,44),(32,45),(20,45),(10,44),(0,44)],
+ 'skybridge':{'x':(23,29),'z':(60,68)},
+ 'wind_towers':[(5,24),(5,46)],
+}
+def _hotel_checks():
+    H=HOTEL; st=H['storey']
+    lvl=lambda n: H['ground']+H['mezzanine']+(n-3)*st      # floor of level n (n >= 3)
+    if abs(lvl(H['court_levels']+1)-H['court_roof'])>0.01: problems.append(('hotel: court roof is not the top of level 12',lvl(13)))
+    if abs(lvl(H['top_level']+1)-H['tower']['top'])>0.01: problems.append(('hotel: tower top is not the top of level 28',lvl(29)))
+    if HEIGHTS[1]!=H['tower']['top'] or CROWNS[1]!=H['drum']['dome_top'] or PODIUM_HEIGHT[1]!=H['court_roof']:
+        problems.append(('hotel: HEIGHTS, CROWNS or PODIUM_HEIGHT disagree with HOTEL',))
+    (tx,tz),tr=H['tower']['c'],H['tower']['r']; o=H['origin']
+    if (tx-tr,tz-tr,tx+tr,tz+tr)!=(TOWER_PART[1][0]-o[0],TOWER_PART[1][1]-o[1],TOWER_PART[1][2]-o[0],TOWER_PART[1][3]-o[1]):
+        problems.append(('hotel: TOWER_PART is not the square round the cylinder',))
+    if tx-tr<0 or tx+tr>H['size'][0] or tz-tr<0: problems.append(('hotel: tower off the site',))
+    v=H['void']; south=lambda n: v['z_south']-v['lean']*max(0,n-2)
+    if south(H['court_levels'])-(tz+tr)<12: problems.append(('hotel: void under 12 m deep at the top',south(12)))
+    # every ramp within the world's 32 degrees, its head on the mezzanine's south edge
+    for r in H['ramps']:
+        L=sum(math.dist(r[i],r[i+1]) for i in range(len(r)-1))
+        if math.degrees(math.atan2(H['ground'],L))>32: problems.append(('hotel: ramp steeper than 32 degrees',r))
+        if abs(r[-1][1]-v['z_south'])>0.01: problems.append(('hotel: ramp head off the mezzanine',r))
+    # the chandelier clears every gallery it hangs beside by 2 m, the tower by
+    # 4 m and the lifts by 1.5 m; lowered, it clears the pavilion's roof
+    ch=H['chandelier']; (cx,cz),cr=ch['c'],ch['r']
+    for n in range(3,H['court_levels']+1):
+        if lvl(n)<ch['top'] and lvl(n)+st>ch['bottom']:
+            gap=min(cx-v['x'][0],v['x'][1]-cx,south(n)-cz)-cr
+            if gap<2: problems.append(('hotel: chandelier within 2 m of level',n,round(gap,2)))
+    if math.dist((cx,cz),(tx,tz))-tr-cr<4: problems.append(('hotel: chandelier within 4 m of the tower',))
+    for b_ in H['lifts']['bearings']:
+        a=math.radians(b_); lx,lz=tx+H['lifts']['track']*math.sin(a),tz+H['lifts']['track']*math.cos(a)
+        if not v['x'][0]+H['lifts']['r']<=lx<=v['x'][1]-H['lifts']['r'] or lz<v['z_north']: problems.append(('hotel: lift outside the void',b_))
+        if math.dist((lx,lz),(cx,cz))-cr-H['lifts']['r']<1.5: problems.append(('hotel: lift within 1.5 m of the chandelier',b_))
+    if ch['bottom']-ch['lowered']<=H['rock_garden']['pavilion'][2]: problems.append(('hotel: lowered chandelier hits the pavilion',))
+_hotel_checks()
 ## Fabric storeys are 3.25 m, downtown mid-rise storeys 3.6 m.
 STOREY={'fabric':3.25,'midrise':3.6}
 ## The park and the giant playground (city.md 7a, 7b), world metres.
@@ -659,5 +718,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

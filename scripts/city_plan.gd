@@ -70,7 +70,7 @@ const PRECINCTS := [
 ## clockwise on the plan with north up (from +X toward +Z); in Godot that
 ## is rotation.y = deg_to_rad(-angle). Use corners() for the true outline.
 const BUILDINGS := [
-	{"n": 1, "name": "Grand Hotel", "kind": "civic", "rect": Rect2(-483, -98, 52, 60), "angle": 0.0, "height": 91.0, "form": "deco", "size": "podium 4 storeys, guest tower 25 floors (97 m)", "who": "Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work"},
+	{"n": 1, "name": "Grand Hotel", "kind": "civic", "rect": Rect2(-483, -98, 52, 60), "angle": 0.0, "height": 96.0, "form": "atrium", "size": "atrium block of 12 levels (44 m) round its void; cylinder guest tower of 28 levels (96 m), drum to 108 m (after John Portman)", "who": "Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work"},
 	{"n": 2, "name": "City hall", "kind": "civic", "rect": Rect2(-431, -30, 34, 60), "angle": 0.0, "height": 22.0, "form": "clock", "size": "exterior only: portico, balcony, side wings and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a)", "who": "Mayor Teodora Vance, Kenji Mori (clerk)"},
 	{"n": 3, "name": "Library", "kind": "civic", "rect": Rect2(-686, -92, 45, 62), "angle": 0.0, "height": 22.0, "form": "block", "size": "art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)", "who": "Ada Fong, Nia Calder, Benji Okoro"},
 	{"n": 4, "name": "Natural history museum", "kind": "civic", "rect": Rect2(-637, 62, 62, 38), "angle": 0.0, "height": 16.0, "form": "block", "size": "3 storeys, top-lit hall", "who": "Dr. Imani Osei (curator)"},
@@ -543,9 +543,9 @@ const BUILDING_KITS := {
 ## Storey heights for the lots (m).
 const STOREY := {"fabric": 3.25, "midrise": 3.6}
 ## Crowns above the main roof (m), and parts that rise above a podium.
-const CROWNS := {1: 104.0, 2: 45.0, 3: 26.0, 12: 280.0}
-const TOWER_PART := {1: Rect2(-473, -96, 32, 22), 2: Rect2(-405, -4, 8, 8)}
-const PODIUM_HEIGHT := {1: 20.0}
+const CROWNS := {1: 108.0, 2: 45.0, 3: 26.0, 12: 280.0}
+const TOWER_PART := {1: Rect2(-471, -98, 28, 28), 2: Rect2(-405, -4, 8, 8)}
+const PODIUM_HEIGHT := {1: 44.0}
 
 ## Shared garden courtyards inside blocks.
 const COURTS: Array[Rect2] = [
