@@ -472,6 +472,12 @@ Ocean Kingdom Chart artifact. It found:
   since the Kraken circles the dock; it must cross the route once, and its
   straight line runs over the coastal-forest islet's slope at (−34, −154).
 
+**Kai Mālie second pass (2026-10-13).** Every home re-sized from its rooms at
+world scale (the first pass did not add up), the coastal plain deepened to
+30 m, and the layout made code-ready: `tools/kai_malie_layout.py` writes
+`KaiMaliePlan`, checked by `tools/validate_kai_malie_plan.tscn` in the
+pre-push hook (`VILLAGE=kai_malie`).
+
 Planning priorities:
 
 - Approve the four briefs: the Atlantean-modern sea folk city with air halls,

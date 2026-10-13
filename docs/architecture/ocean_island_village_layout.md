@@ -1,6 +1,7 @@
 # Kai Mālie: Civic Layout Plan
 
-Status: dimensioned schematic for review (2026-10-06). Read with
+Status: dimensioned schematic for review (2026-10-06); **second pass,
+code-ready, 2026-10-13** (section 6a). Read with
 `ocean_island_village.md`, which owns the community, households, charter and
 language. This document places them on the island.
 
@@ -67,11 +68,12 @@ Replace the main island's `ISLANDS` dome with an authored island shape:
 3. **Taro terraces:** six level terraces across the valley floor between
    `u = 14` and `u = 38`, `v = -35..+5`, each about 4 m deep and 0.8 m above the
    one below, from +7.4 m down to +3.4 m, held by low lava-rock walls.
-4. **Coastal plain:** at the valley mouth, from `u = 38` to about `u = 60`
-   across `v = -45..+58`, falling gently (3 to 5 percent) from +3.0 m to
-   +1.2 m. This is where the village stands.
-5. **Beach:** sand from `u = 60` to `u = 68` between the two headlands, to the
-   waterline at about `u = 66`.
+4. **Coastal plain:** at the valley mouth, from `u = 36` to `u = 66`
+   across `v = -46..+56`, falling gently (6 percent) from +3.0 m to
+   +1.2 m. This is where the village stands. (Second pass: deepened from
+   22 m to 30 m so the houses fit at world scale.)
+5. **Beach:** sand from `u = 66` to `u = 74` between the two headlands, to the
+   waterline at about `u = 72`.
 6. **Reef flat:** a shallow shelf 0.5 to 2 m deep from the beach out to
    `u = 130`, across `v = -60..+45`, ending in a steep reef edge. Hawaiian
    fishponds were built on reef flats like this, and it lets a short pier reach
@@ -90,9 +92,9 @@ portal and its return spawn do not move.
 | Uplands | the crown, the ridges and the leeward side | forest left wild |
 | Valley head | `u = 0..14` | the spring, the waterfall, the fern-hung wall |
 | *Loʻi kalo* | valley floor `u = 14..38`, `v = -35..+5` | flooded taro, fed by the *ʻauwai* |
-| Village | coastal plain `u = 38..60` | homes, green, civic buildings |
-| Beach | `u = 60..68` | canoe launch, pier head, surf access |
-| Reef flat | `u = 68..130` | the fishpond, Makoa's net fishing, the pier |
+| Village | coastal plain `u = 36..66` | homes, green, civic buildings |
+| Beach | `u = 66..74` | canoe launch, pier head, surf access |
+| Reef flat | `u = 74..130` | the fishpond, Makoa's net fishing, the pier |
 | Reef edge and sea | `u > 130` | the dock, the surf break, the sea folk meeting rocks |
 
 **Water:** the spring and waterfall feed a stream that runs down the valley's
@@ -132,7 +134,7 @@ the beach between two dark lava headlands, the village around its green, and
 behind it the valley's taro terraces climbing between steep green walls to a
 waterfall.
 
-## 6. Footprints
+## 6. Footprints (first pass, superseded by section 6a)
 
 Local `(u, v)` centres; footprints include *lānai* and eaves. The first size
 figure runs along `v` (across the slope), the second along `u` (up and down
@@ -164,14 +166,57 @@ post-and-pier foundations over lava-rock piers, floors 0.8 m above the ground.
 Elena's cottage (7 × 6 m) adds a home for her; the census brief gave the
 newcomers a household but no building. Sam lives in the guest house.
 
+## 6a. Second pass: the plan file (2026-10-13)
+
+The first pass sized the houses before the world's 1.1 × scale and its 2.3 m
+beds (2026-10-12), and several did not add up: the Kahale home put a living
+room, kitchen and two bedrooms in about 6 × 2.5 m of floor. Every building is
+now sized from its rooms (`ocean_island_village_buildings.md`), the coastal
+plain is deepened to 30 m to hold them, and the whole layout lives in one
+plan file:
+
+- `tools/kai_malie_layout.py` holds the zones, the green, the paths and every
+  building with its walls, *lānai*, eaves and rooms, checks them and writes
+  `scripts/kai_malie_plan.gd` (`KaiMaliePlan`).
+- `tools/validate_kai_malie_plan.tscn` checks the plan before anything is
+  built, and runs in the pre-push hook (`VILLAGE=kai_malie`):
+  - every floor's rooms add up to its walls, and every room meets the
+    world-scale minimum for its kind;
+  - buildings stand on the plain (the canoe house on the beach), off the
+    terraces, the stream, the green and the pier head;
+  - neighbours stand 3 m apart at the eaves;
+  - no path crosses a wall or *lānai*, and every front faces a path or the
+    green;
+  - every resident has a building, and the rest point has a toilet.
+
+The second-pass footprints (local centre of the walls; walls and footprint
+as width along `v` × depth along `u`; the footprint adds *lānai* and eaves):
+
+| Building | Centre | Walls | Footprint | Front faces |
+|---|---|---|---|---|
+| *Hālau* | `(43, 0)` | 16.0 × 8.0 | 17.2 × 9.2 | the green, its long side open |
+| Kahananui home | `(45.6, -20.8)` | 9.6 × 8.0 | 14.4 × 12.8 | the green; work *lānai* upslope |
+| Kealoha home | `(44, -40)` | 9.6 × 8.0 | 12.0 × 12.8 | the west lane; back door to the *loʻi* |
+| Akana home | `(59, -39.4)` | 6.4 × 6.4 | 8.8 × 11.2 | the beach path |
+| Okafor guest house | `(59, -19.6)` | 12.8 × 8.0 | 15.2 × 12.8 | the pier head |
+| Medeiros home and workshop | `(42.4, 19.4)` | 12.8 × 6.4 | 15.2 × 11.2 | the east lane; workshop wing on the green side |
+| Kahale home | `(42.4, 35.4)` | 8.0 × 6.4 | 10.4 × 11.2 | the east lane, toward the canoe house |
+| Nakamura store and home | `(59.4, 18)` | 9.6 × 8.0 | 14.4 × 10.4 | the pier head and the green (counter *lānai*) |
+| Varga cottage | `(58.4, 30.8)` | 4.8 × 4.8 | 7.2 × 9.2 | the sea |
+| Canoe house | `(67.1, 41.2)` | 6.4 × 13.8 | 7.6 × 15.0 | the sea, open at its seaward end |
+
+The green is `u = 48..60`, `v = -9..+9`; the pier head `u = 60..68`,
+`v = -5..+5`; the fishpond wall's arc `u = 76..108`, `v = -58..-20`; the
+stream crosses the plain at `v = -50`.
+
 ## 7. Routes
 
 | Route | Width | From → to |
 |---|---|---|
 | Pier | 3.6 m | dock → pier head on the beach |
-| Main path | 3.0 m | pier head → green → *hālau* → *loʻi* stair-ramp to the top terrace |
-| Beach path | 2.5 m | canoe house ← pier head → guest house → fishpond wall |
-| House paths | 2.0 m | green to each home's *lānai* |
+| Main path | 3.0 m | pier head → green → *hālau*, then a 2 m path along the green's edge and a ramp to the top terrace |
+| Beach path | 2.5 m | along the top of the beach, `u = 67.2`: canoe house ← pier head → guest house → Akana home → fishpond wall |
+| West and east lanes | 2.0 m | along `u = 52.6`, from the green's corners to the Kealoha and Kahale homes, passing the Kahananui, guest house, Akana, Medeiros, Nakamura and Varga doors |
 | Terrace paths | 1.5 m on bund tops; ramps 2.0 m between terraces | along the *loʻi* |
 | Fishpond wall | 2.0 m along its crest | beach → the *mākāhā* gates |
 
