@@ -43,7 +43,7 @@ footprints come from the layout.
 | Headroom | every leaf-roof eave, bridge or deck a route passes under clears 2.4 m above the deck, so the hero and the apes walk upright; roofs over the commons and rings keep their eave at 2.4 m or higher and slope up from there |
 | Roof construction | leaf roofs are the shared thatch-dome construction for the whole village, one builder and one thickness, never a flat slab with rounded corners |
 | Rails | rope rails on posts at 1.1 m, with catch nets slung beneath every deck edge more than 3 m above the ground |
-| Vertical routes | the existing steep branch ramps for climbers; 32° public switchbacks; rope ladders between nest levels; no stairs |
+| Vertical routes | the climbers' spiral (the trees' own 46° ramps wound tight round each trunk in a 2 m well), the 32° public spiral just outside the well, the grand ramp, the commons hoist; no stairs, no ladders (layout 9) |
 | Light | resin lamps in gourd shades (*damar* resin), hung from the roof beams; no lights on poles |
 | Water | every roof drains by a bamboo gutter into a gourd or a bamboo tube |
 | Palette | 60 percent living bark and lashed timber; 30 percent leaf-green and thatch-brown roofs (the prototype's varied roof colours kept as one household accent each); 10 percent vine rope, rattan and warm fruit colours |
@@ -230,14 +230,15 @@ counter faces the commons.
 - **Capacity:** the ring is about 33 m round at its middle. The fullest rings
   hold:
   - East Tree, 22.8 m: a couple's pavilion, Dahan's pavilion, the bridge
-    landing and the switchback head, about 16 m of arc in all;
+    landing, about 16 m of arc in all (the switchback has given way to the public spiral, layout 9);
   - North Tree, 34.2 m: the joined siblings' pavilions, the empty pavilion and
-    the switchback head, about 20 m of arc.
+    about 20 m of arc.
 
   Both fit with gaps between.
 - Rope rails and catch nets.
-- The 32° public switchback lands on each ring; the steep branch ramps pass
-  through.
+- The 32° public spiral comes up through an opening in each ring; the
+  climbers' spiral rises in the 2 m well between the ring and the trunk, with
+  an arm across to the ring's walkway (layout 9).
 
 ### The household pavilion
 

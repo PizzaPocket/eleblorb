@@ -89,7 +89,7 @@ reachable by everyone, and directly above the arrival.
 - **Grand ramp:** a broad switchback ramp, 2.4 m wide, no steeper than 32°,
   rising from the gate plaza between the Elder and East trees to the commons'
   southern edge (about 18 m of run in three flights with landings).
-- **Tree switchbacks:** each tree's 32° public switchback reaches the commons at
+- **Tree switchbacks** (superseded by the public spiral, section 9): each tree's 32° public switchback reaches the commons at
   its 11.4 m corner, then continues to the higher rings.
 - **Climbing:** the trees' steep branch ramps and rope ladders, for climbers.
 
@@ -166,7 +166,7 @@ The layout is now data with checks: `tools/plant_village_layout.py` holds:
 - the commons and everything on it;
 - the inn;
 - the grand ramp and the posts;
-- the rings, pavilions, switchbacks and bridges;
+- the rings, pavilions, both spirals and bridges;
 - the ground camp;
 - the kingdom's landmarks.
 
@@ -179,17 +179,14 @@ size changed the following.
   - The triangle between the three trunk centres alone is 432 m².
   - The deck's edge stands 3.5 m beyond the lines between the trunks, so that
     it wraps each trunk.
-- **The bridges span 16 to 18.5 m, not 30 to 32.** The rings reach 7 m out from
-  each trunk, so the bridges cross only the gap between rings.
-- **The public switchbacks move to the trees' outer sides.**
-  - On the commons beside their trunks, as section 3 had it, they landed on the
-    kitchen, dining terrace, store and workshop. Their heads also met the
-    bridges on the 22.8 m rings.
-  - Each now stands on its own lobe of deck at its tree's outer side: the
-    East Tree at 135°, the Elder Tree at 153°, the North Tree at 276°. Each is
-    a tower of 32° flights, one flight per 3.8 m storey.
-- **Ring homes take new bearings round their trunks,** clear of the bridges and
-  switchbacks:
+- **The bridges span 12 to 14.5 m, not 30 to 32.** The rings reach 9 m out from
+  each trunk (a 2 m climbing well, then the 5 m ring, then the homes' bays),
+  so the bridges cross only the gap between rings.
+- **The switchback towers are gone,** replaced by the public spiral (section 9).
+  Beside the trunks they landed on the kitchen, dining terrace, store and
+  workshop, and on lobes of their own they were cut off from the commons by
+  the wells.
+- **Ring homes take new bearings round their trunks,** clear of the bridges:
 
   | Tree | Ring | Home | Bearing |
   |---|---|---|---|
@@ -208,11 +205,13 @@ size changed the following.
   1 m in from the rail, with 1.5 m routes between them:
   - the market on the south edge, set back 2 m to face the grand ramp's head;
   - the kitchen and dining terrace on the north-west edge;
-  - the store, privy, cistern and Jati's workshop on the north-east edge;
+  - the store, cistern and Jati's workshop on the north-east edge;
+  - the public privy hung just outside the rail beside the store, on a
+    bracketed platform, its vat lowered straight to the ground;
   - the gathering circle at the middle, 7.2 m across rather than 9 m, so it
     keeps its routes.
-- **The inn** stands on a 12 × 16 m lobe east of the East Tree, its house at least
-  3 m from the trunk.
+- **The inn** stands on a 20 × 16 m lobe that reaches round the East Tree's well
+  to join the commons, its house at least 1.5 m from the well.
 - **The six posts** stand 1 m inside the deck's edge, all outside the gate
   plaza.
 - **The grand ramp** climbs in three 32° flights (18.2 m of run) from the
@@ -224,7 +223,8 @@ The checks:
 - the inn clear of the East Tree;
 - the ring capacity at every bearing;
 - the bridge spans;
-- the switchbacks clear of the amenities;
+- the deck in one piece once the wells are cut;
+- both spirals' arms and openings clear of each other;
 - the ground buildings 3 m apart, 8 m from trunks and out of the plaza;
 - the training grounds outside the safe zone.
 
@@ -232,15 +232,84 @@ The checks:
 branch ramps, a 3.6 m treehouse deck on every fourth landing, and the inn on
 the ground at (27, 22). Nothing else in this plan exists yet.
 
+## 9. Circulation: who goes up, and how (2026-10-13)
+
+Designed from the people who use each level, not from the trees' prototype
+ramps.
+
+### Who moves, and why
+
+- **Canopy households** (eight households, all stuffed-animal monkeys) are
+  natural climbers. Every day they go between their ring and:
+  - the commons, to eat at dusk, buy at the market and cook;
+  - the floor, to forage and fish;
+  - the other trees, across the bridges.
+
+  They want the quickest way up and do not mind a steep one.
+- **The elders** sit in the gathering circle every evening.
+  - Purnama and Sekar are the oldest residents and live highest, on the crown
+    at 45.6 m.
+  - Senja and Rimba live at 34.2 m.
+
+  They need a gentle way down and back.
+- **Floor households:**
+  - the apes are too heavy for the canopy;
+  - the tailed monkeys and the floor villagers go up to the commons every day,
+    but rarely higher.
+- **The hero, the party and visitors** must reach every deck by the world's 32°
+  rule, as every playable character must (traversal parity).
+- **Goods** are food, fish, water, firewood for the one fire, and rope. They come
+  up from the floor to the store and the kitchen. Waste goes down to the
+  compost.
+- **Abu** carries his grandmother's supper up to the crown every evening.
+
+### The routes
+
+| Route | For | Where | Form |
+|---|---|---|---|
+| **Grand ramp** | everyone, from the floor | the plaza's south side to the market | three 32° flights, 2.4 m wide, 18.2 m of run |
+| **Public spiral** | the hero, the party, visitors, the elders | round each trunk just outside its well, under the rings, from the commons to every ring and (Elder Tree) the crown | a 32° ramp 1.5 m wide with a rope rail, a 1.2 m landing at each deck; it comes up through an opening in each ring, where the ring above would cut its 2.4 m headroom |
+| **Climbers' spiral** | canopy residents and anyone who can climb | in each trunk's well, from the ground to the canopy | the trees' own 46° ramps (3.8 m rise over 3.6 m) as a tight spiral, a 2.3 m landing each storey, with a short arm across the well to every deck |
+| **Rope bridges** | everyone | between the trees at 22.8 m | 2 m wide, rope rails, nets beneath, 12 to 14.5 m spans |
+| **Commons hoist** | goods | over the deck's north-east edge beside the food store, down to the floor outside the plaza | a basket on a rope from a pulley beam |
+| **Crown hoist** | the sisters' supplies | from the Elder Tree's 34.2 m ring to the crown | as the brief has it |
+
+### What this changes
+
+- **Every deck stands back 2 m from its trunk.** This is the climbing well,
+  which leaves the climbers' spiral free to rise past every level. The commons
+  is about 657 m² once its wells are cut, still more than the program
+  needs.
+- **The trees' old wandering ramp chain goes** from the three village trees.
+  The same ramps, rebuilt as a tight spiral, are the climbers' route; the wild
+  giant trees elsewhere keep the chain. Code: `NatureProps.build_emergent_tree`
+  needs a helical option for the village trees.
+- **The switchback towers and the rope ladders between levels go.** The two
+  spirals do their work without taking deck space.
+- **Ring walkways** run on the well side of each ring, past the climbers'
+  arms. The public spiral's opening breaks each ring into a C, and every home
+  is still reached from either way round.
+- **Night:** a resin lamp at each climbers' arm and at the public spiral's
+  landings.
+
+The start bearings of both spirals are chosen by the plan file. Each starts
+so that its commons landing falls on open deck, and so that the public
+spiral's openings stand at least 1.5 m clear of the climbers' arms on every
+ring.
+
 ## Fixed, proposed and open
 
 **Fixed:** the three trees and their positions, the gate, the inn's keeper and
 price, the inn's move to the commons (approved 2026-10-06), Ossian and Manchego, the open treehouse character.
 
+**Proposed (2026-10-13):** the circulation in section 9 (climbing wells, the
+two spirals, the hoist), replacing the switchbacks, the rope ladders and the
+trees' wandering ramps in the village.
+
 **Proposed:** the commons at 11.4 m with its shared amenities, grand ramp,
 catch nets and the one fire in the trees; the gate plaza beneath it; the ground
 camp with a stable, paddock and gardens; household rings above the commons;
-bridges at 22.8 m; a 32° switchback on each tree; the training grounds' place; the river trail; the wider foliage
+bridges at 22.8 m; the climbing wells and two spirals on each tree (section 9); the training grounds' place; the river trail; the wider foliage
 clearing.
 
 **Open:** none blocking.

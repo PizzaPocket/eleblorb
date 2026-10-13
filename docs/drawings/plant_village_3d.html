@@ -80,22 +80,20 @@ p { margin: 0; max-width: 72ch; }
         <button class="chip" id="t_labels" aria-pressed="true">Labels</button>
         <button class="chip" id="t_canopy" aria-pressed="true">Canopy</button>
         <button class="chip" id="t_forest" aria-pressed="true">Forest</button>
-        <button class="chip" id="t_ramps" aria-pressed="true">Branch ramps</button>
       </div>
     </div>
     <div class="places" id="places" role="list"></div>
   </div>
   <div class="note" id="note" aria-live="polite"></div>
-  <div class="legend"><span><i style="background:var(--plan)"></i>planned (labels in amber)</span><span><i style="background:var(--bark)"></i>the trees' existing branch ramps</span><span><i style="background:var(--built)"></i>built today, in the switch's other setting</span></div>
+  <div class="legend"><span><i style="background:var(--plan)"></i>planned (labels in amber)</span><span><i style="background:var(--bark)"></i>the climbers' spirals (46°)</span><span><i style="background:var(--built)"></i>built today, in the switch's other setting</span></div>
 
   <section class="finds">
     <h2>What building the model turned up</h2>
     <p>The village layout is now data with checks (<code>tools/plant_village_layout.py</code>), and the model is drawn from it. Placing everything at true size exposed these.</p>
-    <div class="find"><b>Brief error</b><div><p>The commons cannot be 520 m². The triangle between the three trunk centres is already 432 m². A deck that wraps the trunks with 3.5 m to spare is about 800 m². That is more room, not less, so the amenities fit with routes between them.</p></div></div>
-    <div class="find"><b>Brief error</b><div><p>The rope bridges span 16 to 18.5 m, not 30 to 32 m. The trunks stand 30 to 34 m apart, but each household ring reaches 7 m out from its trunk, so the bridges only cross the gap between rings.</p></div></div>
-    <div class="find"><b>Conflict</b><div><p>The brief puts each tree's 32° public switchback on the commons beside its trunk. There it lands on the kitchen, dining terrace, store or workshop, and its head meets the bridges on the 22.8 m rings. The plan moves each switchback to its own small deck lobe on the tree's outer side, away from the bridges. Several ring homes then turn to new bearings:</p><ul><li>Abu: 40°;</li><li>Senja and Rimba: 225°;</li><li>Dahan and Bayu: 50°;</li><li>Intan and Murai: 20°;</li><li>the empty pavilion: 180°.</li></ul></div></div>
-    <div class="find"><b>Placed</b><div><p>The brief gave no positions for the amenities on the commons. They now stand along the deck's edges with 1.5 m routes between them:</p><ul><li>the market on the south edge, facing the grand ramp's head;</li><li>the kitchen and dining terrace on the north-west edge;</li><li>the store, privy, cistern and Jati's workshop on the north-east edge;</li><li>the gathering circle, 7.2 m across, at the middle;</li><li>the inn on its lobe east of the East Tree.</li></ul><p>The six posts stand 1 m inside the deck edge, all outside the gate plaza.</p></div></div>
-    <div class="find"><b>Conflict</b><div><p>The briefs keep the trees' existing steep branch ramps as the climbers' route through the new village, and say they "pass through" the rings. Drawn at true size, they do more than pass through. Each landing sits 3 to 9 m from its trunk, so the ramps cut through the commons deck, the 5 m rings and the pavilion bays. That is why they show in the planned view. Use the Branch ramps switch to see the plan without them. The plan needs a decision on how climbers go up.</p></div></div>
+    <div class="find"><b>Brief error</b><div><p>The commons cannot be 520 m². The triangle between the three trunk centres is already 432 m². A deck that wraps the trunks with 3.5 m to spare is about 800 m², 660 m² once the climbing wells are cut out round the trunks. That is still more room than the program needs, so the amenities fit with routes between them.</p></div></div>
+    <div class="find"><b>Brief error</b><div><p>The rope bridges span 12 to 14.5 m, not 30 to 32 m. The trunks stand 30 to 34 m apart, but each household ring reaches 9 m out from its trunk (a 2 m well, then 5 m of ring, then the homes' bays), so the bridges only cross the gap between rings.</p></div></div>
+    <div class="find"><b>Resolved</b><div><p>How people go up. The briefs had three routes in conflict:</p><ul><li>the trees' old steep branch ramps, a wandering chain whose landings stand 3 to 9 m from the trunk, cutting through the commons, the rings and the homes;</li><li>a 32° switchback tower beside each trunk, which took the commons' best ground and crowded the bridges;</li><li>rope ladders.</li></ul><p>The plan now gives every trunk two spirals and a well:</p><ul><li><b>The climbers' spiral.</b> Every deck stands back 2 m from its trunk, leaving an open well. In it the trees' own 46° ramps climb as a tight spiral, from the ground to the canopy, with a short arm across the well to each deck. It is the canopy monkeys' fast way up, and the trees' signature.</li><li><b>The public spiral.</b> Just outside the well, under the rings, a 32° ramp 1.5 m wide winds from the commons to every ring and to the elders' crown. It comes up through an opening in each ring. The hero, the party, visitors and the old use it.</li><li><b>The hoist.</b> A basket on a rope lifts food, water and firewood from the floor to the food store, so nobody carries loads up the ramps.</li></ul><p>The switchback towers and the rope ladders are gone.</p></div></div>
+    <div class="find"><b>Placed</b><div><p>The brief gave no positions for the amenities on the commons. They now stand along the deck's edges with 1.5 m routes between them:</p><ul><li>the market on the south edge, facing the grand ramp's head;</li><li>the kitchen and dining terrace on the north-west edge;</li><li>the store, cistern and Jati's workshop on the north-east edge, with the public privy hung just outside the rail beside the store;</li><li>the gathering circle, 7.2 m across, at the middle;</li><li>the inn on a lobe of deck that reaches round the East Tree's well.</li></ul><p>The six posts stand 1 m inside the deck edge, all outside the gate plaza.</p></div></div>
     <div class="find"><b>Built today</b><div><p>The game still has the prototype village:</p><ul><li>the three giant trees with their steep branch ramps;</li><li>a 3.6 m treehouse deck on every fourth landing;</li><li>the inn on the ground at (27, 22).</li></ul><p>None of the commons, rings, bridges, ground camp or switchbacks exist yet. The trees' branch ramps climb at 46°, and the model draws their chain from the same rule as <code>nature_props.gd</code>. Their starting directions are random in the game, so the model's are approximate.</p></div></div>
     <div class="find"><b>Approximate</b><div><p>The terrain's hills and the river's wander come from Godot noise that the page cannot reproduce exactly. Their sizes match the code; their exact shapes do not. The village clearing, the river's depth and level, and every landmark position are exact.</p></div></div>
   </section>
@@ -141,7 +139,9 @@ const PLACES = [
   { id: "inn", t: "Bima's inn", s: "the rest point, on its lobe of deck", cam: [44, 22, 26], at: [22, 13, 12],
     p: "The one house on the commons with walls: a long house 14 × 8 m with a deep red-brown leaf roof and a veranda facing the commons. It stands on its own lobe of deck east of the East Tree. The party wakes in its party room. A night costs 15 Tokoins.", who: "Bima keeps it" },
   { id: "rings", t: "Rings and bridges", s: "the households in the canopy", cam: [-38, 40, -44], at: [0, 26, 0],
-    p: "Each tree carries wrap-around decks 5 m wide, with each household's open pavilion on a bay at its outer edge. Each pavilion is round its own central pillar under a broad leaf roof. Rope-and-plank bridges join the trees at 22.8 m, so the canopy households are one neighbourhood. Each tree's public switchback, a tower of 32° flights on its own deck lobe, climbs from the commons to the rings.", who: "Abu · Jati and Embun · Dahan · Tirta and Bintang · Senja and Rimba · Tunas · Bayu · Intan and Murai" },
+    p: "Each tree carries wrap-around decks 5 m wide, with each household's open pavilion on a bay at its outer edge. Each pavilion is round its own central pillar under a broad leaf roof. Rope-and-plank bridges join the trees at 22.8 m, so the canopy households are one neighbourhood. Each ring stands back 2 m from its trunk, leaving the climbing well open.", who: "Abu · Jati and Embun · Dahan · Tirta and Bintang · Senja and Rimba · Tunas · Bayu · Intan and Murai" },
+  { id: "climb", t: "Up through a tree", s: "the two spirals round every trunk", cam: [-4, 18, 22], at: [-16, 17, 9],
+    p: "Every deck stands back 2 m from its trunk, leaving an open well. In the well the trees' own steep ramps, 46°, climb as a tight spiral from the ground to the canopy, with a short arm across the well to each deck: the canopy monkeys' quick way up. Just outside the well, under the rings, the public spiral winds at 32° from the commons to every ring and the elders' crown, and comes up through an opening in each ring: the way for the hero, the party, visitors and the old.", who: "everyone" },
   { id: "crown", t: "The Elder Tree's crown", s: "Purnama and Sekar, 45.6 m", cam: [-6, 52, 6], at: [-16, 44, 9],
     p: "The sisters' crown deck, the highest home in the village. A basket hoist from the ring below brings their supplies up, and Abu carries his grandmother's supper up every evening.", who: "Purnama · Sekar" },
   { id: "camp", t: "The ground camp", s: "the floor households", cam: [-70, 26, 52], at: [-20, 2, 0],
@@ -194,6 +194,7 @@ const labels = [];
 const label = (text, sub, x, y, z, cls = "", near = 0, group = "all") => labels.push({ text, sub, p: new THREE.Vector3(x, y, z), cls, near, group });
 const G = { plan: new THREE.Group(), built: new THREE.Group(), forest: new THREE.Group(), ramps: new THREE.Group(), canopy: [] };
 scene.add(G.plan, G.built, G.forest, G.ramps);
+G.ramps.visible = false;   // the old wandering branch ramps exist only in the village as built today
 
 // ---------- terrain: one coarse grid for the kingdom and a fine one for the village
 function terrain(size, n, cx, cz) {
@@ -241,6 +242,7 @@ function giantTree(k, parent) {
   return g;
 }
 for (const k of Object.keys(TR)) giantTree(k, scene);
+G.built.add(G.ramps); G.ramps.visible = true;
 label("East Tree", "tualang, 56 m", TR.east.c[0], TR.east.h + 4, TR.east.c[1], "", 700);
 label("Elder Tree", "tualang, 62 m", TR.elder.c[0], TR.elder.h + 4, TR.elder.c[1], "", 700);
 label("North Tree", "tualang, 58 m", TR.north.c[0], TR.north.h + 4, TR.north.c[1], "", 700);
@@ -255,8 +257,9 @@ function pavilion(parent, x, y, z, w, d, yaw, roofM = M.roof, h = 2.8) {
   return g;
 }
 // a deck slab from a polygon, at height y
-function slab(poly, y, m, parent, th = 0.35) {
+function slab(poly, y, m, parent, th = 0.35, holes = []) {
   const sh = new THREE.Shape(poly.map(p => new THREE.Vector2(p[0], p[1])));
+  for (const h of holes) sh.holes.push(new THREE.Path(h.map(p => new THREE.Vector2(p[0], p[1]))));
   const g = new THREE.ExtrudeGeometry(sh, { depth: th, bevelEnabled: false }); g.rotateX(Math.PI / 2); g.translate(0, y, 0);
   // ExtrudeGeometry's shape y becomes -z after the rotation; flip z back
   const pos = g.attributes.position; for (let i = 0; i < pos.count; i++) pos.setZ(i, -pos.getZ(i)); g.computeVertexNormals();
@@ -271,12 +274,12 @@ const boxPoly = p => { const xs = p.map(q => q[0]), zs = p.map(q => q[1]); retur
 // ---------- the planned village
 (function planned() {
   const P = G.plan, cy = D.commons_y;
-  slab(D.commons, cy, M.deck, P); rail(D.commons, cy, P);
+  for (const d of D.deck) { slab(d.ext, cy, M.deck, P, 0.35, d.holes); rail(d.ext, cy, P); for (const h of d.holes) rail(h, cy, P); }
+  // the wells' rails where they cut the deck's edge
+  for (const k of Object.keys(TR)) { const t = TR[k], r = trunkR(k, cy) + D.well, o = []; for (let i = 0; i <= 48; i++) { const a = i / 48 * Math.PI * 2; const q = [t.c[0] + Math.cos(a) * r, t.c[1] + Math.sin(a) * r]; o.push(q); } }
   // catch nets beneath the edge
   const net = D.commons.map(p => { const dx = p[0] - D.centroid[0], dz = p[1] - D.centroid[1], n = Math.hypot(dx, dz); return [p[0] + dx / n * 2, p[1] + dz / n * 2]; });
   for (let i = 0; i < D.commons.length; i += 3) { const a = D.commons[i], b = net[i]; }
-  slab(D.inn ? [[D.inn.c[0] - D.inn.w / 2, D.inn.c[1] - D.inn.d / 2], [D.inn.c[0] + D.inn.w / 2, D.inn.c[1] - D.inn.d / 2], [D.inn.c[0] + D.inn.w / 2, D.inn.c[1] + D.inn.d / 2], [D.inn.c[0] - D.inn.w / 2, D.inn.c[1] + D.inn.d / 2]] : [], cy, M.deck, P);
-  for (const k in D.lobes) slab(D.lobes[k], cy, M.deck, P);
   for (const p of D.posts) { egg(0.28, cy / 2, 0.28, 5.5, 5.5, M.barkDark, p[0], cy / 2, p[1], P); egg(0.6, 0.2, 0.6, 5.5, 5.5, M.stone, p[0], 0.1, p[1], P); }
   // amenities
   for (const a of D.amenities) {
@@ -307,38 +310,49 @@ const boxPoly = p => { const xs = p.map(q => q[0]), zs = p.map(q => q[1]); retur
   }
   label("grand ramp", "three 32° flights", (gx0 + gx1) / 2, cy + 2, gz1, "plan small", 100);
   // household rings, the crown deck, pavilions on bays, switchbacks, bridges
-  const ringAt = (k, y, w = D.rings.width) => { const t = TR[k], r0 = trunkR(k, y) + 0.2, r1 = trunkR(k, y) + w; const g = add(new THREE.RingGeometry(r0, r1, 40), M.deck, t.c[0], y, t.c[1], P); g.rotation.x = -Math.PI / 2; g.material.side = THREE.DoubleSide;
-    const o = []; for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2; o.push([t.c[0] + Math.cos(a) * r1, t.c[1] + Math.sin(a) * r1]); } rail(o, y, P, false); };
+  // a ring: an annulus outside the well, less the public spiral's opening where it comes up through
+  const ringAt = (k, y, w = D.rings.width) => {
+    const t = TR[k], r0 = trunkR(k, y) + D.well, r1 = r0 + w, op = (D.public[k] ? D.public[k].openings : []).find(o => Math.abs(o.y - y) < 0.01);
+    const b0 = op ? op.a1 : 0, len = op ? 360 - (op.a1 - op.a0) : 360;
+    // RingGeometry angles run from +x toward -z once laid flat, so a bearing b is angle -b
+    const g = add(new THREE.RingGeometry(r0, r1, 64, 1, -rad(b0 + len), rad(len)), M.deck, t.c[0], y, t.c[1], P); g.rotation.x = -Math.PI / 2; g.material.side = THREE.DoubleSide;
+    for (const r of [r0, r1]) { const o = []; for (let i = 0; i <= 48; i++) { const a = rad(b0 + len * i / 48); o.push([t.c[0] + Math.cos(a) * r, t.c[1] + Math.sin(a) * r]); } rail(o, y, P, false); }
+  };
   for (const k of Object.keys(TR)) for (const y of D.rings.ys) ringAt(k, y);
   ringAt("elder", D.rings.crown, 5.5);
   for (const pv of D.pavilions) {
-    const t = TR[pv.tree], r = trunkR(pv.tree, pv.y) + D.rings.width + pv.size[1] / 2 - 0.6, x = t.c[0] + Math.cos(rad(pv.b)) * r, z = t.c[1] + Math.sin(rad(pv.b)) * r;
+    const t = TR[pv.tree], r = trunkR(pv.tree, pv.y) + D.well + D.rings.width + pv.size[1] / 2 - 0.6, x = t.c[0] + Math.cos(rad(pv.b)) * r, z = t.c[1] + Math.sin(rad(pv.b)) * r;
     pavilion(P, x, pv.y, z, pv.size[0], pv.size[1], pv.b + 90, pv.kind === "empty" ? M.roofEmpty : M.roof, pv.kind === "crown" ? 3.2 : 2.8);
     label(pv.who, `${pv.tree} tree · ${pv.y} m`, x, pv.y + 4.6, z, "plan small", 60);
   }
-  for (const k in D.sbpoly) {
-    const p = D.sbpoly[k], sb = D.switchbacks[k], c = p.reduce((m, q) => [m[0] + q[0] / 4, m[1] + q[1] / 4], [0, 0]);
-    const along = [p[1][0] - p[0][0], p[1][1] - p[0][1]], L = Math.hypot(...along), u = [along[0] / L, along[1] / L], across = [p[3][0] - p[0][0], p[3][1] - p[0][1]], W = Math.hypot(...across), v = [across[0] / W, across[1] / W];
-    let y = D.commons_y, i = 0;
-    while (y < sb.top - 0.1) {
-      const lane = (i % 2 ? 1 : -1) * (sb.lane / 2 + 0.2), s0 = (i % 2 ? 1 : -1) * (L / 2 - 1.2), s1 = -s0;
-      const a = new THREE.Vector3(c[0] + u[0] * s0 + v[0] * lane, y, c[1] + u[1] * s0 + v[1] * lane), b = new THREE.Vector3(c[0] + u[0] * s1 + v[0] * lane, y + 3.8, c[1] + u[1] * s1 + v[1] * lane);
-      const r = add(new THREE.BoxGeometry(sb.lane, 0.22, a.distanceTo(b)), M.plank, 0, 0, 0, P); r.position.copy(a.clone().add(b).multiplyScalar(0.5)); r.lookAt(b);
-      y += 3.8; i++;
-    }
-    for (const q of p) egg(0.16, (sb.top - cy) / 2, 0.16, 5.5, 5.5, M.barkDark, q[0], cy + (sb.top - cy) / 2, q[1], P);
-    label("public switchback", "32°, commons to the rings", c[0], sb.top + 2, c[1], "plan small", 70);
+  // the two spirals round every trunk: the climbers' 46 deg spiral in the well, and the public 32 deg spiral outside it
+  const helixPiece = (t, r, a, b, y0, y1, w, m, railOut) => {
+    const n = Math.max(2, Math.ceil(Math.abs(b - a) / 8)), pts = [];
+    for (let i = 0; i <= n; i++) { const u = i / n, an = rad(a + (b - a) * u); pts.push(new THREE.Vector3(t.c[0] + Math.cos(an) * r, y0 + (y1 - y0) * u, t.c[1] + Math.sin(an) * r)); }
+    for (let i = 0; i < n; i++) { const p0 = pts[i], p1 = pts[i + 1], pl = add(new THREE.BoxGeometry(w, 0.22, p0.distanceTo(p1) + 0.05), m, 0, 0, 0, P); pl.position.copy(p0.clone().add(p1).multiplyScalar(0.5)); pl.lookAt(p1); }
+    if (railOut) { const rp = []; for (let i = 0; i <= n; i++) { const u = i / n, an = rad(a + (b - a) * u); rp.push(new THREE.Vector3(t.c[0] + Math.cos(an) * (r + w / 2), y0 + (y1 - y0) * u + 1.1, t.c[1] + Math.sin(an) * (r + w / 2))); } add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rp), n * 2, 0.04, 4), M.rope, 0, 0, 0, P); }
+  };
+  for (const k of Object.keys(TR)) {
+    const t = TR[k];
+    for (const st of D.helix[k].steps) { helixPiece(t, st.r, st.a0, st.a1, st.y0, st.y1, D.climb_width, M.ramp, false); helixPiece(t, st.r, st.a1, st.a2, st.y1, st.y1, D.climb_width + 0.4, M.barkDark, false); }
+    for (const [y, b] of D.arms[k]) { const r0 = trunkR(k, y) + 0.3 + D.climb_width, r1 = trunkR(k, y) + D.well + 0.6; const m = (r0 + r1) / 2, an = rad(b); const arm = add(new THREE.BoxGeometry(1.4, 0.25, r1 - r0 + 0.4), M.plank, t.c[0] + Math.cos(an) * m, y - 0.12, t.c[1] + Math.sin(an) * m, P); arm.rotation.y = -an + Math.PI / 2; }
+    const pub = D.public[k];
+    for (const st of pub.steps) { helixPiece(t, st.r, st.a0, st.a1, st.y0, st.y1, D.public_w, M.plank, true); helixPiece(t, st.r, st.a1, st.a2, st.y1, st.y1, D.public_w, M.deck, true); }
+    const f = pub.steps[0]; label("public spiral", "32°, for everyone", t.c[0] + Math.cos(rad(f.a0 + 60)) * f.r, f.y0 + 5, t.c[1] + Math.sin(rad(f.a0 + 60)) * f.r, "plan small", 60);
+    const h = D.helix[k].steps[4]; label("climbers' spiral", "46°, in the well", t.c[0] + Math.cos(rad(h.a0)) * h.r, h.y0 + 2, t.c[1] + Math.sin(rad(h.a0)) * h.r, "plan small", 45);
   }
+  // the commons hoist: a basket on a rope from a pulley beam over the deck's edge, down to the floor beside the food store
+  (() => { const [x, z] = D.hoist, gy = ground(x, z); egg(0.15, 0.15, 1.6, 5.5, 5.5, M.barkDark, x, cy + 3.2, z, P); add(new THREE.CylinderGeometry(0.03, 0.03, cy + 3.2 - gy - 4), M.rope, x, (cy + 3.2 + gy + 4) / 2, z, P); egg(0.6, 0.45, 0.6, 2.4, 2.4, M.fence, x, gy + 3.6, z, P); label("hoist", "food, water and firewood up to the store", x, cy + 5, z, "plan small", 70); })();
   const by = D.bridge_y;
   for (const br of D.bridges) {
     const a = TR[br.a], b = TR[br.b], d = [b.c[0] - a.c[0], b.c[1] - a.c[1]], L = Math.hypot(...d), u = [d[0] / L, d[1] / L];
-    const ra = trunkR(br.a, by) + D.rings.width - 0.3, rb = trunkR(br.b, by) + D.rings.width - 0.3, pts = [];
+    const ra = trunkR(br.a, by) + D.well + D.rings.width - 0.3, rb = trunkR(br.b, by) + D.well + D.rings.width - 0.3, pts = [];
     for (let i = 0; i <= 16; i++) { const t = i / 16, s = ra + (L - ra - rb) * t; pts.push(new THREE.Vector3(a.c[0] + u[0] * s, by - Math.sin(Math.PI * t) * 0.9, a.c[1] + u[1] * s)); }
     const curve = new THREE.CatmullRomCurve3(pts);
     for (let i = 0; i < 16; i++) { const p0 = curve.getPointAt(i / 16), p1 = curve.getPointAt((i + 1) / 16); const pl = add(new THREE.BoxGeometry(2, 0.12, p0.distanceTo(p1) * 0.92), M.plank, 0, 0, 0, P); pl.position.copy(p0.clone().add(p1).multiplyScalar(0.5)); pl.lookAt(p1); }
     for (const side of [-1, 1]) { const rp = pts.map(p => p.clone().add(new THREE.Vector3(-u[1] * side, 1.1, u[0] * side))); add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rp), 24, 0.05, 4), M.rope, 0, 0, 0, P); }
   }
-  label("rope bridges", "at 22.8 m, 16 to 18.5 m spans", (TR.elder.c[0] + TR.east.c[0]) / 2, by + 3, (TR.elder.c[1] + TR.east.c[1]) / 2, "plan small", 120);
+  label("rope bridges", "at 22.8 m, 12 to 14.5 m spans", (TR.elder.c[0] + TR.east.c[0]) / 2, by + 3, (TR.elder.c[1] + TR.east.c[1]) / 2, "plan small", 120);
   label("The commons", "11.4 m · about 800 m²", D.centroid[0] + 6, cy + 9, D.centroid[1] - 6, "plan", 320);
   // the ground camp
   for (const gnd of D.ground) {
@@ -438,7 +452,6 @@ const tog = (id, fn) => { const b = document.getElementById(id); b.addEventListe
 tog("t_labels", v => { showLabels = v; labelBox.hidden = !v; });
 tog("t_canopy", v => G.canopy.forEach(c => c.visible = v));
 tog("t_forest", v => G.forest.visible = v);
-tog("t_ramps", v => G.ramps.visible = v);
 function setMode(m) { mode = m; G.plan.visible = m === "plan"; G.built.visible = m === "built"; document.getElementById("m_plan").setAttribute("aria-pressed", m === "plan"); document.getElementById("m_built").setAttribute("aria-pressed", m === "built"); }
 document.getElementById("m_plan").addEventListener("click", () => setMode("plan"));
 document.getElementById("m_built").addEventListener("click", () => setMode("built"));

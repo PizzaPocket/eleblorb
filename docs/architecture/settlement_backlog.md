@@ -84,7 +84,8 @@ computer.
 | P3 | River end, Flower Fruit Mountain plateau, the cliff, gorge, falls and cave | Plant | Ready after P1 | P1 | 10 |
 | P4 | Batu's and Intan's rewritten lines | Plant | Done (2026-10-12) | — | 10 |
 | P5 | Jungle density parity with the demo world | Plant | Deferred | the user | 10 |
-| P6 | Village plan file and audit: commons about 800 m², bridges 16 to 18.5 m, switchbacks on outer deck lobes, ring bearings, amenity places (`plant_kingdom_village_layout.md` 8); 3D model | Plant | Approve | the user | 10 |
+| P6 | Village plan file and audit: commons about 800 m² (660 net of wells), bridges 12 to 14.5 m, ring bearings, amenity places, and the circulation: climbing wells, the climbers' and public spirals, the hoist (`plant_kingdom_village_layout.md` 8 and 9); 3D model | Plant | Approve | the user | 10 |
+| P7 | `NatureProps.build_emergent_tree`: a helical climb option (tight 46° spiral in a 2 m well) for the village trees; wild trees keep the wandering chain | Plant | Ready after P6 | P6 | 10 |
 | **Rock and Ground** |||||
 | R1 | Census (with Cass Rourke the miner, Gus Pickett the prospector, and the earth-science residents: Hazel Coleman the paleontologist, Tomás Reyes the geologist, Della Lusk the track boss), saloon and hotel, the mechanical and motor-punk layer (open gears, motors and cables; windpumps, stamp mill, race clock), layout, charter, briefs | Rock and Ground | Approve | the user | 15 |
 | R1a | Saloon and hotel building brief: 22.4 × 19.2 m, double-height barroom, hotel lobby with its own door, party room as the wake room, cast-iron gallery | Rock and Ground | Approve | the user; the town's style charter | 15 |
