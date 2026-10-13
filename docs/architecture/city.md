@@ -1510,8 +1510,8 @@ and ficus, which take the indoor light). The **runnel** crosses the floor
 land on the north, at the foot of the tower.
 
 **The skylight.** White-cased steel trusses at 4 m centres span the void
-east–west, with bronze glass between, rising to +48 m along the void's
-middle. The central truss carries the chandelier's **winch room**. A
+north–south, with bronze glass between, pitched to a ridge at +48 m that
+runs east–west along the void's middle. The central truss carries the chandelier's **winch room**. A
 clerestory of louvres runs round the skylight's edge. The lift rails pass
 up through glazed sleeves at the skylight's north edge.
 
