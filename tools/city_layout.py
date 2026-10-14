@@ -323,7 +323,7 @@ PODIUM_HEIGHT={1:44}
 HOTEL={
  'origin':(-483,-98),'size':(52,60),
  'ground':6.5,'mezzanine':5.0,'storey':3.25,'court_levels':12,'top_level':28,
- 'court_roof':44.0,'skylight_ridge':48.0,
+ 'court_roof':44.0,'skylight_ridge':48.0,'skylight_north':'tower',
  # the void: x range at every level; the north corners' edge; the south
  # galleries' edge at the floor and mezzanine, leaning 'lean' m north a level
  # from level 3 (Hyatt Regency San Francisco)
@@ -334,7 +334,16 @@ HOTEL={
  'drum':{'r':16,'tank':(96.0,101.0),'lounge':(101.0,105.5),'dome_top':108.0},
  # four glass capsules on the tower's south face, bearings from due south
  'lifts':{'bearings':[-36,-12,12,36],'r':1.3,'track':15.4,'top':101.0},
- 'chandelier':{'c':(26,37),'r':4.0,'bottom':15.0,'top':31.0,'tiers':5,'crystals':3000,'lowered':10.0},
+ 'chandelier':{'c':(26,37),'r':4.0,'bottom':15.0,'top':31.0,'tiers':5,'crystals':3000,'lowered':10.0,'load_t':8.0},
+ # what the chandelier hangs from: a steel hoist girder 3.4 m deep spanning the
+ # void east to west straight over it, bearing on the east and west ranges'
+ # concrete frames. It is the skylight's ridge beam: the glazing trusses run
+ # from it north to a ring beam on the tower's face and south to the leaning
+ # front. A catwalk runs inside it from the winch room on the east range's
+ # roof to the pulley block over the chandelier; two hoist ropes and two
+ # safety ropes; a handwheel lowers it if the power fails.
+ 'hoist':{'z':37.0,'x':(8.0,44.0),'bottom':44.6,'top':48.0,'block':(26,37),'ropes':4,
+          'winch':(43.0,33.5,49.0,40.5),'winch_top':48.6},
  'rock_garden':{'c':(26,37),'r':6.0,'pavilion':(5.0,4.0,4.5)},
  'pod':{'c':(12.5,36),'r':2.5},
  # the double ramp: foot, bend, head on the mezzanine's south gallery
@@ -374,6 +383,22 @@ def _hotel_checks():
         if not v['x'][0]+H['lifts']['r']<=lx<=v['x'][1]-H['lifts']['r'] or lz<v['z_north']: problems.append(('hotel: lift outside the void',b_))
         if math.dist((lx,lz),(cx,cz))-cr-H['lifts']['r']<1.5: problems.append(('hotel: lift within 1.5 m of the chandelier',b_))
     if ch['bottom']-ch['lowered']<=H['rock_garden']['pavilion'][2]: problems.append(('hotel: lowered chandelier hits the pavilion',))
+    # the hoist girder: straight over the chandelier, bearing 2 m into each range,
+    # clear of the tower and of the lifts' sleeves, its winch room on the east
+    # range's roof; the ropes long enough to lower it its full travel
+    hg=H['hoist']
+    if abs(hg['z']-cz)>0.3 or abs(hg['block'][0]-cx)>0.3: problems.append(('hotel: hoist girder not over the chandelier',))
+    if hg['x'][0]>v['x'][0]-2 or hg['x'][1]<v['x'][1]+2: problems.append(('hotel: hoist girder does not bear 2 m into both ranges',))
+    if hg['z']-(tz+tr)<4: problems.append(('hotel: hoist girder within 4 m of the tower',))
+    if hg['z']>south(H['court_levels']): problems.append(('hotel: hoist girder south of the void',))
+    if hg['top']>H['skylight_ridge']+0.01: problems.append(('hotel: hoist girder above the ridge',))
+    wx0,wz0,wx1,wz1=hg['winch']
+    if wx0<v['x'][1] or wx1>H['size'][0]: problems.append(('hotel: winch room not on the east range',))
+    if not (wz0<=hg['z']<=wz1): problems.append(('hotel: winch room not at the girder\'s end',))
+    for b_ in H['lifts']['bearings']:
+        a=math.radians(b_); lz=tz+H['lifts']['track']*math.cos(a)
+        if hg['z']-lz<2: problems.append(('hotel: hoist girder crosses a lift sleeve',b_))
+    if hg['bottom']-ch['top']<6: problems.append(('hotel: under 6 m of rope above the chandelier',))
 _hotel_checks()
 ## Fabric storeys are 3.25 m, downtown mid-rise storeys 3.6 m.
 STOREY={'fabric':3.25,'midrise':3.6}

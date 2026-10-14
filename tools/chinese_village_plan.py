@@ -73,22 +73,22 @@ item('roofers', 'westend_home', 'West end home', 'compound', (-4, 14, H[0], H[1]
 item('lantern', 'sealing_rock', "Sun Wu Kong's rock", 'feature', (0, -30, 8, 10, 0), style='rock', program='the sealing rock under its gold band; a lookout beside it')
 item('lantern', 'play_yard', 'Play hut and yard', 'court', (4, -19, 12, 12, 0), style='play', who='Xiu, Bao, and the others', program='the stick play hut; the staff among the loose sticks')
 item('lantern', 'lantern_home', 'Lantern home and workshop', 'compound', (-3, -4, 14, 18, 0), door='+x', who='Mei Lian, Jin Wei, Xiu', program='main room with kang; workshop; paper and frames drying')
-item('lantern', 'tile_home', 'Tile home', 'compound', (-11, 15, 12, 16, 0), door='+x', who='Yun Tao, Bao', program='main room with kang; tile stack; the one wave coping on a home\'s yard wall', wave_coping=True)
+item('lantern', 'tile_home', 'Tile home', 'compound', (-11, 14, 12, 14, 0), door='+x', who='Yun Tao, Bao', program='main room with kang; tile stack; the one wave coping on a home\'s yard wall', wave_coping=True)
 
 # B, Market: the square with Chen's stall and the well; the bao house; the carrier's home and loading shed
 item('market', 'market_square', 'Market square', 'court', (0, 1.5, 15, 17, 0), style='market', program='Chen\'s stall; the well; gossip', public=True)
 item('market', 'well', 'Well', 'feature', (1, 3, 2.4, 2.4, 0), on='market_square', style='well', program='from a spring in the island\'s rock heart')
 item('market', 'chen_stall', "Chen's stall", 'feature', (-5, -3, 5, 3, 0), on='market_square', style='stall', who='Chen', program='including the Seed of Life')
 item('market', 'bao_house', 'Bao house', 'compound', (-6, -21, 12, 20, 0), door='+z', style='shop', who='Hua Chen, Ting', program='shopfront on the square side; steamers; main room with kang')
-item('market', 'carrier_home', "Carrier's home and loading shed", 'compound', (14, 24, 12, 18, 0), door='-z', style='home', who='Bo Xiang, Rong', program='main room with kang; loading shed for the levy and Ohio goods')
+item('market', 'carrier_home', "Carrier's home and loading shed", 'compound', (15.5, 24, 12, 18, 0), door='-z', style='home', who='Bo Xiang, Rong', program='main room with kang; loading shed for the levy and Ohio goods')
 
 # D, Fields: strips, household plots by the B bridge, threshing floor, shed, compost and night-soil pits downwind on the east rim
 item('fields', 'threshing', 'Threshing floor', 'court', (-8, -19, 15, 15, 0), style='threshing', program='harvest and festivals; Mei Lian\'s lanterns hung for them', public=True)
 for i in range(8):
     item('fields', 'plot%d' % (i + 1), 'Household plot', 'field', (5.5 + (i % 4) * 5.4, -30 + (i // 4) * 9, 5, 8, 0), style='plot', program='one per household, each kept differently')
 # the strips leave a lane down the west side, from the B bridge to the farm bridge
-for j, (z, x0, x1) in enumerate([(-2, -15, 31), (9, -20, 31), (20, -22, 25), (31, -18, 20)]):
-    item('fields', 'strip%d' % (j + 1), 'Field strip', 'field', ((x0 + x1) / 2, z, x1 - x0, 10.6, 0), style='strip', program=['millet', 'wheat', 'soybeans', 'millet'][j])
+for j, (z, x0, x1) in enumerate([(-2, -15, 31), (9, -20, 31), (20, -19, 25), (31, -18, 20)]):
+    item('fields', 'strip%d' % (j + 1), 'Field strip', 'field', ((x0 + x1) / 2, z, x1 - x0, 10.8, 0), style='strip', program=['millet', 'wheat', 'soybeans', 'millet'][j])
 item('fields', 'field_shed', 'Field shed', 'building', (-12.5, -24.5, 5, 4, 0), door='+z', style='shed', roof='hard_gable', on='threshing', program='tools; seed; at the threshing floor\'s corner, its door onto the floor')
 item('fields', 'pits', 'Compost and night-soil pits', 'field', (31, -10, 5, 6, 0), style='pits', program='downwind, on the east rim')
 

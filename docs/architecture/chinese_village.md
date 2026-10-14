@@ -312,18 +312,47 @@ them on stone pillars, and the user rejected it. This version is in
 | D, Fields | (117, 40) | 4,531 (3,632) |
 | Bamboo, Farm | (43, 105) | 4,092 (3,217) |
 
-| Bridge | Span m | Type |
+| Bridge | Clear span m | Type |
 |---|---|---|
-| Rim to Gate | 27 | covered timber cantilever |
-| Gate to Palace | 59 | iron chain |
-| Gate to Inn | 39 | iron chain |
-| Gate to Bamboo | 19 | covered timber cantilever |
-| Palace to Lantern | 32 | covered timber cantilever |
+| Rim to Gate | 25 | covered timber cantilever |
+| Gate to Palace | 57 | iron chain |
+| Gate to Inn | 38 | covered timber cantilever (was a chain) |
+| Gate to Bamboo | 15 | covered timber cantilever |
+| Palace to Lantern | 30 | covered timber cantilever |
 | Palace to Market | 44 | iron chain |
-| Lantern to Roofers | 34 | covered timber cantilever |
-| Roofers to Inn | 37 | covered timber cantilever |
-| Market to Fields | 34 | covered timber cantilever |
-| Fields to Bamboo | 26 | covered timber cantilever |
+| Lantern to Roofers | 32 | covered timber cantilever |
+| Roofers to Inn | 35 | covered timber cantilever |
+| Market to Fields | 31 | covered timber cantilever |
+| Fields to Bamboo | 25 | covered timber cantilever |
+
+**Abutments** (2026-10-14, after the user asked whether every bridge has
+logical grounding at the islands' edges). It did not:
+- the broken edges met the bridges at a slant, down to 48° instead of
+  square;
+- where a bridge landed on a notch, its deck's corners hung over air by up
+  to 2.9 m (the axis bridge on the gate island's north spur);
+- under each island's lip the rock keel slopes away inward, so the covered
+  bridges' log brackets were rooted in empty air below the lip.
+
+Now every bridge lands on a squared stone abutment:
+- **The bastion.** Its face is square to the bridge, 3 m wider than the
+  deck and 5 m deep. Its back half must bear wholly on rock, and it may
+  stand out past the lip by no more than 3 m. As built, every one bears on
+  rock and none stands out more than 0.1 m.
+- **The spur.** Where the torn edge runs out in a spur too narrow to hold
+  it, the abutment stands back where the rock is wide, up to 6 m. The
+  deck's first metres then rest on the spur. The clear span is measured
+  between the rock either side.
+- **Built down the cliff.** The masonry runs about 4 m down the cliff face
+  and steps back into the rock below. The chains anchor in it through the
+  bridge-head houses, and the cantilevers' log brackets are bedded in its
+  face.
+- **The landings slide.** Each bridge may shift up to 7 m sideways at each
+  end to the landing that seats its abutments best. The rim end stays where
+  the road from Ohio arrives.
+- `tools/chinese_village_gorge.py` checks all of it. Three placements moved
+  to clear the new landings: the tile home is 2 m shorter, the carrier's home
+  moved 1.5 m east, and the third field strip's west end is 3 m shorter.
 
 **Checks:**
 - every island at least its program's land;

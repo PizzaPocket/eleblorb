@@ -22,7 +22,7 @@ and Sun Wu Kong code relies on. The bare fragments float above and below it.
 Frame: village-local metres from VILLAGE_CENTER, x east, z south (as scripts/chinese_village.gd).
 """
 import json, math, sys
-from shapely.geometry import Polygon, Point, MultiPoint, LineString
+from shapely.geometry import Polygon, Point, MultiPoint, LineString, box
 from shapely.ops import voronoi_diagram
 from shapely import affinity
 
@@ -151,24 +151,81 @@ for i in range(len(allp)):
         if g < ISLAND_GAP: problems.append((allp[i][0], allp[j][0], 'only %.1f m apart' % g))
 for k, g in allp:
     if g.distance(RIM.exterior) < RIM_CLEAR - 4 or not RIM.contains(g): problems.append((k, 'stands %.0f m from the rim' % g.distance(RIM.exterior)))
-# 3. bridges: each spans what its type can, and passes over nothing
-BR = []
+# 3. bridges and their abutments.
+# Every bridge lands on a squared stone abutment, not on the torn lip of the rock. The broken edges
+# are jagged and meet a bridge at a slant, and under each island's lip the rock keel slopes away
+# inward. So at each end a masonry bastion is built on the rock: its face square to the bridge, set
+# where the deck clears every tooth of rock in its way; its back half bearing wholly on rock; where
+# its face stands out past the lip, the masonry is carried down the cliff to the rock below. The
+# chains anchor in it, and the cantilevers' log brackets are bedded in it. Each bridge may slide
+# sideways along its two edges (up to 7 m at each end) to the landing that seats its abutments best.
+ABUT_DEPTH = 5.0              # face to back, along the bridge
+ABUT_BEAR = 2.5               # the back of the abutment that must bear wholly on rock
+ABUT_MAX_OUT = 3.0            # the most an abutment may stand out past the lip
+RIM_GROUND = box(-2000, -2000, 2000, 2000).difference(RIM)    # the ordinary ground round the Abyss
+def seat(k, e, o, w):
+    """The abutment at end e (on k) of a bridge toward o: its face point, how far it stands out past
+    the rock, how much of its back is over air, and its outline."""
+    L = math.dist(e, o); u = ((o[0] - e[0]) / L, (o[1] - e[1]) / L); v = (-u[1], u[0]); hw = w / 2 + 1.5
+    rock = RIM_GROUND if k == 'rim' else ISLANDS[k]
+    def band(s0, s1):
+        return Polygon([(e[0] + u[0] * s0 + v[0] * hw, e[1] + u[1] * s0 + v[1] * hw), (e[0] + u[0] * s1 + v[0] * hw, e[1] + u[1] * s1 + v[1] * hw),
+                        (e[0] + u[0] * s1 - v[0] * hw, e[1] + u[1] * s1 - v[1] * hw), (e[0] + u[0] * s0 - v[0] * hw, e[1] + u[1] * s0 - v[1] * hw)])
+    teeth = band(0, 8).intersection(rock); face = 0.0
+    for g in getattr(teeth, 'geoms', [teeth]) if not teeth.is_empty else []:
+        if g.geom_type == 'Polygon':
+            for x, z in g.exterior.coords: face = max(face, (x - e[0]) * u[0] + (z - e[1]) * u[1])
+    # the face may also stand back from the last tooth, up to 6 m, where the rock is wider: the deck's
+    # first metres then rest on the spur of rock in front of it
+    def fit(f_):
+        air_ = band(f_ - ABUT_DEPTH, f_ - ABUT_DEPTH + ABUT_BEAR).difference(rock).area; lip_ = 0.0
+        for t in [i / 8 for i in range(9)]:
+            q0 = (e[0] + v[0] * hw * (2 * t - 1), e[1] + v[1] * hw * (2 * t - 1)); s_ = f_
+            while s_ > f_ - ABUT_DEPTH and not rock.contains(Point(q0[0] + u[0] * s_, q0[1] + u[1] * s_)): s_ -= 0.1
+            lip_ = max(lip_, f_ - s_)
+        return lip_, air_
+    tooth = face; best_f = None
+    for back in [x * 0.5 for x in range(13)]:
+        lip, air = fit(tooth - back); c = max(0, lip - 1.0) ** 2 + 0.3 * lip + 20 * (air > 0.3) + 0.08 * back
+        if best_f is None or c < best_f[0]: best_f = (c, tooth - back, lip, air)
+    _, face, lip, air = best_f
+    body = band(face - ABUT_DEPTH, face)
+    fc = (e[0] + u[0] * face, e[1] + u[1] * face)
+    return fc, lip, air, dict(island=k, face=[round(fc[0], 2), round(fc[1], 2)], axis=[round(u[0], 4), round(u[1], 4)], width=round(2 * hw, 2),
+                              depth=ABUT_DEPTH, out=round(lip, 2), spur=round(tooth - face, 2), drop=round(4.0 + 2.0 * lip, 1), outline=[[round(x, 2), round(z, 2)] for x, z in body.exterior.coords])
+BR = []; ABUTMENTS = []
 for a, b, w, use in BRIDGES:
     pa = RIM_LANDING if a == 'rim' else (ISLANDS[a].centroid.x, ISLANDS[a].centroid.y); pb = (ISLANDS[b].centroid.x, ISLANDS[b].centroid.y)
-    line = LineString([pa, pb])
-    def edge(k, other):
-        hit = line.intersection(ISLANDS[k].exterior); pts = [hit] if hit.geom_type == 'Point' else list(getattr(hit, 'geoms', []))
-        return min(pts, key=lambda q: q.distance(Point(other)))
-    A_ = Point(pa) if a == 'rim' else edge(a, pb); B_ = edge(b, pa)
-    span = A_.distance(B_)
+    L0 = math.dist(pa, pb); v = (-(pb[1] - pa[1]) / L0, (pb[0] - pa[0]) / L0)
+    best = None
+    for da in [float(x) for x in range(-7, 8)]:
+        for db in [float(x) for x in range(-7, 8)]:
+            if a == 'rim' and da: continue                  # the road from Ohio fixes the rim end
+            qa = (pa[0] + v[0] * da, pa[1] + v[1] * da); qb = (pb[0] + v[0] * db, pb[1] + v[1] * db)
+            line = LineString([qa, qb])
+            def edge(k, other):
+                hit = line.intersection(ISLANDS[k].exterior); pts = [hit] if hit.geom_type == 'Point' else list(getattr(hit, 'geoms', []))
+                return min(pts, key=lambda q: q.distance(Point(other))) if pts else None
+            A_ = Point(qa) if a == 'rim' else edge(a, qb); B_ = edge(b, qa)
+            if A_ is None or B_ is None: continue
+            ea, eb = (A_.x, A_.y), (B_.x, B_.y)
+            fa, la, aa, sa = seat(a, ea, eb, w); fb, lb, ab, sb = seat(b, eb, ea, w)
+            deck = LineString([fa, fb]).buffer(w / 2 + 0.5)
+            over = sum(1 for k, g in allp if k not in (a, b) and deck.intersects(g))
+            cost = max(0, la - 1.0) ** 2 + max(0, lb - 1.0) ** 2 + 0.3 * (la + lb) + 20 * ((aa > 0.3) + (ab > 0.3)) + 50 * over + 0.05 * (abs(da) + abs(db))
+            if best is None or cost < best[0]: best = (cost, fa, fb, sa, sb, la, lb, aa, ab, over, da, db)
+    cost, fa, fb, sa, sb, la, lb, aa, ab, over, da, db = best
+    length = math.dist(fa, fb); span = length - sa['spur'] - sb['spur']     # the clear span, between the rock either side
     kind = 'arch' if span <= ARCH_MAX else 'cantilever' if span <= CANTILEVER_MAX else 'chain'
     if span > CHAIN_MAX: problems.append((a, b, 'spans %.0f m' % span))
-    deck = LineString([(A_.x, A_.y), (B_.x, B_.y)]).buffer(w / 2 + 0.5)
-    for k, g in allp:
-        if k in (a, b): continue
-        if deck.intersects(g): problems.append((a, b, 'passes over %s' % k))
-    BR.append(dict(a=a, b=b, width=w, use=use, kind=kind, span=round(span, 1), ends=[[round(A_.x, 2), round(A_.y, 2)], [round(B_.x, 2), round(B_.y, 2)]],
-                   sag=round(span / 20, 2) if kind == 'chain' else 0))
+    if over: problems.append((a, b, 'passes over another island'))
+    for k, l_, air in ((a, la, aa), (b, lb, ab)):
+        if air > 0.3: problems.append((a, b, k, 'the abutment\'s back does not bear on rock (%.1f m2 over air)' % air))
+        if l_ > ABUT_MAX_OUT: problems.append((a, b, k, 'the abutment stands %.1f m out past the rock' % l_))
+    name = '%s-%s' % (a, b)
+    for s_ in (sa, sb): ABUTMENTS.append(dict(s_, bridge=name))
+    BR.append(dict(a=a, b=b, width=w, use=use, kind=kind, span=round(span, 1), length=round(length, 1), ends=[[round(fa[0], 2), round(fa[1], 2)], [round(fb[0], 2), round(fb[1], 2)]],
+                   sag=round(span / 20, 2) if kind == 'chain' else 0, shift=[da, db]))
 
 # ---- today's discs (scripts/chinese_village.gd), for comparison
 BUILT = [dict(key=k, c=c, r=r) for k, c, r in [('palace', (0, 0), 62), ('lantern', (-105, -58), 21), ('market', (108, -48), 20), ('bamboo', (18, 116), 25),
@@ -195,7 +252,7 @@ data = dict(abyss_full=ABYSS_FULL, abyss_rim=ABYSS_RIM, floor=ABYSS_FLOOR, rim_l
             islands=[dict(key=k, name=NAMES[k], outline=out_poly(g), area=round(g.area), need=NEED[k], c=[round(g.centroid.x, 2), round(g.centroid.y, 2)],
                           size=round(math.sqrt(g.area), 1)) for k, g in ISLANDS.items()],
             fragments=[dict(key=f['key'], outline=out_poly(f['poly']), dy=f['dy'], area=round(f['poly'].area), c=[round(f['poly'].centroid.x, 2), round(f['poly'].centroid.y, 2)]) for f in FRAGMENTS],
-            bridges=BR, built=BUILT, built_bridges=BUILT_BRIDGES, problems=[list(map(str, p)) for p in problems])
+            bridges=BR, abutments=ABUTMENTS, built=BUILT, built_bridges=BUILT_BRIDGES, problems=[list(map(str, p)) for p in problems])
 if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
 print('rim %.0f to %.0f m from the centre; ' % (min(math.hypot(x, z) for x, z in RIM.exterior.coords), max(math.hypot(x, z) for x, z in RIM.exterior.coords)), end='')

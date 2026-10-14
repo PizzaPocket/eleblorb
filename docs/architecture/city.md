@@ -1509,10 +1509,14 @@ and ficus, which take the indoor light). The **runnel** crosses the floor
 (8.8). The **double ramp** rises at the south. The four **capsule lifts**
 land on the north, at the foot of the tower.
 
-**The skylight.** White-cased steel trusses at 4 m centres span the void
-north–south, with bronze glass between, pitched to a ridge at +48 m that
-runs east–west along the void's middle. The central truss carries the chandelier's **winch room**. A
-clerestory of louvres runs round the skylight's edge. The lift rails pass
+**The skylight** (revised 2026-10-14, with the chandelier's hoist, 8.5).
+Its ridge at +48 m is the **hoist girder** that carries the chandelier, running
+east–west straight over it at z = 37. White-cased steel trusses at 4 m centres
+run from the girder north to a concrete ring beam on the tower's face (or to
+the north range at the void's corners, beyond the tower), and south to the
+leaning front, with bronze glass between. They no longer run into the tower,
+as the first drawing had them. A clerestory of louvres runs round the
+skylight's edge. The lift rails pass
 up through glazed sleeves at the skylight's north edge.
 
 **The double ramp.** Two board-formed concrete ramps curve out either
@@ -1544,10 +1548,34 @@ white tower are the hotel's sign.
 ### 8.5 The chandelier
 
 - About **8 m across and 16 m tall**: a column of crystal in five tiers on
-  bronze rings, hung on cables over the rock garden, down the middle of
-  the void, from the winch room in the skylight's central truss, after the
-  great sculptures Portman hung in his atria. Its lowest tier is at +15 m, above the mezzanine and
-  the level 3 galleries; its crown ring is at +31 m.
+  bronze rings, hung over the rock garden down the middle of the void,
+  after the great sculptures Portman hung in his atria. Its lowest tier is
+  at +15 m, above the mezzanine and the level 3 galleries; its crown ring is
+  at +31 m. It weighs about 8 t, crystal, rings and frame (the largest
+  chandeliers built weigh 4 to 12 t).
+- **What it hangs from** (resolved 2026-10-14). The first brief hung it from
+  a "winch room in the skylight's central truss". That truss is a glazing
+  truss 0.35 m wide, and the chandelier would have hung on its sloping flank,
+  6 m off the ridge, where no winch could be reached. Now:
+  - **The hoist girder:** a steel truss 3.4 m deep (+44.6 to +48 m) spans
+    the void 36 m east to west, straight over the chandelier, and bears 2 m
+    into the concrete frames of the east and west ranges. It is the
+    skylight's ridge beam.
+  - **The ropes:** two hoist ropes and two safety ropes, each able to carry
+    the whole chandelier alone, hang 13.6 m from a pulley block under the
+    girder's bottom chord to the crown ring.
+  - **The winch room:** on the east range's roof at the girder's end, 6 × 7
+    m, reached from the service core, outside the glass. The ropes run to it
+    along the girder on sheaves.
+  - **The catwalk:** inside the girder, from the winch room to the pulley
+    block, so the winch, ropes and block are inspected without scaffolding.
+  - **Power:** the winch runs on the hotel's supply with the Windworks'
+    batteries behind it, and a handwheel lowers it by hand if both fail. On
+    the night of the Blackout the chandelier went dark but stayed where it
+    hung.
+  - `tools/city_layout.py` checks that the girder is over the chandelier,
+    bears into both ranges, stands clear of the tower and the lifts' sleeves,
+    and that the winch room is on the east range at the girder's end.
 - **Three thousand crystals** in strands round the rings, lit from within.
   Lucinda knows them by their faults. During the Blackout they went dark
   for the first time in the hotel's history.
