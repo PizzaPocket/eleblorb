@@ -124,7 +124,7 @@ stay inside the island radius.
 
 - **Dawn Gate** (Chinese palace style, after the Southern Heavenly Gate): a
   three-bay gate hall on a single cloud podium, 14 m wide and 6 m deep, with a
-  floating double eave. Its central bay frames Aethra. The side bays hold the
+  double eave. Its central bay frames Aethra. The side bays hold the
   empty posts where the gate's keepers once stood.
 - **Forecourt** between the top of the course and the gate, 12 m deep. The Air
   Gem rests here as it does now.
@@ -134,7 +134,7 @@ stay inside the island radius.
 
 | Building | Style | Footprint | Program |
 |---|---|---|---|
-| Hall of Mist | Chinese palace | 22 × 14 m on a triple cloud podium 3 m high, at `(0, 8)` | audience hall: Aristeon's throne dais at the rear, a floor for petitioners in front, side galleries; double floating eave, the kingdom's only one |
+| Hall of Mist | Chinese palace | 22 × 14 m on a triple cloud podium 3 m high, at `(0, 8)` | audience hall: Aristeon's throne dais at the rear, a floor for petitioners in front, side galleries; double eave (chongyan) on gold bracket sets, the kingdom's only one |
 | Propylon and forecourt | Chinese gate pavilion | 10 × 5 m at `(0, -22)`; forecourt 16 × 14 m | landing forecourt and the court's threshold |
 | Chamberlain's tholos | Greco-Roman | round, 7 m diameter, at `(-14, -4)` | Mnesia's ledger room and robe store, with a reading table |
 | Herald's moored room | set cloud and gold | 5 m round room moored at `(18, -6)` | Alkis's room, the only one with a door facing outward to the sky |
@@ -256,7 +256,7 @@ can reach every tier.
 
 `tools/sky_kingdom_layout.py` now holds this layout as data, the seed of
 `SkyKingdomPlan`. It holds the frame, the islands, every building with its
-podium, ramp, column height and floating gap, each court's landing forecourt,
+podium, ramp, column height and capital height, each court's landing forecourt,
 the walking routes from it, and the groves. It checks them and writes JSON for
 the 3D model (`docs/drawings/sky_kingdom_3d.html`).
 

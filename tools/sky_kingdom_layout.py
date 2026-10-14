@@ -63,7 +63,7 @@ def local_dir(k, du, dv):
 
 ## ---- buildings. shape: ('rect', w, d) along local x and z; ('circle', diameter); ('ring', inner, outer);
 ## ('semi', diameter) a half disc opening toward -z. podium: tiers of 1 m. cols: column height;
-## gap: the floating roof's gap; roof: 'xieshan', 'xieshan2', 'gable', 'dome', 'cap', 'none'.
+## gap: the height of what the columns carry, a cloud capital (Greek) or a gold bracket set (Chinese), which shows rank; roof: 'xieshan', 'xieshan2', 'gable', 'dome', 'cap', 'none'.
 ## door: which side the entrance faces ('-z', '+z', '-x', '+x', or a bearing in degrees in local x->z).
 B = []
 def bld(island, key, name, style, shape, c, podium=0, cols=4.4, gap=0.6, roof='dome', door='-z', who='', program='',

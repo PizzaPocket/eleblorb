@@ -87,7 +87,7 @@ code { font-family: var(--mono); font-size: .9em; }
     <div class="places" id="places" role="list"></div>
   </div>
   <div class="note" id="note" aria-live="polite"></div>
-  <div class="legend"><span><i style="background:var(--quartz)"></i>quartz: columns, screens, roofs</span><span><i style="background:var(--gold)"></i>gold: bands, rings, capitals, pins</span><span><i style="background:#fff;border:1px solid #889"></i>cloud: everything you stand on</span><span><i style="background:var(--route)"></i>walking routes, 3 m wide</span><span><i style="background:var(--built)"></i>built today (labels in blue)</span></div>
+  <div class="legend"><span><i style="background:var(--quartz)"></i>quartz: columns, screens, roofs</span><span><i style="background:var(--gold)"></i>gold: bands, rings, abaci, bracket sets, roof edges</span><span><i style="background:#fff;border:1px solid #889"></i>cloud: everything you stand on</span><span><i style="background:var(--route)"></i>walking routes, 3 m wide</span><span><i style="background:var(--built)"></i>built today (labels in blue)</span></div>
 
   <section class="finds">
     <h2>What building the model turned up</h2>
@@ -97,6 +97,7 @@ code { font-family: var(--mono); font-size: .9em; }
     <div class="find"><b>Resolved</b><div><p>How people move inside a court. Every court now has a 3 m route from its landing forecourt to every door, kept off every base platform, ramp and building and 1.5 m in from the cloud's edge:</p><ul><li><b>Aethra:</b> every way in passes through the propylon, then branches from the inner court. The propylon loses its base platform, whose ramp took the forecourt. The axis's tier pines now flank the hall's ramp.</li><li><b>Koinon:</b> routes run through the Hall of Assembly's ring colonnade, round the void. That is what the hall is for.</li><li>Routes round a building take up to two bends. The model draws them in gold.</li></ul></div></div>
     <div class="find"><b>Decide</b><div><p><b>From the Dawn Gate you cannot see the Hall of Mist.</b> The layout's arrival view has Aethra "straight ahead and above", its hall on the axis. But Aethra's cloud is 28 m above the landing and its near rim is 47 m from the forecourt. The eye line to the top of the hall's roof passes about 5 m below that rim. From the gate you see the underside of a great cloud and nothing on it, and the gate's own roof cuts the view too. Three ways to answer it:</p><ul><li><b>Terrace Aethra (recommended).</b> Its cloud steps up toward the hall: the forecourt and propylon on a lower terrace at about +16 m, the hall's base at +28 m as now. From the gate the whole hall then stands in view above the lower terrace, and Aethra keeps its height and rank. It suits the stepped base the hall already has.</li><li><b>Lower Aethra to about +12 m.</b> The hall's roof shows over the rim. But Aethra would no longer be the highest court unless every court comes down with it, into a 12 m band.</li><li><b>Keep it as a reveal.</b> Aethra is a towering cloud from the gate, and the hall appears only as the hero flies up to it.</li></ul><p>Whichever you choose, the gate's central bay frames Koinon, low and far beyond, not Aethra: Aethra is too high to fit in the bay.</p></div></div>
     <div class="find"><b>Open</b><div><p>Two questions for you:</p><ul><li><b>Which way the kingdom faces.</b> The layout's frame points away from Ohio, but the staircase's direction is random today, so the courts' compass bearing changes every run. The nectar terraces must face world east. Proposed: fix the staircase on Ohio's north side and point the kingdom north, so world east is to the right of the arrival axis.</li><li><b>Dromos's track crossing.</b> The landing forecourt is inside the racing ring, so a walker never needs to cross the track. Drop the crossing, or move the forecourt outside the ring so arrivals cross it at the judges' tholos.</li></ul></div></div>
+    <div class="find"><b>Resolved</b><div><p>One tradition per building (14 Oct). The Hall of Mist and the other Chinese buildings were drawn with Greek parts: each roof tier was a triangular prism whose ends were full-width pediments, so the hall's double eave read as two stacked Greek pediments, and every column carried a Greek capital with a gold pin and a glowing rod up to a floating roof, with gold spikes at the roof corners. Now:</p><ul><li><b>Chinese buildings</b> (the Dawn Gate, the Hall of Mist and its propylon, Pantao) have true hip-and-gable roofs: eaves on all four sides that sag to the middle and lift at the corners, hips rising to small gables set back under the ridge. The Hall of Mist's double eave is a lower eave all round the hall, a quartz frieze, then the full roof. Columns stand on round gold drum bases and carry gold bracket sets.</li><li><b>Greek buildings</b> keep low gables with true pediments, domes and flat caps, and their columns end in capitals of set cloud under a thin gold abacus.</li><li>No pins, rods or spikes: the roof rests on what the columns carry, whose height still shows rank (0.6, 1.0 and 1.6 m).</li></ul></div></div>
     <div class="find"><b>Built today</b><div><p>The game has the prototype: four round cloud islands placed by offsets from the landing, with a round pavilion each and seeded spires, obelisks and dwellings. None of the six courts' buildings exist yet. The names are still the prototype's (Highcloud, Anvil Cloud, Drift Cloud, Hollow Cloud).</p></div></div>
   </section>
 </div>
@@ -153,7 +154,7 @@ function eggGeo(ax, ay, az, e = 3, eb = e, eta0 = -Math.PI / 2, eta1 = Math.PI /
   for (let i = 0; i < rings; i++) for (let j = 0; j < segs; j++) { const a = i * (segs + 1) + j, b = a + segs + 1; idx.push(a, a + 1, b, a + 1, b + 1, b); }
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
 }
-// small parts get coarse eggs: the model has thousands of columns, pins and leaves
+// small parts get coarse eggs: the model has thousands of columns, capitals and leaves
 const egg = (ax, ay, az, e, eb, m, x, y, z, parent = scene) => { const s = Math.max(ax, ay, az), r = s < 1 ? 6 : s < 3 ? 10 : 14; return add(eggGeo(ax, ay, az, e, eb, -Math.PI / 2, Math.PI / 2, r, r + 4), m, x, y, z, parent); };
 const ring = (r, t, m, x, y, z, parent) => { const o = add(new THREE.TorusGeometry(r, t, 4, Math.max(12, Math.round(r * 5))), m, x, y, z, parent); o.rotation.x = Math.PI / 2; return o; };
 let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -175,8 +176,30 @@ function cloudBody(g, r, opts = {}) {
 }
 
 // ---------- the parts of the kit
-function column(g, x, z, y0, h, w = 0.7) { egg(w / 2, h / 2, w / 2, 6, 6, M.quartz, -x, y0 + h / 2, z, g); add(new THREE.BoxGeometry(w * 1.5, 0.3, w * 1.5), M.gold, -x, y0 + 0.15, z, g); add(new THREE.BoxGeometry(w * 1.6, 0.35, w * 1.6), M.gold, -x, y0 + h - 0.17, z, g); ring(w * 0.55, 0.06, M.gold, -x, y0 + h - 0.6, z, g); }
-function pins(g, x, z, y0, gap) { egg(0.12, 0.25, 0.12, 2.4, 2.4, M.gold, -x, y0 + 0.25, z, g); egg(0.12, 0.25, 0.12, 2.4, 2.4, M.gold, -x, y0 + gap - 0.25, z, g); add(new THREE.CylinderGeometry(0.05, 0.05, gap - 0.5, 5), M.glow, -x, y0 + gap / 2, z, g); }
+// a column, and what it carries: no pins and no spikes. A Greek column stands on a gold plinth and ends in a capital of set
+// cloud, a cushion swelling out of the shaft under a thin gold abacus; a Chinese column stands on a round gold drum base and
+// carries a gold bracket set (dougong) in place of painted timber brackets. Either fills the whole height up to the roof.
+function column(g, x, z, y0, h, w = 0.7, style = "greek") {
+  egg(w / 2, h / 2, w / 2, 6, 6, M.quartz, -x, y0 + h / 2, z, g);
+  if (style === "chinese") add(new THREE.CylinderGeometry(w * 0.78, w * 0.85, 0.35, 16), M.gold, -x, y0 + 0.17, z, g);
+  else { add(new THREE.BoxGeometry(w * 1.5, 0.3, w * 1.5), M.gold, -x, y0 + 0.15, z, g); ring(w * 0.52, 0.06, M.gold, -x, y0 + h - 0.12, z, g); }
+}
+function capital(g, x, z, y0, gap, style = "greek", w = 0.7) {
+  if (style === "chinese") {
+    // the bracket set: a block (dou), arms (gong) crossing both ways, a second block and wider arms, the eave purlin on top
+    const s = gap / 1.6;
+    add(new THREE.BoxGeometry(w * 1.15, 0.32 * s, w * 1.15), M.gold, -x, y0 + 0.16 * s, z, g);
+    for (const [ax, az] of [[1, 0], [0, 1]]) add(new THREE.BoxGeometry(ax ? w * 2.6 : 0.34, 0.26 * s, az ? w * 2.6 : 0.34), M.gold, -x, y0 + 0.45 * s, z, g);
+    for (const [dx, dz] of [[-1, 0], [1, 0], [0, -1], [0, 1], [0, 0]]) add(new THREE.BoxGeometry(0.4, 0.24 * s, 0.4), M.gold, -(x + dx * w * 1.1), y0 + 0.7 * s, z + dz * w * 1.1, g);
+    for (const [ax, az] of [[1, 0], [0, 1]]) add(new THREE.BoxGeometry(ax ? w * 3.8 : 0.36, 0.28 * s, az ? w * 3.8 : 0.36), M.gold, -x, y0 + 0.96 * s, z, g);
+    add(new THREE.BoxGeometry(w * 1.4, gap - 1.1 * s, w * 1.4), M.gold, -x, y0 + 1.1 * s + (gap - 1.1 * s) / 2, z, g);
+    return;
+  }
+  // the cloud capital: an echinus of set cloud, then the abacus
+  const ab = 0.16;
+  egg(w * 0.98, (gap - ab) / 2, w * 0.98, 2.2, 2.2, M.cloudSet, -x, y0 + (gap - ab) / 2, z, g);
+  add(new THREE.BoxGeometry(w * 2.0, ab, w * 2.0), M.gold, -x, y0 + gap - ab / 2, z, g);
+}
 function slabShape(pts) { const s = new THREE.Shape(pts.map(p => new THREE.Vector2(-p[0], -p[1]))); return s; }
 function podium(g, b) {
   if (!b.podium_fp) return 0;
@@ -207,21 +230,74 @@ function ramp(g, b) {
   if (dz) o.rotation.x = -dz * tilt; else o.rotation.z = -dx * tilt;
   for (const s of [-1, 1]) { const rp = []; for (let i = 0; i <= 8; i++) { const t = i / 8, a = dx ? x0 + (x1 - x0) * t : cx + s * w / 2, c = dx ? cz + s * w / 2 : z0 + (z1 - z0) * t; const tt = dx ? (dx > 0 ? 1 - t : t) : (dz > 0 ? 1 - t : t); rp.push(L(a, b.podium * tt + 1.0, c)); } add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rp), 16, 0.05, 4), M.gold, 0, 0, 0, g); }
 }
-// roofs: gable with pediment, xieshan (the fallback in the brief: straight hip-and-gable with gold corner rings and finials), dome, cap
+// roofs. Greek: a low gable whose ends are pediments. Chinese: the hip-and-gable (xieshan), never a pediment: eaves on all
+// four sides lifting at the corners, the hips rising to a small gable set back under a ridge; the Hall of Mist doubles it
+// (chongyan), a lower eave all round the hall and the full roof above. Then the dome and the flat cap.
+function meshOf(verts, quads) {
+  const pos = [];
+  for (const q of quads) { const [a, b, c, d] = q.map(k => verts[k]); pos.push(...a, ...b, ...c); if (d) pos.push(...a, ...c, ...d); }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); geo.computeVertexNormals(); return geo;
+}
+function hipBand(g, cx, cz, y, ww, dd, inset, rise, lift) {
+  // a hipped band from the eave (ww x dd, its corners lifted by `lift`) up `rise` to a rectangle inset all round
+  const v = { e00: [-ww / 2, lift, -dd / 2], e10: [ww / 2, lift, -dd / 2], e11: [ww / 2, lift, dd / 2], e01: [-ww / 2, lift, dd / 2],
+              m0: [0, 0, -dd / 2], m1: [0, 0, dd / 2], n0: [-ww / 2, 0, 0], n1: [ww / 2, 0, 0],
+              t00: [-ww / 2 + inset, rise, -dd / 2 + inset], t10: [ww / 2 - inset, rise, -dd / 2 + inset], t11: [ww / 2 - inset, rise, dd / 2 - inset], t01: [-ww / 2 + inset, rise, dd / 2 - inset] };
+  const geo = meshOf(v, [["e00", "m0", "t10", "t00"], ["m0", "e10", "t10"], ["e10", "n1", "t11", "t10"], ["n1", "e11", "t11"], ["e11", "m1", "t01", "t11"], ["m1", "e01", "t01"], ["e01", "n0", "t00", "t01"], ["n0", "e00", "t00"]]);
+  const o = add(geo, M.quartz, -cx, y, cz, g); o.material.side = THREE.DoubleSide;
+  // the gold eave edge, sagging to the middle of each side and lifting at the corners
+  const edge = [v.e00, v.m0, v.e10, v.n1, v.e11, v.m1, v.e01, v.n0, v.e00].map(p => new THREE.Vector3(-(cx + p[0]), y + p[1] - 0.05, cz + p[2]));
+  add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(edge, false, "catmullrom", 0.2), 64, 0.14, 5), M.gold, 0, 0, 0, g);
+}
+function xieshan(g, cx, cz, y, ww, dd, lift) {
+  // long sides along x. The hips rise from the eave to a hip line at 45 percent of the height; above it the long slopes run
+  // on to the ridge and the short ends become small upright gables set back by the hip's inset, not full-width pediments
+  const along = ww >= dd, L = along ? ww : dd, D = along ? dd : ww, h = D / 2 * 0.62, inset = D / 2 * 0.45, y1 = h * 0.45;
+  const P = (u, yv, w) => along ? [u, yv, w] : [w, yv, u];
+  const v = { e00: P(-L / 2, lift, -D / 2), e10: P(L / 2, lift, -D / 2), e11: P(L / 2, lift, D / 2), e01: P(-L / 2, lift, D / 2),
+              m0: P(0, 0, -D / 2), m1: P(0, 0, D / 2),
+              t00: P(-L / 2 + inset, y1, -D / 2 + inset), t10: P(L / 2 - inset, y1, -D / 2 + inset), t11: P(L / 2 - inset, y1, D / 2 - inset), t01: P(-L / 2 + inset, y1, D / 2 - inset),
+              r0: P(-L / 2 + inset, h, 0), r1: P(L / 2 - inset, h, 0) };
+  const geo = meshOf(v, [["e00", "m0", "r0"], ["e00", "r0", "t00"], ["m0", "e10", "t10", "r1"], ["m0", "r1", "r0"],
+                         ["e01", "t01", "r0"], ["e01", "r0", "m1"], ["m1", "r0", "r1"], ["m1", "r1", "t11", "e11"],
+                         ["e10", "e11", "t11", "t10"], ["e01", "e00", "t00", "t01"], ["t00", "r0", "t01"], ["t10", "t11", "r1"]]);
+  const o = add(geo, M.quartz, -cx, y, cz, g); o.material.side = THREE.DoubleSide;
+  const W = p => new THREE.Vector3(-(cx + p[0]), y + p[1], cz + p[2]);
+  const edge = [v.e00, v.m0, v.e10, P(L / 2, 0, 0), v.e11, v.m1, v.e01, P(-L / 2, 0, 0), v.e00].map(p => { const q = W(p); q.y -= 0.05; return q; });
+  edge[3].y = y; edge[7].y = y;
+  add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(edge, false, "catmullrom", 0.2), 64, 0.14, 5), M.gold, 0, 0, 0, g);
+  // the main ridge and the two hips' gold arrises, and a low gold curl at each end of the ridge (no spikes)
+  const rod = (a, b, r) => { const A = W(a), B = W(b), d = B.clone().sub(A), m = add(new THREE.CylinderGeometry(r, r, d.length(), 6), M.gold, 0, 0, 0, g); m.position.copy(A.clone().add(B).multiplyScalar(0.5)); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); };
+  rod(v.r0, v.r1, 0.16);
+  for (const [a, b] of [["e00", "t00"], ["e10", "t10"], ["e11", "t11"], ["e01", "t01"]]) rod(v[a], v[b], 0.09);
+  for (const r of [v.r0, v.r1]) { const q = W(r); egg(0.2, 0.26, 0.2, 2.4, 2.4, M.gold, q.x, q.y + 0.18, q.z, g); }
+}
 function roof(g, b, y, w, d, cx, cz) {
   const kind = b.roof; if (kind === "none") return;
-  if (kind === "dome") { const r = w / 2 + 0.6; add(eggGeo(r, r * 0.62, r, 2.0, 2.0, 0, Math.PI / 2), M.quartz, -cx, y, cz, g); ring(r, 0.12, M.gold, -cx, y + 0.1, cz, g); egg(0.25, 0.6, 0.25, 2.4, 2.4, M.gold, -cx, y + r * 0.62 + 0.4, cz, g); return; }
+  if (kind === "dome") { const r = w / 2 + 0.6; add(eggGeo(r, r * 0.62, r, 2.0, 2.0, 0, Math.PI / 2), M.quartz, -cx, y, cz, g); ring(r, 0.12, M.gold, -cx, y + 0.1, cz, g); egg(0.32, 0.32, 0.32, 2.4, 2.4, M.gold, -cx, y + r * 0.62 + 0.15, cz, g); return; }
   if (kind === "cap") { add(new THREE.BoxGeometry(w + 1.0, 0.45, d + 1.0), M.quartz, -cx, y + 0.22, cz, g); add(new THREE.BoxGeometry(w + 1.1, 0.12, d + 1.1), M.gold, -cx, y + 0.02, cz, g); return; }
-  const tiers = kind === "xieshan2" ? 2 : 1;
-  for (let t = 0; t < tiers; t++) {
-    const yy = y + t * 3.2, ww = w + 2.4 - t * 3, dd = d + 2.4 - t * 3, pitch = kind === "gable" ? 0.27 : 0.55, h = Math.min(ww, dd) / 2 * pitch;
-    const sh = new THREE.Shape([new THREE.Vector2(-ww / 2, 0), new THREE.Vector2(ww / 2, 0), new THREE.Vector2(0, h)].map(v => v));
-    const geo = new THREE.ExtrudeGeometry(sh, { depth: dd, bevelEnabled: false }); geo.translate(0, 0, -dd / 2);
-    const o = add(geo, M.quartz, -cx, yy + 0.35, cz, g);
-    add(new THREE.BoxGeometry(ww + 0.2, 0.35, dd + 0.2), M.gold, -cx, yy + 0.17, cz, g);
-    if (kind !== "gable") for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const px = cx + sx * ww / 2, pz = cz + sz * dd / 2; ring(0.45, 0.1, M.gold, -px, yy + 0.5, pz, g); egg(0.18, 0.8, 0.18, 2.4, 2.4, M.gold, -px, yy + 1.1, pz, g); }
-    add(new THREE.BoxGeometry(0.25, 0.3, dd), M.gold, -cx, yy + 0.35 + h, cz, g);
+  if (kind === "gable") {
+    // the Greek gable: entablature, then a low pitch whose ends are true pediments, with a raking cornice in gold
+    const ww = w + 1.6, dd = d + 1.6, h = Math.min(ww, dd) / 2 * 0.27, along = ww >= dd;
+    add(new THREE.BoxGeometry(ww, 0.7, dd), M.quartz, -cx, y + 0.35, cz, g);
+    add(new THREE.BoxGeometry(ww + 0.2, 0.18, dd + 0.2), M.gold, -cx, y + 0.72, cz, g);
+    const span = along ? dd : ww, len = along ? ww : dd;
+    const sh = new THREE.Shape([new THREE.Vector2(-span / 2, 0), new THREE.Vector2(span / 2, 0), new THREE.Vector2(0, h)]);
+    const geo = new THREE.ExtrudeGeometry(sh, { depth: len, bevelEnabled: false }); geo.translate(0, 0, -len / 2); if (along) geo.rotateY(Math.PI / 2);
+    add(geo, M.quartz, -cx, y + 0.8, cz, g);
+    return;
   }
+  // Chinese
+  const lift = 0.7;
+  if (kind === "xieshan2") {
+    // the lower eave (a hipped skirt round the hall at the column head), a quartz frieze, then the full roof above
+    hipBand(g, cx, cz, y, w + 3.4, d + 3.4, 2.6, 1.3, lift);
+    add(new THREE.BoxGeometry(w - 1.2, 2.0, d - 1.2), M.quartzMilk, -cx, y + 1.3 + 1.0, cz, g);
+    for (const [sx, sz] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { const px = cx + sx * (w / 2 - 0.6), pz = cz + sz * (d / 2 - 0.6); add(new THREE.BoxGeometry(0.7, 2.0, 0.7), M.gold, -px, y + 2.3, pz, g); }
+    xieshan(g, cx, cz, y + 3.3, w + 1.6, d + 1.6, lift);
+    return;
+  }
+  xieshan(g, cx, cz, y, w + 2.4, d + 2.4, lift);
 }
 function colonnadeRect(g, b, y0, w, d, cx, cz, h, closedSides = []) {
   const bay = 3.2, cw = h > 6 ? 0.7 : 0.55; let nx = Math.max(1, Math.round(w / bay)), nz = Math.max(1, Math.round(d / bay));
@@ -229,12 +305,12 @@ function colonnadeRect(g, b, y0, w, d, cx, cz, h, closedSides = []) {
   else if (b.door === "-z" || b.door === "+z") { if (nx % 2 === 0) nx += 1; } else if (nz % 2 === 0) nz += 1;   // an odd number of bays: the entrance bay is on the axis, never a column
   const ptsX = [...Array(nx + 1).keys()].map(i => cx - w / 2 + w * i / nx), ptsZ = [...Array(nz + 1).keys()].map(i => cz - d / 2 + d * i / nz);
   const seen = new Set();
-  const put = (x, z) => { const k = x.toFixed(2) + "," + z.toFixed(2); if (seen.has(k)) return; seen.add(k); column(g, x, z, y0, h, cw); pins(g, x, z, y0 + h, b.gap); };
+  const put = (x, z) => { const k = x.toFixed(2) + "," + z.toFixed(2); if (seen.has(k)) return; seen.add(k); column(g, x, z, y0, h, cw, b.style); capital(g, x, z, y0 + h, b.gap, b.style, cw); };
   for (const x of ptsX) { put(x, cz - d / 2); put(x, cz + d / 2); } for (const z of ptsZ) { put(cx - w / 2, z); put(cx + w / 2, z); }
   for (const side of closedSides) { const along = side === "x" ? d : w; const o = add(new THREE.BoxGeometry(side === "x" ? 0.3 : w, h - 0.6, side === "x" ? d : 0.3), M.quartzMilk, 0, y0 + (h - 0.6) / 2 + 0.3, 0, g);
     o.position.x = -(side === "x" ? cx - w / 2 : cx); o.position.z = side === "x" ? cz : cz + d / 2; }
 }
-function tholos(g, b, y0, r, h, n) { for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, x = b.c[0] + Math.cos(a) * r, z = b.c[1] + Math.sin(a) * r; column(g, x, z, y0, h, 0.45); pins(g, x, z, y0 + h, b.gap); } ring(r, 0.1, M.gold, -b.c[0], y0 + 0.05, b.c[1], g); }
+function tholos(g, b, y0, r, h, n) { for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, x = b.c[0] + Math.cos(a) * r, z = b.c[1] + Math.sin(a) * r; column(g, x, z, y0, h, 0.45, b.style); capital(g, x, z, y0 + h, b.gap, b.style, 0.45); } ring(r, 0.1, M.gold, -b.c[0], y0 + 0.05, b.c[1], g); }
 
 // ---------- cloud trees: trunks, branches and foliage all of cloud; colour only in fruit and blossom
 function branch(g, a, b, r0, r1, m = M.cloudSet) { const d = b.clone().sub(a), o = add(new THREE.CylinderGeometry(r1, r0, d.length(), 6), m, 0, 0, 0, g); o.position.copy(a.clone().add(b).multiplyScalar(0.5)); o.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); }
@@ -306,7 +382,7 @@ for (const b of D.buildings) {
   } else if (s[0] === "circle") { const r = s[1] / 2; tholos(g, b, y0, r - 0.4, H, Math.max(6, Math.round(s[1] * 1.0))); roof(g, b, y0 + H + b.gap, s[1], s[1], cx, cz);
     if (b.ramp_kind === "spiral") { const R = r + 1.6 + 1.1, pts = []; for (let i = 0; i <= 80; i++) { const t = i / 80, a = t * Math.PI * 2 * 1.15 - Math.PI / 2; pts.push(L(cx + Math.cos(a) * R, b.podium * t + 0.2, cz + Math.sin(a) * R)); } for (let i = 0; i < 80; i++) branch(g, pts[i], pts[i + 1], 1.0, 1.0, M.cloudSet); }
   } else if (s[0] === "ring") {
-    for (const [rr, n] of [[s[1] / 2 + 0.8, 16], [s[2] / 2 - 0.8, 24]]) for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, x = Math.cos(a) * rr, z = Math.sin(a) * rr; column(g, x, z, y0, H, 0.7); pins(g, x, z, y0 + H, b.gap); }
+    for (const [rr, n] of [[s[1] / 2 + 0.8, 16], [s[2] / 2 - 0.8, 24]]) for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, x = Math.cos(a) * rr, z = Math.sin(a) * rr; column(g, x, z, y0, H, 0.7, b.style); capital(g, x, z, y0 + H, b.gap, b.style, 0.7); }
     const sh = new THREE.Shape(); sh.absarc(0, 0, s[2] / 2 - 0.2, 0, Math.PI * 2, false); const hp = new THREE.Path(); hp.absarc(0, 0, s[1] / 2 + 0.2, 0, Math.PI * 2, true); sh.holes.push(hp);
     const geo = new THREE.ExtrudeGeometry(sh, { depth: 0.5, bevelEnabled: false, curveSegments: 64 }); geo.rotateX(Math.PI / 2); add(geo, M.quartz, 0, top + 0.5, 0, g);
     for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2 + 0.26; egg(1.6, 0.4, 1.0, 4, 4, M.cloudSet, Math.cos(a) * 10.5, y0 + 1.1, Math.sin(a) * 10.5, g); ring(1.0, 0.07, M.gold, Math.cos(a) * 10.5, y0 + 3.4, Math.sin(a) * 10.5, g).rotation.set(0, -a, 0); }
@@ -361,7 +437,7 @@ const PLACES = [
   { id: "kingdom", t: "The six courts", s: "the ring round Koinon", cam: [-210, 190, 120], at: [0, 10, -150],
     p: "Aethra stands on the arrival axis. Pantao, Chrysa, Lyria and Dromos ring Koinon about 80 m from it, each at its own height. Aethra is highest, Lyria high and apart, and Chrysa lowest under its storm crown. No bridges: the hero flies, and Tempestars float. The distance between courts is part of the story.", who: "21 Tempestars in six courts" },
   { id: "aethra", t: "Aethra", s: "the court of state", cam: ci("aethra", 34, 22, -50), at: ci("aethra", 0, 6, 2),
-    p: "Through the propylon, past two tier pines, a ramp 4 m wide climbs the Hall of Mist's three-tier base in three flights. The hall's double eave floats 1.6 m over its columns, the kingdom's only one. Mnesia's tholos stands west of the axis and the nectar terrace on the east rim. Aristeon's and Drosia's tholoi are behind the hall. The herald's room hangs off the west rim on its gold chain, its door open to the sky.", who: "Aristeon · Mnesia · Alkis · Drosia" },
+    p: "Through the propylon, past two tier pines, a ramp 4 m wide climbs the Hall of Mist's three-tier base in three flights. The hall's double eave rests on gold bracket sets 1.6 m deep, the kingdom's only one. Mnesia's tholos stands west of the axis and the nectar terrace on the east rim. Aristeon's and Drosia's tholoi are behind the hall. The herald's room hangs off the west rim on its gold chain, its door open to the sky.", who: "Aristeon · Mnesia · Alkis · Drosia" },
   { id: "koinon", t: "Koinon and the void", s: "the empty Hall of Assembly", cam: ci("koinon", -26, 26, -40), at: ci("koinon", 0, 2, 4),
     p: "A ring of columns round a 14 m opening through the cloud to the world below. Six set-cloud seats stand round the void, one per court, each under its gold emblem ring. Six tier pines ring the hall, one for each seat. The observatory stands behind on its four-tier base, reached by a spiral ramp. Routes cross the hall's colonnade, round the void.", who: "Sophrona · Archeia · Astrion" },
   { id: "pantao", t: "Pantao", s: "the feast and the Peach Garden", cam: ci("pantao", 30, 18, -40), at: ci("pantao", 0, 4, 8),
