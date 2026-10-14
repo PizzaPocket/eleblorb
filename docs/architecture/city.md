@@ -1512,12 +1512,20 @@ land on the north, at the foot of the tower.
 **The skylight** (revised 2026-10-14, with the chandelier's hoist, 8.5).
 Its ridge at +48 m is the **hoist girder** that carries the chandelier, running
 east–west straight over it at z = 37. White-cased steel trusses at 4 m centres
-run from the girder north to a concrete ring beam on the tower's face (or to
-the north range at the void's corners, beyond the tower), and south to the
-leaning front, with bronze glass between. They no longer run into the tower,
-as the first drawing had them. A clerestory of louvres runs round the
-skylight's edge. The lift rails pass
-up through glazed sleeves at the skylight's north edge.
+run from the girder north to a concrete ring beam at the edge of the **lift
+collar** (or to the north range at the void's corners, beyond the tower), and
+south to the leaning front, with bronze glass between. A clerestory of louvres
+runs round the skylight's edge.
+
+**The lift collar** (2026-10-14). The capsules cannot pass through the glass,
+as both earlier drawings had them do, through the skylight or through "glazed
+sleeves" in it. So the court's roof round the tower's foot is solid concrete,
+from the tower's face out 4.6 m to the ring beam the skylight springs from. The
+four lifts run 1.4 to 1.8 m off the tower's face and leave the atrium through
+this collar. Above it each capsule rides in its own sealed glass hoistway, 3.5 m
+across, up the tower's face to the drum. Each hoistway is banded in bronze at
+every second level and stands at least 0.8 m clear of the skylight.
+`tools/city_layout.py` checks the clearance.
 
 **The double ramp.** Two board-formed concrete ramps curve out either
 side of the rock garden, from feet at (18, 38) and (34, 38) on the
@@ -1530,9 +1538,9 @@ smooth, sculpture as much as route, in Portman's way.
 **The capsule lifts.** Four glass capsules, 2.6 m across, in bronze frames
 outlined in bulbs, ride rails on the tower's south face at 12° and 36°
 either side of due south. They rise from the atrium floor, stop at the
-mezzanine (by a short bridge) and every level, pass up through the
-skylight and climb the outside of the tower, in full view of the plaza,
-to the Windrose at +101 m. At night the four lit capsules moving up the
+mezzanine (by a short bridge) and every level, leave the atrium through
+the lift collar beside the skylight, and climb the outside of the tower in
+their glass hoistways, in full view of the plaza, to the Windrose at +101 m. At night the four lit capsules moving up the
 white tower are the hotel's sign.
 
 **Circulation:**

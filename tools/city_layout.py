@@ -333,7 +333,14 @@ HOTEL={
  'tower':{'c':(26,14),'r':14,'core_r':5.5,'top':96.0,'ribs':40,'rib':(0.6,0.9)},
  'drum':{'r':16,'tank':(96.0,101.0),'lounge':(101.0,105.5),'dome_top':108.0},
  # four glass capsules on the tower's south face, bearings from due south
- 'lifts':{'bearings':[-36,-12,12,36],'r':1.3,'track':15.4,'top':101.0},
+ 'lifts':{'bearings':[-36,-12,12,36],'r':1.3,'track':15.4,'top':101.0,
+          # above the atrium each capsule rides in its own sealed glass hoistway on the
+          # tower's face, from the court roof to the drum, so no capsule passes through glass
+          'hoistway_r':1.75},
+ # the lift collar: a solid concrete roof round the tower's foot at the court roof,
+ # from the tower's face out to the skylight's north ring beam; the hoistways rise
+ # through it, clear of the skylight
+ 'lift_collar':4.6,
  'chandelier':{'c':(26,37),'r':4.0,'bottom':15.0,'top':31.0,'tiers':5,'crystals':3000,'lowered':10.0,'load_t':8.0},
  # what the chandelier hangs from: a steel hoist girder 3.4 m deep spanning the
  # void east to west straight over it, bearing on the east and west ranges'
@@ -396,8 +403,11 @@ def _hotel_checks():
     if wx0<v['x'][1] or wx1>H['size'][0]: problems.append(('hotel: winch room not on the east range',))
     if not (wz0<=hg['z']<=wz1): problems.append(('hotel: winch room not at the girder\'s end',))
     for b_ in H['lifts']['bearings']:
-        a=math.radians(b_); lz=tz+H['lifts']['track']*math.cos(a)
-        if hg['z']-lz<2: problems.append(('hotel: hoist girder crosses a lift sleeve',b_))
+        a=math.radians(b_); lx,lz=tx+H['lifts']['track']*math.sin(a),tz+H['lifts']['track']*math.cos(a)
+        if hg['z']-lz<2: problems.append(('hotel: hoist girder crosses a lift hoistway',b_))
+        # the skylight springs from the collar's edge, clear of every hoistway by 0.8 m
+        face=tz+math.sqrt(max(0,tr*tr-(lx-tx)**2)); spring=face+H['lift_collar']
+        if lz+H['lifts']['hoistway_r']+0.8>spring: problems.append(('hotel: a lift hoistway reaches the skylight',b_,round(spring-lz,2)))
     if hg['bottom']-ch['top']<6: problems.append(('hotel: under 6 m of rope above the chandelier',))
 _hotel_checks()
 ## Fabric storeys are 3.25 m, downtown mid-rise storeys 3.6 m.
