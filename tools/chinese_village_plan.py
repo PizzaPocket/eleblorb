@@ -24,6 +24,9 @@ It checks:
 Coordinates: each island's own (x, z) in metres from its centroid, x east, z south, as the
 islands' frame in the gorge tool. A home faces south: its main room on the north side of
 its walled court, its gate in the south wall.
+
+When every check passes it writes scripts/chinese_plan.gd (tools/gd_plan.py), the one plan the game's builder
+and validator read; edit here and rerun, never the generated file.
 """
 import io, json, math, runpy, sys, contextlib
 from shapely.geometry import Polygon, Point, LineString, box
@@ -478,5 +481,16 @@ data = dict(G['data'], items=[dict({k: v for k, v in it.items() if k != 'poly'},
             paths=PATHS, openings=OPENINGS, ramps=[dict(r, foot=[round(v, 2) for v in r['foot']], head=[round(v, 2) for v in r['head']]) for r in RAMPS], parapets=PARAPETS, aprons=[dict(island=k, to=t, outline=out(p)) for (k, t), p in APRONS.items()], tops={k: out(v) for k, v in TOP.items()},
             plan_problems=[list(map(str, p)) for p in problems])
 if '--json' in sys.argv: json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from gd_plan import write_plan
+if not problems:
+    write_plan('ChinesePlan', 'chinese_plan.gd', [
+        "The Chinese village's single plan (docs/architecture/chinese_village.md 4.0, 4.0a and 4.0b): the broken",
+        "plateau's islands and keels, the Abyss's rim, the bridges and their abutments, every compound, building,",
+        'court, field and feature, every wall and gate opening, the ramps, the path network with its surfaces, the',
+        'parapets and the bridgehead aprons. Backlog C1: scripts/chinese_village.gd and its validator read only this.',
+        '',
+        'Village-local metres from VILLAGE_CENTER (as scripts/chinese_village.gd): x east, z south, y up.'],
+        {k.upper(): v for k, v in data.items() if k != 'plan_problems'}, 'tools/chinese_village_plan.py')
+    print('wrote scripts/chinese_plan.gd')
 print('%d items on %d islands; %d openings; %d paths; strips %.0f m2, terraces %.0f m2; %d problems' % (len(I), len(by), len(OPENINGS), len(PATHS), strips, terr, len(problems)))
 if problems: sys.exit(1)

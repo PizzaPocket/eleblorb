@@ -13,6 +13,9 @@ Each island has its own local (x, z) in metres from its centre: -z faces its lan
 forecourt, toward whatever the visitor arrives from (the staircase for the Dawn Gate
 cloud, the gate for Aethra, Aethra for the four courts round Koinon and for Koinon), and
 +x is to the right when facing +z.
+
+When every check passes it writes scripts/sky_kingdom_plan.gd (tools/gd_plan.py), the one plan the game's builder
+and validator read; edit here and rerun, never the generated file.
 """
 import json, math, sys
 from shapely.geometry import Polygon, Point, LineString, box
@@ -427,5 +430,17 @@ data = dict(
     east=EAST, tan=TAN, problems=[list(map(str, p)) for p in problems])
 if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from gd_plan import write_plan
+if not problems:
+    write_plan('SkyKingdomPlan', 'sky_kingdom_plan.gd', [
+        "The Sky Kingdom's single plan (docs/architecture/sky_kingdom_layout.md): the seven clouds, every building",
+        'with its podium, ramp and roof, the landing forecourts, the processional ways and trodden walks with their',
+        "surfaces (8a), the groves, and the prototype as built. The courts' builder (replacing the prototype in",
+        'scripts/sky_kingdom.gd) and its validator read only this.',
+        '',
+        'Frame (layout 1): origin at the Air Gem landing, about 89 m up; each island has its own local (x, z) in',
+        'metres from its centre, -z facing its landing; an island\'s c is (u, v, height) in the kingdom frame.'],
+        {k.upper(): v for k, v in data.items() if k != 'problems'}, 'tools/sky_kingdom_layout.py')
+    print('wrote scripts/sky_kingdom_plan.gd')
 print('%d islands, %d buildings, %d routes, %d trees; %d problems' % (len(ISLANDS), len(B), len(ROUTES), len(TREES), len(problems)))
 if problems: sys.exit(1)

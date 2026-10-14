@@ -16,6 +16,9 @@ Bearings are degrees from +x toward +z; the main avenue runs at 90.
 A SuperEgg here is |u/a|^e + |v/b|^e + |w/c|^e <= 1 in its own frame: u along
 the ring (tangential), v up, w across the ring (radial outward). That is the
 implicit form of scripts/superegg.gd's surface with one epsilon.
+
+When every check passes it writes scripts/sea_folk_city_plan.gd (tools/gd_plan.py), the one plan the game's builder
+and validator read; edit here and rerun, never the generated file.
 """
 import json, math, sys
 import numpy as np
@@ -787,6 +790,17 @@ data = dict(volumes=[jv(v) for v in V.values()], tunnels=T, rooms=ROOMS, corrido
                      over={k: round(over(v['floor']), 2) for k, v in V.items() if v['dry'] and v.get('floor') is not None}))
 if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from gd_plan import write_plan
+if not problems:
+    write_plan('SeaFolkCityPlan', 'sea_folk_city_plan.gd', [
+        "The sea folk city's third-pass plan (docs/architecture/ocean_sea_folk_city.md 2a and its layout and",
+        'buildings briefs): the classical floor under its enclosure, the column of bubbles, trunks and tunnels, the',
+        'rooms and ramps, and the air (the datum, moon pools and lock chambers). It supersedes SeaFolkPlan',
+        "(scripts/sea_folk_plan.gd, the second pass) where they differ; the city's builder moves to this one.",
+        '',
+        'Local metres from the city centre (world (0, -540)): x and z follow the world axes, y up from the floor.'],
+        {k.upper(): v for k, v in data.items() if k != 'problems'}, 'tools/sea_folk_third_pass.py')
+    print('wrote scripts/sea_folk_city_plan.gd')
 dryv = [v for v in V.values() if v['dry']]
 print('enclosure: sides %.0f m, mitres %.0f m, walls %.0f to %.0f m over the floor at their foot, %.0f m clear of the Kraken' % (
     side, mitre, ROOF_TOP - max(WALL_GROUND), ROOF_TOP - min(WALL_GROUND), KRAKEN_GAP))

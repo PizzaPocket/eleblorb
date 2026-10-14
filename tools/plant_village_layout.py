@@ -11,6 +11,9 @@ writes JSON for the drawings and the 3D model.
 Local metres from the village centre (the kingdom origin); x and z follow the
 world axes, +z toward the river (south). Heights are metres above the village
 floor. Bearings are degrees from +x toward +z.
+
+When every check passes it writes scripts/plant_village_plan.gd (tools/gd_plan.py), the one plan the game's builder
+and validator read; edit here and rerun, never the generated file.
 """
 import json, math, sys
 from shapely.geometry import Polygon, Point, LineString, box
@@ -795,6 +798,19 @@ data = dict(
     trunk_r_fn='0.045h at the base to 0.02h at 0.86h', problems=[list(map(str, p)) for p in problems])
 if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
+import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from gd_plan import write_plan
+if not problems:
+    write_plan('PlantVillagePlan', 'plant_village_plan.gd', [
+        "The Plant Kingdom primate village's single plan (docs/architecture/plant_kingdom_village*.md):",
+        'the three trees and their forms (bole, buttresses, every limb and branch with its radii, every leaf tuft),',
+        'the commons deck and the inn lobe, the rings and the crown deck, the trunk spirals, the bridges, every',
+        'pavilion and amenity, the structure that carries each deck, and the shared leaf roof. Backlog P6 and P7:',
+        'the village builder, NatureProps.build_emergent_tree and the village validator read only this.',
+        '',
+        'Local metres from the village centre (the kingdom origin): x and z follow the world axes, +z toward the',
+        'river (south), y up from the clearing floor. Points are [x, z] in plan or [x, y, z] in space.'],
+        {k.upper(): v for k, v in data.items() if k != 'problems'}, 'tools/plant_village_layout.py')
+    print('wrote scripts/plant_village_plan.gd')
 print('trees: %s; %d limbs and branches (%d crown limbs), %d leaf tufts' % (', '.join('%s breaks at %.1f m into %d, %d buttresses' % (t, CROWN[t]['break_y'], CROWN[t]['leaders'], len(FINS[t])) for t in TREES), len(BRANCHES), len(BOUGHS), len(LEAVES)))
 print('commons %.0f m2 gross, %.0f net of trunks and spirals, deck %.0f m2 with the inn lobe; %d trunk spirals, %.0f m of ramp; %d bearers, %d deck limbs, %d commons limbs, %d hung bays, %d posts; bridges %s; %d problems' % (
     A, A_NET, DECK.area, len(SPIRAL), sum(math.radians(st['a1'] - st['a0']) * st['r'] / math.cos(rad(RAMP_ANGLE)) for v in SPIRAL.values() for st in v['steps']), len(SUPPORT['bearers']), len(SUPPORT['limbs']), len(SUPPORT['commons_limbs']), len(SUPPORT.get('hangers', [])), len(POSTS), ', '.join('%s-%s %.1f m' % (b['a'], b['b'], b['span']) for b in BR), len(problems)))
