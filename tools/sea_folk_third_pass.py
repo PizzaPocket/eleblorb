@@ -411,7 +411,8 @@ def spiral(c, stops, th0):
     """Centreline points (x, y, z, theta) from stop to stop, starting at bearing th0."""
     pts = []; th = rad(th0); max_rise = math.pi * RAMP_RC * math.tan(rad(RAMP_ANGLE))
     def put(y): pts.append((c[0] + RAMP_RC * math.cos(th), y, c[2] + RAMP_RC * math.sin(th), th))
-    land = LANDING / RAMP_RC
+    land = (LANDING + 0.1) / RAMP_RC
+    put(stops[0])
     for y0, y1 in zip(stops, stops[1:]):
         n = max(1, math.ceil((y1 - y0) / max_rise - 1e-9)); rise = (y1 - y0) / n
         for k in range(n):
@@ -705,9 +706,11 @@ for e in ENTRIES:
         if abs(e['floor'] - DATUM) > DATUM_TOL + 1e-9: problems.append((e['key'], 'is an open pool %.1f m off the datum' % e['rel']))
         if e['mouth'][1] > POOL_LEVEL - 0.2: problems.append((e['key'], 'opens above its own water: the air would spill out'))
         if not open_water(e['mouth']): problems.append((e['key'], 'does not open to open water', e['mouth']))
-        if e['shape'] in ('pool', 'drum') and not inside(host, drum_points(e, e['floor'] + 0.05, e['floor'] + HEADROOM, e['r'] + 0.6), 0.3).all() \
-                and not host['kind'] == 'stump':
-            problems.append((e['key'], 'has no room round its rim inside %s' % e['hall']))
+        # room to step out: floor and headroom beside the rim on the side toward the hall's middle
+        tw = math.atan2(host['c'][2] - e['p'][2], host['c'][0] - e['p'][0])
+        step = np.array([(e['p'][0] + (e['r'] + 0.6) * math.cos(tw + a), y, e['p'][2] + (e['r'] + 0.6) * math.sin(tw + a))
+                         for a in np.linspace(-1.0, 1.0, 7) for y in (e['floor'] + 0.05, e['floor'] + HEADROOM)])
+        if host['kind'] != 'stump' and not inside(host, step, 0.3).all(): problems.append((e['key'], 'has no room to step out inside %s' % e['hall']))
         if host['kind'] == 'stump':     # the foot pool lies in the trunk's foot, inside the ramp
             if e['r'] + 0.6 > RAMP_RC - RAMP_W / 2: problems.append((e['key'], 'crowds the foot of the ramp'))
         if e['shape'] == 'drum':        # a drum rises from a floor below the datum: inside the glass, clear of heritage and ramps
@@ -776,7 +779,12 @@ data = dict(volumes=[jv(v) for v in V.values()], tunnels=T, rooms=ROOMS, corrido
                            ground=[min(WALL_GROUND), max(WALL_GROUND)]),
             spires=SPIRES, ring_r=RING_R, net_floor=NET_FLOOR, crown=CROWN, turn_rise=TURN_RISE, avenues=AVENUES,
             ground_main=[(r, round(ground(0, r), 2)) for r in range(0, 141, 2)],
-            ground_22=[(r, round(ground(r * math.cos(rad(22.5)), r * math.sin(rad(22.5))), 2)) for r in range(0, 141, 2)])
+            ground_22=[(r, round(ground(r * math.cos(rad(22.5)), r * math.sin(rad(22.5))), 2)) for r in range(0, 141, 2)],
+            entries=ENTRIES, trunk_ramps={k: [p[:3] for p in v] for k, v in TRUNK_RAMPS.items()}, ramp_rc=RAMP_RC, ramp_w=RAMP_W,
+            air=dict(datum=DATUM, pool_level=POOL_LEVEL, pool_drop=POOL_DROP, tol=DATUM_TOL, depth=round(WATER - DATUM, 2),
+                     bar=round(NET_BAR, 2), atm=ATM, bar_per_m=round(SEA_BAR_PER_M, 4), keel=[KEEL_T, KEEL_D], lock=[LOCK_R, LOCK_H, HATCH_R],
+                     collar=[COLLAR_R, COLLAR_L], fountain_lock=FOUNTAIN_LOCK, supply=AIR['supply'], glass=AIR['glass'],
+                     over={k: round(over(v['floor']), 2) for k, v in V.items() if v['dry'] and v.get('floor') is not None}))
 if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
 dryv = [v for v in V.values() if v['dry']]
@@ -784,3 +792,6 @@ print('enclosure: sides %.0f m, mitres %.0f m, walls %.0f to %.0f m over the flo
     side, mitre, ROOF_TOP - max(WALL_GROUND), ROOF_TOP - min(WALL_GROUND), KRAKEN_GAP))
 print('third pass: %d volumes (%d dry), %d tunnels (%.0f m), %d homes, trunk ramp %.1f m a turn' % (
     len(V), len(dryv), len(T), sum(sum(math.dist(p, q) for p, q in zip(t['pts'], t['pts'][1:])) for t in T), len(homes), TURN_RISE))
+print('air: one pressure, %.2f bar, set by the datum %.1f m up (%.1f m down); %d moon pools at the datum, %d lock chambers (%d to homes), '
+      'the fountain lock %.1f bar' % (NET_BAR, DATUM, WATER - DATUM, n_pool, n_lock, sum(e['shape'] == 'collar' for e in ENTRIES),
+                                      next(e['dp'] for e in ENTRIES if e['shape'] == 'fountain')))

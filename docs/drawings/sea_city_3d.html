@@ -53,13 +53,18 @@ svg text { font-family: var(--mono); fill: var(--ink); }
 .key div { display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; font-size: 15px; }
 .key i { width: 18px; height: 18px; display: block; margin-top: 3px; }
 .key div > span { min-width: 0; }
+.tbl { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; min-width: 640px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.findings { display: grid; gap: 12px; }
+.finding { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--glow); padding: 14px 16px; display: grid; gap: 8px; }
+.finding .tag { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--glow); }
+.finding p { font-size: 15px; }
+.finding ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; max-width: 74ch; font-size: 15px; }
+.nums { font-variant-numeric: tabular-nums; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
 </style>
-
-<div class="wrap">
-  <header>
-    <div class="eyebrow">Eleblorb · Ocean Kingdom · the sea folk city as SeaFolkPlan holds it</div>
-    <h1>Sea Folk City in Depth</h1>
 
 <div class="wrap">
   <header>
@@ -79,6 +84,8 @@ svg text { font-family: var(--mono); fill: var(--ink); }
         <button class="chip" id="t_roof" aria-pressed="true">Roof and upper walls</button>
         <button class="chip" id="t_clear" aria-pressed="false">Clear water</button>
         <button class="chip" id="t_cut" aria-pressed="false">Cut away the glass</button>
+        <button class="chip" id="t_trunk" aria-pressed="true">Trunk glass</button>
+        <button class="chip" id="t_sec" aria-pressed="false">Section the Garden House trunk</button>
         <button class="chip" id="t_flow" aria-pressed="true">Moving water</button>
       </div>
     </div>
@@ -87,6 +94,18 @@ svg text { font-family: var(--mono); fill: var(--ink); }
     </div>
   </div>
   <div class="note" id="note" aria-live="polite"></div>
+
+  <section style="display:grid;gap:12px">
+    <h2>How the dry network holds its air</h2>
+    <p>The trunks are dry tubes of air, and the spiral inside each is a ramp people walk up and down. All the glass you can walk in is one body of air at one pressure, so nothing inside it needs a door. This section shows where that air meets the sea. Heights are true; the trunks are drawn side by side, not where they stand.</p>
+    <div class="section"><svg id="airsec" role="img" aria-label="Section through a household trunk and the central trunk showing the moon pools at the datum and the lock chambers above it"></svg></div>
+    <div class="key" id="airkey"></div>
+  </section>
+
+  <section class="findings">
+    <h2>Findings</h2>
+    <div class="finding" id="f_air"></div>
+  </section>
 
   <section style="display:grid;gap:12px">
     <h2>Half-section along the main avenue</h2>
