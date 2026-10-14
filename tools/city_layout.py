@@ -323,7 +323,12 @@ PODIUM_HEIGHT={1:44}
 HOTEL={
  'origin':(-483,-98),'size':(52,60),
  'ground':6.5,'mezzanine':5.0,'storey':3.25,'court_levels':12,'top_level':28,
- 'court_roof':44.0,'skylight_ridge':48.0,'skylight_north':'tower',
+ 'court_roof':44.0,'skylight_ridge':48.0,
+ # the roof, the lifts, the chandelier and the rain, designed together (city.md 8.4a):
+ # the skylight is one pitch of bronze glass falling south, away from the tower: high
+ # at +47 along the tower under a band of louvres (+47 to +48, where the stack's warm
+ # air leaves) and the tower gutter, low at +44.6 on the leaning front's box gutter
+ 'skylight':{'high':47.0,'low':44.6,'clerestory':(47.0,48.0),'truss':4.0,'min_pitch':7.0},
  # the void: x range at every level; the north corners' edge; the south
  # galleries' edge at the floor and mezzanine, leaning 'lean' m north a level
  # from level 3 (Hyatt Regency San Francisco)
@@ -332,26 +337,25 @@ HOTEL={
  'forecourt':(0,54,52,60),'entrance_hall':(0,48,52,54),
  'tower':{'c':(26,14),'r':14,'core_r':5.5,'top':96.0,'ribs':40,'rib':(0.6,0.9)},
  'drum':{'r':16,'tank':(96.0,101.0),'lounge':(101.0,105.5),'dome_top':108.0},
- # four glass capsules on the tower's south face, bearings from due south
- 'lifts':{'bearings':[-36,-12,12,36],'r':1.3,'track':15.4,'top':101.0,
-          # each capsule runs its whole height in its own sealed glass hoistway, from the
-          # atrium floor up the tower's face to the drum; the roof is cut round each
-          # hoistway and sealed to its glass, so nothing stands across a capsule's path
-          'hoistway_r':1.75},
- # the lift collar: a solid concrete roof round the tower's foot at the court roof,
- # from the tower's face out to the skylight's north ring beam; the hoistways rise
- # through it, clear of the skylight
- 'lift_collar':4.6,
+ # four glass capsules ride in glazed slots let into the tower's south face, from the
+ # atrium floor to the drum, inside the tower's outline: no roof ever crosses their
+ # path. Bearings from due south; each slot 3.4 m wide and deep; the capsule's face
+ # shows through glass flush with the facade; its doors open into the tower's lobbies
+ 'lifts':{'bearings':[-40,-15,15,40],'r':1.3,'track':12.3,'slot':3.4,'top':101.0},
  'chandelier':{'c':(26,37),'r':4.0,'bottom':15.0,'top':31.0,'tiers':5,'crystals':3000,'lowered':10.0,'load_t':8.0},
- # what the chandelier hangs from: a steel hoist girder 3.4 m deep spanning the
- # void east to west straight over it, bearing on the east and west ranges'
- # concrete frames. It is the skylight's ridge beam: the glazing trusses run
- # from it north to a ring beam on the tower's face and south to the leaning
- # front. A catwalk runs inside it from the winch room on the east range's
- # roof to the pulley block over the chandelier; two hoist ropes and two
- # safety ropes; a handwheel lowers it if the power fails.
- 'hoist':{'z':37.0,'x':(8.0,44.0),'bottom':44.6,'top':48.0,'block':(26,37),'ropes':4,
-          'winch':(43.0,33.5,49.0,40.5),'winch_top':48.6},
+ # what the chandelier hangs from: a steel box arm cantilevered from the tower's core,
+ # out through the tower's face between the two middle lift slots, under the glass, to
+ # a pulley block over the chandelier. Its winch room is inside the tower on level 13,
+ # behind the arm, reached from the service core. Four ropes (two hoist, two safety);
+ # a handwheel lowers it if the power fails
+ 'arm':{'root_z':19.5,'tip':(26,37),'bottom':43.2,'depth':(1.4,0.8),'width':1.0,'block':0.8,'winch_level':13,'ropes':4},
+ # the rain: the glass sheds south to a box gutter on the front, falling 1:100 to an
+ # outlet at each end; the tower's face sheds onto the tower gutter above the louvres,
+ # falling east and west round the tower to the ranges' roofs; every pipe runs down
+ # inside a pier to the rain cistern under the forecourt, which feeds the runnel and
+ # overflows to the street drains and the park's reed pond
+ 'rain':{'gutter':{'z':(40.0,40.9),'fall':0.01},'outlets':[(8.0,40.4),(44.0,40.4)],'tower_gutter':48.0,
+         'cistern':{'rect':(10,54,42,60),'depth':1.6},'storm_mm':50},
  'rock_garden':{'c':(26,37),'r':6.0,'pavilion':(5.0,4.0,4.5)},
  'pod':{'c':(12.5,36),'r':2.5},
  # the double ramp: foot, bend, head on the mezzanine's south gallery
@@ -386,30 +390,39 @@ def _hotel_checks():
             gap=min(cx-v['x'][0],v['x'][1]-cx,south(n)-cz)-cr
             if gap<2: problems.append(('hotel: chandelier within 2 m of level',n,round(gap,2)))
     if math.dist((cx,cz),(tx,tz))-tr-cr<4: problems.append(('hotel: chandelier within 4 m of the tower',))
-    for b_ in H['lifts']['bearings']:
-        a=math.radians(b_); lx,lz=tx+H['lifts']['track']*math.sin(a),tz+H['lifts']['track']*math.cos(a)
-        if not v['x'][0]+H['lifts']['r']<=lx<=v['x'][1]-H['lifts']['r'] or lz<v['z_north']: problems.append(('hotel: lift outside the void',b_))
-        if math.dist((lx,lz),(cx,cz))-cr-H['lifts']['hoistway_r']<1.5: problems.append(('hotel: lift hoistway within 1.5 m of the chandelier',b_))
     if ch['bottom']-ch['lowered']<=H['rock_garden']['pavilion'][2]: problems.append(('hotel: lowered chandelier hits the pavilion',))
-    # the hoist girder: straight over the chandelier, bearing 2 m into each range,
-    # clear of the tower and of the lifts' sleeves, its winch room on the east
-    # range's roof; the ropes long enough to lower it its full travel
-    hg=H['hoist']
-    if abs(hg['z']-cz)>0.3 or abs(hg['block'][0]-cx)>0.3: problems.append(('hotel: hoist girder not over the chandelier',))
-    if hg['x'][0]>v['x'][0]-2 or hg['x'][1]<v['x'][1]+2: problems.append(('hotel: hoist girder does not bear 2 m into both ranges',))
-    if hg['z']-(tz+tr)<4: problems.append(('hotel: hoist girder within 4 m of the tower',))
-    if hg['z']>south(H['court_levels']): problems.append(('hotel: hoist girder south of the void',))
-    if hg['top']>H['skylight_ridge']+0.01: problems.append(('hotel: hoist girder above the ridge',))
-    wx0,wz0,wx1,wz1=hg['winch']
-    if wx0<v['x'][1] or wx1>H['size'][0]: problems.append(('hotel: winch room not on the east range',))
-    if not (wz0<=hg['z']<=wz1): problems.append(('hotel: winch room not at the girder\'s end',))
-    for b_ in H['lifts']['bearings']:
-        a=math.radians(b_); lx,lz=tx+H['lifts']['track']*math.sin(a),tz+H['lifts']['track']*math.cos(a)
-        if hg['z']-lz<2: problems.append(('hotel: hoist girder crosses a lift hoistway',b_))
-        # the skylight springs from the collar's edge, clear of every hoistway by 0.8 m
-        face=tz+math.sqrt(max(0,tr*tr-(lx-tx)**2)); spring=face+H['lift_collar']
-        if lz+H['lifts']['hoistway_r']+0.8>spring: problems.append(('hotel: a lift hoistway reaches the skylight',b_,round(spring-lz,2)))
-    if hg['bottom']-ch['top']<6: problems.append(('hotel: under 6 m of rope above the chandelier',))
+    # the lifts: each capsule inside the tower's outline, in a slot opening onto the
+    # void, the slots clear of one another
+    L_=H['lifts']; bs=sorted(L_['bearings'])
+    if L_['track']+L_['r']>tr-0.3: problems.append(('hotel: a capsule stands outside the tower\'s face',))
+    for b_ in bs:
+        a=math.radians(b_); fx,fz=tx+tr*math.sin(a),tz+tr*math.cos(a)
+        if not (v['x'][0]+L_['slot']/2<=fx<=v['x'][1]-L_['slot']/2 and fz>=v['z_north']): problems.append(('hotel: lift slot does not open onto the void',b_))
+    for a_,b_ in zip(bs,bs[1:]):
+        if math.radians(b_-a_)*L_['track']<L_['slot']+0.6: problems.append(('hotel: lift slots too close',a_,b_))
+    # the skylight: one pitch, never flatter than glass will shed (7 degrees), and the arm under it
+    sk=H['skylight']; zl=south(H['court_levels'])
+    zn=lambda x: max(v['z_north'],tz+math.sqrt(max(0,tr*tr-(x-tx)**2)) if abs(x-tx)<tr else v['z_north'])
+    x=v['x'][0]
+    while x<=v['x'][1]+0.01:
+        run=zl-zn(x)
+        if run<=0 or math.degrees(math.atan2(sk['high']-sk['low'],run))<sk['min_pitch']: problems.append(('hotel: skylight flatter than glass sheds at x',x))
+        x+=sk['truss']
+    ar=H['arm']; (ax,az)=ar['tip']
+    if abs(ax-cx)>0.3 or abs(az-cz)>0.3: problems.append(('hotel: the arm\'s tip is not over the chandelier',))
+    glass_at=lambda x,z: sk['high']-(sk['high']-sk['low'])*(z-zn(x))/(zl-zn(x))
+    if glass_at(ax,az)-(ar['bottom']+ar['depth'][1])<0.6: problems.append(('hotel: the arm reaches the glass',))
+    for b_ in bs:
+        off=abs(L_['track']*math.sin(math.radians(b_)))-L_['slot']/2
+        if off<ar['width']/2+0.4: problems.append(('hotel: the arm crosses a lift slot',b_))
+    if ar['bottom']-ar['block']-ch['top']<6: problems.append(('hotel: under 6 m of rope above the chandelier',))
+    # the rain: the cistern holds a cloudburst on the whole roof
+    rn=H['rain']; c=rn['cistern']; vol=(c['rect'][2]-c['rect'][0])*(c['rect'][3]-c['rect'][1])*c['depth']
+    need=H['size'][0]*H['size'][1]*rn['storm_mm']/1000
+    if vol<need: problems.append(('hotel: the rain cistern holds %.0f m3, under a %d mm cloudburst on the roof (%.0f m3)'%(vol,rn['storm_mm'],need),))
+    for ox,oz in rn['outlets']:
+        # each outlet at a gutter end, inside the east or west range, so its pipe runs down a pier, not through the atrium
+        if not ((v['x'][0]-2.5<=ox<=v['x'][0]-1 or v['x'][1]+1<=ox<=v['x'][1]+2.5) and rn['gutter']['z'][0]<=oz<=rn['gutter']['z'][1]): problems.append(('hotel: a gutter outlet is not at a gutter end inside a range',ox,oz))
 _hotel_checks()
 ## Fabric storeys are 3.25 m, downtown mid-rise storeys 3.6 m.
 STOREY={'fabric':3.25,'midrise':3.6}

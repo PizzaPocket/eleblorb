@@ -1470,7 +1470,7 @@ mezzanine 5 m; every level above 3.25 m. Level n starts at
 | **Levels 3 and 4** | +11.5 to +18 m | Galleries round the void; the ballroom and function rooms (west), the hotel's offices and the luggage room (east) |
 | **Levels 5 to 7** | +18 to +27.75 m | Guest rooms on the galleries |
 | **Levels 8 to 12** | +27.75 to +44 m | The **long-stay residences**, about 8 suites a floor on the galleries, their planters hanging over the void |
-| **Court roof** | +44 m | The **roof garden**: shade trees in planters, the terrace bar, the two **wind towers** after Old Moy's, the air plant behind a screen; the atrium's **skylight** between them, rising to +48 m |
+| **Court roof** | +44 m | The **roof garden**: shade trees in planters, the terrace bar, the two **wind towers** after Old Moy's, the air plant behind a screen; the atrium's **skylight** between them, its high edge along the tower at +47 m, under the tower's louvres and gutter |
 | **Tower, levels 3 to 12** | +11.5 to +44 m | Guest rooms round the north of its core; its south arc is the lift lobby, open to the atrium, joined to the Court's galleries at the north corners |
 | **Tower, levels 13 to 26** | +44 to +89.5 m | Guest rooms, 16 a floor round the core |
 | **Level 27** | +89.5 to +92.75 m | The grand suites, among them **the party's suite**, facing the park |
@@ -1492,8 +1492,8 @@ mezzanine 5 m; every level above 3.25 m. Level n starts at
 runs from the north corners (z 22) and the tower's curved face (z 28 at
 its centre) to the south galleries, which lean in: z 48 at the floor and
 the mezzanine, z 40 at level 12. So the void is about 32 × 26 m at the
-floor and 32 × 18 m at the top, and 48 m from the floor to the
-skylight's ridge.
+floor and 32 × 18 m at the top, and 47 m from the floor to the
+skylight's high edge.
 
 **The galleries.** Every level's gallery is 2.4 m wide, cantilevered from
 the column line, with a solid board-formed parapet 1.1 m high whose top
@@ -1509,33 +1509,41 @@ and ficus, which take the indoor light). The **runnel** crosses the floor
 (8.8). The **double ramp** rises at the south. The four **capsule lifts**
 land on the north, at the foot of the tower.
 
-**The skylight** (revised 2026-10-14, with the chandelier's hoist, 8.5).
-Its ridge at +48 m is the **hoist girder** that carries the chandelier, running
-east–west straight over it at z = 37. White-cased steel trusses at 4 m centres
-run from the girder north to a concrete ring beam at the edge of the **lift
-collar** (or to the north range at the void's corners, beyond the tower), and
-south to the leaning front, with bronze glass between. A clerestory of louvres
-runs round the skylight's edge.
+**The roof, the lifts, the chandelier and the rain, designed together**
+(2026-10-14). Two earlier drawings ran the capsules up through the glass, and
+the fix after them, a concrete collar round the tower's foot pierced by glass
+hoistways, put a solid shelf across the lifts' path and a ridge girder through
+the middle of the skylight. Both were withdrawn. The four requirements are
+solved as one:
+1. **The lifts never cross a roof.** They run in four slots let into the
+   tower itself (below), inside its outline, so the skylight never meets them.
+2. **Nothing pierces the glass.** No shaft, collar, girder or rope passes
+   through it; the chandelier hangs from an arm under it.
+3. **Rain always runs away from the tower** to gutters that are reached from
+   the ranges, never across the glass toward a joint it could leak through.
+4. **Everything that needs servicing is inside the building:** the winch, the
+   gutters' outlets, the lifts' machinery.
 
-**The lifts' hoistways and the lift collar** (2026-10-14). A capsule cannot
-pass through a roof unless the roof is cut round its path, and both earlier
-drawings ran the capsules up through the skylight's glass. Now:
-- **One continuous shaft per lift.** Each capsule runs its whole height
-  inside its own sealed glass hoistway, 3.5 m across. The hoistway rises from
-  the atrium floor, up the void beside the tower, through the roof, and up the
-  tower's face to the drum. Inside the atrium it is clear glass, so the
-  capsules still read as riding free up the void. It is banded in bronze at
-  every second level, with doors to the gallery bridges at each stop.
-- **The roof is cut round each shaft.** Round the tower's foot the court's
-  roof is solid concrete, from the tower's face out 4.6 m to the ring beam
-  that the skylight springs from: the **lift collar**. Each hoistway passes
-  up through its own opening in the collar, sealed to the hoistway's glass by
-  a bronze ring. Nothing stands across a capsule's path, and the weather
-  stays out because the hoistway itself is the enclosure.
-- **Clear of the skylight.** The four lifts run 1.4 to 1.8 m off the tower's
-  face, so every hoistway stands at least 0.8 m clear of the skylight's ring
-  beam. `tools/city_layout.py` checks this, and that every hoistway is 1.5 m
-  clear of the chandelier.
+**The skylight.** One pitch of bronze glass, falling south, away from the
+tower. Its high edge, at +47 m, bears on a ring beam along the tower's face; its
+low edge, at +44.6 m, bears on the leaning front's top beam. It is never flatter
+than 7° (7.6° at the corners to 11° at the middle), steep enough for glass to
+shed water and dust. White-cased steel trusses at 4 m centres run from the
+tower's ring beam to the front. Between the glass's high edge and the tower's
+**gutter** at +48 m runs a band of **louvres**, where the void's warm air leaves
+(8.8).
+
+**The lifts' slots.** Four vertical slots, 3.4 m wide and 3.4 m deep, are let
+into the tower's south face at 15° and 40° either side of due south, from the
+atrium floor to the Windrose at +101 m. Each capsule rides its rails at the
+back of its slot, entirely inside the tower's round outline, and its doors open
+into the tower's lift lobby at every level. The slot's front is flush bronze
+glass, continuous with the facade, so from the plaza the four lit capsules are
+seen climbing the tower behind glass; inside the atrium the slots are open to
+the void below +47 m, and the capsules rise free past the galleries. The tower's
+ribs stop either side of each slot. `tools/city_layout.py` checks that every
+capsule is inside the tower's face, that every slot opens onto the void, and
+that the slots stand clear of each other.
 
 **The double ramp.** Two board-formed concrete ramps curve out either
 side of the rock garden, from feet at (18, 38) and (34, 38) on the
@@ -1546,19 +1554,17 @@ inside the world's 32°. Each is 2.4 m wide (two people abreast) with a
 smooth, sculpture as much as route, in Portman's way.
 
 **The capsule lifts.** Four glass capsules, 2.6 m across, in bronze frames
-outlined in bulbs, ride rails on the tower's south face at 12° and 36°
-either side of due south. They rise from the atrium floor, stop at the
-mezzanine (by a short bridge) and every level, and climb on up the outside
-of the tower, in full view of the plaza, to the Windrose at +101 m. Each runs
-its whole height in its own continuous glass hoistway, which passes through
-the roof at the lift collar (8.4). At night the four lit capsules moving up the
-white tower are the hotel's sign.
+outlined in bulbs, ride in the tower's four slots (above). They rise from the
+atrium floor, stop at the mezzanine and every level, and climb on up the tower,
+in full view of the plaza through the slots' glass, to the Windrose at +101 m.
+At night the four lit capsules moving up the white tower are the hotel's sign.
 
 **Circulation:**
 - **Visitors:** forecourt → revolving door → entrance hall → atrium floor →
   double ramp or capsule lifts → mezzanine.
-- **Guests:** atrium floor → capsule lifts → their level: the galleries
-  through the north corners below +44 m, the tower's lift lobby above.
+- **Guests:** atrium floor → capsule lifts → the tower's lift lobby at
+  their level → their room in the tower, or through the north corners to
+  the galleries of the Court below +44 m.
 - **From the Deck:** skybridge → Deck door → mezzanine gallery → ramps or
   lifts.
 - **Staff and goods:** Hotel Lane → loading door → kitchen and the core's
@@ -1572,29 +1578,29 @@ white tower are the hotel's sign.
   at +15 m, above the mezzanine and the level 3 galleries; its crown ring is
   at +31 m. It weighs about 8 t, crystal, rings and frame (the largest
   chandeliers built weigh 4 to 12 t).
-- **What it hangs from** (resolved 2026-10-14). The first brief hung it from
-  a "winch room in the skylight's central truss". That truss is a glazing
-  truss 0.35 m wide, and the chandelier would have hung on its sloping flank,
-  6 m off the ridge, where no winch could be reached. Now:
-  - **The hoist girder:** a steel truss 3.4 m deep (+44.6 to +48 m) spans
-    the void 36 m east to west, straight over the chandelier, and bears 2 m
-    into the concrete frames of the east and west ranges. It is the
-    skylight's ridge beam.
+- **What it hangs from** (resolved 2026-10-14, after a glazing truss and
+  then a ridge girder through the glass were both withdrawn, 8.4):
+  - **The arm:** a tapered steel box beam, 1 m wide, 1.4 m deep at its root
+    and 0.8 m at its tip, cantilevered from the tower's concrete core at
+    level 13. It runs south out of the tower between the two middle slots
+    and over the void to a tip straight over the chandelier at (26, 37). Its
+    underside is at +43.2 m, at least 0.6 m under the glass everywhere, so the
+    skylight passes over it untouched. Its root is built into the core
+    behind the ring beam, and the core takes the 8 t as it takes the floors.
   - **The ropes:** two hoist ropes and two safety ropes, each able to carry
-    the whole chandelier alone, hang 13.6 m from a pulley block under the
-    girder's bottom chord to the crown ring.
-  - **The winch room:** on the east range's roof at the girder's end, 6 × 7
-    m, reached from the service core, outside the glass. The ropes run to it
-    along the girder on sheaves.
-  - **The catwalk:** inside the girder, from the winch room to the pulley
-    block, so the winch, ropes and block are inspected without scaffolding.
+    the whole chandelier alone, run along inside the arm on sheaves and hang
+    from a pulley block at its tip to the crown ring, 11 m below.
+  - **The winch room:** inside the tower on level 13, beside the arm's root,
+    reached by the service core. The winch, the sheaves and the block are
+    inspected from inside the arm, which is a crawlway, without scaffolding
+    and without going onto the glass.
   - **Power:** the winch runs on the hotel's supply with the Windworks'
     batteries behind it, and a handwheel lowers it by hand if both fail. On
     the night of the Blackout the chandelier went dark but stayed where it
     hung.
-  - `tools/city_layout.py` checks that the girder is over the chandelier,
-    bears into both ranges, stands clear of the tower and the lifts' sleeves,
-    and that the winch room is on the east range at the girder's end.
+  - `tools/city_layout.py` checks that the arm's tip is over the chandelier,
+    that it stands at least 0.6 m under the glass and clear of the slots, and
+    that there are at least 6 m of rope above the chandelier.
 - **Three thousand crystals** in strands round the rings, lit from within.
   Lucinda knows them by their faults. During the Blackout they went dark
   for the first time in the hotel's history.
@@ -1619,7 +1625,7 @@ the tile and glass, and the oldest tower downtown.
 | Walls | white **board-formed concrete**; on the tower, **ribs** 0.6 m wide and 0.9 m deep every 2.2 m round the cylinder | Marriott Marquis; the ribs shade the glass |
 | Glass | **bronze-tinted**, recessed 0.9 m between the ribs, and under 1.2 m concrete **hoods** on the terraces | Portman; the desert's shade |
 | Ground | the **forecourt**: ribbed concrete columns carrying the mezzanine, the revolving door between two 2.8 m swing doors | Portman's entrance, without the drive |
-| Lifts | glass **capsules** outlined in bulbs, riding the tower's face | Hyatt Regency Atlanta, Westin Bonaventure |
+| Lifts | glass **capsules** outlined in bulbs, riding in glazed slots let into the tower's face | Hyatt Regency Atlanta, Westin Bonaventure |
 | Crown | the **drum**: a ribbed tank ring, the revolving Windrose in bronze glass, a shallow lit dome | the Polaris, Peachtree's revolving restaurant |
 | Corners | the Court's corners rounded in a superellipse | Moy's signature |
 | Signature motif | Old Moy's **house marks**, cast into the forecourt's columns, one to a column | the city's signature |
@@ -1643,7 +1649,11 @@ top, and the chandelier is lit in the middle of it all.
   gallery; the gallery slabs cantilever 2.4 m from it. The south range's
   columns rake, leaning 0.8 m a storey, and each floor ties them back to
   the east and west ranges.
-- **The skylight's** trusses bear on the Court's ring beam at +44 m.
+- **The skylight's** trusses bear on a ring beam along the tower's face at
+  +47 m and on the leaning front's top beam at +44.6 m.
+- **The chandelier's arm** is cantilevered from the tower's core at level 13
+  (8.5); the tower's ribs stop either side of each lift slot, and the floor
+  edges bridge the slots as lintels.
 - **The ramps** are board-formed concrete, cantilevered from the
   mezzanine's edge, each with one support at its foot landing.
 
@@ -1652,8 +1662,8 @@ top, and the chandelier is lit in the middle of it all.
 - **The cool well.** The two **wind towers** on the Court roof catch the
   west wind and drop it down shafts in the west range to grilles at the
   foot of the atrium. The air crosses the atrium floor over the runnel and
-  the planting, warms, and rises the 44 m of the void to leave by the
-  skylight's louvres. The stack draws even on still days. It is Old Moy's
+  the planting, warms, and rises the 47 m of the void to leave by the
+  louvres along the skylight's high edge. The stack draws even on still days. It is Old Moy's
   way of cooling, at the hotel's scale.
 - **Working water, not a fountain.** The city's **reclaimed water**, on
   its way from the water works to the park's reed pond, crosses the
@@ -1663,6 +1673,16 @@ top, and the chandelier is lit in the middle of it all.
 - **Shade.** The tower's ribs keep out the low east and west sun; the
   terraces' hoods and planters shade the south; the skylight is bronze
   glass between deep trusses.
+- **Rain** (2026-10-14). Rare in the desert, but a cloudburst comes all at
+  once. The tower's own runoff is caught by the **tower gutter** at +48 m
+  above the louvres, which falls east and west to the ranges' roofs, so none
+  runs onto the glass. The skylight sheds south to a **box gutter** along the
+  leaning front at +40 m, falling 1:100 east and west to **outlets** at x 8
+  and 44, inside the east and west ranges where they are reached from a
+  service door. Pipes down the ranges' piers carry it to the **rain cistern**
+  under the forecourt, 32 × 6 m and 1.6 m deep (307 m³, about twice a 50 mm
+  cloudburst on the whole roof). The cistern tops up the runnel and
+  overflows to the street drains and the park's reed pond.
 - Modern air conditioning does the rest. Its plant sits on the Court
   roof, screened.
 
@@ -1674,8 +1694,8 @@ top, and the chandelier is lit in the middle of it all.
   mezzanine with flush toilets and basins. Waste goes to the city sewer
   and the water works' reclamation.
 - **How the hero rests:** at the reception desk, with Lucinda in the
-  evening (or Felix by day), then up by capsule lift, through the
-  skylight and up the outside of the tower, to the party's suite on
+  evening (or Felix by day), then up by capsule lift, up the void
+  and on up the tower's face behind the slot's glass, to the party's suite on
   level 27, the one built guest floor.
 - **The party's suite:** sitting room, one bedroom with a double bed at
   world scale (mattress 1.55 × 2.3 m), a bathroom, and windows on the
