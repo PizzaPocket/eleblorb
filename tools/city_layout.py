@@ -336,12 +336,20 @@ HOTEL={
  'gallery':2.4,'range':10,'south_range':12,
  'forecourt':(0,54,52,60),'entrance_hall':(0,48,52,54),
  'tower':{'c':(26,14),'r':14,'core_r':5.5,'top':96.0,'ribs':40,'rib':(0.6,0.9)},
- 'drum':{'r':16,'tank':(96.0,101.0),'lounge':(101.0,105.5),'dome_top':108.0},
+ 'drum':{'r':16,'tank':(96.0,101.0),'lounge':(101.0,105.5),'dome_top':108.0,
+          # the tank ring's ribs carry the tower's 40 ribs on up, and the Windrose's fixed
+          # glass has a mullion over every rib (its floor turns; the glass does not)
+          'ribs':40,'mullions':40},
  # four glass capsules ride in glazed slots let into the tower's south face, from the
  # atrium floor to the drum, inside the tower's outline: no roof ever crosses their
- # path. Bearings from due south; each slot 3.4 m wide and deep; the capsule's face
- # shows through glass flush with the facade; its doors open into the tower's lobbies
- 'lifts':{'bearings':[-40,-15,15,40],'r':1.3,'track':12.3,'slot':3.4,'top':101.0},
+ # path. The slots keep the tower's rhythm: each is two of the ribs' 9-degree bays,
+ # centred on a rib that is left out, and framed by the ribs either side, so its
+ # clear width is two bays less a rib (3.8 m). Bearings from due south. The tower's
+ # face onto the atrium (bearings -54 to 54) is twelve bays: glass, slot, glass, glass,
+ # slot, glass either side of the rib at due south that the chandelier's arm leaves by.
+ # The capsule's face shows through glass flush with the facade; its doors open into
+ # the tower's lobbies
+ 'lifts':{'bearings':[-45,-18,18,45],'bays':2,'r':1.3,'track':12.3,'slot':3.8,'depth':3.4,'top':101.0},
  'chandelier':{'c':(26,37),'r':4.0,'bottom':15.0,'top':31.0,'tiers':5,'crystals':3000,'lowered':10.0,'load_t':8.0},
  # what the chandelier hangs from: a steel box arm cantilevered from the tower's core,
  # out through the tower's face between the two middle lift slots, under the glass, to
@@ -398,6 +406,17 @@ def _hotel_checks():
     for b_ in bs:
         a=math.radians(b_); fx,fz=tx+tr*math.sin(a),tz+tr*math.cos(a)
         if not (v['x'][0]+L_['slot']/2<=fx<=v['x'][1]-L_['slot']/2 and fz>=v['z_north']): problems.append(('hotel: lift slot does not open onto the void',b_))
+    # the slots keep the tower's rhythm: each centred on a rib, as wide as its bays less a rib,
+    # and the whole slot, framing ribs and all, on the tower's face onto the void
+    bay=360/H['tower']['ribs']; bay_m=math.radians(bay)*tr
+    if abs(L_['slot']-(L_['bays']*bay_m-H['tower']['rib'][0]))>0.05: problems.append(('hotel: lift slot is not a whole number of the tower\'s bays',L_['slot']))
+    for b_ in bs:
+        if L_['bays']%2==0 and abs(b_/bay-round(b_/bay))>1e-6: problems.append(('hotel: lift slot not centred on a rib',b_))
+        if L_['bays']%2==1 and abs(b_/bay-0.5-round(b_/bay-0.5))>1e-6: problems.append(('hotel: lift slot not centred on a bay',b_))
+        e=math.radians(abs(b_)+L_['bays']*bay/2); ex,ez=tx+tr*math.sin(e),tz+tr*math.cos(e)
+        if ez<v['z_north'] or not v['x'][0]<=ex<=v['x'][1]: problems.append(('hotel: lift slot\'s outer rib is off the void',b_))
+    for k in ('ribs','mullions'):
+        if H['drum'][k]%H['tower']['ribs']: problems.append(('hotel: the drum\'s %s do not carry on the tower\'s ribs'%k,H['drum'][k]))
     for a_,b_ in zip(bs,bs[1:]):
         if math.radians(b_-a_)*L_['track']<L_['slot']+0.6: problems.append(('hotel: lift slots too close',a_,b_))
     # the skylight: one pitch, never flatter than glass will shed (7 degrees), and the arm under it

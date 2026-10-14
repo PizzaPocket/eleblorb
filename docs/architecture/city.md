@@ -1533,17 +1533,31 @@ tower's ring beam to the front. Between the glass's high edge and the tower's
 **gutter** at +48 m runs a band of **louvres**, where the void's warm air leaves
 (8.8).
 
-**The lifts' slots.** Four vertical slots, 3.4 m wide and 3.4 m deep, are let
-into the tower's south face at 15° and 40° either side of due south, from the
-atrium floor to the Windrose at +101 m. Each capsule rides its rails at the
-back of its slot, entirely inside the tower's round outline, and its doors open
-into the tower's lift lobby at every level. The slot's front is flush bronze
-glass, continuous with the facade, so from the plaza the four lit capsules are
-seen climbing the tower behind glass; inside the atrium the slots are open to
-the void below +47 m, and the capsules rise free past the galleries. The tower's
-ribs stop either side of each slot. `tools/city_layout.py` checks that every
-capsule is inside the tower's face, that every slot opens onto the void, and
-that the slots stand clear of each other.
+**The lifts' slots.** Four vertical slots are let into the tower's south face,
+from the atrium floor to the Windrose at +101 m. They keep the tower's rhythm
+(revised 2026-10-14, after the user asked whether the lifts' fittings fit the
+windows). The tower has 40 ribs, one every 9° (2.2 m apart), with a window bay
+between each pair. Each slot is **two bays wide**: the rib between them is left
+out, and the ribs either side frame the slot, so its clear width is two bays
+less a rib, 3.8 m, and it is 3.4 m deep. The slots are centred on the ribs at
+18° and 45° either side of due south. The tower's face onto the atrium (54°
+either side of south) is then twelve bays, read from the middle outward on
+each side: glass, glass (the rib at due south between them is the one the
+chandelier's arm leaves by, 8.5), slot, glass, slot, the outer slot's last rib
+meeting the north corner's gallery. Each capsule rides its rails at the back
+of its slot, entirely inside the tower's round outline, and its doors open
+into the tower's lift lobby at every level. The slot's front is bronze glass
+in the plane of the windows, so from the plaza the four lit capsules are seen
+climbing the tower behind glass in a double bay; inside the atrium the slots
+are open to the void below +47 m, and the capsules rise free past the
+galleries. The floor edges cross each slot as lintels at every level, in line
+with the windows' spandrels. Above the tower the drum's tank ring carries the
+same 40 ribs up, and the Windrose's fixed glass has a mullion over every rib
+(its floor turns; its glass does not). `tools/city_layout.py` checks that
+every capsule is inside the tower's face, that every slot is a whole number
+of bays centred on a rib and lies wholly on the face onto the void, that the
+slots stand clear of each other, and that the drum's ribs and mullions carry
+on the tower's.
 
 **The double ramp.** Two board-formed concrete ramps curve out either
 side of the rock garden, from feet at (18, 38) and (34, 38) on the
@@ -1652,8 +1666,9 @@ top, and the chandelier is lit in the middle of it all.
 - **The skylight's** trusses bear on a ring beam along the tower's face at
   +47 m and on the leaning front's top beam at +44.6 m.
 - **The chandelier's arm** is cantilevered from the tower's core at level 13
-  (8.5); the tower's ribs stop either side of each lift slot, and the floor
-  edges bridge the slots as lintels.
+  (8.5); each lift slot is two of the tower's bays, framed by ribs, with one
+  rib left out and its load carried by the floor edges, which bridge the
+  slot as lintels at every level.
 - **The ramps** are board-formed concrete, cantilevered from the
   mezzanine's edge, each with one support at its foot landing.
 
