@@ -520,6 +520,172 @@ for nb in [x for x in B if x['n'] in ANGLE]:
         if other is nb: continue
         if poly_gap(P,corners_of(other))<8: problems.append(('turned block within 8 m of',nb['n'],other['n']))
 TURBINES=[(-310,-200),(-310,200),(-740,-270),(-740,270)]
+## The Deck (city.md 6.2 and 6a): the walkway at +6.5 m, after Hong Kong's
+## footbridges. Every run has a job: the ring shades the park side of the Park
+## Ring and joins every district; each branch ends at a door that is worth
+## walking to at +6.5 m. Runs are centrelines (world x, z) with a width; a run
+## that ends at a building ends at one of DECK['doors']. Columns stand in pairs
+## at its edges, never in a street mouth or a park gate (the line a walker
+## crosses on), and the skybridges span their street with none. Ways down are
+## ramp towers (the world's 32 degree ramp, two flights of 5.2 m, so a tower
+## 8 m across) and glass lifts. The travelators of the first brief are dropped:
+## at 12 degrees a 6.5 m rise runs 31 m, more than any square can spare.
+DECK={
+ 'level':6.5,'depth':0.9,'rail':1.1,'col':0.6,'max_span':12.0,
+ 'runs':[
+  # the ring, over the park side of the Park Ring: a 6 m arcade below it, 6 m open street outside it
+  dict(name='Park Deck',kind='ring',w=6,pts=[(-628,-53),(-492,-53),(-492,53),(-628,53),(-628,-53)]),
+  # the civic walks along Civic Plaza's north and south edges, to city hall's canopies
+  dict(name='Civic walk north',kind='walk',w=6,pts=[(-489,-27),(-431,-27)]),
+  dict(name='Civic walk south',kind='walk',w=6,pts=[(-489,27),(-431,27)]),
+  # the skybridges: the hotel's (HOTEL['skybridge']) and the glass tower's, each across its street
+  dict(name='Hotel skybridge',kind='bridge',w=6,pts=[(-457,-30),(-457,-38)]),
+  dict(name='Glass skybridge',kind='bridge',w=6,pts=[(-463,30),(-463,38)]),
+  # to the library's east-wing door, over Garden Walk's mouth
+  dict(name='Library walk',kind='walk',w=6,pts=[(-631,-27),(-648,-27)]),
+  # up the east half of North Street to the neighbourhood centre's roof garden
+  dict(name='Estate walk',kind='walk',w=6,pts=[(-557,-56),(-557,-121)]),
+  # down the east half of South Street, then along Market Square's north edge to the wet market's upper hall
+  dict(name='Market walk',kind='walk',w=6,pts=[(-557,56),(-557,125),(-530,125)]),
+ ],
+ # where the Deck meets a building at +6.5 m: (building, point on its face, what is there)
+ 'doors':[
+  (1,(-457,-38),'the hotel\'s Deck door into the mezzanine gallery'),
+  (13,(-463,38),'the glass tower\'s Deck lobby'),
+  (2,(-431,-27),'city hall\'s north canopy, along to the north door'),
+  (2,(-431,27),'city hall\'s south canopy'),
+  (3,(-645,-30),'the library\'s east-wing door to the first gallery'),
+  (51,(-554,-120),'the neighbourhood centre\'s roof garden'),
+  (33,(-530,125),'the wet market\'s upper hall'),
+ ],
+ # indoor runs at +6.5 m that carry the Deck through a building
+ 'through':[(1,12,'the hotel mezzanine\'s east gallery through the party wall to the Windspire\'s lobby')],
+ # ramp towers: centre, radius, the side its head opens onto the Deck and the side its foot opens onto the ground
+ 'ramps':[
+  dict(name='North gate',c=(-552,-46),r=4,head='n',foot='w'),
+  dict(name='South gate',c=(-568,46),r=4,head='s',foot='e'),
+  dict(name='West gate',c=(-621,8),r=4,head='w',foot='n'),
+  dict(name='East gate',c=(-499,-8),r=4,head='e',foot='s'),
+  dict(name='Civic north',c=(-457,-20),r=4,head='n',foot='s'),
+  dict(name='Civic south',c=(-457,20),r=4,head='s',foot='n'),
+ ],
+ 'lifts':[dict(name='Estate Square',c=(-552.3,-112),r=1.6),dict(name='Market Square',c=(-533,129.7),r=1.6)],
+ 'max_to_way_down':75.0,'min_soffit':5.4,'min_open_beside':4.0,
+}
+DIRS={'n':(0,-1),'s':(0,1),'e':(1,0),'w':(-1,0)}
+def _deck_checks():
+    from shapely.geometry import LineString, Point, box as sbox
+    from shapely.ops import unary_union
+    D=DECK
+    if D['level']-D['depth']<D['min_soffit']: problems.append(('deck: soffit too low',))
+    ground=unary_union([sbox(*s[2:]) for s in STREETS]+[sbox(*o[1:]) for o in OPENS])
+    bldg=[(b_['n'],sbox(*b_['r'])) for b_ in named]+[(None,sbox(*l[:4])) for l in lots]
+    park=sbox(*PARK['rect'])
+    polys={}
+    for run in D['runs']:
+        P=LineString(run['pts']).buffer(run['w']/2,cap_style=2,join_style=2); polys[run['name']]=P
+        off=P.difference(ground).area
+        if off>0.5: problems.append(('deck: run leaves the streets and squares',run['name'],round(off,1)))
+        for n_,g in bldg:
+            if P.intersection(g).area>0.05: problems.append(('deck: run over a building',run['name'],n_))
+        if run['kind']=='bridge':
+            ln=LineString(run['pts']).length
+            if ln>D['max_span']+2: problems.append(('deck: skybridge span',run['name'],ln))
+    # a street the Deck runs along keeps an open strip beside it
+    for run in D['runs']:
+        if run['kind']=='bridge': continue
+        for a,c in zip(run['pts'],run['pts'][1:]):
+            along=(a[0]==c[0])
+            for s in STREETS:
+                r=s[2:]; sw=(r[2]-r[0]) if along else (r[3]-r[1])
+                seg=LineString([a,c])
+                if seg.intersection(sbox(*r)).length>20 and ((along and r[3]-r[1]>r[2]-r[0]) or (not along and r[2]-r[0]>r[3]-r[1])):
+                    if sw-run['w']<D['min_open_beside']-1e-6: problems.append(('deck: no open street beside',run['name'],s[0]))
+    for n_,p,what in D['doors']:
+        bb=[b_['r'] for b_ in named if b_['n']==n_][0]
+        if sbox(*bb).exterior.distance(Point(p))>0.6: problems.append(('deck: door not on its building',n_,p))
+        if not any(P.buffer(0.6).contains(Point(p)) for P in polys.values()): problems.append(('deck: door off the Deck',n_,p))
+    # ways down: in the park or on a square, clear of the park's features, head on the Deck, foot on a walk or square
+    pc=PARK['pond']['c']; prx,prz=PARK['pond']['r']
+    from shapely import affinity
+    pond=affinity.scale(Point(pc).buffer(1,64),prx,prz)
+    feats=[sbox(*PARK['dry_garden']),sbox(*PARK['lawn']),pond]+[Point(t).buffer(3) for t in PARK['wind_trees']]+[Point(t).buffer(2.5) for t in PARK['parasols']]
+    walks=unary_union([sbox(*w_) for w_ in PARK['walks']]+[sbox(*s[2:]) for s in STREETS]+[sbox(*o[1:]) for o in OPENS if o[0]!='park'])
+    deck=unary_union(list(polys.values()))
+    heads=[]
+    for t in D['ramps']+D['lifts']:
+        C=Point(t['c']).buffer(t['r'],64)
+        if C.difference(ground).area>0.5: problems.append(('deck: way down off the ground',t['name']))
+        if C.intersection(deck).area>0.05: problems.append(('deck: way down under the Deck',t['name']))
+        if C.distance(deck)>0.6: problems.append(('deck: way down does not meet the Deck',t['name']))
+        for f in feats:
+            if C.buffer(1.2).intersection(f).area>0: problems.append(('deck: way down on a park feature',t['name']))
+        for n_,g in bldg:
+            if C.intersection(g).area>0: problems.append(('deck: way down on a building',t['name'],n_))
+        if 'foot' in t:
+            dx,dz=DIRS[t['foot']]; f=Point(t['c'][0]+dx*(t['r']+1.2),t['c'][1]+dz*(t['r']+1.2))
+            if not walks.contains(f) or deck.contains(f): problems.append(('deck: ramp foot lands nowhere',t['name']))
+            hx,hz=DIRS[t['head']]; h=Point(t['c'][0]+hx*(t['r']+0.5),t['c'][1]+hz*(t['r']+0.5))
+            if not deck.buffer(0.1).contains(h): problems.append(('deck: ramp head not on the Deck',t['name']))
+        heads.append(Point(t['c']))
+    # no point on the Deck more than max_to_way_down from a way down, walking the Deck
+    import heapq
+    pts=[]; adj={}
+    for run in D['runs']:
+        line=LineString(run['pts']); n=max(2,int(line.length)+1); ids=[]
+        for i in range(n):
+            q_=line.interpolate(i/(n-1),normalized=True); pts.append((q_.x,q_.y)); ids.append(len(pts)-1)
+        for a,c in zip(ids,ids[1:]): adj.setdefault(a,[]).append((c,line.length/(n-1))); adj.setdefault(c,[]).append((a,line.length/(n-1)))
+    for i,p in enumerate(pts):
+        for j in range(i+1,len(pts)):
+            d=math.hypot(p[0]-pts[j][0],p[1]-pts[j][1])
+            if d<3.2: adj.setdefault(i,[]).append((j,d)); adj.setdefault(j,[]).append((i,d))
+    dist={}; hq=[]
+    for h in heads:
+        k=min(range(len(pts)),key=lambda i:h.distance(Point(pts[i])))
+        dist[k]=0; heapq.heappush(hq,(0,k))
+    while hq:
+        d,k=heapq.heappop(hq)
+        if d>dist.get(k,1e9): continue
+        for j,w_ in adj.get(k,[]):
+            if d+w_<dist.get(j,1e9): dist[j]=d+w_; heapq.heappush(hq,(d+w_,j))
+    far=max(dist.get(i,1e9) for i in range(len(pts)))
+    if far>D['max_to_way_down']: problems.append(('deck: a point is %.0f m from a way down'%far,))
+    D['_far']=round(far,1)
+    # columns: pairs at the run edges, spaced at most max_span, kept out of street mouths and park gates
+    keep=[]  # (the street or walk, runs east-west, its line grown 13 m along its length)
+    for r in [s_[2:] for s_ in STREETS]+list(PARK['walks']):
+        ew=r[2]-r[0]>r[3]-r[1]
+        keep.append((sbox(*r),ew,sbox(r[0]-13,r[1],r[2]+13,r[3]) if ew else sbox(r[0],r[1]-13,r[2],r[3]+13)))
+    cols=[]
+    for run in D['runs']:
+        if run['kind']=='bridge': continue
+        for a,c in zip(run['pts'],run['pts'][1:]):
+            ux,uz=(c[0]-a[0]),(c[1]-a[1]); L=math.hypot(ux,uz); ux/=L; uz/=L
+            mid=Point((a[0]+c[0])/2,(a[1]+c[1])/2); ew=abs(ux)>abs(uz)
+            bad=unary_union([g for o,e,g in keep if not (e==ew and o.contains(mid))])
+            e_=run['w']/2-0.4
+            def at(t,e): return (a[0]+ux*t-uz*e*e_,a[1]+uz*t+ux*e*e_)
+            def ok(t): return all(not bad.contains(Point(at(t,e))) and not any(g.buffer(0.05).contains(Point(at(t,e))) for _,g in bldg) for e in (-1,1))
+            ts=[i*0.5 for i in range(int(L*2)+1)]
+            okt=[t for t in ts if ok(t)]
+            if not okt: problems.append(('deck: no room for a column',run['name'])); continue
+            placed=[okt[0]]
+            on_run=any(Q.buffer(0.6).contains(Point(a)) for k_,Q in polys.items() if k_!=run['name'])
+            if placed[0]>(D['max_span'] if on_run else D['max_span']/2): problems.append(('deck: first column too far in',run['name'],placed[0]))
+            while placed[-1]<L-0.01:
+                nxt=[t for t in okt if placed[-1]<t<=placed[-1]+D['max_span']]
+                if L<=placed[-1]+D['max_span'] and L in okt: placed.append(L); break
+                if not nxt:
+                    later=[t for t in okt if t>placed[-1]]
+                    if not later: break
+                    problems.append(('deck: column span too long',run['name'],later[0]-placed[-1])); placed.append(later[0]); continue
+                placed.append(nxt[-1])
+            if L-placed[-1]>D['max_span']/2: problems.append(('deck: last column too far in',run['name'],L-placed[-1]))
+            for t in placed:
+                for e in (-1,1): cols.append(tuple(round(v,1) for v in at(t,e)))
+    D['columns']=sorted(set(cols))
+_deck_checks()
 ## Old Moy's tower houses (docs/architecture/moy_tower_house.md). Every Old
 ## Moy lot gets a kit: a tower house where the short side is 6 m or more
 ## (room for the 3.4 m ramp core inside 0.9 m earth walls), the later pencil infill
@@ -767,6 +933,17 @@ w("## The four wind turbines (tower centres), outside the Rim Walk.")
 w("const TURBINES: Array[Vector2] = [")
 for t in TURBINES: w("\tVector2(%g, %g)," % t)
 w("]")
+w("")
+from gd_plan import lit
+w("## The Deck at +6.5 m (city.md 6.2, 6a). runs: centrelines in world (x, z) with")
+w("## a width; kind ring, walk or bridge (a skybridge spanning its street, no")
+w("## columns). doors: [building, point on its face, what is there]. through:")
+w("## indoor runs at +6.5 m [from building, to building, what]. ramps: towers by")
+w("## the world's 32 degree ramp, head onto the Deck, foot onto the ground. lifts:")
+w("## glass public lifts. columns: pairs at the run edges, out of street mouths and")
+w("## park gates. Checked: on streets and squares only, never over a building, no")
+w("## point more than max_to_way_down from a ramp or lift (now %.0f m)." % DECK['_far'])
+w("const DECK := %s" % lit({k:v for k,v in DECK.items() if not k.startswith('_')}))
 w("const TURBINE_HUB_HEIGHT := 95.0")
 w("const TURBINE_ROTOR_RADIUS := 65.0")
 w("")
@@ -786,5 +963,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

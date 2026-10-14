@@ -106,6 +106,7 @@ computer.
 | Ci6 | City hall brief, exterior only, after Dudok's Hilversum and Stockholm City Hall (`city.md` 8a); the hero never goes inside | City | Approve | the user | 22 |
 | Ci7 | Library brief, art deco after Brooklyn's Central Library, the Great Hall and the heritage room (`city.md` 9) | City | Approve | the user | 22 |
 | Ci8 | Old Moy tower house kit (`moy_tower_house.md`) and the market lanes' street buildings (`moy_market_lanes.md`), both in `tools/city_layout.py` | City | Approve | the user | 22 |
+| Ci9 | The Deck's route (`city.md` 6, proposed 2026-10-14): `DECK` in `tools/city_layout.py` (the Park Deck ring, civic, library, estate and market walks, two skybridges, six ramp towers, two glass lifts, columns; checked on streets only, never over a building, every point within 75 m of a way down), written to `CityPlan.DECK`, drawn on `moy_plan.html` and `moy_city_3d.html`; and no city wall | City | Approve | the user | 22 |
 | Ci2 | Prototype the lit-window "interior mapping" shader and one real-size tower with a podium, before any city layout code | City | Ready | — | 22 |
 | **Across the game** |||||
 | X1 | Story-state triggers on revisit (`WorldState` flags read at arrival) | all | Ready | — | 13 |

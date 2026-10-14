@@ -182,6 +182,29 @@ promenade runs round the whole edge:
 Beyond it the paving stops and the desert begins. This is the line the city
 blorbs may not cross. It reads as an edge, never as a sign.
 
+**No wall (proposed 2026-10-14).** Moy has no defensive wall, for four
+reasons:
+- **Nothing a wall would stop.** Skeletons rise straight up out of open
+  ground and never in a town or city (world bible, NMEs). Proposed: they
+  cannot rise through paving or a built floor, so the line where Moy's
+  paving stops, the Rim Walk, is already the edge they cannot cross. A
+  wall would guard against nothing that walks in.
+- **The city blorbs are outcasts, not besiegers.** They are kept out by a
+  law (section 3b), and a wall would make the city's unkindness to them
+  literal and permanent; the open edge keeps the question of letting them
+  back in alive.
+- **History.** Moy grew in the boom from a well town that never needed
+  one: no roads lead to it and no neighbour threatens it. (Shibam, Old
+  Moy's precedent, was walled against raiders; Moy has none.)
+- **Play and arrival.** Every lane's gap in the Rim Walk is a way in, and
+  the skyline is seen whole from the desert. A wall would turn a city you
+  walk into from any side into one you enter by a gate.
+
+What the Rim Walk gives instead: the 0.9 m ledge, the palms and lamps,
+benches facing out, and Kate Byrne walking strays back out. If the story
+ever needs Moy to feel under threat, it reads in the residents (shutters
+pulled, signs unplugged), not in masonry.
+
 **Beyond the bounds** (in the ring between 200 and about 300 m; coordinates
 follow approval):
 - **All round: the city blorbs** stay out in the open desert just beyond the
@@ -448,7 +471,7 @@ city's bounds. **The rest is proposed.**
   - lifts stopped between floors, and the Grand Hotel's glass capsule
     lifts stopped halfway up its atrium with guests inside, in sight of
     every gallery;
-  - the Deck's moving walkways froze;
+  - the Deck's glass lifts stopped, and its lamps went out;
   - the Grand Hotel's chandelier went out for the first time in its history.
 - **The ordinance.** The city council, under Mayor Teodora Vance, banned city
   blorbs from inside the bounds. The Institute, under Dr. Vera Kask,
@@ -646,20 +669,58 @@ often.
    you can walk straight under, and covered linkways join the blocks to the
    hawker centre, the park and the Deck.
 2. **The Deck, at +6.5 m (two storeys up).** An elevated pedestrian network
-   after Hong Kong's footbridges. It runs over the podium roofs and bridges
-   the streets, linking:
-   - the hotel's mezzanine;
-   - the library's second floor;
-   - the office towers' lobbies;
-   - the market's upper hall;
-   - the downtown podiums and the Windspire's lobby;
-   - the estate's neighbourhood centre.
+   after Hong Kong's footbridges, routed in `DECK` in `tools/city_layout.py`
+   (proposed 2026-10-14) and drawn on the plan and the city model. Every run
+   has a job, and every branch ends at a door worth walking to at +6.5 m:
+   - **The Park Deck**, a 6 m ring over the park side of the Park Ring. The
+     walk beneath it is a shaded arcade along the park's edge; the 6 m of
+     street outside it stays open to the sky beside the shopfronts. It joins
+     every district, which is why the Deck is a ring and not a line.
+   - **The civic walks** along Civic Plaza's north and south edges, to city
+     hall's stone canopies at its corners (the north canopy leads along to
+     the north door, section 8a). From them, glazed **skybridges** cross
+     Meridian North into the Grand Hotel's mezzanine (section 8) and
+     Meridian South into the glass tower's Deck lobby. Inside, the hotel's
+     mezzanine runs through the party wall to the Windspire's lobby.
+   - **The Library walk**, over Garden Walk's mouth to the library's
+     east-wing door and its first gallery (section 9).
+   - **The Estate walk**, up the east half of North Street past the hawker
+     centre to the neighbourhood centre's roof garden, which is at the
+     Deck's level (two storeys of 3.25 m). The estate's covered linkways
+     meet it at Estate Square.
+   - **The Market walk**, down the east half of South Street past Hiro's
+     all-night store, then along Market Square's north edge to the wet
+     market's upper hall.
 
-   It is reached at every node by a **ramp tower** (a round tower with a
-   spiral ramp inside, the world's ramp rule at city scale), a **glass public
-   lift**, or an **inclined moving walkway** (the slope of an airport
-   travelator, about 12°, standing in for Hong Kong's escalators within the
-   no-stairs rule).
+   Not on the Deck, deliberately: BLOCK (a closed research institute), the
+   north and south towers (lots stand between them and the Deck; their
+   people use the street), Old Moy (its lanes are too narrow, and its
+   tower houses are older than the Deck).
+
+   **Ways down:** six **ramp towers**, 8 m across, each two flights of the
+   world's 32° ramp with a landing between: four at the park's gates,
+   where the park's cross walks meet the ring (each tower's foot opens onto
+   the walk, its head onto the Deck), and a pair framing Civic Plaza's
+   axis, under the two skybridges. **Glass public lifts** stand at Estate
+   Square and Market Square. Nowhere on the Deck is more than 75 m from a
+   way down (now 68 m), the ramp towers doubling as escape routes. The
+   first brief's **inclined moving walkways are dropped**: at 12° a 6.5 m
+   rise runs 31 m, more than any square can give up without being cut in
+   two.
+
+   **Construction:** a pale concrete deck 0.9 m deep on paired round
+   columns at its edges, no more than 12 m apart, so the soffit is 5.6 m
+   up. Columns stand clear of every street mouth and park gate (the line a
+   walker crosses on), and the skybridges span their street with none.
+   Steel rails 1.1 m high; the skybridges are glazed and roofed. Every
+   12 m street the Deck runs along keeps at least 4 m (here 6 m) open
+   beside it. All checked in the layout.
+
+   **Play:** the Deck is a second ground for the hero: a running loop
+   round the park, ledges into the plaza trees, and the low first rung of
+   the swing corridors (its rails are not anchors: too low for the vine's
+   7 m).
+
 3. **The towers.** Lifts in every lobby. In realised buildings they stop at
    the realised floors; elsewhere they are facade-only. Homes have open
    gallery corridors and ramp towers outside.
@@ -739,7 +800,8 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     **City hall heads the plaza on its axis**, facing west across the plaza
     to the park. The plaza's sides are private and unlike each other: the
     Grand Hotel on the north, the glass tower on the south. Shade trees,
-    misters and benches; Pia busks here; the Deck's main ramp tower.
+    misters and benches; Pia busks here; the Deck's two plaza ramp towers
+    frame the axis under the skybridges.
   - **Library Square**, on the park's west side where West Street arrives,
     with the library's curved front and its portal along the north side,
     and broad sitting steps before it.
@@ -1248,8 +1310,9 @@ the plan means gardens and the park only.
 
 Raman & Reese and Tanglewire share the glass tower on Civic Plaza. The
 start-up floors are in the north tower. Dr. Kask's flat is in the south
-tower. Five ramp towers (marked R on the plan) stand at the Deck's corners
-round the park and on Civic Plaza.
+tower. Six ramp towers (marked R on the plan) stand at the park's four gates
+and in a pair on Civic Plaza; glass lifts (L) at Estate Square and Market
+Square (section 6, the Deck).
 
 **The park**
 
@@ -2224,10 +2287,15 @@ lit crowns.
   up the outside of the tower, the chandelier hung down the void, the
   Windrose revolving lounge, the runnel of reclaimed water and the
   skybridge to the Deck.
+- (2026-10-14) the Deck's route (section 6): the Park Deck ring, the civic,
+  library, estate and market walks, two skybridges, six ramp towers and two
+  glass lifts; travelators dropped;
+- (2026-10-14) **no city wall** (the bounds, above): the Rim Walk stays the
+  edge, and skeletons never rising through paving is the reason none is
+  needed.
 
 **Open:**
 - the hotel's rest price;
-- the skybridges are folded into the Deck;
 - the park's small pond (kept, as plain reclaimed water, not a display);
 - whether the hero's own city blorbs may follow him inside the bounds.
   Proposed: the ban is the city's law, not a wall, so a party city blorb may
