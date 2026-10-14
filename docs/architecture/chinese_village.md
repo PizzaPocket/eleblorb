@@ -448,6 +448,13 @@ top. The shards are built bare, with pines.
 
 ### 4.1 Settlement re-fit (revised 2026-10-12)
 
+> **Superseded where they differ by 4.0 and 4.0a (2026-10-13).** The island
+> outlines, positions, bridge list, spans and bridge types here are the
+> 12 October re-fit; the current islands, bridges and abutments are in 4.0
+> (`tools/chinese_village_gorge.py`), and every placement, opening and path in
+> 4.0a (`tools/chinese_village_plan.py`). The reasoning below (land budget,
+> island roles, public space, farmland, water and edges) still stands.
+
 The first sketch (2026-10-06) kept the existing island sizes and only moved
 islands. This revision applies what the Ohio, Snow, fishing-village and
 Kai Mālie builds taught (see the `settlement-design` skill's lessons): a land

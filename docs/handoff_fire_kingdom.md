@@ -1,5 +1,7 @@
 # Handoff: Fire Kingdom Caldera City
 
+> **Snapshot of 2026-10-08, kept for the record.** Current state and next steps: `docs/architecture/settlement_backlog.md` (index rows Fi1, Fi2; section 4). The web build is deprecated.
+
 **Progress (2026-10-07).** The plan, live caldera ground, reservoir, all nine
 surface foundations, and the finished guest house exist and validate.
 

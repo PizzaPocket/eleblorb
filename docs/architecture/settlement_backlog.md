@@ -34,7 +34,7 @@ Every settlement pass follows the same order.
    are stable. Dialogue receives a final `no-ai-slop` pass and remains
    character-specific, diegetic and free of mechanic instructions.
 
-## Implementation index (updated 2026-10-12)
+## Implementation index (updated 2026-10-14)
 
 Everything decided so far that still has work to do, in one table. The
 numbered sections below hold the detail. States:
@@ -69,10 +69,10 @@ computer.
 | Fi1 | Arrival forecourt and the rest of the city from the approved briefs (steel frame, full glass panels, no wood) | Fire | Verify, then Ready | the user's walkthrough of the guest pavilion | 4 |
 | Fi2 | Ember Rest keeper's body (Eris Nahl) and the incinerating toilet | Fire | Ready (last of the character fixes) | — | 9, 11 |
 | **Chinese village** |||||
-| C1 | `ChinesePlan` data file and validator | Chinese | Ready | — | 18 |
-| C2 | Settlement re-fit: island sizes and moves, households by island, fields on D, ring of chain, cantilever and arch bridges, parapets | Chinese | Approve | approval of `chinese_village.md` 4.1 | 18 |
+| C1 | `ChinesePlan` data file and validator, generated from the JSON of `tools/chinese_village_gorge.py` and `tools/chinese_village_plan.py` | Chinese | Ready after C2 | C2 | 18 |
+| C2 | Settlement re-fit, revised 2026-10-13 and 14: eight islands as pieces of one broken plateau inside a ragged rim, ten bridges (two chain, eight cantilever) seated on squared stone abutments, every home, court, field, opening and path placed (54 items, 38 openings, 64 paths); 3D model `chinese_gorge_3d.html` | Chinese | Approve | approval of `chinese_village.md` 4.0 and 4.0a | 18 |
 | C3 | Story revision in code: Lu and Lu Hao keep the inn, Lu a man; no romance; Liang Zhen advisor in the records room and the Chef's old room | Chinese | Ready (names pending) | Lu's given name, Lu Hao's characters | 17a |
-| C4 | Palace in both states, with civic dressing on the story flag | Chinese | Ready | C1 | 12, 13 |
+| C4 | Palace in both states, with civic dressing on the story flag | Chinese | Ready after C1 | C1 | 12, 13 |
 | C5 | Rank-based charter builders: homes (brick plinth and piers, plaster, grey hard gables, kang), the inn's Shihu Yuan pieces, the palace garden (moon gates, lattice screens, wave copings, pavilions, rocks, pines, lanterns) | Chinese | Ready | C2 | 17a |
 | C6 | Dress charter garments and every resident's look | Chinese | Ready | — | 14 |
 | C7 | The sealing rock stays (built); its lore to be revisited | Chinese | Deferred | the user | 19 |
@@ -95,13 +95,17 @@ computer.
 | Sk2 | Plan file and audit: `tools/sky_kingdom_layout.py` (podiums, ramps, forecourts, 3 m routes, groves) and the 3D model; the arrival view (terrace Aethra?), the heading, Dromos's crossing (`sky_kingdom_layout.md` 8) | Sky | Decide | the user | 6 |
 | **Ocean Kingdom** |||||
 | Oc1 | The four briefs, layouts, ships, planting and ocean floor | Ocean | Approve | the user | 8 |
-| Oc2 | Shared dry-volume system (ships below the waterline, air halls, tunnels) | shared | Ready after Oc1 | Oc1 | 8 |
+| Oc1a | Sea folk city third pass (2026-10-13 and 14): the classical floor under one glass enclosure, the modern column of bubbles, trunks and tunnels, and its air (one pressure set by a datum 4.4 m up, 11 moon pools at the datum, 21 lock chambers above it, the fountain lock); `tools/sea_folk_third_pass.py`; drawings `sea_city_3d.html`, `sea_plans.html` | Ocean | Approve | the user | 8 |
+| Oc2 | Shared dry-volume system (ships below the waterline, air halls, tunnels, moon pools as open water surfaces, lock chambers that fill and drain) | shared | Ready after Oc1 | Oc1, Oc1a | 8 |
 | Oc3 | How tournament fights work; the mongooses' harmony quest | Ocean | Decide | the user | 8, 13 |
 | **The city** |||||
 | Ci1 | Settlement plan, third revision: a desert city with no water nearby, its wells and economy, no cars or trains, a dense walkable Tokyo and Hong Kong neighbourhood, a downtown of skyscrapers, Singapore-style public housing, Pinestein and the outcast city blorbs, a census of forty-five named residents, four movement layers (ground, the Deck, towers, roofs), Leaf Hat swing corridors, site radius 200 m, the Grand Hotel and the library | City | Layout code-ready: `CityPlan` and its validator (2026-10-12); awaiting approval of the brief | the user | 22 |
 | Ci3 | Move the wild city blorbs' spawns and the City Gem outside the city's bounds (the desert just beyond the outskirts), and keep city blorbs' roaming outside the Rim Walk | City | Approve with Ci1 | Ci1's layout | 22 |
 | Ci4 | Wind farm: one instanced turbine (tapered tower, nacelle, animated three-blade rotor whose blades collide with the player and every controller (moving solid bodies, push capped, no damage), blinking aviation light, far LOD), then the four sites in `city.md` 2a (two pairs framing Moy, clear of the Jungle and Ice plateaus), after a terrain-height check | City | Approve with Ci1 | Ci1 | 22 |
 | Ci5 | Grand Hotel brief revised in John Portman's manner (`city.md` 8, proposed 2026-10-13): atrium block with a leaning front, ribbed cylinder tower, glass capsule lifts in slots let into the tower's face, chandelier down the void from an arm out of the tower, a one-pitch skylight shedding away from the tower to gutters and a rain cistern (8.4, 8.5, 8.8, revised 2026-10-14), the Windrose revolving drum, skybridge to the Deck; `HOTEL` in `tools/city_layout.py`; drawing `moy_grand_hotel_3d.html` | City | Approve | the user | 22 |
+| Ci6 | City hall brief, exterior only, after Dudok's Hilversum and Stockholm City Hall (`city.md` 8a); the hero never goes inside | City | Approve | the user | 22 |
+| Ci7 | Library brief, art deco after Brooklyn's Central Library, the Great Hall and the heritage room (`city.md` 9) | City | Approve | the user | 22 |
+| Ci8 | Old Moy tower house kit (`moy_tower_house.md`) and the market lanes' street buildings (`moy_market_lanes.md`), both in `tools/city_layout.py` | City | Approve | the user | 22 |
 | Ci2 | Prototype the lit-window "interior mapping" shader and one real-size tower with a podium, before any city layout code | City | Ready | — | 22 |
 | **Across the game** |||||
 | X1 | Story-state triggers on revisit (`WorldState` flags read at arrival) | all | Ready | — | 13 |
@@ -923,9 +927,9 @@ call, since the shop UI is where players read what an item is.
 - Open: Lu's given name; Lu Hao's characters (吕浩 assumed). The user will
   supply both.
 
-## 18. Chinese village settlement re-fit (2026-10-12, awaiting approval)
+## 18. Chinese village settlement re-fit (2026-10-12; islands and placements revised 2026-10-13, awaiting approval)
 
-Full brief: `chinese_village.md` 4.1, with the islands revised in 4.0 (2026-10-13, proposed): each island a torn piece of one broken plateau, drifted apart asymmetrically with torn keels, and the north piece's shards floating bare, inside a ragged rim 170 to 216 m out; `tools/chinese_village_gorge.py`. Every placement on the islands is in 4.0a, from `tools/chinese_village_plan.py` (54 items, 28 routes, all checks passing), drawn by rank and in the Shihu Yuan manner in `docs/drawings/chinese_gorge_3d.html`; `ChinesePlan` should be generated from that tool's JSON. The positions below are superseded by 4.0 and 4.0a. Code when approved:
+Full brief: `chinese_village.md` 4.1, with the islands revised in 4.0 (2026-10-13, proposed): each island a torn piece of one broken plateau, drifted apart asymmetrically with torn keels, and the north piece's shards floating bare, inside a ragged rim 170 to 216 m out; `tools/chinese_village_gorge.py`. Every placement on the islands is in 4.0a, from `tools/chinese_village_plan.py` (54 items on 8 islands, 38 wall and gate openings, 64 paths; 0 problems as of 2026-10-14), with every bridge seated on a squared stone abutment (4.0), drawn by rank and in the Shihu Yuan manner in `docs/drawings/chinese_gorge_3d.html`; `ChinesePlan` should be generated from that tool's JSON. The positions below are superseded by 4.0 and 4.0a. Code when approved:
 - New radii in `scripts/chinese_village.gd`: A 25, B 27, C 22, D 34, E 27,
   Gate 18 (new island at (0, 150)), Bamboo 32 moved to (80, 112). Every
   island stays inside the Abyss's 170 m full-depth radius. (Superseded: island
