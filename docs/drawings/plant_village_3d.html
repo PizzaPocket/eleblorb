@@ -306,13 +306,16 @@ function atapRoof(g, w, d, plate, top, opts = {}) {
   const apexY = plate + run * Math.tan(ang), eaveY = plate - e * Math.tan(ang);
   const outl = seOutline(w / 2 + e, d / 2 + e);
   const ridgePt = ([x, z]) => along ? [Math.max(-ridge, Math.min(ridge, x)), 0] : [0, Math.max(-ridge, Math.min(ridge, z))];
-  const ring = (f, lift) => outl.map(p => { const q = ridgePt(p); return [p[0] + (q[0] - p[0]) * f, eaveY + (apexY - eaveY) * f + lift, p[1] + (q[1] - p[1]) * f]; });
+  // a hip roof's height at any point of its plan is the plate's height plus the pitch times the point's distance in from the
+  // nearest plate edge (negative past it, under the eave): so the roof sits on the plate everywhere, corners included
+  const hAt = (x, z) => Math.min(apexY, plate + Math.tan(ang) * Math.min(w / 2 - Math.abs(x), d / 2 - Math.abs(z)));
+  const ring = (f, lift) => outl.map(p => { const q = ridgePt(p), x = p[0] + (q[0] - p[0]) * f, z = p[1] + (q[1] - p[1]) * f; return [x, hAt(x, z) + lift, z]; });
   // three overlapping courses: old, middle, and the newest on top in the household's colour
   const courses = opts.grey ? [[0, 0.5, TH.grey], [0.42, 0.8, TH.grey], [0.74, 1, TH.grey]] : [[0, 0.5, TH.old], [0.42, 0.8, TH.mid], [0.74, 1, top]];
   courses.forEach(([f0, f1, m], k) => { const l = 0.08 * k; loft(g, ring(f0, l + RF.thatch), ring(f1, l + RF.thatch), m); loft(g, ring(f0, l + RF.thatch), ring(f0, l), m); });
   // the underside, where the rafters show
   loft(g, ring(0, 0), ring(1, 0), TH.bamboo);
-  for (let i = 0; i < outl.length; i += 4) { const p = outl[i], q = ridgePt(p); pole(g, V(p[0] * 0.98, eaveY - 0.04, p[1] * 0.98), V(q[0], apexY - 0.05, q[1]), 0.05, TH.bamboo); }
+  for (let i = 0; i < outl.length; i += 4) { const p = outl[i], q = ridgePt(p), x0 = p[0] * 0.97, z0 = p[1] * 0.97; pole(g, V(x0, hAt(x0, z0) - 0.06, z0), V(q[0], apexY - 0.06, q[1]), 0.05, TH.bamboo); }
   // the ridge: a rolled leaf bundle, its ends tied off, or a tied finial at a pyramid's peak
   if (ridge > 0.2) { const o = add(eggGeo(along ? ridge + 0.4 : 0.28, 0.24, along ? 0.28 : ridge + 0.4, 2.4, 2.4), top, 0, apexY + RF.thatch + 0.12, 0, g); }
   else egg(0.32, 0.4, 0.32, 2.4, 2.4, top, 0, apexY + RF.thatch + 0.25, 0, g);
@@ -324,11 +327,12 @@ function postFrame(g, w, d, plate, opts = {}) {
   const xs = [], zs = [], nx = Math.max(1, Math.ceil(w / 3.8)), nz = Math.max(1, Math.ceil(d / 3.8));
   for (let i = 0; i <= nx; i++) xs.push(-w / 2 + w * i / nx); for (let i = 0; i <= nz; i++) zs.push(-d / 2 + d * i / nz);
   const posts = []; for (const x of xs) for (const z of [-d / 2, d / 2]) posts.push([x, z]); for (const z of zs.slice(1, -1)) for (const x of [-w / 2, w / 2]) posts.push([x, z]);
-  for (const [x, z] of posts) { if (opts.skip && opts.skip(x, z)) continue; pole(g, V(x, 0, z), V(x, plate, z), 0.13, M.barkDark); add(new THREE.CylinderGeometry(0.16, 0.16, 0.22, 8), TH.lash, x, plate - 0.25, z, g); }
+  const pl = plate - 0.13;     // the plate beam's centre: its top just meets the rafters' feet
+  for (const [x, z] of posts) { if (opts.skip && opts.skip(x, z)) continue; pole(g, V(x, 0, z), V(x, pl, z), 0.13, M.barkDark); add(new THREE.CylinderGeometry(0.16, 0.16, 0.22, 8), TH.lash, x, pl - 0.2, z, g); }
   for (const [a, b] of [[[-w / 2, -d / 2], [w / 2, -d / 2]], [[w / 2, -d / 2], [w / 2, d / 2]], [[w / 2, d / 2], [-w / 2, d / 2]], [[-w / 2, d / 2], [-w / 2, -d / 2]]])
-    pole(g, V(a[0], plate, a[1]), V(b[0], plate, b[1]), 0.11, TH.bamboo);
-  if (opts.pillar !== false) { const top = plate + Math.min(w, d) / 2 * Math.tan(rad(RF.pitch)); pole(g, V(0, 0, 0), V(0, top, 0), 0.22, M.bark); add(new THREE.CylinderGeometry(0.26, 0.26, 0.3, 10), TH.lash, 0, plate - 0.3, 0, g);
-    if (Math.abs(w - d) > 0.2) { const r = Math.abs(w - d) / 2; pole(g, w > d ? V(-r, top - 0.1, 0) : V(0, top - 0.1, -r), w > d ? V(r, top - 0.1, 0) : V(0, top - 0.1, r), 0.12, TH.bamboo); } }
+    pole(g, V(a[0], pl, a[1]), V(b[0], pl, b[1]), 0.11, TH.bamboo);
+  if (opts.pillar !== false) { const top = plate + Math.min(w, d) / 2 * Math.tan(rad(RF.pitch)) - 0.3; pole(g, V(0, 0, 0), V(0, top, 0), 0.22, M.bark); add(new THREE.CylinderGeometry(0.26, 0.26, 0.3, 10), TH.lash, 0, plate - 0.3, 0, g);
+    if (Math.abs(w - d) > 0.2) { const r = Math.abs(w - d) / 2; pole(g, w > d ? V(-r, top + 0.05, 0) : V(0, top + 0.05, -r), w > d ? V(r, top + 0.05, 0) : V(0, top + 0.05, r), 0.12, TH.bamboo); } }
 }
 function floor(g, w, d, m = M.plank) { egg(w / 2 + 0.15, 0.12, d / 2 + 0.15, 5.5, 5.5, m, 0, 0.06, 0, g); }
 function weaveWall(g, x0, z0, x1, z1, h, y0 = 0) { const L = Math.hypot(x1 - x0, z1 - z0), o = add(new THREE.BoxGeometry(L, h, 0.08), TH.weave, (x0 + x1) / 2, y0 + h / 2, (z0 + z1) / 2, g); o.rotation.y = -Math.atan2(z1 - z0, x1 - x0); return o; }
@@ -458,8 +462,8 @@ const boxPoly = p => { const xs = p.map(q => q[0]), zs = p.map(q => q[1]); retur
     // the house's walls and on a row of veranda posts at the 1.9 m module, lashed at their heads
     const V_ = D.inn.veranda, rg = new THREE.Group(); rg.position.set(hx - V_ / 2, cy, hz); P.add(rg);
     const wx = hw + V_, nz = Math.round(hd / 3.8);
-    for (let i = 0; i <= nz; i++) { const z = -hd / 2 + hd * i / nz; pole(rg, V(-wx / 2 + 0.15, 0, z), V(-wx / 2 + 0.15, H, z), 0.14, M.barkDark); add(new THREE.CylinderGeometry(0.17, 0.17, 0.22, 8), TH.lash, -wx / 2 + 0.15, H - 0.25, z, rg); }
-    for (const [a, b] of [[[-wx / 2, -hd / 2], [wx / 2, -hd / 2]], [[wx / 2, -hd / 2], [wx / 2, hd / 2]], [[wx / 2, hd / 2], [-wx / 2, hd / 2]], [[-wx / 2, hd / 2], [-wx / 2, -hd / 2]]]) pole(rg, V(a[0], H, a[1]), V(b[0], H, b[1]), 0.12, TH.bamboo);
+    for (let i = 0; i <= nz; i++) { const z = -hd / 2 + hd * i / nz; pole(rg, V(-wx / 2 + 0.15, 0, z), V(-wx / 2 + 0.15, H - 0.14, z), 0.14, M.barkDark); add(new THREE.CylinderGeometry(0.17, 0.17, 0.22, 8), TH.lash, -wx / 2 + 0.15, H - 0.35, z, rg); }
+    for (const [a, b] of [[[-wx / 2, -hd / 2], [wx / 2, -hd / 2]], [[wx / 2, -hd / 2], [wx / 2, hd / 2]], [[wx / 2, hd / 2], [-wx / 2, hd / 2]], [[-wx / 2, hd / 2], [-wx / 2, -hd / 2]]]) pole(rg, V(a[0], H - 0.14, a[1]), V(b[0], H - 0.14, b[1]), 0.12, TH.bamboo);
     atapRoof(rg, wx, hd, H, M.roofInn);
     floor(rg, wx, hd);
     label("Bima's inn", "rest point · 15 Tokoins", hx, cy + 6.5, hz, "plan", 160);
