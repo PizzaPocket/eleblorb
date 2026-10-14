@@ -60,7 +60,7 @@ code { font-family: var(--mono); font-size: .9em; }
   <header>
     <div class="eyebrow">Eleblorb · Moy · the rest point, after John Portman · proposed 2026-10-13</div>
     <h1>The Grand Hotel in 3D</h1>
-    <p class="lede">Moy's first tall building, redesigned in the manner of John Portman's atrium hotels: a white concrete block of twelve levels round an atrium 44 m high, and a ribbed cylinder tower whose glass lifts climb from the atrium floor, out through a solid collar beside the skylight and up its face in glass hoistways, to the revolving Windrose in the drum. True size, on its block on Civic Plaza, with its neighbours as plain blocks at their planned heights. Turn on the cut-away to look into the atrium.</p>
+    <p class="lede">Moy's first tall building, redesigned in the manner of John Portman's atrium hotels: a white concrete block of twelve levels round an atrium 44 m high, and a ribbed cylinder tower whose glass lifts climb in continuous glass hoistways from the atrium floor, through openings in the roof beside the skylight, up its face to the revolving Windrose in the drum. True size, on its block on Civic Plaza, with its neighbours as plain blocks at their planned heights. Turn on the cut-away to look into the atrium.</p>
   </header>
 
   <div class="explore">
@@ -85,7 +85,7 @@ code { font-family: var(--mono); font-size: .9em; }
     <h2>What building the model turned up</h2>
     <p>The hotel's dimensions are data in the city's plan tool (<code>HOTEL</code> in <code>tools/city_layout.py</code>), with checks, and this model and the plan drawings are drawn from it. The brief is <code>docs/architecture/city.md</code>, section 8.</p>
     <div class="find"><b>Resolved</b><div><p>The old plan and the old brief disagreed: the plan file had the guest tower at 25 floors and 97 m, the brief at 21 floors and 91 m to a 100 m lantern. Both now read from one set of levels: ground 6.5 m, mezzanine 5 m, then 3.25 m a level, so level 12 tops out at 44 m (the atrium block's roof) and level 28 at 96 m (the tower's roof), with the drum to 108 m. The plan tool fails if they drift apart.</p></div></div>
-    <div class="find"><b>Resolved</b><div><p>The lifts no longer pass through glass. Both earlier drawings ran the capsules up through the skylight. The court's roof round the tower's foot is now a solid concrete collar, 4.6 m wide, that the skylight springs from. The capsules leave the atrium through the collar and ride in their own sealed glass hoistways up the tower's face, each at least 0.8 m clear of the skylight.</p></div></div>
+    <div class="find"><b>Resolved</b><div><p>The lifts no longer pass through glass. Both earlier drawings ran the capsules up through the skylight. Now each capsule runs its whole height in its own continuous glass hoistway, from the atrium floor up through the roof and up the tower's face to the drum. Round the tower's foot the roof is solid concrete, a collar 4.6 m wide that the skylight springs from, and each hoistway passes up through its own opening in it, sealed by a bronze ring. Nothing stands across a capsule's path, and every hoistway is at least 0.8 m clear of the skylight.</p></div></div>
     <div class="find"><b>Resolved</b><div><p>What the chandelier hangs from. The first drawing hung it from one glazing truss 0.35 m wide, on its sloping flank 6 m off the ridge, and the glazing trusses near the middle ran 6 m into the tower. Now a steel hoist girder 3.4 m deep spans the void 36 m from east to west, straight over the chandelier, bearing 2 m into each range's concrete frame. It is also the skylight's ridge, and the glazing trusses run from it to a ring beam on the tower's face. Two hoist ropes and two safety ropes hang from a pulley block under it. The winch room stands on the east range's roof, outside the glass, and a catwalk inside the girder reaches the block. A handwheel lowers the chandelier if the power fails. See "What it hangs from".</p></div></div>
     <div class="find"><b>Resolved</b><div><p>The chandelier now hangs 16 m down a void 32 m across, so it is 12 m or more from any gallery. The old brief's perch, "reached from level 4's gallery by a jump", cannot work any more. Its crown becomes a <b>Leaf Hat swing anchor</b> instead, 24.5 m above the mezzanine, for swinging gallery to gallery; it is still a perch for a hero who swings onto it. The plan tool checks that it clears every gallery by 2 m, the tower by 4 m and the glass lifts by 1.5 m, and that lowered 10 m for its yearly cleaning it clears the pavilion's roof.</p></div></div>
     <div class="find"><b>Resolved</b><div><p>The leaning front narrows the void as it rises: 26 m north to south at the floor, 18 m at the top (with the tower's curve, 12 m at its narrowest). That is as far as it can lean, 0.8 m a level, before the chandelier and the capsule lifts crowd each other. The double ramp, curving round the rock garden, rises 6.5 m over about 12.9 m at 27°, inside the world's 32°.</p></div></div>
@@ -285,8 +285,18 @@ for (let x = VO.x[0]; x < VO.x[1] - 0.01; x += 4) {          // bronze glass, ba
     put(g, "sky", "sky", 0, 0.1, 0);
   }
 }
-// the lift collar: a solid concrete roof round the tower's foot, and the ring beam at its edge that the north trusses spring from
-for (let x = VO.x[0]; x < VO.x[1]; x += 0.5) { const f = face(x + 0.25); if (zN(x + 0.25) > VO.z_north + 0.01) box(x, R0 - 0.4, Math.max(VO.z_north, f - 0.5), x + 0.5, R0 + 0.3, zN(x + 0.25), "hotel", "conc"); box(x, R0 - 0.5, zN(x + 0.25) - 0.3, x + 0.5, R0 + 0.35, zN(x + 0.25) + 0.3, "hotel", "conc"); }
+// the lift collar: the concrete roof round the tower's foot, cut round each lift's glass hoistway and sealed to it,
+// and the ring beam at its edge that the north trusses spring from
+const HW = H.lifts.bearings.map(b => { const a = b * Math.PI / 180; return [TX + H.lifts.track * Math.sin(a), TZ + H.lifts.track * Math.cos(a)]; }), HWR = H.lifts.hoistway_r + 0.1;
+for (let x = VO.x[0]; x < VO.x[1]; x += 0.5) {
+  const xc = x + 0.25, f = face(xc), z0 = Math.max(VO.z_north, f - 0.5), z1 = zN(xc);
+  if (z1 > VO.z_north + 0.01) {
+    let cuts = HW.filter(([hx]) => Math.abs(hx - xc) < HWR).map(([hx, hz]) => { const h = Math.sqrt(HWR * HWR - (hx - xc) * (hx - xc)); return [hz - h, hz + h]; }).sort((a, b) => a[0] - b[0]);
+    let za = z0; for (const [c0, c1] of cuts) { if (c0 > za) box(x, R0 - 0.4, za, x + 0.5, R0 + 0.3, c0, "hotel", "conc"); za = Math.max(za, c1); }
+    if (z1 > za) box(x, R0 - 0.4, za, x + 0.5, R0 + 0.3, z1, "hotel", "conc");
+  }
+  box(x, R0 - 0.5, z1 - 0.3, x + 0.5, R0 + 0.35, z1 + 0.3, "hotel", "conc");
+}
 // the hoist girder: top and bottom chords, posts and diagonals, the catwalk inside; white-cased like the trusses
 box(HG.x[0], HG.top - 0.5, HG.z - 0.5, HG.x[1], HG.top, HG.z + 0.5, "chand", "conc");
 box(HG.x[0], HG.bottom, HG.z - 0.6, HG.x[1], HG.bottom + 0.5, HG.z + 0.6, "chand", "conc");
@@ -321,8 +331,11 @@ LIFT.bearings.forEach((b, i) => {
   radial(TX, TZ, TR, a, 1.6, LIFT.track - TR - LIFT.r, 0, LIFT.top, "lifts", "bronze");
   // above the court roof the capsule rides in its own sealed glass hoistway up the tower's face; it leaves the
   // atrium through the lift collar, never through the skylight
-  cyl(x, z, LIFT.hoistway_r, LIFT.hoistway_r, R0, H.drum.tank[0], "lifts", "hoistway", 24, true);
-  for (let yy = R0; yy < H.drum.tank[0]; yy += 6.5) cyl(x, z, LIFT.hoistway_r + 0.05, LIFT.hoistway_r + 0.05, yy, yy + 0.25, "lifts", "bronze", 24, true);
+  // each capsule runs its whole height in its own glass hoistway, from the atrium floor to the drum; the roof is
+  // cut round the hoistway and sealed to its glass, so nothing stands across a capsule's path
+  cyl(x, z, LIFT.hoistway_r, LIFT.hoistway_r, 0, H.drum.tank[0], "lifts", "hoistway", 24, true);
+  cyl(x, z, LIFT.hoistway_r + 0.25, LIFT.hoistway_r + 0.25, R0 - 0.5, R0 + 0.5, "lifts", "bronze", 24, true);   // the seal where it passes the roof
+  for (let yy = 6.5; yy < H.drum.tank[0]; yy += 6.5) cyl(x, z, LIFT.hoistway_r + 0.05, LIFT.hoistway_r + 0.05, yy, yy + 0.25, "lifts", "bronze", 24, true);
   const y = capH[i];
   egg(LIFT.r, 1.7, LIFT.r, 2.6, 2.6, x, y + 1.7, z, "lifts", "capsule");
   cyl(x, z, LIFT.r * 1.02, LIFT.r * 1.02, y + 1.55, y + 1.85, "lifts", "bronze", 20, true);
@@ -454,7 +467,7 @@ const PLACES = [
   { id: "ramps", t: "The double ramp", s: "to the mezzanine and the Chandelier Room", cam: [9, 9, 15], at: [-10, 3, 9],
     p: "Two board-formed ramps curve out either side of the rock garden from the atrium floor to the mezzanine, 6.5 m up over about 12.9 m, at 27°, inside the world's 32°, each 2.4 m wide with landings at foot and head. Their undersides are open and smooth. The Chandelier Room's round terrace hangs 5 m out into the void beside the chandelier. Below, the runnel carries the city's reclaimed water across the floor to the park's reed pond, cooling the air on the way.", who: "" },
   { id: "lifts", t: "The capsule lifts", s: "up the tower's face and out through the roof", cam: [-14, 12, 2], at: [0, 42, -4], cut: true,
-    p: "Four glass capsules in bronze frames, outlined in bulbs, ride rails on the tower's south face. They rise from the atrium floor, stop at the mezzanine and every level, leave the atrium through the concrete lift collar beside the skylight, never through its glass, and climb the outside of the tower in their own sealed glass hoistways to the Windrose. On the night of the Blackout they stopped here, halfway up the atrium, with guests inside.", who: "the hero's ride to the party's suite on level 27" },
+    p: "Four glass capsules in bronze frames, outlined in bulbs, ride rails on the tower's south face. They rise from the atrium floor, stop at the mezzanine and every level, and climb on up the outside of the tower to the Windrose. Each runs its whole height inside its own glass hoistway, which passes up through an opening cut for it in the concrete roof beside the skylight. On the night of the Blackout they stopped here, halfway up the atrium, with guests inside.", who: "the hero's ride to the party's suite on level 27" },
   { id: "night", t: "At night", s: "the lit void, the capsules, the turning crown", cam: [60, 50, 150], at: [0, 50, -10], night: true,
     p: "The atrium glows through the skylight and the terraces, the four capsules climb the white tower, the Windrose turns its ring of light at the top, and the chandelier is lit in the middle of it all.", who: "" },
 ];

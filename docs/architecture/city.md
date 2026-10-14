@@ -1517,15 +1517,25 @@ collar** (or to the north range at the void's corners, beyond the tower), and
 south to the leaning front, with bronze glass between. A clerestory of louvres
 runs round the skylight's edge.
 
-**The lift collar** (2026-10-14). The capsules cannot pass through the glass,
-as both earlier drawings had them do, through the skylight or through "glazed
-sleeves" in it. So the court's roof round the tower's foot is solid concrete,
-from the tower's face out 4.6 m to the ring beam the skylight springs from. The
-four lifts run 1.4 to 1.8 m off the tower's face and leave the atrium through
-this collar. Above it each capsule rides in its own sealed glass hoistway, 3.5 m
-across, up the tower's face to the drum. Each hoistway is banded in bronze at
-every second level and stands at least 0.8 m clear of the skylight.
-`tools/city_layout.py` checks the clearance.
+**The lifts' hoistways and the lift collar** (2026-10-14). A capsule cannot
+pass through a roof unless the roof is cut round its path, and both earlier
+drawings ran the capsules up through the skylight's glass. Now:
+- **One continuous shaft per lift.** Each capsule runs its whole height
+  inside its own sealed glass hoistway, 3.5 m across. The hoistway rises from
+  the atrium floor, up the void beside the tower, through the roof, and up the
+  tower's face to the drum. Inside the atrium it is clear glass, so the
+  capsules still read as riding free up the void. It is banded in bronze at
+  every second level, with doors to the gallery bridges at each stop.
+- **The roof is cut round each shaft.** Round the tower's foot the court's
+  roof is solid concrete, from the tower's face out 4.6 m to the ring beam
+  that the skylight springs from: the **lift collar**. Each hoistway passes
+  up through its own opening in the collar, sealed to the hoistway's glass by
+  a bronze ring. Nothing stands across a capsule's path, and the weather
+  stays out because the hoistway itself is the enclosure.
+- **Clear of the skylight.** The four lifts run 1.4 to 1.8 m off the tower's
+  face, so every hoistway stands at least 0.8 m clear of the skylight's ring
+  beam. `tools/city_layout.py` checks this, and that every hoistway is 1.5 m
+  clear of the chandelier.
 
 **The double ramp.** Two board-formed concrete ramps curve out either
 side of the rock garden, from feet at (18, 38) and (34, 38) on the
@@ -1538,9 +1548,10 @@ smooth, sculpture as much as route, in Portman's way.
 **The capsule lifts.** Four glass capsules, 2.6 m across, in bronze frames
 outlined in bulbs, ride rails on the tower's south face at 12° and 36°
 either side of due south. They rise from the atrium floor, stop at the
-mezzanine (by a short bridge) and every level, leave the atrium through
-the lift collar beside the skylight, and climb the outside of the tower in
-their glass hoistways, in full view of the plaza, to the Windrose at +101 m. At night the four lit capsules moving up the
+mezzanine (by a short bridge) and every level, and climb on up the outside
+of the tower, in full view of the plaza, to the Windrose at +101 m. Each runs
+its whole height in its own continuous glass hoistway, which passes through
+the roof at the lift collar (8.4). At night the four lit capsules moving up the
 white tower are the hotel's sign.
 
 **Circulation:**

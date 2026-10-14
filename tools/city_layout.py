@@ -334,8 +334,9 @@ HOTEL={
  'drum':{'r':16,'tank':(96.0,101.0),'lounge':(101.0,105.5),'dome_top':108.0},
  # four glass capsules on the tower's south face, bearings from due south
  'lifts':{'bearings':[-36,-12,12,36],'r':1.3,'track':15.4,'top':101.0,
-          # above the atrium each capsule rides in its own sealed glass hoistway on the
-          # tower's face, from the court roof to the drum, so no capsule passes through glass
+          # each capsule runs its whole height in its own sealed glass hoistway, from the
+          # atrium floor up the tower's face to the drum; the roof is cut round each
+          # hoistway and sealed to its glass, so nothing stands across a capsule's path
           'hoistway_r':1.75},
  # the lift collar: a solid concrete roof round the tower's foot at the court roof,
  # from the tower's face out to the skylight's north ring beam; the hoistways rise
@@ -388,7 +389,7 @@ def _hotel_checks():
     for b_ in H['lifts']['bearings']:
         a=math.radians(b_); lx,lz=tx+H['lifts']['track']*math.sin(a),tz+H['lifts']['track']*math.cos(a)
         if not v['x'][0]+H['lifts']['r']<=lx<=v['x'][1]-H['lifts']['r'] or lz<v['z_north']: problems.append(('hotel: lift outside the void',b_))
-        if math.dist((lx,lz),(cx,cz))-cr-H['lifts']['r']<1.5: problems.append(('hotel: lift within 1.5 m of the chandelier',b_))
+        if math.dist((lx,lz),(cx,cz))-cr-H['lifts']['hoistway_r']<1.5: problems.append(('hotel: lift hoistway within 1.5 m of the chandelier',b_))
     if ch['bottom']-ch['lowered']<=H['rock_garden']['pavilion'][2]: problems.append(('hotel: lowered chandelier hits the pavilion',))
     # the hoist girder: straight over the chandelier, bearing 2 m into each range,
     # clear of the tower and of the lifts' sleeves, its winch room on the east
