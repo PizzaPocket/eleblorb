@@ -118,10 +118,13 @@ def ground(x, z):
     h += 2 * (1 - sm(20, 25, d))
     h -= 2 * sm(45, 46.6, d) * (1 - sm(51.4, 53, d))
     return h
-GW_FLOOR = round(ground(0, 118) + 0.6, 2)
+# Its floor is the network's datum (NET_FLOOR, the air below): the first bubble
+# set the pressure every later dry space keeps. The slope here is 3.4 m up, so
+# the glass sits on a low nacre socket to bring the floor to the datum.
+GW_FLOOR = NET_FLOOR
 egg('glassworks', 'The Glassworks', 'modern', (0.0, GW_FLOOR - 2.0, 118.0), (8.0, 10.0, 8.0), 2.4, 90.0, True, 'grounded',
     cut=GW_FLOOR - 0.6, floor=GW_FLOOR, keeper='Kunei and Damaku', lock=True, smoked=True,
-    program='the furnace over the vent, the blowing floor, the cooling racks; the first air bubble')
+    program='the furnace over the vent, the blowing floor, the cooling racks; the air engine; the first air bubble')
 
 ## The column: four glass trunks grow from the stumps of the old ring towers
 ## on the ring path, each threading its household's landing hall, with the
@@ -144,7 +147,9 @@ TRUNK_TOP = {}                 # the Kraken lookout has moved to the wall top (t
 for b, house, lf, homes, crown_prog in TRUNKS:
     tc = at(71.0, b)
     egg('stump_%g' % b, 'Ring tower stump', 'classical', (tc[0], 2.6, tc[2]), (5.2, 2.6, 5.2), 5.0, b, True, 'stump', cut=0.0,
-        floor=0.6, note='the preserved base of an old ring tower; the trunk rises from it', lock=True)
+        floor=NET_FLOOR, lock=True,
+        note='the preserved base of an old ring tower; the trunk rises from a nacre deck at the datum in its top, and the '
+             'old chamber below the deck is the foot moon pool\'s well, flooded to the pool, entered by the old tower door')
     V['trunk_%g' % b] = dict(key='trunk_%g' % b, name='%s trunk' % house, era='modern', kind='trunk', dry=True,
                              c=(tc[0], 0, tc[2]), r=TRUNK_R, y0=NET_FLOOR, y1=TRUNK_TOP.get(b, CROWN) + 3.0, facing=b)
     egg('hall_%g' % b, '%s landing hall' % house, 'modern', (tc[0], lf + 1.2, tc[2]), HALL, 2.4, b, True, 'landing',
@@ -307,6 +312,118 @@ FOUNTAIN = dict(tiers=[  # basin radius, rim height above the roof, pedestal rad
 SHAFT = dict(r=3.4, wall=1.6, y0=WATER + 1.0, y1=ROOF_TOP)   # a stone stair down the pedestal and through the roof to the waterline
 LOOKOUT = dict(bearing=90.0, c=(0.0, ROOF_TOP, WALL_IN + WALL_T / 2), semi=(5.0, 3.4, 3.6), who='Ikara',
                program='the Kraken lookout: a glass watch room on the wall over the main gate, facing the islands')
+
+## ---- the air (proposed, 2026-10-14). The dry network is one sealed body of air
+## at one pressure, so walkers climb the trunks' spirals and walk the tunnels with
+## no door anywhere inside it. An open moon pool holds its air only where the air's
+## pressure equals the sea's at the pool's surface, so one pressure allows open
+## pools at one depth only: the DATUM, the walking floor at the network's foot
+## (NET_FLOOR: the civic ring, the spokes, the trunk feet, the common room, the
+## Glassworks). Every pool is there, its water standing POOL_DROP below the floor.
+## Every entry above the datum is a LOCK CHAMBER: the network's air is at a
+## higher pressure than the sea up there, so it blows a chamber dry through a
+## valve in its floor with no pump. A floor below the datum (the Exchange's
+## trading floor, the civic hall's terrace) gets no pool in it: its pool stands in
+## a nacre drum whose rim is at the datum. The top of the central trunk meets
+## the roof's air, near the surface pressure: the fountain lock.
+DATUM = NET_FLOOR
+DATUM_TOL = 0.3              # an open pool's floor within this of the datum
+POOL_DROP = 0.4              # its water stands this far below the floor
+POOL_LEVEL = DATUM - POOL_DROP
+ATM = 1.013                  # bar, at the surface and in the roof's air hall
+SEA_BAR_PER_M = 1025 * 9.81 / 1e5
+def sea_bar(y): return ATM + (WATER - y) * SEA_BAR_PER_M
+NET_BAR = sea_bar(POOL_LEVEL)                  # the whole network's pressure (absolute)
+def over(y): return NET_BAR - sea_bar(y)       # network air over the sea at height y, bar
+LOCK_R, LOCK_H, HATCH_R = 0.85, 2.4, 0.45      # a lock chamber: 1.7 m across, 2.4 m tall, hatches 0.9 m
+KEEL_T, KEEL_D = 0.6, 1.4    # a threaded hall's ballast keel: a nacre collar round the trunk under its glass
+COLLAR_R, COLLAR_L = 1.1, 2.6                  # a home's lock: a short level chamber in the docking collar
+LOCK_RING = TRUNK_R + KEEL_T + 0.2 + LOCK_R    # sea locks hang this far from the trunk's axis, clear of the keel
+FOUNTAIN_LOCK = dict(r=1.8, y0=69.6, y1=SHAFT['y0'] - 0.1)   # in the top of the central trunk, under the waterline landing
+AIR = dict(
+    supply='Damaku\'s air engine in the Glassworks, its bellows worked by the warm vent\'s heat, draws air from the '
+           'roof\'s air hall down a stone air shaft built inside the wall over the main gate and through a conduit in '
+           'the rock to the Glassworks, and presses it into the network. Spent air leaves the only way it can: it '
+           'spills out under the rims of the moon pools, which are the network\'s relief valves, so the pressure can '
+           'never rise above the datum\'s. The air each lock cycle spends is made up the same way.',
+    glass='Above the datum the network\'s air pushes outward on the glass by 0.1 bar for every metre of height: the '
+          'landing halls\' glass is in tension, held by its nacre bands, and the central trunk\'s top holds most.')
+def wpt(c, r, b, y): return (c[0] + r * math.cos(rad(b)), y, c[2] + r * math.sin(rad(b)))
+def local(v, u, y, w):
+    f = rad(v['facing']); c = v['c']       # u along the ring, w along the facing bearing (as frame() below)
+    return (c[0] - u * math.sin(f) + w * math.cos(f), y, c[2] + u * math.cos(f) + w * math.sin(f))
+ENTRIES = []
+def entry(key, hall, shape, p, r, name, opens, **ex):
+    floor = p[1]
+    kind = 'moon pool' if abs(floor - DATUM) <= DATUM_TOL else 'lock'
+    e = dict(key=key, hall=hall, shape=shape, kind=kind, name=name, opens=opens, p=tuple(round(float(x), 3) for x in p), r=r,
+             floor=round(floor, 3), rel=round(floor - DATUM, 2), **ex)
+    if kind == 'moon pool': e['water'] = POOL_LEVEL
+    ENTRIES.append(e); return e
+# moon pools at the datum
+cr_ = V['common_room']
+entry('pool_guest', 'common_room', 'pool', (cr_['c'][0], cr_['floor'], cr_['c'][2]), 2.0, "the guest hall's moon pool", 'the avenue below',
+      well=cr_['cut'], mouth=(cr_['c'][0], cr_['cut'] - 0.5, cr_['c'][2]))
+ex_ = V['exchange']
+entry('pool_exchange', 'exchange', 'drum', local(ex_, 4.4, DATUM, 4.9), 1.4, "the Exchange's moon pool", 'the sea, by a duct through the glass',
+      base=ex_['floor'], well=1.2, mouth=local(ex_, 4.4, 1.8, 8.8),
+      note='on a nacre drum rising from the trading floor (3.8 m below the datum) to the gallery')
+for b, p, m in [(0.0, (19.2, DATUM, -1.0), (23.6, 2.6, -1.0)), (90.0, (4.0, DATUM, 16.0), (4.0, 2.8, 21.3)),
+                (180.0, (-19.2, DATUM, -1.0), (-23.6, 2.6, -1.0)), (270.0, (0.0, DATUM, -18.0), (0.0, 2.8, -23.8))]:
+    entry('pool_civic_%g' % b, 'civic_hall', 'drum', p, 1.5, "a civic hall moon pool, at the foot of the %g\N{DEGREE SIGN} avenue" % b,
+          'the avenue foot, by a duct through the glass', base=V['civic_hall']['floor'], well=1.6, mouth=m,
+          note='on a nacre dais rising from the old terrace (2.4 m below the datum), with steps down to the terrace')
+gw_ = V['glassworks']
+entry('pool_glassworks', 'glassworks', 'pool', (-2.0, gw_['floor'], 113.4), 1.4, "the Glassworks' moon pool", 'the main avenue, through the socket',
+      well=1.0, mouth=(-2.0, 1.8, 109.0))
+for b, house, lf, homes, _ in TRUNKS:
+    tc = V['trunk_%g' % b]['c']
+    entry('pool_foot_%g' % b, 'stump_%g' % b, 'pool', (tc[0], DATUM, tc[2]), 1.3, '%s trunk foot moon pool' % house,
+          'the old tower door', well=0.6, mouth=wpt((0, 0, 0), 71.0 + 5.2 + 0.8, b, 1.6),
+          note='the old tower chamber is the well')
+# lock chambers above the datum: each landing hall's sea lock, each home's lock, each crown hall's sea lock
+for b, house, lf, homes, _ in TRUNKS:
+    tc = V['trunk_%g' % b]['c']; hb = b + 180.0          # toward the city: the gap between the homes
+    for key, hall, fl, nm in [('lock_hall_%g' % b, 'hall_%g' % b, lf, '%s landing hall sea lock' % house),
+                              ('lock_crown_%g' % b, 'crown_%g' % b, CROWN, '%s crown hall sea lock' % house)]:
+        c = wpt(tc, LOCK_RING, hb, fl)
+        entry(key, hall, 'chamber', c, LOCK_R, nm, 'the sea below', y0=round(fl - 0.15 - LOCK_H, 3), y1=round(fl - 0.15, 3),
+              inner=wpt(tc, LOCK_RING - 0.3, hb, fl), outer=wpt(tc, LOCK_RING, hb, fl - 0.15 - LOCK_H),
+              mouth=wpt(tc, LOCK_RING, hb, fl - 0.15 - LOCK_H - 1.0))
+    for v in [v for v in V.values() if v.get('docks') == 'hall_%g' % b]:
+        ang = math.degrees(math.atan2(v['c'][2] - tc[2], v['c'][0] - tc[0]))
+        entry('lock_%s' % v['key'], 'hall_%g' % b, 'collar', wpt(tc, HALL[0], ang, lf), COLLAR_R,
+              'lock to %s\'s home' % v['who'] if v.get('home') != 'reef' else 'lock to the Reef House workshop', 'the wet home',
+              into=v['key'], inner=wpt(tc, HALL[0] - COLLAR_L / 2, ang, lf), outer=wpt(tc, HALL[0] + COLLAR_L / 2, ang, lf),
+              mouth=wpt(tc, HALL[0] + COLLAR_L / 2 + 0.6, ang, lf + COLLAR_R), bearing=round(ang, 2))
+entry('lock_fountain', 'trunk_c', 'fountain', (0.0, FOUNTAIN_LOCK['y0'], 0.0), FOUNTAIN_LOCK['r'], 'the fountain lock', "the roof's air, at the waterline landing",
+      y0=FOUNTAIN_LOCK['y0'], y1=FOUNTAIN_LOCK['y1'], inner=(FOUNTAIN_LOCK['r'], FOUNTAIN_LOCK['y0'], 0.0), outer=(0.0, FOUNTAIN_LOCK['y1'], 0.0),
+      mouth=(0.0, SHAFT['y0'] + 0.5, 0.0), note='slow to equalise: the whole difference between the network and the surface')
+for e in ENTRIES:
+    for k in ('inner', 'outer', 'mouth'):
+        if k in e: e[k] = tuple(round(float(x), 3) for x in e[k])
+    if e['kind'] == 'lock':
+        e['dp'] = round(NET_BAR - ATM if e['shape'] == 'fountain' else over(e['outer'][1]), 2)
+# the trunks' spiral ramps: flights of at most half a turn at no more than 32
+# degrees, a landing between flights, and a landing at every floor they serve
+RAMP_RC = TRUNK_R - 0.3 - RAMP_W / 2          # the ramp's centreline radius
+def spiral(c, stops, th0):
+    """Centreline points (x, y, z, theta) from stop to stop, starting at bearing th0."""
+    pts = []; th = rad(th0); max_rise = math.pi * RAMP_RC * math.tan(rad(RAMP_ANGLE))
+    def put(y): pts.append((c[0] + RAMP_RC * math.cos(th), y, c[2] + RAMP_RC * math.sin(th), th))
+    land = LANDING / RAMP_RC
+    for y0, y1 in zip(stops, stops[1:]):
+        n = max(1, math.ceil((y1 - y0) / max_rise - 1e-9)); rise = (y1 - y0) / n
+        for k in range(n):
+            for i in range(6): th += land / 6; put(y0 + rise * k)          # a landing
+            for i in range(24): th += math.pi / 24; put(y0 + rise * k + rise * (i + 1) / 24)
+        for i in range(6): th += land / 6; put(y1)                         # the landing at the floor it serves
+    return [(round(x, 3), round(y, 3), round(z, 3), round(t, 4)) for x, y, z, t in pts]
+TRUNK_RAMPS = {}
+for b, house, lf, *_ in TRUNKS:
+    tc = V['trunk_%g' % b]['c']; p0 = (tc[0], DATUM, tc[2])
+    TRUNK_RAMPS['trunk_%g' % b] = spiral(tc, [DATUM, lf, CROWN], b + 90)
+TRUNK_RAMPS['trunk_c'] = spiral(V['trunk_c']['c'], [V['trunk_c']['y0'], FOUNTAIN_LOCK['y0']], 90.0)
 
 ## ---- checks
 problems = []
@@ -544,6 +661,103 @@ WALL_GROUND = []
 for i in range(8):
     (x0, z0_), (x1, z1) = INNER[i], INNER[(i + 1) % 8]
     for t in np.linspace(0, 1, 9): WALL_GROUND.append(round(ground(x0 + (x1 - x0) * t, z0_ + (z1 - z0_) * t), 2))
+
+# 12. The air: one pressure, open pools at the datum only, a lock wherever else
+# the sea is met, and every lock with room under its hall and open water outside.
+BUILDINGS = {'civic hall': ['civic_hall'], 'the Exchange': ['exchange'], 'the guest hall': ['west_house_wrap', 'east_house_wrap', 'common_room'],
+             'the Glassworks': ['glassworks'], 'the central trunk': ['trunk_c']}
+for b, house, *_ in TRUNKS:
+    BUILDINGS['%s trunk foot' % house] = ['stump_%g' % b, 'trunk_%g' % b]
+    BUILDINGS['%s landing hall' % house] = ['hall_%g' % b]
+    BUILDINGS['%s crown hall' % house] = ['crown_%g' % b]
+grouped = {k for ks in BUILDINGS.values() for k in ks}
+for k, v in V.items():
+    if v['dry'] and not v.get('inside') and k not in grouped: problems.append((k, 'is a dry space in no building'))
+for name, ks in BUILDINGS.items():
+    if not any(e['hall'] in ks for e in ENTRIES): problems.append((name, 'has no way in from the water'))
+def keel_hit(p):
+    """True where p is inside a threaded hall's ballast keel (a nacre collar round its trunk under its glass)."""
+    p = np.atleast_2d(np.asarray(p, float)); hit = np.zeros(len(p), bool)
+    for v in V.values():
+        if v['kind'] not in ('landing', 'crown'): continue
+        a, bb, _ = v['semi']; bot = v['c'][1] - bb * (1 - ((TRUNK_R + KEEL_T / 2) / a) ** v['eps']) ** (1 / v['eps'])
+        r = np.hypot(p[:, 0] - v['c'][0], p[:, 2] - v['c'][2])
+        hit |= (r <= TRUNK_R + KEEL_T) & (p[:, 1] <= bot + 0.2) & (p[:, 1] >= bot - KEEL_D)
+    return hit
+def tube_hit(p, pad=0.3):
+    p = np.asarray(p, float)
+    return any(np.min(np.linalg.norm(tube_points(t, 0.5) - p, axis=1)) < TUBE_R + pad for t in T)
+def open_water(p):
+    p = np.asarray(p, float)
+    if p[1] > WATER - 0.5 or p[1] < ground(p[0], p[2]) + 0.9 or wall_dist(p[0], p[2]) < 1.0: return False
+    if any(inside(v, p, -0.3)[0] for v in V.values()) or keel_hit(p)[0] or tube_hit(p): return False
+    return True
+def drum_points(e, y0, y1, r=None):
+    r = e['r'] if r is None else r; out = []
+    for y in np.linspace(y0, y1, 5):
+        for th in np.linspace(0, 2 * np.pi, 16, endpoint=False): out.append((e['p'][0] + r * math.cos(th), y, e['p'][2] + r * math.sin(th)))
+    return np.array(out)
+n_pool = n_lock = 0
+for e in ENTRIES:
+    host = V[e['hall']]
+    if e['kind'] == 'moon pool':
+        n_pool += 1
+        if abs(e['floor'] - DATUM) > DATUM_TOL + 1e-9: problems.append((e['key'], 'is an open pool %.1f m off the datum' % e['rel']))
+        if e['mouth'][1] > POOL_LEVEL - 0.2: problems.append((e['key'], 'opens above its own water: the air would spill out'))
+        if not open_water(e['mouth']): problems.append((e['key'], 'does not open to open water', e['mouth']))
+        if e['shape'] in ('pool', 'drum') and not inside(host, drum_points(e, e['floor'] + 0.05, e['floor'] + HEADROOM, e['r'] + 0.6), 0.3).all() \
+                and not host['kind'] == 'stump':
+            problems.append((e['key'], 'has no room round its rim inside %s' % e['hall']))
+        if host['kind'] == 'stump':     # the foot pool lies in the trunk's foot, inside the ramp
+            if e['r'] + 0.6 > RAMP_RC - RAMP_W / 2: problems.append((e['key'], 'crowds the foot of the ramp'))
+        if e['shape'] == 'drum':        # a drum rises from a floor below the datum: inside the glass, clear of heritage and ramps
+            pts = drum_points(e, e['base'] + 0.05, e['floor'])
+            if not inside(host, pts, 0.3).all(): problems.append((e['key'], 'drum does not fit inside %s' % e['hall']))
+            for o in V.values():
+                if o.get('inside') == e['hall'] and inside(o, pts, -1.5).any(): problems.append((e['key'], 'drum stands within 1.5 m of %s' % o['key']))
+            for fl in RAMPS.get(e['hall'], []):
+                fp = flight_points(host, fl)
+                if (np.hypot(fp[:, 0] - e['p'][0], fp[:, 2] - e['p'][2]) < e['r'] + 0.3).any(): problems.append((e['key'], 'drum stands on the ramp'))
+            for t in T:
+                if e['hall'] in t['joins'] and tube_hit(e['p'] + np.array([0, 0.3, 0]), 0.3): problems.append((e['key'], 'drum stands in the tunnel\'s mouth'))
+    else:
+        n_lock += 1
+        if abs(e['floor'] - DATUM) <= DATUM_TOL: problems.append((e['key'], 'is a lock at the datum, where an open pool will do'))
+        if e['shape'] != 'fountain':
+            if e['outer'][1] < DATUM: problems.append((e['key'], 'lies below the datum: it would need a pump'))
+            elif e['dp'] < 0.2: problems.append((e['key'], 'has too little overpressure (%.2f bar) to blow its chamber dry' % e['dp']))
+        if not inside(host, [np.array(e['inner']) + [0, 0.05, 0], np.array(e['inner']) + [0, HEADROOM, 0]], 0.3).all():
+            problems.append((e['key'], 'has no room over its inner hatch inside %s' % e['hall']))
+        if e['shape'] == 'chamber':
+            pts = drum_points(e, e['y0'], e['y1'])
+            if keel_hit(pts).any(): problems.append((e['key'], 'runs into its hall\'s keel'))
+            for o in V.values():
+                if o['key'] != e['hall'] and inside(o, pts, -0.2).any(): problems.append((e['key'], 'runs into %s' % o['key']))
+            if not open_water(e['mouth']): problems.append((e['key'], 'does not open to open water', e['mouth']))
+        elif e['shape'] == 'collar':
+            pod = V[e['into']]
+            if not inside(pod, e['mouth'], 0.3)[0] or any(inside(o, e['mouth'], -0.2)[0] for o in V.values() if o['dry']):
+                problems.append((e['key'], 'does not open into its home'))
+        elif e['shape'] == 'fountain':
+            tcv = V['trunk_c']
+            if not (tcv['y0'] < e['y0'] < WATER < e['y1'] <= SHAFT['y0'] <= tcv['y1']): problems.append((e['key'], 'does not join the trunk to the waterline landing'))
+            if e['r'] + 0.5 > RAMP_RC - RAMP_W / 2: problems.append((e['key'], 'crowds the ramp\'s top'))
+# the trunk ramps: continuous from foot to crown, never over 32 degrees, a landing at every floor, 2.4 m headroom under the turn above
+for key, pts in TRUNK_RAMPS.items():
+    tv = V[key]; P_ = np.array(pts)
+    seg = np.diff(P_[:, :3], axis=0); run = np.hypot(seg[:, 0], seg[:, 2]); rise = np.abs(seg[:, 1])
+    if (np.linalg.norm(seg, axis=1) > 1.0).any(): problems.append((key, 'ramp is broken'))
+    if (rise > run * math.tan(rad(RAMP_ANGLE)) + 1e-6).any(): problems.append((key, 'ramp is steeper than %g degrees' % RAMP_ANGLE))
+    stops = [DATUM, next(t[2] for t in TRUNKS if 'trunk_%g' % t[0] == key), CROWN] if key != 'trunk_c' else [tv['y0'], FOUNTAIN_LOCK['y0']]
+    for y in stops:
+        flat = run[(np.abs(P_[:-1, 1] - y) < 1e-6) & (np.abs(P_[1:, 1] - y) < 1e-6)].sum()
+        if flat < LANDING - 1e-6: problems.append((key, 'ramp has no landing at %g m' % y))
+    if abs(P_[0, 1] - stops[0]) > 1e-6 or abs(P_[-1, 1] - stops[-1]) > 1e-6: problems.append((key, 'ramp does not run from foot to top'))
+    th = P_[:, 3]; up = np.interp(th + 2 * np.pi, th, P_[:, 1], right=np.nan)
+    gap = (up - P_[:, 1])[~np.isnan(up)]
+    if len(gap) and gap.min() < HEADROOM + 0.4 - 1e-6: problems.append((key, 'ramp leaves only %.1f m headroom' % (gap.min() - 0.4)))
+    if RAMP_RC + RAMP_W / 2 > tv['r'] - 0.3 + 1e-6: problems.append((key, 'ramp does not fit inside the glass'))
+    if tv['y1'] < stops[-1] + HEADROOM: problems.append((key, 'has no headroom over its top landing'))
 
 if problems:
     for p in problems: print('PROBLEM', p)
