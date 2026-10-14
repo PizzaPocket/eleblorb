@@ -310,12 +310,15 @@ A desert city needs a reason to exist. This one has **the wind.**
    Vegas was built for its dam. Everything in Moy runs on it: the lifts,
    the lights and signs, the vertical farm, the pumps at the wells.
 2. **Science and technology.** **BLOCK** (renamed from the Lumen Institute,
-   user), a research institute with a campus downtown, works on power and on "living current". Start-ups spun out of
-   it fill floors of the downtown towers, and Tanglewire recruits for both.
-   Pinestein worked at BLOCK.
-3. **Professional services.** Corporate law (Raman & Reese: the Windworks's contracts, BLOCK's
-   patents and the city's own cases) and finance serve the first
-   two.
+   user), a research institute in a dark tower on Civic Plaza, with its
+   first labs behind it, works on power and on "living current". Everything
+   sinister in Moy is concentrated there (section 7c). Start-ups fill the
+   north tower's capsules, and Tanglewire recruits for them and the
+   Windworks. Pinestein worked at BLOCK.
+3. **Professional services.** The Windworks keeps its own legal department
+   in the Windspire (Priya Raman, Elizabeth, Venn); recruiting (Tanglewire)
+   and finance serve the city's companies. (Revised 2026-10-14: no law firm,
+   and nothing ties Elizabeth's work to BLOCK.)
 4. **Hospitality and spectacle.** The Grand Hotel, the cinema and the night
    market serve Moy itself and the rare traveller who crosses the desert on
    foot, like the hero. In a world of villages, the city's lights are
@@ -352,11 +355,10 @@ unnamed: these forty-five are the people the hero meets.
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Elizabeth Reese** | the Reese–Miller house, an old tower house in Old Moy; she walks to work across the park | corporate attorney, partner at Raman & Reese, a corporate law firm in the glass tower on Civic Plaza | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. |
-| **Dan Miller** | the same house; he walks to work with Elizabeth | tech recruiter at Tanglewire, the recruiting firm in the glass tower downtown; he places people at BLOCK, the Windworks and the start-ups | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
+| **Elizabeth Reese** | the Reese–Miller house, an old tower house in Old Moy; she walks to work across the park | corporate attorney in the Windworks' legal department in the Windspire, on Civic Plaza | The hero's aunt by blood: her sibling was the hero's parent. She grew up in the Middle of Nowhere and left for law school; her mother still lives on the farm. Quick, warm, overworked. She has kept a photograph of the hero as a boy on her office shelf for years. |
+| **Dan Miller** | the same house; he walks to work with Elizabeth | tech recruiter at Tanglewire, the recruiting firm on the south tower's office floors; he places people at the Windworks and the start-ups (BLOCK does its own hiring, and never through him) | Elizabeth's husband; city born. He can talk to anyone and never forgets a name, and misses Jammer louder than he admits. |
 | *(Jammer)* | away, at his grandmother's in the Middle of Nowhere | — | Their son; his room in the apartment is full of drawings of the farm. |
 
-Raman & Reese is named for its two partners, Priya Raman and Elizabeth.
 Elizabeth and Dan speak of the Middle of Nowhere freely (user). Draft lines,
 in character and pointing nowhere:
 - Elizabeth: "Jammer's out at my mother's farm for the summer. We call it the
@@ -407,8 +409,8 @@ in character and pointing nowhere:
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Priya Raman** | Garden Row | senior partner, Raman & Reese | Hired Elizabeth straight out of law school and made her a partner. |
-| **Venn Harlow** | Wing Fat Mansion | paralegal at Raman & Reese | Same commute every day, the same fifteen floors; quietly the firm's memory. |
+| **Priya Raman** | Garden Row | general counsel of the Windworks | Hired Elizabeth straight out of law school and made her her deputy. |
+| **Venn Harlow** | Wing Fat Mansion | paralegal in the Windworks' legal department | Same commute every day, the same fifteen floors; quietly the department's memory. |
 | **Theo Park** | Old Moy | software engineer at a start-up | Dan is trying to place him; he would rather be skateboarding on the decks. |
 
 **The wind, the water and the Institute**
@@ -416,7 +418,7 @@ in character and pointing nowhere:
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
 | **Palbert Pinestein** | a top-floor flat and laboratory in Old Moy, the roof bristling with antennas and coils | none, officially; dismissed from BLOCK | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
-| **Dr. Vera Kask** | a downtown flat | director of BLOCK | Pinestein's oldest colleague, and the one who dismissed Pinestein after the Blackout. Still keeps Pinestein's old notebooks locked in her office. |
+| **Dr. Vera Kask** | the top floors of the BLOCK tower | director of BLOCK | Pinestein's oldest colleague, and the one who dismissed Pinestein after the Blackout. Still keeps Pinestein's old notebooks locked in her office. She lives where she works, and is rarely seen at street level. |
 | **Omar Haddad** | a flat at the battery works | chief engineer of the Windworks wind farm | Climbs ninety-five metres to a nacelle before breakfast and calls it his commute. |
 | **Rafael Ortiz** | the keeper's house at the water works | keeper of the wells and the water works | Counts every litre the city uses twice, and has never once let the park's pond run dry. |
 
@@ -509,7 +511,7 @@ city's bounds. **The rest is proposed.**
 | Health | Dr. Mehta | the clinic |
 | Safety | Kate | the police box |
 | School | Yuki | the primary school |
-| Work | Elizabeth, Priya, Venn; Dan, Theo | Raman & Reese; Tanglewire and the start-up floor |
+| Work | Elizabeth, Priya, Venn; Dan, Theo; Vera | the Windworks (Windspire); Tanglewire (south tower) and the start-up capsules (north tower); BLOCK |
 | Making | Gideon; Zara | the Helmsmith; the sign studio |
 | Upkeep | Juno, Dax, Kade, Suri, Orin | the towers, the decks, the facades, the park |
 | Moving goods without cars | Tomas | cargo trikes, hand trucks and service lifts; deliveries at dawn through the back lanes |
@@ -639,7 +641,7 @@ often.
    | Park Ring | main street | 12 m | round the park; every district touches it |
    | Meridian Avenue | main street | 12 m | from the Rim Walk (east) to Clock Street, behind city hall |
    | Meridian North | main street | 10 m | from the Park Ring past Civic Plaza, the hotel and the Windspire to the Rim Walk |
-   | Meridian South | main street | 10 m | from the Park Ring past Civic Plaza, the glass tower and BLOCK to the Rim Walk |
+   | Meridian South | main street | 10 m | from the Park Ring past Civic Plaza, the BLOCK tower and BLOCK's labs to the Rim Walk |
    | Clock Street | lane | 4 m | behind city hall, from Meridian North to Meridian South |
    | West Street | main street | 12 m | from the Rim Walk (west) to Arcade Street and Library Square |
    | North Street | main street | 12 m | from the Park Ring to the Rim Walk (north), through the estate |
@@ -657,7 +659,7 @@ often.
    | Estate Lane | lane | 4 m | from the Park Ring to the Rim Walk, east edge of the estate |
    | Market Lane | lane | 4 m | from the Park Ring to the Rim Walk, east edge of the market lanes |
    | Hotel Lane | lane | 4 m | from Estate Lane to the Rim Walk, behind the hotel |
-   | Glass Lane | lane | 4 m | from Market Lane to the Rim Walk, behind the glass tower |
+   | Glass Lane | lane | 4 m | from Market Lane to the Rim Walk, behind the BLOCK tower |
 
    **No dead ends:** every street meets another street, a square, the Park
    Ring or the Rim Walk at both ends (checked in the layout). Streets that
@@ -676,10 +678,13 @@ often.
      every district, which is why the Deck is a ring and not a line.
    - **The civic walks** along Civic Plaza's north and south edges, to city
      hall's stone canopies at its corners (the north canopy leads along to
-     the north door, section 8a). From them, glazed **skybridges** cross
-     Meridian North into the Grand Hotel's mezzanine (section 8) and
-     Meridian South into the glass tower's Deck lobby. Inside, the hotel's
-     mezzanine runs through the party wall to the Windspire's lobby.
+     the north door, section 8a). From the north walk a glazed
+     **skybridge** crosses Meridian North into the Grand Hotel's mezzanine
+     (section 8), and from there a glass bridge crosses the Windspire's wind
+     garden into its lobby. Nothing crosses Meridian South: BLOCK stays off
+     the Deck.
+   - **The Square walk**, across Library Square under the Meridian Line,
+     the Library Square station's concourse.
    - **The Library walk**, over Garden Walk's mouth to the library's
      east-wing door and its first gallery (section 9).
    - **The Estate walk**, up the east half of North Street past the hawker
@@ -701,10 +706,17 @@ often.
    the walk, its head onto the Deck), and a pair framing Civic Plaza's
    axis, under the two skybridges. **Glass public lifts** stand at Estate
    Square and Market Square. Nowhere on the Deck is more than 75 m from a
-   way down (now 68 m), the ramp towers doubling as escape routes. The
-   first brief's **inclined moving walkways are dropped**: at 12° a 6.5 m
-   rise runs 31 m, more than any square can give up without being cut in
-   two.
+   way down (now 68 m), the ramp towers doubling as escape routes.
+
+   **Escalating ramps** (revised 2026-10-14, at the user's direction): inclined
+   moving walkways at 12°, after airport travelators, each a pair (up and
+   down) 2.6 m wide, standing in for escalators within the no-stairs rule. A
+   6.5 m rise runs 31 m, so they stand only where a square can give that
+   length along its edge without being cut in two: Civic Plaza (two, up to
+   the civic walks), Market Square (up to the Market walk) and Estate Square
+   (up to the Estate walk). Inside the train stations a second pair under
+   each platform rises from the Deck through the platform floor (section
+   6c).
 
    **Construction:** a pale concrete deck 0.9 m deep on paired round
    columns at its edges, no more than 12 m apart, so the soffit is 5.6 m
@@ -846,39 +858,45 @@ about three and a half minutes to go round. From the train you see the whole
 city on one side and the desert, the turbines and the NMEs on the other: the
 city's vigilance and its commute are the same ride.
 
-**The cross lines** are elevated at the Wall Line's own level, +12 m, so
-they meet it on the level at the gates, where junctions let their trains
-reach the Line House.
-- **In conversation with the Deck.** Where a cross line follows the Deck, it
-  rides directly over it, the same 6 m wide, on the Deck's own columns
-  carried up through it. The Deck becomes the line's lower floor: shaded by
-  the track above, and the concourse of every station on it. You walk the
-  Deck and climb a short ramp to the platform. The headroom between them is
-  4.3 m; the Deck's skybridges pass under the Meridian Line with more than
-  a metre to spare.
-- **The Spine Line (north to south).** North Gate, down North Street over
-  the Deck's Estate walk (**Estate Square**), along the park's north side
-  over the Park Deck (**Park North**), down its west side (**Park West**,
-  for the library), along its south side, then down South Street to
-  **Market Square** (over the square, where the Deck's Market walk crosses
-  below) and the **South Gate**. 548 m.
-- **The Meridian Line (east to the park).** From the East Gate's wings, one
-  track each way along Meridian North and Meridian South (8 m streets take
-  one track, never two), so the line divides round city hall and Civic
-  Plaza as the avenues do. **Civic Plaza** has a platform on each track,
-  each over the Deck's civic walk, reached by the plaza's two ramp towers,
-  which now rise on to +12 m. The tracks rejoin on the park's east side and
-  run with the Spine Line along the north side to **Park North** and **Park
-  West**, where the Meridian Line ends and its trains turn back.
-- **Interchanges:** Park North and Park West between the cross lines; the
-  North, South and East Gates with the Wall Line.
-- **Where no rail goes, deliberately:** Old Moy (its lanes are narrow and its
-  tower houses older than any railway), the civic axis between the park and
-  the library, and the park itself (the playground's Lookout is 20 m high).
-  The Wall Line runs along Old Moy's edge.
+**The cross lines** (simplified 2026-10-14, at the user's direction) are two
+straight-through lines, gate to gate and both ways, elevated at the Wall
+Line's own level, +12 m, the whole way: no climbs or dips. They meet the
+Wall Line on the level at all four gates, where junctions let their trains
+reach the Line House. There are no reversals and no single-track stretches.
+- **The Spine Line (north to south, 542 m).** North Gate, down North Street
+  over the Deck's Estate walk (**Estate Square**), along the park's north
+  side (**Park North**), down its east side facing Civic Plaza (**Civic
+  Plaza**), along its south side, then down South Street over **Market
+  Square** to the **South Gate**. It runs past downtown's front door,
+  because that is where the estate and the market go to work.
+- **The Meridian Line (east to west, 519 m).** East Gate, along Meridian
+  North (between the hotel and city hall), across the park's north-east
+  corner to the north side (**Park North**), down the west side, then west
+  across Library Square (**Library Square**) and along West Street through
+  Old Moy to the **West Gate**. It crosses the Spine Line once, on the level,
+  at the park's north-east corner.
+- **Interchanges:** Park North between the two lines; the four gates with
+  the Wall Line.
+- **The Deck is the middle level.** The city has three: the street (0), the
+  Deck (+6.5 m) and the trains and wall top (+12 m). Where a line follows
+  the Deck it rides directly over it, the same 6 m wide, on the Deck's own
+  columns carried up through it, so the Deck is the line's lower floor,
+  shaded by the track, and every station's concourse (after Bangkok's
+  Skytrain and its skywalk). Library Square gets a new Deck run, the
+  **Square walk**, under the line for its station.
+- **Getting up.** From the street to the Deck: the ramp towers, the glass
+  lifts, and escalating ramps on the big squares. From the Deck to the
+  platform: a pair of escalating ramps under each platform, rising 6.5 m in
+  31 m through the platform floor to its far end, so no station needs a
+  tower of its own. At the gates, the gatehouse's ramp tower and lift serve
+  the street, the Wall Line and the cross line together.
+- **Where no rail goes:** the park itself (the playground's Lookout is 20 m
+  high) and the narrow lanes. The Meridian Line keeps to West Street, Old
+  Moy's one main street, with 3 m clear of the tower houses on each side.
 - **Cars:** short two-car articulated sets that take 12 m curves at walking
   pace, after Lisbon's trams, so the lines can turn at the street corners
-  of a dense grid.
+  of a dense grid. It is a game: the trains are there because riding them
+  is fun.
 
 **Structure and checks.** The cross lines stand inside the wall over
 streets, squares and the park, or over buildings at least 2 m below their
@@ -946,7 +964,8 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
   - **Civic Plaza**, on the park's east side, is city hall's forecourt.
     **City hall heads the plaza on its axis**, facing west across the plaza
     to the park. The plaza's sides are private and unlike each other: the
-    Grand Hotel on the north, the glass tower on the south. Shade trees,
+    Grand Hotel on the north, the BLOCK tower on the south, dark and
+    windowless, watching the city's living room. Shade trees,
     misters and benches; Pia busks here; the Deck's two plaza ramp towers
     frame the axis under the skybridges.
   - **Library Square**, on the park's west side where West Street arrives,
@@ -1065,12 +1084,11 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
   sites at the rim.
   - the **Windspire**, the Windworks' headquarters, about 280 m with an
     observation deck, beside the hotel on Meridian North, facing the plaza;
-  - the **glass tower** on the plaza's south side (Raman & Reese and
-    Tanglewire);
-  - the **north tower** (start-up floors) and **south tower** (flats over
-    offices) on the Park Ring's east corners;
-  - **BLOCK**, the research institute, 6 storeys round a court, beside the
-    glass tower on Meridian South;
+  - the **BLOCK tower** on the plaza's south side, BLOCK's headquarters,
+    with **BLOCK's labs**, 6 storeys round a court, behind it on Meridian
+    South;
+  - the **north tower** (start-up capsules) and **south tower** (flats over
+    offices, Tanglewire) on the Park Ring's east corners;
   - **mid-rise blocks of 18 to 34 storeys** filling the rest of downtown
     round the towers, offices and flats on large footprints (20 to 34 m
     frontage), so the towers rise out of a solid mid-rise mass instead of
@@ -1116,7 +1134,7 @@ Ring, with benches and movable chairs under them. Each quarter has a job:
 | **North-west: the dry garden** | Ghaf groves, agave, aloe, desert marigold and boulder outcrops on gravel; never watered. Orin Pike's teaching garden of the desert's own plants | Next to the old town and its wells: the desert as it was |
 | **North-east: the reed pond** | A shallow pond of reed beds and open water, crossed by boardwalks. It polishes the city's reclaimed water before it goes back to the street trees; dragonflies, frogs, herons | Beside the hotel and Civic Plaza: water working, not for show (user: no opulent fountains). The reclaimed water reaches it through the open runnel across the hotel's atrium floor (8.8) |
 | **South-west: the parasols** | Old Fu's tea house and the chess terrace, under a timber canopy of giant parasols | Facing Old Moy and Garden Row; the Hos play here every afternoon |
-| **South-east: the great lawn** | The one irrigated lawn, for picnics, lying down and evening music; the park lodge on its edge | Facing the market lanes and the glass tower: lunch from the market, and the office workers' hour off |
+| **South-east: the great lawn** | The one irrigated lawn, for picnics, lying down and evening music; the park lodge on its edge | Facing the market lanes and the south tower: lunch from the market, and the office workers' hour off |
 
 **The wind trees.** Four steel wind trees, 32 m tall, stand at the corners
 of the playground. Bougainvillea climbs their trunks. Their crowns carry
@@ -1248,28 +1266,32 @@ Central or Tokyo's Marunouchi.
 - **Play:** the fins and the wind-gap ledges are the highest swing anchors
   and climbing holds in the city. The observation deck is realised.
 
-**2. The glass tower** (Raman & Reese and Tanglewire, about 45 storeys, 180 m)
-- **Idea:** a modern tower veiled in the old town's screens.
+**2. The BLOCK tower** (BLOCK's headquarters, about 45 storeys, 180 m; revised 2026-10-14: the glass tower is now BLOCK's)
+- **Idea:** the city's one dark tower, facing its living room. Everything
+  sinister in Moy is concentrated here and in BLOCK's labs behind it, and
+  none of it is said: the architecture says it. Data: `BLOCK_TOWER`.
 - **References:**
-  - **Al Bahar Towers, Abu Dhabi:** a moving mashrabiya screen of panels
-    that open and close with the sun.
-  - **Doha Tower:** a cylinder wrapped in patterned screens.
+  - **33 Thomas Street, New York:** a windowless granite skyscraper (the
+    telephone exchange) with ventilation hoods where windows should be.
+  - **Boston City Hall:** the mass looming over a recessed base.
 - **Form:**
-  - a round-cornered square tower in clear glass, wrapped by an outer skin
-    of screen panels;
-  - by day the panels close against the sun on the side it strikes; at dusk
-    they fold open and the tower goes from screened to glass;
-  - each panel is pierced with one of **Old Moy's painted house marks**,
-    the pictures the city's signs come from, so the tower carries the old
-    town's history on its face.
-- **Site:** the shaft (26 by 24 m) stands back behind a two-storey run of
-  cafes holding Meridian South; the glass skybridge lands on their roof
-  terrace, the tower's Deck lobby. On the park side, the **screen court**,
-  shaded by a canopy of the tower's own pierced panels, so Old Moy's house
-  marks fall as patterns of light on the paving.
-- **Crown:** the screens stop short of the top; a glass crown lit warm
-  amber.
-- **Play:** the screen frames are a climbable lattice from the podium up.
+  - a blue-black glazed brick shaft, 26 by 24 m, in a city of pale tile;
+    at a low sun it shows an azure sheen, the city blorbs' colour;
+  - **no windows**: hairline slits every 4 m, and three rings of vent hoods
+    (at 30, 55 and 80% of its height) that breathe warm air at night;
+  - its base set back 4 m and 9 m high, so the shaft hangs over its own
+    door;
+  - **no crown and no light**, in a skyline where every other tower is lit:
+    only a thin azure line under the roof at night, and a ring of
+    grounding masts above it.
+- **Site:** a forecourt of bare pale paving in full sun on Meridian South,
+  no bench and no tree, and **one door**; the rest of the plot is black
+  gravel, raked every morning, that no one walks on. It is the only tower
+  without a life at its foot, and that is the point. It stays off the Deck.
+- **Who:** Dr. Vera Kask, the director, lives on the top floors and is rarely
+  seen at street level. No one else the hero knows works there (below).
+- **Play:** the vent hoods are the only holds; the masts are anchors no one
+  should swing from.
 
 **3. The north tower** (the start-up floors, about 45 storeys, 175 m)
 - **Idea:** a tower that changes as its tenants come and go.
@@ -1309,12 +1331,12 @@ Central or Tokyo's Marunouchi.
   a play lawn and a sand pit, with a shaded garden on Market Lane.
 - **Crown:** roof terraces stepping back, the residents' gardens.
 - **Play:** the rippling balcony edges are a staircase of ledges for
-  climbers and swing anchors along the south of Civic Plaza. Dr. Kask lives
-  near the top.
+  climbers and swing anchors along the south of Civic Plaza. Tanglewire has
+  its office floors above the colonnade.
 
-**BLOCK** (the research institute, 6 storeys, 22 m; revised 2026-10-14)
-- **Idea:** a closed place that looms. The city never says BLOCK is sinister;
-  the building does, quietly. Data: `BLOCK_FORM`.
+**BLOCK's labs** (BLOCK's first building, 6 storeys, 22 m, behind the tower on Meridian South; revised 2026-10-14)
+- **Idea:** a closed place that looms, where the living-current work
+  happens. Pinestein's old laboratory is here, sealed. Data: `BLOCK_FORM`.
 - **References:**
   - **33 Thomas Street, New York:** the windowless telephone exchange whose
     blank mass is felt before it is understood.
@@ -1324,14 +1346,33 @@ Central or Tokyo's Marunouchi.
     pale tile, with an azure sheen at a low sun, the city blorbs' colour;
   - a **recessed base** 3 m in from the plot line with no windows at eye
     level, so the five storeys above lean over their own pavement and keep
-    it in shadow (it cannot overhang the street: the Meridian Line runs
-    there);
+    it in shadow, without ever leaving the plot line;
   - **one narrow door**, off the axis, the only opening at the ground;
   - **slit windows**, 35 cm wide every 3.6 m;
   - a **court nobody sees**: its clerestory glows azure at night and is dark
     by day;
   - a ring of **grounding masts** on the roof, for the living-current work.
 - It stays off the Deck and turns its back on Civic Plaza's life.
+
+**What happens at BLOCK** (proposed 2026-10-14, in review; the user asked
+for the evil activities and people to be concentrated there).
+- **One person.** After the Blackout the city's scientists left BLOCK. Dr.
+  Kask kept it running with machines: the labs work through the night with
+  no one in them, and she is the only person the hero ever sees go in. It
+  is the one building in Moy without named people inside, and that is
+  what is wrong with it.
+- **The work never stopped.** The living-current work that made the city
+  blorbs goes on. At night the labs draw more power than the rest of
+  downtown together (Omar Haddad sees it on the battery works' meters
+  and says nothing), and the court's azure glow is the colour of the city blorbs.
+  Proposed: Kask lures city blorbs in from the desert with the grid's power
+  to study and drain them, the very creatures the city banned and fears.
+- **Pinestein knows.** He watches BLOCK from his roof in Old Moy, and the
+  batteries he takes out to the city blorbs at night are partly to keep
+  them away from it.
+- **Open:** whether BLOCK serves the Demon King, as the Royal Chef does in
+  the Chinese village; what the hero finds inside, and when.
+
 
 **5. The Grand Hotel's guest tower** (28 levels, 96 m, and the drum to 108 m, rising from a 44 m atrium block; full brief in section 8, proposed 2026-10-13 after the user's direction to follow John Portman)
 - **Idea:** the oldest tower downtown, the boom's idea of the future: a
@@ -1352,8 +1393,8 @@ Central or Tokyo's Marunouchi.
   night, the first landmark seen from the plaza.
 
 **The skyline together:** the twisting Windspire with its spinning wind
-gaps is the tallest; the screened glass tower, the plug-in capsule tower and
-the dune-balconied flats step down around it; the old white drum of the
+gaps is the tallest; the dark, unlit BLOCK tower, the plug-in capsule tower
+and the dune-balconied flats step down around it; the old white drum of the
 hotel, its glass lifts climbing it, stands in front, facing the park.
 
 ### 7d. The North Estate: precinct plan (proposed, 2026-10-13)
@@ -1510,9 +1551,10 @@ or the Rim Walk. Ground left over inside a block is a shared garden
 courtyard; the leftover strips along the Rim Walk are gardens. Green on
 the plan means gardens and the park only.
 
-Raman & Reese and Tanglewire share the glass tower on Civic Plaza. The
-start-up floors are in the north tower. Dr. Kask's flat is in the south
-tower. Six ramp towers (marked R on the plan) stand at the park's four gates
+BLOCK has the tower on Civic Plaza's south side and its labs behind it;
+Dr. Kask lives at the top of the tower. The Windworks (with its legal
+department) has the Windspire, the start-ups the north tower's capsules,
+and Tanglewire the south tower's office floors. Six ramp towers (marked R on the plan) stand at the park's four gates
 and in a pair on Civic Plaza; glass lifts (L) at Estate Square and Market
 Square (section 6, the Deck).
 
@@ -1531,10 +1573,10 @@ Square (section 6, the Deck).
 | 1 | Grand Hotel | 52 × 60 m | atrium block of 12 levels (44 m) round its void; cylinder guest tower of 28 levels (96 m) with the revolving drum to 108 m (section 8) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
 | 2 | City hall | 34 × 60 m | exterior only: portico, balcony, side wings and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a) | Mayor Teodora Vance, Kenji Mori (clerk) |
 | 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, twisting, with three wind gaps (7c) | the Windworks (headquarters, observation deck) |
-| 13 | Glass tower | 40 × 40 m | about 45 storeys, 180 m, in moving screens pierced with the house marks (7c) | Raman & Reese (Elizabeth, Priya, Venn); Tanglewire (Dan) |
+| 13 | BLOCK tower | 40 × 40 m | about 45 storeys, 180 m, a windowless dark shaft (7c) | BLOCK's headquarters; Dr. Vera Kask (director, top floors) |
 | 14 | North tower | 40 × 40 m | about 45 storeys, 175 m, plug-in capsule offices (7c) | start-up floors (Theo Park) |
-| 15 | South tower | 40 × 40 m | about 40 storeys, 150 m, dune balconies (7c) | flats over offices; Dr. Vera Kask |
-| 16 | BLOCK | 38 × 42 m | 6 storeys, research labs round a court | Dr. Vera Kask (director) |
+| 15 | South tower | 40 × 40 m | about 40 storeys, 150 m, dune balconies (7c) | flats over offices; Tanglewire (Dan) |
+| 16 | BLOCK labs | 38 × 42 m | 6 storeys round a court; Pinestein's old lab, sealed (7c) | BLOCK |
 
 **North Estate**
 
@@ -2385,7 +2427,7 @@ Not every floor is built.
 
 | Level | Built | Which |
 |---|---|---|
-| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium (with its mezzanine and galleries) and level 27 with the party's suite; the library's welcome hall, Great Hall and galleries, children's library and heritage room (section 9.8); the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Raman & Reese and Tanglewire floors; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
+| **A. Realised** | rooms, people, light, lifts between realised floors | the Grand Hotel's atrium (with its mezzanine and galleries) and level 27 with the party's suite; the library's welcome hall, Great Hall and galleries, children's library and heritage room (section 9.8); the museum's hall; the Moonlight Cinema; the vertical farm's growing floor; the family's tower house; the Windworks' legal floor in the Windspire and Tanglewire's floor; the Helmsmith; the café; the night market; the wet market; the convenience store; the clinic; the police box; the school's classroom; the giant playground; the park's tea house; Pinestein's rooftop laboratory; the North Estate hawker centre, one void deck and the Lams' block lobby; the twin blocks' sky garden; the Windspire's lobby, express lift and observation deck; the mirror field (outside) |
 | **B. Street** | the ground floor as a real shop or lobby, or a shallow room behind glass; upper floors facade only, with lit windows that show rooms | most street buildings; city hall, exterior only, its doors shut (section 8a.7) |
 | **C. Skyline** | real-proportioned massing and window grids; roof and ledge collision only where routes use them | back-of-block towers; downtown's towers above their lobbies; the estate's blocks above the realised flats; the far skyline |
 
