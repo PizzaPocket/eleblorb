@@ -511,6 +511,43 @@ to solve support and to make the trees feel natural.
   wandering branch-ramp chain and no 46° helix.
 - The wild giant trees keep their chain.
 
+## 12. The trees' forms: review 4 (2026-10-14, proposed)
+
+The user found three faults in the model:
+- The rings and the commons were not round their trunks.
+- The branches were straight sticks of one thickness, many pointing down, some ending bare.
+- The trunks were a stack of SuperEggs.
+
+**The decks.** The first fault was a bug in the drawing, not in the plan. The model built each deck from its outline and then flipped it front to back, which mirrored every deck across the village's middle while its rails stayed true. With three trees in a triangle, the mirror looked like a rotation of about 60°. The flip is gone, and every deck wraps its trunk.
+
+**A tualang's form, and each tree's own.** A tualang grows a plumb, smooth, branch-free bole for half its height and more, on thin plank buttresses, then breaks into a crown of a few huge ascending limbs. That straight bole is why the monkeys chose these three: every ring, spiral and bridge in sections 8 to 11 depends on it, so the boles stay plumb through the inhabited levels. Each tree differs in its buttresses, the fluting of its bark, where its bole breaks, and how its crown spreads. Each crown reaches away from its neighbours, toward the open sky over the clearing.
+
+| Tree | Bole | Buttresses | Crown |
+|---|---|---|---|
+| **Elder** (62 m) | the most massive, 7 shallow flutes | 5, up to 5.2 m high | breaks high, at 50.5 m, 4.9 m over its crown deck, into five limbs rising at 38° to 52° and flattening as they spread: an umbrella over Purnama and Sekar |
+| **East** (56 m) | 5 flutes | 3, up to 4 m | breaks lowest, at 39.5 m, just over its upper ring's headroom, into four broad limbs at 20° to 32°: a wide, flat crown |
+| **North** (58 m) | 6 flutes | 4, up to 4.6 m | forks at 39.5 m into twin leaders that climb side by side at about 70° and spread only at the top |
+
+**How branches grow** (`tools/plant_village_layout.py`, "the trees' forms"):
+- **Taper.** Every limb and branch tapers from its root to its tip. A crown leader starts at the bole's radius over the square root of the number of leaders, so the wood's cross-section carries on through the fork. A side branch starts at half its parent's thickness where it leaves.
+- **Out and up, never down.** A crown leader rises and flattens as it spreads. Side branches leave at 14° to 55° above level. The check fails any branch with a segment more than 6° below level.
+- **No bald tips.** Every tip ends in a tuft: a few overlapping lobes of leaves that imply the twigs inside. Crown leaders carry three or four branches, each with up to three twigs of its own. There are 262 branches and 262 tufts.
+- **Structural limbs grow like limbs.**
+  - The deck, commons, saddle and hanger limbs of section 10 are thick limbs, tapering from 0.5 to 0.8 m at the bark.
+  - Each runs level under its deck, on past the deck's edge and the room above it, then turns up into leaf, putting out two leafy side branches on the way.
+  - A limb that cannot get past its deck straight on turns aside. None is left bare.
+- **Clear of people.** No branch or tuft enters a deck, the room over a deck, a bridge or a spiral's headroom.
+
+**Buttresses** stand only where the spiral's foot leaves room: none within 35° of the foot, and none under a walk.
+
+**In the game** (backlog P7): `NatureProps.build_emergent_tree` builds the village trees from this data:
+- the bole as one swept, fluted mesh;
+- the buttresses as thin curved fins;
+- every branch as a tapered swept tube along its points;
+- the tufts as SuperEgg leaf clusters.
+
+The bole, the buttresses and the limbs a figure could stand on collide. Branches thinner than about 0.25 m and the tufts are decorative. Wild trees keep the wandering chain.
+
 ## Fixed, proposed and open
 
 **Fixed:** the three trees and their positions, the gate, the inn's keeper and

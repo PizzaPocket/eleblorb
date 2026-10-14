@@ -17,6 +17,10 @@ from shapely.geometry import Polygon, Point, LineString, box
 from shapely.ops import unary_union   # pip install shapely
 
 def rad(b): return math.radians(b)
+def frange(a, b, st):
+    out = []; x = a
+    while x < b - 0.5: out.append(x); x += st
+    return out
 def pol(c, r, b): return (c[0] + r * math.cos(rad(b)), c[1] + r * math.sin(rad(b)))
 def dist(a, b): return math.hypot(a[0] - b[0], a[1] - b[1])
 def bearing(a, b): return math.degrees(math.atan2(b[1] - a[1], b[0] - a[0])) % 360
@@ -580,57 +584,135 @@ def leaf_structural(p_, thick, length, kind, rnd, outer_from, tries, have=0):
     if n == 0: n = force_leaf(p_, thick)
     if n == 0: BALD.append(kind)
     return n
+## ---- the trees' forms (plant_kingdom_village_layout.md 12, 2026-10-14). A tualang grows a plumb, smooth,
+## branch-free bole half its height and more, on plank buttresses, and breaks into a crown of a few huge ascending limbs.
+## That straight bole is why the monkeys built on these three, and it keeps every deck, spiral and bridge true. Each tree
+## is its own in its buttresses, the fluting of its bark, where its bole breaks, and how its crown spreads; each crown
+## reaches away from its neighbours toward the open sky. Every limb and branch tapers from its parent, grows out and up
+## (never down), and ends in a tuft of leaves that hides the twigs inside it.
+FORM = {
+    'elder': dict(break_y=50.5, leaders=5, lead_el=(38, 52), lead_len=(16.0, 19.0), lead_bend=-20, spread=150,
+                  sec_from=0.45, sec_n=(3, 4), sec_len=(0.45, 0.6), fins=5, fin_h=5.2, fin_reach=3.6, flutes=7,
+                  note='the oldest: a massive bole breaking high, over its crown deck, into five ascending limbs that spread like an umbrella'),
+    'east':  dict(break_y=39.5, leaders=4, lead_el=(20, 32), lead_len=(16.0, 20.0), lead_bend=-12, spread=125,
+                  sec_from=0.35, sec_n=(3, 4), sec_len=(0.45, 0.6), fins=3, fin_h=4.0, fin_reach=3.0, flutes=5,
+                  note='the shortest: it breaks low into four broad, low-angled limbs, a wide flat crown'),
+    'north': dict(break_y=39.5, leaders=2, lead_el=(66, 72), lead_len=(11.0, 13.0), lead_bend=-25, spread=40,
+                  sec_from=0.75, sec_n=(3, 4), sec_len=(0.7, 0.85), fins=4, fin_h=4.6, fin_reach=3.2, flutes=6,
+                  note='forked: the bole divides into twin leaders that climb side by side and spread only at the top'),
+}
+def taper(n, rb, rt, k=1.3):
+    return [round(rt + (rb - rt) * (1 - i / n) ** k, 3) for i in range(n + 1)]
+def curve(p0, az, el, L, d_el=0.0, d_az=0.0, n=10, min_el=-3.0):
+    """A limb from p0 heading az (bearing, deg) at elevation el, its elevation changing by d_el and its heading by
+    d_az over its length; never pointing down more than min_el."""
+    pts = [tuple(p0)]
+    for i in range(n):
+        a = rad(az + d_az * (i + 0.5) / n); e = rad(max(min_el, el + d_el * (i + 0.5) / n)); st = L / n; x, y, z = pts[-1]
+        pts.append((x + math.cos(a) * math.cos(e) * st, y + math.sin(e) * st, z + math.sin(a) * math.cos(e) * st))
+    return pts
+def at_u(pts, u):
+    i = u * (len(pts) - 1); i0 = int(min(len(pts) - 2, i)); f = i - i0
+    return tuple(pts[i0][j] + (pts[i0 + 1][j] - pts[i0][j]) * f for j in range(3)), i0
+def heading(pts, i0):
+    a, b = pts[i0], pts[min(len(pts) - 1, i0 + 1)]; h = math.hypot(b[0] - a[0], b[2] - a[2])
+    return math.degrees(math.atan2(b[2] - a[2], b[0] - a[0])), math.degrees(math.atan2(b[1] - a[1], h or 1e-6))
+def clear(pts, tuft=None):
+    if any(blocked(q) for q in pts[1:]): return False
+    return tuft is None or not blocked(tuft[:3], tuft[3] * 0.8)
+def tuft_at(p_, r): return (p_[0], p_[1] + r * 0.25, p_[2], round(r, 2))
+def twigs(parent, rs, kind, rnd, u0, n_, len_rng, r_tuft, el_rng=(18, 50), nested=0):
+    """Side branches off the outer part of `parent`, alternating sides, each tapering from half its parent's
+    thickness there, rising, and ending in a tuft; with `nested`, each carries its own smaller twigs."""
+    got = 0; side = 1 if rnd() < 0.5 else -1
+    for k in range(n_ * 3):
+        if got >= n_: break
+        u = u0 + (1 - u0) * (k + 0.5 + 0.4 * (rnd() - 0.5)) / (n_ * 3) if n_ > 1 else u0 + (1 - u0) * rnd()
+        base, i0 = at_u(parent, u); paz, pel = heading(parent, i0)
+        az = paz + side * (25 + 40 * rnd()); el = max(el_rng[0], min(el_rng[1], pel + (rnd() - 0.3) * 30)); L = len_rng[0] + (len_rng[1] - len_rng[0]) * rnd()
+        pts = curve(base, az, el, L, d_el=8 * rnd(), d_az=side * 10 * rnd(), n=5)
+        tf = tuft_at(pts[-1], r_tuft * (0.85 + 0.3 * rnd()))
+        if not clear(pts, tf): side = -side; continue
+        rb = max(0.06, rs[min(len(rs) - 1, int(u * (len(rs) - 1)))] * 0.5)
+        my_rs = taper(len(pts) - 1, rb, 0.05)
+        BRANCHES.append(dict(pts=pts, rs=my_rs, kind=kind)); LEAVES.append(tf); got += 1; side = -side
+        if nested: twigs(pts, my_rs, kind, rnd, 0.5, nested, (L * 0.3, L * 0.45), r_tuft * 0.7, (20, 55), 0)
+    return got
+def limb_on(path, rb, kind, rnd, r_tuft):
+    """A structural limb: its working length under the deck, then on past the deck's edge, turning up into leaf.
+    If no way past the deck fits, it turns aside; the limb is never left bald."""
+    e0 = path[-1]; az0, _ = heading(path, len(path) - 2)
+    for daz in (0, 30, -30, 60, -60, 90, -90, 120, -120):
+        # level, a little rising, until it is out from under the deck and the room over it; then up
+        run = [e0]; a = rad(az0 + daz)
+        for k_ in range(16):
+            q = run[-1]; nq = (q[0] + math.cos(a) * 0.6, q[1] + 0.03, q[2] + math.sin(a) * 0.6); run.append(nq)
+            if k_ >= 1 and not blocked(nq, 0.3): break
+        else: continue
+        for L in (4.5, 3.5, 2.5, 1.6):
+            up = curve(run[-1], az0 + daz, 12, L, d_el=48, n=5); ext = run[:-1] + up
+            tf = tuft_at(ext[-1], r_tuft)
+            if clear(up, tf):
+                pts = path + ext[1:]; rs = taper(len(pts) - 1, rb, 0.1, 0.9)
+                BRANCHES.append(dict(pts=pts, rs=rs, kind=kind)); LEAVES.append(tf)
+                twigs(pts, rs, 'twig', rnd, 0.62, 2, (2.0, 3.5), r_tuft * 0.75)
+                return True
+    BRANCHES.append(dict(pts=path, rs=taper(len(path) - 1, rb, rb * 0.5, 0.9), kind=kind)); BALD.append(kind); return False
+BALD = []
 rnd = rng_(20261014)
 for l in SUPPORT['limbs']:
     p_ = limb_path(l['tree'], l['y'] - 0.8, l['b'], l['r0'], l['length'], 0.0, 0.3 + 0.3 * rnd(), wander=(rnd() - 0.5) * 1.2)
-    BRANCHES.append(dict(pts=p_, r0=0.5, r1=0.22, kind='deck limb'))
-    # past the pavilion the limb runs on and up as a living branch, in leaf
-    n = 0
-    run = 2.5 + 1.5 * rnd(); d_ = (math.cos(rad(l['b'])), math.sin(rad(l['b']))); e0 = p_[-1]
-    if l.get('carries') == 'bridge':   # under a bridge landing the limb turns aside, out from under the bridge, then up
-        sgn = 1 if rnd() < 0.5 else -1; d_ = (math.cos(rad(l['b'] + sgn * 75)), math.sin(rad(l['b'] + sgn * 75)))
-    ext = [e0, (e0[0] + d_[0] * run, e0[1] + 0.2, e0[2] + d_[1] * run), (e0[0] + d_[0] * (run + 1.0), e0[1] + 1.8 + rnd(), e0[2] + d_[1] * (run + 1.0)),
-           (e0[0] + d_[0] * (run + 1.6), e0[1] + 3.6 + rnd(), e0[2] + d_[1] * (run + 1.6))]
-    if not any(blocked(q) for q in ext[1:]) and not blocked((ext[-1][0], ext[-1][1] + 0.6, ext[-1][2]), 1.6):
-        BRANCHES.append(dict(pts=ext, r0=0.22, r1=0.1, kind='twig')); LEAVES.append((ext[-1][0], ext[-1][1] + 0.6, ext[-1][2], round(1.6 + 0.8 * rnd(), 2))); n = 1
-    leaf_structural(p_, 0.5, l['length'], 'deck limb', rnd, 0.7, 4, have=n)
+    limb_on(p_, 0.62 if l.get('carries') == 'the inn' else 0.55, 'deck limb', rnd, 1.8)
 for h in SUPPORT['hangers']:
     p_ = limb_path(h['tree'], h['limb_y'], h['b'], h['r0'], h['length'], 0.05 * rnd(), 0.6 + 0.8 * rnd(), wander=(rnd() - 0.5) * 2.0)
-    h['path'] = p_
-    BRANCHES.append(dict(pts=p_, r0=0.45, r1=0.2, kind='hanger limb'))
-    leaf_structural(p_, 0.45, h['length'], 'hanger limb', rnd, 0.55, 4, have=tip_leaf(p_, rnd))
+    h['path'] = p_; limb_on(p_, 0.5, 'hanger limb', rnd, 1.8)
 for l in SUPPORT['commons_limbs']:
     p_ = limb_path(l['tree'], l['y'], l['b'], l['r0'], l['length'], 0.0, 0.6 + 0.8 * rnd(), wander=(rnd() - 0.5) * 2.0)
-    l['path'] = p_
-    BRANCHES.append(dict(pts=p_, r0=0.6, r1=0.26, kind='commons limb'))
-    leaf_structural(p_, 0.6, l['length'], 'commons limb', rnd, 0.45, 5, have=tip_leaf(p_, rnd))
-# the crown: each tree grows its own way, from about 0.4 of its trunk: mostly one limb at a time, now
-# and then a pair, 3 to 6 m apart, each turned roughly by the golden angle but never exactly, each its
-# own length, pitch, arch and sideways bend. A limb is kept only where its whole path is clear of decks,
-# bridges and walks and it comes into leaf: at its tip and on at least one side branch.
+    l['path'] = p_; limb_on(p_, 0.78, 'commons limb', rnd, 2.2)
+# the crowns
+CROWN = {}
 for t, tr in TREES.items():
-    rt = rng_({'east': 7101, 'elder': 3307, 'north': 5519}[t])
-    top = 0.86 * tr['h']; y = top * (0.37 + 0.08 * rt()); a = rt() * 360
-    while y < top * 0.97:
-        hf = y / top
-        for m in range(2 if rt() < 0.3 else 1):
-            az = a + (110 + 80 * rt()) * m; base_len = (11.5 + (5.0 - 11.5) * hf) * (0.7 + 0.45 * rt())
-            pitch, arch, wander = 0.08 + 0.4 * rt(), 0.4 + 1.4 * rt(), (rt() - 0.5) * 3.0
-            for trial in range(8):       # turn the limb, then shorten it, to find clear air and leaf it
-                bb = (az + (trial % 4) * (15 + 20 * rt()) * (1 if trial % 2 else -1)) % 360
-                ln = base_len * (1.0 if trial < 4 else 0.7)
-                p_ = limb_path(t, y, bb, trunk_r(t, y), ln, pitch, arch, wander=wander)
-                if any(blocked(q) for q in p_[1:]): continue
-                nb, nl = len(BRANCHES), len(LEAVES)
-                BRANCHES.append(dict(pts=p_, r0=round(0.55 * (1 - 0.4 * hf) * (0.8 + 0.3 * rt()), 3), r1=0.18, kind='bough'))
-                got = tip_leaf(p_, rt, 2.0 + 1.4 * rt()) + grow_side_branches(p_, 0.55 * (1 - 0.4 * hf), ln, 'bough', rt, 0.35, 2 + int(4 * rt()))
-                if got >= 1: break
-                del BRANCHES[nb:]; del LEAVES[nl:]          # a bare limb is not grown
-        a += GOLDEN_B + (rt() - 0.5) * 70; y += 2.4 + 2.8 * rt()
+    F = FORM[t]; rt = rng_({'east': 7101, 'elder': 3307, 'north': 5519}[t]); R = trunk_r(t, F['break_y']) * 1.15
+    out_b = bearing(CEN, tr['c']); n = F['leaders']; top = (tr['c'][0], F['break_y'], tr['c'][1]); leaders = []
+    for i in range(n):
+        az = out_b + (-F['spread'] / 2 + F['spread'] * (i + 0.5) / n if n > 1 else 0) + (rt() - 0.5) * 18
+        if n == 2: az = out_b + (-1 if i == 0 else 1) * (F['spread'] / 2 + 8 * rt())
+        el = F['lead_el'][0] + (F['lead_el'][1] - F['lead_el'][0]) * rt(); L = F['lead_len'][0] + (F['lead_len'][1] - F['lead_len'][0]) * rt()
+        for trial in range(10):
+            pts = curve(top, az + (trial // 2) * 9 * (1 if trial % 2 else -1), el + (trial // 2) * 3, L * (1 - 0.04 * trial), d_el=F['lead_bend'], d_az=(rt() - 0.5) * 16, n=12)
+            if clear(pts): break
+        else:
+            problems.append((t, 'crown leader %d finds no clear air' % i)); continue
+        rs = taper(len(pts) - 1, R / math.sqrt(n) * 1.1, 0.16, 1.1)
+        BRANCHES.append(dict(pts=pts, rs=rs, kind='crown limb')); leaders.append(pts)
+        tf = tuft_at(pts[-1], 3.4 + 0.8 * rt())
+        if not blocked(tf[:3], tf[3] * 0.8): LEAVES.append(tf)
+        ns = F['sec_n'][0] + int((F['sec_n'][1] - F['sec_n'][0] + 1) * rt())
+        got = twigs(pts, rs, 'crown branch', rt, F['sec_from'], ns, (L * F['sec_len'][0], L * F['sec_len'][1]), 3.0, (14, 48), nested=3)
+        if got == 0: problems.append((t, 'crown leader %d has no branches' % i))
+    CROWN[t] = dict(break_y=F['break_y'], leaders=len(leaders), note=F['note'])
+# the bole: plumb, its radius from the plan's trunk_r, flared at the foot into the buttresses, and running on a
+# little above the break where the leaders leave it; plank buttresses wherever the spiral's foot leaves room
+SPINES = {}; FINS = {}
+for t, tr in TREES.items():
+    F = FORM[t]; ys = [0, 0.4, 0.9, 1.6, 2.5, 3.6, 5, 7, 9.5] + [round(y, 1) for y in frange(12, F['break_y'], 3.0)] + [F['break_y'], F['break_y'] + 1.2]
+    SPINES[t] = [[y, round(trunk_r(t, min(y, F['break_y'])) * (1 + 0.55 * math.exp(-y / 1.6)) * (0.8 if y > F['break_y'] else 1), 3)] for y in ys]
+    foot = SPIRAL[t]['steps'][0]['a0'] if SPIRAL.get(t) else 0; rf = rng_({'east': 91, 'elder': 37, 'north': 63}[t]); fins = []
+    for b in sorted(range(0, 360, 5), key=lambda _: rf()):
+        if len(fins) >= F['fins']: break
+        if abs((b - foot + 180) % 360 - 180) < 35 or any(abs((b - f[0] + 180) % 360 - 180) < 360 / F['fins'] * 0.5 for f in fins): continue
+        h = F['fin_h'] * (0.75 + 0.35 * rf())
+        if clear_of_walks(t, b, 0.0, h + 0.3): fins.append([b, round(h, 2), round(F['fin_reach'] * (0.75 + 0.4 * rf()), 2)])
+    if len(fins) < F['fins']: problems.append((t, 'room for only %d of %d buttresses' % (len(fins), F['fins'])))
+    FINS[t] = fins
 for (x, y, z, r) in LEAVES:
-    if blocked((x, y, z), r * 0.8): problems.append(('a leaf cluster at (%.1f, %.1f, %.1f) stands in a deck or a walk' % (x, y, z),))
+    if blocked((x, y, z), r * 0.8): problems.append(('a leaf tuft at (%.1f, %.1f, %.1f) stands in a deck or a walk' % (x, y, z),))
+for br_ in BRANCHES:
+    for a_, b_ in zip(br_['pts'], br_['pts'][1:]):
+        h_ = math.hypot(b_[0] - a_[0], b_[2] - a_[2])
+        if math.degrees(math.atan2(b_[1] - a_[1], h_ or 1e-6)) < -6: problems.append(('a %s points down' % br_['kind'],)); break
 if BALD: problems.append(('%d structural limbs could not be put in leaf: %s' % (len(BALD), ', '.join(BALD)),))
-BOUGHS = [b_ for b_ in BRANCHES if b_['kind'] == 'bough']
+BOUGHS = [b_ for b_ in BRANCHES if b_['kind'] == 'crown limb']
 
 ## lianas: the canopy households are climbers, and climb the bark and the lianas left hanging from each
 ## ring's outer edge to the floor. They are the monkeys' own way down, not a built route.
@@ -669,7 +751,7 @@ for p in problems[len(problems) - 0:]: pass
 data = dict(
     deck=[dict(ext=list(map(list, d_.exterior.coords)), holes=[list(map(list, i.coords)) for i in d_.interiors]) for d_ in DECK_POLYS],
     spiral=SPIRAL, ring_decks=RING_POLYS, lianas=LIANAS, well=WELL, hoist=HOIST, commons_net=round(A_NET),
-    trees={k: dict(v, base_r=0.045 * v['h'], top_r=0.02 * v['h'], trunk_top=0.86 * v['h'], canopy_r=0.34 * v['h'],
+    trees={k: dict(v, spine=SPINES[k], fins=FINS[k], flutes=FORM[k]['flutes'], crown=CROWN[k], base_r=0.045 * v['h'], top_r=0.02 * v['h'], trunk_top=0.86 * v['h'], canopy_r=0.34 * v['h'],
                    chain=branch_chain(k, {'east': 30, 'elder': 200, 'north': 290}[k])) for k, v in TREES.items()},
     gate=GATE, plaza=PLAZA_CLEAR, commons=COMMONS, commons_y=COMMONS_Y, commons_area=round(A), centroid=CEN,
     amenities=[dict(key=k, name=n, who=w_, c=c, w=w, d=d, yaw=y, roof=r) for k, n, w_, c, w, d, y, r in AMENITIES + [PRIVY]],
@@ -683,7 +765,7 @@ data = dict(
     trunk_r_fn='0.045h at the base to 0.02h at 0.86h', problems=[list(map(str, p)) for p in problems])
 if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
-print('crowns: %d limbs and branches (%d crown limbs), %d leaf clusters' % (len(BRANCHES), len(BOUGHS), len(LEAVES)))
+print('trees: %s; %d limbs and branches (%d crown limbs), %d leaf tufts' % (', '.join('%s breaks at %.1f m into %d, %d buttresses' % (t, CROWN[t]['break_y'], CROWN[t]['leaders'], len(FINS[t])) for t in TREES), len(BRANCHES), len(BOUGHS), len(LEAVES)))
 print('commons %.0f m2 gross, %.0f net of trunks and spirals, deck %.0f m2 with the inn lobe; %d trunk spirals, %.0f m of ramp; %d bearers, %d deck limbs, %d commons limbs, %d hung bays, %d posts; bridges %s; %d problems' % (
     A, A_NET, DECK.area, len(SPIRAL), sum(math.radians(st['a1'] - st['a0']) * st['r'] / math.cos(rad(RAMP_ANGLE)) for v in SPIRAL.values() for st in v['steps']), len(SUPPORT['bearers']), len(SUPPORT['limbs']), len(SUPPORT['commons_limbs']), len(SUPPORT.get('hangers', [])), len(POSTS), ', '.join('%s-%s %.1f m' % (b['a'], b['b'], b['span']) for b in BR), len(problems)))
 if problems: sys.exit(1)
