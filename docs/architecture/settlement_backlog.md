@@ -506,6 +506,18 @@ through `CollisionPolicy` (the roof as a parkour surface); the fountain's
 water as a hazard-free decorative sheet; the pivoting door as an interactable
 with no text.
 
+**Sea folk city air (2026-10-14, proposed).** The plan's check found that one
+pressure cannot hold open pools at many depths. The dry network keeps one
+pressure, set by its datum (the 4.4 m walking floor): eleven open moon pools
+at the datum, twenty-one lock chambers above it (sea locks under the landing
+and crown halls, locks to the homes, the fountain lock), and Damaku's air
+engine at the Glassworks (`ocean_sea_folk_city.md` 2a, layout 10). The tool
+checks it, and the 3D model and floor plans draw it. To build in Godot: each
+moon pool as an ordinary water surface with swim exits; each lock chamber as a
+small dry volume that floods and empties between two interactable hatches,
+with no text; the drums, daises and lock chambers are solid through
+`CollisionPolicy`.
+
 **Pirate ships plan (2026-10-13).** Both ships drawn at true size and
 code-ready: `tools/pirate_ships_layout.py` writes `PirateShipsPlan` (hull
 shape, decks, rooms, ramps, dry volumes, crew work spots, routes and daily

@@ -213,13 +213,13 @@ cables, air bells moored on cables, lamp lines).
 | Place | Where | What it is |
 |---|---|---|
 | Tidehall | centre, on the mound | the palace, wet and unwrapped; nothing modern over the mound at any height |
-| The Exchange (wrap) | 67.5°, 33 m | a glass bubble 17.6 × 17 m, 12 m high, over the preserved **Hall of Records** (10 × 6 m), now dry: the archive and Dakuro's charts. Trading floor at 0.6 m round it, gallery at 4.4 m joining the ring tunnel, a ramp between them, a pool lock |
-| The guest hall (join) | either side of the 0° avenue, 36 m | the **West** and **East Strangers' Houses** (8.2 × 9.2 m each), preserved and each wrapped in glass, joined by a glass **common room** bridging the avenue at 4.4 m. A swimmer rises into the common room from the avenue below by its pool lock |
+| The Exchange (wrap) | 67.5°, 33 m | a glass bubble 17.6 × 17 m, 12 m high, over the preserved **Hall of Records** (10 × 6 m), now dry: the archive and Dakuro's charts. Trading floor at 0.6 m round it, gallery at 4.4 m joining the ring tunnel, a ramp between them, a moon pool on a nacre drum rising from the trading floor to the gallery, its well leaving through the glass |
+| The guest hall (join) | either side of the 0° avenue, 36 m | the **West** and **East Strangers' Houses** (8.2 × 9.2 m each), preserved and each wrapped in glass, joined by a glass **common room** bridging the avenue at 4.4 m. A swimmer rises into the common room from the avenue below by its moon pool |
 | Lamp House | 112.5°, 31 m | classical, wet |
 | School court | 157.5°, 30 m | classical colonnade, wet |
 | Current House homes (4) and the Lamp House family's home | outer terrace 193° to 257°; 124° at 60 m | classical, wet |
-| Ring-tower stumps (4) | 22.5°, 112.5°, 202.5°, 292.5° on the ring path (71 m) | preserved bases of the old ring towers; each holds a trunk's foot and a pool lock |
-| The Glassworks | (0, 118) by the vent | the first glass bubble, socketed in the slope, smoked glass, the furnace over the vent |
+| Ring-tower stumps (4) | 22.5°, 112.5°, 202.5°, 292.5° on the ring path (71 m) | preserved bases of the old ring towers; each holds a trunk's foot on a deck at 4.4 m with a moon pool in it; the old tower's chamber below, flooded, is the pool's well, and its old door the way in |
+| The Glassworks | (0, 118) by the vent | the first glass bubble, socketed in the slope with its floor at 4.4 m (the datum), smoked glass, the furnace over the vent, Damaku's air engine, a moon pool whose well runs out through the socket onto the main avenue |
 
 **Rooms in the Strangers' Houses** (world scale, inside the old walls):
 
@@ -238,7 +238,7 @@ from the old floor at 0.6 m up to the tunnels' level at 4.4 m.
 | Civic ring | round the open column at 40 m, threading the Exchange and the guest hall | 4.4 m | the classical ring arcade; arches over every avenue |
 | Spokes (4) | from the ring out over the Ring Current to the four trunk feet | 4.4 m | the arcade and the old bridges |
 | Avenue tunnel | beside the main avenue, from the ring to the Glassworks | 4.4 m | the classical avenue colonnade |
-| Trunks (4) | vertical glass shafts 8 m across with a spiral ramp (11.8 m a turn) | 4.4 to 33 m (the lookout's to 57 m) | the ring-tower stumps |
+| Trunks (4) | vertical glass shafts 8 m across, dry, with a spiral ramp 1.4 m wide in half-turn flights of 32° at most, landings between flights and at every floor | 4.4 to 33 m | the ring-tower stumps |
 | Crown ring | joining the trunk tops at 71 m from the centre | 30 m | braced between the trunks |
 
 Swimmers pass under every floor-level tunnel with 3.75 m clear. Total tunnel
@@ -255,8 +255,36 @@ length about 770 m.
 
 A landing hall is a glass SuperEgg 14 m across and 8 m tall, threaded on its
 trunk, with a walkable ring at least 1.6 m wide round the trunk. Each home is a
-wet SuperEgg docked to the hall's rim with a pool lock between them; the Reef
+wet SuperEgg docked to the hall's rim with a lock chamber in the collar between them; the Reef
 House workshop docks the same way. Crown halls are 12 m across.
+
+### The air: moon pools and locks (proposed, 2026-10-14)
+
+The dry network is one body of air at one pressure, about 7.85 bar: the sea's
+at the **datum**, the walking floor at 4.4 m (67.6 m down) where the civic
+ring, the spokes, the trunk feet, the common room and the Glassworks stand.
+Open pools work only there; above it the network's air would blow out of an
+open pool, so every entry up there is a lock chamber. The reasoning is in the
+culture brief, section 2a.
+
+| Entry | Where | Number | Kind |
+|---|---|---|---|
+| Guest hall | in the common room's floor, over the avenue | 1 | moon pool |
+| Glassworks | in its floor; the well runs through the socket onto the main avenue | 1 | moon pool |
+| Trunk feet | in the deck at the foot of each household trunk; the old tower chamber is the well, its door the mouth | 4 | moon pool |
+| Civic hall | at the foot of each avenue, on a dais 2.4 m above the old terrace | 4 | moon pool |
+| The Exchange | on a drum from the trading floor up to the gallery | 1 | moon pool |
+| Landing halls | under the floor on the city side, clear of the keel | 4 | sea lock, 0.9 to 1.4 bar to blow dry |
+| Crown halls | the same, at 30 m | 4 | sea lock, 2.4 bar |
+| Homes | in each docking collar, hall to wet home | 12 | lock |
+| The fountain lock | the central trunk's top, under the waterline landing | 1 | lock to the roof's air, 6.8 bar, slow |
+
+Moon pools are wells about 2 m deep with a nacre rim, the water 0.4 m below
+the floor. Lock chambers are 1.7 m across and 2.4 m tall with two round
+hatches 0.9 m across in orichalcum rims (the home locks are level, 2.2 m
+across and 2.6 m long). Air comes from the roof's air hall down a shaft in the
+wall over the main gate to Damaku's air engine in the Glassworks, worked by the
+vent's heat; spent air spills out under the moon pools' rims.
 
 ### Checks (`tools/sea_folk_third_pass.py`)
 
@@ -272,7 +300,14 @@ House workshop docks the same way. Crown halls are 12 m across.
 - landing halls' walkable rings;
 - the trunk ramps' headroom;
 - sixteen homes and every resident housed;
-- pool locks where swimmers arrive.
+- the air (proposed, 2026-10-14; culture brief 2a): every dry building with a
+  way in from the water; every open moon pool within 0.3 m of the datum
+  (4.4 m) and opening below its own water to open sea; every entry above the
+  datum a lock chamber with at least 0.2 bar of the network's overpressure to
+  blow it dry, and none below the datum; every lock chamber with room under its
+  hall, clear of the keel and the trunk, opening to open water or into its
+  home; the trunk ramps continuous from foot to crown at 32 degrees or less,
+  with a landing at every floor and 2.4 m headroom under the turn above.
 
 On approval this data replaces the second pass in `tools/sea_folk_layout.py`
 and `SeaFolkPlan`, and the validator takes the same checks.
@@ -293,14 +328,14 @@ The city is enclosed (culture brief section 4a). Everything below is in
 | Fountain | roof centre | basins 40, 26, 14, 6 m across; rims 0.9 to 12 m up; jet 16 m; glass floor 6.5 to 14 m out |
 | Secret stair | pedestal, door at 270 degrees behind the second tier's curtain | shaft 6.8 m across, from the roof to the waterline landing at 73 m |
 | Central trunk | the column, centre | 8 m across, glass, 74 m down to the palace roof at 19 m |
-| Civic hall | over the mound, round Tidehall | glass SuperEgg 44 x 41 x 32 m, epsilon 2.6; floor 2 m (the old terrace); pool locks at the four avenue feet |
+| Civic hall | over the mound, round Tidehall | glass SuperEgg 44 x 41 x 32 m, epsilon 2.6; floor 2 m (the old terrace); four moon pools at the avenue feet, each on a nacre dais whose rim is at the datum, 2.4 m above the terrace |
 | Civic link | from the ring at 92 degrees in to the civic hall's gallery | tunnel 21 m; a ramp from the terrace up to the gallery at 4.4 m |
 | Kraken lookout | on the parapet over the main gate | 10 x 7 m glass room |
 | Ancient spires | (r, bearing): (96, 8), (95, 60), (88, 152), (97, 214), (90, 265), (99, 328), (64, 174) | 46, 28 broken, 38, 22 broken, 48, 34 broken, 18 broken m |
 
-Circulation: the secret way in is roof, door, stair, landing, central trunk,
+Circulation: the secret way in is roof, door, stair, landing, the fountain lock, central trunk,
 civic hall. Ikara reaches the lookout across the roof. Swimmers enter by the
-gates' wickets and the pool locks. Visitors on legs reach the civic hall by
+gates' wickets, the moon pools and the lock chambers. Visitors on legs reach the civic hall by
 the civic link from the ring.
 
 Checks added:

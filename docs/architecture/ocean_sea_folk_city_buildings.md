@@ -48,7 +48,10 @@ building uses Greek temple forms; those belong to the Sky Kingdom.
 - **Dry buildings** (the three air halls and the tunnels) hold compressed air:
   a moon pool 4 m across in the floor, a ramp out of it, nacre floors, frescoes,
   and furniture for people on legs. Each registers as a dry and breathable
-  volume.
+  volume. **Third pass (proposed, 2026-10-14):** the whole dry network is at
+  one pressure, the sea's at the datum (the 4.4 m walking floor), so open moon
+  pools stand only at the datum and every entry higher up is a lock chamber
+  (`ocean_sea_folk_city.md` 2a, "Physics the plan respects"; layout brief 10).
 
 ### Exclusions
 
@@ -230,7 +233,11 @@ bird-cage ribs. The modern work is whole bubbles, tunnels and trunks.
   still in the water; nothing hangs it or holds it down.
 - **Floor:** a deck about 1.2 m below the bubble's girth, so the walls lean out
   above the walking ring.
-- **Entry:** a pool lock in the floor.
+- **Entry:** a lock chamber hung under the floor on the city side, clear of
+  the keel: 1.7 m across and 2.4 m tall, an inner hatch in the floor and an
+  outer hatch opening down to the sea, both round in orichalcum rims. The
+  bubble's own air, at a higher pressure than the sea up here, blows it dry.
+  (An open pool would lose the bubble's air.)
 
 ### Wrap (the Exchange; each Strangers' House)
 
@@ -239,27 +246,35 @@ bird-cage ribs. The modern work is whole bubbles, tunnels and trunks.
   at a removable nacre collar.
 - **Inside:** the old building stands whole and is used again, dry. Round it
   are the new floor at 0.6 m and a gallery at 4.4 m where the tunnels arrive,
-  with ramps between them.
+  with ramps between them. The new floor is below the datum, so the moon pool
+  stands on a nacre drum whose rim is at the gallery's level, and its well
+  leaves through the glass by a short duct.
 
 ### Join (the guest hall)
 
 - Two wraps linked by a new glass room: the common room, a SuperEgg cut level
   beneath its floor, bridging the avenue at 4.4 m with swimmers passing under
   it.
-- A pool lock in its floor opens down into the avenue.
+- A moon pool in its floor, at the datum, opens down into the avenue.
 
 ### Trunk
 
 - A vertical glass shaft 8 m across, its foot set in an old ring-tower stump.
-- Inside: a spiral ramp 1.4 m wide at 32° round a nacre core, with landings at
-  the landing hall and the crown hall.
+- Inside: dry air, one with the tunnels and halls, and a spiral ramp 1.4 m
+  wide round an open centre, in half-turn flights of 32° at most with a landing
+  between flights and at the foot, the landing hall and the crown hall.
+- At the foot, a nacre deck at the datum with an open moon pool in the centre;
+  the stump's old chamber below, flooded, is its well, and the old tower door
+  is where swimmers come in.
 - Broad nacre collars at the landing levels; no ribs.
 
 ### Home (wet)
 
 - A nacre SuperEgg (epsilon about 2.0 below, 2.6 above) with a wide glazed
   front, docked to its landing hall's rim.
-- A pool lock leads from the home into the hall. Swim-in openings at least
+- A level lock chamber in the docking collar leads from the home into the
+  hall: an inner hatch on the hall's side and an outer one on the home's, the
+  hall's air blowing it dry. Swim-in openings at least
   3 m clear face the open water. Rooms are at least 4 m tall, with woven-kelp
   screens.
 

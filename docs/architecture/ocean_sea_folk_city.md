@@ -154,12 +154,70 @@ Two kinds of work, both in SuperEggs (revised 2026-10-13 after review):
 
 ### Physics the plan respects
 
-- **One sealed network.** The modern dry spaces are sealed at one pressure, so
-  dry rooms at different depths can be joined and the trunks can climb.
-  Swimmers enter through **pool locks**: a swimmer rises into a pool in the
-  floor and steps out, and the lock keeps the air in. There is one in every
-  dry building, at every trunk foot, in every landing and crown hall, and one
-  between each home and its landing hall.
+**The air (proposed, 2026-10-14).** The second rule below replaces "pool locks
+everywhere": the plan's check found that one pressure cannot hold open pools
+at many depths.
+
+- **One sealed network at one pressure.** Every dry space you can walk in (the
+  trunks, the tunnels, the halls, the wraps) is one body of air, so walkers go
+  up and down the trunks' spiral ramps and along the tunnels with no door
+  anywhere inside it. That is what the trunks are for: inside each is dry air
+  and a ramp, 1.4 m wide, in half-turn flights of 32 degrees at most with a
+  landing between flights and at every floor.
+- **The datum sets the pressure.** An open pool keeps its air only where the
+  air's pressure equals the sea's at the pool's surface, and the sea's pressure
+  rises by a tenth of a bar for every metre down. So the network has one depth
+  where open pools work: its **datum**, the walking floor at its foot, 4.4 m
+  above the city floor and 67.6 m down. The civic ring, the spokes, the trunk
+  feet, the guest hall's common room and the Glassworks' floor are all at the
+  datum. The network's air is at the sea's pressure there, about 7.85 bar.
+- **Moon pools at the datum.** Every open entry is a **moon pool** in a floor
+  at the datum (within 0.3 m): a well about 2 m deep with a nacre rim, its
+  water standing 0.4 m below the floor. A swimmer rises into it and steps out;
+  there is no door. There are eleven: the guest hall's common room (opening
+  down into the avenue), the Glassworks (its well runs down through the socket
+  and out onto the main avenue), one at each trunk foot (the old ring tower's
+  chamber, flooded, is its well, and the old tower door its mouth), four in the
+  civic hall and one in the Exchange. The last five are in halls whose floors
+  are below the datum (the civic hall's old terrace 2.4 m below, the trading
+  floor 3.8 m below), where an open pool would flood the floor: each stands on
+  a nacre drum or dais whose rim is at the datum, with steps down to the floor,
+  and its well leaves through the glass by a short duct.
+- **Lock chambers above the datum.** Higher up, the sea's pressure is lower than
+  the network's (by 1.1 to 1.6 bar at the landing halls, 2.6 bar at the crown
+  halls), and an open pool would blow the air out. Every way in up there is a
+  **lock chamber**: a small chamber of nacre and glass with two round hatches
+  in orichalcum rims. Each landing and crown hall has a sea lock hung under its
+  floor on the city side, clear of the keel round the trunk, with its inner
+  hatch in the floor and its outer hatch opening down to the sea. A swimmer
+  enters the flooded chamber, the outer hatch closes, and the network's own
+  overpressure blows the water out through a valve in the chamber's floor, so
+  no pump is needed; then the inner hatch opens. Leaving reverses it: the
+  chamber's air is let out to the sea and the sea floods in. Each wet home docks
+  to its landing hall through a short level lock in the docking collar, worked
+  the same way. There are twenty-one lock chambers: eight sea locks, twelve
+  home locks and the fountain lock. No entry lies below the datum, where a lock
+  would need a pump.
+- **The fountain lock.** The central trunk's top meets the air under the roof,
+  at the surface's pressure, 6.8 bar below the network's. A lock chamber in the
+  trunk's top, just under the waterline landing, joins them. It is the one
+  slow lock in the city: its air is let up or down through a small valve while
+  whoever is inside waits.
+- **The air supply.** Damaku's air engine in the Glassworks, its bellows worked
+  by the warm vent's heat, draws air from the roof's air hall down a stone air
+  shaft built inside the wall over the main gate and through a conduit in the
+  rock to the Glassworks, and presses it into the network. Spent air leaves the
+  only way it can: it spills out under the rims of the moon pools, which are
+  the network's relief valves, so the pressure can never rise above the
+  datum's. The air each lock cycle spends is made up the same way. The
+  Glassworks was the first air bubble, and its floor set the datum that every
+  later dry space keeps.
+- **The glass.** Above the datum the network's air pushes outward on the glass
+  by about 0.1 bar for every metre of height: the landing and crown halls'
+  glass is in tension, held by its nacre bands, and the top of the central
+  trunk carries the most. Below the datum (the trading floor, the guest
+  houses' floors, the civic hall's terrace) the sea presses in a little and the
+  floors are sealed.
 - **Air is buoyant,** so every bubble in the water carries a nacre ballast keel
   that holds it level and still, and the trunks and tunnels brace one another.
   Nothing is held down by cables, and nothing stands on legs.
@@ -175,9 +233,12 @@ Some work cannot be done underwater: glass is blown in air, paper and charts
 keep only when dry, and air-breathing visitors need somewhere to stand. The sea
 folk build **air halls**, sealed glass bubbles filled with air.
 
-- **Pool lock entry.** An air hall is entered from below, through a pool in its
-  floor. A swimmer rises through the pool and climbs out onto the floor by a
-  broad ramp; the lock keeps the air in, with no door to open.
+- **Entry.** An air hall on the city floor is entered from below through an
+  open moon pool at the network's datum: a swimmer rises through the pool and
+  climbs out onto the floor by a broad step, with no door to open. A hall
+  higher in the column is entered through a lock chamber under its floor, whose
+  outer hatch closes behind the swimmer before the hall's own air blows the
+  water out (section 2a, "Physics the plan respects").
 - **Tail to legs.** As a sea person climbs out of the pool, their tail parts
   into legs, and they walk the hall on foot. Re-entering the water, the legs
   close back into a tail. The change is part of their nature, not a magic
@@ -349,8 +410,10 @@ legs and an unhelmeted hero can walk the city without entering the water.
   arches, with 3.75 m clear.
 - **Dimensions:** walking floor at least 3 m wide, headroom at least 3.2 m,
   1:6 or gentler; trunk ramps 1.4 m wide at 32° with landings.
-- **Air:** the whole network is one sealed volume, as the spaceship's cabin and
-  docking neck are.
+- **Air:** the whole network is one sealed volume at one pressure, as the
+  spaceship's cabin and docking neck are, so no tunnel or trunk has a door.
+  Its pressure is the sea's at the datum, the tunnels' 4.4 m floor; swimmers
+  enter by the moon pools at that level and by lock chambers above it.
 
 ## 4a. The walls and the roof (proposed, 2026-10-13)
 
@@ -392,9 +455,9 @@ Two eras, each a closed kit (section 2a), over the remnants of a third.
 | Sources | Atlantean (Plato's rings and canals) with Minoan named elements | invented; the heritage moves follow the British Museum's Great Court and the Singapore National Gallery |
 | Massing | grounded, symmetrical, on axes; shells on socketed nacre plinths; arcades, bridges and ring towers | whole bubbles with floors; wraps round heritage; tunnels in rings and spokes; trunks |
 | SuperEgg epsilon | 4.5 to 5.5 (carved, stacked) | 2.0 to 2.6 (bubbles, homes, wraps) |
-| Openings | tall superellipse arches, exponent about 4 | the glass itself; pool locks in the floor; swim openings at least 3 m clear in homes |
+| Openings | tall superellipse arches, exponent about 4 | the glass itself; open moon pools at the datum, round-hatched lock chambers above it; swim openings at least 3 m clear in homes |
 | Structure | the shell itself; Minoan columns tapering downward, with cushion capitals, red or ocean blue | frameless curved glass; broad nacre bands at floor lines; a nacre ballast keel under each bubble in the water |
-| Orichalcum | plating on the ring walls and the band | fittings only: rails, counters, lock rims |
+| Orichalcum | plating on the ring walls and the band | fittings only: rails, counters, hatch rims |
 | Ornament | spiral and wave bands carved at the springing line; frescoes of dolphins and octopus | the band as a broad nacre ring at the floor line; nothing else |
 | Palette | nacre white and teal; prism green crowns; column red and blue | clear and faintly green glass, nacre, warm lamp light inside |
 
@@ -481,12 +544,17 @@ written explicitly.
 **Fixed:** the castle, homes, paths, lamps, gardens and twenty residents
 already built; merfolk bodies; the merchants; the Tidekeeper and Nautilus Crown.
 
+**Proposed (2026-10-14):** the air: one pressure set by the datum (4.4 m up),
+open moon pools at the datum only, lock chambers above it, the fountain lock,
+and Damaku's air engine at the Glassworks (section 2a, "Physics the plan
+respects").
+
 **Proposed (2026-10-13):** the walls and roof (section 4a); the civic hall
 round Tidehall; the first city and its spires; the fountain and the secret way
 down; the sea folk's isolationism; the lookout on the wall.
 
 **Proposed:** the Atlantis and Minoan influences with modern technology;
-orichalcum; air halls entered by moon pool, where the sea folk walk on legs;
+orichalcum; air halls entered by moon pool or lock, where the sea folk walk on legs;
 glass tunnels joining the air halls; Linear A-sounding names for every
 resident; the Demon King's discord with the other communities;
 the seven households, the residents' roles and two children; the concentric
@@ -498,6 +566,12 @@ hall charges 25 Tokoins. The layout is in `ocean_sea_folk_city_layout.md`.
 **Deferred by the user:** the Ocean Kingdom's backstory, including how the
 Demon King sowed the discord.
 
+**Open (2026-10-14):** air at 7.85 bar would, in the real world, be too rich
+in oxygen for an air-breather to live in for long and would need hours of
+decompression on the way up; whether the hero and visitors simply breathe it
+(the game's allowance), or the city's air is thinned for them, and how long
+the fountain lock takes in play.
+
 ## Implementation notes
 
 - **Air halls reuse the existing pressurised-volume idea.** The spaceship
@@ -505,7 +579,8 @@ Demon King sowed the discord.
   `contains_breathable_point()`, which `AtmosphereLayer` consults. An air hall
   needs the same kind of query from the liquid system: inside the hall's air,
   a body is out of the water, stops swimming, breathes and walks. The moon pool
-  surface is an ordinary water surface with swim exits. The same shared
+  surface is an ordinary water surface with swim exits. A lock chamber is a
+  small dry volume of its own that floods and empties between its two hatches. The same shared
   **dry volume** system the pirate ships need below their waterline does this
   (`ocean_pirate_ships_design.md`, section 6): no liquid inside, and no
   underwater fog or tint while the camera is inside.
