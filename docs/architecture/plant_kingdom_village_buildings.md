@@ -33,17 +33,18 @@ footprints come from the layout.
 
 | Element | Specification |
 |---|---|
+| Living trees (2026-10-14) | **nothing is driven into a living tree.** The ring collars are compression collars clamped on bark pads and lashed, and loosened every dry season as the trunk thickens, so they never girdle it. The ramps touch the trees nowhere |
 | Joints | **lashed, never nailed** ("bark doesn't hold a nail the way wood does"): every joint wrapped in vine or split rattan, and the lashing visible as the village's signature motif, a dark diagonal wrap at every post head and brace foot |
 | Structural module | 1.9 m post spacing, half the 3.8 m landing rise, so floors fall on the existing ring heights (11.4, 22.8, 34.2, 45.6 m) |
 | Posts | round timber poles and bamboo culms (`EPSILON` about 2.5); a heavier squared timber only for the commons' six support posts and the ape lodge |
 | Decks | split-bamboo or plank decking on joists, lashed, with a small gap between boards |
-| Roofs | **broad leaf roofs** in the prototype's manner: a soft superellipse dome or cone of layered palm-leaf thatch (*atap*), fresh green on top and older brown layers beneath, eaves deep enough to shed afternoon rain clear of the deck (at least 1.0 m past the posts). Pitch 35° to 45°, one band for the whole village |
+| Roofs | **broad leaf roofs**: *atap* (nipa-palm leaf folded over battens) laid in three overlapping courses on bamboo rafters, the older brown courses below and the newest course on top in the household's own colour; a squarish superellipse eave outline 1.0 m past the wall plate; pitch **40°** for the whole village (inside the charter's 35° to 45°) |
 | Walls | none on most buildings. Where privacy, weather or safety needs one: woven bamboo panels or bark panels, with roll-up rattan blinds instead of shutters |
 | Openings | wide round-headed doorways (superellipse), at least 1.5 m clear and 2.4 m high, so the party, blorbs and the apes pass |
 | Headroom | every leaf-roof eave, bridge or deck a route passes under clears 2.4 m above the deck, so the hero and the apes walk upright; roofs over the commons and rings keep their eave at 2.4 m or higher and slope up from there |
-| Roof construction | leaf roofs are the shared thatch-dome construction for the whole village, one builder and one thickness, never a flat slab with rounded corners |
+| Roof construction (revised 2026-10-14) | **the posts carry the roof, visibly.** Round posts at the corners and no more than 3.8 m apart (twice the 1.9 m module) rise to a lashed bamboo **wall plate** at 3.3 m; the rafters run from the plate to the head of the **central pillar**, the prototype's signature, which rises to the peak (a pyramid roof on a square pavilion) or carries a short **ridge pole** (a hip roof on an oblong one). The thatch is 0.3 m thick. With the 1.0 m eave at 40°, the eave's underside is at 2.46 m, clear of the 2.4 m headroom. One builder and one thickness for the whole village (`atapRoof` and `postFrame` in the model), never a flattened leaf mass on poles |
 | Rails | rope rails on posts at 1.1 m, with catch nets slung beneath every deck edge more than 3 m above the ground |
-| Vertical routes | one 32° trunk spiral per tree, from the roots to its highest deck, hung on brackets from the bark; the commons hoist; lianas for the climbers; no stairs, no ladders (layout 11) |
+| Vertical routes (revised 2026-10-14) | one 32° **trunk spiral** per tree, from the roots to its highest deck: a single continuous ramp, a laminated bamboo deck on two curved stringers, self-supporting as a helix. It rests on the ground at its foot and on each deck's ring beam where it passes through, and hangs between them from the deck above by a few rope hangers. **Nothing is driven into the bark**, and it keeps a 0.3 m well clear of the trunk all the way up. Its rope rail stands on short posts stepped into its own outer stringer. Also the commons hoist and lianas for the climbers; no stairs, no ladders |
 | Light | resin lamps in gourd shades (*damar* resin), hung from the roof beams; no lights on poles |
 | Water | every roof drains by a bamboo gutter into a gourd or a bamboo tube |
 | Palette | 60 percent living bark and lashed timber; 30 percent leaf-green and thatch-brown roofs (the prototype's varied roof colours kept as one household accent each); 10 percent vine rope, rattan and warm fruit colours |
@@ -97,9 +98,9 @@ sleeping platforms.
   - over the plaza, a hung ring beam round the gathering circle, carried by
     rope hangers from six limbs, two from each tree, at about 19 m. No cable
     stays.
-- **Trunk spirals:** each tree's 32° plank ramp, 2.4 m wide up to the
-  commons and 1.5 m above, with a rope rail, wound round its trunk on
-  knee-braced brackets. Each lands on the commons through an opening beside
+- **Trunk spirals:** each tree's 32° ramp, 2.4 m wide up to the
+  commons and 1.5 m above, with a rope rail: one continuous self-supporting
+  ramp round the trunk, nothing driven into the bark (section 1). Each lands on the commons through an opening beside
   the bark, facing the deck's middle (layout 11).
 - **Edge:** rope rails all round, with catch nets 2 m wide beneath.
 - **Placement on the deck:**
@@ -289,6 +290,66 @@ Pavilions are sized by household:
 Rope-and-plank bridges join the three trees at 22.8 m: 2 m wide, rope rails at
 1.1 m, nets beneath, a gentle sag. Each lands on a widened ring landing with
 2 m clear.
+
+## 4a. Built from the briefs (2026-10-14)
+
+The model drew every tree structure with one placeholder: a flattened leaf
+dome on thin poles, which read as a squashed tree crown with nothing visibly
+holding it up. Every structure is now built from its brief, with the shared
+roof and frame (section 1).
+
+**Design brief by structure** (plan sizes from the layout):
+
+| Structure | Plan and frame | Roof | Its own parts |
+|---|---|---|---|
+| Single pavilion (Abu, Tunas, Bayu, Dahan) | 4 × 4 m; four corner posts; central pillar | pyramid to the pillar's head | a hammock nest slung from the pillar, storage baskets, blinds rolled up under the plate on the walkway side |
+| Couple's pavilion (Senja and Rimba, Jati and Embun, Tirta and Bintang) | 5 × 4 m; posts no more than 3.8 m apart; pillar | hip on a 1 m ridge pole on the pillar | a broad shared nest, a second storage bay |
+| Joined pavilions (Intan and Murai) | two 4 × 4 m pavilions on a shared 1.2 m deck | two pyramids | each sibling's side faces their own way |
+| Crown pavilion (Purnama and Sekar) | 7 × 5 m; posts at 3.5 m; pillar | hip on a 2 m ridge pole | two sleeping alcoves of woven screens either side of the pillar |
+| The empty pavilion (Laras and Gilang) | 4 × 4 m | pyramid, every course gone grey | blinds tied down on all four sides |
+| Kitchen (Wangi) | 8 × 6 m; posts at 3.8 m; no pillar over the fire | hip, with a **smoke vent**: a small second roof lifted on four short poles clear over the peak | the firebox on a stone base in a sand tray, the long work bench |
+| Dining terrace | 10 × 6 m | hip | two long low split-log tables with benches, orchid baskets from the beams |
+| Market (Delima, Rotan) | 12 × 4 m; posts at 3 m | long hip | two counters, fruit baskets and rope coils, the sellers' side to the edge |
+| Cistern pavilion | 5.5 × 6 m | hip with a bamboo **gutter** all round the eave | the lashed barrel cistern 2 m across |
+| Food store | 4 × 4 m, raised 1.2 m on four posts with smooth collars | pyramid | woven walls, the one lockable door, a rope ladder |
+| Jati's workshop | 5.5 × 5 m | hip | woven back and end walls, the bench, the rack of poles |
+| Public privy | 1.8 × 1.4 m closet | small pyramid on a 2.6 m plate | woven screens, a hung door |
+| Gathering circle | 7.2 m ring, open to the sky | none | two rings of log seats, the log drum, four lamp poles with gourd lamps |
+| Bima's inn | 14 × 6.5 m house and 3 m veranda | one long hip over both, the inn's deep red-brown top course | woven walls; its wall plate on the house walls and a row of veranda posts at 3.8 m |
+| Trunk spirals | one continuous ramp per tree | — | rope rail on posts stepped into its own stringer; no brackets |
+
+**Style audit** (every visible element, its term and its tradition):
+
+| Element | Term | Tradition |
+|---|---|---|
+| Roof | pyramid or hip of *atap* thatch in courses | canopy vernacular (Southeast Asian thatch) |
+| Roof peak | rolled leaf ridge or tied finial | canopy vernacular |
+| Smoke vent | raised vent roof | canopy vernacular |
+| Frame | round posts, lashed wall plate, central pillar | canopy vernacular (the prototype's pillar) |
+| Joints | vine lashing, dark wrap at every post head | canopy vernacular (signature motif) |
+| Walls | woven bamboo panels, roll-up blinds | canopy vernacular |
+| Ramp | self-supporting helical ramp of laminated bamboo | canopy vernacular, from canopy walkways |
+| Food store | raised store on collared posts | ground-lodge secondary (granary on staddles) |
+| Inn | long house with a veranda under one roof | ground-lodge secondary (the longhouse gallery) |
+
+Two traditions at most on any one building. The inn is the one landmark that
+takes the secondary's long-house form.
+
+**Variation matrix** (the shared language is fixed; each differs on two or
+three axes, for a reason):
+
+| Structure | Plan | Roof type | Walls | Own mark |
+|---|---|---|---|---|
+| Single pavilion | square | pyramid | none, blinds | the household's top course colour |
+| Couple's pavilion | oblong | hip | none, blinds | a broad shared nest |
+| Crown pavilion | large oblong | hip | alcove screens | the highest roof in the village |
+| Empty pavilion | square | pyramid, grey | blinds tied down | the only grey roof |
+| Kitchen | large oblong | hip with smoke vent | none | the only fire, the only vent |
+| Market | long | long hip | none | counters to the edge |
+| Cistern | near square | hip | none | the only gutter |
+| Food store | square, raised | pyramid | woven, locked | the only raised building |
+| Workshop | oblong | hip | two woven walls | the only work clutter |
+| Inn | long house | long hip | woven, the only walled house | the only red-brown roof |
 
 ## 5. The ground camp
 

@@ -275,7 +275,7 @@ def spiral(t, a0):
     ys = (0.0,) + DECKS[t]; a = a0; steps = []; opens = []
     for y0, y1 in zip(ys, ys[1:]):
         w = SPIRAL_W_LOW if y0 == 0 else SPIRAL_W_UP
-        r = trunk_r(t, (y0 + y1) / 2) + WELL + w / 2
+        r = trunk_r(t, y0) + WELL + w / 2        # the trunk is thickest at the turn's foot: keep the well clear there
         half = (y1 - y0) / 2 / math.tan(rad(RAMP_ANGLE))
         for k in range(2):
             ya, yb = y0 + (y1 - y0) * k / 2, y0 + (y1 - y0) * (k + 1) / 2
@@ -494,7 +494,19 @@ def limb_path(t, y, b, r0, length, pitch, arch, n=8, wander=0.0):
     return out
 # what a branch or a leaf may not pass through: every deck with the room people stand in over it
 # (pavilion roofs included), the bridges, and the spirals' headroom
+## the shared leaf roof (plant_kingdom_village_buildings.md 1, revised 2026-10-14): atap thatch on bamboo rafters from a
+## lashed wall plate on the posts to the head of the central pillar; one pitch band and one eave for the whole village
+ROOF_PITCH = 40.0             # degrees, inside the charter's 35 to 45
+ROOF_EAVE = 1.0               # eave projection past the wall plate, horizontal
+ROOF_PLATE = 3.3              # wall plate above the deck: the eave's underside then clears 2.4 m
+ROOF_THATCH = 0.3
+def roof_of(w, d):
+    run = min(w, d) / 2; ridge = max(w, d) - min(w, d)
+    return dict(plate=ROOF_PLATE, eave=ROOF_EAVE, pitch=ROOF_PITCH, ridge=round(ridge, 2), thatch=ROOF_THATCH,
+                eave_y=round(ROOF_PLATE - ROOF_EAVE * math.tan(rad(ROOF_PITCH)), 2), apex=round(ROOF_PLATE + run * math.tan(rad(ROOF_PITCH)) + ROOF_THATCH, 2))
+if roof_of(4, 4)['eave_y'] < HEADROOM: problems.append(('the leaf roof\'s eave is under %.1f m' % HEADROOM,))
 SLABS = [(COMMONS_Y, DECK.buffer(0.5))]
+ROOFS = []        # (floor, apex, plan): every roofed building's whole volume, eaves included
 for t in TREES:
     for y in DECKS[t][1:]:
         width = 5.5 if y == CROWN_Y else RING_WIDTH
@@ -505,11 +517,22 @@ for t in TREES:
                 w_, d_ = PAV_SIZE[k]; pc = pol(TREES[t]['c'], r_out + d_ / 2 - 0.6, pb)
                 shp = shp.union(Polygon(rect(pc, d_ + 1.5, w_ + 1.5, pb)))
         SLABS.append((y, shp))
+        for tt, yy, pb, k, who in PAVILIONS:
+            if tt == t and yy == y:
+                w_, d_ = PAV_SIZE[k]; pc = pol(TREES[t]['c'], r_out + d_ / 2 - 0.6, pb); rf = roof_of(w_, d_)
+                ROOFS.append((y, y + rf['apex'] + 0.5, Polygon(rect(pc, d_ + 2 * rf['eave'] + 0.6, w_ + 2 * rf['eave'] + 0.6, pb))))
 for br in BR:
     a_, b_ = TREES[br['a']]['c'], TREES[br['b']]['c']
     SLABS.append((BRIDGE_Y, LineString([a_, b_]).buffer(2.0)))
+for k_, n_, w__, c_, w_, d_, y_, r_ in AMENITIES + [PRIVY]:
+    if k_ == 'circle': continue
+    rf = roof_of(w_, d_); ROOFS.append((COMMONS_Y, COMMONS_Y + rf['apex'] + (1.2 if k_ == 'store' else 0) + 0.5, Polygon(rect(c_, w_ + 2 * rf['eave'] + 0.6, d_ + 2 * rf['eave'] + 0.6, y_))))
+_ir = roof_of(INN['house'][0], INN['house'][1] + INN['veranda'])
+ROOFS.append((COMMONS_Y, COMMONS_Y + _ir['apex'] + 0.5, box(INN['house_c'][0] - INN['house'][1] / 2 - INN['veranda'] - 1.3, INN['house_c'][1] - INN['house'][0] / 2 - 1.3, INN['house_c'][0] + INN['house'][1] / 2 + 1.3, INN['house_c'][1] + INN['house'][0] / 2 + 1.3)))
 def blocked(p, rad_=0.0):
     x, y, z = p; q = Point(x, z).buffer(rad_) if rad_ else Point(x, z)
+    for y0, y1, shp in ROOFS:
+        if y0 - rad_ < y < y1 + rad_ and shp.intersects(q): return True
     for yd, shp in SLABS:
         if yd - 1.5 - rad_ < y < yd + 4.2 + rad_ and shp.intersects(q): return True
     for t, tr in TREES.items():
@@ -695,16 +718,22 @@ for t, tr in TREES.items():
 # little above the break where the leaders leave it; plank buttresses wherever the spiral's foot leaves room
 SPINES = {}; FINS = {}
 for t, tr in TREES.items():
-    F = FORM[t]; ys = [0, 0.4, 0.9, 1.6, 2.5, 3.6, 5, 7, 9.5] + [round(y, 1) for y in frange(12, F['break_y'], 3.0)] + [F['break_y'], F['break_y'] + 1.2]
-    SPINES[t] = [[y, round(trunk_r(t, min(y, F['break_y'])) * (1 + 0.55 * math.exp(-y / 1.6)) * (0.8 if y > F['break_y'] else 1), 3)] for y in ys]
+    F = FORM[t]; ys = [0, 2.5, 5, 7.5] + [round(y, 1) for y in frange(12, F['break_y'], 3.0)] + [F['break_y'], F['break_y'] + 1.2]
+    SPINES[t] = [[y, round(trunk_r(t, min(y, F['break_y'])) * (0.8 if y > F['break_y'] else 1), 3)] for y in ys]     # no flare: the buttresses flare the foot, clear of the ramp
     foot = SPIRAL[t]['steps'][0]['a0'] if SPIRAL.get(t) else 0; rf = rng_({'east': 91, 'elder': 37, 'north': 63}[t]); fins = []
     for b in sorted(range(0, 360, 5), key=lambda _: rf()):
         if len(fins) >= F['fins']: break
-        if abs((b - foot + 180) % 360 - 180) < 35 or any(abs((b - f[0] + 180) % 360 - 180) < 360 / F['fins'] * 0.5 for f in fins): continue
+        if -60 <= ((b - foot + 180) % 360 - 180) <= 15 or any(abs((b - f[0] + 180) % 360 - 180) < 360 / F['fins'] * 0.5 for f in fins): continue
         h = F['fin_h'] * (0.75 + 0.35 * rf())
         if clear_of_walks(t, b, 0.0, h + 0.3): fins.append([b, round(h, 2), round(F['fin_reach'] * (0.75 + 0.4 * rf()), 2)])
     if len(fins) < F['fins']: problems.append((t, 'room for only %d of %d buttresses' % (len(fins), F['fins'])))
     FINS[t] = fins
+for t in TREES:
+    for st in SPIRAL[t]['steps']:
+        if trunk_r(t, st['y0']) + WELL - 1e-6 > st['r'] - st['w'] / 2: problems.append((t, 'the bole reaches the ramp at %.1f m' % st['y0']))
+    foot = SPIRAL[t]['steps'][0]; fb = foot['a0']
+    for b, h, reach in FINS[t]:
+        if -60 <= ((b - fb + 180) % 360 - 180) <= 15: problems.append((t, 'a buttress at %d stands on the way to the ramp foot' % b))
 for (x, y, z, r) in LEAVES:
     if blocked((x, y, z), r * 0.8): problems.append(('a leaf tuft at (%.1f, %.1f, %.1f) stands in a deck or a walk' % (x, y, z),))
 for br_ in BRANCHES:
@@ -756,6 +785,7 @@ data = dict(
     gate=GATE, plaza=PLAZA_CLEAR, commons=COMMONS, commons_y=COMMONS_Y, commons_area=round(A), centroid=CEN,
     amenities=[dict(key=k, name=n, who=w_, c=c, w=w, d=d, yaw=y, roof=r) for k, n, w_, c, w, d, y, r in AMENITIES + [PRIVY]],
     inn=INN, inn_lobe=inn_poly, posts=POSTS, support=SUPPORT, branches=[dict(b_, pts=[[round(v, 2) for v in q] for q in b_['pts']]) for b_ in BRANCHES], leaves=[[round(v, 2) for v in q] for q in LEAVES], sbpoly=SBPOLY, lobes=LOBES, inn_house=house_poly,
+    roof=dict(pitch=ROOF_PITCH, eave=ROOF_EAVE, plate=ROOF_PLATE, thatch=ROOF_THATCH),
     rings=dict(ys=RING_YS, crown=CROWN_Y, width=RING_WIDTH, bay=BAY_WIDTH),
     pavilions=[dict(tree=t, y=y, b=b, kind=k, who=w_, size=PAV_SIZE[k]) for t, y, b, k, w_ in PAVILIONS],
     decks=DECKS,

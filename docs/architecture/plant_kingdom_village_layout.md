@@ -435,7 +435,7 @@ grand spiral. The plan file carries it and checks it.
 - **The trunk spiral.** Each tree has one 32° ramp hugging its trunk from
   the roots to its highest deck: the East and North Trees to 34.2 m, the
   Elder Tree to its crown at 45.6 m.
-  - It hangs on its own knee-braced brackets from the bark.
+  - It is one continuous self-supporting ramp; nothing is driven into the bark (buildings brief 1, revised 2026-10-14). Each turn is sized from the trunk's radius at its foot, where the trunk is thickest, so the 0.3 m well holds all the way up.
   - It is 2.4 m wide up to the commons, which everyone and the goods use,
     and 1.5 m above.
   - Each storey of 11.4 m is two flights of 5.7 m with a 1.2 m landing
@@ -539,6 +539,8 @@ The user found three faults in the model:
 - **Clear of people.** No branch or tuft enters a deck, the room over a deck, a bridge or a spiral's headroom.
 
 **Buttresses** stand only where the spiral's foot leaves room: none within 35° of the foot, and none under a walk.
+
+**Buttresses and the ramp foot (2026-10-14).** The bole has no circular flare: a flare would fill the ramp's well where the ramp leaves the ground. The buttresses flare the foot instead. They are thick plank roots, 1.5 m at the bole and thinning to 0.25 m, with rounded crests, falling in a concave curve to the ground and snaking a little. None stands within 60° before the ramp's foot or 15° after it, so the way onto the ramp is clear. The checks fail a bole that reaches any ramp, and a buttress on the way to a foot.
 
 **In the game** (backlog P7): `NatureProps.build_emergent_tree` builds the village trees from this data:
 - the bole as one swept, fluted mesh;

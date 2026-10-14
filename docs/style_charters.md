@@ -224,6 +224,28 @@ Kok and Sham Shui Po, and Tokyo's covered shopping streets (*shōtengai*).
 | Roof | tanks, laundry, greenhouse or garden | how the residents use it |
 | Core | shared with a neighbour or the house's own | narrow lots share |
 
+## Plant Kingdom: the primate village (canopy vernacular; approved 2026-10-06, kit revised 2026-10-14)
+
+The full kit, hierarchy and briefs are in
+`docs/architecture/plant_kingdom_village_buildings.md` (sections 1 and 4a).
+In brief:
+- **Primary, about 70 percent: canopy vernacular built by primates.** Open
+  pavilions on decks lashed to living trunks, round a central pillar, under
+  *atap* thatch roofs on a lashed wall plate.
+- **Secondary, about 25 percent: ground lodges on short stilts.** Long houses
+  with front galleries, after Borneo's longhouses, as structure only. The inn
+  and the food store borrow it.
+- **Accent, about 5 percent:** the commons and the carved trunk markers.
+- **Invariants:**
+  - one roof pitch (40°) and one eave (1.0 m, its underside at 2.46 m);
+  - a 3.3 m wall plate;
+  - the 1.9 m module;
+  - lashed joints, with the dark wrap at every post head as the signature motif;
+  - woven walls and blinds, round posts and the central pillar;
+  - nothing driven into a living tree.
+- **Exclusions:** nails, sawn boards, glass, lights on poles, Chinese or Greek
+  forms, and copies of real sacred carvings.
+
 ## Other kingdoms
 
-Draft charters to be added from `references/cultures.md` grammars: Rock and Ground (earthen Pueblo/adobe), Ocean (stilt harbour), Plant (tree-borne and thatch), Sky (drafted in `docs/architecture/sky_kingdom.md` as celestial classical in quartz, gold and cloud: Greco-Roman about 55 percent, Chinese celestial palace about 35 percent by deliberate choice rather than the usual 75/20 split, with the rule that no single building mixes both traditions), the Chinese village (courtyard and tiled hip-and-gable), the Western city (concrete). The Fire Kingdom's draft volcanic-modern charter now lives in `docs/architecture/fire_caldera_city.md`. Each remaining kingdom needs the Ohio-style charter with a primary, one secondary, an accent, a kit of parts, hierarchy and exclusions.
+Draft charters to be added from `references/cultures.md` grammars: Rock and Ground (earthen Pueblo/adobe), Ocean (stilt harbour) Sky (drafted in `docs/architecture/sky_kingdom.md` as celestial classical in quartz, gold and cloud: Greco-Roman about 55 percent, Chinese celestial palace about 35 percent by deliberate choice rather than the usual 75/20 split, with the rule that no single building mixes both traditions), the Chinese village (courtyard and tiled hip-and-gable), the Western city (concrete). The Fire Kingdom's draft volcanic-modern charter now lives in `docs/architecture/fire_caldera_city.md`. Each remaining kingdom needs the Ohio-style charter with a primary, one secondary, an accent, a kit of parts, hierarchy and exclusions.
