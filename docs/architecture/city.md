@@ -96,6 +96,17 @@ the world bible.
   city blorbs simply stay outside the city's outskirts.
 - **No opulent fountains.**
 
+**Eighth revision (user, 2026-10-14):**
+- **The NMEs are on the rise** because of the Demon King. They come up to
+  cities but never enter (that is how the game is coded), and Moy is
+  vigilant. More and more dangerous monsters will be added later.
+- **Most people believe blorbs are just another monster** and fear them.
+- **A wall**, a plain circle; the works outside it keep their own security.
+- **An integrated commuter train**: elevated, on the wall, with cross routes
+  through the inner city in conversation with the Deck (section 6c). This
+  revises "no trains": the streets stay free of cars and trains, and the
+  trains run only on the wall and on viaducts over the Deck.
+
 **Seventh revision (user, 2026-10-12):**
 - **No road to a wider world.** There is none: the world ends at the
   planetary ocean beyond the ring of mountains. So nothing comes in or goes
@@ -173,37 +184,14 @@ the Tokyo and Hong Kong density already suits the desert. Add:
 The city is quiet at noon and comes alive after dusk: the night market and
 the lit picture signs.
 
-**The bounds: the Rim Walk.** The city ends sharply, with no sprawl. A ring
-promenade runs round the whole edge:
-- a low wall about 0.9 m high, a parkour ledge;
-- a row of date palms, lamp posts, and benches facing out over the desert;
-- a gap in the wall at the end of every lane.
+**The bounds: the Rim Walk and the wall.** The city ends sharply, with no
+sprawl. A ring promenade, the Rim Walk, runs round the whole edge inside the
+wall (section 6c): date palms, lamp posts and benches along the wall's inner
+face, the old viaduct's arches still reading in it. Every lane and street
+ends on the Rim Walk; four of them pass on through the wall's gates.
 
-Beyond it the paving stops and the desert begins. This is the line the city
-blorbs may not cross. It reads as an edge, never as a sign.
-
-**No wall (proposed 2026-10-14).** Moy has no defensive wall, for four
-reasons:
-- **Nothing a wall would stop.** Skeletons rise straight up out of open
-  ground and never in a town or city (world bible, NMEs). Proposed: they
-  cannot rise through paving or a built floor, so the line where Moy's
-  paving stops, the Rim Walk, is already the edge they cannot cross. A
-  wall would guard against nothing that walks in.
-- **The city blorbs are outcasts, not besiegers.** They are kept out by a
-  law (section 3b), and a wall would make the city's unkindness to them
-  literal and permanent; the open edge keeps the question of letting them
-  back in alive.
-- **History.** Moy grew in the boom from a well town that never needed
-  one: no roads lead to it and no neighbour threatens it. (Shibam, Old
-  Moy's precedent, was walled against raiders; Moy has none.)
-- **Play and arrival.** Every lane's gap in the Rim Walk is a way in, and
-  the skyline is seen whole from the desert. A wall would turn a city you
-  walk into from any side into one you enter by a gate.
-
-What the Rim Walk gives instead: the 0.9 m ledge, the palms and lamps,
-benches facing out, and Kate Byrne walking strays back out. If the story
-ever needs Moy to feel under threat, it reads in the residents (shutters
-pulled, signs unplugged), not in masonry.
+Beyond the wall the paving stops and the desert begins. This is the line the
+city blorbs may not cross, and the line the NMEs come up to and no further.
 
 **Beyond the bounds** (in the ring between 200 and about 300 m; coordinates
 follow approval):
@@ -211,10 +199,17 @@ follow approval):
   outskirts.
 - **No roads out** (user). Westward the desert runs to the mountains, and
   beyond them lies the planetary ocean; eastward there is nothing but rock
-  and the main plateau's 60 m cliff. The streets stop at the Rim Walk.
-- **West: the battery works**, at the end of West Street.
+  and the main plateau's 60 m cliff. Only the four gate streets pass the
+  wall, and they end a few metres beyond it.
+- **West: the battery works**, at the end of West Street outside the West
+  Gate, with the recycling works beside it.
 - **North-west: the water works**, the water tower and the **fish tanks**
   (below).
+- **The works keep their own security** (user, 2026-10-14): each stands in
+  its own fenced compound with floodlights and a keeper on the gate (Omar
+  Haddad at the battery works, Rafael Ortiz at the water works), and the
+  Wall Watch's searchlights reach them from the nearest watch posts. The
+  wall does not bend out to take them in.
 - **Just beyond: the wind farm**, four turbines in two pairs framing the
   city (below).
 
@@ -430,7 +425,7 @@ in character and pointing nowhere:
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
 | **Dr. Arjun Mehta** | above his clinic | the neighbourhood doctor | Treats half the city and remembers all of it. |
-| **Kate Byrne** | the police box's back room | officer at the police box | Gives directions more than anything else. Walks stray city blorbs back out past the Rim Walk, gently, and likes that part least. |
+| **Kate Byrne** | the police box's back room | officer at the police box | Gives directions more than anything else. Walks stray city blorbs back out through the gates, gently, and likes that part least. |
 | **Yuki Hayashi** | Old Moy | teacher at the primary school | Jammer's teacher; sends him postcards at the farm. |
 
 **Upkeep**
@@ -472,6 +467,8 @@ city's bounds. **The rest is proposed.**
     lifts stopped halfway up its atrium with guests inside, in sight of
     every gallery;
   - the Deck's glass lifts stopped, and its lamps went out;
+  - the Ring Line's trains stopped where they stood, round the city's
+    edge (this was before its arches were filled);
   - the Grand Hotel's chandelier went out for the first time in its history.
 - **The ordinance.** The city council, under Mayor Teodora Vance, banned city
   blorbs from inside the bounds. The Institute, under Dr. Vera Kask,
@@ -620,7 +617,8 @@ concrete), bronze and generous entrances. The street buildings are vernacular: t
 
 ## 6. How people move, including vertically
 
-The city is walked in **four layers**. Each has its own job, and they connect
+The city is walked in **four layers**, and ridden in a fifth: the trains at
++12 m (section 6c). Each has its own job, and they connect
 often.
 
 1. **The ground: streets, without cars.** Moy still has a full street
@@ -752,6 +750,151 @@ often.
 **Climbing:** the library's terraces, the tong lau verandas, balconies, the
 sign gantries and the ramp towers' outsides.
 
+### 6c. The wall and the trains (proposed 2026-10-14)
+
+Data: `WALL` and `CROSS` in `tools/city_layout.py`, written to
+`CityPlan.WALL` and `CityPlan.CROSS`, drawn on `moy_plan.html` and
+`moy_city_3d.html`.
+
+**Why now.** The NMEs are on the rise because of the Demon King (eighth
+revision). They come up to the city but never enter; Moy watches them, and
+the wall is how a city of 45 named people shows it is afraid. Most of them
+fear blorbs as one more kind of monster, so the wall also stands between
+them and the city blorbs outside.
+
+**The Ring Line came first.** In the boom, Moy built a double-track railway
+on a viaduct round its own edge: the **Ring Line**, a loop for the city's
+commuters and the Windworks' crews. When the NMEs began to rise, the city
+filled the viaduct's arches with rammed earth and concrete, faced the outside
+in pale tile, and raised a parapet: the railway became the wall. So the wall
+and the train are one structure, and the trains still run on its top.
+- **The wall:** a plain circle (user), centreline 209.5 m from Moy's centre,
+  1,316 m round, 12 m high and 12 m thick, just outside the Rim Walk (its
+  inner face at 203.5 m). The old arches' piers still read on the inner face
+  above the Rim Walk's palms and benches.
+- **The top, from the city side:** a steel rail, the two tracks (centres
+  3.4 m apart), the **watch walk** 3.6 m wide, and a 1.2 m parapet on the
+  outside.
+- **Four gates**, where the main streets pass through: the **East Gate**
+  (Meridian Avenue; the grand gate, 84 m along, its wings receiving the
+  Meridian Line), the **North Gate** (North Street), the **South Gate**
+  (South Street) and the **West Gate** (West Street, out to the battery
+  works). Each is a gatehouse 24 m deep that projects outward from the wall:
+  a 10 m by 8 m arch for the street, two watch towers on its outer corners,
+  and a Wall Line station on its top under a canopy, with a ramp tower and
+  lift inside it down to the street. The gates stand open: the NMEs never
+  enter, so the gates are watched, not shut.
+- **Watch posts:** seven round towers standing out from the outer face
+  between the gates, each with a searchlight that sweeps the desert at
+  night. This is how the vigilance shows: lights on the sand, figures on
+  the watch walk, a bell at each gate.
+- **The Line House:** a bastion on the wall's outside toward the water works,
+  60 m along and 16 m out. Its top floor, level with the track, is the car
+  shed for both lines' trains; below it are the lines' workshop and the
+  **Wall Watch**'s guardroom.
+- **The works stay outside** (user): the battery and recycling works beyond
+  the West Gate, the water works, water tower and fish tanks to the
+  north-west, each fenced and lit with its own keeper (section 2a). The
+  battery and recycling works moved a few metres west, and the fish tanks
+  north, to stand clear of the wall and its gatehouses.
+
+**Precedents (proposed 2026-10-14).** Three real systems already do what this
+one does; the wall, the Deck and the trains take their section and structure
+from them, built in Moy's own language (superellipse corners, pale ceramic,
+the picture-sign colours at night).
+- **The wall: Xi'an's Ming city wall**, for its size and its watch. It is
+  12 m high and 12 to 14 m wide on top, people walk and cycle round its top,
+  and it has a bastion (*mamian*) every 120 m so the guards can see along
+  the face. Moy's wall takes the same height, width and spacing; its gate
+  towers take the gatehouse-and-barbican massing of Xi'an's gates and of
+  Jiayuguan in the Gansu desert, and its watch posts the desert beacon
+  towers on the Great Wall's western end. Material: the infill is Old Moy's
+  rammed earth (the well town's own way of building), faced outside in pale
+  tile.
+- **The viaduct it was: Tokyo's Yamanote line.** Tokyo's railway loop runs
+  on brick and concrete viaducts whose arches are let as bars, workshops
+  and shops (*gādo-shita*, "under the girders", as at Yūrakuchō). Proposed:
+  only the outer half of each Ring Line arch was filled; the inner half
+  stays open to the Rim Walk as small rooms (the Watch's posts, stores,
+  noodle counters, the lines' staff rooms), so the wall is lived in on the
+  city side and blank on the desert side.
+- **The Deck under the train: Bangkok's Skytrain and Ratchaprasong
+  Skywalk.** In Bangkok the elevated BTS line runs over the main roads on
+  single concrete viaducts, and a pedestrian skywalk is slung beneath it on
+  the same structure, joining station to station and into the buildings
+  either side. Each station is street, concourse, then platform. Moy has the
+  same section: street (0), the Deck as concourse (+6.5), platforms (+12).
+  Hong Kong's Central footbridges and Singapore's covered linkways remain
+  the Deck's precedents where it runs alone.
+- **The cross lines and the ring: Chicago's Loop.** An elevated ring around
+  downtown, with lines that come in over the streets and use part of the
+  ring, on structure built over the streets themselves: the Spine and
+  Meridian Lines sharing the park's north side follow its logic.
+- **The cars: Lisbon's trams** for size and tight curves (12 m), in Moy's
+  pale tile white with a band of line colour.
+- **Structure:** viaducts and the Deck's portal frames in fair-faced
+  concrete, piers of rounded-square (superellipse) section, soffits lined in
+  pale tile so the shaded walk below stays light.
+
+**The Wall Line** runs round the top, both ways, stopping at the four gates
+(329 m apart). Two-car trains of 15 m cars at 10 m/s, two each way, take
+about three and a half minutes to go round. From the train you see the whole
+city on one side and the desert, the turbines and the NMEs on the other: the
+city's vigilance and its commute are the same ride.
+
+**The cross lines** are elevated at the Wall Line's own level, +12 m, so
+they meet it on the level at the gates, where junctions let their trains
+reach the Line House.
+- **In conversation with the Deck.** Where a cross line follows the Deck, it
+  rides directly over it, the same 6 m wide, on the Deck's own columns
+  carried up through it. The Deck becomes the line's lower floor: shaded by
+  the track above, and the concourse of every station on it. You walk the
+  Deck and climb a short ramp to the platform. The headroom between them is
+  4.3 m; the Deck's skybridges pass under the Meridian Line with more than
+  a metre to spare.
+- **The Spine Line (north to south).** North Gate, down North Street over
+  the Deck's Estate walk (**Estate Square**), along the park's north side
+  over the Park Deck (**Park North**), down its west side (**Park West**,
+  for the library), along its south side, then down South Street to
+  **Market Square** (over the square, where the Deck's Market walk crosses
+  below) and the **South Gate**. 548 m.
+- **The Meridian Line (east to the park).** From the East Gate's wings, one
+  track each way along Meridian North and Meridian South (8 m streets take
+  one track, never two), so the line divides round city hall and Civic
+  Plaza as the avenues do. **Civic Plaza** has a platform on each track,
+  each over the Deck's civic walk, reached by the plaza's two ramp towers,
+  which now rise on to +12 m. The tracks rejoin on the park's east side and
+  run with the Spine Line along the north side to **Park North** and **Park
+  West**, where the Meridian Line ends and its trains turn back.
+- **Interchanges:** Park North and Park West between the cross lines; the
+  North, South and East Gates with the Wall Line.
+- **Where no rail goes, deliberately:** Old Moy (its lanes are narrow and its
+  tower houses older than any railway), the civic axis between the park and
+  the library, and the park itself (the playground's Lookout is 20 m high).
+  The Wall Line runs along Old Moy's edge.
+- **Cars:** short two-car articulated sets that take 12 m curves at walking
+  pace, after Lisbon's trams, so the lines can turn at the street corners
+  of a dense grid.
+
+**Structure and checks.** The cross lines stand inside the wall over
+streets, squares and the park, or over buildings at least 2 m below their
+soffit (the hawker centre); platforms stand on straight track and clear of
+tall buildings; stations are at least 60 m apart along each line, and each
+line ends at the wall or at an interchange. The wall has no building in it,
+every building inside it, the works clear outside it, the Rim Walk clear,
+and the turbines more than 40 m off. All checked in the layout.
+
+**Play and collision.** The wall and its gatehouses are blocking; the wall
+top, the watch walk and the gatehouse roofs are landings. The trains are
+moving solid bodies (`AnimatableBody3D`, as the turbine blades): the hero can
+stand on a car's roof or ride inside, and is pushed, not hurt. The cross
+lines' viaducts are landings above the Deck. Leaf Hat anchors: the watch
+towers and the gatehouse canopies.
+
+**Who keeps it.** Kade Morrow (city works) inspects the wall and the viaducts
+as well as the Deck; Omar Haddad's battery works power the lines. The Wall
+Watch and the lines' controller are not yet in the census (Open).
+
 ## 7. Districts (schematic; coordinates follow approval)
 
 **Every block is built out** (user): buildings stand shoulder to shoulder to
@@ -812,8 +955,9 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     centre building (minimart, kindergarten, community club) on its north.
   - **Cinema Square**, a small square in Old Moy where the Moonlight Cinema
     and Sol's café face each other.
-- **Arrival.** No road reaches Moy. The hero comes on foot across the open desert, and any lane's gap in the Rim Walk lets
-  him in. From the plateau side the grand way in is **Meridian Avenue**
+- **Arrival.** No road reaches Moy. The hero comes on foot across the open
+  desert to one of the wall's four gates (section 6c); a hero with the
+  powers to climb it can also come over the wall. From the plateau side the grand way in is **Meridian Avenue**
   (renamed from Harbour Street: there is no harbour in a desert), the
   palm-lined main street. It runs in to the back of city hall and divides
   round it, its two branches passing the Windspire, the hotel, the glass
@@ -2290,16 +2434,23 @@ lit crowns.
 - (2026-10-14) the Deck's route (section 6): the Park Deck ring, the civic,
   library, estate and market walks, two skybridges, six ramp towers and two
   glass lifts; travelators dropped;
-- (2026-10-14) **no city wall** (the bounds, above): the Rim Walk stays the
-  edge, and skeletons never rising through paving is the reason none is
-  needed.
+- (2026-10-14) **the wall and the trains** (section 6c): the Ring Line's
+  viaduct filled into a circular wall 12 m high, four gates, watch posts and
+  the Line House; the Wall Line on its top; the elevated Spine and Meridian
+  Lines over the Deck; the works outside with their own security.
 
 **Open:**
+- who keeps the Wall Watch and who runs the lines: two new residents
+  (proposed: a Watch captain living in the Line House, and the lines'
+  controller), taking the census to 47;
+- whether a line ever leaves the city, up the main plateau's cliff toward
+  Ohio (this would revise "no road to a wider world");
+- whether the gates ever shut, in a story alarm;
 - the hotel's rest price;
 - the park's small pond (kept, as plain reclaimed water, not a display);
 - whether the hero's own city blorbs may follow him inside the bounds.
-  Proposed: the ban is the city's law, not a wall, so a party city blorb may
-  follow, and the residents react in character (Kate's look, a shopkeeper
+  Proposed: the ban is the city's law and the gates are watched, not shut,
+  so a party city blorb may follow, and the residents react in character (Kate's look, a shopkeeper
   unplugging a sign), never with a stated rule;
 - whether Pinestein has a quest, such as a case to let the city blorbs back
   in;

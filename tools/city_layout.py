@@ -22,13 +22,13 @@ STREETS=[
  ('Park Ring','main',-637,50,-483,62),
  ('Park Ring','main',-637,-50,-625,50),
  ('Park Ring','main',-495,-50,-483,50),
- ('Meridian Avenue','main',-391,-6,-340,6),
+ ('Meridian Avenue','main',-391,-6,-318,6),
  ('Meridian North','avenue',-483,-38,-340,-30),
  ('Meridian South','avenue',-483,30,-340,38),
  ('Clock Street','lane',-397,-30,-391,30),
- ('West Street','main',-780,-6,-694,6),
- ('North Street','main',-566,-220,-554,-62),
- ('South Street','main',-566,62,-554,220),
+ ('West Street','main',-794,-6,-694,6),
+ ('North Street','main',-566,-232,-554,-62),
+ ('South Street','main',-566,62,-554,232),
  ('Arcade Street','shop',-694,-220,-686,220),
  ('Market Street','shop',-780,114,-487,122),
  ('Cinema Lane','lane',-734,-220,-730,220),
@@ -100,11 +100,11 @@ b(50,'Block 8',(-508,-150,-487,-106),'estate','slab block, 34 storeys, east side
 b(53,'Block 9',(-658,-170,-612,-154),'estate','slab block, 24 storeys, north side of the west court, turned 30° off the grid',NB())
 b(51,'Neighbourhood centre',(-554,-150,-516,-118),'civic','2 storeys: minimart, kindergarten, community club, roof garden','Juno Rell (Housing Board office)')
 for n,name,r,kind,h,who in [
- (40,'Battery works',(-789,-8,-767,8),'works','2 storeys','Omar Haddad (flat)'),
- (41,'Recycling works',(-789,14,-771,26),'works','1 storey',''),
+ (40,'Battery works',(-816,-11,-794,11),'works','2 storeys','Omar Haddad (flat)'),
+ (41,'Recycling works',(-816,16,-798,28),'works','1 storey',''),
  (42,'Water works',(-700,-226,-680,-212),'works','pump house and keeper\'s house','Rafael Ortiz'),
  (43,'Water tower',(-722,-226,-712,-216),'works','35 m',''),
- (44,'Fish tanks',(-676,-206,-656,-190),'works','covered tanks','')]: b(n,name,r,kind,h,who)
+ (44,'Fish tanks',(-668,-250,-648,-234),'works','covered tanks','')]: b(n,name,r,kind,h,who)
 
 # ---- raster
 X0,X1,Z0,Z1=-800,-330,-215,215
@@ -686,6 +686,248 @@ def _deck_checks():
                 for e in (-1,1): cols.append(tuple(round(v,1) for v in at(t,e)))
     D['columns']=sorted(set(cols))
 _deck_checks()
+## The wall and the Wall Line (city.md 6c, proposed 2026-10-14). The Ring Line
+## came first: a double-track viaduct round the city's edge, built in the boom.
+## As the NMEs rose, the city filled its arches with rammed earth and concrete,
+## and the railway became the wall: a plain circle just outside the Rim Walk,
+## carrying the trains on its top. Gatehouses, watch posts and the Line House
+## (the car shed) project outward, never into the city. The works beyond it
+## (battery, recycling and water works, the water tower, the fish tanks) stay
+## outside with their own fences, lights and keepers. Centreline in world (x, z).
+WALL={
+ 'height':12.0,'thick':12.0,'parapet':1.2,'r':209.5,
+ # on the top, from the city side: inner parapet, two tracks (centres 3.4 m apart), the watch walk, outer parapet
+ 'track_axis':-2.2,'track_spacing':3.4,'walk':3.6,'min_curve':25.0,
+ # gates: the streets that pass through, each with a gatehouse 24 m deep (12 m beyond the outer face) and its station above
+ 'gates':[dict(name='East Gate',street='Meridian Avenue',axis='x',at=0.0,arch=(10.0,8.0),along=84.0,out=20.0),
+          dict(name='North Gate',street='North Street',axis='z',at=-560.0,arch=(10.0,8.0)),
+          dict(name='South Gate',street='South Street',axis='z',at=-560.0,arch=(10.0,8.0)),
+          dict(name='West Gate',street='West Street',axis='x',at=0.0,arch=(10.0,8.0))],
+ 'gatehouse':dict(along=44.0,out=12.0),
+ # halts between the gates, each on its own bastion over the lane it serves
+ 'halts':[],
+ 'platform':(40.0,3.0),'watch_every':120.0,'watch_r':7.0,
+ 'line':dict(speed=10.0,dwell=20.0,sets_each_way=2,cars=2,car=(15.0,2.65,3.5),power='the wind, from the battery works'),
+ # the Line House: a bastion on the wall's outside, toward the water works: the car shed at the top's level over the
+ # lines' workshop and the Wall Watch's guardroom. at: degrees round the circle (atan2 of z, x-CX); along and out in metres
+ 'shed':dict(at=232.0,along=60.0,out=16.0),
+}
+def _build_wall():
+    from shapely.geometry import Polygon, LineString, Point, box as sbox
+    from shapely.ops import unary_union, nearest_points
+    W_=WALL
+    pts=[]
+    pts=[(CX+W_['r']*math.cos(math.radians(a_)),W_['r']*math.sin(math.radians(a_))) for a_ in range(0,360)]
+    P=Polygon(pts)
+    C=LineString(list(P.exterior.coords))
+    band=C.buffer(W_['thick']/2,cap_style=2,join_style=1)
+    inner=Polygon(P.exterior.coords).buffer(-W_['thick']/2)
+    W_['centreline']=[(round(x,2),round(z,2)) for x,z in list(C.simplify(0.05).coords)]
+    W_['length']=round(C.length,1)
+    # gates: where their street crosses the centreline
+    gp=[]
+    for g in W_['gates']:
+        if g['street']:
+            st=[s for s in STREETS if s[0]==g['street']][0]; r=st[2:]
+            ax=LineString([((r[0]+r[2])/2,r[1]),((r[0]+r[2])/2,r[3])]) if g['axis']=='z' else LineString([(r[0],(r[1]+r[3])/2),(r[2],(r[1]+r[3])/2)])
+            hit=ax.intersection(C)
+            g['street_w']=(r[2]-r[0]) if g['axis']=='z' else (r[3]-r[1])
+        else:
+            ax=LineString([(-1000,g['at']),(-100,g['at'])]) if g['axis']=='x' else LineString([(g['at'],-400),(g['at'],400)])
+            hit=ax.intersection(C); g['street_w']=0
+        hit=min(list(getattr(hit,'geoms',[hit])),key=lambda p:Point(g['near']).distance(p) if 'near' in g else 0)
+        g['p']=(round(hit.x,2),round(hit.y,2)); g['s']=round(C.project(hit),1); gp.append(g)
+        if g['street'] and g['arch'][0]<g['street_w']-2.0+1e-6 and g['street_w']>12: problems.append(('wall: gate arch narrower than its street',g['name']))
+    for h in W_['halts']:
+        if h.get('street'):
+            st=[s for s in STREETS if s[0]==h['street']][0]; r=st[2:]
+            mx,mz=(r[0]+r[2])/2,(r[1]+r[3])/2
+            ax=LineString([(mx,-400),(mx,400)]) if r[3]-r[1]>r[2]-r[0] else LineString([(-1000,mz),(-100,mz)])
+            hits=list(getattr(ax.intersection(C),'geoms',[ax.intersection(C)]))
+            q=max(hits,key=lambda p:{'s':p.y,'n':-p.y,'e':p.x,'w':-p.x}[h['end']])
+        else: q=C.interpolate(C.project(Point(h['near'])))
+        h['p']=(round(q.x,2),round(q.y,2)); h['s']=round(C.project(q),1)
+    stations=sorted([dict(name=g['name'],s=g['s'],p=g['p'],kind='gate') for g in gp]+[dict(name=h['name'],s=h['s'],p=h['p'],kind='halt') for h in W_['halts']],key=lambda d:d['s'])
+    W_['stations']=stations
+    for st in stations:  # platforms stand on straight or gently curved wall (radius 150 m or more)
+        q0,q1,q2=[C.interpolate((st['s']+d)%C.length) for d in (-W_['platform'][0]/2,0,W_['platform'][0]/2)]
+        ax_,az_=q1.x-q0.x,q1.y-q0.y; bx,bz=q2.x-q1.x,q2.y-q1.y; cr=abs(ax_*bz-az_*bx)
+        if cr>1e-6 and math.hypot(ax_,az_)*math.hypot(bx,bz)*math.hypot(q2.x-q0.x,q2.y-q0.y)/(2*cr)<150: problems.append(('wall: station on a sharp curve',st['name']))
+    L=C.length; gaps=[((stations[(i+1)%len(stations)]['s']-st['s'])%L) for i,st in enumerate(stations)]
+    W_['station_gaps']=[round(x) for x in gaps]
+    if min(gaps)<120: problems.append(('wall: stations closer than 120 m',min(gaps)))
+    if max(gaps)>340: problems.append(('wall: stations further apart than 340 m',max(gaps)))
+    # the Line House bastion, as a polygon outward from the outer face
+    t=math.radians(W_['shed']['at']); da=W_['shed']['along']/2/W_['r']; r0=W_['r']+W_['thick']/2-0.5; r1=W_['r']+W_['thick']/2+W_['shed']['out']
+    shed=Polygon([(CX+rr*math.cos(t+k),rr*math.sin(t+k)) for rr,ks in ((r0,(-da,da)),(r1,(da,-da))) for k in ks])
+    W_['shed_poly']=[(round(x,2),round(z,2)) for x,z in shed.exterior.coords]
+    # watch posts: evenly round the wall, kept 30 m off every station
+    n=int(L//W_['watch_every']); posts=[]
+    for i in range(n):
+        s=(i+0.5)*L/n
+        q=C.interpolate(s)
+        if all(min(abs(s-st['s']),L-abs(s-st['s']))>30 for st in stations) and shed.distance(q)>30:
+            posts.append((round(q.x,2),round(q.y,2)))
+    W_['watch_posts']=posts
+    # the line's curves: radius from three points 10 m apart
+    worst=1e9
+    for i in range(0,int(L),5):
+        p0,p1,p2=[C.interpolate((i+d)%L) for d in (0,10,20)]
+        ax_,az_=p1.x-p0.x,p1.y-p0.y; bx,bz=p2.x-p1.x,p2.y-p1.y
+        cr=abs(ax_*bz-az_*bx)
+        if cr>1e-6:
+            R_=math.hypot(ax_,az_)*math.hypot(bx,bz)*math.hypot(p2.x-p0.x,p2.y-p0.y)/(2*cr); worst=min(worst,R_)
+    W_['min_radius']=round(worst,1)
+    if worst<W_['min_curve']: problems.append(('wall: the line curves tighter than %.0f m'%W_['min_curve'],round(worst,1)))
+    # nothing built stands in the wall; every building, lot and work stands inside it
+    outward=[shed]+[Point(g['p']).buffer(W_['thick']/2+g.get('out',W_['gatehouse']['out'])+0.1) for g in W_['gates']]
+    for b_ in named:
+        g=sbox(*b_['r'])
+        if g.intersection(band).area>0.01: problems.append(('wall: through a building',b_['n']))
+        if b_['kind']=='works':
+            # the works stand outside, clear of the wall, its gatehouses and the Line House, behind their own fences
+            if inner.intersects(g) or g.distance(band)<6: problems.append(('wall: work not clear outside the wall',b_['n']))
+            for o in outward:
+                if o.distance(g)<4: problems.append(('wall: work against a gatehouse or the Line House',b_['n']))
+        elif not inner.contains(g): problems.append(('wall: building left outside',b_['n']))
+    for l in lots:
+        g=sbox(*l[:4])
+        if g.intersection(band).area>0.01 or not inner.contains(g): problems.append(('wall: lot not inside',l[:4]))
+    # the Rim Walk (197 to 203) stays clear of the wall
+    rim=Point(CX,0).buffer(203,128).difference(Point(CX,0).buffer(197,128))
+    if rim.intersection(band).area>0.5: problems.append(('wall: on the Rim Walk',round(rim.intersection(band).area,1),[tuple(round(v) for v in g.centroid.coords[0]) for g in getattr(rim.intersection(band),'geoms',[rim.intersection(band)])]))
+    # streets: a gate street passes through its gate; every other street stops at the Rim Walk (the builder clips it to 203 m)
+    gate_streets={g['street'] for g in gp if g['street']}
+    W_['clipped']=sorted({s[0] for s in STREETS if s[0] not in gate_streets and sbox(*s[2:]).intersection(band).area>0})
+    for g in gp:
+        if g['street']:
+            st=[s for s in STREETS if s[0]==g['street']][0]; r=st[2:]
+            beyond=Point(g['p']).buffer(W_['thick']/2+g.get('out',W_['gatehouse']['out'])+1)
+            if not sbox(*r).intersects(beyond.difference(inner).difference(band)): problems.append(('wall: gate street stops short of the gate\'s outer mouth',g['name']))
+    # the Deck's ways down and the turbines stay clear
+    for t in TURBINES:
+        if band.distance(Point(t))<40 or shed.distance(Point(t))<40: problems.append(('wall: too near a turbine',t))
+_build_wall()
+## The cross lines (city.md 6c, proposed 2026-10-14): elevated, at the Wall
+## Line's own level (+12 m), so the ring on the wall and the cross meet on the
+## level at the gates. Where a cross line follows the Deck it rides directly
+## over it, on the Deck's own columns carried up through it: the Deck is the
+## line's lower floor, its stations' concourse, and is shaded by the track.
+## Elsewhere the line has its own piers. Short articulated cars take 12 m
+## curves, after Lisbon's trams. Main streets (12 m) take double track (6 m);
+## Meridian North and South (8 m) take one track each, one way, so the
+## Meridian Line divides round city hall and Civic Plaza as the avenues do.
+## Old Moy and the civic axis (park to library) stay free of rail.
+## Services are directional centrelines in world (x, z); corners are filleted.
+CROSS={
+ 'rail':12.0,'depth':1.2,'r_min':12.0,'double':6.0,'single':3.6,'platform':(30.0,3.0),'min_gap':60.0,
+ 'clear_over':2.0,  # a building under the line stands at least this far below its soffit
+ 'cars':dict(cars=2,car=(12.0,2.65,3.4),speed=9.0,dwell=20.0,headway=150),
+ 'services':[
+  dict(line='Spine Line',dir='south',w='double',pts=[(-557,-215),(-557,-53),(-628,-53),(-628,53),(-560,53),(-560,215)]),
+  dict(line='Meridian Line',dir='west',w='single',pts=[(-322,34),(-492,34),(-492,-53),(-628,-53),(-628,25)]),
+  dict(line='Meridian Line',dir='east',w='single',pts=[(-628,25),(-628,-53),(-515,-53),(-490,-34),(-322,-34)]),
+ ],
+ # stations: the services that stop, the platform's centre on the line, which sides have platforms, and how people reach it
+ 'stations':[
+  dict(name='North Gate',at=(-557,-200),lines=['Spine Line'],access='the North Gate\'s gatehouse, level with the Wall Line'),
+  dict(name='Estate Square',at=(-557,-100),lines=['Spine Line'],access='from the Deck\'s Estate walk below; the Deck\'s glass lift'),
+  dict(name='Park North',at=(-588,-53),lines=['Spine Line','Meridian Line'],access='from the Park Deck below; the park\'s north gate tower'),
+  dict(name='Park West',at=(-628,0),lines=['Spine Line','Meridian Line'],access='the park\'s west gate tower, rising on to +12 m; the Park Deck and the Library walk'),
+  dict(name='Market Square',at=(-560,138),lines=['Spine Line'],access='from the Deck\'s Market walk where it crosses below; the Deck\'s glass lift'),
+  dict(name='South Gate',at=(-560,200),lines=['Spine Line'],access='the South Gate\'s gatehouse, level with the Wall Line'),
+  dict(name='Civic Plaza',at=(-462,34),toward=(-462,0),lines=['Meridian Line'],access='over the Deck\'s civic walks; the plaza\'s two ramp towers rise on to +12 m'),
+  dict(name='Civic Plaza',at=(-462,-34),toward=(-462,0),lines=['Meridian Line'],access=''),
+  dict(name='East Gate',at=(-345,34),lines=['Meridian Line'],access='the East Gate\'s south wing, level with the Wall Line'),
+  dict(name='East Gate',at=(-345,-34),lines=['Meridian Line'],access='the East Gate\'s north wing'),
+ ],
+ # where the cross lines join the Wall Line on the level, so their trains reach the Line House
+ 'junctions':['North Gate','South Gate','East Gate'],
+}
+def _fillet(pts,R,step=1.0):
+    out=[pts[0]]
+    for i in range(1,len(pts)-1):
+        A,B,C_=pts[i-1],pts[i],pts[i+1]
+        ux,uz=A[0]-B[0],A[1]-B[1]; lu=math.hypot(ux,uz); ux/=lu; uz/=lu
+        vx,vz=C_[0]-B[0],C_[1]-B[1]; lv=math.hypot(vx,vz); vx/=lv; vz/=lv
+        th=math.acos(max(-1,min(1,ux*vx+uz*vz)))
+        if abs(th-math.pi)<1e-6: out.append(B); continue
+        t=R/math.tan(th/2)
+        if t>min(lu,lv)/2+1e-6: problems.append(('cross: no room for a %g m curve'%R,B)); out.append(B); continue
+        bx,bz=ux+vx,uz+vz; lb=math.hypot(bx,bz); bx/=lb; bz/=lb
+        cx,cz=B[0]+bx*R/math.sin(th/2),B[1]+bz*R/math.sin(th/2)
+        p1=(B[0]+ux*t,B[1]+uz*t); p2=(B[0]+vx*t,B[1]+vz*t)
+        a1,a2=math.atan2(p1[1]-cz,p1[0]-cx),math.atan2(p2[1]-cz,p2[0]-cx)
+        d=(a2-a1+math.pi)%(2*math.pi)-math.pi
+        n=max(2,int(abs(d)*R/step))
+        out+= [(cx+R*math.cos(a1+d*k/n),cz+R*math.sin(a1+d*k/n)) for k in range(n+1)]
+    out.append(pts[-1]); return out
+def _cross_checks():
+    from shapely.geometry import LineString, Point, box as sbox, Polygon as SP
+    from shapely.ops import unary_union
+    X=CROSS; soffit=X['rail']-X['depth']
+    ground=unary_union([sbox(*s_[2:]) for s_ in STREETS]+[sbox(*o[1:]) for o in OPENS])
+    tall=[]
+    for b_ in named:
+        h=PODIUM_HEIGHT.get(b_['n'],HEIGHTS.get(b_['n'],8))
+        tall.append((b_['n'],h,sbox(*b_['r'])))
+        if b_['n'] in TOWER_PART: tall.append((b_['n'],HEIGHTS[b_['n']],sbox(*TOWER_PART[b_['n']])))
+    for l in lots: tall.append((None,l[4]*STOREY.get(l[5],3.25),sbox(*l[:4])))
+    # the Deck's skybridges pass under the line with headroom
+    if DECK['level']+2.8+0.25>soffit-1.0: problems.append(('cross: a Deck skybridge too close under the line',))
+    wallP=SP(WALL['centreline'])
+    lines={}
+    for sv in X['services']:
+        P=_fillet(sv['pts'],X['r_min']); sv['path']=[(round(x,2),round(z,2)) for x,z in P]
+        L=LineString(P); sv['length']=round(L.length,1); w=X[sv['w']]
+        env=L.buffer(w/2,cap_style=2,join_style=2)
+        # inside the wall, then over streets, squares and the park, or over buildings low enough to pass
+        inside_env=env.intersection(wallP)
+        for n_,h,g in tall:
+            if inside_env.intersection(g).area>0.05 and h>soffit-X['clear_over']: problems.append(('cross: line through a building',sv['line'],sv['dir'],n_,h))
+        lines.setdefault(sv['line'],[]).append((sv,L,env))
+    # stations: a straight stretch of every service of their lines, platforms clear of tall buildings, spaced along each service
+    for sv in X['services']:
+        L=LineString(sv['path']); pos=[]
+        for st in X['stations']:
+            if sv['line'] not in st['lines']: continue
+            p=Point(st['at'])
+            if L.distance(p)>0.5: continue
+            s0=L.project(p); half=X['platform'][0]/2
+            if s0-half<0 or s0+half>L.length: problems.append(('cross: platform runs off the line',st['name'],sv['dir'])); continue
+            a_,c_=L.interpolate(s0-half),L.interpolate(s0+half)
+            if abs(a_.distance(c_)-2*half)>0.05: problems.append(('cross: platform on a curve',st['name'],sv['dir']))
+            w=X[sv['w']]
+            sl=LineString([a_,c_])
+            if 'toward' in st:
+                offs=[sl.offset_curve(d) for d in (w/2+X['platform'][1],-(w/2+X['platform'][1]))]
+                o=min(offs,key=lambda q:q.distance(Point(st['toward'])))
+                seg=sl.buffer(w/2,cap_style=2).union(SP(list(sl.coords)+list(o.coords)[::-1] if Point(o.coords[0]).distance(Point(sl.coords[0]))<Point(o.coords[-1]).distance(Point(sl.coords[0])) else list(sl.coords)+list(o.coords)).buffer(0))
+            else: seg=sl.buffer(w/2+X['platform'][1],cap_style=2)
+            for n_,h,g in tall:
+                if seg.intersection(g).area>0.05 and h>soffit-X['clear_over']: problems.append(('cross: platform into a building',st['name'],n_))
+            pos.append((s0,st['name']))
+        pos.sort(); sv['stops']=[n for _,n in pos]
+        for (a_,na),(c_,nc) in zip(pos,pos[1:]):
+            if c_-a_<X['min_gap']: problems.append(('cross: stations too close',sv['line'],na,nc,round(c_-a_,1)))
+        for nm in X['junctions']:
+            pass
+    for st in X['stations']:
+        if not any(LineString(sv['path']).distance(Point(st['at']))<0.5 for sv in X['services'] if sv['line'] in st['lines']): problems.append(('cross: station off its line',st['name']))
+    # every service ends at the wall or at an interchange with the other cross line
+    wall_names={x['name'] for x in WALL['stations']}
+    for sv in X['services']:
+        for end in (sv['stops'][0],sv['stops'][-1]):
+            st=[x for x in X['stations'] if x['name']==end][0]
+            if end not in wall_names and len(st['lines'])<2: problems.append(('cross: line ends at no interchange',sv['line'],end))
+    # gate junctions: the line reaches the wall's centreline at the gate (on the level)
+    for nm in X['junctions']:
+        g=[x for x in WALL['gates'] if x['name']==nm][0]
+        near=min((LineString(sv['path']).distance(wallP.exterior) for sv in X['services'] if Point(sv['path'][0]).distance(Point(g['p']))<45 or Point(sv['path'][-1]).distance(Point(g['p']))<45),default=1e9)
+        if near>0.5: problems.append(('cross: line stops short of the wall at',nm,round(near,1)))
+_cross_checks()
+if '--wall' in sys.argv:
+    print(WALL['length'],WALL['min_radius'],WALL['station_gaps']); [print(st) for st in WALL['stations']]
 ## Old Moy's tower houses (docs/architecture/moy_tower_house.md). Every Old
 ## Moy lot gets a kit: a tower house where the short side is 6 m or more
 ## (room for the 3.4 m ramp core inside 0.9 m earth walls), the later pencil infill
@@ -944,6 +1186,18 @@ w("## glass public lifts. columns: pairs at the run edges, out of street mouths 
 w("## park gates. Checked: on streets and squares only, never over a building, no")
 w("## point more than max_to_way_down from a ramp or lift (now %.0f m)." % DECK['_far'])
 w("const DECK := %s" % lit({k:v for k,v in DECK.items() if not k.startswith('_')}))
+w("")
+w("## The wall and the Wall Line (city.md 6c): the Ring Line's viaduct, its arches")
+w("## filled, round the Rim Walk and the Works Ward. centreline: closed, world (x, z);")
+w("## the wall is thick wide, height high, the trains on its top. gates, stations")
+w("## (s: metres along the centreline), watch_posts, the car shed. Streets other than")
+w("## the gate streets stop at the Rim Walk: the builder clips clipped streets to 203 m.")
+w("const WALL := %s" % lit(WALL))
+w("")
+w("## The cross lines (city.md 6c): elevated at the Wall Line's level. services are")
+w("## directional; path is the filleted track centreline. Where a service follows the")
+w("## Deck it rides on the Deck's columns, directly above it.")
+w("const CROSS := %s" % lit(CROSS))
 w("const TURBINE_HUB_HEIGHT := 95.0")
 w("const TURBINE_ROTOR_RADIUS := 65.0")
 w("")
@@ -963,5 +1217,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')
