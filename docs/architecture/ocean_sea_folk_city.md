@@ -566,11 +566,13 @@ hall charges 25 Tokoins. The layout is in `ocean_sea_folk_city_layout.md`.
 **Deferred by the user:** the Ocean Kingdom's backstory, including how the
 Demon King sowed the discord.
 
-**Open (2026-10-14):** air at 7.85 bar would, in the real world, be too rich
-in oxygen for an air-breather to live in for long and would need hours of
-decompression on the way up; whether the hero and visitors simply breathe it
-(the game's allowance), or the city's air is thinned for them, and how long
-the fountain lock takes in play.
+**Fixed (user, 2026-10-14): the air.** The network's air is at the sea's
+pressure, about 7.85 bar, and the hero and visitors simply breathe it: a game
+allowance, with no rule for narcosis or decompression. The fountain lock
+carries the real-world truth as atmosphere instead: equalising between the
+network and the roof's air is a slow passage, a long climb through a hissing
+chamber that the sea folk take unhurried, and the game shows it as a slow
+transition, never as a timer or a rule.
 
 ## Implementation notes
 
