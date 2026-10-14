@@ -446,6 +446,50 @@ plan data (`ChinesePlan`) instead of a radius. The keel is built as stacked
 rings tapering to an offset tip, with simplified convex collision for the
 top. The shards are built bare, with pines.
 
+### 4.0b What the ways are made of (proposed, 2026-10-14)
+
+The first network was one material everywhere, which says nothing. A way's
+construction should say who built it, who keeps it, and what it carries.
+Who paid for each way follows the story: the palace keeps the bridges and
+their heads (3.2), trade pays for brick, and households tread their own lanes.
+The plan tool gives every path a `surface` and every court a `paving`, from
+what it leads to (`tools/chinese_village_plan.py`, section 4b).
+
+| Way | Where | Construction | Why |
+|---|---|---|---|
+| **Imperial way** (yùdào) | the palace's processional axis, through the front court | a raised strip of long white marble slabs, 5 m wide, down the middle of the court's brick | only the Emperor walked it; after the quest anyone does |
+| **Palace courts** (hǎimàn) | the front court, the axis apron | grey brick laid in herringbone across the whole court, wall to wall | a court is paved entire, not crossed by paths |
+| **Stone flags** | the palace grounds, the gate island, every bridgehead apron, the market square, the arrival forecourt | dressed granite flags about 1 m square, in staggered courses | the palace keeps the bridges and the ground at their heads; the market square is the village's one public floor |
+| **Slab road** (shíbǎn lù) | the main way across each village island, bridge to bridge | rough granite slabs 0.45 to 0.8 m long, laid across the way, worn paler and hollow down the middle, on an earth bed with earth shoulders | the old common way, older than the brick; every carrier's load has passed over it |
+| **Brick lane** | to the inn, the inn's garden, the market, the bao house | grey brick in running bond, on the flat | trade can pay for brick |
+| **Packed earth** | to homes, the roofer's and play yards, the sealing rock, the field shed, the pen, the grove | rammed earth crowned to shed rain, with the grass worn back either side | households tread their own lanes |
+| **Bund** | along the field strips, plots, pits and bean terraces | a raised earth bank 0.25 m high and 1.6 m wide, grass on its sides, a trodden top | the paddy-edge path: it divides the fields and keeps feet off the crop |
+| **Pebble mosaic** (huājiē pūdì) | the royal garden's walks and courts, the corridor ends | grey and white pebbles set on edge in a lattice of roof-tile strips | the garden is the one place made for strolling |
+| **Yard cross walk** (shízì yǒnglù) | inside every home's yard | a brick walk 1.2 m wide from the gate to the main room's door, a cross bar to the side shed; the rest of the yard is packed earth with the water jar and the firewood | the siheyuan's own path: the paved way is only where feet always go |
+| **Threshing floor** | the fields island | rolled clay, smooth and hard | worked, not walked |
+
+**How it is built in the game.** Every surface is generated from the plan's
+JSON, not placed by hand:
+- **Strips and patches.** One mesh per surface kind per island: strip meshes
+  along the path polylines, and polygons for the courts. Their uv is in
+  metres. Each surface sits 2 to 9 cm above the ground, so the island's own
+  ground collider carries the player and the surfaces need no collision of
+  their own.
+- **Patterns.** Flags, brick, herringbone, pebble and earth are a pattern
+  shader on the strip, in metres, with no image textures. There are far too
+  many bricks to build each one.
+- **The slab road** is the exception: its slabs are individual squarish
+  SuperEgg slabs (`EPSILON_FLAT`) in one `MultiMeshInstance3D` per island,
+  each with a little height and colour jitter, because the worn slab road is
+  the village's signature ground.
+- **Raised parts get low colliders** (blocking, by `CollisionPolicy`): the
+  bunds' banks and the imperial way's 0.12 m step. The bunds end in short
+  ramps where a lane meets them.
+- **Earth lanes** get a feathered strip of worn grass either side, a decal
+  rather than geometry.
+
+The 3D model draws each of these (`docs/drawings/chinese_gorge_3d.html`).
+
 ### 4.1 Settlement re-fit (revised 2026-10-12)
 
 > **Superseded where they differ by 4.0 and 4.0a (2026-10-13).** The island

@@ -322,6 +322,63 @@ the 3D model (`docs/drawings/sky_kingdom_3d.html`).
   never cross the track. Drop the crossing, or move the forecourt outside the
   ring.
 
+## 8a. Ways, courts and walks: what they are made of (proposed, 2026-10-14)
+
+The first routes were 3 m gold strips, each running straight from the
+middle of a forecourt to a door, which says nothing. In a kingdom where
+everything underfoot is cloud, the ground has to say what has been built
+and what has only been walked.
+
+**Three grounds.**
+- **Bank cloud** is the island's own surface: soft, white and billowing,
+  never built.
+- **Set cloud** is cloud formed and firmed and laid in slabs like stone. Its
+  joints are a faint lavender shadow and its tone is pearly and a touch warm.
+  It is the stuff of podiums, floors and paving, and gold binds its edges
+  wherever it is laid as a work (the binding ring, the signature motif).
+- **Trodden cloud** is bank cloud that feet have pressed smooth and a hand
+  lower, a little greyer and in shadow. The bank rises again in a soft lip
+  either side. It is the sky's footpath, made by nobody.
+
+**What each way is.**
+
+| Way | Where | Construction |
+|---|---|---|
+| **Landing forecourt** | every court, where flyers land and the gate stairs arrive | set cloud, bound all round in gold. Greek courts lay it in square flags 2 m across, like an agora's paving; the Chinese courts (the Dawn Gate, Aethra, Pantao) lay it like court brick, 1.0 × 0.5 m in running bond |
+| **Processional way** | one per court, straight on its axis, from the forecourt to the principal building (Aethra: through the propylon to the Hall of Mist) | set cloud 4 m wide, kerbed in gold. In the Greek courts it is a paved way of long slabs 2.5 m along. In the Chinese courts it is an imperial way: a raised strip of long slabs 1.6 m wide, with gold edges, down the middle of set-cloud brick |
+| **Walk** | to every other door | trodden cloud 2.4 m wide, never kerbed. It leaves the forecourt's edge or the way, wherever that is nearer the door, leaving square to it, and curves to arrive square to the door |
+| **Threshold** | where each walk meets its door | a set-cloud slab 2.8 × 1.6 m: the doorstep, where the trodden ground meets the built |
+| **Stepping pads** | through the Peach Garden | round set-cloud pads in the bank, about a stride apart, winding the garden's length |
+| **The track** | Dromos's racing ring | firmed cloud (as before) |
+
+Gold is spent only where cloud is laid as a work: forecourt borders and the
+ways' kerbs, never on a walk. This keeps to the 10 percent of the palette.
+Pantao's open table moved off the axis, along the west side of the
+forecourt, facing the landing, where the brief puts it. Before, it stood
+across the banquet hall's way.
+
+`tools/sky_kingdom_layout.py` (section 4a) gives every route a `kind` (way
+or walk), a `surface` and a width, and curves the walks. It checks that every
+processional way runs straight, and it still checks every walk against
+buildings, groves and the cloud's edge.
+
+**How it is built in the game.** Every surface is generated from the plan's
+JSON:
+- **Paving.** Forecourts and ways are polygon and strip meshes of set cloud,
+  their uv in metres, with the joint pattern drawn by a shader in the
+  set-cloud material.
+- **Gold.** Kerbs and borders are gold tube meshes, decorative.
+- **Walks** are strips of the trodden-cloud material 3 cm below the bank's
+  visible top, each with a lip strip either side. The island's walkable
+  collider stays the simplified pad: the groove is visual.
+- **Collision.** The imperial way's 0.1 m raised strip gets a low collider.
+  The Peach Garden's stepping pads are landings (`CollisionPolicy` parkour).
+  Thresholds sit flush.
+- **Lighting.** Set cloud and trodden cloud must still read apart under the
+  sky's bright light, so their tones are set for contrast against bank cloud
+  (pearly against pure white, lavender-grey shadow against both), not by
+  texture alone.
+
 ## Fixed, proposed and open
 
 **Fixed:** the Bird Helm gate and staircase entrance; islands within the

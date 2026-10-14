@@ -428,6 +428,31 @@ for k in ISL:
 PATHS += LINKS
 for c in CORRIDORS: PATHS.append(dict(island=c['island'], to='covered corridor', kind='corridor', width=c['width'], pts=[[round(a, 2), round(b, 2)] for a, b in c['pts']]))
 
+# 4b. what each way is made of (chinese_village.md 4.0b). The palace keeps the bridges and their heads, so the palace
+# island, the gate island and every bridgehead apron are laid in dressed stone flags, with the imperial way of long
+# slabs on the palace axis. The village's main way from bridge to bridge across each island is a slab road (shiban lu):
+# rough granite slabs laid crosswise, worn hollow, on an earth bed with a gutter. Lanes to the inn, the market and the bao
+# house are brick, which trade can pay for; lanes to homes, yards, the shed, the pen and the grove are packed earth,
+# crowned to shed rain; fields are reached along raised earth bunds. Inside the palace garden the walks are pebble
+# mosaic (huajie pudi). Inside every home's yard a brick cross walk (shizi yonglu) runs from the gate to the main room's
+# door, with a cross bar to the side shed; the rest of the yard is packed earth.
+BRICK_TO = ('inn', 'inn_garden', 'market_square', 'bao_house', 'chen_stall', 'well')
+GARDEN_COURTS = ('moon_court', 'pond_court', 'rock_garden', 'bamboo_court')
+def surface_of(pth):
+    k, to, kind = pth['island'], pth['to'], pth['kind']
+    item = to.split(':')[0]
+    if kind == 'corridor': return 'flag'
+    if kind == 'link': return 'pebble' if k == 'palace' else 'brick'
+    if k in ('palace', 'gate'): return 'pebble' if item in GARDEN_COURTS or to == 'corridor end' else 'flag'
+    if kind == 'spine': return 'slab'
+    if pth['width'] < 2: return 'bund'
+    if item in BRICK_TO: return 'brick'
+    return 'earth'
+for pth in PATHS: pth['surface'] = surface_of(pth)
+COURT_PAVING = {'palace_apron': 'flag', 'front_court': 'imperial', 'service_yard': 'earth', 'gate_forecourt': 'flag',
+                'market_square': 'flag', 'roof_yard': 'earth', 'play_yard': 'earth', 'threshing': 'threshing', 'inn_garden': 'garden'}
+for it in I:
+    if it['kind'] == 'court': it['paving'] = COURT_PAVING.get(it['key'], 'garden' if it['style'] == 'shihu' else 'earth')
 # 5. land: the program fits its island (checked in the gorge tool), and the fields hold their area
 strips = sum(it['poly'].area for it in I if it['style'] == 'strip')
 if strips < 1550: problems.append(('fields', 'strips are %.0f m2, under 1,550' % strips))

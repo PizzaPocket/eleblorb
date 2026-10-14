@@ -113,7 +113,7 @@ bld('pantao', 'peach_garden', 'Peach Garden', 'landscape', ('rect', 26.0, 18.0),
     program='cloud peach groves; the first-peach tree on its mound', kind='garden')
 bld('pantao', 'kitchen', 'Kitchen pavilion', 'chinese', ('rect', 8.0, 6.0), (-20.0, -4.0), roof='xieshan', who='Tianlu', door='+x',
     program='gold baking plates in full sun; no fire')
-bld('pantao', 'open_table', 'Open table', 'greek', ('rect', 12.0, 3.0), (0.0, -20.5), roof='cap', door='-z',
+bld('pantao', 'open_table', 'Open table', 'greek', ('rect', 3.0, 12.0), (-10.0, -28.0), roof='cap', door='+x',   # along the forecourt's west side, facing the landing, off the axis
     program='the leftover table on gold tripods', kind='terrace')
 bld('pantao', 'pantao_res', 'Residence', 'chinese', ('rect', 14.0, 10.0), (22.0, -6.0), roof='xieshan', who='Xiangyun, Mingyue, Tianlu, Chunlu',
     door='-x', program='three pavilions round a court, entered by a moon gate')
@@ -309,6 +309,65 @@ for k, bs in by_island.items():
         else:
             if k in VIA and b['key'] != 'propylon': best = [(fx, fz)] + best
             ROUTES.append(dict(island=k, to=b['key'], pts=[list(map(lambda v: round(v, 2), p)) for p in best]))
+# 4a. what each way is made of (sky_kingdom_layout.md 8a; the open table moved off the axis to run along the forecourt, 2026-10-14). Three grounds: bank cloud, the island's own soft billowing
+# surface; set cloud, cloud formed and firmed and laid in slabs like stone, the stuff of podiums, floors and paving; and
+# trodden cloud, bank cloud that feet have pressed smooth and a little low, the sky's footpath. Each court has one
+# processional way of set cloud on its axis, from the landing forecourt to its principal building, kerbed in gold; the
+# Chinese courts lay it as an imperial way (a raised strip of long slabs down the middle of set-cloud brick paving), the
+# Greek courts as a paved way of long slabs. Every other door is reached by a trodden walk, which leaves the forecourt or
+# the way, bends where it must and is never kerbed. Where a walk meets a door it ends on a small set-cloud threshold.
+PRINCIPAL = {'gate': ['dawn_gate'], 'aethra': ['propylon', 'hall_of_mist'], 'koinon': ['assembly'], 'pantao': ['banquet'],
+             'chrysa': ['forge'], 'lyria': ['odeon'], 'dromos': ['judges']}
+COURT_STYLE = {k: ('chinese' if k in ('gate', 'aethra', 'pantao') else 'greek') for k in ISLANDS}
+WAY_W, WALK_W = 4.0, 2.4
+def chaikin(pts, n=3):
+    for _ in range(n):
+        out = [pts[0]]
+        for a, b in zip(pts, pts[1:]): out += [(0.75 * a[0] + 0.25 * b[0], 0.75 * a[1] + 0.25 * b[1]), (0.25 * a[0] + 0.75 * b[0], 0.25 * a[1] + 0.75 * b[1])]
+        out.append(pts[-1]); pts = out
+    return pts
+for r in ROUTES:
+    k = r['island']
+    if r['to'] in PRINCIPAL.get(k, []):
+        r.update(kind='way', surface='imperial' if COURT_STYLE[k] == 'chinese' else 'paved', width=WAY_W)
+        (x0, z0), (x1, z1) = r['pts'][0], r['pts'][-1]
+        if any(abs((x1 - x0) * (p[1] - z0) - (z1 - z0) * (p[0] - x0)) / math.dist((x0, z0), (x1, z1)) > 0.05 for p in r['pts']):
+            problems.append((k, r['to'], 'the processional way bends: it must run straight on the axis'))
+    else:
+        # a walk branches from the forecourt's edge or from the way, whichever lets it be shortest, leaves it square,
+        # curves, and comes in square to the door; if no curve fits, the checked route is rounded off instead
+        b = next(q for q in by_island[k] if q['key'] == r['to']); end = tuple(r['pts'][-1]); dv = door_vec(b)
+        fx, fz, fw, fd = FORE[k]; starts = []
+        for t in [i / 12 for i in range(1, 12)]:
+            for (sx, sz, nx, nz) in ((fx - fw / 2 + fw * t, fz - fd / 2, 0, -1), (fx - fw / 2 + fw * t, fz + fd / 2, 0, 1), (fx - fw / 2, fz - fd / 2 + fd * t, -1, 0), (fx + fw / 2, fz - fd / 2 + fd * t, 1, 0)):
+                starts.append(((sx, sz), (nx, nz)))
+        for w_ in ROUTES:
+            if w_['island'] == k and w_['to'] in PRINCIPAL.get(k, []) and w_ is not r:
+                (ax, az), (bx, bz) = w_['pts'][0], w_['pts'][-1]; L_ = math.dist((ax, az), (bx, bz)); ux, uz = (bx - ax) / L_, (bz - az) / L_
+                for d_ in [x_ * 2.0 for x_ in range(1, int(L_ / 2))]:
+                    px, pz = ax + ux * d_, az + uz * d_
+                    if FPOLY[k].buffer(0.5).contains(Point(px, pz)): continue
+                    for sgn in (-1, 1): starts.append(((px - uz * sgn * WAY_W / 2, pz + ux * sgn * WAY_W / 2), (-uz * sgn, ux * sgn)))
+        def bez(p0, n0, p3, n3):
+            L_ = math.dist(p0, p3); p1 = (p0[0] + n0[0] * L_ / 3, p0[1] + n0[1] * L_ / 3); p2 = (p3[0] + n3[0] * L_ / 3, p3[1] + n3[1] * L_ / 3)
+            return [((1 - t) ** 3 * p0[0] + 3 * (1 - t) ** 2 * t * p1[0] + 3 * (1 - t) * t * t * p2[0] + t ** 3 * p3[0], (1 - t) ** 3 * p0[1] + 3 * (1 - t) ** 2 * t * p1[1] + 3 * (1 - t) * t * t * p2[1] + t ** 3 * p3[1]) for t in [i / 16 for i in range(17)]]
+        best = None
+        for (p0, n0) in sorted(starts, key=lambda q: math.dist(q[0], end)):
+            if (end[0] - p0[0]) * n0[0] + (end[1] - p0[1]) * n0[1] <= 0: continue          # leave toward the door, not away
+            c_ = bez(p0, n0, end, dv)
+            if route_ok(k, [(p0[0] + n0[0] * 0.3, p0[1] + n0[1] * 0.3)] + c_[1:], {r['to']}): best = c_; break
+        if best is None: best = chaikin([tuple(p) for p in r['pts']]) if len(r['pts']) > 2 else [tuple(p) for p in r['pts']]
+        r.update(kind='walk', surface='trodden', width=WALK_W, pts=[[round(x, 2), round(z, 2)] for x, z in best])
+# a threshold of set cloud at every door a walk reaches
+THRESHOLDS = [dict(island=r['island'], to=r['to'], at=r['pts'][-1], dir=[round(r['pts'][-1][0] - r['pts'][-2][0], 3), round(r['pts'][-1][1] - r['pts'][-2][1], 3)])
+              for r in ROUTES if r['kind'] == 'walk']
+# the Peach Garden is walked on stepping pads of set cloud laid in the bank, from the banquet hall's back to the far wall
+GARDEN_PADS = []
+for b in B:
+    if b['kind'] == 'garden':
+        x, z = b['c']; w_, d_ = b['shape'][1], b['shape'][2]; n_ = int(d_ // 1.5)
+        for i in range(n_):
+            t = (i + 0.5) / n_; GARDEN_PADS.append(dict(island=b['island'], at=[round(x + math.sin(t * math.pi * 2) * w_ * 0.18, 2), round(z - d_ / 2 + d_ * t, 2)], r=0.55 if i % 3 else 0.7))
 # 5. podium ramps: every podium has one, at most 32 deg, landing at each tier
 for b in B:
     if b['podium'] and b['shape'][0] != 'ring' and ramp_poly(b) is None and b.get('ramp') != 'spiral':
@@ -364,7 +423,7 @@ data = dict(
     buildings=[dict(b, footprint=poly_out(shape_poly(b)), podium_fp=poly_out(podium_poly(b)) if b['podium'] else None,
                     ramp=poly_out(ramp_poly(b)) if ramp_poly(b) is not None else None, ramp_kind=b.get('ramp', 'axial'),
                     ramp_run=round(ramp_run(b), 2) if b['podium'] else 0, door_at=door_point(b)) for b in B],
-    forecourts=FORE, routes=ROUTES, trees=TREES, built=BUILT, landing_world_y=LANDING_WORLD_Y, ambient=AMBIENT,
+    forecourts=FORE, routes=ROUTES, thresholds=THRESHOLDS, garden_pads=GARDEN_PADS, court_style=COURT_STYLE, trees=TREES, built=BUILT, landing_world_y=LANDING_WORLD_Y, ambient=AMBIENT,
     east=EAST, tan=TAN, problems=[list(map(str, p)) for p in problems])
 if '--json' in sys.argv:
     json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
