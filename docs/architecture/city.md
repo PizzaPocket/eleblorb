@@ -545,7 +545,7 @@ hero about 1.9 m. City buildings follow it, on the 3.2 m building cell.
 | Public housing point block | about 22 × 22 m, 30 to 40 storeys (about 100 to 130 m), on an open void deck |
 | Public housing slab block | 13 to 16 m deep, 60 to 90 m long, 12 to 16 storeys (40 to 52 m), with open corridors |
 | Downtown skyscraper | 40 to 45 m square on a podium, 35 to 55 storeys (140 to 220 m) |
-| Downtown mid-rise | 20 to 34 m frontage by about 20 m deep, 10 to 22 storeys, filling the blocks round the towers |
+| Downtown mid-rise | 20 to 34 m frontage by about 20 m deep, 18 to 34 storeys, filling the blocks round the towers |
 | Street building (Old Moy, market lanes) | 6 to 10 m frontage by about 15 m deep, 4 to 9 storeys |
 | The Windspire, the tallest | about 45 m square, about 70 storeys, about 280 m with its crown |
 | Wind turbine (outside the bounds) | about 95 m to the hub; rotor 130 m across; about 160 m to the tip |
@@ -784,8 +784,8 @@ and the train are one structure, and the trains still run on its top.
   and a Wall Line station on its top under a canopy, with a ramp tower and
   lift inside it down to the street. The gates stand open: the NMEs never
   enter, so the gates are watched, not shut.
-- **Watch posts:** seven round towers standing out from the outer face
-  between the gates, each with a searchlight that sweeps the desert at
+- **Watch posts:** seven rectangular bastions standing out from the outer
+  face between the gates, each with a searchlight that sweeps the desert at
   night. This is how the vigilance shows: lights on the sand, figures on
   the watch walk, a bell at each gate.
 - **The Line House:** a bastion on the wall's outside toward the water works,
@@ -805,16 +805,20 @@ the picture-sign colours at night).
 - **The wall: Xi'an's Ming city wall**, for its size and its watch. It is
   12 m high and 12 to 14 m wide on top, people walk and cycle round its top,
   and it has a bastion (*mamian*) every 120 m so the guards can see along
-  the face. Moy's wall takes the same height, width and spacing; its gate
-  towers take the gatehouse-and-barbican massing of Xi'an's gates and of
-  Jiayuguan in the Gansu desert, and its watch posts the desert beacon
-  towers on the Great Wall's western end. Material: the infill is Old Moy's
+  the face. Moy's wall takes the same height, width and spacing, and its
+  watch posts are rectangular bastions like Xi'an's (20 m along, 10 m out,
+  14 m high, a searchlight on each). Its gatehouses take the
+  gatehouse-and-barbican massing of Xi'an's gates, and each carries two
+  three-tier corner towers after Jiayuguan in the Gansu desert, built in
+  Moy's tile with flat steel roofs instead of timber eaves. Material: the infill is Old Moy's
   rammed earth (the well town's own way of building), faced outside in pale
   tile.
 - **The viaduct it was: Tokyo's Yamanote line.** Tokyo's railway loop runs
   on brick and concrete viaducts whose arches are let as bars, workshops
-  and shops (*gādo-shita*, "under the girders", as at Yūrakuchō). Proposed:
-  only the outer half of each Ring Line arch was filled; the inner half
+  and shops (*gādo-shita*, "under the girders", as at Yūrakuchō). Only the
+  outer half of each Ring Line arch was filled (in the data: 112 arches of
+  9 m bays, 6.5 m wide and 5.5 m high, 5 m deep, clear of the gates and the
+  Line House); the inner half
   stays open to the Rim Walk as small rooms (the Watch's posts, stores,
   noodle counters, the lines' staff rooms), so the wall is lived in on the
   city side and blank on the desert side.
@@ -1067,7 +1071,7 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     offices) on the Park Ring's east corners;
   - **BLOCK**, the research institute, 6 storeys round a court, beside the
     glass tower on Meridian South;
-  - **mid-rise blocks of 10 to 22 storeys** filling the rest of downtown
+  - **mid-rise blocks of 18 to 34 storeys** filling the rest of downtown
     round the towers, offices and flats on large footprints (20 to 34 m
     frontage), so the towers rise out of a solid mid-rise mass instead of
     standing among small buildings (user).
@@ -1200,8 +1204,18 @@ and playground design is approved.
 Downtown has five towers. Each answers the same three things in its own
 way: the desert sun, the west wind, and the city's own history. They share
 Moy's language (superellipse corners, pale ceramic, crowns lit at night in
-the picture-sign colours) but no two look alike. Each rises from a podium
-that holds its street edge and meets the Deck at +6.5 m.
+the picture-sign colours) but no two look alike.
+
+**Breathing room and a life at their feet** (revised 2026-10-14, after the
+user's review of the model). No irregular tower takes its whole plot. Each
+shaft stands back at least 6 m from every neighbour and leaves at least 40%
+of its plot as public ground, and that ground has a use: a garden, a
+forecourt, a court or a low pavilion of one or two storeys whose roof is a
+terrace at the Deck's +6.5 m. Data: `TOWER_SITE` in `tools/city_layout.py`,
+checked. Round them, downtown's mid-rise mass is raised to **18 to 34
+storeys (65 to 122 m)**, a third to a half of the towers' height, so the
+towers rise out of a city rather than over a plain, as in Hong Kong's
+Central or Tokyo's Marunouchi.
 
 **1. The Windspire** (the Windworks' headquarters, about 70 storeys, 280 m)
 - **Idea:** the city's wind made into a building.
@@ -1218,6 +1232,17 @@ that holds its street edge and meets the Deck at +6.5 m.
     wind, visible from the whole city;
   - pale fritted glass behind vertical terracotta fins, which shade the
     west face from the afternoon sun.
+- **Structure through the gaps** (revised 2026-10-14: the first model read
+  as a tower balanced on thin poles). Each wind gap is a slot open west to
+  east, not a waist: a broad concrete core and three steel mega-columns at
+  the triangle's corners run unbroken through it, and a two-storey transfer
+  truss band sits under and over every gap, as round the turbine openings
+  of the Pearl River Tower. The turbines spin between the columns.
+- **Site:** a 28 m shaft set back in the **wind garden**: desert grasses that
+  move in the wind, a ring of small turbines at head height, shade trees and
+  benches on Meridian North facing Civic Plaza. The lobby's glass hall stands
+  on the hotel side, and a glass bridge at +6.5 m crosses the garden from
+  the hotel's mezzanine into it (the Deck's indoor run).
 - **Crown:** an open steel lattice round the observation deck, with a slow
   vertical-axis turbine as its spire, lit white at night.
 - **Play:** the fins and the wind-gap ledges are the highest swing anchors
@@ -1237,6 +1262,11 @@ that holds its street edge and meets the Deck at +6.5 m.
   - each panel is pierced with one of **Old Moy's painted house marks**,
     the pictures the city's signs come from, so the tower carries the old
     town's history on its face.
+- **Site:** the shaft (26 by 24 m) stands back behind a two-storey run of
+  cafes holding Meridian South; the glass skybridge lands on their roof
+  terrace, the tower's Deck lobby. On the park side, the **screen court**,
+  shaded by a canopy of the tower's own pierced panels, so Old Moy's house
+  marks fall as patterns of light on the paving.
 - **Crown:** the screens stop short of the top; a glass crown lit warm
   amber.
 - **Play:** the screen frames are a climbable lattice from the podium up.
@@ -1254,6 +1284,10 @@ that holds its street edge and meets the Deck at +6.5 m.
     the same twice;
   - a **sky garden** open to the air at its middle, on floors 22 and 23,
     shaded and planted.
+- **Site:** the capsules start at the third floor, so the ground under them
+  is open round the core: workshops and a cafe in the shade of the capsules
+  above, and the **makers' yard** on Hotel Lane, with bike racks and the skate
+  run Theo uses at lunch.
 - **Crown:** the topmost capsules, stacked unevenly.
 - **Play:** the city's best climbing tower; the capsules' tops are ledges
   all the way up. Theo works in one.
@@ -1270,10 +1304,34 @@ that holds its street edge and meets the Deck at +6.5 m.
   - deep balconies shade the windows behind them, with screens and potted
     plants;
   - pale, sand-coloured concrete and ceramic tile.
+- **Site:** a two-storey colonnade under the first balconies (the lobby, a
+  nursery, the residents' room) opens onto the residents' garden: a pergola,
+  a play lawn and a sand pit, with a shaded garden on Market Lane.
 - **Crown:** roof terraces stepping back, the residents' gardens.
 - **Play:** the rippling balcony edges are a staircase of ledges for
   climbers and swing anchors along the south of Civic Plaza. Dr. Kask lives
   near the top.
+
+**BLOCK** (the research institute, 6 storeys, 22 m; revised 2026-10-14)
+- **Idea:** a closed place that looms. The city never says BLOCK is sinister;
+  the building does, quietly. Data: `BLOCK_FORM`.
+- **References:**
+  - **33 Thomas Street, New York:** the windowless telephone exchange whose
+    blank mass is felt before it is understood.
+  - **Boston City Hall:** upper floors looming out over a recessed base.
+- **Form:**
+  - the only dark building downtown: blue-black glazed brick in a city of
+    pale tile, with an azure sheen at a low sun, the city blorbs' colour;
+  - a **recessed base** 3 m in from the plot line with no windows at eye
+    level, so the five storeys above lean over their own pavement and keep
+    it in shadow (it cannot overhang the street: the Meridian Line runs
+    there);
+  - **one narrow door**, off the axis, the only opening at the ground;
+  - **slit windows**, 35 cm wide every 3.6 m;
+  - a **court nobody sees**: its clerestory glows azure at night and is dark
+    by day;
+  - a ring of **grounding masts** on the roof, for the living-current work.
+- It stays off the Deck and turns its back on Civic Plaza's life.
 
 **5. The Grand Hotel's guest tower** (28 levels, 96 m, and the drum to 108 m, rising from a 44 m atrium block; full brief in section 8, proposed 2026-10-13 after the user's direction to follow John Portman)
 - **Idea:** the oldest tower downtown, the boom's idea of the future: a
@@ -1640,9 +1698,9 @@ face (0) to the east (52) and z from the north face (0) to the south (60).
 - **North face, service:** on Hotel Lane.
 - **East face:** a party wall with the Windspire's podium.
 - **The Deck** runs along Civic Plaza's north edge at +6.5 m. A glazed
-  **skybridge** carries it over Meridian North into the mezzanine, and the
-  Deck's walkway through the Windspire's podium joins the mezzanine's east
-  gallery, so the hotel is a room on the Deck, a city within the city, the
+  **skybridge** carries it over Meridian North into the mezzanine, and a
+  glass bridge from the mezzanine's east gallery crosses the Windspire's
+  wind garden into its lobby, so the hotel is a room on the Deck, a city within the city, the
   way Portman's hotels are joined to their neighbours.
 
 **No porte-cochère.** Portman's hotels open on a drive for cars; Moy has

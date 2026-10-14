@@ -197,7 +197,10 @@ def trim(lot,comp):
         if x1-x0<3 or z1-z0<3: return None
     return None
 FW=[8,6,10,7,9,6,8,10]; MW=[24,30,20,34,26,22]
-FH=[6,8,5,9,7,4,6,8]; MH=[14,18,12,20,16,22,12]
+FH=[6,8,5,9,7,4,6,8]
+# downtown's mid-rise mass (2026-10-14, raised so the towers rise out of it rather than over a plain): 18 to 34
+# storeys, 65 to 122 m, a third to a half of the towers' height, as round Hong Kong's Central and Tokyo's Marunouchi
+MH=[20,26,18,30,24,34,22]
 lots=[]; courts=[]; k=0
 for bl in blocks:
     if bl['type']=='precinct': continue
@@ -519,6 +522,47 @@ for nb in [x for x in B if x['n'] in ANGLE]:
     for other in named:
         if other is nb: continue
         if poly_gap(P,corners_of(other))<8: problems.append(('turned block within 8 m of',nb['n'],other['n']))
+## The towers' sites (city.md 7c, revised 2026-10-14). No irregular tower takes
+## its whole plot: each shaft stands back at least 6 m from every neighbour,
+## and its foot is public ground with a life of its own. shaft: the tower's
+## footprint (world rect); ground: what stands round it, each a kind and a rect
+## (pavilion: one or two storeys, its roof at the Deck's +6.5 m; link: a glass
+## bridge at +6.5 m; canopy: a shade lattice about 4 m up; forecourt, garden,
+## court, yard: open ground).
+TOWER_SITE={
+ 12:dict(shaft=(-424,-74,-396,-46),ground=[
+   ('forecourt',(-431,-46,-389,-38),'the wind garden\'s front on Meridian North: shade trees and benches facing Civic Plaza'),
+   ('garden',(-431,-80,-389,-46),'the wind garden: desert grasses that move in the wind, and a ring of small turbines at head height'),
+   ('pavilion',(-431,-70,-424,-52),'the lobby\'s glass hall on the hotel side; its roof is the Deck\'s run from the hotel mezzanine'),
+   ('link',(-431,-64,-424,-58),'the glass bridge at +6.5 m from the hotel\'s mezzanine into the lobby')]),
+ 13:dict(shaft=(-474,47,-448,71),ground=[
+   ('pavilion',(-483,38,-443,44),'a two-storey run of cafes holding Meridian South; the glass skybridge lands on its roof terrace, the Deck lobby'),
+   ('court',(-483,44,-474,78),'the screen court facing the park, shaded by a canopy of the tower\'s own pierced screens'),
+   ('canopy',(-483,48,-474,74),'the screen canopy, its panels pierced with Old Moy\'s house marks'),
+   ('garden',(-474,71,-443,78),'a planted strip on the neighbours\' side')]),
+ 14:dict(shaft=(-477,-134,-449,-108),ground=[
+   ('yard',(-483,-108,-443,-102),'the makers\' yard on Hotel Lane: benches, bike racks and a skate run Theo uses at lunch'),
+   ('court',(-477,-134,-449,-108),'the open ground under the first capsules: workshops and a cafe round the core, the capsules starting at the third floor'),
+   ('garden',(-483,-142,-443,-134),'shade trees on the north side'),
+   ('garden',(-449,-134,-443,-108),'a planted strip on the east neighbour\'s side')]),
+ 15:dict(shaft=(-477,110,-451,136),ground=[
+   ('forecourt',(-483,102,-443,110),'the residents\' front on Glass Lane'),
+   ('court',(-477,110,-451,136),'a two-storey colonnade under the first balconies: the lobby, a nursery and the residents\' room, open to the gardens'),
+   ('garden',(-483,110,-477,142),'a shaded garden on Market Lane'),
+   ('garden',(-451,110,-443,142),'the residents\' garden: a pergola, a play lawn and the children\'s sand pit'),
+   ('canopy',(-451,114,-443,132),'the pergola'),
+   ('garden',(-477,136,-451,142),'a planted strip to the south')]),
+}
+## BLOCK (city.md 7c, 6 below; proposed 2026-10-14): a closed institute that
+## looms, said with the architecture and never with a sign. A dark recessed base
+## with no windows at eye level and one narrow door off its axis; the five
+## storeys above step out over it to the plot line, so the whole mass leans over
+## its own pavement; slit windows; a court nobody sees, its glow only showing at
+## night; a crown of grounding masts. Precedents: 33 Thomas Street, New York (the
+## windowless telephone exchange), Boston City Hall (upper floors looming over
+## the base), and the Kunsthaus and bunker tradition of dark mass in a pale city.
+BLOCK_FORM=dict(storeys=6,storey=3.6,base=(3.0,6.5),door=(-401,41),court=(-421,50,-403,68),slit=(0.35,3.6),
+  colour='blue-black glazed brick, with an azure sheen at a low sun',masts=12,mast=6.0,glow='the court\'s clerestory, azure at night')
 TURBINES=[(-310,-200),(-310,200),(-740,-270),(-740,270)]
 ## The Deck (city.md 6.2 and 6a): the walkway at +6.5 m, after Hong Kong's
 ## footbridges. Every run has a job: the ring shades the park side of the Park
@@ -686,6 +730,27 @@ def _deck_checks():
                 for e in (-1,1): cols.append(tuple(round(v,1) for v in at(t,e)))
     D['columns']=sorted(set(cols))
 _deck_checks()
+def _site_checks():
+    from shapely.geometry import box as sbox
+    others=[(b_['n'],sbox(*b_['r'])) for b_ in named]+[(None,sbox(*l[:4])) for l in lots]
+    for n_,site in TOWER_SITE.items():
+        plot=sbox(*[b_ for b_ in named if b_['n']==n_][0]['r']); sh=sbox(*site['shaft'])
+        if not plot.contains(sh): problems.append(('tower shaft outside its plot',n_))
+        for m_,g in others:
+            if m_==n_: continue
+            if sh.distance(g)<6-1e-6: problems.append(('tower shaft within 6 m of a neighbour',n_,m_))
+        free=plot.difference(sh).area/plot.area
+        if free<0.4: problems.append(('tower takes too much of its plot',n_,round(1-free,2)))
+        for kind,r,what in site['ground']:
+            g=sbox(*r)
+            if not plot.buffer(0.01).contains(g): problems.append(('tower ground outside its plot',n_,kind))
+            if kind=='pavilion' and g.intersection(sh).area>0.01: problems.append(('pavilion inside the shaft',n_))
+        if not any(k_ in ('pavilion','court','yard') for k_,_,_ in site['ground']): problems.append(('tower foot with no life',n_))
+    bf=BLOCK_FORM; br=[b_ for b_ in named if b_['n']==16][0]['r']
+    if not sbox(*br).buffer(-bf['base'][0]+0.01).contains(sbox(*bf['court'])): problems.append(('BLOCK court not inside its walls',))
+    x,z=bf['door']
+    if not (abs(z-(br[1]+bf['base'][0]))<0.5 and br[0]<x<br[2]): problems.append(('BLOCK door not on its recessed base front',))
+_site_checks()
 ## The wall and the Wall Line (city.md 6c, proposed 2026-10-14). The Ring Line
 ## came first: a double-track viaduct round the city's edge, built in the boom.
 ## As the NMEs rose, the city filled its arches with rammed earth and concrete,
@@ -707,6 +772,13 @@ WALL={
  # halts between the gates, each on its own bastion over the lane it serves
  'halts':[],
  'platform':(40.0,3.0),'watch_every':120.0,'watch_r':7.0,
+ # the watch posts are Xi'an's bastions (mamian): rectangular, 20 m along the wall and 10 m out
+ 'post':dict(along=20.0,out=10.0,height=14.0),
+ # the Ring Line's arches, after Tokyo's gado-shita: only the outer half of each was filled, so the inner half opens on the
+ # Rim Walk as a room 5 m deep under a 6.5 m arch; bays of 9 m, the arches kept clear of the gates and the Line House
+ 'arches':dict(bay=9.0,span=6.5,rise=5.5,depth=5.0),
+ # the gate towers: Jiayuguan's tiered towers on the gatehouse's outer corners, in Moy's tile
+ 'gate_tower':dict(base=7.0,tiers=3,tier=3.2),
  'line':dict(speed=10.0,dwell=20.0,sets_each_way=2,cars=2,car=(15.0,2.65,3.5),power='the wind, from the battery works'),
  # the Line House: a bastion on the wall's outside, toward the water works: the car shed at the top's level over the
  # lines' workshop and the Wall Watch's guardroom. at: degrees round the circle (atan2 of z, x-CX); along and out in metres
@@ -769,6 +841,13 @@ def _build_wall():
         if all(min(abs(s-st['s']),L-abs(s-st['s']))>30 for st in stations) and shed.distance(q)>30:
             posts.append((round(q.x,2),round(q.y,2)))
     W_['watch_posts']=posts
+    # the arch rooms on the city side, kept 4 m clear of every gatehouse and the Line House
+    A=W_['arches']; arches=[]; n_a=int(L//A['bay'])
+    for i in range(n_a):
+        s_=(i+0.5)*L/n_a; q=C.interpolate(s_)
+        if all(Point(g['p']).distance(q)>g.get('along',W_['gatehouse']['along'])/2+4 for g in W_['gates']) and shed.distance(q)>W_['thick']/2+4:
+            arches.append(round(s_,1))
+    W_['arch_s']=arches
     # the line's curves: radius from three points 10 m apart
     worst=1e9
     for i in range(0,int(L),5):
@@ -1198,6 +1277,11 @@ w("## The cross lines (city.md 6c): elevated at the Wall Line's level. services 
 w("## directional; path is the filleted track centreline. Where a service follows the")
 w("## Deck it rides on the Deck's columns, directly above it.")
 w("const CROSS := %s" % lit(CROSS))
+w("")
+w("## The towers' sites: the shaft's footprint and the public ground round it (city.md 7c).")
+w("const TOWER_SITE := %s" % lit(TOWER_SITE))
+w("## BLOCK's form (city.md 7c): recessed dark base, upper storeys out to the plot line, court, masts.")
+w("const BLOCK_FORM := %s" % lit(BLOCK_FORM))
 w("const TURBINE_HUB_HEIGHT := 95.0")
 w("const TURBINE_ROTOR_RADIUS := 65.0")
 w("")
@@ -1217,5 +1301,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,block_form=BLOCK_FORM,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')
