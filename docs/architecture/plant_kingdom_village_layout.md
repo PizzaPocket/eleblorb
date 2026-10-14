@@ -346,7 +346,7 @@ The plan file now carries the structure and checks it.
 - **The rest of each crown** is grown by the plan file, starting from how
   the game grows it (from 0.4 of the trunk, by the golden angle). Revised
   after review, when the trees read light in branches:
-  - two limbs a level, opposite each other, every 2.4 m;
+  - two limbs a level, opposite each other, every 2.4 m (superseded by review 3, section 11);
   - each limb turned or shortened until its whole path clears every deck,
     pavilion roof, bridge and spiral headroom.
   The current plan has 28 such crown limbs.
@@ -471,6 +471,40 @@ grand spiral. The plan file carries it and checks it.
   - the food store to 0.272 of the edge;
   - the cistern to 0.473, now 5.5 m wide;
   - Jati's workshop to 0.695, now 5.5 m wide.
+
+### Crowns and rope stays (review 3, 2026-10-14)
+
+The user found the branches oddly symmetrical, within each tree and from tree
+to tree. Some limbs were wholly bald. The suspension ropes all hung plumb,
+which is an odd way to build. Branches are not to be overdone: they are a way
+to solve support and to make the trees feel natural.
+
+- **Each tree grows its own way.** It has its own seed. Its crown starts at
+  0.37 to 0.45 of the trunk. Limbs come mostly one at a time, now and then a
+  pair 110 to 190° apart, 2.4 to 5.2 m apart up the trunk. Each is turned
+  from the last by roughly the golden angle, give or take 35°. Every limb has
+  its own length (0.7 to 1.15 of the game's), pitch, arch and sideways bend.
+  The opposite pairs every 2.4 m are gone.
+- **The crowns' top lobes are irregular too:** 4 to 6 per tree, of different
+  sizes and heights, unevenly spaced.
+- **No limb is bald.** A crown limb is kept only if it comes into leaf at its
+  tip or on a side branch. Side branches grow at uneven places, on either
+  side as they fall, and only some fork. A structural limb that cannot leaf
+  upward puts out foliage level, or hanging below the deck it carries. The
+  limbs under the bridge landings turn aside, out from under the bridge, and
+  up into leaf. The plan file reports any limb left bare; there are none.
+  The crowns now have 11 crown limbs and 31 structural ones: 141 limbs and
+  branches in all, with 109 leaf clusters.
+- **Raked rope stays, not plumb hangers.** Every hung part hangs in
+  V-pairs of stays from points on its limb, raked out to the beams it
+  carries, so each hang is braced both ways:
+  - **Hung bays on the rings:** two pairs per bay, from 0.35 and 0.85 of the
+    hanger limb, to the inner and outer ring beams either side of the bay's
+    middle.
+  - **The commons limbs:** two pairs per limb, raked 2.6 m to either side
+    and 1.6 m back toward the trunk.
+  - **The hung ring:** each limb tip carries it by two stays, to points
+    along the ring either side of the tip.
 
 **For the game (P7):**
 - The village trees are grown with this spiral and these limbs. They get no

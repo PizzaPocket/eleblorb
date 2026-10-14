@@ -479,12 +479,14 @@ for t in TREES:
 ## A limb's path (as the 3D model draws it): from 0.8 of the trunk's radius out along its bearing,
 ## rising by its pitch, arched by `arch` (it leaves the trunk climbing, then levels).
 GOLDEN_B = 360 * 0.6180339887498949
-def limb_path(t, y, b, r0, length, pitch, arch, n=8):
-    c = TREES[t]['c']; d = (math.cos(rad(b)), math.sin(rad(b))); out = []
+def limb_path(t, y, b, r0, length, pitch, arch, n=8, wander=0.0):
+    """wander bends the limb sideways as it goes (metres at the tip), so no two limbs are the same."""
+    c = TREES[t]['c']; d = (math.cos(rad(b)), math.sin(rad(b))); sd = (-d[1], d[0]); out = []
     for i in range(n + 1):
         u = i / n; s_ = length * u
         rise = length * math.sin(pitch) * u + arch * (math.sin(math.pi * min(1, u * 1.6) / 2) - 0.5)
-        out.append((c[0] + d[0] * (r0 * 0.8 + s_), y + rise, c[1] + d[1] * (r0 * 0.8 + s_)))
+        lat = wander * u * u
+        out.append((c[0] + d[0] * (r0 * 0.8 + s_) + sd[0] * lat, y + rise, c[1] + d[1] * (r0 * 0.8 + s_) + sd[1] * lat))
     return out
 # what a branch or a leaf may not pass through: every deck with the room people stand in over it
 # (pavilion roofs included), the bridges, and the spirals' headroom
@@ -518,74 +520,116 @@ def rng_(seed):
     return r
 BRANCHES = []      # dict(pts, r0, r1, kind)
 LEAVES = []        # (x, y, z, radius)
-def grow_side_branches(path, thick, length, kind, rnd, outer_from=0.45, n_try=6, structural=False):
-    """Side branches off the outer part of a limb, each forking once, every tip in leaf. A side branch
-    that would pass through a deck, a bridge or a walk's headroom is not grown."""
-    grown = 0
+def grow_side_branches(path, thick, length, kind, rnd, outer_from=0.45, n_try=6, droop=False, cap=99):
+    """Side branches off the outer part of a limb, at irregular places and on either side as they fall,
+    each forking once or not, every tip in leaf. A side branch that would pass through a deck, a bridge
+    or a walk's headroom is not grown. Returns the leaf clusters grown."""
+    leaves = 0
     for k in range(n_try):
-        u = outer_from + (1 - outer_from) * (k + 0.5) / n_try + (rnd() - 0.5) * 0.08
-        u = min(1.0, max(outer_from, u)); i = u * (len(path) - 1); i0 = int(min(len(path) - 2, i)); f = i - i0
+        if leaves >= cap: break
+        u = outer_from + (1 - outer_from) * rnd(); i = u * (len(path) - 1); i0 = int(min(len(path) - 2, i)); f = i - i0
         base = tuple(path[i0][j] + (path[i0 + 1][j] - path[i0][j]) * f for j in range(3))
-        dx, dz = path[-1][0] - path[0][0], path[-1][2] - path[0][2]; L = math.hypot(dx, dz) or 1
-        side = 1 if k % 2 == 0 else -1
-        yaw = math.atan2(dz, dx) + side * rad(35 + 30 * rnd())
-        up = rad(28 + 22 * rnd()); sl = max(1.6, length * (0.28 + 0.14 * rnd()))
+        dx, dz = path[-1][0] - path[0][0], path[-1][2] - path[0][2]
+        side = 1 if rnd() < 0.5 else -1
+        yaw = math.atan2(dz, dx) + side * rad(25 + 50 * rnd())
+        hang = droop and rnd() < 0.5           # between decks, foliage hangs below the limb or reaches out level
+        up = rad(-(35 + 15 * rnd()) if hang else (-5 + 25 * rnd()) if droop else (18 + 34 * rnd())); sl = max(1.4, length * (0.2 + 0.2 * rnd())) * (1.4 if hang else 1)
         tip = (base[0] + math.cos(yaw) * math.cos(up) * sl, base[1] + math.sin(up) * sl, base[2] + math.sin(yaw) * math.cos(up) * sl)
         mid = tuple((base[j] + tip[j]) / 2 + (0.3 if j == 1 else 0) for j in range(3))
-        leaf_r = 1.4 + 1.0 * rnd()
-        if any(blocked(q) for q in (mid, tip)) or blocked((tip[0], tip[1] + 0.4, tip[2]), leaf_r): continue
+        leaf_r = (0.8 + 0.4 * rnd()) if hang or droop else 1.2 + 1.2 * rnd(); lift = -0.5 if hang else 0.2 if droop else 0.4
+        if any(blocked(q) for q in (mid, tip)) or blocked((tip[0], tip[1] + lift, tip[2]), leaf_r): continue
         BRANCHES.append(dict(pts=[base, mid, tip], r0=round(thick * (1 - 0.6 * u) * 0.55, 3), r1=0.08, kind='twig'))
-        LEAVES.append((tip[0], tip[1] + 0.4, tip[2], round(leaf_r, 2)))
-        # one fork off each side branch, with its own leaves
-        fy = yaw - side * rad(40); fl = sl * 0.55
-        ftip = (mid[0] + math.cos(fy) * fl * 0.8, mid[1] + fl * 0.6, mid[2] + math.sin(fy) * fl * 0.8)
-        if not blocked(ftip) and not blocked((ftip[0], ftip[1] + 0.3, ftip[2]), leaf_r * 0.7):
-            BRANCHES.append(dict(pts=[mid, ftip], r0=round(thick * 0.22, 3), r1=0.06, kind='twig'))
-            LEAVES.append((ftip[0], ftip[1] + 0.3, ftip[2], round(leaf_r * 0.7, 2)))
-        grown += 1
-    return grown
-rnd = rng_(20261013)
-# the structural limbs: their working length carries a deck, so their side branches grow from beyond it
+        LEAVES.append((tip[0], tip[1] + lift, tip[2], round(leaf_r, 2))); leaves += 1
+        if not hang and rnd() < 0.6:          # a fork off some side branches, with its own leaves
+            fy = yaw - side * rad(25 + 30 * rnd()); fl = sl * (0.4 + 0.3 * rnd())
+            ftip = (mid[0] + math.cos(fy) * fl * 0.8, mid[1] + fl * 0.6, mid[2] + math.sin(fy) * fl * 0.8)
+            if not blocked(ftip) and not blocked((ftip[0], ftip[1] + 0.3, ftip[2]), leaf_r * 0.7):
+                BRANCHES.append(dict(pts=[mid, ftip], r0=round(thick * 0.22, 3), r1=0.06, kind='twig'))
+                LEAVES.append((ftip[0], ftip[1] + 0.3, ftip[2], round(leaf_r * 0.7, 2))); leaves += 1
+    return leaves
+def tip_leaf(p_, rnd, r=None):
+    lr = r or (1.6 + 1.2 * rnd()); q = (p_[-1][0], p_[-1][1] + 0.7, p_[-1][2])
+    if blocked(q, lr * 0.8): return 0
+    LEAVES.append(q + (round(lr, 2),)); return 1
+BALD = []
+def force_leaf(path, thick, want=2):
+    """Search every direction off the limb's outer part for room to put out a leafy twig."""
+    got = 0; L = len(path) - 1
+    dx, dz = path[-1][0] - path[0][0], path[-1][2] - path[0][2]; base_yaw = math.atan2(dz, dx)
+    for u in (0.95, 0.8, 0.65, 0.5, 0.35):
+        i = u * L; i0 = int(min(L - 1, i)); f = i - i0; base = tuple(path[i0][j] + (path[i0 + 1][j] - path[i0][j]) * f for j in range(3))
+        for dyaw in (40, -40, 70, -70, 100, -100, 15, -15, 130, -130, 0):
+            for up in (20, 5, -15, 40, -35, -50, 60):
+                for sl in (3.0, 2.2, 4.0):
+                    yaw = base_yaw + rad(dyaw); a = rad(up)
+                    tip = (base[0] + math.cos(yaw) * math.cos(a) * sl, base[1] + math.sin(a) * sl, base[2] + math.sin(yaw) * math.cos(a) * sl)
+                    mid = tuple((base[j] + tip[j]) / 2 for j in range(3)); lr = 1.0; lift = -0.4 if up < 0 else 0.3
+                    if any(blocked(q) for q in (mid, tip)) or blocked((tip[0], tip[1] + lift, tip[2]), lr): continue
+                    BRANCHES.append(dict(pts=[base, mid, tip], r0=round(thick * 0.3, 3), r1=0.07, kind='twig')); LEAVES.append((tip[0], tip[1] + lift, tip[2], lr))
+                    got += 1; break
+                else: continue
+                break
+            if got: break
+        if got >= want: break
+    return got
+# the structural limbs: their working length carries a deck, so they leaf beyond it, and below where
+# the deck's underside leaves room; a limb that cannot be put in leaf is reported, never left bald
+def leaf_structural(p_, thick, length, kind, rnd, outer_from, tries, have=0):
+    n = have + grow_side_branches(p_, thick, length, kind, rnd, outer_from, tries)
+    if n == 0: n = grow_side_branches(p_, thick, length, kind, rnd, max(0.3, outer_from - 0.3), tries * 6, droop=True, cap=2)
+    if n == 0: n = force_leaf(p_, thick)
+    if n == 0: BALD.append(kind)
+    return n
+rnd = rng_(20261014)
 for l in SUPPORT['limbs']:
-    p_ = limb_path(l['tree'], l['y'] - 0.8, l['b'], l['r0'], l['length'], 0.0, 0.4)
+    p_ = limb_path(l['tree'], l['y'] - 0.8, l['b'], l['r0'], l['length'], 0.0, 0.3 + 0.3 * rnd(), wander=(rnd() - 0.5) * 1.2)
     BRANCHES.append(dict(pts=p_, r0=0.5, r1=0.22, kind='deck limb'))
     # past the pavilion the limb runs on and up as a living branch, in leaf
-    ext = limb_path(l['tree'], l['y'] - 0.8, l['b'], l['r0'], l['length'] + 4.0, 0.0, 0.4, 10)[-3:]
-    ext = [p_[-1]] + [(q[0], q[1] + 1.4 * (i + 1), q[2]) for i, q in enumerate(ext[1:])]
+    n = 0
+    run = 2.5 + 1.5 * rnd(); d_ = (math.cos(rad(l['b'])), math.sin(rad(l['b']))); e0 = p_[-1]
+    if l.get('carries') == 'bridge':   # under a bridge landing the limb turns aside, out from under the bridge, then up
+        sgn = 1 if rnd() < 0.5 else -1; d_ = (math.cos(rad(l['b'] + sgn * 75)), math.sin(rad(l['b'] + sgn * 75)))
+    ext = [e0, (e0[0] + d_[0] * run, e0[1] + 0.2, e0[2] + d_[1] * run), (e0[0] + d_[0] * (run + 1.0), e0[1] + 1.8 + rnd(), e0[2] + d_[1] * (run + 1.0)),
+           (e0[0] + d_[0] * (run + 1.6), e0[1] + 3.6 + rnd(), e0[2] + d_[1] * (run + 1.6))]
     if not any(blocked(q) for q in ext[1:]) and not blocked((ext[-1][0], ext[-1][1] + 0.6, ext[-1][2]), 1.6):
-        BRANCHES.append(dict(pts=ext, r0=0.22, r1=0.1, kind='twig')); LEAVES.append((ext[-1][0], ext[-1][1] + 0.6, ext[-1][2], 2.0))
-    grow_side_branches(p_, 0.5, l['length'], 'deck limb', rnd, 0.75, 4, True)
+        BRANCHES.append(dict(pts=ext, r0=0.22, r1=0.1, kind='twig')); LEAVES.append((ext[-1][0], ext[-1][1] + 0.6, ext[-1][2], round(1.6 + 0.8 * rnd(), 2))); n = 1
+    leaf_structural(p_, 0.5, l['length'], 'deck limb', rnd, 0.7, 4, have=n)
 for h in SUPPORT['hangers']:
-    p_ = limb_path(h['tree'], h['limb_y'], h['b'], h['r0'], h['length'], 0.0, 1.0)
+    p_ = limb_path(h['tree'], h['limb_y'], h['b'], h['r0'], h['length'], 0.05 * rnd(), 0.6 + 0.8 * rnd(), wander=(rnd() - 0.5) * 2.0)
+    h['path'] = p_
     BRANCHES.append(dict(pts=p_, r0=0.45, r1=0.2, kind='hanger limb'))
-    grow_side_branches(p_, 0.45, h['length'], 'hanger limb', rnd, 0.6, 5)
+    leaf_structural(p_, 0.45, h['length'], 'hanger limb', rnd, 0.55, 4, have=tip_leaf(p_, rnd))
 for l in SUPPORT['commons_limbs']:
-    p_ = limb_path(l['tree'], l['y'], l['b'], l['r0'], l['length'], 0.0, 1.0)
+    p_ = limb_path(l['tree'], l['y'], l['b'], l['r0'], l['length'], 0.0, 0.6 + 0.8 * rnd(), wander=(rnd() - 0.5) * 2.0)
+    l['path'] = p_
     BRANCHES.append(dict(pts=p_, r0=0.6, r1=0.26, kind='commons limb'))
-    grow_side_branches(p_, 0.6, l['length'], 'commons limb', rnd, 0.5, 6)
-# the crown: limbs as nature_props.gd grows them, from 0.4 of the trunk by the golden angle, but
-# twice as close (every 3.1 m), wherever a limb's whole path is clear of decks, bridges and walks
-BOUGH_SPACING = 2.4
+    leaf_structural(p_, 0.6, l['length'], 'commons limb', rnd, 0.45, 5, have=tip_leaf(p_, rnd))
+# the crown: each tree grows its own way, from about 0.4 of its trunk: mostly one limb at a time, now
+# and then a pair, 3 to 6 m apart, each turned roughly by the golden angle but never exactly, each its
+# own length, pitch, arch and sideways bend. A limb is kept only where its whole path is clear of decks,
+# bridges and walks and it comes into leaf: at its tip and on at least one side branch.
 for t, tr in TREES.items():
-    top = 0.86 * tr['h']; y = top * 0.40; a = {'east': 40.0, 'elder': 160.0, 'north': 280.0}[t]
+    rt = rng_({'east': 7101, 'elder': 3307, 'north': 5519}[t])
+    top = 0.86 * tr['h']; y = top * (0.37 + 0.08 * rt()); a = rt() * 360
     while y < top * 0.97:
-        hf = y / top; length = 11.5 + (5.0 - 11.5) * hf; pitch = 0.18 + 0.22 * rnd()
-        for a2 in (a, a + 180.0):         # two limbs a level, opposite, as a crown spreads
-            for trial in range(8):       # turn the limb, then shorten it, to find clear air
-                bb = (a2 + (trial % 4) * 23.0 * (1 if trial % 2 else -1)) % 360
-                ln = length * (1.0 if trial < 4 else 0.7)
-                p_ = limb_path(t, y, bb, trunk_r(t, y), ln, pitch, 1.0)
-                if not any(blocked(q) for q in p_[1:]): break
-            else:
-                p_ = None
-            if p_:
-                BRANCHES.append(dict(pts=p_, r0=round(0.55 * (1 - 0.4 * hf), 3), r1=0.18, kind='bough'))
-                lr = 2.0 + 1.4 * rnd(); tipl = (p_[-1][0], p_[-1][1] + 0.8, p_[-1][2])
-                if not blocked(tipl, lr * 0.8): LEAVES.append(tipl + (round(lr, 2),))
-                grow_side_branches(p_, 0.55 * (1 - 0.4 * hf), ln, 'bough', rnd, 0.4, 5)
-        a += GOLDEN_B; y += BOUGH_SPACING
+        hf = y / top
+        for m in range(2 if rt() < 0.3 else 1):
+            az = a + (110 + 80 * rt()) * m; base_len = (11.5 + (5.0 - 11.5) * hf) * (0.7 + 0.45 * rt())
+            pitch, arch, wander = 0.08 + 0.4 * rt(), 0.4 + 1.4 * rt(), (rt() - 0.5) * 3.0
+            for trial in range(8):       # turn the limb, then shorten it, to find clear air and leaf it
+                bb = (az + (trial % 4) * (15 + 20 * rt()) * (1 if trial % 2 else -1)) % 360
+                ln = base_len * (1.0 if trial < 4 else 0.7)
+                p_ = limb_path(t, y, bb, trunk_r(t, y), ln, pitch, arch, wander=wander)
+                if any(blocked(q) for q in p_[1:]): continue
+                nb, nl = len(BRANCHES), len(LEAVES)
+                BRANCHES.append(dict(pts=p_, r0=round(0.55 * (1 - 0.4 * hf) * (0.8 + 0.3 * rt()), 3), r1=0.18, kind='bough'))
+                got = tip_leaf(p_, rt, 2.0 + 1.4 * rt()) + grow_side_branches(p_, 0.55 * (1 - 0.4 * hf), ln, 'bough', rt, 0.35, 2 + int(4 * rt()))
+                if got >= 1: break
+                del BRANCHES[nb:]; del LEAVES[nl:]          # a bare limb is not grown
+        a += GOLDEN_B + (rt() - 0.5) * 70; y += 2.4 + 2.8 * rt()
 for (x, y, z, r) in LEAVES:
     if blocked((x, y, z), r * 0.8): problems.append(('a leaf cluster at (%.1f, %.1f, %.1f) stands in a deck or a walk' % (x, y, z),))
+if BALD: problems.append(('%d structural limbs could not be put in leaf: %s' % (len(BALD), ', '.join(BALD)),))
 BOUGHS = [b_ for b_ in BRANCHES if b_['kind'] == 'bough']
 
 ## lianas: the canopy households are climbers, and climb the bark and the lianas left hanging from each
