@@ -680,22 +680,24 @@ authoritative over the expected labels in the brief: notably, Aro measured as
 a moderate-grade stepped podium rather than a steep-site bedrock spine. Each
 built shell is checked against that measured section in the isolated proof.
 
-## 6. The lower city (after the Lava Helm)
+## 6. The Caldera Heartworks (after the Lava Helm)
 
-The lower rooms are **lava-filled**, like the sea folk's wet buildings, and are
-reached by swimming in the Lava Helm. They are cast-basalt and refractory shells
-set into the reservoir's banks, lit by mineral lenses and molten seams, with
-openings at least 3 m clear so swimmers move in three dimensions. Every occupied
-room has two ways out (`fire_caldera_layout.md` section 7).
+The lower rooms occupy three rings of the proposed 84 m diameter spherical
+Heartworks and are reached by swimming in the Lava Helm. They are cast-basalt
+and refractory shells socketed into the chamber's structural webs, lit by
+mineral lenses, controlled falls and molten return seams, with openings at
+least 3 m clear so swimmers move in three dimensions. Every occupied room has
+two ways out (`fire_caldera_layout.md` section 7). The full section and lava
+cycle are in `fire_caldera_heartworks.md`.
 
 | Room | Character |
 |---|---|
-| `L0` Renewal chamber | a broad bowl of tiered basalt ledges under the Renewal terrace, lit through the lava from above; where youths make their first full immersion |
-| `L1` Primary manifold | a ring gallery of great valves and gauges round the main duct junction |
-| `L2` Deep observatory | a chamber at the active vent's edge, instruments in steel cages, a lens window onto the vent |
+| `L0` Renewal chamber | a broad bowl of tiered basalt ledges on the Steward Ring beside the gentler Renewal Fall; where youths make their first full immersion |
+| `L1` Primary manifold | the north-west Steward Ring's great valves, fall gates and return controls |
+| `L2` Deep observatory | a Civic Ring chamber with instruments in steel cages and a protected lens looking across the Heartfall |
 | `L3` Fired archive | vaulted bays of cast and engraved records in heat-proof niches |
-| `L4` High-temperature forge | the hottest work floor, open crucibles, an alloy handling rail, the lift to Kel |
-| `L5` Experimental materials bay | test rigs shared by Kel and Vara, separate from the clean assembly floor above |
+| `L4` High-temperature forge | the hottest Works Ring floor beside the Forge Fall, open crucibles, an alloy handling rail, the lift to Kel |
+| `L5` Experimental materials bay | Works Ring test rigs shared by Kel and Vara, separate from the clean assembly floor above |
 
 ## 7. Variation matrix
 

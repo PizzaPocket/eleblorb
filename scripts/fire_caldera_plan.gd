@@ -675,14 +675,67 @@ static func _on_ring(angle: float, _ring: PackedVector2Array) -> Vector2:
 # Lower city (layout section 7)
 # ---------------------------------------------------------------------------
 
+## Proposed Caldera Heartworks (2026-10-15), for spatial review before the
+## lower city is built.  The present surface reservoir becomes a crown annulus
+## around an open oculus into a spherical chamber inside the volcano.  The
+## chamber translates Jewel Changi's useful spatial ideas -- a falling element
+## visible from many levels, terraced circulation around one great void, and a
+## legible collection/return system -- into Fire culture's volcanic modernism.
+## Depths are metres below FireCalderaGround.LAVA_Y so the proposal remains
+## independent of the ground builder.  Nothing in the live terrain consumes
+## these values until the model and section are approved.
+const HEARTWORKS := {
+	"status": "proposed",
+	"name": "Caldera Heartworks",
+	"sphere_radius": 42.0,
+	"centre_depth": 38.4,
+	"shell_thickness": 2.4,
+	"oculus_radius": 17.0,
+	"crown_outer_radius": 52.0,
+	"catch_depth": 69.0,
+	"catch_radius": 12.0,
+	"terrace_width": 4.2,
+	"description": "a spherical civic and thermal chamber below the lava mouth; controlled lava falls feed a deep collection basin and enclosed return risers complete the cycle",
+}
+
+## Each ring follows the inside of the structural sphere rather than becoming
+## an unrelated flat floor.  The crown gallery is the dry pre-Helm overlook;
+## the other rings belong to the post-Helm molten public realm.
+const HEART_LEVELS: Array[Dictionary] = [
+	{"id": "H0", "name": "crown gallery", "depth": 4.0, "access": "dry", "role": "oculus overlook, fall controls and the first view down the whole chamber"},
+	{"id": "H1", "name": "steward ring", "depth": 14.0, "access": "lava_helm", "role": "renewal chamber and the primary manifold"},
+	{"id": "H2", "name": "civic ring", "depth": 26.0, "access": "lava_helm", "role": "observatory, fired archive and public crossing galleries"},
+	{"id": "H3", "name": "works ring", "depth": 38.0, "access": "lava_helm", "role": "high-temperature forge and experimental materials bay"},
+	{"id": "H4", "name": "deep inspection ring", "depth": 52.0, "access": "lava_helm", "role": "fall inspection, sampling and pressure-isolation stations"},
+	{"id": "H5", "name": "return gallery", "depth": 66.0, "access": "lava_helm", "role": "collection gates, return-riser intakes and emergency bypass"},
+]
+
+## Three metered falls leave broad clear sectors between them, so the chamber
+## never becomes a solid lava cylinder.  Angles use the plan frame: +90 faces
+## Civic, 0 faces Kel, and 180 faces Renewal.
+const HEART_FALLS: Array[Dictionary] = [
+	{"id": "F0", "name": "Heartfall", "angle": 90.0, "width": 9.0, "source": "crown settling weir", "destination": "central collection basin", "role": "the civic fall, visible on the arrival-to-Civic axis"},
+	{"id": "F1", "name": "Forge Fall", "angle": 18.0, "width": 5.0, "source": "east crown gate", "destination": "works quench splitter", "role": "high-temperature feed for Kel and Vara"},
+	{"id": "F2", "name": "Renewal Fall", "angle": 198.0, "width": 5.5, "source": "west crown gate", "destination": "renewal tempering shelf", "role": "gentler public immersion and communal reheating"},
+]
+
+## Enclosed return risers use pressure differential and thermal convection,
+## with mechanical valve stations at H1 and H5.  They are visible as glowing
+## seams and instrument bays, never exposed fantasy pipes.
+const HEART_RISERS: Array[Dictionary] = [
+	{"id": "V0", "name": "Aro return", "angle": 145.0, "serves": ["L0", "L1"], "role": "primary civic circulation and household thermal spine"},
+	{"id": "V1", "name": "Kel return", "angle": 25.0, "serves": ["L4", "L5"], "role": "hot industrial return to the east crown gate"},
+	{"id": "V2", "name": "Civic relief return", "angle": 278.0, "serves": ["L2", "L3"], "role": "instrumented return with an outward pressure-relief branch"},
+]
+
 ## id, centre (local), depth band below the lava surface (m), purpose.
 const LOWER_ROOMS: Array[Dictionary] = [
-	{"id": "L0", "name": "renewal chamber", "centre": Vector2(-25.0, -8.0), "depth": Vector2(5.0, 8.0), "purpose": "communal immersion and the coming-of-age practice; seen from the Renewal terrace"},
-	{"id": "L1", "name": "primary manifold", "centre": Vector2(-25.0, 15.0), "depth": Vector2(9.0, 13.0), "purpose": "Miru and Tovan's thermal distribution, controls and inspection loop"},
-	{"id": "L2", "name": "deep observatory", "centre": Vector2(-2.0, 25.0), "depth": Vector2(14.0, 18.0), "purpose": "Selka's vent instruments below Civic"},
-	{"id": "L3", "name": "fired archive", "centre": Vector2(-10.0, 18.0), "depth": Vector2(10.0, 14.0), "purpose": "cast and engraved records beside the observatory"},
-	{"id": "L4", "name": "high-temperature forge", "centre": Vector2(24.0, 3.0), "depth": Vector2(10.0, 16.0), "purpose": "Daro, Vesa and Ruun's hot-work floor, with a secure lift to the gallery"},
-	{"id": "L5", "name": "experimental materials bay", "centre": Vector2(18.0, 18.0), "depth": Vector2(8.0, 13.0), "purpose": "the shared Kel and Vara testing space"},
+	{"id": "L0", "name": "renewal chamber", "centre": Vector2(-25.0, -8.0), "depth": Vector2(11.0, 17.0), "heart_level": "H1", "angle": 198.0, "purpose": "communal immersion and the coming-of-age practice beside the Renewal Fall"},
+	{"id": "L1", "name": "primary manifold", "centre": Vector2(-25.0, 15.0), "depth": Vector2(11.0, 17.0), "heart_level": "H1", "angle": 145.0, "purpose": "Miru and Tovan's thermal distribution, controls and inspection loop"},
+	{"id": "L2", "name": "deep observatory", "centre": Vector2(-2.0, 25.0), "depth": Vector2(23.0, 29.0), "heart_level": "H2", "angle": 88.0, "purpose": "Selka's vent instruments looking across and through the Heartfall"},
+	{"id": "L3", "name": "fired archive", "centre": Vector2(-10.0, 18.0), "depth": Vector2(23.0, 29.0), "heart_level": "H2", "angle": 128.0, "purpose": "cast and engraved records in the quieter civic-ring sector"},
+	{"id": "L4", "name": "high-temperature forge", "centre": Vector2(24.0, 3.0), "depth": Vector2(35.0, 41.0), "heart_level": "H3", "angle": 18.0, "purpose": "Daro, Vesa and Ruun's hot-work floor beside the Forge Fall, with a secure lift to Kel"},
+	{"id": "L5", "name": "experimental materials bay", "centre": Vector2(18.0, 18.0), "depth": Vector2(35.0, 41.0), "heart_level": "H3", "angle": 52.0, "purpose": "the shared Kel and Vara testing space on the works ring"},
 ]
 
 ## The lower inspection loop: curved passages round the vent, never through

@@ -32,11 +32,14 @@ func _ready() -> void:
 	_check_network()
 	_check_sightline()
 	_check_lower_city()
+	_check_heartworks()
 	_check_people()
 	_check_survey()
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--svg="):
 			_write_svg(argument.trim_prefix("--svg="))
+		elif argument.begins_with("--model-json="):
+			_write_model_json(argument.trim_prefix("--model-json="))
 	print("---- validate_fire_plan: %d plots, %d routes, %d FAIL, %d WARN" % [FireCalderaPlan.PLOTS.size(), FireCalderaPlan.routes().size(), _failures, _warnings])
 	get_tree().quit(1 if _failures > 0 else 0)
 
@@ -287,6 +290,74 @@ func _check_lower_city() -> void:
 			_fail("lift %s to %s names a missing room or plot" % [lift[0], lift[1]])
 
 
+## The Heartworks is deliberately a proposal, but it is dimensioned data, not
+## an illustration assembled independently of the civic plan.  These checks
+## preserve a real crown annulus, a spherical section, ordered occupied rings,
+## and one complete fall/collection/return cycle while the design is reviewed.
+func _check_heartworks() -> void:
+	var heart: Dictionary = FireCalderaPlan.HEARTWORKS
+	var radius := float(heart["sphere_radius"])
+	var centre_depth := float(heart["centre_depth"])
+	var oculus := float(heart["oculus_radius"])
+	var crown := float(heart["crown_outer_radius"])
+	var catch_depth := float(heart["catch_depth"])
+	if radius <= 0.0 or centre_depth <= 0.0 or centre_depth >= radius:
+		_fail("Heartworks sphere and centre depth do not form an opening below the crown")
+	else:
+		var section_radius := sqrt(radius * radius - centre_depth * centre_depth)
+		if absf(section_radius - oculus) > 0.35:
+			_fail("Heartworks oculus %.2f m does not cut the sphere at its crown section %.2f m" % [oculus, section_radius])
+	if crown - oculus < 12.0:
+		_fail("Heartworks crown annulus is too narrow for settlement circulation and settling channels")
+	if absf(crown - FireCalderaPlan.RESERVOIR_MEAN) > 0.1:
+		_fail("Heartworks crown no longer agrees with the approved reservoir mean radius")
+	if catch_depth >= centre_depth + radius - float(heart["shell_thickness"]):
+		_fail("Heartworks collection basin leaves the structural sphere")
+	if float(heart["catch_radius"]) >= oculus:
+		_fail("Heartworks collection basin is not visibly subordinate to the oculus")
+
+	var levels := {}
+	var previous_depth := -INF
+	for level in FireCalderaPlan.HEART_LEVELS:
+		var id := str(level["id"])
+		var depth := float(level["depth"])
+		if levels.has(id):
+			_fail("duplicate Heartworks level %s" % id)
+		levels[id] = true
+		if depth <= previous_depth:
+			_fail("Heartworks level %s is not below the preceding ring" % id)
+		previous_depth = depth
+		var vertical := centre_depth - depth
+		if absf(vertical) >= radius - float(heart["shell_thickness"]):
+			_fail("Heartworks level %s leaves the usable sphere" % id)
+		else:
+			var ring_radius := sqrt(pow(radius - float(heart["shell_thickness"]), 2.0) - vertical * vertical)
+			if ring_radius < float(heart["terrace_width"]) + 4.0:
+				_fail("Heartworks level %s has no usable inner-shell ring" % id)
+
+	var rooms := {}
+	for room in FireCalderaPlan.LOWER_ROOMS:
+		rooms[str(room["id"])] = true
+		if not levels.has(str(room.get("heart_level", ""))):
+			_fail("lower room %s has no Heartworks ring" % room["id"])
+		var angle := float(room.get("angle", -1.0))
+		if angle < 0.0 or angle >= 360.0:
+			_fail("lower room %s has no valid Heartworks bearing" % room["id"])
+
+	if FireCalderaPlan.HEART_FALLS.size() < 3:
+		_fail("Heartworks has fewer than three controlled lava falls")
+	for fall in FireCalderaPlan.HEART_FALLS:
+		if float(fall["width"]) <= 0.0 or float(fall["width"]) >= oculus:
+			_fail("Heartworks fall %s has an invalid width" % fall["id"])
+	if FireCalderaPlan.HEART_RISERS.size() < 3:
+		_fail("Heartworks has fewer than three enclosed return risers")
+	for riser in FireCalderaPlan.HEART_RISERS:
+		for room_id in riser["serves"]:
+			if not rooms.has(room_id):
+				_fail("Heartworks riser %s serves missing room %s" % [riser["id"], room_id])
+	print("ok   Heartworks: %.0f m diameter sphere, %.0f m oculus, %d rings, %d falls, %d returns" % [radius * 2.0, oculus * 2.0, FireCalderaPlan.HEART_LEVELS.size(), FireCalderaPlan.HEART_FALLS.size(), FireCalderaPlan.HEART_RISERS.size()])
+
+
 func _check_people() -> void:
 	var places := {}
 	for entry in FireCalderaPlan.PLOTS:
@@ -410,6 +481,66 @@ func _check_highline_grades() -> void:
 			_fail("%s's civic ribbon exceeds the 22%% design grade (%.0f%%)" % [spec[0], grade * 100.0])
 		else:
 			print("ok   %s: %.1f m long at %.0f%%" % [spec[0], run, grade * 100.0])
+
+## Compact review data for docs/drawings/fire_caldera_3d.html. Exporting from
+## the validator keeps the model on the same FireCalderaPlan data as the game,
+## the proof scene and the audits.
+func _write_model_json(path: String) -> void:
+	var data := {
+		"frame": {
+			"floor_radius": FireCalderaPlan.FLOOR_RADIUS,
+			"rim_radius": FireCalderaPlan.RIM_RADIUS,
+			"floor_y": FireCalderaPlan.FLOOR_Y,
+			"rim_y": FireCalderaGround.BOWL_LIP_Y,
+			"lava_y": FireCalderaGround.LAVA_Y,
+			"highline_radius": FireCalderaPlan.HIGHLINE_RADIUS,
+			"highline_width": FireCalderaPlan.HIGHLINE_WIDTH,
+			"highline_y": FireCalderaPlan.HIGHLINE_DATUM,
+		},
+		"reservoir": FireCalderaPlan.reservoir_polygon(128),
+		"plots": FireCalderaPlan.PLOTS,
+		"routes": FireCalderaPlan.routes(),
+		"heartworks": FireCalderaPlan.HEARTWORKS,
+		"heart_levels": FireCalderaPlan.HEART_LEVELS,
+		"heart_falls": FireCalderaPlan.HEART_FALLS,
+		"heart_risers": FireCalderaPlan.HEART_RISERS,
+		"lower_rooms": FireCalderaPlan.LOWER_ROOMS,
+		"lower_passages": FireCalderaPlan.LOWER_PASSAGES,
+		"immersion_shelves": FireCalderaPlan.IMMERSION_SHELVES,
+		"problems": _failures,
+	}
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		_fail("could not write Fire model data to %s" % path)
+		return
+	file.store_string(JSON.stringify(_json_safe(data)))
+	file.close()
+	print("wrote Fire model data to ", path)
+
+
+func _json_safe(value: Variant) -> Variant:
+	match typeof(value):
+		TYPE_VECTOR2:
+			return [value.x, value.y]
+		TYPE_VECTOR3:
+			return [value.x, value.y, value.z]
+		TYPE_PACKED_VECTOR2_ARRAY:
+			var points: Array = []
+			for point in value:
+				points.append([point.x, point.y])
+			return points
+		TYPE_ARRAY:
+			var array: Array = []
+			for item in value:
+				array.append(_json_safe(item))
+			return array
+		TYPE_DICTIONARY:
+			var dictionary := {}
+			for key in value:
+				dictionary[str(key)] = _json_safe(value[key])
+			return dictionary
+		_:
+			return value
 
 
 ## A plan drawing for review: reservoir, plots (reserved and footprint),

@@ -276,27 +276,37 @@ workplace relies on only one escape direction. The localized terrain plan must
 shape these slopes deliberately rather than asking paths to climb the current
 coarse crater wall.
 
-## 7. Reservoir and submerged layout
+## 7. Crown reservoir and Heartworks layout
 
-The visible reservoir uses an irregular approximately 30 m mean radius. Broad
-lobes approach Aro, Renewal, Kel, and Civic; shallower coves pull away from the
-arrival sightline and dry visitor counters. The lava mesh overlaps its natural
-bank beneath the surface, while the authored solid bank continues below it.
-There is no decorative rim, shore strip, cylinder wall, or central island.
+The visible reservoir retains its built irregular approximately 52 m mean
+radius. Broad lobes approach Renewal and Civic; dry coves pull away from Aro,
+Kel, the arrival sightline and visitor counters. In the Heartworks proposal its
+lava becomes a crown annulus around a 17 m radius oculus. The lava mesh still
+overlaps its natural outer bank, while the authored solid bank continues below
+it. There is no decorative rim, shore strip, cylinder wall or central island.
+The inner edge is working architecture: settling baffles, three metered fall
+gates and the dry Crown Gallery immediately beneath it.
 
-The lower city sits at three depth bands rather than one flat underwater floor:
+An 84 m diameter spherical chamber begins beneath that opening. Its six rings
+follow the inner shell rather than becoming one flat underwater floor. The
+dimensioned section, flow cycle and review questions are in
+`fire_caldera_heartworks.md` and the explorable model is
+`docs/drawings/fire_caldera_3d.html`.
+
+The six lower programs occupy three of those rings:
 
 | Id | Approximate local position | Depth below surface | Purpose |
 |---|---:|---:|---|
-| `L0 Renewal chamber` | `(-25,-8)` | 5–8 m | Broad communal immersion and coming-of-age practice; visible from Renewal terrace. |
-| `L1 Primary manifold` | `(-25,15)` | 9–13 m | Miru and Tovan's thermal distribution, controls, and inspection loop. |
-| `L2 Deep observatory` | `(-2,25)` | 14–18 m | Selka's vent instruments and direct volcanic readings below Civic. |
-| `L3 Fired archive` | `(-10,18)` | 10–14 m | Protected cast and engraved records adjoining observatory, not loose paper. |
-| `L4 High-temperature forge` | `(24,3)` | 10–16 m | Daro, Vesa, and Ruun's hot-work floor, alloy handling, and secure lift to surface gallery. |
-| `L5 Experimental materials bay` | `(18,18)` | 8–13 m | Shared Kel–Vara testing space, separated from clean surface assembly. |
+| `L0 Renewal chamber` | west / `H1` | 11–17 m | Broad communal immersion beside the Renewal Fall and coming-of-age practice. |
+| `L1 Primary manifold` | north-west / `H1` | 11–17 m | Miru and Tovan's thermal distribution, fall controls, and inspection loop. |
+| `L2 Deep observatory` | north / `H2` | 23–29 m | Selka's instruments looking across and through the Heartfall. |
+| `L3 Fired archive` | north-west / `H2` | 23–29 m | Protected cast and engraved records in the quieter civic sector. |
+| `L4 High-temperature forge` | east / `H3` | 35–41 m | Daro, Vesa, and Ruun's hot-work floor beside the Forge Fall and secure lift to Kel. |
+| `L5 Experimental materials bay` | north-east / `H3` | 35–41 m | Shared Kel–Vara testing space, separated from clean surface assembly. |
 
-Curved lava passages join these rooms around, not through, the active vent. A
-lower inspection loop provides two directions out of every occupied chamber.
+Curved lava passages and shell-following rings join these rooms around, not
+through, the falls. Deep inspection and return galleries continue below them.
+The lower loop provides two directions out of every occupied chamber.
 Vertical material lifts connect the forge to Kel, the experimental bay to Vara,
 and the archive to Civic. These are service paths, not substitutes for public
 circulation.
@@ -313,9 +323,15 @@ second network rather than replacing ordinary circulation.
 
 ## 8. Thermal and material infrastructure
 
-- The primary manifold occupies `L1`. A buried annular service spine follows
+- The primary manifold occupies `L1` on the Steward Ring. A buried annular service spine follows
   the western and northern bank beneath the resident terrace, with branches to
   every household immersion room, Renewal, Civic, Vara, Kel, and Nahl.
+- Three metered falls divide gravity flow into civic, renewal and industrial
+  sectors. A collection basin 69 m below the crown separates return flow, gas,
+  mineral load and emergency overflow.
+- Three enclosed risers follow the spherical shell back to the crown. Their
+  glowing seams and instrument bays express the system without exposing fantasy
+  pipes beside public paths.
 - A separate high-temperature branch serves `L4` and `L5`; it does not run
   beneath the guest house or imported-provisions cabinet.
 - Inspection hatches occur on service terraces beside routes, never in the
@@ -375,8 +391,10 @@ and Vara; no bridge cuts across the reservoir center or blocks the arrival view.
 ### After the Lava Helm
 
 - The three immersion shelves connect to the full lower loop.
-- Thermal manifold, renewal chamber, deep observatory, fired archive,
-  high-temperature forge, and experimental bay become traversable.
+- The spherical Heartworks, its Steward, Civic, Works, Inspection and Return
+  rings, the three separated falls, thermal manifold, renewal chamber, deep
+  observatory, fired archive, high-temperature forge, experimental bay and
+  collection system become traversable.
 - Surface and lower residents use one schedule identity; no duplicate NPCs are
   spawned to populate the submerged district.
 - Returning to the surface is possible from all three entries and through at
@@ -450,8 +468,8 @@ The fire-city validator must fail:
 ### Fixed
 
 - Existing Fire Kingdom gameplay anchors and canonical lava systems remain.
-- The large reservoir, three overlapping realms, dry pre-Helm network, and
-  lower post-Helm network define the settlement.
+- The crown reservoir and proposed spherical Heartworks, three overlapping
+  realms, dry pre-Helm network, and lower post-Helm network define the settlement.
 - All fourteen proposed residents receive real home, work, civic, and schedule
   anchors in the plan; no generic filler residents or houses return.
 - Arrival remains aligned to the kingdom gate, with a clear view to Civic.
@@ -460,8 +478,9 @@ The fire-city validator must fail:
 
 - The precise local coordinates, plot sizes, route hierarchy, lower depth
   bands, four emergency spokes, and short Kel–Vara cove bridge in this document.
-- The submerged district's role as the thermal, scientific, renewal, archival,
-  and hottest industrial heart of the city.
+- The Heartworks' role as the thermal, scientific, renewal, archival and
+  hottest industrial heart of the city; its exact section remains proposed
+  until the interactive-model review is complete.
 
 ### Open without blocking spatial review
 

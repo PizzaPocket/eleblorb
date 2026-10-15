@@ -16,13 +16,16 @@ The settlement belongs to people whose bodies are living lava. It must not be
 a human village made from dark stone. Their physiology determines its plan,
 buildings, economy, customs, and relationship with the volcano.
 
-The city occupies the level floor of the kingdom's largest caldera. Its center
-is a cultivated opening into the volcano's magma system: a broad, deep,
-irregular lava reservoir rather than the present small ornamental fountain.
-The city grows in terraces around that reservoir and continues beneath its
-surface. The volcano is not scenery behind the settlement. It is the source of
-the inhabitants' heat, the subject of their science, the material of their
-craft, and the place through which their community is physically connected.
+The city occupies the bowl of the kingdom's largest caldera. Its center is a
+cultivated opening into the volcano's magma system: an irregular crown
+reservoir surrounds an open oculus into the spherical Caldera Heartworks rather
+than the former small ornamental fountain. Controlled lava falls descend
+through six inhabited and working rings to a collection basin and enclosed
+return system. The city grows in terraces around that opening and continues
+inside the volcano. The volcano is not scenery behind the settlement. It is the
+source of the inhabitants' heat, the subject of their science, the material of
+their craft, and a civic system they actively steward. See
+`fire_caldera_heartworks.md`.
 
 ## Physiology and daily life
 
@@ -141,31 +144,35 @@ to its heat and a dry public entrance from the annular route. It is not placed
 on a small island that would diminish the reservoir. Emergency routes lead from
 every district toward the outer ring and the caldera ascent.
 
-### 3. Reservoir and submerged district
+### 3. Crown reservoir and Heartworks
 
-The reservoir is a shaped natural vent, not a round masonry tank. Its visible
-surface should occupy roughly a 28 to 32 metre radius within the current
-72-metre caldera floor, subject to a traversal mock-up. Its banks are organic
-volcanic shelves, reinforced only where bridges, workshops, or public landings
-need a controlled edge. The floor descends far enough to make immersion and
-vertical exploration meaningful.
+The reservoir is a shaped natural vent engineered as a crown annulus, not a
+round masonry tank. Its visible lava reaches the established approximately
+52-metre mean bank while a 34-metre-diameter oculus opens through its center.
+Its banks are organic volcanic shelves, reinforced only where bridges,
+workshops, public landings, settling baffles or fall gates need a controlled
+edge. Below, an 84-metre-diameter spherical chamber makes immersion and
+vertical exploration the civic heart of the volcano.
 
-Before the hero has the Lava Helm, glimpses of structures, moving residents,
-lights, and routes beneath the surface establish that the city continues below.
-After obtaining the helm, the reservoir becomes a second public realm rather
-than merely a hazard. It contains:
+Before the hero has the Lava Helm, the dry Crown Gallery and glimpses of
+structures, moving residents, lights, falls and routes establish that the city
+continues below. After obtaining the helm, the Heartworks becomes a second
+public realm rather than merely a hazard. It contains:
 
 - a deep communal immersion chamber;
 - a geological observatory beside the active vent;
 - a high-temperature forge and experimental materials workshop;
-- lava-only passages between lower homes and work chambers;
+- lava-only passages and shell-following rings between lower homes and work
+  chambers;
 - protected mineral and pattern archives made from fired, cast, or engraved
   media rather than paper;
 - rare equipment and story encounters that reward returning with the helm.
 
-Dry bridges, cooled stepping shelves, and lava routes form two overlapping
+Dry galleries, cooled stopping shelves, and lava routes form two overlapping
 circulation systems. Residents can walk or swim between districts. Visitors
-can understand the dry network before gaining access to the molten one.
+can understand the dry network before gaining access to the molten one. Three
+falls, a deep collection basin and three enclosed return risers make the city's
+stewardship of pressure, heat and mineral flow visible from those routes.
 
 ## Civic life and occupations
 
@@ -622,15 +629,15 @@ These three businesses cannot be generic counters with unrelated stock.
 ## Gameplay and reveal sequence
 
 1. The player first enters on the dry outer ring. The city already reads as a
-   functioning place, while the large reservoir is visibly inaccessible.
+   functioning place, while the crown annulus and oculus are visibly dangerous.
 2. The outer market, visitor inn, council approach, and selected workshops are
    available without lava protection.
 3. Lava Slide's existing story grants the Lava Helm. The route back to the city
    should make the now-accessible reservoir an obvious invitation without a
    text instruction.
-4. Diving reveals the submerged district, additional residents, deeper
-   scientific and civic spaces, rare craft access, and routes that reconnect to
-   the surface city.
+4. Diving reveals the spherical Heartworks, additional residents, deeper
+   scientific and civic spaces, the separated falls, collection and return
+   system, rare craft access, and routes that reconnect to the surface city.
 5. Party members who cannot enter lava gather on authored dry platforms rather
    than falling into the reservoir or teleporting onto roofs.
 
@@ -660,8 +667,8 @@ shore bands or floating slabs.
 
 - Lava physiology, thermal and mineral needs, and the concealed civic
   lava-duct system determine the settlement rather than human domestic habits.
-- The tiny fountain becomes a large natural reservoir with a surface city and
-  a meaningful submerged public district.
+- The tiny fountain becomes a crown reservoir and open Heartworks with a
+  surface city and meaningful molten public interior.
 - A continuous dry visitor route links the kingdom gate, arrival threshold,
   guest house, shops, civic approach, and safe party gathering areas.
 - Volcanic modernism, SuperEgg and superellipse construction, broad glass,
@@ -678,11 +685,11 @@ shore bands or floating slabs.
   at risk rather than hereditary rule.
 - Three interlocking bands: outer visitor and exchange, habitation and work
   terraces, and reservoir or submerged city.
-- An irregular reservoir with a roughly 28-to-32-metre visible radius, subject
-  to a traversal and terrain mock-up.
-- The submerged district as the city's thermal and scientific heart: primary
-  manifold, communal renewal chamber, deep observatory, high-temperature forge,
-  and protected volcanic archive.
+- The established irregular 52-metre-mean crown reservoir surrounding a
+  17-metre-radius oculus into an 84-metre-diameter spherical chamber.
+- The Heartworks as the city's thermal and scientific heart: primary manifold,
+  communal renewal chamber, deep observatory, high-temperature forge,
+  protected volcanic archive, controlled falls, collection and return works.
 
 These proposals are coherent enough to draw and test as one plan. The layout
 should expose any relationship or capacity that needs revision before code.
@@ -692,7 +699,7 @@ should expose any relationship or capacity that needs revision before code.
 - Final high-quality armor, weapon, and elemental-gem stock. The plan still
   reserves gallery, assay, secure storage, receiving, and delivery functions;
   story-specific gems remain gated.
-- Exact story encounters and rewards in the submerged district.
+- Exact story encounters and rewards in the Heartworks.
 - Names for civic practices and the deeper political history of the council.
 
 The next deliverable is a dimensioned civic layout with an adjacency matrix,

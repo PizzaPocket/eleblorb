@@ -218,9 +218,13 @@ the live-world probe verifies all six uniforms.
 - The original inner forecourt pylons and Kel–Vara cove bridge were superseded
   by the built crater-lip Tempering Gate, curved arrival gallery and shared
   Highline. Do not add them as duplicate routes.
-- The post-Lava-Helm submerged district remains unbuilt. Its manifold, renewal
-  chamber, deep observatory and high-temperature forge have approved spatial
-  reservations, but final shop stock and the submerged story encounters remain
-  decisions for the user.
+- The post-Lava-Helm district remains unbuilt. Its earlier room reservations
+  are now organized as the proposed **Caldera Heartworks**: a 34 m oculus into
+  an 84 m spherical chamber, six shell-following rings, three controlled lava
+  falls, a deep collection basin and three enclosed return risers. Review the
+  explorable `docs/drawings/fire_caldera_3d.html` and resolve the decisions in
+  `docs/architecture/fire_caldera_heartworks.md` before changing live terrain.
+  Final shop stock and Heartworks story encounters also remain decisions for
+  the user.
 - Keep the automated regressions at 0 failures whenever the walkthrough finds
   a visual, collision or circulation issue.
