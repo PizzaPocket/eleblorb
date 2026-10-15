@@ -23,7 +23,7 @@ const WRECKS := {"brig": Vector2(200, -30), "galleon": Vector2(70, 170), "schoon
 const KRAKEN := Vector2(430, 350)
 const GAME_SECONDS_PER_HOUR := 60.0
 
-const SHIPS := {
+static var SHIPS := {
 	"harbinger": {
 		"name": "Harbinger", "captain": "Captain Brine", "hull": {"length": 42.0, "beam": 11.5, "draft": 5.0, "bow_n": 2.2, "stern_n": 4.0, "transom": 0.62, "tumble": 0.08, "tumble_top": 7.2},
 		"decks": [["hold", -4.4, Vector2(-15, 14)], ["berth deck", -1.6, Vector2(-18.5, 17.5)], ["gun deck", 1.4, Vector2(-20.5, 19)], ["spar deck", 4.4, Vector2(-20.8, 19.5)], ["quarterdeck", 7.2, Vector2(-20.8, -13)], ["forecastle", 7.2, Vector2(13, 19.5)]],

@@ -1,5 +1,7 @@
 extends Node
 
+const PirateShipsPlan := preload("res://scripts/pirate_ships_plan.gd")
+
 ## Plan validator for the two pirate ships. It reads only PirateShipsPlan (and
 ## the ocean terrain's height for the routes), so it runs before either ship is
 ## rebuilt:

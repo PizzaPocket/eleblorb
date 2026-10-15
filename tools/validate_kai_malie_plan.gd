@@ -1,5 +1,7 @@
 extends Node
 
+const KaiMaliePlan := preload("res://scripts/kai_malie_plan.gd")
+
 ## Plan validator for Kai Mālie. It reads only KaiMaliePlan, so it runs before
 ## any part of the village is built:
 ##

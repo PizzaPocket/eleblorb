@@ -264,13 +264,13 @@ w_('const U_AXIS := %s' % v2(U))
 w_('const V_AXIS := %s' % v2(V))
 for nm, poly in [('PLAIN', PLAIN), ('BEACH', BEACH), ('REEF_FLAT', REEF_FLAT), ('TERRACES', TERRACES), ('GREEN', GREEN),
                  ('PIER_HEAD', PIER_HEAD), ('KAHALA_GARDEN', KAHALA_GARDEN)]:
-    w_('const %s := %s' % (nm, pts(poly)))
+    w_('static var %s := %s' % (nm, pts(poly)))
 w_('## Lines: the stream from the waterfall to the fishpond, the fishpond wall.')
-w_('const STREAM := %s' % pts(STREAM))
+w_('static var STREAM := %s' % pts(STREAM))
 w_('const STREAM_CLEAR := %g' % STREAM_CLEAR)
-w_('const FISHPOND_WALL := %s' % pts(FISHPOND_WALL))
-w_('const HEADLANDS := [%s]' % ', '.join(pts(h) for h in HEADLANDS))
-w_('const BUNDS := [%s]' % ', '.join(pts(h) for h in BUNDS))
+w_('static var FISHPOND_WALL := %s' % pts(FISHPOND_WALL))
+w_('static var HEADLANDS := [%s]' % ', '.join(pts(h) for h in HEADLANDS))
+w_('static var BUNDS := [%s]' % ', '.join(pts(h) for h in BUNDS))
 w_('const PIER := %s' % rect(PIER))
 w_('const MEETING_ROCKS := %s' % v2(MEETING_ROCKS))
 w_('const WATERFALL := %s' % v2(WATERFALL))
@@ -282,7 +282,7 @@ w_('## (from +u toward +v, about the walls\' centre), the body (walls and lānai
 w_('## footprint (with eaves) as turned polygons, the side its front faces (u+')
 w_('## seaward, u- upslope, v+, v-), and its floors as rows of rooms (depth along')
 w_('## u, then rooms with their width along v), in the building\'s own frame.')
-w_('const BUILDINGS := [')
+w_('static var BUILDINGS := [')
 for bd in B:
     floors = '[' + ', '.join('[' + ', '.join('[%g, [%s]]' % (d, ', '.join('[%s, %s, %g]' % (q(n), q(k), wd) for n, k, wd in rooms)) for d, rooms in rows) + ']' for rows in bd['floors']) + ']'
     extra = {k: v for k, v in bd.items() if k not in ('key', 'name', 'kind', 'walls', 'front', 'lanai', 'eaves', 'floors', 'who', 'turn')}
@@ -293,7 +293,7 @@ for bd in B:
 w_(']')
 w_('')
 w_('## Paths: name, width, the smoothed centre line.')
-w_('const PATHS := [')
+w_('static var PATHS := [')
 for nm, wd, p_ in PATHS: w_('\t[%s, %g, %s],' % (q(nm), wd, pts(p_)))
 w_(']')
 w_('')

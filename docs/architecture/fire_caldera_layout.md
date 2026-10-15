@@ -81,16 +81,15 @@ foot disappears into the bowl, and inset glowing risers express the lava-power
 channels within. These piers replace generic post clusters beneath private
 platforms.
 
-**Proposed molten-route first fit:** the reservoir grows from a 30 m to a 40 m
-mean radius, with a focused 5 m Renewal-side lobe. Renewal moves outward to
-local `(-49.8,-4.7)` and the other buildings move toward the rim, retaining a
-narrow natural bank between lava and slope-integrated architecture. A Lava-Helm
-traversal capture must confirm the widened underwater approach.
+**Superseded first fit:** the earlier 30-to-40 m reservoir proposal was replaced
+by the built 52 m mean-radius reservoir, the parabolic inhabited bowl, the
+Tempering Gate and curved arrival gallery, the guarded Highline, Renewal's two
+byways and immersion tongue, and the building-specific docks described above.
 
-**Open:** final gate and access section; guard and shade treatment; exact
-locations of overlook widenings and vertical connectors; Civic redesign; and
-whether any craft building should later receive a small freight dock without
-changing its natural-grade primary section.
+**Remaining review:** walk the complete surface network at player, Blorbus and
+mount scale; inspect the Tempering Gate, guards, docks, lift stops, thresholds
+and night lighting at eye level; then decide the final shop stock and submerged
+story encounters before constructing the post-Lava-Helm district.
 
 The lava people have developed a foundation system suited to moving heat,
 sloped volcanic rock, and precise modern construction. It is expressed as part

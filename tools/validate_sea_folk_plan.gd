@@ -1,5 +1,7 @@
 extends Node
 
+const SeaFolkPlan := preload("res://scripts/sea_folk_plan.gd")
+
 ## Plan validator for the sea folk city. It reads only SeaFolkPlan, so it runs
 ## before any part of the city is rebuilt:
 ##

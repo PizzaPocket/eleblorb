@@ -1,5 +1,7 @@
 extends Node
 
+const CityPlan := preload("res://scripts/city_plan.gd")
+
 ## Plan validator for Moy. It reads only CityPlan, so it runs before any part
 ## of the city is built:
 ##

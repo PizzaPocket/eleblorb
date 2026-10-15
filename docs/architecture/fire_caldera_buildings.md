@@ -109,6 +109,13 @@ Christian, Catalan or classical symbols; copied Gaudí buildings.
 
 ### Arrival forecourt and pylons (`ARRIVAL`, `(0, -46)`)
 
+> **Superseded by the built public-realm revision (2026-10-09).** The original
+> inner forecourt and paired flame pylons below are retained as design history.
+> The actual threshold is the full-scale multicolour Tempering Gate on the
+> crater lip at local `(0, -112)`, joined to the Highline by its curved arrival
+> gallery. It keeps the clear passage and wayfinding purpose without adding a
+> second ceremonial gate inside the city.
+
 - **Forecourt:** open 16 × 14 m of fitted basalt paving within a 24 × 20 m
   plot, the `R0` axis held 6 m clear through it. It splits visibly west (`R3`
   to the guest house and Nahl) and east (`R4` to Oren and Kel), with the view
@@ -126,6 +133,11 @@ Christian, Catalan or classical symbols; copied Gaudí buildings.
   clear of the axis, where party members who cannot enter lava wait.
 
 ### Kel–Vara cove bridge
+
+> **Superseded by the built Highline (2026-10-09).** Kel and Vara now connect
+> through the shared annular public route and their authored docks; a second
+> dry bridge across the cove would duplicate that network and cut the natural
+> bowl. The original brief below is retained as design history.
 
 - A single short span across the narrow eastern cove between `KEL` and `VARA`,
   4 m wide, about 14 m long.

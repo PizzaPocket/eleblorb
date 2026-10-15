@@ -414,7 +414,7 @@ w_('const WRECKS := {%s}' % ', '.join('%s: %s' % (q(k), v2(v)) for k, v in WRECK
 w_('const KRAKEN := %s' % v2(KRAKEN))
 w_('const GAME_SECONDS_PER_HOUR := %.1f' % GAME_SECONDS_PER_HOUR)
 w_('')
-w_('const SHIPS := {')
+w_('static var SHIPS := {')
 for key, s in SHIPS.items():
     r = ROUTES[key]
     w_('\t%s: {' % q(key))
