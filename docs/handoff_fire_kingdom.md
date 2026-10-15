@@ -219,8 +219,9 @@ the live-world probe verifies all six uniforms.
   by the built crater-lip Tempering Gate, curved arrival gallery and shared
   Highline. Do not add them as duplicate routes.
 - The post-Lava-Helm district remains unbuilt. Its earlier room reservations
-  are now organized as the proposed **Caldera Heartworks**: a 34 m oculus into
-  an 84 m spherical chamber, six shell-following rings, three controlled lava
+  are now organized as the proposed **Caldera Heartworks**: a 34 m submerged
+  immersion throat beneath the continuous reservoir into an 84 m spherical
+  chamber, six shell-following rings, three controlled lava
   falls, a deep collection basin and three enclosed return risers. Review the
   explorable `docs/drawings/fire_caldera_3d.html` and resolve the decisions in
   `docs/architecture/fire_caldera_heartworks.md` before changing live terrain.

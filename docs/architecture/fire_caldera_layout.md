@@ -281,13 +281,14 @@ coarse crater wall.
 The visible reservoir retains its built irregular approximately 52 m mean
 radius. Broad lobes approach Renewal and Civic; dry coves pull away from Aro,
 Kel, the arrival sightline and visitor counters. In the Heartworks proposal its
-lava becomes a crown annulus around a 17 m radius oculus. The lava mesh still
-overlaps its natural outer bank, while the authored solid bank continues below
-it. There is no decorative rim, shore strip, cylinder wall or central island.
-The inner edge is working architecture: settling baffles, three metered fall
-gates and the dry Crown Gallery immediately beneath it.
+lava remains continuous across a 17 m radius submerged immersion throat. The
+lava mesh still overlaps its natural outer bank, while the authored solid bank
+continues below it. There is no decorative rim, shore strip, cylinder wall,
+central island or dry hole. Five metres below the surface, working architecture
+begins: settling baffles, three metered fall intakes and the protected Crown
+Gallery beside the molten throat.
 
-An 84 m diameter spherical chamber begins beneath that opening. Its six rings
+An 84 m diameter spherical chamber begins beneath that throat. Its six rings
 follow the inner shell rather than becoming one flat underwater floor. The
 dimensioned section, flow cycle and review questions are in
 `fire_caldera_heartworks.md` and the explorable model is

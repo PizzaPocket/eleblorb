@@ -676,9 +676,11 @@ static func _on_ring(angle: float, _ring: PackedVector2Array) -> Vector2:
 # ---------------------------------------------------------------------------
 
 ## Proposed Caldera Heartworks (2026-10-15), for spatial review before the
-## lower city is built.  The present surface reservoir becomes a crown annulus
-## around an open oculus into a spherical chamber inside the volcano.  The
-## chamber translates Jewel Changi's useful spatial ideas -- a falling element
+## lower city is built.  The present surface reservoir remains continuous
+## above a lava-filled immersion throat into a spherical chamber inside the
+## volcano.  There is no dry hole in the reservoir: entry requires passing
+## through the canonical lava surface before the controlled falls separate.
+## The chamber translates Jewel Changi's useful spatial ideas -- a falling element
 ## visible from many levels, terraced circulation around one great void, and a
 ## legible collection/return system -- into Fire culture's volcanic modernism.
 ## Depths are metres below FireCalderaGround.LAVA_Y so the proposal remains
@@ -690,19 +692,20 @@ const HEARTWORKS := {
 	"sphere_radius": 42.0,
 	"centre_depth": 38.4,
 	"shell_thickness": 2.4,
-	"oculus_radius": 17.0,
+	"throat_radius": 17.0,
+	"intake_depth": 5.0,
 	"crown_outer_radius": 52.0,
 	"catch_depth": 69.0,
 	"catch_radius": 12.0,
 	"terrace_width": 4.2,
-	"description": "a spherical civic and thermal chamber below the lava mouth; controlled lava falls feed a deep collection basin and enclosed return risers complete the cycle",
+	"description": "a spherical civic and thermal chamber below a lava-filled immersion throat; submerged intakes divide the reservoir into controlled falls feeding a deep collection basin and enclosed return risers",
 }
 
 ## Each ring follows the inside of the structural sphere rather than becoming
 ## an unrelated flat floor.  The crown gallery is the dry pre-Helm overlook;
 ## the other rings belong to the post-Helm molten public realm.
 const HEART_LEVELS: Array[Dictionary] = [
-	{"id": "H0", "name": "crown gallery", "depth": 4.0, "access": "dry", "role": "oculus overlook, fall controls and the first view down the whole chamber"},
+	{"id": "H0", "name": "crown gallery", "depth": 4.0, "access": "dry", "role": "protected glass view into the immersion throat, fall controls and the first view down the chamber"},
 	{"id": "H1", "name": "steward ring", "depth": 14.0, "access": "lava_helm", "role": "renewal chamber and the primary manifold"},
 	{"id": "H2", "name": "civic ring", "depth": 26.0, "access": "lava_helm", "role": "observatory, fired archive and public crossing galleries"},
 	{"id": "H3", "name": "works ring", "depth": 38.0, "access": "lava_helm", "role": "high-temperature forge and experimental materials bay"},
@@ -714,9 +717,9 @@ const HEART_LEVELS: Array[Dictionary] = [
 ## never becomes a solid lava cylinder.  Angles use the plan frame: +90 faces
 ## Civic, 0 faces Kel, and 180 faces Renewal.
 const HEART_FALLS: Array[Dictionary] = [
-	{"id": "F0", "name": "Heartfall", "angle": 90.0, "width": 9.0, "source": "crown settling weir", "destination": "central collection basin", "role": "the civic fall, visible on the arrival-to-Civic axis"},
-	{"id": "F1", "name": "Forge Fall", "angle": 18.0, "width": 5.0, "source": "east crown gate", "destination": "works quench splitter", "role": "high-temperature feed for Kel and Vara"},
-	{"id": "F2", "name": "Renewal Fall", "angle": 198.0, "width": 5.5, "source": "west crown gate", "destination": "renewal tempering shelf", "role": "gentler public immersion and communal reheating"},
+	{"id": "F0", "name": "Heartfall", "angle": 90.0, "width": 9.0, "source": "submerged civic intake", "destination": "central collection basin", "role": "the civic fall, visible on the arrival-to-Civic axis"},
+	{"id": "F1", "name": "Forge Fall", "angle": 18.0, "width": 5.0, "source": "submerged east intake", "destination": "works quench splitter", "role": "high-temperature feed for Kel and Vara"},
+	{"id": "F2", "name": "Renewal Fall", "angle": 198.0, "width": 5.5, "source": "submerged west intake", "destination": "renewal tempering shelf", "role": "gentler public immersion and communal reheating"},
 ]
 
 ## Enclosed return risers use pressure differential and thermal convection,

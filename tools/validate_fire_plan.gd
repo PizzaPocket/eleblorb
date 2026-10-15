@@ -292,29 +292,31 @@ func _check_lower_city() -> void:
 
 ## The Heartworks is deliberately a proposal, but it is dimensioned data, not
 ## an illustration assembled independently of the civic plan.  These checks
-## preserve a real crown annulus, a spherical section, ordered occupied rings,
+## preserve a continuous crown reservoir, a submerged throat, a spherical section, ordered occupied rings,
 ## and one complete fall/collection/return cycle while the design is reviewed.
 func _check_heartworks() -> void:
 	var heart: Dictionary = FireCalderaPlan.HEARTWORKS
 	var radius := float(heart["sphere_radius"])
 	var centre_depth := float(heart["centre_depth"])
-	var oculus := float(heart["oculus_radius"])
+	var throat := float(heart["throat_radius"])
 	var crown := float(heart["crown_outer_radius"])
 	var catch_depth := float(heart["catch_depth"])
 	if radius <= 0.0 or centre_depth <= 0.0 or centre_depth >= radius:
-		_fail("Heartworks sphere and centre depth do not form an opening below the crown")
+		_fail("Heartworks sphere and centre depth do not form a submerged throat below the crown")
 	else:
 		var section_radius := sqrt(radius * radius - centre_depth * centre_depth)
-		if absf(section_radius - oculus) > 0.35:
-			_fail("Heartworks oculus %.2f m does not cut the sphere at its crown section %.2f m" % [oculus, section_radius])
-	if crown - oculus < 12.0:
-		_fail("Heartworks crown annulus is too narrow for settlement circulation and settling channels")
+		if absf(section_radius - throat) > 0.35:
+			_fail("Heartworks throat %.2f m does not meet the sphere at its lava-datum section %.2f m" % [throat, section_radius])
+	if crown - throat < 12.0:
+		_fail("Heartworks submerged throat leaves too little surrounding reservoir for settling channels")
 	if absf(crown - FireCalderaPlan.RESERVOIR_MEAN) > 0.1:
 		_fail("Heartworks crown no longer agrees with the approved reservoir mean radius")
 	if catch_depth >= centre_depth + radius - float(heart["shell_thickness"]):
 		_fail("Heartworks collection basin leaves the structural sphere")
-	if float(heart["catch_radius"]) >= oculus:
-		_fail("Heartworks collection basin is not visibly subordinate to the oculus")
+	if float(heart["catch_radius"]) >= throat:
+		_fail("Heartworks collection basin is not visibly subordinate to the immersion throat")
+	if float(heart["intake_depth"]) <= 0.5 or float(heart["intake_depth"]) >= float(FireCalderaPlan.HEART_LEVELS[1]["depth"]):
+		_fail("Heartworks fall intakes do not begin at a credible submerged depth")
 
 	var levels := {}
 	var previous_depth := -INF
@@ -347,7 +349,7 @@ func _check_heartworks() -> void:
 	if FireCalderaPlan.HEART_FALLS.size() < 3:
 		_fail("Heartworks has fewer than three controlled lava falls")
 	for fall in FireCalderaPlan.HEART_FALLS:
-		if float(fall["width"]) <= 0.0 or float(fall["width"]) >= oculus:
+		if float(fall["width"]) <= 0.0 or float(fall["width"]) >= throat:
 			_fail("Heartworks fall %s has an invalid width" % fall["id"])
 	if FireCalderaPlan.HEART_RISERS.size() < 3:
 		_fail("Heartworks has fewer than three enclosed return risers")
@@ -355,7 +357,7 @@ func _check_heartworks() -> void:
 		for room_id in riser["serves"]:
 			if not rooms.has(room_id):
 				_fail("Heartworks riser %s serves missing room %s" % [riser["id"], room_id])
-	print("ok   Heartworks: %.0f m diameter sphere, %.0f m oculus, %d rings, %d falls, %d returns" % [radius * 2.0, oculus * 2.0, FireCalderaPlan.HEART_LEVELS.size(), FireCalderaPlan.HEART_FALLS.size(), FireCalderaPlan.HEART_RISERS.size()])
+	print("ok   Heartworks: %.0f m diameter sphere, %.0f m submerged throat, %d rings, %d falls, %d returns" % [radius * 2.0, throat * 2.0, FireCalderaPlan.HEART_LEVELS.size(), FireCalderaPlan.HEART_FALLS.size(), FireCalderaPlan.HEART_RISERS.size()])
 
 
 func _check_people() -> void:
@@ -498,8 +500,9 @@ func _write_model_json(path: String) -> void:
 			"highline_y": FireCalderaPlan.HIGHLINE_DATUM,
 		},
 		"reservoir": FireCalderaPlan.reservoir_polygon(128),
-		"plots": FireCalderaPlan.PLOTS,
-		"routes": FireCalderaPlan.routes(),
+		"terrain": _model_terrain(),
+		"plots": _model_plots(),
+		"routes": _model_routes(),
 		"heartworks": FireCalderaPlan.HEARTWORKS,
 		"heart_levels": FireCalderaPlan.HEART_LEVELS,
 		"heart_falls": FireCalderaPlan.HEART_FALLS,
@@ -516,6 +519,99 @@ func _write_model_json(path: String) -> void:
 	file.store_string(JSON.stringify(_json_safe(data)))
 	file.close()
 	print("wrote Fire model data to ", path)
+
+
+## A compact sampled form of the exact analytic ground used by the live fine
+## caldera mesh. Heights remain in world Y; the drawing subtracts LAVA_Y so
+## every route, plot datum and underground depth shares one vertical origin.
+func _model_terrain() -> Dictionary:
+	const EXTENT := 128.0
+	const STEP := 2.0
+	var side := int(EXTENT * 2.0 / STEP) + 1
+	var heights: Array[float] = []
+	for row in side:
+		var z := -EXTENT + float(row) * STEP
+		for column in side:
+			var x := -EXTENT + float(column) * STEP
+			var local := Vector2(x, z)
+			heights.append(FireCalderaGround.blend_height(local, FireCalderaGround.crater_wall(local)))
+	return {"extent": EXTENT, "step": STEP, "side": side, "heights": heights}
+
+
+## The review model receives the surveyed floor datum and the exact turned
+## polygons, rather than reconstructing plots as axis-aligned boxes.
+func _model_plots() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	var heights := {"NAHL": 7.0, "GUEST": 7.2, "OREN": 8.2, "KEL": 10.2,
+		"VARA": 7.2, "CIVIC": 10.8, "IREN": 6.4, "ARO": 7.2, "RENEWAL": 6.2}
+	for entry in FireCalderaPlan.PLOTS:
+		var item: Dictionary = entry.duplicate(true)
+		item["footprint_polygon"] = FireCalderaPlan.plot_polygon(entry, "footprint")
+		item["reserved_polygon"] = FireCalderaPlan.plot_polygon(entry, "reserved")
+		if entry.has("foundation"):
+			item["foundation_polygon"] = FireCalderaPlan.plot_polygon(entry, "foundation")
+		if not bool(entry.get("open", false)):
+			var line := FireCalderaGround.survey(entry)
+			item["survey"] = line
+			item["mass_height"] = float(heights.get(str(entry["id"]), 6.0))
+		result.append(item)
+	return result
+
+
+## Highline and byway elevations repeat the builder's shared profiles. This is
+## intentionally exported as 3D route data so the review drawing cannot turn
+## the arrival, Renewal arms, or roof links back into a flat decorative ring.
+func _model_routes() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for route in FireCalderaPlan.routes():
+		var item: Dictionary = route.duplicate(true)
+		var points: PackedVector2Array = route["points"]
+		var points_3d: Array[Vector3] = []
+		for i in points.size():
+			points_3d.append(Vector3(points[i].x, _model_route_y(str(route["id"]), points[i], i, points.size()), points[i].y))
+		item["points3d"] = points_3d
+		result.append(item)
+	return result
+
+
+func _model_route_y(id: String, point: Vector2, index: int, count: int) -> float:
+	var t := float(index) / float(maxi(count - 1, 1))
+	match id:
+		"H1":
+			return FireCalderaPlan.HIGHLINE_DATUM
+		"H0":
+			var points := FireCalderaPlan.arrival_byway()
+			var start := FireCalderaGround.crater_wall(points[0]) + FireCalderaPlan.ARRIVAL_DECK_CLEARANCE
+			return lerpf(start, FireCalderaPlan.HIGHLINE_DATUM, FireCalderaPlan.route_height_t(id, t))
+		"HG":
+			var arrival := FireCalderaPlan.arrival_byway()
+			var arrival_start := FireCalderaGround.crater_wall(arrival[0]) + FireCalderaPlan.ARRIVAL_DECK_CLEARANCE
+			var radial_t := clampf((FireCalderaPlan.RIM_RADIUS - point.length()) / (FireCalderaPlan.RIM_RADIUS - FireCalderaPlan.HIGHLINE_RADIUS), 0.0, 1.0)
+			var start := lerpf(arrival_start, FireCalderaPlan.HIGHLINE_DATUM, FireCalderaPlan.route_height_t("H0", radial_t))
+			return lerpf(start, FireCalderaPlan.GUEST_GATE_DATUM, FireCalderaPlan.route_height_t(id, t))
+		"H2W", "H2E":
+			var finish := float(FireCalderaGround.survey(FireCalderaPlan.plot("RENEWAL"))["datum"])
+			return lerpf(FireCalderaPlan.HIGHLINE_DATUM, finish, t)
+		"H4":
+			var finish := float(FireCalderaGround.survey(FireCalderaPlan.plot("OREN"))["datum"]) + FireCalderaOren.UPPER + FireCalderaOren.roof_top()
+			return lerpf(FireCalderaPlan.HIGHLINE_DATUM, finish, FireCalderaPlan.route_height_t(id, t))
+		"H5":
+			var finish := float(FireCalderaGround.survey(FireCalderaPlan.plot("KEL"))["datum"]) + FireCalderaKel.RESIDENCE
+			return lerpf(FireCalderaPlan.HIGHLINE_DATUM, finish, FireCalderaPlan.route_height_t(id, t))
+		"D_GUEST":
+			return FireCalderaPlan.GUEST_GATE_DATUM
+		"D_NAHL", "D_VARA", "D_CIVIC", "D_IREN":
+			return FireCalderaPlan.HIGHLINE_DATUM
+		"G1", "G2":
+			return FireCalderaGround.height(point) + 0.08
+		_:
+			if id.begins_with("P_") or id.begins_with("S_"):
+				var entry := FireCalderaPlan.plot(id.substr(2))
+				if not entry.is_empty():
+					var datum := float(FireCalderaGround.survey(entry)["datum"])
+					var raised := FireCalderaPlan.level_height(entry, point)
+					return datum if is_nan(raised) else datum + raised
+			return FireCalderaGround.height(point) + 0.08
 
 
 func _json_safe(value: Variant) -> Variant:

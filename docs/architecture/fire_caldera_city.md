@@ -17,11 +17,11 @@ a human village made from dark stone. Their physiology determines its plan,
 buildings, economy, customs, and relationship with the volcano.
 
 The city occupies the bowl of the kingdom's largest caldera. Its center is a
-cultivated opening into the volcano's magma system: an irregular crown
-reservoir surrounds an open oculus into the spherical Caldera Heartworks rather
-than the former small ornamental fountain. Controlled lava falls descend
+cultivated depth in the volcano's magma system: an irregular, continuously
+filled reservoir covers a submerged immersion throat into the spherical
+Caldera Heartworks rather than the former small ornamental fountain. Controlled lava falls descend
 through six inhabited and working rings to a collection basin and enclosed
-return system. The city grows in terraces around that opening and continues
+return system. The city grows in terraces around that reservoir and continues
 inside the volcano. The volcano is not scenery behind the settlement. It is the
 source of the inhabitants' heat, the subject of their science, the material of
 their craft, and a civic system they actively steward. See
@@ -146,16 +146,18 @@ every district toward the outer ring and the caldera ascent.
 
 ### 3. Crown reservoir and Heartworks
 
-The reservoir is a shaped natural vent engineered as a crown annulus, not a
-round masonry tank. Its visible lava reaches the established approximately
-52-metre mean bank while a 34-metre-diameter oculus opens through its center.
+The reservoir is a shaped natural vent engineered as one continuous molten
+field, not a round masonry tank. Its visible lava reaches the established
+approximately 52-metre mean bank and covers a 34-metre-diameter submerged
+immersion throat at its center.
 Its banks are organic volcanic shelves, reinforced only where bridges,
 workshops, public landings, settling baffles or fall gates need a controlled
 edge. Below, an 84-metre-diameter spherical chamber makes immersion and
 vertical exploration the civic heart of the volcano.
 
 Before the hero has the Lava Helm, the dry Crown Gallery and glimpses of
-structures, moving residents, lights, falls and routes establish that the city
+structures, moving residents, lights, falls and routes seen through protected
+glazing establish that the city
 continues below. After obtaining the helm, the Heartworks becomes a second
 public realm rather than merely a hazard. It contains:
 
@@ -629,7 +631,7 @@ These three businesses cannot be generic counters with unrelated stock.
 ## Gameplay and reveal sequence
 
 1. The player first enters on the dry outer ring. The city already reads as a
-   functioning place, while the crown annulus and oculus are visibly dangerous.
+   functioning place, while the continuous reservoir is visibly dangerous.
 2. The outer market, visitor inn, council approach, and selected workshops are
    available without lava protection.
 3. Lava Slide's existing story grants the Lava Helm. The route back to the city
@@ -667,7 +669,7 @@ shore bands or floating slabs.
 
 - Lava physiology, thermal and mineral needs, and the concealed civic
   lava-duct system determine the settlement rather than human domestic habits.
-- The tiny fountain becomes a crown reservoir and open Heartworks with a
+- The tiny fountain becomes a continuous crown reservoir and submerged Heartworks with a
   surface city and meaningful molten public interior.
 - A continuous dry visitor route links the kingdom gate, arrival threshold,
   guest house, shops, civic approach, and safe party gathering areas.
@@ -685,8 +687,8 @@ shore bands or floating slabs.
   at risk rather than hereditary rule.
 - Three interlocking bands: outer visitor and exchange, habitation and work
   terraces, and reservoir or submerged city.
-- The established irregular 52-metre-mean crown reservoir surrounding a
-  17-metre-radius oculus into an 84-metre-diameter spherical chamber.
+- The established irregular 52-metre-mean crown reservoir covering a
+  17-metre-radius submerged throat into an 84-metre-diameter spherical chamber.
 - The Heartworks as the city's thermal and scientific heart: primary manifold,
   communal renewal chamber, deep observatory, high-temperature forge,
   protected volcanic archive, controlled falls, collection and return works.

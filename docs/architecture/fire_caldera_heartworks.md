@@ -8,10 +8,10 @@ lives in `FireCalderaPlan.HEARTWORKS`, `HEART_LEVELS`, `HEART_FALLS` and
 
 ## 1. Premise
 
-The caldera's lava mouth is no longer only a broad filled basin. It is the
-upper opening of a great spherical structure inside the volcano: the civic and
-thermal **Heartworks**. A crown reservoir gathers lava around the opening;
-three controlled falls descend through the hollow sphere; six inhabited,
+The caldera's lava mouth remains a broad, continuously filled basin, but its
+central depth is now the submerged entrance to a great spherical structure
+inside the volcano: the civic and thermal **Heartworks**. Three controlled
+falls begin below the surface and descend through the hollow sphere; six inhabited,
 working and inspection rings follow the inner shell; a deep collection basin
 separates useful flow, gas and mineral load; and three enclosed return risers
 bring molten material back to the crown and the city's buried service spine.
@@ -46,9 +46,9 @@ All depths below are measured from the crown lava datum.
 | Element | Dimension | Reason |
 |---|---:|---|
 | Crown reservoir | about 52 m outer mean radius | retains the approved surface city's bank and promenade relationship |
-| Oculus | 17 m radius / 34 m diameter | large enough to reveal the sphere and divide the falls, small enough to leave a useful crown annulus |
+| Immersion throat | 17 m radius / 34 m diameter, 5 m below the lava surface | a submerged transition wide enough for swimming access and three separated fall intakes, with no dry hole through the reservoir |
 | Hollow sphere | 42 m inner radius / 84 m diameter | holds six distinct rings without making them flat basement storeys |
-| Sphere centre | 38.4 m below crown | makes the 34 m oculus the true cut through the sphere's upper cap |
+| Sphere centre | 38.4 m below crown | places the immersion throat within the sphere's protected upper cap |
 | Structural shell | 2.4 m conceptual thickness | allows a continuous refractory shell, embedded steel ribs and service chases |
 | Collection basin | 12 m radius, 69 m below crown | receives every gravity fall above the lower return gallery while leaving a structural bottom below it |
 | Public/service ring width | 4.2 m | carries swimmers, stewards, equipment and protected stopping bays |
@@ -62,26 +62,28 @@ shell remains visible at selected service cuts and instrument sockets.
 
 ## 4. Surface crown and reveal
 
-The existing 52 m mean reservoir becomes a **crown annulus**. It still reads
-from the surface as the city's source of heat and light, but its central 34 m
-is open. The annulus performs four jobs:
+The existing 52 m mean reservoir remains one continuous molten surface. Its
+central 34 m is a **submerged immersion throat**, not an open oculus. A player
+must cross and enter the lava before the spherical interior is revealed. The
+upper reservoir performs four jobs:
 
 - settles gas and heavy inclusions before lava reaches a public fall;
 - stores enough flow to keep individual falls steady while one gate is closed;
 - supplies the household thermal spine without routing the hottest material
   beneath the guest house;
-- forms a visible safety interval between the oculus and the existing bank.
+- keeps every approach to the Heartworks visibly and physically lava-only.
 
 The surface promenade, Highline, Tempering Gate, plots and arrival-to-Civic
-sightline remain. The first view through the opening shows the broad Heartfall
-on the far Civic side and glimpses of several rings. It does not expose every
-room or the bottom basin at once.
+sightline remain. From above, the center reads as uninterrupted lava rather
+than a dry shaft. The chamber and its broad Heartfall reveal themselves only
+after immersion or through protected interior glazing.
 
 The **Crown Gallery**, 4 m below the lava datum, is the one dry interior ring.
-It is reached from protected surface overlooks and lets a visitor understand
-the chamber before the Lava Helm. Its floor is structural glass and cooled
-basalt in alternating bays, with opaque refuge pockets between views. It has
-real guards, fall-control stations and two directions back to the surface.
+It is reached by protected dry passages from the surface and looks through
+structural glass into the molten immersion throat; it is never an open balcony
+on a dry hole. Cooled basalt refuge bays alternate with the glazed views. The
+gallery has real guards, fall-control stations and two directions back to the
+surface.
 
 ## 5. The six rings
 
@@ -91,7 +93,7 @@ continuous balcony pasted onto the wall.
 
 | Ring | Depth | Access | Program |
 |---|---:|---|---|
-| `H0` Crown Gallery | 4 m | dry, before Lava Helm | oculus overlook, public fall controls, first chamber view |
+| `H0` Crown Gallery | 4 m | dry, before Lava Helm | protected view into the immersion throat, public fall controls, first chamber view |
 | `H1` Steward Ring | 14 m | Lava Helm | Renewal chamber `L0`, primary manifold `L1`, daily flow balancing |
 | `H2` Civic Ring | 26 m | Lava Helm | deep observatory `L2`, fired archive `L3`, broad public crossings |
 | `H3` Works Ring | 38 m | Lava Helm | high-temperature forge `L4`, materials bay `L5`, protected lifts to Kel and Vara |
@@ -109,11 +111,12 @@ Civic–`L3`; they move material and do not replace public circulation.
 ### 6.1 Intake and settling
 
 Lava arrives at the crown through natural pressure and the city's existing
-thermal branches. The broad annulus slows it. Refractory baffles let gas leave
+thermal branches. The broad reservoir slows it. Refractory baffles let gas leave
 through instrumented vents and let heavy mineral load settle where Pela and
 the stewards can sample it. Three gate houses meter the falls. Their machinery
-is embedded in the crown and read as glass-fronted valve rooms, not decorative
-exposed pipes.
+is embedded below the surface and read as glass-fronted valve rooms, not
+decorative exposed pipes. The three intakes begin 5 m below the lava datum, so
+none creates a visible hole in the surface.
 
 ### 6.2 Controlled falls
 
@@ -128,12 +131,15 @@ exposed pipes.
 The falls are separated sheets or braided curtains, never one solid lava
 cylinder. Clear sectors between them preserve sightlines, swimming routes,
 ventilation and emergency crossing. Each fall can stop independently while the
-other two continue.
+other two continue. Each free-falling sheet narrows as gravity accelerates it:
+its lower section is slimmer than its intake. Lava spreads only where it meets
+a splitter, ledge or the collection works.
 
 ### 6.3 Collection and separation
 
-The basin 69 m below the crown is a receiving and sorting work, not a lake on
-the sphere's bottom. Concentric basalt lips calm the impact zone. Radial gates
+The basin 69 m below the crown is a shallow receiving and sorting work, not a
+floating plug or a second deep lava pool. Concentric refractory basalt lips
+contain the impact spread. Radial gates
 divide:
 
 - reusable flow for the three return risers;
@@ -162,7 +168,8 @@ Tempering Gate, guest house or large glass fronts.
 
 ### Before the Lava Helm
 
-- the Crown Gallery and surface overlooks reveal one inhabited interior;
+- protected Crown Gallery glazing reveals one inhabited interior while the
+  surface remains an unbroken lava field;
 - moving residents, control lights and the upper two rings are visible;
 - every deeper entry is physically a lava route, not a locked human door or an
   instructional sign;
@@ -179,8 +186,9 @@ Tempering Gate, guest house or large glass fronts.
 
 ## 8. Light, sound and environmental character
 
-The oculus supplies a narrow changing cone of daylight. The falls light the
-lower chamber orange from within; cobalt and teal mineral lenses distinguish
+Light filtered through the molten throat supplies a narrow, changing orange
+glow rather than an open cone of daylight. The falls light the lower chamber
+from within; cobalt and teal mineral lenses distinguish
 science, cooling and return systems. The upper rings receive reflections from
 the crown, the middle rings see moving light across the curved shell, and the
 bottom remains dark except for impact glow and return seams.
@@ -198,8 +206,8 @@ separators and relief points. They do not fill every room with generic fog.
    Jewel's waterfall was shifted by its site constraints?
 3. Keep three main falls, or add one thin overflow veil used only during high
    pressure?
-4. Let the Crown Gallery see the collection basin, or conceal the bottom until
-   the Lava Helm descent?
+4. Let the Crown Gallery's protected glazing see the collection basin, or
+   conceal the bottom until the Lava Helm descent?
 5. Give the Crown Gallery a dry lift to Civic, or keep every route below it
    explicitly lava-only?
 6. Is **Caldera Heartworks** useful as a working name, or should the Fire
