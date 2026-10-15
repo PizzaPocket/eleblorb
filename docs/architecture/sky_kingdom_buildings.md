@@ -18,9 +18,8 @@ wall systems.
 |---|---|---|
 | Structural module | bay | 3.2 m (`TownProps.CELL_SIZE`) between column centres |
 | Base | stepped podium (crepidoma in the Greco-Roman buildings, *taiji* platform in the Chinese) | set cloud with a gold edge band, 1.0 m per tier; tier count shows rank; one-way from below |
-| Columns | pier with capital and base | squarish SuperEgg quartz shaft (`EPSILON_FLAT`), 0.7 m on halls, 0.45 m on tholoi and pavilions; gold capital and base blocks |
-| Floating roof | — | roof hovers clear above its columns: 0.6 m on ordinary buildings, 1.0 m on a court's principal building, 1.6 m on the Hall of Mist |
-| Roof anchor | gold pins | a short gold finial on each capital and a matching pendant under the roof, aligned, with a faint glow between them |
+| Columns | quartz shaft | squarish SuperEgg quartz shaft (`EPSILON_FLAT`), 0.7 m on halls, 0.45 m on tholoi and pavilions; the base and the capital follow the building's tradition (below) |
+| What the columns carry (revised 2026-10-14) | cloud capital, or bracket set | the roof rests on the capitals; their height shows rank: 0.6 m on ordinary buildings, 1.0 m on a court's principal building, 1.6 m on the Hall of Mist. No pins, spikes or finials on a column (they replaced the floating roof's gold pins of light, which read as spikes and weakened the columns) |
 | Signature motif | gold binding ring | the ring that holds set cloud: at every column neck, every roof corner, every couch and every gate; never decoration alone |
 | Openings | superellipse arch, oculus | punched through quartz screen walls and framed in gold on both faces |
 | Enclosure | screen wall, cloud panel, curtain | quartz screen walls only where privacy or storage requires; translucent set-cloud panels in gold frames for light partitions; woven-cloud curtains for doorways and between columns |
@@ -32,7 +31,8 @@ wall systems.
 
 | Element | Term | Specification |
 |---|---|---|
-| Roof, rectangular | low gable with pediment ends | one pitch band, 14° to 16°; quartz slab with a gold edge |
+| Column | quartz shaft, gold plinth, cloud capital | a gold plinth block; a gold necking ring; the capital a cushion (echinus) of set cloud swelling out of the shaft under a thin gold abacus twice the shaft's width |
+| Roof, rectangular | low gable with pediment ends | an entablature, then one pitch band, 14° to 16°; quartz slab with a gold edge; the pediments are the gable's ends, nowhere else |
 | Roof, round | dome | SuperEgg dome (epsilon about 2.0) floating over a ring of columns; open oculus where light or stars are needed |
 | Roof, colonnade | flat cap (entablature slab) | thin quartz slab with a gold edge |
 | Plan types | tholos, peristyle, stoa, exedra, odeon | |
@@ -42,9 +42,10 @@ wall systems.
 
 | Element | Term | Specification |
 |---|---|---|
-| Roof | hip-and-gable (*xieshan*) with upturned corners | one pitch band, 28° to 32°, curved; a quartz slab roof with gold ridge and corner finials; a gold ring at each upturned corner |
+| Roof | hip-and-gable (*xieshan*) with upturned corners | eaves on all four sides, sagging to the middle of each side and lifting at the corners; hips rise from the corners to a small upright gable at each end, set back under the ridge (never a full-width pediment); 28° to 32°; quartz with a gold eave edge, gold ridge and hip arrises, and a low gold curl at each end of the ridge; no corner spikes |
+| Column | quartz shaft on a round gold drum base | no Greek capital: the bracket set carries the eave |
 | Double eave | *chongyan* | Hall of Mist only |
-| Brackets | *dougong* | stacked squarish gold blocks under the eave, two tiers on the Hall of Mist, one elsewhere |
+| Brackets | *dougong* | on every column head: a gold block (*dou*), arms (*gong*) crossing both ways, smaller blocks, wider arms, and the eave purlin, as tall as the building's rank allows (0.6, 1.0 or 1.6 m) |
 | Gate | gate hall, *pailou* | |
 | Openings | moon gate | circular opening in set cloud bound by a gold ring |
 | Plan types | gate hall, hall on podium, pavilion (*ting*), courtyard | |
@@ -60,11 +61,11 @@ suits the architecture. The hero and party need the ordinary minimums (route
 
 **Column heights (added by the audit, 2026-10-07).** The briefs gave gaps
 but no column heights, so nothing guaranteed the 5.0 m. The rule: column
-height plus the floating gap is at least 5.0 m above the floor, and at least
+height plus the capital is at least 5.0 m above the floor, and at least
 4.0 m under any lintel or cap a Tempestar passes beneath.
-- **Tholoi and pavilions:** columns 4.4 m (with the 0.6 m gap, 5.0 m).
+- **Tholoi and pavilions:** columns 4.4 m (with the 0.6 m capitals, 5.0 m).
 - **Halls:** columns 5.5 m.
-- **The Hall of Mist:** columns 6.4 m to its lower eave (with the 1.6 m gap,
+- **The Hall of Mist:** columns 6.4 m to its lower eave (with the 1.6 m capitals,
   8.0 m).
 
 A 0.7 m column on the 3.2 m module leaves 2.5 m clear between columns, and a
@@ -103,8 +104,8 @@ continuous curve, the corners lift without kinks or seams, its thickness and
 edge softness match the SuperEgg buildings, and a flier can land on it without
 snagging.
 
-**Fallback if the proof fails:** a straight hip-and-gable floating roof with a
-raised gold ring and finial at each corner to suggest the lift. Only the Dawn
+**Fallback if the proof fails:** a straight hip-and-gable roof with a
+lifted gold eave edge at each corner to suggest the curve (no ring or finial). Only the Dawn
 Gate, the Hall of Mist and its propylon, and Pantao's buildings use this roof,
 so the fallback changes five buildings and nothing else.
 
@@ -118,7 +119,7 @@ so the fallback changes five buildings and nothing else.
 | Hip-and-gable with upturned corners, 30° | *xieshan* | Chinese |
 | Gold bracket blocks | *dougong* | Chinese |
 | Circular gold-ringed opening | moon gate | Chinese |
-| Floating roof gap, gold pins | — | invented, Sky Kingdom |
+| Cloud capital (Greek buildings) | echinus of set cloud | invented, Sky Kingdom |
 | Set-cloud panels and couches | — | invented, Sky Kingdom |
 | Gold binding ring | — | invented, Sky Kingdom (signature motif) |
 
@@ -133,7 +134,7 @@ interior program, materials and ornament, history and variation.
 ### Dawn Gate
 
 - **Masses:** one gate hall, 14 × 6 m, three bays (central 5 m, sides 4.5 m).
-- **Roof:** *xieshan* with a single eave; 1.0 m floating gap (principal
+- **Roof:** *xieshan* with a single eave; 1.0 m bracket sets (principal
   building of its cloud).
 - **Base:** single tier, 1.0 m, with a 6 m wide axial ramp.
 - **Openings:** all three bays open; the central bay frames Aethra.
@@ -150,8 +151,9 @@ interior program, materials and ornament, history and variation.
 
 - **Masses:** main hall 22 × 14 m (7 × 4 bays); rear throne bay one bay deeper.
 - **Roof:** *xieshan* with double eave (*chongyan*), the only one in the
-  kingdom; 1.6 m floating gap to the lower eave, a further 1.0 m between the
-  two eaves.
+  kingdom: the lower eave a hipped skirt all round the hall, carried on 1.6 m
+  gold bracket sets; above it a quartz frieze 2 m high with gold corner
+  posts; then the full hip-and-gable roof.
 - **Base:** triple podium, 3.0 m, with gold-railed balustrades; an axial ramp 4
   m wide in three flights with landings at each tier. At 32° each 1.0 m flight
   needs about 1.6 m of run, so the ramp with its four landings is about 9.6 m
@@ -168,10 +170,10 @@ interior program, materials and ornament, history and variation.
 - **Variation:** largest, tallest, double eave; the reference for rank.
 
 **Propylon** (Chinese gate pavilion): 10 × 5 m, three bays, single *xieshan*,
-0.6 m gap, single-tier base. Frames the hall from the landing forecourt.
+0.6 m capitals, single-tier base. Frames the hall from the landing forecourt.
 
 **Chamberlain's tholos** (Greco-Roman): 7 m diameter, eight columns, dome with
-a 0.6 m gap. Enclosed by quartz screen walls between five columns for the
+a 0.6 m capitals. Enclosed by quartz screen walls between five columns for the
 ledger room; three open bays face the forecourt. Interior: a long reading
 table, ledger shelves on the screen walls, a robe press. Mnesia's sleeping
 alcove behind a cloud panel.
@@ -183,11 +185,11 @@ court and one toward open sky. Alkis's couch and a rack of gold invitation
 tubes.
 
 **Nectar terrace** (Greco-Roman stoa): 18 × 5 m single colonnade, flat cap,
-0.6 m gap, facing world east. Gold dew bowls on low quartz stands between the
+0.6 m capitals, facing world east. Gold dew bowls on low quartz stands between the
 columns; Drosia's pouring table in the end bay.
 
 **Residence tholoi** (Greco-Roman): two tholoi behind the hall.
-Aristeon's is 9 m with ten columns, a 1.0 m gap and fully screened walls
+Aristeon's is 9 m with ten columns, a 1.0 m capitals and fully screened walls
 pierced by arches; Drosia's is 6 m with six columns and half screened. Each
 has a sleeping couch of set cloud, a robe press and a gold dew bowl of its own.
 
@@ -197,7 +199,7 @@ has a sleeping couch of set cloud, a robe press and a gold dew bowl of its own.
 
 - **Masses:** a ring colonnade, inner diameter 16 m, outer 30 m; two concentric
   rings of columns (16 inner, 24 outer).
-- **Roof:** a ring-shaped flat cap between the column rings, 1.0 m gap; open to
+- **Roof:** a ring-shaped flat cap between the column rings, 1.0 m capitals; open to
   the sky over the void.
 - **Base:** single tier, 1.0 m, around the void.
 - **The void:** 14 m round opening through the cloud to the world below,
@@ -211,16 +213,16 @@ has a sleeping couch of set cloud, a robe press and a gold dew bowl of its own.
 
 **Observatory** (Greco-Roman tholos): 9 m diameter, eight columns, on a 4 m
 podium of four tiers reached by a spiral ramp around the podium at 30°, 2 m
-wide with balustrade. Dome with a large oculus and a 1.0 m gap. Astrion's gold
+wide with balustrade. Dome with a large oculus and a 1.0 m capitals. Astrion's gold
 armillary and star tables inside.
 
 **Archive** (Greco-Roman, closed): 10 × 7 m; quartz screen walls on all sides
-pierced only by small high oculi; low gable with pediment, 0.6 m gap. One
+pierced only by small high oculi; low gable with pediment, 0.6 m capitals. One
 doorway with a gold lattice gate, the kingdom's only hung leaf. Shelves of gold
 leaf records.
 
 **Philosopher's residence** (Greco-Roman peristyle house): 12 × 8 m around a
-small cloud court with a sky lily pool; low gable, 0.6 m gap. Three rooms:
+small cloud court with a sky lily pool; low gable, 0.6 m capitals. Three rooms:
 Sophrona's study and sleeping room, Astrion's room, Archeia's room.
 
 ### Pantao
@@ -229,7 +231,7 @@ Sophrona's study and sleeping room, Astrion's room, Archeia's room.
 
 - **Masses:** main hall 20 × 12 m (6 × 3 bays); a 2.4 m serving passage behind,
   enclosed.
-- **Roof:** *xieshan*, single eave, 1.0 m gap; deep eaves of 2 m over the front.
+- **Roof:** *xieshan*, single eave, 1.0 m capitals; deep eaves of 2 m over the front.
 - **Base:** single tier, 1.5 m, with three ramps (one axial, two side ramps
   from the garden).
 - **Openings:** front and both sides open between columns; woven-cloud curtains
@@ -243,7 +245,7 @@ Sophrona's study and sleeping room, Astrion's room, Archeia's room.
   and rebuilt grander out of spite.
 - **Variation:** open on three sides; the warmest colour in the kingdom.
 
-**Kitchen pavilion** (Chinese *ting*): 8 × 6 m, single *xieshan*, 0.6 m gap,
+**Kitchen pavilion** (Chinese *ting*): 8 × 6 m, single *xieshan*, 0.6 m capitals,
 open on all sides so sun reaches the gold baking plates. Tianlu's composing
 table and nectar jars; no fire.
 
@@ -264,7 +266,7 @@ standing alone at the forecourt edge.
 **Forge hall** (principal; Greco-Roman, open-sided)
 
 - **Masses:** 16 × 10 m (5 × 3 bays), open on all sides.
-- **Roof:** low gable with pediments, 1.0 m gap, scorched gold edges.
+- **Roof:** low gable with pediments, 1.0 m capitals, scorched gold edges.
 - **Base:** single tier, 1.0 m.
 - **Interior:** a working floor: three anvils in a line, cooling basins, gold
   stock racks, a lightning collector (a gold mast through the roof gap that
@@ -278,10 +280,10 @@ standing alone at the forecourt edge.
 crown. Keraunia's weather instruments.
 
 **Apprentice's bench:** 6 × 4 m lean-to with a single-slope flat cap against no
-wall: freestanding on four columns with a 0.6 m gap. Kallix's unfinished
+wall: freestanding on four columns with a 0.6 m capitals. Kallix's unfinished
 pieces on every surface.
 
-**Residence** (Greco-Roman): 10 × 8 m, low gable, 0.6 m gap; three rooms; gold
+**Residence** (Greco-Roman): 10 × 8 m, low gable, 0.6 m capitals; three rooms; gold
 trim darkened by scorch.
 
 ### Lyria
@@ -290,7 +292,7 @@ trim darkened by scorch.
 
 - **Masses:** semicircular auditorium 24 m across; a stage 10 × 5 m with a
   colonnaded back wall (scaenae frons) of six columns.
-- **Roof:** flat cap over the stage only, 1.0 m gap; the seating is open sky.
+- **Roof:** flat cap over the stage only, 1.0 m capitals; the seating is open sky.
 - **Seating:** six tiers of set-cloud benches, **0.7 m** rise each (revised by
   the audit from 0.8 m: six 0.8 m tiers rise 4.8 m over the 7 m between stage
   and rim, about 34°, steeper than the aisles may be; at 0.7 m they rise 4.2 m,
@@ -301,11 +303,11 @@ trim darkened by scorch.
   sat in for an age.
 - **Variation:** the only auditorium; the only open-sky principal building.
 
-**Poet's residence** (Greco-Roman): 10 × 8 m, low gable, 0.6 m gap; three
+**Poet's residence** (Greco-Roman): 10 × 8 m, low gable, 0.6 m capitals; three
 rooms, one for each of Elegon, Aulia and Rhapsos, and a writing room on the
 side facing the odeon.
 
-**Song room** (Greco-Roman tholos): 7 m, six columns, dome with 0.6 m gap;
+**Song room** (Greco-Roman tholos): 7 m, six columns, dome with 0.6 m capitals;
 gold-leaf verse in niches; Aulia's practice floor.
 
 ### Dromos
@@ -314,12 +316,12 @@ gold-leaf verse in niches; Aulia's practice floor.
 34 m; gold ring markers at quarter points; a finish line inlaid in gold.
 
 **Judges' tholos** (principal; Greco-Roman): 8 m, eight columns, dome with a
-1.0 m gap, on a 2 m podium overlooking the finish, reached by a 2 m ramp at
+1.0 m capitals, on a 2 m podium overlooking the finish, reached by a 2 m ramp at
 32° (about 3.2 m of run, with landings) on the side away from the track; Nikandra's seat and the gold
 record of victories on the screen wall.
 
 **Prize pavilion** (Greco-Roman, prostyle): 8 × 6 m, low gable with a
-four-column porch, 0.6 m gap; Stephane's rings and woven-cloud wreaths on
+four-column porch, 0.6 m capitals; Stephane's rings and woven-cloud wreaths on
 stands.
 
 **Residence** (Greco-Roman peristyle house): 12 × 10 m around a small court;
@@ -381,7 +383,7 @@ Checked against the architecture skill's brief audit.
 - Roofs are collidable: the hero flies and may land on them.
 - Every floor, podium, ramp, terrace and island surface is cloud and one-way:
   passable rising from below, solid from above.
-- Woven-cloud curtains, wind harp strings and glow between gold pins are
+- Woven-cloud curtains, wind harp strings and the cloud capitals' soft edges are
   decorative; columns, podiums, couches, panels and roofs are solid.
 - Each court's emblem on its Koinon seat is an abstract shape. No building carries
   text.

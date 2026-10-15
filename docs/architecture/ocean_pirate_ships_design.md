@@ -136,8 +136,8 @@ below 0 m is inside the hull and must stay dry (section 6).
 - **Ramps.** A deck pair 3.0 m apart needs about 4.8 m of 32° ramp plus two
   1.2 m landings (about 7.2 m) for each companion ramp. Draw them before the
   rooms.
-- **Still to do before any build:** draw each deck plan at true size. The
-  houseboats each failed their hull when drawn, so expect the same here.
+- **Drawn (2026-10-13):** every deck plan at true size; see section 9. As
+  expected, the first drawing failed the hull at both ends of both ships.
 
 ## 5. Rooms and who uses them
 
@@ -227,6 +227,135 @@ should live side by side so one body can register as either or both.
    cabin and galley interiors.
 3. The *Belle Fortune* on a second route, sailing the opposite way.
 4. The remaining interiors, crew schedules and dialogue.
+
+## 9. Deck plans at true size (2026-10-13)
+
+The audit in section 4 left one item: draw every deck at true size. It is now
+drawn and checked. `tools/pirate_ships_layout.py` holds both ships (hull shape,
+decks, rooms, companion ramps, masts, dry volumes, crew, work spots and routes),
+checks them and writes `scripts/pirate_ships_plan.gd` (`PirateShipsPlan`), the
+one plan the ship builder reads. `tools/validate_pirate_ships_plan.tscn` checks
+the same rules in Godot in the pre-push hook (`VILLAGE=pirate_ships`). The
+deck plans, a midship section and both routes are drawn on the Ocean Kingdom
+Chart.
+
+### Hull shape
+
+One function, `PirateShipsPlan.hull_half_breadth(ship, z, y)`, gives each hull's
+half-breadth at any length and height, so the builder lofts the hull and the
+validator fits rooms against the same shape. Ship-local axes: +z the bow, x
+athwartships, y up from the waterline. Every room stands inside the hull less
+0.3 m of planking and frames, tested at its corners and middle at 0.3 m and
+2.0 m above its floor.
+
+| | *Harbinger* | *Belle Fortune* |
+|---|---|---|
+| Length, beam, draft | 42 × 11.5 m, 5.0 m | 38 × 10 m, 4.2 m |
+| Plan | fine bow, full quarters, flat transom (62 % of the beam) | round bow, round tall stern (55 %) |
+| Sides | slight tumblehome (8 % over 7.2 m) | the fluyt's strong tumblehome: 10 m at the waterline, 7 m at the weather deck |
+
+**What drawing it changed.** As predicted, the first drawing failed the hull at
+both ends of both ships: rectangles drawn to the beam amidships do not fit
+where the hull tapers.
+
+- *Harbinger*: the great cabin narrows to 7.6 × 6.0 m and starts 2 m from the
+  stern; the coach and quarterdeck to 6.8 m wide; the forecastle and boatswain's
+  store to 5.6 m; the battery to 9.6 m between the gun ports; the crew berth to
+  8.6 m. The quarterdeck and forecastle ramps moved 2 m inboard of their old
+  feet, so their heads land on the raised decks instead of short of them.
+- *Belle Fortune*: the stern was made fuller (it fitted no great cabin at
+  all), and the council room is **4.5 × 6.0 m** clear at shoulder height, wider
+  at the floor, under the poop deck. The brief's 5.5 m is only its floor width;
+  the tumblehome takes the rest, as the audit warned. The lower deck's crew
+  quarters are 6.4 m wide, with the carpenter's corner and sail locker either
+  side of a 1.6 m passage to the bow.
+
+### Rooms
+
+| *Harbinger* deck (floor) | Room | Size (beam × length) | z |
+|---|---|---|---|
+| hold (−4.4) | hold stores | 5.2 × 14.0 | −11.0 to +3.0 |
+| hold | magazine | 4.4 × 4.6 | +7.6 to +12.2 |
+| berth deck (−1.6) | crew berth | 8.6 × 10.2 | +2.4 to +12.6 |
+| berth deck | carpenter's walk, sail room | 2.1 × 10.9 each, either side | −9.5 to +1.4 |
+| berth deck | wardroom | 4.0 × 5.5 | −16.0 to −10.5 |
+| berth deck | cabins of Mara Reef and Old Kelp | 2.6 × 2.7 each | −13.2 to −10.5 |
+| berth deck | Ada Shoal's cabin and the surgery | 2.4 × 2.8 each | −16.4 to −13.6 |
+| gun deck (+1.4) | great cabin | 7.6 × 6.0 | −19.0 to −13.0 |
+| gun deck | battery | 9.6 × 21.4 | −12.4 to +9.0 |
+| gun deck | galley | 7.6 × 5.0 | +9.6 to +14.6 |
+| spar deck (+4.4) | coach | 6.8 × 6.0 | −19.6 to −13.6 |
+| spar deck | waist (open) | 8.0 × 26.0 | −13.0 to +13.0 |
+| spar deck | boatswain's store | 5.6 × 4.0 | +13.6 to +17.6 |
+| quarterdeck (+7.2) | quarterdeck | 6.8 × 6.4 | −19.6 to −13.2 |
+| forecastle (+7.2) | forecastle | 5.6 × 4.4 | +13.2 to +17.6 |
+
+| *Belle Fortune* deck (floor) | Room | Size (beam × length) | z |
+|---|---|---|---|
+| hold (−3.6) | plunder hold | 4.8 × 14.0 | −10.0 to +4.0 |
+| hold | powder room | 4.0 × 4.0 | +6.4 to +10.4 |
+| lower deck (−0.6) | crew quarters and the six guns | 6.4 × 21.0 | −11.0 to +10.0 |
+| lower deck | sickbay | 5.6 × 4.0 | −15.4 to −11.4 |
+| lower deck | carpenter's corner, sail locker | 1.9 × 2.6 each | +10.4 to +13.0 |
+| weather deck (+2.4) | great cabin (council room) | 4.5 × 6.0 | −16.4 to −10.4 |
+| weather deck | waist (open) | 5.0 × 20.6 | −9.6 to +11.0 |
+| weather deck | galley | 3.0 × 3.4 | +12.2 to +15.6 |
+| poop deck (+5.2) | captain's cabin | 3.8 × 3.4 | −17.0 to −13.6 |
+| poop deck | poop deck (the wheel) | 4.8 × 3.2 | −13.4 to −10.2 |
+| forecastle (+5.2) | forecastle | 2.8 × 3.8 | +12.2 to +16.0 |
+
+Every enclosed room has at least 2.4 m under the deck above. Masts rise through
+rooms, as they do on every ship; no ramp meets one.
+
+### Companion ramps
+
+One 1.4 m ramp at 32° per deck pair, with 1.2 m landings, laid fore and aft
+beside the centreline and alternating sides so no two on one deck overlap:
+
+- *Harbinger*: hold to berth deck (port, climbing aft from z −4.0), berth deck to
+  gun deck (starboard, aft from −2.6), gun deck to spar deck (port, aft from
+  +6.2), spar deck to quarterdeck (port, aft from −8.6), spar deck to forecastle
+  (starboard, forward from +8.6).
+- *Belle Fortune*: hold to lower deck (port, aft from −2.4), lower deck to
+  weather deck (starboard, forward from −4.4, through the main hatch), weather
+  deck to poop deck (port, aft from −5.6), weather deck to forecastle
+  (starboard, forward from +7.6).
+
+### Dry volumes
+
+Each ship registers two boxes (section 6): the hold and the deck that
+straddles the waterline (*Harbinger* −4.9 to −1.6 and −1.6 to +1.4; *Belle
+Fortune* −4.0 to −0.6 and −0.6 to +2.4). Every room below +0.3 m lies in one.
+
+### Routes and timetable
+
+The survey found the old elliptical route (285 to 350 m out) never passed the
+three wrecks the crews salvage daily. The ships now sail two **nested loops in
+opposite directions** among the islands, inside the Kraken's water with a 40 m
+margin, at least 60 m from the dock and over water at least 3 m deeper than
+their draft:
+
+- The *Harbinger* sails the outer loop (1.87 km) three times a day at about
+  4 m/s, and lies hove to over the **brig** from 14:42 to 15:42.
+- The *Belle Fortune* sails the inner loop (1.34 km), round the west and north
+  of the main island and between the eastern islets, five times a day at about
+  5 m/s, and lies hove to over the **schooner** from 12:00 to 13:00.
+- Both pass within 45 m of the **galleon** they fight over.
+
+Each ship sails a whole number of laps between stops, so its timetable repeats
+exactly every day and it is over its wreck at the same hour. The stop hours
+are phased so that over a simulated week the two ships never come within 60 m
+of each other (74 m at closest). The validator's `position(ship, t)` is the
+function the ship builder moves the ships with, so the game and the check
+agree.
+
+### For the rebuild (`ocean_kingdom_denizens.gd`)
+
+- Replace the 350 × 285 m ellipse with each ship's `route`, `speed`,
+  `stop_index`, `stop_hour` and `stop_minutes`, moved by `position()`.
+- Loft the hull from `hull_half_breadth()`; build decks, rooms and ramps from
+  the plan; register the dry boxes.
+- Spread each room's people over its floor at the work spots in `schedule`.
 
 ## Fixed, proposed and open
 

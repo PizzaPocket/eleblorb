@@ -54,7 +54,7 @@ const PRIMATE_TEMPLATE_IDENTITIES := [
 		"name": "Batu",
 		"has_tail": false,
 		"lines": [
-			"Sap on my hands again. That's what I get for leaning on the ladder tree.",
+			"Used to be half the floor came out to my yard to hit the dummies. Now nobody comes. Can't say I blame them, after dark.",
 			"Rain's coming. You can hear it on the high leaves first.",
 		],
 	},
@@ -208,7 +208,7 @@ const JUNGLE_VILLAGER_IDENTITIES := [
 	{
 		"name": "Intan",
 		"lines": [
-			"The training grounds down below have gone quiet lately. Whoever's running that dummy business isn't telling anyone how.",
+			"Batu's yard has gone quiet. He still goes into that shed of his every night, and he doesn't come out till dawn.",
 			"Mind the third rung. It's newer than the others and very proud of it.",
 		],
 	},

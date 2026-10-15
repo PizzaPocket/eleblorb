@@ -127,6 +127,7 @@ A room's contents are evidence of an economy. What a shop, workshop or stall sel
 
 - Build every prop from `SuperEgg` parts, with epsilons by role (squarish for tables, benches, chests, shelves; soft for cushions, sacks, bedding; round for pots, barrels, stools). Use `TownProps` and `VillageWorks` builders where one exists; add a reusable builder rather than a one-off.
 - Substantial pieces get collision (`CollisionPolicy`). Small clutter (mugs, books, herbs, cloth) is decorative.
+- Furniture is built at the world's scale, about 1.1 × real size, like the doors and the people (architecture skill). Beds have 2.3 m mattresses, a double 1.55 m wide and a single 1.0 m; never use real-world catalogue sizes.
 - Keep to the clearances in the `architecture` skill: 1.2 m on routes, nothing in the foot of a ramp or in front of a door.
 - Light: hearths carry a flickering warm omni light; add a few soft lamps by activity group, never one per prop. Warm window glow at dusk. Respect the Compatibility renderer's light limits (see the interior-lighting plan: emissive materials first, a handful of real lights per room).
 - Plants indoors are purposeful: a pot on a sill, herbs hanging to dry, a vase on a table. Never a stray bush standing beside a person.

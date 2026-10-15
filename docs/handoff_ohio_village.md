@@ -1,5 +1,7 @@
 # Handoff: Ohio starting village
 
+> **Snapshot of 2026-10-06, kept for the record.** Current state and next steps: `docs/architecture/settlement_backlog.md` (index rows O1 to O5; sections 1 and 20). The web build is deprecated.
+
 Status (2026-10-04): validated and visually audited. The guarded validator
 (`tools/check_village_layout.sh`) reports 0 FAIL and 2 WARN (Vey house to
 storehouse 2.9 m, Sallow cottage to drying shed 2.9 m, both usable maintenance

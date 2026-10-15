@@ -1,6 +1,17 @@
 # The Sea Folk City: Architecture Briefs
 
-Status: building briefs for review (2026-10-06). Read with
+Status: building briefs for review (2026-10-06). **Third pass (2026-10-13,
+proposed):** the city now has two eras, the classical floor and the modern
+column (`ocean_sea_folk_city.md` 2a and 5, `ocean_sea_folk_city_layout.md` 10).
+The two-era charter there supersedes the kit below where they differ:
+- the Tidehall, Lamp House, school court and Current House homes are classical;
+- the Exchange wraps the old Hall of Records, and the guest hall joins the two
+  old Strangers' Houses;
+- the Reef House workshop and eleven homes dock round landing halls on four
+  glass trunks;
+- the light pipes are removed.
+
+The new modern kit is in section 2a; the plans are in the layout brief, section 10. Read with
 `ocean_sea_folk_city.md` (community, culture, charter, dress) and
 `ocean_sea_folk_city_layout.md` (layout). Positions and owners come from the
 layout.
@@ -24,7 +35,7 @@ building uses Greek temple forms; those belong to the Sky Kingdom.
 | Columns | Minoan form: wider at the top than the base, with a round cushion capital; painted deep red or ocean blue; squarish SuperEgg shafts as the engine's language requires |
 | Bands | a spiral or wave band at the shell's springing line on every building, the signature motif |
 | Frescoes | dolphins, octopus, fish and sea flowers, inside air halls and the castle only |
-| Light | living pearl lamps at every door and junction; light pipes bring daylight down to the civic ring |
+| Light | living pearl lamps at every door and junction, and strung on the lamp lines in the column |
 | Palette | nacre white and teal 60 percent; prism green, ocean blue and violet light 30 percent; orichalcum 10 percent |
 
 ### Wet and dry buildings
@@ -37,7 +48,10 @@ building uses Greek temple forms; those belong to the Sky Kingdom.
 - **Dry buildings** (the three air halls and the tunnels) hold compressed air:
   a moon pool 4 m across in the floor, a ramp out of it, nacre floors, frescoes,
   and furniture for people on legs. Each registers as a dry and breathable
-  volume.
+  volume. **Third pass (proposed, 2026-10-14):** the whole dry network is at
+  one pressure, the sea's at the datum (the 4.4 m walking floor), so open moon
+  pools stand only at the datum and every entry higher up is a lock chamber
+  (`ocean_sea_folk_city.md` 2a, "Physics the plan respects"; layout brief 10).
 
 ### Exclusions
 
@@ -55,8 +69,11 @@ human city; boxes.
 - **Change:** rebuilt as continuous nacre-and-teal shells on a 2 m mound, its
   entrance turned to `+z`, approached up a broad ramp between two Minoan
   columns.
-- **Audience hall:** a tall wet hall with a central light well rising to a glass
-  oculus fed by a light pipe; Asaru's seat of nacre at the far end; dolphin
+- **Under glass (third pass):** kept whole and dry inside the civic hall, a
+  glass SuperEgg 44 by 41 m and 32 m high on the mound. The assembly meets on its
+  roof terrace, where the central trunk lands from the fountain.
+- **Audience hall:** a tall hall with a central light well rising to a glass
+  oculus under the civic hall's crown; Asaru's seat of nacre at the far end; dolphin
   frescoes along the walls; room enough for the Tidekeeper's challenge fight.
 - **Rooms:** Asaru's chambers behind the hall; Ikara's and Tudaro's rooms in two
   of the towers; a guard post at the entrance.
@@ -75,7 +92,8 @@ human city; boxes.
 
 ### The guest hall (air hall; Isaro; rest point)
 
-- A dome 16 m across, 8 m high, on a 3 m plinth.
+- A dome **20 m across, 8.5 m high** (second pass, 2026-10-13: 16 m could not
+  hold its rooms at world scale), on a 3 m plinth.
 - **Inside:** the moon pool; a common room with low couches; four dry bedrooms
   around the dome's edge, one large enough for the party, where the hero wakes;
   Isaro's counter by the pool; a **washroom** between two of the bedrooms,
@@ -85,6 +103,11 @@ human city; boxes.
   glass washbasin with a tap and a mirror; a shower. Waste goes to a sealed
   holding tank in the plinth, which is pumped out to a treatment vault at the
   city's edge, never into the sea.
+- **Rooms (second pass):** a ring 3.4 m deep under the shell: the party room
+  (6.0 m of arc), three guest rooms (3.6 m each), Isaro's room (3.2 m) and
+  the washroom (2.4 m), each opening off the common room. Between the rooms
+  and the 4 m moon pool, 4.1 m of floor holds the ramp out of the pool and its
+  landing. The plan file checks the fit and the headroom.
 - **Variation:** the warmest light; the only dome with rooms partitioned off.
 - **Audit (2026-10-07):**
   - **Headroom.** A dome 8 m high is low at its rim. Set the four bedrooms
@@ -128,12 +151,6 @@ human city; boxes.
 - **Use:** where the young practise balance and swimming before the open sea;
   a few floating rings and markers.
 
-### Light pipes (Kaluja)
-
-- Four shafts 1.6 m across of orichalcum and glass rising from the civic ring to
-  floating glass collectors at the surface; the lower 6 m of each glows with
-  piped daylight.
-
 ### Reef House workshop (Talisa, Arimu, Kaluja)
 
 - A wet building 12 × 9 m in the garden ring.
@@ -142,8 +159,48 @@ human city; boxes.
 
 ### Kraken lookout (Ikara)
 
-- A slender tower 14 m tall at the city's edge, with a glazed watch chamber at
-  the top facing the Kraken's route.
+- A glass watch room (10 by 7 m) on the parapet over the main sea gate, facing
+  the islands and the Kraken's water. It is reached across the roof from the
+  fountain. Ikara keeps the rota from the Watch Room, the crown hall on the
+  112.5 trunk.
+
+### The walls and the roof
+
+- Two stones, one manner. Below 74.5 m (2.5 m above the waterline) is the dark
+  sea-wall stone in rusticated courses 11 m apart. Above it is the lighter stone
+  with pilasters every 20 m, string courses every 6 m, a cornice and a 1.2 m
+  parapet.
+- The sea gates are SuperEgg leaves (epsilon 4.5) in a dark-stone frame,
+  banded in orichalcum, each with a swim-wicket.
+- The vault is coffered on an 18 m grid, from the soffit at 88 m to the slab at
+  90 m. The piers are 6 m across, dark stone below the water and light above,
+  with flared capitals.
+- **Collision:** walls, parapet, piers, roof slab, basins and pedestals are
+  solid; the roof is a parkour landing surface; the light-well caps and the
+  fountain's glass floor are solid glass. Water sheets and the jet are
+  decorative.
+
+### The fountain
+
+- Four basins in the lighter stone, 40, 26, 14 and 6 m across, on stacked
+  pedestals, with a jet 16 m above the roof. Water falls in a sheet from each
+  lip into the basin below.
+- The lowest basin's floor is glass between 6.5 and 14 m from the centre, over
+  the open column.
+- A line of stepping stones crosses the lowest basin on the north side to the
+  curtain from the second tier. Behind the curtain is a pivoting stone in the
+  pedestal, 2.2 by 3.4 m. No mark shows it.
+- The stone stair winds down a shaft 6.8 m across inside the pedestal and the
+  roof to a landing at the waterline. There the glass central trunk begins.
+
+### The ancient spires
+
+- Seven SuperEgg spires (epsilon 2.6, tapering from a square plinth) in the
+  dark weathered stone, 18 to 48 m tall. Four are broken off at about
+  three-quarters of their height, with a slanted break. Three dark bands are
+  carved round each.
+- They stand where they always stood, at least 3 m clear of everything new.
+  Kelp and sponges may grow on them; no lamp or fitting is fixed to them.
 
 ### Homes (sixteen)
 
@@ -161,6 +218,71 @@ Each household's homes share a type; individual homes vary within it.
 - **Variation axes:** type, the colour of its pearl lamp, the kelp on its shell,
   the tail colours of its residents echoed in a band at the door, and its trade
   at the entrance (sea flowers, shells, charts, scale cloth).
+
+## 2a. The modern kit (third pass, proposed)
+
+Revised after review on 2026-10-13: no cables, stalks, moored bells, legs or
+bird-cage ribs. The modern work is whole bubbles, tunnels and trunks.
+
+### Bubble (landing hall, crown hall, the lookout)
+
+- **Shell:** a whole glass SuperEgg (epsilon about 2.4) with a floor inside.
+- **Glass:** frameless and curved; a broad nacre band at the floor line, which
+  carries the spiral and wave band.
+- **Keel:** a nacre ballast keel under the floor that holds the bubble level and
+  still in the water; nothing hangs it or holds it down.
+- **Floor:** a deck about 1.2 m below the bubble's girth, so the walls lean out
+  above the walking ring.
+- **Entry:** a lock chamber hung under the floor on the city side, clear of
+  the keel: 1.7 m across and 2.4 m tall, an inner hatch in the floor and an
+  outer hatch opening down to the sea, both round in orichalcum rims. The
+  bubble's own air, at a higher pressure than the sea up here, blows it dry.
+  (An open pool would lose the bubble's air.)
+
+### Wrap (the Exchange; each Strangers' House)
+
+- **Shell:** a glass SuperEgg socketed into a nacre ring on the floor, standing
+  at least 1.5 m clear of the heritage it covers. It meets the old work only
+  at a removable nacre collar.
+- **Inside:** the old building stands whole and is used again, dry. Round it
+  are the new floor at 0.6 m and a gallery at 4.4 m where the tunnels arrive,
+  with ramps between them. The new floor is below the datum, so the moon pool
+  stands on a nacre drum whose rim is at the gallery's level, and its well
+  leaves through the glass by a short duct.
+
+### Join (the guest hall)
+
+- Two wraps linked by a new glass room: the common room, a SuperEgg cut level
+  beneath its floor, bridging the avenue at 4.4 m with swimmers passing under
+  it.
+- A moon pool in its floor, at the datum, opens down into the avenue.
+
+### Trunk
+
+- A vertical glass shaft 8 m across, its foot set in an old ring-tower stump.
+- Inside: dry air, one with the tunnels and halls, and a spiral ramp 1.4 m
+  wide round an open centre, in half-turn flights of 32° at most with a landing
+  between flights and at the foot, the landing hall and the crown hall.
+- At the foot, a nacre deck at the datum with an open moon pool in the centre;
+  the stump's old chamber below, flooded, is its well, and the old tower door
+  is where swimmers come in.
+- Broad nacre collars at the landing levels; no ribs.
+
+### Home (wet)
+
+- A nacre SuperEgg (epsilon about 2.0 below, 2.6 above) with a wide glazed
+  front, docked to its landing hall's rim.
+- A level lock chamber in the docking collar leads from the home into the
+  hall: an inner hatch on the hall's side and an outer one on the home's, the
+  hall's air blowing it dry. Swim-in openings at least
+  3 m clear face the open water. Rooms are at least 4 m tall, with woven-kelp
+  screens.
+
+### Tunnel
+
+- A frameless glass tube 4.5 m across with a 3 m flat floor and 3.2 m headroom.
+- A broad nacre collar every 12.8 m.
+- On the floor it rests on the old arcades and bridges.
 
 ## 3. Variation matrix
 

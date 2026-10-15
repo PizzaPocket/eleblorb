@@ -1,5 +1,7 @@
 # Handoff: Snow Village (Ice Kingdom)
 
+> **Snapshot of 2026-10-06, kept for the record.** Current state and next steps: `docs/architecture/settlement_backlog.md` (index rows S1 to S3; sections 2 and 2a). The web build is deprecated.
+
 Status (2026-10-04): rebuilt from one authored plan. `VILLAGE=snow
 tools/check_village_layout.sh` reports 0 failures. Nothing is committed. Same
 publishing and attribution rules as `docs/handoff_ohio_village.md`, same Godot

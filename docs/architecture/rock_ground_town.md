@@ -1,4 +1,4 @@
-# Rock and Ground Kingdom: The Frontier Town
+# Rock and Ground Kingdom: Tennison, the Frontier Town
 
 Status: concept and settlement brief, first pass, for review (2026-10-06).
 Settlement-design stages 1 and 2 (survey and community brief), with the
@@ -68,22 +68,113 @@ The fusion runs through everything:
 - **The livery stable** is also a garage.
 - **The rodeo arena** is also the start of the race.
 
-### The dangerous edge
+### 2a. Mechanical and motor punk (user, 2026-10-12)
 
-Arriving should feel like riding into a movie Western: a wide, quiet street, a
-tumbleweed rolling across it, and someone watching from the saloon gallery.
-- **The gang:** a gang of riders (see the census) loiters at the saloon. Their
-  horse-bikes are tied up outside, revving now and then, and they size up every
-  newcomer.
-- **The sheriff** is outnumbered and knows it.
-- **Wanted posters** on the jail's board are pictures only, never words.
+The town's look is **cowboy punk, mechanical punk and motor punk** together.
+Its technology has real power, electric and battery as much as wind and
+springs, because a dirt bike has a motor. What sets the look is that the
+machinery is **open**:
+- gears, cogs, ratchets, cams, chains and sprockets;
+- finned motor casings, exhausts and heavy cables in braided sleeves;
+- big knife switches and analog gauges with needles;
+- flywheels and leather belts.
 
-Nothing explains the tension; the player reads it. What the gang wants, and
-whether the Demon King's discord is behind it, is open.
+Nothing hides behind a smooth panel or a screen. This sets the town apart
+from the Fire city's steel and glass and from the sea folk's sealed
+engineering.
+
+**The rule.** Every gear, motor and cable does work. They are seen because the
+machines are built open, as a garage or a bike shop leaves them, not because
+cogs are glued onto walls and hats as ornament. A gear that turns nothing is
+excluded, as the interior-design skill already excludes fake pipes.
+
+**Power:**
+- **Batteries and motors** run the dirt bikes and the cyborg horses' bike
+  form. They charge at the livery's charging posts.
+- **Wind.** Steel-bladed windpumps (the kind still standing all over West
+  Texas) pump water, turn line shafts, and drive the dynamos that charge the
+  batteries and light the town.
+- **Springs** wind the hats and the clockwork.
+
+**Where it shows:**
+- **The horses.** Geared joints in the lower legs, and an exposed motor and
+  chain drive in the bike form (section 4).
+- **The hats.** A ratcheting, spring-wound fan of brim segments (section 5).
+- **The livery and garage.**
+  - An overhead **line shaft** turned by the windpump, with belts down to a
+    lathe, a drill press and a grinder.
+  - **Charging posts** with knife switches and needle gauges, cables hanging
+    in loops.
+  - Gears racked by size, chains on hooks, a motor stripped on the bench, a
+    horse leg with its cover off.
+- **The water tower and windpump.** The geared head turns into the wind,
+  pumps the well into the tank, and turns the dynamo for the street's strings
+  of bulbs.
+- **The mine.** A geared **hoist** at the portal, ore carts on rails, a small
+  **stamp mill** at the ore house (a camshaft lifting five iron stamps to
+  crush ore, a clatter heard down the mine road), and electric lamps in steel
+  cages on a cable.
+- **The race barn.** Dirt bikes up on stands with their engines open, the
+  smell of oil, and a tall clockwork **race clock** with a geared dial and
+  drop numbers. The starting gate is released by a falling weight and a cam,
+  so every race starts with the same clank.
+- **The saloon.** A **player piano** with its roll turning behind the glass,
+  ceiling fans on a belt, and spring-hinged swinging doors.
+- **The rodeo arena.** A geared, motor-driven **mechanical bull** that the
+  gang runs for newcomers.
+- **The shops.**
+  - The general store's mechanical cash register.
+  - The assay office's geared balance.
+  - The jail's heavy cell lock.
+  - Inez's hat shop, with a watchmaker's bench of springs and tiny gears.
+- **The jail.** A radio mast, and a **heliograph** with geared mirrors for
+  signalling the ranch and the mine when the radio is out.
+
+**Materials:**
+- blackened and oiled iron and steel;
+- worn chrome on engines and exhausts;
+- brass on fine mechanisms (hats, clocks, gauges);
+- leather for belts, straps and seats;
+- rubber-sleeved cable;
+- timber for frames and housings.
+
+**Two scales: heavy machinery and fine clockwork (user, 2026-10-12).** Beside
+the motors, belts and stamp mill, the town loves **watch gears and clockwork**:
+small brass wheels, escapements, balance wheels, mainsprings and jewelled
+pivots, worked under a loupe. The fine scale shows in:
+- **Inez's hat shop**, the town's watchmaker as well as its hatter. Her bench
+  holds a loupe, tweezers, trays of tiny wheels and springs, a hat with its
+  band open to show the winding train, and pocket watches in for repair.
+- **The hats.** Each brim's ratchet and spring is watch-fine work, wound at a
+  small crown on the hat band, and the change runs with a quick tick.
+- **The horses' joints.** The small gear trains seen through the cut-outs at
+  the fetlock are watch-scale, under glass.
+- **Clocks:**
+  - the race clock's visible escapement and swinging pendulum;
+  - a tall case clock in the saloon;
+  - a clock in the assay office's window.
+- **People.** Pocket watches on chains are everyday wear, opened to show their
+  movement. Inez repairs them all. Gus carries one that has not run in
+  twenty years.
+
+**On dress, an honest exception to the rule.** A gear on a machine must
+turn something. A gear worn as **jewellery** is a different thing: a person's
+adornment made from salvaged watch parts. Allowed:
+- a bolo tie slide set with an old balance wheel;
+- cufflinks of watch wheels;
+- spur rowels cut like gear wheels, which click as their wearer walks.
+
+These belong in the town's dress charter when it is written
+(`character-design` skill). They are never glued onto buildings.
+
+**Sound** is part of it: motors revving at the race barn, ticking clocks and
+watches,
+ratchets, the stamp mill's beat, the windpumps' creak, and the click of a hat
+changing.
 
 ## 3. Community (proposed census, 2026-10-06)
 
-Eighteen residents in twelve households. The eight rock-named residents are
+Nineteen residents in fourteen households (revised 2026-10-12: the earth-science residents added; Ike Pruett and Dutch Raker cut by the user). The eight rock-named residents are
 replaced: their names belonged to the earlier earth-and-stone concept.
 **Dolma Hearthstone keeps her name and her house**, which becomes the saloon
 and hotel.
@@ -94,8 +185,7 @@ Black cowboys, about one in four of the real trail hands.
 
 | Resident | Gender | Household | Role |
 |---|---|---|---|
-| **Dolma Hearthstone** | woman | the saloon | keeps the saloon and hotel: the town's social centre and its rest point |
-| **Ike Pruett** | man | the saloon | Dolma's husband; tends bar and plays the saloon piano |
+| **Dolma Hearthstone** | woman | the saloon | keeps the saloon and hotel alone: tends the bar, cooks, keeps the desk and the books; the town's social centre and its rest point (building brief: `rock_ground_saloon.md`) |
 | **Ruth Calloway** | woman | the jail | the sheriff, outnumbered by the gang and unbending anyway; lives above the jail |
 | **Amos Bell** | man | the Bell ranch | rancher and wrangler; breaks in young cyborg horses |
 | **Cora Bell** | woman | the Bell ranch | Amos's wife; horse trainer and the best judge of a horse in town |
@@ -109,13 +199,23 @@ Black cowboys, about one in four of the real trail hands.
 | **Lark Delgado** | woman | the race barn | the town's champion rider and race marshal |
 | **Cass Rourke** | woman | the mine house | the town's **miner** and mine foreman: works the Silverback mine in the canyon wall with a drill, a pick and an ore cart, and keeps its timbers sound; added 2026-10-07 |
 | **Gus Pickett** | man | his shack | the **old prospector**: fifty years walking the canyons and the fossil basin, knows Dinosaur's bones; never seen without his battered, sweat-stained **prospector's hat** (a wide, floppy-brimmed slouch hat with a dented crown), a pan and a pickaxe on his mule-sized cyborg burro |
-| **Jessup Kane** | man | the gang | leader of the riders who hang around the saloon |
-| **Dutch Raker** | man | the gang | the gang's muscle |
+| **Dr. Hazel Coleman** | woman | the bone camp | the **paleontologist**, added 2026-10-12: has spent eleven years on Dinosaur's bones at a camp on the fossil basin's rim, measuring, sketching and plastering them; buys her plaster and burlap from Walt and forgives Gus for using the first toe bone he found as a doorstop |
+| **Tomás Reyes** | man | the assay office | the **geologist** and surveyor, added 2026-10-12: Pearl Dunaway's husband; reads the canyon's banded layers like pages, keeps a cabinet of labelled stones, and tells Cass where the silver ought to run |
+| **Della Lusk** | woman | the race barn loft | the **track boss**, added 2026-10-12: builds and grooms the race course and loves dirt: mixes clay for grip and sand for drainage, reads a track by its colour, and rakes out the gang's ruts every morning |
+| **Jessup Kane** | man | the gang | leader of the two riders who hang around the saloon; he and Sadie rent the hotel's big back room by the week and pay late |
 | **Sadie Vex** | woman | the gang | the gang's fastest rider, and Lark's rival |
 
 ### Livelihood
 
 - **Ranching** cyborg horses: breeding, breaking, training, selling.
+- **Earth science** (user direction, 2026-10-12): a town on rock and dirt
+  has people who love them.
+  - **Tomás Reyes**, the geologist, maps the strata and finds the mine its
+    seams.
+  - **Della Lusk**, the track boss, knows every kind of dirt by hand.
+  - **Dr. Hazel Coleman**, the paleontologist, studies Dinosaur's bones.
+  - Pearl's assay office doubles as Tomás's survey office: its back room
+    holds his sample cabinet, maps and a hand lens.
 - **The livery and garage:** shoeing, repair, tuning.
 - **Mining** (user direction, 2026-10-07): the town's working backbone.
   - **The mine:** Cass Rourke runs the **Silverback mine**, a timbered tunnel
@@ -129,7 +229,9 @@ Black cowboys, about one in four of the real trail hands.
   - **The store:** Walt sells the miners' tools, candles and lamp oil. The
     general store's stock and the assay office's money depend on the mine.
   - The mine is one more reason for the town's love of machines. Its ore carts
-    run on rails, its lamps are electric, and Mateo maintains its winch.
+    run on rails, a geared hoist and a windmill-driven stamp mill do the heavy
+    work, its lamps are electric in steel cages, and Mateo maintains the
+    machinery.
 - **The saloon and hotel.**
 - **The general store.**
 - **Dirt-bike racing:** the town's passion, run from the race barn.
@@ -138,6 +240,49 @@ Black cowboys, about one in four of the real trail hands.
 
 Sheriff Calloway keeps the law. Town matters are argued out in the saloon,
 where everyone ends up anyway.
+
+### 3a. Draft lines for the earth-science residents (2026-10-12)
+
+Written to the `npc-dialogue` skill: in the moment, never reciting a role.
+No line hints at how Dinosaur could rise.
+
+**Dr. Hazel Coleman**, before Dinosaur rises:
+- "Don't step on the string. Every square in that grid is a week of my life."
+- "Forty-one ribs so far. Every one of them longer than my wagon."
+- "Bones this old ought to be scattered by floods. His are just lying down,
+  like he got tired."
+- "Gus found the first toe bone fifty years ago and used it as a doorstop. I've
+  forgiven him. Mostly."
+
+**Dr. Hazel Coleman**, after Dinosaur rises (a revisit state, backlog item
+13):
+- "Eleven years I measured his ribs. Now he breathes with them. I can hear it
+  from camp."
+- "My notebooks are all wrong about how he walks. I've never been happier to
+  be wrong."
+- "He stepped over my tent this morning. Carefully. I'm choosing to believe it
+  was carefully."
+
+In that state her camp changes too: the grid strings are down, the plaster
+jackets are open and empty, and she sketches him alive from the rim.
+
+**Tomás Reyes:**
+- "See that pale band halfway up the canyon? Water lay here once. Climb up
+  and you'll find its shells."
+- "Every layer's a page. The canyon's a book with the cover torn off."
+- "Cass wants to know where the silver runs. The rock tells you, if you're
+  patient. Cass isn't patient."
+- "Pick that one up. No, the red one. Feel how heavy? Iron."
+
+**Della Lusk:**
+- "Careful, I just raked the start straight. Give it till sundown and it'll
+  hold."
+- "Clay for grip, sand so it drains, a bit of crushed rock off the mine tips.
+  Don't let anyone tell you dirt's just dirt."
+- "You can read a track by its colour. Dark means wet. Wet means you're going
+  down."
+- "The gang tears it up every night. I fix it every morning. That's the deal
+  nobody agreed to."
 
 ## 4. The cyborg horses
 
@@ -148,12 +293,17 @@ racing** they transform into dirt bikes.
 
 - Built on Manchego's functional design and the shared `HorseFigure` rig, in
   the town's own coat colours: duns, bays, sorrels, greys and paints.
-- **Subtly visible cybernetics on the lower half:**
+- **Subtly visible mechanics on the lower half:**
   - plated cannon bones;
-  - metal fetlock joints;
+  - **geared fetlock and knee joints**, small gear trains and a ratchet
+    showing at each joint through cut-outs in the plating;
+  - piston-and-rod tendons down the back of the legs;
   - hooves with a machined rim;
-  - thin glowing seams where the plating meets the coat;
-  - a faint panel line along the belly.
+  - a faint panel line along the belly, where the bike form's motor, battery
+    and chain fold away.
+
+  The machinery is oiled steel, a little brass and worn chrome; it is
+  mechanical in look, not glowing or screen-like.
 
   The upper body, neck and head stay fully horse.
 - Tied at hitching rails outside the saloon, at the livery, in the ranch corral.
@@ -170,10 +320,21 @@ When a rider mounts and prepares to race:
 
 The result is a dirt bike with a horse's head, mane flying.
 
+**What drives it: a motor.** In the bike form an electric motor and battery
+pack sit in the horse's barrel, open to view in the motor-punk way:
+- a finned motor casing;
+- heavy cables in braided sleeves;
+- a chain and sprockets to the rear wheel;
+- a needle gauge on the battery's charge by the reins.
+
+The horses charge at the livery's posts.
+
 ### Design notes
 
-- The change is a short, mechanical sequence: plates sliding, legs folding,
-  wheels spinning out. It is not a puff of smoke.
+- The change is a short, mechanical sequence: ratchets clicking, plates
+  sliding on geared hinges, legs folding on linkages, wheels swinging out on
+  their arms, the chain dropping onto the sprockets. It is not a puff of
+  smoke.
 - The bike form should read as kin to the Ground suit's own dirt bike: the same
   wheel proportions and the same dirt.
 - **Gameplay is open.** Can the player ride one? Do they race the gang or
@@ -214,11 +375,15 @@ experts, the hero can make him full size.
 
 ## 5. The cowboy hat helm
 
-The town's headgear is advanced technology:
+The town's headgear is clockwork:
 - **At rest** it is a **cowboy hat**.
 - **When its wearer rides** it shifts into a **dirt-bike helmet**: a full
   shell with a chin bar and a projecting peak visor that gives the classic
   dirt-bike silhouette.
+- **The change.** The brim is a fan of overlapping segments on a ratchet, wound
+  like a watch by turning the hat band. When the wearer rides, a catch
+  releases the spring: the segments fan down and round into the shell, and
+  the peak swings forward, with a run of clicks.
 - The face opening is **punched out by Boolean subtraction**, the same
   technique as the Space Helm's visor.
 
@@ -289,12 +454,14 @@ this is a deliberate fusion.
   house). Pedimented door cases, square columns, symmetrical fronts.
   Jefferson's **cast-iron gallery** for the saloon and hotel's two-storey
   porch.
-- **Accent, about 5 percent: the modern layer.** It is visible but never
-  dominant:
-  - the livery's garage bay with its tool racks and charging posts;
-  - the race barn's timing tower;
-  - strings of electric bulbs over the street;
-  - a radio mast on the jail.
+- **Accent, about 5 percent: the mechanical layer** (section 2a). It is
+  visible but never dominant:
+  - the livery's garage bay with its line shaft, belts and charging posts;
+  - the race barn's open engines on their stands;
+  - the race barn's clockwork race clock;
+  - windpumps over the well, the ranch and the ore house;
+  - strings of bulbs over the street, lit from the windpump's dynamo;
+  - the radio mast and heliograph on the jail.
 - **Palette:** weathered timber greys and browns, faded paint (oxblood, mustard,
   sage, dusty blue) on the false fronts, warm red brick, sandstone, black iron.
 - **Exclusions:**
@@ -302,6 +469,9 @@ this is a deliberate fusion.
     concept;
   - Spanish mission churches;
   - neon;
+  - decorative cogs that turn nothing;
+  - screens, glowing panels and smooth sealed casings: power is shown, not
+    hidden;
   - glass towers;
   - anything that makes the modern layer the main look.
 
@@ -310,8 +480,9 @@ this is a deliberate fusion.
 - **Main street:** the arrival road becomes the street, with the boardwalk
   along both sides.
 - **The saloon and hotel, the town's inn** (confirmed 2026-10-07): the inn is
-  integrated into the saloon, at the head of the street, facing down it: the
-  social centre and the rest point.
+  integrated into the saloon, on the well square at the middle of main street,
+  its porch facing the road (revised 2026-10-12; see 6a): the social centre
+  and the rest point.
   - Saloon below, with its bar, piano, card tables and swinging doors.
   - Hotel rooms above, with the party room.
   - A modern washroom with a porcelain toilet: the town is layered present-day,
@@ -329,6 +500,19 @@ this is a deliberate fusion.
 - **The Bell ranch** and corral on the edge of town.
 - **Gus's shack** on the road toward the fossil basin, with a sluice box and
   a panning trough beside it.
+- **Hazel's bone camp** on the fossil basin's rim, where she can see the
+  whole skeleton (added 2026-10-12):
+  - a canvas wall tent and a plank work shed;
+  - a dig grid of stakes and string over the nearest bones;
+  - plaster-jacketed bones on pallets, sieves, and a hand-cranked sieve shaker
+    on gears;
+  - a drafting table under an awning, weighted with stones, with her bone
+    drawings;
+  - a camera on a tripod;
+  - a water barrel she fills in town.
+- **Della's track gear** at the race barn: a drag rake a cyborg horse pulls, a
+  water cart filled from the windpump tank, and heaps of sorted clay, sand
+  and crushed tip rock.
 - **The mine** (added 2026-10-07), on the Rock half's canyon wall nearest
   town, reached by the mine road:
   - the **adit**: a timbered portal into the rock, with posts, a cap beam and
@@ -361,7 +545,7 @@ this is a deliberate fusion.
      - About 20 m long, with a gentle bend, so the end is out of sight from
        the portal.
      - Timber sets (two posts and a cap) every 2 m, the ore-cart rails, and
-       electric lamps on a cable.
+       electric lamps in steel cages on a cable.
      - The tunnel ends at a working face with Cass's drill and an ore cart.
        Anything deeper is open.
   3. **The ground under it.** The heightfield is lowered or excluded under the
@@ -381,9 +565,76 @@ this is a deliberate fusion.
   **Decided (user, 2026-10-07):** build the full 20 m tunnel first and judge
   how it feels in play. (The fallback of a portal and 5 m of tunnel ending at
   a barred gate stays in reserve.)
-- **The water tower and windmill pump** over the existing well, which stays
-  where it is.
+- **The water tower and windpump** over the existing well, which stays where
+  it is. Its geared head also turns the livery's line shaft and the dynamo that
+  charges batteries and lights the street.
+- **The stamp mill** at the ore house, under its own windpump.
 - **Hitching rails** outside the saloon, the store and the jail.
+
+### 6a. Town layout concept: a strip on a through road (2026-10-12)
+
+**Why it changed.** The first sketch put the saloon at the head of main
+street, facing down it. That makes main street a dead end, with the saloon
+blocking it. A town whose culture is dirt bikes and motor horses grows along
+a road that goes somewhere, as the Route 66 and highway towns of Texas did
+along their roads. Traffic passes through it and stops.
+
+**The through road.** One kingdom road links everything the town lives on.
+
+| Section | From | To | Why people use it |
+|---|---|---|---|
+| **Mine road** | the town's west end (-222,100) | the Silverback mine on the canyon's east wall (about (-294,112)) | Cass, the ore carts and the miners; ore comes into town at the west end |
+| **Main street** | west end (-222,100) | east end (-88,100) | the town itself |
+| **Arrival road** | east end (-88,100) | the arrival shelf and the gate at the kingdom's centre | everyone arriving or leaving |
+| **Basin road** | the arrival shelf | Gus's shack and Hazel's bone camp on the fossil basin's rim | Gus, Hazel, supplies out and specimens in |
+
+Main street runs east–west across the shelf, about 8 m south of the old well
+at the shelf's centre. So the well stands on the street's north side, not in
+the road.
+- **Carriageway:** 8 m, wide enough for two bikes or two horses to pass a
+  parked rig.
+- **Boardwalks:** a covered boardwalk on each side, about 3 m.
+- **Total:** about 14 m between building fronts, over a length of about
+  135 m.
+
+**Order along the street, west to east.** Ore and miners come in from the
+west, and travellers from the east.
+
+| | North side | South side |
+|---|---|---|
+| West end, by the mine road | **General store** (Walt): miners' tools and supplies, first stop off the mine road | **Doctor's and barber's** (Hollis) |
+| | **Assay office and bank** (Pearl), with **Tomás's survey room** behind: the ore wagons unload at its side yard off the back lane | a house plot (open, for the census's homes) |
+| | **Jail** (Ruth), with the radio mast and heliograph, looking onto the square | — |
+| Middle | **The well square**: a widening of the north boardwalk around the old well, with hitching rails and bike stands. The **saloon and hotel** fills the square's north side, its two-storey porch facing the square and the road. The gang sits on that porch watching every rider who passes, which gives arrival its dangerous edge without blocking the road. | **The water tower and windpump** opposite the square, its tank shading the street; the lane south to the Bell ranch leaves beside it |
+| | — | **Saddlery** (Wes) |
+| | — | **Hat shop** (Inez) |
+| East end, the town's front door | the east end's north corner stays open as the view into town | **Livery and garage** (Mateo) with its **charging posts** at the kerb: the first thing an arriving rider reaches, like a filling station at a town's edge |
+
+**Behind the street.**
+- **Back lanes** run behind both rows: deliveries, the ore wagons to the
+  assay yard, and the residents' yards and sheds.
+- **The race barn and rodeo arena** (Lark, Della) stand south-east, behind
+  the livery, reached by a side lane at the east end. The race course leaves
+  the arena across the flats and loops round the fossil basin's far rim,
+  staying south and east of the through road. It never uses main street and
+  never crosses the road. A stage through the southern half-pipe canyon is
+  open: it would have to stay south of the mine road.
+- **The Bell ranch and corral** lie south of the shelf, down the lane by the
+  water tower, with their own windpump.
+- **Homes** sit above shops and on the open plots, sized in the measured
+  layout.
+
+**Why this holds together.**
+- Every trade sits where its traffic arrives: the store and the assay office
+  by the mine road, the livery by the arrival road.
+- The saloon is on the square at the centre, where every traveller passes it
+  and where the street widens to let people gather off the carriageway.
+- Nothing blocks the through road, and nothing faces away from it.
+- The race traffic stays off main street.
+
+The measured layout (plots, footprints, yards and lane widths) follows when
+the town brief is approved. The 68 m shelf must be checked against these
+frontages then.
 
 ## 7. Landscape direction
 
@@ -433,14 +684,32 @@ integrated into the saloon.
 no holsters, gun belts, rifles on racks or shoot-outs. The Western menace comes
 from horses, riders, stares and races instead.
 
+**Fixed (user, 2026-10-12):** the look is mechanical punk and motor punk as
+well as cowboy punk, with watch gears and clockwork as a fine-scale part of
+it. Electric and battery power exist, since dirt bikes have
+motors, but machinery is shown open, with gears in view. The details are
+proposed in section 2a.
+
 **Proposed:**
-- the census of eighteen, replacing the eight rock-named residents;
+- the mechanical and motor layer in section 2a:
+  - battery, wind and spring power, shown open;
+  - the horses' geared legs, and their bike form's exposed motor and chain
+    drive;
+  - the clockwork hat;
+  - the line shaft, charging posts, stamp mill, race clock, player piano,
+    mechanical bull and heliograph;
+- the census of nineteen (Ike Pruett and Dutch Raker cut, 2026-10-12), replacing the eight rock-named residents,
+  including the earth-science residents added 2026-10-12: Dr. Hazel Coleman
+  (paleontologist, the bone camp), Tomás Reyes (geologist, with Pearl at the
+  assay office) and Della Lusk (track boss);
+- the bone camp on the fossil basin's rim, and the draft lines in 3a;
 - the Silverback mine, Cass Rourke the miner, and Gus's cyborg burro;
-- the Kane gang;
+- the Kane gang, now two riders: Jessup Kane and Sadie Vex;
+- the saloon and hotel's building brief (`rock_ground_saloon.md`);
 - Wes Tolliver the saddle maker and the shifting saddle for Manchego;
 - the cowboy hat as the Ground suit's helm, shifting with `DirtbikeMode`;
 - the architectural charter direction;
-- the places list;
+- the places list, laid out as a strip on the kingdom's through road (6a);
 - the race course;
 - the Chihuahuan palette;
 - the porcelain toilet.

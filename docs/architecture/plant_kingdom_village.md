@@ -253,7 +253,7 @@ from.
 | Ossian | Ossian | lean-to |
 | The inn | Bima | commons |
 
-### Lines rewritten for clarity (proposed 2026-10-06)
+### Lines rewritten for clarity (approved 2026-10-12, in code)
 
 Two existing lines talked about "whoever's running" the training grounds, as
 if nobody knew. The plan was unclear, not the villagers. Batu runs it, and
@@ -264,7 +264,10 @@ everyone knows. The mystery is the dummies themselves.
 | **Batu** | "The training dummies out past the clearing used to get more use. Whoever's running that business isn't telling anyone how." | "Used to be half the floor came out to my yard to hit the dummies. Now nobody comes. Can't say I blame them, after dark." |
 | **Intan** | "The training grounds down below have gone quiet lately. Whoever's running that dummy business isn't telling anyone how." | "Batu's yard has gone quiet. He still goes into that shed of his every night, and he doesn't come out till dawn." |
 
-Both keep their second lines. Batu's is about the curse. Intan's stays: "Don't
+In code (2026-10-12) each new line replaced its speaker's first line in
+`scripts/jungle_kingdom_village.gd`, and both keep the second lines the
+dialogue audit gave them. The note below is from the first draft. Intan's
+earlier second line was: "Don't
 wander near the practice dummies after dark. I've heard they don't stay
 dummies forever." It is atmosphere, and it never states how or when a dummy
 wakes.

@@ -145,7 +145,8 @@ follows his legend closely:
    champions to a standstill with the Jingu Bang.
 4. **The sealing.** All six courts met in the Hall of Assembly on Koinon, the
    only time in living memory they acted together, and sealed him beneath a
-   rock on a high plateau below them, long before anyone lived there. The
+   rock on a high plateau below them (kept for now, 2026-10-12; the lore is
+   to be revisited, since he was born from a rock), long before anyone lived there. The
    plateau later broke into the floating islands of the Chinese village, and
    the rock now stands on Lantern Row. They bound the seal so that only one of his own
    monkeys could lift it, sure that none would ever come looking for him. That
@@ -395,8 +396,15 @@ It takes light like marble and glass at once. It is never a floor.
 
 The courts build as if weight were optional, within rules a player can learn:
 
-- **Floating roofs:** a roof hovers a short, clear gap above its colonnade,
-  held by gold pins of light, so sky shows between capital and eave.
+- **Cloud capitals** (revised 2026-10-14, replacing floating roofs held by
+  gold pins of light, which read as spikes on the columns and weakened them):
+  every column is a strong quartz shaft, and what it carries is cloud. On the
+  Greco-Roman buildings the capital is a cushion of set cloud swelling out of
+  the shaft under a thin gold abacus, and the roof rests on it; on the Chinese
+  buildings a gold bracket set (*dougong*) carries the eave instead. The
+  height of the capital or bracket set is the building's rank: 0.6 m on
+  ordinary buildings, 1.0 m on a court's principal building, 1.6 m on the
+  Hall of Mist. No pins, spikes or finials stand on a column.
 - **Hanging columns:** some columns hang from a roof and stop short of the
   floor, ending in gold finials.
 - **Drifting stairs:** stairs of separate set-cloud slabs float in sequence
@@ -429,8 +437,7 @@ collision policy:
 - Floating furniture and slabs may bob, but slowly and by a few centimetres at
   most. Anything that moves farther is a real moving platform with carry
   behaviour, not a visual drift with static collision.
-- A floating roof's gap and a hanging column's missing base are visual
-  statements. Rooms under them still need full headroom and clear routes.
+- A hanging column's missing base is a visual statement. Rooms under them still need full headroom and clear routes.
 - Bank cloud keeps the current pad collision approach: the walkable surface is
   a simplified collider that matches the visible top.
 - Everything, NPCs and tripods included, remains gated on the Bird Helm.
@@ -449,7 +456,7 @@ Only fruit and some blossoms carry their own colour.
 | Cloud willow | weeping crown whose long strands thin out and fade before they touch anything | none | beside nectar terraces and the odeon |
 | Tier pine | flat, stacked layers like stratus decks | none | Koinon, framing the empty hall; Aethra's axis |
 | Puff shrub | low, round cumulus bushes, clipped into hedges | none | court thresholds and garden edges |
-| Cloud wisteria | trailing blossom over colonnades and floating roofs | faint dawn pink and lavender blossom | Lyria, Pantao |
+| Cloud wisteria | trailing blossom over colonnades and eaves | faint dawn pink and lavender blossom | Lyria, Pantao |
 | Undercloud vine | hangs from an island's underside toward the light reflected from below | pale gold berries | beneath the Orchard and Chrysas |
 | Sky lily | flat leaves and cup flowers floating on shallow pools of set cloud | pale gold or white flowers | Koinon's empty hall, Aethra's forecourt |
 
@@ -461,19 +468,19 @@ strands, blossom and vines are decorative.
 
 This split is deliberately closer than the usual 75/20 charter. Cohesion comes
 from shared invariants instead: quartz shafts, gold capitals and bases, the
-floating roof gap, superellipse openings, the gold-banded cloud podium and the
+cloud capitals (gold bracket sets on the Chinese buildings), superellipse openings, the gold-banded cloud podium and the
 palette. No single building uses both traditions' roof and wall systems.
 
 - **Primary, about 55 percent: Greco-Roman celestial classical.** Peristyle
   courts, round tholos pavilions, colonnades and exedrae, porches with
   pediments reduced to soft SuperEgg forms, an odeon, a racing ring, banquet
   couches and colonnaded nectar terraces. Quartz shafts, gold capitals and
-  bases, floating roofs. It governs Chrysa, Lyria, Koinon and Dromos,
+  bases, roofs resting on cloud capitals. It governs Chrysa, Lyria, Koinon and Dromos,
   every residence and terrace, and the kingdom's overall feel.
 - **Secondary, about 35 percent: the Chinese celestial palace.** It governs the
   places that carry Sun Wu Kong's story: the Dawn Gate after the Southern
   Heavenly Gate, Aethra's Hall of Mist on its stepped cloud podium with
-  floating double eaves, and Pantao's Peach Garden and banquet hall.
+  a double eave (*chongyan*), and Pantao's Peach Garden and banquet hall.
   Elsewhere it appears only as named details: moon gates of set cloud and
   upturned eave corners on gate pavilions. Quartz replaces red-lacquered
   timber; gold replaces painted brackets.
@@ -482,10 +489,17 @@ palette. No single building uses both traditions' roof and wall systems.
 - **Palette:** 60 percent quartz white and cloud white, 30 percent pale sky
   pastels on woven cloud and Tempestar clothing (the prototype's sky blue,
   dawn pink, gold dawn, lavender, mint and peach), 10 percent gold.
-- **Hierarchy:** podium height and the width of the floating gap between
+- **Hierarchy:** podium height and the height of the cloud capital or bracket set between
   columns and roof show rank. Aethra's Hall of Mist stands highest and has
-  the kingdom's only double floating eave. Ordinary residences are small
+  the kingdom's only double eave. Ordinary residences are small
   tholoi or moored rooms.
+- **One tradition per building** (user, 2026-10-14): a building is Greek or
+  Chinese, never both. A Greek building has a low gable whose ends are
+  pediments, a dome or a flat cap, and cloud capitals; a Chinese building has
+  a hip-and-gable (*xieshan*) roof with eaves on all four sides and lifted
+  corners, its gables small and set back under the ridge, never a
+  full-width pediment, on round gold drum bases and gold bracket sets. The
+  Hall of Mist is Chinese.
 - **Exclusions:** no copied real temple, shrine or sacred emblem; no altars,
   statues of gods or worship spaces; no Buddhist imagery from the legend's
   sealing (here the courts themselves sealed him); no heavy masonry walls; no solid gold

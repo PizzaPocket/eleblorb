@@ -91,6 +91,161 @@ Detail and per-building forms: `docs/architecture/fishing_village_buildings.md`.
 - **Exclusions.** Sealed boxes; Peranakan shophouse facades; clan temples or sacred roofs; brick or masonry walls; lights on poles; uniform brown; plain unclipped roof slabs; SuperEgg props standing in for rock.
 - **Doors and openings face the route that serves them** (the layout's route ledger), the veranda faces the water court or landing, and service sides face outward.
 
+## Moy: Old Moy (the well town)
+
+**Status: proposed, 2026-10-13.** Brief: `docs/architecture/moy_tower_house.md`.
+Precedent: the highland Yemeni tower house (old Sana'a, Wadi Dhahr, Sa'dah's
+coursed-earth houses) and Shibam's close-packed towers (user's reference
+photos, 2026-10-13: a single Wadi Dhahr tower and a view of old Sana'a).
+
+- **Primary (about 75 percent): highland Yemeni tower house.** Narrow towers
+  of 4 to 9 storeys on a base of dark stone (most) or of battered,
+  round-cornered rammed earth (*zabur*, the oldest), with upper storeys of
+  fired brick banded at every floor in white gypsum friezes, with white-outlined windows under semicircular
+  fanlights (*qamariya*), and a flat roof terrace behind a crenellated
+  parapet with horned corners.
+- **Secondary (about 20 percent): the Persian wind tower (*badgir*), on the
+  roof only.** One-sided catchers turned to the steady west wind, standing
+  over each house's ramp core, which serves as the house's air shaft.
+- **Accent (about 5 percent, landmarks only):** stained-glass qamariya lit
+  from within at night, on the oldest houses facing squares (the first-well
+  house on Cinema Square, Pinestein's building, Sol's café).
+- **Kit of parts.**
+  - Roof: **flat terrace only**, drained by projecting spouts (*mizab*);
+    parapet 1.2 m, crenellated, whitewashed horns at the corners; a roof
+    kiosk over the ramp core; optionally a *manzar* (rooftop room).
+  - Walls: **stone plinth 0.9 m**, then one of two bases: **stone** (most
+    houses), coursed dark basalt with pale ashlar bands, 0.7 m, plumb,
+    square corners, 1 to 3 storeys; or **zabur** (the oldest, about one in
+    five), 0.65 m lifts battered about 1.5 degrees, 0.9 m thick at the
+    ground, free corners rounded (superellipse) with each lift's ends turned
+    up, 2 to 4 storeys, under a white gypsum cornice. **Fired brick above**,
+    0.45 m, plumb.
+  - Bands: white gypsum (*nura*) friezes at every brick floor from a closed
+    set (zigzag, chevron chain, roundel row, dentil course); roundel panels
+    between windows on polite houses.
+  - Windows: small deep square lights in the base; in the brick, a
+    tall window (1.0 × 1.6 m) under a qamariya fanlight (0.5 m radius), every
+    one outlined in white gypsum; the top floor (*mafraj*) has low wide
+    windows, sills at 0.4 m, for sitting on floor cushions.
+  - Projections: the *kishk*, a plastered box window on brackets
+    (1.2 × 1.6 × 0.6 m); the old latrine shaft, a plastered chute up a side
+    or back face, now carrying the soil stack; white drainpipes from the
+    spouts.
+  - Doors: a heavy carved timber house door in a superellipse-headed
+    opening with a gypsum surround and the **house mark** painted above it;
+    painted leaves in blue, green or ochre. Shopfronts cut into the base
+    later: a wide opening on a timber lintel with folding shutters.
+  - Signature motif: **white gypsum outlines on every opening and band,
+    and the painted house mark over every door.**
+  - Palette: basalt grey-brown, earth ochre and brick red-brown (60 percent), gypsum white
+    (30 percent), accents (10 percent): painted doors, coloured fanlight
+    glass, the house marks.
+- **Hierarchy.** Polite: the old merchant houses on squares and main
+  streets (brick relief panels on every storey, a kishk, stained glass).
+  Vernacular: the rest (relief on the top storey only, plain glass).
+- **Exclusions.** No pitched roofs or roof tiles (tiles belong to the later
+  pencil infill, a separate kit), no domes or horseshoe arches, no Cairene
+  timber mashrabiya, no lettering on any sign or house.
+
+### Old Moy variation matrix (the shared language above is fixed)
+
+| Axis | Range | Reason it varies |
+|---|---|---|
+| Storeys | 4 to 9 | how much the family built, and when |
+| Base | stone, 1 to 3 storeys (most); earth, 2 to 4 storeys and never above two-thirds of the height (about one in four) | the oldest houses, round the first well, were raised in earth; later ones on stone |
+| Corner | rounded only on earth bases where two faces are free; square on stone | how each material is built |
+| Friezes | four band patterns, one or two a floor | each family's ornament |
+| Kishk | 0 to 2, upper floors only | wealth and which rooms face the street |
+| Wind tower | on the core, mouth west; at the front or back of the roof | follows where the core stands |
+| Manzar | about one house in four | a later rooftop room |
+| Parapet | three crenellation patterns | each builder's family pattern |
+| Ground floor | shopfront on main and shopping streets, house door only on lanes | the modern layer |
+| Kit | tower house on lots 6 m or more across; the tiled pencil infill on narrower ones | the narrowest lots were filled last |
+| Age marks | fresh or faded whitewash, a brick storey added in a different brick, an infilled window | each house's history |
+
+## Moy: the market lanes
+
+**Status: proposed, 2026-10-13.** Brief: `docs/architecture/moy_market_lanes.md`.
+Precedent: Hong Kong's tenement shophouses (*tong lau*) in Sheung Wan, Mong
+Kok and Sham Shui Po, and Tokyo's covered shopping streets (*shōtengai*).
+
+- **Primary (about 75 percent): the Hong Kong tong lau,** in two
+  generations:
+  - **Boom houses** (4 and 5 storeys), built for the Windworks' first
+    workers: rendered walls, a **veranda** on square columns over the
+    pavement on main streets and squares, stacked verandas above it, tall
+    French windows.
+  - **Tile houses** (6 to 9 storeys), built as the city grew: mosaic tile,
+    cantilevered balconies, a concrete canopy over the shopfront, and on
+    corner lots the rounded **Streamline Moderne corner** with curved
+    balconies wrapping it.
+- **Secondary (about 20 percent): the Tokyo shōtengai,** at street level
+  only: the arched translucent roof over Arcade Street through the market
+  lanes, roll shutters and cloth door curtains (*noren*) on the shopfronts.
+- **Accent (about 5 percent):** the night market's lantern strings over
+  Lamp Lane; Wing Fat Mansion as the district's one tall landmark.
+- **Kit of parts.**
+  - Roof: **flat**, a 1.1 m parapet; on it water tanks on stands, laundry
+    frames, a rooftop greenhouse (the boom houses), or a roof garden.
+  - Walls: **render** on boom houses, **mosaic tile** on tile houses, both
+    from one palette; a plinth of granite-grey tile 0.6 m.
+  - Windows: boom houses, tall French windows (1.0 × 2.2 m) onto the
+    verandas; tile houses, wide steel windows (2.0 × 1.4 m) behind the
+    balconies; superellipse corners on all.
+  - Balconies: the veranda (boom), the cantilevered balcony with a steel
+    rail (tile), later enclosures and plant cages on some.
+  - Ground: a shopfront the full width but for the house door; roll
+    shutter, noren or a counter to the pavement.
+  - Signs, the signature motif: **lit picture signs stacked up the facades
+    and hung across the lanes, never lettered** (Zara's).
+  - Exterior life: AC units, laundry poles, potted plants, each where a
+    person would put it.
+  - Circulation: a switchback **ramp core shared by two houses** on their
+    party wall, as tong lau pairs share a stair; houses of 7 or more
+    storeys add a lift in a glass shaft at the back.
+  - Palette: tile and render in cream, mint, salmon, pale blue or grey (60
+    percent); white and grey trim, rails and canopies (30 percent); sign
+    colour, noren and lanterns (10 percent).
+- **Hierarchy.** Polite: houses on Market Square and the main streets
+  (verandas, rounded corners, more signs). Vernacular: the lanes.
+- **Exclusions.** No pitched roofs, no Old Moy gypsum friezes or qamariya
+  (they belong to the well town), no glass curtain walls, no lettering.
+
+### Market lanes variation matrix
+
+| Axis | Range | Reason it varies |
+|---|---|---|
+| Generation | boom house (4 to 5 storeys) or tile house (6 to 9) | when it was built |
+| Veranda | boom houses on main streets and squares | the boom streets had them by rule |
+| Corner | rounded Streamline corner on tile houses with two street faces | corner lots |
+| Colour | five tile and render colours; neighbours differ | each owner's choice |
+| Signs | 0 to 3 stacked picture signs | busier streets carry more |
+| Roof | tanks, laundry, greenhouse or garden | how the residents use it |
+| Core | shared with a neighbour or the house's own | narrow lots share |
+
+## Plant Kingdom: the primate village (canopy vernacular; approved 2026-10-06, kit revised 2026-10-14)
+
+The full kit, hierarchy and briefs are in
+`docs/architecture/plant_kingdom_village_buildings.md` (sections 1 and 4a).
+In brief:
+- **Primary, about 70 percent: canopy vernacular built by primates.** Open
+  pavilions on decks lashed to living trunks, round a central pillar, under
+  *atap* thatch roofs on a lashed wall plate.
+- **Secondary, about 25 percent: ground lodges on short stilts.** Long houses
+  with front galleries, after Borneo's longhouses, as structure only. The inn
+  and the food store borrow it.
+- **Accent, about 5 percent:** the commons and the carved trunk markers.
+- **Invariants:**
+  - one roof pitch (40°) and one eave (1.0 m, its underside at 2.46 m);
+  - a 3.3 m wall plate;
+  - the 1.9 m module;
+  - lashed joints, with the dark wrap at every post head as the signature motif;
+  - woven walls and blinds, round posts and the central pillar;
+  - nothing driven into a living tree.
+- **Exclusions:** nails, sawn boards, glass, lights on poles, Chinese or Greek
+  forms, and copies of real sacred carvings.
+
 ## Other kingdoms
 
-Draft charters to be added from `references/cultures.md` grammars: Rock and Ground (earthen Pueblo/adobe), Ocean (stilt harbour), Plant (tree-borne and thatch), Sky (drafted in `docs/architecture/sky_kingdom.md` as celestial classical in quartz, gold and cloud: Greco-Roman about 55 percent, Chinese celestial palace about 35 percent by deliberate choice rather than the usual 75/20 split, with the rule that no single building mixes both traditions), the Chinese village (courtyard and tiled hip-and-gable), the Western city (concrete). The Fire Kingdom's draft volcanic-modern charter now lives in `docs/architecture/fire_caldera_city.md`. Each remaining kingdom needs the Ohio-style charter with a primary, one secondary, an accent, a kit of parts, hierarchy and exclusions.
+Draft charters to be added from `references/cultures.md` grammars: Rock and Ground (earthen Pueblo/adobe), Ocean (stilt harbour) Sky (drafted in `docs/architecture/sky_kingdom.md` as celestial classical in quartz, gold and cloud: Greco-Roman about 55 percent, Chinese celestial palace about 35 percent by deliberate choice rather than the usual 75/20 split, with the rule that no single building mixes both traditions), the Chinese village (courtyard and tiled hip-and-gable), the Western city (concrete). The Fire Kingdom's draft volcanic-modern charter now lives in `docs/architecture/fire_caldera_city.md`. Each remaining kingdom needs the Ohio-style charter with a primary, one secondary, an accent, a kit of parts, hierarchy and exclusions.

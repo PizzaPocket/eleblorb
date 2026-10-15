@@ -14,7 +14,7 @@ anthropomorphic mongooses who make the hero fight their cage match tournament.
 ## 2. Site: a crescent crater
 
 The island is the low satellite at world `(112, 88)`, about 140 m
-east-northeast of the arrival dock and in plain view of the gate and Kai Mālie's
+east-south-east of the arrival dock and in plain view of the gate and Kai Mālie's
 beach. Today it is a 3.8 m dome with only about 10 m of dry radius. It becomes
 a young volcanic **crescent crater**, a tuff cone like Molokini off Maui: a ring
 of rim open on one side to the sea, with a sheltered bay inside. The main island

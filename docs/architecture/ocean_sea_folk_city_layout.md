@@ -1,6 +1,9 @@
 # The Sea Folk City: Civic Layout Plan
 
-Status: dimensioned schematic for review (2026-10-06). Read with
+Status: dimensioned schematic for review (2026-10-06); **second pass,
+code-ready, 2026-10-13** (section 9); **third pass, proposed 2026-10-13: the
+vertical city** (section 10), which supersedes the earlier sections where they
+differ. Read with
 `ocean_sea_folk_city.md`, which owns the community, culture, air halls and
 charter. This document places them on the seabed.
 
@@ -44,7 +47,7 @@ are metres above the city floor (-72 m).
 | Ring | Radius | Contents |
 |---|---|---|
 | Central mound | 0 to 24 m | the castle (Tidehall) on a mound raised 2 m |
-| Civic ring | 24 to 46 m | the Exchange and guest hall air halls, the Lamp House, the school court, the four light pipes |
+| Civic ring | 24 to 46 m | the Exchange and guest hall air halls, the Lamp House, the school court |
 | Ring Current | 46 to 52 m | a channel 2 m below the civic ring, its water running clockwise at a strong swimming pace |
 | Home ring | 52 to 90 m | sixteen homes in two rows, at 60 m and 82 m |
 | Garden ring | 90 to 105 m | kelp gardens, sea-flower beds, the Reef House workshop |
@@ -90,7 +93,6 @@ on a short span.
 | Castle (Tidehall) | Asaru, Ikara, Tudaro | `(0, 0)` | 34 × 30 m on a 48 m mound | entrance turned to `+z`; audience hall unchanged in character |
 | Lamp House | Lunira, Korasi, Mira | `(-26, 22)` | 12 × 10 m | living pearl lamps cultivated in open trays |
 | School court | Munaja | `(-30, -18)` | 16 × 12 m open court | where the young learn balance before the open sea |
-| Light pipes | Kaluja | civic ring at 40 m, at bearings 0°, 65°, 180° and 300° (measured from `+x` toward `+z`), clear of the air halls and tunnels | 1.6 m shafts rising to floating glass collectors at the surface | daylight piped down; the collectors are visible from boats and the islands |
 | Reef House workshop | Talisa, Arimu, Kaluja | `(-70, -70)` | 12 × 9 m | specimens, night-reef records |
 | Kraken lookout | Ikara | `(-30, 100)` | slender tower 14 m tall | faces the Kraken's route |
 | Edge posts | Tudaro | the 105 m edge on each avenue | — | markers where the city ends |
@@ -129,6 +131,223 @@ Homes face the avenue or ring path nearest them, not all toward the centre.
 - The Tidekeeper's audience hall stays open and traversable.
 - Protected bounds: the whole city out to 120 m; Fish Goblins stay outside.
 
+## 9. Second pass: the plan file (2026-10-13)
+
+The layout now lives in one plan file. `tools/sea_folk_layout.py` holds the
+rings, avenues, air halls, tunnels, every building and home, and the guest
+hall's rooms, checks them and writes `scripts/sea_folk_plan.gd`
+(`SeaFolkPlan`). `tools/validate_sea_folk_plan.tscn` checks the plan before
+the city is rebuilt and runs in the pre-push hook (`VILLAGE=sea_folk`). The
+audit found three faults in the first pass, now fixed:
+
+- **The Exchange stood on the main avenue.** At `(0, 34)`, its 18 m dome sat
+  across the avenue the castle's new door looks down, blocking both. It moves
+  beside the avenue, at bearing 69° on the civic ring, `(12.2, 31.7)`, and the
+  castle looks straight down the avenue to the arrivals.
+- **The guest hall was too small for its rooms.** Under a 16 m dome, the
+  party room, three guest rooms, Isaro's room and the washroom at world scale
+  (2.3 m beds) left no floor round the moon pool. It grows to **20 m across,
+  8.5 m high**, at bearing 22.5°, `(32.3, 13.4)`, near the old inn's place:
+  a ring of rooms 3.4 m deep under the shell, and between them and the 4 m
+  moon pool, 4.1 m of common-room floor for the ramp out of the pool and its
+  landing.
+- **Three light pipes stood in avenues.** (The light pipes were removed in
+  the third pass.)
+
+Other placements, all checked:
+- the Lamp House at bearing 112.5° and the school court at 157.5° on the civic
+  ring, each between avenues;
+- the Reef House workshop at 202.5° in the garden ring;
+- the Kraken lookout at bearing 112°, 104 m out;
+- the Glassworks at the head of the main avenue, 118 m out, beside the warm
+  vent at 124 m;
+- the sixteen homes in their households' sectors, between avenues, each
+  facing the ring path between the rows (the inner row outward, the outer
+  row inward);
+- the civic tunnel along the ring from the Exchange to the guest hall;
+- the avenue tunnel from the Exchange out alongside the main avenue to the
+  Glassworks, with its junction moon pool between the rows.
+
+The rings stay circles: Plato's concentric plan is Atlantis's deliberate
+civic geometry. Everything beyond the homes is organic: kelp groves and
+sea-flower beds as irregular patches in the garden ring, and the city's edge,
+where the levelled shelf meets the natural floor and the reef, as a wandering
+line.
+
+### What the rebuild changes in `ocean_kingdom_city.gd`
+
+| Today | The plan |
+|---|---|
+| castle door faces `-z` | faces `+z`, down the main avenue to the arrivals |
+| inner homes at 49 m (in the Ring Current's place) | at 60 m; the outer row stays at 82 m |
+| homes all face the centre | each faces the ring path between the rows |
+| sixteen identical box homes | three home types (single, double, workshop), each household's own |
+| eight spokes of stepping stones | eight sunken avenues, 4 m wide, lit by the stones |
+| `seafolk_village_inn` at `(24, 18)`, keeper Nerissa Stillwater | the guest hall air hall at `(32.3, 13.4)`, keeper Isaro, still 25 Tokoins |
+| prototype names | the Linear A-sounding names (`ocean_sea_folk_city.md` 3a) |
+| no Ring Current, air halls or tunnels | all of them (third pass: section 10) |
+
+## 10. Third pass: two eras, heritage under glass, and the column (proposed, 2026-10-13)
+
+The user's direction:
+- the sea folk are not bound to the seabed, and the city should use their
+  three-dimensional mobility;
+- the architecture merges two eras, the classical city preserved and the
+  modern city of glass;
+- the glass should take up the heritage in considered ways, after the British
+  Museum's Great Court and the Singapore National Gallery;
+- the bubbles in the water are whole SuperEggs with floors: no domes on
+  cables, no legs, no bird-cage ribs, no stalks;
+- more glass tunnels, organised as circulation.
+
+The concept is in `ocean_sea_folk_city.md` 2a; this section is the floor plan.
+The data and its checks are in `tools/sea_folk_third_pass.py`. The drawings
+(key plans, the circulation, building plans and sections) are the Sea Folk
+City Floor Plans artifact. Heights are metres above the city floor (−72 m).
+
+**Removed:** the light pipes, and the first draft of this pass (stalks on
+cables, air bells moored on cables, lamp lines).
+
+### The floor (classical, with glass brought to the heritage)
+
+| Place | Where | What it is |
+|---|---|---|
+| Tidehall | centre, on the mound | the palace, wet and unwrapped; nothing modern over the mound at any height |
+| The Exchange (wrap) | 67.5°, 33 m | a glass bubble 17.6 × 17 m, 12 m high, over the preserved **Hall of Records** (10 × 6 m), now dry: the archive and Dakuro's charts. Trading floor at 0.6 m round it, gallery at 4.4 m joining the ring tunnel, a ramp between them, a moon pool on a nacre drum rising from the trading floor to the gallery, its well leaving through the glass |
+| The guest hall (join) | either side of the 0° avenue, 36 m | the **West** and **East Strangers' Houses** (8.2 × 9.2 m each), preserved and each wrapped in glass, joined by a glass **common room** bridging the avenue at 4.4 m. A swimmer rises into the common room from the avenue below by its moon pool |
+| Lamp House | 112.5°, 31 m | classical, wet |
+| School court | 157.5°, 30 m | classical colonnade, wet |
+| Current House homes (4) and the Lamp House family's home | outer terrace 193° to 257°; 124° at 60 m | classical, wet |
+| Ring-tower stumps (4) | 22.5°, 112.5°, 202.5°, 292.5° on the ring path (71 m) | preserved bases of the old ring towers; each holds a trunk's foot on a deck at 4.4 m with a moon pool in it; the old tower's chamber below, flooded, is the pool's well, and its old door the way in |
+| The Glassworks | (0, 118) by the vent | the first glass bubble, socketed in the slope with its floor at 4.4 m (the datum), smoked glass, the furnace over the vent, Damaku's air engine, a moon pool whose well runs out through the socket onto the main avenue |
+
+**Rooms in the Strangers' Houses** (world scale, inside the old walls):
+
+| House | Rooms |
+|---|---|
+| East | three guest rooms, 3.8 × 3.6 m; Isaro's room, 3.8 × 3.6 m; a central corridor 1.5 m |
+| West | the party room, 7.7 × 5.45 m; the washroom, 2.85 × 1.85 m, with a flush toilet, basin and shower (waste to a sealed tank, as before); a linen store |
+
+Each house's wrap holds a switchback ramp (two flights at 32°, 1.4 m wide)
+from the old floor at 0.6 m up to the tunnels' level at 4.4 m.
+
+### The glass network
+
+| Tunnel | Route | Level | Carried by |
+|---|---|---|---|
+| Civic ring | round the open column at 40 m, threading the Exchange and the guest hall | 4.4 m | the classical ring arcade; arches over every avenue |
+| Spokes (4) | from the ring out over the Ring Current to the four trunk feet | 4.4 m | the arcade and the old bridges |
+| Avenue tunnel | beside the main avenue, from the ring to the Glassworks | 4.4 m | the classical avenue colonnade |
+| Trunks (4) | vertical glass shafts 8 m across, dry, with a spiral ramp 1.4 m wide in half-turn flights of 32° at most, landings between flights and at every floor | 4.4 to 33 m | the ring-tower stumps |
+| Crown ring | joining the trunk tops at 71 m from the centre | 30 m | braced between the trunks |
+
+Swimmers pass under every floor-level tunnel with 3.75 m clear. Total tunnel
+length about 770 m.
+
+### The column
+
+| Trunk | Bearing | Landing hall and the homes docked to it | Crown hall, 30 m |
+|---|---|---|---|
+| Garden House | 22.5°, 71 m | 16 m: Nesaja (double), Rodasu (double), Kasuno and Tami (double) | the Walking Room: where Munaja teaches the young to walk on new legs |
+| Glassworks household | 112.5°, 71 m | 15 m: Kunei (workshop), Damaku (workshop) | the trunk climbs on to the Kraken lookout, 54 m |
+| Exchange household | 202.5°, 71 m | 18 m: Maresa (single), Pelaju (single), Sujira (single) | the Listening Room: Pelaju listens up toward the surface and the ships |
+| Reef House | 292.5°, 71 m | 20 m: Talisa (single), Arimu (single), Kaluja (single), Reef House workshop (reef) | the Reef House laboratory: Talisa's specimens, dry |
+
+A landing hall is a glass SuperEgg 14 m across and 8 m tall, threaded on its
+trunk, with a walkable ring at least 1.6 m wide round the trunk. Each home is a
+wet SuperEgg docked to the hall's rim with a lock chamber in the collar between them; the Reef
+House workshop docks the same way. Crown halls are 12 m across.
+
+### The air: moon pools and locks (proposed, 2026-10-14)
+
+The dry network is one body of air at one pressure, about 7.85 bar: the sea's
+at the **datum**, the walking floor at 4.4 m (67.6 m down) where the civic
+ring, the spokes, the trunk feet, the common room and the Glassworks stand.
+Open pools work only there; above it the network's air would blow out of an
+open pool, so every entry up there is a lock chamber. The reasoning is in the
+culture brief, section 2a.
+
+| Entry | Where | Number | Kind |
+|---|---|---|---|
+| Guest hall | in the common room's floor, over the avenue | 1 | moon pool |
+| Glassworks | in its floor; the well runs through the socket onto the main avenue | 1 | moon pool |
+| Trunk feet | in the deck at the foot of each household trunk; the old tower chamber is the well, its door the mouth | 4 | moon pool |
+| Civic hall | at the foot of each avenue, on a dais 2.4 m above the old terrace | 4 | moon pool |
+| The Exchange | on a drum from the trading floor up to the gallery | 1 | moon pool |
+| Landing halls | under the floor on the city side, clear of the keel | 4 | sea lock, 0.9 to 1.4 bar to blow dry |
+| Crown halls | the same, at 30 m | 4 | sea lock, 2.4 bar |
+| Homes | in each docking collar, hall to wet home | 12 | lock |
+| The fountain lock | the central trunk's top, under the waterline landing | 1 | lock to the roof's air, 6.8 bar, slow |
+
+Moon pools are wells about 2 m deep with a nacre rim, the water 0.4 m below
+the floor. Lock chambers are 1.7 m across and 2.4 m tall with two round
+hatches 0.9 m across in orichalcum rims (the home locks are level, 2.2 m
+across and 2.6 m long). Air comes from the roof's air hall down a shaft in the
+wall over the main gate to Damaku's air engine in the Glassworks, worked by the
+vent's heat; spent air spills out under the moon pools' rims.
+
+### Checks (`tools/sea_folk_third_pass.py`)
+
+- nothing modern over the mound;
+- the avenues and the Ring Current open at the floor, with swimmers' clearance
+  under tunnels;
+- 3 m between volumes that are not joined;
+- every tunnel reaches what it joins, at 1:6 or gentler;
+- one connected dry network;
+- heritage at least 1.5 m inside its glass, with headroom over it;
+- every room at its minimum size and inside the old walls;
+- every ramp fitting with 2.4 m headroom and clear of the heritage;
+- landing halls' walkable rings;
+- the trunk ramps' headroom;
+- sixteen homes and every resident housed;
+- the air (proposed, 2026-10-14; culture brief 2a): every dry building with a
+  way in from the water; every open moon pool within 0.3 m of the datum
+  (4.4 m) and opening below its own water to open sea; every entry above the
+  datum a lock chamber with at least 0.2 bar of the network's overpressure to
+  blow it dry, and none below the datum; every lock chamber with room under its
+  hall, clear of the keel and the trunk, opening to open water or into its
+  home; the trunk ramps continuous from foot to crown at 32 degrees or less,
+  with a landing at every floor and 2.4 m headroom under the turn above.
+
+On approval this data replaces the second pass in `tools/sea_folk_layout.py`
+and `SeaFolkPlan`, and the validator takes the same checks.
+
+## 11. The walls, the roof and the civic hall (proposed, 2026-10-13)
+
+The city is enclosed (culture brief section 4a). Everything below is in
+`tools/sea_folk_third_pass.py` and drawn in the floor plans and the 3D model.
+
+| Element | Where | Size |
+|---|---|---|
+| Walls | octagon; inner faces of the sides 135 m out, the mitres' 166 m | sides 199 m, mitres 50 m, 8 m thick; seabed to 96 m (24 m above the sea); 76 to 120 m tall from their foot |
+| Dark course / light course | below / above 74.5 m | the first city's sea wall / the closing walls and roof |
+| Roof | slab 90 to 96 m, vault soffit 88 m | air hall 16 m high over the water at 72 m |
+| Piers | eight at 100 m (22.5 + 45k degrees); four at 60 m (67.5, 157.5, 247.5, 337.5) | 6 m and 5.2 m across |
+| Light wells | 60 m out over the eight avenues | 8 m square, glass-capped |
+| Sea gates | the sides' middles, on the avenues at 0, 90, 180, 270 | 14 m wide, 24 m tall, shut; swim-wickets |
+| Fountain | roof centre | basins 40, 26, 14, 6 m across; rims 0.9 to 12 m up; jet 16 m; glass floor 6.5 to 14 m out |
+| Secret stair | pedestal, door at 270 degrees behind the second tier's curtain | shaft 6.8 m across, from the roof to the waterline landing at 73 m |
+| Central trunk | the column, centre | 8 m across, glass, 74 m down to the palace roof at 19 m |
+| Civic hall | over the mound, round Tidehall | glass SuperEgg 44 x 41 x 32 m, epsilon 2.6; floor 2 m (the old terrace); four moon pools at the avenue feet, each on a nacre dais whose rim is at the datum, 2.4 m above the terrace |
+| Civic link | from the ring at 92 degrees in to the civic hall's gallery | tunnel 21 m; a ramp from the terrace up to the gallery at 4.4 m |
+| Kraken lookout | on the parapet over the main gate | 10 x 7 m glass room |
+| Ancient spires | (r, bearing): (96, 8), (95, 60), (88, 152), (97, 214), (90, 265), (99, 328), (64, 174) | 46, 28 broken, 38, 22 broken, 48, 34 broken, 18 broken m |
+
+Circulation: the secret way in is roof, door, stair, landing, the fountain lock, central trunk,
+civic hall. Ikara reaches the lookout across the roof. Swimmers enter by the
+gates' wickets, the moon pools and the lock chambers. Visitors on legs reach the civic hall by
+the civic link from the ring.
+
+Checks added:
+- everything at least 6 m inside the walls, and under the water but the trunk;
+- the mitres shorter than a third of a side;
+- the light wells clear of the piers;
+- the gates on the sides;
+- the fountain's glass floor between the shaft and the rim;
+- the trunk reaching the shaft;
+- the walls at least 40 m clear of the Kraken's water (they are 47 m);
+- the spires and piers 3 m clear of everything.
+
 ## Fixed, proposed and open
 
 **Fixed:** the city centre, floor and flat radius; the castle, homes and
@@ -136,7 +355,19 @@ two-ring plan; the existing inn as the city's rest point at 25 Tokoins.
 
 **Proposed:** the castle turned to face arrivals; the ring radii; the Ring
 Current; homes moved from 49 m to 60 m; the three air halls and two tunnels;
-the light pipes with surface collectors; Isaro as the inn's renamed keeper;
+Isaro as the inn's renamed keeper;
 every footprint above.
 
-**Open:** none blocking.
+**Proposed (third pass):**
+- the two eras and the heritage moves (wrap, join, graft);
+- the glass network and the four trunks in section 10;
+- the light pipes removed.
+
+**Proposed (enclosure, section 11):** the walls, roof, piers, wells, gates,
+fountain and secret stair; the civic hall and central trunk; the civic link;
+the ancient spires; the lookout moved to the wall.
+
+**Open:**
+- names for the three eras and the Strangers' Houses;
+- whether the first city built the sea wall (proposed);
+- the crown halls' programs.

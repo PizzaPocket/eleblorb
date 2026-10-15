@@ -1,0 +1,875 @@
+<title>Sea Folk City in Depth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Karla:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a diver's field guide. The explorable model fills the top, a list of places to visit sits beside it, and a measured section below gives the heights. One deliberate world: deep water, so a single dark palette. */
+:root {
+  --water: #0a2f3a; --deep: #061c24; --panel: #0e3743; --line: #1f5563;
+  --ink: #e6f3f1; --muted: #93b9b8; --glow: #59e3cf; --gold: #e0975a; --nacre: #ece6f2; --air: #9fe8ff;
+  --display: "Marcellus", "Palatino Linotype", Palatino, serif;
+  --body: "Karla", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+html { background: var(--deep); }
+body { background: var(--deep); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1320px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 56px; display: grid; gap: 22px; }
+header { display: grid; gap: 6px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(32px, 4.6vw, 52px); line-height: 1.05; margin: 0; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 400; font-size: 26px; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--body); font-weight: 700; font-size: 17px; margin: 0; }
+p { margin: 0; max-width: 70ch; }
+.lede { color: var(--muted); }
+.explore { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .explore { grid-template-columns: 1fr; } }
+.viewer { position: relative; aspect-ratio: 16 / 10; max-width: 100%; background: var(--water); border: 1px solid var(--line); overflow: hidden; touch-action: none; }
+@media (max-width: 600px) { .viewer { aspect-ratio: 4 / 5; } }
+.viewer canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.lab { position: absolute; transform: translate(-50%, -100%); white-space: nowrap; font-family: var(--mono); font-size: 11.5px; color: var(--ink); text-shadow: 0 0 3px #000, 0 0 6px #000; padding-bottom: 4px; }
+.lab b { display: block; font-family: var(--body); font-size: 13px; font-weight: 700; }
+.lab.small { font-size: 10.5px; color: var(--muted); }
+.lab.dry b { color: var(--air); }
+.lab::after { content: ""; position: absolute; left: 50%; bottom: 0; width: 1px; height: 4px; background: var(--muted); }
+.hud { position: absolute; left: 10px; bottom: 10px; right: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--mono); font-size: 12px; color: var(--ink); background: rgba(6, 28, 36, .78); border: 1px solid var(--line); padding: 5px 10px; cursor: pointer; }
+.chip[aria-pressed="true"] { border-color: var(--glow); color: var(--glow); }
+.chip:focus-visible, .place:focus-visible { outline: 2px solid var(--glow); outline-offset: 2px; }
+.hint { position: absolute; top: 10px; right: 10px; font-family: var(--mono); font-size: 11px; color: var(--muted); background: rgba(6, 28, 36, .7); padding: 4px 8px; }
+.depth { position: absolute; top: 10px; left: 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); background: rgba(6, 28, 36, .7); padding: 4px 8px; font-variant-numeric: tabular-nums; }
+.places { display: grid; gap: 6px; }
+.place { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); padding: 10px 12px; cursor: pointer; display: grid; gap: 2px; }
+.place span { font-size: 14px; color: var(--muted); }
+.place[aria-current="true"] { border-color: var(--glow); }
+.place[aria-current="true"] h3 { color: var(--glow); }
+.note { background: var(--panel); border: 1px solid var(--line); padding: 14px 16px; display: grid; gap: 8px; }
+.note p { font-size: 15px; }
+.who { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.section { background: var(--water); border: 1px solid var(--line); overflow-x: auto; }
+.section svg { display: block; width: 100%; min-width: 760px; height: auto; }
+svg text { font-family: var(--mono); fill: var(--ink); }
+.key { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+.key div { display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; font-size: 15px; }
+.key i { width: 18px; height: 18px; display: block; margin-top: 3px; }
+.key div > span { min-width: 0; }
+.tbl { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); }
+table { border-collapse: collapse; width: 100%; font-size: 15px; min-width: 640px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-family: var(--mono); font-weight: 500; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.findings { display: grid; gap: 12px; }
+.finding { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--glow); padding: 14px 16px; display: grid; gap: 8px; }
+.finding .tag { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--glow); }
+.finding p { font-size: 15px; }
+.finding ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; max-width: 74ch; font-size: 15px; }
+.nums { font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Eleblorb · Ocean Kingdom · the sea folk city, third pass with its walls (proposed)</div>
+    <h1>Sea Folk City in Depth</h1>
+    <p class="lede">A walled and roofed city, 540 m north of the arrival dock. Its walls rise from the seabed, 72 m down, and stand 24 m out of the sea. On the roof a fountain plays, and inside its pedestal is the stair down. Under the roof are three eras. Spires of the first city still stand. The classical city is preserved on the floor. The modern glass city joins it, wraps it and climbs above it. Every form is a SuperEgg. Drag to look around, scroll to zoom, and pick a place to visit.</p>
+  </header>
+
+  <div class="explore">
+    <div class="viewer" id="viewer">
+      <canvas id="gl" aria-label="Explorable 3D model of the walled sea folk city"></canvas>
+      <div class="labels" id="labels"></div>
+      <div class="depth" id="depth">72 m down</div>
+      <div class="hint">drag · scroll · right-drag to pan</div>
+      <div class="hud">
+        <button class="chip" id="t_labels" aria-pressed="true">Labels</button>
+        <button class="chip" id="t_roof" aria-pressed="true">Roof and upper walls</button>
+        <button class="chip" id="t_clear" aria-pressed="false">Clear water</button>
+        <button class="chip" id="t_cut" aria-pressed="false">Cut away the glass</button>
+        <button class="chip" id="t_trunk" aria-pressed="true">Trunk glass</button>
+        <button class="chip" id="t_sec" aria-pressed="false">Section the Garden House trunk</button>
+        <button class="chip" id="t_flow" aria-pressed="true">Moving water</button>
+      </div>
+    </div>
+    <div style="display:grid;gap:12px;min-width:0">
+      <div class="places" id="places" role="list"></div>
+    </div>
+  </div>
+  <div class="note" id="note" aria-live="polite"></div>
+
+  <section style="display:grid;gap:12px">
+    <h2>How the dry network holds its air</h2>
+    <p>The trunks are dry tubes of air, and the spiral inside each is a ramp people walk up and down. All the glass you can walk in is one body of air at one pressure, so nothing inside it needs a door. This section shows where that air meets the sea. Heights are true; the trunks are drawn side by side, not where they stand.</p>
+    <div class="section"><svg id="airsec" role="img" aria-label="Section through a household trunk and the central trunk showing the moon pools at the datum and the lock chambers above it"></svg></div>
+    <div class="key" id="airkey"></div>
+  </section>
+
+  <section class="findings">
+    <h2>Findings</h2>
+    <div class="finding" id="f_air"></div>
+  </section>
+
+  <section style="display:grid;gap:12px">
+    <h2>Half-section along the main avenue</h2>
+    <p>From the fountain at the centre out through the island-side wall, at true heights and radii. Things that stand off the avenue are drawn dashed where they would fall on it.</p>
+    <div class="section"><svg id="sect" role="img" aria-label="Section from the centre of the city out through the wall along the main avenue"></svg></div>
+  </section>
+
+  <section style="display:grid;gap:12px">
+    <h2>Three eras, one vocabulary</h2>
+    <div class="tbl"><table>
+      <thead><tr><th></th><th>The first city</th><th>Classical: the floor</th><th>Modern: glass, and the walls</th></tr></thead>
+      <tbody>
+        <tr><td>What stands</td><td>seven spires, some whole and some broken, and the lower course of the sea wall</td><td>Tidehall, the Hall of Records, the Strangers' Houses, the Lamp House, the school court, the ring-tower stumps, the Current House homes, the Ring Current and the avenues</td><td>the civic hall, the Exchange, the guest hall, the trunks, landing halls and crown ring, the tunnels, the Glassworks; the upper walls, the roof and the fountain</td></tr>
+        <tr><td>How it is kept</td><td>never restored and never taken down</td><td>preserved; inside glass where it is used</td><td>built round, beside and above the old, never on it</td></tr>
+        <tr><td>SuperEggs</td><td>tall and tapering, epsilon about 2.6</td><td>square-ended, epsilon 5</td><td>round-ended glass, epsilon 2.4 to 2.6, with broad nacre bands; the walls and roof in a lighter classical stone</td></tr>
+        <tr><td>Stone</td><td>the dark, sturdy sea-wall stone</td><td>nacre-white and teal</td><td>the upper walls and roof: a lighter stone in the classical manner</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+// The plan: python3 tools/sea_folk_third_pass.py --json, embedded with tools/embed_drawing_data.py
+const D = /*DATA*/{"volumes": [{"key": "tidehall", "name": "Tidehall", "era": "classical", "c": [0.0, 8.0, -1.0], "semi": [16.0, 11.0, 14.0], "eps": 5.0, "facing": 90.0, "dry": true, "kind": "castle", "cut": 2.0, "floor": null, "inside": "civic_hall", "note": "preserved and still the palace; now dry inside the civic hall, its roof the floor of the assembly"}, {"key": "civic_hall", "name": "The civic hall", "era": "modern", "c": [0.0, 0.6, -1.0], "semi": [22.0, 32.0, 20.5], "eps": 2.6, "facing": 90.0, "dry": true, "kind": "wrap", "cut": 0.6, "floor": 2.0, "wraps": "tidehall", "keeper": "Tidekeeper Asaru", "lock": true, "program": "the palace kept whole and dry; the assembly floor on its roof terrace under the crown of the glass; hearing benches round its feet on the old terrace; a pool lock at the foot of each avenue"}, {"key": "lamp_house", "name": "Lamp House", "era": "classical", "c": [-11.863, 2.5, 28.64], "semi": [5.0, 3.5, 4.0], "eps": 5.0, "facing": 112.5, "dry": false, "kind": "classical", "cut": 0.0, "floor": null, "note": "pearl lamps grown in open trays"}, {"key": "school_court", "name": "School court", "era": "classical", "c": [-27.716, 2.6, 11.481], "semi": [7.0, 2.6, 4.5], "eps": 5.0, "facing": 157.5, "dry": false, "kind": "colonnade", "cut": 0.0, "floor": null, "note": "a Minoan colonnade round an open court"}, {"key": "home_floor_1", "name": "Current House home", "era": "classical", "c": [-79.898, 2.2, -18.446], "semi": [5.5, 3.0, 3.6], "eps": 5.0, "facing": 373.0, "dry": false, "kind": "home", "cut": 0.0, "floor": null, "who": "Oruko", "home": "double", "household": "Current House"}, {"key": "home_floor_2", "name": "Current House home", "era": "classical", "c": [-68.771, 2.2, -44.66], "semi": [5.5, 3.0, 3.6], "eps": 5.0, "facing": 393.0, "dry": false, "kind": "home", "cut": 0.0, "floor": null, "who": "Dakuro", "home": "double", "household": "Current House"}, {"key": "home_floor_3", "name": "Current House home", "era": "classical", "c": [-44.66, 2.2, -68.771], "semi": [5.5, 3.0, 3.6], "eps": 5.0, "facing": 417.0, "dry": false, "kind": "home", "cut": 0.0, "floor": null, "who": "Sekira", "home": "double", "household": "Current House"}, {"key": "home_floor_4", "name": "Current House home", "era": "classical", "c": [-18.446, 2.2, -79.898], "semi": [5.5, 3.0, 3.6], "eps": 5.0, "facing": 437.0, "dry": false, "kind": "home", "cut": 0.0, "floor": null, "who": "Munaja", "home": "double", "household": "Current House"}, {"key": "home_floor_5", "name": "Lamp House home", "era": "classical", "c": [-33.552, 2.2, 49.742], "semi": [5.0, 3.0, 3.6], "eps": 5.0, "facing": 124.0, "dry": false, "kind": "home", "cut": 0.0, "floor": null, "who": "Lunira, Korasi and Mira", "home": "workshop", "household": "Lamp House"}, {"key": "exchange", "name": "The Exchange", "era": "modern", "c": [12.629, -3.0, 30.488], "semi": [8.8, 15.0, 8.5], "eps": 2.4, "facing": 67.5, "dry": true, "kind": "wrap", "cut": 0.0, "floor": 0.6, "wraps": "hall_of_records", "keeper": "Maresa", "lock": true, "program": "trading floor round the old hall; Maresa's Nautilus Shell counter; Rodasu's Watering Can counter; a gallery at 5 m joining the ring tunnel; Dakuro's charts in the old hall"}, {"key": "hall_of_records", "name": "Hall of Records", "era": "classical", "c": [12.055, 3.6, 29.102], "semi": [5.0, 3.6, 3.0], "eps": 5.0, "facing": 67.5, "dry": true, "kind": "heritage", "cut": 0.6, "floor": null, "inside": "exchange", "note": "preserved classical hall, now dry: the city archive and Dakuro's chart room"}, {"key": "west_house_wrap", "name": "The guest hall, west house", "era": "modern", "c": [33.26, -6.0, -13.777], "semi": [10.5, 20.0, 9.0], "eps": 2.4, "facing": 337.5, "dry": true, "kind": "wrap", "cut": 0.0, "floor": 0.6, "wraps": "west_house", "lock": false}, {"key": "west_house", "name": "West Strangers' House", "era": "classical", "c": [33.26, 2.85, -13.777], "semi": [4.1, 2.25, 4.6], "eps": 5.0, "facing": 337.5, "dry": true, "kind": "heritage", "cut": 0.6, "floor": null, "inside": "west_house_wrap", "note": "preserved guest house of the classical city, now dry"}, {"key": "east_house_wrap", "name": "The guest hall, east house", "era": "modern", "c": [33.26, -6.0, 13.777], "semi": [10.5, 20.0, 9.0], "eps": 2.4, "facing": 22.5, "dry": true, "kind": "wrap", "cut": 0.0, "floor": 0.6, "wraps": "east_house", "lock": false}, {"key": "east_house", "name": "East Strangers' House", "era": "classical", "c": [33.26, 2.85, 13.777], "semi": [4.1, 2.25, 4.6], "eps": 5.0, "facing": 22.5, "dry": true, "kind": "heritage", "cut": 0.6, "floor": null, "inside": "east_house_wrap", "note": "preserved guest house of the classical city, now dry"}, {"key": "common_room", "name": "The guest hall, common room", "era": "modern", "c": [40.0, 5.4, 0.0], "semi": [8.0, 5.0, 5.0], "eps": 2.4, "facing": 0.0, "dry": true, "kind": "bridge", "cut": 3.8000000000000003, "floor": 4.4, "keeper": "Isaro", "lock": true, "program": "Isaro's counter, the common room and the party's gathering floor, the pool lock; a glass bridge over the avenue with Tidehall straight down it"}, {"key": "glassworks", "name": "The Glassworks", "era": "modern", "c": [0.0, 2.4, 118.0], "semi": [8.0, 10.0, 8.0], "eps": 2.4, "facing": 90.0, "dry": true, "kind": "grounded", "cut": 3.8000000000000003, "floor": 4.4, "keeper": "Kunei and Damaku", "lock": true, "smoked": true, "program": "the furnace over the vent, the blowing floor, the cooling racks; the air engine; the first air bubble"}, {"key": "stump_22.5", "name": "Ring tower stump", "era": "classical", "c": [65.595, 2.6, 27.171], "semi": [5.2, 2.6, 5.2], "eps": 5.0, "facing": 22.5, "dry": true, "kind": "stump", "cut": 0.0, "floor": 4.4, "lock": true, "note": "the preserved base of an old ring tower; the trunk rises from a nacre deck at the datum in its top, and the old chamber below the deck is the foot moon pool's well, flooded to the pool, entered by the old tower door"}, {"key": "trunk_22.5", "name": "Garden House trunk", "era": "modern", "kind": "trunk", "dry": true, "c": [65.595, 0.0, 27.171], "r": 4.0, "y0": 4.4, "y1": 33.0, "facing": 22.5}, {"key": "hall_22.5", "name": "Garden House landing hall", "era": "modern", "c": [65.595, 17.2, 27.171], "semi": [7.0, 4.0, 7.0], "eps": 2.4, "facing": 22.5, "dry": true, "kind": "landing", "cut": null, "floor": 16.0, "household": "Garden House", "lock": true, "ballast": true, "program": "the household's dry hall on its trunk: where they meet visitors on legs; a pool lock to each home"}, {"key": "pod_22.5_0", "name": "Garden House home", "era": "modern", "c": [64.186, 17.2, 16.463], "semi": [5.0, 3.0, 4.2], "eps": 2.4, "facing": -97.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Garden House", "who": "Nesaja", "home": "double", "docks": "hall_22.5", "ballast": true}, {"key": "pod_22.5_1", "name": "Garden House home", "era": "modern", "c": [75.573, 17.2, 31.304], "semi": [5.0, 3.0, 4.2], "eps": 2.4, "facing": 22.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Garden House", "who": "Rodasu", "home": "double", "docks": "hall_22.5", "ballast": true}, {"key": "pod_22.5_2", "name": "Garden House home", "era": "modern", "c": [57.027, 17.2, 33.745], "semi": [5.0, 3.0, 4.2], "eps": 2.4, "facing": 142.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Garden House", "who": "Kasuno and Tami", "home": "double", "docks": "hall_22.5", "ballast": true}, {"key": "crown_22.5", "name": "Crown hall", "era": "modern", "c": [65.595, 31.2, 27.171], "semi": [6.0, 3.6, 6.0], "eps": 2.4, "facing": 22.5, "dry": true, "kind": "crown", "cut": null, "floor": 30.0, "lock": true, "ballast": true, "program": "the Walking Room: where Munaja teaches the young to walk on new legs"}, {"key": "stump_112.5", "name": "Ring tower stump", "era": "classical", "c": [-27.171, 2.6, 65.595], "semi": [5.2, 2.6, 5.2], "eps": 5.0, "facing": 112.5, "dry": true, "kind": "stump", "cut": 0.0, "floor": 4.4, "lock": true, "note": "the preserved base of an old ring tower; the trunk rises from a nacre deck at the datum in its top, and the old chamber below the deck is the foot moon pool's well, flooded to the pool, entered by the old tower door"}, {"key": "trunk_112.5", "name": "Glassworks household trunk", "era": "modern", "kind": "trunk", "dry": true, "c": [-27.171, 0.0, 65.595], "r": 4.0, "y0": 4.4, "y1": 33.0, "facing": 112.5}, {"key": "hall_112.5", "name": "Glassworks household landing hall", "era": "modern", "c": [-27.171, 16.2, 65.595], "semi": [7.0, 4.0, 7.0], "eps": 2.4, "facing": 112.5, "dry": true, "kind": "landing", "cut": null, "floor": 15.0, "household": "Glassworks household", "lock": true, "ballast": true, "program": "the household's dry hall on its trunk: where they meet visitors on legs; a pool lock to each home"}, {"key": "pod_112.5_0", "name": "Glassworks household home", "era": "modern", "c": [-17.008, 16.2, 69.805], "semi": [4.6, 3.0, 4.4], "eps": 2.4, "facing": 22.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Glassworks household", "who": "Kunei", "home": "workshop", "docks": "hall_112.5", "ballast": true}, {"key": "pod_112.5_1", "name": "Glassworks household home", "era": "modern", "c": [-37.333, 16.2, 61.386], "semi": [4.6, 3.0, 4.4], "eps": 2.4, "facing": 202.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Glassworks household", "who": "Damaku", "home": "workshop", "docks": "hall_112.5", "ballast": true}, {"key": "crown_112.5", "name": "Crown hall", "era": "modern", "c": [-27.171, 31.2, 65.595], "semi": [6.0, 3.6, 6.0], "eps": 2.4, "facing": 112.5, "dry": true, "kind": "crown", "cut": null, "floor": 30.0, "lock": true, "ballast": true, "program": "the Watch Room: Ikara keeps the rota for the wall lookout and the four sea gates", "who": "Ikara"}, {"key": "stump_202.5", "name": "Ring tower stump", "era": "classical", "c": [-65.595, 2.6, -27.171], "semi": [5.2, 2.6, 5.2], "eps": 5.0, "facing": 202.5, "dry": true, "kind": "stump", "cut": 0.0, "floor": 4.4, "lock": true, "note": "the preserved base of an old ring tower; the trunk rises from a nacre deck at the datum in its top, and the old chamber below the deck is the foot moon pool's well, flooded to the pool, entered by the old tower door"}, {"key": "trunk_202.5", "name": "Exchange household trunk", "era": "modern", "kind": "trunk", "dry": true, "c": [-65.595, 0.0, -27.171], "r": 4.0, "y0": 4.4, "y1": 33.0, "facing": 202.5}, {"key": "hall_202.5", "name": "Exchange household landing hall", "era": "modern", "c": [-65.595, 19.2, -27.171], "semi": [7.0, 4.0, 7.0], "eps": 2.4, "facing": 202.5, "dry": true, "kind": "landing", "cut": null, "floor": 18.0, "household": "Exchange household", "lock": true, "ballast": true, "program": "the household's dry hall on its trunk: where they meet visitors on legs; a pool lock to each home"}, {"key": "pod_202.5_0", "name": "Exchange household home", "era": "modern", "c": [-64.212, 19.2, -16.661], "semi": [3.6, 2.8, 4.0], "eps": 2.4, "facing": 82.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Exchange household", "who": "Maresa", "home": "single", "docks": "hall_202.5", "ballast": true}, {"key": "pod_202.5_1", "name": "Exchange household home", "era": "modern", "c": [-75.389, 19.2, -31.227], "semi": [3.6, 2.8, 4.0], "eps": 2.4, "facing": 202.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Exchange household", "who": "Pelaju", "home": "single", "docks": "hall_202.5", "ballast": true}, {"key": "pod_202.5_2", "name": "Exchange household home", "era": "modern", "c": [-57.186, 19.2, -33.623], "semi": [3.6, 2.8, 4.0], "eps": 2.4, "facing": 322.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Exchange household", "who": "Sujira", "home": "single", "docks": "hall_202.5", "ballast": true}, {"key": "crown_202.5", "name": "Crown hall", "era": "modern", "c": [-65.595, 31.2, -27.171], "semi": [6.0, 3.6, 6.0], "eps": 2.4, "facing": 202.5, "dry": true, "kind": "crown", "cut": null, "floor": 30.0, "lock": true, "ballast": true, "program": "the Listening Room: Pelaju listens up toward the surface and the ships"}, {"key": "stump_292.5", "name": "Ring tower stump", "era": "classical", "c": [27.171, 2.6, -65.595], "semi": [5.2, 2.6, 5.2], "eps": 5.0, "facing": 292.5, "dry": true, "kind": "stump", "cut": 0.0, "floor": 4.4, "lock": true, "note": "the preserved base of an old ring tower; the trunk rises from a nacre deck at the datum in its top, and the old chamber below the deck is the foot moon pool's well, flooded to the pool, entered by the old tower door"}, {"key": "trunk_292.5", "name": "Reef House trunk", "era": "modern", "kind": "trunk", "dry": true, "c": [27.171, 0.0, -65.595], "r": 4.0, "y0": 4.4, "y1": 33.0, "facing": 292.5}, {"key": "hall_292.5", "name": "Reef House landing hall", "era": "modern", "c": [27.171, 21.2, -65.595], "semi": [7.0, 4.0, 7.0], "eps": 2.4, "facing": 292.5, "dry": true, "kind": "landing", "cut": null, "floor": 20.0, "household": "Reef House", "lock": true, "ballast": true, "program": "the household's dry hall on its trunk: where they meet visitors on legs; a pool lock to each home"}, {"key": "pod_292.5_0", "name": "Reef House home", "era": "modern", "c": [17.377, 21.2, -61.539], "semi": [3.6, 2.8, 4.0], "eps": 2.4, "facing": 157.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Reef House", "who": "Talisa", "home": "single", "docks": "hall_292.5", "ballast": true}, {"key": "pod_292.5_1", "name": "Reef House home", "era": "modern", "c": [23.114, 21.2, -75.389], "semi": [3.6, 2.8, 4.0], "eps": 2.4, "facing": 247.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Reef House", "who": "Arimu", "home": "single", "docks": "hall_292.5", "ballast": true}, {"key": "pod_292.5_2", "name": "Reef House home", "era": "modern", "c": [36.964, 21.2, -69.652], "semi": [3.6, 2.8, 4.0], "eps": 2.4, "facing": 337.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Reef House", "who": "Kaluja", "home": "single", "docks": "hall_292.5", "ballast": true}, {"key": "pod_292.5_3", "name": "Reef House workshop", "era": "modern", "c": [31.457, 21.2, -55.248], "semi": [5.6, 3.2, 4.6], "eps": 2.4, "facing": 427.5, "dry": false, "kind": "pod", "cut": null, "floor": null, "household": "Reef House", "who": "Reef House workshop", "home": "reef", "docks": "hall_292.5", "ballast": true}, {"key": "crown_292.5", "name": "Crown hall", "era": "modern", "c": [27.171, 31.2, -65.595], "semi": [6.0, 3.6, 6.0], "eps": 2.4, "facing": 292.5, "dry": true, "kind": "crown", "cut": null, "floor": 30.0, "lock": true, "ballast": true, "program": "the Reef House laboratory: Talisa's specimens, dry"}, {"key": "trunk_c", "name": "Central trunk", "era": "modern", "kind": "trunk", "dry": true, "c": [0.0, 0.0, 0.0], "r": 4.0, "y0": 19.0, "y1": 74.0, "facing": 90.0, "secret": true, "note": "glass from the waterline to the civic hall; an open spiral inside the hall down to the palace roof"}, {"key": "pier_22.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [92.388, 0.0, 38.268], "r": 3.0, "y0": 0.0, "y1": 88.0, "facing": 22.5}, {"key": "pier_67.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [38.268, 0.0, 92.388], "r": 3.0, "y0": 0.0, "y1": 88.0, "facing": 67.5}, {"key": "pier_112.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [-38.268, 0.0, 92.388], "r": 3.0, "y0": 0.0, "y1": 88.0, "facing": 112.5}, {"key": "pier_157.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [-92.388, 0.0, 38.268], "r": 3.0, "y0": 0.0, "y1": 88.0, "facing": 157.5}, {"key": "pier_202.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [-92.388, 0.0, -38.268], "r": 3.0, "y0": 0.0, "y1": 88.0, "facing": 202.5}, {"key": "pier_247.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [-38.268, 0.0, -92.388], "r": 3.0, "y0": 0.0, "y1": 88.0, "facing": 247.5}, {"key": "pier_292.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [38.268, 0.0, -92.388], "r": 3.0, "y0": 0.0, "y1": 88.0, "facing": 292.5}, {"key": "pier_337.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [92.388, 0.0, -38.268], "r": 3.0, "y0": 0.0, "y1": 88.0, "facing": 337.5}, {"key": "pier_in_67.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [22.961, 0.0, 55.433], "r": 2.6, "y0": 0.0, "y1": 88.0, "facing": 67.5}, {"key": "pier_in_157.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [-55.433, 0.0, 22.961], "r": 2.6, "y0": 0.0, "y1": 88.0, "facing": 157.5}, {"key": "pier_in_247.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [-22.961, 0.0, -55.433], "r": 2.6, "y0": 0.0, "y1": 88.0, "facing": 247.5}, {"key": "pier_in_337.5", "name": "Roof pier", "era": "enclosure", "kind": "pier", "dry": false, "c": [55.433, 0.0, -22.961], "r": 2.6, "y0": 0.0, "y1": 88.0, "facing": 337.5}, {"key": "spire_1", "name": "Ancient spire", "era": "ancient", "c": [95.066, 0.0, 13.361], "semi": [3.4, 46.0, 3.4], "eps": 2.6, "facing": 8.0, "dry": false, "kind": "spire", "cut": 0.0, "floor": null, "height": 46.0, "broken": false, "note": "the first city's; never restored, never taken down"}, {"key": "spire_2", "name": "Ancient spire, broken", "era": "ancient", "c": [47.5, 0.0, 82.272], "semi": [3.0, 28.0, 3.0], "eps": 2.6, "facing": 60.0, "dry": false, "kind": "spire", "cut": 0.0, "floor": null, "height": 28.0, "broken": true, "note": "the first city's; never restored, never taken down"}, {"key": "spire_3", "name": "Ancient spire", "era": "ancient", "c": [-77.699, 0.0, 41.313], "semi": [3.2, 38.0, 3.2], "eps": 2.6, "facing": 152.0, "dry": false, "kind": "spire", "cut": 0.0, "floor": null, "height": 38.0, "broken": false, "note": "the first city's; never restored, never taken down"}, {"key": "spire_4", "name": "Ancient spire, broken", "era": "ancient", "c": [-80.417, 0.0, -54.242], "semi": [3.0, 22.0, 3.0], "eps": 2.6, "facing": 214.0, "dry": false, "kind": "spire", "cut": 0.0, "floor": null, "height": 22.0, "broken": true, "note": "the first city's; never restored, never taken down"}, {"key": "spire_5", "name": "Ancient spire", "era": "ancient", "c": [-7.844, 0.0, -89.658], "semi": [3.6, 48.0, 3.6], "eps": 2.6, "facing": 265.0, "dry": false, "kind": "spire", "cut": 0.0, "floor": null, "height": 48.0, "broken": false, "note": "the first city's; never restored, never taken down"}, {"key": "spire_6", "name": "Ancient spire, broken", "era": "ancient", "c": [83.957, 0.0, -52.462], "semi": [3.2, 34.0, 3.2], "eps": 2.6, "facing": 328.0, "dry": false, "kind": "spire", "cut": 0.0, "floor": null, "height": 34.0, "broken": true, "note": "the first city's; never restored, never taken down"}, {"key": "spire_7", "name": "Ancient spire, broken", "era": "ancient", "c": [-63.649, 0.0, 6.69], "semi": [2.6, 18.0, 2.6], "eps": 2.6, "facing": 174.0, "dry": false, "kind": "spire", "cut": 0.0, "floor": null, "height": 18.0, "broken": true, "note": "the first city's; never restored, never taken down"}], "tunnels": [{"key": "ring_0", "name": "Civic ring tunnel", "pts": [[39.514, 4.4, 6.215], [39.41, 4.4, 6.845], [39.296, 4.4, 7.474]], "joins": ["common_room", "east_house_wrap"], "carried": "the classical ring arcade"}, {"key": "ring_1", "name": "Civic ring tunnel", "pts": [[33.071, 4.4, 22.501], [30.601, 4.4, 25.76], [27.812, 4.4, 28.749], [24.731, 4.4, 31.438], [21.393, 4.4, 33.799]], "joins": ["east_house_wrap", "exchange"], "carried": "the classical ring arcade"}, {"key": "ring_2", "name": "Civic ring tunnel", "pts": [[8.772, 4.4, 39.026], [4.741, 4.4, 39.718], [0.66, 4.4, 39.995], [-3.428, 4.4, 39.853], [-7.48, 4.4, 39.294], [-11.453, 4.4, 38.325], [-15.307, 4.4, 36.955]], "joins": ["exchange"], "carried": "the classical ring arcade"}, {"key": "ring_3", "name": "Civic ring tunnel", "pts": [[-15.307, 4.4, 36.955], [-19.349, 4.4, 35.009], [-23.147, 4.4, 32.622], [-26.654, 4.4, 29.826], [-29.826, 4.4, 26.654], [-32.622, 4.4, 23.147], [-35.009, 4.4, 19.349], [-36.955, 4.4, 15.307]], "joins": [], "carried": "the classical ring arcade"}, {"key": "ring_4", "name": "Civic ring tunnel", "pts": [[-36.955, 4.4, 15.307], [-38.437, 4.4, 11.073], [-39.435, 4.4, 6.7], [-39.937, 4.4, 2.243], [-39.937, 4.4, -2.243], [-39.435, 4.4, -6.7], [-38.437, 4.4, -11.073], [-36.955, 4.4, -15.307]], "joins": [], "carried": "the classical ring arcade"}, {"key": "ring_5", "name": "Civic ring tunnel", "pts": [[-36.955, 4.4, -15.307], [-35.009, 4.4, -19.349], [-32.622, 4.4, -23.147], [-29.826, 4.4, -26.654], [-26.654, 4.4, -29.826], [-23.147, 4.4, -32.622], [-19.349, 4.4, -35.009], [-15.307, 4.4, -36.955]], "joins": [], "carried": "the classical ring arcade"}, {"key": "ring_6", "name": "Civic ring tunnel", "pts": [[-15.307, 4.4, -36.955], [-11.073, 4.4, -38.437], [-6.7, 4.4, -39.435], [-2.243, 4.4, -39.937], [2.243, 4.4, -39.937], [6.7, 4.4, -39.435], [11.073, 4.4, -38.437], [15.307, 4.4, -36.955]], "joins": [], "carried": "the classical ring arcade"}, {"key": "ring_7", "name": "Civic ring tunnel", "pts": [[15.307, 4.4, -36.955], [19.486, 4.4, -34.933], [23.403, 4.4, -32.439], [27.004, 4.4, -29.509], [30.241, 4.4, -26.182], [33.071, 4.4, -22.501]], "joins": ["west_house_wrap"], "carried": "the classical ring arcade"}, {"key": "ring_8", "name": "Civic ring tunnel", "pts": [[39.296, 4.4, -7.474], [39.41, 4.4, -6.845], [39.514, 4.4, -6.215]], "joins": ["west_house_wrap", "common_room"], "carried": "the classical ring arcade"}, {"key": "spoke_22.5", "name": "Spoke to the Garden House trunk", "pts": [[41.113, 4.4, 17.029], [42.498, 4.4, 17.603], [48.042, 4.4, 19.9], [61.253, 4.4, 25.372]], "joins": ["stump_22.5", "east_house_wrap"], "carried": "the classical arcade and the old bridge over the Ring Current"}, {"key": "spoke_112.5", "name": "Spoke to the Glassworks household trunk", "pts": [[-15.307, 4.4, 36.955], [-17.603, 4.4, 42.498], [-19.9, 4.4, 48.042], [-25.372, 4.4, 61.253]], "joins": ["stump_112.5"], "carried": "the classical arcade and the old bridge over the Ring Current"}, {"key": "spoke_202.5", "name": "Spoke to the Exchange household trunk", "pts": [[-36.955, 4.4, -15.307], [-42.498, 4.4, -17.603], [-48.042, 4.4, -19.9], [-61.253, 4.4, -25.372]], "joins": ["stump_202.5"], "carried": "the classical arcade and the old bridge over the Ring Current"}, {"key": "spoke_292.5", "name": "Spoke to the Reef House trunk", "pts": [[15.307, 4.4, -36.955], [17.603, 4.4, -42.498], [19.9, 4.4, -48.042], [25.372, 4.4, -61.253]], "joins": ["stump_292.5"], "carried": "the classical arcade and the old bridge over the Ring Current"}, {"key": "avenue", "name": "Avenue tunnel", "pts": [[5.55, 4.4, 39.613], [5.55, 4.4, 70.0], [5.55, 4.4, 100.0], [5.55, 4.4, 111.0]], "joins": ["glassworks"], "carried": "the classical avenue colonnade"}, {"key": "civic_link", "name": "Civic link", "pts": [[-1.3, 4.4, 39.979], [-1.3, 4.4, 30.0], [-1.3, 4.4, 18.6]], "joins": ["civic_hall"], "carried": "the classical avenue colonnade, over the old palace steps"}, {"key": "crown_0", "name": "Crown ring", "pts": [[63.341, 30.0, 32.076], [60.252, 30.0, 37.559], [56.689, 30.0, 42.747], [52.681, 30.0, 47.599], [48.26, 30.0, 52.077], [43.458, 30.0, 56.146], [38.316, 30.0, 59.774], [32.872, 30.0, 62.932], [27.171, 30.0, 65.595], [21.255, 30.0, 67.744], [15.173, 30.0, 69.36], [8.971, 30.0, 70.431], [2.699, 30.0, 70.949], [-3.594, 30.0, 70.909], [-9.859, 30.0, 70.312], [-16.046, 30.0, 69.163], [-22.108, 30.0, 67.47]], "joins": ["crown_22.5", "crown_112.5"], "carried": "free in the water, held level by the trunks and the halls' ballast"}, {"key": "crown_1", "name": "Crown ring", "pts": [[-32.076, 30.0, 63.341], [-37.559, 30.0, 60.252], [-42.747, 30.0, 56.689], [-47.599, 30.0, 52.681], [-52.077, 30.0, 48.26], [-56.146, 30.0, 43.458], [-59.774, 30.0, 38.316], [-62.932, 30.0, 32.872], [-65.595, 30.0, 27.171], [-67.744, 30.0, 21.255], [-69.36, 30.0, 15.173], [-70.431, 30.0, 8.971], [-70.949, 30.0, 2.699], [-70.909, 30.0, -3.594], [-70.312, 30.0, -9.859], [-69.163, 30.0, -16.046], [-67.47, 30.0, -22.108]], "joins": ["crown_112.5", "crown_202.5"], "carried": "free in the water, held level by the trunks and the halls' ballast"}, {"key": "crown_2", "name": "Crown ring", "pts": [[-63.341, 30.0, -32.076], [-60.252, 30.0, -37.559], [-56.689, 30.0, -42.747], [-52.681, 30.0, -47.599], [-48.26, 30.0, -52.077], [-43.458, 30.0, -56.146], [-38.316, 30.0, -59.774], [-32.872, 30.0, -62.932], [-27.171, 30.0, -65.595], [-21.255, 30.0, -67.744], [-15.173, 30.0, -69.36], [-8.971, 30.0, -70.431], [-2.699, 30.0, -70.949], [3.594, 30.0, -70.909], [9.859, 30.0, -70.312], [16.046, 30.0, -69.163], [22.108, 30.0, -67.47]], "joins": ["crown_202.5", "crown_292.5"], "carried": "free in the water, held level by the trunks and the halls' ballast"}, {"key": "crown_3", "name": "Crown ring", "pts": [[32.076, 30.0, -63.341], [37.559, 30.0, -60.252], [42.747, 30.0, -56.689], [47.599, 30.0, -52.681], [52.077, 30.0, -48.26], [56.146, 30.0, -43.458], [59.774, 30.0, -38.316], [62.932, 30.0, -32.872], [65.595, 30.0, -27.171], [67.744, 30.0, -21.255], [69.36, 30.0, -15.173], [70.431, 30.0, -8.971], [70.949, 30.0, -2.699], [70.909, 30.0, 3.594], [70.312, 30.0, 9.859], [69.163, 30.0, 16.046], [67.47, 30.0, 22.108]], "joins": ["crown_292.5", "crown_22.5"], "carried": "free in the water, held level by the trunks and the halls' ballast"}], "rooms": {"east_house": [["guest room", "bed2", [-3.85, -0.05], [-4.35, -0.75]], ["guest room", "bed2", [0.05, 3.85], [-4.35, -0.75]], ["guest room", "bed2", [-3.85, -0.05], [0.75, 4.35]], ["Isaro's room", "bed1", [0.05, 3.85], [0.75, 4.35]]], "west_house": [["party room", "party", [-3.85, 3.85], [-4.35, 1.1]], ["washroom", "bath", [-3.85, -1.0], [2.5, 4.35]], ["linen store", "store", [1.0, 3.85], [2.5, 4.35]]]}, "corridor": {"east_house": 1.4, "west_house": 1.3}, "ramps": {"exchange": [["u", 4.0, -4.6, 1, 0.6, 4.4]], "east_house_wrap": [["w", 5.1, -3.0, 1, 0.6, 2.5], ["w", 6.55, 0.04, -1, 2.5, 4.4]], "west_house_wrap": [["w", -5.1, -3.0, 1, 0.6, 2.5], ["w", -6.55, 0.04, -1, 2.5, 4.4]], "civic_hall": [["u", 17.4, 5.3, -1, 2.0, 4.4]]}, "tan": 0.6248693519093275, "trunks": [{"bearing": 22.5, "household": "Garden House", "landing": 16.0, "homes": [["double", "Nesaja"], ["double", "Rodasu"], ["double", "Kasuno and Tami"]], "crown": "the Walking Room: where Munaja teaches the young to walk on new legs", "top": 30.0}, {"bearing": 112.5, "household": "Glassworks household", "landing": 15.0, "homes": [["workshop", "Kunei"], ["workshop", "Damaku"]], "crown": "the Watch Room: Ikara keeps the rota for the wall lookout and the four sea gates", "top": 30.0}, {"bearing": 202.5, "household": "Exchange household", "landing": 18.0, "homes": [["single", "Maresa"], ["single", "Pelaju"], ["single", "Sujira"]], "crown": "the Listening Room: Pelaju listens up toward the surface and the ships", "top": 30.0}, {"bearing": 292.5, "household": "Reef House", "landing": 20.0, "homes": [["single", "Talisa"], ["single", "Arimu"], ["single", "Kaluja"], ["reef", "Reef House workshop"]], "crown": "the Reef House laboratory: Talisa's specimens, dry", "top": 30.0}], "enclosure": {"inner": [[135.0, 99.645], [99.645, 135.0], [-99.645, 135.0], [-135.0, 99.645], [-135.0, -99.645], [-99.645, -135.0], [99.645, -135.0], [135.0, -99.645]], "outer": [[143.0, 102.958], [102.958, 143.0], [-102.958, 143.0], [-143.0, 102.958], [-143.0, -102.958], [-102.958, -143.0], [102.958, -143.0], [143.0, -102.958]], "water": 72.0, "dark_top": 74.5, "roof_top": 96.0, "roof_soffit": 88.0, "parapet": 1.2, "wall_t": 8.0, "side": 199.28932188134516, "mitre": 50.000000000000036, "wells": [{"bearing": 0.0, "r": 60.0, "half": 4.0}, {"bearing": 45.0, "r": 60.0, "half": 4.0}, {"bearing": 90.0, "r": 60.0, "half": 4.0}, {"bearing": 135.0, "r": 60.0, "half": 4.0}, {"bearing": 180.0, "r": 60.0, "half": 4.0}, {"bearing": 225.0, "r": 60.0, "half": 4.0}, {"bearing": 270.0, "r": 60.0, "half": 4.0}, {"bearing": 315.0, "r": 60.0, "half": 4.0}], "gates": [{"bearing": 0.0, "width": 14.0, "height": 24.0, "wicket": [3.0, 4.0]}, {"bearing": 90.0, "width": 14.0, "height": 24.0, "wicket": [3.0, 4.0]}, {"bearing": 180.0, "width": 14.0, "height": 24.0, "wicket": [3.0, 4.0]}, {"bearing": 270.0, "width": 14.0, "height": 24.0, "wicket": [3.0, 4.0]}], "fountain": {"tiers": [{"r": 20.0, "y": 0.9, "ped": 6.0}, {"r": 13.0, "y": 5.0, "ped": 3.6}, {"r": 7.0, "y": 9.0, "ped": 2.0}, {"r": 3.0, "y": 12.0, "ped": 1.0}], "jet": 16.0, "oculus": [6.5, 14.0], "door_bearing": 270.0}, "shaft": {"r": 3.4, "wall": 1.6, "y0": 73.0, "y1": 96.0}, "lookout": {"bearing": 90.0, "c": [0.0, 96.0, 139.0], "semi": [5.0, 3.4, 3.6], "who": "Ikara", "program": "the Kraken lookout: a glass watch room on the wall over the main gate, facing the islands"}, "kraken_gap": 47.00581526609914, "ground": [-23.91, 19.65]}, "spires": [[96.0, 8.0, 46.0, 3.4, false], [95.0, 60.0, 28.0, 3.0, true], [88.0, 152.0, 38.0, 3.2, false], [97.0, 214.0, 22.0, 3.0, true], [90.0, 265.0, 48.0, 3.6, false], [99.0, 328.0, 34.0, 3.2, true], [64.0, 174.0, 18.0, 2.6, true]], "ring_r": 40.0, "net_floor": 4.4, "crown": 30.0, "turn_rise": 11.77850979247055, "avenues": [0.0, 45.0, 90.0, 135.0, 180.0, 225.0, 270.0, 315.0], "ground_main": [[0, 2.0], [2, 2.0], [4, 2.0], [6, 2.0], [8, 2.0], [10, 2.0], [12, 2.0], [14, 2.0], [16, 2.0], [18, 2.0], [20, 2.0], [22, 1.3], [24, 0.21], [26, 0.0], [28, 0.0], [30, 0.0], [32, 0.0], [34, 0.0], [36, 0.0], [38, 0.0], [40, 0.0], [42, 0.0], [44, 0.0], [46, -1.37], [48, -2.0], [50, -2.0], [52, -1.37], [54, 0.0], [56, 0.0], [58, 0.0], [60, 0.0], [62, 0.0], [64, 0.0], [66, 0.0], [68, 0.0], [70, 0.0], [72, 0.0], [74, 0.0], [76, 0.0], [78, 0.0], [80, 0.0], [82, 0.0], [84, 0.0], [86, 0.0], [88, 0.0], [90, 0.0], [92, 0.0], [94, 0.0], [96, 0.0], [98, 0.0], [100, 0.0], [102, 0.0], [104, 0.0], [106, 0.02], [108, 0.2], [110, 0.55], [112, 1.05], [114, 1.7], [116, 2.48], [118, 3.38], [120, 4.38], [122, 5.47], [124, 6.63], [126, 7.85], [128, 9.1], [130, 10.36], [132, 11.63], [134, 12.87], [136, 14.07], [138, 15.2], [140, 16.24]], "ground_22": [[0, 2.0], [2, 2.0], [4, 2.0], [6, 2.0], [8, 2.0], [10, 2.0], [12, 2.0], [14, 2.0], [16, 2.0], [18, 2.0], [20, 2.0], [22, 1.3], [24, 0.21], [26, 0.0], [28, 0.0], [30, 0.0], [32, 0.0], [34, 0.0], [36, 0.0], [38, 0.0], [40, 0.0], [42, 0.0], [44, 0.0], [46, -1.37], [48, -2.0], [50, -2.0], [52, -1.37], [54, 0.0], [56, 0.0], [58, 0.0], [60, 0.0], [62, 0.0], [64, 0.0], [66, 0.0], [68, 0.0], [70, 0.0], [72, 0.0], [74, 0.0], [76, 0.0], [78, 0.0], [80, 0.0], [82, 0.0], [84, 0.0], [86, 0.0], [88, 0.0], [90, 0.0], [92, 0.0], [94, 0.0], [96, 0.0], [98, 0.0], [100, 0.0], [102, 0.0], [104, 0.0], [106, 0.01], [108, 0.11], [110, 0.29], [112, 0.56], [114, 0.9], [116, 1.31], [118, 1.77], [120, 2.29], [122, 2.84], [124, 3.42], [126, 4.02], [128, 4.64], [130, 5.25], [132, 5.85], [134, 6.44], [136, 6.99], [138, 7.5], [140, 7.96]], "entries": [{"key": "pool_guest", "hall": "common_room", "shape": "pool", "kind": "moon pool", "name": "the guest hall's moon pool", "opens": "the avenue below", "p": [40.0, 4.4, 0.0], "r": 2.0, "floor": 4.4, "rel": 0.0, "well": 3.8000000000000003, "mouth": [40.0, 3.3, 0.0], "water": 4.0}, {"key": "pool_exchange", "hall": "exchange", "shape": "drum", "kind": "moon pool", "name": "the Exchange's moon pool", "opens": "the sea, by a duct through the glass", "p": [10.439, 4.4, 36.699], "r": 1.4, "floor": 4.4, "rel": 0.0, "base": 0.6, "well": 1.2, "mouth": [11.931, 1.8, 40.302], "note": "on a nacre drum rising from the trading floor (3.8 m below the datum) to the gallery", "water": 4.0}, {"key": "pool_civic_0", "hall": "civic_hall", "shape": "drum", "kind": "moon pool", "name": "a civic hall moon pool, at the foot of the 0\u00b0 avenue", "opens": "the avenue foot, by a duct through the glass", "p": [19.2, 4.4, -1.0], "r": 1.5, "floor": 4.4, "rel": 0.0, "base": 2.0, "well": 1.6, "mouth": [23.6, 2.6, -1.0], "note": "on a nacre dais rising from the old terrace (2.4 m below the datum), with steps down to the terrace", "water": 4.0}, {"key": "pool_civic_90", "hall": "civic_hall", "shape": "drum", "kind": "moon pool", "name": "a civic hall moon pool, at the foot of the 90\u00b0 avenue", "opens": "the avenue foot, by a duct through the glass", "p": [4.0, 4.4, 16.0], "r": 1.5, "floor": 4.4, "rel": 0.0, "base": 2.0, "well": 1.6, "mouth": [4.0, 2.8, 21.3], "note": "on a nacre dais rising from the old terrace (2.4 m below the datum), with steps down to the terrace", "water": 4.0}, {"key": "pool_civic_180", "hall": "civic_hall", "shape": "drum", "kind": "moon pool", "name": "a civic hall moon pool, at the foot of the 180\u00b0 avenue", "opens": "the avenue foot, by a duct through the glass", "p": [-19.2, 4.4, -1.0], "r": 1.5, "floor": 4.4, "rel": 0.0, "base": 2.0, "well": 1.6, "mouth": [-23.6, 2.6, -1.0], "note": "on a nacre dais rising from the old terrace (2.4 m below the datum), with steps down to the terrace", "water": 4.0}, {"key": "pool_civic_270", "hall": "civic_hall", "shape": "drum", "kind": "moon pool", "name": "a civic hall moon pool, at the foot of the 270\u00b0 avenue", "opens": "the avenue foot, by a duct through the glass", "p": [0.0, 4.4, -18.0], "r": 1.5, "floor": 4.4, "rel": 0.0, "base": 2.0, "well": 1.6, "mouth": [0.0, 2.8, -23.8], "note": "on a nacre dais rising from the old terrace (2.4 m below the datum), with steps down to the terrace", "water": 4.0}, {"key": "pool_glassworks", "hall": "glassworks", "shape": "pool", "kind": "moon pool", "name": "the Glassworks' moon pool", "opens": "the main avenue, through the socket", "p": [-2.0, 4.4, 113.4], "r": 1.4, "floor": 4.4, "rel": 0.0, "well": 1.0, "mouth": [-2.0, 1.8, 109.0], "water": 4.0}, {"key": "pool_foot_22.5", "hall": "stump_22.5", "shape": "pool", "kind": "moon pool", "name": "Garden House trunk foot moon pool", "opens": "the old tower door", "p": [65.595, 4.4, 27.171], "r": 1.3, "floor": 4.4, "rel": 0.0, "well": 0.6, "mouth": [71.139, 1.6, 29.467], "note": "the old tower chamber is the well", "water": 4.0}, {"key": "pool_foot_112.5", "hall": "stump_112.5", "shape": "pool", "kind": "moon pool", "name": "Glassworks household trunk foot moon pool", "opens": "the old tower door", "p": [-27.171, 4.4, 65.595], "r": 1.3, "floor": 4.4, "rel": 0.0, "well": 0.6, "mouth": [-29.467, 1.6, 71.139], "note": "the old tower chamber is the well", "water": 4.0}, {"key": "pool_foot_202.5", "hall": "stump_202.5", "shape": "pool", "kind": "moon pool", "name": "Exchange household trunk foot moon pool", "opens": "the old tower door", "p": [-65.595, 4.4, -27.171], "r": 1.3, "floor": 4.4, "rel": 0.0, "well": 0.6, "mouth": [-71.139, 1.6, -29.467], "note": "the old tower chamber is the well", "water": 4.0}, {"key": "pool_foot_292.5", "hall": "stump_292.5", "shape": "pool", "kind": "moon pool", "name": "Reef House trunk foot moon pool", "opens": "the old tower door", "p": [27.171, 4.4, -65.595], "r": 1.3, "floor": 4.4, "rel": 0.0, "well": 0.6, "mouth": [29.467, 1.6, -71.139], "note": "the old tower chamber is the well", "water": 4.0}, {"key": "lock_hall_22.5", "hall": "hall_22.5", "shape": "chamber", "kind": "lock", "name": "Garden House landing hall sea lock", "opens": "the sea below", "p": [60.376, 16.0, 25.008], "r": 0.85, "floor": 16.0, "rel": 11.6, "y0": 13.45, "y1": 15.85, "inner": [60.653, 16.0, 25.123], "outer": [60.376, 13.45, 25.008], "mouth": [60.376, 12.45, 25.008], "dp": 0.95}, {"key": "lock_crown_22.5", "hall": "crown_22.5", "shape": "chamber", "kind": "lock", "name": "Garden House crown hall sea lock", "opens": "the sea below", "p": [60.376, 30.0, 25.008], "r": 0.85, "floor": 30.0, "rel": 25.6, "y0": 27.45, "y1": 29.85, "inner": [60.653, 30.0, 25.123], "outer": [60.376, 27.45, 25.008], "mouth": [60.376, 26.45, 25.008], "dp": 2.36}, {"key": "lock_pod_22.5_0", "hall": "hall_22.5", "shape": "collar", "kind": "lock", "name": "lock to Nesaja's home", "opens": "the wet home", "p": [64.682, 16.0, 20.23], "r": 1.1, "floor": 16.0, "rel": 11.6, "into": "pod_22.5_0", "inner": [64.851, 16.0, 21.519], "outer": [64.512, 16.0, 18.942], "mouth": [64.434, 17.1, 18.347], "bearing": -97.5, "dp": 1.21}, {"key": "lock_pod_22.5_1", "hall": "hall_22.5", "shape": "collar", "kind": "lock", "name": "lock to Rodasu's home", "opens": "the wet home", "p": [72.063, 16.0, 29.849], "r": 1.1, "floor": 16.0, "rel": 11.6, "into": "pod_22.5_1", "inner": [70.862, 16.0, 29.352], "outer": [73.264, 16.0, 30.347], "mouth": [73.818, 17.1, 30.576], "bearing": 22.5, "dp": 1.21}, {"key": "lock_pod_22.5_2", "hall": "hall_22.5", "shape": "collar", "kind": "lock", "name": "lock to Kasuno and Tami's home", "opens": "the wet home", "p": [60.042, 16.0, 31.432], "r": 1.1, "floor": 16.0, "rel": 11.6, "into": "pod_22.5_2", "inner": [61.073, 16.0, 30.64], "outer": [59.011, 16.0, 32.223], "mouth": [58.535, 17.1, 32.589], "bearing": 142.5, "dp": 1.21}, {"key": "lock_hall_112.5", "hall": "hall_112.5", "shape": "chamber", "kind": "lock", "name": "Glassworks household landing hall sea lock", "opens": "the sea below", "p": [-25.008, 15.0, 60.376], "r": 0.85, "floor": 15.0, "rel": 10.6, "y0": 12.45, "y1": 14.85, "inner": [-25.123, 15.0, 60.653], "outer": [-25.008, 12.45, 60.376], "mouth": [-25.008, 11.45, 60.376], "dp": 0.85}, {"key": "lock_crown_112.5", "hall": "crown_112.5", "shape": "chamber", "kind": "lock", "name": "Glassworks household crown hall sea lock", "opens": "the sea below", "p": [-25.008, 30.0, 60.376], "r": 0.85, "floor": 30.0, "rel": 25.6, "y0": 27.45, "y1": 29.85, "inner": [-25.123, 30.0, 60.653], "outer": [-25.008, 27.45, 60.376], "mouth": [-25.008, 26.45, 60.376], "dp": 2.36}, {"key": "lock_pod_112.5_0", "hall": "hall_112.5", "shape": "collar", "kind": "lock", "name": "lock to Kunei's home", "opens": "the wet home", "p": [-20.703, 15.0, 68.274], "r": 1.1, "floor": 15.0, "rel": 10.6, "into": "pod_112.5_0", "inner": [-21.904, 15.0, 67.777], "outer": [-19.502, 15.0, 68.772], "mouth": [-18.948, 16.1, 69.001], "bearing": 22.5, "dp": 1.11}, {"key": "lock_pod_112.5_1", "hall": "hall_112.5", "shape": "collar", "kind": "lock", "name": "lock to Damaku's home", "opens": "the wet home", "p": [-33.638, 15.0, 62.917], "r": 1.1, "floor": 15.0, "rel": 10.6, "into": "pod_112.5_1", "inner": [-32.437, 15.0, 63.414], "outer": [-34.839, 15.0, 62.419], "mouth": [-35.393, 16.1, 62.19], "bearing": -157.5, "dp": 1.11}, {"key": "lock_hall_202.5", "hall": "hall_202.5", "shape": "chamber", "kind": "lock", "name": "Exchange household landing hall sea lock", "opens": "the sea below", "p": [-60.376, 18.0, -25.008], "r": 0.85, "floor": 18.0, "rel": 13.6, "y0": 15.45, "y1": 17.85, "inner": [-60.653, 18.0, -25.123], "outer": [-60.376, 15.45, -25.008], "mouth": [-60.376, 14.45, -25.008], "dp": 1.15}, {"key": "lock_crown_202.5", "hall": "crown_202.5", "shape": "chamber", "kind": "lock", "name": "Exchange household crown hall sea lock", "opens": "the sea below", "p": [-60.376, 30.0, -25.008], "r": 0.85, "floor": 30.0, "rel": 25.6, "y0": 27.45, "y1": 29.85, "inner": [-60.653, 30.0, -25.123], "outer": [-60.376, 27.45, -25.008], "mouth": [-60.376, 26.45, -25.008], "dp": 2.36}, {"key": "lock_pod_202.5_0", "hall": "hall_202.5", "shape": "collar", "kind": "lock", "name": "lock to Maresa's home", "opens": "the wet home", "p": [-64.682, 18.0, -20.23], "r": 1.1, "floor": 18.0, "rel": 13.6, "into": "pod_202.5_0", "inner": [-64.851, 18.0, -21.519], "outer": [-64.512, 18.0, -18.942], "mouth": [-64.434, 19.1, -18.347], "bearing": 82.5, "dp": 1.41}, {"key": "lock_pod_202.5_1", "hall": "hall_202.5", "shape": "collar", "kind": "lock", "name": "lock to Pelaju's home", "opens": "the wet home", "p": [-72.063, 18.0, -29.849], "r": 1.1, "floor": 18.0, "rel": 13.6, "into": "pod_202.5_1", "inner": [-70.862, 18.0, -29.352], "outer": [-73.264, 18.0, -30.347], "mouth": [-73.818, 19.1, -30.576], "bearing": -157.5, "dp": 1.41}, {"key": "lock_pod_202.5_2", "hall": "hall_202.5", "shape": "collar", "kind": "lock", "name": "lock to Sujira's home", "opens": "the wet home", "p": [-60.042, 18.0, -31.432], "r": 1.1, "floor": 18.0, "rel": 13.6, "into": "pod_202.5_2", "inner": [-61.073, 18.0, -30.64], "outer": [-59.011, 18.0, -32.223], "mouth": [-58.535, 19.1, -32.589], "bearing": -37.5, "dp": 1.41}, {"key": "lock_hall_292.5", "hall": "hall_292.5", "shape": "chamber", "kind": "lock", "name": "Reef House landing hall sea lock", "opens": "the sea below", "p": [25.008, 20.0, -60.376], "r": 0.85, "floor": 20.0, "rel": 15.6, "y0": 17.45, "y1": 19.85, "inner": [25.123, 20.0, -60.653], "outer": [25.008, 17.45, -60.376], "mouth": [25.008, 16.45, -60.376], "dp": 1.35}, {"key": "lock_crown_292.5", "hall": "crown_292.5", "shape": "chamber", "kind": "lock", "name": "Reef House crown hall sea lock", "opens": "the sea below", "p": [25.008, 30.0, -60.376], "r": 0.85, "floor": 30.0, "rel": 25.6, "y0": 27.45, "y1": 29.85, "inner": [25.123, 30.0, -60.653], "outer": [25.008, 27.45, -60.376], "mouth": [25.008, 26.45, -60.376], "dp": 2.36}, {"key": "lock_pod_292.5_0", "hall": "hall_292.5", "shape": "collar", "kind": "lock", "name": "lock to Talisa's home", "opens": "the wet home", "p": [20.703, 20.0, -62.917], "r": 1.1, "floor": 20.0, "rel": 15.6, "into": "pod_292.5_0", "inner": [21.904, 20.0, -63.414], "outer": [19.502, 20.0, -62.419], "mouth": [18.948, 21.1, -62.19], "bearing": 157.5, "dp": 1.61}, {"key": "lock_pod_292.5_1", "hall": "hall_292.5", "shape": "collar", "kind": "lock", "name": "lock to Arimu's home", "opens": "the wet home", "p": [24.492, 20.0, -72.063], "r": 1.1, "floor": 20.0, "rel": 15.6, "into": "pod_292.5_1", "inner": [24.989, 20.0, -70.862], "outer": [23.994, 20.0, -73.264], "mouth": [23.765, 21.1, -73.818], "bearing": -112.5, "dp": 1.61}, {"key": "lock_pod_292.5_2", "hall": "hall_292.5", "shape": "collar", "kind": "lock", "name": "lock to Kaluja's home", "opens": "the wet home", "p": [33.638, 20.0, -68.274], "r": 1.1, "floor": 20.0, "rel": 15.6, "into": "pod_292.5_2", "inner": [32.437, 20.0, -67.777], "outer": [34.839, 20.0, -68.772], "mouth": [35.393, 21.1, -69.001], "bearing": -22.5, "dp": 1.61}, {"key": "lock_pod_292.5_3", "hall": "hall_292.5", "shape": "collar", "kind": "lock", "name": "lock to the Reef House workshop", "opens": "the wet home", "p": [29.849, 20.0, -59.128], "r": 1.1, "floor": 20.0, "rel": 15.6, "into": "pod_292.5_3", "inner": [29.352, 20.0, -60.329], "outer": [30.347, 20.0, -57.927], "mouth": [30.576, 21.1, -57.373], "bearing": 67.5, "dp": 1.61}, {"key": "lock_fountain", "hall": "trunk_c", "shape": "fountain", "kind": "lock", "name": "the fountain lock", "opens": "the roof's air, at the waterline landing", "p": [0.0, 69.6, 0.0], "r": 1.8, "floor": 69.6, "rel": 65.2, "y0": 69.6, "y1": 72.9, "inner": [1.8, 69.6, 0.0], "outer": [0.0, 72.9, 0.0], "mouth": [0.0, 73.5, 0.0], "note": "slow to equalise: the whole difference between the network and the surface", "dp": 6.84}], "trunk_ramps": {"trunk_22.5": [[64.447, 4.4, 29.942], [64.25, 4.4, 29.852], [64.06, 4.4, 29.748], [63.878, 4.4, 29.631], [63.705, 4.4, 29.5], [63.542, 4.4, 29.358], [63.39, 4.4, 29.204], [63.143, 4.642, 28.899], [62.939, 4.883, 28.564], [62.779, 5.125, 28.205], [62.669, 5.367, 27.829], [62.608, 5.608, 27.441], [62.598, 5.85, 27.049], [62.639, 6.092, 26.658], [62.732, 6.333, 26.277], [62.873, 6.575, 25.911], [63.06, 6.817, 25.566], [63.292, 7.058, 25.249], [63.562, 7.3, 24.965], [63.867, 7.542, 24.718], [64.202, 7.783, 24.514], [64.561, 8.025, 24.355], [64.937, 8.267, 24.244], [65.325, 8.508, 24.183], [65.717, 8.75, 24.173], [66.108, 8.992, 24.215], [66.489, 9.233, 24.307], [66.855, 9.475, 24.448], [67.2, 9.717, 24.636], [67.517, 9.958, 24.867], [67.801, 10.2, 25.137], [67.942, 10.2, 25.302], [68.071, 10.2, 25.476], [68.187, 10.2, 25.659], [68.289, 10.2, 25.85], [68.377, 10.2, 26.048], [68.451, 10.2, 26.251], [68.547, 10.442, 26.632], [68.592, 10.683, 27.022], [68.586, 10.925, 27.414], [68.528, 11.167, 27.802], [68.421, 11.408, 28.18], [68.265, 11.65, 28.54], [68.063, 11.892, 28.876], [67.819, 12.133, 29.184], [67.538, 12.375, 29.457], [67.222, 12.617, 29.691], [66.88, 12.858, 29.882], [66.515, 13.1, 30.026], [66.134, 13.342, 30.122], [65.744, 13.583, 30.167], [65.352, 13.825, 30.161], [64.964, 14.067, 30.103], [64.586, 14.308, 29.996], [64.226, 14.55, 29.84], [63.889, 14.792, 29.638], [63.582, 15.033, 29.394], [63.309, 15.275, 29.113], [63.075, 15.517, 28.798], [62.884, 15.758, 28.455], [62.74, 16.0, 28.09], [62.681, 16.0, 27.881], [62.637, 16.0, 27.669], [62.609, 16.0, 27.454], [62.596, 16.0, 27.238], [62.599, 16.0, 27.022], [62.618, 16.0, 26.806], [62.652, 16.0, 26.592], [62.701, 16.0, 26.381], [62.766, 16.0, 26.174], [62.845, 16.0, 25.973], [62.939, 16.0, 25.777], [63.046, 16.0, 25.589], [63.274, 16.194, 25.27], [63.542, 16.389, 24.983], [63.845, 16.583, 24.734], [64.178, 16.778, 24.526], [64.536, 16.972, 24.364], [64.911, 17.167, 24.25], [65.298, 17.361, 24.185], [65.69, 17.556, 24.172], [66.081, 17.75, 24.21], [66.463, 17.944, 24.299], [66.831, 18.139, 24.437], [67.177, 18.333, 24.621], [67.496, 18.528, 24.849], [67.783, 18.722, 25.117], [68.032, 18.917, 25.42], [68.24, 19.111, 25.753], [68.402, 19.306, 26.111], [68.516, 19.5, 26.486], [68.581, 19.694, 26.873], [68.594, 19.889, 27.265], [68.556, 20.083, 27.656], [68.467, 20.278, 28.038], [68.329, 20.472, 28.406], [68.145, 20.667, 28.752], [68.024, 20.667, 28.932], [67.891, 20.667, 29.102], [67.745, 20.667, 29.263], [67.589, 20.667, 29.413], [67.422, 20.667, 29.551], [67.245, 20.667, 29.676], [66.904, 20.861, 29.87], [66.54, 21.056, 30.018], [66.161, 21.25, 30.117], [65.771, 21.444, 30.165], [65.379, 21.639, 30.163], [64.99, 21.833, 30.109], [64.612, 22.028, 30.005], [64.25, 22.222, 29.852], [63.912, 22.417, 29.654], [63.602, 22.611, 29.412], [63.326, 22.806, 29.133], [63.09, 23.0, 28.82], [62.896, 23.194, 28.479], [62.748, 23.389, 28.115], [62.649, 23.583, 27.736], [62.601, 23.778, 27.346], [62.603, 23.972, 26.954], [62.657, 24.167, 26.565], [62.761, 24.361, 26.187], [62.914, 24.556, 25.825], [63.112, 24.75, 25.487], [63.353, 24.944, 25.177], [63.633, 25.139, 24.902], [63.946, 25.333, 24.665], [64.131, 25.333, 24.552], [64.324, 25.333, 24.453], [64.523, 25.333, 24.369], [64.728, 25.333, 24.299], [64.937, 25.333, 24.244], [65.15, 25.333, 24.204], [65.541, 25.528, 24.171], [65.933, 25.722, 24.19], [66.32, 25.917, 24.259], [66.693, 26.111, 24.379], [67.048, 26.306, 24.546], [67.379, 26.5, 24.758], [67.678, 26.694, 25.011], [67.942, 26.889, 25.302], [68.166, 27.083, 25.624], [68.346, 27.278, 25.973], [68.479, 27.472, 26.342], [68.562, 27.667, 26.725], [68.595, 27.861, 27.117], [68.576, 28.056, 27.509], [68.507, 28.25, 27.895], [68.387, 28.444, 28.269], [68.22, 28.639, 28.624], [68.008, 28.833, 28.954], [67.755, 29.028, 29.253], [67.464, 29.222, 29.517], [67.142, 29.417, 29.741], [66.793, 29.611, 29.921], [66.424, 29.806, 30.054], [66.04, 30.0, 30.137], [65.825, 30.0, 30.162], [65.609, 30.0, 30.17], [65.392, 30.0, 30.164], [65.177, 30.0, 30.141], [64.964, 30.0, 30.103], [64.754, 30.0, 30.05]], "trunk_112.5": [[-29.942, 4.4, 64.447], [-29.852, 4.4, 64.25], [-29.748, 4.4, 64.06], [-29.631, 4.4, 63.878], [-29.5, 4.4, 63.705], [-29.358, 4.4, 63.542], [-29.204, 4.4, 63.39], [-28.899, 4.621, 63.143], [-28.564, 4.842, 62.939], [-28.205, 5.062, 62.779], [-27.829, 5.283, 62.669], [-27.441, 5.504, 62.608], [-27.049, 5.725, 62.598], [-26.658, 5.946, 62.639], [-26.277, 6.167, 62.732], [-25.911, 6.388, 62.873], [-25.566, 6.608, 63.06], [-25.249, 6.829, 63.292], [-24.965, 7.05, 63.562], [-24.718, 7.271, 63.867], [-24.514, 7.492, 64.202], [-24.355, 7.713, 64.561], [-24.244, 7.933, 64.937], [-24.183, 8.154, 65.325], [-24.173, 8.375, 65.717], [-24.215, 8.596, 66.108], [-24.307, 8.817, 66.489], [-24.448, 9.038, 66.855], [-24.636, 9.258, 67.2], [-24.867, 9.479, 67.517], [-25.137, 9.7, 67.801], [-25.302, 9.7, 67.942], [-25.476, 9.7, 68.071], [-25.659, 9.7, 68.187], [-25.85, 9.7, 68.289], [-26.048, 9.7, 68.377], [-26.251, 9.7, 68.451], [-26.632, 9.921, 68.547], [-27.022, 10.142, 68.592], [-27.414, 10.362, 68.586], [-27.802, 10.583, 68.528], [-28.18, 10.804, 68.421], [-28.54, 11.025, 68.265], [-28.876, 11.246, 68.063], [-29.184, 11.467, 67.819], [-29.457, 11.688, 67.538], [-29.691, 11.908, 67.222], [-29.882, 12.129, 66.88], [-30.026, 12.35, 66.515], [-30.122, 12.571, 66.134], [-30.167, 12.792, 65.744], [-30.161, 13.012, 65.352], [-30.103, 13.233, 64.964], [-29.996, 13.454, 64.586], [-29.84, 13.675, 64.226], [-29.638, 13.896, 63.889], [-29.394, 14.117, 63.582], [-29.113, 14.337, 63.309], [-28.798, 14.558, 63.075], [-28.455, 14.779, 62.884], [-28.09, 15.0, 62.74], [-27.881, 15.0, 62.681], [-27.669, 15.0, 62.637], [-27.454, 15.0, 62.609], [-27.238, 15.0, 62.596], [-27.022, 15.0, 62.599], [-26.806, 15.0, 62.618], [-26.592, 15.0, 62.652], [-26.381, 15.0, 62.701], [-26.174, 15.0, 62.766], [-25.973, 15.0, 62.845], [-25.777, 15.0, 62.939], [-25.589, 15.0, 63.046], [-25.27, 15.208, 63.274], [-24.983, 15.417, 63.542], [-24.734, 15.625, 63.845], [-24.526, 15.833, 64.178], [-24.364, 16.042, 64.536], [-24.25, 16.25, 64.911], [-24.185, 16.458, 65.298], [-24.172, 16.667, 65.69], [-24.21, 16.875, 66.081], [-24.299, 17.083, 66.463], [-24.437, 17.292, 66.831], [-24.621, 17.5, 67.177], [-24.849, 17.708, 67.496], [-25.117, 17.917, 67.783], [-25.42, 18.125, 68.032], [-25.753, 18.333, 68.24], [-26.111, 18.542, 68.402], [-26.486, 18.75, 68.516], [-26.873, 18.958, 68.581], [-27.265, 19.167, 68.594], [-27.656, 19.375, 68.556], [-28.038, 19.583, 68.467], [-28.406, 19.792, 68.329], [-28.752, 20.0, 68.145], [-28.932, 20.0, 68.024], [-29.102, 20.0, 67.891], [-29.263, 20.0, 67.745], [-29.413, 20.0, 67.589], [-29.551, 20.0, 67.422], [-29.676, 20.0, 67.245], [-29.87, 20.208, 66.904], [-30.018, 20.417, 66.54], [-30.117, 20.625, 66.161], [-30.165, 20.833, 65.771], [-30.163, 21.042, 65.379], [-30.109, 21.25, 64.99], [-30.005, 21.458, 64.612], [-29.852, 21.667, 64.25], [-29.654, 21.875, 63.912], [-29.412, 22.083, 63.602], [-29.133, 22.292, 63.326], [-28.82, 22.5, 63.09], [-28.479, 22.708, 62.896], [-28.115, 22.917, 62.748], [-27.736, 23.125, 62.649], [-27.346, 23.333, 62.601], [-26.954, 23.542, 62.603], [-26.565, 23.75, 62.657], [-26.187, 23.958, 62.761], [-25.825, 24.167, 62.914], [-25.487, 24.375, 63.112], [-25.177, 24.583, 63.353], [-24.902, 24.792, 63.633], [-24.665, 25.0, 63.946], [-24.552, 25.0, 64.131], [-24.453, 25.0, 64.324], [-24.369, 25.0, 64.523], [-24.299, 25.0, 64.728], [-24.244, 25.0, 64.937], [-24.204, 25.0, 65.15], [-24.171, 25.208, 65.541], [-24.19, 25.417, 65.933], [-24.259, 25.625, 66.32], [-24.379, 25.833, 66.693], [-24.546, 26.042, 67.048], [-24.758, 26.25, 67.379], [-25.011, 26.458, 67.678], [-25.302, 26.667, 67.942], [-25.624, 26.875, 68.166], [-25.973, 27.083, 68.346], [-26.342, 27.292, 68.479], [-26.725, 27.5, 68.562], [-27.117, 27.708, 68.595], [-27.509, 27.917, 68.576], [-27.895, 28.125, 68.507], [-28.269, 28.333, 68.387], [-28.624, 28.542, 68.22], [-28.954, 28.75, 68.008], [-29.253, 28.958, 67.755], [-29.517, 29.167, 67.464], [-29.741, 29.375, 67.142], [-29.921, 29.583, 66.793], [-30.054, 29.792, 66.424], [-30.137, 30.0, 66.04], [-30.162, 30.0, 65.825], [-30.17, 30.0, 65.609], [-30.164, 30.0, 65.392], [-30.141, 30.0, 65.177], [-30.103, 30.0, 64.964], [-30.05, 30.0, 64.754]], "trunk_202.5": [[-64.447, 4.4, -29.942], [-64.25, 4.4, -29.852], [-64.06, 4.4, -29.748], [-63.878, 4.4, -29.631], [-63.705, 4.4, -29.5], [-63.542, 4.4, -29.358], [-63.39, 4.4, -29.204], [-63.143, 4.589, -28.899], [-62.939, 4.778, -28.564], [-62.779, 4.967, -28.205], [-62.669, 5.156, -27.829], [-62.608, 5.344, -27.441], [-62.598, 5.533, -27.049], [-62.639, 5.722, -26.658], [-62.732, 5.911, -26.277], [-62.873, 6.1, -25.911], [-63.06, 6.289, -25.566], [-63.292, 6.478, -25.249], [-63.562, 6.667, -24.965], [-63.867, 6.856, -24.718], [-64.202, 7.044, -24.514], [-64.561, 7.233, -24.355], [-64.937, 7.422, -24.244], [-65.325, 7.611, -24.183], [-65.717, 7.8, -24.173], [-66.108, 7.989, -24.215], [-66.489, 8.178, -24.307], [-66.855, 8.367, -24.448], [-67.2, 8.556, -24.636], [-67.517, 8.744, -24.867], [-67.801, 8.933, -25.137], [-67.942, 8.933, -25.302], [-68.071, 8.933, -25.476], [-68.187, 8.933, -25.659], [-68.289, 8.933, -25.85], [-68.377, 8.933, -26.048], [-68.451, 8.933, -26.251], [-68.547, 9.122, -26.632], [-68.592, 9.311, -27.022], [-68.586, 9.5, -27.414], [-68.528, 9.689, -27.802], [-68.421, 9.878, -28.18], [-68.265, 10.067, -28.54], [-68.063, 10.256, -28.876], [-67.819, 10.444, -29.184], [-67.538, 10.633, -29.457], [-67.222, 10.822, -29.691], [-66.88, 11.011, -29.882], [-66.515, 11.2, -30.026], [-66.134, 11.389, -30.122], [-65.744, 11.578, -30.167], [-65.352, 11.767, -30.161], [-64.964, 11.956, -30.103], [-64.586, 12.144, -29.996], [-64.226, 12.333, -29.84], [-63.889, 12.522, -29.638], [-63.582, 12.711, -29.394], [-63.309, 12.9, -29.113], [-63.075, 13.089, -28.798], [-62.884, 13.278, -28.455], [-62.74, 13.467, -28.09], [-62.681, 13.467, -27.881], [-62.637, 13.467, -27.669], [-62.609, 13.467, -27.454], [-62.596, 13.467, -27.238], [-62.599, 13.467, -27.022], [-62.618, 13.467, -26.806], [-62.691, 13.656, -26.42], [-62.814, 13.844, -26.047], [-62.984, 14.033, -25.694], [-63.199, 14.222, -25.366], [-63.455, 14.411, -25.068], [-63.748, 14.6, -24.807], [-64.072, 14.789, -24.586], [-64.423, 14.978, -24.409], [-64.793, 15.167, -24.28], [-65.177, 15.356, -24.2], [-65.568, 15.544, -24.171], [-65.96, 15.733, -24.193], [-66.346, 15.922, -24.266], [-66.719, 16.111, -24.389], [-67.072, 16.3, -24.559], [-67.4, 16.489, -24.774], [-67.698, 16.678, -25.03], [-67.959, 16.867, -25.323], [-68.18, 17.056, -25.647], [-68.357, 17.244, -25.998], [-68.486, 17.433, -26.368], [-68.566, 17.622, -26.752], [-68.595, 17.811, -27.144], [-68.573, 18.0, -27.535], [-68.539, 18.0, -27.749], [-68.49, 18.0, -27.96], [-68.425, 18.0, -28.167], [-68.346, 18.0, -28.369], [-68.252, 18.0, -28.564], [-68.145, 18.0, -28.752], [-68.024, 18.0, -28.932], [-67.891, 18.0, -29.102], [-67.745, 18.0, -29.263], [-67.589, 18.0, -29.413], [-67.422, 18.0, -29.551], [-67.245, 18.0, -29.676], [-66.904, 18.167, -29.87], [-66.54, 18.333, -30.018], [-66.161, 18.5, -30.117], [-65.771, 18.667, -30.165], [-65.379, 18.833, -30.163], [-64.99, 19.0, -30.109], [-64.612, 19.167, -30.005], [-64.25, 19.333, -29.852], [-63.912, 19.5, -29.654], [-63.602, 19.667, -29.412], [-63.326, 19.833, -29.133], [-63.09, 20.0, -28.82], [-62.896, 20.167, -28.479], [-62.748, 20.333, -28.115], [-62.649, 20.5, -27.736], [-62.601, 20.667, -27.346], [-62.603, 20.833, -26.954], [-62.657, 21.0, -26.565], [-62.761, 21.167, -26.187], [-62.914, 21.333, -25.825], [-63.112, 21.5, -25.487], [-63.353, 21.667, -25.177], [-63.633, 21.833, -24.902], [-63.946, 22.0, -24.665], [-64.131, 22.0, -24.552], [-64.324, 22.0, -24.453], [-64.523, 22.0, -24.369], [-64.728, 22.0, -24.299], [-64.937, 22.0, -24.244], [-65.15, 22.0, -24.204], [-65.541, 22.167, -24.171], [-65.933, 22.333, -24.19], [-66.32, 22.5, -24.259], [-66.693, 22.667, -24.379], [-67.048, 22.833, -24.546], [-67.379, 23.0, -24.758], [-67.678, 23.167, -25.011], [-67.942, 23.333, -25.302], [-68.166, 23.5, -25.624], [-68.346, 23.667, -25.973], [-68.479, 23.833, -26.342], [-68.562, 24.0, -26.725], [-68.595, 24.167, -27.117], [-68.576, 24.333, -27.509], [-68.507, 24.5, -27.895], [-68.387, 24.667, -28.269], [-68.22, 24.833, -28.624], [-68.008, 25.0, -28.954], [-67.755, 25.167, -29.253], [-67.464, 25.333, -29.517], [-67.142, 25.5, -29.741], [-66.793, 25.667, -29.921], [-66.424, 25.833, -30.054], [-66.04, 26.0, -30.137], [-65.825, 26.0, -30.162], [-65.609, 26.0, -30.17], [-65.392, 26.0, -30.164], [-65.177, 26.0, -30.141], [-64.964, 26.0, -30.103], [-64.754, 26.0, -30.05], [-64.385, 26.167, -29.915], [-64.037, 26.333, -29.734], [-63.716, 26.5, -29.509], [-63.427, 26.667, -29.243], [-63.175, 26.833, -28.942], [-62.964, 27.0, -28.611], [-62.799, 27.167, -28.256], [-62.681, 27.333, -27.881], [-62.613, 27.5, -27.495], [-62.596, 27.667, -27.103], [-62.631, 27.833, -26.712], [-62.716, 28.0, -26.329], [-62.851, 28.167, -25.96], [-63.032, 28.333, -25.612], [-63.257, 28.5, -25.291], [-63.523, 28.667, -25.002], [-63.824, 28.833, -24.75], [-64.155, 29.0, -24.539], [-64.51, 29.167, -24.374], [-64.885, 29.333, -24.256], [-65.271, 29.5, -24.188], [-65.663, 29.667, -24.171], [-66.054, 29.833, -24.206], [-66.437, 30.0, -24.291], [-66.643, 30.0, -24.359], [-66.843, 30.0, -24.442], [-67.037, 30.0, -24.539], [-67.223, 30.0, -24.65], [-67.4, 30.0, -24.774], [-67.569, 30.0, -24.911]], "trunk_292.5": [[29.942, 4.4, -64.447], [29.852, 4.4, -64.25], [29.748, 4.4, -64.06], [29.631, 4.4, -63.878], [29.5, 4.4, -63.705], [29.358, 4.4, -63.542], [29.204, 4.4, -63.39], [28.899, 4.617, -63.143], [28.564, 4.833, -62.939], [28.205, 5.05, -62.779], [27.829, 5.267, -62.669], [27.441, 5.483, -62.608], [27.049, 5.7, -62.598], [26.658, 5.917, -62.639], [26.277, 6.133, -62.732], [25.911, 6.35, -62.873], [25.566, 6.567, -63.06], [25.249, 6.783, -63.292], [24.965, 7.0, -63.562], [24.718, 7.217, -63.867], [24.514, 7.433, -64.202], [24.355, 7.65, -64.561], [24.244, 7.867, -64.937], [24.183, 8.083, -65.325], [24.173, 8.3, -65.717], [24.215, 8.517, -66.108], [24.307, 8.733, -66.489], [24.448, 8.95, -66.855], [24.636, 9.167, -67.2], [24.867, 9.383, -67.517], [25.137, 9.6, -67.801], [25.302, 9.6, -67.942], [25.476, 9.6, -68.071], [25.659, 9.6, -68.187], [25.85, 9.6, -68.289], [26.048, 9.6, -68.377], [26.251, 9.6, -68.451], [26.632, 9.817, -68.547], [27.022, 10.033, -68.592], [27.414, 10.25, -68.586], [27.802, 10.467, -68.528], [28.18, 10.683, -68.421], [28.54, 10.9, -68.265], [28.876, 11.117, -68.063], [29.184, 11.333, -67.819], [29.457, 11.55, -67.538], [29.691, 11.767, -67.222], [29.882, 11.983, -66.88], [30.026, 12.2, -66.515], [30.122, 12.417, -66.134], [30.167, 12.633, -65.744], [30.161, 12.85, -65.352], [30.103, 13.067, -64.964], [29.996, 13.283, -64.586], [29.84, 13.5, -64.226], [29.638, 13.717, -63.889], [29.394, 13.933, -63.582], [29.113, 14.15, -63.309], [28.798, 14.367, -63.075], [28.455, 14.583, -62.884], [28.09, 14.8, -62.74], [27.881, 14.8, -62.681], [27.669, 14.8, -62.637], [27.454, 14.8, -62.609], [27.238, 14.8, -62.596], [27.022, 14.8, -62.599], [26.806, 14.8, -62.618], [26.42, 15.017, -62.691], [26.047, 15.233, -62.814], [25.694, 15.45, -62.984], [25.366, 15.667, -63.199], [25.068, 15.883, -63.455], [24.807, 16.1, -63.748], [24.586, 16.317, -64.072], [24.409, 16.533, -64.423], [24.28, 16.75, -64.793], [24.2, 16.967, -65.177], [24.171, 17.183, -65.568], [24.193, 17.4, -65.96], [24.266, 17.617, -66.346], [24.389, 17.833, -66.719], [24.559, 18.05, -67.072], [24.774, 18.267, -67.4], [25.03, 18.483, -67.698], [25.323, 18.7, -67.959], [25.647, 18.917, -68.18], [25.998, 19.133, -68.357], [26.368, 19.35, -68.486], [26.752, 19.567, -68.566], [27.144, 19.783, -68.595], [27.535, 20.0, -68.573], [27.749, 20.0, -68.539], [27.96, 20.0, -68.49], [28.167, 20.0, -68.425], [28.369, 20.0, -68.346], [28.564, 20.0, -68.252], [28.752, 20.0, -68.145], [28.932, 20.0, -68.024], [29.102, 20.0, -67.891], [29.263, 20.0, -67.745], [29.413, 20.0, -67.589], [29.551, 20.0, -67.422], [29.676, 20.0, -67.245], [29.87, 20.208, -66.904], [30.018, 20.417, -66.54], [30.117, 20.625, -66.161], [30.165, 20.833, -65.771], [30.163, 21.042, -65.379], [30.109, 21.25, -64.99], [30.005, 21.458, -64.612], [29.852, 21.667, -64.25], [29.654, 21.875, -63.912], [29.412, 22.083, -63.602], [29.133, 22.292, -63.326], [28.82, 22.5, -63.09], [28.479, 22.708, -62.896], [28.115, 22.917, -62.748], [27.736, 23.125, -62.649], [27.346, 23.333, -62.601], [26.954, 23.542, -62.603], [26.565, 23.75, -62.657], [26.187, 23.958, -62.761], [25.825, 24.167, -62.914], [25.487, 24.375, -63.112], [25.177, 24.583, -63.353], [24.902, 24.792, -63.633], [24.665, 25.0, -63.946], [24.552, 25.0, -64.131], [24.453, 25.0, -64.324], [24.369, 25.0, -64.523], [24.299, 25.0, -64.728], [24.244, 25.0, -64.937], [24.204, 25.0, -65.15], [24.171, 25.208, -65.541], [24.19, 25.417, -65.933], [24.259, 25.625, -66.32], [24.379, 25.833, -66.693], [24.546, 26.042, -67.048], [24.758, 26.25, -67.379], [25.011, 26.458, -67.678], [25.302, 26.667, -67.942], [25.624, 26.875, -68.166], [25.973, 27.083, -68.346], [26.342, 27.292, -68.479], [26.725, 27.5, -68.562], [27.117, 27.708, -68.595], [27.509, 27.917, -68.576], [27.895, 28.125, -68.507], [28.269, 28.333, -68.387], [28.624, 28.542, -68.22], [28.954, 28.75, -68.008], [29.253, 28.958, -67.755], [29.517, 29.167, -67.464], [29.741, 29.375, -67.142], [29.921, 29.583, -66.793], [30.054, 29.792, -66.424], [30.137, 30.0, -66.04], [30.162, 30.0, -65.825], [30.17, 30.0, -65.609], [30.164, 30.0, -65.392], [30.141, 30.0, -65.177], [30.103, 30.0, -64.964], [30.05, 30.0, -64.754]], "trunk_c": [[0.0, 19.0, 3.0], [-0.216, 19.0, 2.992], [-0.432, 19.0, 2.969], [-0.645, 19.0, 2.93], [-0.855, 19.0, 2.876], [-1.06, 19.0, 2.807], [-1.26, 19.0, 2.723], [-1.604, 19.234, 2.535], [-1.921, 19.469, 2.304], [-2.206, 19.703, 2.033], [-2.452, 19.937, 1.728], [-2.657, 20.171, 1.393], [-2.816, 20.406, 1.035], [-2.927, 20.64, 0.658], [-2.988, 20.874, 0.27], [-2.998, 21.108, -0.122], [-2.956, 21.343, -0.512], [-2.864, 21.577, -0.894], [-2.723, 21.811, -1.26], [-2.535, 22.045, -1.604], [-2.304, 22.28, -1.921], [-2.033, 22.514, -2.206], [-1.728, 22.748, -2.452], [-1.393, 22.982, -2.657], [-1.035, 23.217, -2.816], [-0.658, 23.451, -2.927], [-0.27, 23.685, -2.988], [0.122, 23.919, -2.998], [0.512, 24.154, -2.956], [0.894, 24.388, -2.864], [1.26, 24.622, -2.723], [1.453, 24.622, -2.625], [1.638, 24.622, -2.513], [1.816, 24.622, -2.388], [1.983, 24.622, -2.251], [2.14, 24.622, -2.102], [2.287, 24.622, -1.942], [2.52, 24.856, -1.627], [2.711, 25.091, -1.284], [2.856, 25.325, -0.919], [2.951, 25.559, -0.539], [2.996, 25.794, -0.149], [2.99, 26.028, 0.244], [2.933, 26.262, 0.632], [2.825, 26.496, 1.009], [2.669, 26.731, 1.369], [2.468, 26.965, 1.706], [2.224, 27.199, 2.013], [1.942, 27.433, 2.287], [1.627, 27.668, 2.52], [1.284, 27.902, 2.711], [0.919, 28.136, 2.856], [0.539, 28.37, 2.951], [0.149, 28.605, 2.996], [-0.244, 28.839, 2.99], [-0.632, 29.073, 2.933], [-1.009, 29.307, 2.825], [-1.369, 29.542, 2.669], [-1.706, 29.776, 2.468], [-2.013, 30.01, 2.224], [-2.287, 30.244, 1.942], [-2.421, 30.244, 1.772], [-2.542, 30.244, 1.593], [-2.651, 30.244, 1.405], [-2.745, 30.244, 1.21], [-2.825, 30.244, 1.009], [-2.891, 30.244, 0.802], [-2.971, 30.479, 0.418], [-3.0, 30.713, 0.027], [-2.978, 30.947, -0.365], [-2.905, 31.181, -0.75], [-2.782, 31.416, -1.123], [-2.611, 31.65, -1.477], [-2.396, 31.884, -1.805], [-2.14, 32.119, -2.102], [-1.848, 32.353, -2.364], [-1.523, 32.587, -2.584], [-1.173, 32.821, -2.761], [-0.802, 33.056, -2.891], [-0.418, 33.29, -2.971], [-0.027, 33.524, -3.0], [0.365, 33.758, -2.978], [0.75, 33.993, -2.905], [1.123, 34.227, -2.782], [1.477, 34.461, -2.611], [1.805, 34.695, -2.396], [2.102, 34.93, -2.14], [2.364, 35.164, -1.848], [2.584, 35.398, -1.523], [2.761, 35.632, -1.173], [2.891, 35.867, -0.802], [2.941, 35.867, -0.592], [2.976, 35.867, -0.378], [2.996, 35.867, -0.162], [3.0, 35.867, 0.054], [2.988, 35.867, 0.271], [2.96, 35.867, 0.485], [2.872, 36.101, 0.868], [2.734, 36.335, 1.235], [2.549, 36.569, 1.581], [2.321, 36.804, 1.901], [2.053, 37.038, 2.187], [1.75, 37.272, 2.437], [1.417, 37.506, 2.644], [1.06, 37.741, 2.807], [0.684, 37.975, 2.921], [0.297, 38.209, 2.985], [-0.095, 38.444, 2.998], [-0.485, 38.678, 2.96], [-0.868, 38.912, 2.872], [-1.235, 39.146, 2.734], [-1.581, 39.381, 2.549], [-1.901, 39.615, 2.321], [-2.187, 39.849, 2.053], [-2.437, 40.083, 1.75], [-2.644, 40.318, 1.417], [-2.807, 40.552, 1.06], [-2.921, 40.786, 0.684], [-2.985, 41.02, 0.297], [-2.998, 41.255, -0.095], [-2.96, 41.489, -0.485], [-2.918, 41.489, -0.698], [-2.86, 41.489, -0.907], [-2.787, 41.489, -1.111], [-2.699, 41.489, -1.309], [-2.598, 41.489, -1.5], [-2.483, 41.489, -1.684], [-2.242, 41.723, -1.993], [-1.963, 41.957, -2.269], [-1.65, 42.192, -2.506], [-1.308, 42.426, -2.7], [-0.945, 42.66, -2.847], [-0.565, 42.894, -2.946], [-0.176, 43.129, -2.995], [0.217, 43.363, -2.992], [0.605, 43.597, -2.938], [0.984, 43.831, -2.834], [1.345, 44.066, -2.682], [1.684, 44.3, -2.483], [1.993, 44.534, -2.242], [2.269, 44.769, -1.963], [2.506, 45.003, -1.65], [2.7, 45.237, -1.308], [2.847, 45.471, -0.945], [2.946, 45.706, -0.565], [2.995, 45.94, -0.176], [2.992, 46.174, 0.217], [2.938, 46.408, 0.605], [2.834, 46.643, 0.984], [2.682, 46.877, 1.345], [2.483, 47.111, 1.684], [2.355, 47.111, 1.858], [2.215, 47.111, 2.024], [2.063, 47.111, 2.178], [1.9, 47.111, 2.321], [1.728, 47.111, 2.452], [1.547, 47.111, 2.571], [1.198, 47.345, 2.751], [0.828, 47.58, 2.883], [0.445, 47.814, 2.967], [0.054, 48.048, 3.0], [-0.338, 48.282, 2.981], [-0.724, 48.517, 2.911], [-1.098, 48.751, 2.792], [-1.453, 48.985, 2.625], [-1.783, 49.219, 2.413], [-2.083, 49.454, 2.159], [-2.347, 49.688, 1.869], [-2.571, 49.922, 1.547], [-2.751, 50.156, 1.198], [-2.883, 50.391, 0.828], [-2.967, 50.625, 0.445], [-3.0, 50.859, 0.054], [-2.981, 51.094, -0.338], [-2.911, 51.328, -0.724], [-2.792, 51.562, -1.098], [-2.625, 51.796, -1.453], [-2.413, 52.031, -1.783], [-2.159, 52.265, -2.083], [-1.869, 52.499, -2.347], [-1.547, 52.733, -2.571], [-1.357, 52.733, -2.676], [-1.16, 52.733, -2.767], [-0.958, 52.733, -2.843], [-0.75, 52.733, -2.905], [-0.539, 52.733, -2.951], [-0.324, 52.733, -2.982], [0.068, 52.968, -2.999], [0.459, 53.202, -2.965], [0.842, 53.436, -2.879], [1.211, 53.67, -2.745], [1.558, 53.905, -2.563], [1.88, 54.139, -2.338], [2.169, 54.373, -2.073], [2.421, 54.607, -1.772], [2.631, 54.842, -1.441], [2.797, 55.076, -1.085], [2.915, 55.31, -0.711], [2.982, 55.544, -0.324], [2.999, 55.779, 0.068], [2.965, 56.013, 0.459], [2.879, 56.247, 0.842], [2.745, 56.481, 1.211], [2.563, 56.716, 1.558], [2.338, 56.95, 1.88], [2.073, 57.184, 2.169], [1.772, 57.419, 2.421], [1.441, 57.653, 2.631], [1.085, 57.887, 2.797], [0.711, 58.121, 2.915], [0.324, 58.356, 2.982], [0.108, 58.356, 2.998], [-0.109, 58.356, 2.998], [-0.325, 58.356, 2.982], [-0.539, 58.356, 2.951], [-0.75, 58.356, 2.905], [-0.958, 58.356, 2.843], [-1.321, 58.59, 2.693], [-1.661, 58.824, 2.498], [-1.973, 59.058, 2.26], [-2.251, 59.293, 1.983], [-2.491, 59.527, 1.672], [-2.688, 59.761, 1.333], [-2.839, 59.995, 0.97], [-2.941, 60.23, 0.592], [-2.993, 60.464, 0.203], [-2.994, 60.698, -0.19], [-2.944, 60.932, -0.579], [-2.843, 61.167, -0.958], [-2.693, 61.401, -1.321], [-2.498, 61.635, -1.661], [-2.26, 61.869, -1.973], [-1.983, 62.104, -2.251], [-1.672, 62.338, -2.491], [-1.333, 62.572, -2.688], [-0.97, 62.806, -2.839], [-0.592, 63.041, -2.941], [-0.203, 63.275, -2.993], [0.19, 63.509, -2.994], [0.579, 63.744, -2.944], [0.958, 63.978, -2.843], [1.161, 63.978, -2.766], [1.357, 63.978, -2.675], [1.547, 63.978, -2.57], [1.728, 63.978, -2.452], [1.901, 63.978, -2.321], [2.063, 63.978, -2.178], [2.33, 64.212, -1.89], [2.557, 64.446, -1.57], [2.74, 64.681, -1.222], [2.876, 64.915, -0.854], [2.963, 65.149, -0.472], [2.999, 65.383, -0.081], [2.984, 65.618, 0.311], [2.918, 65.852, 0.698], [2.802, 66.086, 1.073], [2.638, 66.32, 1.429], [2.428, 66.555, 1.761], [2.178, 66.789, 2.063], [1.89, 67.023, 2.33], [1.57, 67.257, 2.557], [1.222, 67.492, 2.74], [0.854, 67.726, 2.876], [0.472, 67.96, 2.963], [0.081, 68.194, 2.999], [-0.311, 68.429, 2.984], [-0.698, 68.663, 2.918], [-1.073, 68.897, 2.802], [-1.429, 69.131, 2.638], [-1.761, 69.366, 2.428], [-2.063, 69.6, 2.178], [-2.215, 69.6, 2.023], [-2.355, 69.6, 1.858], [-2.483, 69.6, 1.683], [-2.598, 69.6, 1.5], [-2.7, 69.6, 1.308], [-2.787, 69.6, 1.11]]}, "ramp_rc": 3.0, "ramp_w": 1.4, "air": {"datum": 4.4, "pool_level": 4.0, "pool_drop": 0.4, "tol": 0.3, "depth": 67.6, "bar": 7.85, "atm": 1.013, "bar_per_m": 0.1006, "keel": [0.6, 1.4], "lock": [0.85, 2.4, 0.45], "collar": [1.1, 2.6], "fountain_lock": {"r": 1.8, "y0": 69.6, "y1": 72.9}, "supply": "Damaku's air engine in the Glassworks, its bellows worked by the warm vent's heat, draws air from the roof's air hall down a stone air shaft built inside the wall over the main gate and through a conduit in the rock to the Glassworks, and presses it into the network. Spent air leaves the only way it can: it spills out under the rims of the moon pools, which are the network's relief valves, so the pressure can never rise above the datum's. The air each lock cycle spends is made up the same way.", "glass": "Above the datum the network's air pushes outward on the glass by 0.1 bar for every metre of height: the landing halls' glass is in tension, held by its nacre bands, and the central trunk's top holds most.", "over": {"civic_hall": -0.2, "exchange": -0.34, "west_house_wrap": -0.34, "east_house_wrap": -0.34, "common_room": 0.04, "glassworks": 0.04, "stump_22.5": 0.04, "hall_22.5": 1.21, "crown_22.5": 2.61, "stump_112.5": 0.04, "hall_112.5": 1.11, "crown_112.5": 2.61, "stump_202.5": 0.04, "hall_202.5": 1.41, "crown_202.5": 2.61, "stump_292.5": 0.04, "hall_292.5": 1.61, "crown_292.5": 2.61}}}/*END*/;
+const E = D.enclosure, WATER_Y = E.water, ROOF = E.roof_top;
+const V = Object.fromEntries(D.volumes.map(v => [v.key, v]));
+const rad = b => b * Math.PI / 180;
+const at = (r, b, y = 0) => [r * Math.cos(rad(b)), y, r * Math.sin(rad(b))];
+const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+// ocean_kingdom_terrain.gd near the city, in city metres (y up from the city floor, 72 m down)
+function ground(x, z) {
+  const d = Math.hypot(x, z), xw = x, zw = z - 540, r = Math.hypot(xw, zw);
+  let base = -42 + (-110 + 42) * smooth(250, 930 * 0.94, r);
+  base += Math.sin(xw * 0.010) * 3.2 + Math.cos(zw * 0.012) * 2.5 + Math.sin((xw + zw) * 0.006) * 2.0 + Math.sin(xw * 0.034) * Math.cos(zw * 0.029) * 0.9;
+  for (const [tx, tz, tr] of [[420, 250, 150], [-380, -330, 190]]) base -= Math.exp(-Math.pow(Math.hypot(xw - tx, zw - tz) / tr, 2)) * 24;
+  let h = (base + 72) * smooth(105, 150, d);
+  h += 2 * (1 - smooth(20, 25, d));
+  h -= 2 * smooth(45, 46.6, d) * (1 - smooth(51.4, 53, d));
+  return h;
+}
+const MITRE = (E.inner[0][0] + E.inner[0][1]) / Math.SQRT2;   // apothem of a mitred face, inside
+const FACES = [0, 1, 2, 3, 4, 5, 6, 7].map(k => [k % 2 ? MITRE : E.inner[0][0], k * 45]);
+function wallDist(x, z) { let m = Infinity; for (const [a, b] of FACES) m = Math.min(m, a - (x * Math.cos(rad(b)) + z * Math.sin(rad(b)))); return m; }
+
+// ---------- scene
+const viewer = document.getElementById("viewer"), canvas = document.getElementById("gl");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+renderer.outputEncoding = THREE.sRGBEncoding;
+const scene = new THREE.Scene();
+const SEA = new THREE.Color("#0b4250"), HALL = new THREE.Color("#10242a"), SKY = new THREE.Color("#8fc6e0");
+scene.background = SEA.clone();
+scene.fog = new THREE.FogExp2(SEA.clone(), 0.0036);
+const camera = new THREE.PerspectiveCamera(50, 1.6, 0.5, 3000);
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.enableDamping = true; controls.dampingFactor = 0.08; controls.maxDistance = 700; controls.minDistance = 4;
+
+scene.add(new THREE.HemisphereLight(0xa8ecf2, 0x0b2a30, 0.75));
+const sun = new THREE.DirectionalLight(0xfff3dc, 0.75); sun.position.set(120, 260, 180); scene.add(sun);
+const glow = (c, i, d, p) => { const l = new THREE.PointLight(c, i, d, 2); l.position.set(...p); scene.add(l); return l; };
+glow(0x9ff4ff, 2.4, 70, [0, 22, 0]);       // the civic hall
+glow(0xff8a3a, 2.4, 40, [0, 6, 118]);      // the Glassworks
+glow(0xffd9a0, 1.6, 90, [0, 82, 0]);       // lamps under the roof
+glow(0xaee8ff, 1.2, 50, [40, 24, 50]);
+glow(0xaee8ff, 1.2, 50, [-50, 24, -40]);
+
+const std = (o) => new THREE.MeshStandardMaterial(o);
+const M = {
+  sand: std({ vertexColors: true, roughness: 1 }),
+  dark: std({ color: 0x4a4c50, roughness: 0.9, emissive: 0x06080a }),          // the sea wall's sturdy course
+  darkband: std({ color: 0x47484b, roughness: 0.9 }),
+  light: std({ color: 0xcdbfa8, roughness: 0.7, emissive: 0x0d0b08 }),           // the upper course and roof
+  lightband: std({ color: 0xddd2bf, roughness: 0.6, emissive: 0x100d08 }),
+  ancient: std({ color: 0x6f7f74, roughness: 0.9, emissive: 0x0a1410 }),
+  stone: std({ color: 0xcfc6d6, roughness: 0.55, emissive: 0x0a1218 }),
+  nacre: std({ color: 0xece6f2, roughness: 0.28, metalness: 0.15, emissive: 0x10181e }),
+  teal: std({ color: 0x3fc4b4, roughness: 0.45, metalness: 0.1, emissive: 0x06433e }),
+  crown: std({ color: 0x8dffb0, emissive: 0x2cd07a, emissiveIntensity: 0.9, roughness: 0.2 }),
+  gold: std({ color: 0xc8703f, metalness: 0.75, roughness: 0.35, emissive: 0x2a0f04 }),
+  glass: std({ color: 0xbff4ea, transparent: true, opacity: 0.22, roughness: 0.05, metalness: 0.2, side: THREE.DoubleSide, depthWrite: false }),
+  smoked: std({ color: 0x8a7a6a, transparent: true, opacity: 0.45, roughness: 0.1, side: THREE.DoubleSide, depthWrite: false }),
+  floor: std({ color: 0xd9d2c6, roughness: 0.45, side: THREE.DoubleSide }),
+  pool: std({ color: 0x5fd0e6, emissive: 0x0a4a58, roughness: 0.05, transparent: true, opacity: 0.75, side: THREE.DoubleSide, depthWrite: false }),
+  red: std({ color: 0x9a2f2c, roughness: 0.5 }),
+  gate: std({ color: 0x1b2a2e, roughness: 0.7, metalness: 0.3, emissive: 0x041014 }),
+  avenue: std({ color: 0x9ffff0, emissive: 0x39d9c2, emissiveIntensity: 1 }),
+  trail: std({ color: 0x9ffff0, emissive: 0x4ae8d0, emissiveIntensity: 1.3 }),
+  lamp: std({ color: 0xffe2b0, emissive: 0xffc070, emissiveIntensity: 1.2 }),
+  lava: std({ color: 0xff7a2a, emissive: 0xff5a10, emissiveIntensity: 1.2 }),
+  rock: std({ color: 0x3a3330, roughness: 1 }),
+  surface: new THREE.MeshBasicMaterial({ color: 0xbff4ff, transparent: true, opacity: 0.2, side: THREE.DoubleSide, depthWrite: false }),
+  beam: new THREE.MeshBasicMaterial({ color: 0xfff6d8, transparent: true, opacity: 0.035, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }),
+  curtain: new THREE.MeshBasicMaterial({ color: 0xd8fbff, transparent: true, opacity: 0.4, side: THREE.DoubleSide, depthWrite: false }),
+};
+// the trunks: clearer glass, so the ramp inside reads; lock chambers, hatches and pool wells
+M.trunkGlass = std({ color: 0xe4fdff, transparent: true, opacity: 0.1, roughness: 0.05, metalness: 0.1, side: THREE.DoubleSide, depthWrite: false });
+M.lockGlass = std({ color: 0xd6fff6, transparent: true, opacity: 0.42, roughness: 0.05, metalness: 0.1, side: THREE.DoubleSide, depthWrite: false, emissive: 0x0a3a34 });
+M.hatch = std({ color: 0x2a3d42, roughness: 0.45, metalness: 0.5, emissive: 0x081416, side: THREE.DoubleSide });
+M.well = std({ color: 0x3bb8d4, emissive: 0x0b4a5a, transparent: true, opacity: 0.6, side: THREE.DoubleSide, depthWrite: false });
+M.ramp = std({ color: 0xfff1d6, roughness: 0.4, emissive: 0x6a5530, side: THREE.DoubleSide });
+M.mouth = std({ color: 0x041217, roughness: 1, side: THREE.DoubleSide });
+const glassMats = [M.glass, M.smoked, M.trunkGlass];
+for (const m of glassMats) { m.userData.base = m.opacity; m.userData.cut = true; }
+const add = (geo, mat, x = 0, y = 0, z = 0, parent = scene) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; };
+const labels = [];
+const label = (text, sub, x, y, z, cls = "", near = 0) => labels.push({ text, sub, p: new THREE.Vector3(x, y, z), cls, near });
+const G = { roof: new THREE.Group(), upper: new THREE.Group(), trunk: new THREE.Group() };
+scene.add(G.roof, G.upper, G.trunk);
+
+// SuperEgg: a port of scripts/superegg.gd's surface_point (omega 0 is local +Z), over a band of eta
+function eggGeo(ax, ay, az, e = 3, eta0 = -Math.PI / 2, eta1 = Math.PI / 2, rings = 24, segs = 36) {
+  const ps = (v) => Math.sign(v) * Math.pow(Math.abs(v), 2 / e), snap = v => Math.abs(v) < 1e-9 ? 0 : v;
+  const pos = [], idx = [];
+  for (let i = 0; i <= rings; i++) {
+    const eta = eta0 + (eta1 - eta0) * i / rings, ce = ps(snap(Math.cos(eta))), se = ps(snap(Math.sin(eta)));
+    for (let j = 0; j <= segs; j++) { const om = Math.PI * 2 * j / segs; pos.push(ax * ce * ps(snap(Math.sin(om))), ay * se, az * ce * ps(snap(Math.cos(om)))); }
+  }
+  for (let i = 0; i < rings; i++) for (let j = 0; j < segs; j++) { const a = i * (segs + 1) + j, b = a + segs + 1; idx.push(a, a + 1, b, a + 1, b + 1, b); }
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+// a plan volume: its frame's w axis points along its facing bearing; cut flat at v.cut
+function vol(v, mat, scale = 1, eta0, eta1, parent = scene) {
+  const [a, b, c] = v.semi, g = eggGeo(a * scale, b * scale, c * scale, v.eps, eta0, eta1);
+  if (v.cut != null) { const p = g.attributes.position; for (let i = 0; i < p.count; i++) if (p.getY(i) + v.c[1] < v.cut) p.setY(i, v.cut - v.c[1]); g.computeVertexNormals(); }
+  const m = add(g, mat, v.c[0], v.c[1], v.c[2], parent); m.rotation.y = rad(90 - v.facing); return m;
+}
+// the horizontal section of a volume at height y, as a superellipse floor
+function floorAt(v, y, mat = M.floor, t = 0.3, holes = []) {
+  const [a, b, c] = v.semi, dy = Math.abs((y - v.c[1]) / b); if (dy >= 1) return;
+  const s = Math.pow(1 - Math.pow(dy, v.eps), 1 / v.eps) * 0.985, sh = new THREE.Shape(), ps = (x) => Math.sign(x) * Math.pow(Math.abs(x), 2 / v.eps);
+  for (let i = 0; i <= 64; i++) { const t2 = Math.PI * 2 * i / 64, x = a * s * ps(Math.cos(t2)), z = c * s * ps(Math.sin(t2)); i ? sh.lineTo(x, z) : sh.moveTo(x, z); }
+  // holes, given in world (x, z): the shape's x is -u and its z is w (the mesh turns by 90 - facing)
+  const f = rad(v.facing);
+  for (const [hx, hz, hr] of holes) { const dx = hx - v.c[0], dz = hz - v.c[2], u = -dx * Math.sin(f) + dz * Math.cos(f), w = dx * Math.cos(f) + dz * Math.sin(f); const h = new THREE.Path(); h.absarc(-u, w, hr, 0, Math.PI * 2, true); sh.holes.push(h); }
+  const g = new THREE.ExtrudeGeometry(sh, { depth: t, bevelEnabled: false }); g.rotateX(Math.PI / 2);
+  const m = add(g, mat, v.c[0], y, v.c[2]); m.rotation.y = rad(90 - v.facing); m.position.y = y + t * 0; return m;
+}
+// a broad nacre band round a volume, centred at height y and h metres deep
+function band(v, y, h = 0.8, mat = M.nacre) { const f = (yy) => { const t = Math.max(-0.999, Math.min(0.999, (yy - v.c[1]) / v.semi[1])); return Math.sign(t) * Math.asin(Math.pow(Math.abs(t), v.eps / 2)); }; return vol(v, mat, 1.012, f(y - h / 2), f(y + h / 2)); }
+function cyl(r0, r1, y0, y1, mat, x, z, seg = 24, open = false, parent = scene) { return add(new THREE.CylinderGeometry(r1, r0, y1 - y0, seg, 1, open), mat, x, (y0 + y1) / 2, z, parent); }
+function box(w, h, d, mat, x, y, z, ry = 0, parent = scene) { const m = add(new THREE.BoxGeometry(w, h, d), mat, x, y, z, parent); m.rotation.y = ry; return m; }
+
+const AIR = D.air, TRUNK_R = V["trunk_22.5"].r;
+function keel(v) {   // a threaded hall's ballast keel: a nacre collar round the trunk under its glass
+  const [a, b] = v.semi, k = AIR.keel, bot = v.c[1] - b * Math.pow(1 - Math.pow((TRUNK_R + k[0] / 2) / a, v.eps), 1 / v.eps);
+  cyl(TRUNK_R + k[0] * 0.5, TRUNK_R + k[0], bot - k[1], bot + 0.2, M.nacre, v.c[0], v.c[2], 40);
+}
+const disc = (r, x, y, z, mat) => add(new THREE.CircleGeometry(r, 40).rotateX(-Math.PI / 2), mat, x, y, z);
+const flatRing = (r0, r1, x, y, z, mat) => add(new THREE.RingGeometry(r0, r1, 40).rotateX(-Math.PI / 2), mat, x, y, z);
+const rimAt = (r, t, x, y, z, mat = M.nacre) => add(new THREE.TorusGeometry(r, t, 6, 40).rotateX(Math.PI / 2), mat, x, y, z);
+function between(a, b, r, mat, open = true) {
+  const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), m = add(new THREE.CylinderGeometry(r, r, A.distanceTo(B), 24, 1, open), mat, (A.x + B.x) / 2, (A.y + B.y) / 2, (A.z + B.z) / 2);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), B.clone().sub(A).normalize()); return m;
+}
+function hatch(p, normal, r) {   // a round hatch: a dark leaf in an orichalcum rim, facing along `normal`
+  const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(...normal).normalize());
+  add(new THREE.CircleGeometry(r, 28), M.hatch, ...p).quaternion.copy(q);
+  add(new THREE.TorusGeometry(r, 0.08, 6, 28), M.gold, ...p).quaternion.copy(q);
+}
+function mouthAt(p, from, r = 0.9) {   // an opening to the sea, facing away from `from`
+  const d = [p[0] - from[0], 0, p[2] - from[2]], q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(...d).normalize());
+  add(new THREE.CircleGeometry(r, 24), M.mouth, ...p).quaternion.copy(q);
+  add(new THREE.TorusGeometry(r, 0.12, 6, 24), M.nacre, ...p).quaternion.copy(q);
+}
+// the spiral ramp inside a trunk: a 1.4 m nacre ribbon on its centreline, an orichalcum rail on the open side, posts
+function rampMesh(pts, c) {
+  if (!pts) return;
+  const pos = [], idx = [], rail = [], hw = D.ramp_w / 2;
+  pts.forEach((p, i) => {
+    const dx = p[0] - c[0], dz = p[2] - c[2], n = Math.hypot(dx, dz), ux = dx / n, uz = dz / n;
+    pos.push(p[0] - ux * hw, p[1], p[2] - uz * hw, p[0] + ux * hw, p[1], p[2] + uz * hw);
+    rail.push(new THREE.Vector3(p[0] - ux * hw, p[1] + 1.0, p[2] - uz * hw));
+    if (i) { const a = 2 * (i - 1); idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+    if (i % 6 === 0) add(new THREE.CylinderGeometry(0.04, 0.04, 1.0, 4), M.gold, p[0] - ux * hw, p[1] + 0.5, p[2] - uz * hw);
+  });
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+  add(g, M.ramp);
+  add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rail), rail.length, 0.06, 4), M.gold);
+}
+
+// ---------- ground: the levelled floor inside, the seabed's slopes outside
+(function () {
+  const size = 640, n = 200, g = new THREE.PlaneGeometry(size, size, n, n); g.rotateX(-Math.PI / 2);
+  const pos = g.attributes.position, col = [], cSand = new THREE.Color("#9c9272"), cMound = new THREE.Color("#bdb495"), cChan = new THREE.Color("#3e8fb0"), cWild = new THREE.Color("#5f6a50");
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), z = pos.getZ(i), d = Math.hypot(x, z); pos.setY(i, ground(x, z));
+    let c = cSand.clone(); if (d < 24) c = cMound.clone(); if (d > 46 && d < 52.5) c = cChan.clone(); if (wallDist(x, z) < -4) c = cWild.clone();
+    col.push(c.r, c.g, c.b);
+  }
+  g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3)); g.computeVertexNormals(); add(g, M.sand);
+  // the avenues: lines of pearl lamps from the civic hall to the walls
+  for (const b of D.avenues) for (let r = 26; r < (b % 90 ? 158 : 128); r += 6) { if (r > 44 && r < 54) continue; for (const s of [-1, 1]) { const [x, , z] = at(r, b), ox = -Math.sin(rad(b)) * 2.6 * s, oz = Math.cos(rad(b)) * 2.6 * s; if (wallDist(x + ox, z + oz) < 6) continue; add(new THREE.SphereGeometry(0.28, 8, 6), M.avenue, x + ox, ground(x + ox, z + oz) + 0.4, z + oz); } }
+})();
+// the sea's surface, outside and in
+add(new THREE.PlaneGeometry(2400, 2400).rotateX(-Math.PI / 2), M.surface, 0, WATER_Y, 0);
+
+// ---------- the walls: an octagon, mitred corners short against the sides
+function ring(outer, inner, y0, y1, mat, parent = scene) {
+  const sh = new THREE.Shape(outer.map(p => new THREE.Vector2(p[0], -p[1])));
+  if (inner) sh.holes.push(new THREE.Path(inner.map(p => new THREE.Vector2(p[0], -p[1])).reverse()));
+  const g = new THREE.ExtrudeGeometry(sh, { depth: y1 - y0, bevelEnabled: false, curveSegments: 1 }); g.rotateX(-Math.PI / 2);
+  return add(g, mat, 0, y0, 0, parent);
+}
+const grow = (poly, d) => { // offset an octagon outward by d (its faces' apothems grow by d)
+  const out = [], n = poly.length;
+  const faces = []; for (let k = 0; k < n; k++) { const [x0, z0] = poly[(k + n - 1) % n], [x1, z1] = poly[k]; const nx = z1 - z0, nz = -(x1 - x0), L = Math.hypot(nx, nz); const sgn = (nx * x0 + nz * z0) > 0 ? 1 : -1; faces.push([sgn * nx / L, sgn * nz / L, Math.abs((nx * x0 + nz * z0) / L) + d]); }
+  for (let k = 0; k < n; k++) { const [ax, az, aa] = faces[k], [bx, bz, bb] = faces[(k + 1) % n]; const det = ax * bz - az * bx; out.push([(aa * bz - az * bb) / det, (ax * bb - aa * bx) / det]); }
+  return out;
+};
+const IN = E.inner, OUT = E.outer, FOOT = -34;
+M.paving = std({ color: 0xb8aa93, roughness: 0.85 });
+ring(OUT, IN, FOOT, E.dark_top, M.dark);
+for (let y = 6; y < E.dark_top - 4; y += 11) ring(grow(OUT, 0.35), grow(OUT, -0.5), y, y + 0.9, M.darkband);     // rusticated courses
+ring(OUT, IN, E.dark_top, ROOF, M.light, G.upper);
+ring(grow(OUT, 0.6), grow(IN, -0.6), E.dark_top, E.dark_top + 1.2, M.lightband, G.upper);                     // the string course where the stones meet
+ring(grow(OUT, 0.9), grow(OUT, -1), ROOF - 1.6, ROOF, M.lightband, G.upper);                                   // the cornice
+ring(OUT, grow(OUT, -1.0), ROOF, ROOF + E.parapet, M.light, G.upper);                                          // the parapet
+for (let y = E.dark_top + 6; y < ROOF - 3; y += 6) ring(grow(OUT, 0.25), grow(OUT, -0.5), y, y + 0.45, M.lightband, G.upper); // string courses
+// pilasters on the upper course, every 20 m along each outer face
+for (let k = 0; k < 8; k++) {
+  const [x0, z0] = OUT[k], [x1, z1] = OUT[(k + 1) % 8], L = Math.hypot(x1 - x0, z1 - z0), n = Math.max(1, Math.round(L / 20));
+  const nx = (z1 - z0) / L, nz = -(x1 - x0) / L, s = (nx * x0 + nz * z0) > 0 ? 1 : -1;
+  for (let i = 0; i <= n; i++) { const t = i / n, x = x0 + (x1 - x0) * t + s * nx * 0.6, z = z0 + (z1 - z0) * t + s * nz * 0.6; box(2.6, ROOF - E.dark_top - 1.2, 1.2, M.lightband, x, (E.dark_top + 1.2 + ROOF) / 2, z, -Math.atan2(z1 - z0, x1 - x0), G.upper); }
+}
+// the four sea gates, shut, on the sides where the avenues meet the walls
+for (const g of E.gates) {
+  const r0 = 135, r1 = 135 + E.wall_t, gy = Math.min(ground(...[at(r0, g.bearing)[0], at(r0, g.bearing)[2]]), ground(at(r1, g.bearing)[0], at(r1, g.bearing)[2]));
+  for (const r of [r0 - 0.3, r1 + 0.3]) {
+    const [x, , z] = at(r, g.bearing), ry = rad(90 - g.bearing) + Math.PI / 2;
+    const leaf = add(eggGeo(g.width / 2, g.height / 2, 0.6, 4.5), M.gate, x, gy + g.height / 2, z); leaf.rotation.y = rad(90 - g.bearing);
+    for (const h of [0.25, 0.5, 0.75]) box(g.width * 0.92, 0.5, 1.6, M.gold, x, gy + g.height * h, z, ry);
+    const fr = add(eggGeo(g.width / 2 + 1.6, g.height / 2 + 1.6, 0.5, 4.5), M.darkband, x, gy + g.height / 2, z); fr.rotation.y = rad(90 - g.bearing); fr.scale.z = r > 136 ? 1 : 1;
+  }
+}
+// the luminous trail from the arrival dock ends at the shut main gate
+for (let i = 0; i < 40; i++) { const z = 146 + i * 6.5, x = Math.sin(i * 0.7) * 5 + Math.sin(i * 0.23) * 9; add(new THREE.SphereGeometry(0.7 + (i % 3) * 0.25, 8, 6), M.trail, x, ground(x, z) + 0.3, z); }
+label("main sea gate", "shut · the luminous trail ends here", 0, ground(0, 146) + 26, 146, "", 260);
+label("the walls", "dark sea-wall stone to the waterline, lighter above", 105, 60, 105, "", 520);
+
+// ---------- the roof: a stone deck on the walls and piers, a coffered vault under it
+const SOFFIT = E.roof_soffit, SLAB = 90;
+(function () {
+  const sh = new THREE.Shape(IN.map(p => new THREE.Vector2(p[0], -p[1])));
+  for (const w of E.wells) { const [x, , z] = at(w.r, w.bearing), h = w.half, p = new THREE.Path(); p.moveTo(x - h, -z - h); p.lineTo(x + h, -z - h); p.lineTo(x + h, -z + h); p.lineTo(x - h, -z + h); p.lineTo(x - h, -z - h); sh.holes.push(p); }
+  const oc = new THREE.Path(); oc.absarc(0, 0, E.fountain.oculus[1], 0, Math.PI * 2, true); sh.holes.push(oc);
+  const g = new THREE.ExtrudeGeometry(sh, { depth: ROOF - SLAB, bevelEnabled: false, curveSegments: 48 }); g.rotateX(-Math.PI / 2); add(g, [M.paving, M.light], 0, SLAB, 0, G.roof);
+  // glass caps on the light wells and the fountain's glass floor
+  for (const w of E.wells) { const [x, , z] = at(w.r, w.bearing); add(eggGeo(w.half, 1.2, w.half, 4), M.glass, x, ROOF, z, G.roof); add(new THREE.BoxGeometry(w.half * 2, SLAB - 2, w.half * 2), M.beam, x, SLAB / 2, z, G.roof); }
+  add(new THREE.RingGeometry(E.fountain.oculus[0], E.fountain.oculus[1], 64).rotateX(-Math.PI / 2), M.glass, 0, ROOF + 0.2, 0, G.roof);
+  cyl(E.fountain.oculus[1] * 0.8, E.fountain.oculus[1], 33, SLAB, M.beam, 0, 0, 40, true, G.roof);
+  // coffers: beams every 18 m both ways, clipped to the octagon
+  for (let t = -126; t <= 126; t += 18) {
+    const half = Math.min(135, FACES[1][0] * Math.SQRT2 - Math.abs(t)) - 0.5;
+    for (const ax of [0, 1]) { if (Math.abs(t) < 15) { for (const s of [-1, 1]) { const a = 15, L = half - a; if (L <= 0) continue; ax ? box(1.4, SLAB - SOFFIT, L, M.lightband, t, (SLAB + SOFFIT) / 2, s * (a + L / 2), 0, G.roof) : box(L, SLAB - SOFFIT, 1.4, M.lightband, s * (a + L / 2), (SLAB + SOFFIT) / 2, t, 0, G.roof); } continue; }
+      ax ? box(1.4, SLAB - SOFFIT, half * 2, M.lightband, t, (SLAB + SOFFIT) / 2, 0, 0, G.roof) : box(half * 2, SLAB - SOFFIT, 1.4, M.lightband, 0, (SLAB + SOFFIT) / 2, t, 0, G.roof); }
+  }
+})();
+// the piers: the dark sea-wall stone below the water, the light stone above
+for (const v of D.volumes.filter(v => v.kind === "pier")) {
+  const [x, , z] = v.c; cyl(v.r * 1.4, v.r * 1.4, v.y0 - 1, v.y0 + 2, M.dark, x, z, 16);
+  cyl(v.r, v.r, v.y0, E.dark_top, M.dark, x, z, 16); cyl(v.r, v.r, E.dark_top, SOFFIT - 2, M.light, x, z, 16, false, G.roof);
+  cyl(v.r, v.r * 1.9, SOFFIT - 2, SLAB, M.lightband, x, z, 16, false, G.roof);
+}
+// lamps under the roof, hung from the vault over the water
+for (let k = 0; k < 16; k++) { const [x, , z] = at(k % 2 ? 80 : 40, k * 22.5 + 11.25); add(new THREE.SphereGeometry(0.8, 10, 8), M.lamp, x, SOFFIT - 6, z, G.roof); }
+label("under the roof", "16 m of air over the water, lit by the wells", 70, SOFFIT - 6, -40, "", 200);
+
+// ---------- the fountain at the centre of the roof, and the secret stair in its pedestal
+const F = E.fountain, curtains = [];
+(function () {
+  const T = F.tiers;
+  T.forEach((t, i) => {
+    const y = ROOF + t.y, below = i ? ROOF + T[i - 1].y : ROOF;
+    const prof = i === 0 ? [[t.r - 0.8, ROOF + 0.01], [t.r, ROOF], [t.r, y], [t.r - 0.8, y], [t.r - 0.8, ROOF + 0.02]]
+      : [[t.ped * 0.6, y - 1.8], [t.r * 0.55, y - 1.5], [t.r, y - 0.3], [t.r, y], [t.r - 0.5, y], [t.r - 0.5, y - 0.6], [T[i].ped, y - 0.6]];
+    add(new THREE.LatheGeometry(prof.map(p => new THREE.Vector2(p[0], p[1] - ROOF)), 64), M.lightband, 0, ROOF, 0, G.roof);
+    add(new THREE.RingGeometry(t.ped, t.r - (i ? 0.5 : 0.8), 64).rotateX(-Math.PI / 2), M.pool, 0, y - 0.15, 0, G.roof);
+    // the pedestal carrying the next tier
+    const top = i + 1 < T.length ? ROOF + T[i + 1].y - 1.6 : ROOF + F.jet - 2;
+    cyl(t.ped, t.ped * 0.8, i ? y - 0.6 : ROOF, top, M.light, 0, 0, 32, false, G.roof);
+    // the falling curtain from this tier's lip into the one below
+    if (i > 0) { const c = cyl(t.r + 0.15, t.r + 0.1, below - 0.2, y - 0.1, M.curtain, 0, 0, 64, true, G.roof); curtains.push(c); }
+  });
+  add(eggGeo(0.9, 1.6, 0.9, 2.6), M.lightband, 0, ROOF + F.jet - 1.2, 0, G.roof);
+  // the door: a pivoting stone on the lowest pedestal, behind the curtain from the second tier
+  const db = F.door_bearing, [dx, , dz] = at(T[0].ped + 0.05, db);
+  const door = add(eggGeo(1.1, 1.7, 0.2, 5), M.gate, dx, ROOF + 1.9, dz, G.roof); door.rotation.y = rad(90 - db);
+  for (let r = T[0].r - 2; r > T[0].ped + 1; r -= 1.9) { const [x, , z] = at(r, db); add(eggGeo(0.7, 0.25, 0.7, 4), M.lightband, x, ROOF + 0.75, z, G.roof); }
+  label("the fountain", "four tiers; light falls through its glass floor", 0, ROOF + F.jet + 3, 0, "", 260);
+  label("the secret door", "behind the curtain from the second tier", dx, ROOF + 4.2, dz, "small", 70);
+})();
+const jetN = 260, jet = new Float32Array(jetN * 3), jetD = [];
+for (let i = 0; i < jetN; i++) jetD.push([Math.random(), Math.random() * Math.PI * 2, 0.6 + Math.random() * 0.8]);
+const jetPts = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0xeaffff, size: 0.35, transparent: true, opacity: 0.85, depthWrite: false }));
+jetPts.geometry.setAttribute("position", new THREE.BufferAttribute(jet, 3)); G.roof.add(jetPts);
+// the stone shaft down through the roof to the waterline, and the landing at its foot
+cyl(E.shaft.r + E.shaft.wall, E.shaft.r + E.shaft.wall, E.shaft.y0, SLAB, M.light, 0, 0, 24, false, G.roof);
+cyl(9, 9, E.shaft.y0 - 0.6, E.shaft.y0, M.lightband, 0, 0, 32);
+label("the shaft", "a stair in stone to the waterline", 8, E.shaft.y0 + 6, 0, "small", 120);
+
+// ---------- the Kraken lookout on the wall over the main gate
+(function () { const L = E.lookout; add(eggGeo(...L.semi, 2.4), M.glass, L.c[0], L.c[1] + E.parapet + 2.2, L.c[2], G.upper); add(eggGeo(L.semi[0] * 1.01, 0.35, L.semi[2] * 1.01, 2.4), M.nacre, L.c[0], L.c[1] + E.parapet + 2.2, L.c[2], G.upper); box(L.semi[0] * 2, 0.6, L.semi[2] * 2, M.lightband, L.c[0], L.c[1] + E.parapet, L.c[2], 0, G.upper); label("Kraken lookout", "Ikara's watch, facing the islands", L.c[0], L.c[1] + 10, L.c[2], "", 220); })();
+
+// ---------- the city: every volume of the plan
+const lamp = (x, y, z) => add(new THREE.SphereGeometry(0.35, 8, 6), M.lamp, x, y, z);
+for (const v of D.volumes) {
+  const [x, y, z] = v.c;
+  if (v.kind === "pier") continue;
+  if (v.kind === "trunk") {
+    // a dry tube of clear glass with nacre bands, and the spiral ramp people walk inside it
+    cyl(v.r, v.r, v.y0, v.y1, M.trunkGlass, x, z, 48, true, G.trunk);
+    for (let h = v.y0 + 3; h < v.y1; h += 6) add(new THREE.TorusGeometry(v.r + 0.05, 0.14, 6, 48).rotateX(Math.PI / 2), M.nacre, x, h, z, G.trunk);
+    rampMesh(D.trunk_ramps[v.key], v.c);
+    continue;
+  }
+  if (v.kind === "spire") {
+    const h = v.height, br = v.semi[0], top = v.broken ? h * 0.72 : h;
+    box(br * 3, 1.6, br * 3, M.ancient, x, 0.8 + ground(x, z) * 0, z, rad(-v.facing));
+    const sh = add(eggGeo(br, h - 1.6, br, 2.6, 0, Math.PI / 2), M.ancient, x, 1.6, z);
+    if (v.broken) { const p = sh.geometry.attributes.position; for (let i = 0; i < p.count; i++) if (p.getY(i) > top - 1.6) p.setY(i, top - 1.6 - Math.max(0, (p.getX(i) + p.getZ(i)) * 0.4)); sh.geometry.computeVertexNormals(); }
+    for (const f of [0.18, 0.36, 0.52]) if (f * h < top - 2) add(new THREE.TorusGeometry(br * Math.pow(1 - Math.pow(f * h / (h - 1.6), 2.6), 1 / 2.6) * 1.02 + 0.1, 0.25, 6, 24).rotateX(Math.PI / 2), M.darkband, x, 1.6 + f * h, z);
+    if (!v.broken) add(new THREE.ConeGeometry(0.5, 6, 8), M.ancient, x, h + 1.5, z);
+    continue;
+  }
+  const classical = v.era === "classical";
+  if (v.kind === "castle") {
+    vol(v, M.teal);
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const tx = x + sx * 11, tz = z + sz * 9; add(eggGeo(2.6, 10, 2.6, 5), M.teal, tx, 14, tz); add(new THREE.OctahedronGeometry(2.0), M.crown, tx, 25.5, tz).scale.set(1, 1.8, 1); }
+    for (const sx of [-2.6, 2.6]) cyl(0.5, 0.5, 2, 9, M.red, x + sx, z + 13.6, 12);
+    continue;
+  }
+  if (classical) {
+    vol(v, v.kind === "home" ? M.nacre : M.stone);
+    if (v.kind === "colonnade") for (let k = 0; k < 14; k++) { const a = k / 14 * Math.PI * 2, [px, pz] = [x + Math.cos(a) * (v.semi[0] + 0.8), z + Math.sin(a) * (v.semi[2] + 0.8)]; cyl(0.35, 0.3, 0, 4.2, M.red, px, pz, 10); }
+    continue;
+  }
+  // modern: frameless glass with broad nacre bands, a floor inside
+  if (v.kind === "pod") { vol(v, M.nacre); const g = Object.assign({}, v, { c: [x + Math.cos(rad(v.facing)) * v.semi[2] * 0.55, y, z + Math.sin(rad(v.facing)) * v.semi[2] * 0.55], semi: [v.semi[0] * 0.7, v.semi[1] * 0.6, v.semi[2] * 0.5] }); vol(g, M.glass); lamp(g.c[0], y, g.c[2]); continue; }
+  vol(v, v.smoked ? M.smoked : M.glass);
+  const foot = Math.max(y, v.cut ?? -1e9); band(v, foot + 0.5, 1.0); if (v.semi[1] > 9) band(v, y + v.semi[1] * 0.55, 0.9); else if (foot > y + 0.2 || v.cut == null) band(v, y, 0.8);
+  const holes = (D.entries || []).filter(e => e.hall === v.key && e.shape === "pool").map(e => [e.p[0], e.p[2], e.r + 0.05]);
+  if (v.kind === "landing" || v.kind === "crown") holes.push([x, z, TRUNK_R]);
+  if (v.floor != null) floorAt(v, v.floor, M.floor, 0.3, holes);
+  if (v.kind === "landing" || v.kind === "crown") keel(v);
+  if (v.kind === "grounded") { const g = Object.assign({}, v, { c: [x, 0, z], semi: [v.semi[0] * 0.97, v.cut, v.semi[2] * 0.97], eps: 5, cut: null }); vol(g, M.nacre, 1, 0, Math.PI / 2); }   // its nacre socket, down the slope to the seabed
+}
+// ---------- the air: moon pools at the datum, lock chambers above it, the fountain lock
+for (const e of D.entries || []) {
+  const [x, y, z] = e.p;
+  if (e.kind === "moon pool") {
+    disc(e.r, x, e.water, z, M.pool);                                       // the water, 0.4 m under the floor
+    rimAt(e.r + 0.12, 0.13, x, e.floor + 0.04, z);                           // the nacre rim
+    if (e.shape === "pool") {
+      cyl(e.r, e.r, e.well, e.floor - 0.3, M.well, x, z, 32, true);        // the well under it, open to the sea
+      if (V[e.hall].kind === "stump") {                                     // the old tower's chamber, flooded: the well
+        cyl(3.6, 3.6, 0.6, e.water - 0.02, M.well, x, z, 32, false);
+        flatRing(e.r + 0.25, TRUNK_R - 0.05, x, e.floor, z, M.floor);        // the trunk's foot deck at the datum
+        mouthAt(e.mouth, e.p, 1.0);
+        label("foot moon pool", "at the datum · old tower door below", x, e.floor + 3.2, z, "small dry", 70);
+      } else {
+        if (e.hall === "glassworks") { between([x, e.mouth[1], z], e.mouth, 0.75, M.nacre); mouthAt(e.mouth, e.p, 0.75); }   // down through the socket, out onto the avenue
+        label("moon pool", "open · the water stands 0.4 m under the floor", x, e.floor + 3, z, "small dry", 80);
+      }
+    } else {                                                                // on a nacre drum from a lower floor up to the datum
+      cyl(e.r + 0.3, e.r + 0.3, e.base, e.floor, M.nacre, x, z, 32, true);
+      flatRing(e.r + 0.25, e.r + 1.0, x, e.floor, z, M.floor);
+      between([x, e.mouth[1], z], e.mouth, 0.75, M.nacre);                   // the duct out through the glass
+      mouthAt(e.mouth, e.p, 0.75);
+      label("moon pool", "on a dais at the datum", x, e.floor + 2.6, z, "small dry", 80);
+    }
+  } else if (e.shape === "chamber") {
+    cyl(e.r, e.r, e.y0, e.y1, M.lockGlass, x, z, 28, false);
+    rimAt(e.r + 0.03, 0.12, x, e.y1 - 0.25, z); rimAt(e.r + 0.03, 0.12, x, e.y0 + 0.25, z);
+    hatch([e.inner[0], e.floor + 0.05, e.inner[2]], [0, 1, 0], AIR.lock[2]);            // inner hatch, in the hall's floor
+    hatch([e.outer[0], e.y0 - 0.03, e.outer[2]], [0, -1, 0], AIR.lock[2]);              // outer hatch, to the sea below
+    label("sea lock", `${e.dp.toFixed(1)} bar over the sea blows it dry`, x, e.y0 - 1.2, z, "small dry", 70);
+  } else if (e.shape === "collar") {
+    const a = [e.inner[0], e.floor + e.r, e.inner[2]], b = [e.outer[0], e.floor + e.r, e.outer[2]], d = [b[0] - a[0], 0, b[2] - a[2]];
+    between(a, b, e.r, M.lockGlass, false);
+    hatch(a, d, AIR.lock[2] + 0.2); hatch(b, d, AIR.lock[2] + 0.2);
+    label("lock to the home", e.name.replace(/^lock to /, ""), (a[0] + b[0]) / 2, e.floor + 3.4, (a[2] + b[2]) / 2, "small", 45);
+  } else if (e.shape === "fountain") {
+    cyl(e.r, e.r, e.y0, e.y1, M.lockGlass, x, z, 32, false);
+    rimAt(e.r + 0.03, 0.14, x, e.y1 - 0.3, z); rimAt(e.r + 0.03, 0.14, x, e.y0 + 0.3, z);
+    hatch([e.inner[0] + 0.02, e.y0 + 1.0, e.inner[2]], [1, 0, 0], 0.6);               // from the ramp's top landing
+    hatch([e.outer[0], e.y1 + 0.03, e.outer[2]], [0, 1, 0], 0.6);                     // up to the waterline landing
+    label("the fountain lock", `${e.dp.toFixed(1)} bar between the network and the roof's air · slow`, x + 3, e.y1 + 1.6, z, "dry", 120);
+  }
+}
+label("datum, 4.4 m", `the network's pressure: ${AIR.bar.toFixed(2)} bar`, ...at(71, 22.5 + 9, AIR.datum + 1.2), "small", 90);
+
+// the glass tunnels: tubes on their walking floors, banded every 6 m
+for (const t of D.tunnels) {
+  const P = t.pts.map(p => new THREE.Vector3(p[0], p[1] + D.net_floor * 0 + 1.6, p[2]));
+  const path = new THREE.CurvePath(); for (let i = 1; i < P.length; i++) path.add(new THREE.LineCurve3(P[i - 1], P[i]));
+  const L = path.getLength(); add(new THREE.TubeGeometry(path, Math.max(4, Math.round(L / 1.5)), 2.25, 14, false), M.glass);
+  for (let s = 3; s < L; s += 6) { const p = path.getPointAt(s / L), d = path.getTangentAt(s / L); const r = add(new THREE.TorusGeometry(2.3, 0.16, 6, 28), M.nacre, p.x, p.y, p.z); r.lookAt(p.clone().add(d)); }
+  for (let s = 1; s < L; s += 2.5) { const p = path.getPointAt(s / L); }
+  const fl = new THREE.CurvePath(); for (let i = 1; i < P.length; i++) fl.add(new THREE.LineCurve3(P[i - 1].clone().setY(P[i - 1].y - 1.55), P[i].clone().setY(P[i].y - 1.55)));
+  add(new THREE.TubeGeometry(fl, Math.max(4, Math.round(L / 1.5)), 0.12, 4, false), M.avenue);
+}
+// the civic hall, the Exchange, the guest hall: labels
+const lab = (k, text, sub, dy = 4, near = 0) => { const v = V[k]; if (v) label(text, sub, v.c[0], (v.c[1] || 0) + (v.semi ? v.semi[1] : 0) + dy, v.c[2], "dry", near); };
+lab("civic_hall", "the civic hall", "Tidehall kept whole and dry under glass", 3, 330);
+lab("exchange", "the Exchange", "a glass court round the Hall of Records", 2, 200);
+lab("common_room", "the guest hall", "two Strangers' Houses, joined", 2, 200);
+lab("glassworks", "the Glassworks", "the first air bubble, at the vent", 2, 220);
+for (const tr of D.trunks) { const [x, , z] = at(71, tr.bearing); label(tr.household, `landing hall ${tr.landing} m · crown ${tr.top} m`, x, tr.landing + 6, z, "dry", 200); }
+label("crown ring", "30 m up, between the trunks", ...at(71, 67.5, 33), "small", 200);
+label("central trunk", "the way down from the fountain", 0, 56, 0, "dry", 260);
+for (const v of D.volumes.filter(v => v.kind === "spire")) label(v.broken ? "ancient spire, broken" : "ancient spire", "the first city's", v.c[0], v.height * (v.broken ? 0.75 : 1) + 4, v.c[2], "small", 190);
+// the Ring Current and the vent
+const CN = 900, cdata = [], cpos = new Float32Array(CN * 3);
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+for (let i = 0; i < CN; i++) cdata.push([rnd() * Math.PI * 2, 46.6 + rnd() * 4.8, -1.6 + rnd() * 2.8, 0.6 + rnd() * 0.5]);
+const current = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({ color: 0xbff7ff, size: 0.45, transparent: true, opacity: 0.85, depthWrite: false }));
+current.geometry.setAttribute("position", new THREE.BufferAttribute(cpos, 3)); scene.add(current);
+label("Ring Current", "classical · runs clockwise", ...at(49, 200, 2), "", 160);
+(function () { const x = 0, z = 124, y = ground(x, z); add(eggGeo(4, 2.4, 4, 2.6), M.rock, x, y, z); add(eggGeo(1.2, 0.5, 1.2, 2), M.lava, x, y + 2.3, z); })();
+
+// ---------- a section through the Garden House trunk: every mesh round it gets its own material, clipped
+// on demand by a plane through the trunk's axis along its bearing, so the half toward the camera falls away
+renderer.localClippingEnabled = true;
+const TR = at(71, 22.5), PERP = [Math.cos(rad(112.5)), 0, Math.sin(rad(112.5))];
+const secPlane = new THREE.Plane().setFromNormalAndCoplanarPoint(new THREE.Vector3(-PERP[0], 0, -PERP[2]), new THREE.Vector3(TR[0], 0, TR[2]));
+const SEC = [];
+// the section's cut faces, drawn in the plane: air light, water dark, outlines bright (shown only in section)
+G.sec = new THREE.Group(); scene.add(G.sec); G.sec.visible = false;
+(function () {
+  const b = 22.5, dir = [Math.cos(rad(b)), Math.sin(rad(b))], A = D.air;
+  const ps = (x, e) => Math.sign(x) * Math.pow(Math.abs(x), 2 / e);
+  const W = (s, y) => new THREE.Vector3(TR[0] + s * dir[0], y, TR[2] + s * dir[1]);
+  const fillM = (c, o) => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: o, side: THREE.DoubleSide, depthWrite: false });
+  const AIRM = fillM(0x9fe8ff, 0.16), WETM = fillM(0x0b5a6a, 0.45), LOCKM = fillM(0xd6fff6, 0.5), LINE = new THREE.MeshBasicMaterial({ color: 0xbff4ea }), DAT = new THREE.MeshBasicMaterial({ color: 0x59e3cf });
+  function shape(pts, mat, outline = true) {   // pts: [s, y] in the plane
+    const sh = new THREE.Shape(pts.map(([a, y]) => new THREE.Vector2(a, y))), m = new THREE.Mesh(new THREE.ShapeGeometry(sh), mat);
+    m.position.set(TR[0], 0, TR[2]); m.rotation.y = -rad(b); G.sec.add(m);
+    if (outline) G.sec.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(([a, y]) => W(a, y)), true, "catmullrom", 0), pts.length * 2, 0.06, 4, true), LINE));
+  }
+  const prof = (s0, cy, a, h, e, cut = -1e9) => { const o = []; for (let i = 0; i < 72; i++) { const t = Math.PI * 2 * i / 72; o.push([s0 + a * ps(Math.cos(t), e), Math.max(cut, cy + h * ps(Math.sin(t), e))]); } return o; };
+  const rectP = (s0, y0, s1, y1) => [[s0, y0], [s1, y0], [s1, y1], [s0, y1]];
+  const tk = V["trunk_" + b], H = V["hall_" + b], Cr = V["crown_" + b];
+  shape(rectP(-tk.r, tk.y0, tk.r, tk.y1), AIRM);
+  shape(prof(0, H.c[1], H.semi[2], H.semi[1], H.eps), AIRM); shape(prof(0, Cr.c[1], Cr.semi[2], Cr.semi[1], Cr.eps), AIRM);
+  for (const v of D.volumes.filter(v => v.docks === H.key && Math.abs(((v.facing - b) % 360 + 360) % 360) < 1)) {
+    const reach = Math.hypot(v.c[0] - TR[0], v.c[2] - TR[2]); shape(prof(reach, v.c[1], v.semi[2], v.semi[1], v.eps), WETM);
+  }
+  for (const e of D.entries.filter(e => e.hall === H.key || e.hall === Cr.key || e.hall === "stump_" + b)) {
+    const sOf = p => (p[0] - TR[0]) * dir[0] + (p[2] - TR[2]) * dir[1];
+    if (e.shape === "chamber") { const c = sOf(e.p); if (Math.abs(Math.hypot(e.p[0] - TR[0], e.p[2] - TR[2]) - Math.abs(c)) < 0.2) shape(rectP(c - e.r, e.y0, c + e.r, e.y1), LOCKM); }
+    if (e.shape === "collar") { const a = sOf(e.inner), c = sOf(e.outer); if (Math.abs(Math.hypot(e.outer[0] - TR[0], e.outer[2] - TR[2]) - Math.abs(c)) < 0.2) shape(rectP(Math.min(a, c), e.floor, Math.max(a, c), e.floor + 2 * e.r), LOCKM); }
+    if (e.shape === "pool") { shape(rectP(-3.6, 0.6, 3.6, e.water), WETM, false); shape(rectP(-e.r, e.water - 0.05, e.r, e.water), WETM); }
+  }
+  G.sec.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.LineCurve3(W(-16, A.datum), W(16, A.datum)), 8, 0.05, 4), DAT));
+  label("dry air", `one pressure: ${A.bar.toFixed(2)} bar, as ${A.depth.toFixed(1)} m down`, TR[0], 26.4, TR[2], "dry sec", 90);
+  label("wet home", "the sea comes and goes", ...W(11.6, 12.6).toArray(), "sec", 90);
+})();
+(function () {
+  const sph = new THREE.Sphere(); scene.updateMatrixWorld(true);
+  scene.traverse(o => {
+    if (!o.isMesh || o.parent === G.sec) return; o.geometry.computeBoundingSphere(); sph.copy(o.geometry.boundingSphere).applyMatrix4(o.matrixWorld);
+    if (sph.radius > 26 || Math.hypot(sph.center.x - TR[0], sph.center.z - TR[2]) > 17 || sph.center.y < -1) return;
+    const m = o.material.clone(); if (m.userData.cut) glassMats.push(m); o.material = m; SEC.push(o);
+  });
+})();
+
+// ---------- places
+const C = V.civic_hall, EX = V.exchange, GW = V.glassworks;
+const ENT = Object.fromEntries((D.entries || []).map(e => [e.key, e]));
+const nPools = D.entries.filter(e => e.kind === "moon pool").length, nLocks = D.entries.filter(e => e.kind === "lock").length;
+const PLACES = [
+  { id: "sea", t: "The walls from the sea", s: "what a ship or a swimmer sees", cam: [175, 112, 330], at: [0, 70, 40], roof: true,
+    p: "From the surface the city is a stone fortress standing out of the open sea: an octagon almost 290 m across, square but for its short mitred corners, 24 m high above the water and flat on top. Below the waterline is the first city's dark sea wall. Above it the walls and roof the city added when it closed itself are in a lighter stone, in the same classical manner, with pilasters and string courses. There is no door at the waterline. The four sea gates are on the seabed, and they are shut.", who: "the sea folk keep to themselves" },
+  { id: "gate", t: "The main sea gate", s: "where the luminous trail ends", cam: [26, 22, 205], at: [0, 14, 140], roof: true,
+    p: "The glowing trail from the arrival dock leads across the seabed to the island-side wall and stops at a pair of tall gate leaves. They are banded in orichalcum and shut. There are four gates, one on each side where an avenue meets the wall. A small swim-wicket in each leaf is how the city's own come and go.", who: "Ikara keeps the gate rota" },
+  { id: "roof", t: "The roof and the fountain", s: "24 m above the sea", cam: [34, ROOF + 16, 52], at: [0, ROOF + 5, 0], roof: true,
+    p: "The roof is a stone plaza, flat and open to the sky. Eight glass caps over the avenues let daylight down into the city. At the centre is a working fountain in four tiers. Its lowest basin, 40 m across, has a ring of glass in its floor, so light falls through the water and down the open column onto the civic hall, 60 m below.", who: "the city's one face to the sky" },
+  { id: "secret", t: "The secret way down", s: "through the fountain", cam: [-9, ROOF + 7, -34], at: [0, ROOF + 2.5, -8], roof: true,
+    p: "Water falls in a sheet from the second tier's lip into the lowest basin. A line of stepping stones crosses the basin to that curtain, and behind it, in the pedestal, one stone pivots. Inside, a stone stair winds down the shaft through the roof to a landing at the waterline. Under the landing is the fountain lock, and below it the glass central trunk carries a spiral ramp down through the open column and into the crown of the civic hall. It lands on the palace roof, where the assembly meets.", who: "known to the city, and to few outside it" },
+  { id: "hall", t: "Under the roof", s: "the air between the water and the vault", cam: [92, 84, 38], at: [0, 78, 0], roof: true,
+    p: "Inside the walls the sea comes up to the waterline. Over it is a hall of air 16 m high under a coffered stone vault, carried by the walls and twelve piers. Light falls through the eight wells in shafts. Lamps hang over the water. The stone shaft from the fountain hangs at the centre, and the glass trunk drops from its foot into the sea.", who: "a covered harbour, if the city ever wanted one" },
+  { id: "city", t: "The city, roof lifted", s: "three eras inside the walls", cam: [190, 150, 190], at: [0, 18, 0], roof: false,
+    p: "With the roof and upper walls lifted away, the whole plan reads. At the centre is the civic hall, over the mound. Round it run the classical ring and avenues, with the glass Exchange and guest hall on the ring. The four household trunks and the crown ring climb above them. The Glassworks sits at the vent. Seven ancient spires stand between the piers.", who: "23 residents · 7 households · 16 homes" },
+  { id: "civic", t: "The civic hall", s: "Tidehall under glass", cam: [36, 16, 44], at: [0, 13, 0], roof: true, cut: true,
+    p: "The palace is preserved whole inside one glass SuperEgg, 44 m across and 32 m high. It is dry now. The Tidekeeper's audiences are held in the old audience hall. The assembly meets on the palace roof terrace, under the crown of the glass where the trunk comes down. Hearing benches ring the palace's feet on the old terrace. Swimmers come in by four moon pools, one at the foot of each avenue. The old terrace is 2.4 m below the network's datum, so each pool stands on a nacre dais whose rim is at the datum, with steps down to the terrace, and its well runs out through the glass to the avenue. People on legs arrive by the civic link from the ring.", who: "Tidekeeper Asaru · Tudaro · the city's business" },
+  { id: "exchange", t: "The Exchange", s: "a wrap round the Hall of Records", cam: [EX.c[0] + 24, 16, EX.c[2] + 26], at: [EX.c[0], 5, EX.c[2]], roof: true, cut: true,
+    p: "A glass court round the preserved Hall of Records, which is now the dry archive and Dakuro's chart room. The trading floor runs round the old hall, and a gallery at the tunnels' level looks down into it. The trading floor is 3.8 m below the datum, too deep for an open pool, so the Exchange's moon pool stands on a nacre drum that rises to the gallery, and its well leaves through the glass.", who: "Maresa · Rodasu's counter · Dakuro" },
+  { id: "trunk", t: "A household trunk", s: "the Garden House", cam: [TR[0] + 34, 26, TR[2] + 30], at: [TR[0], 18, TR[2]], roof: true, cut: true,
+    p: "A glass trunk grows from the stump of an old ring tower. It is a dry tube of air, and the spiral inside it is a ramp, 1.4 m wide, that people walk up and down. It threads the household's dry landing hall, with the family's wet homes docked round it, and climbs to a crown hall on the crown ring, 30 m up. Pick \u201cA trunk in section\u201d to see inside.", who: "Nesaja · Rodasu · Kasuno and Tami" },
+  { id: "trunksec", t: "A trunk in section", s: "the air, the ramp, the pools and the locks", cam: [TR[0] + PERP[0] * 50, 16, TR[2] + PERP[2] * 50], at: [TR[0], 17, TR[2]], roof: true, sec: true, fog: 3.2, focus: 22,
+    p: `The Garden House trunk cut in half. Inside the glass is dry air, one body of it with the tunnels and every hall, at one pressure: ${AIR.bar.toFixed(2)} bar, the sea's pressure ${AIR.depth.toFixed(1)} m down. At the foot, on a deck at that depth (the datum, 4.4 m up), is an open moon pool: the old tower's flooded chamber is its well, and a swimmer comes in by the old tower door, rises, and steps out on legs. The ramp climbs from there at no more than 32 degrees, in half-turn flights with landings, to the landing hall at 16 m and the crown hall at 30 m. Up there the sea is at a lower pressure than the air, so an open pool would blow the air out. Each hall is entered instead by a lock chamber hung under its floor, clear of the nacre keel round the trunk: swim in from below, shut the outer hatch, and the hall's own air blows the water out through a valve in the chamber's floor, then open the inner hatch. Each wet home docks to the hall through a short lock in its collar.`,
+    who: `${nPools} moon pools at the datum · ${nLocks} lock chambers above it` },
+  { id: "spires", t: "The ancient spires", s: "the first city", cam: [-118, 26, 54], at: [-76, 18, 0], roof: true,
+    p: "Older than anything the classical city preserved, the first city's spires stand where they always stood, between the piers and the homes. Some are whole and some are broken off. None has been restored and none taken down. Their dark weathered stone is the same as the lower course of the sea wall. That wall was the first city's.", who: "remnants" },
+  { id: "glassworks", t: "The Glassworks", s: "the first air bubble", cam: [GW.c[0] + 22, 14, GW.c[2] - 22], at: [GW.c[0], 4, GW.c[2]], roof: true,
+    p: "The one modern building on the seabed, socketed over the warm vent that heats its furnace. It stands just inside the main gate, 9 m from the wall. It was the first air bubble, and its floor set the datum every later dry space keeps; its moon pool's well runs down through the socket and out onto the avenue. Damaku's air engine is here: the vent's heat works its bellows, drawing air down a shaft in the wall from the roof's air hall and pressing it into the network.", who: "Kunei · Damaku" },
+  { id: "fountainlock", t: "The fountain lock", s: "where the network meets the roof's air", cam: [17, 61, 21], at: [0, 69, 0], roof: true, cut: true, focus: 30,
+    p: `At the top of the central trunk, just under the waterline landing, a chamber of nacre and glass joins the network to the shaft. The network's air is ${ENT.lock_fountain.dp.toFixed(1)} bar above the air under the roof, the whole drop from the datum to the surface, so this is the one lock in the city that is slow: its air is let up or down through a small valve while whoever is inside waits. The ramp ends at a landing beside its lower hatch; its upper hatch opens onto the stone landing at the foot of the stair.`, who: "the secret way down · known to few outside the city" },
+  { id: "lookout", t: "The Kraken lookout", s: "on the wall over the main gate", cam: [36, ROOF + 12, 172], at: [0, ROOF + 3, 139], roof: true,
+    p: "A glass watch room on the parapet over the main gate, facing the islands and the Kraken's water. It is 47 m beyond the wall's foot. Ikara keeps the watch from here and the rota from the Watch Room on the crown ring.", who: "Ikara" },
+];
+
+// ---------- labels, toggles, camera moves
+const labelBox = document.getElementById("labels");
+for (const l of labels) { const d = document.createElement("div"); d.className = "lab " + l.cls; d.innerHTML = `<b>${l.text}</b>${l.sub ? l.sub : ""}`; labelBox.appendChild(d); l.el = d; }
+let showLabels = true;
+const tog = (id, fn) => { const b = document.getElementById(id); b.addEventListener("click", () => { const v = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", v); fn(v); }); return b; };
+tog("t_labels", v => { showLabels = v; labelBox.hidden = !v; });
+let clear = false; const clearBtn = tog("t_clear", v => { clear = v; });
+const cutBtn = tog("t_cut", v => setCut(v));
+const roofBtn = tog("t_roof", v => setRoof(v));
+let flowing = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+const flowBtn = tog("t_flow", v => { flowing = v; }); flowBtn.setAttribute("aria-pressed", flowing);
+function setCut(v) { cutBtn.setAttribute("aria-pressed", v); for (const m of glassMats) m.opacity = v ? Math.min(0.06, m.userData.base) : m.userData.base; }
+const trunkBtn = tog("t_trunk", v => setTrunk(v)), secBtn = tog("t_sec", v => setSec(v));
+function setTrunk(v) { trunkBtn.setAttribute("aria-pressed", v); G.trunk.visible = v; }
+let secOn = false, fogBoost = 1, focus = 0;
+function setSec(v) { secOn = v; G.sec.visible = v; secBtn.setAttribute("aria-pressed", v); for (const o of SEC) { o.material.clippingPlanes = v ? [secPlane] : null; o.material.needsUpdate = true; } }
+function setRoof(v) { roofBtn.setAttribute("aria-pressed", v); G.roof.visible = G.upper.visible = v; }
+function setClear(v) { clear = v; clearBtn.setAttribute("aria-pressed", v); }
+
+const placesEl = document.getElementById("places"), note = document.getElementById("note");
+let anim = null;
+function go(pl, instant) {
+  for (const b of placesEl.children) b.setAttribute("aria-current", b.dataset.id === pl.id);
+  note.innerHTML = `<h3>${pl.t}</h3><p>${pl.p}</p>${pl.who ? `<div class="who">${pl.who}</div>` : ""}`;
+  setCut(!!pl.cut); setClear(!!pl.clear); setRoof(pl.roof !== false); setSec(!!pl.sec); setTrunk(pl.trunkGlass !== false);
+  fogBoost = pl.fog || 1; focus = pl.focus || 0;
+  const to = new THREE.Vector3(...pl.cam), at_ = new THREE.Vector3(...pl.at);
+  if (instant || matchMedia("(prefers-reduced-motion: reduce)").matches) { camera.position.copy(to); controls.target.copy(at_); controls.update(); anim = null; return; }
+  anim = { t0: performance.now(), from: camera.position.clone(), fromAt: controls.target.clone(), to, at: at_ };
+}
+for (const pl of PLACES) { const b = document.createElement("button"); b.className = "place"; b.dataset.id = pl.id; b.setAttribute("role", "listitem"); b.innerHTML = `<h3>${pl.t}</h3><span>${pl.s}</span>`; b.addEventListener("click", () => go(pl)); placesEl.appendChild(b); }
+controls.addEventListener("start", () => { anim = null; fogBoost = 1; focus = 0; });
+function resize() { const w = viewer.clientWidth, h = viewer.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(viewer); resize();
+go(PLACES.find(p => p.id === (location.hash || "").slice(1)) || PLACES[0], true);
+
+const v3 = new THREE.Vector3(), depthEl = document.getElementById("depth"), mx = new THREE.Matrix4();
+let last = performance.now(), time = 0;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now; if (flowing) time += dt;
+  if (anim) { const t = Math.min(1, (now - anim.t0) / 1400), e = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; camera.position.lerpVectors(anim.from, anim.to, e); controls.target.lerpVectors(anim.fromAt, anim.at, e); if (t >= 1) anim = null; }
+  controls.update();
+  const cp = camera.position, gy = ground(cp.x, cp.z) + 1.5; if (cp.y < gy) cp.y = gy;
+  // where the eye is: in the sea, in the air hall under the roof, or under the sky
+  const inside = wallDist(cp.x, cp.z) > 0, roofOn = G.roof.visible;
+  const env = cp.y < WATER_Y ? "sea" : (inside && cp.y < ROOF && roofOn ? "hall" : "sky");
+  const col = env === "sea" ? SEA : env === "hall" ? HALL : SKY;
+  scene.background.copy(col); scene.fog.color.copy(col);
+  scene.fog.density = (env === "sky" ? 0.0006 : env === "hall" ? 0.004 : (clear ? 0.0012 : 0.0036)) * fogBoost;
+  M.surface.opacity = cp.y > WATER_Y ? 0.86 : 0.2; M.surface.color.set(cp.y > WATER_Y ? 0x2d6f86 : 0xbff4ff);
+  depthEl.textContent = cp.y < WATER_Y ? `${(WATER_Y - cp.y).toFixed(0)} m down` : `${(cp.y - WATER_Y).toFixed(0)} m above the sea`;
+  for (let i = 0; i < CN; i++) { const d = cdata[i]; if (flowing) d[0] += dt * d[3] * 4 / d[1]; cpos[i * 3] = Math.cos(d[0]) * d[1]; cpos[i * 3 + 1] = d[2]; cpos[i * 3 + 2] = Math.sin(d[0]) * d[1]; }
+  current.geometry.attributes.position.needsUpdate = true;
+  for (let i = 0; i < jetN; i++) { const d = jetD[i]; if (flowing) d[0] = (d[0] + dt * 0.5 * d[2]) % 1; const t = d[0], r = t * 2.6 * d[2]; jet[i * 3] = Math.cos(d[1]) * r; jet[i * 3 + 1] = ROOF + F.jet - 0.4 + 6 * t - 9 * t * t; jet[i * 3 + 2] = Math.sin(d[1]) * r; }
+  jetPts.geometry.attributes.position.needsUpdate = true;
+  curtains.forEach((c, i) => { c.material.opacity = 0.32 + 0.08 * Math.sin(time * 6 + i); });
+  renderer.render(scene, camera);
+  if (showLabels) {
+    const w = viewer.clientWidth, h = viewer.clientHeight, placed = [], aboveRoof = cp.y > ROOF && G.roof.visible, walledOut = !inside && G.upper.visible && cp.y < ROOF;
+    for (const l of labels) { l.d = camera.position.distanceTo(l.p); l.far = focus && l.p.distanceTo(controls.target) > focus; }
+    const order = labels.slice().sort((a, b) => (a.cls.includes("small") - b.cls.includes("small")) || a.d - b.d);
+    for (const l of order) {
+      v3.copy(l.p).project(camera);
+      const vis = !l.far && !(l.cls.includes("sec") && !secOn) && !(aboveRoof && l.p.y < ROOF - 1) && !(walledOut && wallDist(l.p.x, l.p.z) > 2) && v3.z < 1 && v3.x > -1.1 && v3.x < 1.1 && v3.y > -1.1 && v3.y < 1.1 && (!l.near || l.d < l.near) && l.d < 560;
+      l.el.hidden = !vis;
+      if (vis) {
+        const x = (v3.x + 1) / 2 * w, y = (1 - v3.y) / 2 * h, bw = l.w || (l.w = l.el.offsetWidth), bh = l.h || (l.h = l.el.offsetHeight);
+        const bx = [x - bw / 2 - 4, y - bh - 2, x + bw / 2 + 4, y];
+        if (placed.some(q => bx[0] < q[2] && q[0] < bx[2] && bx[1] < q[3] && q[1] < bx[3])) { l.el.hidden = true; continue; }
+        placed.push(bx); l.el.style.left = x.toFixed(1) + "px"; l.el.style.top = y.toFixed(1) + "px"; l.el.style.opacity = Math.max(0.4, Math.min(1, 1.7 - l.d / 320)).toFixed(2);
+      }
+    }
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+// ---------- the half-section along the main avenue (+z): true heights, true radii
+(function () {
+  const svg = document.getElementById("sect"), NS = "http://www.w3.org/2000/svg";
+  const el = (t, a, txt) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; svg.appendChild(e); return e; };
+  const X0 = -6, X1 = 172, Y0 = -22, Y1 = 118, padR = 44;
+  svg.setAttribute("viewBox", `${X0 - 2} ${-Y1 - 2} ${X1 - X0 + padR + 2} ${Y1 - Y0 + 4}`);
+  const Y = y => -y, T = (x, y, t, o = {}) => el("text", Object.assign({ x, y: Y(y), "font-size": 2.4, "text-anchor": "middle" }, o), t);
+  const ps = (v, e) => Math.sign(v) * Math.pow(Math.abs(v), 2 / e);
+  const eggPath = (cx, cy, a, b, e, cut = -1e9) => { const d = []; for (let i = 0; i <= 96; i++) { const t = Math.PI * 2 * i / 96; d.push([cx + a * ps(Math.cos(t), e), Math.max(cut, cy + b * ps(Math.sin(t), e))]); } return "M" + d.map(p => `${p[0].toFixed(2)},${Y(p[1]).toFixed(2)}`).join(" L") + " Z"; };
+  const radial = (v) => { const f = rad(v.facing); return [v.c[0] * Math.cos(rad(90)) + v.c[2], v.semi[2]]; };
+  el("rect", { x: X0 - 2, y: -Y1 - 2, width: X1 - X0 + padR + 2, height: Y1 - Y0 + 4, fill: "#8fc6e0", "fill-opacity": 0.25 });
+  el("rect", { x: X0, y: Y(WATER_Y), width: X1 - X0, height: WATER_Y - Y0, fill: "#0e4250" });
+  el("rect", { x: X0, y: Y(E.roof_soffit), width: 135 - X0, height: E.roof_soffit - WATER_Y, fill: "#10242a" });
+  // seabed
+  const pts = []; for (let r = X0; r <= X1; r += 1) pts.push([r, ground(0, Math.max(0, r))]);
+  el("path", { d: "M" + pts.map(p => `${p[0]},${Y(p[1])}`).join(" L") + ` L${X1},${-Y0} L${X0},${-Y0} Z`, fill: "#b3a682" });
+  el("line", { x1: X0, y1: Y(WATER_Y), x2: X1, y2: Y(WATER_Y), stroke: "#bff4ff", "stroke-width": 0.5 }); T(150, WATER_Y + 1.6, "the sea", { fill: "#bff4ff" });
+  // the wall, the gate, the roof
+  const g0 = ground(0, 135), g1 = ground(0, 143);
+  el("path", { d: `M135,${Y(Math.min(g0, g1) - 6)} L143,${Y(Math.min(g0, g1) - 6)} L143,${Y(E.dark_top)} L135,${Y(E.dark_top)} Z`, fill: "#5b5c5e" });
+  el("path", { d: `M135,${Y(E.dark_top)} L143,${Y(E.dark_top)} L143,${Y(ROOF + E.parapet)} L142,${Y(ROOF + E.parapet)} L142,${Y(ROOF)} L135,${Y(ROOF)} Z`, fill: "#e6dccb" });
+  el("rect", { x: 135, y: Y(g0 + 24), width: 8, height: 24, fill: "#1b2a2e", "fill-opacity": 0.85 }); T(139, g0 + 26, "sea gate", { "font-size": 2, fill: "#ece6f2" });
+  el("path", { d: `M${E.fountain.oculus[1]},${Y(ROOF)} L135,${Y(ROOF)} L135,${Y(E.roof_soffit)} L${E.fountain.oculus[1]},${Y(E.roof_soffit)} Z`, fill: "#e6dccb" });
+  el("path", { d: `M${E.shaft.r + E.shaft.wall},${Y(ROOF)} L${E.fountain.oculus[0]},${Y(ROOF)} L${E.fountain.oculus[0]},${Y(90)} L${E.shaft.r + E.shaft.wall},${Y(90)} Z`, fill: "#e6dccb" });
+  el("line", { x1: E.fountain.oculus[0], y1: Y(ROOF + 0.3), x2: E.fountain.oculus[1], y2: Y(ROOF + 0.3), stroke: "#bff4ea", "stroke-width": 0.8 });
+  el("path", { d: `M${E.fountain.oculus[0]},${Y(90)} L${E.fountain.oculus[1]},${Y(90)} L${E.fountain.oculus[1] * 0.8},${Y(33)} L${E.fountain.oculus[0]},${Y(33)} Z`, fill: "#fff6d8", "fill-opacity": 0.12 });
+  T(26, 64, "daylight down", { "font-size": 1.9, fill: "#fff6d8" }); T(26, 61.6, "the column", { "font-size": 1.9, fill: "#fff6d8" });
+  // the fountain's tiers, in profile
+  E.fountain.tiers.forEach((t, i) => { const y = ROOF + t.y; el("path", { d: `M0,${Y(y - (i ? 1.6 : 0.2))} L${t.r},${Y(y - 0.3)} L${t.r},${Y(y)} L${t.r - 0.6},${Y(y)} L${t.r - 0.6},${Y(y - 0.6)} L0,${Y(y - 0.6)} Z`, fill: "#f3ead9" }); el("rect", { x: 0, y: Y(i + 1 < E.fountain.tiers.length ? ROOF + E.fountain.tiers[i + 1].y - 1.6 : ROOF + E.fountain.jet - 2), width: t.ped, height: (i + 1 < E.fountain.tiers.length ? E.fountain.tiers[i + 1].y - 1.6 : E.fountain.jet - 2) - (i ? t.y - 0.6 : 0), fill: "#e6dccb" }); if (i) el("line", { x1: t.r + 0.2, y1: Y(y), x2: t.r + 0.2, y2: Y(ROOF + E.fountain.tiers[i - 1].y), stroke: "#d8fbff", "stroke-width": 0.35 }); });
+  T(24, ROOF + 12, "the fountain", { "font-size": 2.6, "text-anchor": "start" });
+  // the shaft and the central trunk
+  el("rect", { x: 0, y: Y(ROOF), width: E.shaft.r, height: ROOF - E.shaft.y0, fill: "#10242a", stroke: "#e6dccb", "stroke-width": 0.4 });
+  el("rect", { x: 0, y: Y(V.trunk_c.y1), width: V.trunk_c.r, height: V.trunk_c.y1 - V.trunk_c.y0, fill: "#9fe8ff", "fill-opacity": 0.25, stroke: "#bff4ea", "stroke-width": 0.35 });
+  T(5, 80, "stone stair", { "font-size": 1.8, "text-anchor": "start", fill: "#ece6f2" }); T(5, 50, "central trunk", { "font-size": 1.9, "text-anchor": "start", fill: "#9fe8ff" });
+  // the civic hall and Tidehall (both face the avenue, so their w axis lies in this plane)
+  el("path", { d: eggPath(C.c[2], C.c[1], C.semi[2], C.semi[1], C.eps, C.cut), fill: "#9fe8ff", "fill-opacity": 0.18, stroke: "#bff4ea", "stroke-width": 0.4 });
+  const TH = V.tidehall; el("path", { d: eggPath(TH.c[2], TH.c[1], TH.semi[2], TH.semi[1], TH.eps, TH.cut), fill: "#45d6c4" });
+  T(0, 36, "civic hall", { "font-size": 2.4, "text-anchor": "start", fill: "#9fe8ff" }); T(-3, 13, "Tidehall", { "font-size": 2.2 });
+  // projected: the Exchange on the ring, the 112.5 trunk, a pier and a spire
+  const dash = { fill: "none", stroke: "#ece6f2", "stroke-width": 0.35, "stroke-dasharray": "1 0.8" };
+  el("path", Object.assign({ d: eggPath(33 * Math.sin(rad(67.5)), EX.c[1], EX.semi[2], EX.semi[1], EX.eps, EX.cut) }, dash)); T(30.5, 14, "Exchange", { "font-size": 1.9 });
+  const tr = at(71, 112.5), tz = tr[2]; el("rect", Object.assign({ x: tz - 4, y: Y(33), width: 8, height: 33 - 4.4 }, dash));
+  el("path", Object.assign({ d: eggPath(tz, 16.2, 7, 4, 2.4) }, dash)); el("path", Object.assign({ d: eggPath(tz, 31.2, 6, 3.6, 2.4) }, dash)); T(tz, 37, "a household trunk", { "font-size": 1.9 });
+  const pz = at(100, 112.5)[2]; el("rect", Object.assign({ x: pz - 3, y: Y(E.roof_soffit), width: 6, height: E.roof_soffit }, dash)); T(pz, 84, "pier", { "font-size": 1.9 });
+  el("path", { d: eggPath(118, GW.c[1], GW.semi[2], GW.semi[1], GW.eps, GW.cut), fill: "#8a7a6a", "fill-opacity": 0.5, stroke: "#bff4ea", "stroke-width": 0.3 }); T(118, GW.c[1] + 12.5, "Glassworks", { "font-size": 1.9 });
+  for (const t of D.tunnels.filter(t => t.key === "civic_link" || t.key === "avenue")) for (const p of [t.pts[0], t.pts[t.pts.length - 1]]) {}
+  el("rect", { x: 18.6, y: Y(D.net_floor + 1.6 + 2.25), width: 111 - 18.6, height: 4.5, fill: "#9fe8ff", "fill-opacity": 0.22 }); T(70, D.net_floor + 5.6, "civic link and avenue tunnel", { "font-size": 1.8, fill: "#9fe8ff" });
+  // the lookout on the wall
+  el("path", { d: eggPath(139, ROOF + E.parapet + 2.2, E.lookout.semi[2], E.lookout.semi[1], 2.4), fill: "#9fe8ff", "fill-opacity": 0.35, stroke: "#bff4ea", "stroke-width": 0.3 }); T(139, ROOF + 10, "Kraken lookout", { "font-size": 2 });
+  // the datum and the moon pools on this line: the civic hall's dais at the avenue foot, the Glassworks'
+  el("line", { x1: X0, y1: Y(D.air.datum), x2: 135, y2: Y(D.air.datum), stroke: "#59e3cf", "stroke-width": 0.25, "stroke-dasharray": "1.2 0.7" });
+  T(40, D.air.datum + 0.9, "datum 4.4 m: the moon pools", { "font-size": 1.6, fill: "#59e3cf", "text-anchor": "start" });
+  for (const k of ["pool_civic_90", "pool_glassworks"]) { const e = D.entries.find(q => q.key === k); if (!e) continue; const r0 = e.p[2];
+    if (e.shape === "drum") el("rect", { x: r0 - e.r - 0.3, y: Y(e.floor), width: 2 * e.r + 0.6, height: e.floor - e.base, fill: "#ece6f2" });
+    el("rect", { x: r0 - e.r, y: Y(e.water), width: 2 * e.r, height: 1.0, fill: "#5fd0e6" }); }
+  // heights
+  for (const [y, t] of [[0, "city floor, 72 m down"], [WATER_Y, "sea level"], [E.dark_top, "dark stone ends"], [E.roof_soffit, "vault"], [ROOF, "roof, 24 m above the sea"]]) { el("line", { x1: X1, y1: Y(y), x2: X1 + 2, y2: Y(y), stroke: "#93b9b8", "stroke-width": 0.3 }); T(X1 + 3, y - 0.7, t, { "text-anchor": "start", fill: "#cfe3e1", "font-size": 1.9 }); }
+  T(155, -12, "toward the islands →", { "font-size": 2.2, fill: "#cfe3e1" });
+})();
+// ---------- how the network holds its air: a household trunk (twice the scale) and the central trunk, true heights in each
+(function () {
+  const svg = document.getElementById("airsec"), NS = "http://www.w3.org/2000/svg", A = D.air;
+  svg.setAttribute("viewBox", "0 0 204 112");
+  const mk = (p, t, a, txt) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; p.appendChild(e); return e; };
+  const ps = (v, e) => Math.sign(v) * Math.pow(Math.abs(v), 2 / e);
+  // a panel: world (s, y) drawn at `sc` from the origin (ox, oy)
+  function panel(ox, oy, sc) {
+    const g = mk(svg, "g", { transform: `translate(${ox} ${oy}) scale(${sc})` }), fs = 1.7 / sc;
+    const P = {
+      g, sc,
+      rect: (x0, y0, x1, y1, o = {}) => mk(g, "rect", Object.assign({ x: Math.min(x0, x1), y: -Math.max(y0, y1), width: Math.abs(x1 - x0), height: Math.abs(y1 - y0) }, o)),
+      line: (x1, y1, x2, y2, o = {}) => mk(g, "line", Object.assign({ x1, y1: -y1, x2, y2: -y2 }, o)),
+      egg: (cx, cy, a, b, e, o = {}, cut = -1e9) => { const d = []; for (let i = 0; i <= 96; i++) { const t = Math.PI * 2 * i / 96; d.push([cx + a * ps(Math.cos(t), e), Math.max(cut, cy + b * ps(Math.sin(t), e))]); } return mk(g, "path", Object.assign({ d: "M" + d.map(p => `${p[0].toFixed(2)},${(-p[1]).toFixed(2)}`).join(" L") + " Z" }, o)); },
+      text: (x, y, t, o = {}) => mk(g, "text", Object.assign({ x, y: -y, "font-size": (o.size || 1) * fs, "text-anchor": "start", fill: "#e6f3f1" }, o), t),
+      w: (n) => n / sc,
+    };
+    return P;
+  }
+  const AIRF = { fill: "#9fe8ff", "fill-opacity": 0.3, stroke: "#bff4ea" }, WET = { fill: "#1d6476", stroke: "#93b9b8" };
+  const NAC = { fill: "#ece6f2" }, POOL = { fill: "#5fd0e6" }, LOCKF = { fill: "#d6fff6", "fill-opacity": 0.55, stroke: "#bff4ea" };
+  const gold = (P) => ({ stroke: "#e0975a", "stroke-width": P.w(0.9) });
+  const rampLine = (P, y0, y1, ox = 0) => {   // flight by flight, as the ramp crosses the section: half a turn each, a landing between
+    const rc = D.ramp_rc, max = Math.PI * rc * D.tan, n = Math.max(1, Math.ceil((y1 - y0) / max - 1e-9)); let x = 1;
+    for (let k = 0; k < n; k++) { const a = y0 + (y1 - y0) * k / n, b = y0 + (y1 - y0) * (k + 1) / n;
+      P.line(ox + x * rc, a, ox - x * rc, b, { stroke: "#f6ead2", "stroke-width": P.w(0.8) });
+      P.line(ox - x * (rc - 0.7), b, ox - x * (rc + 0.7), b, { stroke: "#f6ead2", "stroke-width": P.w(1.4) }); x = -x; }
+  };
+  const sea = y => A.atm + (E.water - y) * A.bar_per_m;
+  // ---- panel 1: the Garden House trunk, at twice the scale; the city's side to the left
+  const P1 = panel(40, 86, 2), tr = D.trunks[0], lf = tr.landing, R = V["trunk_22.5"].r, L = A.lock, K = A.keel, H = V["hall_22.5"], Cr = V["crown_22.5"];
+  P1.rect(-19, 0, 24, 38, { fill: "#0e4250" }); P1.rect(-19, -2.4, 24, 0, { fill: "#b3a682" });
+  P1.text(-18.4, 36.4, "a household trunk, the Garden House, at twice the scale", { size: 1.05 });
+  P1.rect(-5.2, 0, 5.2, 5.2, { fill: "#cfc6d6", rx: 1.2 });                                  // the old tower stump
+  P1.rect(-3.6, 0.6, 3.6, A.pool_level, Object.assign({ "fill-opacity": 0.8 }, POOL));       // its flooded chamber: the well
+  P1.rect(5.2, 0.6, 5.7, 2.6, { fill: "#041217" });
+  P1.rect(-R, A.datum, R, V["trunk_22.5"].y1, Object.assign({ "stroke-width": P1.w(0.4) }, AIRF));
+  const kb = v => v.c[1] - v.semi[1] * Math.pow(1 - Math.pow((R + K[0] / 2) / v.semi[0], v.eps), 1 / v.eps);
+  for (const v of [H, Cr]) {
+    P1.egg(0, v.c[1], v.semi[0], v.semi[1], v.eps, Object.assign({ "stroke-width": P1.w(0.4) }, AIRF));
+    P1.rect(-v.semi[0] * 0.97, v.floor - 0.25, -R, v.floor, NAC); P1.rect(R, v.floor - 0.25, v.semi[0] * 0.97, v.floor, NAC);
+    for (const s of [-1, 1]) P1.rect(s * R, kb(v) - K[1], s * (R + K[0]), kb(v) + 0.2, NAC);
+    const cx = -(R + K[0] + 0.2 + L[0]), y0 = v.floor - 0.15 - L[1];                          // its sea lock, under the floor
+    P1.rect(cx - L[0], y0, cx + L[0], v.floor - 0.15, Object.assign({ "stroke-width": P1.w(0.4) }, LOCKF));
+    P1.line(cx + 0.3 - L[2], v.floor + 0.05, cx + 0.3 + L[2], v.floor + 0.05, gold(P1)); P1.line(cx - L[2], y0, cx + L[2], y0, gold(P1));
+    const e = D.entries.find(q => q.key === (v === H ? "lock_hall_22.5" : "lock_crown_22.5"));
+    P1.text(cx - 1.6, y0 + 0.9, "sea lock", { "text-anchor": "end", fill: "#9fe8ff" });
+    P1.text(cx - 1.6, y0 - 0.4, `the hall's air, ${e.dp.toFixed(1)} bar`, { "text-anchor": "end", size: 0.85, fill: "#93b9b8" });
+    P1.text(cx - 1.6, y0 - 1.5, "over the sea, blows it dry", { "text-anchor": "end", size: 0.85, fill: "#93b9b8" });
+  }
+  for (const s of [-1, 1]) mk(P1.g, "circle", { cx: s * 9.6, cy: -(D.crown + 1.6), r: 2.25, fill: "#9fe8ff", "fill-opacity": 0.3, stroke: "#bff4ea", "stroke-width": P1.w(0.4) });
+  const pod = D.volumes.find(v => v.docks === H.key && Math.abs(((v.facing - 22.5) % 360 + 360) % 360) < 1), reach = H.semi[0] + pod.semi[2] - 0.4, cl = A.collar;
+  P1.egg(reach, pod.c[1], pod.semi[2], pod.semi[1], pod.eps, Object.assign({ "stroke-width": P1.w(0.4) }, WET));
+  P1.rect(H.semi[0] - cl[1] / 2, lf, H.semi[0] + cl[1] / 2, lf + 2 * cl[0], Object.assign({ "stroke-width": P1.w(0.4) }, LOCKF));
+  for (const x of [H.semi[0] - cl[1] / 2, H.semi[0] + cl[1] / 2]) P1.line(x, lf + 0.2, x, lf + 2 * cl[0] - 0.2, gold(P1));
+  rampLine(P1, A.datum, lf); rampLine(P1, lf, D.crown);
+  P1.rect(-R, A.datum - 0.25, -1.3, A.datum, NAC); P1.rect(1.3, A.datum - 0.25, R, A.datum, NAC); P1.rect(-1.3, A.pool_level - 0.12, 1.3, A.pool_level, POOL);
+  P1.line(-19, A.datum, 24, A.datum, { stroke: "#59e3cf", "stroke-width": P1.w(0.5), "stroke-dasharray": `${P1.w(2)} ${P1.w(1.2)}` });
+  P1.text(-18.4, A.datum - 1.4, `datum ${A.datum} m`, { fill: "#59e3cf", size: 0.9 });
+  P1.text(-6.2, 8.6, "foot moon pool, open", { "text-anchor": "end", fill: "#9fe8ff" });
+  P1.text(-6.2, 7.4, "the old chamber is its well", { "text-anchor": "end", size: 0.85, fill: "#93b9b8" });
+  P1.text(6.2, 1.1, "old tower door", { size: 0.85 });
+  P1.text(-17.6, lf + 2.6, `landing hall, ${lf} m`, { fill: "#9fe8ff" }); P1.text(-17.6, D.crown + 4.6, `crown hall, ${D.crown} m`, { fill: "#9fe8ff" });
+  P1.text(reach - 2.6, lf + 1.1, "wet home", { size: 0.9 }); P1.text(H.semi[0] - 1.6, lf + 3.9, "lock to the home", { size: 0.85 });
+  P1.text(5.0, 8.4, "spiral ramp: 1.4 m, flights", { size: 0.85, fill: "#f6ead2" }); P1.text(5.0, 7.3, "of 32° at most, landings", { size: 0.85, fill: "#f6ead2" });
+  P1.text(0, 23.6, "dry air", { "text-anchor": "middle", size: 0.95, fill: "#06333a", "font-weight": 700 });
+  P1.text(0, 22.4, `${A.bar.toFixed(2)} bar`, { "text-anchor": "middle", size: 0.85, fill: "#06333a" });
+  // ---- panel 2: the central trunk, the civic hall and the roof, at true scale
+  const P2 = panel(124, 104, 1), TC = V.trunk_c, CH = V.civic_hall, TH = V.tidehall, FL = A.fountain_lock;
+  P2.rect(-26, 0, 34, E.water, { fill: "#0e4250" }); P2.rect(-26, E.water, 34, E.roof_soffit, { fill: "#10242a" }); P2.rect(-26, 90, 34, ROOF, { fill: "#cdbfa8" });
+  P2.rect(-26, -2.4, 34, 0, { fill: "#b3a682" });
+  P2.line(-26, E.water, 34, E.water, { stroke: "#bff4ff", "stroke-width": 0.35 });
+  P2.text(-25.4, E.water + 0.8, "the sea's surface", { size: 0.9, fill: "#bff4ff" }); P2.text(-25.4, 83.5, "the roof's air hall", { size: 0.9, fill: "#cfe3e1" });
+  P2.text(-25.4, 100.6, "the central trunk, the way down", { size: 1.05 });
+  P2.egg(0, CH.c[1], CH.semi[2], CH.semi[1], CH.eps, { fill: "#9fe8ff", "fill-opacity": 0.14, stroke: "#bff4ea", "stroke-width": 0.35 }, CH.cut);
+  P2.rect(-TH.semi[2], TH.cut, TH.semi[2], TH.c[1] + TH.semi[1], { fill: "#45d6c4", rx: 1.5 });
+  P2.rect(-TC.r, TC.y0, TC.r, TC.y1, Object.assign({ "stroke-width": 0.35 }, AIRF));
+  rampLine(P2, TC.y0, FL.y0);
+  P2.rect(-FL.r, FL.y0, FL.r, FL.y1, Object.assign({ "stroke-width": 0.3 }, LOCKF));
+  P2.line(-0.7, FL.y1 + 0.05, 0.7, FL.y1 + 0.05, gold(P2)); P2.line(FL.r, FL.y0 + 0.3, FL.r, FL.y0 + 1.6, gold(P2));
+  P2.rect(-E.shaft.r - E.shaft.wall, E.shaft.y0, -E.shaft.r, ROOF, { fill: "#cdbfa8" }); P2.rect(E.shaft.r, E.shaft.y0, E.shaft.r + E.shaft.wall, ROOF, { fill: "#cdbfa8" });
+  P2.rect(-9, E.shaft.y0 - 0.6, 9, E.shaft.y0, { fill: "#ddd2bf" });
+  const eF = D.entries.find(e => e.key === "lock_fountain");
+  P2.text(5.6, FL.y0 + 0.4, "the fountain lock", { fill: "#9fe8ff" }); P2.text(5.6, FL.y0 - 1.4, `${eF.dp.toFixed(1)} bar to the roof's air; slow`, { size: 0.85, fill: "#93b9b8" });
+  P2.text(5.6, 80, "stone stair to the fountain", { size: 0.85, fill: "#ece6f2" });
+  P2.text(5.6, 46, "dry air, the same", { size: 0.9, fill: "#9fe8ff" }); P2.text(5.6, 44.2, `${A.bar.toFixed(2)} bar`, { size: 0.85, fill: "#93b9b8" });
+  const dp_ = D.entries.find(e => e.key === "pool_civic_180"), dx = -19.2;     // a civic hall moon pool, on its dais at the datum
+  P2.rect(dx - dp_.r - 0.3, CH.floor, dx + dp_.r + 0.3, dp_.floor, NAC); P2.rect(dx - dp_.r, dp_.water - 1.2, dx + dp_.r, dp_.water, POOL);
+  P2.rect(dx - 4.6, dp_.mouth[1] - 0.6, dx, dp_.mouth[1] + 0.6, NAC);
+  P2.line(-26, A.datum, 34, A.datum, { stroke: "#59e3cf", "stroke-width": 0.25, "stroke-dasharray": "1 0.6" });
+  P2.text(-21.5, 9.2, "moon pool", { "text-anchor": "end", fill: "#9fe8ff" }); P2.text(-21.5, 7.4, "on a dais", { "text-anchor": "end", size: 0.85, fill: "#93b9b8" });
+  P2.text(0, 10.5, "Tidehall", { "text-anchor": "middle", size: 0.9, fill: "#06333a" }); P2.text(-12.5, 27, "civic hall", { size: 0.9, fill: "#9fe8ff" });
+  // ---- pressures, against panel 2's heights
+  const px = 162, Y2 = y => 104 - y;
+  mk(svg, "text", { x: px, y: 6, "font-size": 1.7, fill: "#93b9b8" }, "pressure, bar (absolute)");
+  mk(svg, "text", { x: px, y: Y2(80) + 0.6, "font-size": 1.5, fill: "#93b9b8" }, `roof's air ${A.atm.toFixed(2)}`);
+  for (const [y, t] of [[FL.y0, "the trunk's top"], [D.crown, "crown halls"], [lf, "a landing hall"], [A.datum, "the datum"]]) {
+    mk(svg, "line", { x1: 158, y1: Y2(y), x2: 160.6, y2: Y2(y), stroke: "#93b9b8", "stroke-width": 0.3 });
+    mk(svg, "text", { x: px, y: Y2(y) - 0.3, "font-size": 1.6, fill: "#e6f3f1" }, `${y} m, ${t}`);
+    mk(svg, "text", { x: px, y: Y2(y) + 1.9, "font-size": 1.45, fill: "#93b9b8", class: "nums" }, `sea ${sea(y).toFixed(2)} · air ${A.bar.toFixed(2)} · ${A.bar - sea(y) >= 0 ? "+" : "−"}${Math.abs(A.bar - sea(y)).toFixed(2)}`);
+  }
+  // the key
+  document.getElementById("airkey").innerHTML = [["#5fd0e6", "moon pool: open, no door; only at the datum, its water 0.4 m under the floor"],
+    ["#d6fff6", "lock chamber: two hatches; above the datum the network's own air blows it dry, no pump"],
+    ["#9fe8ff", `dry: one body of air at ${A.bar.toFixed(2)} bar, the trunks, tunnels and halls together`],
+    ["#f6ead2", "the spiral ramp inside each trunk, walked on legs"]].map(([c, t]) => `<div><i style="background:${c}"></i><span>${t}</span></div>`).join("");
+})();
+
+// ---------- the finding
+(function () {
+  const A = D.air, ent = D.entries, pools = ent.filter(e => e.kind === "moon pool"), locks = ent.filter(e => e.kind === "lock");
+  const homes = locks.filter(e => e.shape === "collar").length, seaLocks = locks.filter(e => e.shape === "chamber").length;
+  const fl = ent.find(e => e.key === "lock_fountain"), hallOver = D.trunks.map(t => A.over["hall_" + t.bearing]);
+  document.getElementById("f_air").innerHTML = `<div class="tag">Found by the plan's check · proposed fix (2026-10-14)</div>
+  <h3>One pressure allows open pools at one depth only</h3>
+  <p>The plan joined every dry space into one sealed network at one pressure, and let swimmers in by open pools in the floor at every depth: the floor halls, the trunk feet, the landing halls 15 to 20 m up, the crown halls at 30 m. An open pool keeps its air only where the air's pressure equals the sea's at the pool's surface, and the sea's pressure changes by a tenth of a bar every metre. At one pressure, a pool above that depth blows the air out and one below it floods. Only pools at one depth can be right. The new check found the rest wrong: those in the landing and crown halls and between the halls and the homes, which would blow out, and those on floors below the network's walking level, the Exchange's trading floor, the civic hall's terrace and the old stumps' floors, which would flood.</p>
+  <ul>
+    <li><b>One pressure, kept.</b> Walkers go up and down the trunk ramps and along the tunnels with no doors: <span class="nums">${A.bar.toFixed(2)}</span> bar everywhere in the dry network.</li>
+    <li><b>The datum sets it:</b> the walking floor at the network's foot, ${A.datum} m up, ${A.depth} m down, where the civic ring, the spokes, the trunk feet, the guest hall's common room and the Glassworks' floor stand.</li>
+    <li><b>${pools.length} open moon pools, all at the datum,</b> with no door: the guest hall's, the Glassworks', one at each trunk foot (the old tower's flooded chamber is the well), and five on nacre drums that rise from floors below the datum: four in the civic hall, one in the Exchange.</li>
+    <li><b>${locks.length} lock chambers above it:</b> ${seaLocks} sea locks under the landing and crown halls, ${homes} locks from the halls to the wet homes, and the fountain lock. The network's air is ${Math.min(...hallOver).toFixed(1)} to ${A.over["crown_22.5"].toFixed(1)} bar above the sea up there, so it blows a chamber dry through a valve in its floor with no pump. No entry lies below the datum, where a lock would need one.</li>
+    <li><b>The fountain lock,</b> at the top of the central trunk, holds the whole ${fl.dp.toFixed(1)} bar between the network and the roof's air, and is slow.</li>
+    <li><b>The air.</b> ${A.supply}</li>
+    <li><b>The glass.</b> ${A.glass}</li>
+  </ul>`;
+})();
+</script>

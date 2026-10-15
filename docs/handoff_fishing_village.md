@@ -1,5 +1,7 @@
 # Handoff: Crossroads Fishing Village
 
+> **Snapshot of 2026-10-07, kept for the record.** Current state and next steps: `docs/architecture/settlement_backlog.md` (index row F1; section 3). The web build is deprecated.
+
 Status (2026-10-06): plan, islets, circulation, swim exits and the Mor rest
 point are built and verified in the world (`tools/fishing_islet_probe.tscn`, 0
 FAIL). Every structure in the plan is built from its brief (2026-10-07):

@@ -1,5 +1,7 @@
 # Handoff: Chinese Village pass (population, story and layout re-fit approved; layout not yet built)
 
+> **Snapshot of 2026-10-06, kept for the record (2026-10-14).** Superseded where it differs. The innkeeper is now Lu (吕) and his son Lu Hao (not 林静); Lu, not Liang Zhen, becomes the community chef, and Liang Zhen becomes Tian Bo's advisor; there is no romance (all 2026-10-12). The layout is now `chinese_village.md` 4.0 and 4.0a, drawn in `docs/drawings/chinese_gorge_3d.html`. The web build is deprecated, so pushes no longer regenerate `build/web`. Current state and next steps: `docs/architecture/settlement_backlog.md` (index rows C1 to C7, sections 5, 12, 17a, 18).
+
 Nothing from this work is committed. The working tree holds many unrelated
 modified files, so review `git status` before staging. Follow `AGENTS.md` and
 `CLAUDE.md` for publishing (regenerate and validate `build/web` before any push,

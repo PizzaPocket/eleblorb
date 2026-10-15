@@ -474,6 +474,19 @@ Placement and services:
 - **Partitions under a pitched roof.** A partition on an upper floor with an open roof above runs **up to the rafters**: a wall that runs along the ridge rises to the roof's underside where it stands, a cross wall is gable-shaped following both slopes (pass `roof` to `build_interior_wall`). A wall that stops at storey height under an open roof is a cubicle wall and always wrong. The alternative is a flat ceiling at storey height with the roof space above; never both half-done.
 - **Every room is reachable.** No door opens onto a wall, a bench, a bed or another room's door; every room has a door from a circulation space (hall, landing, corridor, or the room it belongs to); check each door's 1.2 m by 2 m clear zone on both sides before placing furniture.
 - **Circulation first, furniture second.** Draw the routes (door to hearth, door to stairs, door to each room) and keep 1.2 m clear on them; then place furniture around the routes against the walls. Nothing blocks a door swing or the foot of a ramp.
+- **The world is built at about 1.1 × real size, and so are its people and
+  furniture.** Doors are 2.4 m, storeys 3.25 m and tables 0.80 m. The hero is
+  about 1.9 m (a real 1.73 m), and villagers run from about 1.70 m to 1.93 m
+  (women) and 1.82 m to 2.09 m (men) (user, 2026-10-12). Size furniture at
+  real size × about 1.1, never from a real-world catalogue.
+- **Beds** are at least as long as their tallest likely sleeper plus 0.2 m:
+  - a 2.3 m mattress for any adult bed;
+  - a double 1.55 m wide and a single 1.0 m;
+  - a child's bed 0.9 × 1.9 m.
+
+  Every culture's bed (stone, rattan, bunk, kang) keeps these lengths. A room
+  that cannot take a 2.45 m frame plus its access is too small for a
+  bedroom.
 - **Furniture rules.** Beds: head to the wall, 0.6 m access on at least one long side. Toilets: back to a wall, 0.6 m clear either side and in front. Tables: 0.8 m clear all round. Counters: 1.0 m behind, 1.2 m in front. Hearth: 1.2 m clear in front. A chest or shelf stands against a wall.
 - **A ramp needs the depth for its run.** A 32 degree ramp climbing 3.25 m runs 5.2 m, plus 0.9 m before it and a clear landing of at least 1.2 m (prefer 3 m) at its head, where you step off onto the floor with nothing in the way: a house with a stair is at least three cells (9.6 m) deep. Rails are balustrades (a top rail on slender posts), never slabs, along the sides that are open, **not** across the head; the ramp never ends against a wall. Along a curved ramp or gallery, fabricate each uninterrupted top rail as one continuous swept pipe with shared curve vertices. Never expose the path tessellation as a row of short, stumpy beam segments. Break the pipe only at an intentional gate, dock, doorway or junction throat, and give the guard collision.
 - **A walkway is a swept solid.** Audit its centre and both edges with the real
@@ -491,7 +504,7 @@ Placement and services:
 |---|---|
 | Door, clear | 1.2 x 2.4 m (double 2.0, cart 2.8 x 3.0) |
 | Corridor or landing | 1.4 m |
-| Bed | 1.6 x 2.4 m footprint |
+| Bed (world scale) | mattress 1.55 x 2.3 m double, 1.0 x 2.3 m single; frame about 1.7 x 2.45 m |
 | Table for four | 1.7 x 1.0 m, benches 0.4 m |
 | Counter | 0.5 to 1.0 m deep |
 | Hearth opening | 1.05 m wide, breast 1.9 m |
@@ -508,7 +521,7 @@ Every outside prop (woodstack, bench, trellis, barrel, handcart) stands **clear 
 
 ## 7b. Siting a mill
 
-A mill sits **on the settlement's side of the water it uses**, along the course of the leat or aqueduct, and its door faces the way people arrive; nothing (a bridge, the race) lies between the road and the door. Run the water from its source toward the point on the rim nearest the settlement, and place the mill along that run, as close to the settlement as the fall allows.
+A mill sits **on the settlement's side of the water it uses**, along the course of the leat or aqueduct, and its door faces the way people arrive; nothing (a bridge, the race) lies between the road and the door. Run the water from its source toward the point on the rim nearest the settlement, and place the mill along that run, as close to the settlement as the fall allows. Water is part of a settlement's character, not a utility to hide, but every part of a water system needs its own job, written down before it is drawn. Give each kind of water its own carrier: clean water under pressure goes in buried mains (gravity from a raised reservoir needs no arches); power water goes to a mill that takes nearly the whole drop (an overshot wheel at the foot of a pond's dam); working water goes in an open leat at ground level; waste goes to septic tanks, never to open water. If the open water runs a longer way than the shortest outfall, say why (Ohio's leat passes the forge and the market for its working water). Arches are for crossing a valley, never for holding height across flat ground. Put a mill where the terrain gives it height, turn a reservoir's outlet toward where its water goes, and when the outfall must be over a drop, give it a projecting spout over a vertical face. Ground is changed in the terrain itself, never by an added mesh, and the terrain is a coarse heightfield (Ohio's plateau: a vertex every 18 m, one flat triangle between): it can level or slope whole cells but cannot cut a channel, a wheel pit, a culvert or a vertical cliff. So build water channels on the ground with their beds at or above it (`VillageWorks.build_aqueduct`), make the ground beneath them low and level with whole-cell pads, route open water so that no road has to cross it, carry an outfall past a cliff's one-cell slope on a flume sized by `_flume_reach`, and leave pipes unmodelled. Check every water design against the grid before presenting it (`docs/architecture/ohio.md` 3.4 records five tries before this held together). If the only possible outfall is far from the settlement, question the ground before accepting a hidden aqueduct: Ohio's fall was stuck 100 m from the village until the lake was widened along the cliff foot (`docs/architecture/ohio.md` 3.4).
 
 ## 8. Review checklist
 
