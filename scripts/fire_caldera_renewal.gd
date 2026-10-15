@@ -1,21 +1,18 @@
 class_name FireCalderaRenewal
 extends RefCounted
 
-## The Renewal terrace (fire_caldera_buildings.md, section 3; landmark): the
-## city's ghat. As on a river ghat, a broad flight of steps runs from the
-## street down into the lava, and the steps are the use: the dry upper steps
-## are seats for resting, talking and watching; on the waterline step people
-## sit half immersed together; the lower steps carry on under the lava as the
-## immersion shelf, the gentlest way down to the renewal chamber. At the foot
-## of the central flight a dark refractory threshold arch stands half sunk,
-## the way down and the place of the coming-of-age descent.
+## The Renewal terrace (fire_caldera_buildings.md, section 3; landmark) is a
+## public extension of the Highline rather than a rock ghat. Two communal glass
+## byways arrive at opposite landward sides of a broad transparent deck. From
+## its reservoir face, one gently sloped SuperEgg tongue enters the lava and
+## reaches the half-sunk refractory threshold to the renewal chamber. The
+## multiple approaches let gatherings circulate without turning the ritual
+## descent into a dead end.
 ##
-## The promenade runs along a level landing at the top, flush with it: that is
-## the arrival. Along the landing's back, the cast-basalt memory stones face
-## the water, the backdrop to every gathering; at its east end, under a veiled
-## glass windbreak, Eris's warm tempering slab, where she helps those too
-## cracked or cooled to walk straight in. Two arms frame the flight and run out
-## over the lava; the canopy's supports stand on them and on the landing.
+## Cast-basalt memory stones face the water along the landward edge; beneath a
+## veiled glass windbreak, Eris's warm tempering slab assists residents who are
+## too cracked or cooled to enter directly. The same glass-and-dark-metal
+## language continues from byway to deck, guard and immersion tongue.
 ##
 ## Its own idea above: a catenary canopy of slumped glass. The lava people
 ## hang molten glass over chains and let it settle into its own curve, so the
@@ -23,10 +20,9 @@ extends RefCounted
 ## branching supports, the panels shading from teal at the springing through
 ## garnet to amber at the crown, washing the steps in coloured light.
 ##
-## Its foundation is its own, not a plinth: a U-shaped deck level with the
-## promenade, cut to the plot's outline, open at the front to the steps, with
-## a retaining wall only where the ground behind stands higher. Local +Z faces
-## the reservoir.
+## Its foundation is its own civic structure: a squarish glass SuperEgg deck
+## carried by a concave supertoroidal service pier. Local +Z faces the
+## reservoir.
 
 const SPAN := 17.0
 const CROWN := 6.2
@@ -42,14 +38,6 @@ const FRONT_Z := 6.2
 const REFRACTORY := Color(0.21, 0.18, 0.17)
 const RIBS := 6
 const SEGMENTS := 16
-## The flight: its half width, each step's going and rise, how many.
-const FLIGHT_HALF := 7.0
-const GOING := 0.9
-const RISE := 0.45
-const FLIGHT := 7
-const DEEP := 6.0
-## The deck's front edge, where the flight begins.
-const FLIGHT_START := 0.3
 const TEAL := Color(0.18, 0.60, 0.58, 0.55)
 const GARNET := Color(0.62, 0.14, 0.22, 0.55)
 const AMBER := Color(0.95, 0.58, 0.16, 0.55)
@@ -62,96 +50,69 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> Static
 	_canopy(body)
 	_supports(body)
 	_memory_stones(body)
-	_windbreaks(body)
 	_tempering_slab(body)
 	_light(body)
 	return body
 
 
-## The ghat's foundation, in place of a plinth: the U-shaped deck (the plot's
-## outline less the flight), its walls running down into the ground and the
-## lava; the flight of refractory steps; a retaining wall where the ground
-## behind stands above the deck. One body, named as a plinth is.
+## The public renewal deck uses the Highline's glass-and-dark-metal language.
+## It is a light civic platform over one supertoroidal service pier, with two
+## landward access points and one broad SuperEgg immersion tongue.  There is no
+## rock tray, retaining lip, or monumental stair between people and the lava.
 static func build_foundation(parent: Node3D, entry: Dictionary, line: Dictionary) -> StaticBody3D:
 	var datum := float(line["datum"])
 	var body := CalderaShell.make_body(parent, entry, datum)
 	body.name = "%sPlinth" % entry["id"]
-	var outline := PackedVector2Array()
-	var plan_outline := SocketPlinth.exclusion(entry, line)
-	for point in plan_outline:
-		outline.append(FireCalderaPlan.plan_to_shell(entry, point))
-	var flight := PackedVector2Array([Vector2(-FLIGHT_HALF, FLIGHT_START), Vector2(FLIGHT_HALF, FLIGHT_START), Vector2(FLIGHT_HALF, 20.0), Vector2(-FLIGHT_HALF, 20.0)])
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var faces := PackedVector3Array()
-	var deck := CalderaShell.BASALT.lightened(0.1)
-	for piece in Geometry2D.clip_polygons(outline, flight):
-		var triangles := Geometry2D.triangulate_polygon(piece)
-		for t in range(0, triangles.size(), 3):
-			var tri := [piece[triangles[t]], piece[triangles[t + 1]], piece[triangles[t + 2]]]
-			_tri(st, faces, Vector3(tri[0].x, 0, tri[0].y), Vector3(tri[1].x, 0, tri[1].y), Vector3(tri[2].x, 0, tri[2].y), Vector3.UP, deck)
-		for i in piece.size():
-			var a: Vector2 = piece[i]
-			var b: Vector2 = piece[(i + 1) % piece.size()]
-			var mid := (a + b) * 0.5
-			var out := Vector2(b.y - a.y, a.x - b.x).normalized()
-			if Geometry2D.is_point_in_polygon(mid + out * 0.05, piece):
-				out = -out
-			var n := Vector3(out.x, 0, out.y)
-			var colour := REFRACTORY if absf(a.x) < FLIGHT_HALF + 0.01 and absf(b.x) < FLIGHT_HALF + 0.01 and a.y > FLIGHT_START - 0.01 and b.y > FLIGHT_START - 0.01 else CalderaShell.BASALT
-			_tri(st, faces, Vector3(a.x, 0, a.y), Vector3(b.x, 0, b.y), Vector3(b.x, -DEEP, b.y), n, colour)
-			_tri(st, faces, Vector3(a.x, 0, a.y), Vector3(b.x, -DEEP, b.y), Vector3(a.x, -DEEP, a.y), n, colour)
-	var mesh := MeshInstance3D.new()
-	mesh.name = "PlinthMesh"
-	mesh.mesh = st.commit()
-	var material := StandardMaterial3D.new()
-	material.vertex_color_use_as_albedo = true
-	material.vertex_color_is_srgb = true
-	material.roughness = 0.9
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	mesh.material_override = material
-	body.add_child(mesh)
-	var shape := ConcavePolygonShape3D.new()
-	shape.backface_collision = true
-	shape.set_faces(faces)
-	var collider := CollisionShape3D.new()
-	collider.shape = shape
-	collider.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
-	body.add_child(collider)
-	# The flight: refractory steps, each solid down into the lava.
-	for k in FLIGHT:
-		var top := -RISE * float(k + 1)
-		var z0 := FLIGHT_START + GOING * float(k)
-		var step := CalderaFurniture.piece(body, Vector3(FLIGHT_HALF, (DEEP + top) * 0.5, GOING * 0.5 + 0.02), REFRACTORY.lightened(0.03 * float(k % 2)), Vector3(0.0, (top - DEEP) * 0.5, z0 + GOING * 0.5), 0.0, true, 9.0)
-		step.name = "GhatStep"
-	# Where the ground behind stands above the deck, a retaining wall.
-	var retaining := StaticBody3D.new()
-	retaining.name = "%sRetaining" % entry["id"]
-	retaining.collision_layer = 1
-	retaining.collision_mask = 0
-	parent.add_child(retaining)
-	var cap := PackedVector3Array()
-	for point in plan_outline:
-		cap.append(Vector3(point.x, datum, point.y))
-	SocketPlinth._retaining(retaining, cap, FireCalderaPlan.mass_centre(entry), datum)
+	var glass := Color(0.32, 0.66, 0.76, 0.38)
+	CalderaShell.soft_slab(body, "RenewalGlassDeck", Vector3(0.0, -0.14, 0.0), Vector3(11.3, 0.14, 9.3), Vector2(10.8, 8.8), glass)
+	var edge := PackedVector3Array()
+	for i in 48:
+		var angle := TAU * float(i) / 48.0
+		var c := cos(angle)
+		var s := sin(angle)
+		edge.append(Vector3(signf(c) * pow(absf(c), 2.0 / 7.0) * 11.18, -0.03, signf(s) * pow(absf(s), 2.0 / 7.0) * 9.18))
+	for i in edge.size():
+		CalderaShell._beam(body, edge[i], edge[(i + 1) % edge.size()], Vector2(0.13, 0.13), IRON)
+	FireCalderaHighline._supertoroidal_pier(body, Vector2.ZERO, Vector2.RIGHT, Vector2.DOWN, Vector2(10.95, 8.95), float(line["low"]) - datum - 2.2, -0.30, "RenewalSupertoroidalServicePier")
+	_immersion_tongue(body, datum)
 	return body
 
 
-static func _tri(st: SurfaceTool, faces: PackedVector3Array, a: Vector3, b: Vector3, c: Vector3, normal: Vector3, colour: Color) -> void:
-	SocketPlinth._triangle(st, a, b, c, normal, colour)
-	faces.append_array([a, b, c])
+static func _immersion_tongue(body: StaticBody3D, datum: float) -> void:
+	# Begin at the lava-facing deck edge. The former tongue began near the
+	# pavilion centre and pitched down through the glass foundation itself.
+	var start := Vector3(0.0, 0.02, 8.15)
+	var finish := Vector3(0.0, FireCalderaGround.LAVA_Y - datum - 1.2, 15.0)
+	var delta := finish - start
+	var run := Vector2(delta.x, delta.z).length()
+	var pitch := -atan2(delta.y, run)
+	var basis := Basis(Vector3.RIGHT, pitch)
+	var middle := start.lerp(finish, 0.5)
+	CalderaShell.soft_slab(body, "ImmersionTongue", middle - basis.y * 0.11, Vector3(3.2, 0.11, delta.length() * 0.5), Vector2(3.0, delta.length() * 0.5 - 0.18), Color(0.30, 0.62, 0.72, 0.44), basis)
+	for side: float in [-1.0, 1.0]:
+		var offset := basis.x * side * 3.05
+		CalderaShell._beam(body, start + offset + basis.y * 1.12, finish + offset + basis.y * 1.12, Vector2(0.09, 0.09), IRON)
+		var pane := BoxMesh.new()
+		pane.size = Vector3(0.04, 1.0, delta.length())
+		var visual := MeshInstance3D.new()
+		visual.name = "ImmersionGuard"
+		visual.mesh = pane
+		visual.material_override = SolidModel.material(Color(0.42, 0.72, 0.80, 0.22), 0.12, 0.02)
+		visual.transform = Transform3D(basis, middle + offset + basis.y * 0.56)
+		body.add_child(visual)
+		CollisionPolicy.add_box(body, visual, pane.size, visual.position, visual.basis, false)
 
 
-## At the foot of the central flight, half sunk where the waterline step meets
-## the lava, a refractory arch: the way down to the renewal chamber.
+## At the foot of the immersion tongue, half sunk at the lava, a refractory
+## arch marks the way down to the renewal chamber.
 static func _threshold(body: StaticBody3D) -> void:
-	var z := FLIGHT_START + GOING * 4.6
+	var z := 14.2
 	var arch := CSGCombiner3D.new()
 	arch.name = "ThresholdArch"
 	arch.use_collision = true
 	arch.collision_layer = 1
 	arch.collision_mask = 0
-	arch.position = Vector3(0.0, -RISE * 5.0, z)
+	arch.position = Vector3(0.0, FireCalderaGround.LAVA_Y - body.position.y - 1.05, z)
 	body.add_child(arch)
 	var stone := SolidModel.material(REFRACTORY, 0.7, 0.0)
 	var outer := SolidModel.add_profile(arch, "Outer", 0.45, Vector2(2.1, 1.9), 3.2, CSGShape3D.OPERATION_UNION, stone, Vector3(0, 1.0, 0), 72)
@@ -273,29 +234,6 @@ static func _memory_stones(body: StaticBody3D) -> void:
 		var stone := CalderaFurniture.piece(body, Vector3(0.24, h * 0.5, 0.16), CalderaShell.BASALT.lightened(0.05 * float(i % 3)), Vector3(x, h * 0.5, z), 0.1 * (float(i % 3) - 1.0), true, 3.4)
 		stone.name = "MemoryStone"
 		FireCalderaBuildings._glow(body, "MemorySeam", Vector3(0.012, h * 0.3, 0.012), Vector3(x, h * 0.55, z + 0.17), Color(1.0, 0.5, 0.15))
-
-
-## On the landward side, behind the top tier, windbreaks of fused glass with
-## basalt veils drawn through it, on iron posts.
-static func _windbreaks(body: StaticBody3D) -> void:
-	var z := -6.6
-	var panels := 2
-	for i in panels:
-		var x := lerpf(4.2, 7.6, float(i) / float(panels - 1))
-		var pane := MeshInstance3D.new()
-		var box := BoxMesh.new()
-		box.size = Vector3(2.3, 2.2, 0.05)
-		pane.mesh = box
-		var veiled := SolidModel.material(Color(0.80, 0.78, 0.74, 0.35), 0.3, 0.0)
-		veiled.cull_mode = BaseMaterial3D.CULL_DISABLED
-		pane.material_override = veiled
-		pane.position = Vector3(x, 1.2, z)
-		body.add_child(pane)
-		CollisionPolicy.add_box(body, pane, box.size, pane.position, Basis(), false)
-		for v in 3:
-			var vx := x - 0.7 + 0.7 * float(v)
-			CalderaShell._beam(body, Vector3(vx - 0.15, 0.25, z - 0.03), Vector3(vx + 0.2, 2.1, z - 0.03), Vector2(0.03, 0.02), CalderaShell.BASALT)
-		CalderaShell._metal(body, Vector3(x + 1.18, 1.15, z), Vector3(0.08, 2.3, 0.08), IRON, true)
 
 
 ## Coloured light under the canopy, as the glass would throw it; flames in

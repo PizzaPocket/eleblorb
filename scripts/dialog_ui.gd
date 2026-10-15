@@ -58,6 +58,7 @@ var _chinese_response_buttons: Array[Button] = []
 ## double-runs.
 var _dismiss_callback: Callable = Callable()
 var _cancel_confirmation_pending: bool = false
+var _has_dismiss_response: bool = true
 ## True only when this dialog set SceneTree.paused itself. Tracking ownership
 ## prevents an ordinary dialog close from resuming a pause established by a
 ## different system.
@@ -251,6 +252,10 @@ func show_line(
 	dismiss_label: String = "Goodbye.", dismiss_callback: Callable = Callable(),
 	pause_game: bool = false
 ) -> void:
+	# An empty dismiss label intentionally produces an action-only chooser. It
+	# is used by controls such as the three-stop lift where every visible row is
+	# a stable destination; Back still closes the chooser without adding a
+	# fourth pseudo-destination.
 	_cancel_confirmation_pending = false
 	_dismiss_callback = dismiss_callback
 	# Per direct instruction: any already-Chinese-speaking NPC (see
@@ -291,21 +296,26 @@ func show_line(
 		# village's own quest branches) keeps whatever dismiss_label its own
 		# call site passed, unchanged from today.
 		var effective_dismiss_label := "Continue" if (_is_chinese_line and actions.is_empty()) else dismiss_label
-		_add_response(effective_dismiss_label, _on_dismiss_pressed)
+		_has_dismiss_response = not effective_dismiss_label.is_empty()
+		if _has_dismiss_response:
+			_add_response(effective_dismiss_label, _on_dismiss_pressed)
 		# Per direct correction, Chinese lines never show the separate
 		# _response_panel at all -- see _build_chinese_ui()'s own comment on
 		# why "Continue"/every other response now lives inside _chinese_panel
 		# itself instead.
-		if _is_chinese_line:
+		if _is_chinese_line and _has_dismiss_response:
 			_chinese_response_buttons.back().set_meta("ui_sound_kind", "back")
 			_response_panel.visible = false
-		else:
+		elif _has_dismiss_response:
 			_response_buttons.back().set_meta("ui_sound_kind", "back")
+			_response_panel.visible = true
+		else:
 			_response_panel.visible = true
 		if not was_modal:
 			UIState.push_modal()
 		_set_game_pause(pause_game or _is_chinese_line)
 	else:
+		_has_dismiss_response = true
 		_set_transaction_hud(false)
 		_response_panel.visible = false
 		if was_modal:
@@ -400,6 +410,9 @@ func _unhandled_input(event: InputEvent) -> void:
 ## clearly acknowledge which choice was made.
 func _confirm_dismiss_from_cancel() -> void:
 	if _cancel_confirmation_pending:
+		return
+	if not _has_dismiss_response:
+		_on_dismiss_pressed()
 		return
 	var active_buttons := _chinese_response_buttons if _is_chinese_line else _response_buttons
 	if not _is_modal or active_buttons.is_empty():

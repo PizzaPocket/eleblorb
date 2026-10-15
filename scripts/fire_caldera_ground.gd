@@ -2,34 +2,29 @@ class_name FireCalderaGround
 extends RefCounted
 
 ## The caldera city's own ground (fire_caldera_layout.md, sections 1 and 1a):
-## the reservoir basin and its bank, the terraces rising from the promenade to
-## the service loop and toward the far wall, and the three gentler immersion
-## shelves into the lava. One height function, in the plan's local frame, is
-## the source for the ground mesh, its collision, the lava's extent and the
-## plot survey, so they cannot disagree.
+## two nested paraboloids: a shallow inhabited volcanic bowl from its central
+## vertex to the true crater lip, and a second, deeper bowl inside the reservoir
+## boundary. One height function, in the plan's local frame, is the source for
+## the ground mesh, collision, lava extent and plot survey, so they cannot
+## disagree.
 ##
 ## Heights are world Y. In the live kingdom this replaces the coarse flat
 ## crater floor inside the city and blends back to the original crater wall.
 
-## The lava surface, a little below the bank's lip.
-const LAVA_Y := FireCalderaPlan.FLOOR_Y - 0.8
-## The bank's lip, where the promenade meets it.
-const LIP_Y := FireCalderaPlan.FLOOR_Y + 0.3
+## The outer parabola reaches the existing volcanic lip exactly.
+const BOWL_LIP_Y := 48.0
+## The lava surface sits below even the shallowest point of its parabolic rim.
+const LAVA_Y := 29.2
+## Nominal bank height at the reservoir's mean radius; individual bearings
+## vary slightly because the lava outline is intentionally organic.
+const LIP_Y := 30.0
 ## The basin's bed under the deepest lower rooms (layout section 7: down to
 ## 18 m below the surface).
 const BED_DEPTH := 22.0
-## How fast the ordinary bank falls away below the lip (metres down per metre
-## in): a steep, cooled-basalt bank, not a beach.
-const BANK_FALL := 2.4
-## The immersion shelves fall gently instead, a walkable descent.
-const SHELF_FALL := 0.45
-const SHELF_HALF_WIDTH := 3.5
-## The terraces: a rise per metre outward from the bank, and a tilt up toward
-## the far wall (local +Y), so the far bank's civic quarter stands highest.
-const TERRACE_GRADE := 0.07
-const FAR_TILT := 0.025
 ## Where the city's ground gives way to the crater wall.
-const WALL_BLEND := Vector2(FireCalderaPlan.FLOOR_RADIUS, FireCalderaPlan.FLOOR_RADIUS + 8.0)
+## The authored parabola owns almost the whole bowl; only its final apron
+## reconciles to the coarse terrain samples at the same crater lip.
+const WALL_BLEND := Vector2(92.0, 98.0)
 
 const EMBED := 1.5
 ## Foundation type by the ground's change across the reserved plot.
@@ -38,23 +33,30 @@ const PODIUM_MAX := 4.0
 const EXPOSED_MAX := 3.0
 
 
+## The natural inhabited bowl is the outer half of a parabola whose vertex is
+## the lava-mouth shoulder. The central lava basin supplies the second
+## parabola inside that shoulder. This puts homes on the gentle beginning of
+## the curve while the uninterrupted outer wall steepens toward the true lip.
+static func outer_bowl_height(local: Vector2) -> float:
+	var run := FireCalderaPlan.RIM_RADIUS - FireCalderaPlan.FLOOR_RADIUS
+	var normalized_radius := clampf((local.length() - FireCalderaPlan.FLOOR_RADIUS) / run, 0.0, 1.0)
+	return FireCalderaPlan.FLOOR_Y + (BOWL_LIP_Y - FireCalderaPlan.FLOOR_Y) * normalized_radius * normalized_radius
+
+
 ## Ground height at a local plan point, before blending into the crater wall.
+## Inside the organic reservoir outline, a second parabola meets the outer
+## bowl at the bank and falls to the common central bed. Outside it, the ground
+## is the uninterrupted outer parabola—there are no flat terrace bands.
 static func height(local: Vector2) -> float:
 	var r := local.length()
 	var angle := local.angle()
 	var bank := FireCalderaPlan.reservoir_radius(angle)
-	# The lip at this bearing: the terrace's own height there, so the bank
-	# falls from the ground it belongs to with no step at the edge.
-	var lip := LIP_Y + _tilt(local)
-	if r < bank:
-		var fall := lerpf(BANK_FALL, SHELF_FALL, _shelf_weight(local))
-		return maxf(lip - (bank - r) * fall, LAVA_Y - BED_DEPTH)
-	return lip + (r - bank) * TERRACE_GRADE
-
-
-## The rise toward the far wall (local +Y), none on the arrival side.
-static func _tilt(local: Vector2) -> float:
-	return (maxf(local.y, -20.0) + 20.0) * FAR_TILT
+	if r >= bank:
+		return outer_bowl_height(local)
+	var bank_point := Vector2(cos(angle), sin(angle)) * bank
+	var edge_height := outer_bowl_height(bank_point)
+	var t := r / bank
+	return (LAVA_Y - BED_DEPTH) + (edge_height - (LAVA_Y - BED_DEPTH)) * t * t
 
 
 ## Ground height including the blend into the existing crater wall, given that
@@ -71,20 +73,10 @@ static func blend_height(local: Vector2, wall_height: float) -> float:
 	var t := smoothstep(WALL_BLEND.x, WALL_BLEND.y, local.length())
 	if t <= 0.0:
 		return own
-	return lerpf(own, maxf(wall_height, own), t)
-
-
-## 1 on an immersion shelf's centre line, fading to 0 at its sides.
-static func _shelf_weight(local: Vector2) -> float:
-	var weight := 0.0
-	for shelf in FireCalderaPlan.IMMERSION_SHELVES:
-		var entry := FireCalderaPlan.plot(str(shelf["plot"]))
-		var bearing := FireCalderaPlan.front_point(entry).angle()
-		var direction := Vector2(cos(bearing), sin(bearing))
-		var across := absf(local.cross(direction))
-		if local.dot(direction) > 0.0 and across < SHELF_HALF_WIDTH * 1.6:
-			weight = maxf(weight, 1.0 - smoothstep(SHELF_HALF_WIDTH, SHELF_HALF_WIDTH * 1.6, across))
-	return weight
+	# At the outer edge the fine bowl must become the coarse volcano exactly.
+	# Keeping the higher of the two left a visible/collidable shelf wherever
+	# the new shallow bowl happened to sit above the old wall sample.
+	return lerpf(own, wall_height, t)
 
 
 ## The plot survey (layout section 1a, "Required plot survey"), computed from
@@ -120,13 +112,15 @@ static func survey(entry: Dictionary) -> Dictionary:
 	max_grade = maxf(max_grade, gradient.length())
 	# The floor meets its public threshold flush: the datum is the ground at
 	# the front landing (where the promenade arrives), not the plot's average.
-	var datum: float = samples["front landing"]
+	var datum: float = FireCalderaPlan.HIGHLINE_DATUM if str(entry.get("site", "ground")) == "highline" else samples["front landing"]
+	if entry.has("datum"):
+		datum = float(entry["datum"])
 	# A terrace that stands out over the reservoir takes its floor from the
 	# route that crosses it (a point in its own frame), not from the lava.
 	if entry.has("datum_at"):
 		datum = height(FireCalderaPlan.shell_to_plan(entry, entry["datum_at"]))
 	var change := high - low
-	var kind := "socket plinth" if change <= SOCKET_MAX else ("stepped podium" if change <= PODIUM_MAX else "bedrock spine")
+	var kind := "raised service platform" if FireCalderaPlan.is_elevated(entry) else ("socket plinth" if change <= SOCKET_MAX else ("stepped podium" if change <= PODIUM_MAX else "bedrock spine"))
 	return {
 		"id": entry["id"], "samples": samples, "low": low, "high": high, "change": change,
 		"uphill": gradient.normalized(), "max_grade": max_grade, "datum": datum,
@@ -144,25 +138,41 @@ static func survey(entry: Dictionary) -> Dictionary:
 # ---------------------------------------------------------------------------
 
 ## The ground mesh extends this far from the centre (into the wall blend).
-const EXTENT := 84.0
+## The fine bowl owns every raised foundation and its clearance socket.  Its
+## visible seam therefore sits beyond the outermost Civic/inn platform, not
+## through them; the hidden apron still overlaps more than one coarse cell.
+const EXTENT := 120.0
 ## A hidden overlap apron wider than one coarse terrain cell. Coarse triangles
 ## are cut at EXTENT - 2, while this identical wall-blended skin continues far
 ## enough beneath them that no clipped corner can expose sky.
-const MESH_EXTENT := 90.0
+const MESH_EXTENT := 128.0
 const CELL := 0.5
-const BASALT := Color(0.13, 0.12, 0.12)
-const TERRACE := Color(0.20, 0.18, 0.17)
-const BANK := Color(0.09, 0.08, 0.08)
-const HEAT := Color(0.45, 0.16, 0.06)
+## One material and one albedo for the kingdom's terrain, including the coarse
+## world mesh and the fine city ground. Fresh basalt reads charcoal-black;
+## heat belongs to lava and lighting, not to a second brown ground palette.
+const ROCK_COLOR := Color(0.072, 0.074, 0.080)
+static var _shared_terrain_material: StandardMaterial3D
+
+
+static func terrain_material() -> StandardMaterial3D:
+	if _shared_terrain_material == null:
+		_shared_terrain_material = StandardMaterial3D.new()
+		_shared_terrain_material.albedo_color = ROCK_COLOR
+		_shared_terrain_material.roughness = 0.96
+		_shared_terrain_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+		# Vertex colour is deliberately disabled: both terrain meshes receive
+		# this exact material object, with no patch-specific tint underneath it.
+		_shared_terrain_material.vertex_color_use_as_albedo = false
+	return _shared_terrain_material
 
 
 ## The crater wall as the kingdom's terrain draws it (floor to rim), for the
 ## blend at the floor's edge when the proof scene has no terrain.
 static func crater_wall(local: Vector2) -> float:
 	var r := local.length()
-	if r < FireCalderaPlan.FLOOR_RADIUS:
-		return FireCalderaPlan.FLOOR_Y
-	return lerpf(FireCalderaPlan.FLOOR_Y, 48.0, smoothstep(FireCalderaPlan.FLOOR_RADIUS, FireCalderaPlan.RIM_RADIUS, r))
+	if r <= FireCalderaPlan.RIM_RADIUS:
+		return outer_bowl_height(local)
+	return BOWL_LIP_Y
 
 
 ## Builds the ground as one body in `parent`'s frame (local plan coordinates,
@@ -186,13 +196,20 @@ static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(Fire
 			var socketed := 0
 			for socket: Dictionary in sockets:
 				if Geometry2D.is_point_in_polygon(p, socket["band"]):
-					y = minf(y, float(socket["datum"]) - 0.05)
+					var elevated := bool(socket.get("elevated", false))
+					y = minf(y, float(socket["datum"]) - (2.6 if elevated else float(socket.get("landing_clearance", 0.05))))
 					if Geometry2D.is_point_in_polygon(p, socket["outline"]):
-						socketed = 1
+						socketed = 0 if elevated else 1
 						# Under a plinth with a pit dug in it, the hidden skin
 						# drops below the pit's floor.
-						y = minf(y, float(socket["datum"]) - 0.1 - float(socket.get("sink", 0.0)))
-					break
+						if not elevated:
+							y = minf(y, float(socket["datum"]) - 0.1 - float(socket.get("sink", 0.0)))
+					# A ground foundation has priority where a raised district
+					# overlaps it in plan.  The elevated clearance may lower the
+					# bowl, but may never prevent the ground socket from cutting its
+					# actual floor and doorway landings.
+					if not elevated:
+						break
 			vertices[row * columns + column] = Vector3(p.x, y, p.y)
 			inside[row * columns + column] = socketed
 	var indices := PackedInt32Array()
@@ -238,13 +255,8 @@ static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(Fire
 	var instance := MeshInstance3D.new()
 	instance.name = "GroundMesh"
 	instance.mesh = mesh
-	var material := StandardMaterial3D.new()
-	material.vertex_color_use_as_albedo = true
-	material.vertex_color_is_srgb = true
-	material.roughness = 0.95
-	# Seen from above and from inside the basin's banks alike.
-	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	instance.material_override = material
+	# Exactly the same resource used by the kingdom's coarse terrain mesh.
+	instance.material_override = terrain_material()
 	# The coarse triangles that straddle the patch boundary remain underneath
 	# so there can be no hole. Lift only the visible fine skin by one centimetre
 	# to prevent coplanar depth flicker; collision and height queries stay exact.
@@ -261,12 +273,66 @@ static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(Fire
 	return body
 
 
+## The Tempering Gate is the settlement's welcome: a broad refractory portal
+## drawn as a squarish SuperEllipse, tripled in depth like a cooling mould. A
+## suspended veil of locally cast glass catches volcanic light above the clear
+## passage. It uses the civic charcoal/nickel/teal family; amber and cobalt
+## remain specific to the inn beyond it.
+static func build_arrival_threshold(parent: Node3D) -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = "CalderaArrivalThreshold"
+	body.collision_layer = 1
+	body.collision_mask = 0
+	parent.add_child(body)
+	var radial := FireCalderaPlan.ARRIVAL_THRESHOLD.normalized()
+	var tangent := Vector2(-radial.y, radial.x)
+	var ground_y := crater_wall(FireCalderaPlan.ARRIVAL_THRESHOLD)
+	var refractory := Color(0.12, 0.15, 0.17)
+	for i in 2:
+		var side := -1.0 if i == 0 else 1.0
+		var plan := FireCalderaPlan.ARRIVAL_THRESHOLD + tangent * side * 5.6
+		var at := Vector3(plan.x, ground_y + 3.25, plan.y)
+		var marker := SuperEgg.build_part(Vector3(0.72, 3.25, 0.78), refractory, 7.5, 7.5)
+		marker.name = "ArrivalMarkerWest" if i == 0 else "ArrivalMarkerEast"
+		marker.position = at
+		marker.material_override = SolidModel.material(refractory, 0.52, 0.28)
+		body.add_child(marker)
+		CollisionPolicy.add_box(body, marker, Vector3(1.25, 6.4, 1.35), at, Basis(), false)
+		var inset := SuperEgg.build_part(Vector3(0.08, 1.55, 0.48), Color(0.28, 0.68, 0.66, 0.72), 8.0, 8.0)
+		inset.name = "TemperedGlassWayfindingInset"
+		inset.position = at + Vector3(-tangent.x * side * 0.68, 0.3, -tangent.y * side * 0.68)
+		body.add_child(inset)
+		CollisionPolicy.mark_decorative(inset)
+	# Three deep portal frames make the threshold legible from the exterior,
+	# the lip and the descending gallery. Their shared curve is continuous.
+	for depth: float in [-0.48, 0.0, 0.48]:
+		var arch := PackedVector3Array()
+		for i in 33:
+			var x := lerpf(-5.6, 5.6, float(i) / 32.0)
+			var q := clampf(absf(x) / 5.6, 0.0, 1.0)
+			var y := ground_y + 1.0 + 7.2 * pow(maxf(0.0, 1.0 - pow(q, 6.0)), 1.0 / 6.0)
+			var p := FireCalderaPlan.ARRIVAL_THRESHOLD + tangent * x + radial * depth
+			arch.append(Vector3(p.x, y, p.y))
+		FireCalderaHighline._tube(body, arch, 0.18 if depth != 0.0 else 0.26, refractory.lightened(0.06), "TemperingPortal")
+	# The overhead glass veil is high enough for the widest visitor and freight
+	# route; its asymmetrical spectrum is civic, not the inn's two-colour badge.
+	var veil_colours: Array[Color] = [Color(0.22, 0.72, 0.66, 0.62), Color(0.72, 0.24, 0.50, 0.58), Color(0.58, 0.76, 0.28, 0.58), Color(0.38, 0.62, 0.78, 0.54)]
+	for i in 4:
+		var x := -3.0 + float(i) * 2.0
+		var p := FireCalderaPlan.ARRIVAL_THRESHOLD + tangent * x
+		var fin := SuperEgg.build_part(Vector3(0.52, 1.15 + 0.18 * float(i % 2), 0.08), veil_colours[i], 7.0, 7.0)
+		fin.name = "WelcomeGlassVeil"
+		fin.position = Vector3(p.x, ground_y + 6.15 - 0.15 * float(i % 2), p.y)
+		fin.rotation.y = atan2(tangent.y, tangent.x)
+		body.add_child(fin)
+		CollisionPolicy.mark_decorative(fin)
+	return body
+
+
 static func _colour(vertex: Vector3, normal: Vector3) -> Color:
-	if vertex.y < LAVA_Y + 1.2:
-		# The bank near the lava: dark, then heat-stained at the surface.
-		return BANK.lerp(HEAT, clampf(1.0 - absf(vertex.y - LAVA_Y) / 1.2, 0.0, 1.0) * 0.7)
-	var steep := 1.0 - clampf(normal.y, 0.0, 1.0)
-	return TERRACE.lerp(BASALT, clampf(steep * 3.0, 0.0, 1.0))
+	# Kept as the vertex-array source for mesh compatibility and terrain tools;
+	# the shared material intentionally ignores vertex tint.
+	return ROCK_COLOR
 
 
 ## The reservoir's lava: one surface over the bank's outline grown a little,

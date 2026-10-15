@@ -162,6 +162,16 @@ The rules:
 - **Ground is ground.** Rock and terrain bodies go on the ground collision
   layer, never the climbable layer; the wrong layer broke swimming under the
   docks.
+- **One continuous landform uses one material source.** When a fine settlement
+  patch replaces part of a coarse kingdom terrain, both meshes must reference
+  the exact same material resource and palette function. Matching two colours
+  by eye is insufficient; validate resource identity and seam colour as well
+  as seam height.
+- **Do not grade away the feature a culture intends to preserve.** A raised
+  walk around a crater, wetland or ravine is architecture above the landform,
+  not permission to level the land beneath it. Keep the original section
+  continuous and visible between deliberately spaced supports; confine terrain
+  cuts to the footings and to named, necessary access landings.
 - **Review from the air and at eye level** before calling a landscape done.
 
 ## 5. Review checklist

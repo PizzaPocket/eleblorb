@@ -84,6 +84,14 @@ const AERIAL_CAMERA_PITCH_MAX := deg_to_rad(88.0)
 # GROUND_SNAP_MAX_SLOPE, which is what keeps steep mountainsides unclimbable.
 const GROUND_SNAP_MAX_SLOPE := 0.9  # rise/run, ~42 degrees
 const FOOT_OFFSET := 0.05
+## Physics floors are often assembled from adjacent authored solids (a room
+## slab, corridor slab and ramp landing). At their perfectly flush seams,
+## CharacterBody3D can lose `is_on_floor()` for one frame even though the
+## standing capsule still has walkable support immediately below it. That
+## false airborne frame selects the jump pose and can zero vertical support
+## while crossing between rooms. Probe with this body's real shape just below
+## its current transform so support hands off continuously across such seams.
+const PHYSICS_SUPPORT_PROBE_DEPTH := 0.16
 const CLOUD_SINK_DEPTH := WorldSupport.CLOUD_SINK_DEPTH
 
 ## ---- Dirt blorb suit: rear wheel ---- Per direct instruction: a landed
@@ -805,6 +813,7 @@ var _wake_intro_owns_modal_lock: bool = false
 var _wake_intro_camera_pitch_rest: float = 0.0
 var _wake_intro_final_transform: Transform3D
 var _wake_intro_has_final_transform := false
+var _wake_intro_final_heading := 0.0
 
 const SHIRT_COLOR := Color(0.15, 0.35, 0.72)
 const PANTS_COLOR := Color(0.1, 0.1, 0.13)
@@ -1373,9 +1382,9 @@ var _throw_aim_active: bool = false
 ## 0 = ordinary follow framing, 1 = the closer over-the-shoulder aim framing.
 ## Eased by _update_camera_follow() so both entering and leaving aim blend.
 var _throw_camera_blend: float = 0.0
-## This body's yaw as of the last camera update. The rig is top_level, so a
-## teleport that turns this body (a recovery wake at an inn bed) would no
-## longer turn the view with it; _update_camera_follow() carries the change.
+## This body's yaw as of the last camera update. The rig is top_level, so an
+## externally moved host can still require a correction. The Player root itself
+## remains world-aligned; recovery marker yaw is applied through _body_yaw.
 var _camera_follow_root_yaw: float = 0.0
 ## Switching the followed body to one close by (mounting, dismounting, a
 ## nearby companion) glides the camera across instead of cutting. Farther
@@ -2145,6 +2154,7 @@ func _physics_process(delta: float) -> void:
 	# flickers at the organically triangulated shoreline, so it must count as a
 	# real grounded support for the jump gate as well as for skating physics.
 	var on_ice_support:=_is_supported_by_ice()
+	var on_nearby_physics_floor := _has_nearby_walkable_support()
 	# One-way supports do not produce an is_on_floor() contact. If their
 	# analytic surface says a descending jumper is already resting on one,
 	# that is a completed landing and must end the jump state before grounded
@@ -2154,7 +2164,7 @@ func _physics_process(delta: float) -> void:
 		_jumping = false
 		_giant_surface_jump_in_progress = false
 	var grounded := (_giant_surface_grounded or _lake_floor_walk_active or _lava_surface_walk_active or on_climbable_ramp or (
-		is_on_floor() or _is_near_ground() or (_is_aligned_with_terrain() and _grounded_grace_timer > 0.0)
+		is_on_floor() or on_nearby_physics_floor or _is_near_ground() or (_is_aligned_with_terrain() and _grounded_grace_timer > 0.0)
 	) or on_cloud or on_canopy or on_ice_support) and not _jumping
 	if suit_flight or powered_hover:
 		grounded = false
@@ -2551,7 +2561,7 @@ func _physics_process(delta: float) -> void:
 	# is_on_floor() covers that: it's real collision contact, so it fires
 	# the instant the character actually lands on anything solid, elevated
 	# platform or not.
-	if _jumping and velocity.y <= 0.0 and (is_on_floor() or _is_near_ground() or _giant_surface_grounded or on_cloud or on_canopy):
+	if _jumping and velocity.y <= 0.0 and (is_on_floor() or _has_nearby_walkable_support() or _is_near_ground() or _giant_surface_grounded or on_cloud or on_canopy):
 		_jumping = false
 		_giant_surface_jump_in_progress = false
 
@@ -3207,13 +3217,14 @@ func begin_wake_intro() -> void:
 	_set_eye_openness(EyeBlink.CLOSED_OPENNESS)
 
 
-func begin_recovery_wake(final_transform: Transform3D = global_transform) -> void:
+func begin_recovery_wake(final_transform: Transform3D = global_transform, final_heading: float = _body_yaw) -> void:
 	if _wake_intro_active:
 		return
 	_wake_intro_active = true
 	_wake_intro_elapsed = 0.0
 	_wake_intro_camera_pitch_rest = camera_pivot.rotation.x
 	_wake_intro_final_transform = final_transform
+	_wake_intro_final_heading = final_heading
 	_wake_intro_has_final_transform = true
 	UIState.push_modal()
 	_wake_intro_owns_modal_lock = true
@@ -3353,6 +3364,7 @@ func _finish_wake_intro() -> void:
 	_set_eye_openness(1.0)
 	if _wake_intro_has_final_transform:
 		global_transform = _wake_intro_final_transform
+		set_body_heading(_wake_intro_final_heading)
 		_wake_intro_has_final_transform = false
 	_wake_intro_active = false
 	WorldState.opening_wake_completed = true
@@ -7986,6 +7998,25 @@ func _is_near_ground() -> bool:
 	return (global_position.y - FOOT_OFFSET) - h < threshold
 
 
+## A local physics-floor query for authored structures. Unlike the analytic
+## terrain test, this recognizes plinths, room floors, landings and continuous
+## Highline ribbons at their real heights. `test_move` uses the player's own
+## capsule, so a narrow seam at its centre cannot defeat the query the way a
+## single downward ray can. Only a normal within the normal walkable slope
+## limit counts; nearby walls never masquerade as ground.
+func _has_nearby_walkable_support() -> bool:
+	if is_on_floor():
+		return true
+	var result := KinematicCollision3D.new()
+	if not test_move(global_transform, Vector3.DOWN * PHYSICS_SUPPORT_PROBE_DEPTH, result):
+		return false
+	var minimum_up := cos(floor_max_angle)
+	for index in result.get_collision_count():
+		if result.get_normal(index).dot(up_direction) >= minimum_up:
+			return true
+	return false
+
+
 func _is_touching_terrain() -> bool:
 	# Only the ground itself should snap to the terrain height -- standing
 	# on a rock, tree stump, or (now that TownProps bakes in real floor/roof
@@ -8000,6 +8031,11 @@ func _is_touching_terrain() -> bool:
 	# character comes to rest, it drops to zero even though is_on_floor()
 	# stays true via floor snapping, which disabled this entirely right
 	# when it was needed. A height-threshold check has no such gap.
+	# Inside an authored building socket the physical floor is the sole ground
+	# authority.  Treating the deliberately lowered analytic terrain as a second
+	# nearby surface caused threshold stalls and repeated roof/pit hopping.
+	if terrain.has_method("is_architecture_socket") and terrain.is_architecture_socket(global_position.x, global_position.z):
+		return false
 	var h: float = terrain.get_mesh_height(global_position.x, global_position.z)
 	return (global_position.y - FOOT_OFFSET) - h < MAX_TERRAIN_FOLLOW_HEIGHT
 

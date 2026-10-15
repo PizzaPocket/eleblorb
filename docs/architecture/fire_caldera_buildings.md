@@ -22,13 +22,13 @@ unchanged. These are its invariants in buildable terms.
 | Frame | **exposed structural steel** (revised 2026-10-07): squarish SuperEgg columns, I-section and box beams, portal frames and trusses in heat-blued or blackened steel, welded joints left visible; the frame carries roofs and glass |
 | Glass | **full glass panels**: each wall bay between blued-steel posts is either one full-height glass panel (floor channel to transom, no sill, no punched window) or a continuous stone panel; above the transom runs the building's two-tone stained clerestory band, round the outside and through its partitions |
 | Shell | continuous asymmetric SuperEgg shells and extruded superellipse plans in **cast basalt composite**, matte charcoal, for plinths, heat walls round hot work, and the curved landmark volumes (Civic, Renewal canopy base); never a box with a lid |
-| Foundation | the layout's **socketed plinth** family: a tapered cast-basalt base on the same superellipse plan, embedded 1.5 m below the lowest perimeter ground, a recessed metal-and-glass control joint between base and shell, exposed base under 3 m |
+| Foundation | a **cut-and-fill cast-basalt platform** on the same superellipse plan: embedded footing and exposed downhill base, uphill ground cut back beyond the usable apron, one unobstructed finished floor with no enclosing lip; a recessed metal control joint between base and shell |
 | Storey | 3.5 m floor to floor; public halls 5 to 7 m |
 | Glazing | broad superellipse panes, clear, smoky or faintly warm, in blackened-steel frames; every occupied room has one strong outlook; glass never runs below grade |
 | Stained glass | abstract mineral and molten-flow patterns only; clear or smoky glass plus **two** stained colours per building, **three** for landmarks (see the matrix) |
 | Forged metal | blackened iron and dark steel, branching like cooled lava veins, for the structure that holds glass, canopies, rails and bridges; heat-blued and enamelled accents; bright steel only on instruments and controls; gold and silver only as thin inlays on cool surfaces |
 | Roofs | restrained low-pitch slabs, shallow walkable shells and folded or catenary canopies with integrated ash gutters to concealed downpipes; glass SuperEgg shells may be clipped and fitted over matching roof apertures as skylights; no gables, no pediments |
-| Doors | broad superellipse openings, at least 2.0 m clear, with pivoting or sliding metal-and-glass leaves; public thresholds 3 m or more; front and interior doors alike are a superellipse cut in their stone panel with a piped stainless frame of the same outline (`CalderaShell.door_opening`) |
+| Doors | broad superellipse openings, at least 2.0 m clear on public routes, with pivoting or sliding metal-and-glass leaves; public thresholds 3 m or more; front and interior doors alike are a superellipse cut in their stone panel with a piped stainless frame of the same outline (`CalderaShell.door_opening`); Oren's compact secure gem store uses a 1.6 m surface slider rather than spending its lobby on a swing arc |
 | Thermal services | concealed in walls and floors; visible only as **service manifolds**, **inspection hatches** (on service terraces, never in a walkway), **glowing seams** and **temperature controls** where someone uses them |
 | Thermal room types | **immersion well** (a shallow lava pool fed by the duct network, 2 to 3 m across, with a cool perimeter ledge for tools and adornments); **radiant platform** (a hot basalt slab to lie on); **molten-floor room** (the whole floor a thin molten layer, for deep rejuvenation) |
 | Light | **architectural, not fittings** (revised 2026-10-07): concealed LED coves on the transom bar washing up through the stained band, LED lines under counters, sideboards and shelf edges and behind bed heads and mirrors, a few real lights hidden at cove height; no visible lamps or brackets. Set against that, **open flame and lava light** in the working and thermal buildings, plus the arrival beacons, path capsules and mineral lenses below the lava |
@@ -37,7 +37,7 @@ unchanged. These are its invariants in buildable terms.
 | Headroom | every canopy, bridge roof, gallery or upper floor a route passes under clears 2.4 m; public halls are taller by program, not by accident |
 | Vertical circulation | ramps, never stairs: 32 degrees at most, 1.4 m wide (2.0 m on public routes), a 1.2 m landing at foot and head; one storey of 3.5 m needs about 5.6 m of run, so about 8 m with landings. Every upper floor names its ramp or lift in its brief |
 | Furniture and textiles | **no wood anywhere**: a lava person would burn it by touching it (`CalderaFurniture`). Cast basalt and stone, blued and stainless steel, glass. Textiles follow real heat-proof cloth: basalt fibre (bronze-gold, used for fire blankets) for guest bedding and mats, silica cloth (to about 1000 °C) for mattresses and anything a lava person touches, mineral-coated glass-fibre cloth for coloured upholstery, ceramic fibre (about 1260 °C) for the hottest work, stainless mesh for drapery; never asbestos or aramid |
-| SuperEgg language | roofs, floor slabs, landings and canopies are soft SuperEgg slabs, squarish but rounded at every edge and corner, overhanging their walls a little; `CalderaShell.soft_epsilon` picks the lowest exponent whose corners still cover the walls beneath (`soft_slab`, and the shell's roof). Hard boxes only where two solids must meet flush (partitions into walls, floors under walls) |
+| SuperEgg language | roofs, floor slabs, landings and canopies are soft SuperEgg slabs, squarish but rounded at every edge and corner, overhanging their walls a little; `CalderaShell.soft_epsilon` picks the lowest exponent whose corners still cover the walls beneath (`soft_slab`, and the shell's roof). Where two visible SuperEgg slabs join, both extend through and are clipped at one shared plane and section datum so their complete cut profiles are identical: height, width and both side-edge endpoints meet on one exact line. Equal maximum widths are insufficient because each rounded solid narrows at its own cut position. Hard boxes only for hidden fills and continuous wall or floor planes where a rounded edge would leave a gap |
 | Against lava | nothing of steel or iron touches lava; whatever stands in or contains it is refractory: dark magnesia-chrome on the quays and in the ghat, pale forsterite where a pale interior wants it (Nahl's lava bed); metal near it bears on refractory shoes |
 | Collision | shells, plinths, terraces, rails, bridges, counters and instruments solid; molten wells and floors use the hazard and liquid API; sparks and seams decorative |
 
@@ -51,7 +51,7 @@ through a repeated motif. Each household and institution invents its own use
 of these, and a stranger should be able to tell who built what from a single
 facade. When designing a building here, look for an original idea grounded
 in its program and its makers' craft, drawing on the full range of modern
-coloured glass (cast glass bricks, dichroic fins, fused and slumped panels,
+coloured glass (cast glass bricks, dichroic SuperEgg lenses, fused and slumped panels,
 graded and fritted glass, lenses, mosaics), and never copy another
 building's signature.
 
@@ -72,8 +72,9 @@ hand-cast solid glass bricks (after MVRDV's Crystal Houses), each a little
 different, clear at eye level and deepening toward amethyst at the top like
 the colour zoning in a geode, teal over the assay room; larger cast blocks set
 into it are the display cells, each holding one lit stone. The home above
-looks out through clear glass behind vertical dichroic fins whose colour turns
-teal, violet and gold with the angle, like labradorite or opal.
+looks out through clear glass behind a two-row screen of broad, shallow,
+squarish dichroic glass SuperEggs whose colour turns teal, violet and gold with
+the angle, like labradorite or opal.
 
 ### Families by program (2026-10-07)
 
@@ -82,7 +83,7 @@ Buildings differ by what they are for, and the kit has two families:
 - **Commercial and public: the glass pavilion** (the guest house, Oren).
   Sleek, inviting people to look in and out: glass on a blued-steel frame, a
   dark basalt plinth, concealed LED light; each building its own glass (the
-  guest house's stained band, Oren's cast bricks and dichroic fins).
+  guest house's stained band, Oren's cast bricks and dichroic SuperEgg screen).
 - **Care and restoration: the tuff house** (Nahl first). Soothing and light
   rather than sleek: thick walls of pale cream tuff with a few deep
   superellipse openings, floors of white hot-spring sinter, pumice caps and
@@ -342,12 +343,12 @@ shelf.
   bands:
   1. **Front band, 5 m deep, facing the arrival crescent:**
      - the counter, 7 m;
-     - the secure gem store, 3 × 4 m, between the counter and the assay room,
-       with a 1 m lobby in front of its forged door;
+     - the secure gem store, 3 × 3 m, between the counter and the assay room,
+       with a 1.7 m clear lobby in front of its surface slider;
      - the assay room, 5 m;
      - a 2 m bay at the east end, the full 12 m depth, open to the air, which
       holds the home's ramp (see below).
-  2. **A 1.4 m staff corridor** across the width. It joins the assay room,
+  2. **A 2.0 m staff passage** across the width. It joins the assay room,
      the receiving bay and the preparation studio. Customers never enter it.
   3. **Back band, 5.6 m deep, facing `R2`:**
      - the preparation studio, 7 × 5.6 m, west;
@@ -356,7 +357,11 @@ shelf.
 
   Pela's route is receiving bay → corridor → assay room → gem store. Untested
   ore never enters the studio. Savi takes only assayed material from the
-  corridor.
+  passage. The assay, receiving and studio connections are framed open
+  passages because their work route does not need three swing leaves; the
+  tested-stock store keeps the one secure hinged door, opening into the store.
+  The raised receiving bay uses a sectional overhead door parked beneath the
+  ceiling, never one broad leaf swinging across its loading apron.
 - **The way up:** an **open-air ramp** 2 m wide in the east bay, outside the
   shop's walls, climbs from the service side (`R2`) to the upper floor at
   +3.5 m: 5.6 m of run, with 1.2 m landings, inside the 12 m depth. The home therefore has its own door and
@@ -365,7 +370,9 @@ shelf.
   counter lobby, and the receiving bay leads through the corridor to the
   assay room. All are one workshop's own rooms, which is legitimate.
 - **Glass:** see "Oren's glass": cast-glass bricks deepening to amethyst (teal
-  over the assay room), cast display cells, dichroic fins on the home.
+  over the assay room), cast display cells, and the original close-spaced
+  vertical fin screen on the home. Each fin is a narrow, thin, squarish
+  dichroic-glass SuperEgg slab with alternating cant—not a grid of thick blocks.
 - **As built (2026-10-07):** split level as approved; the counter faces the
   shop door with a glass case of finished stones; the vault's strongbox; the
   assay lens, balance and heat cell; Savi's stations in working order along
@@ -471,56 +478,117 @@ shelf.
     home has a glazed door onto it.
 - **Glass:** emerald-teal and amber. Talen holds the building to two colours,
   even here.
+- **As built (2026-10-08):** the 18 × 14 m plan is three exact bands: the
+  8 m studio wing, a 5 m centre band, and the 5 m home. The centre band is an
+  open 5 × 8 m daylight court in front and Talen's enclosed 5 × 5 m metal shop
+  behind. Finished structural panes stand in a working A-frame inspection rack
+  along the court's west side, where direct daylight and reservoir glow reveal
+  colour and distortion; it is storage and quality control, not unexplained
+  decorative glazing. The clean assembly room has a cutting/light table and
+  full-size colour samples. Behind it, the hot shop has the furnace, glory hole,
+  marver and blowing bench; the annealing room has the long lehr and smaller
+  annealers. The metal shop has cutting, leading, soldering and frame-bending
+  stations. The home has its own east-path entrance, a receiving/shaping room,
+  two lava resting niches and a private immersion well, all using the canonical
+  architectural lava fixture.
+- **Site correction from the isolated build:** the assumed rear loading doors
+  faced directly into the plot's two-metre uphill cut. Deliveries now enter one
+  overhead door on the Kel-facing side, serving both connected hot-work rooms;
+  the rear remains the retaining wall. Studio, home and court connections use
+  separate wide sliding openings, and the player capsule passes every approach.
 - **Variation:** the only daylight court; the finest glass in the city.
 
 ## 5. Civic, science and thermal works
 
 ### Civic complex (`CIVIC`, `(0, 43)`; landmark; Aru, Selka and the council)
 
-The council, school, archive and upper observatory in one building, its
-landmark front facing the reservoir and the arrival view.
+The council, school, archive and observatory share one open civic court. Its
+landmark front faces the reservoir and the arrival view. The design begins with
+public use and procession rather than a row of enclosed rooms: Highline,
+threshold, terrarium, council forum and reservoir outlook lie on one legible
+axis.
 
-- **Mass:** a 24 × 15 m two-storey shell on a reservoir-edge foundation, with a
-  superellipse **observatory dome** on its upper roof, the highest civic
-  silhouette.
-- **Ground floor (dry public entrance from `R5`):**
+#### 2026-10-09 redesign brief: the Terrarium Court
+
+**People and purpose.** Residents gather here for council, teaching, public
+records and volcanic observation. Visitors may enter the forum without crossing
+a classroom or secure archive. Pupils can gather around the living collection;
+Selka can move between instruments and council; Aru can supervise the school and
+archive from the same public court. The archive alone must close. The rest is an
+open civic interior with shaded outdoor-room edges.
+
+**Precedents translated, not copied.** Austin Central Library contributes the
+daylit central atrium, bridges and stairs as social circulation, reading
+porches, and a public building that opens toward landscape rather than sealing
+itself off. Calgary Central Library contributes the civic portal and sky-facing
+atrium as the building's wayfinding heart. The British Museum Great Court
+contributes a lightweight glazed roof that turns a court into a luminous public
+room while leaving a singular object at its centre. The Fire Kingdom translates
+these into SuperEgg geometry, forged branching ribs and mineral glass; it does
+not reproduce any facade or motif.
+
+- Austin sources: [City sustainability study](https://www.austintexas.gov/sites/default/files/files/Sustainability/Austin_s_Central_Library_White_Paper_-_FORMATTED.pdf), [Austin Public Library program](https://library.austintexas.gov/library/document/about_library_book.pdf).
+- Daylight-roof sources: [Calgary Central Library / Snøhetta](https://www.snohetta.com/projects/calgary-central-library), [British Museum Great Court](https://www.britishmuseum.org/about-us/british-museum-story/architecture/great-court).
+
+**Coordinated plan and section.** The footprint remains 24 × 15 m on the
+approved 30 × 21 m Highline platform. A five-metre-wide central superellipse
+portal occupies the middle bay of a symmetrical reservoir facade. It opens
+directly into a 6 m-deep arrival loggia and frames the terrarium; there is no
+door leaf across this public threshold. The sealed terrarium is an 8.8 × 7.0 m
+glass lantern at the centre of the plan, leaving at least 1.6 m clear around its
+sides and a much broader forecourt and rear outlook. The west perimeter is the
+open council forum. The east-front perimeter is the school gallery. The east-
+rear perimeter is the secure archive, separated by a full-height glazed screen
+and a surface slider. A broad rear overlook keeps the reservoir visible around
+the terrarium. The upper observation walk is a rear mezzanine, reached by one
+clear two-flight ramp on the west; it never caps the central court.
+
+**Terrarium.** The living archive is the building's largest object, not a case
+against a wall: 8.8 × 7.0 m in plan and about 8.2 m to the crown. A tall clipped
+SuperEgg glass shell rises well above the five-metre specimen tree. Its clear
+lower field makes earth, rock and plants readable at eye level; a restrained
+amber, garnet, cobalt, violet, emerald and teal belt marks the canopy spring.
+Seating, council positions and both gallery routes face it.
+
+**Roof plan and section.** A shallow double-curved glass-and-steel saddle canopy
+spans the whole court at 8.8 to 10.2 m, rising toward the long sides and the
+central front/rear axes. It is not a dome and is not a second terrarium. Clear
+and lightly smoky panes provide the principal daylight; a sparse set of colored
+glass baffles hangs below selected ribs and throws color through the court.
+Continuous perimeter channels drain to the four outer corners, away from the
+central portal. Branching SuperEgg columns at the facade shoulders and rear
+corners visibly carry the canopy.
+
+**Facade and hierarchy.** The front is bilaterally composed: a tall central
+portal, two glass wings, and paired branching piers. The portal is the focal
+point and the terrarium crown is visible through it. Colored glass is an accent,
+not the wall material. The base is the existing cool refractory/composite
+platform; the middle is mostly clear glass and open air; the top is the floating
+gridshell.
+
+**Material/style audit.** Primary Fire volcanic modernism supplies the flowing
+SuperEgg plan, cast-basalt service cores, blackened/heat-blued structure, broad
+mineral glass and concealed lava services. The restrained Gaudi-informed craft
+layer appears only in branching canopy ribs and suspended colored baffles. The
+landmark exception is the building-scale terrarium. There is no classical
+portico, domestic gable, copied Austin facade, or repeated inn dome.
+
+**Program:**
 
 | Room | Size | Description |
 |---|---|---|
-| Council chamber | 10 × 12 m, double height | five warm basalt seats in an open ring facing the reservoir through the landmark glass front; standing room for the whole city behind |
-| School room | 7 × 6 m | low benches, slates of cast basalt, a shaping table, a window toward the Vara court |
-| Archive reading room | 7 × 6 m | cast basalt records and metal pattern plates on shelves; the lift down to the fired archive `L3` |
-
-- **Entrance and ramp hall** (7 × 15 m, east end): the public door from `R5`,
-  the way into the council chamber, school room and archive, and the
-  **ramp** to the upper floor. The ramp is 2.0 m wide in two flights round a
-  landing, 5.6 m of run for the 3.5 m storey.
-- **Ground plan (audited 2026-10-07):**
-  - the council chamber, 10 m wide, double height, at the west end;
-  - the school room and archive stacked in the middle 7 m (6 + 6 m deep, with
-    a 3 m lobby between them off the entrance hall);
-  - the entrance and ramp hall, 7 m, at the east end.
-  - Totals: 10 + 7 + 7 = 24 m.
-  - The upper floor (instrument room, dome gallery) covers the middle and
-    east bays, so the chamber stays double height.
+| Central terrarium court | 12 × 15 m, double height | principal public room, circulation and living archive; the terrarium occupies the centre rather than the route |
+| Council forum | west perimeter, about 6 × 8 m | five warm basalt seats and standing room facing the terrarium and reservoir |
+| School gallery | east-front perimeter, about 6 × 6 m | low benches and shaping tables, visually joined to the court through glass |
+| Archive | east-rear perimeter, about 6 × 5 m | the only closed ground room; dry records, metal pattern plates and future lift to `L3` |
+| Observation walk | rear mezzanine, 3 m deep | instruments, reservoir outlook and visual circuit around the terrarium crown |
 - **Lower observation landing:** against the reservoir wall below the council
   chamber; the second immersion shelf leaves from here, descending to the deep
   observatory `L2`. It is reached by an **outside ramp** from the `R5`
   landing, down about 4 m along the reservoir-edge foundation, not through the
   chamber.
-- **Upper floor:** Selka's instrument room under the dome, with gauges from the
-  rim, the reservoir wall and the deep vent, and a gallery round the dome.
-- **Glass:** cobalt, amber and teal: a landmark's three, the largest stained
-  fields in the city across the council chamber's front.
-- **Terrarium (approved 2026-10-07):** a large glass shell, a SuperEgg dome
-  clipped flat at its base, holding a living tree with earth, rock and the
-  small plants found across the world, gathered from beyond the caldera and
-  kept in a sealed, climate-controlled atmosphere. Lava people cannot touch
-  wood or leaf without burning it, so this is how they enjoy them: a living
-  archive of the cool world for the school and the city. The shell was made
-  by the Vara studio. An ordinary tree, never the Tree of Life.
-- **Variation:** the only dome; the widest glass span; the only double-height
-  public room.
+- **Variation:** the only building-scale terrarium, the broadest open civic
+  portal, and the only full-building saddle gridshell.
 
 ### Iren residence (`IREN`, `(-26, 50)`; Selka, Aru, Mena)
 
@@ -534,10 +602,23 @@ landmark front facing the reservoir and the arrival view.
     studio;
   - a glazed outlook over the reservoir.
 - **Glass:** cobalt and amber, the civic pair, in small fields.
+- **As built (2026-10-08):** the 12 × 9 m shell has a reservoir-facing
+  receiving/shaping room and a closable rear molten room with three individual
+  lava resting niches and a central family immersion well. Mena's backlit
+  colour-fragment case sits in the receiving room beside, not inside, the
+  circulation. A second surface slider opens to a 2.3 m wide sealed glass
+  bridge. The bridge runs diagonally to the matching slider in Civic's ramp
+  hall and slopes continuously across the 1.02 m difference between the two
+  surveyed floor datums; it therefore lands flush at both buildings instead of
+  floating or ending against Civic's wall. All three doors and the bridge pass
+  the player-capsule proof.
 
 ### Aro thermal works and household (`ARO`, `(-39, 22)`; Tovan, Miru, Kes)
 
-- **Mass:** a 17 × 13 m shell on a bedrock spine into the lower caldera wall.
+- **Mass:** a 17 × 13 m shell on a surveyed stepped, embedded podium. The
+  expected bedrock-spine condition did not survive the real site section: the
+  measured grade is moderate, not steep. The geological-spine idea instead
+  appears where it is true, as the protected dry cut for the service descent.
   The thermal works is to the reservoir side, the home to the outer side. The
   public entrance is on the terrace loop, and a service descent leads to the
   primary manifold `L1`.
@@ -553,7 +634,19 @@ landmark front facing the reservoir and the arrival view.
   toward the entrance beacons. A short service passage reaches the control
   gallery, and the public door faces the annular route.
 - **Glass:** cobalt and teal, the cool colours of instruments.
-- **Variation:** the only bedrock-spine foundation; the valve wall.
+- **Variation:** the excavated service descent; the valve wall.
+
+- **As built (2026-10-08):** the 9 m works band and 8 m home band share one
+  low, flat SuperEgg roof but have separate outside sliders. Five cobalt/teal
+  valve stations and gauges anchor Tovan's 9 × 7 m control gallery; the rear
+  workshop has Miru and Kes's pipe bender, welding and pressure-test benches,
+  spare valve bodies, and two exterior inspection hatches. A private slider is
+  the only works-to-home connection. The home has a receiving/shaping room,
+  sample shelf, three canonical lava beds and one shared immersion well. A
+  real 2.4 m-deep pit in the authored podium carries a railed SuperEgg ramp to
+  a sealed future-`L1` bulkhead. The ramp uses its true sloping length so its
+  ends meet both landings; all five doors/passages, the ramp grade, clear zones
+  and lava fixtures pass the isolated physics proof.
 
 ### Audit notes for Iren and Aro (2026-10-07)
 
@@ -567,15 +660,13 @@ landmark front facing the reservoir and the arrival view.
   - **Separate doors:** the works' public door and the home's door are
     separate, and the service passage between them is the family's own.
 
-### Foundations: audit step 5 waits on the survey
+### Foundations: audit step 5 completed by the survey
 
-No building here has yet been placed against its real ground. The localized
-caldera terrain does not exist, and the layout's plot survey (`FireCalderaPlan`
-fields: corner and door heights, floor datum, foundation type) has not been
-run. Every foundation type above is the expected one. Each brief must be
-re-checked against the surveyed section before its proof build. The
-reservoir-edge buildings (Renewal, Civic) and the bedrock spine (Aro) need it
-most.
+The localized caldera terrain and plot survey (`FireCalderaPlan` fields:
+corner and door heights, floor datum, foundation type) are live. The survey is
+authoritative over the expected labels in the brief: notably, Aro measured as
+a moderate-grade stepped podium rather than a steep-site bedrock spine. Each
+built shell is checked against that measured section in the isolated proof.
 
 ## 6. The lower city (after the Lava Helm)
 
@@ -607,7 +698,7 @@ room has two ways out (`fire_caldera_layout.md` section 7).
 | Vara | socket plinth | 1 | shell round a court | teal, amber | daylight court |
 | Civic | reservoir edge | 2 + dome | shell and dome | cobalt, amber, teal | the dome |
 | Iren | stepped podium | 1 | shell | cobalt, amber | glazed link |
-| Aro | bedrock spine | 1 + descent | shell | cobalt, teal | valve wall |
+| Aro | stepped podium + excavated descent | 1 + descent | shell | cobalt, teal | valve wall |
 | Cove bridge | bank sockets | — | — | amber | catenary ribs |
 
 The plot survey confirms or changes each foundation type before any shell is
@@ -645,6 +736,5 @@ metal and glass craft on named elements.
 - the lower rooms as lava-filled shells.
 
 **Open:**
-- the plot survey's foundation confirmations;
 - the final shop stock;
 - the submerged story encounters.

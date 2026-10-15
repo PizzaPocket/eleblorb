@@ -28,10 +28,44 @@ extends RefCounted
 ## World plan positions (x, z) from the current terrain.
 const GATE_WORLD := Vector2(0.0, -3.0)
 const CENTRE_WORLD := Vector2(155.0, 85.0)
-const FLOOR_RADIUS := 72.0
+## Radius of the low shoulder where the inhabited annular parabola hands off
+## to the second, central lava-basin parabola.
+const FLOOR_RADIUS := 52.0
 const SAFE_RADIUS := 58.0
 const RIM_RADIUS := 112.0
-const FLOOR_Y := -16.0
+## Vertex height of the inhabited annular parabola at FLOOR_RADIUS. The
+## central lava basin is its own deeper parabola, so the city has no flat
+## intermediate floor.
+const FLOOR_Y := 30.0
+
+## The Highline is civic architecture, not a terrace cut into the volcano.
+## Its narrow level deck follows the bowl perimeter on independent supports;
+## flat-datum buildings receive widened docking platforms at this same level.
+## The natural caldera profile continues, visible and collidable, below it.
+const HIGHLINE_RADIUS := 72.0
+const HIGHLINE_WIDTH := 4.8
+## The inhabited datum is high enough to clear both the natural inner wall and
+## the ground district below.  It is deliberately a civic datum, not a sampled
+## terrain height: buildings dock to the outside of the ring while the rock
+## bowl remains visible beneath the glass floor.
+const HIGHLINE_DATUM := 42.5
+## The inn is a gate building, reached directly from the lip approach. It
+## remains raised on the same service-pier system without inheriting the lower
+## Highline datum or requiring visitors to traverse the ring first.
+const GUEST_GATE_DATUM := 49.5
+## Kept equal to SocketPlinth.REVEAL so raised-route endpoints land on the
+## finished outer platform edge instead of crossing the private porch.
+const RAISED_PLATFORM_REVEAL := 1.2
+## Top-of-deck clearance where the arrival ramp leaves the natural rim. This
+## keeps the full 0.22 m glass slab above the rock instead of merely lifting
+## its walking surface clear.
+const ARRIVAL_DECK_CLEARANCE := 0.50
+## First permanent wayfinding elements at the town threshold. They reserve a
+## clear 6 m arrival lane without prejudging the eventual gate architecture.
+## The south gate's curved arrival byway joins the Highline on the east.  The
+## marker pair stands at that civic landing, not on the untouched crater dirt.
+const ARRIVAL_THRESHOLD := Vector2(0.0, -112.0)
+const ARRIVAL_MARKER_OFFSET := 5.0
 
 
 ## Unit vector of local +Y in the world plan: from the gate to the centre.
@@ -55,15 +89,24 @@ static func to_local(world: Vector2) -> Vector2:
 
 
 # ---------------------------------------------------------------------------
-# Reservoir: an irregular bank about a 30 m mean radius, broad lobes toward
+# Reservoir: an irregular bank about a 40 m mean radius, broad lobes toward
 # Aro, Renewal, Kel and Civic, shallower coves pulled back from the arrival
 # sightline and the dry visitor counters (layout section 7).
 # ---------------------------------------------------------------------------
 
-const RESERVOIR_MEAN := 30.0
+const RESERVOIR_MEAN := 52.0
 ## [toward (local), push in metres]
 const RESERVOIR_LOBES := [
-	[Vector2(-39.0, 22.0), 2.0], [Vector2(-43.0, -4.0), 2.0], [Vector2(44.0, -4.0), 2.0], [Vector2(0.0, 43.0), 2.0],
+	# Ground-integrated Aro and Kel occupy deliberate dry coves. The reservoir
+	# remains broad at its 52 m mean and expands at Renewal/Civic, but does not
+	# squeeze these buildings into the raised ring.
+	[Vector2(-39.0, 22.0), -0.5],
+	# The Renewal inlet is a broad, legible mouth for swimming into the lower
+	# city. Its larger push and focused mouth are one operation with the ghat's
+	# outward shift; neither dimension is maintained in the building script.
+	[Vector2(-50.0, -5.0), 2.5, 0.42],
+	[Vector2(-50.0, -5.0), 2.5, 0.18],
+	[Vector2(44.0, -4.0), -0.5], [Vector2(0.0, 43.0), 2.0],
 	[Vector2(0.0, -46.0), -4.0], [Vector2(30.0, -34.0), -3.0], [Vector2(-27.0, -51.0), -3.0],
 ]
 const LOBE_WIDTH := 0.42
@@ -75,7 +118,8 @@ static func reservoir_radius(angle: float) -> float:
 	for lobe: Array in RESERVOIR_LOBES:
 		var toward: Vector2 = lobe[0]
 		var difference := wrapf(angle - toward.angle(), -PI, PI)
-		radius += float(lobe[1]) * exp(-pow(difference / LOBE_WIDTH, 2.0))
+		var width := float(lobe[2]) if lobe.size() > 2 else LOBE_WIDTH
+		radius += float(lobe[1]) * exp(-pow(difference / width, 2.0))
 	return radius
 
 
@@ -92,25 +136,27 @@ static func reservoir_polygon(samples: int = 96) -> PackedVector2Array:
 # ---------------------------------------------------------------------------
 
 const PLOTS: Array[Dictionary] = [
-	{"id": "ARRIVAL", "centre": Vector2(0.0, -46.0), "footprint": Vector2(16.0, 14.0), "reserved": Vector2(24.0, 20.0), "facing": Vector2(0.0, 1.0),
+	{"id": "ARRIVAL", "centre": Vector2(0.0, -106.0), "footprint": Vector2(16.0, 10.0), "reserved": Vector2(22.0, 12.0), "facing": Vector2(0.0, 1.0),
 		"household": "", "program": "forecourt and paired pylons; the arrival axis stays 6 m clear", "occupied": false,
 		# Open public ground: the arrival routes cross it.
 		"open": true},
-	{"id": "NAHL", "centre": Vector2(-36.5, -30.0), "footprint": Vector2(16.0, 12.0), "reserved": Vector2(22.0, 18.0),
+	{"id": "NAHL", "centre": Vector2(-63.75, -52.27), "footprint": Vector2(16.0, 12.0), "reserved": Vector2(22.0, 18.0), "foundation": Vector2(22.0, 18.0), "site": "highline",
 		"household": "Nahl", "program": "tempering hall and Eris's suite; public face to the promenade, guest entrance toward arrival", "occupied": true,
+		"foundation_finish": Color(0.16, 0.20, 0.22),
 		# The mediation room's conversation pit, dug into the plinth on its
 		# uphill side, where the socket is deepest (in the building's frame).
 		"pits": [{"at": Vector2(5.1, -3.5), "half": Vector2(1.95, 1.55), "depth": 0.5, "exponent": 4.0}],
 		# A house of care: its plinth's top course is pale hot-spring sinter.
 		"floor_finish": Color(0.90, 0.88, 0.83)},
-	{"id": "GUEST", "centre": Vector2(-27.0, -51.0), "footprint": Vector2(15.5, 12.0), "reserved": Vector2(17.0, 14.0),
+	{"id": "GUEST", "centre": Vector2(22.0, -98.5), "footprint": Vector2(15.5, 12.0), "reserved": Vector2(19.0, 16.0), "site": "gate_platform", "elevated": true, "datum": GUEST_GATE_DATUM, "facing": Vector2(-1.0, 0.0),
 		"household": "Nahl", "program": "insulated guest house and party rest point, seen from arrival, apart from the treatment rooms", "occupied": true,
+		"foundation_finish": Color(0.16, 0.20, 0.22), "floor_finish": Color(0.24, 0.30, 0.31),
 		# The enlarged shell nearly fills its reserved envelope; the foundation
 		# supports it and the shallow public threshold terrace as one floor.
-		"foundation": Vector2(17.0, 14.0),
-		# Reached by R3 from the forecourt, not from the promenade.
+		"foundation": Vector2(19.0, 16.0),
+		# The inn is the first private threshold at the lip-to-Highline arrival.
 		"on_promenade": false},
-	{"id": "OREN", "centre": Vector2(30.0, -34.0), "footprint": Vector2(17.0, 12.0), "reserved": Vector2(22.0, 17.0),
+	{"id": "OREN", "centre": Vector2(41.8, -47.4), "footprint": Vector2(17.0, 12.0), "reserved": Vector2(22.0, 17.0), "site": "ground",
 		"household": "Oren", "program": "mineral counter to the arrival crescent; assay, secure store, preparation and receiving to the service loop", "occupied": true,
 		# Split level (approved 2026-10-07): the shop at the promenade's level,
 		# the workshop half 1.35 m up, flush with the service loop, joined by a
@@ -119,16 +165,17 @@ const PLOTS: Array[Dictionary] = [
 		# {"rect", "y"} or ramps {"rect", "from", "to", "axis"} rising from the
 		# rect's low end (x or z) to its high end.
 		"levels": [
-			{"rect": Rect2(-8.5, -6.0, 15.0, 5.6), "y": 1.35},
-			{"rect": Rect2(-8.5, -0.4, 9.7, 1.4), "y": 1.35},
-			{"rect": Rect2(1.2, -0.4, 4.0, 1.4), "from": 1.35, "to": 0.0, "axis": "x"},
+			{"rect": Rect2(-8.5, -6.0, 15.0, 5.3), "y": 1.35},
+			{"rect": Rect2(-8.5, -0.7, 9.7, 2.0), "y": 1.35},
+			{"rect": Rect2(1.2, -0.7, 4.0, 2.0), "from": 1.35, "to": 0.0, "axis": "x"},
 			{"rect": Rect2(-7.0, -6.8, 2.0, 0.8), "y": 1.35},
 			{"rect": Rect2(6.5, -6.8, 2.0, 2.2), "y": 1.35},
 			{"rect": Rect2(6.5, -4.6, 2.0, 4.24), "from": 1.35, "to": 4.0, "axis": "z"},
 			{"rect": Rect2(6.5, -0.36, 2.0, 3.2), "y": 4.0},
 		]},
-	{"id": "KEL", "centre": Vector2(48.2, -4.4), "footprint": Vector2(19.0, 15.0), "reserved": Vector2(24.0, 20.0),
+	{"id": "KEL", "centre": Vector2(57.6, -21.0), "footprint": Vector2(19.0, 15.0), "reserved": Vector2(24.0, 17.0), "site": "ground",
 		"household": "Kel", "program": "armory gallery and receiving bay; residence on the quiet outer edge; protected descent to the deep forge", "occupied": true,
+		"foundation": Vector2(21.0, 17.0),
 		# Approved 2026-10-08: the receiving bay is a loading dock at the service
 		# loop's level, with a ramp down to its lower strip; the alloy store at
 		# the dock's level; the residence on the back row's roof reached by a
@@ -140,35 +187,35 @@ const PLOTS: Array[Dictionary] = [
 			{"rect": Rect2(10.1, -10.4, 1.4, 5.5), "from": 1.9, "to": 5.2, "axis": "z"},
 			{"rect": Rect2(9.6, -4.9, 1.9, 1.8), "y": 5.2},
 		]},
-	{"id": "VARA", "centre": Vector2(32.9, 32.8), "footprint": Vector2(18.0, 14.0), "reserved": Vector2(23.0, 19.0),
+	{"id": "VARA", "centre": Vector2(59.0, 58.9), "footprint": Vector2(18.0, 14.0), "reserved": Vector2(23.0, 19.0), "foundation": Vector2(23.0, 19.0), "site": "highline",
+		"foundation_finish": Color(0.16, 0.20, 0.22), "floor_finish": Color(0.24, 0.30, 0.31),
 		"household": "Vara", "program": "glass and metal studio round a daylight court; clean assembly to the promenade, hot forming toward Kel", "occupied": true},
-	{"id": "CIVIC", "centre": Vector2(0.0, 49.0), "footprint": Vector2(24.0, 15.0), "reserved": Vector2(30.0, 21.0),
+	{"id": "CIVIC", "centre": Vector2(0.0, 83.9), "footprint": Vector2(24.0, 15.0), "reserved": Vector2(30.0, 21.0), "foundation": Vector2(30.0, 21.0), "site": "highline",
+		"foundation_finish": Color(0.16, 0.20, 0.22), "floor_finish": Color(0.24, 0.30, 0.31),
 		"household": "", "program": "council, school, archive and upper observatory; landmark front to the reservoir and the arrival view", "occupied": true},
-	{"id": "IREN", "centre": Vector2(-26.0, 50.0), "footprint": Vector2(12.0, 9.0), "reserved": Vector2(16.0, 13.0),
+	{"id": "IREN", "centre": Vector2(-37.3, 71.8), "footprint": Vector2(12.0, 9.0), "reserved": Vector2(16.0, 13.0), "foundation": Vector2(16.0, 13.0), "site": "highline",
+		"foundation_finish": Color(0.16, 0.20, 0.22), "floor_finish": Color(0.24, 0.30, 0.31),
 		"household": "Iren", "program": "household residence joined to the civic complex, acoustically apart", "occupied": true,
 		# Reached by R5, behind the civic complex.
 		"on_promenade": false},
-	{"id": "ARO", "centre": Vector2(-39.4, 27.0), "footprint": Vector2(17.0, 13.0), "reserved": Vector2(22.0, 18.0),
-		"household": "Aro", "program": "thermal works and household; public door on the terrace loop, service descent to the manifold", "occupied": true},
-	{"id": "RENEWAL", "centre": Vector2(-33.35, -3.13), "footprint": Vector2(18.0, 14.0), "reserved": Vector2(23.0, 19.0),
+	{"id": "ARO", "centre": Vector2(-51.0, 35.7), "footprint": Vector2(17.0, 13.0), "reserved": Vector2(22.0, 16.0), "site": "ground",
+		"household": "Aro", "program": "thermal works and household; public door on the terrace loop, service descent to the manifold", "occupied": true,
+		"foundation": Vector2(19.0, 15.0),
+		# A protected dry descent is cut through the podium inside the rear works.
+		# Its ramp stops at a sealed L1 bulkhead until the lower city is authored.
+		"pits": [{"at": Vector2(-6.1, -3.6), "half": Vector2(1.25, 2.0), "depth": 2.4, "exponent": 5.5}],
+		"sink": 2.4},
+	{"id": "RENEWAL", "centre": Vector2(-58.7, -5.5), "footprint": Vector2(18.0, 14.0), "reserved": Vector2(23.0, 19.0), "site": "ground",
 		"household": "", "program": "tempering and gathering terrace above the submerged communal chamber", "occupied": false,
-		# Revised 2026-10-08: a ghat. The terrace stands on the bank, its floor
-		# level with the promenade that crosses its back (in its own frame, +Z
-		# to the lava); in front, a broad flight of steps runs down into the
-		# lava between two arms. Its own foundation (no plinth lip), the ground
-		# cut away beneath it, each step a level for the height query.
+		# Revised 2026-10-09: a public glass renewal deck with two Highline
+		# approaches and one broad immersion tongue.  It borrows the shared
+		# civic structural language instead of standing on a bulky rock ghat.
+		# The terrain socket follows the actual 22.6 x 18.6 m civic deck, not
+		# the smaller canopy footprint. This keeps both side-approach slabs clear
+		# of rock all the way to their flush junctions.
+		"foundation": Vector2(22.6, 18.6),
 		"crossed": true, "quay": true, "datum_at": Vector2(0.0, -2.8),
-		"foundation_kind": "ghat", "sink": 6.0,
-		"levels": [
-			{"rect": Rect2(-7.0, 0.3, 14.0, 0.9), "y": -0.45},
-			{"rect": Rect2(-7.0, 1.2, 14.0, 0.9), "y": -0.9},
-			{"rect": Rect2(-7.0, 2.1, 14.0, 0.9), "y": -1.35},
-			{"rect": Rect2(-7.0, 3.0, 14.0, 0.9), "y": -1.8},
-			{"rect": Rect2(-7.0, 3.9, 14.0, 0.9), "y": -2.25},
-			{"rect": Rect2(-7.0, 4.8, 14.0, 0.9), "y": -2.7},
-			{"rect": Rect2(-7.0, 5.7, 14.0, 0.9), "y": -3.15},
-			{"rect": Rect2(-7.0, 6.6, 14.0, 3.0), "y": -6.0},
-		]},
+		"foundation_kind": "renewal_glass", "sink": 5.0},
 ]
 
 
@@ -177,6 +224,10 @@ static func plot(id: String) -> Dictionary:
 		if str(entry["id"]) == id:
 			return entry
 	return {}
+
+
+static func is_elevated(entry: Dictionary) -> bool:
+	return bool(entry.get("elevated", false)) or str(entry.get("site", "ground")) == "highline"
 
 
 ## The direction a plot's front faces: its own "facing", else toward the
@@ -374,47 +425,192 @@ static func service_loop() -> PackedVector2Array:
 	return points
 
 
+## The raised system is a route graph, not only a ring.  These plan curves are
+## shared by the validator and the structure builder; changing a landing moves
+## both the architecture and its circulation contract.
+static func highline_ring(samples: int = 96) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for i in samples + 1:
+		var angle := TAU * float(i) / float(samples)
+		points.append(Vector2(cos(angle), sin(angle)) * HIGHLINE_RADIUS)
+	return points
+
+
+## Shared vertical profiles for structural routes. Ramps leave communal nodes
+## level and meet private porches flush, instead of crossing either landing on
+## a different grade.
+static func route_height_t(id: String, t: float) -> float:
+	match id:
+		"H0":
+			return clampf((t - 0.08) / 0.92, 0.0, 1.0)
+		"HG":
+			return clampf(t / 0.82, 0.0, 1.0)
+		"H4":
+			return clampf((t - 0.18) / 0.82, 0.0, 1.0)
+		"H5":
+			return clampf((t - 0.12) / 0.88, 0.0, 1.0)
+		_:
+			return t
+
+
+static func arrival_byway(samples: int = 30) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for i in samples + 1:
+		var t := float(i) / float(samples)
+		# Uniform radial spacing keeps the single collision ribbon from folding
+		# over itself at either landing. The route's height profile provides the
+		# short level gate throat; plan geometry remains a simple ribbon.
+		var radius := lerpf(RIM_RADIUS, HIGHLINE_RADIUS, t)
+		# A restrained bow preserves the axial gate-to-city reading. The former
+		# 72-degree sweep made the arrival route serve a misplaced inn.
+		points.append(Vector2(-3.0 * sin(PI * t), -radius))
+	return points
+
+
+static func guest_gate_link(samples: int = 10) -> PackedVector2Array:
+	var entry := plot("GUEST")
+	# The public ribbon stops at the outer edge of the inn's private platform;
+	# the platform owns the remaining porch to the door. Continuing to the wall
+	# put two walkable colliders under the final fifth of the approach.
+	var platform_edge := front_point(entry, "foundation") + facing(entry) * RAISED_PLATFORM_REVEAL
+	var start := Vector2(-2.28, platform_edge.y)
+	var points := PackedVector2Array()
+	for i in samples + 1:
+		var t := float(i) / float(samples)
+		# A slight outward bow gives the T-junction a legible flare without
+		# turning the five-second inn approach into another scenic ramp.
+		points.append(start.lerp(platform_edge, t) + Vector2(0.0, -1.2 * sin(PI * t)))
+	return points
+
+
+static func renewal_byway(side: float, samples: int = 24) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	var entry := plot("RENEWAL")
+	# Land on the two flanks of the public deck. Approaching local -Z was a
+	# nominal pair of routes that both functioned as one rear entrance.
+	var door := shell_to_plan(entry, Vector2(side * 10.9, 0.0))
+	var finish := shell_to_plan(entry, Vector2(side * 14.0, 0.0))
+	var deck_edge := shell_to_plan(entry, Vector2(side * 11.3, 0.0))
+	var target_angle := finish.angle()
+	var start_angle := target_angle + side * 0.82
+	# Opposing 47-degree arcs peel from the ring and descend around the public
+	# pavilion like two arms. Their radius eases inward while their plan remains
+	# outside the canopy; there is no hairpin or self-overlap.
+	for i in samples + 1:
+		var t := float(i) / float(samples)
+		var angle := lerp_angle(start_angle, target_angle, t)
+		# Stay beside the ring while passing the Aro district, then peel inward
+		# only for the pavilion approach. This preserves both building envelope
+		# and the legibility of the two-level circulation system.
+		var radius := lerpf(HIGHLINE_RADIUS, 64.0, smoothstep(0.68, 1.0, t))
+		points.append(Vector2(cos(angle), sin(angle)) * radius)
+	points.append(finish)
+	points.append(deck_edge)
+	points.append(door)
+	return points
+
+
+static func oren_terrace_link(samples: int = 10) -> PackedVector2Array:
+	var entry := plot("OREN")
+	# Oren's roof terrace and the Highline already share world Y ~= 42. The
+	# link ends at the lift's existing top landing and parapet opening.
+	var landing := shell_to_plan(entry, Vector2(7.62, 3.7))
+	var points := PackedVector2Array()
+	var target_angle := landing.angle()
+	var start_angle := target_angle + 0.32
+	var start := Vector2(cos(start_angle), sin(start_angle)) * HIGHLINE_RADIUS
+	var tangent := Vector2(sin(start_angle), -cos(start_angle))
+	var outside := landing + (landing - (entry["centre"] as Vector2)).normalized() * 5.0
+	# One cubic curve replaces the old arc-plus-approach splice. Its tangent
+	# leaves the ring naturally, then resolves into the radial terrace landing
+	# without a kink, doubled-back guard panel or overlapping collision face.
+	var control_a := start + tangent * 10.0 + start.normalized() * 12.0
+	var control_b := outside
+	for i in samples * 3 + 1:
+		var t := float(i) / float(samples * 3)
+		var u := 1.0 - t
+		points.append(start * u * u * u + control_a * 3.0 * u * u * t + control_b * 3.0 * u * t * t + landing * t * t * t)
+	return points
+
+
+static func kel_upper_link(samples: int = 18) -> PackedVector2Array:
+	var entry := plot("KEL")
+	# Meet the existing east-side home landing above the sawtooth works. The
+	# curve stays outside the foundry envelope and presents the landing as a
+	# proper upper frontage rather than dropping a ramp onto the roof teeth.
+	var landing := shell_to_plan(entry, Vector2(10.55, -4.0))
+	var points := PackedVector2Array()
+	var target_angle := landing.angle()
+	var start_angle := target_angle - 0.38
+	var outside := landing + (landing - (entry["centre"] as Vector2)).normalized() * 4.0
+	for i in samples:
+		var t := float(i) / float(samples)
+		var angle := lerp_angle(start_angle, target_angle, t)
+		# The long graded arc runs just outside the ring rather than occupying
+		# the ring slab or grazing the foundry envelope. Near its far end it has
+		# already descended enough to pass cleanly beneath the ring on the short
+		# radial approach to the existing upper-home landing.
+		var radius := lerpf(HIGHLINE_RADIUS, HIGHLINE_RADIUS + HIGHLINE_WIDTH * 0.5 + 2.0, smoothstep(0.0, 0.16, t))
+		points.append(Vector2(cos(angle), sin(angle)) * radius)
+	points.append(outside)
+	points.append(landing)
+	return points
+
+
+static func ground_promenade(samples: int = 96) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for i in samples + 1:
+		var angle := TAU * float(i) / float(samples)
+		points.append(Vector2(cos(angle), sin(angle)) * (reservoir_radius(angle) + 4.0))
+	return points
+
+
+static func undercroft_loop(samples: int = 96) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	for i in samples + 1:
+		var angle := TAU * float(i) / float(samples)
+		points.append(Vector2(cos(angle), sin(angle)) * 77.5)
+	return points
+
+
 ## Every route: id, width, class (public, service, link), role, points.
 static func routes() -> Array[Dictionary]:
 	var list: Array[Dictionary] = []
-	var arrival := plot("ARRIVAL")
-	var forecourt: Vector2 = arrival["centre"]
-	var overlook := Vector2(0.0, -reservoir_radius(-PI * 0.5) - 1.5)
-	list.append({"id": "R0", "width": 6.0, "class": "public", "role": "arrival axis: gate approach, pylons, forecourt, reservoir overlook",
-		"points": PackedVector2Array([Vector2(0.0, -FLOOR_RADIUS - 6.0), Vector2(0.0, -56.0), forecourt, overlook])})
-	var prom := promenade()
-	list.append({"id": "R1", "width": 4.0, "class": "public", "role": "reservoir promenade", "points": prom})
-	list.append({"id": "R2", "width": 3.5, "class": "service", "role": "outer service loop", "points": service_loop()})
-	# R3 and R4: from the forecourt's flanks past the guest house and Oren to
-	# the promenade's two ends.
-	var guest_front := front_point(plot("GUEST"))
-	# R3 runs straight from the forecourt's west side to the promenade's west
-	# end (Nahl and Renewal beyond); the guest house's door takes a short
-	# branch off it, so the hospitality route does not hook out and back.
-	var guest_step := guest_front + facing(plot("GUEST")) * 3.0
-	var r3_from := forecourt + Vector2(-10.0, 4.0)
-	list.append({"id": "R3", "width": 4.0, "class": "public", "role": "arrival west link: forecourt, Nahl, Renewal",
-		"points": PackedVector2Array([r3_from, prom[0]])})
-	list.append({"id": "R3g", "width": 3.0, "class": "public", "role": "the guest house's door, off the arrival west link",
-		"points": PackedVector2Array([r3_from.lerp(prom[0], 0.15), guest_step])})
-	list.append({"id": "R4", "width": 4.0, "class": "public", "role": "arrival east link: forecourt, Oren, Kel",
-		"points": PackedVector2Array([forecourt + Vector2(10.0, 2.0), prom[prom.size() - 1]])})
-	# R5: from the promenade between Civic and Aro straight out to Iren's door,
-	# past Civic's west end.
-	var iren_front := front_point(plot("IREN"))
-	list.append({"id": "R5", "width": 4.0, "class": "public", "role": "far civic link to the Iren residence",
-		"points": PackedVector2Array([_on_ring(iren_front.angle(), prom), iren_front])})
-	# R6 and R7: the resident terrace loop's radial links through the gaps
-	# between plots, joining the promenade to the service loop (west: thermal
-	# and care; east: craft and materials).
-	for link: Array in [["R6", "thermal link, Renewal and Aro", "RENEWAL", "ARO"],
-			["R7", "craft link, Oren and Kel", "OREN", "KEL"], ["R7b", "craft link, Kel and Vara", "KEL", "VARA"], ["R7c", "craft link, Vara and Civic", "VARA", "CIVIC"]]:
-		var a: Vector2 = plot(str(link[2]))["centre"]
-		var b: Vector2 = plot(str(link[3]))["centre"]
-		var angle := _clear_bearing(str(link[2]), str(link[3]))
-		var inner := _on_ring(angle, prom)
-		var outer := Vector2(cos(angle), sin(angle)) * service_radius(angle)
-		list.append({"id": str(link[0]), "width": 3.5, "class": "link", "role": str(link[1]), "points": PackedVector2Array([inner, outer])})
+	list.append({"id": "H1", "width": HIGHLINE_WIDTH, "class": "public", "tier": "highline", "role": "glass civic ring and raised-building fronts", "points": highline_ring()})
+	list.append({"id": "H0", "width": 3.8, "class": "public", "tier": "ramp", "role": "direct arrival gallery from the south-lip gate", "points": arrival_byway()})
+	list.append({"id": "HG", "width": 3.0, "class": "public", "tier": "ramp", "serves": ["GUEST"], "role": "short gate forecourt branch to the inn", "points": guest_gate_link()})
+	var guest := plot("GUEST")
+	var guest_front := front_point(guest, "footprint")
+	var guest_back := back_point(guest, "footprint")
+	var guest_side := shell_to_plan(guest, Vector2(8.2, 0.0))
+	list.append({"id": "D_GUEST", "width": 2.4, "class": "service", "tier": "gate_platform", "serves": ["GUEST"], "role": "inn platform circulation from public door to receiving side", "points": PackedVector2Array([guest_front, guest_side, guest_back])})
+	list.append({"id": "H2W", "width": 3.2, "class": "link", "tier": "ramp", "serves": ["RENEWAL"], "role": "west public renewal descent", "points": renewal_byway(-1.0)})
+	list.append({"id": "H2E", "width": 3.2, "class": "link", "tier": "ramp", "serves": ["RENEWAL"], "role": "east public renewal descent", "points": renewal_byway(1.0)})
+	list.append({"id": "H4", "width": 2.4, "class": "link", "tier": "highline", "serves": ["OREN"], "landing_overlap": true, "role": "Oren roof-terrace dock at the existing lift landing", "points": oren_terrace_link()})
+	list.append({"id": "H5", "width": 2.4, "class": "link", "tier": "highline", "serves": ["KEL"], "role": "Kel upper-home frontage beside the sawtooth works", "points": kel_upper_link()})
+	var ground := ground_promenade()
+	var service := undercroft_loop()
+	var ground_ids := ["OREN", "KEL", "ARO", "RENEWAL"]
+	list.append({"id": "G1", "width": 3.5, "class": "public", "tier": "ground", "serves": ground_ids, "role": "inner lava promenade and ground-building forecourts", "points": ground})
+	list.append({"id": "G2", "width": 3.2, "class": "service", "tier": "ground", "serves": ground_ids, "role": "under-Highline service loop and receiving aprons", "points": service})
+	# Ground properties receive two explicit landings.  The Renewal route
+	# crosses its public deck from the promenade to the descent landing.
+	for id: String in ["OREN", "KEL", "ARO", "RENEWAL"]:
+		var entry := plot(id)
+		var front := shell_to_plan(entry, Vector2(-3.2, 7.5)) if id == "KEL" else front_point(entry, "footprint")
+		var back := back_point(entry, "footprint")
+		list.append({"id": "P_%s" % id, "width": 2.8, "class": "public", "tier": "platform", "serves": [id], "role": "%s public threshold" % id,
+			"points": PackedVector2Array([_on_ring(front.angle(), ground), front])})
+		list.append({"id": "S_%s" % id, "width": 2.6, "class": "service", "tier": "platform", "serves": [id], "role": "%s receiving threshold" % id,
+			"points": PackedVector2Array([_on_ring(back.angle(), service), back])})
+	# Raised properties own broad platforms; these centre lines record that a
+	# person can walk round the side from the civic ring to every rear door.
+	for id: String in ["NAHL", "VARA", "CIVIC", "IREN"]:
+		var entry := plot(id)
+		var front := front_point(entry, "footprint")
+		var back := back_point(entry, "footprint")
+		list.append({"id": "D_%s" % id, "width": 2.4, "class": "service", "tier": "highline", "serves": [id], "role": "%s private dock circulation" % id,
+			"points": PackedVector2Array([_on_ring(front.angle(), highline_ring()), front, back])})
 	return list
 
 
@@ -422,10 +618,12 @@ static func routes() -> Array[Dictionary]:
 ## safe shelf beyond the caldera floor.
 static func emergency_spokes() -> Array[Dictionary]:
 	var list: Array[Dictionary] = []
-	for spoke: Array in [["E0", -90.0, "arrival ascent"], ["E1", 131.0, "west ascent, Aro and Civic"], ["E2", 70.0, "far ascent, Civic and Vara"], ["E3", -26.0, "east ascent, Kel and Oren"]]:
+	for spoke: Array in [["E0", -90.0, "arrival byway"], ["E1", -175.0, "west wall refuge"], ["E2", 65.0, "far wall refuge"], ["E3", 155.0, "northwest wall refuge"]]:
 		var angle := deg_to_rad(float(spoke[1]))
-		var from := Vector2(0.0, -56.0) if str(spoke[0]) == "E0" else Vector2(cos(angle), sin(angle)) * service_radius(angle)
-		list.append({"id": str(spoke[0]), "width": 3.5, "role": str(spoke[2]), "points": PackedVector2Array([from, Vector2(cos(angle), sin(angle)) * (FLOOR_RADIUS + 4.0)])})
+		var from := Vector2(cos(angle), sin(angle)) * HIGHLINE_RADIUS
+		var finish := arrival_byway()[0] if str(spoke[0]) == "E0" else Vector2(cos(angle), sin(angle)) * 92.0
+		var points := arrival_byway() if str(spoke[0]) == "E0" else PackedVector2Array([from, finish])
+		list.append({"id": str(spoke[0]), "width": 3.5, "tier": "ramp" if str(spoke[0]) == "E0" else "highline", "role": str(spoke[2]), "points": points})
 	return list
 
 

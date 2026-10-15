@@ -222,6 +222,11 @@ will be rideable as a separate project, and players swim until then.
    gangway's line, too close for Blorbus. All moved; 0 FAIL.
 11. Still open: the islets' faces up close; a walk through the buildings'
    doors at Blorbus scale is not expected (doors are human-sized).
+12. **Roof retrofit debt (recorded 2026-10-08):** the village's existing hip,
+   gable, pent and open-shelter roofs do not yet follow the newer rule for
+   visible SuperEgg construction with exact, coplanar Boolean-clipped seams.
+   Revisit `StiltRoofs` and every roof junction as a dedicated visual pass;
+   the current proof checks do not count this as complete.
 
 ### How to build one structure
 
@@ -243,8 +248,10 @@ Status: concept planning complete (2026-10-05); named census and dimensioned
 layout (`fire_caldera_layout.md`) approved (2026-10-06); architecture
 briefs for every plot and the lower city written for review
 (`fire_caldera_buildings.md`, 2026-10-06). The
-current implementation is eight generic homes around an 8.4-metre-wide
-decorative lava fountain. The proposed direction replaces it with a terraced
+current implementation has replaced the eight generic homes and decorative
+lava fountain with the first nine authored places: the guest house, Nahl hall,
+Oren mineral house, Renewal terrace, Kel foundry, Vara glass studio/home and the
+Civic complex, the Iren residence and the Aro thermal works/home. The direction is a terraced
 city around a broad natural magma reservoir, with a second public district
 beneath the lava that opens after the Lava Helm is obtained. See
 `docs/architecture/fire_caldera_city.md` and `docs/handoff_fire_kingdom.md`.
@@ -283,17 +290,50 @@ Planning priorities:
   systems. Author higher-resolution local geology rather than enlarging the
   current decorative fountain.
 
-Progress (2026-10-07): `FireCalderaPlan`, its validator and plan drawing;
+Progress (2026-10-08): `FireCalderaPlan`, its validator and plan drawing;
 `FireCalderaGround` with the plot survey; `SocketPlinth`; the isolated proof
 (`tools/fire_caldera_proof.tscn`); and the live terrain integration with its
 polygon reservoir (`tools/fire_caldera_world_probe.tscn`, 0 FAIL). The coarse
 flat floor is absent beneath the fine city mesh and their seam agrees exactly.
-All nine socket plinths are now live in the same atomic ground build. The
+All nine foundations are live in the same atomic ground build. The
 revised two-room guest pavilion, its monolithic glass facade, low slab with
 four fitted glass SuperEgg skylights, fitted openings and entry fin, Eris Nahl,
-and the registered 25-Tokoin rest point are live. Pause for the next walkthrough; the arrival
-forecourt follows only after the style is approved.
-See the handoff.
+and the registered 25-Tokoin rest point are live, followed by Nahl, Oren,
+Renewal, Kel, Vara, Civic, Iren and Aro. Vara's first isolated site section rejected two rear
+service doors against the uphill cut; one Kel-facing loading door now serves
+its connected hot and metal shops, while its open daylight court and separate
+home entry remain clear. The 2026-10-08 foundation/circulation pass removed the generic
+settlement and above-floor foundation lips, separated terrain height queries
+from authored floors, widened Oren's service passage, replaced obstructive
+leaves with arches/sliding/overhead doors, fixed recovery heading and bed
+orientation, and added capsule passage checks (both Fire proofs: 0 FAIL).
+The Civic proof added a true double-height council room, school/archive bay,
+two-flight public ramp, plane-clipped observatory dome, and an enlarged sealed
+terrarium that reads as the chamber's living-archive centerpiece. Iren's former
+glazed family bridge to Civic was later retired in favor of the shared
+Highline circulation.
+Aro now separates its public control gallery and rear valve workshop from the
+family home, while a true-length SuperEgg ramp descends through the surveyed
+stepped podium to a sealed future-L1 bulkhead. Both entries, all internal
+passages, the descent grade, four lava fixtures and circulation clear zones
+pass physics. Next are the arrival pylons and the cove bridge.
+The 2026-10-09 settlement correction removed the rejected terrain bench. The
+natural section is now an explicit inhabited annular paraboloid from world Y
+30 at the lava-mouth shoulder to Y 48 at the crater lip, with a second
+paraboloid beneath the central lava. A separate Caldera Highline circles at
+radius 72 and world Y 42.5; four buildings dock directly to the ring and the
+gate inn remains the fifth raised property at Y 49.5 on its matching concave service
+pier. Three buildings remain on the gentle lower natural curve. Its glass guards collide and their top rails are
+continuous bent pipes. Renewal is a public glass interchange with two
+side approaches and an immersion tongue, not a rock ghat. Oren's roof terrace
+has a Highline frontage; Kel's upper home has a separate continuous curved
+ribbon rather than the obsolete cross-village ramp. The reservoir mean radius
+is 52 m and the full-scale Tempering Gate at the south lip connects by a gentle
+curved gallery. The
+planetary ocean masks all six Fire-volcano footprints so its blue surface
+cannot appear inside a lava basin. Plan, isolated physics and live-world probes
+all report 0 FAIL. The player controller also retains walkable support across
+adjacent room-floor seams; its dedicated regression reports 0 FAIL. See the handoff.
 
 ## 5. Chinese Village
 

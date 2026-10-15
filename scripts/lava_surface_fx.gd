@@ -11,12 +11,14 @@ const BUBBLE_SPRAY_THRESHOLD := 1.15
 
 var _rng := RandomNumberGenerator.new()
 var _vents: Array[Dictionary] = []
+var _scale_factor := 1.0
 
 
-static func attach(parent: Node, surface_points: Array, seed_value: int) -> LavaSurfaceFX:
+static func attach(parent: Node, surface_points: Array, seed_value: int, scale_factor: float = 1.0) -> LavaSurfaceFX:
 	var effects := LavaSurfaceFX.new()
 	effects.name = "LavaSurfaceFX"
 	effects._rng.seed = seed_value
+	effects._scale_factor = scale_factor
 	parent.add_child(effects)
 	effects._build_vents(surface_points)
 	return effects
@@ -30,17 +32,17 @@ func _process(delta: float) -> void:
 		var bubble := vent["bubble"] as MeshInstance3D
 		var peak: float = float(vent["peak"])
 		var progress := smoothstep(0.0, 1.0, clampf(1.0 - timer / total, 0.0, 1.0))
-		bubble.scale = Vector3.ONE * lerpf(BUBBLE_START_RADIUS, peak, progress)
+		bubble.scale = Vector3.ONE * lerpf(BUBBLE_START_RADIUS * _scale_factor, peak, progress)
 		if timer <= 0.0:
 			bubble.scale = Vector3.ZERO
-			if peak >= BUBBLE_SPRAY_THRESHOLD:
+			if peak >= BUBBLE_SPRAY_THRESHOLD * _scale_factor:
 				var jet := vent["jet"] as GPUParticles3D
 				jet.restart()
 				jet.emitting = true
 			var next_cycle := _rng.randf_range(2.4, 8.5)
 			vent["timer"] = next_cycle
 			vent["total"] = next_cycle
-			vent["peak"] = _rng.randf_range(BUBBLE_PEAK_RANGE.x, BUBBLE_PEAK_RANGE.y)
+			vent["peak"] = _rng.randf_range(BUBBLE_PEAK_RANGE.x, BUBBLE_PEAK_RANGE.y) * _scale_factor
 
 
 func _build_vents(surface_points: Array) -> void:
@@ -60,7 +62,7 @@ func _build_vents(surface_points: Array) -> void:
 			"bubble": bubble,
 			"timer": cycle,
 			"total": cycle,
-			"peak": _rng.randf_range(BUBBLE_PEAK_RANGE.x, BUBBLE_PEAK_RANGE.y),
+			"peak": _rng.randf_range(BUBBLE_PEAK_RANGE.x, BUBBLE_PEAK_RANGE.y) * _scale_factor,
 		})
 
 
@@ -115,5 +117,6 @@ func _build_hot_vapour_jet() -> GPUParticles3D:
 	quad.size = Vector2(0.8, 1.7)
 	quad.material = material
 	particles.draw_pass_1 = quad
+	particles.scale = Vector3.ONE * _scale_factor
 	particles.visibility_aabb = AABB(Vector3(-12, 0, -12), Vector3(24, 18, 24))
 	return particles

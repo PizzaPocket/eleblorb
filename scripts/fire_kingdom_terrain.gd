@@ -1,5 +1,7 @@
 extends StaticBody3D
 
+const FireCalderaHighline := preload("res://scripts/fire_caldera_highline.gd")
+
 const TOKOIN_SCENE: PackedScene = preload("res://scenes/tokoin.tscn")
 const HALF_SIZE := 900.0
 const RESOLUTION := 121
@@ -11,7 +13,9 @@ const CRATER_RIM_RADIUS := FireCalderaPlan.RIM_RADIUS
 const CRATER_OUTER_RADIUS := 205.0
 const CRATER_FLOOR_Y := FireCalderaPlan.FLOOR_Y
 const CRATER_RIM_Y := 48.0
-const VILLAGE_RADIUS := FireCalderaPlan.SAFE_RADIUS
+## The inhabited bowl and the true gate on its lip are one protected civic
+## precinct.  Encounters begin beyond the rim, never on the arrival gallery.
+const VILLAGE_RADIUS := FireCalderaPlan.RIM_RADIUS + 8.0
 const GATE_CENTER := FireCalderaPlan.GATE_WORLD
 const GATE_CLEAR_RADIUS := 22.0
 const GATE_BLEND_RADIUS := 38.0
@@ -80,12 +84,11 @@ var _registered_lava_surfaces:Array[Dictionary]=[]
 ## then shared with the village builders so shell, floor and terrain exclusion
 ## cannot drift apart.
 var _caldera_surveys:Dictionary={}
-## Every foundation's plan outline, retaining band and floor, in the plan's
-## local frame, with a bounding circle for a cheap first test. The height
-## query answers from these, so walking, landing and snapping all meet the
-## same floor the plinth's collider and the fine mesh show (the player snaps
-## to get_mesh_height(); while it returned the natural slope inside a plot,
-## people hovered at the surrounding ground's height above the floor).
+## Every foundation's plan outline, excavation band and datum, in the plan's
+## local frame, with a bounding circle for a cheap first test. The height query
+## uses these only to keep terrain below the built work. Architecture is
+## intentionally absent from this single-valued query; physical floors, ramps,
+## lift decks and terraces own their own contact at every level.
 var _caldera_sockets:Array[Dictionary]=[]
 var _under_lava_environment:Environment
 var _lava_camera:Camera3D
@@ -109,6 +112,19 @@ func sample_height(x:float,z:float)->float:
 
 func sample_color(x:float,z:float)->Color:
 	return _color(Vector2(x,z))
+
+
+## The planetary sea belongs outside the volcanic island. Its world-scale
+## sphere would otherwise cross the interiors of deep lava bowls at its own
+## surface level and appear as a blue ceiling while the player swims in lava.
+## Mask every volcanic footprint, not only the inhabited caldera.
+func planetary_ocean_holes()->Array[Dictionary]:
+	var holes: Array[Dictionary] = [{"centre":CRATER_CENTER,"radius":CRATER_RIM_RADIUS+8.0}]
+	for centre:Vector2 in LAVA_POOLS:
+		holes.append({"centre":centre,"radius":LAVA_RIM_END_RADIUS+6.0})
+	for centre:Vector2 in SECONDARY_VOLCANO_CENTERS:
+		holes.append({"centre":centre,"radius":160.0})
+	return holes
 
 
 func _ready()->void:
@@ -187,23 +203,25 @@ func _terrain_height(x:float,z:float)->float:
 		for socket in _caldera_sockets:
 			if local.distance_to(socket["centre"])>float(socket["reach"]):
 				continue
+			# Raised platforms bridge above the untouched bowl. Their support
+			# piers pass through the rock; they never excavate or depress it.
+			if bool(socket.get("elevated",false)):
+				continue
 			if Geometry2D.is_point_in_polygon(local,socket["outline"]):
-				# A conversation pit dug into the plinth: its floor.
-				for pit:Dictionary in socket["pits"]:
-					if Geometry2D.is_point_in_polygon(local,pit["outline"]):
-						return float(socket["datum"])-float(pit["depth"])
-				# A raised level or ramp built on the plinth: its floor.
-				var raised:=FireCalderaPlan.level_height(socket["entry"],local)
-				if not is_nan(raised):
-					return float(socket["datum"])+raised
-				return float(socket["datum"])
+				# `get_mesh_height` is terrain, never architecture. Returning the
+				# plinth, a ramp or an upper terrace here gave the player both this
+				# single-valued height and the real floor collider as competing ground
+				# authorities. It cannot represent a room below a roof terrace at all.
+				# Keep the analytic ground safely below the omitted socket collision;
+				# the foundation and every built level are resolved by physics alone.
+				var elevated:=bool(socket.get("elevated",false))
+				var architecture_clearance:=float(socket["datum"])-(2.6 if elevated else maxf(0.75,float(socket.get("sink",0.0))+0.1))
+				# Overlapping upper and lower settlement tiers both constrain the
+				# geology. Accumulate the lowest valid terrain height rather than
+				# returning whichever socket happened to be listed first.
+				height=minf(height,architecture_clearance)
 			if Geometry2D.is_point_in_polygon(local,socket["band"]):
-				return minf(height,float(socket["datum"])-0.05)
-			# A ramp or landing built out beyond the plinth (a covered bridge up
-			# from the ground): its floor wherever it stands above the ground.
-			var outside:=FireCalderaPlan.level_height(socket["entry"],local)
-			if not is_nan(outside) and float(socket["datum"])+outside>height:
-				return float(socket["datum"])+outside
+				height=minf(height,float(socket["datum"])-(2.6 if bool(socket.get("elevated",false)) else float(socket.get("landing_clearance",0.05))))
 		return height
 	return _legacy_terrain_height(x,z)
 
@@ -227,8 +245,7 @@ func _legacy_terrain_height(x:float,z:float)->float:
 	if river_amount>0.0:
 		base=lerpf(base,RIVER_FLOOR_Y,river_amount)
 	var d:float=p.distance_to(CRATER_CENTER)
-	if d<CRATER_FLOOR_RADIUS:base=CRATER_FLOOR_Y
-	elif d<CRATER_RIM_RADIUS:base=lerpf(CRATER_FLOOR_Y,CRATER_RIM_Y,smoothstep(CRATER_FLOOR_RADIUS,CRATER_RIM_RADIUS,d))
+	if d<CRATER_RIM_RADIUS:base=FireCalderaGround.outer_bowl_height(FireCalderaPlan.to_local(p))
 	elif d<CRATER_OUTER_RADIUS:base=lerpf(CRATER_RIM_Y,base,smoothstep(CRATER_RIM_RADIUS,CRATER_OUTER_RADIUS,d))
 	var gate_distance:=p.distance_to(GATE_CENTER)
 	if gate_distance<GATE_BLEND_RADIUS:
@@ -402,7 +419,7 @@ func _coarse_mesh_normal(x:float,z:float)->Vector3:
 	return Vector3(_coarse_mesh_height(x-D,z)-_coarse_mesh_height(x+D,z),D*2.0,_coarse_mesh_height(x,z-D)-_coarse_mesh_height(x,z+D)).normalized()
 func is_lake_area(_p:Vector2)->bool:return false
 func get_lake_water_level()->float:return 0.0
-func is_safe_zone(p:Vector2)->bool:return p.distance_to(CRATER_CENTER)<VILLAGE_RADIUS+15.0
+func is_safe_zone(p:Vector2)->bool:return p.distance_to(CRATER_CENTER)<VILLAGE_RADIUS
 func is_nme_hazard(p:Vector2)->bool:return is_lava_area(p)
 func get_village_center()->Vector2:return CRATER_CENTER
 func get_village_radius()->float:return VILLAGE_RADIUS
@@ -487,10 +504,7 @@ func _in_lava_surface(p:Vector2,surface:Dictionary)->bool:
 	return true
 
 func _color(p:Vector2)->Color:
-	var heat:=0.0
-	for center in LAVA_POOLS:heat=maxf(heat,1.0-smoothstep(LAVA_RADIUS,LAVA_RADIUS+55.0,p.distance_to(center)))
-	heat=maxf(heat,_river_coverage(p))
-	return Color(0.1,0.085,0.08).lerp(Color(0.34,0.13,0.065),heat)
+	return FireCalderaGround.ROCK_COLOR
 
 func _build_mesh_and_collision()->void:
 	var s:float=HALF_SIZE*2.0/float(RESOLUTION-1);var st:=SurfaceTool.new();st.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -505,8 +519,8 @@ func _build_mesh_and_collision()->void:
 				for n in [i,i+RESOLUTION,i+1]:st.add_index(n)
 			if not _coarse_triangle_under_caldera((b+c+d)/3.0):
 				for n in [i+1,i+RESOLUTION,i+RESOLUTION+1]:st.add_index(n)
-	var mat:=StandardMaterial3D.new();mat.vertex_color_use_as_albedo=true;mat.roughness=0.96;mat.cull_mode=BaseMaterial3D.CULL_DISABLED;st.set_material(mat)
-	var mesh:=MeshInstance3D.new();mesh.mesh=st.commit();add_child(mesh)
+	st.set_material(FireCalderaGround.terrain_material())
+	var mesh:=MeshInstance3D.new();mesh.name="TerrainMesh";mesh.mesh=st.commit();mesh.material_override=FireCalderaGround.terrain_material();add_child(mesh)
 	var faces:=PackedVector3Array()
 	for iz in RESOLUTION-1:
 		for ix in RESOLUTION-1:
@@ -548,7 +562,16 @@ func _build_caldera_ground()->void:
 		_caldera_surveys[str(entry["id"])]=line
 		var key:=SocketPlinth.size_key(entry)
 		var socket:={"outline":SocketPlinth.exclusion(entry,line,key),"band":SocketPlinth.band(entry,key),"datum":float(line["datum"]),"sink":SocketPlinth.sink(entry)}
-		sockets.append(socket)
+		# A glass public deck needs room for its own slab and the descending
+		# Highline landing beneath its walking plane. A five-centimetre soil
+		# suppression, suitable behind a solid plinth wall, would visibly cut
+		# through that transparent structure.
+		if str(entry.get("foundation_kind", "")) == "renewal_glass":
+			socket["landing_clearance"] = FireCalderaHighline.DECK_THICKNESS + 0.08
+		var elevated:=FireCalderaPlan.is_elevated(entry)
+		socket["elevated"] = elevated
+		if not elevated:
+			sockets.append(socket)
 		var band:PackedVector2Array=socket["band"]
 		var centre:=Vector2.ZERO
 		for point in band:centre+=point
@@ -560,17 +583,21 @@ func _build_caldera_ground()->void:
 			var rect:Rect2=level["rect"]
 			for corner:Vector2 in [rect.position,rect.end,Vector2(rect.position.x,rect.end.y),Vector2(rect.end.x,rect.position.y)]:
 				reach=maxf(reach,FireCalderaPlan.shell_to_plan(entry,corner).distance_to(centre))
-		_caldera_sockets.append({"outline":socket["outline"],"band":band,"datum":socket["datum"],"centre":centre,"reach":reach+0.1,"pits":FireCalderaPlan.pit_outlines(entry),"entry":entry})
+		_caldera_sockets.append({"outline":socket["outline"],"band":band,"datum":socket["datum"],"centre":centre,"reach":reach+0.1,"pits":FireCalderaPlan.pit_outlines(entry),"entry":entry,"elevated":elevated,"landing_clearance":float(socket.get("landing_clearance",0.05))})
 	FireCalderaGround.build(frame,sockets,func(local:Vector2)->float:
 		var world:=FireCalderaPlan.to_world(local)
 		return _coarse_mesh_height(world.x,world.y))
+	FireCalderaGround.build_arrival_threshold(frame)
 	FireCalderaGround.build_lava(frame)
+	FireCalderaHighline.build(frame)
 	# The holes and the foundations are built in the same synchronous stage:
 	# no frame can expose an open collision socket.
 	for entry in FireCalderaPlan.PLOTS:
 		var id:=str(entry["id"])
 		if _caldera_surveys.has(id):
-			if str(entry.get("foundation_kind",""))=="ghat":
+			if FireCalderaPlan.is_elevated(entry):
+				FireCalderaHighline.build_platform(frame,entry,_caldera_surveys[id])
+			elif str(entry.get("foundation_kind",""))=="renewal_glass":
 				FireCalderaRenewal.build_foundation(frame,entry,_caldera_surveys[id])
 			else:
 				SocketPlinth.build(frame,entry,_caldera_surveys[id],SocketPlinth.size_key(entry))
@@ -586,6 +613,20 @@ func get_caldera_frame()->Node3D:
 
 func get_caldera_survey(id:String)->Dictionary:
 	return _caldera_surveys.get(id,{})
+
+
+## True where authored architecture, rather than the analytic terrain height,
+## owns the player's footing.  The terrain query deliberately stays below
+## these sockets; exposing the same boundary to locomotion prevents terrain
+## snap from fighting a plinth, doorway, upper floor or roof collider.
+func is_architecture_socket(x:float,z:float)->bool:
+	var local:=FireCalderaPlan.to_local(Vector2(x,z))
+	for socket in _caldera_sockets:
+		if local.distance_to(socket["centre"])>float(socket["reach"]):
+			continue
+		if Geometry2D.is_point_in_polygon(local,socket["outline"]):
+			return true
+	return false
 
 func _build_lava_pools()->void:
 	for center in LAVA_POOLS:

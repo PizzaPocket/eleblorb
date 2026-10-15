@@ -1,24 +1,30 @@
 class_name SocketPlinth
 extends RefCounted
 
-## The Fire caldera's socketed plinth (fire_caldera_layout.md, 1a; buildings
-## brief, kit of parts "Foundation"): a tapered cast-basalt base on the same
-## superellipse plan as the building above, embedded below the lowest ground
-## along its perimeter, its top the floor datum, with a recessed metal control
-## joint between base and shell. Its collider is the base itself, and the
-## ground leaves a hole under it (FireCalderaGround builds round
-## `terrain_exclusion`), so the floor is the only thing anyone stands on.
+## The Fire caldera's cut-and-fill foundation: a level cast-basalt platform on
+## the same superellipse plan as the building above. Its downhill face builds
+## up from an embedded footing; uphill, the terrain is cut back outside the
+## platform. Nothing rises above the finished floor round its perimeter: a
+## foundation is a bearing surface, not a lipped tray. Its collider is the
+## base itself, and the ground leaves a hole under it, so this is the only
+## walkable surface inside the platform outline.
 
 const BASALT := Color(0.16, 0.15, 0.15)
 const JOINT_METAL := Color(0.22, 0.26, 0.32)
 ## The base steps out this much per metre down: a battered, tapered base.
 const BATTER := 0.08
 ## Superellipse exponent of the plan: squarish, softened corners.
-const PLAN_EXPONENT := 6.0
+## Squarish enough that the finished floor clears the rectangular wall corners
+## as well as their mid-spans.  A softer exponent turned the nominal reveal
+## into a visually undersized base at every corner.
+const PLAN_EXPONENT := 10.0
 const SEGMENTS := 72
 ## A walkway of floor-level reveal between the building and the retaining
 ## wall on its uphill side (the layout's "retaining reveal").
-const REVEAL := 0.8
+## Clear circulation/inspection strip between the shell and uphill retaining
+## work. This must remain visibly open at building backs; terrain may meet the
+## outside of the retaining wall, never the building envelope itself.
+const REVEAL := 1.2
 const WALL_THICKNESS := 1.0
 
 
@@ -42,8 +48,9 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary, size_key:
 	var rings: Array = [
 		[bottom, height * BATTER], [top - 0.32, 0.0], [top - 0.3, -0.06], [top - 0.14, -0.06], [top - 0.12, 0.0], [top, 0.0],
 	]
-	var top_course: Color = entry.get("floor_finish", BASALT.lightened(0.06))
-	var colours: Array[Color] = [BASALT.darkened(0.15), BASALT, JOINT_METAL, JOINT_METAL, top_course, top_course]
+	var foundation: Color = entry.get("foundation_finish", BASALT)
+	var top_course: Color = entry.get("floor_finish", foundation.lightened(0.06))
+	var colours: Array[Color] = [foundation.darkened(0.15), foundation, JOINT_METAL, JOINT_METAL, top_course, top_course]
 	var loops: Array = []
 	for ring: Array in rings:
 		loops.append(_loop(centre, across, deep, half + Vector2.ONE * float(ring[1]), float(ring[0])))
@@ -107,7 +114,6 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary, size_key:
 		top_collider.shape = course
 		top_collider.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
 		body.add_child(top_collider)
-	_retaining(body, cap, centre, top)
 	return body
 
 
@@ -211,11 +217,10 @@ static func _deepest(pits: Array[Dictionary]) -> float:
 	return deepest
 
 
-## Wherever the ground stands above the datum round the plinth, a retaining
-## wall rises from the reveal to just above the ground: the uphill socket. One
-## continuous band, its inner face on the plinth's edge and WALL_THICKNESS
-## thick, so from the terrace it reads as a basalt kerb flush with the ground
-## and from the reveal as a clean cut face. A box collider per segment.
+## Retaining work for Renewal's explicitly open bank cut. Ordinary
+## building platforms no longer call this: they have no above-floor ring.
+## Renewal passes only its landward terrace outline, where a real retaining
+## wall belongs outside the occupied deck rather than enclosing a shell.
 static func _retaining(body: StaticBody3D, cap: PackedVector3Array, centre: Vector2, datum: float) -> void:
 	var count := cap.size()
 	var tops := PackedFloat32Array()
@@ -239,7 +244,6 @@ static func _retaining(body: StaticBody3D, cap: PackedVector3Array, centre: Vect
 		var a := Vector2(cap[i].x, cap[i].z)
 		var b := Vector2(cap[j].x, cap[j].z)
 		var colour := BASALT.lightened(0.03)
-		# Inner face (toward the building), top, outer face.
 		_quad(st, Vector3(a.x, datum, a.y), Vector3(b.x, datum, b.y), Vector3(b.x, tj, b.y), Vector3(a.x, ti, a.y), middle, colour, true)
 		_quad(st, Vector3(a.x, ti, a.y), Vector3(b.x, tj, b.y), Vector3(outer[j].x, tj, outer[j].y), Vector3(outer[i].x, ti, outer[i].y), middle + Vector3(0, -100, 0), colour.lightened(0.05))
 		_quad(st, Vector3(outer[i].x, datum - 0.5, outer[i].y), Vector3(outer[j].x, datum - 0.5, outer[j].y), Vector3(outer[j].x, tj, outer[j].y), Vector3(outer[i].x, ti, outer[i].y), middle, colour)

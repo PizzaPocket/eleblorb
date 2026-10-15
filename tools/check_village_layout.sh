@@ -25,6 +25,7 @@ fi
 # The Fire caldera city likewise, from FireCalderaPlan.
 if [ "${VILLAGE:-ohio}" = "fire" ]; then
 	"$GODOT_BIN" --headless --path "$ROOT" tools/validate_fire_plan.tscn
+	"$GODOT_BIN" --headless --path "$ROOT" tools/player_support_handoff_probe.tscn
 	exit $?
 fi
 

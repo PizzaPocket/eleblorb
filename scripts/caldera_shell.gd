@@ -112,7 +112,7 @@ static func add_volume(body: StaticBody3D, spec: Dictionary) -> void:
 	for wall: String in runs:
 		if walls.has(wall):
 			_build_wall(body, offset, offset + runs[wall][0], runs[wall][1], walls[wall], stained, storey, head, bool(spec.get("transom", true)))
-	_build_corners(body, offset, hx, hz, head)
+	_build_corners(body, offset, hx, hz, head, bool(spec.get("transom", true)))
 	if bool(spec.get("roof", true)):
 		_build_roof(body, offset, size, storey + clerestory, rake, spec.get("overhang", {}), spec.get("skylights", []), STAINLESS_SHADOW.darkened(0.16), deg_to_rad(float(spec.get("pitch", rad_to_deg(ROOF_PITCH)))))
 
@@ -123,6 +123,7 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 	if outward.dot(start + along - centre) < 0.0:
 		outward = -outward
 	var from := 0.0
+	var wall_length := float((bays[bays.size() - 1] as Dictionary)["to"])
 	for bay: Dictionary in bays:
 		var to := float(bay["to"])
 		var width := to - from
@@ -144,14 +145,20 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 				# raised sill sets the door on a floor above the datum, the panel
 				# then full height, with stone below the sill.
 				var sill := float(bay.get("sill", 0.0))
+				var door_type := str(bay.get("door_type", "swing"))
+				var leaves := 0 if door_type in ["sliding", "overhead", "arch"] else 2
 				if sill > 0.0:
 					_stone(body, Vector3(mid.x, sill * 0.5, mid.y), _oriented(Vector3(width - POST * 0.5, sill, WALL), yaw), bay.get("steel", Color(-1, -1, -1)))
-					door_opening(body, Vector3(mid.x, sill, mid.y), yaw, width - POST * 0.5, storey - sill, WALL, float(bay.get("clear", 2.0)), float(bay.get("height", 2.3)), 1, bay.get("steel", VOLCANIC_STONE))
+					door_opening(body, Vector3(mid.x, sill, mid.y), yaw, width - POST * 0.5, storey - sill, WALL, float(bay.get("clear", 2.0)), float(bay.get("height", 2.3)), leaves, bay.get("steel", VOLCANIC_STONE))
 				else:
-					door_opening(body, Vector3(mid.x, 0.0, mid.y), yaw, width - POST * 0.5, panel_top, WALL, DOOR_CLEAR, DOOR_HEIGHT, 2, bay.get("steel", VOLCANIC_STONE))
+					door_opening(body, Vector3(mid.x, 0.0, mid.y), yaw, width - POST * 0.5, panel_top, WALL, DOOR_CLEAR, DOOR_HEIGHT, leaves, bay.get("steel", VOLCANIC_STONE))
+				if door_type == "overhead":
+					_overhead_door(body, Vector3(mid.x, sill, mid.y), yaw, float(bay.get("clear", 2.0)), float(bay.get("height", 2.3)))
+				elif door_type == "sliding":
+					open_sliding_door(body, Vector3(mid.x, sill, mid.y), yaw, float(bay.get("clear", DOOR_CLEAR)), float(bay.get("height", DOOR_HEIGHT)), bool(bay.get("park_right", true)))
 				var clear_half := (float(bay.get("clear", DOOR_CLEAR)) if sill > 0.0 else DOOR_CLEAR) * 0.5 + 0.15
 				ClearZones.add(body, str(bay.get("label", "front door")), "door", mid, outward, 1.25, 1.25, clear_half, sill + 0.05, sill + 1.95)
-		if kind != "open" and banded:
+		if kind != "open" and banded and not is_equal_approx(to, wall_length):
 			# The stained band above every bay, alternating as each bay asks.
 			var colour: Color = stained[int(bay.get("band", 0)) % stained.size()]
 			_pane(body, "StainedBand", Vector3(mid.x, (TRANSOM + storey) * 0.5, mid.y), Vector2(width * 0.5 - POST * 0.5, (storey - TRANSOM) * 0.5 - 0.05), yaw, Color(colour, 0.72))
@@ -168,6 +175,9 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 		var top := float(head.call(edge))
 		_metal(body, Vector3(edge.x, top * 0.5, edge.y), Vector3(POST, top, POST), STEEL_BLUED, true)
 		if kind != "open" and banded:
+			# At a corner only the inward arm belongs to this wall; the adjoining
+			# wall supplies the other arm.  Letting the usual symmetric fork run
+			# past the endpoint produced the conspicuous stick pointing outdoors.
 			_fork(body, Vector3(edge.x, TRANSOM, edge.y), along)
 		from = to
 	# The transom bar and ring beam along the whole wall; a tall hall's second
@@ -195,13 +205,63 @@ static func _build_wall(body: StaticBody3D, centre: Vector2, start: Vector2, alo
 	CalderaFurniture.led_line(body, Vector3(cove.x, TRANSOM + 0.065, cove.y), yaw, length - POST, CalderaFurniture.LED_WARM)
 
 
+## An open sectional loading door stored flat beneath the ceiling. It closes
+## vertically in tracks rather than consuming the service apron or the room's
+## circulation with a huge swing leaf. The parked panels and tracks are visual
+## fittings; the punched opening remains the passage collider.
+static func _overhead_door(body: StaticBody3D, origin: Vector3, yaw: float, clear: float, door_height: float) -> void:
+	var holder := Node3D.new()
+	holder.name = "OpenSectionalDoor"
+	holder.position = origin
+	holder.rotation.y = yaw
+	body.add_child(holder)
+	var parked_depth := door_height * 0.72
+	for i in 4:
+		var panel := SuperEgg.build_part(Vector3(clear * 0.5 - 0.04, 0.025, parked_depth * 0.125), STEEL_BLUED.lightened(0.08), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		panel.position = Vector3(0.0, door_height + 0.18, 0.18 + parked_depth * (0.125 + 0.25 * float(i)))
+		holder.add_child(panel)
+		CollisionPolicy.mark_decorative(panel)
+	for side: float in [-1.0, 1.0]:
+		var track := SuperEgg.build_part(Vector3(0.025, door_height * 0.5, 0.035), STAINLESS_SHADOW, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+		track.position = Vector3(side * (clear * 0.5 + 0.05), door_height * 0.5, 0.0)
+		holder.add_child(track)
+		CollisionPolicy.mark_decorative(track)
+
+
+## An open surface-mounted sliding leaf parked beside its punched opening.
+## This is the circulation-safe choice where a secure room needs a closeable
+## door but neither adjoining space can surrender a turning arc. The leaf and
+## rail are visual while open; the wall panels remain the passage collision.
+static func open_sliding_door(body: StaticBody3D, origin: Vector3, yaw: float, clear: float, door_height: float, park_right: bool = true) -> void:
+	var holder := Node3D.new()
+	holder.name = "OpenSlidingDoor"
+	holder.position = origin
+	holder.rotation.y = yaw
+	body.add_child(holder)
+	var side := 1.0 if park_right else -1.0
+	var leaf := SuperEgg.build_part(Vector3(clear * 0.5, door_height * 0.5, 0.035), STEEL_BLUED.lightened(0.08), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	leaf.name = "ParkedLeaf"
+	leaf.position = Vector3(side * clear, door_height * 0.5, 0.12)
+	holder.add_child(leaf)
+	CollisionPolicy.mark_decorative(leaf)
+	var rail := SuperEgg.build_part(Vector3(clear, 0.035, 0.035), STAINLESS_SHADOW, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	rail.name = "SlidingRail"
+	rail.position = Vector3(side * clear * 0.5, door_height + 0.12, 0.12)
+	holder.add_child(rail)
+	CollisionPolicy.mark_decorative(rail)
+
+
 ## Corner posts, wide enough to cap every wall end.
-static func _build_corners(body: StaticBody3D, offset: Vector2, hx: float, hz: float, head: Callable) -> void:
+static func _build_corners(body: StaticBody3D, offset: Vector2, hx: float, hz: float, head: Callable, transom: bool) -> void:
 	for x: float in [-hx, hx]:
 		for z: float in [-hz, hz]:
 			var corner := offset + Vector2(x, z)
 			var top := float(head.call(corner))
 			_metal(body, Vector3(corner.x, top * 0.5, corner.y), Vector3(POST * 2.0, top, POST * 2.0), STAINLESS, true)
+			if transom:
+				var at := Vector3(corner.x, TRANSOM, corner.y)
+				_fork(body, at, Vector2(1, 0), [-signf(x)])
+				_fork(body, at, Vector2(0, 1), [-signf(z)])
 
 
 ## The SuperEgg exponent for a soft slab of half size `slab` that must still
@@ -265,9 +325,9 @@ static func _wedge_pane(body: StaticBody3D, a: Vector2, b: Vector2, bottom: floa
 
 ## A forged fork where a post meets the transom: two short branches leaning
 ## out along the wall, like a vein of cooled lava splitting, holding the band.
-static func _fork(body: StaticBody3D, at: Vector3, along: Vector2) -> void:
+static func _fork(body: StaticBody3D, at: Vector3, along: Vector2, sides: Array = [-1.0, 1.0]) -> void:
 	var dir := Vector3(along.x, 0.0, along.y)
-	for side: float in [-1.0, 1.0]:
+	for side: float in sides:
 		var tip := at + dir * side * 0.42 + Vector3.UP * 0.02
 		var root := at + Vector3.DOWN * 0.48
 		var delta := tip - root
@@ -330,7 +390,15 @@ static func _pane(body: StaticBody3D, name_text: String, at: Vector3, half: Vect
 
 
 static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top: float, rake: float, overhang: Dictionary, skylights: Array, colour: Color = STAINLESS_SHADOW.darkened(0.16), level_pitch: float = ROOF_PITCH) -> CSGCombiner3D:
-	var reach := func(side: String) -> float: return float(overhang.get(side, 0.35))
+	# A side given as 0 butts against a neighbour: the slab runs on past the
+	# wall line and is cut flush there, so it meets its neighbour in one plane
+	# (as two gable slabs meet at a ridge) instead of stopping on a rounded
+	# corner.
+	var butts: Array[String] = []
+	for side: String in ["west", "east", "front", "back"]:
+		if overhang.has(side) and is_zero_approx(float(overhang[side])):
+			butts.append(side)
+	var reach := func(side: String) -> float: return 0.6 if side in butts else float(overhang.get(side, 0.35))
 	var west: float = reach.call("west")
 	var east: float = reach.call("east")
 	var front: float = reach.call("front")
@@ -359,6 +427,14 @@ static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top:
 	slab.material = slab_material
 	roof.add_child(slab)
 	var shift := Vector2((east - west) * 0.5, (front - back) * 0.5)
+	var lines := {"west": -size.x * 0.5, "east": size.x * 0.5, "back": -size.y * 0.5, "front": size.y * 0.5}
+	for side in butts:
+		var line: float = lines[side]
+		var outward := -1.0 if side == "west" or side == "back" else 1.0
+		var along_x := side == "west" or side == "east"
+		var cutter_size := Vector3(4.0, 4.0, slab_half.z * 4.0) if along_x else Vector3(slab_half.x * 4.0, 4.0, 4.0)
+		var centre := Vector3(line - shift.x + outward * 2.0, 0.0, 0.0) if along_x else Vector3(0.0, 0.0, (line - shift.y) / cos(pitch) + outward * 2.0)
+		SolidModel.add_box(roof, "%sButtCut" % side.capitalize(), cutter_size, CSGShape3D.OPERATION_SUBTRACTION, slab_material, centre)
 	for given: Dictionary in skylights:
 		var skylight := given.duplicate()
 		skylight["at"] = (given["at"] as Vector2) - shift
@@ -366,7 +442,9 @@ static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top:
 		var half: Vector2 = skylight["half"]
 		var cutter := SolidModel.add_profile(
 			roof, "%sSkylightCut" % skylight["name"], ROOF_DEPTH * 4.0,
-			Vector2(half.x * 0.91, half.y * 0.91), 6.5,
+			# The aperture and the glass share one authored profile.  A former 9%
+			# shrink made the roof visibly intrude into and distort every dome.
+			Vector2(half.x, half.y), 6.5,
 			CSGShape3D.OPERATION_SUBTRACTION, slab_material,
 			Vector3(centre.x, 0.0, centre.y), 96
 		)
@@ -379,16 +457,20 @@ static func _skylight_dome(roof: Node3D, skylight: Dictionary) -> void:
 	var centre: Vector2 = skylight["at"]
 	var half: Vector2 = skylight["half"]
 	var rise: float = skylight["rise"]
-	var dome := MeshInstance3D.new()
+	# Same Boolean discipline as the spaceship glazing: the pane is a hollow
+	# SuperEgg volume clipped at its equator, and its equatorial profile is the
+	# exact profile used to punch the roof.  It therefore cannot be stretched or
+	# approximated independently of its opening.
+	var dome := CSGCombiner3D.new()
 	dome.name = "%sGlassSuperEgg" % skylight["name"]
-	dome.mesh = SuperEgg.build_clipped_mesh(
-		Vector3(half.x, rise, half.y), [Plane(Vector3.DOWN, 0.0)], 6.5, 6.5, 72, 24
-	)
 	var material := SolidModel.material(skylight.get("tint", CLEAR_GLASS), 0.06, 0.04)
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	dome.material_override = material
 	dome.position = Vector3(centre.x, ROOF_DEPTH * 0.5 - 0.01, centre.y)
 	roof.add_child(dome)
+	SolidModel.add_super(dome, "OuterGlass", Vector3(half.x, rise, half.y), CSGShape3D.OPERATION_UNION, material, Vector3.ZERO, 6.5, 28, 72)
+	var wall := minf(0.07, rise * 0.16)
+	SolidModel.add_super(dome, "InnerGlass", Vector3(half.x - wall, rise - wall, half.y - wall), CSGShape3D.OPERATION_SUBTRACTION, material, Vector3(0.0, -wall * 0.15, 0.0), 6.5, 28, 72)
+	SolidModel.add_box(dome, "LowerHalfCut", Vector3(half.x * 2.4, rise * 2.0, half.y * 2.4), CSGShape3D.OPERATION_SUBTRACTION, material, Vector3(0.0, -rise, 0.0))
 	CollisionPolicy.mark_decorative(dome)
 	# The glass base is a walkable roof surface: one thin collider.
 	var glass_body := StaticBody3D.new()

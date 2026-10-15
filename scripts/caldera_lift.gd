@@ -17,6 +17,8 @@ var station_names: Array[String] = []
 var _current := 0
 var _target := 0
 
+const DESTINATION_ORDER: Array[int] = [2, 1, 0]
+
 
 func _physics_process(delta: float) -> void:
 	var goal := stations[_target]
@@ -40,19 +42,27 @@ func is_moving() -> bool:
 	return not is_equal_approx(position.y, stations[_target])
 
 
-## The platform's control: the other stations to choose from.
+## The platform's control always presents the complete three-stop stack in
+## spatial order, top to bottom. The current stop remains present: choosing it
+## simply closes the control. Stable position matters more than omitting one
+## unavailable choice, which made the remaining buttons move after every trip.
 func _ride() -> void:
 	if is_moving():
 		return
 	var actions: Array[Dictionary] = []
-	for i in stations.size():
-		if i == _current:
-			continue
+	for i: int in DESTINATION_ORDER:
 		var index := i
 		actions.append({"label": station_names[i], "callback": func() -> void:
 			DialogUI.hide_dialog()
 			go_to(index)})
-	DialogUI.show_line("Lift", "", actions, "Stay.")
+	DialogUI.show_line("Lift", "", actions, "")
+
+
+func destination_labels() -> Array[String]:
+	var labels: Array[String] = []
+	for i: int in DESTINATION_ORDER:
+		labels.append(station_names[i])
+	return labels
 
 
 ## Builds a lift in `parent` at plan point `at` (its platform's centre), its

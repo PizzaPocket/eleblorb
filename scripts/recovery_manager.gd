@@ -172,10 +172,22 @@ func finish_scene_recovery(scene_root: Node, fallback_transform: Transform3D) ->
 	var player := scene_root.get_tree().get_first_node_in_group("player") as Player
 	if player == null:
 		return false
-	player.global_transform = wake
+	# The Player root is the collision/camera reference frame and must remain
+	# world-aligned. Copying a rotated bed marker's complete transform here
+	# made every subsequent world-space body yaw local to that hidden rotation,
+	# so the character could face opposite their movement after an inn rest.
+	# Keep marker yaw on the rendered body and copy only positions to the root.
+	player.global_transform = Transform3D(Basis(), wake.origin)
+	var wake_forward := wake.basis.z
+	wake_forward.y = 0.0
+	if wake_forward.length_squared() > 0.0001:
+		player.set_body_heading(atan2(wake_forward.x, wake_forward.z))
+	var stand_forward := stand.basis.z
+	stand_forward.y = 0.0
+	var stand_heading := atan2(stand_forward.x, stand_forward.z) if stand_forward.length_squared() > 0.0001 else 0.0
 	Party.spawn_into(scene_root, data.get("party_origin", stand.origin), -stand.basis.z)
 	player.force_human_control(false)
-	player.begin_recovery_wake(stand)
+	player.begin_recovery_wake(Transform3D(Basis(), stand.origin), stand_heading)
 	var kind: StringName = _pending.get("kind", &"faint")
 	# Per direct report ("it seemed when I died... it reset me at the
 	# clearing but left my breath and HP at zero, shouldn't they be

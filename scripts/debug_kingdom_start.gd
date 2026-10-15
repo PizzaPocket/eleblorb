@@ -47,11 +47,14 @@ const LOADOUTS := {
 	"lava": {
 		"label": "Lava Kingdom",
 		"scene": "res://scenes/fire_kingdom.tscn",
-		# A full lava suit with no Lava Helm.
+		# The settlement walkthrough starts with its story-gated traversal
+		# equipment already formed. This is debug-start scope only: ordinary
+		# progression still receives the unique helm from Lava Slide.
 		"slots": {
 			"head": "fire", "leg_left": "fire", "leg_right": "fire",
 			"torso": "fire", "arm_left": "fire", "arm_right": "fire",
 		},
+		"head_item": "Lava Helm",
 	},
 }
 

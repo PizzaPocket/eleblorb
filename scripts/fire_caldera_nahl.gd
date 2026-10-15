@@ -238,7 +238,7 @@ static func _tracery(body: Node3D, foot: Vector3, top: float, along: Vector3) ->
 static func _roofs(body: StaticBody3D) -> void:
 	CalderaShell._build_roof(body, HALL_CENTRE, HALL_SIZE, STOREY, HALL_RAKE, {"east": 0.0}, [], ROOF)
 	CalderaShell._build_roof(body, WING_CENTRE, WING_SIZE, STOREY, 0.0, {"west": 0.0},
-		[{"name": "Mediation", "at": Vector2(0.1, -3.5), "half": Vector2(2.2, 1.9), "rise": 0.8, "tint": Color(0.82, 0.90, 0.74, 0.38)}], ROOF)
+		[{"name": "Mediation", "at": Vector2(0.1, -3.5), "half": Vector2(2.2, 1.9), "rise": 0.8, "tint": Color(0.82, 0.90, 0.74, 0.38)}], ROOF, 0.0)
 
 
 ## Two branching iron columns down the hall's middle carrying its raked roof,
@@ -252,8 +252,10 @@ static func _tree_columns(body: StaticBody3D) -> void:
 		var holder := MeshInstance3D.new()
 		body.add_child(holder)
 		CollisionPolicy.add_box(body, holder, Vector3(0.18, 3.0, 0.18), Vector3(x, 1.5, 1.2), Basis(), false)
-		for corner: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
-			var reach := Vector3(x + corner.x * 1.0, 0.0, 1.2 + corner.y * 1.1)
+		# Four equal cardinal arms land on actual roof-bearing lines.  The old
+		# diagonal fingers read as arbitrary twigs, particularly at the front.
+		for direction: Vector2 in [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 1)]:
+			var reach := Vector3(x + direction.x * 1.1, 0.0, 1.2 + direction.y * 1.1)
 			var elbow := crown + (reach - Vector3(x, 0.0, 1.2)) * 0.4 + Vector3.UP * 0.7
 			_branch(body, crown, elbow, 0.06)
 			var bearing := Vector3(reach.x, head(reach.z) + 0.06, reach.z)
@@ -336,15 +338,11 @@ static func _molten_bay(body: StaticBody3D) -> void:
 	var floor := MeshInstance3D.new()
 	floor.name = "MoltenFloor"
 	floor.mesh = SuperEgg.build_part(Vector3(size.x * 0.5, 0.02, size.y * 0.5), MOLTEN, 7.0, 7.0).mesh
-	var material := StandardMaterial3D.new()
-	material.albedo_color = MOLTEN
-	material.emission_enabled = true
-	material.emission = MOLTEN
-	material.emission_energy_multiplier = 2.4
-	floor.material_override = material
+	floor.material_override = NatureProps.build_lava_material()
 	floor.position = Vector3(centre.x, MOLTEN_Y - 0.01, centre.y)
 	body.add_child(floor)
 	CollisionPolicy.mark_decorative(floor)
+	LavaSurfaceFX.attach(body, [Vector3(centre.x, MOLTEN_Y + 0.02, centre.y)], 34011, 0.42)
 	# A cast-basalt kerb round the molten floor, the step a body takes in.
 	for side: float in [-1.0, 1.0]:
 		CalderaShell._metal(body, Vector3(centre.x, 0.04, centre.y + side * (size.y * 0.5 + 0.06)), Vector3(size.x + 0.24, 0.08, 0.12), CalderaShell.BASALT, false)
@@ -547,31 +545,7 @@ static func _suite(body: StaticBody3D) -> void:
 ## fills from a duct beneath. She rests in it. The duct shows only as an iron
 ## inspection plate in the floor at the bed's foot.
 static func _lava_bed(body: StaticBody3D) -> void:
-	var solid := CSGCombiner3D.new()
-	solid.name = "LavaBed"
-	solid.use_collision = true
-	solid.collision_layer = 1
-	solid.collision_mask = 0
-	solid.position = Vector3(BED_CENTRE.x, 0.0, BED_CENTRE.y)
-	body.add_child(solid)
-	var stone := SolidModel.material(FORSTERITE, 0.7, 0.0)
-	var shell := SolidModel.add_profile(solid, "Shell", BED_HEIGHT, Vector2(BED_HALF.x, BED_HALF.y), 4.0, CSGShape3D.OPERATION_UNION, stone, Vector3(0, BED_HEIGHT * 0.5, 0), 72)
-	shell.rotation.z = PI * 0.5
-	var hollow := SolidModel.add_profile(solid, "Hollow", BED_HEIGHT, Vector2(BED_HALF.x - BED_WALL, BED_HALF.y - BED_WALL), 4.0, CSGShape3D.OPERATION_SUBTRACTION, stone, Vector3(0, BED_HEIGHT * 0.5 + 0.18, 0), 72)
-	hollow.rotation.z = PI * 0.5
-	var lava := MeshInstance3D.new()
-	lava.name = "BedLava"
-	lava.mesh = SolidModel.extruded_profile_mesh(0.03, Vector2(BED_HALF.x - BED_WALL - 0.005, BED_HALF.y - BED_WALL - 0.005), 4.0, 72)
-	var material := StandardMaterial3D.new()
-	material.albedo_color = MOLTEN
-	material.emission_enabled = true
-	material.emission = MOLTEN
-	material.emission_energy_multiplier = 2.2
-	lava.material_override = material
-	lava.position = Vector3(BED_CENTRE.x, BED_LAVA_Y, BED_CENTRE.y)
-	lava.rotation.z = PI * 0.5
-	body.add_child(lava)
-	CollisionPolicy.mark_decorative(lava)
+	CalderaLavaFixture.add_bed(body, "LavaBed", BED_CENTRE, BED_HALF, BED_HEIGHT, BED_WALL, BED_LAVA_Y, FORSTERITE, 34012)
 	# The duct's inspection plate in the floor at the bed's foot.
 	var plate := SuperEgg.build_part(Vector3(0.16, 0.006, 0.16), PUMICE.darkened(0.12), 2.4, 6.0)
 	plate.material_override = SolidModel.material(PUMICE.darkened(0.12), 0.8, 0.0)

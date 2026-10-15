@@ -51,6 +51,10 @@ static func guest_spec() -> Dictionary:
 	var smoky := CalderaShell.SMOKY_GLASS
 	return {
 		"size": GUEST_SIZE,
+		# The wall heads and roof are one coordinated section: the low back wall
+		# bears the roof and the front wall rises by exactly the roof pitch.  This
+		# removes the former back-wall overlap/front-wall daylight gap.
+		"rake": tan(CalderaShell.ROOF_PITCH) * GUEST_SIZE.y,
 		"door_at": GUEST_FRONT_DOOR,
 		"stained": GUEST_STAINED,
 		"walls": {
@@ -317,7 +321,9 @@ static func _guest_rim_room(body: StaticBody3D) -> void:
 		var z := -2.0 - 2.55 * float(i)
 		CalderaFurniture.bed(body, Vector3(-3.5, 0.0, z), PI * 0.5, AMBER_CLOTH if i == 0 else CalderaFurniture.FIBRE)
 		CalderaFurniture.chest(body, Vector3(-1.9, 0.0, z), -PI * 0.5, 0.7)
-	_marker(body, "WakeMarker", Vector3(-3.5, 0.60, -2.0), 0.0)
+	# Match the bed's long axis: the wake pose lies head-to-foot on this one
+	# mattress instead of spanning sideways across the neighbouring pair.
+	_marker(body, "WakeMarker", Vector3(-3.5, 0.60, -2.0), PI * 0.5)
 	CalderaFurniture.mat(body, Vector3(-3.1, 0.0, -3.28), PI * 0.5, Vector2(1.6, 2.4), AMBER_CLOTH.darkened(0.2))
 	_rim_skyline(body, Vector3(0.14, 1.9, -3.2))
 	CalderaFurniture.concealed_light(body, Vector3(-2.6, 2.9, -3.3), CalderaFurniture.LED_WARM, 0.55, 5.0)
@@ -454,15 +460,12 @@ static func _glow(body: StaticBody3D, name_text: String, half: Vector3, at: Vect
 ## edge. Its finish is visual cladding flush with the socket plinth: the plinth
 ## is deliberately the one and only floor collider.
 static func _guest_terrace(body: StaticBody3D) -> void:
-	var terrace := MeshInstance3D.new()
+	# A broad, softly squared arrival apron in the same finish as the guest
+	# floor.  It reads as the public forecourt of a hostelry, not an unrelated
+	# pale rectangular tile pasted onto the front of the foundation.
+	var terrace := SuperEgg.build_part(Vector3(7.9, 0.035, 0.9), CalderaShell.BASALT.lightened(0.10), 10.0, 10.0)
 	terrace.name = "DryGuestTerrace"
-	var slab := BoxMesh.new()
-	slab.size = Vector3(15.5, 0.08, 1.8)
-	terrace.mesh = slab
-	var material := StandardMaterial3D.new()
-	material.albedo_color = COOL_STONE.darkened(0.12)
-	material.roughness = 0.82
-	terrace.material_override = material
+	terrace.material_override = SolidModel.material(CalderaShell.BASALT.lightened(0.10), 0.86, 0.0)
 	terrace.position = Vector3(0.0, -0.028, 6.9)
 	body.add_child(terrace)
 	CollisionPolicy.mark_decorative(terrace)

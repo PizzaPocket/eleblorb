@@ -111,6 +111,30 @@ programs are fixed inputs here.
   embedded foundation, retaining wall, buttress, or engineered cantilever.
 - Build visible foundation, collision, terrain exclusion, retaining edges, and
   drainage from the same authored footprint and site section.
+- A rounded foundation is sized by containment, not by matching nominal width
+  and depth. Check every exterior wall corner, corner post and usable apron
+  point against the actual superellipse equation; all must land on the finished
+  top with the intended reveal. Increase the plan exponent or the base size
+  until the corners clear. Matching the wall's bounding-box dimensions is not
+  enough because a SuperEgg pulls inward at its corners.
+- A foundation is never an above-floor **lipped ring** around the plan. For a
+  cut-and-fill platform, its finished top is one unobstructed level plane:
+  build the downhill face up from an embedded footing, cut the uphill ground
+  back outside the usable apron, and put any retaining wall at that cut—not as
+  a kerb enclosing the building. Break or bridge retaining work wherever a
+  door, lift, loading bay or route meets the platform.
+- Keep the entire rear wall free of terrain. Survey several points across the
+  back edge and through at least a 1.2 m inspection/reveal strip; lower or cut
+  the terrain beneath that strip and retain it beyond the strip. Checking only
+  the plot centre or hiding rock inside the wall is a failure. Raised buildings
+  need the same envelope check even when their service pier clears at centre.
+- Terrain height queries describe terrain only. Do not report a foundation,
+  floor, ramp, stair, lift deck or roof terrace through a single-valued
+  `get_mesh_height()` function: stacked architecture cannot be represented by
+  one Y for each XZ. Cut terrain collision out beneath the foundation and let
+  the built surfaces' physics own footing, landings and storeys. Overlapping
+  analytic ground and floor collision causes snapping, hopping and bodies
+  surfacing through the wrong floor.
 - `SlopeFoundation` (`scripts/slope_foundation.gd`) is the shared builder: it
   sets the deck just above the highest ground anywhere under the footprint and
   carries it on coursed, battered stone that runs down into the ground at every
@@ -134,17 +158,52 @@ SuperEgg forms and superellipse outlines are the defining visual language of thi
 - **Floors and ceilings.** A rounded slab leaves open corners at the walls, so floors use plain slabs that fill to the wall.
 - **Wall planes.** Walls are single solid slabs with Boolean-punched superellipse openings (`SolidModel`), so there is no tiled seam.
 - **Seams between rounded solids** (the ridge of a gable, a wall corner, the joint of two rafters): do not leave the gap. Either **Boolean-subtract** the overlap so the cut faces meet in one solid line (roof slabs are cut where they reach the ridge so they meet along it with no gap and no overlap, then baked), or bury the seam under a square-edged SuperEgg cap (ridge beam, corner post) that spans it.
+- **Glazing fitted into curved shells uses the cutter as its source.** Punch the
+  aperture with one closed Boolean volume, then derive the glass by intersecting
+  that same volume with the shell's outer boundary and subtracting the inner
+  boundary (the spaceship windows are the precedent). Never independently
+  scale a decorative pane until it approximately covers the hole: the mismatch
+  reads as stretched glass, roof intrusion or a floating rim.
+- **Flush clipped junctions share one plane and one datum.** When a sloped
+  SuperEgg slab meets a level slab, canopy, landing or second roof, extend both
+  through one authored junction plane and Boolean-cut both at that exact plane.
+  Calculate both cut-edge heights from the same section datum; never position
+  the pieces independently or hide a small step with overlap. Their clipped
+  faces must be coplanar and their exposed surface edges must meet on one exact
+  line, with no vertical ledge, gap or double thickness. Matching elevation is
+  only half the check: compare the complete cut profile, including width and
+  both side-edge endpoints. Equal maximum slab widths do not prove a flush join
+  because a SuperEgg narrows according to where the plane cuts its rounded end.
+- **A half-SuperEgg is actually clipped.** For a dome, canopy, terrarium or
+  half-shell with a flat spring line, cut the SuperEgg at that plane and cap
+  the cut (`SuperEgg.build_clipped_mesh`); never bury a complete SuperEgg in a
+  roof or plinth. The buried lower half remains visible from below as a hanging
+  bowl and is still the wrong section even when the exterior silhouette passes.
+- **A named centerpiece controls the room.** Size and place it before secondary
+  furniture, then compose seating, sightlines and circulation around it. A
+  civic terrarium, council object or ritual installation that reads as a small
+  display case against a leftover wall has failed its hierarchy even if every
+  required object technically exists. Render an eye-level interior view that
+  includes the centerpiece and the principal entry or seating before approval.
 - **Free wall ends and T-junctions.** A slab wall that simply stops, or meets another wall at a T, shows a bare cut edge. Cap every such end with a small square-edged SuperEgg post the full height of the wall (`TownProps.build_interior_wall` does this for interior walls; exterior corners already use corner posts), so it reads as a pilaster or a post and never as a cut slab.
 - **Gap-fillers and hidden structure:** collision proxies, ground fills, wedges of gable infill, anything the player cannot see.
 - Large ground paint (worn paths, cobbles) is a decal, not geometry.
 
-**The test.** Squint at any element more than a metre across. If a prominent edge is a hard rectangle and nothing structural forces it, rebuild it as a SuperEgg or superellipse. If a rounded element leaves a gap against its neighbour, fix the seam with a Boolean cut or a square cap. Never ship the middle ground of a rounded rectangle slab that merely looks like a box and does not join its neighbours. Never leave a wall ending bare.
+**The test.** Squint at any element more than a metre across. If a prominent edge is a hard rectangle and nothing structural forces it, rebuild it as a SuperEgg or superellipse. If a rounded element leaves a gap against its neighbour, fix the seam with a Boolean cut or a square cap. Inspect every clipped join along the seam from both directions: a height difference that is merely small still fails. Never ship the middle ground of a rounded rectangle slab that merely looks like a box and does not join its neighbours. Never leave a wall ending bare.
 
 ## 2. Town planning principles
 
 - **Hierarchy of ways.** One main road (arrival road), a few lanes off it, then service tracks and yard aprons. Widths: road 4 m, lane 2.5 to 3 m, service 2 m. Paths run along desire lines between real destinations: a door, a gate, a well, a bench, a stall, a yard, the green. **Every path ends at a destination, and wherever two worn areas lie close together they are joined**, because the people who made them walk between the two. Plan the circulation first (who goes from where to where, and by what route), then draw the worn ground along those flows. Never leave a small strip of unworn grass between a path and another path, a worn yard, a doorstep or a gate that traffic obviously crosses; and never run a path toward a destination and stop short of it. A path does not need to continue past its destination.
 - **Public heart.** One green or square, irregular, with the well or fountain off-centre of the routes. Civic building and market face it. Nothing turns its back on it except service buildings.
 - **Frontage.** A building's front door faces the way people arrive (road, green or lane), never a neighbour's wall or a fence. The rear faces the yard, garden or service lane and carries the back door where the program needs one.
+- **Docked frontage.** Where a private building is added to shared raised
+  infrastructure, its front wall and threshold are designed from the shared
+  route datum. Provide a level two-metre landing on the building's own
+  platform, a visible movement joint at the public/private boundary, and a
+  perpendicular approach. Split or stop the public floor collider where the
+  private platform takes over; two coplanar colliders under one doorway are a
+  locomotion bug. Side and rear exterior doors need their own platform route,
+  or they must be changed to windows or walls—never retained as doors onto air.
 - **Orientation of civic objects.** Notice boards, wells, benches and signs face the approach that reads them (the square, the road), standing beside circulation, not in it.
 - **Spacing.** At least 4 m between neighbouring buildings where people must pass, never less than 3 m. Never overlap footprints. Eaves overhang adds 0.3 m each side: measure to the eave, not the wall. Leave 1.5 m behind a stall for the seller and 2 m in front for customers.
 - **Market.** One continuous frontage along the green: stalls in a row, the steward's hall at the head, the noisy forge at one end, food near the inn. Stalls belong to a named seller whose shop or house is directly behind them. Orphan stalls with no seller are clutter.
@@ -253,9 +312,36 @@ posts can still be recorded with `ClearZones.add_support`.
   width. The validator walks registered routes with a person-sized cylinder:
   1.1 m wide along corridors (`ClearZones.add_lane` radius 0.55), a body's width
   through doorways.
+- **Schedule the complete door, not just its opening.** For every doorway,
+  write down: why it closes; leaf type (swing, pair, sliding/pocket,
+  sectional/overhead, curtain, or no leaf/open arch); which room it opens
+  into; hinge side as seen from that room; the fully-open leaf position; and
+  clear width after the frame and open leaf. Choose the hinge so the handle is
+  reached from the natural approach and the parked leaf lies against a wall,
+  never across the onward route. A plan that records only an opening width is
+  unfinished.
+- **Clear aperture means clear in the finished state.** A hung leaf's
+  collision, frame and jamb all count against passage. The 0.4 m-radius player
+  capsule must pass from both approach directions with ordinary off-centre
+  steering; a centre ray proves only that the middle line is empty. Sweep the
+  actual capsule through the built opening and its approach after furniture,
+  ramps and rails exist.
+- **A corridor never absorbs a door swing.** Keep its full required clear
+  width continuously. Swing a room door into the room it serves, use a pocket
+  or surface slider where wall space exists, or leave a framed arch where
+  privacy, heat, noise, smell and security do not require closure. A loading
+  bay uses paired leaves only when there is room to park both; otherwise use a
+  sliding or sectional overhead door. Never hang one enormous leaf across an
+  apron, passage, ramp, or loading route.
 - **Ramps**: 2.0 m of headroom along the whole run (a deck or beam over a ramp's
   upper half is the usual failure), a landing at each end, and nothing standing
   in either foot.
+- **Size a tilted ramp by its true slope length.** If the plan run is `r` and
+  the rise is `h`, the slab's long dimension is `sqrt(r*r + h*h)`, not `r`.
+  Rotating a slab sized only to the plan run shortens its horizontal projection,
+  so its rounded ends miss both landing planes even when its centre and angle
+  are correct. Clip or extend both ends to the shared landing planes, then
+  verify the standing route against the authored ramp collider.
 - **Door frames and jamb ends bury only in the floor they stand on.** An interior
   frame sinks 0.04 m; on an upper floor a deeper sink shows as pipes below the
   ceiling of the room underneath.
@@ -355,6 +441,28 @@ Placement and services:
   valley, low point, drain, chimney penetration, dormer, and junction with a
   secondary mass. If these lines cannot be drawn cleanly in plan and section,
   the roof form is unresolved and should not be generated yet.
+- **Roof section is exact at every bearing.** A raked roof and its front, back
+  and side wall heads share one height function. Derive each wall top, corner
+  post, clerestory wedge and roof transform from that function; do not pitch a
+  slab above level walls and accept a gap at the high side or an overlap at the
+  low side. Rounded slab undersides also need an explicit bearing check at wall
+  corners, not merely at the centreline.
+- **A visible walkable terrace gets one flat contact surface.** Decorative
+  pavers over a rounded roof do not make that roof flat. Give the visible paving
+  a matching parkour collider and ensure neither analytic terrain nor another
+  curved collider competes beneath it. Walk the full surface and every doorway
+  with the player capsule; any repeated hop, hover, snap or floor transition is
+  a failed section/collision audit.
+- **Audit support handoff, not merely aperture clearance.** When a walkthrough
+  reports that movement stops and the figure remains in an airborne/jump pose
+  while crossing between rooms, do not redesign the door from that symptom.
+  First inspect the floor-contact state across the whole route: adjacent room
+  slabs, ramps, landings, plinths and terrain must hand the character one
+  continuous walkable support. A stationary capsule fitting through the opening
+  is insufficient proof. Exercise the real locomotion controller across the
+  joint and verify that grounded support, horizontal travel and the walking pose
+  persist; tolerate a very short downward support probe across flush physics
+  seams rather than treating a one-frame `is_on_floor()` flicker as airborne.
 - **Shutters** belong on narrow casements only, on dwellings and inns, never on halls, workshops, sheds or wide windows. By default they are drawn open, lying flat against the wall either side of the window like the covers of an open book, never swung out into the street, each with a raised panel and a small cut (a diamond) so the visible face has life. A wide window gets mullions, a hood mould and a window box instead; a pair of giant shutters is absurd and hides signs.
 - **Openings** are punched through thick walls and framed on both faces. Windows serve rooms: large windows on the front main room, small ones to service rooms and the rear, one gable light for an occupied upper room. Never put a window where furniture, a flue or a sign covers it. No windows on the hearth wall.
 - **Entries by purpose:** pent canopy for homes, a gabled portico with pediment for the hall, a deep awning over a forge, a hooded cart bay for mills, a shop awning for a bakery, a veranda for an inn. Every roof falls away from the wall. Posts are square, reach their beam and never stand in front of a door.
@@ -367,7 +475,12 @@ Placement and services:
 - **Every room is reachable.** No door opens onto a wall, a bench, a bed or another room's door; every room has a door from a circulation space (hall, landing, corridor, or the room it belongs to); check each door's 1.2 m by 2 m clear zone on both sides before placing furniture.
 - **Circulation first, furniture second.** Draw the routes (door to hearth, door to stairs, door to each room) and keep 1.2 m clear on them; then place furniture around the routes against the walls. Nothing blocks a door swing or the foot of a ramp.
 - **Furniture rules.** Beds: head to the wall, 0.6 m access on at least one long side. Toilets: back to a wall, 0.6 m clear either side and in front. Tables: 0.8 m clear all round. Counters: 1.0 m behind, 1.2 m in front. Hearth: 1.2 m clear in front. A chest or shelf stands against a wall.
-- **A ramp needs the depth for its run.** A 32 degree ramp climbing 3.25 m runs 5.2 m, plus 0.9 m before it and a clear landing of at least 1.2 m (prefer 3 m) at its head, where you step off onto the floor with nothing in the way: a house with a stair is at least three cells (9.6 m) deep. Rails are balustrades (a top rail on slender posts), never slabs, along the sides that are open, **not** across the head; the ramp never ends against a wall.
+- **A ramp needs the depth for its run.** A 32 degree ramp climbing 3.25 m runs 5.2 m, plus 0.9 m before it and a clear landing of at least 1.2 m (prefer 3 m) at its head, where you step off onto the floor with nothing in the way: a house with a stair is at least three cells (9.6 m) deep. Rails are balustrades (a top rail on slender posts), never slabs, along the sides that are open, **not** across the head; the ramp never ends against a wall. Along a curved ramp or gallery, fabricate each uninterrupted top rail as one continuous swept pipe with shared curve vertices. Never expose the path tessellation as a row of short, stumpy beam segments. Break the pipe only at an intentional gate, dock, doorway or junction throat, and give the guard collision.
+- **A walkway is a swept solid.** Audit its centre and both edges with the real
+  deck thickness, guard envelope and player capsule. No part may clip terrain
+  or a building. Only its open endpoint may share a deliberately flush landing
+  plane; where a transparent landing needs a terrain socket, the socket clears
+  the underside of the slab as well as its walking surface.
 - **Stair or ramp placement.** Near the entry or the hearth stack, entered from a hall or lobby, with clear landings. It opens into the upper floor through a **superellipse hole**, rails on the open sides, headroom 2.0 m.
 - **Light.** Every occupied room has a window. Work surfaces sit near light.
 - **Privacy gradient.** Public (common room, workshop, hall), then semi-private (kitchen, office), then private (bedrooms, owner's room).
@@ -570,6 +683,10 @@ The rules now:
 - **Roofs come only from the shared construction:** `TownProps.roof_slab` and
   `build_ridge_slab`, through a kit such as `StiltRoofs`. Never a bare
   `SuperEgg.build_part` slab.
+- **Existing Fishing Village roofs remain retrofit debt.** Their current hip,
+  gable, pent and shelter roofs predate the flush-clipped-junction rule. Audit
+  and rebuild their visible junctions from shared SuperEgg slabs whose cut
+  faces meet on exact common planes; passing the old proof does not waive this.
 - **A kit never redefines a shared construction constant.** It reads it:
   `StiltRoofs.THICKNESS` is `TownProps.ROOF_THICKNESS`.
 - **Render each new building beside an Ohio house at the same scale** before
@@ -580,4 +697,3 @@ The rules now:
 **There is never a placeholder builder.** A placeholder built the rest point
 and its keeper on every houseboat. The village now refuses to build a plan
 structure that has no real builder.
-

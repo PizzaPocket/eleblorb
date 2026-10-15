@@ -5,6 +5,12 @@ systems into one coherent surface and submerged layout. It fixes relationships,
 route hierarchy, approximate footprints, and implementation constraints. Exact
 building architecture follows only after this civic plan is approved.
 
+**Public-realm revision built (2026-10-09).** The reservoir is now a nested
+central lava bowl within a shallower inhabited volcanic bowl. Outer circulation
+is an independently supported **Caldera Highline**, not terrain grading. The
+Civic architecture redesign remains deferred until its Highline dock is
+settled.
+
 Read with `fire_caldera_city.md`. That document owns the community, census,
 physiology, cultural practices, architectural charter, and individual building
 programs. This document owns where those programs meet the caldera.
@@ -15,18 +21,21 @@ The current terrain supplies these fixed facts:
 
 - kingdom gate center: `Vector2(0, -3)`;
 - caldera and proposed reservoir center: `Vector2(155, 85)`;
-- level caldera floor radius: 72 m;
-- village safe-zone radius: 58 m, with the existing extra protected margin;
+- inhabited bowl radius: approximately 108 m before the coarse wall seam;
+- village safe-zone radius: 120 m, protecting the settlement through the true
+  crater lip;
 - crater rim radius: 112 m and outer volcanic mass radius: 205 m;
-- caldera floor elevation: -16 m;
+- inhabited-bowl vertex elevation: 30 m, following a parabola to the 48 m
+  crater lip;
 - terrain sampling: approximately 15 m inside the kingdom's current 121-sample
   mesh, too coarse for the final reservoir bank and settlement terraces.
 
-The present `_terrain_height()` also forces the whole 72 m caldera floor to one
-elevation, `-16 m`. That is a placeholder condition, not the final city ground.
-The new localized caldera mesh must establish the reservoir basin, sloping
-terraces, route grades, and building sockets together. Buildings must not be
-placed first and lowered afterward until they appear to touch.
+The localized caldera mesh establishes two explicit paraboloids. The inhabited
+bowl is `y = 30 + 18(r/112)^2`; inside the organic reservoir outline, a second
+parabola meets that surface at the bank and falls to the central lava bed.
+There is no flat settlement floor or linear grade band. Ground buildings use
+the outer curve; elevated buildings remain separate from it. Buildings are
+never lowered afterward merely until they appear to touch.
 
 The plan uses a local coordinate frame centered on the reservoir:
 
@@ -42,6 +51,46 @@ This frame makes the arrival sequence legible without forcing the city into a
 perfectly radial composition.
 
 ## 1a. Topography and foundation system
+
+### Caldera Highline
+
+**Fixed:** the people preserve the natural volcanic bowl. The perimeter route
+is civic architecture: a level annular deck on sparse branching steel frames,
+with the original ground continuing below it. Terrain height, deck height and
+building floors remain separate collision systems. The lower reservoir
+promenade remains a distinct public realm. The Lava Kingdom debug start equips
+the Lava Helm so dry and molten routes can both be inspected.
+
+**Built first fit:** the Highline centre follows radius 72 m, is 4.8 m wide,
+and has finished world floor elevation 42.5 m. It widens into SuperEgg docking
+platforms only beneath buildings whose entrances share one level. Nahl, Vara,
+Civic and Iren are ring-docked Highline buildings; the gate inn is the fifth
+raised building, on a matching supported platform beside the true gate rather
+than at the far end of a scenic ramp. Oren, Kel and Aro retain split
+sections keyed to the natural slope. Renewal is a glass public deck with two
+Highline byways landing on opposite sides and one broad immersion tongue. Oren's
+roof terrace receives a curved dock at its existing lift landing, and Kel's
+upper home receives its own continuous frontage ribbon. The true gate is the
+multicolour Tempering Gate on the crater lip at local `(0,-112)` and a curved
+arrival gallery descends to the ring. Public overlooks and connectors occur as deliberate stations rather
+than making the whole ring broad and land-like.
+
+Every elevated building is carried by a broad concave-waisted superelliptic
+service pier. Its upper perimeter follows the building foundation, its buried
+foot disappears into the bowl, and inset glowing risers express the lava-power
+channels within. These piers replace generic post clusters beneath private
+platforms.
+
+**Proposed molten-route first fit:** the reservoir grows from a 30 m to a 40 m
+mean radius, with a focused 5 m Renewal-side lobe. Renewal moves outward to
+local `(-49.8,-4.7)` and the other buildings move toward the rim, retaining a
+narrow natural bank between lava and slope-integrated architecture. A Lava-Helm
+traversal capture must confirm the widened underwater approach.
+
+**Open:** final gate and access section; guard and shade treatment; exact
+locations of overlook widenings and vertical connectors; Civic redesign; and
+whether any craft building should later receive a small freight dock without
+changing its natural-grade primary section.
 
 The lava people have developed a foundation system suited to moving heat,
 sloped volcanic rock, and precise modern construction. It is expressed as part
@@ -333,6 +382,32 @@ and Vara; no bridge cuts across the reservoir center or blocks the arrival view.
   spawned to populate the submerged district.
 - Returning to the surface is possible from all three entries and through at
   least two directions in the lower loop.
+
+### Raised civic tier revision (2026-10-09)
+
+The Highline is now the settlement's upper civic street at world Y 42.5, not a
+low shelf behind the buildings. Guest, Nahl, Vara, Civic and Iren stand outside
+the ring with their reservoir-facing front doors docked to its outer edge;
+Guest occupies the higher gate datum at world Y 49.5.
+Their enlarged platforms are private additions to the shared structure and
+own their doorway landings; a coloured expansion joint records the boundary.
+The ring floor is transparent structural glass with steel mullions and guards,
+opened only at authored docks.
+
+Oren, Kel and Aro remain terrain-following buildings below and sit inward
+beneath the upper tier. The lava mean radius is 52 m. A long curved
+arrival gallery descends from the true south-lip gate. Two curved glass byways
+approach Renewal from opposite sides; the renewal deck, guarded immersion
+tongue and concave service pier share the Highline's architectural language.
+The former bulky rock platform and stepped ghat are retired. The former
+diagonal Iren–Civic bridge and its two redundant exterior doors are also
+retired: both properties now connect through the shared Highline. Ring and ramp
+glass guards own collision, and the first and last ramp bays open at junction
+throats rather than placing a railing across the desired path. Guard top rails
+are continuous bent pipes along each uninterrupted run, never a visible chain
+of short tessellation segments. Each graded deck is likewise one continuous
+mesh and collision ribbon; constant-grade profiles and level junction throats
+replace the former chain of overlapping slab colliders.
 
 ## 11. Implementation contract
 

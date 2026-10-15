@@ -18,6 +18,9 @@ const DEFAULT_RINGS := 64
 @export var hole_from := Vector2.ZERO
 @export var hole_to := Vector2.ZERO
 @export var hole_radius := 0.0
+## Circular visual exclusions supplied by a world's terrain. Each Vector4 is
+## (world x, world z, radius, unused); sixteen covers every current kingdom.
+var circle_holes := PackedVector4Array()
 
 
 func _ready() -> void:
@@ -40,6 +43,39 @@ func configure_hole(from: Vector2, to: Vector2, radius: float) -> void:
 	hole_from = from
 	hole_to = to
 	hole_radius = radius
+	_update_hole_uniforms()
+
+
+## Adds world-space circular footprints where the sea surface must not render:
+## volcanic mouths, deep inland lakes, or other enclosed basins. This is a
+## visual mask only; it does not change water physics or terrain.
+func configure_holes(footprints: Array[Dictionary]) -> void:
+	circle_holes.clear()
+	for i in mini(footprints.size(), 16):
+		var footprint: Dictionary = footprints[i]
+		var centre: Vector2 = footprint["centre"]
+		circle_holes.append(Vector4(centre.x, centre.y, float(footprint["radius"]), 0.0))
+	_update_hole_uniforms()
+
+
+func _update_hole_uniforms() -> void:
+	var material := material_override as ShaderMaterial
+	if material == null:
+		return
+	material.set_shader_parameter("hole_enabled", hole_enabled)
+	material.set_shader_parameter("hole_from", hole_from)
+	material.set_shader_parameter("hole_to", hole_to)
+	material.set_shader_parameter("hole_radius", hole_radius)
+	material.set_shader_parameter("circle_hole_count", circle_holes.size())
+	material.set_shader_parameter("circle_holes", _shader_holes())
+
+
+func _shader_holes() -> PackedVector4Array:
+	var padded := PackedVector4Array()
+	padded.resize(16)
+	for i in circle_holes.size():
+		padded[i] = circle_holes[i]
+	return padded
 
 
 func _build_material() -> ShaderMaterial:
@@ -51,6 +87,8 @@ uniform bool hole_enabled = false;
 uniform vec2 hole_from;
 uniform vec2 hole_to;
 uniform float hole_radius;
+uniform int circle_hole_count = 0;
+uniform vec4 circle_holes[16];
 void fragment() {
 	vec3 world = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	vec2 here = vec2(world.x, world.z);
@@ -58,6 +96,11 @@ void fragment() {
 	float along = clamp(dot(here - hole_from, span) / max(dot(span, span), 0.0001), 0.0, 1.0);
 	if (hole_enabled && distance(here, hole_from + span * along) < hole_radius) {
 		discard;
+	}
+	for (int i = 0; i < 16; i++) {
+		if (i < circle_hole_count && distance(here, circle_holes[i].xy) < circle_holes[i].z) {
+			discard;
+		}
 	}
 	vec3 deep_blue = vec3(0.055, 0.31, 0.53);
 	vec3 sky_blue = vec3(0.16, 0.52, 0.72);
@@ -73,4 +116,6 @@ void fragment() {
 	material.set_shader_parameter("hole_from", hole_from)
 	material.set_shader_parameter("hole_to", hole_to)
 	material.set_shader_parameter("hole_radius", hole_radius)
+	material.set_shader_parameter("circle_hole_count", circle_holes.size())
+	material.set_shader_parameter("circle_holes", _shader_holes())
 	return material

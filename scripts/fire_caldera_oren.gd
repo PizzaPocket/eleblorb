@@ -11,9 +11,9 @@ extends RefCounted
 ##     the top like the colour zoning of a geode (teal over the assay room); a
 ##     few larger cast blocks set into it are the display cells, each holding
 ##     one lit stone;
-##   - the home above looks out through clear glass behind a screen of
-##     vertical dichroic fins, whose colour turns teal, violet and gold with
-##     the angle, the play of colour in labradorite or opal.
+##   - the home above looks out through clear glass behind narrow vertical
+##     dichroic SuperEgg fins, whose colour turns teal, violet and gold with the
+##     angle, the play of colour in labradorite or opal.
 ##
 ## Split level (approved 2026-10-07). The plot rises 1.35 m from the counter
 ## front to the service loop behind, so the shop stands at the promenade's
@@ -42,8 +42,10 @@ const FLOOR := Color(0.30, 0.28, 0.27)
 const PARTITION := FireCalderaBuildings.BASALT_PARTITION
 const INNER_DOOR_WIDTH := FireCalderaBuildings.INNER_DOOR_WIDTH
 const INNER_DOOR_HEIGHT := FireCalderaBuildings.INNER_DOOR_HEIGHT
-const WALL_Z_FRONT := 1.0
-const WALL_Z_BACK := -0.4
+## A true 2 m service passage. The former 1.4 m strip met the nominal minimum
+## on paper but became impassable once a leaf opened into it.
+const WALL_Z_FRONT := 1.3
+const WALL_Z_BACK := -0.7
 const RAMP_TOP_X := 1.2
 const RAMP_FOOT_X := 5.2
 const ASSAY_DOOR_X := 5.85
@@ -53,6 +55,7 @@ const RECEIVING_INNER_DOOR_X := -6.0
 const RECEIVING_DOOR_X := -6.0
 const GEM_DOOR_X := 0.0
 const HOME_DOOR_Z := 1.2
+const LIFT_HEADROOM := 2.7
 
 
 static func spec_ground() -> Dictionary:
@@ -72,7 +75,7 @@ static func spec_ground() -> Dictionary:
 			# door on the workshop's raised floor.
 			"back": [
 				{"to": 1.2, "kind": "stone", "band": -1},
-				{"to": 3.8, "kind": "door", "band": -1, "sill": RAISE, "clear": 2.0, "height": 2.3, "label": "receiving door"},
+				{"to": 3.8, "kind": "door", "band": -1, "sill": RAISE, "clear": 2.0, "height": 2.3, "door_type": "overhead", "label": "receiving door"},
 				{"to": 8.5, "kind": "stone", "band": -1}, {"to": 15.0, "kind": "stone", "band": -1},
 			],
 			"west": [
@@ -173,8 +176,7 @@ static func _furnish(body: StaticBody3D, upper: StaticBody3D) -> void:
 		CalderaFurniture.piece(upper, Vector3(0.36, 0.22, 0.3), CalderaShell.BASALT.lightened(0.08), Vector3(-3.0 + side * 1.0, 0.22, 3.4), 0.0, true, SuperEgg.EPSILON_SOFT)
 	# A lava bed each: a cast basalt basin the lava fills from beneath.
 	for x: float in BED_XS:
-		CalderaFurniture.piece(upper, Vector3(1.1, 0.28, 0.55), CalderaShell.BASALT, Vector3(x, 0.28, BED_Z), 0.0, true, 4.0)
-		FireCalderaBuildings._glow(upper, "BedLava", Vector3(0.95, 0.02, 0.42), Vector3(x, BED_LAVA, BED_Z), Color(1.0, 0.42, 0.08))
+		CalderaLavaFixture.add_bed(upper, "LavaBed", Vector2(x, BED_Z), Vector2(1.1, 0.55), 0.56, 0.13, BED_LAVA, CalderaShell.BASALT, 35000 + int(x * 10.0))
 		CalderaFurniture.concealed_light(upper, Vector3(x, 1.0, BED_Z), Color(1.0, 0.55, 0.22), 0.8, 4.0)
 	# The pantry: shelves of Savi's mineral delicacies.
 	CalderaFurniture.shelves(upper, Vector3(4.0, 0.0, -5.6), PI, 2.4, 3, stones)
@@ -396,9 +398,9 @@ static func _brick_wall(body: StaticBody3D, from: Vector2, to: Vector2, deep: Co
 		CollisionPolicy.mark_decorative(stone)
 
 
-## The home's screen: vertical dichroic glass fins standing off the front
-## glass, turned a little toward the reservoir, their colour shifting with the
-## angle of view.
+## The home's original close-spaced fin screen, retained in its narrow width,
+## vertical orientation and alternating cant.  Each former rectangular fin is
+## now a thin, squarish glass SuperEgg slab rather than a grid of thick blocks.
 static func _dichroic_fins(upper: StaticBody3D) -> void:
 	var material := ShaderMaterial.new()
 	material.shader = _dichroic_shader()
@@ -406,24 +408,21 @@ static func _dichroic_fins(upper: StaticBody3D) -> void:
 	var x1 := SHELL_CENTRE.x + SHELL_SIZE.x * 0.5 - 0.3
 	var count := int((x1 - x0) / 0.7) + 1
 	for i in count:
-		var x := lerpf(x0, x1, float(i) / float(count - 1))
 		var fin := MeshInstance3D.new()
-		fin.name = "DichroicFin"
-		var box := BoxMesh.new()
-		box.size = Vector3(0.03, CalderaShell.STOREY - 0.3, 0.5)
-		fin.mesh = box
+		fin.name = "DichroicSuperEggFin"
+		fin.set_meta("dichroic_fin", true)
+		fin.mesh = SuperEgg.build_mesh(Vector3(0.015, (CalderaShell.STOREY - 0.3) * 0.5, 0.25), 8.0, 8.0, 10, 32)
 		fin.material_override = material
-		fin.position = Vector3(x, (CalderaShell.STOREY - 0.3) * 0.5 + 0.1, SHELL_SIZE.y * 0.5 + 0.4)
+		fin.position = Vector3(lerpf(x0, x1, float(i) / float(count - 1)), (CalderaShell.STOREY - 0.3) * 0.5 + 0.1, SHELL_SIZE.y * 0.5 + 0.4)
 		fin.rotation.y = deg_to_rad(28.0)
 		upper.add_child(fin)
 		CollisionPolicy.mark_decorative(fin)
-	# The fins' heads and feet: two slim blued-steel rails.
 	for y: float in [0.1, CalderaShell.STOREY - 0.2]:
 		CalderaShell._metal(upper, Vector3((x0 + x1) * 0.5, y, SHELL_SIZE.y * 0.5 + 0.4), Vector3(x1 - x0 + 0.3, 0.05, 0.08), CalderaShell.STEEL_BLUED, false)
 
 
 ## The roof terrace: a cast upstand round the roof's edge with a balustrade
-## of dichroic glass on it (the fins' glass), open on the east side where the
+## of dichroic glass on it (the screen's glass), open on the east side where the
 ## lift arrives; two seats and a low table looking over the reservoir.
 const LIFT_AT := Vector2(7.62, 3.7)
 const LIFT_SIZE := Vector2(1.66, 1.6)
@@ -474,7 +473,9 @@ static func _parapet(upper: StaticBody3D) -> void:
 	paving.material_override = SolidModel.material(Color(0.58, 0.55, 0.52), 0.85, 0.0)
 	paving.position = Vector3(SHELL_CENTRE.x, top + 0.01, 0.0)
 	upper.add_child(paving)
-	CollisionPolicy.mark_decorative(paving)
+	# The visible terrace is also its single flat walking authority; relying on
+	# the rounded SuperEgg roof beneath made the character hop along its crown.
+	CollisionPolicy.add_box(upper, paving, slab.size, paving.position, Basis(), true)
 	# Seats round two low tables toward the reservoir, a flame in glass at
 	# each end of the group for the evenings.
 	for x: float in [-4.0, 0.5]:
@@ -493,12 +494,14 @@ static func _lift(body: StaticBody3D) -> void:
 	var top := UPPER + roof_top()
 	var glass := ShaderMaterial.new()
 	glass.shader = _dichroic_shader()
+	var canopy_y := top + LIFT_HEADROOM + 0.05
 	for corner: Vector2 in [Vector2(-1, -1), Vector2(1, -1), Vector2(-1, 1), Vector2(1, 1)]:
 		var p := LIFT_AT + Vector2(corner.x * (LIFT_SIZE.x * 0.5 + 0.06), corner.y * (LIFT_SIZE.y * 0.5 + 0.06))
-		CalderaShell._metal(body, Vector3(p.x, (top + 1.2) * 0.5, p.y), Vector3(0.1, top + 1.2, 0.1), CalderaShell.STEEL_BLUED, true)
-	CalderaShell._metal(body, Vector3(LIFT_AT.x, top + 1.2, LIFT_AT.y), Vector3(LIFT_SIZE.x + 0.3, 0.1, LIFT_SIZE.y + 0.3), CalderaShell.STEEL_BLUED, false)
+		CalderaShell._metal(body, Vector3(p.x, canopy_y * 0.5, p.y), Vector3(0.1, canopy_y, 0.1), CalderaShell.STEEL_BLUED, true)
+	var canopy := CalderaShell._metal(body, Vector3(LIFT_AT.x, canopy_y, LIFT_AT.y), Vector3(LIFT_SIZE.x + 0.3, 0.1, LIFT_SIZE.y + 0.3), CalderaShell.STEEL_BLUED, false)
+	canopy.name = "LiftCanopy"
 	var heights: Array[float] = [0.0, UPPER, top]
-	var names: Array[String] = ["Ground", "Home", "Roof terrace"]
+	var names: Array[String] = ["Ground", "Home", "Roof"]
 	var lift := CalderaLift.build(body, LIFT_AT, LIFT_SIZE, heights, names, 1, ["east", "north"], glass)
 	# A fixed plate bridging from the roof's edge to the lift at the top stop.
 	var edge := SHELL_CENTRE.x + SHELL_SIZE.x * 0.5
@@ -570,18 +573,27 @@ static func _ground_partitions(body: StaticBody3D) -> void:
 	var x1 := SHELL_CENTRE.x + SHELL_SIZE.x * 0.5
 	# The corridor's front wall, from the shop's floor: one door, at the
 	# assay room, where the ramp has come down.
-	_wall_with_doors(body, Vector2(x0, WALL_Z_FRONT), Vector2(x1, WALL_Z_FRONT), 0.0, [[ASSAY_DOOR_X, "assay door"]])
+	_wall_with_doors(body, Vector2(x0, WALL_Z_FRONT), Vector2(x1, WALL_Z_FRONT), 0.0, [
+		{"at": ASSAY_DOOR_X, "label": "assay passage", "type": "arch"},
+	])
 	# The corridor's back wall, from the workshop's raised floor: receiving,
 	# the stock store, the studio.
-	_wall_with_doors(body, Vector2(x0, WALL_Z_BACK), Vector2(x1, WALL_Z_BACK), RAISE, [[RECEIVING_INNER_DOOR_X, "receiving inner door"], [STORE_DOOR_X, "stock store door"], [STUDIO_DOOR_X, "studio door"]])
+	_wall_with_doors(body, Vector2(x0, WALL_Z_BACK), Vector2(x1, WALL_Z_BACK), RAISE, [
+		{"at": RECEIVING_INNER_DOOR_X, "label": "receiving passage", "type": "arch"},
+		{"at": STORE_DOOR_X, "label": "stock store door", "type": "sliding", "width": 1.4, "park_right": false},
+		{"at": STUDIO_DOOR_X, "label": "studio passage", "type": "arch"},
+	])
 	# Between the workshop's rooms.
 	for x: float in [-3.5, -0.5]:
 		_wall_with_doors(body, Vector2(x, -SHELL_SIZE.y * 0.5), Vector2(x, WALL_Z_BACK), RAISE, [])
-	# The gem store: walls on three sides, its forged door onto the lobby
-	# (z 1..2) that joins the counter and the assay room.
+	# The gem store: walls on three sides, its forged door onto a genuine
+	# 1.7-metre lobby (z 1.3..3.0).  The former 0.7-metre slot was visibly a
+	# hallway but physically narrower than the player capsule.
 	for x: float in [-1.5, 1.5]:
-		_wall_with_doors(body, Vector2(x, 2.0), Vector2(x, SHELL_SIZE.y * 0.5), 0.0, [])
-	_wall_with_doors(body, Vector2(-1.5, 2.0), Vector2(1.5, 2.0), 0.0, [[GEM_DOOR_X, "gem store door"]])
+		_wall_with_doors(body, Vector2(x, 3.0), Vector2(x, SHELL_SIZE.y * 0.5), 0.0, [])
+	_wall_with_doors(body, Vector2(-1.5, 3.0), Vector2(1.5, 3.0), 0.0, [
+		{"at": GEM_DOOR_X, "label": "gem store door", "type": "sliding", "width": 1.6, "park_right": true},
+	])
 
 
 ## Partitions above: the shared front room (receiving and shaping, its glass
@@ -604,19 +616,26 @@ static func _wall_with_doors(body: StaticBody3D, from: Vector2, to: Vector2, bas
 	var fixed := from.y if along_x else from.x
 	var height := CalderaShell.STOREY - base
 	var cursor := start
-	for door: Array in doors:
-		var at: float = door[0]
-		var low := at - INNER_DOOR_WIDTH * 0.5 - 0.3
-		var high := at + INNER_DOOR_WIDTH * 0.5 + 0.3
+	for door_data in doors:
+		var door: Dictionary = door_data if door_data is Dictionary else {"at": door_data[0], "label": door_data[1], "type": "swing"}
+		var at: float = door["at"]
+		var clear: float = float(door.get("width", INNER_DOOR_WIDTH))
+		var low := at - clear * 0.5 - 0.3
+		var high := at + clear * 0.5 + 0.3
 		if low - cursor > 0.05:
 			_partition(body, cursor, low, fixed, along_x, base, height)
 		var mid := (low + high) * 0.5
 		var origin := Vector3(mid, base, fixed) if along_x else Vector3(fixed, base, mid)
-		CalderaShell.door_opening(body, origin, 0.0 if along_x else PI * 0.5, high - low, height, 0.18, INNER_DOOR_WIDTH, INNER_DOOR_HEIGHT, 1, PARTITION)
+		var door_type := str(door.get("type", "swing"))
+		var yaw := 0.0 if along_x else PI * 0.5
+		var has_swing_leaf := door_type == "swing"
+		CalderaShell.door_opening(body, origin, yaw, high - low, height, 0.18, clear, INNER_DOOR_HEIGHT, 1 if has_swing_leaf else 0, PARTITION)
+		if door_type == "sliding":
+			CalderaShell.open_sliding_door(body, origin, yaw, clear, INNER_DOOR_HEIGHT, bool(door.get("park_right", true)))
 		var point := Vector2(at, fixed) if along_x else Vector2(fixed, at)
 		var normal := Vector2(0, 1) if along_x else Vector2(1, 0)
 		for direction: Vector2 in [normal, -normal]:
-			ClearZones.add(body, str(door[1]), "door", point, direction, 0.0, 1.0, INNER_DOOR_WIDTH * 0.5, base + 0.05, base + 1.9)
+			ClearZones.add(body, str(door["label"]), "door", point, direction, 0.0, 1.0, clear * 0.5, base + 0.05, base + 1.9)
 		cursor = high
 	if finish - cursor > 0.05:
 		_partition(body, cursor, finish, fixed, along_x, base, height)

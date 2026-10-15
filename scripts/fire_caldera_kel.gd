@@ -78,11 +78,11 @@ static func spec_hall() -> Dictionary:
 			# hall's steel.
 			"front": _steel_bays(-SIZE.x * 0.5, 1.0, [2.5, 5.0, 7.6, 10.0, 14.5, 19.0], {
 				2.5: {"kind": "glass", "tint": clear}, 5.0: {"kind": "glass", "tint": clear},
-				7.6: {"kind": "door", "label": "gallery door"}, 10.0: {"kind": "glass", "tint": clear},
+				7.6: {"kind": "door", "door_type": "sliding", "park_right": false, "label": "gallery door"}, 10.0: {"kind": "glass", "tint": clear},
 			}),
 			# Against the uphill ground: steel, the dock's door at the yard's level.
 			"back": _steel_bays(-SIZE.x * 0.5, 1.0, [4.5, 9.0, 10.5, 13.1, 15.0, 19.0], {
-				13.1: {"kind": "door", "sill": DOCK, "clear": 2.4, "height": 2.3, "label": "dock door"},
+				13.1: {"kind": "door", "sill": DOCK, "clear": 2.4, "height": 2.3, "door_type": "overhead", "label": "dock door"},
 			}),
 			"west": _steel_bays(-SIZE.x * 0.5, 0.0, [5.0, 10.0, 12.5, 15.0], {
 				12.5: {"kind": "glass", "tint": clear}, 15.0: {"kind": "glass", "tint": clear},
@@ -103,7 +103,7 @@ static func spec_residence() -> Dictionary:
 			# Over the yard toward the crater rim.
 			"back": _steel_bays(1.5, 1.0, [2.7, 5.4, 8.0], {2.7: {"kind": "glass", "tint": clear}, 5.4: {"kind": "glass", "tint": clear}, 8.0: {"kind": "glass", "tint": clear}}),
 			"west": _steel_bays(1.5, 0.0, [3.2, 6.5], {}),
-			"east": _steel_bays(9.5, 0.0, [2.2, 4.8, 6.5], {4.8: {"kind": "door", "label": "home door"}}),
+			"east": _steel_bays(9.5, 0.0, [2.2, 4.8, 6.5], {4.8: {"kind": "door", "door_type": "sliding", "label": "home door"}}),
 		},
 	}
 
@@ -238,7 +238,9 @@ static func _wall(body: StaticBody3D, from: Vector2, to: Vector2, base: float, d
 			_slab(body, cursor, low, fixed, along_x, base, height)
 		var mid := (low + high) * 0.5
 		var origin := Vector3(mid, base, fixed) if along_x else Vector3(fixed, base, mid)
-		CalderaShell.door_opening(body, origin, 0.0 if along_x else PI * 0.5, high - low, height, 0.18, width, INNER_DOOR_HEIGHT, 1, PARTITION, IRON)
+		# Working-room passages stay open; a swing leaf here only consumes the
+		# required landing and, at the descent, opens directly into the ramp/table.
+		CalderaShell.door_opening(body, origin, 0.0 if along_x else PI * 0.5, high - low, height, 0.18, width, INNER_DOOR_HEIGHT, 0, PARTITION, IRON)
 		var point := Vector2(at, fixed) if along_x else Vector2(fixed, at)
 		var normal := Vector2(0, 1) if along_x else Vector2(1, 0)
 		for direction: Vector2 in [normal, -normal]:
@@ -310,8 +312,7 @@ static func _crane(body: StaticBody3D) -> void:
 static func _residence(home: StaticBody3D) -> void:
 	_wall_home(home)
 	for z in BED_ZS:
-		CalderaFurniture.piece(home, Vector3(1.1, 0.28, 0.5), CalderaShell.BASALT, Vector3(BED_XS[0], 0.28, z), 0.0, true, 4.0)
-		FireCalderaBuildings._glow(home, "BedLava", Vector3(0.95, 0.02, 0.38), Vector3(BED_XS[0], 0.55, z), Color(1.0, 0.42, 0.08))
+		CalderaLavaFixture.add_bed(home, "LavaBed", Vector2(BED_XS[0], z), Vector2(1.1, 0.5), 0.56, 0.13, 0.55, CalderaShell.BASALT, 36000 + int(absf(z) * 10.0))
 	CalderaFurniture.concealed_light(home, Vector3(3.3, 0.9, -5.1), Color(1.0, 0.55, 0.22), 0.9, 4.0)
 	# Ruun's bench and the three racks above it, a tool in the wrong one.
 	CalderaFurniture.table(home, Vector3(8.1, 0.0, -1.75), 0.0, 2.2, 0.7)
@@ -331,7 +332,7 @@ static func _wall_home(home: StaticBody3D) -> void:
 	var high := -2.2 + INNER_DOOR_WIDTH * 0.5 + 0.3
 	var height := 3.4
 	FireCalderaOren._block(home, "Partition", Vector3(5.5, height * 0.5, (-7.5 + low) * 0.5), Vector3(0.18, height, low + 7.5), PARTITION)
-	CalderaShell.door_opening(home, Vector3(5.5, 0.0, (low + high) * 0.5), PI * 0.5, high - low, height, 0.18, INNER_DOOR_WIDTH, INNER_DOOR_HEIGHT, 1, PARTITION, IRON)
+	CalderaShell.door_opening(home, Vector3(5.5, 0.0, (low + high) * 0.5), PI * 0.5, high - low, height, 0.18, INNER_DOOR_WIDTH, INNER_DOOR_HEIGHT, 0, PARTITION, IRON)
 	FireCalderaOren._block(home, "Partition", Vector3(5.5, height * 0.5, (high - 1.0) * 0.5), Vector3(0.18, height, -1.0 - high), PARTITION)
 	for direction: Vector2 in [Vector2(1, 0), Vector2(-1, 0)]:
 		ClearZones.add(home, "bedroom door", "door", Vector2(5.5, -2.2), direction, 0.0, 1.0, INNER_DOOR_WIDTH * 0.5, 0.05, 1.9)
@@ -348,14 +349,57 @@ static func _bridge(body: StaticBody3D) -> void:
 	CalderaShell.soft_slab(body, "HomeLanding", Vector3(head.get_center().x, RESIDENCE - 0.1, head.get_center().y), Vector3(head.size.x * 0.5 + 0.08, 0.1, head.size.y * 0.5 + 0.08), head.size * 0.5, FLOOR)
 	for z: float in [head.position.y + 0.15, head.end.y - 0.15]:
 		CalderaShell._metal(body, Vector3(head.end.x - 0.15, (RESIDENCE - 0.2) * 0.5, z), Vector3(0.14, RESIDENCE - 0.2, 0.14), IRON, true)
-	# The cover: a steel roof following the ramp at 2.6 m, on posts.
+	# The cover: a steel roof following the ramp at 2.6 m and a level one over
+	# the landing, each a soft slab run past the junction and Boolean-cut on
+	# the same vertical plane so the two meet flush.
 	var x0 := ramp.position.x - 0.1
 	var x1 := ramp.end.x + 0.1
-	var roof_from := Vector3((x0 + x1) * 0.5, foot + 2.6, ramp.position.y)
-	var roof_to := Vector3((x0 + x1) * 0.5, RESIDENCE + 2.6, ramp.end.y)
-	var cover := CalderaShell._beam(body, roof_from, roof_to, Vector2(0.08, x1 - x0 + 0.3), temper(9.5))
-	cover.material_override = SolidModel.material(temper(9.5), 0.32, 0.75)
-	CalderaShell._metal(body, Vector3((x0 + x1) * 0.5, RESIDENCE + 2.6, head.get_center().y), Vector3(x1 - x0 + 0.3, 0.08, head.size.y), temper(9.5), false)
+	var junction := ramp.end.y
+	var cover := CSGCombiner3D.new()
+	cover.name = "BridgeCover"
+	body.add_child(cover)
+	var steel := SolidModel.material(temper(9.5), 0.32, 0.75)
+	var slope := CSGCombiner3D.new()
+	slope.name = "Slope"
+	cover.add_child(slope)
+	var rise := RESIDENCE - foot
+	var run := ramp.size.y
+	var length := sqrt(rise * rise + run * run) + 0.8
+	var slope_half := Vector3((x1 - x0) * 0.5 + 0.15, 0.05, length * 0.5)
+	var cover_epsilon := CalderaShell.soft_epsilon(Vector2((x1 - x0) * 0.5, length * 0.5 - 0.4), Vector2(slope_half.x, slope_half.z))
+	var slope_mesh := CSGMesh3D.new()
+	slope_mesh.name = "RampCoverSlab"
+	slope_mesh.mesh = SolidModel.super_mesh(slope_half, cover_epsilon, 8, 64)
+	slope_mesh.material = steel
+	# Keep the slab centred on the ramp. Its former 0.2 m Z shift moved the
+	# inclined centreline down at the cut plane, so the nominally shared edge
+	# sat visibly below the level cover.
+	slope_mesh.position = Vector3((x0 + x1) * 0.5, (foot + RESIDENCE) * 0.5 + 2.6, ramp.get_center().y)
+	slope_mesh.rotation.x = -atan2(rise, run)
+	slope.add_child(slope_mesh)
+	SolidModel.add_box(slope, "PastJunction", Vector3(4.0, 8.0, 4.0), CSGShape3D.OPERATION_SUBTRACTION, steel, Vector3((x0 + x1) * 0.5, RESIDENCE, junction + 2.0))
+	var level := CSGCombiner3D.new()
+	level.name = "Level"
+	cover.add_child(level)
+	var level_z_half := head.size.y * 0.5 + 0.6
+	var level_z := head.get_center().y - 0.45
+	# Matching the slabs' maximum X axes is not enough: a SuperEgg narrows as
+	# it approaches a rounded end, and these two slabs meet at different local-Z
+	# positions. Size the level slab from the ramp slab's actual cross-section at
+	# the shared cut plane, so the two exposed side edges terminate on the same
+	# points as well as at the same height.
+	var slope_angle := atan2(rise, run)
+	var slope_join_z := (junction - slope_mesh.position.z) / cos(slope_angle)
+	var slope_join_factor := _superellipse_section_factor(slope_join_z / slope_half.z, cover_epsilon)
+	var level_join_factor := _superellipse_section_factor((junction - level_z) / level_z_half, cover_epsilon)
+	var level_half := Vector3(slope_half.x * slope_join_factor / level_join_factor, 0.05, level_z_half)
+	var level_mesh := CSGMesh3D.new()
+	level_mesh.name = "LandingCoverSlab"
+	level_mesh.mesh = SolidModel.super_mesh(level_half, cover_epsilon, 8, 64)
+	level_mesh.material = steel
+	level_mesh.position = Vector3((x0 + x1) * 0.5, RESIDENCE + 2.6, level_z)
+	level.add_child(level_mesh)
+	SolidModel.add_box(level, "BeforeJunction", Vector3(4.0, 8.0, 4.0), CSGShape3D.OPERATION_SUBTRACTION, steel, Vector3((x0 + x1) * 0.5, RESIDENCE, junction - 2.0))
 	for i in 4:
 		var t := float(i) / 3.0
 		var z := lerpf(ramp.position.y + 0.2, ramp.end.y, t)
@@ -365,6 +409,12 @@ static func _bridge(body: StaticBody3D) -> void:
 	var holder := MeshInstance3D.new()
 	body.add_child(holder)
 	CollisionPolicy.add_box(body, holder, Vector3(0.08, 1.1, ramp.size.y), Vector3(x1, (foot + RESIDENCE) * 0.5 + 0.55, ramp.get_center().y), Basis(Vector3.RIGHT, -atan2(RESIDENCE - foot, ramp.size.y)), false)
+
+
+## Half-width multiplier of a SuperEgg's XZ section at normalized Z. Both
+## bridge-cover pieces use it so their Boolean cut edges share one full width.
+static func _superellipse_section_factor(normalized_z: float, epsilon: float) -> float:
+	return pow(maxf(1.0 - pow(absf(normalized_z), epsilon), 0.0), 1.0 / epsilon)
 
 
 # ---------------------------------------------------------------------------

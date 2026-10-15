@@ -131,6 +131,35 @@ the whole world is a final integration check, not the default inspection tool.
 - **People stand on what is built.** Residents over water or on raised decks
   need a ground probe that finds the deck beneath them. The world probe checks
   each resident is on a deck at spawn and again after walking their day.
+- **Raised communal infrastructure is its own settlement tier.** Plan a
+  Highline, arcade, boardwalk, or inhabited bridge as a route graph with a
+  declared datum, arrival route, descents, refuges, and destinations—not as a
+  ring-shaped prop. Put level buildings outside the shared route with their
+  public fronts docked to it; reserve the space below for terrain-following
+  buildings and ground circulation. A building platform is private property:
+  mark the expansion joint, let that platform own every doorway landing, and
+  stop the shared deck collider at the joint. Do not run a rail across a dock.
+- **Public descents are public architecture.** When shared circulation sits
+  above a bath, renewal ground, market, or waterfront, the descent belongs to
+  the communal system. Give it a continuous curve, a named landing, a checked
+  grade, and a connection into the lower route graph. Never leave a public
+  destination directly below a route with no legible way between them.
+- **Reserve raised ways as swept volumes, not centre-lines.** Check the deck's
+  full width, thickness, guards and player clearance against both terrain and
+  every building envelope at frequent samples. A shared way may touch geology
+  or private architecture only at an authored gate, dock or landing; every
+  other overlap fails the plan. Moving a route to another vertical tier does
+  not excuse a plan overlap. The arrival face named by the route must be the
+  face actually reached: two nominally different curves that both land behind
+  a pavilion are still one mistaken rear entrance.
+- **Name the landform section mathematically.** “Bowl,” “terrace,” “bench” and
+  “shelf” are not interchangeable visual impressions. If the approved section
+  is parabolic, encode the actual section equation and validate characteristic
+  radii and its lip slope. In a nested volcanic bowl, the inhabited outer
+  parabola may begin at the lava-mouth shoulder while the central basin supplies
+  the second parabola; the join is not a flat floor followed by an arbitrary
+  drop. Re-survey every plot and route whenever that equation changes; do not
+  preserve obsolete datums by flattening sockets around them.
 - **Every walkthrough finding becomes a check.** Headroom, rock in a
   footprint, hull clearance and resident grounding were each found by eye, then
   added to the proof or world probe so they cannot return.
@@ -142,6 +171,16 @@ the whole world is a final integration check, not the default inspection tool.
 - **Look early.** Render the settlement from the air (`tools/village_aerial_capture`,
   a target per settlement) before detailing. The aerial renders showed the
   islets needed a full landscaping pass.
+- **Decide whether a shared datum is geology or architecture before drawing
+  it.** Survey complete sections, then test the culture's attitude to the
+  landform. A cut-and-fill terrace changes the terrain and needs explicit
+  retaining, drainage and transition slopes. A Highline, boardwalk or viaduct
+  is an independently supported structure: keep the natural heightfield below,
+  give the deck its own flat collision, show how every support lands, and widen
+  it only at named stations or building docks. Never turn “a shelf around the
+  edge” into a flattened terrain ring by default. Classify every adjoining
+  building as natural-grade/slope-integrated or flat-datum/deck-supported, and
+  resolve its entrances against the system it actually belongs to.
 
 ## Approval discipline
 

@@ -28,6 +28,7 @@ func _ready() -> void:
 		get_tree().quit(2))
 	_check_plots()
 	_check_routes()
+	_check_walkway_clearance()
 	_check_network()
 	_check_sightline()
 	_check_lower_city()
@@ -59,10 +60,18 @@ func _check_plots() -> void:
 		if not Geometry2D.intersect_polygons(a, reservoir).is_empty() and not bool(plots[i].get("quay", false)):
 			_fail("%s's reserved plot reaches into the reservoir" % plots[i]["id"])
 		for point in a:
-			if point.length() > FireCalderaPlan.FLOOR_RADIUS - 2.0:
-				_fail("%s's reserved plot leaves the caldera floor (%.1f m out)" % [plots[i]["id"], point.length()])
+			var site := str(plots[i].get("site", "ground"))
+			var limit := FireCalderaPlan.RIM_RADIUS - 12.0 if site == "highline" else (FireCalderaPlan.RIM_RADIUS + 2.0 if site == "gate_platform" else FireCalderaPlan.HIGHLINE_RADIUS + 7.0)
+			if bool(plots[i].get("open", false)):
+				limit = FireCalderaPlan.RIM_RADIUS + 4.0
+			if point.length() > limit:
+				_fail("%s's reserved plot leaves its permitted site band (%.1f m out)" % [plots[i]["id"], point.length()])
 				break
 		for j in range(i + 1, plots.size()):
+			var a_tier := str(plots[i].get("site", "ground"))
+			var b_tier := str(plots[j].get("site", "ground"))
+			if a_tier != b_tier and not bool(plots[i].get("open", false)) and not bool(plots[j].get("open", false)):
+				continue
 			if not Geometry2D.intersect_polygons(a, FireCalderaPlan.plot_polygon(plots[j])).is_empty():
 				_fail("%s and %s's reserved plots overlap" % [plots[i]["id"], plots[j]["id"]])
 		var footprint := FireCalderaPlan.plot_polygon(plots[i], "footprint")
@@ -77,6 +86,8 @@ func _check_routes() -> void:
 	for route in FireCalderaPlan.routes() + FireCalderaPlan.emergency_spokes():
 		var points: PackedVector2Array = route["points"]
 		var half := float(route["width"]) * 0.5
+		var tier := str(route.get("tier", "ground"))
+		var serves: Array = route.get("serves", [])
 		for i in points.size() - 1:
 			var lane := _lane(points[i], points[i + 1], half)
 			# A route may end at a plot's edge; only its body counts.
@@ -84,18 +95,104 @@ func _check_routes() -> void:
 			for entry in FireCalderaPlan.PLOTS:
 				if bool(entry.get("open", false)) or bool(entry.get("crossed", false)):
 					continue
+				if str(entry["id"]) in serves:
+					continue
+				var entry_tier := str(entry.get("site", "ground"))
+				if tier == "ramp" or tier != entry_tier:
+					continue
+				if str(route["id"]) == "H1" and entry_tier == "highline":
+					continue
 				var shrunk := _shrink(FireCalderaPlan.plot_polygon(entry), 0.4)
 				if not Geometry2D.intersect_polygons(body, shrunk).is_empty():
 					_fail("%s (%s) runs through %s's reserved plot near %s" % [route["id"], route["role"], entry["id"], str(points[i].lerp(points[i + 1], 0.5).round())])
 					break
-			if str(route["id"]) != "R0" and not Geometry2D.intersect_polygons(lane, reservoir).is_empty():
+			if tier == "ground" and not Geometry2D.intersect_polygons(lane, reservoir).is_empty():
 				_fail("%s runs into the reservoir near %s" % [route["id"], str(points[i].round())])
+			# Raised circulation may pass above open terrain, but never through a
+			# building shell. Tier separation is not permission for an accidental
+			# bridge/building collision.
+			if tier in ["highline", "ramp"]:
+				for entry in FireCalderaPlan.PLOTS:
+					if bool(entry.get("open", false)):
+						continue
+					if bool(route.get("landing_overlap", false)) and str(entry["id"]) in serves:
+						continue
+					# A served building may share only the final landing bay with
+					# its route. It is not exempt along the rest of its envelope.
+					if str(entry["id"]) in serves and i >= points.size() - 2:
+						continue
+					if str(route["id"]) == "H1" and str(entry.get("site", "ground")) == "highline":
+						continue
+					var shell := _shrink(FireCalderaPlan.plot_polygon(entry, "footprint"), 0.15)
+					if not Geometry2D.intersect_polygons(body, shell).is_empty():
+						_fail("%s clips %s's building footprint near %s" % [route["id"], entry["id"], str(points[i].lerp(points[i + 1], 0.5).round())])
+						break
 	# The promenade keeps a real bank between it and the lava.
-	for point in FireCalderaPlan.promenade():
+	for point in FireCalderaPlan.ground_promenade():
 		var gap := point.length() - FireCalderaPlan.reservoir_radius(point.angle()) - 2.0
 		if gap < 1.5:
 			_fail("the promenade comes within %.1f m of the bank at %s" % [gap, str(point.round())])
 			break
+
+
+## A route is a volume, not a line. Sample the centre and both deck edges
+## against the untouched analytic volcano. Endpoints may meet a platform, but
+## no intermediate sample may disappear into the bowl.
+func _check_walkway_clearance() -> void:
+	var arrival := FireCalderaPlan.arrival_byway()
+	var arrival_start := FireCalderaGround.crater_wall(arrival[0]) + FireCalderaPlan.ARRIVAL_DECK_CLEARANCE
+	var guest := FireCalderaPlan.guest_gate_link()
+	var guest_t := clampf((FireCalderaPlan.RIM_RADIUS - guest[0].length()) / (FireCalderaPlan.RIM_RADIUS - FireCalderaPlan.HIGHLINE_RADIUS), 0.0, 1.0)
+	var guest_start := lerpf(arrival_start, FireCalderaPlan.HIGHLINE_DATUM, FireCalderaPlan.route_height_t("H0", guest_t))
+	var renewal_y := float(FireCalderaGround.survey(FireCalderaPlan.plot("RENEWAL"))["datum"])
+	var oren_y := float(FireCalderaGround.survey(FireCalderaPlan.plot("OREN"))["datum"]) + FireCalderaOren.UPPER + FireCalderaOren.roof_top()
+	var kel_y := float(FireCalderaGround.survey(FireCalderaPlan.plot("KEL"))["datum"]) + FireCalderaKel.RESIDENCE
+	_check_path_above_ground("H0", arrival, 3.8, arrival_start, FireCalderaPlan.HIGHLINE_DATUM)
+	_check_path_above_ground("HG", guest, 3.0, guest_start, FireCalderaPlan.GUEST_GATE_DATUM)
+	_check_path_above_ground("H2W", FireCalderaPlan.renewal_byway(-1.0), 3.2, FireCalderaPlan.HIGHLINE_DATUM, renewal_y, "RENEWAL")
+	_check_path_above_ground("H2E", FireCalderaPlan.renewal_byway(1.0), 3.2, FireCalderaPlan.HIGHLINE_DATUM, renewal_y, "RENEWAL")
+	_check_path_above_ground("H4", FireCalderaPlan.oren_terrace_link(), 2.4, FireCalderaPlan.HIGHLINE_DATUM, oren_y)
+	_check_path_above_ground("H5", FireCalderaPlan.kel_upper_link(), 2.4, FireCalderaPlan.HIGHLINE_DATUM, kel_y)
+	for i in 96:
+		var angle := TAU * (float(i) + 0.5) / 96.0
+		for radius: float in [FireCalderaPlan.HIGHLINE_RADIUS - FireCalderaPlan.HIGHLINE_WIDTH * 0.5, FireCalderaPlan.HIGHLINE_RADIUS + FireCalderaPlan.HIGHLINE_WIDTH * 0.5]:
+			var point := Vector2(cos(angle), sin(angle)) * radius
+			if FireCalderaPlan.HIGHLINE_DATUM - FireCalderaGround.height(point) < FireCalderaHighline.DECK_THICKNESS + 0.04:
+				_fail("H1 clips the volcano ground near %s" % str(point.round()))
+				return
+
+
+func _check_path_above_ground(id: String, points: PackedVector2Array, width: float, start_y: float, finish_y: float, landing_id: String = "") -> void:
+	for i in points.size() - 1:
+		var delta := points[i + 1] - points[i]
+		if delta.length() < 0.01:
+			continue
+		var across := Vector2(-delta.y, delta.x).normalized()
+		for k in 5:
+			var local_t := float(k) / 4.0
+			var global_t := (float(i) + local_t) / float(points.size() - 1)
+			# A route's first and last centre-lines intentionally share the
+			# authored landing plane with the gate, deck or roof terrace.  That
+			# flush contact is not terrain clipping; every sample immediately
+			# beyond either endpoint, including both deck edges, still has to
+			# clear the untouched bowl.
+			if global_t < 0.0001 or global_t > 0.9999:
+				continue
+			var height_t := FireCalderaPlan.route_height_t(id, global_t)
+			var y := lerpf(start_y, finish_y, height_t)
+			var centre := points[i].lerp(points[i + 1], local_t)
+			for side: float in [-1.0, 0.0, 1.0]:
+				var sample := centre + across * side * (width * 0.5 - 0.08)
+				var ground := FireCalderaGround.height(sample)
+				if not landing_id.is_empty():
+					var landing := FireCalderaPlan.plot(landing_id)
+					if Geometry2D.is_point_in_polygon(sample, SocketPlinth.band(landing, SocketPlinth.size_key(landing))):
+						ground = minf(ground, finish_y - FireCalderaHighline.DECK_THICKNESS - 0.08)
+				var clearance := y - ground
+				var required := FireCalderaHighline.DECK_THICKNESS + 0.04
+				if clearance + 0.001 < required:
+					_fail("%s clips the volcano ground at %s (clearance %.2f m, route %.3f)" % [id, str(sample.round()), clearance, global_t])
+					return
 
 
 ## Every occupied plot's front on a public route and back on the service
@@ -103,7 +200,8 @@ func _check_routes() -> void:
 func _check_network() -> void:
 	var routes := FireCalderaPlan.routes()
 	var spokes := FireCalderaPlan.emergency_spokes()
-	var all := routes + spokes
+	var public_routes := routes.filter(func(route: Dictionary) -> bool: return str(route["class"]) != "service")
+	var all := public_routes + spokes
 	# Union-find over routes: two routes join where they meet or cross.
 	var parent := {}
 	for route in all:
@@ -113,12 +211,12 @@ func _check_network() -> void:
 			if _routes_meet(all[i], all[j]):
 				_union(parent, str(all[i]["id"]), str(all[j]["id"]))
 	var roots := {}
-	for route in routes:
+	for route in public_routes:
 		roots[_find(parent, str(route["id"]))] = true
 	if roots.size() != 1:
 		_fail("the dry network is in %d separate pieces" % roots.size())
 	for spoke in spokes:
-		if _find(parent, str(spoke["id"])) != _find(parent, "R1"):
+		if _find(parent, str(spoke["id"])) != _find(parent, "H1"):
 			_fail("emergency spoke %s does not join the dry network" % spoke["id"])
 	for entry in FireCalderaPlan.PLOTS:
 		if not bool(entry["occupied"]):
@@ -178,7 +276,8 @@ func _check_lower_city() -> void:
 		# From the plot's front across the promenade to the bank.
 		var front := FireCalderaPlan.front_point(entry)
 		var bank := FireCalderaPlan.reservoir_radius(front.angle())
-		if front.length() - bank > 9.0:
+		var maximum_link := 24.0 if FireCalderaPlan.is_elevated(entry) else 9.0
+		if front.length() - bank > maximum_link:
 			_fail("shelf %s: %s's front is %.1f m from the bank" % [shelf["id"], entry["id"], front.length() - bank])
 	for branch in FireCalderaPlan.THERMAL_BRANCHES:
 		if "GUEST" in (branch["serves"] as Array):
@@ -225,7 +324,38 @@ func _check_people() -> void:
 ## failing where a foundation would show more than EXPOSED_MAX of blank base.
 ## Routes must climb at a walkable grade over the terraces.
 func _check_survey() -> void:
+	# The inhabited ground is one true annular parabola beginning at the lava
+	# shoulder, with a second parabola below the lava. Halfway from its vertex
+	# to the lip must be one quarter of its full rise—not a graded shelf.
+	var vertex := FireCalderaGround.outer_bowl_height(Vector2(FireCalderaPlan.FLOOR_RADIUS, 0.0))
+	var halfway_radius := lerpf(FireCalderaPlan.FLOOR_RADIUS, FireCalderaPlan.RIM_RADIUS, 0.5)
+	var half := FireCalderaGround.outer_bowl_height(Vector2(halfway_radius, 0.0))
+	var lip := FireCalderaGround.outer_bowl_height(Vector2(FireCalderaPlan.RIM_RADIUS, 0.0))
+	if absf((half - vertex) - (lip - vertex) / 4.0) > 0.01:
+		_fail("the inhabited caldera section is not parabolic")
+	var lip_slope := 2.0 * (lip - vertex) / (FireCalderaPlan.RIM_RADIUS - FireCalderaPlan.FLOOR_RADIUS)
+	if lip_slope < 0.45:
+		_fail("the inhabited parabola is too shallow at the crater lip (%.0f degrees)" % rad_to_deg(atan(lip_slope)))
+	var basin_angle := 0.37
+	var bank := FireCalderaPlan.reservoir_radius(basin_angle)
+	var direction := Vector2(cos(basin_angle), sin(basin_angle))
+	var bed := FireCalderaGround.height(Vector2.ZERO)
+	var basin_half := FireCalderaGround.height(direction * bank * 0.5)
+	var basin_edge := FireCalderaGround.height(direction * bank)
+	if absf((basin_half - bed) - (basin_edge - bed) * 0.25) > 0.01:
+		_fail("the central lava basin section is not a second parabola")
 	print("---- plot survey (heights world Y; datum from the public landing)")
+	# The geology must remain a changing bowl beneath the Highline. A level
+	# terrain ring here would mean the structural datum had leaked back into the
+	# A radial parabola is intentionally level around any one contour. Verify
+	# that the Highline bridges above the curved bowl rather than demanding an
+	# artificial terrace at its own datum.
+	var ring_ground := FireCalderaGround.outer_bowl_height(Vector2(FireCalderaPlan.HIGHLINE_RADIUS, 0.0))
+	if ring_ground >= FireCalderaPlan.HIGHLINE_DATUM - 0.5:
+		_fail("the natural parabolic bowl leaves no structural clearance beneath the Highline")
+	var clear_half := FireCalderaPlan.ARRIVAL_MARKER_OFFSET - 0.38
+	if clear_half < 3.0:
+		_fail("arrival markers narrow R0 below its 6 m clear width")
 	for entry in FireCalderaPlan.PLOTS:
 		if bool(entry.get("open", false)):
 			continue
@@ -234,11 +364,19 @@ func _check_survey() -> void:
 			line["id"], line["foundation"], line["datum"], line["low"], line["high"], line["change"], float(line["max_grade"]) * 100.0,
 			line["exposed"], line["retaining"], line["bottom"], line["service_landing"]])
 		# A quay's exposed face is its wall rising out of the lava, by design.
-		if float(line["exposed"]) > FireCalderaGround.EXPOSED_MAX and not bool(entry.get("quay", false)):
+		if str(entry.get("site", "ground")) == "highline" and absf(float(line["datum"]) - FireCalderaPlan.HIGHLINE_DATUM) > 0.01:
+			_fail("%s does not share the Highline datum" % line["id"])
+		if FireCalderaPlan.is_elevated(entry) and str(entry.get("site", "")) == "highline":
+			var facade_gap := FireCalderaPlan.front_point(entry, "footprint").length() - (FireCalderaPlan.HIGHLINE_RADIUS + FireCalderaPlan.HIGHLINE_WIDTH * 0.5)
+			if facade_gap < 1.0 or facade_gap > 4.5:
+				_fail("%s lacks a deliberate 1–4.5 m private arrival porch (%.2f m)" % [line["id"], facade_gap])
+		if float(line["exposed"]) > FireCalderaGround.EXPOSED_MAX and not bool(entry.get("quay", false)) and not FireCalderaPlan.is_elevated(entry):
 			_fail("%s would show %.1f m of blank foundation: step it, split it or move it" % [line["id"], line["exposed"]])
 		if float(line["datum"]) <= FireCalderaGround.LAVA_Y + 0.5:
 			_fail("%s's floor is at the lava" % line["id"])
 	for route in FireCalderaPlan.routes():
+		if str(route.get("tier", "ground")) != "ground":
+			continue
 		var points: PackedVector2Array = route["points"]
 		var worst := 0.0
 		for i in points.size() - 1:
@@ -251,6 +389,27 @@ func _check_survey() -> void:
 				worst = maxf(worst, absf(FireCalderaGround.height(a) - FireCalderaGround.height(b)) / a.distance_to(b))
 		if worst > 0.12:
 			_fail("%s climbs at %.0f%% somewhere; ramps are for buildings, routes stay walkable" % [route["id"], worst * 100.0])
+	_check_highline_grades()
+
+
+func _check_highline_grades() -> void:
+	for spec: Array in [
+		["H0", FireCalderaPlan.arrival_byway(), FireCalderaGround.crater_wall(FireCalderaPlan.arrival_byway()[0]) + FireCalderaPlan.ARRIVAL_DECK_CLEARANCE, FireCalderaPlan.HIGHLINE_DATUM],
+		["HG", FireCalderaPlan.guest_gate_link(), lerpf(FireCalderaGround.BOWL_LIP_Y + FireCalderaPlan.ARRIVAL_DECK_CLEARANCE, FireCalderaPlan.HIGHLINE_DATUM, FireCalderaPlan.route_height_t("H0", clampf((FireCalderaPlan.RIM_RADIUS - FireCalderaPlan.guest_gate_link()[0].length()) / (FireCalderaPlan.RIM_RADIUS - FireCalderaPlan.HIGHLINE_RADIUS), 0.0, 1.0))), FireCalderaPlan.GUEST_GATE_DATUM],
+		["H2W", FireCalderaPlan.renewal_byway(-1.0), FireCalderaPlan.HIGHLINE_DATUM, FireCalderaGround.survey(FireCalderaPlan.plot("RENEWAL"))["datum"]],
+		["H2E", FireCalderaPlan.renewal_byway(1.0), FireCalderaPlan.HIGHLINE_DATUM, FireCalderaGround.survey(FireCalderaPlan.plot("RENEWAL"))["datum"]],
+		["H4", FireCalderaPlan.oren_terrace_link(), FireCalderaPlan.HIGHLINE_DATUM, FireCalderaGround.survey(FireCalderaPlan.plot("OREN"))["datum"] + FireCalderaOren.UPPER + FireCalderaOren.roof_top()],
+		["H5", FireCalderaPlan.kel_upper_link(), FireCalderaPlan.HIGHLINE_DATUM, FireCalderaGround.survey(FireCalderaPlan.plot("KEL"))["datum"] + FireCalderaKel.RESIDENCE],
+	]:
+		var points: PackedVector2Array = spec[1]
+		var run := 0.0
+		for i in points.size() - 1:
+			run += points[i].distance_to(points[i + 1])
+		var grade := absf(float(spec[3]) - float(spec[2])) / run
+		if grade > 0.22:
+			_fail("%s's civic ribbon exceeds the 22%% design grade (%.0f%%)" % [spec[0], grade * 100.0])
+		else:
+			print("ok   %s: %.1f m long at %.0f%%" % [spec[0], run, grade * 100.0])
 
 
 ## A plan drawing for review: reservoir, plots (reserved and footprint),

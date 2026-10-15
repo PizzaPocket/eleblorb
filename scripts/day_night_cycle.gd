@@ -174,6 +174,12 @@ func _ensure_planetary_ocean() -> void:
 	var ocean := PlanetaryOcean.new()
 	ocean.surface_level = planetary_ocean_level
 	ocean.planet_center = planetary_ocean_center
+	var exclusions: Array[Dictionary] = []
+	for child in world.get_children():
+		if child.has_method("planetary_ocean_holes"):
+			exclusions.append_array(child.call("planetary_ocean_holes"))
+	if not exclusions.is_empty():
+		ocean.configure_holes(exclusions)
 	world.add_child(ocean)
 
 
