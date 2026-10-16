@@ -51,12 +51,13 @@ OPENS=[
  ('Market Square',-590,122,-530,164),
  ('Estate Square',-554,-118,-516,-84),
  ('Cinema Square',-752,6,-734,34),
+ ('Meridian Court',-391,-30,-359,30),
 ]
 B=[]
 def b(n,name,r,kind,h,who=''): B.append(dict(n=n,name=name,r=r,kind=kind,h=h,who=who))
 NB=lambda: 'homes (no one the hero meets)'
 b(1,'Grand Hotel',(-483,-98,-431,-38),'civic','atrium block of 12 levels (44 m) round its void; cylinder guest tower of 28 levels (96 m), drum to 108 m (after John Portman)','Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work')
-b(2,'City hall',(-431,-30,-397,30),'civic','exterior only: portico, balcony, side wings and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a)','Mayor Teodora Vance, Kenji Mori (clerk)')
+b(2,'City hall',(-431,-30,-397,30),'civic','exterior only: portico, balcony and side wings, with the Timekeeper standing over it, at the head of Civic Plaza (section 8a)','Mayor Teodora Vance, Kenji Mori (clerk)')
 b(3,'Library',(-686,-92,-641,-30),'civic','art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)','Ada Fong, Nia Calder, Benji Okoro')
 b(4,'Natural history museum',(-637,62,-575,100),'civic','3 storeys, top-lit hall','Dr. Imani Osei (curator)')
 b(5,'Moonlight Cinema',(-730,6,-700,34),'civic','2 storeys, built later into the old town; flat above','Leon Duarte (lives above)')
@@ -64,13 +65,12 @@ b(6,'Police box',(-652,30,-646,38),'civic','1 storey, back room','Kate Byrne')
 b(7,'Clinic',(-712,62,-698,80),'civic','3 storeys; flat above','Dr. Arjun Mehta (lives above)')
 b(8,'Primary school',(-664,122,-641,152),'civic','3 storeys, roof playground','Yuki Hayashi (teacher); Lily, Kofi')
 b(9,'Tea house',(-618,24,-604,36),'civic','1 storey; flat above and keeper\'s room behind','Old Fu (keeper); Kenji Mori (above)')
-b(10,'Park lodge',(-508,30,-498,38),'civic','1 storey','Orin Pike (park keeper)')
+b(10,'Park lodge',(-552,41,-542,49),'civic','1 storey','Orin Pike (park keeper)')
 b(11,'Giant playground',None,'play','climbing towers 12–20 m','Lily, Kofi')
 b(12,'Windspire',(-431,-80,-389,-38),'tower','about 70 storeys, 280 m, on a podium','the Windworks (headquarters, observation deck); its legal department (Priya Raman, Elizabeth Reese, Venn Harlow)')
 b(13,'BLOCK tower',(-483,38,-443,78),'tower','about 45 storeys, 180 m, windowless (section 7c)','BLOCK\'s headquarters and laboratories; Dr. Vera Kask (director, the top floors)')
 b(14,'North tower',(-483,-142,-443,-102),'tower','about 45 storeys, 175 m, on a podium','start-up floors (Theo Park)')
 b(15,'South tower',(-483,102,-443,142),'tower','about 40 storeys, 150 m, on a podium','flats over offices; Tanglewire (Dan)')
-b(16,'BLOCK labs',(-431,38,-393,80),'civic','6 storeys, BLOCK\'s first laboratories round a court; Pinestein\'s old lab, sealed','BLOCK')
 b(17,'Block 1',(-674,-143,-660,-109),'estate','slab block, 28 storeys, west side of the west court, turned 30° off the grid','Tomas Wren')
 b(18,'Block 2',(-547,-184,-511,-166),'estate','slab block, 32 storeys, north side of the east court, turned 30° off the grid','Siti Rahman')
 b(19,'Block 3',(-512,-94,-487,-62),'estate','broad point block, 36 storeys, on the Park Ring','Juno Rell (20th floor)')
@@ -310,15 +310,15 @@ RESIDENT_HOMES={
 HEIGHTS={1:96,2:22,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:180,14:175,15:150,16:22,
  17:91,18:104,19:117,20:130,21:130,22:46,23:6,24:11,25:17,26:20,27:29,28:26,29:20,30:20,31:20,
  32:23,33:9,34:26,35:72,36:42,37:17,38:7,39:6,49:52,50:110,51:8,52:23,53:78,40:8,41:4,42:6,43:35,44:3}
-CROWNS={1:108,2:45,3:26,12:280}
+CROWNS={1:108,3:26,12:280}
 ## Plan forms: twist (a rounded triangle turning as it rises), screen (round-
 ## cornered square in a screen), capsule (core with plug-in capsules), dune
 ## (rippling balconies), atrium (the Grand Hotel: an atrium block with a
 ## cylinder tower, whose rect is TOWER_PART; see HOTEL), clock (city hall).
-FORMS={12:'twist',13:'monolith',14:'capsule',15:'dune',1:'atrium',2:'clock'}
+FORMS={12:'twist',13:'monolith',14:'capsule',15:'dune',1:'atrium',2:'hall'}
 ## Sub-footprints that rise above their building's podium: the hotel's guest
 ## tower (the square round its cylinder) and city hall's clock tower.
-TOWER_PART={1:(-471,-98,-443,-70),2:(-405,-4,-397,4)}
+TOWER_PART={1:(-471,-98,-443,-70)}
 PODIUM_HEIGHT={1:44}
 ## The Grand Hotel after John Portman (city.md 8, proposed 2026-10-13), for
 ## the drawings and the builder. Local metres: x east from the west face, z
@@ -449,18 +449,24 @@ _hotel_checks()
 ## Fabric storeys are 3.25 m, downtown mid-rise storeys 3.6 m.
 STOREY={'fabric':3.25,'midrise':3.6}
 ## The park and the giant playground (city.md 7a, 7b), world metres.
+## (revised 2026-10-16) The park is shared: the Crossing, the city's station, at
+## its centre where the two lines cross; the giant playground moved whole to the
+## south-east quarter at 0.55 scale; the dry garden, the pond, the green and the
+## tea house's parasols round them; the four wind trees stand round the station.
+PG_C=(-515,31); PG_K=0.55
+def _pg(x,z): return (round(PG_C[0]+(x+560)*PG_K,2),round(PG_C[1]+z*PG_K,2))
 PARK={
  'rect':(-625,-50,-495,50),
  'walks':[(-625,-3,-495,3),(-563,-50,-557,50)],
- 'dry_garden':(-620,-45,-568,-6),
- 'pond':{'c':(-522,-26),'r':(22,15)},
- 'lawn':(-552,8,-500,46),
+ 'dry_garden':(-620,-45,-583,-6),
+ 'pond':{'c':(-516,-28),'r':(19,13)},
+ 'lawn':(-551,22,-535,38),
  'parasols':[(-612,12),(-598,14),(-586,22),(-596,32),(-584,40),(-612,44)],
- 'playground':{'c':(-560,0),'track':(24,28),
-   'towers':[(-560,0,20,4.5,'Lookout'),(-548,-7,16,3.5,''),(-574,-4,14,3.2,''),(-560,14,12,3,'')],
-   'perches':[(-566,18),(-554,18),(-560,21)],'perch_height':12,
-   'hoops':[[-560+(9+i*1.6)*math.cos(-math.pi/2+i*0.75),(9+i*1.6)*math.sin(-math.pi/2+i*0.75)] for i in range(8)]},
- 'wind_trees':[(-526,-26),(-594,-26),(-526,26),(-594,26)],'wind_tree_height':32,
+ 'playground':{'c':PG_C,'scale':PG_K,'track':(round(24*PG_K,2),round(28*PG_K,2)),
+   'towers':[_pg(x,z)+(h,round(r*PG_K+0.6,2),nm) for x,z,h,r,nm in [(-560,0,20,4.5,'Lookout'),(-548,-7,16,3.5,''),(-574,-4,14,3.2,''),(-560,14,12,3,'')]],
+   'perches':[_pg(x,z) for x,z in [(-566,18),(-554,18),(-560,21)]],'perch_height':12,
+   'hoops':[list(_pg(-560+(9+i*1.6)*math.cos(-math.pi/2+i*0.75),(9+i*1.6)*math.sin(-math.pi/2+i*0.75))) for i in range(8)]},
+ 'wind_trees':[(-581,-14),(-533,-14),(-581,14),(-533,14)],'wind_tree_height':32,
 }
 ## The North Estate's precincts (clipped by the Rim Walk): west of North Street,
 ## north of Library Lane plus the strip along the Park Ring; east of it.
@@ -535,10 +541,10 @@ TOWER_SITE={
    ('garden',(-431,-80,-389,-46),'the wind garden: desert grasses that move in the wind, and a ring of small turbines at head height'),
    ('pavilion',(-431,-70,-424,-52),'the lobby\'s glass hall on the hotel side; its roof is the Deck\'s run from the hotel mezzanine'),
    ('link',(-431,-64,-424,-58),'the glass bridge at +6.5 m from the hotel\'s mezzanine into the lobby')]),
- 13:dict(shaft=(-474,47,-448,71),ground=[
+ 13:dict(shaft=(-475,47,-449,71),ground=[
    ('court',(-483,38,-443,47),'BLOCK\'s forecourt on Meridian South: bare pale paving in full sun, no bench, no tree, and the one door'),
-   ('gravel',(-483,47,-474,78),'black gravel, raked every morning, that no one walks on'),
-   ('gravel',(-474,71,-443,78),'black gravel on the neighbours\' side')]),
+   ('gravel',(-483,47,-475,78),'black gravel, raked every morning, that no one walks on'),
+   ('gravel',(-475,71,-443,78),'black gravel on the neighbours\' side')]),
  14:dict(shaft=(-477,-134,-449,-108),ground=[
    ('yard',(-483,-108,-443,-102),'the makers\' yard on Hotel Lane: benches, bike racks and a skate run Theo uses at lunch'),
    ('court',(-477,-134,-449,-108),'the open ground under the first capsules: workshops and a cafe round the core, the capsules starting at the third floor'),
@@ -552,18 +558,10 @@ TOWER_SITE={
    ('canopy',(-451,114,-443,132),'the pergola'),
    ('garden',(-477,136,-451,142),'a planted strip to the south')]),
 }
-## BLOCK (city.md 7c, 6 below; proposed 2026-10-14): a closed institute that
-## looms, said with the architecture and never with a sign. A dark recessed base
-## with no windows at eye level and one narrow door off its axis; the five
-## storeys above step out over it to the plot line, so the whole mass leans over
-## its own pavement; slit windows; a court nobody sees, its glow only showing at
-## night; a crown of grounding masts. Precedents: 33 Thomas Street, New York (the
-## windowless telephone exchange), Boston City Hall (upper floors looming over
-## the base), and the Kunsthaus and bunker tradition of dark mass in a pale city.
+## The BLOCK tower's form (city.md 7c, revised 2026-10-16: the BLOCK labs became mid-rise
+## real estate, and everything of BLOCK's, Pinestein's sealed lab included, is in the tower).
 BLOCK_TOWER=dict(base=(4.0,9.0),door=(-461,47),vents=[0.3,0.55,0.8],vent=(1.4,4.5),slit=(0.35,4.0),masts=16,mast=10.0,
-  colour='the same blue-black glazed brick as the labs',crown='no crown and no light, except a thin azure line under the roof at night')
-BLOCK_FORM=dict(storeys=6,storey=3.6,base=(3.0,6.5),door=(-401,41),court=(-421,50,-403,68),slit=(0.35,3.6),
-  colour='blue-black glazed brick, with an azure sheen at a low sun',masts=12,mast=6.0,glow='the court\'s clerestory, azure at night')
+  colour='blue-black glazed brick with an azure sheen at a low sun',crown='no crown and no light, except a thin azure line under the roof at night')
 TURBINES=[(-310,-200),(-310,200),(-740,-270),(-740,270)]
 ## The Deck (city.md 6.2 and 6a): the walkway at +6.5 m, after Hong Kong's
 ## footbridges. Every run has a job: the ring shades the park side of the Park
@@ -587,8 +585,8 @@ DECK={
   dict(name='Hotel skybridge',kind='bridge',w=6,pts=[(-457,-30),(-457,-38)]),
   # to the library's east-wing door, over Garden Walk's mouth
   dict(name='Library walk',kind='walk',w=6,pts=[(-631,-27),(-648,-27)]),
-  # across Library Square under the Meridian Line, the Library Square station's concourse
-  dict(name='Square walk',kind='walk',w=6,pts=[(-631,0),(-680,0)]),
+  # straight through the park under the Spine Line, from the Park Deck's north side to its south side: the Crossing's mezzanine
+  dict(name='Spine walk',kind='walk',w=6,pts=[(-557,-50),(-557,50)]),
   # up the east half of North Street to the neighbourhood centre's roof garden
   dict(name='Estate walk',kind='walk',w=6,pts=[(-557,-56),(-557,-121)]),
   # down the east half of South Street, then along Market Square's north edge to the wet market's upper hall
@@ -607,7 +605,7 @@ DECK={
  'through':[(1,12,'the hotel mezzanine\'s east gallery through the party wall to the Windspire\'s lobby')],
  # ramp towers: centre, radius, the side its head opens onto the Deck and the side its foot opens onto the ground
  'ramps':[
-  dict(name='North gate',c=(-552,-46),r=4,head='n',foot='w'),
+  dict(name='North gate',c=(-568,-46),r=4,head='n',foot='e'),
   dict(name='South gate',c=(-568,46),r=4,head='s',foot='e'),
   dict(name='West gate',c=(-621,8),r=4,head='w',foot='n'),
   dict(name='East gate',c=(-499,-8),r=4,head='e',foot='s'),
@@ -623,6 +621,9 @@ DECK={
   dict(name='Civic Plaza south',foot=(-446,-7),head=(-446,24)),
   dict(name='Market Square',foot=(-545,159),head=(-545,128)),
   dict(name='Estate Square',foot=(-523,-104),head=(-554,-104)),
+  # in the park, along the cross walk, up into the Crossing's mezzanine from the east and the west
+  dict(name='Crossing east',foot=(-523,0),head=(-554,0)),
+  dict(name='Crossing west',foot=(-591,0),head=(-560,0)),
  ],
  'esc_angle':12.0,'esc_w':2.6,
 }
@@ -717,7 +718,7 @@ def _deck_checks():
         for a,c in zip(run['pts'],run['pts'][1:]):
             ux,uz=(c[0]-a[0]),(c[1]-a[1]); L=math.hypot(ux,uz); ux/=L; uz/=L
             mid=Point((a[0]+c[0])/2,(a[1]+c[1])/2); ew=abs(ux)>abs(uz)
-            bad=unary_union([g for o,e,g in keep if not (e==ew and o.contains(mid))])
+            bad=unary_union([g for o,e,g in keep if not (e==ew and o.buffer(0.5).contains(mid))])
             e_=run['w']/2-0.4
             def at(t,e): return (a[0]+ux*t-uz*e*e_,a[1]+uz*t+ux*e*e_)
             def ok(t): return all(not bad.contains(Point(at(t,e))) and not any(g.buffer(0.05).contains(Point(at(t,e))) for _,g in bldg) for e in (-1,1))
@@ -770,10 +771,6 @@ def _site_checks():
             if not plot.buffer(0.01).contains(g): problems.append(('tower ground outside its plot',n_,kind))
             if kind=='pavilion' and g.intersection(sh).area>0.01: problems.append(('pavilion inside the shaft',n_))
         if not any(k_ in ('pavilion','court','yard') for k_,_,_ in site['ground']): problems.append(('tower foot with no life',n_))
-    bf=BLOCK_FORM; br=[b_ for b_ in named if b_['n']==16][0]['r']
-    if not sbox(*br).buffer(-bf['base'][0]+0.01).contains(sbox(*bf['court'])): problems.append(('BLOCK court not inside its walls',))
-    x,z=bf['door']
-    if not (abs(z-(br[1]+bf['base'][0]))<0.5 and br[0]<x<br[2]): problems.append(('BLOCK door not on its recessed base front',))
 _site_checks()
 ## The wall and the Wall Line (city.md 6c, proposed 2026-10-14). The Ring Line
 ## came first: a double-track viaduct round the city's edge, built in the boom.
@@ -911,42 +908,65 @@ def _build_wall():
     for t in TURBINES:
         if band.distance(Point(t))<40 or shed.distance(Point(t))<40: problems.append(('wall: too near a turbine',t))
 _build_wall()
-## The cross lines (city.md 6c, proposed 2026-10-14): elevated, at the Wall
-## Line's own level (+12 m), so the ring on the wall and the cross meet on the
-## level at the gates. Where a cross line follows the Deck it rides directly
-## over it, on the Deck's own columns carried up through it: the Deck is the
-## line's lower floor, its stations' concourse, and is shaded by the track.
-## Elsewhere the line has its own piers. Short articulated cars take 12 m
-## curves, after Lisbon's trams. Main streets (12 m) take double track (6 m);
-## Meridian North and South (8 m) take one track each, one way, so the
-## Meridian Line divides round city hall and Civic Plaza as the avenues do.
-## Old Moy and the civic axis (park to library) stay free of rail.
-## Services are directional centrelines in world (x, z); corners are filleted.
+## The cross lines (city.md 6c, revised 2026-10-16 at the user's direction): two
+## straight lines only. The Spine Line runs north to south at the Wall Line's
+## level (+12 m) and meets it on the level at the North and South Gates. The
+## Meridian Line runs east to west above it (+26 m): through the Timekeeper's
+## open centre over city hall, over the Crossing where the two lines cross,
+## from the Meridian Arch at the east to a high station over the West Gate.
+## Where the Spine rides the Deck it stands on the Deck's columns carried up
+## through it. Services are track centrelines in world (x, z).
 CROSS={
- 'rail':12.0,'depth':1.2,'r_min':12.0,'double':6.0,'single':3.6,'platform':(30.0,3.0),'min_gap':60.0,
- 'clear_over':2.0,  # a building under the line stands at least this far below its soffit
+ 'depth':1.2,'r_min':12.0,'double':6.0,'platform':(30.0,3.0),'min_gap':60.0,'clear_over':2.0,'car_h':3.4,
  'cars':dict(cars=2,car=(12.0,2.65,3.4),speed=9.0,dwell=20.0,headway=150),
  'services':[
-  # both lines run straight through, gate to gate, both ways, level at +12 m; they share the park's north side (Park North)
-  dict(line='Spine Line',w='double',pts=[(-557,-215),(-557,-53),(-492,-53),(-492,53),(-560,53),(-560,215)]),
-  dict(line='Meridian Line',w='double',pts=[(-322,-34),(-484,-34),(-506,-53),(-628,-53),(-628,0),(-792,0)]),
+  dict(line='Spine Line',w='double',rail=12.0,pts=[(-557,-228),(-557,228)]),
+  dict(line='Meridian Line',w='double',rail=26.0,pts=[(-358,0),(-782,0)]),
  ],
- # stations: the services that stop, the platform's centre on the line, how people reach it. deck: the Deck runs under the
- # platform, so a pair of escalating ramps on each side rises from the Deck to the platform
  'stations':[
-  dict(name='North Gate',at=(-557,-200),lines=['Spine Line'],deck=False,access='the North Gate\'s gatehouse, level with the Wall Line'),
+  dict(name='North Gate',at=(-557,-212),lines=['Spine Line'],deck=False,access='the North Gate\'s gatehouse, level with the Wall Line'),
   dict(name='Estate Square',at=(-557,-100),lines=['Spine Line'],deck=True,access='the Deck\'s Estate walk below; the glass lift and the escalating ramp from the square'),
-  dict(name='Park North',at=(-531,-53),lines=['Spine Line','Meridian Line'],deck=True,access='the Park Deck below; the park\'s north gate tower'),
-  dict(name='Civic Plaza',at=(-492,0),lines=['Spine Line'],deck=True,access='the Park Deck below; the park\'s east gate tower; the civic walks and the plaza\'s escalating ramps'),
-  dict(name='Market Square',at=(-560,138),lines=['Spine Line'],deck=False,access='over the square; the Deck\'s Market walk crosses below with the square\'s escalating ramp and glass lift'),
-  dict(name='South Gate',at=(-560,200),lines=['Spine Line'],deck=False,access='the South Gate\'s gatehouse, level with the Wall Line'),
-  dict(name='East Gate',at=(-345,-34),lines=['Meridian Line'],deck=False,access='the East Gate\'s north wing, level with the Wall Line'),
-  dict(name='Library Square',at=(-662,0),lines=['Meridian Line'],deck=True,access='the Square walk below, from the Park Deck and the park\'s west gate tower'),
-  dict(name='West Gate',at=(-770,0),lines=['Meridian Line'],deck=False,access='the West Gate\'s gatehouse, level with the Wall Line'),
+  dict(name='The Crossing',at=(-557,0),lines=['Spine Line','Meridian Line'],deck=True,access='the Crossing, the station at the park\'s centre: the Deck\'s Spine walk as its mezzanine, escalating ramps from the park\'s cross walk, lifts and a ramp core to the Meridian Line\'s platforms'),
+  dict(name='Market Square',at=(-557,138),lines=['Spine Line'],deck=False,access='over the square; the Deck\'s Market walk crosses below with the square\'s escalating ramp and glass lift'),
+  dict(name='South Gate',at=(-557,212),lines=['Spine Line'],deck=False,access='the South Gate\'s gatehouse, level with the Wall Line'),
+  dict(name='Meridian Arch',at=(-377,0),lines=['Meridian Line'],deck=False,access='the Meridian Arch\'s lower bridge, between its legs; a bridge at +12 m to the East Gate\'s Wall Line station'),
+  dict(name='West Gate',at=(-765,0),lines=['Meridian Line'],deck=False,access='a high station over the West Gate\'s gatehouse, its lifts down to the Wall Line'),
  ],
- # where the cross lines join the Wall Line on the level, so their trains reach the Line House
- 'junctions':['North Gate','South Gate','East Gate','West Gate'],
+ # the Spine meets the Wall Line on the level at these gates, so its trains reach the Line House; the Meridian Line's
+ # trains stable in sidings in the West Gate's high station
+ 'junctions':['North Gate','South Gate'],
 }
+## The Crossing (city.md 7a, proposed 2026-10-16): the city's station and civic
+## shelter at the park's centre, where the Spine (+12) and the Meridian (+26)
+## cross. A shading lattice dome after Kanazawa Station's Motenashi Dome, the two
+## viaducts passing through it; the concourse at the park's level opens on all
+## four cross walks; the Deck's Spine walk is its mezzanine.
+CROSSING=dict(c=(-557,0),r=21.0,apex=38.0,lattice='pale ceramic-clad steel diagrid with glass, open at the base for the wind',
+  program='the concourse: shade, water fountains, kiosks, a lost-and-found and the city\'s information desk; the lifts and a ramp core to both lines')
+## The Timekeeper (city.md 8a, proposed 2026-10-16): stands over city hall in
+## place of its clock tower, a ring in the north-south plane through whose empty
+## centre the Meridian Line runs. No hands from the centre: rotating rings, each
+## carrying a lit marker read against a fixed index at the top. From the centre
+## out: the day ring (the game's day: day, dawn, dusk and night painted as
+## regions, turning once a game day), the minute ring and the hour ring (real
+## time), and the fixed bezel. The lower part of the rings turns in a slot in
+## city hall's roof. After Prague's astronomical clock (the day and night regions)
+## and the ring clocks whose hours turn past a fixed index.
+TIMEKEEPER=dict(x=-414.0,z=0.0,y=29.0,thick=3.0,
+  rings=[('day',8.0,11.0,'turns once a game day (24 real minutes); day gold and sky blue, dawn and dusk rose, night indigo'),
+         ('minute',11.0,13.5,'turns once a real hour; one lit marker'),
+         ('hour',13.5,16.5,'turns twice a real day; one larger lit marker'),
+         ('bezel',16.5,19.0,'fixed; twelve hour marks, and the index at the top')],
+  slot=(6.0,40.0))
+## The Meridian Arch (city.md 8b, proposed 2026-10-16): a city-owned building
+## in front of city hall's east face, a loop over Meridian Avenue after Beijing's
+## CCTV headquarters, framing the Timekeeper in the view from the East Gate (the
+## St. Louis arch's framing in a loop of rooms). Two legs in Meridian Court, the
+## lower bridge between them is the Meridian Line's east station (+26 m), the top
+## bridge (with its cantilever toward city hall) the Wall Watch's command room.
+ARCH=dict(legs=[(-387,-28,-369,-12),(-387,12,-369,28)],lower=(22.0,32.0),top=(58.0,72.0),cantilever=12.0,
+  wall_bridge=12.0,program='city offices in the legs; the Meridian Line\'s station on the lower bridge; the Wall Watch\'s command room in the top bridge, looking east over the desert and west down the city\'s axis',
+  skin='a diagrid of pale ceramic-clad steel over glass')
 def _fillet(pts,R,step=1.0):
     out=[pts[0]]
     for i in range(1,len(pts)-1):
@@ -968,73 +988,91 @@ def _fillet(pts,R,step=1.0):
 def _cross_checks():
     from shapely.geometry import LineString, Point, box as sbox, Polygon as SP
     from shapely.ops import unary_union
-    X=CROSS; soffit=X['rail']-X['depth']
-    ground=unary_union([sbox(*s_[2:]) for s_ in STREETS]+[sbox(*o[1:]) for o in OPENS])
+    X=CROSS
     tall=[]
     for b_ in named:
-        h=PODIUM_HEIGHT.get(b_['n'],HEIGHTS.get(b_['n'],8))
-        tall.append((b_['n'],h,sbox(*b_['r'])))
+        tall.append((b_['n'],PODIUM_HEIGHT.get(b_['n'],HEIGHTS.get(b_['n'],8)),sbox(*b_['r'])))
         if b_['n'] in TOWER_PART: tall.append((b_['n'],HEIGHTS[b_['n']],sbox(*TOWER_PART[b_['n']])))
     for l in lots: tall.append((None,l[4]*STOREY.get(l[5],3.25),sbox(*l[:4])))
-    # the Deck's skybridges pass under the line with headroom
-    if DECK['level']+2.8+0.25>soffit-1.0: problems.append(('cross: a Deck skybridge too close under the line',))
     wallP=SP(WALL['centreline'])
-    lines={}
+    if DECK['level']+2.8+0.25>min(sv['rail'] for sv in X['services'])-X['depth']-1.0: problems.append(('cross: a Deck skybridge too close under a line',))
     for sv in X['services']:
-        P=_fillet(sv['pts'],X['r_min']); sv['path']=[(round(x,2),round(z,2)) for x,z in P]
-        L=LineString(P); sv['length']=round(L.length,1); w=X[sv['w']]
-        env=L.buffer(w/2,cap_style=2,join_style=2)
-        # inside the wall, then over streets, squares and the park, or over buildings low enough to pass
-        inside_env=env.intersection(wallP)
+        P=sv['pts']; L=LineString(P); sv['path']=[tuple(p_) for p_ in P]; sv['length']=round(L.length,1)
+        if len(P)!=2: problems.append(('cross: a line that is not straight',sv['line']))
+        soffit=sv['rail']-X['depth']; w=X[sv['w']]
+        env=L.buffer(w/2,cap_style=2).intersection(wallP)
         for n_,h,g in tall:
-            if inside_env.intersection(g).area>0.05 and h>soffit-X['clear_over']: problems.append(('cross: line through a building',sv['line'],sv['line'],n_,h))
-        lines.setdefault(sv['line'],[]).append((sv,L,env))
-    # stations: a straight stretch of every service of their lines, platforms clear of tall buildings, spaced along each service
-    for sv in X['services']:
-        L=LineString(sv['path']); pos=[]
+            if env.intersection(g).area>0.05 and h>soffit-X['clear_over']: problems.append(('cross: line through a building',sv['line'],n_,h))
+        # stations on the line, spaced, platforms clear of tall buildings
+        pos=[]
         for st in X['stations']:
             if sv['line'] not in st['lines']: continue
-            p=Point(st['at'])
-            if L.distance(p)>0.5: continue
-            s0=L.project(p); half=X['platform'][0]/2
-            if s0-half<0 or s0+half>L.length: problems.append(('cross: platform runs off the line',st['name'],sv['line'])); continue
-            a_,c_=L.interpolate(s0-half),L.interpolate(s0+half)
-            if abs(a_.distance(c_)-2*half)>0.05: problems.append(('cross: platform on a curve',st['name'],sv['line']))
-            w=X[sv['w']]
-            sl=LineString([a_,c_])
-            if 'toward' in st:
-                offs=[sl.offset_curve(d) for d in (w/2+X['platform'][1],-(w/2+X['platform'][1]))]
-                o=min(offs,key=lambda q:q.distance(Point(st['toward'])))
-                seg=sl.buffer(w/2,cap_style=2).union(SP(list(sl.coords)+list(o.coords)[::-1] if Point(o.coords[0]).distance(Point(sl.coords[0]))<Point(o.coords[-1]).distance(Point(sl.coords[0])) else list(sl.coords)+list(o.coords)).buffer(0))
-            else: seg=sl.buffer(w/2+X['platform'][1],cap_style=2)
+            p_=Point(st['at'])
+            if L.distance(p_)>0.5: problems.append(('cross: station off its line',st['name'],sv['line'])); continue
+            s0=L.project(p_); half=X['platform'][0]/2
+            if s0-half<-0.01 or s0+half>L.length+0.01: problems.append(('cross: platform runs off the line',st['name']))
+            seg=LineString([L.interpolate(max(0,s0-half)),L.interpolate(min(L.length,s0+half))]).buffer(w/2+X['platform'][1],cap_style=2).intersection(wallP)
             for n_,h,g in tall:
                 if seg.intersection(g).area>0.05 and h>soffit-X['clear_over']: problems.append(('cross: platform into a building',st['name'],n_))
+            if st.get('deck') and sv['rail']==12.0:
+                if not any(LineString(r_['pts']).buffer(r_['w']/2).contains(p_) for r_ in DECK['runs']): problems.append(('cross: no Deck under a Deck station',st['name']))
+                rise=sv['rail']+1.0-DECK['level']; need=rise/math.tan(math.radians(DECK['esc_angle']))
+                if need>X['platform'][0]+2: problems.append(('cross: escalating ramp longer than its platform',st['name']))
+                a_,c_=L.interpolate(max(0,s0-half)),L.interpolate(min(L.length,s0+half))
+                st['_esc']=[dict(foot=[round(c,2) for c in LineString([a_,c_]).offset_curve(sd*(w/2+X['platform'][1]/2)).coords[0]],head=[round(c,2) for c in LineString([a_,c_]).offset_curve(sd*(w/2+X['platform'][1]/2)).coords[-1]],run=round(need,1),under='platform') for sd in (1,-1)]
             pos.append((s0,st['name']))
-            if st.get('deck') and not any(LineString(r_['pts']).buffer(r_['w']/2).contains(p) for r_ in DECK['runs']): problems.append(('cross: no Deck under a Deck station',st['name']))
-            if st.get('deck') and not st.get('_esc'):
-                # a pair of escalating ramps under each platform, rising from the Deck through the platform floor to its far
-                # end, as in Bangkok's Skytrain stations: the run must fit the platform's length
-                rise=X['rail']+1.0-DECK['level']; need=rise/math.tan(math.radians(DECK['esc_angle'])); st['_esc']=[]
-                if need>X['platform'][0]+2: problems.append(('cross: escalating ramp longer than its platform',st['name'],round(need,1)))
-                for side in (1,-1):
-                    off=LineString([a_,c_]).offset_curve(side*(w/2+X['platform'][1]/2))
-                    st['_esc'].append(dict(foot=[round(c,2) for c in off.coords[0]],head=[round(c,2) for c in off.coords[-1]],run=round(need,1),under='platform'))
         pos.sort(); sv['stops']=[n for _,n in pos]
         for (a_,na),(c_,nc) in zip(pos,pos[1:]):
             if c_-a_<X['min_gap']: problems.append(('cross: stations too close',sv['line'],na,nc,round(c_-a_,1)))
-    for st in X['stations']:
-        if not any(LineString(sv['path']).distance(Point(st['at']))<0.5 for sv in X['services'] if sv['line'] in st['lines']): problems.append(('cross: station off its line',st['name']))
-    # every service ends at the wall or at an interchange with the other cross line
-    wall_names={x['name'] for x in WALL['stations']}
-    for sv in X['services']:
-        for end in (sv['stops'][0],sv['stops'][-1]):
-            st=[x for x in X['stations'] if x['name']==end][0]
-            if end not in wall_names and len(st['lines'])<2: problems.append(('cross: line ends at no interchange',sv['line'],end))
-    # gate junctions: the line reaches the wall's centreline at the gate (on the level)
+    sp,me=[sv for sv in X['services'] if sv['line']=='Spine Line'][0],[sv for sv in X['services'] if sv['line']=='Meridian Line'][0]
+    # the two lines cross at different levels, with the Meridian's structure clear over the Spine's trains
+    if me['rail']-X['depth']-(sp['rail']+X['car_h']+0.6)<2.0: problems.append(('cross: the Meridian Line too low over the Spine',))
+    cross_pt=LineString(sp['pts']).intersection(LineString(me['pts']))
+    if cross_pt.is_empty or Point(CROSSING['c']).distance(cross_pt)>1.0: problems.append(('cross: the lines do not cross at the Crossing',))
+    # the Spine meets the Wall Line on the level at its gates
+    if sp['rail']!=WALL['height']: problems.append(('cross: the Spine is not level with the Wall Line',))
     for nm in X['junctions']:
         g=[x for x in WALL['gates'] if x['name']==nm][0]
-        near=min((LineString(sv['path']).distance(wallP.exterior) for sv in X['services'] if Point(sv['path'][0]).distance(Point(g['p']))<45 or Point(sv['path'][-1]).distance(Point(g['p']))<45),default=1e9)
-        if near>0.5: problems.append(('cross: line stops short of the wall at',nm,round(near,1)))
+        if LineString(sp['pts']).distance(Point(g['p']))>4: problems.append(('cross: the Spine misses its gate',nm))
+    # the Meridian passes through the Timekeeper's empty centre with room round its trains
+    T=TIMEKEEPER; inner=T['rings'][0][1]
+    if LineString(me['pts']).distance(Point(T['x'],T['z']))>0.01: problems.append(('cross: the Meridian Line misses the Timekeeper',))
+    for dz in (-X['double']/2,X['double']/2):
+        for y in (me['rail']-X['depth'],me['rail']+X['car_h']+0.4):
+            if math.hypot(dz,y-T['y'])>inner-0.8: problems.append(('cross: the train fouls the Timekeeper\'s rings',dz,y))
+    ch=[b_ for b_ in named if b_['n']==2][0]['r']
+    if not (ch[0]<T['x']<ch[2] and ch[1]<T['z']-T['rings'][-1][2] and T['z']+T['rings'][-1][2]<ch[3]): problems.append(('cross: the Timekeeper does not stand within city hall',))
+    if me['rail']-X['depth']-HEIGHTS[2]<2.0: problems.append(('cross: the Meridian Line too low over city hall\'s roof',))
+    # the Meridian Arch: legs in Meridian Court, clear of the avenue and the line; the lower bridge carries the line\'s station
+    A=ARCH; court=[o for o in OPENS if o[0]=='Meridian Court'][0]
+    av=[s_ for s_ in STREETS if s_[0]=='Meridian Avenue'][0]
+    for lg in A['legs']:
+        g=sbox(*lg)
+        if not sbox(*court[1:]).contains(g): problems.append(('arch: a leg outside Meridian Court',lg))
+        if g.intersects(sbox(*av[2:])): problems.append(('arch: a leg on Meridian Avenue',lg))
+        if g.distance(LineString(me['pts']))<X['double']/2+3: problems.append(('arch: a leg against the line',lg))
+        if g.distance(wallP.exterior)<WALL['thick']/2+4: problems.append(('arch: a leg against the wall',lg))
+    if not (A['lower'][0]<me['rail']-X['depth'] and me['rail']+X['car_h']<A['lower'][1]): problems.append(('arch: the lower bridge does not hold the line',))
+    st=[x for x in X['stations'] if x['name']=='Meridian Arch'][0]
+    if not (A['legs'][0][0]<=st['at'][0]<=A['legs'][0][2]): problems.append(('arch: the station is not between the legs',))
+    # the Crossing at the park's centre: inside the park, clear of its gardens, the pond and the playground
+    C=CROSSING; dome=Point(C['c']).buffer(C['r'],64)
+    if not sbox(*PARK['rect']).contains(dome): problems.append(('crossing: the dome leaves the park',))
+    from shapely import affinity
+    pc=PARK['pond']['c']; pond=affinity.scale(Point(pc).buffer(1,64),*PARK['pond']['r'])
+    pg=PARK['playground']; play=Point(pg['c']).buffer(pg['track'][1],64)
+    for nm,g in [('dry garden',sbox(*PARK['dry_garden'])),('lawn',sbox(*PARK['lawn'])),('pond',pond),('playground',play)]+[('wind tree',Point(t).buffer(3)) for t in PARK['wind_trees']]+[('parasol',Point(t).buffer(2.5)) for t in PARK['parasols']]:
+        if dome.intersection(g).area>0: problems.append(('crossing: the dome on the',nm))
+    if not sbox(*PARK['rect']).buffer(-1).contains(play): problems.append(('park: the playground leaves the park',))
+    for n_ in (9,10):
+        g=sbox(*[b_ for b_ in named if b_['n']==n_][0]['r'])
+        for nm,f in [('playground',play),('dome',dome),('pond',pond),('lawn',sbox(*PARK['lawn'])),('dry garden',sbox(*PARK['dry_garden']))]+[('walk',sbox(*w_)) for w_ in PARK['walks']]:
+            if g.intersection(f).area>0: problems.append(('park: a park building on the',nm,n_))
+    for t in pg['towers']:
+        if pond.distance(Point(t[:2]))<t[3]+1 or sbox(*PARK['lawn']).distance(Point(t[:2]))<t[3]: problems.append(('park: a playground tower on the pond or the lawn',t))
+    for t in PARK['wind_trees']:
+        if pond.contains(Point(t)) or play.distance(Point(t))<3 or dome.distance(Point(t))<4: problems.append(('park: a wind tree on the pond, the playground or the dome',t))
+    if C['apex']<me['rail']+X['car_h']+4: problems.append(('crossing: the dome too low over the Meridian Line',))
 _cross_checks()
 if '--wall' in sys.argv:
     print(WALL['length'],WALL['min_radius'],WALL['station_gaps']); [print(st) for st in WALL['stations']]
@@ -1304,15 +1342,20 @@ w("## (s: metres along the centreline), watch_posts, the car shed. Streets other
 w("## the gate streets stop at the Rim Walk: the builder clips clipped streets to 203 m.")
 w("const WALL := %s" % lit(WALL))
 w("")
-w("## The cross lines (city.md 6c): elevated at the Wall Line's level. services are")
-w("## directional; path is the filleted track centreline. Where a service follows the")
-w("## Deck it rides on the Deck's columns, directly above it.")
+w("## The cross lines (city.md 6c): two straight lines, the Spine at +12 m (level with the")
+w("## Wall Line) and the Meridian above it at +26 m; rail is each line's height. Where the")
+w("## Spine follows the Deck it rides on the Deck's columns, directly above it.")
 w("const CROSS := %s" % lit(CROSS))
+w("## The Crossing: the station and civic shelter at the park's centre (city.md 7a).")
+w("const CROSSING := %s" % lit(CROSSING))
+w("## The Timekeeper over city hall (city.md 8a): rings (name, inner and outer radius, what), centre (x, y, z), the")
+w("## Meridian Line through its empty centre. Day ring: the game day; minute and hour rings: real time.")
+w("const TIMEKEEPER := %s" % lit(TIMEKEEPER))
+w("## The Meridian Arch (city.md 8b): legs (world rects), lower and top bridges (y ranges), the line's east station.")
+w("const ARCH := %s" % lit(ARCH))
 w("")
 w("## The towers' sites: the shaft's footprint and the public ground round it (city.md 7c).")
 w("const TOWER_SITE := %s" % lit(TOWER_SITE))
-w("## BLOCK's form (city.md 7c): recessed dark base, upper storeys out to the plot line, court, masts.")
-w("const BLOCK_FORM := %s" % lit(BLOCK_FORM))
 w("## The BLOCK tower's form (city.md 7c): windowless shaft, recessed base, vent hoods, masts, no crown.")
 w("const BLOCK_TOWER := %s" % lit(BLOCK_TOWER))
 w("const TURBINE_HUB_HEIGHT := 95.0")
@@ -1334,5 +1377,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,block_form=BLOCK_FORM,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

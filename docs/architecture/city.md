@@ -96,6 +96,22 @@ the world bible.
   city blorbs simply stay outside the city's outskirts.
 - **No opulent fountains.**
 
+**Ninth revision (user, 2026-10-16):**
+- **Two simple straight lines** across the city, north–south and
+  east–west, at different heights so they never meet; the east–west line
+  raised (section 6c).
+- **City hall without its clock tower:** a giant timekeeping structure over
+  it that the train passes straight through, with no hands from the centre;
+  hour and minute keep real-world time, and it shows day and night (8a.0).
+- **Clear the mid-rise blocks in front of city hall's east face** and put an
+  arching structure there, after the CCTV headquarters or the St. Louis
+  arch, framing city hall from the east; a very modern, city-owned
+  building, joined to the wall, the train and city hall (8b).
+- **BLOCK's old low building becomes mid-rise real estate.**
+- **The park's centre becomes a civic structure and modern train station**;
+  the playground moves to one section, so the park is shared by the
+  station, the playground and the green (7a).
+
 **Eighth revision (user, 2026-10-14):**
 - **The NMEs are on the rise** because of the Demon King. They come up to
   cities but never enter (that is how the game is coded), and Moy is
@@ -310,8 +326,8 @@ A desert city needs a reason to exist. This one has **the wind.**
    Vegas was built for its dam. Everything in Moy runs on it: the lifts,
    the lights and signs, the vertical farm, the pumps at the wells.
 2. **Science and technology.** **BLOCK** (renamed from the Lumen Institute,
-   user), a research institute in a dark tower on Civic Plaza, with its
-   first labs behind it, works on power and on "living current". Everything
+   user), a research institute in a dark tower on Civic Plaza, works on
+   power and on "living current". Everything
    sinister in Moy is concentrated there (section 7c). Start-ups fill the
    north tower's capsules, and Tanglewire recruits for them and the
    Windworks. Pinestein worked at BLOCK.
@@ -639,9 +655,9 @@ often.
    | Street | Kind | Width | Runs |
    |---|---|---|---|
    | Park Ring | main street | 12 m | round the park; every district touches it |
-   | Meridian Avenue | main street | 12 m | from the Rim Walk (east) to Clock Street, behind city hall |
-   | Meridian North | main street | 10 m | from the Park Ring past Civic Plaza, the hotel and the Windspire to the Rim Walk |
-   | Meridian South | main street | 10 m | from the Park Ring past Civic Plaza, the BLOCK tower and BLOCK's labs to the Rim Walk |
+   | Meridian Avenue | main street | 12 m | from the East Gate through Meridian Court, under the Meridian Arch, to Clock Street behind city hall |
+   | Meridian North | main street | 10 m | from the Park Ring past Civic Plaza, the hotel and the Windspire to Meridian Court and the Rim Walk |
+   | Meridian South | main street | 10 m | from the Park Ring past Civic Plaza and the BLOCK tower to Meridian Court and the Rim Walk |
    | Clock Street | lane | 4 m | behind city hall, from Meridian North to Meridian South |
    | West Street | main street | 12 m | from the Rim Walk (west) to Arcade Street and Library Square |
    | North Street | main street | 12 m | from the Park Ring to the Rim Walk (north), through the estate |
@@ -683,8 +699,10 @@ often.
      (section 8), and from there a glass bridge crosses the Windspire's wind
      garden into its lobby. Nothing crosses Meridian South: BLOCK stays off
      the Deck.
-   - **The Square walk**, across Library Square under the Meridian Line,
-     the Library Square station's concourse.
+   - **The Spine walk**, straight through the park under the Spine Line,
+     from the Park Deck's north side to its south side: the Crossing's
+     mezzanine (section 7a), with escalating ramps up to it from the park's
+     cross walk on the east and the west.
    - **The Library walk**, over Garden Walk's mouth to the library's
      east-wing door and its first gallery (section 9).
    - **The Estate walk**, up the east half of North Street past the hawker
@@ -858,45 +876,42 @@ about three and a half minutes to go round. From the train you see the whole
 city on one side and the desert, the turbines and the NMEs on the other: the
 city's vigilance and its commute are the same ride.
 
-**The cross lines** (simplified 2026-10-14, at the user's direction) are two
-straight-through lines, gate to gate and both ways, elevated at the Wall
-Line's own level, +12 m, the whole way: no climbs or dips. They meet the
-Wall Line on the level at all four gates, where junctions let their trains
-reach the Line House. There are no reversals and no single-track stretches.
-- **The Spine Line (north to south, 542 m).** North Gate, down North Street
-  over the Deck's Estate walk (**Estate Square**), along the park's north
-  side (**Park North**), down its east side facing Civic Plaza (**Civic
-  Plaza**), along its south side, then down South Street over **Market
-  Square** to the **South Gate**. It runs past downtown's front door,
-  because that is where the estate and the market go to work.
-- **The Meridian Line (east to west, 519 m).** East Gate, along Meridian
-  North (between the hotel and city hall), across the park's north-east
-  corner to the north side (**Park North**), down the west side, then west
-  across Library Square (**Library Square**) and along West Street through
-  Old Moy to the **West Gate**. It crosses the Spine Line once, on the level,
-  at the park's north-east corner.
-- **Interchanges:** Park North between the two lines; the four gates with
-  the Wall Line.
-- **The Deck is the middle level.** The city has three: the street (0), the
-  Deck (+6.5 m) and the trains and wall top (+12 m). Where a line follows
-  the Deck it rides directly over it, the same 6 m wide, on the Deck's own
-  columns carried up through it, so the Deck is the line's lower floor,
-  shaded by the track, and every station's concourse (after Bangkok's
-  Skytrain and its skywalk). Library Square gets a new Deck run, the
-  **Square walk**, under the line for its station.
-- **Getting up.** From the street to the Deck: the ramp towers, the glass
-  lifts, and escalating ramps on the big squares. From the Deck to the
-  platform: a pair of escalating ramps under each platform, rising 6.5 m in
-  31 m through the platform floor to its far end, so no station needs a
-  tower of its own. At the gates, the gatehouse's ramp tower and lift serve
-  the street, the Wall Line and the cross line together.
-- **Where no rail goes:** the park itself (the playground's Lookout is 20 m
-  high) and the narrow lanes. The Meridian Line keeps to West Street, Old
-  Moy's one main street, with 3 m clear of the tower houses on each side.
-- **Cars:** short two-car articulated sets that take 12 m curves at walking
-  pace, after Lisbon's trams, so the lines can turn at the street corners
-  of a dense grid. It is a game: the trains are there because riding them
-  is fun.
+**The cross lines** (revised 2026-10-16, at the user's direction): **two simple
+straight lines**, one north to south and one east to west, at two levels so
+they never meet. Data: `CROSS` in `tools/city_layout.py`.
+- **The Spine Line, north to south, at +12 m** (456 m): straight down
+  North Street, through the park and down South Street, at the Wall Line's
+  own level, so it meets the Wall Line on the level at the North and South
+  Gates, where junctions take its trains to the Line House. Stations:
+  **North Gate**, **Estate Square**, **the Crossing**, **Market Square**,
+  **South Gate**. On North Street and South Street and through the park it
+  rides directly over the Deck, on the Deck's own columns carried up
+  through it (after Bangkok's Skytrain and its skywalk).
+- **The Meridian Line, east to west, raised to +26 m** (424 m): from its
+  east station in the **Meridian Arch** (8b), straight along the civic axis,
+  through the **Timekeeper's** empty centre over city hall (8a.0), across
+  Civic Plaza and over the Crossing (where it passes 9 m over the Spine's
+  trains), across Library Square and along West Street to a high station
+  over the **West Gate**, whose lifts go down to the Wall Line. Stations:
+  **Meridian Arch**, **the Crossing**, **West Gate**. It is the city's
+  high line: few stops, the longest views. Its trains stable in sidings in
+  the West Gate's high station. It stands on tall single piers down the
+  middle of the street and spans city hall without touching the
+  Timekeeper.
+- **The Crossing**, at the park's centre, is where they meet: one station on
+  two levels (section 7a).
+- **The Deck is the middle level** between the street (0) and the Spine
+  (+12 m). From the street to the Deck: the ramp towers, the glass lifts and
+  the escalating ramps on the squares and in the park. From the Deck to the
+  Spine's platforms: a pair of escalating ramps under each platform,
+  rising through the platform floor. The Meridian Line's stations, 26 m up,
+  are reached by lifts and ramp cores in the arch, the Crossing and the West
+  Gate's station.
+- **Where no rail goes:** the narrow lanes. Both lines keep to main streets
+  and squares; the Meridian keeps 3 m clear of Old Moy's tower houses on
+  West Street.
+- **Cars:** short two-car articulated sets, after Lisbon's trams. It is a
+  game: the trains are there because riding them is fun.
 
 **Structure and checks.** The cross lines stand inside the wall over
 streets, squares and the park, or over buildings at least 2 m below their
@@ -951,10 +966,12 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
 
 - **The park, at the centre** (user). About 130 × 100 m, ringed by the Park
   Ring, the main street that ties the city together:
-  - the **giant playground** at its heart (section 7b);
-  - four quarters: the dry garden, the reed pond, the parasols with Old Fu's
-    tea house and the chess terrace, and the great lawn (section 7a);
-  - four steel wind trees round the playground;
+  - **the Crossing** at its heart, the city's station where the two train
+    lines cross (section 7a, revised 2026-10-16);
+  - four quarters round it: the dry garden, the reed pond, the parasols
+    with Old Fu's tea house and the chess terrace, and the **giant
+    playground** with the green (sections 7a, 7b);
+  - four steel wind trees round the Crossing;
   - **Garden Row**, a short row of three older townhouses, faces it from
     the west, across the Park Ring from Old Moy.
 
@@ -1085,8 +1102,8 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
   - the **Windspire**, the Windworks' headquarters, about 280 m with an
     observation deck, beside the hotel on Meridian North, facing the plaza;
   - the **BLOCK tower** on the plaza's south side, BLOCK's headquarters,
-    with **BLOCK's labs**, 6 storeys round a court, behind it on Meridian
-    South;
+    BLOCK's only building (its old six-storey labs behind it are ordinary
+    mid-rise real estate now);
   - the **north tower** (start-up capsules) and **south tower** (flats over
     offices, Tanglewire) on the Park Ring's east corners;
   - **mid-rise blocks of 18 to 34 storeys** filling the rest of downtown
@@ -1099,7 +1116,23 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
 ### 7a. The park and the giant playground (proposed, 2026-10-12)
 
 The park is the city's common ground: about 130 × 100 m at the centre of
-Moy, ringed by the Park Ring, with the Deck running round it at +6.5 m. In a
+Moy, ringed by the Park Ring, with the Deck running round it at +6.5 m.
+
+**Revised 2026-10-16 (user): a shared park.** Its centre, where the two cross
+walks meet and the two train lines cross, is now **the Crossing**: a civic
+structure and modern station under a shading lattice dome 42 m across and 38
+m high, after **Kanazawa Station's Motenashi Dome** (a glass-and-steel
+"welcome" dome that shelters arrivals). The Spine Line passes through it at
++12 m and the Meridian Line at +26 m; the Deck's Spine walk runs through it
+at +6.5 m as its mezzanine; escalating ramps rise to the mezzanine from the
+cross walk on the east and the west, and lifts and a ramp core rise to the
+Meridian's platforms. The concourse at the park's level is open on all four
+walks: shade, water fountains, kiosks, a lost-and-found and the city's
+information desk. Data: `CROSSING`, checked against the gardens, the pond,
+the playground and the wind trees. The giant playground moved whole to the
+south-east quarter (7b), beside a smaller green and the park lodge; the dry
+garden and the pond drew back a little from the dome, and the four wind
+trees now stand round the Crossing. In a
 desert it has to earn every drop of water, so most of it is shade and dry
 garden, and the one green lawn and the one pond each have a job.
 
@@ -1156,6 +1189,11 @@ below. They are also the park's high anchors (see below).
 - **Berliner Seilfabrik's rope pyramids:** net towers up to 10 m that
   children climb inside.
 - **BMX pump tracks:** packed-earth loops of rollers and banked turns.
+
+**Moved (2026-10-16):** the whole playground now stands in the park's
+south-east quarter at 0.55 of the size below (about 31 m across), its towers
+keeping their heights; the Crossing took the centre. Distances below are
+the original design's.
 
 **Shape.** One sculpted object about 56 m across at the crossing of the two
 walks. It is a desert landscape in miniature: sand dunes on the west,
@@ -1268,8 +1306,9 @@ Central or Tokyo's Marunouchi.
 
 **2. The BLOCK tower** (BLOCK's headquarters, about 45 storeys, 180 m; revised 2026-10-14: the glass tower is now BLOCK's)
 - **Idea:** the city's one dark tower, facing its living room. Everything
-  sinister in Moy is concentrated here and in BLOCK's labs behind it, and
-  none of it is said: the architecture says it. Data: `BLOCK_TOWER`.
+  sinister in Moy is concentrated here, and none of it is said: the
+  architecture says it. Pinestein's old laboratory is sealed in its base.
+  Data: `BLOCK_TOWER`.
 - **References:**
   - **33 Thomas Street, New York:** a windowless granite skyscraper (the
     telephone exchange) with ventilation hoods where windows should be.
@@ -1334,37 +1373,20 @@ Central or Tokyo's Marunouchi.
   climbers and swing anchors along the south of Civic Plaza. Tanglewire has
   its office floors above the colonnade.
 
-**BLOCK's labs** (BLOCK's first building, 6 storeys, 22 m, behind the tower on Meridian South; revised 2026-10-14)
-- **Idea:** a closed place that looms, where the living-current work
-  happens. Pinestein's old laboratory is here, sealed. Data: `BLOCK_FORM`.
-- **References:**
-  - **33 Thomas Street, New York:** the windowless telephone exchange whose
-    blank mass is felt before it is understood.
-  - **Boston City Hall:** upper floors looming out over a recessed base.
-- **Form:**
-  - the only dark building downtown: blue-black glazed brick in a city of
-    pale tile, with an azure sheen at a low sun, the city blorbs' colour;
-  - a **recessed base** 3 m in from the plot line with no windows at eye
-    level, so the five storeys above lean over their own pavement and keep
-    it in shadow, without ever leaving the plot line;
-  - **one narrow door**, off the axis, the only opening at the ground;
-  - **slit windows**, 35 cm wide every 3.6 m;
-  - a **court nobody sees**: its clerestory glows azure at night and is dark
-    by day;
-  - a ring of **grounding masts** on the roof, for the living-current work.
-- It stays off the Deck and turns its back on Civic Plaza's life.
+(BLOCK's old six-storey labs behind the tower became ordinary mid-rise real
+estate on 2026-10-16; everything of BLOCK's is in the tower now.)
 
 **What happens at BLOCK** (proposed 2026-10-14, in review; the user asked
 for the evil activities and people to be concentrated there).
 - **One person.** After the Blackout the city's scientists left BLOCK. Dr.
-  Kask kept it running with machines: the labs work through the night with
+  Kask kept it running with machines: the tower's labs work through the night with
   no one in them, and she is the only person the hero ever sees go in. It
   is the one building in Moy without named people inside, and that is
   what is wrong with it.
 - **The work never stopped.** The living-current work that made the city
-  blorbs goes on. At night the labs draw more power than the rest of
+  blorbs goes on. At night the tower draws more power than the rest of
   downtown together (Omar Haddad sees it on the battery works' meters
-  and says nothing), and the court's azure glow is the colour of the city blorbs.
+  and says nothing), and the thin azure line under its roof is the colour of the city blorbs.
   Proposed: Kask lures city blorbs in from the desert with the grid's power
   to study and drain them, the very creatures the city banned and fears.
 - **Pinestein knows.** He watches BLOCK from his roof in Old Moy, and the
@@ -1551,8 +1573,7 @@ or the Rim Walk. Ground left over inside a block is a shared garden
 courtyard; the leftover strips along the Rim Walk are gardens. Green on
 the plan means gardens and the park only.
 
-BLOCK has the tower on Civic Plaza's south side and its labs behind it;
-Dr. Kask lives at the top of the tower. The Windworks (with its legal
+BLOCK has the tower on Civic Plaza's south side; Dr. Kask lives at the top of the tower. The Windworks (with its legal
 department) has the Windspire, the start-ups the north tower's capsules,
 and Tanglewire the south tower's office floors. Six ramp towers (marked R on the plan) stand at the park's four gates
 and in a pair on Civic Plaza; glass lifts (L) at Estate Square and Market
@@ -1563,20 +1584,21 @@ Square (section 6, the Deck).
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
 | 9 | Tea house | 14 × 12 m | 1 storey; flat above and keeper's room behind | Old Fu (keeper); Kenji Mori (above) |
-| 10 | Park lodge | 10 × 8 m | 1 storey | Orin Pike (park keeper) |
-| 11 | Giant playground | about 36 m across | climbing towers 12–20 m | Lily, Kofi |
+| 10 | Park lodge | 10 × 8 m, beside the green | 1 storey | Orin Pike (park keeper) |
+| — | The Crossing | dome 42 m across, 38 m high, at the park's centre (7a) | the city's station where the two lines cross, and its shelter | — |
+| 11 | Giant playground | about 31 m across, the park's south-east quarter (7b) | climbing towers 12–20 m | Lily, Kofi |
 
 **Downtown**
 
 | No. | Building | Footprint | Size | Who lives or works here |
 |---|---|---|---|---|
 | 1 | Grand Hotel | 52 × 60 m | atrium block of 12 levels (44 m) round its void; cylinder guest tower of 28 levels (96 m) with the revolving drum to 108 m (section 8) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
-| 2 | City hall | 34 × 60 m | exterior only: portico, balcony, side wings and a 45 m clock tower on Clock Street, at the head of Civic Plaza (section 8a) | Mayor Teodora Vance, Kenji Mori (clerk) |
+| 2 | City hall | 34 × 60 m | exterior only: portico, balcony, side wings, and the Timekeeper standing over it (8a.0), at the head of Civic Plaza (section 8a) | Mayor Teodora Vance, Kenji Mori (clerk) |
+| — | The Meridian Arch | two legs 18 × 16 m in Meridian Court, 72 m high (8b) | city offices; the Meridian Line's east station; the Wall Watch's command room | — |
 | 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, twisting, with three wind gaps (7c) | the Windworks (headquarters, observation deck) |
 | 13 | BLOCK tower | 40 × 40 m | about 45 storeys, 180 m, a windowless dark shaft (7c) | BLOCK's headquarters; Dr. Vera Kask (director, top floors) |
 | 14 | North tower | 40 × 40 m | about 45 storeys, 175 m, plug-in capsule offices (7c) | start-up floors (Theo Park) |
 | 15 | South tower | 40 × 40 m | about 40 storeys, 150 m, dune balconies (7c) | flats over offices; Tanglewire (Dan) |
-| 16 | BLOCK labs | 38 × 42 m | 6 storeys round a court; Pinestein's old lab, sealed (7c) | BLOCK |
 
 **North Estate**
 
@@ -2064,6 +2086,41 @@ still land on and swing from, with no interiors behind them.
 
 ## 8a. City hall: building brief (proposed, 2026-10-13)
 
+### 8a.0 The Timekeeper (revised 2026-10-16, at the user's direction)
+
+City hall's clock tower is replaced by a giant timekeeping structure standing
+over the hall, which the Meridian Line passes straight through. Data:
+`TIMEKEEPER` in `tools/city_layout.py`, checked against the line.
+- **Form:** a ring 38 m across in the north–south plane, over the middle of
+  the hall (3 m thick, centre 29 m up), facing the plaza and the park on
+  one side and Meridian Court and the arch on the other. Its lower part
+  turns in a slot cut through the roof, so from the plaza the ring seems to
+  rise out of the building like a sun from the horizon.
+- **No hands from the centre:** the centre is an empty opening 16 m across,
+  and the Meridian Line runs through it at +26 m with room on every side.
+  Time is read from rings instead, each turning past a fixed **index** at
+  the top (a lit triangle), after the ring clocks whose numbers turn past a
+  pointer, and Prague's astronomical clock, whose dial paints day and night.
+- **The rings, from the centre out:**
+  - the **day ring** (8 to 11 m): the game's own day painted on it, gold for
+    day (5:00 to 20:00), rose for dawn and dusk, indigo for night. It turns
+    once a game day (24 real minutes), so the hour under the index is the
+    game's hour, and anyone can see how long until dark;
+  - the **minute ring** (11 to 13.5 m) and the **hour ring** (13.5 to 16.5
+    m): each carries one lit marker and keeps **real-world time** (user),
+    the minute ring turning once a real hour, the hour ring twice a real
+    day, clockwise as seen from the plaza;
+  - the fixed **bezel** (16.5 to 19 m): twelve hour marks, the index, and
+    rungs on its frame.
+- **Open:** whether the hour and minute rings keep real-world time (as
+  asked) or the game's time like the day ring. Real time and the game's
+  sun run at different speeds (a game day lasts 24 real minutes), so the
+  rings will rarely agree with the light; the day ring is what matches it.
+- **Material:** pale enamelled steel rings on a bronze frame; the markers
+  and index lit, the day ring's colours lit softly from within at night.
+- **Sound:** the old tower's bell is kept, hung in the bezel's frame at the
+  top, striking the real hours.
+
 ### 8a.1 People and purposes
 
 **What city hall is for.** Moy governs itself; no one outside it ever
@@ -2098,7 +2155,8 @@ told the hour by the shadow of its wind towers.
 
 **References:**
 - **Hilversum Town Hall (Willem Dudok, 1931):** interlocking horizontal
-  masses and one tall clock tower, of the same era as the library.
+  masses and one tall clock tower, of the same era as the library (the
+  tower itself is replaced by the Timekeeper, 8a.0).
 - **Stockholm City Hall:** the **Blue Hall**, a great covered courtyard used
   as the city's public room, and the **Golden Hall**, a council hall walled
   in gold mosaic telling the city's story.
@@ -2112,10 +2170,11 @@ The head of Civic Plaza: 34 m (east–west) × 60 m (north–south).
   the library at the other end of the civic axis.
 - **North and south faces:** on Meridian North and Meridian South, the two
   branches of Meridian Avenue.
-- **East face, the back:** on Clock Street, where Meridian Avenue arrives
-  head-on. The **clock tower** stands here, so it closes the long view up
-  Meridian Avenue from the east, and rises over the roof seen from the
-  plaza and the park.
+- **East face, the back:** on Clock Street, facing Meridian Court and the
+  Meridian Arch (section 8b) across it, where Meridian Avenue arrives
+  head-on. The old clock tower here is gone (revised 2026-10-16): the
+  **Timekeeper** stands over the middle of the hall instead (8a.0), framed
+  by the arch in the long view up the avenue from the East Gate.
 - **The Deck** runs along Meridian North at +6.5 m; city hall's north door
   meets it.
 
@@ -2135,7 +2194,7 @@ What the elevations express, west to east across the 34 m depth:
 - **the Hall of the City**, 16 × 30 m, the city's covered public room
   (after Stockholm's Blue Hall), with the wall of house marks; its roof is
   the louvred clerestory seen above the side ranges;
-- **the east range**, 8 m deep on Clock Street, with the clock tower;
+- **the east range**, 8 m deep on Clock Street, under the Timekeeper's slot;
 - **the north and south ranges**, 15 m each along the front: the registry
   (north, with the Deck door) and the marriage room (south);
 - **the strongroom** below ground, holding the registers.
@@ -2153,11 +2212,11 @@ Interlocking horizontal masses with one vertical, after Dudok:
 | **The front block** | the west range, the middle 30 m of the front | +22 m to its parapet | the council chamber over the portico: the tallest of the low masses, on the civic axis |
 | **The side ranges** | north and south, 15 m of front each, the full depth less the east range | +14 m | two long low wings with window bands, stepping down either side of the front |
 | **The clerestory** | the hall, 16 × 30 m, behind the front block | +16.5 m | a long louvred lantern seen over the side ranges from Meridian North and South |
-| **The east range** | the full 60 m on Clock Street, 8 m deep | +18 m | the back wall, plain, the tower rising from its middle |
-| **The clock tower** | 8 × 8 m, middle of the east range | shaft to +42 m, lantern to +45 m | the one vertical: seen over the front block from the plaza, closing Meridian Avenue from the east |
+| **The east range** | the full 60 m on Clock Street, 8 m deep | +18 m | the back wall, plain, facing Meridian Court |
+| **The Timekeeper** | a ring 38 m across over the middle of the hall, in the north–south plane | its top at +48 m | the one vertical (8a.0): seen over the front block from the plaza, framed by the Meridian Arch from the east |
 
 From the plaza the composition steps: the wings at 14 m, the front block at
-22 m, the clock rising behind it to 45 m.
+22 m, the Timekeeper rising behind it to 48 m.
 
 ### 8a.5 Facades
 
@@ -2176,8 +2235,8 @@ From the plaza the composition steps: the wings at 14 m, the front block at
 - **The chamber windows:** five tall narrow windows, +11 to +20 m, between
   plain piers, gold-lit at night: the mosaic glimpsed, not shown.
 - **The parapet:** a plain limestone band at +22 m with a thin bronze
-  coping; no ornament on the skyline but the tower.
-- **The sign:** a picture of the clock tower cast in bronze beside the
+  coping; no ornament on the skyline but the Timekeeper.
+- **The sign:** a picture of the Timekeeper's rings cast in bronze beside the
   middle doors, no lettering.
 
 **North and south faces (Meridian North and South):**
@@ -2190,33 +2249,23 @@ From the plaza the composition steps: the wings at 14 m, the front block at
   between stone fins, angled to throw the hall's warm air out.
 
 **East face, on Clock Street:** the plain back wall of the east range,
-with narrow vertical windows and the staff door. The tower stands proud of
-it by 1 m, its base on Clock Street at the end of Meridian Avenue, so a
-walker coming up the avenue from the Rim Walk sees the tower grow for
-350 m.
-
-**The clock tower:**
-- A plain limestone shaft, its corners set back in small steps (Dudok), a
-  thin vertical slit of windows lighting the stair-ramp up each face.
-- **Four clock faces**, 5 m across, at +34 m: bronze rings and hands on a
-  pale ground, lit from behind at night. They keep the real game time.
-- **The belfry**, +37 to +42 m, open on four sides between corner piers, the
-  bell visible.
-- **The lantern**, a stepped stone cap to +45 m with a lit glass light: the
-  city's night landmark from the park and the Deck.
-- The bell strikes the hours (audio), the one public clock Moy has.
+with narrow vertical windows and the staff door, facing Meridian Court; over
+it the Timekeeper's east face, seen through the Meridian Arch from the
+avenue.
 
 **Materials and palette:** pale limestone 60 % (the same stone as the
-library); bronze and gold 30 % (doors, frames, rail, clock
-rings, louvres); the gold glow of the chamber and the lantern's light 10 %.
+library); bronze and gold 30 % (doors, frames, rail, the Timekeeper's
+frame, louvres); the gold glow of the chamber and the Timekeeper's markers
+10 %.
 
 **At night:** the chamber's windows and balcony doors glow gold, the window
-bands warm white, the clock faces pale, the lantern bright. Lit windows are
+bands warm white, the Timekeeper's markers and index bright and its day
+ring softly lit. Lit windows are
 emissive panels; no room is built behind them.
 
 ### 8a.6 Play
 
-The outside is a climb from the plaza to the top of the city's clock:
+The outside is a climb from the plaza to the top of the Timekeeper:
 - **Onto the portico:** its roof, the entablature over the piers at
   +8.8 m, is the first landing: a super jump from the steps, or along the
   wings' canopies (+6.5 m, reached from the Deck) and a blorb bounce up.
@@ -2227,27 +2276,27 @@ The outside is a climb from the plaza to the top of the city's clock:
 - **The wings:** the side ranges' window-band canopies at +6.5 m are ledges
   the full 60 m of each side, reachable from the Deck on the north; their
   roofs at +14 m are the way round to the clerestory and the back.
-- **Up the tower:** from the east range's roof (+18), the tower's stepped
-  corners carry stone bands every 2.4 m (within a blorb bounce) to the
-  clock at +34 m. Stand on the hands' axle boss; climb into the open
-  belfry at +37; the lantern's cap at +45 m is the top.
-- **The lantern as anchor:** a Leaf Hat swing anchor 45 m up over Civic
-  Plaza, Clock Street and Meridian Avenue, and the high point from which
-  the swing across the plaza to the hotel and the Windspire's podium
-  begins.
+- **Up the Timekeeper:** from the east range's roof (+18), onto the bezel
+  where it rises out of the slot, then up the rungs on its fixed frame
+  (every 2.4 m, within a blorb bounce) to its top at +48 m. The turning
+  rings carry a rider round with them (moving solid bodies) but never
+  through the opening, which stays clear for the train.
+- **The top as anchor:** a Leaf Hat swing anchor 48 m up over Civic
+  Plaza, Meridian Court and the avenue, and the high point from which the
+  swing across the plaza to the hotel and the Windspire's podium begins.
 
 **Collision:** the whole massing is solid (`CollisionPolicy` blocking);
 the steps, pier tops, entablature, balcony and its rail, parapets, canopies,
-roofs, tower bands, clock bosses and belfry floor are parkour landings; the
-louvre blades, clock hands, bell and lantern glass are decorative on solid
-backing. The doors are part of the solid wall.
+roofs and the Timekeeper's bezel rungs and top are parkour landings; the
+rings are moving solid bodies (`AnimatableBody3D`); the louvre blades and the
+lit markers are decorative on solid backing. The doors are part of the solid wall.
 
 ### 8a.7 Realised: the exterior only
 
 - **Built:** the full exterior at street fidelity: the steps, portico,
   bronze doors, balcony, chamber windows, window bands, canopies, the Deck
-  door, the clerestory, the east range, and the clock tower with working
-  clock faces, the belfry with its bell, and the lit lantern. Every roof
+  door, the clerestory, the east range, and the Timekeeper with its
+  turning rings and its bell. Every roof
   and ledge on the climb is walkable.
 - **Not built:** every room. The doors stay shut; the windows are lit
   panels.
@@ -2255,6 +2304,47 @@ backing. The doors are part of the solid wall.
   mayor's door is open, in the city's phrase, but she holds it on the
   steps); Kenji crosses the plaza to the tea house at noon; on council
   evenings the plaza fills to hear the meeting from the balcony.
+
+## 8b. The Meridian Arch and Meridian Court (proposed 2026-10-16, at the user's direction)
+
+**Why.** The mid-rise blocks between city hall's back and the East Gate hid
+city hall from the east, the way most people first see the city. They are
+gone: **Meridian Court**, an open court between Clock Street and the wall
+either side of Meridian Avenue, takes their place, and over it stands the
+**Meridian Arch**, framing the Timekeeper in the view from the East Gate.
+
+**References:**
+- **CCTV headquarters, Beijing (OMA):** a building that is a loop: two leaning
+  towers joined at the ground and at the top by a cantilevered bridge, so the
+  building frames the sky.
+- **The Gateway Arch, St. Louis:** an arch that frames a city's view and is a
+  gate to it.
+
+**Form** (data: `ARCH`, checked):
+- **Two legs** in Meridian Court, each 18 by 16 m, north and south of the
+  avenue, 72 m high, clad in a diagrid of pale ceramic-clad steel over glass
+  (Moy's tile in the CCTV's structural pattern).
+- **The lower bridge** between them at +22 to +32 m: the **Meridian Line's
+  east station**, the line running straight into it at +26 m. Its platforms
+  look west through the Timekeeper.
+- **The top bridge** at +58 to +72 m across both legs, **cantilevered 12 m
+  west** toward city hall: the **Wall Watch's command room**, looking east
+  over the wall and the desert and west down the city's whole axis to the
+  library. The loop of legs and bridges reads, from the East Gate, as one
+  frame round the Timekeeper.
+- **A bridge at +12 m** from the south leg to the East Gate's gatehouse joins
+  the Meridian Line's station to the Wall Line's.
+- **City-owned:** the legs hold the city's offices (planning, works, water,
+  the Housing Board's downtown desk), the business city hall's ceremonial
+  rooms do not do.
+
+**Meridian Court:** pale paving under the arch, the avenue running through
+it, rows of date palms along its north and south edges, benches facing city
+hall. Meridian North and Meridian South now end at the court's corners on
+the Rim Walk.
+
+**The old BLOCK labs** (the six-storey block on Meridian South) are ordinary
+mid-rise real estate now: the plan fills their plot with downtown lots.
 
 ## 9. The library: building brief (proposed, 2026-10-13)
 
@@ -2534,6 +2624,11 @@ lit crowns.
 - (2026-10-14) the Deck's route (section 6): the Park Deck ring, the civic,
   library, estate and market walks, two skybridges, six ramp towers and two
   glass lifts; travelators dropped;
+- (2026-10-16) **two straight lines** (the Spine at +12, the Meridian at
+  +26), **the Timekeeper** over city hall (8a.0), **Meridian Court and the
+  Meridian Arch** (8b), **the Crossing** at the park's centre and the
+  playground in the south-east quarter (7a), BLOCK's old labs as mid-rise
+  real estate;
 - (2026-10-14) **the wall and the trains** (section 6c): the Ring Line's
   viaduct filled into a circular wall 12 m high, four gates, watch posts and
   the Line House; the Wall Line on its top; the elevated Spine and Meridian
