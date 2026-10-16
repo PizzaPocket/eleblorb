@@ -664,9 +664,8 @@ often.
    | South Street | main street | 12 m | from the Park Ring to the Rim Walk (south), through Market Square |
    | Arcade Street | shopping street | 8 m | Rim Walk to Rim Walk, north to south, roofed in the market lanes |
    | Market Street | shopping street | 8 m | from the Rim Walk (west) to Market Lane |
-   | Cinema Lane | lane | 4 m | Rim Walk to Rim Walk through Old Moy |
+   | Cinema Lane | lane | 4 m | from Tank Lane north to the Rim Walk (south of Tank Lane the old town's own lanes take over) |
    | Tank Lane | lane | 4 m | from the Rim Walk to Arcade Street |
-   | Pine Lane | lane | 4 m | from the Rim Walk to Arcade Street |
    | Clinic Lane | lane | 4 m | from the Rim Walk to the Park Ring |
    | Library Lane | lane | 4 m | from Arcade Street to North Street, behind the library |
    | Museum Lane | lane | 4 m | from the Park Ring to Market Street |
@@ -1048,6 +1047,49 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     bakery are in tower houses; Sora's mother kept the first rooftop
     greenhouse on an Old Moy terrace. The Moonlight Cinema was built later,
     into the old fabric.
+  - **The Well Quarter: the old town's own lanes** (proposed 2026-10-16, at
+    the user's direction). Old Moy's oldest sections were never planned:
+    their lanes grew from the paths people wore walking to the first well,
+    to their neighbours and out to the fields, so they wind, narrow, widen
+    into small squares and end in dead-end alleys that serve a few houses
+    each, as in Shibam, old Sana'a and every old desert town. Three
+    sections keep that fabric; data `OLD_TOWN` and `OLD_HOUSES` in
+    `tools/city_layout.py`, checked:
+    - **north of West Street** (Tank Lane to West Street): the **Old High
+      Street**, winding from West Street up to Arcade Street; **Lantern
+      Square** where it meets **Mara's Lane** (named for the district's old
+      name); **Tank Passage** squeezing between Pinestein's and Suri's
+      towers to Tank Lane; **Bakers' Lane** past the bakery; and the
+      dead-end **Well**, **Rope**, **Dyers'** and **Hayloft Alleys**;
+    - **south of West Street**: **Cinema Square**, irregular now, with the
+      capped first well and the oldest shade tree; **Well Lane** winding
+      south from it between the cinema and Sol's café to Clinic Lane; and
+      **Lantern Lane** across to Arcade Street;
+    - **the cistern quarter** south of Clinic Lane, where the grid's Cinema
+      Lane once ran: the dead-end **Cistern Lane** past Theo's tower house,
+      and **Kiln Alley**.
+  - **How the plots were made.** The ground the lanes leave is divided the
+    way old towns divided: each block cut across its long side again and
+    again, a little off the middle, until every plot is house-sized (at most
+    about 105 m² and 11.5 m across). A plot with a front on a lane, a
+    square or a street is a tower house, turned to that front; a plot with
+    none is a family's back yard or light well. Forty tower houses, covering
+    about three quarters of the ground the lanes leave.
+  - **The seam with New Moy.** The boom cut **West Street** straight through
+    the well town (the Meridian Line now runs above it), and New Moy's grid
+    streets (Arcade Street, Tank Lane, Clinic Lane) run round the old
+    sections. Along those streets one row of straight frontage (the grid's
+    lots, 10 m deep) faces the new streets squarely; the old lanes pass
+    through it to reach them. From the grid streets the old town reads as a
+    straight wall of houses with dark mouths in it; step through one and
+    the lanes begin to wind.
+  - **Swinging through.** The Old High Street and Well Lane are 6 m wide and
+    walled at least three quarters of their length by tower houses 16 m or
+    taller, with anchors in the vine's reach (12 to 52 m, 7 m above) the
+    whole way: a swing route through the old town from Tank Lane to Clinic
+    Lane, across West Street at Cinema Square. The narrow lanes and alleys
+    are for walking, and their tower house roofs, a few metres apart, for
+    running roof to roof.
   - **Its places:** Sol's café and the Moonlight Cinema on Cinema Square,
     the bakery, the clinic, the police box, Pinestein's rooftop laboratory,
     Mara's rooftop studio, the Reese–Miller house.

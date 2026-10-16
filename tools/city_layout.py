@@ -31,9 +31,8 @@ STREETS=[
  ('South Street','main',-566,62,-554,232),
  ('Arcade Street','shop',-694,-220,-686,220),
  ('Market Street','shop',-780,114,-487,122),
- ('Cinema Lane','lane',-734,-220,-730,220),
+ ('Cinema Lane','lane',-734,-220,-730,-122),
  ('Tank Lane','lane',-780,-122,-694,-118),
- ('Pine Lane','lane',-780,-62,-694,-58),
  ('Clinic Lane','lane',-780,58,-637,62),
  ('Library Lane','lane',-686,-96,-566,-92),
  ('Museum Lane','lane',-641,62,-637,114),
@@ -50,7 +49,6 @@ OPENS=[
  ('Library Square',-686,-30,-637,30),
  ('Market Square',-590,122,-530,164),
  ('Estate Square',-554,-118,-516,-84),
- ('Cinema Square',-752,6,-734,34),
  ('Meridian Court',-391,-30,-359,30),
 ]
 B=[]
@@ -106,6 +104,57 @@ for n,name,r,kind,h,who in [
  (43,'Water tower',(-722,-226,-712,-216),'works','35 m',''),
  (44,'Fish tanks',(-668,-250,-648,-234),'works','covered tanks','')]: b(n,name,r,kind,h,who)
 
+## The Well Quarter (city.md 7, Old Moy; proposed 2026-10-16 at the user's
+## direction). The two oldest sections of Old Moy, north and south of West
+## Street, keep the well town's organic lanes: grown from the habits of the
+## people who walked to the first well, never planned. The boom later cut West
+## Street straight through them, and New Moy's grid streets (Arcade Street, Tank
+## Lane, Clinic Lane) run round them: along those streets one row of straight
+## frontage (the grid's lots) rectifies the old fabric to the new, and the lanes
+## pass through it to reach them. Inside, tower houses are turned to face their
+## lanes, filled in by the generator below. The Old High Street and Well Lane are
+## a winding swing route 6 m wide between tall houses, through the square where
+## the first well stands.
+## interiors: where the organic fabric is (world rects, cut to the built circle);
+## lanes: centrelines (x, z) with a width; squares: polygons.
+OLD_TOWN=dict(
+ interiors=[('north',(-760,-104,-704,-16)),('south',(-760,6,-704,44)),('cistern',(-760,72,-704,104))],
+ lanes=[
+  dict(name='Old High Street',w=6.0,swing=True,pts=[(-744,-6),(-746,-24),(-739,-40),(-729,-52),(-724,-66),(-716,-80),(-706,-88),(-694,-90)]),
+  dict(name='Tank Passage',w=3.5,pts=[(-716,-80),(-708,-96),(-704.5,-104),(-704.5,-118)]),
+  dict(name='Mara\'s Lane',w=3.0,pts=[(-739,-40),(-726,-36),(-714,-34),(-708,-39.5),(-704,-48),(-694,-52)]),
+  dict(name='Bakers\' Lane',w=3.0,pts=[(-726,-36),(-718,-26),(-714,-16),(-714,-6)]),
+  dict(name='Well Lane',w=6.0,swing=True,pts=[(-735,26),(-731,36),(-727,48),(-725,58)]),
+  dict(name='Lantern Lane',w=3.0,pts=[(-729,45),(-716,44),(-706,40),(-694,40)]),
+  # south of Clinic Lane: the old cistern quarter, where the grid's Cinema Lane once ran
+  dict(name='Cistern Lane',w=4.0,dead_end=True,pts=[(-732,62),(-732.5,74),(-732.5,88),(-737,100)]),
+  dict(name='Kiln Alley',w=2.5,dead_end=True,pts=[(-733,86),(-722,94),(-712,92)]),
+  # dead-end alleys, as in every old desert town: each serves the few houses round it
+  dict(name='Well Alley',w=2.5,dead_end=True,pts=[(-726,-59),(-716,-63),(-709,-71)]),
+  dict(name='Rope Alley',w=2.5,dead_end=True,pts=[(-743,-31),(-751,-26)]),
+  dict(name='Dyers\' Alley',w=2.5,dead_end=True,pts=[(-733,-46),(-742,-60),(-737,-78)]),
+  dict(name='Hayloft Alley',w=2.5,dead_end=True,pts=[(-722,-29),(-724,-20)]),
+ ],
+ squares=[
+  dict(name='Cinema Square',well=(-743,20),pts=[(-752,6),(-734,6),(-731,16),(-734,30),(-739,34),(-751,33),(-754,24),(-755,12)]),
+  dict(name='Lantern Square',pts=[(-747,-47),(-736,-49),(-731,-42),(-734,-34),(-744,-32)]),
+ ],
+ frontage=10.0,swing_min=(5,16.0),anchor=(12.0,52.0,7.0),plot=(40.0,105.0,11.5),
+)
+def _old_town_raster():
+    from shapely.geometry import LineString, Polygon, Point, box as sbox
+    lanes=[LineString(l['pts']).buffer(l['w']/2,cap_style=2,join_style=2) for l in OLD_TOWN['lanes']]
+    sq=[Polygon(q['pts']) for q in OLD_TOWN['squares']]
+    inner=[sbox(*r) for _,r in OLD_TOWN['interiors']]
+    cs=set(); so=set(); si=set()
+    for x in range(-800,-680):
+        for z in range(-130,112):
+            c=Point(x+0.5,z+0.5)
+            if any(g.contains(c) for g in lanes): cs.add((x,z))
+            elif any(g.contains(c) for g in sq): so.add((x,z))
+            elif any(g.contains(c) for g in inner): si.add((x,z))
+    return cs,so,si
+OT_STREET,OT_OPEN,OT_INNER=_old_town_raster()
 # ---- raster
 X0,X1,Z0,Z1=-800,-330,-215,215
 street=set(); opn=set()
@@ -117,7 +166,9 @@ for s in STREETS:
     for p in cells(s[2:]): street.add(p)
 for o in OPENS:
     for p in cells(o[1:]): opn.add(p)
-def free(p): return inside(*p) and p not in street and p not in opn
+street|=OT_STREET; opn|=OT_OPEN
+# the Well Quarter's insides are not grid blocks: the generator below fills them
+def free(p): return inside(*p) and p not in street and p not in opn and p not in OT_INNER
 # components
 seen=set(); comps=[]
 for x in range(X0,X1):
@@ -1139,6 +1190,109 @@ for i,ki in enumerate(LOT_KITS):
     if min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<6: problems.append(('tower house on a narrow lot',i))
     lo,hi=(2,max(2,(2*ki['storeys'])//3)) if ki['base_kind']=='earth' else (1,3)
     if not lo<=ki['base']<=hi: problems.append(('base out of range',i))
+## The Well Quarter's tower houses. The ground the lanes and squares leave is
+## split into plots the way old towns divided: each block is cut across its
+## long side, again and again, until every plot is a house-sized piece (at most
+## 130 m2 and 13 m across), each cut a little off the middle. A plot with a
+## front on a lane, a square or a street is a house, turned to that front; a plot
+## with none is a family's back yard or light well.
+def _old_town_houses():
+    from shapely.geometry import LineString, Polygon, Point, MultiPolygon, box as sbox
+    from shapely.ops import unary_union, split
+    OT=OLD_TOWN
+    circle=Point(CX,0).buffer(R,128)
+    inner=unary_union([sbox(*r) for _,r in OT['interiors']]).intersection(circle)
+    lanes=[(l,LineString(l['pts']).buffer(l['w']/2,cap_style=2,join_style=2)) for l in OT['lanes']]
+    sqs=[(q,Polygon(q['pts'])) for q in OT['squares']]
+    fixed=unary_union([sbox(*b_['r']) for b_ in named]+[sbox(*l[:4]) for l in lots])
+    open_=unary_union([g for _,g in lanes]+[g for _,g in sqs])
+    streets=unary_union([sbox(*s_[2:]) for s_ in STREETS])
+    ground=inner.difference(open_).difference(fixed)
+    def hsh(x,z): return (int(abs(x)*73856093) ^ int(abs(z)*19349663)) & 0xffff
+    def cut(poly,depth=0):
+        if poly.area<OT['plot'][0] or depth>12: return [poly]
+        mrr=poly.minimum_rotated_rectangle; c=list(mrr.exterior.coords)
+        e0=math.hypot(c[1][0]-c[0][0],c[1][1]-c[0][1]); e1=math.hypot(c[2][0]-c[1][0],c[2][1]-c[1][1])
+        if poly.area<OT['plot'][1] and min(e0,e1)<OT['plot'][2]: return [poly]
+        (ax,az),(bx,bz)=(c[0],c[1]) if e0>=e1 else (c[1],c[2])
+        L=max(e0,e1); ux,uz=(bx-ax)/L,(bz-az)/L
+        f=0.5+((hsh(poly.centroid.x,poly.centroid.y)%9)-4)*0.025
+        mx,mz=ax+ux*L*f,az+uz*L*f
+        cutl=LineString([(mx-uz*200,mz+ux*200),(mx+uz*200,mz-ux*200)])
+        parts=[g for g in split(poly,cutl).geoms if g.area>0.5]
+        if len(parts)<2: return [poly]
+        return [q for g in parts for q in cut(g,depth+1)]
+    pieces=[]
+    for g in (ground.geoms if hasattr(ground,'geoms') else [ground]):
+        if g.area<4: continue
+        pieces+=cut(g)
+    houses=[]; yards=[]
+    fronts=[(l['name'],l.get('swing',False),g) for l,g in lanes]+[(q['name'],True,g) for q,g in sqs]+[(s_[0],False,sbox(*s_[2:])) for s_ in STREETS]
+    for g in pieces:
+        if g.area<18: yards.append(g); continue
+        best=None
+        for nm,sw,fg in fronts:
+            edge=g.boundary.intersection(fg.buffer(0.3)).length
+            if edge>=2.5 and (best is None or edge>best[2]): best=(nm,sw,edge)
+        if not best: yards.append(g); continue
+        h=hsh(g.centroid.x,g.centroid.y)
+        st=4+h%6
+        if best[1]: st=max(st,OT['swing_min'][0]+1)
+        poly=g.simplify(0.05)
+        houses.append(dict(corners=[(round(x,2),round(z,2)) for x,z in list(poly.exterior.coords)[:-1]],storeys=st,front=best[0],area=round(g.area,1)))
+    OT['_yards']=[[(round(x,2),round(z,2)) for x,z in list(y.exterior.coords)[:-1]] for y in yards if y.geom_type=='Polygon']
+    return houses,inner,lanes,sqs
+OLD_HOUSES,_ot_inner,_ot_lanes,_ot_sqs=_old_town_houses()
+def _old_town_checks():
+    from shapely.geometry import LineString, Polygon, Point, box as sbox
+    from shapely.ops import unary_union
+    OT=OLD_TOWN; polys=[Polygon(h['corners']) for h in OLD_HOUSES]
+    if len(OLD_HOUSES)<30: problems.append(('old town: too few houses',len(OLD_HOUSES)))
+    for h in OLD_HOUSES:
+        if h['area']<18: problems.append(('old town: a house too small to stand',h['area']))
+    for i,p_ in enumerate(polys):
+        for j in range(i+1,len(polys)):
+            if p_.intersection(polys[j]).area>0.05: problems.append(('old town: houses overlap',i,j))
+    # every lane reaches a grid street, a square or another lane at both ends
+    streets=unary_union([sbox(*s_[2:]) for s_ in STREETS])
+    others=lambda nm: unary_union([g for l,g in _ot_lanes if l['name']!=nm]+[g for _,g in _ot_sqs])
+    for l,g in _ot_lanes:
+        for end in ((l['pts'][0],) if l.get('dead_end') else (l['pts'][0],l['pts'][-1])):
+            if streets.distance(Point(end))>0.6 and others(l['name']).distance(Point(end))>0.6: problems.append(('old town: a lane ends at nothing',l['name'],end))
+    # every named building inside the quarter fronts a lane, a square or a grid street
+    open_=unary_union([g for _,g in _ot_lanes]+[g for _,g in _ot_sqs])|streets
+    for b_ in named:
+        g=sbox(*b_['r'])
+        if g.intersects(_ot_inner) and g.distance(open_)>1.0: problems.append(('old town: a named building with no front',b_['n']))
+    # dense, as the well town was: houses cover most of the ground the lanes and squares leave
+    free_=_ot_inner.difference(open_).difference(unary_union([sbox(*b_['r']) for b_ in named]+[sbox(*l[:4]) for l in lots]))
+    cover=unary_union(polys).intersection(free_).area/free_.area
+    OLD_TOWN['_cover']=round(cover,2)
+    if cover<0.55: problems.append(('old town: too open, houses cover only',round(cover,2)))
+    # the swing route: 6 m between tall houses, with anchors in rope reach all the way along
+    tall=[(Polygon(h['corners']),h['storeys']*STOREY['fabric']) for h in OLD_HOUSES]+[(sbox(*b_['r']),HEIGHTS.get(b_['n'],8)) for b_ in named]+[(sbox(*l[:4]),l[4]*STOREY.get(l[5],3.25)) for l in lots]
+    a0,a1,above=OT['anchor']
+    for l,g in _ot_lanes:
+        if not l.get('swing'): continue
+        if l['w']<6: problems.append(('old town: a swing lane narrower than 6 m',l['name']))
+        line=LineString(l['pts'])
+        for k in range(0,int(line.length)+1,4):
+            q=line.interpolate(k); n_=sum(1 for g2,hh in tall if hh>=OT['swing_min'][1] and a0<=g2.distance(q)<=a1 and hh>=above+2)
+            if n_<3: problems.append(('old town: no swing anchors at',l['name'],k)); break
+        # walls: along both edges, at least three quarters of the frontage is 16 m or taller (the mouths may be lower)
+        tot=hi=0
+        for sd in (1,-1):
+            e=line.offset_curve(sd*(l['w']/2+0.4))
+            for k in range(0,int(e.length)+1,2):
+                q=e.interpolate(k); near=[hh for g2,hh in tall if g2.distance(q)<1.2]
+                if near: tot+=1; hi+=max(near)>=OT['swing_min'][1]
+        if tot and hi/tot<0.75: problems.append(('old town: the swing route is not walled tall enough',l['name'],round(hi/tot,2)))
+_old_town_checks()
+OLD_TOWN['_lane_polys']=[[(round(x,2),round(z,2)) for x,z in list(g.exterior.coords)[:-1]] for _,g in _ot_lanes]
+for h in OLD_HOUSES:
+    xs=[c[0] for c in h['corners']]; zs=[c[1] for c in h['corners']]
+    k=kit_for((int(min(xs)),int(min(zs)),int(max(xs)),int(max(zs))),h['storeys'])
+    k['front']='lane'; h['kit']=k
 ## The market lanes' tong lau (docs/architecture/moy_market_lanes.md). Every
 ## market-lane lot gets a tenement shophouse: a boom house (4 or 5 storeys,
 ## a veranda on main streets and squares) or a tile house (6 to 9, rounded
@@ -1358,6 +1512,13 @@ w("## The towers' sites: the shaft's footprint and the public ground round it (c
 w("const TOWER_SITE := %s" % lit(TOWER_SITE))
 w("## The BLOCK tower's form (city.md 7c): windowless shaft, recessed base, vent hoods, masts, no crown.")
 w("const BLOCK_TOWER := %s" % lit(BLOCK_TOWER))
+w("")
+w("## The Well Quarter (city.md 7, Old Moy): the old town's organic lanes and squares,")
+w("## and its tower houses turned to their lanes. lanes: centrelines with widths (lane_polys:")
+w("## their outlines); squares: polygons; houses: outline corners (world x, z), storeys, the")
+w("## lane or square they front, and their tower house kit. yards: the families' back yards.")
+w("const OLD_TOWN := %s" % lit(dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'])))
+w("const OLD_HOUSES := %s" % lit(OLD_HOUSES))
 w("const TURBINE_HUB_HEIGHT := 95.0")
 w("const TURBINE_ROTOR_RADIUS := 65.0")
 w("")
@@ -1377,5 +1538,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

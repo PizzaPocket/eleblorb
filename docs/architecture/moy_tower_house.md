@@ -156,6 +156,8 @@ the relief panels, drainpipes, lifts' upturned ends beyond 0.1 m.
 
 ### 3.6 Plan data
 
+**Turned houses (2026-10-16).** In the Well Quarter's organic sections (`city.md` 7, Old Moy) the tower houses are not grid lots: `CityPlan.OLD_HOUSES` gives each house's outline (a plot cut from its block, not always a rectangle), its storeys, the lane or square it fronts and its kit. The builder turns the house to its front, follows the outline at the base and squares the tower above where the plot is irregular.
+
 `tools/city_layout.py` assigns every Old Moy lot a kit (`TOWER_KIT`) from
 its size and street, and the numbered tower houses explicitly:
 
