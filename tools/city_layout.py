@@ -513,8 +513,36 @@ PARK={
    'towers':[_pg(x,z)+(h,round(r*PG_K+0.6,2),nm) for x,z,h,r,nm in [(-560,0,20,4.5,'Lookout'),(-548,-7,16,3.5,''),(-574,-4,14,3.2,''),(-560,14,12,3,'')]],
    'perches':[_pg(x,z) for x,z in [(-566,18),(-554,18),(-560,21)]],'perch_height':12,
    'hoops':[list(_pg(-560+(9+i*1.6)*math.cos(-math.pi/2+i*0.75),(9+i*1.6)*math.sin(-math.pi/2+i*0.75))) for i in range(8)]},
- 'wind_trees':[(-581,-14),(-533,-14),(-581,14),(-533,14)],'wind_tree_height':32,
+ # the park's trees (2026-10-17, replacing the four steel wind trees): from the plant kit (NatureProps), each with a job.
+ # kind: round (a ghaf, the desert's shade tree), flowering (a flame tree, Singapore's), palm (a date palm), banyan (one
+ # great banyan by the pond, on reclaimed water). c: the trunk; h: the height. Crowns and trunks follow the kit's
+ # proportions (TREE_KIT); every crown keeps clear of the Deck, the Crossing Ring, the towers and the high line's piers.
+ 'trees':[
+  # the pond: the banyan on its north-west bank, its crown over the water, the place to sit in shade by the water
+  dict(kind='banyan',c=(-530,-40),h=13,job='shade over the pond\'s bank'),
+  dict(kind='round',c=(-507,-14),h=9,job='shade on the pond\'s east bank'),
+  dict(kind='round',c=(-512,-9),h=8,job='shade on the pond\'s east bank'),
+  dict(kind='round',c=(-502,-44),h=9,job='screens the Park Ring from the pond'),
+  # the playground: ghafs round its rim, shading the parents' benches
+  dict(kind='round',c=(-535,44),h=10,job='shade for the playground\'s benches'),
+  dict(kind='round',c=(-501,13),h=9,job='shade for the playground\'s benches'),
+  dict(kind='round',c=(-524,13),h=9,job='shade for the playground\'s benches'),
+  # the tea house and the chess terrace: flame trees over the tables
+  dict(kind='flowering',c=(-600,44),h=9,job='shade over the chess terrace'),
+  dict(kind='flowering',c=(-590,26),h=9,job='shade over the parasols'),
+  dict(kind='flowering',c=(-618,14),h=9,job='shade at the tea house\'s door'),
+  # the dry garden: a loose group of date palms among the rocks and agave
+  dict(kind='palm',c=(-610,-36),h=12,job='the dry garden\'s oasis'),
+  dict(kind='palm',c=(-602,-41),h=11,job='the dry garden\'s oasis'),
+  dict(kind='palm',c=(-616,-42),h=12,job='the dry garden\'s oasis'),
+  dict(kind='palm',c=(-614,-26),h=10,job='the dry garden\'s oasis'),
+  dict(kind='palm',c=(-598,-29),h=11,job='the dry garden\'s oasis'),
+  # the cross walk east and west of the Crossing: an allee of date palms under the high line
+  ]+[dict(kind='palm',c=(-560+x_,z_),h=12,job='the cross walk\'s allee under the high line') for x_ in (-52,-40,40,52) for z_ in (-6.5,6.5)],
 }
+## The plant kit's proportions (scripts/nature_props.gd), as fractions of a tree's height: the clear trunk under the
+## crown, and the crown's radius. Used by the checks and the drawings.
+TREE_KIT=dict(round=dict(trunk=0.4,crown=0.4),flowering=dict(trunk=0.4,crown=0.4),palm=dict(trunk=0.72,crown=0.3),banyan=dict(trunk=0.42,crown=0.6))
 ## The North Estate's precincts (clipped by the Rim Walk): west of North Street,
 ## north of Library Lane plus the strip along the Park Ring; east of it.
 PRECINCTS=[[(-686,-200,-566,-96),(-637,-92,-566,-62)],[(-554,-200,-487,-62)]]
@@ -666,10 +694,15 @@ DECK={
   dict(name='Hotel skybridge',kind='bridge',w=6,pts=[(-457,-30),(-457,-38)]),
   # to the library's east-wing door, over Garden Walk's mouth
   dict(name='Library walk',kind='walk',w=6,pts=[(-631,-27),(-648,-27)]),
-  # straight through the park under the Spine Line, from the Park Deck's north side to its south side: the Crossing's mezzanine
-  dict(name='Spine walk',kind='walk',w=6,pts=[(-560,-50),(-560,50)]),
-  # the Crossing Ring's concourse, at the Deck's level round the park's centre
-  dict(name='Crossing Ring',kind='ring',w=6,pts=[(round(-560+17*math.cos(math.radians(a_)),2),round(17*math.sin(math.radians(a_)),2)) for a_ in range(0,361,15)]),
+  # under the Spine Line from the Park Deck's north and south sides, across the Crossing Ring, to the Crossing's
+  # two cross-bridges (revised 2026-10-17: the middle is left open, from the lawn to the sky)
+  dict(name='Spine walk north',kind='walk',w=6,pts=[(-560,-50),(-560,-13)]),
+  dict(name='Spine walk south',kind='walk',w=6,pts=[(-560,13),(-560,50)]),
+  # the Crossing Ring: the station's concourse at the Deck's level, a garden walk round the four towers (CROSSING)
+  dict(name='Crossing Ring',kind='ring',w=8,pts=[(round(-560+28.7*math.cos(math.radians(a_)),2),round(28.7*math.sin(math.radians(a_)),2)) for a_ in range(0,361,10)]),
+  # the cross-bridges: tower to tower under the Spine's head beams, hung from them, crossing under the Spine's tracks
+  dict(name='Crossing bridge north',kind='bridge',w=6,pts=[(-567,-13),(-553,-13)]),
+  dict(name='Crossing bridge south',kind='bridge',w=6,pts=[(-567,13),(-553,13)]),
   # up the east half of North Street to the neighbourhood centre's roof garden
   dict(name='Estate walk',kind='walk',w=6,pts=[(-560,-56),(-560,-121)]),
   dict(name='Neighbourhood centre bridge',kind='bridge',w=6,pts=[(-560,-121),(-554,-121)]),
@@ -690,20 +723,26 @@ DECK={
  # ramp towers: centre, radius, the side its head opens onto the Deck and the side its foot opens onto the ground
  'ramps':[
   # (the park's north and south gate towers are retired, 2026-10-17: the Deck now runs on the street's centre line
-  # over the whole park walk, and the Crossing's two spirals take the park's people between the lawn and the Deck)
+  # over the park walk, and the Crossing's four towers take the park's people between the lawn and the Deck)
   dict(name='West gate',c=(-621,8),r=4,head='w',foot='n'),
   dict(name='East gate',c=(-499,-8),r=4,head='e',foot='s'),
   dict(name='Civic north',c=(-457,-20),r=4,head='n',foot='s'),
   dict(name='Civic south',c=(-457,20),r=4,head='s',foot='n'),
  ],
- # the Crossing's spirals are ways down from the Crossing Ring (CROSSING['spirals'])
- 'spiral_ways':[(-548.0,-10.6),(-572.0,10.6)],
+ # the Crossing's four towers are ways down from the ring and the cross-bridges (CROSSING['towers'])
+ 'spiral_ways':[(-547.0,-13.0),(-573.0,-13.0),(-547.0,13.0),(-573.0,13.0)],
+ # the Deck as a garden walk, after New York's High Line and Singapore's park connectors: planting beds alternate from
+ # side to side so a path winds between them; a small tree in a deep planter over every second column pair, where the
+ # structure can carry the soil. bed: its width range and its length range; path: the clear width it always leaves.
+ 'garden':dict(path=3.2,bed=(1.2,2.4),bed_len=(9.0,15.0),gap=3.0,tree_every=2,tree=dict(kind='round',h=6.0),
+   planting=['bougainvillea','desert grasses','agave and aloe','coral vine'],keeper='Orin Pike (park keeper)',
+   collision='bed edges and planters solid, 0.45 m (a sitting edge); plants decorative'),
  'lifts':[dict(name='Park north gate',c=(-555.4,-46),r=1.6),dict(name='Park south gate',c=(-555.4,46),r=1.6),dict(name='Estate Square',c=(-555.4,-112),r=1.6),dict(name='Market Square',c=(-533,129.7),r=1.6)],
  'max_to_way_down':75.0,'min_soffit':5.4,'min_open_beside':4.0,
  # escalating ramps from a square up to the Deck (revised 2026-10-17 after the first prototype: the 12 degree
  # travelators ran 31 m and stood in the squares as long obstructions; these are escalator pairs at 30 degrees,
  # an up and a down side by side, 11.3 m long, set end-on into the Deck's edge). The park's two wing ramps to
- # the Crossing are gone: the Crossing's spirals serve it.
+ # the Crossing are gone: the Crossing's towers serve it.
  'escalators':[
   dict(name='Civic Plaza north',foot=(-470,-12.7),head=(-470,-24)),
   dict(name='Civic Plaza south',foot=(-446,12.7),head=(-446,24)),
@@ -749,7 +788,7 @@ def _deck_checks():
     pc=PARK['pond']['c']; prx,prz=PARK['pond']['r']
     from shapely import affinity
     pond=affinity.scale(Point(pc).buffer(1,64),prx,prz)
-    feats=[sbox(*PARK['dry_garden']),sbox(*PARK['lawn']),pond]+[Point(t).buffer(3) for t in PARK['wind_trees']]+[Point(t).buffer(2.5) for t in PARK['parasols']]
+    feats=[sbox(*PARK['dry_garden']),sbox(*PARK['lawn']),pond]+[Point(t['c']).buffer(1.5) for t in PARK['trees']]+[Point(t).buffer(2.5) for t in PARK['parasols']]
     walks=unary_union([sbox(*w_) for w_ in PARK['walks']]+[sbox(*s[2:]) for s in STREETS]+[sbox(*o[1:]) for o in OPENS if o[0]!='park'])
     deck=unary_union(list(polys.values()))
     heads=[]
@@ -800,8 +839,8 @@ def _deck_checks():
         keep.append((sbox(*r),ew,sbox(r[0]-13,r[1],r[2]+13,r[3]) if ew else sbox(r[0],r[1]-13,r[2],r[3]+13)))
     cols=[]
     for run in D['runs']:
-        # the Crossing Ring stands on the Crossing's own column rings (CROSSING)
-        if run['kind'] in ('bridge','ring'): continue
+        # bridges span; the Crossing Ring stands on the Crossing's own supports (CROSSING); the Park Deck has columns
+        if run['kind']=='bridge' or run['name']=='Crossing Ring': continue
         for a,c in zip(run['pts'],run['pts'][1:]):
             ux,uz=(c[0]-a[0]),(c[1]-a[1]); L=math.hypot(ux,uz); ux/=L; uz/=L
             mid=Point((a[0]+c[0])/2,(a[1]+c[1])/2); ew=abs(ux)>abs(uz)
@@ -826,6 +865,9 @@ def _deck_checks():
             if L-placed[-1]>D['max_span']/2: problems.append(('deck: last column too far in',run['name'],L-placed[-1]))
             for t in placed:
                 for e in (-1,1): cols.append(tuple(round(v,1) for v in at(t,e)))
+    # inside the Crossing the Deck stands on the Crossing's own supports (its towers and ring supports), not the rhythm
+    cc=Point(CROSSING['c'])
+    cols=[q for q in cols if cc.distance(Point(q))>CROSSING['ring'][1]+0.5]+[tuple(q) for q in CROSSING['_ring_supports']]
     D['columns']=sorted(set(cols))
     # escalating ramps: the run their 12 degree slope needs, foot on open ground, head end-on at the Deck's edge
     need=D['level']/math.tan(math.radians(D['esc_angle']))
@@ -841,7 +883,6 @@ def _deck_checks():
         for t in D['ramps']+D['lifts']:
             if g.distance(Point(t['c']))<t['r']+1.0: problems.append(('deck: escalating ramp against a tower or lift',e['name'],t['name']))
         e['run']=round(run,1)
-_deck_checks()
 def _site_checks():
     from shapely.geometry import box as sbox
     others=[(b_['n'],sbox(*b_['r'])) for b_ in named]+[(None,sbox(*l[:4])) for l in lots]
@@ -1017,13 +1058,13 @@ CROSS={
   dict(line='Spine Line',w='double',rail=13.2,bay=12.0,pts=[(-560,-200),(-560,200)],
        structure='portal frames: the Deck\'s paired columns carried up through it, with a crossbeam under the track; 12 m bay; buffer stops at both ends, just inside the wall'),
   dict(line='Meridian Line',w='double',rail=36.0,pts=[(-336,0),(-792,0)],
-       piers=[-722,-686,-650,-614,-578,-542,-506,-470,-434,-392],span=36.0,max_span=42.0,
-       structure='tree piers: one round-square stem 2.4 m across in the middle of the street, branching at +28 m into a Y that carries twin steel box girders; 36 m spans, one 42 m bridge over city hall; the West Gate\'s tower carries its west end'),
+       piers=[-722,-686,-650,-614,-506,-470,-434,-392],span=36.0,max_span=42.0,
+       structure='tree piers: one round-square stem 2.4 m across in the middle of the street, branching at +28 m into a Y that carries twin steel box girders; 36 m spans, one 42 m bridge over city hall; the West Gate\'s tower carries its west end; at the Crossing its four towers carry it on two head beams'),
  ],
  'stations':[
   dict(name='North Gate',at=(-560,-184),lines=['Spine Line'],deck=False,mid=7.1,interchange='Wall Line',access='the Spine\'s north terminus just inside the wall: its platforms run on, level, onto the Wall Line\'s inner platform at the North Gate; escalator pairs under both platforms from the street'),
   dict(name='Estate Square',at=(-560,-100),lines=['Spine Line'],deck=True,access='over the Deck\'s Estate walk: escalator pairs under both platforms, from the street by way of the Deck'),
-  dict(name='The Crossing',at=(-560,0),lines=['Spine Line','Meridian Line'],deck=True,access='the Crossing Ring at the park\'s centre: its two double-helix spirals join the lawn, the ring, the Spine\'s platforms and the high line\'s'),
+  dict(name='The Crossing',at=(-560,0),lines=['Spine Line','Meridian Line'],deck=True,access='the Crossing at the park\'s centre: its four garden towers join the lawn, the ring, the Spine\'s platforms and the high line\'s'),
   dict(name='Market Square',at=(-560,124),lines=['Spine Line'],deck=True,access='over Market Street and the square\'s north edge, where the Deck\'s Market walk runs below: escalator pairs under both platforms'),
   dict(name='South Gate',at=(-560,184),lines=['Spine Line'],deck=False,mid=7.1,interchange='Wall Line',access='the Spine\'s south terminus just inside the wall, level with the Wall Line\'s inner platform at the South Gate'),
   dict(name='East Gate',at=(-351,0),lines=['Meridian Line'],deck=False,access='the Meridian Arch, which is the East Gate: its lower bridge holds the platforms, over the Wall Line\'s station'),
@@ -1046,10 +1087,10 @@ PLATFORMS=dict(floor=1.0,edge=1.4,width=3.0,canopy=3.2,
 ## in a crisscross, each level reversing, both flows on every flight), and a
 ## double helix (an up spiral and a down spiral wound together round one eye,
 ## after the double-helix stairs of Chambord and the Vatican and the trunk
-## spirals of the Plant Kingdom), each with a glass lift beside it or in its eye.
+## spirals of the Plant Kingdom), each with a glass lift beside it or in its eye (the Crossing's towers wind theirs round a steel trunk, the lift beside).
 ESCALATORS=dict(pair=dict(angle=30.0,tread=1.2,w=3.2,max_rise=8.0),
   scissor=dict(angle=30.0,w=3.2,max_rise=7.2,landing=1.5),
-  helix=dict(angle=25.0,eye=2.0,band=2.6,hands=2,min_headroom=2.6,deck=0.5))
+  helix=dict(angle=25.0,eye=1.4,band=2.6,hands=2,min_headroom=2.6,deck=0.5))
 ## The Moy car (city.md 6e, user 2026-10-17): one short car for every line, built
 ## entirely of SuperEggs, so the trains belong to the same soft-cornered world as
 ## everything else. Short cars (9.6 m) so a train is two or three of them: they
@@ -1107,44 +1148,72 @@ _train_checks()
 ## the breeze and planted at their edges; only the glass lift shafts beside it
 ## are enclosed. enclosure and canopy say so; lift: the shafts' size, beside
 ## the frame's long side.
-## The Crossing Ring (city.md 7a, revised 2026-10-16): open air, after Sou
-## Fujimoto's Grand Ring at Expo 2025 Osaka. A ring of slender columns, two rows
-## on a 15 degree rhythm, carrying a concourse ring at the Deck's level (+6.5 m)
-## and a halo of shade over the Spine's platforms (+17 m), open at the centre to
-## the sky and the high line crossing above, and open on every side to the park.
-## Revised 2026-10-17 after the first prototype: the ring is centred on the
-## street's line (x -560), the halo raised to 18 m over the Spine's platforms at
-## 14.2, and the two rectangular cores (which clipped the ring) and the park's
-## long wing ramps are replaced by two double-helix spirals: an up and a down
-## escalator spiral wound together round a glass lift, rising from the lawn
-## through the ring concourse and the halo to the high line. Each stands in the
-## ring, beside a Spine platform (a 1.4 m bridge at +14.2) and under the outer
-## edge of a high-line platform, onto which its last turn lands at +37.
-## spirals: centre, the levels it serves, the side each landing opens to
-## (the bearing in degrees: 0 east, 90 south), and what it joins.
-CROSSING=dict(c=(-560,0),ring=(14.0,20.0),deck=6.5,halo=(18.0,12.0,22.0),columns=24,
-  material='pale timber louvres on slender steel columns',
-  program='the ring concourse: shade, water fountains, kiosks, the lost-and-found and the city\'s information desk',
-  spirals=[dict(name='north-east',c=(-548.0,-10.6),levels=[0,6.5,14.2,37.0],opens={'6.5':'the ring','14.2':180,'37.0':90},lift=True,
-                joins='the lawn, the ring, the Spine\'s east platform and the high line\'s north platform'),
-           dict(name='south-west',c=(-572.0,10.6),levels=[0,6.5,14.2,37.0],opens={'6.5':'the ring','14.2':0,'37.0':270},lift=True,
-                joins='the lawn, the ring, the Spine\'s west platform and the high line\'s south platform')],
-  cores=[])
+## The Crossing (city.md 7a; revised 2026-10-17, plan iteration 3, at the user's direction). Where the Spine (+13.2)
+## and the high line (+36) cross over the park's centre. Designed from what people do there:
+## - every transfer is between one Spine platform (+14.2, east or west of the Spine) and one high-line platform (+37,
+##   north or south of the Meridian). So there are four garden towers, one in each quarter, in the corner where a
+##   Spine platform and a high-line platform pass each other: each joins the lawn (0), the concourse (+6.5), its
+##   Spine platform and its high-line platform, by a double-helix escalator inside and a glass lift on its inner
+##   corner, which opens straight onto both platforms. Any change of line is one tower, up or down.
+## - the towers are the Crossing's structure: four great columns, each a steel trunk inside a ring of twelve ribs, carrying
+##   the Spine and the high line on head beams between them (no other columns stand under either line here), the
+##   cross-bridges hung from the Spine's head beams, the ring's inner edge, and the roof. Their ribs carry a steel mesh
+##   that climbers cover: a living wall wrapped round each tower, after Singapore's Supertrees and WOHA's Oasia.
+## - the concourse at the Deck's level is the station's mezzanine: the Crossing Ring, a garden walk round the four
+##   towers (the Deck's Spine walks join it from north and south), and two cross-bridges, tower to tower, crossing
+##   under the Spine's tracks, so both Spine platforms and all four towers are joined below the trains. The middle is
+##   left open from the lawn to the sky.
+## - one roof, a louvred table on the four towers at +41: it shelters the high line's platforms and the towers' tops and
+##   shades the middle; its rain runs down the trunks to a rain garden round the towers' feet. The halo of the earlier
+##   plan is gone (it sheltered nothing anyone waited on), and so are the 48 slender columns and the spirals' posts.
+## towers: centre offsets from c (both axes); trunk, helix band, gallery and the rib ring's radius; the lift beside it.
+## ring: inner and outer radius (a box girder ring_depth deep, spanning between supports at most ring_max_span).
+CROSSING=dict(c=(-560,0),deck=6.5,ring=(24.7,32.7),ring_depth=1.6,ring_max_span=22.0,
+  tower=dict(offset=13.0,trunk=1.2,gallery=1.8,ribs=12,lift=1.3,beam_depth=1.6,mesh='stainless steel mesh between the ribs, coral vine and bougainvillea climbing it from planters at every gallery'),
+  roof=dict(y=41.0,half=22.0,n=4.0,th=0.6,rim=1.4,material='pale timber louvres over glass, a planted rim of desert grasses',drain='down the four trunks to the rain garden'),
+  canopy=dict(material='pale timber louvres over glass, as the roof'),
+  material='steel towers under climbers; pale timber louvres over glass for every roof and canopy',
+  program='the concourse: the information desk, the lost-and-found, kiosks and water fountains along the ring, between its beds',
+  garden=dict(ring='beds on both edges of the ring, the path winding between them; small ghafs in deep planters over the ring\'s eight supports',
+              towers='coral vine and bougainvillea up each tower\'s mesh from planters at every gallery',
+              lawn='a rain garden of reeds and desert grasses round the towers\' feet, fed by the roof',
+              roof='desert grasses on the roof\'s rim'),
+  towers=[],cores=[])
+def _crossing_layout():
+    C=CROSSING; T=C['tower']; H=ESCALATORS['helix']; cx,cz=C['c']
+    band0=H['eye']; band1=band0+H['band']; gal=band1+T['gallery']; drum=gal+0.2
+    T['band']=(band0,band1); T['gallery_r']=(band1,gal); T['drum']=round(drum,2)
+    C['towers']=[]
+    for nm,sx,sz in (('north-east',1,-1),('north-west',-1,-1),('south-east',1,1),('south-west',-1,1)):
+        tc=(cx+sx*T['offset'],cz+sz*T['offset']); d=drum+T['lift']+0.1
+        C['towers'].append(dict(name=nm,c=tc,levels=[0,DECK['level'],13.2+PLATFORMS['floor'],36.0+PLATFORMS['floor']],
+            spine_platform='east' if sx>0 else 'west',high_platform='north' if sz<0 else 'south',
+            opens={str(DECK['level']):['the ring','the cross-bridge'],str(round(13.2+PLATFORMS['floor'],1)):180 if sx>0 else 0,str(36.0+PLATFORMS['floor']):90 if sz<0 else 270},
+            lift=dict(c=(round(tc[0]-sx*d/math.sqrt(2),2),round(tc[1]-sz*d/math.sqrt(2),2)),r=T['lift']),r=(band0,band1)))
+    # the ring's supports: the four towers, a pair of Deck columns where the Spine walks cross it (north and south),
+    # and a pair either side of the cross walk east and west, clear of the walk
+    rm=(C['ring'][0]+C['ring'][1])/2; e=3.0-0.4
+    C['_ring_supports']=[(round(cx+sd*e,1),round(cz+sn*27.5,1)) for sn in (-1,1) for sd in (-1,1)]+\
+                        [(round(cx+sn*27.5,1),round(cz+sd*3.6,1)) for sn in (-1,1) for sd in (-1,1)]
+    C['_ring_r']=rm
+_crossing_layout()
 ## The Timekeeper (city.md 8a, revised 2026-10-16): a full circle standing over
 ## city hall in a bronze cradle, clear of the roof, the high line passing through
-## its empty centre. A twelve-hour ring clock: the minute ring and the hour ring
+## its empty centre. A twelve-hour ring clock: the hour ring and, outside it, the minute ring
 ## turn past the fixed index at the top, each carrying one lit marker, and keep
 ## real time; the fixed bezel carries the twelve hour marks.
 TIMEKEEPER=dict(x=-414.0,z=0.0,y=37.5,thick=3.0,roof=22.0,
-  rings=[('minute',6.0,9.0,'turns once an hour; one lit marker'),
-         ('hour',9.0,12.0,'turns twice a day; one larger lit marker'),
+  rings=[('hour',6.0,9.0,'turns twice a day; one lit arrow'),
+         ('minute',9.0,12.0,'turns once an hour; one lit arrow, its point at the bezel\'s minute ticks'),
          ('bezel',12.0,13.5,'fixed; twelve hour marks and the index at the top')],
   cradle=dict(z=15.0,w=2.0,material='bronze',note='two pylons from the roof hold the bezel at its sides'),
-  # the lit markers: an arc across each moving ring's band, standing proud of both faces so the time reads from the plaza
-  # and from Meridian Court; the hour's is wide, the minute's slim; a lit bead runs round the bezel's rim once a minute
-  markers=dict(hour=dict(arc=24.0,proud=0.4),minute=dict(arc=7.0,proud=0.4)),
+  # the lit markers are arrows (revised 2026-10-17, at the user's direction): each spans its ring's band, its base on
+  # the inner edge (arc: the base's width in degrees) and its point on the outer edge, so it points at an exact place
+  # on the dial. The minute ring is outside the hour ring, as a minute hand is longer, so the minute arrow's point
+  # touches the bezel's minute ticks; a lit bead runs round the bezel's rim once a minute
+  markers=dict(hour=dict(arc=20.0,proud=0.4,shape='arrow'),minute=dict(arc=10.0,proud=0.4,shape='arrow')),
   seconds=dict(r=14.1,bead=0.6,note='runs round the bezel\'s rim once a minute, through the cradle\'s grips'),
-  marks=dict(hour=dict(w=0.5),quarter=dict(w=1.2),proud=0.25))
+  marks=dict(hour=dict(w=0.5),quarter=dict(w=1.2),minute=dict(w=0.16,len=0.55),proud=0.25))
 ## The Meridian Arch is the East Gate (city.md 8b, revised 2026-10-16): a loop
 ## after Beijing's CCTV headquarters whose two legs straddle the wall at the gate.
 ## Meridian Avenue passes under it through a 24 m opening; the Wall Line runs
@@ -1195,12 +1264,12 @@ GREEN=dict(
     dict(name='High line troughs',on='the Meridian Line',planting=['bougainvillea'],trough=(0.9,1.2),bloom_every=9.0,
          where='troughs on both edges of the high line, so it reads from the street as a green line across the sky',after='Singapore\'s planted flyover edges',
          keeper='Kade Morrow (city works)',collision='part of the viaduct\'s solid edge; foliage decorative'),
-    dict(name='The Deck',on='the Deck',planting=['bougainvillea','date palm'],
-         where='planter edges along its parapets and date palms in tubs at the ramp heads: the Deck is Moy\'s park connector, a shaded green walk from every square to the park and the stations',after='Singapore\'s Park Connector Network and its covered walkways to the stations',
-         keeper='Orin Pike (park keeper)',collision='planters and tubs solid; fronds decorative'),
-    dict(name='The Crossing',on='the Crossing Ring',planting=['bougainvillea','coral vine','desert grasses'],ring_planter=1.0,halo_rim=1.2,
-         where='a planter on the ring\'s inner edge spilling bougainvillea into the open middle, coral vine up the inner columns, desert grasses on the halo\'s rim, and a rain garden under the ring catching the halo\'s run-off and the misters\' drip',after='the Supertrees\' climbers and Singapore\'s ABC Waters rain gardens (Bishan–Ang Mo Kio Park)',
-         keeper='Orin Pike (park keeper)',collision='the planters are the concourse\'s parapet (solid, a landing); plants decorative'),
+    dict(name='The Deck',on='the Deck',planting=['bougainvillea','desert grasses','agave and aloe','ghaf'],
+         where='a garden walk (DECK[\'garden\']): beds alternate from side to side so the path winds between them, small ghafs in deep planters over every second column pair, bougainvillea spilling over the outer edges: the Deck is Moy\'s park connector, a shaded green walk from every square to the park and the stations',after='New York\'s High Line and Singapore\'s Park Connector Network',
+         keeper='Orin Pike (park keeper)',collision='bed edges and planters solid (a 0.45 m sitting edge); plants decorative'),
+    dict(name='The Crossing',on='the Crossing\'s towers, ring and roof',planting=['coral vine','bougainvillea','desert grasses','ghaf'],
+         where='climbers up each tower\'s mesh from planters at every gallery, so the four towers read as living columns; the ring a garden walk with small ghafs over its supports; a rain garden of reeds and grasses round the towers\' feet fed by the roof; grasses on the roof\'s rim',after='the Supertrees, WOHA\'s Oasia Hotel Downtown and Singapore\'s ABC Waters rain gardens (Bishan–Ang Mo Kio Park)',
+         keeper='Orin Pike (park keeper)',collision='the towers\' mesh is part of the tower (blocking); planters solid; plants decorative'),
     dict(name='Station cores',on='the station cores',planting=['coral vine'],
          where='planters along the open escalating ramps\' outer edges and at every landing, coral vine trailing down the frame and shading the flights below',after='Singapore\'s planted open-air station escalators and Skyrise Greenery',
          keeper='Kade Morrow (city works)',collision='the planters are the flights\' solid edges; the vine is decorative'),
@@ -1273,7 +1342,7 @@ def _cross_checks():
             seg=LineString([L.interpolate(max(0,s0-half)),L.interpolate(min(L.length,s0+half))]).buffer(w/2+X['platform'][1],cap_style=2).intersection(wallP)
             for n_,h,g in tall:
                 if seg.intersection(g).area>0.05 and h>soffit-X['clear_over']: problems.append(('cross: platform into a building',st['name'],n_))
-            # every Spine station but the Crossing (which has its spirals): a scissor stack of escalator pairs under
+            # every Spine station but the Crossing (which has its towers): a scissor stack of escalator pairs under
             # each platform, from the street to the platform, its middle landing the Deck where the Deck runs below
             if sv['line']=='Spine Line' and st['name']!='The Crossing':
                 ES=ESCALATORS['scissor']; plat=sv['rail']+PLATFORMS['floor']
@@ -1341,14 +1410,18 @@ def _cross_checks():
             if g.distance(q)<1.4: problems.append(('cross: a high-line pier on a building',x,n_))
         if abs(x-sp['pts'][0][0])<4: problems.append(('cross: a high-line pier on the Spine',x))
     ends=[min(lg[0] for lg in WEST_GATE['towers']),max(lg[2] for lg in WEST_GATE['towers']),min(lg[0] for lg in ARCH['legs'])]
-    seq=[WEST_GATE['towers'][0][2]]+xs+[ARCH['legs'][0][0]]
+    # at the Crossing the line rests on its towers' two head beams instead of piers
+    cx_=CROSSING['c'][0]; bear=[cx_-CROSSING['tower']['offset'],cx_+CROSSING['tower']['offset']]; me['bearers']=bear
+    seq=[WEST_GATE['towers'][0][2]]+sorted(xs+bear)+[ARCH['legs'][0][0]]
     spans=[round(b-a,1) for a,b in zip(seq,seq[1:])]
     me['spans']=spans
     if max(spans)>me['max_span']+0.01: problems.append(('cross: a high-line span too long',max(spans)))
-    regular=[sp_ for sp_ in spans if abs(sp_-me['span'])<0.01]
-    if len(regular)<len(spans)*0.6: problems.append(('cross: the high line\'s piers keep no rhythm',spans))
-    cx_=CROSSING['c'][0]
-    if not any(abs(x-(cx_-me['span']/2))<0.01 for x in xs) or not any(abs(x-(cx_+me['span']/2))<0.01 for x in xs): problems.append(('cross: the piers are not set out from the Crossing',))
+    away=[sp_ for a_,b_,sp_ in zip(seq,seq[1:],spans) if not (bear[0]-50<=a_<=bear[1]+50 and bear[0]-50<=b_<=bear[1]+50)]
+    regular=[sp_ for sp_ in away if abs(sp_-me['span'])<0.01]
+    if len(regular)<len(away)*0.6: problems.append(('cross: the high line\'s piers keep no rhythm',spans))
+    # set out from the Crossing: the nearest piers stand a span and a half from its centre, so the grid runs on through it
+    if not any(abs(x-(cx_-1.5*me['span']))<0.01 for x in xs) or not any(abs(x-(cx_+1.5*me['span']))<0.01 for x in xs): problems.append(('cross: the piers are not set out from the Crossing',))
+    if any(abs(x-cx_)<CROSSING['ring'][1]+2 for x in xs): problems.append(('cross: a high-line pier inside the Crossing',))
     # the East Gate is the arch: legs straddle the wall clear of the avenue and the line; it holds both stations
     A=ARCH; av=[s_ for s_ in STREETS if s_[0]=='Meridian Avenue'][0]
     for lg in A['legs']:
@@ -1412,48 +1485,106 @@ def _cross_checks():
             for hx in ((ARCH if host=='arch' else WEST_GATE if host=='west gate' else {}).get('train_hall',{}).get('x') or []):
                 if g.intersects(sbox(hx[0],-300,hx[1],300)) and host!='crossing' and any(sbox(*lg).intersects(g) for lg in (ARCH['legs'] if host=='arch' else WEST_GATE['towers'])): problems.append(('station: a core in the train hall',host,c['name']))
             if host=='west gate' and not any(sbox(*tw).contains(g) for tw in W['towers']): problems.append(('west gate: a core outside its tower',c['name']))
-    # the Crossing's double-helix spirals: an up and a down escalator spiral wound round a glass lift's eye. Headroom
-    # between the two hands; inside the ring; clear of the Spine's tracks and platforms but a short bridge from one;
-    # clear of the high line's deck, and landing on the outer edge of one of its platforms
-    C=CROSSING; H=ESCALATORS['helix']; rm=H['eye']+H['band']/2; ro=H['eye']+H['band']
+    # the Crossing (city.md 7a, iteration 3): four garden towers, each a double helix round a steel trunk, galleries at
+    # its levels, a rib ring with climbers outside, a glass lift on its inner corner; they carry both lines, the ring and
+    # the roof. Checked: headroom between the helix's hands; each tower a short bridge from its Spine platform and its
+    # high-line platform and clear of both lines' decks; the lift opening straight onto both platforms; head beams with
+    # headroom over the concourse and under each line; the ring clear round the towers and spanning within its limit;
+    # the roof clear over the high line's trains and covering its platforms and the towers; everything in the park and
+    # off its features
+    C=CROSSING; T=C['tower']; H=ESCALATORS['helix']; rm=H['eye']+H['band']/2
     turn=2*math.pi*rm*math.tan(math.radians(H['angle']))
-    if turn/H['hands']-H['deck']<H['min_headroom']: problems.append(('crossing: a spiral without headroom between its hands',round(turn/H['hands']-H['deck'],2)))
-    spx=sp['pts'][0][0]; plat_in=X['track']+PLATFORMS['edge']; plat_out=plat_in+PLATFORMS['width']
-    for S in C['spirals']:
-        cx_,cz_=S['c']; d=math.hypot(cx_-C['c'][0],cz_-C['c'][1])
-        if not (C['ring'][0]<=d<=C['ring'][1]): problems.append(('crossing: a spiral not in the ring',S['name']))
-        bridge=abs(cx_-spx)-ro-plat_out
-        if not (0.5<=bridge<=2.5): problems.append(('crossing: a spiral not beside a Spine platform',S['name'],round(bridge,2)))
-        if abs(cz_)-ro<plat_out-0.05 and abs(abs(cz_)-ro-plat_out)>0.3: problems.append(('crossing: a spiral under the high line',S['name']))
-        if abs(abs(cz_)-ro-plat_out)>0.3: problems.append(('crossing: a spiral not landing on a high-line platform',S['name'],round(abs(cz_)-ro,2)))
+    if turn/H['hands']-H['deck']<H['min_headroom']: problems.append(('crossing: a tower\'s helix without headroom between its hands',round(turn/H['hands']-H['deck'],2)))
+    if H['eye']<T['trunk']+0.15: problems.append(('crossing: the helix rubs the trunk',))
+    cx0,cz0=C['c']; spx=sp['pts'][0][0]; mez=me['pts'][0][1]
+    plat_in=X['track']+PLATFORMS['edge']; plat_out=plat_in+PLATFORMS['width']; half_len=X['platform'][0]/2
+    deck_half=X['double']/2+0.9   # the viaduct with its planted troughs
+    sp_fl=sp['rail']+PLATFORMS['floor']; me_fl=me['rail']+PLATFORMS['floor']
+    for TW in C['towers']:
+        tx,tz=TW['c']; dr=T['drum']; nm=TW['name']
+        bx=abs(tx-spx)-dr-plat_out; bz=abs(tz-mez)-dr-plat_out
+        if not (0.5<=bx<=2.0): problems.append(('crossing: a tower not a short bridge from its Spine platform',nm,round(bx,2)))
+        if not (0.5<=bz<=2.0): problems.append(('crossing: a tower not a short bridge from its high-line platform',nm,round(bz,2)))
+        if abs(tz-cz0)-0.0>half_len or abs(tx-cx0)>half_len: problems.append(('crossing: a tower beyond its platforms\' ends',nm))
+        if abs(tx-spx)-dr<deck_half or abs(tz-mez)-dr<deck_half: problems.append(('crossing: a tower against a line\'s deck',nm))
+        lx,lz=TW['lift']['c']; lr=TW['lift']['r']
+        for gap in (abs(lx-spx)-lr-plat_out,abs(lz-mez)-lr-plat_out):
+            if not (0.3<=gap<=1.2): problems.append(('crossing: a lift that does not open onto both platforms',nm,round(gap,2)))
+        if math.hypot(lx-tx,lz-tz)<dr+lr: problems.append(('crossing: a lift inside its tower',nm))
+        if sorted(TW['levels'])!=[0,DECK['level'],sp_fl,me_fl]: problems.append(('crossing: a tower misses a level',nm,TW['levels']))
+        TW['turns']=round(max(TW['levels'])/turn,2); TW['rise_per_turn']=round(turn,2)
+        if math.hypot(tx-cx0,tz-cz0)+dr>C['ring'][0]-0.1 or math.hypot(tx-cx0,tz-cz0)+dr<C['ring'][0]-0.8: problems.append(('crossing: a tower does not meet the ring\'s inner edge',nm))
         for x in me['piers']:
-            if math.hypot(cx_-x,cz_-me['pts'][0][1])<ro+1.6: problems.append(('crossing: a spiral against a pier',S['name'],x))
-        if sorted(S['levels'])!=[0,DECK['level'],sp['rail']+PLATFORMS['floor'],me['rail']+PLATFORMS['floor']]: problems.append(('crossing: a spiral misses a level',S['name'],S['levels']))
-        S['turns']=round(max(S['levels'])/turn,2); S['rise_per_turn']=round(turn,2); S['r']=(H['eye'],ro)
-    # the Crossing Ring: open, inside the park, clear of its gardens, the pond, the playground and the wind trees
-    ring=Point(C['c']).buffer(C['ring'][1],64)
+            if math.hypot(tx-x,tz-mez)<dr+3: problems.append(('crossing: a tower against a pier',nm,x))
+    # head beams: the Spine's (east-west, under its deck) clear over the concourse; the high line's (north-south) under its girders
+    sb_top=sp['rail']-X['depth']; sb_bot=sb_top-T['beam_depth']
+    if sb_bot-DECK['level']<3.0: problems.append(('crossing: no headroom under the Spine\'s head beam',round(sb_bot-DECK['level'],2)))
+    mb_top=me['rail']-X['depth']-2.2; mb_bot=mb_top-2.0
+    if mb_bot<sp_fl+PLATFORMS['canopy']+1.0: problems.append(('crossing: the high line\'s head beam over the Spine\'s platforms',))
+    C['_beams']=dict(spine=dict(z=[cz0-T['offset'],cz0+T['offset']],y=(round(sb_bot,2),round(sb_top,2))),high=dict(x=[cx0-T['offset'],cx0+T['offset']],y=(round(mb_bot,2),round(mb_top,2))))
+    # the Spine across the Crossing: from the head beams to the ring's supports, and between the head beams
+    zs=sorted([q[1] for q in C['_ring_supports'] if abs(q[0]-spx)<4]+C['_beams']['spine']['z'])
+    if max(b_-a_ for a_,b_ in zip(zs,zs[1:]))>30.0: problems.append(('crossing: a Spine span too long',zs))
+    # the ring: round the towers, spanning between its supports (the towers on the diagonals and the column pairs)
+    ang=sorted([math.degrees(math.atan2(q[1]-cz0,q[0]-cx0))%360 for q in C['_ring_supports']]+[45,135,225,315])
+    rr=C['_ring_r']; gaps=[(b_-a_)%360 for a_,b_ in zip(ang,ang[1:]+[ang[0]+360])]
+    C['_ring_spans']=sorted(set(round(math.radians(g_)*rr,1) for g_ in gaps if g_>3))
+    if max(C['_ring_spans'])>C['ring_max_span']: problems.append(('crossing: a ring span too long',C['_ring_spans']))
+    for q in C['_ring_supports']:
+        if not (C['ring'][0]<math.hypot(q[0]-cx0,q[1]-cz0)<C['ring'][1]): problems.append(('crossing: a ring support off the ring',q))
+    # the roof: over the high line's trains, covering its platforms and the towers
+    R=C['roof']
+    if R['y']<me['rail']+X['car_h']+1.0: problems.append(('crossing: the roof on the high line\'s trains',))
+    se=lambda x,z: (abs(x)/R['half'])**R['n']+(abs(z)/R['half'])**R['n']
+    for TW in C['towers']:
+        dx,dz=TW['c'][0]-cx0,TW['c'][1]-cz0; u=T['drum']/math.sqrt(2)
+        if se(abs(dx)+u,abs(dz)+u)>1.0: problems.append(('crossing: the roof does not cover a tower',TW['name']))
+    if se(half_len,plat_out)>1.0: problems.append(('crossing: the roof does not cover the high line\'s platforms',))
+    # in the park, off its pond, playground and buildings; the supports off its walks and gardens
+    ring=Point(C['c']).buffer(C['ring'][1],64).difference(Point(C['c']).buffer(C['ring'][0],64))
     if not sbox(*PARK['rect']).contains(ring): problems.append(('crossing: the ring leaves the park',))
     from shapely import affinity
     pc=PARK['pond']['c']; pond=affinity.scale(Point(pc).buffer(1,64),*PARK['pond']['r'])
     pg=PARK['playground']; play=Point(pg['c']).buffer(pg['track'][1],64)
-    halo=Point(C['c']).buffer(C['halo'][2],64)
-    for nm,g in [('dry garden',sbox(*PARK['dry_garden'])),('lawn',sbox(*PARK['lawn'])),('pond',pond),('playground',play)]+[('parasol',Point(t).buffer(2.5)) for t in PARK['parasols']]:
-        if halo.intersection(g).area>0: problems.append(('crossing: the ring on the',nm))
-    for t in PARK['wind_trees']:
-        if halo.distance(Point(t))<2: problems.append(('crossing: a wind tree under the halo',t))
-    if not (sp['rail']+X['car_h']+0.5<C['halo'][0]<me['rail']-X['depth']-2): problems.append(('crossing: the halo between the lines\' heights is wrong',))
+    for nm,g in [('pond',pond),('playground',play)]+[('park building',sbox(*[b_ for b_ in named if b_['n']==n_][0]['r'])) for n_ in (9,10)]:
+        if ring.intersection(g).area>0: problems.append(('crossing: the ring over the',nm))
+    for q in C['_ring_supports']:
+        for nm,g in [('walk',unary_union([sbox(*w_) for w_ in PARK['walks']])),('dry garden',sbox(*PARK['dry_garden'])),('lawn',sbox(*PARK['lawn'])),('pond',pond)]:
+            if g.contains(Point(q)) and not (nm=='walk' and abs(q[0]-spx)<3.01): problems.append(('crossing: a ring support in the',nm,q))
+    for TW in C['towers']:
+        g=Point(TW['c']).buffer(T['drum'])
+        for nm,f in [('lawn',sbox(*PARK['lawn'])),('dry garden',sbox(*PARK['dry_garden'])),('pond',pond),('walk',unary_union([sbox(*w_) for w_ in PARK['walks']]))]:
+            if g.intersection(f).area>0: problems.append(('crossing: a tower on the',nm,TW['name']))
     if abs(C['deck']-DECK['level'])>0.01: problems.append(('crossing: the ring is not at the Deck\'s level',))
     if not sbox(*PARK['rect']).buffer(-1).contains(play): problems.append(('park: the playground leaves the park',))
     for n_ in (9,10):
         g=sbox(*[b_ for b_ in named if b_['n']==n_][0]['r'])
-        for nm,f in [('playground',play),('ring',halo),('pond',pond),('lawn',sbox(*PARK['lawn'])),('dry garden',sbox(*PARK['dry_garden']))]+[('walk',sbox(*w_)) for w_ in PARK['walks']]:
+        for nm,f in [('playground',play),('pond',pond),('lawn',sbox(*PARK['lawn'])),('dry garden',sbox(*PARK['dry_garden']))]+[('walk',sbox(*w_)) for w_ in PARK['walks']]:
             if g.intersection(f).area>0: problems.append(('park: a park building on the',nm,n_))
     for t in pg['towers']:
         if pond.distance(Point(t[:2]))<t[3]+1 or sbox(*PARK['lawn']).distance(Point(t[:2]))<t[3]: problems.append(('park: a playground tower on the pond or the lawn',t))
-    for t in PARK['wind_trees']:
-        if pond.contains(Point(t)) or play.distance(Point(t))<3: problems.append(('park: a wind tree on the pond or the playground',t))
+    # the park's trees: trunks off the walks, the pond, the playground, the lawn and the buildings; crowns clear of the
+    # Deck (inside the park by the crown and 1.5 m), the Crossing Ring and its towers, the high line's piers, and each other
+    walks_=unary_union([sbox(*w_) for w_ in PARK['walks']]); prk=sbox(*PARK['rect'])
+    for k,t in enumerate(PARK['trees']):
+        K=TREE_KIT[t['kind']]; cr=K['crown']*t['h']; q=Point(t['c']); t['crown']=round(cr,2); t['trunk_h']=round(K['trunk']*t['h'],2)
+        if walks_.distance(q)<1.0: problems.append(('park: a tree on a walk',t['c']))
+        if pond.contains(q) or play.distance(q)<cr*0.5 or sbox(*PARK['lawn']).distance(q)<1.0: problems.append(('park: a tree on the pond, the playground or the lawn',t['c']))
+        for n_ in (9,10):
+            if sbox(*[b_ for b_ in named if b_['n']==n_][0]['r']).distance(q)<cr: problems.append(('park: a tree over a park building',t['c'],n_))
+        if not prk.buffer(-(cr+1.5)).contains(q): problems.append(('park: a tree\'s crown into the Deck',t['c']))
+        d=q.distance(Point(C['c']))
+        if C['ring'][0]-cr-1.0<d<C['ring'][1]+cr+1.0: problems.append(('park: a tree\'s crown into the Crossing Ring',t['c'],round(d,1)))
+        if d<C['ring'][0]: problems.append(('park: a tree inside the Crossing',t['c']))
+        for x in me['piers']:
+            if q.distance(Point(x,mez))<cr*0.5+1.5: problems.append(('park: a tree against a high-line pier',t['c'],x))
+        for u in PARK['trees'][k+1:]:
+            if q.distance(Point(u['c']))<0.6*(cr+TREE_KIT[u['kind']]['crown']*u['h']): problems.append(('park: trees crowded',t['c'],u['c']))
+        for pr in PARK['parasols']:
+            if q.distance(Point(pr))<2.5: problems.append(('park: a tree on a parasol',t['c']))
 _block_checks()
 _cross_checks()
+_deck_checks()
 ## The timetable (city.md 6g, 2026-10-17, at the user's direction). A clock-face
 ## service: on every line a train every 60 real seconds, which in the game's
 ## clock (one real second is one game minute) is a train every hour, on the same
@@ -2043,6 +2174,7 @@ w("const CROSSING := %s" % lit(CROSSING))
 w("## The Timekeeper over city hall (city.md 8a): rings (name, inner and outer radius, what), centre (x, y, z), the")
 w("## Meridian Line through its empty centre. Twelve-hour ring; no day ring.")
 w("const TIMEKEEPER := %s" % lit(TIMEKEEPER))
+w("const TREE_KIT := %s" % lit(TREE_KIT))
 w("## The Meridian Arch (city.md 8b): legs (world rects), lower and top bridges (y ranges), the line's east station.")
 w("const ARCH := %s" % lit(ARCH))
 w("const WEST_GATE := %s" % lit(WEST_GATE))
@@ -2089,5 +2221,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')
