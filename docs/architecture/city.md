@@ -1564,21 +1564,73 @@ high line's piers rising through it. It is redesigned from its purpose:
   down the trunks to a **rain garden** of reeds and grasses round each
   tower's foot. Desert grasses on its rim. The Spine's platforms have their
   own louvred canopies at +17.4, over their bridges to the towers.
-- **The city's clock (2026-10-17, at the user's direction):** a glass dome on
-  the roof. Its drum is a rounded square in plan (the roof's superellipse, 38 m
-  across, 17 m high) with a **ring clock 16 m across** set flush in each side,
-  facing north, south, east and west, down the four streets to the park; a
-  glass cupola above it rises to about 70 m. Each clock is a ring clock like the
-  old Timekeeper: a hollow centre 6 m across, the hour ring, the minute ring
-  outside it, each with a lit arrow, a fixed bezel with hour marks and minute
-  ticks, and a seconds bead on its rim. They keep the game's time, so the dial
-  and the bell agree. A **great bronze bell** (4.4 m across the mouth) hangs on
-  a chain from the cupola's crown, seen through the glass. It rings three
-  times a day, after the Angelus and the old curfew bell, never on the hour (an
-  hour is one real minute): **the dawn bell** at 5:00 (sunrise), three strokes
-  three times then nine; **the noon bell**, twelve strokes; **the evening
-  bell** at 19:30, half an hour before sunset, like the dawn bell.
+- **The city's clock (2026-10-17, at the user's direction; dome revised the
+  same day):**
+  - **The dome.** A glass dome stands on the roof. Its drum is a rounded square
+    in plan (the roof's superellipse, 40 m across, 17 m high), with a **ring
+    clock 16 m across** set flush in each side. The clocks face north, south,
+    east and west, down the four streets to the park. A cupola rises above the
+    drum to about 70 m.
+  - **One shell.** Drum and cupola are one shell of clear glass on a fine
+    **triangulated grid** of slender white members. It is modelled on Foster's
+    Queen Elizabeth II Great Court at the British Museum:
+    - every pane is a triangle;
+    - the grid sweeps from the near-square base up to a small crown ring, which
+      carries the bell and a little glass lantern;
+    - it has no posts and no ring beam. The first dome's 24 posts and steel
+      ring read as a cage.
+  - **The clocks.** Each is a ring clock: the hour ring and, outside it, the
+    minute ring, each with a lit arrow, and a fixed bezel with hour marks and
+    minute ticks. The seconds bead is gone (user, 2026-10-17). They keep the
+    game's time, so the dial and the bell agree.
+  - **The eyes.** Each clock's hollow centre is an **open eye** through the
+    glass, 5.7 m across. It is lined with a bronze sleeve inside the turning
+    hour ring, with a bronze sill 3.1 m wide and 5.25 m clear above it. There
+    is no glass and no guard, so it is a way in and out for climbers, gliders
+    and fliers, and a balcony onto the street it faces.
+  - **The bell.** A **great bronze bell** (4.4 m across the mouth) hangs from
+    the crown ring. It rings three times a day, never on the hour (an hour is
+    one real minute), after the Angelus and the old curfew bell:
+    - **the dawn bell** at 5:00 (sunrise): three strokes three times, then
+      nine;
+    - **the noon bell**: twelve strokes;
+    - **the evening bell** at 19:30, half an hour before sunset: as the dawn
+      bell.
+
   Data: `CROSSING.dome`.
+- **The Clock Room (2026-10-17, at the user's direction).** The dome's floor
+  (the roof's top, +41.6) is a public room under the glass and the bell. It is
+  a destination you go to on purpose, not a stop on the way:
+  - **The towers.** The garden towers' escalators end at the high line, so
+    everyone gets off at the station first.
+  - **Ways in.** Every way in is one of the room's designed openings:
+    - **the arrival wells.** At the middle of each high-line platform, directly
+      under the clock, the platform widens 2.6 m on its outer side into a
+      landing. From it, two escalator pairs, one either side of the axis, climb
+      4.6 m through glass-guarded wells in the floor. They arrive by the glass,
+      under a clock's eye. Each well is guarded on three sides and open where
+      riders step off.
+    - **the lift lanterns.** The four tower lifts run on through the roof, and
+      each arrives in a glass lantern whose door faces the bell. The lifts
+      stop at the ground, the Spine, the high line and the room.
+    - **the clock eyes,** for climbers, gliders and fliers.
+  - **Inside:**
+    - a bronze **compass rose** is set in the terrazzo under the bell;
+    - from the rose, four escalator pairs rise 6.1 m like the compass's arms
+      to a **landing behind each eye**. Each landing is guarded on its sides
+      and either side of the escalator's head, and open to the eye, so anyone
+      can stand in a clock;
+    - beds of desert grasses run along the glass.
+  - **Checks.** The plan checks that:
+    - the eyes are big enough to pass through, inside the hour ring;
+    - the compass's feet meet clear of each other at the rose;
+    - the arrivals stay clear of the compass, the towers, the lifts and the
+      glass;
+    - the widenings stay on their platforms;
+    - no opening fouls another;
+    - the bell hangs clear above the eyes' landings.
+
+  Data: `CROSSING.dome.room`.
 - **Planted:** the towers' climbers (`CROSSING.climbers`), the ring's beds
   and small ghafs (`DECK.beds`, `DECK.trees`), the rain gardens
   (`CROSSING.rain_gardens`), the roof's rim.
@@ -2960,10 +3012,25 @@ wants short, legible ways to every platform.
   legs' faces, so the platforms' west ends meet the scissors, and 9.5 m
   east of them, to a concourse beyond the buffer stops that joins the two
   platforms.
-- **Lifts:**
-  - a glass lift on each leg's inner face stops at 0, +14.2, +21.8, +37
-    and +43;
-  - a second, in each leg's east side, serves the outer platform.
+- **Landings and guards (revised 2026-10-17, at the user's direction).**
+  - **Every flight ends on a landing.** F3 arrives on a landing at +37 beside
+    the gallery, F4 leaves from another, and F4 arrives on one at +43. The
+    outer pair's foot has a platform-side landing inside the leg. The plan
+    checks that both ends of every flight meet a deck.
+  - **Every open edge has a guard:** clear toughened glass 1.1 m high on a
+    bronze shoe, with a bronze rail. This covers every landing and gallery,
+    the Rostrum's front, ends and bay, the deck across the opening, the walk
+    over the tracks and the Steps' half-landings.
+  - **Guards open only where something meets them:** a flight, the Steps, a
+    lift door, the leg's face or a platform. No opening is wider than the way
+    through it. The runs are in `ARCH['front_guard']`.
+- **Lifts (revised 2026-10-17: every stop opens onto a deck, checked):**
+  - **The front lifts.** A glass lift stands in front of each leg, in line
+    with the tubes, flanking the gate's opening. Its door opens onto the
+    tubes' inner ends, at the Rostrum, +37 and +43.
+  - **The +21.8 stop is dropped.** Nothing at the tubes' inner end meets it.
+  - **The outer lifts.** A second lift, at the east end of the walk over the
+    tracks, serves the ground, the outer platform's landing and the walk.
 
 
 **The West Gate** (data: `WEST_GATE`, checked) is the arch's plainer

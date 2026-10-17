@@ -36,10 +36,11 @@ To settle:
 
 1. `AGENTS.md`, `CLAUDE.md`.
 2. This document.
-3. `city.md` 8a.1 (Civic Plaza, the grand square) and 8b.1 (City Hall's city
-   front).
+3. `city.md` 8a.1 (Civic Plaza, the grand square), 8b.1 (City Hall's city
+   front) and 7a (the city's clock and the Clock Room).
 4. `docs/drawings/moy_city_3d.html`. New places to visit: *Civic Plaza*,
-   *City Hall's city front*, *On Civic Plaza*.
+   *City Hall's city front*, *On Civic Plaza*, *The city's clock*, *The Clock
+   Room*, *In a clock's eye*.
 
 ## 2. What changes
 
@@ -76,6 +77,51 @@ To settle:
    Keep at least 1.6 m (checked in `tools/city_layout.py`) between any beam and the
    band. Check it in the validator: no collider other than the hand itself
    may enter the band's volume up to 2.6 m above the treads.
+
+5. **City Hall's landings, guards and lifts.**
+   - **New landings.** Build the new landings `L37o`, `L37i` and `L43`, and
+     each leg's `outer_landing`.
+   - **Guards.** Build every run in `ARCH['front_guard']['runs']`: 1.1 m
+     glass on a bronze shoe, with a bronze rail. Each guard is solid
+     (collision); its top rail is decorative.
+   - **Lifts.** Move the front lifts to their new places, in front of each
+     leg and flanking the gate. Drop their +21.8 stop. Move the outer lifts
+     onto the walk over the tracks.
+   - **Check:** walk every landing's edge with both characters. You must not
+     be able to fall except where a flight, a stair, a lift or a platform
+     meets the edge.
+6. **The clock dome (rebuild it).** Data: `CROSSING.dome`.
+   - **Remove** the drum's posts and the steel ring beam.
+   - **Build one glass shell**, drum and cupola together. Put a triangulated
+     grid of slender white members on it (`lattice`: 72 panes round, rows
+     every 2.2 m up the shell, 7 cm members), meeting a crown ring at
+     3 m radius. The drawing's code builds it. The glass and the grid are
+     solid; the grid has no separate collider.
+   - **The eyes.** Cut each clock's hollow centre out of the glass
+     (`clocks.eye`), line it with the bronze sleeve, and lay the sill. Leave
+     each eye open: no glass, no guard, no collider across it. A glider or
+     flier must be able to pass through.
+   - **Hang the bell** from the crown ring.
+7. **The Clock Room.** Data: `CROSSING.dome.room`.
+   - **The helices end at +37.** They do not continue into the dome.
+   - **The floor:** terrazzo at the roof's top, with the compass rose under
+     the bell.
+   - **The arrivals.** Build the `widenings` on the high-line platforms.
+     Build the four `arrivals` as escalator pairs from 37 to 41.6. Cut their
+     `well`s in the floor, and guard each well on three sides, open at the
+     head.
+   - **The lifts.** Run the four tower lifts on to 41.6, each with a glass
+     lantern whose door faces the bell (`lifts`, `door`). Add the stop to
+     their destination menus.
+   - **The compass.** Build the four `compass` pairs from the floor to the
+     eye landings at the sill's height (47.7). Build each `landing` on
+     slender posts, guarded on its sides and either side of the escalator's
+     head, and open to its eye.
+   - **Check:** ride every way in and out, with both characters:
+     - each arrival, both ways;
+     - each lift to the room and back;
+     - each compass arm to its eye and back;
+     - out through an eye with the Leaf Hat, and back in.
 
 ## 3. Checks
 

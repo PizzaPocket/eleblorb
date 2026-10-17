@@ -1223,13 +1223,23 @@ CROSSING=dict(c=(-560,0),deck=6.5,ring=(24.7,32.7),ring_depth=1.6,ring_max_span=
                  material='white-painted steel, every pane a triangle; the grid sweeps from the square-ish base up to the crown ring the bell hangs from'),
     clocks=dict(bearings=[0,90,180,270],centre=8.5,rings=[('hour',3.0,5.0),('minute',5.0,7.0),('bezel',7.0,8.0)],proud=0.3,
       markers=dict(hour=dict(arc=22.0,shape='arrow'),minute=dict(arc=12.0,shape='arrow')),marks=dict(hour=0.35,quarter=0.8,minute=dict(w=0.12,len=0.4)),
-      eye=dict(r=2.9,sill=-2.4,sleeve=0.15,open='no glass, no guard: a way through for climbers, gliders and fliers'),time='game'),
-    # the Clock Room: the dome's floor (the roof's top) is a public room under the glass and the bell. The four towers'
-    # helices climb through the roof into it, each up a glass-guarded well; from under the bell four escalator pairs rise
-    # like a compass's arms to a landing behind each clock's eye.
-    room=dict(name='the Clock Room',well_guard=0.1,landing=dict(depth=3.0,w=4.4),runoff=2.5,
-      program='a public room under the glass: beds of desert grasses along the glass, benches round the escalator wells, the bell overhead and the backs of the four clocks turning; from each eye, the street it faces',
-      floor='pale terrazzo, the roof\'s top'),
+      eye=dict(r=2.85,sill=-2.4,sleeve=0.12,open='no glass, no guard: a way through for climbers, gliders and fliers'),time='game'),
+    # the Clock Room (2026-10-17, at the user's direction): the dome's floor, the roof's top, is a public room under the
+    # glass and the bell, a destination reached on purpose rather than a stop on the way. The helices end at the high
+    # line, so everyone gets off at the station; every way into the room is one of its designed openings:
+    # - the arrival wells: at the middle of each high-line platform, under the clock, the platform widens into a landing
+    #   on its outer side (widening: its depth); from it two escalator pairs, one either side of the axis (at arrive_x),
+    #   climb through glass-guarded wells in the floor into the room, arriving by the glass under a clock's eye;
+    # - the lift lanterns: the four tower lifts run on through the roof to the room, each arriving in a glass lantern
+    #   (lantern: its height over the floor) whose door faces the bell;
+    # - the clock eyes: open, for climbers, gliders and fliers; inside, from under the bell, four escalator pairs rise
+    #   like a compass's arms to a landing behind each eye (landing: its depth and width), so anyone can stand in an eye
+    #   and look down the street it faces.
+    # rose: the round inlay under the bell where the compass's feet meet; guard: the glass round every well and landing.
+    room=dict(name='the Clock Room',widening=2.6,arrive_x=(2.4,5.6),runoff=2.5,landing=dict(depth=3.0,w=4.4),lantern=3.4,rose=3.6,
+      guard=dict(height=1.1,material='clear toughened glass on a bronze shoe, a bronze handrail on top'),
+      program='a public room under the glass: beds of desert grasses along the glass, benches round the wells, the bell overhead and the backs of the four clocks turning; from each eye, the street it faces',
+      floor='pale terrazzo, the roof\'s top; a bronze compass rose inlaid under the bell, its four arms the escalators to the eyes, the wells and lanterns set on its diagonals and beside its arms'),
     bell=dict(mouth=4.4,height=4.6,crown_gap=1.0,material='bronze',
       rings=[dict(at=5.0,name='the dawn bell',pattern='three strokes, three times, then nine (after the Angelus)'),
              dict(at=12.0,name='the noon bell',pattern='twelve strokes'),
@@ -1243,7 +1253,7 @@ def _crossing_layout():
     C['towers']=[]
     for nm,sx,sz in (('north-east',1,-1),('north-west',-1,-1),('south-east',1,1),('south-west',-1,1)):
         tc=(cx+sx*T['offset'],cz+sz*T['offset']); d=drum+T['lift']+0.1
-        lv_=[0,DECK['level'],13.2+PLATFORMS['floor'],36.0+PLATFORMS['floor'],round(C['roof']['y']+C['roof']['th'],2)]   # the last: the Clock Room, in the dome
+        lv_=[0,DECK['level'],13.2+PLATFORMS['floor'],36.0+PLATFORMS['floor']]   # the helices end at the high line: everyone gets off at the station
         # each hand: a flat landing at every level it serves (the rider steps off onto it, then sideways onto the gallery),
         # then a climb to the next level at the helix's angle; the down hand is the same path half a turn round. Angles in
         # degrees, 0 east, 90 south, increasing as the hand climbs; the up hand starts facing out of the Crossing.
@@ -1257,7 +1267,7 @@ def _crossing_layout():
             hands.append(dict(hand='up' if hand==0 else 'down',profile=prof))
         C['towers'].append(dict(name=nm,c=tc,levels=lv_,hands=hands,
             spine_platform='east' if sx>0 else 'west',high_platform='north' if sz<0 else 'south',
-            opens={str(DECK['level']):['the ring','the cross-bridge'],str(round(13.2+PLATFORMS['floor'],1)):180 if sx>0 else 0,str(36.0+PLATFORMS['floor']):90 if sz<0 else 270,str(lv_[-1]):'the Clock Room'},
+            opens={str(DECK['level']):['the ring','the cross-bridge'],str(round(13.2+PLATFORMS['floor'],1)):180 if sx>0 else 0,str(36.0+PLATFORMS['floor']):90 if sz<0 else 270},
             lift=dict(c=(round(tc[0]-sx*d/math.sqrt(2),2),round(tc[1]-sz*d/math.sqrt(2),2)),r=T['lift']),r=(band0,band1)))
     # the ring's supports: the four towers, a pair of Deck columns where the Spine walks cross it (north and south),
     # and a pair either side of the cross walk east and west, clear of the walk
@@ -1584,7 +1594,7 @@ def _cross_checks():
         for gap in (abs(lx-spx)-lr-plat_out,abs(lz-mez)-lr-plat_out):
             if not (0.3<=gap<=1.2): problems.append(('crossing: a lift that does not open onto both platforms',nm,round(gap,2)))
         if math.hypot(lx-tx,lz-tz)<dr+lr: problems.append(('crossing: a lift inside its tower',nm))
-        if sorted(TW['levels'])!=[0,DECK['level'],sp_fl,me_fl,C['roof']['y']+C['roof']['th']]: problems.append(('crossing: a tower misses a level',nm,TW['levels']))
+        if sorted(TW['levels'])!=[0,DECK['level'],sp_fl,me_fl]: problems.append(('crossing: a tower misses a level',nm,TW['levels']))
         TW['turns']=round(max(TW['levels'])/turn,2); TW['rise_per_turn']=round(turn,2)
         if math.hypot(tx-cx0,tz-cz0)+dr>C['ring'][0]-0.1 or math.hypot(tx-cx0,tz-cz0)+dr<C['ring'][0]-0.8: problems.append(('crossing: a tower does not meet the ring\'s inner edge',nm))
         for x in me['piers']:
@@ -1724,18 +1734,99 @@ def _arch_front():
         galleries=[dict(name='G21',band='AB',y=levels[1],z=(S(z1),S(zo)),to='over the tracks to the outer platform'),
                    dict(name='G29',band='AB',y=levels[2],z=(S(zi),S(z0)),to='the turn'),
                    dict(name='G37',band='B',y=hl,z=(S(zo),S(zi)),to='the high line platform\'s west end'),
-                   dict(name='G43',band='B',y=sky,z=(S(abs(flights[3]['z'][1])+1.5),S(zi)),to='the sky garden on the lower bridge\'s roof')]
+                   dict(name='G43',band='B',y=sky,z=(S(abs(flights[3]['z'][1])+1.5),S(zi)),to='the sky garden on the lower bridge\'s roof'),
+                   # the landings between flights in band A, each joined across to the band B gallery beside it: F3 arrives
+                   # on L37o and its riders cross to G37; F4 leaves from L37i; F4 arrives on L43 and crosses to G43
+                   dict(name='L37o',band='AB',y=hl,z=(S(z1),S(zo)),to='F3\'s head, across to G37'),
+                   dict(name='L37i',band='AB',y=hl,z=(S(zi),S(z0)),to='F4\'s foot, from G37'),
+                   dict(name='L43',band='AB',y=sky,z=(S(abs(flights[3]['z'][1])),S(abs(flights[3]['z'][1])+2.5)),to='F4\'s head, across to G43')]
         ex=(-345.0,round(-345.0+pw,2))
         over=dict(y=levels[1],x=(F,ex[1]),z=(S(z1-1.5),S(zo-0.5)))
         outer=dict(name='outer pair',x=ex,y=(levels[1],pf),z=(S(z1),S(z0)),lands=round(plat_out(sgn*z0)[1],2))
-        lifts=[dict(name='front lift',c=(round(F+2.0,2),S(zi-1.6)),size=2.6,stops=[0.0,pf,levels[1],hl,sky]),
-               dict(name='outer lift',c=(round(ex[1]+1.6,2),S(zo-3.0)),size=2.6,stops=[0.0,pf,levels[1]])]
+        # the lifts (revised 2026-10-17: every stop now opens onto a deck): the front lift stands in front of the face in
+        # line with the tubes, one flanking each side of the gate's opening, its door onto the tubes' inner ends; the
+        # outer lift at the walk over the tracks' east end, down to the outer platform's landing and the ground
+        lifts=[dict(name='front lift',c=(round((bandB[0]+bandA[1])/2,2),S(zi-1.6)),size=2.6,stops=[0.0,pf,hl,sky],door=sgn),
+               dict(name='outer lift',c=(round(ex[1]+1.6,2),S(zo-1.75)),size=2.6,stops=[0.0,pf,levels[1]],door='w')]
+        # the outer pair's foot: a platform-side landing inside the leg, between the outer platform and the pair
+        outer_landing=dict(y=pf,x=(round(plat_out(sgn*z0)[1],2),ex[1]),z=(S(zi),S(zo)))
         # the City Steps: an escalator on each side of a broad stair, in two flights with a shared half-landing
         run=(pf/2)/math.tan(math.radians(ESCALATORS['station']['angle'])); land=ESCALATORS['station']['landing']
         head=rostrum['x'][0]; foot=round(head-2*run-land,2)
         steps=dict(z=S(21.0),width=7.8,head=head,foot=foot,half=(round(head-run-land,2),round(head-run,2)),half_y=round(pf/2,2),
                    lanes=[dict(kind='up escalator',z=S(21.0+3.2)),dict(kind='stair',z=S(21.0),w=4.4),dict(kind='down escalator',z=S(21.0-3.2))])
-        legs.append(dict(side=name,flights=flights,galleries=galleries,over_tracks=over,outer=outer,lifts=lifts,steps=steps))
+        legs.append(dict(side=name,flights=flights,galleries=galleries,over_tracks=over,outer=outer,outer_landing=outer_landing,lifts=lifts,steps=steps))
+    # the guards (2026-10-17, at the user's direction): clear glass on every open edge of every landing, gallery, the
+    # Rostrum, the walk over the tracks and the Steps' half-landings, open only where a flight, a stair, a lift door, a
+    # platform or the leg's face meets it. Worked out as each level's decks together, less those meetings.
+    from shapely.geometry import box as sbox, Point, LineString, MultiLineString
+    from shapely.ops import unary_union, linemerge
+    bx={'A':bandA,'B':bandB,'AB':(bandB[0],bandA[1])}
+    guards=[]; gap_max=0.0
+    def zz(a,b): return (min(a,b),max(a,b))
+    for L in legs:
+        decks={}
+        for g in L['galleries']:
+            z_=zz(*g['z']); decks.setdefault(g['y'],[]).append(sbox(bx[g['band']][0],z_[0],bx[g['band']][1],z_[1]))
+        T_=L['over_tracks']; z_=zz(*T_['z']); decks.setdefault(T_['y'],[]).append(sbox(T_['x'][0],z_[0],T_['x'][1],z_[1]))
+        st=L['steps']; decks.setdefault(st['half_y'],[]).append(sbox(st['half'][0],st['z']-st['width']/2,st['half'][1],st['z']+st['width']/2))
+        OL=L['outer_landing']; z_=zz(*OL['z']); decks.setdefault(OL['y'],[]).append(sbox(OL['x'][0],z_[0],OL['x'][1],z_[1]))
+        pass
+        # where people go on and off: each flight's ends, the Steps' flights, the lifts' doors, the face, the platforms
+        ways=[]
+        for f_ in L['flights']+[dict(band=None,x=L['outer']['x'],y=L['outer']['y'],z=L['outer']['z'])]:
+            xb=bx[f_['band']] if f_.get('band') else f_['x']
+            for zq,yq in ((f_['z'][0],f_['y'][0]),(f_['z'][1],f_['y'][1])): ways.append((yq,LineString([(xb[0],zq),(xb[1],zq)]).buffer(0.05)))
+        ways.append((st['half_y'],LineString([(st['half'][0],st['z']-st['width']/2),(st['half'][0],st['z']+st['width']/2)]).buffer(0.05)))
+        ways.append((st['half_y'],LineString([(st['half'][1],st['z']-st['width']/2),(st['half'][1],st['z']+st['width']/2)]).buffer(0.05)))
+        def door_of(lf):
+            x_,z_=lf['c']; h_=lf['size']/2
+            if lf['door']=='w': return Point(x_-h_-0.6,z_),LineString([(x_-h_,z_-1.0),(x_-h_,z_+1.0)])
+            return Point(x_,z_+lf['door']*(h_+0.6)),LineString([(x_-1.0,z_+lf['door']*h_),(x_+1.0,z_+lf['door']*h_)])
+        for lf in L['lifts']:
+            for yq in lf['stops']: ways.append((yq,door_of(lf)[1].buffer(0.35)))
+        # the outer landing meets the outer platform along its whole west edge
+        platline=LineString([(OL['x'][0],-200),(OL['x'][0],200)]).buffer(0.05); ways.append((OL['y'],platline))
+        face=LineString([(F,-200),(F,200)]).buffer(0.05)
+        for y_,ds in decks.items():
+            U=unary_union(ds); edge=U.boundary.difference(face)
+            # the walk over the tracks meets the outer platform's stair head and the gallery at its ends
+            if abs(y_-L['over_tracks']['y'])<0.01: edge=edge.difference(LineString([(T_['x'][1],-200),(T_['x'][1],200)]).buffer(0.05))
+            for yq,wg in ways:
+                if abs(yq-y_)<0.01: edge=edge.difference(wg)
+            for ln in (getattr(edge,'geoms',None) or [edge]):
+                if ln.is_empty or ln.length<0.05: continue
+                guards.append(dict(side=L['side'],y=round(y_,2),pts=[[round(x,2),round(z,2)] for x,z in ln.coords]))
+            # an opening is never wider than the way through it (a flight's band, a lift door, the Steps' width)
+            for hole in (getattr(U.boundary.difference(edge),'geoms',None) or [U.boundary.difference(edge)]):
+                if not hole.is_empty and not hole.intersects(face) and not (abs(y_-OL['y'])<0.01 and hole.within(platline.buffer(0.1))): gap_max=max(gap_max,hole.length)
+        # every flight ends on a deck: step off its head onto one, step onto its foot from one (2026-10-17: F3 and F4 had none)
+        ro_deck=[sbox(rostrum['x'][0],rostrum['z'][0],F,rostrum['z'][1])]
+        for f_ in L['flights']+[dict(name='outer pair',band=None,x=L['outer']['x'],y=L['outer']['y'],z=L['outer']['z'])]:
+            xb=bx[f_['band']] if f_.get('band') else f_['x']; xm=(xb[0]+xb[1])/2; d_=1 if f_['z'][1]>f_['z'][0] else -1
+            for zq,yq,beyond in ((f_['z'][0],f_['y'][0],-d_),(f_['z'][1],f_['y'][1],d_)):
+                here=decks.get(yq,[])+(ro_deck if abs(yq-pf)<0.01 else [])
+                if not any(dk.buffer(0.05).contains(Point(xm,zq+beyond*0.5)) for dk in here): problems.append(('arch front: a flight ends with no deck',L['side'],f_['name'],yq))
+        # every lift stop opens onto a deck (the ground and the Rostrum included)
+        for lf in L['lifts']:
+            door=door_of(lf)[0]
+            for yq in lf['stops']:
+                if yq<0.01: continue
+                here=decks.get(yq,[])+([sbox(rostrum['x'][0],rostrum['z'][0],rostrum['opening_x'][1],rostrum['z'][1])] if abs(yq-pf)<0.01 else [])
+                if not any(d.buffer(0.3).contains(door) for d in here): problems.append(('arch front: a lift stop with no deck at its door',L['side'],lf['name'],yq))
+    # the Rostrum: its front, its two ends and the edges of its deck across the opening, less the Steps' heads and the bay
+    Rz=rostrum['z']; ro_=unary_union([sbox(rostrum['x'][0],Rz[0],F,Rz[1]),Point(rostrum['bay']['c']).buffer(rostrum['bay']['r']),sbox(F,-12,rostrum['opening_x'][1],12)])
+    edge=ro_.boundary.difference(LineString([(F,-200),(F,-12)]).buffer(0.05)).difference(LineString([(F,12),(F,200)]).buffer(0.05))
+    edge=edge.difference(LineString([(rostrum['opening_x'][1],-13),(rostrum['opening_x'][1],13)]).buffer(0.05))
+    for zl in (-12,12): edge=edge.difference(LineString([(F,zl),(F+30,zl)]).buffer(0.05))     # the legs' inner faces
+    for L in legs:
+        for lf in L['lifts'][:1]: edge=edge.difference(Point(lf['c']).buffer(lf['size']/2*1.5))   # the front lift passes through
+    for L in legs:
+        st=L['steps']; edge=edge.difference(LineString([(rostrum['x'][0],st['z']-st['width']/2),(rostrum['x'][0],st['z']+st['width']/2)]).buffer(0.08))
+    for ln in (getattr(edge,'geoms',None) or [edge]):
+        if not ln.is_empty and ln.length>0.05: guards.append(dict(side='rostrum',y=pf,pts=[[round(x,2),round(z,2)] for x,z in ln.simplify(0.02).coords]))
+    if gap_max>max(L['steps']['width'] for L in legs)+0.3: problems.append(('arch front: an opening in a guard wider than the way through it',round(gap_max,2)))
+    A['front_guard']=dict(height=1.1,material='clear toughened glass on a bronze shoe, a bronze handrail on top',runs=guards)
     A['front']=dict(rostrum=rostrum,bands=dict(A=bandA,B=bandB),levels=levels,sky=sky,legs=legs,
                     bridge_x=(round(F-6.5,2),-332.0),east_concourse=dict(x=(-336.0,-332.0),y=hl),
                     material='glazed tubes in the legs\' pale ceramic diagrid; the Rostrum and the Steps in pale stone; lifts in glass')
@@ -1819,8 +1910,87 @@ def _square_checks():
                 if abs(xb-tx)<0.9 and math.hypot(xb-tx,ze-tz)<T['band'][1]+0.3: P.append(('crossing: a head beam inside a helix',TW['name']))
     C['_beam_clear']=round(T['offset']-(T['offset']-T['drum']+0.4)-T['band'][1],2)
 
+## The Clock Room (city.md 7a): its openings laid out from the dome, the platforms and the towers' lifts, then checked:
+## every way in arrives on the floor with a clear landing and a guard round its well; no opening fouls another.
+def _clock_room():
+    from shapely.geometry import box as sbox, Point, Polygon
+    C=CROSSING; Dm=C['dome']; Rm=Dm['room']; dr_=Dm['drum']; ck=Dm['clocks']; ey=ck['eye']; R=C['roof']; P=problems
+    cx,cz=C['c']; X=CROSS; me=X['services'][1]; base=R['y']+R['th']; me_fl=me['rail']+PLATFORMS['floor']
+    E=ESCALATORS['pair']; tn=math.tan(math.radians(E['angle'])); w=E['w']; ro=Rm['runoff']
+    plat_out=X['track']+PLATFORMS['edge']+PLATFORMS['width']; half_len=X['platform'][0]/2
+    se=[(dr_['half']*math.copysign(abs(math.cos(a))**(2/dr_['n']),math.cos(a)),dr_['half']*math.copysign(abs(math.sin(a))**(2/dr_['n']),math.sin(a))) for a in [i/360*2*math.pi for i in range(360)]]
+    inside=Polygon([(cx+x,cz+z) for x,z in se]); glass_in=inside.buffer(-0.3)
+    sill=round(base+ck['centre']+ey['sill'],2); Dm['base']=round(base,2)
+    # the eyes: a sill wide and tall enough to stand in, inside the hour ring (which turns round it, never across it)
+    chord=2*math.sqrt(max(0,ey['r']**2-ey['sill']**2)); head=ey['r']-ey['sill']
+    ey['sill_y']=sill; ey['chord']=round(chord,2); ey['headroom']=round(head,2)
+    if chord<2.4 or head<2.6: P.append(('clock room: an eye too small to pass through',round(chord,2),round(head,2)))
+    if ey['r']+ey['sleeve']>ck['rings'][0][1]+0.01: P.append(('clock room: an eye\'s sleeve under the turning hour ring',))
+    # the compass: from under the bell to a landing behind each eye
+    Ld=Rm['landing']; rise=sill-base; run=rise/tn
+    if rise>E['max_rise']: P.append(('clock room: the compass rises too far for one flight',round(rise,2)))
+    r_head=dr_['half']-0.3-Ld['depth']; r_foot=r_head-run
+    compass=[]; opens=[]
+    for b in ck['bearings']:
+        ux,uz=round(math.cos(math.radians(b)),6),round(math.sin(math.radians(b)),6)
+        f=(round(cx+ux*r_foot,2),round(cz+uz*r_foot,2)); h=(round(cx+ux*r_head,2),round(cz+uz*r_head,2))
+        land=[round(cx+ux*r_head-abs(uz)*Ld['w']/2,2),round(cz+uz*r_head-abs(ux)*Ld['w']/2,2),round(cx+ux*(dr_['half']-0.3)+abs(uz)*Ld['w']/2,2),round(cz+uz*(dr_['half']-0.3)+abs(ux)*Ld['w']/2,2)]
+        land=[min(land[0],land[2]),min(land[1],land[3]),max(land[0],land[2]),max(land[1],land[3])]
+        compass.append(dict(bearing=b,foot=f,head=h,y=(round(base,2),sill),landing=land,eye=(round(cx+ux*(dr_['half']+0.1),2),round(cz+uz*(dr_['half']+0.1),2),round(base+ck['centre'],2))))
+        a_=Point(f).buffer(0.01).union(Point(h).buffer(0.01)).convex_hull.buffer(w/2,cap_style=2)
+        lane=sbox(min(f[0],h[0])-abs(uz)*w/2-abs(ux)*ro,min(f[1],h[1])-abs(ux)*w/2-abs(uz)*ro,max(f[0],h[0])+abs(uz)*w/2,max(f[1],h[1])+abs(ux)*w/2)
+        opens.append(('compass %d'%b,lane))
+    if r_foot-ro<w/2+0.3: P.append(('clock room: the compass\'s feet run into each other under the bell',round(r_foot-ro,2)))
+    if r_foot-ro<Rm['rose']-0.01: P.append(('clock room: the compass\'s feet inside the rose',))
+    # the arrival wells: from each platform's widening, two pairs either side of the axis, up through the floor
+    a_rise=base-me_fl; a_run=a_rise/tn
+    if a_rise>E['max_rise']: P.append(('clock room: an arrival rises too far for one flight',round(a_rise,2)))
+    arrivals=[]; wid=[]
+    for sz in (-1,1):
+        z_w=(cz+sz*plat_out,cz+sz*(plat_out+Rm['widening']))
+        xs=[x for lo,hi in [Rm['arrive_x']] for x in (lo,hi)]
+        wd=[round(cx-xs[1]-0.3,2),round(min(z_w),2),round(cx+xs[1]+0.3,2),round(max(z_w),2)]; wid.append(dict(side='north' if sz<0 else 'south',rect=wd,y=me_fl))
+        for sx in (-1,1):
+            xm=round(cx+sx*(xs[0]+xs[1])/2,2); zf=cz+sz*(plat_out+Rm['widening']); zh=zf+sz*a_run
+            # the well: the floor is open wherever a rider on the flight would have less than 2.6 m under it
+            z_open=zf+sz*max(0.0,(R['y']-2.6-me_fl))/tn
+            well=[round(xm-w/2-0.2,2),round(min(z_open,zh),2),round(xm+w/2+0.2,2),round(max(z_open,zh),2)]
+            arrivals.append(dict(side='north' if sz<0 else 'south',foot=(xm,round(zf,2)),head=(xm,round(zh,2)),y=(me_fl,round(base,2)),well=well,
+                                 arrive=[round(xm-w/2,2),round(min(zh,zh+sz*ro),2),round(xm+w/2,2),round(max(zh,zh+sz*ro),2)]))
+            opens.append(('arrival %s %s'%('n' if sz<0 else 's','e' if sx>0 else 'w'),sbox(*well)))
+            if not glass_in.contains(sbox(*arrivals[-1]['arrive'])): P.append(('clock room: an arrival lands against the glass',arrivals[-1]['side']))
+            if abs(xm-cx)-w/2<1.6+0.6: P.append(('clock room: an arrival against the compass\'s arm',))
+    # the lifts: on to the room, a lantern each, its door facing the bell
+    lifts=[]
+    for TW in C['towers']:
+        lx,lz=TW['lift']['c']; lr=TW['lift']['r']; d=math.hypot(cx-lx,cz-lz); door=(round(lx+(cx-lx)/d*(lr+1.5),2),round(lz+(cz-lz)/d*(lr+1.5),2))
+        lifts.append(dict(tower=TW['name'],c=(lx,lz),r=lr,stops=[0,round(13.2+PLATFORMS['floor'],2),me_fl,round(base,2)],door=door,top=round(base+Rm['lantern'],2)))
+        opens.append(('lantern '+TW['name'],Point(lx,lz).buffer(lr+0.2).union(Point(door).buffer(1.2))))
+        if not glass_in.contains(Point(lx,lz).buffer(lr+1.5)): P.append(('clock room: a lift lantern against the glass',TW['name']))
+    # no opening fouls another; each stands on the floor inside the glass
+    for i in range(len(opens)):
+        for j in range(i+1,len(opens)):
+            if opens[i][1].distance(opens[j][1])<0.5: P.append(('clock room: two openings foul each other',opens[i][0],opens[j][0],round(opens[i][1].distance(opens[j][1]),2)))
+    for c_ in compass:
+        if not inside.contains(sbox(*c_['landing'])): P.append(('clock room: an eye\'s landing outside the glass',c_['bearing']))
+    # the arrivals climb in the open between the towers, off their drums, lifts and bridges, and the widenings off the line
+    for a in arrivals:
+        ln=sbox(a['foot'][0]-w/2,min(a['foot'][1],a['head'][1]),a['foot'][0]+w/2,max(a['foot'][1],a['head'][1]))
+        for TW in C['towers']:
+            if ln.distance(Point(TW['c']))<C['tower']['drum']+0.5: P.append(('clock room: an arrival against a tower',TW['name']))
+            if ln.distance(Point(TW['lift']['c']))<TW['lift']['r']+0.5: P.append(('clock room: an arrival against a lift',TW['name']))
+    for wd in wid:
+        r_=wd['rect']
+        if abs(r_[0]-cx)>half_len or abs(r_[2]-cx)>half_len: P.append(('clock room: a widening past its platform',wd['side']))
+        for TW in C['towers']:
+            if sbox(*r_).distance(Point(TW['lift']['c']))<TW['lift']['r']+0.3 or sbox(*r_).distance(Point(TW['c']))<C['tower']['drum']+0.3: P.append(('clock room: a widening against a tower',wd['side']))
+    if Dm['bell']['bottom']<sill+2.6+1.0: P.append(('clock room: the bell hangs too low over the room',))
+    Rm.update(sill=sill,compass=compass,arrivals=arrivals,widenings=wid,lifts=lifts,
+              entries=['four escalator pairs from the high line\'s platforms, up through the arrival wells','the four tower lifts, to their lanterns','the four clock eyes, for climbers, gliders and fliers'])
+
 _block_checks()
 _cross_checks()
+_clock_room()
 _arch_front()
 _square_checks()
 _deck_checks()
