@@ -1,5 +1,7 @@
 # Moy: handoff for the first low-fidelity build (2026-10-17)
 
+> **Superseded for the next build** by [moy_prototype_pass_2.md](moy_prototype_pass_2.md).
+
 > **Playable prototype execution contract, 2026-10-17:** For the owner's next
 > implementation chat, read [moy_playable_prototype.md](moy_playable_prototype.md)
 > first. It uses this handoff and the existing 3D/design documents, narrows the

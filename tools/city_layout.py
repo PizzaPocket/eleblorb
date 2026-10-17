@@ -1090,7 +1090,10 @@ PLATFORMS=dict(floor=1.0,edge=1.4,width=3.0,canopy=3.2,
 ## spirals of the Plant Kingdom), each with a glass lift beside it or in its eye (the Crossing's towers wind theirs round a steel trunk, the lift beside).
 ESCALATORS=dict(pair=dict(angle=30.0,tread=1.2,w=3.2,max_rise=8.0),
   scissor=dict(angle=30.0,w=3.2,max_rise=7.2,landing=1.5),
-  helix=dict(angle=25.0,eye=1.4,band=2.6,hands=2,min_headroom=2.6,deck=0.5))
+  helix=dict(angle=30.0,eye=1.4,band=2.6,hands=2,min_headroom=2.6,deck=0.5,landing=50.0),
+  # the Spine stations' straight pairs (iteration 3): two narrow (0.8 m step) escalators side by side, 2.8 m overall,
+  # a 2 m landing between flights and a 2.5 m clear runout at the foot
+  station=dict(angle=30.0,w=2.8,landing=2.0,runout=2.5))
 ## The Moy car (city.md 6e, user 2026-10-17): one short car for every line, built
 ## entirely of SuperEggs, so the trains belong to the same soft-cornered world as
 ## everything else. Short cars (9.6 m) so a train is two or three of them: they
@@ -1186,7 +1189,19 @@ def _crossing_layout():
     C['towers']=[]
     for nm,sx,sz in (('north-east',1,-1),('north-west',-1,-1),('south-east',1,1),('south-west',-1,1)):
         tc=(cx+sx*T['offset'],cz+sz*T['offset']); d=drum+T['lift']+0.1
-        C['towers'].append(dict(name=nm,c=tc,levels=[0,DECK['level'],13.2+PLATFORMS['floor'],36.0+PLATFORMS['floor']],
+        lv_=[0,DECK['level'],13.2+PLATFORMS['floor'],36.0+PLATFORMS['floor']]
+        # each hand: a flat landing at every level it serves (the rider steps off onto it, then sideways onto the gallery),
+        # then a climb to the next level at the helix's angle; the down hand is the same path half a turn round. Angles in
+        # degrees, 0 east, 90 south, increasing as the hand climbs; the up hand starts facing out of the Crossing.
+        turn=2*math.pi*((band0+band1)/2)*math.tan(math.radians(H['angle']))
+        a0=math.degrees(math.atan2(sz,sx)); hands=[]
+        for hand in (0,1):
+            a=a0+180*hand; prof=[]
+            for k,y in enumerate(lv_):
+                prof.append([round(a,2),round(a+H['landing'],2),y,y]); a+=H['landing']
+                if k+1<len(lv_): d_=(lv_[k+1]-y)/turn*360; prof.append([round(a,2),round(a+d_,2),y,lv_[k+1]]); a+=d_
+            hands.append(dict(hand='up' if hand==0 else 'down',profile=prof))
+        C['towers'].append(dict(name=nm,c=tc,levels=lv_,hands=hands,
             spine_platform='east' if sx>0 else 'west',high_platform='north' if sz<0 else 'south',
             opens={str(DECK['level']):['the ring','the cross-bridge'],str(round(13.2+PLATFORMS['floor'],1)):180 if sx>0 else 0,str(36.0+PLATFORMS['floor']):90 if sz<0 else 270},
             lift=dict(c=(round(tc[0]-sx*d/math.sqrt(2),2),round(tc[1]-sz*d/math.sqrt(2),2)),r=T['lift']),r=(band0,band1)))
@@ -1342,25 +1357,40 @@ def _cross_checks():
             seg=LineString([L.interpolate(max(0,s0-half)),L.interpolate(min(L.length,s0+half))]).buffer(w/2+X['platform'][1],cap_style=2).intersection(wallP)
             for n_,h,g in tall:
                 if seg.intersection(g).area>0.05 and h>soffit-X['clear_over']: problems.append(('cross: platform into a building',st['name'],n_))
-            # every Spine station but the Crossing (which has its towers): a scissor stack of escalator pairs under
-            # each platform, from the street to the platform, its middle landing the Deck where the Deck runs below
+            # every Spine station but the Crossing (which has its towers), revised 2026-10-17 (iteration 3): an escalator pair
+            # per platform, straight, in line with the platform beyond its end toward the city's centre, landing on the
+            # platform's end. It stands in the 2.8 m lane between the viaduct's deck and the platform's outer edge, so it
+            # never surfaces through the 3 m platform. Over the Deck one flight rises from the Deck (its foot on an apron
+            # joining the Deck walk); at the gates two flights rise from the street with a landing between. The Spine's
+            # frames and planter troughs keep out of the lanes (sv['frames'], below).
             if sv['line']=='Spine Line' and st['name']!='The Crossing':
-                ES=ESCALATORS['scissor']; plat=sv['rail']+PLATFORMS['floor']
-                mid=DECK['level'] if st.get('deck') else st.get('mid',plat/2)
-                if st.get('deck') and not any(LineString(r_['pts']).buffer(r_['w']/2).contains(p_) for r_ in DECK['runs']): problems.append(('cross: no Deck under a Deck station',st['name']))
-                flights=[(0.0,mid),(mid,plat)]; runs=[(b_-a_)/math.tan(math.radians(ES['angle'])) for a_,b_ in flights]
-                if max(b_-a_ for a_,b_ in flights)>ES['max_rise']+0.6: problems.append(('cross: a station stack flight too tall',st['name']))
-                foot=max(runs)+2*ES['landing']
-                if foot>X['platform'][0]: problems.append(('cross: a station stack longer than its platform',st['name'],round(foot,1)))
+                ES=ESCALATORS['station']; plat=round(sv['rail']+PLATFORMS['floor'],2); deck=bool(st.get('deck'))
+                if deck and not any(LineString(r_['pts']).buffer(r_['w']/2).contains(p_) for r_ in DECK['runs']): problems.append(('cross: no Deck under a Deck station',st['name']))
                 ux,uz=(L.coords[-1][0]-L.coords[0][0])/L.length,(L.coords[-1][1]-L.coords[0][1])/L.length
-                st['_stacks']=[]
+                e=-1 if (st['at'][0]-CX)*ux+st['at'][1]*uz>0 else 1          # along the line toward the city's centre
+                half=X['platform'][0]/2; ex,ez=st['at'][0]+ux*e*half,st['at'][1]+uz*e*half
+                lane0=X['double']/2+0.1; lane1=X['track']+PLATFORMS['edge']+PLATFORMS['width']
+                if abs(lane1-lane0-ES['w'])>0.01: problems.append(('cross: the station escalator lane is not its pair\'s width',round(lane1-lane0,2)))
+                pairs=[(DECK['level'],plat)] if deck else [(0.0,round(plat/2,2)),(round(plat/2,2),plat)]
+                st['_access']=[]
                 for sd in (1,-1):
-                    off=X['track']+PLATFORMS['edge']+PLATFORMS['width']/2-ES['w']/2+0.0
-                    cx_,cz_=st['at'][0]-uz*sd*(X['track']+PLATFORMS['edge']+PLATFORMS['width']/2),st['at'][1]+ux*sd*(X['track']+PLATFORMS['edge']+PLATFORMS['width']/2)
-                    st['_stacks'].append(dict(side=sd,c=[round(cx_,2),round(cz_,2)],along=[round(ux,3),round(uz,3)],length=round(foot,1),flights=[[round(a_,2),round(b_,2),round(r_,2)] for (a_,b_),r_ in zip(flights,runs)]))
-                    sg=LineString([(cx_-ux*foot/2,cz_-uz*foot/2),(cx_+ux*foot/2,cz_+uz*foot/2)]).buffer(ES['w']/2,cap_style=2)
-                    for n_,h,g in tall:
-                        if sg.intersection(g).area>0.05: problems.append(('cross: a station stack on a building',st['name'],n_))
+                    off=sd*(lane0+lane1)/2; at=lambda t_: [round(ex+ux*e*t_-uz*off,2),round(ez+uz*e*t_+ux*off,2)]
+                    fl=[]; t_=0.0
+                    for a_,b_ in reversed(pairs):
+                        run=(b_-a_)/math.tan(math.radians(ES['angle'])); fl.append(dict(foot=at(t_+run)+[a_],head=at(t_)+[b_],w=ES['w'])); t_+=run+ES['landing']
+                    span=round(t_-ES['landing']+ES['runout'],2)
+                    acc=dict(side='east' if sd*(-uz)>0 or sd*ux>0 else 'west',flights=fl[::-1],lane=[round(lane0,2),round(lane1,2)],span=span,end=[round(ex,2),round(ez,2)],dir=[ux*e,uz*e])
+                    if deck: acc['apron']=dict(c=at(t_-ES['landing']+ES['runout']/2)[:2],size=[ES['w']+0.1,ES['runout']],y=DECK['level'],joins='the Deck walk')
+                    else: acc['runout']=dict(c=at(t_-ES['landing']+ES['runout']/2)[:2],size=[ES['w'],ES['runout']],y=0.0,on='the street')
+                    st['_access'].append(acc)
+                    g=LineString([at(0)[:2],at(span)[:2]]).buffer(ES['w']/2,cap_style=2)
+                    for n_,h,g2 in tall:
+                        if g.intersection(g2).area>0.05: problems.append(('cross: a station escalator on a building',st['name'],n_))
+                    for lt in lots:
+                        if g.intersection(sbox(*lt[:4])).area>0.05: problems.append(('cross: a station escalator on a lot',st['name']))
+                    if deck:
+                        ap=Point(acc['apron']['c']).buffer(ES['runout'],cap_style=3)
+                        if min(LineString(r_['pts']).buffer(r_['w']/2).distance(ap) for r_ in DECK['runs'])>0.2: problems.append(('cross: a station escalator\'s foot off the Deck',st['name']))
             pos.append((s0,st['name']))
         pos.sort(); sv['stops']=[n for _,n in pos]
         for (a_,na),(c_,nc) in zip(pos,pos[1:]):
@@ -1495,6 +1525,25 @@ def _cross_checks():
     C=CROSSING; T=C['tower']; H=ESCALATORS['helix']; rm=H['eye']+H['band']/2
     turn=2*math.pi*rm*math.tan(math.radians(H['angle']))
     if turn/H['hands']-H['deck']<H['min_headroom']: problems.append(('crossing: a tower\'s helix without headroom between its hands',round(turn/H['hands']-H['deck'],2)))
+    # with its landings: at every bearing, every pair of band surfaces stacked one over another (both hands, every turn)
+    # leaves the headroom, and every landing is long enough to step off onto (2 m at the band's middle)
+    if math.radians(H['landing'])*rm<2.0: problems.append(('crossing: a helix landing too short to step off',))
+    worst=1e9
+    for TW in C['towers']:
+        for deg in range(0,360):
+            ys=[]
+            for hd in TW['hands']:
+                for a0_,a1_,y0_,y1_ in hd['profile']:
+                    for k_ in range(-2,8):
+                        ang=deg+360*k_
+                        if a0_<=ang<=a1_: ys.append(y0_+(y1_-y0_)*(ang-a0_)/((a1_-a0_) or 1))
+            ys=sorted(set(round(y_,3) for y_ in ys))
+            for lo,hi in zip(ys,ys[1:]): worst=min(worst,hi-lo-H['deck'])
+        tops=[hd['profile'][-1][3] for hd in TW['hands']]; bots=[hd['profile'][0][2] for hd in TW['hands']]
+        for hd in TW['hands']:
+            if [p_[2] for p_ in hd['profile'] if p_[2]==p_[3]]!=TW['levels']: problems.append(('crossing: a helix hand without a landing at every level',TW['name'],hd['hand']))
+    C['_helix_headroom']=round(worst,2)
+    if worst<H['min_headroom']: problems.append(('crossing: the helix\'s hands too close where they pass',round(worst,2)))
     if H['eye']<T['trunk']+0.15: problems.append(('crossing: the helix rubs the trunk',))
     cx0,cz0=C['c']; spx=sp['pts'][0][0]; mez=me['pts'][0][1]
     plat_in=X['track']+PLATFORMS['edge']; plat_out=plat_in+PLATFORMS['width']; half_len=X['platform'][0]/2
@@ -1525,6 +1574,30 @@ def _cross_checks():
     # the Spine across the Crossing: from the head beams to the ring's supports, and between the head beams
     zs=sorted([q[1] for q in C['_ring_supports'] if abs(q[0]-spx)<4]+C['_beams']['spine']['z'])
     if max(b_-a_ for a_,b_ in zip(zs,zs[1:]))>30.0: problems.append(('crossing: a Spine span too long',zs))
+    # the Spine's portal frames, recorded (iteration 3): every 12 m along the line, except where the Deck runs beneath (its
+    # columns carry the line there), inside the Crossing (its towers do), close to the wall (its gatehouses do), and in a
+    # station escalator's lane, where the frame moves just past the lane's far end; spans between supports at most 30 m
+    spP=sp.get('path',sp['pts']); spl=LineString(spP); deckP=[LineString(r_['pts']).buffer(r_['w']/2+1.2) for r_ in DECK['runs']]
+    lanes=[]
+    for st in X['stations']:
+        for acc in st.get('_access',[]):
+            (ex_,ez_),(dx_,dz_)=acc['end'],acc['dir']; g_=LineString([(ex_,ez_),(ex_+dx_*acc['span'],ez_+dz_*acc['span'])]).buffer(4.0,cap_style=2)
+            lanes.append((g_,(ex_+dx_*(acc['span']+0.6),ez_+dz_*(acc['span']+0.6))))
+            lanes.append((g_,(ex_-dx_*0.6,ez_-dz_*0.6)))          # and one just under the platform's end
+    fixed=[]
+    for ln in lanes:
+        q=Point(ln[1])
+        if not any(g.contains(q) for g in deckP) and not any(Point(f_).distance(q)<3 for f_ in fixed): fixed.append([round(q.x,2),round(q.y,2)])
+    frames=list(fixed); t_=6.0
+    while t_<spl.length:
+        q=spl.interpolate(t_); t_+=sp['bay']
+        if any(g.contains(q) for g in deckP) or q.distance(Point(C['c']))<C['ring'][1]+1 or abs(math.hypot(q.x-CX,q.y)-WALL['r'])<WALL['thick']/2+20: continue
+        if any(ln[0].contains(q) for ln in lanes) or any(Point(f_).distance(q)<4 for f_ in fixed): continue
+        frames.append([round(q.x,2),round(q.y,2)])
+    sp['frames']=sorted(frames,key=lambda f_: f_[1])
+    for f_ in sp['frames']:
+        for ln in lanes:
+            if ln[0].buffer(-3.0).distance(Point(f_))<0.6: problems.append(('cross: a Spine frame in a station escalator\'s lane',f_))
     # the ring: round the towers, spanning between its supports (the towers on the diagonals and the column pairs)
     ang=sorted([math.degrees(math.atan2(q[1]-cz0,q[0]-cx0))%360 for q in C['_ring_supports']]+[45,135,225,315])
     rr=C['_ring_r']; gaps=[(b_-a_)%360 for a_,b_ in zip(ang,ang[1:]+[ang[0]+360])]
@@ -1585,6 +1658,136 @@ def _cross_checks():
 _block_checks()
 _cross_checks()
 _deck_checks()
+def _spine_spans():
+    # the Spine's supports in order (its frames, the Deck's columns where it rides the Deck, the Crossing's head beams):
+    # no span longer than 31 m (a gate's escalator lane needs 30.3 m; the Crossing's middle span is 26 m)
+    sp=[sv for sv in CROSS['services'] if sv['line']=='Spine Line'][0]; x0=sp['pts'][0][0]
+    sup=sorted(set([f_[1] for f_ in sp['frames']]+[round(c_[1],1) for c_ in DECK['columns'] if abs(c_[0]-x0)<4.5]+CROSSING['_beams']['spine']['z']))
+    sup=[z_ for z_ in sup if abs(math.hypot(x0-CX,z_)-WALL['r'])>=WALL['thick']/2+20]
+    gaps=[round(b_-a_,1) for a_,b_ in zip(sup,sup[1:])]; sp['_max_span']=max(gaps)
+    if max(gaps)>31.0: problems.append(('cross: a Spine span too long between its frames',max(gaps),sup))
+_spine_spans()
+## The planting and the Deck's parapets, laid out exactly (2026-10-17, plan iteration 3), so a builder places every bed,
+## tree, shrub, reed clump, rock, agave and parapet at a recorded point rather than re-deriving a rule:
+## - DECK['parapets']: [x0, z0, x1, z1, height, kind]: each run's edges, left open wherever anything walkable meets the
+##   edge (another run, a tower's gallery, a ramp tower, a lift, an escalator's head, a building's Deck door);
+##   kind 'rail' (a 1.1 m railing) or 'glass' (a bridge's glass side);
+## - DECK['beds']: the garden walk's beds (DECK['garden']), each a centreline (pts, 1 m apart) and a width, alternating
+##   sides so a path of at least garden.path stays clear; DECK['trees']: a small ghaf in every second bed 1.8 m wide or
+##   more, never within 6 m of the Spine (its deck is 5.5 m over the Deck) or 4 m of a Crossing tower;
+## - PARK['shrubs'], ['reeds'], ['rocks'], ['agave']: the park's small planting; CROSSING['climbers']: the towers'
+##   climber panels (tower, the bay's bearing in degrees, from y0 to y1); CROSSING['rain_gardens'].
+def _planting():
+    from shapely.geometry import Point, LineString, box as sbox
+    D=DECK; G=D['garden']; C=CROSSING; T=C['tower']; runs=D['runs']; lines=[LineString(r['pts']) for r in runs]
+    def on_run(x,z,skip,inset=0.0):
+        q=Point(x,z); return any(k!=skip and lines[k].distance(q)<runs[k]['w']/2-inset for k in range(len(runs)))
+    def walkable(x,z,skip):
+        return (on_run(x,z,skip,-0.05) or any(math.hypot(x-t['c'][0],z-t['c'][1])<T['drum']+0.7 for t in C['towers'])
+            or any(math.hypot(x-t['c'][0],z-t['c'][1])<t['r']+0.8 for t in D['ramps']+D['lifts'])
+            or any(math.hypot(x-e['head'][0],z-e['head'][1])<2.6 for e in D.get('escalators',[]))
+            or any(math.hypot(x-p_[0],z-p_[1])<2.8 for _,p_,_ in D['doors']))
+    sp=[sv for sv in CROSS['services'] if sv['line']=='Spine Line'][0]; spl=LineString(sp.get('path',sp['pts']))
+    R2=lambda v: round(v,2)
+    parapets=[]; beds=[]; trees=[]; bedno=0
+    for k,r in enumerate(runs):
+        pts=r['pts']; w=r['w']; ring=r['kind']=='ring'; ext=w/2 if ring else 0.0
+        low=r['name'].startswith('Crossing bridge'); kind='glass' if r['kind']=='bridge' else 'rail'
+        h=(1.3 if low else 2.8) if r['kind']=='bridge' else D['rail']
+        segs=[LineString([pts[j-1],pts[j]]) for j in range(1,len(pts))]
+        for i in range(1,len(pts)):
+            a,b=pts[i-1],pts[i]; L=math.hypot(b[0]-a[0],b[1]-a[1])
+            if L<0.01: continue
+            ux,uz=(b[0]-a[0])/L,(b[1]-a[1])/L
+            at=lambda t,o: (a[0]+ux*t-uz*o,a[1]+uz*t+ux*o)
+            for e in (-1,1):
+                run0=[None]
+                def flush(t1):
+                    if run0[0] is not None and t1-run0[0]>0.05:
+                        p0=at(run0[0],e*(w/2-0.1)); p1=at(t1,e*(w/2-0.1)); parapets.append([R2(p0[0]),R2(p0[1]),R2(p1[0]),R2(p1[1]),h,kind])
+                    run0[0]=None
+                t=-ext
+                while t<L+ext-1e-6:
+                    tm=t+0.25; px,pz=at(tm,e*(w/2-0.1)); qx,qz=at(tm,e*(w/2+0.7))
+                    inown=any(j!=i-1 and segs[j].distance(Point(px,pz))<w/2-0.2 for j in range(len(segs)))
+                    if walkable(qx,qz,k) or inown or on_run(px,pz,k,0.2): flush(t)
+                    elif run0[0] is None: run0[0]=t
+                    t+=0.5
+                flush(L+ext)
+        if r['kind']=='bridge': continue
+        cum=[0.0]
+        for j in range(1,len(pts)): cum.append(cum[-1]+math.hypot(pts[j][0]-pts[j-1][0],pts[j][1]-pts[j-1][1]))
+        total=cum[-1]
+        def along(sx,o):
+            sx=(sx%total) if ring else max(0.0,min(total,sx)); j=1
+            while j<len(cum)-1 and cum[j]<sx: j+=1
+            a,b=pts[j-1],pts[j]; L=(cum[j]-cum[j-1]) or 1.0; f=(sx-cum[j-1])/L; ux,uz=(b[0]-a[0])/L,(b[1]-a[1])/L
+            return (a[0]+(b[0]-a[0])*f-uz*o,a[1]+(b[1]-a[1])*f+ux*o)
+        t=0.0 if ring else 1.5
+        while t<total-(0.0 if ring else 3.0):
+            n=bedno; bedno+=1
+            ln=G['bed_len'][0]+((n*3)%7)/6*(G['bed_len'][1]-G['bed_len'][0]); bw=G['bed'][0]+((n*5)%4)/3*(G['bed'][1]-G['bed'][0])
+            side=1 if n%2 else -1; l=min(ln,total-t-G['gap']) if ring else min(ln,total-1.5-t); o=side*(w/2-bw/2-0.15)
+            ok=l>4 and w-bw>=G['path']-1e-6; u=0.0
+            while ok and u<=l:
+                px,pz=along(t+u,o); qx,qz=along(t+u,side*(w/2+0.7))
+                if walkable(qx,qz,k) or on_run(px,pz,k,-1.0): ok=False
+                u+=1.0
+            if ok:
+                cl=[along(t+u_,o) for u_ in [x_*1.0 for x_ in range(int(l))]]+[along(t+l,o)]
+                beds.append(dict(run=r['name'],w=R2(bw),pts=[[R2(x),R2(z)] for x,z in cl]))
+                cx,cz=along(t+l/2,o)
+                if bw>=1.8 and n%G['tree_every']==0 and spl.distance(Point(cx,cz))>=6 and not any(math.hypot(cx-t_['c'][0],cz-t_['c'][1])<T['drum']+4 for t_ in C['towers']):
+                    trees.append(dict(kind=G['tree']['kind'],c=[R2(cx),R2(cz)],y=round(D['level']+0.45,2),h=G['tree']['h'],bed=len(beds)-1))
+            t+=l+G['gap']
+    D['parapets']=parapets; D['beds']=beds; D['trees']=trees
+    # a Deck tree's crown clears every building beside it, and a bed never takes the path below its minimum
+    tk=TREE_KIT[G['tree']['kind']]; cr=tk['crown']*G['tree']['h']
+    for t_ in trees:
+        for b_ in named:
+            if b_['r'] and sbox(*b_['r']).distance(Point(t_['c']))<cr*0.8 and HEIGHTS.get(b_['n'],0)>D['level']: problems.append(('deck: a tree\'s crown into a building',t_['c'],b_['n']))
+    # the park's small planting: shrubs along its edge (clear of its walks and the ramp towers and lifts), reed clumps
+    # and flat stones round the pond, rocks and agave in the dry garden, and the towers' climbers and rain gardens
+    P=PARK; px0,pz0,px1,pz1=P['rect']; shrubs=[]
+    def shrub(x,z):
+        if any(w_[0]-1.5<x<w_[2]+1.5 and w_[1]-1.5<z<w_[3]+1.5 for w_ in P['walks']): return
+        if any(math.hypot(x-t['c'][0],z-t['c'][1])<t['r']+2 for t in D['ramps']+D['lifts']): return
+        shrubs.append([R2(x),R2(z)])
+    x=px0+5
+    while x<=px1-5: shrub(x,pz0+1.5); shrub(x,pz1-1.5); x+=6
+    z=pz0+6
+    while z<=pz1-6: shrub(px0+1.5,z); shrub(px1-1.5,z); z+=6
+    P['shrubs']=shrubs
+    (pcx,pcz),(rx,rz)=P['pond']['c'],P['pond']['r']; reeds=[]; rocks=[]
+    for k in range(40):
+        a=k/40*2*math.pi; j=1.0+0.06*((k*7)%3)
+        if k%9==4: rocks.append(dict(c=[R2(pcx+rx*j*math.cos(a)),R2(pcz+rz*j*math.sin(a))],half=[1.1,0.25,0.8],role='a flat stone at the water\'s edge')); continue
+        if k%5==0: continue
+        reeds.append(dict(c=[R2(pcx+(rx*j-0.1)*math.cos(a)),R2(pcz+(rz*j-0.1)*math.sin(a))],stems=3,h=round(1.6+0.4*(k%3),2)))
+    dg=P['dry_garden']; agave=[]
+    for k in range(18):
+        x=dg[0]+2+((k*37)%100)/100*(dg[2]-dg[0]-4); z=dg[1]+2+((k*61)%100)/100*(dg[3]-dg[1]-4); big=k%4==0
+        if any(math.hypot(t['c'][0]-x,t['c'][1]-z)<2.5 for t in P['trees']): continue
+        if k%3==1: agave.append([R2(x),R2(z)])
+        else:
+            rocks.append(dict(c=[R2(x),R2(z)],half=[2.2,1.1,1.6] if big else [1.0,0.55,0.8],role='a boulder'))
+            if big:
+                for dx,dz in ((2.4,0.8),(-1.8,1.6),(0.6,-2.2)): rocks.append(dict(c=[R2(x+dx),R2(z+dz)],half=[0.6,0.35,0.5],role='a stone'))
+    P['reeds']=reeds; P['rocks']=rocks; P['agave']=agave
+    climbers=[]; gardens=[]; lv=[0]+[y for y in C['towers'][0]['levels'] if y>0]; bayA=2*math.pi/T['ribs']; cx0,cz0=C['c']
+    for ti,t_ in enumerate(C['towers']):
+        tx,tz=t_['c']; sx=math.copysign(1,tx-cx0); sz=math.copysign(1,tz-cz0)
+        opens=[(6.5,math.atan2(sz,sx)),(6.5,math.atan2(0,-sx)),(6.5,math.atan2(-sz,-sx)),(14.2,math.atan2(0,-sx)),(37.0,math.atan2(-sz,0)),(0,math.atan2(sz,sx)),(0,math.atan2(-sz,-sx))]
+        for k in range(T['ribs']):
+            ac=k*bayA
+            for m,y in enumerate(lv):
+                y0=y+(0.5 if m else 0.0); nxt=lv[m+1] if m+1<len(lv) else C['roof']['y']; grow=(nxt-y0)*(0.45+0.45*(((k*7+m*3)%5)/4))
+                if any(abs(y_-y)<0.1 and abs(math.atan2(math.sin(ac-b_),math.cos(ac-b_)))<bayA*0.75 for y_,b_ in opens): continue
+                if (k+m)%3==2: continue
+                climbers.append([ti,round(math.degrees(ac),1),R2(y0),R2(y0+grow)])
+        gardens.append(dict(c=list(t_['c']),r=round(T['drum']+3.5,2),reeds=[[R2(tx+(T['drum']+1.2+(q%3)*0.7)*math.cos(q/14*2*math.pi+0.2)),R2(tz+(T['drum']+1.2+(q%3)*0.7)*math.sin(q/14*2*math.pi+0.2)),round(1.4+(q%2)*0.6,2)] for q in range(14) if q%7!=3]))
+    C['climbers']=climbers; C['rain_gardens']=gardens
+_planting()
 ## The timetable (city.md 6g, 2026-10-17, at the user's direction). A clock-face
 ## service: on every line a train every 60 real seconds, which in the game's
 ## clock (one real second is one game minute) is a train every hour, on the same

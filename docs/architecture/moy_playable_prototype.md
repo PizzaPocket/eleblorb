@@ -1,5 +1,10 @@
 # Moy: playable layout prototype contract
 
+> **Second pass, 2026-10-17:** for the next build, start from
+> [moy_prototype_pass_2.md](moy_prototype_pass_2.md) (starter prompt:
+> `docs/prompts/moy_prototype_pass_2_luna.md`). It lists every change since
+> this first pass and keeps this contract's sections 4 to 8.
+
 > **Amended 2026-10-17 by plan iteration 2.** Read
 > [the iteration-2 review](../diagnostics/2026-10-17-moy-plan-iteration-2.md)
 > first: the lines are level (Spine and Wall Line at +13.2, Meridian +36),

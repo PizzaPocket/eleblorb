@@ -114,7 +114,7 @@ function eggGeo(semi, eps, rings = 20, segs = 32) {
   const pw = (v, e) => (Math.abs(v) < 1e-9 ? 0 : Math.sign(v) * Math.pow(Math.abs(v), 2 / e)), pos = [], idx = [];
   for (let i = 0; i <= rings; i++) { const eta = -Math.PI / 2 + Math.PI * i / rings, le = eta < 0 ? eps[1] : eps[0], ce = pw(Math.cos(eta), le), se = pw(Math.sin(eta), le);
     for (let j = 0; j <= segs; j++) { const om = 2 * Math.PI * j / segs; pos.push(semi[0] * ce * pw(Math.sin(om), eps[0]), semi[1] * se, semi[2] * ce * pw(Math.cos(om), eps[0])); } }
-  for (let i = 0; i < rings; i++) for (let j = 0; j < segs; j++) { const a = i * (segs + 1) + j, b = a + segs + 1; idx.push(a, b, a + 1, b, b + 1, a + 1); }
+  for (let i = 0; i < rings; i++) for (let j = 0; j < segs; j++) { const a = i * (segs + 1) + j, b = a + segs + 1; idx.push(a, a + 1, b, a + 1, b + 1, b); }   // wound so every face looks outward
   const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return (EGG[key] = g);
 }
 // every part remembers where it belongs and where it goes when the car is pulled apart

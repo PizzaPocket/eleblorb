@@ -706,10 +706,9 @@ often.
      (section 8), and from there a glass bridge crosses the Windspire's wind
      garden into its lobby. Nothing crosses Meridian South: BLOCK stays off
      the Deck.
-   - **The Spine walk**, straight through the park under the Spine Line,
-     from the Park Deck's north side to its south side: the Crossing's
-     mezzanine (section 7a), with escalating ramps up to it from the park's
-     cross walk on the east and the west.
+   - **The Spine walks**, under the Spine Line from the Park Deck's north
+     and south sides, across the Crossing Ring, to the Crossing's two
+     cross-bridges (section 7a, iteration 3); the middle is left open.
    - **The Library walk**, over Garden Walk's mouth to the library's
      east-wing door and its first gallery (section 9).
    - **The Estate walk**, up the east half of North Street past the hawker
@@ -747,9 +746,25 @@ often.
    columns at its edges, no more than 12 m apart, so the soffit is 5.6 m
    up. Columns stand clear of every street mouth and park gate (the line a
    walker crosses on), and the skybridges span their street with none.
-   Steel rails 1.1 m high; the skybridges are glazed and roofed. Every
-   12 m street the Deck runs along keeps at least 4 m (here 6 m) open
-   beside it. All checked in the layout.
+   *(2026-10-17: the Park Deck had no columns in the data, an error in the
+   layout tool, which skipped every ring-shaped run; it now stands on 164
+   columns in `DECK.columns`. The Crossing Ring alone stands on the
+   Crossing's own supports.)* Steel rails 1.1 m high; the skybridges are
+   glazed and roofed. **The parapets stop wherever something walkable meets
+   the Deck's edge** (another run, a Crossing tower, a ramp tower, a lift,
+   an escalator's head, a building's door), so no railing ever crosses a
+   junction; the plan records every parapet's exact ends in
+   `DECK.parapets`. Every 12 m street the Deck runs along keeps at least
+   4 m (here 6 m) open beside it. All checked in the layout.
+
+   **A garden walk** (2026-10-17, at the user's direction, after New York's
+   High Line and Singapore's park connectors): planting beds alternate from
+   side to side along every run, 1.2 to 2.4 m wide and 9 to 15 m long with
+   3 m between, so a path of at least 3.2 m winds between them; a small ghaf
+   (6 m) stands in every second bed 1.8 m wide or more, never within 6 m of
+   the Spine (its deck is only 5.5 m above the Deck) or 4 m of a Crossing
+   tower. The bed edges are 0.45 m sitting walls. The plan records every bed
+   (`DECK.beds`, a centreline and a width) and every tree (`DECK.trees`).
 
    **Play:** the Deck is a second ground for the hero: a running loop
    round the park, ledges into the plaza trees, and the low first rung of
@@ -940,9 +955,11 @@ Every platform's floor is the car's floor, 1.0 m above the rail head
   scissor stacks, glass lifts beside them; open-air, as Singapore runs its
   escalators everywhere, under a roof but open at the sides, the canopies
   shading the moving ramps. Checked in the layout.
-  - **The Crossing:** two **double-helix spirals** in the ring (section
-    7a), each serving the lawn (0), the ring (+6.5), a Spine platform
-    (+14.2) and a high-line platform (+37).
+  - **The Crossing:** four **garden towers** (section 7a, iteration 3),
+    each a double-helix escalator round a steel trunk with a glass lift on
+    its inner corner, serving the lawn (0), the concourse (+6.5), one Spine
+    platform (+14.2) and one high-line platform (+37): any change of line
+    is one tower.
   - **The East Gate (the arch):** an **open cascade** on each leg's court
     face, a scissor of escalator pairs climbing the diagrid under glass
     canopies in full view of Meridian Court and city hall, after the Centre
@@ -973,16 +990,17 @@ Every platform's floor is the car's floor, 1.0 m above the rail head
   a round-square stem 2.4 m across in the middle of the street, branching at
   +28 m into a Y that carries **twin steel box girders**, one under each
   track, after Santiago Calatrava's branching supports and the High Line's
-  steel. The piers are set out from the Crossing (18 m either side, so the
-  two nearest rise through the Crossing Ring between its two rows of
-  columns and the ring hangs its concourse from them) and run on at 36 m;
+  steel. The piers are set out from the Crossing (the nearest stand 54 m
+  either side of its centre, a span and a half) and run on at 36 m; at the
+  Crossing the line rests instead on two head beams between its four
+  towers (13 m either side), so no pier stands in it (iteration 3);
   over Civic Plaza and city hall the girders make one 42 m bridge so no pier
   stands on the hall; at the west end the West Gate's tower carries the
   girders. The checks keep every pier off buildings and the
   Spine and every span within 42 m.
 - **The rhythm**, read from the street: the Spine's frames every 12 m, the
   high line's trees every third frame where the lines run together, the
-  Crossing's 24 columns on a 15° rhythm, and the wall's arches every 9 m.
+  Crossing's four garden towers, and the wall's arches every 9 m.
 - **The Deck is the middle level** between the street (0) and the Spine's
   platforms (+14.2 m).
 - **Where no rail goes:** the narrow lanes. Both lines keep to main streets
@@ -1077,7 +1095,7 @@ offset street surfaces and pond water stay.
 trains, which players can step onto; escalators that run both up and down;
 crisscross where it suits, spirals where they suit, all part of the
 architecture rather than tacked on. Data: `PLATFORMS`, `ESCALATORS`, the
-stations' `_stacks` and `_interchange`, and `CROSSING.spirals` in
+stations' `_stacks` and `_interchange`, and `CROSSING.towers` in
 `tools/city_layout.py`, all checked.
 
 **Platforms.** Every platform's floor is the car's floor, **1.0 m above the
@@ -1109,16 +1127,18 @@ stack them, each where it suits:
 - **A double helix** winds an up spiral and a down spiral together round
   one eye, half a turn apart, so they never meet; after the double-helix
   stairs of the Château de Chambord and the Vatican Museums, and the trunk
-  spirals of the Plant Kingdom's treehouses. 25°, an eye 4 m across with a
-  round glass lift in it, a 2.6 m band, 9.7 m of rise a turn and 4.3 m of
-  headroom between the hands. Used at the Crossing, where it needs to stand
-  free and be seen from every side.
+  spirals of the Plant Kingdom's treehouses. 25°, wound round a steel
+  trunk 2.4 m across (an eye 2.8 m), a 2.6 m band, 7.9 m of rise a turn and
+  3.5 m of headroom between the hands, with a 1.8 m gallery outside the
+  band at each level it serves. Used in the Crossing's four towers
+  (iteration 3); the lift stands outside the tower on its inner corner,
+  since a lift in the eye cannot reach a gallery past the hands.
 
 **Integrated, not tacked on.** Each kind lives inside a structure it
 belongs to: the pairs end-on in the Deck's edge, the scissors under the
-platforms they serve and in the gate buildings' own frames, the spirals
-inside the Crossing Ring's column rows, rising through openings in its
-halo. Each kind carries the city's planting at its landings (section 6d).
+platforms they serve and in the gate buildings' own frames, the helices
+inside the Crossing's towers, which are also its structure. Each kind
+carries the city's planting at its landings (section 6d).
 
 ### 6g. The timetable (proposed 2026-10-17, at the user's direction)
 
@@ -1173,8 +1193,8 @@ greenery is built into its infrastructure rather than set beside it.
   face. The model for the arch's sky terraces.
 - **WOHA's Kampung Admiralty:** a public building with a community farm and
   park on its roof. The model for the West Gate's roof garden.
-- **Gardens by the Bay's Supertrees:** steel trees planted with climbers
-  (already the model for the park's wind trees).
+- **Gardens by the Bay's Supertrees:** steel trees planted with climbers.
+  The model for the Crossing's garden towers, which are working ones.
 - **The Park Connector Network:** green walks linking the parks across the
   city, with covered walkways to the stations. The Deck is Moy's park
   connector.
@@ -1207,8 +1227,8 @@ each element's keeper, its collision and its fit are checked):
 | **The Spine's frames** | coral vine on a steel mesh up each portal frame's columns | the greened columns under Singapore's viaducts |
 | **The high line's piers** | a stainless mesh sleeve round each tree pier's stem, coral vine climbing it from +2 m to the Y at +28 m: a row of green trees down the civic axis | Oasia's mesh, the Supertrees |
 | **The high line's edges** | bougainvillea troughs on both edges, so the line reads from the street as a green line across the sky | Singapore's flyovers |
-| **The Deck** | planters along its parapets and date palms in tubs at the ramp heads: a shaded green walk from every square to the park and the stations | the Park Connector Network |
-| **The Crossing** | a planter on the ring's inner edge spilling bougainvillea into the open middle; coral vine up the inner columns; desert grasses on the halo's rim; a rain garden under the ring catching the halo's run-off and the misters' drip | the Supertrees; ABC Waters |
+| **The Deck** | a garden walk: beds alternating from side to side so the path winds, a small ghaf in every second wide bed (`DECK.beds`, `DECK.trees`) | the High Line; the Park Connector Network |
+| **The Crossing** | coral vine and bougainvillea up each garden tower's mesh from planters at every gallery (`CROSSING.climbers`); the ring a garden walk like the Deck; a rain garden of reeds and grasses round each tower's foot, fed by the roof through the trunks (`CROSSING.rain_gardens`); desert grasses on the roof's rim | the Supertrees; Oasia; ABC Waters |
 | **The open escalator towers** | planters along the escalating ramps' outer edges and at every landing, coral vine trailing down the frame and shading the flights below | Singapore's planted open-air station escalators |
 | **The Meridian Arch** | sky terraces cut into the legs' east faces at +18 and +48 m, each with a ghaf; the lower bridge's roof (+42 m) a public sky garden over the high line's station, looking down the civic axis to the Timekeeper | Parkroyal on Pickering; LUSH |
 | **The West Gate** | the bridge's roof is Old Moy's community garden: date palms, herb and vegetable beds on drip, a shade pergola; agave and aloe on the towers' roofs | Kampung Admiralty |
@@ -1265,7 +1285,8 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
   - four quarters round it: the dry garden, the reed pond, the parasols
     with Old Fu's tea house and the chess terrace, and the **giant
     playground** with the green (sections 7a, 7b);
-  - four steel wind trees round the Crossing;
+  - the park's trees, each with a job: a banyan over the pond, ghafs,
+    flame trees and date palms (`PARK.trees`, section 7a);
   - **Garden Row**, a short row of three older townhouses, faces it from
     the west, across the Park Ring from Old Moy.
 
@@ -1480,46 +1501,77 @@ civic structure and station. **Revised 2026-10-17 (user): open air.** The
 lattice dome first proposed blocked the view across the park, so the Crossing
 is now an open ring, after **Sou Fujimoto's Grand Ring at Expo 2025 Osaka**
 (a ring of timber frames you walk on and under, open to the sky in the
-middle):
-- **Two rings of slender steel columns**, 14 and 20 m from the centre, 24
-  in each ring on a 15° rhythm, so the park reads straight through it.
-- **The ring concourse** between them at the Deck's level (+6.5 m), joined
-  to the Deck's Spine walk and reached from the lawn by the two spirals:
-  shade, water fountains, kiosks, the lost-and-found and the city's
-  information desk.
-- **A halo** of pale timber louvres at +18 m, 12 to 22 m from the centre,
-  shading the ring and the Spine's platforms; its middle is open, so from
-  the lawn you look straight up at the sky and the high line crossing.
-- **The Spine** passes through at +13.2 m, its platforms (+14.2) under the
-  halo; **the high line**
-  crosses at +36 m, and its two nearest tree piers rise through the ring.
-- **Two double-helix spirals** (revised 2026-10-17, section 6f), one in
-  the ring's north-east and one in its south-west: an up and a down
-  escalator spiral wound round a round glass lift, rising from the lawn
-  through the ring concourse (its landing at +6.5), across a 1.5 m bridge
-  to a Spine platform (+14.2), up through an opening in the halo and onto
-  the outer edge of a high-line platform (+37). They replace the
-  rectangular cores, which clipped the ring, and the long wing ramps
-  across the park. The ring is centred on the Spine's line (x −560).
-**Planted (2026-10-17, section 6d):** bougainvillea from the ring's inner
-planter, coral vine on the inner columns, desert grasses on the halo's rim,
-and a rain garden under the ring, after the Supertrees and Singapore's ABC
-Waters. Data: `CROSSING`, checked against the gardens, the pond, the
-playground and the wind trees. The giant playground moved whole to the south-east quarter
-(7b), beside a smaller green and the park lodge; the dry garden and the pond
-drew back a little from the ring, and the four wind trees stand round it. In a
-desert it has to earn every drop of water, so most of it is shade and dry
-garden, and the one green lawn and the one pond each have a job.
+middle).
+
+**Revised 2026-10-17 (plan iteration 3, at the user's direction): designed
+from what people do there.** The first open ring had a halo at +18 m that
+sheltered nothing anyone waited on, 48 slender columns of several sizes, two
+spirals that ate holes through both rings and clipped the concourse, and the
+high line's piers rising through it. It is redesigned from its purpose:
+
+- **What people do there.** Every change of line is between one Spine
+  platform (+14.2, east or west of the Spine) and one high-line platform
+  (+37, north or south of the Meridian). So there are **four garden
+  towers**, one in each quarter, each in the corner where a Spine platform
+  and a high-line platform pass each other, 13 m from the centre on both
+  axes. Each joins the lawn (0), the concourse (+6.5), its Spine platform
+  and its high-line platform, each a 1.1 m bridge from its gallery. Any
+  change of line is one tower, up or down; no one crosses a track.
+- **A tower:** a steel **trunk** 2.4 m across (its rain downpipes inside);
+  a **double-helix escalator** (section 6f) wound round it, the up hand and
+  the down hand half a turn apart; a 1.8 m **gallery** outside the helix at
+  each level it serves, which riders step onto sideways where their hand
+  meets the level; **twelve ribs** in a ring 12 m across carrying a steel
+  mesh that coral vine and bougainvillea climb from planters at every
+  gallery, bays left open where a bridge or the ring leaves; and a round
+  **glass lift** on the tower's inner corner, standing between the two
+  platforms, which opens straight onto both.
+- **The towers are the structure.** Head beams between them carry the
+  Spine (east-west, 1.6 m deep, at +10.4 to +12.0) and the high line
+  (north-south, at +30.6 to +32.6): no other column stands under either
+  line inside the Crossing, and the high line's nearest piers stand 54 m out.
+  One roof rests on the towers' tops.
+- **The concourse** is the station's mezzanine at the Deck's level: the
+  **Crossing Ring** (24.7 to 32.7 m from the centre, 8 m wide), a garden walk
+  round the four towers whose outer faces it touches, which the Deck's Spine
+  walks join from north and south; and two **cross-bridges**, tower to tower
+  under the Spine's tracks, hung from its head beams (3.9 m of headroom),
+  which join the towers and both Spine platforms below the trains. The ring
+  is a steel box girder 1.6 m deep spanning at most 20 m between its eight
+  supports: the four towers and four pairs of Deck columns (two where the
+  Spine walks cross it, two pairs either side of the cross walk east and
+  west, clear of it). Its program: the information desk, the
+  lost-and-found, kiosks and water fountains, between its beds.
+- **The middle is open** from the lawn to the sky: nothing stands in it but
+  the lines passing over.
+- **One roof**, a louvred table on the four towers at +41 m (1 m over the
+  high line's trains), a superellipse 44 m across: it shelters the high
+  line's platforms, where people wait, and the towers' top landings, shades
+  the middle and the Spine's platforms from the high sun, and its rain runs
+  down the trunks to a **rain garden** of reeds and grasses round each
+  tower's foot. Desert grasses on its rim. The Spine's platforms have their
+  own louvred canopies at +17.4, over their bridges to the towers.
+- **Planted:** the towers' climbers (`CROSSING.climbers`), the ring's beds
+  and small ghafs (`DECK.beds`, `DECK.trees`), the rain gardens
+  (`CROSSING.rain_gardens`), the roof's rim.
+
+Data: `CROSSING` (towers, tower, ring, roof, head beams `_beams`, ring supports
+`_ring_supports`), checked: the towers' bridges and lifts against both
+platforms, their clearance from both lines' decks, headroom under the head
+beams, the ring's spans, the roof over the trains and over the platforms and
+towers, and everything off the park's walks, pond, playground and buildings.
+
+The giant playground moved whole to the south-east quarter (7b), beside a
+smaller green and the park lodge. In a desert it has to earn every drop of
+water, so most of it is shade and dry garden, and the one green lawn and the
+one pond each have a job.
 
 **References:**
 - **The Persian four-part garden (chahar bagh):** a garden quartered by two
   crossing walks, with shade along every path. Moy's quarters are divided by
   tree-lined walks instead of water channels.
 - **Gardens by the Bay, Singapore:** the Supertrees, steel trees planted
-  with climbers that shade, light and frame a park.
-- **The Arbre à Vent (wind tree), Paris:** a steel tree whose leaves are
-  small silent wind turbines. Moy's version is the Windworks' gift to the
-  city.
+  with climbers; the Crossing's towers are working ones.
 - **Metropol Parasol, Seville:** a timber canopy of giant parasols shading
   a public square.
 - **Bishan–Ang Mo Kio Park, Singapore:** a park that cleans water as it goes,
@@ -1533,9 +1585,10 @@ garden, and the one green lawn and the one pond each have a job.
 - the **north–south walk**: from Estate Square on North Street, through
   the park, to Market Square on South Street.
 
-The giant playground stands where they cross. A double row of shade trees
-(ghaf and neem, both drought-hardy) lines the whole edge inside the Park
-Ring, with benches and movable chairs under them. Each quarter has a job:
+The Crossing stands where they cross. Low shrubs line the park's edge under
+the Deck's arcade (a tree there would put its crown into the Deck); the
+shade trees stand inside the quarters, each with a job. Each quarter has a
+job:
 
 | Quarter | What it is | Why it is there |
 |---|---|---|
@@ -1544,11 +1597,29 @@ Ring, with benches and movable chairs under them. Each quarter has a job:
 | **South-west: the parasols** | Old Fu's tea house and the chess terrace, under a timber canopy of giant parasols | Facing Old Moy and Garden Row; the Hos play here every afternoon |
 | **South-east: the great lawn** | The one irrigated lawn, for picnics, lying down and evening music; the park lodge on its edge | Facing the market lanes and the south tower: lunch from the market, and the office workers' hour off |
 
-**The wind trees.** Four steel wind trees, 32 m tall, stand at the corners
-of the playground. Bougainvillea climbs their trunks. Their crowns carry
-hundreds of small leaf-shaped turbines that turn silently in the west wind
-and light the park at night. Misters in the crowns cool the playground
-below. They are also the park's high anchors (see below).
+**The trees (2026-10-17, replacing the four steel wind trees, at the user's
+direction).** Real trees from the plant kit (`NatureProps`), each placed for
+a job and recorded exactly in `PARK.trees` (kind, trunk point, height), at the
+kit's proportions (`TREE_KIT`: the clear trunk and the crown's radius as
+fractions of the height):
+
+| Where | Trees | Job |
+|---|---|---|
+| The pond | a **banyan** (13 m) on its north-west bank, its crown over the water; three **ghafs** (8 to 9 m) on its east bank and toward the Park Ring | shade by the water; a screen from the street |
+| The playground | three **ghafs** (9 to 10 m) round its rim | shade for the parents' benches |
+| The tea house and chess terrace | three **flame trees** (9 m) | shade over the tables, colour |
+| The dry garden | five **date palms** (10 to 12 m) in a loose group among rocks and agave | the dry garden's oasis |
+| The cross walk | eight **date palms** (12 m), an allee east and west of the Crossing under the high line | shade along the civic axis |
+
+Every crown keeps 1.5 m inside the park's edge (clear of the Deck), clear of
+the Crossing Ring and its towers and of the high line's piers; trunks keep
+off the walks, the pond, the lawn and the playground (checked). The small
+planting is recorded too: shrubs along the edge (`PARK.shrubs`), reed clumps
+and flat stones round the pond (`PARK.reeds`, `PARK.rocks`), boulders and
+agave in the dry garden (`PARK.rocks`, `PARK.agave`). The wind trees' jobs in
+the playground move (7b): the Crossing's south-east tower (41 m, about 34 m
+from the Lookout) and the high line's pier on the park's east side (36 m)
+are its high anchors; its hoops hang on cables between its own towers.
 
 ### 7b. The giant playground
 
@@ -1592,8 +1663,9 @@ nets and slides are the city's sign colours.
    8 m, to climb, roll and bounce on.
 7. **The slides:** a tube slide from the 16 m tower, a spiral slide from the
    Lookout, and the wave slide onto the dunes.
-8. **The hoops:** eight rings, each 3 m across, hung on cables from the wind
-   trees, spiralling up round the Lookout and down over the splash pad.
+8. **The hoops:** eight rings, each 3 m across, hung on cables strung
+   between the playground's own towers, spiralling up round the Lookout and
+   down over the splash pad.
 
 **Built for the hero's platforming.** Every route is reachable on foot by
 the residents' children, through nets, ramps and climbing walls (no stairs,
@@ -1605,8 +1677,8 @@ the hero's real movement (`player.gd`):
 | Ordinary jump | about 1.4 m up; gaps of about 3 m running, 4.5 m sprinting | The Lookout's spiral of platforms rising 1.2 m at a time; tower-to-tower hops of 2.5 to 4 m |
 | Blorb bounce | about 2.5 m off a called blorb | Shortcuts onto the nets and the lower towers |
 | Blorb super-jump (a timed jump on the bounce) | about 12 m | The bounce court's ring of high perches at 11 to 12 m, reachable only this way, as in the Demo World's pit |
-| Leaf Hat vine swing (rope 12 to 52 m; anchor at least 7 m above) | from tower tops to the wind trees' crowns | The **swing loop**: the four wind trees (32 m, about 52 m apart) and the Lookout (20 m) make a circuit round and over the playground, and out across the park to the towers on the Park Ring |
-| Air: cloud platforms and hover | a cloud ahead at shoulder height or underfoot | The **cloud gap**: a 14 m gap from the Lookout's top to the high deck in a wind tree's crown, too far to jump |
+| Leaf Hat vine swing (rope 12 to 52 m; anchor at least 7 m above) | from tower tops to the Crossing's towers and the high line's pier | The **swing loop** (revised 2026-10-17, proposed): the Lookout (20 m), the Crossing's south-east tower (41 m, about 34 m away) and the high line's pier on the park's east side (36 m, about 32 m away) make a circuit over the playground and out across the park to the towers on the Park Ring; the ghafs on its rim (crowns to 10 m) serve short swings |
+| Air: cloud platforms and hover | a cloud ahead at shoulder height or underfoot | The **cloud run** (revised 2026-10-17, proposed): from the Lookout's top (20 m) to the south-east Crossing tower's gallery at +14.2, about 30 m off, too far to jump |
 | Water jets and Fire hover | a level hover, then flight with four limbs | **Hover gates**: rings over the splash pad and a high platform on the 16 m tower reached only from the air |
 | Crystal skates | a self-laid ribbon of ice, anywhere in three dimensions | **The ribbon run**: thread all eight hoops in one flight, up round the Lookout and down over the splash pad |
 | Ground dirt bike | rear wheel on dirt; the full bike with the hat | The pump track and its tabletop jump |
@@ -1987,7 +2059,7 @@ Square (section 6, the Deck).
 |---|---|---|---|---|
 | 9 | Tea house | 14 × 12 m | 1 storey; flat above and keeper's room behind | Old Fu (keeper); Kenji Mori (above) |
 | 10 | Park lodge | 10 × 8 m, beside the green | 1 storey | Orin Pike (park keeper) |
-| — | The Crossing | an open ring 40 m across, concourse at +6.5 m, halo at +17 m, at the park's centre (7a) | the city's station where the two lines cross, and its shelter | — |
+| — | The Crossing | four garden towers 12 m across, 41 m to the roof, a garden ring 65 m across at +6.5 m, at the park's centre (7a) | the city's station where the two lines cross | — |
 | 11 | Giant playground | about 31 m across, the park's south-east quarter (7b) | climbing towers 12–20 m | Lily, Kofi |
 
 **Downtown**
@@ -2509,19 +2581,22 @@ would not read).
   instead, each turning past a fixed **index** at the top (a lit triangle),
   after the ring clocks whose numbers turn past a pointer.
 - **The rings, from the centre out:**
-  - the **minute ring** (6 to 9 m) and the **hour ring** (9 to 12 m): each
-    carries one lit marker and keeps **real-world time** (user), the minute
-    ring turning once an hour, the hour ring twice a day, clockwise as seen
-    from the plaza;
+  - the **hour ring** (6 to 9 m) and, outside it, the **minute ring** (9 to
+    12 m), as a minute hand is the longer: each carries one lit **arrow**
+    and keeps **real-world time** (user), the minute ring turning once an
+    hour, the hour ring twice a day, clockwise as seen from the plaza;
   - the fixed **bezel** (12 to 13.5 m): twelve hour marks, the index, and
     rungs on its frame (a swing anchor at its top, 51 m).
-- **Reading it (2026-10-17):** each moving ring's marker is a lit arc
-  across the ring's band, standing proud of both faces: the hour's 24° wide,
-  the minute's 7°, both crimson. The bezel's twelve dark marks run across its
-  whole band, the quarters wider. A lit **seconds bead** runs round the
-  bezel's rim once a minute, through the cradle's grips (`TIMEKEEPER.markers`,
-  `seconds`, `marks`). The city model's Timekeeper runs on the viewer's own
-  clock.
+- **Reading it (2026-10-17, arrows at the user's direction):** each moving
+  ring's marker is a lit crimson arrow spanning the ring's band, its base on
+  the inner edge (the hour's 20° wide, the minute's 10°) and its point on
+  the outer edge, standing proud of both faces, so it points at an exact
+  place on the dial: the minute arrow's point touches the bezel. The
+  bezel's twelve dark hour marks run across its whole band, the quarters
+  wider, with 48 short minute ticks on its inner edge between them. A lit
+  **seconds bead** runs round the bezel's rim once a minute, through the
+  cradle's grips (`TIMEKEEPER.markers`, `seconds`, `marks`). The city
+  model's Timekeeper runs on the viewer's own clock.
 - **Material:** pale enamelled steel rings in the bronze cradle; the markers
   and index lit at night.
 - **Sound:** the old tower's bell is kept, hung in the cradle at the top of
@@ -3063,11 +3138,21 @@ lit crowns.
 - (2026-10-14) the Deck's route (section 6): the Park Deck ring, the civic,
   library, estate and market walks, two skybridges, six ramp towers and two
   glass lifts; travelators dropped;
+- (2026-10-17, plan iteration 3, at the user's direction) **the Crossing
+  redesigned from its purpose**: four garden towers carrying both lines, a
+  garden ring and one roof, the halo, the slender columns and the spirals
+  gone; the Park Deck's missing columns restored; parapets open at every
+  junction; the Deck a garden walk; the park planted with the kit's trees
+  in place of the wind trees, every tree, bed, shrub and parapet recorded
+  in the plan; the Timekeeper's markers made arrows (6, 6c, 6d, 6f, 7a, 7b,
+  8a);
+- (2026-10-17) **the ASAN launch complex** north-east of Moy, the way to
+  the Space Kingdom (section 12);
 - (2026-10-17, after the first playable prototype) **level lines and real
   platforms**: the Spine recentred on its streets and level at the Wall
   Line's height, ending at gate interchanges inside the wall (no flyover,
   no tunnels); platforms at the car's floor; escalator pairs, scissors and
-  the Crossing's double-helix spirals; the train halls following the wall's
+  the Crossing's double-helix spirals (since replaced by its garden towers); the train halls following the wall's
   curve; a clock-face timetable (6c, 6e, 6f, 6g, 7a);
 - (2026-10-17) **the Well Quarter simplified**: two old roads (the Old High
   Street and Mara's Lane) with the grid laid round them, and blocks of
