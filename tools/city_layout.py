@@ -25,7 +25,6 @@ STREETS=[
  ('Meridian Avenue','main',-359,-6,-318,6),
  ('Meridian North','avenue',-483,-38,-340,-30),
  ('Meridian South','avenue',-483,30,-340,38),
- ('Meridian Walk','main',-483,-6,-431,6),('Hotel Passage','shop',-464,-30,-452,-6),
  ('West Street','main',-794,-6,-637,6),
  ('North Street','main',-566,-232,-554,-62),
  ('South Street','main',-566,62,-554,232),
@@ -45,7 +44,7 @@ STREETS=[
 OMITTED_STREETS=[dict(name='Cinema Lane',kind='lane',rect=[-734,-220,-730,-122],reason='entire source rectangle lies outside the 203 m Rim Walk clip; no replacement alignment authorized')]
 OPENS=[
  ('park',-625,-50,-495,50),
- ('Civic Plaza',-431,-30,-359,30),
+ ('Civic Plaza',-483,-30,-359,30),
  ('Library Square',-686,-30,-637,-6),
  ('Market Square',-590,122,-530,164),
  ('Estate Square',-554,-118,-516,-84),
@@ -54,11 +53,9 @@ B=[]
 def b(n,name,r,kind,h,who=''): B.append(dict(n=n,name=name,r=r,kind=kind,h=h,who=who))
 NB=lambda: 'homes (no one the hero meets)'
 b(1,'Grand Hotel',(-483,-98,-431,-38),'civic','atrium block of 12 levels (44 m) round its void; cylinder guest tower of 28 levels (96 m), drum to 108 m (after John Portman)','Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work')
-## (2026-10-17, at the user's direction: city hall moved into the Meridian Arch, section 8b; its old site joined Meridian
-## Court as the new Civic Plaza, and the old Civic Plaza became two commercial blocks either side of Meridian Walk)
-b(54,'Meridian North block, west',(-483,-30,-464,-6),'tower','commercial, 12 storeys: shops and cafes on Meridian Walk, offices above',NB())
-b(55,'Meridian North block, east',(-452,-30,-431,-6),'tower','commercial, 12 storeys: shops and cafes on Meridian Walk, offices above; the Deck\'s hotel bridge passes beside it',NB())
-b(56,'Meridian South block',(-483,6,-431,30),'tower','commercial, 12 storeys: shops and cafes on Meridian Walk, offices above',NB())
+## (2026-10-17, at the user's direction: city hall moved into the Meridian Arch, section 8b. Revised again the same day:
+## the three commercial blocks that briefly stood on the old Civic Plaza hid the Grand Hotel's front, so they and
+## Meridian Walk and Hotel Passage are gone, and Civic Plaza runs the whole way from the park to City Hall: CIVIC_SQUARE)
 b(3,'Library',(-686,-92,-641,-30),'civic','art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)','Ada Fong, Nia Calder, Benji Okoro')
 b(4,'Natural history museum',(-637,62,-575,100),'civic','3 storeys, top-lit hall','Dr. Imani Osei (curator)')
 b(5,'Moonlight Cinema',(-730,6,-700,34),'civic','2 storeys, built later into the old town; flat above','Leon Duarte (lives above)')
@@ -357,7 +354,7 @@ RESIDENT_HOMES={
 ## Heights (m, to the main roof) and crowns of the numbered buildings, and
 ## the plan forms of the towers (city.md 7c, 8): one source for the plan, the
 ## skyline and the elevations.
-HEIGHTS={1:96,54:45,55:45,56:45,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:150,14:175,15:150,16:22,
+HEIGHTS={1:96,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:150,14:175,15:150,16:22,
  17:91,18:104,19:117,20:130,21:130,22:46,23:6,24:11,25:17,26:20,27:29,28:26,29:20,30:20,31:20,
  32:23,33:9,34:26,35:72,36:42,37:17,38:7,39:6,49:52,50:110,51:8,52:23,53:78,40:8,41:4,42:6,43:35,44:3}
 CROWNS={1:108,3:26,12:280}
@@ -422,7 +419,7 @@ HOTEL={
  # the double ramp: foot, bend, head on the mezzanine's south gallery
  'ramps':[[(18,38),(13,41),(12,48)],[(34,38),(39,41),(40,48)]],'ramp_width':2.4,'landing':3.0,
  'runnel':[(42,44),(32,45),(20,45),(10,44),(0,44)],
- 'skybridge':{'x':(19,25),'z':(60,68)},   # (moved 4 m west 2026-10-17 with the Deck's Hotel walk)
+ 'skybridge':{'x':(-6,0),'z':(46,52)},   # (2026-10-17) west across the Park Ring to the Park Deck; Civic Plaza now open in front
  'wind_towers':[(5,24),(5,46)],
 }
 def _hotel_checks():
@@ -674,6 +671,28 @@ def _block_checks():
     plaza=[o_ for o_ in OPENS if o_[0]=='Civic Plaza'][0]
     if not (E['face']=='north' and plaza[4]<=sh[1]): problems.append(('block: its eye does not look at Civic Plaza',))
 
+## Civic Plaza, the grand square (city.md 8a.1, 2026-10-17, at the user's direction): the whole space from the park to
+## City Hall, 124 by 60 m between Meridian North and Meridian South, after Washington's National Mall and Tiananmen
+## Square. One axis runs from the Park Deck to the Rostrum on City Hall: a long water mirror under the high line, its
+## tree piers standing in the water; lawns either side; a cross-axis on the Grand Hotel's door with a fountain in each
+## lawn; then an open paved forecourt for gatherings before City Hall, with the City Steps rising to its Rostrum. The
+## hotel faces the square across Meridian North with nothing in front of it but lawn and water. Monuments and statues
+## are sites only: their subjects are open (world bible, Open threads). Plan rectangles are world (x0, z0, x1, z1).
+CIVIC_SQUARE=dict(
+  rect=(-483,-30,-359,30), axis=0.0,
+  mirror=dict(rect=(-476,-4,-404,4),depth=0.4,why='reclaimed water, recirculated; it doubles the high line and City Hall, and cools the square'),
+  walks=dict(axis=(-483,-8,-359,8),edges=[(-483,-30,-359,-24),(-483,24,-359,30)],why='pale stone; the axis walks either side of the water'),
+  lawns=[dict(name='north lawn',rect=(-476,-24,-404,-8)),dict(name='south lawn',rect=(-476,8,-404,24))],
+  cross_axis=dict(x=(-461,-453),why='the Grand Hotel\'s door at x -457: a walk across each lawn from Meridian North to the water'),
+  fountains=[dict(name='hotel fountain',c=(-457,-16),r=4.5),dict(name='south fountain',c=(-457,16),r=4.5)],
+  # shade trees in rows along the square's long edges, after the Mall's elms; none in front of the hotel's facade
+  tree_rows=[dict(z=-27,x=(-428,-404),every=8.0,kind='round',h=9.0),dict(z=27,x=(-476,-404),every=8.0,kind='round',h=9.0)],
+  forecourt=dict(rect=(-404,-30,-359,30),why='open paving before City Hall, where the city gathers to face its Rostrum'),
+  monuments=[dict(name='west monument',c=(-480,0),size=(5,10),h=5.0,suggest='a bronze caravan walking east up the axis, for the caravan road the city grew on (subject open)'),
+             dict(name='east monument',c=(-398,0),size=(6,6),h=3.0,suggest='a low memorial under the high line at the water\'s end, for the Wall Watch (subject open)')],
+  statues=[dict(c=(x,z)) for x in (-472,-440,-424,-408) for z in (-9.5,9.5)],
+  flagstaffs=[dict(c=(-375,-10),h=22.0),dict(c=(-375,10),h=22.0)],
+)
 TURBINES=[(-310,-200),(-310,200),(-740,-270),(-740,270)]
 ## The Deck (city.md 6.2 and 6a): the walkway at +6.5 m, after Hong Kong's
 ## footbridges. Every run has a job: the ring shades the park side of the Park
@@ -690,12 +709,10 @@ DECK={
  'runs':[
   # the ring, over the park side of the Park Ring: a 6 m arcade below it, 6 m open street outside it
   dict(name='Park Deck',kind='ring',w=6,pts=[(-628,-53),(-492,-53),(-492,53),(-628,53),(-628,-53)]),
-  # the civic walk (revised 2026-10-17): along the north side of Meridian Walk, under the high line, from the Park Deck to
-  # the new Civic Plaza in front of City Hall (the arch); the hotel bridge leaves it north over Hotel Passage and
-  # Meridian North to the Grand Hotel's mezzanine
-  dict(name='Civic walk',kind='walk',w=4,pts=[(-489,-4),(-431,-4)]),
-  dict(name='Hotel walk',kind='walk',w=6,pts=[(-461,-4),(-461,-30)]),
-  dict(name='Hotel skybridge',kind='bridge',w=6,pts=[(-461,-30),(-461,-38)]),
+  # the hotel bridge (revised 2026-10-17, with Civic Plaza opened to the park): the civic walk along Meridian Walk is gone
+  # with the walk itself, so the square stays open to the sky; the Grand Hotel's mezzanine meets the Park Deck instead,
+  # by a short glazed bridge west across the Park Ring
+  dict(name='Hotel skybridge',kind='bridge',w=6,pts=[(-489,-49),(-483,-49)]),
   # to the library's east-wing door, over Garden Walk's mouth
   dict(name='Library walk',kind='walk',w=6,pts=[(-631,-27),(-648,-27)]),
   # under the Spine Line from the Park Deck's north and south sides, across the Crossing Ring, to the Crossing's
@@ -715,7 +732,7 @@ DECK={
  ],
  # where the Deck meets a building at +6.5 m: (building, point on its face, what is there)
  'doors':[
-  (1,(-461,-38),'the hotel\'s Deck door into the mezzanine gallery'),
+  (1,(-483,-49),'the hotel\'s Deck door, on its west side, into the mezzanine gallery'),
   (3,(-645,-30),'the library\'s east-wing door to the first gallery'),
   (51,(-554,-120),'the neighbourhood centre\'s roof garden'),
   (33,(-530,125),'the wet market\'s upper hall'),
@@ -744,7 +761,9 @@ DECK={
  # an up and a down side by side, 11.3 m long, set end-on into the Deck's edge). The park's two wing ramps to
  # the Crossing are gone: the Crossing's towers serve it.
  'escalators':[
-  dict(name='Civic Plaza',foot=(-419.7,-4),head=(-431,-4)),
+  # (revised 2026-10-17) two pairs down from the Park Deck's east side into Civic Plaza, either side of its axis
+  dict(name='Civic Plaza north',foot=(-477.7,-14),head=(-489,-14)),
+  dict(name='Civic Plaza south',foot=(-477.7,14),head=(-489,14)),
   dict(name='Market Square',foot=(-545,139.3),head=(-545,128)),
   dict(name='Estate Square',foot=(-545.7,-104),head=(-557,-104)),
  ],
@@ -1092,7 +1111,13 @@ ESCALATORS=dict(pair=dict(angle=30.0,tread=1.2,w=3.2,max_rise=8.0),
   helix=dict(angle=30.0,eye=1.4,band=2.6,hands=2,min_headroom=2.6,deck=0.5,landing=50.0),
   # the Spine stations' straight pairs (iteration 3): two narrow (0.8 m step) escalators side by side, 2.8 m overall,
   # a 2 m landing between flights and a 2.5 m clear runout at the foot
-  station=dict(angle=30.0,w=2.8,landing=2.0,runout=2.5))
+  station=dict(angle=30.0,w=2.8,landing=2.0,runout=2.5),
+  # (user, 2026-10-17: "have you ever seen an escalator without moving railings?") every lane, straight or spiral, has a
+  # moving handrail on BOTH sides, moving with the treads, on a clear glass balustrade; at each end the handrail runs on
+  # past the incline over the landing (the newel), so a rider is on the flat before letting go. Between the up and the
+  # down lane of a pair stand two balustrades, one for each lane, with a decking strip between them.
+  handrail=dict(height=0.95,section=(0.09,0.07),newel=0.9,balustrade='clear toughened glass',material='black rubber over steel',
+                moves='at the treads\' speed, in the lane\'s direction'))
 ## The Moy car (city.md 6e, user 2026-10-17): one short car for every line, built
 ## entirely of SuperEggs, so the trains belong to the same soft-cornered world as
 ## everything else. Short cars (9.6 m) so a train is two or three of them: they
@@ -1239,8 +1264,9 @@ _crossing_layout()
 ## garden on the lower bridge's roof; the Watch reaches its room by its own lift.
 ARCH=dict(legs=[(-363.5,-30,-341.5,-12),(-363.5,12,-341.5,30)],lower=(32.0,42.0),top=(58.0,72.0),cantilever=12.0,
   opening=24.0,wall_line=12.0,
-  cores=[dict(name='north leg',c=(-366.7,-21),size=(6.4,16.0),levels=[0,14.2,37,43],lifts=2,enclosure='open cascade',canopy=3.2,lift=(2.6,2.6)),
-         dict(name='south leg',c=(-366.7,21),size=(6.4,16.0),levels=[0,14.2,37,43],lifts=2,enclosure='open cascade',canopy=3.2,lift=(2.6,2.6))],
+  # (2026-10-17) the open cascades are retired: their flights overran their 16 m cores and ran into each other. The
+  # city front is ARCH['front'] (_arch_front): the City Steps, the Rostrum, two scissor tubes and the lifts.
+  cores=[],
   # the Wall Line's train hall: a void through both legs at +12 m (v: across the wall, outward positive, from the wall's
   # centreline; y: floor and ceiling), holding both tracks and the station's platform on the outer side
   train_hall=dict(v=(-9.0,5.5),y=(12.0,21.0)),
@@ -1650,8 +1676,138 @@ def _cross_checks():
             if q.distance(Point(u['c']))<0.6*(cr+TREE_KIT[u['kind']]['crown']*u['h']): problems.append(('park: trees crowded',t['c'],u['c']))
         for pr in PARK['parasols']:
             if q.distance(Point(pr))<2.5: problems.append(('park: a tree on a parasol',t['c']))
+## City Hall's city front (city.md 8b.1, 2026-10-17, at the user's direction). A civic seat wants a calm, symmetrical
+## front with one place to stand before the city; the station wants short, legible ways to every platform. So:
+## - the Rostrum: a balcony across the whole west front at the Wall Line's level (+14.2), over the gate's opening, where
+##   the city is addressed (after the Gate of Heavenly Peace); it is also the Wall Line's inner platform concourse;
+## - the City Steps: before each leg a broad stair between an up and a down escalator, from the square to the Rostrum;
+## - on each leg's face a glazed scissor: flights alternate between two bands side by side, so no flight ever runs under
+##   or into another, and every flight is a pair (up and down side by side); it climbs to the high line's platforms
+##   (+37) and the sky garden on the lower bridge (+43), with a landing at +21.8 that crosses over the Wall Line's
+##   tracks inside the leg and down to its outer platform;
+## - a glass lift on each leg's inner face, and one in each leg's east side for the outer platform.
+## Mirror images, north and south of the axis.
+def _arch_front():
+    A=ARCH; F=A['legs'][0][0]; zi=A['legs'][1][1]; zo=A['legs'][1][3]
+    pf=WALL['rail']+PLATFORMS['floor']; hl=CROSS['services'][1]['rail']+PLATFORMS['floor']; sky=A['lower'][1]+1.0
+    WL=WALL; cxw=lambda z: CX+math.sqrt(WL['r']**2-z**2)
+    v_in=WL['track_axis']-WL['track_spacing']/2-PLATFORMS['edge']           # the inner platform's track edge
+    plat_w=lambda z: cxw(z)+v_in-PLATFORMS['width']                          # its west edge
+    plat_out=lambda z: (cxw(z)+WL['track_axis']+WL['track_spacing']/2+PLATFORMS['edge'], cxw(z)+WL['track_axis']+WL['track_spacing']/2+PLATFORMS['edge']+PLATFORMS['width'])
+    pw=ESCALATORS['station']['w']; gap=0.4
+    bandA=(F-pw,F); bandB=(F-2*pw-gap,F-pw-gap)
+    z0,z1=zi+1.5,zo-1.5; levels=[pf,round(pf+(hl-pf)/3,2),round(pf+2*(hl-pf)/3,2),hl]
+    rostrum=dict(y=pf,x=(round(F-7.0,2),F),z=(-zo,zo),opening_x=(F,round(min(plat_w(z) for z in (-zi,0,zi)),2)),
+                 bay=dict(c=(round(F-7.0,2),0.0),r=3.0),portals=[round(z1-3.0,2),round(z1-0.5,2)])
+    legs=[]
+    for sgn,name in ((-1,'north'),(1,'south')):
+        S=lambda z: round(sgn*z,2)
+        flights=[dict(name='F1',band='A',y=(levels[0],levels[1]),z=(S(z0),S(z1))),
+                 dict(name='F2',band='B',y=(levels[1],levels[2]),z=(S(z1),S(z0))),
+                 dict(name='F3',band='A',y=(levels[2],levels[3]),z=(S(z0),S(z1))),
+                 dict(name='F4',band='A',y=(hl,sky),z=(S(z0),S(z0+(sky-hl)/((levels[1]-levels[0])/(z1-z0)))))]
+        galleries=[dict(name='G21',band='AB',y=levels[1],z=(S(z1),S(zo)),to='over the tracks to the outer platform'),
+                   dict(name='G29',band='AB',y=levels[2],z=(S(zi),S(z0)),to='the turn'),
+                   dict(name='G37',band='B',y=hl,z=(S(zo),S(zi)),to='the high line platform\'s west end'),
+                   dict(name='G43',band='B',y=sky,z=(S(abs(flights[3]['z'][1])+1.5),S(zi)),to='the sky garden on the lower bridge\'s roof')]
+        ex=(-345.0,round(-345.0+pw,2))
+        over=dict(y=levels[1],x=(F,ex[1]),z=(S(z1-1.5),S(zo-0.5)))
+        outer=dict(name='outer pair',x=ex,y=(levels[1],pf),z=(S(z1),S(z0)),lands=round(plat_out(sgn*z0)[1],2))
+        lifts=[dict(name='front lift',c=(round(F+2.0,2),S(zi-1.6)),size=2.6,stops=[0.0,pf,levels[1],hl,sky]),
+               dict(name='outer lift',c=(round(ex[1]+1.6,2),S(zo-3.0)),size=2.6,stops=[0.0,pf,levels[1]])]
+        # the City Steps: an escalator on each side of a broad stair, in two flights with a shared half-landing
+        run=(pf/2)/math.tan(math.radians(ESCALATORS['station']['angle'])); land=ESCALATORS['station']['landing']
+        head=rostrum['x'][0]; foot=round(head-2*run-land,2)
+        steps=dict(z=S(21.0),width=7.8,head=head,foot=foot,half=(round(head-run-land,2),round(head-run,2)),half_y=round(pf/2,2),
+                   lanes=[dict(kind='up escalator',z=S(21.0+3.2)),dict(kind='stair',z=S(21.0),w=4.4),dict(kind='down escalator',z=S(21.0-3.2))])
+        legs.append(dict(side=name,flights=flights,galleries=galleries,over_tracks=over,outer=outer,lifts=lifts,steps=steps))
+    A['front']=dict(rostrum=rostrum,bands=dict(A=bandA,B=bandB),levels=levels,sky=sky,legs=legs,
+                    bridge_x=(round(F-6.5,2),-332.0),east_concourse=dict(x=(-336.0,-332.0),y=hl),
+                    material='glazed tubes in the legs\' pale ceramic diagrid; the Rostrum and the Steps in pale stone; lifts in glass')
+    # ------------------------------------------------ checks
+    H=A['train_hall']; P=problems
+    for L in legs:
+        for f_ in L['flights']:
+            run_=abs(f_['z'][1]-f_['z'][0]); rise=f_['y'][1]-f_['y'][0]; ang=math.degrees(math.atan2(rise,run_))
+            if ang>30.0+1e-6: P.append(('arch front: a flight too steep',L['side'],f_['name'],round(ang,1)))
+            if rise>ESCALATORS['pair']['max_rise']+1e-6: P.append(('arch front: a flight rises too far',L['side'],f_['name']))
+            if not (zi-0.01<=min(abs(v) for v in f_['z']) and max(abs(v) for v in f_['z'])<=zo+0.01): P.append(('arch front: a flight off its leg\'s face',L['side'],f_['name']))
+        # in each band, anything stacked over anything else leaves 2.6 m (the deck 0.5 m deep)
+        items=[]
+        for f_ in L['flights']: items.append((f_['band'],f_['z'],f_['y'][0],f_['y'][1]))
+        for g in L['galleries']:
+            for bd in g['band']: items.append((bd,g['z'],g['y'],g['y']))
+        def hz(it,z):
+            za,zb=it[1]; t=(z-za)/((zb-za) or 1); return it[2]+(it[3]-it[2])*min(1,max(0,t))
+        worst=1e9
+        for i in range(len(items)):
+            for j in range(len(items)):
+                if i==j or items[i][0]!=items[j][0]: continue
+                lo_=max(min(items[i][1]),min(items[j][1])); hi_=min(max(items[i][1]),max(items[j][1]))
+                if hi_-lo_<0.6: continue
+                for k in range(11):
+                    z=lo_+(hi_-lo_)*k/10; a_,b_=hz(items[i],z),hz(items[j],z)
+                    if a_>b_+0.01: worst=min(worst,a_-b_-0.5)
+        L['_headroom']=round(worst,2)
+        if worst<ESCALATORS['helix']['min_headroom']: P.append(('arch front: a flight or landing over another without headroom',L['side'],round(worst,2)))
+        if L['over_tracks']['y']-0.8<H['y'][1]: P.append(('arch front: the crossing over the tracks cuts the train hall',L['side']))
+        for lf in L['lifts']:
+            if abs(lf['c'][1])-lf['size']/2<6.5: P.append(('arch front: a lift in the avenue',L['side'],lf['name']))
+        st=L['steps']
+        if st['foot']<CIVIC_SQUARE['forecourt']['rect'][0]: P.append(('arch front: the City Steps run past the forecourt',L['side'],st['foot']))
+        if abs(st['z'])-st['width']/2<12.0: P.append(('arch front: the City Steps in the gate\'s opening',L['side']))
+        for fs in CIVIC_SQUARE['flagstaffs']:
+            if abs(fs['c'][1]-st['z'])<st['width']/2+1.0 and st['foot']<=fs['c'][0]<=st['head']: P.append(('arch front: a flagstaff on the steps',))
+    if abs(rostrum['y']-pf)>1e-6: P.append(('arch front: the Rostrum is not level with the Wall Line\'s platform',))
+    if rostrum['opening_x'][1]-rostrum['opening_x'][0]<1.0: P.append(('arch front: the Rostrum does not reach the inner platform',))
+    # the high line's platforms (at the station, 30 m long) begin within the bridge's west extension, where G37 lands
+    st_=[x for x in CROSS['stations'] if x['name']=='East Gate'][0]; pw_end=st_['at'][0]-CROSS['platform'][0]/2
+    if not (A['front']['bridge_x'][0]<=pw_end<=F): P.append(('arch front: the high line platforms\' west ends are not at the tubes',pw_end))
+    if A['front']['bridge_x'][1]<st_['at'][0]+CROSS['platform'][0]/2+3.0: P.append(('arch front: no concourse beyond the buffer stops',))
+
+## the square's checks: every element inside it and off the high line's pier stems; the hotel's front left open (nothing
+## taller than a lawn between its facade and the water, but the fountain); and every Crossing tower's helix band clear
+## of the head beams (a beam ends at the tower's drum; nothing structural enters the band, user 2026-10-17)
+def _square_checks():
+    from shapely.geometry import box as sbox, Point
+    Q=CIVIC_SQUARE; R=sbox(*Q['rect']); me=CROSS['services'][1]; P=problems
+    if [o for o in OPENS if o[0]=='Civic Plaza'][0][1:]!=Q['rect']: P.append(('square: Civic Plaza and the square disagree',))
+    stems=[Point(x,0) for x in me['piers'] if Q['rect'][0]<=x<=Q['rect'][2]]
+    things=[('mirror',sbox(*Q['mirror']['rect']))]+[(l['name'],sbox(*l['rect'])) for l in Q['lawns']]+\
+           [(f['name'],Point(f['c']).buffer(f['r'])) for f in Q['fountains']]+[(m['name'],sbox(m['c'][0]-m['size'][0]/2,m['c'][1]-m['size'][1]/2,m['c'][0]+m['size'][0]/2,m['c'][1]+m['size'][1]/2)) for m in Q['monuments']]+\
+           [('statue',Point(t['c']).buffer(1.2)) for t in Q['statues']]+[('flagstaff',Point(f['c']).buffer(0.6)) for f in Q['flagstaffs']]
+    for n_,g in things:
+        if not R.contains(g): P.append(('square: outside the square',n_))
+        for st in stems:
+            if n_!='mirror' and g.distance(st)<3.0: P.append(('square: against a high-line pier',n_))
+    for n_,g in things:
+        for b_ in B:
+            if b_['r'] and g.intersects(sbox(*b_['r'])): P.append(('square: on a building',n_,b_['n']))
+    hotel=[b_ for b_ in B if b_['n']==1][0]['r']
+    front=sbox(hotel[0],Q['rect'][1],hotel[2],-8)
+    for row in Q['tree_rows']:
+        for k in range(int((row['x'][1]-row['x'][0])/row['every'])+1):
+            if front.contains(Point(row['x'][0]+k*row['every'],row['z'])): P.append(('square: a tree in front of the hotel',))
+    for t in Q['statues']:
+        if any(sbox(*l['rect']).buffer(-0.5).contains(Point(t['c'])) for l in Q['lawns']) is False and not any(sbox(*l['rect']).contains(Point(t['c'])) for l in Q['lawns']): P.append(('square: a statue off its lawn',t['c']))
+    # the Crossing's head beams stop at the drums: no beam inside any tower's band (radius band[1] + gallery)
+    C=CROSSING; T=C['tower']; cx,cz=C['c']; sp=CROSS['services'][0]
+    for TW in C['towers']:
+        tx,tz=TW['c']
+        for zb in C['_beams']['spine']['z']:
+            end=T['offset']-T['drum']+0.4   # the beam reaches 0.4 m into the drum's ring girder
+            for xe in (cx-end,cx+end):
+                if abs(zb-tz)<0.8 and math.hypot(xe-tx,zb-tz)<T['band'][1]+0.3: P.append(('crossing: a head beam inside a helix',TW['name']))
+        for xb in C['_beams']['high']['x']:
+            end=T['offset']-T['drum']+0.4
+            for ze in (cz-end,cz+end):
+                if abs(xb-tx)<0.9 and math.hypot(xb-tx,ze-tz)<T['band'][1]+0.3: P.append(('crossing: a head beam inside a helix',TW['name']))
+    C['_beam_clear']=round(T['offset']-(T['offset']-T['drum']+0.4)-T['band'][1],2)
+
 _block_checks()
 _cross_checks()
+_arch_front()
+_square_checks()
 _deck_checks()
 def _spine_spans():
     # the Spine's supports in order (its frames, the Deck's columns where it rides the Deck, the Crossing's head beams):
@@ -2416,5 +2572,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,civic_square=CIVIC_SQUARE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

@@ -699,13 +699,14 @@ often.
      walk beneath it is a shaded arcade along the park's edge; the 6 m of
      street outside it stays open to the sky beside the shopfronts. It joins
      every district, which is why the Deck is a ring and not a line.
-   - **The civic walks** along Civic Plaza's north and south edges, to city
-     hall's stone canopies at its corners (the north canopy leads along to
-     the north door, section 8a). From the north walk a glazed
-     **skybridge** crosses Meridian North into the Grand Hotel's mezzanine
-     (section 8), and from there a glass bridge crosses the Windspire's wind
-     garden into its lobby. Nothing crosses Meridian South: BLOCK stays off
-     the Deck.
+   - **The hotel skybridge** (revised 2026-10-17): the civic walks along
+     Civic Plaza's edges are gone with the buildings that briefly replaced
+     the old plaza. The Park Deck's west side sends a short glazed bridge
+     east into the Grand Hotel's mezzanine gallery by its west door (section
+     8), and from there a glass bridge crosses the Windspire's wind garden
+     into its lobby. Two escalator pairs at Civic Plaza's west end, north and
+     south of its axis, join the square to the Deck (section 8a.1). Nothing
+     crosses Meridian South: BLOCK stays off the Deck.
    - **The Spine walks**, under the Spine Line from the Park Deck's north
      and south sides, across the Crossing Ring, to the Crossing's two
      cross-bridges (section 7a, iteration 3); the middle is left open.
@@ -728,7 +729,9 @@ often.
    world's 32° ramp with a landing between: four at the park's gates,
    where the park's cross walks meet the ring (each tower's foot opens onto
    the walk, its head onto the Deck), and a pair framing Civic Plaza's
-   axis, under the two skybridges. **Glass public lifts** stand at Estate
+   axis, under the two skybridges *(since revised: the towers that remain
+   are the West and East gate pairs in `DECK['ramps']`; Civic Plaza's are
+   escalators, section 8a.1)*. **Glass public lifts** stand at Estate
    Square and Market Square. Nowhere on the Deck is more than 75 m from a
    way down (now 68 m), the ramp towers doubling as escape routes.
 
@@ -736,8 +739,8 @@ often.
    moving walkways at 12°, after airport travelators, each a pair (up and
    down) 2.6 m wide, standing in for escalators within the no-stairs rule. A
    6.5 m rise runs 31 m, so they stand only where a square can give that
-   length along its edge without being cut in two: Civic Plaza (two, up to
-   the civic walks), Market Square (up to the Market walk) and Estate Square
+   length along its edge without being cut in two: Civic Plaza (two, at its west end,
+   up to the Park Deck; now true escalators, section 8a.1), Market Square (up to the Market walk) and Estate Square
    (up to the Estate walk). Inside the train stations a second pair under
    each platform rises from the Deck through the platform floor (section
    6c).
@@ -960,15 +963,13 @@ Every platform's floor is the car's floor, 1.0 m above the rail head
     its inner corner, serving the lawn (0), the concourse (+6.5), one Spine
     platform (+14.2) and one high-line platform (+37): any change of line
     is one tower.
-  - **The East Gate (the arch):** an **open cascade** on each leg's court
-    face, a scissor of escalator pairs climbing the diagrid under glass
-    canopies in full view of Meridian Court and city hall, after the Centre
-    Pompidou: from the station hall (0) to the Wall Line's East Gate
-    platforms (+14.2), whose tracks run through the legs in a train hall
-    following the wall's curve, the high line's terminus on the lower
-    bridge (+37), directly above it and at right angles, and the sky garden
-    on the lower bridge's roof (+43). The Watch reaches its command room
-    (+58) by its own lift.
+  - **The East Gate (City Hall), revised 2026-10-17:** City Hall's city
+    front (8b.1). The City Steps rise from the square to the Rostrum (+14.2),
+    which opens straight onto the Wall Line's inner platform. A glazed
+    scissor on each leg climbs to the high line's platforms (+37) and the
+    sky garden (+43). A crossing at +21.8 inside each leg passes over the
+    tracks to the outer platform. Glass lifts serve every level. The Watch
+    reaches its command room (+58) by its own lift.
   - **The West Gate:** a scissor in each tower's outer pier, beside the
     train hall, serving the street (0), the Wall Line (+14.2) and the high
     line's west station on the bridge between the towers (+37).
@@ -1122,8 +1123,16 @@ stack them, each where it suits:
 - **A pair** rises one level: from the squares to the Deck, 30°, 11.3 m.
 - **A scissor** (crisscross) stacks pairs: each flight starts where the
   last ended and turns back, so every flight carries both flows. Under the
-  Spine's platforms (street → Deck or a middle landing → platform), in the
-  arch's open cascades and the West Gate's towers.
+  Spine's platforms (street → Deck or a middle landing → platform), in City
+  Hall's two front scissors and the West Gate's towers. A scissor's flights
+  alternate between two bands side by side, so no flight runs under or into
+  another (the arch's first cascades stacked theirs in one band and
+  collided; retired 2026-10-17).
+- **Handrails (user, 2026-10-17):** every lane, straight or spiral, has a
+  moving handrail on both sides, moving with the treads, on a clear glass
+  balustrade. At each end it runs on 0.9 m past the incline over the landing
+  (the newel). Between the up and the down lane of a pair stand two
+  balustrades, one for each lane. Data: `ESCALATORS.handrail`.
 - **A double helix** winds an up spiral and a down spiral together round
   one eye, half a turn apart, so they never meet; after the double-helix
   stairs of the Château de Chambord and the Vatican Museums, and the trunk
@@ -1293,12 +1302,10 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
   Every district touches the Park Ring, so the park is the city's common
   ground, and the Deck runs round it.
 - **The plazas** (user: "I like the idea of plazas"):
-  - *(Revised 2026-10-17: Civic Plaza now lies in front of City Hall, the
-    Meridian Arch, on the old city hall's site, Clock Street and Meridian
-    Court; the old plaza described here is two commercial blocks, 12 storeys
-    of shops and offices, either side of Meridian Walk under the high line,
-    with Hotel Passage between the north blocks and the Deck's civic walk
-    along the walk's north side. See 8a and 8b.)*
+  - *(Revised 2026-10-17: Civic Plaza is now one grand square from the
+    park to City Hall, the Meridian Arch; see 8a.1. The commercial blocks,
+    Meridian Walk and Hotel Passage that briefly replaced the old plaza are
+    gone.)*
   - **Civic Plaza**, on the park's east side, is city hall's forecourt.
     **City hall heads the plaza on its axis**, facing west across the plaza
     to the park. The plaza's sides are private and unlike each other: the
@@ -2584,9 +2591,9 @@ still land on and swing from, with no interiors behind them.
 
 > **Superseded 2026-10-17 (user):** City Hall moved into the Meridian Arch
 > (8b), and this building and the Timekeeper over it are removed. Its site,
-> Clock Street and Meridian Court are one **Civic Plaza** in front of the
-> arch; the old plaza is two commercial blocks either side of **Meridian
-> Walk**; the city's clock is the Crossing's glass dome (7a). The brief below
+> Clock Street, Meridian Court and the old plaza are one **Civic Plaza**
+> from the park to the arch (8a.1); the city's clock is the Crossing's glass
+> dome (7a). The brief below
 > is kept for its program (the Hall of the City, the council chamber, the
 > plaques), which moves into the arch; its building and clock are history.
 
@@ -2815,6 +2822,47 @@ lit markers are decorative on solid backing. The doors are part of the solid wal
   steps); Kenji crosses the plaza to the tea house at noon; on council
   evenings the plaza fills to hear the meeting from the balcony.
 
+## 8a.1 Civic Plaza, the grand square (2026-10-17, at the user's direction)
+
+**Why.** The three commercial blocks that briefly stood on the old Civic
+Plaza hid the Grand Hotel's front. They, Meridian Walk and Hotel Passage are
+gone, and the whole space from the park to City Hall is one square.
+
+**References:**
+- **Washington's National Mall:** one long axis with a reflecting pool,
+  lawns, and rows of trees along its edges.
+- **Tiananmen Square:** an open forecourt before a gate with a rostrum
+  where the nation is addressed.
+
+**The square** (data: `CIVIC_SQUARE`, checked) is 124 by 60 m, between
+Meridian North and Meridian South, from the Park Deck (x −483) to City Hall
+(x −359). From west to east:
+- **The west monument site** on the axis, where the square opens from the
+  park. Two escalator pairs come down from the Park Deck either side of it.
+- **The water mirror,** 72 by 8 m, down the axis under the high line. The
+  line's tree piers stand in the water, which doubles them and City Hall.
+  Reclaimed water, recirculated; it cools the square.
+- **Two lawns** either side of the water, crossed on the Grand Hotel's door
+  (x −457) by a walk with a fountain in each lawn: the hotel's cross-axis.
+- **Statue plinths** along the lawns' edges by the water, and the **east
+  monument site** at the water's end: a low memorial under the high line.
+- **The forecourt,** 45 m of open paving before City Hall, where the city
+  gathers to face the Rostrum. Two flagstaffs stand before the Rostrum,
+  either side of the axis, and the City Steps rise either side (8b.1).
+- **Tree rows** of shade trees along the long edges, after the Mall's elms:
+  along Meridian South, and along Meridian North only in front of the
+  Windspire. Nothing taller than a lawn or a fountain stands between the
+  hotel's front and the water.
+
+**The hotel.** The Grand Hotel faces the square across Meridian North with
+lawn, its fountain and the water before it. The Deck no longer runs along
+its front: a short glazed skybridge crosses the Park Ring west from the
+Park Deck into its mezzanine.
+
+**Open:** the subjects of the two monuments and the statues. The west site
+suggests a bronze caravan walking east up the axis, for the caravan road
+the city grew on; the east site a low memorial for the Wall Watch.
+
 ## 8b. The Meridian Arch (the East Gate), the West Gate and Meridian Court (proposed 2026-10-16, revised 2026-10-17, at the user's direction)
 
 > **City Hall (2026-10-17, at the user's direction):** the arch is now City
@@ -2863,11 +2911,7 @@ Line's station and the high line's terminus into one building.
   +12 m, its tracks running through the legs and over the opening; and the
   **high line's east terminus** on the **lower bridge** (+32 to +42 m),
   directly above it and at right angles, its platforms looking west through
-  the Timekeeper. On each leg's court face an **open cascade** of 30°
-  escalating ramps climbs the diagrid under glass canopies, glass lifts
-  beside it, through every public level (section 6c): the arch's grand
-  gesture toward the city, as the Centre Pompidou's escalator tube is
-  Paris's.
+  the Timekeeper. Its city front is in 8b.1.
 - **The top bridge** at +58 to +72 m across both legs, **cantilevered 12 m
   west** toward city hall: the **Wall Watch's command room**, looking east
   over the wall and the desert and west down the city's whole axis to the
@@ -2878,7 +2922,49 @@ Line's station and the high line's terminus into one building.
 - **Green (section 6d):** after WOHA's Parkroyal on Pickering and
   Singapore's LUSH rule, sky terraces with ghaf trees are cut into the legs'
   east faces at +18 and +48 m, greeting the desert road, and the lower
-  bridge's roof is a public sky garden, reached by the cascades.
+  bridge's roof is a public sky garden, reached by the front's scissors.
+
+### 8b.1 City Hall's city front (2026-10-17, at the user's direction)
+
+**Why.** The first cascades on the legs' faces stacked flight over flight in
+one band 16 m long. Their flights overran it, ran into each other, and
+carried both directions on one ramp. They also gave the civic seat no front
+to stand on, and no clear way to the platforms. A city hall wants a calm,
+symmetrical front with one place to stand before the city. Its station
+wants short, legible ways to every platform.
+
+**The front** (data: `ARCH['front']`, checked) mirrors about the axis:
+- **The Rostrum** at +14.2, the Wall Line's level. It is a balcony 7 m deep
+  across the whole west front and over the gate's opening, with a speaker's
+  bay on the axis, after the Gate of Heavenly Peace. Over the opening it
+  meets the Wall Line's inner platform; in each leg, portals lead through
+  to the platform.
+- **The City Steps,** one before each leg: a 4.4 m stair to climb or sit
+  on, with an up escalator on one side and a down escalator on the other.
+  They rise in two flights with a shared half-landing, from the square's
+  forecourt to the Rostrum.
+- **A glazed scissor on each leg** above the Rostrum. Every flight is a pair
+  (an up lane and a down lane), and the flights alternate between two bands
+  side by side, so no flight runs under or into another (5.5 m of
+  headroom at the closest):
+  - +14.2 to +21.8 outward;
+  - +21.8 to +29.4 inward;
+  - +29.4 to +37 outward;
+  - a gallery inward at +37 to the high line platforms' west ends;
+  - one more flight to +43 and a gallery onto the sky garden.
+- **The Wall Line's outer platform.** The landing at +21.8 crosses over the
+  tracks inside each leg, just above the train hall's ceiling, and a pair
+  goes down the leg's east side to the outer platform. Any platform reaches
+  any other without going down to the street.
+- **The high line's terminus.** The lower bridge runs out 6.5 m west of the
+  legs' faces, so the platforms' west ends meet the scissors, and 9.5 m
+  east of them, to a concourse beyond the buffer stops that joins the two
+  platforms.
+- **Lifts:**
+  - a glass lift on each leg's inner face stops at 0, +14.2, +21.8, +37
+    and +43;
+  - a second, in each leg's east side, serves the outer platform.
+
 
 **The West Gate** (data: `WEST_GATE`, checked) is the arch's plainer
 partner: two towers 22 by 16 m, 44 m high, straddling the wall either side
