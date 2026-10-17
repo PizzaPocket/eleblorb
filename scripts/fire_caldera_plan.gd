@@ -845,6 +845,9 @@ static func _on_ring(angle: float, _ring: PackedVector2Array) -> Vector2:
 # Lower city (layout section 7)
 # ---------------------------------------------------------------------------
 
+## SUPERSEDED (2026-10-17) by FireCalderaHeartworksPlan (scripts/fire_caldera_heartworks_plan.gd,
+## from tools/fire_caldera_heartworks_layout.py; docs/architecture/fire_caldera_heartworks.md).
+## Kept only until tools/validate_fire_plan.gd moves to it; do not build from these.
 ## Proposed Caldera Heartworks (2026-10-15), for spatial review before the
 ## lower city is built.  The present surface reservoir remains continuous
 ## above a lava-filled immersion throat into a spherical chamber inside the

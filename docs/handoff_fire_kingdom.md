@@ -218,14 +218,22 @@ the live-world probe verifies all six uniforms.
 - The original inner forecourt pylons and Kel–Vara cove bridge were superseded
   by the built crater-lip Tempering Gate, curved arrival gallery and shared
   Highline. Do not add them as duplicate routes.
-- The post-Lava-Helm district remains unbuilt. Its earlier room reservations
-  are now organized as the proposed **Caldera Heartworks**: a 34 m submerged
-  immersion throat beneath the continuous reservoir into an 84 m spherical
-  chamber, six shell-following rings, three controlled lava
-  falls, a deep collection basin and three enclosed return risers. Review the
-  explorable `docs/drawings/fire_caldera_3d.html` and resolve the decisions in
-  `docs/architecture/fire_caldera_heartworks.md` before changing live terrain.
-  Final shop stock and Heartworks story encounters also remain decisions for
-  the user.
+- The post-Lava-Helm district remains unbuilt. It was re-planned on
+  2026-10-17 as the **Caldera Heartworks**:
+  - the reservoir's 5 m settling shelf over a lava-filled throat;
+  - the dry Crown Gallery round the throat;
+  - an 84 m sphere 14 m down, with five shell-following rings (C1 to C5);
+  - three gated falls caught by the Renewal shelf, the Forge Arm and the
+    basin;
+  - six rooms behind the rings;
+  - three lava entries through bed portals, pressure locks and race wells;
+  - two dry crown stairs, four service shafts and three return risers.
+
+  The plan is `tools/fire_caldera_heartworks_layout.py` (it writes
+  `FireCalderaHeartworksPlan` and checks the section); the document is
+  `docs/architecture/fire_caldera_heartworks.md`; the model is
+  `docs/drawings/fire_caldera_3d.html`. Resolve the document's open questions
+  before changing live terrain. Final shop stock and Heartworks story
+  encounters also remain decisions for the user.
 - Keep the automated regressions at 0 failures whenever the walkthrough finds
   a visual, collision or circulation issue.
