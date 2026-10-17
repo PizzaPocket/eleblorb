@@ -26,7 +26,7 @@ STREETS=[
  ('Meridian North','avenue',-483,-38,-340,-30),
  ('Meridian South','avenue',-483,30,-340,38),
  ('Clock Street','lane',-397,-30,-391,30),
- ('West Street','main',-794,-6,-694,6),
+ ('West Street','main',-794,-6,-637,6),
  ('North Street','main',-566,-232,-554,-62),
  ('South Street','main',-566,62,-554,232),
  ('Arcade Street','shop',-694,-220,-686,220),
@@ -46,7 +46,7 @@ STREETS=[
 OPENS=[
  ('park',-625,-50,-495,50),
  ('Civic Plaza',-483,-30,-431,30),
- ('Library Square',-686,-30,-637,30),
+ ('Library Square',-686,-30,-637,-6),
  ('Market Square',-590,122,-530,164),
  ('Estate Square',-554,-118,-516,-84),
  ('Meridian Court',-391,-30,-359,30),
@@ -59,7 +59,7 @@ b(2,'City hall',(-431,-30,-397,30),'civic','exterior only: portico, balcony and 
 b(3,'Library',(-686,-92,-641,-30),'civic','art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)','Ada Fong, Nia Calder, Benji Okoro')
 b(4,'Natural history museum',(-637,62,-575,100),'civic','3 storeys, top-lit hall','Dr. Imani Osei (curator)')
 b(5,'Moonlight Cinema',(-730,6,-700,34),'civic','2 storeys, built later into the old town; flat above','Leon Duarte (lives above)')
-b(6,'Police box',(-652,30,-646,38),'civic','1 storey, back room','Kate Byrne')
+b(6,'Police box',(-652,6,-646,14),'civic','1 storey, back room','Kate Byrne')
 b(7,'Clinic',(-712,62,-698,80),'civic','3 storeys; flat above','Dr. Arjun Mehta (lives above)')
 b(8,'Primary school',(-664,122,-641,152),'civic','3 storeys, roof playground','Yuki Hayashi (teacher); Lily, Kofi')
 b(9,'Tea house',(-618,24,-604,36),'civic','1 storey; flat above and keeper\'s room behind','Old Fu (keeper); Kenji Mori (above)')
@@ -607,8 +607,34 @@ TOWER_SITE={
 }
 ## The BLOCK tower's form (city.md 7c, revised 2026-10-16: the BLOCK labs became mid-rise
 ## real estate, and everything of BLOCK's, Pinestein's sealed lab included, is in the tower).
-BLOCK_TOWER=dict(base=(4.0,9.0),door=(-461,47),vents=[0.3,0.55,0.8],vent=(1.4,4.5),slit=(0.35,4.0),masts=16,mast=10.0,
-  colour='blue-black glazed brick with an azure sheen at a low sun',crown='no crown and no light, except a thin azure line under the roof at night')
+## BLOCK's silhouette (city.md 7c, revised 2026-10-17 at the user's direction:
+## more menacing than a flat top). A head that looms and a face that watches:
+## the shaft rises sheer to shaft_top; the head, the director's floors, is
+## cantilevered out on every side on raking struts (Milan's Torre Velasca, a
+## fortress head bearing down on its street); its roof is a steep gable between
+## two blade horns at the corners facing Civic Plaza (Nashville's AT&T
+## "Batman" building, whose twin spires read as a cowl); and the one light is a
+## thin azure visor slit across the head's plaza face, so at night the tower
+## has eyes and nothing else (Hugh Ferriss's night towers). The horns carry the
+## antennas the old masts did.
+BLOCK_TOWER=dict(base=(4.0,9.0),door=(-461,47),vents=[0.3,0.55],vent=(1.4,4.5),slit=(0.35,4.0),masts=0,mast=10.0,
+  shaft_top=144.0,head=dict(y=(144.0,180.0),out=4.0),struts=dict(y0=116.0,per_face=3,w=1.6),
+  gable=dict(y=(180.0,198.0)),horns=dict(face='north',w=3.6,tip=226.0),visor=dict(y=(158.0,160.5),face='north',w=0.72),
+  colour='blue-black glazed brick with an azure sheen at a low sun',
+  crown='a cantilevered head on raking struts, a steep gable between two blade horns, and an azure visor slit facing Civic Plaza: the only light')
+def _block_checks():
+    from shapely.geometry import box as sbox
+    BT=BLOCK_TOWER; site=TOWER_SITE[13]; sh=site['shaft']; o=BT['head']['out']
+    plot=[b_ for b_ in B if b_['n']==13][0]['r']
+    if not sbox(*plot).contains(sbox(sh[0]-o,sh[1]-o,sh[2]+o,sh[3]+o)): problems.append(('block: the head overhangs its plot',))
+    if o<3.0: problems.append(('block: the head does not loom (overhang under 3 m)',o))
+    if not (BT['struts']['y0']<BT['shaft_top']==BT['head']['y'][0]<BT['head']['y'][1]==HEIGHTS[13]==BT['gable']['y'][0]<BT['gable']['y'][1]<BT['horns']['tip']): problems.append(('block: the silhouette is out of order',))
+    if BT['horns']['tip']>=HEIGHTS[12]: problems.append(('block: the horns outreach the Windspire',BT['horns']['tip']))
+    if not (BT['head']['y'][0]<BT['visor']['y'][0]<BT['visor']['y'][1]<BT['head']['y'][1]): problems.append(('block: the visor is not in the head',))
+    # the face looks at Civic Plaza: the plaza lies off the face the horns and the visor are on
+    plaza=[o_ for o_ in OPENS if o_[0]=='Civic Plaza'][0]
+    if BT['horns']['face']!=BT['visor']['face'] or not (BT['visor']['face']=='north' and plaza[4]<=sh[1]): problems.append(('block: its face does not look at Civic Plaza',))
+
 TURBINES=[(-310,-200),(-310,200),(-740,-270),(-740,270)]
 ## The Deck (city.md 6.2 and 6a): the walkway at +6.5 m, after Hong Kong's
 ## footbridges. Every run has a job: the ring shades the park side of the Park
@@ -1035,15 +1061,18 @@ ARCH=dict(legs=[(-362,-30,-340,-12),(-362,12,-340,30)],lower=(32.0,42.0),top=(58
   opening=24.0,wall_line=12.0,
   cores=[dict(name='north leg',c=(-365.2,-21),size=(6.4,16.0),levels=[0,12,37,43],lifts=2,enclosure='open cascade',canopy=3.2,lift=(2.6,2.6)),
          dict(name='south leg',c=(-365.2,21),size=(6.4,16.0),levels=[0,12,37,43],lifts=2,enclosure='open cascade',canopy=3.2,lift=(2.6,2.6))],
+  # the Wall Line's train hall: a void through both legs at +12 m (v: across the wall, outward positive, from the wall's
+  # centreline; y: floor and ceiling), holding both tracks and the station's platform on the outer side
+  train_hall=dict(v=(-7.0,5.5),y=(12.0,21.0)),
   program='the station hall at the street, the Wall Line\'s station at +12 m, the high line\'s at +36 m, city offices in the legs, the Wall Watch\'s command room at the top',
   skin='a diagrid of pale ceramic-clad steel over glass')
 ## The West Gate's towers (city.md 8b, revised 2026-10-16): the same idea at the
 ## west, smaller: two towers straddling the wall either side of West Street, the
 ## Wall Line through them at +12 m, the high line's west station on the bridge
 ## between them at +36 m, a siding for its trains beyond.
-WEST_GATE=dict(towers=[(-782,-26,-760,-10),(-782,10,-760,26)],bridge=(32.0,42.0),top=44.0,
-  cores=[dict(name='north tower',c=(-771,-18),size=(6.4,15.0),levels=[0,12,37],lifts=2,enclosure='open loggia',canopy=3.2,lift=(2.6,2.6)),
-         dict(name='south tower',c=(-771,18),size=(6.4,15.0),levels=[0,12,37],lifts=2,enclosure='open loggia',canopy=3.2,lift=(2.6,2.6))])
+WEST_GATE=dict(towers=[(-782,-26,-760,-10),(-782,10,-760,26)],bridge=(32.0,42.0),top=44.0,train_hall=dict(v=(-7.0,5.5),y=(12.0,21.0)),
+  cores=[dict(name='north tower',c=(-778,-18),size=(6.4,15.0),levels=[0,12,37],lifts=2,enclosure='open loggia',canopy=3.2,lift=(2.6,2.6)),
+         dict(name='south tower',c=(-778,18),size=(6.4,15.0),levels=[0,12,37],lifts=2,enclosure='open loggia',canopy=3.2,lift=(2.6,2.6))])
 ## Green infrastructure (city.md 6d, user 2026-10-17): after Singapore's City in
 ## a Garden, every line, station and civic structure carries its own planting,
 ## on Moy's terms: a desert palette that the reclaimed water can afford, drip-fed
@@ -1215,6 +1244,22 @@ def _cross_checks():
             if g.distance(g2)<3: problems.append(('west gate: a tower against a building',tw,n_))
     if not (W['bridge'][0]<me['rail']-X['depth'] and me['rail']+X['car_h']<W['bridge'][1]): problems.append(('west gate: the bridge does not hold the high line',))
     if not (W['towers'][0][0]-6<=st['at'][0]<=W['towers'][0][2]+6): problems.append(('west gate: the station is not between the towers',))
+    # the Wall Line runs through the gate buildings in a train hall: for each leg or tower, the hall is a straight void set
+    # on the wall's centreline at the leg's middle; along the leg's whole length the cars on both tracks and the outer
+    # platform must clear its sides by 0.5 m, its ceiling must clear the cars by 3 m, and the piers beside it stay 1 m thick
+    WL=WALL; cw=WL['line']['car'][1]/2
+    need=(WL['track_axis']-WL['track_spacing']/2-cw, WL['track_axis']+WL['track_spacing']/2+cw+0.1+WL['platform'][1])
+    for host,legs,sg in (('arch',ARCH['legs'],1),('west gate',WEST_GATE['towers'],-1)):
+        H_=(ARCH if host=='arch' else WEST_GATE)['train_hall']; xs=[]
+        for lg in legs:
+            cx_=lambda z: CX+sg*math.sqrt(WL['r']**2-z**2)
+            zm=(lg[1]+lg[3])/2; hx=sorted((cx_(zm)+sg*H_['v'][0],cx_(zm)+sg*H_['v'][1])); xs.append([round(hx[0],2),round(hx[1],2)])
+            for z in range(int(lg[1]),int(lg[3])+1):
+                e=sorted((cx_(z)+sg*need[0],cx_(z)+sg*need[1]))
+                if e[0]<hx[0]+0.5 or e[1]>hx[1]-0.5: problems.append(('%s: the Wall Line fouls its train hall'%host,lg,z)); break
+            if hx[0]-lg[0]<1.0 or lg[2]-hx[1]<1.0: problems.append(('%s: a pier beside the train hall too thin'%host,lg))
+        if H_['y'][1]-(WL['height']+0.4+WL['line']['car'][2])<3.0 or H_['y'][0]>WL['height']: problems.append(('%s: the train hall too low'%host,))
+        H_['x']=xs
     # every station core links all its levels with lifts and with escalating ramps in flights the angle allows
     E=X['esc']
     for host,cores in (('crossing',CROSSING['cores']),('arch',A['cores']),('west gate',W['cores'])):
@@ -1235,6 +1280,8 @@ def _cross_checks():
                 ct=[o for o in OPENS if o[0]=='Meridian Court'][0]
                 if not sbox(*ct[1:]).contains(g): problems.append(('arch: a cascade outside Meridian Court',c['name']))
             if c.get('enclosure') not in ('open frame','open cascade','open loggia'): problems.append(('station: an enclosed core',host,c['name']))
+            for hx in ((ARCH if host=='arch' else WEST_GATE if host=='west gate' else {}).get('train_hall',{}).get('x') or []):
+                if g.intersects(sbox(hx[0],-300,hx[1],300)) and host!='crossing' and any(sbox(*lg).intersects(g) for lg in (ARCH['legs'] if host=='arch' else WEST_GATE['towers'])): problems.append(('station: a core in the train hall',host,c['name']))
             if host=='west gate' and not any(sbox(*tw).contains(g) for tw in W['towers']): problems.append(('west gate: a core outside its tower',c['name']))
     # the Crossing Ring: open, inside the park, clear of its gardens, the pond, the playground and the wind trees
     C=CROSSING; ring=Point(C['c']).buffer(C['ring'][1],64)
@@ -1258,6 +1305,7 @@ def _cross_checks():
         if pond.distance(Point(t[:2]))<t[3]+1 or sbox(*PARK['lawn']).distance(Point(t[:2]))<t[3]: problems.append(('park: a playground tower on the pond or the lawn',t))
     for t in PARK['wind_trees']:
         if pond.contains(Point(t)) or play.distance(Point(t))<3: problems.append(('park: a wind tree on the pond or the playground',t))
+_block_checks()
 _cross_checks()
 if '--wall' in sys.argv:
     print(WALL['length'],WALL['min_radius'],WALL['station_gaps']); [print(st) for st in WALL['stations']]

@@ -1128,9 +1128,14 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     windowless, watching the city's living room. Shade trees,
     misters and benches; Pia busks here; the Deck's two plaza ramp towers
     frame the axis under the skybridges.
-  - **Library Square**, on the park's west side where West Street arrives,
-    with the library's curved front and its portal along the north side,
-    and broad sitting steps before it.
+  - **Library Square**, on the park's west side, the library's forecourt
+    between its curved front and West Street (revised 2026-10-17: halved).
+    It was 49 by 60 m, as big as Civic Plaza, and its south half beyond
+    West Street had no job, so West Street now runs on through to the Park
+    Ring, the square keeps the library's side (49 by 24 m, the portal, the
+    broad sitting steps and the shade trees), and the south half is
+    built up as an ordinary block of the market lanes' houses round a
+    courtyard. The police box faces West Street, opposite the library.
   - **Market Square**, on South Street, ringed by stalls by day and by the
     night market after dark, with the wet market hall on its east side.
   - **Estate Square**, on North Street in the North Estate: the estate's
@@ -1528,6 +1533,19 @@ Central or Tokyo's Marunouchi.
   - **33 Thomas Street, New York:** a windowless granite skyscraper (the
     telephone exchange) with ventilation hoods where windows should be.
   - **Boston City Hall:** the mass looming over a recessed base.
+  - **Revised 2026-10-17 (user): a menacing silhouette, not a flat top.**
+    A flat-topped box reads as a filing cabinet, not a threat. What makes a
+    skyline figure menacing is a **head** and a **face**: mass that grows
+    toward the top and bears down, and a profile that reads as something
+    looking back. So:
+    - **The AT&T Building ("the Batman building"), Nashville:** twin
+      spires flanking a pointed crown read as a cowl's ears, a face on the
+      skyline.
+    - **Torre Velasca, Milan:** its top floors cantilever out on raking
+      struts, so the tower is top-heavy and looms over its street like a
+      fortress head.
+    - **Hugh Ferriss's night towers:** buildings drawn as dark masses with
+      almost no light, so the little light there is reads as eyes.
 - **Form:**
   - a blue-black glazed brick shaft, 26 by 24 m, in a city of pale tile;
     at a low sun it shows an azure sheen, the city blorbs' colour;
@@ -1535,17 +1553,29 @@ Central or Tokyo's Marunouchi.
     (at 30, 55 and 80% of its height) that breathe warm air at night;
   - its base set back 4 m and 9 m high, so the shaft hangs over its own
     door;
-  - **no crown and no light**, in a skyline where every other tower is lit:
-    only a thin azure line under the roof at night, and a ring of
-    grounding masts above it.
+  - **the shaft rises sheer to 144 m**; there, on raking struts that spring
+    from the shaft at 116 m, three to a face, the **head** (Dr. Kask's
+    floors, 144 to 180 m) cantilevers 4 m out on every side, so the top of
+    the tower is wider than the tower and leans over the forecourt;
+  - **a steep gable** (to 198 m) between **two blade horns** at the head's
+    two corners facing Civic Plaza, tapering to points at 226 m: from the
+    plaza the tower wears a cowl. The horns carry its antennas. It stays
+    below the Windspire (262 m);
+  - **one light**, in a skyline where every other tower is lit: a thin
+    azure **visor slit** across the head's plaza face at 158 m, the colour
+    of the city blorbs. At night the tower is a dark mass with eyes.
+  - Checked in the layout: the head stays inside the plot and overhangs at
+    least 3 m; the silhouette rises in order (struts, head, gable, horns);
+    the horns and visor face Civic Plaza; the horns stay below the
+    Windspire.
 - **Site:** a forecourt of bare pale paving in full sun on Meridian South,
   no bench and no tree, and **one door**; the rest of the plot is black
   gravel, raked every morning, that no one walks on. It is the only tower
   without a life at its foot, and that is the point. It stays off the Deck.
 - **Who:** Dr. Vera Kask, the director, lives on the top floors and is rarely
   seen at street level. No one else the hero knows works there (below).
-- **Play:** the vent hoods are the only holds; the masts are anchors no one
-  should swing from.
+- **Play:** the vent hoods are the only holds; the struts and the horns are
+  anchors no one should swing from.
 
 **3. The north tower** (the start-up floors, about 45 storeys, 175 m)
 - **Idea:** a tower that changes as its tenants come and go.
@@ -1601,7 +1631,7 @@ for the evil activities and people to be concentrated there).
 - **The work never stopped.** The living-current work that made the city
   blorbs goes on. At night the tower draws more power than the rest of
   downtown together (Omar Haddad sees it on the battery works' meters
-  and says nothing), and the thin azure line under its roof is the colour of the city blorbs.
+  and says nothing), and the azure visor across its head is the colour of the city blorbs.
   Proposed: Kask lures city blorbs in from the desert with the grid's power
   to study and drain them, the very creatures the city banned and fears.
 - **Pinestein knows.** He watches BLOCK from his roof in Old Moy, and the
@@ -1812,7 +1842,7 @@ Square (section 6, the Deck).
 | — | The Meridian Arch (the East Gate) | two legs 22 × 18 m straddling the wall, 72 m high (8b) | the East Gate's station on three levels; city offices; the Wall Watch's command room | — |
 | — | The West Gate | two towers 22 × 16 m straddling the wall, 44 m high (8b) | the West Gate's station: the Wall Line and the high line's west station | — |
 | 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, twisting, with three wind gaps (7c) | the Windworks (headquarters, observation deck) |
-| 13 | BLOCK tower | 40 × 40 m | about 45 storeys, 180 m, a windowless dark shaft (7c) | BLOCK's headquarters; Dr. Vera Kask (director, top floors) |
+| 13 | BLOCK tower | 40 × 40 m | about 45 storeys, 180 m, a windowless dark shaft under a cantilevered head, horns to 226 m (7c) | BLOCK's headquarters; Dr. Vera Kask (director, top floors) |
 | 14 | North tower | 40 × 40 m | about 45 storeys, 175 m, plug-in capsule offices (7c) | start-up floors (Theo Park) |
 | 15 | South tower | 40 × 40 m | about 40 storeys, 150 m, dune balconies (7c) | flats over offices; Tanglewire (Dan) |
 
@@ -2541,6 +2571,16 @@ Line's station and the high line's terminus into one building.
   by 18 m, 72 m high, clad in a diagrid of pale ceramic-clad steel over
   glass (Moy's tile in the CCTV's structural pattern). The avenue passes
   between them through a **24 m opening**, the grandest gate in the city.
+- **The Wall Line's train hall (2026-10-17):** the wall's trains must not
+  run into the legs, so a **train hall** is cut through both legs at +12
+  to +21 m, a straight void between two piers in each leg, set on the
+  wall's line and sized for its curve: both tracks and the station's
+  platform (on the outer side) clear its sides by at least 0.5 m along the
+  leg's whole length, its lit ceiling clears the cars by 3 m, and the piers
+  beside it stay at least 1 m thick, the diagrid left off the hall's mouth
+  (checked in the layout). Between the legs the platform crosses the
+  avenue's opening under a glass canopy. The West Gate's towers have the
+  same hall, their escalator cores moved into the outer piers clear of it.
 - **Three levels of station:** a glazed **station hall** at the foot of each
   leg opening on Meridian Court; the **Wall Line's East Gate station** at
   +12 m, its tracks running through the legs and over the opening; and the
