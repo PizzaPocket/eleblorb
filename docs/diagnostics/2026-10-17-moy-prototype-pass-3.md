@@ -126,3 +126,14 @@ data needs an owner decision on which measurement is authoritative.
   pass-3 runtime validator, checker and rendered walk were not rerun after
   these follow-ups. Escalator animation, physical vine appearance and rendered
   performance remain unverified in a live walk.
+
+## Push-time CityPlan validator correction
+
+The pre-push city check exposed a validator assumption that every street must
+enter the Rim Walk. Meridian Avenue is authored as an exterior East Gate
+approach: its plan rectangle lies just east of the Rim boundary while touching
+the Civic Plaza open area. `tools/validate_city_plan.gd` now accepts an
+outside-Rim street only when its named wall gate anchor is on that street and
+it joins a plan-defined public open. The CityPlan layout and generated bake
+were not changed. Verification: `tools/check_moy_bake.py` passed and
+`validate_city_plan` reported 24 streets, 50 buildings, 133 lots, 0 failures.

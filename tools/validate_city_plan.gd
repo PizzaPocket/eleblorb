@@ -258,6 +258,8 @@ func _check_streets() -> void:
 				inside.append(t)
 			t += STEP
 		if inside.is_empty():
+			if _is_connected_gate_approach(s):
+				continue
 			_fail("%s lies wholly outside the Rim Walk" % s["name"])
 			continue
 		for end_t in [inside[0] - STEP, inside[inside.size() - 1] + STEP]:
@@ -272,6 +274,25 @@ func _check_streets() -> void:
 				k += STEP
 			if not met:
 				_fail("%s dead-ends at %s" % [s["name"], str(end_t)])
+
+
+## Gate roads may run outside the Rim Walk as an approach from the desert.
+## They are valid only when the authored wall gate sits on the road and the
+## road joins a plan-defined public city open area (the East Gate joins Civic
+## Plaza at its eastern edge).
+func _is_connected_gate_approach(street: Dictionary) -> bool:
+	var street_rect: Rect2 = street["rect"]
+	for gate in CityPlan.WALL.gates:
+		if String(gate.street) != String(street["name"]):
+			continue
+		var gate_point := Vector2(float(gate.p[0]), float(gate.p[1]))
+		if not street_rect.grow(0.1).has_point(gate_point):
+			continue
+		for open_area in CityPlan.OPENS:
+			var open_rect: Rect2 = open_area["rect"]
+			if street_rect.grow(0.25).intersects(open_rect.grow(0.25)):
+				return true
+	return false
 
 
 func _in_other_street_or_open(p: Vector2, me: int) -> bool:
