@@ -5,9 +5,32 @@
 only what changes.** If this document and the data disagree, the data wins:
 report it.
 
-The third pass was not on GitHub when this was written (main only, no other
-branches or pull requests). Push it first, so it can be reviewed against this
-brief.
+## 0. Review of the third pass
+
+Pushed late on 2026-10-17 (`a38fa97`, `2549ea4`); its diagnostic is
+`docs/diagnostics/2026-10-17-moy-prototype-pass-3.md`.
+
+Good, keep it:
+- the flat annuli and continuous helix strips, with per-contact tangent travel;
+- the open lower bridges at both gates;
+- the moving tread belts with their closed returns;
+- the call-post and destination-menu lifts;
+- the honest list of what was not physically verified.
+
+To settle:
+1. **Platform edge.** The 7.5 cm boarding gap is authoritative. Keep your
+   builder's offset (track, plus car half-width, plus 0.075, plus platform
+   half-width). `PLATFORMS.edge` in the data is wrong by 0.475 m. Correcting
+   it moves the station escalators, so it will be fixed in a later plan pass.
+   Until then, your offset wins.
+2. **Generated files.** `scripts/city_plan.gd` is generated. Never edit it by
+   hand. If regenerating on your machine gives different rounding, say so in
+   the diagnostic.
+3. **Still owed from pass 3:**
+   - the rendered performance probe;
+   - a physical walk and ride of every escalator, ramp and lift end, by both
+     characters;
+   - all four clock faces at 3:00, 9:15 and 12:00.
 
 ## 1. Read first
 
@@ -55,6 +78,9 @@ brief.
    may enter the band's volume up to 2.6 m above the treads.
 
 ## 3. Checks
+
+- The building count drops from 50 to 47 (buildings 54 to 56 are gone).
+  Update `check_moy_bake.py` and the validators, then rebake.
 
 - `python3 tools/city_layout.py` passes (it checks the square, the front's
   bands, its headroom and the beams' clearance).
