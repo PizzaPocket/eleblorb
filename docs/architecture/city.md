@@ -1,5 +1,7 @@
 # Moy, the city: settlement plan (first real pass)
 
+> **Building Moy in the game?** Start with `moy_build_handoff.md`: the data to build from, the order, the rules and the loose ends (2026-10-17).
+
 Status: survey, community brief and settlement concept, second pass, for
 review (2026-10-12; revised the same day: no cars or trains, a dense
 walkable Tokyo and Hong Kong neighbourhood, everyone named; third revision
