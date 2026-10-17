@@ -17,6 +17,14 @@ if [ ! -x "$GODOT_BIN" ]; then
 fi
 
 # The fishing village is validated from its plan alone, before anything is built.
+if [ "${VILLAGE:-ohio}" = "china" ]; then
+	python3 "$ROOT/tools/check_chinese_bake.py"
+	"$GODOT_BIN" --headless --path "$ROOT" --script tools/validate_chinese_village_plan.gd
+	"$GODOT_BIN" --headless --path "$ROOT" tools/validate_chinese_runtime.tscn
+	"$GODOT_BIN" --headless --path "$ROOT" tools/validate_chinese_platforming.tscn
+	exit $?
+fi
+
 if [ "${VILLAGE:-ohio}" = "fishing" ]; then
 	"$GODOT_BIN" --headless --path "$ROOT" tools/validate_fishing_plan.tscn
 	exit $?

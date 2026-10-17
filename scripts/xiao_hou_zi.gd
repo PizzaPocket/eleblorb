@@ -558,7 +558,7 @@ func _update_ai(delta: float) -> void:
 ## never leaves ground level the way a flying blorb or a climbing player
 ## can.
 func _ground_height_at(x: float, z: float) -> float:
-	var terrain_h: float = terrain.get_mesh_height(x, z)
+	var terrain_h: float = LiquidEnvironment.water_floor_height(terrain,Vector2(x,z))
 	for candidate in get_tree().get_nodes_in_group("blorbs"):
 		if not candidate is Blorb:
 			continue
@@ -575,9 +575,9 @@ func _ground_height_at(x: float, z: float) -> float:
 ## lake water, or null if he should just rest on ground_h as normal --
 ## mirrors blorb.gd's own inline lake-float check in _process().
 func _lake_float_y(ground_h: float) -> Variant:
-	if not terrain.is_lake_area(Vector2(global_position.x, global_position.z)):
+	if not LiquidEnvironment.has_water(terrain,Vector2(global_position.x,global_position.z)):
 		return null
-	var water_level: float = terrain.get_lake_water_level()
+	var water_level: float = LiquidEnvironment.water_surface_height(terrain,Vector2(global_position.x,global_position.z))
 	if water_level - ground_h < LAKE_FLOAT_MIN_DEPTH:
 		return null
 	return water_level - STANDING_HEIGHT * LAKE_FLOAT_SUBMERGENCE_FRACTION

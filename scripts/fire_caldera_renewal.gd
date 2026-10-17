@@ -3,10 +3,10 @@ extends RefCounted
 
 ## The Renewal terrace (fire_caldera_buildings.md, section 3; landmark) is a
 ## public extension of the Highline rather than a rock ghat. Two communal glass
-## byways arrive at opposite landward sides of a broad transparent deck. From
+## byways arrive at opposite sides of a broad transparent deck. From
 ## its reservoir face, one gently sloped SuperEgg tongue enters the lava and
 ## reaches the half-sunk refractory threshold to the renewal chamber. The
-## multiple approaches let gatherings circulate without turning the ritual
+## paired approaches let gatherings circulate without turning the ritual
 ## descent into a dead end.
 ##
 ## Cast-basalt memory stones face the water along the landward edge; beneath a
@@ -57,50 +57,103 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> Static
 
 ## The public renewal deck uses the Highline's glass-and-dark-metal language.
 ## It is a light civic platform over one supertoroidal service pier, with two
-## landward access points and one broad SuperEgg immersion tongue.  There is no
+## side access points and one broad SuperEgg immersion tongue. There is no
 ## rock tray, retaining lip, or monumental stair between people and the lava.
 static func build_foundation(parent: Node3D, entry: Dictionary, line: Dictionary) -> StaticBody3D:
 	var datum := float(line["datum"])
 	var body := CalderaShell.make_body(parent, entry, datum)
 	body.name = "%sPlinth" % entry["id"]
-	var glass := Color(0.32, 0.66, 0.76, 0.38)
-	CalderaShell.soft_slab(body, "RenewalGlassDeck", Vector3(0.0, -0.14, 0.0), Vector3(11.3, 0.14, 9.3), Vector2(10.8, 8.8), glass)
+	var glass := Color(0.32, 0.66, 0.76, 0.34)
+	CalderaShell.soft_slab(body, "RenewalGlassDeck", Vector3(0.0, -0.11, 0.0), Vector3(11.3, 0.11, 9.3), Vector2(10.8, 8.8), glass)
 	var edge := PackedVector3Array()
-	for i in 48:
-		var angle := TAU * float(i) / 48.0
+	const EDGE_SEGMENTS := 192
+	for i in EDGE_SEGMENTS:
+		var angle := TAU * float(i) / float(EDGE_SEGMENTS)
 		var c := cos(angle)
 		var s := sin(angle)
-		edge.append(Vector3(signf(c) * pow(absf(c), 2.0 / 7.0) * 11.18, -0.03, signf(s) * pow(absf(s), 2.0 / 7.0) * 9.18))
-	for i in edge.size():
-		CalderaShell._beam(body, edge[i], edge[(i + 1) % edge.size()], Vector2(0.13, 0.13), IRON)
+		edge.append(Vector3(signf(c) * pow(absf(c), 2.0 / 7.0) * 11.18, -FireCalderaHighline.DECK_THICKNESS + 0.05, signf(s) * pow(absf(s), 2.0 / 7.0) * 9.18))
+	# The structural edge tube is built as runs around the three real portals.
+	# In particular the immersion ramp starts on the same perimeter points, so
+	# no uninterrupted bar crosses its wide mouth.
+	var edge_run := PackedVector3Array()
+	for i in EDGE_SEGMENTS:
+		var point := edge[i % EDGE_SEGMENTS]
+		var next := edge[(i + 1) % EDGE_SEGMENTS]
+		if i < EDGE_SEGMENTS and _renewal_guard_opening((point + next) * 0.5):
+			if edge_run.size() >= 2:
+				FireCalderaHighline._tube(body, edge_run, 0.13, IRON, "RenewalDeckRim")
+			edge_run = PackedVector3Array()
+			continue
+		if edge_run.is_empty():
+			edge_run.append(point)
+		edge_run.append(next)
+	if edge_run.size() >= 2:
+		FireCalderaHighline._tube(body, edge_run, 0.13, IRON, "RenewalDeckRim")
+	_platform_guards(body)
 	FireCalderaHighline._supertoroidal_pier(body, Vector2.ZERO, Vector2.RIGHT, Vector2.DOWN, Vector2(10.95, 8.95), float(line["low"]) - datum - 2.2, -0.30, "RenewalSupertoroidalServicePier")
 	_immersion_tongue(body, datum)
 	return body
 
 
+## The platform is an outdoor room above the lava, so its exposed perimeter is
+## guarded. Three deliberate openings align with the two Highline side
+## approaches and the immersion descent on the reservoir edge.
+static func _platform_guards(body: StaticBody3D) -> void:
+	const SIDES := 192
+	const HALF := Vector2(11.18, 9.18)
+	const EXPONENT := 7.0
+	var edge := PackedVector3Array()
+	for i in SIDES + 1:
+		var angle := TAU * float(i) / float(SIDES)
+		var c := cos(angle)
+		var s := sin(angle)
+		edge.append(Vector3(signf(c) * pow(absf(c), 2.0 / EXPONENT) * HALF.x, 0.0, signf(s) * pow(absf(s), 2.0 / EXPONENT) * HALF.y))
+	var run := PackedVector3Array()
+	for i in SIDES:
+		var a := edge[i]
+		var b := edge[i + 1]
+		var midpoint := (a + b) * 0.5
+		if _renewal_guard_opening(midpoint):
+			if run.size() >= 2:
+				FireCalderaHighline._tube(body, run, 0.08, IRON, "RenewalPerimeterRail")
+				FireCalderaHighline._rail_cap(body, run[0], 0.08, "RenewalPerimeter")
+				FireCalderaHighline._rail_cap(body, run[-1], 0.08, "RenewalPerimeter")
+			run = PackedVector3Array()
+			continue
+		if run.is_empty():
+			run.append(a + Vector3.UP * 1.16)
+		run.append(b + Vector3.UP * 1.16)
+		FireCalderaHighline._path_guard(body, a, b, Vector3.UP)
+	if run.size() >= 2:
+		FireCalderaHighline._tube(body, run, 0.08, IRON, "RenewalPerimeterRail")
+		FireCalderaHighline._rail_cap(body, run[0], 0.08, "RenewalPerimeter")
+		FireCalderaHighline._rail_cap(body, run[-1], 0.08, "RenewalPerimeter")
+
+
+static func _renewal_guard_opening(point: Vector3) -> bool:
+	# The edge windows are route-width plus 0.28 m tolerance, cut through the
+	# same fine perimeter tessellation as the glass guard.
+	var side_approach := absf(point.x) > 10.45 and absf(point.z) < 1.85
+	var immersion := point.z > 8.85 and absf(point.x) < 3.08
+	return side_approach or immersion
+
+
 static func _immersion_tongue(body: StaticBody3D, datum: float) -> void:
-	# Begin at the lava-facing deck edge. The former tongue began near the
-	# pavilion centre and pitched down through the glass foundation itself.
-	var start := Vector3(0.0, 0.02, 8.15)
-	var finish := Vector3(0.0, FireCalderaGround.LAVA_Y - datum - 1.2, 15.0)
-	var delta := finish - start
-	var run := Vector2(delta.x, delta.z).length()
-	var pitch := -atan2(delta.y, run)
-	var basis := Basis(Vector3.RIGHT, pitch)
-	var middle := start.lerp(finish, 0.5)
-	CalderaShell.soft_slab(body, "ImmersionTongue", middle - basis.y * 0.11, Vector3(3.2, 0.11, delta.length() * 0.5), Vector2(3.0, delta.length() * 0.5 - 0.18), Color(0.30, 0.62, 0.72, 0.44), basis)
-	for side: float in [-1.0, 1.0]:
-		var offset := basis.x * side * 3.05
-		CalderaShell._beam(body, start + offset + basis.y * 1.12, finish + offset + basis.y * 1.12, Vector2(0.09, 0.09), IRON)
-		var pane := BoxMesh.new()
-		pane.size = Vector3(0.04, 1.0, delta.length())
-		var visual := MeshInstance3D.new()
-		visual.name = "ImmersionGuard"
-		visual.mesh = pane
-		visual.material_override = SolidModel.material(Color(0.42, 0.72, 0.80, 0.22), 0.12, 0.02)
-		visual.transform = Transform3D(basis, middle + offset + basis.y * 0.56)
-		body.add_child(visual)
-		CollisionPolicy.add_box(body, visual, pane.size, visual.position, visual.basis, false)
+	# The walk begins exactly at the deck edge and continues in the deck's thin
+	# glass cassette. Low refractory lips mark the two edges without enclosing
+	# the bathing route or blocking entry at the lava line.
+	var points := PackedVector3Array([
+		Vector3(0.0, 0.0, 9.18),
+		Vector3(0.0, FireCalderaGround.LAVA_Y - datum - 1.2, 15.0),
+	])
+	# A ceremonial descent is a broad communal apron rather than a narrow
+	# circulation ramp. Its six-metre mouth is aligned to the cut in the deck rim
+	# and perimeter guard above.
+	var junction := {
+		"join_left_pipe": Vector3(-2.88, -FireCalderaHighline.DECK_THICKNESS + 0.05, 9.18),
+		"join_right_pipe": Vector3(2.88, -FireCalderaHighline.DECK_THICKNESS + 0.05, 9.18),
+	}
+	FireCalderaHighline._build_glass_path(body, points, 6.0, "ImmersionTongue", "metal", junction)
 
 
 ## At the foot of the immersion tongue, half sunk at the lava, a refractory

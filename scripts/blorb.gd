@@ -1956,8 +1956,8 @@ func _process(delta: float) -> void:
 		ground_h = resolve_dismount_landing_position(global_position).y
 	var in_deep_water := false
 	var water_level := 0.0
-	if blorb_type != "size" and terrain.is_lake_area(Vector2(global_position.x, global_position.z)):
-		water_level = terrain.get_lake_water_level()
+	if blorb_type != "size" and LiquidEnvironment.has_water(terrain,Vector2(global_position.x,global_position.z)):
+		water_level = LiquidEnvironment.water_surface_height(terrain,Vector2(global_position.x,global_position.z))
 		in_deep_water = water_level - ground_h >= LAKE_FLOAT_MIN_DEPTH
 	# Air blorbs never gain underwater flight. In deep water they remain at
 	# the surface; only Water blorbs can deliberately traverse its volume.
@@ -2015,8 +2015,8 @@ func _process(delta: float) -> void:
 	# Its ordinary XZ following/wandering above remains unchanged, so party
 	# members naturally gather and drift around a swimming player.
 	var lake_float := false
-	if blorb_type != "size" and terrain.is_lake_area(Vector2(global_position.x, global_position.z)):
-		water_level = terrain.get_lake_water_level()
+	if blorb_type != "size" and LiquidEnvironment.has_water(terrain,Vector2(global_position.x,global_position.z)):
+		water_level = LiquidEnvironment.water_surface_height(terrain,Vector2(global_position.x,global_position.z))
 		lake_float = water_level - ground_h >= LAKE_FLOAT_MIN_DEPTH and element_state != "rock"
 		if lake_float:
 			_hop_active = false
@@ -2155,7 +2155,7 @@ func _ground_height_at(x: float, z: float) -> float:
 	# Explicit : float, not := -- terrain is typed as plain Node (see this
 	# file's @onready var), so GDScript can't infer get_mesh_height()'s
 	# return type through type inference alone.
-	var terrain_h: float = terrain.get_mesh_height(x, z)
+	var terrain_h: float = LiquidEnvironment.water_floor_height(terrain,Vector2(x,z))
 	var ground_xz := Vector2(x, z)
 	# Fire blorbs alone can rest directly on molten lava. Raise their
 	# effective support to the visible sheet; without this, the underlying
@@ -2430,8 +2430,8 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	# height would otherwise place him. Mirrors the free-roaming follower's
 	# own lake_float check above, just evaluated here instead since a
 	# player-controlled body skips the rest of _process() entirely.
-	if blorb_type != "size" and element_state != "rock" and terrain.is_lake_area(next):
-		var water_level: float = terrain.get_lake_water_level()
+	if blorb_type != "size" and element_state != "rock" and LiquidEnvironment.has_water(terrain,next):
+		var water_level: float = LiquidEnvironment.water_surface_height(terrain,next)
 		if water_level - ground_h >= LAKE_FLOAT_MIN_DEPTH:
 			var visible_height := BODY_HEIGHT * size_multiplier * vertical_scale
 			rest_y = water_level - visible_height * LAKE_FLOAT_SUBMERGENCE_FRACTION
@@ -2489,7 +2489,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	# surface normal here too, including while idle, so an old slope tilt can
 	# never remain frozen after Blorbus reaches flatter ground.
 	var support_normal := Vector3.UP
-	if blorb_type != "size" and not terrain.is_lake_area(next):
+	if blorb_type != "size" and not LiquidEnvironment.has_water(terrain,next):
 		support_normal = _surface_normal_at(next.x, next.y, ground_h)
 	_update_surface_tilt(delta, support_normal)
 

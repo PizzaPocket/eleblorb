@@ -125,8 +125,7 @@ const ICE_GATE_DRESSING_RADIUS := 55.0
 ## (harmless, but pointless -- they'd land far below anything visible) or
 ## through the village's own floating islands.
 const CHINESE_VILLAGE_CENTER := Vector2(250.0, -650.0)
-## Matches terrain_generator.gd's own CHINESE_VILLAGE_ABYSS_RADIUS +
-## CHINESE_VILLAGE_ABYSS_TRANSITION (170 + 50) with a little margin.
+## Clears the full 170–216 m plan rim with a small margin.
 const CHINESE_VILLAGE_EXCLUSION_RADIUS := 230.0
 ## Two wandering NPCs out in the wilderness, per direct instruction --
 ## "no backstory yet, just make it up for now as placeholder." Hand-set

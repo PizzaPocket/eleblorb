@@ -121,3 +121,93 @@ static func side_hair_anchor(semi_axes: Vector3, style: String, side: float) -> 
 		"position": Vector3(0.0, y, 0.0) + outward * radius,
 		"outward": outward,
 	}
+
+
+## China village kit; every attachment reads the hairstyle's authored envelope.
+static func build_village_headwear(head: MeshInstance3D, axes: Vector3, style: String, kind: String, color: Color) -> Node3D:
+	var mount := Node3D.new()
+	mount.name="VillageHeadwear"
+	head.add_child(mount)
+	var edges := FigureHair.hair_edges(style,axes)
+	var top: float=maxf(float(edges.top),axes.y)
+	if kind in ["wrap","kerchief"]:
+		var band := SuperEgg.build_part(Vector3(float(edges.width)+0.008,0.028,(absf(float(edges.back))+absf(float(edges.front)))*0.5+0.006),color,SuperEgg.EPSILON_SOFT,SuperEgg.EPSILON_FLAT)
+		band.name="TopknotWrap"
+		band.position=Vector3(0,top*0.73,(float(edges.front)+float(edges.back))*0.5)
+		mount.add_child(band)
+		if kind=="kerchief":
+			var cap:=SuperEgg.build_part(Vector3(float(edges.width)+0.008,0.045,axes.z*0.92),Color(0.78,0.78,0.69),SuperEgg.EPSILON_SOFT,SuperEgg.EPSILON_FLAT)
+			cap.position=Vector3(0,top-0.025,-0.025)
+			mount.add_child(cap)
+		var knot:=SuperEgg.build_part(Vector3(0.035,0.025,0.025),color,2.0,2.0)
+		knot.position=Vector3(0,top*0.75,float(edges.back)-0.01)
+		mount.add_child(knot)
+	elif kind=="pin":
+		var anchor:=side_hair_anchor(axes,style,1.0)
+		var pin:=SuperEgg.build_part(Vector3(0.11,0.007,0.007),Color(0.61,0.49,0.34),2.0,2.0)
+		pin.name="BunHairpin"
+		pin.position=Vector3(0,top*0.87,float(anchor.position.z))
+		pin.rotation.z=0.16
+		mount.add_child(pin)
+	elif kind=="ribbons":
+		for side: float in [-1.0,1.0]:
+			var ribbon:=SuperEgg.build_part(Vector3(0.023,0.055,0.014),color,SuperEgg.EPSILON_SOFT,SuperEgg.EPSILON_FLAT)
+			ribbon.position=Vector3(side*(float(edges.width)+0.015),top*0.5,float(edges.back)*0.6)
+			mount.add_child(ribbon)
+	elif kind in ["straw","back_hat"]:
+		# Closed radial cone, softly rounded rim. Head and shoulders use separate
+		# frames for the pushed-back roofer's hat, never a guessed scalp offset.
+		var vertices:=PackedVector3Array()
+		var normals:=PackedVector3Array()
+		for i in 24:
+			var a:=TAU*float(i)/24.0
+			var b:=TAU*float(i+1)/24.0
+			var p:=Vector3(cos(a)*0.33,0,sin(a)*0.33)
+			var q:=Vector3(cos(b)*0.33,0,sin(b)*0.33)
+			var apex:=Vector3(0,0.16,0)
+			for point in [apex,q,p]:
+				vertices.append(point); normals.append((q-apex).cross(p-apex).normalized())
+		var arrays:=[]; arrays.resize(Mesh.ARRAY_MAX)
+		arrays[Mesh.ARRAY_VERTEX]=vertices;arrays[Mesh.ARRAY_NORMAL]=normals
+		var hat:=MeshInstance3D.new();var mesh:=ArrayMesh.new()
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
+		hat.mesh=mesh
+		var mat:=StandardMaterial3D.new();mat.albedo_color=Color(0.64,0.53,0.34);mat.cull_mode=BaseMaterial3D.CULL_DISABLED
+		hat.material_override=mat
+		hat.name="StrawWorkHat"
+		hat.position=Vector3(0,top+0.015,0)
+		if kind=="back_hat":
+			hat.position=Vector3(0,-0.16,float(edges.back)-0.10)
+			hat.rotation.x=deg_to_rad(-65)
+		mount.add_child(hat)
+		var rim:=TorusMesh.new();rim.inner_radius=0.322;rim.outer_radius=0.336;rim.rings=24;rim.ring_segments=6
+		var hem:=MeshInstance3D.new();hem.mesh=rim;hem.material_override=mat
+		hat.add_child(hem)
+	return mount
+
+
+static func build_court_crown(head: MeshInstance3D, axes: Vector3, style: String) -> Node3D:
+	var crown:=Node3D.new();crown.name="CourtCrown"
+	head.add_child(crown)
+	var edges:=FigureHair.hair_edges(style,axes)
+	var board_y: float=maxf(float(edges.top),axes.y)+0.045
+	var red:=Color(0.53,0.09,0.075)
+	var cap:=SuperEgg.build_part(Vector3(axes.x*0.79,0.055,axes.z*0.72),Color(0.045,0.047,0.05),SuperEgg.EPSILON_SOFT,SuperEgg.EPSILON_FLAT)
+	cap.position=Vector3(0,board_y-0.05,0)
+	crown.add_child(cap)
+	for top in [false,true]:
+		var board:=SuperEgg.build_part(Vector3(0.215,0.009,0.19),Color(0.035,0.041,0.05) if top else red,SuperEgg.EPSILON_SOFT,SuperEgg.EPSILON_FLAT)
+		board.name="CrownBlackTop" if top else "CrownRedUnderside"
+		board.position=Vector3(0,board_y+(0.018 if top else 0.0),0)
+		crown.add_child(board)
+	for side: float in [-1.0,1.0]:
+		for i in 12:
+			var strand:=Node3D.new();strand.name="JadeStrand%s%02d"%["Front" if side>0 else "Back",i];crown.add_child(strand)
+			var x:=lerpf(-0.19,0.19,float(i)/11.0)
+			var cord:=SuperEgg.build_part(Vector3(0.0018,0.095,0.0018),Color(0.66,0.57,0.36),2.0,2.0)
+			cord.position=Vector3(x,board_y-0.10,side*0.182);strand.add_child(cord)
+			for bead_index in 5:
+				var bead:=SuperEgg.build_part(Vector3(0.0055,0.006,0.0055),Color(0.78,0.83,0.72) if bead_index%2==0 else Color(0.32,0.53,0.45),2.0,2.0)
+				bead.position=Vector3(x,board_y-0.035-float(bead_index)*0.035,side*0.182)
+				strand.add_child(bead)
+	return crown

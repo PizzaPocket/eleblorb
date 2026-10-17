@@ -37,6 +37,10 @@ const RIM_RADIUS := 112.0
 ## central lava basin is its own deeper parabola, so the city has no flat
 ## intermediate floor.
 const FLOOR_Y := 30.0
+## The lower public promenade is a level civic datum, slightly above the
+## inhabited bowl shoulder. Its plan can follow the bank and house frontages
+## without inheriting the bowl's downward slope toward the lava.
+const GROUND_PROMENADE_DATUM := FLOOR_Y + 0.25
 
 ## The Highline is civic architecture, not a terrace cut into the volcano.
 ## Its narrow level deck follows the bowl perimeter on independent supports;
@@ -66,6 +70,13 @@ const ARRIVAL_DECK_CLEARANCE := 0.50
 ## marker pair stands at that civic landing, not on the untouched crater dirt.
 const ARRIVAL_THRESHOLD := Vector2(0.0, -112.0)
 const ARRIVAL_MARKER_OFFSET := 5.0
+## Threshold centres measured from the authored exterior wall schedules. Kept
+## in the shared plan so the building frames and service route share endpoints.
+const OREN_RECEIVING_DOOR := Vector2(-6.0, -6.0)
+const KEL_DOCK_DOOR := Vector2(2.3, -7.5)
+## A separate arrival edge at the rear of the roof terrace, below its overhang.
+## The lift keeps its own east-side landing, clear of public traffic.
+const OREN_TERRACE_EDGE := Vector2(3.0, -6.2)
 
 
 ## Unit vector of local +Y in the world plan: from the gate to the centre.
@@ -214,7 +225,7 @@ const PLOTS: Array[Dictionary] = [
 		# the smaller canopy footprint. This keeps both side-approach slabs clear
 		# of rock all the way to their flush junctions.
 		"foundation": Vector2(22.6, 18.6),
-		"crossed": true, "quay": true, "datum_at": Vector2(0.0, -2.8),
+		"crossed": true, "quay": true, "datum": GROUND_PROMENADE_DATUM,
 		"foundation_kind": "renewal_glass", "sink": 5.0},
 ]
 
@@ -457,10 +468,10 @@ static func arrival_byway(samples: int = 30) -> PackedVector2Array:
 	var points := PackedVector2Array()
 	for i in samples + 1:
 		var t := float(i) / float(samples)
-		# Uniform radial spacing keeps the single collision ribbon from folding
-		# over itself at either landing. The route's height profile provides the
-		# short level gate throat; plan geometry remains a simple ribbon.
-		var radius := lerpf(RIM_RADIUS, HIGHLINE_RADIUS, t)
+		# The gallery terminates at the Highline's outer edge, making a clear T
+		# landing without running a separate ramp across the shared ring deck.
+		var outer_edge := HIGHLINE_RADIUS + HIGHLINE_WIDTH * 0.5
+		var radius := lerpf(RIM_RADIUS, outer_edge, t)
 		# A restrained bow preserves the axial gate-to-city reading. The former
 		# 72-degree sweep made the arrival route serve a misplaced inn.
 		points.append(Vector2(-3.0 * sin(PI * t), -radius))
@@ -473,87 +484,165 @@ static func guest_gate_link(samples: int = 10) -> PackedVector2Array:
 	# the platform owns the remaining porch to the door. Continuing to the wall
 	# put two walkable colliders under the final fifth of the approach.
 	var platform_edge := front_point(entry, "foundation") + facing(entry) * RAISED_PLATFORM_REVEAL
-	var start := Vector2(-2.28, platform_edge.y)
+	var arrival := arrival_byway()
+	# Take off on the gateward part of the parent run. This gives the private
+	# approach enough run to rise gently to the inn's raised porch datum.
+	var frame := closest_point_and_tangent(Vector2(-2.28, platform_edge.y - 2.5), arrival)
+	var centreline: Vector2 = frame["point"]
+	var across := Vector2((frame["tangent"] as Vector2).y, -(frame["tangent"] as Vector2).x)
+	var side := 1.0 if (platform_edge - centreline).dot(across) >= 0.0 else -1.0
+	# The branch centreline is half of its 3 m width beyond the parent's 3.8 m
+	# edge. Its near deck edge therefore shares the exact Highline boundary.
+	var start := centreline + across * side * 3.4
+	# Finish perpendicular to the inn's actual frontage. That makes the ramp
+	# opening lie on the platform edge instead of cutting diagonally across its
+	# guard. The first control holds the square departure from the gate ramp.
+	var outward := across * side
+	var control_a := start + outward * 6.0
+	var control_b := platform_edge - facing(entry) * 5.0
 	var points := PackedVector2Array()
 	for i in samples + 1:
 		var t := float(i) / float(samples)
-		# A slight outward bow gives the T-junction a legible flare without
-		# turning the five-second inn approach into another scenic ramp.
-		points.append(start.lerp(platform_edge, t) + Vector2(0.0, -1.2 * sin(PI * t)))
+		var u := 1.0 - t
+		points.append(start * (u * u * u) + control_a * (3.0 * u * u * t) + control_b * (3.0 * u * t * t) + platform_edge * (t * t * t))
 	return points
 
 
+static func closest_point_on_polyline(target: Vector2, line: PackedVector2Array) -> Vector2:
+	if line.is_empty():
+		return target
+	var best := line[0]
+	var best_distance := INF
+	for i in line.size() - 1:
+		var a := line[i]
+		var segment := line[i + 1] - a
+		var t := clampf((target - a).dot(segment) / maxf(segment.length_squared(), 0.0001), 0.0, 1.0)
+		var candidate := a + segment * t
+		var distance := candidate.distance_squared_to(target)
+		if distance < best_distance:
+			best = candidate
+			best_distance = distance
+	return best
+
+
+static func closest_point_and_tangent(target: Vector2, line: PackedVector2Array) -> Dictionary:
+	var best_point := line[0]
+	var best_tangent := Vector2.UP
+	var best_distance := INF
+	for i in line.size() - 1:
+		var a := line[i]
+		var segment := line[i + 1] - a
+		var t := clampf((target - a).dot(segment) / maxf(segment.length_squared(), 0.0001), 0.0, 1.0)
+		var candidate := a + segment * t
+		var distance := candidate.distance_squared_to(target)
+		if distance < best_distance:
+			best_point = candidate
+			best_tangent = segment.normalized()
+			best_distance = distance
+	return {"point": best_point, "tangent": best_tangent}
+
+
 static func renewal_byway(side: float, samples: int = 24) -> PackedVector2Array:
-	var points := PackedVector2Array()
 	var entry := plot("RENEWAL")
-	# Land on the two flanks of the public deck. Approaching local -Z was a
-	# nominal pair of routes that both functioned as one rear entrance.
-	var door := shell_to_plan(entry, Vector2(side * 10.9, 0.0))
-	var finish := shell_to_plan(entry, Vector2(side * 14.0, 0.0))
-	var deck_edge := shell_to_plan(entry, Vector2(side * 11.3, 0.0))
-	var target_angle := finish.angle()
-	var start_angle := target_angle + side * 0.82
-	# Opposing 47-degree arcs peel from the ring and descend around the public
-	# pavilion like two arms. Their radius eases inward while their plan remains
-	# outside the canopy; there is no hairpin or self-overlap.
-	for i in samples + 1:
-		var t := float(i) / float(samples)
-		var angle := lerp_angle(start_angle, target_angle, t)
-		# Stay beside the ring while passing the Aro district, then peel inward
-		# only for the pavilion approach. This preserves both building envelope
-		# and the legibility of the two-level circulation system.
-		var radius := lerpf(HIGHLINE_RADIUS, 64.0, smoothstep(0.68, 1.0, t))
-		points.append(Vector2(cos(angle), sin(angle)) * radius)
-	points.append(finish)
-	points.append(deck_edge)
-	points.append(door)
+	# Each side is a contained three-flight grand ramp: a broad outer sweep, a
+	# return flight, then a second matching sweep that arrives on the Renewal
+	# flank. The two routes mirror in the building frame, stay within 28 m of
+	# the terrace centre, and gain 104 m of walking length without acute kinks.
+	var inner_radius := HIGHLINE_RADIUS - HIGHLINE_WIDTH * 0.5
+	var side_run := 10.5
+	var turn_radius := 3.5
+	var far_run := side_run + turn_radius * 2.0
+	var centre_radius := (entry["centre"] as Vector2).length()
+	# Solve the circle intersection in Renewal's local frame so the route starts
+	# exactly on the Highline's inner edge, on the same side as its landing.
+	var start_local_z := centre_radius - sqrt(inner_radius * inner_radius - side_run * side_run)
+	var start_local := Vector2(side * side_run, start_local_z)
+	const OUTER_TURN_Z := 18.0
+	const INNER_TURN_Z := -18.0
+	var landing := Vector2(side * 9.2, 0.0)
+	var points := PackedVector2Array([shell_to_plan(entry, start_local)])
+	var first_turn_start := Vector2(side * side_run, OUTER_TURN_Z)
+	var first_segments := ceili(start_local.distance_to(first_turn_start) * 1.4)
+	for i in range(1, first_segments + 1):
+		points.append(shell_to_plan(entry, start_local.lerp(first_turn_start, float(i) / float(first_segments))))
+	# First half-circle turns the outer flight back toward the city; its tangent
+	# is continuous with both straight runs. Both arcs have a clear 7 m diameter.
+	var turn_segments := maxi(samples, 32)
+	var first_centre := Vector2(side * (side_run + turn_radius), OUTER_TURN_Z)
+	for i in range(1, turn_segments + 1):
+		var angle := lerpf(PI, 0.0, float(i) / float(turn_segments))
+		var local := first_centre + Vector2(side * cos(angle) * turn_radius, sin(angle) * turn_radius)
+		points.append(shell_to_plan(entry, local))
+	var far_start := Vector2(side * far_run, OUTER_TURN_Z)
+	var far_end := Vector2(side * far_run, INNER_TURN_Z)
+	var second_segments := ceili(far_start.distance_to(far_end) * 1.4)
+	for i in range(1, second_segments + 1):
+		points.append(shell_to_plan(entry, far_start.lerp(far_end, float(i) / float(second_segments))))
+	var second_centre := Vector2(side * (side_run + turn_radius), INNER_TURN_Z)
+	for i in range(1, turn_segments + 1):
+		var angle := lerpf(0.0, -PI, float(i) / float(turn_segments))
+		var local := second_centre + Vector2(side * cos(angle) * turn_radius, sin(angle) * turn_radius)
+		points.append(shell_to_plan(entry, local))
+	var third_start := Vector2(side * side_run, INNER_TURN_Z)
+	var third_end := Vector2(side * side_run, -1.3)
+	var third_segments := ceili(third_start.distance_to(third_end) * 1.4)
+	for i in range(1, third_segments + 1):
+		points.append(shell_to_plan(entry, third_start.lerp(third_end, float(i) / float(third_segments))))
+	# A short quarter-turn resolves the last flight onto the side landing without
+	# the old acute kink. Its handles follow the incoming and outgoing tangents.
+	var control_a := third_end + Vector2(0.0, 1.2)
+	var control_b := landing + Vector2(side * 1.2, 0.0)
+	for i in range(1, 13):
+		var t := float(i) / 12.0
+		var u := 1.0 - t
+		var local := third_end * (u * u * u) + control_a * (3.0 * u * u * t) + control_b * (3.0 * u * t * t) + landing * (t * t * t)
+		points.append(shell_to_plan(entry, local))
 	return points
 
 
 static func oren_terrace_link(samples: int = 10) -> PackedVector2Array:
 	var entry := plot("OREN")
-	# Oren's roof terrace and the Highline already share world Y ~= 42. The
-	# link ends at the lift's existing top landing and parapet opening.
-	var landing := shell_to_plan(entry, Vector2(7.62, 3.7))
+	# This route reaches the sheltered rear edge of the roof terrace. The roof
+	# lift retains its independent east-side landing; public circulation does
+	# not pass through the lift lobby.
+	var landing := shell_to_plan(entry, OREN_TERRACE_EDGE)
 	var points := PackedVector2Array()
+	var outward := ((entry["centre"] as Vector2) - CENTRE_WORLD).normalized()
 	var target_angle := landing.angle()
-	var start_angle := target_angle + 0.32
+	var start_angle := target_angle + 0.10
 	var start := Vector2(cos(start_angle), sin(start_angle)) * HIGHLINE_RADIUS
-	var tangent := Vector2(sin(start_angle), -cos(start_angle))
-	var outside := landing + (landing - (entry["centre"] as Vector2)).normalized() * 5.0
-	# One cubic curve replaces the old arc-plus-approach splice. Its tangent
-	# leaves the ring naturally, then resolves into the radial terrace landing
-	# without a kink, doubled-back guard panel or overlapping collision face.
-	var control_a := start + tangent * 10.0 + start.normalized() * 12.0
-	var control_b := outside
-	for i in samples * 3 + 1:
-		var t := float(i) / float(samples * 3)
-		var u := 1.0 - t
-		points.append(start * u * u * u + control_a * 3.0 * u * u * t + control_b * 3.0 * u * t * t + landing * t * t * t)
-	return points
-
-
-static func kel_upper_link(samples: int = 18) -> PackedVector2Array:
-	var entry := plot("KEL")
-	# Meet the existing east-side home landing above the sawtooth works. The
-	# curve stays outside the foundry envelope and presents the landing as a
-	# proper upper frontage rather than dropping a ramp onto the roof teeth.
-	var landing := shell_to_plan(entry, Vector2(10.55, -4.0))
-	var points := PackedVector2Array()
-	var target_angle := landing.angle()
-	var start_angle := target_angle - 0.38
-	var outside := landing + (landing - (entry["centre"] as Vector2)).normalized() * 4.0
-	for i in samples:
-		var t := float(i) / float(samples)
-		var angle := lerp_angle(start_angle, target_angle, t)
-		# The long graded arc runs just outside the ring rather than occupying
-		# the ring slab or grazing the foundry envelope. Near its far end it has
-		# already descended enough to pass cleanly beneath the ring on the short
-		# radial approach to the existing upper-home landing.
-		var radius := lerpf(HIGHLINE_RADIUS, HIGHLINE_RADIUS + HIGHLINE_WIDTH * 0.5 + 2.0, smoothstep(0.0, 0.16, t))
-		points.append(Vector2(cos(angle), sin(angle)) * radius)
-	points.append(outside)
-	points.append(landing)
+	# A compact external spiral gives the roof terrace a real, non-lift approach.
+	# Its centre sits beyond Oren's rear wall; the ribbon winds inward from the
+	# Highline and lands at the exact terrace edge without crossing the house or
+	# the elevator lobby.
+	var spiral_centre := landing + outward * 4.5
+	var start_vector := start - spiral_centre
+	var end_vector := landing - spiral_centre
+	var start_radius := start_vector.length()
+	var end_radius := end_vector.length()
+	var start_spiral_angle := start_vector.angle()
+	var end_spiral_angle := end_vector.angle()
+	var short_turn := wrapf(end_spiral_angle - start_spiral_angle, -PI, PI)
+	var sweep := short_turn + (TAU if short_turn >= 0.0 else -TAU)
+	var path_length_estimate := TAU * (start_radius + end_radius) * 0.5 + absf(start_radius - end_radius)
+	var spiral_samples := maxi(samples * 6, ceili(path_length_estimate * 2.0))
+	for i in spiral_samples + 1:
+		var t := float(i) / float(spiral_samples)
+		var radius := lerpf(start_radius, end_radius, t)
+		var angle := start_spiral_angle + sweep * t
+		points.append(spiral_centre + Vector2(cos(angle), sin(angle)) * radius)
+	# Begin at the inner edge of the shared ring. The private link may branch
+	# from that threshold, but must not overlap the ring's central walking deck.
+	var inner_radius := HIGHLINE_RADIUS - HIGHLINE_WIDTH * 0.5
+	for i in points.size() - 1:
+		var a := points[i]
+		var b := points[i + 1]
+		if a.length() >= inner_radius and b.length() <= inner_radius:
+			var t := clampf((a.length() - inner_radius) / maxf(a.length() - b.length(), 0.0001), 0.0, 1.0)
+			var trimmed := PackedVector2Array([a.lerp(b, t)])
+			for j in range(i + 1, points.size()):
+				trimmed.append(points[j])
+			return trimmed
 	return points
 
 
@@ -561,7 +650,31 @@ static func ground_promenade(samples: int = 96) -> PackedVector2Array:
 	var points := PackedVector2Array()
 	for i in samples + 1:
 		var angle := TAU * float(i) / float(samples)
-		points.append(Vector2(cos(angle), sin(angle)) * (reservoir_radius(angle) + 4.0))
+		# The lava promenade passes in front of each occupied ground facade.
+		# Intersect each radial sample with a plane 3.0 m beyond the facade, then
+		# blend back to the reservoir circuit beyond the building's shoulders.
+		# Using each plot's actual facing and footprint keeps rotated homes from
+		# being clipped by a guessed centre-radius/depth offset.
+		var radial := Vector2(cos(angle), sin(angle))
+		var radius := reservoir_radius(angle) - 1.0
+		for entry: Dictionary in PLOTS:
+			if str(entry.get("site", "")) != "ground" or not bool(entry.get("occupied", false)):
+				continue
+			var centre: Vector2 = entry["centre"]
+			var deep := facing(entry)
+			var across := Vector2(-deep.y, deep.x)
+			var footprint: Vector2 = entry["footprint"]
+			var front_walk_centre := centre + deep * (footprint.y * 0.5 + 3.0)
+			var denominator := radial.dot(deep)
+			if denominator <= 0.15:
+				continue
+			var frontage_radius := front_walk_centre.dot(deep) / denominator
+			var frontage_point := radial * frontage_radius
+			var lateral := absf((frontage_point - front_walk_centre).dot(across))
+			var frontage_half_width := footprint.x * 0.5 + 1.0
+			var frontage_weight := 1.0 - smoothstep(frontage_half_width, frontage_half_width + 3.0, lateral)
+			radius = lerpf(radius, maxf(radius, frontage_radius), frontage_weight)
+		points.append(radial * radius)
 	return points
 
 
@@ -569,7 +682,36 @@ static func undercroft_loop(samples: int = 96) -> PackedVector2Array:
 	var points := PackedVector2Array()
 	for i in samples + 1:
 		var angle := TAU * float(i) / float(samples)
+		# The rear service walk is spatially distinct from the elevated Highline
+		# (72 m centreline). Its former 71.5 m orbit sat directly beneath that
+		# deck and read as a duplicate ground track. This 77.5 m orbit leaves a
+		# clear plan gap while receiving spurs still land at surveyed doors.
 		points.append(Vector2(cos(angle), sin(angle)) * 77.5)
+	return points
+
+
+## A branch leaves a loop at its actual edge, perpendicular to the local
+## parent tangent. The child deck's near edge begins on that exact edge line;
+## this also gives its low metal pipe a shared endpoint with the loop pipe.
+static func loop_door_link(target: Vector2, loop: PackedVector2Array, parent_width: float, child_width: float, outward_hint: Vector2, samples: int = 20) -> PackedVector2Array:
+	var frame := closest_point_and_tangent(target, loop)
+	var parent_point: Vector2 = frame["point"]
+	var tangent: Vector2 = frame["tangent"]
+	var normal := Vector2(tangent.y, -tangent.x)
+	if normal.dot(outward_hint) < 0.0:
+		normal = -normal
+	var parent_edge := parent_point + normal * parent_width * 0.5
+	# The child centreline sits on the parent edge: its opening is the ramp's
+	# full width measured along the parent tangent, so the deck begins flush.
+	var start := parent_edge
+	var door_normal := outward_hint.normalized()
+	var control_a := start + normal * maxf(2.0, child_width * 0.8)
+	var control_b := target + door_normal * 1.8
+	var points := PackedVector2Array()
+	for i in samples + 1:
+		var t := float(i) / float(samples)
+		var u := 1.0 - t
+		points.append(start * (u * u * u) + control_a * (3.0 * u * u * t) + control_b * (3.0 * u * t * t) + target * (t * t * t))
 	return points
 
 
@@ -584,10 +726,9 @@ static func routes() -> Array[Dictionary]:
 	var guest_back := back_point(guest, "footprint")
 	var guest_side := shell_to_plan(guest, Vector2(8.2, 0.0))
 	list.append({"id": "D_GUEST", "width": 2.4, "class": "service", "tier": "gate_platform", "serves": ["GUEST"], "role": "inn platform circulation from public door to receiving side", "points": PackedVector2Array([guest_front, guest_side, guest_back])})
-	list.append({"id": "H2W", "width": 3.2, "class": "link", "tier": "ramp", "serves": ["RENEWAL"], "role": "west public renewal descent", "points": renewal_byway(-1.0)})
-	list.append({"id": "H2E", "width": 3.2, "class": "link", "tier": "ramp", "serves": ["RENEWAL"], "role": "east public renewal descent", "points": renewal_byway(1.0)})
-	list.append({"id": "H4", "width": 2.4, "class": "link", "tier": "highline", "serves": ["OREN"], "landing_overlap": true, "role": "Oren roof-terrace dock at the existing lift landing", "points": oren_terrace_link()})
-	list.append({"id": "H5", "width": 2.4, "class": "link", "tier": "highline", "serves": ["KEL"], "role": "Kel upper-home frontage beside the sawtooth works", "points": kel_upper_link()})
+	list.append({"id": "H2W", "width": 3.2, "class": "link", "tier": "ramp", "serves": ["RENEWAL"], "role": "south side of the paired Renewal sweep ramps", "points": renewal_byway(-1.0)})
+	list.append({"id": "H2E", "width": 3.2, "class": "link", "tier": "ramp", "serves": ["RENEWAL"], "role": "north side of the paired Renewal sweep ramps", "points": renewal_byway(1.0)})
+	list.append({"id": "H4", "width": 2.4, "class": "link", "tier": "highline", "serves": ["OREN"], "landing_overlap": true, "role": "Oren upper-home threshold below the roof terrace, clear of the lift", "points": oren_terrace_link()})
 	var ground := ground_promenade()
 	var service := undercroft_loop()
 	var ground_ids := ["OREN", "KEL", "ARO", "RENEWAL"]
@@ -595,14 +736,24 @@ static func routes() -> Array[Dictionary]:
 	list.append({"id": "G2", "width": 3.2, "class": "service", "tier": "ground", "serves": ground_ids, "role": "under-Highline service loop and receiving aprons", "points": service})
 	# Ground properties receive two explicit landings.  The Renewal route
 	# crosses its public deck from the promenade to the descent landing.
-	for id: String in ["OREN", "KEL", "ARO", "RENEWAL"]:
+	for id: String in ["OREN", "KEL", "ARO"]:
 		var entry := plot(id)
-		var front := shell_to_plan(entry, Vector2(-3.2, 7.5)) if id == "KEL" else front_point(entry, "footprint")
-		var back := back_point(entry, "footprint")
+		var front := Vector2.ZERO
+		var back := Vector2.ZERO
+		match id:
+			"OREN":
+				front = shell_to_plan(entry, Vector2(-4.0, 6.0))
+				back = shell_to_plan(entry, OREN_RECEIVING_DOOR)
+			"KEL":
+				front = shell_to_plan(entry, Vector2(-3.2, 7.5))
+				back = shell_to_plan(entry, KEL_DOCK_DOOR)
+			"ARO":
+				front = shell_to_plan(entry, Vector2(-4.9, 6.5))
 		list.append({"id": "P_%s" % id, "width": 2.8, "class": "public", "tier": "platform", "serves": [id], "role": "%s public threshold" % id,
-			"points": PackedVector2Array([_on_ring(front.angle(), ground), front])})
-		list.append({"id": "S_%s" % id, "width": 2.6, "class": "service", "tier": "platform", "serves": [id], "role": "%s receiving threshold" % id,
-			"points": PackedVector2Array([_on_ring(back.angle(), service), back])})
+			"points": loop_door_link(front, ground, 3.5, 2.8, facing(entry))})
+		if id != "ARO":
+			list.append({"id": "S_%s" % id, "width": 2.6, "class": "service", "tier": "platform", "serves": [id], "role": "%s receiving threshold" % id,
+			"points": loop_door_link(back, service, 3.2, 2.6, -facing(entry))})
 	# Raised properties own broad platforms; these centre lines record that a
 	# person can walk round the side from the civic ring to every rear door.
 	for id: String in ["NAHL", "VARA", "CIVIC", "IREN"]:
@@ -668,7 +819,26 @@ static func _segment_polygon_distance(from: Vector2, to: Vector2, polygon: Packe
 
 ## The promenade's point at a bearing (`_ring` kept for the call sites).
 static func _on_ring(angle: float, _ring: PackedVector2Array) -> Vector2:
-	return Vector2(cos(angle), sin(angle)) * promenade_radius(angle)
+	var ray := Vector2(cos(angle), sin(angle))
+	var best_radius := INF
+	for i in _ring.size() - 1:
+		var a := _ring[i]
+		var segment := _ring[i + 1] - a
+		var denominator := ray.cross(segment)
+		if absf(denominator) < 0.0001:
+			continue
+		var along_ray := a.cross(segment) / denominator
+		var along_segment := a.cross(ray) / denominator
+		if along_ray >= 0.0 and along_segment >= 0.0 and along_segment <= 1.0:
+			best_radius = minf(best_radius, along_ray)
+	if best_radius == INF:
+		for point in _ring:
+			var radius := point.length()
+			if radius > 0.0 and absf(wrapf(point.angle() - angle, -PI, PI)) < deg_to_rad(3.0):
+				best_radius = minf(best_radius, radius)
+	if best_radius == INF:
+		best_radius = promenade_radius(angle)
+	return ray * best_radius
 
 
 # ---------------------------------------------------------------------------

@@ -28,73 +28,141 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> Static
 	var body := CalderaShell.make_body(parent, entry, float(line["datum"]))
 	body.name = "CIVICShell"
 	_court_enclosure(body)
-	_upper_floor(body)
+	_glazed_eaves_and_portals(body)
 	_switchback_ramp(body)
 	_upper_shell(body)
 	_council(body)
 	_school_and_archive(body)
 	_terrarium(body)
 	_daylight_canopy(body)
+	_stained_glass_baffles(body)
 	_observation_landing(body)
 	_lights(body)
 	_register_public_routes(body)
 	return body
 
 
-## A symmetrical, mostly glazed facade around a leafless civic portal. The
-## matching rear opening makes the terrarium a waypoint between Highline and
-## reservoir outlook rather than an object at the end of a room.
+## A symmetrical, mostly glazed facade around the civic portal. The matching
+## rear opening keeps the terrarium on the public axis between Highline and
+## reservoir outlook.
 static func _court_enclosure(body: StaticBody3D) -> void:
-	var glass_top := HALL - 0.25
+	# Curtain walls rise to the steel eaves ring. The old 25 cm reveal read as
+	# an accidental open slot under the canopy from inside the hall.
+	var glass_top := HALL + 0.18
 	for z: float in [-7.5, 7.5]:
 		var front := z > 0.0
 		var portal_height := 6.7 if front else 5.2
 		_portal_frame(body, Vector3(0.0, 0.0, z), portal_height, "CivicEntryPortal" if front else "CivicOutlookPortal")
 		for side: float in [-1.0, 1.0]:
-			var x := side * 7.65
-			CalderaShell._pane(body, "CivicFacadeGlass", Vector3(x, glass_top * 0.5, z), Vector2(4.25, glass_top * 0.5 - 0.08), 0.0, Color(CalderaShell.CLEAR_GLASS, 0.23))
-			CalderaShell._metal(body, Vector3(side * 3.35, glass_top * 0.5, z), Vector3(0.28, glass_top, 0.28), CalderaShell.STEEL_BLUED, true)
+			var x := side * 7.30
+			# Side lights begin at the portal jamb and continue to the corner pier,
+			# so the entry arch and curtain wall meet on one clean line.
+			CalderaShell._pane(body, "CivicFacadeGlass", Vector3(x, glass_top * 0.5, z), Vector2(4.65, glass_top * 0.5 - 0.08), 0.0, Color(CalderaShell.CLEAR_GLASS, 0.23))
+			# One fine mullion divides each broad glass bay at its midpoint.
+			CalderaShell._metal(body, Vector3(side * 7.30, glass_top * 0.5, z), Vector3(0.10, glass_top, 0.10), CalderaShell.STEEL_BLUED, true)
 	for x: float in [-12.0, 12.0]:
 		CalderaShell._pane(body, "CivicSideGlass", Vector3(x, glass_top * 0.5, 0.0), Vector2(7.25, glass_top * 0.5 - 0.08), PI * 0.5, Color(CalderaShell.SMOKY_GLASS, 0.22))
-	# Four branching piers carry the canopy and make the entrance shoulders
-	# visible without turning the open portal into a conventional portico.
-	for at: Vector3 in [Vector3(-3.35, 0, 7.5), Vector3(3.35, 0, 7.5), Vector3(-11.65, 0, -7.2), Vector3(11.65, 0, -7.2)]:
+	# The monumental portals remain open arches. Surface-mounted sliders belong
+	# to the smaller gallery partitions, where their leaves fit the openings.
+	for direction: Vector2 in [Vector2(0, 1), Vector2(0, -1)]:
+		ClearZones.add(body, "civic outlook portal", "door", Vector2(0.0, -7.5), direction, 1.0, 1.0, PORTAL_CLEAR * 0.5, 0.05, 2.1)
+	# Four corner Y-piers align with the curtain-wall corners; the portal remains
+	# visually quiet and its arch is the only frame around the public entry.
+	for at: Vector3 in [Vector3(-11.82, 0, 7.32), Vector3(11.82, 0, 7.32), Vector3(-11.82, 0, -7.32), Vector3(11.82, 0, -7.32)]:
 		_branching_pier(body, at)
-	# Thin colored glass veils hang inside the clear facade. They are the civic
-	# art layer, not the building's wall system.
-	var veil_colours := [Color(0.94, 0.35, 0.13, 0.58), Color(0.64, 0.12, 0.72, 0.58), Color(0.08, 0.62, 0.52, 0.58), Color(0.13, 0.34, 0.90, 0.58)]
-	for i in 4:
-		var side := -1.0 if i < 2 else 1.0
-		var rank := i % 2
-		var pane := SuperEgg.build_part(Vector3(0.055, 1.55 + 0.35 * rank, 0.72), veil_colours[i], 6.0, 6.0)
-		pane.name = "SuspendedCivicGlass"
-		pane.position = Vector3(side * (5.0 + 1.65 * rank), 5.65 - 0.25 * rank, 7.15)
-		pane.material_override = SolidModel.material(veil_colours[i], 0.04, 0.06)
-		body.add_child(pane)
-		CollisionPolicy.mark_decorative(pane)
 
 
 static func _portal_frame(body: StaticBody3D, at: Vector3, height: float, label: String) -> void:
-	var outline := OpeningTrim.door_arch(PORTAL_CLEAR * 0.5, height, TownProps.OPENING_EXPONENT, 0.9, 0.06)
-	var outer := OpeningTrim.piped_frame(outline, 0.18, CalderaShell.STEEL_BLUED, false, Vector2(0.0, height * 0.45))
+	# Sink the pipe ends below the walking plane. The broad radius belongs to
+	# the portal itself; a second ring only thickened and cluttered its silhouette.
+	var outline := OpeningTrim.door_arch(PORTAL_CLEAR * 0.5, height, TownProps.OPENING_EXPONENT, 0.9, 0.28)
+	var outer := OpeningTrim.piped_frame(outline, 0.11, CalderaShell.STEEL_BLUED, false, Vector2(0.0, height * 0.45))
 	outer.name = label
 	outer.position = at
 	body.add_child(outer)
-	# A second fine stainless line makes the frame luminous from both approach
-	# directions without inserting an opaque wall around the opening.
-	var inner_outline: Array[Vector2] = []
-	for point: Vector2 in outline:
-		inner_outline.append(Vector2(point.x * 0.94, point.y * 0.96 + 0.05))
-	var inner := OpeningTrim.piped_frame(inner_outline, 0.055, CalderaShell.STAINLESS, false, Vector2(0.0, height * 0.45))
-	inner.name = "%sInner" % label
-	inner.position = at + Vector3(0.0, 0.0, -0.025)
-	body.add_child(inner)
+
+
+## Complete each curtain-wall bay up to the sloped canopy and glaze the
+## superellipse-shaped fanlight above both open portals. The door apertures
+## remain true voids; no rectangular pane crosses their curved heads.
+static func _glazed_eaves_and_portals(body: StaticBody3D) -> void:
+	var glass_bottom := HALL + 0.10
+	for z: float in [-7.5, 7.5]:
+		for span: Vector2 in [Vector2(-11.95, -PORTAL_CLEAR * 0.5), Vector2(PORTAL_CLEAR * 0.5, 11.95)]:
+			_glass_eave_strip(body, "CivicFacadeEave", span.x, span.y, z, true,
+				func(_value: float) -> float: return glass_bottom,
+				func(value: float) -> float: return _canopy_height(value, z))
+		var portal_height := 6.7 if z > 0.0 else 5.2
+		var arch_half := (portal_height + 0.9) * 0.5
+		var arch_centre := portal_height - arch_half
+		_glass_eave_strip(body, "CivicPortalFanlight", -PORTAL_CLEAR * 0.5, PORTAL_CLEAR * 0.5, z, true,
+			func(value: float) -> float:
+				var ratio := clampf(absf(value) / (PORTAL_CLEAR * 0.5), 0.0, 1.0)
+				return arch_centre + arch_half * pow(maxf(0.0, 1.0 - pow(ratio, TownProps.OPENING_EXPONENT)), 1.0 / TownProps.OPENING_EXPONENT),
+			func(value: float) -> float: return _canopy_height(value, z))
+	for x: float in [-12.0, 12.0]:
+		_glass_eave_strip(body, "CivicSideEave", -7.25, 7.25, x, false,
+			func(_value: float) -> float: return glass_bottom,
+			func(value: float) -> float: return _canopy_height(x, value))
+
+
+static func _glass_eave_strip(body: StaticBody3D, label: String, start: float, finish: float, fixed: float, along_x: bool, lower: Callable, upper: Callable) -> void:
+	const SEGMENTS := 32
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var faces := PackedVector3Array()
+	for i in SEGMENTS:
+		var a := lerpf(start, finish, float(i) / float(SEGMENTS))
+		var b := lerpf(start, finish, float(i + 1) / float(SEGMENTS))
+		var pa := Vector3(a, lower.call(a), fixed) if along_x else Vector3(fixed, lower.call(a), a)
+		var pb := Vector3(b, lower.call(b), fixed) if along_x else Vector3(fixed, lower.call(b), b)
+		var qa := Vector3(a, upper.call(a), fixed) if along_x else Vector3(fixed, upper.call(a), a)
+		var qb := Vector3(b, upper.call(b), fixed) if along_x else Vector3(fixed, upper.call(b), b)
+		var normal := Vector3.FORWARD if along_x else Vector3.RIGHT
+		_civic_quad(st, faces, pa, pb, qb, qa, normal)
+	var pane := MeshInstance3D.new()
+	pane.name = label
+	pane.mesh = st.commit()
+	pane.material_override = SolidModel.material(Color(CalderaShell.CLEAR_GLASS, 0.23), 0.12, 0.02)
+	body.add_child(pane)
+	var collision := CollisionShape3D.new()
+	var shape := ConcavePolygonShape3D.new()
+	shape.backface_collision = true
+	shape.set_faces(faces)
+	collision.shape = shape
+	collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.SOLID)
+	body.add_child(collision)
+
+
+static func _civic_quad(st: SurfaceTool, faces: PackedVector3Array, a: Vector3, b: Vector3, c: Vector3, d: Vector3, normal: Vector3) -> void:
+	for point: Vector3 in [a, b, c, a, c, d]:
+		st.set_normal(normal)
+		st.add_vertex(point)
+		faces.append(point)
 
 
 static func _branching_pier(body: StaticBody3D, at: Vector3) -> void:
-	CalderaShell._metal(body, at + Vector3.UP * 3.85, Vector3(0.38, 7.7, 0.38), CalderaShell.STEEL_BLUED, true)
-	for dx: float in [-1.0, 1.0]:
-		CalderaShell._beam(body, at + Vector3(0.0, 6.8, 0.0), at + Vector3(dx * 1.25, 8.85, -0.35), Vector2(0.20, 0.18), CalderaShell.STEEL_BLUED)
+	var roof_at := _canopy_height(at.x, at.z)
+	# A broad SuperEgg shaft fills the true glass-wall corner. The small collar
+	# capital receives the two saddle ribs without a floating Y fork or exposed
+	# gap between the glazed elevations.
+	var shaft := SuperEgg.build_part(Vector3(0.24, (roof_at - 0.34) * 0.5, 0.24), CalderaShell.STEEL_BLUED, 5.5, 5.5)
+	shaft.position = Vector3(at.x, (roof_at - 0.34) * 0.5, at.z)
+	body.add_child(shaft)
+	CollisionPolicy.add_box(body, shaft, Vector3(0.42, roof_at - 0.34, 0.42), shaft.position, Basis(), false)
+	var side := signf(at.x)
+	var capital := SuperEgg.build_part(Vector3(0.38, 0.16, 0.38), CalderaShell.STEEL_BLUED, 5.5, 5.5)
+	capital.position = Vector3(at.x, roof_at - 0.42, at.z)
+	body.add_child(capital)
+	CollisionPolicy.add_box(body, capital, Vector3(0.76, 0.32, 0.76), capital.position, Basis(), false)
+	var bearing := Vector3(at.x, roof_at - 0.18, at.z)
+	for direction: Vector3 in [Vector3(-side, 0.0, 0.0), Vector3(0.0, 0.0, signf(at.z))]:
+		var end := at + direction * 0.82
+		CalderaShell._beam(body, bearing, Vector3(end.x, _canopy_height(end.x, end.z) - 0.10, end.z), Vector2(0.16, 0.16), CalderaShell.STEEL_BLUED)
+
+
+static func _canopy_height(x: float, z: float) -> float:
+	return 9.00 + 1.05 * pow(absf(x) / 12.65, 1.45) + 0.55 * (z / 8.15)
 
 
 static func _council_spec() -> Dictionary:
@@ -191,13 +259,21 @@ static func _wall_with_openings(body: StaticBody3D, lo: float, hi: float, fixed:
 		var yaw := 0.0 if along_x else PI * 0.5
 		CalderaShell.door_opening(body, origin, yaw, b - a, height, 0.18, float(door["width"]), 2.75, 0, PARTITION)
 		if str(door["type"]) == "sliding":
-			CalderaShell.open_sliding_door(body, origin, yaw, float(door["width"]), 2.75, true)
+			_sliding_door(body, origin, yaw, float(door["width"]), 2.75, true)
 		var point := Vector2(float(door["at"]), fixed) if along_x else Vector2(fixed, float(door["at"]))
 		var normal := Vector2(0, 1) if along_x else Vector2(1, 0)
 		for direction: Vector2 in [normal, -normal]:
 			ClearZones.add(body, str(door["label"]), "door", point, direction, 0.0, 1.0, float(door["width"]) * 0.5, base + 0.05, base + 1.95)
 		cursor = b
 	_partition(body, cursor, hi, fixed, along_x, base, height)
+
+
+static func _sliding_door(body: StaticBody3D, origin: Vector3, yaw: float, clear: float, height: float, initially_open: bool) -> void:
+	var slider := WorldSlidingDoor.new()
+	slider.name = "CivicSlidingDoor"
+	slider.position = origin
+	body.add_child(slider)
+	slider.configure(clear, height, yaw, initially_open, true)
 
 
 static func _partition(body: StaticBody3D, lo: float, hi: float, fixed: float, along_x: bool, base: float, height: float) -> void:
@@ -208,27 +284,40 @@ static func _partition(body: StaticBody3D, lo: float, hi: float, fixed: float, a
 	FireCalderaOren._block(body, "CivicPartition", at, size, PARTITION)
 
 
-static func _upper_floor(body: StaticBody3D) -> void:
-	# One rear observation porch: the centre stays double height and the glass
-	# crown of the terrarium remains visible from entrance to roof.
-	CalderaShell.soft_slab(body, "CivicObservationGallery", Vector3(0.8, UPPER - 0.10, -5.85), Vector3(10.8, 0.10, 1.45), Vector2(10.8, 1.45), FLOOR)
-	# The gallery guard stops at the ramp throat.
-	_guard(body, Vector3(-11.2, UPPER + 1.05, -4.35), Vector3(-9.15, UPPER + 1.05, -4.35))
-	_guard(body, Vector3(-6.75, UPPER + 1.05, -4.35), Vector3(11.6, UPPER + 1.05, -4.35))
-
-
 static func _switchback_ramp(body: StaticBody3D) -> void:
-	# Two six-metre flights sit against the west edge, leaving the public axis
-	# and all four sides of the terrarium unobstructed. At 2 m rise per flight
-	# the grade is 18.4 percent. Both landing interfaces share exact datums.
-	FireCalderaOren._wedge(body, "CivicRampLower", Vector2(-11.0, 1.6), Vector2(-9.0, 6.4), 2.0, 0.0, false, FLOOR)
-	FireCalderaOren._block(body, "CivicRampLanding", Vector3(-9.4, 1.0, 1.1), Vector3(3.2, 2.0, 1.0), FLOOR)
-	FireCalderaOren._wedge(body, "CivicRampUpper", Vector2(-9.0, -4.4), Vector2(-7.0, 1.6), UPPER, 2.0, false, FLOOR)
-	CalderaShell.soft_slab(body, "CivicRampHead", Vector3(-8.0, UPPER - 0.10, -4.75), Vector3(1.15, 0.10, 0.35), Vector2(1.15, 0.35), FLOOR)
-	_guard(body, Vector3(-11.0, 1.05, 6.4), Vector3(-11.0, 3.05, 1.6))
-	_guard(body, Vector3(-7.0, 3.05, 1.6), Vector3(-7.0, UPPER + 1.05, -4.4))
-	ClearZones.add(body, "civic lower ramp", "ramp", Vector2(-10.0, 4.0), Vector2(0, -1), 2.4, 2.4, 0.75, 0.05, 2.0)
-	ClearZones.add(body, "civic upper ramp", "ramp", Vector2(-8.0, -1.4), Vector2(0, -1), 3.0, 3.0, 0.75, 2.0, UPPER)
+	# Two even 2 m flights, joined by a broad half-turn. The terminal meets the
+	# rear edge of a real west observation mezzanine; no exposed ramp ends in
+	# front of the canopy or blocks the rear civic portal.
+	var path := PackedVector3Array()
+	const FLIGHT_X0 := -10.8
+	const FLIGHT_X1 := -6.8
+	const FLIGHT_Z0 := 5.8
+	const FLIGHT_Z1 := -4.0
+	const TURN_Z := -5.2
+	const TURN_R := 2.0
+	const LOW_Y := 0.05
+	const MID_Y := 2.0
+	const HIGH_Y := 4.0
+	for i in 25:
+		var t := float(i) / 24.0
+		path.append(Vector3(FLIGHT_X0, lerpf(LOW_Y, MID_Y, t), lerpf(FLIGHT_Z0, FLIGHT_Z1, t)))
+	for i in range(1, 5):
+		path.append(Vector3(FLIGHT_X0, MID_Y, lerpf(FLIGHT_Z1, TURN_Z, float(i) / 4.0)))
+	var turn_centre_x := (FLIGHT_X0 + FLIGHT_X1) * 0.5
+	for i in range(1, 33):
+		var angle := PI + PI * float(i) / 32.0
+		path.append(Vector3(turn_centre_x + TURN_R * cos(angle), MID_Y, TURN_Z + TURN_R * sin(angle)))
+	for i in range(1, 5):
+		path.append(Vector3(FLIGHT_X1, MID_Y, lerpf(TURN_Z, FLIGHT_Z1, float(i) / 4.0)))
+	for i in range(1, 25):
+		var t := float(i) / 24.0
+		path.append(Vector3(FLIGHT_X1, lerpf(MID_Y, HIGH_Y, t), lerpf(FLIGHT_Z1, 2.2, t)))
+	FireCalderaHighline._build_glass_path(body, path, 2.4, "CivicAccessibleGallery", "glass")
+	var lane: Array[Vector3] = []
+	for point: Vector3 in path:
+		lane.append(point)
+	ClearZones.add_lane(body, "civic glass ramp", lane, 0.58)
+	ClearZones.add_lane(body, "civic ramp forecourt", [Vector3(0.0, 0.05, 6.8), Vector3(-9.0, 0.05, 6.8), Vector3(FLIGHT_X0, LOW_Y, FLIGHT_Z0)], 0.58)
 
 
 static func _guard(body: StaticBody3D, from: Vector3, to: Vector3) -> void:
@@ -239,22 +328,64 @@ static func _guard(body: StaticBody3D, from: Vector3, to: Vector3) -> void:
 
 
 static func _upper_shell(body: StaticBody3D) -> void:
-	# Instruments sit on an open rear mezzanine instead of beneath another
-	# dome. The glass roof and terrarium remain the only dominant silhouettes.
-	for i in 6:
-		var x := -4.4 + 1.7 * float(i)
-		CalderaFurniture.piece(body, Vector3(0.30, 0.65, 0.24), CalderaShell.VOLCANIC_STONE, Vector3(x, UPPER + 0.65, -6.0), 0.0, true, 6.0)
-		CalderaShell._metal(body, Vector3(x, UPPER + 1.45, -6.0), Vector3(0.04, 0.35, 0.04), CalderaShell.STAINLESS, false)
-	FireCalderaBuildings._marker(body, "SelkaInstrumentMarker", Vector3(0.0, UPPER, -5.6), 0.0)
+	# A full second-storey ring of public galleries surrounds the central
+	# terrarium court. The four floor plates meet edge-to-edge; the open centre
+	# keeps the dome visible from both levels. The north and south bridges stop
+	# short of the monumental portals below.
+	var floor_bays: Array[Dictionary] = [
+		{"name": "CivicUpperWestGallery", "centre": Vector3(-8.7, UPPER - 0.11, 0.0), "size": Vector3(6.6, 0.22, 11.4)},
+		{"name": "CivicUpperEastGallery", "centre": Vector3(8.7, UPPER - 0.11, 0.0), "size": Vector3(6.6, 0.22, 11.4)},
+		{"name": "CivicUpperNorthGallery", "centre": Vector3(0.0, UPPER - 0.11, -4.7), "size": Vector3(10.8, 0.22, 2.0)},
+		{"name": "CivicUpperSouthGallery", "centre": Vector3(0.0, UPPER - 0.11, 4.7), "size": Vector3(10.8, 0.22, 2.0)},
+	]
+	for bay: Dictionary in floor_bays:
+		var slab := BoxMesh.new()
+		slab.size = bay["size"]
+		var gallery := MeshInstance3D.new()
+		gallery.name = bay["name"]
+		gallery.mesh = slab
+		gallery.position = bay["centre"]
+		gallery.material_override = SolidModel.material(FLOOR.lightened(0.05), 0.44, 0.08)
+		body.add_child(gallery)
+		CollisionPolicy.add_box(body, gallery, slab.size, gallery.position, Basis(), true)
+	# Slender supports align with the facade piers and the four inner corners of
+	# the gallery bridges, so the new floor reads as a carried structure.
+	for at: Vector2 in [
+		Vector2(-11.7, -5.3), Vector2(-11.7, 0.0), Vector2(-11.7, 5.3),
+		Vector2(11.7, -5.3), Vector2(11.7, 0.0), Vector2(11.7, 5.3),
+		Vector2(-5.25, -5.3), Vector2(5.25, -5.3),
+		Vector2(-5.25, 5.3), Vector2(5.25, 5.3),
+	]:
+		var post := SuperEgg.build_part(Vector3(0.13, (UPPER - 0.22) * 0.5, 0.13), CalderaShell.STEEL_BLUED, 5.5, 5.5)
+		post.position = Vector3(at.x, (UPPER - 0.22) * 0.5, at.y)
+		body.add_child(post)
+		CollisionPolicy.add_box(body, post, Vector3(0.28, UPPER - 0.22, 0.28), post.position, Basis(), false)
+	# The atrium edge uses the same glass cassette and handrail as the Highline.
+	# Its west-side opening is centred on the civic ramp's second-storey arrival.
+	var inner_edges: Array[Array] = [
+		[Vector3(-5.4, UPPER, -3.7), Vector3(-5.4, UPPER, 0.85)],
+		[Vector3(-5.4, UPPER, 3.25), Vector3(-5.4, UPPER, 3.7)],
+		[Vector3(5.4, UPPER, -3.7), Vector3(5.4, UPPER, 3.7)],
+		[Vector3(-5.4, UPPER, -3.7), Vector3(5.4, UPPER, -3.7)],
+		[Vector3(-5.4, UPPER, 3.7), Vector3(5.4, UPPER, 3.7)],
+		[Vector3(-5.4, UPPER, -5.7), Vector3(5.4, UPPER, -5.7)],
+		[Vector3(-5.4, UPPER, 5.7), Vector3(5.4, UPPER, 5.7)],
+	]
+	for edge: Array in inner_edges:
+		var a: Vector3 = edge[0]
+		var b: Vector3 = edge[1]
+		FireCalderaHighline._path_guard(body, a, b, Vector3.UP)
+		FireCalderaHighline._tube(body, PackedVector3Array([a + Vector3.UP * 1.09, b + Vector3.UP * 1.09]), 0.08, FireCalderaHighline.STEEL, "CivicUpperGalleryHandrail")
+	FireCalderaBuildings._marker(body, "SelkaInstrumentMarker", Vector3(-8.25, UPPER, 4.4), 0.0)
 
 
 static func _council(body: StaticBody3D) -> void:
-	# Five warm basalt seats occupy the west porch and face the living archive.
-	# They no longer turn the centerpiece into a display at the back of a room.
+	# Five mineral-teal chairs occupy the west council porch, facing the speaker
+	# and leaving the forecourt route clear.
 	for i in 5:
-		var z := lerpf(2.25, 6.05, float(i) / 4.0)
+		var z := lerpf(1.65, 4.05, float(i) / 4.0)
 		var x := -7.65 - 0.45 * cos(lerpf(-PI * 0.5, PI * 0.5, float(i) / 4.0))
-		CalderaFurniture.chair(body, Vector3(x, 0.0, z), -PI * 0.5, Color(0.42, 0.25, 0.18))
+		CalderaFurniture.chair(body, Vector3(x, 0.0, z), -PI * 0.5, Color(0.14, 0.36, 0.39))
 	FireCalderaBuildings._marker(body, "CouncilSpeakerMarker", Vector3(-5.6, 0.0, 4.0), -PI * 0.5)
 	FireCalderaBuildings._marker(body, "CouncilStandingMarker", Vector3(-8.4, 0.0, 4.0), PI * 0.5)
 
@@ -295,7 +426,7 @@ static func _glass_divider(body: StaticBody3D, a: Vector2, b: Vector2, openings:
 		var origin2 := a + along * centre_distance
 		var origin := Vector3(origin2.x, 0.0, origin2.y)
 		CalderaShell.door_opening(body, origin, yaw, float(opening["width"]) + 0.55, STOREY, 0.18, float(opening["width"]), 2.75, 0, PARTITION)
-		CalderaShell.open_sliding_door(body, origin, yaw, float(opening["width"]), 2.75, true)
+		_sliding_door(body, origin, yaw, float(opening["width"]), 2.75, true)
 		ClearZones.add(body, "archive slider", "door", origin2, Vector2(-along.y, along.x), 1.25, 1.25, half + 0.15, 0.05, 1.95)
 		cursor = centre_distance + half
 	_add_glass_screen_run(body, a + along * cursor, b, yaw)
@@ -327,51 +458,77 @@ static func _terrarium(body: StaticBody3D) -> void:
 	glass.cull_mode = BaseMaterial3D.CULL_DISABLED
 	shell.material_override = glass
 	body.add_child(shell)
+	# The clamped, closed dome is also the terrarium's physical enclosure. Its
+	# collision comes from this very mesh so the visible glass cannot be entered.
+	var glass_body := StaticBody3D.new()
+	glass_body.name = "CivicTerrariumGlassBarrier"
+	glass_body.collision_layer = 1
+	glass_body.collision_mask = 0
+	glass_body.position = shell.position
+	body.add_child(glass_body)
+	var glass_collision := CollisionShape3D.new()
+	glass_collision.name = "TerrariumDomeCollision"
+	glass_collision.shape = shell.mesh.create_trimesh_shape()
+	glass_collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+	glass_body.add_child(glass_collision)
 	CollisionPolicy.mark_decorative(shell)
-	var soil := SuperEgg.build_part(Vector3(TERRARIUM_HALF.x - 0.35, 0.26, TERRARIUM_HALF.y - 0.35), Color(0.18, 0.10, 0.055), 4.0, 4.0)
+	var soil := SuperEgg.build_part(Vector3(TERRARIUM_HALF.x - 0.35, 0.26, TERRARIUM_HALF.y - 0.35), Color(0.12, 0.34, 0.16), 4.0, 4.0)
+	soil.name = "TerrariumGrassFloor"
 	soil.position = centre + Vector3(0.0, 0.58, 0.0)
 	body.add_child(soil)
 	CollisionPolicy.mark_decorative(soil)
-	var tree := NatureProps.build_round_tree(5.1, Color(0.16, 0.48, 0.22))
+	var tree := NatureProps.build_round_tree(5.1, Color(0.05, 0.55, 0.16))
 	tree.name = "TerrariumLivingTree"
 	tree.position = centre + Vector3(0.0, 0.72, 0.0)
 	tree.scale = Vector3.ONE * 0.92
 	body.add_child(tree)
-	# Rock and low plant specimens turn the enclosure into a miniature living
-	# landscape rather than one tree on an empty display disc.
-	for specimen: Array in [
-		[Vector3(-2.45, 0.0, 1.25), Vector3(0.60, 0.40, 0.52), Color(0.32, 0.29, 0.27)],
-		[Vector3(2.35, 0.0, -1.25), Vector3(0.52, 0.34, 0.46), Color(0.38, 0.34, 0.30)],
-		[Vector3(-2.20, 0.0, -1.55), Vector3(0.48, 0.28, 0.40), Color(0.23, 0.42, 0.18)],
-		[Vector3(2.10, 0.0, 1.65), Vector3(0.54, 0.31, 0.44), Color(0.18, 0.48, 0.22)],
-	]:
-		var piece := SuperEgg.build_part(specimen[1], specimen[2], 3.0, 3.0)
-		piece.position = centre + (specimen[0] as Vector3) + Vector3(0.0, 0.82, 0.0)
-		body.add_child(piece)
-		CollisionPolicy.mark_decorative(piece)
-	_ellipse_ring(body, centre + Vector3(0.0, 0.57, 0.0), TERRARIUM_HALF + Vector2(0.06, 0.06))
-	# Branching ribs and a suspended mineral-glass belt make the enclosure read
-	# as fabricated civic infrastructure, not an enlarged inn skylight.
-	var belt := [Color(0.93, 0.43, 0.10, 0.55), Color(0.72, 0.12, 0.56, 0.55), Color(0.10, 0.45, 0.88, 0.55), Color(0.10, 0.62, 0.42, 0.55)]
+	# A sheltered microclimate holds a small, deliberately varied collection:
+	# one canopy tree, two understory trees, flowering shrubs, and ground cover.
+	var understory := NatureProps.build_pine_tree(2.8, Color(0.05, 0.55, 0.16))
+	understory.name = "TerrariumPineUnderstory"
+	understory.position = centre + Vector3(-2.45, 0.72, 1.25)
+	understory.rotation.y = 0.62
+	understory.scale = Vector3(0.84, 0.92, 0.72)
+	body.add_child(understory)
+	var rounded_tree := NatureProps.build_round_tree(2.4, Color(0.10, 0.62, 0.28))
+	rounded_tree.name = "TerrariumBroadleafUnderstory"
+	rounded_tree.position = centre + Vector3(2.35, 0.72, -1.25)
+	rounded_tree.rotation.y = -0.9
+	rounded_tree.scale = Vector3(0.72, 0.78, 0.94)
+	body.add_child(rounded_tree)
 	for i in 12:
-		var a := TAU * float(i) / 12.0
-		var foot := centre + Vector3(cos(a) * TERRARIUM_HALF.x, 0.64, sin(a) * TERRARIUM_HALF.y)
-		var shoulder := centre + Vector3(cos(a) * TERRARIUM_HALF.x * 0.55, 5.95, sin(a) * TERRARIUM_HALF.y * 0.55)
-		CalderaShell._beam(body, foot, shoulder, Vector2(0.085, 0.085), CalderaShell.STEEL_BLUED)
-		if i % 3 == 0:
-			var pane := SuperEgg.build_part(Vector3(0.055, 0.68, 0.42), belt[i / 3], 6.0, 6.0)
-			pane.name = "TerrariumMineralGlass"
-			pane.position = lerp(foot, shoulder, 0.72)
-			pane.rotation.y = -a
-			pane.material_override = SolidModel.material(belt[i / 3], 0.04, 0.06)
-			body.add_child(pane)
-			CollisionPolicy.mark_decorative(pane)
+		var angle := TAU * float(i) / 12.0
+		var radius_x := 3.55 if i % 2 == 0 else 3.15
+		var radius_z := 2.72 if i % 2 == 0 else 2.35
+		var at := centre + Vector3(cos(angle) * radius_x, 0.86, sin(angle) * radius_z)
+		var bush := NatureProps.build_bush([Color(0.04, 0.48, 0.24), Color(0.12, 0.66, 0.40), Color(0.16, 0.55, 0.58)][i % 3])
+		bush.name = "TerrariumFloweringUnderstory"
+		bush.position = at
+		bush.scale = Vector3.ONE * (1.3 if i % 3 == 0 else 1.0)
+		body.add_child(bush)
+		if i % 2 == 0:
+			var flower := NatureProps.build_flower([Color(0.95, 0.52, 0.16), Color(0.26, 0.58, 0.88), Color(0.90, 0.33, 0.54)][i % 3])
+			flower.name = "TerrariumFlower"
+			flower.position = at + Vector3(0.28, 0.04, -0.16)
+			body.add_child(flower)
+	for i in 20:
+		var angle := TAU * float(i) / 20.0
+		var grass := NatureProps.build_grass_tuft([Color(0.12, 0.63, 0.30), Color(0.24, 0.72, 0.38)][i % 2])
+		grass.name = "TerrariumGroundcover"
+		grass.position = centre + Vector3(cos(angle) * 3.7, 0.72, sin(angle) * 2.85)
+		body.add_child(grass)
+	# A single fine mineral sill seals the dome base; random braces and suspended
+	# coloured shards are removed so the glass shell and plants read clearly.
+	_ellipse_ring(body, centre + Vector3(0.0, 0.58, 0.0), TERRARIUM_HALF + Vector2(0.06, 0.06))
+	# Two fine ring courses make the conservatory read as a deliberate lantern
+	# with replaceable glazing bays, rather than a bare bubble in the hall.
+	_ellipse_ring(body, centre + Vector3(0.0, 1.35, 0.0), TERRARIUM_HALF * 0.93)
+	_ellipse_ring(body, centre + Vector3(0.0, 2.45, 0.0), TERRARIUM_HALF * 0.72)
 
 
 ## One continuous translucent butterfly surface. The long central valley falls
 ## toward the rear, so the roof never repeats the inn's dome and never ponds
-## over the entrance. Broad clear panes are the field; restrained coloured
-## glass remains a suspended accent below it.
+## over the entrance. Clear panes keep the terrarium and civic hall legible.
 static func _daylight_canopy(body: StaticBody3D) -> void:
 	var hx := 12.65
 	var hz := 8.15
@@ -404,6 +561,18 @@ static func _daylight_canopy(body: StaticBody3D) -> void:
 	collision.shape = canopy.mesh.create_trimesh_shape()
 	collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
 	body.add_child(collision)
+	# A closed eaves ring follows the roof surface and meets the corner Y-piers.
+	# Both transverse sides share the canopy's saddle profile.
+	for z: float in [-7.5, 7.5]:
+		for segment in 20:
+			var x0 := lerpf(-12.0, 12.0, float(segment) / 20.0)
+			var x1 := lerpf(-12.0, 12.0, float(segment + 1) / 20.0)
+			CalderaShell._beam(body, Vector3(x0, roof_y.call(x0, z) - 0.12, z), Vector3(x1, roof_y.call(x1, z) - 0.12, z), Vector2(0.18, 0.18), CalderaShell.STEEL_BLUED)
+	for side: float in [-1.0, 1.0]:
+		for segment in 16:
+			var z0 := lerpf(-7.5, 7.5, float(segment) / 16.0)
+			var z1 := lerpf(-7.5, 7.5, float(segment + 1) / 16.0)
+			CalderaShell._beam(body, Vector3(side * 12.0, roof_y.call(side * 12.0, z0) - 0.12, z0), Vector3(side * 12.0, roof_y.call(side * 12.0, z1) - 0.12, z1), Vector2(0.18, 0.18), CalderaShell.STEEL_BLUED)
 	# Seven transverse V-ribs and five longitudinal fall ribs explain the span.
 	for zi in 7:
 		var z := lerpf(-hz, hz, float(zi) / 6.0)
@@ -415,6 +584,42 @@ static func _daylight_canopy(body: StaticBody3D) -> void:
 	for xi in 5:
 		var x := lerpf(-hx, hx, float(xi) / 4.0)
 		CalderaShell._beam(body, Vector3(x, roof_y.call(x, -hz) - 0.05, -hz), Vector3(x, roof_y.call(x, hz) - 0.05, hz), Vector2(0.10, 0.12), CalderaShell.STAINLESS_SHADOW)
+
+
+## The Austin-library reference is translated into a restrained lantern of
+## coloured glass below the canopy. Three framed panels hang behind the court,
+## clear of both portals and the terrarium enclosure; they tint daylight
+## without becoming loose shards or blocking the gallery.
+static func _stained_glass_baffles(body: StaticBody3D) -> void:
+	var panels := [
+		{"x": -4.9, "z": -4.6, "w": 1.55, "h": 2.45, "c": Color(0.18, 0.43, 0.88, 0.62)},
+		{"x": 0.0, "z": -4.6, "w": 1.85, "h": 2.9, "c": Color(0.96, 0.47, 0.16, 0.62)},
+		{"x": 4.9, "z": -4.6, "w": 1.55, "h": 2.45, "c": Color(0.10, 0.66, 0.56, 0.62)},
+	]
+	for i in panels.size():
+		var panel: Dictionary = panels[i]
+		var width := float(panel["w"])
+		var height := float(panel["h"])
+		var colour: Color = panel["c"]
+		var y := 8.2 - height * 0.5
+		var pane := BoxMesh.new()
+		pane.size = Vector3(width, height, 0.06)
+		var glass := MeshInstance3D.new()
+		glass.name = "CivicAustinGlassBaffle%d" % i
+		glass.mesh = pane
+		glass.position = Vector3(float(panel["x"]), y, float(panel["z"]))
+		glass.material_override = SolidModel.material(colour, 0.08, 0.04)
+		body.add_child(glass)
+		CollisionPolicy.mark_decorative(glass)
+		for side: float in [-1.0, 1.0]:
+			CalderaShell._beam(body,
+				Vector3(float(panel["x"]) + side * width * 0.5, y - height * 0.5, float(panel["z"])),
+				Vector3(float(panel["x"]) + side * width * 0.5, y + height * 0.5, float(panel["z"])),
+				Vector2(0.055, 0.055), CalderaShell.STEEL_BLUED)
+		CalderaShell._beam(body,
+			Vector3(float(panel["x"]) - width * 0.5, y, float(panel["z"])),
+			Vector3(float(panel["x"]) + width * 0.5, y, float(panel["z"])),
+			Vector2(0.045, 0.045), CalderaShell.STEEL_BLUED)
 
 
 static func _canopy_quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3) -> void:

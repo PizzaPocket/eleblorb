@@ -440,10 +440,13 @@ static func _parapet(upper: StaticBody3D) -> void:
 	var glass := ShaderMaterial.new()
 	glass.shader = _dichroic_shader()
 	# [from, to] runs of upstand; the east side breaks for the lift's landing.
+	# Keep the lift's own door at its actual clear width. The public gallery
+	# arrives at a separate rear terrace edge, broken out in its own run below.
 	var gap0 := LIFT_AT.y - LIFT_SIZE.y * 0.5 - 0.05
 	var gap1 := LIFT_AT.y + LIFT_SIZE.y * 0.5 + 0.05
 	var runs := [
-		[Vector2(x0, -half.y), Vector2(x1, -half.y)], [Vector2(x0, half.y), Vector2(x1, half.y)],
+		[Vector2(x0, -half.y), Vector2(1.45, -half.y)], [Vector2(4.55, -half.y), Vector2(x1, -half.y)],
+		[Vector2(x0, half.y), Vector2(x1, half.y)],
 		[Vector2(x0, -half.y), Vector2(x0, half.y)],
 		[Vector2(x1, -half.y), Vector2(x1, gap0)], [Vector2(x1, gap1), Vector2(x1, half.y)],
 	]

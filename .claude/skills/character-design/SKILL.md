@@ -103,11 +103,14 @@ code rather than to one character's script.
 - **Worn gameplay items** (helmets, crowns, hats a blorb becomes) belong to the
   blorb suit and item systems, not to NPC dress.
 
-Garments planned for the Chinese village and not yet in the kit: standing
-collar, side-fastening (*dàjīn*) or centre (*duìjīn*) closure with frog
-buttons, contrasting edge binding, below-hip jacket length with side slits,
-wide straight sleeves with a bound cuff, sleeveless vest, apron, waist sash,
-pleated panel skirt, conical straw hat, cloth head wrap, hairpin.
+Chinese garment kit (`figure_chinese_clothing.gd`, NPC `cultural_outfit`): separately fitted
+thorax and abdomen details, standing collar or lower court collar, bound centre/side
+closures with frog knots, wraparound hip hems, wide sleeves and bound cuffs, vest,
+apron with pocket/straps, sash, serving cloth, travel pack and cloth-shoe welt.
+`chinese_appearance.gd` assigns fixed named looks. `HairOrnaments` supplies
+hairstyle-fitted wraps, kerchiefs, pins, ribbons, straw hats and the twelve-strand
+court crown. The emperor's roundels and jade belt remain in the shared NPC kit.
+Pleated panel skirts and a carried shoulder pole remain unimplemented.
 
 When a charter needs a garment the kit lacks (a lei, an aloha shirt, an apron,
 a robe), add it as a reusable option in the shared figure code, as `FigureDress`
@@ -188,6 +191,15 @@ axes and mildly on the rest, and give the variation a reason:
 
 No two members of one household share more than half their axes (sleeve,
 garment colour, hair style, hair colour, build, accessory).
+
+## 5a. Preserve the figure language
+
+The thorax, abdomen and hips remain visibly separate volumes, including under
+jackets, vests and workwear. Never add one enclosing torso mesh to hide those
+joints. Dress details follow the individual articulated parts. A short jacket's
+lower section wraps the hips; detached front/back plates read as an apron.
+Only people whose work calls for an apron wear one. Check beards against actual
+garment meshes at neutral and turned-head poses, not only against the face.
 
 ## 6. Readability
 

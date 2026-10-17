@@ -74,3 +74,48 @@ static func validate_body(body: StaticBody3D) -> bool:
 		)
 		return false
 	return true
+
+
+## Godot primitive shapes cannot represent shear. Fitting a building with
+## unequal X/Z scale makes its pitched boxes shear even though the mesh looks
+## correct. Bake those eight actual transformed corners into an unscaled hull.
+static func fit_sheared_static_boxes(root: Node3D) -> int:
+	var bodies: Dictionary={}
+	var count:=0
+	for node in root.find_children("*","CollisionShape3D",true,false):
+		var collision:=node as CollisionShape3D
+		if not collision.shape is BoxShape3D or collision.disabled: continue
+		var owner_body:=collision.get_parent() as StaticBody3D
+		if owner_body==null: continue
+		var moving:=false
+		var ancestor: Node=owner_body
+		while ancestor!=root and ancestor!=null:
+			if ancestor.get_script()!=null: moving=true
+			ancestor=ancestor.get_parent()
+		if moving: continue
+		var basis:=collision.global_basis
+		if absf(basis.x.normalized().dot(basis.y.normalized()))<0.0001 and absf(basis.x.normalized().dot(basis.z.normalized()))<0.0001 and absf(basis.y.normalized().dot(basis.z.normalized()))<0.0001: continue
+		var key:=str(owner_body.collision_layer)+":"+str(owner_body.collision_mask)
+		if not bodies.has(key):
+			var body:=StaticBody3D.new()
+			body.name="FittedSlopeCollision"
+			body.collision_layer=owner_body.collision_layer
+			body.collision_mask=owner_body.collision_mask
+			root.add_child(body,true)
+			bodies[key]=body
+		var target: StaticBody3D=bodies[key]
+		var frame:=target.global_transform.affine_inverse()*collision.global_transform
+		var half: Vector3=collision.shape.size*0.5
+		var points:=PackedVector3Array()
+		for x: float in [-1,1]:
+			for y: float in [-1,1]:
+				for z: float in [-1,1]: points.append(frame*(half*Vector3(x,y,z)))
+		var fitted:=CollisionShape3D.new()
+		var hull:=ConvexPolygonShape3D.new();hull.points=points
+		fitted.shape=hull
+		fitted.set_meta("fitted_from",str(collision.get_path()))
+		for meta in collision.get_meta_list(): fitted.set_meta(meta,collision.get_meta(meta))
+		target.add_child(fitted)
+		collision.free()
+		count+=1
+	return count

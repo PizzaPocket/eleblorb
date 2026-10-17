@@ -105,3 +105,21 @@ static func ground_height(body: Node3D, terrain: Node, reach: float = REACH) -> 
 	# Only ever prefer a surface that stands above the terrain here: below it
 	# is something buried, which nobody is standing on.
 	return maxf(surface, terrain_height)
+
+
+## The same support contract at a proposed foot position. Driven mounts use
+## the normal to sweep along a built ramp instead of treating it as a wall.
+static func sample_ground(body: Node3D, terrain: Node, at: Vector3, exclude: Array[RID], reach: float = REACH) -> Dictionary:
+	var fallback := at.y
+	if terrain!=null and terrain.has_method("get_mesh_height"):
+		fallback=terrain.get_mesh_height(at.x,at.z)
+	var result := {"height":fallback,"normal":Vector3.UP}
+	var world := body.get_world_3d()
+	if world==null: return result
+	var query := PhysicsRayQueryParameters3D.create(at+Vector3.UP*RISE,at-Vector3.UP*reach,1)
+	query.exclude=exclude
+	var hit := world.direct_space_state.intersect_ray(query)
+	if not hit.is_empty() and float(hit.position.y)>=fallback-0.001:
+		result.height=float(hit.position.y)
+		result.normal=hit.normal
+	return result

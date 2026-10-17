@@ -53,7 +53,7 @@ static func merge(root: Node3D) -> int:
 		(group["pieces"] as Array).append([piece.mesh, _xform_in(root, piece), material.albedo_color])
 		var policy := piece.get_meta(CollisionPolicy.POLICY_META, &"") as StringName
 		if policy in [CollisionPolicy.SOLID, CollisionPolicy.PARKOUR]:
-			group["physical"] = int(group["physical"]) + 1
+			group["physical"] = int(group["physical"]) + int(piece.get_meta(MERGED_PHYSICAL_META, 1))
 		merged.append(piece)
 	if merged.is_empty():
 		return 0

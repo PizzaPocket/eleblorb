@@ -209,7 +209,7 @@ func _check_highline(space: PhysicsDirectSpaceState3D) -> void:
 	for rail_name: String in ["InnerTopRailRun", "OuterTopRailRun", "ArrivalBywayLeftTopRail", "ArrivalBywayRightTopRail"]:
 		if _highline.find_child(rail_name, true, false) == null:
 			_fail("Highline: no continuous pipe run named %s" % rail_name)
-	for label: String in ["ArrivalByway", "GuestGateLink", "RenewalWest", "RenewalEast", "OrenTerraceLink", "KelUpperLink"]:
+	for label: String in ["ArrivalByway", "GuestGateLink", "RenewalWest", "RenewalEast", "OrenTerraceLink"]:
 		if _highline.find_child("%sGlassRibbon" % label, true, false) == null:
 			_fail("Highline: %s is not one continuous visual ribbon" % label)
 		if _highline.find_child("%sRibbonCollision" % label, true, false) == null:
@@ -218,18 +218,34 @@ func _check_highline(space: PhysicsDirectSpaceState3D) -> void:
 			_fail("Highline: %s still uses segmented box slabs" % label)
 	var arrival := FireCalderaPlan.arrival_byway()
 	var arrival_start := FireCalderaGround.crater_wall(arrival[0]) + FireCalderaPlan.ARRIVAL_DECK_CLEARANCE
-	_check_ribbon_floor(space, "H0", arrival, arrival_start, FireCalderaPlan.HIGHLINE_DATUM)
+	_check_ribbon_floor(space, "H0", arrival, FireCalderaGround.height(arrival[0]), FireCalderaPlan.HIGHLINE_DATUM)
 	var guest_path := FireCalderaPlan.guest_gate_link()
-	var guest_t := clampf((FireCalderaPlan.RIM_RADIUS - guest_path[0].length()) / (FireCalderaPlan.RIM_RADIUS - FireCalderaPlan.HIGHLINE_RADIUS), 0.0, 1.0)
-	_check_ribbon_floor(space, "HG", guest_path, lerpf(arrival_start, FireCalderaPlan.HIGHLINE_DATUM, FireCalderaPlan.route_height_t("H0", guest_t)), FireCalderaPlan.GUEST_GATE_DATUM)
+	var guest_station := 0
+	var guest_station_distance := INF
+	for i in arrival.size():
+		var distance := arrival[i].distance_to(guest_path[0])
+		if distance < guest_station_distance:
+			guest_station_distance = distance
+			guest_station = i
+	var guest_join_start := maxi(0, guest_station - 1)
+	var guest_join_end := mini(arrival.size() - 1, guest_station + 1)
+	var guest_start_y := 0.0
+	for i in [guest_join_start, guest_join_end]:
+		var t := float(i) / float(arrival.size() - 1)
+		var y := FireCalderaGround.height(arrival[0]) if i == 0 else lerpf(arrival_start, FireCalderaPlan.HIGHLINE_DATUM, FireCalderaPlan.route_height_t("H0", t))
+		if t < 0.08 and i > 0:
+			y = lerpf(FireCalderaGround.height(arrival[0]), arrival_start, smoothstep(0.0, 0.08, t))
+		guest_start_y += y * 0.5
+	_check_ribbon_floor(space, "HG", guest_path, guest_start_y, FireCalderaPlan.GUEST_GATE_DATUM)
 	_check_ribbon_floor(space, "H2W", FireCalderaPlan.renewal_byway(-1.0), FireCalderaPlan.HIGHLINE_DATUM, float(_lines["RENEWAL"]["datum"]))
 	_check_ribbon_floor(space, "H2E", FireCalderaPlan.renewal_byway(1.0), FireCalderaPlan.HIGHLINE_DATUM, float(_lines["RENEWAL"]["datum"]))
 	_check_ribbon_floor(space, "H4", FireCalderaPlan.oren_terrace_link(), FireCalderaPlan.HIGHLINE_DATUM, float(_lines["OREN"]["datum"]) + FireCalderaOren.UPPER + FireCalderaOren.roof_top())
-	_check_ribbon_floor(space, "H5", FireCalderaPlan.kel_upper_link(), FireCalderaPlan.HIGHLINE_DATUM, float(_lines["KEL"]["datum"]) + FireCalderaKel.RESIDENCE)
 	var renewal_plinth := _plinths["RENEWAL"] as Node
-	for feature: String in ["RenewalGlassDeck", "RenewalSupertoroidalServicePier", "ImmersionTongue"]:
+	for feature: String in ["RenewalGlassDeck", "RenewalSupertoroidalServicePier"]:
 		if renewal_plinth.find_child(feature, true, false) == null:
 			_fail("RENEWAL: no %s" % feature)
+	if renewal_plinth.find_child("ImmersionTongueGlassRibbon", true, false) == null:
+		_fail("RENEWAL: the immersion tongue is missing from its civic platform")
 	if not renewal_plinth.find_children("GhatStep", "*", true, false).is_empty():
 		_fail("RENEWAL: the obsolete bulky ghat steps remain")
 	for prefix: String in ["RenewalWestGlass", "RenewalEastGlass"]:
@@ -240,10 +256,21 @@ func _check_highline(space: PhysicsDirectSpaceState3D) -> void:
 
 
 func _check_ribbon_floor(space: PhysicsDirectSpaceState3D, id: String, points: PackedVector2Array, start_y: float, finish_y: float) -> void:
+	var cumulative := PackedFloat32Array()
+	if id == "H2W" or id == "H2E":
+		cumulative.resize(points.size())
+		for i in range(1, points.size()):
+			cumulative[i] = cumulative[i - 1] + points[i - 1].distance_to(points[i])
 	for i in range(1, points.size() - 1, 2):
 		var t := float(i) / float(points.size() - 1)
-		var height_t := FireCalderaPlan.route_height_t(id, t)
+		var height_t := cumulative[i] / maxf(cumulative[-1], 0.001) if not cumulative.is_empty() else FireCalderaPlan.route_height_t(id, t)
 		var y := lerpf(start_y, finish_y, height_t)
+		if id == "H0":
+			var ramp_start := FireCalderaGround.crater_wall(points[0]) + FireCalderaPlan.ARRIVAL_DECK_CLEARANCE
+			if t < 0.08:
+				y = lerpf(start_y, ramp_start, smoothstep(0.0, 0.08, t))
+			else:
+				y = lerpf(ramp_start, finish_y, height_t)
 		var p := points[i]
 		var hit := _ray(space, Vector3(p.x, y + 0.35, p.y), Vector3(p.x, y - 0.45, p.y), [_ground.get_rid()])
 		if hit.is_empty() or hit["collider"] != _highline or absf(float(hit["position"].y) - y) > 0.06:

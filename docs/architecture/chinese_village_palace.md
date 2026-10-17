@@ -15,7 +15,7 @@ The palace has two states, and both use **the same buildings**:
   by trade.
 - **The civic centre** comes after the quest. Tian Bo, now village chief, opens
   its halls, gardens and grounds to everyone. Liang Zhen serves as his
-  **advisor**, and **Lu**, the innkeeper, cooks for the whole village in the
+  **advisor**, and **Lao Ye**, the restaurant keeper, cooks for the whole village in the
   former Royal Kitchen (revised 2026-10-12; no romance).
 
 The conversion is a **renovation, not a rebuild.** The walls, roofs, terraces,
@@ -106,7 +106,7 @@ south, toward the gate island and the axial bridge. The axis runs along `x = 0`.
 | **Inner apartments** | `(-25, -24)` (moved 1 m east to meet the inner court, 2026-10-13) | 14 × 20 m, west wing on the inner court, door facing east | +5.6 | single-eave *xiēshān*, yellow |
 | **Royal Kitchen** | `(32, -22)` | 18 × 12 m on the east, at ground level, reached from the inner court by a ramp down along the court's east edge (5.6 m rise in two flights: about 9 m of run, a 1.2 m mid landing and landings at both ends, about 12.6 m in all, within the court's 14 m depth), landing at the kitchen's west door; and from the service yard | 0 | *xuánshān*, grey |
 | **Chef's quarters** | `(32, -34)` | 8 × 6 m, behind the kitchen | 0 | *xuánshān*, grey |
-| **Service yard** | `(49, -6)` | 16 × 20 m, packed earth, a well, the levy store (10 × 6 m), a latrine closet, a cart turn; its own landing from island B's bridge on the east rim | 0 | store: *xuánshān*, grey |
+| **Service yard** | `(47, -6)` (moved 2 m west to preserve the island's 4.2 m clear edge strip) | 16 × 20 m, packed earth, a well, the levy store (10 × 6 m), a latrine closet, a cart turn; its own landing from island B's bridge on the east rim | 0 | store: *xuánshān*, grey |
 | **High pavilion** | `(0, -42)` | 10 × 10 m, two storeys, on a rock-and-marble mound at the head of the axis, overlooking the Abyss, 4.2 m above the inner court, reached by a switchback ramp of two 2.1 m flights (about 3.4 m of run each, with landings) on the mound's south face; interior ramp 5.2 m run | +9.8 / +13.0 | double-eave *cuánjiān*, yellow, gilded finial |
 | **Royal garden** | north and north-west, `z` -34 to -58 | the four framed views from `chinese_village.md` 4.4: moon-gate court with a pomegranate, pond with a zigzag bridge and a small pavilion, rock garden, bamboo screen and bench court | 0 to +5.6, stepped | small pavilion: *cuánjiān*, yellow |
 
@@ -137,10 +137,10 @@ Every ramp has a 1.2 m landing at its foot and head.
 | **Front court** | Bare and swept. Two bronze water vats for firefighting at the corners. The 14 lanterns in two ceremonial rows. | The village's square. The vats stay. Benches under the eaves; a chalk hopscotch grid near the gate where the children play; festival lantern strings across the court; on meal nights, tables spill out from the Dining Hall. |
 | **Throne terrace** | Empty marble, too grand to linger on. | The same marble, now a place to sit on the balustrade steps and look south over the village. |
 | **Throne Hall** | The **audience hall**. Liang Zhen's throne on a three-step dais under a carved screen; a long empty floor where petitioners kneel; censers and tall lanterns; doors kept half shut, so the hall is dim. Liang Zhen receives the hero here. | The **village hall**. The dais stays as a speaking platform, but the throne is gone and Tian Bo's plain chair stands at floor level in front of it. Long benches in a horseshoe for meetings, a table for the records under the windows, a vase of fresh bamboo culms from Tian Bo's grove. All doors open, so the hall is bright. The carved screen stays as the village's heritage. |
-| **Dining Hall** | Liang Zhen's **private dining hall**: one table, one chair, the rejected bao trials sent back to Hua Chen, an empty hall for one diner. | The **communal dining hall**: long tables and benches for the whole village, a serving hatch through to the kitchen route, lanterns low over the tables. Lu and Lu Hao serve here on meal nights. |
+| **Dining Hall** | Liang Zhen's **private dining hall**: one table, one chair, the rejected bao trials sent back to Hua Chen, an empty hall for one diner. | The **communal dining hall**: long tables and benches for the whole village, a serving hatch through to the kitchen route, lanterns low over the tables. Lao Ye and Lu Hao serve here on meal nights; Lao Lao keeps the inn. |
 | **Inner apartments** | The **Emperor's rooms**: bedchamber, study with the levy ledgers, robe room with the ceremonial crown on its stand. | **Records and meeting rooms.** The bedchamber becomes a small meeting room with a table and six chairs. The study becomes the **records room**, where **Liang Zhen works as Tian Bo's advisor**: the old levy ledgers kept on a shelf as a lesson, beside the new village records, and his writing desk under the window. The robe room becomes a **reading and teaching room** for the five children, with low tables and slates. The crown stays on its stand in a niche, a relic nobody wears. |
-| **Royal Kitchen** | The **Chef's kitchen**: working hearths, bronze pots, bamboo steamers, shelves and preparation counters around a **clear fight floor** of at least 12 × 8 m. The long counter where captured blorbs sit shrunk as buns. | The **community kitchen**: the same hearths and counters, busy. The long counter becomes the serving counter, piled with steamers. **Lu's** kitchen on meal nights: his knives rolled in cloth, his own seasoning jars brought up from the inn, Hua Chen's bao on a rack, which she supplies. The fight floor holds a long prep table, moved aside on the plan so its shell stays the same. |
-| **Chef's quarters** | The Chef's sparse room: a narrow bed, a locked chest, nothing personal. | **Liang Zhen's home** (approved 2026-10-12). The former Emperor chose the humblest room in the palace: a bed, a shelf of borrowed records, a brush stand, a pot of herbs on the sill. Its own door to the service yard means he never passes through Lu's kitchen. |
+| **Royal Kitchen** | The **Chef's kitchen**: working hearths, bronze pots, bamboo steamers, shelves and preparation counters around a **clear fight floor** of at least 12 × 8 m. The long counter where captured blorbs sit shrunk as buns. | The **community kitchen**: the same hearths and counters, busy. The long counter becomes the serving counter, piled with steamers. **Lao Ye's** kitchen on meal nights: his knives rolled in cloth, his own seasoning jars brought up from the inn, Hua Chen's bao on a rack, which she supplies. The fight floor holds a long prep table, moved aside on the plan so its shell stays the same. |
+| **Chef's quarters** | The Chef's sparse room: a narrow bed, a locked chest, nothing personal. | **Liang Zhen's home** (approved 2026-10-12). The former Emperor chose the humblest room in the palace: a bed, a shelf of borrowed records, a brush stand, a pot of herbs on the sill. Its own door to the service yard means he never passes through Lao Ye's kitchen. |
 | **Service yard** | Levy carts unloading flour and beans; the levy store full and locked; the well; the latrine closet. | The levy store becomes the **village store**, kept for lean seasons, its door unlocked. The well and latrine stay. Bo Xiang's cart still turns here. |
 | **High pavilion** | The Emperor's **private viewing pavilion**: a single chair facing north over the Abyss, a tea table, closed to everyone else. | A **public lookout**. Benches on both floors facing out; children fly kites from the upper gallery. |
 | **Royal garden** | Immaculate and empty; the moon gate shut. | Open, used and a little less immaculate: Tian Bo has planted a clump of bamboo in the bamboo court, and a bench where Liang Zhen sits with Tian Bo over the village's business. |
@@ -173,7 +173,7 @@ Checked against the architecture skill's brief audit.
     through it.
   - The Chef's quarters open off the kitchen, a cook's room off his own
     kitchen, which is legitimate for the Chef. Once Liang Zhen lives there and
-    Lu uses the kitchen, the room also uses its own door onto the service yard,
+    Lao Ye uses the kitchen, the room also uses its own door onto the service yard,
     present in both states.
   - The Emperor's bedchamber, study and robe room open into one another. They
     are his own suite, which is legitimate. For the civic state, each of the
@@ -238,7 +238,7 @@ inscriptions; a copied real building.
 - the four levels (gate court, throne terrace, inner court, high pavilion);
 - the roof hierarchy, including grey tile on the service buildings;
 - every room's use in both states;
-- Liang Zhen as advisor, working in the records room; Lu cooking the
+- Liang Zhen as advisor, working in the records room; Lao Ye cooking the
   communal meals in the former Royal Kitchen;
 - the children's reading and teaching room.
 

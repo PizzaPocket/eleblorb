@@ -18,8 +18,9 @@ var _moving := false
 func configure(
 	half_width: float, height: float, leaves: int, color: Color,
 	initially_open: bool = true, locked: bool = false,
-	required_key: String = "", lock_id: String = "", hinge_right: bool = false
+	required_key: String = "", lock_id: String = "", hinge_right: bool = false, inward: bool = false
 ) -> void:
+	set_meta("door_configuration",[half_width,height,leaves,color,initially_open,locked,required_key,lock_id,hinge_right,inward])
 	_is_open = initially_open
 	_locked = locked and not (lock_id != "" and WorldState.is_door_unlocked(lock_id))
 	_required_key = required_key
@@ -30,7 +31,7 @@ func configure(
 	material.roughness = 0.8
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
 	var half_leaf := half_width if leaves == 1 else half_width * 0.5
-	var open_angle := deg_to_rad(78.0 if leaves == 1 else 96.0)
+	var open_angle := deg_to_rad(78.0 if leaves == 1 else 96.0) * (-1.0 if inward else 1.0)
 	for index in leaves:
 		# A single leaf hangs on the left jamb unless `hinge_right` asks for the
 		# other: chosen per door so a leaf never swings into the way through.
@@ -136,3 +137,32 @@ func _apply_pose(animated: bool) -> void:
 func _update_prompt() -> void:
 	if is_instance_valid(_area):
 		_area.set_meta("prompt", _prompt())
+
+
+## Lets authored settlement states open or close a door without simulating an
+## interaction. Repeated state syncs are safe and never replay the animation.
+func set_open_state(open: bool, animated: bool = false) -> void:
+	if _is_open == open:
+		return
+	_is_open = open
+	_apply_pose(animated)
+
+
+func is_open() -> bool:
+	return _is_open
+
+
+## Fit the moving door in world dimensions once its static building has been
+## resized. Cancel inherited nonuniform scale so rotating leaves never shear
+## their collision shapes away from their rendered openings.
+func fit_to_parent() -> void:
+	if has_meta("fitted_door"): return
+	var args: Array=get_meta("door_configuration").duplicate()
+	var fitted_basis:=global_basis
+	args[0]=float(args[0])*fitted_basis.x.length()
+	args[1]=float(args[1])*fitted_basis.y.length()
+	for child in get_children(): child.free()
+	_hinges.clear();_open_rotations.clear();_area=null
+	global_basis=fitted_basis.orthonormalized()
+	callv("configure",args)
+	set_meta("fitted_door",true)

@@ -8,8 +8,20 @@ building architecture follows only after this civic plan is approved.
 **Public-realm revision built (2026-10-09).** The reservoir is now a nested
 central lava bowl within a shallower inhabited volcanic bowl. Outer circulation
 is an independently supported **Caldera Highline**, not terrain grading. The
-Civic architecture redesign remains deferred until its Highline dock is
-settled.
+Civic architecture now follows the surveyed Highline dock; the community
+center entry, roof support, conservatory and internal glass ramp are recorded
+in `fire_caldera_city.md`.
+
+**Surface circulation connection pass (2026-10-15).** The inner lava-edge
+promenade and rear service walk are built as walkable terrain-following routes,
+with public and receiving spurs landing at surveyed door positions. Raised
+building porches are guarded except at their designated route landing; the
+gate gallery rises from the surveyed gate ground; and the Oren roof link meets
+the lift lobby beside the car. Elevated foundations have a finished underside.
+Thresholds meet their selected civic loop at surveyed door and ring points;
+route-to-ring points are computed from the selected ring rather than reusing
+the public promenade radius. Continued review should focus on actual in-game
+grades and any remaining support handoff reports.
 
 Read with `fire_caldera_city.md`. That document owns the community, census,
 physiology, cultural practices, architectural charter, and individual building
@@ -364,8 +376,10 @@ uses:
 - controlled flame fixtures at thresholds and junctions;
 - open reservoir views as intentional empty space.
 
-No living plant is placed anywhere within the caldera. Civic landscape there
-is composed from columnar basalt, vesicular boulder groups, obsidian fins,
+No living plant is placed in the open caldera. The community center terrarium
+is a sealed, heat-isolated civic microclimate for study; it does not extend into
+landscaping. Civic landscape there is composed from columnar basalt,
+vesicular boulder groups, obsidian fins,
 mineral crusts, controlled vents, fitted paving, forged-and-glass sculpture,
 colored mineral light, framed views, and the movement of lava itself. These
 elements still follow the landscape rule that each has a job: retaining,
@@ -401,31 +415,61 @@ and Vara; no bridge cuts across the reservoir center or blocks the arrival view.
 - Returning to the surface is possible from all three entries and through at
   least two directions in the lower loop.
 
-### Raised civic tier revision (2026-10-09)
+### Raised civic tier revision (2026-10-15)
 
-The Highline is now the settlement's upper civic street at world Y 42.5, not a
-low shelf behind the buildings. Guest, Nahl, Vara, Civic and Iren stand outside
-the ring with their reservoir-facing front doors docked to its outer edge;
-Guest occupies the higher gate datum at world Y 49.5.
-Their enlarged platforms are private additions to the shared structure and
-own their doorway landings; a coloured expansion joint records the boundary.
-The ring floor is transparent structural glass with steel mullions and guards,
-opened only at authored docks.
+The Highline remains the upper civic street at world Y 42.5. Its 22 cm
+glass-and-steel deck has a visible edge thickness, matching the ramp
+cassettes. Turns and landings stay within that same deck plane. At the gate to
+inn branch, the parent gallery's sampled side edge defines the branch landing
+seam, the parent guard opening, and both shared handrail endpoints. Branches
+therefore start from their parent edge, not from a guessed perpendicular
+offset. Platform openings use the route's width and direction; round deck-edge
+pipes follow the ribbon, while guard panels and top rails share one height.
+Building docks trim the ring deck to the platform's actual superellipse
+outline, and the outer rail opens only along that dock. The gate gallery
+terminates at the ring's outer edge; Renewal and Oren join at its inner edge.
+An unconnected edge remains closed.
 
-Oren, Kel and Aro remain terrain-following buildings below and sit inward
-beneath the upper tier. The lava mean radius is 52 m. A long curved
-arrival gallery descends from the true south-lip gate. Two curved glass byways
-approach Renewal from opposite sides; the renewal deck, guarded immersion
-tongue and concave service pier share the Highline's architectural language.
-The former bulky rock platform and stepped ghat are retired. The former
-diagonal Iren–Civic bridge and its two redundant exterior doors are also
-retired: both properties now connect through the shared Highline. Ring and ramp
-glass guards own collision, and the first and last ramp bays open at junction
-throats rather than placing a railing across the desired path. Guard top rails
-are continuous bent pipes along each uninterrupted run, never a visible chain
-of short tessellation segments. Each graded deck is likewise one continuous
-mesh and collision ribbon; constant-grade profiles and level junction throats
-replace the former chain of overlapping slab colliders.
+Oren's compact spiral reaches a separate rear edge of the roof terrace, clear
+of the elevator lobby. The Kel sawtooth building keeps its own circulation
+and has no Highline bridge. Renewal's public glass terrace receives two
+opposing, long mirrored grand ramps from adjacent points on the Highline. Each
+stays within the Renewal flanks, makes two 7 m diameter half-circle returns
+and a final tangent quarter-turn, then lands squarely at the north and south
+sides of the terrace, with its guard opening aligned to that side threshold.
+The paired routes rise over the inner ridge while keeping both landings level
+with their parent decks. One broad, shallow immersion
+tongue reaches the lava edge. The deck shares the Highline's 22 cm glass
+cassette; the perimeter guard pauses
+only at those three thresholds. The lower lava promenade and rear service loop
+stay open at their edges, without rails that obstruct access to the lava.
+
+The gate-to-inn branch starts at a 12 m parent-ramp station on the gateward
+side, at a 20% grade. Its near edge, deck seam, rail opening, and handrail
+endpoints share that sampled parent station; its gate-ramp terminal is cut to
+the exact outer Highline arc. The branch then turns squarely toward the inn
+and lands at its porch guard opening. Curved guard glass is built as continuous
+ribbons, with one shared tint and a 1.09 m rail datum. The civic ramp now
+arrives at a real second-storey gallery ring around the terrarium court; its
+main and reservoir portals remain open superellipse
+arches, while only the smaller gallery sliders carry moving leaves.
+
+The lower promenade follows each ground house's actual front-facing direction
+and runs 3 m beyond the facade at its centreline, leaving about 1.25 m between
+the facade and the near edge of the 3.5 m walk, before easing around the corners
+to the reservoir circuit. Its plan follows the bank and changing frontages,
+while its walking plane stays level at the shared bowl-shoulder datum
+(`GROUND_PROMENADE_DATUM`); it does not tilt down with the lava basin. Threshold
+spurs and the Renewal deck meet that datum. It no longer derives frontage from
+a guessed radial depth, which caused the loop to cut through rotated houses.
+The rear service orbit is set at 77.5 m so its 3.2 m deck no longer sits directly
+under the Highline's 72 m centreline. Front and receiving spurs share the same
+parent-edge pipe datum; Renewal's promenade deck and edge members stop at the
+exact superelliptical platform outline.
+The south gate branch joins the arrival gallery at a shared T landing: its guard
+opening and
+top rails align to the branch edges. The hotel porch receives the matching
+guard opening at its arrival threshold.
 
 ## 11. Implementation contract
 

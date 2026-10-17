@@ -2,16 +2,18 @@
 
 Status: population, backstory, quest resolution and postquest civic use are
 approved. The courtyard charter and palace restructure were approved on
-2026-10-06. The settlement re-fit in section 4.1 (land budget, island sizes,
-households by island, bridges, fields, public space) was revised on 2026-10-12
-and awaits approval. Nothing is implemented yet.
+2026-10-06. The settlement re-fit in sections 4.0, 4.0a and 4.0b was approved
+for implementation on 2026-10-15. The plan-driven rebuild is in progress.
 
-Source of truth today is `scripts/chinese_village.gd` (1572 lines, no plan data
-file, no validator). Measurements come from `tools/audit_china.tscn` (headless,
-prints islands, NPC positions and non-island children relative to the village
-centre at world (250, -650)).
+The generated `ChinesePlan` in `scripts/chinese_plan.gd` is the runtime source
+for terrain rim, island outlines, bridges, abutments, buildings, courts, fields,
+openings, paths, ramps, aprons and parapets. Edit its source at
+`tools/chinese_village_plan.py` and `tools/chinese_village_gorge.py`; never edit
+the generated GDScript by hand. `docs/drawings/chinese_gorge_3d.html` is the
+companion spatial drawing. The rebuild keeps quest and shared rest systems in
+the game scripts.
 
-## 1. Inventory
+## 1. Former implementation inventory (before the plan-driven rebuild)
 
 Islands (all at one shared surface y, about -61, over the Abyss):
 
@@ -23,23 +25,26 @@ Islands (all at one shared surface y, about -61, over the Abyss):
 | Bamboo | (18, 116) | 25 | 34 stalks as multimesh, farmer Tian Bo and Pandy |
 | C | (-118, 42) | 18 | 2 houses, no residents |
 | D | (112, 48) | 19 | 2 houses, no residents |
-| E | (-62, 124) | 17 | 1 house, the inn (keeper now Lu 吕 and his son Lu Hao, 2026-10-12; was 林静), no other residents |
+| E | (-62, 124) | 17 | 1 house, the inn (run by Lao Ye, Lao Lao and their adult son Lu Hao; Chen lodges here), no other residents |
 
 Bridges (flat, 3.2 m wide, one deck and two rails each, no gate or landing):
 Palace-A 44 m, Palace-B 44 m, A-C 65 m, B-D 61 m, C-E 67 m, E-Bamboo 42 m, plus
 a 225 m sloped entry bridge running due south from the palace to the mainland.
 
 Residents: Emperor, Royal Chef (hostile agent), farmer Tian Bo, Pandy, vendor
-Chen, innkeeper Lu (吕) and his son Lu Hao (replacing 林静, 2026-10-12), eight adult villagers (Mei Lian, Wen Zhao, Bo
-Xiang, Hua Chen, Jin Wei, Lian Fu, Yun Tao, Shu Mei), six children (Ting, Xiu,
-Pei, Rong, Bao). Sun Wu Kong is sealed on the castle crown (moving to Lantern
+Chen, inn proprietors Lao Ye and Lao Lao, and their adult son Lu Hao (replacing
+林静 and the former innkeeper Lu, 2026-10-12), eight adult villagers (Mei Lian,
+Wen Zhao, Bo
+Xiang, Hua Chen, Jin Wei, Lian Fu, Yun Tao, Shu Mei), six children (Ting Ting, Xiu Xiu,
+Pei Pei, Rong Rong, Bao Bao). Sun Wu Kong is sealed on the castle crown (moving to Lantern
 Row, section 4.6).
 
 Quest chain (must survive any rebuild): Tian Bo's grievance, Liang Zhen's
 audience, blorbs shrunk to buns on the kitchen counter, Chef fight without
 blorbs, cleaver drop, Liang Zhen restored without an Emperor fight, Tian Bo
 made village chief, Pandy joins, palace becomes a civic centre, Liang Zhen
-becomes Tian Bo's advisor, and Lu the innkeeper becomes the community chef. Jingu Bang hunt at the play hut, Sun Wu Kong freed
+becomes Tian Bo's advisor, and Lao Ye becomes the community chef. Jingu Bang
+hunt at the play hut, Sun Wu Kong freed
 from the sealing rock.
 
 ## 2. Measured defects
@@ -107,11 +112,11 @@ approved.
 | Lian Fu | On some nights every window is lit and the village seems awake together. Stopped asking travellers where they come from. |
 | Yun Tao | The tile colour was shipped in long ago and nobody nearby can fire it now. Likes the hour before the lanterns are lit. |
 | Shu Mei | Lives at the western end of a waste with no end. Has counted the lamp posts many times and never got the same number. |
-| Ting | Pigtails, braves the bamboo, nearly. |
-| Xiu | Counts every lantern. Her mother forbids going to the bamboo alone. |
-| Pei | Races to the well. Catches crickets and lets them go. |
-| Rong | Was shown a bean longer than his arm by the peddler. Adults say the roofs ring because of wind. |
-| Bao | Wants to build a roof like Wen Zhao's. Collects stones. |
+| Ting Ting | Pigtails, braves the bamboo, nearly. |
+| Xiu Xiu | Counts every lantern. Her mother forbids going to the bamboo alone. |
+| Pei Pei | Races to the well. Catches crickets and lets them go. |
+| Rong Rong | Was shown a bean longer than his arm by the peddler. Adults say the roofs ring because of wind. |
+| Bao Bao | Wants to build a roof like Wen Zhao's. Collects stones. |
 | Chen | Peddler. Beans from behind the bamboo, lanterns, buns, "whatever the road lacks". |
 | Tian Bo | The Emperor takes more of his land every year. Pandy has followed him for years. |
 | Emperor | Rules the whole valley and the islands. Lets the Chef decide that sternness makes people obey. |
@@ -150,15 +155,15 @@ Children are placed in households first, then the adults around them.
 
 | Household | Members (ages are bands) | Work | Tie to the palace | Hidden or unspoken |
 | --- | --- | --- | --- | --- |
-| Lantern | Mei Lian (elder), her daughter Jin Wei (adult), Xiu (child, Jin Wei's daughter) | Lantern maker and lamp paper | Lanterns for the palace halls, paper changed on set days | Nobody can say who set the midnight rule |
-| Tile | Yun Tao (adult), Bao (child) | Tiler, keeps the last yellow glaze | Palace roof repairs | The glaze stock is nearly gone |
-| Bao house | Hua Chen (adult, single mother), Ting (child, her daughter) | Bao kitchen and shopfront | Hua Chen has sent bao trials to the palace kitchen, all rejected | She cannot account for Liang Zhen's changing demands |
+| Lantern | Mei Lian (elder), her daughter Jin Wei (adult), Xiu Xiu (child, Jin Wei's daughter) | Lantern maker and lamp paper | Lanterns for the palace halls, paper changed on set days | Nobody can say who set the midnight rule |
+| Tile | Yun Tao (adult), Bao Bao (child) | Tiler, keeps the last yellow glaze | Palace roof repairs | The glaze stock is nearly gone |
+| Bao house | Hua Chen (adult, single mother), Ting Ting (child, her daughter) | Bao Bao kitchen and shopfront | Hua Chen has sent bao trials to the palace kitchen, all rejected | She cannot account for Liang Zhen's changing demands |
 | Lamp keeper | Lian Fu (adult) | Tends the entry bridge and public lamps; keeps his own small home | Lights and inspects the palace approach | He sees who crosses after dark but does not know the Chef's secret |
-| Carrier | Bo Xiang (adult), Rong (child) | Carrier to the south town | Moves the palace's levy flour and beans to the service yard, and the village's goods south | The only resident who regularly leaves |
-| West end | Shu Mei (elder), Pei (child, her grandchild) | Waymarker, trims the entry bridge lamps | None directly | Counts posts to stay occupied |
+| Carrier | Bo Xiang (adult), Rong Rong (child) | Carrier to the south town | Moves the palace's levy flour and beans to the service yard, and the village's goods south | The only resident who regularly leaves |
+| West end | Shu Mei (elder), Pei Pei (child, her grandchild) | Waymarker, trims the entry bridge lamps | None directly | Counts posts to stay occupied |
 | Roofer | Wen Zhao (adult) | Roofer, finishes his grandfather's work | Palace roof upkeep | Single, the children follow him around |
 | Farm | Tian Bo (elder), Pandy | Beans and bamboo shoots | The land levy | Fears for the island's last terraces |
-| Inn and restaurant | **Lu (吕)** (adult; given name to choose), proprietor and cook, and his adult son **Lu Hao**, who have run the inn and its restaurant from the beginning; Chen lodges here | Innkeeper, cook and restaurant | Before the quest, none; after it, Lu cooks the village's communal meals | Few guests, mostly Chen's trade and Bo Xiang's contacts; the restaurant feeds the village on market days |
+| Inn and restaurant | **Lao Lao (姥姥)** (adult), who handles the inn; her husband **Lao Ye (姥爷)** (adult), who runs the restaurant; their adult son **Lu Hao**; Chen lodges here | Inn and restaurant proprietors | Before the quest, none; after it, Lao Ye cooks the village's communal meals | Few guests, mostly Chen's trade and Bo Xiang's contacts; the restaurant feeds the village on market days |
 | Stall | Chen (adult) | Peddler and vendor, lives at the inn | Pays nothing, sells only what the village makes | Keeps the village's route open to outsiders |
 | Palace | Liang Zhen (Emperor before the quest), the Royal Chef | Rulership and kitchen before the quest; civic centre and community kitchen after it, with Liang Zhen as advisor | The centre of the levy and later the village's shared house | The Chef's secret; Liang Zhen's long-buried good sense |
 
@@ -170,7 +175,7 @@ Palace staff: none added for now. Villagers rotate through palace work by trade
 (Jin Wei with paper, Lian Fu with night lamps, Yun Tao and Wen Zhao with roofs,
 Bo Xiang with deliveries). The near-empty court is part of the Chef's hold over
 Liang Zhen. After the quest, Tian Bo holds village business there with Liang Zhen as
-his advisor, and Lu cooks the communal meals; neither role requires adding a
+his advisor, and Lao Ye cooks the communal meals; neither role requires adding a
 palace servant.
 
 ### 3.4 Trade provenance for Chen's stall
@@ -221,9 +226,11 @@ quest. The Chef is never named as the cause by an ordinary resident.
    it now names Ohio. Trade is flour and salt in, lanterns and beans out.
 2. The history in 3.2 stands (broken plateau, three generations, yellow glaze
    reserved for the palace, Chef a few harvests ago).
-3. The innkeeper is **Lu (吕)**, proprietor of the inn and its restaurant,
-   who has run it with his son **Lu Hao** from the beginning (revised
-   2026-10-12, replacing 林静). Everyone here speaks Chinese.
+3. **Lao Lao (姥姥)** handles the inn and her husband **Lao Ye (姥爷)** runs its restaurant;
+   their adult son **Lu Hao** works with them. They have kept the business
+   from the beginning (revised 2026-10-15, replacing the former keeper Lu
+   and his son-only household). Lao Ye and Lao Lao are intentional maternal-
+   grandparent forms of address. Everyone here speaks Chinese.
 4. Palace staff: deferred. Nobody is added for now.
 5. Still open: villagers other than the Emperor, farmer and Chef still carry
    Latin display names (Mei Lian, Wen Zhao and so on) while their dialogue is
@@ -235,8 +242,8 @@ quest. The Chef is never named as the cause by an ordinary resident.
 8. Hua Chen is a single mother and the village's bao maker. Lian Fu is a
    separate lamp keeper with his own home. (Revised 2026-10-12: there is
    **no romance** between Liang Zhen and Hua Chen. After the quest Liang Zhen
-   becomes **advisor** to Tian Bo, and **Lu** the innkeeper becomes the
-   **community chef**.)
+   becomes **advisor** to Tian Bo, and **Lao Ye** the restaurant keeper becomes
+   the **community chef**.)
 
 ### 3.9 Quest and postquest state (approved 2026-10-04)
 
@@ -256,12 +263,12 @@ quest. The Chef is never named as the cause by an ordinary resident.
    his time between civic duties and the bamboo grove, with **Liang Zhen as
    his advisor**: the former Emperor knows the levy, the bridges and the
    palace's records better than anyone, and now puts that to the village's use.
-   **Lu**, the innkeeper, becomes the **community chef** and cooks the
-   village's communal meals (revised 2026-10-12; no romance).
+   **Lao Ye**, the restaurant keeper, becomes the **community chef** and cooks
+   the village's communal meals (revised 2026-10-15; no romance).
 
-## 4. Layout (provisional, derived from section 3)
+## 4. Approved layout plan (derived from section 3)
 
-### 4.0 The islands: pieces of one broken plateau (proposed, 2026-10-13)
+### 4.0 The islands: pieces of one broken plateau (approved 2026-10-15)
 
 The user found the island arrangement unnatural and inorganic:
 - every island is a round disc;
@@ -364,7 +371,7 @@ Now every bridge lands on a squared stone abutment:
 The network in 4.1.4 stands. The coordinates in 4.1.3 are superseded by the
 table above, and the placements by 4.0a.
 
-### 4.0a Placements on the islands (proposed, 2026-10-13)
+### 4.0a Placements on the islands (approved 2026-10-15)
 
 Every compound, building, court, field and garden is placed on its island by
 `tools/chinese_village_plan.py`, which reads the islands, rim and bridges from
@@ -409,7 +416,7 @@ coarse and doubted that the ways in and out added up):
   sealing rock to the nearest point of the network. Fields, plots and pits
   get earth bunds 1.6 m wide. Paths are found on a 0.5 m grid round
   everything solid, kept off walls, then straightened, given a slight wander
-  and rounded: 64 paths, about 1,070 m. Paving is stone in the palace and
+  and rounded: 65 paths, about 1,052 m. Paving is stone in the palace and
   between facing gates, trodden earth elsewhere.
 - **What the check found, all fixed:**
   - the entry bridge landed 1 m off the gatehouse's passage, so the
@@ -437,16 +444,18 @@ coarse and doubted that the ways in and out added up):
 balustrades round the palace, timber fences round the fields and the farm,
 brick with a tile coping elsewhere.
 
-**Not yet drawn:** the ramp from the inner court down to the kitchen (it needs
-a section), and the interiors. Eave corners use the brief's fallback, straight
-hips with raised tips, until the swept-roof prototype exists.
+The palace kitchen descent now follows the west door and the eastern edge of
+the inner court: two 4.5 m flights at about 32°, with 1.2 m intermediate and
+end landings. The service yard was fitted to the island's clear edge strip.
+Interiors remain a separate pass. Eave corners use the brief's fallback,
+straight hips with raised tips, until the swept-roof prototype exists.
 
-**For the code (when approved):** each island's outline and keel come from
-plan data (`ChinesePlan`) instead of a radius. The keel is built as stacked
-rings tapering to an offset tip, with simplified convex collision for the
-top. The shards are built bare, with pines.
+**Implementation note:** island outlines and the ragged terrain rim now read
+from `ChinesePlan`. The current keel is a tapered rock skirt with top-surface
+collision; drifting fragments are built from their plan polygons. The authored
+keel's layered strata and fragment pines remain to be added.
 
-### 4.0b What the ways are made of (proposed, 2026-10-14)
+### 4.0b What the ways are made of (approved 2026-10-15)
 
 The first network was one material everywhere, which says nothing. A way's
 construction should say who built it, who keeps it, and what it carries.
@@ -468,27 +477,31 @@ what it leads to (`tools/chinese_village_plan.py`, section 4b).
 | **Yard cross walk** (shízì yǒnglù) | inside every home's yard | a brick walk 1.2 m wide from the gate to the main room's door, a cross bar to the side shed; the rest of the yard is packed earth with the water jar and the firewood | the siheyuan's own path: the paved way is only where feet always go |
 | **Threshing floor** | the fields island | rolled clay, smooth and hard | worked, not walked |
 
-**How it is built in the game.** Every surface is generated from the plan's
-JSON, not placed by hand:
-- **Strips and patches.** One mesh per surface kind per island: strip meshes
-  along the path polylines, and polygons for the courts. Their uv is in
-  metres. Each surface sits 2 to 9 cm above the ground, so the island's own
-  ground collider carries the player and the surfaces need no collision of
-  their own.
-- **Patterns.** Flags, brick, herringbone, pebble and earth are a pattern
-  shader on the strip, in metres, with no image textures. There are far too
-  many bricks to build each one.
-- **The slab road** is the exception: its slabs are individual squarish
-  SuperEgg slabs (`EPSILON_FLAT`) in one `MultiMeshInstance3D` per island,
-  each with a little height and colour jitter, because the worn slab road is
-  the village's signature ground.
-- **Raised parts get low colliders** (blocking, by `CollisionPolicy`): the
-  bunds' banks and the imperial way's 0.12 m step. The bunds end in short
-  ramps where a lane meets them.
-- **Earth lanes** get a feathered strip of worn grass either side, a decal
-  rather than geometry.
+**Current construction — owner correction, 2026-10-16.** The table above
+records the earlier material concept. Its repeating surface patterns were
+rejected in visual review and are superseded by these rules:
+
+- Constructed ways and aprons are united per island, clipped around buildings
+  and courts, and triangulated as one plain stone surface. No overlapping
+  route ribbons or printed brick, pebble or herringbone patterns.
+- Ordinary slab-road lanes and household ways use the shared feathered
+  worn-earth ground-paint system.
+- Courts use calm unpatterned stone or worn earth according to their use.
+- Raised banks, steps and pond crossings retain physical collision. Flat
+  decorative paving rests on the island collider.
 
 The 3D model draws each of these (`docs/drawings/chinese_gorge_3d.html`).
+
+**Runtime corrections after the first visual audit (2026-10-15).** The audit
+showed Ohio-style shutters and gable silhouettes on Chinese houses, a field of
+individual path tiles, and broad brown slabs below crops. The current builder
+uses lattice casements without shutters, Chinese hip-and-gable roof forms,
+continuous slab-road ribbons, and plants directly on the island grass. Broad
+platforms and court infill may use planar solids where they meet walls. Exposed
+edges require SuperEgg copings, corner posts, weathering caps or a joined
+bevelled section; a visible raw box edge is not an acceptable finish. The
+new hexagonal garden pavilion uses six open columns and a tiled roof. These
+changes still need a fresh windowed in-game capture before visual sign-off.
 
 ### 4.1 Settlement re-fit (revised 2026-10-12)
 
@@ -557,18 +570,18 @@ read as fields, worked by named people.
 
 | Island | Centre (was) | Radius | Households and places |
 |---|---|---|---|
-| Palace | (0, 0) | 62 | Liang Zhen and the Chef; after the quest the civic centre, Lu's community kitchen and Liang Zhen's room |
+| Palace | (0, 0) | 62 | Liang Zhen and the Chef; after the quest the civic centre, Lao Ye's community kitchen and Liang Zhen's room |
 | Gate (new) | (0, 150) | 18 | **Lamp keeper** (Lian Fu) lives above the gatehouse he tends; arrival forecourt |
-| E, Inn | (-62, 124) | 27 | **Inn and restaurant** (Lu, Lu Hao, Chen as lodger) |
-| B, Market | (108, -48) | 27 | **Bao house** (Hua Chen, Ting), **Carrier** (Bo Xiang, Rong); market square, Chen's stall, the well |
-| A, Lantern Row | (-105, -58) | 25 | **Lantern** (Mei Lian, Jin Wei, Xiu), **Tile** (Yun Tao, Bao); play hut; Sun Wu Kong's rock on the north rim |
-| C, Roofers | (-118, 42) | 22 | **Roofer** (Wen Zhao), **West end** (Shu Mei, Pei), at the village's western end as her lines say |
+| E, Inn | (-62, 124) | 27 | **Inn and restaurant** (姥姥 Lao Lao, 姥爷 Lao Ye, Lu Hao; Chen as lodger) |
+| B, Market | (108, -48) | 27 | **Bao house** (Hua Chen, Ting Ting), **Carrier** (Bo Xiang, Rong Rong); market square, Chen's stall, the well |
+| A, Lantern Row | (-105, -58) | 25 | **Lantern** (Mei Lian, Jin Wei, Xiu Xiu), **Tile** (Yun Tao, Bao Bao); play hut; Sun Wu Kong's rock on the north rim |
+| C, Roofers | (-118, 42) | 22 | **Roofer** (Wen Zhao), **West end** (Shu Mei, Pei Pei), at the village's western end as her lines say |
 | D, Fields | (112, 48) | 34 | no dwelling: field strips, household vegetable plots, threshing floor, field shed |
 | Bamboo, Farm | (80, 112) (was (18, 116)) | 32 | **Farm** (Tian Bo, Pandy); grove on the north half, terraces and farmstead on the south |
 
 Eight dwellings plus the inn, each once, each with an owner. The children sit
-on three islands (Xiu and Bao on A by the play hut, Ting and Rong on B by the
-well, Pei on C), so play crosses bridges. The Carrier is on B because B's
+on three islands (Xiu Xiu and Bao Bao on A by the play hut, Ting Ting and Rong Rong on B by the
+well, Pei Pei on C), so play crosses bridges. The Carrier is on B because B's
 bridge is the palace's service bridge, where the levy goes in.
 
 #### 4.1.4 Network
@@ -871,7 +884,7 @@ tile, lattice windows); see the rank table in 4.2. Decided 2026-10-12.
   than remaining an imperial apartment.
 - The Royal Kitchen must support two states without rebuilding its shell: the
   Chef encounter with a clear fight floor and captive-blorb counter, then
-  Lu's welcoming community kitchen with communal preparation and meal
+  Lao Ye's welcoming community kitchen with communal preparation and meal
   service.
 - Sun Wu Kong's sealing rock leaves the palace (section 4.6). Full brief for
   both the imperial and the civic state: `chinese_village_palace.md`.
@@ -914,7 +927,7 @@ Parked alternatives, each with a root in *Journey to the West*:
    be freed by prying them apart from outside. Here the Chrysa, the courts'
    goldsmiths, forged a pair of giant gold cymbals and clapped him between
    them. They sit on the rim like a closed bronze-gold shell, tarnished green,
-   ringing faintly in the wind (Rong's "the roofs ring because of wind"). The
+   ringing faintly in the wind (Rong Rong's "the roofs ring because of wind"). The
    children talk to "the singing bell"; his voice comes from inside. Xiao Hou
    Zi pries them apart; after, the two halves lie open and the children use
    them as a slide and a drum. Made of sky gold, which ties it to the
@@ -1004,7 +1017,7 @@ worn.
 | Long gown | *chángshān* | older men, the village chief on civic days, the peddler on the road |
 | Half-sleeve jacket | *bànbì* | anyone in hot work: the bao kitchen, the roofer on the ridge |
 | Sleeveless vest | *kǎnjiān* | over a jacket for elders and the cool evening; alone for heavy work |
-| Work apron | *wéiqún* | Hua Chen, Lu and Lu Hao |
+| Work apron | *wéiqún* | Hua Chen, Lao Ye and Lu Hao |
 | Waist sash | | every jacket worn open or for work |
 | Cloth shoes | *bùxié*: black uppers, thick white soles | everyone |
 | Conical straw hat | *dǒulì* | the farmer, the carrier, the roofer outdoors |
@@ -1090,59 +1103,314 @@ the character-design skill and a code comment say gold. It is red.
 | **Liang Zhen** (Emperor) | regalia as built; after the quest, the advisor's plain grey gown above |
 | **The Royal Chef** | as built |
 | **Tian Bo** (farmer, elder, later chief) | bald; *dǒulì*; a muted-green short jacket with brown edge binding, rolled sleeves, trousers tied at the ankle; a *chángshān* in grey on civic days |
-| **Lu (吕)** (innkeeper and cook) | an indigo *duǎndǎ* with sleeves bound back, a long white apron, a cloth over one shoulder; a topknot wrap |
-| **Lu Hao** (his adult son) | a light-indigo short jacket with red edge binding, the inn's colour; a serving cloth at his sash; a small topknot |
+| **姥姥 Lao Lao** (maternal-grandmother form of address; innkeeper) | blue-grey side-fastening long jacket with red binding, plum-grey trousers, silver-grey pinned bun; shorter and broader-hipped than Lao Ye |
+| **姥爷 Lao Ye** (maternal-grandfather form of address; restaurant keeper) | an indigo *duǎndǎ* with sleeves bound back, a long white apron, a cloth over one shoulder; a topknot wrap |
+| **Lu Hao** (their adult son) | a light-indigo short jacket with red edge binding, the inn's colour; a serving cloth at his sash; a small topknot |
 | **Chen** (peddler) | a travelling *chángshān* in brown, hitched up by a sash; a pack frame; a cloth head wrap |
 | **Mei Lian** (lantern maker, elder) | a black *kǎnjiān* over a grey long-sleeved *ǎo*; a red-paper smudge on her sleeve; grey bun with a wooden pin |
 | **Jin Wei** (her daughter) | a light-indigo *ǎo* with jade binding, trousers; sleeves bound back with a cord for lantern work |
-| **Xiu** (child) | a small red *ǎo* (the household's lantern red); twin buns |
+| **Xiu Xiu** (child) | a small red *ǎo* (the household's lantern red); twin buns |
 | **Yun Tao** (tiler) | a natural-hemp *bànbì* half-sleeve jacket, dark trousers, a tile-green sash; topknot wrap |
-| **Bao** (child) | a short indigo jacket and trousers; a small topknot |
+| **Bao Bao** (child) | a short indigo jacket and trousers; a small topknot |
 | **Hua Chen** (bao maker) | a white *bànbì* with indigo binding, flour on the apron; a bun tucked under a kerchief |
-| **Ting** (child) | a light-blue *ǎo*; pigtails (as now) |
+| **Ting Ting** (child) | a light-blue *ǎo*; pigtails (as now) |
 | **Lian Fu** (lamp keeper) | a deep-indigo *duǎndǎ* with long sleeves, a lamp hook at his sash |
 | **Bo Xiang** (carrier) | a sleeveless natural *kǎnjiān* over bare arms, black trousers tied at the ankle, a *dǒulì*; a carrying pole |
-| **Rong** (child) | a brown short jacket; a small topknot |
+| **Rong Rong** (child) | a brown short jacket; a small topknot |
 | **Shu Mei** (waymarker, elder) | a grey long *ǎo* to the knee over trousers, a black *kǎnjiān*; white hair in a low bun |
-| **Pei** (child) | a jade-green *ǎo*; pigtails |
+| **Pei Pei** (child) | a jade-green *ǎo*; pigtails |
 | **Wen Zhao** (roofer) | a brown *bànbì*, trousers rolled to the calf, a *dǒulì* pushed back on his shoulders |
 
 Households share one colour (the Lantern household its red, the Tile household
 its tile green), and no two neighbours match.
 
-## 5. Build order after approval
+## 5. Implementation status (2026-10-15)
 
-0. Approve and record the population (section 3), then update the world bible.
-1. `ChinesePlan` data file (islands, bridges, gates, houses with doors and
-   facing, strokes, residents, schedules, ledger) and extend
-   `tools/validate_village.gd` to read it: overlaps, facing, door-front paths,
-   bridge landing height and clearance, ledger, schedules.
-2. Prototype the three bridge types in isolation first (chain deck with sag
-   and segmented collision, timber cantilever with its gallery, stone arch),
-   per the settlement skill's rule on unfamiliar systems. Then the island and
-   bridge rebuild: new radii, the gate island, the relocated bamboo island,
-   bridge-head houses and rim parapets.
-3. Courtyard homes, workshops, inn.
-4. Palace axis, service yard, kitchen route, garden.
-5. Bamboo groves.
-6. Residents, homes, schedules, quest-state placements and rewritten Chinese
-   dialogue, including Liang Zhen's postquest lines as advisor and Lu's as
-   community chef.
-7. Traversal validation for the player, Blorbus and a mount on every
-   bridge, landing, residence entrance, palace level and kitchen door.
-8. Visual audit by aerial and eye-level capture.
+The generated `ChinesePlan` and companion drawing are authored. Runtime work is
+in `scripts/chinese_village_plan_builder.gd`; `scripts/chinese_village.gd`
+retains the quest and rest interactions. The builder now consumes the authored
+island polygons, bridge spans and abutments, placements, paths, parapets,
+openings, aprons, ramps, fields, and garden-court footprints. The terrain abyss
+coverage follows the plan's ragged rim, and the entry elevation samples the
+authored landing. Existing quest NPCs and Lao Lao's rest service are attached
+to planned locations; Lao Ye and Lu Hao are present, and Lao Ye moves to the
+communal kitchen after the village is freed.
 
-## 6. Decisions needed
+This remains an incomplete runtime implementation; prior captures exposed
+substantial gaps against the drawing. A broad geometry pass has now corrected
+the 22 × 28 m inn court and 17 × 11 m hall, restored the west guest wing and
+north service buildings, and aligned its screen, partition moon gate and
+garden link. Household compounds now use a south-facing three-bay room on the
+north side of the yard; the house closes the yard's north edge, its side walls
+begin at the facade, and the complete court frame rotates with east- and
+west-facing gates. Crops are sampled inside the plan's island-clipped field
+outlines, and island keels now follow the drawing's full, tapered depth.
+Double-eave palace roofs now have sloped lower roof planes. These are source
+changes only, not visual sign-off. Remaining work includes the building-by-
+building comparison, refined roof and bridge forms, distinct court paving and
+gates, the full garden and palace sequences, interiors, island strata detail,
+checked route surfaces and clearances, plan-driven population schedules,
+post-quest civic dressing, and in-game traversal/visual inspection. The
+structural plan validator is in `tools/validate_chinese_village_plan.gd`.
 
-**Fixed:** population and story state (3.8, 3.9); the courtyard charter by
-rank (4.2); the palace's two states; Liang Zhen's room.
+**2026-10-16 continuation:** the household-yard builder's indentation error was
+fixed so the plan builder loads again. The fields-island service pits are now
+represented by two bounded, covered pits on the grass, and the unplanned flue
+was removed from the inn compound. The 8-island/10-bridge plan validator passes
+in a scratch copy. This is still a source-only pass; no new visual inspection
+was made at that point. The next plan revision moved the kitchen and chef's
+quarters to their approved east-side positions, corrected the kitchen door to
+the west, fitted the service yard to the island clearance, and added a checked
+two-flight marble descent with three landings. The source plan and generated
+runtime data now agree; the descent still needs in-engine visual and traversal
+review.
 
-**Proposed (2026-10-12), for approval:**
-1. The new island radii and the two moves (Gate to (0, 150), Bamboo to
-   (80, 112)) in 4.1.2 and 4.1.3.
-2. The households by island in 4.1.3, with D as the fields.
-3. The ring network and bridge types in 4.1.4 and 4.1.5.
-4. Public spaces, farmland and the levy stones (4.1.6, 4.1.7).
-5. The spring well on B, the parapets and the shared surface height (4.1.8).
+### 5.1 SuperEgg integration audit (2026-10-15)
 
-**Open:** Lu's given name and Lu Hao's characters (the user will supply).
+The site plan describes geometry and building programs, not engine primitives.
+The architectural brief and style charter therefore govern the SuperEgg use.
+The goal is a readable load path and a shared local shape language, not a
+SuperEgg substituted indiscriminately for every surface.
+
+| Element | Current integration | Assessment and next step |
+|---|---|---|
+| Building shells and roof planes | Shared `TownProps` shells still supply much of the wall massing. The inn has a model-sized two-storey hall, a green ridge cap, a red-column gallery and no hall chimney; its court includes the measured guest wing, kitchen, latrine, jars, screen and moon-gate sequence. Home compounds now use the drawing's north-side main room and open yard frame. | The first visual pass caught wall/building overlap and missing court structures. Geometry placement has been corrected in source but is not visually rechecked. Roof sweep, brackets and tile-course legibility remain inadequate across the settlement. |
+| Platforms, courts and ordinary paving | Flat BoxMesh surfaces and continuous textured ribbons; the Great Hall's stepped podium is square-edged. | Planar infill is appropriate where it closes against walls. Exposed tier edges, corners and raised paths require a finished coping or joined soft profile. Earth belongs in the ground-paint system. This supersedes the earlier blanket instruction to keep visible tiers square-edged. |
+| Structural members and carved forms | SuperEgg is explicit on selected beams, rail chains and carved garden/sealing rocks; their collision remains simple and closely fitted. | Appropriate where the shared bevel helps a timber or irregular stone read. The visible support path should still explain how each member carries load. |
+| Windows and garden pavilion | Chinese house windows have timber lattice over the glazing without shutters. The garden pavilion is an open hexagonal frame with six columns and a tiled roof. | The style now differs from the first town. Verify the lattice spacing, roof sweep, bracket details and surrounding garden against the model at eye level. |
+| Fields and vegetation | Crops sit directly on island grass; crop rows use small plant meshes without a broad dirt slab beneath them. | Matches the user's model review. Crop density and island planting still need an in-game comparison. |
+| Islands and bridges | Authored polygon ground, full-depth tapered keels, mesh decks, chain spans, covered cantilever galleries, and a stone-arch builder selected by bridge kind/span. | The visual audit must confirm keel silhouettes, the short arch and bridge-specific framing. |
+
+**Overall:** SuperEgg use is selective on large planar surfaces, but the visual
+audit also shows plain slabs and repeated boxes where the model calls for
+specific architectural members and crafted details. The latest review uses a
+single windowed Godot process in an isolated scratch copy; the screenshots are
+diagnostic, not sign-off. Every island, court, building, bridge and garden still
+needs a measured comparison against the plan and model.
+
+**2026-10-16 continuation:** ordinary eaves now stay nearly straight; only
+palace-rank roofs keep a slight corner lift, avoiding a village-wide pagoda
+silhouette. At that implementation stage, the four palace garden courts used a grey-brick dado and
+pale plaster infill as the Shihu Yuan reference, and their small round openings
+receive timber lattice. The structural plan validator still passes after these
+changes. Palace service buildings (royal kitchen, chef's quarters and levy
+store) now use grey tile, pale plaster and dark timber rather than inheriting
+imperial yellow roofs, red lacquer, lifted eaves and brackets from their island.
+The plan generator passes with 54 items, 38 openings, 65 paths and no plan
+problems. A full scratch-project world audit also completes with the authored
+village plan and named residents instantiated. This confirms runtime
+construction, not visual fit or traversal. The latest windowed capture attempt
+could not start in this environment, so no new visual sign-off is claimed.
+
+### 5.2 Measured architecture and streamed construction (2026-10-16)
+
+The recovery pass replaces the palace's domestic shells with authored halls:
+seven-bay Throne Hall, five-bay Dining Hall and apartments, three-bay gate and
+high pavilion. `PALACE_ARCHITECTURE` in `tools/chinese_village_plan.py` owns
+column heights, bay counts and roof rank for both the Three.js model and
+`scripts/chinese_architecture.gd`. The generator now updates the drawing's
+embedded data as well as `ChinesePlan`; `tools/check_chinese_bake.py` checks
+their agreement at the generated plan's millimetre precision.
+
+World-X/Z footprints are converted to local frontage/depth **before** rotating
+a shell. The kitchen is 18 × 12 m, the apartments 14 × 20 m, the Dining Hall
+9 × 16 m. Hall floors, columns, painted beam bands, bracket sets, closed roof
+planes and physical roof collision share one section. The high pavilion's
+lower roof is an open-centred skirt, leaving the upper storey usable. Its
+battered mound and marble apron contain the full hall, not a narrower top.
+The apartments have three independently entered rooms and fixed partitions;
+their imperial/civic furnishing changes within that one shell.
+
+Household main rooms now have three timber-and-lattice bays, a black door,
+drawn-back blue curtain, brick weathering courses, 0.45 m plinth, threshold
+ramp, grey hard gable and a kang flue. They retain their authored household
+interiors, north-side yard placement and court frame. Exposed members use
+SuperEgg forms; exact wall, floor and joined roof planes retain their common
+edges. Lantern bodies, caps and posts share one vertical axis.
+
+The throne terrace now carries marble posts and rails on all three tiers,
+with gaps for the three central flights and the two inner-court approaches.
+Its north edge stays fixed. Each successive front recess is **3.44 m**, giving
+a 2.24 m flight and 1.2 m landing, instead of the drawing's former 2.5 m
+recess. The drawing and runtime change together. The gate's +1.2 m base has
+front/back ramps. The kitchen descent has separate top-turning, intermediate
+and ground landings, two 4.5 m flights, fitted slab-top elevations, guards and
+masonry support. Its ground landing opens onto the approach beside the west
+door. The garden ramp's previously reversed level direction is corrected,
+and the high pavilion forecourt now exists as physical construction.
+
+China no longer constructs its detailed settlement at an ordinary Crossroads
+start. A cheap island/roof/bridge silhouette remains at distance; the baked
+resource is prefetched at 510 m (extended for fast controlled bodies), detail
+activates at 410 m and unloads beyond 620 m. The check uses both the human and
+the actively controlled body. Local NPCs and the inn unload with the region;
+recruited companions and quest flags persist. Modal interactions defer
+unloading. Pending recovery loads the inn before placing the recovering party.
+Crop fields and bamboo clumps use shared meshes and spatial MultiMeshes.
+
+`assets/generated/chinese_village.scn` contains baked static meshes and
+collision, generated with `tools/bake_chinese_village.tscn` in a scratch copy.
+Doors are reconstructed from stored constructor data so their moving leaves,
+interaction callbacks and quest-state behavior remain live. State furnishings,
+NPCs and the rest service remain runtime objects. The cache signature covers
+its geometry sources; stale caches fail the China pre-push checks.
+
+For playable review, open `scenes/chinese_village_qa.tscn` and run that scene
+(F6). It stages the real China, terrain, player, Blorbus and Manchego without
+the other settlements. `tools/audit_china.tscn` and the China aerial-capture
+target now use it. `tools/validate_chinese_runtime.tscn` checks built floor
+extents, roof rank, three apartment doors, household plinth/bays, upper-pavilion
+headroom, lantern axes, instanced fields, physical ramp surfaces and character
+clearance, ridden ramp traversal with wall blocking, door actions,
+resource release on unload, recruited companions, civic reload and threaded
+activation. These checks and selected rendered views do not replace a full
+human walkthrough of every bridge, room and story sequence. Garden detail,
+the complete dress pass and the outstanding narrative staging remain open.
+
+Measurements, render locations, cache regeneration and the remaining approach
+hitch are recorded in `docs/diagnostics/2026-10-16-china-remediation.md`.
+
+### 5.3 Model fidelity, living pines and real garden water (2026-10-16)
+
+The follow-up walkthrough and its corrections are documented in
+`docs/diagnostics/2026-10-16-china-fidelity-followup.md`. The inn's furnishings
+now use its finished hall footprint; arrival gates, chain anchorages, bridge
+bearings and route guards are physically checked. Lamp posts use explicit
+surveyed data shared with the Three.js drawing. Four conflicts with paths are
+resolved in both representations. Earth paths use the same GroundPaint system
+as Ohio, with island tops explicitly opted into its projection layer.
+
+The ponds are real water. Both the island and court paving have basin openings,
+a solid submerged bed, a position-aware water level and floor, and a walkable
+west exit slope. LiquidEnvironment supplies these to existing swimming/diving,
+companion flotation and the underwater camera environment. The water shader
+alone is not treated as a complete pond implementation.
+
+`NatureProps.build_chinese_pine(height, seed_value)` adds bent, asymmetrical
+Chinese garden pines to the reusable tree library. Garden and selected rim
+specimens use stable seeds and avoid architectural/route footprints. Their
+SuperEgg lobes and structural collision are documented in
+`docs/architecture/chinese_garden_pine.md`; the isolated specimen gallery is
+`tools/chinese_pine_gallery.tscn`.
+
+
+### 5.4 Construction finish pass (2026-10-16)
+
+The visual audit in `docs/diagnostics/2026-10-16-china-visual-audit.md` rejected
+art sign-off. The finish brief is `chinese_finish_pass.md`. The existing plan,
+levels and routes remain authoritative; matching positions alone is not visual
+fidelity.
+
+The shared roof section now has a continuous flared slope, sealed underside
+and softened eave hems. Gatehouse corners, footings, weathering course and
+both arch surrounds are finished. Palace glazing and lattice derive their
+outlines from the actual aperture profile. Exposed podium/tier edges receive
+weathering caps and corner pieces. Island parapets get coping and end posts.
+
+Royal garden wall panels are vermilion on both faces, over a pale dado with
+yellow coping; domestic gardens retain grey masonry and white plaster. The
+pond crossing uses one joined rounded footprint and bevelled section with
+physical bearings. Limestone rockery and scholar stones have real apertures.
+Unequal shoreline groups replace the regular stone necklace; lotus leaves
+are round. The existing real-water surface is tuned for pond wavelengths and
+transparency, retaining the basin and shared swimming behavior. Palace brick
+uses plain stone, as does garden paving; repeating printed patterns were rejected.
+
+Earth courts join the lane ground-paint atlas instead of using rectangular
+slabs. Pines retain deterministic seeds, with a continuous tapering leader,
+unequal branch intervals and thinner, more varied foliage pads. Bridge chains
+use alternating open links, with simplified guard collision; timber corbels
+have end shoes and deck edges have rounded bearers.
+
+Headless baking was also discarding MultiMesh transform buffers. Instance
+counts survived, concealing missing crops and bamboo. CPU-authored buffers and
+bounds are now saved explicitly and restored at load, with saved-data checks
+and rendered confirmation of the fields and chain links. Complete-content
+measurements and remaining visual work are recorded in
+`docs/diagnostics/2026-10-16-china-finish-pass.md`.
+
+These changes require visual review alongside functional checks. They do not
+constitute blanket approval of every building or interior. The detailed inn
+interior, remaining roof families and full village art review remain on the
+backlog.
+
+
+## 6. Decisions
+
+The re-fit in sections 4.0, 4.0a and 4.0b is approved for implementation
+(2026-10-15). The population and story state (3.8, 3.9), courtyard charter by
+rank (4.2), the palace's two states and Liang Zhen's room remain settled.
+
+**Village name (decided 2026-10-15):** 临渊村 (Lín Yuān Cūn), Village at the
+Abyss's Edge.
+
+### Owner finish correction — 16 October 2026
+
+This direction supersedes the patterned paving prescriptions above: do not use
+printed/repeating brick, herringbone or pebble textures. Ordinary lanes use the
+shared worn-earth treatment. Constructed paving is plain stone, joined before
+triangulation and clipped to courts, buildings and island boundaries. Preserve
+the reference zigzag pond crossing, but resolve its scale, supports and pavilion
+connection together. Pavilion geometry must clear the tower’s battered foot,
+not merely its narrower upper footprint. See `chinese_finish_pass.md`.
+
+### Continued finish correction — 16 October 2026
+
+The tree/corridor/household continuation is recorded in
+`../diagnostics/2026-10-16-china-village-continuation.md`. Use actual pine crown
+envelopes and physical architecture during baking, not trunk points or nominal
+plot bounds. Garden pine positions are in the shared garden record. Corridors
+and pavilions use supported, closed swept roofs; facade lattice remains in the
+wall plane. Household walk ends follow the gate and actual main-room threshold,
+with a side run to the shed. The inn screen is visually perforated. Open court
+outlines are softly squared, and both pond crossings reach real banks. These
+corrections preserve the accepted plots and routes and do not sign off the
+remaining village art work.
+
+
+### Building fidelity continuation, 2026-10-16
+
+The owner-authorized inn/sign and workyard correction is recorded in
+`docs/diagnostics/2026-10-16-china-building-fidelity.md`. The inn uses a correctly
+proportioned source section, a flush upstairs gallery with a real doorway,
+structurally mounted signs and supported guest furnishing. Household work bays
+express the existing trade ledger and residents stand clear of entrance routes.
+Pond crossings are thinner within the same usable width; mound faces use rock
+relief beneath the marble cap. The generated bake is current and clearance
+checks pass. The mound composition, household facade variety and remaining
+interior detail are still visual work, not signed off by those checks.
+
+
+### NPC appearance implementation, 2026-10-16
+
+The owner authorized a full named-resident appearance pass, including the
+Emperor and Royal Chef. `scripts/chinese_appearance.gd` assigns stable named
+looks from sections 4.7–4.8 before the shared rig is built. The garment helper
+adds standing collars, bound closures and frog knots, below-hip split hems,
+wide bound sleeves, sashes, work aprons and cloth-shoe welts. Men and women
+retain their approved identities; the five children keep their soft builds.
+Headwear is fitted through `HairOrnaments` using actual hairstyle envelopes.
+The chef keeps the approved foreign court toque with red band, with a bound
+pale jacket, working apron and shorter beard that clears the bib. Liang Zhen
+keeps crimson, a lower round court collar, coiled gold roundels, jade belt and
+a black-topped/red-underlined crown with twelve jade-bead strands per side.
+Lao Lao's newly specified look is recorded in the individual table above.
+
+
+### Walkthrough corrections, 2026-10-17
+
+The owner rejected the enclosing NPC jacket shells and detached hem panels.
+Restore visible thorax/abdomen/hip segmentation; the short jacket's lower part
+wraps the existing hip volume. Only actual cooks wear aprons, articulated over
+the individual volumes. Beards clear clothing at neutral and turned-head poses.
+The five children use doubled affectionate display nicknames: Ting Ting,
+Xiu Xiu, Pei Pei, Rong Rong and Bao Bao. This is a naming choice, not a rule of
+translation, and the five existing identities and households do not change.
+
+The village's traversal audit covers every authored path and passage, interior
+stair headroom and landings, roof landing/jump escape in four directions,
+bridge terminal hardware, pen-to-shed access and field edges. Raised farm walks
+become flush worn earth. Path routing reserves physical stair, gallery-column,
+bridge-pier and workyard envelopes, with locally narrower approaches where the
+built clearance requires them. The approved bridge widths and plot footprints
+remain unchanged.

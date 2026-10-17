@@ -7,6 +7,8 @@ render_mode blend_mix, depth_draw_opaque, cull_disabled, diffuse_burley, specula
 uniform vec4 surface_color : source_color = vec4(0.11, 0.48, 0.58, 0.76);
 uniform vec4 underside_color : source_color = vec4(0.19, 0.66, 0.72, 0.88);
 uniform vec4 underside_glow : source_color = vec4(0.10, 0.40, 0.46, 1.0);
+uniform float ripple_frequency = 1.0;
+uniform float ripple_normal = 0.0;
 varying vec2 world_xz;
 
 void vertex() {
@@ -16,10 +18,12 @@ void vertex() {
 void fragment() {
 	// World-space wavelengths stay stable even though the visual ocean plane
 	// extends far beyond the playable terrain to hide its horizon boundary.
-	float broad_wave = sin(world_xz.x * 0.024 + TIME * 0.48)
-		* cos(world_xz.y * 0.019 - TIME * 0.39);
-	float fine_wave = sin((world_xz.x + world_xz.y) * 0.061 + TIME * 0.72) * 0.5;
+	vec2 wave_xz = world_xz * ripple_frequency;
+	float broad_wave = sin(wave_xz.x * 0.024 + TIME * 0.48)
+		* cos(wave_xz.y * 0.019 - TIME * 0.39);
+	float fine_wave = sin((wave_xz.x + wave_xz.y) * 0.061 + TIME * 0.72) * 0.5;
 	float ripple = broad_wave * 0.65 + fine_wave * 0.35;
+	NORMAL = normalize(NORMAL + (VIEW_MATRIX * vec4(vec3(cos(wave_xz.x*0.061+TIME*0.72)*ripple_normal,0.0,sin(wave_xz.y*0.058-TIME*0.60)*ripple_normal),0.0)).xyz);
 	float grazing = pow(1.0 - abs(dot(normalize(NORMAL), normalize(VIEW))), 2.2);
 
 	if (FRONT_FACING) {

@@ -9,7 +9,7 @@ const CENTER := Vector2(250.0, -650.0)
 
 
 func _ready() -> void:
-	var world := (load("res://scenes/main.tscn") as PackedScene).instantiate()
+	var world := (load("res://scenes/chinese_village_qa.tscn") as PackedScene).instantiate()
 	add_child(world)
 	await get_tree().process_frame
 	await LoadingScreen.wait_for_world_builds()

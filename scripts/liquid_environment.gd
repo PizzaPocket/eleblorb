@@ -69,6 +69,7 @@ func read(terrain: Node, suit: BlorbSuitController, at: Vector3) -> void:
 	if terrain.has_method("is_water_area") and bool(terrain.is_water_area(xz)):
 		liquid = Liquid.WATER
 		surface_height = terrain.get_water_surface_height(xz)
+		floor_height = water_floor_height(terrain,xz)
 		return
 	if terrain.has_method("is_lake_area") and bool(terrain.is_lake_area(xz)):
 		liquid = Liquid.WATER
@@ -142,3 +143,16 @@ func deep_enough_to_swim(for_head_height: float = REFERENCE_HEAD_BASE) -> bool:
 ## Whether a body at `feet_y` is under the liquid's surface.
 func submerged(feet_y: float) -> bool:
 	return liquid != Liquid.NONE and feet_y <= surface_height
+
+
+## Position-aware water queries shared by free companions as well as drivers.
+static func has_water(terrain: Node, xz: Vector2) -> bool:
+	return bool(terrain.is_water_area(xz)) if terrain.has_method("is_water_area") else bool(terrain.is_lake_area(xz))
+
+
+static func water_surface_height(terrain: Node, xz: Vector2) -> float:
+	return terrain.get_water_surface_height(xz) if terrain.has_method("get_water_surface_height") else terrain.get_lake_water_level()
+
+
+static func water_floor_height(terrain: Node, xz: Vector2) -> float:
+	return terrain.get_water_floor_height(xz) if terrain.has_method("get_water_floor_height") else terrain.get_mesh_height(xz.x,xz.y)

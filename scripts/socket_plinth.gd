@@ -69,6 +69,12 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary, size_key:
 			if _in_pit(Vector2(lower[i].x + lower[j].x, lower[i].z + lower[j].z) * 0.5, pits) or _in_pit(Vector2(upper[i].x + upper[j].x, upper[i].z + upper[j].z) * 0.5, pits):
 				continue
 			_quad(st, lower[i], lower[j], upper[j], upper[i], middle, colours[r + 1])
+	# Close the underside so the porch and its foundation read as a continuous
+	# refractory structure when viewed up from the bowl or lava edge.
+	var underside_ring: PackedVector3Array = loops[0]
+	var bottom_centre := Vector3(centre.x, float(rings[0][0]), centre.y)
+	for i in SEGMENTS:
+		_triangle(st, bottom_centre, underside_ring[(i + 1) % SEGMENTS], underside_ring[i], Vector3.DOWN, foundation.darkened(0.2))
 	var faces := PackedVector3Array()
 	# The top course's finish: basalt, or the plot's own floor (a pale sinter
 	# for a house of care).

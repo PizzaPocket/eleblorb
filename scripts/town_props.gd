@@ -340,6 +340,11 @@ static func _build_continuous_panel_shell(
 			var openings := panel_wall_openings(
 				str(wall["wall"]), float(wall["length"]), floor_index, floors, entry_style, back_door_x, shutter_style
 			)
+			# Optional surveyed facade programs replace generic window spacing.
+			for note: Dictionary in opening_notes:
+				if note.get("wall","")==wall.wall and int(note.get("floor",-1))==floor_index and note.has("replace_openings"):
+					openings.clear()
+					for opening in note.replace_openings: openings.append(opening.duplicate(true))
 			_apply_opening_notes(openings, str(wall["wall"]), floor_index, opening_notes)
 			_build_panel_facade(body, float(wall["length"]), wall["origin"], float(wall["yaw"]), color, openings, floor_base)
 			for opening in openings:
@@ -359,7 +364,7 @@ static func _apply_opening_notes(openings: Array[Dictionary], wall: String, floo
 	if wall != "south":
 		return
 	for note: Dictionary in notes:
-		if int(note["floor"]) != floor_index:
+		if not note.has("x") or int(note["floor"]) != floor_index:
 			continue
 		for opening in openings:
 			if absf(float(opening["center"]) - float(note["x"])) < 0.8 and str(opening["kind"]) in ["window", "wide"]:
@@ -474,15 +479,22 @@ static func _apply_shutter_policy(openings: Array[Dictionary], floor_index: int,
 		var kind := str(opening["kind"])
 		# Shutters belong on narrow casements only. A wide window has mullions, a
 		# hood mould and a window box instead; giant shutters read as absurd.
-		if kind != "window":
+		if kind not in ["window","wide"]:
 			continue
 		match shutter_style:
 			"all":
-				opening["shutters"] = true
+				opening["shutters"] = kind == "window"
 			"upper":
-				opening["shutters"] = floor_index > 0
+				opening["shutters"] = kind == "window" and floor_index > 0
+			"lattice":
+				opening["shutters"] = false
+				opening["lattice"] = true
 			_:
 				opening["shutters"] = false
+
+
+static func _window_lattice_bar(size: Vector3, color: Color) -> MeshInstance3D:
+	return SuperEgg.build_part(size*0.5,color,SuperEgg.EPSILON_FLAT,SuperEgg.EPSILON_FLAT,4,8)
 
 
 ## Kept for callers that only want the front.
@@ -790,28 +802,50 @@ static func _build_panel_opening_trim(
 	if kind == "window" or kind == "wide":
 		var pane := MeshInstance3D.new()
 		pane.mesh = SolidModel.extruded_profile_mesh(0.03, Vector2(half_h - 0.004, half_w - 0.004), opening_exponent, 96)
-		pane.material_override = SolidModel.material(Color(0.38, 0.63, 0.75, 0.42), 0.12, 0.0)
+		if bool(opening.get("lattice",false)):
+			var paper := StandardMaterial3D.new()
+			paper.albedo_color = Color(0.76,0.72,0.61)
+			paper.roughness = 1.0
+			pane.material_override = paper
+		else:
+			pane.material_override = SolidModel.material(Color(0.38, 0.63, 0.75, 0.42), 0.12, 0.0)
 		pane.position = Vector3(cx, mid, 0.0)
 		pane.rotation.y = PI * 0.5
 		pivot.add_child(pane)
 		CollisionPolicy.mark_decorative(pane)
-		# Rails run past the glass and bury their ends in the wall.
 		var rail_color := trim_color
-		var upright_xs: Array[float] = []
-		if kind == "window":
-			upright_xs.append(0.0)
+		if bool(opening.get("lattice",false)):
+			# Laths lie in the facade plane on both faces of the paper. Rotating
+			# a horizontal lath by 90 degrees sends it out through the window.
+			for face in [-1.0,1.0]:
+				for index in range(1,4):
+					var x := -half_w+float(index)*half_w*0.5
+					var hh := half_h*pow(1.0-pow(absf(x)/half_w,opening_exponent),1.0/opening_exponent)-0.04
+					var upright := _window_lattice_bar(Vector3(0.04,hh*2.0,0.04),rail_color)
+					upright.position=Vector3(cx+x,mid,face*(half_t+0.015))
+					pivot.add_child(upright)
+					CollisionPolicy.mark_decorative(upright)
+					var dy := height*(float(index)*0.25-0.5)
+					var hw := half_w*pow(1.0-pow(absf(dy)/half_h,opening_exponent),1.0/opening_exponent)-0.04
+					var crossbar := _window_lattice_bar(Vector3(hw*2.0,0.04,0.04),rail_color)
+					crossbar.position=Vector3(cx,mid+dy,face*(half_t+0.015))
+					pivot.add_child(crossbar)
+					CollisionPolicy.mark_decorative(crossbar)
 		else:
-			upright_xs.append(-half_w / 3.0)
-			upright_xs.append(half_w / 3.0)
-		for upright_x in upright_xs:
-			var upright := SuperEgg.build_part(Vector3(0.016, half_h + 0.05, 0.022), rail_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-			upright.position = Vector3(cx + upright_x, mid, 0.0)
-			pivot.add_child(upright)
-			CollisionPolicy.mark_decorative(upright)
-		var crossbar := SuperEgg.build_part(Vector3(half_w + 0.05, 0.016, 0.022), rail_color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-		crossbar.position = Vector3(cx, mid + 0.1, 0.0)
-		pivot.add_child(crossbar)
-		CollisionPolicy.mark_decorative(crossbar)
+			var upright_xs: Array[float] = []
+			if kind=="window": upright_xs.append(0.0)
+			else:
+				upright_xs.append(-half_w/3.0)
+				upright_xs.append(half_w/3.0)
+			for upright_x in upright_xs:
+				var upright := SuperEgg.build_part(Vector3(0.016,half_h+0.05,0.022),rail_color,SuperEgg.EPSILON_FLAT,SuperEgg.EPSILON_FLAT)
+				upright.position=Vector3(cx+upright_x,mid,0.0)
+				pivot.add_child(upright)
+				CollisionPolicy.mark_decorative(upright)
+			var crossbar := SuperEgg.build_part(Vector3(half_w+0.05,0.016,0.022),rail_color,SuperEgg.EPSILON_FLAT,SuperEgg.EPSILON_FLAT)
+			crossbar.position=Vector3(cx,mid+0.1,0.0)
+			pivot.add_child(crossbar)
+			CollisionPolicy.mark_decorative(crossbar)
 	# As with doorways, the reveal between the two frames takes the frame colour.
 	var liner := OpeningTrim.reveal_liner(loop, half_t, trim_color, Vector2.ZERO, 0.995, true)
 	liner.name = "WindowReveal"
@@ -905,7 +939,7 @@ static func _build_door_leaves(
 		half_w, height, leaves, color,
 		bool(options.get("initially_open", true)), bool(options.get("locked", false)),
 		str(options.get("required_key", "")), str(options.get("lock_id", "")),
-		bool(options.get("hinge_right", false))
+		bool(options.get("hinge_right", false)), bool(options.get("inward", false))
 	)
 
 
@@ -1721,7 +1755,9 @@ static func _build_roof(body: StaticBody3D, w: int, d: int, floor_top_y: float, 
 	var ridge_pos := Vector3(0, roof_center_y(floor_top_y, half_wall, 0.0), 0)
 	var rear_len := slope_len + float(form.get("catslide", 0.0)) / cos(ROOF_PITCH)
 	var hip_side := float(form.get("half_hip", 0.0))
-	if form.has("belfry_gap") and hip_side == 0.0:
+	if bool(form.get("hip_all", false)):
+		_build_full_hipped_roof(body,ridge_pos,width,rear_len,slope_len,color,float(form.get("hip_inset",HIP_INSET)))
+	elif form.has("belfry_gap") and hip_side == 0.0:
 		_build_gapped_roof(body, ridge_pos, width, rear_len, slope_len, color, form["belfry_gap"] as Dictionary, half_wall, form.get("cross_gables", []))
 	elif hip_side != 0.0:
 		_build_hipped_roof(body, ridge_pos, width, rear_len, slope_len, color, hip_side)
@@ -1730,6 +1766,80 @@ static func _build_roof(body: StaticBody3D, w: int, d: int, floor_top_y: float, 
 		_build_roof_panel(body, ridge_pos, width, rear_len, true, color)
 		_build_front_slope(body, ridge_pos, width, slope_len, color, half_wall, form.get("cross_gables", []))
 		_build_ridge_beam(body, ridge_pos, width, color)
+
+
+## Four-sided hip roof: each end facet and both main slopes share exact mitre
+## planes, so there is no gable-sized hole beneath the roof at either end.
+## `hip_inset` can shorten a pavilion ridge to a point while the main halls
+## retain a substantial ridge beam.
+static func _build_full_hipped_roof(
+	body: StaticBody3D,ridge_pos: Vector3,width: float,rear_len: float,slope_len: float,
+	color: Color,hip_inset: float
+) -> void:
+	var half_width := width*0.5
+	var drop := HIP_HEIGHT
+	var base_z := drop/tan(ROOF_PITCH)
+	var north_planes: Array[Plane] = []
+	var south_planes: Array[Plane] = []
+	var end_data: Array[Dictionary] = []
+	for side in [-1.0,1.0]:
+		var apex := ridge_pos+Vector3(side*(half_width-hip_inset),0.0,0.0)
+		var corner_south := Vector3(side*half_width,ridge_pos.y-drop,-base_z)
+		var corner_north := Vector3(side*half_width,ridge_pos.y-drop,base_z)
+		var hip_normal := (corner_south-apex).cross(corner_north-apex).normalized()
+		if hip_normal.y<0.0:
+			hip_normal=-hip_normal
+		var north_normal := Vector3(0.0,cos(ROOF_PITCH),sin(ROOF_PITCH))
+		var south_normal := Vector3(0.0,cos(ROOF_PITCH),-sin(ROOF_PITCH))
+		var north_mitre := _mitre_plane(apex,corner_north-apex,north_normal,hip_normal,Vector3(0.0,ridge_pos.y-2.0*tan(ROOF_PITCH),2.0))
+		var south_mitre := _mitre_plane(apex,corner_south-apex,south_normal,hip_normal,Vector3(0.0,ridge_pos.y-2.0*tan(ROOF_PITCH),-2.0))
+		north_planes.append(north_mitre)
+		south_planes.append(south_mitre)
+		end_data.append({"apex":apex,"south":corner_south,"north":corner_north,"normal":hip_normal,"north_plane":north_mitre,"south_plane":south_mitre})
+	_build_roof_panel(body,ridge_pos,width,rear_len,true,color,0.0,0.0,true,true,north_planes)
+	_build_roof_panel(body,ridge_pos,width,slope_len,false,color,0.0,0.0,true,true,south_planes)
+	for data in end_data:
+		var apex: Vector3 = data.apex
+		var corner_south: Vector3 = data.south
+		var corner_north: Vector3 = data.north
+		var hip_normal: Vector3 = data.normal
+		var north_mitre: Plane = data.north_plane
+		var south_mitre: Plane = data.south_plane
+		var eave_mid := (corner_north+corner_south)*0.5
+		var up_slope := (apex-eave_mid).normalized()
+		var length := (apex-eave_mid).length()+0.5
+		var x_axis := hip_normal.cross(up_slope).normalized()
+		var facet_basis := Basis(x_axis,hip_normal,up_slope)
+		var centre := eave_mid+up_slope*(length*0.5)
+		var to_local := Transform3D(facet_basis,centre).affine_inverse()
+		var planes: Array[Plane] = [to_local*Plane(-north_mitre.normal,-north_mitre.d),to_local*Plane(-south_mitre.normal,-south_mitre.d)]
+		var facet := MeshInstance3D.new()
+		mark_roof_slab(facet)
+		facet.mesh = SuperEgg.build_clipped_mesh(Vector3(base_z+0.8,ROOF_THICKNESS*0.5,length*0.5),planes,ROOF_EDGE_EPSILON,ROOF_EDGE_EPSILON,ROOF_SEGMENTS,ROOF_RINGS)
+		facet.material_override = _roof_material(color)
+		facet.transform = Transform3D(facet_basis,centre)
+		body.add_child(facet)
+		var up := hip_normal*ROOF_THICKNESS*0.5
+		var points := PackedVector3Array()
+		for corner in [apex,corner_south,corner_north]:
+			points.append(corner+up)
+			points.append(corner-up)
+		var shape := ConvexPolygonShape3D.new()
+		shape.points = points
+		var collision := CollisionShape3D.new()
+		collision.shape = shape
+		collision.set_meta(CollisionPolicy.POLICY_META,CollisionPolicy.PARKOUR)
+		body.add_child(collision)
+	if half_width-hip_inset>0.3:
+		_build_ridge_beam(body,ridge_pos,maxf(0.6,width-2.0*hip_inset),color)
+
+
+static func _roof_material(color: Color) -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.roughness = 0.82
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	return material
 
 
 ## The front (south) slope. Where a cross gable stands on it, the slope is cut away

@@ -1,11 +1,21 @@
-# Handoff: Chinese Village pass (population, story and layout re-fit approved; layout not yet built)
+# Handoff: Chinese Village pass
+
+> **Walkthrough corrections, 2026-10-17:** See `docs/diagnostics/2026-10-17-china-platforming-and-character-corrections.md`. This supersedes the continuous-jacket approval in the earlier NPC report. Roof collision winding, fitted slopes/doors, stair approaches, service routes, farm edges and segmented clothing were corrected. Run the new `tools/validate_chinese_platforming.tscn` with the existing runtime validator after a bake.
+
+> **Latest NPC pass, 2026-10-16:** `docs/diagnostics/2026-10-16-china-npc-pass.md` records the 20 stable named looks, shared cultural garment/headwear kit, revised emperor/chef and advisor wardrobe transition. `tools/chinese_character_review.tscn` is a repeatable roster and gait proof. Runtime appearance checks run with the existing village validator.
+
+> **Latest building fidelity, 2026-10-16:** See `docs/diagnostics/2026-10-16-china-building-fidelity.md`. Inn roof/section, upstairs gallery and supported signs, guest furnishings, distinct workyards and resident route clearance are corrected. Final bake and runtime checks pass. The royal crossing is thinner and the mound has rock relief, but the mound still needs visual refinement; this is not final village art approval.
+
+> **Latest finish continuation, 2026-10-16:** See `docs/diagnostics/2026-10-16-china-village-continuation.md`. The owner authorized continuing the whole-village correction. Garden pine positions are canonical in `ChinesePlan.GARDENS`; rim pines are resolved against physical crown envelopes during baking. Always run `tools/bake_chinese_village.tscn`, which now settles those pines before packing. The continuation also replaces flat corridor roofs, corrects facade lattices and household paths, opens the inn screen, and softens exposed court outlines. This is progress, not village-wide visual sign-off.
+
+> **Current implementation, 2026-10-16:** The layout is built and the performance/architectural remediation is recorded in `docs/architecture/chinese_village.md` section 5.2 and `docs/diagnostics/2026-10-16-china-remediation.md`. The subsequent arrival/inn/bridge/garden/pine and real-water pass is in `docs/diagnostics/2026-10-16-china-fidelity-followup.md`. Use `scenes/chinese_village_qa.tscn` (F6) for isolated playable review. Detailed geometry is baked and streamed; changes to geometry sources require rebaking. The historical notes below are superseded by those documents and the current settlement backlog. Web publishing remains deprecated.
 
 > **Snapshot of 2026-10-06, kept for the record (2026-10-14).** Superseded where it differs. The innkeeper is now Lu (吕) and his son Lu Hao (not 林静); Lu, not Liang Zhen, becomes the community chef, and Liang Zhen becomes Tian Bo's advisor; there is no romance (all 2026-10-12). The layout is now `chinese_village.md` 4.0 and 4.0a, drawn in `docs/drawings/chinese_gorge_3d.html`. The web build is deprecated, so pushes no longer regenerate `build/web`. Current state and next steps: `docs/architecture/settlement_backlog.md` (index rows C1 to C7, sections 5, 12, 17a, 18).
 
 Nothing from this work is committed. The working tree holds many unrelated
 modified files, so review `git status` before staging. Follow `AGENTS.md` and
-`CLAUDE.md` for publishing (regenerate and validate `build/web` before any push,
-never credit an AI as author or co-author).
+`CLAUDE.md` for publishing (do not regenerate `build/web` unless a web release
+is explicitly requested; never credit an AI as author or co-author).
 
 Read in this order: this file, `docs/architecture/chinese_village.md` (audit,
 population, provisional layout), `docs/architecture/settlement_backlog.md`

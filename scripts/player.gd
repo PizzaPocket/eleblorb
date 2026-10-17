@@ -92,6 +92,10 @@ const FOOT_OFFSET := 0.05
 ## while crossing between rooms. Probe with this body's real shape just below
 ## its current transform so support hands off continuously across such seams.
 const PHYSICS_SUPPORT_PROBE_DEPTH := 0.16
+## Opt-in diagnostic for reports where the player remains in the airborne pose
+## after a landing. Set ELEBLORB_TRACE_JUMP_STALLS=1 in the environment to
+## emit a snapshot after a descending jump has failed to resolve for 1.25 s.
+const JUMP_STALL_TRACE_DELAY := 1.25
 const CLOUD_SINK_DEPTH := WorldSupport.CLOUD_SINK_DEPTH
 
 ## ---- Dirt blorb suit: rear wheel ---- Per direct instruction: a landed
@@ -1127,6 +1131,8 @@ const IDLE_HIP_DROP_ANGLE := deg_to_rad(4.0)
 
 var _skip_next_mouse_motion: bool = true
 var _jumping: bool = false
+var _jump_stall_trace_elapsed := 0.0
+var _jump_stall_trace_enabled := false
 ## Captured at take-off so the airborne pose reaches its full tuck at the
 ## apex of normal, blorb, and giant jumps alike, regardless of jump height.
 var _jump_takeoff_speed: float = 0.0
@@ -1837,6 +1843,7 @@ const THROW_HAND_COCK := deg_to_rad(18.0)
 
 
 func _ready() -> void:
+	_jump_stall_trace_enabled = OS.get_environment("ELEBLORB_TRACE_JUMP_STALLS") == "1"
 	current_hp = clampf(WorldState.player_current_hp, 0.0, MAX_HP)
 	_rng.randomize()
 	_dirtbike_default_floor_max_angle = floor_max_angle
@@ -2561,7 +2568,12 @@ func _physics_process(delta: float) -> void:
 	# is_on_floor() covers that: it's real collision contact, so it fires
 	# the instant the character actually lands on anything solid, elevated
 	# platform or not.
-	if _jumping and velocity.y <= 0.0 and (is_on_floor() or _has_nearby_walkable_support() or _is_near_ground() or _giant_surface_grounded or on_cloud or on_canopy):
+	# A Fire Caldera ribbon ramp can report walkable contact through its
+	# dedicated ramp layer without satisfying is_on_floor() or the generic
+	# support probe. Treat that authored ramp contact as a completed landing too;
+	# otherwise _jumping keeps grounded false and the airborne tuck survives as
+	# the player walks along the ramp or crosses a room threshold.
+	if _jumping and velocity.y <= 0.0 and (on_climbable_ramp or is_on_floor() or _has_nearby_walkable_support() or _is_near_ground() or _giant_surface_grounded or on_cloud or on_canopy):
 		_jumping = false
 		_giant_surface_jump_in_progress = false
 
@@ -2595,6 +2607,33 @@ func _physics_process(delta: float) -> void:
 	_update_dirtbike_wheels(delta)
 	_update_snowboard_visual()
 	_prev_grounded = grounded
+	_trace_unresolved_jump(delta, grounded)
+
+
+## Keep the next reproduction actionable: distinguish a jump flag that never
+## sees support from a pose/animation problem after the flag has cleared.
+## This is disabled by default and only samples the current physics state.
+func _trace_unresolved_jump(delta: float, grounded: bool) -> void:
+	if not _jump_stall_trace_enabled:
+		return
+	# Capture both failure shapes: the jump flag can remain set after a missed
+	# touchdown, or the character can remain in an airborne pose with the flag
+	# already cleared but no grounded handoff/motion.
+	var descending_jump_unresolved := _jumping and velocity.y <= 0.0
+	var stationary_air_pose := not grounded and _continuous_airborne_time >= JUMP_STALL_TRACE_DELAY and velocity.length_squared() < 0.09
+	if not descending_jump_unresolved and not stationary_air_pose:
+		_jump_stall_trace_elapsed = 0.0
+		return
+	_jump_stall_trace_elapsed += delta
+	if _jump_stall_trace_elapsed < JUMP_STALL_TRACE_DELAY:
+		return
+	_jump_stall_trace_elapsed = 0.0
+	print("JUMP_STALL_TRACE pos=%s vel=%s grounded=%s jumping=%s landing=%.2f floor=%s nearby=%s near_ground=%s ramp=%s airborne=%.2f giant=%s cloud=%s canopy=%s ice=%s lava=%s" % [
+		global_position, velocity, grounded, _jumping, _landing_timer, is_on_floor(), _has_nearby_walkable_support(), _is_near_ground(),
+		_is_on_climbable_ramp(), _continuous_airborne_time, _giant_surface_jump_in_progress,
+		_standing_on_cloud, _tree_canopy_stand_height_at(global_position.x, global_position.z, global_position.y - FOOT_OFFSET + 0.2) != null,
+		_is_supported_by_ice(), _is_on_lava_surface()
+	])
 
 
 ## The body's resting height above this CharacterBody's origin this frame:
@@ -8172,9 +8211,16 @@ func _try_step_onto_prop(delta: float) -> void:
 	# more than it could through a bracket subscript (see blorb.gd's
 	# _ground_height_at() and wilderness_scatter.gd's _pave_canyon_floor()
 	# for the same pitfall already hit twice this session).
+	# An overhang or steep face is not a step. Test the complete capsule's
+	# upward motion before moving it: a ray can see a ledge through an eave
+	# while the person's head cannot fit beneath that eave.
+	if result.normal.dot(up_direction)<(0.05 if _dirtbike_wheel_active else cos(floor_max_angle)):
+		return
 	var hit_y: float = result.position.y
 	var rise := hit_y - foot_y
 	if rise <= 0.02 or rise > max_step_height:
+		return
+	if test_move(global_transform,Vector3.UP*rise):
 		return
 	if _dirtbike_wheel_active:
 		# Resolve the rise progressively from actual wheel travel. This gives a

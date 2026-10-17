@@ -1,6 +1,7 @@
 @tool
 extends StaticBody3D
 
+const CHINESE_PLAN := preload("res://scripts/chinese_plan.gd")
 const OCEAN_KINGDOM_TERRAIN := preload("res://scripts/ocean_kingdom_terrain.gd")
 const OCEAN_WATER_SHADER: Shader = preload("res://scripts/ocean_water.gdshader")
 
@@ -302,16 +303,12 @@ const CITY_FLATTEN_TRANSITION := 18.0
 ## floating islands over a chasm ("the Abyss of Impending Doom") rather than
 ## on ordinary flat ground -- see chinese_village_abyss_coverage() below
 ## for the height dip and _height_color()'s own use of it for the matching
-## dark color. The islands themselves are chinese_village.gd's own
-## responsibility (free-floating StaticBody3D props at a fixed height, not
-## part of this mesh) -- this file only has to carve the pit underneath them.
+## dark color. `ChinesePlan` is the shared geometry source; the plan builder
+## creates its floating islands while this terrain carves the matching pit.
 const CHINESE_VILLAGE_CENTER := Vector2(250.0, -650.0)
-## Comfortably covers every island chinese_village.gd actually places (see
-## that file's own ISLAND_* layout consts) -- same "the smoothstep needs a
-## hard inner radius, not just a start-at-0 falloff" reasoning CITY_FLAT_
-## RADIUS's own comment already established for a settlement's foundation.
+## Inside this radius the abyss is at full depth; beyond it the coverage fades
+## to the plan's direction-specific ragged rim.
 const CHINESE_VILLAGE_ABYSS_RADIUS := 170.0
-const CHINESE_VILLAGE_ABYSS_TRANSITION := 50.0
 ## Far deeper than GORGE_DEPTH (60) -- the ordinary wasteland floor -- so the
 ## drop reads as a genuine bottomless-feeling chasm under the islands rather
 ## than just another shallow gorge.
@@ -553,14 +550,27 @@ func town_pond_coverage(world_pos: Vector2) -> float:
 	return 1.0-smoothstep(TOWN_POND_SHORE_RADIUS-3.0,TOWN_POND_SHORE_RADIUS,distance)
 
 
+const CHINESE_WATER := preload("res://scripts/chinese_water.gd")
+
+
 func is_water_area(world_pos: Vector2) -> bool:
+	if not CHINESE_WATER.at(world_pos).is_empty(): return true
 	return is_lake_area(world_pos) or town_pond_coverage(world_pos)>0.01
 
 
 func get_water_surface_height(world_pos: Vector2) -> float:
+	if not CHINESE_WATER.at(world_pos).is_empty():
+		return get_chinese_village_island_surface_y()+CHINESE_WATER.SURFACE
 	if town_pond_coverage(world_pos)>0.01:
 		return TOWN_POND_WATER_LEVEL
 	return LAKE_WATER_LEVEL
+
+
+func get_water_floor_height(world_pos: Vector2) -> float:
+	var pond := CHINESE_WATER.at(world_pos)
+	if not pond.is_empty():
+		return get_chinese_village_island_surface_y()+CHINESE_WATER.bed(pond,world_pos-CHINESE_WATER.CENTER)
+	return get_mesh_height(world_pos.x,world_pos.y)
 
 
 ## Broad, low-amplitude undulation keeps the desert floor from reading as a
@@ -580,15 +590,15 @@ func _wasteland_height(x: float, z: float) -> float:
 	return lerpf(ordinary, CHINESE_VILLAGE_ABYSS_DEPTH, chinese_village_abyss_coverage(x, z))
 
 
-## 1.0 at the Chinese village's own center, fading to 0.0 past
-## CHINESE_VILLAGE_ABYSS_RADIUS + CHINESE_VILLAGE_ABYSS_TRANSITION -- same
-## "coverage" shape jungle_coverage()/volcano_coverage() already establish,
-## just for a pit instead of a raised landform. Public so chinese_village.gd
-## can query the same edge the ground itself uses when deciding how far out
-## its own floating islands/bridges need to reach.
+## 1.0 inside the full-depth radius, fading to 0.0 at the authored, irregular
+## rim in ChinesePlan.RIM. Public so chinese_village.gd can query the same
+## edge the ground itself uses when placing its entry approach.
 func chinese_village_abyss_coverage(x: float, z: float) -> float:
-	var dist := Vector2(x, z).distance_to(CHINESE_VILLAGE_CENTER)
-	return 1.0 - smoothstep(CHINESE_VILLAGE_ABYSS_RADIUS, CHINESE_VILLAGE_ABYSS_RADIUS + CHINESE_VILLAGE_ABYSS_TRANSITION, dist)
+	var relative := Vector2(x,z)-CHINESE_VILLAGE_CENTER
+	var dist := relative.length()
+	if dist <= CHINESE_VILLAGE_ABYSS_RADIUS:
+		return 1.0
+	return 1.0-smoothstep(CHINESE_VILLAGE_ABYSS_RADIUS,_chinese_rim_radius(atan2(relative.y,relative.x)),dist)
 
 
 ## One authoritative elevation for the entire floating-village network,
@@ -596,9 +606,47 @@ func chinese_village_abyss_coverage(x: float, z: float) -> float:
 ## Pandy and Sun Wu Kong all call this rather than maintaining separate
 ## approximate constants that can disagree with the procedural terrain.
 func get_chinese_village_island_surface_y() -> float:
-	const ENTRY_SHORE_DISTANCE := 225.0
-	var shore := CHINESE_VILLAGE_CENTER + Vector2(0.0, ENTRY_SHORE_DISTANCE)
+	var shore := CHINESE_VILLAGE_CENTER + Vector2(CHINESE_PLAN.RIM_LANDING[0],CHINESE_PLAN.RIM_LANDING[1])
 	return get_mesh_height(shore.x, shore.y)
+
+
+var _chinese_rim_radii: PackedFloat32Array = PackedFloat32Array()
+
+
+func _build_chinese_rim_profile() -> void:
+	const SAMPLES := 720
+	_chinese_rim_radii.resize(SAMPLES)
+	var vertices := PackedVector2Array()
+	for point in CHINESE_PLAN.RIM:
+		vertices.append(Vector2(point[0],point[1]))
+	for sample in SAMPLES:
+		var angle := TAU*float(sample)/float(SAMPLES)
+		var ray := Vector2(cos(angle),sin(angle))
+		var best := CHINESE_PLAN.ABYSS_RIM
+		for edge_index in vertices.size()-1:
+			var a := vertices[edge_index]
+			var edge := vertices[edge_index+1]-a
+			var denominator := _cross2(ray,edge)
+			if absf(denominator)<0.00001:
+				continue
+			var distance := _cross2(a,edge)/denominator
+			var along := _cross2(a,ray)/denominator
+			if distance>0.0 and along>=0.0 and along<=1.0:
+				best=minf(best,distance)
+		_chinese_rim_radii[sample]=maxf(best,CHINESE_PLAN.ABYSS_FULL+1.0)
+
+
+func _chinese_rim_radius(angle: float) -> float:
+	if _chinese_rim_radii.is_empty():
+		return CHINESE_PLAN.ABYSS_RIM
+	var phase := fposmod(angle,TAU)/TAU*float(_chinese_rim_radii.size())
+	var index := int(floor(phase))
+	var next := (index+1)%_chinese_rim_radii.size()
+	return lerpf(_chinese_rim_radii[index],_chinese_rim_radii[next],phase-float(index))
+
+
+static func _cross2(a: Vector2,b: Vector2) -> float:
+	return a.x*b.y-a.y*b.x
 
 
 ## The plateau's boundary radius at a given angle around the origin --
@@ -893,6 +941,7 @@ func _ready() -> void:
 	collision_layer = 1
 	collision_mask = 0
 	set_process(true)
+	_build_chinese_rim_profile()
 	LoadingScreen.enqueue_build_stage("Generating world geometry…",0.73,_rebuild)
 
 

@@ -246,6 +246,46 @@ In brief:
 - **Exclusions:** nails, sawn boards, glass, lights on poles, Chinese or Greek
   forms, and copies of real sacred carvings.
 
+## 临渊村: northern Chinese courtyard village (approved implementation charter, 2026-10-15)
+
+Full building and garden brief: `docs/architecture/chinese_village.md`
+sections 4.1–4.4. The authored `ChinesePlan` fixes the site geometry and
+openings; this charter fixes how that geometry is expressed in the game.
+
+- **Primary (about 75 percent): northern Chinese courtyard vernacular.**
+  Axial household compounds, grey tile, white plaster over a brick plinth,
+  plain dark timber, restrained eaves, and homes organized around a kang and
+  its stove.
+- **Secondary (about 20 percent): late-Qing Shihu Yuan garden architecture.**
+  Used for the inn and palace garden: moon gates, lattice screens, covered
+  corridors, pebble courts, rockery, small pavilions, and painted beams.
+- **Accent (about 5 percent): imperial palace.** Vermilion walls and columns,
+  marble terraces, and yellow glazed tile are reserved for the palace.
+- **Kit of parts.**
+  - Roofs: ordinary homes use flush or overhanging gables in grey tile; the
+    inn may use its green ridge; important halls use hip or hip-and-gable
+    forms. One shared pitch and restrained, gently upturned eave treatment.
+  - Walls: grey brick plinth, brick piers, white plaster infill; brick lattice
+    where a courtyard wall should screen without closing the view.
+  - Structure: squarish SuperEgg columns on stone bases carry SuperEgg beams;
+    bracket sets are stacked squarish members under the eaves. Walls read as
+    infill between the frame, not as unsupported ornament.
+  - Openings: superellipse-framed doors and windows; round lattice windows;
+    moon, square, and octagonal garden passages with level thresholds.
+  - Palette: white plaster, grey tile and brick, dark timber; green and blue
+    painted beams and restrained red lacquer. Yellow remains imperial.
+- **SuperEgg rule.** Use clipped SuperEgg slabs for roof planes and their
+  shaped free edges; squarish SuperEggs for plinths, piers, columns, beams,
+  brackets, and opening trim; soft SuperEggs for garden rocks and cloud-pruned
+  forms. Pair substantial pieces with `CollisionPolicy`. Keep continuous
+  ground, water, and polygonal landforms as purpose-built surfaces, and use
+  simple collision primitives where they give dependable traversal.
+- **Hierarchy.** Vernacular: household compounds, shops, and sheds. Polite:
+  the inn and public halls. Imperial: palace and its garden.
+- **Exclusions.** No generic pagoda trim on every house, no yellow tile beyond
+  the palace, no southern garden excess, and no ornament without a structural
+  or cultural role.
+
 ## Other kingdoms
 
-Draft charters to be added from `references/cultures.md` grammars: Rock and Ground (earthen Pueblo/adobe), Ocean (stilt harbour) Sky (drafted in `docs/architecture/sky_kingdom.md` as celestial classical in quartz, gold and cloud: Greco-Roman about 55 percent, Chinese celestial palace about 35 percent by deliberate choice rather than the usual 75/20 split, with the rule that no single building mixes both traditions), the Chinese village (courtyard and tiled hip-and-gable), the Western city (concrete). The Fire Kingdom's draft volcanic-modern charter now lives in `docs/architecture/fire_caldera_city.md`. Each remaining kingdom needs the Ohio-style charter with a primary, one secondary, an accent, a kit of parts, hierarchy and exclusions.
+Draft charters to be added from `references/cultures.md` grammars: Rock and Ground (earthen Pueblo/adobe), Ocean (stilt harbour), Sky (drafted in `docs/architecture/sky_kingdom.md` as celestial classical in quartz, gold and cloud: Greco-Roman about 55 percent, Chinese celestial palace about 35 percent by deliberate choice rather than the usual 75/20 split, with the rule that no single building mixes both traditions), and the Western city (concrete). The Fire Kingdom's draft volcanic-modern charter now lives in `docs/architecture/fire_caldera_city.md`. Each remaining kingdom needs the Ohio-style charter with a primary, one secondary, an accent, a kit of parts, hierarchy and exclusions.

@@ -14,7 +14,7 @@ const TARGETS := {
 		"eye_from": Vector2(8.0, 38.0), "eye_to": Vector2(0.0, -3.0)},
 	# The Chinese Village floats at one fixed height over the abyss: ground is the
 	# island surface, not the terrain below.
-	"china": {"scene": "res://scenes/main.tscn", "center": Vector2(250.0, -650.0), "extent": 170.0,
+	"china": {"scene": "res://scenes/chinese_village_qa.tscn", "center": Vector2(250.0, -650.0), "extent": 170.0,
 		"eye_from": Vector2(0.0, 150.0), "eye_to": Vector2(0.0, 40.0),
 		"ground_node": "ChineseVillage", "ground_prop": "_island_surface_y"},
 	# The fishing village stands over the lake: ground is the lake surface.

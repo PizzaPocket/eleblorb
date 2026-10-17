@@ -1,6 +1,8 @@
 class_name VillageInn
 extends Node3D
 
+const CHINESE_VILLAGE_PLAN_BUILDER := preload("res://scripts/chinese_village_plan_builder.gd")
+
 const NPC_SCENE := preload("res://scenes/npc.tscn")
 
 var world_id := "outskirts"
@@ -18,6 +20,7 @@ var _stand_marker: Marker3D
 var _wake_marker: Marker3D
 var _half_width := 8.0
 var _half_depth := 6.4
+var _is_chinese_plan := false
 var _is_lodge := false
 var _is_ohio_lodge := false
 var _terrain_ref: Node
@@ -84,25 +87,51 @@ func _build(
 ) -> void:
 	name = "VillageInn_%s" % point_id
 	_terrain_ref = terrain
-	# The two settled villages use a proper lodge: a generous six-by-five-cell
-	# primary mass, an occupied upper floor, and the shared ramp/well system.
-	# Other kingdoms retain their established compact footprint unless they opt
-	# in with an architectural style.
-	var is_lodge:=architecture_style in ["log","continuous_panel"] and not open_pavilion_style
-	var cells_w:=6 if is_lodge else 5
-	var cells_d:=5 if is_lodge else 4
+	# Ohio and Snow use a broad lodge. Linyuan uses a narrower two-storey hall
+	# inside its plan-sized compound so the south court and north service court
+	# remain legible around it.
+	var chinese_plan_inn := architecture_style == "chinese_plan"
+	_is_chinese_plan=chinese_plan_inn
+	var is_lodge:=architecture_style in ["log","continuous_panel","chinese_plan"] and not open_pavilion_style
+	var cells_w:=5 if chinese_plan_inn else (6 if is_lodge else 5)
+	var cells_d:=3 if chinese_plan_inn else (5 if is_lodge else 4)
 	var floor_count:=2 if is_lodge else 1
 	_half_width=float(cells_w)*TownProps.CELL_SIZE*0.5
 	_half_depth=float(cells_d)*TownProps.CELL_SIZE*0.5
 	_is_lodge = is_lodge
 	_is_ohio_lodge = architecture_style == "continuous_panel" and is_lodge
 	var back_door := LODGE_BACK_DOOR_X if is_lodge else TownProps.NO_BACK_DOOR
-	var house := _build_open_inn_shell(roof_color,wall_color) if open_pavilion_style else TownProps.build_building(cells_w,cells_d,floor_count,roof_color,wall_color,wall_color.lightened(0.08),TownProps.FLOOR_COLOR,roof_color.lightened(0.12),architecture_style,false,"inn",back_door,"all",{},[HEARTH_HALL_VOID] if _is_ohio_lodge else [])
+	var wall_style := "continuous_panel" if chinese_plan_inn else architecture_style
+	var facade_notes: Array=[]
+	if chinese_plan_inn:
+		var gallery_openings: Array[Dictionary]=[{"kind":"door","center":0.0,"width":2.2,"bottom":TownProps.FLOOR_HEIGHT,"top":TownProps.FLOOR_HEIGHT+2.4,"leaves":2,"exponent":5.5,"interior":true}]
+		for x in [-5.8,-2.8,2.8,5.8]:
+			gallery_openings.append({"kind":"window","center":x,"width":2.5,"bottom":TownProps.FLOOR_HEIGHT+0.8,"top":TownProps.FLOOR_HEIGHT+2.4,"leaves":0,"exponent":5.5,"lattice":true})
+		facade_notes.append({"wall":"south","floor":1,"replace_openings":gallery_openings})
+	var house := _build_open_inn_shell(roof_color,wall_color) if open_pavilion_style else TownProps.build_building(cells_w,cells_d,floor_count,roof_color,wall_color,wall_color.lightened(0.08),TownProps.FLOOR_COLOR,roof_color.lightened(0.12),wall_style,false,"inn",back_door,"lattice" if chinese_plan_inn else "all",{},[HEARTH_HALL_VOID] if _is_ohio_lodge else [],facade_notes)
 	house.name = "InnBuilding"
 	add_child(house)
+	if chinese_plan_inn:
+		# The surveyed hall is 17 × 11 m. TownProps supplies the walkable,
+		# collision-backed room shell; scale that shell and its structure to the
+		# drawing's exact footprint before adding facade members in its local frame.
+		var hall_width := 17.0
+		var hall_depth := 11.0
+		var cell_width := float(cells_w)*TownProps.CELL_SIZE
+		var cell_depth := float(cells_d)*TownProps.CELL_SIZE
+		house.scale = Vector3(hall_width/cell_width,1.0,hall_depth/cell_depth)
+		_half_width=hall_width*0.5
+		_half_depth=hall_depth*0.5
+		CHINESE_VILLAGE_PLAN_BUILDER._build_house_rank_details(house,cell_width,cell_depth,floor_count)
+		CHINESE_VILLAGE_PLAN_BUILDER._build_chinese_roof_details(house,cell_width,cell_depth,floor_count,roof_color,"inn","hard_gable_green")
+		_build_chinese_gallery(house,cell_width,cell_depth)
 	if is_lodge:
 		_smoke_rng.seed = hash(point_id)
-		if _is_ohio_lodge:
+		if chinese_plan_inn:
+			# Lao Ye's kitchen is a separate back-court building. The hall in the
+			# model has no chimney, so skip the Ohio lodge's exterior hearth here.
+			pass
+		elif _is_ohio_lodge:
 			# One great common-room fireplace and one chimney mass. The kitchen uses
 			# that same heat wall but does not present a second fireplace mouth.
 			# The breast rises through the open bay and remains visible outside.
@@ -138,7 +167,12 @@ func _build(
 		# Heads against the rear wall, spaced clear of the doorway at x~1.5 and
 		# of the back door at x=4.
 		bed_z=_half_depth-1.4
-		if _is_ohio_lodge:
+		if chinese_plan_inn:
+			bed_positions.assign([
+				Vector3(-4.4,0.0,bed_z),Vector3(-1.5,0.0,bed_z),Vector3(1.5,0.0,bed_z),
+				Vector3(-4.4,TownProps.FLOOR_HEIGHT,bed_z),Vector3(-1.5,TownProps.FLOOR_HEIGHT,bed_z),Vector3(1.5,TownProps.FLOOR_HEIGHT,bed_z),Vector3(4.4,TownProps.FLOOR_HEIGHT,bed_z),
+			])
+		elif _is_ohio_lodge:
 			# Two beds in each front room, head to the front wall, and one in the
 			# spare room behind the gallery.
 			bed_positions.assign([
@@ -159,12 +193,13 @@ func _build(
 	for i in bed_positions.size():
 		_build_bed(bed_positions[i], i, 0.0 if _is_ohio_lodge else PI)
 	_build_service_rooms(wall_color.lightened(0.04))
+	if chinese_plan_inn: _build_chinese_guest_furnishings(bed_positions)
 
 	_wake_marker = Marker3D.new()
 	_wake_marker.position = bed_positions[0] + Vector3(0.0,0.88,0.0)
 	add_child(_wake_marker)
 	_stand_marker = Marker3D.new()
-	_stand_marker.position = Vector3(-1.0,TownProps.FLOOR_HEIGHT+0.1,-2.2) if _is_ohio_lodge else (Vector3(-7.4,0.1,bed_z-2.8) if is_lodge else Vector3(-6.8,0.1,bed_z-2.4))
+	_stand_marker.position = Vector3(-1.0,TownProps.FLOOR_HEIGHT+0.1,-2.2) if _is_ohio_lodge else (Vector3(0.0,0.1,-1.0) if chinese_plan_inn else (Vector3(-7.4,0.1,bed_z-2.8) if is_lodge else Vector3(-6.8,0.1,bed_z-2.4)))
 	add_child(_stand_marker)
 
 	var keeper := (keeper_scene if keeper_scene != null else NPC_SCENE).instantiate() as Node3D
@@ -196,12 +231,72 @@ func _build(
 	else:
 		inn_lines.assign(["The room is quiet, and the sheets are warm."])
 	keeper.talk_lines = inn_lines
+	if chinese_plan_inn:
+		preload("res://scripts/chinese_appearance.gd").apply(keeper,"姥姥")
 	keeper.dialog_actions_provider = _rest_actions
-	keeper.position = Vector3(-3.4,0.0,1.95) if _is_ohio_lodge else (Vector3(5.0,0.0,-3.1) if is_lodge else Vector3(3.2,0.0,-_half_depth+3.0))
+	keeper.position = Vector3(-3.4,0.0,1.95) if _is_ohio_lodge else (Vector3(4.8,0.0,-1.1) if chinese_plan_inn else (Vector3(5.0,0.0,-3.1) if is_lodge else Vector3(3.2,0.0,-_half_depth+3.0)))
 	if keeper.has_method("set_terrain_reference"):
 		keeper.set_terrain_reference(terrain)
 	add_child(keeper)
+	if chinese_plan_inn:
+		CollisionPolicy.fit_sheared_static_boxes(self)
+		for door in find_children("*","Node3D",true,false):
+			if is_instance_valid(door) and door.has_method("fit_to_parent"): door.fit_to_parent()
 	_register.call_deferred()
+
+
+func _build_chinese_gallery(house: StaticBody3D, width: float, depth: float) -> void:
+	# Shihu Yuan inn facade: projecting gallery, six lacquered supports and
+	# closely spaced balusters, with painted bands beneath the grey tile eave.
+	var lacquer := Color(0.55,0.13,0.085)
+	var dark_lacquer := Color(0.33,0.10,0.07)
+	var blue_paint := Color(0.20,0.36,0.37)
+	var front_z := -depth*0.5
+	var gallery_z := front_z-0.58
+	var gallery_y := TownProps.FLOOR_HEIGHT-0.12
+	var gallery_width := width+0.55
+	CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(gallery_width,0.24,1.55),Vector3(0,gallery_y,gallery_z),Color(0.34,0.27,0.20),true)
+	CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(gallery_width+0.10,0.24,0.14),Vector3(0,gallery_y,gallery_z-0.775),Color(0.34,0.27,0.20),true,SuperEgg.EPSILON_FLAT,true)
+	for index in 6:
+		var x := lerpf(-width*0.5+0.22,width*0.5-0.22,float(index)/5.0)
+		CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(0.25,6.1,0.25),Vector3(x,3.02,front_z-0.86),lacquer,true,SuperEgg.EPSILON_FLAT,true)
+		var brace := CHINESE_VILLAGE_PLAN_BUILDER._local_beam(house,Vector3(x,2.56,front_z-0.30),Vector3(x,3.18,gallery_z+0.35),0.12,dark_lacquer)
+		CollisionPolicy.mark_decorative(brace)
+	var rail_y := gallery_y+1.11
+	CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(gallery_width,0.12,0.14),Vector3(0,rail_y,gallery_z-0.64),lacquer,true,SuperEgg.EPSILON_FLAT,true)
+	var baluster_count := maxi(15,ceili(gallery_width/0.92))
+	for index in baluster_count+1:
+		var x := lerpf(-gallery_width*0.5,gallery_width*0.5,float(index)/float(baluster_count))
+		CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(0.075,0.98,0.075),Vector3(x,gallery_y+0.61,gallery_z-0.64),lacquer,true,SuperEgg.EPSILON_FLAT,true)
+	CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(width+0.55,0.22,0.18),Vector3(0,6.16,front_z-0.90),blue_paint,false,SuperEgg.EPSILON_FLAT,true)
+	CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(width+0.3,0.11,0.20),Vector3(0,6.32,front_z-0.90),lacquer,false,SuperEgg.EPSILON_FLAT,true)
+	# The model's sign hangs over the ground-floor entry, not at the upper eave.
+	# It remains intentionally unlettered; a thin lacquer face sits in a dark frame.
+	var board := CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(2.6,0.50,0.12),Vector3(0,2.68,front_z-1.30),dark_lacquer,true,SuperEgg.EPSILON_FLAT,true)
+	board.name="InnLacquerSignBoard"
+	CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(2.3,0.36,0.14),Vector3(0,2.68,front_z-1.38),Color(0.60,0.11,0.075),false,SuperEgg.EPSILON_FLAT,true)
+	for x in [-0.85,0.85]:
+		var hanger := CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(0.055,0.20,0.07),Vector3(x,3.01,front_z-1.30),dark_lacquer,false,SuperEgg.EPSILON_FLAT,true)
+		hanger.name="InnSignHangerLeft" if x<0 else "InnSignHangerRight"
+	for side in [-1.0,1.0]:
+		for z in [front_z,front_z-1.22]:
+			CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(0.16,1.08,0.16),Vector3(side*gallery_width*0.5,TownProps.FLOOR_HEIGHT+0.54,z),lacquer,true,SuperEgg.EPSILON_FLAT,true)
+		for y in [TownProps.FLOOR_HEIGHT+0.20,TownProps.FLOOR_HEIGHT+1.0]:
+			CHINESE_VILLAGE_PLAN_BUILDER._add_box(house,Vector3(0.14,0.12,1.22),Vector3(side*gallery_width*0.5,y,front_z-0.61),lacquer,true,SuperEgg.EPSILON_FLAT,true)
+		var end_guard := CollisionShape3D.new()
+		var end_shape := BoxShape3D.new()
+		end_shape.size=Vector3(0.14,1.05,1.22)
+		end_guard.shape=end_shape
+		end_guard.position=Vector3(side*gallery_width*0.5,TownProps.FLOOR_HEIGHT+0.525,front_z-0.61)
+		end_guard.set_meta(CollisionPolicy.POLICY_META,CollisionPolicy.PARKOUR)
+		house.add_child(end_guard)
+	var guard := CollisionShape3D.new()
+	var guard_shape := BoxShape3D.new()
+	guard_shape.size=Vector3(gallery_width,1.05,0.14)
+	guard.shape=guard_shape
+	guard.position=Vector3(0,TownProps.FLOOR_HEIGHT+0.525,gallery_z-0.64)
+	guard.set_meta(CollisionPolicy.POLICY_META,CollisionPolicy.PARKOUR)
+	house.add_child(guard)
 
 
 func _build_open_inn_shell(roof_color: Color,wood_color: Color) -> StaticBody3D:
@@ -231,6 +326,17 @@ func _build_inn_sign(accent_color: Color, wall_color: Color) -> void:
 	# Hung beside the door on the left, between it and the common-room window.
 	var sign := build_bed_and_moon_sign(accent_color, wall_color)
 	sign.position = Vector3(-2.7 if _is_lodge else _half_width - 1.7, 0.0, -_half_depth)
+	if _is_chinese_plan:
+		sign.scale=Vector3.ONE*0.55
+		sign.position.y=2.2-0.76*0.55
+		# The cantilever bracket is bolted to the gallery's underside, above
+		# headroom and entirely below its walking surface.
+		var shoe := SuperEgg.build_part(Vector3(0.11,0.07,0.14),wall_color.darkened(0.35),SuperEgg.EPSILON_FLAT,SuperEgg.EPSILON_FLAT)
+		shoe.name="InnSignMountingShoe"
+		shoe.position=Vector3(-2.7,3.035,-_half_depth-0.16)
+		sign.set_meta("mounting_surface_y",3.01)
+		add_child(shoe)
+		CollisionPolicy.mark_decorative(shoe)
 	add_child(sign)
 
 
@@ -245,6 +351,7 @@ static func build_bed_and_moon_sign(accent_color: Color, wall_color: Color) -> S
 	var sign_z := -0.68
 	var bracket_position := Vector3(sign_x,2.42,-0.15)
 	var bracket := SuperEgg.build_part(Vector3(0.62,0.055,0.055),wall_color.darkened(0.35),SuperEgg.EPSILON_FLAT,SuperEgg.EPSILON_FLAT)
+	bracket.name="SignWallBracket"
 	bracket.position = bracket_position+Vector3(0.0,0.0,-0.52)
 	bracket.rotation.y = PI*0.5
 	sign.add_child(bracket)
@@ -264,6 +371,7 @@ static func build_bed_and_moon_sign(accent_color: Color, wall_color: Color) -> S
 		CollisionPolicy.mark_decorative(chain)
 	var plaque_position := Vector3(sign_x,1.34,sign_z)
 	var plaque := SuperEgg.build_part(Vector3(0.92,0.58,0.11),accent_color.darkened(0.16),3.4,3.4)
+	plaque.name="SignPlaque"
 	plaque.position = plaque_position
 	sign.add_child(plaque)
 	CollisionPolicy.add_box(sign,plaque,Vector3(1.84,1.16,0.22),plaque_position,Basis(),false)
@@ -303,6 +411,7 @@ static func build_bed_and_moon_sign(accent_color: Color, wall_color: Color) -> S
 	moon_mesh.material = moon_material
 	var moon := MeshInstance3D.new()
 	moon.mesh = moon_mesh
+	moon.rotation.y=PI
 	moon.position = plaque_position + Vector3(0.0, 0.25, -0.13)
 	sign.add_child(moon)
 	CollisionPolicy.mark_decorative(moon)
@@ -340,7 +449,7 @@ func _build_reception(color: Color) -> void:
 	# beyond; the compact inns keep their original frontage counter.
 	var half := Vector3(2.2,0.62,0.5) if _is_lodge else Vector3(3.0,0.62,0.55)
 	var visual := SuperEgg.build_part(half,color.darkened(0.12),SuperEgg.EPSILON_FLAT,SuperEgg.EPSILON_FLAT)
-	visual.position = Vector3(-3.0,0.62,-4.25) if _is_ohio_lodge else (Vector3(5.0,0.62,-4.4) if _is_lodge else Vector3(3.2,0.62,-_half_depth+2.0))
+	visual.position = Vector3(-3.0,0.62,-4.25) if _is_ohio_lodge else (Vector3(5.0,0.62,-2.4) if _is_chinese_plan else (Vector3(5.0,0.62,-4.4) if _is_lodge else Vector3(3.2,0.62,-_half_depth+2.0)))
 	counter.add_child(visual)
 	CollisionPolicy.add_box(counter,visual,half*2.0,visual.position,Basis(),true)
 	add_child(counter)
@@ -355,7 +464,7 @@ func _build_common_room_tables() -> void:
 	if _is_ohio_lodge:
 		table_positions.assign([Vector3(4.1,0.0,-3.0),Vector3(4.1,0.0,3.0)])
 	else:
-		table_positions.assign([Vector3(-4.4,0.0,-5.4),Vector3(-4.4,0.0,-2.2)])
+		table_positions.assign([Vector3(-2.8,0.0,-3.0),Vector3(-2.8,0.0,-0.2)] if _is_chinese_plan else [Vector3(-4.4,0.0,-5.4),Vector3(-4.4,0.0,-2.2)])
 	for table_position in table_positions:
 		var table := StaticBody3D.new()
 		table.name = "CommonTable"
@@ -717,6 +826,12 @@ func _add_rect_wall(body: StaticBody3D,position: Vector3,size: Vector3,color: Co
 
 
 func _build_bedroom_partition(color: Color) -> void:
+	if _is_chinese_plan:
+		var wall := StaticBody3D.new()
+		wall.name="BedroomPartition"
+		TownProps.build_interior_wall(wall,Vector2(-6.2,1.15),Vector2(8.2,1.15),0.0,[6.2],color)
+		add_child(wall)
+		return
 	var partition := StaticBody3D.new()
 	partition.name = "BedroomPartition"
 	partition.collision_layer = 1
@@ -756,6 +871,8 @@ func _build_bed(position: Vector3, index: int, lodge_yaw: float = PI) -> void:
 
 
 func _build_service_rooms(color: Color) -> void:
+	if _is_chinese_plan:
+		return # The authored latrine and kitchen are in the back court.
 	if _is_ohio_lodge:
 		# The room itself is already part of the purpose-built ground plan.  Only
 		# furnish it here; do not wrap it in a second set of walls and create the
@@ -820,3 +937,16 @@ func _rest_actions() -> Array[Dictionary]:
 		"Your purse feels too light.",
 		func() -> bool: return RecoveryManager.can_rest()
 	)]
+
+
+func _build_chinese_guest_furnishings(beds: Array[Vector3]) -> void:
+	var furniture := StaticBody3D.new()
+	furniture.name="ChineseInnGuestFurnishings"
+	add_child(furniture)
+	for bed in beds:
+		Furnishings.chest(furniture,Vector3(bed.x,bed.y,2.35),PI,Color(0.30,0.20,0.13),1.0)
+	for y in [0.0,TownProps.FLOOR_HEIGHT]:
+		Furnishings.washstand(furniture,Vector3(6.6,y,4.6),0.0)
+		Furnishings.peg_rail(furniture,Vector3(8.28,y,3.3),PI*0.5,1.1,1.65)
+		Furnishings.rug(furniture,Vector3(-1.2,y+0.02,0.6),0.0,Vector2(3.0,1.2),Color(0.30,0.36,0.39))
+		Furnishings.hanging_lamp(furniture,Vector3(0,y+2.65,-0.3),0.45,5.0)

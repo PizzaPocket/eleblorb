@@ -52,11 +52,10 @@ const CLOUD_TURN_SPEED := 7.0
 ## own SPECIAL_BANANA_ITEM_NAME) rather than anything scene-local.
 const JINGU_BANG_ITEM_NAME := "Jingu Bang"
 
-## Duplicated from terrain_generator.gd's own CHINESE_VILLAGE_CENTER/
-## CHINESE_VILLAGE_ABYSS_RADIUS/CHINESE_VILLAGE_ABYSS_TRANSITION, same
-## reasoning wilderness_scatter.gd's own duplicate copy already gives --
-## see _ground_y() below for why this specific companion needs to know
-## about it: he's freed standing on one of chinese_village.gd's own
+## Duplicated from terrain_generator.gd's own CHINESE_VILLAGE_CENTER and
+## sized beyond ChinesePlan's farthest ragged rim. See _ground_y() below for
+## why this specific companion needs to know about it: he's freed standing
+## on one of chinese_village.gd's own
 ## floating islands, where the real ground far below is the Abyss of
 ## Impending Doom, not anywhere he should actually walk down onto once he
 ## starts following.

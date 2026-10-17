@@ -1813,3 +1813,115 @@ static func build_branching_coral(height: float, color: Color) -> Node3D:
 static func _egg(semi_axes: Vector3, color: Color, epsilon_top: float = SuperEgg.EPSILON_SOFT, epsilon_bottom: float = SuperEgg.EPSILON_SOFT) -> MeshInstance3D:
 	var detail := SuperEgg.prop_detail(semi_axes)
 	return SuperEgg.build_part(semi_axes, color, epsilon_top, epsilon_bottom, detail.x, detail.y)
+
+
+## Chinese garden pine: a bent leader and alternating, unequally spaced lateral
+## branches. A seed fixes the whole specimen, so reloading never reshuffles it.
+## Foliage pads are overlapping flattened superellipses, not stacked cones.
+static func build_chinese_pine(height: float, seed_value: int = 1) -> StaticBody3D:
+	var rng := RandomNumberGenerator.new()
+	rng.seed=seed_value
+	var tree := StaticBody3D.new()
+	tree.name="ChineseGardenPine"
+	tree.set_meta("pine_seed",seed_value)
+	tree.collision_layer=1
+	tree.collision_mask=0
+	var bark := Color(0.31,0.23,0.16)
+	var green := Color(0.17,0.36,0.23).lightened(rng.randf_range(0.0,0.10))
+	var bearing := rng.randf_range(-PI,PI)
+	var lean := Vector3(cos(bearing),0,sin(bearing))*height*rng.randf_range(0.12,0.23)
+	var joints: Array[Vector3]=[Vector3.ZERO]
+	for i in range(1,6):
+		var t := float([0.0,0.20,0.43,0.61,0.84,1.0][i])
+		joints.append(Vector3(lean.x*t+sin(t*TAU)*height*0.055,height*(t+(rng.randf_range(-0.045,0.045) if i<5 else 0.0)),lean.z*t+sin(t*PI)*height*0.09))
+	_chinese_pine_leader(tree,joints,height,bark)
+	for i in range(1,5):
+		var origin: Vector3=joints[i]
+		var angle := bearing+float(i)*2.4+rng.randf_range(-0.45,0.45)
+		var reach := height*rng.randf_range(0.22,0.42)*(1.25-float(i)*0.13)
+		var elbow := origin+Vector3(cos(angle)*reach*0.55,height*rng.randf_range(0.02,0.09),sin(angle)*reach*0.55)
+		var tip := origin+Vector3(cos(angle)*reach,height*rng.randf_range(0.07,0.13),sin(angle)*reach)
+		_chinese_pine_limb(tree,origin,elbow,height*0.023,bark)
+		_chinese_pine_limb(tree,elbow,tip,height*0.014,bark)
+		_chinese_pine_pad(tree,tip,height*rng.randf_range(0.22,0.30)*(1.10-float(i)*0.08),angle,green,rng)
+	_chinese_pine_pad(tree,joints[5],height*0.20,bearing+0.6,green.lightened(0.06),rng)
+	for i in 3:
+		var angle := bearing+float(i)*2.1
+		_chinese_pine_limb(tree,Vector3(0,0.10,0),Vector3(cos(angle)*height*0.15,0.035,sin(angle)*height*0.15),height*0.04,bark)
+	# Preserve actual canopy envelopes for clearance proofs after static merging.
+	var crowns: Array=[]
+	for child in tree.get_children():
+		if child is MeshInstance3D and child.has_meta("pine_canopy"):
+			var bounds: AABB=child.transform*child.mesh.get_aabb()
+			crowns.append({"position":bounds.get_center(),"size":bounds.size})
+	tree.set_meta("pine_crown_boxes",crowns)
+	return tree
+
+
+static func _chinese_pine_limb(tree: StaticBody3D, a: Vector3, b: Vector3, radius: float, color: Color) -> void:
+	var length := a.distance_to(b)
+	var mesh := SuperEgg.build_part(Vector3(radius,length*0.5+radius*0.7,radius*0.88),color,2.0,2.5,8,12)
+	mesh.name="PineStructuralLimb"
+	mesh.position=(a+b)*0.5
+	mesh.basis=Basis(Quaternion(Vector3.UP,(b-a).normalized()))
+	tree.add_child(mesh)
+	CollisionPolicy.add_box(tree,mesh,Vector3(radius*2,length,radius*1.76),mesh.position,mesh.basis,true)
+
+
+static func _chinese_pine_pad(tree: StaticBody3D, at: Vector3, radius: float, angle: float, color: Color, rng: RandomNumberGenerator) -> void:
+	for lobe in 3:
+		var offset := Vector3(cos(angle+float(lobe)*2.2),0,sin(angle+float(lobe)*2.2))*radius*(0.44 if lobe>0 else 0.10)
+		var mesh := SuperEgg.build_part(Vector3(radius*rng.randf_range(0.60,0.95),radius*rng.randf_range(0.10,0.14),radius*rng.randf_range(0.38,0.65)),color.lightened(rng.randf_range(0.0,0.055)),2.3,2.6,8,16)
+		mesh.name="PineCloudPad"
+		mesh.set_meta("pine_canopy",true)
+		mesh.position=at+offset+Vector3(0,float(lobe%2)*radius*0.08,0)
+		mesh.rotation.y=angle+rng.randf_range(-0.3,0.3)
+		tree.add_child(mesh)
+		# Broad pruned pads are deliberate landing surfaces; the fine scalloped
+		# perimeter stays visual, with a conservative core collider.
+		CollisionPolicy.add_box(tree,mesh,Vector3(radius*1.30,radius*0.28,radius*0.85),mesh.position,mesh.basis,true)
+
+
+## A single tapering leader with shared rings. The canopy remains SuperEgg
+## lobes; only the bent woody junction needs a continuous swept surface.
+static func _chinese_pine_leader(tree: StaticBody3D, joints: Array[Vector3], height: float, color: Color) -> void:
+	var rings: Array[PackedVector3Array]=[]
+	var samples := 30
+	for i in samples+1:
+		var t := float(i)/samples*float(joints.size()-1)
+		var k := mini(floori(t),joints.size()-2)
+		var at := joints[k].cubic_interpolate(joints[k+1],joints[maxi(k-1,0)],joints[mini(k+2,joints.size()-1)],t-float(k))
+		var direction := (joints[k+1]-joints[k]).normalized()
+		var basis := Basis(Quaternion(Vector3.UP,direction))
+		var radius := height*lerpf(0.056,0.009,float(i)/samples)
+		var ring := PackedVector3Array()
+		for side in 12:
+			var angle := TAU*float(side)/12.0
+			ring.append(at+basis*Vector3(cos(angle)*radius,0,sin(angle)*radius*0.88))
+		rings.append(ring)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in samples:
+		for side in 12:
+			var next := (side+1)%12
+			for p in [rings[i][side],rings[i+1][side],rings[i+1][next],rings[i][side],rings[i+1][next],rings[i][next]]: st.add_vertex(p)
+	for side in 12:
+		for p in [joints[0],rings[0][(side+1)%12],rings[0][side],joints[-1],rings[-1][side],rings[-1][(side+1)%12]]: st.add_vertex(p)
+	st.generate_normals()
+	var mesh := MeshInstance3D.new()
+	mesh.name="PineContinuousLeader"
+	mesh.mesh=st.commit()
+	var material := StandardMaterial3D.new()
+	material.albedo_color=color
+	material.roughness=0.90
+	material.cull_mode=BaseMaterial3D.CULL_DISABLED
+	mesh.material_override=material
+	tree.add_child(mesh)
+	CollisionPolicy.mark_decorative(mesh) # Physical leader segments are paired below.
+	for i in joints.size()-1:
+		var a := joints[i]
+		var b := joints[i+1]
+		var radius := height*lerpf(0.056,0.012,float(i)/float(joints.size()-1))
+		CollisionPolicy.add_box(tree,mesh,Vector3(radius*2,a.distance_to(b),radius*2),(a+b)*0.5,Basis(Quaternion(Vector3.UP,(b-a).normalized())),true)
+	# One visual stands for the segment colliders, including through the bake.
+	mesh.set_meta(StaticMerge.MERGED_PHYSICAL_META,joints.size()-1)

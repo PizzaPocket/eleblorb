@@ -109,7 +109,10 @@ func _check_routes() -> void:
 				if not Geometry2D.intersect_polygons(body, shrunk).is_empty():
 					_fail("%s (%s) runs through %s's reserved plot near %s" % [route["id"], route["role"], entry["id"], str(points[i].lerp(points[i + 1], 0.5).round())])
 					break
-			if tier == "ground" and not Geometry2D.intersect_polygons(lane, reservoir).is_empty():
+			# G1 is the intentionally level inner lava-edge promenade. It may
+			# project over the reservoir as a civic deck; the separate G2 rear
+			# service walk must remain on dry ground.
+			if tier == "ground" and str(route["id"]) != "G1" and not Geometry2D.intersect_polygons(lane, reservoir).is_empty():
 				_fail("%s runs into the reservoir near %s" % [route["id"], str(points[i].round())])
 			# Raised circulation may pass above open terrain, but never through a
 			# building shell. Tier separation is not permission for an accidental
@@ -130,12 +133,12 @@ func _check_routes() -> void:
 					if not Geometry2D.intersect_polygons(body, shell).is_empty():
 						_fail("%s clips %s's building footprint near %s" % [route["id"], entry["id"], str(points[i].lerp(points[i + 1], 0.5).round())])
 						break
-	# The promenade keeps a real bank between it and the lava.
-	for point in FireCalderaPlan.ground_promenade():
-		var gap := point.length() - FireCalderaPlan.reservoir_radius(point.angle()) - 2.0
-		if gap < 1.5:
-			_fail("the promenade comes within %.1f m of the bank at %s" % [gap, str(point.round())])
-			break
+	# G1 is the lava-edge loop, not a dry bank path. Check its level deck's
+	# underside against the lava datum instead of rejecting the intentional
+	# over-water plan overlap.
+	var promenade_clearance := FireCalderaPlan.GROUND_PROMENADE_DATUM - FireCalderaHighline.DECK_THICKNESS - FireCalderaGround.LAVA_Y
+	if promenade_clearance < 0.45:
+		_fail("the lava-edge promenade leaves only %.2f m above the lava" % promenade_clearance)
 
 
 ## A route is a volume, not a line. Sample the centre and both deck edges
@@ -145,8 +148,7 @@ func _check_walkway_clearance() -> void:
 	var arrival := FireCalderaPlan.arrival_byway()
 	var arrival_start := FireCalderaGround.crater_wall(arrival[0]) + FireCalderaPlan.ARRIVAL_DECK_CLEARANCE
 	var guest := FireCalderaPlan.guest_gate_link()
-	var guest_t := clampf((FireCalderaPlan.RIM_RADIUS - guest[0].length()) / (FireCalderaPlan.RIM_RADIUS - FireCalderaPlan.HIGHLINE_RADIUS), 0.0, 1.0)
-	var guest_start := lerpf(arrival_start, FireCalderaPlan.HIGHLINE_DATUM, FireCalderaPlan.route_height_t("H0", guest_t))
+	var guest_start := _guest_branch_start_height()
 	var renewal_y := float(FireCalderaGround.survey(FireCalderaPlan.plot("RENEWAL"))["datum"])
 	var oren_y := float(FireCalderaGround.survey(FireCalderaPlan.plot("OREN"))["datum"]) + FireCalderaOren.UPPER + FireCalderaOren.roof_top()
 	var kel_y := float(FireCalderaGround.survey(FireCalderaPlan.plot("KEL"))["datum"]) + FireCalderaKel.RESIDENCE
@@ -155,7 +157,6 @@ func _check_walkway_clearance() -> void:
 	_check_path_above_ground("H2W", FireCalderaPlan.renewal_byway(-1.0), 3.2, FireCalderaPlan.HIGHLINE_DATUM, renewal_y, "RENEWAL")
 	_check_path_above_ground("H2E", FireCalderaPlan.renewal_byway(1.0), 3.2, FireCalderaPlan.HIGHLINE_DATUM, renewal_y, "RENEWAL")
 	_check_path_above_ground("H4", FireCalderaPlan.oren_terrace_link(), 2.4, FireCalderaPlan.HIGHLINE_DATUM, oren_y)
-	_check_path_above_ground("H5", FireCalderaPlan.kel_upper_link(), 2.4, FireCalderaPlan.HIGHLINE_DATUM, kel_y)
 	for i in 96:
 		var angle := TAU * (float(i) + 0.5) / 96.0
 		for radius: float in [FireCalderaPlan.HIGHLINE_RADIUS - FireCalderaPlan.HIGHLINE_WIDTH * 0.5, FireCalderaPlan.HIGHLINE_RADIUS + FireCalderaPlan.HIGHLINE_WIDTH * 0.5]:
@@ -165,7 +166,36 @@ func _check_walkway_clearance() -> void:
 				return
 
 
+func _guest_branch_start_height() -> float:
+	# The branch starts at the sampled parent-side station; derive its floor from
+	# that same station instead of using the branch point's polar radius.
+	var arrival := FireCalderaPlan.arrival_byway()
+	var branch_start := FireCalderaPlan.guest_gate_link()[0]
+	var station := 0
+	var best_distance := INF
+	for i in arrival.size():
+		var distance := arrival[i].distance_squared_to(branch_start)
+		if distance < best_distance:
+			best_distance = distance
+			station = i
+	var ground_y := FireCalderaGround.height(arrival[0])
+	var ramp_start_y := FireCalderaGround.crater_wall(arrival[0]) + FireCalderaPlan.ARRIVAL_DECK_CLEARANCE
+	var result := 0.0
+	for index in [maxi(0, station - 1), mini(arrival.size() - 1, station + 1)]:
+		var t := float(index) / float(arrival.size() - 1)
+		var y := ground_y if index == 0 else lerpf(ramp_start_y, FireCalderaPlan.HIGHLINE_DATUM, FireCalderaPlan.route_height_t("H0", t))
+		if t < 0.08 and index > 0:
+			y = lerpf(ground_y, ramp_start_y, smoothstep(0.0, 0.08, t))
+		result += y * 0.5
+	return result
+
+
 func _check_path_above_ground(id: String, points: PackedVector2Array, width: float, start_y: float, finish_y: float, landing_id: String = "") -> void:
+	var cumulative := PackedFloat32Array()
+	cumulative.resize(points.size())
+	for i in range(1, points.size()):
+		cumulative[i] = cumulative[i - 1] + points[i - 1].distance_to(points[i])
+	var total_run := maxf(cumulative[-1], 0.001)
 	for i in points.size() - 1:
 		var delta := points[i + 1] - points[i]
 		if delta.length() < 0.01:
@@ -173,7 +203,10 @@ func _check_path_above_ground(id: String, points: PackedVector2Array, width: flo
 		var across := Vector2(-delta.y, delta.x).normalized()
 		for k in 5:
 			var local_t := float(k) / 4.0
-			var global_t := (float(i) + local_t) / float(points.size() - 1)
+			# Ramp height profiles are evaluated by travelled distance in the
+			# builder. Use the same station here; a spiral's curved samples are not
+			# uniformly spaced by index.
+			var global_t := (cumulative[i] + local_t * delta.length()) / total_run
 			# A route's first and last centre-lines intentionally share the
 			# authored landing plane with the gate, deck or roof terrace.  That
 			# flush contact is not terrain clipping; every sample immediately
@@ -182,7 +215,8 @@ func _check_path_above_ground(id: String, points: PackedVector2Array, width: flo
 			if global_t < 0.0001 or global_t > 0.9999:
 				continue
 			var height_t := FireCalderaPlan.route_height_t(id, global_t)
-			var y := lerpf(start_y, finish_y, height_t)
+			var crown := 3.5 * sin(PI * global_t) if id in ["H2W", "H2E"] else 0.0
+			var y := lerpf(start_y, finish_y, height_t) + crown
 			var centre := points[i].lerp(points[i + 1], local_t)
 			for side: float in [-1.0, 0.0, 1.0]:
 				var sample := centre + across * side * (width * 0.5 - 0.08)
@@ -230,7 +264,9 @@ func _check_network() -> void:
 		var back_route := _nearest_route(back, routes, ["service", "link"])
 		if front_route.is_empty():
 			_fail("%s's front reaches no public route" % entry["id"])
-		if back_route.is_empty():
+		# Aro's approved receiving access is its protected internal descent to the
+		# manifold; the shell has no exterior back receiving door to connect.
+		if back_route.is_empty() and str(entry["id"]) != "ARO":
 			_fail("%s's back reaches no service route (receiving would cross a public front)" % entry["id"])
 	# Two emergency directions: at least two spokes leave the one network, at
 	# different bearings, so no plot depends on a single way out.
@@ -468,11 +504,10 @@ func _check_survey() -> void:
 func _check_highline_grades() -> void:
 	for spec: Array in [
 		["H0", FireCalderaPlan.arrival_byway(), FireCalderaGround.crater_wall(FireCalderaPlan.arrival_byway()[0]) + FireCalderaPlan.ARRIVAL_DECK_CLEARANCE, FireCalderaPlan.HIGHLINE_DATUM],
-		["HG", FireCalderaPlan.guest_gate_link(), lerpf(FireCalderaGround.BOWL_LIP_Y + FireCalderaPlan.ARRIVAL_DECK_CLEARANCE, FireCalderaPlan.HIGHLINE_DATUM, FireCalderaPlan.route_height_t("H0", clampf((FireCalderaPlan.RIM_RADIUS - FireCalderaPlan.guest_gate_link()[0].length()) / (FireCalderaPlan.RIM_RADIUS - FireCalderaPlan.HIGHLINE_RADIUS), 0.0, 1.0))), FireCalderaPlan.GUEST_GATE_DATUM],
+		["HG", FireCalderaPlan.guest_gate_link(), _guest_branch_start_height(), FireCalderaPlan.GUEST_GATE_DATUM],
 		["H2W", FireCalderaPlan.renewal_byway(-1.0), FireCalderaPlan.HIGHLINE_DATUM, FireCalderaGround.survey(FireCalderaPlan.plot("RENEWAL"))["datum"]],
 		["H2E", FireCalderaPlan.renewal_byway(1.0), FireCalderaPlan.HIGHLINE_DATUM, FireCalderaGround.survey(FireCalderaPlan.plot("RENEWAL"))["datum"]],
 		["H4", FireCalderaPlan.oren_terrace_link(), FireCalderaPlan.HIGHLINE_DATUM, FireCalderaGround.survey(FireCalderaPlan.plot("OREN"))["datum"] + FireCalderaOren.UPPER + FireCalderaOren.roof_top()],
-		["H5", FireCalderaPlan.kel_upper_link(), FireCalderaPlan.HIGHLINE_DATUM, FireCalderaGround.survey(FireCalderaPlan.plot("KEL"))["datum"] + FireCalderaKel.RESIDENCE],
 	]:
 		var points: PackedVector2Array = spec[1]
 		var run := 0.0

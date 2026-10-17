@@ -34,8 +34,8 @@ const LOOK_DISTANCE := 16.0
 const HEAD_YAW_LIMIT := 0.65
 const HEAD_PITCH_LIMIT := 0.24
 
-## Duplicated from terrain_generator.gd's own CHINESE_VILLAGE_CENTER/
-## CHINESE_VILLAGE_ABYSS_RADIUS/CHINESE_VILLAGE_ABYSS_TRANSITION -- see
+## Duplicated from terrain_generator.gd's own CHINESE_VILLAGE_CENTER and
+## sized beyond ChinesePlan's farthest ragged rim -- see
 ## sun_wu_kong.gd's own identical consts and _ground_y() for why a companion
 ## first found on one of chinese_village.gd's own floating islands needs to
 ## know about this at all (the real ground far below is the Abyss of

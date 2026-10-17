@@ -28,7 +28,8 @@ its walled court, its gate in the south wall.
 When every check passes it writes scripts/chinese_plan.gd (tools/gd_plan.py), the one plan the game's builder
 and validator read; edit here and rerun, never the generated file.
 """
-import io, json, math, runpy, sys, contextlib
+import io, json, math, runpy, sys, contextlib, re
+from pathlib import Path
 from shapely.geometry import Polygon, Point, LineString, box
 from shapely.ops import unary_union
 from shapely import affinity
@@ -70,20 +71,20 @@ item('inn', 'inn_garden', "Inn's garden court", 'court', (18, -5, 13, 13, 0), st
 # C, Roofers
 item('roofers', 'roofer_home', "Roofer's home", 'compound', (-4.5, -8, H[0], H[1], 0), who='Wen Zhao', program='three-bay main room with kang; court; side shed')
 item('roofers', 'roof_yard', 'Roof yard', 'court', (10, -9, 10, 12, 0), style='yard', who='Wen Zhao', program='stacks of grey tile and timber; a practice roof frame')
-item('roofers', 'westend_home', 'West end home', 'compound', (-4, 14, H[0], H[1], 0), who='Shu Mei, Pei', program='three-bay main room with kang; court; side shed')
+item('roofers', 'westend_home', 'West end home', 'compound', (-4, 14, H[0], H[1], 0), who='Shu Mei, Pei Pei', program='three-bay main room with kang; court; side shed')
 
 # A, Lantern Row: Sun Wu Kong's rock and a lookout on the north rim; the children's play hut in its lee
 item('lantern', 'sealing_rock', "Sun Wu Kong's rock", 'feature', (0, -30, 8, 10, 0), style='rock', program='the sealing rock under its gold band; a lookout beside it')
-item('lantern', 'play_yard', 'Play hut and yard', 'court', (4, -19, 12, 12, 0), style='play', who='Xiu, Bao, and the others', program='the stick play hut; the staff among the loose sticks')
-item('lantern', 'lantern_home', 'Lantern home and workshop', 'compound', (-3, -4, 14, 18, 0), door='+x', who='Mei Lian, Jin Wei, Xiu', program='main room with kang; workshop; paper and frames drying')
-item('lantern', 'tile_home', 'Tile home', 'compound', (-11, 14, 12, 14, 0), door='+x', who='Yun Tao, Bao', program='main room with kang; tile stack; the one wave coping on a home\'s yard wall', wave_coping=True)
+item('lantern', 'play_yard', 'Play hut and yard', 'court', (4, -19, 12, 12, 0), style='play', who='Xiu Xiu, Bao Bao, and the others', program='the stick play hut; the staff among the loose sticks')
+item('lantern', 'lantern_home', 'Lantern home and workshop', 'compound', (-3, -4, 14, 18, 0), door='+x', who='Mei Lian, Jin Wei, Xiu Xiu', program='main room with kang; workshop; paper and frames drying')
+item('lantern', 'tile_home', 'Tile home', 'compound', (-11, 14, 12, 14, 0), door='+x', who='Yun Tao, Bao Bao', program='main room with kang; tile stack; the one wave coping on a home\'s yard wall', wave_coping=True)
 
 # B, Market: the square with Chen's stall and the well; the bao house; the carrier's home and loading shed
 item('market', 'market_square', 'Market square', 'court', (0, 1.5, 15, 17, 0), style='market', program='Chen\'s stall; the well; gossip', public=True)
 item('market', 'well', 'Well', 'feature', (1, 3, 2.4, 2.4, 0), on='market_square', style='well', program='from a spring in the island\'s rock heart')
 item('market', 'chen_stall', "Chen's stall", 'feature', (-5, -3, 5, 3, 0), on='market_square', style='stall', who='Chen', program='including the Seed of Life')
-item('market', 'bao_house', 'Bao house', 'compound', (-6, -21, 12, 20, 0), door='+z', style='shop', who='Hua Chen, Ting', program='shopfront on the square side; steamers; main room with kang')
-item('market', 'carrier_home', "Carrier's home and loading shed", 'compound', (15.5, 24, 12, 18, 0), door='-z', style='home', who='Bo Xiang, Rong', program='main room with kang; loading shed for the levy and Ohio goods')
+item('market', 'bao_house', 'Bao house', 'compound', (-6, -21, 12, 20, 0), door='+z', style='shop', who='Hua Chen, Ting Ting', program='shopfront on the square side; steamers; main room with kang')
+item('market', 'carrier_home', "Carrier's home and loading shed", 'compound', (15.5, 24, 12, 18, 0), door='-z', style='home', who='Bo Xiang, Rong Rong', program='main room with kang; loading shed for the levy and Ohio goods')
 
 # D, Fields: strips, household plots by the B bridge, threshing floor, shed, compost and night-soil pits downwind on the east rim
 item('fields', 'threshing', 'Threshing floor', 'court', (-8, -19, 15, 15, 0), style='threshing', program='harvest and festivals; Mei Lian\'s lanterns hung for them', public=True)
@@ -105,17 +106,17 @@ for j, (x, z, w) in enumerate(((6, 11, 36), (6, 18, 36), (8, 25, 34))):
 # Palace (chinese_village_palace.md 3, in the palace island's own frame)
 P_ = [
     ('palace_apron', 'Axis landing apron', 'court', (0, 55, 8, 6, 0), {}),
-    ('gate_pavilion', 'Gate pavilion', 'building', (0, 47.5, 16, 7, 0), dict(style='palace', roof='xieshan', through=True, door='+z', program='the axis bridge-head: chains anchored in its base')),
+    ('gate_pavilion', 'Gate pavilion', 'building', (0, 47.5, 16, 7, 0), dict(style='palace', roof='xieshan', height=1.2, through=True, door='+z', program='the axis bridge-head: chains anchored in its base')),
     ('front_court', 'Front court', 'court', (0, 32, 40, 22, 0), dict(style='palace', program='paved, an axis of white stone; the village square after the quest', public=True)),
     ('dining_hall', 'Dining Hall', 'building', (28, 32, 9, 16, 0), dict(style='palace', roof='xieshan', door='-x', program='communal dining after the quest')),
     ('throne_terrace', 'Throne terrace', 'platform', (0, 3, 46, 34, 0), dict(style='marble', program='three tiers of 1.4 m with balustrades; a central ramp in three flights', height=4.2)),
     ('throne_hall', 'Throne Hall', 'building', (0, 1, 28, 16, 0), dict(style='palace', roof='wudian2', on='throne_terrace', door='+z', program='the throne; the village hall after the quest', height=4.2)),
     ('inner_court', 'Inner court', 'platform', (0, -24, 36, 14, 0), dict(style='marble', program='1.4 m above the throne terrace', height=5.6)),
     ('apartments', 'Inner apartments', 'building', (-25, -24, 14, 20, 0), dict(style='palace', roof='xieshan', door='+x', program='records, meeting and reading rooms after the quest', height=5.6)),
-    ('kitchen', 'Royal Kitchen', 'building', (29, -22, 18, 12, 0), dict(style='palace_service', roof='xuanshan', door='+x', program='the Chef\'s fight floor; Lu\'s community kitchen after')),
-    ('chef_quarters', "Chef's quarters", 'building', (29, -34, 8, 6, 0), dict(style='palace_service', roof='xuanshan', door='+x', program='Liang Zhen\'s room after the quest')),
-    ('service_yard', 'Service yard', 'court', (45, -18, 10, 30, 0), dict(style='yard', program='packed earth; well; latrine closet; cart turn; the B bridge lands here')),
-    ('levy_store', 'Levy store', 'building', (46, -8, 6, 10, 0), dict(style='palace_service', roof='xuanshan', on='service_yard', door='-x', program='the levy; the village store after')),
+    ('kitchen', 'Royal Kitchen', 'building', (32, -22, 18, 12, 0), dict(style='palace_service', roof='xuanshan', door='-x', door_width=2.0, program='the Chef\'s fight floor; Lao Ye\'s community kitchen after')),
+    ('chef_quarters', "Chef's quarters", 'building', (32, -34, 8, 6, 0), dict(style='palace_service', roof='xuanshan', door='+x', program='Liang Zhen\'s room after the quest')),
+    ('service_yard', 'Service yard', 'court', (47, -6, 16, 20, 0), dict(style='yard', program='packed earth; well; latrine closet; cart turn; the B bridge lands here')),
+    ('levy_store', 'Levy store', 'building', (49, -8, 6, 10, 0), dict(style='palace_service', roof='xuanshan', on='service_yard', door='-x', program='the levy; the village store after')),
     ('high_pavilion', 'High pavilion', 'building', (0, -44, 10, 10, 0), dict(style='palace', roof='cuanjian2', door='+z', storeys=2, program='the Emperor\'s private view north; a public lookout after', height=9.8)),
     ('moon_court', 'Moon-gate court', 'court', (-18, -46, 14, 12, 0), dict(style='shihu', garden=True, program='a pomegranate; entered by moon gates', openings=[('s', 0.0, 'moon'), ('e', 0.0, 'moon'), ('w', 0.0, 'oct'), ('n', 0.0, 'round')])),
     ('pond_court', 'Pond court', 'court', (14, -45, 16, 13, 0), dict(style='shihu', garden=True, program='lotus pond, zigzag bridge, rockery and waterfall, hexagonal pavilion', openings=[('s', -3.0, 'moon'), ('e', 0.0, 'oct'), ('n', 2.0, 'round'), ('n', -4.0, 'round')])),
@@ -215,7 +216,8 @@ for it in I:
     for side, at, kind in ops:
         (nx, nz), f = SIDES[side]; ex, ez = f(W, D, at)
         edge = tw(ex, ez); n = dw(nx, nz)
-        OPENINGS.append(dict(island=it['island'], item=it['key'], side=side, at=at, kind=kind, width=OPEN_W[kind],
+        opening_width = 4.0 if it['key'] in ('gatehouse','gate_pavilion') and kind == 'door' else (it.get('door_width', OPEN_W[kind]) if kind == 'door' else OPEN_W[kind])
+        OPENINGS.append(dict(island=it['island'], item=it['key'], side=side, at=at, kind=kind, width=opening_width,
                              edge=[round(edge[0], 2), round(edge[1], 2)], normal=[round(n[0], 3), round(n[1], 3)],
                              level=it.get('height', 0.0) if it['kind'] == 'building' else 0.0,
                              passage=kind in PASSAGE))
@@ -225,21 +227,46 @@ P0 = CEN['palace']
 def pl(x, z): return (P0[0] + x, P0[1] + z)
 def pbox(x0, z0, x1, z1): return box(P0[0] + x0, P0[1] + z0, P0[0] + x1, P0[1] + z1)
 LEVELS = {   # raised spaces: polygon (world), height
-    'terrace': (pbox(-23, -14, 23, 20), 4.2),
+    'gate base': (pbox(-8,42,8,53),1.2),
+    'terrace': (pbox(-18,-14,18,13.12),4.2),
     'inner court': (pbox(-18, -31, 18, -17), 5.6),
     'pavilion plinth': (pbox(-7.5, -38, 7.4, -31), 5.6),
     'mound': (pbox(-6, -50, 6, -38), 9.8),
 }
 RAMPS = [    # name, from (space or 'ground'), to, foot (world), head (world), rise, width; drawn by the model where marked
-    dict(name='the terrace ramp, three flights', a='ground', b='terrace', foot=pl(0, 22.9), head=pl(0, 14.5), width=3.2, drawn='terrace'),
+    dict(name='gate front ramp', a='ground', b='gate base', foot=pl(0,55.4), head=pl(0,53), width=5.0, drawn='gate'),
+    dict(name='gate back ramp', a='ground', b='gate base', foot=pl(0,39.6), head=pl(0,42), width=5.0, drawn='gate'),
+    dict(name='the terrace ramp, three flights', a='ground', b='terrace', foot=pl(0, 22.24), head=pl(0, 13.12), width=3.2, drawn='terrace', segments=[
+        dict(kind='flight', a=pl(0,22.24), b=pl(0,20), from_y=0.0, to_y=1.4),
+        dict(kind='landing', a=pl(0,20), b=pl(0,18.8), height=1.4),
+        dict(kind='flight', a=pl(0,18.8), b=pl(0,16.56), from_y=1.4, to_y=2.8),
+        dict(kind='landing', a=pl(0,16.56), b=pl(0,15.36), height=2.8),
+        dict(kind='flight', a=pl(0,15.36), b=pl(0,13.12), from_y=2.8, to_y=4.2),
+    ]),
     dict(name='inner court flights', a='terrace', b='inner court', foot=pl(-16, -14), head=pl(-16, -17), width=3.2, drawn='terrace'),
     dict(name='inner court flights (east)', a='terrace', b='inner court', foot=pl(16, -14), head=pl(16, -17), width=3.2, drawn='terrace'),
     dict(name='to the pavilion plinth', a='inner court', b='pavilion plinth', foot=pl(0, -31), head=pl(0, -31), width=6, drawn='level'),
     dict(name='the high pavilion flights', a='pavilion plinth', b='mound', foot=pl(-6, -36.4), head=pl(5.7, -38), width=3.2, drawn='pavilion'),
+    # The route hugs the east edge of the inner court. Its paired 4.5 m runs
+    # descend 2.8 m each (31.9 degrees), with 1.2 m end and mid landings.
+    # The ground landing opens onto the 1.8 m approach beside the west kitchen door; all dimensions
+    # are plan geometry, also used by the runtime and the 3D drawing.
+    dict(name='inner court to royal kitchen', a='inner court', b='ground', foot=pl(18, -29.2), head=pl(19.6, -15.8), width=3.2, drawn='kitchen', rise=5.6,
+         segments=[
+             dict(kind='landing', a=pl(18.0, -29.2), b=pl(21.2, -29.2), height=5.6),
+             dict(kind='flight', a=pl(19.6, -27.6), b=pl(19.6, -23.1), from_y=5.6, to_y=2.8),
+             dict(kind='landing', a=pl(19.6, -23.1), b=pl(19.6, -21.9), height=2.8),
+             dict(kind='flight', a=pl(19.6, -21.9), b=pl(19.6, -17.4), from_y=2.8, to_y=0.0),
+             dict(kind='landing', a=pl(19.6, -17.4), b=pl(19.6, -15.8), height=0.0),
+         ]),
     # down from the plinth to the garden on its east side: 5.6 m in two 32 deg flights with a landing
-    dict(name='east garden ramp', a='pavilion plinth', b='ground', foot=pl(17.9, -33.5), head=pl(7.4, -33.5), width=2.4, drawn='garden', rise=5.6),
+    dict(name='east garden ramp', a='ground', b='pavilion plinth', foot=pl(17.9, -33.5), head=pl(7.4, -33.5), width=2.4, drawn='garden', rise=5.6, landing_length=1.2),
 ]
-RAMP_POLYS = [LineString([r['foot'], r['head']]).buffer(r['width'] / 2, cap_style=2) for r in RAMPS if r['drawn'] == 'garden']
+RAMP_POLYS = []
+for ramp in RAMPS:
+    if 'ground' not in (ramp['a'], ramp['b']): continue
+    sections = ramp.get('segments', [dict(a=ramp['foot'], b=ramp['head'])])
+    RAMP_POLYS.append(unary_union([LineString([s['a'],s['b']]).buffer(ramp['width']/2,cap_style=2) for s in sections]))
 # the covered corridors along the garden's south side are paths themselves (walked, roofed)
 CORRIDORS = [dict(island='palace', pts=[pl(-26, -36.6), pl(-12, -36.6)], width=2.4), dict(island='palace', pts=[pl(10, -36.6), pl(22, -36.6)], width=2.4)]
 # the level graph: every raised space reached from the ground
@@ -308,7 +335,7 @@ for i in range(len(ps)):
 def access_points(it):
     W, D, tw, dw = local_frame(it)
     if it['kind'] == 'court' and it['style'] not in WALLED_COURTS and not it.get('on') and it['island'] != 'palace':
-        return [(tw(0, 0), dw(0, 1))]
+        return [(tw(-4 if it['key']=='market_square' else 0, 0), dw(0, 1))]
     if it['kind'] in ('field', 'grove') or (it['kind'] == 'feature' and it['style'] == 'rock'):
         if it['style'] == 'plot' and it['key'] != 'plot1': return []      # one access for the plot block
         cx, cz = CEN[it['island']]
@@ -320,7 +347,7 @@ def access_points(it):
 
 # ---- the path network
 GRID = 0.5
-SPINE_W, BRANCH_W, BUND_W = 3.0, 2.4, 1.6   # a bund: the raised footpath along a field's end
+SPINE_W, BRANCH_W, BUND_W = 3.0, 2.4, 1.6   # a bund: the flat earth footpath along a field's end
 def chaikin(pts, n=3):
     for _ in range(n):
         out = [pts[0]]
@@ -328,23 +355,57 @@ def chaikin(pts, n=3):
             out += [(0.75 * a[0] + 0.25 * b[0], 0.75 * a[1] + 0.25 * b[1]), (0.25 * a[0] + 0.75 * b[0], 0.25 * a[1] + 0.75 * b[1])]
         out.append(pts[-1]); pts = out
     return pts
+WORKYARDS = {'roof_yard': dict(tile_center=[-2.2,-4.0],tile_half=[1.5,1.1],frame_center=[0,3.3],frame_half=[1.6,1.0],rack_center=[3.2,1.7],rack_half=[1.4,.6])}
 PATHS = []
 for k in ISL:
+    grid=0.25 if k=="palace" else GRID
     solids = unary_union([g for key, g in SOLID_BY.get(k, [])]) if SOLID_BY.get(k) else Polygon()
+    columns=[]
+    for gallery in CORRIDORS:
+        if gallery['island']!=k: continue
+        a,b=gallery['pts']; length=math.dist(a,b); dx=(b[0]-a[0])/length; dz=(b[1]-a[1])/length
+        bays=max(1,math.ceil(length/2.4))
+        for i in range(bays+1):
+            for side in (-1,1):
+                point=(a[0]+(b[0]-a[0])*i/bays-dz*side*gallery['width']*.43,
+                       a[1]+(b[1]-a[1])*i/bays+dx*side*gallery['width']*.43)
+                if any(o['passage'] and math.dist(o['edge'],point)<1.2 for o in OPENINGS): continue
+                columns.append(Point(point).buffer(.20))
+    if columns: solids=unary_union([solids]+columns)
+    fitted=[]
+    for bridge in G['data']['bridges']:
+        if bridge['kind']!='chain': continue
+        aa,bb=bridge['ends']; dx=bb[0]-aa[0]; dz=bb[1]-aa[1]; length=math.hypot(dx,dz); dx/=length;dz/=length
+        for endpoint,island in enumerate((bridge['a'],bridge['b'])):
+            if island!=k: continue
+            direction=(dx,dz) if endpoint==0 else (-dx,-dz)
+            point=(aa if endpoint==0 else bb); origin=(point[0]-direction[0]*2.5,point[1]-direction[1]*2.5)
+            xaxis=(direction[1],-direction[0])
+            for side in (-1,1):
+                cx=origin[0]+xaxis[0]*side*(bridge['width']/2+1.1);cz=origin[1]+xaxis[1]*side*(bridge['width']/2+1.1)
+                fitted.append(Polygon([(cx+xaxis[0]*x+direction[0]*z,cz+xaxis[1]*x+direction[1]*z) for x,z in [(-.8,-2.5),(.8,-2.5),(.8,2.5),(-.8,2.5)]]))
+    for yard_key,layout in WORKYARDS.items():
+        item=next(it for it in I if it['key']==yard_key)
+        if item['island']!=k: continue
+        ox=CEN[k][0]+item['rect'][0];oz=CEN[k][1]+item['rect'][1]
+        for part in ('tile','frame','rack'):
+            x,z=layout[part+'_center'];hx,hz=layout[part+'_half']
+            fitted.append(box(ox+x-hx,oz+z-hz,ox+x+hx,oz+z+hz))
+    if fitted: solids=unary_union([solids]+fitted)
     area = ISL[k].buffer(-WALK_EDGE)
     x0, z0, x1, z1 = area.bounds
-    xs = np.arange(x0, x1 + GRID, GRID); zs = np.arange(z0, z1 + GRID, GRID)
+    xs = np.arange(x0, x1 + grid, grid); zs = np.arange(z0, z1 + grid, grid)
     XX, ZZ = np.meshgrid(xs, zs)
     free = {}
-    for w in (SPINE_W, BRANCH_W, BUND_W):
-        ok = shapely.contains_xy(area.buffer(-w / 2 + 0.3), XX, ZZ) & ~shapely.contains_xy(solids.buffer(w / 2 + 0.25), XX, ZZ)
+    for w in (SPINE_W, BRANCH_W, BUND_W, 1.4, 2.0):
+        ok = shapely.contains_xy(area.buffer(-w / 2 + 0.3), XX, ZZ) & ~shapely.contains_xy(solids.buffer(w / 2 + (0.10 if w==1.4 else 0.25)), XX, ZZ)
         free[w] = ok
     # a cost that keeps paths off walls: cheaper in the middle of open ground
     dist = shapely.distance(solids.boundary.union(area.boundary), shapely.points(XX.ravel(), ZZ.ravel())).reshape(XX.shape) if not solids.is_empty else np.full(XX.shape, 9.0)
     extra = np.clip(3.0 - dist, 0, None) * 0.6
     nz_, nx_ = XX.shape
-    def cell(p): return (int(round((p[1] - z0) / GRID)), int(round((p[0] - x0) / GRID)))
-    def pt(c): return (x0 + c[1] * GRID, z0 + c[0] * GRID)
+    def cell(p): return (int(round((p[1] - z0) / grid)), int(round((p[0] - x0) / grid)))
+    def pt(c): return (x0 + c[1] * grid, z0 + c[0] * grid)
     network = {}          # cell -> path index
     def search(start, w, targets):
         """Dijkstra from start to any target cell (or the given goal set); walking on the network costs less."""
@@ -359,19 +420,26 @@ for k in ISL:
             for dz, dx, L in ((1, 0, 1), (-1, 0, 1), (0, 1, 1), (0, -1, 1), (1, 1, 1.414), (1, -1, 1.414), (-1, 1, 1.414), (-1, -1, 1.414)):
                 q = (c[0] + dz, c[1] + dx)
                 if not (0 <= q[0] < nz_ and 0 <= q[1] < nx_) or not (fr[q] or q in targets): continue
-                cost = c0 + L * GRID * (0.35 if q in network else 1.0 + extra[q])
+                cost = c0 + L * grid * (0.35 if q in network else 1.0 + extra[q])
                 if cost < best.get(q, 1e9): best[q] = cost; prev[q] = c; heapq.heappush(h, (cost, q))
         return None
     def stub(p, n, w):
         """From an opening's outside point, out along its normal to the first cell a path of width w fits."""
-        for s in np.arange(0, 6.01, 0.25):
+        for s in np.arange(0, 9.01, 0.25):
             q = (p[0] + n[0] * s, p[1] + n[1] * s); c = cell(q)
             if 0 <= c[0] < nz_ and 0 <= c[1] < nx_ and free[w][c]: return q, c
         return None, None
     nodes = []   # (name, point, normal, kind[, other access points])
     for l in LANDINGS.get(k, []):
         cx, cz = CEN[k]; ix, iz = l['inner']; d = math.hypot(cx - ix, cz - iz)
-        nodes.append(('landing:' + l['to'], (ix, iz), ((cx - ix) / d, (cz - iz) / d), 'landing'))
+        if k=='palace' and l['to']=='gate':
+            # The bridge joins the raised gate passage via its front/back ramps.
+            # Ground-level routes join the EXIT stair, never cut through the plinth.
+            ramp=next(r for r in RAMPS if r['name']=='gate back ramp')
+            ix,iz=ramp['foot']; iz-=1.0
+            nodes.append(('landing:'+l['to'],(ix,iz),(0,-1),'landing'))
+        else:
+            nodes.append(('landing:' + l['to'], (ix, iz), ((cx - ix) / d, (cz - iz) / d), 'landing'))
     for o in OPENINGS:
         if o['island'] == k and o['passage'] and o.get('onto') == 'ground' and not o.get('linked'): nodes.append((o['item'] + ':' + o['side'], tuple(o['out']), tuple(o['normal']), 'opening'))
     for it in by.get(k, []):
@@ -379,8 +447,10 @@ for k in ISL:
         if aps: nodes.append((it['key'], aps[0][0], aps[0][1], 'access', aps))
     for r in RAMPS:
         if k == 'palace' and 'ground' in (r['a'], r['b']):
-            d = (r['foot'][0] - r['head'][0], r['foot'][1] - r['head'][1]); L = math.hypot(*d) or 1
-            nodes.append(('ramp:' + r['name'], r['foot'], (d[0] / L, d[1] / L), 'ramp'))
+            ground = r['foot'] if r['a'] == 'ground' else r['head']
+            raised = r['head'] if r['a'] == 'ground' else r['foot']
+            d = (ground[0] - raised[0], ground[1] - raised[1]); L = math.hypot(*d) or 1
+            nodes.append(('ramp:' + r['name'], ground, (d[0] / L, d[1] / L), 'ramp'))
     for c in CORRIDORS:
         if c['island'] == k:
             for p, q in ((c['pts'][0], c['pts'][1]), (c['pts'][1], c['pts'][0])):
@@ -389,16 +459,29 @@ for k in ISL:
     order = [n_ for n_ in nodes if n_[3] == 'landing'] + sorted([n_ for n_ in nodes if n_[3] != 'landing'], key=lambda n_: math.dist(n_[1], nodes[0][1]))
     for i, node in enumerate(order):
         name, p, n, kind = node[:4]
-        w = SPINE_W if kind == 'landing' else BUND_W if kind == 'access' and name.startswith(('strip', 'terrace', 'plot', 'pits')) else BRANCH_W
+        if k=='palace' and name=='kitchen:s': n=(0,1)
+        w = SPINE_W if kind == 'landing' else BUND_W if kind == 'access' and name.startswith(('strip', 'terrace', 'plot', 'pits')) else 1.4 if k == 'palace' else BRANCH_W
         sp_, sc = stub(p, n, w)
+        if sp_ is None and kind=='landing':
+            for pinch in (2.4,2.0,1.6):
+                sp_,sc=stub(p,n,pinch)
+                if sp_ is not None: w=pinch;break
         if sp_ is None and kind == 'access':
             for p2, n2 in node[4][1:]:
                 sp_, sc = stub(p2, n2, w)
                 if sp_ is not None: p, n = p2, n2; break
-        if sp_ is None: problems.append((k, name, 'no room for a %.1f m path outside it' % w)); continue
+        if sp_ is None:
+            problems.append((k, name, 'no room for a %.1f m path outside it' % w))
+            continue
         if not network:
             network[sc] = -1; continue
         cs = search(sc, w, set(network))
+        if cs is None and kind=='landing':
+            for pinch in (2.4,2.0,1.6):
+                sp2,sc2=stub(p,n,pinch)
+                if sp2 is None: continue
+                cs2=search(sc2,pinch,set(network))
+                if cs2 is not None: w=pinch;sp_=sp2;sc=sc2;cs=cs2;break
         if cs is None: problems.append((k, name, 'no %.1f m path joins it to the rest' % w)); continue
         raw = [p] + [pt(c) for c in cs]
         # string-pull: keep only the turns the ground forces, then round them off
@@ -436,7 +519,7 @@ for c in CORRIDORS: PATHS.append(dict(island=c['island'], to='covered corridor',
 # slabs on the palace axis. The village's main way from bridge to bridge across each island is a slab road (shiban lu):
 # rough granite slabs laid crosswise, worn hollow, on an earth bed with a gutter. Lanes to the inn, the market and the bao
 # house are brick, which trade can pay for; lanes to homes, yards, the shed, the pen and the grove are packed earth,
-# crowned to shed rain; fields are reached along raised earth bunds. Inside the palace garden the walks are pebble
+# crowned to shed rain; fields are reached along flush worn-earth walks. Inside the palace garden the walks are pebble
 # mosaic (huajie pudi). Inside every home's yard a brick cross walk (shizi yonglu) runs from the gate to the main room's
 # door, with a cross bar to the side shed; the rest of the yard is packed earth.
 BRICK_TO = ('inn', 'inn_garden', 'market_square', 'bao_house', 'chen_stall', 'well')
@@ -448,7 +531,7 @@ def surface_of(pth):
     if kind == 'link': return 'pebble' if k == 'palace' else 'brick'
     if k in ('palace', 'gate'): return 'pebble' if item in GARDEN_COURTS or to == 'corridor end' else 'flag'
     if kind == 'spine': return 'slab'
-    if pth['width'] < 2: return 'bund'
+    if pth['width'] < 2: return 'earth'
     if item in BRICK_TO: return 'brick'
     return 'earth'
 for pth in PATHS: pth['surface'] = surface_of(pth)
@@ -468,7 +551,15 @@ PARAPET_KIND = {'palace': 'marble', 'fields': 'fence', 'bamboo': 'fence'}
 PARAPETS = []
 for k, g in ISL.items():
     ring = g.buffer(-1.0, 4).exterior
-    gaps = unary_union([ap.buffer(1.2) for (kk, t), ap in APRONS.items() if kk == k])
+    gaps_list = [ap.buffer(1.2) for (kk, t), ap in APRONS.items() if kk == k]
+    # The cut is the bridge's complete swept width as well as the inland
+    # apron. A spur can project past the face and otherwise leave a guard
+    # across the bridge itself, which the earlier apron-only cut missed.
+    for bridge in G['data']['bridges']:
+        if k not in (bridge['a'], bridge['b']): continue
+        aa,bb = bridge['ends']; axis = np.array(bb)-np.array(aa); axis=axis/np.linalg.norm(axis)
+        gaps_list.append(LineString([np.array(aa)-axis*3,np.array(bb)+axis*3]).buffer(bridge['width']/2+.5))
+    gaps = unary_union(gaps_list)
     rest = ring.difference(gaps) if not gaps.is_empty else ring
     for ln in (rest.geoms if hasattr(rest, 'geoms') else [rest]):
         if ln.length > 1.0: PARAPETS.append(dict(island=k, kind=PARAPET_KIND.get(k, 'brick'), pts=[[round(x, 2), round(z, 2)] for x, z in ln.simplify(0.4).coords]))
@@ -477,9 +568,144 @@ for p in problems: print('PROBLEM', p)
 def out(p):
     if p.geom_type != 'Polygon': p = max(p.geoms, key=lambda q: q.area)
     return [[round(x, 2), round(z, 2)] for x, z in p.exterior.coords]
-data = dict(G['data'], items=[dict({k: v for k, v in it.items() if k != 'poly'}, outline=out(it['poly']), door_at=door_point(it), centre=[round(CEN[it['island']][0] + it['rect'][0], 2), round(CEN[it['island']][1] + it['rect'][1], 2)]) for it in I],
+# Survey the bank overlap on each bridge's actual axis. Chain bearings stay
+# level over those tails; sag begins only after the full body clears the bank.
+for bridge in G['data']['bridges']:
+    if bridge['kind']!='chain': continue
+    line=LineString(bridge['ends']); length=line.length
+    for endpoint,field in [(bridge['a'],'bearing_start'),(bridge['b'],'bearing_end')]:
+        island=next(q for q in G['data']['islands'] if q['key']==endpoint)
+        cut=line.intersection(Polygon(island['outline']).buffer(.55))
+        parts=list(cut.geoms) if hasattr(cut,'geoms') else [cut]
+        distances=[line.project(Point(p)) for part in parts if hasattr(part,'coords') for p in part.coords]
+        reach=max(distances,default=0) if field=='bearing_start' else length-min(distances,default=length)
+        bridge[field]=round(min(length*.20,reach)/length,5)
+PALACE_ARCHITECTURE = {
+    'throne_hall': dict(bays=7, column_height=6.6, roof='wudian2'),
+    'gate_pavilion': dict(bays=3, column_height=4.6, roof='xieshan', through=True),
+    'dining_hall': dict(bays=5, column_height=4.4, roof='xieshan'),
+    'apartments': dict(bays=5, column_height=4.0, roof='xieshan'),
+    'high_pavilion': dict(bays=3, column_height=3.2, roof='cuanjian2', storeys=2),
+}
+data = dict(G['data'], palace_architecture=PALACE_ARCHITECTURE, items=[dict({k: v for k, v in it.items() if k != 'poly'}, outline=out(it['poly']), door_at=door_point(it), centre=[round(CEN[it['island']][0] + it['rect'][0], 2), round(CEN[it['island']][1] + it['rect'][1], 2)]) for it in I],
             paths=PATHS, openings=OPENINGS, ramps=[dict(r, foot=[round(v, 2) for v in r['foot']], head=[round(v, 2) for v in r['head']]) for r in RAMPS], parapets=PARAPETS, aprons=[dict(island=k, to=t, outline=out(p)) for (k, t), p in APRONS.items()], tops={k: out(v) for k, v in TOP.items()},
             plan_problems=[list(map(str, p)) for p in problems])
+# Exact freestanding lamp arrangements expressed by the approved model.
+# Wall/eave lanterns remain a separate type, never substituted by route posts.
+import math
+lamps = []
+by_key = {it['key']: it for it in data['items']}
+def lamp_local(key, x, z, y=0, kind='post'):
+    it = by_key[key]; angle = {'+z': 0, '+x': math.pi/2, '-z': math.pi, '-x': -math.pi/2}[it['door']]
+    c, sn = math.cos(angle), math.sin(angle)
+    lamps.append(dict(owner=key, kind=kind, at=[round(it['centre'][0]+x*c+z*sn,3),round(it['centre'][1]-x*sn+z*c,3)],base_y=y))
+for sx in (-1,1):
+    for sz in (-1,1): lamp_local('gate_forecourt',sx*5.4,sz*5.4)
+    lamp_local('market_square',sx*(by_key['market_square']['rect'][2]/2-.5),by_key['market_square']['rect'][3]/2-.5)
+for x,z in [(-14,6),(14,6),(-14,-6),(14,-6)]: lamp_local('front_court',x,z)
+for i in range(4):
+    angle=i/4*6.28+.6; it=by_key['threshing']
+    lamp_local('threshing',math.cos(angle)*(it['rect'][2]/2-.4),math.sin(angle)*(it['rect'][3]/2-.4))
+for it in data['items']:
+    if it['kind']=='compound' and it['key']!='inn':
+        side=it['door'] in ('+x','-x'); w=it['rect'][3] if side else it['rect'][2]; d=it['rect'][2] if side else it['rect'][3]
+        for sx in (-1,1): lamp_local(it['key'],sx*(w-.2)/3,-d/2+5.45,3.15,'eave')
+for sx in (-1,1): lamp_local('gatehouse',sx*2.2,5.5,3.0,'eave')
+# Resolve conflicts already present between the illustrative lamps and the
+# surveyed route ribbons. Keep the reference point, move only to the nearest
+# clear bay in the same court, and draw that same resolved set in the model.
+for lamp in lamps:
+    if lamp['kind']!='post': continue
+    it=by_key[lamp['owner']]; original=lamp['at'][:]
+    ways=[LineString(q['pts']).buffer(q['width']/2+.45) for q in PATHS if q['island']==it['island']]
+    def clear_lamp(at):
+        return abs(at[0]-it['centre'][0])<=it['rect'][2]/2-.35 and abs(at[1]-it['centre'][1])<=it['rect'][3]/2-.35 and all(not way.contains(Point(at)) for way in ways)
+    if not clear_lamp(original):
+        choices=sorted(((dx*.25,dz*.25) for dx in range(-16,17) for dz in range(-16,17)),key=lambda q:q[0]*q[0]+q[1]*q[1])
+        for dx,dz in choices:
+            at=[round(original[0]+dx,3),round(original[1]+dz,3)]
+            if clear_lamp(at):
+                lamp['at']=at;lamp['reference_at']=original;break
+        else: raise RuntimeError('No clear lamp bay in '+it['key'])
+data['lanterns']=lamps
+# Garden furniture shares one surveyed local layout between model and runtime.
+data['workyards']=WORKYARDS
+data['gardens'] = {
+    'pond_court': dict(pavilion=[-3.4, 0, -3.7], pavilion_yaw=-math.pi/2, pine=[-4.1,0,3.6], pond_radii=[5.6,4.0],
+        crossing=[[-5.7,.12,0],[-2.4,.12,.65],[1.5,.12,-.65],[6.3,.12,0]],
+        approach=[[-3.4,.45,-2.2],[-3.4,.12,-.32]]),
+    'inn_garden': dict(pavilion=[-3.9,0,-3.7], pavilion_yaw=0, pine=[3.7,0,3.8], pond_radii=[3.4,2.4],
+        crossing=[[-1.7,.12,.6],[4.1,.12,.6]], approach=[]),
+}
+# A continuous pond crossing, with the pavilion approach joined at one datum.
+# Polygonize the shared boundaries before triangulation so junction vertices
+# belong to both adjacent surfaces instead of producing overlapping slabs.
+from shapely import constrained_delaunay_triangles
+from shapely.ops import polygonize, nearest_points
+for key, garden in data['gardens'].items():
+    route=garden['crossing']; deck_y=route[0][1]
+    main=LineString([(q[0],q[2]) for q in route]).buffer(.725,quad_segs=6,cap_style=1,join_style=1)
+    approach=garden['approach']
+    branch=None
+    if approach:
+        x,y,z=approach[0]
+        branch=box(x-.75,z,x+.75,approach[-1][2]+.7)
+    top=main.union(branch) if branch is not None else main
+    outer=top.buffer(.03,quad_segs=3,join_style=1)
+    def height(x,z):
+        point=Point(x,z)
+        if not approach or main.buffer(.00001).covers(point): return deck_y
+        start=approach[0]
+        cross=LineString([(x,-20),(x,20)]).intersection(main)
+        entry=cross.bounds[1] if not cross.is_empty else approach[-1][2]
+        return deck_y+(start[1]-deck_y)*max(0,min(1,(entry-z)/(entry-start[2])))
+    def bevel_height(x,z):
+        q=Point(x,z); near=nearest_points(top,q)[0]
+        return height(near.x,near.y)-min(.03,q.distance(top))
+    vertices=[]
+    def vertex(x,y,z): return [round(x,4),round(y,4),round(z,4)]
+    faces=list(polygonize(unary_union([main.boundary,branch.boundary]))) if branch is not None else [main]
+    for face in faces:
+        if not top.covers(face.representative_point()): continue
+        for tri in constrained_delaunay_triangles(face).geoms:
+            vertices.extend(vertex(x,height(x,z),z) for x,z in list(tri.exterior.coords)[:3])
+    for tri in constrained_delaunay_triangles(outer.difference(top)).geoms:
+        vertices.extend(vertex(x,bevel_height(x,z),z) for x,z in list(tri.exterior.coords)[:3])
+    outline=list(outer.exterior.coords)
+    for (ax,az),(bx,bz) in zip(outline,outline[1:]):
+        ay=bevel_height(ax,az);end_y=bevel_height(bx,bz)
+        a=vertex(ax,ay,az);b=vertex(bx,end_y,bz);c=vertex(bx,end_y-.08,bz);d=vertex(ax,ay-.08,az)
+        vertices.extend([a,b,c,a,c,d])
+    for tri in constrained_delaunay_triangles(outer).geoms:
+        vertices.extend(vertex(x,bevel_height(x,z)-.08,z) for x,z in list(tri.exterior.coords)[:3][::-1])
+    # Godot's front faces use clockwise winding; GEOS emits the reverse.
+    for i in range(0,len(vertices),3): vertices[i+1],vertices[i+2]=vertices[i+2],vertices[i+1]
+    garden['walk_vertices']=vertices
+# Constructed paving is one surveyed union per island, not overlapping ribbons.
+# Constrained triangulation preserves holes and concave corners without UVs.
+from shapely import constrained_delaunay_triangles
+paving_network = []
+for island_key in ISL:
+    paving_strips = [LineString(q['pts']).buffer(q['width']/2, quad_segs=4, cap_style=1, join_style=1)
+              for q in PATHS if q['island']==island_key and q['surface'] in ('flag','brick','pebble','garden','imperial')]
+    paving_strips += [p for (k, _), p in APRONS.items() if k==island_key]
+    if not paving_strips: continue
+    surface = unary_union(paving_strips).intersection(ISL[island_key].buffer(-.12,4))
+    masks = [it['poly'] for it in I if it['island']==island_key and it['kind'] in ('court','compound','platform','building')]
+    for it in I:
+        if it['key']=='high_pavilion' and island_key=='palace':
+            masks.append(it['poly'].buffer(3.0,join_style=2))
+    if masks: surface = surface.difference(unary_union(masks))
+    surface = surface.simplify(.015,preserve_topology=True)
+    triangles = constrained_delaunay_triangles(surface)
+    points=[]
+    for tri in triangles.geoms:
+        if not surface.buffer(.001).covers(tri): raise RuntimeError('Paving triangle leaves its authored footprint')
+        # GEOS rings face down after XY is mapped to Godot XZ.
+        ring=list(tri.exterior.coords)[:3]
+        points.extend([[round(x,4),round(z,4)] for x,z in (ring[0],ring[2],ring[1])])
+    paving_network.append(dict(island=island_key,triangles=points,area=round(surface.area,3)))
+data['paving_network']=paving_network
 if '--json' in sys.argv: json.dump(data, open(sys.argv[sys.argv.index('--json') + 1], 'w'))
 import sys as _s, os as _o; _s.path.insert(0, _o.path.dirname(_o.path.abspath(__file__))); from gd_plan import write_plan
 if not problems:
@@ -491,6 +717,11 @@ if not problems:
         '',
         'Village-local metres from VILLAGE_CENTER (as scripts/chinese_village.gd): x east, z south, y up.'],
         {k.upper(): v for k, v in data.items() if k != 'plan_problems'}, 'tools/chinese_village_plan.py')
-    print('wrote scripts/chinese_plan.gd')
+    model_path = Path(__file__).resolve().parent.parent / 'docs/drawings/chinese_gorge_3d.html'
+    model = model_path.read_text()
+    model, replacements = re.subn(r'(?<=/\*DATA\*/).*?(?=/\*END\*/)', lambda _: json.dumps(data), model, count=1, flags=re.S)
+    if replacements != 1: raise RuntimeError('Chinese model data markers are missing')
+    model_path.write_text(model)
+    print('wrote scripts/chinese_plan.gd and the Three.js reference data')
 print('%d items on %d islands; %d openings; %d paths; strips %.0f m2, terraces %.0f m2; %d problems' % (len(I), len(by), len(OPENINGS), len(PATHS), strips, terr, len(problems)))
 if problems: sys.exit(1)

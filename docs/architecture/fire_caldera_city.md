@@ -478,6 +478,24 @@ The 60/30/10 material hierarchy (revised 2026-10-07) is:
 - **10:** molten or mineral colour. Dark structure is a foil
 for light and color, not the city's whole visual identity.
 
+### Community center building revision (2026-10-15)
+
+The hall's front and rear monumental portals are one slim swept steel arch,
+with its feet buried below the finished floor. The glazed side lights meet the
+arch jambs directly; corner Y-piers bear on the same sloped eaves ring that
+supports the roof ribs. Paired clear-glass sliders move into the adjacent
+bays. The central floor remains open to the rear outlook. A 2.4 m wide
+Highline-section glass ramp climbs the west side around a broad return and
+arrives at a full second-storey gallery ring around the central court. Four
+connected floor bays overlook the terrarium; their inner guard opens at the
+ramp landing, while the north and south bridges stop short of the monumental
+portals below. The terrarium is a sealed, collidable
+glass enclosure with a layered canopy, varied understory and ground cover;
+fine mineral ring courses articulate it as a lantern. Three framed Austin-
+inspired stained-glass baffles hang below the saddle canopy, tinting the court
+without crossing either public portal. The gallery ramp, deck, edge members,
+and guards share the Highline's glass-and-steel cassette.
+
 ### Color, glass, and metal palette
 
 Most large glazing remains clear, lightly smoky, or faintly warm so interiors
@@ -569,9 +587,11 @@ braziers placed where the reservoir already provides light, fake exposed pipes,
 and decorative lava containers with no thermal or civic use. Sparse pioneer
 grass and flowers belong only to old cooled rock in the kingdom's outer wilds;
 they do not become ornamental planting on the hot civic terraces. No living
-plant survives within the caldera; its public landscape is geological and
-civic, using rock formations, mineral deposits, fitted terraces, controlled
-fire, colored glass light, and sculpture.
+plant survives in the open caldera. The community center terrarium is the sole
+exception: a closed, heat-isolated glass microclimate for civic study, not open-
+air planting. Its public landscape remains geological and civic, using rock
+formations, mineral deposits, fitted terraces, controlled fire, colored glass
+light, and sculpture.
 
 ### Flame and night-lighting family
 

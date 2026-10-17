@@ -66,6 +66,8 @@ extends StaticBody3D
 ## details to the same articulated human rig rather than introducing a
 ## separate character implementation.
 @export var wears_emperor_regalia: bool = false
+## Shared cultural garment kit, assigned before the rig is built.
+@export var cultural_outfit: Dictionary = {}
 @export_enum("none", "stubble", "full") var beard_style: String = "none"
 @export var beard_color: Color = Color(0.06, 0.045, 0.035)
 @export var beard_scale: float = 1.0
@@ -394,8 +396,10 @@ func _build_figure() -> void:
 		)
 		_skirt = dress_parts["skirt"]
 		_skirt_pivot = dress_parts["pivot"]
+	if not cultural_outfit.is_empty():
+		preload("res://scripts/figure_chinese_clothing.gd").add_to_figure(pivots,cultural_outfit,shirt_color,hair_style)
 	if wears_emperor_regalia:
-		_add_emperor_regalia()
+		_add_emperor_regalia(pivots)
 	elif beard_style != "none":
 		_add_beard(beard_style, beard_color, beard_scale)
 	if wears_pirate_captain_hat:
@@ -424,6 +428,16 @@ func _build_figure() -> void:
 				(eye as MeshInstance3D).set_surface_override_material(0, eye_material)
 
 
+## Refit an authored civilian wardrobe after a story-state change. Rebuilding
+## only visuals keeps the person, dialogue hooks, schedule and collider intact.
+func refresh_wardrobe() -> void:
+	assert(not is_instance_valid(_held_combat_weapon),"Do not replace a combatant's equipped rig")
+	for child in visuals.get_children(): child.free()
+	_skirt=null
+	_skirt_pivot=null
+	_build_figure()
+
+
 func _apply_lava_material_recursive(node: Node, material: Material) -> void:
 	# Long/bob-like hair is a CSGCombiner containing CSGMesh3D pieces, not a
 	# MeshInstance3D. GeometryInstance3D covers both forms, ensuring the main
@@ -439,42 +453,55 @@ func _apply_lava_material_recursive(node: Node, material: Material) -> void:
 		_apply_lava_material_recursive(child, material)
 
 
-func _add_emperor_regalia() -> void:
-	var red := Color(0.66, 0.055, 0.045)
-	var gold := Color(0.95, 0.69, 0.16)
-	# A high court bun sits on the crown rather than behind the skull.
-	var bun := SuperEgg.build_part(Vector3(0.065, 0.075, 0.06), hair_color, 2.4, 2.4)
-	bun.position = Vector3(0.0, 0.285, -0.015)
-	_head.add_child(bun)
-	# Beard is deliberately sunk into the chin so it reads like the project's
-	# hair shapes emerging from the head, not a pasted-on prop.
-	_add_beard("full", hair_color, 1.0)
-	# Mian-style square crown with ten bead cords at both front and back.
-	var crown := SuperEgg.build_part(Vector3(0.18, 0.025, 0.145), red, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-	crown.position = Vector3(0.0, 0.34, 0.0)
-	_head.add_child(crown)
-	for front_sign: float in [-1.0, 1.0]:
-		for i in 10:
-			var x := lerpf(-0.145, 0.145, float(i) / 9.0)
-			var cord := SuperEgg.build_part(Vector3(0.008, 0.095, 0.008), gold, 2.0, 2.0)
-			cord.position = Vector3(x, 0.225, front_sign * 0.13)
-			_head.add_child(cord)
-	# Gold waist and sleeve borders complete the continuous red robe.
-	var belt := SuperEgg.build_part(Vector3(0.235, 0.025, 0.145), gold, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-	belt.position = Vector3(0.0, -0.21, 0.0)
-	_spine.add_child(belt)
-	for arm in [_arm_left, _arm_right]:
-		var cuff := SuperEgg.build_part(Vector3(0.061, 0.025, 0.061), gold, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
-		cuff.position = Vector3(0.0, -0.27, 0.0)
-		arm.add_child(cuff)
+func _add_emperor_regalia(pivots: Dictionary) -> void:
+	var gold := Color(0.77,0.57,0.25)
+	HairOrnaments.build_court_crown(pivots.head_mesh,ProceduralFigure.HEAD_SIZE,hair_style)
+	_add_beard("full",hair_color,1.05)
+	var chest: MeshInstance3D=pivots.chest
+	var c:=chest.mesh.get_aabb().size*0.5
+	# Court roundels use a coiled raised line, not printed repeating texture.
+	for side: float in [-1.0,1.0]:
+		var medallion:=SuperEgg.build_part(Vector3(0.068,0.068,0.008),Color(0.36,0.065,0.055),2.0,2.0)
+		medallion.name="CourtRoundel"
+		medallion.position=Vector3(0,0,side*(c.z+0.02));chest.add_child(medallion)
+		for i in 16:
+			var a:=TAU*float(i)/16.0
+			var r:=0.048-float(i)*0.0014
+			var coil:=SuperEgg.build_part(Vector3(0.006,0.014,0.004),gold,2.0,2.0)
+			coil.position=Vector3(cos(a)*r,sin(a)*r,side*0.012)
+			coil.rotation.z=a
+			medallion.add_child(coil)
+		var head:=SuperEgg.build_part(Vector3(0.016,0.008,0.005),gold,2.0,2.0)
+		head.position=Vector3(0.026,-0.01,side*0.014);medallion.add_child(head)
+		if side>0.0:
+			for pair in [[_arm_left,1.0],[_arm_right,-1.0]]:
+				var shoulder_badge:=medallion.duplicate() as MeshInstance3D
+				shoulder_badge.name="CourtShoulderRoundel"
+				shoulder_badge.scale=Vector3.ONE*0.65
+				shoulder_badge.position=Vector3(float(pair[1])*0.067,-0.10,0)
+				shoulder_badge.rotation.y=float(pair[1])*PI*0.5
+				pair[0].add_child(shoulder_badge)
+	var hips: MeshInstance3D=pivots.hips
+	var h:=hips.mesh.get_aabb().size*0.5
+	for i in 7:
+		var plaque:=SuperEgg.build_part(Vector3(0.022,0.027,0.008),Color(0.65,0.76,0.63),SuperEgg.EPSILON_SOFT,SuperEgg.EPSILON_FLAT)
+		plaque.name="JadeBeltPlaque"
+		plaque.position=Vector3(lerpf(-h.x*0.9,h.x*0.9,float(i)/6.0),h.y*0.5,h.z+0.066)
+		hips.add_child(plaque)
 
 
 func _add_beard(style: String, color: Color, scale_factor: float) -> void:
 	var half_size := Vector3(0.075, 0.16, 0.045) if style == "full" else Vector3(0.082, 0.045, 0.028)
+	if not cultural_outfit.is_empty() and style=="full":
+		half_size=Vector3(0.067,0.13,0.033)
 	var beard := SuperEgg.build_part(half_size * scale_factor, color, 2.5, 2.5)
 	beard.name = "FullBeard" if style == "full" else "ChinStubble"
 	beard.position = Vector3(0.0, 0.015 if style == "full" else 0.035, 0.105)
 	beard.rotation.x = deg_to_rad(-8.0)
+	if not cultural_outfit.is_empty() and style=="full":
+		beard.position=Vector3(0,0.035,0.105+half_size.y*scale_factor*sin(deg_to_rad(45.0)))
+		beard.rotation.x=deg_to_rad(-45.0)
+	CollisionPolicy.mark_decorative(beard)
 	_head.add_child(beard)
 
 
@@ -876,6 +903,10 @@ func _reveal_demon_agent_form() -> void:
 	_replace_figure_color(visuals, former_shirt, shirt_color)
 	_replace_figure_color(visuals, former_pants, pants_color)
 	_replace_figure_color(visuals, former_hat, Color(0.055, 0.045, 0.055))
+	if cultural_outfit.has("apron"):
+		var former_apron: Color=cultural_outfit.apron
+		_replace_figure_color(visuals,former_apron,Color(0.10,0.07,0.085))
+		_replace_figure_color(visuals,former_apron.darkened(0.08),Color(0.075,0.05,0.065))
 	# A brief hot glow makes the change readable as the disguise dropping,
 	# rather than the materials merely popping between dialogue frames.
 	var tween := create_tween()

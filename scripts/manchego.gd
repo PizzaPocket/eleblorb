@@ -188,7 +188,7 @@ func _ready() -> void:
 	add_to_group("manchego")
 	_player = get_node("../Player")
 	terrain = get_node("../Terrain")
-	global_position.y = terrain.get_mesh_height(global_position.x, global_position.z)
+	global_position.y = WorldSupport.ground_height(self,terrain)
 	_idle_anchor = Vector2(global_position.x, global_position.z)
 
 	var collision_shape := CollisionShape3D.new()
@@ -524,7 +524,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	var travelled := _move_planar_toward(next)
 	# Explicit : float, not := -- see _update_follow()'s own identical
 	# comment on the same get_mesh_height() return-type pitfall.
-	var ground_h: float = terrain.get_mesh_height(global_position.x, global_position.z)
+	var ground_h: float = WorldSupport.ground_height(self,terrain)
 	# _landing_timer > 0.0 guards against an immediate re-jump the instant
 	# the impact pose starts -- has to actually finish reading as a landing
 	# first, not just touch the ground for one frame.
@@ -557,13 +557,24 @@ func _move_planar_toward(target: Vector2) -> float:
 	var motion := Vector3(target.x - global_position.x, 0.0, target.y - global_position.z)
 	if motion.length_squared() < 0.00000001:
 		return 0.0
-	var center := global_position + Vector3.UP * (SWEEP_STEP_HEIGHT + SWEEP_BOX_SIZE.y * 0.5)
+	var excluded := _sweep_exclusions()
+	var normal := Vector3.UP
+	if not _is_airborne:
+		var sample := WorldSupport.sample_ground(self,terrain,Vector3(target.x,global_position.y,target.y),excluded)
+		var rise := float(sample.height)-global_position.y
+		var surface_normal: Vector3=sample.normal
+		if absf(rise)<=SWEEP_STEP_HEIGHT and surface_normal.y>=cos(deg_to_rad(33.0)):
+			motion.y=rise
+			normal=surface_normal
+	var basis := Basis(Quaternion(Vector3.UP,normal))*Basis(Vector3.UP,rotation.y)
+	var center := global_position + normal * (SWEEP_STEP_HEIGHT + SWEEP_BOX_SIZE.y * 0.5)
 	var allowed := ObstacleSweep.slide(
 		get_world_3d().direct_space_state, _sweep_shape,
-		Transform3D(Basis(Vector3.UP, rotation.y), center), motion, _sweep_exclusions()
+		Transform3D(basis, center), motion, excluded
 	)
 	global_position.x += allowed.x
 	global_position.z += allowed.z
+	global_position.y += allowed.y
 	return Vector2(allowed.x, allowed.z).length()
 
 

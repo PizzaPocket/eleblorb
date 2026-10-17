@@ -10,32 +10,22 @@ extends Node3D
 ## top-level placement (a standalone Node3D sibling of Terrain/Player in
 ## main.tscn) rather than its dense tower-grid/LOD-wake system.
 ##
-## The Abyss itself is terrain_generator.gd's own responsibility (a deep
-## dip in the shared analytic heightfield, see that file's own
-## chinese_village_abyss_coverage()) -- this file only builds what floats
-## above it: a hub-and-spoke layout of four islands (one large Palace
-## island at the center, three smaller spokes -- two ordinary village
-## islands and one bamboo-forest island) joined by plank bridges, plus one
-## longer entry bridge reaching back to solid ordinary wasteland to the
-## south. Every island sits at the same shared surface elevation sampled
-## once from the entry shore -- nothing on them independently samples terrain height, since the real ground far
-## below is the abyss floor, not anywhere a building or a wandering
-## villager should actually settle. NPCs use npc.gd's own fixed_ground_y
-## override for this reason (see _spawn_villagers() etc.); Sun Wu Kong and
-## Pandy use their own scripts' abyss-aware _ground_y() helpers instead
-## (see either file's own doc comment), since they can walk beyond the
-## village once they join the party.
+## The Abyss is terrain_generator.gd's responsibility. ChinesePlan drives the
+## floating island shapes, the village's bridges, and the landing at the
+## ragged rim. The lived-in islands share the elevation sampled at that
+## landing. Residents use fixed_ground_y while they live above the chasm;
+## Sun Wu Kong and Pandy keep their own terrain-aware ground behavior after
+## they leave the village.
 ##
-## Buildings are ordinary TownProps.build_building() shells (real walls,
-## door, and a collidable/landable gable roof) topped with a tapering stack
-## of thin ornamental SuperEgg eave tiers, using the same "shrink each tier
-## as you stack upward" technique NatureProps.build_slab_tower()/
-## build_rock_spire() already establish for unrelated stacked landmarks --
-## the pagoda silhouette comes from that taper, not new wall/roof code.
+## ChinesePlan owns the settlement geometry. ChineseVillagePlanBuilder adapts
+## the shared shell pieces to the northern courtyard charter, while this node
+## keeps the story, residents and quest-state transitions.
 
 const NPC_SCENE: PackedScene = preload("res://scenes/npc.tscn")
 const SUN_WU_KONG_SCENE: PackedScene = preload("res://scenes/sun_wu_kong.tscn")
 const PANDY_SCENE: PackedScene = preload("res://scenes/pandy.tscn")
+const CHINESE_PLAN_BUILDER := preload("res://scripts/chinese_village_plan_builder.gd")
+const CHINESE_PLAN := preload("res://scripts/chinese_plan.gd")
 
 ## Duplicated from terrain_generator.gd's/wilderness_scatter.gd's own
 ## CHINESE_VILLAGE_CENTER, matching this project's own established
@@ -78,10 +68,8 @@ const ISLAND_EDGE_VARIATION := 0.08
 const BRIDGE_WIDTH := 3.2
 const BRIDGE_PLANK_COLOR := Color(0.42, 0.3, 0.18)
 const BRIDGE_RAIL_HEIGHT := 0.7
-## Where the one entry bridge from ordinary wasteland lands, measured from
-## VILLAGE_CENTER -- past terrain_generator.gd's own CHINESE_VILLAGE_ABYSS_
-## RADIUS + CHINESE_VILLAGE_ABYSS_TRANSITION (170 + 50 = 220) with margin,
-## so its far end rests on genuinely solid, ordinary ground.
+## Legacy radial-layout dimensions retained by the old helper methods below.
+## The active settlement and its rim approach are positioned by ChinesePlan.
 const ENTRY_BRIDGE_RIM_DISTANCE := 225.0
 const ENTRY_BRIDGE_DIRECTION := Vector2(0.0, 1.0)  # local +Z = south, back toward the main plateau
 
@@ -190,9 +178,9 @@ const EMPEROR_LINES := [
 const EMPEROR_LINES_AFTER_DEPOSED := [
 	"朕像做了一场很长的噩梦。如今这座村庄由你作主。",
 ]
-## The inn is the Lin family's own, kept on the island since the first
-## settlers. Lines are Chinese like everyone else's here.
-const INNKEEPER_NAME := "林静"
+## Lao Lao keeps the inn with her husband Lao Ye and their son Lu Hao. Lines
+## are Chinese like everyone else's here.
+const INNKEEPER_NAME := "姥姥"
 const INNKEEPER_LINES := [
 	"这间客栈我家守了三代。床铺的被子,每天都晒。",
 	"陈贩子在楼上住了不少年头,还是爱抢靠窗的那张床。",
@@ -315,7 +303,7 @@ const KID_CHEST_BUILD_SCALE := 1.12
 const KID_HIP_BUILD_SCALE := 1.12
 const KID_IDENTITIES := [
 	{
-		"name": "Ting",
+		"name": "Ting Ting",
 		"female": true,
 		"lines": [
 			"我今早扎辫子扎了好久,不过很值得。",
@@ -323,7 +311,7 @@ const KID_IDENTITIES := [
 		],
 	},
 	{
-		"name": "Xiu",
+		"name": "Xiu Xiu",
 		"female": true,
 		"lines": [
 			"我能把灯笼全都数出来。没人信,但我真的可以。",
@@ -331,7 +319,7 @@ const KID_IDENTITIES := [
 		],
 	},
 	{
-		"name": "Pei",
+		"name": "Pei Pei",
 		"female": true,
 		"lines": [
 			"我们比赛跑去井边吧!",
@@ -339,7 +327,7 @@ const KID_IDENTITIES := [
 		],
 	},
 	{
-		"name": "Rong",
+		"name": "Rong Rong",
 		"female": false,
 		"lines": [
 			"货郎给我看过他的一根豆子。比我的手臂还长。",
@@ -347,7 +335,7 @@ const KID_IDENTITIES := [
 		],
 	},
 	{
-		"name": "Bao",
+		"name": "Bao Bao",
 		"female": false,
 		"lines": [
 			"长大以后我要盖一个像文昭家一样的屋顶。",
@@ -372,96 +360,313 @@ var _proximity_lantern_lights: Array[OmniLight3D] = []
 var _lantern_light_update_elapsed: float = 0.0
 var _captive_blorb_displays: Array[Blorb] = []
 var _royal_chef: Node3D
+var _lao_ye: Node3D
+var _lao_ye_at_kitchen := false
+var _postquest_civic_dressing_built := false
+const SETTLEMENT_BAKE := preload("res://scripts/settlement_bake.gd")
+@export var stream_detail := true
+## Source audits may explicitly build without the baked cache.
+@export var use_baked_geometry := true
+const DETAIL_PREFETCH_RADIUS := 510.0
+const DETAIL_ACTIVATE_RADIUS := 410.0
+const DETAIL_UNLOAD_RADIUS := 620.0
+var _proxy: Node3D
+var _cached_scene: PackedScene
+var _cache_valid := false
+var _load_requested := false
+var _region_elapsed := 0.0
+var _region_guests: Array[Node3D] = []
+var _region_inn: Node3D
+var _plan_root: Node3D
+var _plan_islands: Dictionary = {}
+var _plan_items: Dictionary = {}
+var _plan_centers: Dictionary = {}
 
 
 func _ready() -> void:
-	LoadingScreen.enqueue_build_stage("Instantiating scene data…",0.93,_build_village)
+	terrain=get_node("../Terrain")
+	_island_surface_y=terrain.get_chinese_village_island_surface_y()
+	_cache_valid=use_baked_geometry and SETTLEMENT_BAKE.valid()
+	if not stream_detail or _region_distance()<=DETAIL_ACTIVATE_RADIUS or RecoveryManager.has_pending_recovery():
+		LoadingScreen.enqueue_build_stage("Building Linyuan…",0.93,_build_village)
+	else:
+		_proxy=CHINESE_PLAN_BUILDER.build_proxy(self,VILLAGE_CENTER,_island_surface_y)
+
+
+func _region_distance() -> float:
+	var distance := INF
+	var player := get_node_or_null("../Player") as Node3D
+	if player!=null:
+		var at := player.global_position if player.is_inside_tree() else player.position
+		distance=Vector2(at.x,at.z).distance_to(VILLAGE_CENTER)
+	var controlled := PartyControl.active_control_body()
+	if is_instance_valid(controlled):
+		distance=minf(distance,Vector2(controlled.global_position.x,controlled.global_position.z).distance_to(VILLAGE_CENTER))
+	return distance
+
+
+func _update_region() -> void:
+	if not stream_detail: return
+	var distance := _region_distance()
+	if is_instance_valid(_plan_root):
+		if distance>DETAIL_UNLOAD_RADIUS and not UIState.modal_open:
+			_unload_region()
+		return
+	var prefetch := DETAIL_PREFETCH_RADIUS
+	var controlled := PartyControl.active_control_body()
+	if controlled is CharacterBody3D:
+		prefetch=maxf(prefetch,DETAIL_ACTIVATE_RADIUS+controlled.velocity.length()*4.0)
+	if distance<=prefetch and _cache_valid and not _load_requested and _cached_scene==null:
+		_load_requested=ResourceLoader.load_threaded_request(SETTLEMENT_BAKE.CACHE_PATH)==OK
+	if _load_requested:
+		var status := ResourceLoader.load_threaded_get_status(SETTLEMENT_BAKE.CACHE_PATH)
+		if status==ResourceLoader.THREAD_LOAD_LOADED:
+			_cached_scene=ResourceLoader.load_threaded_get(SETTLEMENT_BAKE.CACHE_PATH) as PackedScene
+			_load_requested=false
+		elif status==ResourceLoader.THREAD_LOAD_FAILED or status==ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
+			_load_requested=false
+			_cache_valid=false
+	if distance<=DETAIL_ACTIVATE_RADIUS and not _load_requested:
+		_build_village()
+	elif distance>DETAIL_UNLOAD_RADIUS:
+		_cached_scene=null
+
+
+func _unload_region() -> void:
+	for actor in _region_guests:
+		if is_instance_valid(actor) and not bool(actor.get("in_party")):
+			actor.queue_free()
+	_region_guests.clear()
+	if is_instance_valid(_region_inn): _region_inn.queue_free()
+	_plan_root.queue_free()
+	_plan_root=null
+	_plan_islands.clear()
+	_plan_items.clear()
+	_plan_centers.clear()
+	_proximity_lantern_lights.clear()
+	_captive_blorb_displays.clear()
+	_postquest_civic_dressing_built=false
+	_lao_ye_at_kitchen=false
+	_lao_ye=null
+	_royal_kitchen=null
+	_cached_scene=null
+	if not is_instance_valid(_proxy):
+		_proxy=CHINESE_PLAN_BUILDER.build_proxy(self,VILLAGE_CENTER,_island_surface_y)
+	_proxy.show()
 
 
 func _build_village() -> void:
+	if is_instance_valid(_plan_root): return
 	terrain = get_node("../Terrain")
 	_rng.seed = 20260906
 	if terrain.has_method("get_chinese_village_island_surface_y"):
 		_island_surface_y = terrain.get_chinese_village_island_surface_y()
+	var built: Dictionary
+	if _cache_valid:
+		if _cached_scene==null:
+			_cached_scene=load(SETTLEMENT_BAKE.CACHE_PATH) as PackedScene
+		built=CHINESE_PLAN_BUILDER.from_bake(self,_cached_scene,_island_surface_y,bool(WorldState.chinese_village_rule_delegated))
+	else:
+		built=CHINESE_PLAN_BUILDER.build(self,VILLAGE_CENTER,_island_surface_y,bool(WorldState.chinese_village_rule_delegated))
+	if is_instance_valid(_proxy): _proxy.hide()
 
-	_palace = _build_island(PALACE_LOCAL, PALACE_RADIUS)
-	_village_a = _build_island(VILLAGE_A_LOCAL, VILLAGE_A_RADIUS)
-	_village_b = _build_island(VILLAGE_B_LOCAL, VILLAGE_B_RADIUS)
-	_bamboo_island = _build_island(BAMBOO_ISLAND_LOCAL, BAMBOO_ISLAND_RADIUS)
-	_village_c = _build_island(VILLAGE_C_LOCAL, VILLAGE_C_RADIUS)
-	_village_d = _build_island(VILLAGE_D_LOCAL, VILLAGE_D_RADIUS)
-	_village_e = _build_island(VILLAGE_E_LOCAL, VILLAGE_E_RADIUS)
-
-	_build_bridge(PALACE_LOCAL, PALACE_RADIUS, VILLAGE_A_LOCAL, VILLAGE_A_RADIUS)
-	_build_bridge(PALACE_LOCAL, PALACE_RADIUS, VILLAGE_B_LOCAL, VILLAGE_B_RADIUS)
-	# The bamboo island is reached through the residential-island route below;
-	# a second near-parallel bridge from the palace made the map read as an
-	# accidental duplicate rather than an intentional network.
-	_build_bridge(VILLAGE_A_LOCAL, VILLAGE_A_RADIUS, VILLAGE_C_LOCAL, VILLAGE_C_RADIUS)
-	_build_bridge(VILLAGE_B_LOCAL, VILLAGE_B_RADIUS, VILLAGE_D_LOCAL, VILLAGE_D_RADIUS)
-	_build_bridge(VILLAGE_C_LOCAL, VILLAGE_C_RADIUS, VILLAGE_E_LOCAL, VILLAGE_E_RADIUS)
-	_build_bridge(VILLAGE_E_LOCAL, VILLAGE_E_RADIUS, BAMBOO_ISLAND_LOCAL, BAMBOO_ISLAND_RADIUS)
-	_build_entry_bridge()
-
-	_build_palace()
-	_build_palace_interiors()
-	_build_palace_gardens()
+	_plan_root = built.root
+	_plan_islands = built.islands
+	_plan_items = built.items
+	_plan_centers = built.centers
+	_palace = _plan_islands["palace"]
+	_village_a = _plan_islands["lantern"]
+	_village_b = _plan_islands["market"]
+	_bamboo_island = _plan_islands["bamboo"]
+	_village_c = _plan_islands["roofers"]
+	_village_d = _plan_islands["fields"]
+	_village_e = _plan_islands["inn"]
 	_build_emperor()
 	_build_royal_kitchen()
 	_apply_blorb_captivity.call_deferred()
-
-	# Play hut reserved first so the ordinary building scatter below (which
-	# shares the same BUILDING_MIN_SPACING check) naturally avoids it.
 	_build_play_hut()
-	_village_a_positions.append(PLAY_HUT_LOCAL_POS)
-	for i in VILLAGE_A_BUILDING_COUNT:
-		_build_one_village_building(_village_a, VILLAGE_A_RADIUS, _village_a_positions)
-	_spawn_kids()
-	_spawn_villagers(_village_a, _village_a_positions, 0, VILLAGER_IDENTITIES.size() / 2)
 	_build_sun_wu_kong.call_deferred()
-
-	# Vendor stall reserved first, same reasoning as the play hut above.
 	_build_vendor_stall()
-	_village_b_positions.append(VENDOR_LOCAL_POS)
-	for i in VILLAGE_B_BUILDING_COUNT:
-		_build_one_village_building(_village_b, VILLAGE_B_RADIUS, _village_b_positions)
-	# Each smaller residential island carries only one or two houses, leaving
-	# visible grass and making the crossings meaningful.
-	_build_pagoda(_village_c, Vector2(-3.0, 1.0), 2, 2)
-	_build_pagoda(_village_c, Vector2(6.0, -5.0), 1, 2)
-	_build_pagoda(_village_d, Vector2(-4.0, -2.0), 2, 2)
-	_build_pagoda(_village_d, Vector2(6.0, 5.0), 1, 2)
-	_build_pagoda(_village_e, Vector2.ZERO, 2, 2)
-	_spawn_villagers(_village_b, _village_b_positions, VILLAGER_IDENTITIES.size() / 2, VILLAGER_IDENTITIES.size() - VILLAGER_IDENTITIES.size() / 2)
-
-	_build_bamboo_forest()
+	_spawn_plan_villagers()
+	_spawn_kids()
 	_build_farmer_and_pandy_quest.call_deferred()
-	_decorate_island_with_trees(_palace, PALACE_RADIUS, 7)
-	_decorate_island_with_trees(_village_a, VILLAGE_A_RADIUS, 3)
-	_decorate_island_with_trees(_village_b, VILLAGE_B_RADIUS, 3)
-	_decorate_island_with_trees(_village_c, VILLAGE_C_RADIUS, 2)
-	_decorate_island_with_trees(_village_d, VILLAGE_D_RADIUS, 2)
-	_decorate_island_with_trees(_village_e, VILLAGE_E_RADIUS, 2)
-
-	_scatter_lanterns(_palace, PALACE_RADIUS)
-	_scatter_lanterns(_village_a, VILLAGE_A_RADIUS)
-	_scatter_lanterns(_village_b, VILLAGE_B_RADIUS)
-	_scatter_lanterns(_village_c, VILLAGE_C_RADIUS)
-	_scatter_lanterns(_village_d, VILLAGE_D_RADIUS)
-	_scatter_lanterns(_village_e, VILLAGE_E_RADIUS)
-	_update_proximity_lantern_lights()
-	var inn_world := VILLAGE_CENTER + VILLAGE_E_LOCAL + Vector2(5.0, -5.0)
+	# Center the playable hall on the model's authored footprint inside the
+	# 22 × 28 m compound; the inn's occupants retain their plan-centre routes.
+	var inn_center := _plan_item_center("inn") + Vector2(-1.9,-0.5)
+	var inn_door := _plan_item_center("inn") + Vector2(0.0,10.0)
 	var inn_lines: Array[String] = []
 	inn_lines.assign(INNKEEPER_LINES)
-	VillageInn.create(self, terrain, Vector3(inn_world.x, _island_surface_y, inn_world.y), "outskirts", "chinese_village_inn", 15, INNKEEPER_NAME, Color(0.68, 0.08, 0.06), Color(0.48, 0.25, 0.12), {}, false, null, false, "panel", null, inn_lines, true, "matong")
+	_region_inn=VillageInn.create(self,terrain,Vector3(VILLAGE_CENTER.x+inn_center.x,_island_surface_y,VILLAGE_CENTER.y+inn_center.y),"outskirts","chinese_village_inn",15,INNKEEPER_NAME,Color(0.34,0.35,0.34),Color(0.84,0.81,0.73),{},false,null,false,"chinese_plan",Vector2(VILLAGE_CENTER.x+inn_center.x,VILLAGE_CENTER.y+inn_door.y),inn_lines,true,"matong")
+	_spawn_inn_family()
+	_build_plan_lanterns()
+	_update_proximity_lantern_lights()
+	_sync_lao_ye_civic_role()
+	_sync_postquest_civic_dressing()
+
+
+func _build_plan_lanterns() -> void:
+	var placed := {}
+	for lamp in CHINESE_PLAN.LANTERNS:
+		if lamp.kind=="post":
+			_add_plan_lantern(Vector2(lamp.at[0],lamp.at[1]),_island_surface_y+float(lamp.get("base_y",0)),placed)
+		else:
+			var lantern := _build_deng_long()
+			lantern.position=Vector3(VILLAGE_CENTER.x+lamp.at[0],_island_surface_y+lamp.base_y,VILLAGE_CENTER.y+lamp.at[1])
+			_plan_root.add_child(lantern)
+			_track_proximity_lantern(lantern)
+
+
+func _add_plan_lantern(plan_position: Vector2, y: float, placed: Dictionary) -> void:
+	var key := "%d:%d" % [roundi(plan_position.x*2.0),roundi(plan_position.y*2.0)]
+	if placed.has(key):
+		return
+	placed[key]=true
+	var post := StaticBody3D.new()
+	post.name = "LinyuanLanternPost"
+	post.collision_layer = 1
+	post.collision_mask = 0
+	post.position = Vector3(VILLAGE_CENTER.x+plan_position.x,y,VILLAGE_CENTER.y+plan_position.y)
+	_plan_root.add_child(post,true)
+	var shaft := SuperEgg.build_part(Vector3(0.10,1.60,0.10),Color(0.24,0.16,0.11),SuperEgg.EPSILON_FLAT,SuperEgg.EPSILON_FLAT)
+	shaft.position.y = 1.60
+	post.add_child(shaft)
+	CollisionPolicy.add_cylinder(post,shaft,0.10,3.20,shaft.position,true)
+	# The model's lantern, caps, tassel and post share one vertical axis.
+	var lantern := _build_deng_long()
+	lantern.position=Vector3(0.0,3.62,0.0)
+	post.add_child(lantern)
+	_track_proximity_lantern(lantern)
+
+
+func _plan_item_center(key: String) -> Vector2:
+	for item in CHINESE_PLAN.ITEMS:
+		if item.key == key:
+			return Vector2(item.centre[0],item.centre[1])
+	return Vector2.ZERO
+
+
+func _plan_item_door(key: String) -> Vector2:
+	for item in CHINESE_PLAN.ITEMS:
+		if item.key == key:
+			var door: Array = item.get("door_at", item.centre)
+			return Vector2(float(door[0]),float(door[1]))
+	return Vector2.ZERO
+
+
+func _spawn_plan_villagers() -> void:
+	# Household keys are the plan's actual compounds. NPCs now begin at the
+	# corresponding doorstep so moving the settlement in the authored plan moves
+	# its population with it.
+	var homes := ["lantern_home","roofer_home","carrier_home","bao_house","lantern_home","gatehouse","tile_home","westend_home"]
+	var work_sites := ["lantern_home","roof_yard","carrier_home","bao_house","lantern_home","gate_forecourt","tile_home","roof_yard"]
+	for i in homes.size():
+		var npc_inst: Node3D = NPC_SCENE.instantiate()
+		npc_inst.set_terrain_reference(terrain)
+		npc_inst.fixed_ground_y = _island_surface_y
+		npc_inst.stationary = false
+		_assign_villager_identity(npc_inst,i)
+		var home_point := _plan_item_door(homes[i])
+		var front := (home_point-_plan_item_center(homes[i])).normalized()
+		home_point+=front*0.6+Vector2(front.y,-front.x)*(1.6 if i<4 else -1.6)
+		var work_point := _plan_item_center(work_sites[i])
+		var work_range := 1.8
+		if work_sites[i]=="gate_forecourt":
+			work_point+=Vector2(3.2,0)
+			work_range=0.25
+		if work_sites[i]=="roof_yard":
+			work_point+=Vector2(2.5,-2.2) if i==1 else Vector2(-0.2,-2.2)
+			work_range=0.25
+		if work_sites[i] == homes[i]:
+			var yard: Node3D=_plan_items[homes[i]]
+			var at: Vector3=yard.to_global(yard.get_meta("workyard_anchor",Vector3(-2,0,2))+Vector3(0,0,0.65 if i>=4 else -0.65))
+			work_point=Vector2(at.x,at.z)-VILLAGE_CENTER
+			work_range=0.35
+		npc_inst.position = Vector3(VILLAGE_CENTER.x+home_point.x,_island_surface_y,VILLAGE_CENTER.y+home_point.y)
+		var schedule: Array[Dictionary] = [
+			{"hour":6.0,"at":Vector2(VILLAGE_CENTER.x+home_point.x,VILLAGE_CENTER.y+home_point.y),"range":0.45},
+			{"hour":8.0,"at":Vector2(VILLAGE_CENTER.x+work_point.x,VILLAGE_CENTER.y+work_point.y),"range":work_range},
+			{"hour":12.0,"at":Vector2(VILLAGE_CENTER.x+work_point.x,VILLAGE_CENTER.y+work_point.y),"range":work_range},
+			{"hour":18.0,"at":Vector2(VILLAGE_CENTER.x+home_point.x,VILLAGE_CENTER.y+home_point.y),"range":0.45},
+			{"hour":22.0,"at":Vector2(VILLAGE_CENTER.x+home_point.x,VILLAGE_CENTER.y+home_point.y),"range":0.45},
+		]
+		npc_inst.configure_daily_schedule(schedule)
+		_plan_root.add_child(npc_inst)
+
+
+func _spawn_inn_family() -> void:
+	var inn_center := _plan_item_center("inn")
+	_lao_ye = _spawn_named_plan_npc("姥爷",inn_center+Vector2(2.2,-4.0),false,["餐馆刚开门,今天的汤还在灶上。","面粉和盐都是从俄亥俄一路运来的。","收成好的时候,我会给全村做一顿饭。"])
+	_lao_ye.talk_override = func() -> bool: return _on_lao_ye_talk()
+	_spawn_named_plan_npc("陆浩",inn_center+Vector2(-2.2,-4.0),false,["我在客栈和饭馆两边帮忙。","陈叔总把靠窗的床留给自己。"])
+
+
+func _on_lao_ye_talk() -> bool:
+	if not WorldState.chinese_village_rule_delegated:
+		return false
+	DialogUI.show_line("姥爷","御膳房如今向全村敞开了。灶火不该只为宫里一个人烧。")
+	return true
+
+
+func _sync_lao_ye_civic_role() -> void:
+	if _lao_ye_at_kitchen or not WorldState.chinese_village_rule_delegated or not is_instance_valid(_lao_ye) or not is_instance_valid(_royal_kitchen):
+		return
+	_lao_ye.reparent(_royal_kitchen,true)
+	_lao_ye.global_position = _royal_kitchen.global_position+Vector3(5.8,0.0,1.3)
+	_lao_ye_at_kitchen = true
+
+
+func _spawn_named_plan_npc(display_name: String, plan_pos: Vector2, female: bool, lines: Array) -> Node3D:
+	var npc_inst: Node3D = NPC_SCENE.instantiate()
+	npc_inst.set_terrain_reference(terrain)
+	npc_inst.fixed_ground_y = _island_surface_y
+	npc_inst.stationary = true
+	npc_inst.display_name = display_name
+	npc_inst.is_female = female
+	npc_inst.skin_color = SKIN_COLORS[1]
+	npc_inst.hair_color = HAIR_COLORS[0]
+	npc_inst.hair_style = FigureHair.STYLE_BUN
+	npc_inst.shirt_color = Color(0.53,0.25,0.16)
+	npc_inst.pants_color = PANTS_COLORS[0]
+	var typed_lines: Array[String] = []
+	typed_lines.assign(lines)
+	npc_inst.talk_lines = typed_lines
+	npc_inst.position = Vector3(VILLAGE_CENTER.x+plan_pos.x,_island_surface_y,VILLAGE_CENTER.y+plan_pos.y)
+	preload("res://scripts/chinese_appearance.gd").apply(npc_inst,display_name)
+	_plan_root.add_child(npc_inst)
+	return npc_inst
 
 
 func _process(delta: float) -> void:
+	_region_elapsed+=delta
+	if _region_elapsed>=0.25:
+		_region_elapsed=0.0
+		_update_region()
+	if not is_instance_valid(_plan_root): return
 	_lantern_light_update_elapsed += delta
 	if _lantern_light_update_elapsed < LANTERN_LIGHT_UPDATE_INTERVAL:
 		return
 	_lantern_light_update_elapsed = 0.0
 	_update_proximity_lantern_lights()
+	_sync_lao_ye_civic_role()
+	_sync_postquest_civic_dressing()
+
+
+func _sync_postquest_civic_dressing() -> void:
+	if _postquest_civic_dressing_built or not WorldState.chinese_village_rule_delegated:
+		return
+	CHINESE_PLAN_BUILDER.set_palace_state(_plan_items, true)
+	var front_court: Node3D = _plan_items.get("front_court")
+	if is_instance_valid(front_court):
+		var council := StaticBody3D.new()
+		council.name = "VillageCouncilFurniture"
+		council.collision_layer = 1
+		council.collision_mask = 0
+		front_court.add_child(council)
+		Furnishings.table(council,Vector3(0.0,0.08,3.0),0.0,2.4,1.3,"benches",Color(0.29,0.19,0.12))
+		Furnishings.armchair(council,Vector3(0.0,0.0,-2.2),PI)
+		for x in [-5.0,5.0]:
+			Furnishings.bench(council,Vector3(x,0.0,3.0),0.0,2.0)
+	_postquest_civic_dressing_built = true
 
 
 func _track_proximity_lantern(lantern: Node3D) -> void:
@@ -818,13 +1023,16 @@ func _build_deng_long() -> Node3D:
 	body_material.emission_enabled = true
 	body_material.emission = Color(1.0, 0.18, 0.06)
 	body_material.emission_energy_multiplier = 1.0
+	CollisionPolicy.mark_decorative(body)
 	root.add_child(body)
 	for y in [-0.42, 0.42]:
 		var rim := SuperEgg.build_part(Vector3(0.3, 0.035, 0.3), TRIM_COLOR, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
 		rim.position.y = y
+		CollisionPolicy.mark_decorative(rim)
 		root.add_child(rim)
 	var tassel := SuperEgg.build_part(Vector3(0.035, 0.28, 0.035), TRIM_COLOR, 2.0, 2.0)
 	tassel.position.y = -0.68
+	CollisionPolicy.mark_decorative(tassel)
 	root.add_child(tassel)
 	var light := OmniLight3D.new()
 	light.name = "Light"
@@ -937,25 +1145,8 @@ func _assign_villager_identity(npc_inst: Node3D, index: int) -> void:
 	lines.assign(identity["lines"])
 	npc_inst.talk_lines = lines
 	npc_inst.is_female = bool(identity["female"])
-	# Fixed default look for ordinary adult villagers, per direct
-	# instruction -- not drawn from a random pool the way outfit colors
-	# below still are.
-	npc_inst.skin_color = SKIN_COLORS[1]
-	npc_inst.hair_color = HAIR_COLORS[0]
-	npc_inst.hair_style = FigureHair.STYLE_BUN
-	npc_inst.shirt_color = SHIRT_COLORS[_rng.randi() % SHIRT_COLORS.size()]
-	npc_inst.pants_color = PANTS_COLORS[_rng.randi() % PANTS_COLORS.size()]
-	# Gendered build pools, matching the other settlements' profiles: women
-	# stand a little shorter with the wider hips, only men get the broad chest.
-	if npc_inst.is_female:
-		npc_inst.body_scale = _rng.randf_range(0.90, 0.98)
-		npc_inst.chest_build_scale = 0.96
-		npc_inst.hip_build_scale = 1.10
-	else:
-		npc_inst.body_scale = _rng.randf_range(0.98, 1.08)
-		npc_inst.chest_build_scale = 1.04
-		npc_inst.hip_build_scale = 1.0
-	npc_inst.abdomen_width_scale = 1.08
+	preload("res://scripts/chinese_appearance.gd").apply(npc_inst,str(identity["name"]))
+
 
 
 ## Small roaming children on Village A, per direct instruction. Reuses the
@@ -967,13 +1158,12 @@ func _assign_villager_identity(npc_inst: Node3D, index: int) -> void:
 ## KID_IDENTITIES[0] (Ting) is guaranteed the new STYLE_PIGTAILS.
 func _spawn_kids() -> void:
 	for i in KID_IDENTITIES.size():
-		var jitter := Vector2(_rng.randf_range(-KID_ROAM_JITTER, KID_ROAM_JITTER), _rng.randf_range(-KID_ROAM_JITTER, KID_ROAM_JITTER))
-		var local := PLAY_HUT_LOCAL_POS + jitter
+		var play_center := _plan_item_center("play_yard")
+		var local := _child_play_anchor(play_center,i)
 		var npc_inst: Node3D = NPC_SCENE.instantiate()
 		npc_inst.set_terrain_reference(terrain)
 		npc_inst.fixed_ground_y = _island_surface_y
-		npc_inst.wander_boundary_center = Vector2(_village_a.global_position.x, _village_a.global_position.z)
-		npc_inst.wander_boundary_radius = float(_village_a.get_meta("walk_radius", 0.0))
+		npc_inst.stationary = true
 		var identity: Dictionary = KID_IDENTITIES[i]
 		npc_inst.display_name = identity["name"]
 		var lines: Array[String] = []
@@ -981,16 +1171,24 @@ func _spawn_kids() -> void:
 		npc_inst.talk_lines = lines
 		npc_inst.is_female = bool(identity["female"])
 		npc_inst.skin_color = SKIN_COLORS[1]
-		npc_inst.hair_color = HAIR_COLORS[0]
-		npc_inst.hair_style = FigureHair.STYLE_PIGTAILS if i == 0 else KID_HAIR_STYLES[_rng.randi() % KID_HAIR_STYLES.size()]
-		npc_inst.shirt_color = SHIRT_COLORS[_rng.randi() % SHIRT_COLORS.size()]
-		npc_inst.pants_color = PANTS_COLORS[_rng.randi() % PANTS_COLORS.size()]
-		npc_inst.body_scale = _rng.randf_range(KID_BODY_SCALE_MIN, KID_BODY_SCALE_MAX)
-		npc_inst.abdomen_width_scale = KID_ABDOMEN_WIDTH_SCALE
-		npc_inst.chest_build_scale = KID_CHEST_BUILD_SCALE
-		npc_inst.hip_build_scale = KID_HIP_BUILD_SCALE
-		npc_inst.position = Vector3(local.x, 0, local.y)
-		_village_a.add_child(npc_inst)
+		preload("res://scripts/chinese_appearance.gd").apply(npc_inst,str(identity["name"]))
+		npc_inst.position = Vector3(VILLAGE_CENTER.x+local.x,_island_surface_y,VILLAGE_CENTER.y+local.y)
+		_plan_root.add_child(npc_inst)
+
+
+func _child_play_anchor(center: Vector2, index: int) -> Vector2:
+	var slots: Array[Vector2]=[Vector2(-3,2),Vector2(3,2),Vector2(-3,-2),Vector2(3,-2),Vector2(0,3.5)]
+	for attempt in 25:
+		var candidate:=center+slots[index]+Vector2(float(attempt%5-2),float(attempt/5-2))*0.45
+		var clear:=true
+		for path in CHINESE_PLAN.PATHS:
+			if path.island!="lantern": continue
+			for j in path.pts.size()-1:
+				var a:=Vector2(path.pts[j][0],path.pts[j][1])
+				var b:=Vector2(path.pts[j+1][0],path.pts[j+1][1])
+				if candidate.distance_to(Geometry2D.get_closest_point_to_segment(candidate,a,b))<float(path.width)*0.5+0.8: clear=false
+		if clear: return candidate
+	return center+slots[index]
 
 
 ## The kids' own play hut -- a rough teepee of leaned stick poles (thin
@@ -999,7 +1197,9 @@ func _spawn_kids() -> void:
 ## Sun Wu Kong's staff hides among those loose sticks.
 func _build_play_hut() -> void:
 	var hut := Node3D.new()
-	hut.position = Vector3(PLAY_HUT_LOCAL_POS.x, 0, PLAY_HUT_LOCAL_POS.y)
+	var hut_center := _plan_item_center("play_yard")
+	var lantern_center: Vector2 = _plan_centers["lantern"]
+	hut.position = Vector3(hut_center.x-lantern_center.x, 0, hut_center.y-lantern_center.y)
 	_village_a.add_child(hut)
 
 	var material := StandardMaterial3D.new()
@@ -1065,8 +1265,8 @@ func _build_jingu_bang_pickup(hut: Node3D) -> void:
 	hut.add_child(pickup)
 
 
-## Sun Wu Kong, sealed beneath the rock crowning the Emperor's castle --
-## added via get_parent().add_child() (Main's own root, a direct sibling of
+## Sun Wu Kong is sealed beneath the rock on Lantern Row -- added via
+## get_parent().add_child() (Main's own root, a direct sibling of
 ## Player/Terrain), NOT island.add_child() -- sun_wu_kong.gd resolves
 ## "../Player"/"../Terrain" via that exact fixed-sibling lookup (see its
 ## own class doc comment), and its own _ground_y() helper is already
@@ -1076,13 +1276,16 @@ func _build_sun_wu_kong() -> void:
 	var rock := SealingRock.new()
 	rock.name = "SealingRock"
 	_village_a.add_child(rock)
-	rock.position = Vector3(SEALING_ROCK_LOCAL_POS.x, 0.0, SEALING_ROCK_LOCAL_POS.y)
+	var rock_center := _plan_item_center("sealing_rock")
+	var lantern_center: Vector2 = _plan_centers["lantern"]
+	rock.position = Vector3(rock_center.x-lantern_center.x,0.0,rock_center.y-lantern_center.y)
 	if WorldState.sun_wu_kong_freed:
 		# Freed, he no longer stands here; the split rock is built on its own.
 		return
 	var sage: SunWuKong = SUN_WU_KONG_SCENE.instantiate()
 	sage.fixed_ground_y = _island_surface_y
 	get_parent().add_child(sage)
+	_region_guests.append(sage)
 	var at := rock.global_position + Vector3(SUN_WU_KONG_OFFSET_FROM_ROCK.x, 0.0, SUN_WU_KONG_OFFSET_FROM_ROCK.y)
 	sage.global_position = Vector3(at.x, _island_surface_y, at.z)
 	# Facing out over the Abyss, to the north.
@@ -1175,24 +1378,22 @@ func _add_bamboo_multimesh(node_name: String, transforms: Array[Transform3D], te
 ## shop_category, opening ShopUI on talk to whatever ShopCatalog.
 ## get_items_for_shop() returns for that category).
 func _build_vendor_stall() -> void:
-	var stall: Dictionary = TownProps.build_stall(ROOF_COLORS[0])
-	var stall_body: StaticBody3D = stall["body"]
-	stall_body.position = Vector3(VENDOR_LOCAL_POS.x, 0, VENDOR_LOCAL_POS.y)
-	stall_body.rotation.y = _rng.randf_range(0.0, TAU)
-	_village_b.add_child(stall_body)
-
-	var counter_y: float = stall["counter_y"]
+	var stall_item: Node3D = _plan_items.get("chen_stall")
+	if stall_item == null:
+		return
+	var stall_body := stall_item.get_child(0) as StaticBody3D
+	if stall_body == null:
+		return
+	var counter_y := float(stall_body.get_meta("counter_y",0.72))
 	var index := 0
-	for item in ShopCatalog.get_items_for_shop("chinese_village"):
-		if not item.get("purchasable", false):
+	for shop_item in ShopCatalog.get_items_for_shop("chinese_village"):
+		if not shop_item.get("purchasable", false):
 			continue
-		var visual: Node3D = item["build_visual"].call(1.0)
-		visual.position = Vector3((float(index) - 1.0) * 0.3, counter_y + 0.05, 0)
+		var visual: Node3D = shop_item["build_visual"].call(1.0)
+		visual.position = Vector3((float(index)-1.0)*0.3,counter_y+0.05,0)
 		stall_body.add_child(visual)
 		index += 1
-
-	var vendor_layout:=TownProps.vendor_layout(VENDOR_LOCAL_POS,stall_body.rotation.y)
-	var vendor_local:=vendor_layout["position"] as Vector2
+	var center := _plan_item_center("chen_stall")
 	var npc_inst: Node3D = NPC_SCENE.instantiate()
 	npc_inst.set_terrain_reference(terrain)
 	npc_inst.fixed_ground_y = _island_surface_y
@@ -1209,9 +1410,12 @@ func _build_vendor_stall() -> void:
 	npc_inst.shirt_color = TRIM_COLOR
 	npc_inst.pants_color = PANTS_COLORS[0]
 	npc_inst.body_scale = 1.0
-	npc_inst.facing_degrees=vendor_layout["facing_degrees"] as float
-	npc_inst.position = Vector3(vendor_local.x, 0, vendor_local.y)
-	_village_b.add_child(npc_inst)
+	var vendor_layout := TownProps.vendor_layout(Vector2.ZERO,0.0)
+	var vendor_offset: Vector2 = vendor_layout.position
+	preload("res://scripts/chinese_appearance.gd").apply(npc_inst,"Chen")
+	npc_inst.facing_degrees = float(vendor_layout.facing_degrees)
+	npc_inst.position = Vector3(VILLAGE_CENTER.x+center.x+vendor_offset.x,_island_surface_y,VILLAGE_CENTER.y+center.y+vendor_offset.y)
+	_plan_root.add_child(npc_inst)
 
 
 ## The Emperor begins under the Royal Chef's influence. The farmer's account
@@ -1220,7 +1424,8 @@ func _build_vendor_stall() -> void:
 func _build_emperor() -> void:
 	var npc_inst: Node3D = NPC_SCENE.instantiate()
 	npc_inst.set_terrain_reference(terrain)
-	npc_inst.fixed_ground_y = _island_surface_y + 0.08
+	var throne_height := 4.2
+	npc_inst.fixed_ground_y = _island_surface_y + throne_height
 	npc_inst.display_name = EMPEROR_NAME
 	npc_inst.stationary = true
 	npc_inst.is_female = false
@@ -1235,10 +1440,13 @@ func _build_emperor() -> void:
 	npc_inst.dress_color = Color(0.66, 0.055, 0.045)
 	npc_inst.wears_emperor_regalia = true
 	npc_inst.body_scale = 1.08
+	preload("res://scripts/chinese_appearance.gd").apply(npc_inst,"梁臻" if WorldState.chinese_village_emperor_deposed else "皇帝")
 	npc_inst.talk_override = func() -> bool: return _on_emperor_talk(npc_inst)
 	if WorldState.chinese_village_control_granted:
 		npc_inst.talk_lines.assign(EMPEROR_LINES_AFTER_DEPOSED)
-	npc_inst.position = Vector3(EMPEROR_LOCAL_POS.x, 0.08, EMPEROR_LOCAL_POS.y)
+	var throne_center := _plan_item_center("throne_hall")
+	var palace_center: Vector2 = _plan_centers["palace"]
+	npc_inst.position = Vector3(throne_center.x-palace_center.x,throne_height,throne_center.y-palace_center.y+2.0)
 	_palace.add_child(npc_inst)
 
 
@@ -1246,6 +1454,8 @@ func _on_emperor_talk(_emperor: Node3D) -> bool:
 	if WorldState.chinese_village_chef_defeated and not WorldState.chinese_village_control_granted:
 		WorldState.chinese_village_control_granted = true
 		WorldState.chinese_village_emperor_deposed = true
+		preload("res://scripts/chinese_appearance.gd").apply(_emperor,"梁臻")
+		_emperor.refresh_wardrobe()
 		_emperor.talk_lines.assign(EMPEROR_LINES_AFTER_DEPOSED)
 		DialogUI.show_line(EMPEROR_NAME, "原来御厨一直在蒙蔽朕。你救了朕和百姓——从今日起，这座村庄由你作主。")
 		return true
@@ -1363,77 +1573,48 @@ func _clear_captive_blorb_displays() -> void:
 
 func _build_royal_kitchen() -> void:
 	_royal_kitchen = StaticBody3D.new()
-	_royal_kitchen.name = "RoyalKitchen"
-	var ground_width: float = float(PALACE_CELLS) * TownProps.CELL_SIZE
-	var palace_back_z: float = PALACE_LOCAL_POS.y - ground_width * 0.5
-	var kitchen_center_z: float = palace_back_z - 4.0
-	_royal_kitchen.position = Vector3(0.0, 0.0, kitchen_center_z)
+	_royal_kitchen.name = "RoyalKitchenGameplay"
 	_royal_kitchen.collision_layer = 1
 	_royal_kitchen.collision_mask = 0
+	var kitchen_center := _plan_item_center("kitchen")
+	var palace_center: Vector2 = _plan_centers["palace"]
+	_royal_kitchen.position = Vector3(kitchen_center.x-palace_center.x,0.0,kitchen_center.y-palace_center.y)
 	_palace.add_child(_royal_kitchen)
-	# Original adjoining annex circulation: its front doorway aligns with the
-	# throne room's split rear wall, making the kitchen directly accessible.
-	var kitchen_width := 10.0
-	var kitchen_depth := 8.0
-	var kitchen_height := PALACE_STOREY_HEIGHT
-	_add_palace_block(Vector3(0.0, 0.09, kitchen_center_z), Vector3(kitchen_width, 0.18, kitchen_depth), Color(0.64, 0.36, 0.09))
-	_add_palace_block(Vector3(0.0, kitchen_height, kitchen_center_z), Vector3(kitchen_width + 1.2, 0.24, kitchen_depth + 1.2), TRIM_COLOR)
-	_add_palace_block(Vector3(-kitchen_width * 0.5, kitchen_height * 0.5, kitchen_center_z), Vector3(PALACE_WALL_THICKNESS, kitchen_height, kitchen_depth), Color(0.88, 0.62, 0.12))
-	_add_palace_block(Vector3(kitchen_width * 0.5, kitchen_height * 0.5, kitchen_center_z), Vector3(PALACE_WALL_THICKNESS, kitchen_height, kitchen_depth), Color(0.88, 0.62, 0.12))
-	_add_palace_block(Vector3(0.0, kitchen_height * 0.5, kitchen_center_z - kitchen_depth * 0.5), Vector3(kitchen_width, kitchen_height, PALACE_WALL_THICKNESS), Color(0.88, 0.62, 0.12))
-	var front_piece_width := (kitchen_width - PALACE_DOOR_WIDTH) * 0.5
-	var front_z := kitchen_center_z + kitchen_depth * 0.5
-	for side in [-1.0, 1.0]:
-		_add_palace_block(Vector3(side * (PALACE_DOOR_WIDTH + front_piece_width) * 0.5, kitchen_height * 0.5, front_z), Vector3(front_piece_width, kitchen_height, PALACE_WALL_THICKNESS), Color(0.66, 0.055, 0.045))
-	_add_palace_block(Vector3(0.0, kitchen_height - 0.35, front_z), Vector3(PALACE_DOOR_WIDTH, 0.7, PALACE_WALL_THICKNESS), TRIM_COLOR)
-	var counter := SuperEgg.build_part(Vector3(3.35, 0.48, 0.62), Color(0.48, 0.25, 0.1), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
-	counter.position = Vector3(0.0, 0.48, -1.4)
+	var counter := SuperEgg.build_part(Vector3(3.35,0.48,0.62),Color(0.48,0.25,0.1),SuperEgg.EPSILON_SOFT,SuperEgg.EPSILON_FLAT)
+	counter.position = Vector3(0.0,0.48,1.4)
 	_royal_kitchen.add_child(counter)
-	CollisionPolicy.add_box(
-		_royal_kitchen, counter, Vector3(6.7, 0.96, 1.24),
-		counter.position, counter.basis, true
-	)
-	_build_royal_kitchen_furnishings(kitchen_width, kitchen_depth)
-	for side in [-1.0, 1.0]:
-		var lantern := _build_deng_long()
-		lantern.position = Vector3(side * 2.8, kitchen_height - 0.75, kitchen_center_z)
-		_palace.add_child(lantern)
-		_track_proximity_lantern(lantern)
+	CollisionPolicy.add_box(_royal_kitchen,counter,Vector3(6.7,0.96,1.24),counter.position,counter.basis,true)
+	_build_royal_kitchen_furnishings(18.0,12.0)
 	if WorldState.chinese_village_chef_defeated:
 		_spawn_royal_cleaver_pickup()
 		return
 	var chef: Node3D = NPC_SCENE.instantiate()
 	chef.set_terrain_reference(terrain)
-	chef.fixed_ground_y = _island_surface_y + 0.08
+	chef.fixed_ground_y = _island_surface_y
 	chef.display_name = "御厨"
 	chef.stationary = true
 	chef.is_female = false
-	# His demonic identity is a disguise reveal, not his ambient appearance:
-	# he begins as a plausible royal cook in clean kitchen whites.
 	chef.skin_color = SKIN_COLORS[1]
-	chef.hair_color = Color(0.025, 0.018, 0.022)
+	chef.hair_color = Color(0.025,0.018,0.022)
 	chef.hair_style = FigureHair.STYLE_FLAT_TOP
-	chef.shirt_color = Color(0.88, 0.85, 0.76)
-	chef.pants_color = Color(0.19, 0.17, 0.16)
-	chef.shoe_color = Color(0.09, 0.07, 0.065)
-	chef.glove_color = Color(0.0, 0.0, 0.0, 0.0)
+	chef.shirt_color = Color(0.88,0.85,0.76)
+	chef.pants_color = Color(0.19,0.17,0.16)
+	chef.shoe_color = Color(0.09,0.07,0.065)
 	chef.wears_chef_hat = true
-	chef.chef_hat_color = Color(0.92, 0.89, 0.8)
-	chef.chef_hat_band_color = Color(0.62, 0.08, 0.055)
+	chef.chef_hat_color = Color(0.92,0.89,0.8)
+	chef.chef_hat_band_color = Color(0.62,0.08,0.055)
 	chef.beard_style = "full"
-	chef.beard_color = Color(0.025, 0.018, 0.022)
+	chef.beard_color = Color(0.025,0.018,0.022)
 	chef.beard_scale = 1.18
 	chef.body_scale = 1.08
 	chef.chest_build_scale = 1.12
 	chef.abdomen_width_scale = 1.18
-	var chef_lines: Array[String] = [
-		"陛下说这些是肉包。等火再旺一些，它们就不会跳了。",
-		"御膳房的门一关，外面的人就听不见里面发生什么。",
-	]
+	preload("res://scripts/chinese_appearance.gd").apply(chef,"御厨")
+	var chef_lines: Array[String] = ["陛下说这些是肉包。等火再旺一些，它们就不会跳了。","御膳房的门一关，外面的人就听不见里面发生什么。"]
 	chef.talk_lines = chef_lines
 	chef.talk_override = func() -> bool: return _on_royal_chef_talk(chef)
-	chef.position = Vector3(2.4, 0.08, kitchen_center_z - 0.8)
-	_palace.add_child(chef)
+	chef.position = Vector3(-3.0,0.0,-1.0)
+	_royal_kitchen.add_child(chef)
 	chef.equip_meat_cleaver()
 	_royal_chef = chef
 
@@ -1557,8 +1738,10 @@ func _build_farmer_and_pandy_quest() -> void:
 	var panda: Pandy = null
 	if not WorldState.pandy_joined:
 		panda = PANDY_SCENE.instantiate()
-		var panda_world := VILLAGE_CENTER + BAMBOO_ISLAND_LOCAL + FARMER_LOCAL_POS + Vector2(2.5, 0.0)
+		var pen_center := _plan_item_center("pen")
+		var panda_world := VILLAGE_CENTER + pen_center + Vector2(2.0,-2.4)
 		get_parent().add_child(panda)
+		_region_guests.append(panda)
 		panda.global_position = Vector3(panda_world.x, _island_surface_y, panda_world.y)
 
 	var farmer: Node3D = NPC_SCENE.instantiate()
@@ -1573,11 +1756,14 @@ func _build_farmer_and_pandy_quest() -> void:
 	farmer.shirt_color = Color(0.35, 0.42, 0.28)
 	farmer.pants_color = PANTS_COLORS[1]
 	farmer.body_scale = 1.0
+	preload("res://scripts/chinese_appearance.gd").apply(farmer,"田伯")
 	var lines: Array[String] = []
 	lines.assign(FARMER_LINES)
 	farmer.talk_lines = lines
 	farmer.talk_override = func() -> bool: return _on_farmer_talk(farmer, panda)
-	farmer.position = Vector3(FARMER_LOCAL_POS.x, 0, FARMER_LOCAL_POS.y)
+	var farm_center := _plan_item_center("farm_home")
+	var bamboo_center: Vector2 = _plan_centers["bamboo"]
+	farmer.position = Vector3(farm_center.x-bamboo_center.x-2.3,0.0,farm_center.y-bamboo_center.y+2.0)
 	_bamboo_island.add_child(farmer)
 
 
