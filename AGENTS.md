@@ -12,10 +12,15 @@ is a stale snapshot and may lag the source.
 Before every push:
 
 1. Finish and verify the requested source changes.
-2. Let the pre-push hook run (`git config core.hooksPath .githooks`): pose
-   owner, power parity, and the Ohio and Snow village validators. The village
-   validators run headless Godot on the project, so close the Godot editor first
-   (the hook fails closed if it sees one running).
+2. Let the pre-push hook run (`git config core.hooksPath .githooks`). It
+   always runs the quick checks (pose owner, power parity, design language).
+   It runs a settlement's validator (headless Godot) only when the push changes
+   that settlement's files, all of them when it changes shared game code
+   (scripts, scenes, resources, shaders, the project file), and none for
+   documents, drawings, skills or media; `tools/changed_villages.py` decides
+   and prints its choice. Set `ELEBLORB_HOOK_ALL=1` to run every validator.
+   When a validator runs, close the Godot editor first (the hook fails closed
+   if it sees one running).
 3. Commit and push.
 
 To bring web back: re-add `python3 tools/check_web_build.py` to
