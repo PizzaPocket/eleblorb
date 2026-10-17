@@ -21,6 +21,8 @@ The most important points:
 - Test the routes with the real player and Xiao Hou Zi: every escalator and
   ramp end, changing lines, boarding a train, the clock and the bell.
 - Run the rendered performance probe and report its numbers.
+- Last, once the fixes pass, build the Grand Hotel's public interior with its four
+  working capsule lifts (section 3.5), from HOTEL and the hotel's own 3D model.
 - Read every number from CityPlan; never hand-edit scripts/city_plan.gd.
 
 Finish with the diagnostic, recording real passes and failures. Report plan

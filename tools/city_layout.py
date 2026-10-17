@@ -422,7 +422,7 @@ HOTEL={
  # the double ramp: foot, bend, head on the mezzanine's south gallery
  'ramps':[[(18,38),(13,41),(12,48)],[(34,38),(39,41),(40,48)]],'ramp_width':2.4,'landing':3.0,
  'runnel':[(42,44),(32,45),(20,45),(10,44),(0,44)],
- 'skybridge':{'x':(23,29),'z':(60,68)},
+ 'skybridge':{'x':(19,25),'z':(60,68)},   # (moved 4 m west 2026-10-17 with the Deck's Hotel walk)
  'wind_towers':[(5,24),(5,46)],
 }
 def _hotel_checks():

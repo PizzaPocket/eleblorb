@@ -157,6 +157,57 @@ Build on top of the Crossing's roof (`CROSSING.roof`, top at `dome.base`
   been regenerated: rebuild them from the data.
 - The high line's pier at x -392 now stands in Civic Plaza: unchanged.
 
+### 3.5 The Grand Hotel's public interior (do this **last**, after sections 2 to 5 pass)
+
+The first contract deferred the hotel's interior; the owner now wants it built.
+Build exactly the realised scope in `city.md` section 8 ("Fidelity" list near
+its end), from `HOTEL` and the construction code in
+`docs/drawings/moy_grand_hotel_3d.html` (the hotel's own model). Everything
+else in the hotel stays solid massing with closed doors, as now. All hotel
+numbers in `HOTEL` are relative to `HOTEL.origin` (-483, -98).
+
+1. **Ground**: the forecourt (`forecourt`), the revolving door between two
+   swing doors (an open passage 2.8 m wide is enough), the entrance hall
+   (`entrance_hall`), and the **atrium floor** under the void (`void`), with
+   the rock garden and pavilion (`rock_garden`), the pod (`pod`) and the
+   runnel (`runnel`, a shallow water channel, decorative).
+2. **The double ramp** (`ramps`, `ramp_width` 2.4, `landing` 3.0) from the
+   atrium floor to the mezzanine (+6.5). Same rule as every ramp: a way on
+   and off at both ends.
+3. **The mezzanine gallery** round the void at +6.5, 2.4 m wide
+   (`gallery`), with railings toward the void, the Deck door at the
+   skybridge (`skybridge`, now x 19 to 25: it meets the Deck's Hotel
+   skybridge at x -461) and the Windspire passage (`DECK.through`).
+4. **Galleries, levels 3 to 12**: walkable ledges 2.4 m wide round the void
+   at each level (`ground` 6.5, `mezzanine` 5.0, then `storey` 3.25 a
+   level), railings toward the void, closed room doors on the wall side.
+   The void leans (`void.lean`): follow the hotel model's code exactly.
+5. **The chandelier** (`chandelier`, `arm`): one static body (a solid core
+   for collision, its crystals one `MultiMesh`, no more than a few hundred
+   instances in this pass) hanging from the arm. Do not animate the winch.
+6. **The four capsule lifts** (`lifts`): glass capsules 2.6 m across in the
+   tower's four slots (`bearings`, `slot`, `depth`, `track`), each an
+   `AnimatableBody3D` with a floor, glass sides and an open door side.
+   They stop **only** at the atrium floor, the mezzanine (+6.5) and level 27
+   (+89.5). Each runs on its own schedule (stop 6 s with its door open,
+   travel at about 2.5 m/s, the four out of phase). The rider rides inside,
+   carried by the moving body, through the slot up the outside of the
+   tower; no teleport, no text, no buttons.
+7. **Level 27**: the capsules' lift lobby on the tower's south arc, the ring
+   corridor (1.8 m) round the core, and **the party's suite** facing the
+   park as empty rooms with doors and windows (furniture is later work,
+   with the interior-design skill). Every other tower floor stays solid.
+8. **Performance**: the hotel interior is its own pack(s), activated only
+   when the player is near or inside the hotel, kept while occupied; the
+   skeleton the first pass built stays as the outside. Share meshes.
+
+Acceptance (add to section 5): walk forecourt → revolving door → atrium →
+double ramp → mezzanine → Deck door → skybridge; walk every gallery round the
+void; ride each capsule from the atrium floor to level 27 and back with the
+player and with Xiao Hou Zi, getting on and off at all three stops; walk from
+the level 27 lobby round the corridor into the suite. Report anything you
+could not build to the hotel model's dimensions.
+
 ## 4. Counts after this change
 
 50 buildings (48 + 3 new - 1 removed), 24 streets, 133 lots, 60 old houses;
