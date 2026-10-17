@@ -1191,49 +1191,63 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
     bakery are in tower houses; Sora's mother kept the first rooftop
     greenhouse on an Old Moy terrace. The Moonlight Cinema was built later,
     into the old fabric.
-  - **The Well Quarter: the old town's own lanes** (proposed 2026-10-16, at
-    the user's direction). Old Moy's oldest sections were never planned:
-    their lanes grew from the paths people wore walking to the first well,
-    to their neighbours and out to the fields, so they wind, narrow, widen
-    into small squares and end in dead-end alleys that serve a few houses
-    each, as in Shibam, old Sana'a and every old desert town. Three
-    sections keep that fabric; data `OLD_TOWN` and `OLD_HOUSES` in
-    `tools/city_layout.py`, checked:
-    - **north of West Street** (Tank Lane to West Street): the **Old High
-      Street**, winding from West Street up to Arcade Street; **Lantern
-      Square** where it meets **Mara's Lane** (named for the district's old
-      name); **Tank Passage** squeezing between Pinestein's and Suri's
-      towers to Tank Lane; **Bakers' Lane** past the bakery; and the
-      dead-end **Well**, **Rope**, **Dyers'** and **Hayloft Alleys**;
-    - **south of West Street**: **Cinema Square**, irregular now, with the
-      capped first well and the oldest shade tree; **Well Lane** winding
-      south from it between the cinema and Sol's café to Clinic Lane; and
-      **Lantern Lane** across to Arcade Street;
-    - **the cistern quarter** south of Clinic Lane, where the grid's Cinema
-      Lane once ran: the dead-end **Cistern Lane** past Theo's tower house,
-      and **Kiln Alley**.
-  - **How the plots were made.** The ground the lanes leave is divided the
-    way old towns divided: each block cut across its long side again and
-    again, a little off the middle, until every plot is house-sized (at most
-    about 105 m² and 11.5 m across). A plot with a front on a lane, a
-    square or a street is a tower house, turned to that front; a plot with
-    none is a family's back yard or light well. Forty tower houses, covering
-    about three quarters of the ground the lanes leave.
-  - **The seam with New Moy.** The boom cut **West Street** straight through
-    the well town (the Meridian Line now runs above it), and New Moy's grid
-    streets (Arcade Street, Tank Lane, Clinic Lane) run round the old
-    sections. Along those streets one row of straight frontage (the grid's
-    lots, 10 m deep) faces the new streets squarely; the old lanes pass
-    through it to reach them. From the grid streets the old town reads as a
-    straight wall of houses with dark mouths in it; step through one and
-    the lanes begin to wind.
-  - **Swinging through.** The Old High Street and Well Lane are 6 m wide and
-    walled at least three quarters of their length by tower houses 16 m or
-    taller, with anchors in the vine's reach (12 to 52 m, 7 m above) the
-    whole way: a swing route through the old town from Tank Lane to Clinic
-    Lane, across West Street at Cinema Square. The narrow lanes and alleys
-    are for walking, and their tower house roofs, a few metres apart, for
-    running roof to roof.
+  - **The Well Quarter: the old roads and their blocks** (proposed
+    2026-10-16; **revised 2026-10-17, at the user's direction**). The first
+    version wound a dozen lanes and dead-end alleys through the old fabric,
+    which left plots no real house could stand on and lanes running into
+    buildings. The old town is small, two blocks either side of West Street,
+    so it now keeps **only the roads that were there before the grid**, and
+    the grid was laid round and across them. **References:**
+    - **Broadway and Greenwich Village, New York:** roads older than the 1811
+      grid, which the grid was mapped round, so they meet it at odd angles
+      and make wedge-shaped blocks.
+    - **Barcelona's Ciutat Vella and the Eixample:** an old town held inside
+      a modern grid, its few old roads running on into the new streets.
+    - **Al Fahidi (Bastakiya), Dubai:** a small quarter of wind-tower houses
+      in compact blocks round courtyards, surrounded by modern roads. The
+      closest in scale and climate to Moy's well town.
+    - **Vieux-Québec:** an old town inside its wall, its houses facing the
+      street that runs round the wall's inner side.
+
+    **The old roads** (data `OLD_TOWN`, checked: at most three, each running
+    road to road, through no building):
+    - **The Old High Street**, the caravan road from the plateau's foot: it
+      leaves **Cinema Square** (the capped first well and the oldest shade
+      tree) north across West Street and bends north-east past Mara's
+      building to Arcade Street; south of the square it runs between the
+      cinema and Sol's café to Clinic Lane, which cut off the rest of it.
+      6 m wide, a swing route.
+    - **Mara's Lane**, a short old branch from the Old High Street east to
+      Arcade Street along the north side of Mara's building (named for the
+      district's old name).
+
+    **The blocks** (data `OLD_HOUSES`, checked): every block is the ground
+    between roads, and its buildings come first. A perimeter row of tower
+    houses faces every road the block touches: the old roads and the square
+    first, so the oldest houses face them, then the grid streets, then the
+    **Rim Walk**, which the houses at the city's edge face as Québec's face
+    the street inside its wall. Each plot is cut square to its frontage, 6
+    to 10 m wide and up to 14 m deep; slivers at corners join their
+    neighbour only where that makes a buildable plot, and otherwise become
+    part of a courtyard. Every house has at least 30 m², is at least 4.5 m
+    across and nearly convex. The middle of each block is its **shared
+    courtyards**, reached through the houses, as in Al Fahidi. Sixty tower
+    houses, about 94 m² each, covering about three quarters of the ground.
+    There are no lanes inside a block and no dead ends.
+  - **The seam with New Moy.** The boom cut **West Street** straight
+    through the well town (the Meridian Line now runs above it), and New
+    Moy's grid streets (Arcade Street, Tank Lane, Clinic Lane, Market
+    Street) run round it. The houses along the grid streets stand square to
+    them, so the old town reads from the grid as straight frontage with the
+    old roads leaving it at an angle. The cistern block south of Clinic
+    Lane is now an ordinary block of the same perimeter houses; Theo's
+    tower house moved to its corner on Clinic Lane.
+  - **Swinging through.** The Old High Street is 6 m wide and walled at
+    least three quarters of its length by tower houses 16 m or taller, with
+    anchors in the vine's reach (12 to 52 m, 7 m above) the whole way: a
+    swing route from Arcade Street through Cinema Square to Clinic Lane.
+    Mara's Lane is for walking, and the tower house roofs, a few metres
+    apart across the courtyards, are for running roof to roof.
   - **Its places:** Sol's café and the Moonlight Cinema on Cinema Square,
     the bakery, the clinic, the police box, Pinestein's rooftop laboratory,
     Mara's rooftop studio, the Reese–Miller house.
@@ -2845,6 +2859,10 @@ lit crowns.
 - (2026-10-14) the Deck's route (section 6): the Park Deck ring, the civic,
   library, estate and market walks, two skybridges, six ramp towers and two
   glass lifts; travelators dropped;
+- (2026-10-17) **the Well Quarter simplified**: two old roads (the Old High
+  Street and Mara's Lane) with the grid laid round them, and blocks of
+  perimeter tower houses round courtyards, replacing the winding lanes and
+  dead-end alleys;
 - (2026-10-17) **green infrastructure after Singapore** (section 6d): the
   lines' planted edges, the piers' climbing sleeves, the Crossing's planted
   ring, planted open-air escalator towers and cascades (the cores opened to

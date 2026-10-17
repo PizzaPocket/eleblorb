@@ -77,12 +77,12 @@ b(21,'Block 5',(-615,-147,-593,-127),'estate','twin broad point block, 40 storey
 b(22,'Block 6',(-635,-78,-568,-62),'estate','slab block, 14 storeys, shops in its void deck on the Park Ring',NB())
 b(23,'Hawker centre',(-554,-82,-516,-62),'civic','1 storey, open-sided, on the Park Ring and Estate Square','Siti\'s laksa stall')
 b(24,'Garden Row',(-660,40,-637,58),'home','3 townhouses, 3 storeys, facing the Park Ring','Teodora Vance; Ada Fong and Sora Ishida; Priya Raman')
-b(25,"Sol's café",(-750,34,-734,44),'shop','old tower house, 5 storeys; flat above','Sol Brant')
+b(25,"Sol's café",(-752,34,-737,44),'shop','old tower house, 5 storeys; flat above','Sol Brant')
 b(26,'Bakery',(-730,-22,-720,-6),'shop','old tower house, 6 storeys; flats above','Felix Tanaka (above)')
 b(27,"Pinestein's building",(-716,-118,-707,-102),'shop','old tower house, 9 storeys; laboratory on the roof beside its wind tower','Palbert Pinestein (top floor)')
 b(28,"Mara's building",(-716,-58,-707,-42),'shop','8 storeys; rooftop studio','Mara Quill')
 b(29,"Benji's building",(-686,40,-678,56),'shop','6 storeys','Benji Okoro')
-b(30,"Theo's building",(-730,74,-722,90),'shop','6 storeys','Theo Park')
+b(30,"Theo's building",(-730,62,-722,78),'shop','6 storeys','Theo Park')
 b(31,"Yuki's building",(-686,62,-678,78),'shop','6 storeys','Yuki Hayashi')
 b(32,"Suri's building",(-702,-112,-694,-96),'shop','7 storeys','Suri Vale')
 b(33,'Wet market',(-530,122,-490,160),'civic','2 storeys; sign studio on the roof','Rosa Delgado, Wen Li; Zara Quinn (roof studio)')
@@ -104,42 +104,38 @@ for n,name,r,kind,h,who in [
  (43,'Water tower',(-722,-226,-712,-216),'works','35 m',''),
  (44,'Fish tanks',(-668,-250,-648,-234),'works','covered tanks','')]: b(n,name,r,kind,h,who)
 
-## The Well Quarter (city.md 7, Old Moy; proposed 2026-10-16 at the user's
-## direction). The two oldest sections of Old Moy, north and south of West
-## Street, keep the well town's organic lanes: grown from the habits of the
-## people who walked to the first well, never planned. The boom later cut West
-## Street straight through them, and New Moy's grid streets (Arcade Street, Tank
-## Lane, Clinic Lane) run round them: along those streets one row of straight
-## frontage (the grid's lots) rectifies the old fabric to the new, and the lanes
-## pass through it to reach them. Inside, tower houses are turned to face their
-## lanes, filled in by the generator below. The Old High Street and Well Lane are
-## a winding swing route 6 m wide between tall houses, through the square where
-## the first well stands.
-## interiors: where the organic fabric is (world rects, cut to the built circle);
-## lanes: centrelines (x, z) with a width; squares: polygons.
+## The Well Quarter (city.md 7, Old Moy; revised 2026-10-17 at the user's
+## direction). Two blocks of the well town, north and south of West Street, keep
+## the roads that were there before the grid: the **Old High Street**, the
+## caravan road that ran past the first well and on north-east toward the
+## plateau (Clinic Lane now cuts off its southern end), and **Mara's Lane**, a short old branch from it to the
+## east. That is all: the boom's grid (West Street, Arcade Street, Tank Lane,
+## Clinic Lane, Market Street) was laid round and across them, so the old roads
+## meet the grid at odd angles, as Broadway and Greenwich Village's lanes meet
+## Manhattan's grid, and Barcelona's old town meets the Eixample. The blocks come
+## first: every block is bounded by roads, its houses stand in a perimeter row
+## facing them, each on a plot of a real house's width and depth, and the middle
+## of the block is shared courtyards (after Dubai's Al Fahidi quarter, whose
+## wind-tower houses close round courts behind their lanes). Inside a block
+## there are no lanes. The Old High Street is a swing route 6 m wide between
+## tall houses, through Cinema Square where the first well stands.
+## interiors: the blocks the quarter owns (world rects, cut to the built circle);
+## lanes: centrelines (x, z) with a width; squares: polygons; plot: a house's
+## depth, its frontage range, and the least area and side a house can stand on.
 OLD_TOWN=dict(
- interiors=[('north',(-760,-104,-704,-16)),('south',(-760,6,-704,44)),('cistern',(-760,72,-704,104))],
+ interiors=[('north',(-780,-118,-694,-6)),('south',(-780,6,-694,58)),('cistern',(-780,62,-694,114))],
  lanes=[
-  dict(name='Old High Street',w=6.0,swing=True,pts=[(-744,-6),(-746,-24),(-739,-40),(-729,-52),(-724,-66),(-716,-80),(-706,-88),(-694,-90)]),
-  dict(name='Tank Passage',w=3.5,pts=[(-716,-80),(-708,-96),(-704.5,-104),(-704.5,-118)]),
-  dict(name='Mara\'s Lane',w=3.0,pts=[(-739,-40),(-726,-36),(-714,-34),(-708,-39.5),(-704,-48),(-694,-52)]),
-  dict(name='Bakers\' Lane',w=3.0,pts=[(-726,-36),(-718,-26),(-714,-16),(-714,-6)]),
-  dict(name='Well Lane',w=6.0,swing=True,pts=[(-735,26),(-731,36),(-727,48),(-725,58)]),
-  dict(name='Lantern Lane',w=3.0,pts=[(-729,45),(-716,44),(-706,40),(-694,40)]),
-  # south of Clinic Lane: the old cistern quarter, where the grid's Cinema Lane once ran
-  dict(name='Cistern Lane',w=4.0,dead_end=True,pts=[(-732,62),(-732.5,74),(-732.5,88),(-737,100)]),
-  dict(name='Kiln Alley',w=2.5,dead_end=True,pts=[(-733,86),(-722,94),(-712,92)]),
-  # dead-end alleys, as in every old desert town: each serves the few houses round it
-  dict(name='Well Alley',w=2.5,dead_end=True,pts=[(-726,-59),(-716,-63),(-709,-71)]),
-  dict(name='Rope Alley',w=2.5,dead_end=True,pts=[(-743,-31),(-751,-26)]),
-  dict(name='Dyers\' Alley',w=2.5,dead_end=True,pts=[(-733,-46),(-742,-60),(-737,-78)]),
-  dict(name='Hayloft Alley',w=2.5,dead_end=True,pts=[(-722,-29),(-724,-20)]),
+  # north of West Street, from the well square to Arcade Street, bending past Mara's building
+  dict(name='Old High Street',w=6.0,swing=True,pts=[(-746,-6),(-741,-30),(-729,-50),(-718,-70),(-706,-84),(-694,-90)]),
+  # south of the square, between the cinema and Sol's café, down to Clinic Lane, where the grid cut it off
+  dict(name='Old High Street (south)',w=6.0,swing=True,pts=[(-735,26),(-733.5,34),(-733.5,44),(-728.5,52),(-726.5,60)]),
+  dict(name='Mara\'s Lane',w=5.0,pts=[(-725,-58),(-712,-61.5),(-694,-63)]),
  ],
  squares=[
   dict(name='Cinema Square',well=(-743,20),pts=[(-752,6),(-734,6),(-731,16),(-734,30),(-739,34),(-751,33),(-754,24),(-755,12)]),
-  dict(name='Lantern Square',pts=[(-747,-47),(-736,-49),(-731,-42),(-734,-34),(-744,-32)]),
  ],
- frontage=10.0,swing_min=(5,16.0),anchor=(12.0,52.0,7.0),plot=(40.0,105.0,11.5),
+ legacy_max=3,swing_min=(5,16.0),anchor=(12.0,52.0,7.0),
+ plot=dict(depth=14.0,w=(6.0,10.0),min_area=30.0,min_side=4.5,convex=0.8),
 )
 def _old_town_raster():
     from shapely.geometry import LineString, Polygon, Point, box as sbox
@@ -148,7 +144,7 @@ def _old_town_raster():
     inner=[sbox(*r) for _,r in OLD_TOWN['interiors']]
     cs=set(); so=set(); si=set()
     for x in range(-800,-680):
-        for z in range(-130,112):
+        for z in range(-130,116):
             c=Point(x+0.5,z+0.5)
             if any(g.contains(c) for g in lanes): cs.add((x,z))
             elif any(g.contains(c) for g in sq): so.add((x,z))
@@ -1335,49 +1331,77 @@ for i,ki in enumerate(LOT_KITS):
 ## front on a lane, a square or a street is a house, turned to that front; a plot
 ## with none is a family's back yard or light well.
 def _old_town_houses():
-    from shapely.geometry import LineString, Polygon, Point, MultiPolygon, box as sbox
-    from shapely.ops import unary_union, split
-    OT=OLD_TOWN
+    # blocks first: each block (the ground between roads) gets a perimeter row of houses along every road it fronts,
+    # the old roads and the square first so their houses face them, the grid streets after; plots are cut square to
+    # the frontage at a house's width; what is left in the middle is the block's courtyards
+    from shapely.geometry import LineString, Polygon, Point, MultiLineString, box as sbox
+    from shapely.ops import unary_union, split, linemerge
+    OT=OLD_TOWN; PL=OT['plot']
     circle=Point(CX,0).buffer(R,128)
     inner=unary_union([sbox(*r) for _,r in OT['interiors']]).intersection(circle)
     lanes=[(l,LineString(l['pts']).buffer(l['w']/2,cap_style=2,join_style=2)) for l in OT['lanes']]
     sqs=[(q,Polygon(q['pts'])) for q in OT['squares']]
     fixed=unary_union([sbox(*b_['r']) for b_ in named]+[sbox(*l[:4]) for l in lots])
     open_=unary_union([g for _,g in lanes]+[g for _,g in sqs])
-    streets=unary_union([sbox(*s_[2:]) for s_ in STREETS])
     ground=inner.difference(open_).difference(fixed)
     def hsh(x,z): return (int(abs(x)*73856093) ^ int(abs(z)*19349663)) & 0xffff
-    def cut(poly,depth=0):
-        if poly.area<OT['plot'][0] or depth>12: return [poly]
-        mrr=poly.minimum_rotated_rectangle; c=list(mrr.exterior.coords)
-        e0=math.hypot(c[1][0]-c[0][0],c[1][1]-c[0][1]); e1=math.hypot(c[2][0]-c[1][0],c[2][1]-c[1][1])
-        if poly.area<OT['plot'][1] and min(e0,e1)<OT['plot'][2]: return [poly]
-        (ax,az),(bx,bz)=(c[0],c[1]) if e0>=e1 else (c[1],c[2])
-        L=max(e0,e1); ux,uz=(bx-ax)/L,(bz-az)/L
-        f=0.5+((hsh(poly.centroid.x,poly.centroid.y)%9)-4)*0.025
-        mx,mz=ax+ux*L*f,az+uz*L*f
-        cutl=LineString([(mx-uz*200,mz+ux*200),(mx+uz*200,mz-ux*200)])
-        parts=[g for g in split(poly,cutl).geoms if g.area>0.5]
-        if len(parts)<2: return [poly]
-        return [q for g in parts for q in cut(g,depth+1)]
-    pieces=[]
-    for g in (ground.geoms if hasattr(ground,'geoms') else [ground]):
-        if g.area<4: continue
-        pieces+=cut(g)
-    houses=[]; yards=[]
-    fronts=[(l['name'],l.get('swing',False),g) for l,g in lanes]+[(q['name'],True,g) for q,g in sqs]+[(s_[0],False,sbox(*s_[2:])) for s_ in STREETS]
-    for g in pieces:
-        if g.area<18: yards.append(g); continue
-        best=None
+    fronts=[(q['name'],True,g) for q,g in sqs]+[(l['name'],l.get('swing',False),g) for l,g in sorted(lanes,key=lambda t:-t[0]['w'])]+[(s_[0],False,sbox(*s_[2:])) for s_ in STREETS]
+    # last, the Rim Walk: the promenade inside the wall, which the houses at the city's edge face as old towns face their wall road
+    fronts.append(('Rim Walk',False,Point(CX,0).buffer(203,128).difference(Point(CX,0).buffer(197,128))))
+    def parts(g): return [q for q in (g.geoms if hasattr(g,'geoms') else [g]) if q.geom_type=='Polygon' and q.area>0.5]
+    def ok(g):
+        r=g.minimum_rotated_rectangle; c=list(r.exterior.coords)
+        side=min(math.hypot(c[1][0]-c[0][0],c[1][1]-c[0][1]),math.hypot(c[2][0]-c[1][0],c[2][1]-c[1][1]))
+        return g.area>=PL['min_area'] and side>=PL['min_side'] and g.area/g.convex_hull.area>=PL['convex']
+    houses=[]; yards=[]; placed=None
+    for blk in parts(ground):
+        taken=Polygon(); plots=[]
         for nm,sw,fg in fronts:
-            edge=g.boundary.intersection(fg.buffer(0.3)).length
-            if edge>=2.5 and (best is None or edge>best[2]): best=(nm,sw,edge)
-        if not best: yards.append(g); continue
-        h=hsh(g.centroid.x,g.centroid.y)
-        st=4+h%6
-        if best[1]: st=max(st,OT['swing_min'][0]+1)
-        poly=g.simplify(0.05)
-        houses.append(dict(corners=[(round(x,2),round(z,2)) for x,z in list(poly.exterior.coords)[:-1]],storeys=st,front=best[0],area=round(g.area,1)))
+            fr=blk.boundary.intersection(fg.buffer(0.3))
+            if fr.is_empty: continue
+            ls=linemerge(fr) if fr.geom_type in ('MultiLineString','GeometryCollection') else fr
+            for Lf in (ls.geoms if hasattr(ls,'geoms') else [ls]):
+                if Lf.geom_type!='LineString' or Lf.length<PL['w'][0]: continue
+                band=blk.difference(taken).intersection(Lf.buffer(PL['depth'],cap_style=2,join_style=2))
+                if band.area<1: continue
+                # cut lines square to the frontage, at house widths that vary along the street
+                n=max(1,round(Lf.length/((PL['w'][0]+PL['w'][1])/2))); cuts=[]; acc=0.0
+                ws=[PL['w'][0]+(hsh(*Lf.interpolate(k/n,normalized=True).coords[0])%100)/100*(PL['w'][1]-PL['w'][0]) for k in range(n)]
+                k_=Lf.length/sum(ws)
+                for w_ in ws[:-1]:
+                    acc+=w_*k_; p0=Lf.interpolate(max(0,acc-0.5)); p1=Lf.interpolate(min(Lf.length,acc+0.5))
+                    tx,tz=p1.x-p0.x,p1.y-p0.y; tl=math.hypot(tx,tz) or 1; nx,nz=-tz/tl,tx/tl; pc=Lf.interpolate(acc)
+                    cuts.append(LineString([(pc.x-nx*(PL['depth']+2),pc.y-nz*(PL['depth']+2)),(pc.x+nx*(PL['depth']+2),pc.y+nz*(PL['depth']+2))]))
+                pcs=parts(band)
+                for cl in cuts:
+                    nxt=[]
+                    for g in pcs: nxt+=parts(split(g,cl)) if g.intersects(cl) else [g]
+                    pcs=nxt
+                plots+=[dict(g=g,front=nm,swing=sw) for g in pcs]
+                taken=taken.union(band)
+        # slivers and awkward corners join the neighbour they share most wall with
+        changed=True
+        while changed:
+            changed=False
+            for a in sorted(plots,key=lambda d:d['g'].area):
+                if ok(a['g']): continue
+                nb=[(b2['g'].buffer(0.05).intersection(a['g'].boundary).length,b2) for b2 in plots if b2 is not a]
+                nb=[t for t in nb if t[0]>1.0]
+                if nb:
+                    b2=max(nb,key=lambda t:t[0])[1]; u=unary_union([b2['g'].buffer(0.05),a['g'].buffer(0.05)]).buffer(-0.05)
+                    if u.geom_type=='Polygon' and (ok(u) or not ok(b2['g'])): b2['g']=u; plots.remove(a); changed=True; break
+            if not changed: break
+        for d in plots:
+            g=d['g']
+            if not ok(g): yards.append(g); continue
+            h=hsh(g.centroid.x,g.centroid.y); st=4+h%6
+            if d['swing']: st=max(st,OT['swing_min'][0]+1)
+            poly=g.simplify(0.05)
+            if placed: poly=poly.difference(placed)   # simplifying can nudge a shared wall into the neighbour
+            if poly.geom_type!='Polygon': poly=max(parts(poly),key=lambda q:q.area)
+            placed=poly if placed is None else placed.union(poly)
+            houses.append(dict(corners=[(round(x,2),round(z,2)) for x,z in list(poly.exterior.coords)[:-1]],storeys=st,front=d['front'],area=round(poly.area,1)))
+        yards+=parts(blk.difference(taken))
     OT['_yards']=[[(round(x,2),round(z,2)) for x,z in list(y.exterior.coords)[:-1]] for y in yards if y.geom_type=='Polygon']
     return houses,inner,lanes,sqs
 OLD_HOUSES,_ot_inner,_ot_lanes,_ot_sqs=_old_town_houses()
@@ -1387,16 +1411,27 @@ def _old_town_checks():
     OT=OLD_TOWN; polys=[Polygon(h['corners']) for h in OLD_HOUSES]
     if len(OLD_HOUSES)<30: problems.append(('old town: too few houses',len(OLD_HOUSES)))
     for h in OLD_HOUSES:
-        if h['area']<18: problems.append(('old town: a house too small to stand',h['area']))
+        if h['area']<OT['plot']['min_area']: problems.append(('old town: a house too small to stand',h['area']))
     for i,p_ in enumerate(polys):
         for j in range(i+1,len(polys)):
             if p_.intersection(polys[j]).area>0.05: problems.append(('old town: houses overlap',i,j))
-    # every lane reaches a grid street, a square or another lane at both ends
+    # a few legacy roads, each running through from road to road (no dead ends), and through no building
+    if len(OT['lanes'])>OT['legacy_max']: problems.append(('old town: too many legacy roads',len(OT['lanes'])))
     streets=unary_union([sbox(*s_[2:]) for s_ in STREETS])
     others=lambda nm: unary_union([g for l,g in _ot_lanes if l['name']!=nm]+[g for _,g in _ot_sqs])
+    built=unary_union([sbox(*b_['r']) for b_ in named]+[sbox(*l[:4]) for l in lots])
     for l,g in _ot_lanes:
-        for end in ((l['pts'][0],) if l.get('dead_end') else (l['pts'][0],l['pts'][-1])):
+        if l.get('dead_end'): problems.append(('old town: a dead-end lane',l['name']))
+        for end in (l['pts'][0],l['pts'][-1]):
             if streets.distance(Point(end))>0.6 and others(l['name']).distance(Point(end))>0.6: problems.append(('old town: a lane ends at nothing',l['name'],end))
+        if g.intersection(built).area>0.1: problems.append(('old town: a lane through a building',l['name']))
+    # every house is a buildable plot: big enough, wide enough, near-convex, and fronting a road
+    PL=OT['plot']
+    for h in OLD_HOUSES:
+        g=Polygon(h['corners']); r=g.minimum_rotated_rectangle; c=list(r.exterior.coords)
+        side=min(math.hypot(c[1][0]-c[0][0],c[1][1]-c[0][1]),math.hypot(c[2][0]-c[1][0],c[2][1]-c[1][1]))
+        if g.area<PL['min_area'] or side<PL['min_side']-0.05 or g.area/g.convex_hull.area<PL['convex']-0.01: problems.append(('old town: an unbuildable plot',h['front'],round(g.area,1),round(side,1)))
+        if not h['front']: problems.append(('old town: a house with no front',))
     # every named building inside the quarter fronts a lane, a square or a grid street
     open_=unary_union([g for _,g in _ot_lanes]+[g for _,g in _ot_sqs])|streets
     for b_ in named:
