@@ -1039,6 +1039,60 @@ ARCH=dict(legs=[(-362,-30,-340,-12),(-362,12,-340,30)],lower=(32.0,42.0),top=(58
 WEST_GATE=dict(towers=[(-782,-26,-760,-10),(-782,10,-760,26)],bridge=(32.0,42.0),top=44.0,
   cores=[dict(name='north tower',c=(-771,-18),size=(6.4,15.0),levels=[0,12,37],lifts=2),
          dict(name='south tower',c=(-771,18),size=(6.4,15.0),levels=[0,12,37],lifts=2)])
+## Green infrastructure (city.md 6d, user 2026-10-17): after Singapore's City in
+## a Garden, every line, station and civic structure carries its own planting,
+## on Moy's terms: a desert palette that the reclaimed water can afford, drip-fed
+## at night from a "green main" that rides in every viaduct. palette: the only
+## kinds used on the infrastructure. Each element names its planting, where it
+## stands, what it is after, who keeps it and how it collides; the numbers are
+## what the drawings and the model build.
+GREEN=dict(
+  palette=['bougainvillea','coral vine','ghaf','date palm','agave and aloe','desert grasses'],
+  water='reclaimed water from the works, polished in the park\'s reed pond, in a green main inside every viaduct; drip lines, watered at night',
+  elements=[
+    dict(name='Spine troughs',on='the Spine Line',planting=['bougainvillea'],trough=(0.9,1.2),bloom_every=6.0,
+         where='a planter trough hung on each edge of the viaduct, bougainvillea spilling over it',after='Singapore\'s planted flyover edges',
+         keeper='Kade Morrow (city works)',collision='the trough is part of the viaduct\'s solid edge; the foliage is decorative'),
+    dict(name='Spine frames',on='the Spine Line',planting=['coral vine'],
+         where='coral vine on a steel mesh up each portal frame\'s columns',after='the greened columns under Singapore\'s viaducts',
+         keeper='Kade Morrow (city works)',collision='the mesh is part of the column; the vine is decorative'),
+    dict(name='High line sleeves',on='the Meridian Line',planting=['coral vine'],sleeve=(2.0,26.0),
+         where='a stainless mesh sleeve round each tree pier\'s stem, coral vine climbing it to the Y',after='WOHA\'s Oasia Hotel Downtown (its red mesh and creepers) and the Supertrees',
+         keeper='Kade Morrow (city works)',collision='the sleeve is part of the pier (blocking); the vine is decorative'),
+    dict(name='High line troughs',on='the Meridian Line',planting=['bougainvillea'],trough=(0.9,1.2),bloom_every=9.0,
+         where='troughs on both edges of the high line, so it reads from the street as a green line across the sky',after='Singapore\'s planted flyover edges',
+         keeper='Kade Morrow (city works)',collision='part of the viaduct\'s solid edge; foliage decorative'),
+    dict(name='The Deck',on='the Deck',planting=['bougainvillea','date palm'],
+         where='planter edges along its parapets and date palms in tubs at the ramp heads: the Deck is Moy\'s park connector, a shaded green walk from every square to the park and the stations',after='Singapore\'s Park Connector Network and its covered walkways to the stations',
+         keeper='Orin Pike (park keeper)',collision='planters and tubs solid; fronds decorative'),
+    dict(name='The Crossing',on='the Crossing Ring',planting=['bougainvillea','coral vine','desert grasses'],ring_planter=1.0,halo_rim=1.2,
+         where='a planter on the ring\'s inner edge spilling bougainvillea into the open middle, coral vine up the inner columns, desert grasses on the halo\'s rim, and a rain garden under the ring catching the halo\'s run-off and the misters\' drip',after='the Supertrees\' climbers and Singapore\'s ABC Waters rain gardens (Bishan–Ang Mo Kio Park)',
+         keeper='Orin Pike (park keeper)',collision='the planters are the concourse\'s parapet (solid, a landing); plants decorative'),
+    dict(name='Station cores',on='the station cores',planting=['coral vine'],
+         where='a green wall on each core\'s sunny face: coral vine on a mesh a metre off the glass, shading the escalating ramps inside',after='WOHA\'s green facades and Singapore\'s Skyrise Greenery',
+         keeper='Kade Morrow (city works)',collision='the mesh is decorative; the core is blocking'),
+    dict(name='The arch',on='the Meridian Arch',planting=['ghaf','bougainvillea','agave and aloe'],terraces=[18.0,48.0],roof=True,
+         where='sky terraces cut into the legs\' court faces at +18 and +48 m, each with a ghaf tree; the lower bridge\'s roof a public sky garden over the high line\'s station, looking down the civic axis',after='WOHA\'s Parkroyal on Pickering (its sky gardens) and Singapore\'s LUSH rule that a building gives back the green its site took',
+         keeper='the city (Kade Morrow); the sky garden open from the station',collision='terrace floors and the roof garden are landings; trees solid trunks, crowns decorative'),
+    dict(name='The West Gate',on='the West Gate',planting=['date palm','agave and aloe','desert grasses'],roof=True,
+         where='the bridge\'s roof is Old Moy\'s community garden: date palms, herb and vegetable beds on drip, a shade pergola; the towers\' roofs planted with agave and aloe',after='WOHA\'s Kampung Admiralty (its rooftop community farm over a public building)',
+         keeper='Old Moy\'s residents, with Orin Pike',collision='beds\' edges and the pergola solid; plants decorative'),
+    dict(name='The Rim Corridor',on='the Rim Walk',planting=['ghaf','desert grasses','bougainvillea'],
+         where='the Ring Line\'s old service road at the wall\'s inner foot, kept as a green walk all the way round: ghaf shade, desert grasses, bougainvillea on the wall\'s arches',after='Singapore\'s Rail Corridor, a railway kept as a 24 km green walk',
+         keeper='Orin Pike (park keeper)',collision='trees solid; grasses and climbers decorative'),
+  ])
+def _green_checks():
+    pal=set(GREEN['palette'])
+    if len(pal)>6: problems.append(('green: more than six kinds on the infrastructure',len(pal)))
+    for e in GREEN['elements']:
+        for k in ('where','after','keeper','collision'):
+            if not e.get(k): problems.append(('green: an element without its %s'%k,e['name']))
+        for sp in e['planting']:
+            if sp not in pal: problems.append(('green: a plant outside the palette',e['name'],sp))
+    for e in GREEN['elements']:
+        if 'sleeve' in e and not e['sleeve'][1]<=28.0: problems.append(('green: the sleeve climbs past the pier\'s Y',e['sleeve']))
+        if 'terraces' in e and not all(ARCH['legs'] and 0<t<ARCH['lower'][0] or ARCH['lower'][1]<t<ARCH['top'][0] for t in e['terraces']): problems.append(('green: an arch terrace in a bridge',e['terraces']))
+_green_checks()
 def _fillet(pts,R,step=1.0):
     out=[pts[0]]
     for i in range(1,len(pts)-1):
@@ -1578,6 +1632,7 @@ w("const TIMEKEEPER := %s" % lit(TIMEKEEPER))
 w("## The Meridian Arch (city.md 8b): legs (world rects), lower and top bridges (y ranges), the line's east station.")
 w("const ARCH := %s" % lit(ARCH))
 w("const WEST_GATE := %s" % lit(WEST_GATE))
+w("const GREEN := %s" % lit(GREEN))
 w("")
 w("## The towers' sites: the shaft's footprint and the public ground round it (city.md 7c).")
 w("const TOWER_SITE := %s" % lit(TOWER_SITE))
@@ -1609,5 +1664,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,green=GREEN,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

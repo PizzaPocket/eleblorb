@@ -985,6 +985,82 @@ towers and the gatehouse canopies.
 as well as the Deck; Omar Haddad's battery works power the lines. The Wall
 Watch and the lines' controller are not yet in the census (Open).
 
+### 6d. A city in a garden: green infrastructure after Singapore (proposed 2026-10-17, at the user's direction)
+
+**Direction (user):** the trains, the stations and the civic structures take
+their inspiration from Singapore's urban design, a famously green city whose
+greenery is built into its infrastructure rather than set beside it.
+
+**References (Singapore):**
+- **The Garden City and "City in a Garden":** the city's long policy of
+  planting every road, flyover and public building, so that green is part of
+  the infrastructure's own fabric. Its planted flyover and viaduct edges,
+  troughs of bougainvillea and climbers on the columns, are the model for
+  Moy's two lines.
+- **LUSH (Landscaping for Urban Spaces and High-Rises, URA, 2009) and
+  Skyrise Greenery (NParks):** a building gives back, on its terraces, roofs
+  and walls, the green its site took. Moy applies the rule to its own civic
+  buildings: the arch, the gate towers and the Crossing.
+- **WOHA's Oasia Hotel Downtown:** a tower wrapped in a mesh that creepers
+  climb, with open-sided sky gardens. The model for the high line's pier
+  sleeves and the station cores' green walls.
+- **WOHA's Parkroyal on Pickering:** sky gardens stacked in the building's
+  face. The model for the arch's sky terraces.
+- **WOHA's Kampung Admiralty:** a public building with a community farm and
+  park on its roof. The model for the West Gate's roof garden.
+- **Gardens by the Bay's Supertrees:** steel trees planted with climbers
+  (already the model for the park's wind trees).
+- **The Park Connector Network:** green walks linking the parks across the
+  city, with covered walkways to the stations. The Deck is Moy's park
+  connector.
+- **The Rail Corridor:** the old railway line kept as a 24 km green walk.
+  The model for the Rim Corridor at the wall's foot.
+- **ABC Waters and Bishan–Ang Mo Kio Park:** infrastructure that cleans and
+  holds water in planted beds. The model for the rain garden under the
+  Crossing, beside the reed pond that already polishes the city's water.
+
+**Moy's terms: a desert, not the tropics.** Singapore's greenery is watered
+by the rain; Moy's must be paid for in water. So:
+- **A small, hardy palette**, six kinds and no more on the infrastructure:
+  **bougainvillea** (drought-hardy and already Moy's climber on the wind
+  trees), **coral vine** (a fast desert climber for meshes), **ghaf** (the
+  park's shade tree), **date palm**, **agave and aloe**, and **desert
+  grasses**.
+- **Every drop used twice:** the reclaimed water from the works, polished in
+  the reed pond, runs in a **green main** inside every viaduct and up every
+  core, feeding drip lines at night. Planters are deep troughs with mulch;
+  no lawn on the infrastructure (the great lawn stays the city's one).
+- **Shade is the job.** Every planting shades a walk, a platform, a ramp or
+  a glass wall, so the green cools the city it costs water to keep.
+
+**Where it goes** (data: `GREEN` in `tools/city_layout.py`; the palette,
+each element's keeper, its collision and its fit are checked):
+
+| Element | Planting | After |
+|---|---|---|
+| **The Spine's edges** | a planter trough hung on each edge of the viaduct, bougainvillea spilling over it, bright blooms every 6 m | Singapore's planted flyover edges |
+| **The Spine's frames** | coral vine on a steel mesh up each portal frame's columns | the greened columns under Singapore's viaducts |
+| **The high line's piers** | a stainless mesh sleeve round each tree pier's stem, coral vine climbing it from +2 m to the Y at +28 m: a row of green trees down the civic axis | Oasia's mesh, the Supertrees |
+| **The high line's edges** | bougainvillea troughs on both edges, so the line reads from the street as a green line across the sky | Singapore's flyovers |
+| **The Deck** | planters along its parapets and date palms in tubs at the ramp heads: a shaded green walk from every square to the park and the stations | the Park Connector Network |
+| **The Crossing** | a planter on the ring's inner edge spilling bougainvillea into the open middle; coral vine up the inner columns; desert grasses on the halo's rim; a rain garden under the ring catching the halo's run-off and the misters' drip | the Supertrees; ABC Waters |
+| **The station cores** | a green wall on each core's sunny face, coral vine on a mesh a metre off the glass, shading the escalating ramps inside | Oasia; Skyrise Greenery |
+| **The Meridian Arch** | sky terraces cut into the legs' court faces at +18 and +48 m, each with a ghaf; the lower bridge's roof (+42 m) a public sky garden over the high line's station, looking down the civic axis to the Timekeeper | Parkroyal on Pickering; LUSH |
+| **The West Gate** | the bridge's roof is Old Moy's community garden: date palms, herb and vegetable beds on drip, a shade pergola; agave and aloe on the towers' roofs | Kampung Admiralty |
+| **The Rim Corridor** | the Ring Line's old service road at the wall's inner foot, kept as a green walk all the way round: ghaf shade, desert grasses, bougainvillea over the wall's arches | the Rail Corridor |
+
+**Who keeps it.** Kade Morrow's city works keep the planting on the lines,
+the cores and the arch, from the green main's valves in the Line House; Orin
+Pike, the park keeper, keeps the Crossing, the Deck and the Rim Corridor and
+chooses the plants; Old Moy's residents keep their roof garden on the West
+Gate, with Orin's help.
+
+**Play and collision.** Troughs, meshes, terrace floors, roof-garden beds
+and pergolas are solid with their structure, and the terraces and roof
+gardens are landings; foliage, blooms and grasses are decorative. The green
+lines change no route and add no text: they make the lines read as places
+to walk under and look at.
+
 ## 7. Districts (schematic; coordinates follow approval)
 
 **Every block is built out** (user): buildings stand shoulder to shoulder to
@@ -1236,8 +1312,11 @@ middle):
 - **Two glass cores** (lifts and switchback escalating ramps), north-east
   and south-west of the ring, join the lawn, the ring, the Spine and the
   high line (section 6c).
-Data: `CROSSING`, checked against the gardens, the pond, the playground and
-the wind trees. The giant playground moved whole to the south-east quarter
+**Planted (2026-10-17, section 6d):** bougainvillea from the ring's inner
+planter, coral vine on the inner columns, desert grasses on the halo's rim,
+and a rain garden under the ring, after the Supertrees and Singapore's ABC
+Waters. Data: `CROSSING`, checked against the gardens, the pond, the
+playground and the wind trees. The giant playground moved whole to the south-east quarter
 (7b), beside a smaller green and the park lodge; the dry garden and the pond
 drew back a little from the ring, and the four wind trees stand round it. In a
 desert it has to earn every drop of water, so most of it is shade and dry
@@ -2447,13 +2526,18 @@ Line's station and the high line's terminus into one building.
   frame round the Timekeeper.
 - **City-owned:** the legs hold the city's offices (planning, works, water,
   the Housing Board's downtown desk) above the station.
+- **Green (section 6d):** after WOHA's Parkroyal on Pickering and
+  Singapore's LUSH rule, sky terraces with ghaf trees are cut into the legs'
+  court faces at +18 and +48 m, and the lower bridge's roof is a public sky
+  garden, reached from the station's cores.
 
 **The West Gate** (data: `WEST_GATE`, checked) is the arch's plainer
 partner: two towers 22 by 16 m, 44 m high, straddling the wall either side
 of West Street, the Wall Line running through them at +12 m and the high
 line's west station on a glazed bridge between them at +32 to +42 m, with a
 siding for its trains beyond the wall's line. A core in each tower joins the
-street hall, the Wall Line and the high line. The bands of the towers repeat
+street hall, the Wall Line and the high line. Its bridge's roof is Old Moy's
+community garden, after WOHA's Kampung Admiralty (section 6d). The bands of the towers repeat
 every 6 m, the Wall Line's and the high line's levels among them.
 
 **Meridian Court:** pale paving under the arch, the avenue running through
@@ -2742,6 +2826,10 @@ lit crowns.
 - (2026-10-14) the Deck's route (section 6): the Park Deck ring, the civic,
   library, estate and market walks, two skybridges, six ramp towers and two
   glass lifts; travelators dropped;
+- (2026-10-17) **green infrastructure after Singapore** (section 6d): the
+  lines' planted edges, the piers' climbing sleeves, the Crossing's planted
+  ring, green walls on the cores, the arch's sky terraces and sky garden,
+  the West Gate's community roof garden, the Rim Corridor;
 - (2026-10-17) the Meridian raised to **+36 m**; the **Timekeeper** a full
   twelve-hour circle in a bronze cradle; the **arch as the East Gate** and
   **the West Gate's towers**, each an integrated station; **the Crossing**
