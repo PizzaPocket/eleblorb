@@ -998,6 +998,12 @@ CROSS={
 }
 ## Station cores: lifts and switchback escalating ramps, linking every level a
 ## station has. levels: heights served; c and size: the core's footprint (world).
+## Revised 2026-10-17 (user): open air, as Singapore uses escalators even in
+## open structures. A core is an open steel frame, not a glass box: its
+## escalating ramps climb in switchback flights under light canopies, open to
+## the breeze and planted at their edges; only the glass lift shafts beside it
+## are enclosed. enclosure and canopy say so; lift: the shafts' size, beside
+## the frame's long side.
 ## The Crossing Ring (city.md 7a, revised 2026-10-16): open air, after Sou
 ## Fujimoto's Grand Ring at Expo 2025 Osaka. A ring of slender columns, two rows
 ## on a 15 degree rhythm, carrying a concourse ring at the Deck's level (+6.5 m)
@@ -1006,8 +1012,8 @@ CROSS={
 CROSSING=dict(c=(-557,0),ring=(14.0,20.0),deck=6.5,halo=(17.0,12.0,22.0),columns=24,
   material='pale timber louvres on slender steel columns',
   program='the ring concourse: shade, water fountains, kiosks, the lost-and-found and the city\'s information desk',
-  cores=[dict(name='north-east',c=(-545,-16),size=(6.4,16.0),levels=[0,6.5,13,37],lifts=2),
-         dict(name='south-west',c=(-569,16),size=(6.4,16.0),levels=[0,6.5,13,37],lifts=2)])
+  cores=[dict(name='north-east',c=(-545,-16),size=(6.4,16.0),levels=[0,6.5,13,37],lifts=2,enclosure='open frame',canopy=3.2,lift=(2.6,2.6)),
+         dict(name='south-west',c=(-569,16),size=(6.4,16.0),levels=[0,6.5,13,37],lifts=2,enclosure='open frame',canopy=3.2,lift=(2.6,2.6))])
 ## The Timekeeper (city.md 8a, revised 2026-10-16): a full circle standing over
 ## city hall in a bronze cradle, clear of the roof, the high line passing through
 ## its empty centre. A twelve-hour ring clock: the minute ring and the hour ring
@@ -1024,12 +1030,15 @@ TIMEKEEPER=dict(x=-414.0,z=0.0,y=37.5,thick=3.0,roof=22.0,
 ## through the legs at +12 m with its station between them; the high line ends on
 ## the lower bridge at +36 m, directly above, crossing the Wall Line at right
 ## angles; the top bridge, cantilevered toward city hall, is the Wall Watch's
-## command room. Each leg holds a core of lifts and escalating ramps through
-## every level, and opens on Meridian Court as the station's hall.
+## command room. Revised 2026-10-17: on each leg's court face an open cascade
+## of escalating ramps climbs the diagrid under glass canopies, after the
+## Centre Pompidou's and Singapore's open-air station escalators, from the
+## station hall on Meridian Court to the Wall Line, the high line and the sky
+## garden on the lower bridge's roof; the Watch reaches its room by its own lift.
 ARCH=dict(legs=[(-362,-30,-340,-12),(-362,12,-340,30)],lower=(32.0,42.0),top=(58.0,72.0),cantilever=12.0,
   opening=24.0,wall_line=12.0,
-  cores=[dict(name='north leg',c=(-351,-21),size=(6.4,16.0),levels=[0,12,37,58],lifts=2),
-         dict(name='south leg',c=(-351,21),size=(6.4,16.0),levels=[0,12,37,58],lifts=2)],
+  cores=[dict(name='north leg',c=(-365.2,-21),size=(6.4,16.0),levels=[0,12,37,43],lifts=2,enclosure='open cascade',canopy=3.2,lift=(2.6,2.6)),
+         dict(name='south leg',c=(-365.2,21),size=(6.4,16.0),levels=[0,12,37,43],lifts=2,enclosure='open cascade',canopy=3.2,lift=(2.6,2.6))],
   program='the station hall at the street, the Wall Line\'s station at +12 m, the high line\'s at +36 m, city offices in the legs, the Wall Watch\'s command room at the top',
   skin='a diagrid of pale ceramic-clad steel over glass')
 ## The West Gate's towers (city.md 8b, revised 2026-10-16): the same idea at the
@@ -1037,8 +1046,8 @@ ARCH=dict(legs=[(-362,-30,-340,-12),(-362,12,-340,30)],lower=(32.0,42.0),top=(58
 ## Wall Line through them at +12 m, the high line's west station on the bridge
 ## between them at +36 m, a siding for its trains beyond.
 WEST_GATE=dict(towers=[(-782,-26,-760,-10),(-782,10,-760,26)],bridge=(32.0,42.0),top=44.0,
-  cores=[dict(name='north tower',c=(-771,-18),size=(6.4,15.0),levels=[0,12,37],lifts=2),
-         dict(name='south tower',c=(-771,18),size=(6.4,15.0),levels=[0,12,37],lifts=2)])
+  cores=[dict(name='north tower',c=(-771,-18),size=(6.4,15.0),levels=[0,12,37],lifts=2,enclosure='open loggia',canopy=3.2,lift=(2.6,2.6)),
+         dict(name='south tower',c=(-771,18),size=(6.4,15.0),levels=[0,12,37],lifts=2,enclosure='open loggia',canopy=3.2,lift=(2.6,2.6))])
 ## Green infrastructure (city.md 6d, user 2026-10-17): after Singapore's City in
 ## a Garden, every line, station and civic structure carries its own planting,
 ## on Moy's terms: a desert palette that the reclaimed water can afford, drip-fed
@@ -1069,10 +1078,10 @@ GREEN=dict(
          where='a planter on the ring\'s inner edge spilling bougainvillea into the open middle, coral vine up the inner columns, desert grasses on the halo\'s rim, and a rain garden under the ring catching the halo\'s run-off and the misters\' drip',after='the Supertrees\' climbers and Singapore\'s ABC Waters rain gardens (Bishan–Ang Mo Kio Park)',
          keeper='Orin Pike (park keeper)',collision='the planters are the concourse\'s parapet (solid, a landing); plants decorative'),
     dict(name='Station cores',on='the station cores',planting=['coral vine'],
-         where='a green wall on each core\'s sunny face: coral vine on a mesh a metre off the glass, shading the escalating ramps inside',after='WOHA\'s green facades and Singapore\'s Skyrise Greenery',
-         keeper='Kade Morrow (city works)',collision='the mesh is decorative; the core is blocking'),
+         where='planters along the open escalating ramps\' outer edges and at every landing, coral vine trailing down the frame and shading the flights below',after='Singapore\'s planted open-air station escalators and Skyrise Greenery',
+         keeper='Kade Morrow (city works)',collision='the planters are the flights\' solid edges; the vine is decorative'),
     dict(name='The arch',on='the Meridian Arch',planting=['ghaf','bougainvillea','agave and aloe'],terraces=[18.0,48.0],roof=True,
-         where='sky terraces cut into the legs\' court faces at +18 and +48 m, each with a ghaf tree; the lower bridge\'s roof a public sky garden over the high line\'s station, looking down the civic axis',after='WOHA\'s Parkroyal on Pickering (its sky gardens) and Singapore\'s LUSH rule that a building gives back the green its site took',
+         where='sky terraces cut into the legs\' east faces at +18 and +48 m, each with a ghaf tree greeting the desert road (the court faces carry the escalator cascades); the lower bridge\'s roof a public sky garden over the high line\'s station, looking down the civic axis',after='WOHA\'s Parkroyal on Pickering (its sky gardens) and Singapore\'s LUSH rule that a building gives back the green its site took',
          keeper='the city (Kade Morrow); the sky garden open from the station',collision='terrace floors and the roof garden are landings; trees solid trunks, crowns decorative'),
     dict(name='The West Gate',on='the West Gate',planting=['date palm','agave and aloe','desert grasses'],roof=True,
          where='the bridge\'s roof is Old Moy\'s community garden: date palms, herb and vegetable beds on drip, a shade pergola; the towers\' roofs planted with agave and aloe',after='WOHA\'s Kampung Admiralty (its rooftop community farm over a public building)',
@@ -1224,7 +1233,12 @@ def _cross_checks():
             g=sbox(c['c'][0]-c['size'][0]/2,c['c'][1]-c['size'][1]/2,c['c'][0]+c['size'][0]/2,c['c'][1]+c['size'][1]/2)
             for sv in X['services']:
                 if g.distance(LineString(sv['pts']))<X['double']/2+X['platform'][1]+0.5 and host=='crossing': problems.append(('station: a core against a line',host,c['name'],sv['line']))
-            if host=='arch' and not any(sbox(*lg).contains(g) for lg in A['legs']): problems.append(('arch: a core outside its leg',c['name']))
+            if host=='arch':
+                # the cascade stands against its leg's court face, in Meridian Court, clear of the avenue
+                if not any(sbox(*lg).distance(g)<0.6 and not sbox(*lg).buffer(-0.01).intersects(g) for lg in A['legs']): problems.append(('arch: a cascade not against its leg',c['name']))
+                ct=[o for o in OPENS if o[0]=='Meridian Court'][0]
+                if not sbox(*ct[1:]).contains(g): problems.append(('arch: a cascade outside Meridian Court',c['name']))
+            if c.get('enclosure') not in ('open frame','open cascade','open loggia'): problems.append(('station: an enclosed core',host,c['name']))
             if host=='west gate' and not any(sbox(*tw).contains(g) for tw in W['towers']): problems.append(('west gate: a core outside its tower',c['name']))
     # the Crossing Ring: open, inside the park, clear of its gardens, the pond, the playground and the wind trees
     C=CROSSING; ring=Point(C['c']).buffer(C['ring'][1],64)

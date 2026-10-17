@@ -915,29 +915,43 @@ can go from the street to any train without leaving it. The levels:
   Estate Square) and from the park's cross walk to the Crossing Ring.
 - **Between the Deck and the Spine:** a pair of escalating ramps under each
   Spine platform, rising through the platform floor.
-- **Station cores, for everything higher:** a glass core of **two lifts and
-  switchback escalating ramps at 30°** (an escalator's angle, without
-  steps), in flights of at most 6.5 m with a landing at each level. The
-  cores are checked in the layout: each must hold its longest flight plus
-  its landings, and has its flights stored in the data.
-  - **The Crossing:** two cores, north-east and south-west of the ring,
-    each serving the lawn (0), the ring (+6.5), the Spine's platforms (+13)
+- **Station cores, for everything higher:** **switchback escalating ramps
+  at 30°** (an escalator's angle, without steps), in flights of at most
+  6.5 m with a landing at each level, and **two glass lifts** beside them.
+  **Revised 2026-10-17 (user): in the open air.** Singapore runs its
+  escalators everywhere, and in the open: up from the street to its
+  elevated stations, through its parks and along its covered walkways,
+  under a roof but open at the sides to the breeze. So a Moy core is an
+  **open steel frame, not a glass box**: each flight climbs under its own
+  light canopy, open on its sides, with a planter at every landing; only
+  the lift shafts are glazed. In a desert the canopies are the point: they
+  shade the moving ramp, and the open sides let the hot air go. The cores
+  are checked in the layout: each must be open, hold its longest flight
+  plus its landings, and has its flights stored in the data.
+  - **The Crossing:** two open escalator towers, north-east and south-west
+    of the ring, their lifts on the side away from the Spine, each serving the lawn (0), the ring (+6.5), the Spine's platforms (+13)
     and the high line's platforms (+37).
-  - **The East Gate (the arch):** a core in each leg serving the station
-    hall on Meridian Court (0), the Wall Line's East Gate station (+12),
-    whose tracks run through the legs, the high line's terminus on the
-    lower bridge (+37), directly above it and at right angles, and the
-    Watch's command room (+58). The change between the two lines is one
-    core, straight up.
-  - **The West Gate:** a core in each tower, serving the street hall (0),
+  - **The East Gate (the arch):** an **open cascade** of escalating ramps
+    on each leg's court face, climbing the diagrid under glass canopies in
+    full view of Meridian Court and city hall, after the Centre Pompidou's
+    facade escalators and Singapore's open-air ones: from the station hall
+    (0) to the Wall Line's East Gate station (+12), whose tracks run through
+    the legs, the high line's terminus on the lower bridge (+37), directly
+    above it and at right angles, and the sky garden on the lower bridge's
+    roof (+43). The change between the two lines is one cascade, straight
+    up. The Watch reaches its command room (+58) by its own lift.
+  - **The West Gate:** escalating ramps in an open loggia in each tower's
+    face on West Street (the street between the towers is too narrow for a
+    cascade beside it), serving the street hall (0),
     the Wall Line (+12) through the towers and the high line's west
     station on the bridge between them (+37).
   - **North and South Gates:** the Spine and the Wall Line on one level,
     the change across the platform.
 - **The high line's platforms and the Deck** are one system with the
   street: from any square you reach the Deck by its escalating ramp, the
-  Spine through its platform floor, and the high line by the nearest core;
-  no route needs stairs.
+  Spine through its platform floor, and the high line by the nearest open
+  escalator tower; no route needs stairs, and almost every route is in the
+  open air under shade.
 
 **Rhythm and construction of the supports (2026-10-17).**
 - **The Spine** stands on **portal frames on a 12 m bay**: two square
@@ -1003,7 +1017,7 @@ greenery is built into its infrastructure rather than set beside it.
   buildings: the arch, the gate towers and the Crossing.
 - **WOHA's Oasia Hotel Downtown:** a tower wrapped in a mesh that creepers
   climb, with open-sided sky gardens. The model for the high line's pier
-  sleeves and the station cores' green walls.
+  sleeves.
 - **WOHA's Parkroyal on Pickering:** sky gardens stacked in the building's
   face. The model for the arch's sky terraces.
 - **WOHA's Kampung Admiralty:** a public building with a community farm and
@@ -1044,8 +1058,8 @@ each element's keeper, its collision and its fit are checked):
 | **The high line's edges** | bougainvillea troughs on both edges, so the line reads from the street as a green line across the sky | Singapore's flyovers |
 | **The Deck** | planters along its parapets and date palms in tubs at the ramp heads: a shaded green walk from every square to the park and the stations | the Park Connector Network |
 | **The Crossing** | a planter on the ring's inner edge spilling bougainvillea into the open middle; coral vine up the inner columns; desert grasses on the halo's rim; a rain garden under the ring catching the halo's run-off and the misters' drip | the Supertrees; ABC Waters |
-| **The station cores** | a green wall on each core's sunny face, coral vine on a mesh a metre off the glass, shading the escalating ramps inside | Oasia; Skyrise Greenery |
-| **The Meridian Arch** | sky terraces cut into the legs' court faces at +18 and +48 m, each with a ghaf; the lower bridge's roof (+42 m) a public sky garden over the high line's station, looking down the civic axis to the Timekeeper | Parkroyal on Pickering; LUSH |
+| **The open escalator towers** | planters along the escalating ramps' outer edges and at every landing, coral vine trailing down the frame and shading the flights below | Singapore's planted open-air station escalators |
+| **The Meridian Arch** | sky terraces cut into the legs' east faces at +18 and +48 m, each with a ghaf; the lower bridge's roof (+42 m) a public sky garden over the high line's station, looking down the civic axis to the Timekeeper | Parkroyal on Pickering; LUSH |
 | **The West Gate** | the bridge's roof is Old Moy's community garden: date palms, herb and vegetable beds on drip, a shade pergola; agave and aloe on the towers' roofs | Kampung Admiralty |
 | **The Rim Corridor** | the Ring Line's old service road at the wall's inner foot, kept as a green walk all the way round: ghaf shade, desert grasses, bougainvillea over the wall's arches | the Rail Corridor |
 
@@ -1309,9 +1323,10 @@ middle):
 - **The Spine** passes through at +12 m, its platforms under the halo, the
   escalating ramps under them rising from the concourse; **the high line**
   crosses at +36 m, and its two nearest tree piers rise through the ring.
-- **Two glass cores** (lifts and switchback escalating ramps), north-east
-  and south-west of the ring, join the lawn, the ring, the Spine and the
-  high line (section 6c).
+- **Two open escalator towers** (switchback escalating ramps under light
+  canopies, glass lifts beside them), north-east and south-west of the
+  ring, join the lawn, the ring, the Spine and the high line in the open
+  air (section 6c).
 **Planted (2026-10-17, section 6d):** bougainvillea from the ring's inner
 planter, coral vine on the inner columns, desert grasses on the halo's rim,
 and a rain garden under the ring, after the Supertrees and Singapore's ABC
@@ -2517,8 +2532,11 @@ Line's station and the high line's terminus into one building.
   +12 m, its tracks running through the legs and over the opening; and the
   **high line's east terminus** on the **lower bridge** (+32 to +42 m),
   directly above it and at right angles, its platforms looking west through
-  the Timekeeper. Each leg holds a core of two lifts and switchback 30°
-  escalating ramps through every level (section 6c).
+  the Timekeeper. On each leg's court face an **open cascade** of 30°
+  escalating ramps climbs the diagrid under glass canopies, glass lifts
+  beside it, through every public level (section 6c): the arch's grand
+  gesture toward the city, as the Centre Pompidou's escalator tube is
+  Paris's.
 - **The top bridge** at +58 to +72 m across both legs, **cantilevered 12 m
   west** toward city hall: the **Wall Watch's command room**, looking east
   over the wall and the desert and west down the city's whole axis to the
@@ -2528,14 +2546,15 @@ Line's station and the high line's terminus into one building.
   the Housing Board's downtown desk) above the station.
 - **Green (section 6d):** after WOHA's Parkroyal on Pickering and
   Singapore's LUSH rule, sky terraces with ghaf trees are cut into the legs'
-  court faces at +18 and +48 m, and the lower bridge's roof is a public sky
-  garden, reached from the station's cores.
+  east faces at +18 and +48 m, greeting the desert road, and the lower
+  bridge's roof is a public sky garden, reached by the cascades.
 
 **The West Gate** (data: `WEST_GATE`, checked) is the arch's plainer
 partner: two towers 22 by 16 m, 44 m high, straddling the wall either side
 of West Street, the Wall Line running through them at +12 m and the high
 line's west station on a glazed bridge between them at +32 to +42 m, with a
-siding for its trains beyond the wall's line. A core in each tower joins the
+siding for its trains beyond the wall's line. In each tower's face on West
+Street an open loggia of escalating ramps, glass lifts beside it, joins the
 street hall, the Wall Line and the high line. Its bridge's roof is Old Moy's
 community garden, after WOHA's Kampung Admiralty (section 6d). The bands of the towers repeat
 every 6 m, the Wall Line's and the high line's levels among them.
@@ -2828,7 +2847,8 @@ lit crowns.
   glass lifts; travelators dropped;
 - (2026-10-17) **green infrastructure after Singapore** (section 6d): the
   lines' planted edges, the piers' climbing sleeves, the Crossing's planted
-  ring, green walls on the cores, the arch's sky terraces and sky garden,
+  ring, planted open-air escalator towers and cascades (the cores opened to
+  the air), the arch's sky terraces and sky garden,
   the West Gate's community roof garden, the Rim Corridor;
 - (2026-10-17) the Meridian raised to **+36 m**; the **Timekeeper** a full
   twelve-hour circle in a bronze cradle; the **arch as the East Gate** and
