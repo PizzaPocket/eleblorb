@@ -638,6 +638,8 @@ DECK={
   dict(name='Library walk',kind='walk',w=6,pts=[(-631,-27),(-648,-27)]),
   # straight through the park under the Spine Line, from the Park Deck's north side to its south side: the Crossing's mezzanine
   dict(name='Spine walk',kind='walk',w=6,pts=[(-557,-50),(-557,50)]),
+  # the Crossing Ring's concourse, at the Deck's level round the park's centre
+  dict(name='Crossing Ring',kind='ring',w=6,pts=[(round(-557+17*math.cos(math.radians(a_)),2),round(17*math.sin(math.radians(a_)),2)) for a_ in range(0,361,15)]),
   # up the east half of North Street to the neighbourhood centre's roof garden
   dict(name='Estate walk',kind='walk',w=6,pts=[(-557,-56),(-557,-121)]),
   # down the east half of South Street, then along Market Square's north edge to the wet market's upper hall
@@ -673,8 +675,8 @@ DECK={
   dict(name='Market Square',foot=(-545,159),head=(-545,128)),
   dict(name='Estate Square',foot=(-523,-104),head=(-554,-104)),
   # in the park, along the cross walk, up into the Crossing's mezzanine from the east and the west
-  dict(name='Crossing east',foot=(-523,0),head=(-554,0)),
-  dict(name='Crossing west',foot=(-591,0),head=(-560,0)),
+  dict(name='Crossing east',foot=(-506,0),head=(-537,0)),
+  dict(name='Crossing west',foot=(-608,0),head=(-577,0)),
  ],
  'esc_angle':12.0,'esc_w':2.6,
 }
@@ -765,7 +767,8 @@ def _deck_checks():
         keep.append((sbox(*r),ew,sbox(r[0]-13,r[1],r[2]+13,r[3]) if ew else sbox(r[0],r[1]-13,r[2],r[3]+13)))
     cols=[]
     for run in D['runs']:
-        if run['kind']=='bridge': continue
+        # the Crossing Ring stands on the Crossing's own column rings (CROSSING)
+        if run['kind'] in ('bridge','ring'): continue
         for a,c in zip(run['pts'],run['pts'][1:]):
             ux,uz=(c[0]-a[0]),(c[1]-a[1]); L=math.hypot(ux,uz); ux/=L; uz/=L
             mid=Point((a[0]+c[0])/2,(a[1]+c[1])/2); ew=abs(ux)>abs(uz)
@@ -836,10 +839,10 @@ WALL={
  # on the top, from the city side: inner parapet, two tracks (centres 3.4 m apart), the watch walk, outer parapet
  'track_axis':-2.2,'track_spacing':3.4,'walk':3.6,'min_curve':25.0,
  # gates: the streets that pass through, each with a gatehouse 24 m deep (12 m beyond the outer face) and its station above
- 'gates':[dict(name='East Gate',street='Meridian Avenue',axis='x',at=0.0,arch=(10.0,8.0),along=84.0,out=20.0),
+ 'gates':[dict(name='East Gate',street='Meridian Avenue',axis='x',at=0.0,arch=(24.0,10.0),along=60.0,out=5.0,building='arch'),
           dict(name='North Gate',street='North Street',axis='z',at=-560.0,arch=(10.0,8.0)),
           dict(name='South Gate',street='South Street',axis='z',at=-560.0,arch=(10.0,8.0)),
-          dict(name='West Gate',street='West Street',axis='x',at=0.0,arch=(10.0,8.0))],
+          dict(name='West Gate',street='West Street',axis='x',at=0.0,arch=(20.0,10.0),along=52.0,out=7.0,building='towers')],
  'gatehouse':dict(along=44.0,out=12.0),
  # halts between the gates, each on its own bastion over the lane it serves
  'halts':[],
@@ -960,64 +963,82 @@ def _build_wall():
         if band.distance(Point(t))<40 or shed.distance(Point(t))<40: problems.append(('wall: too near a turbine',t))
 _build_wall()
 ## The cross lines (city.md 6c, revised 2026-10-16 at the user's direction): two
-## straight lines only. The Spine Line runs north to south at the Wall Line's
-## level (+12 m) and meets it on the level at the North and South Gates. The
-## Meridian Line runs east to west above it (+26 m): through the Timekeeper's
-## open centre over city hall, over the Crossing where the two lines cross,
-## from the Meridian Arch at the east to a high station over the West Gate.
-## Where the Spine rides the Deck it stands on the Deck's columns carried up
-## through it. Services are track centrelines in world (x, z).
+## straight lines. The Spine Line runs north to south at the Wall Line's level
+## (+12 m) and meets it on the level at the North and South Gates; it rides the
+## Deck on the Deck's own columns, portal frames on a 12 m bay. The Meridian Line
+## is the high line (+36 m): through the Timekeeper's open centre over city hall,
+## over the Crossing, between the East Gate's arch and the West Gate's towers. It
+## stands on tree piers spaced three Spine bays apart (36 m), set out from the
+## Crossing so that no pier stands on the Spine, with one longer bridge over city
+## hall. Services are track centrelines in world (x, z).
 CROSS={
  'depth':1.2,'r_min':12.0,'double':6.0,'platform':(30.0,3.0),'min_gap':60.0,'clear_over':2.0,'car_h':3.4,
  'cars':dict(cars=2,car=(12.0,2.65,3.4),speed=9.0,dwell=20.0,headway=150),
  'services':[
-  dict(line='Spine Line',w='double',rail=12.0,pts=[(-557,-228),(-557,228)]),
-  dict(line='Meridian Line',w='double',rail=26.0,pts=[(-358,0),(-782,0)]),
+  dict(line='Spine Line',w='double',rail=12.0,bay=12.0,pts=[(-557,-228),(-557,228)],
+       structure='portal frames: the Deck\'s paired columns carried up through it, with a crossbeam under the track; 12 m bay'),
+  dict(line='Meridian Line',w='double',rail=36.0,pts=[(-336,0),(-792,0)],
+       piers=[-755,-719,-683,-647,-611,-575,-539,-503,-467,-435,-393],span=36.0,max_span=42.0,
+       structure='tree piers: one round-square stem 2.4 m across in the middle of the street, branching at +28 m into a Y that carries twin steel box girders; 36 m spans, one 42 m bridge over city hall'),
  ],
  'stations':[
   dict(name='North Gate',at=(-557,-212),lines=['Spine Line'],deck=False,access='the North Gate\'s gatehouse, level with the Wall Line'),
   dict(name='Estate Square',at=(-557,-100),lines=['Spine Line'],deck=True,access='the Deck\'s Estate walk below; the glass lift and the escalating ramp from the square'),
-  dict(name='The Crossing',at=(-557,0),lines=['Spine Line','Meridian Line'],deck=True,access='the Crossing, the station at the park\'s centre: the Deck\'s Spine walk as its mezzanine, escalating ramps from the park\'s cross walk, lifts and a ramp core to the Meridian Line\'s platforms'),
+  dict(name='The Crossing',at=(-557,0),lines=['Spine Line','Meridian Line'],deck=True,access='the Crossing Ring at the park\'s centre: its concourse at the Deck\'s level, its cores to both lines'),
   dict(name='Market Square',at=(-557,138),lines=['Spine Line'],deck=False,access='over the square; the Deck\'s Market walk crosses below with the square\'s escalating ramp and glass lift'),
   dict(name='South Gate',at=(-557,212),lines=['Spine Line'],deck=False,access='the South Gate\'s gatehouse, level with the Wall Line'),
-  dict(name='Meridian Arch',at=(-377,0),lines=['Meridian Line'],deck=False,access='the Meridian Arch\'s lower bridge, between its legs; a bridge at +12 m to the East Gate\'s Wall Line station'),
-  dict(name='West Gate',at=(-765,0),lines=['Meridian Line'],deck=False,access='a high station over the West Gate\'s gatehouse, its lifts down to the Wall Line'),
+  dict(name='East Gate',at=(-351,0),lines=['Meridian Line'],deck=False,access='the Meridian Arch, which is the East Gate: its lower bridge holds the platforms, over the Wall Line\'s station'),
+  dict(name='West Gate',at=(-771,0),lines=['Meridian Line'],deck=False,access='the West Gate\'s twin towers: the bridge between them holds the platforms, over the Wall Line\'s station'),
  ],
  # the Spine meets the Wall Line on the level at these gates, so its trains reach the Line House; the Meridian Line's
- # trains stable in sidings in the West Gate's high station
+ # trains stable on a siding in the West Gate's bridge
  'junctions':['North Gate','South Gate'],
+ # escalating ramps in the station cores: 30 degrees (an escalator's angle, without steps), flights of at most 6.5 m
+ 'esc':dict(angle=30.0,max_rise=6.5,w=2.6),
 }
-## The Crossing (city.md 7a, proposed 2026-10-16): the city's station and civic
-## shelter at the park's centre, where the Spine (+12) and the Meridian (+26)
-## cross. A shading lattice dome after Kanazawa Station's Motenashi Dome, the two
-## viaducts passing through it; the concourse at the park's level opens on all
-## four cross walks; the Deck's Spine walk is its mezzanine.
-CROSSING=dict(c=(-557,0),r=21.0,apex=38.0,lattice='pale ceramic-clad steel diagrid with glass, open at the base for the wind',
-  program='the concourse: shade, water fountains, kiosks, a lost-and-found and the city\'s information desk; the lifts and a ramp core to both lines')
-## The Timekeeper (city.md 8a, proposed 2026-10-16): stands over city hall in
-## place of its clock tower, a ring in the north-south plane through whose empty
-## centre the Meridian Line runs. No hands from the centre: rotating rings, each
-## carrying a lit marker read against a fixed index at the top. From the centre
-## out: the day ring (the game's day: day, dawn, dusk and night painted as
-## regions, turning once a game day), the minute ring and the hour ring (real
-## time), and the fixed bezel. The lower part of the rings turns in a slot in
-## city hall's roof. After Prague's astronomical clock (the day and night regions)
-## and the ring clocks whose hours turn past a fixed index.
-TIMEKEEPER=dict(x=-414.0,z=0.0,y=29.0,thick=3.0,
-  rings=[('day',8.0,11.0,'turns once a game day (24 real minutes); day gold and sky blue, dawn and dusk rose, night indigo'),
-         ('minute',11.0,13.5,'turns once a real hour; one lit marker'),
-         ('hour',13.5,16.5,'turns twice a real day; one larger lit marker'),
-         ('bezel',16.5,19.0,'fixed; twelve hour marks, and the index at the top')],
-  slot=(6.0,40.0))
-## The Meridian Arch (city.md 8b, proposed 2026-10-16): a city-owned building
-## in front of city hall's east face, a loop over Meridian Avenue after Beijing's
-## CCTV headquarters, framing the Timekeeper in the view from the East Gate (the
-## St. Louis arch's framing in a loop of rooms). Two legs in Meridian Court, the
-## lower bridge between them is the Meridian Line's east station (+26 m), the top
-## bridge (with its cantilever toward city hall) the Wall Watch's command room.
-ARCH=dict(legs=[(-387,-28,-369,-12),(-387,12,-369,28)],lower=(22.0,32.0),top=(58.0,72.0),cantilever=12.0,
-  wall_bridge=12.0,program='city offices in the legs; the Meridian Line\'s station on the lower bridge; the Wall Watch\'s command room in the top bridge, looking east over the desert and west down the city\'s axis',
+## Station cores: lifts and switchback escalating ramps, linking every level a
+## station has. levels: heights served; c and size: the core's footprint (world).
+## The Crossing Ring (city.md 7a, revised 2026-10-16): open air, after Sou
+## Fujimoto's Grand Ring at Expo 2025 Osaka. A ring of slender columns, two rows
+## on a 15 degree rhythm, carrying a concourse ring at the Deck's level (+6.5 m)
+## and a halo of shade over the Spine's platforms (+17 m), open at the centre to
+## the sky and the high line crossing above, and open on every side to the park.
+CROSSING=dict(c=(-557,0),ring=(14.0,20.0),deck=6.5,halo=(17.0,12.0,22.0),columns=24,
+  material='pale timber louvres on slender steel columns',
+  program='the ring concourse: shade, water fountains, kiosks, the lost-and-found and the city\'s information desk',
+  cores=[dict(name='north-east',c=(-545,-16),size=(6.4,16.0),levels=[0,6.5,13,37],lifts=2),
+         dict(name='south-west',c=(-569,16),size=(6.4,16.0),levels=[0,6.5,13,37],lifts=2)])
+## The Timekeeper (city.md 8a, revised 2026-10-16): a full circle standing over
+## city hall in a bronze cradle, clear of the roof, the high line passing through
+## its empty centre. A twelve-hour ring clock: the minute ring and the hour ring
+## turn past the fixed index at the top, each carrying one lit marker, and keep
+## real time; the fixed bezel carries the twelve hour marks.
+TIMEKEEPER=dict(x=-414.0,z=0.0,y=37.5,thick=3.0,roof=22.0,
+  rings=[('minute',6.0,9.0,'turns once an hour; one lit marker'),
+         ('hour',9.0,12.0,'turns twice a day; one larger lit marker'),
+         ('bezel',12.0,13.5,'fixed; twelve hour marks and the index at the top')],
+  cradle=dict(z=15.0,w=2.0,material='bronze',note='two pylons from the roof hold the bezel at its sides'))
+## The Meridian Arch is the East Gate (city.md 8b, revised 2026-10-16): a loop
+## after Beijing's CCTV headquarters whose two legs straddle the wall at the gate.
+## Meridian Avenue passes under it through a 24 m opening; the Wall Line runs
+## through the legs at +12 m with its station between them; the high line ends on
+## the lower bridge at +36 m, directly above, crossing the Wall Line at right
+## angles; the top bridge, cantilevered toward city hall, is the Wall Watch's
+## command room. Each leg holds a core of lifts and escalating ramps through
+## every level, and opens on Meridian Court as the station's hall.
+ARCH=dict(legs=[(-362,-30,-340,-12),(-362,12,-340,30)],lower=(32.0,42.0),top=(58.0,72.0),cantilever=12.0,
+  opening=24.0,wall_line=12.0,
+  cores=[dict(name='north leg',c=(-351,-21),size=(6.4,16.0),levels=[0,12,37,58],lifts=2),
+         dict(name='south leg',c=(-351,21),size=(6.4,16.0),levels=[0,12,37,58],lifts=2)],
+  program='the station hall at the street, the Wall Line\'s station at +12 m, the high line\'s at +36 m, city offices in the legs, the Wall Watch\'s command room at the top',
   skin='a diagrid of pale ceramic-clad steel over glass')
+## The West Gate's towers (city.md 8b, revised 2026-10-16): the same idea at the
+## west, smaller: two towers straddling the wall either side of West Street, the
+## Wall Line through them at +12 m, the high line's west station on the bridge
+## between them at +36 m, a siding for its trains beyond.
+WEST_GATE=dict(towers=[(-782,-26,-760,-10),(-782,10,-760,26)],bridge=(32.0,42.0),top=44.0,
+  cores=[dict(name='north tower',c=(-771,-18),size=(6.4,15.0),levels=[0,12,37],lifts=2),
+         dict(name='south tower',c=(-771,18),size=(6.4,15.0),levels=[0,12,37],lifts=2)])
 def _fillet(pts,R,step=1.0):
     out=[pts[0]]
     for i in range(1,len(pts)-1):
@@ -1086,44 +1107,93 @@ def _cross_checks():
         g=[x for x in WALL['gates'] if x['name']==nm][0]
         if LineString(sp['pts']).distance(Point(g['p']))>4: problems.append(('cross: the Spine misses its gate',nm))
     # the Meridian passes through the Timekeeper's empty centre with room round its trains
-    T=TIMEKEEPER; inner=T['rings'][0][1]
+    T=TIMEKEEPER; inner=T['rings'][0][1]; R1=T['rings'][-1][2]
     if LineString(me['pts']).distance(Point(T['x'],T['z']))>0.01: problems.append(('cross: the Meridian Line misses the Timekeeper',))
     for dz in (-X['double']/2,X['double']/2):
         for y in (me['rail']-X['depth'],me['rail']+X['car_h']+0.4):
             if math.hypot(dz,y-T['y'])>inner-0.8: problems.append(('cross: the train fouls the Timekeeper\'s rings',dz,y))
+    if T['y']-R1<T['roof']+2.0: problems.append(('cross: the Timekeeper dips into city hall\'s roof',round(T['y']-R1,1)))
     ch=[b_ for b_ in named if b_['n']==2][0]['r']
-    if not (ch[0]<T['x']<ch[2] and ch[1]<T['z']-T['rings'][-1][2] and T['z']+T['rings'][-1][2]<ch[3]): problems.append(('cross: the Timekeeper does not stand within city hall',))
+    if not (ch[0]<T['x']<ch[2] and ch[1]<T['z']-T['cradle']['z']-T['cradle']['w'] and T['z']+T['cradle']['z']+T['cradle']['w']<ch[3]): problems.append(('cross: the Timekeeper\'s cradle does not stand on city hall',))
+    if T['cradle']['z']<R1+0.5: problems.append(('cross: the cradle fouls the rings',))
     if me['rail']-X['depth']-HEIGHTS[2]<2.0: problems.append(('cross: the Meridian Line too low over city hall\'s roof',))
-    # the Meridian Arch: legs in Meridian Court, clear of the avenue and the line; the lower bridge carries the line\'s station
-    A=ARCH; court=[o for o in OPENS if o[0]=='Meridian Court'][0]
-    av=[s_ for s_ in STREETS if s_[0]=='Meridian Avenue'][0]
+    # the high line's piers: in the street or a square, never on a building, the Spine or a station; spans to rhythm
+    ml=LineString(me['pts']); pz=me['pts'][0][1]; xs=sorted(me['piers'])
+    for x in xs:
+        q=Point(x,pz)
+        for n_,h,g in tall:
+            if g.distance(q)<1.4: problems.append(('cross: a high-line pier on a building',x,n_))
+        if abs(x-sp['pts'][0][0])<4: problems.append(('cross: a high-line pier on the Spine',x))
+    ends=[min(lg[0] for lg in WEST_GATE['towers']),max(lg[2] for lg in WEST_GATE['towers']),min(lg[0] for lg in ARCH['legs'])]
+    seq=[WEST_GATE['towers'][0][2]]+xs+[ARCH['legs'][0][0]]
+    spans=[round(b-a,1) for a,b in zip(seq,seq[1:])]
+    me['spans']=spans
+    if max(spans)>me['max_span']+0.01: problems.append(('cross: a high-line span too long',max(spans)))
+    regular=[sp_ for sp_ in spans if abs(sp_-me['span'])<0.01]
+    if len(regular)<len(spans)*0.6: problems.append(('cross: the high line\'s piers keep no rhythm',spans))
+    cx_=CROSSING['c'][0]
+    if not any(abs(x-(cx_-me['span']/2))<0.01 for x in xs) or not any(abs(x-(cx_+me['span']/2))<0.01 for x in xs): problems.append(('cross: the piers are not set out from the Crossing',))
+    # the East Gate is the arch: legs straddle the wall clear of the avenue and the line; it holds both stations
+    A=ARCH; av=[s_ for s_ in STREETS if s_[0]=='Meridian Avenue'][0]
     for lg in A['legs']:
         g=sbox(*lg)
-        if not sbox(*court[1:]).contains(g): problems.append(('arch: a leg outside Meridian Court',lg))
+        if not g.intersects(wallP.exterior): problems.append(('arch: a leg that does not straddle the wall',lg))
         if g.intersects(sbox(*av[2:])): problems.append(('arch: a leg on Meridian Avenue',lg))
-        if g.distance(LineString(me['pts']))<X['double']/2+3: problems.append(('arch: a leg against the line',lg))
-        if g.distance(wallP.exterior)<WALL['thick']/2+4: problems.append(('arch: a leg against the wall',lg))
-    if not (A['lower'][0]<me['rail']-X['depth'] and me['rail']+X['car_h']<A['lower'][1]): problems.append(('arch: the lower bridge does not hold the line',))
-    st=[x for x in X['stations'] if x['name']=='Meridian Arch'][0]
-    if not (A['legs'][0][0]<=st['at'][0]<=A['legs'][0][2]): problems.append(('arch: the station is not between the legs',))
-    # the Crossing at the park's centre: inside the park, clear of its gardens, the pond and the playground
-    C=CROSSING; dome=Point(C['c']).buffer(C['r'],64)
-    if not sbox(*PARK['rect']).contains(dome): problems.append(('crossing: the dome leaves the park',))
+        if g.distance(LineString(me['pts']))<X['double']/2+2: problems.append(('arch: a leg against the high line',lg))
+        for n_,h,g2 in tall:
+            if g.intersection(g2).area>0.05: problems.append(('arch: a leg on a building',lg,n_))
+    if A['legs'][1][1]-A['legs'][0][3]<A['opening']-0.01: problems.append(('arch: the gate opening is narrower than asked',))
+    if not (A['lower'][0]<me['rail']-X['depth'] and me['rail']+X['car_h']<A['lower'][1]): problems.append(('arch: the lower bridge does not hold the high line',))
+    st=[x for x in X['stations'] if x['name']=='East Gate'][0]
+    if not (A['legs'][0][0]<=st['at'][0]<=A['legs'][0][2]): problems.append(('arch: the high line\'s station is not between the legs',))
+    if wallP.exterior.distance(Point(st['at']))>8: problems.append(('arch: the station is not over the wall',))
+    W=WEST_GATE; st=[x for x in X['stations'] if x['name']=='West Gate'][0]
+    for tw in W['towers']:
+        g=sbox(*tw)
+        if not g.intersects(wallP.exterior): problems.append(('west gate: a tower that does not straddle the wall',tw))
+        if g.intersects(sbox(*[s_ for s_ in STREETS if s_[0]=='West Street'][0][2:])): problems.append(('west gate: a tower on West Street',tw))
+        for n_,h,g2 in tall:
+            if g.distance(g2)<3: problems.append(('west gate: a tower against a building',tw,n_))
+    if not (W['bridge'][0]<me['rail']-X['depth'] and me['rail']+X['car_h']<W['bridge'][1]): problems.append(('west gate: the bridge does not hold the high line',))
+    if not (W['towers'][0][0]-6<=st['at'][0]<=W['towers'][0][2]+6): problems.append(('west gate: the station is not between the towers',))
+    # every station core links all its levels with lifts and with escalating ramps in flights the angle allows
+    E=X['esc']
+    for host,cores in (('crossing',CROSSING['cores']),('arch',A['cores']),('west gate',W['cores'])):
+        for c in cores:
+            lv=sorted(c['levels']); flights=[]
+            for a_,b_ in zip(lv,lv[1:]):
+                n=max(1,math.ceil((b_-a_)/E['max_rise']-1e-9)); rise=(b_-a_)/n; run=rise/math.tan(math.radians(E['angle']))
+                flights+=[(a_+k*rise,a_+(k+1)*rise,round(run,2)) for k in range(n)]
+            c['flights']=flights
+            if max(f[2] for f in flights)+3.0>c['size'][1]+0.01: problems.append(('station: a core too short for its flights',host,c['name']))
+            if c.get('lifts',0)<1: problems.append(('station: a core without a lift',host,c['name']))
+            g=sbox(c['c'][0]-c['size'][0]/2,c['c'][1]-c['size'][1]/2,c['c'][0]+c['size'][0]/2,c['c'][1]+c['size'][1]/2)
+            for sv in X['services']:
+                if g.distance(LineString(sv['pts']))<X['double']/2+X['platform'][1]+0.5 and host=='crossing': problems.append(('station: a core against a line',host,c['name'],sv['line']))
+            if host=='arch' and not any(sbox(*lg).contains(g) for lg in A['legs']): problems.append(('arch: a core outside its leg',c['name']))
+            if host=='west gate' and not any(sbox(*tw).contains(g) for tw in W['towers']): problems.append(('west gate: a core outside its tower',c['name']))
+    # the Crossing Ring: open, inside the park, clear of its gardens, the pond, the playground and the wind trees
+    C=CROSSING; ring=Point(C['c']).buffer(C['ring'][1],64)
+    if not sbox(*PARK['rect']).contains(ring): problems.append(('crossing: the ring leaves the park',))
     from shapely import affinity
     pc=PARK['pond']['c']; pond=affinity.scale(Point(pc).buffer(1,64),*PARK['pond']['r'])
     pg=PARK['playground']; play=Point(pg['c']).buffer(pg['track'][1],64)
-    for nm,g in [('dry garden',sbox(*PARK['dry_garden'])),('lawn',sbox(*PARK['lawn'])),('pond',pond),('playground',play)]+[('wind tree',Point(t).buffer(3)) for t in PARK['wind_trees']]+[('parasol',Point(t).buffer(2.5)) for t in PARK['parasols']]:
-        if dome.intersection(g).area>0: problems.append(('crossing: the dome on the',nm))
+    halo=Point(C['c']).buffer(C['halo'][2],64)
+    for nm,g in [('dry garden',sbox(*PARK['dry_garden'])),('lawn',sbox(*PARK['lawn'])),('pond',pond),('playground',play)]+[('parasol',Point(t).buffer(2.5)) for t in PARK['parasols']]:
+        if halo.intersection(g).area>0: problems.append(('crossing: the ring on the',nm))
+    for t in PARK['wind_trees']:
+        if halo.distance(Point(t))<2: problems.append(('crossing: a wind tree under the halo',t))
+    if not (sp['rail']+X['car_h']+0.5<C['halo'][0]<me['rail']-X['depth']-2): problems.append(('crossing: the halo between the lines\' heights is wrong',))
+    if abs(C['deck']-DECK['level'])>0.01: problems.append(('crossing: the ring is not at the Deck\'s level',))
     if not sbox(*PARK['rect']).buffer(-1).contains(play): problems.append(('park: the playground leaves the park',))
     for n_ in (9,10):
         g=sbox(*[b_ for b_ in named if b_['n']==n_][0]['r'])
-        for nm,f in [('playground',play),('dome',dome),('pond',pond),('lawn',sbox(*PARK['lawn'])),('dry garden',sbox(*PARK['dry_garden']))]+[('walk',sbox(*w_)) for w_ in PARK['walks']]:
+        for nm,f in [('playground',play),('ring',halo),('pond',pond),('lawn',sbox(*PARK['lawn'])),('dry garden',sbox(*PARK['dry_garden']))]+[('walk',sbox(*w_)) for w_ in PARK['walks']]:
             if g.intersection(f).area>0: problems.append(('park: a park building on the',nm,n_))
     for t in pg['towers']:
         if pond.distance(Point(t[:2]))<t[3]+1 or sbox(*PARK['lawn']).distance(Point(t[:2]))<t[3]: problems.append(('park: a playground tower on the pond or the lawn',t))
     for t in PARK['wind_trees']:
-        if pond.contains(Point(t)) or play.distance(Point(t))<3 or dome.distance(Point(t))<4: problems.append(('park: a wind tree on the pond, the playground or the dome',t))
-    if C['apex']<me['rail']+X['car_h']+4: problems.append(('crossing: the dome too low over the Meridian Line',))
+        if pond.contains(Point(t)) or play.distance(Point(t))<3: problems.append(('park: a wind tree on the pond or the playground',t))
 _cross_checks()
 if '--wall' in sys.argv:
     print(WALL['length'],WALL['min_radius'],WALL['station_gaps']); [print(st) for st in WALL['stations']]
@@ -1507,6 +1577,7 @@ w("## Meridian Line through its empty centre. Day ring: the game day; minute and
 w("const TIMEKEEPER := %s" % lit(TIMEKEEPER))
 w("## The Meridian Arch (city.md 8b): legs (world rects), lower and top bridges (y ranges), the line's east station.")
 w("const ARCH := %s" % lit(ARCH))
+w("const WEST_GATE := %s" % lit(WEST_GATE))
 w("")
 w("## The towers' sites: the shaft's footprint and the public ground round it (city.md 7c).")
 w("const TOWER_SITE := %s" % lit(TOWER_SITE))
@@ -1538,5 +1609,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

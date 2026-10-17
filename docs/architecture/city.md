@@ -886,26 +886,80 @@ they never meet. Data: `CROSS` in `tools/city_layout.py`.
   **South Gate**. On North Street and South Street and through the park it
   rides directly over the Deck, on the Deck's own columns carried up
   through it (after Bangkok's Skytrain and its skywalk).
-- **The Meridian Line, east to west, raised to +26 m** (424 m): from its
-  east station in the **Meridian Arch** (8b), straight along the civic axis,
-  through the **Timekeeper's** empty centre over city hall (8a.0), across
-  Civic Plaza and over the Crossing (where it passes 9 m over the Spine's
-  trains), across Library Square and along West Street to a high station
-  over the **West Gate**, whose lifts go down to the Wall Line. Stations:
-  **Meridian Arch**, **the Crossing**, **West Gate**. It is the city's
-  high line: few stops, the longest views. Its trains stable in sidings in
-  the West Gate's high station. It stands on tall single piers down the
-  middle of the street and spans city hall without touching the
-  Timekeeper.
-- **The Crossing**, at the park's centre, is where they meet: one station on
-  two levels (section 7a).
+- **The Meridian Line, east to west: the high line, at +36 m** (456 m;
+  raised from +26 m on 2026-10-17 so the Timekeeper can be a full circle
+  clear of city hall's roof). From its east terminus on the lower bridge of
+  the **Meridian Arch, which is the East Gate** (8b), straight along the
+  civic axis, through the **Timekeeper's** empty centre over city hall
+  (8a.0), across Civic Plaza and over the Crossing (24 m over the Spine's
+  trains), across Library Square and along West Street to its west station
+  on the bridge between the **West Gate's towers**, with a siding for its
+  trains beyond. Stations: **East Gate**, **the Crossing**, **West Gate**:
+  few stops, the longest views.
+- **The Crossing**, at the park's centre, is where they meet: an open ring
+  (section 7a).
+
+**Stations and circulation (2026-10-17, at the user's direction).** Every
+station is one building that joins all the levels it serves, so a person
+can go from the street to any train without leaving it. The levels:
+
+| Level | Height | What is there |
+|---|---|---|
+| Street | 0 | the avenues, the squares, the park's lawns, the station halls |
+| The Deck | +6.5 m | the walkway round the park and up the streets; the Crossing Ring's concourse |
+| The Spine and the Wall Line | +12 m | one level, so they meet on the level at the North and South Gates |
+| The high line | +36 m | the Meridian Line, platforms at +37 m |
+
+- **Between the street and the Deck:** the ramp towers, the glass lifts,
+  and 12° escalating ramps from the squares (Civic Plaza, Market Square,
+  Estate Square) and from the park's cross walk to the Crossing Ring.
+- **Between the Deck and the Spine:** a pair of escalating ramps under each
+  Spine platform, rising through the platform floor.
+- **Station cores, for everything higher:** a glass core of **two lifts and
+  switchback escalating ramps at 30°** (an escalator's angle, without
+  steps), in flights of at most 6.5 m with a landing at each level. The
+  cores are checked in the layout: each must hold its longest flight plus
+  its landings, and has its flights stored in the data.
+  - **The Crossing:** two cores, north-east and south-west of the ring,
+    each serving the lawn (0), the ring (+6.5), the Spine's platforms (+13)
+    and the high line's platforms (+37).
+  - **The East Gate (the arch):** a core in each leg serving the station
+    hall on Meridian Court (0), the Wall Line's East Gate station (+12),
+    whose tracks run through the legs, the high line's terminus on the
+    lower bridge (+37), directly above it and at right angles, and the
+    Watch's command room (+58). The change between the two lines is one
+    core, straight up.
+  - **The West Gate:** a core in each tower, serving the street hall (0),
+    the Wall Line (+12) through the towers and the high line's west
+    station on the bridge between them (+37).
+  - **North and South Gates:** the Spine and the Wall Line on one level,
+    the change across the platform.
+- **The high line's platforms and the Deck** are one system with the
+  street: from any square you reach the Deck by its escalating ramp, the
+  Spine through its platform floor, and the high line by the nearest core;
+  no route needs stairs.
+
+**Rhythm and construction of the supports (2026-10-17).**
+- **The Spine** stands on **portal frames on a 12 m bay**: two square
+  columns either side of the track and a crossbeam under it. Where it rides
+  the Deck, the Deck's own paired columns carry up through the Deck as the
+  portals' legs, so the Deck and the Spine are one structure (after
+  Bangkok's Skytrain and its skywalk).
+- **The high line** stands on **tree piers spaced 36 m, three Spine bays**:
+  a round-square stem 2.4 m across in the middle of the street, branching at
+  +28 m into a Y that carries **twin steel box girders**, one under each
+  track, after Santiago Calatrava's branching supports and the High Line's
+  steel. The piers are set out from the Crossing (18 m either side, so the
+  two nearest rise through the Crossing Ring between its two rows of
+  columns and the ring hangs its concourse from them) and run on at 36 m;
+  over Civic Plaza and city hall the girders make one 42 m bridge so no pier
+  stands on the hall. The checks keep every pier off buildings and the
+  Spine and every span within 42 m.
+- **The rhythm**, read from the street: the Spine's frames every 12 m, the
+  high line's trees every third frame where the lines run together, the
+  Crossing's 24 columns on a 15° rhythm, and the wall's arches every 9 m.
 - **The Deck is the middle level** between the street (0) and the Spine
-  (+12 m). From the street to the Deck: the ramp towers, the glass lifts and
-  the escalating ramps on the squares and in the park. From the Deck to the
-  Spine's platforms: a pair of escalating ramps under each platform,
-  rising through the platform floor. The Meridian Line's stations, 26 m up,
-  are reached by lifts and ramp cores in the arch, the Crossing and the West
-  Gate's station.
+  (+12 m), as above.
 - **Where no rail goes:** the narrow lanes. Both lines keep to main streets
   and squares; the Meridian keeps 3 m clear of Old Moy's tower houses on
   West Street.
@@ -1161,20 +1215,31 @@ The park is the city's common ground: about 130 × 100 m at the centre of
 Moy, ringed by the Park Ring, with the Deck running round it at +6.5 m.
 
 **Revised 2026-10-16 (user): a shared park.** Its centre, where the two cross
-walks meet and the two train lines cross, is now **the Crossing**: a civic
-structure and modern station under a shading lattice dome 42 m across and 38
-m high, after **Kanazawa Station's Motenashi Dome** (a glass-and-steel
-"welcome" dome that shelters arrivals). The Spine Line passes through it at
-+12 m and the Meridian Line at +26 m; the Deck's Spine walk runs through it
-at +6.5 m as its mezzanine; escalating ramps rise to the mezzanine from the
-cross walk on the east and the west, and lifts and a ramp core rise to the
-Meridian's platforms. The concourse at the park's level is open on all four
-walks: shade, water fountains, kiosks, a lost-and-found and the city's
-information desk. Data: `CROSSING`, checked against the gardens, the pond,
-the playground and the wind trees. The giant playground moved whole to the
-south-east quarter (7b), beside a smaller green and the park lodge; the dry
-garden and the pond drew back a little from the dome, and the four wind
-trees now stand round the Crossing. In a
+walks meet and the two train lines cross, is **the Crossing**, the city's
+civic structure and station. **Revised 2026-10-17 (user): open air.** The
+lattice dome first proposed blocked the view across the park, so the Crossing
+is now an open ring, after **Sou Fujimoto's Grand Ring at Expo 2025 Osaka**
+(a ring of timber frames you walk on and under, open to the sky in the
+middle):
+- **Two rings of slender steel columns**, 14 and 20 m from the centre, 24
+  in each ring on a 15° rhythm, so the park reads straight through it.
+- **The ring concourse** between them at the Deck's level (+6.5 m), joined
+  to the Deck's Spine walk and reached by 12° escalating ramps from the
+  park's east and west cross walk: shade, water fountains, kiosks, the
+  lost-and-found and the city's information desk.
+- **A halo** of pale timber louvres at +17 m, 12 to 22 m from the centre,
+  shading the ring and the Spine's platforms; its middle is open, so from
+  the lawn you look straight up at the sky and the high line crossing.
+- **The Spine** passes through at +12 m, its platforms under the halo, the
+  escalating ramps under them rising from the concourse; **the high line**
+  crosses at +36 m, and its two nearest tree piers rise through the ring.
+- **Two glass cores** (lifts and switchback escalating ramps), north-east
+  and south-west of the ring, join the lawn, the ring, the Spine and the
+  high line (section 6c).
+Data: `CROSSING`, checked against the gardens, the pond, the playground and
+the wind trees. The giant playground moved whole to the south-east quarter
+(7b), beside a smaller green and the park lodge; the dry garden and the pond
+drew back a little from the ring, and the four wind trees stand round it. In a
 desert it has to earn every drop of water, so most of it is shade and dry
 garden, and the one green lawn and the one pond each have a job.
 
@@ -1627,7 +1692,7 @@ Square (section 6, the Deck).
 |---|---|---|---|---|
 | 9 | Tea house | 14 × 12 m | 1 storey; flat above and keeper's room behind | Old Fu (keeper); Kenji Mori (above) |
 | 10 | Park lodge | 10 × 8 m, beside the green | 1 storey | Orin Pike (park keeper) |
-| — | The Crossing | dome 42 m across, 38 m high, at the park's centre (7a) | the city's station where the two lines cross, and its shelter | — |
+| — | The Crossing | an open ring 40 m across, concourse at +6.5 m, halo at +17 m, at the park's centre (7a) | the city's station where the two lines cross, and its shelter | — |
 | 11 | Giant playground | about 31 m across, the park's south-east quarter (7b) | climbing towers 12–20 m | Lily, Kofi |
 
 **Downtown**
@@ -1636,7 +1701,8 @@ Square (section 6, the Deck).
 |---|---|---|---|---|
 | 1 | Grand Hotel | 52 × 60 m | atrium block of 12 levels (44 m) round its void; cylinder guest tower of 28 levels (96 m) with the revolving drum to 108 m (section 8) | Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work |
 | 2 | City hall | 34 × 60 m | exterior only: portico, balcony, side wings, and the Timekeeper standing over it (8a.0), at the head of Civic Plaza (section 8a) | Mayor Teodora Vance, Kenji Mori (clerk) |
-| — | The Meridian Arch | two legs 18 × 16 m in Meridian Court, 72 m high (8b) | city offices; the Meridian Line's east station; the Wall Watch's command room | — |
+| — | The Meridian Arch (the East Gate) | two legs 22 × 18 m straddling the wall, 72 m high (8b) | the East Gate's station on three levels; city offices; the Wall Watch's command room | — |
+| — | The West Gate | two towers 22 × 16 m straddling the wall, 44 m high (8b) | the West Gate's station: the Wall Line and the high line's west station | — |
 | 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, twisting, with three wind gaps (7c) | the Windworks (headquarters, observation deck) |
 | 13 | BLOCK tower | 40 × 40 m | about 45 storeys, 180 m, a windowless dark shaft (7c) | BLOCK's headquarters; Dr. Vera Kask (director, top floors) |
 | 14 | North tower | 40 × 40 m | about 45 storeys, 175 m, plug-in capsule offices (7c) | start-up floors (Theo Park) |
@@ -2132,36 +2198,32 @@ still land on and swing from, with no interiors behind them.
 
 City hall's clock tower is replaced by a giant timekeeping structure standing
 over the hall, which the Meridian Line passes straight through. Data:
-`TIMEKEEPER` in `tools/city_layout.py`, checked against the line.
-- **Form:** a ring 38 m across in the north–south plane, over the middle of
-  the hall (3 m thick, centre 29 m up), facing the plaza and the park on
-  one side and Meridian Court and the arch on the other. Its lower part
-  turns in a slot cut through the roof, so from the plaza the ring seems to
-  rise out of the building like a sun from the horizon.
-- **No hands from the centre:** the centre is an empty opening 16 m across,
-  and the Meridian Line runs through it at +26 m with room on every side.
-  Time is read from rings instead, each turning past a fixed **index** at
-  the top (a lit triangle), after the ring clocks whose numbers turn past a
-  pointer, and Prague's astronomical clock, whose dial paints day and night.
+`TIMEKEEPER` in `tools/city_layout.py`, checked against the line and the
+roof. **Revised 2026-10-17 (user):** a full circle, not dipping into the
+roof, and a plain twelve-hour clock (the game's day ring is dropped: it
+would not read).
+- **Form:** a full ring 27 m across in the north–south plane, over the
+  middle of the hall (3 m thick, centre 37.5 m up), its bottom 2 m clear of
+  the 22 m roof. It stands in a **bronze cradle**: two pylons rise from the
+  roof 15 m either side of the centre and grip the bezel at its sides,
+  after the cradles of great bells and observatory telescopes. It faces the
+  plaza and the park on one side and Meridian Court and the arch on the
+  other.
+- **No hands from the centre:** the centre is an empty opening 12 m across,
+  and the high line runs through it at +36 m. Time is read from rings
+  instead, each turning past a fixed **index** at the top (a lit triangle),
+  after the ring clocks whose numbers turn past a pointer.
 - **The rings, from the centre out:**
-  - the **day ring** (8 to 11 m): the game's own day painted on it, gold for
-    day (5:00 to 20:00), rose for dawn and dusk, indigo for night. It turns
-    once a game day (24 real minutes), so the hour under the index is the
-    game's hour, and anyone can see how long until dark;
-  - the **minute ring** (11 to 13.5 m) and the **hour ring** (13.5 to 16.5
-    m): each carries one lit marker and keeps **real-world time** (user),
-    the minute ring turning once a real hour, the hour ring twice a real
-    day, clockwise as seen from the plaza;
-  - the fixed **bezel** (16.5 to 19 m): twelve hour marks, the index, and
-    rungs on its frame.
-- **Open:** whether the hour and minute rings keep real-world time (as
-  asked) or the game's time like the day ring. Real time and the game's
-  sun run at different speeds (a game day lasts 24 real minutes), so the
-  rings will rarely agree with the light; the day ring is what matches it.
-- **Material:** pale enamelled steel rings on a bronze frame; the markers
-  and index lit, the day ring's colours lit softly from within at night.
-- **Sound:** the old tower's bell is kept, hung in the bezel's frame at the
-  top, striking the real hours.
+  - the **minute ring** (6 to 9 m) and the **hour ring** (9 to 12 m): each
+    carries one lit marker and keeps **real-world time** (user), the minute
+    ring turning once an hour, the hour ring twice a day, clockwise as seen
+    from the plaza;
+  - the fixed **bezel** (12 to 13.5 m): twelve hour marks, the index, and
+    rungs on its frame (a swing anchor at its top, 51 m).
+- **Material:** pale enamelled steel rings in the bronze cradle; the markers
+  and index lit at night.
+- **Sound:** the old tower's bell is kept, hung in the cradle at the top of
+  the north pylon, striking the real hours.
 
 ### 8a.1 People and purposes
 
@@ -2255,7 +2317,7 @@ Interlocking horizontal masses with one vertical, after Dudok:
 | **The side ranges** | north and south, 15 m of front each, the full depth less the east range | +14 m | two long low wings with window bands, stepping down either side of the front |
 | **The clerestory** | the hall, 16 × 30 m, behind the front block | +16.5 m | a long louvred lantern seen over the side ranges from Meridian North and South |
 | **The east range** | the full 60 m on Clock Street, 8 m deep | +18 m | the back wall, plain, facing Meridian Court |
-| **The Timekeeper** | a ring 38 m across over the middle of the hall, in the north–south plane | its top at +48 m | the one vertical (8a.0): seen over the front block from the plaza, framed by the Meridian Arch from the east |
+| **The Timekeeper** | a full ring 27 m across over the middle of the hall, in the north–south plane, in a bronze cradle | its top at +51 m | the one vertical (8a.0): seen over the front block from the plaza, framed by the Meridian Arch from the east |
 
 From the plaza the composition steps: the wings at 14 m, the front block at
 22 m, the Timekeeper rising behind it to 48 m.
@@ -2347,7 +2409,7 @@ lit markers are decorative on solid backing. The doors are part of the solid wal
   steps); Kenji crosses the plaza to the tea house at noon; on council
   evenings the plaza fills to hear the meeting from the balcony.
 
-## 8b. The Meridian Arch and Meridian Court (proposed 2026-10-16, at the user's direction)
+## 8b. The Meridian Arch (the East Gate), the West Gate and Meridian Court (proposed 2026-10-16, revised 2026-10-17, at the user's direction)
 
 **Why.** The mid-rise blocks between city hall's back and the East Gate hid
 city hall from the east, the way most people first see the city. They are
@@ -2362,23 +2424,37 @@ either side of Meridian Avenue, takes their place, and over it stands the
 - **The Gateway Arch, St. Louis:** an arch that frames a city's view and is a
   gate to it.
 
+**Revised 2026-10-17 (user): larger and grander, and the arch is the East
+Gate.** The station is a civic amenity, so the arch takes the gate, the Wall
+Line's station and the high line's terminus into one building.
+
 **Form** (data: `ARCH`, checked):
-- **Two legs** in Meridian Court, each 18 by 16 m, north and south of the
-  avenue, 72 m high, clad in a diagrid of pale ceramic-clad steel over glass
-  (Moy's tile in the CCTV's structural pattern).
-- **The lower bridge** between them at +22 to +32 m: the **Meridian Line's
-  east station**, the line running straight into it at +26 m. Its platforms
-  look west through the Timekeeper.
+- **Two legs** straddling the wall either side of Meridian Avenue, each 22
+  by 18 m, 72 m high, clad in a diagrid of pale ceramic-clad steel over
+  glass (Moy's tile in the CCTV's structural pattern). The avenue passes
+  between them through a **24 m opening**, the grandest gate in the city.
+- **Three levels of station:** a glazed **station hall** at the foot of each
+  leg opening on Meridian Court; the **Wall Line's East Gate station** at
+  +12 m, its tracks running through the legs and over the opening; and the
+  **high line's east terminus** on the **lower bridge** (+32 to +42 m),
+  directly above it and at right angles, its platforms looking west through
+  the Timekeeper. Each leg holds a core of two lifts and switchback 30°
+  escalating ramps through every level (section 6c).
 - **The top bridge** at +58 to +72 m across both legs, **cantilevered 12 m
   west** toward city hall: the **Wall Watch's command room**, looking east
   over the wall and the desert and west down the city's whole axis to the
-  library. The loop of legs and bridges reads, from the East Gate, as one
+  library. From the desert road the loop of legs and bridges reads as one
   frame round the Timekeeper.
-- **A bridge at +12 m** from the south leg to the East Gate's gatehouse joins
-  the Meridian Line's station to the Wall Line's.
 - **City-owned:** the legs hold the city's offices (planning, works, water,
-  the Housing Board's downtown desk), the business city hall's ceremonial
-  rooms do not do.
+  the Housing Board's downtown desk) above the station.
+
+**The West Gate** (data: `WEST_GATE`, checked) is the arch's plainer
+partner: two towers 22 by 16 m, 44 m high, straddling the wall either side
+of West Street, the Wall Line running through them at +12 m and the high
+line's west station on a glazed bridge between them at +32 to +42 m, with a
+siding for its trains beyond the wall's line. A core in each tower joins the
+street hall, the Wall Line and the high line. The bands of the towers repeat
+every 6 m, the Wall Line's and the high line's levels among them.
 
 **Meridian Court:** pale paving under the arch, the avenue running through
 it, rows of date palms along its north and south edges, benches facing city
@@ -2666,6 +2742,11 @@ lit crowns.
 - (2026-10-14) the Deck's route (section 6): the Park Deck ring, the civic,
   library, estate and market walks, two skybridges, six ramp towers and two
   glass lifts; travelators dropped;
+- (2026-10-17) the Meridian raised to **+36 m**; the **Timekeeper** a full
+  twelve-hour circle in a bronze cradle; the **arch as the East Gate** and
+  **the West Gate's towers**, each an integrated station; **the Crossing**
+  an open ring; station cores, and the rhythm of the lines' supports
+  (6c, 7a, 8a.0, 8b);
 - (2026-10-16) **two straight lines** (the Spine at +12, the Meridian at
   +26), **the Timekeeper** over city hall (8a.0), **Meridian Court and the
   Meridian Arch** (8b), **the Crossing** at the park's centre and the
