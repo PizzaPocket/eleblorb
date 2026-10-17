@@ -1139,7 +1139,12 @@ TIMEKEEPER=dict(x=-414.0,z=0.0,y=37.5,thick=3.0,roof=22.0,
   rings=[('minute',6.0,9.0,'turns once an hour; one lit marker'),
          ('hour',9.0,12.0,'turns twice a day; one larger lit marker'),
          ('bezel',12.0,13.5,'fixed; twelve hour marks and the index at the top')],
-  cradle=dict(z=15.0,w=2.0,material='bronze',note='two pylons from the roof hold the bezel at its sides'))
+  cradle=dict(z=15.0,w=2.0,material='bronze',note='two pylons from the roof hold the bezel at its sides'),
+  # the lit markers: an arc across each moving ring's band, standing proud of both faces so the time reads from the plaza
+  # and from Meridian Court; the hour's is wide, the minute's slim; a lit bead runs round the bezel's rim once a minute
+  markers=dict(hour=dict(arc=24.0,proud=0.4),minute=dict(arc=7.0,proud=0.4)),
+  seconds=dict(r=14.1,bead=0.6,note='runs round the bezel\'s rim once a minute, through the cradle\'s grips'),
+  marks=dict(hour=dict(w=0.5),quarter=dict(w=1.2),proud=0.25))
 ## The Meridian Arch is the East Gate (city.md 8b, revised 2026-10-16): a loop
 ## after Beijing's CCTV headquarters whose two legs straddle the wall at the gate.
 ## Meridian Avenue passes under it through a 24 m opening; the Wall Line runs
@@ -1324,6 +1329,9 @@ def _cross_checks():
     ch=[b_ for b_ in named if b_['n']==2][0]['r']
     if not (ch[0]<T['x']<ch[2] and ch[1]<T['z']-T['cradle']['z']-T['cradle']['w'] and T['z']+T['cradle']['z']+T['cradle']['w']<ch[3]): problems.append(('cross: the Timekeeper\'s cradle does not stand on city hall',))
     if T['cradle']['z']<R1+0.5: problems.append(('cross: the cradle fouls the rings',))
+    sb=T['seconds']
+    if sb['r']-sb['bead']<R1-0.01 or sb['r']+sb['bead']>T['cradle']['z']: problems.append(('cross: the seconds bead leaves the bezel\'s rim',))
+    if max(m['arc'] for m in T['markers'].values())>=30.0: problems.append(('cross: a Timekeeper marker spans an hour mark',))
     if me['rail']-X['depth']-HEIGHTS[2]<2.0: problems.append(('cross: the Meridian Line too low over city hall\'s roof',))
     # the high line's piers: in the street or a square, never on a building, the Spine or a station; spans to rhythm
     ml=LineString(me['pts']); pz=me['pts'][0][1]; xs=sorted(me['piers'])
@@ -1530,6 +1538,88 @@ def _timetable():
     TT['waits']=waits
     if max(L_['trains'] for L_ in lines.values())>6: problems.append(('timetable: more trains than a small city runs on one line',))
 _timetable()
+## The launch site (city.md 12, proposed 2026-10-17 at the user's direction): the
+## way to the Space Kingdom. The ASAN launch vehicle (the spacecraft of the Demo
+## World, scripts/demo_spaceship.gd) stands on a pad in the open desert north-east
+## of Moy, between the Ice plateau and the main plateau's cliff, far enough from
+## the wall, the turbines and the Ice plateau's slope for a launch. It is not part
+## of the city: it keeps its own security, like the works outside the wall.
+## How it stands up: it is built lying down, as in the Demo World, in the
+## horizontal integration hangar, rolled out on a strongback along the erector
+## rails and raised through 90 degrees about a hinge at the launch mount (after
+## the Falcon 9's transporter-erector and the Soyuz's rail erector); in the game,
+## the same ship node under a parent turned -90 degrees about its own X axis, so
+## its nose (+Z) points up and its doorway (+X) faces the launch tower.
+## Its boosters are strap-ons that separate in flight and fly back to land on the
+## two landing zones (after the Falcon Heavy's side boosters), so the concept reads
+## on the ground: folded landing legs and grid fins on the boosters, empty landing
+## pads before a launch, boosters standing on them after.
+## World (x, z) in metres; heights above the desert floor (the basin datum).
+## ship: the Demo World ship's parts (half-extents along its own X, Y, Z, from
+## demo_spaceship.gd) for the drawings; the stack's heights are derived.
+LAUNCH_SITE=dict(
+  name='the ASAN launch complex',pad=(-250.0,-580.0),
+  mount=dict(half=(15.0,15.0),deck=8.0,trench=dict(to=(-250.0,-660.0),w=14.0,note='the flame trench under the mount runs north, away from the tower, the hangar and Moy')),
+  ship=dict(core=(11.0,11.0,35.0),cockpit=dict(c=(0,-1.3,43.0),half=(11.0,4.8,7.5)),
+            boosters=[dict(c=(-6.0,sd*12.0,-6.0),half=(4.6,4.6,24.0),nose=dict(c=(-6.0,sd*12.0,20.0),half=(4.0,4.0,6.0)),bell=dict(c=(-6.0,sd*12.0,-32.0),half=(3.6,3.6,3.4))) for sd in (-1,1)],
+            bells=[dict(c=(bx,by,-38.0),half=(3.2,3.2,4.0)) for bx in (-4.2,4.2) for by in (-4.2,4.2)],
+            skirt=dict(c=(0,0,-34.0),half=(11.3,11.3,3.0)),door=dict(z=-6.0,up=-1.0,half=(6.5,5.0)),clearance=2.0),
+  # the launch tower on the doorway's side, its crew access arm swinging out to the door; a lift inside
+  tower=dict(half=(6.0,6.0),height=118.0,mast=12.0,gap=12.0,arm=dict(w=3.0),lift=True),
+  # the horizontal integration hangar and the erector rails out to the mount (the strongback rolls the ship out lying down)
+  hangar=dict(c=(-250.0,-380.0),half=(22.0,50.0),height=34.0,door='north'),
+  rails=dict(gauge=12.0),
+  blockhouse=dict(c=(-205.0,-430.0),half=(12.0,8.0),height=6.0,note='the firing room behind an earth blast bank, its windows facing the pad'),
+  landing_zones=[dict(name='LZ-1',c=(-150.0,-720.0),r=25.0),dict(name='LZ-2',c=(-345.0,-705.0),r=25.0)],
+  fence=dict(pts=[(-300,-320),(-180,-320),(-110,-780),(-390,-780),(-395,-700),(-290,-600),(-285,-480),(-300,-320)],gate=(-200,-320),note='its own security, like the works'),
+  track=dict(pts=[(-560,-215),(-560,-260),(-420,-310),(-200,-320)],w=8.0,note='an unpaved service track from the North Gate to the site\'s gate'),
+  clear=dict(wall=300.0,turbines=220.0,plateau_slope=50.0,world_edge=120.0,village=300.0,pads=150.0),
+  boarding=dict(sequence=['the service track from the North Gate to the site gate','the gate (its condition: open)','the tower lift to the crew access arm','the doorway: boarding is a seated launch, the cabin deck being vertical on the pad','the countdown and ignition (the four core bells and both boosters)','lift-off and the roll','booster separation; the boosters relight, fly back and land on LZ-1 and LZ-2','core flight; fade to the Space Kingdom, where the ship flies level, as in the Demo World, without its boosters'],
+    conditions='open (city.md 12; the owner to decide)'),
+)
+def _launch_checks():
+    from shapely.geometry import Point, Polygon, LineString, box as sbox
+    L=LAUNCH_SITE; S=L['ship']; px,pz=L['pad']; P=Point(L['pad'])
+    # the stack's heights: the core's bells clear the mount deck; the ship's origin, nose, door and booster bells follow
+    bell_bottom=min(b['c'][2]-b['half'][2] for b in S['bells'])
+    origin=L['mount']['deck']+S['clearance']-bell_bottom
+    nose=origin+S['cockpit']['c'][2]+S['cockpit']['half'][2]
+    door=origin+S['door']['z']
+    bb=min(b['bell']['c'][2]-b['bell']['half'][2] for b in S['boosters'])+origin
+    L['stack']=dict(origin=round(origin,2),nose=round(nose,2),door=round(door,2),booster_bells=round(bb,2),rotation='-90 degrees about the ship\'s X axis: nose up, doorway toward the tower (+x)')
+    if bb<L['mount']['deck']+1.0: problems.append(('launch: a booster bell below the mount deck',bb))
+    if L['tower']['height']<nose+6: problems.append(('launch: the tower shorter than the stack',L['tower']['height'],nose))
+    # the tower stands on the doorway's side (+x), its arm reaching the door
+    tx=px+S['core'][0]+L['tower']['gap']+L['tower']['half'][0]; L['tower']['c']=(round(tx,2),pz)
+    if L['tower']['gap']<6 or L['tower']['gap']>16: problems.append(('launch: the crew arm\'s span',L['tower']['gap']))
+    # clearances: the wall, the turbines, the plateaus' slopes, the world's edge, the Chinese village; the landing zones from the pad
+    C=L['clear']
+    if math.hypot(px-CX,pz)-(WALL['r']+WALL['thick']/2)<C['wall']: problems.append(('launch: too near the wall',))
+    for t in TURBINES:
+        if math.hypot(px-t[0],pz-t[1])<C['turbines']: problems.append(('launch: too near a turbine',t))
+    for nm,c,r in (('main plateau',(0,0),245+20),('Ice plateau',(-450,-480),72+13+68),('Jungle plateau',(-500,464),70+14+70)):
+        for q in [L['pad'],L['hangar']['c']]+[z_['c'] for z_ in L['landing_zones']]:
+            if math.hypot(q[0]-c[0],q[1]-c[1])<r+C['plateau_slope']: problems.append(('launch: on or near the %s\'s slope'%nm,q))
+        # the fence keeps off the slope itself
+        if Polygon(L['fence']['pts']).exterior.distance(Point(c))<r+10 or Polygon(L['fence']['pts']).contains(Point(c)): problems.append(('launch: the fence on the %s\'s slope'%nm,))
+    for q in [L['pad']]+[z_['c'] for z_ in L['landing_zones']]:
+        if math.hypot(*q)>910-C['world_edge']: problems.append(('launch: too near the world\'s edge',q))
+    if math.hypot(px-250,pz+650)<C['village']: problems.append(('launch: too near the Chinese village',))
+    for z_ in L['landing_zones']:
+        if math.hypot(z_['c'][0]-px,z_['c'][1]-pz)<C['pads']: problems.append(('launch: a landing zone too near the pad',z_['name']))
+    # everything inside the fence; the rails run straight from the hangar door to the mount
+    fence=Polygon(L['fence']['pts'])
+    hg=L['hangar']; hb=sbox(hg['c'][0]-hg['half'][0],hg['c'][1]-hg['half'][1],hg['c'][0]+hg['half'][0],hg['c'][1]+hg['half'][1])
+    for nm,g in (('pad',P.buffer(max(L['mount']['half']))),('hangar',hb),('tower',Point(L['tower']['c']).buffer(8)),('blockhouse',Point(L['blockhouse']['c']).buffer(12)))+tuple((z_['name'],Point(z_['c']).buffer(z_['r'])) for z_ in L['landing_zones']):
+        if not fence.contains(g): problems.append(('launch: outside the fence',nm))
+    if abs(hg['c'][0]-px)>0.01: problems.append(('launch: the erector rails do not run straight to the mount',))
+    L['rails']['pts']=[(px,hg['c'][1]-hg['half'][1]),(px,pz+L['mount']['half'][1])]
+    # the blockhouse stands back from the pad behind its bank, nearer than the hangar is not required, but not under the stack's fall
+    if P.distance(Point(L['blockhouse']['c']))<nose*1.2: problems.append(('launch: the firing room within the stack\'s fall',))
+    if P.distance(hb)<nose*1.2: problems.append(('launch: the hangar within the stack\'s fall',))
+    tr=LineString(L['track']['pts'])
+    if tr.distance(Point(L['fence']['gate']))>0.5: problems.append(('launch: the track misses the gate',))
+_launch_checks()
 if '--wall' in sys.argv:
     print(WALL['length'],WALL['min_radius'],WALL['station_gaps']); [print(st) for st in WALL['stations']]
 ## Old Moy's tower houses (docs/architecture/moy_tower_house.md). Every Old
@@ -1962,6 +2052,8 @@ w("## Platforms, escalators and the timetable (city.md 6f, 6g).")
 w("const PLATFORMS := %s" % lit(PLATFORMS))
 w("const ESCALATORS := %s" % lit(ESCALATORS))
 w("const TIMETABLE := %s" % lit(TIMETABLE))
+w("## The launch site outside the city (city.md 12): the way to the Space Kingdom.")
+w("const LAUNCH_SITE := %s" % lit(LAUNCH_SITE))
 w("## The park (city.md 7a): its gardens, pond, lawn, playground, wind trees and walks.")
 w("const PARK := %s" % lit(PARK))
 w("## The Grand Hotel (city.md 8): its atrium block, tower, drum, lifts and skybridge.")
@@ -1997,5 +2089,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

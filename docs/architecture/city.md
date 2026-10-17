@@ -2515,6 +2515,13 @@ would not read).
     from the plaza;
   - the fixed **bezel** (12 to 13.5 m): twelve hour marks, the index, and
     rungs on its frame (a swing anchor at its top, 51 m).
+- **Reading it (2026-10-17):** each moving ring's marker is a lit arc
+  across the ring's band, standing proud of both faces: the hour's 24° wide,
+  the minute's 7°, both crimson. The bezel's twelve dark marks run across its
+  whole band, the quarters wider. A lit **seconds bead** runs round the
+  bezel's rim once a minute, through the cradle's grips (`TIMEKEEPER.markers`,
+  `seconds`, `marks`). The city model's Timekeeper runs on the viewer's own
+  clock.
 - **Material:** pale enamelled steel rings in the bronze cradle; the markers
   and index lit at night.
 - **Sound:** the old tower's bell is kept, hung in the cradle at the top of
@@ -3104,3 +3111,114 @@ lit crowns.
 - the Windspire's height against the far skyline's draw distance;
 - the turbines' draw cost: four animated rotors seen from across the
   world (proposed: one shared mesh, instanced, rotors as cheap far LODs).
+- what lets the hero board the ship at the launch site and launch it
+  (section 12).
+
+## 12. The launch site: the way to the Space Kingdom (proposed 2026-10-17, at the user's direction)
+
+The Space Kingdom is on the roadmap. Unlike the other kingdoms it has no
+gate: the hero goes by rocket. Its entry point is a launch complex in the
+open desert outside Moy, where the ship from the Demo World (the **ASAN
+launch vehicle**, `scripts/demo_spaceship.gd`) stands upright, ready to fly.
+This first step only places and plans the site; nothing is built in the game
+yet. Data: `LAUNCH_SITE` in `tools/city_layout.py` (exported to
+`scripts/city_plan.gd`); drawings: the plan's *The launch site* (site plan and
+section) and the city model's *The launch site* view.
+
+### 12.1 Where
+
+North-east of the city, centred on the mount at **(−250, −580)**: about 440 m
+beyond the wall, on the desert floor between the Ice plateau and the main
+plateau's cliff, with the service track running out from the **North Gate**.
+The plan tool checks that the site keeps 300 m from the wall, 220 m from every
+turbine, 50 m off every plateau's slope (the fence itself stays off them), 120
+m inside the world's edge and 300 m from the Chinese village, that the landing
+zones stand 150 m from the mount, that everything sits inside the fence, and
+that the hangar and the firing room stand further from the mount than 1.2
+times the stack's height (the fall zone).
+
+| Part | Where | Size |
+|---|---|---|
+| Launch mount | (−250, −580) | 30 × 30 m, deck +8 m; the flame trench runs north 80 m, away from the tower, the hangar and Moy |
+| Launch tower | (−221, −580), on the doorway's (east) side | 12 × 12 m open steel frame, 118 m, a 12 m lightning mast; glass lift; crew arm at +46 m |
+| Hangar | (−250, −380), doors north | 44 × 100 m, 34 m tall (vaulted roof) |
+| Erector rails | from the hangar door to the mount, x −250 | gauge 12 m, 135 m long |
+| Firing room | (−205, −430) | 24 × 16 m, 6 m, behind an earth blast bank, its windows on the pad |
+| LZ-1, LZ-2 | (−150, −720), (−345, −705) | 25 m radius each |
+| Fence and gate | round all of it; the gate at (−200, −320) | |
+| Service track | North Gate → site gate | 8 m, unpaved |
+
+### 12.2 Standing the ship up
+
+The Demo World's ship lies along its own Z axis, nose +Z, doorway +X, with
+its two booster-like pods along its flanks and four engine bells at the tail.
+Its exterior parts are SuperEggs (exponent 3) with box colliders.
+
+- **The rotation.** The upright ship is the same scene under a parent rotated
+  **−90° about its X axis**: local +Z (the nose) becomes up, +X (the doorway)
+  stays facing the tower, local Y becomes world −Z. Nothing in the ship is
+  re-authored; the parent node carries the turn. Its origin sits at **+52 m**
+  (the mount's deck, +8, plus 2 m of clearance below the engine bells, whose
+  bottoms are 42 m behind the origin); the nose stands at **+102.5 m**, the
+  doorway at **+46 m**, the booster bells at +16.6 m. The tower (118 m) is
+  checked to stand at least 6 m above the nose.
+- **How it got there (told by the site, not by text).** After the Falcon 9's
+  transporter-erector and the Soyuz's rail erector: the ship is built lying
+  down in the hangar, rolled out on a **strongback** along the erector rails,
+  and raised a quarter-turn about a **hinge at the mount**; the strongback
+  then lowers back onto its rails. The lowered strongback, its saddles and the
+  rails stay in view, so a player who looks can read the story. A later pass
+  could animate the raise as a cutscene, as one rotation of the parent about
+  the hinge.
+- **Inside, on end.** The cabin's deck (`DECK_Y`) becomes a vertical wall when
+  the ship stands. Boarding is therefore a **seated launch**: the hero passes
+  through the doorway from the crew arm and is placed in a seat; the cabin is
+  not walked while upright. When the ship arrives in space it flies level
+  again, as it does in the Demo World, so its interior works as it already
+  does.
+
+### 12.3 Boosters, and showing the idea
+
+The two flank pods read as strap-on boosters. The design follows the Falcon
+Heavy: two side boosters that **separate in flight, relight, fly back and
+land upright** on the two landing zones. The concept is shown, never
+explained:
+
+- the boosters carry **folded grid fins** at their heads and **folded landing
+  legs** along their feet (in the model: the small fins and the dark strips);
+- the **landing zones** are visible, painted pads north of the mount, empty
+  before a launch;
+- **after a launch**, the two boosters stand on their pads, legs out,
+  scorched, and the mount is empty; a player who returns sees what happened;
+- the launch itself (if the camera follows it before the fade) shows the
+  separation as two bodies peeling away.
+
+The core keeps its four bells and goes on alone. Expendable boosters falling
+into the desert were considered and rejected: they leave nothing to show, and
+fly-back boosters give the site a visible before and after.
+
+### 12.4 Boarding and launch (planned, not built)
+
+1. The hero follows the track from the North Gate to the site's gate.
+2. **The condition.** Something must be true before the gate, the lift or the
+   doorway lets him through. **Open: the owner decides.** A natural candidate
+   is the Space Helm (a bound Space blorb lets him breathe in vacuum). Any
+   such condition is shown in the world (the doorway's seal stays shut, the
+   crew arm stays folded back), never stated in text.
+3. The tower's glass lift to the crew arm; across the arm to the doorway.
+4. Inside, the seated launch: the hero in a seat; the trigger to launch is
+   the cockpit's controls, as in the Demo World (proposed).
+5. Countdown, ignition (the four core bells and both boosters), lift-off, a
+   roll toward the east.
+6. Booster separation; the boosters relight and turn back.
+7. A fade, and the **next scene loads**: the Space Kingdom, where the ship
+   flies level without its boosters. Back at the site, the boosters now stand
+   on LZ-1 and LZ-2 and the mount is empty (until the ship returns: open).
+
+### 12.5 Open
+
+- the boarding condition and how the world shows it;
+- whether the raise is ever seen (a cutscene) or only implied;
+- who runs the site (ASAN's own crew, or Moy's), and whether anyone is there;
+- how the hero comes back, and whether the ship returns to the pad;
+- the Space Kingdom itself.
