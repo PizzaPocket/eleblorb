@@ -22,10 +22,10 @@ STREETS=[
  ('Park Ring','main',-637,50,-483,62),
  ('Park Ring','main',-637,-50,-625,50),
  ('Park Ring','main',-495,-50,-483,50),
- ('Meridian Avenue','main',-391,-6,-318,6),
+ ('Meridian Avenue','main',-359,-6,-318,6),
  ('Meridian North','avenue',-483,-38,-340,-30),
  ('Meridian South','avenue',-483,30,-340,38),
- ('Clock Street','lane',-397,-30,-391,30),
+ ('Meridian Walk','main',-483,-6,-431,6),('Hotel Passage','shop',-464,-30,-452,-6),
  ('West Street','main',-794,-6,-637,6),
  ('North Street','main',-566,-232,-554,-62),
  ('South Street','main',-566,62,-554,232),
@@ -45,17 +45,20 @@ STREETS=[
 OMITTED_STREETS=[dict(name='Cinema Lane',kind='lane',rect=[-734,-220,-730,-122],reason='entire source rectangle lies outside the 203 m Rim Walk clip; no replacement alignment authorized')]
 OPENS=[
  ('park',-625,-50,-495,50),
- ('Civic Plaza',-483,-30,-431,30),
+ ('Civic Plaza',-431,-30,-359,30),
  ('Library Square',-686,-30,-637,-6),
  ('Market Square',-590,122,-530,164),
  ('Estate Square',-554,-118,-516,-84),
- ('Meridian Court',-391,-30,-359,30),
-]
+ ]
 B=[]
 def b(n,name,r,kind,h,who=''): B.append(dict(n=n,name=name,r=r,kind=kind,h=h,who=who))
 NB=lambda: 'homes (no one the hero meets)'
 b(1,'Grand Hotel',(-483,-98,-431,-38),'civic','atrium block of 12 levels (44 m) round its void; cylinder guest tower of 28 levels (96 m), drum to 108 m (after John Portman)','Lucinda Wah (top-floor flat); Felix, Ah Keung, Iris at work')
-b(2,'City hall',(-431,-30,-397,30),'civic','exterior only: portico, balcony and side wings, with the Timekeeper standing over it, at the head of Civic Plaza (section 8a)','Mayor Teodora Vance, Kenji Mori (clerk)')
+## (2026-10-17, at the user's direction: city hall moved into the Meridian Arch, section 8b; its old site joined Meridian
+## Court as the new Civic Plaza, and the old Civic Plaza became two commercial blocks either side of Meridian Walk)
+b(54,'Meridian North block, west',(-483,-30,-464,-6),'tower','commercial, 12 storeys: shops and cafes on Meridian Walk, offices above',NB())
+b(55,'Meridian North block, east',(-452,-30,-431,-6),'tower','commercial, 12 storeys: shops and cafes on Meridian Walk, offices above; the Deck\'s hotel bridge passes beside it',NB())
+b(56,'Meridian South block',(-483,6,-431,30),'tower','commercial, 12 storeys: shops and cafes on Meridian Walk, offices above',NB())
 b(3,'Library',(-686,-92,-641,-30),'civic','art deco limestone, renovated; the galleried Great Hall, 22 m, with a heritage room below (section 9)','Ada Fong, Nia Calder, Benji Okoro')
 b(4,'Natural history museum',(-637,62,-575,100),'civic','3 storeys, top-lit hall','Dr. Imani Osei (curator)')
 b(5,'Moonlight Cinema',(-730,6,-700,34),'civic','2 storeys, built later into the old town; flat above','Leon Duarte (lives above)')
@@ -354,15 +357,15 @@ RESIDENT_HOMES={
 ## Heights (m, to the main roof) and crowns of the numbered buildings, and
 ## the plan forms of the towers (city.md 7c, 8): one source for the plan, the
 ## skyline and the elevations.
-HEIGHTS={1:96,2:22,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:150,14:175,15:150,16:22,
+HEIGHTS={1:96,54:45,55:45,56:45,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:150,14:175,15:150,16:22,
  17:91,18:104,19:117,20:130,21:130,22:46,23:6,24:11,25:17,26:20,27:29,28:26,29:20,30:20,31:20,
  32:23,33:9,34:26,35:72,36:42,37:17,38:7,39:6,49:52,50:110,51:8,52:23,53:78,40:8,41:4,42:6,43:35,44:3}
 CROWNS={1:108,3:26,12:280}
 ## Plan forms: twist (a rounded triangle turning as it rises), screen (round-
 ## cornered square in a screen), capsule (core with plug-in capsules), dune
 ## (rippling balconies), atrium (the Grand Hotel: an atrium block with a
-## cylinder tower, whose rect is TOWER_PART; see HOTEL), clock (city hall).
-FORMS={12:'twist',13:'monolith',14:'capsule',15:'dune',1:'atrium',2:'hall'}
+## cylinder tower, whose rect is TOWER_PART; see HOTEL).
+FORMS={12:'twist',13:'monolith',14:'capsule',15:'dune',1:'atrium'}
 ## Sub-footprints that rise above their building's podium: the hotel's guest
 ## tower (the square round its cylinder) and city hall's clock tower.
 TOWER_PART={1:(-471,-98,-443,-70)}
@@ -687,11 +690,12 @@ DECK={
  'runs':[
   # the ring, over the park side of the Park Ring: a 6 m arcade below it, 6 m open street outside it
   dict(name='Park Deck',kind='ring',w=6,pts=[(-628,-53),(-492,-53),(-492,53),(-628,53),(-628,-53)]),
-  # the civic walks along Civic Plaza's north and south edges, to city hall's canopies
-  dict(name='Civic walk north',kind='walk',w=6,pts=[(-489,-27),(-431,-27)]),
-  dict(name='Civic walk south',kind='walk',w=6,pts=[(-489,27),(-431,27)]),
-  # the skybridges: the hotel's (HOTEL['skybridge']) and the glass tower's, each across its street
-  dict(name='Hotel skybridge',kind='bridge',w=6,pts=[(-457,-30),(-457,-38)]),
+  # the civic walk (revised 2026-10-17): along the north side of Meridian Walk, under the high line, from the Park Deck to
+  # the new Civic Plaza in front of City Hall (the arch); the hotel bridge leaves it north over Hotel Passage and
+  # Meridian North to the Grand Hotel's mezzanine
+  dict(name='Civic walk',kind='walk',w=4,pts=[(-489,-4),(-431,-4)]),
+  dict(name='Hotel walk',kind='walk',w=6,pts=[(-461,-4),(-461,-30)]),
+  dict(name='Hotel skybridge',kind='bridge',w=6,pts=[(-461,-30),(-461,-38)]),
   # to the library's east-wing door, over Garden Walk's mouth
   dict(name='Library walk',kind='walk',w=6,pts=[(-631,-27),(-648,-27)]),
   # under the Spine Line from the Park Deck's north and south sides, across the Crossing Ring, to the Crossing's
@@ -711,9 +715,7 @@ DECK={
  ],
  # where the Deck meets a building at +6.5 m: (building, point on its face, what is there)
  'doors':[
-  (1,(-457,-38),'the hotel\'s Deck door into the mezzanine gallery'),
-  (2,(-431,-27),'city hall\'s north canopy, along to the north door'),
-  (2,(-431,27),'city hall\'s south canopy'),
+  (1,(-461,-38),'the hotel\'s Deck door into the mezzanine gallery'),
   (3,(-645,-30),'the library\'s east-wing door to the first gallery'),
   (51,(-554,-120),'the neighbourhood centre\'s roof garden'),
   (33,(-530,125),'the wet market\'s upper hall'),
@@ -726,8 +728,6 @@ DECK={
   # over the park walk, and the Crossing's four towers take the park's people between the lawn and the Deck)
   dict(name='West gate',c=(-621,8),r=4,head='w',foot='n'),
   dict(name='East gate',c=(-499,-8),r=4,head='e',foot='s'),
-  dict(name='Civic north',c=(-457,-20),r=4,head='n',foot='s'),
-  dict(name='Civic south',c=(-457,20),r=4,head='s',foot='n'),
  ],
  # the Crossing's four towers are ways down from the ring and the cross-bridges (CROSSING['towers'])
  'spiral_ways':[(-547.0,-13.0),(-573.0,-13.0),(-547.0,13.0),(-573.0,13.0)],
@@ -744,8 +744,7 @@ DECK={
  # an up and a down side by side, 11.3 m long, set end-on into the Deck's edge). The park's two wing ramps to
  # the Crossing are gone: the Crossing's towers serve it.
  'escalators':[
-  dict(name='Civic Plaza north',foot=(-470,-12.7),head=(-470,-24)),
-  dict(name='Civic Plaza south',foot=(-446,12.7),head=(-446,24)),
+  dict(name='Civic Plaza',foot=(-419.7,-4),head=(-431,-4)),
   dict(name='Market Square',foot=(-545,139.3),head=(-545,128)),
   dict(name='Estate Square',foot=(-545.7,-104),head=(-557,-104)),
  ],
@@ -1181,6 +1180,21 @@ CROSSING=dict(c=(-560,0),deck=6.5,ring=(24.7,32.7),ring_depth=1.6,ring_max_span=
               towers='coral vine and bougainvillea up each tower\'s mesh from planters at every gallery',
               lawn='a rain garden of reeds and desert grasses round the towers\' feet, fed by the roof',
               roof='desert grasses on the roof\'s rim'),
+  # the clock (2026-10-17, at the user's direction, replacing the Timekeeper over the old city hall): a glass dome on the
+  # roof, its drum a superellipse in plan (the roof's shape, so its four sides are nearly flat) with a ring clock set
+  # flush in each side facing north, south, east and west, and a glass cupola above; a great bell hangs from the
+  # cupola's crown. Each clock is a ring clock like the Timekeeper: a hollow centre, the hour ring, the minute ring
+  # outside it and a fixed bezel, each moving ring carrying a lit arrow, minute ticks on the bezel, a seconds bead on its
+  # rim. It keeps the game's time, so the dial and the bell agree.
+  dome=dict(drum=dict(half=19.0,n=4.0,h=17.0),cupola=dict(h=11.0),ribs=24,glass='clear glass in a steel diagrid, lit from within at night',
+    clocks=dict(bearings=[0,90,180,270],centre=8.5,rings=[('hour',3.0,5.0),('minute',5.0,7.0),('bezel',7.0,8.0)],proud=0.3,
+      markers=dict(hour=dict(arc=22.0,shape='arrow'),minute=dict(arc=12.0,shape='arrow')),marks=dict(hour=0.35,quarter=0.8,minute=dict(w=0.12,len=0.4)),
+      seconds=dict(r=8.35,bead=0.35),time='game'),
+    bell=dict(mouth=4.4,height=4.6,crown_gap=1.0,material='bronze',
+      rings=[dict(at=5.0,name='the dawn bell',pattern='three strokes, three times, then nine (after the Angelus)'),
+             dict(at=12.0,name='the noon bell',pattern='twelve strokes'),
+             dict(at=19.5,name='the evening bell',pattern='three strokes, three times, then nine, half an hour before sunset (after the Angelus and the old curfew bell)')],
+      why='sunrise in the game is 5:00 and sunset 20:00 (day_night_cycle.gd); a bell every hour would ring every real minute')),
   towers=[],cores=[])
 def _crossing_layout():
     C=CROSSING; T=C['tower']; H=ESCALATORS['helix']; cx,cz=C['c']
@@ -1212,29 +1226,12 @@ def _crossing_layout():
                         [(round(cx+sn*27.5,1),round(cz+sd*3.6,1)) for sn in (-1,1) for sd in (-1,1)]
     C['_ring_r']=rm
 _crossing_layout()
-## The Timekeeper (city.md 8a, revised 2026-10-16): a full circle standing over
-## city hall in a bronze cradle, clear of the roof, the high line passing through
-## its empty centre. A twelve-hour ring clock: the hour ring and, outside it, the minute ring
-## turn past the fixed index at the top, each carrying one lit marker, and keep
-## real time; the fixed bezel carries the twelve hour marks.
-TIMEKEEPER=dict(x=-414.0,z=0.0,y=37.5,thick=3.0,roof=22.0,
-  rings=[('hour',6.0,9.0,'turns twice a day; one lit arrow'),
-         ('minute',9.0,12.0,'turns once an hour; one lit arrow, its point at the bezel\'s minute ticks'),
-         ('bezel',12.0,13.5,'fixed; twelve hour marks and the index at the top')],
-  cradle=dict(z=15.0,w=2.0,material='bronze',note='two pylons from the roof hold the bezel at its sides'),
-  # the lit markers are arrows (revised 2026-10-17, at the user's direction): each spans its ring's band, its base on
-  # the inner edge (arc: the base's width in degrees) and its point on the outer edge, so it points at an exact place
-  # on the dial. The minute ring is outside the hour ring, as a minute hand is longer, so the minute arrow's point
-  # touches the bezel's minute ticks; a lit bead runs round the bezel's rim once a minute
-  markers=dict(hour=dict(arc=20.0,proud=0.4,shape='arrow'),minute=dict(arc=10.0,proud=0.4,shape='arrow')),
-  seconds=dict(r=14.1,bead=0.6,note='runs round the bezel\'s rim once a minute, through the cradle\'s grips'),
-  marks=dict(hour=dict(w=0.5),quarter=dict(w=1.2),minute=dict(w=0.16,len=0.55),proud=0.25))
 ## The Meridian Arch is the East Gate (city.md 8b, revised 2026-10-16): a loop
 ## after Beijing's CCTV headquarters whose two legs straddle the wall at the gate.
 ## Meridian Avenue passes under it through a 24 m opening; the Wall Line runs
 ## through the legs at +12 m with its station between them; the high line ends on
 ## the lower bridge at +36 m, directly above, crossing the Wall Line at right
-## angles; the top bridge, cantilevered toward city hall, is the Wall Watch's
+## angles; the top bridge, cantilevered toward the city, holds the council chamber and the Wall Watch's
 ## command room. Revised 2026-10-17: on each leg's court face an open cascade
 ## of escalating ramps climbs the diagrid under glass canopies, after the
 ## Centre Pompidou's and Singapore's open-air station escalators, from the
@@ -1247,7 +1244,7 @@ ARCH=dict(legs=[(-363.5,-30,-341.5,-12),(-363.5,12,-341.5,30)],lower=(32.0,42.0)
   # the Wall Line's train hall: a void through both legs at +12 m (v: across the wall, outward positive, from the wall's
   # centreline; y: floor and ceiling), holding both tracks and the station's platform on the outer side
   train_hall=dict(v=(-9.0,5.5),y=(12.0,21.0)),
-  program='the station hall at the street, the Wall Line\'s station at +12 m, the high line\'s at +36 m, city offices in the legs, the Wall Watch\'s command room at the top',
+  program='City Hall (2026-10-17, at the user\'s direction): its public hall at the street, joined to the station hall; the Wall Line\'s station at +12 m and the high line\'s at +36 m; the city\'s offices in the legs; the council chamber and the mayor\'s office in the top bridge\'s cantilever, looking down the civic axis over Civic Plaza to the park; the Wall Watch\'s command room in the top bridge\'s east end',
   skin='a diagrid of pale ceramic-clad steel over glass')
 ## The West Gate's towers (city.md 8b, revised 2026-10-16): the same idea at the
 ## west, smaller: two towers straddling the wall either side of West Street, the
@@ -1418,20 +1415,6 @@ def _cross_checks():
         if math.hypot(end[0]-CX,end[1])+1.0>inner_plat: problems.append(('cross: the Spine\'s buffer stop reaches the Wall Line platform',nm))
         if abs(st['at'][0]-gate['p'][0])>4: problems.append(('cross: the Spine terminus is not at its gate',nm))
         st['_interchange']=dict(gap=round(gap,2),level=round(sp['rail']+PLATFORMS['floor'],2))
-    # the Meridian passes through the Timekeeper's empty centre with room round its trains
-    T=TIMEKEEPER; inner=T['rings'][0][1]; R1=T['rings'][-1][2]
-    if LineString(me['pts']).distance(Point(T['x'],T['z']))>0.01: problems.append(('cross: the Meridian Line misses the Timekeeper',))
-    for dz in (-X['double']/2,X['double']/2):
-        for y in (me['rail']-X['depth'],me['rail']+X['car_h']+0.4):
-            if math.hypot(dz,y-T['y'])>inner-0.8: problems.append(('cross: the train fouls the Timekeeper\'s rings',dz,y))
-    if T['y']-R1<T['roof']+2.0: problems.append(('cross: the Timekeeper dips into city hall\'s roof',round(T['y']-R1,1)))
-    ch=[b_ for b_ in named if b_['n']==2][0]['r']
-    if not (ch[0]<T['x']<ch[2] and ch[1]<T['z']-T['cradle']['z']-T['cradle']['w'] and T['z']+T['cradle']['z']+T['cradle']['w']<ch[3]): problems.append(('cross: the Timekeeper\'s cradle does not stand on city hall',))
-    if T['cradle']['z']<R1+0.5: problems.append(('cross: the cradle fouls the rings',))
-    sb=T['seconds']
-    if sb['r']-sb['bead']<R1-0.01 or sb['r']+sb['bead']>T['cradle']['z']: problems.append(('cross: the seconds bead leaves the bezel\'s rim',))
-    if max(m['arc'] for m in T['markers'].values())>=30.0: problems.append(('cross: a Timekeeper marker spans an hour mark',))
-    if me['rail']-X['depth']-HEIGHTS[2]<2.0: problems.append(('cross: the Meridian Line too low over city hall\'s roof',))
     # the high line's piers: in the street or a square, never on a building, the Spine or a station; spans to rhythm
     ml=LineString(me['pts']); pz=me['pts'][0][1]; xs=sorted(me['piers'])
     for x in xs:
@@ -1509,8 +1492,8 @@ def _cross_checks():
             if host=='arch':
                 # the cascade stands against its leg's court face, in Meridian Court, clear of the avenue
                 if not any(sbox(*lg).distance(g)<0.6 and not sbox(*lg).buffer(-0.01).intersects(g) for lg in A['legs']): problems.append(('arch: a cascade not against its leg',c['name']))
-                ct=[o for o in OPENS if o[0]=='Meridian Court'][0]
-                if not sbox(*ct[1:]).contains(g): problems.append(('arch: a cascade outside Meridian Court',c['name']))
+                ct=[o for o in OPENS if o[0]=='Civic Plaza'][0]
+                if not sbox(*ct[1:]).contains(g): problems.append(('arch: a cascade outside Civic Plaza',c['name']))
             if c.get('enclosure') not in ('open frame','open cascade','open loggia'): problems.append(('station: an enclosed core',host,c['name']))
             for hx in ((ARCH if host=='arch' else WEST_GATE if host=='west gate' else {}).get('train_hall',{}).get('x') or []):
                 if g.intersects(sbox(hx[0],-300,hx[1],300)) and host!='crossing' and any(sbox(*lg).intersects(g) for lg in (ARCH['legs'] if host=='arch' else WEST_GATE['towers'])): problems.append(('station: a core in the train hall',host,c['name']))
@@ -1613,6 +1596,18 @@ def _cross_checks():
         dx,dz=TW['c'][0]-cx0,TW['c'][1]-cz0; u=T['drum']/math.sqrt(2)
         if se(abs(dx)+u,abs(dz)+u)>1.0: problems.append(('crossing: the roof does not cover a tower',TW['name']))
     if se(half_len,plat_out)>1.0: problems.append(('crossing: the roof does not cover the high line\'s platforms',))
+    # the dome stands on the roof inside its edge; each clock fits its side of the drum; the bell hangs clear inside
+    Dm=C['dome']; dr_=Dm['drum']; ck=Dm['clocks']; base=R['y']+R['th']; Dm['base']=round(base,2)
+    if dr_['half']>R['half']-R['rim']-0.5 or dr_['n']!=R['n']: problems.append(('crossing: the dome does not sit on the roof',))
+    R1=ck['rings'][-1][2]
+    if ck['centre']-R1<0.4 or ck['centre']+R1>dr_['h']-0.4: problems.append(('crossing: a clock does not fit the drum\'s height',))
+    flat=dr_['half']*(1-0.5**(1/dr_['n']))      # how far the drum's side bows back at a clock's edge, roughly
+    if R1>dr_['half']*0.6: problems.append(('crossing: a clock too wide for the drum\'s flat side',))
+    if ck['rings'][0][1]<2.5: problems.append(('crossing: the clock\'s hollow centre too small to read as a ring',))
+    if max(m['arc'] for m in ck['markers'].values())>=30: problems.append(('crossing: a clock arrow spans an hour mark',))
+    top=base+dr_['h']+Dm['cupola']['h']; bl=Dm['bell']; Dm['top']=round(top,2); bl['bottom']=round(top-bl['crown_gap']-bl['height'],2)
+    if bl['bottom']<base+dr_['h']+0.5 or bl['mouth']/2>dr_['half']*0.5: problems.append(('crossing: the bell does not hang clear inside the cupola',))
+    if sorted(r_['at'] for r_ in bl['rings'])!=[r_['at'] for r_ in bl['rings']]: problems.append(('crossing: the bell\'s rings out of order',))
     # in the park, off its pond, playground and buildings; the supports off its walks and gardens
     ring=Point(C['c']).buffer(C['ring'][1],64).difference(Point(C['c']).buffer(C['ring'][0],64))
     if not sbox(*PARK['rect']).contains(ring): problems.append(('crossing: the ring leaves the park',))
@@ -2368,15 +2363,12 @@ w("## the gate streets stop at the Rim Walk: the builder clips clipped streets t
 w("const WALL := %s" % lit(WALL))
 w("")
 w("## The cross lines (city.md 6c): the Spine at +12 m, rising to +20 m flyovers above")
-w("## the Wall Line at both gates; independent services, no junctions. Meridian at +36 m.")
+w("## level at +13.2 (the Wall Line's height) with gate interchanges; independent services. Meridian at +36 m.")
 w("## Where the Spine follows the Deck it rides on the Deck columns, directly above it.")
 w("## Spine follows the Deck it rides on the Deck's columns, directly above it.")
 w("const CROSS := %s" % lit(CROSS))
 w("## The Crossing: the station and civic shelter at the park's centre (city.md 7a).")
 w("const CROSSING := %s" % lit(CROSSING))
-w("## The Timekeeper over city hall (city.md 8a): rings (name, inner and outer radius, what), centre (x, y, z), the")
-w("## Meridian Line through its empty centre. Twelve-hour ring; no day ring.")
-w("const TIMEKEEPER := %s" % lit(TIMEKEEPER))
 w("const TREE_KIT := %s" % lit(TREE_KIT))
 w("## The Meridian Arch (city.md 8b): legs (world rects), lower and top bridges (y ranges), the line's east station.")
 w("const ARCH := %s" % lit(ARCH))
@@ -2424,5 +2416,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

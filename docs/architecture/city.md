@@ -1293,6 +1293,12 @@ W  │  OLD MOY   │ Library    THE PARK     Civic│ DOWNTOWN       │ E: des
   Every district touches the Park Ring, so the park is the city's common
   ground, and the Deck runs round it.
 - **The plazas** (user: "I like the idea of plazas"):
+  - *(Revised 2026-10-17: Civic Plaza now lies in front of City Hall, the
+    Meridian Arch, on the old city hall's site, Clock Street and Meridian
+    Court; the old plaza described here is two commercial blocks, 12 storeys
+    of shops and offices, either side of Meridian Walk under the high line,
+    with Hotel Passage between the north blocks and the Deck's civic walk
+    along the walk's north side. See 8a and 8b.)*
   - **Civic Plaza**, on the park's east side, is city hall's forecourt.
     **City hall heads the plaza on its axis**, facing west across the plaza
     to the park. The plaza's sides are private and unlike each other: the
@@ -1551,6 +1557,21 @@ high line's piers rising through it. It is redesigned from its purpose:
   down the trunks to a **rain garden** of reeds and grasses round each
   tower's foot. Desert grasses on its rim. The Spine's platforms have their
   own louvred canopies at +17.4, over their bridges to the towers.
+- **The city's clock (2026-10-17, at the user's direction):** a glass dome on
+  the roof. Its drum is a rounded square in plan (the roof's superellipse, 38 m
+  across, 17 m high) with a **ring clock 16 m across** set flush in each side,
+  facing north, south, east and west, down the four streets to the park; a
+  glass cupola above it rises to about 70 m. Each clock is a ring clock like the
+  old Timekeeper: a hollow centre 6 m across, the hour ring, the minute ring
+  outside it, each with a lit arrow, a fixed bezel with hour marks and minute
+  ticks, and a seconds bead on its rim. They keep the game's time, so the dial
+  and the bell agree. A **great bronze bell** (4.4 m across the mouth) hangs on
+  a chain from the cupola's crown, seen through the glass. It rings three
+  times a day, after the Angelus and the old curfew bell, never on the hour (an
+  hour is one real minute): **the dawn bell** at 5:00 (sunrise), three strokes
+  three times then nine; **the noon bell**, twelve strokes; **the evening
+  bell** at 19:30, half an hour before sunset, like the dawn bell.
+  Data: `CROSSING.dome`.
 - **Planted:** the towers' climbers (`CROSSING.climbers`), the ring's beds
   and small ghafs (`DECK.beds`, `DECK.trees`), the rain gardens
   (`CROSSING.rain_gardens`), the roof's rim.
@@ -2561,6 +2582,14 @@ still land on and swing from, with no interiors behind them.
 
 ## 8a. City hall: building brief (proposed, 2026-10-13)
 
+> **Superseded 2026-10-17 (user):** City Hall moved into the Meridian Arch
+> (8b), and this building and the Timekeeper over it are removed. Its site,
+> Clock Street and Meridian Court are one **Civic Plaza** in front of the
+> arch; the old plaza is two commercial blocks either side of **Meridian
+> Walk**; the city's clock is the Crossing's glass dome (7a). The brief below
+> is kept for its program (the Hall of the City, the council chamber, the
+> plaques), which moves into the arch; its building and clock are history.
+
 ### 8a.0 The Timekeeper (revised 2026-10-16, at the user's direction)
 
 City hall's clock tower is replaced by a giant timekeeping structure standing
@@ -2787,6 +2816,15 @@ lit markers are decorative on solid backing. The doors are part of the solid wal
   evenings the plaza fills to hear the meeting from the balcony.
 
 ## 8b. The Meridian Arch (the East Gate), the West Gate and Meridian Court (proposed 2026-10-16, revised 2026-10-17, at the user's direction)
+
+> **City Hall (2026-10-17, at the user's direction):** the arch is now City
+> Hall as well as the East Gate and its station. City Hall's public hall (the
+> Hall of the City, with the house-mark plaques) opens at the foot of the legs
+> beside the station hall; the city's offices fill the legs; the council
+> chamber and the mayor's office sit in the top bridge's cantilever, looking
+> down the civic axis over Civic Plaza to the park; the Wall Watch keeps its
+> command room in the top bridge's east end. Meridian Court is now part of
+> Civic Plaza. Data: `ARCH.program`.
 
 **Why.** The mid-rise blocks between city hall's back and the East Gate hid
 city hall from the east, the way most people first see the city. They are

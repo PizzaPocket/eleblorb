@@ -1,5 +1,7 @@
 # Moy: second prototype pass, build instructions
 
+> **Next: [moy_prototype_pass_3.md](moy_prototype_pass_3.md)** reviews this pass and lists the changes since (2026-10-17).
+
 2026-10-17. Instructions for the next implementation chat. They replace nothing
 in `moy_playable_prototype.md` (the first pass's contract) except where they
 say so: **read that contract's sections 4 to 8 (scope, loading, collision,
