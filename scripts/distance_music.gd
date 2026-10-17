@@ -9,9 +9,9 @@ const MUSIC_BUS := &"Music"
 @export var player_path: NodePath = NodePath("../../Player")
 @export var full_volume_radius := 42.0
 @export var silent_radius := 112.0
-# Keep the score clearly behind dialogue and gameplay sounds. The distance
-# fade only attenuates from this already restrained in-town level.
-@export var volume_db := -24.0
+# Keep the score behind dialogue and gameplay sounds; the distance fade
+# attenuates from this in-town level as the listener leaves Ohio.
+@export var volume_db := -18.0
 
 var _player: AudioStreamPlayer
 var _listener: Node3D

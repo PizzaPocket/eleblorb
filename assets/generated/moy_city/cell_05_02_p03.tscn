@@ -1,0 +1,423 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/moy_hotel_lift.gd" id="1_pxxt6"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nl386"]
+size = Vector3(32, 1.05, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lmc5m"]
+albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_wj2ve"]
+size = Vector3(32, 1.05, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_y85al"]
+size = Vector3(32, 1.05, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8xu82"]
+albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_a0dt2"]
+size = Vector3(32, 1.05, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kdrnc"]
+size = Vector3(26, 1.05, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tax1t"]
+albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_fh2vv"]
+size = Vector3(26, 1.05, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7d8ry"]
+size = Vector3(26, 1.05, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_511jw"]
+albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_yhy5r"]
+size = Vector3(26, 1.05, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_npugi"]
+size = Vector3(6, 0.3, 12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8ocxp"]
+albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_avabh"]
+size = Vector3(6, 0.3, 12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4ouqk"]
+size = Vector3(17.5, 1.1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t8avk"]
+albedo_color = Color(0.46666667, 0.48235294, 0.47058824, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_fuce1"]
+size = Vector3(17.5, 1.1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sl7oh"]
+size = Vector3(1.2, 16, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_urdtg"]
+albedo_color = Color(0.9098039, 0.85882354, 0.65882355, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_4uy74"]
+size = Vector3(1.2, 16, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u6j2f"]
+albedo_color = Color(1, 0.9411765, 0.73333335, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_1aq8s"]
+size = Vector3(0.22, 0.28, 0.22)
+
+[sub_resource type="MultiMesh" id="MultiMesh_bn200"]
+transform_format = 1
+instance_count = 300
+mesh = SubResource("BoxMesh_1aq8s")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xtwvl"]
+albedo_color = Color(0.654902, 0.7411765, 0.76862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_mn1mt"]
+size = Vector3(2.6, 0.25, 3.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pqwhk"]
+size = Vector3(2.6, 0.25, 3.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x6vmc"]
+transparency = 1
+albedo_color = Color(0.38, 0.65, 0.72, 0.25)
+
+[sub_resource type="BoxMesh" id="BoxMesh_c56uu"]
+size = Vector3(0.08, 2.7, 3.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vb2e8"]
+size = Vector3(0.08, 2.7, 3.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_233qu"]
+size = Vector3(2.6, 2.7, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hn1a7"]
+albedo_color = Color(0.654902, 0.7411765, 0.76862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_wun16"]
+size = Vector3(2.6, 0.25, 3.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_berte"]
+size = Vector3(2.6, 0.25, 3.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0ox7h"]
+transparency = 1
+albedo_color = Color(0.38, 0.65, 0.72, 0.25)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sly6j"]
+size = Vector3(0.08, 2.7, 3.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_igj2c"]
+size = Vector3(0.08, 2.7, 3.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sfcdw"]
+size = Vector3(2.6, 2.7, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o6s6g"]
+albedo_color = Color(0.654902, 0.7411765, 0.76862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_o3eiv"]
+size = Vector3(2.6, 0.25, 3.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_y23t5"]
+size = Vector3(2.6, 0.25, 3.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_478bt"]
+transparency = 1
+albedo_color = Color(0.38, 0.65, 0.72, 0.25)
+
+[sub_resource type="BoxMesh" id="BoxMesh_kqxrr"]
+size = Vector3(0.08, 2.7, 3.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xhdm8"]
+size = Vector3(0.08, 2.7, 3.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vnimy"]
+size = Vector3(2.6, 2.7, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i36ij"]
+albedo_color = Color(0.654902, 0.7411765, 0.76862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_laesm"]
+size = Vector3(2.6, 0.25, 3.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0vk5j"]
+size = Vector3(2.6, 0.25, 3.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h4703"]
+transparency = 1
+albedo_color = Color(0.38, 0.65, 0.72, 0.25)
+
+[sub_resource type="BoxMesh" id="BoxMesh_uj0tj"]
+size = Vector3(0.08, 2.7, 3.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5j7vt"]
+size = Vector3(0.08, 2.7, 3.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_nbkg7"]
+size = Vector3(2.6, 2.7, 0.08)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_leus2"]
+size = Vector3(16, 0.3, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tqb4k"]
+albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_tlmrm"]
+size = Vector3(16, 0.3, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_7queu"]
+size = Vector3(0.2, 3, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_av8n1"]
+albedo_color = Color(0.9019608, 0.85490197, 0.75686276, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_v2d2b"]
+size = Vector3(0.2, 3, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_k8qgd"]
+size = Vector3(0.2, 3, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ob104"]
+albedo_color = Color(0.9019608, 0.85490197, 0.75686276, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_b6pqv"]
+size = Vector3(0.2, 3, 10)
+
+[node name="MoyCell_05_02_Part_03" type="Node3D" unique_id=69160537]
+
+[node name="Building_1_GrandHotel_Part_02" type="Node3D" parent="." unique_id=1847150484]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -457, -60, -68)
+
+[node name="HotelGalleryVoidRail_10" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1297478860]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 41.825, -0.8)
+
+[node name="@CollisionShape3D@1083" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelGalleryVoidRail_10" unique_id=2138193133]
+shape = SubResource("BoxShape3D_nl386")
+
+[node name="@MeshInstance3D@1084" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelGalleryVoidRail_10" unique_id=815892860]
+material_override = SubResource("StandardMaterial3D_lmc5m")
+mesh = SubResource("BoxMesh_wj2ve")
+
+[node name="@StaticBody3D@1087" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=43159470]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 41.825, 25.2)
+
+[node name="@CollisionShape3D@1085" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1087" unique_id=64409186]
+shape = SubResource("BoxShape3D_y85al")
+
+[node name="@MeshInstance3D@1086" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1087" unique_id=1399838232]
+material_override = SubResource("StandardMaterial3D_8xu82")
+mesh = SubResource("BoxMesh_a0dt2")
+
+[node name="@StaticBody3D@1090" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1047873606]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -16, 41.825, 12.200001)
+
+[node name="@CollisionShape3D@1088" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1090" unique_id=988103617]
+shape = SubResource("BoxShape3D_kdrnc")
+
+[node name="@MeshInstance3D@1089" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1090" unique_id=1045358336]
+material_override = SubResource("StandardMaterial3D_tax1t")
+mesh = SubResource("BoxMesh_fh2vv")
+
+[node name="@StaticBody3D@1093" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=598626580]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 16, 41.825, 12.200001)
+
+[node name="@CollisionShape3D@1091" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1093" unique_id=455097701]
+shape = SubResource("BoxShape3D_7d8ry")
+
+[node name="@MeshInstance3D@1092" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1093" unique_id=1836641451]
+material_override = SubResource("StandardMaterial3D_511jw")
+mesh = SubResource("BoxMesh_yhy5r")
+
+[node name="HotelDeckDoorSkybridgeLanding" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=993249200]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 6.35, 24)
+
+[node name="@CollisionShape3D@1094" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelDeckDoorSkybridgeLanding" unique_id=582608817]
+shape = SubResource("BoxShape3D_npugi")
+
+[node name="@MeshInstance3D@1095" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelDeckDoorSkybridgeLanding" unique_id=666410821]
+material_override = SubResource("StandardMaterial3D_8ocxp")
+mesh = SubResource("BoxMesh_avabh")
+
+[node name="HotelChandelierArm" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=37693009]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 43.2, -1.75)
+
+[node name="@CollisionShape3D@1096" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelChandelierArm" unique_id=390317310]
+shape = SubResource("BoxShape3D_4ouqk")
+
+[node name="@MeshInstance3D@1097" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelChandelierArm" unique_id=531038451]
+material_override = SubResource("StandardMaterial3D_t8avk")
+mesh = SubResource("BoxMesh_fuce1")
+
+[node name="HotelChandelierCore" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=684979358]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 23, 7)
+
+[node name="@CollisionShape3D@1098" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelChandelierCore" unique_id=2090678872]
+shape = SubResource("BoxShape3D_sl7oh")
+
+[node name="@MeshInstance3D@1099" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelChandelierCore" unique_id=1060797092]
+material_override = SubResource("StandardMaterial3D_urdtg")
+mesh = SubResource("BoxMesh_4uy74")
+
+[node name="HotelChandelierCrystals" type="MultiMeshInstance3D" parent="Building_1_GrandHotel_Part_02" unique_id=2029616081]
+material_override = SubResource("StandardMaterial3D_u6j2f")
+multimesh = SubResource("MultiMesh_bn200")
+
+[node name="HotelCapsuleLift_0" type="AnimatableBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1313474018]
+transform = Transform3D(-0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, -0.70710677, 8.697413, 0, -24.697412)
+script = ExtResource("1_pxxt6")
+
+[node name="@MeshInstance3D@1100" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_0" unique_id=1872345]
+material_override = SubResource("StandardMaterial3D_xtwvl")
+mesh = SubResource("BoxMesh_mn1mt")
+
+[node name="@CollisionShape3D@1101" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_0" unique_id=996537506]
+shape = SubResource("BoxShape3D_pqwhk")
+
+[node name="@MeshInstance3D@1102" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_0" unique_id=1247778188]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0, 0)
+material_override = SubResource("StandardMaterial3D_x6vmc")
+mesh = SubResource("BoxMesh_c56uu")
+
+[node name="@MeshInstance3D@1103" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_0" unique_id=1145134568]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0, 0)
+material_override = SubResource("StandardMaterial3D_x6vmc")
+mesh = SubResource("BoxMesh_vb2e8")
+
+[node name="@MeshInstance3D@1104" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_0" unique_id=873663438]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.7)
+material_override = SubResource("StandardMaterial3D_x6vmc")
+mesh = SubResource("BoxMesh_233qu")
+
+[node name="HotelCapsuleLift_1" type="AnimatableBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=871370490]
+transform = Transform3D(-0.30901703, 0, 0.9510565, 0, 1, 0, -0.9510565, 0, -0.30901703, 11.697995, 0, -19.800909)
+script = ExtResource("1_pxxt6")
+phase_seconds = 12.0
+
+[node name="@MeshInstance3D@1105" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_1" unique_id=211293364]
+material_override = SubResource("StandardMaterial3D_hn1a7")
+mesh = SubResource("BoxMesh_wun16")
+
+[node name="@CollisionShape3D@1106" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_1" unique_id=960940321]
+shape = SubResource("BoxShape3D_berte")
+
+[node name="@MeshInstance3D@1107" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_1" unique_id=1947067479]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0, 0)
+material_override = SubResource("StandardMaterial3D_0ox7h")
+mesh = SubResource("BoxMesh_sly6j")
+
+[node name="@MeshInstance3D@1108" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_1" unique_id=46183309]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0, 0)
+material_override = SubResource("StandardMaterial3D_0ox7h")
+mesh = SubResource("BoxMesh_igj2c")
+
+[node name="@MeshInstance3D@1109" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_1" unique_id=1354289415]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.7)
+material_override = SubResource("StandardMaterial3D_0ox7h")
+mesh = SubResource("BoxMesh_sfcdw")
+
+[node name="HotelCapsuleLift_2" type="AnimatableBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=685417116]
+transform = Transform3D(0.30901697, 0, 0.95105654, 0, 1, 0, -0.95105654, 0, 0.30901697, 11.697995, 0, -12.199091)
+script = ExtResource("1_pxxt6")
+phase_seconds = 24.0
+
+[node name="@MeshInstance3D@1110" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_2" unique_id=1549436921]
+material_override = SubResource("StandardMaterial3D_o6s6g")
+mesh = SubResource("BoxMesh_o3eiv")
+
+[node name="@CollisionShape3D@1111" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_2" unique_id=1340391835]
+shape = SubResource("BoxShape3D_y23t5")
+
+[node name="@MeshInstance3D@1112" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_2" unique_id=286497020]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0, 0)
+material_override = SubResource("StandardMaterial3D_478bt")
+mesh = SubResource("BoxMesh_kqxrr")
+
+[node name="@MeshInstance3D@1113" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_2" unique_id=882482619]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0, 0)
+material_override = SubResource("StandardMaterial3D_478bt")
+mesh = SubResource("BoxMesh_xhdm8")
+
+[node name="@MeshInstance3D@1114" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_2" unique_id=1348832554]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.7)
+material_override = SubResource("StandardMaterial3D_478bt")
+mesh = SubResource("BoxMesh_vnimy")
+
+[node name="HotelCapsuleLift_3" type="AnimatableBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=13104253]
+transform = Transform3D(0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, 0.70710677, 8.697413, 0, -7.3025866)
+script = ExtResource("1_pxxt6")
+phase_seconds = 36.0
+
+[node name="@MeshInstance3D@1115" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_3" unique_id=209588902]
+material_override = SubResource("StandardMaterial3D_i36ij")
+mesh = SubResource("BoxMesh_laesm")
+
+[node name="@CollisionShape3D@1116" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_3" unique_id=1843211413]
+shape = SubResource("BoxShape3D_0vk5j")
+
+[node name="@MeshInstance3D@1117" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_3" unique_id=709332526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0, 0)
+material_override = SubResource("StandardMaterial3D_h4703")
+mesh = SubResource("BoxMesh_uj0tj")
+
+[node name="@MeshInstance3D@1118" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_3" unique_id=1608303909]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0, 0)
+material_override = SubResource("StandardMaterial3D_h4703")
+mesh = SubResource("BoxMesh_5j7vt")
+
+[node name="@MeshInstance3D@1119" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_3" unique_id=857229399]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.7)
+material_override = SubResource("StandardMaterial3D_h4703")
+mesh = SubResource("BoxMesh_nbkg7")
+
+[node name="HotelLevel27PartySuite" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1755709764]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 89.35, 23)
+
+[node name="@CollisionShape3D@1120" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelLevel27PartySuite" unique_id=597326460]
+shape = SubResource("BoxShape3D_leus2")
+
+[node name="@MeshInstance3D@1121" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelLevel27PartySuite" unique_id=62775929]
+material_override = SubResource("StandardMaterial3D_tqb4k")
+mesh = SubResource("BoxMesh_tlmrm")
+
+[node name="HotelPartySuiteWall" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=765060069]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 91, 23)
+
+[node name="@CollisionShape3D@1122" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelPartySuiteWall" unique_id=1022170985]
+shape = SubResource("BoxShape3D_7queu")
+
+[node name="@MeshInstance3D@1123" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelPartySuiteWall" unique_id=1749080849]
+material_override = SubResource("StandardMaterial3D_av8n1")
+mesh = SubResource("BoxMesh_v2d2b")
+
+[node name="@StaticBody3D@1126" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1831749487]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 91, 23)
+
+[node name="@CollisionShape3D@1124" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1126" unique_id=1127714895]
+shape = SubResource("BoxShape3D_k8qgd")
+
+[node name="@MeshInstance3D@1125" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1126" unique_id=1577822405]
+material_override = SubResource("StandardMaterial3D_ob104")
+mesh = SubResource("BoxMesh_b6pqv")

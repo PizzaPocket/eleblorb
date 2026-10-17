@@ -88,8 +88,12 @@ const MOY_MANIFEST_PATH := "res://assets/generated/moy_city/manifest.json"
 const MOY_REQUEST_RADIUS := 520.0
 const MOY_ACTIVATE_RADIUS := 390.0
 const MOY_RELEASE_RADIUS := 455.0
+const MOY_HOTEL_ACTIVATE_RADIUS := 48.0
+const MOY_HOTEL_RELEASE_RADIUS := 72.0
+const MOY_HOTEL_CENTER := Vector2(-457.0, -68.0)
 const MOY_SILHOUETTE_PATH := "res://assets/generated/moy_city/silhouette.tscn"
 var _moy_paths: Array[String] = []
+var _moy_hotel_paths: Array[String] = []
 var _moy_active: Dictionary = {}
 var _moy_requested := {}
 var _moy_unload_queue: Array[String] = []
@@ -117,6 +121,7 @@ func _process(delta: float) -> void:
 
 func _load_moy_manifest() -> void:
 	_moy_paths.clear()
+	_moy_hotel_paths.clear()
 	if not FileAccess.file_exists(MOY_MANIFEST_PATH):
 		push_error("Moy static bake is missing. Run Godot --headless --path . tools/bake_moy_city.tscn")
 		return
@@ -135,6 +140,8 @@ func _load_moy_manifest() -> void:
 			push_error("Moy static pack is missing: %s. Re-run tools/bake_moy_city.tscn" % path)
 			return
 		_moy_paths.append(String(path))
+	for path in data.get("hotel_packs", []):
+		_moy_hotel_paths.append(String(path))
 	_moy_paths.sort()
 
 
@@ -142,6 +149,8 @@ func _stream_moy_city() -> void:
 	var player := get_node_or_null("../Player") as Node3D
 	if player == null or _moy_paths.is_empty(): return
 	var distance := Vector2(player.global_position.x, player.global_position.z).distance_to(CITY_CENTER)
+	var hotel_distance := Vector2(player.global_position.x, player.global_position.z).distance_to(MOY_HOTEL_CENTER)
+	var force_hotel := bool(get_meta("moy_force_hotel_pack", false))
 	if distance <= CITY_SKYLINE_WAKE_RADIUS and _moy_silhouette == null and FileAccess.file_exists(MOY_SILHOUETTE_PATH):
 		var silhouette_scene := load(MOY_SILHOUETTE_PATH) as PackedScene
 		if silhouette_scene != null:
@@ -160,6 +169,7 @@ func _stream_moy_city() -> void:
 			else: push_warning("Moy pack request failed: %s (%s)" % [path, error_string(err)])
 	if distance <= MOY_ACTIVATE_RADIUS:
 		for path in _moy_paths:
+			if _moy_hotel_paths.has(path) and not force_hotel and hotel_distance > MOY_HOTEL_ACTIVATE_RADIUS: continue
 			if _moy_active.has(path): continue
 			var state := ResourceLoader.load_threaded_get_status(path)
 			if state == ResourceLoader.THREAD_LOAD_LOADED:
@@ -185,7 +195,14 @@ func _stream_moy_city() -> void:
 			_moy_active.erase(path)
 			node.queue_free()
 			_moy_requested.erase(path)
-	if distance <= MOY_ACTIVATE_RADIUS and _moy_active.size() == _moy_paths.size() and not _moy_actors_added:
+	if not force_hotel and hotel_distance >= MOY_HOTEL_RELEASE_RADIUS:
+		for path in _moy_hotel_paths:
+			if _moy_active.has(path):
+				var hotel_node: Node3D = _moy_active[path]
+				_moy_active.erase(path)
+				hotel_node.queue_free()
+				_moy_requested.erase(path)
+	if distance <= MOY_ACTIVATE_RADIUS and _moy_required_packs_active() and not _moy_actors_added:
 		_add_moy_actors()
 	elif distance >= MOY_RELEASE_RADIUS and _moy_active.is_empty():
 		_remove_moy_actors()
@@ -202,7 +219,16 @@ func _count_physics_bodies(node: Node) -> int:
 
 
 func moy_packs_ready() -> bool:
-	return not _moy_paths.is_empty() and _moy_active.size() == _moy_paths.size()
+	return _moy_required_packs_active()
+
+
+func _moy_required_packs_active() -> bool:
+	var required_count := _moy_paths.size()
+	var force_hotel := bool(get_meta("moy_force_hotel_pack", false))
+	if not force_hotel:
+		for path in _moy_hotel_paths:
+			if not _moy_active.has(path): required_count -= 1
+	return not _moy_paths.is_empty() and _moy_active.size() >= required_count
 
 
 func get_active_moy_pack_count() -> int:

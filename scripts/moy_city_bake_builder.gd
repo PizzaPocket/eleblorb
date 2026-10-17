@@ -18,7 +18,7 @@ static func build_packs() -> Dictionary:
 		_add(packs, _cell(Vector2(r.get_center().x, r.get_center().y)), body)
 	for o in PLAN.OPENS:
 		var r: Rect2 = o.rect
-		var body := _box_body("Open_%s" % o.name, Vector3(r.size.x, 0.18, r.size.y), Vector3(r.position.x + r.size.x * 0.5, DATUM - 0.02, r.position.y + r.size.y * 0.5), Color("#b9a586"))
+		var body := _park_ground_body(r) if String(o.name) == "park" else _box_body("Open_%s" % o.name, Vector3(r.size.x, 0.18, r.size.y), Vector3(r.position.x + r.size.x * 0.5, DATUM - 0.02, r.position.y + r.size.y * 0.5), Color("#b9a586"))
 		_add(packs, _cell(r.get_center()), body)
 	for i in PLAN.OLD_TOWN.lanes.size():
 		var lane: Dictionary = PLAN.OLD_TOWN.lanes[i]
@@ -53,13 +53,19 @@ static func build_packs() -> Dictionary:
 			continue
 		var body := _landmark(b)
 		_add(packs, _cell(b.rect.get_center()), body)
+		if int(b.n) == 1:
+			var hotel_pack := Node3D.new()
+			hotel_pack.name = "HotelPublicInteriorPack"
+			hotel_pack.position = Vector3(b.rect.get_center().x, DATUM, b.rect.get_center().y)
+			_add_hotel_public_interior(hotel_pack, PLAN.HOTEL)
+			packs["hotel_interior"] = hotel_pack
 	_add_deck(packs,tree_templates)
 	_add_wall(packs)
 	_add_park(packs,tree_templates)
 	_add_estate_links(packs)
 	_add_transit(packs)
 	_add_gate_forms(packs)
-	_add_timekeeper(packs)
+	_add_city_dome(packs)
 	_add_turbines(packs)
 	for template in tree_templates.values(): (template as StaticBody3D).free()
 	return packs
@@ -112,9 +118,8 @@ static func build_silhouette() -> Node3D:
 			var mesh:=BoxMesh.new(); mesh.size=Vector3(r.size.x,h,r.size.y)
 			var vis:=MeshInstance3D.new(); vis.name="Landmark_%02d"%n; vis.mesh=mesh; vis.position=Vector3(center.x,DATUM+h*0.5,center.y); vis.material_override=material; vis.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; root.add_child(vis)
 	_add_silhouette_wall(root,material)
-	var timekeeper:=TorusMesh.new(); timekeeper.inner_radius=12.0; timekeeper.outer_radius=13.5; timekeeper.rings=24; timekeeper.ring_segments=6
-	var time_vis:=MeshInstance3D.new(); time_vis.name="TimekeeperSilhouette"; time_vis.mesh=timekeeper; time_vis.position=Vector3(PLAN.TIMEKEEPER.x,DATUM+PLAN.TIMEKEEPER.y,PLAN.TIMEKEEPER.z); time_vis.rotation.z=PI*0.5; time_vis.material_override=material; root.add_child(time_vis)
-	var crossing:=TorusMesh.new(); crossing.inner_radius=14.0; crossing.outer_radius=17.0; crossing.rings=24; crossing.ring_segments=6
+	_silhouette_box(root,"CityDomeSilhouette",Vector3(38,28,38),Vector3(PLAN.CENTER.x,DATUM+55.6,0),material)
+	var crossing:=CylinderMesh.new(); crossing.top_radius=28.7; crossing.bottom_radius=28.7; crossing.height=1.0; crossing.radial_segments=32
 	var crossing_vis:=MeshInstance3D.new(); crossing_vis.name="CrossingRingSilhouette"; crossing_vis.mesh=crossing; crossing_vis.position=Vector3(PLAN.CENTER.x,DATUM+6.5,0); crossing_vis.material_override=material; root.add_child(crossing_vis)
 	for i in PLAN.TURBINES.size():
 		var p: Vector2=PLAN.TURBINES[i]
@@ -159,6 +164,23 @@ static func _cell(p: Vector2) -> Vector2i:
 	return Vector2i(floori((p.x + 800.0) / CELL), floori((p.y + 240.0) / CELL))
 
 
+static func _station_platform_offset(crossing_tracks: bool) -> float:
+	var track_offset: float=float(PLAN.CROSS.track) if crossing_tracks else 0.0
+	var car_half: float=float(PLAN.TRAIN.car[2])*0.5
+	var platform_half: float=float(PLAN.PLATFORMS.width)*0.5
+	# PLATFORMS.boarding requires 7.5 cm clear; edge=1.4 alone overlaps
+	# the 3.6 m car envelope, so use the actual car and platform widths.
+	return track_offset+car_half+0.075+platform_half
+
+
+static func _curved_platform_offset(track_radius: float) -> float:
+	var flat_gap:=_station_platform_offset(false)
+	var car_half_length:=float(PLAN.TRAIN.car[0])*0.5
+	var platform_half_length:=float(PLAN.CROSS.platform[0])*0.5
+	# A long car spans the chord while the platform follows the wall arc.
+	return flat_gap+car_half_length*sin(platform_half_length/maxf(track_radius,0.1))
+
+
 static func _add(packs: Dictionary, cell: Vector2i, node: Node3D) -> void:
 	var key := "%02d_%02d" % [cell.x, cell.y]
 	if not packs.has(key):
@@ -187,6 +209,57 @@ static func _box_body(label: String, size: Vector3, center: Vector3, color: Colo
 	return body
 
 
+static func _park_ground_body(rect: Rect2) -> StaticBody3D:
+	# The terrain already contains the authored 4 m pond basin. Make the park
+	# paving a baked grid with an actual elliptical opening so neither this slab
+	# nor its collision can seal the water surface.
+	var pond: Dictionary = PLAN.PARK.pond
+	var pond_center := Vector2(float(pond.c[0]), float(pond.c[1]))
+	var pond_radii := Vector2(float(pond.r[0]), float(pond.r[1]))
+	var step := 1.0
+	var surface_y := DATUM + 0.07
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for ix in ceili(rect.size.x / step):
+		var x0 := rect.position.x + float(ix) * step
+		var x1 := minf(rect.end.x, x0 + step)
+		for iz in ceili(rect.size.y / step):
+			var z0 := rect.position.y + float(iz) * step
+			var z1 := minf(rect.end.y, z0 + step)
+			var closest := Vector2(clampf(pond_center.x, x0, x1), clampf(pond_center.y, z0, z1))
+			var basin_point := (closest - pond_center) / pond_radii
+			if basin_point.length_squared() <= 1.0:
+				continue
+			var a := Vector3(x0, surface_y, z0)
+			var b := Vector3(x0, surface_y, z1)
+			var c := Vector3(x1, surface_y, z0)
+			var d := Vector3(x1, surface_y, z1)
+			tool.set_normal(Vector3.UP); tool.add_vertex(a)
+			tool.set_normal(Vector3.UP); tool.add_vertex(b)
+			tool.set_normal(Vector3.UP); tool.add_vertex(c)
+			tool.set_normal(Vector3.UP); tool.add_vertex(c)
+			tool.set_normal(Vector3.UP); tool.add_vertex(b)
+			tool.set_normal(Vector3.UP); tool.add_vertex(d)
+	var mesh := tool.commit()
+	var body := StaticBody3D.new()
+	body.name = "Open_park"
+	body.collision_layer = 1
+	body.collision_mask = 1
+	var visual := MeshInstance3D.new()
+	visual.name = "ParkGroundPaving"
+	visual.mesh = mesh
+	visual.material_override = _material(Color("#b9a586"))
+	body.add_child(visual)
+	var faces := mesh.get_faces()
+	var shape := ConcavePolygonShape3D.new()
+	shape.set_faces(faces)
+	var collision := CollisionShape3D.new()
+	collision.name = "ParkGroundPavingWithoutPondCollision"
+	collision.shape = shape
+	body.add_child(collision)
+	return body
+
+
 static func _round_column(label: String, radius: float, height: float, center: Vector3, color: Color) -> StaticBody3D:
 	var body:=StaticBody3D.new(); body.name=label; body.position=center; body.collision_layer=1; body.collision_mask=1
 	var mesh:=CylinderMesh.new(); mesh.top_radius=radius; mesh.bottom_radius=radius; mesh.height=height; mesh.radial_segments=12
@@ -207,6 +280,18 @@ static func _segment_body(label: String, a: Vector2, b: Vector2, width: float, b
 	var body := _box_body(label, Vector3(d.length(), height, width), Vector3((a.x+b.x)*0.5, bottom+height*0.5, (a.y+b.y)*0.5), color)
 	body.rotation.y = -atan2(d.y, d.x)
 	return body
+
+
+static func _set_box_collision_margin(body: StaticBody3D, margin: float) -> void:
+	for child in body.get_children():
+		if child is CollisionShape3D and child.shape is BoxShape3D:
+			(child.shape as BoxShape3D).margin=margin
+
+
+static func _set_body_glass(body: StaticBody3D, color: Color) -> void:
+	var glass:=StandardMaterial3D.new(); glass.albedo_color=color; glass.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; glass.roughness=0.2; glass.metallic=0.05
+	for child in body.get_children():
+		if child is MeshInstance3D: (child as MeshInstance3D).material_override=glass
 
 
 static func _add_roof(body: StaticBody3D, footprint: Vector2, height: float, color: Color) -> void:
@@ -286,13 +371,19 @@ static func _landmark(b: Dictionary) -> Node3D:
 		var body := Node3D.new(); body.name = "Building_1_GrandHotel"
 		body.position = Vector3(center.x,DATUM,center.y)
 		# Four separate podium wings keep the public atrium open at ground and Deck.
-		for wing in [Vector4(-26,0,6,60),Vector4(26,0,6,60),Vector4(0,-30,46,6),Vector4(0,30,46,6)]:
+		for wing in [Vector4(-26,0,6,60),Vector4(26,0,6,60),Vector4(0,-30,46,6),Vector4(-12.7,30,20.6,6),Vector4(12.7,30,20.6,6)]:
 			var wall := _box_body("HotelAtriumWing",Vector3(wing.z,44,wing.w),Vector3(wing.x,22,wing.y),color); body.add_child(wall)
-		var tower := CylinderMesh.new(); tower.top_radius=10.5; tower.bottom_radius=14.0; tower.height=96; tower.radial_segments=12
-		var tm := MeshInstance3D.new(); tm.mesh=tower; tm.position.y=48; tm.material_override=_material(Color("#d1b78f")); body.add_child(tm)
-		var drum := CylinderMesh.new(); drum.top_radius=12.0; drum.bottom_radius=12.0; drum.height=12; drum.radial_segments=12
-		var dm := MeshInstance3D.new(); dm.mesh=drum; dm.position.y=102; dm.material_override=_material(Color("#a98a65")); body.add_child(dm)
-		var collision := CollisionShape3D.new(); var cs := CylinderShape3D.new(); cs.radius=14; cs.height=96; collision.shape=cs; collision.position.y=48; body.add_child(collision)
+		var revolving:=CylinderMesh.new(); revolving.top_radius=1.4; revolving.bottom_radius=1.4; revolving.height=2.6; revolving.radial_segments=12
+		var revolving_vis:=MeshInstance3D.new(); revolving_vis.name="HotelRevolvingDoor"; revolving_vis.mesh=revolving; revolving_vis.position=Vector3(0,1.3,27); revolving_vis.material_override=_material(Color("#8f795b")); body.add_child(revolving_vis)
+		for side in [-1.0,1.0]:
+			var swing:=MeshInstance3D.new(); swing.name="HotelSwingDoorLeaf"; var swing_mesh:=BoxMesh.new(); swing_mesh.size=Vector3(1.2,2.5,0.08); swing.mesh=swing_mesh; swing.position=Vector3(side*2.0,1.25,27); swing.material_override=_material(Color("#baa47c")); body.add_child(swing)
+		var tower_data: Dictionary = PLAN.HOTEL.tower
+		var origin: Array = PLAN.HOTEL.origin
+		var tower_center := _hotel_local(center, float(origin[0]), float(origin[1]), float(tower_data.c[0]), float(tower_data.c[1]))
+		_hotel_tower_shell(body, tower_center, float(tower_data.r), float(tower_data.top), PLAN.HOTEL.lifts)
+		var drum_data: Dictionary = PLAN.HOTEL.drum
+		var drum := CylinderMesh.new(); drum.top_radius=float(drum_data.r); drum.bottom_radius=float(drum_data.r); drum.height=float(drum_data.dome_top)-float(drum_data.tank[0]); drum.radial_segments=40
+		var dm := MeshInstance3D.new(); dm.mesh=drum; dm.position=Vector3(tower_center.x,(float(drum_data.tank[0])+float(drum_data.dome_top))*0.5,tower_center.y); dm.material_override=_material(Color("#a98a65")); body.add_child(dm)
 		return body
 	if String(b.kind) == "estate":
 		var body := StaticBody3D.new(); body.name="Building_%02d_%s" % [n,String(b.name).replace(" ","_")]; body.collision_layer=1; body.collision_mask=1
@@ -328,6 +419,117 @@ static func _landmark(b: Dictionary) -> Node3D:
 	var roof_mesh := BoxMesh.new(); roof_mesh.size=Vector3(r.size.x,0.15,r.size.y)
 	var roof := MeshInstance3D.new(); roof.mesh=roof_mesh; roof.position=Vector3(0,h*0.5-0.075,0); roof.rotation.y=body.rotation.y; roof.material_override=_material(color.lightened(0.17)); body.add_child(roof)
 	return body
+
+
+static func _add_hotel_public_interior(body: Node3D, hotel: Dictionary) -> void:
+	var origin: Array=hotel.origin; var ox:=float(origin[0]); var oz:=float(origin[1]); var center:=Vector2(body.position.x,body.position.z)
+	var floor_color:=Color("#c9b99d")
+	# Forecourt, entrance hall and atrium floor follow HOTEL's rectangles.
+	for record in [[hotel.forecourt,"HotelForecourt"],[hotel.entrance_hall,"HotelEntranceHall"]]:
+		var q: Array=record[0]; var p0:=_hotel_local(center,ox,oz,float(q[0]),float(q[1])); var p1:=_hotel_local(center,ox,oz,float(q[2]),float(q[3]))
+		var slab:=_box_body(String(record[1]),Vector3(p1.x-p0.x,0.24,p1.y-p0.y),Vector3((p0.x+p1.x)*0.5,0.12,(p0.y+p1.y)*0.5),floor_color); body.add_child(slab)
+	var void_data: Dictionary=hotel.void; var left:=float(void_data.x[0])-26.0; var right:=float(void_data.x[1])-26.0
+	var south:=float(void_data.z_north)-30.0; var north:=float(void_data.z_south)-30.0
+	# Atrium floor under the 32 x 26 m void, with the rock garden at its authored centre.
+	var atrium:=_box_body("HotelAtriumFloor",Vector3(32.0,0.24,north-south),Vector3(0,0.12,(south+north)*0.5),floor_color); body.add_child(atrium)
+	var garden: Dictionary=hotel.rock_garden; var gc:=_hotel_local(center,ox,oz,float(garden.c[0]),float(garden.c[1])); var garden_body:=_box_body("HotelRockGarden",Vector3(12.0,0.45,12.0),Vector3(gc.x,0.34,gc.y),Color("#637b50")); body.add_child(garden_body)
+	var pavilion: Array=garden.pavilion; var pavilion_mesh:=BoxMesh.new(); pavilion_mesh.size=Vector3(float(pavilion[0]),float(pavilion[1]),float(pavilion[2])); var pavilion_vis:=MeshInstance3D.new(); pavilion_vis.name="HotelRockGardenPavilion"; pavilion_vis.mesh=pavilion_mesh; pavilion_vis.position=Vector3(gc.x,0.45+float(pavilion[1])*0.5,gc.y); pavilion_vis.material_override=_material(Color("#c1ad88")); body.add_child(pavilion_vis)
+	var pod: Dictionary=hotel.pod; var pc:=_hotel_local(center,ox,oz,float(pod.c[0]),float(pod.c[1])); var pod_body:=_box_body("HotelGardenPod",Vector3(5.0,3.2,5.0),Vector3(pc.x,1.7,pc.y),Color("#d9c6a4")); body.add_child(pod_body)
+	# Decorative shallow runnel, segmented along the HOTEL survey polyline.
+	var runnel: Array=hotel.runnel
+	for i in runnel.size()-1:
+		var a:=_hotel_local(center,ox,oz,float(runnel[i][0]),float(runnel[i][1])); var b:=_hotel_local(center,ox,oz,float(runnel[i+1][0]),float(runnel[i+1][1]))
+		var water:=_segment_body("HotelRunnel_%02d"%i,a,b,0.7,0.08,0.08,Color("#6fa8c8")); body.add_child(water)
+	# Two ramp runs with intermediate landings, each end landing tied to the atrium and mezzanine.
+	for ri in hotel.ramps.size():
+		var ramp: Array=hotel.ramps[ri]
+		for si in ramp.size()-1:
+			var a2:=_hotel_local(center,ox,oz,float(ramp[si][0]),float(ramp[si][1])); var b2:=_hotel_local(center,ox,oz,float(ramp[si+1][0]),float(ramp[si+1][1]))
+			var y0:=6.5*float(si)/float(ramp.size()-1); var y1:=6.5*float(si+1)/float(ramp.size()-1)
+			var flight:=_ramp_body("HotelDoubleRamp_%d_%d"%[ri,si],Vector3(a2.x,y0,a2.y),Vector3(b2.x,y1,b2.y),float(hotel.ramp_width),0.22,Color("#c9b99d")); body.add_child(flight)
+			if si>0:
+				var land:=_box_body("HotelRampLanding_%d_%d"%[ri,si],Vector3(float(hotel.landing),0.25,float(hotel.landing)),Vector3(a2.x,y0,a2.y),floor_color); body.add_child(land)
+	# Mezzanine and levels 3–12: exact void dimensions, 2.4 m ledges, shifted with its lean.
+	for level_index in 11:
+		var level:=6.5 if level_index==0 else 11.5+float(level_index-1)*float(hotel.storey)
+		var lean:=float(void_data.lean)*float(maxi(0,level_index-1)); var s:=south+lean; var n:=north+lean
+		for side in [-1.0,1.0]:
+			var x0:=left-2.4 if side<0 else right; var x1:=left if side<0 else right+2.4
+			var strip:=_box_body("HotelGallerySide_%02d_%d"%[level_index,int(side)],Vector3(2.4,0.3,n-s),Vector3((x0+x1)*0.5,level-0.15,(s+n)*0.5),Color("#c9b99d")); body.add_child(strip)
+		for side in [-1.0,1.0]:
+			var z0:=s-2.4 if side<0 else n; var z1:=s if side<0 else n+2.4
+			var strip:=_box_body("HotelGalleryEnd_%02d_%d"%[level_index,int(side)],Vector3(right-left,0.3,2.4),Vector3((left+right)*0.5,level-0.15,(z0+z1)*0.5),Color("#c9b99d")); body.add_child(strip)
+		# Inner-void guards on the four open edges.
+		for edge in [Vector4(left, s, right, s),Vector4(left,n,right,n),Vector4(left,s,left,n),Vector4(right,s,right,n)]:
+			var a3:=Vector2(edge.x,edge.y); var b3:=Vector2(edge.z,edge.w); var rail:=_segment_body("HotelGalleryVoidRail_%02d"%level_index,a3,b3,0.12,level+0.55,1.05,Color("#876d50")); body.add_child(rail)
+	# Direct mezzanine route to the authored skybridge and Deck door.
+	var deck_landing:=_box_body("HotelDeckDoorSkybridgeLanding",Vector3(6.0,0.3,12.0),Vector3(-4.0,6.35,24.0),floor_color); body.add_child(deck_landing)
+	# Chandelier arm and compact shared crystal multimesh (300 visible crystals at this prototype scale).
+	var arm: Dictionary=hotel.arm; var arm_root:=_hotel_local(center,ox,oz,26.0,float(arm.root_z)); var arm_tip:=_hotel_local(center,ox,oz,float(arm.tip[0]),float(arm.tip[1])); var beam:=_ramp_body("HotelChandelierArm",Vector3(arm_root.x,float(arm.bottom),arm_root.y),Vector3(arm_tip.x,float(arm.bottom),arm_tip.y),float(arm.width),1.1,Color("#777b78")); body.add_child(beam)
+	var chandelier: Dictionary=hotel.chandelier; var chandelier_center:=_hotel_local(center,ox,oz,float(chandelier.c[0]),float(chandelier.c[1])); var core:=_box_body("HotelChandelierCore",Vector3(1.2,float(chandelier.top)-float(chandelier.bottom),1.2),Vector3(chandelier_center.x,(float(chandelier.top)+float(chandelier.bottom))*0.5,chandelier_center.y),Color("#e8dba8")); body.add_child(core)
+	var crystal:=BoxMesh.new(); crystal.size=Vector3(0.22,0.28,0.22); var multimesh:=MultiMesh.new(); multimesh.transform_format=MultiMesh.TRANSFORM_3D; multimesh.mesh=crystal; multimesh.instance_count=300
+	for i in 300:
+		var tier:=i%int(chandelier.tiers); var band:=i/int(chandelier.tiers); var angle:=TAU*float(band)/60.0; var radius:=float(chandelier.r)*(0.45+0.08*float(tier)); var y:=lerpf(float(chandelier.bottom),float(chandelier.top),float(tier)/float(chandelier.tiers-1)); multimesh.set_instance_transform(i,Transform3D(Basis.IDENTITY,Vector3(cos(angle)*radius,y,sin(angle)*radius)))
+	var crystals:=MultiMeshInstance3D.new(); crystals.name="HotelChandelierCrystals"; crystals.multimesh=multimesh; crystals.material_override=_material(Color("#fff0bb")); body.add_child(crystals)
+	# Four manually called rideable glass capsules, three stops only.
+	var lift_cfg: Dictionary=hotel.lifts
+	for i in 4:
+		var bearing:=deg_to_rad(float(lift_cfg.bearings[i])); var lift:=AnimatableBody3D.new(); lift.name="HotelCapsuleLift_%d"%i; lift.collision_layer=1; lift.collision_mask=1; lift.position=Vector3(float(lift_cfg.track)*cos(bearing),0.0,float(lift_cfg.track)*sin(bearing)-16.0); lift.rotation.y=PI*0.5-bearing; lift.set_script(load("res://scripts/moy_hotel_lift.gd")); lift.set("stop_levels",PackedFloat32Array([0.0,6.5,89.5])); lift.set("stop_names",PackedStringArray(["Atrium floor","Mezzanine","Level 27 — Party suite"])); lift.set("cab_depth",float(lift_cfg.depth))
+		var deck:=BoxMesh.new(); deck.size=Vector3(2.6,0.25,float(lift_cfg.depth)); var deck_vis:=MeshInstance3D.new(); deck_vis.mesh=deck; deck_vis.material_override=_material(Color("#a7bdc4")); lift.add_child(deck_vis); var deck_shape:=BoxShape3D.new(); deck_shape.size=deck.size; var deck_col:=CollisionShape3D.new(); deck_col.shape=deck_shape; lift.add_child(deck_col)
+		var glass_mat:=StandardMaterial3D.new(); glass_mat.albedo_color=Color(0.38,0.65,0.72,0.25); glass_mat.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA
+		for side in [-1.0,1.0]:
+			var pane:=MeshInstance3D.new(); var pane_mesh:=BoxMesh.new(); pane_mesh.size=Vector3(0.08,2.7,float(lift_cfg.depth)); pane.mesh=pane_mesh; pane.position.x=side*1.3; pane.material_override=glass_mat; lift.add_child(pane)
+		var back:=MeshInstance3D.new(); var back_mesh:=BoxMesh.new(); back_mesh.size=Vector3(2.6,2.7,0.08); back.mesh=back_mesh; back.position.z=-float(lift_cfg.depth)*0.5; back.material_override=glass_mat; lift.add_child(back); body.add_child(lift)
+		for stop_i in 3:
+			var radial := Vector3(cos(bearing), 0.0, sin(bearing))
+			var call_at := lift.position + Vector3.UP * float([0.0, 6.5, 89.5][stop_i]) + radial * (float(lift_cfg.depth) * 0.5 + 0.8)
+			_add_moy_lift_call(body, lift, stop_i, String(["Atrium floor", "Mezzanine", "Level 27 — Party suite"][stop_i]), call_at)
+	# Level 27 lobby and an empty south-facing party suite.
+	var suite_y:=89.5; var suite:=_box_body("HotelLevel27PartySuite",Vector3(16,0.3,10),Vector3(0,suite_y-0.15,23),Color("#c9b99d")); body.add_child(suite)
+	for side in [-1.0,1.0]:
+		var wall:=_box_body("HotelPartySuiteWall",Vector3(0.2,3.0,10),Vector3(side*8,suite_y+1.5,23),Color("#e6dac1")); body.add_child(wall)
+
+static func _hotel_local(center: Vector2, origin_x: float, origin_z: float, x: float, z: float) -> Vector2:
+	return Vector2(origin_x+x-center.x,origin_z+z-center.y)
+
+
+static func _hotel_tower_shell(parent: Node3D, center: Vector2, radius: float, height: float, lift_cfg: Dictionary) -> void:
+	# Faceted collision shell leaves the authored full-height lift slots open;
+	# the former cylinder collider sealed both the hotel interior and the exits.
+	var shell := StaticBody3D.new()
+	shell.name = "HotelTowerShellWithLiftClearances"
+	shell.collision_layer = 1
+	shell.collision_mask = 1
+	var segments := 96
+	var slot_half := atan2(float(lift_cfg.slot) * 0.5, radius)
+	var bearing_values: Array = lift_cfg.bearings
+	var material := _material(Color("#d1b78f"))
+	for i in segments:
+		var angle := TAU * (float(i) + 0.5) / float(segments)
+		var in_slot := false
+		for bearing_degrees in bearing_values:
+			if absf(wrapf(angle - deg_to_rad(float(bearing_degrees)), -PI, PI)) <= slot_half + PI / float(segments):
+				in_slot = true
+				break
+		if in_slot: continue
+		var arc := TAU * radius / float(segments) * 1.02
+		var panel_size := Vector3(0.42, height, arc)
+		var angle_center := Vector3(center.x + cos(angle) * (radius - 0.21), height * 0.5, center.y + sin(angle) * (radius - 0.21))
+		var panel_mesh := BoxMesh.new(); panel_mesh.size = panel_size
+		var panel := MeshInstance3D.new(); panel.name = "HotelTowerWallPanel_%02d" % i; panel.mesh = panel_mesh; panel.position = angle_center; panel.rotation.y = -angle; panel.material_override = material; shell.add_child(panel)
+		var shape := BoxShape3D.new(); shape.size = panel_size
+		var collision := CollisionShape3D.new(); collision.shape = shape; collision.position = angle_center; collision.rotation.y = -angle; shell.add_child(collision)
+	parent.add_child(shell)
+
+
+static func _add_moy_lift_call(parent: Node3D, lift: Node, index: int, label: String, at: Vector3) -> void:
+	var post := Node3D.new()
+	post.name = "%s_Call_%s" % [lift.name, label.to_snake_case()]
+	post.position = at
+	parent.add_child(post)
+	CalderaLift._control_post(post, Vector3.ZERO)
+	var area := Interactable.attach(post, "Call the lift", 1.2, func() -> void: lift.call("go_to", index), Callable(), Callable(), false, 1.5)
+	area.position = Vector3(0.0, 1.0, 0.0)
 
 
 static func _add_deck(packs: Dictionary, tree_templates: Dictionary) -> void:
@@ -390,9 +592,13 @@ static func _add_deck(packs: Dictionary, tree_templates: Dictionary) -> void:
 		for sx in [-1.0,1.0]:
 			for sz in [-1.0,1.0]:
 				var post:=_box_body("DeckLiftGuide",Vector3(0.22,6.5,0.22),Vector3(c.x+sx*(radius-0.2),DATUM+3.25,c.y+sz*(radius-0.2)),Color("#9caaac")); _add(packs,_cell(c),post)
-		var car:=AnimatableBody3D.new(); car.name="DeckLift_%s"%String(lift.name).replace(" ","_"); car.position=Vector3(c.x,DATUM,c.y); car.set_script(load("res://scripts/moy_lift_platform.gd"));
+		var car:=AnimatableBody3D.new(); car.name="DeckLift_%s"%String(lift.name).replace(" ","_"); car.position=Vector3(c.x,DATUM,c.y); car.set_script(load("res://scripts/moy_lift_platform.gd")); car.set("base_height",DATUM); car.set("stop_levels",PackedFloat32Array([0.0,6.5])); car.set("stop_names",PackedStringArray(["Park ground","Deck"]))
 		var platform:=BoxMesh.new(); platform.size=Vector3(radius*2,0.28,radius*2); var pv:=MeshInstance3D.new(); pv.mesh=platform; pv.material_override=_material(Color("#c7d1ce")); car.add_child(pv)
 		var ps:=BoxShape3D.new(); ps.size=platform.size; var pc:=CollisionShape3D.new(); pc.shape=ps; car.add_child(pc); _add(packs,_cell(c),car)
+		var controls := Node3D.new(); controls.name = "DeckLiftControls_%s" % String(lift.name).replace(" ", "_")
+		_add_moy_lift_call(controls, car, 0, "Park ground", Vector3(c.x, DATUM, c.y + radius + 1.0))
+		_add_moy_lift_call(controls, car, 1, "Deck", Vector3(c.x, DATUM + 6.5, c.y + radius + 1.0))
+		_add(packs, _cell(c), controls)
 	_add_crossing_towers(packs)
 
 
@@ -421,6 +627,10 @@ static func _add_park(packs: Dictionary, tree_templates: Dictionary) -> void:
 	# make the authored lawn read as grass instead of a pavement-coloured slab.
 	var grass:=_box_body("ParkLawn",Vector3(lawn_rect.size.x,0.12,lawn_rect.size.y),Vector3(lawn_rect.get_center().x,DATUM+0.13,lawn_rect.get_center().y),Color("#65a66b"))
 	_add(packs,_cell(lawn_rect.get_center()),grass)
+	var dry: Array = PLAN.PARK.dry_garden
+	var dry_rect := Rect2(float(dry[0]), float(dry[1]), float(dry[2]) - float(dry[0]), float(dry[3]) - float(dry[1]))
+	var gravel := _box_body("ParkDryGardenGravel", Vector3(dry_rect.size.x, 0.035, dry_rect.size.y), Vector3(dry_rect.get_center().x, DATUM + 0.095, dry_rect.get_center().y), Color("#938269"))
+	_add(packs, _cell(dry_rect.get_center()), gravel)
 	var pond: Dictionary = PLAN.PARK.pond; var c := Vector2(pond.c[0],pond.c[1]); var r: Vector2 = Vector2(pond.r[0],pond.r[1])
 	var water := MeshInstance3D.new(); water.name="MoyReedPondSurface"; var mesh := CylinderMesh.new(); mesh.top_radius=1; mesh.bottom_radius=1; mesh.height=0.01; mesh.radial_segments=64; water.mesh=mesh
 	water.scale=Vector3(r.x,1,r.y); water.position=Vector3(c.x,DATUM+0.4,c.y)
@@ -533,9 +743,15 @@ static func _add_meridian_pier(packs: Dictionary, x: float, rail: float, pier_in
 		var arm_foot:=Vector3(x,DATUM+25.5,0); var arm_head:=Vector3(x,DATUM+rail-1.2,side*2.7)
 		var arm:=_ramp_body("MeridianPierYArm_%02d_%d"%[pier_index,side_index],arm_foot,arm_head,1.15,1.15,Color("#888173")); _add(packs,_cell(Vector2(x,0)),arm)
 		var girder:=_box_body("MeridianBoxGirder_%02d_%d"%[pier_index,side_index],Vector3(36.0,1.2,1.0),Vector3(x,rail_y-1.2,side*1.7),Color("#77766f")); _add(packs,_cell(Vector2(x,0)),girder)
-	for vine_index in 2:
-		var z: float=-3.0 if vine_index==0 else 3.0
-		var vine:=_box_body("MeridianVineSleeve_%02d_%d"%[pier_index,vine_index],Vector3(0.3,21.0,0.3),Vector3(x,DATUM+17.5,z),Color("#66824f")); _add(packs,_cell(Vector2(x,z)),vine)
+	# GREEN specifies a 2 m mesh sleeve from +2 to +28 m. Wrap four leafy
+	# sheets around the actual pier stem; the vine geometry is decorative.
+	for side in 4:
+		var angle := float(side) * PI * 0.5
+		var sleeve := _vine_sheet(1.8, 26.0, pier_index * 17 + side)
+		sleeve.name = "MeridianVineSleeve_%02d_%d" % [pier_index, side]
+		sleeve.position = Vector3(x + cos(angle) * 1.25, DATUM + 15.0, sin(angle) * 1.25)
+		sleeve.rotation.y = PI * 0.5 - angle
+		_add(packs, _cell(Vector2(x, 0.0)), sleeve)
 
 
 static func _add_crossing_towers(packs: Dictionary) -> void:
@@ -543,24 +759,39 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 	for ti in cfg.towers.size():
 		var data: Dictionary=cfg.towers[ti]; var c: Vector2=Vector2(data.c[0],data.c[1]); var root:=Node3D.new(); root.name="CrossingTower_%02d"%ti; root.position=Vector3(c.x,DATUM,c.y)
 		var trunk:=_round_column("CrossingTowerTrunk",float(tcfg.trunk),float(cfg.roof.y),Vector3(0,float(cfg.roof.y)*0.5,0),Color("#8e948d")); root.add_child(trunk)
-		# Each authored profile is tessellated into short, walkable moving belt sections.
+		# A single continuous strip and collider per authored flight or landing.
 		for hand in data.hands:
 			var is_up:=String(hand.hand)=="up"
 			for pi in hand.profile.size():
 				var seg: Array=hand.profile[pi]; var a0:=deg_to_rad(float(seg[0])); var a1:=deg_to_rad(float(seg[1])); var y0:=float(seg[2]); var y1:=float(seg[3])
-				var count:=maxi(1,ceili(absf(a1-a0)*2.7))
-				for si in count:
-					var f0:=float(si)/float(count); var f1:=float(si+1)/float(count); var am:float=lerpf(a0,a1,(f0+f1)*0.5)
-					var ym:float=lerpf(y0,y1,(f0+f1)*0.5); var da:=absf(a1-a0)/float(count); var len:=maxf(0.16,2.7*da)
-					var tangent:=Vector3(-sin(am),0,cos(am)); var center:=Vector3(cos(am)*2.7,ym,sin(am)*2.7)
-					if y1==y0:
-						# The profile bearing is measured east-to-south around +Y.  A
-						# landing's long axis follows the tangent, not the radial axis.
-						var landing:=_box_body("CrossingHandLanding_%s_%d_%d"%[String(hand.hand),pi,si],Vector3(len,0.2,2.6),center,Color("#b5a783")); landing.rotation.y=-am-PI*0.5; root.add_child(landing)
-					else:
-						var p0:=Vector3(cos(lerpf(a0,a1,f0))*2.7,y0,sin(lerpf(a0,a1,f0))*2.7)
-						var p1:=Vector3(cos(lerpf(a0,a1,f1))*2.7,y1,sin(lerpf(a0,a1,f1))*2.7)
-						var belt:=_ramp_body("CrossingHand_%s_%d_%d"%[String(hand.hand),pi,si],p0,p1,2.6,0.16,Color("#aaa58f")); belt.set_script(load("res://scripts/moy_escalator.gd")); belt.set("travel_direction",(p1-p0).normalized()*(1.0 if is_up else -1.0)); belt.set("travel_speed",0.55); root.add_child(belt)
+				var mesh:=_helix_strip_mesh(a0,a1,y0,y1,1.4,4.0,0.2)
+				var body:=StaticBody3D.new(); body.name="CrossingHand_%02d_%s_%d"%[ti,String(hand.hand),pi]; body.collision_layer=1; body.collision_mask=1
+				var visual:=MeshInstance3D.new(); visual.mesh=mesh; visual.material_override=_material(Color("#aaa58f" if y1!=y0 else "#b5a783")); body.add_child(visual)
+				var shape:=ConcavePolygonShape3D.new(); shape.set_faces(mesh.get_faces()); var collision:=CollisionShape3D.new(); collision.shape=shape; body.add_child(collision)
+				if not is_equal_approx(y0,y1):
+					body.set_script(load("res://scripts/moy_escalator.gd")); body.set("helix_center",Vector3.ZERO); body.set("helix_rise_per_radian",(y1-y0)/(a1-a0)); body.set("helix_direction",1.0 if is_up else -1.0); body.set("travel_speed",0.55)
+					body.set_meta("helix_span",absf(a1-a0)); body.set_meta("helix_a0",a0); body.set_meta("helix_a1",a1); body.set_meta("helix_y0",y0); body.set_meta("helix_y1",y1); body.set_meta("helix_tread_radius",2.7)
+					# Add a visible underside and side returns below the continuous
+					# walking surface. They are visual only; the top remains the
+					# sole collision surface for traversal and handovers.
+					var belt_depth := 0.32
+					var return_material := _material(Color("#454b4b"))
+					var underside := MeshInstance3D.new(); underside.name = "HelixBelt_Return"
+					underside.mesh = _helix_strip_mesh(a0,a1,y0-belt_depth,y1-belt_depth,1.4,4.0,0.2); underside.material_override = return_material; body.add_child(underside)
+					var inner_side := MeshInstance3D.new(); inner_side.name = "HelixBelt_InnerEdge"
+					inner_side.mesh = _helix_strip_mesh(a0,a1,y0-belt_depth,y1-belt_depth,1.4,1.52,0.2); inner_side.material_override = return_material; body.add_child(inner_side)
+					var outer_side := MeshInstance3D.new(); outer_side.name = "HelixBelt_OuterEdge"
+					outer_side.mesh = _helix_strip_mesh(a0,a1,y0-belt_depth,y1-belt_depth,3.88,4.0,0.2); outer_side.material_override = return_material; body.add_child(outer_side)
+					var tread_material := _material(Color("#d7d8d1")); var tread_mesh := BoxMesh.new(); tread_mesh.size = Vector3(0.06,0.035,2.45)
+					var tread_count := maxi(4, ceili(absf(a1-a0)*2.7/0.7))
+					for tread_index in tread_count:
+						var tread := MeshInstance3D.new(); tread.name = "HelixMovingTread_%02d" % tread_index; tread.mesh = tread_mesh; tread.material_override = tread_material
+						var fraction := float(tread_index) / float(tread_count)
+						if not is_up: fraction = 1.0 - fraction
+						tread.set_meta("helix_fraction", fraction)
+						var tread_angle := lerpf(a0,a1,fraction); var tread_y := lerpf(y0,y1,fraction)
+						tread.position = Vector3(cos(tread_angle)*2.7,tread_y+0.05,sin(tread_angle)*2.7); tread.rotation.y = -tread_angle-PI*0.5; body.add_child(tread)
+				root.add_child(body)
 		for level in [6.5,14.2,37.0]:
 			var ann:=_annulus_body("CrossingGallery_%.1f"%level,float(tcfg.gallery_r[0]),float(tcfg.gallery_r[1]),48,1.0,level); root.add_child(ann)
 			for rail_i in 36:
@@ -578,15 +809,26 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 			# The plan's bearing is radial.  The panel width lies tangent to the
 			# tower; using the bearing directly yawed it 90 degrees around the
 			# drum and made the vines project outward instead of following the ribs.
-			var panel:=MeshInstance3D.new(); panel.name="CrossingClimberPanel_%03d"%ci; var mesh:=BoxMesh.new(); mesh.size=Vector3(width,y1-y0,0.16); panel.mesh=mesh; panel.position=Vector3(cos(angle)*6.02,(y0+y1)*0.5,sin(angle)*6.02); panel.rotation.y=-angle-PI*0.5; panel.material_override=_material(Color("#678752")); root.add_child(panel)
+			var panel := _vine_sheet(width, y1 - y0, 9000 + ci)
+			panel.name = "CrossingClimberVineSheet_%03d" % ci
+			panel.position = Vector3(cos(angle) * 6.02, (y0 + y1) * 0.5, sin(angle) * 6.02)
+			panel.rotation.y = -angle - PI * 0.5
+			root.add_child(panel)
 			if y0>0:
 				var planter:=_box_body("CrossingClimberPlanter_%03d"%ci,Vector3(0.55,0.5,0.8),Vector3(cos(angle)*5.55,y0+0.25,sin(angle)*5.55),Color("#746e54")); root.add_child(planter)
 		for hoop_i in 10:
 			var hoop_level:=float(hoop_i+1)*4.1
 			var hoop:=_annulus_visual("CrossingTowerHoop_%02d"%hoop_i,5.85,6.1,48,0.12,hoop_level); root.add_child(hoop)
-		var lift_data: Dictionary=data.lift; var lc: Array=lift_data.c; var lift:=AnimatableBody3D.new(); lift.name="CrossingTowerLift"; lift.position=Vector3(float(lc[0])-c.x,0,float(lc[1])-c.y); lift.set_script(load("res://scripts/moy_lift_platform.gd")); lift.set("base_height",0.0); lift.set("travel_height",40.4); lift.set("travel_period",48.0)
-		lift.set("stop_levels",PackedFloat32Array(data.levels))
+		var lift_data: Dictionary=data.lift; var lc: Array=lift_data.c; var lift:=AnimatableBody3D.new(); lift.name="CrossingTowerLift"; lift.position=Vector3(float(lc[0])-c.x,0,float(lc[1])-c.y); lift.set_script(load("res://scripts/moy_lift_platform.gd")); lift.set("base_height",0.0); lift.set("stop_levels",PackedFloat32Array(data.levels)); lift.set("stop_names",PackedStringArray(["Park ground", "Deck concourse", "Spine Line", "Meridian Line"]))
 		var liftmesh:=BoxMesh.new(); liftmesh.size=Vector3(2.6,0.22,2.6); var lv:=MeshInstance3D.new(); lv.mesh=liftmesh; lv.material_override=_material(Color("#bfd0ce")); lift.add_child(lv); var ls:=BoxShape3D.new(); ls.size=liftmesh.size; var lcol:=CollisionShape3D.new(); lcol.shape=ls; lift.add_child(lcol); root.add_child(lift)
+		var lift_controls := Node3D.new(); lift_controls.name = "CrossingTowerLiftCalls"
+		var lift_radial := Vector2(float(lc[0]) - c.x, float(lc[1]) - c.y).normalized()
+		for stop_i in data.levels.size():
+			var level := float(data.levels[stop_i])
+			var call_at := Vector3(float(lc[0]) - c.x + lift_radial.x * 2.3, level, float(lc[1]) - c.y + lift_radial.y * 2.3)
+			var label := String(["Park ground", "Deck concourse", "Spine Line", "Meridian Line"][mini(stop_i, 3)])
+			_add_moy_lift_call(lift_controls, lift, stop_i, label, call_at)
+		root.add_child(lift_controls)
 		# The glazed shaft is visual only; four separate guide posts carry it
 		# without sealing the lift or its landings with one tall collider.
 		var shaft_center:=Vector3(float(lc[0])-c.x,20.2,float(lc[1])-c.y)
@@ -606,11 +848,11 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 			var pts: Array=run.pts; var nearest:=_nearest_point_on_segment(c,Vector2(pts[0][0],pts[0][1]),Vector2(pts[-1][0],pts[-1][1]))
 			if c.distance_to(nearest)<=float(tcfg.gallery_r[1])+0.25: _add_crossing_walkway(packs,"CrossingTower_%02d_CrossBridgeLink_%s"%[ti,String(run.name)],c+(nearest-c).normalized()*float(tcfg.gallery_r[1]),nearest,6.5,2.4,Color("#b6a782"))
 		var spine_side:=1.0 if String(data.spine_platform)=="east" else -1.0
-		var spine_target:=Vector2(float(cfg.c[0])+spine_side*(float(PLAN.PLATFORMS.edge)+float(PLAN.CROSS.track)+float(PLAN.PLATFORMS.width)*0.5),c.y)
+		var spine_target:=Vector2(float(cfg.c[0])+spine_side*_station_platform_offset(true),c.y)
 		var spine_start:=c+Vector2(cos(deg_to_rad(float(data.opens["14.2"]))),sin(deg_to_rad(float(data.opens["14.2"]))))*float(tcfg.gallery_r[1])
 		_add_crossing_walkway(packs,"CrossingTower_%02d_SpinePlatformBridge"%ti,spine_start,spine_target,14.2,2.4,Color("#b6a782"))
 		var meridian_side:=1.0 if String(data.high_platform)=="south" else -1.0
-		var meridian_target:=Vector2(float(cfg.c[0]),float(cfg.c[1])+meridian_side*(float(PLAN.PLATFORMS.edge)+float(PLAN.CROSS.track)+float(PLAN.PLATFORMS.width)*0.5))
+		var meridian_target:=Vector2(float(cfg.c[0]),float(cfg.c[1])+meridian_side*_station_platform_offset(true))
 		var meridian_start:=c+Vector2(cos(deg_to_rad(float(data.opens["37.0"]))),sin(deg_to_rad(float(data.opens["37.0"]))))*float(tcfg.gallery_r[1])
 		_add_crossing_walkway(packs,"CrossingTower_%02d_MeridianPlatformBridge"%ti,meridian_start,meridian_target,37.0,2.4,Color("#b6a782"))
 		var lift_world:=Vector2(float(lc[0]),float(lc[1])); var lift_direction:Vector2=(lift_world-c).normalized()
@@ -639,10 +881,29 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 
 static func _annulus_body(label: String, inner: float, outer: float, segments: int, thickness: float, y: float) -> StaticBody3D:
 	var body:=StaticBody3D.new(); body.name=label; body.position.y=y-thickness*0.5; body.collision_layer=1; body.collision_mask=1
-	var mesh:=TorusMesh.new(); mesh.inner_radius=inner; mesh.outer_radius=outer; mesh.rings=segments; mesh.ring_segments=8; mesh.inner_radius=inner; mesh.outer_radius=outer
-	var vis:=MeshInstance3D.new(); vis.mesh=mesh; vis.rotation.x=PI*0.5; vis.material_override=_material(Color("#b6a580")); body.add_child(vis)
-	var col:=CollisionShape3D.new(); col.shape=mesh.create_trimesh_shape(); col.rotation.x=PI*0.5; body.add_child(col)
+	var mesh:=_flat_annulus_mesh(inner,outer,segments,thickness)
+	var vis:=MeshInstance3D.new(); vis.mesh=mesh; vis.material_override=_material(Color("#b6a580")); body.add_child(vis)
+	var col:=CollisionShape3D.new(); var shape:=ConcavePolygonShape3D.new(); shape.set_faces(mesh.get_faces()); col.shape=shape; body.add_child(col)
 	return body
+
+static func _flat_annulus_mesh(inner: float, outer: float, segments: int, thickness: float) -> ArrayMesh:
+	var st:=SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in segments:
+		var a:=TAU*float(i)/float(segments); var b:=TAU*float(i+1)/float(segments)
+		var ia0:=Vector3(cos(a)*inner,-thickness*0.5,sin(a)*inner); var oa0:=Vector3(cos(a)*outer,-thickness*0.5,sin(a)*outer)
+		var ia1:=Vector3(cos(b)*inner,-thickness*0.5,sin(b)*inner); var oa1:=Vector3(cos(b)*outer,-thickness*0.5,sin(b)*outer)
+		var ib0:=ia0+Vector3.UP*thickness; var ob0:=oa0+Vector3.UP*thickness; var ib1:=ia1+Vector3.UP*thickness; var ob1:=oa1+Vector3.UP*thickness
+		for tri in [[ib0,ob0,ob1],[ib0,ob1,ib1],[oa0,ia0,ia1],[oa0,ia1,oa1],[ob0,oa0,oa1],[ob0,oa1,ob1],[ia0,ib0,ib1],[ia0,ib1,ia1]]:
+			for v in tri: st.add_vertex(v)
+	return st.commit()
+
+static func _helix_strip_mesh(a0: float,a1: float,y0: float,y1: float,r_inner: float,r_outer: float,step_degrees: float) -> ArrayMesh:
+	var count:=maxi(1,ceili(absf(rad_to_deg(a1-a0))/step_degrees)); var st:=SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in count:
+		var f0:=float(i)/count; var f1:=float(i+1)/count; var aa:=lerpf(a0,a1,f0); var ab:=lerpf(a0,a1,f1); var ya:=lerpf(y0,y1,f0); var yb:=lerpf(y0,y1,f1)
+		var p0:=Vector3(cos(aa)*r_inner,ya,sin(aa)*r_inner); var p1:=Vector3(cos(aa)*r_outer,ya,sin(aa)*r_outer); var q0:=Vector3(cos(ab)*r_inner,yb,sin(ab)*r_inner); var q1:=Vector3(cos(ab)*r_outer,yb,sin(ab)*r_outer)
+		st.add_vertex(p0); st.add_vertex(p1); st.add_vertex(q1); st.add_vertex(p0); st.add_vertex(q1); st.add_vertex(q0)
+	return st.commit()
 
 
 static func _crossing_hand_landing_open(hands: Array, level: float, bearing: float) -> bool:
@@ -666,8 +927,7 @@ static func _add_crossing_walkway(packs: Dictionary, label: String, a: Vector2, 
 
 
 static func _annulus_visual(label: String, inner: float, outer: float, segments: int, thickness: float, y: float) -> Node3D:
-	var mesh:=TorusMesh.new(); mesh.inner_radius=inner; mesh.outer_radius=outer; mesh.rings=segments; mesh.ring_segments=8
-	var vis:=MeshInstance3D.new(); vis.name=label; vis.mesh=mesh; vis.rotation.x=PI*0.5; vis.position.y=y; vis.material_override=_material(Color("#a4aaa2")); return vis
+	var vis:=MeshInstance3D.new(); vis.name=label; vis.mesh=_flat_annulus_mesh(inner,outer,segments,thickness); vis.position.y=y; vis.material_override=_material(Color("#a4aaa2")); return vis
 
 
 static func _add_transit(packs: Dictionary) -> void:
@@ -707,17 +967,21 @@ static func _add_transit(packs: Dictionary) -> void:
 					var xoff: float=-3.2 if leg_index==0 else 3.2
 					var height:=top-DATUM
 					var leg:=_box_body("SpineFrameLeg_%02d_%d"%[frame_index,leg_index],Vector3(0.9,height,0.9),Vector3(fx+xoff,DATUM+height*0.5,fz),Color("#938a78")); _add(packs,_cell(Vector2(fx+xoff,fz)),leg)
+					var vine := _vine_sheet(0.84, height, 12000 + frame_index * 2 + leg_index)
+					vine.name = "SpineFrameCoralVine_%02d_%d" % [frame_index, leg_index]
+					vine.position = Vector3(fx + xoff, DATUM + height * 0.5, fz + 0.47)
+					_add(packs, _cell(Vector2(fx + xoff, fz)), vine)
 				var beam:=_box_body("SpineFrameBeam_%02d"%frame_index,Vector3(7.3,0.9,0.9),Vector3(fx,top-0.45,fz),Color("#938a78")); _add(packs,_cell(Vector2(fx,fz)),beam)
 		for station in PLAN.CROSS.stations:
 			if not station.lines.has(line_name): continue
 			var p: Vector2=Vector2(station.at[0],station.at[1]); var plat := PLAN.CROSS.platform
 			var station_y:=DATUM+float(station.get("rail",service.rail))+float(PLAN.PLATFORMS.floor)
 			var along_z:=line_name=="Spine Line"
-			var platform_offset:=float(PLAN.PLATFORMS.edge)+float(PLAN.CROSS.track)+float(PLAN.PLATFORMS.width)*0.5
+			var platform_offset:=_station_platform_offset(true)
 			for side in [-1.0,1.0]:
 				var platform_size:=Vector3(float(PLAN.PLATFORMS.width),0.3,plat[0]) if along_z else Vector3(plat[0],0.3,float(PLAN.PLATFORMS.width))
 				var platform_center:=Vector3(p.x+(side*platform_offset if along_z else 0.0),station_y-0.15,p.y+(0.0 if along_z else side*platform_offset))
-				var platform := _box_body("Station_%s_%s_%d"%[line_name,String(station.name).replace(" ","_"),int(side)],platform_size,platform_center,Color("#c4b18b"))
+				var platform := _box_body("Station_%s_%s_%d"%[line_name,String(station.name).replace(" ","_"),int(side)],platform_size,platform_center,Color("#c4b18b")); _set_box_collision_margin(platform,0.0)
 				_add(packs,_cell(p),platform)
 				var crossing_meridian:=String(station.name)=="The Crossing" and line_name=="Meridian Line"
 				if not crossing_meridian:
@@ -790,10 +1054,12 @@ static func _add_escalator_pair(packs: Dictionary, label: String, foot: Vector3,
 	var a:=foot-lateral*belt_width*0.5; var b:=head-lateral*belt_width*0.5
 	var up:=_ramp_body("%s_Up"%label,a,b,belt_width,0.32,Color("#b3a27e"))
 	up.set_script(load("res://scripts/moy_escalator.gd")); up.set("travel_direction",(b-a).normalized()); up.set("travel_speed",0.9)
+	_add_escalator_belt_visuals(up, (b-a).length(), belt_width, 0.32)
 	_add(packs,_cell(Vector2((a.x+b.x)*0.5,(a.z+b.z)*0.5)),up)
 	var c:=foot+lateral*belt_width*0.5; var d:=head+lateral*belt_width*0.5
 	var down:=_ramp_body("%s_Down"%label,d,c,belt_width,0.32,Color("#a49372"))
 	down.set_script(load("res://scripts/moy_escalator.gd")); down.set("travel_direction",(c-d).normalized()); down.set("travel_speed",0.9)
+	_add_escalator_belt_visuals(down, (c-d).length(), belt_width, 0.32)
 	_add(packs,_cell(Vector2((c.x+d.x)*0.5,(c.z+d.z)*0.5)),down)
 	var along_z:=absf(horizontal.z)>absf(horizontal.x)
 	var landing_size:=Vector3(total_width+0.6,0.3,2.4) if along_z else Vector3(2.4,0.3,total_width+0.6)
@@ -801,6 +1067,70 @@ static func _add_escalator_pair(packs: Dictionary, label: String, foot: Vector3,
 		var endpoint: Vector3=foot if endpoint_i==0 else head
 		var landing:=_box_body("%s_Landing_%d"%[label,endpoint_i],landing_size,endpoint-Vector3.UP*0.15,Color("#b6a17b"))
 		_add(packs,_cell(Vector2(endpoint.x,endpoint.z)),landing)
+
+
+static func _add_escalator_belt_visuals(body: StaticBody3D, length: float, width: float, thickness: float) -> void:
+	# The existing box remains the sole walking collider. This baked closed-loop
+	# ribbon makes the return belt and rounded end turns visible without adding
+	# collision that could snag the player below the steps.
+	var side_material := _material(Color("#454b4b"))
+	var ribbon := MeshInstance3D.new(); ribbon.name = "Belt_Return_And_End_Rolls"
+	var st := SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var radius := thickness * 0.5; var half := length * 0.5; var path := PackedVector2Array()
+	var arc_steps := 8
+	path.append(Vector2(-half, radius)); path.append(Vector2(half, radius))
+	for i in range(1, arc_steps + 1):
+		var angle := PI * 0.5 - PI * float(i) / float(arc_steps)
+		path.append(Vector2(half + cos(angle) * radius, sin(angle) * radius))
+	path.append(Vector2(-half, -radius))
+	for i in range(1, arc_steps + 1):
+		var angle := -PI * 0.5 - PI * float(i) / float(arc_steps)
+		path.append(Vector2(-half + cos(angle) * radius, sin(angle) * radius))
+	for i in path.size():
+		var p0 := path[i]; var p1 := path[(i + 1) % path.size()]
+		var a := Vector3(p0.x, p0.y, -width * 0.5); var b := Vector3(p0.x, p0.y, width * 0.5)
+		var c := Vector3(p1.x, p1.y, width * 0.5); var d := Vector3(p1.x, p1.y, -width * 0.5)
+		for vertex in [a, b, c, a, c, d]: st.add_vertex(vertex)
+	ribbon.mesh = st.commit(); ribbon.material_override = side_material; body.add_child(ribbon)
+	var tread_material := _material(Color("#d7d8d1"))
+	var tread_mesh := BoxMesh.new(); tread_mesh.size = Vector3(0.055, 0.035, width * 0.88)
+	var perimeter := 2.0 * length + PI * thickness
+	var tread_count := maxi(8, ceili(perimeter / 0.7))
+	for i in tread_count:
+		var tread := MeshInstance3D.new(); tread.name = "Moving_Tread_%02d" % i
+		tread.mesh = tread_mesh; tread.material_override = tread_material
+		tread.set_meta("belt_distance", perimeter * float(i) / float(tread_count))
+		body.add_child(tread)
+
+
+static func _vine_sheet(width: float, height: float, seed_value: int) -> MultiMeshInstance3D:
+	# Reuse NatureProps' SuperEgg leaves, arranged as a dense sheet of its
+	# actual jungle hanging vines. MultiMesh keeps the baked public city cheap.
+	var rng := RandomNumberGenerator.new(); rng.seed = seed_value
+	var prototype := NatureProps.build_hanging_vine(0.8, rng)
+	var leaf := prototype.get_child(0) as MeshInstance3D
+	var mesh := leaf.mesh
+	var material := leaf.material_override
+	prototype.free()
+	var strand_count := maxi(2, ceili(width / 0.28))
+	var segment_count := maxi(4, ceili(height / 0.18))
+	var multimesh := MultiMesh.new()
+	multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	multimesh.mesh = mesh
+	multimesh.instance_count = strand_count * segment_count
+	var instance := MultiMeshInstance3D.new(); instance.multimesh = multimesh
+	instance.material_override = material
+	var bounds := AABB(Vector3(-width * 0.5 - 0.2, -height * 0.5 - 0.1, -0.12), Vector3(width + 0.4, height + 0.2, 0.24))
+	instance.custom_aabb = bounds
+	for strand in strand_count:
+		var x := lerpf(-width * 0.5, width * 0.5, float(strand) / float(strand_count - 1))
+		var phase := rng.randf_range(0.0, TAU)
+		for segment in segment_count:
+			var y := height * 0.5 - 0.09 - float(segment) * 0.18
+			var sway := sin(float(segment) * 0.9 + phase) * 0.03
+			var transform := Transform3D(Basis(Vector3.BACK, sway * 2.0), Vector3(x + sway, y, 0.0))
+			multimesh.set_instance_transform(strand * segment_count + segment, transform)
+	return instance
 
 
 static func _add_station_core(packs: Dictionary, core: Dictionary, prefix: String) -> void:
@@ -833,67 +1163,123 @@ static func _add_station_core(packs: Dictionary, core: Dictionary, prefix: Strin
 		var lift_x:float=c.x+side*(sx*0.5-1.0)
 		var car:=AnimatableBody3D.new(); car.name="%s_%s_Lift_%d"%[prefix,String(core.name).replace(" ","_"),side_index]
 		car.position=Vector3(lift_x,DATUM,c.y); car.set_script(load("res://scripts/moy_lift_platform.gd"))
-		car.set("travel_height",max_level); car.set("base_height",DATUM); car.set("travel_period",maxf(12.0,max_level*1.2))
+		car.set("base_height",DATUM); car.set("stop_levels",PackedFloat32Array([0.0,max_level])); car.set("stop_names",PackedStringArray(["Station ground", "Station deck"]))
 		var mesh:=BoxMesh.new(); mesh.size=Vector3(1.5,0.25,1.5); var vis:=MeshInstance3D.new(); vis.mesh=mesh; vis.material_override=_material(Color("#c7d1ce")); car.add_child(vis)
 		var shape:=BoxShape3D.new(); shape.size=mesh.size; var col:=CollisionShape3D.new(); col.shape=shape; car.add_child(col)
 		_add(packs,_cell(c),car)
+		var controls := Node3D.new(); controls.name = "%s_%s_LiftControls_%d" % [prefix, String(core.name).replace(" ", "_"), side_index]
+		_add_moy_lift_call(controls, car, 0, "Station ground", Vector3(lift_x + side * 2.1, DATUM, c.y))
+		_add_moy_lift_call(controls, car, 1, "Station deck", Vector3(lift_x + side * 2.1, DATUM + max_level, c.y))
+		_add(packs, _cell(c), controls)
 
 
 static func _add_gate_forms(packs: Dictionary) -> void:
 	var color:=Color("#b39b73")
 	for leg in PLAN.ARCH.legs:
 		var r:=Rect2(float(leg[0]),float(leg[1]),float(leg[2])-float(leg[0]),float(leg[3])-float(leg[1])); var center:=r.get_center()
-		_add(packs,_cell(center),_box_body("MeridianArchLegLower",Vector3(r.size.x,12.0,r.size.y),Vector3(center.x,DATUM+6.0,center.y),color))
+		# Open six-metre public halls at both feet; corner piers carry the upper leg.
+		for sx in [-1.0,1.0]:
+			for sz in [-1.0,1.0]: _add(packs,_cell(center),_box_body("MeridianArchPublicHallPier",Vector3(3.0,6.0,3.0),Vector3(center.x+sx*(r.size.x*0.5-1.5),DATUM+3.0,center.y+sz*(r.size.y*0.5-1.5)),color))
+		_add(packs,_cell(center),_box_body("MeridianArchPublicHallLintel",Vector3(r.size.x,1.0,r.size.y),Vector3(center.x,DATUM+6.5,center.y),color))
 		_add(packs,_cell(center),_box_body("MeridianArchLegUpper",Vector3(r.size.x,51.0,r.size.y),Vector3(center.x,DATUM+46.5,center.y),color))
 		# Plan train_hall.arc defines the actual wall openings; leave the 12–21 m band clear through each data-defined leg.
 		var hall: Dictionary=PLAN.ARCH.train_hall; var hall_index:=0 if center.y<0 else 1; var bounds: Array=hall.x[hall_index]
 		var left_width:=maxf(0.0,float(bounds[0])-r.position.x); var right_start:=minf(r.size.x,float(bounds[1])-r.position.x)
 		for part in [Rect2(r.position.x,r.position.y,left_width,r.size.y),Rect2(r.position.x+right_start,r.position.y,r.size.x-right_start,r.size.y)]:
 			if part.size.x>0.1: _add(packs,_cell(center),_box_body("MeridianArchTrainHallPier",Vector3(part.size.x,9.0,part.size.y),Vector3(part.get_center().x,DATUM+16.5,part.get_center().y),color))
-	for bridge in [[PLAN.ARCH.lower, "MeridianArchLowerBridge"],[PLAN.ARCH.top,"MeridianArchTopBridge"]]:
-		var levels: Array=bridge[0]; var y0:=float(levels[0]); var y1:=float(levels[1]); var body:=_box_body(String(bridge[1]),Vector3(PLAN.ARCH.opening, y1-y0, 6.0),Vector3(-352.5,DATUM+(y0+y1)*0.5,0),color); _add(packs,_cell(Vector2(-352.5,0)),body)
+	var east_leg: Array=PLAN.ARCH.legs[0]
+	_add_bridge_station(packs,"MeridianArch",float(PLAN.ARCH.lower[0]),float(PLAN.ARCH.lower[1]),float(east_leg[0]),float(east_leg[2]),float(PLAN.ARCH.opening))
+	var top_levels: Array=PLAN.ARCH.top; var top_body:=_box_body("MeridianArchTopBridge",Vector3(PLAN.ARCH.opening,float(top_levels[1])-float(top_levels[0]),6.0),Vector3(-352.5,DATUM+(float(top_levels[0])+float(top_levels[1]))*0.5,0),color); _add(packs,_cell(Vector2(-352.5,0)),top_body)
 	var west_towers: Array=PLAN.WEST_GATE.towers
 	for i in west_towers.size():
 		var t: Array=west_towers[i]; var r:=Rect2(float(t[0]),float(t[1]),float(t[2])-float(t[0]),float(t[3])-float(t[1])); var c:=r.get_center(); var hall:=PLAN.WEST_GATE.train_hall; var bounds: Array=hall.x[i]
-		_add(packs,_cell(c),_box_body("WestGateTowerLower",Vector3(r.size.x,12.0,r.size.y),Vector3(c.x,DATUM+6,c.y),Color("#a78b64")))
+		for sx in [-1.0,1.0]:
+			for sz in [-1.0,1.0]: _add(packs,_cell(c),_box_body("WestGatePassagePier",Vector3(3.0,6.0,3.0),Vector3(c.x+sx*(r.size.x*0.5-1.5),DATUM+3,c.y+sz*(r.size.y*0.5-1.5)),Color("#a78b64")))
+		_add(packs,_cell(c),_box_body("WestGatePassageLintel",Vector3(r.size.x,1.0,r.size.y),Vector3(c.x,DATUM+6.5,c.y),Color("#a78b64")))
 		_add(packs,_cell(c),_box_body("WestGateTowerUpper",Vector3(r.size.x,23.0,r.size.y),Vector3(c.x,DATUM+32.5,c.y),Color("#a78b64")))
 		var left_width:=maxf(0.0,float(bounds[0])-r.position.x); var right_start:=minf(r.size.x,float(bounds[1])-r.position.x)
 		for part in [Rect2(r.position.x,r.position.y,left_width,r.size.y),Rect2(r.position.x+right_start,r.position.y,r.size.x-right_start,r.size.y)]:
 			if part.size.x>0.1: _add(packs,_cell(c),_box_body("WestGateTrainHallPier",Vector3(part.size.x,9.0,part.size.y),Vector3(part.get_center().x,DATUM+16.5,c.y),Color("#a78b64")))
 	var west_bridge:=PLAN.WEST_GATE.bridge
-	_add(packs,_cell(Vector2(-769.5,0)),_box_body("WestGateBridge",Vector3(25.0,float(west_bridge[1])-float(west_bridge[0]),6.0),Vector3(-769.5,DATUM+(float(west_bridge[0])+float(west_bridge[1]))*0.5,0),Color("#bca37c")))
+	var west_leg: Array=PLAN.WEST_GATE.towers[0]
+	_add_bridge_station(packs,"WestGate",float(west_bridge[0]),float(west_bridge[1]),float(west_leg[0]),float(west_leg[2]),float(PLAN.ARCH.opening))
 	for core in PLAN.ARCH.cores: _add_station_core(packs,core,"EastGateCore")
 	for core in PLAN.WEST_GATE.cores: _add_station_core(packs,core,"WestGateCore")
+	# Public doors from the City Hall halls onto Civic Plaza.
+
+static func _add_bridge_station(packs: Dictionary,label: String,y0: float,y1: float,x0: float,x1: float,width_z: float) -> void:
+	var cx:=(x0+x1)*0.5; var cy:=DATUM+y0; var length:=x1-x0
+	_add(packs,_cell(Vector2(cx,0)),_box_body(label+"BridgeFloor",Vector3(length,0.8,width_z),Vector3(cx,cy+0.4,0),Color("#bca37c")))
+	_add(packs,_cell(Vector2(cx,0)),_box_body(label+"BridgeRoof",Vector3(length,0.6,width_z),Vector3(cx,DATUM+y1-0.3,0),Color("#bca37c")))
+	for side in [-1.0,1.0]:
+		var glass_side:=_box_body(label+"BridgeGlassSide",Vector3(length,y1-y0-1.4,0.12),Vector3(cx,DATUM+(y0+y1)*0.5,side*(width_z*0.5-0.06)),Color(0.45,0.65,0.69,0.24)); _set_body_glass(glass_side,Color(0.45,0.65,0.69,0.24)); _add(packs,_cell(Vector2(cx,side*width_z*0.5)),glass_side)
+	# Tracks remain in the central 8 m; platforms flank them, with open ends.
+	var platform_offset:=_station_platform_offset(true)
+	for side in [-1.0,1.0]:
+		var pz: float=side*platform_offset
+		var platform:=_box_body(label+"BridgePlatform",Vector3(float(PLAN.CROSS.platform[0]),0.3,float(PLAN.PLATFORMS.width)),Vector3(cx,DATUM+y0+5.0-0.15,pz),Color("#c4b18b")); _set_box_collision_margin(platform,0.0); _add(packs,_cell(Vector2(cx,pz)),platform)
 
 
-static func _add_timekeeper(packs: Dictionary) -> void:
-	var cfg: Dictionary = PLAN.TIMEKEEPER; var center := Vector3(cfg.x,DATUM+cfg.y,cfg.z)
-	var root := Node3D.new(); root.name="TimekeeperRings"; root.set_script(load("res://scripts/moy_timekeeper.gd"))
-	root.position=center
-	for ring in cfg.rings:
-		var inner := float(ring[1]); var outer := float(ring[2])
-		var torus := TorusMesh.new(); torus.inner_radius=inner; torus.outer_radius=outer; torus.rings=48; torus.ring_segments=8
-		var body:=AnimatableBody3D.new(); body.name="Timekeeper_%s"%String(ring[0]); body.collision_layer=1; body.collision_mask=1; body.sync_to_physics=true
-		var visual := MeshInstance3D.new(); visual.mesh=torus; visual.rotation.z=PI*0.5; visual.material_override=_material(Color("#a88955")); body.add_child(visual)
-		var collision:=CollisionShape3D.new(); collision.shape=torus.create_trimesh_shape(); collision.rotation.z=PI*0.5; body.add_child(collision)
-		if String(ring[0])!="bezel":
-			var marker: Dictionary=cfg.markers[String(ring[0])]; var arrow:=_clock_arrow(inner,outer,float(marker.arc),float(marker.proud)); arrow.name="Timekeeper_%s_Arrow"%String(ring[0]); body.add_child(arrow)
-		else:
-			for mark_i in 60:
-				var is_hour:=mark_i%5==0; var angle:=TAU*float(mark_i)/60.0
-				var mark:=MeshInstance3D.new(); var box:=BoxMesh.new(); box.size=Vector3(0.16,0.12,1.2 if is_hour and mark_i%15==0 else 0.5 if is_hour else 0.55)
-				mark.mesh=box; mark.position=Vector3(0,cos(angle)*12.75,sin(angle)*12.75); mark.rotation.x=angle; mark.material_override=_material(Color("#45433d")); body.add_child(mark)
-		root.add_child(body)
-	var seconds:=MeshInstance3D.new(); seconds.name="TimekeeperSecondsBead"; var bead:=SphereMesh.new(); bead.radius=float(cfg.seconds.bead); bead.height=float(cfg.seconds.bead)*2; seconds.mesh=bead; seconds.material_override=_material(Color("#f24d38")); seconds.position=Vector3(0,cos(0.0)*float(cfg.seconds.r),sin(0.0)*float(cfg.seconds.r)); root.add_child(seconds)
-	_add(packs,_cell(Vector2(center.x,center.z)),root)
+static func _add_city_dome(packs: Dictionary) -> void:
+	var cfg: Dictionary=PLAN.CROSSING; var dome: Dictionary=cfg.dome; var base:=float(dome.base); var center:=Vector2(float(cfg.c[0]),float(cfg.c[1]))
+	var root:=Node3D.new(); root.name="CrossingCityDome"; root.position=Vector3(center.x,DATUM+base,center.y)
+	var drum: Dictionary=dome.drum; var half:=float(drum.half); var exponent:=float(drum.n); var glass:=StandardMaterial3D.new(); glass.albedo_color=Color(0.38,0.63,0.68,0.18); glass.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; glass.roughness=0.15
+	# Continuous faceted superellipse glass enclosure; collision keeps the roof edge safe.
+	for i in 96:
+		var a:=TAU*float(i)/96.0; var b:=TAU*float(i+1)/96.0
+		var xa:=half*signf(cos(a))*pow(absf(cos(a)),2.0/exponent); var za:=half*signf(sin(a))*pow(absf(sin(a)),2.0/exponent)
+		var xb:=half*signf(cos(b))*pow(absf(cos(b)),2.0/exponent); var zb:=half*signf(sin(b))*pow(absf(sin(b)),2.0/exponent)
+		var panel:=_box_body("DomeGlassPanel_%02d"%i,Vector3(Vector2(xa,za).distance_to(Vector2(xb,zb)),float(drum.h),0.12),Vector3((xa+xb)*0.5,float(drum.h)*0.5,(za+zb)*0.5),Color(0.42,0.67,0.72,0.28)); panel.rotation.y=-atan2(zb-za,xb-xa)
+		for panel_child in panel.get_children():
+			if panel_child is MeshInstance3D: (panel_child as MeshInstance3D).material_override=glass
+		# panes are collision-bearing walls, assigned into the Crossing cell.
+		_add(packs,_cell(center),panel)
+	for ri in int(dome.ribs):
+		var a:=TAU*float(ri)/float(dome.ribs); var rib:=_round_column("DomeSteelRib_%02d"%ri,0.24,float(drum.h),Vector3(half*cos(a),float(drum.h)*0.5,half*sin(a)),Color("#879b9d")); root.add_child(rib)
+	var top_ring:=_annulus_visual("DomeTopSteelRing",half-0.25,half+0.25,96,0.32,float(drum.h)); root.add_child(top_ring)
+	var cupola: Dictionary=dome.cupola; var cap:=MeshInstance3D.new(); cap.name="DomeGlassCupola"; var cupola_mesh:=_superellipsoid_mesh(half,float(cupola.h),exponent,48,16); cap.mesh=cupola_mesh; cap.position.y=float(drum.h); cap.material_override=glass; root.add_child(cap)
+	var cs:=CollisionShape3D.new(); var css:=ConcavePolygonShape3D.new(); css.set_faces(cupola_mesh.get_faces()); cs.shape=css; var collision_body:=StaticBody3D.new(); collision_body.name="DomeCupolaLanding"; collision_body.position.y=float(drum.h); collision_body.add_child(cs); root.add_child(collision_body)
+	var clock_root:=Node3D.new(); clock_root.name="CityClockFaces"; clock_root.position.y=float(dome.clocks.centre); clock_root.set_meta("moy_keep_children",true); clock_root.set_script(load("res://scripts/moy_timekeeper.gd")); clock_root.set("game_clock_path",NodePath("/root/World/DayNightCycle")); root.add_child(clock_root)
+	for face_i in 4:
+		var bearing:=deg_to_rad(float(dome.clocks.bearings[face_i])); var face:=Node3D.new(); face.name="ClockFace_%d"%face_i; face.position=Vector3(cos(bearing)*half,0,sin(bearing)*half); face.rotation.y=-bearing+PI*0.5; clock_root.add_child(face)
+		for ring in dome.clocks.rings:
+			var ring_name:=String(ring[0]); var inner:=float(ring[1]); var outer:=float(ring[2]); var anim:=Node3D.new(); anim.name="CityClock_%s_%d"%[ring_name,face_i]; face.add_child(anim)
+			var visual:=MeshInstance3D.new(); visual.mesh=_flat_annulus_mesh(inner,outer,48,0.16); visual.rotation.x=PI*0.5; visual.material_override=_material(Color("#a88955")); anim.add_child(visual)
+			if ring_name!="bezel":
+				var marker: Dictionary=dome.clocks.markers[ring_name]; var arrow:=_clock_arrow(inner,outer,float(marker.arc),float(dome.clocks.proud)); arrow.name="Arrow"; anim.add_child(arrow)
+			else:
+				for tick in 48:
+					var angle:=TAU*float(tick)/48.0; var mark_width:=float(dome.clocks.marks.minute.w); var mark_len:=float(dome.clocks.marks.minute.len)
+					if tick%4==0: mark_width=float(dome.clocks.marks.hour); mark_len=float(dome.clocks.marks.quarter) if tick%12==0 else float(dome.clocks.marks.hour)
+					var box:=BoxMesh.new(); box.size=Vector3(mark_width,mark_len,0.08)
+					var tick_mesh:=MeshInstance3D.new(); tick_mesh.mesh=box; tick_mesh.position=Vector3(cos(angle)*7.5,sin(angle)*7.5,0.2); tick_mesh.rotation.z=angle-PI*0.5; tick_mesh.material_override=_material(Color("#45433d")); anim.add_child(tick_mesh)
+	var bell: Dictionary=dome.bell; var bell_node:=MeshInstance3D.new(); bell_node.name="CityBell_SOUND_PLACEHOLDER"; var bell_mesh:=CylinderMesh.new(); bell_mesh.top_radius=float(bell.mouth)*0.35; bell_mesh.bottom_radius=float(bell.mouth)*0.5; bell_mesh.height=float(bell.height); bell_node.mesh=bell_mesh; bell_node.position.y=float(bell.bottom)+float(bell.height)*0.5-base; bell_node.material_override=_material(Color("#96764a")); root.add_child(bell_node)
+	var bell_script_root:=Node3D.new(); bell_script_root.name="CityBellScheduler"; bell_script_root.set_script(load("res://scripts/moy_timekeeper.gd")); bell_script_root.set("bell_path",NodePath("../CityBell_SOUND_PLACEHOLDER")); var audio_placeholder:=AudioStreamPlayer3D.new(); audio_placeholder.name="CityBellAudio_PLACEHOLDER_NO_ASSET"; bell_script_root.add_child(audio_placeholder); root.add_child(bell_script_root)
+	_add(packs,_cell(center),root)
 
 
 static func _clock_arrow(inner: float, outer: float, arc: float, proud: float) -> MeshInstance3D:
 	var half:=deg_to_rad(arc)*0.5; var st:=SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var a:=Vector3(proud,cos(-half)*inner,sin(-half)*inner); var b:=Vector3(proud,cos(half)*inner,sin(half)*inner); var tip:=Vector3(proud,outer,0)
+	var a:=Vector3(cos(-half)*inner,sin(-half)*inner,proud); var b:=Vector3(cos(half)*inner,sin(half)*inner,proud); var tip:=Vector3(outer,0,proud)
 	for side in [-1.0,1.0]:
-		var x: float=proud*side; st.set_normal(Vector3(side,0,0)); st.add_vertex(Vector3(x,a.y,a.z)); st.add_vertex(Vector3(x,b.y,b.z)); st.add_vertex(Vector3(x,tip.y,tip.z))
+		var z: float=proud+side*0.05; st.set_normal(Vector3(0,0,side)); st.add_vertex(Vector3(a.x,a.y,z)); st.add_vertex(Vector3(b.x,b.y,z)); st.add_vertex(Vector3(tip.x,tip.y,z))
 	var mesh:=st.commit(); var arrow:=MeshInstance3D.new(); arrow.mesh=mesh; var mat:=StandardMaterial3D.new(); mat.albedo_color=Color("#f03f35"); mat.emission_enabled=true; mat.emission=Color("#f03f35"); arrow.material_override=mat; return arrow
+
+
+static func _superellipsoid_mesh(radius: float,height: float,exponent: float,segments: int,rings: int) -> ArrayMesh:
+	var st:=SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for row in rings:
+		var v0:float=-PI*0.5+PI*float(row)/float(rings); var v1:float=-PI*0.5+PI*float(row+1)/float(rings)
+		for col in segments:
+			var u0:=TAU*float(col)/float(segments); var u1:=TAU*float(col+1)/float(segments)
+			var p00:=_superellipsoid_point(radius,height,exponent,u0,v0); var p10:=_superellipsoid_point(radius,height,exponent,u1,v0); var p01:=_superellipsoid_point(radius,height,exponent,u0,v1); var p11:=_superellipsoid_point(radius,height,exponent,u1,v1)
+			st.add_vertex(p00); st.add_vertex(p01); st.add_vertex(p11); st.add_vertex(p00); st.add_vertex(p11); st.add_vertex(p10)
+	return st.commit()
+
+static func _superellipsoid_point(radius: float,height: float,exponent: float,u: float,v: float) -> Vector3:
+	var cv:=cos(v); var sv:=sin(v); var cu:=cos(u); var su:=sin(u)
+	var x:=radius*signf(cv*cu)*pow(absf(cv*cu),2.0/exponent); var z:=radius*signf(cv*su)*pow(absf(cv*su),2.0/exponent)
+	return Vector3(x,(sv*0.5+0.5)*height,z)
 
 
 static func _add_turbines(packs: Dictionary) -> void:
@@ -949,16 +1335,16 @@ static func _add_wall_transit(packs: Dictionary) -> void:
 		var theta:=atan2(radial.y,radial.x)
 		for lane in 2:
 			var track_radius:=float(PLAN.WALL.r)+float(PLAN.WALL.track_axis)+float(lane)*float(PLAN.WALL.track_spacing)
-			var platform_offset:=float(PLAN.PLATFORMS.edge)+float(PLAN.CROSS.track)+float(PLAN.PLATFORMS.width)*0.5
-			var platform_radius:=track_radius+(-platform_offset if lane==0 else platform_offset)
-			var platform_segments:=10
 			var platform_half_length:=float(PLAN.CROSS.platform[0])*0.5
+			var platform_segments:=maxi(1,ceili(rad_to_deg(platform_half_length*2.0/track_radius)/2.0))
+			var platform_offset:=_curved_platform_offset(track_radius)
+			var platform_radius:=track_radius+(-platform_offset if lane==0 else platform_offset)
 			for segment_index in platform_segments:
 				var a_angle:=theta-platform_half_length/track_radius+(platform_half_length*2.0)/track_radius*float(segment_index)/float(platform_segments)
 				var b_angle:=theta-platform_half_length/track_radius+(platform_half_length*2.0)/track_radius*float(segment_index+1)/float(platform_segments)
 				var a:=Vector2(PLAN.CENTER.x+platform_radius*cos(a_angle),PLAN.CENTER.y+platform_radius*sin(a_angle))
 				var b:=Vector2(PLAN.CENTER.x+platform_radius*cos(b_angle),PLAN.CENTER.y+platform_radius*sin(b_angle))
-				var platform:=_segment_body("WallLine_Station_%s_Platform_%d_%d"%[String(station.name).replace(" ","_"),lane,segment_index],a,b,float(PLAN.PLATFORMS.width),rail_y+0.7,0.3,Color("#c4b18b"))
+				var platform:=_segment_body("WallLine_Station_%s_Platform_%d_%d"%[String(station.name).replace(" ","_"),lane,segment_index],a,b,float(PLAN.PLATFORMS.width),rail_y+0.7,0.3,Color("#c4b18b")); _set_box_collision_margin(platform,0.0)
 				_add(packs,_cell((a+b)*0.5),platform)
 				var canopy:=_segment_body("WallLine_Station_%s_Canopy_%d_%d"%[String(station.name).replace(" ","_"),lane,segment_index],a,b,float(PLAN.PLATFORMS.width),rail_y+float(PLAN.PLATFORMS.floor)+float(PLAN.PLATFORMS.canopy),0.18,Color("#bcb49b")); _add(packs,_cell((a+b)*0.5),canopy)
 	for lane in 2:

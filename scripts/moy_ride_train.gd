@@ -228,7 +228,7 @@ func _add_rideable_car_collision(car: AnimatableBody3D) -> void:
 		[Vector3(1.7,2.65,0.16),Vector3(-3.95,2.325,1.52)], [Vector3(3.4,2.65,0.16),Vector3(0,2.325,1.52)], [Vector3(1.7,2.65,0.16),Vector3(3.95,2.325,1.52)],
 	]
 	for i in parts.size():
-		var shape:=BoxShape3D.new(); shape.size=parts[i][0]
+		var shape:=BoxShape3D.new(); shape.size=parts[i][0]; shape.margin=0.0
 		var collision:=CollisionShape3D.new(); collision.name="RideableCarFrame_%02d"%i; collision.shape=shape; collision.position=parts[i][1]; car.add_child(collision)
 	for side in [-1.0,1.0]:
 		for door_x in [-2.4,2.4]:

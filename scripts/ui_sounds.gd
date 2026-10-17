@@ -15,6 +15,7 @@ const BLORB_GLIDE_HOLD_MSEC := 90
 const SNOWBOARD_HOLD_MSEC := 45
 const ICE_SKATE_HOLD_MSEC := 45
 const FOLEY_POOL_SIZE := 3
+const SFX_BUS_GAIN_DB := 4.0
 
 var enabled: bool = true
 var _selection_player: AudioStreamPlayer
@@ -449,9 +450,12 @@ func _input(event: InputEvent) -> void:
 
 func _ensure_audio_buses() -> void:
 	for bus_name in [&"Foley", &"UI"]:
-		if AudioServer.get_bus_index(bus_name) < 0:
+		var bus_index := AudioServer.get_bus_index(bus_name)
+		if bus_index < 0:
 			AudioServer.add_bus()
-			AudioServer.set_bus_name(AudioServer.bus_count - 1, bus_name)
+			bus_index = AudioServer.bus_count - 1
+			AudioServer.set_bus_name(bus_index, bus_name)
+		AudioServer.set_bus_volume_db(bus_index, SFX_BUS_GAIN_DB)
 
 
 func _make_player(stream: AudioStreamWAV, bus_name: StringName = &"Foley") -> AudioStreamPlayer:

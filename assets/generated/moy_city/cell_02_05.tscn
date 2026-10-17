@@ -241,219 +241,219 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_8i3qk"]
 size = Vector3(32, 0.15, 24)
 
-[node name="MoyCell_02_05" type="Node3D" unique_id=709444908]
+[node name="MoyCell_02_05" type="Node3D" unique_id=512812076]
 
-[node name="Street_Market Street" type="StaticBody3D" parent="." unique_id=2081138221]
+[node name="Street_Market Street" type="StaticBody3D" parent="." unique_id=77255708]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -633.5, -60.05, 118)
 
-[node name="@CollisionShape3D@333" type="CollisionShape3D" parent="Street_Market Street" unique_id=1866107425]
+[node name="@CollisionShape3D@335" type="CollisionShape3D" parent="Street_Market Street" unique_id=295470328]
 shape = SubResource("BoxShape3D_b4qbh")
 
-[node name="@MeshInstance3D@334" type="MeshInstance3D" parent="Street_Market Street" unique_id=538591326]
+[node name="@MeshInstance3D@336" type="MeshInstance3D" parent="Street_Market Street" unique_id=1612645849]
 material_override = SubResource("StandardMaterial3D_k3d1s")
 mesh = SubResource("BoxMesh_prl82")
 
-[node name="Street_Museum Lane" type="StaticBody3D" parent="." unique_id=426122490]
+[node name="Street_Museum Lane" type="StaticBody3D" parent="." unique_id=1503010288]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -639, -60.05, 88)
 
-[node name="@CollisionShape3D@341" type="CollisionShape3D" parent="Street_Museum Lane" unique_id=1667810887]
+[node name="@CollisionShape3D@343" type="CollisionShape3D" parent="Street_Museum Lane" unique_id=249969232]
 shape = SubResource("BoxShape3D_f6yw1")
 
-[node name="@MeshInstance3D@342" type="MeshInstance3D" parent="Street_Museum Lane" unique_id=774900518]
+[node name="@MeshInstance3D@344" type="MeshInstance3D" parent="Street_Museum Lane" unique_id=1881860748]
 material_override = SubResource("StandardMaterial3D_nlfb7")
 mesh = SubResource("BoxMesh_bgx4j")
 
-[node name="Lot_023" type="StaticBody3D" parent="." unique_id=1836340934]
+[node name="Lot_023" type="StaticBody3D" parent="." unique_id=2017340632]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -666.5, -45.375, 106.5)
 
-[node name="@CollisionShape3D@437" type="CollisionShape3D" parent="Lot_023" unique_id=992635418]
+[node name="@CollisionShape3D@435" type="CollisionShape3D" parent="Lot_023" unique_id=876482303]
 shape = SubResource("BoxShape3D_exubr")
 
-[node name="@MeshInstance3D@438" type="MeshInstance3D" parent="Lot_023" unique_id=2048899165]
+[node name="@MeshInstance3D@436" type="MeshInstance3D" parent="Lot_023" unique_id=1816017467]
 material_override = SubResource("StandardMaterial3D_1yaic")
 mesh = SubResource("BoxMesh_5rqbs")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_023" unique_id=134981160]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_023" unique_id=1954952312]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.55, 0)
 material_override = SubResource("StandardMaterial3D_0ymva")
 mesh = SubResource("BoxMesh_dbs64")
 
-[node name="Lot_024" type="StaticBody3D" parent="." unique_id=159154506]
+[node name="Lot_024" type="StaticBody3D" parent="." unique_id=619120442]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -658.5, -48.625, 106.5)
 
-[node name="@CollisionShape3D@439" type="CollisionShape3D" parent="Lot_024" unique_id=609921591]
+[node name="@CollisionShape3D@437" type="CollisionShape3D" parent="Lot_024" unique_id=300927741]
 shape = SubResource("BoxShape3D_mdb27")
 
-[node name="@MeshInstance3D@440" type="MeshInstance3D" parent="Lot_024" unique_id=941420045]
+[node name="@MeshInstance3D@438" type="MeshInstance3D" parent="Lot_024" unique_id=311917074]
 material_override = SubResource("StandardMaterial3D_qakbi")
 mesh = SubResource("BoxMesh_of5yp")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_024" unique_id=630011157]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_024" unique_id=1547748776]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.3, 0)
 material_override = SubResource("StandardMaterial3D_uveya")
 mesh = SubResource("BoxMesh_3o88n")
 
-[node name="Lot_025" type="StaticBody3D" parent="." unique_id=1511259486]
+[node name="Lot_025" type="StaticBody3D" parent="." unique_id=703598288]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -651, -53.5, 106.5)
 
-[node name="@CollisionShape3D@441" type="CollisionShape3D" parent="Lot_025" unique_id=14587941]
+[node name="@CollisionShape3D@439" type="CollisionShape3D" parent="Lot_025" unique_id=1530421846]
 shape = SubResource("BoxShape3D_c4jw6")
 
-[node name="@MeshInstance3D@442" type="MeshInstance3D" parent="Lot_025" unique_id=1676494808]
+[node name="@MeshInstance3D@440" type="MeshInstance3D" parent="Lot_025" unique_id=1742268721]
 material_override = SubResource("StandardMaterial3D_4xfl3")
 mesh = SubResource("BoxMesh_u12h1")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_025" unique_id=1146302307]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_025" unique_id=1526984163]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.425, 0)
 material_override = SubResource("StandardMaterial3D_4xsk4")
 mesh = SubResource("BoxMesh_x5tfg")
 
-[node name="Lot_026" type="StaticBody3D" parent="." unique_id=1317454333]
+[node name="Lot_026" type="StaticBody3D" parent="." unique_id=1571945608]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -644.5, -50.25, 106.5)
 
-[node name="@CollisionShape3D@443" type="CollisionShape3D" parent="Lot_026" unique_id=1007311043]
+[node name="@CollisionShape3D@441" type="CollisionShape3D" parent="Lot_026" unique_id=1374243312]
 shape = SubResource("BoxShape3D_tjaer")
 
-[node name="@MeshInstance3D@444" type="MeshInstance3D" parent="Lot_026" unique_id=734416364]
+[node name="@MeshInstance3D@442" type="MeshInstance3D" parent="Lot_026" unique_id=1183629577]
 material_override = SubResource("StandardMaterial3D_4e5ob")
 mesh = SubResource("BoxMesh_qa1au")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_026" unique_id=1628126333]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_026" unique_id=685078512]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.675, 0)
 material_override = SubResource("StandardMaterial3D_vkxku")
 mesh = SubResource("BoxMesh_fsbuy")
 
-[node name="Lot_029" type="StaticBody3D" parent="." unique_id=1619703465]
+[node name="Lot_029" type="StaticBody3D" parent="." unique_id=1502814318]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -648.5, -47, 80)
 
-[node name="@CollisionShape3D@449" type="CollisionShape3D" parent="Lot_029" unique_id=669703744]
+[node name="@CollisionShape3D@447" type="CollisionShape3D" parent="Lot_029" unique_id=1539020440]
 shape = SubResource("BoxShape3D_kw6sm")
 
-[node name="@MeshInstance3D@450" type="MeshInstance3D" parent="Lot_029" unique_id=1271015250]
+[node name="@MeshInstance3D@448" type="MeshInstance3D" parent="Lot_029" unique_id=2091665239]
 material_override = SubResource("StandardMaterial3D_ldxii")
 mesh = SubResource("BoxMesh_1e5pj")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_029" unique_id=2057756208]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_029" unique_id=1391116554]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.925, 0)
 material_override = SubResource("StandardMaterial3D_yqlg0")
 mesh = SubResource("BoxMesh_pexwy")
 
-[node name="Lot_030" type="StaticBody3D" parent="." unique_id=1309530161]
+[node name="Lot_030" type="StaticBody3D" parent="." unique_id=862384673]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -648.5, -51.875, 88)
 
-[node name="@CollisionShape3D@451" type="CollisionShape3D" parent="Lot_030" unique_id=991961970]
+[node name="@CollisionShape3D@449" type="CollisionShape3D" parent="Lot_030" unique_id=123261163]
 shape = SubResource("BoxShape3D_ra5ii")
 
-[node name="@MeshInstance3D@452" type="MeshInstance3D" parent="Lot_030" unique_id=645117790]
+[node name="@MeshInstance3D@450" type="MeshInstance3D" parent="Lot_030" unique_id=2137054774]
 material_override = SubResource("StandardMaterial3D_caxqm")
 mesh = SubResource("BoxMesh_josfr")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_030" unique_id=1342310705]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_030" unique_id=2125006328]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.05, 0)
 material_override = SubResource("StandardMaterial3D_u1shw")
 mesh = SubResource("BoxMesh_ynkm4")
 
-[node name="Lot_031" type="StaticBody3D" parent="." unique_id=769233918]
+[node name="Lot_031" type="StaticBody3D" parent="." unique_id=655142488]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -648.5, -45.375, 96)
 
-[node name="@CollisionShape3D@453" type="CollisionShape3D" parent="Lot_031" unique_id=1294943662]
+[node name="@CollisionShape3D@451" type="CollisionShape3D" parent="Lot_031" unique_id=574422440]
 shape = SubResource("BoxShape3D_kdvuy")
 
-[node name="@MeshInstance3D@454" type="MeshInstance3D" parent="Lot_031" unique_id=1619340744]
+[node name="@MeshInstance3D@452" type="MeshInstance3D" parent="Lot_031" unique_id=1512514345]
 material_override = SubResource("StandardMaterial3D_865rb")
 mesh = SubResource("BoxMesh_c2hxc")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_031" unique_id=48346687]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_031" unique_id=884607704]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14.55, 0)
 material_override = SubResource("StandardMaterial3D_7bhas")
 mesh = SubResource("BoxMesh_8f16m")
 
-[node name="Lot_057" type="StaticBody3D" parent="." unique_id=1602015508]
+[node name="Lot_057" type="StaticBody3D" parent="." unique_id=171539675]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -632.5, -48.625, 107)
 
-[node name="@CollisionShape3D@505" type="CollisionShape3D" parent="Lot_057" unique_id=604156003]
+[node name="@CollisionShape3D@503" type="CollisionShape3D" parent="Lot_057" unique_id=924852793]
 shape = SubResource("BoxShape3D_ya5l0")
 
-[node name="@MeshInstance3D@506" type="MeshInstance3D" parent="Lot_057" unique_id=1075337648]
+[node name="@MeshInstance3D@504" type="MeshInstance3D" parent="Lot_057" unique_id=164256097]
 material_override = SubResource("StandardMaterial3D_y0uur")
 mesh = SubResource("BoxMesh_5bvii")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_057" unique_id=1318904479]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_057" unique_id=1055087478]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 11.3, 0)
 material_override = SubResource("StandardMaterial3D_vsf0l")
 mesh = SubResource("BoxMesh_t2xgn")
 
-[node name="Lot_058" type="StaticBody3D" parent="." unique_id=366230828]
+[node name="Lot_058" type="StaticBody3D" parent="." unique_id=643318781]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -625, -53.5, 107)
 
-[node name="@CollisionShape3D@507" type="CollisionShape3D" parent="Lot_058" unique_id=366772613]
+[node name="@CollisionShape3D@505" type="CollisionShape3D" parent="Lot_058" unique_id=2090310300]
 shape = SubResource("BoxShape3D_8p865")
 
-[node name="@MeshInstance3D@508" type="MeshInstance3D" parent="Lot_058" unique_id=142717779]
+[node name="@MeshInstance3D@506" type="MeshInstance3D" parent="Lot_058" unique_id=199844435]
 material_override = SubResource("StandardMaterial3D_jikrt")
 mesh = SubResource("BoxMesh_g2y5r")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_058" unique_id=1637270764]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_058" unique_id=598053536]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.425, 0)
 material_override = SubResource("StandardMaterial3D_x24cb")
 mesh = SubResource("BoxMesh_hii3i")
 
-[node name="Lot_059" type="StaticBody3D" parent="." unique_id=629849040]
+[node name="Lot_059" type="StaticBody3D" parent="." unique_id=1522751808]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -618, -50.25, 107)
 
-[node name="@CollisionShape3D@509" type="CollisionShape3D" parent="Lot_059" unique_id=235448565]
+[node name="@CollisionShape3D@507" type="CollisionShape3D" parent="Lot_059" unique_id=181510947]
 shape = SubResource("BoxShape3D_f0wba")
 
-[node name="@MeshInstance3D@510" type="MeshInstance3D" parent="Lot_059" unique_id=1943635438]
+[node name="@MeshInstance3D@508" type="MeshInstance3D" parent="Lot_059" unique_id=100898207]
 material_override = SubResource("StandardMaterial3D_r6wc7")
 mesh = SubResource("BoxMesh_xwu1j")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_059" unique_id=1452608043]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_059" unique_id=472250850]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.675, 0)
 material_override = SubResource("StandardMaterial3D_awor2")
 mesh = SubResource("BoxMesh_oe8kg")
 
-[node name="Lot_060" type="StaticBody3D" parent="." unique_id=2203350]
+[node name="Lot_060" type="StaticBody3D" parent="." unique_id=374836896]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -609, -47, 107)
 
-[node name="@CollisionShape3D@511" type="CollisionShape3D" parent="Lot_060" unique_id=2131527402]
+[node name="@CollisionShape3D@509" type="CollisionShape3D" parent="Lot_060" unique_id=1137408069]
 shape = SubResource("BoxShape3D_rbawc")
 
-[node name="@MeshInstance3D@512" type="MeshInstance3D" parent="Lot_060" unique_id=1210517847]
+[node name="@MeshInstance3D@510" type="MeshInstance3D" parent="Lot_060" unique_id=154168929]
 material_override = SubResource("StandardMaterial3D_2orit")
 mesh = SubResource("BoxMesh_38mo3")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_060" unique_id=1766359491]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_060" unique_id=1917726199]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.925, 0)
 material_override = SubResource("StandardMaterial3D_5sxr1")
 mesh = SubResource("BoxMesh_mot8o")
 
-[node name="Building_08_Primary_school" type="StaticBody3D" parent="." unique_id=1606837008]
+[node name="Building_08_Primary_school" type="StaticBody3D" parent="." unique_id=924375864]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -652.5, -54, 137)
 
-[node name="@CollisionShape3D@869" type="CollisionShape3D" parent="Building_08_Primary_school" unique_id=23810781]
+[node name="@CollisionShape3D@1260" type="CollisionShape3D" parent="Building_08_Primary_school" unique_id=1393122859]
 shape = SubResource("BoxShape3D_lrg5k")
 
-[node name="@MeshInstance3D@870" type="MeshInstance3D" parent="Building_08_Primary_school" unique_id=783076982]
+[node name="@MeshInstance3D@1261" type="MeshInstance3D" parent="Building_08_Primary_school" unique_id=1788680796]
 material_override = SubResource("StandardMaterial3D_nv20s")
 mesh = SubResource("BoxMesh_wwn1g")
 
-[node name="@MeshInstance3D@871" type="MeshInstance3D" parent="Building_08_Primary_school" unique_id=865134461]
+[node name="@MeshInstance3D@1262" type="MeshInstance3D" parent="Building_08_Primary_school" unique_id=1895475397]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.925, 0)
 material_override = SubResource("StandardMaterial3D_dk33n")
 mesh = SubResource("BoxMesh_vilos")
 
-[node name="Building_35_Wing_Fat_Mansion" type="StaticBody3D" parent="." unique_id=1115275568]
+[node name="Building_35_Wing_Fat_Mansion" type="StaticBody3D" parent="." unique_id=1968596820]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -621, -24, 134)
 
-[node name="@CollisionShape3D@996" type="CollisionShape3D" parent="Building_35_Wing_Fat_Mansion" unique_id=1542778709]
+[node name="@CollisionShape3D@1387" type="CollisionShape3D" parent="Building_35_Wing_Fat_Mansion" unique_id=1958608437]
 shape = SubResource("BoxShape3D_hrdeg")
 
-[node name="@MeshInstance3D@997" type="MeshInstance3D" parent="Building_35_Wing_Fat_Mansion" unique_id=1394904928]
+[node name="@MeshInstance3D@1388" type="MeshInstance3D" parent="Building_35_Wing_Fat_Mansion" unique_id=1412628611]
 material_override = SubResource("StandardMaterial3D_pimnh")
 mesh = SubResource("BoxMesh_bfqwp")
 
-[node name="@MeshInstance3D@998" type="MeshInstance3D" parent="Building_35_Wing_Fat_Mansion" unique_id=1349665860]
+[node name="@MeshInstance3D@1389" type="MeshInstance3D" parent="Building_35_Wing_Fat_Mansion" unique_id=623432915]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 35.925, 0)
 material_override = SubResource("StandardMaterial3D_jei8q")
 mesh = SubResource("BoxMesh_8i3qk")

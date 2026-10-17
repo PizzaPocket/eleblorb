@@ -1,46 +1,52 @@
 extends AnimatableBody3D
 
-## Small public lift platform between street datum and the Moy Deck.
-@export var travel_height := 6.5
-@export var travel_period := 12.0
+## Stationary-until-called public lift used by the Deck, station cores and
+## Crossing towers. Its call posts and onboard menu share Fire Kingdom lift
+## interaction semantics.
 @export var base_height := -60.0
-@export var stop_levels := PackedFloat32Array()
-@export var stop_dwell := 0.8
-var _clock := 0.0
+@export var stop_levels := PackedFloat32Array([0.0, 6.5])
+@export var stop_names := PackedStringArray(["Street", "Deck"])
+@export var travel_speed := 2.5
+var _current_stop := 0
+var _target_stop := 0
 
 func _ready() -> void:
 	sync_to_physics = true
+	if stop_levels.size() > 0:
+		position.y = base_height + stop_levels[0]
+	var control := Interactable.attach(self, "Choose a level", 1.0, _show_level_menu, Callable(), Callable(), false, 1.6)
+	control.position = Vector3(0.0, 0.45, 0.0)
 
 func _physics_process(delta: float) -> void:
-	if stop_levels.size()>=2:
-		_clock=fposmod(_clock+delta,_stop_cycle_duration())
-		position.y=base_height+_scheduled_stop_height(_clock)
-		return
-	_clock=fposmod(_clock+delta,travel_period)
-	var u:=_clock/travel_period
-	var phase:=u*2.0
-	position.y=base_height+travel_height*(phase if phase<=1.0 else 2.0-phase)
+	if stop_levels.is_empty(): return
+	var before := position.y
+	var target_y := base_height + stop_levels[_target_stop]
+	position.y = move_toward(position.y, target_y, travel_speed * delta)
+	constant_linear_velocity = Vector3.UP * ((position.y - before) / maxf(delta, 0.0001))
+	if is_equal_approx(position.y, target_y):
+		_current_stop = _target_stop
+		constant_linear_velocity = Vector3.ZERO
 
+func go_to(index: int) -> void:
+	if index >= 0 and index < stop_levels.size():
+		_target_stop = index
 
-func _stop_cycle_duration() -> float:
-	var travel_distance:=0.0
-	for i in stop_levels.size()-1: travel_distance+=absf(stop_levels[i+1]-stop_levels[i])*2.0
-	return travel_period+stop_dwell*float(stop_levels.size()*2-2)
+func is_moving() -> bool:
+	return stop_levels.is_empty() or not is_equal_approx(position.y, base_height + stop_levels[_target_stop])
 
+func _show_level_menu() -> void:
+	if is_moving(): return
+	var actions: Array[Dictionary] = []
+	for i in range(stop_levels.size() - 1, -1, -1):
+		var destination := i
+		var label := String(stop_names[i]) if i < stop_names.size() else "Level %.1f" % (base_height + stop_levels[i])
+		actions.append({"label": label, "callback": func() -> void:
+			DialogUI.hide_dialog()
+			go_to(destination)})
+	DialogUI.show_line("Lift", "Choose a level", actions, "")
 
-func _scheduled_stop_height(clock: float) -> float:
-	var distance:=0.0
-	for i in stop_levels.size()-1: distance+=absf(stop_levels[i+1]-stop_levels[i])*2.0
-	if distance<=0.001: return stop_levels[0]
-	var current_time:=clock
-	var waypoints:=PackedFloat32Array()
-	for level in stop_levels: waypoints.append(level)
-	for i in range(stop_levels.size()-2,0,-1): waypoints.append(stop_levels[i])
-	for i in waypoints.size():
-		var here:=float(waypoints[i]); var next:=float(waypoints[(i+1)%waypoints.size()])
-		if current_time<=stop_dwell: return here
-		current_time-=stop_dwell
-		var duration:=travel_period*absf(next-here)/distance
-		if current_time<=duration: return lerpf(here,next,current_time/maxf(duration,0.001))
-		current_time-=duration
-	return waypoints[0]
+func destination_labels() -> PackedStringArray:
+	var labels := PackedStringArray()
+	for i in range(stop_levels.size() - 1, -1, -1):
+		labels.append(String(stop_names[i]) if i < stop_names.size() else "Level %.1f" % (base_height + stop_levels[i]))
+	return labels
