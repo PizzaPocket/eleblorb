@@ -1,0 +1,35 @@
+[gd_scene format=3]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_c87h1"]
+size = Vector3(18, 4, 12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_frjyl"]
+albedo_color = Color(0.7411765, 0.7607843, 0.7647059, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_kbi7n"]
+size = Vector3(18, 4, 12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_syl67"]
+albedo_color = Color(0.78517646, 0.80145097, 0.8047059, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_bd6c3"]
+size = Vector3(18, 0.15, 12)
+
+[node name="MoyCell_-1_04" type="Node3D" unique_id=469552954]
+
+[node name="Building_41_Recycling_works" type="StaticBody3D" parent="." unique_id=1263493547]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -807, -58, 22)
+
+[node name="@CollisionShape3D@1037" type="CollisionShape3D" parent="Building_41_Recycling_works" unique_id=828719194]
+shape = SubResource("BoxShape3D_c87h1")
+
+[node name="@MeshInstance3D@1038" type="MeshInstance3D" parent="Building_41_Recycling_works" unique_id=1284442483]
+material_override = SubResource("StandardMaterial3D_frjyl")
+mesh = SubResource("BoxMesh_kbi7n")
+
+[node name="@MeshInstance3D@1039" type="MeshInstance3D" parent="Building_41_Recycling_works" unique_id=770447548]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.925, 0)
+material_override = SubResource("StandardMaterial3D_syl67")
+mesh = SubResource("BoxMesh_bd6c3")

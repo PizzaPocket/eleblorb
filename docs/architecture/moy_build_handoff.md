@@ -1,5 +1,14 @@
 # Moy: handoff for the first low-fidelity build (2026-10-17)
 
+> **Playable prototype execution contract, 2026-10-17:** For the owner's next
+> implementation chat, read [moy_playable_prototype.md](moy_playable_prototype.md)
+> first. It uses this handoff and the existing 3D/design documents, narrows the
+> scope to a traversal prototype, and supplies performance/QA gates. The
+> [readiness review](../diagnostics/2026-10-17-moy-prototype-readiness.md) records
+> two current Godot plan failures and the missing estate data export. This
+> earlier handoff is not evidence that those preflight checks pass. The short
+> starter is [here](../prompts/moy_playable_prototype_luna.md).
+
 This is the snapshot to build from. The plan is settled enough for a first
 pass: block out every street, building, landmark and line at the right size
 and place, with collision, so the city can be walked, climbed and ridden.
@@ -45,7 +54,7 @@ metres above the basin floor; levels are fixed:
 |---|---|---|
 | street | 0 | streets, squares, the park |
 | the Deck | +6.5 | the walkway (`DECK`) |
-| the Spine Line and the Wall Line | +12 | `CROSS` service 0, the top of `WALL` |
+| the Spine Line / Wall Line | +12 main / +20 gate flyover vs +13.2 wall rail | independent services, no junction; `CROSS` profile and gate station rail |
 | the Meridian high line | +36 (rail) | `CROSS` service 1 |
 
 ## What to build, in order

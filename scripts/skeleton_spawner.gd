@@ -49,8 +49,8 @@ const TOWN_EXCLUSION_RADIUS := 85.0
 ## new cross-referencing pattern. CITY_EXCLUSION_RADIUS itself is
 ## CITY_FLAT_RADIUS (78.0) plus margin so skeletons don't rise just outside
 ## the city's own flattened foundation edge.
-const CITY_CENTER := Vector2(-540, 0)
-const CITY_EXCLUSION_RADIUS := 110.0
+const CITY_CENTER := Vector2(-560, 0)
+const CITY_EXCLUSION_RADIUS := 270.0
 ## The player's arrival clearing is a settlement-like safe space even though
 ## it has no buildings. Check both the player and candidate positions so an
 ## encounter cannot rise just inside the boundary while the player stands

@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2q08o"]
+size = Vector3(86, 0.16, 4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hxr1n"]
+albedo_color = Color(0.6117647, 0.5372549, 0.4392157, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_c5yp0"]
+size = Vector3(86, 0.16, 4)
+
+[node name="MoyCell_00_01" type="Node3D" unique_id=1284899280]
+
+[node name="Street_Tank Lane" type="StaticBody3D" parent="." unique_id=421702643]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -737, -60.05, -120)
+
+[node name="@CollisionShape3D@335" type="CollisionShape3D" parent="Street_Tank Lane" unique_id=268522296]
+shape = SubResource("BoxShape3D_2q08o")
+
+[node name="@MeshInstance3D@336" type="MeshInstance3D" parent="Street_Tank Lane" unique_id=1399414640]
+material_override = SubResource("StandardMaterial3D_hxr1n")
+mesh = SubResource("BoxMesh_c5yp0")

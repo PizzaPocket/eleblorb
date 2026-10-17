@@ -294,9 +294,13 @@ const FALL_POOL_DEPTH := 10.0
 ## The city lies far beyond the western canyon and the giant's wasteland
 ## route, deep in the gorge-floor wasteland. Its foundation stays flat and
 ## collision-safe.
-const CITY_CENTER := Vector2(-540, 0)
-const CITY_FLAT_RADIUS := 78.0
-const CITY_FLATTEN_TRANSITION := 18.0
+const CITY_CENTER := Vector2(-560, 0)
+const CITY_FLAT_RADIUS := 235.0
+const CITY_FLATTEN_TRANSITION := 24.0
+const MOY_POND_CENTER := Vector2(-516.0, -28.0)
+const MOY_POND_RADII := Vector2(19.0, 13.0)
+const MOY_POND_SURFACE := -59.6
+const MOY_POND_DEPTH := 4.0
 ## The Chinese village sits out in the northwest-of-lake wasteland, confirmed
 ## clear of every other landform/biome center -- see chinese_village.gd's own
 ## doc comment. Per direct instruction, the whole village now sits on
@@ -469,7 +473,19 @@ func get_height(x: float, z: float) -> float:
 				else:
 					height = _wasteland_height(x, z)
 
-	return height
+	return _moy_pond_bed(x, z, height)
+
+
+func _moy_pond_bed(x: float, z: float, natural: float) -> float:
+	var d := (Vector2(x, z) - MOY_POND_CENTER) / MOY_POND_RADII
+	var r2 := d.length_squared()
+	if r2 >= 1.0: return natural
+	return MOY_POND_SURFACE - 0.35 - MOY_POND_DEPTH * (1.0 - r2)
+
+
+func moy_pond_coverage(world_pos: Vector2) -> float:
+	var d := (world_pos - MOY_POND_CENTER) / MOY_POND_RADII
+	return 1.0 - smoothstep(0.82, 1.0, d.length())
 
 
 ## Bowl, banks and the east sill of the tarn. Inside TOWN_POND_BANK_RADIUS the
@@ -555,12 +571,14 @@ const CHINESE_WATER := preload("res://scripts/chinese_water.gd")
 
 func is_water_area(world_pos: Vector2) -> bool:
 	if not CHINESE_WATER.at(world_pos).is_empty(): return true
-	return is_lake_area(world_pos) or town_pond_coverage(world_pos)>0.01
+	return moy_pond_coverage(world_pos)>0.01 or is_lake_area(world_pos) or town_pond_coverage(world_pos)>0.01
 
 
 func get_water_surface_height(world_pos: Vector2) -> float:
 	if not CHINESE_WATER.at(world_pos).is_empty():
 		return get_chinese_village_island_surface_y()+CHINESE_WATER.SURFACE
+	if moy_pond_coverage(world_pos)>0.01:
+		return MOY_POND_SURFACE
 	if town_pond_coverage(world_pos)>0.01:
 		return TOWN_POND_WATER_LEVEL
 	return LAKE_WATER_LEVEL
@@ -570,6 +588,8 @@ func get_water_floor_height(world_pos: Vector2) -> float:
 	var pond := CHINESE_WATER.at(world_pos)
 	if not pond.is_empty():
 		return get_chinese_village_island_surface_y()+CHINESE_WATER.bed(pond,world_pos-CHINESE_WATER.CENTER)
+	if moy_pond_coverage(world_pos)>0.01:
+		return _moy_pond_bed(world_pos.x,world_pos.y,-60.0)
 	return get_mesh_height(world_pos.x,world_pos.y)
 
 

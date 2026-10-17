@@ -44,6 +44,7 @@ func _ready() -> void:
 	_check_overlaps()
 	_check_frontage()
 	_check_streets()
+	_check_omitted_streets()
 	_check_turbines()
 	_check_tower_kits()
 	print("---- validate_city_plan: %d streets, %d buildings, %d lots, %d FAIL" % [CityPlan.STREETS.size(), CityPlan.BUILDINGS.size(), CityPlan.LOTS.size(), _failures])
@@ -92,7 +93,22 @@ func _in_street_or_open(p: Vector2) -> bool:
 	for o in CityPlan.OPENS:
 		if (o["rect"] as Rect2).has_point(p):
 			return true
+	for poly in CityPlan.OLD_TOWN["lane_polys"]:
+		if Geometry2D.is_point_in_polygon(p, PackedVector2Array(poly)):
+			return true
+	for square in CityPlan.OLD_TOWN["squares"]:
+		if Geometry2D.is_point_in_polygon(p, PackedVector2Array(square["pts"])):
+			return true
 	return false
+
+
+func _check_omitted_streets() -> void:
+	for s in CityPlan.OMITTED_STREETS:
+		var r: Array = s["rect"]
+		var nearest_x := clampf(CityPlan.CENTER.x, float(r[0]), float(r[2]))
+		var nearest_z := clampf(CityPlan.CENTER.y, float(r[1]), float(r[3]))
+		if Vector2(nearest_x, nearest_z).distance_to(CityPlan.CENTER) <= CityPlan.RIM_RADIUS + 3.0:
+			_fail("omitted street %s intersects the 203 m clip" % s["name"])
 
 
 func _in_precinct(p: Vector2) -> bool:
@@ -170,6 +186,22 @@ func _occupied(p: Vector2) -> bool:
 
 
 func _has_frontage(r: Rect2) -> bool:
+	# Old Moy is organic rather than grid-snapped. A served face can sit just
+	# outside the sampling ray while remaining within the authored street edge.
+	for lane in CityPlan.OLD_TOWN["lanes"]:
+		var reach_rect: Rect2 = r.grow(FRONT_REACH + float(lane["w"]) * 0.5)
+		var points: Array = lane["pts"]
+		for i in points.size() - 1:
+			var a := Vector2(points[i][0], points[i][1])
+			var b := Vector2(points[i + 1][0], points[i + 1][1])
+			var steps := maxi(1, int(ceil(a.distance_to(b))))
+			for step in steps + 1:
+				if reach_rect.has_point(a.lerp(b, float(step) / steps)):
+					return true
+	for square in CityPlan.OLD_TOWN["squares"]:
+		for point in square["pts"]:
+			if r.grow(FRONT_REACH).has_point(Vector2(point[0], point[1])):
+				return true
 	var sides := [
 		[r.position, Vector2(r.end.x, r.position.y), Vector2(0, -0.5)],
 		[Vector2(r.position.x, r.end.y), r.end, Vector2(0, 0.5)],

@@ -35,6 +35,12 @@ const FAR_WEIGHT := 0.45
 const PASS_THROUGH := 3
 const PASS_THROUGH_STEP := 0.4
 
+## A little camera movement is just looking around. Deliberately looking
+## 15–65 degrees up progressively asks for climbing, on every playable rig.
+static func climb_intent(ctx: TraversalContext) -> float:
+	var look := -ctx.aim_basis.z.normalized()
+	return smoothstep(sin(deg_to_rad(15.0)), sin(deg_to_rad(65.0)), look.y)
+
 
 ## One support worth throwing at. A class rather than a bare Vector3 because the
 ## body it belongs to matters too: the next search has to be able to look past
@@ -65,12 +71,18 @@ static func best(
 	var from := ctx.body.global_position
 	var found: Found = null
 	var best_score := -INF
+	var climb_bias := climb_intent(ctx)
+	var elevations := ELEVATIONS.duplicate()
+	if climb_bias > 0.0:
+		# One extra steep ray per bearing; keep the old fan as a fallback so
+		# looking up cannot miss a usable support just between new angles.
+		elevations.push_front(lerpf(ELEVATIONS[0], 0.98, climb_bias))
 	var excluded: Array[RID] = [ctx.body.get_rid()]
 	if skip.is_valid():
 		excluded.append(skip)
 	for bearing: float in BEARINGS:
 		var horizontal := forward.rotated(Vector3.UP, deg_to_rad(bearing))
-		for rise: float in ELEVATIONS:
+		for rise: float in elevations:
 			var direction := (
 				horizontal * sqrt(maxf(0.0, 1.0 - rise * rise)) + Vector3.UP * rise
 			).normalized()

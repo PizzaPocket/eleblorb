@@ -8,7 +8,7 @@ extends Node3D
 const NPC_SCENE := "res://scenes/npc.tscn"
 # Far beyond the canyon and the giant's route, including the farthest edge
 # of the street grid.
-const CITY_CENTER := Vector2(-540, 0)
+const CITY_CENTER := Vector2(-560, 0)
 const BLOCK_X := [-48.0, -16.0, 16.0, 48.0]
 const BLOCK_Z := [-34.0, 0.0, 34.0]
 const HEIGHTS := [8, 14, 20, 11, 17, 7, 15, 19, 10, 13, 6, 16, 9, 18, 12, 5, 16, 8, 20, 11, 14, 7, 18, 10]
@@ -83,45 +83,179 @@ var _city_blocks: Array[Node3D] = []
 var _light_lod_timer := 0.0
 var _city_zone_active := true
 var _city_skyline_visible := false
+const MOY_PLAN := preload("res://scripts/city_plan.gd")
+const MOY_MANIFEST_PATH := "res://assets/generated/moy_city/manifest.json"
+const MOY_REQUEST_RADIUS := 520.0
+const MOY_ACTIVATE_RADIUS := 390.0
+const MOY_RELEASE_RADIUS := 455.0
+const MOY_SILHOUETTE_PATH := "res://assets/generated/moy_city/silhouette.tscn"
+var _moy_paths: Array[String] = []
+var _moy_active: Dictionary = {}
+var _moy_requested := {}
+var _moy_unload_queue: Array[String] = []
+var _moy_actors_added := false
+var _moy_silhouette: Node3D
+var _moy_activation_frame_pending := false
+var _moy_activation_count := 0
+var _moy_resident_index := 0
+var _moy_shop_added := false
+var _moy_resident_points := [Vector2(-600,0),Vector2(-600,-54),Vector2(-600,54),Vector2(-700,2),Vector2(-690,-40),Vector2(-695,-63),Vector2(-743,20),Vector2(-720,60),Vector2(-620,-94),Vector2(-600,120),Vector2(-450,-18),Vector2(-360,2)]
 
 func _ready() -> void:
 	terrain = get_node("../Terrain")
-	LoadingScreen.enqueue_build_stage("Preparing navigation…",0.84,_rebuild)
+	_load_moy_manifest()
 
 func _rebuild() -> void:
-	var old := get_node_or_null("Generated")
-	if old:
-		old.free()
-	var old_skyline := get_node_or_null("Skyline")
-	if old_skyline:
-		old_skyline.free()
-	var generated := Node3D.new()
-	generated.name = "Generated"
-	add_child(generated)
-	_rng.seed = 2095
-	_city_blocks.clear()
-	_build_grid(generated)
-	_build_towers(generated)
-	_build_city_skyline()
-	for block in _city_blocks:
-		_materialize_block(block)
-	_build_skybridges(generated)
-	_spawn_residents(generated)
-	_spawn_city_helm_vendor(generated)
-	_update_city_zone_from_player()
-	# A hot reload can rebuild Generated while the zone is already asleep;
-	# apply the current state explicitly so the replacement does not wake
-	# until the player actually returns to the western travel range.
-	_set_city_children_active(generated, _city_zone_active)
-	_set_city_skyline_visible(_city_skyline_visible)
+	_load_moy_manifest()
 
 func _process(delta: float) -> void:
-	_light_lod_timer -= delta
-	if _light_lod_timer <= 0.0:
-		_light_lod_timer = LIGHT_LOD_UPDATE_INTERVAL
-		_update_city_zone_from_player()
-		if _city_zone_active:
-			_update_room_lights_from_player()
+	if _moy_activation_frame_pending:
+		print("MOY_ACTIVATION_FRAME delta_ms=", delta * 1000.0, " active_packs=", _moy_active.size(), " bodies=", _count_physics_bodies(self))
+		_moy_activation_frame_pending = false
+	_stream_moy_city()
+
+
+func _load_moy_manifest() -> void:
+	_moy_paths.clear()
+	if not FileAccess.file_exists(MOY_MANIFEST_PATH):
+		push_error("Moy static bake is missing. Run Godot --headless --path . tools/bake_moy_city.tscn")
+		return
+	var data = JSON.parse_string(FileAccess.get_file_as_string(MOY_MANIFEST_PATH))
+	if not data is Dictionary or not data.has("packs"):
+		push_error("Moy static bake manifest is invalid. Re-run tools/bake_moy_city.tscn")
+		return
+	for source in data.get("sources", {}):
+		var expected := String(data.sources[source])
+		var absolute := ProjectSettings.globalize_path(String(source))
+		if not FileAccess.file_exists(String(source)) or FileAccess.get_sha256(absolute) != expected:
+			push_error("Moy static bake is stale at %s. Re-run tools/bake_moy_city.tscn" % source)
+			return
+	for path in data.packs:
+		if not FileAccess.file_exists(path):
+			push_error("Moy static pack is missing: %s. Re-run tools/bake_moy_city.tscn" % path)
+			return
+		_moy_paths.append(String(path))
+	_moy_paths.sort()
+
+
+func _stream_moy_city() -> void:
+	var player := get_node_or_null("../Player") as Node3D
+	if player == null or _moy_paths.is_empty(): return
+	var distance := Vector2(player.global_position.x, player.global_position.z).distance_to(CITY_CENTER)
+	if distance <= CITY_SKYLINE_WAKE_RADIUS and _moy_silhouette == null and FileAccess.file_exists(MOY_SILHOUETTE_PATH):
+		var silhouette_scene := load(MOY_SILHOUETTE_PATH) as PackedScene
+		if silhouette_scene != null:
+			_moy_silhouette=silhouette_scene.instantiate() as Node3D
+			add_child(_moy_silhouette)
+			_city_skyline_visible=true
+	if _moy_silhouette != null:
+		_moy_silhouette.visible = distance > MOY_ACTIVATE_RADIUS and distance <= CITY_SKYLINE_SLEEP_RADIUS
+		if distance > CITY_SKYLINE_SLEEP_RADIUS:
+			_moy_silhouette.queue_free(); _moy_silhouette=null
+	if distance <= MOY_REQUEST_RADIUS:
+		for path in _moy_paths:
+			if _moy_requested.has(path) or _moy_active.has(path): continue
+			var err := ResourceLoader.load_threaded_request(path, "", false, ResourceLoader.CACHE_MODE_REUSE)
+			if err == OK or err == ERR_BUSY: _moy_requested[path] = true
+			else: push_warning("Moy pack request failed: %s (%s)" % [path, error_string(err)])
+	if distance <= MOY_ACTIVATE_RADIUS:
+		for path in _moy_paths:
+			if _moy_active.has(path): continue
+			var state := ResourceLoader.load_threaded_get_status(path)
+			if state == ResourceLoader.THREAD_LOAD_LOADED:
+				var packed := ResourceLoader.load_threaded_get(path) as PackedScene
+				if packed:
+					var started := Time.get_ticks_usec()
+					var instance := packed.instantiate() as Node3D
+					add_child(instance)
+					_moy_active[path] = instance
+					_moy_activation_count += 1
+					_moy_activation_frame_pending = true
+					print("MOY_ACTIVATE path=", path.get_file(), " instantiate_add_ms=", (Time.get_ticks_usec()-started)/1000.0, " bodies=", _count_physics_bodies(instance), " activation=", _moy_activation_count)
+					_moy_requested.erase(path)
+					break
+			elif state == ResourceLoader.THREAD_LOAD_FAILED:
+				push_error("Moy pack failed to load: %s" % path); _moy_requested.erase(path)
+	elif distance >= MOY_RELEASE_RADIUS and _moy_active.size() > 0:
+		if _moy_unload_queue.is_empty():
+			for path in _moy_active.keys(): _moy_unload_queue.append(String(path))
+		if not _moy_unload_queue.is_empty():
+			var path: String = String(_moy_unload_queue.pop_back())
+			var node: Node3D = _moy_active[path]
+			_moy_active.erase(path)
+			node.queue_free()
+			_moy_requested.erase(path)
+	if distance <= MOY_ACTIVATE_RADIUS and _moy_active.size() == _moy_paths.size() and not _moy_actors_added:
+		_add_moy_actors()
+	elif distance >= MOY_RELEASE_RADIUS and _moy_active.is_empty():
+		_remove_moy_actors()
+	if _moy_actors_added and not _moy_shop_added:
+		_add_moy_helmsmith()
+	elif _moy_actors_added and _moy_resident_index < CITY_NAMES.size():
+		_spawn_moy_resident()
+
+
+func _count_physics_bodies(node: Node) -> int:
+	var count := 1 if node is CollisionObject3D else 0
+	for child in node.get_children(): count += _count_physics_bodies(child)
+	return count
+
+
+func moy_packs_ready() -> bool:
+	return not _moy_paths.is_empty() and _moy_active.size() == _moy_paths.size()
+
+
+func moy_actors_ready() -> bool:
+	return _moy_actors_added and _moy_shop_added and _moy_resident_index >= CITY_NAMES.size()
+
+
+func _add_moy_actors() -> void:
+	if Engine.is_editor_hint(): return
+	_moy_actors_added = true
+	_moy_resident_index = 0
+	_moy_shop_added = false
+
+
+func _add_moy_helmsmith() -> void:
+	var packed := load(NPC_SCENE) as PackedScene
+	if packed == null: return
+	# Preserve the existing vendor, with its original authored SuperEgg shop
+	# frontage, on tested open Civic Plaza ground.
+	var shop := StaticBody3D.new(); shop.name="MoyHelmsmithShop"; shop.position=Vector3(-470,_ground(Vector2(-470,-18)),-18); add_child(shop)
+	_build_helmsmith_storefront(shop,{"width":2,"depth":2,"light_seed":0})
+	var vendor=packed.instantiate(); vendor.set_terrain_reference(terrain); vendor.stationary=true; vendor.is_vendor=true
+	vendor.display_name="Helmsmith"; vendor.shop_category="city"
+	var vendor_lines: Array[String]=["A good helm does not ask who is inside it. This one will fit a blorb just fine.","A core takes one head-shape at a time. Choose a sealed diver's hood or a knight's steel."]
+	vendor.vendor_lines=vendor_lines; vendor.skin_color=Color(0.38,0.24,0.16); vendor.shirt_color=Color(0.23,0.25,0.29); vendor.pants_color=Color(0.12,0.14,0.17); vendor.hair_color=Color(0.12,0.1,0.08); vendor.hair_style=FigureHair.STYLE_FLAT_TOP
+	vendor.position=Vector3(0,0,1.8); vendor.facing_degrees=180.0; vendor.add_to_group("city_npcs"); shop.add_child(vendor)
+	_moy_shop_added = true
+	_moy_activation_frame_pending = true
+
+
+func _spawn_moy_resident() -> void:
+	var i := _moy_resident_index
+	var packed := load(NPC_SCENE) as PackedScene
+	if packed == null: return
+	var npc := packed.instantiate()
+	npc.set_terrain_reference(terrain); npc.display_name=CITY_NAMES[i]; npc.is_female=i%2==0
+	npc.skin_color=Color(0.35+0.05*float(i%6),0.23+0.06*float((i+2)%6),0.16+0.05*float(i%5))
+	npc.shirt_color=TownProps.CITY_ACCENTS[i%TownProps.CITY_ACCENTS.size()]
+	npc.pants_color=Color(0.12,0.16+0.03*float(i%3),0.2); npc.hair_color=Color(0.08+0.08*float(i%4),0.06,0.04)
+	npc.hair_style=FigureHair.STYLE_LONG if npc.is_female else FigureHair.STYLE_FLAT_TOP
+	var lines: Array[String]=[]; lines.assign(CITY_RESIDENT_LINES[i]); npc.talk_lines=lines
+	var p: Vector2=_moy_resident_points[i]; npc.position=Vector3(p.x,_ground(p),p.y); npc.add_to_group("city_npcs"); add_child(npc)
+	_moy_resident_index += 1
+	_moy_activation_frame_pending = true
+
+
+func _remove_moy_actors() -> void:
+	_moy_actors_added=false
+	_moy_resident_index=0
+	_moy_shop_added=false
+	for actor in get_tree().get_nodes_in_group("city_npcs"):
+		if actor is Node3D and Vector2(actor.global_position.x,actor.global_position.z).distance_to(CITY_CENTER)<250.0: actor.queue_free()
+	var shop := get_node_or_null("MoyHelmsmithShop")
+	if shop != null: shop.queue_free()
 
 
 func _update_city_zone_from_player() -> void:

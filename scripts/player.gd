@@ -2491,6 +2491,13 @@ func _physics_process(delta: float) -> void:
 	# matters for this one.
 	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and not _snowboard_active:
 		_try_step_onto_prop(delta)
+	if is_on_floor():
+		for collision_index in get_slide_collision_count():
+			var floor_collision:=get_slide_collision(collision_index)
+			var escalator_floor:=floor_collision.get_collider()
+			if floor_collision.get_normal().dot(Vector3.UP)>0.65 and escalator_floor is StaticBody3D and escalator_floor.has_method("assist_character"):
+				escalator_floor.assist_character(self)
+				break
 	var pre_move_feet_y := global_position.y - FOOT_OFFSET
 	move_and_slide()
 	_resolve_ice_surface_contact(pre_move_feet_y)

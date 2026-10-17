@@ -1028,6 +1028,13 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 		global_position.y = clampf(global_position.y, dive_floor, dive_surface)
 	var pre_move_position := global_position
 	var bounced_before_move: bool = _try_direct_blorb_bounce(delta)
+	if is_on_floor():
+		for collision_index in get_slide_collision_count():
+			var floor_collision:=get_slide_collision(collision_index)
+			var escalator_floor:=floor_collision.get_collider()
+			if floor_collision.get_normal().dot(Vector3.UP)>0.65 and escalator_floor is StaticBody3D and escalator_floor.has_method("assist_character"):
+				escalator_floor.assist_character(self)
+				break
 	move_and_slide()
 	_update_direct_ice_skate_airtime(delta,pre_move_position)
 	_resolve_direct_dirtbike_motion(delta,pre_move_position)
@@ -1361,8 +1368,15 @@ func _update_direct_vine_swing(direction: Vector3, delta: float, jump_pressed: b
 	var ctx := _traversal_context(delta)
 	ctx.direction = direction
 	ctx.grounded = is_on_floor()
+	# This driver owns camera input; targeting/climbing remain in the shared
+	# mode. Movement stays planar while looking up, just as for the human.
+	var aim := direction
+	var view := get_viewport().get_camera_3d()
+	if view != null:
+		ctx.aim_basis = view.global_basis
+		aim = -view.global_basis.z
 	var was_swinging := _vine_swing.swinging
-	if not _vine_swing.swing(ctx, direction, jump_pressed and not UIState.modal_open):
+	if not _vine_swing.swing(ctx, aim, jump_pressed and not UIState.modal_open):
 		if was_swinging and _vine_swing.exit_velocity != Vector3.ZERO:
 			# The arc's momentum carries on past the release, as it does for the
 			# human (see Player._update_vine_swing()).

@@ -51,6 +51,9 @@ const CRUISE_HEIGHT := 30.0
 const HOP_GAP_FRACTION := 0.45
 ## Below this the climb is not worth a hop.
 const HOP_MIN_RISE := 0.6
+## World metres per second, like the rope lengths: both rigs climb the same
+## buildings. This reels toward a real held support, beyond the startup lift.
+const CLIMB_SPEED := 3.0
 ## The shortest a grip can last, so one apex cannot fire two throws, and how
 ## long an opened hand stays open before it can catch again.
 const MIN_GRIP := 0.25
@@ -223,7 +226,7 @@ func is_available(ctx: TraversalContext) -> bool:
 
 
 ## The whole power for one frame. `aim` is the world direction the thrower is
-## looking or travelling, horizontal. Returns true when the swing owned the
+## looking or travelling; ctx.aim_basis supplies camera pitch. Returns true when the swing owned the
 ## frame, in which case the caller has already been moved and must not run its
 ## own locomotion.
 func swing(ctx: TraversalContext, aim: Vector3, jump_pressed: bool) -> bool:
@@ -338,8 +341,13 @@ func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 		var stretching := body.velocity.dot(outward)
 		if stretching > 0.0:
 			body.velocity -= outward * stretching
+	var climbing := _pull_for_climb(ctx, radial)
 	body.move_and_slide()
 	radial = body.global_position - anchor
+	if climbing:
+		# Reel in only the distance physics actually allowed. Shortening before
+		# move_and_slide would let the rope's position clamp pull through a roof.
+		rope_length = maxf(MIN_ROPE, minf(rope_length, radial.length()))
 	if radial.length() > rope_length:
 		body.global_position = anchor + radial.normalized() * rope_length
 	# The stick is what asks for the next vine. Hold a direction and the free hand
@@ -355,6 +363,23 @@ func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 	if steered and grip_timer <= 0.0 and _spent_toward(ctx, wanted):
 		_catch_next(ctx, wanted)
 	_cord.grow(ctx, anchor, left_hand)
+
+
+## Looking up pulls along a taut vine, never freely upward. Collision can stop
+## the pull, and looking level stops reeling without erasing swing momentum.
+func _pull_for_climb(ctx: TraversalContext, radial: Vector3) -> bool:
+	var intent := VineAnchorSearch.climb_intent(ctx)
+	var distance := radial.length()
+	if intent <= 0.0 or ctx.delta <= 0.0 or distance <= MIN_ROPE:
+		return false
+	if -radial.y < VineAnchorSearch.MIN_RISE or distance < rope_length - 0.2:
+		return false
+	var inward := -radial / distance
+	var speed := minf(CLIMB_SPEED * intent, (distance - MIN_ROPE) / ctx.delta)
+	if ctx.body.test_move(ctx.body.global_transform, inward * speed * ctx.delta):
+		return false
+	ctx.body.velocity += inward * maxf(0.0, speed - ctx.body.velocity.dot(inward))
+	return true
 
 
 ## Whether this vine has given all it can toward `wanted`: he is out past its

@@ -1,0 +1,35 @@
+[gd_scene format=3]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5dgde"]
+size = Vector3(20, 3, 16)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hrfy0"]
+albedo_color = Color(0.7058824, 0.78431374, 0.84313726, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_boruh"]
+size = Vector3(20, 3, 16)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vry70"]
+albedo_color = Color(0.7558824, 0.8209804, 0.8698039, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_16kw0"]
+size = Vector3(20, 0.15, 16)
+
+[node name="MoyCell_02_-1" type="Node3D" unique_id=62888178]
+
+[node name="Building_44_Fish_tanks" type="StaticBody3D" parent="." unique_id=616722890]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -658, -58.5, -242)
+
+[node name="@CollisionShape3D@1046" type="CollisionShape3D" parent="Building_44_Fish_tanks" unique_id=2040718445]
+shape = SubResource("BoxShape3D_5dgde")
+
+[node name="@MeshInstance3D@1047" type="MeshInstance3D" parent="Building_44_Fish_tanks" unique_id=708696910]
+material_override = SubResource("StandardMaterial3D_hrfy0")
+mesh = SubResource("BoxMesh_boruh")
+
+[node name="@MeshInstance3D@1048" type="MeshInstance3D" parent="Building_44_Fish_tanks" unique_id=1223524249]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.425, 0)
+material_override = SubResource("StandardMaterial3D_vry70")
+mesh = SubResource("BoxMesh_16kw0")

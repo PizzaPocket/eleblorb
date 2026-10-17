@@ -7,6 +7,7 @@ extends Control
 const LOADING_SCENE := "res://scenes/loading.tscn"
 const CAMPAIGN_SCENE := "res://scenes/main.tscn"
 const DEMO_SCENE := "res://scenes/demo_world.tscn"
+const MOY_QA_SCENE := "res://scenes/moy_city_qa.tscn"
 const LOGO := preload("res://assets/ui/eleblorbs_logo.svg")
 const BACKGROUND := preload("res://assets/ui/start_background.png")
 
@@ -121,6 +122,11 @@ func _build_ui() -> void:
 	_new_game_button.custom_minimum_size = Vector2(280.0, UITheme.BUTTON_MIN_HEIGHT)
 	buttons.add_child(_new_game_button)
 	var count := 2
+	var moy_button := UIKit.button("Moy QA", _play_moy_qa)
+	moy_button.custom_minimum_size = Vector2(280.0, UITheme.BUTTON_MIN_HEIGHT)
+	buttons.add_child(moy_button)
+	_debug_buttons.append(moy_button)
+	count += 1
 	# TEMPORARY: straight into a kingdom with a ready-made suit, to speed up testing.
 	for loadout_id: String in DebugKingdomStart.LOADOUTS.keys():
 		var label: String = DebugKingdomStart.LOADOUTS[loadout_id]["label"]
@@ -166,6 +172,11 @@ func _play_demo() -> void:
 
 func _play_new_game() -> void:
 	_launch(CAMPAIGN_SCENE)
+
+
+## Temporary prototype entry: the QA scene grants its own traversal loadout.
+func _play_moy_qa() -> void:
+	_launch(MOY_QA_SCENE)
 
 
 ## TEMPORARY: a fresh run that begins inside a kingdom (see DebugKingdomStart).

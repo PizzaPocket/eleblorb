@@ -110,8 +110,8 @@ const CANYON_ZONE_RADIUS := 72.0
 ## established convention of keeping its biome-center consts local rather
 ## than reaching into those other generator scripts (see CANYON_BIOME_CENTER
 ## above, defined the same standalone way).
-const CITY_CENTER := Vector2(-540.0, 0.0)
-const CITY_ZONE_RADIUS := 78.0
+const CITY_CENTER := Vector2(-560.0, 0.0)
+const CITY_ZONE_RADIUS := 235.0
 ## Duplicated from main.gd's own ICE_GATE_XZ, same reasoning as CITY_CENTER
 ## above -- the Ice Kingdom's gate needs no new sculpted landform (see that
 ## const's own comment), just this cosmetic frost dressing scattered around
@@ -823,15 +823,17 @@ func _spawn_city_blorbs() -> void:
 		push_warning("Missing blorb scene: " + BLORB_SCENE)
 		return
 	for i in WILD_BLORB_CITY_COUNT:
-		var pos := _point_in_city_disk(CITY_CENTER, CITY_ZONE_RADIUS * 0.85, 1.1)
+		var pos := _point_in_city_outskirts(CITY_CENTER, CITY_ZONE_RADIUS + 18.0, CITY_ZONE_RADIUS + 72.0)
 		if pos == Vector2.INF:
 			continue
 		var inst = packed.instantiate()
 		inst.in_party = false
 		inst.initial_element = "city" if i % 2 == 0 else ""
+		# Free blorbs already wander in a 1.2 m radius around this spawn, which
+		# keeps the outskirts find clear of Moy's protected wall and routes.
 		inst.position = Vector3(pos.x, terrain.get_mesh_height(pos.x, pos.y), pos.y)
 		get_parent().add_child(inst)
-	var gem_pos := _point_in_city_disk(CITY_CENTER, CITY_ZONE_RADIUS * 0.6, 1.0)
+	var gem_pos := _point_in_city_outskirts(CITY_CENTER, CITY_ZONE_RADIUS + 30.0, CITY_ZONE_RADIUS + 68.0)
 	if gem_pos != Vector2.INF:
 		var gem_ground_y: float = terrain.get_mesh_height(gem_pos.x, gem_pos.y)
 		_place_gem(
@@ -844,6 +846,12 @@ func _spawn_city_blorbs() -> void:
 ## outside the ordinary 190m field_half_size square _point_in_disk() covers.
 func _point_in_city_disk(center: Vector2, radius: float, bias: float) -> Vector2:
 	var r := radius * pow(_rng.randf(), bias)
+	var angle := _rng.randf_range(0.0, TAU)
+	return center + Vector2(cos(angle), sin(angle)) * r
+
+
+func _point_in_city_outskirts(center: Vector2, inner_radius: float, outer_radius: float) -> Vector2:
+	var r := sqrt(_rng.randf_range(inner_radius * inner_radius, outer_radius * outer_radius))
 	var angle := _rng.randf_range(0.0, TAU)
 	return center + Vector2(cos(angle), sin(angle)) * r
 

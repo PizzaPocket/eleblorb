@@ -2,6 +2,12 @@
 
 > **Building Moy in the game?** Start with `moy_build_handoff.md`: the data to build from, the order, the rules and the loose ends (2026-10-17).
 
+> **First playable prototype (owner authorized, 2026-10-17):** Use
+> [moy_playable_prototype.md](moy_playable_prototype.md) with the existing models.
+> It resolves precedence among dated revisions and defines the first pass's
+> reduced detail, collision, traversal, loading and acceptance requirements.
+> Older summaries below remain historical where newer measured data differs.
+
 Status: survey, community brief and settlement concept, second pass, for
 review (2026-10-12; revised the same day: no cars or trains, a dense
 walkable Tokyo and Hong Kong neighbourhood, everyone named; third revision
@@ -881,9 +887,10 @@ city's vigilance and its commute are the same ride.
 straight lines**, one north to south and one east to west, at two levels so
 they never meet. Data: `CROSS` in `tools/city_layout.py`.
 - **The Spine Line, north to south, at +12 m** (456 m): straight down
-  North Street, through the park and down South Street, at the Wall Line's
-  own level, so it meets the Wall Line on the level at the North and South
-  Gates, where junctions take its trains to the Line House. Stations:
+  North Street, through the park and down South Street. It rises on long
+  approach ramps to +20 m through the North and South Gates, flying above the
+  Wall Line at +13.2 m. These are separate services on separate tracks; they
+  never join. Stations:
   **North Gate**, **Estate Square**, **the Crossing**, **Market Square**,
   **South Gate**. On North Street and South Street and through the park it
   rides directly over the Deck, on the Deck's own columns carried up
@@ -909,7 +916,8 @@ can go from the street to any train without leaving it. The levels:
 |---|---|---|
 | Street | 0 | the avenues, the squares, the park's lawns, the station halls |
 | The Deck | +6.5 m | the walkway round the park and up the streets; the Crossing Ring's concourse |
-| The Spine and the Wall Line | +12 m | one level, so they meet on the level at the North and South Gates |
+| The Wall Line | +13.2 m rail head | circle line on the wall; Spine gate crossings remain grade-separated |
+| Spine Line main section | +12 m rail head | rises to +20 m on approach ramps at North and South Gates |
 | The high line | +36 m | the Meridian Line, platforms at +37 m |
 
 - **Between the street and the Deck:** the ramp towers, the glass lifts,
@@ -947,8 +955,9 @@ can go from the street to any train without leaving it. The levels:
     cascade beside it), serving the street hall (0),
     the Wall Line (+12) through the towers and the high line's west
     station on the bridge between them (+37).
-  - **North and South Gates:** the Spine and the Wall Line on one level,
-    the change across the platform.
+  - **North and South Gates:** the Spine flyover is reached from its own
+    platform and long approach ramps; the Wall Line station stays below on
+    the wall. There is no track junction or shared platform.
 - **The high line's platforms and the Deck** are one system with the
   street: from any square you reach the Deck by its escalating ramp, the
   Spine through its platform floor, and the high line by the nearest open
@@ -974,8 +983,8 @@ can go from the street to any train without leaving it. The levels:
 - **The rhythm**, read from the street: the Spine's frames every 12 m, the
   high line's trees every third frame where the lines run together, the
   Crossing's 24 columns on a 15° rhythm, and the wall's arches every 9 m.
-- **The Deck is the middle level** between the street (0) and the Spine
-  (+12 m), as above.
+- **The Deck is the middle level** between the street (0) and the Spine's
+  main section (+12 m); the gate approaches climb to +20 m.
 - **Where no rail goes:** the narrow lanes. Both lines keep to main streets
   and squares; the Meridian keeps 3 m clear of Old Moy's tower houses on
   West Street.
@@ -1035,21 +1044,31 @@ short, two or three to a train.
 | Line | Cars | Length | Platform | Why |
 |---|---|---|---|---|
 | **Wall Line** | 3 | 30.4 m | 40 m | the ring is the commute, round the whole city |
-| **Spine Line** | 2 | 20.0 m | 30 m | short runs on the Deck, and the 12 m curves onto the Wall Line |
+| **Spine Line** | 2 | 20.0 m | 30 m | short runs on the Deck and separate +20 m gate flyovers |
 | **Meridian Line** | 2 | 20.0 m | 30 m | the high line: few stops, a ride for the view |
 
-**Why short cars.** Where the Spine joins the Wall Line at the North and
-South Gates it turns on 12 m curves. On those the 9.6 m car, its bogies
-6.4 m apart, swings 0.43 m off the track's line at its middle and 0.53 m
-at its ends, inside the 0.6 m the plan allows; the old 15 m car swung 1.0
-and 1.3 m and would have clipped the platform edges. One fleet serves
-every line, since the Spine's trains run onto the Wall Line and all share
-the Line House's workshop.
+**Why short cars.** The 9.6 m car is compact for the station platforms and
+quick service. The Spine and Wall Line are separate services; neither uses
+a curve or junction to the other. One fleet serves every line because the
+same simple car suits all three routes and shares the Line House workshop.
 
 **Checked in the layout:** every line uses the Moy car; each train is two
 or three cars and stops at least 4 m short of its platform's length; the
 car's swing on the tightest curve stays within its allowance; every part
 stays inside the car's envelope and uses exponents superegg.gd supports.
+
+**Playable prototype implementation (2026-10-17).** Each car is its own
+physics-synchronized rideable body and pivots to follow the sampled path. The
+prototype runs two trains per cross-line on separate tracks and four on the
+Wall loop, with four-second stops at authored stations; the North/South
+Spine-to-Wall crossings use a block interlock. The train clearance sweep
+includes building and lot masses, gate supports, and Wall Line platforms. The
+Spine edge portal is cut through the All-night Store and every overlapping
+authored lot while preserving their outer footprints and roofs. The model
+drawing's four turbines are aligned westward with the authored wind and their
+three blades rotate at 2 rpm. Color, offset street surfaces and real pond
+water are in the baked city. Automated controller and envelope checks do not
+replace sustained rider traversal or physical turbine-hazard tuning.
 
 ### 6d. A city in a garden: green infrastructure after Singapore (proposed 2026-10-17, at the user's direction)
 
