@@ -219,21 +219,20 @@ the live-world probe verifies all six uniforms.
   by the built crater-lip Tempering Gate, curved arrival gallery and shared
   Highline. Do not add them as duplicate routes.
 - The post-Lava-Helm district remains unbuilt. It was re-planned on
-  2026-10-17 as the **Caldera Heartworks**:
-  - the reservoir's 5 m settling shelf over a lava-filled throat;
-  - the dry Crown Gallery round the throat;
-  - an 84 m sphere 14 m down, with five shell-following rings (C1 to C5);
-  - three gated falls caught by the Renewal shelf, the Forge Arm and the
-    basin;
-  - six rooms behind the rings;
-  - three lava entries through bed portals, pressure locks and race wells;
-  - two dry crown stairs, four service shafts and three return risers.
-
-  The plan is `tools/fire_caldera_heartworks_layout.py` (it writes
-  `FireCalderaHeartworksPlan` and checks the section); the document is
-  `docs/architecture/fire_caldera_heartworks.md`; the model is
-  `docs/drawings/fire_caldera_3d.html`. Resolve the document's open questions
-  before changing live terrain. Final shop stock and Heartworks story
-  encounters also remain decisions for the user.
+  2026-10-17 as the lava vortex. The plan is
+  `tools/fire_caldera_heartworks_layout.py` (`FireCalderaHeartworksPlan`) and
+  the design is `docs/architecture/fire_caldera_heartworks.md`. Its parts:
+  - one cascade through an oculus under a glass dome;
+  - rim terraces, bridges, double ramps;
+  - the Floor and the pool gallery.
+- Every walk above the lava is redesigned as one system: the Highline, docks,
+  the Renewal horseshoe stair, Oren's spiral stair, the promenade and
+  frontages, the service lanes, the Gate Terrace and a funicular from the
+  volcano's foot. The plan is `tools/fire_caldera_walkways_layout.py`
+  (`FireCalderaWalkwaysPlan`) and the design is
+  `docs/architecture/fire_caldera_walkways.md`. The builders should read
+  every deck outline, guard line and flight from it, never derive their own.
+- The model of both is `docs/drawings/fire_caldera_3d.html`. Resolve the open
+  questions before changing live terrain.
 - Keep the automated regressions at 0 failures whenever the walkthrough finds
   a visual, collision or circulation issue.

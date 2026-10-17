@@ -715,6 +715,9 @@ static func loop_door_link(target: Vector2, loop: PackedVector2Array, parent_wid
 	return points
 
 
+## Proposed replacement (2026-10-17): FireCalderaWalkwaysPlan (scripts/fire_caldera_walkways_plan.gd,
+## from tools/fire_caldera_walkways_layout.py; docs/architecture/fire_caldera_walkways.md) designs every
+## walk above the lava as one system. These routes stay the built geometry until it is approved.
 ## Every route: id, width, class (public, service, link), role, points.
 static func routes() -> Array[Dictionary]:
 	var list: Array[Dictionary] = []
