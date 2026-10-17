@@ -863,14 +863,14 @@ the picture-sign colours at night).
   downtown, with lines that come in over the streets and use part of the
   ring, on structure built over the streets themselves: the Spine and
   Meridian Lines sharing the park's north side follow its logic.
-- **The cars: Lisbon's trams** for size and tight curves (12 m), in Moy's
-  pale tile white with a band of line colour.
+- **The cars: Lisbon's trams** for size and tight curves (12 m), built of
+  SuperEggs in Moy's cream with a band of line colour (section 6e).
 - **Structure:** viaducts and the Deck's portal frames in fair-faced
   concrete, piers of rounded-square (superellipse) section, soffits lined in
   pale tile so the shaded walk below stays light.
 
 **The Wall Line** runs round the top, both ways, stopping at the four gates
-(329 m apart). Two-car trains of 15 m cars at 10 m/s, two each way, take
+(329 m apart). Three-car trains of the Moy car (6e) at 10 m/s, two each way, take
 about three and a half minutes to go round. From the train you see the whole
 city on one side and the desert, the turbines and the NMEs on the other: the
 city's vigilance and its commute are the same ride.
@@ -977,8 +977,8 @@ can go from the street to any train without leaving it. The levels:
 - **Where no rail goes:** the narrow lanes. Both lines keep to main streets
   and squares; the Meridian keeps 3 m clear of Old Moy's tower houses on
   West Street.
-- **Cars:** short two-car articulated sets, after Lisbon's trams. It is a
-  game: the trains are there because riding them is fun.
+- **Cars:** two-car trains of the Moy car (section 6e). It is a game: the
+  trains are there because riding them is fun.
 
 **Structure and checks.** The cross lines stand inside the wall over
 streets, squares and the park, or over buildings at least 2 m below their
@@ -998,6 +998,56 @@ towers and the gatehouse canopies.
 **Who keeps it.** Kade Morrow (city works) inspects the wall and the viaducts
 as well as the Deck; Omar Haddad's battery works power the lines. The Wall
 Watch and the lines' controller are not yet in the census (Open).
+
+### 6e. The Moy car (proposed 2026-10-17, at the user's direction)
+
+**Direction (user):** the train cars are built of SuperEggs, relatively
+short, two or three to a train.
+
+**One car for every line** (data: `TRAIN` in `tools/city_layout.py`, checked;
+3D preview `docs/drawings/moy_train_3d.html`):
+- **9.6 m long, 2.65 m wide, 3.4 m tall** over everything, with a 0.8 m
+  bellows between cars. A chubby, soft-cornered tram that belongs to the
+  same world as the hero and the blorbs.
+- **Every part is a SuperEgg**, as `scripts/superegg.gd` builds it:
+  - **the body**, semi-axes 4.8 × 1.3 × 1.325 m, exponent 3.4 above (a
+    rounded plan, round ends, soft roof shoulders) and 5.5 below (a flat
+    floor), in cream glazed ceramic over an aluminium frame;
+  - **the window band**, a dark SuperEgg slightly proud of the body and
+    following its curve, wrapping round both ends, so the ends are
+    panoramic windows rather than a driver's cab;
+  - **the livery band** in the line's colour (the Wall Line ochre, the
+    Spine teal, the Meridian violet);
+  - **the roof battery**, a flat pod charged from the wind at the battery
+    works (the lines have no wires);
+  - **two bogies**, dark flat eggs;
+  - **lamps**, small round eggs, at the train's two ends only;
+  - **the bellows**, a dark egg between cars.
+- **In the game** the builder makes each part with `SuperEgg.build_part`;
+  the windows can be cut as apertures with `build_hollow_shell_mesh` when
+  the interior is built. The car is a moving solid (`AnimatableBody3D`) with
+  a simplified collider: the hero rides on the roof or inside.
+
+**Two or three cars, by line:**
+
+| Line | Cars | Length | Platform | Why |
+|---|---|---|---|---|
+| **Wall Line** | 3 | 30.4 m | 40 m | the ring is the commute, round the whole city |
+| **Spine Line** | 2 | 20.0 m | 30 m | short runs on the Deck, and the 12 m curves onto the Wall Line |
+| **Meridian Line** | 2 | 20.0 m | 30 m | the high line: few stops, a ride for the view |
+
+**Why short cars.** Where the Spine joins the Wall Line at the North and
+South Gates it turns on 12 m curves. On those the 9.6 m car, its bogies
+6.4 m apart, swings 0.43 m off the track's line at its middle and 0.53 m
+at its ends, inside the 0.6 m the plan allows; the old 15 m car swung 1.0
+and 1.3 m and would have clipped the platform edges. One fleet serves
+every line, since the Spine's trains run onto the Wall Line and all share
+the Line House's workshop.
+
+**Checked in the layout:** every line uses the Moy car; each train is two
+or three cars and stops at least 4 m short of its platform's length; the
+car's swing on the tightest curve stays within its allowance; every part
+stays inside the car's envelope and uses exponents superegg.gd supports.
 
 ### 6d. A city in a garden: green infrastructure after Singapore (proposed 2026-10-17, at the user's direction)
 
@@ -1524,7 +1574,7 @@ Central or Tokyo's Marunouchi.
 - **Play:** the fins and the wind-gap ledges are the highest swing anchors
   and climbing holds in the city. The observation deck is realised.
 
-**2. The BLOCK tower** (BLOCK's headquarters, about 45 storeys, 180 m; revised 2026-10-14: the glass tower is now BLOCK's)
+**2. The BLOCK tower** (BLOCK's headquarters, about 38 storeys to 150 m, its crown to 212 m; revised 2026-10-14: the glass tower is now BLOCK's)
 - **Idea:** the city's one dark tower, facing its living room. Everything
   sinister in Moy is concentrated here, and none of it is said: the
   architecture says it. Pinestein's old laboratory is sealed in its base.
@@ -1533,19 +1583,16 @@ Central or Tokyo's Marunouchi.
   - **33 Thomas Street, New York:** a windowless granite skyscraper (the
     telephone exchange) with ventilation hoods where windows should be.
   - **Boston City Hall:** the mass looming over a recessed base.
-  - **Revised 2026-10-17 (user): a menacing silhouette, not a flat top.**
-    A flat-topped box reads as a filing cabinet, not a threat. What makes a
-    skyline figure menacing is a **head** and a **face**: mass that grows
-    toward the top and bears down, and a profile that reads as something
-    looking back. So:
-    - **The AT&T Building ("the Batman building"), Nashville:** twin
-      spires flanking a pointed crown read as a cowl's ears, a face on the
-      skyline.
-    - **Torre Velasca, Milan:** its top floors cantilever out on raking
-      struts, so the tower is top-heavy and looms over its street like a
-      fortress head.
-    - **Hugh Ferriss's night towers:** buildings drawn as dark masses with
-      almost no light, so the little light there is reads as eyes.
+  - **Revised 2026-10-17 (user): a menacing silhouette, not a flat top,
+    and an original one.** A flat-topped box reads as a filing cabinet,
+    not a threat; a borrowed crown (Nashville's AT&T building was the
+    example of a dynamic, ominous crown, not a model) reads as a costume.
+    What makes a tower ominous is tension: a form that narrows and sharpens
+    as it rises, leans toward what it watches, and gives away almost no
+    light. The crown folds **inward**, so it never reaches over its
+    neighbours' air.
+    - **Hugh Ferriss's night towers:** dark masses with almost no light, so
+      the little there is reads as eyes.
 - **Form:**
   - a blue-black glazed brick shaft, 26 by 24 m, in a city of pale tile;
     at a low sun it shows an azure sheen, the city blorbs' colour;
@@ -1553,29 +1600,34 @@ Central or Tokyo's Marunouchi.
     (at 30, 55 and 80% of its height) that breathe warm air at night;
   - its base set back 4 m and 9 m high, so the shaft hangs over its own
     door;
-  - **the shaft rises sheer to 144 m**; there, on raking struts that spring
-    from the shaft at 116 m, three to a face, the **head** (Dr. Kask's
-    floors, 144 to 180 m) cantilevers 4 m out on every side, so the top of
-    the tower is wider than the tower and leans over the forecourt;
-  - **a steep gable** (to 198 m) between **two blade horns** at the head's
-    two corners facing Civic Plaza, tapering to points at 226 m: from the
-    plaza the tower wears a cowl. The horns carry its antennas. It stays
-    below the Windspire (262 m);
-  - **one light**, in a skyline where every other tower is lit: a thin
-    azure **visor slit** across the head's plaza face at 158 m, the colour
-    of the city blorbs. At night the tower is a dark mass with eyes.
-  - Checked in the layout: the head stays inside the plot and overhangs at
-    least 3 m; the silhouette rises in order (struts, head, gable, horns);
-    the horns and visor face Civic Plaza; the horns stay below the
-    Windspire.
+  - **the shaft rises sheer to 150 m**; there its four faces **fold
+    inward** to a knife-edge ridge, so the crown narrows from the shaft's
+    full 26 m to a 2 m edge;
+  - **the ridge is set close to the plaza face** (3 to 5 m back from it):
+    the plaza face rises almost sheer and the back falls away in one long
+    slope, so from the side the crown is a blade raised toward Civic
+    Plaza, and from the plaza a tall narrowing shard;
+  - **the ridge is canted**, off-centre to the west and falling from 212 m
+    at its west end to 198 m at its east, so the blade looks raised and
+    turned rather than a symmetrical obelisk;
+  - **ribs** continue the shaft's slits up the folding faces and converge
+    on the ridge;
+  - **one light**, in a skyline where every other tower is lit: a single
+    **vertical azure slit**, 1.2 m wide and 24 m tall, in the crown's plaza
+    face, the colour of the city blorbs. At night the tower is a dark shard
+    with one slit pupil.
+  - Checked in the layout: the crown stays inside the shaft's footprint;
+    the ridge sits in the plaza-side third and is canted; the eye fits the
+    crown's face and faces Civic Plaza; the crown stays below the Windspire
+    (262 m).
 - **Site:** a forecourt of bare pale paving in full sun on Meridian South,
   no bench and no tree, and **one door**; the rest of the plot is black
   gravel, raked every morning, that no one walks on. It is the only tower
   without a life at its foot, and that is the point. It stays off the Deck.
 - **Who:** Dr. Vera Kask, the director, lives on the top floors and is rarely
   seen at street level. No one else the hero knows works there (below).
-- **Play:** the vent hoods are the only holds; the struts and the horns are
-  anchors no one should swing from.
+- **Play:** the vent hoods are the only holds; the ridge is an anchor no one
+  should swing from.
 
 **3. The north tower** (the start-up floors, about 45 storeys, 175 m)
 - **Idea:** a tower that changes as its tenants come and go.
@@ -1631,7 +1683,7 @@ for the evil activities and people to be concentrated there).
 - **The work never stopped.** The living-current work that made the city
   blorbs goes on. At night the tower draws more power than the rest of
   downtown together (Omar Haddad sees it on the battery works' meters
-  and says nothing), and the azure visor across its head is the colour of the city blorbs.
+  and says nothing), and the azure slit in its crown is the colour of the city blorbs.
   Proposed: Kask lures city blorbs in from the desert with the grid's power
   to study and drain them, the very creatures the city banned and fears.
 - **Pinestein knows.** He watches BLOCK from his roof in Old Moy, and the
@@ -1842,7 +1894,7 @@ Square (section 6, the Deck).
 | — | The Meridian Arch (the East Gate) | two legs 22 × 18 m straddling the wall, 72 m high (8b) | the East Gate's station on three levels; city offices; the Wall Watch's command room | — |
 | — | The West Gate | two towers 22 × 16 m straddling the wall, 44 m high (8b) | the West Gate's station: the Wall Line and the high line's west station | — |
 | 12 | Windspire | 42 × 42 m | about 70 storeys, 280 m, twisting, with three wind gaps (7c) | the Windworks (headquarters, observation deck) |
-| 13 | BLOCK tower | 40 × 40 m | about 45 storeys, 180 m, a windowless dark shaft under a cantilevered head, horns to 226 m (7c) | BLOCK's headquarters; Dr. Vera Kask (director, top floors) |
+| 13 | BLOCK tower | 40 × 40 m | about 38 storeys to 150 m, a windowless dark shaft, its crown folded inward to a canted ridge at 212 m (7c) | BLOCK's headquarters; Dr. Vera Kask (director, top floors) |
 | 14 | North tower | 40 × 40 m | about 45 storeys, 175 m, plug-in capsule offices (7c) | start-up floors (Theo Park) |
 | 15 | South tower | 40 × 40 m | about 40 storeys, 150 m, dune balconies (7c) | flats over offices; Tanglewire (Dan) |
 

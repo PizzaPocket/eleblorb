@@ -66,7 +66,7 @@ b(9,'Tea house',(-618,24,-604,36),'civic','1 storey; flat above and keeper\'s ro
 b(10,'Park lodge',(-552,41,-542,49),'civic','1 storey','Orin Pike (park keeper)')
 b(11,'Giant playground',None,'play','climbing towers 12–20 m','Lily, Kofi')
 b(12,'Windspire',(-431,-80,-389,-38),'tower','about 70 storeys, 280 m, on a podium','the Windworks (headquarters, observation deck); its legal department (Priya Raman, Elizabeth Reese, Venn Harlow)')
-b(13,'BLOCK tower',(-483,38,-443,78),'tower','about 45 storeys, 180 m, windowless (section 7c)','BLOCK\'s headquarters and laboratories; Dr. Vera Kask (director, the top floors)')
+b(13,'BLOCK tower',(-483,38,-443,78),'tower','about 38 storeys to 150 m, a blade crown to 212 m, windowless (section 7c)','BLOCK\'s headquarters and laboratories; Dr. Vera Kask (director, the top floors)')
 b(14,'North tower',(-483,-142,-443,-102),'tower','about 45 storeys, 175 m, on a podium','start-up floors (Theo Park)')
 b(15,'South tower',(-483,102,-443,142),'tower','about 40 storeys, 150 m, on a podium','flats over offices; Tanglewire (Dan)')
 b(17,'Block 1',(-674,-143,-660,-109),'estate','slab block, 28 storeys, west side of the west court, turned 30° off the grid','Tomas Wren')
@@ -354,7 +354,7 @@ RESIDENT_HOMES={
 ## Heights (m, to the main roof) and crowns of the numbered buildings, and
 ## the plan forms of the towers (city.md 7c, 8): one source for the plan, the
 ## skyline and the elevations.
-HEIGHTS={1:96,2:22,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:180,14:175,15:150,16:22,
+HEIGHTS={1:96,2:22,3:22,4:16,5:9,6:4,7:11,8:12,9:4,10:4,12:262,13:150,14:175,15:150,16:22,
  17:91,18:104,19:117,20:130,21:130,22:46,23:6,24:11,25:17,26:20,27:29,28:26,29:20,30:20,31:20,
  32:23,33:9,34:26,35:72,36:42,37:17,38:7,39:6,49:52,50:110,51:8,52:23,53:78,40:8,41:4,42:6,43:35,44:3}
 CROWNS={1:108,3:26,12:280}
@@ -608,32 +608,40 @@ TOWER_SITE={
 ## The BLOCK tower's form (city.md 7c, revised 2026-10-16: the BLOCK labs became mid-rise
 ## real estate, and everything of BLOCK's, Pinestein's sealed lab included, is in the tower).
 ## BLOCK's silhouette (city.md 7c, revised 2026-10-17 at the user's direction:
-## more menacing than a flat top). A head that looms and a face that watches:
-## the shaft rises sheer to shaft_top; the head, the director's floors, is
-## cantilevered out on every side on raking struts (Milan's Torre Velasca, a
-## fortress head bearing down on its street); its roof is a steep gable between
-## two blade horns at the corners facing Civic Plaza (Nashville's AT&T
-## "Batman" building, whose twin spires read as a cowl); and the one light is a
-## thin azure visor slit across the head's plaza face, so at night the tower
-## has eyes and nothing else (Hugh Ferriss's night towers). The horns carry the
-## antennas the old masts did.
-BLOCK_TOWER=dict(base=(4.0,9.0),door=(-461,47),vents=[0.3,0.55],vent=(1.4,4.5),slit=(0.35,4.0),masts=0,mast=10.0,
-  shaft_top=144.0,head=dict(y=(144.0,180.0),out=4.0),struts=dict(y0=116.0,per_face=3,w=1.6),
-  gable=dict(y=(180.0,198.0)),horns=dict(face='north',w=3.6,tip=226.0),visor=dict(y=(158.0,160.5),face='north',w=0.72),
+## more menacing than a flat top, but its own crown, and drawn inward, never out
+## over its neighbours). The shaft rises sheer to shaft_top; above it the four
+## faces fold inward to a knife-edge ridge, set close to the plaza face: the
+## plaza face rises almost sheer and the back falls away in one long slope, so
+## from Civic Plaza the crown is a tall narrowing blade and from the side a
+## wedge raised toward the plaza, all inside its own footprint. Its one light is
+## a single vertical slit, azure, in the crown's plaza face: an eye with a
+## slit pupil. The ridge is canted, off-centre to the west and falling to the
+## east, so the blade reads as raised and turned, not a symmetrical obelisk.
+## ridge: its insets from the west and east faces and its front and back insets
+## from the plaza (north) face; top: the ridge's west and east heights; fins:
+## dark ribs continuing the shaft's slits up the folding faces to the ridge.
+BLOCK_TOWER=dict(base=(4.0,9.0),door=(-461,47),vents=[0.3,0.55,0.8],vent=(1.4,4.5),slit=(0.35,4.0),masts=0,mast=10.0,
+  shaft_top=150.0,crown=dict(top=212.0,top_east=198.0,ridge=dict(x_west=5.0,x_east=10.0,z_front=3.0,z_back=5.0),fins=True),
+  eye=dict(face='north',w=1.2,y=(168.0,192.0)),
   colour='blue-black glazed brick with an azure sheen at a low sun',
-  crown='a cantilevered head on raking struts, a steep gable between two blade horns, and an azure visor slit facing Civic Plaza: the only light')
+  crown_note='a crown folded inward to a knife-edge ridge leaning toward Civic Plaza, with one vertical azure slit in its plaza face: the only light')
 def _block_checks():
-    from shapely.geometry import box as sbox
-    BT=BLOCK_TOWER; site=TOWER_SITE[13]; sh=site['shaft']; o=BT['head']['out']
-    plot=[b_ for b_ in B if b_['n']==13][0]['r']
-    if not sbox(*plot).contains(sbox(sh[0]-o,sh[1]-o,sh[2]+o,sh[3]+o)): problems.append(('block: the head overhangs its plot',))
-    if o<3.0: problems.append(('block: the head does not loom (overhang under 3 m)',o))
-    if not (BT['struts']['y0']<BT['shaft_top']==BT['head']['y'][0]<BT['head']['y'][1]==HEIGHTS[13]==BT['gable']['y'][0]<BT['gable']['y'][1]<BT['horns']['tip']): problems.append(('block: the silhouette is out of order',))
-    if BT['horns']['tip']>=HEIGHTS[12]: problems.append(('block: the horns outreach the Windspire',BT['horns']['tip']))
-    if not (BT['head']['y'][0]<BT['visor']['y'][0]<BT['visor']['y'][1]<BT['head']['y'][1]): problems.append(('block: the visor is not in the head',))
-    # the face looks at Civic Plaza: the plaza lies off the face the horns and the visor are on
+    BT=BLOCK_TOWER; sh=TOWER_SITE[13]['shaft']; C=BT['crown']; rg=C['ridge']; E=BT['eye']
+    w_,d_=sh[2]-sh[0],sh[3]-sh[1]
+    # inward only: the ridge lies inside the shaft's footprint, so nothing reaches over the neighbours
+    if not (0<rg['x_west'] and 0<rg['x_east'] and rg['x_west']+rg['x_east']<w_-4 and 0<=rg['z_front']<rg['z_back']<d_): problems.append(('block: the crown reaches past its shaft',))
+    if not (BT['shaft_top']<C['top_east']<C['top']): problems.append(('block: the ridge is not canted',))
+    # it leans toward the plaza: the ridge sits in the plaza-side third
+    if rg['z_back']>d_/3: problems.append(('block: the crown does not lean toward Civic Plaza',))
+    if not (BT['shaft_top']==HEIGHTS[13]<C['top']): problems.append(('block: the crown is out of order',))
+    if C['top']>=HEIGHTS[12]: problems.append(('block: the crown outreaches the Windspire',C['top']))
+    if not (BT['shaft_top']<E['y'][0]<E['y'][1]<C['top']): problems.append(('block: the eye is not in the crown',))
+    # the eye fits on the plaza face's width at its top
+    f=(E['y'][1]-BT['shaft_top'])/(C['top_east']-BT['shaft_top'])
+    span=w_-(rg['x_west']+rg['x_east'])*f
+    if E['w']>span-2.0 or E['y'][1]>=C['top_east']: problems.append(('block: the eye does not fit the crown face',))
     plaza=[o_ for o_ in OPENS if o_[0]=='Civic Plaza'][0]
-    if BT['horns']['face']!=BT['visor']['face'] or not (BT['visor']['face']=='north' and plaza[4]<=sh[1]): problems.append(('block: its face does not look at Civic Plaza',))
+    if not (E['face']=='north' and plaza[4]<=sh[1]): problems.append(('block: its eye does not look at Civic Plaza',))
 
 TURBINES=[(-310,-200),(-310,200),(-740,-270),(-740,270)]
 ## The Deck (city.md 6.2 and 6a): the walkway at +6.5 m, after Hong Kong's
@@ -876,7 +884,7 @@ WALL={
  'arches':dict(bay=9.0,span=6.5,rise=5.5,depth=5.0),
  # the gate towers: Jiayuguan's tiered towers on the gatehouse's outer corners, in Moy's tile
  'gate_tower':dict(base=7.0,tiers=3,tier=3.2),
- 'line':dict(speed=10.0,dwell=20.0,sets_each_way=2,cars=2,car=(15.0,2.65,3.5),power='the wind, from the battery works'),
+ 'line':dict(speed=10.0,dwell=20.0,sets_each_way=2,cars=3,car=(9.6,2.65,3.4),power='the wind, from the battery works'),
  # the Line House: a bastion on the wall's outside, toward the water works: the car shed at the top's level over the
  # lines' workshop and the Wall Watch's guardroom. at: degrees round the circle (atan2 of z, x-CX); along and out in metres
  'shed':dict(at=232.0,along=60.0,out=16.0),
@@ -995,7 +1003,7 @@ _build_wall()
 ## hall. Services are track centrelines in world (x, z).
 CROSS={
  'depth':1.2,'r_min':12.0,'double':6.0,'platform':(30.0,3.0),'min_gap':60.0,'clear_over':2.0,'car_h':3.4,
- 'cars':dict(cars=2,car=(12.0,2.65,3.4),speed=9.0,dwell=20.0,headway=150),
+ 'cars':dict(cars=2,car=(9.6,2.65,3.4),speed=9.0,dwell=20.0,headway=150),
  'services':[
   dict(line='Spine Line',w='double',rail=12.0,bay=12.0,pts=[(-557,-228),(-557,228)],
        structure='portal frames: the Deck\'s paired columns carried up through it, with a crossbeam under the track; 12 m bay'),
@@ -1018,6 +1026,52 @@ CROSS={
  # escalating ramps in the station cores: 30 degrees (an escalator's angle, without steps), flights of at most 6.5 m
  'esc':dict(angle=30.0,max_rise=6.5,w=2.6),
 }
+## The Moy car (city.md 6e, user 2026-10-17): one short car for every line, built
+## entirely of SuperEggs, so the trains belong to the same soft-cornered world as
+## everything else. Short cars (9.6 m) so a train is two or three of them: they
+## take the 12 m curves where the Spine joins the Wall Line with little swing,
+## and short, frequent trains suit a small city. Every part is a SuperEgg in the
+## car's frame (x along the car, y up from the rail head, z across): semi-axes,
+## centre and its exponents (top: the plan shape and the upper half; bottom: the
+## lower half), as superegg.gd builds them. consists: cars per train and the
+## livery's colour for each line.
+TRAIN=dict(
+  name='the Moy car',car=(9.6,2.65,3.4),gangway=0.8,bogie_at=3.2,
+  parts=[
+    dict(name='body',semi=(4.8,1.3,1.325),c=(0,1.9,0),eps=(3.4,5.5),mat='cream glazed ceramic over an aluminium frame'),
+    dict(name='glazing',semi=(4.64,0.55,1.338),c=(0,2.25,0),eps=(3.4,3.4),mat='a dark panoramic window band wrapping round both ends'),
+    dict(name='livery',semi=(4.82,0.16,1.338),c=(0,1.35,0),eps=(3.4,3.4),mat='a band of the line\'s colour'),
+    dict(name='battery pod',semi=(1.8,0.16,0.8),c=(0,3.24,0),eps=(5.5,5.5),mat='the roof battery, charged from the wind at the battery works'),
+    dict(name='bogie',semi=(1.0,0.3,1.05),c=(3.2,0.35,0),eps=(5.5,5.5),mirror_x=True,mat='dark steel'),
+    dict(name='lamp',semi=(0.14,0.14,0.14),c=(4.6,1.15,0.7),eps=(2.0,2.0),mirror_z=True,ends_only=True,mat='a warm lamp, lit at the train\'s ends'),
+  ],
+  gangway_part=dict(semi=(0.45,1.1,1.0),c=(0,1.9,0),eps=(5.5,5.5),mat='a dark bellows between cars'),
+  consists={'Wall Line':dict(cars=3,colour='ochre',why='the ring is the commute, round the whole city'),
+            'Spine Line':dict(cars=2,colour='teal',why='short runs on the Deck, and the 12 m curves onto the Wall Line'),
+            'Meridian Line':dict(cars=2,colour='violet',why='the high line: few stops, a ride for the view')},
+  swing=0.6,
+)
+def _train_checks():
+    T=TRAIN; L,Wd,H=T['car']
+    if (WALL['line']['car'],CROSS['cars']['car'])!=(T['car'],T['car']): problems.append(('train: a line not using the Moy car',))
+    if WALL['line']['cars']!=T['consists']['Wall Line']['cars'] or CROSS['cars']['cars']!=max(T['consists'][k]['cars'] for k in ('Spine Line','Meridian Line')): problems.append(('train: the lines\' car counts disagree with the consists',))
+    for line,cn in T['consists'].items():
+        n=cn['cars']
+        if n not in (2,3): problems.append(('train: not two or three cars',line,n))
+        length=n*L+(n-1)*T['gangway']; plat=WALL['platform'][0] if line=='Wall Line' else CROSS['platform'][0]
+        if length>plat-4.0: problems.append(('train: longer than its platform allows',line,round(length,1),plat))
+    # on the tightest curve (the Spine's junctions onto the Wall Line) the car's middle and ends swing off the track's line
+    r=CROSS['r_min']; b=T['bogie_at']
+    mid=b*b/(2*r); end=((L/2)**2-b*b)/(2*r)
+    if max(mid,end)>T['swing']: problems.append(('train: the car swings too far on a %g m curve'%r,round(mid,2),round(end,2)))
+    # every part stays inside the car's envelope, and every part is a SuperEgg no squarer than superegg.gd's flat
+    for p_ in T['parts']+[T['gangway_part']]:
+        sx,sy,sz=p_['semi']; cx_,cy_,cz_=p_['c']
+        if abs(cx_)+sx>L/2+0.05 and p_ is not T['gangway_part']: problems.append(('train: a part past the car\'s ends',p_.get('name')))
+        if abs(cz_)+sz>Wd/2+0.05 or cy_+sy>H+0.01 or cy_-sy<-0.01: problems.append(('train: a part outside the car\'s section',p_.get('name')))
+        if not all(2.0<=e<=5.5 for e in p_['eps']): problems.append(('train: an exponent outside superegg.gd\'s range',p_.get('name')))
+    T['_swing']=(round(mid,2),round(end,2))
+_train_checks()
 ## Station cores: lifts and switchback escalating ramps, linking every level a
 ## station has. levels: heights served; c and size: the core's footprint (world).
 ## Revised 2026-10-17 (user): open air, as Singapore uses escalators even in
@@ -1730,6 +1784,7 @@ w("## The Meridian Arch (city.md 8b): legs (world rects), lower and top bridges 
 w("const ARCH := %s" % lit(ARCH))
 w("const WEST_GATE := %s" % lit(WEST_GATE))
 w("const GREEN := %s" % lit(GREEN))
+w("const TRAIN := %s" % lit(TRAIN))
 w("")
 w("## The towers' sites: the shaft's footprint and the public ground round it (city.md 7c).")
 w("const TOWER_SITE := %s" % lit(TOWER_SITE))
@@ -1761,5 +1816,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,green=GREEN,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')
