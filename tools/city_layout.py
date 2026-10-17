@@ -1209,12 +1209,27 @@ CROSSING=dict(c=(-560,0),deck=6.5,ring=(24.7,32.7),ring_depth=1.6,ring_max_span=
   # roof, its drum a superellipse in plan (the roof's shape, so its four sides are nearly flat) with a ring clock set
   # flush in each side facing north, south, east and west, and a glass cupola above; a great bell hangs from the
   # cupola's crown. Each clock is a ring clock like the Timekeeper: a hollow centre, the hour ring, the minute ring
-  # outside it and a fixed bezel, each moving ring carrying a lit arrow, minute ticks on the bezel, a seconds bead on its
-  # rim. It keeps the game's time, so the dial and the bell agree.
-  dome=dict(drum=dict(half=19.0,n=4.0,h=17.0),cupola=dict(h=11.0),ribs=24,glass='clear glass in a steel diagrid, lit from within at night',
+  # outside it and a fixed bezel, each moving ring carrying a lit arrow, minute ticks on the bezel. It keeps the game's
+  # time, so the dial and the bell agree. (The seconds bead is gone, 2026-10-17, at the user's direction.)
+  # Revised 2026-10-17, at the user's direction: no posts and no ring beam (they read as a cage). Drum and cupola are one
+  # glass shell on a fine triangulated grid of slender white members, after the Queen Elizabeth II Great Court at the
+  # British Museum: every pane a triangle, the grid's lines sweeping from the near-square base up to a small crown ring.
+  # lattice: panes round the base, the rows' height on the shell, the members' section. Each clock's hollow centre is an
+  # open eye through the glass (eye: its radius, the sill's height from the clock's centre, the bronze sleeve lining it):
+  # a way in and out for anyone who can climb, glide or fly, and a balcony onto the street it faces.
+  dome=dict(drum=dict(half=20.0,n=4.0,h=17.0),cupola=dict(h=11.0),
+    glass='one shell of clear glass, drum and cupola together, on a triangulated grid of slender white steel members; no posts, no ring beam; lit from within at night',
+    lattice=dict(around=72,row=2.2,member=0.07,crown=3.0,after='the Queen Elizabeth II Great Court, British Museum (Foster, 2000)',
+                 material='white-painted steel, every pane a triangle; the grid sweeps from the square-ish base up to the crown ring the bell hangs from'),
     clocks=dict(bearings=[0,90,180,270],centre=8.5,rings=[('hour',3.0,5.0),('minute',5.0,7.0),('bezel',7.0,8.0)],proud=0.3,
       markers=dict(hour=dict(arc=22.0,shape='arrow'),minute=dict(arc=12.0,shape='arrow')),marks=dict(hour=0.35,quarter=0.8,minute=dict(w=0.12,len=0.4)),
-      seconds=dict(r=8.35,bead=0.35),time='game'),
+      eye=dict(r=2.9,sill=-2.4,sleeve=0.15,open='no glass, no guard: a way through for climbers, gliders and fliers'),time='game'),
+    # the Clock Room: the dome's floor (the roof's top) is a public room under the glass and the bell. The four towers'
+    # helices climb through the roof into it, each up a glass-guarded well; from under the bell four escalator pairs rise
+    # like a compass's arms to a landing behind each clock's eye.
+    room=dict(name='the Clock Room',well_guard=0.1,landing=dict(depth=3.0,w=4.4),runoff=2.5,
+      program='a public room under the glass: beds of desert grasses along the glass, benches round the escalator wells, the bell overhead and the backs of the four clocks turning; from each eye, the street it faces',
+      floor='pale terrazzo, the roof\'s top'),
     bell=dict(mouth=4.4,height=4.6,crown_gap=1.0,material='bronze',
       rings=[dict(at=5.0,name='the dawn bell',pattern='three strokes, three times, then nine (after the Angelus)'),
              dict(at=12.0,name='the noon bell',pattern='twelve strokes'),
@@ -1228,7 +1243,7 @@ def _crossing_layout():
     C['towers']=[]
     for nm,sx,sz in (('north-east',1,-1),('north-west',-1,-1),('south-east',1,1),('south-west',-1,1)):
         tc=(cx+sx*T['offset'],cz+sz*T['offset']); d=drum+T['lift']+0.1
-        lv_=[0,DECK['level'],13.2+PLATFORMS['floor'],36.0+PLATFORMS['floor']]
+        lv_=[0,DECK['level'],13.2+PLATFORMS['floor'],36.0+PLATFORMS['floor'],round(C['roof']['y']+C['roof']['th'],2)]   # the last: the Clock Room, in the dome
         # each hand: a flat landing at every level it serves (the rider steps off onto it, then sideways onto the gallery),
         # then a climb to the next level at the helix's angle; the down hand is the same path half a turn round. Angles in
         # degrees, 0 east, 90 south, increasing as the hand climbs; the up hand starts facing out of the Crossing.
@@ -1242,7 +1257,7 @@ def _crossing_layout():
             hands.append(dict(hand='up' if hand==0 else 'down',profile=prof))
         C['towers'].append(dict(name=nm,c=tc,levels=lv_,hands=hands,
             spine_platform='east' if sx>0 else 'west',high_platform='north' if sz<0 else 'south',
-            opens={str(DECK['level']):['the ring','the cross-bridge'],str(round(13.2+PLATFORMS['floor'],1)):180 if sx>0 else 0,str(36.0+PLATFORMS['floor']):90 if sz<0 else 270},
+            opens={str(DECK['level']):['the ring','the cross-bridge'],str(round(13.2+PLATFORMS['floor'],1)):180 if sx>0 else 0,str(36.0+PLATFORMS['floor']):90 if sz<0 else 270,str(lv_[-1]):'the Clock Room'},
             lift=dict(c=(round(tc[0]-sx*d/math.sqrt(2),2),round(tc[1]-sz*d/math.sqrt(2),2)),r=T['lift']),r=(band0,band1)))
     # the ring's supports: the four towers, a pair of Deck columns where the Spine walks cross it (north and south),
     # and a pair either side of the cross walk east and west, clear of the walk
@@ -1569,7 +1584,7 @@ def _cross_checks():
         for gap in (abs(lx-spx)-lr-plat_out,abs(lz-mez)-lr-plat_out):
             if not (0.3<=gap<=1.2): problems.append(('crossing: a lift that does not open onto both platforms',nm,round(gap,2)))
         if math.hypot(lx-tx,lz-tz)<dr+lr: problems.append(('crossing: a lift inside its tower',nm))
-        if sorted(TW['levels'])!=[0,DECK['level'],sp_fl,me_fl]: problems.append(('crossing: a tower misses a level',nm,TW['levels']))
+        if sorted(TW['levels'])!=[0,DECK['level'],sp_fl,me_fl,C['roof']['y']+C['roof']['th']]: problems.append(('crossing: a tower misses a level',nm,TW['levels']))
         TW['turns']=round(max(TW['levels'])/turn,2); TW['rise_per_turn']=round(turn,2)
         if math.hypot(tx-cx0,tz-cz0)+dr>C['ring'][0]-0.1 or math.hypot(tx-cx0,tz-cz0)+dr<C['ring'][0]-0.8: problems.append(('crossing: a tower does not meet the ring\'s inner edge',nm))
         for x in me['piers']:
@@ -1925,7 +1940,7 @@ def _planting():
             if big:
                 for dx,dz in ((2.4,0.8),(-1.8,1.6),(0.6,-2.2)): rocks.append(dict(c=[R2(x+dx),R2(z+dz)],half=[0.6,0.35,0.5],role='a stone'))
     P['reeds']=reeds; P['rocks']=rocks; P['agave']=agave
-    climbers=[]; gardens=[]; lv=[0]+[y for y in C['towers'][0]['levels'] if y>0]; bayA=2*math.pi/T['ribs']; cx0,cz0=C['c']
+    climbers=[]; gardens=[]; lv=[0]+[y for y in C['towers'][0]['levels'] if 0<y<C['roof']['y']]; bayA=2*math.pi/T['ribs']; cx0,cz0=C['c']
     for ti,t_ in enumerate(C['towers']):
         tx,tz=t_['c']; sx=math.copysign(1,tx-cx0); sz=math.copysign(1,tz-cz0)
         opens=[(6.5,math.atan2(sz,sx)),(6.5,math.atan2(0,-sx)),(6.5,math.atan2(-sz,-sx)),(14.2,math.atan2(0,-sx)),(37.0,math.atan2(-sz,0)),(0,math.atan2(sz,sx)),(0,math.atan2(-sz,-sx))]
