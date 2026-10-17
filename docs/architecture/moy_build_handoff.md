@@ -54,7 +54,7 @@ metres above the basin floor; levels are fixed:
 |---|---|---|
 | street | 0 | streets, squares, the park |
 | the Deck | +6.5 | the walkway (`DECK`) |
-| the Spine Line / Wall Line | +12 main / +20 gate flyover vs +13.2 wall rail | independent services, no junction; `CROSS` profile and gate station rail |
+| the Spine Line and the Wall Line | +13.2 rail, platforms +14.2 | level, separate tracks, platforms meeting at the North and South Gates (iteration 2) |
 | the Meridian high line | +36 (rail) | `CROSS` service 1 |
 
 ## What to build, in order

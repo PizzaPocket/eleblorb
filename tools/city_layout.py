@@ -667,13 +667,14 @@ DECK={
   # to the library's east-wing door, over Garden Walk's mouth
   dict(name='Library walk',kind='walk',w=6,pts=[(-631,-27),(-648,-27)]),
   # straight through the park under the Spine Line, from the Park Deck's north side to its south side: the Crossing's mezzanine
-  dict(name='Spine walk',kind='walk',w=6,pts=[(-557,-50),(-557,50)]),
+  dict(name='Spine walk',kind='walk',w=6,pts=[(-560,-50),(-560,50)]),
   # the Crossing Ring's concourse, at the Deck's level round the park's centre
-  dict(name='Crossing Ring',kind='ring',w=6,pts=[(round(-557+17*math.cos(math.radians(a_)),2),round(17*math.sin(math.radians(a_)),2)) for a_ in range(0,361,15)]),
+  dict(name='Crossing Ring',kind='ring',w=6,pts=[(round(-560+17*math.cos(math.radians(a_)),2),round(17*math.sin(math.radians(a_)),2)) for a_ in range(0,361,15)]),
   # up the east half of North Street to the neighbourhood centre's roof garden
-  dict(name='Estate walk',kind='walk',w=6,pts=[(-557,-56),(-557,-121)]),
+  dict(name='Estate walk',kind='walk',w=6,pts=[(-560,-56),(-560,-121)]),
+  dict(name='Neighbourhood centre bridge',kind='bridge',w=6,pts=[(-560,-121),(-554,-121)]),
   # down the east half of South Street, then along Market Square's north edge to the wet market's upper hall
-  dict(name='Market walk',kind='walk',w=6,pts=[(-557,56),(-557,125),(-530,125)]),
+  dict(name='Market walk',kind='walk',w=6,pts=[(-560,56),(-560,125),(-530,125)]),
  ],
  # where the Deck meets a building at +6.5 m: (building, point on its face, what is there)
  'doors':[
@@ -688,27 +689,28 @@ DECK={
  'through':[(1,12,'the hotel mezzanine\'s east gallery through the party wall to the Windspire\'s lobby')],
  # ramp towers: centre, radius, the side its head opens onto the Deck and the side its foot opens onto the ground
  'ramps':[
-  dict(name='North gate',c=(-568,-46),r=4,head='n',foot='e'),
-  dict(name='South gate',c=(-568,46),r=4,head='s',foot='e'),
+  # (the park's north and south gate towers are retired, 2026-10-17: the Deck now runs on the street's centre line
+  # over the whole park walk, and the Crossing's two spirals take the park's people between the lawn and the Deck)
   dict(name='West gate',c=(-621,8),r=4,head='w',foot='n'),
   dict(name='East gate',c=(-499,-8),r=4,head='e',foot='s'),
   dict(name='Civic north',c=(-457,-20),r=4,head='n',foot='s'),
   dict(name='Civic south',c=(-457,20),r=4,head='s',foot='n'),
  ],
- 'lifts':[dict(name='Estate Square',c=(-552.3,-112),r=1.6),dict(name='Market Square',c=(-533,129.7),r=1.6)],
+ # the Crossing's spirals are ways down from the Crossing Ring (CROSSING['spirals'])
+ 'spiral_ways':[(-548.0,-10.6),(-572.0,10.6)],
+ 'lifts':[dict(name='Park north gate',c=(-555.4,-46),r=1.6),dict(name='Park south gate',c=(-555.4,46),r=1.6),dict(name='Estate Square',c=(-555.4,-112),r=1.6),dict(name='Market Square',c=(-533,129.7),r=1.6)],
  'max_to_way_down':75.0,'min_soffit':5.4,'min_open_beside':4.0,
- # escalating ramps (inclined moving walkways at 12 degrees, after airport travelators): from a square up to the Deck,
- # each a pair (up and down) 2.6 m wide; foot on the square, head landing end-on on the Deck
+ # escalating ramps from a square up to the Deck (revised 2026-10-17 after the first prototype: the 12 degree
+ # travelators ran 31 m and stood in the squares as long obstructions; these are escalator pairs at 30 degrees,
+ # an up and a down side by side, 11.3 m long, set end-on into the Deck's edge). The park's two wing ramps to
+ # the Crossing are gone: the Crossing's spirals serve it.
  'escalators':[
-  dict(name='Civic Plaza north',foot=(-470,7),head=(-470,-24)),
-  dict(name='Civic Plaza south',foot=(-446,-7),head=(-446,24)),
-  dict(name='Market Square',foot=(-545,159),head=(-545,128)),
-  dict(name='Estate Square',foot=(-523,-104),head=(-554,-104)),
-  # in the park, along the cross walk, up into the Crossing's mezzanine from the east and the west
-  dict(name='Crossing east',foot=(-506,0),head=(-537,0)),
-  dict(name='Crossing west',foot=(-608,0),head=(-577,0)),
+  dict(name='Civic Plaza north',foot=(-470,-12.7),head=(-470,-24)),
+  dict(name='Civic Plaza south',foot=(-446,12.7),head=(-446,24)),
+  dict(name='Market Square',foot=(-545,139.3),head=(-545,128)),
+  dict(name='Estate Square',foot=(-545.7,-104),head=(-557,-104)),
  ],
- 'esc_angle':12.0,'esc_w':2.6,
+ 'esc_angle':30.0,'esc_w':3.2,
 }
 DIRS={'n':(0,-1),'s':(0,1),'e':(1,0),'w':(-1,0)}
 def _deck_checks():
@@ -766,6 +768,7 @@ def _deck_checks():
             hx,hz=DIRS[t['head']]; h=Point(t['c'][0]+hx*(t['r']+0.5),t['c'][1]+hz*(t['r']+0.5))
             if not deck.buffer(0.1).contains(h): problems.append(('deck: ramp head not on the Deck',t['name']))
         heads.append(Point(t['c']))
+    heads+=[Point(q) for q in D.get('spiral_ways',[])]
     # no point on the Deck more than max_to_way_down from a way down, walking the Deck
     import heapq
     pts=[]; adj={}
@@ -884,7 +887,8 @@ WALL={
  'arches':dict(bay=9.0,span=6.5,rise=5.5,depth=5.0),
  # the gate towers: Jiayuguan's tiered towers on the gatehouse's outer corners, in Moy's tile
  'gate_tower':dict(base=7.0,tiers=3,tier=3.2),
- 'line':dict(speed=10.0,dwell=4.0,sets_each_way=2,cars=3,car=(9.6,2.65,3.4),power='the wind, from the battery works'),
+ 'rail':13.2,  # the Wall Line's rail head: the wall's top (12 m) and its 1.2 m trackbed
+ 'line':dict(speed=10.0,dwell=12.0,sets_each_way=3,cars=3,car=(9.6,2.65,3.6),power='the wind, from the battery works'),
  # the Line House: a bastion on the wall's outside, toward the water works: the car shed at the top's level over the
  # lines' workshop and the Wall Watch's guardroom. at: degrees round the circle (atan2 of z, x-CX); along and out in metres
  'shed':dict(at=232.0,along=60.0,out=16.0),
@@ -992,63 +996,85 @@ def _build_wall():
     for t in TURBINES:
         if band.distance(Point(t))<40 or shed.distance(Point(t))<40: problems.append(('wall: too near a turbine',t))
 _build_wall()
-## The cross lines (city.md 6c, revised 2026-10-16 at the user's direction): two
-## straight lines. The Spine Line runs north to south at +12 m over the Deck,
-## then rises on long approach ramps to a +20 m gate flyover above the Wall Line;
-## the two services keep distinct tracks and never join. The Meridian Line
+## The cross lines (city.md 6c; revised 2026-10-17 after the first playable
+## prototype, at the user's direction). Two straight, level lines; no track
+## climbs anywhere in Moy. The Spine Line runs north to south down the middle of
+## North Street, the park and South Street at the Wall Line's own rail height
+## (+13.2 m), and ends at a terminus just inside the wall at each gate, its
+## platforms meeting the Wall Line's inner platform on the level: the two lines
+## never cross or join, and changing between them is a few steps. (The first
+## prototype found the old line 3 m off the street's centre, so its trains
+## brushed the frontage; and its gate flyover climbed at 29%.) The Meridian Line
 ## is the high line (+36 m): through the Timekeeper's open centre over city hall,
-## over the Crossing, between the East Gate's arch and the West Gate's towers. It
-## stands on tree piers spaced three Spine bays apart (36 m), set out from the
-## Crossing so that no pier stands on the Spine, with one longer bridge over city
-## hall. Services are track centrelines in world (x, z).
+## over the Crossing, between the East Gate's arch and the West Gate's towers, on
+## tree piers three Spine bays apart (36 m), set out from the Crossing, with one
+## longer bridge over city hall. Services are track centrelines in world (x, z);
+## rail is the rail head's height; tracks run 1.5 m either side of the line.
 CROSS={
- 'depth':1.2,'r_min':12.0,'double':6.0,'platform':(30.0,3.0),'min_gap':60.0,'clear_over':2.0,'car_h':3.4,
- 'cars':dict(cars=2,car=(9.6,2.65,3.4),speed=9.0,dwell=4.0,headway=150),
+ 'depth':1.2,'r_min':12.0,'double':6.0,'track':1.5,'platform':(30.0,3.0),'min_gap':60.0,'clear_over':2.0,'car_h':3.6,
+ 'cars':dict(cars=2,car=(9.6,2.65,3.6),speed=9.0,dwell=8.0,headway=60),
  'services':[
-  dict(line='Spine Line',w='double',rail=12.0,bay=12.0,pts=[(-557,-248),(-557,248)],
-       profile=[(-557,-248,12.0),(-557,-220,20.0),(-557,-198,20.0),(-557,-170,12.0),(-557,170,12.0),(-557,198,20.0),(-557,220,20.0),(-557,248,12.0)],
-       structure='portal frames: the Deck\'s paired columns carried up through it, with a crossbeam under the track; 12 m bay'),
+  dict(line='Spine Line',w='double',rail=13.2,bay=12.0,pts=[(-560,-200),(-560,200)],
+       structure='portal frames: the Deck\'s paired columns carried up through it, with a crossbeam under the track; 12 m bay; buffer stops at both ends, just inside the wall'),
   dict(line='Meridian Line',w='double',rail=36.0,pts=[(-336,0),(-792,0)],
-       piers=[-755,-719,-683,-647,-611,-575,-539,-503,-467,-435,-393],span=36.0,max_span=42.0,
-       structure='tree piers: one round-square stem 2.4 m across in the middle of the street, branching at +28 m into a Y that carries twin steel box girders; 36 m spans, one 42 m bridge over city hall'),
+       piers=[-722,-686,-650,-614,-578,-542,-506,-470,-434,-392],span=36.0,max_span=42.0,
+       structure='tree piers: one round-square stem 2.4 m across in the middle of the street, branching at +28 m into a Y that carries twin steel box girders; 36 m spans, one 42 m bridge over city hall; the West Gate\'s tower carries its west end'),
  ],
  'stations':[
-  dict(name='North Gate',at=(-557,-212),rail=20.0,lines=['Spine Line'],deck=False,access='the North Gate\'s gatehouse, on a separate flyover above the Wall Line'),
-  dict(name='Estate Square',at=(-557,-100),lines=['Spine Line'],deck=True,access='the Deck\'s Estate walk below; the glass lift and the escalating ramp from the square'),
-  dict(name='The Crossing',at=(-557,0),lines=['Spine Line','Meridian Line'],deck=True,access='the Crossing Ring at the park\'s centre: its concourse at the Deck\'s level, its cores to both lines'),
-  dict(name='Market Square',at=(-557,138),lines=['Spine Line'],deck=False,access='over the square; the Deck\'s Market walk crosses below with the square\'s escalating ramp and glass lift'),
-  dict(name='South Gate',at=(-557,212),rail=20.0,lines=['Spine Line'],deck=False,access='the South Gate\'s gatehouse, on a separate flyover above the Wall Line'),
+  dict(name='North Gate',at=(-560,-184),lines=['Spine Line'],deck=False,mid=7.1,interchange='Wall Line',access='the Spine\'s north terminus just inside the wall: its platforms run on, level, onto the Wall Line\'s inner platform at the North Gate; escalator pairs under both platforms from the street'),
+  dict(name='Estate Square',at=(-560,-100),lines=['Spine Line'],deck=True,access='over the Deck\'s Estate walk: escalator pairs under both platforms, from the street by way of the Deck'),
+  dict(name='The Crossing',at=(-560,0),lines=['Spine Line','Meridian Line'],deck=True,access='the Crossing Ring at the park\'s centre: its two double-helix spirals join the lawn, the ring, the Spine\'s platforms and the high line\'s'),
+  dict(name='Market Square',at=(-560,124),lines=['Spine Line'],deck=True,access='over Market Street and the square\'s north edge, where the Deck\'s Market walk runs below: escalator pairs under both platforms'),
+  dict(name='South Gate',at=(-560,184),lines=['Spine Line'],deck=False,mid=7.1,interchange='Wall Line',access='the Spine\'s south terminus just inside the wall, level with the Wall Line\'s inner platform at the South Gate'),
   dict(name='East Gate',at=(-351,0),lines=['Meridian Line'],deck=False,access='the Meridian Arch, which is the East Gate: its lower bridge holds the platforms, over the Wall Line\'s station'),
   dict(name='West Gate',at=(-771,0),lines=['Meridian Line'],deck=False,access='the West Gate\'s twin towers: the bridge between them holds the platforms, over the Wall Line\'s station'),
  ],
- # The Spine flyovers pass above the Wall Line at both gates; the services
- # remain independent and the Meridian Line terminates on a West Gate siding.
+ # no junctions: every line keeps its own tracks; changes happen on platforms
  'junctions':[],
- # escalating ramps in the station cores: 30 degrees (an escalator's angle, without steps), flights of at most 6.5 m
- 'esc':dict(angle=30.0,max_rise=6.5,w=2.6),
+ # escalators in station cores and stacks: pairs (an up and a down side by side) at 30 degrees, flights of at most 7.2 m
+ 'esc':dict(angle=30.0,max_rise=7.2,w=3.2),
 }
+## Platforms and boarding (city.md 6f, 2026-10-17): every platform's floor is the
+## car's floor, 1.0 m above the rail head, so boarding is level; its edge stands
+## 1.4 m from the track's centre, 7.5 cm from the car's side. Platforms are 3 m
+## wide, one beside each track, under a canopy 3.2 m up where nothing else shades
+## them. The train stops with its doors at marks on the platform.
+PLATFORMS=dict(floor=1.0,edge=1.4,width=3.0,canopy=3.2,
+  boarding='level: the platform is the car\'s floor; the gap is 7.5 cm; doors open for the whole stop, and the train stops at marks')
+## Escalators (city.md 6f): moving ramps without steps, always in up-and-down
+## pairs. Three ways to stack them: a pair (one level), a scissor (pairs stacked
+## in a crisscross, each level reversing, both flows on every flight), and a
+## double helix (an up spiral and a down spiral wound together round one eye,
+## after the double-helix stairs of Chambord and the Vatican and the trunk
+## spirals of the Plant Kingdom), each with a glass lift beside it or in its eye.
+ESCALATORS=dict(pair=dict(angle=30.0,tread=1.2,w=3.2,max_rise=8.0),
+  scissor=dict(angle=30.0,w=3.2,max_rise=7.2,landing=1.5),
+  helix=dict(angle=25.0,eye=2.0,band=2.6,hands=2,min_headroom=2.6,deck=0.5))
 ## The Moy car (city.md 6e, user 2026-10-17): one short car for every line, built
 ## entirely of SuperEggs, so the trains belong to the same soft-cornered world as
 ## everything else. Short cars (9.6 m) so a train is two or three of them: they
-## use short consists for the city's independent routes; the Spine never joins the Wall Line,
+## take the short platforms and frequent service of a small city; no line joins another,
 ## and short, frequent trains suit a small city. Every part is a SuperEgg in the
 ## car's frame (x along the car, y up from the rail head, z across): semi-axes,
 ## centre and its exponents (top: the plan shape and the upper half; bottom: the
 ## lower half), as superegg.gd builds them. consists: cars per train and the
 ## livery's colour for each line.
 TRAIN=dict(
-  name='the Moy car',car=(9.6,2.65,3.4),gangway=0.8,bogie_at=3.2,
+  name='the Moy car',car=(9.6,2.65,3.6),gangway=0.8,bogie_at=3.2,
+  # boarding (2026-10-17): the floor is 1.0 m above the rail head, level with every platform; two doors a side per
+  # car, each 1.4 m wide and 2.1 m tall, open for the whole stop; 2.3 m clear inside, 2.4 m wide
+  floor=1.0,doors=dict(per_side=2,at=2.4,w=1.4,h=2.1),inside=(2.3,2.4),
   parts=[
-    dict(name='body',semi=(4.8,1.3,1.325),c=(0,1.9,0),eps=(3.4,5.5),mat='cream glazed ceramic over an aluminium frame'),
-    dict(name='glazing',semi=(4.64,0.55,1.338),c=(0,2.25,0),eps=(3.4,3.4),mat='a dark panoramic window band wrapping round both ends'),
+    dict(name='body',semi=(4.8,1.4,1.325),c=(0,2.0,0),eps=(3.4,5.5),mat='cream glazed ceramic over an aluminium frame'),
+    dict(name='glazing',semi=(4.64,0.6,1.338),c=(0,2.4,0),eps=(3.4,3.4),mat='a dark panoramic window band wrapping round both ends'),
     dict(name='livery',semi=(4.82,0.16,1.338),c=(0,1.35,0),eps=(3.4,3.4),mat='a band of the line\'s colour'),
-    dict(name='battery pod',semi=(1.8,0.16,0.8),c=(0,3.24,0),eps=(5.5,5.5),mat='the roof battery, charged from the wind at the battery works'),
+    dict(name='battery pod',semi=(1.8,0.16,0.8),c=(0,3.44,0),eps=(5.5,5.5),mat='the roof battery, charged from the wind at the battery works'),
     dict(name='bogie',semi=(1.0,0.3,1.05),c=(3.2,0.35,0),eps=(5.5,5.5),mirror_x=True,mat='dark steel'),
     dict(name='lamp',semi=(0.14,0.14,0.14),c=(4.6,1.15,0.7),eps=(2.0,2.0),mirror_z=True,ends_only=True,mat='a warm lamp, lit at the train\'s ends'),
   ],
-  gangway_part=dict(semi=(0.45,1.1,1.0),c=(0,1.9,0),eps=(5.5,5.5),mat='a dark bellows between cars'),
+  gangway_part=dict(semi=(0.45,1.2,1.0),c=(0,2.0,0),eps=(5.5,5.5),mat='a dark bellows between cars'),
   consists={'Wall Line':dict(cars=3,colour='ochre',why='the ring is the commute, round the whole city'),
-            'Spine Line':dict(cars=2,colour='teal',why='short runs on the Deck and separate +20 m gate flyovers'),
+            'Spine Line':dict(cars=2,colour='teal',why='short runs over the Deck, gate to gate'),
             'Meridian Line':dict(cars=2,colour='violet',why='the high line: few stops, a ride for the view')},
   swing=0.6,
 )
@@ -1086,11 +1112,24 @@ _train_checks()
 ## on a 15 degree rhythm, carrying a concourse ring at the Deck's level (+6.5 m)
 ## and a halo of shade over the Spine's platforms (+17 m), open at the centre to
 ## the sky and the high line crossing above, and open on every side to the park.
-CROSSING=dict(c=(-557,0),ring=(14.0,20.0),deck=6.5,halo=(17.0,12.0,22.0),columns=24,
+## Revised 2026-10-17 after the first prototype: the ring is centred on the
+## street's line (x -560), the halo raised to 18 m over the Spine's platforms at
+## 14.2, and the two rectangular cores (which clipped the ring) and the park's
+## long wing ramps are replaced by two double-helix spirals: an up and a down
+## escalator spiral wound together round a glass lift, rising from the lawn
+## through the ring concourse and the halo to the high line. Each stands in the
+## ring, beside a Spine platform (a 1.4 m bridge at +14.2) and under the outer
+## edge of a high-line platform, onto which its last turn lands at +37.
+## spirals: centre, the levels it serves, the side each landing opens to
+## (the bearing in degrees: 0 east, 90 south), and what it joins.
+CROSSING=dict(c=(-560,0),ring=(14.0,20.0),deck=6.5,halo=(18.0,12.0,22.0),columns=24,
   material='pale timber louvres on slender steel columns',
   program='the ring concourse: shade, water fountains, kiosks, the lost-and-found and the city\'s information desk',
-  cores=[dict(name='north-east',c=(-545,-16),size=(6.4,16.0),levels=[0,6.5,13,37],lifts=2,enclosure='open frame',canopy=3.2,lift=(2.6,2.6)),
-         dict(name='south-west',c=(-569,16),size=(6.4,16.0),levels=[0,6.5,13,37],lifts=2,enclosure='open frame',canopy=3.2,lift=(2.6,2.6))])
+  spirals=[dict(name='north-east',c=(-548.0,-10.6),levels=[0,6.5,14.2,37.0],opens={'6.5':'the ring','14.2':180,'37.0':90},lift=True,
+                joins='the lawn, the ring, the Spine\'s east platform and the high line\'s north platform'),
+           dict(name='south-west',c=(-572.0,10.6),levels=[0,6.5,14.2,37.0],opens={'6.5':'the ring','14.2':0,'37.0':270},lift=True,
+                joins='the lawn, the ring, the Spine\'s west platform and the high line\'s south platform')],
+  cores=[])
 ## The Timekeeper (city.md 8a, revised 2026-10-16): a full circle standing over
 ## city hall in a bronze cradle, clear of the roof, the high line passing through
 ## its empty centre. A twelve-hour ring clock: the minute ring and the hour ring
@@ -1112,22 +1151,22 @@ TIMEKEEPER=dict(x=-414.0,z=0.0,y=37.5,thick=3.0,roof=22.0,
 ## Centre Pompidou's and Singapore's open-air station escalators, from the
 ## station hall on Meridian Court to the Wall Line, the high line and the sky
 ## garden on the lower bridge's roof; the Watch reaches its room by its own lift.
-ARCH=dict(legs=[(-362,-30,-340,-12),(-362,12,-340,30)],lower=(32.0,42.0),top=(58.0,72.0),cantilever=12.0,
+ARCH=dict(legs=[(-363.5,-30,-341.5,-12),(-363.5,12,-341.5,30)],lower=(32.0,42.0),top=(58.0,72.0),cantilever=12.0,
   opening=24.0,wall_line=12.0,
-  cores=[dict(name='north leg',c=(-365.2,-21),size=(6.4,16.0),levels=[0,12,37,43],lifts=2,enclosure='open cascade',canopy=3.2,lift=(2.6,2.6)),
-         dict(name='south leg',c=(-365.2,21),size=(6.4,16.0),levels=[0,12,37,43],lifts=2,enclosure='open cascade',canopy=3.2,lift=(2.6,2.6))],
+  cores=[dict(name='north leg',c=(-366.7,-21),size=(6.4,16.0),levels=[0,14.2,37,43],lifts=2,enclosure='open cascade',canopy=3.2,lift=(2.6,2.6)),
+         dict(name='south leg',c=(-366.7,21),size=(6.4,16.0),levels=[0,14.2,37,43],lifts=2,enclosure='open cascade',canopy=3.2,lift=(2.6,2.6))],
   # the Wall Line's train hall: a void through both legs at +12 m (v: across the wall, outward positive, from the wall's
   # centreline; y: floor and ceiling), holding both tracks and the station's platform on the outer side
-  train_hall=dict(v=(-7.0,5.5),y=(12.0,21.0)),
+  train_hall=dict(v=(-9.0,5.5),y=(12.0,21.0)),
   program='the station hall at the street, the Wall Line\'s station at +12 m, the high line\'s at +36 m, city offices in the legs, the Wall Watch\'s command room at the top',
   skin='a diagrid of pale ceramic-clad steel over glass')
 ## The West Gate's towers (city.md 8b, revised 2026-10-16): the same idea at the
 ## west, smaller: two towers straddling the wall either side of West Street, the
 ## Wall Line through them at +12 m, the high line's west station on the bridge
 ## between them at +36 m, a siding for its trains beyond.
-WEST_GATE=dict(towers=[(-782,-26,-760,-10),(-782,10,-760,26)],bridge=(32.0,42.0),top=44.0,train_hall=dict(v=(-7.0,5.5),y=(12.0,21.0)),
-  cores=[dict(name='north tower',c=(-778,-18),size=(6.4,15.0),levels=[0,12,37],lifts=2,enclosure='open loggia',canopy=3.2,lift=(2.6,2.6)),
-         dict(name='south tower',c=(-778,18),size=(6.4,15.0),levels=[0,12,37],lifts=2,enclosure='open loggia',canopy=3.2,lift=(2.6,2.6))])
+WEST_GATE=dict(towers=[(-782,-26,-757,-10),(-782,10,-757,26)],bridge=(32.0,42.0),top=44.0,train_hall=dict(v=(-9.0,5.5),y=(12.0,21.0)),
+  cores=[dict(name='north tower',c=(-778.8,-18),size=(6.4,15.6),levels=[0,14.2,37],lifts=2,enclosure='open loggia',canopy=3.2,lift=(2.6,2.6)),
+         dict(name='south tower',c=(-778.8,18),size=(6.4,15.6),levels=[0,14.2,37],lifts=2,enclosure='open loggia',canopy=3.2,lift=(2.6,2.6))])
 ## Green infrastructure (city.md 6d, user 2026-10-17): after Singapore's City in
 ## a Garden, every line, station and civic structure carries its own planting,
 ## on Moy's terms: a desert palette that the reclaimed water can afford, drip-fed
@@ -1229,12 +1268,25 @@ def _cross_checks():
             seg=LineString([L.interpolate(max(0,s0-half)),L.interpolate(min(L.length,s0+half))]).buffer(w/2+X['platform'][1],cap_style=2).intersection(wallP)
             for n_,h,g in tall:
                 if seg.intersection(g).area>0.05 and h>soffit-X['clear_over']: problems.append(('cross: platform into a building',st['name'],n_))
-            if st.get('deck') and sv['rail']==12.0:
-                if not any(LineString(r_['pts']).buffer(r_['w']/2).contains(p_) for r_ in DECK['runs']): problems.append(('cross: no Deck under a Deck station',st['name']))
-                rise=sv['rail']+1.0-DECK['level']; need=rise/math.tan(math.radians(DECK['esc_angle']))
-                if need>X['platform'][0]+2: problems.append(('cross: escalating ramp longer than its platform',st['name']))
-                a_,c_=L.interpolate(max(0,s0-half)),L.interpolate(min(L.length,s0+half))
-                st['_esc']=[dict(foot=[round(c,2) for c in LineString([a_,c_]).offset_curve(sd*(w/2+X['platform'][1]/2)).coords[0]],head=[round(c,2) for c in LineString([a_,c_]).offset_curve(sd*(w/2+X['platform'][1]/2)).coords[-1]],run=round(need,1),under='platform') for sd in (1,-1)]
+            # every Spine station but the Crossing (which has its spirals): a scissor stack of escalator pairs under
+            # each platform, from the street to the platform, its middle landing the Deck where the Deck runs below
+            if sv['line']=='Spine Line' and st['name']!='The Crossing':
+                ES=ESCALATORS['scissor']; plat=sv['rail']+PLATFORMS['floor']
+                mid=DECK['level'] if st.get('deck') else st.get('mid',plat/2)
+                if st.get('deck') and not any(LineString(r_['pts']).buffer(r_['w']/2).contains(p_) for r_ in DECK['runs']): problems.append(('cross: no Deck under a Deck station',st['name']))
+                flights=[(0.0,mid),(mid,plat)]; runs=[(b_-a_)/math.tan(math.radians(ES['angle'])) for a_,b_ in flights]
+                if max(b_-a_ for a_,b_ in flights)>ES['max_rise']+0.6: problems.append(('cross: a station stack flight too tall',st['name']))
+                foot=max(runs)+2*ES['landing']
+                if foot>X['platform'][0]: problems.append(('cross: a station stack longer than its platform',st['name'],round(foot,1)))
+                ux,uz=(L.coords[-1][0]-L.coords[0][0])/L.length,(L.coords[-1][1]-L.coords[0][1])/L.length
+                st['_stacks']=[]
+                for sd in (1,-1):
+                    off=X['track']+PLATFORMS['edge']+PLATFORMS['width']/2-ES['w']/2+0.0
+                    cx_,cz_=st['at'][0]-uz*sd*(X['track']+PLATFORMS['edge']+PLATFORMS['width']/2),st['at'][1]+ux*sd*(X['track']+PLATFORMS['edge']+PLATFORMS['width']/2)
+                    st['_stacks'].append(dict(side=sd,c=[round(cx_,2),round(cz_,2)],along=[round(ux,3),round(uz,3)],length=round(foot,1),flights=[[round(a_,2),round(b_,2),round(r_,2)] for (a_,b_),r_ in zip(flights,runs)]))
+                    sg=LineString([(cx_-ux*foot/2,cz_-uz*foot/2),(cx_+ux*foot/2,cz_+uz*foot/2)]).buffer(ES['w']/2,cap_style=2)
+                    for n_,h,g in tall:
+                        if sg.intersection(g).area>0.05: problems.append(('cross: a station stack on a building',st['name'],n_))
             pos.append((s0,st['name']))
         pos.sort(); sv['stops']=[n for _,n in pos]
         for (a_,na),(c_,nc) in zip(pos,pos[1:]):
@@ -1244,29 +1296,24 @@ def _cross_checks():
     if me['rail']-X['depth']-(sp['rail']+X['car_h']+0.6)<2.0: problems.append(('cross: the Meridian Line too low over the Spine',))
     cross_pt=LineString(sp['pts']).intersection(LineString(me['pts']))
     if cross_pt.is_empty or Point(CROSSING['c']).distance(cross_pt)>1.0: problems.append(('cross: the lines do not cross at the Crossing',))
-    # Separate the north/south Spine flyovers vertically from the circular
-    # Wall Line. The car envelope plus track soffit must clear the Wall train.
-    profile=sp.get('profile',[])
-    if len(profile)<2: problems.append(('cross: the Spine lacks its vertical profile',))
+    # no track climbs: every line is level along its whole length
+    for sv in X['services']:
+        if 'profile' in sv: problems.append(('cross: a line that climbs',sv['line']))
+    # the Spine ends inside the wall at each gate: its platforms meet the Wall Line's inner platform on the level, a few
+    # steps apart, and its trains (and their buffer stops) stay clear of the Wall Line's platform and tracks
+    WLr=WALL['r']+WALL['track_axis']-WALL['track_spacing']/2   # the Wall Line's inner track
+    inner_plat=WLr-PLATFORMS['edge']-PLATFORMS['width']           # the inner edge of its inner platform
+    if abs(sp['rail']-WALL['rail'])>0.01: problems.append(('cross: the Spine is not level with the Wall Line',sp['rail'],WALL['rail']))
     for nm in ('North Gate','South Gate'):
+        st=[x for x in X['stations'] if x['name']==nm][0]
         gate=[x for x in WALL['gates'] if x['name']==nm][0]
-        station=[x for x in X['stations'] if x['name']==nm][0]
-        at=station['at']; station_rail=float(station.get('rail',sp['rail']))
-        if LineString(sp['pts']).distance(Point(gate['p']))>4: problems.append(('cross: the Spine misses its gate',nm))
-        if abs(station_rail-(WALL['height']+1.2))<X['car_h']+X['depth']+0.5:
-            problems.append(('cross: the Spine and Wall Line overlap in height at the gate',nm,station_rail))
-        best=(1e9,None)
-        for a_,b_ in zip(profile,profile[1:]):
-            dx=b_[0]-a_[0]; dz=b_[1]-a_[1]; d2=dx*dx+dz*dz or 1
-            t=max(0,min(1,((at[0]-a_[0])*dx+(at[1]-a_[1])*dz)/d2))
-            err=math.hypot(at[0]-a_[0]-t*dx,at[1]-a_[1]-t*dz)
-            if err<best[0]: best=(err,a_[2]+t*(b_[2]-a_[2]))
-        if best[0]>0.5 or best[1] is None or abs(float(best[1])-station_rail)>0.1:
-            problems.append(('cross: the Spine flyover does not meet its gate platform',nm,best[0],best[1],station_rail))
-    for a_,b_ in zip(profile,profile[1:]):
-        run=math.hypot(b_[0]-a_[0],b_[1]-a_[1])
-        if run<0.01 or abs(b_[2]-a_[2])/run>0.33:
-            problems.append(('cross: the Spine gate approach is too steep',a_,b_))
+        end=min(sp['pts'],key=lambda q:math.hypot(q[0]-gate['p'][0],q[1]-gate['p'][1]))
+        plat_end=math.hypot(st['at'][0]-CX,st['at'][1])+X['platform'][0]/2
+        gap=inner_plat-plat_end
+        if not (0.5<=gap<=4.0): problems.append(('cross: the Spine terminus does not meet the Wall Line platform',nm,round(gap,2)))
+        if math.hypot(end[0]-CX,end[1])+1.0>inner_plat: problems.append(('cross: the Spine\'s buffer stop reaches the Wall Line platform',nm))
+        if abs(st['at'][0]-gate['p'][0])>4: problems.append(('cross: the Spine terminus is not at its gate',nm))
+        st['_interchange']=dict(gap=round(gap,2),level=round(sp['rail']+PLATFORMS['floor'],2))
     # the Meridian passes through the Timekeeper's empty centre with room round its trains
     T=TIMEKEEPER; inner=T['rings'][0][1]; R1=T['rings'][-1][2]
     if LineString(me['pts']).distance(Point(T['x'],T['z']))>0.01: problems.append(('cross: the Meridian Line misses the Timekeeper',))
@@ -1321,21 +1368,22 @@ def _cross_checks():
     # on the wall's centreline at the leg's middle; along the leg's whole length the cars on both tracks and the outer
     # platform must clear its sides by 0.5 m, its ceiling must clear the cars by 3 m, and the piers beside it stay 1 m thick
     WL=WALL; cw=WL['line']['car'][1]/2
-    need=(WL['track_axis']-WL['track_spacing']/2-cw, WL['track_axis']+WL['track_spacing']/2+cw+0.1+WL['platform'][1])
+    need=(WL['track_axis']-WL['track_spacing']/2-PLATFORMS['edge']-PLATFORMS['width'], WL['track_axis']+WL['track_spacing']/2+PLATFORMS['edge']+PLATFORMS['width'])
     for host,legs,sg in (('arch',ARCH['legs'],1),('west gate',WEST_GATE['towers'],-1)):
-        H_=(ARCH if host=='arch' else WEST_GATE)['train_hall']; xs=[]
+        # the hall follows the wall's curve through the leg, so it holds the tracks and both platforms at every point
+        H_=(ARCH if host=='arch' else WEST_GATE)['train_hall']; xs=[]; arcs=[]
+        if need[0]<H_['v'][0]+0.5 or need[1]>H_['v'][1]-0.5: problems.append(('%s: the Wall Line fouls its train hall'%host,need,H_['v']))
         for lg in legs:
             cx_=lambda z: CX+sg*math.sqrt(WL['r']**2-z**2)
-            zm=(lg[1]+lg[3])/2; hx=sorted((cx_(zm)+sg*H_['v'][0],cx_(zm)+sg*H_['v'][1])); xs.append([round(hx[0],2),round(hx[1],2)])
-            for z in range(int(lg[1]),int(lg[3])+1):
-                e=sorted((cx_(z)+sg*need[0],cx_(z)+sg*need[1]))
-                if e[0]<hx[0]+0.5 or e[1]>hx[1]-0.5: problems.append(('%s: the Wall Line fouls its train hall'%host,lg,z)); break
-            if hx[0]-lg[0]<1.0 or lg[2]-hx[1]<1.0: problems.append(('%s: a pier beside the train hall too thin'%host,lg))
-        if H_['y'][1]-(WL['height']+0.4+WL['line']['car'][2])<3.0 or H_['y'][0]>WL['height']: problems.append(('%s: the train hall too low'%host,))
-        H_['x']=xs
+            zs=[lg[1]+(lg[3]-lg[1])*k/8 for k in range(9)]
+            a0=[(round(cx_(z)+sg*H_['v'][0],2),round(z,2)) for z in zs]; a1=[(round(cx_(z)+sg*H_['v'][1],2),round(z,2)) for z in zs]
+            arcs.append(a0+a1[::-1]); xx=[q[0] for q in a0+a1]; xs.append([min(xx),max(xx)])
+            if min(xx)-lg[0]<1.0 or lg[2]-max(xx)<1.0: problems.append(('%s: a pier beside the train hall too thin'%host,lg,round(min(xx)-lg[0],2),round(lg[2]-max(xx),2)))
+        if H_['y'][1]-(WL['rail']+WL['line']['car'][2])<3.0 or H_['y'][0]>WL['height']: problems.append(('%s: the train hall too low'%host,))
+        H_['x']=xs; H_['arcs']=arcs
     # every station core links all its levels with lifts and with escalating ramps in flights the angle allows
     E=X['esc']
-    for host,cores in (('crossing',CROSSING['cores']),('arch',A['cores']),('west gate',W['cores'])):
+    for host,cores in (('arch',A['cores']),('west gate',W['cores'])):
         for c in cores:
             lv=sorted(c['levels']); flights=[]
             for a_,b_ in zip(lv,lv[1:]):
@@ -1356,8 +1404,26 @@ def _cross_checks():
             for hx in ((ARCH if host=='arch' else WEST_GATE if host=='west gate' else {}).get('train_hall',{}).get('x') or []):
                 if g.intersects(sbox(hx[0],-300,hx[1],300)) and host!='crossing' and any(sbox(*lg).intersects(g) for lg in (ARCH['legs'] if host=='arch' else WEST_GATE['towers'])): problems.append(('station: a core in the train hall',host,c['name']))
             if host=='west gate' and not any(sbox(*tw).contains(g) for tw in W['towers']): problems.append(('west gate: a core outside its tower',c['name']))
+    # the Crossing's double-helix spirals: an up and a down escalator spiral wound round a glass lift's eye. Headroom
+    # between the two hands; inside the ring; clear of the Spine's tracks and platforms but a short bridge from one;
+    # clear of the high line's deck, and landing on the outer edge of one of its platforms
+    C=CROSSING; H=ESCALATORS['helix']; rm=H['eye']+H['band']/2; ro=H['eye']+H['band']
+    turn=2*math.pi*rm*math.tan(math.radians(H['angle']))
+    if turn/H['hands']-H['deck']<H['min_headroom']: problems.append(('crossing: a spiral without headroom between its hands',round(turn/H['hands']-H['deck'],2)))
+    spx=sp['pts'][0][0]; plat_in=X['track']+PLATFORMS['edge']; plat_out=plat_in+PLATFORMS['width']
+    for S in C['spirals']:
+        cx_,cz_=S['c']; d=math.hypot(cx_-C['c'][0],cz_-C['c'][1])
+        if not (C['ring'][0]<=d<=C['ring'][1]): problems.append(('crossing: a spiral not in the ring',S['name']))
+        bridge=abs(cx_-spx)-ro-plat_out
+        if not (0.5<=bridge<=2.5): problems.append(('crossing: a spiral not beside a Spine platform',S['name'],round(bridge,2)))
+        if abs(cz_)-ro<plat_out-0.05 and abs(abs(cz_)-ro-plat_out)>0.3: problems.append(('crossing: a spiral under the high line',S['name']))
+        if abs(abs(cz_)-ro-plat_out)>0.3: problems.append(('crossing: a spiral not landing on a high-line platform',S['name'],round(abs(cz_)-ro,2)))
+        for x in me['piers']:
+            if math.hypot(cx_-x,cz_-me['pts'][0][1])<ro+1.6: problems.append(('crossing: a spiral against a pier',S['name'],x))
+        if sorted(S['levels'])!=[0,DECK['level'],sp['rail']+PLATFORMS['floor'],me['rail']+PLATFORMS['floor']]: problems.append(('crossing: a spiral misses a level',S['name'],S['levels']))
+        S['turns']=round(max(S['levels'])/turn,2); S['rise_per_turn']=round(turn,2); S['r']=(H['eye'],ro)
     # the Crossing Ring: open, inside the park, clear of its gardens, the pond, the playground and the wind trees
-    C=CROSSING; ring=Point(C['c']).buffer(C['ring'][1],64)
+    ring=Point(C['c']).buffer(C['ring'][1],64)
     if not sbox(*PARK['rect']).contains(ring): problems.append(('crossing: the ring leaves the park',))
     from shapely import affinity
     pc=PARK['pond']['c']; pond=affinity.scale(Point(pc).buffer(1,64),*PARK['pond']['r'])
@@ -1380,6 +1446,90 @@ def _cross_checks():
         if pond.contains(Point(t)) or play.distance(Point(t))<3: problems.append(('park: a wind tree on the pond or the playground',t))
 _block_checks()
 _cross_checks()
+## The timetable (city.md 6g, 2026-10-17, at the user's direction). A clock-face
+## service: on every line a train every 60 real seconds, which in the game's
+## clock (one real second is one game minute) is a train every hour, on the same
+## minute of every hour. Stops are 8 s at ordinary stations and 12 s at the
+## interchanges (both gates of the Spine, both gates of the Meridian, the
+## Crossing); the shuttles' turnaround at each terminus takes up the slack so a
+## round trip is a whole number of headways. Lines run from 5:00 to midnight;
+## through the night the Wall Line keeps one train each way, the Watch train.
+## The offsets set a pulse: the Spine's southbound and the Meridian's westbound
+## trains stand together at the Crossing on the hour, and the Wall Line's trains
+## each way meet the Spine's at the North Gate. Derived: each line's circuit
+## (events per stop, relative to a train's start), its trains, their offsets,
+## and the minute past the hour each train leaves each stop.
+TIMETABLE=dict(clock='one real second is one game minute; a game day is 24 real minutes',
+  headway=60.0,service=dict(start=5,end=24,night=dict(line='Wall Line',trains_each_way=1,name='the Watch train')),
+  dwell=dict(ordinary=8.0,interchange=12.0,terminus_min=12.0),
+  interchanges=['The Crossing','North Gate','South Gate','East Gate','West Gate'],
+  pulse=dict(at='The Crossing',lines=[('Spine Line','south'),('Meridian Line','west')],wall_meets=('North Gate','Spine Line')))
+def _timetable():
+    from shapely.geometry import LineString, Point
+    TT=TIMETABLE; H=TT['headway']; D=TT['dwell']; lines={}
+    dw=lambda nm: D['interchange'] if nm in TT['interchanges'] else D['ordinary']
+    for sv in CROSS['services']:
+        line=sv['line']; v=CROSS['cars']['speed']; Ls=LineString(sv['pts'])
+        stops=sorted((round(Ls.project(Point(st['at'])),2),st['name']) for st in CROSS['stations'] if line in st['lines'])
+        run=(stops[-1][0]-stops[0][0])/v; mid=sum(dw(nm) for _,nm in stops[1:-1])
+        n=math.ceil((2*run+2*mid+2*D['terminus_min'])/H-1e-9); T=(n*H-2*run-2*mid)/2
+        if T<D['terminus_min']-1e-6: problems.append(('timetable: a terminus turnaround too short',line,T))
+        if T>=H: problems.append(('timetable: two trains at a terminus at once',line,T))
+        ev=[]; t=0.0
+        dirs=('south','north') if line=='Spine Line' else ('west','east')
+        for leg,order in enumerate((stops,stops[::-1])):
+            for k,(s0,nm) in enumerate(order):
+                if k: t+=abs(s0-order[k-1][0])/v
+                arr=t; d_=T if k==len(order)-1 else (0.0 if k==0 else dw(nm))
+                if k==0 and leg==0: arr=t
+                t+=d_ if k else 0.0
+                ev.append(dict(stop=nm,s=s0,dir=dirs[leg],arr=round(arr,2),dep=round(t,2),kind='start' if k==0 else ('end' if k==len(order)-1 else 'stop')))
+        # the first event's dwell is the turnaround at the start terminus, at the circuit's end
+        ev[0]['arr']=round(n*H-T,2) if False else ev[0]['arr']
+        lines[line]=dict(kind='shuttle',speed=v,trains=n,circuit=n*H,turnaround=round(T,2),events=ev,length=round(Ls.length,1),cars=TRAIN['consists'][line]['cars'])
+    WL=WALL; v=WL['line']['speed']; Lw=WL['length']
+    for dname,sgn in (('inner',1),('outer',-1)):
+        st=sorted(((x['s'] if sgn>0 else (Lw-x['s'])%Lw),x['name']) for x in WL['stations'])
+        run=Lw/v; dws=[dw(nm) for _,nm in st]; n=math.ceil((run+sum(dws))/H-1e-9); pad=n*H-run-sum(dws)
+        ev=[]; t=0.0
+        for k,(s0,nm) in enumerate(st):
+            if k: t+=(s0-st[k-1][0])/v
+            arr=t; t+=dws[k]+(pad if k==0 else 0.0)
+            ev.append(dict(stop=nm,s=round(s0 if sgn>0 else (Lw-s0)%Lw,2),dir=dname,arr=round(arr,2),dep=round(t,2),kind='stop'))
+        lines['Wall Line '+dname]=dict(kind='loop',dir=sgn,speed=v,trains=n,circuit=n*H,pad=round(pad,2),events=ev,length=round(Lw,1),cars=TRAIN['consists']['Wall Line']['cars'])
+    # offsets: the pulse at the Crossing, then the Wall Line's trains meeting the Spine's at the North Gate
+    def first(line,stop,dir_=None,key='arr'):
+        return [e[key] for e in lines[line]['events'] if e['stop']==stop and (dir_ is None or e['dir']==dir_)][0]
+    off={}
+    for line,dir_ in TT['pulse']['lines']:
+        e=[e for e in lines[line]['events'] if e['stop']==TT['pulse']['at'] and e['dir']==dir_][0]
+        off[line]=round((-(e['arr']+e['dep'])/2)%H,2)
+    # the Wall Line's trains stand at the gate in the middle of the Spine's turnaround there, so both changes are short
+    g,ln=TT['pulse']['wall_meets']; e_end=[e for e in lines[ln]['events'] if e['stop']==g and e['kind']=='end'][0]
+    mid_=((e_end['arr']+e_end['dep'])/2+off[ln])%H
+    for d_ in ('inner','outer'):
+        e=[e for e in lines['Wall Line '+d_]['events'] if e['stop']==g][0]
+        off['Wall Line '+d_]=round((mid_-(e['arr']+e['dep'])/2)%H,2)
+    for k,L_ in lines.items():
+        L_['offset']=off[k]
+        # the minute past the hour each stop's departures leave (one per hour, one per headway in real seconds)
+        L_['minutes']=[dict(stop=e['stop'],dir=e['dir'],minute=int(math.floor((e['dep']+off[k])%H))%60) for e in L_['events'] if e['kind']!='end']
+    # each line's train fits its platforms; interchange waits at the gates and the Crossing
+    for k,L_ in lines.items():
+        base='Wall Line' if k.startswith('Wall') else k
+        n_=TRAIN['consists'][base]['cars']; length=n_*TRAIN['car'][0]+(n_-1)*TRAIN['gangway']
+        plat=WALL['platform'][0] if base=='Wall Line' else CROSS['platform'][0]
+        if length>plat-4: problems.append(('timetable: a train longer than its platforms',k))
+    TT['lines']=lines
+    waits=[]
+    for a_,b_,stop in (('Wall Line inner','Spine Line','North Gate'),('Wall Line outer','Spine Line','South Gate'),('Spine Line','Wall Line inner','North Gate'),('Spine Line','Wall Line outer','North Gate'),('Spine Line','Wall Line inner','South Gate'),('Spine Line','Wall Line outer','South Gate'),('Spine Line','Meridian Line','The Crossing'),('Meridian Line','Spine Line','The Crossing'),('Meridian Line','Wall Line inner','East Gate'),('Meridian Line','Wall Line inner','West Gate')):
+        A_=[(e['arr']+off[a_])%H for e in lines[a_]['events'] if e['stop']==stop and e['kind']!='start']; B_=[(e['dep']+off[b_])%H for e in lines[b_]['events'] if e['stop']==stop and e['kind']!='end']
+        if not A_ or not B_: continue
+        w=min((b2-a2-1.0)%H for a2 in A_ for b2 in B_)
+        waits.append(dict(stop=stop,arrive=a_,leave=b_,wait=round(w,1)))
+    TT['waits']=waits
+    if max(L_['trains'] for L_ in lines.values())>6: problems.append(('timetable: more trains than a small city runs on one line',))
+_timetable()
 if '--wall' in sys.argv:
     print(WALL['length'],WALL['min_radius'],WALL['station_gaps']); [print(st) for st in WALL['stations']]
 ## Old Moy's tower houses (docs/architecture/moy_tower_house.md). Every Old
@@ -1808,6 +1958,10 @@ w("const ARCH := %s" % lit(ARCH))
 w("const WEST_GATE := %s" % lit(WEST_GATE))
 w("const GREEN := %s" % lit(GREEN))
 w("const TRAIN := %s" % lit(TRAIN))
+w("## Platforms, escalators and the timetable (city.md 6f, 6g).")
+w("const PLATFORMS := %s" % lit(PLATFORMS))
+w("const ESCALATORS := %s" % lit(ESCALATORS))
+w("const TIMETABLE := %s" % lit(TIMETABLE))
 w("## The park (city.md 7a): its gardens, pond, lawn, playground, wind trees and walks.")
 w("const PARK := %s" % lit(PARK))
 w("## The Grand Hotel (city.md 8): its atrium block, tower, drum, lifts and skybridge.")
@@ -1843,5 +1997,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,timekeeper=TIMEKEEPER,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

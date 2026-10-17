@@ -886,15 +886,21 @@ city's vigilance and its commute are the same ride.
 **The cross lines** (revised 2026-10-16, at the user's direction): **two simple
 straight lines**, one north to south and one east to west, at two levels so
 they never meet. Data: `CROSS` in `tools/city_layout.py`.
-- **The Spine Line, north to south, at +12 m** (456 m): straight down
-  North Street, through the park and down South Street. It rises on long
-  approach ramps to +20 m through the North and South Gates, flying above the
-  Wall Line at +13.2 m. These are separate services on separate tracks; they
-  never join. Stations:
-  **North Gate**, **Estate Square**, **the Crossing**, **Market Square**,
-  **South Gate**. On North Street and South Street and through the park it
-  rides directly over the Deck, on the Deck's own columns carried up
-  through it (after Bangkok's Skytrain and its skywalk).
+- **The Spine Line, north to south, level at +13.2 m** (400 m; revised
+  2026-10-17 after the first playable prototype): straight down the middle
+  of North Street, through the park and down the middle of South Street, at
+  the Wall Line's own rail height. **No track in Moy climbs.** It ends at a
+  terminus just inside the wall at each gate, its buffer stops short of the
+  Wall Line; the two lines never cross or join, and the Spine's platforms
+  run on, level, onto the Wall Line's inner platform two metres away
+  (section 6f). Stations: **North Gate**, **Estate Square**, **the
+  Crossing**, **Market Square**, **South Gate**. Along North Street, the
+  park and South Street it rides directly over the Deck, on the Deck's own
+  columns carried up through it (after Bangkok's Skytrain and its skywalk).
+  *(The first prototype found the line 3 m east of its streets' centre, so
+  its trains brushed the east frontage, and its gate flyover climbed at
+  29%; both are corrected here, and nothing needs to tunnel through a
+  building.)*
 - **The Meridian Line, east to west: the high line, at +36 m** (456 m;
   raised from +26 m on 2026-10-17 so the Timekeeper can be a full circle
   clear of city hall's roof). From its east terminus on the lower bridge of
@@ -916,52 +922,45 @@ can go from the street to any train without leaving it. The levels:
 |---|---|---|
 | Street | 0 | the avenues, the squares, the park's lawns, the station halls |
 | The Deck | +6.5 m | the walkway round the park and up the streets; the Crossing Ring's concourse |
-| The Wall Line | +13.2 m rail head | circle line on the wall; Spine gate crossings remain grade-separated |
-| Spine Line main section | +12 m rail head | rises to +20 m on approach ramps at North and South Gates |
-| The high line | +36 m | the Meridian Line, platforms at +37 m |
+| The Wall Line and the Spine | +13.2 m rail head, platforms +14.2 | one level, so their platforms meet at the North and South Gates; the Wall Line on the wall's 1.2 m trackbed |
+| The high line | +36 m rail head, platforms +37 | the Meridian Line |
+
+Every platform's floor is the car's floor, 1.0 m above the rail head
+(section 6f).
 
 - **Between the street and the Deck:** the ramp towers, the glass lifts,
-  and 12° escalating ramps from the squares (Civic Plaza, Market Square,
-  Estate Square) and from the park's cross walk to the Crossing Ring.
-- **Between the Deck and the Spine:** a pair of escalating ramps under each
-  Spine platform, rising through the platform floor.
-- **Station cores, for everything higher:** **switchback escalating ramps
-  at 30°** (an escalator's angle, without steps), in flights of at most
-  6.5 m with a landing at each level, and **two glass lifts** beside them.
-  **Revised 2026-10-17 (user): in the open air.** Singapore runs its
-  escalators everywhere, and in the open: up from the street to its
-  elevated stations, through its parks and along its covered walkways,
-  under a roof but open at the sides to the breeze. So a Moy core is an
-  **open steel frame, not a glass box**: each flight climbs under its own
-  light canopy, open on its sides, with a planter at every landing; only
-  the lift shafts are glazed. In a desert the canopies are the point: they
-  shade the moving ramp, and the open sides let the hot air go. The cores
-  are checked in the layout: each must be open, hold its longest flight
-  plus its landings, and has its flights stored in the data.
-  - **The Crossing:** two open escalator towers, north-east and south-west
-    of the ring, their lifts on the side away from the Spine, each serving the lawn (0), the ring (+6.5), the Spine's platforms (+13)
-    and the high line's platforms (+37).
-  - **The East Gate (the arch):** an **open cascade** of escalating ramps
-    on each leg's court face, climbing the diagrid under glass canopies in
-    full view of Meridian Court and city hall, after the Centre Pompidou's
-    facade escalators and Singapore's open-air ones: from the station hall
-    (0) to the Wall Line's East Gate station (+12), whose tracks run through
-    the legs, the high line's terminus on the lower bridge (+37), directly
-    above it and at right angles, and the sky garden on the lower bridge's
-    roof (+43). The change between the two lines is one cascade, straight
-    up. The Watch reaches its command room (+58) by its own lift.
-  - **The West Gate:** escalating ramps in an open loggia in each tower's
-    face on West Street (the street between the towers is too narrow for a
-    cascade beside it), serving the street hall (0),
-    the Wall Line (+12) through the towers and the high line's west
-    station on the bridge between them (+37).
-  - **North and South Gates:** the Spine flyover is reached from its own
-    platform and long approach ramps; the Wall Line station stays below on
-    the wall. There is no track junction or shared platform.
+  and **escalator pairs** (an up and a down side by side, 30°, 11.3 m long)
+  set end-on into the Deck's edge from Civic Plaza, Market Square and
+  Estate Square. *(The 12° travelators of the earlier plan ran 31 m and stood
+  in the squares and the park as long obstructions; they are gone.)*
+- **Up to the Spine's platforms:** a **scissor stack of escalator pairs**
+  under each platform, from the street to the Deck (or a middle landing
+  where no Deck runs below) and on to the platform (section 6f).
+- **The station cores, for everything higher:** open steel frames of
+  scissor stacks, glass lifts beside them; open-air, as Singapore runs its
+  escalators everywhere, under a roof but open at the sides, the canopies
+  shading the moving ramps. Checked in the layout.
+  - **The Crossing:** two **double-helix spirals** in the ring (section
+    7a), each serving the lawn (0), the ring (+6.5), a Spine platform
+    (+14.2) and a high-line platform (+37).
+  - **The East Gate (the arch):** an **open cascade** on each leg's court
+    face, a scissor of escalator pairs climbing the diagrid under glass
+    canopies in full view of Meridian Court and city hall, after the Centre
+    Pompidou: from the station hall (0) to the Wall Line's East Gate
+    platforms (+14.2), whose tracks run through the legs in a train hall
+    following the wall's curve, the high line's terminus on the lower
+    bridge (+37), directly above it and at right angles, and the sky garden
+    on the lower bridge's roof (+43). The Watch reaches its command room
+    (+58) by its own lift.
+  - **The West Gate:** a scissor in each tower's outer pier, beside the
+    train hall, serving the street (0), the Wall Line (+14.2) and the high
+    line's west station on the bridge between the towers (+37).
+  - **North and South Gates:** the Spine's terminus and the Wall Line's
+    station on one level; the change is a few steps along the platform.
 - **The high line's platforms and the Deck** are one system with the
   street: from any square you reach the Deck by its escalating ramp, the
   Spine through its platform floor, and the high line by the nearest open
-  escalator tower; no route needs stairs, and almost every route is in the
+  escalators; no route needs stairs, and almost every route is in the
   open air under shade.
 
 **Rhythm and construction of the supports (2026-10-17).**
@@ -978,13 +977,14 @@ can go from the street to any train without leaving it. The levels:
   two nearest rise through the Crossing Ring between its two rows of
   columns and the ring hangs its concourse from them) and run on at 36 m;
   over Civic Plaza and city hall the girders make one 42 m bridge so no pier
-  stands on the hall. The checks keep every pier off buildings and the
+  stands on the hall; at the west end the West Gate's tower carries the
+  girders. The checks keep every pier off buildings and the
   Spine and every span within 42 m.
 - **The rhythm**, read from the street: the Spine's frames every 12 m, the
   high line's trees every third frame where the lines run together, the
   Crossing's 24 columns on a 15° rhythm, and the wall's arches every 9 m.
 - **The Deck is the middle level** between the street (0) and the Spine's
-  main section (+12 m); the gate approaches climb to +20 m.
+  platforms (+14.2 m).
 - **Where no rail goes:** the narrow lanes. Both lines keep to main streets
   and squares; the Meridian keeps 3 m clear of Old Moy's tower houses on
   West Street.
@@ -1057,18 +1057,98 @@ or three cars and stops at least 4 m short of its platform's length; the
 car's swing on the tightest curve stays within its allowance; every part
 stays inside the car's envelope and uses exponents superegg.gd supports.
 
-**Playable prototype implementation (2026-10-17).** Each car is its own
-physics-synchronized rideable body and pivots to follow the sampled path. The
-prototype runs two trains per cross-line on separate tracks and four on the
-Wall loop, with four-second stops at authored stations; the North/South
-Spine-to-Wall crossings use a block interlock. The train clearance sweep
-includes building and lot masses, gate supports, and Wall Line platforms. The
-Spine edge portal is cut through the All-night Store and every overlapping
-authored lot while preserving their outer footprints and roofs. The model
-drawing's four turbines are aligned westward with the authored wind and their
-three blades rotate at 2 rpm. Color, offset street surfaces and real pond
-water are in the baked city. Automated controller and envelope checks do not
-replace sustained rider traversal or physical turbine-hazard tuning.
+**Boarding (2026-10-17):** the car is 3.6 m tall over everything, its floor
+1.0 m above the rail head and level with every platform, 2.3 m clear and
+2.4 m wide inside; two doors a side per car, each 1.4 m wide and 2.1 m
+tall, open for the whole stop (section 6f).
+
+**The first playable prototype (2026-10-17)** built each car as its own
+rideable body following its path, which stays. Its gate flyovers, block
+interlock, four-second stops and the train tunnels cut through the
+All-night Store, the Hawker centre, the Neighbourhood centre and the lots
+along the Spine's east frontage are **superseded** by the level Spine on
+its streets' centre line, the gate interchanges and the timetable
+(sections 6c, 6f, 6g). Its turbines (facing the west wind, 2 rpm), colour,
+offset street surfaces and pond water stay.
+
+### 6f. Platforms, boarding and the escalators (proposed 2026-10-17, after the first prototype, at the user's direction)
+
+**Direction (user):** no track climbs; real platforms right beside the
+trains, which players can step onto; escalators that run both up and down;
+crisscross where it suits, spirals where they suit, all part of the
+architecture rather than tacked on. Data: `PLATFORMS`, `ESCALATORS`, the
+stations' `_stacks` and `_interchange`, and `CROSSING.spirals` in
+`tools/city_layout.py`, all checked.
+
+**Platforms.** Every platform's floor is the car's floor, **1.0 m above the
+rail head**: +14.2 m for the Wall Line and the Spine, +37 m for the high
+line. Its edge stands **1.4 m from its track's centre**, 7.5 cm from the
+car's side, so boarding is level and nobody steps over a gap. Platforms are
+3 m wide, one beside each track (side platforms), 40 m long on the Wall Line
+and 30 m on the cross lines, under a canopy 3.2 m up wherever nothing else
+shades them. Trains stop with their doors at marks on the platform; the
+doors stay open for the whole stop.
+
+**The gate interchanges.** At the North and South Gates the Spine's two
+platforms run on past its buffer stops, across the end of the line, onto the
+Wall Line's inner platform, which overhangs the wall's city face over the
+Rim Walk: one level floor, two metres from one train to the other. The
+Wall Line's two platforms at every gate, one beside each track, stand on
+the wall's top; at the East and West Gates they run through the train halls
+in the arch's legs and the West Gate's towers, which now follow the wall's
+curve.
+
+**Escalators: always an up and a down.** Moving ramps without steps, as
+everywhere in the city, 1.2 m treads, always built in pairs. Three ways to
+stack them, each where it suits:
+- **A pair** rises one level: from the squares to the Deck, 30°, 11.3 m.
+- **A scissor** (crisscross) stacks pairs: each flight starts where the
+  last ended and turns back, so every flight carries both flows. Under the
+  Spine's platforms (street → Deck or a middle landing → platform), in the
+  arch's open cascades and the West Gate's towers.
+- **A double helix** winds an up spiral and a down spiral together round
+  one eye, half a turn apart, so they never meet; after the double-helix
+  stairs of the Château de Chambord and the Vatican Museums, and the trunk
+  spirals of the Plant Kingdom's treehouses. 25°, an eye 4 m across with a
+  round glass lift in it, a 2.6 m band, 9.7 m of rise a turn and 4.3 m of
+  headroom between the hands. Used at the Crossing, where it needs to stand
+  free and be seen from every side.
+
+**Integrated, not tacked on.** Each kind lives inside a structure it
+belongs to: the pairs end-on in the Deck's edge, the scissors under the
+platforms they serve and in the gate buildings' own frames, the spirals
+inside the Crossing Ring's column rows, rising through openings in its
+halo. Each kind carries the city's planting at its landings (section 6d).
+
+### 6g. The timetable (proposed 2026-10-17, at the user's direction)
+
+**A clock-face service.** One real second is one game minute (a game day is
+24 real minutes, as the day-night cycle runs). **Every line runs a train
+every 60 real seconds, which on the game's clock is one train every hour,
+on the same minute of every hour**: a Moy schedule anyone can remember.
+Data: `TIMETABLE`, derived and checked in `tools/city_layout.py`; the city
+model runs its trains to it and shows a departure board.
+
+| Line | Trains | Cars | Round trip | Notes |
+|---|---|---|---|---|
+| Spine | 3 | 2 | 3 h (180 s) | turns round in 21 min at each gate |
+| Meridian | 3 | 2 | 3 h | turns round in 31 min at each gate |
+| Wall Line, clockwise | 3 | 3 | 3 h round the city | |
+| Wall Line, anticlockwise | 3 | 3 | 3 h round the city | |
+
+- **Stops:** 8 min at ordinary stations, 12 min at the interchanges (the
+  Crossing and the four gates). On the game's clock these are generous;
+  in real time they are 8 and 12 seconds, enough to step aboard.
+- **Hours:** 5:00 to midnight. Through the night the Wall Line keeps one
+  **Watch train** each way, the city's vigilance going round the wall;
+  the others stand in the Line House.
+- **Timed changes:** the Spine's southbound and the Meridian's westbound
+  trains stand together at the Crossing on the hour; the Wall Line's trains
+  in both directions stand at the North Gate in the middle of the Spine's
+  turnaround. Changes take 6 to 16 game minutes (6 to 16 real seconds).
+- **Checked:** every line's round trip is a whole number of headways; no
+  turnaround is shorter than 12 min or long enough to put two trains at
+  one terminus; every train fits its platforms.
 
 ### 6d. A city in a garden: green infrastructure after Singapore (proposed 2026-10-17, at the user's direction)
 
@@ -1404,19 +1484,23 @@ middle):
 - **Two rings of slender steel columns**, 14 and 20 m from the centre, 24
   in each ring on a 15° rhythm, so the park reads straight through it.
 - **The ring concourse** between them at the Deck's level (+6.5 m), joined
-  to the Deck's Spine walk and reached by 12° escalating ramps from the
-  park's east and west cross walk: shade, water fountains, kiosks, the
-  lost-and-found and the city's information desk.
-- **A halo** of pale timber louvres at +17 m, 12 to 22 m from the centre,
+  to the Deck's Spine walk and reached from the lawn by the two spirals:
+  shade, water fountains, kiosks, the lost-and-found and the city's
+  information desk.
+- **A halo** of pale timber louvres at +18 m, 12 to 22 m from the centre,
   shading the ring and the Spine's platforms; its middle is open, so from
   the lawn you look straight up at the sky and the high line crossing.
-- **The Spine** passes through at +12 m, its platforms under the halo, the
-  escalating ramps under them rising from the concourse; **the high line**
+- **The Spine** passes through at +13.2 m, its platforms (+14.2) under the
+  halo; **the high line**
   crosses at +36 m, and its two nearest tree piers rise through the ring.
-- **Two open escalator towers** (switchback escalating ramps under light
-  canopies, glass lifts beside them), north-east and south-west of the
-  ring, join the lawn, the ring, the Spine and the high line in the open
-  air (section 6c).
+- **Two double-helix spirals** (revised 2026-10-17, section 6f), one in
+  the ring's north-east and one in its south-west: an up and a down
+  escalator spiral wound round a round glass lift, rising from the lawn
+  through the ring concourse (its landing at +6.5), across a 1.5 m bridge
+  to a Spine platform (+14.2), up through an opening in the halo and onto
+  the outer edge of a high-line platform (+37). They replace the
+  rectangular cores, which clipped the ring, and the long wing ramps
+  across the park. The ring is centred on the Spine's line (x −560).
 **Planted (2026-10-17, section 6d):** bougainvillea from the ring's inner
 planter, coral vine on the inner columns, desert grasses on the halo's rim,
 and a rain garden under the ring, after the Supertrees and Singapore's ABC
@@ -2972,6 +3056,12 @@ lit crowns.
 - (2026-10-14) the Deck's route (section 6): the Park Deck ring, the civic,
   library, estate and market walks, two skybridges, six ramp towers and two
   glass lifts; travelators dropped;
+- (2026-10-17, after the first playable prototype) **level lines and real
+  platforms**: the Spine recentred on its streets and level at the Wall
+  Line's height, ending at gate interchanges inside the wall (no flyover,
+  no tunnels); platforms at the car's floor; escalator pairs, scissors and
+  the Crossing's double-helix spirals; the train halls following the wall's
+  curve; a clock-face timetable (6c, 6e, 6f, 6g, 7a);
 - (2026-10-17) **the Well Quarter simplified**: two old roads (the Old High
   Street and Mara's Lane) with the grid laid round them, and blocks of
   perimeter tower houses round courtyards, replacing the winding lanes and

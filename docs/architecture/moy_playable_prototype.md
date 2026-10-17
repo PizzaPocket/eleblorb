@@ -1,5 +1,13 @@
 # Moy: playable layout prototype contract
 
+> **Amended 2026-10-17 by plan iteration 2.** Read
+> [the iteration-2 review](../diagnostics/2026-10-17-moy-plan-iteration-2.md)
+> first: the lines are level (Spine and Wall Line at +13.2, Meridian +36),
+> the Spine ends at gate interchanges inside the wall (no flyover, no
+> tunnels, no interlock), platforms sit at the car's floor, escalators are
+> pairs, scissors and the Crossing's double-helix spirals, and trains run to
+> `TIMETABLE`. Where this contract says otherwise, the review wins.
+
 2026-10-17. Implementation brief for the next chat. The owner authorized a rough,
 playable reconstruction of the **existing city plan and 3D model**. This is not
 permission to redesign Moy, build every interior, or deliver final art. The
@@ -34,7 +42,7 @@ visual language. Do not introduce new lore, residents or progression.
 Latest decisions that older prose sometimes contradicts:
 
 - Cars remain absent. **Trains exist**, elevated on the wall and cross lines.
-- Street datum is 0; Deck walking surface +6.5; Spine +12 m, with +20 m gate flyovers over the Wall Line; Wall rail +13.2 m;
+- Street datum is 0; Deck walking surface +6.5; Spine and Wall Line rails +13.2 m, level, platforms +14.2 (iteration 2);
   Meridian rails **+36**, with high platforms **+37**. A rail elevation is not
   a platform or train-roof elevation.
 - Timekeeper is a full twelve-hour ring, centre +37.5, top +51, empty centre
@@ -158,7 +166,7 @@ and actual pond water. These directions supersede the corresponding deferrals
 above for this prototype. Keep the original plan geometry and SuperEgg style.
 
 - Trains use independent pivoting rideable car bodies, station stops with a
-  four-second dwell, separate Spine and Wall Line tracks with grade-separated gate crossings. Car-envelope
+  stops and service from `TIMETABLE` (iteration 2), separate Spine and Wall Line tracks meeting at level gate interchanges. Car-envelope
   collision sweeps verify the constructed passages through buildings/lots and
   station platforms; do not solve clearance by changing player range.
 - Four turbine rotors face west into the authored wind and turn at 2 rpm with
