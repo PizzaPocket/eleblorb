@@ -46,11 +46,9 @@ const IRON := CalderaShell.STEEL_BLUED
 
 static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> StaticBody3D:
 	var body := CalderaShell.make_body(parent, entry, float(line["datum"]))
-	_threshold(body)
 	_canopy(body)
 	_supports(body)
 	_memory_stones(body)
-	_tempering_slab(body)
 	_light(body)
 	return body
 
@@ -92,6 +90,21 @@ static func build_foundation(parent: Node3D, entry: Dictionary, line: Dictionary
 	_platform_guards(body)
 	FireCalderaHighline._supertoroidal_pier(body, Vector2.ZERO, Vector2.RIGHT, Vector2.DOWN, Vector2(10.95, 8.95), float(line["low"]) - datum - 2.2, -0.30, "RenewalSupertoroidalServicePier")
 	_immersion_tongue(body, datum)
+	return body
+
+
+static func build_support(parent: Node3D, entry: Dictionary, line: Dictionary) -> StaticBody3D:
+	# The generated promenade surface already includes the Renewal deck. Retain
+	# its load path while avoiding a second floor, tongue, kerb or guard.
+	var body := StaticBody3D.new()
+	body.name = "RenewalPlanDeckSupport"
+	body.collision_layer = 1
+	body.collision_mask = 0
+	parent.add_child(body)
+	var centre: Vector2 = entry["centre"]
+	FireCalderaHighline._supertoroidal_pier(body, centre, Vector2.RIGHT, Vector2.DOWN,
+		Vector2(11.1, 8.7), float(line["low"]) - float(line["datum"]) - 2.2, -0.30,
+		"RenewalSupertoroidalServicePier")
 	return body
 
 

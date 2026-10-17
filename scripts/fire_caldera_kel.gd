@@ -28,7 +28,9 @@ extends RefCounted
 
 const SIZE := Vector2(19.0, 15.0)
 const STOREY := 5.0
-const DOCK := 1.25
+# The receiving yard is the generated 31.15 m tier above the 30.0 m ground
+# datum; keep its private dock floor exactly flush with that plan surface.
+const DOCK := 1.15
 const RESIDENCE := 5.2
 const BACK_ROW := -0.5
 const PARTITION := FireCalderaBuildings.BASALT_PARTITION
@@ -125,7 +127,6 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> Static
 	_bridge(body)
 	_gallery(body)
 	_workshop(body)
-	_descent(body)
 	_lights(body, home)
 	_temper_panels(body)
 	return body
@@ -192,7 +193,10 @@ static func _floors(body: StaticBody3D) -> void:
 	var dock: Rect2 = levels[0]["rect"]
 	var store: Rect2 = levels[1]["rect"]
 	var ramp: Rect2 = levels[2]["rect"]
-	FireCalderaOren._block(body, "LoadingDock", Vector3(dock.get_center().x, DOCK * 0.5, dock.get_center().y), Vector3(dock.size.x - 0.2, DOCK, dock.size.y - 0.2), FLOOR)
+	# The private dock floor reaches the receiving wall plane exactly. The plan's
+	# exterior yard meets it flush there, without a 0.1 m inset that left the
+	# human capsule balanced on the loading threshold edge.
+	FireCalderaOren._block(body, "LoadingDock", Vector3(dock.get_center().x, DOCK * 0.5, dock.get_center().y), Vector3(dock.size.x, DOCK, dock.size.y), FLOOR)
 	FireCalderaOren._block(body, "AlloyStoreFloor", Vector3(store.get_center().x, DOCK * 0.5, store.get_center().y), Vector3(store.size.x - 0.2, DOCK, store.size.y - 0.2), FLOOR)
 	FireCalderaOren._wedge(body, "DockRamp", ramp.position, ramp.end, DOCK, 0.0, false, FLOOR)
 	# The dock's edge: a steel rail where it stands above the strip.
@@ -345,7 +349,7 @@ static func _bridge(body: StaticBody3D) -> void:
 	var ramp: Rect2 = levels[3]["rect"]
 	var head: Rect2 = levels[4]["rect"]
 	var foot := float(levels[3]["from"])
-	FireCalderaOren._wedge(body, "HomeRamp", ramp.position, ramp.end, foot, RESIDENCE, false, FLOOR)
+	_build_home_ramp_slab(body, ramp, foot, RESIDENCE)
 	CalderaShell.soft_slab(body, "HomeLanding", Vector3(head.get_center().x, RESIDENCE - 0.1, head.get_center().y), Vector3(head.size.x * 0.5 + 0.08, 0.1, head.size.y * 0.5 + 0.08), head.size * 0.5, FLOOR)
 	for z: float in [head.position.y + 0.15, head.end.y - 0.15]:
 		CalderaShell._metal(body, Vector3(head.end.x - 0.15, (RESIDENCE - 0.2) * 0.5, z), Vector3(0.14, RESIDENCE - 0.2, 0.14), IRON, true)
@@ -409,6 +413,44 @@ static func _bridge(body: StaticBody3D) -> void:
 	var holder := MeshInstance3D.new()
 	body.add_child(holder)
 	CollisionPolicy.add_box(body, holder, Vector3(0.08, 1.1, ramp.size.y), Vector3(x1, (foot + RESIDENCE) * 0.5 + 0.55, ramp.get_center().y), Basis(Vector3.RIGHT, -atan2(RESIDENCE - foot, ramp.size.y)), false)
+
+
+## A raised deck on cantilevered steel outriggers. The former solid wedge
+## filled its whole rise with stone and buried the newly plan-defined Kel lane;
+## this slab keeps the private home's bridge walkable while leaving the public
+## service route open beneath it.
+static func _build_home_ramp_slab(body: StaticBody3D, ramp: Rect2, foot: float, head: float) -> void:
+	var rise := head - foot
+	var angle := -atan2(rise, ramp.size.y)
+	var centre := Vector3(ramp.get_center().x, (foot + head) * 0.5 - 0.11 * cos(angle), ramp.get_center().y)
+	var size := Vector3(ramp.size.x, 0.22, sqrt(ramp.size.y * ramp.size.y + rise * rise))
+	var mesh := BoxMesh.new()
+	mesh.size = size
+	var visual := MeshInstance3D.new()
+	visual.name = "HomeRamp"
+	visual.mesh = mesh
+	visual.position = centre
+	visual.rotation.x = angle
+	visual.material_override = SolidModel.material(FLOOR, 0.85, 0.0)
+	visual.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.SOLID)
+	body.add_child(visual)
+	CollisionPolicy.add_box(body, visual, size, centre, Basis(Vector3.RIGHT, angle), false)
+	# Beams cantilever from the house wall across the lane, above 2.1 m of clear
+	# headroom at every point where the generated LK profile passes underneath.
+	for i in range(6):
+		var t := (float(i) + 0.5) / 6.0
+		var z := lerpf(ramp.position.y + 0.15, ramp.end.y - 0.15, t)
+		var y := lerpf(foot, head, t) - 0.32
+		var beam := BoxMesh.new()
+		beam.size = Vector3(ramp.end.x - (ramp.position.x - 0.5), 0.16, 0.18)
+		var support := MeshInstance3D.new()
+		support.name = "HomeRampCantilever"
+		support.mesh = beam
+		support.position = Vector3((ramp.position.x - 0.5 + ramp.end.x) * 0.5, y, z)
+		support.material_override = SolidModel.material(IRON, 0.34, 0.72)
+		support.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.SOLID)
+		body.add_child(support)
+		CollisionPolicy.add_box(body, support, beam.size, support.position, Basis.IDENTITY, false)
 
 
 ## Half-width multiplier of a SuperEgg's XZ section at normalized Z. Both
@@ -494,17 +536,6 @@ static func _workshop(body: StaticBody3D) -> void:
 
 ## The descent hall: the lift's steel cage and the protected ramp's head, a
 ## refractory portal with its forged gate, toward the deep forge.
-static func _descent(body: StaticBody3D) -> void:
-	for corner: Vector2 in [Vector2(6.6, 5.2), Vector2(9.0, 5.2), Vector2(6.6, 7.0), Vector2(9.0, 7.0)]:
-		CalderaShell._metal(body, Vector3(corner.x, STOREY * 0.5, corner.y), Vector3(0.12, STOREY, 0.12), IRON, true)
-	CalderaShell._metal(body, Vector3(7.8, 0.06, 6.1), Vector3(2.3, 0.12, 1.7), REFRACTORY, false)
-	var portal := CalderaFurniture.piece(body, Vector3(1.4, 1.6, 0.4), REFRACTORY, Vector3(5.0, 1.6, 1.0), 0.0, true, 6.0)
-	portal.name = "DescentPortal"
-	CalderaShell._metal(body, Vector3(5.0, 1.3, 1.42), Vector3(1.6, 2.4, 0.06), IRON, false)
-	for i in 4:
-		CalderaShell._beam(body, Vector3(4.4 + 0.4 * float(i), 0.2, 1.46), Vector3(4.4 + 0.4 * float(i), 2.4, 1.46), Vector2(0.03, 0.03), TEMPER[i])
-
-
 static func _lights(body: StaticBody3D, home: StaticBody3D) -> void:
 	for at: Vector3 in [Vector3(-5.0, 4.3, 3.5), Vector3(5.0, 4.3, 3.5), Vector3(-5.0, 4.3, -3.5), Vector3(2.5, 4.0, -3.5), Vector3(7.5, 4.0, -3.5)]:
 		CalderaFurniture.concealed_light(body, at, CalderaFurniture.LED_WARM, 0.9, 7.0)

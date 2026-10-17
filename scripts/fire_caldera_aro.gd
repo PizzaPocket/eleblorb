@@ -4,7 +4,7 @@ extends RefCounted
 ## Tovan, Miru and Kes's thermal works and home.  The 17 x 13 m plan is two
 ## exact bands: nine metres of public control/work rooms at the west and eight
 ## metres of private home at the east.  The service descent is a real cut in
-## the surveyed podium, with a walkable ramp to a sealed future-L1 bulkhead.
+## the surveyed podium and the thermal distribution workshop.
 
 const WORK_CENTRE := Vector2(-4.0, 0.0)
 const HOME_CENTRE := Vector2(4.5, 0.0)
@@ -15,8 +15,6 @@ const FLOOR := Color(0.30, 0.28, 0.27)
 const PARTITION := FireCalderaBuildings.BASALT_PARTITION
 const BED_CENTRES: Array[Vector2] = [Vector2(2.0, -4.8), Vector2(4.5, -4.8), Vector2(7.0, -4.8)]
 const BED_LAVA_Y := 0.55
-const PIT_CENTRE := Vector2(-6.1, -3.6)
-const PIT_DEPTH := 2.4
 
 
 static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> StaticBody3D:
@@ -25,7 +23,6 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> Static
 	CalderaShell.add_volume(body, _works_spec())
 	CalderaShell.add_volume(body, _home_spec())
 	_partitions(body)
-	_service_descent(body)
 	_control_gallery(body)
 	_valve_workshop(body)
 	_home(body)
@@ -110,32 +107,6 @@ static func _partition(body: StaticBody3D, lo: float, hi: float, fixed: float, a
 	var size := Vector3(hi - lo, CalderaShell.STOREY, 0.18) if along_x else Vector3(0.18, CalderaShell.STOREY, hi - lo)
 	var at := Vector3((lo + hi) * 0.5, CalderaShell.STOREY * 0.5, fixed) if along_x else Vector3(fixed, CalderaShell.STOREY * 0.5, (lo + hi) * 0.5)
 	FireCalderaOren._block(body, "AroPartition", at, size, PARTITION)
-
-
-static func _service_descent(body: StaticBody3D) -> void:
-	# A thin, tilted SuperEgg slab follows the pitted podium from datum to the
-	# sealed lower bulkhead.  The pit owns the surrounding floor and sidewalls;
-	# there is no competing terrain or hidden flat collider beneath the ramp.
-	var run := 4.0
-	var pitch := atan2(PIT_DEPTH, run)
-	var slope_length := Vector2(run, PIT_DEPTH).length()
-	# Local -Z runs from the workshop threshold toward L1.  A negative X
-	# rotation therefore makes that direction descend, rather than rise.
-	var basis := Basis(Vector3.RIGHT, -pitch)
-	var centre := Vector3(PIT_CENTRE.x, -PIT_DEPTH * 0.5, PIT_CENTRE.y)
-	# `half.z` is measured along the slope, so use the hypotenuse rather than
-	# the four-metre plan run; otherwise both landings stop short after rotation.
-	CalderaShell.soft_slab(body, "L1ServiceRamp", centre, Vector3(1.0, 0.09, slope_length * 0.5), Vector2(0.92, slope_length * 0.46), FLOOR, basis)
-	# The sealed future-L1 bulkhead is visible at the ramp's low end.
-	var bulkhead := SuperEgg.build_part(Vector3(0.82, 1.05, 0.12), CalderaShell.STEEL_BLUED, 5.5, 5.5)
-	bulkhead.name = "L1Bulkhead"
-	bulkhead.position = Vector3(PIT_CENTRE.x, -PIT_DEPTH + 1.02, PIT_CENTRE.y - 2.02)
-	body.add_child(bulkhead)
-	CollisionPolicy.mark_decorative(bulkhead)
-	for side: float in [-1.0, 1.0]:
-		CalderaShell._beam(body, Vector3(PIT_CENTRE.x + side * 1.05, 0.9, PIT_CENTRE.y + 2.0), Vector3(PIT_CENTRE.x + side * 1.05, -PIT_DEPTH + 0.9, PIT_CENTRE.y - 2.0), Vector2(0.045, 0.045), CalderaShell.STAINLESS)
-	ClearZones.add(body, "L1 service descent", "lane", PIT_CENTRE, Vector2(0, -1), 1.8, 1.8, 0.68, -PIT_DEPTH + 0.95, 1.9)
-	FireCalderaBuildings._marker(body, "L1DescentMarker", Vector3(PIT_CENTRE.x, -PIT_DEPTH, PIT_CENTRE.y - 1.5), 0.0)
 
 
 static func _control_gallery(body: StaticBody3D) -> void:

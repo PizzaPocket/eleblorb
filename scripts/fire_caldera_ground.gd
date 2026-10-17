@@ -18,9 +18,9 @@ const LAVA_Y := 29.2
 ## Nominal bank height at the reservoir's mean radius; individual bearings
 ## vary slightly because the lava outline is intentionally organic.
 const LIP_Y := 30.0
-## The basin's bed under the deepest lower rooms (layout section 7: down to
-## 18 m below the surface).
-const BED_DEPTH := 22.0
+## The natural bed beneath the Heartworks collection pool. The public pool is
+## at 58.8 m depth; leave geological clearance below its walkable gallery.
+const BED_DEPTH := 92.0
 ## Where the city's ground gives way to the crater wall.
 ## The authored parabola owns almost the whole bowl; only its final apron
 ## reconciles to the coarse terrain samples at the same crater lip.
@@ -273,61 +273,7 @@ static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(Fire
 	return body
 
 
-## The Tempering Gate is the settlement's welcome: a broad refractory portal
-## drawn as a squarish SuperEllipse, tripled in depth like a cooling mould. A
-## suspended veil of locally cast glass catches volcanic light above the clear
-## passage. It uses the civic charcoal/nickel/teal family; amber and cobalt
-## remain specific to the inn beyond it.
-static func build_arrival_threshold(parent: Node3D) -> StaticBody3D:
-	var body := StaticBody3D.new()
-	body.name = "CalderaArrivalThreshold"
-	body.collision_layer = 1
-	body.collision_mask = 0
-	parent.add_child(body)
-	var radial := FireCalderaPlan.ARRIVAL_THRESHOLD.normalized()
-	var tangent := Vector2(-radial.y, radial.x)
-	var ground_y := crater_wall(FireCalderaPlan.ARRIVAL_THRESHOLD)
-	var refractory := Color(0.12, 0.15, 0.17)
-	for i in 2:
-		var side := -1.0 if i == 0 else 1.0
-		var plan := FireCalderaPlan.ARRIVAL_THRESHOLD + tangent * side * 5.6
-		var at := Vector3(plan.x, ground_y + 3.25, plan.y)
-		var marker := SuperEgg.build_part(Vector3(0.72, 3.25, 0.78), refractory, 7.5, 7.5)
-		marker.name = "ArrivalMarkerWest" if i == 0 else "ArrivalMarkerEast"
-		marker.position = at
-		marker.material_override = SolidModel.material(refractory, 0.52, 0.28)
-		body.add_child(marker)
-		CollisionPolicy.add_box(body, marker, Vector3(1.25, 6.4, 1.35), at, Basis(), false)
-		var inset := SuperEgg.build_part(Vector3(0.08, 1.55, 0.48), Color(0.28, 0.68, 0.66, 0.72), 8.0, 8.0)
-		inset.name = "TemperedGlassWayfindingInset"
-		inset.position = at + Vector3(-tangent.x * side * 0.68, 0.3, -tangent.y * side * 0.68)
-		body.add_child(inset)
-		CollisionPolicy.mark_decorative(inset)
-	# Three deep portal frames make the threshold legible from the exterior,
-	# the lip and the descending gallery. Their shared curve is continuous.
-	for depth: float in [-0.48, 0.0, 0.48]:
-		var arch := PackedVector3Array()
-		for i in 33:
-			var x := lerpf(-5.6, 5.6, float(i) / 32.0)
-			var q := clampf(absf(x) / 5.6, 0.0, 1.0)
-			var y := ground_y + 1.0 + 7.2 * pow(maxf(0.0, 1.0 - pow(q, 6.0)), 1.0 / 6.0)
-			var p := FireCalderaPlan.ARRIVAL_THRESHOLD + tangent * x + radial * depth
-			arch.append(Vector3(p.x, y, p.y))
-		FireCalderaHighline._tube(body, arch, 0.18 if depth != 0.0 else 0.26, refractory.lightened(0.06), "TemperingPortal")
-	# The overhead glass veil is high enough for the widest visitor and freight
-	# route; its asymmetrical spectrum is civic, not the inn's two-colour badge.
-	var veil_colours: Array[Color] = [Color(0.22, 0.72, 0.66, 0.62), Color(0.72, 0.24, 0.50, 0.58), Color(0.58, 0.76, 0.28, 0.58), Color(0.38, 0.62, 0.78, 0.54)]
-	for i in 4:
-		var x := -3.0 + float(i) * 2.0
-		var p := FireCalderaPlan.ARRIVAL_THRESHOLD + tangent * x
-		var fin := SuperEgg.build_part(Vector3(0.52, 1.15 + 0.18 * float(i % 2), 0.08), veil_colours[i], 7.0, 7.0)
-		fin.name = "WelcomeGlassVeil"
-		fin.position = Vector3(p.x, ground_y + 6.15 - 0.15 * float(i % 2), p.y)
-		fin.rotation.y = atan2(tangent.y, tangent.x)
-		body.add_child(fin)
-		CollisionPolicy.mark_decorative(fin)
-	return body
-
+# The former standalone arrival arch was superseded by the generated Gate Terrace.
 
 static func _colour(vertex: Vector3, normal: Vector3) -> Color:
 	# Kept as the vertex-array source for mesh compatibility and terrain tools;

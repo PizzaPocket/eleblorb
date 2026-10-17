@@ -3,7 +3,7 @@ extends RefCounted
 
 ## The Fire Kingdom caldera city's single plan (docs/architecture/
 ## fire_caldera_layout.md, approved 2026-10-06): the local frame, reservoir,
-## plots, routes, emergency spokes, the lower city and its immersion shelves,
+## plots, routes, emergency spokes and surface surveys,
 ## the fourteen residents and the trade ledger. The city's builder and
 ## tools/validate_fire_plan.tscn read only this; nothing keeps a second list.
 ##
@@ -40,7 +40,7 @@ const FLOOR_Y := 30.0
 ## The lower public promenade is a level civic datum, slightly above the
 ## inhabited bowl shoulder. Its plan can follow the bank and house frontages
 ## without inheriting the bowl's downward slope toward the lava.
-const GROUND_PROMENADE_DATUM := FLOOR_Y + 0.25
+const GROUND_PROMENADE_DATUM := FLOOR_Y
 
 ## The Highline is civic architecture, not a terrace cut into the volcano.
 ## Its narrow level deck follows the bowl perimeter on independent supports;
@@ -56,7 +56,7 @@ const HIGHLINE_DATUM := 42.5
 ## The inn is a gate building, reached directly from the lip approach. It
 ## remains raised on the same service-pier system without inheriting the lower
 ## Highline datum or requiring visitors to traverse the ring first.
-const GUEST_GATE_DATUM := 49.5
+const GUEST_GATE_DATUM := 48.5
 ## Kept equal to SocketPlinth.REVEAL so raised-route endpoints land on the
 ## finished outer platform edge instead of crossing the private porch.
 const RAISED_PLATFORM_REVEAL := 1.2
@@ -169,6 +169,7 @@ const PLOTS: Array[Dictionary] = [
 		"on_promenade": false},
 	{"id": "OREN", "centre": Vector2(41.8, -47.4), "footprint": Vector2(17.0, 12.0), "reserved": Vector2(22.0, 17.0), "site": "ground",
 		"household": "Oren", "program": "mineral counter to the arrival crescent; assay, secure store, preparation and receiving to the service loop", "occupied": true,
+		"datum": GROUND_PROMENADE_DATUM,
 		# Split level (approved 2026-10-07): the shop at the promenade's level,
 		# the workshop half 1.35 m up, flush with the service loop, joined by a
 		# ramp along the staff corridor; the home's open-air ramp in the east
@@ -185,7 +186,8 @@ const PLOTS: Array[Dictionary] = [
 			{"rect": Rect2(6.5, -0.36, 2.0, 3.2), "y": 4.0},
 		]},
 	{"id": "KEL", "centre": Vector2(57.6, -21.0), "footprint": Vector2(19.0, 15.0), "reserved": Vector2(24.0, 17.0), "site": "ground",
-		"household": "Kel", "program": "armory gallery and receiving bay; residence on the quiet outer edge; protected descent to the deep forge", "occupied": true,
+		"household": "Kel", "program": "armory gallery, receiving bay and residence on the quiet outer edge", "occupied": true,
+		"datum": GROUND_PROMENADE_DATUM,
 		"foundation": Vector2(21.0, 17.0),
 		# Approved 2026-10-08: the receiving bay is a loading dock at the service
 		# loop's level, with a ramp down to its lower strip; the alloy store at
@@ -195,7 +197,7 @@ const PLOTS: Array[Dictionary] = [
 			{"rect": Rect2(-0.5, -7.5, 6.0, 4.8), "y": 1.25},
 			{"rect": Rect2(5.5, -7.5, 4.0, 7.0), "y": 1.25},
 			{"rect": Rect2(2.0, -2.7, 1.4, 2.0), "from": 1.25, "to": 0.0, "axis": "z"},
-			{"rect": Rect2(10.1, -10.4, 1.4, 5.5), "from": 1.9, "to": 5.2, "axis": "z"},
+			{"rect": Rect2(10.1, -10.4, 1.4, 5.5), "from": 3.8, "to": 5.2, "axis": "z"},
 			{"rect": Rect2(9.6, -4.9, 1.9, 1.8), "y": 5.2},
 		]},
 	{"id": "VARA", "centre": Vector2(59.0, 58.9), "footprint": Vector2(18.0, 14.0), "reserved": Vector2(23.0, 19.0), "foundation": Vector2(23.0, 19.0), "site": "highline",
@@ -210,12 +212,9 @@ const PLOTS: Array[Dictionary] = [
 		# Reached by R5, behind the civic complex.
 		"on_promenade": false},
 	{"id": "ARO", "centre": Vector2(-51.0, 35.7), "footprint": Vector2(17.0, 13.0), "reserved": Vector2(22.0, 16.0), "site": "ground",
-		"household": "Aro", "program": "thermal works and household; public door on the terrace loop, service descent to the manifold", "occupied": true,
-		"foundation": Vector2(19.0, 15.0),
-		# A protected dry descent is cut through the podium inside the rear works.
-		# Its ramp stops at a sealed L1 bulkhead until the lower city is authored.
-		"pits": [{"at": Vector2(-6.1, -3.6), "half": Vector2(1.25, 2.0), "depth": 2.4, "exponent": 5.5}],
-		"sink": 2.4},
+		"household": "Aro", "program": "thermal works and household; public door on the terrace loop, service access within the compound", "occupied": true,
+		"datum": GROUND_PROMENADE_DATUM,
+		"foundation": Vector2(19.0, 15.0)},
 	{"id": "RENEWAL", "centre": Vector2(-58.7, -5.5), "footprint": Vector2(18.0, 14.0), "reserved": Vector2(23.0, 19.0), "site": "ground",
 		"household": "", "program": "tempering and gathering terrace above the submerged communal chamber", "occupied": false,
 		# Revised 2026-10-09: a public glass renewal deck with two Highline
@@ -715,56 +714,17 @@ static func loop_door_link(target: Vector2, loop: PackedVector2Array, parent_wid
 	return points
 
 
-## Proposed replacement (2026-10-17): FireCalderaWalkwaysPlan (scripts/fire_caldera_walkways_plan.gd,
-## from tools/fire_caldera_walkways_layout.py; docs/architecture/fire_caldera_walkways.md) designs every
-## walk above the lava as one system. These routes stay the built geometry until it is approved.
-## Every route: id, width, class (public, service, link), role, points.
+## Readable centreline view of the generated walkway flights. The generated
+## levels own continuous surfaces; this compatibility view exposes sampled
+## flight plan coordinates without reconstructing their junctions.
 static func routes() -> Array[Dictionary]:
 	var list: Array[Dictionary] = []
-	list.append({"id": "H1", "width": HIGHLINE_WIDTH, "class": "public", "tier": "highline", "role": "glass civic ring and raised-building fronts", "points": highline_ring()})
-	list.append({"id": "H0", "width": 3.8, "class": "public", "tier": "ramp", "role": "direct arrival gallery from the south-lip gate", "points": arrival_byway()})
-	list.append({"id": "HG", "width": 3.0, "class": "public", "tier": "ramp", "serves": ["GUEST"], "role": "short gate forecourt branch to the inn", "points": guest_gate_link()})
-	var guest := plot("GUEST")
-	var guest_front := front_point(guest, "footprint")
-	var guest_back := back_point(guest, "footprint")
-	var guest_side := shell_to_plan(guest, Vector2(8.2, 0.0))
-	list.append({"id": "D_GUEST", "width": 2.4, "class": "service", "tier": "gate_platform", "serves": ["GUEST"], "role": "inn platform circulation from public door to receiving side", "points": PackedVector2Array([guest_front, guest_side, guest_back])})
-	list.append({"id": "H2W", "width": 3.2, "class": "link", "tier": "ramp", "serves": ["RENEWAL"], "role": "south side of the paired Renewal sweep ramps", "points": renewal_byway(-1.0)})
-	list.append({"id": "H2E", "width": 3.2, "class": "link", "tier": "ramp", "serves": ["RENEWAL"], "role": "north side of the paired Renewal sweep ramps", "points": renewal_byway(1.0)})
-	list.append({"id": "H4", "width": 2.4, "class": "link", "tier": "highline", "serves": ["OREN"], "landing_overlap": true, "role": "Oren upper-home threshold below the roof terrace, clear of the lift", "points": oren_terrace_link()})
-	var ground := ground_promenade()
-	var service := undercroft_loop()
-	var ground_ids := ["OREN", "KEL", "ARO", "RENEWAL"]
-	list.append({"id": "G1", "width": 3.5, "class": "public", "tier": "ground", "serves": ground_ids, "role": "inner lava promenade and ground-building forecourts", "points": ground})
-	list.append({"id": "G2", "width": 3.2, "class": "service", "tier": "ground", "serves": ground_ids, "role": "under-Highline service loop and receiving aprons", "points": service})
-	# Ground properties receive two explicit landings.  The Renewal route
-	# crosses its public deck from the promenade to the descent landing.
-	for id: String in ["OREN", "KEL", "ARO"]:
-		var entry := plot(id)
-		var front := Vector2.ZERO
-		var back := Vector2.ZERO
-		match id:
-			"OREN":
-				front = shell_to_plan(entry, Vector2(-4.0, 6.0))
-				back = shell_to_plan(entry, OREN_RECEIVING_DOOR)
-			"KEL":
-				front = shell_to_plan(entry, Vector2(-3.2, 7.5))
-				back = shell_to_plan(entry, KEL_DOCK_DOOR)
-			"ARO":
-				front = shell_to_plan(entry, Vector2(-4.9, 6.5))
-		list.append({"id": "P_%s" % id, "width": 2.8, "class": "public", "tier": "platform", "serves": [id], "role": "%s public threshold" % id,
-			"points": loop_door_link(front, ground, 3.5, 2.8, facing(entry))})
-		if id != "ARO":
-			list.append({"id": "S_%s" % id, "width": 2.6, "class": "service", "tier": "platform", "serves": [id], "role": "%s receiving threshold" % id,
-			"points": loop_door_link(back, service, 3.2, 2.6, -facing(entry))})
-	# Raised properties own broad platforms; these centre lines record that a
-	# person can walk round the side from the civic ring to every rear door.
-	for id: String in ["NAHL", "VARA", "CIVIC", "IREN"]:
-		var entry := plot(id)
-		var front := front_point(entry, "footprint")
-		var back := back_point(entry, "footprint")
-		list.append({"id": "D_%s" % id, "width": 2.4, "class": "service", "tier": "highline", "serves": [id], "role": "%s private dock circulation" % id,
-			"points": PackedVector2Array([_on_ring(front.angle(), highline_ring()), front, back])})
+	for flight: Dictionary in FireCalderaWalkwaysPlan.FLIGHTS:
+		var points := PackedVector2Array()
+		for sample: Array in flight["profile"]:
+			points.append(Vector2(float(sample[0]), float(sample[2])))
+		list.append({"id": str(flight["id"]), "width": float(flight["width"]), "class": str(flight.get("kind", "ramp")),
+			"upper": str(flight["upper"]), "lower": str(flight["lower"]), "role": str(flight.get("note", "")), "points": points})
 	return list
 
 
@@ -848,111 +808,23 @@ static func _on_ring(angle: float, _ring: PackedVector2Array) -> Vector2:
 # Lower city (layout section 7)
 # ---------------------------------------------------------------------------
 
-## SUPERSEDED (2026-10-17) by FireCalderaHeartworksPlan (scripts/fire_caldera_heartworks_plan.gd,
-## from tools/fire_caldera_heartworks_layout.py; docs/architecture/fire_caldera_heartworks.md).
-## Kept only until tools/validate_fire_plan.gd moves to it; do not build from these.
-## Proposed Caldera Heartworks (2026-10-15), for spatial review before the
-## lower city is built.  The present surface reservoir remains continuous
-## above a lava-filled immersion throat into a spherical chamber inside the
-## volcano.  There is no dry hole in the reservoir: entry requires passing
-## through the canonical lava surface before the controlled falls separate.
-## The chamber translates Jewel Changi's useful spatial ideas -- a falling element
-## visible from many levels, terraced circulation around one great void, and a
-## legible collection/return system -- into Fire culture's volcanic modernism.
-## Depths are metres below FireCalderaGround.LAVA_Y so the proposal remains
-## independent of the ground builder.  Nothing in the live terrain consumes
-## these values until the model and section are approved.
-const HEARTWORKS := {
-	"status": "proposed",
-	"name": "Caldera Heartworks",
-	"sphere_radius": 42.0,
-	"centre_depth": 38.4,
-	"shell_thickness": 2.4,
-	"throat_radius": 17.0,
-	"intake_depth": 5.0,
-	"crown_outer_radius": 52.0,
-	"catch_depth": 69.0,
-	"catch_radius": 12.0,
-	"terrace_width": 4.2,
-	"description": "a spherical civic and thermal chamber below a lava-filled immersion throat; submerged intakes divide the reservoir into controlled falls feeding a deep collection basin and enclosed return risers",
-}
-
-## Each ring follows the inside of the structural sphere rather than becoming
-## an unrelated flat floor.  The crown gallery is the dry pre-Helm overlook;
-## the other rings belong to the post-Helm molten public realm.
-const HEART_LEVELS: Array[Dictionary] = [
-	{"id": "H0", "name": "crown gallery", "depth": 4.0, "access": "dry", "role": "protected glass view into the immersion throat, fall controls and the first view down the chamber"},
-	{"id": "H1", "name": "steward ring", "depth": 14.0, "access": "lava_helm", "role": "renewal chamber and the primary manifold"},
-	{"id": "H2", "name": "civic ring", "depth": 26.0, "access": "lava_helm", "role": "observatory, fired archive and public crossing galleries"},
-	{"id": "H3", "name": "works ring", "depth": 38.0, "access": "lava_helm", "role": "high-temperature forge and experimental materials bay"},
-	{"id": "H4", "name": "deep inspection ring", "depth": 52.0, "access": "lava_helm", "role": "fall inspection, sampling and pressure-isolation stations"},
-	{"id": "H5", "name": "return gallery", "depth": 66.0, "access": "lava_helm", "role": "collection gates, return-riser intakes and emergency bypass"},
-]
-
-## Three metered falls leave broad clear sectors between them, so the chamber
-## never becomes a solid lava cylinder.  Angles use the plan frame: +90 faces
-## Civic, 0 faces Kel, and 180 faces Renewal.
-const HEART_FALLS: Array[Dictionary] = [
-	{"id": "F0", "name": "Heartfall", "angle": 90.0, "width": 9.0, "source": "submerged civic intake", "destination": "central collection basin", "role": "the civic fall, visible on the arrival-to-Civic axis"},
-	{"id": "F1", "name": "Forge Fall", "angle": 18.0, "width": 5.0, "source": "submerged east intake", "destination": "works quench splitter", "role": "high-temperature feed for Kel and Vara"},
-	{"id": "F2", "name": "Renewal Fall", "angle": 198.0, "width": 5.5, "source": "submerged west intake", "destination": "renewal tempering shelf", "role": "gentler public immersion and communal reheating"},
-]
-
-## Enclosed return risers use pressure differential and thermal convection,
-## with mechanical valve stations at H1 and H5.  They are visible as glowing
-## seams and instrument bays, never exposed fantasy pipes.
-const HEART_RISERS: Array[Dictionary] = [
-	{"id": "V0", "name": "Aro return", "angle": 145.0, "serves": ["L0", "L1"], "role": "primary civic circulation and household thermal spine"},
-	{"id": "V1", "name": "Kel return", "angle": 25.0, "serves": ["L4", "L5"], "role": "hot industrial return to the east crown gate"},
-	{"id": "V2", "name": "Civic relief return", "angle": 278.0, "serves": ["L2", "L3"], "role": "instrumented return with an outward pressure-relief branch"},
-]
-
-## id, centre (local), depth band below the lava surface (m), purpose.
-const LOWER_ROOMS: Array[Dictionary] = [
-	{"id": "L0", "name": "renewal chamber", "centre": Vector2(-25.0, -8.0), "depth": Vector2(11.0, 17.0), "heart_level": "H1", "angle": 198.0, "purpose": "communal immersion and the coming-of-age practice beside the Renewal Fall"},
-	{"id": "L1", "name": "primary manifold", "centre": Vector2(-25.0, 15.0), "depth": Vector2(11.0, 17.0), "heart_level": "H1", "angle": 145.0, "purpose": "Miru and Tovan's thermal distribution, controls and inspection loop"},
-	{"id": "L2", "name": "deep observatory", "centre": Vector2(-2.0, 25.0), "depth": Vector2(23.0, 29.0), "heart_level": "H2", "angle": 88.0, "purpose": "Selka's vent instruments looking across and through the Heartfall"},
-	{"id": "L3", "name": "fired archive", "centre": Vector2(-10.0, 18.0), "depth": Vector2(23.0, 29.0), "heart_level": "H2", "angle": 128.0, "purpose": "cast and engraved records in the quieter civic-ring sector"},
-	{"id": "L4", "name": "high-temperature forge", "centre": Vector2(24.0, 3.0), "depth": Vector2(35.0, 41.0), "heart_level": "H3", "angle": 18.0, "purpose": "Daro, Vesa and Ruun's hot-work floor beside the Forge Fall, with a secure lift to Kel"},
-	{"id": "L5", "name": "experimental materials bay", "centre": Vector2(18.0, 18.0), "depth": Vector2(35.0, 41.0), "heart_level": "H3", "angle": 52.0, "purpose": "the shared Kel and Vara testing space on the works ring"},
-]
-
-## The lower inspection loop: curved passages round the vent, never through
-## it, so every occupied chamber has two ways out.
-const LOWER_PASSAGES := [["L0", "L1"], ["L1", "L3"], ["L3", "L2"], ["L2", "L5"], ["L5", "L4"], ["L4", "L0"]]
-
-## The three public immersion shelves: from a surface plot down to a room.
-const IMMERSION_SHELVES: Array[Dictionary] = [
-	{"id": "S0", "plot": "RENEWAL", "room": "L0", "note": "the gentlest and most social entry"},
-	{"id": "S1", "plot": "CIVIC", "room": "L2", "note": "the deep scientific descent from the observation landing"},
-	{"id": "S2", "plot": "KEL", "room": "L4", "note": "the protected hot-work landing, kept out of the gallery"},
-]
-
-## Service lifts: forge to Kel, experimental bay to Vara, archive to Civic.
-const LIFTS := [["L4", "KEL"], ["L5", "VARA"], ["L3", "CIVIC"]]
-
-## Thermal branches (section 8): the annular spine under the west and far bank
-## from the manifold, and the separate hot branch. Neither runs under GUEST.
-const THERMAL_BRANCHES: Array[Dictionary] = [
-	{"id": "spine", "from": "L1", "serves": ["ARO", "IREN", "CIVIC", "VARA", "KEL", "NAHL", "RENEWAL"]},
-	{"id": "hot", "from": "L4", "serves": ["L5"]},
-]
+## The generated FireCalderaHeartworksPlan owns the single public chamber.
 
 # ---------------------------------------------------------------------------
 # People (docs/architecture/fire_caldera_city.md, approved census) and trade
 # ---------------------------------------------------------------------------
 
 const RESIDENTS: Array[Dictionary] = [
-	{"name": "Tovan Aro", "age": 63, "home": "ARO", "work": ["ARO", "L1"], "job": "senior vent steward"},
-	{"name": "Miru Aro", "age": 38, "home": "ARO", "work": ["ARO", "L1"], "job": "thermal engineer and pipe fitter"},
+	{"name": "Tovan Aro", "age": 63, "home": "ARO", "work": ["ARO", "HEARTWORKS"], "job": "senior vent steward"},
+	{"name": "Miru Aro", "age": 38, "home": "ARO", "work": ["ARO", "HEARTWORKS"], "job": "thermal engineer and pipe fitter"},
 	{"name": "Kes Aro", "age": 15, "home": "ARO", "work": ["ARO"], "job": "apprentice engineer"},
-	{"name": "Selka Iren", "age": 46, "home": "IREN", "work": ["CIVIC", "L2"], "job": "geologist and seismologist"},
-	{"name": "Aru Iren", "age": 43, "home": "IREN", "work": ["CIVIC", "L3"], "job": "teacher and archivist"},
+	{"name": "Selka Iren", "age": 46, "home": "IREN", "work": ["CIVIC", "HEARTWORKS"], "job": "geologist and seismologist"},
+	{"name": "Aru Iren", "age": 43, "home": "IREN", "work": ["CIVIC", "HEARTWORKS"], "job": "teacher and archivist"},
 	{"name": "Mena Iren", "age": 10, "home": "IREN", "work": ["CIVIC", "VARA"], "job": "pupil"},
-	{"name": "Daro Kel", "age": 45, "home": "KEL", "work": ["KEL", "L4"], "job": "metallurgist and armorer"},
-	{"name": "Vesa Kel", "age": 42, "home": "KEL", "work": ["KEL", "L4"], "job": "weaponsmith and fabricator"},
-	{"name": "Ruun Kel", "age": 17, "home": "KEL", "work": ["KEL", "L4"], "job": "apprentice smith"},
-	{"name": "Omi Vara", "age": 34, "home": "VARA", "work": ["VARA", "L5"], "job": "structural and scientific glassworker"},
+	{"name": "Daro Kel", "age": 45, "home": "KEL", "work": ["KEL", "HEARTWORKS"], "job": "metallurgist and armorer"},
+	{"name": "Vesa Kel", "age": 42, "home": "KEL", "work": ["KEL", "HEARTWORKS"], "job": "weaponsmith and fabricator"},
+	{"name": "Ruun Kel", "age": 17, "home": "KEL", "work": ["KEL", "HEARTWORKS"], "job": "apprentice smith"},
+	{"name": "Omi Vara", "age": 34, "home": "VARA", "work": ["VARA", "HEARTWORKS"], "job": "structural and scientific glassworker"},
 	{"name": "Talen Vara", "age": 36, "home": "VARA", "work": ["VARA"], "job": "stained-glass designer and art metalworker"},
 	{"name": "Pela Oren", "age": 40, "home": "OREN", "work": ["OREN"], "job": "mineral forager and gem cutter"},
 	{"name": "Savi Oren", "age": 33, "home": "OREN", "work": ["OREN"], "job": "mineral preparer"},
@@ -962,7 +834,7 @@ const RESIDENTS: Array[Dictionary] = [
 ## The two visitor-facing counters and where their goods come from (the
 ## architecture skill's trade provenance rule). Stock itself stays open.
 const TRADE := {
-	"armory": {"vendor": "Daro Kel", "counter": "KEL", "made_at": ["L4", "KEL"], "makers": ["Daro Kel", "Vesa Kel", "Ruun Kel"], "inputs": "ore and alloy stock from Pela's receiving shelf"},
+	"armory": {"vendor": "Daro Kel", "counter": "KEL", "made_at": ["HEARTWORKS", "KEL"], "makers": ["Daro Kel", "Vesa Kel", "Ruun Kel"], "inputs": "ore and alloy stock from Pela's receiving shelf"},
 	"minerals": {"vendor": "Pela Oren", "counter": "OREN", "made_at": ["OREN"], "makers": ["Pela Oren"], "inputs": "deposits Pela surveys outside the caldera and dives for in the reservoir"},
 }
 

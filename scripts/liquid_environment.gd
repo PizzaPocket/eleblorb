@@ -63,7 +63,7 @@ func read(terrain: Node, suit: BlorbSuitController, at: Vector3) -> void:
 	floor_height = terrain.get_mesh_height(xz.x, xz.y)
 	if LavaMode.terrain_has_lava(terrain) and bool(terrain.is_lava_area(xz)):
 		liquid = Liquid.LAVA
-		surface_height = terrain.get_lava_surface_height(xz)
+		surface_height = terrain.get_lava_surface_height_at(at) if terrain.has_method("get_lava_surface_height_at") else terrain.get_lava_surface_height(xz)
 		lava_contact = LavaMode.contact(suit)
 		return
 	if terrain.has_method("is_water_area") and bool(terrain.is_water_area(xz)):

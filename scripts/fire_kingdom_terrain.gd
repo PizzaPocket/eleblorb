@@ -1,6 +1,7 @@
 extends StaticBody3D
 
 const FireCalderaHighline := preload("res://scripts/fire_caldera_highline.gd")
+const FireCalderaHeartworks := preload("res://scripts/fire_caldera_heartworks.gd")
 
 const TOKOIN_SCENE: PackedScene = preload("res://scenes/tokoin.tscn")
 const HALF_SIZE := 900.0
@@ -445,10 +446,28 @@ func is_lava_area(p:Vector2)->bool:
 	return get_mesh_height(p.x,p.y)<RIVER_LAVA_SURFACE_Y+0.15
 func get_lava_surface_height(p:Vector2)->float:
 	for surface in _registered_lava_surfaces:
+		if surface.has("column") and _in_lava_surface(p,surface):
+			return float(surface["top_y"])
+	for surface in _registered_lava_surfaces:
 		if _in_lava_surface(p,surface):return float(surface["height"])
 	for center in LAVA_POOLS:
 		if p.distance_to(center)<LAVA_MOUTH_RADIUS:return VOLCANO_LAVA_SURFACE_Y
 	return RIVER_LAVA_SURFACE_Y
+
+
+## At the cascade, the same continuous lava volume has a distinct collection
+## pool surface. A swimmer near the pool resolves against that surface, then
+## may rise through the cascade toward the reservoir without being snapped
+## back to the dome.
+func get_lava_surface_height_at(at: Vector3) -> float:
+	for surface in _registered_lava_surfaces:
+		if not surface.has("column") or not _in_lava_surface(Vector2(at.x, at.z), surface):
+			continue
+		var pool_y := float(surface["pool_y"])
+		if at.y <= pool_y + 2.0:
+			return pool_y
+		return float(surface["top_y"])
+	return get_lava_surface_height(Vector2(at.x, at.z))
 func get_lava_escape_position(p:Vector2)->Vector3:
 	for surface in _registered_lava_surfaces:
 		if surface.has("polygon") and _in_lava_surface(p,surface):
@@ -497,6 +516,11 @@ func register_lava_polygon(polygon:PackedVector2Array,height:float)->void:
 	var reach:=0.0
 	for point in polygon:reach=maxf(reach,point.distance_to(centre))
 	_registered_lava_surfaces.append({"center":centre,"radius":reach,"height":height,"polygon":polygon})
+
+
+func register_lava_column(center: Vector2, radius: float, top_y: float, pool_radius: float, pool_y: float) -> void:
+	_registered_lava_surfaces.append({"center":center,"radius":radius,"height":top_y,
+		"column":true,"top_y":top_y,"pool_radius":pool_radius,"pool_y":pool_y})
 
 func _in_lava_surface(p:Vector2,surface:Dictionary)->bool:
 	if p.distance_to(surface["center"] as Vector2)>=float(surface["radius"]):return false
@@ -584,10 +608,21 @@ func _build_caldera_ground()->void:
 			for corner:Vector2 in [rect.position,rect.end,Vector2(rect.position.x,rect.end.y),Vector2(rect.end.x,rect.position.y)]:
 				reach=maxf(reach,FireCalderaPlan.shell_to_plan(entry,corner).distance_to(centre))
 		_caldera_sockets.append({"outline":socket["outline"],"band":band,"datum":socket["datum"],"centre":centre,"reach":reach+0.1,"pits":FireCalderaPlan.pit_outlines(entry),"entry":entry,"elevated":elevated,"landing_clearance":float(socket.get("landing_clearance",0.05))})
+	# Oren's generated receiving yard extends beyond the ordinary plot socket.
+	# Cut the natural mesh below the authored basalt floor too, so a human-sized
+	# capsule cannot catch the steep bowl face at the flush receiving threshold.
+	for level: Dictionary in FireCalderaWalkwaysPlan.LEVELS:
+		if str(level["id"]) != "oren-yard":
+			continue
+		for region: Dictionary in level["surface"]:
+			var outline := PackedVector2Array()
+			for point: Array in region["outer"]:
+				outline.append(Vector2(float(point[0]), float(point[1])))
+			sockets.append({"outline": outline, "band": outline, "datum": float(level["datum"]), "sink": 0.45,
+				"elevated": false, "landing_clearance": 0.5})
 	FireCalderaGround.build(frame,sockets,func(local:Vector2)->float:
 		var world:=FireCalderaPlan.to_world(local)
 		return _coarse_mesh_height(world.x,world.y))
-	FireCalderaGround.build_arrival_threshold(frame)
 	FireCalderaGround.build_lava(frame)
 	FireCalderaHighline.build(frame)
 	# The holes and the foundations are built in the same synchronous stage:
@@ -598,13 +633,19 @@ func _build_caldera_ground()->void:
 			if FireCalderaPlan.is_elevated(entry):
 				FireCalderaHighline.build_platform(frame,entry,_caldera_surveys[id])
 			elif str(entry.get("foundation_kind",""))=="renewal_glass":
-				FireCalderaRenewal.build_foundation(frame,entry,_caldera_surveys[id])
+				FireCalderaRenewal.build_support(frame,entry,_caldera_surveys[id])
 			else:
-				SocketPlinth.build(frame,entry,_caldera_surveys[id],SocketPlinth.size_key(entry))
+				FireCalderaHighline.build_ground_plot(frame,entry,_caldera_surveys[id])
 	var reservoir_world:=PackedVector2Array()
 	for point in FireCalderaPlan.reservoir_polygon(128):
 		reservoir_world.append(FireCalderaPlan.to_world(point))
 	register_lava_polygon(reservoir_world,FireCalderaGround.LAVA_Y)
+	FireCalderaHeartworks.build(frame)
+	var pool_y := FireCalderaHeartworksPlan.SECTION["lava_y"] - FireCalderaHeartworksPlan.SECTION["cascade"]["bottom_depth"]
+	register_lava_column(FireCalderaPlan.to_world(Vector2.ZERO),
+		maxf(float(FireCalderaHeartworksPlan.SECTION["cascade"]["top_radius"]), float(FireCalderaHeartworksPlan.SECTION["chamber"]["pool_radius"])),
+		FireCalderaGround.LAVA_Y,
+		float(FireCalderaHeartworksPlan.SECTION["chamber"]["pool_radius"]), pool_y)
 
 
 func get_caldera_frame()->Node3D:

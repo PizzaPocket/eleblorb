@@ -36,7 +36,6 @@ static func build(parent: Node3D, entry: Dictionary, line: Dictionary) -> Static
 	_terrarium(body)
 	_daylight_canopy(body)
 	_stained_glass_baffles(body)
-	_observation_landing(body)
 	_lights(body)
 	_register_public_routes(body)
 	return body
@@ -671,14 +670,6 @@ static func _instruments(upper: StaticBody3D) -> void:
 		CalderaFurniture.piece(upper, Vector3(0.30, 0.65, 0.24), CalderaShell.VOLCANIC_STONE, Vector3(x, 0.65, -4.7), 0.0, true, 6.0)
 		CalderaShell._metal(upper, Vector3(x, 1.45, -4.7), Vector3(0.04, 0.35, 0.04), CalderaShell.STAINLESS, false)
 	FireCalderaBuildings._marker(upper, "SelkaInstrumentMarker", Vector3(1.5, 0.0, -2.5), 0.0)
-
-
-static func _observation_landing(body: StaticBody3D) -> void:
-	# This is the dry surface threshold for the future lower-city descent.  It
-	# projects from the reservoir facade and is already aligned to the council;
-	# the submerged L2 continuation can attach without cutting through it.
-	CalderaShell.soft_slab(body, "LowerObservationThreshold", Vector3(0.0, -0.10, -8.45), Vector3(3.2, 0.10, 0.95), Vector2(3.2, 0.95), FLOOR)
-	FireCalderaBuildings._marker(body, "LowerObservationMarker", Vector3(0.0, 0.0, -8.5), 0.0)
 
 
 static func _lights(body: StaticBody3D) -> void:
