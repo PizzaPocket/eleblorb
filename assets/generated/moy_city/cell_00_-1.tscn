@@ -69,77 +69,77 @@ size = Vector3(3.2, 64, 0.8)
 radius = 1.6
 height = 64.0
 
-[node name="MoyCell_00_-1" type="Node3D" unique_id=1538767299]
+[node name="MoyCell_00_-1" type="Node3D" unique_id=1218420029]
 
-[node name="WindTurbine_02" type="Node3D" parent="." unique_id=742366331]
+[node name="WindTurbine_02" type="Node3D" parent="." unique_id=1219920640]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -740, -60, -270)
 
-[node name="WindTurbineTower" type="StaticBody3D" parent="WindTurbine_02" unique_id=542225868]
+[node name="WindTurbineTower" type="StaticBody3D" parent="WindTurbine_02" unique_id=205528616]
 
-[node name="@MeshInstance3D@6396" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineTower" unique_id=518939618]
+[node name="@MeshInstance3D@9679" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineTower" unique_id=497691610]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 47.5, 0)
 material_override = SubResource("StandardMaterial3D_gwbma")
 mesh = SubResource("CylinderMesh_bjkdw")
 
-[node name="@CollisionShape3D@6397" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineTower" unique_id=1709228823]
+[node name="@CollisionShape3D@9680" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineTower" unique_id=772717227]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 47.5, 0)
 shape = SubResource("CylinderShape3D_ylc0b")
 
-[node name="WindTurbineNacelle" type="StaticBody3D" parent="WindTurbine_02" unique_id=143974312]
+[node name="WindTurbineNacelle" type="StaticBody3D" parent="WindTurbine_02" unique_id=1964758726]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -2.5, 97, 0)
 
-[node name="@CollisionShape3D@6398" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineNacelle" unique_id=199687480]
+[node name="@CollisionShape3D@9681" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineNacelle" unique_id=1228449010]
 shape = SubResource("BoxShape3D_7ihs7")
 
-[node name="@MeshInstance3D@6399" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineNacelle" unique_id=264857237]
+[node name="@MeshInstance3D@9682" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineNacelle" unique_id=527405394]
 material_override = SubResource("StandardMaterial3D_4itkw")
 mesh = SubResource("BoxMesh_cqtd4")
 
-[node name="WindTurbineHub" type="StaticBody3D" parent="WindTurbine_02" unique_id=577138833]
+[node name="WindTurbineHub" type="StaticBody3D" parent="WindTurbine_02" unique_id=214198484]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 97, 0)
 
-[node name="@MeshInstance3D@6400" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineHub" unique_id=1454521320]
+[node name="@MeshInstance3D@9683" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineHub" unique_id=545828196]
 material_override = SubResource("StandardMaterial3D_lp1i0")
 mesh = SubResource("SphereMesh_aw536")
 
-[node name="@CollisionShape3D@6401" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineHub" unique_id=1920672159]
+[node name="@CollisionShape3D@9684" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineHub" unique_id=359022140]
 shape = SubResource("SphereShape3D_f5vj8")
 
-[node name="WindTurbineRotor" type="Node3D" parent="WindTurbine_02" unique_id=1001169733]
+[node name="WindTurbineRotor" type="Node3D" parent="WindTurbine_02" unique_id=1109236592]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -6.5, 97, 0)
 script = ExtResource("1_chf03")
 
-[node name="WindTurbineBlade_0" type="AnimatableBody3D" parent="WindTurbine_02/WindTurbineRotor" unique_id=2049384090]
+[node name="WindTurbineBlade_0" type="AnimatableBody3D" parent="WindTurbine_02/WindTurbineRotor" unique_id=1969509779]
 
-[node name="@MeshInstance3D@6402" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_0" unique_id=1985881407]
+[node name="@MeshInstance3D@9685" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_0" unique_id=1727256612]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 32, 0)
 material_override = SubResource("StandardMaterial3D_gp3nl")
 mesh = SubResource("BoxMesh_d6h1j")
 
-[node name="@CollisionShape3D@6403" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_0" unique_id=1868925454]
+[node name="@CollisionShape3D@9686" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_0" unique_id=1756337419]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 32, 0)
 shape = SubResource("CapsuleShape3D_kmk8c")
 
-[node name="WindTurbineBlade_1" type="AnimatableBody3D" parent="WindTurbine_02/WindTurbineRotor" unique_id=1642870705]
+[node name="WindTurbineBlade_1" type="AnimatableBody3D" parent="WindTurbine_02/WindTurbineRotor" unique_id=495945650]
 transform = Transform3D(-0.50000006, -0.8660254, 0, 0.8660254, -0.50000006, 0, 0, 0, 1, 0, 0, 0)
 
-[node name="@MeshInstance3D@6404" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_1" unique_id=797491156]
+[node name="@MeshInstance3D@9687" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_1" unique_id=616989105]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 32, 0)
 material_override = SubResource("StandardMaterial3D_4wcck")
 mesh = SubResource("BoxMesh_qm1co")
 
-[node name="@CollisionShape3D@6405" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_1" unique_id=406521412]
+[node name="@CollisionShape3D@9688" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_1" unique_id=1915783715]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 32, 0)
 shape = SubResource("CapsuleShape3D_8weib")
 
-[node name="WindTurbineBlade_2" type="AnimatableBody3D" parent="WindTurbine_02/WindTurbineRotor" unique_id=1262730910]
+[node name="WindTurbineBlade_2" type="AnimatableBody3D" parent="WindTurbine_02/WindTurbineRotor" unique_id=1693639127]
 transform = Transform3D(-0.4999999, 0.86602545, 0, -0.86602545, -0.4999999, 0, 0, 0, 1, 0, 0, 0)
 
-[node name="@MeshInstance3D@6406" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_2" unique_id=710398485]
+[node name="@MeshInstance3D@9689" type="MeshInstance3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_2" unique_id=2006008993]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 32, 0)
 material_override = SubResource("StandardMaterial3D_218rl")
 mesh = SubResource("BoxMesh_i5y0r")
 
-[node name="@CollisionShape3D@6407" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_2" unique_id=1751219615]
+[node name="@CollisionShape3D@9690" type="CollisionShape3D" parent="WindTurbine_02/WindTurbineRotor/WindTurbineBlade_2" unique_id=2113110252]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 32, 0)
 shape = SubResource("CapsuleShape3D_4xdrg")

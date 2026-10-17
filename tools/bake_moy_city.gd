@@ -38,7 +38,15 @@ func _ready() -> void:
 	var hashes := {}
 	for source in ["res://scripts/city_plan.gd", "res://scripts/moy_city_bake_builder.gd", "res://scripts/moy_ride_train.gd", "res://scripts/moy_wind_turbine_rotor.gd", "res://scripts/moy_timekeeper.gd", "res://scripts/moy_lift_platform.gd", "res://scripts/moy_escalator.gd", "res://shaders/moy_pond_water.gdshader", "res://tools/city_layout.py"]:
 		hashes[source] = _sha256(ProjectSettings.globalize_path(source))
-	var manifest := {"format":1,"datum":BUILDER.DATUM,"cell_size":BUILDER.CELL,"counts":{"streets":BUILDER.PLAN.STREETS.size(),"buildings":BUILDER.PLAN.BUILDINGS.size(),"lots":BUILDER.PLAN.LOTS.size(),"old_houses":BUILDER.PLAN.OLD_HOUSES.size()},"sources":hashes,"silhouette":"res://assets/generated/moy_city/silhouette.tscn","packs":files}
+	var spine: Dictionary={}
+	var meridian: Dictionary={}
+	for service in BUILDER.PLAN.CROSS.services:
+		if String(service.line)=="Spine Line": spine=service
+		if String(service.line)=="Meridian Line": meridian=service
+	var access_count:=0
+	for station in BUILDER.PLAN.CROSS.stations: access_count+=station.get("_access",[]).size()
+	var first_timetable_line: Dictionary=BUILDER.PLAN.TIMETABLE.lines.values()[0]
+	var manifest := {"format":2,"datum":BUILDER.DATUM,"cell_size":BUILDER.CELL,"counts":{"streets":BUILDER.PLAN.STREETS.size(),"buildings":BUILDER.PLAN.BUILDINGS.size(),"lots":BUILDER.PLAN.LOTS.size(),"old_houses":BUILDER.PLAN.OLD_HOUSES.size()},"prototype_counts":{"crossing_towers":BUILDER.PLAN.CROSSING.towers.size(),"deck_columns":BUILDER.PLAN.DECK.columns.size(),"deck_parapets":BUILDER.PLAN.DECK.parapets.size(),"deck_beds":BUILDER.PLAN.DECK.beds.size(),"deck_trees":BUILDER.PLAN.DECK.trees.size(),"park_trees":BUILDER.PLAN.PARK.trees.size(),"shrubs":BUILDER.PLAN.PARK.shrubs.size(),"reed_clumps":BUILDER.PLAN.PARK.reeds.size(),"rocks":BUILDER.PLAN.PARK.rocks.size(),"agave":BUILDER.PLAN.PARK.agave.size(),"climber_panels":BUILDER.PLAN.CROSSING.climbers.size(),"meridian_piers":meridian.piers.size(),"spine_frames":spine.frames.size(),"station_escalator_sets":access_count,"trains_per_service":int(first_timetable_line.trains),"service_lines":BUILDER.PLAN.TIMETABLE.lines.size()},"sources":hashes,"silhouette":"res://assets/generated/moy_city/silhouette.tscn","packs":files}
 	var coverage := _coverage_ledger()
 	manifest["coverage"] = "res://assets/generated/moy_city/coverage.json"
 	var f := FileAccess.open(OUTPUT + "/manifest.json", FileAccess.WRITE)

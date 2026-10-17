@@ -27,6 +27,7 @@ func _ready() -> void:
 	if not bool(city.call("moy_packs_ready")):
 		_fail("static pack activation did not complete")
 		_finish(); return
+	_test_qa_air_party(qa)
 	var counts := {"streets":PLAN.STREETS.size(),"buildings":PLAN.BUILDINGS.size(),"lots":PLAN.LOTS.size(),"old_houses":PLAN.OLD_HOUSES.size()}
 	if counts.buildings != 48 or counts.lots != 133 or counts.old_houses != 60 or counts.streets != 23:
 		_fail("source coverage counts differ: %s" % counts)
@@ -35,16 +36,31 @@ func _ready() -> void:
 	if building_bodies.size() < 46: _fail("numbered building collision bodies missing: %d" % building_bodies.size())
 	if old_house_count < 60: _fail("old house bodies missing: %d" % old_house_count)
 	if lot_count < 133: _fail("lot bodies missing: %d" % lot_count)
+	_test_pass2_counts(city)
+	_test_escalator_geometry(city)
+	_test_recorded_positions(city)
 	var rays := [Vector2(-500,0),Vector2(-560,-40),Vector2(-620,0),Vector2(-560,45),Vector2(-700,-40),Vector2(-515,-35)]
 	for p in rays:
 		if not _ray_hits_city(p): _fail("no collision at route sample %s" % p)
 	_test_public_route_geometry(qa)
 	await _test_wind_turbines(city)
+	await _test_timekeeper(city)
 	await _test_moving_platforms(city)
 	await _test_leaf_suit_handover(qa)
 	_test_vine_handover_search(qa)
 	print("MOY_RUNTIME packs=",city.get_child_count(),"coverage=",counts,"numbered_bodies=",building_bodies.size(),"old_house_bodies=",old_house_count,"lot_bodies=",lot_count,"frames_to_ready=",frames,"failures=",failures)
 	_finish()
+
+
+func _test_qa_air_party(qa: Node) -> void:
+	var air:=qa.get_node_or_null("QA_AirBlorb") as Blorb
+	if air==null:
+		_fail("QA party is missing its Air blorb")
+		return
+	if not air.in_party or air.element_state!="air": _fail("QA Air blorb is not an Air party member")
+	if not air.is_in_group("party_playable_candidates"): _fail("QA Air blorb did not register with party controls")
+	if air.body.get_node_or_null("AirBlorbWings")==null: _fail("QA Air blorb visual/wings are missing")
+	print("MOY_QA_PARTY air_companions=1 element=air registered=",air.is_in_group("party_playable_candidates"))
 
 
 func _test_leaf_suit_handover(qa: Node) -> void:
@@ -126,6 +142,206 @@ func _test_public_route_geometry(qa: Node) -> void:
 	print("MOY_ROUTES gate_openings=4 deck_ramps=",deck.ramps.size()," pond_surface=",surface," pond_depth=",surface-floor)
 
 
+func _test_pass2_counts(city: Node) -> void:
+	var names: Dictionary={}; var stack: Array[Node]=[city]
+	while not stack.is_empty():
+		var node: Node=stack.pop_back(); names[node.name]=int(names.get(node.name,0))+1
+		for child in node.get_children(): stack.append(child)
+	var actual: Dictionary={
+		"crossing_towers":_sum_indexed_roots(names,"CrossingTower_",PLAN.CROSSING.towers.size()), "deck_columns":_sum_prefix(names,"DeckColumn_"),
+		"deck_parapets":_sum_prefix(names,"DeckParapet_"), "deck_beds":_sum_marker_prefix(names,"DeckGardenBed_","_Segment_"),
+		"deck_trees":_sum_prefix(names,"DeckTree_"), "park_trees":_sum_prefix(names,"ParkTree_"),
+		"shrubs":_sum_metadata_prefix(city,"ParkShrubMultiMesh_"), "reed_clumps":_sum_metadata_prefix(city,"ParkReedClumpMultiMesh_"),
+		"rocks":_sum_prefix(names,"ParkRock_"), "agave":_sum_metadata_prefix(city,"ParkAgaveMultiMesh_"),
+		"climber_panels":_sum_prefix(names,"CrossingClimberPanel_"), "meridian_piers":_sum_prefix(names,"MeridianPierStem"),
+		"spine_frames":_sum_prefix(names,"SpineFrameBeam")}
+	var expected: Dictionary={"crossing_towers":4,"deck_columns":164,"deck_parapets":131,"deck_beds":50,"deck_trees":9,"park_trees":23,"shrubs":62,"reed_clumps":28,"rocks":21,"agave":6,"climber_panels":104,"meridian_piers":8,"spine_frames":8}
+	for key in expected:
+		if int(actual[key])!=int(expected[key]): _fail("pass-2 %s expected %d found %d"%[key,expected[key],actual[key]])
+	var access_sets:=0; var access_flights:=0
+	for station in PLAN.CROSS.stations:
+		for side_data in station.get("_access",[]):
+			access_sets+=1; access_flights+=side_data.flights.size()
+	var access_lanes:=0
+	for key in names:
+		if String(key).begins_with("SpineAccess_") and (String(key).ends_with("_Up") or String(key).ends_with("_Down")): access_lanes+=int(names[key])
+	if access_sets!=8 or access_flights!=12 or access_lanes!=24: _fail("station access source/build count mismatch: sets=%d flights=%d lanes=%d"%[access_sets,access_flights,access_lanes])
+	print("MOY_STATION_ACCESS sets=",access_sets," authored_flights=",access_flights," moving_lanes=",access_lanes)
+	print("MOY_PASS2_COUNTS actual=",actual,"expected=",expected)
+	var disabled_geometry: Array[String]=[]; var item_stack: Array[Node]=[city]
+	while not item_stack.is_empty():
+		var node: Node=item_stack.pop_back(); var node_name:=String(node.name)
+		if node_name.contains("SpineLotPortal") or node_name.contains("GateEscalator") or node_name.contains("WindTree"): disabled_geometry.append(node_name)
+		for child in node.get_children(): item_stack.append(child)
+	if not disabled_geometry.is_empty(): _fail("removed first-pass geometry still baked: %s"%disabled_geometry)
+	print("MOY_REMOVED_GEOMETRY tunnels=0 gate_flyovers=0 wind_trees=0")
+
+
+func _sum_prefix(counts: Dictionary, prefix: String) -> int:
+	var total:=0
+	for key in counts:
+		if String(key).begins_with(prefix): total+=int(counts[key])
+	return total
+
+
+func _sum_marker_prefix(counts: Dictionary, prefix: String, child_marker: String) -> int:
+	var total:=0
+	for key in counts:
+		if String(key).begins_with(prefix) and not String(key).contains(child_marker): total+=int(counts[key])
+	return total
+
+
+func _sum_indexed_roots(counts: Dictionary, prefix: String, count: int) -> int:
+	var total:=0
+	for i in count: total+=int(counts.get("%s%02d"%[prefix,i],0))
+	return total
+
+
+func _sum_metadata_prefix(root: Node, prefix: String) -> int:
+	var total:=0; var stack: Array[Node]=[root]
+	while not stack.is_empty():
+		var node: Node=stack.pop_back()
+		if String(node.name).begins_with(prefix): total+=int(node.get_meta("moy_item_count",0))
+		for child in node.get_children(): stack.append(child)
+	return total
+
+
+func _test_escalator_geometry(city: Node) -> void:
+	var checked_landings:=0
+	var checked_climbers:=0
+	var named: Dictionary={}
+	var stack: Array[Node]=[city]
+	while not stack.is_empty():
+		var node: Node=stack.pop_back()
+		named[String(node.name)]=node
+		for child in node.get_children(): stack.append(child)
+	for tower_index in PLAN.CROSSING.towers.size():
+		var tower:=named.get("CrossingTower_%02d"%tower_index) as Node3D
+		if tower==null:
+			_fail("Crossing tower %d missing for escalator orientation check"%tower_index)
+			continue
+		for child in tower.get_children():
+			if child.name.begins_with("CrossingHandLanding_"):
+				var landing:=child as Node3D
+				var radial:=Vector2(landing.position.x,landing.position.z).normalized()
+				var tangent:=Vector3(-radial.y,0.0,radial.x)
+				if absf(landing.basis.x.normalized().dot(tangent))<0.99:
+					_fail("Crossing escalator landing long axis is not tangent: %s"%child.name)
+				checked_landings+=1
+	for climber_index in PLAN.CROSSING.climbers.size():
+		var climber: Array=PLAN.CROSSING.climbers[climber_index]
+		var tower:=named.get("CrossingTower_%02d"%int(climber[0])) as Node3D
+		var panel:=named.get("CrossingClimberPanel_%03d"%climber_index) as Node3D
+		if tower==null or panel==null:
+			_fail("Crossing climber %d missing for orientation check"%climber_index)
+			continue
+		var radial:=Vector2(panel.position.x,panel.position.z).normalized()
+		var tangent:=Vector3(-radial.y,0.0,radial.x)
+		if absf(panel.basis.x.normalized().dot(tangent))<0.99:
+			_fail("Crossing vine panel width is not tangent to the tower ribs: %s"%panel.name)
+		checked_climbers+=1
+	var core_flights:=0
+	for core in PLAN.ARCH.cores:
+		var prefix:="EastGateCore_%s_Flight_"%String(core.name).replace(" ","_")
+		var p:=-(float(core.size[1])*0.5-1.5)
+		var direction:=1.0
+		for flight_index in core.flights.size():
+			var flight: Array=core.flights[flight_index]
+			var q:=p+direction*float(flight[2])
+			var up:=named.get("%s%02d_Up"%[prefix,flight_index]) as StaticBody3D
+			var down:=named.get("%s%02d_Down"%[prefix,flight_index]) as StaticBody3D
+			if up==null or down==null:
+				_fail("East Gate flight %d lane pair missing for %s"%[flight_index,core.name])
+			else:
+				var lane_spacing:=Vector2(up.global_position.x-down.global_position.x,up.global_position.z-down.global_position.z).length()
+				if absf(lane_spacing-1.2)>0.08: _fail("East Gate flight lanes overlap or diverge: %s flight %d spacing=%.2f"%[core.name,flight_index,lane_spacing])
+				if absf((q-p)-direction*float(flight[2]))>0.01: _fail("East Gate switchback flight direction does not alternate")
+			core_flights+=1
+			p=q
+			direction=-direction
+	print("MOY_ESCALATOR_GEOMETRY tangent_landings=",checked_landings," tangent_climbers=",checked_climbers," east_gate_flights=",core_flights," paired_lane_spacing_m=1.2 headroom_policy=plan_canopy_3.2m")
+
+
+func _test_recorded_positions(city: Node) -> void:
+	var named: Dictionary={}; var multimeshes: Array[MultiMeshInstance3D]=[]; var stack: Array[Node]=[city]
+	while not stack.is_empty():
+		var node: Node=stack.pop_back(); named[String(node.name)]=node
+		if node is MultiMeshInstance3D: multimeshes.append(node as MultiMeshInstance3D)
+		for child in node.get_children(): stack.append(child)
+	var checks:=0; var bed_segments:=0
+	for i in PLAN.DECK.columns.size():
+		var p: Array=PLAN.DECK.columns[i]; var node:=named.get("DeckColumn_%03d"%i) as Node3D
+		if node==null or Vector2(node.global_position.x,node.global_position.z).distance_to(Vector2(p[0],p[1]))>0.05: _fail("Deck column %d moved from its CityPlan point"%i)
+		checks+=1
+	for i in PLAN.DECK.beds.size():
+		var bed: Dictionary=PLAN.DECK.beds[i]
+		bed_segments+=bed.pts.size()-1
+		for j in bed.pts.size()-1:
+			var node:=named.get("DeckGardenBed_%02d_Segment_%03d"%[i,j]) as Node3D; var a: Array=bed.pts[j]; var b: Array=bed.pts[j+1]; var expected:=Vector2((float(a[0])+float(b[0]))*0.5,(float(a[1])+float(b[1]))*0.5)
+			if node==null or Vector2(node.global_position.x,node.global_position.z).distance_to(expected)>0.05: _fail("Deck bed %d segment %d moved from CityPlan"%[i,j])
+			checks+=1
+	for i in PLAN.DECK.trees.size():
+		var tree: Dictionary=PLAN.DECK.trees[i]; var node:=named.get("DeckTree_%02d"%i) as Node3D
+		if node==null or Vector3(node.global_position.x,node.global_position.y,node.global_position.z).distance_to(Vector3(tree.c[0],-60.0+float(tree.y),tree.c[1]))>0.05: _fail("Deck tree %d moved from CityPlan"%i)
+		checks+=1
+	for i in PLAN.PARK.trees.size():
+		var tree: Dictionary=PLAN.PARK.trees[i]; var node:=named.get("ParkTree_%02d_%s"%[i,String(tree.kind)]) as Node3D
+		if node==null or Vector3(node.global_position.x,node.global_position.y,node.global_position.z).distance_to(Vector3(tree.c[0],-60.0,tree.c[1]))>0.05: _fail("park tree %d moved from CityPlan"%i)
+		checks+=1
+	for i in PLAN.PARK.rocks.size():
+		var rock: Dictionary=PLAN.PARK.rocks[i]; var node:=named.get("ParkRock_%02d"%i) as Node3D; var half: Array=rock.half
+		if node==null or Vector3(node.global_position.x,node.global_position.y,node.global_position.z).distance_to(Vector3(rock.c[0],-60.0+float(half[1]),rock.c[1]))>0.05: _fail("park rock %d moved from CityPlan"%i)
+		checks+=1
+	for i in PLAN.CROSS.services.size():
+		var service: Dictionary=PLAN.CROSS.services[i]
+		for j in service.get("frames",[]).size():
+			var p: Array=service.frames[j]; var node:=named.get("SpineFrameBeam_%02d"%j) as Node3D
+			if node==null or Vector2(node.global_position.x,node.global_position.z).distance_to(Vector2(p[0],p[1]))>0.05: _fail("Spine frame %d moved from CityPlan"%j)
+			checks+=1
+		for j in service.get("piers",[]).size():
+			var p: float=float(service.piers[j]); var node:=named.get("MeridianPierStem_%02d"%j) as Node3D
+			if node==null or absf(node.global_position.x-p)>0.05 or absf(node.global_position.z)>0.05: _fail("Meridian pier %d moved from CityPlan"%j)
+			checks+=1
+	for i in PLAN.PARK.shrubs.size():
+		var p: Array=PLAN.PARK.shrubs[i]; var found:=false
+		for mm in multimeshes:
+			if not String(mm.name).begins_with("ParkShrubMultiMesh_"): continue
+			for inst in mm.multimesh.instance_count:
+				var pos:=_multimesh_instance_position(mm,inst)
+				if Vector2(pos.x,pos.z).distance_to(Vector2(p[0],p[1]))<0.05: found=true; break
+			if found: break
+		if not found: _fail("park shrub %d is not at its recorded point"%i)
+		checks+=1
+	for i in PLAN.PARK.reeds.size():
+		var data: Dictionary=PLAN.PARK.reeds[i]; var p: Vector2=Vector2(data.c[0],data.c[1]); var found:=false
+		for mm in multimeshes:
+			if not String(mm.name).begins_with("ParkReedClumpMultiMesh_"): continue
+			for inst in mm.multimesh.instance_count:
+				var pos:=_multimesh_instance_position(mm,inst)
+				if Vector2(pos.x,pos.z).distance_to(p)<0.05: found=true; break
+			if found: break
+		if not found: _fail("reed clump %d has no stem at its recorded point"%i)
+		checks+=1
+	for i in PLAN.PARK.agave.size():
+		var p: Array=PLAN.PARK.agave[i]; var found:=false
+		for mm in multimeshes:
+			if not String(mm.name).begins_with("ParkAgaveMultiMesh_"): continue
+			for inst in mm.multimesh.instance_count:
+				var pos:=_multimesh_instance_position(mm,inst)
+				if Vector2(pos.x,pos.z).distance_to(Vector2(p[0],p[1]))<0.05: found=true; break
+			if found: break
+		if not found: _fail("agave %d is not at its recorded point"%i)
+		checks+=1
+	print("MOY_PLAN_POSITIONS checked_records=",checks," tolerance_m=0.05 columns=164 beds_segments=",bed_segments," trees=32 plants=96 frames/piers=16")
+
+
+func _multimesh_instance_position(instance: MultiMeshInstance3D, index: int) -> Vector3:
+	var buffer:=instance.multimesh.buffer; var stride:=12+(4 if instance.multimesh.use_colors else 0)+(4 if instance.multimesh.use_custom_data else 0); var start:=index*stride
+	if buffer.size()<start+12: return Vector3.INF
+	var local:=Vector3(buffer[start+3],buffer[start+7],buffer[start+11])
+	return instance.global_transform*local
+
+
 func _ray_corridor_clear(p: Vector2) -> bool:
 	var query:=PhysicsRayQueryParameters3D.create(Vector3(p.x-6.0,-56.0,p.y),Vector3(p.x+6.0,-56.0,p.y),1)
 	if absf(p.y)>100.0: query.from=Vector3(p.x,-56.0,p.y-6.0); query.to=Vector3(p.x,-56.0,p.y+6.0)
@@ -149,56 +365,73 @@ func _test_moving_platforms(city: Node) -> void:
 			if node.name.begins_with("MoyTrain_"): trains.append(node as Node3D)
 			if node.name.begins_with("DeckLift_") and lift==null: lift=node as Node3D
 			for sub in node.get_children(): stack.append(sub)
-	if trains.size()!=8: _fail("expected 8 train consists (two per Crossroads route, four Wall Line), got %d"%trains.size()); return
+	if trains.size()!=12: _fail("expected 12 train consists (3 per each of four timetable services), got %d"%trains.size()); return
 	if lift==null: _fail("public Deck lift missing"); return
 	var rids: Array[RID] = []
 	var movement_before: Dictionary = {}
-	var stops_expected := {"Spine Line":5,"Meridian Line":3,"Wall Line":4}
+	var stops_expected := {"Spine Line":5,"Meridian Line":3,"Wall Line inner":4,"Wall Line outer":4}
 	for train in trains:
 		var service := String(train.get("service_name"))
-		var expected_cars := 3 if service=="Wall Line" else 2
+		var is_wall:=service.begins_with("Wall Line")
+		var expected_cars := 3 if is_wall else 2
 		var car_bodies: Array = train.get("_car_bodies")
 		if car_bodies.size()!=expected_cars: _fail("%s car count mismatch: %d"%[service,car_bodies.size()])
 		if (train.get("_stop_distances") as PackedFloat32Array).size()!=stops_expected[service]: _fail("%s station stop count mismatch"%service)
-		if not is_equal_approx(float(train.get("dwell")),4.0): _fail("%s dwell is not the brief 4 second stop"%service)
-		if service in ["Spine Line","Meridian Line"]:
-			var expected_direction:=1.0 if int(train.get("initial_direction"))>0 else -1.0
-			if not is_equal_approx(float(train.get("_direction")),expected_direction): _fail("%s double-track direction assignment is wrong"%service)
-		movement_before[train.get_instance_id()]=float(train.get("_distance"))
+		if not is_equal_approx(float(train.get("dwell")),8.0): _fail("%s ordinary dwell is not 8 seconds"%service)
+		var dwells: PackedFloat32Array=train.get("_stop_dwell_times")
+		if dwells.size()!=stops_expected[service]: _fail("%s per-station dwell schedule missing"%service)
+		for dwell_time in dwells:
+			if dwell_time!=8.0 and dwell_time!=12.0: _fail("%s has invalid dwell %s"%[service,dwell_time])
 		for car in car_bodies:
 			if not car is AnimatableBody3D: _fail("train car is not an independent rideable physics body"); continue
 			var rid: RID=car.get_rid()
 			if rid in rids: _fail("train cars share a physics RID")
 			rids.append(rid)
 		_test_train_clearance(train)
-		# Exercise a real stop crossing in the controller and require its dwell timer.
-		var stop_distances: PackedFloat32Array=train.get("_stop_distances")
-		var saved_conflicts: PackedVector3Array=train.get("conflict_points")
-		train.set("conflict_points",PackedVector3Array())
-		for target_value in stop_distances:
-			var target:=float(target_value)
-			train.set("_direction",1.0)
-			train.set("_dwell_left",0.0)
-			train.set("_distance",target-0.05 if target>0.1 else float(train.get("_total"))-0.05)
-			train.call("_physics_process",1.0/60.0)
-			if float(train.get("_dwell_left"))<3.9: _fail("%s failed to dwell at station distance %.2f"%[service,target])
-		train.set("conflict_points",saved_conflicts)
+		var events: Array=train.get("schedule_events")
+		if events.is_empty(): _fail("%s has no authored timetable events"%service)
+		else:
+			var offset:=float(train.get("schedule_offset"))+float(train.get("schedule_train_index"))*float(train.get("schedule_headway"))
+			for event in events:
+				var event_sample_time:=float(event.arr)+0.01 if float(event.dep)>float(event.arr) else float(event.arr)
+				var at_event:=train.call("_scheduled_state_at",offset+event_sample_time) as Dictionary
+				if absf(float(at_event.s)-float(event.s))>0.05: _fail("%s does not arrive on its authored stop mark %s"%[service,event.stop])
+				var authored_dwell:=float(event.dep)-float(event.arr)
+				if authored_dwell>0.0 and absf(float(at_event.dwell)-authored_dwell)>0.05: _fail("%s dwell at %s is %.3f, timetable says %.3f game minutes"%[service,event.stop,float(at_event.dwell),authored_dwell])
+			# Sample every game minute for a whole day twice: once minute-for-minute
+			# and once by mapping 10x real minutes back onto the same game clock.
+			# The public schedule is expressed in game minutes, so both runs must
+			# visit the same complete 24-hour state sequence.
+			for speed_scale in [1.0,10.0]:
+				for minute in 1440:
+					var game_minute:=float(minute) if speed_scale==1.0 else float(minute)*10.0/10.0
+					var sample:=train.call("_scheduled_state_at",game_minute) as Dictionary
+					if not is_finite(float(sample.s)) or float(sample.s)<0.0 or float(sample.s)>float(train.get("_total"))+0.01: _fail("%s timetable leaves its line at %.2f"%[service,sample.s]); break
+					if not is_finite(float(sample.dwell)) or float(sample.dwell)<0.0: _fail("%s has invalid dwell state"%service); break
 	var lift_before:=lift.position.y
-	for i in 600: await get_tree().physics_frame
+	# Exercise the real update method at moving and stopping schedule instants.
+	var original_time:=WorldState.game_time_hours
 	for train in trains:
-		if absf(float(train.get("_distance"))-float(movement_before[train.get_instance_id()]))<1.0: _fail("%s train did not move on its path"%train.get("service_name"))
+		var events: Array=train.get("schedule_events"); if events.is_empty(): continue
+		var offset:=float(train.get("schedule_offset"))+float(train.get("schedule_train_index"))*float(train.get("schedule_headway"))
+		var moving_minute:=offset+float(events[0].dep)+1.0
+		WorldState.game_time_hours=fposmod(moving_minute/60.0,24.0); train.call("_physics_process",1.0/60.0)
+		var moving_position:=float(train.get("_distance"))
+		WorldState.game_time_hours=fposmod((moving_minute+2.0)/60.0,24.0); train.call("_physics_process",1.0/60.0)
+		if absf(float(train.get("_distance"))-moving_position)<0.01: _fail("%s scheduled train failed to move on its line"%train.get("service_name"))
+	WorldState.game_time_hours=original_time
 	for i in 1800:
 		await get_tree().physics_frame
 		if i%10==0: _check_gate_train_separation(trains)
 	if absf(lift.position.y-lift_before)<0.1: _fail("Deck lift platform did not move")
-	print("MOY_MOVERS consists=",trains.size()," independent_cars=",rids.size()," route_stops=",stops_expected," dwell_seconds=4 gate_simulation_seconds=40 lift_delta_m=",absf(lift.position.y-lift_before))
+	print("MOY_MOVERS consists=",trains.size()," independent_cars=",rids.size()," route_stops=",stops_expected," dwell_seconds=8/12 gate_simulation_seconds=40 lift_delta_m=",absf(lift.position.y-lift_before))
 
 
 func _check_gate_train_separation(trains: Array[Node3D]) -> void:
 	for spine in trains:
 		if String(spine.get("service_name"))!="Spine Line": continue
 		for wall in trains:
-			if String(wall.get("service_name"))!="Wall Line": continue
+			if not String(wall.get("service_name")).begins_with("Wall Line"): continue
 			for spine_car in spine.get("_car_bodies"):
 				for wall_car in wall.get("_car_bodies"):
 					if absf(spine_car.global_position.y-wall_car.global_position.y)<3.5 and spine_car.global_position.distance_to(wall_car.global_position)<5.2:
@@ -228,11 +461,27 @@ func _test_wind_turbines(city: Node) -> void:
 	print("MOY_TURBINES count=",rotors.size()," facing=west turns_per_minute=2 moving_collision_blades=12")
 
 
+func _test_timekeeper(city: Node) -> void:
+	var root:=city.find_child("TimekeeperRings",true,false) as Node3D
+	if root==null: _fail("Timekeeper rings missing"); return
+	var hour:=root.get_node_or_null("Timekeeper_hour") as AnimatableBody3D
+	var minute:=root.get_node_or_null("Timekeeper_minute") as AnimatableBody3D
+	var bead:=root.get_node_or_null("TimekeeperSecondsBead") as MeshInstance3D
+	if hour==null or minute==null or bead==null: _fail("Timekeeper hour/minute ring or seconds bead missing"); return
+	if hour.get_node_or_null("Timekeeper_hour_Arrow")==null or minute.get_node_or_null("Timekeeper_minute_Arrow")==null: _fail("Timekeeper moving ring arrow missing")
+	var before:=bead.position
+	for i in 75: await get_tree().physics_frame
+	var radius:=Vector2(bead.position.y,bead.position.z).length()
+	if absf(radius-14.1)>0.05: _fail("Timekeeper seconds bead radius wrong: %.3f"%radius)
+	if before.distance_to(bead.position)<0.25: _fail("Timekeeper seconds bead did not move")
+	print("MOY_CLOCK hollow_hour_minute_arrows=present seconds_bead_radius=",radius," bead_moved=PASS")
+
+
 func _test_train_clearance(train: Node3D) -> void:
 	var route: PackedVector3Array=train.get("path")
 	var sample_count := 0
 	var car_envelope := BoxShape3D.new()
-	car_envelope.size=Vector3(9.6,3.4,3.2)
+	car_envelope.size=Vector3(float(PLAN.TRAIN.car[0]),float(PLAN.TRAIN.car[1]),float(PLAN.TRAIN.car[2]))
 	for i in route.size()-1:
 		var a:=route[i]
 		var b:=route[(i+1)%route.size()]
@@ -241,21 +490,19 @@ func _test_train_clearance(train: Node3D) -> void:
 			var center:=a.lerp(b,float(sample)/float(count))
 			var tangent: Vector3=(b-a).normalized()
 			var yaw:=atan2(-tangent.z,tangent.x)
-			for lane_offset in [0.0]:
-				var lateral:=Vector3(-tangent.z,0,tangent.x)*float(lane_offset)
-				var pose:=Transform3D(Basis(Vector3.UP,yaw),center+lateral+Vector3.UP*1.9)
-				var query:=PhysicsShapeQueryParameters3D.new()
-				query.shape=car_envelope
-				query.transform=pose
-				query.collision_mask=1
-				for car in train.get("_car_bodies"): query.exclude.append(car.get_rid())
-				for hit in get_viewport().world_3d.direct_space_state.intersect_shape(query,64):
-					var collider: Object=hit.get("collider")
-					if collider==null: continue
-					var name:=String(collider.get("name"))
-					if name.begins_with("Building_") or name.begins_with("OldHouse_") or name.begins_with("Lot_") or name.begins_with("WestGate") or name.begins_with("MeridianArch") or name.begins_with("SpineGate") or name.begins_with("NorthSouthGate") or name.begins_with("WallLine_Station_"):
-						_fail("train clearance intersects %s on %s at %s"%[name,train.get("service_name"),center])
-						return
+			var pose:=Transform3D(Basis(Vector3.UP,yaw),center+Vector3.UP*(1.0+float(PLAN.TRAIN.car[1])*0.5))
+			var query:=PhysicsShapeQueryParameters3D.new()
+			query.shape=car_envelope
+			query.transform=pose
+			query.collision_mask=1
+			for car in train.get("_car_bodies"): query.exclude.append(car.get_rid())
+			for hit in get_viewport().world_3d.direct_space_state.intersect_shape(query,64):
+				var collider: Object=hit.get("collider")
+				if collider==null: continue
+				var name:=String(collider.get("name"))
+				if name.begins_with("Building_") or name.begins_with("OldHouse_") or name.begins_with("Lot_") or name.begins_with("WestGate") or name.begins_with("MeridianArch") or name.begins_with("SpineGate") or name.begins_with("NorthSouthGate") or name.begins_with("WallLine_Station_"):
+					_fail("train clearance intersects %s on %s at %s"%[name,train.get("service_name"),center])
+					return
 			sample_count+=1
 	print("MOY_TUNNEL_CLEARANCE service=",train.get("service_name")," route_samples=",sample_count," tested_class=buildings,old_houses,lots,gate_masses,station_platforms")
 

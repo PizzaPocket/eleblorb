@@ -205,6 +205,10 @@ func moy_packs_ready() -> bool:
 	return not _moy_paths.is_empty() and _moy_active.size() == _moy_paths.size()
 
 
+func get_active_moy_pack_count() -> int:
+	return _moy_active.size()
+
+
 func moy_actors_ready() -> bool:
 	return _moy_actors_added and _moy_shop_added and _moy_resident_index >= CITY_NAMES.size()
 

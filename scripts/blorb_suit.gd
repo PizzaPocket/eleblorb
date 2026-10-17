@@ -860,6 +860,50 @@ static func rebuild_arm(
 		right_hint, Vector3.ZERO, Vector3(0, ARM_EYE_RAISE * rig_scale, 0)
 	)
 
+	_update_boxing_glove(mesh_instance, blorb, wrist_bulged, tip_bulged, reach_dir, outward_dir, rig_scale, limb_fit, signf(shoulder_pos.x), r_wrist)
+
+
+## The glove encloses the same bulged hand stations as the goo shell above.
+## Keep it under the returned suit piece so normal unequip/preview cleanup owns
+## it. Reuse the visual; only its live transform changes during animation.
+static func _update_boxing_glove(piece: MeshInstance3D, blorb: Blorb, wrist: Vector3, tip: Vector3, reach: Vector3, outward: Vector3, rig_scale: float, limb_fit: Dictionary, anatomical_side: float, hand_radius: float) -> void:
+	var glove := piece.get_node_or_null("BoxingGlove") as Node3D
+	var equipped := blorb.element_state == "fighting" and blorb.has_core_item("Boxing Gloves")
+	if not equipped:
+		if glove != null: glove.visible = false
+		return
+	if glove == null:
+		glove = ShopCatalog.build_boxing_glove_visual(1.0, anatomical_side)
+		glove.set_meta("thumb_side", anatomical_side)
+		glove.name = "BoxingGlove"
+		piece.add_child(glove)
+		CollisionPolicy.mark_decorative(glove)
+	glove.visible = true
+	var length_scale := 1.1 * rig_scale
+	var center := wrist.lerp(tip, 0.5)
+	# Catalog glove +Y runs from cuff toward knuckles. The actual wrist/tip
+	# vector works for articulated hands and for rigs with one round arm end.
+	var y := reach.normalized()
+	var z := (outward - y * outward.dot(y)).normalized()
+	if z.length_squared() < 0.001:
+		z = y.cross(Vector3.RIGHT).normalized()
+		if z.length_squared() < 0.001: z = y.cross(Vector3.UP).normalized()
+	glove.basis = Basis(y.cross(z).normalized(), y, z).scaled_local(Vector3(1.65 * rig_scale, length_scale, 1.85 * rig_scale))
+	glove.position = center - y * 0.22 * length_scale
+	# Body scale sets the glove silhouette. Broader hand proportions only
+	# widen the individual cuff/padding enough to enclose the actual shell;
+	# multiplying the entire glove by arm_wrist made compact wearers' gloves
+	# disproportionately large (including their thumbs and cuff length).
+	var cuff := glove.get_child(0) as Node3D
+	var pad := glove.get_child(1) as Node3D
+	var width_scale := 1.65 * rig_scale
+	var depth_scale := 1.85 * rig_scale
+	var clearance := hand_radius * 1.06
+	cuff.scale = Vector3(maxf(1.0, clearance / (0.075 * width_scale)), 1.0, maxf(1.0, clearance / (0.065 * depth_scale)))
+	pad.scale = Vector3(maxf(1.0, clearance / (0.105 * width_scale)), 1.0, maxf(1.0, (clearance + 0.025 * depth_scale) / (0.10 * depth_scale)))
+	if bool(limb_fit.get("round_arm_tip", false)):
+		pad.scale.y = maxf(1.0, (wrist.distance_to(tip) * 0.5 + clearance) / (0.115 * length_scale))
+
 
 ## The mermaid tail, in `root` space, from both legs' live joints: one mass
 ## starting up inside the pelvis, tapering through hips and knees to its

@@ -17,6 +17,8 @@
 [ext_resource type="Script" path="res://scripts/chinese_village.gd" id="16"]
 [ext_resource type="Script" path="res://scripts/life_tree.gd" id="17"]
 [ext_resource type="Script" path="res://scripts/sky_kingdom.gd" id="19"]
+[ext_resource type="Script" path="res://scripts/distance_music.gd" id="20"]
+[ext_resource type="AudioStreamWAV" path="res://assets/audio/music/ohio.wav" id="21"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.12, 0.52, 0.96, 1)
@@ -61,6 +63,10 @@ script = ExtResource("3")
 [node name="Town" type="Node3D" parent="." unique_id=237348816]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 150, 0, 70)
 script = ExtResource("4")
+
+[node name="OhioMusic" type="Node3D" parent="Town"]
+script = ExtResource("20")
+track = ExtResource("21")
 
 [node name="WesternCity" type="Node3D" parent="."]
 script = ExtResource("12")

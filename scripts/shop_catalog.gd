@@ -23,6 +23,7 @@ const ICE_COLOR := Color(0.78, 0.92, 0.98)
 const SNOW_COLOR := ElementPalette.SNOW_BODY
 const WOOD_COLOR := Color(0.42, 0.26, 0.15)
 const SPACE_COLOR := ElementPalette.SPACE_BODY
+const FIGHTING_COLOR := Color(0.82, 0.12, 0.12)
 const BEAN_OF_LIFE_COLOR := Color(0.36, 0.6, 0.22)
 const BLORB_SLIME_COLOR := Color(0.42, 0.92, 0.68)
 const JINGU_BANG_RED := Color(0.75, 0.08, 0.06)
@@ -75,6 +76,11 @@ static func _ensure_items() -> void:
 	if not _items.is_empty():
 		return
 	_items = [
+		{
+			"name": "Fighting Gem", "color": FIGHTING_COLOR, "price": 0, "sell_price": 6,
+			"purchasable": false, "element": "fighting", "description": "A dense red crystal.",
+			"build_visual": Callable(ShopCatalog, "_build_gem_visual").bind(FIGHTING_COLOR),
+		},
 		{
 			"name": "Fire Gem", "color": FIRE_COLOR, "price": 26, "sell_price": 12,
 			"purchasable": true, "element": "fire", "description": "Warm to the touch even in shade.",
@@ -394,8 +400,9 @@ static func _ensure_items() -> void:
 		},
 		{
 			"name": "Boxing Gloves", "color": Color(0.72, 0.10, 0.08),
-			"price": 0, "sell_price": 14, "purchasable": false, "element": "",
-			"weapon": true, "weapon_damage": 16.0, "weapon_reach": 1.05,
+			"price": 0, "sell_price": 14, "purchasable": false, "element": "fighting",
+			"core_item": "Boxing Gloves", "core_slot": "accessory", "required_element": "fighting",
+			"punch_damage": 16.0,
 			"description": "A matched pair of padded red fighting gloves found in the Holt Inn.",
 			"build_visual": Callable(ShopCatalog, "_build_boxing_gloves_visual"),
 		},
@@ -420,13 +427,25 @@ static func _build_boxing_gloves_visual(item_scale: float = 1.0) -> Node3D:
 	var root := Node3D.new()
 	root.scale = Vector3.ONE * item_scale
 	for side: float in [-1.0, 1.0]:
-		var cuff := SuperEgg.build_part(Vector3(0.075, 0.07, 0.065), Color(0.48, 0.055, 0.045), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
-		cuff.position = Vector3(side * 0.11, 0.07, 0.0)
-		root.add_child(cuff)
-		var glove := SuperEgg.build_part(Vector3(0.105, 0.115, 0.10), Color(0.72, 0.10, 0.08), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
-		glove.position = Vector3(side * 0.11, 0.22, -0.025)
+		var glove := build_boxing_glove_visual(1.0, -side)
+		glove.position.x = side * 0.11
 		root.add_child(glove)
 	_add_catalog_grip(root)
+	return root
+
+
+static func build_boxing_glove_visual(item_scale: float = 1.0, thumb_side: float = 1.0) -> Node3D:
+	var root := Node3D.new()
+	root.scale = Vector3.ONE * item_scale
+	var cuff := SuperEgg.build_part(Vector3(0.075, 0.07, 0.065), Color(0.48, 0.055, 0.045), SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_SOFT)
+	cuff.position.y = 0.07
+	root.add_child(cuff)
+	var glove := SuperEgg.build_part(Vector3(0.105, 0.115, 0.10), Color(0.72, 0.10, 0.08), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+	glove.position = Vector3(0.0, 0.22, -0.025)
+	root.add_child(glove)
+	var thumb := SuperEgg.build_part(Vector3(0.040, 0.070, 0.050), Color(0.72, 0.10, 0.08), SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+	thumb.position = Vector3(thumb_side * 0.078, 0.17, -0.068)
+	root.add_child(thumb)
 	return root
 
 

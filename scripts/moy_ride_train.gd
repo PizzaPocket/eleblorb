@@ -1,4 +1,5 @@
 extends Node3D
+const PLAN := preload("res://scripts/city_plan.gd")
 
 ## Baked consist controller. Each car has its own physics RID and samples the
 ## route independently, allowing the couplings to articulate through curves.
@@ -12,13 +13,19 @@ extends Node3D
 @export var initial_phase := 0.0
 @export var initial_direction := 1
 @export var conflict_points := PackedVector3Array()
+@export var schedule_events: Array = []
+@export var schedule_offset := 0.0
+@export var schedule_headway := 60.0
+@export var schedule_circuit := 180.0
+@export var schedule_train_index := 0
 
-const CAR_SPACING := 10.4
+const CAR_SPACING := float(PLAN.TRAIN.car[0])+float(PLAN.TRAIN.gangway)
 const BLOCK_RADIUS := 15.0
 var _car_bodies: Array[AnimatableBody3D] = []
 var _couplers: Array[MeshInstance3D] = []
 var _lengths := PackedFloat32Array()
 var _stop_distances := PackedFloat32Array()
+var _stop_dwell_times := PackedFloat32Array()
 var _total := 0.0
 var _distance := 0.0
 var _direction := 1.0
@@ -44,6 +51,8 @@ func _ready() -> void:
 	for stop in stops:
 		_stop_distances.append(_project_stop(stop))
 	_stop_distances.sort()
+	for stop_distance in _stop_distances:
+		_stop_dwell_times.append(_dwell_for_distance(float(stop_distance)))
 	_direction = -1.0 if initial_direction < 0 else 1.0
 	_distance = _total * clampf(initial_phase, 0.0, 0.999999)
 	if loop and _stop_distances.size() > 0 and _nearest_stop_distance(_distance) < 8.0:
@@ -59,6 +68,10 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if not schedule_events.is_empty():
+		var state:=_scheduled_state_at(float(WorldState.game_time_hours)*60.0)
+		_distance=float(state.s); _direction=float(state.direction); _apply_pose()
+		return
 	if _dwell_left > 0.0:
 		_dwell_left = maxf(0.0, _dwell_left - delta)
 		return
@@ -70,7 +83,7 @@ func _physics_process(delta: float) -> void:
 		return
 	_distance = fposmod(candidate, _total) if loop else clampf(candidate, 0.0, _total)
 	if stop_distance >= 0.0:
-		_dwell_left = dwell
+		_dwell_left = _dwell_at(stop_distance)
 		_station_arrivals += 1
 		if not loop and (_distance <= 0.01 or _distance >= _total - 0.01):
 			_direction *= -1.0
@@ -144,7 +157,7 @@ func _apply_pose() -> void:
 		_car_bodies[i].global_transform = _path_pose(_distance - float(i) * CAR_SPACING * _direction)
 	for i in _couplers.size():
 		var pose := _path_pose(_distance - (float(i) + 0.5) * CAR_SPACING * _direction)
-		pose.origin.y += 1.9
+		pose.origin.y += 2.4
 		_couplers[i].global_transform = pose
 
 
@@ -165,7 +178,8 @@ func _build_consist() -> void:
 	var shell_material := _mat(Color("#e4d4b4"))
 	var glass_material := _mat(Color("#273943"))
 	var livery_material := _mat(_line_color(service_name))
-	var shell_mesh := SuperEgg.build_mesh(Vector3(4.8, 1.3, 1.325), 3.4, 5.5, 16, 24)
+	var shell_data: Dictionary=PLAN.TRAIN.parts[0]; var shell_semi: Array=shell_data.semi; var shell_eps: Array=shell_data.eps
+	var shell_mesh := SuperEgg.build_mesh(Vector3(float(shell_semi[0]),float(shell_semi[1]),float(shell_semi[2])),float(shell_eps[0]),float(shell_eps[1]),16,24)
 	for i in cars:
 		var car := AnimatableBody3D.new()
 		car.name = "Car_%02d" % i
@@ -175,28 +189,24 @@ func _build_consist() -> void:
 		add_child(car)
 		var shell := MeshInstance3D.new()
 		shell.mesh = shell_mesh
-		shell.position.y = 1.9
+		shell.position.y = float(shell_data.c[1])+0.4
 		shell.material_override = shell_material
 		car.add_child(shell)
-		var shape := BoxShape3D.new()
-		shape.size = Vector3(9.6, 2.65, 3.2)
-		var collision := CollisionShape3D.new()
-		collision.name = "RideableCarBody"
-		collision.shape = shape
-		collision.position.y = 1.9
-		car.add_child(collision)
+		_add_rideable_car_collision(car)
 		var window_mesh := BoxMesh.new()
-		window_mesh.size = Vector3(8.8, 0.72, 2.72)
+		var glazing: Dictionary=PLAN.TRAIN.parts[1]; var glazing_semi: Array=glazing.semi
+		window_mesh.size = Vector3(float(glazing_semi[0])*2.0,float(glazing_semi[1])*2.0,float(glazing_semi[2])*2.0)
 		var windows := MeshInstance3D.new()
 		windows.mesh = window_mesh
-		windows.position.y = 2.28
+		windows.position.y = float(glazing.c[1])+0.4
 		windows.material_override = glass_material
 		car.add_child(windows)
 		var stripe_mesh := BoxMesh.new()
-		stripe_mesh.size = Vector3(9.0, 0.34, 3.26)
+		var livery: Dictionary=PLAN.TRAIN.parts[2]; var livery_semi: Array=livery.semi
+		stripe_mesh.size = Vector3(float(livery_semi[0])*2.0,float(livery_semi[1])*2.0,float(livery_semi[2])*2.0)
 		var stripe := MeshInstance3D.new()
 		stripe.mesh = stripe_mesh
-		stripe.position.y = 1.32
+		stripe.position.y = float(livery.c[1])+0.4
 		stripe.material_override = livery_material
 		car.add_child(stripe)
 	var bellows_mesh := BoxMesh.new()
@@ -207,6 +217,23 @@ func _build_consist() -> void:
 		bellows.mesh = bellows_mesh
 		bellows.material_override = glass_material
 		add_child(bellows)
+
+
+func _add_rideable_car_collision(car: AnimatableBody3D) -> void:
+	# Frame pieces leave the four side-door apertures clear for boarding.
+	var parts: Array[Array]=[
+		[Vector3(9.6,0.2,3.6),Vector3(0,1.1,0)], [Vector3(9.6,0.2,3.6),Vector3(0,3.65,0)],
+		[Vector3(0.2,2.65,3.6),Vector3(-4.7,2.325,0)], [Vector3(0.2,2.65,3.6),Vector3(4.7,2.325,0)],
+		[Vector3(1.7,2.65,0.16),Vector3(-3.95,2.325,-1.52)], [Vector3(3.4,2.65,0.16),Vector3(0,2.325,-1.52)], [Vector3(1.7,2.65,0.16),Vector3(3.95,2.325,-1.52)],
+		[Vector3(1.7,2.65,0.16),Vector3(-3.95,2.325,1.52)], [Vector3(3.4,2.65,0.16),Vector3(0,2.325,1.52)], [Vector3(1.7,2.65,0.16),Vector3(3.95,2.325,1.52)],
+	]
+	for i in parts.size():
+		var shape:=BoxShape3D.new(); shape.size=parts[i][0]
+		var collision:=CollisionShape3D.new(); collision.name="RideableCarFrame_%02d"%i; collision.shape=shape; collision.position=parts[i][1]; car.add_child(collision)
+	for side in [-1.0,1.0]:
+		for door_x in [-2.4,2.4]:
+			var door_spec: Dictionary=PLAN.TRAIN.doors; var door_mesh:=BoxMesh.new(); door_mesh.size=Vector3(float(door_spec.w),float(door_spec.h),0.08)
+			var door:=MeshInstance3D.new(); door.name="TrainDoor"; door.mesh=door_mesh; door.position=Vector3(door_x,1.0+float(door_spec.h)*0.5,side*1.64); door.material_override=_mat(Color("#7b8580")); car.add_child(door)
 
 
 func _is_stop(distance: float) -> bool:
@@ -222,6 +249,53 @@ func _nearest_stop_distance(distance: float) -> float:
 		if loop: d = minf(d, _total - d)
 		nearest = minf(nearest, d)
 	return nearest
+
+
+func _dwell_for_distance(distance: float) -> float:
+	var nearest_index:=0; var nearest_error:=INF
+	for i in _stop_distances.size():
+		var error:=absf(_stop_distances[i]-distance)
+		if loop: error=minf(error,_total-error)
+		if error<nearest_error: nearest_error=error; nearest_index=i
+	var pos:=_path_pose(distance).origin
+	var terminal:=not loop and (distance<1.0 or distance>_total-1.0)
+	var interchange:=String(service_name).begins_with("Wall Line") or pos.distance_to(Vector3(-560.0,pos.y,0.0))<8.0 or (String(service_name)=="Spine Line" and absf(pos.z)>175.0) or (String(service_name)=="Meridian Line" and absf(pos.x+564.0)>200.0)
+	if terminal or interchange: return 12.0
+	return dwell
+
+
+func _dwell_at(distance: float) -> float:
+	var best:=INF; var value:=dwell
+	for i in _stop_distances.size():
+		var d:=absf(_stop_distances[i]-distance)
+		if loop: d=minf(d,_total-d)
+		if d<best: best=d; value=_stop_dwell_times[i]
+	return value
+
+
+func _scheduled_state_at(game_minute: float) -> Dictionary:
+	var tau:=fposmod(game_minute-schedule_offset-float(schedule_train_index)*schedule_headway,schedule_circuit)
+	for i in schedule_events.size():
+		var event: Dictionary=schedule_events[i]
+		var next: Dictionary=schedule_events[(i+1)%schedule_events.size()]
+		var next_arrival:=float(next.arr) if i+1<schedule_events.size() else schedule_circuit
+		var arrival:=float(event.arr); var departure:=float(event.dep); var direction:=_event_direction(String(event.dir))
+		if tau>=arrival and tau<=departure:
+			return {"s":float(event.s),"direction":direction,"moving":false,"stop":String(event.stop),"dwell":departure-arrival}
+		if tau>departure and tau<next_arrival:
+			if String(event.kind)=="end" and String(next.kind)=="start":
+				return {"s":float(event.s),"direction":direction,"moving":false,"stop":String(event.stop),"dwell":next_arrival-departure}
+			var fraction:float=(tau-departure)/maxf(0.001,next_arrival-departure)
+			var s0:=float(event.s); var s1:=float(next.s)
+			if String(service_name).begins_with("Wall Line"):
+				var travel:=fposmod(s1-s0,_total) if direction>0.0 else fposmod(s0-s1,_total)
+				return {"s":fposmod(s0+direction*fraction*travel,_total),"direction":direction,"moving":true,"stop":"","dwell":0.0}
+			return {"s":lerpf(s0,s1,fraction),"direction":direction,"moving":true,"stop":"","dwell":0.0}
+	return {"s":float(schedule_events[0].s),"direction":_event_direction(String(schedule_events[0].dir)),"moving":false,"stop":String(schedule_events[0].stop),"dwell":0.0}
+
+
+func _event_direction(value: String) -> float:
+	return -1.0 if value in ["north","east","outer"] else 1.0
 
 
 func _line_color(line: String) -> Color:

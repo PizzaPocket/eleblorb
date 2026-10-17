@@ -1194,6 +1194,7 @@ var _right_arm_plant_cooldown := 0.0
 ## wears the Leaf Hat. Jump throws the vine and jump opens the hand again;
 ## there is no separate mode toggle.
 var _vine_swing := VineSwingMode.new()
+var _fighting_punch := FightingPunchMode.new()
 ## Airborne off a released swing, so the arc's momentum is his until he lands.
 var _vine_airborne := false
 var _air_foot_hover_active := false
@@ -1922,6 +1923,9 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not UIState.modal_open and not _piloting_xiao_hou_zi and not event.is_echo():
+		if event.is_action_pressed("left_arm_power"): _fighting_punch.queue_press(0)
+		if event.is_action_pressed("right_arm_power"): _fighting_punch.queue_press(1)
 	if _throw_aim_active and event.is_action_pressed("ui_cancel"):
 		cancel_throw_preparation()
 		get_viewport().set_input_as_handled()
@@ -3242,6 +3246,8 @@ func _process(delta: float) -> void:
 		_update_head_look(delta)
 	if not _piloting_xiao_hou_zi:
 		_update_suit_input(delta)
+	else:
+		_fighting_punch.reset()
 	if _wake_intro_active:
 		_apply_wake_intro_eyes()
 	else:
@@ -4375,12 +4381,25 @@ func _update_suit_input(delta: float) -> void:
 	# The head blorb is a normal hat until genuine buoyancy starts. This uses
 	# the same state that controls swimming, so stepping onto a wet-looking
 	# shore cannot prematurely create the diving helmet.
+	_update_fighting_punch(delta)
 	_blorb_suit.update(delta)
 	# Do this after update(): a head blorb can complete its equip hop during
 	# that call and must immediately receive the correct form as well.
 	_blorb_suit.set_head_blorb_submerged(_lake_buoyancy_active or _giant_goo_active)
 	_blorb_suit.set_mermaid_swimming(_is_swimming())
 	_portrait.update()
+
+
+func _update_fighting_punch(delta: float) -> void:
+	if _player_following_manchego or _player_following_blorbus or is_instance_valid(_controlled_host) or is_instance_valid(_controlled_generic_member) or _vine_swing.swinging or _wake_intro_active or UIState.modal_open:
+		_fighting_punch.reset()
+		return
+	var ctx := _traversal_context(delta)
+	ctx.left_arm_busy = _throw_aim_active
+	ctx.right_arm_busy = _throw_aim_active or _held_item_is_weapon()
+	_fighting_punch.requested = [Input.is_action_pressed("left_arm_power"), Input.is_action_pressed("right_arm_power")]
+	_fighting_punch.update(ctx)
+	_fighting_punch.pose(ctx)
 
 
 ## Per direct instruction: holding "left_arm_power"/"right_arm_power" (Q/E
@@ -4450,9 +4469,12 @@ func _apply_arm_power_poses(delta: float) -> void:
 	# lerps never fully resolved, settling the arm at a permanent halfway
 	# compromise instead of cleanly canceling the raise.
 	# Swimming Water jets likewise own their arms (_apply_swim_jet_pose()).
-	var left_power := Input.is_action_pressed("left_arm_power") and not _powers.fire_hand_hover and not (_powers.left_arm_water and _is_swimming())
+	var boxing_left := FightingPunchMode.owns_arm(_blorb_suit, "left")
+	var boxing_right := FightingPunchMode.owns_arm(_blorb_suit, "right")
+	var left_power := not boxing_left and Input.is_action_pressed("left_arm_power") and not _powers.fire_hand_hover and not (_powers.left_arm_water and _is_swimming())
 	var right_power := (
 		Input.is_action_pressed("right_arm_power")
+		and not boxing_right
 		and not _powers.fire_hand_hover
 		and not (_powers.right_arm_water and _is_swimming())
 		and not _throw_aim_active
@@ -4480,11 +4502,15 @@ func _apply_arm_power_poses(delta: float) -> void:
 	# pivot-naming fix landed without this call site being updated to match.
 	_left_arm_power_blend = move_toward(_left_arm_power_blend, 1.0 if left_power else 0.0, t)
 	_right_arm_power_blend = move_toward(_right_arm_power_blend, 1.0 if right_power else 0.0, t)
-	if _left_arm_power_blend > 0.001:
+	if boxing_left:
+		_left_arm_power_blend = 0.0
+	elif _left_arm_power_blend > 0.001:
 		_pose_extended_arm(_arm_left, _elbow_left, _hand_left, 1.0, _left_arm_power_blend)
 	else:
 		_rest_hand_roll(_hand_left, 1.0, t)
-	if _right_arm_power_blend > 0.001:
+	if boxing_right:
+		_right_arm_power_blend = 0.0
+	elif _right_arm_power_blend > 0.001:
 		_pose_extended_arm(_arm_right, _elbow_right, _hand_right, -1.0, _right_arm_power_blend)
 	else:
 		_rest_hand_roll(_hand_right, -1.0, t)

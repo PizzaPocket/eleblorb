@@ -32,6 +32,22 @@ func _ready() -> void:
 		var blorb := get_node("Blorb%d" % (i + 1)) as Blorb
 		blorb.in_party = true
 		blorb.global_position = player.global_position + Vector3(float(i - 1) * 2.0, 0.0, 3.0)
+	# Two genuine Fighting companions exercise the current free-blorb combat
+	# behavior in the city. merge_element("fighting") supplies each one's
+	# Boxing Gloves through the same path used by normal progression.
+	for i in 2:
+		var fighter := BLORB_SCENE.instantiate() as Blorb
+		fighter.name = "QA_FightingBlorb%d" % (i + 1)
+		fighter.in_party = true
+		fighter.initial_element = "fighting"
+		fighter.position = player.position + Vector3(-3.0 + float(i) * 6.0, 0.0, 5.0)
+		add_child(fighter)
+	var air_companion := BLORB_SCENE.instantiate() as Blorb
+	air_companion.name = "QA_AirBlorb"
+	air_companion.in_party = true
+	air_companion.initial_element = "air"
+	air_companion.position = player.position + Vector3(0.0, 0.5, 7.0)
+	add_child(air_companion)
 	var human_members: Array[Blorb] = []
 	for slot in ["head", "torso", "arm_left", "arm_right", "leg_left", "leg_right"]:
 		if slot == "head":
@@ -71,7 +87,7 @@ func _finish() -> void:
 		await get_tree().process_frame
 	print("MOY_QA packs_ready_frames=", waited, " bodies=", city.call("_count_physics_bodies", city), " full_plant_suit=6 handover=PartyControl")
 	LoadingScreen.complete()
-	Hud.show_message("MOY QA: WASD move, mouse look, Space jump/throw/release Leaf Hat vine, Q/E arm steering, N switch party control (the full Plant suit follows).")
+	Hud.show_message("MOY QA: WASD move, mouse look, Space jump/throw/release Leaf Hat vine, Q/E arm steering, N switch party control. Party: one Air blorb and two Fighting blorbs with Boxing Gloves.")
 	set_meta("qa_ready", true)
 
 

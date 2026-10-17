@@ -19,6 +19,7 @@ const ICE_BODY := Color(0.78,0.92,0.98)
 const SNOW_BODY := Color(0.94,0.96,0.98)
 const WOOD_BODY := Color(0.42,0.26,0.15)
 const SPACE_BODY := Color(0.105,0.055,0.18)
+const FIGHTING_BODY := Color(0.96,0.95,0.91) # Warm dobok white.
 
 
 static func body_color(element: String) -> Color:
@@ -36,4 +37,5 @@ static func body_color(element: String) -> Color:
 		"snow": return SNOW_BODY
 		"wood": return WOOD_BODY
 		"space": return SPACE_BODY
+		"fighting": return FIGHTING_BODY
 		_: return Color(0.94,0.96,0.93)

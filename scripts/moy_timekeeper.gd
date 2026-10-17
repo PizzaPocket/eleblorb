@@ -21,3 +21,9 @@ func _update_clock() -> void:
 	var minute_ring := get_node_or_null("Timekeeper_minute") as AnimatableBody3D
 	if hour_ring: hour_ring.rotation.x=hour/12.0*TAU
 	if minute_ring: minute_ring.rotation.x=minute/60.0*TAU
+	var bead:=get_node_or_null("TimekeeperSecondsBead") as MeshInstance3D
+	if bead:
+		var seconds:=float(now.second)+float(now.minute)*60.0
+		var angle:=fposmod(seconds,60.0)/60.0*TAU
+		var radius:=14.1
+		bead.position=Vector3(0,cos(angle)*radius,sin(angle)*radius)

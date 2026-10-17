@@ -1,75 +1,83 @@
 extends Node3D
 
-## Windowed renderer probe. Run with Godot tools/moy_performance_probe.tscn.
+## Windowed, rendered city measurement. Start without user args for the normal
+## Crossroads-to-Moy path, or pass --qa to measure the isolated traversal scene.
 const MAIN := preload("res://scenes/main.tscn")
-const CAPTURE_DIR := "res://docs/diagnostics/moy-prototype-captures"
-var _deltas: Array[float] = []
+const QA := preload("res://scenes/moy_city_qa.tscn")
 
 func _ready() -> void:
-	WorldState.opening_wake_completed = true
-	WorldState.game_time_hours = 12.0
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(CAPTURE_DIR))
-	var build_started := Time.get_ticks_usec()
-	var world := MAIN.instantiate() as Node3D
+	WorldState.opening_wake_completed=true
+	WorldState.game_time_hours=12.0
+	var qa_mode: bool="--qa" in OS.get_cmdline_user_args()
+	var start_usec:=Time.get_ticks_usec()
+	var world: Node3D=(QA if qa_mode else MAIN).instantiate() as Node3D
 	add_child(world)
 	await LoadingScreen.wait_for_world_builds()
-	var player := world.get_node("Player") as Node3D
-	player.set_physics_process(false)
-	var player_camera := player.get_node("CameraRig/CameraPivot/SpringArm3D/Camera3D") as Camera3D
-	player_camera.clear_current()
-	player_camera.set_process(false)
-	player_camera.set_physics_process(false)
-	var camera := Camera3D.new(); camera.far = 1800.0; add_child(camera); camera.make_current()
-	await _sample("crossroads_sleep",camera,Vector3(0,7,16),Vector3(0,2,0),true)
-	print("MOY_PERF startup_world_ms=",(Time.get_ticks_usec()-build_started)/1000.0," renderer=",RenderingServer.get_video_adapter_name()," window=",DisplayServer.window_get_size()," nodes=",Performance.get_monitor(Performance.OBJECT_NODE_COUNT)," bodies=",Performance.get_monitor(Performance.PHYSICS_3D_ACTIVE_OBJECTS)," static_mib=",Performance.get_monitor(Performance.MEMORY_STATIC)/1048576.0)
-	var spawn := player.global_position
-	var city := world.get_node("WesternCity")
-	for cycle in 2:
-		player.global_position=Vector3(-600,-59.0,0)
-		var ready_started := Time.get_ticks_usec()
-		var guard := 0
-		while not city.call("moy_packs_ready") and guard < 2400:
-			guard+=1; await get_tree().process_frame
-		if not city.call("moy_packs_ready"):
-			push_error("Moy performance probe timed out waiting for playable packs")
-			get_tree().quit(2); return
-		var packs_ready_ms := (Time.get_ticks_usec()-ready_started)/1000.0
-		guard=0
-		while not city.call("moy_actors_ready") and guard<600:
-			guard+=1; await get_tree().process_frame
-		print("MOY_PERF cycle=",cycle+1," packs_ready_ms=",packs_ready_ms," actors_ready_ms=",(Time.get_ticks_usec()-ready_started)/1000.0," packs=",city.get_child_count()," nodes=",Performance.get_monitor(Performance.OBJECT_NODE_COUNT)," bodies=",city.call("_count_physics_bodies",city)," static_mib=",Performance.get_monitor(Performance.MEMORY_STATIC)/1048576.0)
-		await _sample("old_moy",camera,Vector3(-600,-18,65),Vector3(-600,-32,0),true)
-		await _sample("downtown_up",camera,Vector3(-464,10,-15),Vector3(-464,120,-15),true)
-		await _sample("estate_court",camera,Vector3(-552,-46,-105),Vector3(-552,-42,-115),true)
-		await _sample("train_view",camera,Vector3(-542,5,28),Vector3(-557,-20,10),true)
-		player.global_position=spawn
-		var unload_started := Time.get_ticks_usec()
-		guard=0
-		while (city.call("moy_packs_ready") or city.get_child_count()>1) and guard<2400:
-			guard+=1; await get_tree().process_frame
-		print("MOY_PERF cycle=",cycle+1," unload_ms=",(Time.get_ticks_usec()-unload_started)/1000.0," guards=",guard," nodes=",Performance.get_monitor(Performance.OBJECT_NODE_COUNT)," static_mib=",Performance.get_monitor(Performance.MEMORY_STATIC)/1048576.0)
-	await _sample("crossroads_after_unloads",camera,Vector3(0,7,16),Vector3(0,2,0),true)
+	for i in 8: await get_tree().process_frame
+	var player:=world.get_node_or_null("Player") as Player
+	var terrain:=world.get_node_or_null("Terrain")
+	var city:=world.get_node_or_null("WesternCity")
+	var city_start_ms:float=float(Time.get_ticks_usec()-start_usec)/1000.0
+	print("MOY_PERF_START mode=",("qa" if qa_mode else "crossroads")," startup_ms=",city_start_ms," nodes=",Performance.get_monitor(Performance.OBJECT_NODE_COUNT)," static_mib=",Performance.get_monitor(Performance.MEMORY_STATIC)/1048576.0)
+	for child in get_tree().root.get_children():
+		if child is CanvasLayer: child.visible=false
+	var camera:=Camera3D.new(); camera.name="MoyPerfCamera"; camera.far=1800.0; add_child(camera); camera.make_current()
+	if qa_mode:
+		if player and terrain:
+			var ground:float=terrain.call("get_mesh_height",-704.0,0.0); player.global_position=Vector3(-704.0,ground+0.5,0.0)
+			for i in 2400:
+				await get_tree().process_frame
+				if city and bool(city.call("moy_packs_ready")): break
+		await _sample(camera,"qa_dense_old_moy",Vector3(-704.0,-27.0,0.0),Vector3(-700.0,-42.0,0.0),player,terrain,city)
+	else:
+		await _sample(camera,"crossroads_spawn",Vector3(0,4,12),Vector3(0,2,0),player,terrain,city)
+		if player and terrain:
+			player.set_physics_process(false)
+			var ground:float=terrain.call("get_mesh_height",-600.0,0.0)
+			player.global_position=Vector3(-600.0,ground+0.5,0.0)
+			var approach_start:=Time.get_ticks_usec()
+			for i in 2400:
+				await get_tree().process_frame
+				if city and bool(city.call("moy_packs_ready")): break
+			print("MOY_PERF_APPROACH elapsed_ms=",float(Time.get_ticks_usec()-approach_start)/1000.0," packs_ready=",bool(city.call("moy_packs_ready")) if city else false)
+			var views:Array[Dictionary]=[
+				{"name":"old_moy_market","camera":Vector3(-704.0,-29.0,-24.0),"look":Vector3(-704.0,-48.0,0.0),"player":Vector2(-704,0)},
+				{"name":"downtown_up","camera":Vector3(-462.0,5.0,-40.0),"look":Vector3(-462.0,-25.0,-20.0),"player":Vector2(-462,-20)},
+				{"name":"estate_court","camera":Vector3(-535.0,-38.0,-125.0),"look":Vector3(-535.0,-48.0,-100.0),"player":Vector2(-535,-100)},
+				{"name":"train_ride","camera":Vector3(-560.0,-34.0,-12.0),"look":Vector3(-560.0,-45.0,0.0),"player":Vector2(-560,0)},
+			]
+		for view in views:
+			var p:Vector2=view.player; var y:=float(terrain.call("get_mesh_height",p.x,p.y))+0.5
+			player.global_position=Vector3(p.x,y,p.y)
+			await _sample(camera,String(view.name),view.camera,view.look,player,terrain,city)
+		for cycle in 2:
+			var away_ground:float=terrain.call("get_mesh_height",-1600.0,0.0); player.global_position=Vector3(-1600.0,away_ground+0.5,0.0)
+			var unload_start:=Time.get_ticks_usec()
+			for i in 1200:
+				await get_tree().process_frame
+				if city and int(city.get("_moy_active").size())==0: break
+			var after_unload:=int(city.get("_moy_active").size()) if city else -1
+			var near_ground:float=terrain.call("get_mesh_height",-600.0,0.0); player.global_position=Vector3(-600.0,near_ground+0.5,0.0)
+			for i in 2400:
+				await get_tree().process_frame
+				if city and bool(city.call("moy_packs_ready")): break
+			print("MOY_PERF_RELOAD cycle=",cycle+1," active_after_unload=",after_unload," packs_ready=",bool(city.call("moy_packs_ready")) if city else false," cycle_ms=",float(Time.get_ticks_usec()-unload_start)/1000.0," static_mib=",Performance.get_monitor(Performance.MEMORY_STATIC)/1048576.0," nodes=",Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
 	get_tree().quit()
 
-func _sample(label: String, camera: Camera3D, position: Vector3, target: Vector3, capture: bool) -> void:
-	camera.global_position=position
-	var direction := (target-position).normalized()
-	var up := Vector3.FORWARD if absf(direction.dot(Vector3.UP)) > 0.98 else Vector3.UP
-	camera.look_at(target,up); camera.make_current(); await get_tree().process_frame
-	for i in 8: await get_tree().process_frame
-	if capture:
-		var image := get_viewport().get_texture().get_image()
-		var path := "%s/%s.png" % [CAPTURE_DIR,label]
-		var err := image.save_png(ProjectSettings.globalize_path(path))
-		print("MOY_CAPTURE path=",path," size=",image.get_size()," error=",err)
-	_deltas.clear()
-	for i in 300:
+func _sample(camera: Camera3D, label: String, position: Vector3, target: Vector3, player: Player, terrain: Node, city: Node) -> void:
+	camera.global_position=position; camera.look_at(target)
+	for i in 120: await get_tree().process_frame
+	var frames: Array[float]=[]; var started:=Time.get_ticks_usec(); var previous:=started
+	while Time.get_ticks_usec()-started<5000000:
 		await get_tree().process_frame
-		_deltas.append(get_process_delta_time()*1000.0)
-	_deltas.sort()
-	var p50 := _percentile(0.50); var p95 := _percentile(0.95); var p99 := _percentile(0.99); var worst := _deltas[-1] if not _deltas.is_empty() else 0.0
-	print("MOY_PERF view=",label," frames=",_deltas.size()," p50_ms=",p50," p95_ms=",p95," p99_ms=",p99," worst_ms=",worst," draw_calls=",Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)," triangles=",Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)," static_mib=",Performance.get_monitor(Performance.MEMORY_STATIC)/1048576.0," video_mib=",Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)/1048576.0)
+		var now:=Time.get_ticks_usec(); frames.append(float(now-previous)/1000.0); previous=now
+	frames.sort()
+	var sum:=0.0; var worst:=0.0
+	for frame_ms in frames: sum+=frame_ms; worst=maxf(worst,frame_ms)
+	var fps:=1000.0/(sum/maxf(1.0,float(frames.size())))
+	var packs:=int(city.call("get_active_moy_pack_count")) if city and city.has_method("get_active_moy_pack_count") else -1
+	print("MOY_PERF_SAMPLE name=",label," frames=",frames.size()," fps_mean=",fps," p50_ms=",_percentile(frames,0.50)," p95_ms=",_percentile(frames,0.95)," p99_ms=",_percentile(frames,0.99)," worst_ms=",worst," draws=",Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)," triangles=",Performance.get_monitor(Performance.RENDER_TOTAL_PRIMITIVES_IN_FRAME)," static_mib=",Performance.get_monitor(Performance.MEMORY_STATIC)/1048576.0," video_mib=",Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED)/1048576.0," nodes=",Performance.get_monitor(Performance.OBJECT_NODE_COUNT)," active_packs=",packs," physics_objects=",Performance.get_monitor(Performance.PHYSICS_3D_ACTIVE_OBJECTS))
 
-func _percentile(p: float) -> float:
-	if _deltas.is_empty(): return 0.0
-	return _deltas[clampi(ceili(float(_deltas.size()-1)*p),0,_deltas.size()-1)]
+func _percentile(values: Array[float], quantile: float) -> float:
+	if values.is_empty(): return 0.0
+	return values[clampi(ceili(float(values.size()-1)*quantile),0,values.size()-1)]

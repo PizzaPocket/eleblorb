@@ -124,6 +124,11 @@ const HEAD_MOD_ITEMS := ["Diving Helmet", "Knight's Helm", "Lava Helm", "Nautilu
 const ARMOR_MOD_ITEMS := ["Dented Breastplate"]
 ## Items a leg blorb binds (one at a time).
 const LEG_MOD_ITEMS := ["Crystal Skates"]
+const BOXING := preload("res://scripts/blorb_boxing.gd")
+const BOXING_RANGE := 1.6
+const BOXING_COOLDOWN := 0.48
+var _boxing: Node3D
+var _boxing_target: Node3D
 ## The "shiny blorb" cosmetic override applied in _build_visuals() -- a
 ## bright pearlescent cream, distinctly shinier than the plain off-white
 ## body_color default, but deliberately not tinted toward any element's own
@@ -738,7 +743,7 @@ func _build_body_mesh() -> ArrayMesh:
 ## which doesn't match that lore and made most gem/blorb pairings silently
 ## "not react" for no reason a player could discover.
 func can_merge(element: String) -> bool:
-	return element_state == "" and element != "" and not is_blorbus and not is_shiny
+	return element_state == "" and element != "" and not is_blorbus and not is_shiny and (element != "fighting" or blorb_type != "size")
 
 
 ## "Normal", "Shiny" (the rare cosmetic wild variant, see is_shiny -- never
@@ -1114,6 +1119,8 @@ func icon_color() -> Color:
 
 func _element_glow_color() -> Color:
 	match element_state:
+		"fighting":
+			return ShopCatalog.FIGHTING_COLOR
 		"water":
 			return Color(0.3, 0.55, 0.95)
 		"fire":
@@ -1146,6 +1153,8 @@ func merge_element(element: String) -> void:
 	if not can_merge(element):
 		return
 	element_state = element
+	if element == "fighting":
+		add_core_item("Boxing Gloves")
 	_apply_element_visuals()
 	if is_starter_trio:
 		_check_blorbus_awakening()
@@ -1154,6 +1163,17 @@ func merge_element(element: String) -> void:
 func _apply_element_visuals() -> void:
 	var core_material: StandardMaterial3D = _core_mesh_instance.get_meta("material")
 	match element_state:
+		"fighting":
+			_body_material.albedo_color = Color(ElementPalette.FIGHTING_BODY, 0.9)
+			_body_material.roughness = 0.3
+			core_material.albedo_color = ShopCatalog.FIGHTING_COLOR
+			core_material.emission_enabled = true
+			core_material.emission = ShopCatalog.FIGHTING_COLOR
+			core_material.emission_energy_multiplier = 0.8
+			if not is_melted and _boxing == null:
+				_boxing = BOXING.new()
+				_boxing.name = "FightingGloves"
+				body.add_child(_boxing)
 		"water":
 			# Medium-dark blue, deliberately between a pale sky blue and
 			# a near-navy -- "dark viscous water," per direct
@@ -1543,6 +1563,8 @@ func begin_worn() -> void:
 ## queued plant shot/deferred melee impact is cancelled here.
 func _cancel_autonomous_combat() -> void:
 	_combat_target = null
+	_boxing_target = null
+	if is_instance_valid(_boxing): _boxing.cancel()
 	_state = State.IDLE
 	_attack_cooldown = 0.0
 	_hop_is_attack = false
@@ -1696,6 +1718,8 @@ func _process(delta: float) -> void:
 		return
 	if _dormant(delta):
 		return
+	if is_instance_valid(_boxing) and _boxing.advance(delta):
+		_apply_boxing_damage()
 	_update_slime_excretion(delta)
 	if _platform_aid_time > 0.0 and is_instance_valid(_platform_aid_target):
 		_platform_aid_time -= delta
@@ -1852,6 +1876,8 @@ func _process(delta: float) -> void:
 		var is_stream := element_state in ["water", "fire", "electric", "city"]
 		var engage_range: float
 		match element_state:
+			"fighting":
+				engage_range = BOXING_RANGE
 			"water", "fire", "electric", "city":
 				engage_range = STREAM_RANGE
 			"rock", "ice":
@@ -1868,7 +1894,14 @@ func _process(delta: float) -> void:
 		# only `to_skeleton` -- this blorb steers across the ground plane
 		# regardless, only the attack gate needs the real 3D check.
 		if global_position.distance_to(_combat_target.global_position) > engage_range:
-			target = skeleton_here - to_skeleton.normalized() * engage_range
+			var approach_range := engage_range
+			if element_state == "fighting":
+				# The attack gate uses 3D distance but movement uses XZ. Stopping
+				# at the full radius horizontally leaves even a tiny height offset
+				# outside punching range forever. Leave room inside that sphere.
+				var dy := global_position.y - _combat_target.global_position.y
+				approach_range = sqrt(maxf(0.0, engage_range * engage_range - dy * dy)) * 0.9
+			target = skeleton_here - to_skeleton.normalized() * approach_range
 			glide_speed = _follow_glide_speed
 			moving = true
 			_set_combat_stream_active(false)
@@ -1877,12 +1910,14 @@ func _process(delta: float) -> void:
 			# continuing to close the last bit of distance, which would
 			# otherwise walk a jump-attacker straight into the skeleton.
 			if to_skeleton.length() > 0.01:
-				var face_angle := atan2(to_skeleton.x, to_skeleton.y) + PI
+				var face_angle := atan2(to_skeleton.x, to_skeleton.y) + (0.0 if element_state == "fighting" else PI)
 				rotation.y = lerp_angle(rotation.y, face_angle, ROTATION_SPEED * motion_speed_scale() * delta)
 			if is_stream:
 				_update_elemental_stream(delta)
 			else:
 				match element_state:
+					"fighting":
+						_try_boxing_attack()
 					"rock", "ice":
 						_try_rock_attack()
 					"plant":
@@ -1917,7 +1952,7 @@ func _process(delta: float) -> void:
 			# Blorb faces are authored toward local -Z, so add the same half-turn
 			# used by direct Blorbus control. Without it, ordinary followers and
 			# wanderers visually glide backward toward their targets.
-			var target_angle := atan2(to_target.x, to_target.y) + PI
+			var target_angle := atan2(to_target.x, to_target.y) + (0.0 if element_state == "fighting" else PI)
 			rotation.y = lerp_angle(rotation.y, target_angle, ROTATION_SPEED * motion_speed_scale() * delta)
 
 		if allow_movement_hops and not _hop_active and _rng.randf() < HOP_CHANCE_PER_SEC * delta:
@@ -2103,7 +2138,10 @@ func _update_surface_tilt(delta: float, world_normal: Vector3) -> void:
 		world_normal = Vector3.UP
 	var root_rotation := global_transform.basis.orthonormalized()
 	var local_up := (root_rotation.inverse() * world_normal).normalized()
-	var local_forward := Vector3.FORWARD - local_up * Vector3.FORWARD.dot(local_up)
+	# The fighter's eyes and gloves face local +Z together. Its combat yaw
+	# already points that way; preserve it instead of adding the legacy half-turn.
+	var front := Vector3.BACK if element_state == "fighting" else Vector3.FORWARD
+	var local_forward := front - local_up * front.dot(local_up)
 	if local_forward.length_squared() < 0.0001:
 		local_forward = Vector3.RIGHT - local_up * Vector3.RIGHT.dot(local_up)
 	local_forward = local_forward.normalized()
@@ -2543,11 +2581,39 @@ func _find_nearest_skeleton(here: Vector2) -> Node3D:
 
 func _exit_combat(here: Vector2) -> void:
 	_combat_target = null
+	_boxing_target = null
+	if is_instance_valid(_boxing): _boxing.cancel()
 	_set_combat_stream_active(false)
 	_state = State.IDLE
 	_home = here
 	_has_wander_target = false
 	_idle_pause_timer = _rng.randf_range(IDLE_PAUSE_MIN, IDLE_PAUSE_MAX)
+
+
+func _try_boxing_attack() -> void:
+	if _attack_cooldown > 0.0 or not is_instance_valid(_combat_target) or not is_instance_valid(_boxing): return
+	if _boxing.begin_punch():
+		_boxing_target = _combat_target
+		_attack_cooldown = BOXING_COOLDOWN
+
+
+func _apply_boxing_damage() -> void:
+	var victim := _boxing_target
+	_boxing_target = null
+	if not is_instance_valid(victim) or is_worn or is_melted or not in_party or _state != State.COMBAT: return
+	if not victim.has_method("take_damage") or global_position.distance_to(victim.global_position) > BOXING_RANGE: return
+	if victim.has_method("is_defeated") and victim.is_defeated(): return
+	# A close-range hit still cannot pass through a wall between the bodies.
+	var from := global_position + Vector3.UP * 0.7
+	var to := victim.global_position + Vector3.UP * 0.7
+	var query := PhysicsRayQueryParameters3D.create(from, to, 1)
+	query.exclude = [get_rid()]
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if not hit.is_empty() and hit.collider != victim and not victim.is_ancestor_of(hit.collider): return
+	var damage := float(ShopCatalog.find("Boxing Gloves").get("punch_damage", 16.0))
+	var roll := CombatMath.rolled_attack(damage, strength, _rng)
+	victim.take_damage(roll["amount"], self)
+	UISounds.play_blorb_body_hit(get_instance_id())
 
 
 ## Non-elemental blorbs' combat response: a melee bounce dealing

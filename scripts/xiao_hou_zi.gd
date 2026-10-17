@@ -188,6 +188,7 @@ var _lava := LavaMode.new()
 var _dirtbike := DirtbikeMode.new()
 ## The Leaf Hat's vine, the same power the human swings on.
 var _vine_swing := VineSwingMode.new()
+var _fighting_punch := FightingPunchMode.new()
 ## Airborne off a released swing, so the arc's momentum is his until he lands.
 var _direct_vine_airborne := false
 ## His snowboard: the same power the player rides, on his own rig and at his
@@ -357,6 +358,12 @@ func _on_talk() -> void:
 	DialogUI.show_line(display_name, line)
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if not is_player_controlled or UIState.modal_open or event.is_echo(): return
+	if event.is_action_pressed("left_arm_power"): _fighting_punch.queue_press(0)
+	if event.is_action_pressed("right_arm_power"): _fighting_punch.queue_press(1)
+
+
 func _process(delta: float) -> void:
 	EyeBlink.apply(_eye_blink, delta, _eyes)
 	_update_head_look(delta)
@@ -368,6 +375,13 @@ func _process(delta: float) -> void:
 		_update_ai(delta)
 	# This body always remains Xiao Hou Zi's real MonkeyFigure now. Its tubes
 	# must follow the animated pivots during direct control as well as AI.
+	if is_player_controlled and not _vine_swing.swinging and not UIState.modal_open:
+		var ctx := _traversal_context(delta)
+		_fighting_punch.requested = [Input.is_action_pressed("left_arm_power"), Input.is_action_pressed("right_arm_power")]
+		_fighting_punch.update(ctx)
+		_fighting_punch.pose(ctx)
+	else:
+		_fighting_punch.reset()
 	MonkeyFigure.rebuild_limbs(_pivots, self, delta)
 	_blorb_suit.update(delta)
 	_update_direct_ice_skate_state()
@@ -709,6 +723,7 @@ func begin_direct_control() -> void:
 ## it stood in for the human), re-enables the "Talk" prompt, and resumes
 ## being himself.
 func end_direct_control() -> void:
+	_fighting_punch.reset()
 	if _interact_area != null:
 		_interact_area.monitoring = true
 	is_player_controlled = false
@@ -1322,6 +1337,10 @@ func _apply_direct_power_pose(delta: float) -> void:
 		var elbow := _pivots["elbow_%s" % side] as Node3D
 		var wrist := _pivots["wrist_%s" % side] as Node3D
 		if arm == null or elbow == null or wrist == null:
+			continue
+		if FightingPunchMode.owns_arm(_blorb_suit, side):
+			if side == "left": _direct_left_arm_power_blend = 0.0
+			else: _direct_right_arm_power_blend = 0.0
 			continue
 		var held := Input.is_action_pressed(action)
 		var blend: float = _direct_left_arm_power_blend if side == "left" else _direct_right_arm_power_blend

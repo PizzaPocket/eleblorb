@@ -11,6 +11,7 @@ static var _soft_block_unit: ArrayMesh
 
 static func build_packs() -> Dictionary:
 	var packs := {}
+	var tree_templates: Dictionary={}
 	for s in PLAN.STREETS:
 		var r: Rect2 = s.rect
 		var body := _box_body("Street_%s" % s.name, Vector3(r.size.x, 0.16, r.size.y), Vector3(r.position.x + r.size.x * 0.5, DATUM - 0.05, r.position.y + r.size.y * 0.5), Color("#9c8970"))
@@ -39,32 +40,7 @@ static func build_packs() -> Dictionary:
 		var r: Rect2 = lot[0]
 		var h := float(lot[1]) * float(PLAN.STOREY[lot[2]])
 		var color := _lot_color(i, String(lot[2]))
-		var body: StaticBody3D
-		if _needs_spine_portal(r,h):
-			# Keep the recorded footprint and roof, but form a real clear tunnel
-			# through the mass wherever the elevated Spine runs through a lot.
-			body=StaticBody3D.new(); body.name="Lot_%03d"%i; body.collision_layer=1; body.collision_mask=1
-			body.position=Vector3(r.get_center().x,DATUM,r.get_center().y)
-			var tunnel_half_width:=6.8
-			var tunnel_bottom:=10.9
-			# Covers the highest +20 m gate approach plus the car's roof and query margin.
-			var tunnel_top:=24.0
-			var spine_x:float=-557.0
-			var left_width:=clampf(spine_x-tunnel_half_width-r.position.x,0.0,r.size.x)
-			var right_start:=clampf(spine_x+tunnel_half_width-r.position.x,0.0,r.size.x)
-			var right_width:=r.size.x-right_start
-			if h>tunnel_bottom:
-				_add_building_box_part(body,Vector3(r.size.x,minf(h,tunnel_bottom),r.size.y),Vector3(0.0,minf(h,tunnel_bottom)*0.5,0.0),color)
-			if h>tunnel_top:
-				_add_building_box_part(body,Vector3(r.size.x,h-tunnel_top,r.size.y),Vector3(0.0,(h+tunnel_top)*0.5,0.0),color.lightened(0.12))
-			var tunnel_height:=minf(maxf(0.0,h-tunnel_bottom),tunnel_top-tunnel_bottom)
-			if tunnel_height>0.05:
-				if left_width>0.05:
-					_add_building_box_part(body,Vector3(left_width,tunnel_height,r.size.y),Vector3(-r.size.x*0.5+left_width*0.5,tunnel_bottom+tunnel_height*0.5,0.0),color)
-				if right_width>0.05:
-					_add_building_box_part(body,Vector3(right_width,tunnel_height,r.size.y),Vector3(r.size.x*0.5-right_width*0.5,tunnel_bottom+tunnel_height*0.5,0.0),color)
-		else:
-			body = _box_body("Lot_%03d" % i, Vector3(r.size.x, h, r.size.y), Vector3(r.get_center().x, DATUM + h * 0.5, r.get_center().y), color)
+		var body := _box_body("Lot_%03d" % i, Vector3(r.size.x, h, r.size.y), Vector3(r.get_center().x, DATUM + h * 0.5, r.get_center().y), color)
 		_add_roof(body, r.size, h, color.lightened(0.15))
 		_add(packs, _cell(r.get_center()), body)
 	for i in PLAN.OLD_HOUSES.size():
@@ -77,14 +53,15 @@ static func build_packs() -> Dictionary:
 			continue
 		var body := _landmark(b)
 		_add(packs, _cell(b.rect.get_center()), body)
-	_add_deck(packs)
+	_add_deck(packs,tree_templates)
 	_add_wall(packs)
-	_add_park(packs)
+	_add_park(packs,tree_templates)
 	_add_estate_links(packs)
 	_add_transit(packs)
 	_add_gate_forms(packs)
 	_add_timekeeper(packs)
 	_add_turbines(packs)
+	for template in tree_templates.values(): (template as StaticBody3D).free()
 	return packs
 
 
@@ -96,19 +73,23 @@ static func build_silhouette() -> Node3D:
 	material.vertex_color_use_as_albedo=true
 	var lots := MultiMesh.new(); lots.transform_format=MultiMesh.TRANSFORM_3D; lots.use_colors=true; lots.mesh=box
 	lots.instance_count=PLAN.LOTS.size()
+	var lot_transforms: Array[Transform3D]=[]; var lot_colors: Array[Color]=[]
 	for i in PLAN.LOTS.size():
 		var l: Array=PLAN.LOTS[i]; var r: Rect2=l[0]; var h:=float(l[1])*float(PLAN.STOREY[l[2]])
-		lots.set_instance_transform(i,Transform3D(Basis.from_scale(Vector3(r.size.x,h,r.size.y)),Vector3(r.get_center().x,DATUM+h*0.5,r.get_center().y)))
-		lots.set_instance_color(i,Color("#b9a181") if String(l[2])=="fabric" else Color("#a48f73"))
-	var li := MultiMeshInstance3D.new(); li.name="LotSilhouettes"; li.multimesh=lots; li.material_override=material; li.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; root.add_child(li)
+		var transform:=Transform3D(Basis.from_scale(Vector3(r.size.x,h,r.size.y)),Vector3(r.get_center().x,DATUM+h*0.5,r.get_center().y)); var tint:=Color("#b9a181") if String(l[2])=="fabric" else Color("#a48f73")
+		lots.set_instance_transform(i,transform); lots.set_instance_color(i,tint); lot_transforms.append(transform); lot_colors.append(tint)
+	_store_multimesh_buffer(lots,lot_transforms,lot_colors)
+	var li := MultiMeshInstance3D.new(); li.name="LotSilhouettes"; li.multimesh=lots; li.custom_aabb=_multimesh_bounds(lots,lot_transforms); li.material_override=material; li.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; root.add_child(li)
 	var old := MultiMesh.new(); old.transform_format=MultiMesh.TRANSFORM_3D; old.use_colors=true; old.mesh=box
 	old.instance_count=PLAN.OLD_HOUSES.size()
+	var old_transforms: Array[Transform3D]=[]; var old_colors: Array[Color]=[]
 	for i in PLAN.OLD_HOUSES.size():
 		var h: Dictionary=PLAN.OLD_HOUSES[i]; var pts: Array=h.corners
 		var r:=_point_bounds(pts); var height:=float(h.storeys)*3.25
-		old.set_instance_transform(i,Transform3D(Basis.from_scale(Vector3(r.size.x,height,r.size.y)),Vector3(r.get_center().x,DATUM+height*0.5,r.get_center().y)))
-		old.set_instance_color(i,Color("#c6aa82"))
-	var oi := MultiMeshInstance3D.new(); oi.name="OldHouseSilhouettes"; oi.multimesh=old; oi.material_override=material; oi.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; root.add_child(oi)
+		var transform:=Transform3D(Basis.from_scale(Vector3(r.size.x,height,r.size.y)),Vector3(r.get_center().x,DATUM+height*0.5,r.get_center().y)); var tint:=Color("#c6aa82")
+		old.set_instance_transform(i,transform); old.set_instance_color(i,tint); old_transforms.append(transform); old_colors.append(tint)
+	_store_multimesh_buffer(old,old_transforms,old_colors)
+	var oi := MultiMeshInstance3D.new(); oi.name="OldHouseSilhouettes"; oi.multimesh=old; oi.custom_aabb=_multimesh_bounds(old,old_transforms); oi.material_override=material; oi.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; root.add_child(oi)
 	for b in PLAN.BUILDINGS:
 		if b.rect==null: continue
 		var r: Rect2=b.rect; var h:=maxf(float(b.height),4.0)
@@ -152,7 +133,7 @@ static func _silhouette_box(root: Node3D, label: String, size: Vector3, center: 
 
 static func _add_silhouette_wall(root: Node3D, material: Material) -> void:
 	var mesh:=BoxMesh.new(); mesh.size=Vector3.ONE
-	var multi:=MultiMesh.new(); multi.transform_format=MultiMesh.TRANSFORM_3D; multi.mesh=mesh; multi.instance_count=64
+	var multi:=MultiMesh.new(); multi.transform_format=MultiMesh.TRANSFORM_3D; multi.mesh=mesh; multi.instance_count=64; var transforms: Array[Transform3D]=[]
 	var r:=float(PLAN.WALL.r)
 	for i in 64:
 		var a:=TAU*float(i)/64.0; var b:=TAU*float(i+1)/64.0; var mid:Vector2=Vector2(PLAN.CENTER.x+r*cos((a+b)*0.5),r*sin((a+b)*0.5))
@@ -162,8 +143,9 @@ static func _add_silhouette_wall(root: Node3D, material: Material) -> void:
 		var d:=Vector2(PLAN.CENTER.x+r*cos(b),r*sin(b))-Vector2(PLAN.CENTER.x+r*cos(a),r*sin(a))
 		var segment_scale:=Vector3.ZERO if blocked else Vector3(d.length(),12.0,12.0)
 		var transform:=Transform3D(Basis(Vector3.UP,-atan2(d.y,d.x))*Basis.from_scale(segment_scale),Vector3(mid.x,DATUM+6.0,mid.y))
-		multi.set_instance_transform(i,transform)
-	var wall:=MultiMeshInstance3D.new(); wall.name="RimWallSilhouette"; wall.multimesh=multi; wall.material_override=material; wall.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; root.add_child(wall)
+		multi.set_instance_transform(i,transform); transforms.append(transform)
+	_store_multimesh_buffer(multi,transforms)
+	var wall:=MultiMeshInstance3D.new(); wall.name="RimWallSilhouette"; wall.multimesh=multi; wall.custom_aabb=_multimesh_bounds(multi,transforms); wall.material_override=material; wall.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; root.add_child(wall)
 
 
 static func _point_bounds(points: Array) -> Rect2:
@@ -205,6 +187,14 @@ static func _box_body(label: String, size: Vector3, center: Vector3, color: Colo
 	return body
 
 
+static func _round_column(label: String, radius: float, height: float, center: Vector3, color: Color) -> StaticBody3D:
+	var body:=StaticBody3D.new(); body.name=label; body.position=center; body.collision_layer=1; body.collision_mask=1
+	var mesh:=CylinderMesh.new(); mesh.top_radius=radius; mesh.bottom_radius=radius; mesh.height=height; mesh.radial_segments=12
+	var visual:=MeshInstance3D.new(); visual.mesh=mesh; visual.material_override=_material(color); body.add_child(visual)
+	var shape:=CylinderShape3D.new(); shape.radius=radius; shape.height=height; var col:=CollisionShape3D.new(); col.shape=shape; body.add_child(col)
+	return body
+
+
 static func _add_building_box_part(root: StaticBody3D, size: Vector3, center: Vector3, color: Color) -> void:
 	var shape:=BoxShape3D.new(); shape.size=size
 	var collision:=CollisionShape3D.new(); collision.shape=shape; collision.position=center; root.add_child(collision)
@@ -232,21 +222,6 @@ static func _lot_color(index: int, kind: String) -> Color:
 
 static func _old_house_color(index: int) -> Color:
 	return [Color("#d5c09d"), Color("#c8a685"), Color("#d1b2a3"), Color("#b2c4b8"), Color("#c0c6cf")][index % 5]
-
-
-static func _needs_spine_portal(rect: Rect2, height: float) -> bool:
-	if height<=10.9: return false
-	for service in PLAN.CROSS.services:
-		if String(service.line)!="Spine Line": continue
-		var points: Array=service.get("profile",service.pts)
-		for i in points.size()-1:
-			var a:=Vector2(points[i][0],points[i][1]); var b:=Vector2(points[i+1][0],points[i+1][1])
-			var d:=b-a
-			if absf(d.y)<=absf(d.x): continue
-			var train_z_min:=minf(a.y,b.y)-4.8; var train_z_max:=maxf(a.y,b.y)+4.8
-			if rect.position.x<=a.x+6.8 and rect.end.x>=a.x-6.8 and rect.position.y<=train_z_max and rect.end.y>=train_z_min:
-					return true
-	return false
 
 
 static func _polygon_center(points: Array) -> Vector2:
@@ -319,16 +294,6 @@ static func _landmark(b: Dictionary) -> Node3D:
 		var dm := MeshInstance3D.new(); dm.mesh=drum; dm.position.y=102; dm.material_override=_material(Color("#a98a65")); body.add_child(dm)
 		var collision := CollisionShape3D.new(); var cs := CylinderShape3D.new(); cs.radius=14; cs.height=96; collision.shape=cs; collision.position.y=48; body.add_child(collision)
 		return body
-	if n == 37:
-		# The authored Spine track passes this shop within 0.3 m of its west
-		# wall. Cut a train-sized portal through the edge, including car body
-		# clearance below the rail centreline; retain the shop around the portal.
-		var body:=StaticBody3D.new(); body.name="Building_37_%s"%String(b.name).replace(" ","_"); body.collision_layer=1; body.collision_mask=1
-		body.position=Vector3(center.x,DATUM,center.y)
-		_add_building_box_part(body,Vector3(5.5,h,r.size.y),Vector3(1.25,h*0.5,0.0),color)
-		_add_building_box_part(body,Vector3(2.5,9.0,r.size.y),Vector3(-2.75,4.5,0.0),color)
-		_add_building_box_part(body,Vector3(2.5,0.2,r.size.y),Vector3(-2.75,17.1,0.0),color.lightened(0.12))
-		return body
 	if String(b.kind) == "estate":
 		var body := StaticBody3D.new(); body.name="Building_%02d_%s" % [n,String(b.name).replace(" ","_")]; body.collision_layer=1; body.collision_mask=1
 		body.position=Vector3(center.x,DATUM,center.y); body.rotation.y=-deg_to_rad(float(b.angle))
@@ -365,20 +330,42 @@ static func _landmark(b: Dictionary) -> Node3D:
 	return body
 
 
-static func _add_deck(packs: Dictionary) -> void:
+static func _add_deck(packs: Dictionary, tree_templates: Dictionary) -> void:
 	var level := DATUM + float(PLAN.DECK.level)
 	# The authored paired columns carry each Deck run from terrain to its soffit.
-	for p in PLAN.DECK.columns:
-		var column_height:=float(PLAN.DECK.level)-0.9
-		var column:=_box_body("DeckColumn",Vector3(0.9,column_height,0.9),Vector3(float(p[0]),DATUM+column_height*0.5,float(p[1])),Color("#978b74"))
+	for column_index in PLAN.DECK.columns.size():
+		var p: Array=PLAN.DECK.columns[column_index]
+		var column_height:=float(PLAN.DECK.level)-float(PLAN.DECK.depth)
+		var column:=_round_column("DeckColumn_%03d"%column_index,float(PLAN.DECK.col)*0.5,column_height,Vector3(float(p[0]),DATUM+column_height*0.5,float(p[1])),Color("#978b74"))
 		_add(packs,_cell(Vector2(float(p[0]),float(p[1]))),column)
 	for run in PLAN.DECK.runs:
 		var pts: Array = run.pts
 		for j in pts.size()-1:
 			var a := Vector2(pts[j][0],pts[j][1]); var b := Vector2(pts[j+1][0],pts[j+1][1])
 			var width := float(run.w)
-			var bridge := _segment_body("Deck_%s_%d" % [run.name,j],a,b,width,level-0.45,0.9,Color("#b8a782"))
+			var depth:=float(PLAN.CROSSING.ring_depth) if String(run.name)=="Crossing Ring" else 0.9
+			var bridge := _segment_body("Deck_%s_%d" % [run.name,j],a,b,width,level-depth,depth,Color("#b8a782"))
 			_add(packs,_cell((a+b)*0.5),bridge)
+	for parapet_index in PLAN.DECK.parapets.size():
+		var seg: Array=PLAN.DECK.parapets[parapet_index]
+		var a:=Vector2(float(seg[0]),float(seg[1])); var b:=Vector2(float(seg[2]),float(seg[3]))
+		var kind:=String(seg[5]); var width:=0.12 if kind=="rail" else 0.08
+		var rail:=_segment_body("DeckParapet_%03d_%s"%[parapet_index,kind],a,b,width,level,float(seg[4]),Color("#858c87") if kind=="rail" else Color("#a9c5c6"))
+		_add(packs,_cell((a+b)*0.5),rail)
+	for bed_i in PLAN.DECK.beds.size():
+		var bed: Dictionary=PLAN.DECK.beds[bed_i]; var bed_root:=Node3D.new(); bed_root.name="DeckGardenBed_%02d"%bed_i
+		var pts: Array=bed.pts
+		bed_root.set_meta("plan_width",float(bed.w))
+		for j in pts.size()-1:
+			var a:=Vector2(pts[j][0],pts[j][1]); var b:=Vector2(pts[j+1][0],pts[j+1][1])
+			var body:=_segment_body("DeckGardenBed_%02d_Segment_%03d"%[bed_i,j],a,b,float(bed.w),level,0.45,Color("#756f55"))
+			bed_root.add_child(body)
+		var bed_center:=Vector2(float(pts[0][0]),float(pts[0][1])); _add(packs,_cell(bed_center),bed_root)
+	for i in PLAN.DECK.trees.size():
+		var tree_data: Dictionary=PLAN.DECK.trees[i]; var c: Vector2=Vector2(tree_data.c[0],tree_data.c[1])
+		var key:="round|%.2f|%s"%[float(tree_data.h),Color("#839568").to_html()]
+		var tree:=_instance_tree(tree_templates,key,"round",float(tree_data.h),Color("#839568"),i); tree.name="DeckTree_%02d"%i; tree.position=Vector3(c.x,DATUM+float(tree_data.y),c.y)
+		_add(packs,_cell(c),tree)
 	for ramp in PLAN.DECK.ramps:
 		var c: Vector2 = Vector2(ramp.c[0],ramp.c[1])
 		var directions: Dictionary = {"n":Vector2(0,-1),"s":Vector2(0,1),"e":Vector2(1,0),"w":Vector2(-1,0)}
@@ -391,8 +378,6 @@ static func _add_deck(packs: Dictionary) -> void:
 		var lower_flight := _ramp_body("DeckRamp_%s_lower" % ramp.name,bottom,mid,2.6,0.55,Color("#a99470"))
 		var upper_flight := _ramp_body("DeckRamp_%s_upper" % ramp.name,mid,top,2.6,0.55,Color("#a99470"))
 		var landing := _box_body("DeckRamp_%s_landing"%ramp.name,Vector3(3.8,0.35,3.8),mid,Color("#b6a17b"))
-		_add_ramp_guardrails(lower_flight,2.6,bottom.distance_to(mid))
-		_add_ramp_guardrails(upper_flight,2.6,mid.distance_to(top))
 		var foot_landing:=_box_body("DeckRamp_%s_FootLanding"%ramp.name,Vector3(3.8,0.35,3.8),bottom-Vector3.UP*0.175,Color("#b6a17b"))
 		var head_landing:=_box_body("DeckRamp_%s_HeadLanding"%ramp.name,Vector3(3.8,0.35,3.8),top-Vector3.UP*0.175,Color("#b6a17b"))
 		for body in [lower_flight,upper_flight,landing,foot_landing,head_landing]: _add(packs,_cell(c),body)
@@ -408,11 +393,7 @@ static func _add_deck(packs: Dictionary) -> void:
 		var car:=AnimatableBody3D.new(); car.name="DeckLift_%s"%String(lift.name).replace(" ","_"); car.position=Vector3(c.x,DATUM,c.y); car.set_script(load("res://scripts/moy_lift_platform.gd"));
 		var platform:=BoxMesh.new(); platform.size=Vector3(radius*2,0.28,radius*2); var pv:=MeshInstance3D.new(); pv.mesh=platform; pv.material_override=_material(Color("#c7d1ce")); car.add_child(pv)
 		var ps:=BoxShape3D.new(); ps.size=platform.size; var pc:=CollisionShape3D.new(); pc.shape=ps; car.add_child(pc); _add(packs,_cell(c),car)
-	for p in PLAN.CROSS.stations:
-		for escalator in p.get("_esc",[]):
-			var foot:=Vector3(escalator.foot[0],DATUM+6.5,escalator.foot[1])
-			var head:=Vector3(escalator.head[0],DATUM+13.0,escalator.head[1])
-			_add_escalator_pair(packs,"SpinePlatformEscalator_%s"%String(p.name).replace(" ","_"),foot,head,2.6)
+	_add_crossing_towers(packs)
 
 
 static func _add_wall(packs: Dictionary) -> void:
@@ -428,7 +409,7 @@ static func _add_wall(packs: Dictionary) -> void:
 		_add(packs,_cell(p),body)
 
 
-static func _add_park(packs: Dictionary) -> void:
+static func _add_park(packs: Dictionary, tree_templates: Dictionary) -> void:
 	var playground: Dictionary = PLAN.PARK.playground
 	for tower in playground.towers:
 		var c := Vector2(tower[0],tower[1]); var h := float(tower[2]); var radius := float(tower[3])
@@ -445,6 +426,94 @@ static func _add_park(packs: Dictionary) -> void:
 	water.scale=Vector3(r.x,1,r.y); water.position=Vector3(c.x,DATUM+0.4,c.y)
 	var water_material:=ShaderMaterial.new(); water_material.shader=load("res://shaders/moy_pond_water.gdshader"); water.material_override=water_material; water.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var root := Node3D.new(); root.name="MoyReedPond"; root.add_child(water); _add(packs,_cell(c),root)
+	for i in PLAN.PARK.trees.size():
+		var data: Dictionary=PLAN.PARK.trees[i]; var p: Vector2=Vector2(data.c[0],data.c[1]); var h:=float(data.h)
+		var leaf_color:=Color("#81936a"); var kind:=String(data.kind); var key:="%s|%.2f|%s"%[kind,h,leaf_color.to_html()]
+		var tree:=_instance_tree(tree_templates,key,kind,h,leaf_color,i)
+		tree.name="ParkTree_%02d_%s"%[i,String(data.kind)]; tree.position=Vector3(p.x,DATUM,p.y); _add(packs,_cell(p),tree)
+	var shrub_mesh_root:=NatureProps.build_bush(Color("#648756")); StaticMerge.merge(shrub_mesh_root)
+	var shrub_mesh_instance:=shrub_mesh_root.get_child(0) as MeshInstance3D
+	var shrub_mesh: Mesh=shrub_mesh_instance.mesh; var shrub_material: Material=shrub_mesh_instance.material_override
+	shrub_mesh_root.free()
+	var shrub_transforms: Dictionary={}; var shrub_counts: Dictionary={}
+	for p in PLAN.PARK.shrubs:
+		var pos:=Vector2(float(p[0]),float(p[1])); var cell:=_cell(pos)
+		if not shrub_transforms.has(cell): shrub_transforms[cell]=[]; shrub_counts[cell]=0
+		(shrub_transforms[cell] as Array).append(Transform3D(Basis.from_scale(Vector3(6.5,4.7,6.5)),Vector3(pos.x,DATUM,pos.y))); shrub_counts[cell]=int(shrub_counts[cell])+1
+	_add_plant_multimeshes(packs,"ParkShrub",shrub_mesh,shrub_material,shrub_transforms,shrub_counts)
+	var reed_mesh:=BoxMesh.new(); reed_mesh.size=Vector3(0.09,1.0,0.09); var reed_transforms: Dictionary={}; var reed_counts: Dictionary={}
+	for data in PLAN.PARK.reeds:
+		var p: Vector2=Vector2(data.c[0],data.c[1]); var cell:=_cell(p)
+		if not reed_transforms.has(cell): reed_transforms[cell]=[]; reed_counts[cell]=0
+		for stem in int(data.stems):
+			var height:=float(data.h); var origin:=Vector3(p.x+(float(stem)-1.0)*0.16,DATUM+height*0.5,p.y)
+			(reed_transforms[cell] as Array).append(Transform3D(Basis.from_scale(Vector3.ONE*Vector3(1,height,1)),origin))
+		reed_counts[cell]=int(reed_counts[cell])+1
+	_add_plant_multimeshes(packs,"ParkReedClump",reed_mesh,_material(Color("#758e58")),reed_transforms,reed_counts)
+	for i in PLAN.PARK.rocks.size():
+		var data: Dictionary=PLAN.PARK.rocks[i]; var p: Vector2=Vector2(data.c[0],data.c[1]); var half: Array=data.half
+		var size:=Vector3(float(half[0])*2,float(half[1])*2,float(half[2])*2); var center:=Vector3(p.x,DATUM+float(half[1]),p.y)
+		if float(half[1])>=1.0:
+			_add(packs,_cell(p),_box_body("ParkRock_%02d"%i,size,center,Color("#777467")))
+		else:
+			var rock:=MeshInstance3D.new(); rock.name="ParkRock_%02d"%i; var rockmesh:=BoxMesh.new(); rockmesh.size=size; rock.mesh=rockmesh; rock.position=center; rock.material_override=_material(Color("#777467")); var holder:=Node3D.new(); holder.add_child(rock); _add(packs,_cell(p),holder)
+	var agave_root:=Node3D.new()
+	for leaf in 5:
+		var blade:=MeshInstance3D.new(); var agavemesh:=BoxMesh.new(); agavemesh.size=Vector3(0.18,1.5,0.42); blade.mesh=agavemesh; blade.position=Vector3(0,0.72,0); blade.rotation.z=deg_to_rad(float(leaf-2)*20.0); blade.rotation.y=TAU*float(leaf)/5.0; blade.material_override=_material(Color("#80946c")); agave_root.add_child(blade)
+	StaticMerge.merge(agave_root); var agave_instance:=agave_root.get_child(0) as MeshInstance3D; var agave_mesh:Mesh=agave_instance.mesh; var agave_material:Material=agave_instance.material_override; agave_root.free()
+	var agave_transforms: Dictionary={}; var agave_counts: Dictionary={}
+	for p in PLAN.PARK.agave:
+		var pos:=Vector2(float(p[0]),float(p[1])); var cell:=_cell(pos)
+		if not agave_transforms.has(cell): agave_transforms[cell]=[]; agave_counts[cell]=0
+		(agave_transforms[cell] as Array).append(Transform3D(Basis.IDENTITY,Vector3(pos.x,DATUM,pos.y))); agave_counts[cell]=int(agave_counts[cell])+1
+	_add_plant_multimeshes(packs,"ParkAgave",agave_mesh,agave_material,agave_transforms,agave_counts)
+
+
+static func _add_plant_multimeshes(packs: Dictionary, item_name: String, mesh: Mesh, material: Material, transforms_by_cell: Dictionary, item_counts: Dictionary) -> void:
+	for cell in transforms_by_cell:
+		var transforms: Array=transforms_by_cell[cell]; var multimesh:=MultiMesh.new(); multimesh.transform_format=MultiMesh.TRANSFORM_3D; multimesh.mesh=mesh; multimesh.instance_count=transforms.size()
+		var typed_transforms: Array[Transform3D]=[]
+		for i in transforms.size():
+			var transform: Transform3D=transforms[i]; multimesh.set_instance_transform(i,transform); typed_transforms.append(transform)
+		_store_multimesh_buffer(multimesh,typed_transforms)
+		var instance:=MultiMeshInstance3D.new(); instance.name="%sMultiMesh_%s"%[item_name,str(cell)]; instance.multimesh=multimesh; instance.custom_aabb=_multimesh_bounds(multimesh,typed_transforms); instance.material_override=material; instance.set_meta("moy_item_count",int(item_counts[cell])); CollisionPolicy.mark_decorative(instance)
+		_add(packs,cell,instance)
+
+
+static func _store_multimesh_buffer(multimesh: MultiMesh, transforms: Array[Transform3D], colors: Array[Color]=[]) -> void:
+	var stride:=12+(4 if multimesh.use_colors else 0)+(4 if multimesh.use_custom_data else 0)
+	var buffer:=PackedFloat32Array(); buffer.resize(transforms.size()*stride)
+	for i in transforms.size():
+		var t:=transforms[i]; var values: Array[float]=[t.basis.x.x,t.basis.y.x,t.basis.z.x,t.origin.x,t.basis.x.y,t.basis.y.y,t.basis.z.y,t.origin.y,t.basis.x.z,t.basis.y.z,t.basis.z.z,t.origin.z]
+		for j in 12: buffer[i*stride+j]=values[j]
+		var cursor:=i*stride+12
+		if multimesh.use_colors:
+			var color: Color=colors[i] if i<colors.size() else Color.WHITE
+			buffer[cursor]=color.r; buffer[cursor+1]=color.g; buffer[cursor+2]=color.b; buffer[cursor+3]=color.a; cursor+=4
+		if multimesh.use_custom_data:
+			buffer[cursor]=0.0; buffer[cursor+1]=0.0; buffer[cursor+2]=0.0; buffer[cursor+3]=0.0
+	multimesh.buffer=buffer
+
+
+static func _multimesh_bounds(multimesh: MultiMesh, transforms: Array[Transform3D]) -> AABB:
+	var mesh_bounds:=multimesh.mesh.get_aabb(); var bounds:=AABB()
+	for i in transforms.size():
+		var instance_bounds:=transforms[i]*mesh_bounds
+		bounds=instance_bounds if i==0 else bounds.merge(instance_bounds)
+	return bounds
+
+
+static func _instance_tree(cache: Dictionary, key: String, kind: String, height: float, leaf: Color, seed_index: int) -> StaticBody3D:
+	if not cache.has(key):
+		var rng:=RandomNumberGenerator.new(); rng.seed=seed_index+1
+		var template: StaticBody3D
+		match kind:
+			"round": template=NatureProps.build_round_tree(height,leaf)
+			"flowering": template=NatureProps.build_flowering_tree(height,leaf,Color("#d96b45"),rng)
+			"palm": template=NatureProps.build_palm_tree(height,0.0,rng)
+			_: template=NatureProps.build_banyan_tree(height,rng)
+		template.position=Vector3.ZERO; cache[key]=template
+	return (cache[key] as StaticBody3D).duplicate() as StaticBody3D
 
 
 static func _add_estate_links(packs: Dictionary) -> void:
@@ -456,17 +525,159 @@ static func _add_estate_links(packs: Dictionary) -> void:
 			_add(packs,_cell((a+b)*0.5),body)
 
 
+static func _add_meridian_pier(packs: Dictionary, x: float, rail: float, pier_index: int) -> void:
+	var stem_top:=DATUM+28.0; var rail_y:=DATUM+rail
+	var stem:=_round_column("MeridianPierStem_%02d"%pier_index,1.2,(stem_top-DATUM),Vector3(x,DATUM+(stem_top-DATUM)*0.5,0),Color("#888173")); _add(packs,_cell(Vector2(x,0)),stem)
+	for side_index in 2:
+		var side: float=-1.0 if side_index==0 else 1.0
+		var arm_foot:=Vector3(x,DATUM+25.5,0); var arm_head:=Vector3(x,DATUM+rail-1.2,side*2.7)
+		var arm:=_ramp_body("MeridianPierYArm_%02d_%d"%[pier_index,side_index],arm_foot,arm_head,1.15,1.15,Color("#888173")); _add(packs,_cell(Vector2(x,0)),arm)
+		var girder:=_box_body("MeridianBoxGirder_%02d_%d"%[pier_index,side_index],Vector3(36.0,1.2,1.0),Vector3(x,rail_y-1.2,side*1.7),Color("#77766f")); _add(packs,_cell(Vector2(x,0)),girder)
+	for vine_index in 2:
+		var z: float=-3.0 if vine_index==0 else 3.0
+		var vine:=_box_body("MeridianVineSleeve_%02d_%d"%[pier_index,vine_index],Vector3(0.3,21.0,0.3),Vector3(x,DATUM+17.5,z),Color("#66824f")); _add(packs,_cell(Vector2(x,z)),vine)
+
+
+static func _add_crossing_towers(packs: Dictionary) -> void:
+	var cfg: Dictionary=PLAN.CROSSING; var tcfg: Dictionary=cfg.tower
+	for ti in cfg.towers.size():
+		var data: Dictionary=cfg.towers[ti]; var c: Vector2=Vector2(data.c[0],data.c[1]); var root:=Node3D.new(); root.name="CrossingTower_%02d"%ti; root.position=Vector3(c.x,DATUM,c.y)
+		var trunk:=_round_column("CrossingTowerTrunk",float(tcfg.trunk),float(cfg.roof.y),Vector3(0,float(cfg.roof.y)*0.5,0),Color("#8e948d")); root.add_child(trunk)
+		# Each authored profile is tessellated into short, walkable moving belt sections.
+		for hand in data.hands:
+			var is_up:=String(hand.hand)=="up"
+			for pi in hand.profile.size():
+				var seg: Array=hand.profile[pi]; var a0:=deg_to_rad(float(seg[0])); var a1:=deg_to_rad(float(seg[1])); var y0:=float(seg[2]); var y1:=float(seg[3])
+				var count:=maxi(1,ceili(absf(a1-a0)*2.7))
+				for si in count:
+					var f0:=float(si)/float(count); var f1:=float(si+1)/float(count); var am:float=lerpf(a0,a1,(f0+f1)*0.5)
+					var ym:float=lerpf(y0,y1,(f0+f1)*0.5); var da:=absf(a1-a0)/float(count); var len:=maxf(0.16,2.7*da)
+					var tangent:=Vector3(-sin(am),0,cos(am)); var center:=Vector3(cos(am)*2.7,ym,sin(am)*2.7)
+					if y1==y0:
+						# The profile bearing is measured east-to-south around +Y.  A
+						# landing's long axis follows the tangent, not the radial axis.
+						var landing:=_box_body("CrossingHandLanding_%s_%d_%d"%[String(hand.hand),pi,si],Vector3(len,0.2,2.6),center,Color("#b5a783")); landing.rotation.y=-am-PI*0.5; root.add_child(landing)
+					else:
+						var p0:=Vector3(cos(lerpf(a0,a1,f0))*2.7,y0,sin(lerpf(a0,a1,f0))*2.7)
+						var p1:=Vector3(cos(lerpf(a0,a1,f1))*2.7,y1,sin(lerpf(a0,a1,f1))*2.7)
+						var belt:=_ramp_body("CrossingHand_%s_%d_%d"%[String(hand.hand),pi,si],p0,p1,2.6,0.16,Color("#aaa58f")); belt.set_script(load("res://scripts/moy_escalator.gd")); belt.set("travel_direction",(p1-p0).normalized()*(1.0 if is_up else -1.0)); belt.set("travel_speed",0.55); root.add_child(belt)
+		for level in [6.5,14.2,37.0]:
+			var ann:=_annulus_body("CrossingGallery_%.1f"%level,float(tcfg.gallery_r[0]),float(tcfg.gallery_r[1]),48,1.0,level); root.add_child(ann)
+			for rail_i in 36:
+				var a_deg:=float(rail_i)*10.0; var b_deg:=float(rail_i+1)*10.0; var mid_deg:float=(a_deg+b_deg)*0.5
+				if _crossing_hand_landing_open(data.hands,level,mid_deg): continue
+				var a:=Vector2(c.x+cos(deg_to_rad(a_deg))*float(tcfg.gallery_r[0]),c.y+sin(deg_to_rad(a_deg))*float(tcfg.gallery_r[0]))
+				var b:=Vector2(c.x+cos(deg_to_rad(b_deg))*float(tcfg.gallery_r[0]),c.y+sin(deg_to_rad(b_deg))*float(tcfg.gallery_r[0]))
+				var rail:=_segment_body("CrossingGalleryInnerRail_%02d_%.1f_%02d"%[ti,level,rail_i],a,b,0.12,DATUM+level,1.1,Color("#80908a")); _add(packs,_cell(c),rail)
+		for rib_i in int(tcfg.ribs):
+			var angle:=TAU*(float(rib_i)+0.5)/float(tcfg.ribs); var rib:=_round_column("CrossingTowerRib_%02d"%rib_i,0.22,float(cfg.roof.y),Vector3(cos(angle)*float(tcfg.drum),float(cfg.roof.y)*0.5,sin(angle)*float(tcfg.drum)),Color("#a4aaa2")); root.add_child(rib)
+		for ci in cfg.climbers.size():
+			var climber: Array=cfg.climbers[ci]
+			if int(climber[0])!=ti: continue
+			var angle:=deg_to_rad(float(climber[1])); var y0:=float(climber[2]); var y1:=float(climber[3]); var width:=2.35
+			# The plan's bearing is radial.  The panel width lies tangent to the
+			# tower; using the bearing directly yawed it 90 degrees around the
+			# drum and made the vines project outward instead of following the ribs.
+			var panel:=MeshInstance3D.new(); panel.name="CrossingClimberPanel_%03d"%ci; var mesh:=BoxMesh.new(); mesh.size=Vector3(width,y1-y0,0.16); panel.mesh=mesh; panel.position=Vector3(cos(angle)*6.02,(y0+y1)*0.5,sin(angle)*6.02); panel.rotation.y=-angle-PI*0.5; panel.material_override=_material(Color("#678752")); root.add_child(panel)
+			if y0>0:
+				var planter:=_box_body("CrossingClimberPlanter_%03d"%ci,Vector3(0.55,0.5,0.8),Vector3(cos(angle)*5.55,y0+0.25,sin(angle)*5.55),Color("#746e54")); root.add_child(planter)
+		for hoop_i in 10:
+			var hoop_level:=float(hoop_i+1)*4.1
+			var hoop:=_annulus_visual("CrossingTowerHoop_%02d"%hoop_i,5.85,6.1,48,0.12,hoop_level); root.add_child(hoop)
+		var lift_data: Dictionary=data.lift; var lc: Array=lift_data.c; var lift:=AnimatableBody3D.new(); lift.name="CrossingTowerLift"; lift.position=Vector3(float(lc[0])-c.x,0,float(lc[1])-c.y); lift.set_script(load("res://scripts/moy_lift_platform.gd")); lift.set("base_height",0.0); lift.set("travel_height",40.4); lift.set("travel_period",48.0)
+		lift.set("stop_levels",PackedFloat32Array(data.levels))
+		var liftmesh:=BoxMesh.new(); liftmesh.size=Vector3(2.6,0.22,2.6); var lv:=MeshInstance3D.new(); lv.mesh=liftmesh; lv.material_override=_material(Color("#bfd0ce")); lift.add_child(lv); var ls:=BoxShape3D.new(); ls.size=liftmesh.size; var lcol:=CollisionShape3D.new(); lcol.shape=ls; lift.add_child(lcol); root.add_child(lift)
+		# The glazed shaft is visual only; four separate guide posts carry it
+		# without sealing the lift or its landings with one tall collider.
+		var shaft_center:=Vector3(float(lc[0])-c.x,20.2,float(lc[1])-c.y)
+		var glass_material:=StandardMaterial3D.new(); glass_material.albedo_color=Color(0.55,0.72,0.75,0.22); glass_material.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; glass_material.roughness=0.18; glass_material.metallic=0.08
+		for sx in [-1.0,1.0]:
+			for sz in [-1.0,1.0]:
+				var guide:=_box_body("CrossingLiftGuide",Vector3(0.12,40.4,0.12),shaft_center+Vector3(sx*1.3,0,sz*1.3),Color("#a6b7b7")); root.add_child(guide)
+		for wall_side in 4:
+			var pane:=MeshInstance3D.new(); pane.name="CrossingLiftGlass"; var glass:=BoxMesh.new(); glass.size=Vector3(2.5,40.0,0.04) if wall_side<2 else Vector3(0.04,40.0,2.5); pane.mesh=glass; pane.position=shaft_center+([Vector3(0,0,-1.3),Vector3(0,0,1.3),Vector3(-1.3,0,0),Vector3(1.3,0,0)][wall_side]); pane.material_override=glass_material; root.add_child(pane)
+		# Data-directed clear connections from the gallery to the ring/bridges,
+		# then onward to the exact line platform at each intermediate level.
+		var ring_open:=Vector2(c.x-float(cfg.c[0]),c.y-float(cfg.c[1])).normalized()
+		var ring_start:=c+ring_open*float(tcfg.gallery_r[1]); var ring_end:=Vector2(float(cfg.c[0]),float(cfg.c[1]))+ring_open*float(cfg.ring[0])
+		_add_crossing_walkway(packs,"CrossingTower_%02d_RingLink"%ti,ring_start,ring_end,6.5,2.4,Color("#b6a782"))
+		for run in PLAN.DECK.runs:
+			if String(run.name)!="Crossing bridge north" and String(run.name)!="Crossing bridge south": continue
+			var pts: Array=run.pts; var nearest:=_nearest_point_on_segment(c,Vector2(pts[0][0],pts[0][1]),Vector2(pts[-1][0],pts[-1][1]))
+			if c.distance_to(nearest)<=float(tcfg.gallery_r[1])+0.25: _add_crossing_walkway(packs,"CrossingTower_%02d_CrossBridgeLink_%s"%[ti,String(run.name)],c+(nearest-c).normalized()*float(tcfg.gallery_r[1]),nearest,6.5,2.4,Color("#b6a782"))
+		var spine_side:=1.0 if String(data.spine_platform)=="east" else -1.0
+		var spine_target:=Vector2(float(cfg.c[0])+spine_side*(float(PLAN.PLATFORMS.edge)+float(PLAN.CROSS.track)+float(PLAN.PLATFORMS.width)*0.5),c.y)
+		var spine_start:=c+Vector2(cos(deg_to_rad(float(data.opens["14.2"]))),sin(deg_to_rad(float(data.opens["14.2"]))))*float(tcfg.gallery_r[1])
+		_add_crossing_walkway(packs,"CrossingTower_%02d_SpinePlatformBridge"%ti,spine_start,spine_target,14.2,2.4,Color("#b6a782"))
+		var meridian_side:=1.0 if String(data.high_platform)=="south" else -1.0
+		var meridian_target:=Vector2(float(cfg.c[0]),float(cfg.c[1])+meridian_side*(float(PLAN.PLATFORMS.edge)+float(PLAN.CROSS.track)+float(PLAN.PLATFORMS.width)*0.5))
+		var meridian_start:=c+Vector2(cos(deg_to_rad(float(data.opens["37.0"]))),sin(deg_to_rad(float(data.opens["37.0"]))))*float(tcfg.gallery_r[1])
+		_add_crossing_walkway(packs,"CrossingTower_%02d_MeridianPlatformBridge"%ti,meridian_start,meridian_target,37.0,2.4,Color("#b6a782"))
+		var lift_world:=Vector2(float(lc[0]),float(lc[1])); var lift_direction:Vector2=(lift_world-c).normalized()
+		for connection_level in [6.5,14.2,37.0]:
+			_add_crossing_walkway(packs,"CrossingTower_%02d_LiftGallery_%0.1f"%[ti,connection_level],c+lift_direction*float(tcfg.gallery_r[1]),lift_world,connection_level,1.8,Color("#b6a782"))
+		_add_crossing_walkway(packs,"CrossingTower_%02d_LiftSpineLanding"%ti,lift_world,spine_target,14.2,1.8,Color("#b6a782"))
+		_add_crossing_walkway(packs,"CrossingTower_%02d_LiftMeridianLanding"%ti,lift_world,meridian_target,37.0,1.8,Color("#b6a782"))
+		_add(packs,_cell(c),root)
+	var roof_pts: Array=[]; var roof_cfg: Dictionary=cfg.roof; var roof_half:=float(roof_cfg.half); var exp:=float(roof_cfg.n)
+	for ri in 64:
+		var angle:=TAU*float(ri)/64.0; var cx:=cos(angle); var sz:=sin(angle)
+		roof_pts.append([float(cfg.c[0])+roof_half*signf(cx)*pow(absf(cx),2.0/exp),float(cfg.c[1])+roof_half*signf(sz)*pow(absf(sz),2.0/exp)])
+	var roof:=_polygon_building("CrossingRoof",roof_pts,float(roof_cfg.th),Color("#d2c7a7")); roof.position.y=DATUM+float(roof_cfg.y); _add(packs,_cell(Vector2(cfg.c[0],cfg.c[1])),roof)
+	for beam_index in cfg._beams.spine.z.size():
+		var z: float=cfg._beams.spine.z[beam_index]; var spine_y0:=float(cfg._beams.spine.y[0]); var spine_y1:=float(cfg._beams.spine.y[1]); var beam:=_box_body("CrossingSpineHeadBeam_%d"%beam_index,Vector3(26.0,spine_y1-spine_y0,1.6),Vector3(-560,DATUM+(spine_y0+spine_y1)*0.5,z),Color("#8d948b")); _add(packs,_cell(Vector2(-560,z)),beam)
+	for beam_index in cfg._beams.high.x.size():
+		var x: float=cfg._beams.high.x[beam_index]; var high_y0:=float(cfg._beams.high.y[0]); var high_y1:=float(cfg._beams.high.y[1]); var beam:=_box_body("CrossingMeridianHeadBeam_%d"%beam_index,Vector3(1.6,high_y1-high_y0,26.0),Vector3(x,DATUM+(high_y0+high_y1)*0.5,0),Color("#8d948b")); _add(packs,_cell(Vector2(x,0)),beam)
+	for garden_index in cfg.rain_gardens.size():
+		var garden: Dictionary=cfg.rain_gardens[garden_index]; var gc:=Vector2(float(garden.c[0]),float(garden.c[1])); var disc:=_round_column("CrossingRainGarden_%02d"%garden_index,float(garden.r),0.22,Vector3(gc.x,DATUM+0.11,gc.y),Color("#648350")); _add(packs,_cell(gc),disc)
+		for reed in garden.reeds:
+			var rp:=Vector2(float(reed[0]),float(reed[1])); var clump:=Node3D.new(); clump.name="CrossingRainReeds_%0.2f_%0.2f"%[rp.x,rp.y]; clump.position=Vector3(rp.x,DATUM,rp.y)
+			for ri in 3:
+				var leafmesh:=BoxMesh.new(); leafmesh.size=Vector3(0.08,float(reed[2]),0.08); var leaf:=MeshInstance3D.new(); leaf.mesh=leafmesh; leaf.position.y=float(reed[2])*0.5; leaf.material_override=_material(Color("#7e945e")); clump.add_child(leaf)
+			_add(packs,_cell(rp),clump)
+
+
+static func _annulus_body(label: String, inner: float, outer: float, segments: int, thickness: float, y: float) -> StaticBody3D:
+	var body:=StaticBody3D.new(); body.name=label; body.position.y=y-thickness*0.5; body.collision_layer=1; body.collision_mask=1
+	var mesh:=TorusMesh.new(); mesh.inner_radius=inner; mesh.outer_radius=outer; mesh.rings=segments; mesh.ring_segments=8; mesh.inner_radius=inner; mesh.outer_radius=outer
+	var vis:=MeshInstance3D.new(); vis.mesh=mesh; vis.rotation.x=PI*0.5; vis.material_override=_material(Color("#b6a580")); body.add_child(vis)
+	var col:=CollisionShape3D.new(); col.shape=mesh.create_trimesh_shape(); col.rotation.x=PI*0.5; body.add_child(col)
+	return body
+
+
+static func _crossing_hand_landing_open(hands: Array, level: float, bearing: float) -> bool:
+	for hand in hands:
+		for profile in hand.profile:
+			if not is_equal_approx(float(profile[2]),level) or not is_equal_approx(float(profile[3]),level): continue
+			var span:=fposmod(float(profile[1])-float(profile[0]),360.0)
+			if fposmod(bearing-float(profile[0]),360.0)<=span: return true
+	return false
+
+
+static func _nearest_point_on_segment(p: Vector2, a: Vector2, b: Vector2) -> Vector2:
+	var delta:=b-a; var t:=clampf((p-a).dot(delta)/maxf(delta.length_squared(),0.001),0.0,1.0); return a+delta*t
+
+
+static func _add_crossing_walkway(packs: Dictionary, label: String, a: Vector2, b: Vector2, level: float, width: float, color: Color) -> void:
+	var direction:=b-a
+	if direction.length()<0.05: return
+	var walk:=_segment_body(label,a,b,width,DATUM+level-0.3,0.3,color)
+	_add(packs,_cell((a+b)*0.5),walk)
+
+
+static func _annulus_visual(label: String, inner: float, outer: float, segments: int, thickness: float, y: float) -> Node3D:
+	var mesh:=TorusMesh.new(); mesh.inner_radius=inner; mesh.outer_radius=outer; mesh.rings=segments; mesh.ring_segments=8
+	var vis:=MeshInstance3D.new(); vis.name=label; vis.mesh=mesh; vis.rotation.x=PI*0.5; vis.position.y=y; vis.material_override=_material(Color("#a4aaa2")); return vis
+
+
 static func _add_transit(packs: Dictionary) -> void:
 	for service in PLAN.CROSS.services:
 		var line_name := String(service.line)
 		var route := PackedVector3Array()
-		if line_name == "Spine Line" and service.has("profile"):
-			for p in service.profile: route.append(Vector3(p[0],DATUM+float(p[2]),p[1]))
-		else:
-			for p in service.pts: route.append(Vector3(p[0],DATUM+float(service.rail),p[1]))
+		for p in service.path: route.append(Vector3(p[0],DATUM+float(service.rail),p[1]))
 		var lane_paths: Array[PackedVector3Array] = [PackedVector3Array(), PackedVector3Array()]
 		for lane in 2:
-			var offset := -1.7 if lane == 0 else 1.7
+			var offset := -float(PLAN.CROSS.track) if lane == 0 else float(PLAN.CROSS.track)
 			for i in route.size():
 				var before := route[maxi(0,i-1)]; var after := route[mini(route.size()-1,i+1)]
 				var tangent := after-before; tangent.y=0.0
@@ -478,79 +689,80 @@ static func _add_transit(packs: Dictionary) -> void:
 			_add(packs,_cell(Vector2(mid.x,mid.z)),bed)
 			var tangent:=b-a; tangent.y=0.0; var across:=Vector3(-tangent.z,0.0,tangent.x).normalized()
 			for lane in 2:
-				var lane_offset:float=-1.7 if lane==0 else 1.7
+				var lane_offset:float=-float(PLAN.CROSS.track) if lane==0 else float(PLAN.CROSS.track)
 				for rail_side in [-1.0,1.0]:
 					var rail_offset:float=lane_offset+rail_side*0.7175
 					var rail:=_ramp_body("%s_Rail_%d_%d_%d"%[line_name,i,lane,int(rail_side)],a+across*rail_offset,b+across*rail_offset,0.16,0.2,Color("#555b5d"))
 					_add(packs,_cell(Vector2(mid.x,mid.z)),rail)
 		var pier_xs: Array = service.get("piers", [])
 		if not pier_xs.is_empty():
-			for x in pier_xs:
-				var rail_y:=DATUM+float(service.rail)
-				var pier := _box_body("MeridianTreePier",Vector3(2.4,rail_y-DATUM-1.2,2.4),Vector3(float(x),DATUM+(rail_y-DATUM-1.2)*0.5,0),Color("#888173"))
-				_add(packs,_cell(Vector2(float(x),0)),pier)
+			for pier_index in pier_xs.size():
+				_add_meridian_pier(packs,float(pier_xs[pier_index]),float(service.rail),pier_index)
 		elif line_name == "Spine Line":
-			for i in route.size()-1:
-				var mid:Vector3=(route[i]+route[i+1])*0.5
-				if absf(mid.z+212.0)<18.0 or absf(mid.z-212.0)<18.0: continue
-				var top:=maxf(route[i].y,route[i+1].y)-1.2
-				for xoff in [-5.0,5.0]:
+			for frame_index in service.frames.size():
+				var frame: Array=service.frames[frame_index]
+				var fx:=float(frame[0]); var fz:=float(frame[1]); var top:=DATUM+float(service.rail)-1.2
+				if absf(fx-PLAN.CENTER.x)<1.0 and absf(fz)<20.0: continue
+				for leg_index in 2:
+					var xoff: float=-3.2 if leg_index==0 else 3.2
 					var height:=top-DATUM
-					if height<=0.5: continue
-					var pier:=_box_body("SpinePortalPier",Vector3(1.0,height,1.0),Vector3(mid.x+xoff,DATUM+height*0.5,mid.z),Color("#938a78"))
-					_add(packs,_cell(Vector2(mid.x+xoff,mid.z)),pier)
-				var beam:=_ramp_body("SpinePortalCrossbeam",Vector3(mid.x-5.5,top,mid.z),Vector3(mid.x+5.5,top,mid.z),0.8,0.8,Color("#938a78"))
-				_add(packs,_cell(Vector2(mid.x,mid.z)),beam)
+					var leg:=_box_body("SpineFrameLeg_%02d_%d"%[frame_index,leg_index],Vector3(0.9,height,0.9),Vector3(fx+xoff,DATUM+height*0.5,fz),Color("#938a78")); _add(packs,_cell(Vector2(fx+xoff,fz)),leg)
+				var beam:=_box_body("SpineFrameBeam_%02d"%frame_index,Vector3(7.3,0.9,0.9),Vector3(fx,top-0.45,fz),Color("#938a78")); _add(packs,_cell(Vector2(fx,fz)),beam)
 		for station in PLAN.CROSS.stations:
 			if not station.lines.has(line_name): continue
 			var p: Vector2=Vector2(station.at[0],station.at[1]); var plat := PLAN.CROSS.platform
-			var station_y:=DATUM+float(station.get("rail",service.rail))
+			var station_y:=DATUM+float(station.get("rail",service.rail))+float(PLAN.PLATFORMS.floor)
 			var along_z:=line_name=="Spine Line"
+			var platform_offset:=float(PLAN.PLATFORMS.edge)+float(PLAN.CROSS.track)+float(PLAN.PLATFORMS.width)*0.5
 			for side in [-1.0,1.0]:
-				var platform_size:=Vector3(plat[1],0.3,plat[0]) if along_z else Vector3(plat[0],0.3,plat[1])
-				var platform_center:=Vector3(p.x+(side*5.2 if along_z else 0.0),station_y+0.1,p.y+(0.0 if along_z else side*5.2))
+				var platform_size:=Vector3(float(PLAN.PLATFORMS.width),0.3,plat[0]) if along_z else Vector3(plat[0],0.3,float(PLAN.PLATFORMS.width))
+				var platform_center:=Vector3(p.x+(side*platform_offset if along_z else 0.0),station_y-0.15,p.y+(0.0 if along_z else side*platform_offset))
 				var platform := _box_body("Station_%s_%s_%d"%[line_name,String(station.name).replace(" ","_"),int(side)],platform_size,platform_center,Color("#c4b18b"))
 				_add(packs,_cell(p),platform)
-		var loop := line_name == "Wall Line"
-		var path := PackedVector3Array()
-		if loop:
-			for i in 64:
-				var angle := TAU*float(i)/64.0
-				path.append(Vector3(PLAN.CENTER.x+PLAN.WALL.r*cos(angle),DATUM+PLAN.WALL.height+1.2,PLAN.WALL.r*sin(angle)))
-		else:
-			path=route
+				var crossing_meridian:=String(station.name)=="The Crossing" and line_name=="Meridian Line"
+				if not crossing_meridian:
+					var canopy_size:=Vector3(platform_size.x,0.18,platform_size.z)
+					var canopy:=_box_body("StationCanopy_%s_%s_%d"%[line_name,String(station.name).replace(" ","_"),int(side)],canopy_size,platform_center+Vector3.UP*(float(PLAN.PLATFORMS.canopy)+0.24),Color("#c0b99f")); _add(packs,_cell(p),canopy)
+			if line_name=="Spine Line" and station.has("_interchange"):
+				var outward:=signf(float(station.at[1])); var z0:=float(station.at[1])+outward*float(plat[0])*0.5; var gap:=float(station._interchange.gap)+0.3
+				var slab_depth:=float(PLAN.PLATFORMS.floor); var slab_width:=2.0*(platform_offset+float(PLAN.PLATFORMS.width)*0.5)
+				var slab:=_box_body("SpineWallInterchange",Vector3(slab_width,slab_depth,gap),Vector3(p.x,DATUM+float(service.rail)+slab_depth*0.5,z0+outward*gap*0.5),Color("#b6a17b")); _add(packs,_cell(Vector2(p.x,z0)),slab)
+		if line_name=="Spine Line":
+			for station in PLAN.CROSS.stations:
+				if not station.has("_access"): continue
+				for side_data in station._access:
+					for flight_index in side_data.flights.size():
+						var flight: Dictionary=side_data.flights[flight_index]
+						var foot:=Vector3(flight.foot[0],DATUM+float(flight.foot[2]),flight.foot[1]); var head:=Vector3(flight.head[0],DATUM+float(flight.head[2]),flight.head[1])
+						_add_escalator_pair(packs,"SpineAccess_%s_%s_%d"%[String(station.name).replace(" ","_"),String(side_data.side),flight_index],foot,head,float(flight.w))
+						if side_data.has("runout") and flight_index==0:
+							var runout: Dictionary=side_data.runout; var rp: Array=runout.c; var sz: Array=runout.size
+							var slab:=_box_body("SpineAccessRunout",Vector3(sz[0],0.3,sz[1]),Vector3(rp[0],DATUM+float(runout.y)-0.15,rp[1]),Color("#b6a17b")); _add(packs,_cell(Vector2(rp[0],rp[1])),slab)
+						if side_data.has("apron"):
+							var ap: Dictionary=side_data.apron; var ac: Array=ap.c; var az: Array=ap.size
+							var slab:=_box_body("SpineAccessApron",Vector3(az[0],0.35,az[1]),Vector3(ac[0],DATUM+float(ap.y)-0.175,ac[1]),Color("#b6a17b")); _add(packs,_cell(Vector2(ac[0],ac[1])),slab)
+		var loop := false
+		var path := route
 		var stops := PackedVector3Array()
 		for station in PLAN.CROSS.stations:
 			if station.lines.has(line_name): stops.append(Vector3(station.at[0],DATUM+float(station.get("rail",service.rail)),station.at[1]))
-		for lane in 2:
-			var lane_path := lane_paths[lane] if not loop else path
-			var train := _make_train(line_name,lane_path,int(PLAN.TRAIN.consists[line_name].cars),float(PLAN.CROSS.cars.speed),false,stops,float(PLAN.CROSS.cars.dwell),lane,1 if lane == 0 else -1)
+		var line_plan: Dictionary=PLAN.TIMETABLE.lines.get(line_name,{})
+		for train_index in int(line_plan.get("trains",1)):
+			var lane:=mini(train_index,1); var lane_path:=lane_paths[lane]
+			var train := _make_train(line_name,lane_path,int(PLAN.TRAIN.consists[line_name].cars),float(PLAN.CROSS.cars.speed),loop,stops,float(PLAN.TIMETABLE.dwell.ordinary),train_index,1 if train_index%2==0 else -1)
+			train.set("schedule_events",line_plan.events); train.set("schedule_offset",float(line_plan.offset)); train.set("schedule_headway",float(PLAN.TIMETABLE.headway)); train.set("schedule_circuit",float(line_plan.circuit)); train.set("schedule_train_index",train_index)
 			_add(packs,_cell(Vector2(path[0].x,path[0].z)),train)
-	# Use the authored flight levels/runs for every open-air station core. Each
-	# flight is a paired, directional moving walkway with real landings and lifts.
 	for core in PLAN.CROSSING.cores: _add_station_core(packs,core,"CrossingCore")
-	for core in PLAN.ARCH.cores: _add_station_core(packs,core,"EastGateCore")
-	for core in PLAN.WEST_GATE.cores: _add_station_core(packs,core,"WestGateCore")
-	for gate_sign in [-1.0,1.0]:
-		var gate_z:float=212.0*gate_sign
-		var foot:=Vector3(-585.0,DATUM+PLAN.WALL.height+1.2,gate_z-23.0*gate_sign)
-		var head:=Vector3(-585.0,DATUM+20.0,gate_z-10.0*gate_sign)
-		_add_escalator_pair(packs,"SpineGateEscalator_%s"%("North" if gate_sign<0 else "South"),foot,head,2.6)
-		var access_walk:=_box_body("SpineGateAccessWalk",Vector3(22.5,0.32,4.0),Vector3(-573.75,DATUM+19.84,head.z),Color("#b6a17b"))
-		_add(packs,_cell(Vector2(-573.75,head.z)),access_walk)
+	for service in PLAN.CROSS.services:
+		if String(service.line)=="Spine Line":
+			for z in [-200.0,200.0]:
+				var stop:=_box_body("SpineBufferStop",Vector3(8.0,0.8,1.0),Vector3(-560.0,DATUM+13.2,z),Color("#9c3428")); _add(packs,_cell(Vector2(-560,z)),stop)
 	_add_wall_transit(packs)
 
 
 static func _make_train(label: String, path: PackedVector3Array, cars: int, speed: float, loop: bool, stops := PackedVector3Array(), dwell := 4.0, lane := 0, direction := 1) -> Node3D:
 	var train := Node3D.new(); train.name="MoyTrain_%s_%d"%[label.replace(" ","_"),lane]; train.set_script(load("res://scripts/moy_ride_train.gd"))
 	train.set("service_name",label); train.set("path",path); train.set("cars",cars); train.set("speed",speed); train.set("loop",loop); train.set("stops",stops); train.set("dwell",dwell); train.set("initial_direction",direction)
-	if label in ["Wall Line","Spine Line"]:
-		var conflict_points:=PackedVector3Array()
-		for junction in PLAN.CROSS.junctions:
-			for gate in PLAN.WALL.gates:
-				if gate.name == junction:
-					conflict_points.append(Vector3(gate.p[0],DATUM+PLAN.WALL.height+1.2,gate.p[1]))
-		train.set("conflict_points",conflict_points)
 	train.call("_build_consist")
 	return train
 
@@ -575,51 +787,51 @@ static func _add_escalator_pair(packs: Dictionary, label: String, foot: Vector3,
 	var lateral:=Vector3(-horizontal.z,0.0,horizontal.x).normalized()
 	if lateral.length_squared()<0.5: lateral=Vector3.RIGHT
 	var belt_width:=minf(1.2,total_width*0.46)
-	for lane in 2:
-		var side:=(-1.0 if lane==0 else 1.0)*(belt_width*0.5+0.06)
-		var offset:=lateral*side
-		var a:=foot+offset; var b:=head+offset
-		var up:=_ramp_body("%s_Up"%label,a,b,belt_width,0.32,Color("#b3a27e"))
-		up.set_script(load("res://scripts/moy_escalator.gd")); up.set("travel_direction",(b-a).normalized()); up.set("travel_speed",0.9)
-		_add_ramp_guardrails(up,belt_width,a.distance_to(b))
-		_add(packs,_cell(Vector2((a.x+b.x)*0.5,(a.z+b.z)*0.5)),up)
-		var down:=_ramp_body("%s_Down"%label,b,a,belt_width,0.32,Color("#a49372"))
-		down.set_script(load("res://scripts/moy_escalator.gd")); down.set("travel_direction",(a-b).normalized()); down.set("travel_speed",0.9)
-		_add_ramp_guardrails(down,belt_width,a.distance_to(b))
-		_add(packs,_cell(Vector2((a.x+b.x)*0.5,(a.z+b.z)*0.5)),down)
+	var a:=foot-lateral*belt_width*0.5; var b:=head-lateral*belt_width*0.5
+	var up:=_ramp_body("%s_Up"%label,a,b,belt_width,0.32,Color("#b3a27e"))
+	up.set_script(load("res://scripts/moy_escalator.gd")); up.set("travel_direction",(b-a).normalized()); up.set("travel_speed",0.9)
+	_add(packs,_cell(Vector2((a.x+b.x)*0.5,(a.z+b.z)*0.5)),up)
+	var c:=foot+lateral*belt_width*0.5; var d:=head+lateral*belt_width*0.5
+	var down:=_ramp_body("%s_Down"%label,d,c,belt_width,0.32,Color("#a49372"))
+	down.set_script(load("res://scripts/moy_escalator.gd")); down.set("travel_direction",(c-d).normalized()); down.set("travel_speed",0.9)
+	_add(packs,_cell(Vector2((c.x+d.x)*0.5,(c.z+d.z)*0.5)),down)
 	var along_z:=absf(horizontal.z)>absf(horizontal.x)
 	var landing_size:=Vector3(total_width+0.6,0.3,2.4) if along_z else Vector3(2.4,0.3,total_width+0.6)
-	for endpoint in [foot,head]:
-		var landing:=_box_body("%s_Landing"%label,landing_size,endpoint-Vector3.UP*0.15,Color("#b6a17b"))
+	for endpoint_i in 2:
+		var endpoint: Vector3=foot if endpoint_i==0 else head
+		var landing:=_box_body("%s_Landing_%d"%[label,endpoint_i],landing_size,endpoint-Vector3.UP*0.15,Color("#b6a17b"))
 		_add(packs,_cell(Vector2(endpoint.x,endpoint.z)),landing)
 
 
 static func _add_station_core(packs: Dictionary, core: Dictionary, prefix: String) -> void:
 	var c:=Vector2(core.c[0],core.c[1]); var sx:=float(core.size[0]); var sz:=float(core.size[1])
 	var levels: Array=core.levels; var max_level:=float(levels[-1]); var frame_height:=max_level+float(core.canopy)
+	var post_index:=0
 	for xside in [-1.0,1.0]:
 		for zside in [-1.0,1.0]:
-			var post:=_box_body("%s_%s_Frame"%[prefix,String(core.name).replace(" ","_")],Vector3(0.45,frame_height,0.45),Vector3(c.x+xside*(sx*0.5-0.25),DATUM+frame_height*0.5,c.y+zside*(sz*0.5-0.25)),Color("#a99a79"))
+			var post:=_box_body("%s_%s_Frame_%d"%[prefix,String(core.name).replace(" ","_"),post_index],Vector3(0.45,frame_height,0.45),Vector3(c.x+xside*(sx*0.5-0.25),DATUM+frame_height*0.5,c.y+zside*(sz*0.5-0.25)),Color("#a99a79")); post_index+=1
 			_add(packs,_cell(c),post)
 	var flights: Array=core.flights
+	var p:=-(sz*0.5-1.5); var direction:=1.0
 	for i in flights.size():
 		var flight: Array=flights[i]; var low:=DATUM+float(flight[0]); var high:=DATUM+float(flight[1]); var run:=float(flight[2])
-		var side: float=-1.0 if i%2==0 else 1.0
-		# Switchback flights use separate lateral lanes: overlapping centerlines
-		# made the prior ramp stack impassable at intermediate landings.
-		var lane_x:=c.x+(-1.35 if i%2==0 else 1.35)
-		var foot:=Vector3(lane_x,low,c.y+side*run*0.5)
-		var head:=Vector3(lane_x,high,c.y-side*run*0.5)
+		var q:=p+direction*run
+		# Match the drawing's accumulating switchback: each flight starts where
+		# the previous ended, then reverses direction on the next run.
+		var foot:=Vector3(c.x,low,c.y+p)
+		var head:=Vector3(c.x,high,c.y+q)
 		_add_escalator_pair(packs,"%s_%s_Flight_%02d"%[prefix,String(core.name).replace(" ","_"),i],foot,head,2.6)
-		for endpoint in [foot,head]:
-			var landing:=_box_body("%s_%s_Landing_%02d"%[prefix,String(core.name).replace(" ","_"),i],Vector3(3.6,0.35,2.6),Vector3(lane_x,endpoint.y-0.175,endpoint.z),Color("#baa781"))
-			_add(packs,_cell(Vector2(lane_x,endpoint.z)),landing)
+		var landing_z:=q+direction*0.75
+		var landing:=_box_body("%s_%s_Landing_%02d"%[prefix,String(core.name).replace(" ","_"),i],Vector3(3.6,0.35,1.5),Vector3(c.x,high-0.175,c.y+landing_z),Color("#baa781"))
+		_add(packs,_cell(Vector2(c.x,c.y+landing_z)),landing)
 		var canopy:=_ramp_body("%s_%s_Canopy_%02d"%[prefix,String(core.name).replace(" ","_"),i],foot+Vector3.UP*float(core.canopy),head+Vector3.UP*float(core.canopy),2.9,0.16,Color("#9c927d"))
 		_add(packs,_cell(Vector2(c.x,c.y)),canopy)
+		p=q; direction=-direction
 	# Two small public lift platforms share each open-air core with the ramps.
-	for side in [-1.0,1.0]:
+	for side_index in 2:
+		var side: float=-1.0 if side_index==0 else 1.0
 		var lift_x:float=c.x+side*(sx*0.5-1.0)
-		var car:=AnimatableBody3D.new(); car.name="%s_%s_Lift"%[prefix,String(core.name).replace(" ","_")]
+		var car:=AnimatableBody3D.new(); car.name="%s_%s_Lift_%d"%[prefix,String(core.name).replace(" ","_"),side_index]
 		car.position=Vector3(lift_x,DATUM,c.y); car.set_script(load("res://scripts/moy_lift_platform.gd"))
 		car.set("travel_height",max_level); car.set("base_height",DATUM); car.set("travel_period",maxf(12.0,max_level*1.2))
 		var mesh:=BoxMesh.new(); mesh.size=Vector3(1.5,0.25,1.5); var vis:=MeshInstance3D.new(); vis.mesh=mesh; vis.material_override=_material(Color("#c7d1ce")); car.add_child(vis)
@@ -628,29 +840,30 @@ static func _add_station_core(packs: Dictionary, core: Dictionary, prefix: Strin
 
 
 static func _add_gate_forms(packs: Dictionary) -> void:
-	# The East Gate is the open Meridian Arch; the West Gate's pair of towers
-	# holds an elevated crossbeam. Openings retain street and track clearance.
-	# The East Gate's Wall Line passes through these supports at +12 m. Preserve
-	# the authored piers while leaving a 4 m high, 11 m wide train hall through
-	# the support band (the cars sweep wider than the two 3.4 m track centres).
-	for p in [[-362,-30,-340,-12],[-362,12,-340,30]]:
-		var r := Rect2(p[0],p[1],p[2]-p[0],p[3]-p[1]); var h := 72.0
-		var opening := Vector2(-357.0,-346.0)
-		var low := _box_body("MeridianArchLeg_Lower",Vector3(r.size.x,13.0,r.size.y),Vector3(r.get_center().x,DATUM+6.5,r.get_center().y),Color("#b39b73")); _add(packs,_cell(r.get_center()),low)
-		var high := _box_body("MeridianArchLeg_Upper",Vector3(r.size.x,h-17.0,r.size.y),Vector3(r.get_center().x,DATUM+(h+17.0)*0.5,r.get_center().y),Color("#b39b73")); _add(packs,_cell(r.get_center()),high)
-		for side in [Vector2(r.position.x,opening.x),Vector2(opening.y,r.end.x)]:
-			var width: float = side.y-side.x
-			var pier := _box_body("MeridianArchLeg_Pier",Vector3(width,4.0,r.size.y),Vector3((side.x+side.y)*0.5,DATUM+15.0,r.get_center().y),Color("#b39b73")); _add(packs,_cell(r.get_center()),pier)
-	for x in [-790.0,-752.0]:
-		for z in [-11.0,11.0]:
-			var tower := _box_body("WestGateTower",Vector3(10,34,10),Vector3(x,DATUM+17,z),Color("#a78b64")); _add(packs,_cell(Vector2(x,z)),tower)
-	var beam := _box_body("WestGateBridge",Vector3(44,7,6),Vector3(-771,DATUM+48,0),Color("#bca37c")); _add(packs,_cell(Vector2(-771,0)),beam)
-	for z in [-212.0,212.0]:
-		for x in [-605.0,-505.0]:
-			# Posts flank both tracks and carry a high lintel above the train sweep.
-			var post:=_box_body("NorthSouthGatePost",Vector3(3.0,25.0,6.0),Vector3(x,DATUM+12.5,z),Color("#ad9873")); _add(packs,_cell(Vector2(x,z)),post)
-		var lintel:=_box_body("NorthSouthGateLintel",Vector3(26.0,2.0,6.0),Vector3(-557.0,DATUM+26.0,z),Color("#c0aa7d")); _add(packs,_cell(Vector2(-557.0,z)),lintel)
-	var east_bridge:=_box_body("MeridianArchHighStationBridge",Vector3(24.0,6.0,30.0),Vector3(-351.0,DATUM+44.0,0.0),Color("#aa936c")); _add(packs,_cell(Vector2(-351.0,0.0)),east_bridge)
+	var color:=Color("#b39b73")
+	for leg in PLAN.ARCH.legs:
+		var r:=Rect2(float(leg[0]),float(leg[1]),float(leg[2])-float(leg[0]),float(leg[3])-float(leg[1])); var center:=r.get_center()
+		_add(packs,_cell(center),_box_body("MeridianArchLegLower",Vector3(r.size.x,12.0,r.size.y),Vector3(center.x,DATUM+6.0,center.y),color))
+		_add(packs,_cell(center),_box_body("MeridianArchLegUpper",Vector3(r.size.x,51.0,r.size.y),Vector3(center.x,DATUM+46.5,center.y),color))
+		# Plan train_hall.arc defines the actual wall openings; leave the 12–21 m band clear through each data-defined leg.
+		var hall: Dictionary=PLAN.ARCH.train_hall; var hall_index:=0 if center.y<0 else 1; var bounds: Array=hall.x[hall_index]
+		var left_width:=maxf(0.0,float(bounds[0])-r.position.x); var right_start:=minf(r.size.x,float(bounds[1])-r.position.x)
+		for part in [Rect2(r.position.x,r.position.y,left_width,r.size.y),Rect2(r.position.x+right_start,r.position.y,r.size.x-right_start,r.size.y)]:
+			if part.size.x>0.1: _add(packs,_cell(center),_box_body("MeridianArchTrainHallPier",Vector3(part.size.x,9.0,part.size.y),Vector3(part.get_center().x,DATUM+16.5,part.get_center().y),color))
+	for bridge in [[PLAN.ARCH.lower, "MeridianArchLowerBridge"],[PLAN.ARCH.top,"MeridianArchTopBridge"]]:
+		var levels: Array=bridge[0]; var y0:=float(levels[0]); var y1:=float(levels[1]); var body:=_box_body(String(bridge[1]),Vector3(PLAN.ARCH.opening, y1-y0, 6.0),Vector3(-352.5,DATUM+(y0+y1)*0.5,0),color); _add(packs,_cell(Vector2(-352.5,0)),body)
+	var west_towers: Array=PLAN.WEST_GATE.towers
+	for i in west_towers.size():
+		var t: Array=west_towers[i]; var r:=Rect2(float(t[0]),float(t[1]),float(t[2])-float(t[0]),float(t[3])-float(t[1])); var c:=r.get_center(); var hall:=PLAN.WEST_GATE.train_hall; var bounds: Array=hall.x[i]
+		_add(packs,_cell(c),_box_body("WestGateTowerLower",Vector3(r.size.x,12.0,r.size.y),Vector3(c.x,DATUM+6,c.y),Color("#a78b64")))
+		_add(packs,_cell(c),_box_body("WestGateTowerUpper",Vector3(r.size.x,23.0,r.size.y),Vector3(c.x,DATUM+32.5,c.y),Color("#a78b64")))
+		var left_width:=maxf(0.0,float(bounds[0])-r.position.x); var right_start:=minf(r.size.x,float(bounds[1])-r.position.x)
+		for part in [Rect2(r.position.x,r.position.y,left_width,r.size.y),Rect2(r.position.x+right_start,r.position.y,r.size.x-right_start,r.size.y)]:
+			if part.size.x>0.1: _add(packs,_cell(c),_box_body("WestGateTrainHallPier",Vector3(part.size.x,9.0,part.size.y),Vector3(part.get_center().x,DATUM+16.5,c.y),Color("#a78b64")))
+	var west_bridge:=PLAN.WEST_GATE.bridge
+	_add(packs,_cell(Vector2(-769.5,0)),_box_body("WestGateBridge",Vector3(25.0,float(west_bridge[1])-float(west_bridge[0]),6.0),Vector3(-769.5,DATUM+(float(west_bridge[0])+float(west_bridge[1]))*0.5,0),Color("#bca37c")))
+	for core in PLAN.ARCH.cores: _add_station_core(packs,core,"EastGateCore")
+	for core in PLAN.WEST_GATE.cores: _add_station_core(packs,core,"WestGateCore")
 
 
 static func _add_timekeeper(packs: Dictionary) -> void:
@@ -663,8 +876,24 @@ static func _add_timekeeper(packs: Dictionary) -> void:
 		var body:=AnimatableBody3D.new(); body.name="Timekeeper_%s"%String(ring[0]); body.collision_layer=1; body.collision_mask=1; body.sync_to_physics=true
 		var visual := MeshInstance3D.new(); visual.mesh=torus; visual.rotation.z=PI*0.5; visual.material_override=_material(Color("#a88955")); body.add_child(visual)
 		var collision:=CollisionShape3D.new(); collision.shape=torus.create_trimesh_shape(); collision.rotation.z=PI*0.5; body.add_child(collision)
+		if String(ring[0])!="bezel":
+			var marker: Dictionary=cfg.markers[String(ring[0])]; var arrow:=_clock_arrow(inner,outer,float(marker.arc),float(marker.proud)); arrow.name="Timekeeper_%s_Arrow"%String(ring[0]); body.add_child(arrow)
+		else:
+			for mark_i in 60:
+				var is_hour:=mark_i%5==0; var angle:=TAU*float(mark_i)/60.0
+				var mark:=MeshInstance3D.new(); var box:=BoxMesh.new(); box.size=Vector3(0.16,0.12,1.2 if is_hour and mark_i%15==0 else 0.5 if is_hour else 0.55)
+				mark.mesh=box; mark.position=Vector3(0,cos(angle)*12.75,sin(angle)*12.75); mark.rotation.x=angle; mark.material_override=_material(Color("#45433d")); body.add_child(mark)
 		root.add_child(body)
+	var seconds:=MeshInstance3D.new(); seconds.name="TimekeeperSecondsBead"; var bead:=SphereMesh.new(); bead.radius=float(cfg.seconds.bead); bead.height=float(cfg.seconds.bead)*2; seconds.mesh=bead; seconds.material_override=_material(Color("#f24d38")); seconds.position=Vector3(0,cos(0.0)*float(cfg.seconds.r),sin(0.0)*float(cfg.seconds.r)); root.add_child(seconds)
 	_add(packs,_cell(Vector2(center.x,center.z)),root)
+
+
+static func _clock_arrow(inner: float, outer: float, arc: float, proud: float) -> MeshInstance3D:
+	var half:=deg_to_rad(arc)*0.5; var st:=SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var a:=Vector3(proud,cos(-half)*inner,sin(-half)*inner); var b:=Vector3(proud,cos(half)*inner,sin(half)*inner); var tip:=Vector3(proud,outer,0)
+	for side in [-1.0,1.0]:
+		var x: float=proud*side; st.set_normal(Vector3(side,0,0)); st.add_vertex(Vector3(x,a.y,a.z)); st.add_vertex(Vector3(x,b.y,b.z)); st.add_vertex(Vector3(x,tip.y,tip.z))
+	var mesh:=st.commit(); var arrow:=MeshInstance3D.new(); arrow.mesh=mesh; var mat:=StandardMaterial3D.new(); mat.albedo_color=Color("#f03f35"); mat.emission_enabled=true; mat.emission=Color("#f03f35"); arrow.material_override=mat; return arrow
 
 
 static func _add_turbines(packs: Dictionary) -> void:
@@ -720,18 +949,22 @@ static func _add_wall_transit(packs: Dictionary) -> void:
 		var theta:=atan2(radial.y,radial.x)
 		for lane in 2:
 			var track_radius:=float(PLAN.WALL.r)+float(PLAN.WALL.track_axis)+float(lane)*float(PLAN.WALL.track_spacing)
-			var platform_radius:=track_radius+(-3.6 if lane==0 else 3.6)
+			var platform_offset:=float(PLAN.PLATFORMS.edge)+float(PLAN.CROSS.track)+float(PLAN.PLATFORMS.width)*0.5
+			var platform_radius:=track_radius+(-platform_offset if lane==0 else platform_offset)
 			var platform_segments:=10
+			var platform_half_length:=float(PLAN.CROSS.platform[0])*0.5
 			for segment_index in platform_segments:
-				var a_angle:=theta-20.0/track_radius+40.0/track_radius*float(segment_index)/float(platform_segments)
-				var b_angle:=theta-20.0/track_radius+40.0/track_radius*float(segment_index+1)/float(platform_segments)
+				var a_angle:=theta-platform_half_length/track_radius+(platform_half_length*2.0)/track_radius*float(segment_index)/float(platform_segments)
+				var b_angle:=theta-platform_half_length/track_radius+(platform_half_length*2.0)/track_radius*float(segment_index+1)/float(platform_segments)
 				var a:=Vector2(PLAN.CENTER.x+platform_radius*cos(a_angle),PLAN.CENTER.y+platform_radius*sin(a_angle))
 				var b:=Vector2(PLAN.CENTER.x+platform_radius*cos(b_angle),PLAN.CENTER.y+platform_radius*sin(b_angle))
-				var platform:=_segment_body("WallLine_Station_%s_Platform_%d"%[String(station.name).replace(" ","_"),lane],a,b,3.0,rail_y-0.05,0.3,Color("#c4b18b"))
+				var platform:=_segment_body("WallLine_Station_%s_Platform_%d_%d"%[String(station.name).replace(" ","_"),lane,segment_index],a,b,float(PLAN.PLATFORMS.width),rail_y+0.7,0.3,Color("#c4b18b"))
 				_add(packs,_cell((a+b)*0.5),platform)
+				var canopy:=_segment_body("WallLine_Station_%s_Canopy_%d_%d"%[String(station.name).replace(" ","_"),lane,segment_index],a,b,float(PLAN.PLATFORMS.width),rail_y+float(PLAN.PLATFORMS.floor)+float(PLAN.PLATFORMS.canopy),0.18,Color("#bcb49b")); _add(packs,_cell((a+b)*0.5),canopy)
 	for lane in 2:
-		for set_index in 2:
-			var phase := 0.08 if set_index == 0 else 0.58
-			var train := _make_train("Wall Line",lane_paths[lane],int(PLAN.WALL.line.cars),float(PLAN.WALL.line.speed),true,wall_stops,float(PLAN.WALL.line.dwell),lane*2+set_index,1 if lane == 0 else -1)
-			train.set("initial_phase",phase)
+		var line_name: String="Wall Line inner" if lane==0 else "Wall Line outer"
+		var line_plan: Dictionary=PLAN.TIMETABLE.lines[line_name]
+		for train_index in int(line_plan.trains):
+			var train := _make_train(line_name,lane_paths[lane],int(PLAN.TRAIN.consists["Wall Line"].cars),float(line_plan.speed),true,wall_stops,float(PLAN.TIMETABLE.dwell.ordinary),lane*3+train_index,1 if lane==0 else -1)
+			train.set("schedule_events",line_plan.events); train.set("schedule_offset",float(line_plan.offset)); train.set("schedule_headway",float(PLAN.TIMETABLE.headway)); train.set("schedule_circuit",float(line_plan.circuit)); train.set("schedule_train_index",train_index)
 			_add(packs,_cell(Vector2(lane_paths[lane][0].x,lane_paths[lane][0].z)),train)
