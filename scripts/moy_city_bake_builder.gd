@@ -443,6 +443,21 @@ static func _curved_platform_offset(track_radius: float) -> float:
 
 
 static func _add(packs: Dictionary, cell: Vector2i, node: Node3D) -> void:
+	var label := String(node.name).to_lower()
+	if "door" in label or "landing" in label or "liftstop" in label or "platform" in label:
+		node.set_meta("reach_target", true)
+	if "platform" in label: node.set_meta("station_platform", true)
+	if "landing" in label or "platform" in label or "flight" in label or "ramp" in label or "walkway" in label or "deck" in label:
+		node.set_meta("walk_deck", true)
+	if "enterable" in label:
+		node.set_meta("enterable", true)
+	if "clockroom" in label: node.set_meta("enterable", true)
+	if "closed_shell" in label:
+		node.set_meta("closed_shell", true)
+	for child in node.find_children("*", "Node", true, false):
+		var child_name := String(child.name).to_lower()
+		if "foliage" in child_name or "cloud" in child_name or "trim" in child_name or "rope" in child_name or "particle" in child_name or "flower" in child_name or "grass" in child_name or "banner" in child_name:
+			CollisionPolicy.mark_decorative(child)
 	var key := "%02d_%02d" % [cell.x, cell.y]
 	if not packs.has(key):
 		var root := Node3D.new(); root.name = "MoyCell_%s" % key; packs[key] = root
@@ -630,7 +645,9 @@ static func _landmark(b: Dictionary) -> Node3D:
 		_: pass
 	if n == 1:
 		var body := Node3D.new(); body.name = "Building_1_GrandHotel"
+		body.set_meta("closed_shell", true); body.set_meta("enterable", true)
 		body.position = Vector3(center.x,DATUM,center.y)
+		var entrance_target := Node3D.new(); entrance_target.name = "HotelPublicEntranceReachTarget"; entrance_target.position = Vector3(0,0,24); entrance_target.set_meta("reach_target",true); body.add_child(entrance_target)
 		# Four separate podium wings keep the public atrium open at ground and Deck.
 		for wing in [Vector4(-26,0,6,60),Vector4(26,0,6,60),Vector4(0,-30,46,6),Vector4(-12.7,30,20.6,6),Vector4(12.7,30,20.6,6)]:
 			var wall := _box_body("HotelAtriumWing",Vector3(wing.z,44,wing.w),Vector3(wing.x,22,wing.y),color); body.add_child(wall)
@@ -897,6 +914,8 @@ static func _add_moy_lift_call(parent: Node3D, lift: Node, index: int, label: St
 	var post := Node3D.new()
 	post.name = "%s_Call_%s" % [lift.name, label.to_snake_case()]
 	post.position = at
+	post.set_meta("reach_target", true)
+	post.set_meta("reach_link_id", String(lift.name))
 	parent.add_child(post)
 	CalderaLift._control_post(post, Vector3.ZERO)
 	var area := Interactable.attach(post, "Call the lift", 1.2, func() -> void: lift.call("go_to", index), Callable(), Callable(), false, 1.5)
@@ -1249,9 +1268,16 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 		roof_pts.append([float(cfg.c[0])+roof_half*signf(cx)*pow(absf(cx),2.0/exp),float(cfg.c[1])+roof_half*signf(sz)*pow(absf(sz),2.0/exp)])
 	var roof:=_polygon_building("CrossingRoof",roof_pts,float(roof_cfg.th),Color("#d2c7a7")); roof.position.y=DATUM+float(roof_cfg.y); _add(packs,_cell(Vector2(cfg.c[0],cfg.c[1])),roof)
 	for beam_index in cfg._beams.spine.z.size():
-		var z: float=cfg._beams.spine.z[beam_index]; var spine_y0:=float(cfg._beams.spine.y[0]); var spine_y1:=float(cfg._beams.spine.y[1]); var beam:=_box_body("CrossingSpineHeadBeam_%d"%beam_index,Vector3(26.0,spine_y1-spine_y0,1.6),Vector3(-560,DATUM+(spine_y0+spine_y1)*0.5,z),Color("#8d948b")); _add(packs,_cell(Vector2(-560,z)),beam)
+		var z: float=cfg._beams.spine.z[beam_index]; var beam_y0:=float(cfg._beams.spine.y[0]); var beam_y1:=float(cfg._beams.spine.y[1])
+		# Stop at each drum's inner edge. The empty span between drums protects both helix bands.
+		for side in [-1.0,1.0]:
+			var inner_end: float=-560.0+side*7.4; var outer_end: float=-560.0+side*13.0
+			var beam:=_box_body("CrossingSpineHeadBeam_%d_%s"%[beam_index,"E" if side>0.0 else "W"],Vector3(absf(outer_end-inner_end),beam_y1-beam_y0,1.6),Vector3((outer_end+inner_end)*0.5,DATUM+(beam_y0+beam_y1)*0.5,z),Color("#8d948b")); _add(packs,_cell(Vector2((outer_end+inner_end)*0.5,z)),beam)
 	for beam_index in cfg._beams.high.x.size():
-		var x: float=cfg._beams.high.x[beam_index]; var high_y0:=float(cfg._beams.high.y[0]); var high_y1:=float(cfg._beams.high.y[1]); var beam:=_box_body("CrossingMeridianHeadBeam_%d"%beam_index,Vector3(1.6,high_y1-high_y0,26.0),Vector3(x,DATUM+(high_y0+high_y1)*0.5,0),Color("#8d948b")); _add(packs,_cell(Vector2(x,0)),beam)
+		var x: float=cfg._beams.high.x[beam_index]; var beam_y0:=float(cfg._beams.high.y[0]); var beam_y1:=float(cfg._beams.high.y[1])
+		for side in [-1.0,1.0]:
+			var inner_end: float=side*7.4; var outer_end: float=side*13.0
+			var beam:=_box_body("CrossingMeridianHeadBeam_%d_%s"%[beam_index,"N" if side>0.0 else "S"],Vector3(1.6,beam_y1-beam_y0,absf(outer_end-inner_end)),Vector3(x,DATUM+(beam_y0+beam_y1)*0.5,(outer_end+inner_end)*0.5),Color("#8d948b")); _add(packs,_cell(Vector2(x,(outer_end+inner_end)*0.5)),beam)
 	for garden_index in cfg.rain_gardens.size():
 		var garden: Dictionary=cfg.rain_gardens[garden_index]; var gc:=Vector2(float(garden.c[0]),float(garden.c[1])); var disc:=_round_column("CrossingRainGarden_%02d"%garden_index,float(garden.r),0.22,Vector3(gc.x,DATUM+0.11,gc.y),Color("#648350")); _add(packs,_cell(gc),disc)
 		for reed in garden.reeds:
@@ -1386,7 +1412,7 @@ static func _add_transit(packs: Dictionary) -> void:
 			for side in [-1.0,1.0]:
 				var platform_size:=Vector3(float(PLAN.PLATFORMS.width),0.3,plat[0]) if along_z else Vector3(plat[0],0.3,float(PLAN.PLATFORMS.width))
 				var platform_center:=Vector3(p.x+(side*platform_offset if along_z else 0.0),station_y-0.15,p.y+(0.0 if along_z else side*platform_offset))
-				var platform := _box_body("Station_%s_%s_%d"%[line_name,String(station.name).replace(" ","_"),int(side)],platform_size,platform_center,Color("#c4b18b")); _set_box_collision_margin(platform,0.0)
+				var platform := _box_body("Station_%s_%s_%d"%[line_name,String(station.name).replace(" ","_"),int(side)],platform_size,platform_center,Color("#c4b18b")); _set_box_collision_margin(platform,0.0); platform.set_meta("reach_link_id",line_name)
 				_add(packs,_cell(p),platform)
 				var crossing_meridian:=String(station.name)=="The Crossing" and line_name=="Meridian Line"
 				if not crossing_meridian:
@@ -1683,8 +1709,11 @@ static func _add_arch_front(packs: Dictionary) -> void:
 			var foot:=Vector3((float(band[0])+float(band[1]))*0.5,DATUM+float(ys[0]),float(zs[0])); var head:=Vector3(foot.x,DATUM+float(ys[1]),float(zs[1]))
 			_add_escalator_pair(packs,"CityHall_%s_%s"%[side,String(flight.name)],foot,head,2.8)
 		for gallery in leg.galleries:
-			var xr: Array=front.bands.A; var zr: Array=gallery.z; var gy:=DATUM+float(gallery.y)
-			var g:=_box_body("CityHallGallery_%s_%s"%[side,String(gallery.name)],Vector3(absf(float(zr[1])-float(zr[0]))+0.5,0.38,2.8),Vector3((float(xr[0])+float(xr[1]))*0.5,gy,(float(zr[0])+float(zr[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(g.position.x,g.position.z)),g)
+			var band_name:=String(gallery.band); var xr: Array
+			if band_name=="AB": xr=[minf(float(front.bands.A[0]),float(front.bands.B[0])),maxf(float(front.bands.A[1]),float(front.bands.B[1]))]
+			else: xr=front.bands[band_name]
+			var zr: Array=gallery.z; var gy:=DATUM+float(gallery.y)
+			var g:=_box_body("CityHallGallery_%s_%s"%[side,String(gallery.name)],Vector3(absf(float(xr[1])-float(xr[0])),0.38,absf(float(zr[1])-float(zr[0]))),Vector3((float(xr[0])+float(xr[1]))*0.5,gy-0.19,(float(zr[0])+float(zr[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(g.position.x,g.position.z)),g)
 		var ov: Dictionary=leg.over_tracks; var ox: Array=ov.x; var oz: Array=ov.z
 		var walk:=_box_body("CityHallOverTrackWalk_%s"%side,Vector3(float(ox[1])-float(ox[0]),0.4,absf(float(oz[1])-float(oz[0]))),Vector3((float(ox[0])+float(ox[1]))*0.5,DATUM+float(ov.y),(float(oz[0])+float(oz[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(walk.position.x,walk.position.z)),walk)
 		var outer: Dictionary=leg.outer; var oys: Array=outer.y; var ozs: Array=outer.z
@@ -1732,7 +1761,9 @@ static func _add_bridge_station(packs: Dictionary,label: String,y0: float,y1: fl
 	var platform_offset:=_station_platform_offset(true)
 	for side in [-1.0,1.0]:
 		var pz: float=side*platform_offset
-		var platform:=_box_body(label+"BridgePlatform",Vector3(float(PLAN.CROSS.platform[0]),0.3,float(PLAN.PLATFORMS.width)),Vector3(cx,DATUM+y0+5.0-0.15,pz),Color("#c4b18b")); _set_box_collision_margin(platform,0.0); _add(packs,_cell(Vector2(cx,pz)),platform)
+		var platform:=_box_body(label+"BridgePlatform",Vector3(float(PLAN.CROSS.platform[0]),0.3,float(PLAN.PLATFORMS.width)),Vector3(cx,DATUM+y0+5.0-0.15,pz),Color("#c4b18b")); _set_box_collision_margin(platform,0.0)
+		platform.set_meta("reach_link_id","Meridian Line" if label=="MeridianArch" else "Wall Line")
+		_add(packs,_cell(Vector2(cx,pz)),platform)
 
 
 static func _add_city_dome(packs: Dictionary) -> void:

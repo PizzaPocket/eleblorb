@@ -1,57 +1,110 @@
 extends Node
 
+class FixtureTerrain:
+	extends Node
+	func get_mesh_height(_x:float,_z:float)->float: return 0.0
+
 ## Headless walk-surface audit. World geometry is read from collision shapes;
 ## visual-only meshes are read separately so the checks do not confuse a
 ## pretty floor with a floor a character can stand on.
 const CHECKS := ["overlap","buried","water","reach","trap","headroom","underside","solid","guard"]
 const DEFAULT_AREA := Vector4(-763.0,-203.0,-357.0,203.0)
+const WALK_GRID_STEP := 0.5
+const OVERLAP_GRID_STEP := 0.25
+const WALKER_RADIUS := 0.45
+const WALKER_HEIGHT := 2.0
+const STEP_HEIGHT := 0.7 # Matches Player.PROP_STEP_MAX_HEIGHT.
+const COLUMN_HIT_LIMIT := 24
 var _area := DEFAULT_AREA
 var _only_checks: Array[String] = []
 var _findings: Array[Dictionary] = []
 var _timings: Dictionary = {}
 var _world: Node3D
 var _terrain: Node
+var _static_mask := 0
+var _dynamic_excludes:Array[RID] = []
+var _walk_grid: Dictionary = {}
+var _walk_cells: Array[Dictionary] = []
+var _overlap_grid: Dictionary = {}
+var _walkable_slope_dot := 0.70710678
+var _grid_step := WALK_GRID_STEP
+var _graph: Dictionary = {}
+var _reverse_graph: Dictionary = {}
+var _cell_by_id: Dictionary = {}
+var _reachable: Dictionary = {}
+var _reached_buckets:Dictionary = {}
+var _reverse_reachable: Dictionary = {}
+var _clearance_cache: Dictionary = {}
+var _player_start: Vector3 = Vector3.ZERO
+var _sample_stats := {"grid_step_m": WALK_GRID_STEP, "columns": 0, "walk_cells": 0}
+var _mesh_buckets:Dictionary = {}
+var _mesh_bounds:Dictionary = {}
+var _suite_started_usec:int = 0
 
 func _ready() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
+	_suite_started_usec = Time.get_ticks_usec()
 	var opts := _parse_options(OS.get_cmdline_user_args())
 	if opts.has("area"):
 		var values := String(opts.area).split(",")
 		if values.size()==4: _area=Vector4(float(values[0]),float(values[1]),float(values[2]),float(values[3]))
 	if opts.has("checks"):
 		for check in String(opts.checks).split(","): _only_checks.append(check)
+	if opts.has("fixtures"):
+		await _run_fixture_suite()
+		return
 	var main := (load("res://scenes/main.tscn") as PackedScene).instantiate() as Node3D
-	get_tree().root.add_child(main); get_tree().current_scene=main; _world=main
-	await get_tree().process_frame
-	_terrain=main.get_node_or_null("Terrain")
+	# The audit needs only Moy, its terrain and the player physics settings.
+	# Prune other kingdoms and the Ohio village before entering the tree so
+	# their unrelated procedural meshes do not run in the headless renderer.
+	main.set_script(null)
+	var keep := ["WorldEnvironment","DirectionalLight3D","Terrain","WesternCity","Player"]
+	for child in main.get_children():
+		if child.name not in keep: main.remove_child(child); child.free()
 	var player:=main.get_node_or_null("Player") as Node3D
 	if player!=null:
-		player.global_position=Vector3((_area.x+_area.z)*0.5,-58.0,(_area.y+_area.w)*0.5)
+		player.position=Vector3((_area.x+_area.z)*0.5,-58.0,(_area.y+_area.w)*0.5)
 		player.set_physics_process(false)
+		_player_start = player.position
+		_walkable_slope_dot = cos(player.floor_max_angle)
+	get_tree().root.add_child(main); get_tree().current_scene=main; _world=main
+	await get_tree().process_frame
+	await LoadingScreen.wait_for_world_builds()
+	_terrain=main.get_node_or_null("Terrain")
 	var city:=main.get_node_or_null("WesternCity")
 	var deadline:=Time.get_ticks_msec()+240000
 	while city!=null and city.has_method("moy_packs_ready") and not city.moy_packs_ready() and Time.get_ticks_msec()<deadline:
 		await get_tree().create_timer(0.25).timeout
 	await get_tree().physics_frame
 	var meshes:Array[MeshInstance3D]=[]; var shapes:Array[CollisionShape3D]=[]; _collect(main,meshes,shapes)
+	var grid_started := Time.get_ticks_usec()
+	var bounds := _scene_y_bounds(shapes)
+	_walk_grid = _build_walk_grid(WALK_GRID_STEP, bounds.x, bounds.y)
+	_grid_step = WALK_GRID_STEP
+	_sample_stats["columns"] = _grid_column_count(WALK_GRID_STEP)
+	_sample_stats["walk_cells"] = _walk_cells.size()
+	_timings["walk_grid"] = (Time.get_ticks_usec() - grid_started) / 1000.0
+	var graph_started := Time.get_ticks_usec()
+	_build_reach_graph(main)
+	_timings["reach_graph"] = (Time.get_ticks_usec() - graph_started) / 1000.0
 	for check in CHECKS:
 		if not _only_checks.is_empty() and check not in _only_checks: continue
 		var started:=Time.get_ticks_usec()
 		match check:
-			"overlap": _check_overlap(shapes)
-			"buried": _check_buried(shapes)
+			"overlap": _check_overlap(bounds.x, bounds.y)
+			"buried": _check_buried()
 			"water": _check_water(main)
-			"reach": _check_reach(main,shapes)
+			"reach": _check_reach(main)
 			"trap": _check_traps(main)
-			"headroom": _check_headroom(shapes)
+			"headroom": _check_headroom()
 			"underside": _check_underside(meshes,shapes)
 			"solid": _check_solid(meshes,shapes)
-			"guard": _check_guard(shapes)
+			"guard": _check_guard()
 		_timings[check]=(Time.get_ticks_usec()-started)/1000.0
 	_write_report(String(opts.get("kingdom","moy")),String(opts.get("date","2026-10-18")))
-	print("WORLD_CHECKS findings=",_findings.size()," timings_ms=",_timings)
+	print("WORLD_CHECKS findings=",_findings.size()," elapsed_ms=",Time.get_ticks_usec()-_suite_started_usec," timings_ms=",_timings)
 	get_tree().quit(1 if _has_blocking_finding() else 0)
 
 func _parse_options(args:PackedStringArray)->Dictionary:
@@ -64,7 +117,98 @@ func _parse_options(args:PackedStringArray)->Dictionary:
 func _collect(node:Node,meshes:Array[MeshInstance3D],shapes:Array[CollisionShape3D])->void:
 	if node is MeshInstance3D and (node as Node3D).visible: meshes.append(node as MeshInstance3D)
 	if node is CollisionShape3D and not (node as CollisionShape3D).disabled: shapes.append(node as CollisionShape3D)
+	if node is CollisionObject3D:
+		var body := node as CollisionObject3D
+		if body is StaticBody3D or body is AnimatableBody3D:
+			_static_mask |= body.collision_layer
 	for child in node.get_children(): _collect(child,meshes,shapes)
+
+func _scene_y_bounds(shapes:Array[CollisionShape3D])->Vector2:
+	var low := -120.0
+	var high := 320.0
+	for shape in shapes:
+		if shape.shape == null: continue
+		var box := _world_aabb(shape)
+		low = minf(low, box.position.y - 2.0)
+		high = maxf(high, box.end.y + 2.0)
+	return Vector2(low, high)
+
+func _grid_column_count(step:float)->int:
+	var x_count := int(ceil((_area.z - _area.x) / step)) + 1
+	var z_count := int(ceil((_area.w - _area.y) / step)) + 1
+	return x_count * z_count
+
+func _build_walk_grid(step:float, low:float, high:float, candidate_columns:Variant = null)->Dictionary:
+	var grid:Dictionary = {}
+	var cells:Array[Dictionary] = []
+	var x_min := int(ceil(_area.x / step))
+	var x_max := int(floor(_area.z / step))
+	var z_min := int(ceil(_area.y / step))
+	var z_max := int(floor(_area.w / step))
+	_dynamic_excludes.clear()
+	for node in _walk(_world):
+		if node is CollisionObject3D and not (node is StaticBody3D) and not (node is AnimatableBody3D):
+			_dynamic_excludes.append((node as CollisionObject3D).get_rid())
+	var space := get_viewport().world_3d.direct_space_state
+	for ix in range(x_min, x_max + 1):
+		var x := float(ix) * step
+		for iz in range(z_min, z_max + 1):
+			if candidate_columns != null and not candidate_columns.has(Vector2i(ix,iz)): continue
+			var z := float(iz) * step
+			var from := Vector3(x, high, z)
+			var to := Vector3(x, low, z)
+			var excluded := _dynamic_excludes.duplicate()
+			var seen_heights:Dictionary = {}
+			for _hit_index in COLUMN_HIT_LIMIT:
+				var query := PhysicsRayQueryParameters3D.create(from, to, _static_mask, excluded)
+				query.hit_back_faces = true
+				var hit := space.intersect_ray(query)
+				if hit.is_empty(): break
+				var body := hit.get("collider") as CollisionObject3D
+				if body == null: break
+				var rid := body.get_rid()
+				if rid in excluded: break
+				excluded.append(rid)
+				var normal:Vector3 = hit.normal
+				if normal.y < _walkable_slope_dot: continue
+				var position:Vector3 = hit.position
+				var height_key := "%d:%d" % [body.get_instance_id(), roundi(position.y * 50.0)]
+				if seen_heights.has(height_key): continue
+				seen_heights[height_key] = true
+				var key := Vector2i(ix, iz)
+				var cell := {"key": key, "x": x, "z": z, "y": position.y, "position": position, "normal": normal, "body": body, "body_path": str(body.get_path()), "id": _cell_id(key, position.y, body)}
+				if not grid.has(key): grid[key] = []
+				grid[key].append(cell)
+				cells.append(cell)
+		if (ix-x_min) % 200 == 0: print("WORLD_CHECKS grid_columns=", ix-x_min, "/", x_max-x_min+1, " cells=", cells.size())
+	_walk_cells = _apply_radius_filter(cells, grid, step)
+	var filtered:Dictionary = {}
+	for cell in _walk_cells:
+		var key:Vector2i = cell.key
+		if not filtered.has(key): filtered[key] = []
+		filtered[key].append(cell)
+	return filtered
+
+func _apply_radius_filter(cells:Array[Dictionary], grid:Dictionary, step:float)->Array[Dictionary]:
+	var result:Array[Dictionary] = []
+	var offsets:Array[Vector2i] = [Vector2i(-1,0),Vector2i(1,0),Vector2i(0,-1),Vector2i(0,1)]
+	for cell in cells:
+		var supported := true
+		for offset in offsets:
+			var neighbour_key:Vector2i = cell.key + offset
+			if not grid.has(neighbour_key) or not _has_nearby_height(grid[neighbour_key], float(cell.y), STEP_HEIGHT):
+				supported = false
+				break
+		if supported: result.append(cell)
+	return result
+
+func _has_nearby_height(cells:Array, target_height:float, tolerance:float)->bool:
+	for cell in cells:
+		if absf(float(cell.y) - target_height) <= tolerance: return true
+	return false
+
+func _cell_id(key:Vector2i, height:float, body:CollisionObject3D)->String:
+	return "%d,%d:%.2f:%s" % [key.x, key.y, height, str(body.get_path())]
 
 func _inside_area(point:Vector3)->bool:
 	return point.x>=_area.x and point.x<=_area.z and point.z>=_area.y and point.z<=_area.w
@@ -77,27 +221,174 @@ func _world_aabb(shape:CollisionShape3D)->AABB:
 	if debug_mesh==null: return AABB(shape.global_position,Vector3.ZERO)
 	return shape.global_transform*debug_mesh.get_aabb()
 
-func _check_overlap(shapes:Array[CollisionShape3D])->void:
-	var surfaces:Array[Dictionary]=[]
-	for shape in shapes:
-		var bounds:=_world_aabb(shape)
-		if bounds.size.x<0.4 or bounds.size.z<0.4 or not _inside_area(bounds.get_center()): continue
-		surfaces.append({"node":shape,"bounds":bounds,"top":bounds.end.y})
-	for i in surfaces.size():
-		for j in range(i+1,surfaces.size()):
-			var a:Dictionary=surfaces[i]; var b:Dictionary=surfaces[j]
-			var na:=a.node as CollisionShape3D; var nb:=b.node as CollisionShape3D
-			if na.get_parent()==nb.get_parent() or absf(float(a.top)-float(b.top))>0.02: continue
-			var aa:=a.bounds as AABB; var bb:=b.bounds as AABB
-			if aa.intersects(bb) and (aa.size.x>0.6 and aa.size.z>0.6): _record("overlap",na,(aa.get_center()+bb.get_center())*0.5,"overlapping upward surfaces within 0.02 m",false,nb)
+func _node_world_aabb(node:Node3D)->AABB:
+	if node is MeshInstance3D:
+		var mesh := node as MeshInstance3D
+		if mesh.mesh != null: return mesh.global_transform * mesh.mesh.get_aabb()
+	if node is CollisionShape3D: return _world_aabb(node as CollisionShape3D)
+	var found := false
+	var bounds := AABB()
+	var stack:Array[Node] = [node]
+	while not stack.is_empty():
+		var current:Node = stack.pop_back()
+		if current is MeshInstance3D or current is CollisionShape3D:
+			var part := _world_aabb(current as CollisionShape3D) if current is CollisionShape3D else _node_world_aabb(current as Node3D)
+			if not found: bounds = part; found = true
+			else: bounds = bounds.merge(part)
+		for child in current.get_children(): stack.append(child)
+	return bounds if found else AABB(node.global_position, Vector3.ZERO)
 
-func _check_buried(shapes:Array[CollisionShape3D])->void:
+func _body_has_meta(node:Node, key:StringName)->bool:
+	var current:Node = node
+	while current != null:
+		if current.has_meta(key) and bool(current.get_meta(key)): return true
+		current = current.get_parent()
+	return false
+
+func _collision_is_decorative(node:Node)->bool:
+	var current:Node = node
+	while current != null:
+		if String(current.get_meta("collision_policy", "")) == "decorative": return true
+		current = current.get_parent()
+	return false
+
+func _emit_cell_clusters(check:String, cells:Array[Dictionary], detail_template:String, blocking:bool, override_node:Node=null)->void:
+	var remaining:Dictionary = {}
+	var seed_ids:Array = []
+	for cell in cells:
+		var body_path := str(override_node.get_path()) if override_node != null else String(cell.body_path)
+		var id := "%s|%s" % [body_path, str(cell.key)]
+		if not remaining.has(id): seed_ids.append(id); remaining[id] = cell
+	var seed_index := 0
+	while not remaining.is_empty():
+		while seed_index < seed_ids.size() and not remaining.has(seed_ids[seed_index]): seed_index += 1
+		if seed_index >= seed_ids.size(): break
+		var seed_id:String = seed_ids[seed_index]
+		seed_index += 1
+		var seed:Dictionary = remaining[seed_id]
+		var queue:Array[Dictionary] = [seed]
+		var queue_index := 0
+		remaining.erase(seed_id)
+		var cluster:Array[Dictionary] = []
+		while queue_index < queue.size():
+			var current:Dictionary = queue[queue_index]
+			queue_index += 1
+			cluster.append(current)
+			for dx in range(-1, 2):
+				for dz in range(-1, 2):
+					var next_key:Vector2i = current.key + Vector2i(dx, dz)
+					var body_path := str(override_node.get_path()) if override_node != null else String(current.body_path)
+					var next_id := "%s|%s" % [body_path, str(next_key)]
+					if remaining.has(next_id):
+						queue.append(remaining[next_id])
+						remaining.erase(next_id)
+		var center := Vector3.ZERO
+		for cell in cluster: center += cell.position
+		center /= float(cluster.size())
+		var source:Node = override_node if override_node != null else seed.body
+		var detail := detail_template % cluster.size() if "%" in detail_template else detail_template
+		_record(check, source, center, detail, blocking)
+
+func _check_overlap(low:float, high:float)->void:
+	var base_grid := _walk_grid
+	var base_cells := _walk_cells
+	var candidates:Dictionary = {}
+	for key in base_grid:
+		var column:Array = base_grid[key]
+		var possible := false
+		for i in column.size():
+			for j in range(i+1,column.size()):
+				if column[i].body != column[j].body and absf(float(column[i].y)-float(column[j].y)) <= 0.02 and not _same_walk_run(column[i].body,column[j].body):
+					possible = true; break
+			if possible: break
+		if possible:
+			for dx in range(-1,2):
+				for dz in range(-1,2):
+					if not base_grid.has(key+Vector2i(dx,dz)): continue
+					for fx in range(-1,2):
+						for fz in range(-1,2): candidates[(key+Vector2i(dx,dz))*2+Vector2i(fx,fz)] = true
+	var started := Time.get_ticks_usec()
+	_overlap_grid = _build_walk_grid(OVERLAP_GRID_STEP, low, high, candidates)
+	var overlap_cells := _walk_cells
+	_walk_grid = base_grid
+	_walk_cells = base_cells
+	_timings["overlap_grid"] = (Time.get_ticks_usec() - started) / 1000.0
+	var contacts:Dictionary = {}
+	for key in _overlap_grid:
+		var at_column:Array = _overlap_grid[key]
+		for i in at_column.size():
+			for j in range(i + 1, at_column.size()):
+				var a:Dictionary = at_column[i]
+				var b:Dictionary = at_column[j]
+				if a.body == b.body or absf(float(a.y) - float(b.y)) > 0.02: continue
+				if _same_walk_run(a.body, b.body): continue
+				var a_path:String = String(a.body_path)
+				var b_path:String = String(b.body_path)
+				var first:Dictionary = a if a_path < b_path else b
+				var second:Dictionary = b if a_path < b_path else a
+				var pair_key := "%s||%s" % [first.body_path, second.body_path]
+				if not contacts.has(pair_key): contacts[pair_key] = {"a": first.body, "b": second.body, "cells": {}}
+				contacts[pair_key].cells[key] = Vector3(a.x, (a.y + b.y) * 0.5, a.z)
+	for pair_key in contacts:
+		var contact:Dictionary = contacts[pair_key]
+		var remaining:Dictionary = contact.cells.duplicate()
+		var seed_keys:Array = remaining.keys()
+		var seed_index := 0
+		while not remaining.is_empty():
+			while seed_index < seed_keys.size() and not remaining.has(seed_keys[seed_index]): seed_index += 1
+			if seed_index >= seed_keys.size(): break
+			var seed:Vector2i = seed_keys[seed_index]
+			seed_index += 1
+			var queue:Array[Vector2i] = [seed]
+			var queue_index := 0
+			var cluster:Array[Vector3] = []
+			remaining.erase(seed)
+			while queue_index < queue.size():
+				var current:Vector2i = queue[queue_index]
+				queue_index += 1
+				cluster.append(contact.cells[current])
+				for dx in range(-1, 2):
+					for dz in range(-1, 2):
+						var next := current + Vector2i(dx, dz)
+						if remaining.has(next):
+							remaining.erase(next)
+							queue.append(next)
+			var center := Vector3.ZERO
+			for point in cluster: center += point
+			center /= float(cluster.size())
+			_record("overlap", contact.a, center, "walk cells on different bodies share height within 0.02 m (%d cells)" % cluster.size(), true, contact.b)
+	if overlap_cells.is_empty(): _sample_stats["overlap_walk_cells"] = 0
+	else: _sample_stats["overlap_walk_cells"] = overlap_cells.size()
+
+func _same_walk_run(a:CollisionObject3D, b:CollisionObject3D)->bool:
+	for meta_key in [&"walk_run_id", &"surface_run_id", &"track_run_id"]:
+		if a.has_meta(meta_key) and b.has_meta(meta_key) and a.get_meta(meta_key) == b.get_meta(meta_key): return true
+	var a_run := _walk_run_name(a.name)
+	var b_run := _walk_run_name(b.name)
+	return not a_run.is_empty() and a_run == b_run
+
+func _walk_run_name(raw_name:StringName)->String:
+	var tokens := String(raw_name).split("_", false)
+	if tokens.size() < 3: return ""
+	var numeric_suffix := 0
+	for i in range(tokens.size() - 1, 0, -1):
+		var token := tokens[i]
+		if token.is_valid_int(): numeric_suffix += 1
+		else: break
+	if numeric_suffix == 0: return ""
+	var root := "_".join(tokens.slice(0, tokens.size() - numeric_suffix))
+	var normalized := root.to_lower()
+	if "rail" in normalized or "track" in normalized or "escalator" in normalized or "walkway" in normalized: return root
+	return ""
+
+func _check_buried()->void:
 	if _terrain==null or not _terrain.has_method("get_mesh_height"): return
-	for shape in shapes:
-		var a:=_world_aabb(shape)
-		if not _inside_area(a.get_center()) or a.size.x<0.5 or a.size.z<0.5: continue
-		var ground:=float(_terrain.get_mesh_height(a.get_center().x,a.get_center().z))
-		if ground>a.end.y+0.02 and a.end.y-ground>-2.0: _record("buried",shape,a.get_center(),"surface top is below sampled terrain",true)
+	var buried:Array[Dictionary] = []
+	for cell in _walk_cells:
+		var ground := float(_terrain.get_mesh_height(float(cell.x), float(cell.z)))
+		if ground > float(cell.y) + 0.02:
+			buried.append(cell)
+	_emit_cell_clusters("buried", buried, "terrain stands above walk surface (%d samples)", true)
 
 func _check_water(root:Node)->void:
 	for node in _walk(root):
@@ -105,70 +396,523 @@ func _check_water(root:Node)->void:
 		var p:=node as Node3D
 		if p==null or not _inside_area(p.global_position): continue
 		var water_y:=float(node.get_meta("water_surface_y"))
-		if _terrain!=null and _terrain.has_method("get_mesh_height"):
-			var edge_ground:=float(_terrain.get_mesh_height(p.global_position.x,p.global_position.z))
-			if edge_ground<water_y-0.02 and not node.has_meta("water_weir"): _record("water",node,p.global_position,"water surface stands above edge ground",true)
+		var water_mesh:MeshInstance3D = null
+		for child in _walk(node):
+			if child is MeshInstance3D: water_mesh = child as MeshInstance3D; break
+		if water_mesh == null or not _uses_shared_water_material(water_mesh):
+			_record("water",node,p.global_position,"water mesh does not use the shared water shader material",true)
+		if _terrain==null or not _terrain.has_method("get_mesh_height") or water_mesh == null: continue
+		var bounds := _node_world_aabb(water_mesh)
+		var samples:Array[Vector2] = []
+		var step := 0.5
+		var x0 := bounds.position.x - step; var x1 := bounds.end.x + step
+		var z0 := bounds.position.z - step; var z1 := bounds.end.z + step
+		var nx := maxi(1, int(ceil((x1-x0)/step))); var nz := maxi(1, int(ceil((z1-z0)/step)))
+		for i in range(nx+1):
+			var x := lerpf(x0,x1,float(i)/float(nx)); samples.append(Vector2(x,z0)); samples.append(Vector2(x,z1))
+		for i in range(1,nz):
+			var z := lerpf(z0,z1,float(i)/float(nz)); samples.append(Vector2(x0,z)); samples.append(Vector2(x1,z))
+		for point in samples:
+			var ground := float(_terrain.get_mesh_height(point.x,point.y))
+			if ground < water_y-0.02 and not node.has_meta("water_weir") and not node.has_meta("water_spout"):
+				_record("water",node,Vector3(point.x,water_y,point.y),"water stands %.2f m above bank at 0.5 m outside its outline" % (water_y-ground),true)
+				break
 
-func _check_reach(root:Node,shapes:Array[CollisionShape3D])->void:
-	var targets:Array[Node]=[]
-	for n in _walk(root):
-		if n.has_meta("reach_target") and _inside_area((n as Node3D).global_position): targets.append(n)
-	# Walkable surface connectivity is measured by shared top heights and
-	# touching footprints. Tagged destinations must have a nearby walk surface.
+func _uses_shared_water_material(mesh:MeshInstance3D)->bool:
+	for i in mesh.mesh.get_surface_count() if mesh.mesh != null else 0:
+		var material := mesh.get_active_material(i)
+		if material is ShaderMaterial and (material as ShaderMaterial).shader == VillageWorks.SHARED_WATER_SHADER: return true
+	if mesh.material_override is ShaderMaterial and (mesh.material_override as ShaderMaterial).shader == VillageWorks.SHARED_WATER_SHADER: return true
+	return false
+
+func _build_reach_graph(root:Node)->void:
+	_graph.clear(); _reverse_graph.clear(); _cell_by_id.clear()
+	for cell in _walk_cells:
+		var id:String = cell.id
+		_cell_by_id[id] = cell
+		_graph[id] = []
+		_reverse_graph[id] = []
+	for cell in _walk_cells:
+		var id:String = cell.id
+		var key:Vector2i = cell.key
+		var neighbours:Array = []
+		for dx in range(-1, 2):
+			for dz in range(-1, 2):
+				if dx == 0 and dz == 0: continue
+				var next_key := key + Vector2i(dx, dz)
+				if _walk_grid.has(next_key): neighbours.append_array(_walk_grid[next_key])
+		if _walk_grid.has(key):
+			for stacked in _walk_grid[key]:
+				if stacked.id != id: neighbours.append(stacked)
+		for next_cell in neighbours:
+			if not _can_step_between(cell, next_cell): continue
+			_add_graph_edge(id, String(next_cell.id))
+	# Transport endpoints with the same id are explicit graph links (lift,
+	# escalator, or train). They are authored on markers so the checker remains
+	# kingdom-agnostic.
+	var links:Dictionary = {}
+	for node in _walk(root):
+		if not node.has_meta("reach_link_id") or not node is Node3D: continue
+		var link_id := str(node.get_meta("reach_link_id"))
+		var cell := _nearest_cell((node as Node3D).global_position, 3.0)
+		if cell.is_empty(): continue
+		if not links.has(link_id): links[link_id] = []
+		links[link_id].append(String(cell.id))
+	for link_id in links:
+		var endpoints:Array = links[link_id]
+		for a in endpoints:
+			for b in endpoints:
+				if a != b: _add_graph_edge(String(a), String(b))
+	var starts:Array[String] = []
+	var spawn := _nearest_cell(_player_start, 3.0)
+	if not spawn.is_empty(): starts.append(String(spawn.id))
+	for node in _walk(root):
+		if not node is Node3D: continue
+		if node.has_meta("reach_start") or node.has_meta("station_platform"):
+			var cell := _nearest_cell((node as Node3D).global_position, 3.0)
+			if not cell.is_empty() and String(cell.id) not in starts: starts.append(String(cell.id))
+	_reachable = _flood_graph(starts, _graph)
+	_reached_buckets.clear()
+	for id in _reachable:
+		var cell:Dictionary = _cell_by_id[id]
+		var bucket := Vector2i(floori(float(cell.x)/16.0),floori(float(cell.z)/16.0))
+		if not _reached_buckets.has(bucket): _reached_buckets[bucket] = []
+		_reached_buckets[bucket].append(cell)
+	var spawn_seeds:Array[String] = []
+	if not spawn.is_empty(): spawn_seeds.append(String(spawn.id))
+	_reverse_reachable = _flood_graph(spawn_seeds, _reverse_graph)
+
+func _add_graph_edge(from_id:String, to_id:String)->void:
+	if not _graph.has(from_id) or not _graph.has(to_id): return
+	if to_id not in _graph[from_id]: _graph[from_id].append(to_id)
+	if from_id not in _reverse_graph[to_id]: _reverse_graph[to_id].append(from_id)
+
+func _flood_graph(starts:Array[String], edges:Dictionary)->Dictionary:
+	var visited:Dictionary = {}
+	var queue:Array[String] = []
+	for start in starts:
+		if _cell_by_id.has(start) and not visited.has(start): visited[start] = true; queue.append(start)
+	var queue_index := 0
+	while queue_index < queue.size():
+		var current:String = queue[queue_index]
+		queue_index += 1
+		for next in edges.get(current, []):
+			if visited.has(next): continue
+			if not _cell_clearance(_cell_by_id[next]): continue
+			visited[next] = true
+			queue.append(next)
+	return visited
+
+func _can_step_between(a:Dictionary, b:Dictionary)->bool:
+	var rise := float(b.y) - float(a.y)
+	if rise > STEP_HEIGHT or rise < -1.0: return false
+	if float(a.normal.y) < _walkable_slope_dot or float(b.normal.y) < _walkable_slope_dot: return false
+	if a.body == b.body: return true
+	var from:Vector3 = a.position + Vector3.UP * 0.8
+	var to:Vector3 = b.position + Vector3.UP * 0.8
+	var query := PhysicsRayQueryParameters3D.create(from,to,_static_mask)
+	query.exclude = _dynamic_excludes.duplicate()
+	query.exclude.append((a.body as CollisionObject3D).get_rid())
+	query.exclude.append((b.body as CollisionObject3D).get_rid())
+	if not get_viewport().world_3d.direct_space_state.intersect_ray(query).is_empty(): return false
+	return true
+
+func _cell_clearance(cell:Dictionary)->bool:
+	var id:String = cell.id
+	if _clearance_cache.has(id): return bool(_clearance_cache[id])
+	var point:Vector3 = cell.position
+	var state := get_viewport().world_3d.direct_space_state
+	var from := point + Vector3.UP * 0.05
+	var to := from + Vector3.UP * (WALKER_HEIGHT - 0.1)
+	var query := PhysicsRayQueryParameters3D.create(from, to, _static_mask)
+	query.exclude = _dynamic_excludes.duplicate()
+	query.exclude.append((cell.body as CollisionObject3D).get_rid())
+	var clear := state.intersect_ray(query).is_empty()
+	_clearance_cache[id] = clear
+	return clear
+
+func _nearest_cell(point:Vector3, max_distance:float)->Dictionary:
+	var best:Dictionary = {}
+	var best_distance := max_distance
+	var radius := ceili(max_distance/_grid_step)
+	var center := Vector2i(roundi(point.x/_grid_step),roundi(point.z/_grid_step))
+	for dx in range(-radius,radius+1):
+		for dz in range(-radius,radius+1):
+			for cell in _walk_grid.get(center+Vector2i(dx,dz),[]):
+				var dy := absf(float(cell.y)-point.y)
+				if dy > 3.0: continue
+				var distance := Vector2(float(cell.x)-point.x,float(cell.z)-point.z).length()
+				if distance <= best_distance: best_distance = distance; best = cell
+	return best
+
+func _check_reach(root:Node)->void:
+	var targets:Array[Node] = []
+	for node in _walk(root):
+		if node.has_meta("reach_target") and node is Node3D and _inside_area((node as Node3D).global_position): targets.append(node)
 	for target in targets:
-		var p:Vector3=(target as Node3D).global_position
-		var found:=false
-		for shape in shapes:
-			var a:=_world_aabb(shape)
-			if a.has_point(Vector3(p.x,p.y-0.2,p.z)) or (absf(a.end.y-p.y)<1.0 and absf(a.get_center().x-p.x)<5.0 and absf(a.get_center().z-p.z)<5.0): found=true; break
-		if not found: _record("reach",target,p,"tagged target has no nearby walk surface",true)
+		var point := (target as Node3D).global_position
+		var cell := _nearest_cell(point, 2.0)
+		if cell.is_empty():
+			_record("reach", target, point, "no walk cell lies within 2 m of the target", true)
+		elif not _reachable.has(String(cell.id)):
+			var nearest := _nearest_reached(point)
+			_record("reach", target, point, "target is disconnected from spawn/stations; nearest reached cell: %s" % (str(nearest.position.round()) if not nearest.is_empty() else "none"), true)
+
+func _nearest_reached(point:Vector3)->Dictionary:
+	var best:Dictionary = {}
+	var best_distance := INF
+	for bucket in _reached_buckets:
+		var center := Vector3((float(bucket.x)+0.5)*16.0,point.y,(float(bucket.y)+0.5)*16.0)
+		var lower_bound := Vector2(center.x-point.x,center.z-point.z).length()-11.4
+		if lower_bound > best_distance: continue
+		for cell in _reached_buckets[bucket]:
+			var distance := point.distance_to(cell.position)
+			if distance < best_distance: best_distance = distance; best = cell
+	return best
 
 func _check_traps(root:Node)->void:
+	var one_way:Array[Dictionary] = []
+	for id in _reachable:
+		if not _reverse_reachable.has(id): one_way.append(_cell_by_id[id])
+	_emit_cell_clusters("trap", one_way, "reachable pocket cannot return to spawn (%d walk samples)", true)
+	var shells:Array[Node3D] = []
 	for node in _walk(root):
-		if node.has_meta("enterable") and bool(node.get_meta("enterable")) and node.has_meta("closed_shell") and bool(node.get_meta("closed_shell")):
-			_record("trap",node,(node as Node3D).global_position,"enterable closed shell is not marked with a ways_out connection",true)
+		if node is Node3D and node.has_meta("closed_shell") and bool(node.get_meta("closed_shell")) and not bool(node.get_meta("enterable", false)):
+			shells.append(node as Node3D)
+	for shell in shells:
+		var bounds := _node_world_aabb(shell)
+		var inside:Array[Dictionary] = []
+		for cell_id in _reachable:
+			var cell:Dictionary = _cell_by_id[cell_id]
+			if bounds.has_point(cell.position): inside.append(cell)
+		_emit_cell_clusters("trap", inside, "reachable cells inside an untagged shell (%d samples)", true, shell)
 
-func _check_headroom(shapes:Array[CollisionShape3D])->void:
-	var space:=get_viewport().world_3d.direct_space_state
-	for shape in shapes:
-		var a:=_world_aabb(shape)
-		if not _inside_area(a.get_center()) or a.size.x<0.45 or a.size.z<0.45: continue
-		var from:=Vector3(a.get_center().x,a.end.y+0.05,a.get_center().z)
-		# Start above the source shape, so an exclusion RID is unnecessary.
-		var query:=PhysicsRayQueryParameters3D.create(from,from+Vector3.UP*2.2,1)
-		var hit:=space.intersect_ray(query)
-		if not hit.is_empty(): _record("headroom",shape,hit.position,"solid geometry within 2.2 m above walk",false,hit.collider as Node)
+func _check_headroom()->void:
+	var groups:Dictionary = {}
+	var state := get_viewport().world_3d.direct_space_state
+	for id in _reachable:
+		var cell:Dictionary = _cell_by_id[id]
+		var point:Vector3 = cell.position
+		var from := point + Vector3.UP * 0.05
+		var distance := 2.4 if _body_has_meta(cell.body, &"flight") else 2.2
+		var query := PhysicsRayQueryParameters3D.create(from, from + Vector3.UP * distance, _static_mask)
+		query.exclude = [(cell.body as CollisionObject3D).get_rid()]
+		var hit := state.intersect_ray(query)
+		if hit.is_empty(): continue
+		var obstacle := hit.get("collider") as Node
+		if obstacle == null: continue
+		var key := str(obstacle.get_path())
+		if not groups.has(key): groups[key] = {"node": obstacle, "cells": []}
+		groups[key].cells.append(cell)
+	for key in groups:
+		var group:Dictionary = groups[key]
+		var blocking := _body_has_meta(group.node, &"flight") or _body_has_meta(group.node, &"doorway") or _body_has_meta(group.node, &"ways_out")
+		var typed_cells:Array[Dictionary] = []
+		for cell in group.cells: typed_cells.append(cell)
+		_emit_cell_clusters("headroom", typed_cells, "solid geometry within standing height (%d samples)", blocking, group.node)
 
-func _check_underside(meshes:Array[MeshInstance3D],shapes:Array[CollisionShape3D])->void:
+func _check_underside(meshes:Array[MeshInstance3D], shapes:Array[CollisionShape3D])->void:
+	_build_mesh_buckets(meshes)
+	var body_cells:Dictionary = {}
+	for cell in _walk_cells:
+		var body_path:String = cell.body_path
+		if not body_cells.has(body_path): body_cells[body_path] = {"body": cell.body, "cells": []}
+		body_cells[body_path].cells.append(cell)
+	var issues:Dictionary = {}
+	var checked_meshes:Dictionary = {}
+	for body_path in body_cells:
+		var entry:Dictionary = body_cells[body_path]
+		if not _is_walk_deck(entry.body): continue
+		for cell in entry.cells:
+			var candidates := _meshes_at_walk_cell(meshes, cell)
+			for mesh in candidates:
+				var mesh_id := mesh.get_instance_id()
+				if checked_meshes.has(mesh_id): continue
+				checked_meshes[mesh_id] = true
+				var bounds := _node_world_aabb(mesh)
+				var sample := Vector3(float(cell.x), bounds.position.y, float(cell.z))
+				var has_visible_face := _has_visible_underside(mesh, sample)
+				var ray_from:Vector3 = cell.position - Vector3.UP
+				var ray_to:Vector3 = cell.position + Vector3.UP * 0.05
+				var query := PhysicsRayQueryParameters3D.create(ray_from, ray_to, _static_mask)
+				var hit := get_viewport().world_3d.direct_space_state.intersect_ray(query)
+				var collider_present:bool = not hit.is_empty() and hit.get("collider") == entry.body
+				if has_visible_face and collider_present: continue
+				var key := str(mesh.get_path())
+				if not issues.has(key): issues[key] = {"mesh": mesh, "position": sample, "visible": has_visible_face, "collider": collider_present, "cells": []}
+				issues[key].cells.append(cell)
+	for key in issues:
+		var issue:Dictionary = issues[key]
+		var reasons:Array[String] = []
+		if not issue.visible: reasons.append("no underside-facing face or two-sided material")
+		if not issue.collider: reasons.append("upward ray did not hit this deck's collider")
+		_record("underside", issue.mesh, issue.position, "; ".join(reasons), true)
+	_check_inward_winding(meshes)
+
+func _is_walk_deck(body:Node)->bool:
+	if _body_has_meta(body,&"walk_deck") or _body_has_meta(body,&"flight"): return true
+	var label := String(body.name).to_lower()
+	return "landing" in label or "platform" in label or "flight" in label or "walkway" in label or "ramp" in label or "deck" in label
+
+func _build_mesh_buckets(meshes:Array[MeshInstance3D])->void:
+	_mesh_buckets.clear(); _mesh_bounds.clear()
+	const bucket_size := 8.0
 	for mesh in meshes:
-		var a:=mesh.get_aabb(); var world_a:=mesh.global_transform*a
-		if not _inside_area(world_a.get_center()) or world_a.size.x<1.5 or world_a.size.z<1.5: continue
-		var has_collider:=false
-		for shape in shapes:
-			var sa:=_world_aabb(shape)
-			if sa.intersects(world_a): has_collider=true; break
-		if not has_collider: _record("underside",mesh,world_a.get_center(),"walk-sized mesh has no collider beneath its footprint",true)
+		if mesh.mesh == null or String(mesh.get_meta("collision_policy", "")) == "decorative": continue
+		var bounds := _node_world_aabb(mesh)
+		if bounds.size.x > 128.0 or bounds.size.z > 128.0: continue
+		var min_x := int(floor(bounds.position.x / bucket_size)); var max_x := int(floor(bounds.end.x / bucket_size))
+		var min_z := int(floor(bounds.position.z / bucket_size)); var max_z := int(floor(bounds.end.z / bucket_size))
+		var mesh_id := mesh.get_instance_id()
+		_mesh_bounds[mesh_id] = bounds
+		for bx in range(min_x, max_x + 1):
+			for bz in range(min_z, max_z + 1):
+				var bucket_key := Vector2i(bx, bz)
+				if not _mesh_buckets.has(bucket_key): _mesh_buckets[bucket_key] = []
+				_mesh_buckets[bucket_key].append(mesh)
+
+func _meshes_at_walk_cell(meshes:Array[MeshInstance3D], cell:Dictionary)->Array[MeshInstance3D]:
+	var candidates:Array[MeshInstance3D] = []
+	var bucket_key := Vector2i(int(floor(float(cell.x) / 8.0)), int(floor(float(cell.z) / 8.0)))
+	for mesh in _mesh_buckets.get(bucket_key, []):
+		var bounds:AABB = _mesh_bounds[mesh.get_instance_id()]
+		if float(cell.x) < bounds.position.x - 0.01 or float(cell.x) > bounds.end.x + 0.01: continue
+		if float(cell.z) < bounds.position.z - 0.01 or float(cell.z) > bounds.end.z + 0.01: continue
+		if absf(bounds.end.y - float(cell.y)) > 0.3: continue
+		if bounds.size.x < 0.25 or bounds.size.z < 0.25: continue
+		candidates.append(mesh)
+	return candidates
+
+func _has_visible_underside(mesh:MeshInstance3D, sample:Vector3)->bool:
+	if _mesh_is_two_sided(mesh): return true
+	if mesh.mesh == null: return false
+	var faces := mesh.mesh.get_faces()
+	for i in range(0, faces.size(), 3):
+		var a:Vector3 = mesh.global_transform * faces[i]
+		var b:Vector3 = mesh.global_transform * faces[i + 1]
+		var c:Vector3 = mesh.global_transform * faces[i + 2]
+		var normal := (b - a).cross(c - a).normalized()
+		if normal.y > -0.5: continue
+		if absf((a.y + b.y + c.y) / 3.0 - sample.y) > 0.15: continue
+		if _point_in_triangle_xz(Vector2(sample.x, sample.z), Vector2(a.x,a.z), Vector2(b.x,b.z), Vector2(c.x,c.z)): return true
+	return false
+
+func _mesh_is_two_sided(mesh:MeshInstance3D)->bool:
+	var materials:Array[Material] = []
+	if mesh.material_override != null: materials.append(mesh.material_override)
+	if mesh.mesh != null:
+		for surface in mesh.mesh.get_surface_count():
+			var material := mesh.get_active_material(surface)
+			if material != null: materials.append(material)
+	for material in materials:
+		if material is BaseMaterial3D and (material as BaseMaterial3D).cull_mode == BaseMaterial3D.CULL_DISABLED: return true
+	return false
+
+func _point_in_triangle_xz(p:Vector2, a:Vector2, b:Vector2, c:Vector2)->bool:
+	var v0 := c-a; var v1 := b-a; var v2 := p-a
+	var dot00 := v0.dot(v0); var dot01 := v0.dot(v1); var dot02 := v0.dot(v2)
+	var dot11 := v1.dot(v1); var dot12 := v1.dot(v2)
+	var denominator := dot00 * dot11 - dot01 * dot01
+	if absf(denominator) < 0.000001: return false
+	var u := (dot11 * dot02 - dot01 * dot12) / denominator
+	var v := (dot00 * dot12 - dot01 * dot02) / denominator
+	return u >= -0.001 and v >= -0.001 and u + v <= 1.001
+
+func _check_inward_winding(meshes:Array[MeshInstance3D])->void:
+	for mesh in meshes:
+		if not mesh.has_meta("closed_shell") or not bool(mesh.get_meta("closed_shell")) or mesh.mesh == null: continue
+		var faces := mesh.mesh.get_faces()
+		if faces.size() < 36: continue
+		var bounds := _node_world_aabb(mesh)
+		var center := bounds.get_center()
+		var inward := 0; var outward := 0
+		for i in range(0, faces.size(), 3):
+			var a:Vector3 = mesh.global_transform * faces[i]
+			var b:Vector3 = mesh.global_transform * faces[i + 1]
+			var c:Vector3 = mesh.global_transform * faces[i + 2]
+			var normal := (b-a).cross(c-a).normalized()
+			var direction := (a+b+c)/3.0-center
+			if normal.length_squared() < 0.5 or direction.length_squared() < 0.01: continue
+			if normal.dot(direction) < 0.0: inward += 1
+			else: outward += 1
+		if inward > 0 and inward > outward * 4:
+			_record("underside", mesh, center, "closed mesh winding faces inward (%d inward, %d outward triangles)" % [inward, outward], true)
 
 func _check_solid(meshes:Array[MeshInstance3D],shapes:Array[CollisionShape3D])->void:
 	for mesh in meshes:
 		var a:=mesh.global_transform*mesh.get_aabb()
-		if not _inside_area(a.get_center()) or int(mesh.get_meta("collision_policy",0))==1 or minf(a.size.x,a.size.y)<1.5: continue
+		var substantial_dimensions := 0
+		for dimension in [a.size.x,a.size.y,a.size.z]:
+			if float(dimension) > 1.5: substantial_dimensions += 1
+		if not _inside_area(a.get_center()) or _collision_is_decorative(mesh) or substantial_dimensions < 2: continue
 		var near:=false
 		for shape in shapes:
 			if _world_aabb(shape).grow(0.05).intersects(a): near=true; break
 		if not near: _record("solid",mesh,a.get_center(),"substantial visual has no nearby collision",false)
 
-func _check_guard(shapes:Array[CollisionShape3D])->void:
-	for shape in shapes:
-		var a:=_world_aabb(shape)
-		if not _inside_area(a.get_center()) or a.size.x<1.5 or a.size.z<1.5 or a.size.y>1.0: continue
-		if a.end.y<0.0: continue
-		var perimeter:=2.0*(a.size.x+a.size.z); var guards:=0
-		for other in shapes:
-			if other==shape: continue
-			var b:=_world_aabb(other)
-			if b.end.y>a.end.y+0.7 and b.position.y<a.end.y+1.7 and a.grow(0.3).intersects(b): guards+=1
-		if guards>=4: _record("guard",shape,a.get_center(),"walkable surface is fully enclosed by nearby guards",false)
+func _check_guard()->void:
+	var unguarded:Array[Dictionary] = []
+	var body_edges:Dictionary = {}
+	var directions:Array[Vector2i] = [Vector2i(-1,0),Vector2i(1,0),Vector2i(0,-1),Vector2i(0,1)]
+	for cell in _walk_cells:
+		var key:Vector2i = cell.key
+		for direction in directions:
+			var neighbour_key := key + direction
+			if _has_walk_neighbour(neighbour_key, float(cell.y), 1.0): continue
+			var neighbor_x := float(cell.x) + float(direction.x) * _grid_step
+			var neighbor_z := float(cell.z) + float(direction.y) * _grid_step
+			var ground := float(_terrain.get_mesh_height(neighbor_x, neighbor_z)) if _terrain != null and _terrain.has_method("get_mesh_height") else float(cell.y) - 2.0
+			if ground > float(cell.y) - 1.0: continue
+			var edge := Vector3(float(cell.x), float(cell.y), float(cell.z)) + Vector3(direction.x,0,direction.y) * (_grid_step * 0.5)
+			var guarded := _edge_has_guard(edge, Vector3(direction.x,0,direction.y), cell.body)
+			var body_path:String = cell.body_path
+			if not body_edges.has(body_path): body_edges[body_path] = {"body":cell.body,"total":0,"guarded":0,"cells":[]}
+			body_edges[body_path].total += 1
+			if guarded: body_edges[body_path].guarded += 1
+			else: unguarded.append(cell)
+	_emit_cell_clusters("guard", unguarded, "drop of at least 1 m without a guard within 0.3 m (%d edge samples)", false)
+	for body_path in body_edges:
+		var edges:Dictionary = body_edges[body_path]
+		var body:Node = edges.body
+		if int(edges.total) == 0 or int(edges.guarded) != int(edges.total): continue
+		if _body_has_meta(body, &"ways_out") or _body_has_meta(body, &"flight") or _body_has_meta(body, &"reach_target"): continue
+		_record("guard", body, (body as Node3D).global_position, "walkable outline is fully guarded and has no tagged way through", false)
+
+func _has_walk_neighbour(key:Vector2i, height:float, tolerance:float)->bool:
+	if not _walk_grid.has(key): return false
+	for cell in _walk_grid[key]:
+		if absf(float(cell.y) - height) <= tolerance: return true
+	return false
+
+func _edge_has_guard(edge:Vector3, direction:Vector3, source_body:Node)->bool:
+	var from := edge - direction * 0.3 + Vector3.UP * 0.8
+	var to := edge + direction * 0.3 + Vector3.UP * 0.8
+	var query := PhysicsRayQueryParameters3D.create(from, to, _static_mask)
+	query.exclude = _dynamic_excludes.duplicate()
+	if source_body is CollisionObject3D: query.exclude.append((source_body as CollisionObject3D).get_rid())
+	return not get_viewport().world_3d.direct_space_state.intersect_ray(query).is_empty()
+
+func _run_fixture_suite()->void:
+	var root := Node3D.new(); root.name = "WorldChecksTemporaryFixtures"
+	get_tree().root.add_child(root); get_tree().current_scene = root; _world = root
+	_terrain = FixtureTerrain.new()
+	var floor := _fixture_box(root,"FixtureGround",Vector3(100,1,24),Vector3(40,-0.5,0),true)
+	floor.set_meta("collision_policy","decorative")
+	_fixture_overlap(root)
+	_fixture_buried(root)
+	_fixture_water(root)
+	_fixture_reach(root)
+	_fixture_trap(root)
+	_fixture_headroom(root)
+	_fixture_underside(root)
+	_fixture_solid(root)
+	_fixture_guard(root)
+	await get_tree().process_frame
+	await get_tree().physics_frame
+	var fixture_path := "res://tools/world_checks_fixtures/temporary_suite.tscn"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://tools/world_checks_fixtures"))
+	_set_fixture_owners(root,root)
+	var packed := PackedScene.new()
+	var pack_error := packed.pack(root)
+	if pack_error == OK: pack_error = ResourceSaver.save(packed,fixture_path)
+	if pack_error != OK:
+		push_error("Could not create temporary world-check fixtures: %s" % error_string(pack_error))
+		root.queue_free(); get_tree().quit(1); return
+	root.queue_free(); await get_tree().process_frame
+	root = (load(fixture_path) as PackedScene).instantiate() as Node3D
+	get_tree().root.add_child(root); get_tree().current_scene = root; _world = root
+	_terrain = FixtureTerrain.new(); root.add_child(_terrain)
+	await get_tree().process_frame; await get_tree().physics_frame
+	var meshes:Array[MeshInstance3D] = []; var shapes:Array[CollisionShape3D] = []; _collect(root,meshes,shapes)
+	var cases := [
+		["overlap",Vector4(-3,-3,3,3),Vector3.ZERO],
+		["buried",Vector4(7,-3,13,3),Vector3(10,0,0)],
+		["water",Vector4(17,-3,23,3),Vector3(20,0,0)],
+		["reach",Vector4(27,-3,35,3),Vector3(28,0.2,0)],
+		["trap",Vector4(37,-3,45,3),Vector3(39.5,2.2,0)],
+		["headroom",Vector4(47,-3,53,3),Vector3(50,0.2,0)],
+		["underside",Vector4(57,-3,63,3),Vector3(60,0.2,0)],
+		["solid",Vector4(67,-3,73,3),Vector3(70,0,0)],
+		["guard",Vector4(77,-3,83,3),Vector3(80,2.2,0)],
+	]
+	var failed:Array[String] = []
+	for test in cases:
+		var check:String = test[0]; _area = test[1]; _player_start = test[2]; _findings.clear(); _clearance_cache.clear()
+		var bounds := _scene_y_bounds(shapes)
+		_walk_grid = _build_walk_grid(WALK_GRID_STEP,bounds.x,bounds.y); _grid_step = WALK_GRID_STEP
+		_build_reach_graph(root)
+		match check:
+			"overlap": _check_overlap(bounds.x,bounds.y)
+			"buried": _check_buried()
+			"water": _check_water(root)
+			"reach": _check_reach(root)
+			"trap": _check_traps(root)
+			"headroom": _check_headroom()
+			"underside": _check_underside(meshes,shapes)
+			"solid": _check_solid(meshes,shapes)
+			"guard": _check_guard()
+		var caught := false
+		for finding in _findings:
+			if finding.check_id == check: caught = true; break
+		if caught: print("WORLD_CHECK_FIXTURE PASS ",check)
+		else: print("WORLD_CHECK_FIXTURE FAIL ",check); failed.append(check)
+	root.queue_free(); await get_tree().process_frame
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(fixture_path))
+	var uid_path := ProjectSettings.globalize_path(fixture_path+".uid")
+	if FileAccess.file_exists(fixture_path+".uid"): DirAccess.remove_absolute(uid_path)
+	print("WORLD_CHECK_FIXTURES passed=",9-failed.size(),"/9 failed=",failed)
+	get_tree().quit(1 if not failed.is_empty() else 0)
+
+func _set_fixture_owners(node:Node,owner:Node)->void:
+	for child in node.get_children(): child.owner = owner; _set_fixture_owners(child,owner)
+
+func _fixture_box(parent:Node3D,label:String,size:Vector3,center:Vector3,with_mesh:bool)->StaticBody3D:
+	var body := StaticBody3D.new(); body.name = label; body.collision_layer = 1; body.collision_mask = 1; body.position = center
+	var shape := BoxShape3D.new(); shape.size = size; var collision := CollisionShape3D.new(); collision.shape = shape; body.add_child(collision)
+	if with_mesh:
+		var mesh := BoxMesh.new(); mesh.size = size; var visual := MeshInstance3D.new(); visual.mesh = mesh; visual.material_override = StandardMaterial3D.new(); body.add_child(visual)
+	parent.add_child(body); return body
+
+func _fixture_overlap(root:Node3D)->void:
+	_fixture_box(root,"FixtureOverlapA",Vector3(2,0.2,2),Vector3(0,0.1,0),true)
+	_fixture_box(root,"FixtureOverlapB",Vector3(2,0.2,2),Vector3(0,0.1,0),true)
+
+func _fixture_buried(root:Node3D)->void:
+	_fixture_box(root,"FixtureBuriedSlab",Vector3(2,0.2,2),Vector3(10,-0.2,0),true)
+
+func _fixture_water(root:Node3D)->void:
+	var water := Node3D.new(); water.name = "FixtureOverbankPond"; water.position = Vector3(20,0,0); water.set_meta("water_surface_y",1.0); root.add_child(water)
+	var visual := MeshInstance3D.new(); var plane := PlaneMesh.new(); plane.size = Vector2(2,2); visual.mesh = plane
+	var material := ShaderMaterial.new(); material.shader = VillageWorks.SHARED_WATER_SHADER; visual.material_override = material; visual.position.y = 1.0; water.add_child(visual)
+
+func _fixture_reach(root:Node3D)->void:
+	var platform := _fixture_box(root,"FixtureDisconnectedPlatform",Vector3(2,0.2,2),Vector3(32,4.1,0),true)
+	platform.set_meta("reach_target",true)
+
+func _fixture_trap(root:Node3D)->void:
+	var shell := Node3D.new(); shell.name = "FixtureOpenTopShell"; shell.position = Vector3(40,0,0); shell.set_meta("closed_shell",true); root.add_child(shell)
+	_fixture_box(shell,"FixtureShellFloor",Vector3(3,0.2,3),Vector3.ZERO,true)
+	for side in [-1.0,1.0]:
+		_fixture_box(shell,"FixtureShellWallX",Vector3(0.2,2.5,3),Vector3(side*1.5,1.25,0),true)
+		_fixture_box(shell,"FixtureShellWallZ",Vector3(3,2.5,0.2),Vector3(0,1.25,side*1.5),true)
+
+func _fixture_headroom(root:Node3D)->void:
+	_fixture_box(root,"FixtureHeadroomBeam",Vector3(3,0.2,2),Vector3(50,1.8,0),true)
+
+func _fixture_underside(root:Node3D)->void:
+	var body := _fixture_box(root,"FixtureUndersideDeck",Vector3(2,0.1,2),Vector3(60,1.05,0),false); body.set_meta("walk_deck",true)
+	var arrays:Array = []; arrays.resize(Mesh.ARRAY_MAX); arrays[Mesh.ARRAY_VERTEX] = PackedVector3Array([Vector3(-1,0,-1),Vector3(-1,0,1),Vector3(1,0,-1)]); arrays[Mesh.ARRAY_INDEX] = PackedInt32Array([0,1,2])
+	var top_only := ArrayMesh.new(); top_only.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
+	var visual := MeshInstance3D.new(); visual.mesh = top_only; visual.position.y = 0.05; body.add_child(visual)
+
+func _fixture_solid(root:Node3D)->void:
+	var mesh := MeshInstance3D.new(); mesh.name = "FixtureUncollidedSolid"; var box := BoxMesh.new(); box.size = Vector3(3,3,3); mesh.mesh = box; mesh.position = Vector3(70,3.5,0); root.add_child(mesh)
+
+func _fixture_guard(root:Node3D)->void:
+	_fixture_box(root,"FixtureGuardPad",Vector3(4,0.2,4),Vector3(80,1.9,0),true)
+	for side in [-1.0,1.0]:
+		_fixture_box(root,"FixtureGuardRailX",Vector3(0.12,1.4,4),Vector3(80+side*2,2.7,0),true)
+		_fixture_box(root,"FixtureGuardRailZ",Vector3(4,1.4,0.12),Vector3(80,2.7,side*2),true)
 
 func _walk(root:Node)->Array[Node]:
 	var out:Array[Node]=[root]
@@ -184,6 +928,9 @@ func _write_report(kingdom:String,date:String)->void:
 	var dir="res://docs/diagnostics/checks"; DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))
 	var md:="# %s world checks — %s\n\n"%[kingdom,date]
 	md+="Area: %.1f, %.1f to %.1f, %.1f. Findings: %d.\n\n"%[_area.x,_area.y,_area.z,_area.w,_findings.size()]
+	md+="Walk grid: %.2f m; %d columns; %d walk cells; overlap grid: %.2f m; %d overlap cells.\n\n"%[float(_sample_stats.get("grid_step_m",WALK_GRID_STEP)),int(_sample_stats.get("columns",0)),int(_sample_stats.get("walk_cells",0)),OVERLAP_GRID_STEP,int(_sample_stats.get("overlap_walk_cells",0))]
+	md+="Preflight: walk grid %.1f ms; reach graph %.1f ms.\n\n"%[float(_timings.get("walk_grid",0.0)),float(_timings.get("reach_graph",0.0))]
+	md+="Total elapsed: %.1f ms.\n\n"%[(Time.get_ticks_usec()-_suite_started_usec)/1000.0]
 	for check in CHECKS:
 		if _timings.has(check):
 			var group:Array=[]
@@ -193,5 +940,5 @@ func _write_report(kingdom:String,date:String)->void:
 			for f in group.slice(0,20): md+="- %s `%s` at (%.2f, %.2f, %.2f): %s\n"%["blocking" if f.blocking else "warning",f.node_path,f.position.x,f.position.y,f.position.z,f.detail]
 			md+="\n"
 	var stem="%s-%s"%[kingdom,date]
-	var json_file:=FileAccess.open(dir+"/"+stem+".json",FileAccess.WRITE); json_file.store_string(JSON.stringify({"kingdom":kingdom,"date":date,"area":[_area.x,_area.y,_area.z,_area.w],"timings_ms":_timings,"findings":_findings},"\t")); json_file.close()
+	var json_file:=FileAccess.open(dir+"/"+stem+".json",FileAccess.WRITE); json_file.store_string(JSON.stringify({"kingdom":kingdom,"date":date,"area":[_area.x,_area.y,_area.z,_area.w],"sample_stats":_sample_stats,"elapsed_ms":Time.get_ticks_usec()-_suite_started_usec,"timings_ms":_timings,"findings":_findings},"\t")); json_file.close()
 	var md_file:=FileAccess.open(dir+"/"+stem+".md",FileAccess.WRITE); md_file.store_string(md); md_file.close()

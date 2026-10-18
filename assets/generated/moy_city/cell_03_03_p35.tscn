@@ -1634,1101 +1634,1101 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_fp8pd"]
 size = Vector3(0.12, 0.4, 0.08)
 
-[node name="MoyCell_03_03_Part_35" type="Node3D" unique_id=1014072864]
+[node name="MoyCell_03_03_Part_35" type="Node3D" unique_id=879601056]
 
-[node name="CrossingCityDome_Part_01" type="Node3D" parent="." unique_id=533033476]
+[node name="CrossingCityDome_Part_01" type="Node3D" parent="." unique_id=56446164]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -18.4, 0)
 
-[node name="CityClockFaces" type="Node3D" parent="CrossingCityDome_Part_01" unique_id=909687178]
+[node name="CityClockFaces" type="Node3D" parent="CrossingCityDome_Part_01" unique_id=274869042]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.5, 0)
 script = ExtResource("1_2jfu8")
 game_clock_path = NodePath("/root/World/DayNightCycle")
 metadata/moy_keep_children = true
 
-[node name="ClockFace_0" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces" unique_id=1375436748]
+[node name="ClockFace_0" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces" unique_id=235767017]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 20, 0, 0)
 
-[node name="CityClock_hour_0" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0" unique_id=1693394140]
+[node name="CityClock_hour_0" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0" unique_id=1857472657]
 
-[node name="@MeshInstance3D@11765" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_hour_0" unique_id=576408709]
+[node name="@MeshInstance3D@12034" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_hour_0" unique_id=254529586]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_4cq7k")
 mesh = SubResource("ArrayMesh_kfqpk")
 
-[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_hour_0" unique_id=1711560612]
+[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_hour_0" unique_id=1076066540]
 material_override = SubResource("StandardMaterial3D_7qdnw")
 mesh = SubResource("ArrayMesh_8ttis")
 
-[node name="CityClock_minute_0" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0" unique_id=794535711]
+[node name="CityClock_minute_0" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0" unique_id=154797309]
 
-[node name="@MeshInstance3D@11766" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_minute_0" unique_id=799115550]
+[node name="@MeshInstance3D@12035" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_minute_0" unique_id=392400275]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_7m53l")
 mesh = SubResource("ArrayMesh_qrjii")
 
-[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_minute_0" unique_id=261123136]
+[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_minute_0" unique_id=985120165]
 material_override = SubResource("StandardMaterial3D_0ssbu")
 mesh = SubResource("ArrayMesh_cv4jw")
 
-[node name="CityClock_bezel_0" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0" unique_id=412494698]
+[node name="CityClock_bezel_0" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0" unique_id=941445794]
 
-[node name="@MeshInstance3D@11767" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1302255648]
+[node name="@MeshInstance3D@12036" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1678872985]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_va5jb")
 mesh = SubResource("ArrayMesh_4n8wu")
 
-[node name="@MeshInstance3D@11768" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=390863950]
+[node name="@MeshInstance3D@12037" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=701166874]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 7.5, 0, 0.2)
 material_override = SubResource("StandardMaterial3D_1nawf")
 mesh = SubResource("BoxMesh_av0dx")
 
-[node name="@MeshInstance3D@11769" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1589533768]
+[node name="@MeshInstance3D@12038" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=139135142]
 transform = Transform3D(0.13052624, 0.9914448, 0, -0.9914448, 0.13052624, 0, 0, 0, 1, 7.4358363, 0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_p610o")
 mesh = SubResource("BoxMesh_ligaw")
 
-[node name="@MeshInstance3D@11770" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=108740480]
+[node name="@MeshInstance3D@12039" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=547748601]
 transform = Transform3D(0.25881907, 0.9659258, 0, -0.9659258, 0.25881907, 0, 0, 0, 1, 7.244444, 1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_23hvu")
 mesh = SubResource("BoxMesh_jhdcu")
 
-[node name="@MeshInstance3D@11771" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1994714715]
+[node name="@MeshInstance3D@12040" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=667735392]
 transform = Transform3D(0.38268343, 0.9238795, 0, -0.9238795, 0.38268343, 0, 0, 0, 1, 6.9290967, 2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_wd8h4")
 mesh = SubResource("BoxMesh_6pyfb")
 
-[node name="@MeshInstance3D@11772" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=300379976]
+[node name="@MeshInstance3D@12041" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=35587526]
 transform = Transform3D(0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 0, 0, 1, 6.4951906, 3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_v3ya3")
 mesh = SubResource("BoxMesh_o1dyp")
 
-[node name="@MeshInstance3D@11773" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=950594454]
+[node name="@MeshInstance3D@12042" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=640298228]
 transform = Transform3D(0.6087614, 0.7933533, 0, -0.7933533, 0.6087614, 0, 0, 0, 1, 5.95015, 4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_k0di5")
 mesh = SubResource("BoxMesh_25kol")
 
-[node name="@MeshInstance3D@11774" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=725275920]
+[node name="@MeshInstance3D@12043" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1264918130]
 transform = Transform3D(0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0, 1, 5.303301, 5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_2880f")
 mesh = SubResource("BoxMesh_hwlhq")
 
-[node name="@MeshInstance3D@11775" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=937422116]
+[node name="@MeshInstance3D@12044" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1112306806]
 transform = Transform3D(0.7933533, 0.6087614, 0, -0.6087614, 0.7933533, 0, 0, 0, 1, 4.5657105, 5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_jb3m0")
 mesh = SubResource("BoxMesh_wrt1j")
 
-[node name="@MeshInstance3D@11776" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1877523304]
+[node name="@MeshInstance3D@12045" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1863520071]
 transform = Transform3D(0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 0, 0, 1, 3.75, 6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_4nop7")
 mesh = SubResource("BoxMesh_5pn1y")
 
-[node name="@MeshInstance3D@11777" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1001790086]
+[node name="@MeshInstance3D@12046" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1517977707]
 transform = Transform3D(0.9238795, 0.38268346, 0, -0.38268346, 0.9238795, 0, 0, 0, 1, 2.8701258, 6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_c0o1n")
 mesh = SubResource("BoxMesh_spm4d")
 
-[node name="@MeshInstance3D@11778" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1645624104]
+[node name="@MeshInstance3D@12047" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1750885236]
 transform = Transform3D(0.9659258, 0.25881904, 0, -0.25881904, 0.9659258, 0, 0, 0, 1, 1.9411428, 7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_bo6dc")
 mesh = SubResource("BoxMesh_fr7sx")
 
-[node name="@MeshInstance3D@11779" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=467802808]
+[node name="@MeshInstance3D@12048" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=2011086398]
 transform = Transform3D(0.9914449, 0.1305262, 0, -0.1305262, 0.9914449, 0, 0, 0, 1, 0.97894645, 7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_60xo6")
 mesh = SubResource("BoxMesh_rsoio")
 
-[node name="@MeshInstance3D@11780" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=30337997]
+[node name="@MeshInstance3D@12049" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1534099366]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.592425e-16, 7.5, 0.2)
 material_override = SubResource("StandardMaterial3D_5ej42")
 mesh = SubResource("BoxMesh_h86pt")
 
-[node name="@MeshInstance3D@11781" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=145192811]
+[node name="@MeshInstance3D@12050" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1501003591]
 transform = Transform3D(0.9914449, -0.1305262, 0, 0.1305262, 0.9914449, 0, 0, 0, 1, -0.97894645, 7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_fxwuq")
 mesh = SubResource("BoxMesh_03ufw")
 
-[node name="@MeshInstance3D@11782" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1531441382]
+[node name="@MeshInstance3D@12051" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1187684238]
 transform = Transform3D(0.9659258, -0.25881904, 0, 0.25881904, 0.9659258, 0, 0, 0, 1, -1.9411428, 7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_hwxb1")
 mesh = SubResource("BoxMesh_0xwi4")
 
-[node name="@MeshInstance3D@11783" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1705311900]
+[node name="@MeshInstance3D@12052" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=119725533]
 transform = Transform3D(0.9238795, -0.38268346, 0, 0.38268346, 0.9238795, 0, 0, 0, 1, -2.8701258, 6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_g063o")
 mesh = SubResource("BoxMesh_ovkxp")
 
-[node name="@MeshInstance3D@11784" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1770693060]
+[node name="@MeshInstance3D@12053" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1751807516]
 transform = Transform3D(0.8660254, -0.5, 0, 0.5, 0.8660254, 0, 0, 0, 1, -3.75, 6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_6qfd8")
 mesh = SubResource("BoxMesh_owwed")
 
-[node name="@MeshInstance3D@11785" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=544023893]
+[node name="@MeshInstance3D@12054" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1360495168]
 transform = Transform3D(0.7933533, -0.6087614, 0, 0.6087614, 0.7933533, 0, 0, 0, 1, -4.5657105, 5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_tu24b")
 mesh = SubResource("BoxMesh_kmea7")
 
-[node name="@MeshInstance3D@11786" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=714836905]
+[node name="@MeshInstance3D@12055" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=692800]
 transform = Transform3D(0.70710677, -0.70710677, 0, 0.70710677, 0.70710677, 0, 0, 0, 1, -5.303301, 5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_3d1xc")
 mesh = SubResource("BoxMesh_sd2r4")
 
-[node name="@MeshInstance3D@11787" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=820319221]
+[node name="@MeshInstance3D@12056" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=833840453]
 transform = Transform3D(0.6087614, -0.7933533, 0, 0.7933533, 0.6087614, 0, 0, 0, 1, -5.95015, 4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_61rkh")
 mesh = SubResource("BoxMesh_40vfj")
 
-[node name="@MeshInstance3D@11788" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1975202409]
+[node name="@MeshInstance3D@12057" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=537368222]
 transform = Transform3D(0.49999997, -0.86602545, 0, 0.86602545, 0.49999997, 0, 0, 0, 1, -6.4951906, 3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_m1ecq")
 mesh = SubResource("BoxMesh_0b1vf")
 
-[node name="@MeshInstance3D@11789" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=998858690]
+[node name="@MeshInstance3D@12058" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1931347788]
 transform = Transform3D(0.38268343, -0.9238795, 0, 0.9238795, 0.38268343, 0, 0, 0, 1, -6.9290967, 2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_drjhg")
 mesh = SubResource("BoxMesh_vaw2l")
 
-[node name="@MeshInstance3D@11790" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1456595300]
+[node name="@MeshInstance3D@12059" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=590270321]
 transform = Transform3D(0.25881907, -0.9659258, 0, 0.9659258, 0.25881907, 0, 0, 0, 1, -7.244444, 1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_nq6pv")
 mesh = SubResource("BoxMesh_hlb5t")
 
-[node name="@MeshInstance3D@11791" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1022963980]
+[node name="@MeshInstance3D@12060" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1089226534]
 transform = Transform3D(0.13052624, -0.9914448, 0, 0.9914448, 0.13052624, 0, 0, 0, 1, -7.4358363, 0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_sgkjo")
 mesh = SubResource("BoxMesh_ask7a")
 
-[node name="@MeshInstance3D@11792" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=978193118]
+[node name="@MeshInstance3D@12061" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=438299785]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -7.5, 9.18485e-16, 0.2)
 material_override = SubResource("StandardMaterial3D_fdp4i")
 mesh = SubResource("BoxMesh_o7rha")
 
-[node name="@MeshInstance3D@11793" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=141686559]
+[node name="@MeshInstance3D@12062" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1014632930]
 transform = Transform3D(-0.13052621, -0.9914449, 0, 0.9914449, -0.13052621, 0, 0, 0, 1, -7.4358363, -0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_3urvl")
 mesh = SubResource("BoxMesh_7x6xn")
 
-[node name="@MeshInstance3D@11794" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=499683608]
+[node name="@MeshInstance3D@12063" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=863223212]
 transform = Transform3D(-0.25881904, -0.9659258, 0, 0.9659258, -0.25881904, 0, 0, 0, 1, -7.244444, -1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_y52iw")
 mesh = SubResource("BoxMesh_5uq25")
 
-[node name="@MeshInstance3D@11795" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1898405976]
+[node name="@MeshInstance3D@12064" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1742004447]
 transform = Transform3D(-0.3826834, -0.92387956, 0, 0.92387956, -0.3826834, 0, 0, 0, 1, -6.9290967, -2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_nqf0k")
 mesh = SubResource("BoxMesh_2cftr")
 
-[node name="@MeshInstance3D@11796" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=169094961]
+[node name="@MeshInstance3D@12065" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=564804227]
 transform = Transform3D(-0.50000006, -0.8660254, 0, 0.8660254, -0.50000006, 0, 0, 0, 1, -6.4951906, -3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_1ql54")
 mesh = SubResource("BoxMesh_o5cbh")
 
-[node name="@MeshInstance3D@11797" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1942983701]
+[node name="@MeshInstance3D@12066" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1880368039]
 transform = Transform3D(-0.6087614, -0.7933533, 0, 0.7933533, -0.6087614, 0, 0, 0, 1, -5.95015, -4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_4rnkv")
 mesh = SubResource("BoxMesh_utgt8")
 
-[node name="@MeshInstance3D@11798" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=15805396]
+[node name="@MeshInstance3D@12067" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=467102939]
 transform = Transform3D(-0.70710677, -0.70710677, 0, 0.70710677, -0.70710677, 0, 0, 0, 1, -5.303301, -5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_nofxl")
 mesh = SubResource("BoxMesh_dymp2")
 
-[node name="@MeshInstance3D@11799" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=386000651]
+[node name="@MeshInstance3D@12068" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1967284477]
 transform = Transform3D(-0.7933533, -0.6087614, 0, 0.6087614, -0.7933533, 0, 0, 0, 1, -4.5657105, -5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_55jpo")
 mesh = SubResource("BoxMesh_5m5yq")
 
-[node name="@MeshInstance3D@11800" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=350928655]
+[node name="@MeshInstance3D@12069" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=884098228]
 transform = Transform3D(-0.8660254, -0.50000006, 0, 0.50000006, -0.8660254, 0, 0, 0, 1, -3.75, -6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_dk8q7")
 mesh = SubResource("BoxMesh_d1i6d")
 
-[node name="@MeshInstance3D@11801" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1148519941]
+[node name="@MeshInstance3D@12070" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1645979323]
 transform = Transform3D(-0.9238795, -0.3826835, 0, 0.3826835, -0.9238795, 0, 0, 0, 1, -2.8701258, -6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_fx8g0")
 mesh = SubResource("BoxMesh_8iyj2")
 
-[node name="@MeshInstance3D@11802" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1127289607]
+[node name="@MeshInstance3D@12071" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1163631983]
 transform = Transform3D(-0.9659258, -0.25881913, 0, 0.25881913, -0.9659258, 0, 0, 0, 1, -1.9411428, -7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_aay78")
 mesh = SubResource("BoxMesh_yv3jc")
 
-[node name="@MeshInstance3D@11803" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1378236387]
+[node name="@MeshInstance3D@12072" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=729983508]
 transform = Transform3D(-0.9914449, -0.13052608, 0, 0.13052608, -0.9914449, 0, 0, 0, 1, -0.97894645, -7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_suf8x")
 mesh = SubResource("BoxMesh_0wbdg")
 
-[node name="@MeshInstance3D@11804" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1623829546]
+[node name="@MeshInstance3D@12073" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1552591865]
 transform = Transform3D(-1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0, 0, 1, -1.3777277e-15, -7.5, 0.2)
 material_override = SubResource("StandardMaterial3D_7g17j")
 mesh = SubResource("BoxMesh_rfw5y")
 
-[node name="@MeshInstance3D@11805" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1735146644]
+[node name="@MeshInstance3D@12074" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=830708968]
 transform = Transform3D(-0.9914448, 0.13052626, 0, -0.13052626, -0.9914448, 0, 0, 0, 1, 0.97894645, -7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_7b5uh")
 mesh = SubResource("BoxMesh_txus3")
 
-[node name="@MeshInstance3D@11806" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1324659513]
+[node name="@MeshInstance3D@12075" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=2107413849]
 transform = Transform3D(-0.9659258, 0.25881907, 0, -0.25881907, -0.9659258, 0, 0, 0, 1, 1.9411428, -7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_l284p")
 mesh = SubResource("BoxMesh_2xsdt")
 
-[node name="@MeshInstance3D@11807" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=680166024]
+[node name="@MeshInstance3D@12076" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1222844337]
 transform = Transform3D(-0.9238795, 0.38268343, 0, -0.38268343, -0.9238795, 0, 0, 0, 1, 2.8701258, -6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_lgvfo")
 mesh = SubResource("BoxMesh_dgdvj")
 
-[node name="@MeshInstance3D@11808" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1634920270]
+[node name="@MeshInstance3D@12077" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1383173192]
 transform = Transform3D(-0.8660254, 0.49999997, 0, -0.49999997, -0.8660254, 0, 0, 0, 1, 3.75, -6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_73c6e")
 mesh = SubResource("BoxMesh_jxj25")
 
-[node name="@MeshInstance3D@11809" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1851491317]
+[node name="@MeshInstance3D@12078" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=138319153]
 transform = Transform3D(-0.7933534, 0.60876137, 0, -0.60876137, -0.7933534, 0, 0, 0, 1, 4.5657105, -5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_6obuq")
 mesh = SubResource("BoxMesh_usyhu")
 
-[node name="@MeshInstance3D@11810" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1390119625]
+[node name="@MeshInstance3D@12079" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=2027150975]
 transform = Transform3D(-0.7071068, 0.7071067, 0, -0.7071067, -0.7071068, 0, 0, 0, 1, 5.303301, -5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_3mi1o")
 mesh = SubResource("BoxMesh_jgejd")
 
-[node name="@MeshInstance3D@11811" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=58692020]
+[node name="@MeshInstance3D@12080" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1937266366]
 transform = Transform3D(-0.6087615, 0.79335326, 0, -0.79335326, -0.6087615, 0, 0, 0, 1, 5.95015, -4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_3p5p7")
 mesh = SubResource("BoxMesh_fp27j")
 
-[node name="@MeshInstance3D@11812" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=413207804]
+[node name="@MeshInstance3D@12081" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=566224870]
 transform = Transform3D(-0.4999999, 0.86602545, 0, -0.86602545, -0.4999999, 0, 0, 0, 1, 6.4951906, -3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_n2p6f")
 mesh = SubResource("BoxMesh_uto4h")
 
-[node name="@MeshInstance3D@11813" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1744744283]
+[node name="@MeshInstance3D@12082" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1666766847]
 transform = Transform3D(-0.38268358, 0.9238795, 0, -0.9238795, -0.38268358, 0, 0, 0, 1, 6.9290967, -2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_xxbgc")
 mesh = SubResource("BoxMesh_b3qix")
 
-[node name="@MeshInstance3D@11814" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=354929507]
+[node name="@MeshInstance3D@12083" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1885399316]
 transform = Transform3D(-0.25881898, 0.9659259, 0, -0.9659259, -0.25881898, 0, 0, 0, 1, 7.244444, -1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_6rq8s")
 mesh = SubResource("BoxMesh_x357j")
 
-[node name="@MeshInstance3D@11815" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1934152694]
+[node name="@MeshInstance3D@12084" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_0/CityClock_bezel_0" unique_id=1388688592]
 transform = Transform3D(-0.1305264, 0.9914448, 0, -0.9914448, -0.1305264, 0, 0, 0, 1, 7.4358363, -0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_c6og2")
 mesh = SubResource("BoxMesh_wbufq")
 
-[node name="ClockFace_1" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces" unique_id=1816301340]
+[node name="ClockFace_1" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces" unique_id=1845292944]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2246468e-15, 0, 20)
 
-[node name="CityClock_hour_1" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1" unique_id=1980021854]
+[node name="CityClock_hour_1" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1" unique_id=53000735]
 
-[node name="@MeshInstance3D@11816" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_hour_1" unique_id=1319193495]
+[node name="@MeshInstance3D@12085" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_hour_1" unique_id=1635729919]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_1rol4")
 mesh = SubResource("ArrayMesh_weely")
 
-[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_hour_1" unique_id=1104636719]
+[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_hour_1" unique_id=174674697]
 material_override = SubResource("StandardMaterial3D_pxhm4")
 mesh = SubResource("ArrayMesh_bxiue")
 
-[node name="CityClock_minute_1" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1" unique_id=232283116]
+[node name="CityClock_minute_1" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1" unique_id=362029269]
 
-[node name="@MeshInstance3D@11817" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_minute_1" unique_id=953652130]
+[node name="@MeshInstance3D@12086" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_minute_1" unique_id=1910742043]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_kv0k0")
 mesh = SubResource("ArrayMesh_phq3d")
 
-[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_minute_1" unique_id=94484407]
+[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_minute_1" unique_id=774554648]
 material_override = SubResource("StandardMaterial3D_1fwua")
 mesh = SubResource("ArrayMesh_h8fr4")
 
-[node name="CityClock_bezel_1" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1" unique_id=1229683472]
+[node name="CityClock_bezel_1" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1" unique_id=1059972914]
 
-[node name="@MeshInstance3D@11818" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1793542732]
+[node name="@MeshInstance3D@12087" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=189434281]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_wlj86")
 mesh = SubResource("ArrayMesh_rv324")
 
-[node name="@MeshInstance3D@11819" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=991867914]
+[node name="@MeshInstance3D@12088" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1922129981]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 7.5, 0, 0.2)
 material_override = SubResource("StandardMaterial3D_5e38k")
 mesh = SubResource("BoxMesh_7dx7s")
 
-[node name="@MeshInstance3D@11820" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=478286749]
+[node name="@MeshInstance3D@12089" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1852555066]
 transform = Transform3D(0.13052624, 0.9914448, 0, -0.9914448, 0.13052624, 0, 0, 0, 1, 7.4358363, 0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_qrrpr")
 mesh = SubResource("BoxMesh_toojw")
 
-[node name="@MeshInstance3D@11821" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1248169712]
+[node name="@MeshInstance3D@12090" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1562458502]
 transform = Transform3D(0.25881907, 0.9659258, 0, -0.9659258, 0.25881907, 0, 0, 0, 1, 7.244444, 1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_tfysa")
 mesh = SubResource("BoxMesh_64ai8")
 
-[node name="@MeshInstance3D@11822" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1170990859]
+[node name="@MeshInstance3D@12091" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1952669315]
 transform = Transform3D(0.38268343, 0.9238795, 0, -0.9238795, 0.38268343, 0, 0, 0, 1, 6.9290967, 2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_gpir4")
 mesh = SubResource("BoxMesh_imuds")
 
-[node name="@MeshInstance3D@11823" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1356271824]
+[node name="@MeshInstance3D@12092" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=2145251860]
 transform = Transform3D(0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 0, 0, 1, 6.4951906, 3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_upiue")
 mesh = SubResource("BoxMesh_70yar")
 
-[node name="@MeshInstance3D@11824" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=173195963]
+[node name="@MeshInstance3D@12093" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=864351526]
 transform = Transform3D(0.6087614, 0.7933533, 0, -0.7933533, 0.6087614, 0, 0, 0, 1, 5.95015, 4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_txu4u")
 mesh = SubResource("BoxMesh_iau1h")
 
-[node name="@MeshInstance3D@11825" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1833296512]
+[node name="@MeshInstance3D@12094" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=54966304]
 transform = Transform3D(0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0, 1, 5.303301, 5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_r45fb")
 mesh = SubResource("BoxMesh_4d0ao")
 
-[node name="@MeshInstance3D@11826" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1645654114]
+[node name="@MeshInstance3D@12095" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=557835374]
 transform = Transform3D(0.7933533, 0.6087614, 0, -0.6087614, 0.7933533, 0, 0, 0, 1, 4.5657105, 5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_g3n01")
 mesh = SubResource("BoxMesh_nl1pq")
 
-[node name="@MeshInstance3D@11827" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=748137233]
+[node name="@MeshInstance3D@12096" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=56699892]
 transform = Transform3D(0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 0, 0, 1, 3.75, 6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_jqf5i")
 mesh = SubResource("BoxMesh_2cdiv")
 
-[node name="@MeshInstance3D@11828" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1088460682]
+[node name="@MeshInstance3D@12097" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1372508014]
 transform = Transform3D(0.9238795, 0.38268346, 0, -0.38268346, 0.9238795, 0, 0, 0, 1, 2.8701258, 6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_sybvq")
 mesh = SubResource("BoxMesh_12j55")
 
-[node name="@MeshInstance3D@11829" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1988530372]
+[node name="@MeshInstance3D@12098" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1126449139]
 transform = Transform3D(0.9659258, 0.25881904, 0, -0.25881904, 0.9659258, 0, 0, 0, 1, 1.9411428, 7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_4uitw")
 mesh = SubResource("BoxMesh_u71as")
 
-[node name="@MeshInstance3D@11830" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1127426690]
+[node name="@MeshInstance3D@12099" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1398163972]
 transform = Transform3D(0.9914449, 0.1305262, 0, -0.1305262, 0.9914449, 0, 0, 0, 1, 0.97894645, 7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_s6qt3")
 mesh = SubResource("BoxMesh_qqh0u")
 
-[node name="@MeshInstance3D@11831" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=2049250915]
+[node name="@MeshInstance3D@12100" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=234091759]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.592425e-16, 7.5, 0.2)
 material_override = SubResource("StandardMaterial3D_lifkq")
 mesh = SubResource("BoxMesh_16wiv")
 
-[node name="@MeshInstance3D@11832" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=501884232]
+[node name="@MeshInstance3D@12101" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=433366764]
 transform = Transform3D(0.9914449, -0.1305262, 0, 0.1305262, 0.9914449, 0, 0, 0, 1, -0.97894645, 7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_ks8p8")
 mesh = SubResource("BoxMesh_wswck")
 
-[node name="@MeshInstance3D@11833" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=724515683]
+[node name="@MeshInstance3D@12102" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1431166346]
 transform = Transform3D(0.9659258, -0.25881904, 0, 0.25881904, 0.9659258, 0, 0, 0, 1, -1.9411428, 7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_5ic4b")
 mesh = SubResource("BoxMesh_kovqm")
 
-[node name="@MeshInstance3D@11834" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=607732787]
+[node name="@MeshInstance3D@12103" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=272328553]
 transform = Transform3D(0.9238795, -0.38268346, 0, 0.38268346, 0.9238795, 0, 0, 0, 1, -2.8701258, 6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_2eod2")
 mesh = SubResource("BoxMesh_g1n4h")
 
-[node name="@MeshInstance3D@11835" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=402870957]
+[node name="@MeshInstance3D@12104" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=671594295]
 transform = Transform3D(0.8660254, -0.5, 0, 0.5, 0.8660254, 0, 0, 0, 1, -3.75, 6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_3vbc3")
 mesh = SubResource("BoxMesh_e34w4")
 
-[node name="@MeshInstance3D@11836" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=462589020]
+[node name="@MeshInstance3D@12105" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=346508470]
 transform = Transform3D(0.7933533, -0.6087614, 0, 0.6087614, 0.7933533, 0, 0, 0, 1, -4.5657105, 5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_e5p0r")
 mesh = SubResource("BoxMesh_8m3k0")
 
-[node name="@MeshInstance3D@11837" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1337422969]
+[node name="@MeshInstance3D@12106" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=978966475]
 transform = Transform3D(0.70710677, -0.70710677, 0, 0.70710677, 0.70710677, 0, 0, 0, 1, -5.303301, 5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_v32uh")
 mesh = SubResource("BoxMesh_v4dbo")
 
-[node name="@MeshInstance3D@11838" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1958414547]
+[node name="@MeshInstance3D@12107" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=791804950]
 transform = Transform3D(0.6087614, -0.7933533, 0, 0.7933533, 0.6087614, 0, 0, 0, 1, -5.95015, 4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_dm5bk")
 mesh = SubResource("BoxMesh_wn858")
 
-[node name="@MeshInstance3D@11839" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=827961630]
+[node name="@MeshInstance3D@12108" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=375712871]
 transform = Transform3D(0.49999997, -0.86602545, 0, 0.86602545, 0.49999997, 0, 0, 0, 1, -6.4951906, 3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_r2jq1")
 mesh = SubResource("BoxMesh_foyqr")
 
-[node name="@MeshInstance3D@11840" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1555216222]
+[node name="@MeshInstance3D@12109" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1137664706]
 transform = Transform3D(0.38268343, -0.9238795, 0, 0.9238795, 0.38268343, 0, 0, 0, 1, -6.9290967, 2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_uibrk")
 mesh = SubResource("BoxMesh_1302b")
 
-[node name="@MeshInstance3D@11841" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=215060060]
+[node name="@MeshInstance3D@12110" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1412028915]
 transform = Transform3D(0.25881907, -0.9659258, 0, 0.9659258, 0.25881907, 0, 0, 0, 1, -7.244444, 1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_rtxrh")
 mesh = SubResource("BoxMesh_85gev")
 
-[node name="@MeshInstance3D@11842" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1350813031]
+[node name="@MeshInstance3D@12111" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=2060595054]
 transform = Transform3D(0.13052624, -0.9914448, 0, 0.9914448, 0.13052624, 0, 0, 0, 1, -7.4358363, 0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_rjm0e")
 mesh = SubResource("BoxMesh_5b6lb")
 
-[node name="@MeshInstance3D@11843" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=111406062]
+[node name="@MeshInstance3D@12112" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1388019407]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -7.5, 9.18485e-16, 0.2)
 material_override = SubResource("StandardMaterial3D_oty84")
 mesh = SubResource("BoxMesh_os6b3")
 
-[node name="@MeshInstance3D@11844" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1291806842]
+[node name="@MeshInstance3D@12113" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=2113221757]
 transform = Transform3D(-0.13052621, -0.9914449, 0, 0.9914449, -0.13052621, 0, 0, 0, 1, -7.4358363, -0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_w2sk7")
 mesh = SubResource("BoxMesh_f0w4e")
 
-[node name="@MeshInstance3D@11845" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1968189830]
+[node name="@MeshInstance3D@12114" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1222975438]
 transform = Transform3D(-0.25881904, -0.9659258, 0, 0.9659258, -0.25881904, 0, 0, 0, 1, -7.244444, -1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_glmdp")
 mesh = SubResource("BoxMesh_i0sri")
 
-[node name="@MeshInstance3D@11846" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=2130921652]
+[node name="@MeshInstance3D@12115" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1639613679]
 transform = Transform3D(-0.3826834, -0.92387956, 0, 0.92387956, -0.3826834, 0, 0, 0, 1, -6.9290967, -2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_13xep")
 mesh = SubResource("BoxMesh_xmh45")
 
-[node name="@MeshInstance3D@11847" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1034989332]
+[node name="@MeshInstance3D@12116" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=452351454]
 transform = Transform3D(-0.50000006, -0.8660254, 0, 0.8660254, -0.50000006, 0, 0, 0, 1, -6.4951906, -3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_2lrcw")
 mesh = SubResource("BoxMesh_ylqtf")
 
-[node name="@MeshInstance3D@11848" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=2059513038]
+[node name="@MeshInstance3D@12117" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1002152452]
 transform = Transform3D(-0.6087614, -0.7933533, 0, 0.7933533, -0.6087614, 0, 0, 0, 1, -5.95015, -4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_o0a8j")
 mesh = SubResource("BoxMesh_oso5m")
 
-[node name="@MeshInstance3D@11849" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=514298970]
+[node name="@MeshInstance3D@12118" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=472256989]
 transform = Transform3D(-0.70710677, -0.70710677, 0, 0.70710677, -0.70710677, 0, 0, 0, 1, -5.303301, -5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_05c5v")
 mesh = SubResource("BoxMesh_fdt21")
 
-[node name="@MeshInstance3D@11850" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=2145993629]
+[node name="@MeshInstance3D@12119" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1560563532]
 transform = Transform3D(-0.7933533, -0.6087614, 0, 0.6087614, -0.7933533, 0, 0, 0, 1, -4.5657105, -5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_fk7lt")
 mesh = SubResource("BoxMesh_hga4i")
 
-[node name="@MeshInstance3D@11851" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1623779311]
+[node name="@MeshInstance3D@12120" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=759053393]
 transform = Transform3D(-0.8660254, -0.50000006, 0, 0.50000006, -0.8660254, 0, 0, 0, 1, -3.75, -6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_xjcbn")
 mesh = SubResource("BoxMesh_j6ugi")
 
-[node name="@MeshInstance3D@11852" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1868068134]
+[node name="@MeshInstance3D@12121" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1231132509]
 transform = Transform3D(-0.9238795, -0.3826835, 0, 0.3826835, -0.9238795, 0, 0, 0, 1, -2.8701258, -6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_sbahx")
 mesh = SubResource("BoxMesh_14cjx")
 
-[node name="@MeshInstance3D@11853" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1972644103]
+[node name="@MeshInstance3D@12122" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1922577751]
 transform = Transform3D(-0.9659258, -0.25881913, 0, 0.25881913, -0.9659258, 0, 0, 0, 1, -1.9411428, -7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_jgcn3")
 mesh = SubResource("BoxMesh_0qh5u")
 
-[node name="@MeshInstance3D@11854" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1108378829]
+[node name="@MeshInstance3D@12123" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=462332843]
 transform = Transform3D(-0.9914449, -0.13052608, 0, 0.13052608, -0.9914449, 0, 0, 0, 1, -0.97894645, -7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_obm0k")
 mesh = SubResource("BoxMesh_4adlb")
 
-[node name="@MeshInstance3D@11855" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=669362536]
+[node name="@MeshInstance3D@12124" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1700647955]
 transform = Transform3D(-1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0, 0, 1, -1.3777277e-15, -7.5, 0.2)
 material_override = SubResource("StandardMaterial3D_uxyhq")
 mesh = SubResource("BoxMesh_gquc1")
 
-[node name="@MeshInstance3D@11856" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1607734308]
+[node name="@MeshInstance3D@12125" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=507208729]
 transform = Transform3D(-0.9914448, 0.13052626, 0, -0.13052626, -0.9914448, 0, 0, 0, 1, 0.97894645, -7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_u7nw3")
 mesh = SubResource("BoxMesh_61st1")
 
-[node name="@MeshInstance3D@11857" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=252586834]
+[node name="@MeshInstance3D@12126" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=453467814]
 transform = Transform3D(-0.9659258, 0.25881907, 0, -0.25881907, -0.9659258, 0, 0, 0, 1, 1.9411428, -7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_7dwqr")
 mesh = SubResource("BoxMesh_c0wt0")
 
-[node name="@MeshInstance3D@11858" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1267459018]
+[node name="@MeshInstance3D@12127" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=82543789]
 transform = Transform3D(-0.9238795, 0.38268343, 0, -0.38268343, -0.9238795, 0, 0, 0, 1, 2.8701258, -6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_pocf5")
 mesh = SubResource("BoxMesh_2vd1d")
 
-[node name="@MeshInstance3D@11859" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1574189269]
+[node name="@MeshInstance3D@12128" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=248105931]
 transform = Transform3D(-0.8660254, 0.49999997, 0, -0.49999997, -0.8660254, 0, 0, 0, 1, 3.75, -6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_udhpk")
 mesh = SubResource("BoxMesh_j6s4c")
 
-[node name="@MeshInstance3D@11860" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1459627831]
+[node name="@MeshInstance3D@12129" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1342101901]
 transform = Transform3D(-0.7933534, 0.60876137, 0, -0.60876137, -0.7933534, 0, 0, 0, 1, 4.5657105, -5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_fv23i")
 mesh = SubResource("BoxMesh_8e4os")
 
-[node name="@MeshInstance3D@11861" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1049678119]
+[node name="@MeshInstance3D@12130" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=598019133]
 transform = Transform3D(-0.7071068, 0.7071067, 0, -0.7071067, -0.7071068, 0, 0, 0, 1, 5.303301, -5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_a63fw")
 mesh = SubResource("BoxMesh_yek33")
 
-[node name="@MeshInstance3D@11862" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1082378448]
+[node name="@MeshInstance3D@12131" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=679018028]
 transform = Transform3D(-0.6087615, 0.79335326, 0, -0.79335326, -0.6087615, 0, 0, 0, 1, 5.95015, -4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_m2mr1")
 mesh = SubResource("BoxMesh_xc27d")
 
-[node name="@MeshInstance3D@11863" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1833120507]
+[node name="@MeshInstance3D@12132" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1710718939]
 transform = Transform3D(-0.4999999, 0.86602545, 0, -0.86602545, -0.4999999, 0, 0, 0, 1, 6.4951906, -3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_323rn")
 mesh = SubResource("BoxMesh_q1jum")
 
-[node name="@MeshInstance3D@11864" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1531321786]
+[node name="@MeshInstance3D@12133" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=748608039]
 transform = Transform3D(-0.38268358, 0.9238795, 0, -0.9238795, -0.38268358, 0, 0, 0, 1, 6.9290967, -2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_uw0uy")
 mesh = SubResource("BoxMesh_agdkf")
 
-[node name="@MeshInstance3D@11865" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=615898902]
+[node name="@MeshInstance3D@12134" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=232364888]
 transform = Transform3D(-0.25881898, 0.9659259, 0, -0.9659259, -0.25881898, 0, 0, 0, 1, 7.244444, -1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_mnx2p")
 mesh = SubResource("BoxMesh_0olwf")
 
-[node name="@MeshInstance3D@11866" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=611072366]
+[node name="@MeshInstance3D@12135" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_1/CityClock_bezel_1" unique_id=1183440242]
 transform = Transform3D(-0.1305264, 0.9914448, 0, -0.9914448, -0.1305264, 0, 0, 0, 1, 7.4358363, -0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_1tqtf")
 mesh = SubResource("BoxMesh_x0nq5")
 
-[node name="ClockFace_2" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces" unique_id=1448300814]
+[node name="ClockFace_2" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces" unique_id=1985547586]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -20, 0, 2.4492936e-15)
 
-[node name="CityClock_hour_2" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2" unique_id=1790546586]
+[node name="CityClock_hour_2" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2" unique_id=298847742]
 
-[node name="@MeshInstance3D@11867" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_hour_2" unique_id=1703950161]
+[node name="@MeshInstance3D@12136" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_hour_2" unique_id=422593458]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_ni50u")
 mesh = SubResource("ArrayMesh_w58wj")
 
-[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_hour_2" unique_id=303346966]
+[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_hour_2" unique_id=329221791]
 material_override = SubResource("StandardMaterial3D_v0m3v")
 mesh = SubResource("ArrayMesh_ebssj")
 
-[node name="CityClock_minute_2" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2" unique_id=56919084]
+[node name="CityClock_minute_2" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2" unique_id=528075898]
 
-[node name="@MeshInstance3D@11868" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_minute_2" unique_id=685970560]
+[node name="@MeshInstance3D@12137" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_minute_2" unique_id=329446662]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_hiqpm")
 mesh = SubResource("ArrayMesh_880dc")
 
-[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_minute_2" unique_id=807449307]
+[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_minute_2" unique_id=1355405082]
 material_override = SubResource("StandardMaterial3D_srulm")
 mesh = SubResource("ArrayMesh_lpso4")
 
-[node name="CityClock_bezel_2" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2" unique_id=688084047]
+[node name="CityClock_bezel_2" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2" unique_id=1492210645]
 
-[node name="@MeshInstance3D@11869" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1918998436]
+[node name="@MeshInstance3D@12138" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1681766528]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_rsfe8")
 mesh = SubResource("ArrayMesh_i7wfd")
 
-[node name="@MeshInstance3D@11870" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1000537877]
+[node name="@MeshInstance3D@12139" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1549416062]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 7.5, 0, 0.2)
 material_override = SubResource("StandardMaterial3D_8p2qn")
 mesh = SubResource("BoxMesh_og7o5")
 
-[node name="@MeshInstance3D@11871" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1853487297]
+[node name="@MeshInstance3D@12140" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1675320811]
 transform = Transform3D(0.13052624, 0.9914448, 0, -0.9914448, 0.13052624, 0, 0, 0, 1, 7.4358363, 0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_xtoqe")
 mesh = SubResource("BoxMesh_nkejc")
 
-[node name="@MeshInstance3D@11872" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=2068872092]
+[node name="@MeshInstance3D@12141" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1807055555]
 transform = Transform3D(0.25881907, 0.9659258, 0, -0.9659258, 0.25881907, 0, 0, 0, 1, 7.244444, 1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_1ct4p")
 mesh = SubResource("BoxMesh_7ugh3")
 
-[node name="@MeshInstance3D@11873" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1716658253]
+[node name="@MeshInstance3D@12142" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=861296396]
 transform = Transform3D(0.38268343, 0.9238795, 0, -0.9238795, 0.38268343, 0, 0, 0, 1, 6.9290967, 2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_qtntg")
 mesh = SubResource("BoxMesh_8i64a")
 
-[node name="@MeshInstance3D@11874" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=678683717]
+[node name="@MeshInstance3D@12143" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=633401350]
 transform = Transform3D(0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 0, 0, 1, 6.4951906, 3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_j23pp")
 mesh = SubResource("BoxMesh_dar0f")
 
-[node name="@MeshInstance3D@11875" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1060269376]
+[node name="@MeshInstance3D@12144" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=270783989]
 transform = Transform3D(0.6087614, 0.7933533, 0, -0.7933533, 0.6087614, 0, 0, 0, 1, 5.95015, 4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_3bnhb")
 mesh = SubResource("BoxMesh_wusnf")
 
-[node name="@MeshInstance3D@11876" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=719239224]
+[node name="@MeshInstance3D@12145" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=242672889]
 transform = Transform3D(0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0, 1, 5.303301, 5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_e3en2")
 mesh = SubResource("BoxMesh_vhaup")
 
-[node name="@MeshInstance3D@11877" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=408512890]
+[node name="@MeshInstance3D@12146" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1679220464]
 transform = Transform3D(0.7933533, 0.6087614, 0, -0.6087614, 0.7933533, 0, 0, 0, 1, 4.5657105, 5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_y0uwl")
 mesh = SubResource("BoxMesh_rt72u")
 
-[node name="@MeshInstance3D@11878" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1249089649]
+[node name="@MeshInstance3D@12147" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1951622129]
 transform = Transform3D(0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 0, 0, 1, 3.75, 6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_472eb")
 mesh = SubResource("BoxMesh_akh3s")
 
-[node name="@MeshInstance3D@11879" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1802150696]
+[node name="@MeshInstance3D@12148" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1072581307]
 transform = Transform3D(0.9238795, 0.38268346, 0, -0.38268346, 0.9238795, 0, 0, 0, 1, 2.8701258, 6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_k8q6e")
 mesh = SubResource("BoxMesh_20jqi")
 
-[node name="@MeshInstance3D@11880" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1537004301]
+[node name="@MeshInstance3D@12149" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1482193753]
 transform = Transform3D(0.9659258, 0.25881904, 0, -0.25881904, 0.9659258, 0, 0, 0, 1, 1.9411428, 7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_qwyv0")
 mesh = SubResource("BoxMesh_xo0aa")
 
-[node name="@MeshInstance3D@11881" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=2028583012]
+[node name="@MeshInstance3D@12150" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1149408975]
 transform = Transform3D(0.9914449, 0.1305262, 0, -0.1305262, 0.9914449, 0, 0, 0, 1, 0.97894645, 7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_vc2v8")
 mesh = SubResource("BoxMesh_ofkg2")
 
-[node name="@MeshInstance3D@11882" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1040959891]
+[node name="@MeshInstance3D@12151" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1548000028]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.592425e-16, 7.5, 0.2)
 material_override = SubResource("StandardMaterial3D_8fpi6")
 mesh = SubResource("BoxMesh_dipdv")
 
-[node name="@MeshInstance3D@11883" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1631775196]
+[node name="@MeshInstance3D@12152" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1188766298]
 transform = Transform3D(0.9914449, -0.1305262, 0, 0.1305262, 0.9914449, 0, 0, 0, 1, -0.97894645, 7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_15ddm")
 mesh = SubResource("BoxMesh_4d0jn")
 
-[node name="@MeshInstance3D@11884" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=637729751]
+[node name="@MeshInstance3D@12153" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=214265649]
 transform = Transform3D(0.9659258, -0.25881904, 0, 0.25881904, 0.9659258, 0, 0, 0, 1, -1.9411428, 7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_f6cp1")
 mesh = SubResource("BoxMesh_b1lf8")
 
-[node name="@MeshInstance3D@11885" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=276519678]
+[node name="@MeshInstance3D@12154" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=522121729]
 transform = Transform3D(0.9238795, -0.38268346, 0, 0.38268346, 0.9238795, 0, 0, 0, 1, -2.8701258, 6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_tapeo")
 mesh = SubResource("BoxMesh_oqsbc")
 
-[node name="@MeshInstance3D@11886" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=683219938]
+[node name="@MeshInstance3D@12155" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=262116885]
 transform = Transform3D(0.8660254, -0.5, 0, 0.5, 0.8660254, 0, 0, 0, 1, -3.75, 6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_mse3g")
 mesh = SubResource("BoxMesh_slwls")
 
-[node name="@MeshInstance3D@11887" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1252237255]
+[node name="@MeshInstance3D@12156" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1317339027]
 transform = Transform3D(0.7933533, -0.6087614, 0, 0.6087614, 0.7933533, 0, 0, 0, 1, -4.5657105, 5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_1t2fi")
 mesh = SubResource("BoxMesh_rc20l")
 
-[node name="@MeshInstance3D@11888" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1765559312]
+[node name="@MeshInstance3D@12157" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1383324075]
 transform = Transform3D(0.70710677, -0.70710677, 0, 0.70710677, 0.70710677, 0, 0, 0, 1, -5.303301, 5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_1fagu")
 mesh = SubResource("BoxMesh_nab3m")
 
-[node name="@MeshInstance3D@11889" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1200354134]
+[node name="@MeshInstance3D@12158" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1616922708]
 transform = Transform3D(0.6087614, -0.7933533, 0, 0.7933533, 0.6087614, 0, 0, 0, 1, -5.95015, 4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_fdjfo")
 mesh = SubResource("BoxMesh_sxjbg")
 
-[node name="@MeshInstance3D@11890" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1631221676]
+[node name="@MeshInstance3D@12159" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1582533684]
 transform = Transform3D(0.49999997, -0.86602545, 0, 0.86602545, 0.49999997, 0, 0, 0, 1, -6.4951906, 3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_5nqrw")
 mesh = SubResource("BoxMesh_wnr6v")
 
-[node name="@MeshInstance3D@11891" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=364626972]
+[node name="@MeshInstance3D@12160" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=486765586]
 transform = Transform3D(0.38268343, -0.9238795, 0, 0.9238795, 0.38268343, 0, 0, 0, 1, -6.9290967, 2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_a17sk")
 mesh = SubResource("BoxMesh_gowj8")
 
-[node name="@MeshInstance3D@11892" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1554840626]
+[node name="@MeshInstance3D@12161" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=547350908]
 transform = Transform3D(0.25881907, -0.9659258, 0, 0.9659258, 0.25881907, 0, 0, 0, 1, -7.244444, 1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_cknxj")
 mesh = SubResource("BoxMesh_eo6mw")
 
-[node name="@MeshInstance3D@11893" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=385798666]
+[node name="@MeshInstance3D@12162" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1225292962]
 transform = Transform3D(0.13052624, -0.9914448, 0, 0.9914448, 0.13052624, 0, 0, 0, 1, -7.4358363, 0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_4jb4w")
 mesh = SubResource("BoxMesh_buipn")
 
-[node name="@MeshInstance3D@11894" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=920500833]
+[node name="@MeshInstance3D@12163" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=911226434]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -7.5, 9.18485e-16, 0.2)
 material_override = SubResource("StandardMaterial3D_8w106")
 mesh = SubResource("BoxMesh_pkye7")
 
-[node name="@MeshInstance3D@11895" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=115680898]
+[node name="@MeshInstance3D@12164" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=326415679]
 transform = Transform3D(-0.13052621, -0.9914449, 0, 0.9914449, -0.13052621, 0, 0, 0, 1, -7.4358363, -0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_1piia")
 mesh = SubResource("BoxMesh_6l14u")
 
-[node name="@MeshInstance3D@11896" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1461934784]
+[node name="@MeshInstance3D@12165" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=939614098]
 transform = Transform3D(-0.25881904, -0.9659258, 0, 0.9659258, -0.25881904, 0, 0, 0, 1, -7.244444, -1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_y8qgc")
 mesh = SubResource("BoxMesh_ldy7q")
 
-[node name="@MeshInstance3D@11897" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1054131780]
+[node name="@MeshInstance3D@12166" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=724881915]
 transform = Transform3D(-0.3826834, -0.92387956, 0, 0.92387956, -0.3826834, 0, 0, 0, 1, -6.9290967, -2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_sa318")
 mesh = SubResource("BoxMesh_lbsma")
 
-[node name="@MeshInstance3D@11898" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=828478634]
+[node name="@MeshInstance3D@12167" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1276036538]
 transform = Transform3D(-0.50000006, -0.8660254, 0, 0.8660254, -0.50000006, 0, 0, 0, 1, -6.4951906, -3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_dm8ur")
 mesh = SubResource("BoxMesh_ugdmk")
 
-[node name="@MeshInstance3D@11899" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1460613597]
+[node name="@MeshInstance3D@12168" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=569602110]
 transform = Transform3D(-0.6087614, -0.7933533, 0, 0.7933533, -0.6087614, 0, 0, 0, 1, -5.95015, -4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_b4guj")
 mesh = SubResource("BoxMesh_fpdqt")
 
-[node name="@MeshInstance3D@11900" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1009781549]
+[node name="@MeshInstance3D@12169" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=5057421]
 transform = Transform3D(-0.70710677, -0.70710677, 0, 0.70710677, -0.70710677, 0, 0, 0, 1, -5.303301, -5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_vrqd0")
 mesh = SubResource("BoxMesh_4pxmf")
 
-[node name="@MeshInstance3D@11901" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=960903082]
+[node name="@MeshInstance3D@12170" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=2010767133]
 transform = Transform3D(-0.7933533, -0.6087614, 0, 0.6087614, -0.7933533, 0, 0, 0, 1, -4.5657105, -5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_nhlo7")
 mesh = SubResource("BoxMesh_xw11q")
 
-[node name="@MeshInstance3D@11902" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1792386526]
+[node name="@MeshInstance3D@12171" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=811034926]
 transform = Transform3D(-0.8660254, -0.50000006, 0, 0.50000006, -0.8660254, 0, 0, 0, 1, -3.75, -6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_201dm")
 mesh = SubResource("BoxMesh_yxemm")
 
-[node name="@MeshInstance3D@11903" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=111961575]
+[node name="@MeshInstance3D@12172" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1271827637]
 transform = Transform3D(-0.9238795, -0.3826835, 0, 0.3826835, -0.9238795, 0, 0, 0, 1, -2.8701258, -6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_1el04")
 mesh = SubResource("BoxMesh_2fuxg")
 
-[node name="@MeshInstance3D@11904" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1295287876]
+[node name="@MeshInstance3D@12173" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=418459361]
 transform = Transform3D(-0.9659258, -0.25881913, 0, 0.25881913, -0.9659258, 0, 0, 0, 1, -1.9411428, -7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_x8k3m")
 mesh = SubResource("BoxMesh_du32f")
 
-[node name="@MeshInstance3D@11905" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=415567168]
+[node name="@MeshInstance3D@12174" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1081618454]
 transform = Transform3D(-0.9914449, -0.13052608, 0, 0.13052608, -0.9914449, 0, 0, 0, 1, -0.97894645, -7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_x0vkd")
 mesh = SubResource("BoxMesh_qhk32")
 
-[node name="@MeshInstance3D@11906" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=426498263]
+[node name="@MeshInstance3D@12175" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=824323137]
 transform = Transform3D(-1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0, 0, 1, -1.3777277e-15, -7.5, 0.2)
 material_override = SubResource("StandardMaterial3D_j4cln")
 mesh = SubResource("BoxMesh_inov3")
 
-[node name="@MeshInstance3D@11907" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=575275327]
+[node name="@MeshInstance3D@12176" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1011053782]
 transform = Transform3D(-0.9914448, 0.13052626, 0, -0.13052626, -0.9914448, 0, 0, 0, 1, 0.97894645, -7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_503v2")
 mesh = SubResource("BoxMesh_e23gp")
 
-[node name="@MeshInstance3D@11908" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1592010117]
+[node name="@MeshInstance3D@12177" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=586498647]
 transform = Transform3D(-0.9659258, 0.25881907, 0, -0.25881907, -0.9659258, 0, 0, 0, 1, 1.9411428, -7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_pup5j")
 mesh = SubResource("BoxMesh_onch3")
 
-[node name="@MeshInstance3D@11909" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=2129969140]
+[node name="@MeshInstance3D@12178" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1953938948]
 transform = Transform3D(-0.9238795, 0.38268343, 0, -0.38268343, -0.9238795, 0, 0, 0, 1, 2.8701258, -6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_y3rcn")
 mesh = SubResource("BoxMesh_inv12")
 
-[node name="@MeshInstance3D@11910" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1165391804]
+[node name="@MeshInstance3D@12179" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=616102126]
 transform = Transform3D(-0.8660254, 0.49999997, 0, -0.49999997, -0.8660254, 0, 0, 0, 1, 3.75, -6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_4rdtj")
 mesh = SubResource("BoxMesh_0n2gn")
 
-[node name="@MeshInstance3D@11911" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1139830605]
+[node name="@MeshInstance3D@12180" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1087382757]
 transform = Transform3D(-0.7933534, 0.60876137, 0, -0.60876137, -0.7933534, 0, 0, 0, 1, 4.5657105, -5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_kplem")
 mesh = SubResource("BoxMesh_1mpha")
 
-[node name="@MeshInstance3D@11912" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1707619350]
+[node name="@MeshInstance3D@12181" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=122635195]
 transform = Transform3D(-0.7071068, 0.7071067, 0, -0.7071067, -0.7071068, 0, 0, 0, 1, 5.303301, -5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_qt4va")
 mesh = SubResource("BoxMesh_ktf0s")
 
-[node name="@MeshInstance3D@11913" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=203627140]
+[node name="@MeshInstance3D@12182" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1490531326]
 transform = Transform3D(-0.6087615, 0.79335326, 0, -0.79335326, -0.6087615, 0, 0, 0, 1, 5.95015, -4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_my72f")
 mesh = SubResource("BoxMesh_2h4jb")
 
-[node name="@MeshInstance3D@11914" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=744448336]
+[node name="@MeshInstance3D@12183" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1060060267]
 transform = Transform3D(-0.4999999, 0.86602545, 0, -0.86602545, -0.4999999, 0, 0, 0, 1, 6.4951906, -3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_yw3oi")
 mesh = SubResource("BoxMesh_10pho")
 
-[node name="@MeshInstance3D@11915" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1437569652]
+[node name="@MeshInstance3D@12184" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1903673685]
 transform = Transform3D(-0.38268358, 0.9238795, 0, -0.9238795, -0.38268358, 0, 0, 0, 1, 6.9290967, -2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_8w8d0")
 mesh = SubResource("BoxMesh_n13yd")
 
-[node name="@MeshInstance3D@11916" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=814826628]
+[node name="@MeshInstance3D@12185" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=115606441]
 transform = Transform3D(-0.25881898, 0.9659259, 0, -0.9659259, -0.25881898, 0, 0, 0, 1, 7.244444, -1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_i1clh")
 mesh = SubResource("BoxMesh_84oja")
 
-[node name="@MeshInstance3D@11917" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=1187501216]
+[node name="@MeshInstance3D@12186" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_2/CityClock_bezel_2" unique_id=383548811]
 transform = Transform3D(-0.1305264, 0.9914448, 0, -0.9914448, -0.1305264, 0, 0, 0, 1, 7.4358363, -0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_514rd")
 mesh = SubResource("BoxMesh_kmbrp")
 
-[node name="ClockFace_3" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces" unique_id=2018483870]
+[node name="ClockFace_3" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces" unique_id=922497509]
 transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -3.67394e-15, 0, -20)
 
-[node name="CityClock_hour_3" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3" unique_id=1409228211]
+[node name="CityClock_hour_3" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3" unique_id=137012692]
 
-[node name="@MeshInstance3D@11918" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_hour_3" unique_id=2000237069]
+[node name="@MeshInstance3D@12187" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_hour_3" unique_id=1766263175]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_juq7p")
 mesh = SubResource("ArrayMesh_q8v8m")
 
-[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_hour_3" unique_id=1437350662]
+[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_hour_3" unique_id=1378971155]
 material_override = SubResource("StandardMaterial3D_84ngl")
 mesh = SubResource("ArrayMesh_x2luj")
 
-[node name="CityClock_minute_3" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3" unique_id=1532920457]
+[node name="CityClock_minute_3" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3" unique_id=771267879]
 
-[node name="@MeshInstance3D@11919" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_minute_3" unique_id=1467539453]
+[node name="@MeshInstance3D@12188" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_minute_3" unique_id=2090067784]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_11y77")
 mesh = SubResource("ArrayMesh_3wtya")
 
-[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_minute_3" unique_id=1735283445]
+[node name="Arrow" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_minute_3" unique_id=1463266514]
 material_override = SubResource("StandardMaterial3D_s3862")
 mesh = SubResource("ArrayMesh_fjn0f")
 
-[node name="CityClock_bezel_3" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3" unique_id=239772203]
+[node name="CityClock_bezel_3" type="Node3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3" unique_id=1398643603]
 
-[node name="@MeshInstance3D@11920" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=963528030]
+[node name="@MeshInstance3D@12189" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1416030402]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_3twsi")
 mesh = SubResource("ArrayMesh_1n3xs")
 
-[node name="@MeshInstance3D@11921" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1759092084]
+[node name="@MeshInstance3D@12190" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=2076418045]
 transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 7.5, 0, 0.2)
 material_override = SubResource("StandardMaterial3D_6tv8o")
 mesh = SubResource("BoxMesh_6y2r8")
 
-[node name="@MeshInstance3D@11922" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=2081313199]
+[node name="@MeshInstance3D@12191" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1582542878]
 transform = Transform3D(0.13052624, 0.9914448, 0, -0.9914448, 0.13052624, 0, 0, 0, 1, 7.4358363, 0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_sw5a2")
 mesh = SubResource("BoxMesh_2hlis")
 
-[node name="@MeshInstance3D@11923" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1668765076]
+[node name="@MeshInstance3D@12192" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=2140835318]
 transform = Transform3D(0.25881907, 0.9659258, 0, -0.9659258, 0.25881907, 0, 0, 0, 1, 7.244444, 1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_sjjty")
 mesh = SubResource("BoxMesh_puabn")
 
-[node name="@MeshInstance3D@11924" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=2120305074]
+[node name="@MeshInstance3D@12193" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=265415985]
 transform = Transform3D(0.38268343, 0.9238795, 0, -0.9238795, 0.38268343, 0, 0, 0, 1, 6.9290967, 2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_1mwkr")
 mesh = SubResource("BoxMesh_1jepj")
 
-[node name="@MeshInstance3D@11925" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1694720984]
+[node name="@MeshInstance3D@12194" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1750441349]
 transform = Transform3D(0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 0, 0, 1, 6.4951906, 3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_t6kom")
 mesh = SubResource("BoxMesh_lc5d7")
 
-[node name="@MeshInstance3D@11926" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1538618232]
+[node name="@MeshInstance3D@12195" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1838508846]
 transform = Transform3D(0.6087614, 0.7933533, 0, -0.7933533, 0.6087614, 0, 0, 0, 1, 5.95015, 4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_ur64l")
 mesh = SubResource("BoxMesh_jam8f")
 
-[node name="@MeshInstance3D@11927" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=292858681]
+[node name="@MeshInstance3D@12196" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1381628127]
 transform = Transform3D(0.70710677, 0.70710677, 0, -0.70710677, 0.70710677, 0, 0, 0, 1, 5.303301, 5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_byg5p")
 mesh = SubResource("BoxMesh_s1dd2")
 
-[node name="@MeshInstance3D@11928" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=729095229]
+[node name="@MeshInstance3D@12197" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=161909026]
 transform = Transform3D(0.7933533, 0.6087614, 0, -0.6087614, 0.7933533, 0, 0, 0, 1, 4.5657105, 5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_p7n43")
 mesh = SubResource("BoxMesh_8lgx4")
 
-[node name="@MeshInstance3D@11929" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=489666156]
+[node name="@MeshInstance3D@12198" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1195265978]
 transform = Transform3D(0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 0, 0, 1, 3.75, 6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_nip5r")
 mesh = SubResource("BoxMesh_j8gii")
 
-[node name="@MeshInstance3D@11930" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1972065451]
+[node name="@MeshInstance3D@12199" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=740632168]
 transform = Transform3D(0.9238795, 0.38268346, 0, -0.38268346, 0.9238795, 0, 0, 0, 1, 2.8701258, 6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_wyedk")
 mesh = SubResource("BoxMesh_v0md1")
 
-[node name="@MeshInstance3D@11931" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=975433995]
+[node name="@MeshInstance3D@12200" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1043157915]
 transform = Transform3D(0.9659258, 0.25881904, 0, -0.25881904, 0.9659258, 0, 0, 0, 1, 1.9411428, 7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_3fend")
 mesh = SubResource("BoxMesh_d84sp")
 
-[node name="@MeshInstance3D@11932" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=340288245]
+[node name="@MeshInstance3D@12201" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1416969856]
 transform = Transform3D(0.9914449, 0.1305262, 0, -0.1305262, 0.9914449, 0, 0, 0, 1, 0.97894645, 7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_148o4")
 mesh = SubResource("BoxMesh_1bwaq")
 
-[node name="@MeshInstance3D@11933" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=347461199]
+[node name="@MeshInstance3D@12202" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1429875708]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.592425e-16, 7.5, 0.2)
 material_override = SubResource("StandardMaterial3D_tqlnt")
 mesh = SubResource("BoxMesh_wicse")
 
-[node name="@MeshInstance3D@11934" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=17939405]
+[node name="@MeshInstance3D@12203" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=835761175]
 transform = Transform3D(0.9914449, -0.1305262, 0, 0.1305262, 0.9914449, 0, 0, 0, 1, -0.97894645, 7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_ijj3d")
 mesh = SubResource("BoxMesh_akrw3")
 
-[node name="@MeshInstance3D@11935" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=252495318]
+[node name="@MeshInstance3D@12204" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1763460074]
 transform = Transform3D(0.9659258, -0.25881904, 0, 0.25881904, 0.9659258, 0, 0, 0, 1, -1.9411428, 7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_vttc0")
 mesh = SubResource("BoxMesh_7kbow")
 
-[node name="@MeshInstance3D@11936" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=751490868]
+[node name="@MeshInstance3D@12205" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=562290518]
 transform = Transform3D(0.9238795, -0.38268346, 0, 0.38268346, 0.9238795, 0, 0, 0, 1, -2.8701258, 6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_siq0i")
 mesh = SubResource("BoxMesh_i1wk5")
 
-[node name="@MeshInstance3D@11937" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=390669509]
+[node name="@MeshInstance3D@12206" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1854877212]
 transform = Transform3D(0.8660254, -0.5, 0, 0.5, 0.8660254, 0, 0, 0, 1, -3.75, 6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_krimk")
 mesh = SubResource("BoxMesh_rpkqc")
 
-[node name="@MeshInstance3D@11938" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1335023021]
+[node name="@MeshInstance3D@12207" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=745692273]
 transform = Transform3D(0.7933533, -0.6087614, 0, 0.6087614, 0.7933533, 0, 0, 0, 1, -4.5657105, 5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_qbnpn")
 mesh = SubResource("BoxMesh_cevc1")
 
-[node name="@MeshInstance3D@11939" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=598769703]
+[node name="@MeshInstance3D@12208" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=98287815]
 transform = Transform3D(0.70710677, -0.70710677, 0, 0.70710677, 0.70710677, 0, 0, 0, 1, -5.303301, 5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_g18se")
 mesh = SubResource("BoxMesh_tpl1x")
 
-[node name="@MeshInstance3D@11940" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1244516485]
+[node name="@MeshInstance3D@12209" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=271046622]
 transform = Transform3D(0.6087614, -0.7933533, 0, 0.7933533, 0.6087614, 0, 0, 0, 1, -5.95015, 4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_7kmy8")
 mesh = SubResource("BoxMesh_agtrh")
 
-[node name="@MeshInstance3D@11941" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1606664417]
+[node name="@MeshInstance3D@12210" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=13883848]
 transform = Transform3D(0.49999997, -0.86602545, 0, 0.86602545, 0.49999997, 0, 0, 0, 1, -6.4951906, 3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_w563t")
 mesh = SubResource("BoxMesh_hum05")
 
-[node name="@MeshInstance3D@11942" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=898638270]
+[node name="@MeshInstance3D@12211" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=987646633]
 transform = Transform3D(0.38268343, -0.9238795, 0, 0.9238795, 0.38268343, 0, 0, 0, 1, -6.9290967, 2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_t040c")
 mesh = SubResource("BoxMesh_gjfbx")
 
-[node name="@MeshInstance3D@11943" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1927000643]
+[node name="@MeshInstance3D@12212" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=294970075]
 transform = Transform3D(0.25881907, -0.9659258, 0, 0.9659258, 0.25881907, 0, 0, 0, 1, -7.244444, 1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_oxpq3")
 mesh = SubResource("BoxMesh_ecm2f")
 
-[node name="@MeshInstance3D@11944" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=308541065]
+[node name="@MeshInstance3D@12213" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1385820102]
 transform = Transform3D(0.13052624, -0.9914448, 0, 0.9914448, 0.13052624, 0, 0, 0, 1, -7.4358363, 0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_58il8")
 mesh = SubResource("BoxMesh_mmh7i")
 
-[node name="@MeshInstance3D@11945" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1850419051]
+[node name="@MeshInstance3D@12214" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=881150326]
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, -7.5, 9.18485e-16, 0.2)
 material_override = SubResource("StandardMaterial3D_fdwu7")
 mesh = SubResource("BoxMesh_3p5wx")
 
-[node name="@MeshInstance3D@11946" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=561518645]
+[node name="@MeshInstance3D@12215" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=951288872]
 transform = Transform3D(-0.13052621, -0.9914449, 0, 0.9914449, -0.13052621, 0, 0, 0, 1, -7.4358363, -0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_vcy62")
 mesh = SubResource("BoxMesh_q8why")
 
-[node name="@MeshInstance3D@11947" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=2018382138]
+[node name="@MeshInstance3D@12216" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=292743944]
 transform = Transform3D(-0.25881904, -0.9659258, 0, 0.9659258, -0.25881904, 0, 0, 0, 1, -7.244444, -1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_ybedo")
 mesh = SubResource("BoxMesh_8sibg")
 
-[node name="@MeshInstance3D@11948" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1884115620]
+[node name="@MeshInstance3D@12217" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=2008165001]
 transform = Transform3D(-0.3826834, -0.92387956, 0, 0.92387956, -0.3826834, 0, 0, 0, 1, -6.9290967, -2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_tt6sq")
 mesh = SubResource("BoxMesh_hlwm2")
 
-[node name="@MeshInstance3D@11949" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=36625923]
+[node name="@MeshInstance3D@12218" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=955088510]
 transform = Transform3D(-0.50000006, -0.8660254, 0, 0.8660254, -0.50000006, 0, 0, 0, 1, -6.4951906, -3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_7kb8k")
 mesh = SubResource("BoxMesh_tu8o8")
 
-[node name="@MeshInstance3D@11950" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=2005122729]
+[node name="@MeshInstance3D@12219" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1660765177]
 transform = Transform3D(-0.6087614, -0.7933533, 0, 0.7933533, -0.6087614, 0, 0, 0, 1, -5.95015, -4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_swe8g")
 mesh = SubResource("BoxMesh_bskdt")
 
-[node name="@MeshInstance3D@11951" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1868488031]
+[node name="@MeshInstance3D@12220" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1651444762]
 transform = Transform3D(-0.70710677, -0.70710677, 0, 0.70710677, -0.70710677, 0, 0, 0, 1, -5.303301, -5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_2bbpp")
 mesh = SubResource("BoxMesh_bno5w")
 
-[node name="@MeshInstance3D@11952" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1438577066]
+[node name="@MeshInstance3D@12221" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=538249101]
 transform = Transform3D(-0.7933533, -0.6087614, 0, 0.6087614, -0.7933533, 0, 0, 0, 1, -4.5657105, -5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_pm2lb")
 mesh = SubResource("BoxMesh_3io3h")
 
-[node name="@MeshInstance3D@11953" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1953930822]
+[node name="@MeshInstance3D@12222" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=2075266667]
 transform = Transform3D(-0.8660254, -0.50000006, 0, 0.50000006, -0.8660254, 0, 0, 0, 1, -3.75, -6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_335ly")
 mesh = SubResource("BoxMesh_vsm2r")
 
-[node name="@MeshInstance3D@11954" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=393817931]
+[node name="@MeshInstance3D@12223" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1602920218]
 transform = Transform3D(-0.9238795, -0.3826835, 0, 0.3826835, -0.9238795, 0, 0, 0, 1, -2.8701258, -6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_vkv5p")
 mesh = SubResource("BoxMesh_lbqjn")
 
-[node name="@MeshInstance3D@11955" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=767899313]
+[node name="@MeshInstance3D@12224" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1945230164]
 transform = Transform3D(-0.9659258, -0.25881913, 0, 0.25881913, -0.9659258, 0, 0, 0, 1, -1.9411428, -7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_cgu21")
 mesh = SubResource("BoxMesh_eg34y")
 
-[node name="@MeshInstance3D@11956" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1765237620]
+[node name="@MeshInstance3D@12225" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=849240065]
 transform = Transform3D(-0.9914449, -0.13052608, 0, 0.13052608, -0.9914449, 0, 0, 0, 1, -0.97894645, -7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_b47su")
 mesh = SubResource("BoxMesh_kg4pi")
 
-[node name="@MeshInstance3D@11957" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1598847091]
+[node name="@MeshInstance3D@12226" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1207803973]
 transform = Transform3D(-1, 8.742278e-08, 0, -8.742278e-08, -1, 0, 0, 0, 1, -1.3777277e-15, -7.5, 0.2)
 material_override = SubResource("StandardMaterial3D_et2j4")
 mesh = SubResource("BoxMesh_l57cb")
 
-[node name="@MeshInstance3D@11958" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1487079101]
+[node name="@MeshInstance3D@12227" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=388693634]
 transform = Transform3D(-0.9914448, 0.13052626, 0, -0.13052626, -0.9914448, 0, 0, 0, 1, 0.97894645, -7.4358363, 0.2)
 material_override = SubResource("StandardMaterial3D_kvdrx")
 mesh = SubResource("BoxMesh_68jex")
 
-[node name="@MeshInstance3D@11959" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=795035486]
+[node name="@MeshInstance3D@12228" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=771532913]
 transform = Transform3D(-0.9659258, 0.25881907, 0, -0.25881907, -0.9659258, 0, 0, 0, 1, 1.9411428, -7.244444, 0.2)
 material_override = SubResource("StandardMaterial3D_2s4lw")
 mesh = SubResource("BoxMesh_03te3")
 
-[node name="@MeshInstance3D@11960" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=196120655]
+[node name="@MeshInstance3D@12229" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=156404023]
 transform = Transform3D(-0.9238795, 0.38268343, 0, -0.38268343, -0.9238795, 0, 0, 0, 1, 2.8701258, -6.9290967, 0.2)
 material_override = SubResource("StandardMaterial3D_1rymn")
 mesh = SubResource("BoxMesh_og8sy")
 
-[node name="@MeshInstance3D@11961" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=612702441]
+[node name="@MeshInstance3D@12230" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1997437831]
 transform = Transform3D(-0.8660254, 0.49999997, 0, -0.49999997, -0.8660254, 0, 0, 0, 1, 3.75, -6.4951906, 0.2)
 material_override = SubResource("StandardMaterial3D_pqtnd")
 mesh = SubResource("BoxMesh_11xfk")
 
-[node name="@MeshInstance3D@11962" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=745257123]
+[node name="@MeshInstance3D@12231" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1486995337]
 transform = Transform3D(-0.7933534, 0.60876137, 0, -0.60876137, -0.7933534, 0, 0, 0, 1, 4.5657105, -5.95015, 0.2)
 material_override = SubResource("StandardMaterial3D_xm7d4")
 mesh = SubResource("BoxMesh_yla3y")
 
-[node name="@MeshInstance3D@11963" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=26785653]
+[node name="@MeshInstance3D@12232" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1675842540]
 transform = Transform3D(-0.7071068, 0.7071067, 0, -0.7071067, -0.7071068, 0, 0, 0, 1, 5.303301, -5.303301, 0.2)
 material_override = SubResource("StandardMaterial3D_r7whw")
 mesh = SubResource("BoxMesh_klm6c")
 
-[node name="@MeshInstance3D@11964" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1375296854]
+[node name="@MeshInstance3D@12233" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=776091611]
 transform = Transform3D(-0.6087615, 0.79335326, 0, -0.79335326, -0.6087615, 0, 0, 0, 1, 5.95015, -4.5657105, 0.2)
 material_override = SubResource("StandardMaterial3D_sbuff")
 mesh = SubResource("BoxMesh_iv7bd")
 
-[node name="@MeshInstance3D@11965" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=550251665]
+[node name="@MeshInstance3D@12234" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=270504083]
 transform = Transform3D(-0.4999999, 0.86602545, 0, -0.86602545, -0.4999999, 0, 0, 0, 1, 6.4951906, -3.75, 0.2)
 material_override = SubResource("StandardMaterial3D_de4kf")
 mesh = SubResource("BoxMesh_6rng0")
 
-[node name="@MeshInstance3D@11966" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1130118646]
+[node name="@MeshInstance3D@12235" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=819400383]
 transform = Transform3D(-0.38268358, 0.9238795, 0, -0.9238795, -0.38268358, 0, 0, 0, 1, 6.9290967, -2.8701258, 0.2)
 material_override = SubResource("StandardMaterial3D_m4e6e")
 mesh = SubResource("BoxMesh_d2dr8")
 
-[node name="@MeshInstance3D@11967" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1124752613]
+[node name="@MeshInstance3D@12236" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1656497193]
 transform = Transform3D(-0.25881898, 0.9659259, 0, -0.9659259, -0.25881898, 0, 0, 0, 1, 7.244444, -1.9411428, 0.2)
 material_override = SubResource("StandardMaterial3D_5oiuj")
 mesh = SubResource("BoxMesh_quic3")
 
-[node name="@MeshInstance3D@11968" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1841188366]
+[node name="@MeshInstance3D@12237" type="MeshInstance3D" parent="CrossingCityDome_Part_01/CityClockFaces/ClockFace_3/CityClock_bezel_3" unique_id=1973349747]
 transform = Transform3D(-0.1305264, 0.9914448, 0, -0.9914448, -0.1305264, 0, 0, 0, 1, 7.4358363, -0.97894645, 0.2)
 material_override = SubResource("StandardMaterial3D_5cu5b")
 mesh = SubResource("BoxMesh_fp8pd")

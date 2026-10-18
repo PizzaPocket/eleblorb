@@ -418,31 +418,31 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_q3obp"]
 size = Vector3(0.6972257, 1.1, 0.12)
 
-[node name="MoyCell_03_03_Part_05" type="Node3D" unique_id=1776015495]
+[node name="MoyCell_03_03_Part_05" type="Node3D" unique_id=1884312943]
 
-[node name="CrossingTower_00" type="Node3D" parent="." unique_id=1619454966]
+[node name="CrossingTower_00" type="Node3D" parent="." unique_id=1628074122]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547, -60, -13)
 
-[node name="CrossingTowerTrunk" type="StaticBody3D" parent="CrossingTower_00" unique_id=1114343297]
+[node name="CrossingTowerTrunk" type="StaticBody3D" parent="CrossingTower_00" unique_id=1306342519]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 20.5, 0)
 
-[node name="@MeshInstance3D@4293" type="MeshInstance3D" parent="CrossingTower_00/CrossingTowerTrunk" unique_id=1969624132]
+[node name="@MeshInstance3D@4554" type="MeshInstance3D" parent="CrossingTower_00/CrossingTowerTrunk" unique_id=1759023031]
 material_override = SubResource("StandardMaterial3D_pll6j")
 mesh = SubResource("CylinderMesh_6rsb4")
 
-[node name="@CollisionShape3D@4294" type="CollisionShape3D" parent="CrossingTower_00/CrossingTowerTrunk" unique_id=167692771]
+[node name="@CollisionShape3D@4555" type="CollisionShape3D" parent="CrossingTower_00/CrossingTowerTrunk" unique_id=1530374813]
 shape = SubResource("CylinderShape3D_etwhp")
 
-[node name="CrossingHand_00_up_0" type="StaticBody3D" parent="CrossingTower_00" unique_id=1474151052]
+[node name="CrossingHand_00_up_0" type="StaticBody3D" parent="CrossingTower_00" unique_id=2116153833]
 
-[node name="@MeshInstance3D@4295" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_0" unique_id=1442251673]
+[node name="@MeshInstance3D@4556" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_0" unique_id=2082502918]
 material_override = SubResource("StandardMaterial3D_5l1nh")
 mesh = SubResource("ArrayMesh_2frrb")
 
-[node name="@CollisionShape3D@4296" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_0" unique_id=585325201]
+[node name="@CollisionShape3D@4557" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_0" unique_id=985005002]
 shape = SubResource("ConcavePolygonShape3D_qbp0i")
 
-[node name="CrossingHand_00_up_1" type="StaticBody3D" parent="CrossingTower_00" unique_id=884819547]
+[node name="CrossingHand_00_up_1" type="StaticBody3D" parent="CrossingTower_00" unique_id=679743521]
 script = ExtResource("1_6oyca")
 travel_speed = 0.55
 helix_rise_per_radian = 1.558840428759931
@@ -453,40 +453,40 @@ metadata/helix_y0 = 0.0
 metadata/helix_y1 = 6.5
 metadata/helix_tread_radius = 2.7
 
-[node name="@MeshInstance3D@4297" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=575402162]
+[node name="@MeshInstance3D@4558" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1272862341]
 material_override = SubResource("StandardMaterial3D_7uc8k")
 mesh = SubResource("ArrayMesh_c2ejo")
 
-[node name="@CollisionShape3D@4298" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1652584993]
+[node name="@CollisionShape3D@4559" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1546027950]
 shape = SubResource("ConcavePolygonShape3D_668qe")
 
-[node name="HelixBelt_Return" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1242993995]
+[node name="HelixBelt_Return" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=999729011]
 material_override = SubResource("StandardMaterial3D_4gtao")
 mesh = SubResource("ArrayMesh_o1k7h")
 
-[node name="HelixBelt_InnerEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1881118242]
+[node name="HelixBelt_InnerEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1298987037]
 material_override = SubResource("StandardMaterial3D_4gtao")
 mesh = SubResource("ArrayMesh_wq2vt")
 
-[node name="HelixBelt_OuterEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1565202370]
+[node name="HelixBelt_OuterEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=691553751]
 material_override = SubResource("StandardMaterial3D_4gtao")
 mesh = SubResource("ArrayMesh_is16x")
 
-[node name="HelixGlassBalustrade" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1074373562]
+[node name="HelixGlassBalustrade" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=161951250]
 material_override = SubResource("StandardMaterial3D_q6olo")
 mesh = SubResource("ArrayMesh_d2of8")
 
-[node name="HelixGlassBalustradeCollision" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1861050531]
+[node name="HelixGlassBalustradeCollision" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=2024209070]
 shape = SubResource("ConcavePolygonShape3D_1macy")
 
-[node name="@MeshInstance3D@4299" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1340658462]
+[node name="@MeshInstance3D@4560" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=161320793]
 material_override = SubResource("StandardMaterial3D_q6olo")
 mesh = SubResource("ArrayMesh_p01lf")
 
-[node name="@CollisionShape3D@4300" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1750838974]
+[node name="@CollisionShape3D@4561" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=211557065]
 shape = SubResource("ConcavePolygonShape3D_mdunh")
 
-[node name="HelixMovingTread_00" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=2128472065]
+[node name="HelixMovingTread_00" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=412867185]
 transform = Transform3D(-0.08715577, 0, -0.9961947, 0, 1, 0, 0.9961947, 0, -0.08715577, 2.6897256, 0.05, 0.23532051)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -494,7 +494,7 @@ metadata/helix_fraction = 0.0
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_01" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=997237743]
+[node name="HelixMovingTread_01" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=85029995]
 transform = Transform3D(-0.32645142, 0, -0.945214, 0, 1, 0, 0.945214, 0, -0.32645142, 2.5520778, 0.43235293, 0.8814187)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -502,7 +502,7 @@ metadata/helix_fraction = 0.058823529411764705
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_02" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1783142490]
+[node name="HelixMovingTread_02" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=635541195]
 transform = Transform3D(-0.5462051, 0, -0.83765143, 0, 1, 0, 0.83765143, 0, -0.5462051, 2.261659, 0.8147059, 1.474754)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -510,7 +510,7 @@ metadata/helix_fraction = 0.11764705882352941
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_03" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1166942483]
+[node name="HelixMovingTread_03" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=548478617]
 transform = Transform3D(-0.7332624, 0, -0.67994577, 0, 1, 0, 0.67994577, 0, -0.7332624, 1.8358538, 1.1970588, 1.9798083)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -518,7 +518,7 @@ metadata/helix_fraction = 0.17647058823529413
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_04" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1953792016]
+[node name="HelixMovingTread_04" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1668534889]
 transform = Transform3D(-0.8764254, 0, -0.48153773, 0, 1, 0, 0.48153773, 0, -0.8764254, 1.300152, 1.5794117, 2.3663485)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -526,7 +526,7 @@ metadata/helix_fraction = 0.23529411764705882
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_05" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1507575717]
+[node name="HelixMovingTread_05" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=2135494024]
 transform = Transform3D(-0.9671243, 0, -0.25430417, 0, 1, 0, 0.25430417, 0, -0.9671243, 0.686621, 1.9617647, 2.6112356)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -534,7 +534,7 @@ metadata/helix_fraction = 0.29411764705882354
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_06" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1480897824]
+[node name="HelixMovingTread_06" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=2056096010]
 transform = Transform3D(-0.99992985, 0, -0.01184737, 0, 1, 0, 0.01184737, 0, -0.99992985, 0.03198806, 2.3441176, 2.6998105)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -542,7 +542,7 @@ metadata/helix_fraction = 0.35294117647058826
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_07" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1171406660]
+[node name="HelixMovingTread_07" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1292438805]
 transform = Transform3D(-0.9728781, 0, 0.2313184, 0, 1, 0, -0.2313184, 0, -0.9728781, -0.62455976, 2.7264705, 2.6267707)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -550,7 +550,7 @@ metadata/helix_fraction = 0.4117647058823529
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_08" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=481618776]
+[node name="HelixMovingTread_08" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=149809388]
 transform = Transform3D(-0.88758844, 0, 0.46063733, 0, 1, 0, -0.46063733, 0, -0.88758844, -1.2437205, 3.1088235, 2.396489)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -558,7 +558,7 @@ metadata/helix_fraction = 0.47058823529411764
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_09" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=685406078]
+[node name="HelixMovingTread_09" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=92897454]
 transform = Transform3D(-0.74916655, 0, 0.66238165, 0, 1, 0, -0.66238165, 0, -0.74916655, -1.7884305, 3.4911764, 2.0227497)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -566,7 +566,7 @@ metadata/helix_fraction = 0.5294117647058824
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_10" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1495532307]
+[node name="HelixMovingTread_10" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1087104005]
 transform = Transform3D(-0.56589836, 0, 0.82447505, 0, 1, 0, -0.82447505, 0, -0.56589836, -2.2260823, 3.8735294, 1.5279258)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -574,7 +574,7 @@ metadata/helix_fraction = 0.5882352941176471
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_11" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1452321929]
+[node name="HelixMovingTread_11" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=889318438]
 transform = Transform3D(-0.34875482, 0, 0.937214, 0, 1, 0, -0.937214, 0, -0.34875482, -2.5304778, 4.2558823, 0.9416382)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -582,7 +582,7 @@ metadata/helix_fraction = 0.6470588235294118
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_12" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=441783726]
+[node name="HelixMovingTread_12" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=2051383018]
 transform = Transform3D(-0.110734336, 0, 0.99385005, 0, 1, 0, -0.99385005, 0, -0.110734336, -2.6833951, 4.638235, 0.29898265)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -590,7 +590,7 @@ metadata/helix_fraction = 0.7058823529411765
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_13" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1774929126]
+[node name="HelixMovingTread_13" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1339446142]
 transform = Transform3D(0.13391484, 0, 0.99099284, 0, 1, 0, -0.99099284, 0, 0.13391484, -2.6756806, 5.0205884, -0.36157042)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -598,7 +598,7 @@ metadata/helix_fraction = 0.7647058823529411
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_14" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1584607291]
+[node name="HelixMovingTread_14" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=865398627]
 transform = Transform3D(0.3705477, 0, 0.92881346, 0, 1, 0, -0.92881346, 0, 0.3705477, -2.507796, 5.402941, -1.0004793)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -606,7 +606,7 @@ metadata/helix_fraction = 0.8235294117647058
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_15" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=384829353]
+[node name="HelixMovingTread_15" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=224247103]
 transform = Transform3D(0.58499944, 0, 0.81103367, 0, 1, 0, -0.81103367, 0, 0.58499944, -2.1897912, 5.785294, -1.5794982)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -614,7 +614,7 @@ metadata/helix_fraction = 0.8823529411764706
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_16" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=1767395218]
+[node name="HelixMovingTread_16" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_1" unique_id=2069557922]
 transform = Transform3D(0.7644319, 0, 0.6447045, 0, 1, 0, -0.6447045, 0, 0.7644319, -1.7407024, 6.167647, -2.0639658)
 material_override = SubResource("StandardMaterial3D_6gr7m")
 mesh = SubResource("BoxMesh_xg7lp")
@@ -622,16 +622,16 @@ metadata/helix_fraction = 0.9411764705882353
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="CrossingHand_00_up_2" type="StaticBody3D" parent="CrossingTower_00" unique_id=2084148427]
+[node name="CrossingHand_00_up_2" type="StaticBody3D" parent="CrossingTower_00" unique_id=1368225615]
 
-[node name="@MeshInstance3D@4301" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_2" unique_id=319496403]
+[node name="@MeshInstance3D@4562" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_2" unique_id=1481573537]
 material_override = SubResource("StandardMaterial3D_ck5jd")
 mesh = SubResource("ArrayMesh_lp6sc")
 
-[node name="@CollisionShape3D@4302" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_2" unique_id=337038198]
+[node name="@CollisionShape3D@4563" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_2" unique_id=307888256]
 shape = SubResource("ConcavePolygonShape3D_17kxb")
 
-[node name="CrossingHand_00_up_3" type="StaticBody3D" parent="CrossingTower_00" unique_id=791652125]
+[node name="CrossingHand_00_up_3" type="StaticBody3D" parent="CrossingTower_00" unique_id=2024143727]
 script = ExtResource("1_6oyca")
 travel_speed = 0.55
 helix_rise_per_radian = 1.5588760194012015
@@ -642,40 +642,40 @@ metadata/helix_y0 = 6.5
 metadata/helix_y1 = 14.2
 metadata/helix_tread_radius = 2.7
 
-[node name="@MeshInstance3D@4303" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=840261594]
+[node name="@MeshInstance3D@4564" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=2131125754]
 material_override = SubResource("StandardMaterial3D_y01pe")
 mesh = SubResource("ArrayMesh_rjduo")
 
-[node name="@CollisionShape3D@4304" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1531569108]
+[node name="@CollisionShape3D@4565" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1148327640]
 shape = SubResource("ConcavePolygonShape3D_cuesu")
 
-[node name="HelixBelt_Return" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=458235577]
+[node name="HelixBelt_Return" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=286362194]
 material_override = SubResource("StandardMaterial3D_5f33e")
 mesh = SubResource("ArrayMesh_arqsl")
 
-[node name="HelixBelt_InnerEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=666599762]
+[node name="HelixBelt_InnerEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1217128323]
 material_override = SubResource("StandardMaterial3D_5f33e")
 mesh = SubResource("ArrayMesh_i0lnf")
 
-[node name="HelixBelt_OuterEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=21090137]
+[node name="HelixBelt_OuterEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1960889836]
 material_override = SubResource("StandardMaterial3D_5f33e")
 mesh = SubResource("ArrayMesh_hqh4w")
 
-[node name="HelixGlassBalustrade" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1846681445]
+[node name="HelixGlassBalustrade" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=240620230]
 material_override = SubResource("StandardMaterial3D_yxf8m")
 mesh = SubResource("ArrayMesh_ncspm")
 
-[node name="HelixGlassBalustradeCollision" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=644307154]
+[node name="HelixGlassBalustradeCollision" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=45324800]
 shape = SubResource("ConcavePolygonShape3D_8l6b4")
 
-[node name="@MeshInstance3D@4305" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=791767284]
+[node name="@MeshInstance3D@4566" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=227097816]
 material_override = SubResource("StandardMaterial3D_yxf8m")
 mesh = SubResource("ArrayMesh_uvidq")
 
-[node name="@CollisionShape3D@4306" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1691716653]
+[node name="@CollisionShape3D@4567" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=952248641]
 shape = SubResource("ConcavePolygonShape3D_hrus5")
 
-[node name="HelixMovingTread_00" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1401574705]
+[node name="HelixMovingTread_00" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1787642080]
 transform = Transform3D(0.9141833, 0, -0.40530097, 0, 1, 0, 0.40530097, 0, 0.9141833, 1.0943131, 6.55, -2.4682946)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -683,7 +683,7 @@ metadata/helix_fraction = 0.0
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_01" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=19084872]
+[node name="HelixMovingTread_01" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=2068381436]
 transform = Transform3D(0.7873602, 0, -0.6164932, 0, 1, 0, 0.6164932, 0, 0.7873602, 1.6645317, 6.935, -2.1258726)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -691,7 +691,7 @@ metadata/helix_fraction = 0.05
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_02" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1874718401]
+[node name="HelixMovingTread_02" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1491016299]
 transform = Transform3D(0.61275554, 0, -0.79027253, 0, 1, 0, 0.79027253, 0, 0.61275554, 2.1337361, 7.32, -1.6544394)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -699,7 +699,7 @@ metadata/helix_fraction = 0.1
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_03" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=223630612]
+[node name="HelixMovingTread_03" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1951277314]
 transform = Transform3D(0.4009647, 0, -0.9160935, 0, 1, 0, 0.9160935, 0, 0.4009647, 2.4734526, 7.705, -1.0826046)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -707,7 +707,7 @@ metadata/helix_fraction = 0.15
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_04" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=121894271]
+[node name="HelixMovingTread_04" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1939430988]
 transform = Transform3D(0.16484082, 0, -0.9863202, 0, 1, 0, 0.9863202, 0, 0.16484082, 2.6630645, 8.09, -0.4450708)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -715,7 +715,7 @@ metadata/helix_fraction = 0.2
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_05" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=602015143]
+[node name="HelixMovingTread_05" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1311921991]
 transform = Transform3D(-0.081286155, 0, -0.9966908, 0, 1, 0, 0.9966908, 0, -0.081286155, 2.691065, 8.475, 0.21947272)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -723,7 +723,7 @@ metadata/helix_fraction = 0.25
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_06" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=598095089]
+[node name="HelixMovingTread_06" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=56356023]
 transform = Transform3D(-0.3224802, 0, -0.94657624, 0, 1, 0, 0.94657624, 0, -0.3224802, 2.5557556, 8.86, 0.87069726)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -731,7 +731,7 @@ metadata/helix_fraction = 0.3
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_07" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1154499611]
+[node name="HelixMovingTread_07" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1759624748]
 transform = Transform3D(-0.5441046, 0, -0.8390174, 0, 1, 0, 0.8390174, 0, -0.5441046, 2.2653468, 9.245, 1.4690826)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -739,7 +739,7 @@ metadata/helix_fraction = 0.35
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_08" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=681093173]
+[node name="HelixMovingTread_08" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=741980014]
 transform = Transform3D(-0.7327093, 0, -0.68054175, 0, 1, 0, 0.68054175, 0, -0.7327093, 1.837463, 9.63, 1.9783149)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -747,7 +747,7 @@ metadata/helix_fraction = 0.4
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_09" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=683301459]
+[node name="HelixMovingTread_09" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=420513593]
 transform = Transform3D(-0.87684864, 0, -0.48076656, 0, 1, 0, 0.48076656, 0, -0.87684864, 1.2980705, 10.015, 2.3674908)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -755,7 +755,7 @@ metadata/helix_fraction = 0.45
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_10" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1967859247]
+[node name="HelixMovingTread_10" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=641136885]
 transform = Transform3D(-0.96777505, 0, -0.25181636, 0, 1, 0, 0.25181636, 0, -0.96777505, 0.6799032, 10.4, 2.6129928)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -763,7 +763,7 @@ metadata/helix_fraction = 0.5
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_11" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1054069080]
+[node name="HelixMovingTread_11" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1637309115]
 transform = Transform3D(-0.9999713, 0, -0.007583522, 0, 1, 0, 0.007583522, 0, -0.9999713, 0.020475134, 10.785, 2.6999223)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -771,7 +771,7 @@ metadata/helix_fraction = 0.55
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_12" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1528615878]
+[node name="HelixMovingTread_12" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=709928730]
 transform = Transform3D(-0.97148293, 0, 0.23710953, 0, 1, 0, -0.23710953, 0, -0.97148293, -0.6401955, 11.17, 2.623004)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -779,7 +779,7 @@ metadata/helix_fraction = 0.6
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_13" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=485762363]
+[node name="HelixMovingTread_13" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=63742024]
 transform = Transform3D(-0.8840389, 0, 0.46741328, 0, 1, 0, -0.46741328, 0, -0.8840389, -1.2620151, 11.555, 2.3869054)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -787,7 +787,7 @@ metadata/helix_fraction = 0.65
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_14" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1762749812]
+[node name="HelixMovingTread_14" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1514164967]
 transform = Transform3D(-0.74294657, 0, 0.66935074, 0, 1, 0, -0.66935074, 0, -0.74294657, -1.8072479, 11.94, 2.005955)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -795,7 +795,7 @@ metadata/helix_fraction = 0.7
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_15" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=362595060]
+[node name="HelixMovingTread_15" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1833723650]
 transform = Transform3D(-0.55676705, 0, 0.8306687, 0, 1, 0, -0.8306687, 0, -0.55676705, -2.2428057, 12.325, 1.5032706)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -803,7 +803,7 @@ metadata/helix_fraction = 0.75
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_16" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1873228764]
+[node name="HelixMovingTread_16" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1833056439]
 transform = Transform3D(-0.33679944, 0, 0.9415764, 0, 1, 0, -0.9415764, 0, -0.33679944, -2.5422564, 12.71, 0.90935856)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -811,7 +811,7 @@ metadata/helix_fraction = 0.8
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_17" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1530958376]
+[node name="HelixMovingTread_17" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1746317777]
 transform = Transform3D(-0.09639275, 0, 0.9953434, 0, 1, 0, -0.9953434, 0, -0.09639275, -2.687427, 13.095, 0.26026106)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -819,7 +819,7 @@ metadata/helix_fraction = 0.85
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_18" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1220779319]
+[node name="HelixMovingTread_18" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=864206825]
 transform = Transform3D(0.14986368, 0, 0.98870665, 0, 1, 0, -0.98870665, 0, 0.14986368, -2.6695082, 13.48, -0.4046307)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -827,7 +827,7 @@ metadata/helix_fraction = 0.9
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_19" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=639499961]
+[node name="HelixMovingTread_19" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_3" unique_id=1139972316]
 transform = Transform3D(0.38702455, 0, 0.92206943, 0, 1, 0, -0.92206943, 0, 0.38702455, -2.489587, 13.865, -1.0449669)
 material_override = SubResource("StandardMaterial3D_73laa")
 mesh = SubResource("BoxMesh_5g16v")
@@ -835,16 +835,16 @@ metadata/helix_fraction = 0.95
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="CrossingHand_00_up_4" type="StaticBody3D" parent="CrossingTower_00" unique_id=224406798]
+[node name="CrossingHand_00_up_4" type="StaticBody3D" parent="CrossingTower_00" unique_id=138729809]
 
-[node name="@MeshInstance3D@4307" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_4" unique_id=169902727]
+[node name="@MeshInstance3D@4568" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_4" unique_id=1937236851]
 material_override = SubResource("StandardMaterial3D_gqlmc")
 mesh = SubResource("ArrayMesh_10adp")
 
-[node name="@CollisionShape3D@4308" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_4" unique_id=868390169]
+[node name="@CollisionShape3D@4569" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_4" unique_id=455361731]
 shape = SubResource("ConcavePolygonShape3D_irnhu")
 
-[node name="CrossingHand_00_up_5" type="StaticBody3D" parent="CrossingTower_00" unique_id=1855839707]
+[node name="CrossingHand_00_up_5" type="StaticBody3D" parent="CrossingTower_00" unique_id=2039128970]
 script = ExtResource("1_6oyca")
 travel_speed = 0.55
 helix_rise_per_radian = 1.5588455799363699
@@ -855,40 +855,40 @@ metadata/helix_y0 = 14.2
 metadata/helix_y1 = 37.0
 metadata/helix_tread_radius = 2.7
 
-[node name="@MeshInstance3D@4309" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=8585357]
+[node name="@MeshInstance3D@4570" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=668893210]
 material_override = SubResource("StandardMaterial3D_8ixfa")
 mesh = SubResource("ArrayMesh_jfe05")
 
-[node name="@CollisionShape3D@4310" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1478980961]
+[node name="@CollisionShape3D@4571" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1821701814]
 shape = SubResource("ConcavePolygonShape3D_vo6qj")
 
-[node name="HelixBelt_Return" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=200212493]
+[node name="HelixBelt_Return" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=867290375]
 material_override = SubResource("StandardMaterial3D_dg6l7")
 mesh = SubResource("ArrayMesh_gg36y")
 
-[node name="HelixBelt_InnerEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=419757831]
+[node name="HelixBelt_InnerEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=703469351]
 material_override = SubResource("StandardMaterial3D_dg6l7")
 mesh = SubResource("ArrayMesh_le84u")
 
-[node name="HelixBelt_OuterEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1497048141]
+[node name="HelixBelt_OuterEdge" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1589389643]
 material_override = SubResource("StandardMaterial3D_dg6l7")
 mesh = SubResource("ArrayMesh_vv526")
 
-[node name="HelixGlassBalustrade" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1590660799]
+[node name="HelixGlassBalustrade" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1034907224]
 material_override = SubResource("StandardMaterial3D_1x8fc")
 mesh = SubResource("ArrayMesh_rmajd")
 
-[node name="HelixGlassBalustradeCollision" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=290381160]
+[node name="HelixGlassBalustradeCollision" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=2017574547]
 shape = SubResource("ConcavePolygonShape3D_ws8v1")
 
-[node name="@MeshInstance3D@4311" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=85093804]
+[node name="@MeshInstance3D@4572" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=167044447]
 material_override = SubResource("StandardMaterial3D_1x8fc")
 mesh = SubResource("ArrayMesh_qr02s")
 
-[node name="@CollisionShape3D@4312" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1451370937]
+[node name="@CollisionShape3D@4573" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=460447575]
 shape = SubResource("ConcavePolygonShape3D_3m3lj")
 
-[node name="HelixMovingTread_00" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=110351408]
+[node name="HelixMovingTread_00" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=201985196]
 transform = Transform3D(0.9985555, 0, 0.053730477, 0, 1, 0, -0.053730477, 0, 0.9985555, -0.14507169, 14.25, -2.6960998)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -896,7 +896,7 @@ metadata/helix_fraction = 0.0
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_01" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=460247313]
+[node name="HelixMovingTread_01" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1291018627]
 transform = Transform3D(0.9794976, 0, -0.20145585, 0, 1, 0, 0.20145585, 0, 0.9794976, 0.54393077, 14.65, -2.6446435)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -904,7 +904,7 @@ metadata/helix_fraction = 0.017543859649122806
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_02" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=471531277]
+[node name="HelixMovingTread_02" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1505477430]
 transform = Transform3D(0.896299, 0, -0.44345018, 0, 1, 0, 0.44345018, 0, 0.896299, 1.1973149, 15.05, -2.4200077)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -912,7 +912,7 @@ metadata/helix_fraction = 0.03508771929824561
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_03" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1425531841]
+[node name="HelixMovingTread_03" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=43862330]
 transform = Transform3D(0.7544085, 0, -0.65640527, 0, 1, 0, 0.65640527, 0, 0.7544085, 1.7722951, 15.45, -2.0369022)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -920,7 +920,7 @@ metadata/helix_fraction = 0.05263157894736842
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_04" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=967531408]
+[node name="HelixMovingTread_04" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1437531509]
 transform = Transform3D(0.5631164, 0, -0.8263776, 0, 1, 0, 0.8263776, 0, 0.5631164, 2.2312198, 15.85, -1.5204138)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -928,7 +928,7 @@ metadata/helix_fraction = 0.07017543859649122
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_05" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=482592084]
+[node name="HelixMovingTread_05" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=71896920]
 transform = Transform3D(0.3349496, 0, -0.94223607, 0, 1, 0, 0.94223607, 0, 0.3349496, 2.5440373, 16.25, -0.90436393)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -936,7 +936,7 @@ metadata/helix_fraction = 0.08771929824561403
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_06" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=938068095]
+[node name="HelixMovingTread_06" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=779464224]
 transform = Transform3D(0.08484922, 0, -0.9963938, 0, 1, 0, 0.9963938, 0, 0.08484922, 2.6902633, 16.65, -0.22909355)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -944,7 +944,7 @@ metadata/helix_fraction = 0.10526315789473684
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_07" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=442439199]
+[node name="HelixMovingTread_07" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=237504090]
 transform = Transform3D(-0.17080736, 0, -0.9853044, 0, 1, 0, 0.9853044, 0, -0.17080736, 2.6603222, 17.05, 0.4611786)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -952,7 +952,7 @@ metadata/helix_fraction = 0.12280701754385964
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_08" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1926778467]
+[node name="HelixMovingTread_08" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1131185745]
 transform = Transform3D(-0.41527805, 0, -0.90969455, 0, 1, 0, 0.90969455, 0, -0.41527805, 2.4561749, 17.45, 1.1212513)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -960,7 +960,7 @@ metadata/helix_fraction = 0.14035087719298245
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_09" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=674620337]
+[node name="HelixMovingTread_09" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=750881116]
 transform = Transform3D(-0.6325559, 0, -0.7745147, 0, 1, 0, 0.7745147, 0, -0.6325559, 2.0911896, 17.85, 1.707901)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -968,7 +968,7 @@ metadata/helix_fraction = 0.15789473684210525
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_10" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1390384401]
+[node name="HelixMovingTread_10" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=848966140]
 transform = Transform3D(-0.80841196, 0, -0.5886171, 0, 1, 0, 0.5886171, 0, -0.80841196, 1.5892667, 18.25, 2.182712)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -976,7 +976,7 @@ metadata/helix_fraction = 0.17543859649122806
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_11" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=901831515]
+[node name="HelixMovingTread_11" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=438009317]
 transform = Transform3D(-0.93133056, 0, -0.36417493, 0, 1, 0, 0.36417493, 0, -0.93133056, 0.9832735, 18.65, 2.5145922)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -984,7 +984,7 @@ metadata/helix_fraction = 0.19298245614035087
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_12" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=139571932]
+[node name="HelixMovingTread_12" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1673139127]
 transform = Transform3D(-0.99326247, 0, -0.11588635, 0, 1, 0, 0.11588635, 0, -0.99326247, 0.3128925, 19.05, 2.6818087)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -992,7 +992,7 @@ metadata/helix_fraction = 0.21052631578947367
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_13" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1430396730]
+[node name="HelixMovingTread_13" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=636961130]
 transform = Transform3D(-0.99015266, 0, 0.13999173, 0, 1, 0, -0.13999173, 0, -0.99015266, -0.3779777, 19.45, 2.6734123)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1000,7 +1000,7 @@ metadata/helix_fraction = 0.22807017543859648
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_14" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=82060349]
+[node name="HelixMovingTread_14" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1379744465]
 transform = Transform3D(-0.92220443, 0, 0.3867027, 0, 1, 0, -0.3867027, 0, -0.92220443, -1.0440967, 19.85, 2.4899523)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1008,7 +1008,7 @@ metadata/helix_fraction = 0.24561403508771928
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_15" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1057939778]
+[node name="HelixMovingTread_15" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=81824386]
 transform = Transform3D(-0.7938678, 0, 0.60809034, 0, 1, 0, -0.60809034, 0, -0.7938678, -1.641845, 20.25, 2.1434424)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1016,7 +1016,7 @@ metadata/helix_fraction = 0.2631578947368421
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_16" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1970825663]
+[node name="HelixMovingTread_16" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=396429889]
 transform = Transform3D(-0.61354506, 0, 0.78965974, 0, 1, 0, -0.78965974, 0, -0.61354506, -2.13208, 20.65, 1.656573)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1024,7 +1024,7 @@ metadata/helix_fraction = 0.2807017543859649
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_17" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1343488766]
+[node name="HelixMovingTread_17" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=801117271]
 transform = Transform3D(-0.39304677, 0, 0.9195185, 0, 1, 0, -0.9195185, 0, -0.39304677, -2.4826999, 21.05, 1.0612262)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1032,7 +1032,7 @@ metadata/helix_fraction = 0.2982456140350877
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_18" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=482273536]
+[node name="HelixMovingTread_18" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=423653393]
 transform = Transform3D(-0.14681071, 0, 0.9891646, 0, 1, 0, -0.9891646, 0, -0.14681071, -2.6707447, 21.45, 0.39638695)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1040,7 +1040,7 @@ metadata/helix_fraction = 0.3157894736842105
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_19" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1032281158]
+[node name="HelixMovingTread_19" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=2114771780]
 transform = Transform3D(0.10904081, 0, 0.9940373, 0, 1, 0, -0.9940373, 0, 0.10904081, -2.6839008, 21.85, -0.294409)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1048,7 +1048,7 @@ metadata/helix_fraction = 0.3333333333333333
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_20" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1289029427]
+[node name="HelixMovingTread_20" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=379347376]
 transform = Transform3D(0.35775015, 0, 0.9338173, 0, 1, 0, -0.9338173, 0, 0.35775015, -2.5213065, 22.25, -0.9659261)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1056,7 +1056,7 @@ metadata/helix_fraction = 0.3508771929824561
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_21" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=869364357]
+[node name="HelixMovingTread_21" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1737939629]
 transform = Transform3D(0.5830346, 0, 0.8124473, 0, 1, 0, -0.8124473, 0, 0.5830346, -2.1936092, 22.65, -1.5741913)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1064,7 +1064,7 @@ metadata/helix_fraction = 0.3684210526315789
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_22" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1662481943]
+[node name="HelixMovingTread_22" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=106479613]
 transform = Transform3D(0.7701385, 0, 0.6378767, 0, 1, 0, -0.6378767, 0, 0.7701385, -1.7222675, 23.05, -2.0793736)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1072,7 +1072,7 @@ metadata/helix_fraction = 0.38596491228070173
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_23" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1942808595]
+[node name="HelixMovingTread_23" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1374389214]
 transform = Transform3D(0.9068116, 0, 0.42153615, 0, 1, 0, -0.42153615, 0, 0.9068116, -1.1381463, 23.45, -2.448392)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1080,7 +1080,7 @@ metadata/helix_fraction = 0.40350877192982454
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_24" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=662311596]
+[node name="HelixMovingTread_24" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1243709620]
 transform = Transform3D(0.9841045, 0, 0.17759034, 0, 1, 0, -0.17759034, 0, 0.9841045, -0.4794957, 23.85, -2.6570818)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1088,7 +1088,7 @@ metadata/helix_fraction = 0.42105263157894735
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_25" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1909441119]
+[node name="HelixMovingTread_25" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1062744504]
 transform = Transform3D(0.9969547, 0, -0.07798285, 0, 1, 0, 0.07798285, 0, 0.9969547, 0.21055381, 24.25, -2.6917777)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1096,7 +1096,7 @@ metadata/helix_fraction = 0.43859649122807015
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_26" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=753649964]
+[node name="HelixMovingTread_26" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=730939128]
 transform = Transform3D(0.94452155, 0, -0.3284495, 0, 1, 0, 0.3284495, 0, 0.94452155, 0.8868156, 24.65, -2.5502074)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1104,7 +1104,7 @@ metadata/helix_fraction = 0.45614035087719296
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_27" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=874235170]
+[node name="HelixMovingTread_27" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1141167197]
 transform = Transform3D(0.8302374, 0, -0.55740994, 0, 1, 0, 0.55740994, 0, 0.8302374, 1.5050058, 25.05, -2.2416418)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1112,7 +1112,7 @@ metadata/helix_fraction = 0.47368421052631576
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_28" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=866597408]
+[node name="HelixMovingTread_28" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1695119704]
 transform = Transform3D(0.66158766, 0, -0.74986786, 0, 1, 0, 0.74986786, 0, 0.66158766, 2.0246437, 25.45, -1.7862861)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1120,7 +1120,7 @@ metadata/helix_fraction = 0.49122807017543857
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_29" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=148039070]
+[node name="HelixMovingTread_29" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=641620129]
 transform = Transform3D(0.4496136, 0, -0.89322317, 0, 1, 0, 0.89322317, 0, 0.4496136, 2.4117014, 25.85, -1.2139589)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1128,7 +1128,7 @@ metadata/helix_fraction = 0.5087719298245614
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_30" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1664936831]
+[node name="HelixMovingTread_30" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1914024182]
 transform = Transform3D(0.20819902, 0, -0.9780865, 0, 1, 0, 0.9780865, 0, 0.20819902, 2.6408334, 26.25, -0.56213784)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1136,7 +1136,7 @@ metadata/helix_fraction = 0.5263157894736842
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_31" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=2136759630]
+[node name="HelixMovingTread_31" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1216957814]
 transform = Transform3D(-0.046848997, 0, -0.99890196, 0, 1, 0, 0.99890196, 0, -0.046848997, 2.6970353, 26.65, 0.12649372)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1144,7 +1144,7 @@ metadata/helix_fraction = 0.543859649122807
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_32" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=2145701575]
+[node name="HelixMovingTread_32" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1291900364]
 transform = Transform3D(-0.29883105, 0, -0.95430607, 0, 1, 0, 0.95430607, 0, -0.29883105, 2.5766268, 27.05, 0.8068421)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1152,7 +1152,7 @@ metadata/helix_fraction = 0.5614035087719298
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_33" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=85316379]
+[node name="HelixMovingTread_33" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=810588890]
 transform = Transform3D(-0.5312429, 0, -0.8472196, 0, 1, 0, 0.8472196, 0, -0.5312429, 2.2874928, 27.45, 1.434356)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1160,7 +1160,7 @@ metadata/helix_fraction = 0.5789473684210527
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_34" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1036804638]
+[node name="HelixMovingTread_34" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1617715443]
 transform = Transform3D(-0.7288675, 0, -0.68465483, 0, 1, 0, 0.68465483, 0, -0.7288675, 1.8485664, 27.85, 1.9679437)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1168,7 +1168,7 @@ metadata/helix_fraction = 0.5964912280701754
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_35" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=2039190576]
+[node name="HelixMovingTread_35" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1235539356]
 transform = Transform3D(-0.8787647, 0, -0.47725525, 0, 1, 0, 0.47725525, 0, -0.8787647, 1.2885902, 28.25, 2.3726642)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1176,7 +1176,7 @@ metadata/helix_fraction = 0.6140350877192983
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_36" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=105784065]
+[node name="HelixMovingTread_36" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=607891685]
 transform = Transform3D(-0.97111666, 0, -0.23860513, 0, 1, 0, 0.23860513, 0, -0.97111666, 0.64423305, 28.65, 2.6220152)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1184,7 +1184,7 @@ metadata/helix_fraction = 0.631578947368421
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_37" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=533205677]
+[node name="HelixMovingTread_37" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1333899230]
 transform = Transform3D(-0.9998772, 0, 0.015671462, 0, 1, 0, -0.015671462, 0, -0.9998772, -0.042310562, 29.05, 2.6996684)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1192,7 +1192,7 @@ metadata/helix_fraction = 0.6491228070175439
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_38" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1429407568]
+[node name="HelixMovingTread_38" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=317611625]
 transform = Transform3D(-0.96316254, 0, 0.26891997, 0, 1, 0, -0.26891997, 0, -0.96316254, -0.7260835, 29.45, 2.600539)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1200,7 +1200,7 @@ metadata/helix_fraction = 0.6666666666666666
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_39" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1157113546]
+[node name="HelixMovingTread_39" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=2035507090]
 transform = Transform3D(-0.8633773, 0, 0.50455886, 0, 1, 0, -0.50455886, 0, -0.8633773, -1.3623103, 29.85, 2.3311179)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1208,7 +1208,7 @@ metadata/helix_fraction = 0.6842105263157895
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_40" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1955522677]
+[node name="HelixMovingTread_40" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1297148991]
 transform = Transform3D(-0.7070544, 0, 0.7071592, 0, 1, 0, -0.7071592, 0, -0.7070544, -1.9093286, 30.25, 1.909048)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1216,7 +1216,7 @@ metadata/helix_fraction = 0.7017543859649122
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_41" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1114656842]
+[node name="HelixMovingTread_41" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1702664255]
 transform = Transform3D(-0.5044325, 0, 0.8634511, 0, 1, 0, -0.8634511, 0, -0.5044325, -2.3313181, 30.65, 1.3619676)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1224,7 +1224,7 @@ metadata/helix_fraction = 0.7192982456140351
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_42" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=531309264]
+[node name="HelixMovingTread_42" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1891749656]
 transform = Transform3D(-0.268779, 0, 0.9632019, 0, 1, 0, -0.9632019, 0, -0.268779, -2.6006455, 31.05, 0.7257013)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1232,7 +1232,7 @@ metadata/helix_fraction = 0.7368421052631579
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_43" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=956760928]
+[node name="HelixMovingTread_43" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1828321970]
 transform = Transform3D(-0.015523227, 0, 0.9998795, 0, 1, 0, -0.9998795, 0, -0.015523227, -2.6996746, 31.45, 0.041913778)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1240,7 +1240,7 @@ metadata/helix_fraction = 0.7543859649122807
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_44" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1116996049]
+[node name="HelixMovingTread_44" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=10463711]
 transform = Transform3D(0.23874724, 0, 0.97108173, 0, 1, 0, -0.97108173, 0, 0.23874724, -2.6219206, 31.85, -0.6446184)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1248,7 +1248,7 @@ metadata/helix_fraction = 0.7719298245614035
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_45" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=488958480]
+[node name="HelixMovingTread_45" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=181271926]
 transform = Transform3D(0.47738555, 0, 0.87869394, 0, 1, 0, -0.87869394, 0, 0.47738555, -2.3724747, 32.25, -1.2889389)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1256,7 +1256,7 @@ metadata/helix_fraction = 0.7894736842105263
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_46" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=868884385]
+[node name="HelixMovingTread_46" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1243094670]
 transform = Transform3D(0.68476146, 0, 0.7287673, 0, 1, 0, -0.7287673, 0, 0.68476146, -1.9676719, 32.65, -1.8488556)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1264,7 +1264,7 @@ metadata/helix_fraction = 0.8070175438596491
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_47" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1860642091]
+[node name="HelixMovingTread_47" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1516693613]
 transform = Transform3D(0.8472973, 0, 0.53111887, 0, 1, 0, -0.53111887, 0, 0.8472973, -1.4340197, 33.05, -2.2877035)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1272,7 +1272,7 @@ metadata/helix_fraction = 0.8245614035087719
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_48" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1858799580]
+[node name="HelixMovingTread_48" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=562701938]
 transform = Transform3D(0.95435035, 0, 0.29868954, 0, 1, 0, -0.29868954, 0, 0.95435035, -0.8064634, 33.45, -2.5767453)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1280,7 +1280,7 @@ metadata/helix_fraction = 0.8421052631578947
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_49" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1044688675]
+[node name="HelixMovingTread_49" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1130308835]
 transform = Transform3D(0.9989088, 0, 0.04670281, 0, 1, 0, -0.04670281, 0, 0.9989088, -0.12609732, 33.85, -2.697054)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1288,7 +1288,7 @@ metadata/helix_fraction = 0.8596491228070176
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_50" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=666431078]
+[node name="HelixMovingTread_50" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=503289006]
 transform = Transform3D(0.978056, 0, -0.20834216, 0, 1, 0, 0.20834216, 0, 0.978056, 0.562526, 34.25, -2.6407506)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1296,7 +1296,7 @@ metadata/helix_fraction = 0.8771929824561403
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_51" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1807860609]
+[node name="HelixMovingTread_51" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1425891781]
 transform = Transform3D(0.89315647, 0, -0.449746, 0, 1, 0, 0.449746, 0, 0.89315647, 1.2143134, 34.65, -2.4115229)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1304,7 +1304,7 @@ metadata/helix_fraction = 0.8947368421052632
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_52" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=922463590]
+[node name="HelixMovingTread_52" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=2413917]
 transform = Transform3D(0.749771, 0, -0.6616974, 0, 1, 0, 0.6616974, 0, 0.749771, 1.7865837, 35.05, -2.0243812)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1312,7 +1312,7 @@ metadata/helix_fraction = 0.9122807017543859
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_53" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=194927111]
+[node name="HelixMovingTread_53" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=672661256]
 transform = Transform3D(0.55728686, 0, -0.83032006, 0, 1, 0, 0.83032006, 0, 0.55728686, 2.2418628, 35.45, -1.5046765)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1320,7 +1320,7 @@ metadata/helix_fraction = 0.9298245614035088
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_54" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1366835297]
+[node name="HelixMovingTread_54" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=180461524]
 transform = Transform3D(0.32831126, 0, -0.9445696, 0, 1, 0, 0.9445696, 0, 0.32831126, 2.5503378, 35.85, -0.88644075)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1328,7 +1328,7 @@ metadata/helix_fraction = 0.9473684210526315
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_55" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=474025333]
+[node name="HelixMovingTread_55" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=2006228046]
 transform = Transform3D(0.077836946, 0, -0.9969661, 0, 1, 0, 0.9969661, 0, 0.077836946, 2.6918087, 36.25, -0.21015818)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1336,7 +1336,7 @@ metadata/helix_fraction = 0.9649122807017544
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="HelixMovingTread_56" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=1750373318]
+[node name="HelixMovingTread_56" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_5" unique_id=890914964]
 transform = Transform3D(-0.17773622, 0, -0.98407817, 0, 1, 0, 0.98407817, 0, -0.17773622, 2.6570113, 36.65, 0.47988623)
 material_override = SubResource("StandardMaterial3D_8nydh")
 mesh = SubResource("BoxMesh_ploid")
@@ -1344,70 +1344,70 @@ metadata/helix_fraction = 0.9824561403508771
 metadata/helix_radius = 2.7
 metadata/helix_offset_y = 0.05
 
-[node name="CrossingHand_00_up_6" type="StaticBody3D" parent="CrossingTower_00" unique_id=705754550]
+[node name="CrossingHand_00_up_6" type="StaticBody3D" parent="CrossingTower_00" unique_id=445317115]
 
-[node name="@MeshInstance3D@4313" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_6" unique_id=1877678404]
+[node name="@MeshInstance3D@4574" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_up_6" unique_id=954755494]
 material_override = SubResource("StandardMaterial3D_mlmuv")
 mesh = SubResource("ArrayMesh_hdfmf")
 
-[node name="@CollisionShape3D@4314" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_6" unique_id=1737387357]
+[node name="@CollisionShape3D@4575" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_up_6" unique_id=1053233711]
 shape = SubResource("ConcavePolygonShape3D_hcq7w")
 
-[node name="CrossingHand_00_down_0" type="StaticBody3D" parent="CrossingTower_00" unique_id=1078471983]
+[node name="CrossingHand_00_down_0" type="StaticBody3D" parent="CrossingTower_00" unique_id=530528038]
 
-[node name="@MeshInstance3D@4315" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_down_0" unique_id=2126259309]
+[node name="@MeshInstance3D@4576" type="MeshInstance3D" parent="CrossingTower_00/CrossingHand_00_down_0" unique_id=2120805259]
 material_override = SubResource("StandardMaterial3D_jt7pc")
 mesh = SubResource("ArrayMesh_23055")
 
-[node name="@CollisionShape3D@4316" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_down_0" unique_id=1554959037]
+[node name="@CollisionShape3D@4577" type="CollisionShape3D" parent="CrossingTower_00/CrossingHand_00_down_0" unique_id=1443909458]
 shape = SubResource("ConcavePolygonShape3D_fnvjt")
 
-[node name="CrossingGalleryInnerRail_01_6_5_02" type="StaticBody3D" parent="." unique_id=407610525]
+[node name="CrossingGalleryInnerRail_01_6_5_02" type="StaticBody3D" parent="." unique_id=698350419]
 transform = Transform3D(-0.4226285, 0, -0.90630305, 0, 1, 0, 0.90630305, 0, -0.4226285, -569.38855, -52.95, -11.31596)
 
-[node name="@CollisionShape3D@4729" type="CollisionShape3D" parent="CrossingGalleryInnerRail_01_6_5_02" unique_id=615154341]
+[node name="@CollisionShape3D@4990" type="CollisionShape3D" parent="CrossingGalleryInnerRail_01_6_5_02" unique_id=1717711155]
 shape = SubResource("BoxShape3D_pl0gq")
 
-[node name="@MeshInstance3D@4730" type="MeshInstance3D" parent="CrossingGalleryInnerRail_01_6_5_02" unique_id=1784376049]
+[node name="@MeshInstance3D@4991" type="MeshInstance3D" parent="CrossingGalleryInnerRail_01_6_5_02" unique_id=1776664794]
 material_override = SubResource("StandardMaterial3D_rbkbg")
 mesh = SubResource("BoxMesh_hipw6")
 
-[node name="CrossingGalleryInnerRail_01_6_5_03" type="StaticBody3D" parent="." unique_id=1980843134]
+[node name="CrossingGalleryInnerRail_01_6_5_03" type="StaticBody3D" parent="." unique_id=1207842376]
 transform = Transform3D(-0.5736142, 0, -0.81912565, 0, 1, 0, 0.81912565, 0, -0.5736142, -569.73584, -52.95, -10.714424)
 
-[node name="@CollisionShape3D@4731" type="CollisionShape3D" parent="CrossingGalleryInnerRail_01_6_5_03" unique_id=254559024]
+[node name="@CollisionShape3D@4992" type="CollisionShape3D" parent="CrossingGalleryInnerRail_01_6_5_03" unique_id=441377031]
 shape = SubResource("BoxShape3D_r1c3q")
 
-[node name="@MeshInstance3D@4732" type="MeshInstance3D" parent="CrossingGalleryInnerRail_01_6_5_03" unique_id=1013535564]
+[node name="@MeshInstance3D@4993" type="MeshInstance3D" parent="CrossingGalleryInnerRail_01_6_5_03" unique_id=1576717378]
 material_override = SubResource("StandardMaterial3D_emqwl")
 mesh = SubResource("BoxMesh_7orjq")
 
-[node name="CrossingGalleryInnerRail_01_6_5_04" type="StaticBody3D" parent="." unique_id=241089365]
+[node name="CrossingGalleryInnerRail_01_6_5_04" type="StaticBody3D" parent="." unique_id=1846332939]
 transform = Transform3D(-0.7070739, 0, -0.7071397, 0, 1, 0, 0.7071397, 0, -0.7070739, -570.1824, -52.95, -10.182336)
 
-[node name="@CollisionShape3D@4733" type="CollisionShape3D" parent="CrossingGalleryInnerRail_01_6_5_04" unique_id=1541024374]
+[node name="@CollisionShape3D@4994" type="CollisionShape3D" parent="CrossingGalleryInnerRail_01_6_5_04" unique_id=1365589858]
 shape = SubResource("BoxShape3D_8iid8")
 
-[node name="@MeshInstance3D@4734" type="MeshInstance3D" parent="CrossingGalleryInnerRail_01_6_5_04" unique_id=256433216]
+[node name="@MeshInstance3D@4995" type="MeshInstance3D" parent="CrossingGalleryInnerRail_01_6_5_04" unique_id=1630521221]
 material_override = SubResource("StandardMaterial3D_tddl6")
 mesh = SubResource("BoxMesh_q58vm")
 
-[node name="CrossingGalleryInnerRail_01_6_5_05" type="StaticBody3D" parent="." unique_id=980342376]
+[node name="CrossingGalleryInnerRail_01_6_5_05" type="StaticBody3D" parent="." unique_id=2099095553]
 transform = Transform3D(-0.81915957, 0, -0.5735657, 0, 1, 0, 0.5735657, 0, -0.81915957, -570.7144, -52.95, -9.735861)
 
-[node name="@CollisionShape3D@4735" type="CollisionShape3D" parent="CrossingGalleryInnerRail_01_6_5_05" unique_id=117578934]
+[node name="@CollisionShape3D@4996" type="CollisionShape3D" parent="CrossingGalleryInnerRail_01_6_5_05" unique_id=1541592677]
 shape = SubResource("BoxShape3D_vv228")
 
-[node name="@MeshInstance3D@4736" type="MeshInstance3D" parent="CrossingGalleryInnerRail_01_6_5_05" unique_id=354678703]
+[node name="@MeshInstance3D@4997" type="MeshInstance3D" parent="CrossingGalleryInnerRail_01_6_5_05" unique_id=965554926]
 material_override = SubResource("StandardMaterial3D_sgnei")
 mesh = SubResource("BoxMesh_3j1g1")
 
-[node name="CrossingGalleryInnerRail_01_6_5_06" type="StaticBody3D" parent="." unique_id=1246141354]
+[node name="CrossingGalleryInnerRail_01_6_5_06" type="StaticBody3D" parent="." unique_id=1465853042]
 transform = Transform3D(-0.9063019, 0, -0.42263085, 0, 1, 0, 0.42263085, 0, -0.9063019, -571.3159, -52.95, -9.388563)
 
-[node name="@CollisionShape3D@4737" type="CollisionShape3D" parent="CrossingGalleryInnerRail_01_6_5_06" unique_id=330370368]
+[node name="@CollisionShape3D@4998" type="CollisionShape3D" parent="CrossingGalleryInnerRail_01_6_5_06" unique_id=582973558]
 shape = SubResource("BoxShape3D_tvboh")
 
-[node name="@MeshInstance3D@4738" type="MeshInstance3D" parent="CrossingGalleryInnerRail_01_6_5_06" unique_id=526677169]
+[node name="@MeshInstance3D@4999" type="MeshInstance3D" parent="CrossingGalleryInnerRail_01_6_5_06" unique_id=1832571057]
 material_override = SubResource("StandardMaterial3D_fyhrt")
 mesh = SubResource("BoxMesh_q3obp")

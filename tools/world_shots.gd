@@ -1,8 +1,7 @@
 extends Node
 
-const VIEWS := {
+const STANDARD_VIEWS := {
 	"overview": {"camera": Vector3(-130, 270, 470), "at": Vector3(-540, -40, 0)},
-	"skyline": {"camera": Vector3(-1030, 10, 40), "at": Vector3(-480, 10, -10)},
 	"street": {"camera": Vector3(-468, -58.2, 6), "at": Vector3(-380, -40, 0)},
 	"under_high_line": {"camera": Vector3(-540, -61, -12), "at": Vector3(-420, -25, 0)},
 }
@@ -14,6 +13,7 @@ func _render_set() -> void:
 	var args := _parse_args(OS.get_cmdline_user_args())
 	var package := String(args.get("package", "P0"))
 	var date := String(args.get("date", "2026-10-18"))
+	var views := _package_views(package)
 	var root := (load("res://scenes/main.tscn") as PackedScene).instantiate() as Node3D
 	get_tree().root.add_child(root)
 	get_tree().current_scene = root
@@ -33,8 +33,8 @@ func _render_set() -> void:
 	get_viewport().size = Vector2i(1280, 720)
 	var out_dir := "res://docs/diagnostics/images/%s-%s" % [date, package]
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(out_dir))
-	for view_name in VIEWS:
-		var view: Dictionary = VIEWS[view_name]
+	for view_name in views:
+		var view: Dictionary = views[view_name]
 		camera.global_position = view.camera
 		camera.look_at(view.at, Vector3.UP)
 		for lighting in ["noon", "dusk"]:
@@ -51,6 +51,46 @@ func _render_set() -> void:
 			print("WORLD_SHOT ", path)
 	get_tree().quit(0)
 
+func _package_views(package:String)->Dictionary:
+	var available := _read_places()
+	var selected:Dictionary = STANDARD_VIEWS.duplicate(true)
+	for standard_id in ["overview","street"]:
+		if available.has(standard_id): selected[standard_id] = available[standard_id]
+	var brief_path := "res://docs/architecture/moy_pkg_%s.md" % package
+	if not FileAccess.file_exists(brief_path): return selected
+	var text := FileAccess.get_file_as_string(brief_path)
+	var heading := RegEx.new(); heading.compile("(?ms)^## \\d+\\. Viewpoints\\s*\\n(.*?)(?=^## |\\z)")
+	var heading_match := heading.search(text)
+	if heading_match == null: return selected
+	var names := RegEx.new(); names.compile("`([a-z0-9_]+)`")
+	for match_view in names.search_all(heading_match.get_string(1)):
+		var id := match_view.get_string(1)
+		if available.has(id): selected[id] = available[id]
+	return selected
+
+func _read_places()->Dictionary:
+	var result:Dictionary = {}
+	var path := "res://docs/drawings/moy_city_3d.html"
+	if not FileAccess.file_exists(path): return result
+	var html := FileAccess.get_file_as_string(path)
+	var marker := html.find("const PLACES = [")
+	if marker < 0: return result
+	var end := html.find("\n];", marker)
+	if end < 0: return result
+	var block := html.substr(marker, end-marker)
+	var entry := RegEx.new(); entry.compile('\\{ id: "([^"]+)"[^\\n]*?cam: \\[([^]]+)\\], at: \\[([^]]+)\\]')
+	for found in entry.search_all(block):
+		var camera := _parse_vector(found.get_string(2)); var target := _parse_vector(found.get_string(3))
+		if camera.size()!=3 or target.size()!=3: continue
+		result[found.get_string(1)] = {"camera": Vector3(camera[0]-560.0,camera[1]-60.0,camera[2]), "at": Vector3(target[0]-560.0,target[1]-60.0,target[2])}
+	return result
+
+func _parse_vector(raw:String)->Array[float]:
+	var result:Array[float] = []
+	for part in raw.split(","):
+		result.append(float(part.strip_edges()))
+	return result
+
 func _set_lighting(root: Node, dusk: bool) -> void:
 	for node in _walk(root):
 		if node is DirectionalLight3D:
@@ -58,6 +98,7 @@ func _set_lighting(root: Node, dusk: bool) -> void:
 			(node as DirectionalLight3D).light_energy = 0.32 if dusk else 1.0
 		elif node is WorldEnvironment and (node as WorldEnvironment).environment != null:
 			var env := (node as WorldEnvironment).environment
+			env.fog_enabled = false
 			env.ambient_light_color = Color(0.19, 0.23, 0.4) if dusk else Color(0.7, 0.73, 0.78)
 
 func _walk(node: Node) -> Array[Node]:

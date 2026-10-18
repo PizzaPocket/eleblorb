@@ -1,60 +1,58 @@
 [gd_scene format=3]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nh0mm"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_nh0mm"]
+size = Vector3(1.6, 2, 5.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uavop"]
+albedo_color = Color(0.5529412, 0.5803922, 0.54509807, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_2nqh7"]
+size = Vector3(1.6, 2, 5.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_f8b0r"]
+size = Vector3(1.6, 2, 5.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3u2r5"]
+albedo_color = Color(0.5529412, 0.5803922, 0.54509807, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_icqpw"]
+size = Vector3(1.6, 2, 5.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4vhi2"]
+size = Vector3(1.6, 2, 5.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_frlnp"]
+albedo_color = Color(0.5529412, 0.5803922, 0.54509807, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_7trmo"]
+size = Vector3(1.6, 2, 5.6)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vax0h"]
+size = Vector3(1.6, 2, 5.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ryjd1"]
+albedo_color = Color(0.5529412, 0.5803922, 0.54509807, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_sc5am"]
+size = Vector3(1.6, 2, 5.6)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cs620"]
 albedo_color = Color(0.39215687, 0.5137255, 0.3137255, 1)
 roughness = 0.92
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_uavop"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_uyjvw"]
 top_radius = 9.5
 bottom_radius = 9.5
 height = 0.22
 radial_segments = 12
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_2nqh7"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_whuaf"]
 height = 0.22
 radius = 9.5
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f8b0r"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_3u2r5"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_icqpw"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_4vhi2"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_frlnp"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_7trmo"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vax0h"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_ryjd1"]
-size = Vector3(0.08, 2, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sc5am"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_cs620"]
-size = Vector3(0.08, 2, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uyjvw"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_whuaf"]
-size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8awc5"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
@@ -141,60 +139,60 @@ roughness = 0.92
 size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i6p4j"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_yxoqa"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0jg0t"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_su1vh"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vxxvt"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_teduw"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cbg7h"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_mhmed"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ka3nq"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_65ylx"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k7e8c"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_mwmfs"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_idreq"]
 albedo_color = Color(0.39215687, 0.5137255, 0.3137255, 1)
 roughness = 0.92
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_yxoqa"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_kdhn0"]
 top_radius = 9.5
 bottom_radius = 9.5
 height = 0.22
 radial_segments = 12
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_0jg0t"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_0s6g3"]
 height = 0.22
 radius = 9.5
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_su1vh"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_vxxvt"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_teduw"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_cbg7h"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mhmed"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_ka3nq"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_65ylx"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_k7e8c"]
-size = Vector3(0.08, 2, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mwmfs"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_idreq"]
-size = Vector3(0.08, 2, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kdhn0"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_0s6g3"]
-size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_amatd"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
@@ -222,42 +220,42 @@ albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_3ihnj"]
-size = Vector3(0.08, 1.4, 0.08)
+size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ybo04"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_to7bd"]
-size = Vector3(0.08, 1.4, 0.08)
+size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d6oo3"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_3d83e"]
-size = Vector3(0.08, 1.4, 0.08)
+size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g71ht"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_qkgsl"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b6xfk"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_hbtwc"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4fqq3"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_swnns"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hccoo"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
@@ -348,42 +346,42 @@ albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_s8laq"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0sue5"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_dcxgq"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bopje"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_bnb0y"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_krprr"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_kwrlx"]
-size = Vector3(0.08, 1.4, 0.08)
+size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cbmvs"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_gnbi0"]
-size = Vector3(0.08, 1.4, 0.08)
+size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rqrna"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_uh76x"]
-size = Vector3(0.08, 1.4, 0.08)
+size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i3pws"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
@@ -407,60 +405,60 @@ roughness = 0.92
 size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7sahh"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_nkgfx"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q3mti"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_4w0f7"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lidr1"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ikqwt"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y6qtl"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_b4mle"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rlck3"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_lns2u"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7oq2e"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_eu1cl"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6ktev"]
 albedo_color = Color(0.39215687, 0.5137255, 0.3137255, 1)
 roughness = 0.92
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_nkgfx"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_b2bkw"]
 top_radius = 9.5
 bottom_radius = 9.5
 height = 0.22
 radial_segments = 12
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_q3mti"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_7uu8u"]
 height = 0.22
 radius = 9.5
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4w0f7"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_lidr1"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ikqwt"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_y6qtl"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b4mle"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_rlck3"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lns2u"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_7oq2e"]
-size = Vector3(0.08, 2, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eu1cl"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_6ktev"]
-size = Vector3(0.08, 2, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b2bkw"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_7uu8u"]
-size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v6k10"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
@@ -505,81 +503,81 @@ roughness = 0.92
 size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aeyvl"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ipcvh"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n4d5m"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_e81jf"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a71a6"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_qc353"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1wct4"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_jnt4y"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n1w65"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ytede"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mek41"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_dub2h"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_igbux"]
 albedo_color = Color(0.39215687, 0.5137255, 0.3137255, 1)
 roughness = 0.92
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_ipcvh"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_0qlc6"]
 top_radius = 9.5
 bottom_radius = 9.5
 height = 0.22
 radial_segments = 12
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_n4d5m"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_sf140"]
 height = 0.22
 radius = 9.5
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e81jf"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_a71a6"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qc353"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_1wct4"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jnt4y"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_n1w65"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ytede"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_mek41"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dub2h"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_igbux"]
-size = Vector3(0.08, 1.4, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0qlc6"]
-albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
-roughness = 0.92
-
-[sub_resource type="BoxMesh" id="BoxMesh_sf140"]
-size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3dy2i"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_lys7j"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rl83y"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_3kjvs"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uevx4"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_i8gmb"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6on0m"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
@@ -628,42 +626,42 @@ albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_1h12i"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tkau4"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_irhb3"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l1u4i"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_xfcv0"]
-size = Vector3(0.08, 2, 0.08)
+size = Vector3(0.08, 1.4, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mdjbf"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_osty2"]
-size = Vector3(0.08, 1.4, 0.08)
+size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0cskr"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_ndg3n"]
-size = Vector3(0.08, 1.4, 0.08)
+size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vm0qn"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_8bj6n"]
-size = Vector3(0.08, 1.4, 0.08)
+size = Vector3(0.08, 2, 0.08)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lh23d"]
 albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
@@ -686,604 +684,686 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_8po70"]
 size = Vector3(0.08, 2, 0.08)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_gy6dp"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gy6dp"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_5r1vx"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mlbka"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_f6j4a"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ldvvd"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_17bd4"]
+size = Vector3(0.08, 1.4, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dkunr"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_cldqg"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1tg4u"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_pdsjj"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d3sow"]
+albedo_color = Color(0.49411765, 0.5803922, 0.36862746, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ojovf"]
+size = Vector3(0.08, 2, 0.08)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mggjd"]
 size = Vector3(37, 0.035, 39)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5r1vx"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ajekq"]
 albedo_color = Color(0.5764706, 0.50980395, 0.4117647, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_mlbka"]
+[sub_resource type="BoxMesh" id="BoxMesh_rbo63"]
 size = Vector3(37, 0.035, 39)
 
-[node name="MoyCell_03_03_Part_15" type="Node3D" unique_id=1567185678]
+[node name="MoyCell_03_03_Part_15" type="Node3D" unique_id=1322102064]
 
-[node name="CrossingRainGarden_00" type="StaticBody3D" parent="." unique_id=1677668456]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547, -59.89, -13)
+[node name="CrossingMeridianHeadBeam_0_S" type="StaticBody3D" parent="." unique_id=1084329857]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -573, -28.4, -10.2)
 
-[node name="@MeshInstance3D@5832" type="MeshInstance3D" parent="CrossingRainGarden_00" unique_id=1826916169]
-material_override = SubResource("StandardMaterial3D_nh0mm")
-mesh = SubResource("CylinderMesh_uavop")
+[node name="@CollisionShape3D@6093" type="CollisionShape3D" parent="CrossingMeridianHeadBeam_0_S" unique_id=263981931]
+shape = SubResource("BoxShape3D_nh0mm")
 
-[node name="@CollisionShape3D@5833" type="CollisionShape3D" parent="CrossingRainGarden_00" unique_id=1194737464]
-shape = SubResource("CylinderShape3D_2nqh7")
+[node name="@MeshInstance3D@6094" type="MeshInstance3D" parent="CrossingMeridianHeadBeam_0_S" unique_id=120961317]
+material_override = SubResource("StandardMaterial3D_uavop")
+mesh = SubResource("BoxMesh_2nqh7")
 
-[node name="CrossingRainReeds_-550_25_-5_80" type="Node3D" parent="." unique_id=1870100948]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -550.25, -60, -5.8)
+[node name="CrossingMeridianHeadBeam_0_N" type="StaticBody3D" parent="." unique_id=2124213993]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -573, -28.4, 10.2)
 
-[node name="@MeshInstance3D@5843" type="MeshInstance3D" parent="CrossingRainReeds_-550_25_-5_80" unique_id=2096378643]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_f8b0r")
-mesh = SubResource("BoxMesh_3u2r5")
+[node name="@CollisionShape3D@6095" type="CollisionShape3D" parent="CrossingMeridianHeadBeam_0_N" unique_id=106040434]
+shape = SubResource("BoxShape3D_f8b0r")
 
-[node name="@MeshInstance3D@5844" type="MeshInstance3D" parent="CrossingRainReeds_-550_25_-5_80" unique_id=1599316036]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_icqpw")
-mesh = SubResource("BoxMesh_4vhi2")
+[node name="@MeshInstance3D@6096" type="MeshInstance3D" parent="CrossingMeridianHeadBeam_0_N" unique_id=1361630207]
+material_override = SubResource("StandardMaterial3D_3u2r5")
+mesh = SubResource("BoxMesh_icqpw")
 
-[node name="@MeshInstance3D@5845" type="MeshInstance3D" parent="CrossingRainReeds_-550_25_-5_80" unique_id=1975142870]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+[node name="CrossingMeridianHeadBeam_1_S" type="StaticBody3D" parent="." unique_id=439898914]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547, -28.4, -10.2)
+
+[node name="@CollisionShape3D@6097" type="CollisionShape3D" parent="CrossingMeridianHeadBeam_1_S" unique_id=417419826]
+shape = SubResource("BoxShape3D_4vhi2")
+
+[node name="@MeshInstance3D@6098" type="MeshInstance3D" parent="CrossingMeridianHeadBeam_1_S" unique_id=490355639]
 material_override = SubResource("StandardMaterial3D_frlnp")
 mesh = SubResource("BoxMesh_7trmo")
 
-[node name="CrossingRainReeds_-553_59_-7_48" type="Node3D" parent="." unique_id=2031633345]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -553.59, -60, -7.48)
+[node name="CrossingMeridianHeadBeam_1_N" type="StaticBody3D" parent="." unique_id=1256788168]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547, -28.4, 10.2)
 
-[node name="@MeshInstance3D@5846" type="MeshInstance3D" parent="CrossingRainReeds_-553_59_-7_48" unique_id=1595761500]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-material_override = SubResource("StandardMaterial3D_vax0h")
-mesh = SubResource("BoxMesh_ryjd1")
+[node name="@CollisionShape3D@6099" type="CollisionShape3D" parent="CrossingMeridianHeadBeam_1_N" unique_id=668805119]
+shape = SubResource("BoxShape3D_vax0h")
 
-[node name="@MeshInstance3D@5847" type="MeshInstance3D" parent="CrossingRainReeds_-553_59_-7_48" unique_id=958088103]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-material_override = SubResource("StandardMaterial3D_sc5am")
-mesh = SubResource("BoxMesh_cs620")
+[node name="@MeshInstance3D@6100" type="MeshInstance3D" parent="CrossingMeridianHeadBeam_1_N" unique_id=1049523427]
+material_override = SubResource("StandardMaterial3D_ryjd1")
+mesh = SubResource("BoxMesh_sc5am")
 
-[node name="@MeshInstance3D@5848" type="MeshInstance3D" parent="CrossingRainReeds_-553_59_-7_48" unique_id=1188238098]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-material_override = SubResource("StandardMaterial3D_uyjvw")
-mesh = SubResource("BoxMesh_whuaf")
+[node name="CrossingRainGarden_00" type="StaticBody3D" parent="." unique_id=239486247]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547, -59.89, -13)
 
-[node name="CrossingRainReeds_-553_98_-11_23" type="Node3D" parent="." unique_id=1259035304]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -553.98, -60, -11.23)
+[node name="@MeshInstance3D@6101" type="MeshInstance3D" parent="CrossingRainGarden_00" unique_id=2063358103]
+material_override = SubResource("StandardMaterial3D_cs620")
+mesh = SubResource("CylinderMesh_uyjvw")
 
-[node name="@MeshInstance3D@5849" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_-11_23" unique_id=1254402991]
+[node name="@CollisionShape3D@6102" type="CollisionShape3D" parent="CrossingRainGarden_00" unique_id=1279577197]
+shape = SubResource("CylinderShape3D_whuaf")
+
+[node name="CrossingRainReeds_-550_25_-5_80" type="Node3D" parent="." unique_id=149188604]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -550.25, -60, -5.8)
+
+[node name="@MeshInstance3D@6112" type="MeshInstance3D" parent="CrossingRainReeds_-550_25_-5_80" unique_id=1537224615]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_8awc5")
 mesh = SubResource("BoxMesh_safim")
 
-[node name="@MeshInstance3D@5850" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_-11_23" unique_id=1513154090]
+[node name="@MeshInstance3D@6113" type="MeshInstance3D" parent="CrossingRainReeds_-550_25_-5_80" unique_id=566957497]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_iqtff")
 mesh = SubResource("BoxMesh_6p5ul")
 
-[node name="@MeshInstance3D@5851" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_-11_23" unique_id=333810693]
+[node name="@MeshInstance3D@6114" type="MeshInstance3D" parent="CrossingRainReeds_-550_25_-5_80" unique_id=1112370771]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_6vxn7")
 mesh = SubResource("BoxMesh_mcah6")
 
-[node name="CrossingRainReeds_-554_74_-14_57" type="Node3D" parent="." unique_id=119484177]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -554.74, -60, -14.57)
+[node name="CrossingRainReeds_-553_59_-7_48" type="Node3D" parent="." unique_id=329373631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -553.59, -60, -7.48)
 
-[node name="@MeshInstance3D@5852" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_-14_57" unique_id=998018887]
+[node name="@MeshInstance3D@6115" type="MeshInstance3D" parent="CrossingRainReeds_-553_59_-7_48" unique_id=800881248]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_ptw41")
 mesh = SubResource("BoxMesh_8t0mc")
 
-[node name="@MeshInstance3D@5853" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_-14_57" unique_id=202954379]
+[node name="@MeshInstance3D@6116" type="MeshInstance3D" parent="CrossingRainReeds_-553_59_-7_48" unique_id=1235913916]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_d2arj")
 mesh = SubResource("BoxMesh_jm2wn")
 
-[node name="@MeshInstance3D@5854" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_-14_57" unique_id=799057727]
+[node name="@MeshInstance3D@6117" type="MeshInstance3D" parent="CrossingRainReeds_-553_59_-7_48" unique_id=657636862]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_j53hd")
 mesh = SubResource("BoxMesh_hb0xy")
 
-[node name="CrossingRainReeds_-553_85_-18_20" type="Node3D" parent="." unique_id=1970058227]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -553.85, -60, -18.2)
+[node name="CrossingRainReeds_-553_98_-11_23" type="Node3D" parent="." unique_id=816758425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -553.98, -60, -11.23)
 
-[node name="@MeshInstance3D@5855" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_-18_20" unique_id=2006090344]
+[node name="@MeshInstance3D@6118" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_-11_23" unique_id=98274622]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_jktsd")
 mesh = SubResource("BoxMesh_7ffa2")
 
-[node name="@MeshInstance3D@5856" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_-18_20" unique_id=2065991281]
+[node name="@MeshInstance3D@6119" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_-11_23" unique_id=791069326]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_e5exw")
 mesh = SubResource("BoxMesh_ooebu")
 
-[node name="@MeshInstance3D@5857" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_-18_20" unique_id=1635126855]
+[node name="@MeshInstance3D@6120" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_-11_23" unique_id=1518827036]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_jp22x")
 mesh = SubResource("BoxMesh_cshg2")
 
-[node name="CrossingRainReeds_-550_28_-19_41" type="Node3D" parent="." unique_id=1477012826]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -550.28, -60, -19.41)
+[node name="CrossingRainReeds_-554_74_-14_57" type="Node3D" parent="." unique_id=1324614824]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -554.74, -60, -14.57)
 
-[node name="@MeshInstance3D@5858" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_-19_41" unique_id=532949321]
+[node name="@MeshInstance3D@6121" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_-14_57" unique_id=2089041262]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_1yjqj")
 mesh = SubResource("BoxMesh_nk0ay")
 
-[node name="@MeshInstance3D@5859" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_-19_41" unique_id=1783859356]
+[node name="@MeshInstance3D@6122" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_-14_57" unique_id=1078356290]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_47m0i")
 mesh = SubResource("BoxMesh_4axgy")
 
-[node name="@MeshInstance3D@5860" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_-19_41" unique_id=365835072]
+[node name="@MeshInstance3D@6123" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_-14_57" unique_id=1534900567]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_57sxy")
 mesh = SubResource("BoxMesh_cafqx")
 
-[node name="CrossingRainGarden_01" type="StaticBody3D" parent="." unique_id=2009883096]
+[node name="CrossingRainReeds_-553_85_-18_20" type="Node3D" parent="." unique_id=2008863006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -553.85, -60, -18.2)
+
+[node name="@MeshInstance3D@6124" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_-18_20" unique_id=811435079]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_i6p4j")
+mesh = SubResource("BoxMesh_yxoqa")
+
+[node name="@MeshInstance3D@6125" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_-18_20" unique_id=1572781558]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_0jg0t")
+mesh = SubResource("BoxMesh_su1vh")
+
+[node name="@MeshInstance3D@6126" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_-18_20" unique_id=1786887198]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_vxxvt")
+mesh = SubResource("BoxMesh_teduw")
+
+[node name="CrossingRainReeds_-550_28_-19_41" type="Node3D" parent="." unique_id=790264502]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -550.28, -60, -19.41)
+
+[node name="@MeshInstance3D@6127" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_-19_41" unique_id=921872121]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_cbg7h")
+mesh = SubResource("BoxMesh_mhmed")
+
+[node name="@MeshInstance3D@6128" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_-19_41" unique_id=1499872983]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_ka3nq")
+mesh = SubResource("BoxMesh_65ylx")
+
+[node name="@MeshInstance3D@6129" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_-19_41" unique_id=549862251]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_k7e8c")
+mesh = SubResource("BoxMesh_mwmfs")
+
+[node name="CrossingRainGarden_01" type="StaticBody3D" parent="." unique_id=1962663500]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -573, -59.89, -13)
 
-[node name="@MeshInstance3D@5870" type="MeshInstance3D" parent="CrossingRainGarden_01" unique_id=487929710]
-material_override = SubResource("StandardMaterial3D_i6p4j")
-mesh = SubResource("CylinderMesh_yxoqa")
+[node name="@MeshInstance3D@6139" type="MeshInstance3D" parent="CrossingRainGarden_01" unique_id=1209122071]
+material_override = SubResource("StandardMaterial3D_idreq")
+mesh = SubResource("CylinderMesh_kdhn0")
 
-[node name="@CollisionShape3D@5871" type="CollisionShape3D" parent="CrossingRainGarden_01" unique_id=1363435204]
-shape = SubResource("CylinderShape3D_0jg0t")
+[node name="@CollisionShape3D@6140" type="CollisionShape3D" parent="CrossingRainGarden_01" unique_id=1808051529]
+shape = SubResource("CylinderShape3D_0s6g3")
 
-[node name="CrossingRainReeds_-565_94_-11_57" type="Node3D" parent="." unique_id=1001605281]
+[node name="CrossingRainReeds_-565_94_-11_57" type="Node3D" parent="." unique_id=1897724707]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -565.94, -60, -11.57)
 
-[node name="@MeshInstance3D@5872" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_-11_57" unique_id=1154059355]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_su1vh")
-mesh = SubResource("BoxMesh_vxxvt")
-
-[node name="@MeshInstance3D@5873" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_-11_57" unique_id=1914224066]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_teduw")
-mesh = SubResource("BoxMesh_cbg7h")
-
-[node name="@MeshInstance3D@5874" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_-11_57" unique_id=2036901673]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_mhmed")
-mesh = SubResource("BoxMesh_ka3nq")
-
-[node name="CrossingRainReeds_-566_71_-8_23" type="Node3D" parent="." unique_id=1006052515]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -566.71, -60, -8.23)
-
-[node name="@MeshInstance3D@5875" type="MeshInstance3D" parent="CrossingRainReeds_-566_71_-8_23" unique_id=689640378]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-material_override = SubResource("StandardMaterial3D_65ylx")
-mesh = SubResource("BoxMesh_k7e8c")
-
-[node name="@MeshInstance3D@5876" type="MeshInstance3D" parent="CrossingRainReeds_-566_71_-8_23" unique_id=1098597694]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-material_override = SubResource("StandardMaterial3D_mwmfs")
-mesh = SubResource("BoxMesh_idreq")
-
-[node name="@MeshInstance3D@5877" type="MeshInstance3D" parent="CrossingRainReeds_-566_71_-8_23" unique_id=398729042]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-material_override = SubResource("StandardMaterial3D_kdhn0")
-mesh = SubResource("BoxMesh_0s6g3")
-
-[node name="CrossingRainReeds_-569_08_-5_35" type="Node3D" parent="." unique_id=1278113508]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -569.08, -60, -5.35)
-
-[node name="@MeshInstance3D@5878" type="MeshInstance3D" parent="CrossingRainReeds_-569_08_-5_35" unique_id=1428169469]
+[node name="@MeshInstance3D@6141" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_-11_57" unique_id=1012669076]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_amatd")
 mesh = SubResource("BoxMesh_gu73q")
 
-[node name="@MeshInstance3D@5879" type="MeshInstance3D" parent="CrossingRainReeds_-569_08_-5_35" unique_id=74667120]
+[node name="@MeshInstance3D@6142" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_-11_57" unique_id=1073851814]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_puype")
 mesh = SubResource("BoxMesh_48i2o")
 
-[node name="@MeshInstance3D@5880" type="MeshInstance3D" parent="CrossingRainReeds_-569_08_-5_35" unique_id=211798321]
+[node name="@MeshInstance3D@6143" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_-11_57" unique_id=381740215]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_mmpaq")
 mesh = SubResource("BoxMesh_nyqaj")
 
-[node name="CrossingRainReeds_-576_25_-5_80" type="Node3D" parent="." unique_id=338908470]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -576.25, -60, -5.8)
+[node name="CrossingRainReeds_-566_71_-8_23" type="Node3D" parent="." unique_id=38489987]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -566.71, -60, -8.23)
 
-[node name="@MeshInstance3D@5881" type="MeshInstance3D" parent="CrossingRainReeds_-576_25_-5_80" unique_id=1765270887]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+[node name="@MeshInstance3D@6144" type="MeshInstance3D" parent="CrossingRainReeds_-566_71_-8_23" unique_id=313686310]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_gv21d")
 mesh = SubResource("BoxMesh_3ihnj")
 
-[node name="@MeshInstance3D@5882" type="MeshInstance3D" parent="CrossingRainReeds_-576_25_-5_80" unique_id=1003961519]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+[node name="@MeshInstance3D@6145" type="MeshInstance3D" parent="CrossingRainReeds_-566_71_-8_23" unique_id=1576282172]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_ybo04")
 mesh = SubResource("BoxMesh_to7bd")
 
-[node name="@MeshInstance3D@5883" type="MeshInstance3D" parent="CrossingRainReeds_-576_25_-5_80" unique_id=1846481283]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+[node name="@MeshInstance3D@6146" type="MeshInstance3D" parent="CrossingRainReeds_-566_71_-8_23" unique_id=946107022]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_d6oo3")
 mesh = SubResource("BoxMesh_3d83e")
 
-[node name="CrossingRainReeds_-579_59_-7_48" type="Node3D" parent="." unique_id=1052156917]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -579.59, -60, -7.48)
+[node name="CrossingRainReeds_-569_08_-5_35" type="Node3D" parent="." unique_id=1837579308]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -569.08, -60, -5.35)
 
-[node name="@MeshInstance3D@5884" type="MeshInstance3D" parent="CrossingRainReeds_-579_59_-7_48" unique_id=1863482805]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="@MeshInstance3D@6147" type="MeshInstance3D" parent="CrossingRainReeds_-569_08_-5_35" unique_id=182754368]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_g71ht")
 mesh = SubResource("BoxMesh_qkgsl")
 
-[node name="@MeshInstance3D@5885" type="MeshInstance3D" parent="CrossingRainReeds_-579_59_-7_48" unique_id=1307381583]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="@MeshInstance3D@6148" type="MeshInstance3D" parent="CrossingRainReeds_-569_08_-5_35" unique_id=1057602136]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_b6xfk")
 mesh = SubResource("BoxMesh_hbtwc")
 
-[node name="@MeshInstance3D@5886" type="MeshInstance3D" parent="CrossingRainReeds_-579_59_-7_48" unique_id=1692092428]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="@MeshInstance3D@6149" type="MeshInstance3D" parent="CrossingRainReeds_-569_08_-5_35" unique_id=1435899015]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_4fqq3")
 mesh = SubResource("BoxMesh_swnns")
 
-[node name="CrossingRainReeds_-579_98_-11_23" type="Node3D" parent="." unique_id=1020710175]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -579.98, -60, -11.23)
+[node name="CrossingRainReeds_-576_25_-5_80" type="Node3D" parent="." unique_id=468894948]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -576.25, -60, -5.8)
 
-[node name="@MeshInstance3D@5887" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_-11_23" unique_id=1364603459]
+[node name="@MeshInstance3D@6150" type="MeshInstance3D" parent="CrossingRainReeds_-576_25_-5_80" unique_id=1618791212]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_hccoo")
 mesh = SubResource("BoxMesh_5dtp2")
 
-[node name="@MeshInstance3D@5888" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_-11_23" unique_id=1381597044]
+[node name="@MeshInstance3D@6151" type="MeshInstance3D" parent="CrossingRainReeds_-576_25_-5_80" unique_id=236615802]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_dne5w")
 mesh = SubResource("BoxMesh_avoj1")
 
-[node name="@MeshInstance3D@5889" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_-11_23" unique_id=1111671582]
+[node name="@MeshInstance3D@6152" type="MeshInstance3D" parent="CrossingRainReeds_-576_25_-5_80" unique_id=224192780]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_l7mpg")
 mesh = SubResource("BoxMesh_1p7aq")
 
-[node name="CrossingRainReeds_-580_74_-14_57" type="Node3D" parent="." unique_id=1358428797]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -580.74, -60, -14.57)
+[node name="CrossingRainReeds_-579_59_-7_48" type="Node3D" parent="." unique_id=718171747]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -579.59, -60, -7.48)
 
-[node name="@MeshInstance3D@5890" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_-14_57" unique_id=2063787163]
+[node name="@MeshInstance3D@6153" type="MeshInstance3D" parent="CrossingRainReeds_-579_59_-7_48" unique_id=802549699]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_bqp38")
 mesh = SubResource("BoxMesh_ojtkn")
 
-[node name="@MeshInstance3D@5891" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_-14_57" unique_id=1952261112]
+[node name="@MeshInstance3D@6154" type="MeshInstance3D" parent="CrossingRainReeds_-579_59_-7_48" unique_id=547846090]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_rfnib")
 mesh = SubResource("BoxMesh_2k4pv")
 
-[node name="@MeshInstance3D@5892" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_-14_57" unique_id=160819096]
+[node name="@MeshInstance3D@6155" type="MeshInstance3D" parent="CrossingRainReeds_-579_59_-7_48" unique_id=1000337789]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_k1t7e")
 mesh = SubResource("BoxMesh_70f5q")
 
-[node name="CrossingRainReeds_-579_85_-18_20" type="Node3D" parent="." unique_id=1647956661]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -579.85, -60, -18.2)
+[node name="CrossingRainReeds_-579_98_-11_23" type="Node3D" parent="." unique_id=1904949131]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -579.98, -60, -11.23)
 
-[node name="@MeshInstance3D@5893" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_-18_20" unique_id=305318140]
+[node name="@MeshInstance3D@6156" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_-11_23" unique_id=1389066399]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_d2uvl")
 mesh = SubResource("BoxMesh_so44h")
 
-[node name="@MeshInstance3D@5894" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_-18_20" unique_id=294146862]
+[node name="@MeshInstance3D@6157" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_-11_23" unique_id=1798921802]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_oeepo")
 mesh = SubResource("BoxMesh_okqal")
 
-[node name="@MeshInstance3D@5895" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_-18_20" unique_id=666670503]
+[node name="@MeshInstance3D@6158" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_-11_23" unique_id=162647704]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_n2xid")
 mesh = SubResource("BoxMesh_qikwm")
 
-[node name="CrossingRainReeds_-576_28_-19_41" type="Node3D" parent="." unique_id=352870839]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -576.28, -60, -19.41)
+[node name="CrossingRainReeds_-580_74_-14_57" type="Node3D" parent="." unique_id=1281769771]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -580.74, -60, -14.57)
 
-[node name="@MeshInstance3D@5896" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_-19_41" unique_id=825654269]
+[node name="@MeshInstance3D@6159" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_-14_57" unique_id=610261026]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_lv4x8")
 mesh = SubResource("BoxMesh_gsqmw")
 
-[node name="@MeshInstance3D@5897" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_-19_41" unique_id=1653614025]
+[node name="@MeshInstance3D@6160" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_-14_57" unique_id=1778920080]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_rio4c")
 mesh = SubResource("BoxMesh_0ughn")
 
-[node name="@MeshInstance3D@5898" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_-19_41" unique_id=40340155]
+[node name="@MeshInstance3D@6161" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_-14_57" unique_id=358568457]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_7gpfg")
 mesh = SubResource("BoxMesh_ic05g")
 
-[node name="CrossingRainReeds_-569_46_-20_84" type="Node3D" parent="." unique_id=1496836361]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -569.46, -60, -20.84)
+[node name="CrossingRainReeds_-579_85_-18_20" type="Node3D" parent="." unique_id=1041359637]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -579.85, -60, -18.2)
 
-[node name="@MeshInstance3D@5899" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_-20_84" unique_id=1407982184]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="@MeshInstance3D@6162" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_-18_20" unique_id=1663311260]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_qrtwm")
 mesh = SubResource("BoxMesh_s8laq")
 
-[node name="@MeshInstance3D@5900" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_-20_84" unique_id=100653100]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="@MeshInstance3D@6163" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_-18_20" unique_id=1845644522]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_0sue5")
 mesh = SubResource("BoxMesh_dcxgq")
 
-[node name="@MeshInstance3D@5901" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_-20_84" unique_id=45991156]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="@MeshInstance3D@6164" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_-18_20" unique_id=2047581865]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_bopje")
 mesh = SubResource("BoxMesh_bnb0y")
 
-[node name="CrossingRainReeds_-567_48_-17_63" type="Node3D" parent="." unique_id=1665756842]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -567.48, -60, -17.63)
+[node name="CrossingRainReeds_-576_28_-19_41" type="Node3D" parent="." unique_id=1686014200]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -576.28, -60, -19.41)
 
-[node name="@MeshInstance3D@5902" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_-17_63" unique_id=1947196562]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+[node name="@MeshInstance3D@6165" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_-19_41" unique_id=860481358]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_krprr")
 mesh = SubResource("BoxMesh_kwrlx")
 
-[node name="@MeshInstance3D@5903" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_-17_63" unique_id=113225614]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+[node name="@MeshInstance3D@6166" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_-19_41" unique_id=1027239942]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_cbmvs")
 mesh = SubResource("BoxMesh_gnbi0")
 
-[node name="@MeshInstance3D@5904" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_-17_63" unique_id=943612688]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+[node name="@MeshInstance3D@6167" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_-19_41" unique_id=1484153161]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_rqrna")
 mesh = SubResource("BoxMesh_uh76x")
 
-[node name="CrossingRainReeds_-565_34_-14_95" type="Node3D" parent="." unique_id=1578612023]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -565.34, -60, -14.95)
+[node name="CrossingRainReeds_-569_46_-20_84" type="Node3D" parent="." unique_id=1669917946]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -569.46, -60, -20.84)
 
-[node name="@MeshInstance3D@5905" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_-14_95" unique_id=894995893]
+[node name="@MeshInstance3D@6168" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_-20_84" unique_id=1055088512]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_i3pws")
 mesh = SubResource("BoxMesh_liwo2")
 
-[node name="@MeshInstance3D@5906" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_-14_95" unique_id=1422160962]
+[node name="@MeshInstance3D@6169" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_-20_84" unique_id=1269049279]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_5m6i0")
 mesh = SubResource("BoxMesh_vjhqa")
 
-[node name="@MeshInstance3D@5907" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_-14_95" unique_id=2574885]
+[node name="@MeshInstance3D@6170" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_-20_84" unique_id=650972114]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_1hi1p")
 mesh = SubResource("BoxMesh_2ipba")
 
-[node name="CrossingRainGarden_02" type="StaticBody3D" parent="." unique_id=109450089]
+[node name="CrossingRainReeds_-567_48_-17_63" type="Node3D" parent="." unique_id=1645884674]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -567.48, -60, -17.63)
+
+[node name="@MeshInstance3D@6171" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_-17_63" unique_id=1972662775]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_7sahh")
+mesh = SubResource("BoxMesh_nkgfx")
+
+[node name="@MeshInstance3D@6172" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_-17_63" unique_id=144912811]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_q3mti")
+mesh = SubResource("BoxMesh_4w0f7")
+
+[node name="@MeshInstance3D@6173" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_-17_63" unique_id=425719372]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_lidr1")
+mesh = SubResource("BoxMesh_ikqwt")
+
+[node name="CrossingRainReeds_-565_34_-14_95" type="Node3D" parent="." unique_id=1943801027]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -565.34, -60, -14.95)
+
+[node name="@MeshInstance3D@6174" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_-14_95" unique_id=688666887]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_y6qtl")
+mesh = SubResource("BoxMesh_b4mle")
+
+[node name="@MeshInstance3D@6175" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_-14_95" unique_id=511966896]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_rlck3")
+mesh = SubResource("BoxMesh_lns2u")
+
+[node name="@MeshInstance3D@6176" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_-14_95" unique_id=23896025]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_7oq2e")
+mesh = SubResource("BoxMesh_eu1cl")
+
+[node name="CrossingRainGarden_02" type="StaticBody3D" parent="." unique_id=571105588]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -547, -59.89, 13)
 
-[node name="@MeshInstance3D@5908" type="MeshInstance3D" parent="CrossingRainGarden_02" unique_id=671384528]
-material_override = SubResource("StandardMaterial3D_7sahh")
-mesh = SubResource("CylinderMesh_nkgfx")
+[node name="@MeshInstance3D@6177" type="MeshInstance3D" parent="CrossingRainGarden_02" unique_id=252298937]
+material_override = SubResource("StandardMaterial3D_6ktev")
+mesh = SubResource("CylinderMesh_b2bkw")
 
-[node name="@CollisionShape3D@5909" type="CollisionShape3D" parent="CrossingRainGarden_02" unique_id=1337367797]
-shape = SubResource("CylinderShape3D_q3mti")
+[node name="@CollisionShape3D@6178" type="CollisionShape3D" parent="CrossingRainGarden_02" unique_id=1822074416]
+shape = SubResource("CylinderShape3D_7uu8u")
 
-[node name="CrossingRainReeds_-553_98_14_77" type="Node3D" parent="." unique_id=918648926]
+[node name="CrossingRainReeds_-553_98_14_77" type="Node3D" parent="." unique_id=673180463]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -553.98, -60, 14.77)
 
-[node name="@MeshInstance3D@5925" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_14_77" unique_id=1817457063]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_4w0f7")
-mesh = SubResource("BoxMesh_lidr1")
-
-[node name="@MeshInstance3D@5926" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_14_77" unique_id=2086745581]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_ikqwt")
-mesh = SubResource("BoxMesh_y6qtl")
-
-[node name="@MeshInstance3D@5927" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_14_77" unique_id=1428194986]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_b4mle")
-mesh = SubResource("BoxMesh_rlck3")
-
-[node name="CrossingRainReeds_-554_74_11_43" type="Node3D" parent="." unique_id=1236591534]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -554.74, -60, 11.43)
-
-[node name="@MeshInstance3D@5928" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_11_43" unique_id=629500824]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-material_override = SubResource("StandardMaterial3D_lns2u")
-mesh = SubResource("BoxMesh_7oq2e")
-
-[node name="@MeshInstance3D@5929" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_11_43" unique_id=1294878931]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-material_override = SubResource("StandardMaterial3D_eu1cl")
-mesh = SubResource("BoxMesh_6ktev")
-
-[node name="@MeshInstance3D@5930" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_11_43" unique_id=1038790006]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-material_override = SubResource("StandardMaterial3D_b2bkw")
-mesh = SubResource("BoxMesh_7uu8u")
-
-[node name="CrossingRainReeds_-553_85_7_80" type="Node3D" parent="." unique_id=1645709884]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -553.85, -60, 7.8)
-
-[node name="@MeshInstance3D@5931" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_7_80" unique_id=462257506]
+[node name="@MeshInstance3D@6194" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_14_77" unique_id=2019024981]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_v6k10")
 mesh = SubResource("BoxMesh_nvb1t")
 
-[node name="@MeshInstance3D@5932" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_7_80" unique_id=1342864859]
+[node name="@MeshInstance3D@6195" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_14_77" unique_id=1343165563]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_phgpo")
 mesh = SubResource("BoxMesh_6th5u")
 
-[node name="@MeshInstance3D@5933" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_7_80" unique_id=1367991734]
+[node name="@MeshInstance3D@6196" type="MeshInstance3D" parent="CrossingRainReeds_-553_98_14_77" unique_id=295446374]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_qgb6k")
 mesh = SubResource("BoxMesh_yw0c1")
 
-[node name="CrossingRainReeds_-550_28_6_59" type="Node3D" parent="." unique_id=1008163508]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -550.28, -60, 6.59)
+[node name="CrossingRainReeds_-554_74_11_43" type="Node3D" parent="." unique_id=1195430122]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -554.74, -60, 11.43)
 
-[node name="@MeshInstance3D@5934" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_6_59" unique_id=1490137556]
+[node name="@MeshInstance3D@6197" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_11_43" unique_id=262465665]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_d62f5")
 mesh = SubResource("BoxMesh_20aw8")
 
-[node name="@MeshInstance3D@5935" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_6_59" unique_id=939687271]
+[node name="@MeshInstance3D@6198" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_11_43" unique_id=1031924168]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_wyohj")
 mesh = SubResource("BoxMesh_mhixj")
 
-[node name="@MeshInstance3D@5936" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_6_59" unique_id=1936119358]
+[node name="@MeshInstance3D@6199" type="MeshInstance3D" parent="CrossingRainReeds_-554_74_11_43" unique_id=797107740]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_at708")
 mesh = SubResource("BoxMesh_v3o1r")
 
-[node name="CrossingRainGarden_03" type="StaticBody3D" parent="." unique_id=309992734]
+[node name="CrossingRainReeds_-553_85_7_80" type="Node3D" parent="." unique_id=696366604]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -553.85, -60, 7.8)
+
+[node name="@MeshInstance3D@6200" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_7_80" unique_id=1204079644]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_aeyvl")
+mesh = SubResource("BoxMesh_ipcvh")
+
+[node name="@MeshInstance3D@6201" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_7_80" unique_id=1088590174]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_n4d5m")
+mesh = SubResource("BoxMesh_e81jf")
+
+[node name="@MeshInstance3D@6202" type="MeshInstance3D" parent="CrossingRainReeds_-553_85_7_80" unique_id=1397419590]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_a71a6")
+mesh = SubResource("BoxMesh_qc353")
+
+[node name="CrossingRainReeds_-550_28_6_59" type="Node3D" parent="." unique_id=1539048035]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -550.28, -60, 6.59)
+
+[node name="@MeshInstance3D@6203" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_6_59" unique_id=1353497652]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_1wct4")
+mesh = SubResource("BoxMesh_jnt4y")
+
+[node name="@MeshInstance3D@6204" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_6_59" unique_id=473374592]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_n1w65")
+mesh = SubResource("BoxMesh_ytede")
+
+[node name="@MeshInstance3D@6205" type="MeshInstance3D" parent="CrossingRainReeds_-550_28_6_59" unique_id=1747962187]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_mek41")
+mesh = SubResource("BoxMesh_dub2h")
+
+[node name="CrossingRainGarden_03" type="StaticBody3D" parent="." unique_id=389279292]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -573, -59.89, 13)
 
-[node name="@MeshInstance3D@5946" type="MeshInstance3D" parent="CrossingRainGarden_03" unique_id=798819107]
-material_override = SubResource("StandardMaterial3D_aeyvl")
-mesh = SubResource("CylinderMesh_ipcvh")
+[node name="@MeshInstance3D@6215" type="MeshInstance3D" parent="CrossingRainGarden_03" unique_id=2040773475]
+material_override = SubResource("StandardMaterial3D_igbux")
+mesh = SubResource("CylinderMesh_0qlc6")
 
-[node name="@CollisionShape3D@5947" type="CollisionShape3D" parent="CrossingRainGarden_03" unique_id=1221980238]
-shape = SubResource("CylinderShape3D_n4d5m")
+[node name="@CollisionShape3D@6216" type="CollisionShape3D" parent="CrossingRainGarden_03" unique_id=1554217553]
+shape = SubResource("CylinderShape3D_sf140")
 
-[node name="CrossingRainReeds_-565_94_14_43" type="Node3D" parent="." unique_id=708834701]
+[node name="CrossingRainReeds_-565_94_14_43" type="Node3D" parent="." unique_id=1804502837]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -565.94, -60, 14.43)
 
-[node name="@MeshInstance3D@5948" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_14_43" unique_id=376126090]
+[node name="@MeshInstance3D@6217" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_14_43" unique_id=1019185073]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_e81jf")
-mesh = SubResource("BoxMesh_a71a6")
-
-[node name="@MeshInstance3D@5949" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_14_43" unique_id=386909337]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_qc353")
-mesh = SubResource("BoxMesh_1wct4")
-
-[node name="@MeshInstance3D@5950" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_14_43" unique_id=588689494]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_jnt4y")
-mesh = SubResource("BoxMesh_n1w65")
-
-[node name="CrossingRainReeds_-579_98_14_77" type="Node3D" parent="." unique_id=2033711838]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -579.98, -60, 14.77)
-
-[node name="@MeshInstance3D@5963" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_14_77" unique_id=256383702]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_ytede")
-mesh = SubResource("BoxMesh_mek41")
-
-[node name="@MeshInstance3D@5964" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_14_77" unique_id=109226712]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_dub2h")
-mesh = SubResource("BoxMesh_igbux")
-
-[node name="@MeshInstance3D@5965" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_14_77" unique_id=877948848]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-material_override = SubResource("StandardMaterial3D_0qlc6")
-mesh = SubResource("BoxMesh_sf140")
-
-[node name="CrossingRainReeds_-580_74_11_43" type="Node3D" parent="." unique_id=2137453098]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -580.74, -60, 11.43)
-
-[node name="@MeshInstance3D@5966" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_11_43" unique_id=429746103]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_3dy2i")
 mesh = SubResource("BoxMesh_lys7j")
 
-[node name="@MeshInstance3D@5967" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_11_43" unique_id=218109824]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="@MeshInstance3D@6218" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_14_43" unique_id=405351382]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_rl83y")
 mesh = SubResource("BoxMesh_3kjvs")
 
-[node name="@MeshInstance3D@5968" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_11_43" unique_id=1329596178]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="@MeshInstance3D@6219" type="MeshInstance3D" parent="CrossingRainReeds_-565_94_14_43" unique_id=238146565]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_uevx4")
 mesh = SubResource("BoxMesh_i8gmb")
 
-[node name="CrossingRainReeds_-579_85_7_80" type="Node3D" parent="." unique_id=1647568764]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -579.85, -60, 7.8)
+[node name="CrossingRainReeds_-579_98_14_77" type="Node3D" parent="." unique_id=1652405617]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -579.98, -60, 14.77)
 
-[node name="@MeshInstance3D@5969" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_7_80" unique_id=518703514]
+[node name="@MeshInstance3D@6232" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_14_77" unique_id=1424645679]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_6on0m")
 mesh = SubResource("BoxMesh_41lnu")
 
-[node name="@MeshInstance3D@5970" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_7_80" unique_id=1390563097]
+[node name="@MeshInstance3D@6233" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_14_77" unique_id=2064267146]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_l70st")
 mesh = SubResource("BoxMesh_uwwoa")
 
-[node name="@MeshInstance3D@5971" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_7_80" unique_id=1449581892]
+[node name="@MeshInstance3D@6234" type="MeshInstance3D" parent="CrossingRainReeds_-579_98_14_77" unique_id=476286075]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_kx2sb")
 mesh = SubResource("BoxMesh_fau54")
 
-[node name="CrossingRainReeds_-576_28_6_59" type="Node3D" parent="." unique_id=162419426]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -576.28, -60, 6.59)
+[node name="CrossingRainReeds_-580_74_11_43" type="Node3D" parent="." unique_id=1331805984]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -580.74, -60, 11.43)
 
-[node name="@MeshInstance3D@5972" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_6_59" unique_id=1063582061]
+[node name="@MeshInstance3D@6235" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_11_43" unique_id=1360536305]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_0ac2b")
 mesh = SubResource("BoxMesh_hjydf")
 
-[node name="@MeshInstance3D@5973" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_6_59" unique_id=1539927991]
+[node name="@MeshInstance3D@6236" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_11_43" unique_id=2102207868]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_aurqh")
 mesh = SubResource("BoxMesh_p00ys")
 
-[node name="@MeshInstance3D@5974" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_6_59" unique_id=1304224515]
+[node name="@MeshInstance3D@6237" type="MeshInstance3D" parent="CrossingRainReeds_-580_74_11_43" unique_id=169953819]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_wy61s")
 mesh = SubResource("BoxMesh_4gl3y")
 
-[node name="CrossingRainReeds_-569_46_5_16" type="Node3D" parent="." unique_id=1946038349]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -569.46, -60, 5.16)
+[node name="CrossingRainReeds_-579_85_7_80" type="Node3D" parent="." unique_id=846125515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -579.85, -60, 7.8)
 
-[node name="@MeshInstance3D@5975" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_5_16" unique_id=670788271]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="@MeshInstance3D@6238" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_7_80" unique_id=1193536627]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_yvi38")
 mesh = SubResource("BoxMesh_1h12i")
 
-[node name="@MeshInstance3D@5976" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_5_16" unique_id=1686836282]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="@MeshInstance3D@6239" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_7_80" unique_id=1504441149]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_tkau4")
 mesh = SubResource("BoxMesh_irhb3")
 
-[node name="@MeshInstance3D@5977" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_5_16" unique_id=2080207846]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="@MeshInstance3D@6240" type="MeshInstance3D" parent="CrossingRainReeds_-579_85_7_80" unique_id=578853835]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
 material_override = SubResource("StandardMaterial3D_l1u4i")
 mesh = SubResource("BoxMesh_xfcv0")
 
-[node name="CrossingRainReeds_-567_48_8_37" type="Node3D" parent="." unique_id=1459611905]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -567.48, -60, 8.37)
+[node name="CrossingRainReeds_-576_28_6_59" type="Node3D" parent="." unique_id=970579409]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -576.28, -60, 6.59)
 
-[node name="@MeshInstance3D@5978" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_8_37" unique_id=1649850465]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+[node name="@MeshInstance3D@6241" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_6_59" unique_id=849976810]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_mdjbf")
 mesh = SubResource("BoxMesh_osty2")
 
-[node name="@MeshInstance3D@5979" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_8_37" unique_id=383234679]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+[node name="@MeshInstance3D@6242" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_6_59" unique_id=1588200935]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_0cskr")
 mesh = SubResource("BoxMesh_ndg3n")
 
-[node name="@MeshInstance3D@5980" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_8_37" unique_id=534377248]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+[node name="@MeshInstance3D@6243" type="MeshInstance3D" parent="CrossingRainReeds_-576_28_6_59" unique_id=116876518]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_vm0qn")
 mesh = SubResource("BoxMesh_8bj6n")
 
-[node name="CrossingRainReeds_-565_34_11_05" type="Node3D" parent="." unique_id=1316039259]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -565.34, -60, 11.05)
+[node name="CrossingRainReeds_-569_46_5_16" type="Node3D" parent="." unique_id=683346957]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -569.46, -60, 5.16)
 
-[node name="@MeshInstance3D@5981" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_11_05" unique_id=1219620969]
+[node name="@MeshInstance3D@6244" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_5_16" unique_id=1333290977]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_lh23d")
 mesh = SubResource("BoxMesh_d5c2b")
 
-[node name="@MeshInstance3D@5982" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_11_05" unique_id=1239013721]
+[node name="@MeshInstance3D@6245" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_5_16" unique_id=1613971608]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_vi6g1")
 mesh = SubResource("BoxMesh_dq5i6")
 
-[node name="@MeshInstance3D@5983" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_11_05" unique_id=143650616]
+[node name="@MeshInstance3D@6246" type="MeshInstance3D" parent="CrossingRainReeds_-569_46_5_16" unique_id=1784487067]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 material_override = SubResource("StandardMaterial3D_okb8f")
 mesh = SubResource("BoxMesh_8po70")
 
-[node name="ParkDryGardenGravel" type="StaticBody3D" parent="." unique_id=1130210508]
+[node name="CrossingRainReeds_-567_48_8_37" type="Node3D" parent="." unique_id=917345982]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -567.48, -60, 8.37)
+
+[node name="@MeshInstance3D@6247" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_8_37" unique_id=906026878]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_gy6dp")
+mesh = SubResource("BoxMesh_5r1vx")
+
+[node name="@MeshInstance3D@6248" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_8_37" unique_id=1572196280]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_mlbka")
+mesh = SubResource("BoxMesh_f6j4a")
+
+[node name="@MeshInstance3D@6249" type="MeshInstance3D" parent="CrossingRainReeds_-567_48_8_37" unique_id=1567245272]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+material_override = SubResource("StandardMaterial3D_ldvvd")
+mesh = SubResource("BoxMesh_17bd4")
+
+[node name="CrossingRainReeds_-565_34_11_05" type="Node3D" parent="." unique_id=884288909]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -565.34, -60, 11.05)
+
+[node name="@MeshInstance3D@6250" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_11_05" unique_id=1697607592]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_dkunr")
+mesh = SubResource("BoxMesh_cldqg")
+
+[node name="@MeshInstance3D@6251" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_11_05" unique_id=364819327]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_1tg4u")
+mesh = SubResource("BoxMesh_pdsjj")
+
+[node name="@MeshInstance3D@6252" type="MeshInstance3D" parent="CrossingRainReeds_-565_34_11_05" unique_id=299407]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_d3sow")
+mesh = SubResource("BoxMesh_ojovf")
+
+[node name="ParkDryGardenGravel" type="StaticBody3D" parent="." unique_id=611778500]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -601.5, -59.905, -25.5)
 
-[node name="@CollisionShape3D@6108" type="CollisionShape3D" parent="ParkDryGardenGravel" unique_id=1588252012]
-shape = SubResource("BoxShape3D_gy6dp")
+[node name="@CollisionShape3D@6377" type="CollisionShape3D" parent="ParkDryGardenGravel" unique_id=637190615]
+shape = SubResource("BoxShape3D_mggjd")
 
-[node name="@MeshInstance3D@6109" type="MeshInstance3D" parent="ParkDryGardenGravel" unique_id=1789046320]
-material_override = SubResource("StandardMaterial3D_5r1vx")
-mesh = SubResource("BoxMesh_mlbka")
+[node name="@MeshInstance3D@6378" type="MeshInstance3D" parent="ParkDryGardenGravel" unique_id=241163303]
+material_override = SubResource("StandardMaterial3D_ajekq")
+mesh = SubResource("BoxMesh_rbo63")
