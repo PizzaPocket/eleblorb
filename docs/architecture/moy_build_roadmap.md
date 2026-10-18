@@ -113,7 +113,7 @@ diagnostic replaces this column.
 | P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane; the Helmsmith moves off Civic Plaza to his shop on Lamp Lane | market lanes | L1 | L2 | **ready** | `moy_pkg_P3.md` |
 | P4 | The Old Moy tower-house kit: 60 houses on their old roads, courtyards, the first well | Old Moy | L1 | L2 | next | (design: `moy_tower_house.md`) |
 | P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L1 | L2 | planned | |
-| P6 | Downtown: the mid-rise podium kit, and the four towers' exteriors (the Windspire, BLOCK, north, south) | downtown | L1 | L2 | planned | |
+| P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L1 | L2 | planned | |
 | P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L4 | planned (after P1) | |
 | P8 | **The park**: the four quarters, the dry garden, the reed pond, the tea house and chess terrace, the lawn, the wind trees, walks, benches | park | L2 | L4 | planned | |
 | P9 | **The giant playground**: climbing towers, nets, slides, perches, hoops, the pump track | park, south-east | L1 | L4 | planned | |
@@ -124,7 +124,7 @@ diagnostic replaces this column.
 | P14 | People: the residents' looks, schedules, dialogue, the night market | city | ? | L3 | planned | |
 | P15 | Outside the wall: turbines, the battery, water and recycling works, the launch site, city blorbs | desert | L1 to L2 | L3 | planned | |
 | P16 | Final polish and performance | city | n/a | L4 | planned | |
-| P17 | **The BLOCK tower, a story project** (iterative): its scenes, rooms and levels, Pinestein's sealed lab in its base, the lift to the climax near the top | BLOCK tower | L1 | L4 | **story set**; round P17a (the blorb mech) **ready** | `moy_pkg_P17.md` |
+| P17 | **The BLOCK tower**, one playable build: its outside and climb, the way in, the lift, the crown arena, the blorb mech (playable, carried or piloted as Humongous), the boss fight, Kask and Pinestein | BLOCK tower | L1 | L3 | **ready** | `moy_pkg_P17.md` |
 | P18 | **The Arches**: the old goods store in the wall's arches; the fight club (Tuesday, Friday) and the rave (Saturday night) | the wall by the South Gate | L0 | L3 | planned | |
 
 **Order.**
@@ -153,26 +153,20 @@ diagnostic replaces this column.
 | P13j | Hiro's all-night store |
 | P13k | the Helmsmith (his shop front and the move off Civic Plaza are in P3) |
 
-**P17, the BLOCK tower.** One of the big projects, and iterative by design.
-- **What it is:** narrative scenes spanning several rooms and levels of the
-  tower; Pinestein's sealed laboratory in its base; a lift that rises to
-  the top or near it for a climactic scene.
-- **How it runs:** first a planning round that writes the tower's story
-  beats and a section through it (which floors are entered, and what
-  happens on each); then build rounds floor group by floor group, each to
-  L3; the climax last.
-- **Keep:** BLOCK is the city's plain bad guy, with no elaborate backstory
-  (user, 2026-10-18). Its outside stays as P6 builds it.
-- **Story round done** (2026-10-18): the vent-hood climb in, Pinestein's lab
-  (he and Kask still work together; the city blorbs are their synthetic
-  blorbs), the lift, and a boss fight against the blorb mech, suited in city
-  blorbs that then join the party; Blorbus mounts the mech.
-- **Model:** `moy_block_tower_3d.html`, the section and the route drawn from
-  `CityPlan.BLOCK_TOWER.inside`, and the mech with its parts.
-- **Minimal** (user, 2026-10-18): four places built (the way in, the lab,
-  Kask's floors, the crown), the rest solid; two lifts join them, and the
-  inside loads as its own scene on the rides. Rounds P17a to P17e. Rounds P17a to P17f are in the
-  brief; P17a, the mech, needs no tower and can be built now.
+**P17, the BLOCK tower.** One build, handed off whole so it can be played
+through (user, 2026-10-18).
+- **The story, kept simple:** sneak in up the vent hoods; the lift to the
+  crown; Kask in charge and Pinestein mind-controlling the city blorbs; a
+  prototype fight against the blorb mech; the win breaks his control and
+  frees seven city blorbs; Blorbus pilots the mech or carries it in his
+  core, as with Humongous; the two stay, defeated; out by the lift and the
+  one door.
+- **Built:** the tower's outside (it leaves P6's scope), the climb, the way
+  in, the lobby and the crown arena; the rest is solid. The lab and Kask's
+  floors wait for a later round.
+- **Model:** `moy_block_tower_3d.html`, drawn from `CityPlan.BLOCK_TOWER.inside`
+  and the game's exported figures.
+- **Keep:** BLOCK is the city's plain bad guy (user, 2026-10-18).
 
 **P18, the Arches.** One long vaulted hall in five bays of the wall
 (`CityPlan.WALL.venue`, `city.md` section 6c), dug 10 m into the fill.
