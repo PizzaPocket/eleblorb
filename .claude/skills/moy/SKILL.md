@@ -34,10 +34,19 @@ The user's shorthand for starting a planning session on the city of Moy.
   means it exits 1 without writing the JSON. Fix the cause, never the check.
 - **Drawings** stay in sync with the plan: re-embed the JSON with
   `python3 tools/embed_drawing_data.py docs/drawings/<page>.html <scratch>/c.json`
-  for `moy_city_3d.html`, `moy_plan.html` and `moy_grand_hotel_3d.html`.
+  for `moy_city_3d.html`, `moy_plan.html`, `moy_grand_hotel_3d.html` and
+  `moy_block_tower_3d.html`.
   Load-check each page in Chromium (Playwright) and look at a screenshot of
   the places you changed. City model mapping: model x = world x + 560, z the
   same, height = model y − 60.
+- **Every package gets a 3D model page** (user, 2026-10-18), like
+  `moy_grand_hotel_3d.html` and `moy_block_tower_3d.html`: the building or
+  area at true size among its neighbours, a cut-away or section where it is
+  entered, its places as camera views, and any character, vehicle or kit it
+  introduces modelled beside the hero. Draw it from the plan data (put new
+  numbers in `city_layout.py` with checks first), publish it once as a new
+  artifact, add it to `docs/drawings/README.md` and the roadmap's "Where
+  everything is", and name it in the brief.
 - **Republish** the models you changed to their existing artifact URLs (in
   the roadmap's "Where everything is"), never as new artifacts.
 - **Briefs** follow `moy_pkg_P0.md` and `moy_pkg_P3.md`: area, target level,

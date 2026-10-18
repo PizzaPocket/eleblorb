@@ -166,7 +166,9 @@ diagnostic replaces this column.
 - **Story round done** (2026-10-18): the vent-hood climb in, Pinestein's lab
   (he and Kask still work together; the city blorbs are their synthetic
   blorbs), the lift, and a boss fight against the blorb mech, suited in city
-  blorbs that then join the party; Blorbus mounts the mech. Rounds P17a to P17f are in the
+  blorbs that then join the party; Blorbus mounts the mech.
+- **Model:** `moy_block_tower_3d.html`, the section and the route drawn from
+  `CityPlan.BLOCK_TOWER.inside`, and the mech with its parts. Rounds P17a to P17f are in the
   brief; P17a, the mech, needs no tower and can be built now.
 
 **P18, the Arches.** One long vaulted hall in five bays of the wall
@@ -201,7 +203,7 @@ Each interior gets an architecture and interior brief (the `architecture` and
 | The city's design | `docs/architecture/city.md` (sections by district and landmark) |
 | Kits | `moy_market_lanes.md`, `moy_tower_house.md` |
 | Plan data and checks | `tools/city_layout.py`, which writes `scripts/city_plan.gd` (never edited by hand) |
-| Models | `docs/drawings/moy_city_3d.html`, `moy_plan.html`, `moy_grand_hotel_3d.html`, `moy_train_3d.html` (published: the city model https://claude.ai/artifact/YJq2qoeR9thJ67M5Xr23yd, the plan https://claude.ai/artifact/9qeXfC1J9oGNUT8pFmLWi1, the hotel https://claude.ai/artifact/HQ3yrpKk7SSaapbkDzmTWy) |
+| Models | `docs/drawings/moy_city_3d.html`, `moy_plan.html`, `moy_grand_hotel_3d.html`, `moy_block_tower_3d.html`, `moy_train_3d.html` (published: the city model https://claude.ai/artifact/YJq2qoeR9thJ67M5Xr23yd, the plan https://claude.ai/artifact/9qeXfC1J9oGNUT8pFmLWi1, the hotel https://claude.ai/artifact/HQ3yrpKk7SSaapbkDzmTWy, the BLOCK tower and the mech https://claude.ai/artifact/Cghz59HZajwK7RoZmrubpH) |
 | Lore | `docs/world_bible.md` |
 | Past build briefs | `moy_playable_prototype.md`, `moy_prototype_pass_2.md` to `_4.md` |
 | Diagnostics | `docs/diagnostics/*moy*` |

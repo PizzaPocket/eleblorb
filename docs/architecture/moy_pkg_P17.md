@@ -65,43 +65,48 @@ said in character, and explains no mechanic.
 
 ## 3. The section through the tower
 
-The shaft is 26 by 24 m, about 38 storeys to 150 m (3.95 m each), the crown
-150 to 212 m. Floors are numbered from the forecourt (L0).
+The shaft is 26 by 24 m, 38 storeys to 150 m (3.95 m each), the crown 150
+to 212 m. Storeys are numbered from the forecourt (L0). **The data is
+`CityPlan.BLOCK_TOWER.inside`** (`tools/city_layout.py`), with checks: the
+zones fill every storey once; each vent ring opens onto a plant floor; the
+louvre is on a ring; the core, lab and lift are inside the shaft; the climb's
+neighbour is a real lot, 6 m off the east face and taller than the first
+ring; the gallery is inside the crown. **The model:**
+`docs/drawings/moy_block_tower_3d.html` (the section, the route, the mech).
 
-| Level | Height (m) | What | Beat |
+| Storeys | Height (m) | What | Beat |
 |---|---|---|---|
-| Crown | 150 to 212 | **the arena**: the hollow blade, ribs converging on the ridge; the eye slit (168 to 192) the one light; a glass control gallery on the back slope | the boss fight (5) |
-| L35 to L37 | 138 to 150 | **Kask's floors**: her flat, sparse and dark, and the control room under the crown; the lift's top stop | the approach (4) |
-| L30 | 118.5 | plant floor, the 80% vent ring | |
-| L22 to L29 | 87 to 115 | **the hangar**: two double-height floors where the mech is built and tested, its spare glass heads on racks | the mech glimpsed, empty (3) |
-| L21 | 83 | plant floor, **the 55% vent ring: the way in** | entry (1) |
-| L12 to L20 | 47 to 79 | **the growing floors**: tanks where city blorbs are grown from synthetic slime, and pens of new ones | (2) |
-| L11 | 43.5 | plant floor, the 30% vent ring | |
-| L3 to L10 | 12 to 40 | **the stacks**: machine floors, rows of humming cabinets; no people, only machines | |
-| L0 to L2 | 0 to 9 | **the base**: the one door, a bare lobby, machines that keep it; set back 4 m under the shaft | |
-| L−2 to L−1 | −9 to 0 | **Pinestein's lab, sealed**: a double-height vat hall of synthetic slime, blorb tanks, his bench beside Kask's | the discovery (2) |
+| crown | 150 to 212 | **the arena**: the hollow blade, ribs converging on the ridge; the eye slit (168 to 192) the one light; a glass gallery on the back slope at 164 m | the boss fight (6) |
+| L35 to L37 | 138 to 150 | **Kask's floors**: her flat, sparse and dark, and the control room under the crown; the lift's top stop | the approach (5) |
+| L31 to L34 | 122 to 138 | the upper stacks: machine-kept records | |
+| L30 | 118 | plant floor, the 80% vent ring | |
+| L21 to L29 | 83 to 118 | **the hangar**: three tall bays where the mech is built and tested, spare glass heads on racks | the mech glimpsed, empty (3) |
+| L20 | 79 to 83 | plant floor, **the 55% vent ring (82.5 m): the way in** | entry (2) |
+| L12 to L19 | 47 to 79 | **the growing floors**: tanks where city blorbs are grown from synthetic slime, and pens of new ones | (3) |
+| L11 | 43 to 47 | plant floor, the 30% vent ring | |
+| L2 to L10 | 8 to 43 | **the stacks**: machine floors, rows of humming cabinets; no people, only machines | |
+| L0 to L1 | 0 to 8 | **the base**: the one door, a bare double-height lobby kept by machines; set back 4 m under the shaft | |
+| L−2 to L−1 | −8 to 0 | **Pinestein's lab, sealed**: a double-height vat hall of synthetic slime, blorb tanks, his bench beside Kask's | the discovery (4) |
 
-**The way through**, top to bottom and back:
-1. **The climb.** From a neighbour's roof across Glass Lane, up the vent
-   rings (30%, then 55%) on the hoods and the shaft's slits. One hood at the
-   55% ring has open louvres. The gaps between rings are crossed with the
-   powers the player has by then; nothing marks them.
-2. **Down.** Through the plant floor and the service stair in the core:
-   past the growing floors and the stacks to the sealed lab, which opens from
-   the stair's foot. The discovery.
-3. **The lift.** The lab's private lift (Pinestein's own way in) rises from
-   L−2 to Kask's floors, about 150 m, in one windowless ride: the slits
-   flicker past.
-4. **Kask's floors.** Her flat; the control room; the stair up into the
-   crown.
-5. **The arena.** Kask and Pinestein behind the gallery glass; the mech
-   drops from the ridge, a city blorb glowing azure in its head, suited in
-   city blorbs. Beaten, it kneels; its suit and pilot fall away as joinable
-   city blorbs; Blorbus can mount it. The Demon King line comes here, at
-   the very end. The hero leaves by the lift.
-
-The hangar (L22 to L29) is passed on the stair down: the mech's frame seen
-empty, before it is met.
+**The way through:**
+1. **The climb.** Up the face of the 34-storey mid-rise east of the tower
+   (`approach`), a 6 m leap to the 30% ring at 45 m, then up the hoods and
+   the shaft's slits to the 55% ring. The gaps between rings are crossed
+   with the powers the player has by then; nothing marks them.
+2. **In.** Through the one hood with open louvres, in the east face at the
+   55% ring, onto the plant floor at L20. At night it breathes warm, lit air.
+3. **Down.** The service stair in the core: the hangar's empty frames above,
+   the growing floors and the stacks below, to the stair's foot in the lab.
+4. **The lab.** The discovery.
+5. **The lift.** The lab's private lift (Pinestein's own way in) rises from
+   L−2 to L35, 146 m, in one windowless ride: the slits flicker past.
+   Kask's floors; the stair up into the crown.
+6. **The arena.** Kask and Pinestein behind the gallery glass; the mech
+   drops from the ridge, a city blorb glowing azure in its dome, five city
+   blorbs worn on its chest, arms and legs (the head slot open, so the pilot
+   shows). Beaten, it kneels; the five and the pilot fall away as six
+   joinable city blorbs; Blorbus can mount it. The Demon King line comes
+   here, at the very end. The hero leaves by the lift.
 
 ## 4. The blorb mech (round P17a)
 
@@ -112,9 +117,11 @@ empty, before it is met.
 - piloted by a blorb in its glass head; Blorbus pilots it for the player.
 
 **Body:**
-- **human size** (user): as tall as the tallest human the game has, no
-  taller, so it walks through every door built for the hero; check it
-  against the smallest door the hero uses;
+- **human size** (user): 2.0 m to the top of the dome (the hero is about
+  1.85 m), so it walks through every door built for the hero; Moy's closed
+  doors are 2.2 m; check it against the smallest door the hero uses;
+- **its parts** are drawn and listed in the model, as SuperEggs with their
+  sizes, centres and shape exponents: build from that list;
 - **mechanical**, from SuperEgg parts: riveted plates, exposed pistons at
   the knees and elbows, cable runs, a boxy pelvis, three-fingered hands;
   dark steel with BLOCK's blue-black;
@@ -193,14 +200,14 @@ Each round gets its own build brief section here before it runs.
 | Round | What | Level | Needs | Status |
 |---|---|---|---|---|
 | P17a | the blorb mech: rig, pilot, suit, mount, boss form | L3 | nothing | **ready** (section 4) |
-| P17b | the climb and the way in: vent rings, the open louvres, the plant floor at L21 | L3 | P6 (shaft at L2) | planned |
+| P17b | the climb and the way in: vent rings, the open louvres, the plant floor at L20 | L3 | P6 (shaft at L2) | planned |
 | P17c | down: the stair, the growing floors, the stacks, the hangar seen in passing | L2 | P17b | planned |
 | P17d | the sealed lab and the lift | L3 | P17c | planned |
 | P17e | Kask's floors, the crown arena, the boss fight | L3 | P17a, P17d | planned |
 | P17f | the whole tower to L4: checks, performance, walk-through | L4 | all | planned |
 
 **Viewpoints** (for every round): the forecourt from Civic Plaza (noon, and
-night with the eye lit); the 55% ring from Glass Lane; the vat hall; the
+night with the eye lit); the 55% ring from the east neighbour's roof; the vat hall; the
 lift's door at L−2; the arena from the gallery and from its floor.
 
 ## Decisions log
@@ -223,3 +230,9 @@ lift's door at L−2; the arena from the gallery and from its floor.
 - 2026-10-18: the section (section 3) and the route (in at the 55% ring,
   down to the lab, up by the lift) are proposed, in review.
 - 2026-10-18: the mech is built first, as P17a, because it needs no tower.
+- 2026-10-18: the section is in the plan data (`BLOCK_TOWER.inside`) with
+  checks, and drawn in `moy_block_tower_3d.html`. Drawing it moved the way
+  in: the climb starts on the east neighbour (the mid-rises stand against
+  the plot's back, so Glass Lane is 20 m away), and the 55% ring is L20,
+  not L21. The boss wears five city blorbs and the pilot shows: six to
+  befriend. Open for P6 and P17b: the 9 m base against the 7.9 m lobby.
