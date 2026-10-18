@@ -33,34 +33,35 @@
 - **Kask and Pinestein still work together.** The city thinks him BLOCK's
   outcast; he is not.
 - In Pinestein's lab the hero finds their work: they have been
-  **experimenting on blorbs and making synthetic blorb slime**.
-- **BLOCK serves the Demon King, subtly.** It is also plain human villainy:
-  Kask's and Pinestein's own ambition. Nothing says the Demon King's name.
+  **experimenting on blorbs and making synthetic blorb slime**. The city
+  blorbs are those synthetic blorbs: they exist because of his experiments,
+  and BLOCK still makes them. Nothing lures them in from the desert.
+- **The whole sequence is a fight against an evil organization.** BLOCK is
+  human villainy first.
+- **The Demon King, barely.** At the very end, one subtle line, in the
+  moment, that Kask is being rewarded, or given more power, by the Demon
+  King. A light touch, not a strong connection, and nothing else in the
+  tower points to him.
 - **The climax is a boss fight against a blorb mech**, which Kask and
   Pinestein pit against the hero together.
 - **The mech:**
   - a mechanical body on a rig like the playable characters';
   - its head is a glass dome that a blorb fills to pilot it;
   - it can wear a blorb suit;
-  - in the fight a city blorb pilots it, and it is suited;
-  - beaten, it is the hero's: from then on **Blorbus mounts it** (fills its
-    head) and drives it.
+  - in the fight a city blorb pilots it, and it wears a **suit of city
+    blorbs**;
+  - **beaten, as with the False Hero:** the suit falls away and every city
+    blorb in it, the pilot too, lands nearby as a real, joinable blorb the
+    party can befriend and equip;
+  - the mech is then the hero's: from then on **Blorbus mounts it** (fills
+    its head) and drives it.
 
-**Proposed (in review):**
-- Pinestein's night walks with Hiro's batteries are bait: the city blorbs
-  are hungry for power, and he brings them in to BLOCK.
-- The mech's fight suit is made of synthetic blorbs, grown from the lab's
-  slime: the lab's work, wearing the city blorb.
-- The Demon King's trace: the current BLOCK drains runs up the core to the
-  crown, into a tall black mirror pane behind the arena. When the mech
-  falls and the eye goes dark, the pane shows the arena inverted for a
-  beat, as the mirror world does. Nothing more.
-- After the fight Kask and Pinestein leave by the lift and are gone; the
-  city blorb pilot flees out through the eye. (Open: where they go.)
+**Open:** what becomes of Kask and Pinestein after the fight.
 
-**No text.** No line names the mech, the slime, the Demon King, or the way
-up. The open louvres breathe warm, lit air at night (section 3); the lab's
-two benches and two mugs say who works there.
+**No text that guides.** No line names the mech, the slime or the way up.
+The open louvres breathe warm, lit air at night (section 3); the lab's two
+benches and two mugs say who works there. The one Demon King line is story,
+said in character, and explains no mechanic.
 
 ## 3. The section through the tower
 
@@ -69,12 +70,12 @@ The shaft is 26 by 24 m, about 38 storeys to 150 m (3.95 m each), the crown
 
 | Level | Height (m) | What | Beat |
 |---|---|---|---|
-| Crown | 150 to 212 | **the arena**: the hollow blade, ribs converging on the ridge; the eye slit (168 to 192) the one light; a glass control gallery on the back slope; the black mirror pane | the boss fight (5) |
+| Crown | 150 to 212 | **the arena**: the hollow blade, ribs converging on the ridge; the eye slit (168 to 192) the one light; a glass control gallery on the back slope | the boss fight (5) |
 | L35 to L37 | 138 to 150 | **Kask's floors**: her flat, sparse and dark, and the control room under the crown; the lift's top stop | the approach (4) |
 | L30 | 118.5 | plant floor, the 80% vent ring | |
 | L22 to L29 | 87 to 115 | **the hangar**: two double-height floors where the mech is built and tested, its spare glass heads on racks | the mech glimpsed, empty (3) |
 | L21 | 83 | plant floor, **the 55% vent ring: the way in** | entry (1) |
-| L12 to L20 | 47 to 79 | **the drain floors**: pens of captive city blorbs, conduits drawing their current | (2) |
+| L12 to L20 | 47 to 79 | **the growing floors**: tanks where city blorbs are grown from synthetic slime, and pens of new ones | (2) |
 | L11 | 43.5 | plant floor, the 30% vent ring | |
 | L3 to L10 | 12 to 40 | **the stacks**: machine floors, rows of humming cabinets; no people, only machines | |
 | L0 to L2 | 0 to 9 | **the base**: the one door, a bare lobby, machines that keep it; set back 4 m under the shaft | |
@@ -86,7 +87,7 @@ The shaft is 26 by 24 m, about 38 storeys to 150 m (3.95 m each), the crown
    55% ring has open louvres. The gaps between rings are crossed with the
    powers the player has by then; nothing marks them.
 2. **Down.** Through the plant floor and the service stair in the core:
-   past the drain floors and the stacks to the sealed lab, which opens from
+   past the growing floors and the stacks to the sealed lab, which opens from
    the stair's foot. The discovery.
 3. **The lift.** The lab's private lift (Pinestein's own way in) rises from
    L−2 to Kask's floors, about 150 m, in one windowless ride: the slits
@@ -95,8 +96,9 @@ The shaft is 26 by 24 m, about 38 storeys to 150 m (3.95 m each), the crown
    crown.
 5. **The arena.** Kask and Pinestein behind the gallery glass; the mech
    drops from the ridge, a city blorb glowing azure in its head, suited in
-   synthetic blorbs. Beaten, it kneels; the pilot flees through the eye;
-   Blorbus can mount it. The hero leaves by the lift.
+   city blorbs. Beaten, it kneels; its suit and pilot fall away as joinable
+   city blorbs; Blorbus can mount it. The Demon King line comes here, at
+   the very end. The hero leaves by the lift.
 
 The hangar (L22 to L29) is passed on the stair down: the mech's frame seen
 empty, before it is met.
@@ -110,8 +112,9 @@ empty, before it is met.
 - piloted by a blorb in its glass head; Blorbus pilots it for the player.
 
 **Body:**
-- about 3.2 m tall (proposed): taller than the hero, short enough for
-  Moy's doors at 4 m and the tower's lift;
+- **human size** (user): as tall as the tallest human the game has, no
+  taller, so it walks through every door built for the hero; check it
+  against the smallest door the hero uses;
 - **mechanical**, from SuperEgg parts: riveted plates, exposed pistons at
   the knees and elbows, cable runs, a boxy pelvis, three-fingered hands;
   dark steel with BLOCK's blue-black;
@@ -147,11 +150,13 @@ empty, before it is met.
 
 **The boss form:**
 - the same mech, the same rig, driven by the NME controller: a city blorb
-  pilot and a suit of synthetic blorbs (azure-glassy, crackling);
+  pilot and a suit of city blorbs (azure-glassy, crackling);
 - a named boss like False Hero: far more HP, a far larger XP reward;
 - it uses its suit's powers as a player would;
-- beaten, the suit's blorbs melt to slime, the pilot leaves the dome, and
-  the mech becomes the player's (a saved flag).
+- beaten, as with the False Hero: the suit falls away and its city blorbs
+  and the pilot land nearby as wild, joinable blorbs the party can befriend
+  and equip; the mech kneels, empty, and becomes the player's (a saved
+  flag).
 
 **Where to build it:** a test pad in the demo world or a sandbox scene; the
 tower comes later. Leave a hook for the arena (round P17e).
@@ -164,8 +169,9 @@ tower comes later. Leave a hook for the arena (round P17e).
    follows.
 4. The suit on, piece by piece and whole.
 5. The boss: fight it on the pad with the hero and with Xiao Hou Zi, beat
-   it, mount it.
-6. Collision: its body blocks; it fits a 4 m door and stands on a 1 m ledge.
+   it, befriend and equip its city blorbs, mount it.
+6. Collision: its body blocks; it walks through the smallest door the hero
+   uses, and stands on a 1 m ledge.
 
 **Report:** `docs/diagnostics/<date>-moy-P17a.md` with the checks, the pose
 screenshots (front, side, three-quarter, suited and bare, empty and
@@ -188,9 +194,9 @@ Each round gets its own build brief section here before it runs.
 |---|---|---|---|---|
 | P17a | the blorb mech: rig, pilot, suit, mount, boss form | L3 | nothing | **ready** (section 4) |
 | P17b | the climb and the way in: vent rings, the open louvres, the plant floor at L21 | L3 | P6 (shaft at L2) | planned |
-| P17c | down: the stair, the drain floors, the stacks, the hangar seen in passing | L2 | P17b | planned |
+| P17c | down: the stair, the growing floors, the stacks, the hangar seen in passing | L2 | P17b | planned |
 | P17d | the sealed lab and the lift | L3 | P17c | planned |
-| P17e | Kask's floors, the crown arena, the boss fight, the mirror pane | L3 | P17a, P17d | planned |
+| P17e | Kask's floors, the crown arena, the boss fight | L3 | P17a, P17d | planned |
 | P17f | the whole tower to L4: checks, performance, walk-through | L4 | all | planned |
 
 **Viewpoints** (for every round): the forecourt from Civic Plaza (noon, and
@@ -208,6 +214,12 @@ lift's door at L−2; the arena from the gallery and from its floor.
   playable-style rig, mechanical, a glass head a blorb pilots, able to wear
   a blorb suit), piloted by a city blorb and suited; beaten, it becomes the
   hero's, and Blorbus mounts it.
+- 2026-10-18 (user): no luring: the city blorbs exist because of
+  Pinestein's experiments. The mech's suit is city blorbs, which are the
+  synthetic blorbs. No mirror pane; the Demon King gets one subtle line at
+  the end, about rewarding Kask. Beaten, the suit's city blorbs join the
+  party, as the False Hero's do. The mech is human size and uses the hero's
+  doors.
 - 2026-10-18: the section (section 3) and the route (in at the 55% ring,
   down to the lab, up by the lift) are proposed, in review.
 - 2026-10-18: the mech is built first, as P17a, because it needs no tower.

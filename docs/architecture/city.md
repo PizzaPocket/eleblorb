@@ -441,7 +441,7 @@ in character and pointing nowhere:
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Palbert Pinestein** | a top-floor flat in Old Moy, the roof bristling with antennas and coils, where he watches BLOCK | none, as far as the city knows: he still works with Kask in secret (user, 2026-10-18). His laboratory, where he made the city blorbs, is sealed in the BLOCK tower's base (user, 2026-10-18): the one lab of his the hero enters | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless; the city takes him for BLOCK's outcast. Goes out past the Rim Walk most nights with a pocketful of charged batteries (proposed: bait, to bring city blorbs in to BLOCK). |
+| **Palbert Pinestein** | a top-floor flat in Old Moy, the roof bristling with antennas and coils, where he watches BLOCK | none, as far as the city knows: he still works with Kask in secret (user, 2026-10-18). His laboratory, where he made the city blorbs, is sealed in the BLOCK tower's base (user, 2026-10-18): the one lab of his the hero enters | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless; the city takes him for BLOCK's outcast. Goes out past the Rim Walk most nights with a pocketful of charged batteries (what he does with them is open). |
 | **Dr. Vera Kask** | the top floors of the BLOCK tower | director of BLOCK | Runs BLOCK, the city's bad guy. She lives where she works, and is rarely seen at street level. |
 | **Omar Haddad** | a flat at the battery works | chief engineer of the Windworks wind farm | Climbs ninety-five metres to a nacelle before breakfast and calls it his commute. |
 | **Rafael Ortiz** | the keeper's house at the water works | keeper of the wells and the water works | Counts every litre the city uses twice, and has never once let the park's pond run dry. |
@@ -1992,13 +1992,14 @@ for the evil activities and people to be concentrated there).
   blorbs goes on. At night the tower draws more power than the rest of
   downtown together (Omar Haddad sees it on the battery works' meters
   and says nothing), and the azure slit in its crown is the colour of the city blorbs.
-  Proposed: Kask lures city blorbs in from the desert with the grid's power
-  to study and drain them, the very creatures the city banned and fears.
-- **Pinestein knows.** He watches BLOCK from his roof in Old Moy, and the
-  batteries he takes out to the city blorbs at night are partly to keep
-  them away from it.
-- **Open:** whether BLOCK serves the Demon King, as the Royal Chef does in
-  the Chinese village; what the hero finds inside, and when.
+  BLOCK still makes them: the city blorbs are its synthetic blorbs, grown
+  from synthetic slime (user, 2026-10-18). Nothing lures them in.
+- **Pinestein is in on it.** He still works with Kask, in secret (user,
+  2026-10-18); the city takes him for BLOCK's outcast.
+- **The Demon King, lightly.** BLOCK is an evil organization first; one
+  subtle line at the end of the tower's story says Kask is rewarded, or
+  given more power, by him (user, 2026-10-18). The tower's story is
+  package P17, `moy_pkg_P17.md`.
 
 
 **5. The Grand Hotel's guest tower** (28 levels, 96 m, and the drum to 108 m, rising from a 44 m atrium block; full brief in section 8, proposed 2026-10-13 after the user's direction to follow John Portman)

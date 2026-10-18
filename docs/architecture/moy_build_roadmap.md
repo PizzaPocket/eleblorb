@@ -164,8 +164,9 @@ diagnostic replaces this column.
 - **Keep:** BLOCK is the city's plain bad guy, with no elaborate backstory
   (user, 2026-10-18). Its outside stays as P6 builds it.
 - **Story round done** (2026-10-18): the vent-hood climb in, Pinestein's lab
-  (he and Kask still work together), the lift, and a boss fight against the
-  blorb mech, which Blorbus then mounts. Rounds P17a to P17f are in the
+  (he and Kask still work together; the city blorbs are their synthetic
+  blorbs), the lift, and a boss fight against the blorb mech, suited in city
+  blorbs that then join the party; Blorbus mounts the mech. Rounds P17a to P17f are in the
   brief; P17a, the mech, needs no tower and can be built now.
 
 **P18, the Arches.** One long vaulted hall in five bays of the wall
