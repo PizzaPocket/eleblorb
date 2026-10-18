@@ -35,6 +35,11 @@ var opening_wake_completed: bool = false
 ## (and every NPC with it) on each kingdom portal round trip.
 var false_hero_defeated: bool = false
 
+## P17's story and the empty mech survive the streamed city scene and travel.
+var block_tower_story_started: bool = false
+var block_tower_mech_defeated: bool = false
+var block_tower_door_open: bool = false
+
 ## Set once False Hero is defeated -- "" means no title yet. A plain string
 ## rather than an enum/id: nothing else reads this except whatever surfaces
 ## it to the player (Hud), and there's only ever been the one title so far.
@@ -107,6 +112,9 @@ func reset_for_new_game() -> void:
 	blorbus_unlocked = false
 	opening_wake_completed = false
 	false_hero_defeated = false
+	block_tower_story_started = false
+	block_tower_mech_defeated = false
+	block_tower_door_open = false
 	player_title = ""
 	ice_kingdom_visited = false
 	chinese_village_farmer_heard = false

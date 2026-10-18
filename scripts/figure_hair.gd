@@ -44,6 +44,9 @@ const STYLE_HERO := "hero"
 ## unrecognized/empty string, which add_hair()'s own match falls back to
 ## STYLE_BUZZCUT for -- this is a real, explicit "skip hair entirely" case.
 const STYLE_BALD := "bald"
+## A bald crown ringed by loose, outward-swept tufts. Used by Pinestein;
+## its public envelope is kept in hair_edges() with every other style.
+const STYLE_WILD := "wild"
 
 const DEFAULT_HAIR_COLOR := Color(0.14, 0.1, 0.08)
 
@@ -233,6 +236,8 @@ static func add_hair(
 	match style:
 		STYLE_BALD:
 			pass
+		STYLE_WILD:
+			_build_wild(head, semi_axes, hair_color)
 		STYLE_AFRO:
 			_build_afro(head, semi_axes, top_epsilon, hair_color)
 		STYLE_FLAT_TOP:
@@ -279,6 +284,11 @@ static func hair_edges(style: String, semi_axes: Vector3) -> Dictionary:
 	match style:
 		STYLE_BALD:
 			edges = {"front": 0.0, "back": 0.0, "top": 0.0, "bottom": 0.0, "width": 0.0}
+		STYLE_WILD:
+			edges["width"] *= 1.75
+			edges["top"] += 0.12
+			edges["back"] -= 0.13
+			edges["bottom"] -= 0.04
 		STYLE_AFRO:
 			edges["width"] = edges["width"] * AFRO_WIDTH_MULT - AFRO_WIDTH_REDUCTION
 			edges["top"] += AFRO_TOP_EXTRA
@@ -350,6 +360,26 @@ static func _build_buzzcut(head: MeshInstance3D, semi_axes: Vector3, top_epsilon
 	var edges := _buzzcut_edges(semi_axes)
 	var bottom_epsilon := lerpf(top_epsilon, BOTTOM_EPSILON_TARGET, BOTTOM_EPSILON_BLEND)
 	_add_edge_piece(head, edges, top_epsilon, bottom_epsilon, color)
+
+
+static func _build_wild(head: MeshInstance3D, semi_axes: Vector3, color: Color) -> void:
+	# Keep the crown bare, then ring it with swept tapered locks. The loose,
+	# irregular silhouette reads as a storm of hair rather than a round cap.
+	for i in 15:
+		var angle := TAU * float(i) / 15.0
+		var outward := Vector3(cos(angle), 0.18 + 0.24 * sin(float(i) * 2.3), sin(angle))
+		var lock := SuperEgg.build_part(
+			Vector3(0.026, 0.09 + 0.025 * float(i % 3), 0.026),
+			color, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT
+		)
+		lock.position = Vector3(
+			outward.x * semi_axes.x * 0.83,
+			semi_axes.y * 0.43 + outward.y * 0.08,
+			outward.z * semi_axes.z * 0.80
+		)
+		lock.rotation.z = -outward.x * 0.75
+		lock.rotation.x = outward.z * 0.75
+		head.add_child(lock)
 
 
 static func _build_tied_base(head: MeshInstance3D, semi_axes: Vector3, top_epsilon: float, color: Color) -> void:

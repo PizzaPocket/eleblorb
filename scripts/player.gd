@@ -4393,6 +4393,8 @@ func _update_suit_input(delta: float) -> void:
 		if _player_following_blorbus:
 			if is_instance_valid(_controlled_blorbus) and HumongousState.is_carried():
 				HumongousState.show_carried_actions(self)
+			elif is_instance_valid(_controlled_blorbus) and MechState.is_carried():
+				MechState.show_carried_actions(self)
 		else:
 			_blorb_suit.toggle()
 	# The head blorb is a normal hat until genuine buoyancy starts. This uses

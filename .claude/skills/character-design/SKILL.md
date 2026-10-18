@@ -84,11 +84,15 @@ code rather than to one character's script.
   `dress_color`, `dress_has_covered_legs`, `wears_full_boots`,
   `cropped_trousers`, `beard_style`, `beard_color`, `beard_scale`,
   `wears_pirate_captain_hat` with `pirate_hat_variant`, `wears_chef_hat`,
-  `wears_emperor_regalia`, `hook_hand`, `peg_leg`, `lava_body`.
+  `wears_emperor_regalia`, `wears_lab_coat`, `collar_pin_color`, `hook_hand`,
+  `peg_leg`, `lava_body`. The lab coat is an open-front shared garment with
+  articulated chest, abdomen, hip and sleeve pieces; its pocket can hold a
+  small emissive battery. Collar pins use the same shared chest anchor.
 - `has_glasses` (lensless frames) and `wears_full_boots` (the Emperor's boots)
   exist; no population uses glasses yet.
 - **Hair styles** (`FigureHair`): buzzcut, afro, flat top, bun, pigtails,
-  ponytail, long, hero, bald. `is_female` gates the bun in the generic picker.
+  ponytail, long, hero, bald, wild. Wild leaves the crown open and rings it
+  with swept tufts. `is_female` gates the bun in the generic picker.
 - **Community profiles** (`VillagerAppearance.apply_profile()`): a dictionary of
   colour pools, build ranges per gender, hair pools, dress indices, covered
   legs and sleeve style. Prefer a profile over ad hoc assignment for any

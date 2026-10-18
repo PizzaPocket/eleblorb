@@ -201,6 +201,7 @@ func _launch(world_scene: String, debug_loadout: String = "") -> void:
 	Party.reset_for_new_session()
 	WorldState.reset_for_new_game()
 	HumongousState.reset_for_new_session()
+	MechState.reset_for_new_session()
 	RecoveryManager.reset_for_new_session()
 	KingdomTravel.pending_gate_id = ""
 	KingdomTravel.debug_loadout = debug_loadout

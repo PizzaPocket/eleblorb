@@ -52,6 +52,10 @@ static func build_packs() -> Dictionary:
 	for b in PLAN.BUILDINGS:
 		if b.rect == null or int(b.n) == 11:
 			continue
+		if int(b.n) == 13:
+			var block := _block_tower_exterior()
+			_add(packs, _cell(b.rect.get_center()), block)
+			continue
 		var body := _landmark(b)
 		_add(packs, _cell(b.rect.get_center()), body)
 		if int(b.n) == 1:
@@ -72,6 +76,142 @@ static func build_packs() -> Dictionary:
 	_add_turbines(packs)
 	for template in tree_templates.values(): (template as StaticBody3D).free()
 	return packs
+
+
+## P17's tower is a real climbable landmark rather than the generic massing
+## box used by the surrounding skyline. Coordinates are derived from the
+## locked plan; the facade, vent ledges, rail brackets and east balconies all
+## carry collision because they read as physical structure.
+static func _block_tower_exterior() -> StaticBody3D:
+	var site: Dictionary = PLAN.TOWER_SITE["13"]
+	var shaft: Array = site.shaft
+	var left := float(shaft[0]); var front := float(shaft[1])
+	var right := float(shaft[2]); var back := float(shaft[3])
+	var center := Vector2((left + right) * 0.5, (front + back) * 0.5)
+	var width := right - left; var depth := back - front
+	var cfg: Dictionary = PLAN.BLOCK_TOWER
+	var root := StaticBody3D.new()
+	root.name = "BLOCK_Tower_Exterior"
+	root.collision_layer = 1; root.collision_mask = 1
+	root.position = Vector3(center.x, DATUM, center.y)
+	var dark := Color("#171b27"); var ceramic := Color("#252b3a")
+	var azure := Color("#50bfff")
+	# The broad base is set back four metres from the tower site boundary. Its
+	# north wall keeps the single doorway opening; the leaf itself cannot open
+	# until the lobby's post-fight control releases it.
+	var base_w := width + 8.0; var base_d := depth + 8.0; var base_t := 1.2
+	_add_building_box_part(root, Vector3(base_t, 9.0, base_d), Vector3(-base_w * 0.5 + base_t * 0.5, 4.5, 0), Color("#30323a"))
+	_add_building_box_part(root, Vector3(base_t, 9.0, base_d), Vector3(base_w * 0.5 - base_t * 0.5, 4.5, 0), Color("#30323a"))
+	_add_building_box_part(root, Vector3(base_w - base_t * 2.0, 9.0, base_t), Vector3(0, 4.5, base_d * 0.5 - base_t * 0.5), Color("#30323a"))
+	var door_x := float(cfg.door[0]) - center.x
+	var door_w := 2.2; var door_h := 3.0; var door_wall_z := -base_d * 0.5 + base_t * 0.5
+	var door_left := -base_w * 0.5 + base_t; var door_right := base_w * 0.5 - base_t
+	_add_building_box_part(root, Vector3(door_x - door_left - door_w * 0.5, 9.0, base_t), Vector3((door_left + door_x - door_w * 0.5) * 0.5, 4.5, door_wall_z), Color("#30323a"))
+	_add_building_box_part(root, Vector3(door_right - door_x - door_w * 0.5, 9.0, base_t), Vector3((door_x + door_w * 0.5 + door_right) * 0.5, 4.5, door_wall_z), Color("#30323a"))
+	_add_building_box_part(root, Vector3(door_w, 9.0 - door_h, base_t), Vector3(door_x, door_h + (9.0 - door_h) * 0.5, door_wall_z), Color("#30323a"))
+	var door := StaticBody3D.new(); door.name = "BLOCK_Forecourt_Door"
+	var door_script := load("res://scripts/moy_block_tower_door.gd")
+	if door_script != null: door.set_script(door_script)
+	var door_shape := BoxShape3D.new(); door_shape.size = Vector3(door_w, door_h, 0.32)
+	var door_collision := CollisionShape3D.new(); door_collision.shape = door_shape; door_collision.position = Vector3(door_x, door_h * 0.5, -base_d * 0.5 + base_t)
+	door.add_child(door_collision)
+	var door_mesh := BoxMesh.new(); door_mesh.size = door_shape.size
+	var door_visual := MeshInstance3D.new(); door_visual.mesh = door_mesh; door_visual.position = door_collision.position; door_visual.material_override = _material(Color("#090b10")); door.add_child(door_visual)
+	root.add_child(door)
+	# The shaft begins at the plinth roof and is split around its only open
+	# louvre. The unbuilt storeys behind it remain solid wall thickness.
+	var wall_t := 1.1; var shaft_bottom := 9.0; var shaft_h := 150.0 - shaft_bottom
+	_add_building_box_part(root, Vector3(wall_t, shaft_h, depth), Vector3(-width * 0.5 + wall_t * 0.5, shaft_bottom + shaft_h * 0.5, 0), dark)
+	_add_building_box_part(root, Vector3(wall_t, shaft_h, depth), Vector3(width * 0.5 - wall_t * 0.5, shaft_bottom + shaft_h * 0.5, 0), dark)
+	_add_building_box_part(root, Vector3(width - wall_t * 2.0, shaft_h, wall_t), Vector3(0, shaft_bottom + shaft_h * 0.5, depth * 0.5 - wall_t * 0.5), dark)
+	# North shaft wall includes a second-floor opening aligned with the only door.
+	_add_building_box_part(root, Vector3(door_x - door_w * 0.5 + width * 0.5, shaft_h, wall_t), Vector3((-width * 0.5 + door_x - door_w * 0.5) * 0.5, shaft_bottom + shaft_h * 0.5, -depth * 0.5 + wall_t * 0.5), dark)
+	_add_building_box_part(root, Vector3(width * 0.5 - door_x - door_w * 0.5, shaft_h, wall_t), Vector3((door_x + door_w * 0.5 + width * 0.5) * 0.5, shaft_bottom + shaft_h * 0.5, -depth * 0.5 + wall_t * 0.5), dark)
+	_add_building_box_part(root, Vector3(door_w, shaft_h - door_h, wall_t), Vector3(door_x, shaft_bottom + door_h + (shaft_h - door_h) * 0.5, -depth * 0.5 + wall_t * 0.5), dark)
+	# East face louvre opening at the 55% ring, two metres across and centred
+	# on the authored entrance approach.
+	var louvre_bottom := 81.7; var louvre_top := 83.3; var louvre_gap := 2.4
+	_add_building_box_part(root, Vector3(wall_t, louvre_bottom - shaft_bottom, depth), Vector3(width * 0.5 - wall_t * 0.5, (shaft_bottom + louvre_bottom) * 0.5, 0), dark)
+	_add_building_box_part(root, Vector3(wall_t, 150.0 - louvre_top, depth), Vector3(width * 0.5 - wall_t * 0.5, (150.0 + louvre_top) * 0.5, 0), dark)
+	_add_building_box_part(root, Vector3(wall_t, louvre_top - louvre_bottom, (depth - louvre_gap) * 0.5), Vector3(width * 0.5 - wall_t * 0.5, (louvre_top + louvre_bottom) * 0.5, -(depth + louvre_gap) * 0.25), dark)
+	_add_building_box_part(root, Vector3(wall_t, louvre_top - louvre_bottom, (depth - louvre_gap) * 0.5), Vector3(width * 0.5 - wall_t * 0.5, (louvre_top + louvre_bottom) * 0.5, (depth + louvre_gap) * 0.25), dark)
+	# Dark hairline joints repeat on a four-metre course. They are visual inlays,
+	# not openings or collision seams.
+	for y in range(6, 150, 4):
+		for z_side in [-1.0, 1.0]:
+			var seam := MeshInstance3D.new(); var mesh := BoxMesh.new(); mesh.size = Vector3(width - 0.5, 0.035, 0.025)
+			seam.mesh = mesh; seam.position = Vector3(0, float(y), z_side * (depth * 0.5 + 0.013)); seam.material_override = _material(ceramic.darkened(0.35)); root.add_child(seam)
+		for x_side in [-1.0, 1.0]:
+			var seam := MeshInstance3D.new(); var mesh := BoxMesh.new(); mesh.size = Vector3(0.025, 0.035, depth - 0.5)
+			seam.mesh = mesh; seam.position = Vector3(x_side * (width * 0.5 + 0.013), float(y), 0); seam.material_override = _material(ceramic.darkened(0.35)); root.add_child(seam)
+	# Solid continuous vent hoods; their upper ledges remain walkable. The 55%
+	# ring leaves one opening on the east face for the warm-lit louvre.
+	var vent_size: Array = cfg.vent
+	var projection := float(vent_size[0]); var hood_height := float(vent_size[1])
+	var z_len := depth + projection * 2.0
+	for ring_i in cfg.vents.size():
+		var y := float(cfg.vents[ring_i]) * 150.0
+		var top := y
+		var mid_y := top - hood_height * 0.5
+		for side in [-1.0, 1.0]:
+			# East face is +X. Split its middle ring around the entry louvre.
+			if side > 0.0 and ring_i == 1:
+				var gap := 2.8
+				for z_sign in [-1.0, 1.0]:
+					var seg_len := (z_len - gap) * 0.5
+					var seg_z: float = z_sign * (gap * 0.5 + seg_len * 0.5)
+					_add_building_box_part(root, Vector3(projection, hood_height, seg_len), Vector3(width * 0.5 + projection * 0.5, mid_y, seg_z), ceramic)
+			else:
+				_add_building_box_part(root, Vector3(projection, hood_height, z_len), Vector3(side * (width * 0.5 + projection * 0.5), mid_y, 0), ceramic)
+			_add_building_box_part(root, Vector3(width, hood_height, projection), Vector3(0, mid_y, side * (depth * 0.5 + projection * 0.5)), ceramic)
+		# A dark lip emphasizes the ledge edge and reads as the hood's drip line.
+		for side in [-1.0, 1.0]:
+			_add_building_box_part(root, Vector3(0.16, 0.10, z_len), Vector3(side * (width * 0.5 + projection - 0.08), top - 0.05, 0), Color("#10131b"))
+	# A slim maintenance rail on the east face joins the 30% and 55% ledges.
+	for y_step in range(0, 16):
+		var y := 45.0 + float(y_step) * 2.5
+		var bracket := _box_body("BLOCK_Rail_Bracket_%02d" % y_step, Vector3(1.15, 0.20, 0.72), Vector3(width * 0.5 + 0.38, y, 0), Color("#414752"))
+		bracket.collision_layer = 1; root.add_child(bracket)
+	# The open louvre is deliberately the only warm element on the facade.
+	var louvre := MeshInstance3D.new(); louvre.name = "BLOCK_Open_Louvre"
+	var louvre_mesh := BoxMesh.new(); louvre_mesh.size = Vector3(0.10, 1.6, 2.4); louvre.mesh = louvre_mesh
+	var warm := StandardMaterial3D.new(); warm.albedo_color = Color("#ffbd70"); warm.emission_enabled = true; warm.emission = Color("#e98e42"); warm.emission_energy_multiplier = 1.8
+	louvre.material_override = warm; louvre.position = Vector3(width * 0.5 + 0.02, 82.5, 0); root.add_child(louvre)
+	# Crown panels fold in to a canted ridge; convex faces block escape and the
+	# raised ribs give the arena approach a small set of parkour landings.
+	var crown_top := float(cfg.crown.top); var crown_h := crown_top - 150.0
+	for side in [-1.0, 1.0]:
+		var panel := _block_panel(Vector3(side * width * 0.5, 150.0, 0), Vector3(side * 5.0, crown_top, 4.0), depth, dark.lightened(0.06))
+		root.add_child(panel)
+	for side in [-1.0, 1.0]:
+		var panel := _block_panel(Vector3(0, 150.0, side * depth * 0.5), Vector3(0, crown_top - 12.0, side * 4.0), width, dark.lightened(0.03))
+		root.add_child(panel)
+	# The plaza-facing slit is the crown's only light.
+	var eye := MeshInstance3D.new(); eye.name = "BLOCK_Crown_Eye"
+	var eye_mesh := BoxMesh.new(); eye_mesh.size = Vector3(1.2, 24.0, 0.08); eye.mesh = eye_mesh
+	var eye_material := StandardMaterial3D.new(); eye_material.albedo_color = azure; eye_material.emission_enabled = true; eye_material.emission = azure; eye_material.emission_energy_multiplier = 2.6
+	eye.material_override = eye_material; eye.position = Vector3(0, 180.0, -depth * 0.5 - 0.06); root.add_child(eye)
+	# East-neighbour balconies, every second storey to the 30% hood.
+	var approach: Dictionary = cfg.inside.approach
+	var neighbour: Array = approach.rect
+	var nx0 := float(neighbour[0]); var nx1 := float(neighbour[2]); var nz := (float(neighbour[1]) + float(neighbour[3])) * 0.5
+	var storey_height := 150.0 / float(cfg.inside.floors)
+	for level in range(2, 11, 2):
+		var y := float(level) * storey_height
+		var balcony := _box_body("BLOCK_Approach_Balcony_%02d" % level, Vector3(2.0, 0.28, 3.4), Vector3(nx0 - 0.85, y, nz), Color("#353944"))
+		root.add_child(balcony)
+	return root
+
+
+static func _block_panel(a: Vector3, b: Vector3, width: float, color: Color) -> StaticBody3D:
+	var body := StaticBody3D.new(); body.name = "BLOCK_Crown_Face"; body.collision_layer = 1; body.collision_mask = 1
+	var delta := b - a; body.position = (a + b) * 0.5
+	var box := BoxMesh.new(); box.size = Vector3(0.45, delta.length(), width)
+	var visual := MeshInstance3D.new(); visual.mesh = box; visual.material_override = _material(color)
+	visual.rotation = Basis(Vector3.RIGHT, atan2(delta.x, delta.y)).get_euler(); body.add_child(visual)
+	var shape := BoxShape3D.new(); shape.size = box.size
+	var collision := CollisionShape3D.new(); collision.shape = shape; collision.rotation = visual.rotation; body.add_child(collision)
+	return body
 
 
 ## The launch approach sits well outside Moy's core streaming radius, so it is

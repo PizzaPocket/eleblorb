@@ -102,6 +102,7 @@ var _moy_requested := {}
 var _moy_unload_queue: Array[String] = []
 var _moy_actors_added := false
 var _moy_silhouette: Node3D
+var _moy_block_tower_inside: Node3D
 var _moy_activation_frame_pending := false
 var _moy_activation_count := 0
 var _moy_resident_index := 0
@@ -155,6 +156,7 @@ func _load_moy_manifest() -> void:
 func _stream_moy_city() -> void:
 	var player := get_node_or_null("../Player") as Node3D
 	if player == null: return
+	_stream_block_tower_inside(player)
 	_stream_moy_launch_site(player)
 	if _moy_paths.is_empty(): return
 	var distance := Vector2(player.global_position.x, player.global_position.z).distance_to(CITY_CENTER)
@@ -219,6 +221,22 @@ func _stream_moy_city() -> void:
 		_add_moy_helmsmith()
 	elif _moy_actors_added and _moy_resident_index < CITY_NAMES.size():
 		_spawn_moy_resident()
+
+
+func _stream_block_tower_inside(player: Node3D) -> void:
+	var point := Vector2(player.global_position.x, player.global_position.z)
+	var distance := point.distance_to(Vector2(-462.0, 59.0))
+	if distance <= 36.0 and _moy_block_tower_inside == null:
+		var packed := load("res://scenes/moy_block_tower_inside.tscn") as PackedScene
+		if packed == null:
+			push_error("BLOCK tower interior scene is missing")
+			return
+		_moy_block_tower_inside = packed.instantiate() as Node3D
+		add_child(_moy_block_tower_inside)
+		_moy_block_tower_inside.global_position = Vector3(-462.0, -60.0, 59.0)
+	elif distance >= 70.0 and _moy_block_tower_inside != null:
+		_moy_block_tower_inside.queue_free()
+		_moy_block_tower_inside = null
 
 
 func _stream_moy_launch_site(player: Node3D) -> void:

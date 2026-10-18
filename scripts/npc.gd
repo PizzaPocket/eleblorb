@@ -62,6 +62,11 @@ var _figure_standing_height := 1.9
 ## crown/flat-hem superegg skirt through FigureDress.
 @export var wears_dress: bool = false
 @export var dress_color: Color = Color(0.0, 0.0, 0.0, 0.0)
+## Shared open-front laboratory coat kit. Pieces attach to the same articulated
+## thorax, abdomen, hip and arm pivots as the figure instead of living in an
+## individual NPC script.
+@export var wears_lab_coat: bool = false
+@export var collar_pin_color: Color = Color(0.0, 0.0, 0.0, 0.0)
 ## Winter profiles use opaque tights/trousers beneath a skirt instead of the
 ## ordinary bare-leg dress convention.
 @export var dress_has_covered_legs: bool = false
@@ -409,6 +414,10 @@ func _build_figure() -> void:
 		)
 		_skirt = dress_parts["skirt"]
 		_skirt_pivot = dress_parts["pivot"]
+	if wears_lab_coat:
+		_add_lab_coat(pivots)
+	if collar_pin_color.a > 0.0:
+		_add_collar_pin(pivots, collar_pin_color)
 	if not cultural_outfit.is_empty():
 		preload("res://scripts/figure_chinese_clothing.gd").add_to_figure(pivots,cultural_outfit,shirt_color,hair_style)
 	if wears_emperor_regalia:
@@ -449,6 +458,65 @@ func refresh_wardrobe() -> void:
 	_skirt=null
 	_skirt_pivot=null
 	_build_figure()
+
+
+func _add_lab_coat(pivots: Dictionary) -> void:
+	var coat := Color("#eeeae0")
+	var trim := Color("#d2d1ca")
+	var chest := pivots.get("chest") as MeshInstance3D
+	if chest != null:
+		var half := chest.mesh.get_aabb().size * 0.5
+		for side in [-1.0, 1.0]:
+			var panel := SuperEgg.build_part(Vector3(half.x * 0.53, half.y * 0.96, half.z * 0.97), coat, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+			panel.position = Vector3(side * half.x * 0.49, 0, half.z * 0.10)
+			chest.add_child(panel)
+			var lapel := SuperEgg.build_part(Vector3(0.042, 0.105, 0.016), trim, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+			lapel.position = Vector3(side * 0.055, half.y * 0.43, half.z + 0.023)
+			lapel.rotation.z = side * deg_to_rad(24.0)
+			chest.add_child(lapel)
+		var pocket := SuperEgg.build_part(Vector3(0.046, 0.045, 0.012), Color("#e1dfd5"), 3.0, 3.0)
+		pocket.position = Vector3(half.x * 0.55, -half.y * 0.35, half.z + 0.018)
+		chest.add_child(pocket)
+		var battery := SuperEgg.build_part(Vector3(0.012, 0.028, 0.010), Color("#73d1ff"), 3.0, 3.0)
+		var glow := StandardMaterial3D.new(); glow.albedo_color = Color("#73d1ff"); glow.emission_enabled = true; glow.emission = Color("#58bfff"); glow.emission_energy_multiplier = 1.8
+		battery.material_override = glow; battery.position = Vector3(half.x * 0.55, -half.y * 0.32, half.z + 0.034); chest.add_child(battery)
+	var abdomen := pivots.get("abdomen") as MeshInstance3D
+	if abdomen != null:
+		for side in [-1.0, 1.0]:
+			var panel := SuperEgg.build_part(Vector3(0.078, 0.115, 0.112), coat, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+			panel.position = Vector3(side * 0.075, 0, 0.005); abdomen.add_child(panel)
+	var hips := pivots.get("hips") as MeshInstance3D
+	if hips != null:
+		for side in [-1.0, 1.0]:
+			var tail := SuperEgg.build_part(Vector3(0.092, 0.19, 0.105), coat, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_FLAT)
+			tail.position = Vector3(side * 0.078, -0.08, -0.02); hips.add_child(tail)
+	# Sleeves follow the articulated upper and lower arms, so the coat keeps its
+	# shape as Pinestein gestures at his temples.
+	for key in ["arm_left", "arm_right"]:
+		var arm := pivots.get(key) as Node3D
+		if arm != null:
+			var sleeve := SuperEgg.build_part(Vector3(0.082, 0.115, 0.082), coat, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+			sleeve.position.y = -0.08; arm.add_child(sleeve)
+	for key in ["elbow_left", "elbow_right"]:
+		var elbow := pivots.get(key) as Node3D
+		if elbow != null:
+			var cuff := SuperEgg.build_part(Vector3(0.072, 0.105, 0.072), coat, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+			cuff.position.y = -0.06; elbow.add_child(cuff)
+	var neck := pivots.get("neck") as Node3D
+	if neck != null:
+		var collar := SuperEgg.build_part(Vector3(0.078, 0.034, 0.074), coat, SuperEgg.EPSILON_SOFT, SuperEgg.EPSILON_SOFT)
+		collar.position.y = 0.015; neck.add_child(collar)
+
+
+func _add_collar_pin(pivots: Dictionary, color: Color) -> void:
+	var chest := pivots.get("chest") as MeshInstance3D
+	if chest == null: return
+	var pin := SuperEgg.build_part(Vector3(0.007, 0.031, 0.007), color, SuperEgg.EPSILON_FLAT, SuperEgg.EPSILON_FLAT)
+	var material := StandardMaterial3D.new(); material.albedo_color = color; material.emission_enabled = true; material.emission = color; material.emission_energy_multiplier = 1.4
+	pin.material_override = material
+	var half := chest.mesh.get_aabb().size * 0.5
+	pin.position = Vector3(half.x * 0.42, half.y * 0.88, half.z + 0.023)
+	chest.add_child(pin)
 
 
 func _apply_lava_material_recursive(node: Node, material: Material) -> void:
