@@ -140,16 +140,19 @@ pocket, not a floor.
 - **thin limbs** (user): strength from strong material, not bulk, after
   Boston Dynamics' Atlas and Rogue One's K-2SO. Limbs are SuperEgg tubes
   joint to joint (ε 3 / 3): upper arm 0.030 m radius, forearm 0.027, thigh
-  0.040, shin 0.034, with a slim piston behind each shin; black-steel
-  actuator balls at shoulders, elbows, wrists, hips, knees and ankles.
-- **two materials** (user): black steel (the actuators, chest, pelvis,
-  spine, hands, feet, the head's shell) and bright steel (limbs, chest
-  plate, side rods, neck). Metallic both.
-- **the blue light** (user): a thread of the city blorbs' azure: a lit core
-  behind the spine segments, rings at the shoulders, knees and neck, and a
-  vertical slit on the chest plate, echoing the tower's eye.
-- **a neck** (user), for the movement cycles: a slim bright-steel column on
-  the hero's neck joint. No collar.
+  0.040, shin 0.034, with a slim piston behind each shin; actuator balls at
+  shoulders, elbows, wrists, hips, knees and ankles.
+- **one matte black metal** (user) for the whole body and every limb, the
+  neck and the head's shell. The one exception is the chest plate, in
+  bright steel.
+- **shoulder pads** (user): a broad flattened SuperEgg over each shoulder
+  (0.10 × 0.055 × 0.10, ε 5.5 / 2), for a stronger look.
+- **the blue light** (user) is the city blorbs' own colour: the city
+  blorb's exported albedo and glow, not a chosen azure. A lit core behind
+  the spine segments, rings at the shoulders, knees and neck, and a vertical
+  slit on the chest plate, echoing the tower's eye.
+- **a neck** (user), for the movement cycles: a slim column on the hero's
+  neck joint. No collar.
 - **hands and feet are the hero's own** (user): his solid hand, digits
   implied, no fingers; his foot. Both at the mech's scale, in black steel.
 - **the head** (user): the hero's own head shape (ε 2.5), squarish, at the
@@ -246,25 +249,30 @@ it, as modern city dress, and P14 takes them in.
   - tall and straight; iron-grey hair in a tight bun;
   - a long blue-black dress with long sleeves, the tower's colour, legs
     covered; black gloves (she touches nothing herself); black shoes;
-  - one thin vertical **azure pin** at the collar, the shape of the
-    tower's eye: the one accent;
+  - one thin vertical **pin** at the collar in the city blorbs' blue, the
+    shape of the tower's eye: the one accent;
   - all in the existing kit except the pin (a small worn ornament).
 - **Palbert Pinestein** (he; the city's outcast, in secret not):
   - older, slight, a little shorter than the hero;
   - **wild white hair** (user): a bald crown with a storm of white tufts
     round the sides and back, flaring out and up;
   - glasses (the first in the game: `has_glasses`);
-  - an off-white **lab coat**, knee-length and open, over a white shirt;
-    pockets sagging with charged batteries, one glowing azure; brown
+  - an off-white **lab coat** (user: it hangs from the shoulders) from the
+    shoulders to the knees, sleeves to the wrists, open at the front:
+    narrow at the waist, opening to a V with folded lapels up the chest,
+    and a little toward the hem; a collar round the back of the neck;
+    a pocket sagging with batteries, one glowing in the city blorbs' blue;
+  - a mustard shirt under it, showing in the V and at the cuffs; brown
     corduroy trousers, scuffed brown shoes; bare hands.
 - **New shared pieces** (the kit lacks them; they go in the shared figure
   code, not in one character's script, and are recorded in the skill's
   toolkit):
   - `FigureHair.STYLE_WILD`, the wild hair, fitted through
     `FigureHair.hair_edges()` like every style;
-  - `wears_lab_coat` on `npc.gd`: an open knee-length coat that follows the
-    articulated torso and hips (no single enclosing torso mesh) with a
-    glowing-pocket option;
+  - `wears_lab_coat` on `npc.gd`: an open coat from the shoulders to the
+    knees, built as pieces that follow the thorax, abdomen and hips (no
+    single enclosing torso mesh), each cut by the same front opening; lapels,
+    a collar, sleeves over each arm segment, a glowing-pocket option;
   - a collar pin as a small worn ornament.
 - **Skin tones** are chosen, not assigned by role, from the full human range.
 - The hero cut stays the player's alone.
@@ -343,3 +351,7 @@ the arena from the gallery and from its floor.
   suit of six city blorbs with the pilot inside: seven to befriend.
 - 2026-10-18 (user): character briefs for Kask and Pinestein (section 4a);
   Pinestein a mad scientist with wild hair.
+- 2026-10-18 (user): the mech's limbs in the same matte black metal as its
+  body (the chest plate stays bright steel); its shoulder pads back; its
+  light the city blorbs' own colour. Pinestein's lab coat hangs from the
+  shoulders, with lapels, a collar and sleeves.
