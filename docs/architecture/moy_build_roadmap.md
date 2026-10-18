@@ -9,7 +9,13 @@ time.
 
 ## 1. Quick start for a new session
 
-Paste one of these to start a cloud session:
+**Shorthand (Claude Code):** type `/moy` in a new session.
+- `/moy`: the status of every package and what should go next.
+- `/moy P3`: take package P3 (write its brief, or review its build).
+- `/moy plan P17`: write or revise P17's brief.
+- `/moy review P1`: review P1's build diagnostic.
+
+The skill is `.claude/skills/moy/SKILL.md`. Or paste one of these in full:
 
 > **Planning session (Claude Code):** We're picking up the Moy build. Read
 > `docs/architecture/moy_build_roadmap.md` and take package **P__** (or: review
