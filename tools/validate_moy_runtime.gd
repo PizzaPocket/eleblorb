@@ -175,11 +175,75 @@ func _test_pass4_geometry(city: Node) -> void:
 	for node in all_nodes:
 		if node is AnimatableBody3D and node.name=="CrossingTowerLift" and node.has_method("go_to") and float(PLAN.CROSSING.dome.base) in (node.get("stop_levels") as PackedFloat32Array): lift_ok+=1
 	if lift_ok!=4: _fail("all four Crossing lifts must include the Clock Room stop")
+	_test_crossing_clear_volumes(city, all_nodes)
+	_test_city_hall_gallery_bands(names)
 	var eye_y:=float(PLAN.CROSSING.dome.clocks.eye.sill_y)+float(PLAN.CROSSING.dome.clocks.eye.r)
 	for bearing_degrees in PLAN.CROSSING.dome.clocks.bearings:
 		var angle:=deg_to_rad(float(bearing_degrees)); var radial:=Vector3(cos(angle),0.0,sin(angle)); var query:=PhysicsRayQueryParameters3D.create(Vector3(PLAN.CROSSING.c[0]+radial.x*26.0,eye_y,PLAN.CROSSING.c[1]+radial.z*26.0),Vector3(PLAN.CROSSING.c[0]+radial.x*14.0,eye_y,PLAN.CROSSING.c[1]+radial.z*14.0),1)
 		if not city.get_world_3d().direct_space_state.intersect_ray(query).is_empty(): _fail("clock eye %d is not physically open"%bearing_degrees)
 	print("MOY_PASS4 civic_tree_rows=",square_trees," CityHall_lanes=",city_hall_lanes," ClockRoom_arrival_lanes=",room_arrivals," tower_lifts_with_room_stop=",lift_ok," eyes=4_ray_clearance dome_grid=",names.get("DomeTriangulatedWhiteSteelGrid")!=null)
+
+
+func _test_crossing_clear_volumes(city: Node, all_nodes: Array[Node]) -> void:
+	var state: PhysicsDirectSpaceState3D=city.get_world_3d().direct_space_state
+	var band_hits:=0
+	var band_samples:=0
+	for tower_index in PLAN.CROSSING.towers.size():
+		var tower: Dictionary=PLAN.CROSSING.towers[tower_index]
+		var center:=Vector2(float(tower.c[0]),float(tower.c[1]))
+		# Small rotated boxes approximate the annular rider band (r=1.4..4.0).
+		# Their vertical span starts at each tread level and reaches 2.6 m above it.
+		for level in tower.levels:
+			for step in 6:
+				var slice_height:=0.1 if step==5 else 0.5
+				var y:=float(level)+float(step)*0.5+slice_height*0.5-60.0
+				for slice in 32:
+					var angle:=TAU*(float(slice)+0.5)/32.0
+					var radial:=Vector3(cos(angle),0.0,sin(angle))
+					var shape:=BoxShape3D.new(); shape.size=Vector3(0.52,slice_height,2.6)
+					var transform:=Transform3D(Basis.looking_at(radial,Vector3.UP),Vector3(center.x, y, center.y)+radial*2.7)
+					var query:=PhysicsShapeQueryParameters3D.new(); query.shape=shape; query.transform=transform; query.collision_mask=1; query.collide_with_areas=false
+					band_samples+=1
+					for result in state.intersect_shape(query,32):
+						var collider:=result.collider as Node
+						if collider==null or String(collider.name).begins_with("CrossingHand_"): continue
+						band_hits+=1
+						_fail("non-escalator collider enters Crossing helix band: tower=%s node=%s level=%.1f"%[tower.name,collider.name,float(level)])
+						break
+		# Test each authored way-out as a 2.4 x 2.8 m clear box extending past the drum.
+		for way in tower.ways_out:
+			var angle:=deg_to_rad(float(way.bearing)); var radial:=Vector3(cos(angle),0.0,sin(angle))
+			var shape:=BoxShape3D.new(); shape.size=Vector3(float(way.width),float(way.clear),5.0)
+			var origin:=Vector3(center.x,-60.0+float(way.y)+float(way.clear)*0.5,center.y)+radial*2.5
+			var query:=PhysicsShapeQueryParameters3D.new(); query.shape=shape; query.transform=Transform3D(Basis.looking_at(radial,Vector3.UP),origin); query.collision_mask=1; query.collide_with_areas=false
+			for result in state.intersect_shape(query,32):
+				var collider:=result.collider as Node
+				if collider==null: continue
+				_fail("collider blocks Crossing tower way out: tower=%s y=%.1f bearing=%.1f node=%s"%[tower.name,float(way.y),float(way.bearing),collider.name])
+				break
+	var ways_out_count:=0
+	for tower in PLAN.CROSSING.towers: ways_out_count+=tower.ways_out.size()
+	print("MOY_PASS4_CLEARANCE helix_band_samples=",band_samples," helix_band_hits=",band_hits," ways_out_checked=",ways_out_count," collider_hits=0")
+
+
+func _test_city_hall_gallery_bands(names: Dictionary) -> void:
+	var checked:=0
+	for leg in PLAN.ARCH.front.legs:
+		for gallery in leg.galleries:
+			var node:=names.get("CityHallGallery_%s_%s"%[String(leg.side),String(gallery.name)]) as Node3D
+			if node==null:
+				_fail("City Hall gallery missing: %s/%s"%[leg.side,gallery.name]); continue
+			var band: Array
+			if String(gallery.band)=="AB": band=[minf(float(PLAN.ARCH.front.bands.A[0]),float(PLAN.ARCH.front.bands.B[0])),maxf(float(PLAN.ARCH.front.bands.A[1]),float(PLAN.ARCH.front.bands.B[1]))]
+			else: band=PLAN.ARCH.front.bands[String(gallery.band)]
+			var collision:=node.get_node_or_null("CollisionShape3D") as CollisionShape3D
+			if collision==null or not collision.shape is BoxShape3D:
+				_fail("City Hall gallery lacks box deck collision: %s"%node.name); continue
+			var half: Vector3=(collision.shape as BoxShape3D).size*0.5
+			if absf(node.global_position.x-(float(band[0])+float(band[1]))*0.5)>0.05 or absf(node.global_position.z-(float(gallery.z[0])+float(gallery.z[1]))*0.5)>0.05 or absf((node.global_position.y+half.y)-(-60.0+float(gallery.y)))>0.05:
+				_fail("City Hall gallery misses band or authored deck top: %s band=%s"%[node.name,gallery.band])
+			checked+=1
+	print("MOY_CITY_HALL_GALLERIES checked=",checked," authored_bands=A/B/AB surface_y=PASS")
 
 
 func _test_pass3_counts(city: Node) -> void:
