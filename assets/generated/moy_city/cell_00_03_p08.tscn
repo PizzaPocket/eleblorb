@@ -70,88 +70,96 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_mfmsa"]
 size = Vector3(3.6, 0.35, 1.5)
 
-[node name="MoyCell_00_03_Part_08" type="Node3D" unique_id=1577921695]
+[node name="MoyCell_00_03_Part_08" type="Node3D" unique_id=485700260]
 
-[node name="WestGateCore_south_tower_Landing_01" type="StaticBody3D" parent="." unique_id=1540140134]
+[node name="WestGateCore_south_tower_Landing_01" type="StaticBody3D" parent="." unique_id=1255841163]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -778.8, -45.975, 10.95)
 metadata/reach_target = true
 metadata/walk_deck = true
 
-[node name="@CollisionShape3D@10652" type="CollisionShape3D" parent="WestGateCore_south_tower_Landing_01" unique_id=1275216478]
+[node name="@CollisionShape3D@10644" type="CollisionShape3D" parent="WestGateCore_south_tower_Landing_01" unique_id=1224620792]
 shape = SubResource("BoxShape3D_k7qsm")
 
-[node name="@MeshInstance3D@10653" type="MeshInstance3D" parent="WestGateCore_south_tower_Landing_01" unique_id=145310328]
+[node name="@MeshInstance3D@10645" type="MeshInstance3D" parent="WestGateCore_south_tower_Landing_01" unique_id=589748636]
 material_override = SubResource("StandardMaterial3D_57xq1")
 mesh = SubResource("BoxMesh_rkaj4")
 
-[node name="WestGateCore_south_tower_Flight_02_Landing_0" type="StaticBody3D" parent="." unique_id=49223496]
+[node name="WestGateCore_south_tower_Flight_02_Landing_0" type="StaticBody3D" parent="." unique_id=340284275]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -778.8, -45.95, 11.7)
-metadata/reach_target = true
 metadata/walk_deck = true
+metadata/walk_run_id = "Escalator:WestGateCore_south_tower_Flight_02"
+metadata/reach_link_id = "Escalator:WestGateCore_south_tower_Flight_02"
+metadata/reach_target = true
 
-[node name="@CollisionShape3D@10684" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_02_Landing_0" unique_id=1465209409]
+[node name="@CollisionShape3D@10676" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_02_Landing_0" unique_id=137943208]
 shape = SubResource("BoxShape3D_eins8")
 
-[node name="@MeshInstance3D@10685" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_02_Landing_0" unique_id=673762831]
+[node name="@MeshInstance3D@10677" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_02_Landing_0" unique_id=1387610357]
 material_override = SubResource("StandardMaterial3D_e8ghp")
 mesh = SubResource("BoxMesh_ywmp6")
 
-[node name="WestGateCore_south_tower_Flight_03_Landing_1" type="StaticBody3D" parent="." unique_id=27879865]
+[node name="WestGateCore_south_tower_Flight_03_Landing_1" type="StaticBody3D" parent="." unique_id=919174353]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -778.8, -34.550003, 11.7)
-metadata/reach_target = true
 metadata/walk_deck = true
+metadata/walk_run_id = "Escalator:WestGateCore_south_tower_Flight_03"
+metadata/reach_link_id = "Escalator:WestGateCore_south_tower_Flight_03"
+metadata/reach_target = true
 
-[node name="@CollisionShape3D@10722" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_03_Landing_1" unique_id=2089073280]
+[node name="@CollisionShape3D@10714" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_03_Landing_1" unique_id=917839391]
 shape = SubResource("BoxShape3D_1kd4s")
 
-[node name="@MeshInstance3D@10723" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_03_Landing_1" unique_id=1078006952]
+[node name="@MeshInstance3D@10715" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_03_Landing_1" unique_id=611513329]
 material_override = SubResource("StandardMaterial3D_yo12j")
 mesh = SubResource("BoxMesh_gr3a0")
 
-[node name="WestGateCore_south_tower_Landing_03" type="StaticBody3D" parent="." unique_id=331643578]
+[node name="WestGateCore_south_tower_Landing_03" type="StaticBody3D" parent="." unique_id=767521896]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -778.8, -34.575, 10.95)
 metadata/reach_target = true
 metadata/walk_deck = true
 
-[node name="@CollisionShape3D@10724" type="CollisionShape3D" parent="WestGateCore_south_tower_Landing_03" unique_id=1896404789]
+[node name="@CollisionShape3D@10716" type="CollisionShape3D" parent="WestGateCore_south_tower_Landing_03" unique_id=1574195298]
 shape = SubResource("BoxShape3D_1lusk")
 
-[node name="@MeshInstance3D@10725" type="MeshInstance3D" parent="WestGateCore_south_tower_Landing_03" unique_id=2040928662]
+[node name="@MeshInstance3D@10717" type="MeshInstance3D" parent="WestGateCore_south_tower_Landing_03" unique_id=701592018]
 material_override = SubResource("StandardMaterial3D_qnght")
 mesh = SubResource("BoxMesh_jldk7")
 
-[node name="WestGateCore_south_tower_Flight_04_Landing_0" type="StaticBody3D" parent="." unique_id=1271076402]
+[node name="WestGateCore_south_tower_Flight_04_Landing_0" type="StaticBody3D" parent="." unique_id=695922788]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -778.8, -34.550003, 11.7)
-metadata/reach_target = true
 metadata/walk_deck = true
+metadata/walk_run_id = "Escalator:WestGateCore_south_tower_Flight_04"
+metadata/reach_link_id = "Escalator:WestGateCore_south_tower_Flight_04"
+metadata/reach_target = true
 
-[node name="@CollisionShape3D@10756" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_04_Landing_0" unique_id=1115354117]
+[node name="@CollisionShape3D@10748" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_04_Landing_0" unique_id=18341897]
 shape = SubResource("BoxShape3D_tisoo")
 
-[node name="@MeshInstance3D@10757" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_04_Landing_0" unique_id=625149570]
+[node name="@MeshInstance3D@10749" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_04_Landing_0" unique_id=257377997]
 material_override = SubResource("StandardMaterial3D_cphud")
 mesh = SubResource("BoxMesh_0mht3")
 
-[node name="WestGateCore_south_tower_Flight_05_Landing_1" type="StaticBody3D" parent="." unique_id=2119615824]
+[node name="WestGateCore_south_tower_Flight_05_Landing_1" type="StaticBody3D" parent="." unique_id=85975882]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -778.8, -23.15, 11.7)
-metadata/reach_target = true
 metadata/walk_deck = true
+metadata/walk_run_id = "Escalator:WestGateCore_south_tower_Flight_05"
+metadata/reach_link_id = "Escalator:WestGateCore_south_tower_Flight_05"
+metadata/reach_target = true
 
-[node name="@CollisionShape3D@10794" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_05_Landing_1" unique_id=606013623]
+[node name="@CollisionShape3D@10786" type="CollisionShape3D" parent="WestGateCore_south_tower_Flight_05_Landing_1" unique_id=47225571]
 shape = SubResource("BoxShape3D_onrg1")
 
-[node name="@MeshInstance3D@10795" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_05_Landing_1" unique_id=1335808692]
+[node name="@MeshInstance3D@10787" type="MeshInstance3D" parent="WestGateCore_south_tower_Flight_05_Landing_1" unique_id=999357445]
 material_override = SubResource("StandardMaterial3D_ko0jv")
 mesh = SubResource("BoxMesh_in2xh")
 
-[node name="WestGateCore_south_tower_Landing_05" type="StaticBody3D" parent="." unique_id=87907750]
+[node name="WestGateCore_south_tower_Landing_05" type="StaticBody3D" parent="." unique_id=95218217]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -778.8, -23.175, 10.95)
 metadata/reach_target = true
 metadata/walk_deck = true
 
-[node name="@CollisionShape3D@10796" type="CollisionShape3D" parent="WestGateCore_south_tower_Landing_05" unique_id=236623124]
+[node name="@CollisionShape3D@10788" type="CollisionShape3D" parent="WestGateCore_south_tower_Landing_05" unique_id=1453346957]
 shape = SubResource("BoxShape3D_nvmsi")
 
-[node name="@MeshInstance3D@10797" type="MeshInstance3D" parent="WestGateCore_south_tower_Landing_05" unique_id=1865764216]
+[node name="@MeshInstance3D@10789" type="MeshInstance3D" parent="WestGateCore_south_tower_Landing_05" unique_id=406624844]
 material_override = SubResource("StandardMaterial3D_igw3h")
 mesh = SubResource("BoxMesh_mfmsa")

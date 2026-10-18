@@ -488,487 +488,465 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_j37xi"]
 size = Vector3(4.9994, 1.1, 0.12)
 
-[node name="MoyCell_04_03" type="Node3D" unique_id=407039697]
+[node name="MoyCell_04_03" type="Node3D" unique_id=1117573135]
 
-[node name="Street_Park Ring" type="StaticBody3D" parent="." unique_id=759416013]
+[node name="Street_Park Ring" type="StaticBody3D" parent="." unique_id=872184474]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -489, -60.05, 0)
+metadata/walk_run_id = "Street_Park Ring"
 
-[node name="@CollisionShape3D@315" type="CollisionShape3D" parent="Street_Park Ring" unique_id=1800079244]
+[node name="@CollisionShape3D@315" type="CollisionShape3D" parent="Street_Park Ring" unique_id=106710395]
 shape = SubResource("BoxShape3D_lu7uv")
 
-[node name="@MeshInstance3D@316" type="MeshInstance3D" parent="Street_Park Ring" unique_id=1670595307]
+[node name="@MeshInstance3D@316" type="MeshInstance3D" parent="Street_Park Ring" unique_id=1835682104]
 material_override = SubResource("StandardMaterial3D_wrkk6")
 mesh = SubResource("BoxMesh_aatuq")
 
-[node name="DeckColumn_100" type="StaticBody3D" parent="." unique_id=1582068547]
+[node name="DeckColumn_100" type="StaticBody3D" parent="." unique_id=1759030091]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -532.5, -57.2, -3.6)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2869" type="MeshInstance3D" parent="DeckColumn_100" unique_id=923388074]
+[node name="@MeshInstance3D@2869" type="MeshInstance3D" parent="DeckColumn_100" unique_id=123852840]
 material_override = SubResource("StandardMaterial3D_o3dpy")
 mesh = SubResource("CylinderMesh_vqigl")
 
-[node name="@CollisionShape3D@2870" type="CollisionShape3D" parent="DeckColumn_100" unique_id=246247438]
+[node name="@CollisionShape3D@2870" type="CollisionShape3D" parent="DeckColumn_100" unique_id=1463804461]
 shape = SubResource("CylinderShape3D_ek77a")
 
-[node name="DeckColumn_101" type="StaticBody3D" parent="." unique_id=53512994]
+[node name="DeckColumn_101" type="StaticBody3D" parent="." unique_id=968628768]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -532.5, -57.2, 3.6)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2871" type="MeshInstance3D" parent="DeckColumn_101" unique_id=36676310]
+[node name="@MeshInstance3D@2871" type="MeshInstance3D" parent="DeckColumn_101" unique_id=3840644]
 material_override = SubResource("StandardMaterial3D_mpmd2")
 mesh = SubResource("CylinderMesh_kb38g")
 
-[node name="@CollisionShape3D@2872" type="CollisionShape3D" parent="DeckColumn_101" unique_id=62288293]
+[node name="@CollisionShape3D@2872" type="CollisionShape3D" parent="DeckColumn_101" unique_id=672052572]
 shape = SubResource("CylinderShape3D_37hmt")
 
-[node name="DeckColumn_121" type="StaticBody3D" parent="." unique_id=388428531]
+[node name="DeckColumn_121" type="StaticBody3D" parent="." unique_id=841837597]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -494.6, -57.2, -38)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2911" type="MeshInstance3D" parent="DeckColumn_121" unique_id=701986856]
+[node name="@MeshInstance3D@2911" type="MeshInstance3D" parent="DeckColumn_121" unique_id=1809494113]
 material_override = SubResource("StandardMaterial3D_r85bu")
 mesh = SubResource("CylinderMesh_80ff7")
 
-[node name="@CollisionShape3D@2912" type="CollisionShape3D" parent="DeckColumn_121" unique_id=615966320]
+[node name="@CollisionShape3D@2912" type="CollisionShape3D" parent="DeckColumn_121" unique_id=246190442]
 shape = SubResource("CylinderShape3D_617gs")
 
-[node name="DeckColumn_122" type="StaticBody3D" parent="." unique_id=1745036969]
+[node name="DeckColumn_122" type="StaticBody3D" parent="." unique_id=916889654]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -494.6, -57.2, -26)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2913" type="MeshInstance3D" parent="DeckColumn_122" unique_id=305606672]
+[node name="@MeshInstance3D@2913" type="MeshInstance3D" parent="DeckColumn_122" unique_id=1230684531]
 material_override = SubResource("StandardMaterial3D_rbr5g")
 mesh = SubResource("CylinderMesh_1w8ye")
 
-[node name="@CollisionShape3D@2914" type="CollisionShape3D" parent="DeckColumn_122" unique_id=175545871]
+[node name="@CollisionShape3D@2914" type="CollisionShape3D" parent="DeckColumn_122" unique_id=1151200266]
 shape = SubResource("CylinderShape3D_sywyx")
 
-[node name="DeckColumn_123" type="StaticBody3D" parent="." unique_id=842044621]
+[node name="DeckColumn_123" type="StaticBody3D" parent="." unique_id=539339639]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -494.6, -57.2, -14)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2915" type="MeshInstance3D" parent="DeckColumn_123" unique_id=1492415261]
+[node name="@MeshInstance3D@2915" type="MeshInstance3D" parent="DeckColumn_123" unique_id=86052429]
 material_override = SubResource("StandardMaterial3D_eyd5i")
 mesh = SubResource("CylinderMesh_63g0h")
 
-[node name="@CollisionShape3D@2916" type="CollisionShape3D" parent="DeckColumn_123" unique_id=1359150408]
+[node name="@CollisionShape3D@2916" type="CollisionShape3D" parent="DeckColumn_123" unique_id=532649201]
 shape = SubResource("CylinderShape3D_7w0re")
 
-[node name="DeckColumn_124" type="StaticBody3D" parent="." unique_id=183976764]
+[node name="DeckColumn_124" type="StaticBody3D" parent="." unique_id=704460884]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -494.6, -57.2, -3)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2917" type="MeshInstance3D" parent="DeckColumn_124" unique_id=458805931]
+[node name="@MeshInstance3D@2917" type="MeshInstance3D" parent="DeckColumn_124" unique_id=765093410]
 material_override = SubResource("StandardMaterial3D_jsv80")
 mesh = SubResource("CylinderMesh_7n4g4")
 
-[node name="@CollisionShape3D@2918" type="CollisionShape3D" parent="DeckColumn_124" unique_id=560723816]
+[node name="@CollisionShape3D@2918" type="CollisionShape3D" parent="DeckColumn_124" unique_id=1716877624]
 shape = SubResource("CylinderShape3D_72cy8")
 
-[node name="DeckColumn_125" type="StaticBody3D" parent="." unique_id=342678187]
+[node name="DeckColumn_125" type="StaticBody3D" parent="." unique_id=1036952001]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -494.6, -57.2, 9)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2919" type="MeshInstance3D" parent="DeckColumn_125" unique_id=1821830279]
+[node name="@MeshInstance3D@2919" type="MeshInstance3D" parent="DeckColumn_125" unique_id=337193477]
 material_override = SubResource("StandardMaterial3D_dii4h")
 mesh = SubResource("CylinderMesh_sgb7f")
 
-[node name="@CollisionShape3D@2920" type="CollisionShape3D" parent="DeckColumn_125" unique_id=496586669]
+[node name="@CollisionShape3D@2920" type="CollisionShape3D" parent="DeckColumn_125" unique_id=429297949]
 shape = SubResource("CylinderShape3D_ccqk8")
 
-[node name="DeckColumn_131" type="StaticBody3D" parent="." unique_id=326168626]
+[node name="DeckColumn_131" type="StaticBody3D" parent="." unique_id=19251796]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -489.4, -57.2, -38)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2931" type="MeshInstance3D" parent="DeckColumn_131" unique_id=285987471]
+[node name="@MeshInstance3D@2931" type="MeshInstance3D" parent="DeckColumn_131" unique_id=1771767429]
 material_override = SubResource("StandardMaterial3D_mxjyn")
 mesh = SubResource("CylinderMesh_635wb")
 
-[node name="@CollisionShape3D@2932" type="CollisionShape3D" parent="DeckColumn_131" unique_id=2118133583]
+[node name="@CollisionShape3D@2932" type="CollisionShape3D" parent="DeckColumn_131" unique_id=1501551323]
 shape = SubResource("CylinderShape3D_kb114")
 
-[node name="DeckColumn_132" type="StaticBody3D" parent="." unique_id=1468083606]
+[node name="DeckColumn_132" type="StaticBody3D" parent="." unique_id=2016476067]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -489.4, -57.2, -26)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2933" type="MeshInstance3D" parent="DeckColumn_132" unique_id=1336159223]
+[node name="@MeshInstance3D@2933" type="MeshInstance3D" parent="DeckColumn_132" unique_id=683636333]
 material_override = SubResource("StandardMaterial3D_7tsm5")
 mesh = SubResource("CylinderMesh_1et1p")
 
-[node name="@CollisionShape3D@2934" type="CollisionShape3D" parent="DeckColumn_132" unique_id=116689428]
+[node name="@CollisionShape3D@2934" type="CollisionShape3D" parent="DeckColumn_132" unique_id=336446092]
 shape = SubResource("CylinderShape3D_rpl14")
 
-[node name="DeckColumn_133" type="StaticBody3D" parent="." unique_id=599417052]
+[node name="DeckColumn_133" type="StaticBody3D" parent="." unique_id=1696511948]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -489.4, -57.2, -14)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2935" type="MeshInstance3D" parent="DeckColumn_133" unique_id=982101030]
+[node name="@MeshInstance3D@2935" type="MeshInstance3D" parent="DeckColumn_133" unique_id=964164544]
 material_override = SubResource("StandardMaterial3D_wdogk")
 mesh = SubResource("CylinderMesh_ewe1f")
 
-[node name="@CollisionShape3D@2936" type="CollisionShape3D" parent="DeckColumn_133" unique_id=619108418]
+[node name="@CollisionShape3D@2936" type="CollisionShape3D" parent="DeckColumn_133" unique_id=1442078657]
 shape = SubResource("CylinderShape3D_ptxri")
 
-[node name="DeckColumn_134" type="StaticBody3D" parent="." unique_id=425135936]
+[node name="DeckColumn_134" type="StaticBody3D" parent="." unique_id=121796121]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -489.4, -57.2, -3)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2937" type="MeshInstance3D" parent="DeckColumn_134" unique_id=213338313]
+[node name="@MeshInstance3D@2937" type="MeshInstance3D" parent="DeckColumn_134" unique_id=1174420786]
 material_override = SubResource("StandardMaterial3D_7vblu")
 mesh = SubResource("CylinderMesh_6raur")
 
-[node name="@CollisionShape3D@2938" type="CollisionShape3D" parent="DeckColumn_134" unique_id=539471191]
+[node name="@CollisionShape3D@2938" type="CollisionShape3D" parent="DeckColumn_134" unique_id=1669912750]
 shape = SubResource("CylinderShape3D_wuh6b")
 
-[node name="DeckColumn_135" type="StaticBody3D" parent="." unique_id=479322961]
+[node name="DeckColumn_135" type="StaticBody3D" parent="." unique_id=1039118875]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -489.4, -57.2, 9)
-metadata/walk_deck = true
 
-[node name="@MeshInstance3D@2939" type="MeshInstance3D" parent="DeckColumn_135" unique_id=1431587669]
+[node name="@MeshInstance3D@2939" type="MeshInstance3D" parent="DeckColumn_135" unique_id=325581967]
 material_override = SubResource("StandardMaterial3D_hhdh6")
 mesh = SubResource("CylinderMesh_y638q")
 
-[node name="@CollisionShape3D@2940" type="CollisionShape3D" parent="DeckColumn_135" unique_id=281875409]
+[node name="@CollisionShape3D@2940" type="CollisionShape3D" parent="DeckColumn_135" unique_id=904736103]
 shape = SubResource("CylinderShape3D_lwc3h")
 
-[node name="Deck_Park Deck_1" type="StaticBody3D" parent="." unique_id=2030288831]
+[node name="Deck_Park Deck_1" type="StaticBody3D" parent="." unique_id=1125532001]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -492, -53.95, 0)
 metadata/walk_deck = true
+metadata/walk_run_id = "Deck_Park Deck"
 
-[node name="@CollisionShape3D@2951" type="CollisionShape3D" parent="Deck_Park Deck_1" unique_id=1920402448]
+[node name="@CollisionShape3D@2951" type="CollisionShape3D" parent="Deck_Park Deck_1" unique_id=1737570939]
 shape = SubResource("BoxShape3D_7eh3q")
 
-[node name="@MeshInstance3D@2952" type="MeshInstance3D" parent="Deck_Park Deck_1" unique_id=952737031]
+[node name="@MeshInstance3D@2952" type="MeshInstance3D" parent="Deck_Park Deck_1" unique_id=1024969312]
 material_override = SubResource("StandardMaterial3D_atpq8")
 mesh = SubResource("BoxMesh_y2gkm")
 
-[node name="Deck_Crossing Ring_0" type="StaticBody3D" parent="." unique_id=1022582450]
+[node name="Deck_Crossing Ring_0" type="StaticBody3D" parent="." unique_id=1565677058]
 transform = Transform3D(-0.08801101, 0, -0.9961195, 0, 1, 0, 0.9961195, 0, -0.08801101, -531.52, -54.3, 2.49)
 metadata/walk_deck = true
+metadata/walk_run_id = "Deck_Crossing Ring"
 
-[node name="@CollisionShape3D@2965" type="CollisionShape3D" parent="Deck_Crossing Ring_0" unique_id=1528626342]
+[node name="@CollisionShape3D@2965" type="CollisionShape3D" parent="Deck_Crossing Ring_0" unique_id=1001592181]
 shape = SubResource("BoxShape3D_p4218")
 
-[node name="@MeshInstance3D@2966" type="MeshInstance3D" parent="Deck_Crossing Ring_0" unique_id=448512164]
+[node name="@MeshInstance3D@2966" type="MeshInstance3D" parent="Deck_Crossing Ring_0" unique_id=1088275274]
 material_override = SubResource("StandardMaterial3D_l0kyp")
 mesh = SubResource("BoxMesh_2xubt")
 
-[node name="Deck_Crossing Ring_1" type="StaticBody3D" parent="." unique_id=414857109]
+[node name="Deck_Crossing Ring_1" type="StaticBody3D" parent="." unique_id=1266189721]
 transform = Transform3D(-0.25754574, 0, -0.9662661, 0, 1, 0, 0.9662661, 0, -0.25754574, -532.385, -54.3, 7.3999996)
 metadata/walk_deck = true
+metadata/walk_run_id = "Deck_Crossing Ring"
 
-[node name="@CollisionShape3D@2967" type="CollisionShape3D" parent="Deck_Crossing Ring_1" unique_id=21326668]
+[node name="@CollisionShape3D@2967" type="CollisionShape3D" parent="Deck_Crossing Ring_1" unique_id=896377632]
 shape = SubResource("BoxShape3D_cxnc4")
 
-[node name="@MeshInstance3D@2968" type="MeshInstance3D" parent="Deck_Crossing Ring_1" unique_id=1837941668]
+[node name="@MeshInstance3D@2968" type="MeshInstance3D" parent="Deck_Crossing Ring_1" unique_id=1034254001]
 material_override = SubResource("StandardMaterial3D_70206")
 mesh = SubResource("BoxMesh_s40h2")
 
-[node name="Deck_Crossing Ring_2" type="StaticBody3D" parent="." unique_id=64902638]
+[node name="Deck_Crossing Ring_2" type="StaticBody3D" parent="." unique_id=458306823]
 transform = Transform3D(-0.42386946, 0, -0.9057233, 0, 1, 0, 0.9057233, 0, -0.42386946, -534.09, -54.3, 12.085)
 metadata/walk_deck = true
+metadata/walk_run_id = "Deck_Crossing Ring"
 
-[node name="@CollisionShape3D@2969" type="CollisionShape3D" parent="Deck_Crossing Ring_2" unique_id=1441229392]
+[node name="@CollisionShape3D@2969" type="CollisionShape3D" parent="Deck_Crossing Ring_2" unique_id=1645577749]
 shape = SubResource("BoxShape3D_aqytu")
 
-[node name="@MeshInstance3D@2970" type="MeshInstance3D" parent="Deck_Crossing Ring_2" unique_id=655071757]
+[node name="@MeshInstance3D@2970" type="MeshInstance3D" parent="Deck_Crossing Ring_2" unique_id=248150405]
 material_override = SubResource("StandardMaterial3D_28ryh")
 mesh = SubResource("BoxMesh_ud45w")
 
-[node name="Deck_Crossing Ring_30" type="StaticBody3D" parent="." unique_id=1179194389]
+[node name="Deck_Crossing Ring_30" type="StaticBody3D" parent="." unique_id=1187507856]
 transform = Transform3D(0.82017297, 0, -0.57211566, 0, 1, 0, 0.57211566, 0, 0.82017297, -543.6, -54.3, -23.42)
 metadata/walk_deck = true
+metadata/walk_run_id = "Deck_Crossing Ring"
 
-[node name="@CollisionShape3D@3025" type="CollisionShape3D" parent="Deck_Crossing Ring_30" unique_id=117364178]
+[node name="@CollisionShape3D@3025" type="CollisionShape3D" parent="Deck_Crossing Ring_30" unique_id=1612570]
 shape = SubResource("BoxShape3D_kbu3p")
 
-[node name="@MeshInstance3D@3026" type="MeshInstance3D" parent="Deck_Crossing Ring_30" unique_id=1896596809]
+[node name="@MeshInstance3D@3026" type="MeshInstance3D" parent="Deck_Crossing Ring_30" unique_id=513948707]
 material_override = SubResource("StandardMaterial3D_owan1")
 mesh = SubResource("BoxMesh_hes4r")
 
-[node name="Deck_Crossing Ring_31" type="StaticBody3D" parent="." unique_id=1722339991]
+[node name="Deck_Crossing Ring_31" type="StaticBody3D" parent="." unique_id=1847372603]
 transform = Transform3D(0.7071047, 0, -0.70710886, 0, 1, 0, 0.70710886, 0, 0.7071047, -539.78, -54.3, -20.220001)
 metadata/walk_deck = true
+metadata/walk_run_id = "Deck_Crossing Ring"
 
-[node name="@CollisionShape3D@3027" type="CollisionShape3D" parent="Deck_Crossing Ring_31" unique_id=84757872]
+[node name="@CollisionShape3D@3027" type="CollisionShape3D" parent="Deck_Crossing Ring_31" unique_id=230103822]
 shape = SubResource("BoxShape3D_4gvp1")
 
-[node name="@MeshInstance3D@3028" type="MeshInstance3D" parent="Deck_Crossing Ring_31" unique_id=1051105043]
+[node name="@MeshInstance3D@3028" type="MeshInstance3D" parent="Deck_Crossing Ring_31" unique_id=1948381035]
 material_override = SubResource("StandardMaterial3D_lqay5")
 mesh = SubResource("BoxMesh_5tlca")
 
-[node name="Deck_Crossing Ring_32" type="StaticBody3D" parent="." unique_id=1608485185]
+[node name="Deck_Crossing Ring_32" type="StaticBody3D" parent="." unique_id=1038304288]
 transform = Transform3D(0.57211703, 0, -0.820172, 0, 1, 0, 0.820172, 0, 0.57211703, -536.58, -54.3, -16.400002)
 metadata/walk_deck = true
+metadata/walk_run_id = "Deck_Crossing Ring"
 
-[node name="@CollisionShape3D@3029" type="CollisionShape3D" parent="Deck_Crossing Ring_32" unique_id=1485573687]
+[node name="@CollisionShape3D@3029" type="CollisionShape3D" parent="Deck_Crossing Ring_32" unique_id=307546194]
 shape = SubResource("BoxShape3D_yemva")
 
-[node name="@MeshInstance3D@3030" type="MeshInstance3D" parent="Deck_Crossing Ring_32" unique_id=2011376078]
+[node name="@MeshInstance3D@3030" type="MeshInstance3D" parent="Deck_Crossing Ring_32" unique_id=1296034824]
 material_override = SubResource("StandardMaterial3D_4d1ni")
 mesh = SubResource("BoxMesh_y0en8")
 
-[node name="Deck_Crossing Ring_33" type="StaticBody3D" parent="." unique_id=1888373686]
+[node name="Deck_Crossing Ring_33" type="StaticBody3D" parent="." unique_id=811858112]
 transform = Transform3D(0.4238695, 0, -0.9057233, 0, 1, 0, 0.9057233, 0, 0.4238695, -534.09, -54.3, -12.085)
 metadata/walk_deck = true
+metadata/walk_run_id = "Deck_Crossing Ring"
 
-[node name="@CollisionShape3D@3031" type="CollisionShape3D" parent="Deck_Crossing Ring_33" unique_id=873688995]
+[node name="@CollisionShape3D@3031" type="CollisionShape3D" parent="Deck_Crossing Ring_33" unique_id=732828638]
 shape = SubResource("BoxShape3D_fx162")
 
-[node name="@MeshInstance3D@3032" type="MeshInstance3D" parent="Deck_Crossing Ring_33" unique_id=1418240192]
+[node name="@MeshInstance3D@3032" type="MeshInstance3D" parent="Deck_Crossing Ring_33" unique_id=213925390]
 material_override = SubResource("StandardMaterial3D_1acos")
 mesh = SubResource("BoxMesh_odb1q")
 
-[node name="Deck_Crossing Ring_34" type="StaticBody3D" parent="." unique_id=1452467566]
+[node name="Deck_Crossing Ring_34" type="StaticBody3D" parent="." unique_id=1957794873]
 transform = Transform3D(0.25754565, 0, -0.96626616, 0, 1, 0, 0.96626616, 0, 0.25754565, -532.385, -54.3, -7.3999996)
 metadata/walk_deck = true
+metadata/walk_run_id = "Deck_Crossing Ring"
 
-[node name="@CollisionShape3D@3033" type="CollisionShape3D" parent="Deck_Crossing Ring_34" unique_id=907378196]
+[node name="@CollisionShape3D@3033" type="CollisionShape3D" parent="Deck_Crossing Ring_34" unique_id=1136403427]
 shape = SubResource("BoxShape3D_gq6r3")
 
-[node name="@MeshInstance3D@3034" type="MeshInstance3D" parent="Deck_Crossing Ring_34" unique_id=1714885392]
+[node name="@MeshInstance3D@3034" type="MeshInstance3D" parent="Deck_Crossing Ring_34" unique_id=1149513666]
 material_override = SubResource("StandardMaterial3D_16ee2")
 mesh = SubResource("BoxMesh_8dxd1")
 
-[node name="Deck_Crossing Ring_35" type="StaticBody3D" parent="." unique_id=1604570312]
+[node name="Deck_Crossing Ring_35" type="StaticBody3D" parent="." unique_id=1400696790]
 transform = Transform3D(0.08801105, 0, -0.9961195, 0, 1, 0, 0.9961195, 0, 0.08801105, -531.52, -54.3, -2.49)
 metadata/walk_deck = true
+metadata/walk_run_id = "Deck_Crossing Ring"
 
-[node name="@CollisionShape3D@3035" type="CollisionShape3D" parent="Deck_Crossing Ring_35" unique_id=723117029]
+[node name="@CollisionShape3D@3035" type="CollisionShape3D" parent="Deck_Crossing Ring_35" unique_id=1326952437]
 shape = SubResource("BoxShape3D_bxeyb")
 
-[node name="@MeshInstance3D@3036" type="MeshInstance3D" parent="Deck_Crossing Ring_35" unique_id=1087818023]
+[node name="@MeshInstance3D@3036" type="MeshInstance3D" parent="Deck_Crossing Ring_35" unique_id=1913778667]
 material_override = SubResource("StandardMaterial3D_fugaf")
 mesh = SubResource("BoxMesh_s57hy")
 
-[node name="DeckParapet_005_rail" type="StaticBody3D" parent="." unique_id=1058185437]
+[node name="DeckParapet_005_rail" type="StaticBody3D" parent="." unique_id=904905210]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -489.1, -52.95, -31.25)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3059" type="CollisionShape3D" parent="DeckParapet_005_rail" unique_id=483325030]
+[node name="@CollisionShape3D@3059" type="CollisionShape3D" parent="DeckParapet_005_rail" unique_id=1919575561]
 shape = SubResource("BoxShape3D_osjwt")
 
-[node name="@MeshInstance3D@3060" type="MeshInstance3D" parent="DeckParapet_005_rail" unique_id=1867031379]
+[node name="@MeshInstance3D@3060" type="MeshInstance3D" parent="DeckParapet_005_rail" unique_id=705163153]
 material_override = SubResource("StandardMaterial3D_r82sh")
 mesh = SubResource("BoxMesh_dd733")
 
-[node name="DeckParapet_006_rail" type="StaticBody3D" parent="." unique_id=1038030121]
+[node name="DeckParapet_006_rail" type="StaticBody3D" parent="." unique_id=1165403344]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -489.1, -52.95, 0)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3061" type="CollisionShape3D" parent="DeckParapet_006_rail" unique_id=28520031]
+[node name="@CollisionShape3D@3061" type="CollisionShape3D" parent="DeckParapet_006_rail" unique_id=248079882]
 shape = SubResource("BoxShape3D_v403w")
 
-[node name="@MeshInstance3D@3062" type="MeshInstance3D" parent="DeckParapet_006_rail" unique_id=1380323522]
+[node name="@MeshInstance3D@3062" type="MeshInstance3D" parent="DeckParapet_006_rail" unique_id=1592150652]
 material_override = SubResource("StandardMaterial3D_xcywr")
 mesh = SubResource("BoxMesh_un718")
 
-[node name="DeckParapet_008_rail" type="StaticBody3D" parent="." unique_id=118793617]
+[node name="DeckParapet_008_rail" type="StaticBody3D" parent="." unique_id=1016057115]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -494.9, -52.95, -30.75)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3065" type="CollisionShape3D" parent="DeckParapet_008_rail" unique_id=1617670579]
+[node name="@CollisionShape3D@3065" type="CollisionShape3D" parent="DeckParapet_008_rail" unique_id=477861773]
 shape = SubResource("BoxShape3D_d7u8p")
 
-[node name="@MeshInstance3D@3066" type="MeshInstance3D" parent="DeckParapet_008_rail" unique_id=914469438]
+[node name="@MeshInstance3D@3066" type="MeshInstance3D" parent="DeckParapet_008_rail" unique_id=516176215]
 material_override = SubResource("StandardMaterial3D_kg164")
 mesh = SubResource("BoxMesh_53rsn")
 
-[node name="DeckParapet_019_glass" type="StaticBody3D" parent="." unique_id=59034853]
+[node name="DeckParapet_019_glass" type="StaticBody3D" parent="." unique_id=1173924606]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -486, -52.1, -46.1)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3087" type="CollisionShape3D" parent="DeckParapet_019_glass" unique_id=1238237266]
+[node name="@CollisionShape3D@3087" type="CollisionShape3D" parent="DeckParapet_019_glass" unique_id=942621494]
 shape = SubResource("BoxShape3D_iikv1")
 
-[node name="@MeshInstance3D@3088" type="MeshInstance3D" parent="DeckParapet_019_glass" unique_id=663851561]
+[node name="@MeshInstance3D@3088" type="MeshInstance3D" parent="DeckParapet_019_glass" unique_id=2024534444]
 material_override = SubResource("StandardMaterial3D_tre2s")
 mesh = SubResource("BoxMesh_hvb33")
 
-[node name="DeckParapet_033_rail" type="StaticBody3D" parent="." unique_id=1441286253]
+[node name="DeckParapet_033_rail" type="StaticBody3D" parent="." unique_id=244006734]
 transform = Transform3D(-0.0884569, 0, -0.99608, 0, 1, 0, 0.99608, 0, -0.0884569, -527.635, -52.95, 2.835)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3115" type="CollisionShape3D" parent="DeckParapet_033_rail" unique_id=1165565258]
+[node name="@CollisionShape3D@3115" type="CollisionShape3D" parent="DeckParapet_033_rail" unique_id=1008675129]
 shape = SubResource("BoxShape3D_ap3bm")
 
-[node name="@MeshInstance3D@3116" type="MeshInstance3D" parent="DeckParapet_033_rail" unique_id=177857466]
+[node name="@MeshInstance3D@3116" type="MeshInstance3D" parent="DeckParapet_033_rail" unique_id=1459010226]
 material_override = SubResource("StandardMaterial3D_8u0pf")
 mesh = SubResource("BoxMesh_y7bj7")
 
-[node name="DeckParapet_034_rail" type="StaticBody3D" parent="." unique_id=1318996092]
+[node name="DeckParapet_034_rail" type="StaticBody3D" parent="." unique_id=1153543711]
 transform = Transform3D(-0.08801101, 0, -0.9961195, 0, 1, 0, 0.9961195, 0, -0.08801101, -535.4, -52.95, 2.1499999)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3117" type="CollisionShape3D" parent="DeckParapet_034_rail" unique_id=476407616]
+[node name="@CollisionShape3D@3117" type="CollisionShape3D" parent="DeckParapet_034_rail" unique_id=2018256464]
 shape = SubResource("BoxShape3D_308p4")
 
-[node name="@MeshInstance3D@3118" type="MeshInstance3D" parent="DeckParapet_034_rail" unique_id=494641474]
+[node name="@MeshInstance3D@3118" type="MeshInstance3D" parent="DeckParapet_034_rail" unique_id=1730309648]
 material_override = SubResource("StandardMaterial3D_a6jb4")
 mesh = SubResource("BoxMesh_0jyv3")
 
-[node name="DeckParapet_035_rail" type="StaticBody3D" parent="." unique_id=1017047599]
+[node name="DeckParapet_035_rail" type="StaticBody3D" parent="." unique_id=439885231]
 transform = Transform3D(-0.2575174, 0, -0.96627367, 0, 1, 0, 0.96627367, 0, -0.2575174, -528.615, -52.95, 8.405)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3119" type="CollisionShape3D" parent="DeckParapet_035_rail" unique_id=767618322]
+[node name="@CollisionShape3D@3119" type="CollisionShape3D" parent="DeckParapet_035_rail" unique_id=254760031]
 shape = SubResource("BoxShape3D_wkf4f")
 
-[node name="@MeshInstance3D@3120" type="MeshInstance3D" parent="DeckParapet_035_rail" unique_id=221395753]
+[node name="@MeshInstance3D@3120" type="MeshInstance3D" parent="DeckParapet_035_rail" unique_id=1313106874]
 material_override = SubResource("StandardMaterial3D_jjv30")
 mesh = SubResource("BoxMesh_woklk")
 
-[node name="DeckParapet_036_rail" type="StaticBody3D" parent="." unique_id=487622303]
+[node name="DeckParapet_036_rail" type="StaticBody3D" parent="." unique_id=1580932111]
 transform = Transform3D(-0.25803202, 0, -0.96613634, 0, 1, 0, 0.96613634, 0, -0.25803202, -536.155, -52.95, 6.3950005)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3121" type="CollisionShape3D" parent="DeckParapet_036_rail" unique_id=685349242]
+[node name="@CollisionShape3D@3121" type="CollisionShape3D" parent="DeckParapet_036_rail" unique_id=72257978]
 shape = SubResource("BoxShape3D_77750")
 
-[node name="@MeshInstance3D@3122" type="MeshInstance3D" parent="DeckParapet_036_rail" unique_id=2031167158]
+[node name="@MeshInstance3D@3122" type="MeshInstance3D" parent="DeckParapet_036_rail" unique_id=2133180282]
 material_override = SubResource("StandardMaterial3D_jhkgl")
 mesh = SubResource("BoxMesh_wu1w4")
 
-[node name="DeckParapet_037_rail" type="StaticBody3D" parent="." unique_id=1293679094]
+[node name="DeckParapet_037_rail" type="StaticBody3D" parent="." unique_id=434042989]
 transform = Transform3D(-0.4236857, 0, -0.9058093, 0, 1, 0, 0.9058093, 0, -0.4236857, -530.555, -52.95, 13.74)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3123" type="CollisionShape3D" parent="DeckParapet_037_rail" unique_id=934147135]
+[node name="@CollisionShape3D@3123" type="CollisionShape3D" parent="DeckParapet_037_rail" unique_id=1402663831]
 shape = SubResource("BoxShape3D_8drwd")
 
-[node name="@MeshInstance3D@3124" type="MeshInstance3D" parent="DeckParapet_037_rail" unique_id=1142096686]
+[node name="@MeshInstance3D@3124" type="MeshInstance3D" parent="DeckParapet_037_rail" unique_id=1518387247]
 material_override = SubResource("StandardMaterial3D_h0gd0")
 mesh = SubResource("BoxMesh_b46p2")
 
-[node name="DeckParapet_038_rail" type="StaticBody3D" parent="." unique_id=1709684893]
+[node name="DeckParapet_038_rail" type="StaticBody3D" parent="." unique_id=1100435971]
 transform = Transform3D(-0.42378396, 0, -0.9057633, 0, 1, 0, 0.9057633, 0, -0.42378396, -537.725, -52.95, 10.66)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3125" type="CollisionShape3D" parent="DeckParapet_038_rail" unique_id=1323903624]
+[node name="@CollisionShape3D@3125" type="CollisionShape3D" parent="DeckParapet_038_rail" unique_id=648506840]
 shape = SubResource("BoxShape3D_d1mc4")
 
-[node name="@MeshInstance3D@3126" type="MeshInstance3D" parent="DeckParapet_038_rail" unique_id=1695004483]
+[node name="@MeshInstance3D@3126" type="MeshInstance3D" parent="DeckParapet_038_rail" unique_id=1323102040]
 material_override = SubResource("StandardMaterial3D_s2ycw")
 mesh = SubResource("BoxMesh_q2kh7")
 
-[node name="DeckParapet_040_rail" type="StaticBody3D" parent="." unique_id=1207006324]
+[node name="DeckParapet_040_rail" type="StaticBody3D" parent="." unique_id=1190580752]
 transform = Transform3D(-0.57302225, 0, -0.8195398, 0, 1, 0, 0.8195398, 0, -0.57302225, -538.92004, -52.95, 12.940001)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3129" type="CollisionShape3D" parent="DeckParapet_040_rail" unique_id=1121592767]
+[node name="@CollisionShape3D@3129" type="CollisionShape3D" parent="DeckParapet_040_rail" unique_id=799857177]
 shape = SubResource("BoxShape3D_ldmf5")
 
-[node name="@MeshInstance3D@3130" type="MeshInstance3D" parent="DeckParapet_040_rail" unique_id=1576039940]
+[node name="@MeshInstance3D@3130" type="MeshInstance3D" parent="DeckParapet_040_rail" unique_id=434182053]
 material_override = SubResource("StandardMaterial3D_piiu5")
 mesh = SubResource("BoxMesh_y4u86")
 
-[node name="DeckParapet_094_rail" type="StaticBody3D" parent="." unique_id=1220068660]
+[node name="DeckParapet_094_rail" type="StaticBody3D" parent="." unique_id=944322738]
 transform = Transform3D(0.82002705, 0, -0.57232475, 0, 1, 0, 0.57232475, 0, 0.82002705, -541.37, -52.95, -26.619999)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3237" type="CollisionShape3D" parent="DeckParapet_094_rail" unique_id=1646487622]
+[node name="@CollisionShape3D@3237" type="CollisionShape3D" parent="DeckParapet_094_rail" unique_id=436091031]
 shape = SubResource("BoxShape3D_jkgye")
 
-[node name="@MeshInstance3D@3238" type="MeshInstance3D" parent="DeckParapet_094_rail" unique_id=545747826]
+[node name="@MeshInstance3D@3238" type="MeshInstance3D" parent="DeckParapet_094_rail" unique_id=2047731233]
 material_override = SubResource("StandardMaterial3D_w31vo")
 mesh = SubResource("BoxMesh_fy7g0")
 
-[node name="DeckParapet_096_rail" type="StaticBody3D" parent="." unique_id=295151454]
+[node name="DeckParapet_096_rail" type="StaticBody3D" parent="." unique_id=503589133]
 transform = Transform3D(0.70710725, 0, -0.70710635, 0, 1, 0, 0.70710635, 0, 0.70710725, -537.02, -52.95, -22.98)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3241" type="CollisionShape3D" parent="DeckParapet_096_rail" unique_id=2010814505]
+[node name="@CollisionShape3D@3241" type="CollisionShape3D" parent="DeckParapet_096_rail" unique_id=1879269707]
 shape = SubResource("BoxShape3D_ppa8m")
 
-[node name="@MeshInstance3D@3242" type="MeshInstance3D" parent="DeckParapet_096_rail" unique_id=1048202394]
+[node name="@MeshInstance3D@3242" type="MeshInstance3D" parent="DeckParapet_096_rail" unique_id=1616016083]
 material_override = SubResource("StandardMaterial3D_0avt7")
 mesh = SubResource("BoxMesh_ybsqv")
 
-[node name="DeckParapet_097_rail" type="StaticBody3D" parent="." unique_id=1791290246]
+[node name="DeckParapet_097_rail" type="StaticBody3D" parent="." unique_id=1825081452]
 transform = Transform3D(0.5723261, 0, -0.8200261, 0, 1, 0, 0.8200261, 0, 0.5723261, -533.38, -52.95, -18.63)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3243" type="CollisionShape3D" parent="DeckParapet_097_rail" unique_id=2080527696]
+[node name="@CollisionShape3D@3243" type="CollisionShape3D" parent="DeckParapet_097_rail" unique_id=2138504298]
 shape = SubResource("BoxShape3D_m16kw")
 
-[node name="@MeshInstance3D@3244" type="MeshInstance3D" parent="DeckParapet_097_rail" unique_id=227165583]
+[node name="@MeshInstance3D@3244" type="MeshInstance3D" parent="DeckParapet_097_rail" unique_id=226298830]
 material_override = SubResource("StandardMaterial3D_2puc3")
 mesh = SubResource("BoxMesh_kgx6n")
 
-[node name="DeckParapet_098_rail" type="StaticBody3D" parent="." unique_id=1324866800]
+[node name="DeckParapet_098_rail" type="StaticBody3D" parent="." unique_id=1110464176]
 transform = Transform3D(0.5730222, 0, -0.81953984, 0, 1, 0, 0.81953984, 0, 0.5730222, -538.92004, -52.95, -12.940001)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3245" type="CollisionShape3D" parent="DeckParapet_098_rail" unique_id=2115220351]
+[node name="@CollisionShape3D@3245" type="CollisionShape3D" parent="DeckParapet_098_rail" unique_id=1885378711]
 shape = SubResource("BoxShape3D_wh4ni")
 
-[node name="@MeshInstance3D@3246" type="MeshInstance3D" parent="DeckParapet_098_rail" unique_id=1012144089]
+[node name="@MeshInstance3D@3246" type="MeshInstance3D" parent="DeckParapet_098_rail" unique_id=1141362718]
 material_override = SubResource("StandardMaterial3D_gdbop")
 mesh = SubResource("BoxMesh_7qgyi")
 
-[node name="DeckParapet_099_rail" type="StaticBody3D" parent="." unique_id=351503547]
+[node name="DeckParapet_099_rail" type="StaticBody3D" parent="." unique_id=891336238]
 transform = Transform3D(0.42368573, 0, -0.9058093, 0, 1, 0, 0.9058093, 0, 0.42368573, -530.555, -52.95, -13.74)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3247" type="CollisionShape3D" parent="DeckParapet_099_rail" unique_id=1275871748]
+[node name="@CollisionShape3D@3247" type="CollisionShape3D" parent="DeckParapet_099_rail" unique_id=168244677]
 shape = SubResource("BoxShape3D_f1uhn")
 
-[node name="@MeshInstance3D@3248" type="MeshInstance3D" parent="DeckParapet_099_rail" unique_id=310603310]
+[node name="@MeshInstance3D@3248" type="MeshInstance3D" parent="DeckParapet_099_rail" unique_id=2054272118]
 material_override = SubResource("StandardMaterial3D_loy47")
 mesh = SubResource("BoxMesh_6eco1")
 
-[node name="DeckParapet_100_rail" type="StaticBody3D" parent="." unique_id=1954918669]
+[node name="DeckParapet_100_rail" type="StaticBody3D" parent="." unique_id=1305627609]
 transform = Transform3D(0.423784, 0, -0.90576327, 0, 1, 0, 0.90576327, 0, 0.423784, -537.725, -52.95, -10.66)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3249" type="CollisionShape3D" parent="DeckParapet_100_rail" unique_id=596219586]
+[node name="@CollisionShape3D@3249" type="CollisionShape3D" parent="DeckParapet_100_rail" unique_id=664141054]
 shape = SubResource("BoxShape3D_yea1f")
 
-[node name="@MeshInstance3D@3250" type="MeshInstance3D" parent="DeckParapet_100_rail" unique_id=692819997]
+[node name="@MeshInstance3D@3250" type="MeshInstance3D" parent="DeckParapet_100_rail" unique_id=2139380627]
 material_override = SubResource("StandardMaterial3D_tu0ic")
 mesh = SubResource("BoxMesh_53xx0")
 
-[node name="DeckParapet_101_rail" type="StaticBody3D" parent="." unique_id=848098941]
+[node name="DeckParapet_101_rail" type="StaticBody3D" parent="." unique_id=342677074]
 transform = Transform3D(0.2575173, 0, -0.96627367, 0, 1, 0, 0.96627367, 0, 0.2575173, -528.615, -52.95, -8.405)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3251" type="CollisionShape3D" parent="DeckParapet_101_rail" unique_id=572808716]
+[node name="@CollisionShape3D@3251" type="CollisionShape3D" parent="DeckParapet_101_rail" unique_id=843245405]
 shape = SubResource("BoxShape3D_nus3m")
 
-[node name="@MeshInstance3D@3252" type="MeshInstance3D" parent="DeckParapet_101_rail" unique_id=110304030]
+[node name="@MeshInstance3D@3252" type="MeshInstance3D" parent="DeckParapet_101_rail" unique_id=718812034]
 material_override = SubResource("StandardMaterial3D_i0mjt")
 mesh = SubResource("BoxMesh_3t5py")
 
-[node name="DeckParapet_102_rail" type="StaticBody3D" parent="." unique_id=1867535503]
+[node name="DeckParapet_102_rail" type="StaticBody3D" parent="." unique_id=368574477]
 transform = Transform3D(0.25788578, 0, -0.96617544, 0, 1, 0, 0.96617544, 0, 0.25788578, -536.08997, -52.95, -6.16)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3253" type="CollisionShape3D" parent="DeckParapet_102_rail" unique_id=1456801719]
+[node name="@CollisionShape3D@3253" type="CollisionShape3D" parent="DeckParapet_102_rail" unique_id=971218008]
 shape = SubResource("BoxShape3D_ct7xd")
 
-[node name="@MeshInstance3D@3254" type="MeshInstance3D" parent="DeckParapet_102_rail" unique_id=1539294707]
+[node name="@MeshInstance3D@3254" type="MeshInstance3D" parent="DeckParapet_102_rail" unique_id=839461290]
 material_override = SubResource("StandardMaterial3D_to862")
 mesh = SubResource("BoxMesh_tab7d")
 
-[node name="DeckParapet_103_rail" type="StaticBody3D" parent="." unique_id=575950316]
+[node name="DeckParapet_103_rail" type="StaticBody3D" parent="." unique_id=82528305]
 transform = Transform3D(0.08845681, 0, -0.99608004, 0, 1, 0, 0.99608004, 0, 0.08845681, -527.635, -52.95, -2.835)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3255" type="CollisionShape3D" parent="DeckParapet_103_rail" unique_id=954498321]
+[node name="@CollisionShape3D@3255" type="CollisionShape3D" parent="DeckParapet_103_rail" unique_id=2128111933]
 shape = SubResource("BoxShape3D_vdyuu")
 
-[node name="@MeshInstance3D@3256" type="MeshInstance3D" parent="DeckParapet_103_rail" unique_id=1588490847]
+[node name="@MeshInstance3D@3256" type="MeshInstance3D" parent="DeckParapet_103_rail" unique_id=1630994014]
 material_override = SubResource("StandardMaterial3D_30e2l")
 mesh = SubResource("BoxMesh_uhmg1")
 
-[node name="DeckParapet_104_rail" type="StaticBody3D" parent="." unique_id=126962506]
+[node name="DeckParapet_104_rail" type="StaticBody3D" parent="." unique_id=1565588777]
 transform = Transform3D(0.08801105, 0, -0.9961195, 0, 1, 0, 0.9961195, 0, 0.08801105, -535.4, -52.95, -2.1499999)
-metadata/walk_deck = true
 
-[node name="@CollisionShape3D@3257" type="CollisionShape3D" parent="DeckParapet_104_rail" unique_id=2063744960]
+[node name="@CollisionShape3D@3257" type="CollisionShape3D" parent="DeckParapet_104_rail" unique_id=686772367]
 shape = SubResource("BoxShape3D_8mss6")
 
-[node name="@MeshInstance3D@3258" type="MeshInstance3D" parent="DeckParapet_104_rail" unique_id=324901332]
+[node name="@MeshInstance3D@3258" type="MeshInstance3D" parent="DeckParapet_104_rail" unique_id=1332928583]
 material_override = SubResource("StandardMaterial3D_6yn42")
 mesh = SubResource("BoxMesh_j37xi")

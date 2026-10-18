@@ -390,237 +390,257 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_43usf"]
 size = Vector3(0.22, 0.9, 0.22)
 
-[node name="MoyCell_03_02_Part_02" type="Node3D" unique_id=1170562724]
+[node name="MoyCell_03_02_Part_02" type="Node3D" unique_id=665159340]
 
-[node name="DeckGardenBed_36" type="Node3D" parent="." unique_id=38223618]
+[node name="DeckGardenBed_36" type="Node3D" parent="." unique_id=1022454836]
 metadata/plan_width = 2.4
-metadata/walk_deck = true
 
-[node name="DeckGardenBed_36_Segment_000" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=701770453]
+[node name="DeckGardenBed_36_Segment_000" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=1159287347]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -88)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4135" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_000" unique_id=1069043130]
+[node name="@CollisionShape3D@4135" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_000" unique_id=284932573]
 shape = SubResource("BoxShape3D_o1ek1")
 
-[node name="@MeshInstance3D@4136" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_000" unique_id=289235850]
+[node name="@MeshInstance3D@4136" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_000" unique_id=1443325687]
 material_override = SubResource("StandardMaterial3D_3w76o")
 mesh = SubResource("BoxMesh_yafe3")
 
-[node name="DeckGardenBed_36_Segment_001" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=474104626]
+[node name="DeckGardenBed_36_Segment_001" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=2055864840]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -89)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4137" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_001" unique_id=233611868]
+[node name="@CollisionShape3D@4137" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_001" unique_id=1808722678]
 shape = SubResource("BoxShape3D_j2f62")
 
-[node name="@MeshInstance3D@4138" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_001" unique_id=1860242702]
+[node name="@MeshInstance3D@4138" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_001" unique_id=2068566561]
 material_override = SubResource("StandardMaterial3D_tr181")
 mesh = SubResource("BoxMesh_pwhdj")
 
-[node name="DeckGardenBed_36_Segment_002" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=708725190]
+[node name="DeckGardenBed_36_Segment_002" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=1075172580]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -90)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4139" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_002" unique_id=1605435522]
+[node name="@CollisionShape3D@4139" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_002" unique_id=1012023589]
 shape = SubResource("BoxShape3D_ouedt")
 
-[node name="@MeshInstance3D@4140" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_002" unique_id=905370236]
+[node name="@MeshInstance3D@4140" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_002" unique_id=821144657]
 material_override = SubResource("StandardMaterial3D_l081p")
 mesh = SubResource("BoxMesh_cywk8")
 
-[node name="DeckGardenBed_36_Segment_003" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=1637342479]
+[node name="DeckGardenBed_36_Segment_003" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=718423239]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -91)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4141" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_003" unique_id=1749503026]
+[node name="@CollisionShape3D@4141" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_003" unique_id=418214931]
 shape = SubResource("BoxShape3D_fv5ii")
 
-[node name="@MeshInstance3D@4142" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_003" unique_id=362166858]
+[node name="@MeshInstance3D@4142" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_003" unique_id=270221447]
 material_override = SubResource("StandardMaterial3D_mcie0")
 mesh = SubResource("BoxMesh_0rpvp")
 
-[node name="DeckGardenBed_36_Segment_004" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=286199845]
+[node name="DeckGardenBed_36_Segment_004" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=1568011605]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -92)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4143" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_004" unique_id=733169445]
+[node name="@CollisionShape3D@4143" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_004" unique_id=1215289385]
 shape = SubResource("BoxShape3D_utdkw")
 
-[node name="@MeshInstance3D@4144" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_004" unique_id=1413481782]
+[node name="@MeshInstance3D@4144" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_004" unique_id=482402494]
 material_override = SubResource("StandardMaterial3D_6w3yp")
 mesh = SubResource("BoxMesh_so07j")
 
-[node name="DeckGardenBed_36_Segment_005" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=1217257900]
+[node name="DeckGardenBed_36_Segment_005" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=423484702]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -93)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4145" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_005" unique_id=1505666627]
+[node name="@CollisionShape3D@4145" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_005" unique_id=788298801]
 shape = SubResource("BoxShape3D_x8ja0")
 
-[node name="@MeshInstance3D@4146" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_005" unique_id=314719122]
+[node name="@MeshInstance3D@4146" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_005" unique_id=1812207430]
 material_override = SubResource("StandardMaterial3D_xytug")
 mesh = SubResource("BoxMesh_p6frr")
 
-[node name="DeckGardenBed_36_Segment_006" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=907222648]
+[node name="DeckGardenBed_36_Segment_006" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=2118325675]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -94)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4147" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_006" unique_id=1007917798]
+[node name="@CollisionShape3D@4147" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_006" unique_id=325616298]
 shape = SubResource("BoxShape3D_7ognj")
 
-[node name="@MeshInstance3D@4148" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_006" unique_id=443441161]
+[node name="@MeshInstance3D@4148" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_006" unique_id=2006761424]
 material_override = SubResource("StandardMaterial3D_2lr0o")
 mesh = SubResource("BoxMesh_r81cc")
 
-[node name="DeckGardenBed_36_Segment_007" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=1543149801]
+[node name="DeckGardenBed_36_Segment_007" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=437797315]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -95)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4149" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_007" unique_id=15061428]
+[node name="@CollisionShape3D@4149" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_007" unique_id=784736382]
 shape = SubResource("BoxShape3D_wiuiu")
 
-[node name="@MeshInstance3D@4150" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_007" unique_id=600527460]
+[node name="@MeshInstance3D@4150" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_007" unique_id=241443326]
 material_override = SubResource("StandardMaterial3D_qwtdj")
 mesh = SubResource("BoxMesh_x6bfe")
 
-[node name="DeckGardenBed_36_Segment_008" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=1281302859]
+[node name="DeckGardenBed_36_Segment_008" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=44010730]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -96)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4151" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_008" unique_id=1200327568]
+[node name="@CollisionShape3D@4151" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_008" unique_id=1587278097]
 shape = SubResource("BoxShape3D_qok84")
 
-[node name="@MeshInstance3D@4152" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_008" unique_id=1683363579]
+[node name="@MeshInstance3D@4152" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_008" unique_id=1414853130]
 material_override = SubResource("StandardMaterial3D_m71qe")
 mesh = SubResource("BoxMesh_lsnja")
 
-[node name="DeckGardenBed_36_Segment_009" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=924932713]
+[node name="DeckGardenBed_36_Segment_009" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=556318688]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -97)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4153" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_009" unique_id=79566341]
+[node name="@CollisionShape3D@4153" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_009" unique_id=1447049131]
 shape = SubResource("BoxShape3D_w373m")
 
-[node name="@MeshInstance3D@4154" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_009" unique_id=2094947555]
+[node name="@MeshInstance3D@4154" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_009" unique_id=699920208]
 material_override = SubResource("StandardMaterial3D_5tylg")
 mesh = SubResource("BoxMesh_jk456")
 
-[node name="DeckGardenBed_36_Segment_010" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=610236702]
+[node name="DeckGardenBed_36_Segment_010" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=1977917991]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -98)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4155" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_010" unique_id=28412687]
+[node name="@CollisionShape3D@4155" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_010" unique_id=1866604143]
 shape = SubResource("BoxShape3D_fq7kj")
 
-[node name="@MeshInstance3D@4156" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_010" unique_id=850060058]
+[node name="@MeshInstance3D@4156" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_010" unique_id=1769217158]
 material_override = SubResource("StandardMaterial3D_lqlpi")
 mesh = SubResource("BoxMesh_juyr5")
 
-[node name="DeckGardenBed_36_Segment_011" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=1457176850]
+[node name="DeckGardenBed_36_Segment_011" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=1020309744]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -99)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4157" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_011" unique_id=1577566340]
+[node name="@CollisionShape3D@4157" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_011" unique_id=611158077]
 shape = SubResource("BoxShape3D_3f6an")
 
-[node name="@MeshInstance3D@4158" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_011" unique_id=731368706]
+[node name="@MeshInstance3D@4158" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_011" unique_id=41160709]
 material_override = SubResource("StandardMaterial3D_3l01w")
 mesh = SubResource("BoxMesh_wwu2p")
 
-[node name="DeckGardenBed_36_Segment_012" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=844129358]
+[node name="DeckGardenBed_36_Segment_012" type="StaticBody3D" parent="DeckGardenBed_36" unique_id=645891541]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -558.35, -53.275, -100)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4159" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_012" unique_id=1508149031]
+[node name="@CollisionShape3D@4159" type="CollisionShape3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_012" unique_id=687052323]
 shape = SubResource("BoxShape3D_6t51v")
 
-[node name="@MeshInstance3D@4160" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_012" unique_id=1133730591]
+[node name="@MeshInstance3D@4160" type="MeshInstance3D" parent="DeckGardenBed_36/DeckGardenBed_36_Segment_012" unique_id=1304698458]
 material_override = SubResource("StandardMaterial3D_lxjip")
 mesh = SubResource("BoxMesh_jlj10")
 
-[node name="DeckGardenBed_37" type="Node3D" parent="." unique_id=1723646307]
+[node name="DeckGardenBed_37" type="Node3D" parent="." unique_id=1691491633]
 metadata/plan_width = 1.2
-metadata/walk_deck = true
 
-[node name="DeckGardenBed_37_Segment_000" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=2049469263]
+[node name="DeckGardenBed_37_Segment_000" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=546879551]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -562.25, -53.275, -104)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4161" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_000" unique_id=1726921045]
+[node name="@CollisionShape3D@4161" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_000" unique_id=2079119173]
 shape = SubResource("BoxShape3D_l3b0s")
 
-[node name="@MeshInstance3D@4162" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_000" unique_id=56404811]
+[node name="@MeshInstance3D@4162" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_000" unique_id=1272761855]
 material_override = SubResource("StandardMaterial3D_o4vvc")
 mesh = SubResource("BoxMesh_ihtwr")
 
-[node name="DeckGardenBed_37_Segment_001" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=917287179]
+[node name="DeckGardenBed_37_Segment_001" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=761750049]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -562.25, -53.275, -105)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4163" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_001" unique_id=209649247]
+[node name="@CollisionShape3D@4163" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_001" unique_id=168713499]
 shape = SubResource("BoxShape3D_u5a3q")
 
-[node name="@MeshInstance3D@4164" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_001" unique_id=1829542065]
+[node name="@MeshInstance3D@4164" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_001" unique_id=1910960063]
 material_override = SubResource("StandardMaterial3D_wal6t")
 mesh = SubResource("BoxMesh_7n1gj")
 
-[node name="DeckGardenBed_37_Segment_002" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=725137457]
+[node name="DeckGardenBed_37_Segment_002" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=1658297869]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -562.25, -53.275, -106)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4165" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_002" unique_id=1880530232]
+[node name="@CollisionShape3D@4165" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_002" unique_id=263420408]
 shape = SubResource("BoxShape3D_djq1l")
 
-[node name="@MeshInstance3D@4166" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_002" unique_id=1335070846]
+[node name="@MeshInstance3D@4166" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_002" unique_id=1482525931]
 material_override = SubResource("StandardMaterial3D_36avp")
 mesh = SubResource("BoxMesh_sogsx")
 
-[node name="DeckGardenBed_37_Segment_003" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=1584254637]
+[node name="DeckGardenBed_37_Segment_003" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=2130670972]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -562.25, -53.275, -107)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4167" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_003" unique_id=786442431]
+[node name="@CollisionShape3D@4167" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_003" unique_id=1436146806]
 shape = SubResource("BoxShape3D_kflrr")
 
-[node name="@MeshInstance3D@4168" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_003" unique_id=354566547]
+[node name="@MeshInstance3D@4168" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_003" unique_id=1163641657]
 material_override = SubResource("StandardMaterial3D_5bgpj")
 mesh = SubResource("BoxMesh_gfsha")
 
-[node name="DeckGardenBed_37_Segment_004" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=2083089966]
+[node name="DeckGardenBed_37_Segment_004" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=815985026]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -562.25, -53.275, -108)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4169" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_004" unique_id=107854993]
+[node name="@CollisionShape3D@4169" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_004" unique_id=697642511]
 shape = SubResource("BoxShape3D_mg36g")
 
-[node name="@MeshInstance3D@4170" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_004" unique_id=18917448]
+[node name="@MeshInstance3D@4170" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_004" unique_id=230767069]
 material_override = SubResource("StandardMaterial3D_uprxy")
 mesh = SubResource("BoxMesh_2hlrt")
 
-[node name="DeckGardenBed_37_Segment_005" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=177486584]
+[node name="DeckGardenBed_37_Segment_005" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=396503474]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -562.25, -53.275, -109)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4171" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_005" unique_id=1903066403]
+[node name="@CollisionShape3D@4171" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_005" unique_id=963934718]
 shape = SubResource("BoxShape3D_ku1ou")
 
-[node name="@MeshInstance3D@4172" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_005" unique_id=263959188]
+[node name="@MeshInstance3D@4172" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_005" unique_id=2087076186]
 material_override = SubResource("StandardMaterial3D_g32gt")
 mesh = SubResource("BoxMesh_foas4")
 
-[node name="DeckGardenBed_37_Segment_006" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=1222850019]
+[node name="DeckGardenBed_37_Segment_006" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=937727917]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -562.25, -53.275, -110)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4173" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_006" unique_id=1089617227]
+[node name="@CollisionShape3D@4173" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_006" unique_id=220953716]
 shape = SubResource("BoxShape3D_dhtt0")
 
-[node name="@MeshInstance3D@4174" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_006" unique_id=1880850137]
+[node name="@MeshInstance3D@4174" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_006" unique_id=1324927299]
 material_override = SubResource("StandardMaterial3D_d6yfk")
 mesh = SubResource("BoxMesh_rncu7")
 
-[node name="DeckGardenBed_37_Segment_007" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=1633825451]
+[node name="DeckGardenBed_37_Segment_007" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=1669165115]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -562.25, -53.275, -111)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4175" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_007" unique_id=344317876]
+[node name="@CollisionShape3D@4175" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_007" unique_id=1220561113]
 shape = SubResource("BoxShape3D_2yswg")
 
-[node name="@MeshInstance3D@4176" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_007" unique_id=126564448]
+[node name="@MeshInstance3D@4176" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_007" unique_id=260649082]
 material_override = SubResource("StandardMaterial3D_elyfu")
 mesh = SubResource("BoxMesh_g1tg4")
 
-[node name="DeckGardenBed_37_Segment_008" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=358314673]
+[node name="DeckGardenBed_37_Segment_008" type="StaticBody3D" parent="DeckGardenBed_37" unique_id=105137612]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -562.25, -53.275, -112)
+metadata/walk_run_id = "DeckGardenBed_Segment"
 
-[node name="@CollisionShape3D@4177" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_008" unique_id=1359356214]
+[node name="@CollisionShape3D@4177" type="CollisionShape3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_008" unique_id=75343831]
 shape = SubResource("BoxShape3D_53jkh")
 
-[node name="@MeshInstance3D@4178" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_008" unique_id=719833724]
+[node name="@MeshInstance3D@4178" type="MeshInstance3D" parent="DeckGardenBed_37/DeckGardenBed_37_Segment_008" unique_id=1987863146]
 material_override = SubResource("StandardMaterial3D_nf5m4")
 mesh = SubResource("BoxMesh_3rmgf")
 
-[node name="DeckTree_00" type="StaticBody3D" parent="." unique_id=1005044692]
+[node name="DeckTree_00" type="StaticBody3D" parent="." unique_id=986896154]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -593.5, -53.05, -54.85)
 collision_mask = 0
 metadata/canopy_blobs = [{
@@ -633,33 +653,32 @@ metadata/canopy_blobs = [{
 "local_pos": Vector3(-1.08, 4.56, -0.84),
 "semi_axes": Vector3(1.44, 1.2672, 1.44)
 }]
-metadata/walk_deck = true
 
-[node name="_MeshInstance3D_4317" type="MeshInstance3D" parent="DeckTree_00" unique_id=101300747]
+[node name="_MeshInstance3D_4317" type="MeshInstance3D" parent="DeckTree_00" unique_id=1552198277]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
 mesh = SubResource("ArrayMesh_sy4is")
 surface_material_override/0 = SubResource("StandardMaterial3D_pbv6h")
 
-[node name="_MeshInstance3D_4318" type="MeshInstance3D" parent="DeckTree_00" unique_id=228663676]
+[node name="_MeshInstance3D_4318" type="MeshInstance3D" parent="DeckTree_00" unique_id=1489421557]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.2, 0)
 mesh = SubResource("ArrayMesh_k1gxc")
 surface_material_override/0 = SubResource("StandardMaterial3D_1ofqx")
 
-[node name="_MeshInstance3D_4319" type="MeshInstance3D" parent="DeckTree_00" unique_id=473518904]
+[node name="_MeshInstance3D_4319" type="MeshInstance3D" parent="DeckTree_00" unique_id=192297966]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.32, 4.7999997, 0.24)
 mesh = SubResource("ArrayMesh_7p4sr")
 surface_material_override/0 = SubResource("StandardMaterial3D_hlh48")
 
-[node name="_MeshInstance3D_4320" type="MeshInstance3D" parent="DeckTree_00" unique_id=1991549523]
+[node name="_MeshInstance3D_4320" type="MeshInstance3D" parent="DeckTree_00" unique_id=669494966]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.08, 4.56, -0.84)
 mesh = SubResource("ArrayMesh_ne4bl")
 surface_material_override/0 = SubResource("StandardMaterial3D_n0cx1")
 
-[node name="_CollisionShape3D_4321" type="CollisionShape3D" parent="DeckTree_00" unique_id=475077880]
+[node name="_CollisionShape3D_4321" type="CollisionShape3D" parent="DeckTree_00" unique_id=1674199198]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
 shape = SubResource("CylinderShape3D_mpl7n")
 
-[node name="DeckEscalator_Estate Square_Up" type="StaticBody3D" parent="." unique_id=1389715987]
+[node name="DeckEscalator_Estate Square_Up" type="StaticBody3D" parent="." unique_id=40439751]
 transform = Transform3D(-0.86682314, 0.49861565, 0, 0.49861562, 0.8668232, 0, 0, 0, -1, -551.35, -56.75, -103.402)
 script = ExtResource("1_wv1t5")
 travel_direction = Vector3(-0.86682314, 0.49861562, 0)
@@ -667,303 +686,305 @@ travel_speed = 0.35
 belt_length = 13.036094
 belt_width = 1.1960000000000002
 belt_thickness = 0.9
+metadata/flight = true
 metadata/walk_deck = true
+metadata/walk_run_id = "Escalator:DeckEscalator_Estate Square"
 
-[node name="@CollisionShape3D@4438" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=238557598]
+[node name="@CollisionShape3D@4438" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=1949008795]
 shape = SubResource("BoxShape3D_rjujd")
 
-[node name="@MeshInstance3D@4439" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=726264993]
+[node name="@MeshInstance3D@4439" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=13690984]
 material_override = SubResource("StandardMaterial3D_pwh75")
 mesh = SubResource("BoxMesh_g4h4a")
 
-[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1384746565]
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1278325212]
 material_override = SubResource("StandardMaterial3D_pxien")
 mesh = SubResource("ArrayMesh_175nh")
 
-[node name="Moving_Tread_00" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1617644302]
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=972824073]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 0.0
 
-[node name="Moving_Tread_01" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1653848985]
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=44996345]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 0.6880862098080207
 
-[node name="Moving_Tread_02" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=2008242436]
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1429492531]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 1.3761724196160414
 
-[node name="Moving_Tread_03" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=525154366]
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=596817053]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 2.0642586294240624
 
-[node name="Moving_Tread_04" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1003343664]
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=276979464]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 2.752344839232083
 
-[node name="Moving_Tread_05" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1312718966]
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1561888154]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 3.4404310490401038
 
-[node name="Moving_Tread_06" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1586229712]
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=536300344]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 4.128517258848125
 
-[node name="Moving_Tread_07" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1714515962]
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=373543647]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 4.816603468656145
 
-[node name="Moving_Tread_08" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1786031597]
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=594110081]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 5.504689678464166
 
-[node name="Moving_Tread_09" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=85765586]
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=84085766]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 6.192775888272187
 
-[node name="Moving_Tread_10" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1388725518]
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=261738651]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 6.8808620980802075
 
-[node name="Moving_Tread_11" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1195657055]
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1047793122]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 7.568948307888228
 
-[node name="Moving_Tread_12" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1791788009]
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1248538041]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 8.25703451769625
 
-[node name="Moving_Tread_13" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1825724563]
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1057054690]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 8.94512072750427
 
-[node name="Moving_Tread_14" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1721731445]
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1652603916]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 9.63320693731229
 
-[node name="Moving_Tread_15" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=16016513]
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1935548770]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 10.321293147120311
 
-[node name="Moving_Tread_16" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=167263371]
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1002651233]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 11.009379356928331
 
-[node name="Moving_Tread_17" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=511603219]
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1088069925]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 11.697465566736351
 
-[node name="Moving_Tread_18" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=2138551635]
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1659539224]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 12.385551776544373
 
-[node name="Moving_Tread_19" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=548635006]
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=542577112]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 13.073637986352393
 
-[node name="Moving_Tread_20" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=184577432]
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1468109918]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 13.761724196160415
 
-[node name="Moving_Tread_21" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1493820651]
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=840706749]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 14.449810405968435
 
-[node name="Moving_Tread_22" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1328364489]
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1941475315]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 15.137896615776455
 
-[node name="Moving_Tread_23" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1333635133]
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1673422236]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 15.825982825584477
 
-[node name="Moving_Tread_24" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=735981016]
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=703607852]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 16.5140690353925
 
-[node name="Moving_Tread_25" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=2121808236]
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1776165162]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 17.20215524520052
 
-[node name="Moving_Tread_26" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=164984534]
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1865398328]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 17.89024145500854
 
-[node name="Moving_Tread_27" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1667276902]
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=287636057]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 18.57832766481656
 
-[node name="Moving_Tread_28" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1058579101]
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=2115318257]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 19.26641387462458
 
-[node name="Moving_Tread_29" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1413161295]
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=439587882]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 19.954500084432603
 
-[node name="Moving_Tread_30" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=96087737]
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1648857211]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 20.642586294240623
 
-[node name="Moving_Tread_31" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=2003314828]
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=2075474244]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 21.330672504048643
 
-[node name="Moving_Tread_32" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1546494775]
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1608905880]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 22.018758713856663
 
-[node name="Moving_Tread_33" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=551164984]
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=2071774483]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 22.706844923664683
 
-[node name="Moving_Tread_34" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1596952440]
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=755220556]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 23.394931133472703
 
-[node name="Moving_Tread_35" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1170787694]
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=47977179]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 24.083017343280726
 
-[node name="Moving_Tread_36" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=2014330636]
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=2018457182]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 24.771103553088746
 
-[node name="Moving_Tread_37" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1336793845]
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=751409200]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 25.45918976289677
 
-[node name="Moving_Tread_38" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=938243053]
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1832298633]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 26.147275972704787
 
-[node name="Moving_Tread_39" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1323498054]
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1374493835]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 26.835362182512807
 
-[node name="Moving_Tread_40" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=385492556]
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1763451836]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 27.52344839232083
 
-[node name="Moving_Tread_41" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=664563572]
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1022558635]
 material_override = SubResource("StandardMaterial3D_nfmvm")
 mesh = SubResource("BoxMesh_uummu")
 metadata/belt_distance = 28.211534602128854
 
-[node name="@CollisionShape3D@4440" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=243909372]
+[node name="@CollisionShape3D@4440" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=2026893430]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.543)
 shape = SubResource("BoxShape3D_yehmp")
 
-[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=937665546]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=49810797]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.543)
 material_override = SubResource("StandardMaterial3D_x2t35")
 mesh = SubResource("BoxMesh_rj13g")
 
-[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=582636891]
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1794545006]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2590234, 1.4, -0.543)
 material_override = SubResource("StandardMaterial3D_hivjm")
 mesh = SubResource("BoxMesh_jhnma")
 metadata/handrail_distance = 3.2590234
 
-[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1031057505]
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1199485512]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2590234, 1.4, -0.543)
 material_override = SubResource("StandardMaterial3D_hivjm")
 mesh = SubResource("BoxMesh_sy7js")
 metadata/handrail_distance = 9.77707028388977
 
-[node name="@CollisionShape3D@4442" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=422952648]
+[node name="@CollisionShape3D@4442" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=1634167662]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, -0.543)
 shape = SubResource("BoxShape3D_feajt")
 
-[node name="@MeshInstance3D@4443" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=985309979]
+[node name="@MeshInstance3D@4443" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=172062547]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, -0.543)
 material_override = SubResource("StandardMaterial3D_2lavh")
 mesh = SubResource("BoxMesh_xylda")
 
-[node name="@CollisionShape3D@4444" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=1934847909]
+[node name="@CollisionShape3D@4444" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=1251153573]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, -0.543)
 shape = SubResource("BoxShape3D_0pvx6")
 
-[node name="@MeshInstance3D@4445" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=480068434]
+[node name="@MeshInstance3D@4445" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1821512306]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, -0.543)
 material_override = SubResource("StandardMaterial3D_nkt0w")
 mesh = SubResource("BoxMesh_cipix")
 
-[node name="@CollisionShape3D@4446" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=1636179756]
+[node name="@CollisionShape3D@4446" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=1794388600]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
 shape = SubResource("BoxShape3D_3d84s")
 
-[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=884017227]
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1188973826]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.543)
 material_override = SubResource("StandardMaterial3D_x2t35")
 mesh = SubResource("BoxMesh_7m10v")
 
-[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1327851459]
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=40459865]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2590234, 1.4, 0.543)
 material_override = SubResource("StandardMaterial3D_ishis")
 mesh = SubResource("BoxMesh_xtnuw")
 metadata/handrail_distance = 3.2590234
 
-[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=824415636]
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1512825477]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2590234, 1.4, 0.543)
 material_override = SubResource("StandardMaterial3D_ishis")
 mesh = SubResource("BoxMesh_qgy0h")
 metadata/handrail_distance = 9.77707028388977
 
-[node name="@CollisionShape3D@4448" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=677310851]
+[node name="@CollisionShape3D@4448" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=600844409]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, 0.543)
 shape = SubResource("BoxShape3D_xityj")
 
-[node name="@MeshInstance3D@4449" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=1752242047]
+[node name="@MeshInstance3D@4449" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=29028946]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3680468, 0.925, 0.543)
 material_override = SubResource("StandardMaterial3D_3ky2v")
 mesh = SubResource("BoxMesh_odgmd")
 
-[node name="@CollisionShape3D@4450" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=1016433481]
+[node name="@CollisionShape3D@4450" type="CollisionShape3D" parent="DeckEscalator_Estate Square_Up" unique_id=815535525]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, 0.543)
 shape = SubResource("BoxShape3D_goxga")
 
-[node name="@MeshInstance3D@4451" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=408633132]
+[node name="@MeshInstance3D@4451" type="MeshInstance3D" parent="DeckEscalator_Estate Square_Up" unique_id=745694615]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3680468, 0.925, 0.543)
 material_override = SubResource("StandardMaterial3D_lgt5r")
 mesh = SubResource("BoxMesh_43usf")

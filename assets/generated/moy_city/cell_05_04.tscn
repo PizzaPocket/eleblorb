@@ -34,34 +34,36 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_h7g36"]
 size = Vector3(20, 0.15, 20)
 
-[node name="MoyCell_05_04" type="Node3D" unique_id=20796455]
+[node name="MoyCell_05_04" type="Node3D" unique_id=574663898]
 
-[node name="Lot_119" type="StaticBody3D" parent="." unique_id=852828996]
+[node name="Lot_119" type="StaticBody3D" parent="." unique_id=1492245847]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -436, 1.2, 48)
+metadata/walk_run_id = "Lot_119"
 
-[node name="@CollisionShape3D@623" type="CollisionShape3D" parent="Lot_119" unique_id=596741791]
+[node name="@CollisionShape3D@623" type="CollisionShape3D" parent="Lot_119" unique_id=254018149]
 shape = SubResource("BoxShape3D_3ed46")
 
-[node name="@MeshInstance3D@624" type="MeshInstance3D" parent="Lot_119" unique_id=1973656458]
+[node name="@MeshInstance3D@624" type="MeshInstance3D" parent="Lot_119" unique_id=247942461]
 material_override = SubResource("StandardMaterial3D_upts3")
 mesh = SubResource("BoxMesh_icxio")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_119" unique_id=2099077287]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_119" unique_id=851749688]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 61.125, 0)
 material_override = SubResource("StandardMaterial3D_f3vlj")
 mesh = SubResource("BoxMesh_h6236")
 
-[node name="Lot_120" type="StaticBody3D" parent="." unique_id=553225844]
+[node name="Lot_120" type="StaticBody3D" parent="." unique_id=698256273]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -419, -20.4, 48)
+metadata/walk_run_id = "Lot_120"
 
-[node name="@CollisionShape3D@625" type="CollisionShape3D" parent="Lot_120" unique_id=182318030]
+[node name="@CollisionShape3D@625" type="CollisionShape3D" parent="Lot_120" unique_id=83101942]
 shape = SubResource("BoxShape3D_d2hp3")
 
-[node name="@MeshInstance3D@626" type="MeshInstance3D" parent="Lot_120" unique_id=1588037007]
+[node name="@MeshInstance3D@626" type="MeshInstance3D" parent="Lot_120" unique_id=1781776133]
 material_override = SubResource("StandardMaterial3D_wcbuq")
 mesh = SubResource("BoxMesh_1wifq")
 
-[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_120" unique_id=1224523356]
+[node name="WalkableRoof" type="MeshInstance3D" parent="Lot_120" unique_id=1993470538]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 39.525, 0)
 material_override = SubResource("StandardMaterial3D_lme5n")
 mesh = SubResource("BoxMesh_h7g36")

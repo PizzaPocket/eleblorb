@@ -17,19 +17,19 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_34cra"]
 size = Vector3(22, 0.15, 22)
 
-[node name="MoyCell_-1_03" type="Node3D" unique_id=97733834]
+[node name="MoyCell_-1_03" type="Node3D" unique_id=2134430376]
 
-[node name="Building_40_Battery_works" type="StaticBody3D" parent="." unique_id=38879369]
+[node name="Building_40_Battery_works" type="StaticBody3D" parent="." unique_id=1209046166]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -805, -56, 0)
 
-[node name="@CollisionShape3D@2618" type="CollisionShape3D" parent="Building_40_Battery_works" unique_id=382939211]
+[node name="@CollisionShape3D@2618" type="CollisionShape3D" parent="Building_40_Battery_works" unique_id=582119316]
 shape = SubResource("BoxShape3D_ljd6o")
 
-[node name="@MeshInstance3D@2619" type="MeshInstance3D" parent="Building_40_Battery_works" unique_id=1926248127]
+[node name="@MeshInstance3D@2619" type="MeshInstance3D" parent="Building_40_Battery_works" unique_id=1935574753]
 material_override = SubResource("StandardMaterial3D_rpc5v")
 mesh = SubResource("BoxMesh_1tfwx")
 
-[node name="@MeshInstance3D@2620" type="MeshInstance3D" parent="Building_40_Battery_works" unique_id=650562634]
+[node name="@MeshInstance3D@2620" type="MeshInstance3D" parent="Building_40_Battery_works" unique_id=2106050291]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.925, 0)
 material_override = SubResource("StandardMaterial3D_svbgo")
 mesh = SubResource("BoxMesh_34cra")

@@ -8,7 +8,7 @@ class FixtureTerrain:
 ## visual-only meshes are read separately so the checks do not confuse a
 ## pretty floor with a floor a character can stand on.
 const CHECKS := ["overlap","buried","water","reach","trap","headroom","underside","solid","guard"]
-const DEFAULT_AREA := Vector4(-763.0,-203.0,-357.0,203.0)
+const DEFAULT_AREA := Vector4(-790.0,-210.0,-330.0,210.0)
 const WALK_GRID_STEP := 0.5
 const OVERLAP_GRID_STEP := 0.25
 const WALKER_RADIUS := 0.45
@@ -36,6 +36,9 @@ var _reached_buckets:Dictionary = {}
 var _reverse_reachable: Dictionary = {}
 var _clearance_cache: Dictionary = {}
 var _player_start: Vector3 = Vector3.ZERO
+var _reach_start_position: Vector3 = Vector3.ZERO
+var _reach_start_cell: Dictionary = {}
+var _broken_reach_links: Array[Dictionary] = []
 var _sample_stats := {"grid_step_m": WALK_GRID_STEP, "columns": 0, "walk_cells": 0}
 var _mesh_buckets:Dictionary = {}
 var _mesh_bounds:Dictionary = {}
@@ -213,8 +216,8 @@ func _cell_id(key:Vector2i, height:float, body:CollisionObject3D)->String:
 func _inside_area(point:Vector3)->bool:
 	return point.x>=_area.x and point.x<=_area.z and point.z>=_area.y and point.z<=_area.w
 
-func _record(check:String,node:Node,point:Vector3,detail:String,blocking:=false,other:Node=null)->void:
-	_findings.append({"check_id":check,"blocking":blocking,"position":{"x":point.x,"y":point.y,"z":point.z},"node_path":str(node.get_path()) if node!=null else "", "other_path":str(other.get_path()) if other!=null else "", "detail":detail})
+func _record(check:String,node:Node,point:Vector3,detail:String,blocking:=false,other:Node=null,kind:String="")->void:
+	_findings.append({"check_id":check,"kind":kind if not kind.is_empty() else check,"blocking":blocking,"position":{"x":point.x,"y":point.y,"z":point.z},"node_path":str(node.get_path()) if node!=null else "", "other_path":str(other.get_path()) if other!=null else "", "detail":detail})
 
 func _world_aabb(shape:CollisionShape3D)->AABB:
 	var debug_mesh:=shape.shape.get_debug_mesh()
@@ -327,7 +330,9 @@ func _check_overlap(low:float, high:float)->void:
 				var first:Dictionary = a if a_path < b_path else b
 				var second:Dictionary = b if a_path < b_path else a
 				var pair_key := "%s||%s" % [first.body_path, second.body_path]
-				if not contacts.has(pair_key): contacts[pair_key] = {"a": first.body, "b": second.body, "cells": {}}
+				if not contacts.has(pair_key):
+					var terrain_pair := _is_terrain_body(first.body) or _is_terrain_body(second.body)
+					contacts[pair_key] = {"a": first.body, "b": second.body, "cells": {}, "terrain_pair": terrain_pair}
 				contacts[pair_key].cells[key] = Vector3(a.x, (a.y + b.y) * 0.5, a.z)
 	for pair_key in contacts:
 		var contact:Dictionary = contacts[pair_key]
@@ -356,30 +361,22 @@ func _check_overlap(low:float, high:float)->void:
 			var center := Vector3.ZERO
 			for point in cluster: center += point
 			center /= float(cluster.size())
-			_record("overlap", contact.a, center, "walk cells on different bodies share height within 0.02 m (%d cells)" % cluster.size(), true, contact.b)
+			if contact.terrain_pair:
+				_record("overlap", contact.a, center, "flush with terrain: walk cells share height within 0.02 m (%d cells)" % cluster.size(), true, contact.b, "flush_with_terrain")
+			else:
+				_record("overlap", contact.a, center, "walk cells on different bodies share height within 0.02 m (%d cells)" % cluster.size(), true, contact.b, "surface_overlap")
 	if overlap_cells.is_empty(): _sample_stats["overlap_walk_cells"] = 0
 	else: _sample_stats["overlap_walk_cells"] = overlap_cells.size()
 
 func _same_walk_run(a:CollisionObject3D, b:CollisionObject3D)->bool:
-	for meta_key in [&"walk_run_id", &"surface_run_id", &"track_run_id"]:
-		if a.has_meta(meta_key) and b.has_meta(meta_key) and a.get_meta(meta_key) == b.get_meta(meta_key): return true
-	var a_run := _walk_run_name(a.name)
-	var b_run := _walk_run_name(b.name)
-	return not a_run.is_empty() and a_run == b_run
+	return a.has_meta("walk_run_id") and b.has_meta("walk_run_id") and a.get_meta("walk_run_id") == b.get_meta("walk_run_id")
 
-func _walk_run_name(raw_name:StringName)->String:
-	var tokens := String(raw_name).split("_", false)
-	if tokens.size() < 3: return ""
-	var numeric_suffix := 0
-	for i in range(tokens.size() - 1, 0, -1):
-		var token := tokens[i]
-		if token.is_valid_int(): numeric_suffix += 1
-		else: break
-	if numeric_suffix == 0: return ""
-	var root := "_".join(tokens.slice(0, tokens.size() - numeric_suffix))
-	var normalized := root.to_lower()
-	if "rail" in normalized or "track" in normalized or "escalator" in normalized or "walkway" in normalized: return root
-	return ""
+func _is_terrain_body(body:CollisionObject3D)->bool:
+	var current:Node = body
+	while current != null:
+		if current == _terrain or String(current.name).to_lower() == "terrain": return true
+		current = current.get_parent()
+	return false
 
 func _check_buried()->void:
 	if _terrain==null or not _terrain.has_method("get_mesh_height"): return
@@ -451,36 +448,58 @@ func _build_reach_graph(root:Node)->void:
 	# escalator, or train). They are authored on markers so the checker remains
 	# kingdom-agnostic.
 	var links:Dictionary = {}
+	_broken_reach_links.clear()
 	for node in _walk(root):
 		if not node.has_meta("reach_link_id") or not node is Node3D: continue
 		var link_id := str(node.get_meta("reach_link_id"))
 		var cell := _nearest_cell((node as Node3D).global_position, 3.0)
-		if cell.is_empty(): continue
-		if not links.has(link_id): links[link_id] = []
-		links[link_id].append(String(cell.id))
+		if cell.is_empty():
+			_broken_reach_links.append({"node": node, "link_id": link_id, "position": (node as Node3D).global_position})
+			continue
+		if not links.has(link_id): links[link_id] = {"cells": {}, "nodes": []}
+		links[link_id].cells[String(cell.id)] = true
+		links[link_id].nodes.append(node)
 	for link_id in links:
-		var endpoints:Array = links[link_id]
+		var endpoints:Array = links[link_id].cells.keys()
+		if endpoints.size() < 2:
+			for node in links[link_id].nodes:
+				_broken_reach_links.append({"node": node, "link_id": String(link_id), "position": (node as Node3D).global_position, "detail": "reach link has fewer than two distinct walkable endpoints"})
+			continue
 		for a in endpoints:
 			for b in endpoints:
 				if a != b: _add_graph_edge(String(a), String(b))
 	var starts:Array[String] = []
-	var spawn := _nearest_cell(_player_start, 3.0)
-	if not spawn.is_empty(): starts.append(String(spawn.id))
+	var primary_start:Dictionary = {}
 	for node in _walk(root):
 		if not node is Node3D: continue
-		if node.has_meta("reach_start") or node.has_meta("station_platform"):
+		if node.has_meta("reach_start"):
 			var cell := _nearest_cell((node as Node3D).global_position, 3.0)
-			if not cell.is_empty() and String(cell.id) not in starts: starts.append(String(cell.id))
+			if not cell.is_empty():
+				if primary_start.is_empty():
+					primary_start = cell
+					_reach_start_position = (node as Node3D).global_position
+				if String(cell.id) not in starts: starts.append(String(cell.id))
+	if primary_start.is_empty():
+		primary_start = _nearest_cell(_player_start, 3.0)
+		_reach_start_position = _player_start
+		if not primary_start.is_empty(): starts.append(String(primary_start.id))
+	_reach_start_cell = primary_start
+	_sample_stats["reach_start"] = [_reach_start_position.x, _reach_start_position.y, _reach_start_position.z]
+	for node in _walk(root):
+		if not node is Node3D or not node.has_meta("station_platform"): continue
+		var cell := _nearest_cell((node as Node3D).global_position, 3.0)
+		if not cell.is_empty() and String(cell.id) not in starts: starts.append(String(cell.id))
 	_reachable = _flood_graph(starts, _graph)
+	_sample_stats["reachable_cells"] = _reachable.size()
 	_reached_buckets.clear()
 	for id in _reachable:
 		var cell:Dictionary = _cell_by_id[id]
 		var bucket := Vector2i(floori(float(cell.x)/16.0),floori(float(cell.z)/16.0))
 		if not _reached_buckets.has(bucket): _reached_buckets[bucket] = []
 		_reached_buckets[bucket].append(cell)
-	var spawn_seeds:Array[String] = []
-	if not spawn.is_empty(): spawn_seeds.append(String(spawn.id))
-	_reverse_reachable = _flood_graph(spawn_seeds, _reverse_graph)
+	var primary_seeds:Array[String] = []
+	if not primary_start.is_empty(): primary_seeds.append(String(primary_start.id))
+	_reverse_reachable = _flood_graph(primary_seeds, _reverse_graph)
 
 func _add_graph_edge(from_id:String, to_id:String)->void:
 	if not _graph.has(from_id) or not _graph.has(to_id): return
@@ -539,17 +558,22 @@ func _nearest_cell(point:Vector3, max_distance:float)->Dictionary:
 	for dx in range(-radius,radius+1):
 		for dz in range(-radius,radius+1):
 			for cell in _walk_grid.get(center+Vector2i(dx,dz),[]):
-				var dy := absf(float(cell.y)-point.y)
-				if dy > 3.0: continue
-				var distance := Vector2(float(cell.x)-point.x,float(cell.z)-point.z).length()
+				var distance := point.distance_to(cell.position)
 				if distance <= best_distance: best_distance = distance; best = cell
 	return best
 
 func _check_reach(root:Node)->void:
+	for broken in _broken_reach_links:
+		var detail := String(broken.get("detail", "reach link endpoint has no walk cell within 3 m"))
+		_record("reach", broken.node, broken.position, "%s (link %s)" % [detail, broken.link_id], true)
 	var targets:Array[Node] = []
 	for node in _walk(root):
 		if node.has_meta("reach_target") and node is Node3D and _inside_area((node as Node3D).global_position): targets.append(node)
 	for target in targets:
+		var already_reported := false
+		for broken in _broken_reach_links:
+			if broken.node == target: already_reported = true; break
+		if already_reported: continue
 		var point := (target as Node3D).global_position
 		var cell := _nearest_cell(point, 2.0)
 		if cell.is_empty():
@@ -574,6 +598,8 @@ func _check_traps(root:Node)->void:
 	var one_way:Array[Dictionary] = []
 	for id in _reachable:
 		if not _reverse_reachable.has(id): one_way.append(_cell_by_id[id])
+	_sample_stats["trapped_cells"] = one_way.size()
+	_sample_stats["trapped_share"] = float(one_way.size()) / maxf(float(_reachable.size()), 1.0)
 	_emit_cell_clusters("trap", one_way, "reachable pocket cannot return to spawn (%d walk samples)", true)
 	var shells:Array[Node3D] = []
 	for node in _walk(root):
@@ -650,9 +676,7 @@ func _check_underside(meshes:Array[MeshInstance3D], shapes:Array[CollisionShape3
 	_check_inward_winding(meshes)
 
 func _is_walk_deck(body:Node)->bool:
-	if _body_has_meta(body,&"walk_deck") or _body_has_meta(body,&"flight"): return true
-	var label := String(body.name).to_lower()
-	return "landing" in label or "platform" in label or "flight" in label or "walkway" in label or "ramp" in label or "deck" in label
+	return _body_has_meta(body,&"walk_deck") or _body_has_meta(body,&"flight")
 
 func _build_mesh_buckets(meshes:Array[MeshInstance3D])->void:
 	_mesh_buckets.clear(); _mesh_bounds.clear()
@@ -685,13 +709,13 @@ func _meshes_at_walk_cell(meshes:Array[MeshInstance3D], cell:Dictionary)->Array[
 
 func _has_visible_underside(mesh:MeshInstance3D, sample:Vector3)->bool:
 	if _mesh_is_two_sided(mesh): return true
-	if mesh.mesh == null: return false
+	if mesh.mesh == null or mesh.mesh.get_surface_count() == 0: return false
 	var faces := mesh.mesh.get_faces()
 	for i in range(0, faces.size(), 3):
 		var a:Vector3 = mesh.global_transform * faces[i]
 		var b:Vector3 = mesh.global_transform * faces[i + 1]
 		var c:Vector3 = mesh.global_transform * faces[i + 2]
-		var normal := (b - a).cross(c - a).normalized()
+		var normal := (c - a).cross(b - a).normalized()
 		if normal.y > -0.5: continue
 		if absf((a.y + b.y + c.y) / 3.0 - sample.y) > 0.15: continue
 		if _point_in_triangle_xz(Vector2(sample.x, sample.z), Vector2(a.x,a.z), Vector2(b.x,b.z), Vector2(c.x,c.z)): return true
@@ -720,7 +744,7 @@ func _point_in_triangle_xz(p:Vector2, a:Vector2, b:Vector2, c:Vector2)->bool:
 
 func _check_inward_winding(meshes:Array[MeshInstance3D])->void:
 	for mesh in meshes:
-		if not mesh.has_meta("closed_shell") or not bool(mesh.get_meta("closed_shell")) or mesh.mesh == null: continue
+		if not _body_has_meta(mesh,&"closed_shell") or mesh.mesh == null or mesh.mesh.get_surface_count() == 0: continue
 		var faces := mesh.mesh.get_faces()
 		if faces.size() < 36: continue
 		var bounds := _node_world_aabb(mesh)
@@ -730,7 +754,7 @@ func _check_inward_winding(meshes:Array[MeshInstance3D])->void:
 			var a:Vector3 = mesh.global_transform * faces[i]
 			var b:Vector3 = mesh.global_transform * faces[i + 1]
 			var c:Vector3 = mesh.global_transform * faces[i + 2]
-			var normal := (b-a).cross(c-a).normalized()
+			var normal := (c-a).cross(b-a).normalized()
 			var direction := (a+b+c)/3.0-center
 			if normal.length_squared() < 0.5 or direction.length_squared() < 0.01: continue
 			if normal.dot(direction) < 0.0: inward += 1
@@ -739,16 +763,26 @@ func _check_inward_winding(meshes:Array[MeshInstance3D])->void:
 			_record("underside", mesh, center, "closed mesh winding faces inward (%d inward, %d outward triangles)" % [inward, outward], true)
 
 func _check_solid(meshes:Array[MeshInstance3D],shapes:Array[CollisionShape3D])->void:
+	var excluded:Array[RID] = _dynamic_excludes.duplicate()
+	var candidates:Array[CollisionShape3D] = []
+	for shape in shapes:
+		var box := _world_aabb(shape)
+		if maxf(box.size.x,maxf(box.size.y,box.size.z)) > 64.0:
+			var owner := shape.get_parent() as CollisionObject3D
+			if owner != null: excluded.append(owner.get_rid())
+		else: candidates.append(shape)
+	var state := get_viewport().world_3d.direct_space_state
 	for mesh in meshes:
-		var a:=mesh.global_transform*mesh.get_aabb()
+		var a:=_node_world_aabb(mesh)
 		var substantial_dimensions := 0
 		for dimension in [a.size.x,a.size.y,a.size.z]:
 			if float(dimension) > 1.5: substantial_dimensions += 1
 		if not _inside_area(a.get_center()) or _collision_is_decorative(mesh) or substantial_dimensions < 2: continue
-		var near:=false
-		for shape in shapes:
-			if _world_aabb(shape).grow(0.05).intersects(a): near=true; break
-		if not near: _record("solid",mesh,a.get_center(),"substantial visual has no nearby collision",false)
+		var query_shape := BoxShape3D.new(); query_shape.size = a.size + Vector3.ONE * 0.1
+		var query := PhysicsShapeQueryParameters3D.new(); query.shape = query_shape; query.transform = Transform3D(Basis.IDENTITY,a.get_center()); query.collision_mask = _static_mask; query.exclude = excluded
+		var hits := state.intersect_shape(query,64)
+		var near := not hits.is_empty()
+		if not near: _record("solid",mesh,a.get_center(),"substantial visual has no collider within 0.05 m",false)
 
 func _check_guard()->void:
 	var unguarded:Array[Dictionary] = []
@@ -758,7 +792,13 @@ func _check_guard()->void:
 		var key:Vector2i = cell.key
 		for direction in directions:
 			var neighbour_key := key + direction
-			if _has_walk_neighbour(neighbour_key, float(cell.y), 1.0): continue
+			if _has_walk_neighbour(neighbour_key, float(cell.y), 1.0):
+				for neighbour in _walk_grid.get(neighbour_key, []):
+					if absf(float(neighbour.y) - float(cell.y)) <= 1.0 and neighbour.body != cell.body:
+						var connected_path := String(cell.body_path)
+						if not body_edges.has(connected_path): body_edges[connected_path] = {"body":cell.body,"total":0,"guarded":0,"way_out":false,"cells":[]}
+						body_edges[connected_path].way_out = true
+				continue
 			var neighbor_x := float(cell.x) + float(direction.x) * _grid_step
 			var neighbor_z := float(cell.z) + float(direction.y) * _grid_step
 			var ground := float(_terrain.get_mesh_height(neighbor_x, neighbor_z)) if _terrain != null and _terrain.has_method("get_mesh_height") else float(cell.y) - 2.0
@@ -766,7 +806,7 @@ func _check_guard()->void:
 			var edge := Vector3(float(cell.x), float(cell.y), float(cell.z)) + Vector3(direction.x,0,direction.y) * (_grid_step * 0.5)
 			var guarded := _edge_has_guard(edge, Vector3(direction.x,0,direction.y), cell.body)
 			var body_path:String = cell.body_path
-			if not body_edges.has(body_path): body_edges[body_path] = {"body":cell.body,"total":0,"guarded":0,"cells":[]}
+			if not body_edges.has(body_path): body_edges[body_path] = {"body":cell.body,"total":0,"guarded":0,"way_out":false,"cells":[]}
 			body_edges[body_path].total += 1
 			if guarded: body_edges[body_path].guarded += 1
 			else: unguarded.append(cell)
@@ -774,7 +814,7 @@ func _check_guard()->void:
 	for body_path in body_edges:
 		var edges:Dictionary = body_edges[body_path]
 		var body:Node = edges.body
-		if int(edges.total) == 0 or int(edges.guarded) != int(edges.total): continue
+		if int(edges.total) == 0 or int(edges.guarded) != int(edges.total) or bool(edges.way_out): continue
 		if _body_has_meta(body, &"ways_out") or _body_has_meta(body, &"flight") or _body_has_meta(body, &"reach_target"): continue
 		_record("guard", body, (body as Node3D).global_position, "walkable outline is fully guarded and has no tagged way through", false)
 
@@ -825,15 +865,15 @@ func _run_fixture_suite()->void:
 	await get_tree().process_frame; await get_tree().physics_frame
 	var meshes:Array[MeshInstance3D] = []; var shapes:Array[CollisionShape3D] = []; _collect(root,meshes,shapes)
 	var cases := [
-		["overlap",Vector4(-3,-3,3,3),Vector3.ZERO],
-		["buried",Vector4(7,-3,13,3),Vector3(10,0,0)],
-		["water",Vector4(17,-3,23,3),Vector3(20,0,0)],
-		["reach",Vector4(27,-3,35,3),Vector3(28,0.2,0)],
-		["trap",Vector4(37,-3,45,3),Vector3(39.5,2.2,0)],
-		["headroom",Vector4(47,-3,53,3),Vector3(50,0.2,0)],
-		["underside",Vector4(57,-3,63,3),Vector3(60,0.2,0)],
-		["solid",Vector4(67,-3,73,3),Vector3(70,0,0)],
-		["guard",Vector4(77,-3,83,3),Vector3(80,2.2,0)],
+		["overlap",Vector4(-3,-3,4,3),Vector3.ZERO,"FixtureOverlapA","share height","FixtureOverlapClean"],
+		["buried",Vector4(7,-3,13,3),Vector3(10,0,0),"FixtureBuriedSlab","terrain stands above","FixtureBuriedClean"],
+		["water",Vector4(17,-3,23,3),Vector3(20,0,0),"FixtureWaterFourTenthsOverBank","0.40 m above bank","FixtureWaterClean"],
+		["reach",Vector4(27,-3,35,3),Vector3(28,0.2,0),"FixtureDisconnectedPlatform","disconnected from spawn","FixtureReachClean"],
+		["trap",Vector4(37,-3,45,3),Vector3(44,0.2,0),"FixtureOneWayPocket","cannot return to spawn","FixtureTrapClean"],
+		["headroom",Vector4(47,-3,53,3),Vector3(50,0.2,0),"FixtureHeadroomBeam","standing height","FixtureHeadroomClean"],
+		["underside",Vector4(57,-3,63,3),Vector3(60,0.2,0),"FixtureUndersideTopOnlyVisual","no underside-facing face","FixtureUndersideClean"],
+		["solid",Vector4(67,-3,77,3),Vector3(70,0,0),"FixtureUncollidedSolid","no collider within 0.05 m","FixtureSolidClean"],
+		["guard",Vector4(77,-3,86,3),Vector3(80,2.2,0),"FixtureGuardPad","fully guarded and has no tagged way through","FixtureGuardClean"],
 	]
 	var failed:Array[String] = []
 	for test in cases:
@@ -852,10 +892,27 @@ func _run_fixture_suite()->void:
 			"solid": _check_solid(meshes,shapes)
 			"guard": _check_guard()
 		var caught := false
+		var clean_caught := false
 		for finding in _findings:
-			if finding.check_id == check: caught = true; break
-		if caught: print("WORLD_CHECK_FIXTURE PASS ",check)
-		else: print("WORLD_CHECK_FIXTURE FAIL ",check); failed.append(check)
+			if finding.check_id != check: continue
+			var path := String(finding.node_path)
+			if String(test[3]) in path and String(test[4]) in String(finding.detail): caught = true
+			if check == "trap" and "FixtureShellGap" in path and "inside an untagged shell" in String(finding.detail): clean_caught = false
+			if String(test[5]) in path: clean_caught = true
+		var second_trap_caught := check != "trap"
+		var broken_link_caught := check != "reach"
+		if check == "reach":
+			for finding in _findings:
+				if finding.check_id == "reach" and "FixtureBrokenReachLinkEndpoint" in String(finding.node_path) and "no walk cell within 3 m" in String(finding.detail): broken_link_caught = true
+		if check == "trap":
+			for finding in _findings:
+				if finding.check_id == "trap" and "FixtureShellGap" in String(finding.node_path) and "inside an untagged shell" in String(finding.detail): second_trap_caught = true
+		if caught and second_trap_caught and broken_link_caught and not clean_caught: print("WORLD_CHECK_FIXTURE PASS ",check," fault=",test[3]," clean=",test[5])
+		else:
+			print("WORLD_CHECK_FIXTURE FAIL ",check," expected_fault=",caught," clean_twin_clear=",not clean_caught)
+			for finding in _findings:
+				if finding.check_id == check: print("  finding ",finding.node_path," :: ",finding.detail)
+			failed.append(check)
 	root.queue_free(); await get_tree().process_frame
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(fixture_path))
 	var uid_path := ProjectSettings.globalize_path(fixture_path+".uid")
@@ -876,43 +933,91 @@ func _fixture_box(parent:Node3D,label:String,size:Vector3,center:Vector3,with_me
 func _fixture_overlap(root:Node3D)->void:
 	_fixture_box(root,"FixtureOverlapA",Vector3(2,0.2,2),Vector3(0,0.1,0),true)
 	_fixture_box(root,"FixtureOverlapB",Vector3(2,0.2,2),Vector3(0,0.1,0),true)
+	_fixture_box(root,"FixtureOverlapCleanA",Vector3(0.8,0.2,0.8),Vector3(2.0,0.1,0),true)
+	_fixture_box(root,"FixtureOverlapCleanB",Vector3(0.8,0.2,0.8),Vector3(3.0,0.1,0),true)
 
 func _fixture_buried(root:Node3D)->void:
 	_fixture_box(root,"FixtureBuriedSlab",Vector3(2,0.2,2),Vector3(10,-0.2,0),true)
+	_fixture_box(root,"FixtureBuriedCleanSlab",Vector3(1,0.2,1),Vector3(12,0.2,0),true)
 
 func _fixture_water(root:Node3D)->void:
-	var water := Node3D.new(); water.name = "FixtureOverbankPond"; water.position = Vector3(20,0,0); water.set_meta("water_surface_y",1.0); root.add_child(water)
+	var water := Node3D.new(); water.name = "FixtureWaterFourTenthsOverBank"; water.position = Vector3(20,0,0); water.set_meta("water_surface_y",0.4); root.add_child(water)
 	var visual := MeshInstance3D.new(); var plane := PlaneMesh.new(); plane.size = Vector2(2,2); visual.mesh = plane
-	var material := ShaderMaterial.new(); material.shader = VillageWorks.SHARED_WATER_SHADER; visual.material_override = material; visual.position.y = 1.0; water.add_child(visual)
+	var material := ShaderMaterial.new(); material.shader = VillageWorks.SHARED_WATER_SHADER; visual.material_override = material; visual.position.y = 0.4; water.add_child(visual)
+	var clean := Node3D.new(); clean.name = "FixtureWaterCleanUnderBank"; clean.position = Vector3(22,0,0); clean.set_meta("water_surface_y",-0.1); root.add_child(clean)
+	var clean_visual := MeshInstance3D.new(); var clean_plane := PlaneMesh.new(); clean_plane.size = Vector2(0.8,0.8); clean_visual.mesh = clean_plane; clean_visual.position.y = -0.1; clean_visual.material_override = material; clean.add_child(clean_visual)
 
 func _fixture_reach(root:Node3D)->void:
 	var platform := _fixture_box(root,"FixtureDisconnectedPlatform",Vector3(2,0.2,2),Vector3(32,4.1,0),true)
 	platform.set_meta("reach_target",true)
+	var clean := _fixture_box(root,"FixtureReachCleanTarget",Vector3(1,0.2,1),Vector3(28,0.1,0),true); clean.set_meta("reach_target",true)
+	var broken := Node3D.new(); broken.name="FixtureBrokenReachLinkEndpoint"; broken.position=Vector3(34,20,0); broken.set_meta("reach_link_id","FixtureBrokenPair"); root.add_child(broken)
 
 func _fixture_trap(root:Node3D)->void:
-	var shell := Node3D.new(); shell.name = "FixtureOpenTopShell"; shell.position = Vector3(40,0,0); shell.set_meta("closed_shell",true); root.add_child(shell)
-	_fixture_box(shell,"FixtureShellFloor",Vector3(3,0.2,3),Vector3.ZERO,true)
+	var pocket := Node3D.new(); pocket.name="FixtureOneWayPocket"; pocket.position=Vector3(40,0,0); root.add_child(pocket)
+	_fixture_box(pocket,"FixturePocketFloor",Vector3(2,0.2,2),Vector3(0,0.1,0),true)
+	# The ring is a roof with an open top. Its 0.9 m drop is walkable down,
+	# while the climb back exceeds the 0.7 m step-up limit.
+	var high_roof := _fixture_box(pocket,"FixturePocketRoofNorth",Vector3(4,0.2,1),Vector3(0,1.0,-1.5),true); high_roof.set_meta("station_platform",true)
+	_fixture_box(pocket,"FixturePocketRoofSouth",Vector3(4,0.2,1),Vector3(0,1.0,1.5),true)
+	_fixture_box(pocket,"FixturePocketRoofEast",Vector3(1,0.2,2),Vector3(1.5,1.0,0),true)
+	_fixture_box(pocket,"FixturePocketRoofWest",Vector3(1,0.2,2),Vector3(-1.5,1.0,0),true)
 	for side in [-1.0,1.0]:
-		_fixture_box(shell,"FixtureShellWallX",Vector3(0.2,2.5,3),Vector3(side*1.5,1.25,0),true)
-		_fixture_box(shell,"FixtureShellWallZ",Vector3(3,2.5,0.2),Vector3(0,1.25,side*1.5),true)
+		_fixture_box(pocket,"FixturePocketOuterWallX",Vector3(0.2,2,4),Vector3(side*2,1,0),true)
+		_fixture_box(pocket,"FixturePocketOuterWallZ",Vector3(4,2,0.2),Vector3(0,1,side*2),true)
+	var shell := Node3D.new(); shell.name="FixtureShellGap"; shell.position=Vector3(43,0,0); shell.set_meta("closed_shell",true); root.add_child(shell)
+	var shell_floor := _fixture_box(shell,"FixtureShellGapFloor",Vector3(2,0.2,2),Vector3.ZERO,true); shell_floor.set_meta("station_platform",true)
+	_fixture_box(shell,"FixtureShellGapWallNorth",Vector3(2,2,0.2),Vector3(0,1,-1),true)
+	_fixture_box(shell,"FixtureShellGapWallSouth",Vector3(2,2,0.2),Vector3(0,1,1),true)
+	_fixture_box(shell,"FixtureShellGapWallWest",Vector3(0.2,2,2),Vector3(-1,1,0),true)
+	var clean_shell := Node3D.new(); clean_shell.name="FixtureTrapCleanEnterableShell"; clean_shell.position=Vector3(44,0,0); clean_shell.set_meta("closed_shell",true); clean_shell.set_meta("enterable",true); root.add_child(clean_shell)
+	_fixture_box(clean_shell,"FixtureTrapCleanEnterableFloor",Vector3(1.5,0.2,1.5),Vector3.ZERO,true)
+	_fixture_box(clean_shell,"FixtureTrapCleanWallNorth",Vector3(1.5,1.5,0.12),Vector3(0,0.75,-0.75),true)
+	_fixture_box(clean_shell,"FixtureTrapCleanWallSouth",Vector3(1.5,1.5,0.12),Vector3(0,0.75,0.75),true)
+	_fixture_box(clean_shell,"FixtureTrapCleanWallWest",Vector3(0.12,1.5,1.5),Vector3(-0.75,0.75,0),true)
 
 func _fixture_headroom(root:Node3D)->void:
 	_fixture_box(root,"FixtureHeadroomBeam",Vector3(3,0.2,2),Vector3(50,1.8,0),true)
+	_fixture_box(root,"FixtureHeadroomCleanWalk",Vector3(1,0.2,1),Vector3(52,0.1,0),true)
 
 func _fixture_underside(root:Node3D)->void:
 	var body := _fixture_box(root,"FixtureUndersideDeck",Vector3(2,0.1,2),Vector3(60,1.05,0),false); body.set_meta("walk_deck",true)
-	var arrays:Array = []; arrays.resize(Mesh.ARRAY_MAX); arrays[Mesh.ARRAY_VERTEX] = PackedVector3Array([Vector3(-1,0,-1),Vector3(-1,0,1),Vector3(1,0,-1)]); arrays[Mesh.ARRAY_INDEX] = PackedInt32Array([0,1,2])
+	var arrays:Array = []; arrays.resize(Mesh.ARRAY_MAX); arrays[Mesh.ARRAY_VERTEX] = PackedVector3Array([Vector3(-1,0,-1),Vector3(-1,0,1),Vector3(1,0,-1)]); arrays[Mesh.ARRAY_INDEX] = PackedInt32Array([0,2,1])
 	var top_only := ArrayMesh.new(); top_only.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
-	var visual := MeshInstance3D.new(); visual.mesh = top_only; visual.position.y = 0.05; body.add_child(visual)
+	var visual := MeshInstance3D.new(); visual.name="FixtureUndersideTopOnlyVisual"; visual.mesh = top_only; visual.position.y = 0.05; body.add_child(visual)
+	var clean := _fixture_box(root,"FixtureUndersideCleanBoxedDeck",Vector3(1.5,0.1,1.5),Vector3(62,1.05,0),true); clean.set_meta("walk_deck",true)
 
 func _fixture_solid(root:Node3D)->void:
-	var mesh := MeshInstance3D.new(); mesh.name = "FixtureUncollidedSolid"; var box := BoxMesh.new(); box.size = Vector3(3,3,3); mesh.mesh = box; mesh.position = Vector3(70,3.5,0); root.add_child(mesh)
+	var mesh := MeshInstance3D.new(); mesh.name = "FixtureUncollidedSolid"; var box := BoxMesh.new(); box.size = Vector3(3,3,3); mesh.mesh = box; mesh.position = Vector3(70,1.5,0); root.add_child(mesh)
+	_fixture_box(root,"FixtureSolidCleanTwin",Vector3(3,3,3),Vector3(75,1.5,0),true)
 
 func _fixture_guard(root:Node3D)->void:
 	_fixture_box(root,"FixtureGuardPad",Vector3(4,0.2,4),Vector3(80,1.9,0),true)
 	for side in [-1.0,1.0]:
-		_fixture_box(root,"FixtureGuardRailX",Vector3(0.12,1.4,4),Vector3(80+side*2,2.7,0),true)
-		_fixture_box(root,"FixtureGuardRailZ",Vector3(4,1.4,0.12),Vector3(80,2.7,side*2),true)
+		_fixture_rail(root,"FixtureGuardRailX",Vector3(80+side*2,2.7,0),Vector2(0.12,4),1.4)
+		_fixture_rail(root,"FixtureGuardRailZ",Vector3(80,2.7,side*2),Vector2(4,0.12),1.4)
+	_fixture_box(root,"FixtureGuardCleanPad",Vector3(3,0.2,3),Vector3(82.5,0.1,0),true)
+	_fixture_rail(root,"FixtureGuardCleanRailLeft",Vector3(81,0.9,0),Vector2(0.12,3),1.4)
+	_fixture_rail(root,"FixtureGuardCleanRailBack",Vector3(82.5,0.9,-1.5),Vector2(3,0.12),1.4)
+	_fixture_rail(root,"FixtureGuardCleanRailFront",Vector3(82.5,0.9,1.5),Vector2(3,0.12),1.4)
+	_fixture_box(root,"FixtureGuardCleanLanding",Vector3(2,0.2,3),Vector3(85,0.1,0),true)
+
+func _fixture_rail(parent:Node3D,label:String,center:Vector3,footprint:Vector2,height:float)->void:
+	var left := -footprint.x * 0.5; var right := footprint.x * 0.5
+	var front := -footprint.y * 0.5; var back := footprint.y * 0.5
+	var low := -height * 0.5; var high := height * 0.5
+	var faces := PackedVector3Array()
+	var quads:Array = [
+		[Vector3(left,low,front),Vector3(right,low,front),Vector3(right,high,front),Vector3(left,high,front)],
+		[Vector3(right,low,back),Vector3(left,low,back),Vector3(left,high,back),Vector3(right,high,back)],
+		[Vector3(left,low,back),Vector3(left,low,front),Vector3(left,high,front),Vector3(left,high,back)],
+		[Vector3(right,low,front),Vector3(right,low,back),Vector3(right,high,back),Vector3(right,high,front)]
+	]
+	for quad in quads:
+		faces.append_array([quad[0],quad[1],quad[2],quad[0],quad[2],quad[3]])
+	var shape := ConcavePolygonShape3D.new(); shape.set_faces(faces)
+	var body := StaticBody3D.new(); body.name=label; body.collision_layer=1; body.collision_mask=1; body.position=center
+	var collision := CollisionShape3D.new(); collision.shape=shape; body.add_child(collision); parent.add_child(body)
 
 func _walk(root:Node)->Array[Node]:
 	var out:Array[Node]=[root]
@@ -929,6 +1034,9 @@ func _write_report(kingdom:String,date:String)->void:
 	var md:="# %s world checks — %s\n\n"%[kingdom,date]
 	md+="Area: %.1f, %.1f to %.1f, %.1f. Findings: %d.\n\n"%[_area.x,_area.y,_area.z,_area.w,_findings.size()]
 	md+="Walk grid: %.2f m; %d columns; %d walk cells; overlap grid: %.2f m; %d overlap cells.\n\n"%[float(_sample_stats.get("grid_step_m",WALK_GRID_STEP)),int(_sample_stats.get("columns",0)),int(_sample_stats.get("walk_cells",0)),OVERLAP_GRID_STEP,int(_sample_stats.get("overlap_walk_cells",0))]
+	var trapped_cells := int(_sample_stats.get("trapped_cells",0)); var trapped_share := float(_sample_stats.get("trapped_share",0.0))
+	var start:Array = _sample_stats.get("reach_start", [0.0,0.0,0.0])
+	md+="Primary reach start: (%.2f, %.2f, %.2f); reachable cells: %d; trapped cells: %d (%.6f%% of reachable).\n\n"%[float(start[0]),float(start[1]),float(start[2]),int(_sample_stats.get("reachable_cells",0)),trapped_cells,trapped_share*100.0]
 	md+="Preflight: walk grid %.1f ms; reach graph %.1f ms.\n\n"%[float(_timings.get("walk_grid",0.0)),float(_timings.get("reach_graph",0.0))]
 	md+="Total elapsed: %.1f ms.\n\n"%[(Time.get_ticks_usec()-_suite_started_usec)/1000.0]
 	for check in CHECKS:
@@ -941,4 +1049,4 @@ func _write_report(kingdom:String,date:String)->void:
 			md+="\n"
 	var stem="%s-%s"%[kingdom,date]
 	var json_file:=FileAccess.open(dir+"/"+stem+".json",FileAccess.WRITE); json_file.store_string(JSON.stringify({"kingdom":kingdom,"date":date,"area":[_area.x,_area.y,_area.z,_area.w],"sample_stats":_sample_stats,"elapsed_ms":Time.get_ticks_usec()-_suite_started_usec,"timings_ms":_timings,"findings":_findings},"\t")); json_file.close()
-	var md_file:=FileAccess.open(dir+"/"+stem+".md",FileAccess.WRITE); md_file.store_string(md); md_file.close()
+	var md_file:=FileAccess.open(dir+"/"+stem+".md",FileAccess.WRITE); md_file.store_string(md.strip_edges(false,true)+"\n"); md_file.close()
