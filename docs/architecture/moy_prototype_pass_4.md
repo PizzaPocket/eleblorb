@@ -295,3 +295,74 @@ beyond its ring girder.
 - three screenshots: under the Spine's head beam from a tower's gallery,
   looking along the line; looking up the helix band past it; and City Hall's
   L37o and G37 from the forecourt.
+
+## 6. Third review, and fixes (2026-10-18)
+
+Reviewed: `ec3abd5` (builder, validator), `e83fc68` (bake), diagnostic
+`docs/diagnostics/2026-10-18-moy-P1-fixes-2.md`. No screenshots (rightly held
+back until the checks pass).
+**Result: fix, small.** The head beams are right, and the checks now run and
+tell the truth. What they find is centimetres of geometry, plus two
+mistakes of ours.
+
+Good, keep it:
+- four single 14.8 m head beams, ends at ±7.4 (the band check's unique
+  colliders fell from 312 to 304: the eight half-beams are gone);
+- `--p1-only`, which finishes, and real counts in every line;
+- the band check walking every hand's profile in 5° steps;
+- City Hall's galleries: 14 checked, 0 failures;
+- no exemptions added to make a check pass.
+
+**What the checks found.** Planning rebuilt your collision from the baked
+cells and repeated both checks. The ~304 band colliders per run are, on
+each tower:
+- 72 `CrossingGalleryInnerRail_*`: the rails are centred on r = 4.0, so
+  half of each 0.12 m rail, and every chord's middle, stands in the band;
+- 3 `CrossingGallery_*`: the 48-sided annulus has its *vertices* on r = 4.0,
+  so its chords cut 9 mm into the band, and its 1.0 m depth reaches the
+  headroom of the climb below;
+- `Open_park` and `CrossingRainGarden_*` at the helix's foot: the lawn stands
+  0.07 m and the rain garden 0.05 to 0.22 m above the ground landing (tread
+  0.0), and the garden is a full disc over the tower's foot.
+
+**Our errors (fixed in the plan, 2026-10-18).**
+- **Two ways out faced the lift.** The plan put a way out at the Deck and on
+  the lawn at the inner corner's bearing, where the tower's lift stands (r
+  6.1 to 8.7). At the Deck that way led into the open middle; on the lawn,
+  into the shaft. Now each tower has the Deck's two (the ring, outward, and
+  the cross-bridge) and three on the lawn (outward, and the two sides facing
+  the open middle). `city_layout.py` checks that no way out meets the lift.
+- **The way-out box began on the rail.** Section 5 said to test from r = 4.0,
+  the line of the gallery's inner guard, which stays closed except at a
+  landing: so it could never pass. Test from r = 4.2.
+- **The rain garden** is now a ring, `r_in` (the drum, 6.0) to `r` (9.5),
+  with a paved path along each way out on the lawn (`paths`, `path_width`)
+  and clear of the lift; no reed stands in a path. The city model draws it so.
+
+**Fix these:**
+1. **Nothing of a gallery inside r = 4.0.** Put the inner rail's inner face
+   at r ≥ 4.02, chords included (vertices on r / cos(π/n)). Do the same for
+   the gallery annulus's inner edge. Keep the rail open along each landing,
+   as now.
+2. **The ground landing is flush with the lawn** (within 0.01 m), or the
+   lawn is cut round the drum. Nothing stands above the tread inside the
+   drum on the lawn.
+3. **Build the rain garden from the new data:** a ring from `r_in` to `r`,
+   cut by a 2.4 m paved path along each bearing in `paths`, clear of the
+   lift by `lift_clear`. The reeds are the data's (fewer now).
+4. **Build the new ways out.** Rebake from the regenerated
+   `scripts/city_plan.gd`. Leave bays open at the new bearings; the climbers
+   already follow them.
+5. **The way-out check runs from r = 4.2 to 7.0** (it is 4.0 today).
+6. **Print the colliders by kind** in the band and way-out lines (as
+   `CrossingGalleryInnerRail ×72`), so a review can read them.
+
+Planning's rebuild of the checks on `e83fc68` with the new plan found
+nothing else: no beam, rib, hoop, lift or guide in any band or way out
+once fixes 1 to 3 are made.
+
+**Report:** `docs/diagnostics/<date>-moy-P1-fixes-3.md`:
+- each fix, and the P1 checks' output, all passing;
+- the bake and validator counts;
+- the three screenshots from section 5, and a fourth: a tower's foot on the
+  lawn, from the middle, showing the garden's paths.

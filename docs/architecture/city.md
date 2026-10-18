@@ -1674,6 +1674,13 @@ high line's piers rising through it. It is redesigned from its purpose:
   - **The check.** The plan lists each tower's ways out (`ways_out`: level,
     bearing, width, clear height) and fails if a rib stands in one or a hoop
     crosses one.
+  - **The lift's corner (2026-10-18).** No way out faces the tower's inner
+    corner, where its lift stands. At the Deck: the ring and the cross-bridge.
+    On the lawn: outward, and the two sides facing the open middle. The check
+    fails if a way out meets the lift.
+  - **The rain garden** is a ring round the drum's foot, 6 to 9.5 m from the
+    tower's centre, cut by a paved path along each way out on the lawn and
+    clear of the lift (`rain_gardens`: `r_in`, `r`, `paths`).
 - **The escalators are closed boxes (2026-10-18).** In the third pass the
   helices' undersides were invisible and had no collision from below. Every
   flight, straight or spiral, is now a closed section 0.9 m deep

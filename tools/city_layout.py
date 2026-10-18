@@ -1381,8 +1381,11 @@ def _crossing_layout():
     # level's floor to 2.8 m over it, at most hoop_every apart elsewhere.
     for TW in C['towers']:
         tx, tz = TW['c']; sx = math.copysign(1, tx - cx); sz = math.copysign(1, tz - cz)
-        ways = [(DECK['level'], math.degrees(math.atan2(sz, sx))), (DECK['level'], math.degrees(math.atan2(0, -sx))), (DECK['level'], math.degrees(math.atan2(-sz, -sx))),
-                (round(13.2 + PLATFORMS['floor'], 2), 180.0 if sx > 0 else 0.0), (36.0 + PLATFORMS['floor'], 90.0 if sz < 0 else 270.0), (0.0, math.degrees(math.atan2(sz, sx))), (0.0, math.degrees(math.atan2(-sz, -sx)))]
+        # (revised 2026-10-18, P1's second fix review) the inner corner is the lift's: no way out faces it. At the Deck
+        # the ring (outward) and the cross-bridge; on the lawn, outward and the two sides that face the open middle.
+        ways = [(DECK['level'], math.degrees(math.atan2(sz, sx))), (DECK['level'], math.degrees(math.atan2(0, -sx))),
+                (round(13.2 + PLATFORMS['floor'], 2), 180.0 if sx > 0 else 0.0), (36.0 + PLATFORMS['floor'], 90.0 if sz < 0 else 270.0),
+                (0.0, math.degrees(math.atan2(sz, sx))), (0.0, math.degrees(math.atan2(0, -sx))), (0.0, math.degrees(math.atan2(-sz, 0)))]
         TW['ways_out'] = [dict(y=y, bearing=round(b % 360, 2), width=2.4, clear=2.8) for y, b in ways]
         lv_ = sorted(set(TW['levels'])); bands = [(y, y + 2.8) for y in lv_]
         hoops = []; tops = [b_[1] for b_ in bands]; bots = [b_[0] - 0.25 for b_ in bands[1:]] + [C['roof']['y'] - 0.3]
@@ -1726,6 +1729,10 @@ def _cross_checks():
                 if abs((rb - w_['bearing'] + 180) % 360 - 180) < half_deg: problems.append(('crossing: a rib in a way out of a tower', nm, w_['y'], w_['bearing']))
             for h_ in TW['hoops']:
                 if w_['y'] - 0.2 < h_ < w_['y'] + w_['clear']: problems.append(('crossing: a hoop across a way out of a tower', nm, w_['y'], h_))
+            # nor the tower's lift: the way's centre line passes the shaft with the way's half-width and 0.2 m to spare
+            ab = math.radians(w_['bearing']); ux, uz = math.cos(ab), math.sin(ab)
+            along = (lx - tx) * ux + (lz - tz) * uz; perp = abs(-(lx - tx) * uz + (lz - tz) * ux)
+            if along > 0 and perp < lr + w_['width'] / 2 + 0.2: problems.append(('crossing: a tower\'s lift in a way out', nm, w_['y'], w_['bearing']))
         gaps_ = [b_ - a_ for a_, b_ in zip(TW['hoops'], TW['hoops'][1:])]
         if TW['hoops'][0] > 3.2 or max(gaps_) > 6.0 + 0.01: problems.append(('crossing: the hoops too far apart to carry the mesh', nm, max(gaps_)))
         if math.hypot(tx-cx0,tz-cz0)+dr>C['ring'][0]-0.1 or math.hypot(tx-cx0,tz-cz0)+dr<C['ring'][0]-0.8: problems.append(('crossing: a tower does not meet the ring\'s inner edge',nm))
@@ -2240,7 +2247,7 @@ def _planting():
     climbers=[]; gardens=[]; lv=[0]+[y for y in C['towers'][0]['levels'] if 0<y<C['roof']['y']]; bayA=2*math.pi/T['ribs']; cx0,cz0=C['c']
     for ti,t_ in enumerate(C['towers']):
         tx,tz=t_['c']; sx=math.copysign(1,tx-cx0); sz=math.copysign(1,tz-cz0)
-        opens=[(6.5,math.atan2(sz,sx)),(6.5,math.atan2(0,-sx)),(6.5,math.atan2(-sz,-sx)),(14.2,math.atan2(0,-sx)),(37.0,math.atan2(-sz,0)),(0,math.atan2(sz,sx)),(0,math.atan2(-sz,-sx))]
+        opens=[(w_['y'],math.radians(w_['bearing'])) for w_ in t_['ways_out']]
         for k in range(T['ribs']):
             ac=k*bayA
             for m,y in enumerate(lv):
@@ -2248,9 +2255,23 @@ def _planting():
                 if any(abs(y_-y)<0.1 and abs(math.atan2(math.sin(ac-b_),math.cos(ac-b_)))<bayA*0.75 for y_,b_ in opens): continue
                 if (k+m)%3==2: continue
                 climbers.append([ti,round(math.degrees(ac),1),R2(y0),R2(y0+grow)])
-        gardens.append(dict(c=list(t_['c']),r=round(T['drum']+3.5,2),reeds=[[R2(tx+(T['drum']+1.2+(q%3)*0.7)*math.cos(q/14*2*math.pi+0.2)),R2(tz+(T['drum']+1.2+(q%3)*0.7)*math.sin(q/14*2*math.pi+0.2)),round(1.4+(q%2)*0.6,2)] for q in range(14) if q%7!=3]))
+        # the rain garden is a ring round the drum's foot (never inside it: the helix lands on the lawn there), cut by a
+        # paved path along each way out on the lawn, and clear of the lift; no reed in a path or against the lift
+        paths=[w_['bearing'] for w_ in t_['ways_out'] if w_['y']==0]; pw=t_['ways_out'][0]['width']; lx,lz=t_['lift']['c']; lr=t_['lift']['r']
+        def _clear(x,z):
+            if math.hypot(x-lx,z-lz)<lr+0.6: return False
+            for b_ in paths:
+                ux,uz=math.cos(math.radians(b_)),math.sin(math.radians(b_))
+                if (x-tx)*ux+(z-tz)*uz>0 and abs(-(x-tx)*uz+(z-tz)*ux)<pw/2+0.4: return False
+            return True
+        rd=[[R2(tx+(T['drum']+1.2+(q%3)*0.7)*math.cos(q/14*2*math.pi+0.2)),R2(tz+(T['drum']+1.2+(q%3)*0.7)*math.sin(q/14*2*math.pi+0.2)),round(1.4+(q%2)*0.6,2)] for q in range(14) if q%7!=3]
+        gardens.append(dict(c=list(t_['c']),r_in=T['drum'],r=round(T['drum']+3.5,2),paths=paths,path_width=pw,lift_clear=round(lr+0.3,2),
+                            reeds=[q for q in rd if _clear(q[0],q[1])]))
     C['climbers']=climbers; C['rain_gardens']=gardens
 _planting()
+for _g in CROSSING['rain_gardens']:
+    if _g['r_in']<CROSSING['tower']['drum'] or len(_g['reeds'])<6: problems.append(('crossing: a rain garden inside its drum, or bare of reeds',_g['c']))
+    if len(_g['paths'])!=3: problems.append(('crossing: a rain garden without a path for each way out on the lawn',_g['c']))
 ## The timetable (city.md 6g, 2026-10-17, at the user's direction). A clock-face
 ## service: on every line a train every 60 real seconds, which in the game's
 ## clock (one real second is one game minute) is a train every hour, on the same
