@@ -24,7 +24,8 @@
 4. `docs/architecture/city.md` section 7, Old Moy: grep for "Old Moy" and
    "Well Quarter". Do not read the whole file.
 5. The plan data. **The data wins** over every document:
-   - `CityPlan.TOWER_HOUSE`: the kit's numbers (all in metres).
+   - `CityPlan.TOWER_HOUSE`: the kit's numbers (all in metres), and its
+     `parts` and `joins` (section 2.7).
    - `CityPlan.OLD_HOUSES`: 60 houses. Each has `corners`, `storeys`,
      `front` (the road it was cut from), `door` (the road its door is on,
      or `court`, or `through`), `front_edge` (the index of the corner pair
@@ -146,11 +147,52 @@ From `OLD_TOWN.squares[0].first_well`:
 - the old ghaf over it (`tree`, kind `round`, from the park's tree kit): the
   trunk solid, the crown decorative.
 
-### 2.7 Construction
+### 2.7 Parts and joins (binding)
 
-- Build every piece from SuperEgg parts (`SuperEgg.build_part`), in the
-  manner of the village kits: the rounded earth corners are the kit's
-  superellipse.
+**Build every piece from the schedule:** `CityPlan.TOWER_HOUSE.parts` (53
+parts) and `.joins` (10 joins). The model's kit sheet draws the same schedule:
+match it piece for piece. Nothing in the house is left to choose. If a piece
+seems missing or wrong, say so in the diagnostic; do not invent one.
+
+- **Shapes**, with the game's own code:
+  - `egg`: `SuperEgg.build_part(semi, colour, eps[0], eps[1])`;
+  - `clipped`: `SuperEgg.build_clipped_part(semi, planes, colour, eps…)`,
+    with the planes its join names; every cut is capped;
+  - `profile`: a superellipse outline of exponent `n`, extruded;
+  - `wall`: a `SolidModel` solid of the outline, its openings punched;
+  - `punched`: a `SolidModel` cutter of exponent `n` through its wall. The
+    glazing is that cutter intersected with the wall, and the gypsum ring is
+    the cutter grown by `ring` less the cutter, as the architecture skill
+    says;
+  - `box`: only the roof slab, for its stated reason;
+  - `decal`: painted, not geometry.
+- **Sizes:** `semi` is half-sizes across the face, up, and out from it;
+  `fit` means the plot sets it. A seated part's centre is on its seat and
+  its upper half is kept; a part against a wall is centred on the wall face
+  and its outer half is kept.
+- **Joins:**
+  - **split** (`door_pair`, `shutter_set`): one parent egg the size of the
+    closed opening, cut by `cuts`. Each leaf hinges at its outer edge, so shut
+    they make the parent again. The doors are double; the shopfront's four
+    shutter leaves fold back to the jambs by day.
+  - **meet** (`cap_ridge`): the wind tower's two cap slabs both run past the
+    ridge and are cut at its one plane.
+  - **chain** (`band_chain`, `lift_stack`, `ramp_ends`): each frieze,
+    cornice and ashlar band is one egg per face, cut at both corners'
+    bisectors and at the wall face, so neighbouring runs meet on one mitre
+    line. The ramps are cut at both roofs' tops from one datum.
+  - **seated** (`seated`, `against_wall`): merlons, horns, posts, pots, the
+    well head, the wind shaft; and sills, lintels, the kishk, its brackets,
+    the spouts and the latrine shaft against their walls. Each is cut flat
+    where it sits and capped. Nothing is buried whole.
+  - **punched** (`punched`): every opening.
+- **The test**, as the architecture skill sets it: look at every join from
+  both sides. A gap, a step, a double thickness or a mismatched profile
+  fails, however small.
+
+### 2.8 Construction
+
+- The rounded earth corners are the kit's superellipse (`corner_exp`).
 - Share meshes and materials between houses; merge static pieces per bake
   cell by material, as the bake builder does.
 - Bake everything into the Moy bake (`moy_city_bake_builder.gd`), with the
@@ -205,6 +247,11 @@ Each at noon and dusk.
 ## 6. Report
 
 Write `docs/diagnostics/<date>-moy-P4.md` with:
+- **the schedule as built:** one line per part and per join in
+  `TOWER_HOUSE.parts` and `.joins`, saying how it was built and naming the
+  function used, with a close screenshot of each join kind (the door pair
+  shut and open, a frieze mitre, the cap's ridge, a seated merlon, a punched
+  window with its glass and ring);
 - what was built, with counts by kind;
 - the check results;
 - the parkour runs;
@@ -213,6 +260,10 @@ Write `docs/diagnostics/<date>-moy-P4.md` with:
 - every place the data and this brief disagreed.
 
 ## Decisions log
+
+- 2026-10-18 (user): every piece and every join is decided in the plan
+  (`TOWER_HOUSE.parts`, `.joins`), not left to the build; the model draws
+  the same schedule; the diagnostic reports it part by part.
 
 - 2026-10-18: the houses are exterior only, as in P3; the Reese–Miller
   house's inside is P13h.

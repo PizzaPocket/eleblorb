@@ -2738,6 +2738,124 @@ TOWER_HOUSE=dict(
   passage=dict(w=2.4,h=3.0), court_min=25.0, ramp=dict(w=1.2,max_deg=32.0,min_wall=6.5),
   pocket=dict(open_min=4.0,gate=1.4,wall=2.4,tree_area=12.0),
 )
+## The tower house's parts and joins (P4, 2026-10-18, at the user's direction): every visible piece of the kit, its
+## shape and how it meets its neighbours, decided here so the build follows one schedule and the model draws the
+## same one. shape: egg (SuperEgg.build_part: semi-axes, eps top and bottom), clipped (SuperEgg.build_clipped_part:
+## an egg cut by the planes its join names, every cut capped), profile (a superellipse outline extruded, exponent n),
+## wall (a SolidModel solid of the outline with its openings punched), punched (a SolidModel profile cutter through a
+## wall: exponent n; glazing derived from the same cutter) or box (only with a reason). semi: half-sizes in metres
+## (x along the face, y up, z out from it), or 'fit' where the plot sets them. A seated part's centre is on its seat
+## and its upper half is kept, so its height is semi y; a part against a wall is centred on the wall face and its outer
+## half kept, so it stands out by semi z. col: solid, landing, decorative, open.
+## role: what it is, which sets how square it must be.
+TH_PARTS=[
+ # the body
+ dict(id='plinth',what='basalt courses at the street',shape='profile',n=4.0,semi='fit',h=0.9,out=0.05,mat='basalt',col='landing',role='course'),
+ dict(id='stone_wall',what='the stone base, plumb',shape='wall',semi='fit',mat='stone',col='solid',role='wall'),
+ dict(id='ashlar_band',what='pale ashlar bands across the stone base',shape='clipped',semi=('fit',0.11,0.04),eps=(5.5,5.5),mat='ashlar',col='landing',role='band',join='band_chain'),
+ dict(id='earth_lift',what='one rammed-earth lift; the outer face steps in by the batter, free corners rounded',shape='profile',n=4.0,semi='fit',h=0.65,mat='earth',col='solid',role='course',join='lift_stack'),
+ dict(id='lift_horn',what='a lift end turned up at a rounded corner (the climbable corner)',shape='clipped',semi=(0.18,0.08,0.14),eps=(3.0,5.5),mat='earth',col='landing',role='trim',join='seated'),
+ dict(id='cornice',what='gypsum cornice over an earth base',shape='clipped',semi=('fit',0.25,0.3),eps=(5.5,5.5),mat='gypsum',col='landing',role='band',join='band_chain'),
+ dict(id='brick_wall',what='the brick storeys, plumb on the outline',shape='wall',semi='fit',mat='brick',col='solid',role='wall'),
+ dict(id='frieze',what='gypsum frieze at each brick floor (pattern in relief, decorative)',shape='clipped',semi=('fit',0.175,0.08),eps=(5.5,5.5),mat='gypsum',col='landing',role='band',join='band_chain'),
+ dict(id='latrine_shaft',what='the plastered service chute on a side or back face',shape='clipped',semi=(0.55,'fit',0.45),eps=(3.0,3.0),mat='gypsum',col='solid',role='shaft',join='against_wall'),
+ dict(id='drainpipe',what='white drainpipe from a roof spout',shape='egg',semi=(0.06,'fit',0.06),eps=(2.0,2.0),mat='gypsum',col='decorative',role='pipe'),
+ dict(id='mizab',what='roof spout through the parapet',shape='clipped',semi=(0.08,0.08,0.35),eps=(3.0,3.0),mat='gypsum',col='decorative',role='trim',join='against_wall'),
+ # openings
+ dict(id='light',what='small square light in a base',shape='punched',n=4.0,semi=(0.3,0.4,'wall'),mat='glass_dark',col='solid',role='opening',join='punched'),
+ dict(id='window',what='tall brick-storey window under its qamariya',shape='punched',n=6.0,semi=(0.5,0.8,'wall'),head=dict(shape='half',r=0.5),mat='glass',col='solid',role='opening',join='punched'),
+ dict(id='surround',what='the white gypsum outline round a window, door or qamariya',shape='punched',n=6.0,semi=(0.62,0.92,0.05),ring=0.12,mat='gypsum',col='decorative',role='trim',join='punched'),
+ dict(id='qamariya',what='the fanlight: coloured glass in the half-round head',shape='punched',n=2.0,semi=(0.5,0.5,'wall'),half=True,mat='glass_colour',col='solid',role='opening',join='punched'),
+ dict(id='sill',what='window sill, proud of the wall: a hold',shape='clipped',semi=(0.6,0.06,0.12),eps=(5.5,5.5),mat='gypsum',col='landing',role='sill',join='against_wall'),
+ dict(id='mafraj_window',what='the top floor\'s low wide window',shape='punched',n=6.0,semi=(0.8,0.5,'wall'),mat='glass',col='solid',role='opening',join='punched'),
+ dict(id='door_opening',what='the house door\'s opening, a superellipse head',shape='punched',n=4.0,semi=(0.6,1.2,'wall'),mat='shadow',col='open',role='opening',join='punched'),
+ dict(id='door_leaf',what='one leaf of the carved double door, painted blue, green or ochre',shape='clipped',semi=(0.3,1.18,0.04),eps=(5.5,5.5),mat='door',col='solid',role='leaf',join='door_pair'),
+ dict(id='house_mark',what='the painted house mark over the door',shape='decal',semi=(0.3,0.3,0.0),mat='paint',col='decorative',role='paint'),
+ dict(id='shop_opening',what='the shopfront cut later into the base',shape='punched',n=8.0,semi=(1.4,1.4,'wall'),mat='shadow',col='open',role='opening',join='punched'),
+ dict(id='lintel',what='timber lintel over the shopfront',shape='clipped',semi=(1.6,0.11,0.16),eps=(5.5,5.5),mat='timber',col='landing',role='beam',join='against_wall'),
+ dict(id='shutter_leaf',what='one leaf of the folding shopfront shutters',shape='clipped',semi=(0.35,1.35,0.03),eps=(5.5,5.5),mat='timber',col='solid',role='leaf',join='shutter_set'),
+ dict(id='kishk',what='the box window: a white box on the brick storeys',shape='clipped',semi=(0.6,0.8,0.6),eps=(5.5,5.5),mat='gypsum',col='landing',role='box_window',join='against_wall'),
+ dict(id='kishk_bracket',what='a bracket under the kishk',shape='clipped',semi=(0.1,0.3,0.55),eps=(3.0,5.5),mat='gypsum',col='landing',role='bracket',join='against_wall'),
+ dict(id='lattice',what='the kishk\'s latticed panels',shape='decal',semi=(0.5,0.6,0.0),mat='timber',col='decorative',role='paint'),
+ # the top
+ dict(id='parapet',what='the parapet wall round the roof',shape='wall',semi='fit',h=0.7,mat='brick',col='landing',role='wall'),
+ dict(id='merlon',what='a merlon on the parapet (pattern 0 to 2)',shape='clipped',semi=(0.3,0.5,0.22),eps=(5.5,5.5),mat='brick',col='landing',role='merlon',join='seated'),
+ dict(id='horn',what='a whitewashed horn at a parapet corner',shape='clipped',semi=(0.25,0.5,0.25),eps=(3.0,5.5),mat='gypsum',col='landing',role='trim',join='seated'),
+ dict(id='parapet_post',what='a post closing a parapet end at a ramp\'s gap',shape='clipped',semi=(0.25,1.2,0.25),eps=(5.5,5.5),mat='brick',col='landing',role='post',join='seated'),
+ dict(id='roof',what='the roof terrace',shape='box',semi='fit',mat='plaster',col='landing',role='slab',reason='a floor fills to the walls: a rounded slab would leave open corners'),
+ dict(id='kiosk',what='the kiosk over the core, where the ramp arrives on the roof',shape='wall',semi=(1.7,1.3,1.5),mat='brick',col='landing',role='wall'),
+ dict(id='kiosk_door',what='the kiosk\'s door onto the terrace',shape='clipped',semi=(0.45,1.0,0.04),eps=(5.5,5.5),mat='door',col='solid',role='leaf',join='kiosk_door_pair'),
+ dict(id='wind_shaft',what='the wind tower\'s shaft',shape='clipped',semi=(1.1,4.5,0.7),eps=(5.5,5.5),mat='gypsum',col='solid',role='shaft',join='seated'),
+ dict(id='wind_mouth',what='the catcher\'s mouth, turned to the west wind',shape='punched',n=4.0,semi=(0.5,0.7,'wall'),mat='shadow',col='open',role='opening',join='punched'),
+ dict(id='wind_cap',what='one slab of the wind tower\'s pitched cap',shape='clipped',semi=(0.75,0.12,0.85),eps=(5.5,5.5),mat='gypsum',col='landing',role='slab',join='cap_ridge'),
+ dict(id='manzar',what='the rooftop room, qamariya windows on three sides',shape='wall',semi=(2.5,1.5,3.0),mat='gypsum',col='landing',role='wall'),
+ # the quarter's ground
+ dict(id='ramp',what='the timber roof ramp, a storey up along a party wall',shape='clipped',semi=(0.6,0.07,'fit'),eps=(5.5,5.5),mat='timber',col='landing',role='slab',join='ramp_ends'),
+ dict(id='ramp_rail',what='the ramp\'s side rail',shape='clipped',semi=(0.04,0.45,'fit'),eps=(5.5,5.5),mat='timber',col='solid',role='rail',join='ramp_ends'),
+ dict(id='passage_arch',what='a court passage\'s opening, at both ends',shape='punched',n=2.5,semi=(1.2,1.5,'wall'),mat='shadow',col='open',role='opening',join='punched'),
+ dict(id='passage_lamp',what='the lamp inside a passage',shape='egg',semi=(0.15,0.2,0.15),eps=(2.0,2.0),mat='lamp',col='decorative',role='lamp'),
+ dict(id='bench',what='a pocket\'s bench seat',shape='egg',semi=(0.8,0.06,0.22),eps=(5.5,5.5),mat='timber',col='landing',role='slab'),
+ dict(id='bench_leg',what='a bench leg',shape='clipped',semi=(0.06,0.4,0.18),eps=(5.5,5.5),mat='timber',col='solid',role='post',join='seated'),
+ dict(id='pot',what='a planted pot',shape='clipped',semi=(0.28,0.5,0.28),eps=(2.6,3.0),mat='terracotta',col='solid',role='vessel',join='seated'),
+ dict(id='yard_wall',what='a family yard\'s wall',shape='wall',semi='fit',h=2.4,mat='earth',col='solid',role='wall'),
+ dict(id='gate_post',what='a post at each side of the yard\'s open gateway',shape='clipped',semi=(0.22,2.6,0.22),eps=(5.5,5.5),mat='earth',col='landing',role='post',join='seated'),
+ dict(id='well_head',what='the first well\'s head',shape='clipped',semi=(1.1,0.8,1.1),eps=(3.0,5.5),mat='stone',col='landing',role='vessel',join='seated'),
+ dict(id='well_lid',what='its stone lid',shape='clipped',semi=(1.05,0.1,1.05),eps=(3.0,5.5),mat='basalt',col='landing',role='lid',join='seated'),
+ dict(id='trough',what='the stone trough, hollowed',shape='clipped',semi=(0.4,0.6,1.6),eps=(5.5,5.5),mat='stone',col='landing',role='vessel',join='seated',hollow=0.08),
+ dict(id='ghaf_trunk',what='the old ghaf\'s trunk',shape='clipped',semi=(0.45,3.8,0.45),eps=(2.0,2.4),mat='bark',col='solid',role='trunk',join='seated'),
+ dict(id='ghaf_crown',what='the ghaf\'s crown, a cluster of soft eggs',shape='egg',semi=(2.8,1.5,2.8),eps=(2.2,2.6),mat='leaf',col='decorative',role='crown'),
+]
+## The joins: each names its kind and the parts it holds together. split: one parent egg the size of the closed
+## opening, cut by planes into leaves that hinge at their outer edges, so shut they make the parent again. meet: two
+## slabs run through one shared plane and both cut at it. chain: each piece cut at the plane it shares with the next
+## (a corner's bisector, a roof's top), so a run reads as one form. seated: an egg cut flat where it stands on or
+## against a surface and capped there, never buried whole. punched: a SolidModel cutter through a wall; glazing and
+## the gypsum ring come from the same cutter.
+TH_JOINS=[
+ dict(id='door_pair',kind='split',parts=['door_leaf'],parent=(0.6,1.18,0.04),eps=(5.5,5.5),cuts=[(1,0,0,0.0)],hinge='outer',rule='shut, the two leaves rebuild the parent egg; each swings from its outer edge'),
+ dict(id='kiosk_door_pair',kind='split',parts=['kiosk_door'],parent=(0.45,1.0,0.04),eps=(5.5,5.5),cuts=[],hinge='left',rule='a single leaf: the parent itself, hinged at one side'),
+ dict(id='shutter_set',kind='split',parts=['shutter_leaf'],parent=(1.4,1.35,0.03),eps=(5.5,5.5),cuts=[(1,0,0,-0.7),(1,0,0,0.0),(1,0,0,0.7)],hinge='outer',rule='four leaves from one parent; they fold back in pairs to each jamb'),
+ dict(id='cap_ridge',kind='meet',parts=['wind_cap','wind_cap'],plane='the vertical plane through the ridge',rule='both slabs run past the ridge and are cut at it; their cut faces meet on one line, the profile the same both sides'),
+ dict(id='band_chain',kind='chain',parts=['ashlar_band','cornice','frieze'],plane='the bisector of each corner of the outline',rule='each face\'s run is cut at both corners\' bisectors; neighbouring runs meet on one mitre line, same height and same profile'),
+ dict(id='lift_stack',kind='chain',parts=['earth_lift'],plane='each lift\'s top',rule='each lift stands on the one below on one horizontal plane; the batter shows as a step of tan(batter) x lift'),
+ dict(id='ramp_ends',kind='chain',parts=['ramp','ramp_rail'],plane='the lower roof\'s top at the foot; the higher roof\'s top at the head, through the parapet gap',rule='cut at both roofs\' planes from the same datum (the storey): flush at both ends, no ledge'),
+ dict(id='seated',kind='seated',parts=['lift_horn','merlon','horn','parapet_post','bench_leg','pot','gate_post','well_head','well_lid','trough','ghaf_trunk','wind_shaft'],plane='the top of what it stands on',rule='cut flat at that plane and capped; the cut face sits on it, no gap, no buried half'),
+ dict(id='against_wall',kind='seated',parts=['latrine_shaft','mizab','sill','lintel','kishk','kishk_bracket'],plane='the wall\'s outer face',rule='cut at the wall face and capped; it stands proud of the wall by its depth, nothing sunk into the wall'),
+ dict(id='punched',kind='punched',parts=['light','window','surround','qamariya','mafraj_window','door_opening','shop_opening','wind_mouth','passage_arch'],plane='through the wall',rule='one closed cutter per opening; the glass is the cutter intersected with the wall, the gypsum ring the cutter grown by its ring less the cutter'),
+]
+TOWER_HOUSE['parts']=TH_PARTS; TOWER_HOUSE['joins']=TH_JOINS
+def _th_parts_checks():
+    ids={p['id'] for p in TH_PARTS}; square=('post','rail','slab','beam','sill','merlon','band','leaf','box_window','course')
+    for p in TH_PARTS:
+        if p['shape'] not in ('egg','clipped','profile','wall','punched','box','decal'): problems.append(('tower parts: unknown shape',p['id']))
+        if p['shape']=='box' and not p.get('reason'): problems.append(('tower parts: a box with no reason',p['id']))
+        if p['shape'] in ('egg','clipped'):
+            if min(p['eps'])<2.0: problems.append(('tower parts: an egg below exponent 2 pinches',p['id']))
+            if p['role'] in square and min(p['eps'])<5.0: problems.append(('tower parts: a square member not square enough',p['id']))
+        if p['shape']=='clipped' and not any(p['id'] in j['parts'] for j in TH_JOINS): problems.append(('tower parts: a clipped part with no join to cut it',p['id']))
+        if p['shape']=='punched' and p['n']<2.0: problems.append(('tower parts: an opening below exponent 2',p['id']))
+        if p['col'] not in ('solid','landing','decorative','open'): problems.append(('tower parts: no collision class',p['id']))
+    for j in TH_JOINS:
+        for q in j['parts']:
+            if q not in ids: problems.append(('tower joins: a join names a missing part',j['id'],q))
+        if j['kind']=='split' and j['cuts']:
+            # the leaves rebuild the parent: n cuts make n+1 leaves of the part's width
+            leaf=[p for p in TH_PARTS if p['id']==j['parts'][0]][0]
+            if abs((len(j['cuts'])+1)*leaf['semi'][0]-j['parent'][0])>0.01: problems.append(('tower joins: the leaves do not make the parent',j['id']))
+    # the openings and members agree with the kit's numbers
+    win=[p for p in TH_PARTS if p['id']=='window'][0]
+    if abs(2*win['semi'][0]-TOWER_HOUSE['window']['w'])>0.01 or abs(2*win['semi'][1]-TOWER_HOUSE['window']['h'])>0.01: problems.append(('tower parts: the window out of step with TOWER_HOUSE',))
+    door=[p for p in TH_PARTS if p['id']=='door_opening'][0]
+    if abs(2*door['semi'][0]-TOWER_HOUSE['door']['w'])>0.01 or abs(2*door['semi'][1]-TOWER_HOUSE['door']['h'])>0.01: problems.append(('tower parts: the door out of step with TOWER_HOUSE',))
+    shaft=[p for p in TH_PARTS if p['id']=='wind_shaft'][0]
+    if abs(shaft['semi'][1]-TOWER_HOUSE['wind_tower']['h'])>0.01: problems.append(('tower parts: the wind shaft out of step with TOWER_HOUSE',))
+    k_=[p for p in TH_PARTS if p['id']=='kishk'][0]
+    if abs(k_['semi'][2]-TOWER_HOUSE['kishk']['d'])>0.01 or abs(2*k_['semi'][0]-TOWER_HOUSE['kishk']['w'])>0.01: problems.append(('tower parts: the kishk out of step with TOWER_HOUSE',))
+    m_=[p for p in TH_PARTS if p['id']=='merlon'][0]
+    if abs(m_['semi'][1]-TOWER_HOUSE['parapet']['merlon'][1])>0.01 or abs(2*m_['semi'][0]-TOWER_HOUSE['parapet']['merlon'][0])>0.01: problems.append(('tower parts: the merlon out of step with TOWER_HOUSE',))
+    pp=[p for p in TH_PARTS if p['id']=='parapet'][0]
+    if abs(pp['h']+m_['semi'][1]-TOWER_HOUSE['parapet']['h'])>0.01: problems.append(('tower parts: parapet and merlon do not make the parapet height',))
+_th_parts_checks()
 def _p4():
     from shapely.geometry import LineString, Polygon, Point, box as sbox
     from shapely.ops import unary_union, nearest_points

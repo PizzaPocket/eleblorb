@@ -52,6 +52,14 @@ The user's shorthand for starting a planning session on the city of Moy.
   everything is", and name it in the brief.
 - **Republish** the models you changed to their existing artifact URLs (in
   the roadmap's "Where everything is"), never as new artifacts.
+- **Every kit gets a parts and joins schedule** (user, 2026-10-18), in the
+  plan data beside its numbers (as `TOWER_HOUSE.parts` and `.joins`): every
+  visible piece's shape (SuperEgg, clipped SuperEgg, superellipse profile,
+  wall with punched openings, or a box with its reason), its half-sizes and
+  exponents, its collision; and every join's kind (split, meet, chain,
+  seated, punched) with its planes, under the architecture skill's section
+  1a. Check it in `city_layout.py`; draw the model from it; make it binding in
+  the brief; ask for it part by part in the diagnostic, and review it so.
 - **Briefs** follow `moy_pkg_P0.md` and `moy_pkg_P3.md`: area, target level,
   depends on, read first, what to build, collision, checks, viewpoints,
   report, decisions log. Short lines and bullets; no in-game text.

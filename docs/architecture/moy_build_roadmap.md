@@ -71,6 +71,11 @@ matters is in the files listed in section 6.
 - Inside a package's area, a building's details (its kit, its facade, its
   interior) are open to design.
 
+**The plan decides the parts** (user, 2026-10-18). Every kit carries a
+parts and joins schedule in the plan data: each visible piece's SuperEgg
+shape and sizes, and how each pair of pieces is cut where they meet. The
+build follows it; the diagnostic reports it part by part.
+
 **The checks do the walking** (package P0). Every bug of the prototype passes
 could have been caught by a machine:
 - surfaces at one height;
