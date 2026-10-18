@@ -2249,7 +2249,7 @@ Square (section 6, the Deck).
 | 35 | Wing Fat Mansion | 32 × 24 m | mansion block, 22 storeys on a podium | Ah Keung, Iris Dune, Nia Calder, Venn Harlow, Dax Merrow, Bea and Wilfred Ho |
 | 36 | Vertical farm | 22 × 24 m | windowless, 12 storeys of growing racks | Sora Ishida |
 | 37 | All-night store | 8 × 12 m | 5 storeys; flat above | Hiro Sato |
-| 38 | Helmsmith | 10 × 12 m | 2 storeys; home behind | Gideon Hale |
+| 38 | Helmsmith | 10 × 12 m | 2 storeys, a lock-up shop open onto Lamp Lane; home behind (the game's legacy stall on Civic Plaza moves here in P3) | Gideon Hale |
 | 39 | City works yard | 26 × 12 m | sheds and a flat | Kade Morrow |
 
 **Beyond the Rim Walk**

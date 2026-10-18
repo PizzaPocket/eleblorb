@@ -15,8 +15,8 @@
    are the specification.
 3. The market lanes charter in `docs/style_charters.md`.
 4. The plan data: `CityPlan.LOT_KITS` (one entry per lot, `null` outside
-   Old Moy and the market lanes) and `CityPlan.BUILDING_KITS[34]` (the market
-   flats).
+   Old Moy and the market lanes), `CityPlan.BUILDING_KITS[34]` (the market
+   flats) and `CityPlan.BUILDING_KITS[38]` (the Helmsmith).
    - There are 80 market-lane lots today: 58 tile houses, 15 boom houses and
      7 lock-ups.
    - The design doc's table predates the current layout. The data wins.
@@ -66,6 +66,34 @@ with its kit house, built from its `LOT_KITS` entry. Build no house by hand.
   lettered (picture signs only: no in-game text). Some hang across the lanes.
 - **The market flats** (`BUILDING_KITS[34]`): four tile houses built as one
   terrace, rounded at the corner, with laundry on the shared roof.
+
+## 2a. The Helmsmith moves home
+
+The live game still has the old Helmsmith stall standing in the middle of
+Civic Plaza (`_add_moy_helmsmith()` in `scripts/city_generator.gd`, at world
+(−470, −18)). It was kept there as a stopgap when the city was replaced. Its
+real home is building 38, on Lamp Lane's south side (`CityPlan.BUILDINGS`
+38, x −600 to −590, z 174 to 186; `CityPlan.BUILDING_KITS[38]`).
+
+- **Build 38** as a lock-up (two storeys) facing north onto Lamp Lane: its
+  shutter rolled up by day, a counter across the open front, helms on the
+  back wall's racks and on stands either side of the opening (dressed at L2
+  in plain shapes), one picture sign of a helm. His home is behind and above,
+  not entered.
+- **Move the vendor:** the same NPC, with the same name, looks, `shop_category`
+  `"city"` and stock, standing behind the counter, facing the lane, on
+  tested ground. Keep him stationary.
+- **Remove the legacy stall from Civic Plaza** and its storefront node
+  (`MoyHelmsmithShop`), and update `_remove_moy_actors()` to match. Nothing
+  of the shop is left on the plaza.
+- **Check:** the shop UI opens from Lamp Lane with both characters; the
+  plaza is clear; `reach` finds the counter from the lane.
+- **His lines.** His second line ("A core takes one head-shape at a time…")
+  explains a mechanic, which the in-game text rule forbids. Replace it with
+  an in-character remark that explains nothing, and flag the change in the
+  diagnostic.
+- Building 38 is still the Helmsmith's interior package (P13k) later; this
+  move needs only its front.
 
 **The streets they make:**
 - **Arcade Street's roof** (section 3.5): steel arches carrying translucent
@@ -138,3 +166,5 @@ Write `docs/diagnostics/<date>-moy-P3.md` with:
 
 - 2026-10-18: the houses are exterior only; shop windows are dressed 1.5 m
   deep; no core or flat is built.
+- 2026-10-18: the Helmsmith's legacy stall leaves Civic Plaza for building
+  38 on Lamp Lane in this package (section 2a).

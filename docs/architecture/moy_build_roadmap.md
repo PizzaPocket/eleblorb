@@ -104,7 +104,7 @@ diagnostic replaces this column.
 | P0 | **The check suite and the screenshot rig** | the whole city (and reused by every kingdom) | none | n/a | **ready** | `moy_pkg_P0.md` |
 | P1 | Prototype pass 4: grand square, City Hall's front, the clock dome, the Clock Room, tower ribs, closed escalators, the pond | civic core, Crossing | L1 to L3 | L2 | **built, to review** (`03a9d7a`) | `moy_prototype_pass_4.md` |
 | P2 | Bake and performance: the rendered probe, budgets, streaming | the whole city | owed | budgets met | planned | |
-| P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane | market lanes | L1 | L2 | **ready** | `moy_pkg_P3.md` |
+| P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane; the Helmsmith moves off Civic Plaza to his shop on Lamp Lane | market lanes | L1 | L2 | **ready** | `moy_pkg_P3.md` |
 | P4 | The Old Moy tower-house kit: 60 houses on their old roads, courtyards, the first well | Old Moy | L1 | L2 | next | (design: `moy_tower_house.md`) |
 | P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L1 | L2 | planned | |
 | P6 | Downtown: the mid-rise podium kit, and the four towers' exteriors (the Windspire, BLOCK, north, south) | downtown | L1 | L2 | planned | |
@@ -145,7 +145,7 @@ diagnostic replaces this column.
 | P13h | the Reese–Miller house |
 | P13i | (moved into P17) Pinestein's laboratory, sealed in the BLOCK tower's base; his Old Moy flat is not entered |
 | P13j | Hiro's all-night store |
-| P13k | the Helmsmith |
+| P13k | the Helmsmith (his shop front and the move off Civic Plaza are in P3) |
 
 **P17, the BLOCK tower.** One of the big projects, and iterative by design.
 - **What it is:** narrative scenes spanning several rooms and levels of the

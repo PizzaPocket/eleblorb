@@ -2406,6 +2406,10 @@ BUILDING_KITS[27].update(polite=True); BUILDING_KITS[25].update(polite=True)
 # corner of Market Street and Museum Lane (moy_market_lanes.md 4)
 BUILDING_KITS[34]={'kit':'tong_lau','storeys':8,'front':'s','shop':True,'gen':'tile','veranda':False,
                    'corner':True,'colour':1,'signs':3,'roof':'laundry','core':'own','pair':-1,'lift':True,'units':4}
+# the Helmsmith (38): Gideon Hale's two-storey lock-up shop on Lamp Lane's
+# south side, the counter in its open front and his home behind; the live
+# game's legacy stall on Civic Plaza moves here in P3 (moy_pkg_P3.md 2a)
+BUILDING_KITS[38]={'kit':'lockup','storeys':2,'front':'n','shop':True,'colour':3,'signs':1,'counter':True,'home':'behind'}
 # two neighbours never share both parapet pattern and base height
 def touching(a,b_): return a[0]<=b_[2] and b_[0]<=a[2] and a[1]<=b_[3] and b_[1]<=a[3]
 for i,ki in enumerate(LOT_KITS):

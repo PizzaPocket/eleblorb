@@ -411,6 +411,7 @@ const BUILDING_KITS := {
 	31: {"kit": "tower", "storeys": 6, "front": "w", "shop": true, "base_kind": "stone", "base": 2, "kishk": 2, "manzar": false, "parapet": 0, "frieze": 1, "polite": true},
 	32: {"kit": "tower", "storeys": 7, "front": "e", "shop": true, "base_kind": "stone", "base": 2, "kishk": 2, "manzar": false, "parapet": 2, "frieze": 3, "polite": true},
 	34: {"kit": "tong_lau", "storeys": 8, "front": "s", "shop": true, "gen": "tile", "veranda": false, "corner": true, "colour": 1, "signs": 3, "roof": "laundry", "core": "own", "pair": -1, "lift": true, "units": 4},
+	38: {"kit": "lockup", "storeys": 2, "front": "n", "shop": true, "colour": 3, "signs": 1, "counter": true, "home": "behind"},
 	52: {"kit": "tower", "storeys": 7, "front": "e", "shop": true, "base_kind": "earth", "base": 3, "kishk": 1, "manzar": true, "parapet": 2, "frieze": 3, "polite": true},
 }
 
