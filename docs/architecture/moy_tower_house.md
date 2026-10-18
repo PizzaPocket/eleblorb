@@ -1,9 +1,11 @@
-# Moy: the Old Moy tower house kit (proposed, 2026-10-13)
+# Moy: the Old Moy tower house kit (proposed, 2026-10-13; built in package P4)
 
 Read with `docs/architecture/city.md` (section 7, Old Moy) and the Old Moy
 charter in `docs/style_charters.md`. The plan data is in
-`tools/city_layout.py` (`TOWER_KIT`), emitted to `CityPlan.LOT_KITS` and
-`CityPlan.BUILDING_KITS`.
+`tools/city_layout.py`: the kit's numbers in `TOWER_HOUSE`, each house's kit in
+`CityPlan.LOT_KITS`, `CityPlan.BUILDING_KITS` and `CityPlan.OLD_HOUSES`. The
+build brief is `moy_pkg_P4.md` (2026-10-18), which settles where this
+document and the data differ.
 
 ## 1. Precedent
 
@@ -173,7 +175,9 @@ neighbours never share both the parapet pattern and the base height.
 
 ## 4. The Reese–Miller house (number 52), the first of the kit
 
-**Site.** 10 × 16 m on Arcade Street, its 16 m street face on the east. It
+**Site** (superseded 2026-10-18: in the Well Quarter's plots a four-storey
+house stands against its north end and its court is the block's big shared
+court behind it; see `moy_pkg_P4.md`). 10 × 16 m on Arcade Street, its 16 m street face on the east. It
 stands nearly free, as in the reference photo:
 - a 3 m slot to the north, which leads from Arcade Street to the court gate;
 - a walled **court** behind it, to the west, about 12 × 16 m;

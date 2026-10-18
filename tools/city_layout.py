@@ -2703,6 +2703,150 @@ for i in TL:
     if min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<6 and ki['core']!='shared': problems.append(('narrow tong lau without a shared core',i,lots[i]))
 for i,ki in enumerate(LOT_KITS):
     if ki and ki['kit']=='lockup' and lots[i][4]!=2: problems.append(('lock-up shop not two storeys',i))
+## Old Moy, package P4 (docs/architecture/moy_pkg_P4.md, 2026-10-18). The tower house kit's
+## numbers (moy_tower_house.md 3), every house's kit fitted to its true width, the face it
+## turns to its road, the courtyards and their ways in, the roof route's ramps and the first well.
+TOWER_HOUSE=dict(
+  storey=3.25, plinth=0.9,
+  wall=dict(earth=0.9,earth_top_min=0.5,stone=0.7,brick=0.45),
+  lift=0.65, batter=1.5, corner_exp=4.0, horn=0.08,         # earth: zabur lifts, the batter in degrees, rounded free corners
+  cornice=dict(h=0.5,out=0.3), corbel=0.3,                   # over an earth base the brick steps back out to the lot line
+  frieze=dict(h=0.35,out=0.08,kinds=['zigzag','chevron chain','roundels','dentils']),
+  parapet=dict(h=1.2,merlon=(0.6,0.5),horn=0.5,patterns=3),
+  kiosk=dict(w=3.4,d=3.0,h=2.6), wind_tower=dict(w=2.2,d=1.4,h=4.5,mouth='w'),
+  manzar=dict(w=5.0,d=6.0,h=3.0),
+  light=dict(w=0.6,h=0.8), window=dict(w=1.0,h=1.6,sill=0.9,fan=0.5), mafraj=dict(w=1.6,h=1.0,sill=0.4),
+  door=dict(w=1.2,h=2.4), shopfront=dict(w=(2.4,3.2),h=2.8), kishk=dict(w=1.2,h=1.6,d=0.6),
+  core=dict(w=3.4,l=5.8), holds_max=2.4, infill_below=6.0,
+  passage=dict(w=2.4,h=3.0), court_min=25.0, ramp=dict(w=1.2,max_deg=32.0,min_wall=6.5),
+)
+def _p4():
+    from shapely.geometry import LineString, Polygon, Point, box as sbox
+    from shapely.ops import unary_union, nearest_points
+    TH=TOWER_HOUSE; S_=TH['storey']
+    # the kit's own numbers hold together
+    if TH['core']['w']+2*TH['wall']['earth']>TH['infill_below']: problems.append(('tower house: the core does not fit inside earth walls',))
+    if abs(TH['lift']*5-S_)>0.01: problems.append(('tower house: five lifts do not make a storey',))
+    W_=TH['window']; holds=[0.0,W_['sill'],W_['sill']+W_['h']+W_['fan'],S_]
+    if max(b_-a_ for a_,b_ in zip(holds,holds[1:]))>TH['holds_max']: problems.append(('tower house: holds too far apart up a brick face',))
+    if TH['wall']['earth']-4*S_*math.tan(math.radians(TH['batter']))<TH['wall']['earth_top_min']: problems.append(('tower house: the batter eats the earth wall',))
+    if TH['ramp']['min_wall']<S_/math.tan(math.radians(TH['ramp']['max_deg'])): problems.append(('tower house: a roof ramp cannot climb a storey along its wall',))
+    def msides(g):
+        r=g.minimum_rotated_rectangle; c=list(r.exterior.coords)
+        a=math.hypot(c[1][0]-c[0][0],c[1][1]-c[0][1]); b_=math.hypot(c[2][0]-c[1][0],c[2][1]-c[1][1]); return min(a,b_),max(a,b_)
+    def hsh(x,z): return (int(abs(x)*2654435761) ^ int(abs(z)*40503)) & 0xffff
+    # the later pencil infill: P3's tile house, plumb and tiled, with a lift for a core
+    def infill(storeys,front,shop,h):
+        return {'kit':'infill','storeys':storeys,'front':front,'shop':shop,'gen':'tile','veranda':False,'corner':False,
+                'colour':h%5,'signs':h%2,'roof':'tanks','core':'own','pair':-1,'lift':True}
+    for i,ki in enumerate(LOT_KITS):
+        if ki and ki['kit']=='infill':
+            l=lots[i]; LOT_KITS[i]=infill(ki['storeys'],ki['front'],ki['shop'],hsh((l[0]+l[2])/2,(l[1]+l[3])/2))
+    # the Well Quarter's houses: each one's face to its road, and its kit fitted to its true (turned) width
+    fronts={q['name']:g for q,g in _ot_sqs}; fronts.update({l['name']:g for l,g in _ot_lanes})
+    fronts.update({s_[0]:sbox(*s_[2:]) for s_ in STREETS}); fronts['Rim Walk']=Point(CX,0).buffer(203,128).difference(Point(CX,0).buffer(197,128))
+    kind={s_[0]:s_[1] for s_ in STREETS}
+    def face(cs,fg):
+        n=len(cs); out=[]
+        for k in range(n):
+            e=LineString([cs[k],cs[(k+1)%n]]); on=e.intersection(fg.buffer(1.0)).length
+            if on>=TH['door']['w']+1.2: out.append((on,k))
+        return max(out) if out else None
+    for i,h in enumerate(OLD_HOUSES):
+        g=Polygon(h['corners'])
+        # its door is on the road it was cut from; where that frontage was lost to a corner, on the longest
+        # face it has on another road; a house with no face on any road is a court house, its door on its court
+        f=face(h['corners'],fronts[h['front']]); door=h['front']
+        if not f:
+            alt=[(face(h['corners'],fg),nm) for nm,fg in fronts.items()]; alt=[t for t in alt if t[0]]
+            if alt: f,door=max(alt)
+        if f: h['front_edge']=f[1]; h['door']=door
+        else: h['front_edge']=-1; h['door']='court'
+        cx_,cz_=g.centroid.x,g.centroid.y; hh=hsh(cx_,cz_); fr=h['door']
+        old_road=fr in ('Cinema Square','Old High Street','Old High Street (south)')
+        shop=fr=='Cinema Square' or (old_road and hh%5<3) or kind.get(fr) in ('main','shop')
+        polite=old_road or kind.get(fr) in ('main','shop')
+        if msides(g)[0]<TH['infill_below']: h['kit']=infill(h['storeys'],'lane',shop,hh)
+        else: h['kit'].update(shop=shop,polite=polite)
+    # every tower house is at least the core's width inside its walls
+    for i,h in enumerate(OLD_HOUSES):
+        if h['kit']['kit']=='tower' and msides(Polygon(h['corners']))[0]<TH['infill_below']-0.01: problems.append(('old town: a tower house too narrow for its core',i))
+    # everything built in Old Moy, as (key, polygon, height in m)
+    built=[(('old',i),Polygon(h['corners']),h['storeys']*S_) for i,h in enumerate(OLD_HOUSES)]
+    built+=[(('lot',i),sbox(*lots[i][:4]),lots[i][4]*STOREY[lots[i][5]]) for i,k_ in enumerate(LOT_KITS) if k_ and k_['kit'] in ('tower','infill')]
+    built+=[(('bldg',b_['n']),sbox(*b_['r']),HEIGHTS.get(b_['n'],8)) for b_ in named if b_['r'][2]<=-637 and b_['r'][0]>=-790]
+    kit_of=lambda key: OLD_HOUSES[key[1]]['kit'] if key[0]=='old' else LOT_KITS[key[1]] if key[0]=='lot' else BUILDING_KITS.get(key[1])
+    roads=unary_union(list(fronts.values()))
+    # the courtyards: a yard of at least court_min is a court, open to the sky, reached from a road by a covered
+    # passage through one house's ground floor (a sabat), unless it opens on a road itself; a smaller yard is a
+    # light well, built up solid to its lowest neighbour's roof so no one can drop into a slot with no way out
+    courts=[]; wells=[]
+    for y in OLD_TOWN['_yards']:
+        g=Polygon(y)
+        if not g.is_valid or g.area<0.5: continue
+        nb=[(key,pg,ht) for key,pg,ht in built if pg.distance(g)<0.3]
+        if g.area<TH['court_min']:
+            wells.append(dict(pts=y,area=round(g.area,1),fill_to=round(min([ht for _,_,ht in nb] or [S_]),2))); continue
+        c=dict(pts=y,area=round(g.area,1))
+        if g.exterior.intersection(roads.buffer(0.6)).length>=TH['passage']['w']: c['open']=True; courts.append(c); continue
+        best=None
+        for key,pg,ht in nb:
+            if key[0]!='old' or OLD_HOUSES[key[1]]['kit']['kit']!='tower' or OLD_HOUSES[key[1]]['front_edge']<0: continue
+            wall=g.buffer(0.3).intersection(pg.exterior)
+            if wall.length<TH['passage']['w']+0.6: continue
+            a=wall.interpolate(0.5,normalized=True) if wall.geom_type=='LineString' else max(wall.geoms,key=lambda q:q.length).interpolate(0.5,normalized=True)
+            hc=OLD_HOUSES[key[1]]['corners']; k=OLD_HOUSES[key[1]]['front_edge']; fe=LineString([hc[k],hc[(k+1)%len(hc)]])
+            b_=fe.interpolate(fe.project(a)); ln=LineString([a,b_])
+            # the passage must stay inside its house, clear of its corners
+            if ln.buffer(TH['passage']['w']/2,cap_style=2).difference(pg.buffer(0.35)).area>0.5: continue
+            if best is None or ln.length<best[0]: best=(ln.length,key[1],a,b_)
+        if best: c['passage']=dict(house=best[1],court=(round(best[2].x,2),round(best[2].y,2)),road=(round(best[3].x,2),round(best[3].y,2)),w=TH['passage']['w'],h=TH['passage']['h'])
+        else: problems.append(('old town: a court with no way in',round(g.area,1),y[0]))
+        courts.append(c)
+    # a house with no face on a road opens on the court behind it; one with no court either is reached through
+    # its neighbour's house, as the oldest back houses were (P4 builds no interiors, so only its door shows)
+    for i,h in enumerate(OLD_HOUSES):
+        if h['door']!='court': continue
+        g=Polygon(h['corners']); ok_=[k for k,c in enumerate(courts) if Polygon(c['pts']).buffer(0.3).intersection(g.exterior).length>=TH['door']['w']+1.2]
+        if ok_: h['court']=ok_[0]
+        else: h['door']='through'
+    for c in courts:
+        if 'passage' in c and OLD_HOUSES[c['passage']['house']]['storeys']<2: problems.append(('old town: a passage under a one-storey house',))
+    # the roof route: two touching houses one storey apart get a timber ramp up along their party wall
+    links=[]
+    for a_ in range(len(built)):
+        for b2 in range(a_+1,len(built)):
+            (ka,pa,ha),(kb,pb,hb)=built[a_],built[b2]
+            if not (kit_of(ka) and kit_of(kb)): continue
+            if abs(abs(ha-hb)-S_)>0.05: continue
+            wall=pa.buffer(0.15).intersection(pb.buffer(0.15)).minimum_rotated_rectangle
+            cs=list(wall.exterior.coords) if wall.geom_type=='Polygon' else []
+            if len(cs)<4: continue
+            e=sorted([(math.dist(cs[k],cs[k+1]),cs[k],cs[k+1]) for k in range(4)])[-1]
+            if e[0]<TH['ramp']['min_wall']: continue
+            lo,hi=((ka,pa,ha),(kb,pb,hb)) if ha<hb else ((kb,pb,hb),(ka,pa,ha))
+            # the ramp lies on the lower roof beside the wall, one ramp width in, foot at one end, head at the other
+            (x0,z0),(x1,z1)=e[1],e[2]; L_=e[0]; ux,uz=(x1-x0)/L_,(z1-z0)/L_
+            off=TH['ramp']['w']/2+0.5
+            for sd in (1,-1):
+                px,pz=-uz*sd*off,ux*sd*off; mid=Point((x0+x1)/2+px,(z0+z1)/2+pz)
+                if lo[1].buffer(-0.3).contains(mid): break
+            else: continue
+            run=S_/math.tan(math.radians(TH['ramp']['max_deg'])); m0=(L_-run)/2
+            foot=(round(x0+ux*m0+px,2),round(z0+uz*m0+pz,2)); head=(round(x0+ux*(m0+run)+px,2),round(z0+uz*(m0+run)+pz,2))
+            if not (lo[1].buffer(-0.2).contains(Point(foot)) and lo[1].buffer(-0.2).contains(Point(head))): continue
+            links.append(dict(low=list(lo[0]),high=list(hi[0]),foot=foot,head=head,y=(round(lo[2],2),round(hi[2],2)),w=TH['ramp']['w']))
+    # the first well on Cinema Square: the capped well head, its stone trough and the oldest shade tree in the city
+    sq=[q for q in OLD_TOWN['squares'] if q['name']=='Cinema Square'][0]; sg=Polygon(sq['pts']); wx,wz=sq['well']
+    sq['first_well']=dict(head=dict(c=(wx,wz),r=1.1,h=0.8,cap='a stone lid, chained'),trough=dict(c=(wx+2.6,wz),l=3.2,w=0.8,h=0.6,along='z'),
+                          tree=dict(kind='round',c=(wx-3.5,wz+4.0),h=14.0,job='the oldest shade tree in the city, over the well'))
+    fw=sq['first_well']; lanes_=unary_union([g for _,g in _ot_lanes])
+    for nm,(px,pz),clear in (('well',fw['head']['c'],1.5),('trough',fw['trough']['c'],2.0),('tree',fw['tree']['c'],1.5)):
+        if not sg.buffer(-clear).contains(Point(px,pz)): problems.append(('the first well: the %s too near the square\'s edge'%nm,))
+        if lanes_.distance(Point(px,pz))<clear: problems.append(('the first well: the %s in the Old High Street'%nm,))
+    if math.dist(fw['tree']['c'],fw['head']['c'])>TREE_KIT['round']['crown']*fw['tree']['h']+1: problems.append(('the first well: its tree does not shade it',))
+    OLD_TOWN['_courts']=courts; OLD_TOWN['_wells']=wells; OLD_TOWN['_roof_links']=links
+_p4()
 JUNGLE=(-500,464); ICE=(-450,-480)
 assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)
 nums={b['n'] for b in B}
@@ -2869,8 +3013,10 @@ w("## The Well Quarter (city.md 7, Old Moy): the old town's organic lanes and sq
 w("## and its tower houses turned to their lanes. lanes: centrelines with widths (lane_polys:")
 w("## their outlines); squares: polygons; houses: outline corners (world x, z), storeys, the")
 w("## lane or square they front, and their tower house kit. yards: the families' back yards.")
-w("const OLD_TOWN := %s" % lit(dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'])))
+w("const OLD_TOWN := %s" % lit(dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'],courts=OLD_TOWN['_courts'],wells=OLD_TOWN['_wells'],roof_links=OLD_TOWN['_roof_links'])))
 w("const OLD_HOUSES := %s" % lit(OLD_HOUSES))
+w("## The tower house kit's numbers (moy_tower_house.md 3; package P4): metres, the batter in degrees.")
+w("const TOWER_HOUSE := %s" % lit(TOWER_HOUSE))
 w("const TURBINE_HUB_HEIGHT := 95.0")
 w("const TURBINE_ROTOR_RADIUS := 65.0")
 w("")
@@ -2890,5 +3036,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,civic_square=CIVIC_SQUARE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover']),old_houses=OLD_HOUSES,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,civic_square=CIVIC_SQUARE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'],courts=OLD_TOWN['_courts'],wells=OLD_TOWN['_wells'],roof_links=OLD_TOWN['_roof_links']),old_houses=OLD_HOUSES,tower_house=TOWER_HOUSE,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')
