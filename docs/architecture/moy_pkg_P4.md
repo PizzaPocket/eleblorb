@@ -156,7 +156,7 @@ From `OLD_TOWN.squares[0].first_well`:
 ### 2.7 Parts and joins (binding)
 
 **Build every piece from the schedule:** `CityPlan.TOWER_HOUSE.parts` (51
-parts) and `.joins` (11 joins). The model's kit sheet draws the same schedule:
+parts) and `.joins` (10 joins). The model's kit sheet draws the same schedule:
 match it piece for piece. Nothing in the house is left to choose. If a piece
 seems missing or wrong, say so in the diagnostic; do not invent one.
 
@@ -177,10 +177,25 @@ seems missing or wrong, say so in the diagnostic; do not invent one.
   its upper half is kept; a part against a wall is centred on the wall face
   and its outer half is kept.
 - **Joins:**
-  - **split** (`door_pair`, `shutter_set`): one parent egg the size of the
-    closed opening, cut by `cuts`. Each leaf hinges at its outer edge, so shut
-    they make the parent again. The doors are double; the shopfront's four
-    shutter leaves fold back to the jambs by day.
+  - **floor cut** (`floor_cut`), as `scripts/world_door.gd` builds every
+    door in the game: the house door and the kiosk door are **one leaf on one
+    hinge**, an egg reaching below the floor and cut flat at it, so its bottom
+    stands square on the threshold and its top keeps its soft shoulders. Use
+    the same construction (in P4 the houses stay shut, so the leaf is static,
+    without the interaction or its lock message).
+  - **split** (`shutter_set`): the shopfront's four shutter leaves are cut
+    from one parent egg the size of the closed opening, by `cuts` and by the
+    floor; each hinges at its outer edge and they fold back in pairs to the
+    jambs by day.
+  - **Openings to the floor** (the door, the shopfront, the court passages:
+    `floor`) are flat at the floor.
+  - **The frame is the door's own shape** (`outline`, `clear`): the door
+    opening and the shopfront are cut from the outline of the leaf or shutter
+    set that closes them, grown by `clear` (a hairline), and stand on the
+    same spot and the same floor. The gypsum surround is that outline grown
+    again by the ring width, less the opening. Never draw a frame as its own
+    arch or rectangle: a frame that is not the door's shape shows a gap or
+    an overlap.
   - **meet** (`cap_ridge`): the wind tower's two cap slabs both run past the
     ridge and are cut at its one plane.
   - **chain** (`band_chain`, `lift_stack`, `ramp_ends`): each frieze,
@@ -267,6 +282,9 @@ Write `docs/diagnostics/<date>-moy-P4.md` with:
 
 ## Decisions log
 
+- 2026-10-18 (user): a house door is one leaf on one hinge, and every door
+  leaf, shutter and doorway is cut flat at the floor, as Ohio's and Snowhio's
+  doors are (`world_door.gd`).
 - 2026-10-18 (user): the earth base keeps its whole-plan superellipse; the
   white band and the square brick sit on it as before; no corbels or
   squinches. It must look clean, not argue its structure. Openings and trim
@@ -298,3 +316,6 @@ Write `docs/diagnostics/<date>-moy-P4.md` with:
   slot north, an infill to the south, a 12 × 16 m court) predates the Well
   Quarter's plots. The data wins: a four-storey house stands at its north
   end and its court is the block's big shared court behind it.
+- 2026-10-18: door frames match their doors. Each opening and its surround
+  are grown from the silhouette of the leaf or shutter set that closes it,
+  on the same spot, flat at the floor.
