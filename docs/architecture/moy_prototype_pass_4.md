@@ -366,3 +366,113 @@ once fixes 1 to 3 are made.
 - the bake and validator counts;
 - the three screenshots from section 5, and a fourth: a tower's foot on the
   lawn, from the middle, showing the garden's paths.
+
+## 7. Fourth review, and fixes (2026-10-19)
+
+Reviewed: the uncommitted builder and validator changes
+(`scripts/moy_city_bake_builder.gd`, `tools/validate_moy_runtime.gd`), the
+rebaked packs, diagnostic `docs/diagnostics/2026-10-19-moy-P1-fixes-3.md`, and
+two of its four shots (the helix band and the tower foot). Planning also ran
+the P0 suite on the Crossing (`--area=-600,-40,-520,40`, 27 s) and compared it
+with the pre-fix audit `checks/moy-2026-10-19.*` over the same box.
+**Result: fix, small.** Section 6's fixes 1 to 6 are built and the P1 checks
+pass. The build chat marked P1 *done* in the roadmap; that call is planning's,
+and it is not yet earned: the garden mesh is wrong, and the suite still fails
+on the Crossing.
+
+Good, keep it:
+- the gallery rail's inner face at r = 4.0244 on a chord's middle, the annulus
+  at 4.02 / cos(π/48), bays open at the new ways out;
+- the lawn cut round each drum, the rain garden as a ring with a path along
+  each bearing and clear of the lift, the reeds from the data;
+- the way-out box from r = 4.2 to 7.0, and collider kinds in the lines;
+- the checks shown failing (30 failures before) and then passing (0), on the
+  same plan, with nothing exempted;
+- `check_moy_bake.py` passes (198 packs).
+
+**What the review found.**
+- **The rain garden mesh is wrong.** `_crossing_rain_garden` emits four quads
+  per cell on a 0.25 m by 1° grid (5,040 cells a garden): the top, a bottom,
+  and a wall at both the inner and outer radius of every cell. It never emits
+  the walls at a cell's angular ends.
+  - Beside each path the bed is open: the shot shows the 14 concentric inner
+    walls as dark fins down each cut edge.
+  - Every interior radius carries two coincident, opposed walls that can
+    never be seen.
+  - The bottom lies on the terrain. The suite reads its back face as a walk
+    cell flush with terrain: 12 new blocking `overlap` findings (the four
+    gardens), where the old discs gave 8 against the helix hands.
+  - Size: `cell_03_03_p14.tscn` went from 2.7 MB to 18.6 MB, and the Moy bake
+    from 69.7 MB to 88.0 MB. A ring bed of this size needs a few hundred
+    triangles.
+- **The suite fails on the Crossing, and the diagnostic does not run it.**
+  The roadmap says a package is not done until it passes. Over this box, 152
+  blocking `overlap`, 8 blocking `headroom` and 151 blocking `underside`
+  findings. All but the garden's 12 `overlap` findings were there before
+  this build, so the fix list below holds P1 to what it owns, not to the
+  whole baseline.
+  - `underside`: 95 `HelixMovingTread`, 56 anonymous meshes. This is P0's
+    open follow-up (section 11 of `moy_pkg_P0.md`), inside P1's helices.
+  - `headroom`: one per hand, 8 in all, at r = 3.02 on the ground inside the
+    drum, under the first turn (tower 00 up hand at bearing 114°, y −60.0),
+    blocking because the hand carries the `flight` meta. The band check
+    exempts `CrossingHand_*` and tests only above the tread, so it cannot
+    see this. It is the walk-under a stair makes, with 2.2 to 2.4 m of
+    clearance. Plan data gives the headroom as 2.64.
+  - `overlap`: the roof, the lift landings and the meridian bridges are the
+    old findings, P7's and P1's earlier work; not new.
+- **The shot cannot show fix 2.** Rendered from the focused pack scenes, the
+  tower-foot shot has no terrain and no lawn: only the garden and its paths
+  stand on a flat background.
+- **Constants and labels.**
+  - The rail radius 4.1, the way-out bay's `4.0` in `_crossing_way_out_open`,
+    the lawn height DATUM + 0.04 (the whole park's lawn drops from +0.07) and
+    the 4.02 clearance are literals in the builder, not plan data.
+  - `MOY_P1_WAYS_OUT` prints `r=4.2..7.0 width=2.4 height=2.8` as a literal;
+    the box it tests is `way.width` by `way.clear` (floor + 0.05 to + 2.85).
+
+**Fix these, in order:**
+1. **Rebuild the rain garden.** For each run of the ring between two paths,
+   one wedge: top, inner wall, outer wall and the two end walls; two radial
+   vertices; no bottom face. Collision as boxes or convex pieces along the arc
+   (CLAUDE.md prefers them to a mesh), not a copy of the visual. Hold
+   `cell_03_03_p14.tscn` to its old size plus a few hundred KB, and say the
+   new triangle count in the report.
+2. **The P0 suite on the Crossing, with P1 held to what it owns.** Run it on
+   the area above and the civic core (`--area` per package, as P0 allows).
+   - No new blocking finding against `checks/moy-2026-10-19.*`: the garden's
+     12 go with fix 1.
+   - The 8 `headroom` findings under each hand's first turn: either a guard
+     or planter keeps people out of the low zone (the plan's walk-under), or
+     the check tags it as an accepted stair underside with a reason in the
+     plan data. Decide with planning; do not exempt by name.
+   - `underside` on the helices is P0's fix 2 (section 11 of `moy_pkg_P0.md`).
+     P1 is *done* when that triage says whether the treads are visuals or
+     real faults.
+3. **Plan data, not literals.** Put the gallery rail radius, the 4.02
+   clearance, the lawn's height and the bay half-angle margin in
+   `PLAN.CROSSING` (checked in `city_layout.py`), and read them in the
+   builder and the validator. The bay uses the rail's radius, not 4.0.
+4. **The way-out line prints the box it tested** (`shape.size` and the
+   origin's height), and the box runs from floor + 0.05 to + 2.8 as section 5
+   says.
+5. **The shot shows the ground.** Render the tower foot, and the lawn round a
+   drum, with the park pack and the terrain in the scene (or from the full
+   world). Show the garden from the side of a path cut.
+6. **Commit by package.** The P1 builder, validator and bake go in one commit
+   named for P1; the P0.1 tools in another; `build/web` is not touched (the
+   web build is deprecated, `CLAUDE.md`). The roadmap's P1 row is set by
+   planning.
+
+**Report:** `docs/diagnostics/<date>-moy-P1-fixes-4.md`:
+- each fix, with the garden's triangle count and the bake sizes before and
+  after;
+- the suite's output on the Crossing and civic core, as a delta against
+  `checks/moy-2026-10-19.*`, and every P1-owned finding triaged;
+- the P1 validator's output;
+- the tower-foot shot with the ground in it, and one along a path's cut edge.
+
+**Decisions:**
+- 2026-10-19: P1 stays *fix*. The build's own *done* is reverted.
+- 2026-10-19: P1's gate is "no new blocking suite findings and every
+  finding on its own elements triaged", not the whole city's baseline.

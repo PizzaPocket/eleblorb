@@ -324,3 +324,70 @@ Checked:
 - 2026-10-18: P0 done; `underside` reports as a warning until P0.1.
 - 2026-10-18: `checks/moy-2026-10-18.*` is the measured "now" for the
   roadmap's levels.
+
+## 11. Review of the P0.1 build (2026-10-19)
+
+Reviewed: the uncommitted P0.1 changes to `tools/world_checks.gd`,
+`tools/world_shots.gd` and `tools/check_moy_bake.py`, diagnostic
+`docs/diagnostics/2026-10-19-moy-P0.md`, `checks/moy-2026-10-19.json`, and
+the `2026-10-19-P0.1` shots. Not re-run: the fixtures and the audit.
+**Result: fix (small).** Both follow-ups landed in the right shape and the
+diagnostic's numbers match the JSON. `underside` is not yet a measurement.
+
+Checked:
+- Every check but `underside` has the 10-18 count (overlap 425, buried 4,
+  reach 120, trap 1, headroom 36, solid 219, guard 2,669). `underside` fell
+  from 891 to 161.
+- A mesh is tested only when its nearest collision ancestor is the cell's
+  body. The rails, hoops and galleries are gone.
+- The under-flight cameras sit on reached walk cells with a clear ray. The
+  five shots opened show real undersides; none is flat.
+- `check_moy_bake.py` passes with the plan's 71 climber panels.
+
+**Fix these, in order:**
+1. **`underside` ORs across cells.** `_check_underside` keeps one result per
+   mesh and sets `visible` and `collider` true if any one cell passes. A
+   flight missing its underside along half its length passes.
+   - Keep the result per cell, or per mesh with AND.
+   - Add a fixture, with a clean twin, for a deck whose underside is only
+     partly missing.
+2. **Characterise the 161.** All are `HelixMovingTread` (92),
+   `MovingTread` (3) and anonymous `@MeshInstance3D@N` meshes (66); 149
+   fail both the face test and the ray test. `underside` is still blocking
+   in code, so Moy exits non-zero on it.
+   - Say whether these are tread visuals or decks. If treads, the builder
+     tags them and the suite skips them, with a twin that proves a stepped
+     flight with no underside is still caught.
+   - If real, list what each needs.
+3. **A baseline for the current tree.** The audit ran at 07:35. P1's
+   geometry (rain garden ring, park lawn openings, gallery rails) was baked
+   at 07:41 to 07:42. The working tree holds P0.1, P1 fixes 3 and
+   `build/web` together.
+   - Commit P0.1 on its own.
+   - Re-run on Moy once P1 settles and replace `checks/moy-<date>.*`; that
+     run is the roadmap's "now".
+   - Update the P0 roadmap row, which still lists P0.1 as open.
+4. **The rig.**
+   - 28 of 54 flight runs are skipped, all with one reason. Log which
+     condition failed: no reached top cell (a possible `reach` problem) or
+     no clear ray from below. The skips include WestGateCore flights 01 to
+     05, CityHall F1 to F4 and the SpineAccess `_0` pairs.
+   - `under_high_line` and `under_civic_north_flight` share one camera and
+     target (`world_shots.gd`, `STANDARD_VIEWS`). Give the first its own.
+   - 43 of 44 noon shots are 3420 × 1902; only `overview` is 1280 × 720.
+     Render at 1280 × 720 as section 3 says, or report the real size.
+5. **Smaller.**
+   - `_mesh_collision_owner_for_node` duplicates `_mesh_collision_owner`.
+   - `_underside_thickness` takes the first `BoxShape3D` in the body, which
+     may be a rail's, and walks the subtree twice per candidate.
+   - A deck collider with no visual within 8 cm of its cell is skipped
+     without a finding. Report it as its own kind.
+
+**Report:** `docs/diagnostics/<date>-moy-P0-fixes-3.md`: the per-cell
+`underside` method and its new fixture pair; what the remaining findings are;
+the new baseline by check and its date against the geometry; the skip reasons
+by run; the shot sizes.
+
+**Decisions:**
+- 2026-10-19: P0 stays open for fixes 1 to 4 above. Until fix 2, read
+  `underside` counts as unverified.
