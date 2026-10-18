@@ -60,7 +60,8 @@ lift for a core; 15 have a core of their own.
 - **Tile house** (`gen: tile`, 6 to 9 storeys):
   - mosaic-tile front in palette colour `colour`, a grey-tile plinth;
   - the shopfront canopy (`tile.canopy`);
-  - cantilevered balconies with steel rails (`tile.balcony`); steel
+  - cantilevered balconies with steel rails (`tile.balcony`) from the
+    second storey (`first`): the canopy stands in for the first's; steel
     windows (`tile.window`);
   - **if `corner`:** the corner where the front meets the second street is
     rounded the full height (superellipse, `tile.corner_exp`), with curved
@@ -157,8 +158,8 @@ That was a downgrade. Build it as a shop you walk into:
     The others are P4's, P6's or a landmark's (`within`).
 
 **Construction.**
-- Build every piece from SuperEgg parts (`SuperEgg.build_part`), in the
-  manner of the village kits.
+- Build every piece from the schedule (section 2b), with the game's own
+  SuperEgg code.
 - Share meshes and materials between houses, and merge static pieces per bake
   cell by material (as the bake builder already does).
 - Bake everything into the Moy bake (`moy_city_bake_builder.gd`), with the
@@ -171,6 +172,82 @@ That was a downgrade. Build it as a shop you walk into:
   canopies, parapets, roofs, arches.
 - **Decorative:** sign faces (their frames are solid), lantern strings,
   plants and laundry.
+
+## 2b. Parts and joins (binding)
+
+**Build every piece from the schedule:** `CityPlan.MARKET_HOUSE.parts` (66
+parts) and `.joins` (15 joins). It covers the boom house, the tile house, the
+lock-up, the Helmsmith's shop, the arcade roof, Lamp Lane's lanterns and
+stalls, and the courts. The model's kit sheet draws it piece for piece, and
+its tables list it. Nothing is left to choose. If a piece seems missing or
+wrong, say so in the diagnostic; do not invent one. The vocabulary is the
+tower house's (`moy_pkg_P4.md` 2.7), with one more shape.
+
+- **Shapes:**
+  - `egg`: `SuperEgg.build_part(semi, colour, eps[0], eps[1])`;
+  - `clipped`: `SuperEgg.build_clipped_part(semi, planes, colour, eps…)`,
+    cut by the planes its join names, every cut capped;
+  - `profile`: a superellipse outline of exponent `n`, extruded (the
+    plinth; the curved balcony round a rounded corner);
+  - `wall`: a `SolidModel` solid of the outline, its openings punched;
+  - `punched`: a `SolidModel` cutter through its wall. The glass is the
+    cutter intersected with the wall; a ring is the cutter grown by `ring`,
+    less the cutter;
+  - `arch`: a half superellipse of exponent `n` across Arcade Street, swept
+    with its `section` (the steel arch; the panels between them);
+  - `box`: only the roof slab, for its stated reason;
+  - `decal`: painted, not geometry (sign pictures, rail bars, laundry).
+- **Sizes:** `semi` is half-sizes across the face, up, and out from it;
+  `fit` means the house sets it. A seated part's centre is on its seat, its
+  upper half kept; a part against a wall is centred on the wall face, its
+  outer half kept; a hung part (the blade sign) is centred on the underside
+  of its bracket, its lower half kept.
+- **Leaves and their openings:**
+  - **floor cut** (`floor_cut`), as `scripts/world_door.gd` builds a door:
+    the house door is **one leaf on one hinge**, on the side away from the
+    shop. A pair's one door straddles their party wall, and is built once.
+    The French windows' leaves and shutters and the roll shutters are cut
+    the same way at their floor. The houses stay shut: build the leaves
+    static, without the door's interaction or its lock message.
+  - **split** (`french_set`, `shutter_pair`): a French window's two glazed
+    leaves are cut from one parent egg; so are its two timber shutters.
+    Shut, the shutters are the window's own outline. Open by day, each lies
+    flat on the wall beside it, so a window needs 2 m of front.
+  - **The frame is the leaf's shape** (`outline`, `clear`): the doorway,
+    the French window, the shopfront and the lock-up's front are each cut
+    from the silhouette of what closes it, grown by `clear`, on the same
+    spot and flat at the same floor. The door's grey-tile frame is that
+    outline grown again by its `ring`. The fanlight is its own opening
+    above the frame.
+  - Openings reached from the floor without a leaf (the passages, the
+    Helmsmith's entrance and workshop door: `floor`) are flat at the floor.
+- **Joins of the fronts:**
+  - **party cut** (`party_cut`): the canopy and the veranda floors run
+    past both party walls and are cut at them, so neighbours' canopies and
+    walkways meet flush.
+  - **balcony ends** (`balcony_ends`): every balcony is cut square at both
+    ends and capped, so its rail posts stand on its corners.
+  - **corner wrap** (`corner_wrap`): on a rounded corner, the straight
+    balcony is cut where the curve begins, and the curved balcony (the
+    corner's own superellipse, grown by the balcony's depth) runs on at the
+    same height, depth and thickness. Its rail follows it, each run cut at
+    the bisector it shares with the next.
+  - **rail bays** (`rail_bays`): each handrail and top bar is cut at the
+    faces of the columns or posts that carry it.
+  - **column ends** (`col_ends`): columns, balusters, rail posts, the
+    arcade's posts, the stalls' posts and the lift shaft are cut flat at
+    both ends, standing on their floor and stopping under what they carry.
+  - **seated, hung, against the wall** as in P4: nothing is buried whole,
+    nothing sunk into a wall.
+  - **arcade bays** (`arcade_bays`): each panel spans from one arch's
+    middle plane to the next and is cut at both; each arch springs flush
+    from its posts' tops.
+  - **On the surface** (`on_surface`): openings, signs and shutter boxes
+    stand only on a flat run of a face. The rounded corner carries only the
+    balconies, the coping and the plinth.
+- **The test**, as the architecture skill sets it: look at every join from
+  both sides. A gap, a step, a double thickness or a mismatched profile
+  fails, however small.
 
 ## 3. Checks
 
@@ -215,7 +292,9 @@ Write `docs/diagnostics/<date>-moy-P3.md` with:
 - the parkour runs;
 - performance before and after;
 - the screenshots;
-- every place the data and this brief disagreed.
+- every place the data and this brief disagreed;
+- the schedule as built: each part and join, and where the build departs
+  from it.
 
 ## Decisions log
 
@@ -238,3 +317,8 @@ Write `docs/diagnostics/<date>-moy-P3.md` with:
   piece has a way in or belongs to a landmark.
 - 2026-10-18: some houses hang a blade sign over their lane (`blade`),
   never two within 4 m.
+- 2026-10-18 (user): the plan decides the parts. The market house's parts
+  and joins are a binding schedule in the data (`MARKET_HOUSE.parts`,
+  `.joins`; section 2b), checked by the plan, drawn by the model. Doors are
+  one leaf on one hinge, cut at the floor; every frame is its leaf's own
+  shape.

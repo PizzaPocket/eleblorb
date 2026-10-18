@@ -2794,7 +2794,7 @@ TH_PARTS=[
  dict(id='house_mark',what='the painted house mark over the door',shape='decal',semi=(0.3,0.3,0.0),mat='paint',col='decorative',role='paint'),
  dict(id='shop_opening',what='the shopfront cut later into the base: the closed shutters\' silhouette with its clearance, flat at the floor',shape='punched',outline='shutter_set',clear=0.02,semi=(1.4,1.4,'wall'),floor=True,mat='shadow',col='open',role='opening',join='punched'),
  dict(id='lintel',what='timber lintel over the shopfront',shape='clipped',semi=(1.6,0.11,0.16),eps=(5.5,5.5),mat='timber',col='landing',role='beam',join='against_wall'),
- dict(id='shutter_leaf',what='one leaf of the folding shopfront shutters',shape='clipped',semi=(0.35,1.61,0.03),centre=1.17,eps=(5.5,5.5),mat='timber',col='solid',role='leaf',join='shutter_set'),
+ dict(id='shutter_leaf',what='one leaf of the folding shopfront shutters',shape='clipped',semi=(0.345,1.61,0.03),centre=1.17,eps=(5.5,5.5),mat='timber',col='solid',role='leaf',join='shutter_set'),
  dict(id='kishk',what='the box window: a white box on the brick storeys',shape='clipped',semi=(0.6,0.8,0.6),eps=(5.5,5.5),mat='gypsum',col='landing',role='box_window',join='against_wall'),
  dict(id='kishk_bracket',what='a bracket under the kishk',shape='clipped',semi=(0.1,0.3,0.55),eps=(3.0,5.5),mat='gypsum',col='landing',role='bracket',join='against_wall'),
  dict(id='lattice',what='the kishk\'s latticed panels',shape='decal',semi=(0.5,0.6,0.0),mat='timber',col='decorative',role='paint'),
@@ -2834,7 +2834,7 @@ TH_PARTS=[
 ## the gypsum ring come from the same cutter.
 TH_JOINS=[
  dict(id='floor_cut',kind='seated',parts=['door_leaf','kiosk_door','shutter_leaf'],plane='the floor under the leaf',rule='as world_door.gd: the leaf\'s egg reaches below the floor and is cut flat at it, so its bottom stands square on the threshold and its top keeps its soft shoulders; one leaf on one hinge, on the side that swings clear'),
- dict(id='shutter_set',kind='split',parts=['shutter_leaf'],parent=(1.4,1.61,0.03),centre=1.17,eps=(5.5,5.5),cuts=[(1,0,0,-0.7),(1,0,0,0.0),(1,0,0,0.7)],hinge='outer',rule='four leaves from one parent, cut at the floor too (floor_cut); they fold back in pairs to each jamb'),
+ dict(id='shutter_set',kind='split',parts=['shutter_leaf'],parent=(1.38,1.61,0.03),centre=1.17,eps=(5.5,5.5),cuts=[(1,0,0,-0.69),(1,0,0,0.0),(1,0,0,0.69)],hinge='outer',rule='four leaves from one parent, cut at the floor too (floor_cut); they fold back in pairs to each jamb'),
  dict(id='cap_ridge',kind='meet',parts=['wind_cap','wind_cap'],plane='the vertical plane through the ridge',rule='both slabs run past the ridge and are cut at it; their cut faces meet on one line, the profile the same both sides'),
  dict(id='band_chain',kind='chain',parts=['ashlar_band','cornice','frieze'],plane='the bisector of each corner of the outline',rule='each face\'s run is cut at both corners\' bisectors; neighbouring runs meet on one mitre line, same height and same profile'),
  dict(id='on_surface',kind='placed',parts=['light','window','surround','qamariya','mafraj_window','sill','door_opening','shop_opening','kishk','kishk_bracket','mizab','lintel'],plane='the face as it is at that height',rule='on the wall\'s real surface at its height (the earth\'s superellipse, stepped in by the batter), turned to that surface\'s normal, and only where the surface is flat to 3 cm across the piece'),
@@ -2845,34 +2845,48 @@ TH_JOINS=[
  dict(id='punched',kind='punched',parts=['light','window','surround','qamariya','mafraj_window','door_opening','shop_opening','wind_mouth','passage_arch'],plane='through the wall',rule='one closed cutter per opening; a doorway or shopfront is its leaves\' own silhouette (outline) grown by its clearance, so frame and door are one shape; an opening that reaches the floor (floor) is flat there; the glass is the cutter intersected with the wall, the gypsum ring the cutter grown by its ring less the cutter'),
 ]
 TOWER_HOUSE['parts']=TH_PARTS; TOWER_HOUSE['joins']=TH_JOINS
-def _th_parts_checks():
-    ids={p['id'] for p in TH_PARTS}; square=('post','rail','slab','beam','sill','merlon','band','leaf','box_window','course')
-    for p in TH_PARTS:
-        if p['shape'] not in ('egg','clipped','profile','wall','punched','box','decal'): problems.append(('tower parts: unknown shape',p['id']))
-        if p['shape']=='box' and not p.get('reason'): problems.append(('tower parts: a box with no reason',p['id']))
+SHAPES=('egg','clipped','profile','wall','punched','box','decal','arch')
+SQUARE=('post','rail','slab','beam','sill','merlon','band','leaf','box_window','course')
+def parts_checks(tag,PARTS,JOINS):
+    # the rules every kit's schedule keeps: known shapes and joins, square members square, every clipped part cut by
+    # a join, every opening drawn from a part that exists, a collision class on everything
+    ids={p['id'] for p in PARTS}; jids={j['id'] for j in JOINS}
+    if len(ids)<len(PARTS): problems.append((tag+' parts: an id used twice',))
+    for p in PARTS:
+        if p['shape'] not in SHAPES: problems.append((tag+' parts: unknown shape',p['id']))
+        if p['shape']=='box' and not p.get('reason'): problems.append((tag+' parts: a box with no reason',p['id']))
         if p['shape'] in ('egg','clipped'):
-            if min(p['eps'])<2.0: problems.append(('tower parts: an egg below exponent 2 pinches',p['id']))
+            if min(p['eps'])<2.0: problems.append((tag+' parts: an egg below exponent 2 pinches',p['id']))
             # a leaf cut at the floor keeps world_door.gd's softer lower exponent: its lower half is cut away
-            if p['role'] in square and (p['eps'][0] if p.get('join')=='floor_cut' else min(p['eps']))<5.0: problems.append(('tower parts: a square member not square enough',p['id']))
-        if p['shape']=='clipped' and not any(p['id'] in j['parts'] for j in TH_JOINS): problems.append(('tower parts: a clipped part with no join to cut it',p['id']))
-        if p['shape']=='punched' and not p.get('outline') and p['n']<2.0: problems.append(('tower parts: an opening below exponent 2',p['id']))
-        if p.get('outline') and p['outline'] not in ids and p['outline'] not in {j['id'] for j in TH_JOINS}: problems.append(('tower parts: an opening drawn from a missing part',p['id']))
-        if p['col'] not in ('solid','landing','decorative','open'): problems.append(('tower parts: no collision class',p['id']))
-    for j in TH_JOINS:
-        if j['kind'] not in ('split','meet','chain','seated','punched','placed'): problems.append(('tower joins: unknown kind',j['id']))
+            if p['role'] in SQUARE and (p['eps'][0] if any(j['id']=='floor_cut' and p['id'] in j['parts'] for j in JOINS) else min(p['eps']))<5.0: problems.append((tag+' parts: a square member not square enough',p['id']))
+        if p['shape']=='clipped' and not any(p['id'] in j['parts'] for j in JOINS): problems.append((tag+' parts: a clipped part with no join to cut it',p['id']))
+        if p.get('join') and p['join'] not in jids: problems.append((tag+' parts: a part names a missing join',p['id']))
+        if p['shape']=='punched' and not p.get('outline') and p['n']<2.0: problems.append((tag+' parts: an opening below exponent 2',p['id']))
+        if p.get('outline') and p['outline'] not in ids and p['outline'] not in jids: problems.append((tag+' parts: an opening drawn from a missing part',p['id']))
+        if p['col'] not in ('solid','landing','decorative','open'): problems.append((tag+' parts: no collision class',p['id']))
+    for j in JOINS:
+        if j['kind'] not in ('split','meet','chain','seated','punched','placed'): problems.append((tag+' joins: unknown kind',j['id']))
         for q in j['parts']:
-            if q not in ids: problems.append(('tower joins: a join names a missing part',j['id'],q))
+            if q not in ids: problems.append((tag+' joins: a join names a missing part',j['id'],q))
         if j['kind']=='split' and j['cuts']:
             # the leaves rebuild the parent: n cuts make n+1 leaves of the part's width
-            leaf=[p for p in TH_PARTS if p['id']==j['parts'][0]][0]
-            if abs((len(j['cuts'])+1)*leaf['semi'][0]-j['parent'][0])>0.01: problems.append(('tower joins: the leaves do not make the parent',j['id']))
+            leaf=[p for p in PARTS if p['id']==j['parts'][0]][0]
+            if abs((len(j['cuts'])+1)*leaf['semi'][0]-j['parent'][0])>0.01: problems.append((tag+' joins: the leaves do not make the parent',j['id']))
+    P_={p['id']:p for p in PARTS}
+    for p in PARTS:
+        # an opening drawn from a leaf: the leaf reaches below the floor to be cut there, and the opening is its height
+        # (less a hairline) and its width (plus the clearance)
+        o=p.get('outline'); lf=P_.get(o) or next((j for j in JOINS if j['id']==o),None)
+        if not o or lf is None or p['shape']!='punched' or p.get('ring'): continue
+        semi=lf.get('semi',lf.get('parent'))
+        if lf['centre']-semi[1]>-0.1: problems.append((tag+' parts: a leaf does not reach below the floor to be cut',o))
+        if isinstance(p['semi'][1],(int,float)) and abs(lf['centre']+semi[1]-(2*p['semi'][1]-0.02))>0.01: problems.append((tag+' parts: a leaf not the height of its opening',o,p['id']))
+        if isinstance(p['semi'][0],(int,float)) and abs(semi[0]-(p['semi'][0]-p['clear']))>0.01: problems.append((tag+' parts: a leaf not the width of its opening',o,p['id']))
+        if not p.get('floor'): problems.append((tag+' parts: an opening closed by a leaf not flat at the floor',p['id']))
+def _th_parts_checks():
+    parts_checks('tower',TH_PARTS,TH_JOINS)
     # the openings and members agree with the kit's numbers
     P_={p['id']:p for p in TH_PARTS}
-    for lid,oid in (('door_leaf','door_opening'),):
-        lf,op=P_[lid],P_[oid]
-        if lf['centre']-lf['semi'][1]>-0.1: problems.append(('tower parts: a door leaf does not reach below the floor to be cut',lid))
-        if abs(lf['centre']+lf['semi'][1]-(2*op['semi'][1]-0.02))>0.01: problems.append(('tower parts: a door leaf not the height of its opening',lid))
-        if abs(lf['semi'][0]-(op['semi'][0]-0.015))>0.01: problems.append(('tower parts: a door leaf not the width of its opening',lid))
     for p in TH_PARTS:
         if p['shape']=='punched' and p['id'] in ('door_opening','shop_opening','passage_arch') and not p.get('floor'): problems.append(('tower parts: an opening to the floor not flat at it',p['id']))
     sh=[j for j in TH_JOINS if j['id']=='shutter_set'][0]
@@ -3073,7 +3087,7 @@ MARKET_HOUSE=dict(
   storey=3.25, plinth=0.6, parapet=1.1, wall=0.25,
   palette=['jade','ochre','coral','cornflower','cream'],
   boom=dict(veranda=dict(col=0.5,out=2.4,rail=1.0),balcony=dict(d=0.6,rail=1.0),window=dict(w=1.0,h=2.2),shutter=0.5),
-  tile=dict(canopy=dict(d=1.5,y=3.6,t=0.2),balcony=dict(d=1.2,rail=1.05),window=dict(w=2.0,h=1.4,sill=0.9),corner_exp=4.0,lift=dict(w=1.9,d=1.9)),
+  tile=dict(canopy=dict(d=1.5,y=3.6,t=0.2),balcony=dict(d=1.2,rail=1.05,first=2),window=dict(w=2.0,h=1.4,sill=0.9),corner_exp=4.0,lift=dict(w=1.9,d=1.9)),
   lockup=dict(shutter_h=2.8),
   core=dict(w=3.4,l=5.8,room=4.0), door=dict(w=1.2,h=2.4), shop=dict(h=3.0,depth=1.5), fanlight=0.4,
   sign=dict(w=0.9,h=0.7,gap=0.25,y=4.2,out=1.3), holds_max=2.4,
@@ -3081,6 +3095,138 @@ MARKET_HOUSE=dict(
   arcade=dict(h=9.0,arch_every=6.0,arch=dict(w=0.3,d=0.25),panel=0.04,end_clear=3.0),
   lamp=dict(lantern_every=4.0,lantern_y=4.6,stall=dict(w=2.4,d=1.0,h=2.2),stall_every=7.5,door_clear=1.5,walk_min=2.6),
 )
+## The market house's parts and joins (moy_pkg_P3.md 2b): every piece of a boom house, a tile house, a lock-up, the
+## Helmsmith's shop and the streets they make, and how each meets the next. The same vocabulary as TH_PARTS; arch is
+## a half superellipse of exponent n spanning a street (semi: half the span, the rise, and the rib's half-depth),
+## swept with a section of the part's own size.
+MH_PARTS=[
+ # the body
+ dict(id='plinth',what='the grey-tile plinth at the street, on the house\'s outline',shape='profile',n=4.0,semi='fit',h=0.6,out=0.03,mat='tile_grey',col='landing',role='course'),
+ dict(id='house_wall',what='the house, plumb on its outline: a rectangle, or on a corner lot with that corner a superellipse quarter (corner_exp) the full height; rendered (boom) or mosaic tile (tile) in its palette colour',shape='wall',semi='fit',mat='front',col='solid',role='wall'),
+ dict(id='parapet',what='the parapet round the roof',shape='wall',semi='fit',h=1.04,mat='front',col='landing',role='wall'),
+ dict(id='coping',what='the coping along the parapet\'s top, on its outer face',shape='clipped',semi=('fit',0.06,0.12),eps=(5.5,5.5),mat='tile_grey',col='landing',role='band',join='band_chain'),
+ dict(id='roof',what='the roof',shape='box',semi='fit',mat='plaster',col='landing',role='slab',reason='a floor fills to the walls: a rounded slab would leave open corners'),
+ # the boom house\'s front
+ dict(id='veranda_col',what='a square veranda column, the full height, at the veranda\'s outer edge',shape='clipped',semi=(0.25,'fit',0.25),eps=(5.5,5.5),mat='render_pale',col='solid',role='post',join='col_ends'),
+ dict(id='veranda_floor',what='a veranda floor at each storey and the walkway\'s roof, out to the columns\' outer faces',shape='clipped',semi=('fit',0.125,2.4),eps=(5.5,5.5),mat='slab',col='landing',role='slab',join='against_wall'),
+ dict(id='veranda_handrail',what='the timber balustrade\'s handrail between columns',shape='clipped',semi=('fit',0.05,0.06),eps=(5.5,5.5),mat='timber',col='landing',role='rail',join='rail_bays'),
+ dict(id='baluster',what='a timber baluster, floor to handrail',shape='clipped',semi=(0.03,'fit',0.03),eps=(5.5,5.5),mat='timber',col='solid',role='post',join='col_ends'),
+ dict(id='balcony',what='the boom house\'s shallow balcony where it has no veranda',shape='clipped',semi=('fit',0.09,0.6),eps=(5.5,5.5),mat='slab',col='landing',role='slab',join='against_wall'),
+ dict(id='french_window',what='a French window: the leaves\' own silhouette with its clearance, flat at its storey\'s floor',shape='punched',outline='french_set',clear=0.015,semi=(0.5,1.1,'wall'),floor=True,mat='glass_dark',col='solid',role='opening',join='punched'),
+ dict(id='french_leaf',what='one glazed leaf of a French window',shape='clipped',semi=(0.2425,1.31,0.03),centre=0.87,eps=(5.5,4.0),mat='glass_frame',col='solid',role='leaf',join='french_set'),
+ dict(id='window_shutter',what='one timber shutter of a French window; shut, the pair is the opening\'s own outline; open, each lies flat on the wall beside it',shape='clipped',semi=(0.25,1.325,0.025),centre=0.87,eps=(5.5,4.0),mat='shutter',col='solid',role='leaf',join='shutter_pair'),
+ # the tile house\'s front
+ dict(id='canopy',what='the cantilevered canopy over the shopfront',shape='clipped',semi=('fit',0.1,1.5),eps=(5.5,5.5),mat='slab',col='landing',role='slab',join='party_cut'),
+ dict(id='tile_balcony',what='a cantilevered balcony on each storey from the second (balcony.first); the first storey\'s is the canopy',shape='clipped',semi=('fit',0.09,1.2),eps=(5.5,5.5),mat='slab',col='landing',role='slab',join='corner_wrap'),
+ dict(id='corner_balcony',what='the balcony round a rounded corner: the corner\'s own superellipse quarter, grown by the balcony\'s depth',shape='profile',n=4.0,semi='fit',h=0.18,mat='slab',col='landing',role='slab',join='corner_wrap'),
+ dict(id='balcony_rail',what='a steel rail\'s top bar along a balcony\'s edge (boom and tile)',shape='clipped',semi=('fit',0.03,0.03),eps=(5.5,5.5),mat='rail',col='landing',role='rail',join='rail_bays'),
+ dict(id='rail_post',what='a steel rail post, slab to top bar, at the ends and every 1.2 m',shape='clipped',semi=(0.025,'fit',0.025),eps=(5.5,5.5),mat='rail',col='solid',role='post',join='col_ends'),
+ dict(id='rail_infill',what='the rail\'s bars between posts',shape='decal',semi=('fit','fit',0.0),mat='rail',col='decorative',role='paint'),
+ dict(id='steel_window',what='a wide steel window behind a balcony',shape='punched',n=6.0,semi=(1.0,0.7,'wall'),mat='glass_steel',col='solid',role='opening',join='punched'),
+ dict(id='window_bars',what='its steel glazing bars',shape='decal',semi=(1.0,0.7,0.0),mat='rail',col='decorative',role='paint'),
+ dict(id='lift_shaft',what='the glass lift shaft on the back face, against the core, a storey above the roof',shape='clipped',semi=(0.95,'fit',1.9),eps=(5.5,5.5),mat='glass',col='solid',role='shaft',join='against_wall'),
+ # the ground floor
+ dict(id='door_opening',what='the house door\'s opening: the leaf\'s own silhouette with its clearance, flat at the floor',shape='punched',outline='door_leaf',clear=0.015,semi=(0.6,1.2,'wall'),floor=True,mat='shadow',col='open',role='opening',join='punched'),
+ dict(id='door_leaf',what='the house door, one leaf on one hinge (as world_door.gd builds a door); a pair\'s one door straddles their party wall',shape='clipped',semi=(0.585,1.41,0.03),centre=0.97,eps=(5.5,4.0),mat='door',col='solid',role='leaf',join='floor_cut'),
+ dict(id='door_surround',what='the grey-tile frame round the door: its opening\'s outline grown by ring',shape='punched',outline='door_leaf',ring=0.15,semi=(0.75,1.35,0.04),mat='tile_grey',col='decorative',role='trim',join='punched'),
+ dict(id='fanlight',what='the lit fanlight over the door, above its frame',shape='punched',n=6.0,semi=(0.6,0.2,'wall'),mat='fanlight',col='solid',role='opening',join='punched'),
+ dict(id='shop_opening',what='the shopfront, the rest of the ground floor\'s front: the roll shutter\'s own silhouette with its clearance, flat at the floor; glazed by day, the dressed window behind',shape='punched',outline='roll_shutter',clear=0.02,semi=('fit',1.5,'wall'),floor=True,mat='shop',col='solid',role='opening',join='punched'),
+ dict(id='roll_shutter',what='the shopfront\'s roll shutter, down at night, rolled into its box by day',shape='clipped',semi=('fit',1.79,0.03),centre=1.19,eps=(5.5,5.5),mat='shutter_steel',col='solid',role='leaf',join='floor_cut'),
+ dict(id='shutter_box',what='the roll shutter\'s box over the shopfront (a hold)',shape='clipped',semi=('fit',0.18,0.22),eps=(5.5,5.5),mat='shutter_steel',col='landing',role='beam',join='against_wall'),
+ dict(id='shop_shelf',what='a shelf at the back of the dressed shop window',shape='clipped',semi=('fit',0.03,0.2),eps=(5.5,5.5),mat='timber',col='decorative',role='slab',join='against_wall'),
+ dict(id='goods',what='goods on the shelves, by the trade, in plain shapes',shape='egg',semi=(0.15,0.15,0.12),eps=(2.5,3.0),mat='goods',col='decorative',role='goods'),
+ # the lock-up
+ dict(id='lockup_opening',what='a lock-up\'s whole front: the shutter\'s own silhouette with its clearance, flat at the floor',shape='punched',outline='lockup_shutter',clear=0.02,semi=('fit',1.4,'wall'),floor=True,mat='shop',col='solid',role='opening',join='punched'),
+ dict(id='lockup_shutter',what='the lock-up\'s roll shutter',shape='clipped',semi=('fit',1.69,0.03),centre=1.09,eps=(5.5,5.5),mat='shutter_steel',col='solid',role='leaf',join='floor_cut'),
+ dict(id='lockup_window',what='the small window over a lock-up',shape='punched',n=6.0,semi=(0.5,0.4,'wall'),mat='glass_steel',col='solid',role='opening',join='punched'),
+ # the signs
+ dict(id='sign',what='a picture sign on the front (its frame solid)',shape='clipped',semi=(0.45,0.35,0.06),eps=(5.5,5.5),mat='sign',col='solid',role='slab',join='against_wall'),
+ dict(id='sign_picture',what='the sign\'s picture, never lettered',shape='decal',semi=(0.3,0.25,0.0),mat='paint',col='decorative',role='paint'),
+ dict(id='blade_bracket',what='the steel arm a blade sign hangs from, out over the lane (a swing anchor)',shape='clipped',semi=(0.03,0.03,1.3),eps=(5.5,5.5),mat='rail',col='solid',role='beam',join='against_wall'),
+ dict(id='blade_sign',what='the blade sign, hung under its arm',shape='clipped',semi=(0.05,1.1,0.6),eps=(5.5,5.5),mat='sign',col='solid',role='slab',join='hung'),
+ # the roof
+ dict(id='water_tank',what='a water tank',shape='clipped',semi=(0.9,1.6,0.9),eps=(3.0,5.5),mat='tank',col='landing',role='vessel',join='seated'),
+ dict(id='laundry_post',what='a laundry frame\'s post',shape='clipped',semi=(0.04,1.8,0.04),eps=(5.5,5.5),mat='rail',col='solid',role='post',join='seated'),
+ dict(id='laundry',what='laundry on the lines',shape='decal',semi=('fit',0.35,0.0),mat='laundry',col='decorative',role='paint'),
+ dict(id='greenhouse',what='a rooftop greenhouse',shape='clipped',semi=('fit',2.4,1.5),eps=(5.5,5.5),mat='glass',col='landing',role='slab',join='seated'),
+ dict(id='planter',what='a roof garden\'s planter bed',shape='clipped',semi=('fit',0.6,1.5),eps=(5.5,5.5),mat='planter',col='landing',role='slab',join='seated'),
+ dict(id='roof_plant',what='a plant in a bed or a pot',shape='egg',semi=(0.35,0.4,0.35),eps=(2.2,2.6),mat='leaf',col='decorative',role='crown'),
+ # the streets they make
+ dict(id='arcade_post',what='a post at the street\'s edge carrying an arch',shape='clipped',semi=(0.15,'fit',0.125),eps=(5.5,5.5),mat='steel',col='solid',role='post',join='col_ends'),
+ dict(id='arcade_arch',what='a steel arch over Arcade Street',shape='arch',n=2.5,semi=('fit','fit',0.125),section=(0.15,0.15),mat='steel',col='landing',role='rib',join='arcade_bays'),
+ dict(id='arcade_panel',what='a translucent panel between two arches',shape='arch',n=2.5,semi=('fit','fit','fit'),section=(0.02,),mat='panel',col='solid',role='shell',join='arcade_bays'),
+ dict(id='lantern',what='a lantern on a string across Lamp Lane',shape='egg',semi=(0.15,0.2,0.15),eps=(2.0,2.0),mat='lantern',col='decorative',role='lamp'),
+ dict(id='lantern_string',what='the string, house to house',shape='decal',semi=('fit',0.0,0.0),mat='string',col='decorative',role='paint'),
+ dict(id='stall_table',what='a night-market stall\'s table',shape='clipped',semi=(1.2,0.9,0.5),eps=(5.5,5.5),mat='stall',col='landing',role='slab',join='seated'),
+ dict(id='stall_post',what='an awning post at a stall\'s corner',shape='clipped',semi=(0.04,'fit',0.04),eps=(5.5,5.5),mat='stall',col='solid',role='post',join='col_ends'),
+ dict(id='awning',what='a stall\'s awning (a bounce)',shape='clipped',semi=(1.3,0.05,0.7),eps=(5.5,5.5),mat='awning',col='landing',role='slab',join='seated'),
+ dict(id='passage_arch',what='a court passage\'s opening, at both ends, flat at the floor',shape='punched',n=2.5,semi=(1.2,1.5,'wall'),floor=True,mat='shadow',col='open',role='opening',join='punched'),
+ dict(id='passage_lamp',what='the lamp inside a passage',shape='egg',semi=(0.15,0.2,0.15),eps=(2.0,2.0),mat='lamp',col='decorative',role='lamp'),
+ dict(id='bench',what='a court\'s bench seat',shape='egg',semi=(0.8,0.06,0.22),eps=(5.5,5.5),mat='timber',col='landing',role='slab'),
+ dict(id='bench_leg',what='a bench leg',shape='clipped',semi=(0.06,0.4,0.18),eps=(5.5,5.5),mat='timber',col='solid',role='post',join='seated'),
+ dict(id='pot',what='a planted pot',shape='clipped',semi=(0.28,0.5,0.28),eps=(2.6,3.0),mat='terracotta',col='solid',role='vessel',join='seated'),
+ dict(id='washing_line',what='a court\'s washing line and its washing',shape='decal',semi=('fit',0.35,0.0),mat='laundry',col='decorative',role='paint'),
+ # the Helmsmith\'s shop (BUILDING_KITS[38])
+ dict(id='entrance',what='the shop\'s wide open entrance, no door, no threshold, flat at the floor',shape='punched',n=6.0,semi=(1.5,1.6,'wall'),floor=True,mat='shadow',col='open',role='opening',join='punched'),
+ dict(id='shop_glazing',what='the glazed front either side of the entrance, over a teal stall riser',shape='punched',n=6.0,semi=('fit',1.4,'wall'),mat='shop',col='solid',role='opening',join='punched'),
+ dict(id='counter',what='the counter across the room',shape='clipped',semi=('fit',1.0,0.35),eps=(5.5,5.5),mat='timber',col='landing',role='slab',join='seated'),
+ dict(id='counter_top',what='its gold top',shape='clipped',semi=('fit',0.06,0.37),eps=(5.5,5.5),mat='gold',col='landing',role='slab',join='seated'),
+ dict(id='display_shelf',what='a shelf of the back wall\'s display',shape='clipped',semi=('fit',0.04,0.18),eps=(5.5,5.5),mat='timber',col='solid',role='slab',join='against_wall'),
+ dict(id='helm_stand',what='a stand for a helm either side of the room',shape='clipped',semi=(0.06,1.4,0.06),eps=(5.5,5.5),mat='timber',col='solid',role='post',join='seated'),
+ dict(id='workshop_door',what='the doorway behind the counter into his workshop, open, flat at the floor',shape='punched',n=6.0,semi=(0.7,1.2,'wall'),floor=True,mat='shadow',col='open',role='opening',join='punched'),
+ dict(id='shop_lamp',what='a pendant lamp over the shop floor',shape='egg',semi=(0.25,0.2,0.25),eps=(2.2,3.0),mat='lamp',col='decorative',role='lamp'),
+]
+MH_JOINS=[
+ dict(id='floor_cut',kind='seated',parts=['door_leaf','french_leaf','window_shutter','roll_shutter','lockup_shutter'],plane='the floor under the leaf (the street, or a French window\'s storey)',rule='as world_door.gd: the leaf\'s egg reaches below the floor and is cut flat at it, so its bottom stands square on the threshold and its top keeps its soft shoulders; a door is one leaf on one hinge'),
+ dict(id='french_set',kind='split',parts=['french_leaf'],parent=(0.485,1.31,0.03),centre=0.87,eps=(5.5,4.0),cuts=[(1,0,0,0.0)],hinge='outer',rule='two glazed leaves from one parent, cut at the floor too; they open inward'),
+ dict(id='shutter_pair',kind='split',parts=['window_shutter'],parent=(0.5,1.325,0.025),centre=0.87,eps=(5.5,4.0),cuts=[(1,0,0,0.0)],hinge='outer',rule='shut, the two shutters are the French window\'s own outline (its leaves\' silhouette grown by the clearance); open, each folds flat to the wall beside the opening'),
+ dict(id='band_chain',kind='chain',parts=['coping'],plane='the bisector of each corner of the outline (on a rounded corner, of each step of the curve)',rule='each face\'s run is cut at both corners\' bisectors and at the wall face; neighbouring runs meet on one mitre line, same height and same profile'),
+ dict(id='party_cut',kind='chain',parts=['canopy','veranda_floor'],plane='the party wall\'s plane at each end of the front',rule='the piece runs past both party walls and is cut at them, so neighbouring canopies and veranda walkways meet flush; at a row\'s end the cut is capped'),
+ dict(id='corner_wrap',kind='chain',parts=['tile_balcony','corner_balcony'],plane='each end of the corner\'s curve, square to the face',rule='on a rounded corner, each face\'s straight balcony is cut where the curve begins and the curved balcony runs between those cuts at the same depth, height and thickness'),
+ dict(id='balcony_ends',kind='chain',parts=['balcony','tile_balcony'],plane='each end of the balcony, square to the face: 0.3 m (boom) or 0.2 m (tile) in from a party wall, or where a rounded corner\'s curve begins',rule='the slab runs past both ends and is cut square there and capped, so its rail posts stand on its corners'),
+ dict(id='rail_bays',kind='chain',parts=['veranda_handrail','balcony_rail'],plane='the faces of the columns or posts at each end of a bay',rule='each bay\'s rail is cut at the faces of what carries it; it runs into the column with no gap and no overlap'),
+ dict(id='col_ends',kind='chain',parts=['veranda_col','baluster','rail_post','arcade_post','stall_post','lift_shaft'],plane='what it stands on, and the underside of what it carries',rule='cut flat at both ends and capped: a column stands on the pavement and stops under the top veranda floor; a baluster or rail post stands on its floor and stops under its rail; an arcade post stops at the arch\'s springing; a stall post under the awning; a lift shaft stands on the ground'),
+ dict(id='seated',kind='seated',parts=['water_tank','laundry_post','greenhouse','planter','bench_leg','pot','stall_table','awning','counter','counter_top','helm_stand'],plane='the top of what it stands on',rule='cut flat at that plane and capped; the cut face sits on it, no gap, no buried half'),
+ dict(id='hung',kind='seated',parts=['blade_sign'],plane='the underside of its bracket',rule='its centre on the bracket\'s underside, its lower half kept (so it hangs its semi y), cut flat there and capped; its outer edge inside the bracket\'s end, its bottom clear above the canopy'),
+ dict(id='against_wall',kind='seated',parts=['veranda_floor','balcony','tile_balcony','canopy','lift_shaft','shutter_box','shop_shelf','sign','blade_bracket','display_shelf'],plane='the wall\'s outer face',rule='cut at the wall face and capped; it stands proud of the wall by its depth, nothing sunk into the wall'),
+ dict(id='arcade_bays',kind='chain',parts=['arcade_arch','arcade_panel'],plane='each arch\'s middle plane; the posts\' tops',rule='each panel spans from one arch\'s middle plane to the next and is cut at both, so the roof reads as one vault; each arch is cut at its posts\' tops and springs from them flush'),
+ dict(id='on_surface',kind='placed',parts=['steel_window','french_window','door_opening','door_surround','fanlight','shop_opening','sign','blade_bracket','shutter_box'],plane='the face as it is',rule='only on a flat run of a face; the rounded corner carries only the balconies, the coping and the plinth'),
+ dict(id='punched',kind='punched',parts=['french_window','steel_window','door_opening','door_surround','fanlight','shop_opening','lockup_opening','lockup_window','passage_arch','entrance','shop_glazing','workshop_door'],plane='through the wall',rule='one closed cutter per opening; a doorway, a French window or a shopfront is its leaves\' own silhouette (outline) grown by its clearance, so frame and leaf are one shape; an opening that reaches the floor (floor) is flat there; the glass is the cutter intersected with the wall, a ring the cutter grown by its ring less the cutter'),
+]
+MARKET_HOUSE['parts']=MH_PARTS; MARKET_HOUSE['joins']=MH_JOINS
+def _mh_parts_checks():
+    parts_checks('market',MH_PARTS,MH_JOINS)
+    P_={p['id']:p for p in MH_PARTS}; J_={j['id']:j for j in MH_JOINS}; MH=MARKET_HOUSE
+    def off(nm,a,b):
+        if abs(a-b)>0.01: problems.append(('market parts: %s out of step with MARKET_HOUSE'%nm,a,b))
+    off('the door width',2*P_['door_opening']['semi'][0],MH['door']['w']); off('the door height',2*P_['door_opening']['semi'][1],MH['door']['h'])
+    off('the fanlight',2*P_['fanlight']['semi'][1],MH['fanlight']); off('the fanlight width',2*P_['fanlight']['semi'][0],MH['door']['w'])
+    off('the surround',P_['door_surround']['semi'][0]-P_['door_surround']['ring'],P_['door_opening']['semi'][0])
+    off('the French window width',2*P_['french_window']['semi'][0],MH['boom']['window']['w']); off('the French window height',2*P_['french_window']['semi'][1],MH['boom']['window']['h'])
+    sp=J_['shutter_pair']; off('the shutter width',2*P_['window_shutter']['semi'][0],MH['boom']['shutter'])
+    fs=J_['french_set']; off('the shutters shut, against the window\'s outline',sp['parent'][0],fs['parent'][0]+P_['french_window']['clear']); off('the shutters\' top',sp['centre']+sp['parent'][1],fs['centre']+fs['parent'][1]+P_['french_window']['clear'])
+    off('the steel window width',2*P_['steel_window']['semi'][0],MH['tile']['window']['w']); off('the steel window height',2*P_['steel_window']['semi'][1],MH['tile']['window']['h'])
+    off('the shop height',2*P_['shop_opening']['semi'][1],MH['shop']['h']); off('the lock-up shutter',2*P_['lockup_opening']['semi'][1],MH['lockup']['shutter_h'])
+    off('the canopy depth',P_['canopy']['semi'][2],MH['tile']['canopy']['d']); off('the canopy thickness',2*P_['canopy']['semi'][1],MH['tile']['canopy']['t'])
+    off('the tile balcony',P_['tile_balcony']['semi'][2],MH['tile']['balcony']['d']);
+    cy,ct=MH['tile']['canopy']['y'],MH['tile']['canopy']['t']
+    if cy-ct/2<MH['shop']['h']+2*P_['shutter_box']['semi'][1]: problems.append(('market parts: the canopy foul of the shopfront and its shutter box',))
+    if cy+ct/2>MH['tile']['balcony']['first']*MH['storey']-P_['tile_balcony']['semi'][1]-0.3: problems.append(('market parts: the canopy foul of the first balcony',))
+    if cy<(MH['tile']['balcony']['first']-1)*MH['storey']: problems.append(('market parts: a storey with neither balcony nor canopy',))
+    off('the boom balcony',P_['balcony']['semi'][2],MH['boom']['balcony']['d'])
+    off('the veranda column',2*P_['veranda_col']['semi'][0],MH['boom']['veranda']['col']); off('the veranda floor',P_['veranda_floor']['semi'][2],MH['boom']['veranda']['out'])
+    off('the lift width',2*P_['lift_shaft']['semi'][0],MH['tile']['lift']['w']); off('the lift depth',P_['lift_shaft']['semi'][2],MH['tile']['lift']['d'])
+    off('the sign width',2*P_['sign']['semi'][0],MH['sign']['w']); off('the sign height',2*P_['sign']['semi'][1],MH['sign']['h']); off('the blade\'s reach',P_['blade_bracket']['semi'][2],MH['sign']['out'])
+    if 2*P_['blade_sign']['semi'][2]>MH['sign']['out']: problems.append(('market parts: the blade sign longer than its bracket',))
+    if P_['blade_sign']['semi'][1]<MH['sign']['h']: problems.append(('market parts: the blade sign shorter than a front sign',))
+    off('the parapet',P_['parapet']['h']+P_['coping']['semi'][1],MH['parapet']); off('the plinth',P_['plinth']['h'],MH['plinth'])
+    off('the arcade arch',2*P_['arcade_post']['semi'][0],MH['arcade']['arch']['w']); off('the arcade post depth',2*P_['arcade_post']['semi'][2],MH['arcade']['arch']['d'])
+    off('the stall width',2*P_['stall_table']['semi'][0],MH['lamp']['stall']['w']); off('the stall depth',2*P_['stall_table']['semi'][2],MH['lamp']['stall']['d'])
+    off('the passage width',2*P_['passage_arch']['semi'][0],MH['passage']['w']); off('the passage height',2*P_['passage_arch']['semi'][1],MH['passage']['h'])
+    hk=BUILDING_KITS[38]['shop_floor']; off('the Helmsmith\'s entrance',2*P_['entrance']['semi'][0],hk['entrance'])
+    if 2*P_['entrance']['semi'][1]>hk['h']-0.5: problems.append(('market parts: the Helmsmith\'s entrance too tall for his shop floor',))
+    if P_['counter']['semi'][1]+P_['counter_top']['semi'][1]*2>1.2: problems.append(('market parts: the counter too tall to serve over',))
+_mh_parts_checks()
 def _p3():
     from shapely.geometry import LineString, Point, Polygon, box as sbox
     from shapely.ops import unary_union

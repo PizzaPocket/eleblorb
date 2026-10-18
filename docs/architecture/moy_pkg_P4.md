@@ -109,6 +109,8 @@ The houses are climbable by their own features, never by added rungs:
 P3's tile house, built from the infill kit's `gen: tile`, `colour`, `lift`,
 `signs` and `roof` fields: plumb, mosaic-tiled, a glass lift shaft on its back
 face, no ramp core. These are the narrowest plots (under `infill_below`).
+Its parts and joins are P3's schedule (`CityPlan.MARKET_HOUSE.parts` and
+`.joins`, `moy_pkg_P3.md` 2b), not the tower house's.
 
 ### 2.4 The courts, the passages and the pockets
 
