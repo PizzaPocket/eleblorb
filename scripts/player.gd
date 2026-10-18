@@ -6173,8 +6173,13 @@ func _is_on_lava_surface() -> bool:
 	if terrain == null or not terrain.has_method("is_lava_area"):
 		return false
 	var xz := Vector2(global_position.x, global_position.z)
-	if not bool(terrain.is_lava_area(xz)) or _lava_swimming_active:
+	var feet := Vector3(xz.x, global_position.y - FOOT_OFFSET, xz.y)
+	var in_lava := bool(terrain.is_lava_at(feet)) if terrain.has_method("is_lava_at") else bool(terrain.is_lava_area(xz))
+	if not in_lava or _lava_swimming_active:
 		return false
+	if terrain.has_method("get_lava_surface_at"):
+		var lava_surface: float = terrain.get_lava_surface_at(feet)
+		return lava_surface != -INF and absf(feet.y - lava_surface) <= 0.28
 	if not terrain.has_method("get_lava_surface_height"):
 		return false
 	var lava_y: float = terrain.get_lava_surface_height(xz)

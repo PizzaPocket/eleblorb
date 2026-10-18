@@ -6,9 +6,9 @@ extends RefCounted
 ## exactly once. Flight profiles and guard rails are consumed verbatim.
 
 const DECK := 0.22
-const GLASS := Color(0.32, 0.66, 0.76, 0.36)
-const RAIL := Color(0.13, 0.18, 0.20)
-const GUARD := Color(0.43, 0.73, 0.82, 0.28)
+const GLASS := Color(0.62, 0.82, 0.88, 0.20)
+const RAIL := Color(0.15, 0.24, 0.42)
+const GUARD := Color(0.62, 0.82, 0.88, 0.16)
 const BASALT := Color(0.17, 0.16, 0.16)
 const POST := Color(0.055, 0.065, 0.07)
 
@@ -20,6 +20,8 @@ static func build(parent: Node3D, levels: Array, flights: Array, label: String) 
 	body.collision_mask = 0
 	parent.add_child(body)
 	for level: Dictionary in levels:
+		if not bool(level.get("build", true)):
+			continue
 		_build_level(body, level)
 	for flight: Dictionary in flights:
 		_build_flight(body, flight)
@@ -29,8 +31,8 @@ static func build(parent: Node3D, levels: Array, flights: Array, label: String) 
 static func _build_level(body: StaticBody3D, level: Dictionary) -> void:
 	var datum := float(level["datum"])
 	var material_name := str(level.get("material", "glass"))
-	var surface_material := SolidModel.material(BASALT if material_name == "basalt" else GLASS, 0.35, 0.08)
-	surface_material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var surface_material := SolidModel.material(BASALT if material_name == "basalt" else GLASS, 0.0, 0.9 if material_name == "basalt" else 0.05)
+	surface_material.cull_mode = BaseMaterial3D.CULL_BACK
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var faces := PackedVector3Array()
@@ -103,43 +105,22 @@ static func _build_level(body: StaticBody3D, level: Dictionary) -> void:
 		for raw: Array in guard_line:
 			points.append(Vector3(float(raw[0]), datum + 1.09, float(raw[1])))
 		_build_guard(body, points, "%sLevelGuard" % level["id"])
-	if str(level["id"]) == "promenade":
-		_build_renewal_finish(body, datum)
-
-
-static func _build_renewal_finish(body: StaticBody3D, datum: float) -> void:
-	# A finish layer marks the Renewal glass deck inside the joined basalt
-	# promenade; it has no thickness or collider, so the junction remains one
-	# floor and one collision plane.
-	var site: Dictionary = FireCalderaWalkwaysPlan.SITE["renewal_deck"]
-	var entry := FireCalderaPlan.plot("RENEWAL")
-	var centre: Vector2 = entry["centre"]
-	var half: Array = site["half"]
-	var exponent := float(site["exponent"])
-	var polygon := PackedVector2Array()
-	const SAMPLES := 128
-	for i in SAMPLES:
-		var angle := TAU * float(i) / SAMPLES
-		var c := cos(angle)
-		var s := sin(angle)
-		polygon.append(centre + Vector2(signf(c) * pow(absf(c), 2.0 / exponent) * float(half[0]),
-			signf(s) * pow(absf(s), 2.0 / exponent) * float(half[1])))
-	var st := SurfaceTool.new()
-	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	for index in Geometry2D.triangulate_polygon(polygon):
-		var p: Vector2 = polygon[index]
-		st.set_normal(Vector3.UP)
-		st.add_vertex(Vector3(p.x, datum + 0.001, p.y))
-	var finish := MeshInstance3D.new()
-	finish.name = "RenewalGlassFinishInPromenade"
-	finish.mesh = st.commit()
-	finish.material_override = SolidModel.material(GLASS, 0.14, 0.08)
-	body.add_child(finish)
-	CollisionPolicy.mark_decorative(finish)
-
-
+		# The glass cassette edge gets an opaque blued-steel cap around every
+		# authored outer and hole boundary.
+	for region: Dictionary in level["surface"]:
+		for raw_loop: Array in [region["outer"]] + region.get("holes", []):
+			var edge := PackedVector3Array()
+			for raw: Array in raw_loop:
+				edge.append(Vector3(float(raw[0]), datum - 0.11, float(raw[1])))
+			if edge.size() > 2 and edge[0].distance_to(edge[-1]) > 0.001:
+				edge.append(edge[0])
+			var trim := _tube(edge, 0.025)
+			trim.name = "%sDeckEdge" % level["id"]
+			trim.material_override = SolidModel.material(RAIL, 0.9, 0.2)
+			body.add_child(trim)
+			CollisionPolicy.mark_decorative(trim)
 static func _build_flight(body: StaticBody3D, flight: Dictionary) -> void:
-	var profile: Array = flight["profile"]
+	var profile: Array = flight.get("deck", flight["profile"])
 	if profile.size() < 2:
 		return
 	var half_width := float(flight["width"]) * 0.5
@@ -161,21 +142,32 @@ static func _build_flight(body: StaticBody3D, flight: Dictionary) -> void:
 		var b := right[i]
 		var c := right[i + 1]
 		var d := left[i + 1]
-		_add_face(st, faces, a, b, c)
-		_add_face(st, faces, a, c, d)
+		_add_face(st, faces, a, b, c, Vector3.UP)
+		_add_face(st, faces, a, c, d, Vector3.UP)
 		# Closed 220 mm cassette, following each sampled height and endpoint.
-		_add_face(st, faces, a - Vector3.UP * DECK, d - Vector3.UP * DECK, c - Vector3.UP * DECK)
-		_add_face(st, faces, a - Vector3.UP * DECK, c - Vector3.UP * DECK, b - Vector3.UP * DECK)
-		_add_face(st, faces, a, d, d - Vector3.UP * DECK)
-		_add_face(st, faces, a, d - Vector3.UP * DECK, a - Vector3.UP * DECK)
-		_add_face(st, faces, b, b - Vector3.UP * DECK, c - Vector3.UP * DECK)
-		_add_face(st, faces, b, c - Vector3.UP * DECK, c)
+		_add_face(st, faces, a - Vector3.UP * DECK, d - Vector3.UP * DECK, c - Vector3.UP * DECK, Vector3.DOWN)
+		_add_face(st, faces, a - Vector3.UP * DECK, c - Vector3.UP * DECK, b - Vector3.UP * DECK, Vector3.DOWN)
+		var forward := Vector3(float(profile[i + 1][0]) - float(profile[i][0]), 0.0, float(profile[i + 1][2]) - float(profile[i][2])).normalized()
+		var left_out := Vector3(-forward.z, 0.0, forward.x)
+		_add_face(st, faces, a, d, d - Vector3.UP * DECK, left_out)
+		_add_face(st, faces, a, d - Vector3.UP * DECK, a - Vector3.UP * DECK, left_out)
+		_add_face(st, faces, b, b - Vector3.UP * DECK, c - Vector3.UP * DECK, -left_out)
+		_add_face(st, faces, b, c - Vector3.UP * DECK, c, -left_out)
 	var visual := MeshInstance3D.new()
 	visual.name = "%sFlight" % flight["id"]
 	visual.mesh = st.commit()
-	visual.material_override = SolidModel.material(BASALT if str(flight.get("material", "glass")) == "basalt" else GLASS, 0.3, 0.08)
+	var is_basalt := str(flight.get("material", "glass")) == "basalt"
+	var deck_material := SolidModel.material(BASALT if is_basalt else GLASS, 0.0, 0.9 if is_basalt else 0.05)
+	deck_material.cull_mode = BaseMaterial3D.CULL_BACK
+	visual.material_override = deck_material
 	visual.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
 	body.add_child(visual)
+	for edge_points: PackedVector3Array in [left, right]:
+		var edge_trim := _tube(edge_points, 0.025)
+		edge_trim.name = "%sDeckEdge" % flight["id"]
+		edge_trim.material_override = SolidModel.material(RAIL, 0.9, 0.2)
+		body.add_child(edge_trim)
+		CollisionPolicy.mark_decorative(edge_trim)
 	var shape := ConcavePolygonShape3D.new()
 	shape.backface_collision = true
 	shape.set_faces(faces)
@@ -199,7 +191,8 @@ static func _build_guard(body: StaticBody3D, rail_points: PackedVector3Array, la
 	# interval exceeds 1.6 m; every authored endpoint and profile corner gets one.
 	var post_st := SurfaceTool.new()
 	post_st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var post_material := SolidModel.material(POST, 0.4, 0.7)
+	var post_material := SolidModel.material(RAIL, 0.9, 0.2)
+	post_material.cull_mode = BaseMaterial3D.CULL_BACK
 	for i in rail_points.size() - 1:
 		var a := rail_points[i]
 		var b := rail_points[i + 1]
@@ -225,7 +218,7 @@ static func _build_guard(body: StaticBody3D, rail_points: PackedVector3Array, la
 	CollisionPolicy.mark_decorative(posts)
 	var rail := _tube(rail_points, 0.05)
 	rail.name = label + "Handrail"
-	rail.material_override = SolidModel.material(RAIL, 0.48, 0.64)
+	rail.material_override = SolidModel.material(RAIL, 0.9, 0.2)
 	body.add_child(rail)
 	CollisionPolicy.mark_decorative(rail)
 	var st := SurfaceTool.new()
@@ -244,7 +237,9 @@ static func _build_guard(body: StaticBody3D, rail_points: PackedVector3Array, la
 	var pane := MeshInstance3D.new()
 	pane.name = label + "Glass"
 	pane.mesh = st.commit()
-	pane.material_override = SolidModel.material(GUARD, 0.12, 0.03)
+	var glass_material := SolidModel.material(GUARD, 0.0, 0.05)
+	glass_material.cull_mode = BaseMaterial3D.CULL_BACK
+	pane.material_override = glass_material
 	pane.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
 	body.add_child(pane)
 	var shape := ConcavePolygonShape3D.new()
@@ -290,13 +285,10 @@ static func _polygon_with_holes(region: Dictionary) -> PackedVector2Array:
 		for i in hole.size():
 			if hole[i].x > hole[hi].x:
 				hi = i
-		var oi := 0
-		var best := INF
-		for i in polygon.size():
-			var distance := polygon[i].distance_squared_to(hole[hi])
-			if distance < best:
-				best = distance
-				oi = i
+		var oi := _visible_bridge_index(polygon, hole, hi)
+		if oi < 0:
+			push_error("FireCalderaPlanWalks: no visible bridge for a hole")
+			return PackedVector2Array()
 		var merged := PackedVector2Array()
 		for i in range(oi + 1):
 			merged.append(polygon[i])
@@ -311,13 +303,52 @@ static func _polygon_with_holes(region: Dictionary) -> PackedVector2Array:
 	return polygon
 
 
+static func _visible_bridge_index(outer: PackedVector2Array, hole: PackedVector2Array, hole_index: int) -> int:
+	var best_index := -1
+	var best_distance := INF
+	var h := hole[hole_index]
+	for candidate_index in outer.size():
+		var o := outer[candidate_index]
+		var midpoint := (h + o) * 0.5
+		if not Geometry2D.is_point_in_polygon(midpoint, outer) or Geometry2D.is_point_in_polygon(midpoint, hole):
+			continue
+		var blocked := false
+		for i in outer.size():
+			var a := outer[i]
+			var b := outer[(i + 1) % outer.size()]
+			if i == candidate_index or (i + 1) % outer.size() == candidate_index:
+				continue
+			var hit: Variant = Geometry2D.segment_intersects_segment(h, o, a, b)
+			if hit != null:
+				blocked = true
+				break
+		if blocked:
+			continue
+		for i in hole.size():
+			var a := hole[i]
+			var b := hole[(i + 1) % hole.size()]
+			if i == hole_index or (i + 1) % hole.size() == hole_index:
+				continue
+			var hit: Variant = Geometry2D.segment_intersects_segment(h, o, a, b)
+			if hit != null:
+				blocked = true
+				break
+		if blocked:
+			continue
+		var distance := h.distance_squared_to(o)
+		if distance < best_distance:
+			best_distance = distance
+			best_index = candidate_index
+	return best_index
+
+
 static func _level_point(p: Vector2, y: float) -> Vector3:
 	return Vector3(p.x, y, p.y)
 
 
-static func _add_face(st: SurfaceTool, faces: PackedVector3Array, a: Vector3, b: Vector3, c: Vector3) -> void:
+static func _add_face(st: SurfaceTool, faces: PackedVector3Array, a: Vector3, b: Vector3, c: Vector3, expected: Vector3 = Vector3.ZERO) -> void:
 	var normal := (b - a).cross(c - a).normalized()
-	if normal.y < 0.0:
+	if expected.length_squared() > 0.0 and normal.dot(expected) < 0.0:
 		var swap := b
 		b = c
 		c = swap

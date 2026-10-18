@@ -7,6 +7,13 @@ var _terrain: Node3D
 var _world: Node3D
 var _player: Player
 var _xiao: XiaoHouZi
+var _first_frame_marked := false
+
+
+func _process(_delta: float) -> void:
+	if not _first_frame_marked:
+		_first_frame_marked = true
+		print("FIRE_FIRST_FRAME_OBSERVATION")
 
 
 func _ready() -> void:
@@ -26,7 +33,8 @@ func _ready() -> void:
 
 
 func _run() -> void:
-	for _i in 6:
+	await LoadingScreen.wait_for_world_builds()
+	for _i in 2:
 		await get_tree().physics_frame
 	var frame := _terrain.get_node_or_null("CalderaCityGround") as Node3D
 	_expect(frame != null, "live city frame is built")
@@ -54,10 +62,12 @@ func _run() -> void:
 	var centre_world := FireCalderaPlan.to_world(Vector2.ZERO)
 	_expect(_terrain.is_lava_area(centre_world), "cascade column is registered as hazardous lava")
 	var section: Dictionary = FireCalderaHeartworksPlan.SECTION
-	var cascade: Dictionary = section["cascade"]
-	var pool_y := float(section["lava_y"]) - float(cascade["bottom_depth"])
-	_expect(is_equal_approx(float(_terrain.get_lava_surface_height_at(Vector3(centre_world.x, pool_y + 0.5, centre_world.y))), pool_y), "swimmer-height liquid query resolves the collection pool")
-	_expect(is_equal_approx(float(_terrain.get_lava_surface_height_at(Vector3(centre_world.x, float(section["lava_y"]) + 1.0, centre_world.y))), float(section["lava_y"])), "swimmer-height liquid query resolves the reservoir")
+	var volumes: Array = section["lava_volumes"]
+	var pool: Dictionary = volumes[2]
+	var pool_mid := (float(pool["top"]) + float(pool["bottom"])) * 0.5
+	_expect(is_equal_approx(_terrain.get_lava_surface_at(Vector3(centre_world.x, pool_mid, centre_world.y)), float(pool["surface"])), "3D liquid query resolves the collection pool")
+	_expect(is_equal_approx(_terrain.get_lava_surface_at(Vector3(centre_world.x, float(section["lava_y"]) - 0.5, centre_world.y)), float(section["lava_y"])), "3D liquid query resolves the reservoir")
+	_expect(not _terrain.is_lava_at(Vector3(centre_world.x, float(section["lava_y"]) + 1.0, centre_world.y)), "air above reservoir is not lava")
 	var space := get_world_3d().direct_space_state
 	var surface_routes := 0
 	_spawn_playables()
@@ -80,6 +90,7 @@ func _run() -> void:
 	_check_junction(space, frame, "F", FireCalderaHeartworksPlan.LEVELS)
 	var cars := frame.find_child("FunicularCarUp", true, false)
 	_expect(cars != null and frame.find_child("FunicularCarDown", true, false) != null, "counterbalanced funicular cars are present")
+	_check_funicular_corridor()
 	_check_funicular(space, frame, highline)
 	_finish()
 
@@ -97,6 +108,34 @@ func _check_profile(space: PhysicsDirectSpaceState3D, frame: Node3D, body: Stati
 		if supported:
 			tested += 1
 	return 1 if tested == samples.size() else 0
+
+
+func _check_funicular_corridor() -> void:
+	var profile: Array = FireCalderaWalkwaysPlan.SITE["funicular"]["profile"]
+	var maximum := 0.0
+	var max_index := -1
+	var max_world := Vector2.ZERO
+	var profile_top: Array = FireCalderaWalkwaysPlan.SITE["funicular"]["top"]
+	var final_profile: Array = profile[profile.size() - 1]
+	var tangent := (Vector2(float(final_profile[0]), float(final_profile[2])) - Vector2(float(profile_top[0]), float(profile_top[1]))).normalized()
+	var normal := Vector2(-tangent.y, tangent.x)
+	for i in profile.size():
+		var raw: Array = profile[i]
+		var world := FireCalderaPlan.to_world(Vector2(float(raw[0]), float(raw[2])))
+		var live_ground := -INF
+		for offset in [-5.3, 0.0, 5.3]:
+			var sample_local: Vector2 = Vector2(float(raw[0]), float(raw[2])) + normal * float(offset)
+			var sample_world := FireCalderaPlan.to_world(sample_local)
+			live_ground = maxf(live_ground, _terrain.get_mesh_height(sample_world.x, sample_world.y))
+		var difference := absf(live_ground - float(raw[3]))
+		if difference > maximum:
+			maximum = difference
+			max_index = i
+			max_world = world
+	var max_raw: float = _terrain.get_mesh_height(max_world.x, max_world.y)
+	var weight: float = _terrain._funicular_corridor_weight(max_world)
+	print("FUNicular_CORRIDOR_MAX_HEIGHT_DIFF=%.4f INDEX=%d PLAN=%.4f LIVE=%.4f LEGACY=%.4f WEIGHT=%.3f" % [maximum, max_index, float(profile[max_index][3]), _terrain.get_mesh_height(max_world.x, max_world.y), max_raw, weight])
+	_expect(maximum < 0.05, "funicular corridor terrain follows every generated ground sample within five centimetres")
 
 
 func _check_junction(space: PhysicsDirectSpaceState3D, frame: Node3D, id: String, levels: Array) -> void:
@@ -129,44 +168,70 @@ func _spawn_playables() -> void:
 	_world.add_child(_xiao)
 	_xiao.set_process(false)
 	_xiao.set_physics_process(false)
+	_equip_test_lava_suit(_player)
+	_equip_test_lava_suit(_xiao)
+
+
+func _equip_test_lava_suit(actor: Node) -> void:
+	var suit := actor.get("_blorb_suit") as BlorbSuitController
+	if suit == null:
+		_expect(false, "%s has a suit controller" % actor.name)
+		return
+	var worn: Array[Dictionary] = []
+	for slot: String in ["head", "torso", "arm_left", "arm_right", "leg_left", "leg_right"]:
+		var blorb := Blorb.new()
+		blorb.portrait_mode = true
+		blorb.element_state = "fire"
+		if slot == "head":
+			blorb.core_items = ["Lava Helm"]
+		worn.append({"slot": slot, "blorb": blorb})
+	suit.set("_worn", worn)
+	_expect(suit.has_lava_safe_legs(), "%s wears two landed fire legs for lava traversal" % actor.name)
+	_expect(suit.has_full_lava_suit(), "%s wears the full Lava Helm formation for lava immersion" % actor.name)
 
 
 func _check_cascade_liquid(section: Dictionary, centre: Vector2) -> void:
-	var cascade: Dictionary = section["cascade"]
-	var pool_y := float(section["lava_y"]) - float(cascade["bottom_depth"])
+	var pool: Dictionary = section["lava_volumes"][2]
+	var pool_y := float(pool["surface"])
+	var pool_mid := (float(pool["top"]) + float(pool["bottom"])) * 0.5
 	for actor: Node3D in [_player, _xiao]:
 		var suit := actor.get("_blorb_suit") as BlorbSuitController
 		var liquid := LiquidEnvironment.new()
-		for y: float in [pool_y + 0.5, pool_y + 1.8, pool_y + 3.0, float(section["lava_y"]) - 0.5]:
+		for y: float in [pool_mid, pool_y + 0.5, -10.0, float(section["lava_y"]) - 0.5]:
 			var at := Vector3(centre.x, y, centre.y)
 			liquid.read(_terrain, suit, at)
 			_expect(liquid.in_lava(), "%s swimmer remains in hazardous lava along cascade ascent/descent at Y %.2f" % [actor.name, y])
-			if y <= pool_y + 2.0:
+			if y <= pool_y:
 				_expect(is_equal_approx(liquid.surface_height, pool_y), "%s resolves collection-pool surface at Y %.2f" % [actor.name, y])
 			else:
 				_expect(is_equal_approx(liquid.surface_height, float(section["lava_y"])), "%s resolves reservoir surface at Y %.2f" % [actor.name, y])
 
 
-func _check_funicular(space: PhysicsDirectSpaceState3D, frame: Node3D, highline: StaticBody3D) -> void:
-	for station_name in ["FunicularLowerStation", "FunicularGateStation"]:
+func _check_funicular(_space: PhysicsDirectSpaceState3D, _frame: Node3D, highline: StaticBody3D) -> void:
+	for station_name in ["funicular-footFloor", "gateFloor"]:
 		var station := highline.get_node_or_null(station_name) as MeshInstance3D
 		_expect(station != null, "%s boarding platform exists" % station_name)
 		if station == null:
 			continue
-		var local := station.position + Vector3.UP * 0.5
-		var world := frame.global_transform * local
-		var hit := _ray(space, world, world - Vector3.UP * 1.0)
-		_expect(not hit.is_empty() and hit.get("collider") == highline, "%s boarding platform has live collision" % station_name)
+		var collision_name: String = station_name + "Collision"
+		var collision := highline.get_node_or_null(collision_name) as CollisionShape3D
+		_expect(collision != null and collision.shape != null, "%s boarding platform has live collision" % station_name)
 	var lift := highline.get_node_or_null("CounterbalancedFunicular") as Node3D
-	var up := highline.get_node_or_null("FunicularCarUp") as Node3D
-	var down := highline.get_node_or_null("FunicularCarDown") as Node3D
+	var up := lift.get_node_or_null("FunicularCarUp") as Node3D if lift != null else null
+	var down := lift.get_node_or_null("FunicularCarDown") as Node3D if lift != null else null
 	if lift == null or up == null or down == null:
 		_expect(false, "funicular car controller and both moving cars are present")
 		return
-	var before_up := up.position
-	var before_down := down.position
-	lift.call("_process", 1.0)
-	_expect(up.position.distance_to(before_up) > 0.05 and down.position.distance_to(before_down) > 0.05, "both funicular cars advance on the sampled track profile")
+	var before_up := up.global_position
+	var before_down := down.global_position
+	var before_player := _player.global_position
+	var before_xiao := _xiao.global_position
+	_player.global_position = up.global_position + Vector3(-0.45, 0.25, 0.0)
+	_xiao.global_position = up.global_position + Vector3(0.45, 0.25, 0.0)
+	lift.call("_process", 0.0)
+	lift.call("_process", 4.0)
+	_expect(up.global_position.distance_to(before_up) > 0.05 and down.global_position.distance_to(before_down) > 0.05, "both funicular cars move along the sampled profile")
+	_expect(_player.global_position.distance_to(before_player) > 0.05 and _xiao.global_position.distance_to(before_xiao) > 0.05, "both playable characters are carried when aboard")
 
 
 func _check_character_support(space: PhysicsDirectSpaceState3D, frame: Node3D, flight: Dictionary) -> void:

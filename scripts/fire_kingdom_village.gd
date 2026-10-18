@@ -43,16 +43,16 @@ func _ready()->void:
 	# of generic TownProps houses, placeholder residents, braziers and fountain
 	# occupied the same ground and clipped through the authored city, so none of
 	# that transitional settlement layer is spawned anymore.
-	_spawn_lava_slide()
-	_build_guest_house()
-	_build_nahl()
-	_build_oren()
-	_build_renewal()
-	_build_kel()
-	_build_vara()
-	_build_civic()
-	_build_iren()
-	_build_aro()
+	LoadingScreen.enqueue_build_stage("Building the Renewal ghat", 0.955, Callable(self, "_spawn_lava_slide"))
+	LoadingScreen.enqueue_build_stage("Building the guest house", 0.965, Callable(self, "_build_guest_house"))
+	LoadingScreen.enqueue_build_stage("Building the Nahl tempering hall", 0.972, Callable(self, "_build_nahl"))
+	LoadingScreen.enqueue_build_stage("Building Oren's mineral house", 0.979, Callable(self, "_build_oren"))
+	LoadingScreen.enqueue_build_stage("Building Renewal", 0.984, Callable(self, "_build_renewal"))
+	LoadingScreen.enqueue_build_stage("Building Kel's foundry", 0.989, Callable(self, "_build_kel"))
+	LoadingScreen.enqueue_build_stage("Building Vara's glass studio", 0.993, Callable(self, "_build_vara"))
+	LoadingScreen.enqueue_build_stage("Building City Hall", 0.996, Callable(self, "_build_civic"))
+	LoadingScreen.enqueue_build_stage("Building Iren's residence", 0.998, Callable(self, "_build_iren"))
+	LoadingScreen.enqueue_build_stage("Completing the Fire settlement", 1.0, Callable(self, "_build_aro"))
 
 
 ## Tovan, Miru and Kes's thermal control works and adjoining home.

@@ -198,7 +198,17 @@ func set_world_load_progress(scene_progress: float) -> void:
 ## per generator is intentionally cheap; it avoids per-object progress work.
 func enqueue_build_stage(label: String, completion_progress: float, job: Callable) -> void:
 	_pending_build_jobs += 1
-	_build_queue.append({"label": label, "progress": completion_progress, "job": job})
+	_build_queue.append({"label": label, "progress": completion_progress, "job": job, "async": false})
+	if not _build_queue_running:
+		_build_queue_running = true
+		_drain_build_queue.call_deferred()
+
+
+## Async builders yield between chunks so a loading phase never hides one
+## unchanged monolithic generator behind a progress label.
+func enqueue_async_build_stage(label: String, completion_progress: float, job: Callable) -> void:
+	_pending_build_jobs += 1
+	_build_queue.append({"label": label, "progress": completion_progress, "job": job, "async": true})
 	if not _build_queue_running:
 		_build_queue_running = true
 		_drain_build_queue.call_deferred()
@@ -221,7 +231,10 @@ func _drain_build_queue() -> void:
 		await get_tree().process_frame
 		var job: Callable = entry["job"] as Callable
 		if job.is_valid():
-			job.call()
+			if bool(entry.get("async", false)):
+				await job.call()
+			else:
+				job.call()
 		_pending_build_jobs -= 1
 		set_phase(entry["label"] as String, float(entry["progress"]))
 	_build_queue_running = false

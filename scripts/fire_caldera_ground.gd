@@ -183,16 +183,40 @@ static func crater_wall(local: Vector2) -> float:
 ## wall, out of sight; on the downhill side it is untouched), and the
 ## collider leaves out every cell touching the plinth itself, so the
 ## foundation is the only floor there.
-static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(FireCalderaGround, "crater_wall")) -> StaticBody3D:
+static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(FireCalderaGround, "crater_wall"), cuts: Array = []) -> StaticBody3D:
+	var tree := Engine.get_main_loop() as SceneTree
 	var columns := int(MESH_EXTENT * 2.0 / CELL) + 1
 	var vertices := PackedVector3Array()
 	var inside := PackedByteArray()
+	var prepared_cuts: Array[Dictionary] = []
+	for cut: Dictionary in cuts:
+		for region: Dictionary in cut.get("regions", []):
+			var outer := _raw_polygon(region["outer"])
+			var holes: Array[PackedVector2Array] = []
+			for raw_hole: Array in region.get("holes", []):
+				holes.append(_raw_polygon(raw_hole))
+			prepared_cuts.append({"outer": outer, "holes": holes, "bounds": _polygon_bounds(outer), "cut_to": float(region.get("cut_to", cut["cut_to"]))})
 	vertices.resize(columns * columns)
 	inside.resize(columns * columns)
 	for row in columns:
 		for column in columns:
 			var p := Vector2(-MESH_EXTENT + float(column) * CELL, -MESH_EXTENT + float(row) * CELL)
-			var y := blended_height(p, wall)
+			var y := height(p)
+			var blend := smoothstep(WALL_BLEND.x, WALL_BLEND.y, p.length())
+			if blend > 0.0:
+				y = lerpf(y, float(wall.call(p)), blend)
+			for cut_region: Dictionary in prepared_cuts:
+				if not (cut_region["bounds"] as Rect2).has_point(p):
+					continue
+				if not Geometry2D.is_point_in_polygon(p, cut_region["outer"]):
+					continue
+				var in_hole := false
+				for hole: PackedVector2Array in cut_region["holes"]:
+					if Geometry2D.is_point_in_polygon(p, hole):
+						in_hole = true
+						break
+				if not in_hole:
+					y = minf(y, float(cut_region["cut_to"]))
 			var socketed := 0
 			for socket: Dictionary in sockets:
 				if Geometry2D.is_point_in_polygon(p, socket["band"]):
@@ -212,6 +236,8 @@ static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(Fire
 						break
 			vertices[row * columns + column] = Vector3(p.x, y, p.y)
 			inside[row * columns + column] = socketed
+		if row % 8 == 7:
+			await tree.process_frame
 	var indices := PackedInt32Array()
 	var faces := PackedVector3Array()
 	for row in columns - 1:
@@ -226,12 +252,16 @@ static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(Fire
 				if inside[tri[0]] + inside[tri[1]] + inside[tri[2]] == 0:
 					for k in tri:
 						faces.append(vertices[k])
+		if row % 16 == 15:
+			await tree.process_frame
 	var normals := PackedVector3Array()
 	normals.resize(vertices.size())
 	for i in range(0, indices.size(), 3):
 		var n := (vertices[indices[i + 1]] - vertices[indices[i]]).cross(vertices[indices[i + 2]] - vertices[indices[i]])
 		for k in 3:
 			normals[indices[i + k]] += n
+		if i % 24576 == 0 and i > 0:
+			await tree.process_frame
 	var colors := PackedColorArray()
 	colors.resize(vertices.size())
 	for i in vertices.size():
@@ -239,6 +269,8 @@ static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(Fire
 		var n := normals[i] if normals[i].y >= 0.0 else -normals[i]
 		normals[i] = n.normalized() if n.length() > 0.0 else Vector3.UP
 		colors[i] = _colour(vertices[i], normals[i])
+		if i % 8192 == 8191:
+			await tree.process_frame
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = vertices
@@ -274,6 +306,24 @@ static func build(parent: Node3D, sockets: Array, wall: Callable = Callable(Fire
 
 
 # The former standalone arrival arch was superseded by the generated Gate Terrace.
+
+static func _raw_polygon(raw: Array) -> PackedVector2Array:
+	var polygon := PackedVector2Array()
+	for p: Array in raw:
+		polygon.append(Vector2(float(p[0]), float(p[1])))
+	if polygon.size() > 2 and polygon[0].is_equal_approx(polygon[-1]):
+		polygon.remove_at(polygon.size() - 1)
+	return polygon
+
+
+static func _polygon_bounds(polygon: PackedVector2Array) -> Rect2:
+	if polygon.is_empty():
+		return Rect2()
+	var bounds := Rect2(polygon[0], Vector2.ZERO)
+	for p in polygon:
+		bounds = bounds.expand(p)
+	return bounds
+
 
 static func _colour(vertex: Vector3, normal: Vector3) -> Color:
 	# Kept as the vertex-array source for mesh compatibility and terrain tools;

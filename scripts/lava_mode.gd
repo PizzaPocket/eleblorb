@@ -76,9 +76,11 @@ func enforce_access(ctx: TraversalContext, underside_y: float, origin_lift: floa
 		return false
 	var body := ctx.body
 	var xz := Vector2(body.global_position.x, body.global_position.z)
-	if not bool(terrain.is_lava_area(xz)):
+	var point := Vector3(xz.x, underside_y, xz.y)
+	var in_lava := bool(terrain.is_lava_at(point)) if terrain.has_method("is_lava_at") else bool(terrain.is_lava_area(xz))
+	if not in_lava:
 		return false
-	var surface: float = terrain.get_lava_surface_height(xz)
+	var surface: float = terrain.get_lava_surface_at(point) if terrain.has_method("get_lava_surface_at") else terrain.get_lava_surface_height(xz)
 	if underside_y > surface + CONTACT_TOLERANCE:
 		return false
 	var safe_position: Vector3 = terrain.get_lava_escape_position(xz)

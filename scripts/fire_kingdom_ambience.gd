@@ -41,8 +41,8 @@ func _ready()->void:
 func _process(delta:float)->void:
 	var camera:=get_viewport().get_camera_3d();var submerged:=false
 	if camera!=null and _terrain!=null:
-		var xz:=Vector2(camera.global_position.x,camera.global_position.z)
-		submerged=_terrain.is_lava_area(xz) and camera.global_position.y<_terrain.get_lava_surface_height(xz)-0.06
+		var point := camera.global_position
+		submerged = bool(_terrain.is_lava_at(point)) and point.y < _terrain.get_lava_surface_at(point) - 0.06 if _terrain.has_method("is_lava_at") else false
 	_immersion=move_toward(_immersion,1.0 if submerged else 0.0,delta*1.7)
 	_surface_filter.cutoff_hz=lerpf(9200.0,520.0,_immersion)
 	_surface_player.volume_db=lerpf(SURFACE_VOLUME_DB,SURFACE_SUBMERGED_VOLUME_DB,_immersion)

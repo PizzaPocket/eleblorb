@@ -30,6 +30,7 @@ const DOOR_CLEAR := 2.30
 const DOOR_HEIGHT := 2.75
 const ROOF_PITCH := deg_to_rad(2.0)
 const ROOF_DEPTH := 0.18
+const FireCalderaBake := preload("res://scripts/fire_caldera_bake.gd")
 
 
 ## Builds the pavilion. `spec`:
@@ -389,7 +390,11 @@ static func _pane(body: StaticBody3D, name_text: String, at: Vector3, half: Vect
 	return pane
 
 
-static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top: float, rake: float, overhang: Dictionary, skylights: Array, colour: Color = STAINLESS_SHADOW.darkened(0.16), level_pitch: float = ROOF_PITCH) -> CSGCombiner3D:
+static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top: float, rake: float, overhang: Dictionary, skylights: Array, colour: Color = STAINLESS_SHADOW.darkened(0.16), level_pitch: float = ROOF_PITCH) -> Node3D:
+	var bake_key := FireCalderaBake.roof_key(offset, size, top, rake, overhang, skylights, colour, level_pitch)
+	var baked := FireCalderaBake.instantiate_roof(bake_key, body)
+	if baked != null:
+		return baked
 	# A side given as 0 butts against a neighbour: the slab runs on past the
 	# wall line and is cut flush there, so it meets its neighbour in one plane
 	# (as two gable slabs meet at a ridge) instead of stopping on a rounded
@@ -405,6 +410,7 @@ static func _build_roof(body: StaticBody3D, offset: Vector2, size: Vector2, top:
 	var back: float = reach.call("back")
 	var roof := CSGCombiner3D.new()
 	roof.name = "LowPitchSkylightRoof"
+	roof.set_meta("fire_caldera_roof_key", bake_key)
 	# A raked roof rests on its walls' heads, climbing from back to front.
 	var pitch := atan2(rake, size.y) if rake > 0.0 else level_pitch
 	var shift_z := (front - back) * 0.5

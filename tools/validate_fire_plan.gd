@@ -10,8 +10,10 @@ var _failures := 0
 func _ready() -> void:
 	_check_walkway_levels(FireCalderaWalkwaysPlan.LEVELS)
 	_check_flights(FireCalderaWalkwaysPlan.LEVELS, FireCalderaWalkwaysPlan.FLIGHTS, "surface")
+	_check_level_overlaps(FireCalderaWalkwaysPlan.LEVELS, "surface")
 	_check_walkway_site(FireCalderaWalkwaysPlan.SITE)
 	_check_heartworks()
+	_check_level_overlaps(FireCalderaHeartworksPlan.LEVELS, "Heartworks")
 	_check_census()
 	_check_surveys()
 	print("---- validate_fire_plan: %d surface levels, %d surface flights, %d chamber levels, %d chamber flights, %d FAIL" % [
@@ -30,6 +32,8 @@ func _check_walkway_levels(levels: Array) -> void:
 	for level: Dictionary in levels:
 		var level_id := str(level["id"])
 		var datum := float(level["datum"])
+		if not bool(level.get("build", true)) and str(level.get("owner", "")).is_empty():
+			_fail("%s is excluded from shared construction but has no owner" % level_id)
 		if level["surface"].is_empty():
 			_fail("%s has no authored floor surfaces" % level_id)
 		for region: Dictionary in level["surface"]:
@@ -64,9 +68,12 @@ func _check_flights(levels: Array, flights: Array, label: String) -> void:
 	for flight: Dictionary in flights:
 		var id := str(flight["id"])
 		var profile: Array = flight["profile"]
+		var deck: Array = flight.get("deck", profile)
 		if profile.size() < 2:
 			_fail("%s flight %s has no sampled profile" % [label, id])
 			continue
+		if deck.size() < 2 or deck.size() > profile.size():
+			_fail("%s flight %s has malformed slope-only deck samples" % [label, id])
 		if not levels_by_id.has(str(flight["upper"])) or not levels_by_id.has(str(flight["lower"])):
 			_fail("%s flight %s names an absent level" % [label, id])
 		var calculated_length := 0.0
@@ -108,6 +115,24 @@ func _check_walkway_site(site: Dictionary) -> void:
 		_fail("funicular section does not reach between stations")
 	if terrace["half"].size() != 2:
 		_fail("Gate Terrace has malformed authored half extents")
+	var beds: Dictionary = site["beds"]
+	for level: Dictionary in FireCalderaWalkwaysPlan.LEVELS:
+		var bed: Dictionary = beds.get(str(level["id"]), {})
+		if str(bed.get("kind", "")) == "ground":
+			if not bed.has("cut_to"):
+				_fail("ground bed %s lacks its generated cut datum" % level["id"])
+	var cuts: Dictionary = site["flight_cuts"]
+	for id: String in cuts:
+		var found_flight := false
+		for flight: Dictionary in FireCalderaWalkwaysPlan.FLIGHTS:
+			found_flight = found_flight or str(flight["id"]) == id
+		if not found_flight:
+			_fail("ground cut references an unknown flight %s" % id)
+	var materials: Dictionary = site["materials"]
+	if materials["deck_glass"]["colour"] != [0.62, 0.82, 0.88] or float(materials["deck_glass"]["alpha"]) != 0.2:
+		_fail("generated glass deck material changed from the Fire palette")
+	if profile.size() < 2 or funicular["piers"].size() != 12 or funicular["stair"]["profile"].size() < 2:
+		_fail("funicular profile, pier or stair data is incomplete")
 	print("ok   site: Gate Terrace/plinth, 12 frames, %d sampled funicular stations" % profile.size())
 
 
@@ -115,6 +140,13 @@ func _check_heartworks() -> void:
 	var section: Dictionary = FireCalderaHeartworksPlan.SECTION
 	var chamber: Dictionary = section["chamber"]
 	var cascade: Dictionary = section["cascade"]
+	var volumes: Array = section["lava_volumes"]
+	if volumes.size() != 3 or str(volumes[0]["kind"]) != "layer" or str(volumes[1]["kind"]) != "frustum" or str(volumes[2]["kind"]) != "cylinder":
+		_fail("Heartworks plan does not define the reservoir, cascade and pool volumes")
+	if volumes[0]["outline"].size() < 3 or not volumes[0]["floor"].has("dome"):
+		_fail("Heartworks reservoir outline or dome floor is missing")
+	if float(volumes[0]["top"]) != 29.2 or float(volumes[1]["top_radius"]) != 6.0 or float(volumes[1]["bottom_radius"]) != 4.2 or float(volumes[2]["radius"]) != 10.5:
+		_fail("Heartworks lava volumes disagree with the generated section")
 	if float(cascade["top_radius"]) * 2.0 != 12.0 or float(cascade["bottom_radius"]) * 2.0 != 8.4:
 		_fail("Heartworks cascade radii disagree with the generated section")
 	if absf(float(cascade["bottom_depth"]) - float(chamber["pool_surface"])) > 0.001:
@@ -124,6 +156,40 @@ func _check_heartworks() -> void:
 	_check_walkway_levels(FireCalderaHeartworksPlan.LEVELS)
 	_check_flights(FireCalderaHeartworksPlan.LEVELS, FireCalderaHeartworksPlan.FLIGHTS, "Heartworks")
 	print("ok   Heartworks section: single cascade, oculus, collection pool, %d crossings" % FireCalderaHeartworksPlan.SECTION["crossings"].size())
+
+
+func _check_level_overlaps(levels: Array, label: String) -> void:
+	for i in levels.size():
+		var first: Dictionary = levels[i]
+		if not bool(first.get("build", true)):
+			continue
+		for j in range(i + 1, levels.size()):
+			var second: Dictionary = levels[j]
+			if not bool(second.get("build", true)) or absf(float(first["datum"]) - float(second["datum"])) >= 0.02:
+				continue
+			for a: Dictionary in first["surface"]:
+				for b: Dictionary in second["surface"]:
+					for overlap: PackedVector2Array in Geometry2D.intersect_polygons(_points(a["outer"]), _points(b["outer"])):
+						if absf(_area(overlap)) > 0.02 and _overlap_has_walkable_point(overlap, a, b):
+							_fail("%s walkable surfaces %s and %s overlap at equal height" % [label, first["id"], second["id"]])
+
+
+func _overlap_has_walkable_point(overlap: PackedVector2Array, first: Dictionary, second: Dictionary) -> bool:
+	var indices := Geometry2D.triangulate_polygon(overlap)
+	for i in range(0, indices.size(), 3):
+		var p := (overlap[indices[i]] + overlap[indices[i + 1]] + overlap[indices[i + 2]]) / 3.0
+		if _region_contains(first, p) and _region_contains(second, p):
+			return true
+	return false
+
+
+func _region_contains(region: Dictionary, point: Vector2) -> bool:
+	if not Geometry2D.is_point_in_polygon(point, _points(region["outer"])):
+		return false
+	for hole: Array in region.get("holes", []):
+		if Geometry2D.is_point_in_polygon(point, _points(hole)):
+			return false
+	return true
 
 
 func _check_census() -> void:

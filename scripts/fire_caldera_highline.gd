@@ -59,8 +59,55 @@ static func build_ground_plot(parent: Node3D, entry: Dictionary, line: Dictionar
 	return SocketPlinth.build(parent, floor_entry, line, "walk_footprint")
 
 
+static func build_ground_beds(parent: Node3D, site: Dictionary) -> StaticBody3D:
+	var body := StaticBody3D.new()
+	body.name = "CalderaBedRetainingEdges"
+	body.collision_layer = 1
+	body.collision_mask = 0
+	parent.add_child(body)
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var faces := PackedVector3Array()
+	for bed_id: String in site["beds"]:
+		var bed: Dictionary = site["beds"][bed_id]
+		if str(bed.get("kind", "")) != "ground":
+			continue
+		var cut_to := float(bed["cut_to"])
+		for run: Array in bed.get("retaining", []):
+			for i in range(1, run.size()):
+				var p0: Array = run[i - 1]
+				var p1: Array = run[i]
+				var a := Vector3(float(p0[0]), float(p0[1]), float(p0[2]))
+				var b := Vector3(float(p1[0]), float(p1[1]), float(p1[2]))
+				var ab := Vector3(a.x, cut_to, a.z)
+				var bb := Vector3(b.x, cut_to, b.z)
+				var normal := (b - a).cross(ab - a).normalized()
+				for tri: Array in [[a, ab, bb], [a, bb, b]]:
+					st.set_normal(normal)
+					for point: Vector3 in tri:
+						st.add_vertex(point)
+						faces.append(point)
+				for tri: Array in [[a, bb, ab], [a, b, bb]]:
+					st.set_normal(-normal)
+					for point: Vector3 in tri:
+						st.add_vertex(point)
+						faces.append(point)
+	var visual := MeshInstance3D.new()
+	visual.name = "BasaltRetainingFaces"
+	visual.mesh = st.commit()
+	visual.material_override = SolidModel.material(REFRACTORY_EDGE, 0.9, 0.0)
+	body.add_child(visual)
+	var shape := ConcavePolygonShape3D.new()
+	shape.backface_collision = true
+	shape.set_faces(faces)
+	var collision := CollisionShape3D.new()
+	collision.shape = shape
+	collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.SOLID)
+	body.add_child(collision)
+	return body
+
+
 static func _build_plan_site(body: StaticBody3D, site: Dictionary) -> void:
-	var terrace: Dictionary = site["gate_terrace"]
 	var gate: Dictionary = site["tempering_gate"]
 	var plinth: Dictionary = site["gate_plinth"]
 	for bearing: float in site["frames"]:
@@ -75,32 +122,30 @@ static func _build_plan_site(body: StaticBody3D, site: Dictionary) -> void:
 			var head := Vector3(foot_plan.x, deck_y - 0.55, foot_plan.y)
 			var tip := foot_plan + tangent * side * 1.35
 			_beam(body, head, Vector3(tip.x, deck_y, tip.y), Vector2(0.18, 0.18), JOINT)
-	var centre: Array = terrace["centre"]
 	var top := float(plinth["top"])
 	var bottom := float(plinth["bottom"])
-	var half: Array = terrace["half"]
-	var outline := PackedVector2Array()
-	var exponent := float(terrace["exponent"])
-	const SAMPLES := 128
-	for i in SAMPLES:
-		var angle := TAU * float(i) / SAMPLES
-		var c := cos(angle)
-		var s := sin(angle)
-		outline.append(Vector2(float(centre[0]) + signf(c) * pow(absf(c), 2.0 / exponent) * float(half[0]),
-			float(centre[1]) + signf(s) * pow(absf(s), 2.0 / exponent) * float(half[1])))
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var faces := PackedVector3Array()
-	for i in SAMPLES:
-		var a2 := outline[i]
-		var b2 := outline[(i + 1) % SAMPLES]
-		var a := Vector3(a2.x, top, a2.y)
-		var b := Vector3(b2.x, top, b2.y)
-		var ab := Vector3(a2.x, bottom, a2.y)
-		var bb := Vector3(b2.x, bottom, b2.y)
-		st.add_vertex(a); st.add_vertex(ab); st.add_vertex(bb)
-		st.add_vertex(a); st.add_vertex(bb); st.add_vertex(b)
-		faces.append_array([a, ab, bb, a, bb, b])
+	for region: Dictionary in FireCalderaWalkwaysPlan.LEVELS[0]["surface"]:
+		for raw_loop: Array in [region["outer"]] + region.get("holes", []):
+			var loop := PackedVector2Array()
+			for raw: Array in raw_loop:
+				loop.append(Vector2(float(raw[0]), float(raw[1])))
+			if loop.size() > 2 and loop[0].is_equal_approx(loop[-1]):
+				loop.remove_at(loop.size() - 1)
+			for i in loop.size():
+				var p0 := loop[i]
+				var p1 := loop[(i + 1) % loop.size()]
+				var a := Vector3(p0.x, top, p0.y)
+				var b := Vector3(p1.x, top, p1.y)
+				var ab := Vector3(p0.x, bottom, p0.y)
+				var bb := Vector3(p1.x, bottom, p1.y)
+				var normal := (b - a).cross(ab - a).normalized()
+				for point: Vector3 in [a, ab, bb, a, bb, b]:
+					st.set_normal(normal)
+					st.add_vertex(point)
+				faces.append_array([a, ab, bb, a, bb, b])
 	var pier := MeshInstance3D.new()
 	pier.name = "GateTerraceSocketedPlinth"
 	pier.mesh = st.commit()
@@ -114,36 +159,17 @@ static func _build_plan_site(body: StaticBody3D, site: Dictionary) -> void:
 	plinth_collision.shape = plinth_shape
 	plinth_collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.SOLID)
 	body.add_child(plinth_collision)
-	var axis: Array = gate["at"]
-	var span := float(gate["span"])
-	var height := float(gate["height"])
-	for side: float in [-1.0, 1.0]:
-		var p := Vector3(float(axis[0]) + side * span * 0.5, top + height * 0.5, float(axis[1]))
-		var pylon_size := Vector3(float(gate["pylon"]), height, 1.0)
-		var pylon := BoxMesh.new()
-		pylon.size = pylon_size
-		var post := MeshInstance3D.new()
-		post.name = "TemperingGatePylon"
-		post.mesh = pylon
-		post.position = p
-		post.material_override = SolidModel.material(REFRACTORY_EDGE, 0.7, 0.03)
-		body.add_child(post)
-		CollisionPolicy.add_box(body, post, pylon_size, post.position, Basis.IDENTITY, false)
-	var lintel := BoxMesh.new()
-	lintel.size = Vector3(span + 0.9, 0.72, 0.9)
-	var lintel_node := MeshInstance3D.new()
-	lintel_node.name = "TemperingGateMineralGlazingLintel"
-	lintel_node.mesh = lintel
-	lintel_node.position = Vector3(float(axis[0]), top + height - 0.36, float(axis[1]))
-	lintel_node.material_override = SolidModel.material(Color(0.48, 0.22, 0.15), 0.25, 0.2)
-	body.add_child(lintel_node)
-	CollisionPolicy.add_box(body, lintel_node, lintel.size, lintel_node.position, Basis.IDENTITY, false)
+	_build_tempering_gate(body, gate, top)
 	var tongue: Dictionary = site["immersion_tongue"]
 	var start: Array = tongue["start"]
 	var renewal: Dictionary = FireCalderaPlan.plot("RENEWAL")
 	var tongue_origin: Vector2 = FireCalderaPlan.shell_to_plan(renewal, Vector2(float(start[0]), float(start[1])))
 	var tongue_end: Vector2 = FireCalderaPlan.shell_to_plan(renewal, Vector2(float(start[0]), float(start[1]) + float(tongue["length"])))
-	var datum := float(FireCalderaWalkwaysPlan.LEVELS[2]["datum"])
+	var datum := 0.0
+	for level: Dictionary in FireCalderaWalkwaysPlan.LEVELS:
+		if str(level["id"]) == "promenade":
+			datum = float(level["datum"])
+			break
 	var tongue_flight := {
 		"id": "RenewalImmersionTongue",
 		"width": float(tongue["width"]),
@@ -158,6 +184,64 @@ static func _build_plan_site(body: StaticBody3D, site: Dictionary) -> void:
 	_build_funicular(body, site["funicular"])
 
 
+static func _build_tempering_gate(body: StaticBody3D, gate: Dictionary, floor_y: float) -> void:
+	var at: Array = gate["at"]
+	var span := float(gate["span"])
+	var arch: Dictionary = gate["arch"]
+	for depth: float in arch["layers"]:
+		var points := PackedVector3Array()
+		const SEGMENTS := 96
+		for i in SEGMENTS + 1:
+			var x := -span * 0.5 + span * float(i) / float(SEGMENTS)
+			var ratio := clampf(absf(x) / (span * 0.5), 0.0, 1.0)
+			var profile := pow(maxf(1.0 - pow(ratio, float(arch["exponent"])), 0.0), 1.0 / float(arch["exponent"]))
+			var y := floor_y + 0.7 + (float(gate["height"]) - 0.7) * profile
+			points.append(Vector3(float(at[0]) + x, y, float(at[1]) + depth))
+		var tube := _tube(body, points, float(arch["tube"]), REFRACTORY_EDGE, "TemperingGateArchTube")
+		var faces := PackedVector3Array()
+		faces.append_array(tube.mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX])
+		var shape := ConcavePolygonShape3D.new()
+		shape.backface_collision = true
+		shape.set_faces(faces)
+		var collision := CollisionShape3D.new()
+		collision.shape = shape
+		collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.SOLID)
+		body.add_child(collision)
+	var feet: Dictionary = gate["feet"]
+	for side: float in [-1.0, 1.0]:
+		var foot_mesh := SolidModel.super_mesh(Vector3(float(feet["semi"][0]), float(feet["semi"][1]), float(feet["semi"][2])), float(feet["eps"]), 20, 20)
+		var foot := MeshInstance3D.new()
+		foot.name = "TemperingGateBasaltFoot"
+		foot.mesh = foot_mesh
+		foot.position = Vector3(float(at[0]) + side * span * 0.5, floor_y + 0.35, float(at[1]))
+		foot.material_override = SolidModel.material(REFRACTORY_EDGE, 0.9, 0.0)
+		body.add_child(foot)
+		var foot_shape := ConvexPolygonShape3D.new()
+		foot_shape.points = foot_mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+		var foot_collision := CollisionShape3D.new()
+		foot_collision.shape = foot_shape
+		foot_collision.position = foot.position
+		foot_collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.SOLID)
+		body.add_child(foot_collision)
+	var veil: Dictionary = gate["veil"]
+	var colours := {"teal": Color(0.02, 0.75, 0.72), "magenta": Color(0.9, 0.12, 0.7), "lime": Color(0.56, 0.95, 0.08), "cobalt": Color(0.1, 0.3, 0.95)}
+	for fin: Dictionary in veil["fins"]:
+		var fin_height := float(fin["len"])
+		var fin_mesh := SolidModel.super_mesh(Vector3(float(veil["semi_width"]), fin_height * 0.5, float(veil["semi_depth"])), float(veil["eps"]), 16, 16)
+		var fin_node := MeshInstance3D.new()
+		fin_node.name = "TemperingGateStainedFin"
+		fin_node.mesh = fin_mesh
+		fin_node.position = Vector3(float(at[0]) + float(fin["x"]), floor_y + float(gate["height"]) - fin_height * 0.5, float(at[1]))
+		var tint: Color = colours[str(fin["colour"])]
+		var glass := SolidModel.material(tint, 0.05, 0.0)
+		glass.emission_enabled = true
+		glass.emission = tint
+		glass.emission_energy_multiplier = 0.7
+		fin_node.material_override = glass
+		body.add_child(fin_node)
+		CollisionPolicy.mark_decorative(fin_node)
+
+
 static func _build_funicular(body: StaticBody3D, plan: Dictionary) -> void:
 	var profile: Array = plan["profile"]
 	if profile.size() < 2:
@@ -169,42 +253,140 @@ static func _build_funicular(body: StaticBody3D, plan: Dictionary) -> void:
 	var last := centreline[-1]
 	var direction := Vector2(last.x - first.x, last.z - first.z).normalized()
 	var across := Vector2(-direction.y, direction.x)
-	# Socketed track bed, rails, and paired supports follow the sampled section.
-	for offset: float in [-float(plan["tracks"]) * 0.5, float(plan["tracks"]) * 0.5]:
+	# The generated profile is the rail datum. The basalt bed sits exactly
+	# 0.15 m below it and follows each authored point.
+	var bed_width := float(plan["bed"]["width"])
+	var bed_depth := float(plan["bed"]["depth"])
+	var bed_faces := PackedVector3Array()
+	var bed_st := SurfaceTool.new()
+	bed_st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in centreline.size() - 1:
+		var p0 := centreline[i] - Vector3.UP * 0.15
+		var p1 := centreline[i + 1] - Vector3.UP * 0.15
+		var tangent := Vector2(p1.x - p0.x, p1.z - p0.z).normalized()
+		var lateral := Vector3(-tangent.y, 0.0, tangent.x) * bed_width * 0.5
+		var a := p0 + lateral
+		var b := p0 - lateral
+		var c := p1 - lateral
+		var d := p1 + lateral
+		FireCalderaPlanWalks._add_face(bed_st, bed_faces, a, b, c, Vector3.UP)
+		FireCalderaPlanWalks._add_face(bed_st, bed_faces, a, c, d, Vector3.UP)
+		var down := Vector3.DOWN * bed_depth
+		FireCalderaPlanWalks._add_face(bed_st, bed_faces, a + down, c + down, b + down, Vector3.DOWN)
+		FireCalderaPlanWalks._add_face(bed_st, bed_faces, a + down, d + down, c + down, Vector3.DOWN)
+		FireCalderaPlanWalks._add_face(bed_st, bed_faces, a, d, d + down, lateral.normalized())
+		FireCalderaPlanWalks._add_face(bed_st, bed_faces, a, d + down, a + down, lateral.normalized())
+		FireCalderaPlanWalks._add_face(bed_st, bed_faces, b, b + down, c + down, -lateral.normalized())
+		FireCalderaPlanWalks._add_face(bed_st, bed_faces, b, c + down, c, -lateral.normalized())
+	var bed_node := MeshInstance3D.new()
+	bed_node.name = "FunicularBasaltTrackBed"
+	bed_node.mesh = bed_st.commit()
+	bed_node.material_override = SolidModel.material(REFRACTORY_EDGE, 0.9, 0.0)
+	body.add_child(bed_node)
+	var bed_shape := ConcavePolygonShape3D.new()
+	bed_shape.backface_collision = true
+	bed_shape.set_faces(bed_faces)
+	var bed_collider := CollisionShape3D.new()
+	bed_collider.shape = bed_shape
+	bed_collider.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+	body.add_child(bed_collider)
+	# Each of the two tracks carries its own one-metre gauge pair.
+	var rail_offsets: Array[float] = []
+	for track: float in [-float(plan["tracks"]) * 0.5, float(plan["tracks"]) * 0.5]:
+		for gauge: float in [-float(plan["gauge"]) * 0.5, float(plan["gauge"]) * 0.5]:
+			rail_offsets.append(track + gauge)
+	for offset: float in rail_offsets:
 		var rail_points := PackedVector3Array()
 		for point in centreline:
-			rail_points.append(point + Vector3(across.x * offset, 0.18, across.y * offset))
+			rail_points.append(point + Vector3(across.x * offset, 0.0, across.y * offset))
 		var rail := _tube(body, rail_points, 0.09, STEEL, "FunicularTrackRail")
 		CollisionPolicy.mark_decorative(rail)
-	for i in range(0, centreline.size(), 5):
-		var point := centreline[i]
-		var footing_y := float(profile[i][3])
-		if point.y > footing_y + 0.5:
-			_vertical_member(body, Vector3(point.x, footing_y, point.z), Vector3(point.x, point.y, point.z), 0.22, "FunicularViaductPier")
-	for station_index in [0, centreline.size() - 1]:
-		var end := centreline[station_index]
-		var tangent := (centreline[mini(station_index + 1, centreline.size() - 1)] - centreline[maxi(station_index - 1, 0)]).normalized()
-		var yaw := atan2(tangent.x, tangent.z)
-		var platform := BoxMesh.new()
-		platform.size = Vector3(5.2, 0.3, 8.0)
-		var station := MeshInstance3D.new()
-		station.name = "FunicularLowerStation" if station_index == 0 else "FunicularGateStation"
-		station.mesh = platform
-		station.position = Vector3(end.x, end.y - 0.15, end.z)
-		station.rotation.y = yaw
-		station.material_override = SolidModel.material(PLATFORM_COMPOSITE, 0.76, 0.04)
-		body.add_child(station)
-		CollisionPolicy.add_box(body, station, platform.size, station.position, station.basis, true)
+	for pier: Dictionary in plan["piers"]:
+		var at: Array = pier["at"]
+		var pier_mesh := SolidModel.super_mesh(Vector3(0.9, maxf(0.6, (float(pier["top"]) - float(pier["foot"])) * 0.5), 0.9), 3.0, 24, 24)
+		var support := MeshInstance3D.new()
+		support.name = "FunicularSuperEggPier"
+		support.mesh = pier_mesh
+		support.position = Vector3(float(at[0]), (float(pier["top"]) + float(pier["foot"])) * 0.5, float(at[1]))
+		support.material_override = SolidModel.material(REFRACTORY_EDGE, 0.8, 0.05)
+		body.add_child(support)
+		var points: PackedVector3Array = pier_mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+		var support_shape := ConvexPolygonShape3D.new()
+		support_shape.points = points
+		var support_collider := CollisionShape3D.new()
+		support_collider.shape = support_shape
+		support_collider.position = support.position
+		support_collider.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.SOLID)
+		body.add_child(support_collider)
+	# The generated levels are the station platforms. Only the two authored
+	# platform gate lines are added here, leaving the car door width clear.
+	for gate_index in plan["gates"].size():
+		var datum := float(FireCalderaWalkwaysPlan.LEVELS[0]["datum"]) if gate_index == 0 else float(FireCalderaWalkwaysPlan.LEVELS[1]["datum"])
+		var points := PackedVector3Array()
+		for raw: Array in plan["gates"][gate_index]:
+			points.append(Vector3(float(raw[0]), datum + 1.09, float(raw[1])))
+		FireCalderaPlanWalks._build_guard(body, points, "FunicularPlatformGate%d" % gate_index)
+	var stair: Dictionary = plan["stair"]
+	_build_funicular_stair(body, stair)
 	var lift := Node3D.new()
 	lift.name = "CounterbalancedFunicular"
-	body.add_child(lift)
 	lift.set_script(load("res://scripts/fire_caldera_funicular.gd"))
-	lift.set("profile", centreline)
-	lift.set("car_length", float(plan["car"]["length"]))
-	lift.set("car_width", float(plan["car"]["width"]))
-	lift.set("step_count", int(plan["car"]["steps"]))
-	if lift.has_method("build_cars"):
-		lift.call("build_cars", body)
+	lift.set("plan", plan)
+	body.add_child(lift)
+
+
+static func _build_funicular_stair(body: StaticBody3D, stair: Dictionary) -> void:
+	var profile: Array = stair["profile"]
+	var flight := {"id": "FunicularStair", "width": float(stair["width"]), "profile": profile, "deck": profile, "guards": [], "material": "basalt"}
+	FireCalderaPlanWalks._build_flight(body, flight)
+	var tread := float(stair["tread"])
+	var width := float(stair["width"])
+	var tread_st := SurfaceTool.new()
+	tread_st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var tread_faces := PackedVector3Array()
+	var step_mesh := BoxMesh.new()
+	step_mesh.size = Vector3(width, 0.08, tread)
+	for i in range(1, profile.size()):
+		var a: Array = profile[i - 1]
+		var b: Array = profile[i]
+		var horizontal := Vector2(float(b[0]) - float(a[0]), float(b[2]) - float(a[2]))
+		var grade := absf(float(b[1]) - float(a[1])) / maxf(horizontal.length(), 0.001)
+		if grade <= 0.18:
+			continue
+		var count := maxi(1, int(ceil(horizontal.length() / tread)))
+		for step in count:
+			var t := (float(step) + 0.5) / float(count)
+			var p := Vector3(lerpf(float(a[0]), float(b[0]), t), lerpf(float(a[1]), float(b[1]), t), lerpf(float(a[2]), float(b[2]), t))
+			var yaw := atan2(horizontal.x, horizontal.y)
+			var st := Transform3D(Basis(Vector3.UP, yaw), p - Vector3.UP * 0.04)
+			for tri: Array in _box_triangles(step_mesh.size, st):
+				FireCalderaPlanWalks._add_face(tread_st, tread_faces, tri[0], tri[1], tri[2])
+			var collision := CollisionShape3D.new()
+			collision.shape = BoxShape3D.new()
+			(collision.shape as BoxShape3D).size = step_mesh.size
+			collision.transform = st
+			collision.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+			body.add_child(collision)
+	var treads := MeshInstance3D.new()
+	treads.name = "FunicularStairTreads"
+	treads.mesh = tread_st.commit()
+	treads.material_override = SolidModel.material(REFRACTORY_EDGE, 0.9, 0.0)
+	treads.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.PARKOUR)
+	body.add_child(treads)
+	for raw_guard: Array in stair["guards"]:
+		var points := PackedVector3Array()
+		for raw: Array in raw_guard:
+			points.append(Vector3(float(raw[0]), float(raw[1]), float(raw[2])))
+		FireCalderaPlanWalks._build_guard(body, points, "FunicularStairGuard")
+
+
+static func _box_triangles(size: Vector3, transform: Transform3D) -> Array:
+	var h := size * 0.5
+	var p: Array[Vector3] = [Vector3(-h.x,-h.y,-h.z),Vector3(h.x,-h.y,-h.z),Vector3(h.x,-h.y,h.z),Vector3(-h.x,-h.y,h.z),Vector3(-h.x,h.y,-h.z),Vector3(h.x,h.y,-h.z),Vector3(h.x,h.y,h.z),Vector3(-h.x,h.y,h.z)]
+	var tris: Array = []
+	for face: Array in [[0,2,1],[0,3,2],[4,5,6],[4,6,7],[0,1,5],[0,5,4],[1,2,6],[1,6,5],[2,3,7],[2,7,6],[3,0,4],[3,4,7]]:
+		tris.append([transform * p[face[0]], transform * p[face[1]], transform * p[face[2]]])
+	return tris
 
 
 # Retired independent route, junction and guard builders.
@@ -328,14 +510,20 @@ static func _supertoroidal_pier(body: StaticBody3D, centre: Vector2, across: Vec
 	mesh.mesh = st.commit()
 	mesh.material_override = SolidModel.material(PLATFORM_COMPOSITE, 0.46, 0.34)
 	body.add_child(mesh)
-	# The accessible collision is the substantial refractory core; the visual
-	# shell remains concave without turning its underside into a climbable maze.
-	CollisionPolicy.add_cylinder(body, mesh, minf(half.x, half.y) * 0.34, top - bottom, Vector3(centre.x, (bottom + top) * 0.5, centre.y), false)
-	var glow := Color(1.0, 0.22, 0.035)
-	for axis: Vector2 in [across, -across, deep, -deep]:
-		var span := minf(half.x, half.y) * 0.36
-		var p := centre + axis * span
-		_beam(body, Vector3(p.x, bottom + 0.7, p.y), Vector3(p.x, top - 0.7, p.y), Vector2(0.09, 0.07), glow)
+	# Three overlapping collision courses follow the visible flare, waist and
+	# crown. A single waist-only core left the model's broadened base walkable.
+	for course: Array in [[0.14, 0.54], [0.50, 0.34], [0.78, 0.72]]:
+		var t0 := float(course[0])
+		var scale := float(course[1])
+		var height := (top - bottom) * 0.42
+		var shape := CylinderShape3D.new()
+		shape.radius = minf(half.x, half.y) * scale
+		shape.height = height
+		var collider := CollisionShape3D.new()
+		collider.shape = shape
+		collider.position = Vector3(centre.x, lerpf(bottom, top, t0), centre.y)
+		collider.set_meta(CollisionPolicy.POLICY_META, CollisionPolicy.SOLID)
+		body.add_child(collider)
 	return mesh
 
 

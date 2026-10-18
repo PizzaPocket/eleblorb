@@ -60,7 +60,7 @@ func _run() -> void:
 		var elevated := FireCalderaPlan.is_elevated(entry)
 		if not elevated:
 			sockets.append({"outline": SocketPlinth.exclusion(entry, line, key), "band": SocketPlinth.band(entry, key), "datum": float(line["datum"]), "sink": SocketPlinth.sink(entry), "elevated": false})
-	_ground = FireCalderaGround.build(self, sockets)
+	_ground = await FireCalderaGround.build(self, sockets)
 	FireCalderaGround.build_lava(self)
 	_highline = FireCalderaHighline.build(self)
 	for entry in FireCalderaPlan.PLOTS:

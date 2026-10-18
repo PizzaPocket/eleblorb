@@ -77,6 +77,16 @@ var _river_centerlines:Array[PackedVector2Array]=[]
 ## the segment from _river_centerlines[p][i] to [p][i+1].
 var _river_point_allowed:Array[PackedByteArray]=[]
 var _river_segment_allowed:Array[PackedByteArray]=[]
+## The coarse terrain is a fixed regular grid. Cache each authored vertex once
+## after rivers and caldera cuts are configured so every mesh, normal, fine
+## ground blend and gameplay query shares the same samples.
+var _coarse_vertices := PackedVector3Array()
+var _coarse_cache_revision := -1
+var _terrain_configuration_revision := 0
+var _funicular_corridor: Dictionary = {}
+var _caldera_frame: Node3D
+var _ground_sockets: Array = []
+var _ground_cuts: Array = []
 ## Additional authored molten surfaces (for example the village fountain)
 ## register here so traversal, damage, ambience and immersion all consult the
 ## same lava query instead of each prop inventing a separate contact rule.
@@ -133,8 +143,17 @@ func _ready()->void:
 	_rng.seed=20260912
 	_sync_planetary_ocean_level()
 	_build_river_centerlines()
-	_build_mesh_and_collision();_build_caldera_ground();_build_lava_pools();_build_lava_rivers();_build_fire_vents();_scatter_volcanic_rocks()
-	_scatter_volcano_floor_tokoins.call_deferred()
+	_funicular_corridor = FireCalderaWalkwaysPlan.SITE["funicular"]["corridor"].duplicate(true)
+	_prepare_caldera_ground()
+	LoadingScreen.enqueue_async_build_stage("Caching volcanic terrain", 0.12, Callable(self, "_cache_coarse_vertices_staged"))
+	LoadingScreen.enqueue_async_build_stage("Building volcanic terrain", 0.30, Callable(self, "_build_mesh_and_collision"))
+	LoadingScreen.enqueue_async_build_stage("Cutting the caldera ground", 0.46, Callable(self, "_build_caldera_ground"))
+	LoadingScreen.enqueue_build_stage("Laying out the Fire Caldera walks", 0.56, Callable(self, "_build_caldera_walks"))
+	LoadingScreen.enqueue_build_stage("Socketing the caldera buildings", 0.63, Callable(self, "_build_caldera_foundations"))
+	LoadingScreen.enqueue_build_stage("Building the Heartworks chamber", 0.70, Callable(self, "_build_caldera_heartworks"))
+	LoadingScreen.enqueue_build_stage("Building lava and volcanic features", 0.80, Callable(self, "_build_lava_environment"))
+	LoadingScreen.enqueue_build_stage("Placing volcanic details", 0.88, Callable(self, "_scatter_volcanic_rocks"))
+	LoadingScreen.enqueue_build_stage("Placing deep-floor finds", 0.94, Callable(self, "_scatter_volcano_floor_tokoins"))
 	_prepare_under_lava_environment()
 	set_process(true)
 
@@ -188,7 +207,8 @@ func _update_camera_immersion()->void:
 	var camera:=get_viewport().get_camera_3d()
 	if camera==null:return
 	var xz:=Vector2(camera.global_position.x,camera.global_position.z)
-	var immersed:=is_lava_area(xz) and camera.global_position.y<get_lava_surface_height(xz)-0.06
+	var camera_point := camera.global_position
+	var immersed := bool(is_lava_at(camera_point)) and camera_point.y < get_lava_surface_at(camera_point) - 0.06
 	if immersed:
 		if camera.environment!=_under_lava_environment:camera.environment=_under_lava_environment
 		_lava_camera=camera
@@ -232,7 +252,8 @@ func _terrain_height(x:float,z:float)->float:
 ## and gives both meshes one exact seam surface.
 func _legacy_terrain_height(x:float,z:float)->float:
 	var p:=Vector2(x,z)
-	var base:float=_noise.get_noise_2d(x,z)*6.0
+	var corridor_weight := _funicular_corridor_weight(p)
+	var base:float=_noise.get_noise_2d(x,z)*6.0*corridor_weight
 	base*=smoothstep(0.0,38.0,p.length())
 	base+=maxf(_mountain_noise.get_noise_2d(x,z)+0.3,0.0)*78.0*smoothstep(650.0,850.0,p.length())
 	for center in LAVA_POOLS:
@@ -257,6 +278,56 @@ func _legacy_terrain_height(x:float,z:float)->float:
 	var skirt_bottom := _planetary_ocean_level - ISLAND_SKIRT_BURY_MARGIN
 	base=lerpf(base,skirt_bottom,smoothstep(HALF_SIZE*0.93,HALF_SIZE,p.length()))
 	return base
+
+
+func _funicular_corridor_weight(world: Vector2) -> float:
+	if _funicular_corridor.is_empty():
+		return 1.0
+	var plan: Dictionary = FireCalderaWalkwaysPlan.SITE["funicular"]
+	var profile: Array = plan["profile"]
+	if profile.is_empty():
+		return 1.0
+	var top: Array = plan["top"]
+	var a := FireCalderaPlan.to_world(Vector2(float(top[0]), float(top[1])))
+	var last: Array = profile[-1]
+	var b := FireCalderaPlan.to_world(Vector2(float(last[0]), float(last[2])))
+	var distance := _distance_to_segment(world, a, b)
+	return smoothstep(float(_funicular_corridor["clear"]), float(_funicular_corridor["blend"]), distance)
+
+
+func set_funicular_corridor(corridor: Dictionary) -> void:
+	_funicular_corridor = corridor.duplicate(true)
+	invalidate_height_cache()
+
+
+func invalidate_height_cache() -> void:
+	_terrain_configuration_revision += 1
+	_coarse_vertices.clear()
+	_coarse_cache_revision = -1
+
+
+func _cache_coarse_vertices() -> void:
+	var spacing := HALF_SIZE * 2.0 / float(RESOLUTION - 1)
+	_coarse_vertices.resize(RESOLUTION * RESOLUTION)
+	for iz in RESOLUTION:
+		for ix in RESOLUTION:
+			var x := -HALF_SIZE + float(ix) * spacing
+			var z := -HALF_SIZE + float(iz) * spacing
+			_coarse_vertices[iz * RESOLUTION + ix] = Vector3(x, _legacy_terrain_height(x, z), z)
+	_coarse_cache_revision = _terrain_configuration_revision
+
+
+func _cache_coarse_vertices_staged() -> void:
+	var spacing := HALF_SIZE * 2.0 / float(RESOLUTION - 1)
+	_coarse_vertices.resize(RESOLUTION * RESOLUTION)
+	for iz in RESOLUTION:
+		for ix in RESOLUTION:
+			var x := -HALF_SIZE + float(ix) * spacing
+			var z := -HALF_SIZE + float(iz) * spacing
+			_coarse_vertices[iz * RESOLUTION + ix] = Vector3(x, _legacy_terrain_height(x, z), z)
+		if iz % 4 == 3:
+			await get_tree().process_frame
+	_coarse_cache_revision = _terrain_configuration_revision
 
 
 ## Ecological suitability for pioneer growth on old, cooled lava. The visual
@@ -395,13 +466,25 @@ func get_mesh_height(x:float,z:float)->float:
 
 
 func _coarse_mesh_height(x:float,z:float)->float:
+	if not _river_centerlines.is_empty() and _coarse_cache_revision != _terrain_configuration_revision:
+		_cache_coarse_vertices()
 	var s:float=HALF_SIZE*2.0/float(RESOLUTION-1)
 	var fx:float=clampf((x+HALF_SIZE)/s,0.0,float(RESOLUTION-1)-0.001);var fz:float=clampf((z+HALF_SIZE)/s,0.0,float(RESOLUTION-1)-0.001)
 	var ix:int=clampi(int(fx),0,RESOLUTION-2);var iz:int=clampi(int(fz),0,RESOLUTION-2)
-	var a:=_vertex(ix,iz,s);var b:=_vertex(ix+1,iz,s);var c:=_vertex(ix,iz+1,s);var d:=_vertex(ix+1,iz+1,s)
+	var a:=_cached_vertex(ix,iz,s);var b:=_cached_vertex(ix+1,iz,s);var c:=_cached_vertex(ix,iz+1,s);var d:=_cached_vertex(ix+1,iz+1,s)
 	return _plane(a,c,b,x,z) if fx-float(ix)+fz-float(iz)<=1.0 else _plane(b,c,d,x,z)
 
 func _vertex(ix:int,iz:int,s:float)->Vector3:
+	if _coarse_cache_revision == _terrain_configuration_revision and _coarse_vertices.size() == RESOLUTION * RESOLUTION:
+		return _coarse_vertices[iz * RESOLUTION + ix]
+	return _vertex_uncached(ix, iz, s)
+
+func _cached_vertex(ix: int, iz: int, s: float) -> Vector3:
+	if _coarse_cache_revision == _terrain_configuration_revision and _coarse_vertices.size() == RESOLUTION * RESOLUTION:
+		return _coarse_vertices[iz * RESOLUTION + ix]
+	return _vertex_uncached(ix, iz, s)
+
+func _vertex_uncached(ix:int,iz:int,s:float)->Vector3:
 	var x:float=-HALF_SIZE+float(ix)*s;var z:float=-HALF_SIZE+float(iz)*s
 	return Vector3(x,_legacy_terrain_height(x,z),z)
 
@@ -424,11 +507,92 @@ func is_safe_zone(p:Vector2)->bool:return p.distance_to(CRATER_CENTER)<VILLAGE_R
 func is_nme_hazard(p:Vector2)->bool:return is_lava_area(p)
 func get_village_center()->Vector2:return CRATER_CENTER
 func get_village_radius()->float:return VILLAGE_RADIUS
+
+
+## Exact 3D membership for the authored Heartworks lava volumes. The plan's
+## outline and vertical section are the source of truth; the legacy 2D query
+## remains available for spawn rejection and hazard placement.
+func is_lava_at(point: Vector3) -> bool:
+	var local := FireCalderaPlan.to_local(Vector2(point.x, point.z))
+	var radius := local.length()
+	var section: Dictionary = FireCalderaHeartworksPlan.SECTION
+	var volumes: Array = section["lava_volumes"]
+	var reservoir: Dictionary = volumes[0]
+	var top := float(reservoir["top"])
+	var outline := PackedVector2Array()
+	for raw: Array in reservoir["outline"]:
+		outline.append(Vector2(float(raw[0]), float(raw[1])))
+	if point.y <= top and Geometry2D.is_point_in_polygon(local, outline):
+		var floor_data: Dictionary = reservoir["floor"]
+		var dome: Dictionary = floor_data["dome"]
+		var open_over := float(floor_data["open_over"])
+		if radius < open_over:
+			if point.y > float(volumes[1]["top"]):
+				return true # Above the cascade lip, the oculus is part of the reservoir.
+		elif radius <= float(floor_data["inside"]):
+			var centre_y := float(dome["centre_y"])
+			var dome_radius := float(dome["radius"])
+			var floor_y := centre_y + sqrt(maxf(dome_radius * dome_radius - radius * radius, 0.0))
+			if point.y > floor_y:
+				return true
+		elif point.y > FireCalderaGround.height(local):
+			return true
+	var cascade: Dictionary = volumes[1]
+	var cascade_top := float(cascade["top"])
+	var cascade_bottom := float(cascade["bottom"])
+	if point.y <= cascade_top and point.y >= cascade_bottom:
+		var t := clampf((cascade_top - point.y) / (cascade_top - cascade_bottom), 0.0, 1.0)
+		var cascade_radius := lerpf(float(cascade["top_radius"]), float(cascade["bottom_radius"]), t)
+		var centre: Array = cascade["centre"]
+		if Vector2(local.x - float(centre[0]), local.y - float(centre[1])).length() <= cascade_radius:
+			return true
+	var pool: Dictionary = volumes[2]
+	var pool_centre: Array = pool["centre"]
+	var pool_radius := float(pool["radius"])
+	return point.y >= float(pool["bottom"]) and point.y <= float(pool["top"]) \
+		and Vector2(local.x - float(pool_centre[0]), local.y - float(pool_centre[1])).length() <= pool_radius
+
+
+## Return the surface for the occupied volume. -INF means the point is not in
+## an authored lava volume; the legacy height-only query remains for 2D uses.
+func get_lava_surface_at(point: Vector3) -> float:
+	if not is_lava_at(point):
+		return -INF
+	var local := FireCalderaPlan.to_local(Vector2(point.x, point.z))
+	var volumes: Array = FireCalderaHeartworksPlan.SECTION["lava_volumes"]
+	var pool: Dictionary = volumes[2]
+	var pool_centre: Array = pool["centre"]
+	if point.y <= float(pool["top"]) and Vector2(local.x - float(pool_centre[0]), local.y - float(pool_centre[1])).length() <= float(pool["radius"]):
+		return float(pool["surface"])
+	return float(volumes[0]["top"])
+
+
+func get_lava_bed_height_at(point: Vector3) -> float:
+	var local := FireCalderaPlan.to_local(Vector2(point.x, point.z))
+	var radius := local.length()
+	var volumes: Array = FireCalderaHeartworksPlan.SECTION["lava_volumes"]
+	var pool: Dictionary = volumes[2]
+	var pool_centre: Array = pool["centre"]
+	if point.y >= float(pool["bottom"]) and point.y <= float(volumes[1]["top"]) \
+		and Vector2(local.x - float(pool_centre[0]), local.y - float(pool_centre[1])).length() <= float(pool["radius"]):
+		return float(pool["bottom"])
+	if radius <= float(volumes[0]["floor"]["inside"]):
+		var dome: Dictionary = volumes[0]["floor"]["dome"]
+		var dome_radius := float(dome["radius"])
+		return float(dome["centre_y"]) + sqrt(maxf(dome_radius * dome_radius - radius * radius, 0.0))
+	if radius <= float(volumes[2]["radius"]):
+		return float(volumes[2]["bottom"])
+	return FireCalderaGround.height(local)
+
+
 func is_lava_area(p:Vector2)->bool:
 	for surface in _registered_lava_surfaces:
 		if _in_lava_surface(p,surface):return true
 	for center in LAVA_POOLS:
 		if p.distance_to(center)<LAVA_MOUTH_RADIUS:return true
+	var plan_local := FireCalderaPlan.to_local(p)
+	if plan_local.length() <= float(FireCalderaHeartworksPlan.SECTION["chamber"]["pool_radius"]):
+		return true
 	if _river_coverage(p)>0.01:return true
 	# The rendered river extends beneath its banks to hide terrain-grid gaps.
 	# Treat that wider ribbon as liquid only where it is genuinely exposed
@@ -446,9 +610,6 @@ func is_lava_area(p:Vector2)->bool:
 	return get_mesh_height(p.x,p.y)<RIVER_LAVA_SURFACE_Y+0.15
 func get_lava_surface_height(p:Vector2)->float:
 	for surface in _registered_lava_surfaces:
-		if surface.has("column") and _in_lava_surface(p,surface):
-			return float(surface["top_y"])
-	for surface in _registered_lava_surfaces:
 		if _in_lava_surface(p,surface):return float(surface["height"])
 	for center in LAVA_POOLS:
 		if p.distance_to(center)<LAVA_MOUTH_RADIUS:return VOLCANO_LAVA_SURFACE_Y
@@ -460,13 +621,9 @@ func get_lava_surface_height(p:Vector2)->float:
 ## may rise through the cascade toward the reservoir without being snapped
 ## back to the dome.
 func get_lava_surface_height_at(at: Vector3) -> float:
-	for surface in _registered_lava_surfaces:
-		if not surface.has("column") or not _in_lava_surface(Vector2(at.x, at.z), surface):
-			continue
-		var pool_y := float(surface["pool_y"])
-		if at.y <= pool_y + 2.0:
-			return pool_y
-		return float(surface["top_y"])
+	var authored := get_lava_surface_at(at)
+	if authored != -INF:
+		return authored
 	return get_lava_surface_height(Vector2(at.x, at.z))
 func get_lava_escape_position(p:Vector2)->Vector3:
 	for surface in _registered_lava_surfaces:
@@ -518,10 +675,6 @@ func register_lava_polygon(polygon:PackedVector2Array,height:float)->void:
 	_registered_lava_surfaces.append({"center":centre,"radius":reach,"height":height,"polygon":polygon})
 
 
-func register_lava_column(center: Vector2, radius: float, top_y: float, pool_radius: float, pool_y: float) -> void:
-	_registered_lava_surfaces.append({"center":center,"radius":radius,"height":top_y,
-		"column":true,"top_y":top_y,"pool_radius":pool_radius,"pool_y":pool_y})
-
 func _in_lava_surface(p:Vector2,surface:Dictionary)->bool:
 	if p.distance_to(surface["center"] as Vector2)>=float(surface["radius"]):return false
 	if surface.has("polygon"):return Geometry2D.is_point_in_polygon(p,surface["polygon"])
@@ -535,6 +688,8 @@ func _build_mesh_and_collision()->void:
 	for iz in RESOLUTION:
 		for ix in RESOLUTION:
 			var v:=_vertex(ix,iz,s);st.set_color(_color(Vector2(v.x,v.z)));st.set_normal(_coarse_mesh_normal(v.x,v.z));st.add_vertex(v)
+		if iz % 8 == 7:
+			await get_tree().process_frame
 	for iz in RESOLUTION-1:
 		for ix in RESOLUTION-1:
 			var i:int=iz*RESOLUTION+ix
@@ -543,6 +698,8 @@ func _build_mesh_and_collision()->void:
 				for n in [i,i+RESOLUTION,i+1]:st.add_index(n)
 			if not _coarse_triangle_under_caldera((b+c+d)/3.0):
 				for n in [i+1,i+RESOLUTION,i+RESOLUTION+1]:st.add_index(n)
+		if iz % 8 == 7:
+			await get_tree().process_frame
 	st.set_material(FireCalderaGround.terrain_material())
 	var mesh:=MeshInstance3D.new();mesh.name="TerrainMesh";mesh.mesh=st.commit();mesh.material_override=FireCalderaGround.terrain_material();add_child(mesh)
 	var faces:=PackedVector3Array()
@@ -553,6 +710,8 @@ func _build_mesh_and_collision()->void:
 				var centre:Vector3=(tri[0]+tri[1]+tri[2])/3.0
 				if not _coarse_triangle_under_caldera(centre):
 					for v in tri:faces.append(v)
+		if iz % 8 == 7:
+			await get_tree().process_frame
 	var shape:=ConcavePolygonShape3D.new();shape.set_faces(faces);shape.backface_collision=true
 	var collider:=CollisionShape3D.new();collider.shape=shape;add_child(collider)
 
@@ -571,13 +730,13 @@ func _coarse_triangle_under_caldera(centre:Vector3)->bool:
 	return absf(local.x)<FireCalderaGround.EXTENT-CUT_MARGIN and absf(local.y)<FireCalderaGround.EXTENT-CUT_MARGIN
 
 
-func _build_caldera_ground()->void:
-	var frame:=Node3D.new()
-	frame.name="CalderaCityGround"
+func _prepare_caldera_ground() -> void:
+	_caldera_frame = Node3D.new()
+	_caldera_frame.name="CalderaCityGround"
 	var right:=FireCalderaPlan.right()
 	var forward:=FireCalderaPlan.forward()
-	frame.transform=Transform3D(Basis(Vector3(right.x,0.0,right.y),Vector3.UP,Vector3(forward.x,0.0,forward.y)),Vector3(CRATER_CENTER.x,0.0,CRATER_CENTER.y))
-	add_child(frame)
+	_caldera_frame.transform=Transform3D(Basis(Vector3(right.x,0.0,right.y),Vector3.UP,Vector3(forward.x,0.0,forward.y)),Vector3(CRATER_CENTER.x,0.0,CRATER_CENTER.y))
+	add_child(_caldera_frame)
 	var sockets:Array=[]
 	for entry in FireCalderaPlan.PLOTS:
 		if bool(entry.get("open",false)):
@@ -620,13 +779,75 @@ func _build_caldera_ground()->void:
 				outline.append(Vector2(float(point[0]), float(point[1])))
 			sockets.append({"outline": outline, "band": outline, "datum": float(level["datum"]), "sink": 0.45,
 				"elevated": false, "landing_clearance": 0.5})
-	FireCalderaGround.build(frame,sockets,func(local:Vector2)->float:
+	_ground_sockets = sockets
+	_ground_cuts.clear()
+	for level: Dictionary in FireCalderaWalkwaysPlan.LEVELS:
+		var level_id := str(level["id"])
+		var bed: Dictionary = FireCalderaWalkwaysPlan.SITE["beds"].get(level_id, {})
+		if str(bed.get("kind", "")) == "ground":
+			_ground_cuts.append({"regions": level["surface"], "cut_to": float(bed["cut_to"])})
+	var flight_cuts: Dictionary = FireCalderaWalkwaysPlan.SITE["flight_cuts"]
+	for flight: Dictionary in FireCalderaWalkwaysPlan.FLIGHTS:
+		var intervals: Array = flight_cuts.get(str(flight["id"]), [])
+		if not intervals.is_empty():
+			_ground_cuts.append({"regions": _flight_cut_regions(flight, intervals), "cut_to": 0.0})
+	# Corridor grading and authored ground cuts are both part of the input to
+	# terrain sampling. Invalidate only after their final setup, before caching.
+	invalidate_height_cache()
+
+
+func _build_caldera_ground()->void:
+	var frame := _caldera_frame
+	var sockets := _ground_sockets
+	var wall_sampler := func(local: Vector2) -> float:
 		var world:=FireCalderaPlan.to_world(local)
-		return _coarse_mesh_height(world.x,world.y))
-	FireCalderaGround.build_lava(frame)
+		return _coarse_mesh_height(world.x,world.y)
+	await FireCalderaGround.build(frame,sockets,wall_sampler,_ground_cuts)
+
+
+func _flight_cut_regions(flight: Dictionary, intervals: Array) -> Array[Dictionary]:
+	var profile: Array = flight["profile"]
+	var cumulative := PackedFloat32Array()
+	cumulative.resize(profile.size())
+	for i in range(1, profile.size()):
+		var a: Array = profile[i - 1]
+		var b: Array = profile[i]
+		cumulative[i] = cumulative[i - 1] + Vector2(float(b[0]) - float(a[0]), float(b[2]) - float(a[2])).length()
+	var regions: Array[Dictionary] = []
+	var half_width := float(flight["width"]) * 0.5
+	for interval: Array in intervals:
+		var start := float(interval[0])
+		var finish := float(interval[1])
+		for i in range(1, profile.size()):
+			var lo := maxf(start, cumulative[i - 1])
+			var hi := minf(finish, cumulative[i])
+			if hi <= lo:
+				continue
+			var a: Array = profile[i - 1]
+			var b: Array = profile[i]
+			var segment_length := cumulative[i] - cumulative[i - 1]
+			var t0 := (lo - cumulative[i - 1]) / segment_length
+			var t1 := (hi - cumulative[i - 1]) / segment_length
+			var p0 := Vector2(lerpf(float(a[0]), float(b[0]), t0), lerpf(float(a[2]), float(b[2]), t0))
+			var p1 := Vector2(lerpf(float(a[0]), float(b[0]), t1), lerpf(float(a[2]), float(b[2]), t1))
+			var normal := (p1 - p0).normalized().orthogonal() * half_width
+			var quad := [p0 + normal, p1 + normal, p1 - normal, p0 - normal]
+			var raw: Array = []
+			for p: Vector2 in quad:
+				raw.append([p.x, p.y])
+			var cut_y := (lerpf(float(a[1]), float(b[1]), t0) + lerpf(float(a[1]), float(b[1]), t1)) * 0.5 - 0.25
+			regions.append({"outer": raw, "holes": [], "cut_to": cut_y})
+	return regions
+
+
+func _build_caldera_walks() -> void:
+	var frame := _caldera_frame
 	FireCalderaHighline.build(frame)
-	# The holes and the foundations are built in the same synchronous stage:
-	# no frame can expose an open collision socket.
+	FireCalderaHighline.build_ground_beds(frame, FireCalderaWalkwaysPlan.SITE)
+
+
+func _build_caldera_foundations() -> void:
+	var frame := _caldera_frame
 	for entry in FireCalderaPlan.PLOTS:
 		var id:=str(entry["id"])
 		if _caldera_surveys.has(id):
@@ -636,16 +857,22 @@ func _build_caldera_ground()->void:
 				FireCalderaRenewal.build_support(frame,entry,_caldera_surveys[id])
 			else:
 				FireCalderaHighline.build_ground_plot(frame,entry,_caldera_surveys[id])
-	var reservoir_world:=PackedVector2Array()
-	for point in FireCalderaPlan.reservoir_polygon(128):
-		reservoir_world.append(FireCalderaPlan.to_world(point))
-	register_lava_polygon(reservoir_world,FireCalderaGround.LAVA_Y)
+
+
+func _build_caldera_heartworks() -> void:
+	var frame := _caldera_frame
+	FireCalderaGround.build_lava(frame)
 	FireCalderaHeartworks.build(frame)
-	var pool_y := FireCalderaHeartworksPlan.SECTION["lava_y"] - FireCalderaHeartworksPlan.SECTION["cascade"]["bottom_depth"]
-	register_lava_column(FireCalderaPlan.to_world(Vector2.ZERO),
-		maxf(float(FireCalderaHeartworksPlan.SECTION["cascade"]["top_radius"]), float(FireCalderaHeartworksPlan.SECTION["chamber"]["pool_radius"])),
-		FireCalderaGround.LAVA_Y,
-		float(FireCalderaHeartworksPlan.SECTION["chamber"]["pool_radius"]), pool_y)
+	var reservoir_outline := PackedVector2Array()
+	for raw: Array in FireCalderaHeartworksPlan.SECTION["lava_volumes"][0]["outline"]:
+		reservoir_outline.append(FireCalderaPlan.to_world(Vector2(float(raw[0]), float(raw[1]))))
+	register_lava_polygon(reservoir_outline, float(FireCalderaHeartworksPlan.SECTION["lava_volumes"][0]["top"]))
+
+
+func _build_lava_environment() -> void:
+	_build_lava_pools()
+	_build_lava_rivers()
+	_build_fire_vents()
 
 
 func get_caldera_frame()->Node3D:
