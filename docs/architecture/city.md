@@ -1534,7 +1534,7 @@ high line's piers rising through it. It is redesigned from its purpose:
   a **double-helix escalator** (section 6f) wound round it, the up hand and
   the down hand half a turn apart; a 1.8 m **gallery** outside the helix at
   each level it serves, which riders step onto sideways where their hand
-  meets the level; **twelve ribs** in a ring 12 m across carrying a steel
+  meets the level; **eight ribs** in a ring 12 m across carrying a steel
   mesh that coral vine and bougainvillea climb from planters at every
   gallery, bays left open where a bridge or the ring leaves; and a round
   **glass lift** on the tower's inner corner, standing between the two
@@ -1613,24 +1613,46 @@ high line's piers rising through it. It is redesigned from its purpose:
     - **the lift lanterns.** The four tower lifts run on through the roof, and
       each arrives in a glass lantern whose door faces the bell. The lifts
       stop at the ground, the Spine, the high line and the room.
-    - **the clock eyes,** for climbers, gliders and fliers.
+    - **the clock eyes,** for fliers and gliders only.
+  - **No way up to the eyes (revised 2026-10-18, at the user's direction).**
+    - The escalators that rose from under the bell to a landing behind each
+      eye are gone.
+    - An eye is not a place to carry ordinary people up to: it would be a
+      ledge to fall from.
+    - A flier lands on its bronze sill; nothing walkable or rideable rises
+      toward it, and the plan checks that.
   - **Inside:**
-    - a bronze **compass rose** is set in the terrazzo under the bell;
-    - from the rose, four escalator pairs rise 6.1 m like the compass's arms
-      to a **landing behind each eye**. Each landing is guarded on its sides
-      and either side of the escalator's head, and open to the eye, so anyone
-      can stand in a clock;
+    - a bronze **compass rose** is set in the terrazzo under the bell, its
+      points toward the four clocks;
     - beds of desert grasses run along the glass.
   - **Checks.** The plan checks that:
     - the eyes are big enough to pass through, inside the hour ring;
-    - the compass's feet meet clear of each other at the rose;
-    - the arrivals stay clear of the compass, the towers, the lifts and the
-      glass;
+    - the arrivals stay clear of the towers, the lifts and the glass;
     - the widenings stay on their platforms;
     - no opening fouls another;
-    - the bell hangs clear above the eyes' landings.
+    - nothing rises toward an eye;
+    - the bell hangs clear over the room.
 
   Data: `CROSSING.dome.room`.
+- **The towers' ways out (revised 2026-10-18, at the user's direction).** In
+  the third pass, the ring every 4.1 m round each tower crossed the ways out at
+  head height, and with twelve ribs a rib stood in each diagonal way out to the
+  ring.
+  - **Ribs.** Eight ribs at 22.5° + 45k, so every way out (all at multiples of
+    45°) is in the middle of a bay.
+  - **Hoops.** Only where nobody walks out: never from a level's floor to 2.8
+    m above it, and at most 4.2 m apart elsewhere (`towers[...].hoops`).
+  - **The check.** The plan lists each tower's ways out (`ways_out`: level,
+    bearing, width, clear height) and fails if a rib stands in one or a hoop
+    crosses one.
+- **The escalators are closed boxes (2026-10-18).** In the third pass the
+  helices' undersides were invisible and had no collision from below. Every
+  flight, straight or spiral, is now a closed section 0.9 m deep
+  (`ESCALATORS.section`):
+  - the moving treads on top, with the return belt hidden inside;
+  - solid skirts at its sides;
+  - a hard brushed-stainless soffit underneath, facing down.
+  - Top and soffit both collide.
 - **Planted:** the towers' climbers (`CROSSING.climbers`), the ring's beds
   and small ghafs (`DECK.beds`, `DECK.trees`), the rain gardens
   (`CROSSING.rain_gardens`), the roof's rim.

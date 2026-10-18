@@ -1108,7 +1108,16 @@ PLATFORMS=dict(floor=1.0,edge=1.4,width=3.0,canopy=3.2,
 ## spirals of the Plant Kingdom), each with a glass lift beside it or in its eye (the Crossing's towers wind theirs round a steel trunk, the lift beside).
 ESCALATORS=dict(pair=dict(angle=30.0,tread=1.2,w=3.2,max_rise=8.0),
   scissor=dict(angle=30.0,w=3.2,max_rise=7.2,landing=1.5),
-  helix=dict(angle=30.0,eye=1.4,band=2.6,hands=2,min_headroom=2.6,deck=0.5,landing=50.0),
+  helix=dict(angle=30.0,eye=1.4,band=2.6,hands=2,min_headroom=2.6,deck=0.9,landing=50.0),
+  # every flight's section, straight or spiral (2026-10-18, at the user's direction: in the third prototype pass the
+  # helices' undersides were invisible and had no collision from below). An escalator is a closed box: the moving
+  # treads on top, the return belt inside, solid skirts at its sides, and a hard stainless soffit underneath that hides
+  # the return and is seen from below. Top, skirts and soffit are all visible both ways they face out, and the top and
+  # the soffit both collide (a closed convex piece per segment), so nothing passes up through a flight from beneath.
+  section=dict(depth=0.9,treads='the moving surface on top, 0.4 m treads, in the lane\'s direction',
+               return_belt='inside the box, never seen', skirts='solid brushed stainless, the box\'s sides',
+               soffit='a hard brushed-stainless soffit closing the box underneath, its face down',
+               collision='closed: the top and the soffit both solid, one convex piece per segment'),
   # the Spine stations' straight pairs (iteration 3): two narrow (0.8 m step) escalators side by side, 2.8 m overall,
   # a 2 m landing between flights and a 2.5 m clear runout at the foot
   station=dict(angle=30.0,w=2.8,landing=2.0,runout=2.5),
@@ -1196,7 +1205,7 @@ _train_checks()
 ## towers: centre offsets from c (both axes); trunk, helix band, gallery and the rib ring's radius; the lift beside it.
 ## ring: inner and outer radius (a box girder ring_depth deep, spanning between supports at most ring_max_span).
 CROSSING=dict(c=(-560,0),deck=6.5,ring=(24.7,32.7),ring_depth=1.6,ring_max_span=22.0,
-  tower=dict(offset=13.0,trunk=1.2,gallery=1.8,ribs=12,lift=1.3,beam_depth=1.6,mesh='stainless steel mesh between the ribs, coral vine and bougainvillea climbing it from planters at every gallery'),
+  tower=dict(offset=13.0,trunk=1.2,gallery=1.8,ribs=8,rib=0.44,hoop=0.16,hoop_every=4.2,lift=1.3,beam_depth=1.6,mesh='stainless steel mesh between the ribs, coral vine and bougainvillea climbing it from planters at every gallery'),
   roof=dict(y=41.0,half=22.0,n=4.0,th=0.6,rim=1.4,material='pale timber louvres over glass, a planted rim of desert grasses',drain='down the four trunks to the rain garden'),
   canopy=dict(material='pale timber louvres over glass, as the roof'),
   material='steel towers under climbers; pale timber louvres over glass for every roof and canopy',
@@ -1232,14 +1241,14 @@ CROSSING=dict(c=(-560,0),deck=6.5,ring=(24.7,32.7),ring_depth=1.6,ring_max_span=
     #   climb through glass-guarded wells in the floor into the room, arriving by the glass under a clock's eye;
     # - the lift lanterns: the four tower lifts run on through the roof to the room, each arriving in a glass lantern
     #   (lantern: its height over the floor) whose door faces the bell;
-    # - the clock eyes: open, for climbers, gliders and fliers; inside, from under the bell, four escalator pairs rise
-    #   like a compass's arms to a landing behind each eye (landing: its depth and width), so anyone can stand in an eye
-    #   and look down the street it faces.
-    # rose: the round inlay under the bell where the compass's feet meet; guard: the glass round every well and landing.
-    room=dict(name='the Clock Room',widening=2.6,arrive_x=(2.4,5.6),runoff=2.5,landing=dict(depth=3.0,w=4.4),lantern=3.4,rose=3.6,
+    # - the clock eyes: open, for those who can fly or glide, and only for them. (Revised 2026-10-18, at the user's
+    #   direction: the escalators that rose from under the bell to a landing behind each eye are gone. An eye is not a
+    #   place for ordinary people to be carried up to: it would be a ledge to fall from. A flier lands on its sill.)
+    # rose: the round bronze inlay under the bell; guard: the glass round every well.
+    room=dict(name='the Clock Room',widening=2.6,arrive_x=(2.4,5.6),runoff=2.5,lantern=3.4,rose=3.6,
       guard=dict(height=1.1,material='clear toughened glass on a bronze shoe, a bronze handrail on top'),
-      program='a public room under the glass: beds of desert grasses along the glass, benches round the wells, the bell overhead and the backs of the four clocks turning; from each eye, the street it faces',
-      floor='pale terrazzo, the roof\'s top; a bronze compass rose inlaid under the bell, its four arms the escalators to the eyes, the wells and lanterns set on its diagonals and beside its arms'),
+      program='a public room under the glass: beds of desert grasses along the glass, benches round the wells, the bell overhead and the backs of the four clocks turning high on the walls, their open eyes showing the sky',
+      floor='pale terrazzo, the roof\'s top; a bronze compass rose inlaid under the bell, its four points toward the four clocks'),
     bell=dict(mouth=4.4,height=4.6,crown_gap=1.0,material='bronze',
       rings=[dict(at=5.0,name='the dawn bell',pattern='three strokes, three times, then nine (after the Angelus)'),
              dict(at=12.0,name='the noon bell',pattern='twelve strokes'),
@@ -1269,6 +1278,23 @@ def _crossing_layout():
             spine_platform='east' if sx>0 else 'west',high_platform='north' if sz<0 else 'south',
             opens={str(DECK['level']):['the ring','the cross-bridge'],str(round(13.2+PLATFORMS['floor'],1)):180 if sx>0 else 0,str(36.0+PLATFORMS['floor']):90 if sz<0 else 270},
             lift=dict(c=(round(tc[0]-sx*d/math.sqrt(2),2),round(tc[1]-sz*d/math.sqrt(2),2)),r=T['lift']),r=(band0,band1)))
+    # the rib cage's openings and hoops (2026-10-18, at the user's direction, after the third prototype pass: the
+    # hoops, a ring every 4.1 m whatever the levels, crossed the ways out at head height, and with twelve ribs a rib
+    # stood in the middle of each diagonal way out to the ring). Eight ribs, at 22.5 + 45k degrees, so every way out
+    # (all at multiples of 45 degrees) is in the middle of a bay; hoops only where nobody walks out: never from a
+    # level's floor to 2.8 m over it, at most hoop_every apart elsewhere.
+    for TW in C['towers']:
+        tx, tz = TW['c']; sx = math.copysign(1, tx - cx); sz = math.copysign(1, tz - cz)
+        ways = [(DECK['level'], math.degrees(math.atan2(sz, sx))), (DECK['level'], math.degrees(math.atan2(0, -sx))), (DECK['level'], math.degrees(math.atan2(-sz, -sx))),
+                (round(13.2 + PLATFORMS['floor'], 2), 180.0 if sx > 0 else 0.0), (36.0 + PLATFORMS['floor'], 90.0 if sz < 0 else 270.0), (0.0, math.degrees(math.atan2(sz, sx))), (0.0, math.degrees(math.atan2(-sz, -sx)))]
+        TW['ways_out'] = [dict(y=y, bearing=round(b % 360, 2), width=2.4, clear=2.8) for y, b in ways]
+        lv_ = sorted(set(TW['levels'])); bands = [(y, y + 2.8) for y in lv_]
+        hoops = []; tops = [b_[1] for b_ in bands]; bots = [b_[0] - 0.25 for b_ in bands[1:]] + [C['roof']['y'] - 0.3]
+        for lo, hi in zip(tops, bots):
+            if hi - lo < 0.3: continue
+            n_ = max(1, math.ceil((hi - lo) / T['hoop_every']))
+            hoops += [round(lo + (hi - lo) * k / n_, 2) for k in range(n_ + 1)]
+        TW['hoops'] = sorted(set(hoops))
     # the ring's supports: the four towers, a pair of Deck columns where the Spine walks cross it (north and south),
     # and a pair either side of the cross walk east and west, clear of the walk
     rm=(C['ring'][0]+C['ring'][1])/2; e=3.0-0.4
@@ -1596,6 +1622,16 @@ def _cross_checks():
         if math.hypot(lx-tx,lz-tz)<dr+lr: problems.append(('crossing: a lift inside its tower',nm))
         if sorted(TW['levels'])!=[0,DECK['level'],sp_fl,me_fl]: problems.append(('crossing: a tower misses a level',nm,TW['levels']))
         TW['turns']=round(max(TW['levels'])/turn,2); TW['rise_per_turn']=round(turn,2)
+        # every way out passes clear: no rib in it, no hoop across it
+        for w_ in TW['ways_out']:
+            half_deg = math.degrees((w_['width'] / 2 + T['rib'] / 2 + 0.1) / T['drum'])
+            for k_ in range(T['ribs']):
+                rb = (k_ + 0.5) * 360 / T['ribs']
+                if abs((rb - w_['bearing'] + 180) % 360 - 180) < half_deg: problems.append(('crossing: a rib in a way out of a tower', nm, w_['y'], w_['bearing']))
+            for h_ in TW['hoops']:
+                if w_['y'] - 0.2 < h_ < w_['y'] + w_['clear']: problems.append(('crossing: a hoop across a way out of a tower', nm, w_['y'], h_))
+        gaps_ = [b_ - a_ for a_, b_ in zip(TW['hoops'], TW['hoops'][1:])]
+        if TW['hoops'][0] > 3.2 or max(gaps_) > 6.0 + 0.01: problems.append(('crossing: the hoops too far apart to carry the mesh', nm, max(gaps_)))
         if math.hypot(tx-cx0,tz-cz0)+dr>C['ring'][0]-0.1 or math.hypot(tx-cx0,tz-cz0)+dr<C['ring'][0]-0.8: problems.append(('crossing: a tower does not meet the ring\'s inner edge',nm))
         for x in me['piers']:
             if math.hypot(tx-x,tz-mez)<dr+3: problems.append(('crossing: a tower against a pier',nm,x))
@@ -1926,22 +1962,7 @@ def _clock_room():
     ey['sill_y']=sill; ey['chord']=round(chord,2); ey['headroom']=round(head,2)
     if chord<2.4 or head<2.6: P.append(('clock room: an eye too small to pass through',round(chord,2),round(head,2)))
     if ey['r']+ey['sleeve']>ck['rings'][0][1]+0.01: P.append(('clock room: an eye\'s sleeve under the turning hour ring',))
-    # the compass: from under the bell to a landing behind each eye
-    Ld=Rm['landing']; rise=sill-base; run=rise/tn
-    if rise>E['max_rise']: P.append(('clock room: the compass rises too far for one flight',round(rise,2)))
-    r_head=dr_['half']-0.3-Ld['depth']; r_foot=r_head-run
-    compass=[]; opens=[]
-    for b in ck['bearings']:
-        ux,uz=round(math.cos(math.radians(b)),6),round(math.sin(math.radians(b)),6)
-        f=(round(cx+ux*r_foot,2),round(cz+uz*r_foot,2)); h=(round(cx+ux*r_head,2),round(cz+uz*r_head,2))
-        land=[round(cx+ux*r_head-abs(uz)*Ld['w']/2,2),round(cz+uz*r_head-abs(ux)*Ld['w']/2,2),round(cx+ux*(dr_['half']-0.3)+abs(uz)*Ld['w']/2,2),round(cz+uz*(dr_['half']-0.3)+abs(ux)*Ld['w']/2,2)]
-        land=[min(land[0],land[2]),min(land[1],land[3]),max(land[0],land[2]),max(land[1],land[3])]
-        compass.append(dict(bearing=b,foot=f,head=h,y=(round(base,2),sill),landing=land,eye=(round(cx+ux*(dr_['half']+0.1),2),round(cz+uz*(dr_['half']+0.1),2),round(base+ck['centre'],2))))
-        a_=Point(f).buffer(0.01).union(Point(h).buffer(0.01)).convex_hull.buffer(w/2,cap_style=2)
-        lane=sbox(min(f[0],h[0])-abs(uz)*w/2-abs(ux)*ro,min(f[1],h[1])-abs(ux)*w/2-abs(uz)*ro,max(f[0],h[0])+abs(uz)*w/2,max(f[1],h[1])+abs(ux)*w/2)
-        opens.append(('compass %d'%b,lane))
-    if r_foot-ro<w/2+0.3: P.append(('clock room: the compass\'s feet run into each other under the bell',round(r_foot-ro,2)))
-    if r_foot-ro<Rm['rose']-0.01: P.append(('clock room: the compass\'s feet inside the rose',))
+    w=E['w']; ro=Rm['runoff']; opens=[]
     # the arrival wells: from each platform's widening, two pairs either side of the axis, up through the floor
     a_rise=base-me_fl; a_run=a_rise/tn
     if a_rise>E['max_rise']: P.append(('clock room: an arrival rises too far for one flight',round(a_rise,2)))
@@ -1959,7 +1980,6 @@ def _clock_room():
                                  arrive=[round(xm-w/2,2),round(min(zh,zh+sz*ro),2),round(xm+w/2,2),round(max(zh,zh+sz*ro),2)]))
             opens.append(('arrival %s %s'%('n' if sz<0 else 's','e' if sx>0 else 'w'),sbox(*well)))
             if not glass_in.contains(sbox(*arrivals[-1]['arrive'])): P.append(('clock room: an arrival lands against the glass',arrivals[-1]['side']))
-            if abs(xm-cx)-w/2<1.6+0.6: P.append(('clock room: an arrival against the compass\'s arm',))
     # the lifts: on to the room, a lantern each, its door facing the bell
     lifts=[]
     for TW in C['towers']:
@@ -1971,8 +1991,9 @@ def _clock_room():
     for i in range(len(opens)):
         for j in range(i+1,len(opens)):
             if opens[i][1].distance(opens[j][1])<0.5: P.append(('clock room: two openings foul each other',opens[i][0],opens[j][0],round(opens[i][1].distance(opens[j][1]),2)))
-    for c_ in compass:
-        if not inside.contains(sbox(*c_['landing'])): P.append(('clock room: an eye\'s landing outside the glass',c_['bearing']))
+    # an eye is reached only by flying: nothing walkable or rideable rises to it (2026-10-18)
+    for a in arrivals:
+        if a['y'][1] > sill - 2.0: P.append(('clock room: an escalator rises toward an eye',))
     # the arrivals climb in the open between the towers, off their drums, lifts and bridges, and the widenings off the line
     for a in arrivals:
         ln=sbox(a['foot'][0]-w/2,min(a['foot'][1],a['head'][1]),a['foot'][0]+w/2,max(a['foot'][1],a['head'][1]))
@@ -1984,9 +2005,9 @@ def _clock_room():
         if abs(r_[0]-cx)>half_len or abs(r_[2]-cx)>half_len: P.append(('clock room: a widening past its platform',wd['side']))
         for TW in C['towers']:
             if sbox(*r_).distance(Point(TW['lift']['c']))<TW['lift']['r']+0.3 or sbox(*r_).distance(Point(TW['c']))<C['tower']['drum']+0.3: P.append(('clock room: a widening against a tower',wd['side']))
-    if Dm['bell']['bottom']<sill+2.6+1.0: P.append(('clock room: the bell hangs too low over the room',))
-    Rm.update(sill=sill,compass=compass,arrivals=arrivals,widenings=wid,lifts=lifts,
-              entries=['four escalator pairs from the high line\'s platforms, up through the arrival wells','the four tower lifts, to their lanterns','the four clock eyes, for climbers, gliders and fliers'])
+    if Dm['bell']['bottom']<base+2.6+1.0: P.append(('clock room: the bell hangs too low over the room',))
+    Rm.update(sill=sill,arrivals=arrivals,widenings=wid,lifts=lifts,
+              entries=['four escalator pairs from the high line\'s platforms, up through the arrival wells','the four tower lifts, to their lanterns','the four clock eyes, for fliers and gliders only'])
 
 _block_checks()
 _cross_checks()

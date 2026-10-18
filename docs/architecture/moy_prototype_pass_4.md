@@ -113,15 +113,38 @@ To settle:
    - **The lifts.** Run the four tower lifts on to 41.6, each with a glass
      lantern whose door faces the bell (`lifts`, `door`). Add the stop to
      their destination menus.
-   - **The compass.** Build the four `compass` pairs from the floor to the
-     eye landings at the sill's height (47.7). Build each `landing` on
-     slender posts, guarded on its sides and either side of the escalator's
-     head, and open to its eye.
+   - **No way up to the eyes.** There are no escalators or landings to the
+     eyes (revised 2026-10-18): an eye is reached only by flying or gliding,
+     onto its sill.
    - **Check:** ride every way in and out, with both characters:
      - each arrival, both ways;
      - each lift to the room and back;
-     - each compass arm to its eye and back;
      - out through an eye with the Leaf Hat, and back in.
+8. **The garden towers' ways out.** The third pass's hoops and ribs block
+   them.
+   - Rebuild each tower's rib cage with **eight** ribs at 22.5° + 45k.
+   - Put hoops only at each tower's `hoops` heights: never from a level's
+     floor to 2.8 m over it.
+   - Check every `ways_out` entry: walk out of each tower at each level, and
+     onto the ring and the bridges, with both characters. No rib or hoop is
+     in the way, and none collides inside the clear width and height.
+9. **The escalators are closed boxes** (`ESCALATORS.section`). In the third
+   pass the helices' undersides were invisible and had no collision from
+   below. Every flight, straight and spiral:
+   - **Top:** the moving treads, unchanged.
+   - **Return belt:** inside the box, hidden.
+   - **Skirts:** solid side skirts.
+   - **Soffit:** a hard brushed-stainless soffit closing it underneath, its
+     faces outward.
+   - **Collision:** the top and the soffit both solid, as closed convex
+     pieces per segment.
+   - **Check:** stand under each helix and each straight flight and look up.
+     Jump up into its underside: it is solid.
+10. **The Grand Hotel stays as built.** The city model draws it as massing
+    only, and points to the detailed model, `docs/drawings/moy_grand_hotel_3d.html`.
+    Its data is `CityPlan.HOTEL`, which both models read. Keep building the
+    hotel from `HOTEL` and the detailed model, as in pass 3; nothing about it
+    changes in this pass.
 
 ## 3. Checks
 
