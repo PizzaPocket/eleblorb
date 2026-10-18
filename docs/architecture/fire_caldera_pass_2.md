@@ -99,6 +99,11 @@ Each of these was seen in one place but is wrong everywhere. Fix the builder
    starts at the deck's lava edge (`SITE.immersion_tongue.start`).
 8. **Validator.** Add a check that no two walkable surfaces overlap within
    2 cm of the same height, anywhere in the caldera, buildings included.
+9. **Guards open where people pass.** Build guards only from the plan's lines.
+   A landing on the ground (`foot-ground`, `lip-west`, the promenade) is open
+   to the ground on every side without a drop.
+   - Validator: walk onto every public level from the ground, and through
+     every opening in every guard.
 
 ## 3. The Gate Terrace and the Tempering Gate
 
@@ -109,6 +114,9 @@ Each of these was seen in one place but is wrong everywhere. Fix the builder
     two platform gates (`SITE.funicular.gates`) and the stair head.
   - Its plinth goes down to `SITE.gate_plinth.bottom` (41.73), under the wing
     too.
+  - Build the west ramp `GL` and its landing on the crater lip, so a walker
+    on the lip can get onto the terrace. Check: walk from the lip onto the
+    terrace, to the gate and to the top station.
 - **The gate.** Rebuild it from `SITE.tempering_gate`, in the language of the
   retired `FireCalderaGround.build_arrival_threshold` (`9aeea61`), at the new
   size:

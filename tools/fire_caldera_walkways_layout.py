@@ -23,6 +23,7 @@ from walkway_kit import Network, Flight, superellipse, annulus, band, circle_pts
 from fire_caldera_frame import (PLOT, PLOTS, LAVA_Y, HIGHLINE_RADIUS, HIGHLINE_WIDTH, HIGHLINE_DATUM, REVEAL, bank, bowl_y, flank_y,
                                 pol, brg, adiff, facing, shell_to_plan, plan_to_shell, shell_turn)
 from gd_plan import write_plan
+import fire_kingdom_terrain_bounds as TB
 
 GATE_DATUM = 48.5          # the crater lip under the Tempering Gate, half a metre up
 PROMENADE_DATUM = 30.0     # FireCalderaPlan.FLOOR_Y: the bank's shoulder; every ground door meets it
@@ -38,10 +39,12 @@ net = Network('surface')
 
 
 def ground_below(x, y, lv=None):
-    """What lies under a point: lava inside the bank, the bowl, or the outer flank."""
+    """What lies under a point: lava inside the bank, else the live ground. Revised 2026-10-18: it was the smooth
+    flank, which put the funicular's ground landing 1.6 m in the air and railed it all round. A guard is decided on
+    the ground the game builds (its low bound outside the city's fine ground, so an uncertain drop is guarded)."""
     r, b = math.hypot(x, y), brg(x, y)
     if r < bank(b): return LAVA_Y
-    return bowl_y(r) if r <= 112 else flank_y(r)
+    return TB.bounds_local((x, y))[0]
 net.below = ground_below
 
 
@@ -123,7 +126,7 @@ FUN = dict(top=(7.0, -118.0), tracks=3.4, gauge=1.0, dock=8.4, frame=0.9, bed=di
            pier=dict(every=7.5, semi=[0.9, 1.1], eps=3.0, socket=1.0))
 def along(s, across=0.0): return (FUN['top'][0] + FU[0] * s + FN[0] * across, FUN['top'][1] + FU[1] * s + FN[1] * across)
 S_END = 108.0
-TB.set_corridor(FUN['top'], along(S_END + 6), FUN['corridor']['clear'], FUN['corridor']['blend'])
+TB.set_corridor(FUN['top'], along(S_END + 34), FUN['corridor']['clear'], FUN['corridor']['blend'])   # on past the lower station's ramp and landing
 def ground_at(q): return TB.bounds_local(q)[1]
 # the profile: docks level at both ends (the cars' floors meet the platforms), between them the track follows the
 # ground at a constant clearance, a taut line over it eased into vertical curves
@@ -210,17 +213,34 @@ net.open_edge('funicular-foot', LineString([along(S_END - FUN['dock'] - 0.4, st[
 # down to the ground: a straight ramp off the plaza's far end, on the line, to a landing on the graded ground
 foot_end = along(S_END - FUN['dock'] / 2 + 1.0 + FUN['foot']['half'][0] - 0.5)
 ground_end = ground_at(foot_end)
-FOOT_GROUND = round(max(ground_at(along(S_END + 8 + t, 0)) for t in range(0, 28)) + 0.1, 2)
-net.level('foot-ground', FOOT_GROUND, 'basalt', 'the landing on the ground at the foot of the lower station\'s ramp')
+_r0 = S_END - FUN['dock'] / 2 + 1.0 + FUN['foot']['half'][0] - 1.5     # the ramp leaves the plaza's far end on the line
+FOOT_GROUND = round(ground_at(along(_r0 + 12)) + 0.1, 2)
+for _ in range(6):   # the landing takes its height from the ground under itself, wherever the ramp's length puts it
+    ramp_len = (low_datum - FOOT_GROUND) / 0.16 + 3.0
+    _pad = along(_r0 + ramp_len + 2.0)
+    FOOT_GROUND = round(max(ground_at((_pad[0] + dx, _pad[1] + dy)) for dx in (-3, 0, 3) for dy in (-3, 0, 3)) + 0.1, 2)
 ramp_len = (low_datum - FOOT_GROUND) / 0.16 + 3.0
-foot_ramp = Flight('FR', 'funicular-foot', 'foot-ground', line_path(along(S_END - FUN['dock'] / 2 + 1.0 + FUN['foot']['half'][0] - 1.5), along(S_END - FUN['dock'] / 2 + 1.0 + FUN['foot']['half'][0] - 1.5 + ramp_len)),
+net.level('foot-ground', FOOT_GROUND, 'basalt', 'the landing on the ground at the foot of the lower station\'s ramp')
+foot_ramp = Flight('FR', 'funicular-foot', 'foot-ground', line_path(along(_r0), along(_r0 + ramp_len)),
                    3.0, 'ramp', landing=(1.5, 1.5), note="the lower station's ramp down to the ground")
 net.flight(foot_ramp)
-net.add('foot-ground', superellipse(*along(S_END - FUN['dock'] / 2 + 1.0 + FUN['foot']['half'][0] - 1.5 + ramp_len + 2.0), 3.5, 3.0, 6.0, math.atan2(FU[1], FU[0]), 96), 'landing')
+net.add('foot-ground', superellipse(*along(_r0 + ramp_len + 2.0), 3.5, 3.0, 6.0, math.atan2(FU[1], FU[0]), 96), 'landing')
 
 net.add('gate', platform(GUEST), 'inn porch')
 net.wall('gate', walls_of(GUEST))
 net.add('gate', band(INN_BRIDGE, 3.0), 'inn bridge')
+# the way onto the terrace for a walker on the crater lip (2026-10-18: guarding the terrace all round had left no
+# way on from the ground): a ramp off its west end, down to a landing on the lip
+LIP_RAMP = dict(top=(-8.6, -115.0), heading=180.0, width=3.0, grade=0.16)
+_lip_x1 = -8.6 - 1.5 - (GATE_DATUM - 47.3) / LIP_RAMP['grade'] - 1.5
+LIP_DATUM = round(max(ground_at((_lip_x1 - dx, -115.0 + dy)) for dx in (0, 2, 4) for dy in (-2.5, 0, 2.5)) + 0.1, 2)
+_lip_len = 1.5 + (GATE_DATUM - LIP_DATUM) / LIP_RAMP['grade'] + 1.5
+net.level('lip-west', LIP_DATUM, 'basalt', 'the landing on the crater lip at the foot of the Gate Terrace\'s west ramp')
+lip_ramp = Flight('GL', 'gate', 'lip-west', line_path((-8.6, -115.0), (-8.6 - _lip_len, -115.0)), LIP_RAMP['width'], 'ramp', landing=(1.5, 1.5),
+                  material='basalt', note="the Gate Terrace's west ramp, from the crater lip")
+net.flight(lip_ramp)
+net.add('lip-west', superellipse(-8.6 - _lip_len - 1.5, -115.0, 3.0, 3.2, 6.0, 0.0, 96), 'landing')
+LIP_RAMP.update(datum=LIP_DATUM, length=round(_lip_len, 2))
 
 # ===================================================================== the Highline (42.5)
 net.level('highline', HIGHLINE_DATUM, 'glass', 'the Highline ring and everything level with it')
@@ -462,7 +482,7 @@ def live_ground(x, y):
     r = math.hypot(x, y)
     if r < bank(brg(x, y)): return None
     return TB.bounds_local((x, y))[1]
-ON_GROUND = ['promenade', 'oren-yard', 'kel-yard', 'foot-ground']
+ON_GROUND = ['promenade', 'oren-yard', 'kel-yard', 'foot-ground', 'lip-west']
 BEDS = {}
 for lid, lv in net.levels.items():
     if lv['owner']: continue
@@ -513,6 +533,31 @@ ok('ground under the walks: %s cut to their undersides; retaining edges where th
 # the materials every walk shares: the guards' posts and handrail in Renewal's blued steel (user, 2026-10-18), and one
 # clear sheet of glass for a glass deck: a top face seen from above, a bottom face seen from below, each culled
 # from behind, so no view looks through two layers
+# every public level can be reached on foot from the ground (2026-10-18): a level is on the ground where an edge of it
+# 1 m or longer has no guard and the live ground beside it lies within 0.4 m of its datum; from those, flights and
+# the funicular's cars join the rest. A level nobody can walk onto is a fault, however well it is guarded.
+reach = set()
+for lid, lv in net.levels.items():
+    if lv['owner']: continue
+    guarded = unary_union(lv['guards']).buffer(0.2) if lv['guards'] else None
+    for edge in lines(lv['surface'].boundary):
+        n_ = max(2, int(edge.length / 0.5)); run_ = 0.0
+        for k in range(n_ + 1):
+            q = edge.interpolate(edge.length * k / n_)
+            g_ = live_ground(q.x, q.y)
+            free = (guarded is None or not guarded.contains(q)) and g_ is not None and abs(g_ - lv['datum']) <= 0.4
+            run_ = run_ + edge.length / n_ if free else 0.0
+            if run_ >= 1.0: reach.add(lid); break
+        if lid in reach: break
+links = [(f.upper, f.lower) for f in net.flights] + [('gate', 'funicular-foot')]
+grew = True
+while grew:
+    grew = False
+    for a_, b_ in links:
+        if (a_ in reach) != (b_ in reach): reach |= {a_, b_}; grew = True
+for lid, lv in net.levels.items():
+    if not lv['owner'] and lid not in reach: F.append('no one can walk onto %s from the ground' % lid)
+ok('every public level reached on foot from the ground (on the ground: %s)' % ', '.join(sorted(l for l in reach if l in ON_GROUND or l == 'lip-west')))
 MATERIALS = dict(
     guard_steel=dict(colour=[0.15, 0.24, 0.42], metallic=0.9, roughness=0.2, source='CalderaShell.STEEL_BLUED, as on Renewal\'s canopy'),
     guard_glass=dict(colour=[0.62, 0.82, 0.88], alpha=0.16, roughness=0.05, cull='back, one pane each side'),
@@ -526,7 +571,7 @@ if F:
 # ===================================================================== write
 data = net.data()
 EXTRA = dict(gate_terrace=GATE_TERRACE, tempering_gate=TEMPERING_GATE, gate_plinth=GATE_PLINTH, inn_bridge=INN_BRIDGE, iren_bridge=IREN_BRIDGE,
-             refuges=REFUGES, renewal_deck=RENEWAL_DECK, canopy=CANOPY, immersion_tongue=IMMERSION_TONGUE, horseshoe=HS, spiral=SPIRAL,
+             refuges=REFUGES, lip_ramp=LIP_RAMP, renewal_deck=RENEWAL_DECK, canopy=CANOPY, immersion_tongue=IMMERSION_TONGUE, horseshoe=HS, spiral=SPIRAL,
              yards=YARDS, frames=FRAMES, funicular=FUN, promenade_centre=PROM_CENTRE[::4], beds=BEDS, flight_cuts=FLIGHT_CUTS, materials=MATERIALS,
              datums=dict(gate=GATE_DATUM, highline=HIGHLINE_DATUM, promenade=PROMENADE_DATUM, oren_roof=OREN_ROOF, oren_yard=OREN_YARD, kel_yard=KEL_YARD))
 HEADER = ['The Fire Caldera\'s walkways above the lava (docs/architecture/fire_caldera_walkways.md): every level',

@@ -161,6 +161,15 @@ surfaces, and are built only with them.
 - Oren's yard stops at the house's own ramp-foot landings instead of lying
   over them.
 
+**Guards are decided on the live ground** (2026-10-18). An edge gets a guard
+where the drop beside it is 1 m or more, measured to the ground the game
+builds:
+- the analytic bowl inside the rim;
+- the coarse mesh outside it, at its low bound where the noise is unknown.
+It used to be measured to the smooth flank, which put the funicular's ground
+landing 1.6 m in the air and railed it all round. A landing on the ground is
+now open to it.
+
 **Walks on the ground are cut into it.**
 - The promenade's datum, 30.0, is the bowl's lowest point. The bowl rises
   outward, up to 1.4 m above the walk, so in the first build the promenade
@@ -189,7 +198,11 @@ surfaces, and are built only with them.
   - the arrival gallery's mouth;
   - the inn's bridge;
   - the funicular's platform gates;
-  - the head of the track-side stair.
+  - the head of the track-side stair;
+  - the head of the west ramp (`GL`). It brings a walker on the crater lip
+    onto the terrace: 5.9 m at 16%, from a landing on the lip at 47.56
+    (`SITE.lip_ramp`). Without it the terrace could only be reached by the
+    funicular or its stair.
 - **The Tempering Gate** keeps its new size: 6.8 m clear, 10 m high. It
   returns to the language of the first arrival threshold:
   - a squarish superellipse arch (exponent 6) of three ember-glazed refractory
@@ -380,6 +393,8 @@ chord cuts through its shoulder. Data: `SITE.funicular`.
 - **the gate's veil hangs into the walk:** less than 3.4 m clear under it;
 - **the Renewal ramps are too steep:** over 55%;
 - **Oren's spiral lands on the lift's landing;**
+- **a level can't be reached on foot:** a public level can't be reached
+  from the ground by walking (via flights and the track-side stair);
 - **a raised walk is in the ground:** the Highline (outside its refuges) comes
   within 0.3 m of the live ground.
 
