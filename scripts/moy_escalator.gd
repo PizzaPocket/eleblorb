@@ -17,16 +17,24 @@ func _process(delta: float) -> void:
 	if belt_length > 0.1:
 		var path_length := 2.0 * belt_length + PI * belt_thickness
 		for tread in get_children():
-			if not tread is MeshInstance3D or not tread.has_meta("belt_distance"):
+			if not tread is MeshInstance3D:
+				continue
+			if tread.has_meta("handrail_distance"):
+				var rail_distance := fposmod(float(tread.get_meta("handrail_distance")) + travel_speed * delta, belt_length)
+				var rail_position: Vector3 = tread.position
+				rail_position.x = rail_distance - belt_length * 0.5
+				tread.position = rail_position
+				continue
+			if not tread.has_meta("belt_distance"):
 				continue
 			var distance := fposmod(float(tread.get_meta("belt_distance")) + travel_speed * delta, path_length)
 			var point := _belt_point(distance)
-			tread.position = Vector3(point.x, point.y, 0.0)
+			tread.position = Vector3(point.x, point.y, float(tread.get_meta("belt_z",0.0)))
 	var helix_span := float(get_meta("helix_span", 0.0))
 	if helix_span <= 0.001:
 		return
-	var radius := float(get_meta("helix_tread_radius", 2.7))
-	var arc_length := helix_span * radius
+	var base_radius := float(get_meta("helix_tread_radius", 2.7))
+	var arc_length := helix_span * base_radius
 	for tread in get_children():
 		if not tread is MeshInstance3D or not tread.has_meta("helix_fraction"):
 			continue
@@ -35,7 +43,9 @@ func _process(delta: float) -> void:
 		tread.set_meta("helix_fraction", fraction)
 		var angle := lerpf(float(get_meta("helix_a0")), float(get_meta("helix_a1")), fraction)
 		var y := lerpf(float(get_meta("helix_y0")), float(get_meta("helix_y1")), fraction)
-		tread.position = Vector3(cos(angle) * radius, y + 0.05, sin(angle) * radius)
+		var radius := float(tread.get_meta("helix_radius",base_radius))
+		var height_offset:=float(tread.get_meta("helix_offset_y",0.05))
+		tread.position = Vector3(cos(angle) * radius, y + height_offset, sin(angle) * radius)
 		tread.rotation.y = -angle - PI * 0.5
 
 func _belt_point(distance: float) -> Vector2:

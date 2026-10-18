@@ -54,6 +54,9 @@ const HOP_MIN_RISE := 0.6
 ## World metres per second, like the rope lengths: both rigs climb the same
 ## buildings. This reels toward a real held support, beyond the startup lift.
 const CLIMB_SPEED := 3.0
+const CLIMB_REGRIP_MARGIN := 2.0
+const CLIMB_ANCHOR_GAIN := 6.0
+const CLIMB_SEARCH_INTERVAL := 0.25
 ## The shortest a grip can last, so one apex cannot fire two throws, and how
 ## long an opened hand stays open before it can catch again.
 const MIN_GRIP := 0.25
@@ -184,6 +187,7 @@ var anchor := Vector3.ZERO
 ## The body the rope is tied to, so the search for the NEXT support can look past
 ## it. Hanging from a trunk, that trunk is the first thing every forward ray hits.
 var anchor_rid := RID()
+var _climb_search_timer := 0.0
 var rope_length := 0.0
 ## Which hand carries the load. The other one is the one that throws next.
 var left_hand := true
@@ -270,6 +274,7 @@ func reset() -> void:
 	swinging = false
 	relatch_timer = 0.0
 	grip_timer = 0.0
+	_climb_search_timer = 0.0
 	_cord.clear()
 	_eased.clear()
 	_releasing = true
@@ -314,11 +319,11 @@ func _throw(ctx: TraversalContext, aim: Vector3, with_pickup: bool) -> bool:
 ## rather than duplicated. `reach_out` is for a hand-over, which wants distance
 ## counted in a candidate's favour.
 func find_anchor(
-	ctx: TraversalContext, aim: Vector3, reach_out: bool = false, skip: RID = RID()
+	ctx: TraversalContext, aim: Vector3, reach_out: bool = false, skip: RID = RID(), same_body_min_y: float = INF
 ) -> VineAnchorSearch.Found:
 	return VineAnchorSearch.best(
 		ctx, VineCord.hand_point(ctx, left_hand), _horizontal(aim, ctx),
-		Vector2(MIN_ROPE, MAX_ROPE), reach_out, skip
+		Vector2(MIN_ROPE, MAX_ROPE), reach_out, skip, same_body_min_y
 	)
 
 
@@ -331,6 +336,7 @@ func find_anchor(
 func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 	var body := ctx.body
 	grip_timer = maxf(grip_timer - ctx.delta, 0.0)
+	_climb_search_timer = maxf(_climb_search_timer - ctx.delta, 0.0)
 	body.velocity += ctx.direction * STEER_ACCELERATION * ctx.delta
 	body.velocity.y = HumanoidLocomotion.apply_gravity(
 		body.velocity.y, ctx.delta, ctx.profile, TERMINAL_FALL
@@ -360,7 +366,13 @@ func _hang(ctx: TraversalContext, aim: Vector3) -> void:
 	# vine can carry him no further the way he is asking to go, does the free hand
 	# reach for the next one. Failing to find one costs nothing: the vine he has
 	# is still load-bearing and the swing carries on.
-	if steered and grip_timer <= 0.0 and _spent_toward(ctx, wanted):
+	var regripped := false
+	if VineAnchorSearch.climb_intent(ctx) > 0.0 and grip_timer <= 0.0 and _climb_search_timer <= 0.0 and (
+		rope_length <= MIN_ROPE + CLIMB_REGRIP_MARGIN or anchor.y - body.global_position.y <= VineAnchorSearch.MIN_RISE + CLIMB_REGRIP_MARGIN
+	):
+		_climb_search_timer = CLIMB_SEARCH_INTERVAL
+		regripped = _catch_next(ctx, _horizontal(aim, ctx), true)
+	if not regripped and steered and grip_timer <= 0.0 and _spent_toward(ctx, wanted):
 		_catch_next(ctx, wanted)
 	_cord.grow(ctx, anchor, left_hand)
 
@@ -376,8 +388,17 @@ func _pull_for_climb(ctx: TraversalContext, radial: Vector3) -> bool:
 		return false
 	var inward := -radial / distance
 	var speed := minf(CLIMB_SPEED * intent, (distance - MIN_ROPE) / ctx.delta)
-	if ctx.body.test_move(ctx.body.global_transform, inward * speed * ctx.delta):
-		return false
+	var collision := KinematicCollision3D.new()
+	if ctx.body.test_move(ctx.body.global_transform, inward * speed * ctx.delta, collision, ctx.body.safe_margin, false, 8):
+		# A facade may block the inward component while leaving upward travel
+		# clear. Slide the pull along it; a ceiling still cancels ascent.
+		for i in collision.get_collision_count():
+			var normal := collision.get_normal(i)
+			if inward.dot(normal) < 0.0:
+				inward = inward.slide(normal)
+		if inward.y <= 0.001:
+			return false
+		inward = inward.normalized()
 	ctx.body.velocity += inward * maxf(0.0, speed - ctx.body.velocity.dot(inward))
 	return true
 
@@ -401,17 +422,20 @@ func _spent_toward(ctx: TraversalContext, wanted: Vector3) -> bool:
 
 
 ## The next support in the direction being asked for, taken hand over hand. It has
-## to lie AHEAD of him: catching something level or behind would stop the run
-## rather than continue it.
-func _catch_next(ctx: TraversalContext, wanted: Vector3) -> bool:
-	var found := find_anchor(ctx, wanted, true, anchor_rid)
+## to lie AHEAD during ordinary travel. An upward regrip instead needs a
+## genuinely higher physical point, which may be on the same building.
+func _catch_next(ctx: TraversalContext, wanted: Vector3, climbing: bool = false) -> bool:
+	var minimum_y := anchor.y + CLIMB_ANCHOR_GAIN if climbing else INF
+	var found := find_anchor(ctx, wanted, true, anchor_rid, minimum_y)
 	if found == null:
 		return false
 	var next := found.point
 	var ahead := Vector3(
 		next.x - ctx.body.global_position.x, 0.0, next.z - ctx.body.global_position.z
 	).dot(wanted)
-	if ahead < CATCH_MIN_AHEAD:
+	if climbing and next.y < minimum_y:
+		return false
+	if not climbing and ahead < CATCH_MIN_AHEAD:
 		return false
 	var held := anchor
 	var hand_was := left_hand
@@ -424,7 +448,8 @@ func _catch_next(ctx: TraversalContext, wanted: Vector3) -> bool:
 	# The spent vine retracts to the hand that threw it while the other hand's
 	# own throw is already on its way out.
 	_cord.retire(held, hand_was)
-	_hop(ctx)
+	if not climbing:
+		_hop(ctx)
 	grip_timer = MIN_GRIP
 	_peak_carry = 0.0
 	return true

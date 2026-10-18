@@ -1,228 +1,1067 @@
-[gd_scene format=3]
+[gd_scene format=4]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_jelt4"]
-size = Vector3(7.361544, 0.2, 0.16)
+[ext_resource type="Script" path="res://scripts/moy_escalator.gd" id="1_8of4h"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8of4h"]
-albedo_color = Color(0.33333334, 0.35686275, 0.3647059, 1)
+[sub_resource type="BoxShape3D" id="BoxShape3D_cd47a"]
+size = Vector3(14.202116, 0.9, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3e4kd"]
+albedo_color = Color(0.7019608, 0.63529414, 0.49411765, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_cd47a"]
-size = Vector3(7.361544, 0.2, 0.16)
+[sub_resource type="BoxMesh" id="BoxMesh_hvnt7"]
+size = Vector3(14.202116, 0.9, 1.2)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_3e4kd"]
-margin = 0.0
-size = Vector3(5.892072, 0.3, 3)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hvnt7"]
-albedo_color = Color(0.76862746, 0.69411767, 0.54509807, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p3uc3"]
+albedo_color = Color(0.27058825, 0.29411766, 0.29411766, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_p3uc3"]
-size = Vector3(5.892072, 0.3, 3)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_u40tn"]
-size = Vector3(5.892072, 0.18, 3)
+[sub_resource type="ArrayMesh" id="ArrayMesh_u40tn"]
+_surfaces = [{
+"aabb": AABB(-7.551058, -0.45, -0.6, 15.102116, 0.9, 1.2),
+"format": 34359738369,
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 114,
+"vertex_data": PackedByteArray("3jvjwGZm5j6amRm/3jvjwGZm5j6amRk/3jvjQGZm5j6amRk/3jvjwGZm5j6amRm/3jvjQGZm5j6amRk/3jvjQGZm5j6amRm/3jvjQGZm5j6amRm/3jvjQGZm5j6amRk/l77oQKLc1D6amRk/3jvjQGZm5j6amRm/l77oQKLc1D6amRk/l77oQKLc1D6amRm/l77oQKLc1D6amRm/l77oQKLc1D6amRk/jGrtQNvqoj6amRk/l77oQKLc1D6amRm/jGrtQNvqoj6amRk/jGrtQNvqoj6amRm/jGrtQNvqoj6amRm/jGrtQNvqoj6amRk/qInwQC1XMD6amRk/jGrtQNvqoj6amRm/qInwQC1XMD6amRk/qInwQC1XMD6amRm/qInwQC1XMD6amRm/qInwQC1XMD6amRk/RKLxQAAAAACamRk/qInwQC1XMD6amRm/RKLxQAAAAACamRk/RKLxQAAAAACamRm/RKLxQAAAAACamRm/RKLxQAAAAACamRk/qInwQC1XML6amRk/RKLxQAAAAACamRm/qInwQC1XML6amRk/qInwQC1XML6amRm/qInwQC1XML6amRm/qInwQC1XML6amRk/jGrtQNvqor6amRk/qInwQC1XML6amRm/jGrtQNvqor6amRk/jGrtQNvqor6amRm/jGrtQNvqor6amRm/jGrtQNvqor6amRk/l77oQKLc1L6amRk/jGrtQNvqor6amRm/l77oQKLc1L6amRk/l77oQKLc1L6amRm/l77oQKLc1L6amRm/l77oQKLc1L6amRk/3jvjQGZm5r6amRk/l77oQKLc1L6amRm/3jvjQGZm5r6amRk/3jvjQGZm5r6amRm/3jvjQGZm5r6amRm/3jvjQGZm5r6amRk/3jvjwGZm5r6amRk/3jvjQGZm5r6amRm/3jvjwGZm5r6amRk/3jvjwGZm5r6amRm/3jvjwGZm5r6amRm/3jvjwGZm5r6amRk/l77owKLc1L6amRk/3jvjwGZm5r6amRm/l77owKLc1L6amRk/l77owKLc1L6amRm/l77owKLc1L6amRm/l77owKLc1L6amRk/jGrtwNvqor6amRk/l77owKLc1L6amRm/jGrtwNvqor6amRk/jGrtwNvqor6amRm/jGrtwNvqor6amRm/jGrtwNvqor6amRk/qInwwC1XML6amRk/jGrtwNvqor6amRm/qInwwC1XML6amRk/qInwwC1XML6amRm/qInwwC1XML6amRm/qInwwC1XML6amRk/RKLxwFklfqSamRk/qInwwC1XML6amRm/RKLxwFklfqSamRk/RKLxwFklfqSamRm/RKLxwFklfqSamRm/RKLxwFklfqSamRk/qInwwC1XMD6amRk/RKLxwFklfqSamRm/qInwwC1XMD6amRk/qInwwC1XMD6amRm/qInwwC1XMD6amRm/qInwwC1XMD6amRk/jGrtwNvqoj6amRk/qInwwC1XMD6amRm/jGrtwNvqoj6amRk/jGrtwNvqoj6amRm/jGrtwNvqoj6amRm/jGrtwNvqoj6amRk/l77owKLc1D6amRk/jGrtwNvqoj6amRm/l77owKLc1D6amRk/l77owKLc1D6amRm/l77owKLc1D6amRm/l77owKLc1D6amRk/3jvjwGZm5j6amRk/l77owKLc1D6amRm/3jvjwGZm5j6amRk/3jvjwGZm5j6amRm/3jvjwGZm5j6amRm/3jvjwGZm5j6amRk/3jvjwGZm5j6amRk/3jvjwGZm5j6amRm/3jvjwGZm5j6amRk/3jvjwGZm5j6amRm/")
+}]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kyfqd"]
-albedo_color = Color(0.7372549, 0.7058824, 0.60784316, 1)
+albedo_color = Color(0.84313726, 0.84705883, 0.81960785, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_57yas"]
-size = Vector3(5.892072, 0.18, 3)
+size = Vector3(0.055, 0.035, 1.056)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_exre5"]
-margin = 0.0
-size = Vector3(5.892055, 0.3, 3)
+size = Vector3(14.202116, 0.95, 0.11)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_giy7m"]
-albedo_color = Color(0.76862746, 0.69411767, 0.54509807, 1)
-roughness = 0.92
+transparency = 1
+albedo_color = Color(0.48, 0.68, 0.72, 0.24)
+roughness = 0.2
 
 [sub_resource type="BoxMesh" id="BoxMesh_tugkc"]
-size = Vector3(5.892055, 0.3, 3)
+size = Vector3(14.202116, 0.95, 0.11)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_3j0yw"]
-size = Vector3(5.892055, 0.18, 3)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3j0yw"]
+albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
+roughness = 0.4
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k4jev"]
-albedo_color = Color(0.7372549, 0.7058824, 0.60784316, 1)
-roughness = 0.92
+[sub_resource type="BoxMesh" id="BoxMesh_k4jev"]
+size = Vector3(0.75, 0.09, 0.13)
 
 [sub_resource type="BoxMesh" id="BoxMesh_2r8ut"]
-size = Vector3(5.892055, 0.18, 3)
+size = Vector3(0.75, 0.09, 0.13)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_khjgl"]
-margin = 0.0
-size = Vector3(5.89209, 0.3, 3)
+size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mx13c"]
-albedo_color = Color(0.76862746, 0.69411767, 0.54509807, 1)
+albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_k2s0i"]
-size = Vector3(5.89209, 0.3, 3)
+size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tj1xw"]
-size = Vector3(5.89209, 0.18, 3)
+size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_inftc"]
-albedo_color = Color(0.7372549, 0.7058824, 0.60784316, 1)
+albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
 [sub_resource type="BoxMesh" id="BoxMesh_eb0jt"]
-size = Vector3(5.89209, 0.18, 3)
+size = Vector3(0.22, 0.9, 0.22)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_irsjw"]
-margin = 0.0
-size = Vector3(5.892055, 0.3, 3)
+size = Vector3(14.202116, 0.95, 0.11)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k17jx"]
-albedo_color = Color(0.76862746, 0.69411767, 0.54509807, 1)
+[sub_resource type="BoxMesh" id="BoxMesh_k17jx"]
+size = Vector3(14.202116, 0.95, 0.11)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d14jm"]
+albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_5deu1"]
+size = Vector3(0.75, 0.09, 0.13)
+
+[sub_resource type="BoxMesh" id="BoxMesh_7aow2"]
+size = Vector3(0.75, 0.09, 0.13)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_udttc"]
+size = Vector3(0.22, 0.9, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_026dk"]
+albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_d14jm"]
-size = Vector3(5.892055, 0.3, 3)
+[sub_resource type="BoxMesh" id="BoxMesh_txnup"]
+size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_5deu1"]
-size = Vector3(5.892055, 0.18, 3)
+[sub_resource type="BoxShape3D" id="BoxShape3D_xe34y"]
+size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7aow2"]
-albedo_color = Color(0.7372549, 0.7058824, 0.60784316, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6ec3e"]
+albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_udttc"]
-size = Vector3(5.892055, 0.18, 3)
+[sub_resource type="BoxMesh" id="BoxMesh_ni26j"]
+size = Vector3(0.22, 0.9, 0.22)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_026dk"]
-margin = 0.0
-size = Vector3(5.892072, 0.3, 3)
+[sub_resource type="BoxShape3D" id="BoxShape3D_lxnxo"]
+size = Vector3(14.202116, 0.9, 1.2)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_txnup"]
-albedo_color = Color(0.76862746, 0.69411767, 0.54509807, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ggmil"]
+albedo_color = Color(0.6431373, 0.5764706, 0.44705883, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_xe34y"]
-size = Vector3(5.892072, 0.3, 3)
+[sub_resource type="BoxMesh" id="BoxMesh_ls1u1"]
+size = Vector3(14.202116, 0.9, 1.2)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_6ec3e"]
-size = Vector3(5.892072, 0.18, 3)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ni26j"]
-albedo_color = Color(0.7372549, 0.7058824, 0.60784316, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gjnn8"]
+albedo_color = Color(0.27058825, 0.29411766, 0.29411766, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_lxnxo"]
-size = Vector3(5.892072, 0.18, 3)
+[sub_resource type="ArrayMesh" id="ArrayMesh_ce8cr"]
+_surfaces = [{
+"aabb": AABB(-7.551058, -0.45, -0.6, 15.102116, 0.9, 1.2),
+"format": 34359738369,
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 114,
+"vertex_data": PackedByteArray("3jvjwGZm5j6amRm/3jvjwGZm5j6amRk/3jvjQGZm5j6amRk/3jvjwGZm5j6amRm/3jvjQGZm5j6amRk/3jvjQGZm5j6amRm/3jvjQGZm5j6amRm/3jvjQGZm5j6amRk/l77oQKLc1D6amRk/3jvjQGZm5j6amRm/l77oQKLc1D6amRk/l77oQKLc1D6amRm/l77oQKLc1D6amRm/l77oQKLc1D6amRk/jGrtQNvqoj6amRk/l77oQKLc1D6amRm/jGrtQNvqoj6amRk/jGrtQNvqoj6amRm/jGrtQNvqoj6amRm/jGrtQNvqoj6amRk/qInwQC1XMD6amRk/jGrtQNvqoj6amRm/qInwQC1XMD6amRk/qInwQC1XMD6amRm/qInwQC1XMD6amRm/qInwQC1XMD6amRk/RKLxQAAAAACamRk/qInwQC1XMD6amRm/RKLxQAAAAACamRk/RKLxQAAAAACamRm/RKLxQAAAAACamRm/RKLxQAAAAACamRk/qInwQC1XML6amRk/RKLxQAAAAACamRm/qInwQC1XML6amRk/qInwQC1XML6amRm/qInwQC1XML6amRm/qInwQC1XML6amRk/jGrtQNvqor6amRk/qInwQC1XML6amRm/jGrtQNvqor6amRk/jGrtQNvqor6amRm/jGrtQNvqor6amRm/jGrtQNvqor6amRk/l77oQKLc1L6amRk/jGrtQNvqor6amRm/l77oQKLc1L6amRk/l77oQKLc1L6amRm/l77oQKLc1L6amRm/l77oQKLc1L6amRk/3jvjQGZm5r6amRk/l77oQKLc1L6amRm/3jvjQGZm5r6amRk/3jvjQGZm5r6amRm/3jvjQGZm5r6amRm/3jvjQGZm5r6amRk/3jvjwGZm5r6amRk/3jvjQGZm5r6amRm/3jvjwGZm5r6amRk/3jvjwGZm5r6amRm/3jvjwGZm5r6amRm/3jvjwGZm5r6amRk/l77owKLc1L6amRk/3jvjwGZm5r6amRm/l77owKLc1L6amRk/l77owKLc1L6amRm/l77owKLc1L6amRm/l77owKLc1L6amRk/jGrtwNvqor6amRk/l77owKLc1L6amRm/jGrtwNvqor6amRk/jGrtwNvqor6amRm/jGrtwNvqor6amRm/jGrtwNvqor6amRk/qInwwC1XML6amRk/jGrtwNvqor6amRm/qInwwC1XML6amRk/qInwwC1XML6amRm/qInwwC1XML6amRm/qInwwC1XML6amRk/RKLxwFklfqSamRk/qInwwC1XML6amRm/RKLxwFklfqSamRk/RKLxwFklfqSamRm/RKLxwFklfqSamRm/RKLxwFklfqSamRk/qInwwC1XMD6amRk/RKLxwFklfqSamRm/qInwwC1XMD6amRk/qInwwC1XMD6amRm/qInwwC1XMD6amRm/qInwwC1XMD6amRk/jGrtwNvqoj6amRk/qInwwC1XMD6amRm/jGrtwNvqoj6amRk/jGrtwNvqoj6amRm/jGrtwNvqoj6amRm/jGrtwNvqoj6amRk/l77owKLc1D6amRk/jGrtwNvqoj6amRm/l77owKLc1D6amRk/l77owKLc1D6amRm/l77owKLc1D6amRm/l77owKLc1D6amRk/3jvjwGZm5j6amRk/l77owKLc1D6amRm/3jvjwGZm5j6amRk/3jvjwGZm5j6amRm/3jvjwGZm5j6amRm/3jvjwGZm5j6amRk/3jvjwGZm5j6amRk/3jvjwGZm5j6amRm/3jvjwGZm5j6amRk/3jvjwGZm5j6amRm/")
+}]
 
-[node name="MoyCell_03_06_Part_04" type="Node3D" unique_id=1329430903]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q7civ"]
+albedo_color = Color(0.84313726, 0.84705883, 0.81960785, 1)
+roughness = 0.92
 
-[node name="WallLine_Rail_65_1_1" type="StaticBody3D" parent="." unique_id=1695434210]
-transform = Transform3D(-0.9781486, 0, 0.20790718, 0, 1, 0, -0.20790718, 0, -0.9781486, -603.65045, -46.7, 205.36258)
+[sub_resource type="BoxMesh" id="BoxMesh_mpgdv"]
+size = Vector3(0.055, 0.035, 1.056)
 
-[node name="@CollisionShape3D@6801" type="CollisionShape3D" parent="WallLine_Rail_65_1_1" unique_id=1729796359]
-shape = SubResource("BoxShape3D_jelt4")
+[sub_resource type="BoxShape3D" id="BoxShape3D_66mkf"]
+size = Vector3(14.202116, 0.95, 0.11)
 
-[node name="@MeshInstance3D@6802" type="MeshInstance3D" parent="WallLine_Rail_65_1_1" unique_id=658839753]
-material_override = SubResource("StandardMaterial3D_8of4h")
-mesh = SubResource("BoxMesh_cd47a")
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8lt78"]
+transparency = 1
+albedo_color = Color(0.48, 0.68, 0.72, 0.24)
+roughness = 0.2
 
-[node name="WallLine_Station_South_Gate_Platform_0_0" type="StaticBody3D" parent="." unique_id=579559783]
-transform = Transform3D(-0.9983249, 0, -0.05785681, 0, 1, 0, 0.05785681, 0, -0.9983249, -548.22327, -45.95, 203.2157)
+[sub_resource type="BoxMesh" id="BoxMesh_dvw6j"]
+size = Vector3(14.202116, 0.95, 0.11)
 
-[node name="@CollisionShape3D@8503" type="CollisionShape3D" parent="WallLine_Station_South_Gate_Platform_0_0" unique_id=150717310]
-shape = SubResource("BoxShape3D_3e4kd")
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lf4ec"]
+albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
+roughness = 0.4
 
-[node name="@MeshInstance3D@8504" type="MeshInstance3D" parent="WallLine_Station_South_Gate_Platform_0_0" unique_id=1583785155]
-material_override = SubResource("StandardMaterial3D_hvnt7")
-mesh = SubResource("BoxMesh_p3uc3")
+[sub_resource type="BoxMesh" id="BoxMesh_x7dua"]
+size = Vector3(0.75, 0.09, 0.13)
 
-[node name="WallLine_Station_South_Gate_Canopy_0_0" type="StaticBody3D" parent="." unique_id=1958252551]
-transform = Transform3D(-0.9983249, 0, -0.05785681, 0, 1, 0, 0.05785681, 0, -0.9983249, -548.22327, -42.51, 203.2157)
+[sub_resource type="BoxMesh" id="BoxMesh_h7ts0"]
+size = Vector3(0.75, 0.09, 0.13)
 
-[node name="@CollisionShape3D@8505" type="CollisionShape3D" parent="WallLine_Station_South_Gate_Canopy_0_0" unique_id=747589837]
-shape = SubResource("BoxShape3D_u40tn")
+[sub_resource type="BoxShape3D" id="BoxShape3D_awfav"]
+size = Vector3(0.22, 0.9, 0.22)
 
-[node name="@MeshInstance3D@8506" type="MeshInstance3D" parent="WallLine_Station_South_Gate_Canopy_0_0" unique_id=345982385]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wmpmj"]
+albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_fc0p8"]
+size = Vector3(0.22, 0.9, 0.22)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d2kb3"]
+size = Vector3(0.22, 0.9, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j352s"]
+albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_7aqme"]
+size = Vector3(0.22, 0.9, 0.22)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_k7fnu"]
+size = Vector3(14.202116, 0.95, 0.11)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ps6mr"]
+size = Vector3(14.202116, 0.95, 0.11)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cn3ve"]
+albedo_color = Color(0.14117648, 0.15686275, 0.15294118, 1)
+roughness = 0.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_kkxw8"]
+size = Vector3(0.75, 0.09, 0.13)
+
+[sub_resource type="BoxMesh" id="BoxMesh_4a22q"]
+size = Vector3(0.75, 0.09, 0.13)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_0f7id"]
+size = Vector3(0.22, 0.9, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tp8jj"]
+albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_cw7ca"]
+size = Vector3(0.22, 0.9, 0.22)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_84ccn"]
+size = Vector3(0.22, 0.9, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_duetk"]
+albedo_color = Color(0.40392157, 0.41960785, 0.4117647, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ix212"]
+size = Vector3(0.22, 0.9, 0.22)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_kgfnb"]
+size = Vector3(3.4, 0.3, 2.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bf367"]
+albedo_color = Color(0.7137255, 0.6313726, 0.48235294, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_dq4g6"]
+size = Vector3(3.4, 0.3, 2.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pvfaq"]
+size = Vector3(3.4, 0.3, 2.4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fnbic"]
+albedo_color = Color(0.7137255, 0.6313726, 0.48235294, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_e0n2g"]
+size = Vector3(3.4, 0.3, 2.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uh512"]
+size = Vector3(8, 0.8, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2v2gc"]
+albedo_color = Color(0.6117647, 0.20392157, 0.15686275, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_e7uyq"]
+size = Vector3(8, 0.8, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qonak"]
+size = Vector3(3.661542, 1.4, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6gjhx"]
+albedo_color = Color(0.46666667, 0.4627451, 0.43529412, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ffg7s"]
+size = Vector3(3.661542, 1.4, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_snv7d"]
+size = Vector3(3.6231616, 0.2, 0.16)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pkk6y"]
+albedo_color = Color(0.33333334, 0.35686275, 0.3647059, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_6jmxt"]
+size = Vector3(3.6231616, 0.2, 0.16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5fnsu"]
+size = Vector3(3.6231616, 0.2, 0.16)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_604a3"]
+albedo_color = Color(0.33333334, 0.35686275, 0.3647059, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_v8ydy"]
+size = Vector3(3.6231616, 0.2, 0.16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qa7fp"]
+size = Vector3(3.6825702, 0.2, 0.16)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e0kip"]
+albedo_color = Color(0.33333334, 0.35686275, 0.3647059, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ik5fy"]
+size = Vector3(3.6825702, 0.2, 0.16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_hy0iq"]
+size = Vector3(3.6825702, 0.2, 0.16)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2qwjc"]
+albedo_color = Color(0.33333334, 0.35686275, 0.3647059, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_g5b40"]
+size = Vector3(3.6825702, 0.2, 0.16)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_w7va8"]
+size = Vector3(3.6502113, 1.4, 8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2flco"]
+albedo_color = Color(0.46666667, 0.4627451, 0.43529412, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ijcaa"]
+size = Vector3(3.6502113, 1.4, 8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nh0h4"]
+size = Vector3(3.6118765, 0.2, 0.16)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wcy1p"]
+albedo_color = Color(0.33333334, 0.35686275, 0.3647059, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_mhwjn"]
+size = Vector3(3.6118765, 0.2, 0.16)
+
+[node name="MoyCell_03_06_Part_04" type="Node3D" unique_id=2082999107]
+
+[node name="SpineAccess_South_Gate_east_1_Up" type="StaticBody3D" parent="." unique_id=281416371]
+transform = Transform3D(0, 0, -1, 0.49992567, 0.86606836, 0, 0.86606836, -0.49992567, 0, -554.9, -49.35, 162.85)
+script = ExtResource("1_8of4h")
+travel_direction = Vector3(0, 0.49992567, 0.86606836)
+travel_speed = 0.35
+belt_length = 14.202116
+belt_width = 1.2
+belt_thickness = 0.9
+
+[node name="@CollisionShape3D@7019" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1307207906]
+shape = SubResource("BoxShape3D_cd47a")
+
+[node name="@MeshInstance3D@7020" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=614013813]
+material_override = SubResource("StandardMaterial3D_3e4kd")
+mesh = SubResource("BoxMesh_hvnt7")
+
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=349284748]
+material_override = SubResource("StandardMaterial3D_p3uc3")
+mesh = SubResource("ArrayMesh_u40tn")
+
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=473693584]
 material_override = SubResource("StandardMaterial3D_kyfqd")
 mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 0.0
 
-[node name="WallLine_Station_South_Gate_Platform_0_1" type="StaticBody3D" parent="." unique_id=1667051641]
-transform = Transform3D(-0.9995812, 0, -0.028937504, 0, 1, 0, 0.028937504, 0, -0.9995812, -554.10913, -45.95, 203.4714)
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1087225866]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 0.6940370091861622
 
-[node name="@CollisionShape3D@8507" type="CollisionShape3D" parent="WallLine_Station_South_Gate_Platform_0_1" unique_id=5584972]
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=83423156]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 1.3880740183723244
+
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=780408491]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 2.082111027558487
+
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1204201471]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 2.7761480367446487
+
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=759222180]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 3.470185045930811
+
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1461182102]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 4.164222055116974
+
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=35032879]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 4.858259064303136
+
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1200678372]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 5.552296073489297
+
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1906238309]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 6.24633308267546
+
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1104793730]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 6.940370091861622
+
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=212733837]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 7.634407101047785
+
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1626167139]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 8.328444110233947
+
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1297673491]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 9.022481119420108
+
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1589330443]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 9.716518128606271
+
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1587761725]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 10.410555137792434
+
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=741703655]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 11.104592146978595
+
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=227403835]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 11.798629156164758
+
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=2119559187]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 12.49266616535092
+
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1513643521]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 13.186703174537083
+
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=994092901]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 13.880740183723244
+
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1223013317]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 14.574777192909407
+
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=904179410]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 15.26881420209557
+
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=2041846185]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 15.96285121128173
+
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=767806418]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 16.656888220467895
+
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1164650758]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 17.350925229654056
+
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=2076583288]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 18.044962238840217
+
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1228908365]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 18.73899924802638
+
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=887965190]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 19.433036257212542
+
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1333315818]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 20.127073266398703
+
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1762089282]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 20.821110275584868
+
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1956388113]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 21.51514728477103
+
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=665718301]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 22.20918429395719
+
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=830723397]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 22.903221303143354
+
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=906054025]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 23.597258312329515
+
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=171556181]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 24.291295321515676
+
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1340537157]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 24.98533233070184
+
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1627812517]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 25.679369339888005
+
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=264910925]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 26.373406349074166
+
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1620434632]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 27.067443358260324
+
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1623195953]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 27.761480367446488
+
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1432411159]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 28.455517376632653
+
+[node name="Moving_Tread_42" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1493408221]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 29.149554385818814
+
+[node name="Moving_Tread_43" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=888166283]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 29.843591395004974
+
+[node name="Moving_Tread_44" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1030175034]
+material_override = SubResource("StandardMaterial3D_kyfqd")
+mesh = SubResource("BoxMesh_57yas")
+metadata/belt_distance = 30.53762840419114
+
+[node name="@CollisionShape3D@7021" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1843555368]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 shape = SubResource("BoxShape3D_exre5")
 
-[node name="@MeshInstance3D@8508" type="MeshInstance3D" parent="WallLine_Station_South_Gate_Platform_0_1" unique_id=233119444]
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1885006929]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_giy7m")
 mesh = SubResource("BoxMesh_tugkc")
 
-[node name="WallLine_Station_South_Gate_Canopy_0_1" type="StaticBody3D" parent="." unique_id=590387527]
-transform = Transform3D(-0.9995812, 0, -0.028937504, 0, 1, 0, 0.028937504, 0, -0.9995812, -554.10913, -42.51, 203.4714)
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1663753712]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.550529, 1.4, -0.545)
+material_override = SubResource("StandardMaterial3D_3j0yw")
+mesh = SubResource("BoxMesh_k4jev")
+metadata/handrail_distance = 3.550529
 
-[node name="@CollisionShape3D@8509" type="CollisionShape3D" parent="WallLine_Station_South_Gate_Canopy_0_1" unique_id=1400819327]
-shape = SubResource("BoxShape3D_3j0yw")
-
-[node name="@MeshInstance3D@8510" type="MeshInstance3D" parent="WallLine_Station_South_Gate_Canopy_0_1" unique_id=2100617216]
-material_override = SubResource("StandardMaterial3D_k4jev")
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1337738985]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.550529, 1.4, -0.545)
+material_override = SubResource("StandardMaterial3D_3j0yw")
 mesh = SubResource("BoxMesh_2r8ut")
+metadata/handrail_distance = 10.651587009429932
 
-[node name="WallLine_Station_South_Gate_Platform_0_2" type="StaticBody3D" parent="." unique_id=255013649]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -560, -45.95, 203.55666)
-
-[node name="@CollisionShape3D@8511" type="CollisionShape3D" parent="WallLine_Station_South_Gate_Platform_0_2" unique_id=103947730]
+[node name="@CollisionShape3D@7023" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=638489870]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951058, 0.925, -0.545)
 shape = SubResource("BoxShape3D_khjgl")
 
-[node name="@MeshInstance3D@8512" type="MeshInstance3D" parent="WallLine_Station_South_Gate_Platform_0_2" unique_id=301755104]
+[node name="@MeshInstance3D@7024" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1593545614]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951058, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_mx13c")
 mesh = SubResource("BoxMesh_k2s0i")
 
-[node name="WallLine_Station_South_Gate_Canopy_0_2" type="StaticBody3D" parent="." unique_id=1797048116]
-transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -560, -42.51, 203.55666)
-
-[node name="@CollisionShape3D@8513" type="CollisionShape3D" parent="WallLine_Station_South_Gate_Canopy_0_2" unique_id=1656650850]
+[node name="@CollisionShape3D@7025" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1978353477]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951058, 0.925, -0.545)
 shape = SubResource("BoxShape3D_tj1xw")
 
-[node name="@MeshInstance3D@8514" type="MeshInstance3D" parent="WallLine_Station_South_Gate_Canopy_0_2" unique_id=1239443210]
+[node name="@MeshInstance3D@7026" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=973330327]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951058, 0.925, -0.545)
 material_override = SubResource("StandardMaterial3D_inftc")
 mesh = SubResource("BoxMesh_eb0jt")
 
-[node name="WallLine_Station_South_Gate_Platform_0_3" type="StaticBody3D" parent="." unique_id=416967203]
-transform = Transform3D(-0.9995812, 0, 0.028937504, 0, 1, 0, -0.028937504, 0, -0.9995812, -565.89087, -45.95, 203.4714)
-
-[node name="@CollisionShape3D@8515" type="CollisionShape3D" parent="WallLine_Station_South_Gate_Platform_0_3" unique_id=516706965]
+[node name="@CollisionShape3D@7027" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1434908545]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
 shape = SubResource("BoxShape3D_irsjw")
 
-[node name="@MeshInstance3D@8516" type="MeshInstance3D" parent="WallLine_Station_South_Gate_Platform_0_3" unique_id=1787507447]
-material_override = SubResource("StandardMaterial3D_k17jx")
-mesh = SubResource("BoxMesh_d14jm")
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=2113841066]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
+material_override = SubResource("StandardMaterial3D_giy7m")
+mesh = SubResource("BoxMesh_k17jx")
 
-[node name="WallLine_Station_South_Gate_Canopy_0_3" type="StaticBody3D" parent="." unique_id=1057319139]
-transform = Transform3D(-0.9995812, 0, 0.028937504, 0, 1, 0, -0.028937504, 0, -0.9995812, -565.89087, -42.51, 203.4714)
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=373594953]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.550529, 1.4, 0.545)
+material_override = SubResource("StandardMaterial3D_d14jm")
+mesh = SubResource("BoxMesh_5deu1")
+metadata/handrail_distance = 3.550529
 
-[node name="@CollisionShape3D@8517" type="CollisionShape3D" parent="WallLine_Station_South_Gate_Canopy_0_3" unique_id=1943983864]
-shape = SubResource("BoxShape3D_5deu1")
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1904304347]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.550529, 1.4, 0.545)
+material_override = SubResource("StandardMaterial3D_d14jm")
+mesh = SubResource("BoxMesh_7aow2")
+metadata/handrail_distance = 10.651587009429932
 
-[node name="@MeshInstance3D@8518" type="MeshInstance3D" parent="WallLine_Station_South_Gate_Canopy_0_3" unique_id=1863730804]
-material_override = SubResource("StandardMaterial3D_7aow2")
-mesh = SubResource("BoxMesh_udttc")
+[node name="@CollisionShape3D@7029" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=1567807999]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951058, 0.925, 0.545)
+shape = SubResource("BoxShape3D_udttc")
 
-[node name="WallLine_Station_South_Gate_Platform_0_4" type="StaticBody3D" parent="." unique_id=757444609]
-transform = Transform3D(-0.9983249, 0, 0.05785681, 0, 1, 0, -0.05785681, 0, -0.9983249, -571.77673, -45.95, 203.2157)
+[node name="@MeshInstance3D@7030" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=662055979]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951058, 0.925, 0.545)
+material_override = SubResource("StandardMaterial3D_026dk")
+mesh = SubResource("BoxMesh_txnup")
 
-[node name="@CollisionShape3D@8519" type="CollisionShape3D" parent="WallLine_Station_South_Gate_Platform_0_4" unique_id=1990855618]
-shape = SubResource("BoxShape3D_026dk")
+[node name="@CollisionShape3D@7031" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=536632241]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951058, 0.925, 0.545)
+shape = SubResource("BoxShape3D_xe34y")
 
-[node name="@MeshInstance3D@8520" type="MeshInstance3D" parent="WallLine_Station_South_Gate_Platform_0_4" unique_id=390816198]
-material_override = SubResource("StandardMaterial3D_txnup")
-mesh = SubResource("BoxMesh_xe34y")
+[node name="@MeshInstance3D@7032" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Up" unique_id=136246009]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951058, 0.925, 0.545)
+material_override = SubResource("StandardMaterial3D_6ec3e")
+mesh = SubResource("BoxMesh_ni26j")
 
-[node name="WallLine_Station_South_Gate_Canopy_0_4" type="StaticBody3D" parent="." unique_id=873887538]
-transform = Transform3D(-0.9983249, 0, 0.05785681, 0, 1, 0, -0.05785681, 0, -0.9983249, -571.77673, -42.51, 203.2157)
+[node name="SpineAccess_South_Gate_east_1_Down" type="StaticBody3D" parent="." unique_id=1602606456]
+transform = Transform3D(0, 0, 1, -0.49992567, 0.86606836, 0, -0.86606836, -0.49992567, 0, -556.1, -49.35, 162.85)
+script = ExtResource("1_8of4h")
+travel_direction = Vector3(0, -0.49992567, -0.86606836)
+travel_speed = 0.35
+belt_length = 14.202116
+belt_width = 1.2
+belt_thickness = 0.9
 
-[node name="@CollisionShape3D@8521" type="CollisionShape3D" parent="WallLine_Station_South_Gate_Canopy_0_4" unique_id=227923732]
-shape = SubResource("BoxShape3D_6ec3e")
+[node name="@CollisionShape3D@7033" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=647849327]
+shape = SubResource("BoxShape3D_lxnxo")
 
-[node name="@MeshInstance3D@8522" type="MeshInstance3D" parent="WallLine_Station_South_Gate_Canopy_0_4" unique_id=732341893]
-material_override = SubResource("StandardMaterial3D_ni26j")
-mesh = SubResource("BoxMesh_lxnxo")
+[node name="@MeshInstance3D@7034" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1229799052]
+material_override = SubResource("StandardMaterial3D_ggmil")
+mesh = SubResource("BoxMesh_ls1u1")
+
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1514995281]
+material_override = SubResource("StandardMaterial3D_gjnn8")
+mesh = SubResource("ArrayMesh_ce8cr")
+
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1215054845]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 0.0
+
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=923684020]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 0.6940370091861622
+
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=494079639]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 1.3880740183723244
+
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1916994640]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 2.082111027558487
+
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1158141790]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 2.7761480367446487
+
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1161075681]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 3.470185045930811
+
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1328693840]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 4.164222055116974
+
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=2081623830]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 4.858259064303136
+
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=878925372]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 5.552296073489297
+
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1499790944]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 6.24633308267546
+
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=399659127]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 6.940370091861622
+
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1607496682]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 7.634407101047785
+
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=287831077]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 8.328444110233947
+
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1180644640]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 9.022481119420108
+
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1448989879]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 9.716518128606271
+
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=541742715]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 10.410555137792434
+
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=449869125]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 11.104592146978595
+
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=2058073657]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 11.798629156164758
+
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1474777723]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 12.49266616535092
+
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=88695276]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 13.186703174537083
+
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=355517723]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 13.880740183723244
+
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=185532732]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 14.574777192909407
+
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1059910831]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 15.26881420209557
+
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=710697627]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 15.96285121128173
+
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=342340749]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 16.656888220467895
+
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1274871814]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 17.350925229654056
+
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=526247798]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 18.044962238840217
+
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1448555981]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 18.73899924802638
+
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=646077927]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 19.433036257212542
+
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=704831993]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 20.127073266398703
+
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1884461286]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 20.821110275584868
+
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1913988784]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 21.51514728477103
+
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1151736668]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 22.20918429395719
+
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=570342950]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 22.903221303143354
+
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1546255099]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 23.597258312329515
+
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1149682204]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 24.291295321515676
+
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=514332902]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 24.98533233070184
+
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1554776923]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 25.679369339888005
+
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=24959807]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 26.373406349074166
+
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=429258274]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 27.067443358260324
+
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=614642729]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 27.761480367446488
+
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=643826776]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 28.455517376632653
+
+[node name="Moving_Tread_42" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=112963764]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 29.149554385818814
+
+[node name="Moving_Tread_43" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=94247888]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 29.843591395004974
+
+[node name="Moving_Tread_44" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1685507846]
+material_override = SubResource("StandardMaterial3D_q7civ")
+mesh = SubResource("BoxMesh_mpgdv")
+metadata/belt_distance = 30.53762840419114
+
+[node name="@CollisionShape3D@7035" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=757865080]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
+shape = SubResource("BoxShape3D_66mkf")
+
+[node name="EscalatorGlassBalustrade" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=136790542]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, -0.545)
+material_override = SubResource("StandardMaterial3D_8lt78")
+mesh = SubResource("BoxMesh_dvw6j")
+
+[node name="Moving_Rubber_Handrail_-1_0" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1153770207]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.550529, 1.4, -0.545)
+material_override = SubResource("StandardMaterial3D_lf4ec")
+mesh = SubResource("BoxMesh_x7dua")
+metadata/handrail_distance = 3.550529
+
+[node name="Moving_Rubber_Handrail_-1_1" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=684352222]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.550529, 1.4, -0.545)
+material_override = SubResource("StandardMaterial3D_lf4ec")
+mesh = SubResource("BoxMesh_h7ts0")
+metadata/handrail_distance = 10.651587009429932
+
+[node name="@CollisionShape3D@7037" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=2023885430]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951058, 0.925, -0.545)
+shape = SubResource("BoxShape3D_awfav")
+
+[node name="@MeshInstance3D@7038" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=384919493]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951058, 0.925, -0.545)
+material_override = SubResource("StandardMaterial3D_wmpmj")
+mesh = SubResource("BoxMesh_fc0p8")
+
+[node name="@CollisionShape3D@7039" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=960088069]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951058, 0.925, -0.545)
+shape = SubResource("BoxShape3D_d2kb3")
+
+[node name="@MeshInstance3D@7040" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=908300400]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951058, 0.925, -0.545)
+material_override = SubResource("StandardMaterial3D_j352s")
+mesh = SubResource("BoxMesh_7aqme")
+
+[node name="@CollisionShape3D@7041" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1068766682]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
+shape = SubResource("BoxShape3D_k7fnu")
+
+[node name="EscalatorGlassBalustrade2" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1215024555]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.925, 0.545)
+material_override = SubResource("StandardMaterial3D_8lt78")
+mesh = SubResource("BoxMesh_ps6mr")
+
+[node name="Moving_Rubber_Handrail_1_0" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=2008801940]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.550529, 1.4, 0.545)
+material_override = SubResource("StandardMaterial3D_cn3ve")
+mesh = SubResource("BoxMesh_kkxw8")
+metadata/handrail_distance = 3.550529
+
+[node name="Moving_Rubber_Handrail_1_1" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1051010330]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.550529, 1.4, 0.545)
+material_override = SubResource("StandardMaterial3D_cn3ve")
+mesh = SubResource("BoxMesh_4a22q")
+metadata/handrail_distance = 10.651587009429932
+
+[node name="@CollisionShape3D@7043" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1745776183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951058, 0.925, 0.545)
+shape = SubResource("BoxShape3D_0f7id")
+
+[node name="@MeshInstance3D@7044" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=62687890]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.951058, 0.925, 0.545)
+material_override = SubResource("StandardMaterial3D_tp8jj")
+mesh = SubResource("BoxMesh_cw7ca")
+
+[node name="@CollisionShape3D@7045" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=92959899]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951058, 0.925, 0.545)
+shape = SubResource("BoxShape3D_84ccn")
+
+[node name="@MeshInstance3D@7046" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Down" unique_id=1778297027]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.951058, 0.925, 0.545)
+material_override = SubResource("StandardMaterial3D_duetk")
+mesh = SubResource("BoxMesh_ix212")
+
+[node name="SpineAccess_South_Gate_east_1_Landing_0" type="StaticBody3D" parent="." unique_id=1369942383]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -555.5, -53.050003, 156.7)
+
+[node name="@CollisionShape3D@7047" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Landing_0" unique_id=1280561665]
+shape = SubResource("BoxShape3D_kgfnb")
+
+[node name="@MeshInstance3D@7048" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Landing_0" unique_id=238304281]
+material_override = SubResource("StandardMaterial3D_bf367")
+mesh = SubResource("BoxMesh_dq4g6")
+
+[node name="SpineAccess_South_Gate_east_1_Landing_1" type="StaticBody3D" parent="." unique_id=1168032483]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -555.5, -45.95, 169)
+
+[node name="@CollisionShape3D@7049" type="CollisionShape3D" parent="SpineAccess_South_Gate_east_1_Landing_1" unique_id=1149014248]
+shape = SubResource("BoxShape3D_pvfaq")
+
+[node name="@MeshInstance3D@7050" type="MeshInstance3D" parent="SpineAccess_South_Gate_east_1_Landing_1" unique_id=497320810]
+material_override = SubResource("StandardMaterial3D_fnbic")
+mesh = SubResource("BoxMesh_e0n2g")
+
+[node name="SpineBufferStop" type="StaticBody3D" parent="." unique_id=1829197241]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -46.8, 200)
+
+[node name="@CollisionShape3D@7363" type="CollisionShape3D" parent="SpineBufferStop" unique_id=225878809]
+shape = SubResource("BoxShape3D_uh512")
+
+[node name="@MeshInstance3D@7364" type="MeshInstance3D" parent="SpineBufferStop" unique_id=1755004930]
+material_override = SubResource("StandardMaterial3D_2v2gc")
+mesh = SubResource("BoxMesh_e7uyq")
+
+[node name="WallLine_Track_62" type="StaticBody3D" parent="." unique_id=2010194167]
+transform = Transform3D(-0.9913703, 0, 0.13109124, 0, 1, 0, -0.13109124, 0, -0.9913703, -587.345, -46.8, 207.70001)
+
+[node name="@CollisionShape3D@7985" type="CollisionShape3D" parent="WallLine_Track_62" unique_id=92442719]
+shape = SubResource("BoxShape3D_qonak")
+
+[node name="@MeshInstance3D@7986" type="MeshInstance3D" parent="WallLine_Track_62" unique_id=861926234]
+material_override = SubResource("StandardMaterial3D_6gjhx")
+mesh = SubResource("BoxMesh_ffg7s")
+
+[node name="WallLine_Rail_62_0_-1" type="StaticBody3D" parent="." unique_id=359209021]
+transform = Transform3D(-0.99144435, 0, 0.13052987, 0, 1, 0, -0.13052987, 0, -0.99144435, -587.1514, -46.7, 206.22993)
+
+[node name="@CollisionShape3D@7987" type="CollisionShape3D" parent="WallLine_Rail_62_0_-1" unique_id=1697238947]
+shape = SubResource("BoxShape3D_snv7d")
+
+[node name="@MeshInstance3D@7988" type="MeshInstance3D" parent="WallLine_Rail_62_0_-1" unique_id=920063872]
+material_override = SubResource("StandardMaterial3D_pkk6y")
+mesh = SubResource("BoxMesh_6jmxt")
+
+[node name="WallLine_Rail_62_0_1" type="StaticBody3D" parent="." unique_id=564496897]
+transform = Transform3D(-0.99144435, 0, 0.13052987, 0, 1, 0, -0.13052987, 0, -0.99144435, -586.9642, -46.7, 204.8072)
+
+[node name="@CollisionShape3D@7989" type="CollisionShape3D" parent="WallLine_Rail_62_0_1" unique_id=1910750722]
+shape = SubResource("BoxShape3D_5fnsu")
+
+[node name="@MeshInstance3D@7990" type="MeshInstance3D" parent="WallLine_Rail_62_0_1" unique_id=837818464]
+material_override = SubResource("StandardMaterial3D_604a3")
+mesh = SubResource("BoxMesh_v8ydy")
+
+[node name="WallLine_Rail_62_1_-1" type="StaticBody3D" parent="." unique_id=1798099949]
+transform = Transform3D(-0.99144393, 0, 0.13053317, 0, 1, 0, -0.13053317, 0, -0.99144393, -587.5952, -46.7, 209.60071)
+
+[node name="@CollisionShape3D@7991" type="CollisionShape3D" parent="WallLine_Rail_62_1_-1" unique_id=754794985]
+shape = SubResource("BoxShape3D_qa7fp")
+
+[node name="@MeshInstance3D@7992" type="MeshInstance3D" parent="WallLine_Rail_62_1_-1" unique_id=1959337648]
+material_override = SubResource("StandardMaterial3D_e0kip")
+mesh = SubResource("BoxMesh_ik5fy")
+
+[node name="WallLine_Rail_62_1_1" type="StaticBody3D" parent="." unique_id=1352736863]
+transform = Transform3D(-0.99144393, 0, 0.13053317, 0, 1, 0, -0.13053317, 0, -0.99144393, -587.40796, -46.7, 208.17798)
+
+[node name="@CollisionShape3D@7993" type="CollisionShape3D" parent="WallLine_Rail_62_1_1" unique_id=1229587595]
+shape = SubResource("BoxShape3D_hy0iq")
+
+[node name="@MeshInstance3D@7994" type="MeshInstance3D" parent="WallLine_Rail_62_1_1" unique_id=1319627456]
+material_override = SubResource("StandardMaterial3D_2qwjc")
+mesh = SubResource("BoxMesh_g5b40")
+
+[node name="WallLine_Track_63" type="StaticBody3D" parent="." unique_id=1583801378]
+transform = Transform3D(-0.9889965, 0, 0.14793889, 0, 1, 0, -0.14793889, 0, -0.9889965, -590.96497, -46.8, 207.19)
+
+[node name="@CollisionShape3D@7995" type="CollisionShape3D" parent="WallLine_Track_63" unique_id=1595270805]
+shape = SubResource("BoxShape3D_w7va8")
+
+[node name="@MeshInstance3D@7996" type="MeshInstance3D" parent="WallLine_Track_63" unique_id=2125898749]
+material_override = SubResource("StandardMaterial3D_2flco")
+mesh = SubResource("BoxMesh_ijcaa")
+
+[node name="WallLine_Rail_63_0_-1" type="StaticBody3D" parent="." unique_id=1159608224]
+transform = Transform3D(-0.9890163, 0, 0.14780661, 0, 1, 0, -0.14780661, 0, -0.9890163, -590.7461, -46.7, 205.7248)
+
+[node name="@CollisionShape3D@7997" type="CollisionShape3D" parent="WallLine_Rail_63_0_-1" unique_id=1897902656]
+shape = SubResource("BoxShape3D_nh0h4")
+
+[node name="@MeshInstance3D@7998" type="MeshInstance3D" parent="WallLine_Rail_63_0_-1" unique_id=649985154]
+material_override = SubResource("StandardMaterial3D_wcy1p")
+mesh = SubResource("BoxMesh_mhwjn")

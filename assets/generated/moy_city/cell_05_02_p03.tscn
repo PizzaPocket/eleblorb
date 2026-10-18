@@ -1,423 +1,1278 @@
-[gd_scene format=3]
+[gd_scene format=4]
 
-[ext_resource type="Script" path="res://scripts/moy_hotel_lift.gd" id="1_pxxt6"]
+[ext_resource type="Script" path="res://scripts/moy_hotel_windrose.gd" id="1_pxxt6"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_nl386"]
-size = Vector3(32, 1.05, 0.12)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lmc5m"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nl386"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_wj2ve"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_lmc5m"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_y85al"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_wj2ve"]
+height = 4.5
+radius = 0.12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8xu82"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y85al"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_a0dt2"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_8xu82"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_kdrnc"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_a0dt2"]
+height = 4.5
+radius = 0.12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tax1t"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kdrnc"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_fh2vv"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_tax1t"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_7d8ry"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_fh2vv"]
+height = 4.5
+radius = 0.12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_511jw"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7d8ry"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_yhy5r"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_511jw"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_npugi"]
-size = Vector3(6, 0.3, 12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_yhy5r"]
+height = 4.5
+radius = 0.12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8ocxp"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_npugi"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_avabh"]
-size = Vector3(6, 0.3, 12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_8ocxp"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_4ouqk"]
-size = Vector3(17.5, 1.1, 1)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_avabh"]
+height = 4.5
+radius = 0.12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t8avk"]
-albedo_color = Color(0.46666667, 0.48235294, 0.47058824, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4ouqk"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_fuce1"]
-size = Vector3(17.5, 1.1, 1)
+[sub_resource type="CylinderMesh" id="CylinderMesh_t8avk"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_sl7oh"]
-size = Vector3(1.2, 16, 1.2)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_fuce1"]
+height = 4.5
+radius = 0.12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_urdtg"]
-albedo_color = Color(0.9098039, 0.85882354, 0.65882355, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sl7oh"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_4uy74"]
-size = Vector3(1.2, 16, 1.2)
+[sub_resource type="CylinderMesh" id="CylinderMesh_urdtg"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_4uy74"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u6j2f"]
-albedo_color = Color(1, 0.9411765, 0.73333335, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_1aq8s"]
-size = Vector3(0.22, 0.28, 0.22)
+[sub_resource type="CylinderMesh" id="CylinderMesh_1aq8s"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="MultiMesh" id="MultiMesh_bn200"]
-transform_format = 1
-instance_count = 300
-mesh = SubResource("BoxMesh_1aq8s")
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_bn200"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xtwvl"]
-albedo_color = Color(0.654902, 0.7411765, 0.76862746, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_mn1mt"]
-size = Vector3(2.6, 0.25, 3.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_mn1mt"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_pqwhk"]
-size = Vector3(2.6, 0.25, 3.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_pqwhk"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x6vmc"]
-transparency = 1
-albedo_color = Color(0.38, 0.65, 0.72, 0.25)
-
-[sub_resource type="BoxMesh" id="BoxMesh_c56uu"]
-size = Vector3(0.08, 2.7, 3.4)
-
-[sub_resource type="BoxMesh" id="BoxMesh_vb2e8"]
-size = Vector3(0.08, 2.7, 3.4)
-
-[sub_resource type="BoxMesh" id="BoxMesh_233qu"]
-size = Vector3(2.6, 2.7, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hn1a7"]
-albedo_color = Color(0.654902, 0.7411765, 0.76862746, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_wun16"]
-size = Vector3(2.6, 0.25, 3.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_c56uu"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_berte"]
-size = Vector3(2.6, 0.25, 3.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_vb2e8"]
+height = 4.5
+radius = 0.12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0ox7h"]
-transparency = 1
-albedo_color = Color(0.38, 0.65, 0.72, 0.25)
-
-[sub_resource type="BoxMesh" id="BoxMesh_sly6j"]
-size = Vector3(0.08, 2.7, 3.4)
-
-[sub_resource type="BoxMesh" id="BoxMesh_igj2c"]
-size = Vector3(0.08, 2.7, 3.4)
-
-[sub_resource type="BoxMesh" id="BoxMesh_sfcdw"]
-size = Vector3(2.6, 2.7, 0.08)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o6s6g"]
-albedo_color = Color(0.654902, 0.7411765, 0.76862746, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_233qu"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_o3eiv"]
-size = Vector3(2.6, 0.25, 3.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_hn1a7"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_y23t5"]
-size = Vector3(2.6, 0.25, 3.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_wun16"]
+height = 4.5
+radius = 0.12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_478bt"]
-transparency = 1
-albedo_color = Color(0.38, 0.65, 0.72, 0.25)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_berte"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_kqxrr"]
-size = Vector3(0.08, 2.7, 3.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_0ox7h"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxMesh" id="BoxMesh_xhdm8"]
-size = Vector3(0.08, 2.7, 3.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_sly6j"]
+height = 4.5
+radius = 0.12
 
-[sub_resource type="BoxMesh" id="BoxMesh_vnimy"]
-size = Vector3(2.6, 2.7, 0.08)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_igj2c"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_sfcdw"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_o6s6g"]
+height = 4.5
+radius = 0.12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o3eiv"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_y23t5"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_478bt"]
+height = 4.5
+radius = 0.12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kqxrr"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_xhdm8"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_vnimy"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i36ij"]
-albedo_color = Color(0.654902, 0.7411765, 0.76862746, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_laesm"]
-size = Vector3(2.6, 0.25, 3.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_laesm"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_0vk5j"]
-size = Vector3(2.6, 0.25, 3.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_0vk5j"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h4703"]
-transparency = 1
-albedo_color = Color(0.38, 0.65, 0.72, 0.25)
-
-[sub_resource type="BoxMesh" id="BoxMesh_uj0tj"]
-size = Vector3(0.08, 2.7, 3.4)
-
-[sub_resource type="BoxMesh" id="BoxMesh_5j7vt"]
-size = Vector3(0.08, 2.7, 3.4)
-
-[sub_resource type="BoxMesh" id="BoxMesh_nbkg7"]
-size = Vector3(2.6, 2.7, 0.08)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_leus2"]
-size = Vector3(16, 0.3, 10)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tqb4k"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_tlmrm"]
-size = Vector3(16, 0.3, 10)
+[sub_resource type="CylinderMesh" id="CylinderMesh_uj0tj"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_7queu"]
-size = Vector3(0.2, 3, 10)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_5j7vt"]
+height = 4.5
+radius = 0.12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_av8n1"]
-albedo_color = Color(0.9019608, 0.85490197, 0.75686276, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nbkg7"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_v2d2b"]
-size = Vector3(0.2, 3, 10)
+[sub_resource type="CylinderMesh" id="CylinderMesh_leus2"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_k8qgd"]
-size = Vector3(0.2, 3, 10)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_tqb4k"]
+height = 4.5
+radius = 0.12
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ob104"]
-albedo_color = Color(0.9019608, 0.85490197, 0.75686276, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tlmrm"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_b6pqv"]
-size = Vector3(0.2, 3, 10)
+[sub_resource type="CylinderMesh" id="CylinderMesh_7queu"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[node name="MoyCell_05_02_Part_03" type="Node3D" unique_id=69160537]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_av8n1"]
+height = 4.5
+radius = 0.12
 
-[node name="Building_1_GrandHotel_Part_02" type="Node3D" parent="." unique_id=1847150484]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v2d2b"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_k8qgd"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ob104"]
+height = 4.5
+radius = 0.12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b6pqv"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_7eia7"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_pg16b"]
+height = 4.5
+radius = 0.12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dvtm6"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_s3oyw"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_f7ci0"]
+height = 4.5
+radius = 0.12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ggice"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_xrvcj"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_dpw2p"]
+height = 4.5
+radius = 0.12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gpyvq"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_uu78o"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_8ca36"]
+height = 4.5
+radius = 0.12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nuba4"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_obc46"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_6hvnj"]
+height = 4.5
+radius = 0.12
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_llopb"]
+albedo_color = Color(0.6431373, 0.6666667, 0.63529414, 1)
+roughness = 0.92
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_p2p1h"]
+_surfaces = [{
+"aabb": AABB(-16, -0.08, -16, 32, 0.16, 32),
+"format": 34359738369,
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 1536,
+"vertex_data": PackedByteArray("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mWciQQrXo70D5EVBe+QIQQrXo73G30xB2jkOQQrXo70x21RBmWciQQrXoz0D5EVBmWciQQrXo70D5EVB2jkOQQrXo70x21RBmWciQQrXoz0D5EVB2jkOQQrXo70x21RB2jkOQQrXoz0x21RBg1AcQQrXo71DeD5Bg1AcQQrXoz1DeD5Be+QIQQrXoz3G30xBg1AcQQrXo71DeD5Be+QIQQrXoz3G30xBe+QIQQrXo73G30xBe+QIQQrXoz3G30xB2jkOQQrXoz0x21RB6lrxQArXoz2YxWFBe+QIQQrXoz3G30xB6lrxQArXoz2YxWFB503oQArXoz0vTllB2jkOQQrXo70x21RBe+QIQQrXo73G30xB503oQArXo70vTllB2jkOQQrXo70x21RB503oQArXo70vTllB6lrxQArXo72YxWFB2jkOQQrXoz0x21RB2jkOQQrXo70x21RB6lrxQArXo72YxWFB2jkOQQrXoz0x21RB6lrxQArXo72YxWFB6lrxQArXoz2YxWFBe+QIQQrXo73G30xBe+QIQQrXoz3G30xB503oQArXoz0vTllBe+QIQQrXo73G30xB503oQArXoz0vTllB503oQArXo70vTllB503oQArXoz0vTllB6lrxQArXoz2YxWFBFe/DQArXoz1eg2xB503oQArXoz0vTllBFe/DQArXoz1eg2xBHpa8QArXoz3YpGNB6lrxQArXo72YxWFB503oQArXo70vTllBHpa8QArXo73YpGNB6lrxQArXo72YxWFBHpa8QArXo73YpGNBFe/DQArXo71eg2xB6lrxQArXoz2YxWFB6lrxQArXo72YxWFBFe/DQArXo71eg2xB6lrxQArXoz2YxWFBFe/DQArXo71eg2xBFe/DQArXoz1eg2xB503oQArXo70vTllB503oQArXoz0vTllBHpa8QArXoz3YpGNB503oQArXo70vTllBHpa8QArXoz3YpGNBHpa8QArXo73YpGNBHpa8QArXoz3YpGNBFe/DQArXoz1eg2xBMaCUQArXoz0L+nRBHpa8QArXoz3YpGNBMaCUQArXoz0L+nRBYw2PQArXoz1EymtBFe/DQArXo71eg2xBHpa8QArXo73YpGNBYw2PQArXo71EymtBFe/DQArXo71eg2xBYw2PQArXo71EymtBMaCUQArXo70L+nRB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8UdAwArXo71eqnFB8UdAwArXoz1eqnFBYw2PwArXoz1EymtB8UdAwArXo71eqnFBYw2PwArXoz1EymtBYw2PwArXo71EymtBYw2PwArXoz1EymtBMaCUwArXoz0L+nRBFe/DwArXoz1eg2xBYw2PwArXoz1EymtBFe/DwArXoz1eg2xBHpa8wArXoz3YpGNBMaCUwArXo70L+nRBYw2PwArXo71EymtBHpa8wArXo73YpGNBMaCUwArXo70L+nRBHpa8wArXo73YpGNBFe/DwArXo71eg2xBMaCUwArXoz0L+nRBMaCUwArXo70L+nRBFe/DwArXo71eg2xBMaCUwArXoz0L+nRBFe/DwArXo71eg2xBFe/DwArXoz1eg2xBYw2PwArXo71EymtBYw2PwArXoz1EymtBHpa8wArXoz3YpGNBYw2PwArXo71EymtBHpa8wArXoz3YpGNBHpa8wArXo73YpGNBHpa8wArXoz3YpGNBFe/DwArXoz1eg2xB6lrxwArXoz2YxWFBHpa8wArXoz3YpGNB6lrxwArXoz2YxWFB503owArXoz0vTllBFe/DwArXo71eg2xBHpa8wArXo73YpGNB503owArXo70vTllBFe/DwArXo71eg2xB503owArXo70vTllB6lrxwArXo72YxWFBFe/DwArXoz1eg2xBFe/DwArXo71eg2xB6lrxwArXo72YxWFBFe/DwArXoz1eg2xB6lrxwArXo72YxWFB6lrxwArXoz2YxWFBHpa8wArXo73YpGNBHpa8wArXoz3YpGNB503owArXoz0vTllBHpa8wArXo73YpGNB503owArXoz0vTllB503owArXo70vTllB503owArXoz0vTllB6lrxwArXoz2YxWFB2jkOwQrXoz0x21RB503owArXoz0vTllB2jkOwQrXoz0x21RBe+QIwQrXoz3G30xB6lrxwArXo72YxWFB503owArXo70vTllBe+QIwQrXo73G30xB6lrxwArXo72YxWFBe+QIwQrXo73G30xB2jkOwQrXo70x21RB6lrxwArXoz2YxWFB6lrxwArXo72YxWFB2jkOwQrXo70x21RB6lrxwArXoz2YxWFB2jkOwQrXo70x21RB2jkOwQrXoz0x21RB503owArXo70vTllB503owArXoz0vTllBe+QIwQrXoz3G30xB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8wQ1wQrXoz3zBDXBmWciwQrXo70D5EXBmWciwQrXoz0D5EXBKjsuwQrXo70qOy7BKjsuwQrXoz0qOy7Bg1AcwQrXoz1DeD7BKjsuwQrXo70qOy7Bg1AcwQrXoz1DeD7Bg1AcwQrXo71DeD7Bg1AcwQrXoz1DeD7BmWciwQrXoz0D5EXB2jkOwQrXoz0x21TBg1AcwQrXoz1DeD7B2jkOwQrXoz0x21TBe+QIwQrXoz3G30zBmWciwQrXo70D5EXBg1AcwQrXo71DeD7Be+QIwQrXo73G30zBmWciwQrXo70D5EXBe+QIwQrXo73G30zB2jkOwQrXo70x21TBmWciwQrXoz0D5EXBmWciwQrXo70D5EXB2jkOwQrXo70x21TBmWciwQrXoz0D5EXB2jkOwQrXo70x21TB2jkOwQrXoz0x21TBg1AcwQrXo71DeD7Bg1AcwQrXoz1DeD7Be+QIwQrXoz3G30zBg1AcwQrXo71DeD7Be+QIwQrXoz3G30zBe+QIwQrXo73G30zBe+QIwQrXoz3G30zB2jkOwQrXoz0x21TB6lrxwArXoz2YxWHBe+QIwQrXoz3G30zB6lrxwArXoz2YxWHB503owArXoz0vTlnB2jkOwQrXo70x21TBe+QIwQrXo73G30zB503owArXo70vTlnB2jkOwQrXo70x21TB503owArXo70vTlnB6lrxwArXo72YxWHB2jkOwQrXoz0x21TB2jkOwQrXo70x21TB6lrxwArXo72YxWHB2jkOwQrXoz0x21TB6lrxwArXo72YxWHB6lrxwArXoz2YxWHBe+QIwQrXo73G30zBe+QIwQrXoz3G30zB503owArXoz0vTlnBe+QIwQrXo73G30zB503owArXoz0vTlnB503owArXo70vTlnB503owArXoz0vTlnB6lrxwArXoz2YxWHBFe/DwArXoz1eg2zB503owArXoz0vTlnBFe/DwArXoz1eg2zBHpa8wArXoz3YpGPB6lrxwArXo72YxWHB503owArXo70vTlnBHpa8wArXo73YpGPB6lrxwArXo72YxWHBHpa8wArXo73YpGPBFe/DwArXo71eg2zB6lrxwArXoz2YxWHB6lrxwArXo72YxWHBFe/DwArXo71eg2zB6lrxwArXoz2YxWHBFe/DwArXo71eg2zBFe/DwArXoz1eg2zB503owArXo70vTlnB503owArXoz0vTlnBHpa8wArXoz3YpGPB503owArXo70vTlnBHpa8wArXoz3YpGPBHpa8wArXo73YpGPBHpa8wArXoz3YpGPBFe/DwArXoz1eg2zBMaCUwArXoz0L+nTBHpa8wArXoz3YpGPBMaCUwArXoz0L+nTBYw2PwArXoz1EymvBFe/DwArXo71eg2zBHpa8wArXo73YpGPBYw2PwArXo71EymvBFe/DwArXo71eg2zBYw2PwArXo71EymvBMaCUwArXo70L+nTBFe/DwArXoz1eg2zBFe/DwArXo71eg2zBMaCUwArXo70L+nTBFe/DwArXoz1eg2zBMaCUwArXo70L+nTBMaCUwArXoz0L+nTBHpa8wArXo73YpGPBHpa8wArXoz3YpGPBYw2PwArXoz1EymvBHpa8wArXo73YpGPBYw2PwArXoz1EymvBYw2PwArXo71EymvBYw2PwArXoz1EymvBMaCUwArXoz0L+nTBwsVHwArXoz2+FHvBYw2PwArXoz1EymvBwsVHwArXoz2+FHvB8UdAwArXoz1eqnHBMaCUwArXo70L+nTBYw2PwArXo71EymvB8UdAwArXo71eqnHBMaCUwArXo70L+nTB8UdAwArXo71eqnHBwsVHwArXo72+FHvBMaCUwArXoz0L+nTBMaCUwArXo70L+nTBwsVHwArXo72+FHvBMaCUwArXoz0L+nTBwsVHwArXo72+FHvBwsVHwArXoz2+FHvBYw2PwArXo71EymvBYw2PwArXoz1EymvB8UdAwArXoz1eqnHBYw2PwArXo71EymvB8UdAwArXoz1eqnHB8UdAwArXo71eqnHB8UdAwArXoz1eqnHBwsVHwArXoz2+FHvBNr3IvwrXoz1txH7B8UdAwArXoz1eqnHBNr3IvwrXoz1txH7BHTbBvwrXoz2pNnXBwsVHwArXo72+FHvB8UdAwArXo71eqnHBHTbBvwrXo72pNnXBwsVHwArXo72+FHvBHTbBvwrXo72pNnXBNr3IvwrXo71txH7BwsVHwArXoz2+FHvBwsVHwArXo72+FHvBNr3IvwrXo71txH7BwsVHwArXoz2+FHvBNr3IvwrXo71txH7BNr3IvwrXoz1txH7B8UdAwArXo71eqnHB8UdAwArXoz1eqnHBHTbBvwrXoz2pNnXB8UdAwArXo71eqnHBHTbBvwrXoz2pNnXBHTbBvwrXo72pNnXBHTbBvwrXoz2pNnXBNr3IvwrXoz1txH7ByslTpwrXoz0AAIDBHTbBvwrXoz2pNnXByslTpwrXoz0AAIDBoNhLpwrXoz1mZnbBNr3IvwrXo71txH7BHTbBvwrXo72pNnXBoNhLpwrXo71mZnbBNr3IvwrXo71txH7BoNhLpwrXo71mZnbByslTpwrXo70AAIDBNr3IvwrXoz1txH7BNr3IvwrXo71txH7ByslTpwrXo70AAIDBNr3IvwrXoz1txH7ByslTpwrXo70AAIDByslTpwrXoz0AAIDBHTbBvwrXo72pNnXBHTbBvwrXoz2pNnXBoNhLpwrXoz1mZnbBHTbBvwrXo72pNnXBoNhLpwrXoz1mZnbBoNhLpwrXo71mZnbBoNhLpwrXoz1mZnbByslTpwrXoz0AAIDBNr3IPwrXoz1txH7BoNhLpwrXoz1mZnbBNr3IPwrXoz1txH7BHTbBPwrXoz2pNnXByslTpwrXo70AAIDBoNhLpwrXo71mZnbBHTbBPwrXo72pNnXByslTpwrXo70AAIDBHTbBPwrXo72pNnXBNr3IPwrXo71txH7ByslTpwrXoz0AAIDByslTpwrXo70AAIDBNr3IPwrXo71txH7ByslTpwrXoz0AAIDBNr3IPwrXo71txH7BNr3IPwrXoz1txH7BoNhLpwrXo71mZnbBoNhLpwrXoz1mZnbBHTbBPwrXoz2pNnXBoNhLpwrXo71mZnbBHTbBPwrXoz2pNnXBHTbBPwrXo72pNnXBHTbBPwrXoz2pNnXBNr3IPwrXoz1txH7BwsVHQArXoz2+FHvBHTbBPwrXoz2pNnXBwsVHQArXoz2+FHvB8UdAQArXoz1eqnHBNr3IPwrXo71txH7BHTbBPwrXo72pNnXB8UdAQArXo71eqnHBNr3IPwrXo71txH7B8UdAQArXo71eqnHBwsVHQArXo72+FHvBNr3IPwrXoz1txH7BNr3IPwrXo71txH7BwsVHQArXo72+FHvBNr3IPwrXoz1txH7BwsVHQArXo72+FHvBwsVHQArXoz2+FHvBHTbBPwrXo72pNnXBHTbBPwrXoz2pNnXB8UdAQArXoz1eqnHBHTbBPwrXo72pNnXB8UdAQArXoz1eqnHB8UdAQArXo71eqnHB8UdAQArXoz1eqnHBwsVHQArXoz2+FHvBMaCUQArXoz0L+nTB8UdAQArXoz1eqnHBMaCUQArXoz0L+nTBYw2PQArXoz1EymvBwsVHQArXo72+FHvB8UdAQArXo71eqnHBYw2PQArXo71EymvBwsVHQArXo72+FHvBYw2PQArXo71EymvBMaCUQArXo70L+nTBwsVHQArXoz2+FHvBwsVHQArXo72+FHvBMaCUQArXo70L+nTBwsVHQArXoz2+FHvBMaCUQArXo70L+nTBMaCUQArXoz0L+nTB8UdAQArXo71eqnHB8UdAQArXoz1eqnHBYw2PQArXoz1EymvB8UdAQArXo71eqnHBYw2PQArXoz1EymvBYw2PQArXo71EymvBYw2PQArXoz1EymvBMaCUQArXoz0L+nTBFe/DQArXoz1eg2zBYw2PQArXoz1EymvBFe/DQArXoz1eg2zBHpa8QArXoz3YpGPBMaCUQArXo70L+nTBYw2PQArXo71EymvBHpa8QArXo73YpGPBMaCUQArXo70L+nTBHpa8QArXo73YpGPBFe/DQArXo71eg2zBMaCUQArXoz0L+nTBMaCUQArXo70L+nTBFe/DQArXo71eg2zBMaCUQArXoz0L+nTBFe/DQArXo71eg2zBFe/DQArXoz1eg2zBYw2PQArXo71EymvBYw2PQArXoz1EymvBHpa8QArXoz3YpGPBYw2PQArXo71EymvBHpa8QArXoz3YpGPBHpa8QArXo73YpGPBHpa8QArXoz3YpGPBFe/DQArXoz1eg2zB6lrxQArXoz2YxWHBHpa8QArXoz3YpGPB6lrxQArXoz2YxWHB503oQArXoz0vTlnBFe/DQArXo71eg2zBHpa8QArXo73YpGPB503oQArXo70vTlnBFe/DQArXo71eg2zB503oQArXo70vTlnB6lrxQArXo72YxWHBFe/DQArXoz1eg2zBFe/DQArXo71eg2zB6lrxQArXo72YxWHBFe/DQArXoz1eg2zB6lrxQArXo72YxWHB6lrxQArXoz2YxWHBHpa8QArXo73YpGPBHpa8QArXoz3YpGPB503oQArXoz0vTlnBHpa8QArXo73YpGPB503oQArXoz0vTlnB503oQArXo70vTlnB503oQArXoz0vTlnB6lrxQArXoz2YxWHB2jkOQQrXoz0x21TB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")
+}]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vl3m8"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_tg7d6"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_qdnpx"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2p5x8"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_0hv5m"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_pdd2o"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4i5mw"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_dioe7"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_cr6ms"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nm4y5"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_bhmbj"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_tbh3c"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0qfgr"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_18wjq"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_gs3xa"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r0b2u"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_hrnv3"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_nhg3b"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ive8y"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_j6upq"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ca1ob"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m0iba"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_wkaso"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_6ev28"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nerjk"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_s6j54"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_8m7ib"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cutwy"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ngcao"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_0prbo"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8th2r"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_jjphy"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_e17sn"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_joqh5"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1hkd6"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_nwtt2"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lh1he"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_dfoq6"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_mbyc8"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8afjs"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_d35n6"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_td0ji"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tojwu"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_nyl74"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_0e4v5"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_femyr"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_6qdhs"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_01g1x"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dvkvu"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1tmy5"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_pupbj"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sm1if"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_52yx2"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ygrxu"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mi8x1"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_k7nkv"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_w2lhc"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r87hc"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_b7wt4"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_d6hch"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_odiid"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_jf0wg"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_prrr5"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y0stv"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_c7ski"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_6cs30"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r3gxg"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_7p6d1"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_js3ne"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bfcnq"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_uturg"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_4qfed"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1jxkt"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_oqpvp"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_3g00y"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yxyoj"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_gr6as"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_tks0i"]
+height = 7.0
+radius = 0.22
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_03pvx"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
+roughness = 0.92
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_t0ajf"]
+top_radius = 0.22
+bottom_radius = 0.22
+height = 7.0
+radial_segments = 12
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_bvuca"]
+height = 7.0
+radius = 0.22
+
+[node name="MoyCell_05_02_Part_03" type="Node3D" unique_id=1806939167]
+
+[node name="Building_1_GrandHotel_Part_03" type="Node3D" parent="." unique_id=23076605]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -457, -60, -68)
 
-[node name="HotelGalleryVoidRail_10" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1297478860]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 41.825, -0.8)
+[node name="HotelWindroseMullion_15" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1137614295]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.228856, 103.25, -4.7711444)
 
-[node name="@CollisionShape3D@1083" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelGalleryVoidRail_10" unique_id=2138193133]
-shape = SubResource("BoxShape3D_nl386")
+[node name="@MeshInstance3D@1047" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_15" unique_id=1042181263]
+material_override = SubResource("StandardMaterial3D_nl386")
+mesh = SubResource("CylinderMesh_lmc5m")
 
-[node name="@MeshInstance3D@1084" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelGalleryVoidRail_10" unique_id=815892860]
-material_override = SubResource("StandardMaterial3D_lmc5m")
-mesh = SubResource("BoxMesh_wj2ve")
+[node name="@CollisionShape3D@1048" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_15" unique_id=480592648]
+shape = SubResource("CylinderShape3D_wj2ve")
 
-[node name="@StaticBody3D@1087" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=43159470]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 41.825, 25.2)
+[node name="HotelWindroseMullion_16" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1918446050]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.84719, 103.25, -6.6659703)
 
-[node name="@CollisionShape3D@1085" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1087" unique_id=64409186]
-shape = SubResource("BoxShape3D_y85al")
+[node name="@MeshInstance3D@1049" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_16" unique_id=1371371229]
+material_override = SubResource("StandardMaterial3D_y85al")
+mesh = SubResource("CylinderMesh_8xu82")
 
-[node name="@MeshInstance3D@1086" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1087" unique_id=1399838232]
-material_override = SubResource("StandardMaterial3D_8xu82")
-mesh = SubResource("BoxMesh_a0dt2")
+[node name="@CollisionShape3D@1050" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_16" unique_id=56124714]
+shape = SubResource("CylinderShape3D_a0dt2")
 
-[node name="@StaticBody3D@1090" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1047873606]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -16, 41.825, 12.200001)
+[node name="HotelWindroseMullion_17" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1467079950]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.149183, 103.25, -8.790631)
 
-[node name="@CollisionShape3D@1088" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1090" unique_id=988103617]
-shape = SubResource("BoxShape3D_kdrnc")
+[node name="@MeshInstance3D@1051" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_17" unique_id=1949000516]
+material_override = SubResource("StandardMaterial3D_kdrnc")
+mesh = SubResource("CylinderMesh_tax1t")
 
-[node name="@MeshInstance3D@1089" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1090" unique_id=1045358336]
-material_override = SubResource("StandardMaterial3D_tax1t")
-mesh = SubResource("BoxMesh_fh2vv")
+[node name="@CollisionShape3D@1052" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_17" unique_id=672357683]
+shape = SubResource("CylinderShape3D_fh2vv")
 
-[node name="@StaticBody3D@1093" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=598626580]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 16, 41.825, 12.200001)
+[node name="HotelWindroseMullion_18" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=392831299]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.1027775, 103.25, -11.09281)
 
-[node name="@CollisionShape3D@1091" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1093" unique_id=455097701]
-shape = SubResource("BoxShape3D_7d8ry")
+[node name="@MeshInstance3D@1053" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_18" unique_id=69003066]
+material_override = SubResource("StandardMaterial3D_7d8ry")
+mesh = SubResource("CylinderMesh_511jw")
 
-[node name="@MeshInstance3D@1092" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1093" unique_id=1836641451]
-material_override = SubResource("StandardMaterial3D_511jw")
-mesh = SubResource("BoxMesh_yhy5r")
+[node name="@CollisionShape3D@1054" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_18" unique_id=622500163]
+shape = SubResource("CylinderShape3D_yhy5r")
 
-[node name="HotelDeckDoorSkybridgeLanding" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=993249200]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 6.35, 24)
+[node name="HotelWindroseMullion_19" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=74488054]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.684491, 103.25, -13.5158205)
 
-[node name="@CollisionShape3D@1094" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelDeckDoorSkybridgeLanding" unique_id=582608817]
-shape = SubResource("BoxShape3D_npugi")
+[node name="@MeshInstance3D@1055" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_19" unique_id=1939228504]
+material_override = SubResource("StandardMaterial3D_npugi")
+mesh = SubResource("CylinderMesh_8ocxp")
 
-[node name="@MeshInstance3D@1095" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelDeckDoorSkybridgeLanding" unique_id=666410821]
-material_override = SubResource("StandardMaterial3D_8ocxp")
-mesh = SubResource("BoxMesh_avabh")
+[node name="@CollisionShape3D@1056" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_19" unique_id=352632298]
+shape = SubResource("CylinderShape3D_avabh")
 
-[node name="HotelChandelierArm" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=37693009]
-transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0, 43.2, -1.75)
+[node name="HotelWindroseMullion_20" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=2097741072]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.88, 103.25, -16)
 
-[node name="@CollisionShape3D@1096" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelChandelierArm" unique_id=390317310]
-shape = SubResource("BoxShape3D_4ouqk")
+[node name="@MeshInstance3D@1057" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_20" unique_id=1698292104]
+material_override = SubResource("StandardMaterial3D_4ouqk")
+mesh = SubResource("CylinderMesh_t8avk")
 
-[node name="@MeshInstance3D@1097" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelChandelierArm" unique_id=531038451]
-material_override = SubResource("StandardMaterial3D_t8avk")
-mesh = SubResource("BoxMesh_fuce1")
+[node name="@CollisionShape3D@1058" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_20" unique_id=58171747]
+shape = SubResource("CylinderShape3D_fuce1")
 
-[node name="HotelChandelierCore" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=684979358]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 23, 7)
+[node name="HotelWindroseMullion_21" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=974829841]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.684491, 103.25, -18.484179)
 
-[node name="@CollisionShape3D@1098" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelChandelierCore" unique_id=2090678872]
-shape = SubResource("BoxShape3D_sl7oh")
+[node name="@MeshInstance3D@1059" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_21" unique_id=1905929663]
+material_override = SubResource("StandardMaterial3D_sl7oh")
+mesh = SubResource("CylinderMesh_urdtg")
 
-[node name="@MeshInstance3D@1099" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelChandelierCore" unique_id=1060797092]
-material_override = SubResource("StandardMaterial3D_urdtg")
-mesh = SubResource("BoxMesh_4uy74")
+[node name="@CollisionShape3D@1060" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_21" unique_id=857103667]
+shape = SubResource("CylinderShape3D_4uy74")
 
-[node name="HotelChandelierCrystals" type="MultiMeshInstance3D" parent="Building_1_GrandHotel_Part_02" unique_id=2029616081]
+[node name="HotelWindroseMullion_22" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1381441593]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.1027775, 103.25, -20.90719)
+
+[node name="@MeshInstance3D@1061" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_22" unique_id=148011635]
 material_override = SubResource("StandardMaterial3D_u6j2f")
-multimesh = SubResource("MultiMesh_bn200")
+mesh = SubResource("CylinderMesh_1aq8s")
 
-[node name="HotelCapsuleLift_0" type="AnimatableBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1313474018]
-transform = Transform3D(-0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, -0.70710677, 8.697413, 0, -24.697412)
-script = ExtResource("1_pxxt6")
+[node name="@CollisionShape3D@1062" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_22" unique_id=2136895523]
+shape = SubResource("CylinderShape3D_bn200")
 
-[node name="@MeshInstance3D@1100" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_0" unique_id=1872345]
+[node name="HotelWindroseMullion_23" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=204820097]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.149183, 103.25, -23.20937)
+
+[node name="@MeshInstance3D@1063" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_23" unique_id=1464686908]
 material_override = SubResource("StandardMaterial3D_xtwvl")
-mesh = SubResource("BoxMesh_mn1mt")
+mesh = SubResource("CylinderMesh_mn1mt")
 
-[node name="@CollisionShape3D@1101" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_0" unique_id=996537506]
-shape = SubResource("BoxShape3D_pqwhk")
+[node name="@CollisionShape3D@1064" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_23" unique_id=735819241]
+shape = SubResource("CylinderShape3D_pqwhk")
 
-[node name="@MeshInstance3D@1102" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_0" unique_id=1247778188]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0, 0)
+[node name="HotelWindroseMullion_24" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1024202130]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.84719, 103.25, -25.33403)
+
+[node name="@MeshInstance3D@1065" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_24" unique_id=1486359817]
 material_override = SubResource("StandardMaterial3D_x6vmc")
-mesh = SubResource("BoxMesh_c56uu")
+mesh = SubResource("CylinderMesh_c56uu")
 
-[node name="@MeshInstance3D@1103" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_0" unique_id=1145134568]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0, 0)
-material_override = SubResource("StandardMaterial3D_x6vmc")
-mesh = SubResource("BoxMesh_vb2e8")
+[node name="@CollisionShape3D@1066" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_24" unique_id=1961273500]
+shape = SubResource("CylinderShape3D_vb2e8")
 
-[node name="@MeshInstance3D@1104" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_0" unique_id=873663438]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.7)
-material_override = SubResource("StandardMaterial3D_x6vmc")
-mesh = SubResource("BoxMesh_233qu")
+[node name="HotelWindroseMullion_25" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1197982022]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.228856, 103.25, -27.228855)
 
-[node name="HotelCapsuleLift_1" type="AnimatableBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=871370490]
-transform = Transform3D(-0.30901703, 0, 0.9510565, 0, 1, 0, -0.9510565, 0, -0.30901703, 11.697995, 0, -19.800909)
-script = ExtResource("1_pxxt6")
-phase_seconds = 12.0
+[node name="@MeshInstance3D@1067" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_25" unique_id=2054762697]
+material_override = SubResource("StandardMaterial3D_233qu")
+mesh = SubResource("CylinderMesh_hn1a7")
 
-[node name="@MeshInstance3D@1105" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_1" unique_id=211293364]
-material_override = SubResource("StandardMaterial3D_hn1a7")
-mesh = SubResource("BoxMesh_wun16")
+[node name="@CollisionShape3D@1068" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_25" unique_id=770636316]
+shape = SubResource("CylinderShape3D_wun16")
 
-[node name="@CollisionShape3D@1106" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_1" unique_id=960940321]
-shape = SubResource("BoxShape3D_berte")
+[node name="HotelWindroseMullion_26" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=983666590]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.33403, 103.25, -28.847189)
 
-[node name="@MeshInstance3D@1107" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_1" unique_id=1947067479]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0, 0)
-material_override = SubResource("StandardMaterial3D_0ox7h")
-mesh = SubResource("BoxMesh_sly6j")
+[node name="@MeshInstance3D@1069" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_26" unique_id=1749922306]
+material_override = SubResource("StandardMaterial3D_berte")
+mesh = SubResource("CylinderMesh_0ox7h")
 
-[node name="@MeshInstance3D@1108" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_1" unique_id=46183309]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0, 0)
-material_override = SubResource("StandardMaterial3D_0ox7h")
-mesh = SubResource("BoxMesh_igj2c")
+[node name="@CollisionShape3D@1070" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_26" unique_id=1070490368]
+shape = SubResource("CylinderShape3D_sly6j")
 
-[node name="@MeshInstance3D@1109" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_1" unique_id=1354289415]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.7)
-material_override = SubResource("StandardMaterial3D_0ox7h")
-mesh = SubResource("BoxMesh_sfcdw")
+[node name="HotelWindroseMullion_27" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=51972682]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.209369, 103.25, -30.149183)
 
-[node name="HotelCapsuleLift_2" type="AnimatableBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=685417116]
-transform = Transform3D(0.30901697, 0, 0.95105654, 0, 1, 0, -0.95105654, 0, 0.30901697, 11.697995, 0, -12.199091)
-script = ExtResource("1_pxxt6")
-phase_seconds = 24.0
+[node name="@MeshInstance3D@1071" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_27" unique_id=1176418877]
+material_override = SubResource("StandardMaterial3D_igj2c")
+mesh = SubResource("CylinderMesh_sfcdw")
 
-[node name="@MeshInstance3D@1110" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_2" unique_id=1549436921]
-material_override = SubResource("StandardMaterial3D_o6s6g")
-mesh = SubResource("BoxMesh_o3eiv")
+[node name="@CollisionShape3D@1072" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_27" unique_id=729212438]
+shape = SubResource("CylinderShape3D_o6s6g")
 
-[node name="@CollisionShape3D@1111" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_2" unique_id=1340391835]
-shape = SubResource("BoxShape3D_y23t5")
+[node name="HotelWindroseMullion_28" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1115209325]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.90719, 103.25, -31.102777)
 
-[node name="@MeshInstance3D@1112" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_2" unique_id=286497020]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0, 0)
-material_override = SubResource("StandardMaterial3D_478bt")
-mesh = SubResource("BoxMesh_kqxrr")
+[node name="@MeshInstance3D@1073" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_28" unique_id=1766837176]
+material_override = SubResource("StandardMaterial3D_o3eiv")
+mesh = SubResource("CylinderMesh_y23t5")
 
-[node name="@MeshInstance3D@1113" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_2" unique_id=882482619]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0, 0)
-material_override = SubResource("StandardMaterial3D_478bt")
-mesh = SubResource("BoxMesh_xhdm8")
+[node name="@CollisionShape3D@1074" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_28" unique_id=1578697568]
+shape = SubResource("CylinderShape3D_478bt")
 
-[node name="@MeshInstance3D@1114" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_2" unique_id=1348832554]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.7)
-material_override = SubResource("StandardMaterial3D_478bt")
-mesh = SubResource("BoxMesh_vnimy")
+[node name="HotelWindroseMullion_29" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1937952794]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4841793, 103.25, -31.68449)
 
-[node name="HotelCapsuleLift_3" type="AnimatableBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=13104253]
-transform = Transform3D(0.70710677, 0, 0.70710677, 0, 1, 0, -0.70710677, 0, 0.70710677, 8.697413, 0, -7.3025866)
-script = ExtResource("1_pxxt6")
-phase_seconds = 36.0
+[node name="@MeshInstance3D@1075" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_29" unique_id=75958230]
+material_override = SubResource("StandardMaterial3D_kqxrr")
+mesh = SubResource("CylinderMesh_xhdm8")
 
-[node name="@MeshInstance3D@1115" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_3" unique_id=209588902]
+[node name="@CollisionShape3D@1076" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_29" unique_id=32496898]
+shape = SubResource("CylinderShape3D_vnimy")
+
+[node name="HotelWindroseMullion_30" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1672262815]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.9171086e-15, 103.25, -31.88)
+
+[node name="@MeshInstance3D@1077" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_30" unique_id=1344039697]
 material_override = SubResource("StandardMaterial3D_i36ij")
-mesh = SubResource("BoxMesh_laesm")
+mesh = SubResource("CylinderMesh_laesm")
 
-[node name="@CollisionShape3D@1116" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_3" unique_id=1843211413]
-shape = SubResource("BoxShape3D_0vk5j")
+[node name="@CollisionShape3D@1078" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_30" unique_id=1299978389]
+shape = SubResource("CylinderShape3D_0vk5j")
 
-[node name="@MeshInstance3D@1117" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_3" unique_id=709332526]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3, 0, 0)
+[node name="HotelWindroseMullion_31" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=150398525]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4841793, 103.25, -31.68449)
+
+[node name="@MeshInstance3D@1079" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_31" unique_id=1823430529]
 material_override = SubResource("StandardMaterial3D_h4703")
-mesh = SubResource("BoxMesh_uj0tj")
+mesh = SubResource("CylinderMesh_uj0tj")
 
-[node name="@MeshInstance3D@1118" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_3" unique_id=1608303909]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0, 0)
-material_override = SubResource("StandardMaterial3D_h4703")
-mesh = SubResource("BoxMesh_5j7vt")
+[node name="@CollisionShape3D@1080" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_31" unique_id=507574280]
+shape = SubResource("CylinderShape3D_5j7vt")
 
-[node name="@MeshInstance3D@1119" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelCapsuleLift_3" unique_id=857229399]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.7)
-material_override = SubResource("StandardMaterial3D_h4703")
-mesh = SubResource("BoxMesh_nbkg7")
+[node name="HotelWindroseMullion_32" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=116656729]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.90719, 103.25, -31.102777)
 
-[node name="HotelLevel27PartySuite" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1755709764]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 89.35, 23)
+[node name="@MeshInstance3D@1081" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_32" unique_id=129033233]
+material_override = SubResource("StandardMaterial3D_nbkg7")
+mesh = SubResource("CylinderMesh_leus2")
 
-[node name="@CollisionShape3D@1120" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelLevel27PartySuite" unique_id=597326460]
-shape = SubResource("BoxShape3D_leus2")
+[node name="@CollisionShape3D@1082" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_32" unique_id=821723497]
+shape = SubResource("CylinderShape3D_tqb4k")
 
-[node name="@MeshInstance3D@1121" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelLevel27PartySuite" unique_id=62775929]
-material_override = SubResource("StandardMaterial3D_tqb4k")
-mesh = SubResource("BoxMesh_tlmrm")
+[node name="HotelWindroseMullion_33" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=664305692]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.209369, 103.25, -30.149183)
 
-[node name="HotelPartySuiteWall" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=765060069]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 91, 23)
+[node name="@MeshInstance3D@1083" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_33" unique_id=118864891]
+material_override = SubResource("StandardMaterial3D_tlmrm")
+mesh = SubResource("CylinderMesh_7queu")
 
-[node name="@CollisionShape3D@1122" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelPartySuiteWall" unique_id=1022170985]
-shape = SubResource("BoxShape3D_7queu")
+[node name="@CollisionShape3D@1084" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_33" unique_id=1034881676]
+shape = SubResource("CylinderShape3D_av8n1")
 
-[node name="@MeshInstance3D@1123" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelPartySuiteWall" unique_id=1749080849]
-material_override = SubResource("StandardMaterial3D_av8n1")
-mesh = SubResource("BoxMesh_v2d2b")
+[node name="HotelWindroseMullion_34" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1351857281]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.33403, 103.25, -28.847189)
 
-[node name="@StaticBody3D@1126" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1831749487]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 91, 23)
+[node name="@MeshInstance3D@1085" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_34" unique_id=842597419]
+material_override = SubResource("StandardMaterial3D_v2d2b")
+mesh = SubResource("CylinderMesh_k8qgd")
 
-[node name="@CollisionShape3D@1124" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1126" unique_id=1127714895]
-shape = SubResource("BoxShape3D_k8qgd")
+[node name="@CollisionShape3D@1086" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_34" unique_id=728629957]
+shape = SubResource("CylinderShape3D_ob104")
 
-[node name="@MeshInstance3D@1125" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/@StaticBody3D@1126" unique_id=1577822405]
-material_override = SubResource("StandardMaterial3D_ob104")
-mesh = SubResource("BoxMesh_b6pqv")
+[node name="HotelWindroseMullion_35" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=778898753]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.228856, 103.25, -27.228855)
+
+[node name="@MeshInstance3D@1087" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_35" unique_id=1159781703]
+material_override = SubResource("StandardMaterial3D_b6pqv")
+mesh = SubResource("CylinderMesh_7eia7")
+
+[node name="@CollisionShape3D@1088" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_35" unique_id=1357362224]
+shape = SubResource("CylinderShape3D_pg16b")
+
+[node name="HotelWindroseMullion_36" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1075717324]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.84719, 103.25, -25.33403)
+
+[node name="@MeshInstance3D@1089" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_36" unique_id=654713174]
+material_override = SubResource("StandardMaterial3D_dvtm6")
+mesh = SubResource("CylinderMesh_s3oyw")
+
+[node name="@CollisionShape3D@1090" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_36" unique_id=2126060458]
+shape = SubResource("CylinderShape3D_f7ci0")
+
+[node name="HotelWindroseMullion_37" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=908244460]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.149183, 103.25, -23.20937)
+
+[node name="@MeshInstance3D@1091" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_37" unique_id=602468532]
+material_override = SubResource("StandardMaterial3D_ggice")
+mesh = SubResource("CylinderMesh_xrvcj")
+
+[node name="@CollisionShape3D@1092" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_37" unique_id=311123211]
+shape = SubResource("CylinderShape3D_dpw2p")
+
+[node name="HotelWindroseMullion_38" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1047339963]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.1027775, 103.25, -20.90719)
+
+[node name="@MeshInstance3D@1093" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_38" unique_id=905690018]
+material_override = SubResource("StandardMaterial3D_gpyvq")
+mesh = SubResource("CylinderMesh_uu78o")
+
+[node name="@CollisionShape3D@1094" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_38" unique_id=463287416]
+shape = SubResource("CylinderShape3D_8ca36")
+
+[node name="HotelWindroseMullion_39" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=315347286]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.684491, 103.25, -18.484179)
+
+[node name="@MeshInstance3D@1095" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_39" unique_id=270109107]
+material_override = SubResource("StandardMaterial3D_nuba4")
+mesh = SubResource("CylinderMesh_obc46")
+
+[node name="@CollisionShape3D@1096" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseMullion_39" unique_id=185494383]
+shape = SubResource("CylinderShape3D_6hvnj")
+
+[node name="HotelWindroseTurningLight" type="Node3D" parent="Building_1_GrandHotel_Part_03" unique_id=516204020]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 101.6, -16)
+script = ExtResource("1_pxxt6")
+
+[node name="HotelWindroseLightRing" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelWindroseTurningLight" unique_id=1857654339]
+material_override = SubResource("StandardMaterial3D_llopb")
+mesh = SubResource("ArrayMesh_p2p1h")
+
+[node name="HotelDrumRib_00" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1504803987]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.82, 104.5, -16)
+
+[node name="@MeshInstance3D@1097" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_00" unique_id=1145111070]
+material_override = SubResource("StandardMaterial3D_vl3m8")
+mesh = SubResource("CylinderMesh_tg7d6")
+
+[node name="@CollisionShape3D@1098" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_00" unique_id=1262357581]
+shape = SubResource("CylinderShape3D_qdnpx")
+
+[node name="HotelDrumRib_01" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=98843345]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.62523, 104.5, -13.525207)
+
+[node name="@MeshInstance3D@1099" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_01" unique_id=1461503285]
+material_override = SubResource("StandardMaterial3D_2p5x8")
+mesh = SubResource("CylinderMesh_0hv5m")
+
+[node name="@CollisionShape3D@1100" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_01" unique_id=651715598]
+shape = SubResource("CylinderShape3D_pdd2o")
+
+[node name="HotelDrumRib_02" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1159149253]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.045714, 104.5, -11.111351)
+
+[node name="@MeshInstance3D@1101" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_02" unique_id=1183345957]
+material_override = SubResource("StandardMaterial3D_4i5mw")
+mesh = SubResource("CylinderMesh_dioe7")
+
+[node name="@CollisionShape3D@1102" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_02" unique_id=2066245130]
+shape = SubResource("CylinderShape3D_cr6ms")
+
+[node name="HotelDrumRib_03" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=802576876]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.095723, 104.5, -8.81787)
+
+[node name="@MeshInstance3D@1103" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_03" unique_id=1902367224]
+material_override = SubResource("StandardMaterial3D_nm4y5")
+mesh = SubResource("CylinderMesh_bhmbj")
+
+[node name="@CollisionShape3D@1104" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_03" unique_id=393263045]
+shape = SubResource("CylinderShape3D_tbh3c")
+
+[node name="HotelDrumRib_04" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=351224892]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.798649, 104.5, -6.701237)
+
+[node name="@MeshInstance3D@1105" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_04" unique_id=2044987632]
+material_override = SubResource("StandardMaterial3D_0qfgr")
+mesh = SubResource("CylinderMesh_18wjq")
+
+[node name="@CollisionShape3D@1106" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_04" unique_id=1878457686]
+shape = SubResource("CylinderShape3D_gs3xa")
+
+[node name="HotelDrumRib_05" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=2122742315]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.186429, 104.5, -4.8135705)
+
+[node name="@MeshInstance3D@1107" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_05" unique_id=532986812]
+material_override = SubResource("StandardMaterial3D_r0b2u")
+mesh = SubResource("CylinderMesh_hrnv3")
+
+[node name="@CollisionShape3D@1108" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_05" unique_id=55189217]
+shape = SubResource("CylinderShape3D_nhg3b")
+
+[node name="HotelDrumRib_06" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=938236949]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.298762, 104.5, -3.2013512)
+
+[node name="@MeshInstance3D@1109" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_06" unique_id=710549433]
+material_override = SubResource("StandardMaterial3D_ive8y")
+mesh = SubResource("CylinderMesh_j6upq")
+
+[node name="@CollisionShape3D@1110" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_06" unique_id=1496279970]
+shape = SubResource("CylinderShape3D_ca1ob")
+
+[node name="HotelDrumRib_07" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=64685729]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.18213, 104.5, -1.9042767)
+
+[node name="@MeshInstance3D@1111" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_07" unique_id=1638550530]
+material_override = SubResource("StandardMaterial3D_m0iba")
+mesh = SubResource("CylinderMesh_wkaso")
+
+[node name="@CollisionShape3D@1112" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_07" unique_id=172118995]
+shape = SubResource("CylinderShape3D_6ev28")
+
+[node name="HotelDrumRib_08" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=2077116382]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.888649, 104.5, -0.9542859)
+
+[node name="@MeshInstance3D@1113" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_08" unique_id=1118010200]
+material_override = SubResource("StandardMaterial3D_nerjk")
+mesh = SubResource("CylinderMesh_s6j54")
+
+[node name="@CollisionShape3D@1114" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_08" unique_id=87024753]
+shape = SubResource("CylinderShape3D_8m7ib")
+
+[node name="HotelDrumRib_09" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=196579373]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4747932, 104.5, -0.37477046)
+
+[node name="@MeshInstance3D@1115" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_09" unique_id=394543497]
+material_override = SubResource("StandardMaterial3D_cutwy")
+mesh = SubResource("CylinderMesh_ngcao")
+
+[node name="@CollisionShape3D@1116" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_09" unique_id=1053828554]
+shape = SubResource("CylinderShape3D_0prbo")
+
+[node name="HotelDrumRib_10" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=836068453]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.686956e-16, 104.5, -0.18)
+
+[node name="@MeshInstance3D@1117" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_10" unique_id=624579975]
+material_override = SubResource("StandardMaterial3D_8th2r")
+mesh = SubResource("CylinderMesh_jjphy")
+
+[node name="@CollisionShape3D@1118" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_10" unique_id=109246936]
+shape = SubResource("CylinderShape3D_e17sn")
+
+[node name="HotelDrumRib_11" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=17075324]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4747932, 104.5, -0.37477046)
+
+[node name="@MeshInstance3D@1119" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_11" unique_id=1516329576]
+material_override = SubResource("StandardMaterial3D_joqh5")
+mesh = SubResource("CylinderMesh_1hkd6")
+
+[node name="@CollisionShape3D@1120" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_11" unique_id=1804290367]
+shape = SubResource("CylinderShape3D_nwtt2")
+
+[node name="HotelDrumRib_12" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1326156372]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.888649, 104.5, -0.9542859)
+
+[node name="@MeshInstance3D@1121" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_12" unique_id=1117384861]
+material_override = SubResource("StandardMaterial3D_lh1he")
+mesh = SubResource("CylinderMesh_dfoq6")
+
+[node name="@CollisionShape3D@1122" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_12" unique_id=801688982]
+shape = SubResource("CylinderShape3D_mbyc8")
+
+[node name="HotelDrumRib_13" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=937820412]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.18213, 104.5, -1.9042767)
+
+[node name="@MeshInstance3D@1123" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_13" unique_id=147854586]
+material_override = SubResource("StandardMaterial3D_8afjs")
+mesh = SubResource("CylinderMesh_d35n6")
+
+[node name="@CollisionShape3D@1124" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_13" unique_id=1995409020]
+shape = SubResource("CylinderShape3D_td0ji")
+
+[node name="HotelDrumRib_14" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=278676313]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.298762, 104.5, -3.2013512)
+
+[node name="@MeshInstance3D@1125" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_14" unique_id=1265055081]
+material_override = SubResource("StandardMaterial3D_tojwu")
+mesh = SubResource("CylinderMesh_nyl74")
+
+[node name="@CollisionShape3D@1126" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_14" unique_id=643116120]
+shape = SubResource("CylinderShape3D_0e4v5")
+
+[node name="HotelDrumRib_15" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=470260356]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.186429, 104.5, -4.8135705)
+
+[node name="@MeshInstance3D@1127" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_15" unique_id=960799261]
+material_override = SubResource("StandardMaterial3D_femyr")
+mesh = SubResource("CylinderMesh_6qdhs")
+
+[node name="@CollisionShape3D@1128" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_15" unique_id=900694164]
+shape = SubResource("CylinderShape3D_01g1x")
+
+[node name="HotelDrumRib_16" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=35131458]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.798649, 104.5, -6.701237)
+
+[node name="@MeshInstance3D@1129" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_16" unique_id=1583597338]
+material_override = SubResource("StandardMaterial3D_dvkvu")
+mesh = SubResource("CylinderMesh_1tmy5")
+
+[node name="@CollisionShape3D@1130" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_16" unique_id=1447046801]
+shape = SubResource("CylinderShape3D_pupbj")
+
+[node name="HotelDrumRib_17" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1628661841]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.095723, 104.5, -8.81787)
+
+[node name="@MeshInstance3D@1131" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_17" unique_id=22242268]
+material_override = SubResource("StandardMaterial3D_sm1if")
+mesh = SubResource("CylinderMesh_52yx2")
+
+[node name="@CollisionShape3D@1132" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_17" unique_id=779197722]
+shape = SubResource("CylinderShape3D_ygrxu")
+
+[node name="HotelDrumRib_18" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1176618249]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.045714, 104.5, -11.111351)
+
+[node name="@MeshInstance3D@1133" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_18" unique_id=1126621124]
+material_override = SubResource("StandardMaterial3D_mi8x1")
+mesh = SubResource("CylinderMesh_k7nkv")
+
+[node name="@CollisionShape3D@1134" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_18" unique_id=1165193881]
+shape = SubResource("CylinderShape3D_w2lhc")
+
+[node name="HotelDrumRib_19" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=426153477]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.62523, 104.5, -13.525207)
+
+[node name="@MeshInstance3D@1135" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_19" unique_id=1197380160]
+material_override = SubResource("StandardMaterial3D_r87hc")
+mesh = SubResource("CylinderMesh_b7wt4")
+
+[node name="@CollisionShape3D@1136" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_19" unique_id=135253890]
+shape = SubResource("CylinderShape3D_d6hch")
+
+[node name="HotelDrumRib_20" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=657463248]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.82, 104.5, -16)
+
+[node name="@MeshInstance3D@1137" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_20" unique_id=2118332473]
+material_override = SubResource("StandardMaterial3D_odiid")
+mesh = SubResource("CylinderMesh_jf0wg")
+
+[node name="@CollisionShape3D@1138" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_20" unique_id=667451056]
+shape = SubResource("CylinderShape3D_prrr5")
+
+[node name="HotelDrumRib_21" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=951237912]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.62523, 104.5, -18.474792)
+
+[node name="@MeshInstance3D@1139" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_21" unique_id=742592396]
+material_override = SubResource("StandardMaterial3D_y0stv")
+mesh = SubResource("CylinderMesh_c7ski")
+
+[node name="@CollisionShape3D@1140" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_21" unique_id=1152177621]
+shape = SubResource("CylinderShape3D_6cs30")
+
+[node name="HotelDrumRib_22" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=295213308]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.045714, 104.5, -20.888649)
+
+[node name="@MeshInstance3D@1141" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_22" unique_id=1507751175]
+material_override = SubResource("StandardMaterial3D_r3gxg")
+mesh = SubResource("CylinderMesh_7p6d1")
+
+[node name="@CollisionShape3D@1142" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_22" unique_id=990535983]
+shape = SubResource("CylinderShape3D_js3ne")
+
+[node name="HotelDrumRib_23" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=455827806]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.095723, 104.5, -23.182129)
+
+[node name="@MeshInstance3D@1143" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_23" unique_id=2083923603]
+material_override = SubResource("StandardMaterial3D_bfcnq")
+mesh = SubResource("CylinderMesh_uturg")
+
+[node name="@CollisionShape3D@1144" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_23" unique_id=659615632]
+shape = SubResource("CylinderShape3D_4qfed")
+
+[node name="HotelDrumRib_24" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=483867139]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.798649, 104.5, -25.298763)
+
+[node name="@MeshInstance3D@1145" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_24" unique_id=1535859613]
+material_override = SubResource("StandardMaterial3D_1jxkt")
+mesh = SubResource("CylinderMesh_oqpvp")
+
+[node name="@CollisionShape3D@1146" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_24" unique_id=806959357]
+shape = SubResource("CylinderShape3D_3g00y")
+
+[node name="HotelDrumRib_25" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=869481382]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.186429, 104.5, -27.18643)
+
+[node name="@MeshInstance3D@1147" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_25" unique_id=1622326365]
+material_override = SubResource("StandardMaterial3D_yxyoj")
+mesh = SubResource("CylinderMesh_gr6as")
+
+[node name="@CollisionShape3D@1148" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_25" unique_id=642475902]
+shape = SubResource("CylinderShape3D_tks0i")
+
+[node name="HotelDrumRib_26" type="StaticBody3D" parent="Building_1_GrandHotel_Part_03" unique_id=1648337674]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.298762, 104.5, -28.798649)
+
+[node name="@MeshInstance3D@1149" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_26" unique_id=667398104]
+material_override = SubResource("StandardMaterial3D_03pvx")
+mesh = SubResource("CylinderMesh_t0ajf")
+
+[node name="@CollisionShape3D@1150" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_03/HotelDrumRib_26" unique_id=1939247613]
+shape = SubResource("CylinderShape3D_bvuca")

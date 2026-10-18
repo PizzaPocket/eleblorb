@@ -1,728 +1,866 @@
 [gd_scene format=3]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_omjtv"]
-size = Vector3(1.2820042, 17, 0.12)
+margin = 0.0
+size = Vector3(30, 0.3, 3)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8pemf"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iyinf"]
+albedo_color = Color(0.76862746, 0.69411767, 0.54509807, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_oweyt"]
+size = Vector3(30, 0.3, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yfb1n"]
+margin = 0.0
+size = Vector3(30, 0.3, 3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kmsyq"]
+albedo_color = Color(0.76862746, 0.69411767, 0.54509807, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_rsasm"]
+size = Vector3(30, 0.3, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2yyjb"]
+size = Vector3(5.114852, 6.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y3dds"]
 transparency = 1
 albedo_color = Color(0.38, 0.63, 0.68, 0.18)
 roughness = 0.15
 
-[sub_resource type="BoxMesh" id="BoxMesh_iyinf"]
-size = Vector3(1.2820042, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_h4wdj"]
+size = Vector3(5.114852, 6.1, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_oweyt"]
-size = Vector3(1.1213468, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_8h1pv"]
+size = Vector3(5.114852, 5.2, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_yfb1n"]
-size = Vector3(1.1213468, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_i34ec"]
+size = Vector3(5.114852, 5.2, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_kmsyq"]
-size = Vector3(1.0072763, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_f83nb"]
+size = Vector3(2.111854, 6.1, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_rsasm"]
-size = Vector3(1.0072763, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_rwj5w"]
+size = Vector3(2.111854, 6.1, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_2yyjb"]
-size = Vector3(0.92231226, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_emjg7"]
+size = Vector3(2.111854, 5.2, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_y3dds"]
-size = Vector3(0.92231226, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_osfbe"]
+size = Vector3(2.111854, 5.2, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_h4wdj"]
-size = Vector3(0.85792017, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_3865u"]
+size = Vector3(1.6117029, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_8h1pv"]
-size = Vector3(0.85792017, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_7kp3g"]
+size = Vector3(1.6117029, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_i34ec"]
-size = Vector3(0.80956835, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_ljy28"]
+size = Vector3(1.3494778, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_f83nb"]
-size = Vector3(0.80956835, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_4w6w3"]
+size = Vector3(1.3494778, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_rwj5w"]
-size = Vector3(0.7747636, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_m8fan"]
+size = Vector3(1.1803657, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_emjg7"]
-size = Vector3(0.7747636, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_8d4n6"]
+size = Vector3(1.1803657, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_osfbe"]
-size = Vector3(0.7521346, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_tcerw"]
+size = Vector3(1.0602897, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_3865u"]
-size = Vector3(0.7521346, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_vuyh8"]
+size = Vector3(1.0602897, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_7kp3g"]
-size = Vector3(0.740972, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_wfwrk"]
+size = Vector3(0.97085494, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ljy28"]
-size = Vector3(0.740972, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_e157g"]
+size = Vector3(0.97085494, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_4w6w3"]
-size = Vector3(0.740972, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_2r43y"]
+size = Vector3(0.90307426, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_m8fan"]
-size = Vector3(0.740972, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_f7awm"]
+size = Vector3(0.90307426, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_8d4n6"]
-size = Vector3(0.7521346, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_kfbsp"]
+size = Vector3(0.8521775, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_tcerw"]
-size = Vector3(0.7521346, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_t38cj"]
+size = Vector3(0.8521775, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_vuyh8"]
-size = Vector3(0.7747636, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_t5jp6"]
+size = Vector3(0.8155406, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_wfwrk"]
-size = Vector3(0.7747636, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_8boe5"]
+size = Vector3(0.8155406, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_e157g"]
-size = Vector3(0.80956835, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_dnuq6"]
+size = Vector3(0.7917212, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_2r43y"]
-size = Vector3(0.80956835, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_1tyxy"]
+size = Vector3(0.7917212, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_f7awm"]
-size = Vector3(0.85792017, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_102m2"]
+size = Vector3(0.77997005, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_kfbsp"]
-size = Vector3(0.85792017, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_fn8ax"]
+size = Vector3(0.77997005, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_t38cj"]
-size = Vector3(0.92231226, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_y8j2p"]
+size = Vector3(0.77997005, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_t5jp6"]
-size = Vector3(0.92231226, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_agvli"]
+size = Vector3(0.77997005, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_8boe5"]
-size = Vector3(1.0072763, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_0e1am"]
+size = Vector3(0.7917212, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_dnuq6"]
-size = Vector3(1.0072763, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_ac150"]
+size = Vector3(0.7917212, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_1tyxy"]
-size = Vector3(1.1213468, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_yytil"]
+size = Vector3(0.8155406, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_102m2"]
-size = Vector3(1.1213468, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_w8c4m"]
+size = Vector3(0.8155406, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_fn8ax"]
-size = Vector3(1.2820042, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_jxfhd"]
+size = Vector3(0.8521775, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_y8j2p"]
-size = Vector3(1.2820042, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_ajrru"]
+size = Vector3(0.8521775, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_agvli"]
-size = Vector3(1.5311179, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_tvlh1"]
+size = Vector3(0.90307426, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_0e1am"]
-size = Vector3(1.5311179, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_ivug7"]
+size = Vector3(0.90307426, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ac150"]
-size = Vector3(2.006261, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_ux0et"]
+size = Vector3(0.97085494, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_yytil"]
-size = Vector3(2.006261, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_vu472"]
+size = Vector3(0.97085494, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_w8c4m"]
-size = Vector3(4.859109, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_wov7m"]
+size = Vector3(1.0602897, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_jxfhd"]
-size = Vector3(4.859109, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_gjygj"]
+size = Vector3(1.0602897, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ajrru"]
-size = Vector3(4.85911, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_ax84t"]
+size = Vector3(1.1803657, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_tvlh1"]
-size = Vector3(4.85911, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_7vs2g"]
+size = Vector3(1.1803657, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ivug7"]
-size = Vector3(2.006261, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_386ua"]
+size = Vector3(1.3494778, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ux0et"]
-size = Vector3(2.006261, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_pljku"]
+size = Vector3(1.3494778, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_vu472"]
-size = Vector3(1.5311179, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_42xli"]
+size = Vector3(1.6117029, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_wov7m"]
-size = Vector3(1.5311179, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_ucwui"]
+size = Vector3(1.6117029, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_gjygj"]
-size = Vector3(1.2820042, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_oe3pg"]
+size = Vector3(2.111854, 6.1, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ax84t"]
-size = Vector3(1.2820042, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_k38oa"]
+size = Vector3(2.111854, 6.1, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_7vs2g"]
-size = Vector3(1.1213468, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_cgx8s"]
+size = Vector3(2.111854, 5.2, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_386ua"]
-size = Vector3(1.1213468, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_ijjxi"]
+size = Vector3(2.111854, 5.2, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_pljku"]
-size = Vector3(1.0072763, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_yxwtk"]
+size = Vector3(5.114852, 6.1, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_42xli"]
-size = Vector3(1.0072763, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_r37vx"]
+size = Vector3(5.114852, 6.1, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ucwui"]
-size = Vector3(0.92231226, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_71s50"]
+size = Vector3(5.114852, 5.2, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_oe3pg"]
-size = Vector3(0.92231226, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_aslsa"]
+size = Vector3(5.114852, 5.2, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_k38oa"]
-size = Vector3(0.85792017, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_d7sfy"]
+size = Vector3(5.114852, 6.1, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_cgx8s"]
-size = Vector3(0.85792017, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_fq42a"]
+size = Vector3(5.114852, 6.1, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ijjxi"]
-size = Vector3(0.80956835, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_kytk0"]
+size = Vector3(5.114852, 5.2, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_yxwtk"]
-size = Vector3(0.80956835, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_jyfvj"]
+size = Vector3(5.114852, 5.2, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_r37vx"]
-size = Vector3(0.7747636, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_kqd0y"]
+size = Vector3(2.111854, 6.1, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_71s50"]
-size = Vector3(0.7747636, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_6je8y"]
+size = Vector3(2.111854, 6.1, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_aslsa"]
-size = Vector3(0.7521346, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_njsuu"]
+size = Vector3(2.111854, 5.2, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_d7sfy"]
-size = Vector3(0.7521346, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_v27tb"]
+size = Vector3(2.111854, 5.2, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_fq42a"]
-size = Vector3(0.740972, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_v750l"]
+size = Vector3(1.6117029, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_kytk0"]
-size = Vector3(0.740972, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_p25n6"]
+size = Vector3(1.6117029, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_jyfvj"]
-size = Vector3(0.740972, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_yrh02"]
+size = Vector3(1.3494778, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_kqd0y"]
-size = Vector3(0.740972, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_5g6qr"]
+size = Vector3(1.3494778, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_6je8y"]
-size = Vector3(0.7521346, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_6f4js"]
+size = Vector3(1.1803657, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_njsuu"]
-size = Vector3(0.7521346, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_p0n7g"]
+size = Vector3(1.1803657, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_v27tb"]
-size = Vector3(0.7747636, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_oebt6"]
+size = Vector3(1.0602897, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_v750l"]
-size = Vector3(0.7747636, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_tqw1e"]
+size = Vector3(1.0602897, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_p25n6"]
-size = Vector3(0.80956835, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_ht21s"]
+size = Vector3(0.97085494, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_yrh02"]
-size = Vector3(0.80956835, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_jxidi"]
+size = Vector3(0.97085494, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_5g6qr"]
-size = Vector3(0.85792017, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_kv5nv"]
+size = Vector3(0.90307426, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_6f4js"]
-size = Vector3(0.85792017, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_j810e"]
+size = Vector3(0.90307426, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_p0n7g"]
-size = Vector3(0.92231226, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_cp5qy"]
+size = Vector3(0.8521775, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_oebt6"]
-size = Vector3(0.92231226, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_6t1nx"]
+size = Vector3(0.8521775, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_tqw1e"]
-size = Vector3(1.0072763, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_ybo8u"]
+size = Vector3(0.8155406, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ht21s"]
-size = Vector3(1.0072763, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_8qqvi"]
+size = Vector3(0.8155406, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_jxidi"]
-size = Vector3(1.1213468, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_llerx"]
+size = Vector3(0.7917212, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_kv5nv"]
-size = Vector3(1.1213468, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_0nqd7"]
+size = Vector3(0.7917212, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_j810e"]
-size = Vector3(1.2820042, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_8xmyi"]
+size = Vector3(0.77997005, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_cp5qy"]
-size = Vector3(1.2820042, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_nemaf"]
+size = Vector3(0.77997005, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_6t1nx"]
-size = Vector3(1.5311179, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_vxyrh"]
+size = Vector3(0.77997005, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_ybo8u"]
-size = Vector3(1.5311179, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_nkpgp"]
+size = Vector3(0.77997005, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_8qqvi"]
-size = Vector3(2.006261, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_pp5fd"]
+size = Vector3(0.7917212, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_llerx"]
-size = Vector3(2.006261, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_8vld2"]
+size = Vector3(0.7917212, 17, 0.12)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_0nqd7"]
-size = Vector3(4.859109, 17, 0.12)
+[sub_resource type="BoxShape3D" id="BoxShape3D_qlrvs"]
+size = Vector3(0.8155406, 17, 0.12)
 
-[sub_resource type="BoxMesh" id="BoxMesh_8xmyi"]
-size = Vector3(4.859109, 17, 0.12)
+[sub_resource type="BoxMesh" id="BoxMesh_o70ne"]
+size = Vector3(0.8155406, 17, 0.12)
 
-[node name="MoyCell_03_03_Part_20" type="Node3D" unique_id=2141934800]
+[sub_resource type="BoxShape3D" id="BoxShape3D_vrxnc"]
+size = Vector3(0.8521775, 17, 0.12)
 
-[node name="DomeGlassPanel_51" type="StaticBody3D" parent="." unique_id=232723203]
-transform = Transform3D(0.1116104, 0, 0.99375206, 0, 1, 0, -0.99375206, 0, 0.1116104, -18.745033, 8.5, -9.029113)
+[sub_resource type="BoxMesh" id="BoxMesh_23waj"]
+size = Vector3(0.8521775, 17, 0.12)
 
-[node name="@CollisionShape3D@9367" type="CollisionShape3D" parent="DomeGlassPanel_51" unique_id=1183726556]
+[sub_resource type="BoxShape3D" id="BoxShape3D_s6ab7"]
+size = Vector3(0.90307426, 17, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_d18pf"]
+size = Vector3(0.90307426, 17, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_py826"]
+size = Vector3(0.97085494, 17, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0wgl4"]
+size = Vector3(0.97085494, 17, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uv41p"]
+size = Vector3(1.0602897, 17, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_qxxwh"]
+size = Vector3(1.0602897, 17, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4gcly"]
+size = Vector3(1.1803657, 17, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_dqr2d"]
+size = Vector3(1.1803657, 17, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nkbha"]
+size = Vector3(1.3494778, 17, 0.12)
+
+[sub_resource type="BoxMesh" id="BoxMesh_0ic3n"]
+size = Vector3(1.3494778, 17, 0.12)
+
+[node name="MoyCell_03_03_Part_20" type="Node3D" unique_id=966974827]
+
+[node name="Station_Meridian Line_The_Crossing_-1" type="StaticBody3D" parent="." unique_id=1152757133]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -23.15, -4.875)
+
+[node name="@CollisionShape3D@7305" type="CollisionShape3D" parent="Station_Meridian Line_The_Crossing_-1" unique_id=174322162]
 shape = SubResource("BoxShape3D_omjtv")
 
-[node name="@MeshInstance3D@9368" type="MeshInstance3D" parent="DomeGlassPanel_51" unique_id=653961000]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_iyinf")
+[node name="@MeshInstance3D@7306" type="MeshInstance3D" parent="Station_Meridian Line_The_Crossing_-1" unique_id=430044654]
+material_override = SubResource("StandardMaterial3D_iyinf")
+mesh = SubResource("BoxMesh_oweyt")
 
-[node name="DomeGlassPanel_52" type="StaticBody3D" parent="." unique_id=393954247]
-transform = Transform3D(0.16455762, 0, 0.98636746, 0, 1, 0, -0.98636746, 0, 0.16455762, -18.581226, 8.5, -10.21914)
+[node name="Station_Meridian Line_The_Crossing_1" type="StaticBody3D" parent="." unique_id=559743959]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -23.15, 4.875)
 
-[node name="@CollisionShape3D@9369" type="CollisionShape3D" parent="DomeGlassPanel_52" unique_id=1548978036]
-shape = SubResource("BoxShape3D_oweyt")
+[node name="@CollisionShape3D@7307" type="CollisionShape3D" parent="Station_Meridian Line_The_Crossing_1" unique_id=2106768026]
+shape = SubResource("BoxShape3D_yfb1n")
 
-[node name="@MeshInstance3D@9370" type="MeshInstance3D" parent="DomeGlassPanel_52" unique_id=912564503]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_yfb1n")
-
-[node name="DomeGlassPanel_53" type="StaticBody3D" parent="." unique_id=1501610132]
-transform = Transform3D(0.22478424, 0, 0.97440857, 0, 1, 0, -0.97440857, 0, 0.22478424, -18.375753, 8.5, -11.262919)
-
-[node name="@CollisionShape3D@9371" type="CollisionShape3D" parent="DomeGlassPanel_53" unique_id=270005021]
-shape = SubResource("BoxShape3D_kmsyq")
-
-[node name="@MeshInstance3D@9372" type="MeshInstance3D" parent="DomeGlassPanel_53" unique_id=1802281856]
-material_override = SubResource("StandardMaterial3D_8pemf")
+[node name="@MeshInstance3D@7308" type="MeshInstance3D" parent="Station_Meridian Line_The_Crossing_1" unique_id=1055496146]
+material_override = SubResource("StandardMaterial3D_kmsyq")
 mesh = SubResource("BoxMesh_rsasm")
 
-[node name="DomeGlassPanel_54" type="StaticBody3D" parent="." unique_id=385728483]
-transform = Transform3D(0.29155472, 0, 0.9565542, 0, 1, 0, -0.9565542, 0, 0.29155472, -18.128092, 8.5, -12.194789)
+[node name="DomeGlassEyeRim_00_0" type="StaticBody3D" parent="." unique_id=346710346]
+transform = Transform3D(-0.0041882116, 0, -0.99999124, 0, 1, 0, 0.99999124, 0, -0.0041882116, 19.989288, 3.05, 2.5574036)
 
-[node name="@CollisionShape3D@9373" type="CollisionShape3D" parent="DomeGlassPanel_54" unique_id=1525352159]
+[node name="@CollisionShape3D@11526" type="CollisionShape3D" parent="DomeGlassEyeRim_00_0" unique_id=920198918]
 shape = SubResource("BoxShape3D_2yyjb")
 
-[node name="@MeshInstance3D@9374" type="MeshInstance3D" parent="DomeGlassPanel_54" unique_id=1325956154]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_y3dds")
+[node name="@MeshInstance3D@11527" type="MeshInstance3D" parent="DomeGlassEyeRim_00_0" unique_id=1647899062]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_h4wdj")
 
-[node name="DomeGlassPanel_55" type="StaticBody3D" parent="." unique_id=1187640578]
-transform = Transform3D(0.36384165, 0, 0.9314608, 0, 1, 0, -0.9314608, 0, 0.36384165, -17.837566, 8.5, -13.035469)
+[node name="DomeGlassEyeRim_00_1" type="StaticBody3D" parent="." unique_id=1219635628]
+transform = Transform3D(-0.0041882116, 0, -0.99999124, 0, 1, 0, 0.99999124, 0, -0.0041882116, 19.989288, 14.4, 2.5574036)
 
-[node name="@CollisionShape3D@9375" type="CollisionShape3D" parent="DomeGlassPanel_55" unique_id=1480236723]
-shape = SubResource("BoxShape3D_h4wdj")
+[node name="@CollisionShape3D@11528" type="CollisionShape3D" parent="DomeGlassEyeRim_00_1" unique_id=1112346620]
+shape = SubResource("BoxShape3D_8h1pv")
 
-[node name="@MeshInstance3D@9376" type="MeshInstance3D" parent="DomeGlassPanel_55" unique_id=2022525844]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_8h1pv")
+[node name="@MeshInstance3D@11529" type="MeshInstance3D" parent="DomeGlassEyeRim_00_1" unique_id=327318466]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_i34ec")
 
-[node name="DomeGlassPanel_56" type="StaticBody3D" parent="." unique_id=807281328]
-transform = Transform3D(0.4401735, 0, 0.89791274, 0, 1, 0, -0.89791274, 0, 0.4401735, -17.503317, 8.5, -13.79849)
+[node name="DomeGlassEyeRim_01_0" type="StaticBody3D" parent="." unique_id=1538628454]
+transform = Transform3D(-0.030453308, 0, -0.9995362, 0, 1, 0, 0.9995362, 0, -0.030453308, 19.94642, 3.05, 6.170244)
 
-[node name="@CollisionShape3D@9377" type="CollisionShape3D" parent="DomeGlassPanel_56" unique_id=214827633]
-shape = SubResource("BoxShape3D_i34ec")
+[node name="@CollisionShape3D@11530" type="CollisionShape3D" parent="DomeGlassEyeRim_01_0" unique_id=451604800]
+shape = SubResource("BoxShape3D_f83nb")
 
-[node name="@MeshInstance3D@9378" type="MeshInstance3D" parent="DomeGlassPanel_56" unique_id=44843551]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_f83nb")
+[node name="@MeshInstance3D@11531" type="MeshInstance3D" parent="DomeGlassEyeRim_01_0" unique_id=1291488115]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_rwj5w")
 
-[node name="DomeGlassPanel_57" type="StaticBody3D" parent="." unique_id=671467135]
-transform = Transform3D(0.5185692, 0, 0.85503566, 0, 1, 0, -0.85503566, 0, 0.5185692, -17.124258, 8.5, -14.493176)
+[node name="DomeGlassEyeRim_01_1" type="StaticBody3D" parent="." unique_id=1823782972]
+transform = Transform3D(-0.030453308, 0, -0.9995362, 0, 1, 0, 0.9995362, 0, -0.030453308, 19.94642, 14.4, 6.170244)
 
-[node name="@CollisionShape3D@9379" type="CollisionShape3D" parent="DomeGlassPanel_57" unique_id=709850755]
-shape = SubResource("BoxShape3D_rwj5w")
+[node name="@CollisionShape3D@11532" type="CollisionShape3D" parent="DomeGlassEyeRim_01_1" unique_id=1165671913]
+shape = SubResource("BoxShape3D_emjg7")
 
-[node name="@MeshInstance3D@9380" type="MeshInstance3D" parent="DomeGlassPanel_57" unique_id=1843082433]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_emjg7")
+[node name="@MeshInstance3D@11533" type="MeshInstance3D" parent="DomeGlassEyeRim_01_1" unique_id=173779356]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_osfbe")
 
-[node name="DomeGlassPanel_58" type="StaticBody3D" parent="." unique_id=1176433847]
-transform = Transform3D(0.5965958, 0, 0.80254185, 0, 1, 0, -0.80254185, 0, 0.5965958, -16.699013, 8.5, -15.126211)
+[node name="DomeGlassPanel_02" type="StaticBody3D" parent="." unique_id=660850541]
+transform = Transform3D(-0.066602886, 0, -0.99777955, 0, 1, 0, 0.99777955, 0, -0.066602886, 19.860592, 8.5, 8.029744)
 
-[node name="@CollisionShape3D@9381" type="CollisionShape3D" parent="DomeGlassPanel_58" unique_id=60614012]
-shape = SubResource("BoxShape3D_osfbe")
+[node name="@CollisionShape3D@11534" type="CollisionShape3D" parent="DomeGlassPanel_02" unique_id=534263134]
+shape = SubResource("BoxShape3D_3865u")
 
-[node name="@MeshInstance3D@9382" type="MeshInstance3D" parent="DomeGlassPanel_58" unique_id=804670073]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_3865u")
+[node name="@MeshInstance3D@11535" type="MeshInstance3D" parent="DomeGlassPanel_02" unique_id=1068911114]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_7kp3g")
 
-[node name="DomeGlassPanel_59" type="StaticBody3D" parent="." unique_id=1960608127]
-transform = Transform3D(0.6715784, 0, 0.7409335, 0, 1, 0, -0.7409335, 0, 0.6715784, -16.225842, 8.5, -15.702526)
+[node name="DomeGlassPanel_03" type="StaticBody3D" parent="." unique_id=2029911747]
+transform = Transform3D(-0.11161036, 0, -0.99375206, 0, 1, 0, 0.99375206, 0, -0.11161036, 19.731613, 8.5, 9.504329)
 
-[node name="@CollisionShape3D@9383" type="CollisionShape3D" parent="DomeGlassPanel_59" unique_id=804238259]
-shape = SubResource("BoxShape3D_7kp3g")
+[node name="@CollisionShape3D@11536" type="CollisionShape3D" parent="DomeGlassPanel_03" unique_id=922095070]
+shape = SubResource("BoxShape3D_ljy28")
 
-[node name="@MeshInstance3D@9384" type="MeshInstance3D" parent="DomeGlassPanel_59" unique_id=172205246]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_ljy28")
+[node name="@MeshInstance3D@11537" type="MeshInstance3D" parent="DomeGlassPanel_03" unique_id=794250663]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_4w6w3")
 
-[node name="DomeGlassPanel_60" type="StaticBody3D" parent="." unique_id=2070931275]
-transform = Transform3D(0.74093354, 0, 0.6715784, 0, 1, 0, -0.6715784, 0, 0.74093354, -15.702526, 8.5, -16.225842)
+[node name="DomeGlassPanel_04" type="StaticBody3D" parent="." unique_id=2042168316]
+transform = Transform3D(-0.16455759, 0, -0.98636746, 0, 1, 0, 0.98636746, 0, -0.16455759, 19.559187, 8.5, 10.7569895)
 
-[node name="@CollisionShape3D@9385" type="CollisionShape3D" parent="DomeGlassPanel_60" unique_id=1938690116]
-shape = SubResource("BoxShape3D_4w6w3")
+[node name="@CollisionShape3D@11538" type="CollisionShape3D" parent="DomeGlassPanel_04" unique_id=1475656886]
+shape = SubResource("BoxShape3D_m8fan")
 
-[node name="@MeshInstance3D@9386" type="MeshInstance3D" parent="DomeGlassPanel_60" unique_id=2059102892]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_m8fan")
+[node name="@MeshInstance3D@11539" type="MeshInstance3D" parent="DomeGlassPanel_04" unique_id=474838314]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_8d4n6")
 
-[node name="DomeGlassPanel_61" type="StaticBody3D" parent="." unique_id=504069897]
-transform = Transform3D(0.8025418, 0, 0.5965959, 0, 1, 0, -0.5965959, 0, 0.8025418, -15.126211, 8.5, -16.699013)
+[node name="DomeGlassPanel_05" type="StaticBody3D" parent="." unique_id=2046636631]
+transform = Transform3D(-0.22478421, 0, -0.97440857, 0, 1, 0, 0.97440857, 0, -0.22478421, 19.3429, 8.5, 11.855704)
 
-[node name="@CollisionShape3D@9387" type="CollisionShape3D" parent="DomeGlassPanel_61" unique_id=626918468]
-shape = SubResource("BoxShape3D_8d4n6")
+[node name="@CollisionShape3D@11540" type="CollisionShape3D" parent="DomeGlassPanel_05" unique_id=330266923]
+shape = SubResource("BoxShape3D_tcerw")
 
-[node name="@MeshInstance3D@9388" type="MeshInstance3D" parent="DomeGlassPanel_61" unique_id=1030741900]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_tcerw")
+[node name="@MeshInstance3D@11541" type="MeshInstance3D" parent="DomeGlassPanel_05" unique_id=1300360679]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_vuyh8")
 
-[node name="DomeGlassPanel_62" type="StaticBody3D" parent="." unique_id=1612579446]
-transform = Transform3D(0.85503566, 0, 0.51856923, 0, 1, 0, -0.51856923, 0, 0.85503566, -14.493176, 8.5, -17.124258)
+[node name="DomeGlassPanel_06" type="StaticBody3D" parent="." unique_id=1632914554]
+transform = Transform3D(-0.2915548, 0, -0.9565541, 0, 1, 0, 0.9565541, 0, -0.2915548, 19.082201, 8.5, 12.83662)
 
-[node name="@CollisionShape3D@9389" type="CollisionShape3D" parent="DomeGlassPanel_62" unique_id=396869850]
-shape = SubResource("BoxShape3D_vuyh8")
+[node name="@CollisionShape3D@11542" type="CollisionShape3D" parent="DomeGlassPanel_06" unique_id=549524163]
+shape = SubResource("BoxShape3D_wfwrk")
 
-[node name="@MeshInstance3D@9390" type="MeshInstance3D" parent="DomeGlassPanel_62" unique_id=1325661951]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_wfwrk")
+[node name="@MeshInstance3D@11543" type="MeshInstance3D" parent="DomeGlassPanel_06" unique_id=223441229]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_e157g")
 
-[node name="DomeGlassPanel_63" type="StaticBody3D" parent="." unique_id=629761640]
-transform = Transform3D(0.89791274, 0, 0.44017357, 0, 1, 0, -0.44017357, 0, 0.89791274, -13.79849, 8.5, -17.503317)
+[node name="DomeGlassPanel_07" type="StaticBody3D" parent="." unique_id=1475945835]
+transform = Transform3D(-0.36384162, 0, -0.93146086, 0, 1, 0, 0.93146086, 0, -0.36384162, 18.776384, 8.5, 13.721547)
 
-[node name="@CollisionShape3D@9391" type="CollisionShape3D" parent="DomeGlassPanel_63" unique_id=1361847437]
-shape = SubResource("BoxShape3D_e157g")
+[node name="@CollisionShape3D@11544" type="CollisionShape3D" parent="DomeGlassPanel_07" unique_id=391759992]
+shape = SubResource("BoxShape3D_2r43y")
 
-[node name="@MeshInstance3D@9392" type="MeshInstance3D" parent="DomeGlassPanel_63" unique_id=1606907120]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_2r43y")
+[node name="@MeshInstance3D@11545" type="MeshInstance3D" parent="DomeGlassPanel_07" unique_id=403086281]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_f7awm")
 
-[node name="DomeGlassPanel_64" type="StaticBody3D" parent="." unique_id=1028735740]
-transform = Transform3D(0.9314608, 0, 0.36384165, 0, 1, 0, -0.36384165, 0, 0.9314608, -13.035469, 8.5, -17.837566)
+[node name="DomeGlassPanel_08" type="StaticBody3D" parent="." unique_id=1904995834]
+transform = Transform3D(-0.44017348, 0, -0.89791274, 0, 1, 0, 0.89791274, 0, -0.44017348, 18.424543, 8.5, 14.524726)
 
-[node name="@CollisionShape3D@9393" type="CollisionShape3D" parent="DomeGlassPanel_64" unique_id=1115091962]
-shape = SubResource("BoxShape3D_f7awm")
+[node name="@CollisionShape3D@11546" type="CollisionShape3D" parent="DomeGlassPanel_08" unique_id=1822928493]
+shape = SubResource("BoxShape3D_kfbsp")
 
-[node name="@MeshInstance3D@9394" type="MeshInstance3D" parent="DomeGlassPanel_64" unique_id=397135784]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_kfbsp")
+[node name="@MeshInstance3D@11547" type="MeshInstance3D" parent="DomeGlassPanel_08" unique_id=1820172089]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_t38cj")
 
-[node name="DomeGlassPanel_65" type="StaticBody3D" parent="." unique_id=105916256]
-transform = Transform3D(0.9565541, 0, 0.29155478, 0, 1, 0, -0.29155478, 0, 0.9565541, -12.194789, 8.5, -18.128092)
+[node name="DomeGlassPanel_09" type="StaticBody3D" parent="." unique_id=19112182]
+transform = Transform3D(-0.5185692, 0, -0.85503566, 0, 1, 0, 0.85503566, 0, -0.5185692, 18.025534, 8.5, 15.255975)
 
-[node name="@CollisionShape3D@9395" type="CollisionShape3D" parent="DomeGlassPanel_65" unique_id=1951143712]
-shape = SubResource("BoxShape3D_t38cj")
+[node name="@CollisionShape3D@11548" type="CollisionShape3D" parent="DomeGlassPanel_09" unique_id=691534512]
+shape = SubResource("BoxShape3D_t5jp6")
 
-[node name="@MeshInstance3D@9396" type="MeshInstance3D" parent="DomeGlassPanel_65" unique_id=1874015253]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_t5jp6")
+[node name="@MeshInstance3D@11549" type="MeshInstance3D" parent="DomeGlassPanel_09" unique_id=374491011]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_8boe5")
 
-[node name="DomeGlassPanel_66" type="StaticBody3D" parent="." unique_id=596424532]
-transform = Transform3D(0.97440857, 0, 0.2247842, 0, 1, 0, -0.2247842, 0, 0.97440857, -11.262919, 8.5, -18.375753)
+[node name="DomeGlassPanel_10" type="StaticBody3D" parent="." unique_id=1911921747]
+transform = Transform3D(-0.59659594, 0, -0.80254173, 0, 1, 0, 0.80254173, 0, -0.59659594, 17.577908, 8.5, 15.922328)
 
-[node name="@CollisionShape3D@9397" type="CollisionShape3D" parent="DomeGlassPanel_66" unique_id=1731801457]
-shape = SubResource("BoxShape3D_8boe5")
+[node name="@CollisionShape3D@11550" type="CollisionShape3D" parent="DomeGlassPanel_10" unique_id=491386096]
+shape = SubResource("BoxShape3D_dnuq6")
 
-[node name="@MeshInstance3D@9398" type="MeshInstance3D" parent="DomeGlassPanel_66" unique_id=1762835356]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_dnuq6")
+[node name="@MeshInstance3D@11551" type="MeshInstance3D" parent="DomeGlassPanel_10" unique_id=1988914667]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_1tyxy")
 
-[node name="DomeGlassPanel_67" type="StaticBody3D" parent="." unique_id=1451336622]
-transform = Transform3D(0.98636746, 0, 0.1645576, 0, 1, 0, -0.1645576, 0, 0.98636746, -10.21914, 8.5, -18.581226)
+[node name="DomeGlassPanel_11" type="StaticBody3D" parent="." unique_id=1266860363]
+transform = Transform3D(-0.67157847, 0, -0.7409334, 0, 1, 0, 0.7409334, 0, -0.67157847, 17.079834, 8.5, 16.528975)
 
-[node name="@CollisionShape3D@9399" type="CollisionShape3D" parent="DomeGlassPanel_67" unique_id=1715555705]
-shape = SubResource("BoxShape3D_1tyxy")
+[node name="@CollisionShape3D@11552" type="CollisionShape3D" parent="DomeGlassPanel_11" unique_id=1639190798]
+shape = SubResource("BoxShape3D_102m2")
 
-[node name="@MeshInstance3D@9400" type="MeshInstance3D" parent="DomeGlassPanel_67" unique_id=162776473]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_102m2")
+[node name="@MeshInstance3D@11553" type="MeshInstance3D" parent="DomeGlassPanel_11" unique_id=1237168834]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_fn8ax")
 
-[node name="DomeGlassPanel_68" type="StaticBody3D" parent="." unique_id=782632011]
-transform = Transform3D(0.99375206, 0, 0.111610375, 0, 1, 0, -0.111610375, 0, 0.99375206, -9.029113, 8.5, -18.745033)
+[node name="DomeGlassPanel_12" type="StaticBody3D" parent="." unique_id=1243258992]
+transform = Transform3D(-0.7409335, 0, -0.67157847, 0, 1, 0, 0.67157847, 0, -0.7409335, 16.528975, 8.5, 17.079834)
 
-[node name="@CollisionShape3D@9401" type="CollisionShape3D" parent="DomeGlassPanel_68" unique_id=1039871465]
-shape = SubResource("BoxShape3D_fn8ax")
+[node name="@CollisionShape3D@11554" type="CollisionShape3D" parent="DomeGlassPanel_12" unique_id=2033030455]
+shape = SubResource("BoxShape3D_y8j2p")
 
-[node name="@MeshInstance3D@9402" type="MeshInstance3D" parent="DomeGlassPanel_68" unique_id=1564217706]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_y8j2p")
+[node name="@MeshInstance3D@11555" type="MeshInstance3D" parent="DomeGlassPanel_12" unique_id=1591592974]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_agvli")
 
-[node name="DomeGlassPanel_69" type="StaticBody3D" parent="." unique_id=1762603722]
-transform = Transform3D(0.99777955, 0, 0.06660287, 0, 1, 0, -0.06660287, 0, 0.99777955, -7.628257, 8.5, -18.867563)
+[node name="DomeGlassPanel_13" type="StaticBody3D" parent="." unique_id=714532533]
+transform = Transform3D(-0.80254173, 0, -0.59659594, 0, 1, 0, 0.59659594, 0, -0.80254173, 15.922328, 8.5, 17.577908)
 
-[node name="@CollisionShape3D@9403" type="CollisionShape3D" parent="DomeGlassPanel_69" unique_id=1414996293]
-shape = SubResource("BoxShape3D_agvli")
+[node name="@CollisionShape3D@11556" type="CollisionShape3D" parent="DomeGlassPanel_13" unique_id=1443085435]
+shape = SubResource("BoxShape3D_0e1am")
 
-[node name="@MeshInstance3D@9404" type="MeshInstance3D" parent="DomeGlassPanel_69" unique_id=268429934]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_0e1am")
+[node name="@MeshInstance3D@11557" type="MeshInstance3D" parent="DomeGlassPanel_13" unique_id=586797189]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_ac150")
 
-[node name="DomeGlassPanel_70" type="StaticBody3D" parent="." unique_id=65571541]
-transform = Transform3D(0.9995362, 0, 0.03045329, 0, 1, 0, -0.03045329, 0, 0.9995362, -5.861732, 8.5, -18.9491)
+[node name="DomeGlassPanel_14" type="StaticBody3D" parent="." unique_id=1363203535]
+transform = Transform3D(-0.8550357, 0, -0.5185692, 0, 1, 0, 0.5185692, 0, -0.8550357, 15.255975, 8.5, 18.025534)
 
-[node name="@CollisionShape3D@9405" type="CollisionShape3D" parent="DomeGlassPanel_70" unique_id=1052645376]
-shape = SubResource("BoxShape3D_ac150")
+[node name="@CollisionShape3D@11558" type="CollisionShape3D" parent="DomeGlassPanel_14" unique_id=1003106857]
+shape = SubResource("BoxShape3D_yytil")
 
-[node name="@MeshInstance3D@9406" type="MeshInstance3D" parent="DomeGlassPanel_70" unique_id=413190433]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_yytil")
+[node name="@MeshInstance3D@11559" type="MeshInstance3D" parent="DomeGlassPanel_14" unique_id=727985060]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_w8c4m")
 
-[node name="DomeGlassPanel_71" type="StaticBody3D" parent="." unique_id=1615783329]
-transform = Transform3D(0.99999124, 0, 0.004188243, 0, 1, 0, -0.004188243, 0, 0.99999124, -2.4295335, 8.5, -18.989824)
+[node name="DomeGlassPanel_15" type="StaticBody3D" parent="." unique_id=1425466493]
+transform = Transform3D(-0.89791274, 0, -0.44017348, 0, 1, 0, 0.44017348, 0, -0.89791274, 14.524726, 8.5, 18.424543)
 
-[node name="@CollisionShape3D@9407" type="CollisionShape3D" parent="DomeGlassPanel_71" unique_id=676518503]
-shape = SubResource("BoxShape3D_w8c4m")
+[node name="@CollisionShape3D@11560" type="CollisionShape3D" parent="DomeGlassPanel_15" unique_id=381702086]
+shape = SubResource("BoxShape3D_jxfhd")
 
-[node name="@MeshInstance3D@9408" type="MeshInstance3D" parent="DomeGlassPanel_71" unique_id=565304504]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_jxfhd")
+[node name="@MeshInstance3D@11561" type="MeshInstance3D" parent="DomeGlassPanel_15" unique_id=288744152]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_ajrru")
 
-[node name="DomeGlassPanel_72" type="StaticBody3D" parent="." unique_id=505179293]
-transform = Transform3D(0.99999124, 0, -0.0041882424, 0, 1, 0, 0.0041882424, 0, 0.99999124, 2.4295332, 8.5, -18.989824)
+[node name="DomeGlassPanel_16" type="StaticBody3D" parent="." unique_id=1406116831]
+transform = Transform3D(-0.9314608, 0, -0.3638417, 0, 1, 0, 0.3638417, 0, -0.9314608, 13.721547, 8.5, 18.776384)
 
-[node name="@CollisionShape3D@9409" type="CollisionShape3D" parent="DomeGlassPanel_72" unique_id=1066951104]
-shape = SubResource("BoxShape3D_ajrru")
+[node name="@CollisionShape3D@11562" type="CollisionShape3D" parent="DomeGlassPanel_16" unique_id=1267816105]
+shape = SubResource("BoxShape3D_tvlh1")
 
-[node name="@MeshInstance3D@9410" type="MeshInstance3D" parent="DomeGlassPanel_72" unique_id=1474091585]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_tvlh1")
+[node name="@MeshInstance3D@11563" type="MeshInstance3D" parent="DomeGlassPanel_16" unique_id=2129211716]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_ivug7")
 
-[node name="DomeGlassPanel_73" type="StaticBody3D" parent="." unique_id=1447424179]
-transform = Transform3D(0.9995362, 0, -0.03045329, 0, 1, 0, 0.03045329, 0, 0.9995362, 5.861732, 8.5, -18.9491)
+[node name="DomeGlassPanel_17" type="StaticBody3D" parent="." unique_id=215592494]
+transform = Transform3D(-0.9565541, 0, -0.2915548, 0, 1, 0, 0.2915548, 0, -0.9565541, 12.83662, 8.5, 19.082201)
 
-[node name="@CollisionShape3D@9411" type="CollisionShape3D" parent="DomeGlassPanel_73" unique_id=1942074711]
-shape = SubResource("BoxShape3D_ivug7")
+[node name="@CollisionShape3D@11564" type="CollisionShape3D" parent="DomeGlassPanel_17" unique_id=1858447742]
+shape = SubResource("BoxShape3D_ux0et")
 
-[node name="@MeshInstance3D@9412" type="MeshInstance3D" parent="DomeGlassPanel_73" unique_id=1096165184]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_ux0et")
+[node name="@MeshInstance3D@11565" type="MeshInstance3D" parent="DomeGlassPanel_17" unique_id=1766551275]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_vu472")
 
-[node name="DomeGlassPanel_74" type="StaticBody3D" parent="." unique_id=1971066985]
-transform = Transform3D(0.99777955, 0, -0.06660287, 0, 1, 0, 0.06660287, 0, 0.99777955, 7.628257, 8.5, -18.867563)
+[node name="DomeGlassPanel_18" type="StaticBody3D" parent="." unique_id=839087417]
+transform = Transform3D(-0.9744086, 0, -0.22478408, 0, 1, 0, 0.22478408, 0, -0.9744086, 11.855704, 8.5, 19.3429)
 
-[node name="@CollisionShape3D@9413" type="CollisionShape3D" parent="DomeGlassPanel_74" unique_id=1857501530]
-shape = SubResource("BoxShape3D_vu472")
+[node name="@CollisionShape3D@11566" type="CollisionShape3D" parent="DomeGlassPanel_18" unique_id=76032656]
+shape = SubResource("BoxShape3D_wov7m")
 
-[node name="@MeshInstance3D@9414" type="MeshInstance3D" parent="DomeGlassPanel_74" unique_id=1503998018]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_wov7m")
+[node name="@MeshInstance3D@11567" type="MeshInstance3D" parent="DomeGlassPanel_18" unique_id=1648646214]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_gjygj")
 
-[node name="DomeGlassPanel_75" type="StaticBody3D" parent="." unique_id=1111513165]
-transform = Transform3D(0.99375206, 0, -0.111610375, 0, 1, 0, 0.111610375, 0, 0.99375206, 9.029113, 8.5, -18.745033)
+[node name="DomeGlassPanel_19" type="StaticBody3D" parent="." unique_id=950462295]
+transform = Transform3D(-0.98636746, 0, -0.1645577, 0, 1, 0, 0.1645577, 0, -0.98636746, 10.7569895, 8.5, 19.559187)
 
-[node name="@CollisionShape3D@9415" type="CollisionShape3D" parent="DomeGlassPanel_75" unique_id=252891245]
-shape = SubResource("BoxShape3D_gjygj")
+[node name="@CollisionShape3D@11568" type="CollisionShape3D" parent="DomeGlassPanel_19" unique_id=169827578]
+shape = SubResource("BoxShape3D_ax84t")
 
-[node name="@MeshInstance3D@9416" type="MeshInstance3D" parent="DomeGlassPanel_75" unique_id=1774860385]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_ax84t")
+[node name="@MeshInstance3D@11569" type="MeshInstance3D" parent="DomeGlassPanel_19" unique_id=1830625155]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_7vs2g")
 
-[node name="DomeGlassPanel_76" type="StaticBody3D" parent="." unique_id=1331536051]
-transform = Transform3D(0.98636746, 0, -0.1645576, 0, 1, 0, 0.1645576, 0, 0.98636746, 10.21914, 8.5, -18.581226)
+[node name="DomeGlassPanel_20" type="StaticBody3D" parent="." unique_id=2099285648]
+transform = Transform3D(-0.99375206, 0, -0.11161047, 0, 1, 0, 0.11161047, 0, -0.99375206, 9.504329, 8.5, 19.731613)
 
-[node name="@CollisionShape3D@9417" type="CollisionShape3D" parent="DomeGlassPanel_76" unique_id=929344126]
-shape = SubResource("BoxShape3D_7vs2g")
+[node name="@CollisionShape3D@11570" type="CollisionShape3D" parent="DomeGlassPanel_20" unique_id=1885467045]
+shape = SubResource("BoxShape3D_386ua")
 
-[node name="@MeshInstance3D@9418" type="MeshInstance3D" parent="DomeGlassPanel_76" unique_id=901666653]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_386ua")
+[node name="@MeshInstance3D@11571" type="MeshInstance3D" parent="DomeGlassPanel_20" unique_id=141260819]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_pljku")
 
-[node name="DomeGlassPanel_77" type="StaticBody3D" parent="." unique_id=61251391]
-transform = Transform3D(0.97440857, 0, -0.2247842, 0, 1, 0, 0.2247842, 0, 0.97440857, 11.262919, 8.5, -18.375753)
+[node name="DomeGlassPanel_21" type="StaticBody3D" parent="." unique_id=1454692261]
+transform = Transform3D(-0.99777955, 0, -0.06660287, 0, 1, 0, 0.06660287, 0, -0.99777955, 8.029744, 8.5, 19.860592)
 
-[node name="@CollisionShape3D@9419" type="CollisionShape3D" parent="DomeGlassPanel_77" unique_id=614522881]
-shape = SubResource("BoxShape3D_pljku")
+[node name="@CollisionShape3D@11572" type="CollisionShape3D" parent="DomeGlassPanel_21" unique_id=1744401027]
+shape = SubResource("BoxShape3D_42xli")
 
-[node name="@MeshInstance3D@9420" type="MeshInstance3D" parent="DomeGlassPanel_77" unique_id=75254047]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_42xli")
+[node name="@MeshInstance3D@11573" type="MeshInstance3D" parent="DomeGlassPanel_21" unique_id=832204870]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_ucwui")
 
-[node name="DomeGlassPanel_78" type="StaticBody3D" parent="." unique_id=1458325775]
-transform = Transform3D(0.9565541, 0, -0.29155478, 0, 1, 0, 0.29155478, 0, 0.9565541, 12.194789, 8.5, -18.128092)
+[node name="DomeGlassEyeRim_22_0" type="StaticBody3D" parent="." unique_id=713648464]
+transform = Transform3D(-0.9995362, 0, -0.030453177, 0, 1, 0, 0.030453177, 0, -0.9995362, 6.170244, 3.05, 19.94642)
 
-[node name="@CollisionShape3D@9421" type="CollisionShape3D" parent="DomeGlassPanel_78" unique_id=2088768873]
-shape = SubResource("BoxShape3D_ucwui")
+[node name="@CollisionShape3D@11574" type="CollisionShape3D" parent="DomeGlassEyeRim_22_0" unique_id=1674211894]
+shape = SubResource("BoxShape3D_oe3pg")
 
-[node name="@MeshInstance3D@9422" type="MeshInstance3D" parent="DomeGlassPanel_78" unique_id=979923694]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_oe3pg")
+[node name="@MeshInstance3D@11575" type="MeshInstance3D" parent="DomeGlassEyeRim_22_0" unique_id=1631000681]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_k38oa")
 
-[node name="DomeGlassPanel_79" type="StaticBody3D" parent="." unique_id=218050344]
-transform = Transform3D(0.9314608, 0, -0.36384165, 0, 1, 0, 0.36384165, 0, 0.9314608, 13.035469, 8.5, -17.837566)
+[node name="DomeGlassEyeRim_22_1" type="StaticBody3D" parent="." unique_id=1149009784]
+transform = Transform3D(-0.9995362, 0, -0.030453177, 0, 1, 0, 0.030453177, 0, -0.9995362, 6.170244, 14.4, 19.94642)
 
-[node name="@CollisionShape3D@9423" type="CollisionShape3D" parent="DomeGlassPanel_79" unique_id=262907086]
-shape = SubResource("BoxShape3D_k38oa")
+[node name="@CollisionShape3D@11576" type="CollisionShape3D" parent="DomeGlassEyeRim_22_1" unique_id=58765662]
+shape = SubResource("BoxShape3D_cgx8s")
 
-[node name="@MeshInstance3D@9424" type="MeshInstance3D" parent="DomeGlassPanel_79" unique_id=1191063326]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_cgx8s")
+[node name="@MeshInstance3D@11577" type="MeshInstance3D" parent="DomeGlassEyeRim_22_1" unique_id=1001926934]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_ijjxi")
 
-[node name="DomeGlassPanel_80" type="StaticBody3D" parent="." unique_id=825010050]
-transform = Transform3D(0.89791274, 0, -0.44017357, 0, 1, 0, 0.44017357, 0, 0.89791274, 13.79849, 8.5, -17.503317)
+[node name="DomeGlassEyeRim_23_0" type="StaticBody3D" parent="." unique_id=160990011]
+transform = Transform3D(-0.99999124, 0, -0.0041881995, 0, 1, 0, 0.0041881995, 0, -0.99999124, 2.5574036, 3.05, 19.989288)
 
-[node name="@CollisionShape3D@9425" type="CollisionShape3D" parent="DomeGlassPanel_80" unique_id=161063159]
-shape = SubResource("BoxShape3D_ijjxi")
+[node name="@CollisionShape3D@11578" type="CollisionShape3D" parent="DomeGlassEyeRim_23_0" unique_id=1555620588]
+shape = SubResource("BoxShape3D_yxwtk")
 
-[node name="@MeshInstance3D@9426" type="MeshInstance3D" parent="DomeGlassPanel_80" unique_id=665538075]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_yxwtk")
+[node name="@MeshInstance3D@11579" type="MeshInstance3D" parent="DomeGlassEyeRim_23_0" unique_id=972624655]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_r37vx")
 
-[node name="DomeGlassPanel_81" type="StaticBody3D" parent="." unique_id=766932062]
-transform = Transform3D(0.85503566, 0, -0.51856923, 0, 1, 0, 0.51856923, 0, 0.85503566, 14.493176, 8.5, -17.124258)
+[node name="DomeGlassEyeRim_23_1" type="StaticBody3D" parent="." unique_id=735460148]
+transform = Transform3D(-0.99999124, 0, -0.0041881995, 0, 1, 0, 0.0041881995, 0, -0.99999124, 2.5574036, 14.4, 19.989288)
 
-[node name="@CollisionShape3D@9427" type="CollisionShape3D" parent="DomeGlassPanel_81" unique_id=1428991739]
-shape = SubResource("BoxShape3D_r37vx")
+[node name="@CollisionShape3D@11580" type="CollisionShape3D" parent="DomeGlassEyeRim_23_1" unique_id=1182727728]
+shape = SubResource("BoxShape3D_71s50")
 
-[node name="@MeshInstance3D@9428" type="MeshInstance3D" parent="DomeGlassPanel_81" unique_id=2142529956]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_71s50")
+[node name="@MeshInstance3D@11581" type="MeshInstance3D" parent="DomeGlassEyeRim_23_1" unique_id=700228861]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_aslsa")
 
-[node name="DomeGlassPanel_82" type="StaticBody3D" parent="." unique_id=1949788020]
-transform = Transform3D(0.8025418, 0, -0.5965959, 0, 1, 0, 0.5965959, 0, 0.8025418, 15.126211, 8.5, -16.699013)
+[node name="DomeGlassEyeRim_24_0" type="StaticBody3D" parent="." unique_id=553488632]
+transform = Transform3D(-0.99999124, 0, 0.0041881995, 0, 1, 0, -0.0041881995, 0, -0.99999124, -2.5574036, 3.05, 19.989288)
 
-[node name="@CollisionShape3D@9429" type="CollisionShape3D" parent="DomeGlassPanel_82" unique_id=1238445623]
-shape = SubResource("BoxShape3D_aslsa")
+[node name="@CollisionShape3D@11582" type="CollisionShape3D" parent="DomeGlassEyeRim_24_0" unique_id=667785925]
+shape = SubResource("BoxShape3D_d7sfy")
 
-[node name="@MeshInstance3D@9430" type="MeshInstance3D" parent="DomeGlassPanel_82" unique_id=1541120389]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_d7sfy")
+[node name="@MeshInstance3D@11583" type="MeshInstance3D" parent="DomeGlassEyeRim_24_0" unique_id=1313222960]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_fq42a")
 
-[node name="DomeGlassPanel_83" type="StaticBody3D" parent="." unique_id=210332019]
-transform = Transform3D(0.74093354, 0, -0.6715784, 0, 1, 0, 0.6715784, 0, 0.74093354, 15.702526, 8.5, -16.225842)
+[node name="DomeGlassEyeRim_24_1" type="StaticBody3D" parent="." unique_id=1253682819]
+transform = Transform3D(-0.99999124, 0, 0.0041881995, 0, 1, 0, -0.0041881995, 0, -0.99999124, -2.5574036, 14.4, 19.989288)
 
-[node name="@CollisionShape3D@9431" type="CollisionShape3D" parent="DomeGlassPanel_83" unique_id=1220491188]
-shape = SubResource("BoxShape3D_fq42a")
+[node name="@CollisionShape3D@11584" type="CollisionShape3D" parent="DomeGlassEyeRim_24_1" unique_id=1580788514]
+shape = SubResource("BoxShape3D_kytk0")
 
-[node name="@MeshInstance3D@9432" type="MeshInstance3D" parent="DomeGlassPanel_83" unique_id=77270060]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_kytk0")
+[node name="@MeshInstance3D@11585" type="MeshInstance3D" parent="DomeGlassEyeRim_24_1" unique_id=250594143]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_jyfvj")
 
-[node name="DomeGlassPanel_84" type="StaticBody3D" parent="." unique_id=221956965]
-transform = Transform3D(0.6715784, 0, -0.7409335, 0, 1, 0, 0.7409335, 0, 0.6715784, 16.225842, 8.5, -15.702526)
+[node name="DomeGlassEyeRim_25_0" type="StaticBody3D" parent="." unique_id=437637338]
+transform = Transform3D(-0.9995362, 0, 0.030453177, 0, 1, 0, -0.030453177, 0, -0.9995362, -6.170244, 3.05, 19.94642)
 
-[node name="@CollisionShape3D@9433" type="CollisionShape3D" parent="DomeGlassPanel_84" unique_id=582040163]
-shape = SubResource("BoxShape3D_jyfvj")
+[node name="@CollisionShape3D@11586" type="CollisionShape3D" parent="DomeGlassEyeRim_25_0" unique_id=351291440]
+shape = SubResource("BoxShape3D_kqd0y")
 
-[node name="@MeshInstance3D@9434" type="MeshInstance3D" parent="DomeGlassPanel_84" unique_id=1563572915]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_kqd0y")
+[node name="@MeshInstance3D@11587" type="MeshInstance3D" parent="DomeGlassEyeRim_25_0" unique_id=83305898]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_6je8y")
 
-[node name="DomeGlassPanel_85" type="StaticBody3D" parent="." unique_id=536421423]
-transform = Transform3D(0.5965958, 0, -0.80254185, 0, 1, 0, 0.80254185, 0, 0.5965958, 16.699013, 8.5, -15.126211)
+[node name="DomeGlassEyeRim_25_1" type="StaticBody3D" parent="." unique_id=585197205]
+transform = Transform3D(-0.9995362, 0, 0.030453177, 0, 1, 0, -0.030453177, 0, -0.9995362, -6.170244, 14.4, 19.94642)
 
-[node name="@CollisionShape3D@9435" type="CollisionShape3D" parent="DomeGlassPanel_85" unique_id=1732626389]
-shape = SubResource("BoxShape3D_6je8y")
+[node name="@CollisionShape3D@11588" type="CollisionShape3D" parent="DomeGlassEyeRim_25_1" unique_id=1177284522]
+shape = SubResource("BoxShape3D_njsuu")
 
-[node name="@MeshInstance3D@9436" type="MeshInstance3D" parent="DomeGlassPanel_85" unique_id=1844432036]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_njsuu")
+[node name="@MeshInstance3D@11589" type="MeshInstance3D" parent="DomeGlassEyeRim_25_1" unique_id=1030681348]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_v27tb")
 
-[node name="DomeGlassPanel_86" type="StaticBody3D" parent="." unique_id=58748224]
-transform = Transform3D(0.5185692, 0, -0.85503566, 0, 1, 0, 0.85503566, 0, 0.5185692, 17.124258, 8.5, -14.493176)
+[node name="DomeGlassPanel_26" type="StaticBody3D" parent="." unique_id=1742076138]
+transform = Transform3D(-0.99777955, 0, 0.06660287, 0, 1, 0, -0.06660287, 0, -0.99777955, -8.029744, 8.5, 19.860592)
 
-[node name="@CollisionShape3D@9437" type="CollisionShape3D" parent="DomeGlassPanel_86" unique_id=84821190]
-shape = SubResource("BoxShape3D_v27tb")
+[node name="@CollisionShape3D@11590" type="CollisionShape3D" parent="DomeGlassPanel_26" unique_id=1755611186]
+shape = SubResource("BoxShape3D_v750l")
 
-[node name="@MeshInstance3D@9438" type="MeshInstance3D" parent="DomeGlassPanel_86" unique_id=1598046759]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_v750l")
+[node name="@MeshInstance3D@11591" type="MeshInstance3D" parent="DomeGlassPanel_26" unique_id=1500911611]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_p25n6")
 
-[node name="DomeGlassPanel_87" type="StaticBody3D" parent="." unique_id=2009326086]
-transform = Transform3D(0.4401735, 0, -0.89791274, 0, 1, 0, 0.89791274, 0, 0.4401735, 17.503317, 8.5, -13.79849)
+[node name="DomeGlassPanel_27" type="StaticBody3D" parent="." unique_id=2060460556]
+transform = Transform3D(-0.99375206, 0, 0.11161047, 0, 1, 0, -0.11161047, 0, -0.99375206, -9.504329, 8.5, 19.731613)
 
-[node name="@CollisionShape3D@9439" type="CollisionShape3D" parent="DomeGlassPanel_87" unique_id=1296474050]
-shape = SubResource("BoxShape3D_p25n6")
+[node name="@CollisionShape3D@11592" type="CollisionShape3D" parent="DomeGlassPanel_27" unique_id=1527430456]
+shape = SubResource("BoxShape3D_yrh02")
 
-[node name="@MeshInstance3D@9440" type="MeshInstance3D" parent="DomeGlassPanel_87" unique_id=1536795988]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_yrh02")
+[node name="@MeshInstance3D@11593" type="MeshInstance3D" parent="DomeGlassPanel_27" unique_id=2034218860]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_5g6qr")
 
-[node name="DomeGlassPanel_88" type="StaticBody3D" parent="." unique_id=152137058]
-transform = Transform3D(0.36384165, 0, -0.9314608, 0, 1, 0, 0.9314608, 0, 0.36384165, 17.837566, 8.5, -13.035469)
+[node name="DomeGlassPanel_28" type="StaticBody3D" parent="." unique_id=1652266141]
+transform = Transform3D(-0.98636746, 0, 0.1645577, 0, 1, 0, -0.1645577, 0, -0.98636746, -10.7569895, 8.5, 19.559187)
 
-[node name="@CollisionShape3D@9441" type="CollisionShape3D" parent="DomeGlassPanel_88" unique_id=634436779]
-shape = SubResource("BoxShape3D_5g6qr")
+[node name="@CollisionShape3D@11594" type="CollisionShape3D" parent="DomeGlassPanel_28" unique_id=86834996]
+shape = SubResource("BoxShape3D_6f4js")
 
-[node name="@MeshInstance3D@9442" type="MeshInstance3D" parent="DomeGlassPanel_88" unique_id=784850938]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_6f4js")
+[node name="@MeshInstance3D@11595" type="MeshInstance3D" parent="DomeGlassPanel_28" unique_id=338989580]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_p0n7g")
 
-[node name="DomeGlassPanel_89" type="StaticBody3D" parent="." unique_id=699954296]
-transform = Transform3D(0.29155472, 0, -0.9565542, 0, 1, 0, 0.9565542, 0, 0.29155472, 18.128092, 8.5, -12.194789)
+[node name="DomeGlassPanel_29" type="StaticBody3D" parent="." unique_id=1292452462]
+transform = Transform3D(-0.9744086, 0, 0.22478408, 0, 1, 0, -0.22478408, 0, -0.9744086, -11.855704, 8.5, 19.3429)
 
-[node name="@CollisionShape3D@9443" type="CollisionShape3D" parent="DomeGlassPanel_89" unique_id=2088195647]
-shape = SubResource("BoxShape3D_p0n7g")
+[node name="@CollisionShape3D@11596" type="CollisionShape3D" parent="DomeGlassPanel_29" unique_id=1542602347]
+shape = SubResource("BoxShape3D_oebt6")
 
-[node name="@MeshInstance3D@9444" type="MeshInstance3D" parent="DomeGlassPanel_89" unique_id=490807147]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_oebt6")
+[node name="@MeshInstance3D@11597" type="MeshInstance3D" parent="DomeGlassPanel_29" unique_id=734028504]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_tqw1e")
 
-[node name="DomeGlassPanel_90" type="StaticBody3D" parent="." unique_id=2112140152]
-transform = Transform3D(0.22478424, 0, -0.97440857, 0, 1, 0, 0.97440857, 0, 0.22478424, 18.375753, 8.5, -11.262919)
+[node name="DomeGlassPanel_30" type="StaticBody3D" parent="." unique_id=1089664008]
+transform = Transform3D(-0.9565541, 0, 0.2915548, 0, 1, 0, -0.2915548, 0, -0.9565541, -12.83662, 8.5, 19.082201)
 
-[node name="@CollisionShape3D@9445" type="CollisionShape3D" parent="DomeGlassPanel_90" unique_id=1779880390]
-shape = SubResource("BoxShape3D_tqw1e")
+[node name="@CollisionShape3D@11598" type="CollisionShape3D" parent="DomeGlassPanel_30" unique_id=1386760983]
+shape = SubResource("BoxShape3D_ht21s")
 
-[node name="@MeshInstance3D@9446" type="MeshInstance3D" parent="DomeGlassPanel_90" unique_id=1202160838]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_ht21s")
+[node name="@MeshInstance3D@11599" type="MeshInstance3D" parent="DomeGlassPanel_30" unique_id=343714242]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_jxidi")
 
-[node name="DomeGlassPanel_91" type="StaticBody3D" parent="." unique_id=400759211]
-transform = Transform3D(0.16455762, 0, -0.98636746, 0, 1, 0, 0.98636746, 0, 0.16455762, 18.581226, 8.5, -10.21914)
+[node name="DomeGlassPanel_31" type="StaticBody3D" parent="." unique_id=1236066748]
+transform = Transform3D(-0.9314608, 0, 0.3638417, 0, 1, 0, -0.3638417, 0, -0.9314608, -13.721547, 8.5, 18.776384)
 
-[node name="@CollisionShape3D@9447" type="CollisionShape3D" parent="DomeGlassPanel_91" unique_id=1801111376]
-shape = SubResource("BoxShape3D_jxidi")
+[node name="@CollisionShape3D@11600" type="CollisionShape3D" parent="DomeGlassPanel_31" unique_id=1214824017]
+shape = SubResource("BoxShape3D_kv5nv")
 
-[node name="@MeshInstance3D@9448" type="MeshInstance3D" parent="DomeGlassPanel_91" unique_id=1069611259]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_kv5nv")
+[node name="@MeshInstance3D@11601" type="MeshInstance3D" parent="DomeGlassPanel_31" unique_id=1111543999]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_j810e")
 
-[node name="DomeGlassPanel_92" type="StaticBody3D" parent="." unique_id=739219628]
-transform = Transform3D(0.1116104, 0, -0.99375206, 0, 1, 0, 0.99375206, 0, 0.1116104, 18.745033, 8.5, -9.029113)
+[node name="DomeGlassPanel_32" type="StaticBody3D" parent="." unique_id=1348392640]
+transform = Transform3D(-0.89791274, 0, 0.44017348, 0, 1, 0, -0.44017348, 0, -0.89791274, -14.524726, 8.5, 18.424543)
 
-[node name="@CollisionShape3D@9449" type="CollisionShape3D" parent="DomeGlassPanel_92" unique_id=85881202]
-shape = SubResource("BoxShape3D_j810e")
+[node name="@CollisionShape3D@11602" type="CollisionShape3D" parent="DomeGlassPanel_32" unique_id=289336950]
+shape = SubResource("BoxShape3D_cp5qy")
 
-[node name="@MeshInstance3D@9450" type="MeshInstance3D" parent="DomeGlassPanel_92" unique_id=381374121]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_cp5qy")
+[node name="@MeshInstance3D@11603" type="MeshInstance3D" parent="DomeGlassPanel_32" unique_id=179710249]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_6t1nx")
 
-[node name="DomeGlassPanel_93" type="StaticBody3D" parent="." unique_id=1798609505]
-transform = Transform3D(0.066602916, 0, -0.99777955, 0, 1, 0, 0.99777955, 0, 0.066602916, 18.867563, 8.5, -7.628257)
+[node name="DomeGlassPanel_33" type="StaticBody3D" parent="." unique_id=1211344580]
+transform = Transform3D(-0.8550357, 0, 0.5185692, 0, 1, 0, -0.5185692, 0, -0.8550357, -15.255975, 8.5, 18.025534)
 
-[node name="@CollisionShape3D@9451" type="CollisionShape3D" parent="DomeGlassPanel_93" unique_id=1574678643]
-shape = SubResource("BoxShape3D_6t1nx")
+[node name="@CollisionShape3D@11604" type="CollisionShape3D" parent="DomeGlassPanel_33" unique_id=1358681735]
+shape = SubResource("BoxShape3D_ybo8u")
 
-[node name="@MeshInstance3D@9452" type="MeshInstance3D" parent="DomeGlassPanel_93" unique_id=1253695578]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_ybo8u")
+[node name="@MeshInstance3D@11605" type="MeshInstance3D" parent="DomeGlassPanel_33" unique_id=450275999]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_8qqvi")
 
-[node name="DomeGlassPanel_94" type="StaticBody3D" parent="." unique_id=829942975]
-transform = Transform3D(0.03045334, 0, -0.9995362, 0, 1, 0, 0.9995362, 0, 0.03045334, 18.9491, 8.5, -5.861732)
+[node name="DomeGlassPanel_34" type="StaticBody3D" parent="." unique_id=1982743691]
+transform = Transform3D(-0.80254173, 0, 0.59659594, 0, 1, 0, -0.59659594, 0, -0.80254173, -15.922328, 8.5, 17.577908)
 
-[node name="@CollisionShape3D@9453" type="CollisionShape3D" parent="DomeGlassPanel_94" unique_id=636119026]
-shape = SubResource("BoxShape3D_8qqvi")
+[node name="@CollisionShape3D@11606" type="CollisionShape3D" parent="DomeGlassPanel_34" unique_id=419587366]
+shape = SubResource("BoxShape3D_llerx")
 
-[node name="@MeshInstance3D@9454" type="MeshInstance3D" parent="DomeGlassPanel_94" unique_id=234425282]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_llerx")
+[node name="@MeshInstance3D@11607" type="MeshInstance3D" parent="DomeGlassPanel_34" unique_id=8767976]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_0nqd7")
 
-[node name="DomeGlassPanel_95" type="StaticBody3D" parent="." unique_id=1877706718]
-transform = Transform3D(0.0041882433, 0, -0.99999124, 0, 1, 0, 0.99999124, 0, 0.0041882433, 18.989824, 8.5, -2.4295335)
+[node name="DomeGlassPanel_35" type="StaticBody3D" parent="." unique_id=828958162]
+transform = Transform3D(-0.7409335, 0, 0.67157847, 0, 1, 0, -0.67157847, 0, -0.7409335, -16.528975, 8.5, 17.079834)
 
-[node name="@CollisionShape3D@9455" type="CollisionShape3D" parent="DomeGlassPanel_95" unique_id=1251623189]
-shape = SubResource("BoxShape3D_0nqd7")
+[node name="@CollisionShape3D@11608" type="CollisionShape3D" parent="DomeGlassPanel_35" unique_id=1875472791]
+shape = SubResource("BoxShape3D_8xmyi")
 
-[node name="@MeshInstance3D@9456" type="MeshInstance3D" parent="DomeGlassPanel_95" unique_id=889701666]
-material_override = SubResource("StandardMaterial3D_8pemf")
-mesh = SubResource("BoxMesh_8xmyi")
+[node name="@MeshInstance3D@11609" type="MeshInstance3D" parent="DomeGlassPanel_35" unique_id=5227248]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_nemaf")
+
+[node name="DomeGlassPanel_36" type="StaticBody3D" parent="." unique_id=1818202225]
+transform = Transform3D(-0.67157847, 0, 0.7409334, 0, 1, 0, -0.7409334, 0, -0.67157847, -17.079834, 8.5, 16.528975)
+
+[node name="@CollisionShape3D@11610" type="CollisionShape3D" parent="DomeGlassPanel_36" unique_id=1390946761]
+shape = SubResource("BoxShape3D_vxyrh")
+
+[node name="@MeshInstance3D@11611" type="MeshInstance3D" parent="DomeGlassPanel_36" unique_id=1808504832]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_nkpgp")
+
+[node name="DomeGlassPanel_37" type="StaticBody3D" parent="." unique_id=1310342796]
+transform = Transform3D(-0.59659594, 0, 0.80254173, 0, 1, 0, -0.80254173, 0, -0.59659594, -17.577908, 8.5, 15.922328)
+
+[node name="@CollisionShape3D@11612" type="CollisionShape3D" parent="DomeGlassPanel_37" unique_id=554788571]
+shape = SubResource("BoxShape3D_pp5fd")
+
+[node name="@MeshInstance3D@11613" type="MeshInstance3D" parent="DomeGlassPanel_37" unique_id=801731589]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_8vld2")
+
+[node name="DomeGlassPanel_38" type="StaticBody3D" parent="." unique_id=480113168]
+transform = Transform3D(-0.5185692, 0, 0.85503566, 0, 1, 0, -0.85503566, 0, -0.5185692, -18.025534, 8.5, 15.255975)
+
+[node name="@CollisionShape3D@11614" type="CollisionShape3D" parent="DomeGlassPanel_38" unique_id=774434870]
+shape = SubResource("BoxShape3D_qlrvs")
+
+[node name="@MeshInstance3D@11615" type="MeshInstance3D" parent="DomeGlassPanel_38" unique_id=1308013261]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_o70ne")
+
+[node name="DomeGlassPanel_39" type="StaticBody3D" parent="." unique_id=122437768]
+transform = Transform3D(-0.44017348, 0, 0.89791274, 0, 1, 0, -0.89791274, 0, -0.44017348, -18.424543, 8.5, 14.524726)
+
+[node name="@CollisionShape3D@11616" type="CollisionShape3D" parent="DomeGlassPanel_39" unique_id=1596241941]
+shape = SubResource("BoxShape3D_vrxnc")
+
+[node name="@MeshInstance3D@11617" type="MeshInstance3D" parent="DomeGlassPanel_39" unique_id=1514559970]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_23waj")
+
+[node name="DomeGlassPanel_40" type="StaticBody3D" parent="." unique_id=993579174]
+transform = Transform3D(-0.36384162, 0, 0.93146086, 0, 1, 0, -0.93146086, 0, -0.36384162, -18.776384, 8.5, 13.721547)
+
+[node name="@CollisionShape3D@11618" type="CollisionShape3D" parent="DomeGlassPanel_40" unique_id=1944114241]
+shape = SubResource("BoxShape3D_s6ab7")
+
+[node name="@MeshInstance3D@11619" type="MeshInstance3D" parent="DomeGlassPanel_40" unique_id=1217321964]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_d18pf")
+
+[node name="DomeGlassPanel_41" type="StaticBody3D" parent="." unique_id=1959095818]
+transform = Transform3D(-0.2915548, 0, 0.9565541, 0, 1, 0, -0.9565541, 0, -0.2915548, -19.082201, 8.5, 12.83662)
+
+[node name="@CollisionShape3D@11620" type="CollisionShape3D" parent="DomeGlassPanel_41" unique_id=413232253]
+shape = SubResource("BoxShape3D_py826")
+
+[node name="@MeshInstance3D@11621" type="MeshInstance3D" parent="DomeGlassPanel_41" unique_id=901666852]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_0wgl4")
+
+[node name="DomeGlassPanel_42" type="StaticBody3D" parent="." unique_id=1906939531]
+transform = Transform3D(-0.22478421, 0, 0.97440857, 0, 1, 0, -0.97440857, 0, -0.22478421, -19.3429, 8.5, 11.855704)
+
+[node name="@CollisionShape3D@11622" type="CollisionShape3D" parent="DomeGlassPanel_42" unique_id=1891710945]
+shape = SubResource("BoxShape3D_uv41p")
+
+[node name="@MeshInstance3D@11623" type="MeshInstance3D" parent="DomeGlassPanel_42" unique_id=410696316]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_qxxwh")
+
+[node name="DomeGlassPanel_43" type="StaticBody3D" parent="." unique_id=1961044238]
+transform = Transform3D(-0.16455759, 0, 0.98636746, 0, 1, 0, -0.98636746, 0, -0.16455759, -19.559187, 8.5, 10.7569895)
+
+[node name="@CollisionShape3D@11624" type="CollisionShape3D" parent="DomeGlassPanel_43" unique_id=1272485929]
+shape = SubResource("BoxShape3D_4gcly")
+
+[node name="@MeshInstance3D@11625" type="MeshInstance3D" parent="DomeGlassPanel_43" unique_id=1700416304]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_dqr2d")
+
+[node name="DomeGlassPanel_44" type="StaticBody3D" parent="." unique_id=1422894280]
+transform = Transform3D(-0.11161036, 0, 0.99375206, 0, 1, 0, -0.99375206, 0, -0.11161036, -19.731613, 8.5, 9.504329)
+
+[node name="@CollisionShape3D@11626" type="CollisionShape3D" parent="DomeGlassPanel_44" unique_id=584286861]
+shape = SubResource("BoxShape3D_nkbha")
+
+[node name="@MeshInstance3D@11627" type="MeshInstance3D" parent="DomeGlassPanel_44" unique_id=1434586597]
+material_override = SubResource("StandardMaterial3D_y3dds")
+mesh = SubResource("BoxMesh_0ic3n")

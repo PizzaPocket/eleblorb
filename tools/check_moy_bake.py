@@ -11,8 +11,8 @@ if not manifest_path.exists():
     sys.exit("Moy city bake is missing; run Godot --headless --path . tools/bake_moy_city.tscn")
 manifest = json.loads(manifest_path.read_text())
 bad = []
-if manifest.get("format") != 3:
-    bad.append("pass-3 manifest format missing")
+if manifest.get("format") != 4:
+	bad.append("pass-4 manifest format missing")
 for rel, expected in manifest.get("sources", {}).items():
     path = root / rel.removeprefix("res://")
     actual = hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else "MISSING"
@@ -37,18 +37,18 @@ else:
         building_rows = [row for row in rows if str(row.get("key", "")).startswith("building:")]
         lot_rows = [row for row in rows if str(row.get("key", "")).startswith("lot:")]
         house_rows = [row for row in rows if str(row.get("key", "")).startswith("old_house:")]
-        if len(building_rows) != 50 or len(lot_rows) != 133 or len(house_rows) != 60:
+        if len(building_rows) != 47 or len(lot_rows) != 133 or len(house_rows) != 60:
             bad.append("coverage ledger incomplete")
 expected_prototype_counts = {
-    "crossing_towers": 4, "deck_columns": 158, "deck_parapets": 127,
-    "deck_beds": 41, "deck_trees": 9, "park_trees": 23, "shrubs": 62,
-    "reed_clumps": 28, "rocks": 21, "agave": 6, "climber_panels": 104,
+    "crossing_towers": 4, "deck_columns": 140, "deck_parapets": 123,
+    "deck_beds": 44, "deck_trees": 10, "park_trees": 23, "shrubs": 62,
+    "reed_clumps": 28, "rocks": 21, "agave": 6, "climber_panels": 72,
     "meridian_piers": 8, "spine_frames": 8, "station_escalator_sets": 8,
-    "trains_per_service": 3, "service_lines": 4, "deck_escalator_pairs": 3,
+    "trains_per_service": 3, "service_lines": 4, "deck_escalator_pairs": 4,
     "deck_ramp_towers": 2, "city_clocks": 4, "city_bells": 1, "timekeepers": 0,
 }
 if manifest.get("prototype_counts") != expected_prototype_counts:
-    bad.append("pass-3 data counts mismatch: " + json.dumps(manifest.get("prototype_counts", {}), sort_keys=True))
+    bad.append("pass-4 data counts mismatch: " + json.dumps(manifest.get("prototype_counts", {}), sort_keys=True))
 if bad:
     sys.exit("Moy city bake is stale or incomplete: " + ", ".join(bad))
 print("Moy city bake current:", len(manifest["packs"]), "packs;", manifest["counts"])

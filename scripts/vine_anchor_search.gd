@@ -60,10 +60,11 @@ class Found extends RefCounted:
 ## distance as a reward instead of a cost, which is what a hand-over wants: a
 ## first throw wants the best support nearby, while a hand-over wants to GET
 ## somewhere, and scored the near way a hand-over kept choosing something barely
-## ahead of the tree already held. `skip` is a body the rays ignore.
+## ahead of the tree already held. `skip` is ignored entirely unless a finite
+## `same_body_min_y` permits a genuinely higher grip on that same structure.
 static func best(
 	ctx: TraversalContext, origin: Vector3, forward: Vector3, span: Vector2,
-	reach_out: bool = false, skip: RID = RID()
+	reach_out: bool = false, skip: RID = RID(), same_body_min_y: float = INF
 ) -> Found:
 	var space := ctx.body.get_world_3d().direct_space_state
 	if space == null:
@@ -78,14 +79,30 @@ static func best(
 		# looking up cannot miss a usable support just between new angles.
 		elevations.push_front(lerpf(ELEVATIONS[0], 0.98, climb_bias))
 	var excluded: Array[RID] = [ctx.body.get_rid()]
-	if skip.is_valid():
+	if skip.is_valid() and is_inf(same_body_min_y):
 		excluded.append(skip)
 	for bearing: float in BEARINGS:
 		var horizontal := forward.rotated(Vector3.UP, deg_to_rad(bearing))
+		var directions: Array[Vector3] = []
 		for rise: float in elevations:
-			var direction := (
+			directions.append((
 				horizontal * sqrt(maxf(0.0, 1.0 - rise * rise)) + Vector3.UP * rise
-			).normalized()
+			).normalized())
+		if climb_bias > 0.0:
+			# Fixed ray elevations cannot reach high up a facade once the body
+			# is pressed close to it. Measure its distance, then aim above the
+			# real face; the subsequent ray must still hit physical geometry.
+			var face_query := PhysicsRayQueryParameters3D.create(origin, origin + horizontal * span.y, 1)
+			face_query.exclude = excluded
+			var face := space.intersect_ray(face_query)
+			if not face.is_empty():
+				var face_distance := (face.position as Vector3).distance_to(origin)
+				var reach := face_distance + maxf(face_distance * 0.005, 0.00005)
+				var high := lerpf(span.x + MIN_RISE + 2.0, span.y * 0.8, climb_bias)
+				var low := lerpf(span.x + MIN_RISE, span.y * 0.5, climb_bias)
+				for height: float in [high, low]:
+					directions.append((horizontal * reach + Vector3.UP * height).normalized())
+		for direction in directions:
 			# A sapling must not shadow the tree behind it. The first thing a ray
 			# meets is often undergrowth, too low to swing from, and taking that
 			# as the answer wasted the whole bearing: once the jungle filled in
@@ -105,6 +122,9 @@ static func best(
 				if hit.is_empty():
 					break
 				var point: Vector3 = hit["position"]
+				if hit["rid"] == skip and point.y < same_body_min_y:
+					# Do not shoot through this facade to look behind it.
+					break
 				var climb := point.y - from.y
 				var reach := from.distance_to(point)
 				if climb < MIN_RISE or reach > span.y or reach < span.x:

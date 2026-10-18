@@ -693,109 +693,109 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_nh3yh"]
 size = Vector3(7.348248, 0.2, 0.16)
 
-[node name="MoyCell_03_00" type="Node3D" unique_id=1496079475]
+[node name="MoyCell_03_00" type="Node3D" unique_id=413295623]
 
-[node name="RimWall_46" type="StaticBody3D" parent="." unique_id=1409836779]
+[node name="RimWall_46" type="StaticBody3D" parent="." unique_id=1019106383]
 transform = Transform3D(0.9891765, 0, 0.14673045, 0, 1, 0, -0.14673045, 0, 0.9891765, -590.703, -54, -206.98285)
 
-[node name="@CollisionShape3D@5132" type="CollisionShape3D" parent="RimWall_46" unique_id=807717111]
+[node name="@CollisionShape3D@6066" type="CollisionShape3D" parent="RimWall_46" unique_id=1161639930]
 shape = SubResource("BoxShape3D_rll1w")
 
-[node name="@MeshInstance3D@5133" type="MeshInstance3D" parent="RimWall_46" unique_id=250313685]
+[node name="@MeshInstance3D@6067" type="MeshInstance3D" parent="RimWall_46" unique_id=206596472]
 material_override = SubResource("StandardMaterial3D_h778d")
 mesh = SubResource("BoxMesh_a168u")
 
-[node name="SpineFrameLeg_00_0" type="StaticBody3D" parent="." unique_id=760770363]
+[node name="SpineFrameLeg_00_0" type="StaticBody3D" parent="." unique_id=1645192885]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -563.2, -54, -182)
 
-[node name="@CollisionShape3D@5557" type="CollisionShape3D" parent="SpineFrameLeg_00_0" unique_id=408679027]
+[node name="@CollisionShape3D@6491" type="CollisionShape3D" parent="SpineFrameLeg_00_0" unique_id=253697221]
 shape = SubResource("BoxShape3D_gy4ic")
 
-[node name="@MeshInstance3D@5558" type="MeshInstance3D" parent="SpineFrameLeg_00_0" unique_id=1858730707]
+[node name="@MeshInstance3D@6492" type="MeshInstance3D" parent="SpineFrameLeg_00_0" unique_id=1403175522]
 material_override = SubResource("StandardMaterial3D_htv7w")
 mesh = SubResource("BoxMesh_tv2o6")
 
-[node name="SpineFrameCoralVine_00_0" type="MultiMeshInstance3D" parent="." unique_id=74160449]
+[node name="SpineFrameCoralVine_00_0" type="MultiMeshInstance3D" parent="." unique_id=1114621278]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -563.2, -54, -181.53)
 custom_aabb = AABB(-0.62, -6.1, -0.12, 1.24, 12.2, 0.24)
 multimesh = SubResource("MultiMesh_bun7n")
 
-[node name="SpineFrameLeg_00_1" type="StaticBody3D" parent="." unique_id=1298201438]
+[node name="SpineFrameLeg_00_1" type="StaticBody3D" parent="." unique_id=1571075163]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -556.8, -54, -182)
 
-[node name="@CollisionShape3D@5563" type="CollisionShape3D" parent="SpineFrameLeg_00_1" unique_id=1924524361]
+[node name="@CollisionShape3D@6497" type="CollisionShape3D" parent="SpineFrameLeg_00_1" unique_id=1566289490]
 shape = SubResource("BoxShape3D_xvvek")
 
-[node name="@MeshInstance3D@5564" type="MeshInstance3D" parent="SpineFrameLeg_00_1" unique_id=1974959716]
+[node name="@MeshInstance3D@6498" type="MeshInstance3D" parent="SpineFrameLeg_00_1" unique_id=2067051409]
 material_override = SubResource("StandardMaterial3D_or71k")
 mesh = SubResource("BoxMesh_4q63a")
 
-[node name="SpineFrameCoralVine_00_1" type="MultiMeshInstance3D" parent="." unique_id=1047675496]
+[node name="SpineFrameCoralVine_00_1" type="MultiMeshInstance3D" parent="." unique_id=1805565278]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -556.8, -54, -181.53)
 custom_aabb = AABB(-0.62, -6.1, -0.12, 1.24, 12.2, 0.24)
 multimesh = SubResource("MultiMesh_6u3uv")
 
-[node name="SpineFrameBeam_00" type="StaticBody3D" parent="." unique_id=2021117716]
+[node name="SpineFrameBeam_00" type="StaticBody3D" parent="." unique_id=1087171843]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -48.45, -182)
 
-[node name="@CollisionShape3D@5569" type="CollisionShape3D" parent="SpineFrameBeam_00" unique_id=2030834388]
+[node name="@CollisionShape3D@6503" type="CollisionShape3D" parent="SpineFrameBeam_00" unique_id=1088125544]
 shape = SubResource("BoxShape3D_s8id5")
 
-[node name="@MeshInstance3D@5570" type="MeshInstance3D" parent="SpineFrameBeam_00" unique_id=352169961]
+[node name="@MeshInstance3D@6504" type="MeshInstance3D" parent="SpineFrameBeam_00" unique_id=157421120]
 material_override = SubResource("StandardMaterial3D_ml2me")
 mesh = SubResource("BoxMesh_gkwb8")
 
-[node name="Station_Spine Line_North_Gate_-1" type="StaticBody3D" parent="." unique_id=950889740]
+[node name="Station_Spine Line_North_Gate_-1" type="StaticBody3D" parent="." unique_id=1631621069]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -564.875, -45.95, -184)
 
-[node name="@CollisionShape3D@5669" type="CollisionShape3D" parent="Station_Spine Line_North_Gate_-1" unique_id=1063969206]
+[node name="@CollisionShape3D@6603" type="CollisionShape3D" parent="Station_Spine Line_North_Gate_-1" unique_id=1653169578]
 shape = SubResource("BoxShape3D_d1dta")
 
-[node name="@MeshInstance3D@5670" type="MeshInstance3D" parent="Station_Spine Line_North_Gate_-1" unique_id=1510341810]
+[node name="@MeshInstance3D@6604" type="MeshInstance3D" parent="Station_Spine Line_North_Gate_-1" unique_id=766960428]
 material_override = SubResource("StandardMaterial3D_23m1u")
 mesh = SubResource("BoxMesh_8huw6")
 
-[node name="StationCanopy_Spine Line_North_Gate_-1" type="StaticBody3D" parent="." unique_id=1835772284]
+[node name="StationCanopy_Spine Line_North_Gate_-1" type="StaticBody3D" parent="." unique_id=1289470418]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -564.875, -42.510002, -184)
 
-[node name="@CollisionShape3D@5671" type="CollisionShape3D" parent="StationCanopy_Spine Line_North_Gate_-1" unique_id=1475191429]
+[node name="@CollisionShape3D@6605" type="CollisionShape3D" parent="StationCanopy_Spine Line_North_Gate_-1" unique_id=1641475192]
 shape = SubResource("BoxShape3D_6oxou")
 
-[node name="@MeshInstance3D@5672" type="MeshInstance3D" parent="StationCanopy_Spine Line_North_Gate_-1" unique_id=563534987]
+[node name="@MeshInstance3D@6606" type="MeshInstance3D" parent="StationCanopy_Spine Line_North_Gate_-1" unique_id=1892838879]
 material_override = SubResource("StandardMaterial3D_03q2v")
 mesh = SubResource("BoxMesh_b2aeq")
 
-[node name="Station_Spine Line_North_Gate_1" type="StaticBody3D" parent="." unique_id=1991677415]
+[node name="Station_Spine Line_North_Gate_1" type="StaticBody3D" parent="." unique_id=1639374846]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -555.125, -45.95, -184)
 
-[node name="@CollisionShape3D@5673" type="CollisionShape3D" parent="Station_Spine Line_North_Gate_1" unique_id=1444790463]
+[node name="@CollisionShape3D@6607" type="CollisionShape3D" parent="Station_Spine Line_North_Gate_1" unique_id=214354432]
 shape = SubResource("BoxShape3D_jvrb8")
 
-[node name="@MeshInstance3D@5674" type="MeshInstance3D" parent="Station_Spine Line_North_Gate_1" unique_id=1029990580]
+[node name="@MeshInstance3D@6608" type="MeshInstance3D" parent="Station_Spine Line_North_Gate_1" unique_id=2060552041]
 material_override = SubResource("StandardMaterial3D_tng8o")
 mesh = SubResource("BoxMesh_uvl3l")
 
-[node name="StationCanopy_Spine Line_North_Gate_1" type="StaticBody3D" parent="." unique_id=1335683211]
+[node name="StationCanopy_Spine Line_North_Gate_1" type="StaticBody3D" parent="." unique_id=1786148517]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -555.125, -42.510002, -184)
 
-[node name="@CollisionShape3D@5675" type="CollisionShape3D" parent="StationCanopy_Spine Line_North_Gate_1" unique_id=346176345]
+[node name="@CollisionShape3D@6609" type="CollisionShape3D" parent="StationCanopy_Spine Line_North_Gate_1" unique_id=344627349]
 shape = SubResource("BoxShape3D_a8rmg")
 
-[node name="@MeshInstance3D@5676" type="MeshInstance3D" parent="StationCanopy_Spine Line_North_Gate_1" unique_id=1525084639]
+[node name="@MeshInstance3D@6610" type="MeshInstance3D" parent="StationCanopy_Spine Line_North_Gate_1" unique_id=82030754]
 material_override = SubResource("StandardMaterial3D_keuhp")
 mesh = SubResource("BoxMesh_cba21")
 
-[node name="SpineWallInterchange" type="StaticBody3D" parent="." unique_id=1757836491]
+[node name="SpineWallInterchange" type="StaticBody3D" parent="." unique_id=1407641628]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -46.3, -200.25)
 
-[node name="@CollisionShape3D@5677" type="CollisionShape3D" parent="SpineWallInterchange" unique_id=1893847585]
+[node name="@CollisionShape3D@6611" type="CollisionShape3D" parent="SpineWallInterchange" unique_id=1082265433]
 shape = SubResource("BoxShape3D_yi43n")
 
-[node name="@MeshInstance3D@5678" type="MeshInstance3D" parent="SpineWallInterchange" unique_id=42058380]
+[node name="@MeshInstance3D@6612" type="MeshInstance3D" parent="SpineWallInterchange" unique_id=1706513698]
 material_override = SubResource("StandardMaterial3D_qv8n0")
 mesh = SubResource("BoxMesh_l668q")
 
-[node name="MoyTrain_Spine_Line_0" type="Node3D" parent="." unique_id=1666122616]
+[node name="MoyTrain_Spine_Line_0" type="Node3D" parent="." unique_id=203302123]
 script = ExtResource("1_l4t0m")
 service_name = "Spine Line"
 path = PackedVector3Array(-558.5, -46.8, -200, -558.5, -46.8, 200)
@@ -876,167 +876,167 @@ schedule_events = [{
 }]
 schedule_offset = 25.56
 
-[node name="Car_00" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_0" unique_id=1586267889]
+[node name="Car_00" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_0" unique_id=730050855]
 sync_to_physics = false
 
-[node name="@MeshInstance3D@5829" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1381504692]
+[node name="@MeshInstance3D@7051" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1750175586]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
 material_override = SubResource("StandardMaterial3D_vaung")
 mesh = SubResource("ArrayMesh_j2w2i")
 
-[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1613538744]
+[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1175769437]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("BoxShape3D_46r84")
 
-[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=2110190025]
+[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1521164577]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.65, 0)
 shape = SubResource("BoxShape3D_l8viu")
 
-[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1268633649]
+[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=2107107436]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_aepbr")
 
-[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=934071277]
+[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1324757311]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_207dl")
 
-[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=841478576]
+[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=137651180]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_7iu6v")
 
-[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=217661192]
+[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1827293975]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, -1.52)
 shape = SubResource("BoxShape3D_4uh08")
 
-[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=2113443914]
+[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1039513195]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_no2ub")
 
-[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=902009557]
+[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1284599187]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_dptvb")
 
-[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=816136862]
+[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=914950594]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, 1.52)
 shape = SubResource("BoxShape3D_1yu1y")
 
-[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=2000015796]
+[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1605313657]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_las1m")
 
-[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1767626939]
+[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=12011892]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_6chyu")
 mesh = SubResource("BoxMesh_67tu7")
 
-[node name="@MeshInstance3D@5830" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=122859616]
+[node name="@MeshInstance3D@7052" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1989513429]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_d0eh5")
 mesh = SubResource("BoxMesh_blhvb")
 
-[node name="@MeshInstance3D@5831" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=445224290]
+[node name="@MeshInstance3D@7053" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1371075312]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_mpgm4")
 mesh = SubResource("BoxMesh_ioang")
 
-[node name="@MeshInstance3D@5832" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=679358080]
+[node name="@MeshInstance3D@7054" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=471685254]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_dtui3")
 mesh = SubResource("BoxMesh_j1gnk")
 
-[node name="@MeshInstance3D@5833" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1835868756]
+[node name="@MeshInstance3D@7055" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=761814679]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
 material_override = SubResource("StandardMaterial3D_wdelf")
 mesh = SubResource("BoxMesh_imrw5")
 
-[node name="@MeshInstance3D@5834" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=593542520]
+[node name="@MeshInstance3D@7056" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_00" unique_id=1097613082]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
 material_override = SubResource("StandardMaterial3D_p6ijh")
 mesh = SubResource("BoxMesh_mwtrr")
 
-[node name="Car_01" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_0" unique_id=1974933154]
+[node name="Car_01" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_0" unique_id=1376541216]
 sync_to_physics = false
 
-[node name="@MeshInstance3D@5835" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=473497106]
+[node name="@MeshInstance3D@7057" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1098282556]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
 material_override = SubResource("StandardMaterial3D_vaung")
 mesh = SubResource("ArrayMesh_j2w2i")
 
-[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=310553762]
+[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=511411884]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("BoxShape3D_a5r53")
 
-[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=509902721]
+[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1699135864]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.65, 0)
 shape = SubResource("BoxShape3D_ua54v")
 
-[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1761827134]
+[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=839274738]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_hh6bu")
 
-[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1050914815]
+[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1631624254]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_l6xuf")
 
-[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=806355191]
+[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=4325944]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_htd0p")
 
-[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=627322562]
+[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=245758600]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, -1.52)
 shape = SubResource("BoxShape3D_oloes")
 
-[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=2100793063]
+[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=827244339]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_y5umv")
 
-[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=25199229]
+[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=40189792]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_g6gga")
 
-[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=102287771]
+[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=789810078]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, 1.52)
 shape = SubResource("BoxShape3D_sj7jv")
 
-[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1872590075]
+[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1199672923]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_3jq72")
 
-[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=2073902574]
+[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1238401604]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_36qjq")
 mesh = SubResource("BoxMesh_5gita")
 
-[node name="@MeshInstance3D@5836" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1193101160]
+[node name="@MeshInstance3D@7058" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=761248827]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_di8j6")
 mesh = SubResource("BoxMesh_a2tdt")
 
-[node name="@MeshInstance3D@5837" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1825976068]
+[node name="@MeshInstance3D@7059" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1309259883]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_8ub2o")
 mesh = SubResource("BoxMesh_3qcof")
 
-[node name="@MeshInstance3D@5838" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=541430419]
+[node name="@MeshInstance3D@7060" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1444184664]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_nrsq2")
 mesh = SubResource("BoxMesh_4xbcq")
 
-[node name="@MeshInstance3D@5839" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1608387951]
+[node name="@MeshInstance3D@7061" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=2025214618]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
 material_override = SubResource("StandardMaterial3D_wdelf")
 mesh = SubResource("BoxMesh_ddtp6")
 
-[node name="@MeshInstance3D@5840" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=405394510]
+[node name="@MeshInstance3D@7062" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0/Car_01" unique_id=1845682110]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
 material_override = SubResource("StandardMaterial3D_p6ijh")
 mesh = SubResource("BoxMesh_u64sd")
 
-[node name="ArticulatedBellows_00" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0" unique_id=777029270]
+[node name="ArticulatedBellows_00" type="MeshInstance3D" parent="MoyTrain_Spine_Line_0" unique_id=169681861]
 material_override = SubResource("StandardMaterial3D_wdelf")
 mesh = SubResource("BoxMesh_ufj6n")
 
-[node name="MoyTrain_Spine_Line_1" type="Node3D" parent="." unique_id=1532841970]
+[node name="MoyTrain_Spine_Line_1" type="Node3D" parent="." unique_id=743630276]
 script = ExtResource("1_l4t0m")
 service_name = "Spine Line"
 path = PackedVector3Array(-561.5, -46.8, -200, -561.5, -46.8, 200)
@@ -1119,167 +1119,167 @@ schedule_events = [{
 schedule_offset = 25.56
 schedule_train_index = 1
 
-[node name="Car_00" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_1" unique_id=1397042543]
+[node name="Car_00" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_1" unique_id=1665932576]
 sync_to_physics = false
 
-[node name="@MeshInstance3D@5841" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=38264348]
+[node name="@MeshInstance3D@7063" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1877277159]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
 material_override = SubResource("StandardMaterial3D_puffo")
 mesh = SubResource("ArrayMesh_70nwr")
 
-[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=569900883]
+[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=598513246]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("BoxShape3D_4fdn2")
 
-[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=2087207486]
+[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=393265933]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.65, 0)
 shape = SubResource("BoxShape3D_hhvct")
 
-[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1813907083]
+[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1989835401]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_gs061")
 
-[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=117335526]
+[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1940699951]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_52tke")
 
-[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1638893446]
+[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=574645694]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_f2lhh")
 
-[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=619646722]
+[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1950049705]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, -1.52)
 shape = SubResource("BoxShape3D_bpy8b")
 
-[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=477410265]
+[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=112132989]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_5isrs")
 
-[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1946982595]
+[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=853807900]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_2frqy")
 
-[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1015875668]
+[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1466203655]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, 1.52)
 shape = SubResource("BoxShape3D_sfhsn")
 
-[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1941122132]
+[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=187577555]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_2cr3u")
 
-[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=2107781110]
+[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1633149043]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_hkh8g")
 mesh = SubResource("BoxMesh_vcqqa")
 
-[node name="@MeshInstance3D@5842" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1323308174]
+[node name="@MeshInstance3D@7064" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=323012632]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_gky56")
 mesh = SubResource("BoxMesh_7m3cn")
 
-[node name="@MeshInstance3D@5843" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1062415761]
+[node name="@MeshInstance3D@7065" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1772097491]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_4jseq")
 mesh = SubResource("BoxMesh_l0pp0")
 
-[node name="@MeshInstance3D@5844" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=548334165]
+[node name="@MeshInstance3D@7066" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=970585183]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_snckn")
 mesh = SubResource("BoxMesh_0grnt")
 
-[node name="@MeshInstance3D@5845" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1479327835]
+[node name="@MeshInstance3D@7067" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1778481010]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
 material_override = SubResource("StandardMaterial3D_180ui")
 mesh = SubResource("BoxMesh_n6ldd")
 
-[node name="@MeshInstance3D@5846" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=7135041]
+[node name="@MeshInstance3D@7068" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_00" unique_id=1935912024]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
 material_override = SubResource("StandardMaterial3D_u4enb")
 mesh = SubResource("BoxMesh_k77qk")
 
-[node name="Car_01" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_1" unique_id=1264308322]
+[node name="Car_01" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_1" unique_id=518122930]
 sync_to_physics = false
 
-[node name="@MeshInstance3D@5847" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=1984453697]
+[node name="@MeshInstance3D@7069" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=512277661]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
 material_override = SubResource("StandardMaterial3D_puffo")
 mesh = SubResource("ArrayMesh_70nwr")
 
-[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=1965285988]
+[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=1572893818]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("BoxShape3D_0cy8b")
 
-[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=852919559]
+[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=394734283]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.65, 0)
 shape = SubResource("BoxShape3D_jvr6m")
 
-[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=875522731]
+[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=616216402]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_d476m")
 
-[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=600757829]
+[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=949692189]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_3pf3a")
 
-[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=2130246859]
+[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=104795936]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_7luwg")
 
-[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=1428568373]
+[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=364394631]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, -1.52)
 shape = SubResource("BoxShape3D_mm06d")
 
-[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=1886938533]
+[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=1112387905]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_3sbhs")
 
-[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=921663829]
+[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=1718673582]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_2kx8n")
 
-[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=642085062]
+[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=994421805]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, 1.52)
 shape = SubResource("BoxShape3D_08mxr")
 
-[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=2112483122]
+[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=753122603]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_uulyj")
 
-[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=1331774427]
+[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=706147474]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_52620")
 mesh = SubResource("BoxMesh_03h67")
 
-[node name="@MeshInstance3D@5848" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=676957077]
+[node name="@MeshInstance3D@7070" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=57319677]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_iqscq")
 mesh = SubResource("BoxMesh_ahy2h")
 
-[node name="@MeshInstance3D@5849" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=523859906]
+[node name="@MeshInstance3D@7071" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=940577196]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_exane")
 mesh = SubResource("BoxMesh_1sxd0")
 
-[node name="@MeshInstance3D@5850" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=206583783]
+[node name="@MeshInstance3D@7072" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=2006593272]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_txfrr")
 mesh = SubResource("BoxMesh_swcf4")
 
-[node name="@MeshInstance3D@5851" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=1060498659]
+[node name="@MeshInstance3D@7073" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=1222314885]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
 material_override = SubResource("StandardMaterial3D_180ui")
 mesh = SubResource("BoxMesh_8di20")
 
-[node name="@MeshInstance3D@5852" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=617583220]
+[node name="@MeshInstance3D@7074" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1/Car_01" unique_id=1742680616]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
 material_override = SubResource("StandardMaterial3D_u4enb")
 mesh = SubResource("BoxMesh_4na07")
 
-[node name="ArticulatedBellows_00" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1" unique_id=2074765554]
+[node name="ArticulatedBellows_00" type="MeshInstance3D" parent="MoyTrain_Spine_Line_1" unique_id=414345230]
 material_override = SubResource("StandardMaterial3D_180ui")
 mesh = SubResource("BoxMesh_t3sr3")
 
-[node name="MoyTrain_Spine_Line_2" type="Node3D" parent="." unique_id=702652428]
+[node name="MoyTrain_Spine_Line_2" type="Node3D" parent="." unique_id=1844891126]
 script = ExtResource("1_l4t0m")
 service_name = "Spine Line"
 path = PackedVector3Array(-561.5, -46.8, -200, -561.5, -46.8, 200)
@@ -1361,212 +1361,212 @@ schedule_events = [{
 schedule_offset = 25.56
 schedule_train_index = 2
 
-[node name="Car_00" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_2" unique_id=1574685430]
+[node name="Car_00" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_2" unique_id=821330447]
 sync_to_physics = false
 
-[node name="@MeshInstance3D@5853" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=389792042]
+[node name="@MeshInstance3D@7075" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1549760786]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
 material_override = SubResource("StandardMaterial3D_lrspl")
 mesh = SubResource("ArrayMesh_i32p7")
 
-[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=452201226]
+[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1940377731]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("BoxShape3D_tkfts")
 
-[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=2125050068]
+[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=370475771]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.65, 0)
 shape = SubResource("BoxShape3D_1e7q2")
 
-[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1348628368]
+[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1361352612]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_8f5w2")
 
-[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1630119980]
+[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=694492932]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_6avsv")
 
-[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=901970447]
+[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1831718397]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_xseol")
 
-[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=990703530]
+[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1780642994]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, -1.52)
 shape = SubResource("BoxShape3D_goh0b")
 
-[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=25671937]
+[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1984979457]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_3a8in")
 
-[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=209848229]
+[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1001863308]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_6urn4")
 
-[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=389796241]
+[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1825464819]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, 1.52)
 shape = SubResource("BoxShape3D_g8fbc")
 
-[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1043711511]
+[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=678185617]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_i4gk8")
 
-[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=504698644]
+[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1073657176]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_nuava")
 mesh = SubResource("BoxMesh_16wcd")
 
-[node name="@MeshInstance3D@5854" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1986684509]
+[node name="@MeshInstance3D@7076" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1103344104]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_b6aqd")
 mesh = SubResource("BoxMesh_e5cxd")
 
-[node name="@MeshInstance3D@5855" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=350999009]
+[node name="@MeshInstance3D@7077" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1896285094]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_cbtfi")
 mesh = SubResource("BoxMesh_a6u1c")
 
-[node name="@MeshInstance3D@5856" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=536171348]
+[node name="@MeshInstance3D@7078" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1419238286]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_efv1r")
 mesh = SubResource("BoxMesh_6maoe")
 
-[node name="@MeshInstance3D@5857" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=697790899]
+[node name="@MeshInstance3D@7079" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1377360777]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
 material_override = SubResource("StandardMaterial3D_j7lr0")
 mesh = SubResource("BoxMesh_v4vct")
 
-[node name="@MeshInstance3D@5858" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1080868827]
+[node name="@MeshInstance3D@7080" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_00" unique_id=1993872196]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
 material_override = SubResource("StandardMaterial3D_cbqsv")
 mesh = SubResource("BoxMesh_v04qo")
 
-[node name="Car_01" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_2" unique_id=853949240]
+[node name="Car_01" type="AnimatableBody3D" parent="MoyTrain_Spine_Line_2" unique_id=1964302826]
 sync_to_physics = false
 
-[node name="@MeshInstance3D@5859" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=99717940]
+[node name="@MeshInstance3D@7081" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=1502198971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, 0)
 material_override = SubResource("StandardMaterial3D_lrspl")
 mesh = SubResource("ArrayMesh_i32p7")
 
-[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=127957495]
+[node name="RideableCarFrame_00" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=5231056]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("BoxShape3D_4ahfr")
 
-[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=492045125]
+[node name="RideableCarFrame_01" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=1619359428]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.65, 0)
 shape = SubResource("BoxShape3D_bi15v")
 
-[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=210129941]
+[node name="RideableCarFrame_02" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=539551971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_eanry")
 
-[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=34363234]
+[node name="RideableCarFrame_03" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=792985579]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.7, 2.325, 0)
 shape = SubResource("BoxShape3D_1g8nw")
 
-[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=2099243495]
+[node name="RideableCarFrame_04" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=2051948342]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_l2lof")
 
-[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=1760880694]
+[node name="RideableCarFrame_05" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=1855996956]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, -1.52)
 shape = SubResource("BoxShape3D_krbep")
 
-[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=1899514465]
+[node name="RideableCarFrame_06" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=1546715149]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, -1.52)
 shape = SubResource("BoxShape3D_20gpr")
 
-[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=279164030]
+[node name="RideableCarFrame_07" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=1380870268]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_upvvj")
 
-[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=758821169]
+[node name="RideableCarFrame_08" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=1974280540]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.325, 1.52)
 shape = SubResource("BoxShape3D_cb5x4")
 
-[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=2138921465]
+[node name="RideableCarFrame_09" type="CollisionShape3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=1556791847]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.95, 2.325, 1.52)
 shape = SubResource("BoxShape3D_pfnhn")
 
-[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=2030490497]
+[node name="TrainDoor" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=2134327505]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_n8h0h")
 mesh = SubResource("BoxMesh_g3g4y")
 
-[node name="@MeshInstance3D@5860" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=676231026]
+[node name="@MeshInstance3D@7082" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=93008540]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, -1.64)
 material_override = SubResource("StandardMaterial3D_2exi7")
 mesh = SubResource("BoxMesh_088rh")
 
-[node name="@MeshInstance3D@5861" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=606532210]
+[node name="@MeshInstance3D@7083" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=1530599434]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_06whl")
 mesh = SubResource("BoxMesh_i6v3r")
 
-[node name="@MeshInstance3D@5862" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=1779571177]
+[node name="@MeshInstance3D@7084" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=2050166636]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 2.05, 1.64)
 material_override = SubResource("StandardMaterial3D_hchhd")
 mesh = SubResource("BoxMesh_s3qej")
 
-[node name="@MeshInstance3D@5863" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=771008819]
+[node name="@MeshInstance3D@7085" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=2013099423]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8, 0)
 material_override = SubResource("StandardMaterial3D_j7lr0")
 mesh = SubResource("BoxMesh_845am")
 
-[node name="@MeshInstance3D@5864" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=890235424]
+[node name="@MeshInstance3D@7086" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2/Car_01" unique_id=2016386129]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.75, 0)
 material_override = SubResource("StandardMaterial3D_cbqsv")
 mesh = SubResource("BoxMesh_wo33l")
 
-[node name="ArticulatedBellows_00" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2" unique_id=1282221285]
+[node name="ArticulatedBellows_00" type="MeshInstance3D" parent="MoyTrain_Spine_Line_2" unique_id=492904819]
 material_override = SubResource("StandardMaterial3D_j7lr0")
 mesh = SubResource("BoxMesh_ftd6e")
 
-[node name="SpineBufferStop" type="StaticBody3D" parent="." unique_id=1972645846]
+[node name="SpineBufferStop" type="StaticBody3D" parent="." unique_id=1218052348]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -560, -46.8, -200)
 
-[node name="@CollisionShape3D@6139" type="CollisionShape3D" parent="SpineBufferStop" unique_id=200986080]
+[node name="@CollisionShape3D@7361" type="CollisionShape3D" parent="SpineBufferStop" unique_id=1117358950]
 shape = SubResource("BoxShape3D_hbud3")
 
-[node name="@MeshInstance3D@6140" type="MeshInstance3D" parent="SpineBufferStop" unique_id=899205726]
+[node name="@MeshInstance3D@7362" type="MeshInstance3D" parent="SpineBufferStop" unique_id=962624946]
 material_override = SubResource("StandardMaterial3D_2wj5l")
 mesh = SubResource("BoxMesh_r6826")
 
-[node name="WallLine_Track_165" type="StaticBody3D" parent="." unique_id=474221440]
+[node name="WallLine_Track_165" type="StaticBody3D" parent="." unique_id=593124926]
 transform = Transform3D(0.9744834, 0, 0.22445972, 0, 1, 0, -0.22445972, 0, 0.9744834, -607.12, -46.8, -204.1)
 
-[node name="@CollisionShape3D@7793" type="CollisionShape3D" parent="WallLine_Track_165" unique_id=1795847915]
+[node name="@CollisionShape3D@9015" type="CollisionShape3D" parent="WallLine_Track_165" unique_id=1892509816]
 shape = SubResource("BoxShape3D_4xbdu")
 
-[node name="@MeshInstance3D@7794" type="MeshInstance3D" parent="WallLine_Track_165" unique_id=1125596202]
+[node name="@MeshInstance3D@9016" type="MeshInstance3D" parent="WallLine_Track_165" unique_id=1009636855]
 material_override = SubResource("StandardMaterial3D_hk6b2")
 mesh = SubResource("BoxMesh_5tcc7")
 
-[node name="WallLine_Rail_165_0_-1" type="StaticBody3D" parent="." unique_id=1770569501]
+[node name="WallLine_Rail_165_0_-1" type="StaticBody3D" parent="." unique_id=300150105]
 transform = Transform3D(0.97437036, 0, 0.22494984, 0, 1, 0, -0.22494984, 0, 0.97437036, -606.7864, -46.7, -202.65536)
 
-[node name="@CollisionShape3D@7795" type="CollisionShape3D" parent="WallLine_Rail_165_0_-1" unique_id=1840960819]
+[node name="@CollisionShape3D@9017" type="CollisionShape3D" parent="WallLine_Rail_165_0_-1" unique_id=1827375401]
 shape = SubResource("BoxShape3D_oomc6")
 
-[node name="@MeshInstance3D@7796" type="MeshInstance3D" parent="WallLine_Rail_165_0_-1" unique_id=68504510]
+[node name="@MeshInstance3D@9018" type="MeshInstance3D" parent="WallLine_Rail_165_0_-1" unique_id=1922294241]
 material_override = SubResource("StandardMaterial3D_lkoap")
 mesh = SubResource("BoxMesh_ab536")
 
-[node name="WallLine_Rail_165_0_1" type="StaticBody3D" parent="." unique_id=488541811]
+[node name="WallLine_Rail_165_0_1" type="StaticBody3D" parent="." unique_id=1588774300]
 transform = Transform3D(0.97437036, 0, 0.22494984, 0, 1, 0, -0.22494984, 0, 0.97437036, -606.4636, -46.7, -201.25714)
 
-[node name="@CollisionShape3D@7797" type="CollisionShape3D" parent="WallLine_Rail_165_0_1" unique_id=708775193]
+[node name="@CollisionShape3D@9019" type="CollisionShape3D" parent="WallLine_Rail_165_0_1" unique_id=743119125]
 shape = SubResource("BoxShape3D_r6cq3")
 
-[node name="@MeshInstance3D@7798" type="MeshInstance3D" parent="WallLine_Rail_165_0_1" unique_id=1152269393]
+[node name="@MeshInstance3D@9020" type="MeshInstance3D" parent="WallLine_Rail_165_0_1" unique_id=11968793]
 material_override = SubResource("StandardMaterial3D_vcgyq")
 mesh = SubResource("BoxMesh_wcr14")
 
-[node name="WallLine_Rail_165_1_-1" type="StaticBody3D" parent="." unique_id=1355355094]
+[node name="WallLine_Rail_165_1_-1" type="StaticBody3D" parent="." unique_id=858337774]
 transform = Transform3D(0.97436994, 0, 0.22495157, 0, 1, 0, -0.22495157, 0, 0.97436994, -607.55115, -46.7, -205.96771)
 
-[node name="@CollisionShape3D@7799" type="CollisionShape3D" parent="WallLine_Rail_165_1_-1" unique_id=451677991]
+[node name="@CollisionShape3D@9021" type="CollisionShape3D" parent="WallLine_Rail_165_1_-1" unique_id=461482394]
 shape = SubResource("BoxShape3D_fm8hy")
 
-[node name="@MeshInstance3D@7800" type="MeshInstance3D" parent="WallLine_Rail_165_1_-1" unique_id=293668693]
+[node name="@MeshInstance3D@9022" type="MeshInstance3D" parent="WallLine_Rail_165_1_-1" unique_id=280150041]
 material_override = SubResource("StandardMaterial3D_fwyx1")
 mesh = SubResource("BoxMesh_nh3yh")

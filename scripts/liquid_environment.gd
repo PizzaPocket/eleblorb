@@ -32,9 +32,9 @@ const FLOAT_DEPTH_FRACTION := 0.877
 ## How deep the water has to be before it must be swum, on the same measure:
 ## once standing on the bottom would put the base of the head under, there is
 ## nothing to do but swim. Below it a body wades or walks out up a bank or a
-## ramp with its head in the air. The human's authored 1.75 m is where this
-## comes from.
-const SWIMMABLE_FRACTION := 1.097
+## ramp with its head in the air. Begin swimming before the skull base goes
+## under, with a small margin for the waterline.
+const SWIMMABLE_FRACTION := 0.98
 
 ## The human figure these were authored against, for a body that has not been
 ## measured yet.
@@ -138,6 +138,60 @@ func deep_enough_to_swim(for_head_height: float = REFERENCE_HEAD_BASE) -> bool:
 	if liquid == Liquid.NONE:
 		return false
 	return surface_height - floor_height >= swimmable_depth(for_head_height)
+
+
+## A real ramp, stair or bank can stand above the basin's analytic bed.
+## Only accept a nearby walkable surface and a body-sized clear lift: a roof
+## overhead, a steep wall or a deep submerged floor cannot end swimming.
+func try_stand(ctx: TraversalContext, foot_offset: float, head_base: float) -> bool:
+	if liquid == Liquid.NONE:
+		return false
+	var body := ctx.body
+	var feet_y := body.global_position.y - foot_offset
+	if feet_y > surface_height:
+		return false
+	var step := ctx.scaled(0.35)
+	var planar := Vector3(ctx.direction.x, 0.0, ctx.direction.z)
+	var probes: Array[Vector3] = [body.global_position]
+	if planar.length_squared() > 0.001:
+		probes.append(body.global_position + planar.normalized() * ctx.scaled(0.4))
+	for probe in probes:
+		var query := PhysicsRayQueryParameters3D.create(
+			Vector3(probe.x, feet_y + step, probe.z),
+			Vector3(probe.x, feet_y - ctx.scaled(0.3), probe.z), body.collision_mask)
+		query.exclude = [body.get_rid()]
+		var hit := body.get_world_3d().direct_space_state.intersect_ray(query)
+		if hit.is_empty() or (hit.normal as Vector3).dot(body.up_direction) < cos(body.floor_max_angle):
+			continue
+		var collider := hit.collider as Node
+		if collider is CharacterBody3D or (collider != null and collider.is_in_group("blorbs")):
+			continue
+		var floor_y := float(hit.position.y)
+		if surface_height - floor_y > head_base * 0.94:
+			continue
+		var lift := maxf(floor_y + foot_offset + body.safe_margin - body.global_position.y, 0.0)
+		if lift > step or (lift > 0.0 and not WorldSupport.can_lift(body, lift)):
+			continue
+		var raised := body.global_transform.translated(Vector3.UP * lift)
+		if ctx.standing_collision != null:
+			var clearance := PhysicsShapeQueryParameters3D.new()
+			clearance.shape = ctx.standing_collision.shape
+			clearance.transform = raised * ctx.standing_collision_transform
+			clearance.collision_mask = body.collision_mask
+			clearance.exclude = [body.get_rid()]
+			if not body.get_world_3d().direct_space_state.intersect_shape(clearance, 1).is_empty():
+				continue
+		var ahead := KinematicCollision3D.new()
+		if body.test_move(raised, probe - body.global_position, ahead, body.safe_margin, false, 8):
+			var blocked := false
+			for i in ahead.get_collision_count():
+				if ahead.get_normal(i).dot(body.up_direction) < cos(body.floor_max_angle): blocked = true
+			if blocked: continue
+		floor_height = floor_y
+		body.global_position.y += lift
+		body.velocity.y = 0.0
+		return true
+	return false
 
 
 ## Whether a body at `feet_y` is under the liquid's surface.

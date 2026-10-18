@@ -2,6 +2,7 @@
 extends StaticBody3D
 
 const CHINESE_PLAN := preload("res://scripts/chinese_plan.gd")
+const MOY_PLAN := preload("res://scripts/city_plan.gd")
 const OCEAN_KINGDOM_TERRAIN := preload("res://scripts/ocean_kingdom_terrain.gd")
 const OCEAN_WATER_SHADER: Shader = preload("res://scripts/ocean_water.gdshader")
 
@@ -299,8 +300,9 @@ const CITY_FLAT_RADIUS := 235.0
 const CITY_FLATTEN_TRANSITION := 24.0
 const MOY_POND_CENTER := Vector2(-516.0, -28.0)
 const MOY_POND_RADII := Vector2(19.0, 13.0)
-const MOY_POND_SURFACE := -59.6
-const MOY_POND_DEPTH := 4.0
+const MOY_POND_SURFACE := -60.3
+const MOY_POND_DEPTH := 2.1
+const MOY_POND_PROFILE := [[1.15, 0.0], [1.0, -0.3], [0.86, -0.65], [0.6, -1.5], [0.3, -2.0], [0.0, -2.1]]
 ## The Chinese village sits out in the northwest-of-lake wasteland, confirmed
 ## clear of every other landform/biome center -- see chinese_village.gd's own
 ## doc comment. Per direct instruction, the whole village now sits on
@@ -478,14 +480,25 @@ func get_height(x: float, z: float) -> float:
 
 func _moy_pond_bed(x: float, z: float, natural: float) -> float:
 	var d := (Vector2(x, z) - MOY_POND_CENTER) / MOY_POND_RADII
-	var r2 := d.length_squared()
-	if r2 >= 1.0: return natural
-	return MOY_POND_SURFACE - 0.35 - MOY_POND_DEPTH * (1.0 - r2)
+	var radius := d.length()
+	if radius >= float(MOY_POND_PROFILE[0][0]): return natural
+	for i in range(MOY_POND_PROFILE.size() - 1):
+		var outer: Array = MOY_POND_PROFILE[i]
+		var inner: Array = MOY_POND_PROFILE[i + 1]
+		if radius <= float(outer[0]) and radius >= float(inner[0]):
+			var t := inverse_lerp(float(outer[0]), float(inner[0]), radius)
+			return -60.0 + lerpf(float(outer[1]), float(inner[1]), t)
+	return -60.0 - MOY_POND_DEPTH
 
 
 func moy_pond_coverage(world_pos: Vector2) -> float:
 	var d := (world_pos - MOY_POND_CENTER) / MOY_POND_RADII
-	return 1.0 - smoothstep(0.82, 1.0, d.length())
+	return 1.0 - smoothstep(0.985, 1.0, d.length())
+
+
+func moy_mirror_pool_coverage(world_pos: Vector2) -> float:
+	var r: Array=MOY_PLAN.CIVIC_SQUARE.mirror.rect
+	return 1.0 if Rect2(float(r[0]),float(r[1]),float(r[2])-float(r[0]),float(r[3])-float(r[1])).has_point(world_pos) else 0.0
 
 
 ## Bowl, banks and the east sill of the tarn. Inside TOWN_POND_BANK_RADIUS the
@@ -571,7 +584,7 @@ const CHINESE_WATER := preload("res://scripts/chinese_water.gd")
 
 func is_water_area(world_pos: Vector2) -> bool:
 	if not CHINESE_WATER.at(world_pos).is_empty(): return true
-	return moy_pond_coverage(world_pos)>0.01 or is_lake_area(world_pos) or town_pond_coverage(world_pos)>0.01
+	return moy_pond_coverage(world_pos)>0.01 or moy_mirror_pool_coverage(world_pos)>0.5 or is_lake_area(world_pos) or town_pond_coverage(world_pos)>0.01
 
 
 func get_water_surface_height(world_pos: Vector2) -> float:
@@ -579,6 +592,8 @@ func get_water_surface_height(world_pos: Vector2) -> float:
 		return get_chinese_village_island_surface_y()+CHINESE_WATER.SURFACE
 	if moy_pond_coverage(world_pos)>0.01:
 		return MOY_POND_SURFACE
+	if moy_mirror_pool_coverage(world_pos)>0.5:
+		return -60.0-float(MOY_PLAN.CIVIC_SQUARE.mirror.depth)
 	if town_pond_coverage(world_pos)>0.01:
 		return TOWN_POND_WATER_LEVEL
 	return LAKE_WATER_LEVEL
@@ -590,6 +605,8 @@ func get_water_floor_height(world_pos: Vector2) -> float:
 		return get_chinese_village_island_surface_y()+CHINESE_WATER.bed(pond,world_pos-CHINESE_WATER.CENTER)
 	if moy_pond_coverage(world_pos)>0.01:
 		return _moy_pond_bed(world_pos.x,world_pos.y,-60.0)
+	if moy_mirror_pool_coverage(world_pos)>0.5:
+		return -60.0-2.0*float(MOY_PLAN.CIVIC_SQUARE.mirror.depth)
 	return get_mesh_height(world_pos.x,world_pos.y)
 
 

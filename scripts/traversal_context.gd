@@ -18,6 +18,10 @@ var profile: PlayableCharacterProfile
 var suit: BlorbSuitController
 var rig: RigAdapter
 var terrain: Node
+## Optional rest collider for a rig whose swim/flight pose tilts its physics
+## shape. Standing clearance must test the upright shape, not the swim pose.
+var standing_collision: CollisionShape3D
+var standing_collision_transform := Transform3D.IDENTITY
 ## The rendered body root, which carries the character's facing. Poses that
 ## need "which way is this character's own right" read it from here rather
 ## than from the collision body, which this project never rotates.

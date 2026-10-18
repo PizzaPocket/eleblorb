@@ -2,6 +2,7 @@ extends Node3D
 
 ## Small real-physics regression, independent of settlement construction.
 var failures: Array[String] = []
+var _ground_level := 0.0
 
 
 func _ready() -> void:
@@ -9,6 +10,8 @@ func _ready() -> void:
 	for profile in [PlayableCharacterProfile.human(), PlayableCharacterProfile.xiao_hou_zi()]:
 		await _check_climb(profile)
 	await _check_targeting()
+	for profile in [PlayableCharacterProfile.human(), PlayableCharacterProfile.xiao_hou_zi()]:
+		await _check_city_tower(profile)
 	for failure in failures: push_error(failure)
 	print("Vine camera climb: %d failures" % failures.size())
 	get_tree().quit(0 if failures.is_empty() else 1)
@@ -41,7 +44,7 @@ func _context(body: CharacterBody3D, profile: PlayableCharacterProfile) -> Trave
 
 
 func get_mesh_height(_x: float, _z: float) -> float:
-	return 0.0
+	return _ground_level
 
 
 func _check_climb(profile: PlayableCharacterProfile) -> void:
@@ -114,4 +117,62 @@ func _check_targeting() -> void:
 	mode.anchor = Vector3(100, 65, 0); mode.rope_length = 30.0; mode.swinging = true
 	mode.anchor_rid = wall.get_rid()
 	_check(not mode._catch_next(ctx, Vector3.FORWARD) and mode.anchor == Vector3(100, 65, 0) and mode.swinging, "failed handover dropped current grip")
+	var held := mode.anchor
+	_check(mode._catch_next(ctx, Vector3.FORWARD, true) and mode.anchor_rid == wall.get_rid() and mode.anchor.y >= held.y + VineSwingMode.CLIMB_ANCHOR_GAIN, "cannot regrip higher on the same physical wall")
+	body.position = Vector3(100,35,-7.4)
+	ctx.aim_basis = Basis(Vector3.RIGHT, deg_to_rad(20.0))
+	var gentle := mode.find_anchor(ctx, Vector3.FORWARD)
+	ctx.aim_basis = Basis(Vector3.RIGHT, deg_to_rad(65.0))
+	var close := mode.find_anchor(ctx, Vector3.FORWARD)
+	_check(gentle != null and close != null and close.point.y > gentle.point.y + 5.0, "steeper camera aim did not raise close-facade targeting")
+	_check(close != null and close.point.y > body.position.y + 20.0, "close facade cannot supply a higher anchor")
 	wall.free(); body.queue_free(); mode.reset()
+
+
+## Exercise real saved Moy collision, not a manually injected free-air anchor.
+## Only Windspire is attached, so this does not construct the whole Crossroads.
+func _check_city_tower(profile: PlayableCharacterProfile) -> void:
+	var manifest = JSON.parse_string(FileAccess.get_file_as_string("res://assets/generated/moy_city/manifest.json"))
+	var tower: StaticBody3D
+	for path: String in manifest.packs:
+		if not FileAccess.get_file_as_string(path).contains('name="Building_12_'):
+			continue
+		var cell := (load(path) as PackedScene).instantiate()
+		tower = cell.find_child("Building_12_*",true,false) as StaticBody3D
+		if tower != null: tower.get_parent().remove_child(tower)
+		cell.free()
+		break
+	_check(tower != null, "Moy Windspire fixture missing")
+	if tower == null: return
+	add_child(tower)
+	var shell: CollisionShape3D
+	for child in tower.get_children():
+		if child is CollisionShape3D and child.shape is BoxShape3D: shell = child; break
+	_check(shell != null, "Moy Windspire shell collision missing")
+	if shell == null: tower.free(); return
+	var size := (shell.shape as BoxShape3D).size
+	_ground_level = -60.0
+	var body := _body(Vector3(tower.position.x,-25,tower.position.z-size.z*0.5-8),profile.standing_height)
+	var ctx := _context(body,profile); ctx.direction=Vector3.BACK
+	ctx.aim_basis=Basis.looking_at(Vector3(0,sin(deg_to_rad(65.0)),cos(deg_to_rad(65.0))),Vector3.UP)
+	await get_tree().physics_frame
+	await get_tree().physics_frame
+	var mode := VineSwingMode.new()
+	_check(mode._throw(ctx,Vector3.BACK,false),profile.id+": no real Moy initial anchor")
+	var first_anchor := mode.anchor
+	var start := body.position.y
+	var regrips := 0
+	for frame in 1000:
+		await get_tree().physics_frame
+		var previous := mode.anchor
+		mode._hang(ctx,Vector3.BACK)
+		if mode.anchor != previous:
+			regrips += 1
+			_check(mode.anchor.y >= previous.y + VineSwingMode.CLIMB_ANCHOR_GAIN,profile.id+": upward handover did not gain height")
+	_check(body.position.y > start+35.0,profile.id+": stalled climbing real Moy facade: "+str(body.position.y-start))
+	_check(regrips > 0 and mode.anchor.y > first_anchor.y+6.0,profile.id+": never advanced past first anchor")
+	_check(mode.anchor_rid == tower.get_rid(),profile.id+": did not reuse physical tower support")
+	_check(body.position.z <= tower.position.z-size.z*0.5+0.01,profile.id+": climbed inside tower")
+	print("MOY_VINE_CLIMB rig=",profile.id," gained_m=",body.position.y-start," higher_regrips=",regrips," real_saved_collision=Windspire")
+	mode.reset(); body.free(); tower.free(); _ground_level=0.0
+	await get_tree().physics_frame

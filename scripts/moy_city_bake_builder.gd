@@ -65,6 +65,8 @@ static func build_packs() -> Dictionary:
 	_add_estate_links(packs)
 	_add_transit(packs)
 	_add_gate_forms(packs)
+	_add_civic_square(packs,tree_templates)
+	_add_arch_front(packs)
 	_add_city_dome(packs)
 	_add_turbines(packs)
 	for template in tree_templates.values(): (template as StaticBody3D).free()
@@ -373,17 +375,44 @@ static func _landmark(b: Dictionary) -> Node3D:
 		# Four separate podium wings keep the public atrium open at ground and Deck.
 		for wing in [Vector4(-26,0,6,60),Vector4(26,0,6,60),Vector4(0,-30,46,6),Vector4(-12.7,30,20.6,6),Vector4(12.7,30,20.6,6)]:
 			var wall := _box_body("HotelAtriumWing",Vector3(wing.z,44,wing.w),Vector3(wing.x,22,wing.y),color); body.add_child(wall)
-		var revolving:=CylinderMesh.new(); revolving.top_radius=1.4; revolving.bottom_radius=1.4; revolving.height=2.6; revolving.radial_segments=12
-		var revolving_vis:=MeshInstance3D.new(); revolving_vis.name="HotelRevolvingDoor"; revolving_vis.mesh=revolving; revolving_vis.position=Vector3(0,1.3,27); revolving_vis.material_override=_material(Color("#8f795b")); body.add_child(revolving_vis)
+		# Four moving leaves in the model's front entrance. The door stays a
+		# separate body so the public entrance remains clear of the podium wings.
+		var revolving:=AnimatableBody3D.new(); revolving.name="HotelRevolvingDoor"; revolving.position=Vector3(0,0,24); revolving.set_script(load("res://scripts/moy_hotel_revolving_door.gd"))
+		var hub:=CylinderMesh.new(); hub.top_radius=0.18; hub.bottom_radius=0.18; hub.height=2.6; hub.radial_segments=12
+		var hub_vis:=MeshInstance3D.new(); hub_vis.mesh=hub; hub_vis.position.y=1.3; hub_vis.material_override=_material(Color("#8f795b")); revolving.add_child(hub_vis)
+		for leaf_i in 4:
+			var leaf:=Node3D.new(); leaf.rotation.y=TAU*float(leaf_i)/4.0
+			var panel_mesh:=BoxMesh.new(); panel_mesh.size=Vector3(1.22,2.45,0.07)
+			var panel:=MeshInstance3D.new(); panel.mesh=panel_mesh; panel.position=Vector3(0.64,1.3,0); panel.material_override=_material(Color("#9ab6b4")); leaf.add_child(panel)
+			var panel_shape:=BoxShape3D.new(); panel_shape.size=panel_mesh.size; var panel_col:=CollisionShape3D.new(); panel_col.shape=panel_shape; panel_col.position=panel.position; leaf.add_child(panel_col); revolving.add_child(leaf)
+		body.add_child(revolving)
 		for side in [-1.0,1.0]:
-			var swing:=MeshInstance3D.new(); swing.name="HotelSwingDoorLeaf"; var swing_mesh:=BoxMesh.new(); swing_mesh.size=Vector3(1.2,2.5,0.08); swing.mesh=swing_mesh; swing.position=Vector3(side*2.0,1.25,27); swing.material_override=_material(Color("#baa47c")); body.add_child(swing)
+			var swing:=_box_body("HotelSwingDoorLeaf",Vector3(1.2,2.5,0.08),Vector3(side*2.05,1.25,24.0),Color("#9ab6b4")); body.add_child(swing)
 		var tower_data: Dictionary = PLAN.HOTEL.tower
 		var origin: Array = PLAN.HOTEL.origin
 		var tower_center := _hotel_local(center, float(origin[0]), float(origin[1]), float(tower_data.c[0]), float(tower_data.c[1]))
 		_hotel_tower_shell(body, tower_center, float(tower_data.r), float(tower_data.top), PLAN.HOTEL.lifts)
+		var tower_glass:=StandardMaterial3D.new(); tower_glass.albedo_color=Color(0.58,0.72,0.72,0.22); tower_glass.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; tower_glass.roughness=0.28
+		for child in body.get_node("HotelTowerShellWithLiftClearances").get_children():
+			if child is MeshInstance3D: (child as MeshInstance3D).material_override=tower_glass
+		var rib_cfg: Array=tower_data.rib
+		for rib_i in int(tower_data.ribs):
+			var a:=TAU*float(rib_i)/float(tower_data.ribs); var rib:=_round_column("HotelTowerRib_%02d"%rib_i,float(rib_cfg[0])*0.5,float(tower_data.top),Vector3(tower_center.x+cos(a)*(float(tower_data.r)-0.12),float(tower_data.top)*0.5,tower_center.y+sin(a)*(float(tower_data.r)-0.12)),Color("#c5c5b5")); body.add_child(rib)
 		var drum_data: Dictionary = PLAN.HOTEL.drum
-		var drum := CylinderMesh.new(); drum.top_radius=float(drum_data.r); drum.bottom_radius=float(drum_data.r); drum.height=float(drum_data.dome_top)-float(drum_data.tank[0]); drum.radial_segments=40
-		var dm := MeshInstance3D.new(); dm.mesh=drum; dm.position=Vector3(tower_center.x,(float(drum_data.tank[0])+float(drum_data.dome_top))*0.5,tower_center.y); dm.material_override=_material(Color("#a98a65")); body.add_child(dm)
+		# The tank ring is a capped service band. Above it, the Windrose is a
+		# glass lounge with forty fixed mullions and a slow turning light ring.
+		var tank := CylinderMesh.new(); tank.top_radius=float(drum_data.r); tank.bottom_radius=float(drum_data.r); tank.height=float(drum_data.tank[1])-float(drum_data.tank[0]); tank.radial_segments=40
+		var tank_vis := MeshInstance3D.new(); tank_vis.name="HotelTankDrum"; tank_vis.mesh=tank; tank_vis.position=Vector3(tower_center.x,(float(drum_data.tank[0])+float(drum_data.tank[1]))*0.5,tower_center.y); tank_vis.material_override=_material(Color("#a98a65")); body.add_child(tank_vis)
+		var glass:=StandardMaterial3D.new(); glass.albedo_color=Color(0.48,0.70,0.72,0.27); glass.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; glass.roughness=0.32
+		var lounge_h:=float(drum_data.lounge[1])-float(drum_data.lounge[0]); var lounge_mesh:=CylinderMesh.new(); lounge_mesh.top_radius=float(drum_data.r); lounge_mesh.bottom_radius=float(drum_data.r); lounge_mesh.height=lounge_h; lounge_mesh.radial_segments=40
+		var lounge:=MeshInstance3D.new(); lounge.name="HotelWindroseGlazing"; lounge.mesh=lounge_mesh; lounge.position=Vector3(tower_center.x,(float(drum_data.lounge[0])+float(drum_data.lounge[1]))*0.5,tower_center.y); lounge.material_override=glass; body.add_child(lounge)
+		for rib_i in int(drum_data.mullions):
+			var a:=TAU*float(rib_i)/float(drum_data.mullions); var mullion:=_round_column("HotelWindroseMullion_%02d"%rib_i,0.12,lounge_h,Vector3(tower_center.x+cos(a)*(float(drum_data.r)-0.12),(float(drum_data.lounge[0])+float(drum_data.lounge[1]))*0.5,tower_center.y+sin(a)*(float(drum_data.r)-0.12)),Color("#a98a65")); body.add_child(mullion)
+		var ring_root:=Node3D.new(); ring_root.name="HotelWindroseTurningLight"; ring_root.position=Vector3(tower_center.x,float(drum_data.lounge[0])+0.6,tower_center.y); ring_root.set_script(load("res://scripts/moy_hotel_windrose.gd")); body.add_child(ring_root)
+		var ring:=_annulus_visual("HotelWindroseLightRing",float(drum_data.r)-0.6,float(drum_data.r),64,0.16,0.0); ring_root.add_child(ring)
+		# Forty ribs continue the tower rhythm through the tank and dome base.
+		for rib_i in int(drum_data.ribs):
+			var a:=TAU*float(rib_i)/float(drum_data.ribs); var rib:=_round_column("HotelDrumRib_%02d"%rib_i,0.22,float(drum_data.dome_top)-float(drum_data.tank[1]),Vector3(tower_center.x+cos(a)*(float(drum_data.r)-0.18),(float(drum_data.tank[1])+float(drum_data.dome_top))*0.5,tower_center.y+sin(a)*(float(drum_data.r)-0.18)),Color("#a98a65")); body.add_child(rib)
 		return body
 	if String(b.kind) == "estate":
 		var body := StaticBody3D.new(); body.name="Building_%02d_%s" % [n,String(b.name).replace(" ","_")]; body.collision_layer=1; body.collision_mask=1
@@ -428,31 +457,79 @@ static func _add_hotel_public_interior(body: Node3D, hotel: Dictionary) -> void:
 	for record in [[hotel.forecourt,"HotelForecourt"],[hotel.entrance_hall,"HotelEntranceHall"]]:
 		var q: Array=record[0]; var p0:=_hotel_local(center,ox,oz,float(q[0]),float(q[1])); var p1:=_hotel_local(center,ox,oz,float(q[2]),float(q[3]))
 		var slab:=_box_body(String(record[1]),Vector3(p1.x-p0.x,0.24,p1.y-p0.y),Vector3((p0.x+p1.x)*0.5,0.12,(p0.y+p1.y)*0.5),floor_color); body.add_child(slab)
+	# The desk and picture sign occupy their measured model positions in the atrium.
+	var desk0:=_hotel_local(center,ox,oz,44.4,31.0); var desk1:=_hotel_local(center,ox,oz,45.4,45.0)
+	var reception:=_box_body("HotelReceptionDesk",Vector3(desk1.x-desk0.x,1.1,desk1.y-desk0.y),Vector3((desk0.x+desk1.x)*0.5,0.55,(desk0.y+desk1.y)*0.5),Color("#806c52")); body.add_child(reception)
+	var concierge:=_box_body("HotelConciergeDesk",Vector3(2.2,1.0,1.1),Vector3(desk0.x-1.5,0.5,(desk0.y+desk1.y)*0.5),Color("#927a5b")); body.add_child(concierge)
+	var iris_stand:=_box_body("HotelIrisStand",Vector3(0.9,1.0,0.9),Vector3(desk0.x-3.2,0.5,(desk0.y+desk1.y)*0.5),Color("#b89d70")); body.add_child(iris_stand)
+	var sign_center:=_hotel_local(center,ox,oz,26.0,56.5); var picture:=_box_body("HotelChandelierPictureSign",Vector3(2.0,1.6,0.12),Vector3(sign_center.x,4.8,sign_center.y),Color("#c5ad78")); body.add_child(picture)
+	for x in range(2,51,4):
+		var post_at:=_hotel_local(center,ox,oz,float(x),59.5); var post:=_round_column("HotelForecourtColonnadePost",0.32,6.5,Vector3(post_at.x,3.25,post_at.y),Color("#9e8e70")); body.add_child(post)
+	# One pitched glass roof drains away from the tower. Four metre bronze
+	# trusses carry the glazing; the high clerestory and front box gutter follow
+	# the data elevations and leave the capsule slots in the cylindrical core.
+	var sky: Dictionary=hotel.skylight; var skylight_glass_mat:=StandardMaterial3D.new(); skylight_glass_mat.albedo_color=Color(0.45,0.66,0.69,0.22); skylight_glass_mat.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; skylight_glass_mat.roughness=0.2
+	var skylight_body:=StaticBody3D.new(); skylight_body.name="HotelPitchedSkylight"; skylight_body.collision_layer=1; skylight_body.collision_mask=1; body.add_child(skylight_body)
+	var z_high:=float(hotel.tower.c[1])-float(origin[1]); var z_low:=float(hotel.void.z_south)
+	for sx in range(10,43,4):
+		for zi in range(0,ceili((z_low-z_high)/4.0)):
+			var za:=z_high+float(zi)*4.0; var zb:=minf(z_low,za+4.0); var ya:=lerpf(float(sky.high),float(sky.low),(za-z_high)/(z_low-z_high)); var yb:=lerpf(float(sky.high),float(sky.low),(zb-z_high)/(z_low-z_high)); var zm:=(za+zb)*0.5; var ym:=(ya+yb)*0.5
+			var panel_mesh:=BoxMesh.new(); panel_mesh.size=Vector3(4.0,0.08,Vector2(4.0,zb-za).length()); var panel:=MeshInstance3D.new(); panel.name="HotelSkylightGlassPanel"; panel.mesh=panel_mesh; panel.position=Vector3(float(sx)-26.0,ym,zm-30.0); panel.rotation.x=atan2(ya-yb,zb-za); panel.material_override=skylight_glass_mat; skylight_body.add_child(panel)
+			var panel_shape:=BoxShape3D.new(); panel_shape.size=panel_mesh.size; var panel_col:=CollisionShape3D.new(); panel_col.shape=panel_shape; panel_col.position=panel.position; panel_col.rotation=panel.rotation; skylight_body.add_child(panel_col)
+	for zi in range(0,ceili((z_low-z_high)/float(sky.truss))+1):
+		var z:=minf(z_low,z_high+float(zi)*float(sky.truss)); var y:=lerpf(float(sky.high),float(sky.low),(z-z_high)/(z_low-z_high)); var truss:=_segment_body("HotelSkylightTruss",Vector2(-16.0,z-30.0),Vector2(16.0,z-30.0),0.18,y-0.09,0.18,Color("#887753")); truss.rotation.x=0.0; body.add_child(truss)
+	var high_louvre:=_box_body("HotelTowerLouvreBand",Vector3(32.0,0.8,0.28),Vector3(0.0,47.5,z_high-30.0),Color("#8b7959")); body.add_child(high_louvre)
+	var front_gutter:=_box_body("HotelFrontBoxGutter",Vector3(32.0,0.9,0.42),Vector3(0.0,float(sky.low)-0.25,z_low-30.0),Color("#75694f")); body.add_child(front_gutter)
+	var rain: Dictionary=hotel.rain; var cis: Dictionary=rain.cistern; var cr: Array=cis.rect; var cx:=(float(cr[0])+float(cr[2]))*0.5-26.0; var cz:=(float(cr[1])+float(cr[3]))*0.5-30.0; var cistern:=_box_body("HotelForecourtCistern",Vector3(float(cr[2])-float(cr[0]),float(cis.depth),float(cr[3])-float(cr[1])),Vector3(cx,-float(cis.depth)*0.5,cz),Color("#867b65")); body.add_child(cistern)
+	for outlet in rain.outlets:
+		var outlet_local:=_hotel_local(center,ox,oz,float(outlet[0]),float(outlet[1])); var downpipe:=_round_column("HotelRainOutletPipe",0.1,44.0,Vector3(outlet_local.x,22.0,outlet_local.y),Color("#81765e")); body.add_child(downpipe)
 	var void_data: Dictionary=hotel.void; var left:=float(void_data.x[0])-26.0; var right:=float(void_data.x[1])-26.0
 	var south:=float(void_data.z_north)-30.0; var north:=float(void_data.z_south)-30.0
 	# Atrium floor under the 32 x 26 m void, with the rock garden at its authored centre.
 	var atrium:=_box_body("HotelAtriumFloor",Vector3(32.0,0.24,north-south),Vector3(0,0.12,(south+north)*0.5),floor_color); body.add_child(atrium)
-	var garden: Dictionary=hotel.rock_garden; var gc:=_hotel_local(center,ox,oz,float(garden.c[0]),float(garden.c[1])); var garden_body:=_box_body("HotelRockGarden",Vector3(12.0,0.45,12.0),Vector3(gc.x,0.34,gc.y),Color("#637b50")); body.add_child(garden_body)
-	var pavilion: Array=garden.pavilion; var pavilion_mesh:=BoxMesh.new(); pavilion_mesh.size=Vector3(float(pavilion[0]),float(pavilion[1]),float(pavilion[2])); var pavilion_vis:=MeshInstance3D.new(); pavilion_vis.name="HotelRockGardenPavilion"; pavilion_vis.mesh=pavilion_mesh; pavilion_vis.position=Vector3(gc.x,0.45+float(pavilion[1])*0.5,gc.y); pavilion_vis.material_override=_material(Color("#c1ad88")); body.add_child(pavilion_vis)
+	var garden: Dictionary=hotel.rock_garden; var gc:=_hotel_local(center,ox,oz,float(garden.c[0]),float(garden.c[1]));
+	var gravel:=_round_column("HotelRockGardenGravel",float(garden.r),0.14,Vector3(gc.x,0.07,gc.y),Color("#b9ad91")); body.add_child(gravel)
+	# Six rocks and two trees follow the model's coordinates; no extra planting.
+	var rocks: Array=[[-3.4,-2.0,0.9,1.6],[3.6,1.8,1.1,2.2],[-1.5,3.8,0.7,1.1],[2.2,-3.6,0.8,1.4],[-4.3,1.6,0.6,0.9],[4.4,-1.4,0.5,0.8]]
+	for i in rocks.size():
+		var q: Array=rocks[i]; var rock:=NatureProps.build_rock(float(q[2]),true); rock.name="HotelRockGardenStone_%02d"%i; rock.position=Vector3(gc.x+float(q[0]),0.12,gc.y+float(q[1])); rock.scale=Vector3(1.0,float(q[3])/(float(q[2])*2.0),0.8); body.add_child(rock)
+	var pavilion: Array=garden.pavilion; var pavilion_base:=_box_body("HotelRockGardenPavilionBase",Vector3(float(pavilion[0])-0.4,0.35,float(pavilion[1])-0.4),Vector3(gc.x,0.28,gc.y),Color("#927956")); body.add_child(pavilion_base)
+	for sx in [-1.0,1.0]:
+		for sz in [-1.0,1.0]:
+			var post:=_round_column("HotelRockGardenPavilionPost",0.14,float(pavilion[2])*0.8,Vector3(gc.x+sx*(float(pavilion[0])*0.5-0.3),float(pavilion[2])*0.4,gc.y+sz*(float(pavilion[1])*0.5-0.3)),Color("#866f4d")); body.add_child(post)
+	var pavilion_roof:=_box_body("HotelRockGardenPavilionRoof",Vector3(float(pavilion[0])+1.2,0.28,float(pavilion[1])+1.2),Vector3(gc.x,float(pavilion[2])*0.8+0.2,gc.y),Color("#d0bd93")); body.add_child(pavilion_roof)
+	for x in [13.2,38.8]:
+		var tree_at:=_hotel_local(center,ox,oz,float(x),29.0); var planter:=_box_body("HotelRockGardenTreePlanter",Vector3(2.0,0.8,2.0),Vector3(tree_at.x,0.4,tree_at.y),Color("#b6a17e")); body.add_child(planter)
+		var trunk:=_round_column("HotelRockGardenTreeTrunk",0.2,4.0,Vector3(tree_at.x,2.8,tree_at.y),Color("#795b3c")); body.add_child(trunk)
+		var crown:=_box_body("HotelRockGardenTreeCrown",Vector3(4.4,3.2,4.4),Vector3(tree_at.x,5.0,tree_at.y),Color("#647e55")); body.add_child(crown)
 	var pod: Dictionary=hotel.pod; var pc:=_hotel_local(center,ox,oz,float(pod.c[0]),float(pod.c[1])); var pod_body:=_box_body("HotelGardenPod",Vector3(5.0,3.2,5.0),Vector3(pc.x,1.7,pc.y),Color("#d9c6a4")); body.add_child(pod_body)
 	# Decorative shallow runnel, segmented along the HOTEL survey polyline.
 	var runnel: Array=hotel.runnel
 	for i in runnel.size()-1:
 		var a:=_hotel_local(center,ox,oz,float(runnel[i][0]),float(runnel[i][1])); var b:=_hotel_local(center,ox,oz,float(runnel[i+1][0]),float(runnel[i+1][1]))
-		var water:=_segment_body("HotelRunnel_%02d"%i,a,b,0.7,0.08,0.08,Color("#6fa8c8")); body.add_child(water)
+		var channel:=_segment_body("HotelRunnelChannel_%02d"%i,a,b,1.1,0.02,0.09,Color("#9f9278")); body.add_child(channel)
+		channel.get_child(0).scale.z=1.0
+		var water_mesh:=BoxMesh.new(); water_mesh.size=Vector3(a.distance_to(b),0.07,0.6); var water:=MeshInstance3D.new(); water.name="HotelRunnelWater_%02d"%i; water.mesh=water_mesh; water.position=Vector3((a.x+b.x)*0.5,0.075,(a.y+b.y)*0.5); water.rotation.y=-atan2(b.y-a.y,b.x-a.x); water.material_override=_material(Color("#699eb1")); body.add_child(water)
 	# Two ramp runs with intermediate landings, each end landing tied to the atrium and mezzanine.
 	for ri in hotel.ramps.size():
 		var ramp: Array=hotel.ramps[ri]
-		for si in ramp.size()-1:
-			var a2:=_hotel_local(center,ox,oz,float(ramp[si][0]),float(ramp[si][1])); var b2:=_hotel_local(center,ox,oz,float(ramp[si+1][0]),float(ramp[si+1][1]))
-			var y0:=6.5*float(si)/float(ramp.size()-1); var y1:=6.5*float(si+1)/float(ramp.size()-1)
-			var flight:=_ramp_body("HotelDoubleRamp_%d_%d"%[ri,si],Vector3(a2.x,y0,a2.y),Vector3(b2.x,y1,b2.y),float(hotel.ramp_width),0.22,Color("#c9b99d")); body.add_child(flight)
-			if si>0:
-				var land:=_box_body("HotelRampLanding_%d_%d"%[ri,si],Vector3(float(hotel.landing),0.25,float(hotel.landing)),Vector3(a2.x,y0,a2.y),floor_color); body.add_child(land)
+		var curve: Array=[]; var p0: Vector2=Vector2(float(ramp[0][0]),float(ramp[0][1])); var p1: Vector2=Vector2(float(ramp[1][0]),float(ramp[1][1])); var p2: Vector2=Vector2(float(ramp[2][0]),float(ramp[2][1])); var control:=2.0*p1-(p0+p2)*0.5
+		for si in 18:
+			var t0:=float(si)/18.0; var t1:=float(si+1)/18.0; var q0:=p0*(1.0-t0)*(1.0-t0)+control*2.0*(1.0-t0)*t0+p2*t0*t0; var q1:=p0*(1.0-t1)*(1.0-t1)+control*2.0*(1.0-t1)*t1+p2*t1*t1
+			var a2:=_hotel_local(center,ox,oz,q0.x,q0.y); var b2:=_hotel_local(center,ox,oz,q1.x,q1.y); var y0:=6.5*t0; var y1:=6.5*t1
+			var flight:=_ramp_body("HotelDoubleRamp_%d_%02d"%[ri,si],Vector3(a2.x,y0,a2.y),Vector3(b2.x,y1,b2.y),float(hotel.ramp_width),0.35,Color("#c9b99d")); body.add_child(flight)
+			var lateral: Vector2=(b2-a2).normalized().orthogonal()
+			for side in [-1.0,1.0]:
+				var offset: Vector2=lateral*side*(float(hotel.ramp_width)*0.5-0.08)
+				var rail:=_ramp_body("HotelRampGuard_%d_%02d_%d"%[ri,si,int(side)],Vector3(a2.x+offset.x,y0+0.9,a2.y+offset.y),Vector3(b2.x+offset.x,y1+0.9,b2.y+offset.y),0.12,0.12,Color("#a9c5c6")); body.add_child(rail)
+		var foot:=_hotel_local(center,ox,oz,float(ramp[0][0]),float(ramp[0][1])); var bend:=_hotel_local(center,ox,oz,float(ramp[1][0]),float(ramp[1][1])); var head:=_hotel_local(center,ox,oz,float(ramp[2][0]),float(ramp[2][1]))
+		for endpoint in [[foot,0.0],[head,6.5]]:
+			var loc: Vector2=endpoint[0]; var yy:=float(endpoint[1]); var land:=_box_body("HotelRampLanding_%d_%.1f"%[ri,yy],Vector3(float(hotel.landing),0.28,float(hotel.landing)),Vector3(loc.x,yy-0.14,loc.y),floor_color); body.add_child(land)
+		var support:=_round_column("HotelRampMidSupport_%d"%ri,0.5,3.0,Vector3(bend.x,1.5,bend.y),Color("#9b8c72")); body.add_child(support)
 	# Mezzanine and levels 3–12: exact void dimensions, 2.4 m ledges, shifted with its lean.
 	for level_index in 11:
 		var level:=6.5 if level_index==0 else 11.5+float(level_index-1)*float(hotel.storey)
-		var lean:=float(void_data.lean)*float(maxi(0,level_index-1)); var s:=south+lean; var n:=north+lean
+		var lean:=-float(void_data.lean)*float(maxi(0,level_index-1)); var s:=south+lean; var n:=north+lean
 		for side in [-1.0,1.0]:
 			var x0:=left-2.4 if side<0 else right; var x1:=left if side<0 else right+2.4
 			var strip:=_box_body("HotelGallerySide_%02d_%d"%[level_index,int(side)],Vector3(2.4,0.3,n-s),Vector3((x0+x1)*0.5,level-0.15,(s+n)*0.5),Color("#c9b99d")); body.add_child(strip)
@@ -461,16 +538,44 @@ static func _add_hotel_public_interior(body: Node3D, hotel: Dictionary) -> void:
 			var strip:=_box_body("HotelGalleryEnd_%02d_%d"%[level_index,int(side)],Vector3(right-left,0.3,2.4),Vector3((left+right)*0.5,level-0.15,(z0+z1)*0.5),Color("#c9b99d")); body.add_child(strip)
 		# Inner-void guards on the four open edges.
 		for edge in [Vector4(left, s, right, s),Vector4(left,n,right,n),Vector4(left,s,left,n),Vector4(right,s,right,n)]:
-			var a3:=Vector2(edge.x,edge.y); var b3:=Vector2(edge.z,edge.w); var rail:=_segment_body("HotelGalleryVoidRail_%02d"%level_index,a3,b3,0.12,level+0.55,1.05,Color("#876d50")); body.add_child(rail)
+			var a3:=Vector2(edge.x,edge.y); var b3:=Vector2(edge.z,edge.w); var rail:=_segment_body("HotelGalleryVoidRail_%02d"%level_index,a3,b3,0.12,level,1.1,Color("#876d50")); body.add_child(rail)
+		var planter:=_segment_body("HotelGalleryPlanterTrough_%02d"%level_index,Vector2(left,s),Vector2(right,s),0.42,level+1.05,0.22,Color("#667d52")); body.add_child(planter)
+		var vine_mesh:=CylinderMesh.new(); vine_mesh.top_radius=0.035; vine_mesh.bottom_radius=0.025; vine_mesh.height=1.8; vine_mesh.radial_segments=5
+		var vine_multi:=MultiMesh.new(); vine_multi.transform_format=MultiMesh.TRANSFORM_3D; vine_multi.mesh=vine_mesh; vine_multi.instance_count=9
+		for vine_i in 9:
+			var x:=lerpf(left+1.0,right-1.0,float(vine_i)/8.0); var drift:=0.16*sin(float(vine_i)*1.7+float(level_index)); vine_multi.set_instance_transform(vine_i,Transform3D(Basis.from_scale(Vector3.ONE),Vector3(x,level+0.12,s+drift)))
+		var vines:=MultiMeshInstance3D.new(); vines.name="HotelGalleryHangingPlants_%02d"%level_index; vines.multimesh=vine_multi; vines.position=Vector3(0,0.0,0); vines.material_override=_material(Color("#607b50")); body.add_child(vines)
+		# Closed room fronts define the opaque range beyond the walking ledges.
+		# Door leaves replace short wall sections on both sides of each gallery.
+		var door_positions:=PackedFloat32Array([s+5.0,n-5.0])
+		for side in [-1.0,1.0]:
+			var wall_x:=left-2.48 if side<0 else right+2.48
+			var cuts:=PackedFloat32Array([s])
+			for door_z in door_positions:
+				cuts.append(door_z-0.65); cuts.append(door_z+0.65)
+			cuts.append(n)
+			for cut_i in range(0,cuts.size()-1,2):
+				var z0:=cuts[cut_i]; var z1:=cuts[cut_i+1]
+				if z1-z0<0.1: continue
+				var wall:=_box_body("HotelGalleryRoomFront",Vector3(0.16,3.25,z1-z0),Vector3(wall_x,level+1.625,(z0+z1)*0.5),Color("#d2c4a8")); body.add_child(wall)
+			for door_z in door_positions:
+				var door:=_box_body("HotelGalleryClosedRoomDoor",Vector3(0.14,2.2,1.25),Vector3(wall_x,level+1.1,door_z),Color("#806b50")); body.add_child(door)
 	# Direct mezzanine route to the authored skybridge and Deck door.
 	var deck_landing:=_box_body("HotelDeckDoorSkybridgeLanding",Vector3(6.0,0.3,12.0),Vector3(-4.0,6.35,24.0),floor_color); body.add_child(deck_landing)
 	# Chandelier arm and compact shared crystal multimesh (300 visible crystals at this prototype scale).
-	var arm: Dictionary=hotel.arm; var arm_root:=_hotel_local(center,ox,oz,26.0,float(arm.root_z)); var arm_tip:=_hotel_local(center,ox,oz,float(arm.tip[0]),float(arm.tip[1])); var beam:=_ramp_body("HotelChandelierArm",Vector3(arm_root.x,float(arm.bottom),arm_root.y),Vector3(arm_tip.x,float(arm.bottom),arm_tip.y),float(arm.width),1.1,Color("#777b78")); body.add_child(beam)
-	var chandelier: Dictionary=hotel.chandelier; var chandelier_center:=_hotel_local(center,ox,oz,float(chandelier.c[0]),float(chandelier.c[1])); var core:=_box_body("HotelChandelierCore",Vector3(1.2,float(chandelier.top)-float(chandelier.bottom),1.2),Vector3(chandelier_center.x,(float(chandelier.top)+float(chandelier.bottom))*0.5,chandelier_center.y),Color("#e8dba8")); body.add_child(core)
-	var crystal:=BoxMesh.new(); crystal.size=Vector3(0.22,0.28,0.22); var multimesh:=MultiMesh.new(); multimesh.transform_format=MultiMesh.TRANSFORM_3D; multimesh.mesh=crystal; multimesh.instance_count=300
-	for i in 300:
-		var tier:=i%int(chandelier.tiers); var band:=i/int(chandelier.tiers); var angle:=TAU*float(band)/60.0; var radius:=float(chandelier.r)*(0.45+0.08*float(tier)); var y:=lerpf(float(chandelier.bottom),float(chandelier.top),float(tier)/float(chandelier.tiers-1)); multimesh.set_instance_transform(i,Transform3D(Basis.IDENTITY,Vector3(cos(angle)*radius,y,sin(angle)*radius)))
+	var arm: Dictionary=hotel.arm; var chandelier: Dictionary=hotel.chandelier; var arm_root:=_hotel_local(center,ox,oz,26.0,float(arm.root_z)); var arm_tip:=_hotel_local(center,ox,oz,float(arm.tip[0]),float(arm.tip[1]))
+	for i in 8:
+		var t0:=float(i)/8.0; var t1:=float(i+1)/8.0; var a:=arm_root.lerp(arm_tip,t0); var b:=arm_root.lerp(arm_tip,t1); var depth0:=lerpf(float(arm.depth[0]),float(arm.depth[1]),t0); var depth1:=lerpf(float(arm.depth[0]),float(arm.depth[1]),t1); var middle_depth:=(depth0+depth1)*0.5
+		var beam:=_ramp_body("HotelChandelierArm_%02d"%i,Vector3(a.x,float(arm.bottom)+depth0,a.y),Vector3(b.x,float(arm.bottom)+depth1,b.y),float(arm.width),middle_depth,Color("#777b78")); body.add_child(beam)
+	for rope_i in int(arm.ropes):
+		var offset:=float(rope_i)-float(arm.ropes-1)*0.5; var rope:=_round_column("HotelChandelierSuspensionRope_%02d"%rope_i,0.022,float(arm.bottom)-float(chandelier.bottom),Vector3(arm_tip.x+offset*0.18,(float(arm.bottom)+float(chandelier.bottom))*0.5,arm_tip.y),Color("#8a8b7d")); body.add_child(rope)
+	var chandelier_center:=_hotel_local(center,ox,oz,float(chandelier.c[0]),float(chandelier.c[1])); var core:=_box_body("HotelChandelierCore",Vector3(1.2,float(chandelier.top)-float(chandelier.bottom),1.2),Vector3(chandelier_center.x,(float(chandelier.top)+float(chandelier.bottom))*0.5,chandelier_center.y),Color("#e8dba8")); body.add_child(core)
+	var crystal:=BoxMesh.new(); crystal.size=Vector3(0.12,0.18,0.12); var multimesh:=MultiMesh.new(); multimesh.transform_format=MultiMesh.TRANSFORM_3D; multimesh.mesh=crystal; multimesh.instance_count=int(chandelier.crystals)
+	for i in int(chandelier.crystals):
+		var tier:=i%int(chandelier.tiers); var band:=i/int(chandelier.tiers); var count_per_tier:=int(chandelier.crystals)/int(chandelier.tiers); var angle:=TAU*float(band)/float(count_per_tier); var radius:=float(chandelier.r)*(0.48+0.1*float(tier)); var y:=lerpf(float(chandelier.bottom),float(chandelier.top),float(tier)/float(chandelier.tiers-1)); multimesh.set_instance_transform(i,Transform3D(Basis.IDENTITY,Vector3(cos(angle)*radius,y,sin(angle)*radius)))
 	var crystals:=MultiMeshInstance3D.new(); crystals.name="HotelChandelierCrystals"; crystals.multimesh=multimesh; crystals.material_override=_material(Color("#fff0bb")); body.add_child(crystals)
+	for tier in int(chandelier.tiers):
+		var radius:=float(chandelier.r)*(0.45+0.1*float(tier)); var y:=lerpf(float(chandelier.bottom),float(chandelier.top),float(tier)/float(chandelier.tiers-1)); var ring:=_annulus_visual("HotelChandelierBronzeRing_%02d"%tier,radius-0.07,radius,64,0.1,y); ring.position.x=chandelier_center.x; ring.position.z=chandelier_center.y; ring.material_override=_material(Color("#9f8055")); body.add_child(ring)
 	# Four manually called rideable glass capsules, three stops only.
 	var lift_cfg: Dictionary=hotel.lifts
 	for i in 4:
@@ -480,14 +585,21 @@ static func _add_hotel_public_interior(body: Node3D, hotel: Dictionary) -> void:
 		for side in [-1.0,1.0]:
 			var pane:=MeshInstance3D.new(); var pane_mesh:=BoxMesh.new(); pane_mesh.size=Vector3(0.08,2.7,float(lift_cfg.depth)); pane.mesh=pane_mesh; pane.position.x=side*1.3; pane.material_override=glass_mat; lift.add_child(pane)
 		var back:=MeshInstance3D.new(); var back_mesh:=BoxMesh.new(); back_mesh.size=Vector3(2.6,2.7,0.08); back.mesh=back_mesh; back.position.z=-float(lift_cfg.depth)*0.5; back.material_override=glass_mat; lift.add_child(back); body.add_child(lift)
+		var bulb_mesh:=SphereMesh.new(); bulb_mesh.radius=0.07; bulb_mesh.height=0.14; bulb_mesh.radial_segments=6; bulb_mesh.rings=3
+		var bulb_multi:=MultiMesh.new(); bulb_multi.transform_format=MultiMesh.TRANSFORM_3D; bulb_multi.mesh=bulb_mesh; bulb_multi.instance_count=42
+		for bulb_i in 42:
+			var ring_i:=bulb_i/14; var bearing_i:=bulb_i%14; var angle:=TAU*float(bearing_i)/14.0; var y:=float([0.25,1.7,3.15][ring_i]); var radius:=0.8 if ring_i!=1 else 1.36; bulb_multi.set_instance_transform(bulb_i,Transform3D(Basis.IDENTITY,Vector3(cos(angle)*radius,y,sin(angle)*radius)))
+		var bulbs:=MultiMeshInstance3D.new(); bulbs.name="HotelCapsuleBulbs_%d"%i; bulbs.multimesh=bulb_multi; bulbs.material_override=_material(Color("#e6d28a")); lift.add_child(bulbs)
 		for stop_i in 3:
 			var radial := Vector3(cos(bearing), 0.0, sin(bearing))
 			var call_at := lift.position + Vector3.UP * float([0.0, 6.5, 89.5][stop_i]) + radial * (float(lift_cfg.depth) * 0.5 + 0.8)
 			_add_moy_lift_call(body, lift, stop_i, String(["Atrium floor", "Mezzanine", "Level 27 — Party suite"][stop_i]), call_at)
 	# Level 27 lobby and an empty south-facing party suite.
-	var suite_y:=89.5; var suite:=_box_body("HotelLevel27PartySuite",Vector3(16,0.3,10),Vector3(0,suite_y-0.15,23),Color("#c9b99d")); body.add_child(suite)
+	var suite_y:=89.5; var corridor:=_annulus_body("HotelLevel27RingCorridor",5.5,7.3,64,0.3,suite_y); corridor.position.x=0.0; corridor.position.z=-16.0; body.add_child(corridor)
+	var suite:=_box_body("HotelLevel27PartySuite",Vector3(16,0.3,10),Vector3(0,suite_y-0.15,21),Color("#c9b99d")); body.add_child(suite)
 	for side in [-1.0,1.0]:
-		var wall:=_box_body("HotelPartySuiteWall",Vector3(0.2,3.0,10),Vector3(side*8,suite_y+1.5,23),Color("#e6dac1")); body.add_child(wall)
+		var wall:=_box_body("HotelPartySuiteWall",Vector3(0.2,3.0,10),Vector3(side*8,suite_y+1.5,21),Color("#e6dac1")); body.add_child(wall)
+	var park_window:=_box_body("HotelPartySuiteParkWindow",Vector3(10,2.4,0.14),Vector3(0,suite_y+1.5,26),Color(0.45,0.67,0.72,0.35)); _set_body_glass(park_window,Color(0.45,0.67,0.72,0.35)); body.add_child(park_window)
 
 static func _hotel_local(center: Vector2, origin_x: float, origin_z: float, x: float, z: float) -> Vector2:
 	return Vector2(origin_x+x-center.x,origin_z+z-center.y)
@@ -632,10 +744,12 @@ static func _add_park(packs: Dictionary, tree_templates: Dictionary) -> void:
 	var gravel := _box_body("ParkDryGardenGravel", Vector3(dry_rect.size.x, 0.035, dry_rect.size.y), Vector3(dry_rect.get_center().x, DATUM + 0.095, dry_rect.get_center().y), Color("#938269"))
 	_add(packs, _cell(dry_rect.get_center()), gravel)
 	var pond: Dictionary = PLAN.PARK.pond; var c := Vector2(pond.c[0],pond.c[1]); var r: Vector2 = Vector2(pond.r[0],pond.r[1])
-	var water := MeshInstance3D.new(); water.name="MoyReedPondSurface"; var mesh := CylinderMesh.new(); mesh.top_radius=1; mesh.bottom_radius=1; mesh.height=0.01; mesh.radial_segments=64; water.mesh=mesh
-	water.scale=Vector3(r.x,1,r.y); water.position=Vector3(c.x,DATUM+0.4,c.y)
-	var water_material:=ShaderMaterial.new(); water_material.shader=load("res://shaders/moy_pond_water.gdshader"); water.material_override=water_material; water.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	var root := Node3D.new(); root.name="MoyReedPond"; root.add_child(water); _add(packs,_cell(c),root)
+	var water := MeshInstance3D.new(); water.name="MoyReedPondSurface"; var mesh := CylinderMesh.new(); mesh.top_radius=1; mesh.bottom_radius=1; mesh.height=0.002; mesh.radial_segments=96; water.mesh=mesh
+	water.scale=Vector3(r.x,1,r.y); water.position=Vector3(c.x,DATUM+float(pond.surface),c.y)
+	water.material_override=VillageWorks.water_material(); water.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var root := Node3D.new(); root.name="MoyReedPond"; root.add_child(water)
+	root.set_meta("water_surface_y",DATUM+float(pond.surface)); root.set_meta("water_depth",float(pond.surface)-float(pond.bed[-1][1])); CollisionPolicy.mark_hazard(root)
+	_add(packs,_cell(c),root)
 	for i in PLAN.PARK.trees.size():
 		var data: Dictionary=PLAN.PARK.trees[i]; var p: Vector2=Vector2(data.c[0],data.c[1]); var h:=float(data.h)
 		var leaf_color:=Color("#81936a"); var kind:=String(data.kind); var key:="%s|%.2f|%s"%[kind,h,leaf_color.to_html()]
@@ -764,7 +878,7 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 			var is_up:=String(hand.hand)=="up"
 			for pi in hand.profile.size():
 				var seg: Array=hand.profile[pi]; var a0:=deg_to_rad(float(seg[0])); var a1:=deg_to_rad(float(seg[1])); var y0:=float(seg[2]); var y1:=float(seg[3])
-				var mesh:=_helix_strip_mesh(a0,a1,y0,y1,1.4,4.0,0.2)
+				var mesh:=_helix_closed_section_mesh(a0,a1,y0,y1,1.4,4.0,float(PLAN.ESCALATORS.section.depth),4.0)
 				var body:=StaticBody3D.new(); body.name="CrossingHand_%02d_%s_%d"%[ti,String(hand.hand),pi]; body.collision_layer=1; body.collision_mask=1
 				var visual:=MeshInstance3D.new(); visual.mesh=mesh; visual.material_override=_material(Color("#aaa58f" if y1!=y0 else "#b5a783")); body.add_child(visual)
 				var shape:=ConcavePolygonShape3D.new(); shape.set_faces(mesh.get_faces()); var collision:=CollisionShape3D.new(); collision.shape=shape; body.add_child(collision)
@@ -774,7 +888,7 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 					# Add a visible underside and side returns below the continuous
 					# walking surface. They are visual only; the top remains the
 					# sole collision surface for traversal and handovers.
-					var belt_depth := 0.32
+					var belt_depth := float(PLAN.ESCALATORS.section.depth)
 					var return_material := _material(Color("#454b4b"))
 					var underside := MeshInstance3D.new(); underside.name = "HelixBelt_Return"
 					underside.mesh = _helix_strip_mesh(a0,a1,y0-belt_depth,y1-belt_depth,1.4,4.0,0.2); underside.material_override = return_material; body.add_child(underside)
@@ -782,15 +896,23 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 					inner_side.mesh = _helix_strip_mesh(a0,a1,y0-belt_depth,y1-belt_depth,1.4,1.52,0.2); inner_side.material_override = return_material; body.add_child(inner_side)
 					var outer_side := MeshInstance3D.new(); outer_side.name = "HelixBelt_OuterEdge"
 					outer_side.mesh = _helix_strip_mesh(a0,a1,y0-belt_depth,y1-belt_depth,3.88,4.0,0.2); outer_side.material_override = return_material; body.add_child(outer_side)
+					var glass_material:=StandardMaterial3D.new(); glass_material.albedo_color=Color(0.48,0.68,0.72,0.24); glass_material.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; glass_material.roughness=0.2
+					for rail_radius in [1.48,3.92]:
+						var glass_mesh:=_helix_guard_mesh(a0,a1,y0,y1,rail_radius,float(PLAN.ESCALATORS.handrail.height),4.0)
+						var glass_node:=MeshInstance3D.new(); glass_node.name="HelixGlassBalustrade"; glass_node.mesh=glass_mesh; glass_node.material_override=glass_material; body.add_child(glass_node)
+						var glass_shape:=ConcavePolygonShape3D.new(); glass_shape.set_faces(glass_mesh.get_faces()); var glass_col:=CollisionShape3D.new(); glass_col.name="HelixGlassBalustradeCollision"; glass_col.shape=glass_shape; body.add_child(glass_col)
 					var tread_material := _material(Color("#d7d8d1")); var tread_mesh := BoxMesh.new(); tread_mesh.size = Vector3(0.06,0.035,2.45)
 					var tread_count := maxi(4, ceili(absf(a1-a0)*2.7/0.7))
 					for tread_index in tread_count:
 						var tread := MeshInstance3D.new(); tread.name = "HelixMovingTread_%02d" % tread_index; tread.mesh = tread_mesh; tread.material_override = tread_material
 						var fraction := float(tread_index) / float(tread_count)
 						if not is_up: fraction = 1.0 - fraction
-						tread.set_meta("helix_fraction", fraction)
+						tread.set_meta("helix_fraction", fraction); tread.set_meta("helix_radius",2.7); tread.set_meta("helix_offset_y",0.05)
 						var tread_angle := lerpf(a0,a1,fraction); var tread_y := lerpf(y0,y1,fraction)
 						tread.position = Vector3(cos(tread_angle)*2.7,tread_y+0.05,sin(tread_angle)*2.7); tread.rotation.y = -tread_angle-PI*0.5; body.add_child(tread)
+					for rail_radius in [1.48,3.92]:
+						for rail_i in 2:
+							var rail_belt:=MeshInstance3D.new(); rail_belt.name="HelixMovingRubberHandrail"; var rbm:=BoxMesh.new(); rbm.size=Vector3(0.72,0.09,0.13); rail_belt.mesh=rbm; rail_belt.material_override=_material(Color("#242827")); var fraction:=float(rail_i)*0.5; if not is_up: fraction=1.0-fraction; rail_belt.set_meta("helix_fraction",fraction); rail_belt.set_meta("helix_radius",rail_radius); rail_belt.set_meta("helix_offset_y",float(PLAN.ESCALATORS.handrail.height)); var ra:=lerpf(a0,a1,fraction); var ry:=lerpf(y0,y1,fraction)+float(PLAN.ESCALATORS.handrail.height); rail_belt.position=Vector3(cos(ra)*rail_radius,ry,sin(ra)*rail_radius); rail_belt.rotation.y=-ra-PI*0.5; body.add_child(rail_belt)
 				root.add_child(body)
 		for level in [6.5,14.2,37.0]:
 			var ann:=_annulus_body("CrossingGallery_%.1f"%level,float(tcfg.gallery_r[0]),float(tcfg.gallery_r[1]),48,1.0,level); root.add_child(ann)
@@ -816,17 +938,18 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 			root.add_child(panel)
 			if y0>0:
 				var planter:=_box_body("CrossingClimberPlanter_%03d"%ci,Vector3(0.55,0.5,0.8),Vector3(cos(angle)*5.55,y0+0.25,sin(angle)*5.55),Color("#746e54")); root.add_child(planter)
-		for hoop_i in 10:
-			var hoop_level:=float(hoop_i+1)*4.1
+		for hoop_i in data.hoops.size():
+			var hoop_level:=float(data.hoops[hoop_i])
 			var hoop:=_annulus_visual("CrossingTowerHoop_%02d"%hoop_i,5.85,6.1,48,0.12,hoop_level); root.add_child(hoop)
-		var lift_data: Dictionary=data.lift; var lc: Array=lift_data.c; var lift:=AnimatableBody3D.new(); lift.name="CrossingTowerLift"; lift.position=Vector3(float(lc[0])-c.x,0,float(lc[1])-c.y); lift.set_script(load("res://scripts/moy_lift_platform.gd")); lift.set("base_height",0.0); lift.set("stop_levels",PackedFloat32Array(data.levels)); lift.set("stop_names",PackedStringArray(["Park ground", "Deck concourse", "Spine Line", "Meridian Line"]))
+		var lift_data: Dictionary=data.lift; var lc: Array=lift_data.c; var lift:=AnimatableBody3D.new(); lift.name="CrossingTowerLift"; lift.position=Vector3(float(lc[0])-c.x,0,float(lc[1])-c.y); lift.set_script(load("res://scripts/moy_lift_platform.gd")); lift.set("base_height",0.0)
+		var tower_stops:=PackedFloat32Array(data.levels); tower_stops.append(float(cfg.dome.base)); lift.set("stop_levels",tower_stops); lift.set("stop_names",PackedStringArray(["Park ground", "Deck concourse", "City Hall level", "Meridian platform", "Clock Room"]))
 		var liftmesh:=BoxMesh.new(); liftmesh.size=Vector3(2.6,0.22,2.6); var lv:=MeshInstance3D.new(); lv.mesh=liftmesh; lv.material_override=_material(Color("#bfd0ce")); lift.add_child(lv); var ls:=BoxShape3D.new(); ls.size=liftmesh.size; var lcol:=CollisionShape3D.new(); lcol.shape=ls; lift.add_child(lcol); root.add_child(lift)
 		var lift_controls := Node3D.new(); lift_controls.name = "CrossingTowerLiftCalls"
 		var lift_radial := Vector2(float(lc[0]) - c.x, float(lc[1]) - c.y).normalized()
-		for stop_i in data.levels.size():
-			var level := float(data.levels[stop_i])
+		for stop_i in tower_stops.size():
+			var level := float(tower_stops[stop_i])
 			var call_at := Vector3(float(lc[0]) - c.x + lift_radial.x * 2.3, level, float(lc[1]) - c.y + lift_radial.y * 2.3)
-			var label := String(["Park ground", "Deck concourse", "Spine Line", "Meridian Line"][mini(stop_i, 3)])
+			var label := String(["Park ground", "Deck concourse", "City Hall level", "Meridian platform", "Clock Room"][stop_i])
 			_add_moy_lift_call(lift_controls, lift, stop_i, label, call_at)
 		root.add_child(lift_controls)
 		# The glazed shaft is visual only; four separate guide posts carry it
@@ -903,6 +1026,29 @@ static func _helix_strip_mesh(a0: float,a1: float,y0: float,y1: float,r_inner: f
 		var f0:=float(i)/count; var f1:=float(i+1)/count; var aa:=lerpf(a0,a1,f0); var ab:=lerpf(a0,a1,f1); var ya:=lerpf(y0,y1,f0); var yb:=lerpf(y0,y1,f1)
 		var p0:=Vector3(cos(aa)*r_inner,ya,sin(aa)*r_inner); var p1:=Vector3(cos(aa)*r_outer,ya,sin(aa)*r_outer); var q0:=Vector3(cos(ab)*r_inner,yb,sin(ab)*r_inner); var q1:=Vector3(cos(ab)*r_outer,yb,sin(ab)*r_outer)
 		st.add_vertex(p0); st.add_vertex(p1); st.add_vertex(q1); st.add_vertex(p0); st.add_vertex(q1); st.add_vertex(q0)
+	return st.commit()
+
+
+static func _helix_closed_section_mesh(a0: float,a1: float,y0: float,y1: float,r_inner: float,r_outer: float,depth: float,step_degrees: float) -> ArrayMesh:
+	var count:=maxi(1,ceili(absf(rad_to_deg(a1-a0))/step_degrees)); var st:=SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in count:
+		var f0:=float(i)/count; var f1:=float(i+1)/count; var aa:=lerpf(a0,a1,f0); var ab:=lerpf(a0,a1,f1); var ya:=lerpf(y0,y1,f0); var yb:=lerpf(y0,y1,f1)
+		var ti0:=Vector3(cos(aa)*r_inner,ya,sin(aa)*r_inner); var to0:=Vector3(cos(aa)*r_outer,ya,sin(aa)*r_outer); var ti1:=Vector3(cos(ab)*r_inner,yb,sin(ab)*r_inner); var to1:=Vector3(cos(ab)*r_outer,yb,sin(ab)*r_outer)
+		var bi0:=ti0-Vector3.UP*depth; var bo0:=to0-Vector3.UP*depth; var bi1:=ti1-Vector3.UP*depth; var bo1:=to1-Vector3.UP*depth
+		for v in [ti0,to0,to1,ti0,to1,ti1,bi0,bi1,bo1,bi0,bo1,bo0,ti0,ti1,bi1,ti0,bi1,bi0,to0,bo0,bo1,to0,bo1,to1]: st.add_vertex(v)
+		if i==0:
+			for v in [ti0,bi0,bo0,ti0,bo0,to0]: st.add_vertex(v)
+		if i==count-1:
+			for v in [ti1,to1,bo1,ti1,bo1,bi1]: st.add_vertex(v)
+	return st.commit()
+
+
+static func _helix_guard_mesh(a0: float,a1: float,y0: float,y1: float,radius: float,height: float,step_degrees: float) -> ArrayMesh:
+	var count:=maxi(1,ceili(absf(rad_to_deg(a1-a0))/step_degrees)); var st:=SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in count:
+		var f0:=float(i)/count; var f1:=float(i+1)/count; var aa:=lerpf(a0,a1,f0); var ab:=lerpf(a0,a1,f1); var ya:=lerpf(y0,y1,f0); var yb:=lerpf(y0,y1,f1)
+		var a0v:=Vector3(cos(aa)*radius,ya,sin(aa)*radius); var b0v:=Vector3(cos(aa)*radius,ya+height,sin(aa)*radius); var a1v:=Vector3(cos(ab)*radius,yb,sin(ab)*radius); var b1v:=Vector3(cos(ab)*radius,yb+height,sin(ab)*radius)
+		for v in [a0v,b0v,b1v,a0v,b1v,a1v]: st.add_vertex(v)
 	return st.commit()
 
 
@@ -1052,14 +1198,18 @@ static func _add_escalator_pair(packs: Dictionary, label: String, foot: Vector3,
 	if lateral.length_squared()<0.5: lateral=Vector3.RIGHT
 	var belt_width:=minf(1.2,total_width*0.46)
 	var a:=foot-lateral*belt_width*0.5; var b:=head-lateral*belt_width*0.5
-	var up:=_ramp_body("%s_Up"%label,a,b,belt_width,0.32,Color("#b3a27e"))
-	up.set_script(load("res://scripts/moy_escalator.gd")); up.set("travel_direction",(b-a).normalized()); up.set("travel_speed",0.9)
-	_add_escalator_belt_visuals(up, (b-a).length(), belt_width, 0.32)
+	var up:=_ramp_body("%s_Up"%label,a,b,belt_width,float(PLAN.ESCALATORS.section.depth),Color("#b3a27e"))
+	up.set_script(load("res://scripts/moy_escalator.gd")); up.set("travel_direction",(b-a).normalized()); up.set("travel_speed",0.35)
+	up.set("belt_length",(b-a).length()); up.set("belt_width",belt_width); up.set("belt_thickness",float(PLAN.ESCALATORS.section.depth))
+	_add_escalator_belt_visuals(up, (b-a).length(), belt_width, float(PLAN.ESCALATORS.section.depth))
+	_add_escalator_handrails(up,(b-a).length(),belt_width,float(PLAN.ESCALATORS.handrail.height))
 	_add(packs,_cell(Vector2((a.x+b.x)*0.5,(a.z+b.z)*0.5)),up)
 	var c:=foot+lateral*belt_width*0.5; var d:=head+lateral*belt_width*0.5
-	var down:=_ramp_body("%s_Down"%label,d,c,belt_width,0.32,Color("#a49372"))
-	down.set_script(load("res://scripts/moy_escalator.gd")); down.set("travel_direction",(c-d).normalized()); down.set("travel_speed",0.9)
-	_add_escalator_belt_visuals(down, (c-d).length(), belt_width, 0.32)
+	var down:=_ramp_body("%s_Down"%label,d,c,belt_width,float(PLAN.ESCALATORS.section.depth),Color("#a49372"))
+	down.set_script(load("res://scripts/moy_escalator.gd")); down.set("travel_direction",(c-d).normalized()); down.set("travel_speed",0.35)
+	down.set("belt_length",(c-d).length()); down.set("belt_width",belt_width); down.set("belt_thickness",float(PLAN.ESCALATORS.section.depth))
+	_add_escalator_belt_visuals(down, (c-d).length(), belt_width, float(PLAN.ESCALATORS.section.depth))
+	_add_escalator_handrails(down,(c-d).length(),belt_width,float(PLAN.ESCALATORS.handrail.height))
 	_add(packs,_cell(Vector2((c.x+d.x)*0.5,(c.z+d.z)*0.5)),down)
 	var along_z:=absf(horizontal.z)>absf(horizontal.x)
 	var landing_size:=Vector3(total_width+0.6,0.3,2.4) if along_z else Vector3(2.4,0.3,total_width+0.6)
@@ -1067,6 +1217,20 @@ static func _add_escalator_pair(packs: Dictionary, label: String, foot: Vector3,
 		var endpoint: Vector3=foot if endpoint_i==0 else head
 		var landing:=_box_body("%s_Landing_%d"%[label,endpoint_i],landing_size,endpoint-Vector3.UP*0.15,Color("#b6a17b"))
 		_add(packs,_cell(Vector2(endpoint.x,endpoint.z)),landing)
+
+
+static func _add_escalator_handrails(body: StaticBody3D, length: float, width: float, height: float) -> void:
+	var glass := StandardMaterial3D.new(); glass.albedo_color=Color(0.48,0.68,0.72,0.24); glass.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; glass.roughness=0.2
+	for side in [-1.0,1.0]:
+		var z: float=side*(width*0.5-0.055)
+		var size:=Vector3(length, height, 0.11)
+		_add_building_box_part(body,size,Vector3(0.0,float(PLAN.ESCALATORS.section.depth)*0.5+height*0.5,z),Color(0.48,0.68,0.72,0.24))
+		var pane:=body.get_child(body.get_child_count()-1) as MeshInstance3D; pane.name="EscalatorGlassBalustrade"; pane.material_override=glass
+		var rubber:=StandardMaterial3D.new(); rubber.albedo_color=Color("#242827"); rubber.roughness=0.4
+		for segment in 2:
+			var belt:=MeshInstance3D.new(); belt.name="Moving_Rubber_Handrail_%d_%d"%[int(side),segment]; var mesh:=BoxMesh.new(); mesh.size=Vector3(0.75,0.09,0.13); belt.mesh=mesh; belt.material_override=rubber; belt.position=Vector3(-length*0.25+float(segment)*length*0.5,float(PLAN.ESCALATORS.section.depth)*0.5+height,z); belt.set_meta("handrail_distance",length*0.25+float(segment)*length*0.5); body.add_child(belt)
+		for end in [-1.0,1.0]:
+			_add_building_box_part(body,Vector3(0.22,0.9,0.22),Vector3(end*(length*0.5-0.15),float(PLAN.ESCALATORS.section.depth)*0.5+height*0.5,z),Color("#676b69"))
 
 
 static func _add_escalator_belt_visuals(body: StaticBody3D, length: float, width: float, thickness: float) -> void:
@@ -1207,6 +1371,98 @@ static func _add_gate_forms(packs: Dictionary) -> void:
 	for core in PLAN.WEST_GATE.cores: _add_station_core(packs,core,"WestGateCore")
 	# Public doors from the City Hall halls onto Civic Plaza.
 
+
+static func _add_civic_square(packs: Dictionary, tree_templates: Dictionary) -> void:
+	var data: Dictionary = PLAN.CIVIC_SQUARE
+	var r: Array = data.rect
+	var mr: Array=data.mirror.rect
+	var pave_rects: Array=[Rect2(float(r[0]),float(r[1]),float(mr[0])-float(r[0]),float(r[3])-float(r[1])),Rect2(float(mr[2]),float(r[1]),float(r[2])-float(mr[2]),float(r[3])-float(r[1])),Rect2(float(mr[0]),float(r[1]),float(mr[2])-float(mr[0]),float(mr[1])-float(r[1])),Rect2(float(mr[0]),float(mr[3]),float(mr[2])-float(mr[0]),float(r[3])-float(mr[3]))]
+	for i in pave_rects.size():
+		var pr: Rect2=pave_rects[i]; var paving := _box_body("CivicPlazaPaving_%02d"%i,Vector3(pr.size.x,0.18,pr.size.y),Vector3(pr.get_center().x,DATUM+0.04,pr.get_center().y),Color("#c7b99d")); _add(packs,_cell(pr.get_center()),paving)
+	for lawn in data.lawns:
+		var lr: Array = lawn.rect
+		var cross: Array=data.cross_axis.x
+		for piece in 2:
+			var x0:=float(lr[0]) if piece==0 else float(cross[1]); var x1:=float(cross[0]) if piece==0 else float(lr[2])
+			var body := _box_body("CivicPlazaLawn_%s_%d" % [String(lawn.name).to_snake_case(),piece],Vector3(x1-x0,0.12,float(lr[3])-float(lr[1])),Vector3((x0+x1)*0.5,DATUM+0.16,(float(lr[1])+float(lr[3]))*0.5),Color("#67a66b"))
+			_add(packs,_cell(Vector2((x0+x1)*0.5,(float(lr[1])+float(lr[3]))*0.5)),body)
+		var path:=_box_body("CivicPlazaHotelWalk",Vector3(float(cross[1])-float(cross[0]),0.08,float(lr[3])-float(lr[1])),Vector3((float(cross[0])+float(cross[1]))*0.5,DATUM+0.16,(float(lr[1])+float(lr[3]))*0.5),Color("#c7b99d")); _add(packs,_cell(Vector2(path.position.x,path.position.z)),path)
+	for fountain in data.fountains:
+		var c: Vector2 = Vector2(fountain.c[0],fountain.c[1]); var radius := float(fountain.r)
+		var basin := _box_body("CivicFountainBasin_%s" % str(fountain.name).replace(" ","_"),Vector3(radius*2,0.25,radius*2),Vector3(c.x,DATUM+0.35,c.y),Color("#8eaaad"))
+		_add(packs,_cell(c),basin)
+		var jet := _box_body("CivicFountainJet",Vector3(0.3,1.8,0.3),Vector3(c.x,DATUM+1.35,c.y),Color("#d6e8e6")); _add(packs,_cell(c),jet)
+	for row in data.tree_rows:
+		var start := float(row.x[0]); var finish := float(row.x[1]); var step := float(row.every); var index := 0
+		while start + float(index)*step <= finish + 0.01:
+			var p := Vector2(start + float(index)*step,float(row.z)); var tree := _instance_tree(tree_templates,"square_round_9","round",float(row.h),Color("#829c69"),index)
+			tree.name="CivicPlazaTree_%s_%02d"%[str(int(row.z)).replace("-","n"),index]; tree.position=Vector3(p.x,DATUM,p.y); _add(packs,_cell(p),tree); index += 1
+	for monument in data.monuments:
+		var c: Vector2=Vector2(monument.c[0],monument.c[1]); var size: Array=monument.size
+		var plinth := _box_body("CivicPlazaMonument_%s"%str(monument.name).replace(" ","_"),Vector3(float(size[0]),float(monument.h),float(size[1])),Vector3(c.x,DATUM+float(monument.h)*0.5,c.y),Color("#b3a58d")); _add(packs,_cell(c),plinth)
+	for statue in data.statues:
+		var c: Vector2=Vector2(statue.c[0],statue.c[1]); var body := _box_body("CivicPlazaStatue",Vector3(1.2,2.2,1.2),Vector3(c.x,DATUM+1.1,c.y),Color("#8d8a78")); _add(packs,_cell(c),body)
+	for flag in data.flagstaffs:
+		var c: Vector2=Vector2(flag.c[0],flag.c[1]); var pole := _round_column("CivicPlazaFlagstaff",0.12,float(flag.h),Vector3(c.x,DATUM+float(flag.h)*0.5,c.y),Color("#b6a77e")); _add(packs,_cell(c),pole)
+	# The reflecting pool is decorative, but explicitly hazardous and queried as water.
+	var mirror: Dictionary=data.mirror; var mirror_rect: Array=mirror.rect; var center:=Vector2((float(mirror_rect[0])+float(mirror_rect[2]))*0.5,(float(mirror_rect[1])+float(mirror_rect[3]))*0.5)
+	var pool := MeshInstance3D.new(); pool.name="CivicReflectingPoolSurface"; var pm:=PlaneMesh.new(); pm.size=Vector2(float(mirror_rect[2])-float(mirror_rect[0]),float(mirror_rect[3])-float(mirror_rect[1])); pool.mesh=pm; pool.position=Vector3(center.x,DATUM-float(mirror.depth),center.y); pool.material_override=VillageWorks.water_material()
+	var hazard:=Node3D.new(); hazard.name="CivicReflectingPool"; hazard.add_child(pool); hazard.set_meta("water_surface_y",pool.position.y); hazard.set_meta("water_depth",float(mirror.depth)); CollisionPolicy.mark_hazard(hazard); _add(packs,_cell(center),hazard)
+
+
+static func _add_arch_front(packs: Dictionary) -> void:
+	var front: Dictionary=PLAN.ARCH.front; var rostrum: Dictionary=front.rostrum; var rx: Array=rostrum.x; var rz: Array=rostrum.z; var y:=float(rostrum.y)
+	# Rostrum piers leave the authored central bay and two portals open.
+	for side in [-1.0,1.0]:
+		var x: float=(float(rx[0])+float(rx[1]))*0.5+side*(float(rx[1])-float(rx[0]))*0.5
+		_add(packs,_cell(Vector2(x,0)),_box_body("CityHallRostrumPier",Vector3(0.6,5.0,float(rz[1])-float(rz[0])),Vector3(x,DATUM+y+2.5,0),Color("#d3c6ad")))
+	_add(packs,_cell(Vector2(-367,0)),_box_body("CityHallRostrumLintel",Vector3(7.0,0.6,60),Vector3(-367,DATUM+y+5.0,0),Color("#d3c6ad")))
+	for leg in front.legs:
+		var side:=String(leg.side)
+		for flight in leg.flights:
+			var band: Array=front.bands[String(flight.band)]; var ys: Array=flight.y; var zs: Array=flight.z
+			var foot:=Vector3((float(band[0])+float(band[1]))*0.5,DATUM+float(ys[0]),float(zs[0])); var head:=Vector3(foot.x,DATUM+float(ys[1]),float(zs[1]))
+			_add_escalator_pair(packs,"CityHall_%s_%s"%[side,String(flight.name)],foot,head,2.8)
+		for gallery in leg.galleries:
+			var xr: Array=front.bands.A; var zr: Array=gallery.z; var gy:=DATUM+float(gallery.y)
+			var g:=_box_body("CityHallGallery_%s_%s"%[side,String(gallery.name)],Vector3(absf(float(zr[1])-float(zr[0]))+0.5,0.38,2.8),Vector3((float(xr[0])+float(xr[1]))*0.5,gy,(float(zr[0])+float(zr[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(g.position.x,g.position.z)),g)
+		var ov: Dictionary=leg.over_tracks; var ox: Array=ov.x; var oz: Array=ov.z
+		var walk:=_box_body("CityHallOverTrackWalk_%s"%side,Vector3(float(ox[1])-float(ox[0]),0.4,absf(float(oz[1])-float(oz[0]))),Vector3((float(ox[0])+float(ox[1]))*0.5,DATUM+float(ov.y),(float(oz[0])+float(oz[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(walk.position.x,walk.position.z)),walk)
+		var outer: Dictionary=leg.outer; var oys: Array=outer.y; var ozs: Array=outer.z
+		_add_escalator_pair(packs,"CityHallOuter_%s"%side,Vector3(float(outer.x[0]),DATUM+float(oys[0]),float(ozs[0])),Vector3(float(outer.x[1]),DATUM+float(oys[1]),float(ozs[1])),2.8)
+		var ol: Dictionary=leg.outer_landing; var olx: Array=ol.x; var olz: Array=ol.z
+		var landing:=_box_body("CityHallOuterLanding_%s"%side,Vector3(float(olx[1])-float(olx[0]),0.4,absf(float(olz[1])-float(olz[0]))),Vector3((float(olx[0])+float(olx[1]))*0.5,DATUM+float(ol.y),(float(olz[0])+float(olz[1]))*0.5),Color("#c9b999")); _add(packs,_cell(Vector2(landing.position.x,landing.position.z)),landing)
+		var steps: Dictionary=leg.steps; var footx:=float(steps.foot); var headx:=float(steps.head); var half: Array=steps.half
+		for lane in steps.lanes:
+			var z:=float(lane.z)
+			if String(lane.kind).contains("escalator"):
+				var a:=Vector3(footx,DATUM+7.1,z); var b:=Vector3(headx,DATUM+14.2,z)
+				if String(lane.kind)=="down escalator": var swap:=a; a=b; b=swap
+				_add_escalator_pair(packs,"CityHallSteps_%s_%s"%[side,String(lane.kind).to_snake_case()],a,b,2.4)
+			else:
+				for i in 12:
+					var t:=float(i)/11.0; var x:=lerpf(footx,headx,t); var sy:=lerpf(DATUM+7.1,DATUM+14.2,t)
+					var stair:=_box_body("CityHallStep_%s_%02d"%[side,i],Vector3(2.5,0.24,float(lane.w)),Vector3(x,sy,z),Color("#c9b999")); _add(packs,_cell(Vector2(x,z)),stair)
+		var half_land:=_box_body("CityHallStepsHalfLanding_%s"%side,Vector3(absf(float(half[1])-float(half[0])),0.4,float(steps.width)),Vector3((float(half[0])+float(half[1]))*0.5,DATUM+float(steps.half_y),float(steps.z)),Color("#c9b999")); _add(packs,_cell(Vector2(half_land.position.x,half_land.position.z)),half_land)
+		for li in leg.lifts.size():
+			var ld: Dictionary=leg.lifts[li]; var c: Vector2=Vector2(ld.c[0],float(ld.c[1])); var stops: Array=ld.stops
+			var car:=AnimatableBody3D.new(); car.name="CityHall_%s_Lift_%d"%[side,li]; car.position=Vector3(c.x,DATUM,c.y); car.set_script(load("res://scripts/moy_lift_platform.gd")); car.set("base_height",DATUM)
+			var levels:=PackedFloat32Array(); var labels:=PackedStringArray()
+			for stop in stops: levels.append(float(stop)); labels.append("Floor %s"%str(stop))
+			car.set("stop_levels",levels); car.set("stop_names",labels)
+			var cm:=BoxMesh.new(); cm.size=Vector3(float(ld.size),0.22,float(ld.size)); var cv:=MeshInstance3D.new(); cv.mesh=cm; cv.material_override=_material(Color(0.55,0.74,0.77,0.35)); car.add_child(cv); var cs:=BoxShape3D.new(); cs.size=cm.size; var cc:=CollisionShape3D.new(); cc.shape=cs; car.add_child(cc); _add(packs,_cell(c),car)
+			var controls:=Node3D.new(); controls.name=car.name+"Controls"; _add_moy_lift_call(controls,car,1,"City Hall",Vector3(c.x+float(ld.size),DATUM,c.y)); _add(packs,_cell(c),controls)
+	# Only the plan-authored guard runs are built; glass and shoe share a solid body.
+	for guard in PLAN.ARCH.front_guard.runs:
+		var pts: Array=guard.pts; var level:=DATUM+float(guard.y)
+		for i in range(pts.size()-1):
+			var a:=Vector2(pts[i][0],pts[i][1]); var b:=Vector2(pts[i+1][0],pts[i+1][1]); var center:=(a+b)*0.5; var length:=a.distance_to(b)
+			var rail:=_segment_body("CityHallFrontGuard",a,b,0.12,level,1.1,Color(0.45,0.66,0.69,0.3)); _set_body_glass(rail,Color(0.45,0.66,0.69,0.3))
+			for trim in 2:
+				var shoe:=MeshInstance3D.new(); shoe.name="CityHallFrontGuardBronzeShoe"; var sm:=BoxMesh.new(); sm.size=Vector3(length,0.08,0.16); shoe.mesh=sm; shoe.position.y=-0.5; shoe.material_override=_material(Color("#92704a")); rail.add_child(shoe)
+				if trim==1: shoe.position.y=0.54; shoe.name="CityHallFrontGuardBronzeTopRail"
+			_add(packs,_cell(center),rail)
+
 static func _add_bridge_station(packs: Dictionary,label: String,y0: float,y1: float,x0: float,x1: float,width_z: float) -> void:
 	var cx:=(x0+x1)*0.5; var cy:=DATUM+y0; var length:=x1-x0
 	_add(packs,_cell(Vector2(cx,0)),_box_body(label+"BridgeFloor",Vector3(length,0.8,width_z),Vector3(cx,cy+0.4,0),Color("#bca37c")))
@@ -1225,20 +1481,52 @@ static func _add_city_dome(packs: Dictionary) -> void:
 	var root:=Node3D.new(); root.name="CrossingCityDome"; root.position=Vector3(center.x,DATUM+base,center.y)
 	var drum: Dictionary=dome.drum; var half:=float(drum.half); var exponent:=float(drum.n); var glass:=StandardMaterial3D.new(); glass.albedo_color=Color(0.38,0.63,0.68,0.18); glass.transparency=BaseMaterial3D.TRANSPARENCY_ALPHA; glass.roughness=0.15
 	# Continuous faceted superellipse glass enclosure; collision keeps the roof edge safe.
+	var eye_sill_y := float(dome.clocks.eye.sill_y)-base
+	var eye_r := float(dome.clocks.eye.r)
 	for i in 96:
 		var a:=TAU*float(i)/96.0; var b:=TAU*float(i+1)/96.0
 		var xa:=half*signf(cos(a))*pow(absf(cos(a)),2.0/exponent); var za:=half*signf(sin(a))*pow(absf(sin(a)),2.0/exponent)
 		var xb:=half*signf(cos(b))*pow(absf(cos(b)),2.0/exponent); var zb:=half*signf(sin(b))*pow(absf(sin(b)),2.0/exponent)
-		var panel:=_box_body("DomeGlassPanel_%02d"%i,Vector3(Vector2(xa,za).distance_to(Vector2(xb,zb)),float(drum.h),0.12),Vector3((xa+xb)*0.5,float(drum.h)*0.5,(za+zb)*0.5),Color(0.42,0.67,0.72,0.28)); panel.rotation.y=-atan2(zb-za,xb-xa)
-		for panel_child in panel.get_children():
-			if panel_child is MeshInstance3D: (panel_child as MeshInstance3D).material_override=glass
-		# panes are collision-bearing walls, assigned into the Crossing cell.
-		_add(packs,_cell(center),panel)
-	for ri in int(dome.ribs):
-		var a:=TAU*float(ri)/float(dome.ribs); var rib:=_round_column("DomeSteelRib_%02d"%ri,0.24,float(drum.h),Vector3(half*cos(a),float(drum.h)*0.5,half*sin(a)),Color("#879b9d")); root.add_child(rib)
-	var top_ring:=_annulus_visual("DomeTopSteelRing",half-0.25,half+0.25,96,0.32,float(drum.h)); root.add_child(top_ring)
-	var cupola: Dictionary=dome.cupola; var cap:=MeshInstance3D.new(); cap.name="DomeGlassCupola"; var cupola_mesh:=_superellipsoid_mesh(half,float(cupola.h),exponent,48,16); cap.mesh=cupola_mesh; cap.position.y=float(drum.h); cap.material_override=glass; root.add_child(cap)
+		var angle_mid := (a+b)*0.5
+		var eye_bearing := -1
+		for face_i in dome.clocks.bearings.size():
+			var bearing := deg_to_rad(float(dome.clocks.bearings[face_i]))
+			if absf(wrapf(angle_mid-bearing,-PI,PI)) < eye_r/half + 0.02: eye_bearing=face_i; break
+		var length := Vector2(xa,za).distance_to(Vector2(xb,zb))
+		if eye_bearing < 0:
+			var panel:=_box_body("DomeGlassPanel_%02d"%i,Vector3(length,float(drum.h),0.12),Vector3((xa+xb)*0.5,float(drum.h)*0.5,(za+zb)*0.5),Color(0.42,0.67,0.72,0.28)); panel.rotation.y=-atan2(zb-za,xb-xa)
+			for panel_child in panel.get_children():
+				if panel_child is MeshInstance3D: (panel_child as MeshInstance3D).material_override=glass
+			_add(packs,_cell(center),panel)
+		else:
+			# Split each eye-facing pane into sill and crown pieces. The opening has no glass or collider.
+			for part in 2:
+				var py := 0.0 if part==0 else eye_sill_y+2.0*eye_r
+				var ph := eye_sill_y if part==0 else float(drum.h)-py
+				if ph < 0.1: continue
+				var panel:=_box_body("DomeGlassEyeRim_%02d_%d"%[i,part],Vector3(length,ph,0.12),Vector3((xa+xb)*0.5,py+ph*0.5,(za+zb)*0.5),Color(0.42,0.67,0.72,0.28)); panel.rotation.y=-atan2(zb-za,xb-xa)
+				for panel_child in panel.get_children():
+					if panel_child is MeshInstance3D: (panel_child as MeshInstance3D).material_override=glass
+				_add(packs,_cell(center),panel)
+	# The revised Great Court shell removes the old posts and ring beam.
+	# Older plans may still explicitly request that support arrangement.
+	var rib_count := int(dome.get("ribs", 0))
+	for ri in rib_count:
+		var a:=TAU*float(ri)/float(rib_count); var rib:=_round_column("DomeSteelRib_%02d"%ri,0.24,float(drum.h),Vector3(half*cos(a),float(drum.h)*0.5,half*sin(a)),Color("#879b9d")); root.add_child(rib)
+	if rib_count > 0:
+		var top_ring:=_annulus_visual("DomeTopSteelRing",half-0.25,half+0.25,96,0.32,float(drum.h)); root.add_child(top_ring)
+	# A slim bronze sleeve follows each open eye; it frames, but never fills, the flight path.
+	var chord:=float(dome.clocks.eye.chord); var eye_top:=eye_sill_y+2.0*eye_r
+	for bearing_degrees in dome.clocks.bearings:
+		var bearing:=deg_to_rad(float(bearing_degrees)); var radial:=Vector3(cos(bearing),0,sin(bearing)); var tangent:=Vector3(-sin(bearing),0,cos(bearing)); var eye_center:=radial*half
+		for side in [-1.0,1.0]:
+			var jamb:=MeshInstance3D.new(); jamb.name="ClockEyeBronzeSleeveJamb"; var jm:=BoxMesh.new(); jm.size=Vector3(0.12,2.0*eye_r,0.12); jamb.mesh=jm; jamb.position=eye_center+tangent*side*(chord*0.5); jamb.position.y=eye_sill_y+eye_r; jamb.rotation.y=-bearing; jamb.material_override=_material(Color("#92704a")); root.add_child(jamb)
+		for yy in [eye_sill_y,eye_top]:
+			var rim:=MeshInstance3D.new(); rim.name="ClockEyeBronzeSleeveRim"; var rm:=BoxMesh.new(); rm.size=Vector3(chord+0.24,0.12,0.12); rim.mesh=rm; rim.position=eye_center+Vector3.UP*yy; rim.rotation.y=-bearing; rim.material_override=_material(Color("#92704a")); root.add_child(rim)
+	var cupola: Dictionary=dome.cupola; var cap:=MeshInstance3D.new(); cap.name="DomeGlassCupola"; var cupola_mesh:=_superellipsoid_mesh(half,float(cupola.h),exponent,72,20); cap.mesh=cupola_mesh; cap.position.y=float(drum.h); cap.material_override=glass; root.add_child(cap)
+	var crown_ring:=_annulus_visual("DomeBellCrownRing",float(dome.lattice.crown)-0.06,float(dome.lattice.crown)+0.06,72,0.07,float(drum.h)+float(cupola.h)); root.add_child(crown_ring)
 	var cs:=CollisionShape3D.new(); var css:=ConcavePolygonShape3D.new(); css.set_faces(cupola_mesh.get_faces()); cs.shape=css; var collision_body:=StaticBody3D.new(); collision_body.name="DomeCupolaLanding"; collision_body.position.y=float(drum.h); collision_body.add_child(cs); root.add_child(collision_body)
+	_add_dome_lattice(root,half,float(drum.h),float(cupola.h),exponent,float(dome.lattice.row),float(dome.lattice.member),int(dome.lattice.around))
 	var clock_root:=Node3D.new(); clock_root.name="CityClockFaces"; clock_root.position.y=float(dome.clocks.centre); clock_root.set_meta("moy_keep_children",true); clock_root.set_script(load("res://scripts/moy_timekeeper.gd")); clock_root.set("game_clock_path",NodePath("/root/World/DayNightCycle")); root.add_child(clock_root)
 	for face_i in 4:
 		var bearing:=deg_to_rad(float(dome.clocks.bearings[face_i])); var face:=Node3D.new(); face.name="ClockFace_%d"%face_i; face.position=Vector3(cos(bearing)*half,0,sin(bearing)*half); face.rotation.y=-bearing+PI*0.5; clock_root.add_child(face)
@@ -1255,7 +1543,45 @@ static func _add_city_dome(packs: Dictionary) -> void:
 					var tick_mesh:=MeshInstance3D.new(); tick_mesh.mesh=box; tick_mesh.position=Vector3(cos(angle)*7.5,sin(angle)*7.5,0.2); tick_mesh.rotation.z=angle-PI*0.5; tick_mesh.material_override=_material(Color("#45433d")); anim.add_child(tick_mesh)
 	var bell: Dictionary=dome.bell; var bell_node:=MeshInstance3D.new(); bell_node.name="CityBell_SOUND_PLACEHOLDER"; var bell_mesh:=CylinderMesh.new(); bell_mesh.top_radius=float(bell.mouth)*0.35; bell_mesh.bottom_radius=float(bell.mouth)*0.5; bell_mesh.height=float(bell.height); bell_node.mesh=bell_mesh; bell_node.position.y=float(bell.bottom)+float(bell.height)*0.5-base; bell_node.material_override=_material(Color("#96764a")); root.add_child(bell_node)
 	var bell_script_root:=Node3D.new(); bell_script_root.name="CityBellScheduler"; bell_script_root.set_script(load("res://scripts/moy_timekeeper.gd")); bell_script_root.set("bell_path",NodePath("../CityBell_SOUND_PLACEHOLDER")); var audio_placeholder:=AudioStreamPlayer3D.new(); audio_placeholder.name="CityBellAudio_PLACEHOLDER_NO_ASSET"; bell_script_root.add_child(audio_placeholder); root.add_child(bell_script_root)
+	_add_clock_room(packs, cfg)
 	_add(packs,_cell(center),root)
+
+
+static func _add_clock_room(packs: Dictionary, cfg: Dictionary) -> void:
+	var room: Dictionary=cfg.dome.room; var center:=Vector2(float(cfg.c[0]),float(cfg.c[1])); var level:=DATUM+float(cfg.dome.base)
+	var xs: Array[float]=[-580.0,-540.0]; var zs: Array[float]=[-20.0,20.0]
+	for arrival in room.arrivals:
+		var w: Array=arrival.well; xs.append(float(w[0])); xs.append(float(w[2])); zs.append(float(w[1])); zs.append(float(w[3]))
+	xs.sort(); zs.sort()
+	for xi in range(xs.size()-1):
+		for zi in range(zs.size()-1):
+			var x0:=xs[xi]; var x1:=xs[xi+1]; var z0:=zs[zi]; var z1:=zs[zi+1]
+			if x1-x0<0.1 or z1-z0<0.1: continue
+			var hole:=false
+			for arrival in room.arrivals:
+				var w: Array=arrival.well
+				if x0>=float(w[0])-0.01 and x1<=float(w[2])+0.01 and z0>=float(w[1])-0.01 and z1<=float(w[3])+0.01: hole=true; break
+			if hole: continue
+			var tile:=_box_body("ClockRoomTerrazzo",Vector3(x1-x0,0.32,z1-z0),Vector3((x0+x1)*0.5,level-0.16,(z0+z1)*0.5),Color("#d5d1c7")); _add(packs,_cell(center),tile)
+	var rose:=_annulus_visual("ClockRoomCompassRose",1.5,3.6,64,0.04,level+0.02); rose.position.x=center.x; rose.position.z=center.y; _add(packs,_cell(center),rose)
+	for widening in room.widenings:
+		var wr: Array=widening.rect; var platform:=_box_body("ClockRoomPlatformWidening_%s"%String(widening.side),Vector3(float(wr[2])-float(wr[0]),0.32,float(wr[3])-float(wr[1])),Vector3((float(wr[0])+float(wr[2]))*0.5,DATUM+float(widening.y)-0.16,(float(wr[1])+float(wr[3]))*0.5),Color("#c4b18b")); _add(packs,_cell(center),platform)
+	for arrival_index in room.arrivals.size():
+		var arrival: Dictionary=room.arrivals[arrival_index]
+		var foot: Array=arrival.foot; var head: Array=arrival.head; var ys: Array=arrival.y
+		_add_escalator_pair(packs,"ClockRoomArrival_%02d_%s"%[arrival_index,String(arrival.side)],Vector3(float(foot[0]),DATUM+float(ys[0]),float(foot[1])),Vector3(float(head[0]),DATUM+float(ys[1]),float(head[1])),3.2)
+		var w: Array=arrival.well; var corners: Array=[Vector2(float(w[0]),float(w[1])),Vector2(float(w[2]),float(w[1])),Vector2(float(w[2]),float(w[3])),Vector2(float(w[0]),float(w[3]))]
+		var open_edge:=0 if String(arrival.side)=="north" else 2
+		for i in 4:
+			if i==open_edge: continue
+			var a: Vector2=corners[i]; var b: Vector2=corners[(i+1)%corners.size()]; var guard:=_segment_body("ClockRoomWellGuard",a,b,0.12,level+0.55,1.1,Color(0.4,0.65,0.68,0.35)); _add(packs,_cell(center),guard)
+	for lift_index in room.lifts.size():
+		var lift: Dictionary=room.lifts[lift_index]
+		var c: Vector2=Vector2(lift.c[0],lift.c[1]); var toward: Vector2=(center-c).normalized(); var tangent:=Vector2(-toward.y,toward.x); var half:=float(lift.r); var h:=float(room.lantern)
+		var lift_label:=String(lift.tower).replace("-","_")
+		var back:=_box_body("ClockRoomLiftLanternBack_%s"%lift_label,Vector3(half*2,h,0.12),Vector3(c.x-toward.x*half,level+h*0.5,c.y-toward.y*half),Color(0.45,0.68,0.72,0.28)); back.rotation.y=-atan2(tangent.y,tangent.x); _set_body_glass(back,Color(0.45,0.68,0.72,0.28)); _add(packs,_cell(center),back)
+		for side in [-1.0,1.0]:
+			var wall:=_box_body("ClockRoomLiftLanternSide_%s_%d"%[lift_label,int(side)],Vector3(half*2,h,0.12),Vector3(c.x+tangent.x*side*half,level+h*0.5,c.y+tangent.y*side*half),Color(0.45,0.68,0.72,0.28)); wall.rotation.y=-atan2(toward.y,toward.x); _set_body_glass(wall,Color(0.45,0.68,0.72,0.28)); _add(packs,_cell(center),wall)
 
 
 static func _clock_arrow(inner: float, outer: float, arc: float, proud: float) -> MeshInstance3D:
@@ -1269,12 +1595,60 @@ static func _clock_arrow(inner: float, outer: float, arc: float, proud: float) -
 static func _superellipsoid_mesh(radius: float,height: float,exponent: float,segments: int,rings: int) -> ArrayMesh:
 	var st:=SurfaceTool.new(); st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	for row in rings:
-		var v0:float=-PI*0.5+PI*float(row)/float(rings); var v1:float=-PI*0.5+PI*float(row+1)/float(rings)
+		var t0:=float(row)/float(rings); var t1:=float(row+1)/float(rings)
 		for col in segments:
 			var u0:=TAU*float(col)/float(segments); var u1:=TAU*float(col+1)/float(segments)
-			var p00:=_superellipsoid_point(radius,height,exponent,u0,v0); var p10:=_superellipsoid_point(radius,height,exponent,u1,v0); var p01:=_superellipsoid_point(radius,height,exponent,u0,v1); var p11:=_superellipsoid_point(radius,height,exponent,u1,v1)
+			var p00:=_dome_point(radius,height,exponent,u0,t0); var p10:=_dome_point(radius,height,exponent,u1,t0); var p01:=_dome_point(radius,height,exponent,u0,t1); var p11:=_dome_point(radius,height,exponent,u1,t1)
 			st.add_vertex(p00); st.add_vertex(p01); st.add_vertex(p11); st.add_vertex(p00); st.add_vertex(p11); st.add_vertex(p10)
 	return st.commit()
+
+
+static func _dome_point(radius: float,height: float,exponent: float,angle: float,t: float) -> Vector3:
+	var angular_denom:=pow(pow(absf(cos(angle)),exponent)+pow(absf(sin(angle)),exponent),1.0/exponent)
+	var r:=radius*sqrt(maxf(0.0,1.0-t*t))/maxf(angular_denom,0.001)
+	return Vector3(cos(angle)*r,height*t,sin(angle)*r)
+
+
+static func _add_dome_lattice(root: Node3D, radius: float, drum_height: float, crown_height: float, exponent: float, row_step: float, member_diameter: float, around: int) -> void:
+	var heights: Array[float]=[0.0]
+	var y:=row_step
+	while y<drum_height+crown_height:
+		heights.append(y); y+=row_step
+	heights.append(drum_height+crown_height)
+	var transforms: Array[Transform3D]=[]
+	for row in heights.size():
+		var h:=heights[row]
+		for spoke in around:
+			var angle:=TAU*float(spoke)/float(around); var next:=TAU*float(spoke+1)/float(around)
+			var angular_denom:=pow(pow(absf(cos(angle)),exponent)+pow(absf(sin(angle)),exponent),1.0/exponent)
+			var r0:=radius*sqrt(maxf(0.0,1.0-pow(maxf(0.0,h-drum_height)/crown_height,2.0)))/angular_denom
+			var r1:=r0
+			var a:=Vector3(cos(angle)*r0,h,sin(angle)*r0); var b:=Vector3(cos(next)*r1,h,sin(next)*r1)
+			transforms.append(_dome_strut_transform(a,b))
+		if row>=heights.size()-1: continue
+		var next_h:=heights[row+1]
+		for spoke in around:
+			var angle:=TAU*float(spoke)/float(around); var next_angle:=TAU*float((spoke+1)%around)/float(around)
+			var da:=pow(pow(absf(cos(angle)),exponent)+pow(absf(sin(angle)),exponent),1.0/exponent)
+			var ra:=radius*sqrt(maxf(0.0,1.0-pow(maxf(0.0,h-drum_height)/crown_height,2.0)))/da
+			var db:=pow(pow(absf(cos(next_angle)),exponent)+pow(absf(sin(next_angle)),exponent),1.0/exponent)
+			var rb:=radius*sqrt(maxf(0.0,1.0-pow(maxf(0.0,next_h-drum_height)/crown_height,2.0)))/db
+			var a:=Vector3(cos(angle)*ra,h,sin(angle)*ra); var b:=Vector3(cos(angle)*rb,next_h,sin(angle)*rb)
+			transforms.append(_dome_strut_transform(a,b))
+			var diagonal_start:=Vector3(cos(angle)*ra,h,sin(angle)*ra) if row%2==0 else Vector3(cos(next_angle)*ra,h,sin(next_angle)*ra)
+			var diagonal_end:=Vector3(cos(next_angle)*rb,next_h,sin(next_angle)*rb) if row%2==0 else Vector3(cos(angle)*rb,next_h,sin(angle)*rb)
+			transforms.append(_dome_strut_transform(diagonal_start,diagonal_end))
+	var mesh:=CylinderMesh.new(); mesh.top_radius=member_diameter*0.5; mesh.bottom_radius=member_diameter*0.5; mesh.height=1.0; mesh.radial_segments=6
+	var multimesh:=MultiMesh.new(); multimesh.transform_format=MultiMesh.TRANSFORM_3D; multimesh.mesh=mesh; multimesh.instance_count=transforms.size(); _store_multimesh_buffer(multimesh,transforms)
+	var members:=MultiMeshInstance3D.new(); members.name="DomeTriangulatedWhiteSteelGrid"; members.multimesh=multimesh; members.material_override=_material(Color("#f0eee5")); members.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF; root.add_child(members)
+
+
+static func _dome_strut_transform(a: Vector3, b: Vector3) -> Transform3D:
+	var direction: Vector3=(b-a).normalized(); var x_axis:=Vector3.UP.cross(direction).normalized()
+	if x_axis.length_squared()<0.1: x_axis=Vector3.RIGHT
+	var z_axis:=x_axis.cross(direction).normalized(); var basis:=Basis(x_axis,direction,z_axis)
+	basis=basis.scaled(Vector3(1.0,a.distance_to(b),1.0))
+	return Transform3D(basis,(a+b)*0.5)
 
 static func _superellipsoid_point(radius: float,height: float,exponent: float,u: float,v: float) -> Vector3:
 	var cv:=cos(v); var sv:=sin(v); var cu:=cos(u); var su:=sin(u)

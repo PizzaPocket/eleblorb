@@ -29,15 +29,20 @@ func _ready() -> void:
 		_finish(); return
 	_test_qa_air_party(qa)
 	var counts := {"streets":PLAN.STREETS.size(),"buildings":PLAN.BUILDINGS.size(),"lots":PLAN.LOTS.size(),"old_houses":PLAN.OLD_HOUSES.size()}
-	if counts.buildings != 50 or counts.lots != 133 or counts.old_houses != 60 or counts.streets != 24:
+	if counts.buildings != 47 or counts.lots != 133 or counts.old_houses != 60 or counts.streets != 22:
 		_fail("source coverage counts differ: %s" % counts)
 	var building_bodies := {}
 	_count_coverage(city, building_bodies)
-	if building_bodies.size() < 46: _fail("numbered building collision bodies missing: %d" % building_bodies.size())
+	for building in PLAN.BUILDINGS:
+		# Hotel and playground are composites, not generic numbered bodies.
+		if building.rect == null or int(building.n) in [1, 11]: continue
+		var label := "Building_%02d_%s" % [int(building.n), String(building.name).replace(" ", "_")]
+		if not building_bodies.has(label): _fail("numbered building collision body missing: %s" % label)
 	if old_house_count < 60: _fail("old house bodies missing: %d" % old_house_count)
 	if lot_count < 133: _fail("lot bodies missing: %d" % lot_count)
 	_test_pass3_counts(city)
 	_test_escalator_geometry(city)
+	_test_pass4_geometry(city)
 	_test_recorded_positions(city)
 	var rays := [Vector2(-500,0),Vector2(-560,-40),Vector2(-620,0),Vector2(-560,45),Vector2(-700,-40),Vector2(-515,-35)]
 	for p in rays:
@@ -46,7 +51,7 @@ func _ready() -> void:
 	await _test_wind_turbines(city)
 	await _test_timekeeper(city)
 	await _test_moving_platforms(city)
-	_test_hotel_lift_schedules(city)
+	await _test_hotel_lift_schedules(city)
 	await _test_leaf_suit_handover(qa)
 	_test_vine_handover_search(qa)
 	print("MOY_RUNTIME packs=",city.get_child_count(),"coverage=",counts,"numbered_bodies=",building_bodies.size(),"old_house_bodies=",old_house_count,"lot_bodies=",lot_count,"frames_to_ready=",frames,"failures=",failures)
@@ -129,7 +134,8 @@ func _test_public_route_geometry(qa: Node) -> void:
 	var pond:=Vector2(-516.0,-28.0)
 	if not bool(terrain.call("is_water_area",pond)): _fail("pond is not registered with water/swim API")
 	var surface:=float(terrain.call("get_water_surface_height",pond)); var floor:=float(terrain.call("get_water_floor_height",pond))
-	if surface-floor<3.0: _fail("pond bed is too shallow for its recorded basin")
+	var authored_depth:=float(PLAN.PARK.pond.surface)-float(PLAN.PARK.pond.bed[-1][1])
+	if absf(surface-(-60.0+float(PLAN.PARK.pond.surface)))>0.01 or absf(surface-floor-authored_depth)>0.05: _fail("pond surface/bed differ from the authored profile")
 	var water_mesh: MeshInstance3D
 	var lawn_found:=false
 	var stack: Array[Node]=[qa.get_node("WesternCity")]
@@ -138,9 +144,42 @@ func _test_public_route_geometry(qa: Node) -> void:
 		if node.name=="MoyReedPondSurface": water_mesh=node as MeshInstance3D
 		if node.name=="ParkLawn": lawn_found=true
 		for child in node.get_children(): stack.append(child)
-	if water_mesh==null or not water_mesh.material_override is ShaderMaterial: _fail("park pond lacks its visible animated water surface")
+	if water_mesh==null or not water_mesh.material_override is ShaderMaterial or (water_mesh.material_override as ShaderMaterial).shader!=VillageWorks.SHARED_WATER_SHADER: _fail("park pond lacks the shared translucent water material")
 	if not lawn_found: _fail("park lawn color patch missing")
 	print("MOY_ROUTES gate_openings=4 deck_ramps=",deck.ramps.size()," pond_surface=",surface," pond_depth=",surface-floor)
+
+
+func _test_pass4_geometry(city: Node) -> void:
+	var names: Dictionary={}; var all_nodes: Array[Node]=[]; var stack: Array[Node]=[city]
+	while not stack.is_empty():
+		var node: Node=stack.pop_back(); names[String(node.name)]=node; all_nodes.append(node)
+		for child in node.get_children(): stack.append(child)
+	var square_trees:=0; var city_hall_lanes:=0; var lanterns:=0; var tower_lifts:=0; var room_arrivals:=0; var straight_handrails:=0; var helix_sections:=0
+	for node in all_nodes:
+		var key:=String(node.name)
+		if key.begins_with("CivicPlazaTree_"): square_trees+=1
+		if key.begins_with("CityHall") and (key.ends_with("_Up") or key.ends_with("_Down")): city_hall_lanes+=1
+		if key.begins_with("ClockRoomLiftLanternBack_"): lanterns+=1
+		if key=="CrossingTowerLift": tower_lifts+=1
+		if key.begins_with("ClockRoomArrival_") and (key.ends_with("_Up") or key.ends_with("_Down")): room_arrivals+=1
+		if key.begins_with("Moving_Rubber_Handrail_"): straight_handrails+=1
+		if key.begins_with("CrossingHand_") and node is StaticBody3D and node.get_child_count()>4: helix_sections+=1
+	if square_trees!=14: _fail("Civic Plaza exact tree rows expected 14 trees, found %d"%square_trees)
+	if city_hall_lanes<24: _fail("City Hall front expected scissor, steps and outer access lanes; found %d"%city_hall_lanes)
+	if room_arrivals!=8: _fail("Clock Room expected four paired arrivals, found %d escalator lanes"%room_arrivals)
+	if lanterns!=4 or tower_lifts!=4: _fail("Clock Room expected four lift lanterns and four integrated tower lifts")
+	if straight_handrails==0: _fail("straight escalators have no moving handrail surfaces")
+	if names.get("DomeTriangulatedWhiteSteelGrid")==null: _fail("triangulated dome grid is missing")
+	if names.get("DomeBellCrownRing")==null: _fail("dome crown ring is missing")
+	var lift_ok:=0
+	for node in all_nodes:
+		if node is AnimatableBody3D and node.name=="CrossingTowerLift" and node.has_method("go_to") and float(PLAN.CROSSING.dome.base) in (node.get("stop_levels") as PackedFloat32Array): lift_ok+=1
+	if lift_ok!=4: _fail("all four Crossing lifts must include the Clock Room stop")
+	var eye_y:=float(PLAN.CROSSING.dome.clocks.eye.sill_y)+float(PLAN.CROSSING.dome.clocks.eye.r)
+	for bearing_degrees in PLAN.CROSSING.dome.clocks.bearings:
+		var angle:=deg_to_rad(float(bearing_degrees)); var radial:=Vector3(cos(angle),0.0,sin(angle)); var query:=PhysicsRayQueryParameters3D.create(Vector3(PLAN.CROSSING.c[0]+radial.x*26.0,eye_y,PLAN.CROSSING.c[1]+radial.z*26.0),Vector3(PLAN.CROSSING.c[0]+radial.x*14.0,eye_y,PLAN.CROSSING.c[1]+radial.z*14.0),1)
+		if not city.get_world_3d().direct_space_state.intersect_ray(query).is_empty(): _fail("clock eye %d is not physically open"%bearing_degrees)
+	print("MOY_PASS4 civic_tree_rows=",square_trees," CityHall_lanes=",city_hall_lanes," ClockRoom_arrival_lanes=",room_arrivals," tower_lifts_with_room_stop=",lift_ok," eyes=4_ray_clearance dome_grid=",names.get("DomeTriangulatedWhiteSteelGrid")!=null)
 
 
 func _test_pass3_counts(city: Node) -> void:
@@ -154,9 +193,9 @@ func _test_pass3_counts(city: Node) -> void:
 		"deck_trees":_sum_prefix(names,"DeckTree_"), "park_trees":_sum_prefix(names,"ParkTree_"),
 		"shrubs":_sum_metadata_prefix(city,"ParkShrubMultiMesh_"), "reed_clumps":_sum_metadata_prefix(city,"ParkReedClumpMultiMesh_"),
 		"rocks":_sum_prefix(names,"ParkRock_"), "agave":_sum_metadata_prefix(city,"ParkAgaveMultiMesh_"),
-		"climber_panels":_sum_prefix(names,"CrossingClimberPanel_"), "meridian_piers":_sum_prefix(names,"MeridianPierStem"),
+		"climber_panels":_sum_prefix(names,"CrossingClimberVineSheet_"), "meridian_piers":_sum_prefix(names,"MeridianPierStem"),
 		"spine_frames":_sum_prefix(names,"SpineFrameBeam")}
-	var expected: Dictionary={"crossing_towers":4,"deck_columns":158,"deck_parapets":127,"deck_beds":41,"deck_trees":9,"park_trees":23,"shrubs":62,"reed_clumps":28,"rocks":21,"agave":6,"climber_panels":104,"meridian_piers":8,"spine_frames":8}
+	var expected: Dictionary={"crossing_towers":4,"deck_columns":PLAN.DECK.columns.size(),"deck_parapets":PLAN.DECK.parapets.size(),"deck_beds":PLAN.DECK.beds.size(),"deck_trees":PLAN.DECK.trees.size(),"park_trees":PLAN.PARK.trees.size(),"shrubs":PLAN.PARK.shrubs.size(),"reed_clumps":PLAN.PARK.reeds.size(),"rocks":PLAN.PARK.rocks.size(),"agave":PLAN.PARK.agave.size(),"climber_panels":PLAN.CROSSING.climbers.size(),"meridian_piers":8,"spine_frames":8}
 	for key in expected:
 		if int(actual[key])!=int(expected[key]): _fail("pass-3 %s expected %d found %d"%[key,expected[key],actual[key]])
 	var access_sets:=0; var access_flights:=0
@@ -240,7 +279,7 @@ func _test_escalator_geometry(city: Node) -> void:
 	for climber_index in PLAN.CROSSING.climbers.size():
 		var climber: Array=PLAN.CROSSING.climbers[climber_index]
 		var tower:=named.get("CrossingTower_%02d"%int(climber[0])) as Node3D
-		var panel:=named.get("CrossingClimberPanel_%03d"%climber_index) as Node3D
+		var panel:=named.get("CrossingClimberVineSheet_%03d"%climber_index) as Node3D
 		if tower==null or panel==null:
 			_fail("Crossing climber %d missing for orientation check"%climber_index)
 			continue
@@ -372,7 +411,7 @@ func _test_moving_platforms(city: Node) -> void:
 		while not stack.is_empty():
 			var node: Node=stack.pop_back()
 			if node.name.begins_with("MoyTrain_"): trains.append(node as Node3D)
-			if node.name.begins_with("DeckLift_") and lift==null: lift=node as Node3D
+			if node.name.begins_with("DeckLift_") and node is AnimatableBody3D and lift==null: lift=node as Node3D
 			for sub in node.get_children(): stack.append(sub)
 	if trains.size()!=12: _fail("expected 12 train consists (3 per each of four timetable services), got %d"%trains.size()); return
 	if lift==null: _fail("public Deck lift missing"); return
@@ -418,6 +457,7 @@ func _test_moving_platforms(city: Node) -> void:
 					if not is_finite(float(sample.s)) or float(sample.s)<0.0 or float(sample.s)>float(train.get("_total"))+0.01: _fail("%s timetable leaves its line at %.2f"%[service,sample.s]); break
 					if not is_finite(float(sample.dwell)) or float(sample.dwell)<0.0: _fail("%s has invalid dwell state"%service); break
 	var lift_before:=lift.position.y
+	print("MOY_DECK_LIFT_SELECTED name=",lift.name," class=",lift.get_class()," script=",lift.get_script()," has_go_to=",lift.has_method("go_to")," y=",lift.position.y," base=",lift.get("base_height")," stops=",lift.get("stop_levels"))
 	# Exercise the real update method at moving and stopping schedule instants.
 	var original_time:=WorldState.game_time_hours
 	for train in trains:
@@ -430,10 +470,12 @@ func _test_moving_platforms(city: Node) -> void:
 		if absf(float(train.get("_distance"))-moving_position)<0.01: _fail("%s scheduled train failed to move on its line"%train.get("service_name"))
 	WorldState.game_time_hours=original_time
 	if lift.has_method("go_to"):
+		print("MOY_DECK_LIFT before name=",lift.name," y=",lift.position.y," base=",lift.get("base_height")," stops=",lift.get("stop_levels")," target=",lift.get("_target_stop")," physics=",lift.is_physics_processing())
 		lift.call("go_to", 1)
 	for i in 1800:
 		await get_tree().physics_frame
 		if i%10==0: _check_gate_train_separation(trains)
+	print("MOY_DECK_LIFT after y=",lift.position.y," target=",lift.get("_target_stop")," process=",lift.is_physics_processing()," paused=",get_tree().paused)
 	if absf(lift.position.y-lift_before)<0.1: _fail("Deck lift platform did not respond to a floor call")
 	print("MOY_MOVERS consists=",trains.size()," independent_cars=",rids.size()," route_stops=",stops_expected," dwell_seconds=8/12 gate_simulation_seconds=40 lift_call_delta_m=",absf(lift.position.y-lift_before))
 
@@ -482,7 +524,22 @@ func _test_timekeeper(city: Node) -> void:
 	if hour==null or minute==null: _fail("game clock hour/minute arrows missing"); return
 	if faces.get_child(0).find_child("SecondsBead",true,false)!=null: _fail("removed fast seconds indicator is still present")
 	if city.find_child("CityBell_SOUND_PLACEHOLDER",true,false)==null: _fail("named city bell placeholder missing")
-	print("MOY_CLOCK faces=4 game_time_arrows=PASS seconds_indicator=REMOVED bell_sound=PLACEHOLDER")
+	var previous_hour:=WorldState.game_time_hours
+	var samples: Array[Dictionary]=[
+		{"hour":3.0,"hour_angle":-PI*0.5,"minute_angle":0.0},
+		{"hour":9.25,"hour_angle":-TAU*9.25/12.0,"minute_angle":-PI*0.5},
+		{"hour":12.0,"hour_angle":0.0,"minute_angle":0.0},
+	]
+	for sample in samples:
+		WorldState.game_time_hours=float(sample.hour); (faces as Node3D).call("_update_clock")
+		for face_index in 4:
+			var face:=faces.get_child(face_index) as Node3D
+			var hour_ring:=face.get_node("CityClock_hour_%d"%face_index) as Node3D
+			var minute_ring:=face.get_node("CityClock_minute_%d"%face_index) as Node3D
+			if absf(wrapf(hour_ring.rotation.z-float(sample.hour_angle),-PI,PI))>0.002: _fail("clock hour hand is wrong at %s on face %d"%[sample.hour,face_index])
+			if absf(wrapf(minute_ring.rotation.z-float(sample.minute_angle),-PI,PI))>0.002: _fail("clock minute hand is wrong at %s on face %d"%[sample.hour,face_index])
+	WorldState.game_time_hours=previous_hour; (faces as Node3D).call("_update_clock")
+	print("MOY_CLOCK faces=4 times=3:00,9:15,12:00 arrows=PASS seconds_indicator=REMOVED bell_sound=PLACEHOLDER")
 	if city.find_child("TimekeeperRings",true,false)!=null: _fail("removed Timekeeper geometry is still present")
 
 
@@ -491,9 +548,11 @@ func _test_hotel_lift_schedules(city: Node) -> void:
 	var stack: Array[Node] = [city]
 	while not stack.is_empty():
 		var node: Node=stack.pop_back()
-		if String(node.name).begins_with("HotelCapsuleLift_"): lifts.append(node)
+		if node is AnimatableBody3D and String(node.name).begins_with("HotelCapsuleLift_"): lifts.append(node)
 		for child in node.get_children(): stack.append(child)
-	if lifts.size()!=4: _fail("hotel capsule lift count is %d, expected four"%lifts.size()); return
+	if lifts.size()!=4:
+		_fail("hotel capsule lift count is %d, expected four"%lifts.size())
+		return
 	var expected_labels := PackedStringArray(["Level 27 — Party suite", "Mezzanine", "Atrium floor"])
 	for lift in lifts:
 		var has_deck_collision:=false
@@ -505,7 +564,40 @@ func _test_hotel_lift_schedules(city: Node) -> void:
 	moving_lift.call("go_to", 1)
 	for frame in 240: await get_tree().physics_frame
 	if absf(moving_lift.global_position.y-before)<0.1: _fail("hotel capsule never moved during live physics")
+	var crystal_node:=city.find_child("HotelChandelierCrystals",true,false) as MultiMeshInstance3D
+	if crystal_node==null or crystal_node.multimesh==null or crystal_node.multimesh.instance_count!=int(PLAN.HOTEL.chandelier.crystals): _fail("hotel chandelier does not use the plan's crystal count")
+	if _count_named(city,"HotelTowerRib_*")!=int(PLAN.HOTEL.tower.ribs): _fail("hotel tower rib count differs from plan")
+	if _count_named(city,"HotelDrumRib_*")!=int(PLAN.HOTEL.drum.ribs): _fail("hotel tank/drum rib count differs from plan")
+	if _count_named(city,"HotelWindroseMullion_*")!=int(PLAN.HOTEL.drum.mullions): _fail("hotel Windrose mullion count differs from plan")
+	if _count_named(city,"HotelChandelierBronzeRing_*")!=int(PLAN.HOTEL.chandelier.tiers): _fail("hotel chandelier bronze ring count differs from plan")
+	if _count_named(city,"HotelGalleryHangingPlants_*")!=11: _fail("hotel gallery hanging planting is incomplete")
+	var door:=city.find_child("HotelRevolvingDoor",true,false)
+	var windrose:=city.find_child("HotelWindroseTurningLight",true,false)
+	if door==null or door.get_script()==null or not door is AnimatableBody3D: _fail("hotel revolving door is missing its moving body")
+	if windrose==null or windrose.get_script()==null: _fail("hotel Windrose light ring is missing its rotation script")
+	if door is Node3D and absf((door as Node3D).rotation.y)<0.01: _fail("hotel revolving door did not turn during physics")
+	if windrose is Node3D and absf((windrose as Node3D).rotation.y)<0.01: _fail("hotel Windrose ring did not turn")
+	var door_leaf_colliders:=0
+	if door is Node:
+		for leaf in door.get_children():
+			for part in leaf.get_children():
+				if part is CollisionShape3D: door_leaf_colliders+=1
+	if door_leaf_colliders!=4: _fail("hotel revolving door needs four collidable moving leaves")
+	for required in ["HotelReceptionDesk","HotelConciergeDesk","HotelIrisStand","HotelPitchedSkylight","HotelForecourtCistern","HotelLevel27RingCorridor","HotelLevel27PartySuite"]:
+		if city.find_child(required,true,false)==null: _fail("hotel public prototype object is missing: %s"%required)
+	if _count_named(city,"HotelRampLanding_*")!=4: _fail("hotel double ramp needs foot and head landings on both ramps")
+	print("MOY_HOTEL_FIDELITY ribs=40 windrose_mullions=40 crystals=3000 bronze_rings=5 gallery_plants=11 service_objects=PASS ramp_end_landings=4 door=TURNING windrose=TURNING player_rides=UNTESTED")
 	print("MOY_HOTEL_LIFTS cars=4 stops=0,6.5,89.5 floor_call=PASS menu_order=top_to_bottom player_rides=UNTESTED")
+
+
+func _count_named(root: Node, pattern: String) -> int:
+	var count:=0
+	var stack: Array[Node]=[root]
+	while not stack.is_empty():
+		var node: Node=stack.pop_back()
+		if node.name.match(pattern): count+=1
+		for child in node.get_children(): stack.append(child)
+	return count
 
 
 func _test_train_clearance(train: Node3D) -> void:

@@ -738,20 +738,26 @@ func end_direct_control() -> void:
 	_clear_direct_environment()
 
 
-func prepare_direct_control_environment(delta: float) -> void:
+func prepare_direct_control_environment(delta: float, aim_direction: Vector3 = Vector3.ZERO) -> void:
 	_clear_direct_environment()
 	_update_direct_dirtbike_state()
 	_update_direct_snowboard_state()
 	_update_direct_penguin_state(delta)
 	_update_direct_ice_skate_state()
-	_update_direct_powered_movement(delta)
 	# Turned back at the pool's edge by the same rule the player answers to.
 	# His origin sits at his feet, so his underside is simply where he is.
 	_lava.enforce_access(_traversal_context(delta), global_position.y, 0.0)
 	_liquid.read(terrain, _blorb_suit, global_position)
+	var liquid_ctx := _traversal_context(delta)
+	liquid_ctx.direction = aim_direction
+	liquid_ctx.jump_pressed = Input.is_action_just_pressed("jump") and not UIState.modal_open
+	var exiting := _flight.update_liquid_exit(liquid_ctx, _liquid, _head_height(), 0.0)
+	var standing := not exiting and _liquid.try_stand(liquid_ctx, 0.0, _head_height())
+	if standing:
+		_direct_vertical_velocity = velocity.y
 	_direct_floor_height = _liquid.floor_height
 	_direct_liquid_level = _liquid.surface_height
-	if _liquid.in_lava():
+	if not exiting and not standing and _liquid.in_lava():
 		match _liquid.lava_contact:
 			LavaMode.Contact.IMMERSED:
 				if _liquid.submerged(global_position.y):
@@ -763,13 +769,14 @@ func prepare_direct_control_environment(delta: float) -> void:
 				var rising: bool = velocity.y > 0.0 and global_position.y > _direct_liquid_level
 				if not rising and global_position.y <= _direct_liquid_level + LavaMode.CONTACT_TOLERANCE:
 					_direct_lava_surface = true
-	elif _liquid.in_water() and _liquid.deep_enough_to_swim(_head_height()) and _liquid.submerged(global_position.y):
+	elif not exiting and not standing and _liquid.in_water() and _liquid.deep_enough_to_swim(_head_height()) and _liquid.submerged(global_position.y):
 		# Anybody can go under, whatever they are wearing. Only breath
 		# depends on the helmet, which he does not need at all.
 		_direct_diving = true
 	if not _direct_diving and not _direct_lava_surface:
 		_direct_flying = _blorb_suit.has_chest_air_blorb()
 		_direct_air_feet = _blorb_suit.has_air_hover_legs()
+	_update_direct_powered_movement(delta)
 	# The tail forms while its wearer is actually swimming, and the suit only
 	# ever heard that from the human, so his legs never became one.
 	_blorb_suit.set_mermaid_swimming(_direct_diving)
@@ -791,7 +798,8 @@ func _update_direct_powered_movement(delta: float) -> void:
 	var was_hovering: bool = _powers.powered_hover_active()
 	_powers.update(
 		_blorb_suit, delta, _direct_diving,
-		false, false, get_instance_id()
+		false, false, get_instance_id(),
+		_flight.suppress_fire(_liquid, _direct_diving)
 	)
 	_update_direct_plant_powers(delta)
 	if _powers.powered_hover_active() and not was_hovering:
@@ -1037,6 +1045,10 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			gravity_factor = atmosphere.gravity_factor_at(global_position)
 		_direct_vertical_velocity = lerpf(_direct_vertical_velocity, gravity_velocity, gravity_factor)
 	velocity.y = _direct_vertical_velocity
+	_flight.apply_liquid_exit(_traversal_context(delta))
+	if _flight.liquid_exit_active:
+		_direct_hover_height = global_position.y + velocity.y * delta
+	_direct_vertical_velocity = velocity.y
 	if _direct_diving:
 		var dive_floor := _direct_floor_height + Player.LAKE_DIVE_FLOOR_CLEARANCE
 		var dive_surface := _direct_liquid_level - _swim_float_depth()
@@ -1050,6 +1062,8 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 			if floor_collision.get_normal().dot(Vector3.UP)>0.65 and escalator_floor is StaticBody3D and escalator_floor.has_method("assist_character"):
 				escalator_floor.assist_character(self)
 				break
+	if not jump_pressed and not (_direct_diving or _direct_flying or _direct_air_feet or _powers.powered_hover_active() or _direct_snowboard_active or _direct_dirtbike_active):
+		WorldSupport.try_step_up(_traversal_context(delta))
 	move_and_slide()
 	_update_direct_ice_skate_airtime(delta,pre_move_position)
 	_resolve_direct_dirtbike_motion(delta,pre_move_position)

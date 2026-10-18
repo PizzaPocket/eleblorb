@@ -1,0 +1,937 @@
+[gd_scene format=4]
+
+[ext_resource type="Script" path="res://scripts/moy_escalator.gd" id="1_j2u36"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qiwf1"]
+size = Vector3(27.531261, 0.32, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u6kj7"]
+albedo_color = Color(0.6431373, 0.5764706, 0.44705883, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_edx2o"]
+size = Vector3(27.531261, 0.32, 1.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kqiqh"]
+albedo_color = Color(0.27058825, 0.29411766, 0.29411766, 1)
+roughness = 0.92
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_o0v43"]
+_surfaces = [{
+"aabb": AABB(-13.925631, -0.16, -0.6, 27.851261, 0.32, 1.2),
+"format": 34359738369,
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 114,
+"vertex_data": PackedByteArray("BkBcwQrXIz6amRm/BkBcwQrXIz6amRk/BkBcQQrXIz6amRk/BkBcwQrXIz6amRm/BkBcQQrXIz6amRk/BkBcQQrXIz6amRm/BkBcQQrXIz6amRm/BkBcQQrXIz6amRk/0jpdQVFeFz6amRk/BkBcQQrXIz6amRm/0jpdQVFeFz6amRk/0jpdQVFeFz6amRm/0jpdQVFeFz6amRm/0jpdQVFeFz6amRk/bw9eQWq05z2amRk/0jpdQVFeFz6amRm/bw9eQWq05z2amRk/bw9eQWq05z2amRm/bw9eQWq05z2amRm/bw9eQWq05z2amRk/f51eQaDLej2amRk/bw9eQWq05z2amRm/f51eQaDLej2amRk/f51eQaDLej2amRm/f51eQaDLej2amRm/f51eQaDLej2amRk/Ys9eQQAAAACamRk/f51eQaDLej2amRm/Ys9eQQAAAACamRk/Ys9eQQAAAACamRm/Ys9eQQAAAACamRm/Ys9eQQAAAACamRk/f51eQaDLer2amRk/Ys9eQQAAAACamRm/f51eQaDLer2amRk/f51eQaDLer2amRm/f51eQaDLer2amRm/f51eQaDLer2amRk/bw9eQWq0572amRk/f51eQaDLer2amRm/bw9eQWq0572amRk/bw9eQWq0572amRm/bw9eQWq0572amRm/bw9eQWq0572amRk/0jpdQVFeF76amRk/bw9eQWq0572amRm/0jpdQVFeF76amRk/0jpdQVFeF76amRm/0jpdQVFeF76amRm/0jpdQVFeF76amRk/BkBcQQrXI76amRk/0jpdQVFeF76amRm/BkBcQQrXI76amRk/BkBcQQrXI76amRm/BkBcQQrXI76amRm/BkBcQQrXI76amRk/BkBcwQrXI76amRk/BkBcQQrXI76amRm/BkBcwQrXI76amRk/BkBcwQrXI76amRm/BkBcwQrXI76amRm/BkBcwQrXI76amRk/0jpdwVFeF76amRk/BkBcwQrXI76amRm/0jpdwVFeF76amRk/0jpdwVFeF76amRm/0jpdwVFeF76amRm/0jpdwVFeF76amRk/bw9ewWq0572amRk/0jpdwVFeF76amRm/bw9ewWq0572amRk/bw9ewWq0572amRm/bw9ewWq0572amRm/bw9ewWq0572amRk/f51ewaDLer2amRk/bw9ewWq0572amRm/f51ewaDLer2amRk/f51ewaDLer2amRm/f51ewaDLer2amRm/f51ewaDLer2amRk/Ys9ewdm5tKOamRk/f51ewaDLer2amRm/Ys9ewdm5tKOamRk/Ys9ewdm5tKOamRm/Ys9ewdm5tKOamRm/Ys9ewdm5tKOamRk/f51ewaDLej2amRk/Ys9ewdm5tKOamRm/f51ewaDLej2amRk/f51ewaDLej2amRm/f51ewaDLej2amRm/f51ewaDLej2amRk/bw9ewWq05z2amRk/f51ewaDLej2amRm/bw9ewWq05z2amRk/bw9ewWq05z2amRm/bw9ewWq05z2amRm/bw9ewWq05z2amRk/0jpdwVFeFz6amRk/bw9ewWq05z2amRm/0jpdwVFeFz6amRk/0jpdwVFeFz6amRm/0jpdwVFeFz6amRm/0jpdwVFeFz6amRk/BkBcwQrXIz6amRk/0jpdwVFeFz6amRm/BkBcwQrXIz6amRk/BkBcwQrXIz6amRm/BkBcwQrXIz6amRm/BkBcwQrXIz6amRk/BkBcwQrXIz6amRk/BkBcwQrXIz6amRm/BkBcwQrXIz6amRk/BkBcwQrXIz6amRm/")
+}]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1tatv"]
+albedo_color = Color(0.84313726, 0.84705883, 0.81960785, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_mf81a"]
+size = Vector3(0.055, 0.035, 1.056)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_utwtc"]
+size = Vector3(2.4, 0.3, 3.876)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qofbu"]
+albedo_color = Color(0.7137255, 0.6313726, 0.48235294, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_bm1bq"]
+size = Vector3(2.4, 0.3, 3.876)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_pi5th"]
+size = Vector3(2.4, 0.3, 3.876)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rlcrj"]
+albedo_color = Color(0.7137255, 0.6313726, 0.48235294, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_mp2od"]
+size = Vector3(2.4, 0.3, 3.876)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ghmaa"]
+size = Vector3(2, 0.4, 7.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ulmtl"]
+albedo_color = Color(0.7882353, 0.7254902, 0.6, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_xwsw8"]
+size = Vector3(2, 0.4, 7.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lmlqw"]
+size = Vector3(21.200012, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k6i3d"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_6485h"]
+size = Vector3(21.200012, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mxduq"]
+size = Vector3(0.2999878, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mlabe"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_qxct2"]
+size = Vector3(0.2999878, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_q8w1w"]
+size = Vector3(1.4500008, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_of15s"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ldksr"]
+size = Vector3(1.4500008, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lrqoe"]
+size = Vector3(5.950012, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l2pt5"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_nh7j2"]
+size = Vector3(5.950012, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6noru"]
+size = Vector3(21.200012, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_55eum"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_tkbfb"]
+size = Vector3(21.200012, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_cm5u3"]
+size = Vector3(15, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l26sj"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_46kr8"]
+size = Vector3(15, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mr1dv"]
+size = Vector3(1.5, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fhrax"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_4udt0"]
+size = Vector3(1.5, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vd2es"]
+size = Vector3(2.7999878, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6hkox"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_vw0ei"]
+size = Vector3(2.7999878, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_jwbwr"]
+size = Vector3(3.1500244, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_unh86"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_i14x5"]
+size = Vector3(3.1500244, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qadcp"]
+size = Vector3(0.3500061, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kyy3r"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_0v20b"]
+size = Vector3(0.3500061, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_c80kd"]
+size = Vector3(15, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_50snr"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_yr7rw"]
+size = Vector3(15, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ry4xc"]
+size = Vector3(13.34, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s3p7f"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_xmkn1"]
+size = Vector3(13.34, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_4q6o0"]
+size = Vector3(1.5, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nhfre"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_gtvik"]
+size = Vector3(1.5, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yv4b0"]
+size = Vector3(1, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nlhvy"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_3m2uf"]
+size = Vector3(1, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_et8vg"]
+size = Vector3(5.950012, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w53ig"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_p2xhr"]
+size = Vector3(5.950012, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_p715t"]
+size = Vector3(0.3500061, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qwwj6"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ec2vi"]
+size = Vector3(0.3500061, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_x4vdk"]
+size = Vector3(13.29, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_imggu"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_j86wh"]
+size = Vector3(13.29, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oaqtd"]
+size = Vector3(1.8999939, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_agluk"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_b2dvd"]
+size = Vector3(1.8999939, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_56t6t"]
+size = Vector3(1.8999939, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uyuql"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_86rhn"]
+size = Vector3(1.8999939, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m71tm"]
+size = Vector3(5.0200005, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wogci"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_07nqt"]
+size = Vector3(5.0200005, 1.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_b4bog"]
+size = Vector3(6.950012, 1.1, 0.12)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1pq3p"]
+albedo_color = Color(0.45, 0.66, 0.69, 0.3)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="BoxMesh_ug08k"]
+size = Vector3(6.950012, 1.1, 0.12)
+
+[node name="MoyCell_06_04_Part_11" type="Node3D" unique_id=1735928689]
+
+[node name="CityHallSteps_south_down_escalator_Down" type="StaticBody3D" parent="." unique_id=1863536525]
+transform = Transform3D(0.9661746, -0.25788873, 0, 0.25788873, 0.9661746, 0, 0, 0, 1, -383.8, -49.35, 17.199999)
+script = ExtResource("1_j2u36")
+travel_direction = Vector3(0.9661746, 0.25788873, 0)
+
+[node name="@CollisionShape3D@9092" type="CollisionShape3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=158786291]
+shape = SubResource("BoxShape3D_qiwf1")
+
+[node name="@MeshInstance3D@9093" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=4387467]
+material_override = SubResource("StandardMaterial3D_u6kj7")
+mesh = SubResource("BoxMesh_edx2o")
+
+[node name="Belt_Return_And_End_Rolls" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=85801604]
+material_override = SubResource("StandardMaterial3D_kqiqh")
+mesh = SubResource("ArrayMesh_o0v43")
+
+[node name="Moving_Tread_00" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1135672744]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 0.0
+
+[node name="Moving_Tread_01" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1628764693]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 0.692195463423856
+
+[node name="Moving_Tread_02" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1159900256]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 1.384390926847712
+
+[node name="Moving_Tread_03" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1262006787]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 2.0765863902715678
+
+[node name="Moving_Tread_04" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1499695692]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 2.768781853695424
+
+[node name="Moving_Tread_05" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1124530927]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 3.46097731711928
+
+[node name="Moving_Tread_06" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=933812366]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 4.1531727805431355
+
+[node name="Moving_Tread_07" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=170333180]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 4.845368243966991
+
+[node name="Moving_Tread_08" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1111982391]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 5.537563707390848
+
+[node name="Moving_Tread_09" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1764882980]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 6.229759170814703
+
+[node name="Moving_Tread_10" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=494561965]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 6.92195463423856
+
+[node name="Moving_Tread_11" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=674071641]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 7.614150097662415
+
+[node name="Moving_Tread_12" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=787228759]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 8.306345561086271
+
+[node name="Moving_Tread_13" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1572554349]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 8.998541024510127
+
+[node name="Moving_Tread_14" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=407585351]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 9.690736487933982
+
+[node name="Moving_Tread_15" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1621802896]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 10.382931951357838
+
+[node name="Moving_Tread_16" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1421116648]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 11.075127414781695
+
+[node name="Moving_Tread_17" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1071360624]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 11.767322878205551
+
+[node name="Moving_Tread_18" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=164355279]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 12.459518341629407
+
+[node name="Moving_Tread_19" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1933736716]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 13.151713805053262
+
+[node name="Moving_Tread_20" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1132172081]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 13.84390926847712
+
+[node name="Moving_Tread_21" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1687684010]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 14.536104731900974
+
+[node name="Moving_Tread_22" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1654775888]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 15.22830019532483
+
+[node name="Moving_Tread_23" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1827093937]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 15.920495658748687
+
+[node name="Moving_Tread_24" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1436560568]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 16.612691122172542
+
+[node name="Moving_Tread_25" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=2075714402]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 17.3048865855964
+
+[node name="Moving_Tread_26" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1314071985]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 17.997082049020253
+
+[node name="Moving_Tread_27" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=921746565]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 18.68927751244411
+
+[node name="Moving_Tread_28" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=219378474]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 19.381472975867965
+
+[node name="Moving_Tread_29" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1151058787]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 20.073668439291822
+
+[node name="Moving_Tread_30" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1557255261]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 20.765863902715676
+
+[node name="Moving_Tread_31" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=519154109]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 21.458059366139533
+
+[node name="Moving_Tread_32" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=822292853]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 22.15025482956339
+
+[node name="Moving_Tread_33" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=424230829]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 22.842450292987245
+
+[node name="Moving_Tread_34" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=787513224]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 23.534645756411102
+
+[node name="Moving_Tread_35" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=871084588]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 24.226841219834956
+
+[node name="Moving_Tread_36" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=449955195]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 24.919036683258813
+
+[node name="Moving_Tread_37" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=2104580011]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 25.61123214668267
+
+[node name="Moving_Tread_38" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=648461200]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 26.303427610106525
+
+[node name="Moving_Tread_39" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1326780187]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 26.995623073530382
+
+[node name="Moving_Tread_40" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=327144692]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 27.68781853695424
+
+[node name="Moving_Tread_41" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=860162047]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 28.380014000378097
+
+[node name="Moving_Tread_42" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=102891830]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 29.072209463801947
+
+[node name="Moving_Tread_43" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1451077361]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 29.7644049272258
+
+[node name="Moving_Tread_44" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1234379163]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 30.45660039064966
+
+[node name="Moving_Tread_45" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1673274387]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 31.148795854073516
+
+[node name="Moving_Tread_46" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1201842126]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 31.840991317497373
+
+[node name="Moving_Tread_47" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=2061981731]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 32.53318678092123
+
+[node name="Moving_Tread_48" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1471016930]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 33.225382244345084
+
+[node name="Moving_Tread_49" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=720901408]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 33.91757770776894
+
+[node name="Moving_Tread_50" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1784789416]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 34.6097731711928
+
+[node name="Moving_Tread_51" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1734184175]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 35.30196863461665
+
+[node name="Moving_Tread_52" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1406517450]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 35.99416409804051
+
+[node name="Moving_Tread_53" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=216993045]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 36.686359561464364
+
+[node name="Moving_Tread_54" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=51705086]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 37.37855502488822
+
+[node name="Moving_Tread_55" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1812197887]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 38.07075048831207
+
+[node name="Moving_Tread_56" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1556497899]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 38.76294595173593
+
+[node name="Moving_Tread_57" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=112862096]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 39.45514141515979
+
+[node name="Moving_Tread_58" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=943397406]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 40.147336878583644
+
+[node name="Moving_Tread_59" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=583033313]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 40.8395323420075
+
+[node name="Moving_Tread_60" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1713775529]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 41.53172780543135
+
+[node name="Moving_Tread_61" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=26737016]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 42.22392326885521
+
+[node name="Moving_Tread_62" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=348575526]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 42.91611873227907
+
+[node name="Moving_Tread_63" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1211510405]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 43.608314195702924
+
+[node name="Moving_Tread_64" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=217054071]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 44.30050965912678
+
+[node name="Moving_Tread_65" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=872548884]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 44.99270512255063
+
+[node name="Moving_Tread_66" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=188103165]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 45.68490058597449
+
+[node name="Moving_Tread_67" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1795983007]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 46.37709604939835
+
+[node name="Moving_Tread_68" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1032658260]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 47.069291512822204
+
+[node name="Moving_Tread_69" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=589016722]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 47.761486976246054
+
+[node name="Moving_Tread_70" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=2057361310]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 48.45368243966991
+
+[node name="Moving_Tread_71" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=802033912]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 49.14587790309377
+
+[node name="Moving_Tread_72" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=390621720]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 49.83807336651763
+
+[node name="Moving_Tread_73" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1417888200]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 50.530268829941484
+
+[node name="Moving_Tread_74" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=540558198]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 51.22246429336534
+
+[node name="Moving_Tread_75" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1094820845]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 51.91465975678919
+
+[node name="Moving_Tread_76" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1540622333]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 52.60685522021305
+
+[node name="Moving_Tread_77" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1574222500]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 53.2990506836369
+
+[node name="Moving_Tread_78" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=688683601]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 53.991246147060764
+
+[node name="Moving_Tread_79" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=858817968]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 54.683441610484614
+
+[node name="Moving_Tread_80" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Down" unique_id=1184738495]
+material_override = SubResource("StandardMaterial3D_1tatv")
+mesh = SubResource("BoxMesh_mf81a")
+metadata/belt_distance = 55.37563707390848
+
+[node name="CityHallSteps_south_down_escalator_Landing_0" type="StaticBody3D" parent="." unique_id=24282063]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -370.5, -45.95, 17.8)
+
+[node name="@CollisionShape3D@9094" type="CollisionShape3D" parent="CityHallSteps_south_down_escalator_Landing_0" unique_id=1461727952]
+shape = SubResource("BoxShape3D_utwtc")
+
+[node name="@MeshInstance3D@9095" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Landing_0" unique_id=693568511]
+material_override = SubResource("StandardMaterial3D_qofbu")
+mesh = SubResource("BoxMesh_bm1bq")
+
+[node name="CityHallSteps_south_down_escalator_Landing_1" type="StaticBody3D" parent="." unique_id=1448010547]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -397.1, -53.050003, 17.8)
+
+[node name="@CollisionShape3D@9096" type="CollisionShape3D" parent="CityHallSteps_south_down_escalator_Landing_1" unique_id=1732773561]
+shape = SubResource("BoxShape3D_pi5th")
+
+[node name="@MeshInstance3D@9097" type="MeshInstance3D" parent="CityHallSteps_south_down_escalator_Landing_1" unique_id=1103674854]
+material_override = SubResource("StandardMaterial3D_rlcrj")
+mesh = SubResource("BoxMesh_mp2od")
+
+[node name="@StaticBody3D@9100" type="StaticBody3D" parent="." unique_id=963172436]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -383.8, -52.9, 21)
+
+[node name="@CollisionShape3D@9098" type="CollisionShape3D" parent="@StaticBody3D@9100" unique_id=1817678050]
+shape = SubResource("BoxShape3D_ghmaa")
+
+[node name="@MeshInstance3D@9099" type="MeshInstance3D" parent="@StaticBody3D@9100" unique_id=1019051537]
+material_override = SubResource("StandardMaterial3D_ulmtl")
+mesh = SubResource("BoxMesh_xwsw8")
+
+[node name="CityHallFrontGuard" type="StaticBody3D" parent="." unique_id=1170872806]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -352.85, -37.1, 27)
+
+[node name="@CollisionShape3D@9207" type="CollisionShape3D" parent="CityHallFrontGuard" unique_id=1457769008]
+shape = SubResource("BoxShape3D_lmlqw")
+
+[node name="@MeshInstance3D@9208" type="MeshInstance3D" parent="CityHallFrontGuard" unique_id=909901319]
+material_override = SubResource("StandardMaterial3D_k6i3d")
+mesh = SubResource("BoxMesh_6485h")
+
+[node name="@StaticBody3D@9211" type="StaticBody3D" parent="." unique_id=1081444061]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -366.5, -37.1, 28.5)
+
+[node name="@CollisionShape3D@9209" type="CollisionShape3D" parent="@StaticBody3D@9211" unique_id=1465752455]
+shape = SubResource("BoxShape3D_mxduq")
+
+[node name="@MeshInstance3D@9210" type="MeshInstance3D" parent="@StaticBody3D@9211" unique_id=827683607]
+material_override = SubResource("StandardMaterial3D_mlabe")
+mesh = SubResource("BoxMesh_qxct2")
+
+[node name="@StaticBody3D@9214" type="StaticBody3D" parent="." unique_id=618509358]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -369.5, -37.1, 29.275)
+
+[node name="@CollisionShape3D@9212" type="CollisionShape3D" parent="@StaticBody3D@9214" unique_id=11783018]
+shape = SubResource("BoxShape3D_q8w1w")
+
+[node name="@MeshInstance3D@9213" type="MeshInstance3D" parent="@StaticBody3D@9214" unique_id=566711113]
+material_override = SubResource("StandardMaterial3D_of15s")
+mesh = SubResource("BoxMesh_ldksr")
+
+[node name="@StaticBody3D@9217" type="StaticBody3D" parent="." unique_id=239452184]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -366.525, -37.1, 30)
+
+[node name="@CollisionShape3D@9215" type="CollisionShape3D" parent="@StaticBody3D@9217" unique_id=1615110525]
+shape = SubResource("BoxShape3D_lrqoe")
+
+[node name="@MeshInstance3D@9216" type="MeshInstance3D" parent="@StaticBody3D@9217" unique_id=774569559]
+material_override = SubResource("StandardMaterial3D_l2pt5")
+mesh = SubResource("BoxMesh_nh7j2")
+
+[node name="@StaticBody3D@9220" type="StaticBody3D" parent="." unique_id=900577474]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -352.85, -37.1, 29.5)
+
+[node name="@CollisionShape3D@9218" type="CollisionShape3D" parent="@StaticBody3D@9220" unique_id=2146836714]
+shape = SubResource("BoxShape3D_6noru")
+
+[node name="@MeshInstance3D@9219" type="MeshInstance3D" parent="@StaticBody3D@9220" unique_id=233202338]
+material_override = SubResource("StandardMaterial3D_55eum")
+mesh = SubResource("BoxMesh_tkbfb")
+
+[node name="@StaticBody3D@9241" type="StaticBody3D" parent="." unique_id=16599662]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -369.5, -21.9, 21)
+
+[node name="@CollisionShape3D@9239" type="CollisionShape3D" parent="@StaticBody3D@9241" unique_id=1828215788]
+shape = SubResource("BoxShape3D_cm5u3")
+
+[node name="@MeshInstance3D@9240" type="MeshInstance3D" parent="@StaticBody3D@9241" unique_id=1522079096]
+material_override = SubResource("StandardMaterial3D_l26sj")
+mesh = SubResource("BoxMesh_46kr8")
+
+[node name="@StaticBody3D@9244" type="StaticBody3D" parent="." unique_id=1821207984]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -369.5, -21.9, 29.25)
+
+[node name="@CollisionShape3D@9242" type="CollisionShape3D" parent="@StaticBody3D@9244" unique_id=348762917]
+shape = SubResource("BoxShape3D_mr1dv")
+
+[node name="@MeshInstance3D@9243" type="MeshInstance3D" parent="@StaticBody3D@9244" unique_id=1170987292]
+material_override = SubResource("StandardMaterial3D_fhrax")
+mesh = SubResource("BoxMesh_4udt0")
+
+[node name="@StaticBody3D@9247" type="StaticBody3D" parent="." unique_id=620021656]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -368.1, -21.9, 30)
+
+[node name="@CollisionShape3D@9245" type="CollisionShape3D" parent="@StaticBody3D@9247" unique_id=558825794]
+shape = SubResource("BoxShape3D_vd2es")
+
+[node name="@MeshInstance3D@9246" type="MeshInstance3D" parent="@StaticBody3D@9247" unique_id=159437492]
+material_override = SubResource("StandardMaterial3D_6hkox")
+mesh = SubResource("BoxMesh_vw0ei")
+
+[node name="@StaticBody3D@9250" type="StaticBody3D" parent="." unique_id=1522490588]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -365.125, -21.9, 30)
+
+[node name="@CollisionShape3D@9248" type="CollisionShape3D" parent="@StaticBody3D@9250" unique_id=1237822942]
+shape = SubResource("BoxShape3D_jwbwr")
+
+[node name="@MeshInstance3D@9249" type="MeshInstance3D" parent="@StaticBody3D@9250" unique_id=41504921]
+material_override = SubResource("StandardMaterial3D_unh86")
+mesh = SubResource("BoxMesh_i14x5")
+
+[node name="@StaticBody3D@9253" type="StaticBody3D" parent="." unique_id=1351860414]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -366.52502, -21.9, 28.5)
+
+[node name="@CollisionShape3D@9251" type="CollisionShape3D" parent="@StaticBody3D@9253" unique_id=1484867013]
+shape = SubResource("BoxShape3D_qadcp")
+
+[node name="@MeshInstance3D@9252" type="MeshInstance3D" parent="@StaticBody3D@9253" unique_id=88730118]
+material_override = SubResource("StandardMaterial3D_kyy3r")
+mesh = SubResource("BoxMesh_0v20b")
+
+[node name="@StaticBody3D@9256" type="StaticBody3D" parent="." unique_id=74525686]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -366.7, -21.9, 21)
+
+[node name="@CollisionShape3D@9254" type="CollisionShape3D" parent="@StaticBody3D@9256" unique_id=1189756617]
+shape = SubResource("BoxShape3D_c80kd")
+
+[node name="@MeshInstance3D@9255" type="MeshInstance3D" parent="@StaticBody3D@9256" unique_id=1755569297]
+material_override = SubResource("StandardMaterial3D_50snr")
+mesh = SubResource("BoxMesh_yr7rw")
+
+[node name="@StaticBody3D@9265" type="StaticBody3D" parent="." unique_id=622082146]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -369.5, -15.9, 18.67)
+
+[node name="@CollisionShape3D@9263" type="CollisionShape3D" parent="@StaticBody3D@9265" unique_id=100300474]
+shape = SubResource("BoxShape3D_ry4xc")
+
+[node name="@MeshInstance3D@9264" type="MeshInstance3D" parent="@StaticBody3D@9265" unique_id=1947989250]
+material_override = SubResource("StandardMaterial3D_s3p7f")
+mesh = SubResource("BoxMesh_xmkn1")
+
+[node name="@StaticBody3D@9268" type="StaticBody3D" parent="." unique_id=146622176]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -369.5, -15.9, 26.09)
+
+[node name="@CollisionShape3D@9266" type="CollisionShape3D" parent="@StaticBody3D@9268" unique_id=1971087741]
+shape = SubResource("BoxShape3D_4q6o0")
+
+[node name="@MeshInstance3D@9267" type="MeshInstance3D" parent="@StaticBody3D@9268" unique_id=220506813]
+material_override = SubResource("StandardMaterial3D_nhfre")
+mesh = SubResource("BoxMesh_gtvik")
+
+[node name="@StaticBody3D@9271" type="StaticBody3D" parent="." unique_id=1130500486]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -369.5, -15.9, 27.34)
+
+[node name="@CollisionShape3D@9269" type="CollisionShape3D" parent="@StaticBody3D@9271" unique_id=531127525]
+shape = SubResource("BoxShape3D_yv4b0")
+
+[node name="@MeshInstance3D@9270" type="MeshInstance3D" parent="@StaticBody3D@9271" unique_id=1497235297]
+material_override = SubResource("StandardMaterial3D_nlhvy")
+mesh = SubResource("BoxMesh_3m2uf")
+
+[node name="@StaticBody3D@9274" type="StaticBody3D" parent="." unique_id=369493269]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -366.525, -15.9, 27.84)
+
+[node name="@CollisionShape3D@9272" type="CollisionShape3D" parent="@StaticBody3D@9274" unique_id=1046258628]
+shape = SubResource("BoxShape3D_et8vg")
+
+[node name="@MeshInstance3D@9273" type="MeshInstance3D" parent="@StaticBody3D@9274" unique_id=979791183]
+material_override = SubResource("StandardMaterial3D_w53ig")
+mesh = SubResource("BoxMesh_p2xhr")
+
+[node name="@StaticBody3D@9277" type="StaticBody3D" parent="." unique_id=1935375344]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -366.52502, -15.9, 25.34)
+
+[node name="@CollisionShape3D@9275" type="CollisionShape3D" parent="@StaticBody3D@9277" unique_id=2050864285]
+shape = SubResource("BoxShape3D_p715t")
+
+[node name="@MeshInstance3D@9276" type="MeshInstance3D" parent="@StaticBody3D@9277" unique_id=1339609467]
+material_override = SubResource("StandardMaterial3D_qwwj6")
+mesh = SubResource("BoxMesh_ec2vi")
+
+[node name="@StaticBody3D@9280" type="StaticBody3D" parent="." unique_id=1049994790]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -366.7, -15.9, 18.695)
+
+[node name="@CollisionShape3D@9278" type="CollisionShape3D" parent="@StaticBody3D@9280" unique_id=200221826]
+shape = SubResource("BoxShape3D_x4vdk")
+
+[node name="@MeshInstance3D@9279" type="MeshInstance3D" parent="@StaticBody3D@9280" unique_id=660382505]
+material_override = SubResource("StandardMaterial3D_imggu")
+mesh = SubResource("BoxMesh_j86wh")
+
+[node name="@StaticBody3D@9283" type="StaticBody3D" parent="." unique_id=232660074]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -383.8, -51.8, 24.9)
+
+[node name="@CollisionShape3D@9281" type="CollisionShape3D" parent="@StaticBody3D@9283" unique_id=1129037077]
+shape = SubResource("BoxShape3D_oaqtd")
+
+[node name="@MeshInstance3D@9282" type="MeshInstance3D" parent="@StaticBody3D@9283" unique_id=1769009793]
+material_override = SubResource("StandardMaterial3D_agluk")
+mesh = SubResource("BoxMesh_b2dvd")
+
+[node name="@StaticBody3D@9286" type="StaticBody3D" parent="." unique_id=1859601169]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -383.8, -51.8, 17.1)
+
+[node name="@CollisionShape3D@9284" type="CollisionShape3D" parent="@StaticBody3D@9286" unique_id=1345453054]
+shape = SubResource("BoxShape3D_56t6t")
+
+[node name="@MeshInstance3D@9285" type="MeshInstance3D" parent="@StaticBody3D@9286" unique_id=1697752678]
+material_override = SubResource("StandardMaterial3D_uyuql")
+mesh = SubResource("BoxMesh_86rhn")
+
+[node name="@StaticBody3D@9354" type="StaticBody3D" parent="." unique_id=682751381]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -370.5, -44.7, 27.49)
+
+[node name="@CollisionShape3D@9352" type="CollisionShape3D" parent="@StaticBody3D@9354" unique_id=1698443734]
+shape = SubResource("BoxShape3D_m71tm")
+
+[node name="@MeshInstance3D@9353" type="MeshInstance3D" parent="@StaticBody3D@9354" unique_id=385421976]
+material_override = SubResource("StandardMaterial3D_wogci")
+mesh = SubResource("BoxMesh_07nqt")
+
+[node name="@StaticBody3D@9357" type="StaticBody3D" parent="." unique_id=1998157473]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -367.025, -44.7, 30)
+
+[node name="@CollisionShape3D@9355" type="CollisionShape3D" parent="@StaticBody3D@9357" unique_id=355178090]
+shape = SubResource("BoxShape3D_b4bog")
+
+[node name="@MeshInstance3D@9356" type="MeshInstance3D" parent="@StaticBody3D@9357" unique_id=815395845]
+material_override = SubResource("StandardMaterial3D_1pq3p")
+mesh = SubResource("BoxMesh_ug08k")

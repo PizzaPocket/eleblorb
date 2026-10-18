@@ -57,20 +57,20 @@ var fire_limb_flight := false
 ## `right_arm_busy` leave a hand alone that is already holding something.
 func update(
 	suit: BlorbSuitController, delta: float, swimming: bool,
-	left_arm_busy: bool = false, right_arm_busy: bool = false, sound_key: int = 0
+	left_arm_busy: bool = false, right_arm_busy: bool = false, sound_key: int = 0, fire_suppressed: bool = false
 ) -> void:
 	left_arm_water = _consume(suit, "arm_left", "left_arm_power", "water", WATER_MP_PER_SECOND, delta, left_arm_busy)
 	right_arm_water = _consume(suit, "arm_right", "right_arm_power", "water", WATER_MP_PER_SECOND, delta, right_arm_busy)
-	left_arm_fire = _consume(suit, "arm_left", "left_arm_power", "fire", FIRE_MP_PER_SECOND, delta, left_arm_busy)
-	right_arm_fire = _consume(suit, "arm_right", "right_arm_power", "fire", FIRE_MP_PER_SECOND, delta, right_arm_busy)
+	left_arm_fire = _consume(suit, "arm_left", "left_arm_power", "fire", FIRE_MP_PER_SECOND, delta, left_arm_busy or fire_suppressed)
+	right_arm_fire = _consume(suit, "arm_right", "right_arm_power", "fire", FIRE_MP_PER_SECOND, delta, right_arm_busy or fire_suppressed)
 	left_arm_electric = _consume(suit, "arm_left", "left_arm_power", "electric", ELECTRIC_MP_PER_SECOND, delta, left_arm_busy)
 	right_arm_electric = _consume(suit, "arm_right", "right_arm_power", "electric", ELECTRIC_MP_PER_SECOND, delta, right_arm_busy)
 	left_arm_city = _consume(suit, "arm_left", "left_arm_power", "city", CITY_MP_PER_SECOND, delta, left_arm_busy)
 	right_arm_city = _consume(suit, "arm_right", "right_arm_power", "city", CITY_MP_PER_SECOND, delta, right_arm_busy)
 	left_leg_water = _consume(suit, "leg_left", "left_leg_power", "water", WATER_MP_PER_SECOND, delta)
 	right_leg_water = _consume(suit, "leg_right", "right_leg_power", "water", WATER_MP_PER_SECOND, delta)
-	left_leg_fire = _consume(suit, "leg_left", "left_leg_power", "fire", FIRE_MP_PER_SECOND, delta)
-	right_leg_fire = _consume(suit, "leg_right", "right_leg_power", "fire", FIRE_MP_PER_SECOND, delta)
+	left_leg_fire = _consume(suit, "leg_left", "left_leg_power", "fire", FIRE_MP_PER_SECOND, delta, fire_suppressed)
+	right_leg_fire = _consume(suit, "leg_right", "right_leg_power", "fire", FIRE_MP_PER_SECOND, delta, fire_suppressed)
 	if any_water():
 		UISounds.pulse_power_loop(&"water", sound_key)
 	if any_fire():

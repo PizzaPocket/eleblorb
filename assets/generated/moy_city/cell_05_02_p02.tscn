@@ -1,1066 +1,1285 @@
 [gd_scene format=3]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ktnjg"]
-size = Vector3(26, 1.05, 0.12)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kobgp"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ktnjg"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_krjwh"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_kobgp"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_rco8w"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_krjwh"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vvyay"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rco8w"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_gou80"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_vvyay"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_7py5e"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_gou80"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8jvnp"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7py5e"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_helb2"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_8jvnp"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_jud88"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_helb2"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aiamu"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jud88"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_jylfl"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_aiamu"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_b76ab"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_jylfl"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ik67b"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b76ab"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_nnp8g"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_ik67b"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_s0t7q"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_nnp8g"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3gjk0"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s0t7q"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_x1xp7"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_3gjk0"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_8bbku"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_x1xp7"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p2jve"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8bbku"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_evv0e"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_p2jve"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_7xtmn"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_evv0e"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0x1mw"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7xtmn"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_dqi2f"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_0x1mw"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_6bd3h"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_dqi2f"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yx3n8"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6bd3h"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_dpl84"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_yx3n8"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_1uj7n"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_dpl84"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6xn15"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1uj7n"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_5rj5x"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_6xn15"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_unx2q"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_5rj5x"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0q6qh"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_unx2q"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_7cxnu"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_0q6qh"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_gcjbi"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_7cxnu"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n3h32"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gcjbi"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_nqdpi"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_n3h32"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_8kqa5"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_nqdpi"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_88yrr"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8kqa5"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_3hnxg"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_88yrr"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ju3o7"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_3hnxg"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yna7a"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ju3o7"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_vk6w5"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_yna7a"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_a43uw"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_vk6w5"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_omskr"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a43uw"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_1vs3c"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_omskr"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_q8u2v"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1vs3c"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6sf3x"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q8u2v"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_wva55"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_6sf3x"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_xxtuf"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_wva55"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ion6u"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xxtuf"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_hwtm6"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_ion6u"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_hu63n"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_hwtm6"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wumyj"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hu63n"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_27op1"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_wumyj"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_254qv"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_27op1"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_avgkm"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_254qv"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_40mun"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_avgkm"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_m8xjp"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_40mun"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5w1q4"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m8xjp"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_daue8"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_5w1q4"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_kreee"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_daue8"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vif8f"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kreee"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_8kukg"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_vif8f"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_g1prh"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_8kukg"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ixvte"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g1prh"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_2oli4"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_ixvte"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_56a34"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_2oli4"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mw5pc"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_56a34"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_1lox0"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_mw5pc"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_gglv4"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1lox0"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m8okj"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gglv4"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_dscc0"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_m8okj"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ldrke"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_dscc0"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6ra1j"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ldrke"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_4p70l"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_6ra1j"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ctxjf"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_4p70l"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7go46"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ctxjf"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_62vk6"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_7go46"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_126hg"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_62vk6"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r3jxj"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_126hg"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_ym5s2"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_r3jxj"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_rk63n"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_ym5s2"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a5bdx"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rk63n"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_dabyr"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_a5bdx"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_3agf4"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_dabyr"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kny20"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3agf4"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_c2msh"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_kny20"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_46gm1"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_c2msh"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8yjf3"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_46gm1"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_raef2"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_8yjf3"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_xahxv"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_raef2"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gtdet"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xahxv"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_bueq0"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_gtdet"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_sxqwy"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_bueq0"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cyfor"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sxqwy"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_64gtx"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_cyfor"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_jy006"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_64gtx"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_q3qgd"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jy006"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_obtuj"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_q3qgd"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_lmmll"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_obtuj"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wvfbh"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lmmll"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_jphah"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_wvfbh"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_8mqy7"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_jphah"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2c73b"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8mqy7"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_aeskb"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_2c73b"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_oodfh"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_aeskb"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5200e"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oodfh"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_8vwem"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_5200e"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_jmyl2"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_8vwem"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n4r4n"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jmyl2"]
+albedo_color = Color(0.77254903, 0.77254903, 0.70980394, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_unk8o"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_n4r4n"]
+top_radius = 0.3
+bottom_radius = 0.3
+height = 96.0
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_1175p"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_unk8o"]
+height = 96.0
+radius = 0.3
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_55q8p"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1175p"]
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_h3qod"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_55q8p"]
+top_radius = 16.0
+bottom_radius = 16.0
+height = 5.0
+radial_segments = 40
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_f2vrm"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h3qod"]
+transparency = 1
+albedo_color = Color(0.48, 0.7, 0.72, 0.27)
+roughness = 0.32
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_f2vrm"]
+top_radius = 16.0
+bottom_radius = 16.0
+height = 4.5
+radial_segments = 40
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_use75"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_f8uw0"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_f8uw0"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_cjo7l"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_cjo7l"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jnr0g"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_g32c5"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_g32c5"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_trepx"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_trepx"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gxe0g"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_sf0e3"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_sf0e3"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_xm67f"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_xm67f"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vhmac"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_m03u7"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_m03u7"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_dgpk0"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_dgpk0"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ueqsy"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_cy105"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_cy105"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_urqgi"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_urqgi"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a53k1"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_gkjc4"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_gkjc4"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_yvaxu"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_yvaxu"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fufl0"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_7q5da"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_7q5da"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_wqu4e"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_wqu4e"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1wxa1"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_cqpti"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_cqpti"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_bmbc4"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_bmbc4"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tti4n"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_ivyb4"]
-size = Vector3(32, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_ivyb4"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_5ryui"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_5ryui"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ylwpt"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_wgexl"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_wgexl"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_8v6is"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_8v6is"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xjjoh"]
-albedo_color = Color(0.5294118, 0.42745098, 0.3137255, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_ae1j0"]
-size = Vector3(26, 1.05, 0.12)
+[sub_resource type="CylinderMesh" id="CylinderMesh_ae1j0"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_f58l7"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_f58l7"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_58ocx"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_u6ff0"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_u6ff0"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_m7dfv"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_m7dfv"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lrqo4"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_beqjg"]
-size = Vector3(2.4, 0.3, 26)
+[sub_resource type="CylinderMesh" id="CylinderMesh_beqjg"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_q4eqx"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_q4eqx"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_v7n2c"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_ofjl0"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_ofjl0"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_crfrq"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_crfrq"]
+height = 4.5
+radius = 0.12
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bvlvb"]
-albedo_color = Color(0.7882353, 0.7254902, 0.6156863, 1)
+albedo_color = Color(0.6627451, 0.5411765, 0.39607844, 1)
 roughness = 0.92
 
-[sub_resource type="BoxMesh" id="BoxMesh_6lt4p"]
-size = Vector3(32, 0.3, 2.4)
+[sub_resource type="CylinderMesh" id="CylinderMesh_6lt4p"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 4.5
+radial_segments = 12
 
-[node name="MoyCell_05_02_Part_02" type="Node3D" unique_id=2043868476]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_wi50j"]
+height = 4.5
+radius = 0.12
 
-[node name="Building_1_GrandHotel_Part_01" type="Node3D" parent="." unique_id=78439682]
+[node name="MoyCell_05_02_Part_02" type="Node3D" unique_id=2053440391]
+
+[node name="Building_1_GrandHotel_Part_02" type="Node3D" parent="." unique_id=1845178084]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -457, -60, -68)
 
-[node name="@StaticBody3D@960" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=2094489060]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 16, 19.075, 6.6000004)
+[node name="HotelTowerRib_03" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1330135846]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.36717, 48, -9.698612)
 
-[node name="@CollisionShape3D@958" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@960" unique_id=1710568206]
-shape = SubResource("BoxShape3D_ktnjg")
+[node name="@MeshInstance3D@943" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_03" unique_id=47633310]
+material_override = SubResource("StandardMaterial3D_ktnjg")
+mesh = SubResource("CylinderMesh_kobgp")
 
-[node name="@MeshInstance3D@959" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@960" unique_id=302374463]
-material_override = SubResource("StandardMaterial3D_kobgp")
-mesh = SubResource("BoxMesh_krjwh")
+[node name="@CollisionShape3D@944" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_03" unique_id=2135802038]
+shape = SubResource("CylinderShape3D_krjwh")
 
-[node name="HotelGallerySide_04_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=257302311]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.2, 21.1, 7.4)
+[node name="HotelTowerRib_04" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1798583825]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.229156, 48, -7.841541)
 
-[node name="@CollisionShape3D@961" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_04_-1" unique_id=456149738]
-shape = SubResource("BoxShape3D_rco8w")
+[node name="@MeshInstance3D@945" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_04" unique_id=662915479]
+material_override = SubResource("StandardMaterial3D_rco8w")
+mesh = SubResource("CylinderMesh_vvyay")
 
-[node name="@MeshInstance3D@962" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_04_-1" unique_id=2050717633]
-material_override = SubResource("StandardMaterial3D_vvyay")
-mesh = SubResource("BoxMesh_gou80")
+[node name="@CollisionShape3D@946" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_04" unique_id=1391241495]
+shape = SubResource("CylinderShape3D_gou80")
 
-[node name="HotelGallerySide_04_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1002313113]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.2, 21.1, 7.4)
+[node name="HotelTowerRib_05" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1770202618]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.814642, 48, -6.185358)
 
-[node name="@CollisionShape3D@963" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_04_1" unique_id=420540866]
-shape = SubResource("BoxShape3D_7py5e")
+[node name="@MeshInstance3D@947" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_05" unique_id=918052909]
+material_override = SubResource("StandardMaterial3D_7py5e")
+mesh = SubResource("CylinderMesh_8jvnp")
 
-[node name="@MeshInstance3D@964" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_04_1" unique_id=154215891]
-material_override = SubResource("StandardMaterial3D_8jvnp")
-mesh = SubResource("BoxMesh_helb2")
+[node name="@CollisionShape3D@948" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_05" unique_id=1888262435]
+shape = SubResource("CylinderShape3D_helb2")
 
-[node name="HotelGalleryEnd_04_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1458657278]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 21.1, -6.8)
+[node name="HotelTowerRib_06" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=97905625]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.15846, 48, -4.770844)
 
-[node name="@CollisionShape3D@965" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_04_-1" unique_id=1490822666]
-shape = SubResource("BoxShape3D_jud88")
+[node name="@MeshInstance3D@949" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_06" unique_id=1175852151]
+material_override = SubResource("StandardMaterial3D_jud88")
+mesh = SubResource("CylinderMesh_aiamu")
 
-[node name="@MeshInstance3D@966" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_04_-1" unique_id=2047540988]
-material_override = SubResource("StandardMaterial3D_aiamu")
-mesh = SubResource("BoxMesh_jylfl")
+[node name="@CollisionShape3D@950" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_06" unique_id=106724459]
+shape = SubResource("CylinderShape3D_jylfl")
 
-[node name="HotelGalleryEnd_04_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1972557261]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 21.1, 21.6)
+[node name="HotelTowerRib_07" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1825852851]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3013883, 48, -3.6328294)
 
-[node name="@CollisionShape3D@967" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_04_1" unique_id=1557403342]
-shape = SubResource("BoxShape3D_b76ab")
+[node name="@MeshInstance3D@951" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_07" unique_id=1423982939]
+material_override = SubResource("StandardMaterial3D_b76ab")
+mesh = SubResource("CylinderMesh_ik67b")
 
-[node name="@MeshInstance3D@968" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_04_1" unique_id=943683875]
-material_override = SubResource("StandardMaterial3D_ik67b")
-mesh = SubResource("BoxMesh_nnp8g")
+[node name="@CollisionShape3D@952" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_07" unique_id=1813369403]
+shape = SubResource("CylinderShape3D_nnp8g")
 
-[node name="HotelGalleryVoidRail_04" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=2117279236]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22.325, -5.6)
+[node name="HotelTowerRib_08" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=33748061]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.289156, 48, -2.7993355)
 
-[node name="@CollisionShape3D@969" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_04" unique_id=1922909843]
-shape = SubResource("BoxShape3D_s0t7q")
+[node name="@MeshInstance3D@953" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_08" unique_id=550875349]
+material_override = SubResource("StandardMaterial3D_s0t7q")
+mesh = SubResource("CylinderMesh_3gjk0")
 
-[node name="@MeshInstance3D@970" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_04" unique_id=1225869413]
-material_override = SubResource("StandardMaterial3D_3gjk0")
-mesh = SubResource("BoxMesh_x1xp7")
+[node name="@CollisionShape3D@954" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_08" unique_id=1507034819]
+shape = SubResource("CylinderShape3D_x1xp7")
 
-[node name="@StaticBody3D@973" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1952797998]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 22.325, 20.4)
+[node name="HotelTowerRib_09" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=903146476]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1713104, 48, -2.290886)
 
-[node name="@CollisionShape3D@971" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@973" unique_id=2072906182]
-shape = SubResource("BoxShape3D_8bbku")
+[node name="@MeshInstance3D@955" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_09" unique_id=1137834628]
+material_override = SubResource("StandardMaterial3D_8bbku")
+mesh = SubResource("CylinderMesh_p2jve")
 
-[node name="@MeshInstance3D@972" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@973" unique_id=86418013]
-material_override = SubResource("StandardMaterial3D_p2jve")
-mesh = SubResource("BoxMesh_evv0e")
+[node name="@CollisionShape3D@956" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_09" unique_id=400624066]
+shape = SubResource("CylinderShape3D_evv0e")
 
-[node name="@StaticBody3D@976" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1010083337]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -16, 22.325, 7.3999996)
+[node name="HotelTowerRib_10" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1112351403]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.4990487e-16, 48, -2.12)
 
-[node name="@CollisionShape3D@974" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@976" unique_id=1702015647]
-shape = SubResource("BoxShape3D_7xtmn")
+[node name="@MeshInstance3D@957" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_10" unique_id=649267732]
+material_override = SubResource("StandardMaterial3D_7xtmn")
+mesh = SubResource("CylinderMesh_0x1mw")
 
-[node name="@MeshInstance3D@975" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@976" unique_id=1803090347]
-material_override = SubResource("StandardMaterial3D_0x1mw")
-mesh = SubResource("BoxMesh_dqi2f")
+[node name="@CollisionShape3D@958" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_10" unique_id=1451504687]
+shape = SubResource("CylinderShape3D_dqi2f")
 
-[node name="@StaticBody3D@979" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1157952782]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 16, 22.325, 7.3999996)
+[node name="HotelTowerRib_11" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=841692550]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1713104, 48, -2.290886)
 
-[node name="@CollisionShape3D@977" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@979" unique_id=1665918913]
-shape = SubResource("BoxShape3D_6bd3h")
+[node name="@MeshInstance3D@959" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_11" unique_id=567664726]
+material_override = SubResource("StandardMaterial3D_6bd3h")
+mesh = SubResource("CylinderMesh_yx3n8")
 
-[node name="@MeshInstance3D@978" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@979" unique_id=1884455728]
-material_override = SubResource("StandardMaterial3D_yx3n8")
-mesh = SubResource("BoxMesh_dpl84")
+[node name="@CollisionShape3D@960" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_11" unique_id=1833481986]
+shape = SubResource("CylinderShape3D_dpl84")
 
-[node name="HotelGallerySide_05_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1545512122]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.2, 24.35, 8.2)
+[node name="HotelTowerRib_12" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=273404214]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.289156, 48, -2.7993355)
 
-[node name="@CollisionShape3D@980" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_05_-1" unique_id=771312812]
-shape = SubResource("BoxShape3D_1uj7n")
+[node name="@MeshInstance3D@961" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_12" unique_id=1595157222]
+material_override = SubResource("StandardMaterial3D_1uj7n")
+mesh = SubResource("CylinderMesh_6xn15")
 
-[node name="@MeshInstance3D@981" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_05_-1" unique_id=534771894]
-material_override = SubResource("StandardMaterial3D_6xn15")
-mesh = SubResource("BoxMesh_5rj5x")
+[node name="@CollisionShape3D@962" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_12" unique_id=626551224]
+shape = SubResource("CylinderShape3D_5rj5x")
 
-[node name="HotelGallerySide_05_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=2058891737]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.2, 24.35, 8.2)
+[node name="HotelTowerRib_13" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=279408656]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3013883, 48, -3.6328294)
 
-[node name="@CollisionShape3D@982" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_05_1" unique_id=800132530]
-shape = SubResource("BoxShape3D_unx2q")
+[node name="@MeshInstance3D@963" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_13" unique_id=1110456301]
+material_override = SubResource("StandardMaterial3D_unx2q")
+mesh = SubResource("CylinderMesh_0q6qh")
 
-[node name="@MeshInstance3D@983" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_05_1" unique_id=460217626]
-material_override = SubResource("StandardMaterial3D_0q6qh")
-mesh = SubResource("BoxMesh_7cxnu")
+[node name="@CollisionShape3D@964" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_13" unique_id=799000318]
+shape = SubResource("CylinderShape3D_7cxnu")
 
-[node name="HotelGalleryEnd_05_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1856762320]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 24.35, -6)
+[node name="HotelTowerRib_14" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=909374699]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.15846, 48, -4.770844)
 
-[node name="@CollisionShape3D@984" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_05_-1" unique_id=888614000]
-shape = SubResource("BoxShape3D_gcjbi")
+[node name="@MeshInstance3D@965" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_14" unique_id=952156774]
+material_override = SubResource("StandardMaterial3D_gcjbi")
+mesh = SubResource("CylinderMesh_n3h32")
 
-[node name="@MeshInstance3D@985" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_05_-1" unique_id=693916614]
-material_override = SubResource("StandardMaterial3D_n3h32")
-mesh = SubResource("BoxMesh_nqdpi")
+[node name="@CollisionShape3D@966" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_14" unique_id=233534609]
+shape = SubResource("CylinderShape3D_nqdpi")
 
-[node name="HotelGalleryEnd_05_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1738609571]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 24.35, 22.4)
+[node name="HotelTowerRib_15" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1439153377]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.814642, 48, -6.185358)
 
-[node name="@CollisionShape3D@986" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_05_1" unique_id=265721950]
-shape = SubResource("BoxShape3D_8kqa5")
+[node name="@MeshInstance3D@967" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_15" unique_id=1559772341]
+material_override = SubResource("StandardMaterial3D_8kqa5")
+mesh = SubResource("CylinderMesh_88yrr")
 
-[node name="@MeshInstance3D@987" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_05_1" unique_id=235043318]
-material_override = SubResource("StandardMaterial3D_88yrr")
-mesh = SubResource("BoxMesh_3hnxg")
+[node name="@CollisionShape3D@968" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_15" unique_id=597890188]
+shape = SubResource("CylinderShape3D_3hnxg")
 
-[node name="HotelGalleryVoidRail_05" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=252244081]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 25.575, -4.8)
+[node name="HotelTowerRib_16" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1073783426]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.229156, 48, -7.841541)
 
-[node name="@CollisionShape3D@988" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_05" unique_id=844180105]
-shape = SubResource("BoxShape3D_ju3o7")
+[node name="@MeshInstance3D@969" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_16" unique_id=140762600]
+material_override = SubResource("StandardMaterial3D_ju3o7")
+mesh = SubResource("CylinderMesh_yna7a")
 
-[node name="@MeshInstance3D@989" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_05" unique_id=639213909]
-material_override = SubResource("StandardMaterial3D_yna7a")
-mesh = SubResource("BoxMesh_vk6w5")
+[node name="@CollisionShape3D@970" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_16" unique_id=1154240486]
+shape = SubResource("CylinderShape3D_vk6w5")
 
-[node name="@StaticBody3D@992" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=809420078]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 25.575, 21.2)
+[node name="HotelTowerRib_17" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=431275945]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.36717, 48, -9.698612)
 
-[node name="@CollisionShape3D@990" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@992" unique_id=887557893]
-shape = SubResource("BoxShape3D_a43uw")
+[node name="@MeshInstance3D@971" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_17" unique_id=1384502438]
+material_override = SubResource("StandardMaterial3D_a43uw")
+mesh = SubResource("CylinderMesh_omskr")
 
-[node name="@MeshInstance3D@991" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@992" unique_id=1393679296]
-material_override = SubResource("StandardMaterial3D_omskr")
-mesh = SubResource("BoxMesh_1vs3c")
+[node name="@CollisionShape3D@972" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_17" unique_id=609024359]
+shape = SubResource("CylinderShape3D_1vs3c")
 
-[node name="@StaticBody3D@995" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=476073770]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -16, 25.575, 8.200001)
+[node name="HotelTowerRib_18" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=148399308]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.2006645, 48, -11.710844)
 
-[node name="@CollisionShape3D@993" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@995" unique_id=428552336]
-shape = SubResource("BoxShape3D_q8u2v")
+[node name="@MeshInstance3D@973" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_18" unique_id=924514902]
+material_override = SubResource("StandardMaterial3D_q8u2v")
+mesh = SubResource("CylinderMesh_6sf3x")
 
-[node name="@MeshInstance3D@994" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@995" unique_id=170824466]
-material_override = SubResource("StandardMaterial3D_6sf3x")
-mesh = SubResource("BoxMesh_wva55")
+[node name="@CollisionShape3D@974" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_18" unique_id=365319925]
+shape = SubResource("CylinderShape3D_wva55")
 
-[node name="@StaticBody3D@998" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1233906878]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 16, 25.575, 8.200001)
+[node name="HotelTowerRib_19" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1070764182]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.709114, 48, -13.82869)
 
-[node name="@CollisionShape3D@996" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@998" unique_id=1960716170]
-shape = SubResource("BoxShape3D_xxtuf")
+[node name="@MeshInstance3D@975" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_19" unique_id=1480237116]
+material_override = SubResource("StandardMaterial3D_xxtuf")
+mesh = SubResource("CylinderMesh_ion6u")
 
-[node name="@MeshInstance3D@997" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@998" unique_id=519500327]
-material_override = SubResource("StandardMaterial3D_ion6u")
-mesh = SubResource("BoxMesh_hwtm6")
+[node name="@CollisionShape3D@976" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_19" unique_id=410852956]
+shape = SubResource("CylinderShape3D_hwtm6")
 
-[node name="HotelGallerySide_06_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1041084644]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.2, 27.6, 9)
+[node name="HotelTowerRib_20" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=443870524]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.88, 48, -16)
 
-[node name="@CollisionShape3D@999" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_06_-1" unique_id=1386649668]
-shape = SubResource("BoxShape3D_hu63n")
+[node name="@MeshInstance3D@977" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_20" unique_id=1017638730]
+material_override = SubResource("StandardMaterial3D_hu63n")
+mesh = SubResource("CylinderMesh_wumyj")
 
-[node name="@MeshInstance3D@1000" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_06_-1" unique_id=967709479]
-material_override = SubResource("StandardMaterial3D_wumyj")
-mesh = SubResource("BoxMesh_27op1")
+[node name="@CollisionShape3D@978" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_20" unique_id=429596508]
+shape = SubResource("CylinderShape3D_27op1")
 
-[node name="HotelGallerySide_06_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=99897919]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.2, 27.6, 9)
+[node name="HotelTowerRib_21" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=665632917]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.709114, 48, -18.17131)
 
-[node name="@CollisionShape3D@1001" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_06_1" unique_id=339196550]
-shape = SubResource("BoxShape3D_254qv")
+[node name="@MeshInstance3D@979" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_21" unique_id=1009313333]
+material_override = SubResource("StandardMaterial3D_254qv")
+mesh = SubResource("CylinderMesh_avgkm")
 
-[node name="@MeshInstance3D@1002" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_06_1" unique_id=1136542686]
-material_override = SubResource("StandardMaterial3D_avgkm")
-mesh = SubResource("BoxMesh_40mun")
+[node name="@CollisionShape3D@980" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_21" unique_id=2147108868]
+shape = SubResource("CylinderShape3D_40mun")
 
-[node name="HotelGalleryEnd_06_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=293086195]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 27.6, -5.2)
+[node name="HotelTowerRib_22" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=636092506]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.2006645, 48, -20.289156)
 
-[node name="@CollisionShape3D@1003" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_06_-1" unique_id=1205868206]
-shape = SubResource("BoxShape3D_m8xjp")
+[node name="@MeshInstance3D@981" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_22" unique_id=132829920]
+material_override = SubResource("StandardMaterial3D_m8xjp")
+mesh = SubResource("CylinderMesh_5w1q4")
 
-[node name="@MeshInstance3D@1004" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_06_-1" unique_id=1207711566]
-material_override = SubResource("StandardMaterial3D_5w1q4")
-mesh = SubResource("BoxMesh_daue8")
+[node name="@CollisionShape3D@982" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_22" unique_id=384668779]
+shape = SubResource("CylinderShape3D_daue8")
 
-[node name="HotelGalleryEnd_06_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=297763419]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 27.6, 23.2)
+[node name="HotelTowerRib_23" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=840406590]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.36717, 48, -22.301388)
 
-[node name="@CollisionShape3D@1005" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_06_1" unique_id=1578078347]
-shape = SubResource("BoxShape3D_kreee")
+[node name="@MeshInstance3D@983" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_23" unique_id=671261419]
+material_override = SubResource("StandardMaterial3D_kreee")
+mesh = SubResource("CylinderMesh_vif8f")
 
-[node name="@MeshInstance3D@1006" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_06_1" unique_id=122766293]
-material_override = SubResource("StandardMaterial3D_vif8f")
-mesh = SubResource("BoxMesh_8kukg")
+[node name="@CollisionShape3D@984" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_23" unique_id=465332041]
+shape = SubResource("CylinderShape3D_8kukg")
 
-[node name="HotelGalleryVoidRail_06" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=2131868568]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 28.825, -4)
+[node name="HotelTowerRib_24" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=232285138]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.229156, 48, -24.158459)
 
-[node name="@CollisionShape3D@1007" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_06" unique_id=1901446497]
-shape = SubResource("BoxShape3D_g1prh")
+[node name="@MeshInstance3D@985" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_24" unique_id=591788405]
+material_override = SubResource("StandardMaterial3D_g1prh")
+mesh = SubResource("CylinderMesh_ixvte")
 
-[node name="@MeshInstance3D@1008" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_06" unique_id=570142265]
-material_override = SubResource("StandardMaterial3D_ixvte")
-mesh = SubResource("BoxMesh_2oli4")
+[node name="@CollisionShape3D@986" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_24" unique_id=171638530]
+shape = SubResource("CylinderShape3D_2oli4")
 
-[node name="@StaticBody3D@1011" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1493420820]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 28.825, 22)
+[node name="HotelTowerRib_25" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=408780819]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.814642, 48, -25.814642)
 
-[node name="@CollisionShape3D@1009" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1011" unique_id=779924638]
-shape = SubResource("BoxShape3D_56a34")
+[node name="@MeshInstance3D@987" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_25" unique_id=1533422782]
+material_override = SubResource("StandardMaterial3D_56a34")
+mesh = SubResource("CylinderMesh_mw5pc")
 
-[node name="@MeshInstance3D@1010" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1011" unique_id=1364404065]
-material_override = SubResource("StandardMaterial3D_mw5pc")
-mesh = SubResource("BoxMesh_1lox0")
+[node name="@CollisionShape3D@988" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_25" unique_id=525844453]
+shape = SubResource("CylinderShape3D_1lox0")
 
-[node name="@StaticBody3D@1014" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=113085908]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -16, 28.825, 9)
+[node name="HotelTowerRib_26" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1310328595]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.15846, 48, -27.229156)
 
-[node name="@CollisionShape3D@1012" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1014" unique_id=1970023247]
-shape = SubResource("BoxShape3D_gglv4")
+[node name="@MeshInstance3D@989" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_26" unique_id=86379456]
+material_override = SubResource("StandardMaterial3D_gglv4")
+mesh = SubResource("CylinderMesh_m8okj")
 
-[node name="@MeshInstance3D@1013" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1014" unique_id=989912076]
-material_override = SubResource("StandardMaterial3D_m8okj")
-mesh = SubResource("BoxMesh_dscc0")
+[node name="@CollisionShape3D@990" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_26" unique_id=185717047]
+shape = SubResource("CylinderShape3D_dscc0")
 
-[node name="@StaticBody3D@1017" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1538756743]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 16, 28.825, 9)
+[node name="HotelTowerRib_27" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1627814299]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3013883, 48, -28.36717)
 
-[node name="@CollisionShape3D@1015" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1017" unique_id=1213485276]
-shape = SubResource("BoxShape3D_ldrke")
+[node name="@MeshInstance3D@991" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_27" unique_id=607881273]
+material_override = SubResource("StandardMaterial3D_ldrke")
+mesh = SubResource("CylinderMesh_6ra1j")
 
-[node name="@MeshInstance3D@1016" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1017" unique_id=1027994377]
-material_override = SubResource("StandardMaterial3D_6ra1j")
-mesh = SubResource("BoxMesh_4p70l")
+[node name="@CollisionShape3D@992" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_27" unique_id=159465892]
+shape = SubResource("CylinderShape3D_4p70l")
 
-[node name="HotelGallerySide_07_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=209804158]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.2, 30.85, 9.8)
+[node name="HotelTowerRib_28" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=320456215]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.289156, 48, -29.200665)
 
-[node name="@CollisionShape3D@1018" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_07_-1" unique_id=1282234466]
-shape = SubResource("BoxShape3D_ctxjf")
+[node name="@MeshInstance3D@993" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_28" unique_id=1319995404]
+material_override = SubResource("StandardMaterial3D_ctxjf")
+mesh = SubResource("CylinderMesh_7go46")
 
-[node name="@MeshInstance3D@1019" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_07_-1" unique_id=2030326598]
-material_override = SubResource("StandardMaterial3D_7go46")
-mesh = SubResource("BoxMesh_62vk6")
+[node name="@CollisionShape3D@994" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_28" unique_id=36997635]
+shape = SubResource("CylinderShape3D_62vk6")
 
-[node name="HotelGallerySide_07_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=95219147]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.2, 30.85, 9.8)
+[node name="HotelTowerRib_29" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=744582462]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1713104, 48, -29.709114)
 
-[node name="@CollisionShape3D@1020" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_07_1" unique_id=347396301]
-shape = SubResource("BoxShape3D_126hg")
+[node name="@MeshInstance3D@995" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_29" unique_id=984845272]
+material_override = SubResource("StandardMaterial3D_126hg")
+mesh = SubResource("CylinderMesh_r3jxj")
 
-[node name="@MeshInstance3D@1021" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_07_1" unique_id=101331455]
-material_override = SubResource("StandardMaterial3D_r3jxj")
-mesh = SubResource("BoxMesh_ym5s2")
+[node name="@CollisionShape3D@996" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_29" unique_id=290681360]
+shape = SubResource("CylinderShape3D_ym5s2")
 
-[node name="HotelGalleryEnd_07_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1116983607]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.85, -4.4)
+[node name="HotelTowerRib_30" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=801290968]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5497146e-15, 48, -29.88)
 
-[node name="@CollisionShape3D@1022" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_07_-1" unique_id=1491279153]
-shape = SubResource("BoxShape3D_rk63n")
+[node name="@MeshInstance3D@997" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_30" unique_id=705093433]
+material_override = SubResource("StandardMaterial3D_rk63n")
+mesh = SubResource("CylinderMesh_a5bdx")
 
-[node name="@MeshInstance3D@1023" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_07_-1" unique_id=1496431378]
-material_override = SubResource("StandardMaterial3D_a5bdx")
-mesh = SubResource("BoxMesh_dabyr")
+[node name="@CollisionShape3D@998" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_30" unique_id=1112168757]
+shape = SubResource("CylinderShape3D_dabyr")
 
-[node name="HotelGalleryEnd_07_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=596255065]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.85, 24)
+[node name="HotelTowerRib_31" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1830964745]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1713104, 48, -29.709114)
 
-[node name="@CollisionShape3D@1024" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_07_1" unique_id=2062996453]
-shape = SubResource("BoxShape3D_3agf4")
+[node name="@MeshInstance3D@999" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_31" unique_id=279487798]
+material_override = SubResource("StandardMaterial3D_3agf4")
+mesh = SubResource("CylinderMesh_kny20")
 
-[node name="@MeshInstance3D@1025" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_07_1" unique_id=1045074611]
-material_override = SubResource("StandardMaterial3D_kny20")
-mesh = SubResource("BoxMesh_c2msh")
+[node name="@CollisionShape3D@1000" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_31" unique_id=824590360]
+shape = SubResource("CylinderShape3D_c2msh")
 
-[node name="HotelGalleryVoidRail_07" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=810268751]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 32.075, -3.2)
+[node name="HotelTowerRib_32" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=2134362673]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.289156, 48, -29.200665)
 
-[node name="@CollisionShape3D@1026" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_07" unique_id=1183999528]
-shape = SubResource("BoxShape3D_46gm1")
+[node name="@MeshInstance3D@1001" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_32" unique_id=1860570421]
+material_override = SubResource("StandardMaterial3D_46gm1")
+mesh = SubResource("CylinderMesh_8yjf3")
 
-[node name="@MeshInstance3D@1027" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_07" unique_id=995968021]
-material_override = SubResource("StandardMaterial3D_8yjf3")
-mesh = SubResource("BoxMesh_raef2")
+[node name="@CollisionShape3D@1002" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_32" unique_id=779106636]
+shape = SubResource("CylinderShape3D_raef2")
 
-[node name="@StaticBody3D@1030" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1348402845]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 32.075, 22.8)
+[node name="HotelTowerRib_33" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=692580326]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3013883, 48, -28.36717)
 
-[node name="@CollisionShape3D@1028" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1030" unique_id=1703436275]
-shape = SubResource("BoxShape3D_xahxv")
+[node name="@MeshInstance3D@1003" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_33" unique_id=458847005]
+material_override = SubResource("StandardMaterial3D_xahxv")
+mesh = SubResource("CylinderMesh_gtdet")
 
-[node name="@MeshInstance3D@1029" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1030" unique_id=2103543845]
-material_override = SubResource("StandardMaterial3D_gtdet")
-mesh = SubResource("BoxMesh_bueq0")
+[node name="@CollisionShape3D@1004" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_33" unique_id=522918255]
+shape = SubResource("CylinderShape3D_bueq0")
 
-[node name="@StaticBody3D@1033" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=2004602263]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -16, 32.075, 9.799999)
+[node name="HotelTowerRib_34" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=943957880]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.15846, 48, -27.229156)
 
-[node name="@CollisionShape3D@1031" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1033" unique_id=269685493]
-shape = SubResource("BoxShape3D_sxqwy")
+[node name="@MeshInstance3D@1005" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_34" unique_id=1933038485]
+material_override = SubResource("StandardMaterial3D_sxqwy")
+mesh = SubResource("CylinderMesh_cyfor")
 
-[node name="@MeshInstance3D@1032" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1033" unique_id=1700644729]
-material_override = SubResource("StandardMaterial3D_cyfor")
-mesh = SubResource("BoxMesh_64gtx")
+[node name="@CollisionShape3D@1006" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_34" unique_id=300169312]
+shape = SubResource("CylinderShape3D_64gtx")
 
-[node name="@StaticBody3D@1036" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1542199358]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 16, 32.075, 9.799999)
+[node name="HotelTowerRib_35" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=2133246572]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.814642, 48, -25.814642)
 
-[node name="@CollisionShape3D@1034" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1036" unique_id=2055506440]
-shape = SubResource("BoxShape3D_jy006")
+[node name="@MeshInstance3D@1007" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_35" unique_id=1261788653]
+material_override = SubResource("StandardMaterial3D_jy006")
+mesh = SubResource("CylinderMesh_q3qgd")
 
-[node name="@MeshInstance3D@1035" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1036" unique_id=2113173226]
-material_override = SubResource("StandardMaterial3D_q3qgd")
-mesh = SubResource("BoxMesh_obtuj")
+[node name="@CollisionShape3D@1008" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_35" unique_id=1588922969]
+shape = SubResource("CylinderShape3D_obtuj")
 
-[node name="HotelGallerySide_08_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1925252460]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.2, 34.1, 10.6)
+[node name="HotelTowerRib_36" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=655199136]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.229156, 48, -24.158459)
 
-[node name="@CollisionShape3D@1037" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_08_-1" unique_id=418049521]
-shape = SubResource("BoxShape3D_lmmll")
+[node name="@MeshInstance3D@1009" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_36" unique_id=1333287475]
+material_override = SubResource("StandardMaterial3D_lmmll")
+mesh = SubResource("CylinderMesh_wvfbh")
 
-[node name="@MeshInstance3D@1038" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_08_-1" unique_id=407429667]
-material_override = SubResource("StandardMaterial3D_wvfbh")
-mesh = SubResource("BoxMesh_jphah")
+[node name="@CollisionShape3D@1010" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_36" unique_id=92958225]
+shape = SubResource("CylinderShape3D_jphah")
 
-[node name="HotelGallerySide_08_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=333561683]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.2, 34.1, 10.6)
+[node name="HotelTowerRib_37" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=350646834]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.36717, 48, -22.301388)
 
-[node name="@CollisionShape3D@1039" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_08_1" unique_id=2099393814]
-shape = SubResource("BoxShape3D_8mqy7")
+[node name="@MeshInstance3D@1011" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_37" unique_id=346649665]
+material_override = SubResource("StandardMaterial3D_8mqy7")
+mesh = SubResource("CylinderMesh_2c73b")
 
-[node name="@MeshInstance3D@1040" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_08_1" unique_id=630359849]
-material_override = SubResource("StandardMaterial3D_2c73b")
-mesh = SubResource("BoxMesh_aeskb")
+[node name="@CollisionShape3D@1012" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_37" unique_id=383635664]
+shape = SubResource("CylinderShape3D_aeskb")
 
-[node name="HotelGalleryEnd_08_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1340822179]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 34.1, -3.6)
+[node name="HotelTowerRib_38" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1437776085]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.2006645, 48, -20.289156)
 
-[node name="@CollisionShape3D@1041" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_08_-1" unique_id=1676325942]
-shape = SubResource("BoxShape3D_oodfh")
+[node name="@MeshInstance3D@1013" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_38" unique_id=730765718]
+material_override = SubResource("StandardMaterial3D_oodfh")
+mesh = SubResource("CylinderMesh_5200e")
 
-[node name="@MeshInstance3D@1042" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_08_-1" unique_id=251755739]
-material_override = SubResource("StandardMaterial3D_5200e")
-mesh = SubResource("BoxMesh_8vwem")
+[node name="@CollisionShape3D@1014" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_38" unique_id=337653946]
+shape = SubResource("CylinderShape3D_8vwem")
 
-[node name="HotelGalleryEnd_08_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=648530206]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 34.1, 24.8)
+[node name="HotelTowerRib_39" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1351298496]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.709114, 48, -18.17131)
 
-[node name="@CollisionShape3D@1043" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_08_1" unique_id=37574209]
-shape = SubResource("BoxShape3D_jmyl2")
+[node name="@MeshInstance3D@1015" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_39" unique_id=1470317921]
+material_override = SubResource("StandardMaterial3D_jmyl2")
+mesh = SubResource("CylinderMesh_n4r4n")
 
-[node name="@MeshInstance3D@1044" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_08_1" unique_id=1085585644]
-material_override = SubResource("StandardMaterial3D_n4r4n")
-mesh = SubResource("BoxMesh_unk8o")
+[node name="@CollisionShape3D@1016" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelTowerRib_39" unique_id=1021641722]
+shape = SubResource("CylinderShape3D_unk8o")
 
-[node name="HotelGalleryVoidRail_08" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=589127150]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 35.325, -2.4)
+[node name="HotelTankDrum" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02" unique_id=2026495410]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 98.5, -16)
+material_override = SubResource("StandardMaterial3D_1175p")
+mesh = SubResource("CylinderMesh_55q8p")
 
-[node name="@CollisionShape3D@1045" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_08" unique_id=297175037]
-shape = SubResource("BoxShape3D_1175p")
+[node name="HotelWindroseGlazing" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02" unique_id=1744469871]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 103.25, -16)
+material_override = SubResource("StandardMaterial3D_h3qod")
+mesh = SubResource("CylinderMesh_f2vrm")
 
-[node name="@MeshInstance3D@1046" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_08" unique_id=1438384586]
-material_override = SubResource("StandardMaterial3D_55q8p")
-mesh = SubResource("BoxMesh_h3qod")
+[node name="HotelWindroseMullion_00" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1945904486]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.88, 103.25, -16)
 
-[node name="@StaticBody3D@1049" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=871253178]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 35.325, 23.6)
-
-[node name="@CollisionShape3D@1047" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1049" unique_id=318027098]
-shape = SubResource("BoxShape3D_f2vrm")
-
-[node name="@MeshInstance3D@1048" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1049" unique_id=1720339313]
+[node name="@MeshInstance3D@1017" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_00" unique_id=19952563]
 material_override = SubResource("StandardMaterial3D_use75")
-mesh = SubResource("BoxMesh_f8uw0")
+mesh = SubResource("CylinderMesh_f8uw0")
 
-[node name="@StaticBody3D@1052" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1446457198]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -16, 35.325, 10.6)
+[node name="@CollisionShape3D@1018" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_00" unique_id=159518658]
+shape = SubResource("CylinderShape3D_cjo7l")
 
-[node name="@CollisionShape3D@1050" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1052" unique_id=11651157]
-shape = SubResource("BoxShape3D_cjo7l")
+[node name="HotelWindroseMullion_01" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1517356603]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.684491, 103.25, -13.5158205)
 
-[node name="@MeshInstance3D@1051" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1052" unique_id=2140050551]
+[node name="@MeshInstance3D@1019" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_01" unique_id=753269730]
 material_override = SubResource("StandardMaterial3D_jnr0g")
-mesh = SubResource("BoxMesh_g32c5")
+mesh = SubResource("CylinderMesh_g32c5")
 
-[node name="@StaticBody3D@1055" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1340603205]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 16, 35.325, 10.6)
+[node name="@CollisionShape3D@1020" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_01" unique_id=1786474946]
+shape = SubResource("CylinderShape3D_trepx")
 
-[node name="@CollisionShape3D@1053" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1055" unique_id=438405203]
-shape = SubResource("BoxShape3D_trepx")
+[node name="HotelWindroseMullion_02" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=393137662]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.1027775, 103.25, -11.09281)
 
-[node name="@MeshInstance3D@1054" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1055" unique_id=1858756055]
+[node name="@MeshInstance3D@1021" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_02" unique_id=235492031]
 material_override = SubResource("StandardMaterial3D_gxe0g")
-mesh = SubResource("BoxMesh_sf0e3")
+mesh = SubResource("CylinderMesh_sf0e3")
 
-[node name="HotelGallerySide_09_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1980023879]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.2, 37.35, 11.4)
+[node name="@CollisionShape3D@1022" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_02" unique_id=1801601210]
+shape = SubResource("CylinderShape3D_xm67f")
 
-[node name="@CollisionShape3D@1056" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_09_-1" unique_id=833517232]
-shape = SubResource("BoxShape3D_xm67f")
+[node name="HotelWindroseMullion_03" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=328853740]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.149183, 103.25, -8.790631)
 
-[node name="@MeshInstance3D@1057" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_09_-1" unique_id=127540919]
+[node name="@MeshInstance3D@1023" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_03" unique_id=1504197018]
 material_override = SubResource("StandardMaterial3D_vhmac")
-mesh = SubResource("BoxMesh_m03u7")
+mesh = SubResource("CylinderMesh_m03u7")
 
-[node name="HotelGallerySide_09_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1993219152]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.2, 37.35, 11.4)
+[node name="@CollisionShape3D@1024" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_03" unique_id=643259665]
+shape = SubResource("CylinderShape3D_dgpk0")
 
-[node name="@CollisionShape3D@1058" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_09_1" unique_id=1945525213]
-shape = SubResource("BoxShape3D_dgpk0")
+[node name="HotelWindroseMullion_04" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=771481332]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.84719, 103.25, -6.6659703)
 
-[node name="@MeshInstance3D@1059" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_09_1" unique_id=902378816]
+[node name="@MeshInstance3D@1025" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_04" unique_id=1308598318]
 material_override = SubResource("StandardMaterial3D_ueqsy")
-mesh = SubResource("BoxMesh_cy105")
+mesh = SubResource("CylinderMesh_cy105")
 
-[node name="HotelGalleryEnd_09_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1241676672]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 37.35, -2.8)
+[node name="@CollisionShape3D@1026" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_04" unique_id=1165621320]
+shape = SubResource("CylinderShape3D_urqgi")
 
-[node name="@CollisionShape3D@1060" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_09_-1" unique_id=1748190864]
-shape = SubResource("BoxShape3D_urqgi")
+[node name="HotelWindroseMullion_05" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1711363398]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.228856, 103.25, -4.7711444)
 
-[node name="@MeshInstance3D@1061" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_09_-1" unique_id=1554707676]
+[node name="@MeshInstance3D@1027" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_05" unique_id=1013113575]
 material_override = SubResource("StandardMaterial3D_a53k1")
-mesh = SubResource("BoxMesh_gkjc4")
+mesh = SubResource("CylinderMesh_gkjc4")
 
-[node name="HotelGalleryEnd_09_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1666798319]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 37.35, 25.6)
+[node name="@CollisionShape3D@1028" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_05" unique_id=133043264]
+shape = SubResource("CylinderShape3D_yvaxu")
 
-[node name="@CollisionShape3D@1062" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_09_1" unique_id=1613299729]
-shape = SubResource("BoxShape3D_yvaxu")
+[node name="HotelWindroseMullion_06" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=315242788]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.33403, 103.25, -3.15281)
 
-[node name="@MeshInstance3D@1063" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_09_1" unique_id=1233861297]
+[node name="@MeshInstance3D@1029" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_06" unique_id=1946336463]
 material_override = SubResource("StandardMaterial3D_fufl0")
-mesh = SubResource("BoxMesh_7q5da")
+mesh = SubResource("CylinderMesh_7q5da")
 
-[node name="HotelGalleryVoidRail_09" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=405274846]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 38.575, -1.6)
+[node name="@CollisionShape3D@1030" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_06" unique_id=1460375647]
+shape = SubResource("CylinderShape3D_wqu4e")
 
-[node name="@CollisionShape3D@1064" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_09" unique_id=1413552036]
-shape = SubResource("BoxShape3D_wqu4e")
+[node name="HotelWindroseMullion_07" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=197232148]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.209369, 103.25, -1.8508164)
 
-[node name="@MeshInstance3D@1065" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryVoidRail_09" unique_id=385166161]
+[node name="@MeshInstance3D@1031" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_07" unique_id=1905635597]
 material_override = SubResource("StandardMaterial3D_1wxa1")
-mesh = SubResource("BoxMesh_cqpti")
+mesh = SubResource("CylinderMesh_cqpti")
 
-[node name="@StaticBody3D@1068" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=2019684776]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 38.575, 24.4)
+[node name="@CollisionShape3D@1032" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_07" unique_id=2072570289]
+shape = SubResource("CylinderShape3D_bmbc4")
 
-[node name="@CollisionShape3D@1066" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1068" unique_id=2091025663]
-shape = SubResource("BoxShape3D_bmbc4")
+[node name="HotelWindroseMullion_08" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1500489814]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.90719, 103.25, -0.8972225)
 
-[node name="@MeshInstance3D@1067" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1068" unique_id=1865257370]
+[node name="@MeshInstance3D@1033" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_08" unique_id=1224055315]
 material_override = SubResource("StandardMaterial3D_tti4n")
-mesh = SubResource("BoxMesh_ivyb4")
+mesh = SubResource("CylinderMesh_ivyb4")
 
-[node name="@StaticBody3D@1071" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1741553767]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -16, 38.575, 11.4)
+[node name="@CollisionShape3D@1034" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_08" unique_id=1083668294]
+shape = SubResource("CylinderShape3D_5ryui")
 
-[node name="@CollisionShape3D@1069" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1071" unique_id=1456565953]
-shape = SubResource("BoxShape3D_5ryui")
+[node name="HotelWindroseMullion_09" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=886423848]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4841793, 103.25, -0.31550914)
 
-[node name="@MeshInstance3D@1070" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1071" unique_id=1143500195]
+[node name="@MeshInstance3D@1035" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_09" unique_id=1374599546]
 material_override = SubResource("StandardMaterial3D_ylwpt")
-mesh = SubResource("BoxMesh_wgexl")
+mesh = SubResource("CylinderMesh_wgexl")
 
-[node name="@StaticBody3D@1074" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=377846066]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 16, 38.575, 11.4)
+[node name="@CollisionShape3D@1036" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_09" unique_id=2091311969]
+shape = SubResource("CylinderShape3D_8v6is")
 
-[node name="@CollisionShape3D@1072" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1074" unique_id=1030789801]
-shape = SubResource("BoxShape3D_8v6is")
+[node name="HotelWindroseMullion_10" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=148389317]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.723696e-16, 103.25, -0.12)
 
-[node name="@MeshInstance3D@1073" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/@StaticBody3D@1074" unique_id=110690337]
+[node name="@MeshInstance3D@1037" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_10" unique_id=521554414]
 material_override = SubResource("StandardMaterial3D_xjjoh")
-mesh = SubResource("BoxMesh_ae1j0")
+mesh = SubResource("CylinderMesh_ae1j0")
 
-[node name="HotelGallerySide_10_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1243923078]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.2, 40.6, 12.2)
+[node name="@CollisionShape3D@1038" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_10" unique_id=121794298]
+shape = SubResource("CylinderShape3D_f58l7")
 
-[node name="@CollisionShape3D@1075" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_10_-1" unique_id=1059534256]
-shape = SubResource("BoxShape3D_f58l7")
+[node name="HotelWindroseMullion_11" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=939910885]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4841793, 103.25, -0.31550914)
 
-[node name="@MeshInstance3D@1076" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_10_-1" unique_id=1603805757]
+[node name="@MeshInstance3D@1039" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_11" unique_id=1954456550]
 material_override = SubResource("StandardMaterial3D_58ocx")
-mesh = SubResource("BoxMesh_u6ff0")
+mesh = SubResource("CylinderMesh_u6ff0")
 
-[node name="HotelGallerySide_10_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=2054084773]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.2, 40.6, 12.2)
+[node name="@CollisionShape3D@1040" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_11" unique_id=519962974]
+shape = SubResource("CylinderShape3D_m7dfv")
 
-[node name="@CollisionShape3D@1077" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_10_1" unique_id=788662942]
-shape = SubResource("BoxShape3D_m7dfv")
+[node name="HotelWindroseMullion_12" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=930567670]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.90719, 103.25, -0.8972225)
 
-[node name="@MeshInstance3D@1078" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGallerySide_10_1" unique_id=491332258]
+[node name="@MeshInstance3D@1041" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_12" unique_id=909254886]
 material_override = SubResource("StandardMaterial3D_lrqo4")
-mesh = SubResource("BoxMesh_beqjg")
+mesh = SubResource("CylinderMesh_beqjg")
 
-[node name="HotelGalleryEnd_10_-1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=997834332]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 40.6, -2)
+[node name="@CollisionShape3D@1042" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_12" unique_id=2038838574]
+shape = SubResource("CylinderShape3D_q4eqx")
 
-[node name="@CollisionShape3D@1079" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_10_-1" unique_id=2142911661]
-shape = SubResource("BoxShape3D_q4eqx")
+[node name="HotelWindroseMullion_13" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=1542721812]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.209369, 103.25, -1.8508164)
 
-[node name="@MeshInstance3D@1080" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_10_-1" unique_id=1326648894]
+[node name="@MeshInstance3D@1043" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_13" unique_id=1198430698]
 material_override = SubResource("StandardMaterial3D_v7n2c")
-mesh = SubResource("BoxMesh_ofjl0")
+mesh = SubResource("CylinderMesh_ofjl0")
 
-[node name="HotelGalleryEnd_10_1" type="StaticBody3D" parent="Building_1_GrandHotel_Part_01" unique_id=1199681140]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 40.6, 26.4)
+[node name="@CollisionShape3D@1044" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_13" unique_id=1650920760]
+shape = SubResource("CylinderShape3D_crfrq")
 
-[node name="@CollisionShape3D@1081" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_10_1" unique_id=1363199688]
-shape = SubResource("BoxShape3D_crfrq")
+[node name="HotelWindroseMullion_14" type="StaticBody3D" parent="Building_1_GrandHotel_Part_02" unique_id=914096889]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.33403, 103.25, -3.15281)
 
-[node name="@MeshInstance3D@1082" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_01/HotelGalleryEnd_10_1" unique_id=1932943949]
+[node name="@MeshInstance3D@1045" type="MeshInstance3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_14" unique_id=678114807]
 material_override = SubResource("StandardMaterial3D_bvlvb")
-mesh = SubResource("BoxMesh_6lt4p")
+mesh = SubResource("CylinderMesh_6lt4p")
+
+[node name="@CollisionShape3D@1046" type="CollisionShape3D" parent="Building_1_GrandHotel_Part_02/HotelWindroseMullion_14" unique_id=1910803793]
+shape = SubResource("CylinderShape3D_wi50j")

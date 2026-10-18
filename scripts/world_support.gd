@@ -28,6 +28,67 @@ static var _cloud_layers_cache: Array[Node] = []
 static var _cloud_layers_frame := -1
 
 
+## A swimmer may already overlap a shallow floor at the feet. Allow recovery
+## away from that floor, while checking every contact for a wall or ceiling.
+static func can_lift(body: CharacterBody3D, lift: float) -> bool:
+	var collision := KinematicCollision3D.new()
+	var poses := [body.global_transform, body.global_transform.translated(Vector3.UP * lift)]
+	for i in poses.size():
+		var motion := Vector3.UP * lift if i == 0 else Vector3.ZERO
+		if body.test_move(poses[i], motion, collision, body.safe_margin, true, 8):
+			for contact in collision.get_collision_count():
+				if collision.get_normal(contact).dot(body.up_direction) < cos(body.floor_max_angle):
+					return false
+	return true
+
+
+## Discrete walking steps use the body's whole collision shape, never an
+## analytic terrain snap. Slopes remain move_and_slide's responsibility.
+static func try_step_up(ctx: TraversalContext) -> bool:
+	var body := ctx.body
+	var planar := Vector3(body.velocity.x, 0.0, body.velocity.z)
+	if not ctx.grounded or planar.length() < ctx.scaled(0.1):
+		return false
+	var travel := planar * ctx.delta
+	var obstacle := KinematicCollision3D.new()
+	if not body.test_move(body.global_transform, travel, obstacle, body.safe_margin, false, 8):
+		return false
+	var minimum_up := cos(body.floor_max_angle)
+	var blocked := false
+	for i in obstacle.get_collision_count():
+		if obstacle.get_normal(i).dot(body.up_direction) < minimum_up:
+			blocked = true
+	if not blocked:
+		return false
+	var maximum := ctx.scaled(0.35)
+	var raised := body.global_transform
+	if not can_lift(body, maximum):
+		return false
+	raised.origin.y += maximum
+	# Look past the capsule's leading edge, but only lift once actual travel
+	# encounters a wall. This cannot pull a falling body onto a distant roof.
+	var forward := planar.normalized() * maxf(travel.length(), ctx.scaled(0.4))
+	if body.test_move(raised, forward):
+		return false
+	raised.origin += forward
+	var landing := KinematicCollision3D.new()
+	if not body.test_move(raised, Vector3.DOWN * (maximum + ctx.scaled(0.03)), landing):
+		return false
+	for i in landing.get_collision_count():
+		var collider := landing.get_collider(i) as Node
+		if collider is CharacterBody3D or (collider != null and collider.is_in_group("blorbs")):
+			return false
+		if landing.get_normal(i).dot(body.up_direction) < minimum_up:
+			return false
+	var rise := maximum + landing.get_travel().y
+	if rise <= ctx.scaled(0.01) or rise > maximum:
+		return false
+	# XZ is still advanced exactly once, by the driver's move_and_slide.
+	body.global_position.y += rise + body.safe_margin
+	body.velocity.y = 0.0
+	return true
+
+
 ## The height to stand at on a cloud above `world`, or null where there is
 ## none. Any character can ask; only the one-way surface decides.
 ##

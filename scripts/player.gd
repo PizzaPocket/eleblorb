@@ -1264,6 +1264,7 @@ var _traversal := TraversalDirector.new()
 var _ice_skates := IceSkateMode.new()
 var _crystal := CrystalSkateMode.new()
 var _swim := SwimMode.new()
+var _flight := FlightMode.new()
 var _penguin := PenguinMode.new()
 var _lava := LavaMode.new()
 ## Matched Ice legs automatically extend these runners. They remain visible
@@ -2443,6 +2444,9 @@ func _physics_process(delta: float) -> void:
 	# lift. Air feet and four-limb Fire flight instead use camera-pitched
 	# direction above; with no input they hold the last elevation here.
 	_apply_powered_hover_vertical(delta, direction.length() > 0.001 and aerial_active)
+	_flight.apply_liquid_exit(_traversal_context(delta))
+	if _flight.liquid_exit_active:
+		_powered_hover_target_y = global_position.y + velocity.y * delta
 	_face_snowboard_heading(delta)
 	# Resolve a normal blorb landing before physics can convert it into a
 	# stationary floor contact. This also lets the launch velocity influence
@@ -2493,7 +2497,7 @@ func _physics_process(delta: float) -> void:
 	# and not jumped_this_frame alone (the same "don't fight an active
 	# jump" guard every other step/snap call here uses) is what actually
 	# matters for this one.
-	if grounded and not on_climbable_ramp and not jumped_this_frame and not buoyant and not _giant_surface_grounded and not _snowboard_active:
+	if grounded and not jumped_this_frame and not buoyant and not _giant_surface_grounded and not _snowboard_active:
 		_try_step_onto_prop(delta)
 	if is_on_floor():
 		for collision_index in get_slide_collision_count():
@@ -4018,7 +4022,7 @@ func _update_xiao_hou_zi_control(delta: float) -> void:
 		_end_xiao_hou_zi_control()
 		return
 	var input := _get_move_input()
-	_controlled_xiao_hou_zi.prepare_direct_control_environment(delta)
+	_controlled_xiao_hou_zi.prepare_direct_control_environment(delta, camera.global_basis.x * input.x + camera.global_basis.z * input.y)
 	var atmosphere := AtmosphereLayer.active(get_tree())
 	if atmosphere != null and atmosphere.gravity_factor_at(_controlled_xiao_hou_zi.global_position) <= ZERO_G_CONTROL_GRAVITY_THRESHOLD:
 		_update_remote_zero_g(_controlled_xiao_hou_zi, delta, false)
@@ -5034,9 +5038,10 @@ func _update_limb_power_state(delta: float) -> void:
 	# A hand already committed to a thrown item or a weapon does not also jet.
 	var right_hand_busy: bool = _throw_aim_active or _held_item_is_weapon()
 	_powers.update(
-		_blorb_suit, delta, _is_swimming(), false, right_hand_busy, get_instance_id()
+		_blorb_suit, delta, _is_swimming(), false, right_hand_busy, get_instance_id(),
+		_flight.suppress_fire(_liquid, _lake_buoyancy_active)
 	)
-	_air_foot_hover_active = _blorb_suit.has_air_hover_legs()
+	_air_foot_hover_active = _blorb_suit.has_air_hover_legs() and not _lake_buoyancy_active
 
 	var hovering := _is_powered_hover_active()
 	if hovering and not _was_powered_hover_active:
@@ -6789,6 +6794,9 @@ func _traversal_context(delta: float) -> TraversalContext:
 	ctx.grounded = is_on_floor() or _is_near_ground()
 	ctx.visuals = visuals
 	ctx.leg_speed_multiplier = worn_leg_speed_multiplier()
+	ctx.right_arm_busy = _throw_aim_active or _held_item_is_weapon()
+	ctx.standing_collision = _collision_shape
+	ctx.standing_collision_transform = _standing_collision_transform
 	return ctx
 
 
@@ -7227,10 +7235,20 @@ func _update_lake_buoyancy(delta: float) -> void:
 	_lava_surface_walk_active = false
 	_in_lava_area_now = false
 	if _giant_goo_active or terrain == null:
+		_flight.liquid_exit_active = false
 		return
 	# The facts about this spot are LiquidEnvironment's, so both characters
 	# come to the same answer about the same pond.
 	_liquid.read(terrain, _blorb_suit, global_position)
+	var liquid_ctx := _traversal_context(delta)
+	var liquid_input := _get_move_input()
+	liquid_ctx.direction = camera.global_basis.x * liquid_input.x + camera.global_basis.z * liquid_input.y
+	if _flight.update_liquid_exit(liquid_ctx, _liquid, _head_height(), FOOT_OFFSET):
+		_jumping = false
+		return
+	if not (_jumping and velocity.y > 0.0) and _liquid.try_stand(liquid_ctx, FOOT_OFFSET, _head_height()):
+		_jumping = false
+		return
 	var water_pos := Vector2(global_position.x, global_position.z)
 	var in_lava_area: bool = _liquid.in_lava()
 	_in_lava_area_now = in_lava_area
@@ -7262,11 +7280,6 @@ func _update_lake_buoyancy(delta: float) -> void:
 	# The shallow feathered shoreline stays walkable. Buoyancy begins only
 	# once the basin has enough real depth to immerse the character.
 	if not _liquid.deep_enough_to_swim(_head_height()):
-		return
-	# Dock ramps deliberately start below the swimmer's feet. Once one is
-	# beneath the player, let its continuous climbable collision take over
-	# rather than pulling the player back down to the swim depth every frame.
-	if _is_on_climbable_ramp():
 		return
 	# Two Rock legs convert the seabed into an ordinary walkable floor --
 	# per direct correction, no longer gated on the Diving Helmet too (see
@@ -8206,6 +8219,11 @@ const PROP_STEP_PROBE_CLEARANCE := 0.3
 ## uses) so move_and_slide() right after resolves the move as walking
 ## onto a floor instead of bumping into the slab's side.
 func _try_step_onto_prop(delta: float) -> void:
+	if not _dirtbike_wheel_active:
+		var step_ctx := _traversal_context(delta)
+		step_ctx.grounded = true
+		WorldSupport.try_step_up(step_ctx)
+		return
 	var horizontal := Vector3(velocity.x, 0.0, velocity.z)
 	if horizontal.length() < 0.1:
 		return

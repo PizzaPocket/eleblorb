@@ -22,6 +22,7 @@ func _ready() -> void:
 	for child in get_tree().root.get_children():
 		if child is CanvasLayer: child.visible=false
 	var camera:=Camera3D.new(); camera.name="MoyPerfCamera"; camera.far=1800.0; add_child(camera); camera.make_current()
+	var views:Array[Dictionary]=[]
 	if qa_mode:
 		if player and terrain:
 			var ground:float=terrain.call("get_mesh_height",-704.0,0.0); player.global_position=Vector3(-704.0,ground+0.5,0.0)
@@ -40,7 +41,7 @@ func _ready() -> void:
 				await get_tree().process_frame
 				if city and bool(city.call("moy_packs_ready")): break
 			print("MOY_PERF_APPROACH elapsed_ms=",float(Time.get_ticks_usec()-approach_start)/1000.0," packs_ready=",bool(city.call("moy_packs_ready")) if city else false)
-			var views:Array[Dictionary]=[
+			views=[
 				{"name":"old_moy_market","camera":Vector3(-704.0,-29.0,-24.0),"look":Vector3(-704.0,-48.0,0.0),"player":Vector2(-704,0)},
 				{"name":"downtown_up","camera":Vector3(-462.0,5.0,-40.0),"look":Vector3(-462.0,-25.0,-20.0),"player":Vector2(-462,-20)},
 				{"name":"estate_court","camera":Vector3(-535.0,-38.0,-125.0),"look":Vector3(-535.0,-48.0,-100.0),"player":Vector2(-535,-100)},

@@ -17,19 +17,19 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_16kw0"]
 size = Vector3(20, 0.15, 16)
 
-[node name="MoyCell_02_-1" type="Node3D" unique_id=1205887585]
+[node name="MoyCell_02_-1" type="Node3D" unique_id=667620719]
 
-[node name="Building_44_Fish_tanks" type="StaticBody3D" parent="." unique_id=759396765]
+[node name="Building_44_Fish_tanks" type="StaticBody3D" parent="." unique_id=1908935807]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -658, -58.5, -242)
 
-[node name="@CollisionShape3D@1414" type="CollisionShape3D" parent="Building_44_Fish_tanks" unique_id=1136785483]
+[node name="@CollisionShape3D@2369" type="CollisionShape3D" parent="Building_44_Fish_tanks" unique_id=244582341]
 shape = SubResource("BoxShape3D_5dgde")
 
-[node name="@MeshInstance3D@1415" type="MeshInstance3D" parent="Building_44_Fish_tanks" unique_id=1895579794]
+[node name="@MeshInstance3D@2370" type="MeshInstance3D" parent="Building_44_Fish_tanks" unique_id=501598699]
 material_override = SubResource("StandardMaterial3D_hrfy0")
 mesh = SubResource("BoxMesh_boruh")
 
-[node name="@MeshInstance3D@1416" type="MeshInstance3D" parent="Building_44_Fish_tanks" unique_id=1807757641]
+[node name="@MeshInstance3D@2371" type="MeshInstance3D" parent="Building_44_Fish_tanks" unique_id=303337239]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.425, 0)
 material_override = SubResource("StandardMaterial3D_vry70")
 mesh = SubResource("BoxMesh_16kw0")

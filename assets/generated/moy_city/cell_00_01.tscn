@@ -10,14 +10,14 @@ roughness = 0.92
 [sub_resource type="BoxMesh" id="BoxMesh_c5yp0"]
 size = Vector3(86, 0.16, 4)
 
-[node name="MoyCell_00_01" type="Node3D" unique_id=1008696940]
+[node name="MoyCell_00_01" type="Node3D" unique_id=246457474]
 
-[node name="Street_Tank Lane" type="StaticBody3D" parent="." unique_id=1897663759]
+[node name="Street_Tank Lane" type="StaticBody3D" parent="." unique_id=1974968642]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -737, -60.05, -120)
 
-[node name="@CollisionShape3D@337" type="CollisionShape3D" parent="Street_Tank Lane" unique_id=919161956]
+[node name="@CollisionShape3D@333" type="CollisionShape3D" parent="Street_Tank Lane" unique_id=658502451]
 shape = SubResource("BoxShape3D_2q08o")
 
-[node name="@MeshInstance3D@338" type="MeshInstance3D" parent="Street_Tank Lane" unique_id=2092123068]
+[node name="@MeshInstance3D@334" type="MeshInstance3D" parent="Street_Tank Lane" unique_id=1440129064]
 material_override = SubResource("StandardMaterial3D_hxr1n")
 mesh = SubResource("BoxMesh_c5yp0")

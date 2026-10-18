@@ -22,6 +22,50 @@ const CRUISE_LEAN := deg_to_rad(78.0)
 const PITCH_LIMIT := deg_to_rad(80.0)
 
 var motion := 0.0
+var liquid_exit_active := false
+
+
+## A surface breach, not underwater flight. Keep it latched through the
+## body's passage across the plane, so the swim clamp cannot recapture it.
+func update_liquid_exit(ctx: TraversalContext, liquid: LiquidEnvironment, head_base: float, foot_offset: float) -> bool:
+	var feet_y := ctx.body.global_position.y - foot_offset
+	if liquid.liquid == LiquidEnvironment.Liquid.NONE or feet_y > liquid.surface_height + ctx.scaled(0.08):
+		liquid_exit_active = false
+		return false
+	var upward := ctx.direction.y > 0.05 or ctx.jump_pressed
+	var lift := ctx.suit != null and (ctx.suit.has_chest_air_blorb() or ctx.suit.has_air_hover_legs() or _fire_lift_requested(ctx))
+	if not upward or not lift:
+		liquid_exit_active = false
+		return false
+	var surface_band := liquid.surface_height - LiquidEnvironment.float_depth(head_base) - ctx.scaled(0.1)
+	liquid_exit_active = liquid_exit_active or feet_y >= surface_band
+	return liquid_exit_active
+
+
+func apply_liquid_exit(ctx: TraversalContext) -> void:
+	if liquid_exit_active:
+		ctx.body.velocity.y = maxf(ctx.body.velocity.y, ctx.scaled(3.5))
+
+
+## Fire remains usable while wading with the body above water, and in lava.
+## Immersed water disables it except during the bounded surface breach.
+func suppress_fire(liquid: LiquidEnvironment, immersed: bool) -> bool:
+	return liquid.in_water() and immersed and not liquid_exit_active
+
+
+static func _fire_lift_requested(ctx: TraversalContext) -> bool:
+	if UIState.modal_open:
+		return false
+	var suit := ctx.suit
+	for pair in [["arm_left", "arm_right", "left_arm_power", "right_arm_power"],
+		["leg_left", "leg_right", "left_leg_power", "right_leg_power"]]:
+		if pair[0] == "arm_left" and (ctx.left_arm_busy or ctx.right_arm_busy):
+			continue
+		var left := suit.worn_blorb_in_slot(pair[0])
+		var right := suit.worn_blorb_in_slot(pair[1])
+		if left != null and right != null and left.element_state == "fire" and right.element_state == "fire" and left.current_mp > 0.0 and right.current_mp > 0.0 and Input.is_action_pressed(pair[2]) and Input.is_action_pressed(pair[3]):
+			return true
+	return false
 
 
 func id() -> StringName:
@@ -54,3 +98,4 @@ func attitude_pitch(travel: Vector3) -> float:
 
 func reset() -> void:
 	motion = 0.0
+	liquid_exit_active = false
