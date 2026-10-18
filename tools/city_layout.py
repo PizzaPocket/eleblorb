@@ -665,27 +665,33 @@ BLOCK_TOWER=dict(base=(4.0,9.0),door=(-461,47),vents=[0.3,0.55,0.8],vent=(1.4,4.
   crown_note='a crown folded inward to a knife-edge ridge leaning toward Civic Plaza, with one vertical azure slit in its plaza face: the only light')
 ## Inside the BLOCK tower: package P17 (moy_pkg_P17.md, user, 2026-10-18). The tower's story runs
 ## through it: the hero climbs the vent hoods from the east neighbour and gets in through the one open
-## louvre at the 55% ring; takes the core's stair down past the growing floors to Pinestein's sealed
-## lab in the base; rides the lab's private lift to Kask's floors; and fights the blorb mech in the
-## hollow crown. floors: storeys from the forecourt (L0), shaft_top/floors each; zones: (key, first
-## level, last level, what), levels below 0 are under the forecourt; core and lab: world rects;
-## lift: its world (x, z) and its stops; louvre: the vent ring and face it opens in, and its world
-## coordinate along that face; approach: the neighbour the climb starts from (a lot's world rect)
-## and the gap the hero leaps; arena: the crown's floor and the glass gallery on its back slope
-## (world z range and floor height).
+## louvre at the 55% ring; rides a service lift down to Pinestein's sealed lab in the base; rides the
+## lab's private lift up to Kask's floors; and fights the blorb mech in the hollow crown. Only four
+## places are built (user, 2026-10-18: keep it minimal): the plant floor behind the louvre, the lab,
+## Kask's floors and the crown. Every other storey is solid mass inside the shell, never entered; the
+## lifts pass them without stopping, and each shows one glimpse through a gap in its shaft.
+## floors: storeys from the forecourt (L0), shaft_top/floors each; zones: (key, first level, last
+## level, what), what each storey is, built or not, levels below 0 under the forecourt; built: the
+## zones that are built and entered (the crown is always built: the arena); core and lab: world
+## rects; lifts: each one's world (x, z), its two stops, and the storey it shows through its one gap;
+## louvre: the vent ring and face it opens in, and its world coordinate along that face; approach:
+## the neighbour the climb starts from (a lot's world rect) and the gap the hero leaps; arena: the
+## crown's floor and the glass gallery on its back slope (world z range and floor height).
 BLOCK_TOWER['inside']=dict(floors=38,
   zones=[('lab',-2,-1,'Pinestein\'s lab, sealed: a double-height vat hall of synthetic slime, blorb tanks, his bench beside Kask\'s'),
          ('base',0,1,'the base: the one door and a bare double-height lobby kept by machines'),
          ('stacks',2,10,'the stacks: machine floors, rows of humming cabinets, no people'),
          ('plant',11,11,'plant floor behind the 30% vent ring'),
          ('growing',12,19,'the growing floors: tanks where city blorbs are grown from synthetic slime, pens of new ones'),
-         ('plant',20,20,'plant floor behind the 55% vent ring: the way in'),
+         ('way in',20,20,'plant floor behind the 55% vent ring: the way in'),
          ('hangar',21,29,'the hangar: three tall bays where the mech is built and tested, spare glass heads on racks'),
          ('plant',30,30,'plant floor behind the 80% vent ring'),
          ('records',31,34,'the upper stacks: machine-kept records'),
          ('kask',35,37,'Kask\'s floors: her flat, sparse and dark, and the control room under the crown')],
+  built=['lab','way in','kask'],
   core=(-462,57,-455,64), lab=(-473,49,-451,69),
-  lift=dict(at=(-458.5,60.5),stops=[-2,35]),
+  lifts=dict(service=dict(at=(-460.2,60.5),stops=[20,-2],glimpse=16,what='down from the plant floor to the lab; the gap shows a growing floor\'s tanks'),
+             private=dict(at=(-456.8,60.5),stops=[-2,35],glimpse=24,what='Pinestein\'s own, up from the lab to Kask\'s floors; the gap shows the hangar and the mech\'s empty frame')),
   louvre=dict(ring=0.55,face='east',at=55.0),
   approach=dict(rect=(-443,38,-429,58),storeys=34,gap=6.0),
   arena=dict(floor=150.0,gallery=dict(z=(61.0,66.0),y=164.0)))
@@ -713,13 +719,27 @@ def _block_checks():
     # each vent ring opens onto a plant floor
     for f in BT['vents']:
         y=f*BT['shaft_top']; z_=[z for z in I['zones'] if z[1]*st<=y<(z[2]+1)*st]
-        if not z_ or z_[0][0]!='plant': problems.append(('block: a vent ring has no plant floor behind it',f))
+        if not z_ or z_[0][0] not in ('plant','way in'): problems.append(('block: a vent ring has no plant floor behind it',f))
     if I['louvre']['ring'] not in BT['vents']: problems.append(('block: the open louvre is not on a vent ring',))
     if not (sh[1]+3<I['louvre']['at']<sh[3]-3): problems.append(('block: the open louvre is off its face',))
     inside=lambda r: sh[0]<r[0]<r[2]<sh[2] and sh[1]<r[1]<r[3]<sh[3]
     if not (inside(I['core']) and inside(I['lab'])): problems.append(('block: the core or the lab is outside the shaft',))
-    lx,lz=I['lift']['at']
-    if not (I['core'][0]<lx<I['core'][2] and I['core'][1]<lz<I['core'][3]): problems.append(('block: the lift is not in the core',))
+    # built: only named zones; the way in is the storey the louvre opens onto
+    keys=[z[0] for z in I['zones']]
+    if any(b not in keys for b in I['built']): problems.append(('block: a built place is not a zone',))
+    wz=[z for z in I['zones'] if z[0]=='way in'][0]
+    if not (wz[1]*st<=I['louvre']['ring']*BT['shaft_top']<(wz[2]+1)*st): problems.append(('block: the way in is not behind the open louvre',))
+    # lifts: in the core, 2.2 m cars clear of each other; each stops only at built storeys and its gap shows a storey it passes
+    zone=lambda n: [z for z in I['zones'] if z[1]<=n<=z[2]][0]
+    L_=I['lifts']; pts=[l['at'] for l in L_.values()]
+    for nm,l in L_.items():
+        lx,lz=l['at']
+        if not (I['core'][0]+1.1<lx<I['core'][2]-1.1 and I['core'][1]+1.1<lz<I['core'][3]-1.1): problems.append(('block: a lift is not in the core',nm))
+        if any(zone(n)[0] not in I['built'] for n in l['stops']): problems.append(('block: a lift stops at a storey that is not built',nm))
+        lo,hi=min(l['stops']),max(l['stops'])
+        if not (lo<l['glimpse']<hi) or zone(l['glimpse'])[0] in I['built']: problems.append(('block: a lift\'s gap does not show a storey it passes',nm))
+    if math.hypot(pts[0][0]-pts[1][0],pts[0][1]-pts[1][1])<3.2: problems.append(('block: the two lifts overlap',))
+    if L_['service']['stops'][0]!=wz[1] or L_['private']['stops'][0]!=L_['service']['stops'][1] or zone(L_['private']['stops'][1])[0]!='kask': problems.append(('block: the lifts do not chain way in, lab, Kask\'s floors',))
     # the climb: the neighbour stands the gap off the face the louvre opens in, and is tall enough to reach the first ring
     A=I['approach']
     if I['louvre']['face']!='east' or abs(A['rect'][0]-sh[2]-A['gap'])>0.01 or A['gap']>7: problems.append(('block: the climb\'s leap is not the planned gap',))

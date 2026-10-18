@@ -43,7 +43,10 @@ The user's shorthand for starting a planning session on the city of Moy.
   `moy_grand_hotel_3d.html` and `moy_block_tower_3d.html`: the building or
   area at true size among its neighbours, a cut-away or section where it is
   entered, its places as camera views, and any character, vehicle or kit it
-  introduces modelled beside the hero. Draw it from the plan data (put new
+  introduces modelled beside the hero. The hero, his suit and blorbs come
+  from the game itself (`tools/export_figure_reference.tscn`, embedded as a
+  `FIGURE` block), never redrawn by hand; a new rig starts from his
+  exported joints. Draw it from the plan data (put new
   numbers in `city_layout.py` with checks first), publish it once as a new
   artifact, add it to `docs/drawings/README.md` and the roadmap's "Where
   everything is", and name it in the brief.

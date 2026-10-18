@@ -168,7 +168,10 @@ diagnostic replaces this column.
   blorbs), the lift, and a boss fight against the blorb mech, suited in city
   blorbs that then join the party; Blorbus mounts the mech.
 - **Model:** `moy_block_tower_3d.html`, the section and the route drawn from
-  `CityPlan.BLOCK_TOWER.inside`, and the mech with its parts. Rounds P17a to P17f are in the
+  `CityPlan.BLOCK_TOWER.inside`, and the mech with its parts.
+- **Minimal** (user, 2026-10-18): four places built (the way in, the lab,
+  Kask's floors, the crown), the rest solid; two lifts join them, and the
+  inside loads as its own scene on the rides. Rounds P17a to P17e. Rounds P17a to P17f are in the
   brief; P17a, the mech, needs no tower and can be built now.
 
 **P18, the Arches.** One long vaulted hall in five bays of the wall
