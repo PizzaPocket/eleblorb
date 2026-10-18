@@ -108,7 +108,7 @@ diagnostic replaces this column.
 | ID | Package | Area | Now | Target | Status | Brief |
 |---|---|---|---|---|---|---|
 | P0 | **The check suite and the screenshot rig** | the whole city (and reused by every kingdom) | none | n/a | **ready** | `moy_pkg_P0.md` |
-| P1 | Prototype pass 4: grand square, City Hall's front, the clock dome, the Clock Room, tower ribs, closed escalators, the pond | civic core, Crossing | L1 to L3 | L2 | **built, to review** (`03a9d7a`) | `moy_prototype_pass_4.md` |
+| P1 | Prototype pass 4: grand square, City Hall's front, the clock dome, the Clock Room, tower ribs, closed escalators, the pond | civic core, Crossing | L1 to L3 | L2 | **fix** (reviewed 2026-10-18: head beams, City Hall's bands, two checks; section 4 of the brief) | `moy_prototype_pass_4.md` |
 | P2 | Bake and performance: the rendered probe, budgets, streaming | the whole city | owed | budgets met | planned | |
 | P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane; the Helmsmith moves off Civic Plaza to his shop on Lamp Lane | market lanes | L1 | L2 | **ready** | `moy_pkg_P3.md` |
 | P4 | The Old Moy tower-house kit: 60 houses on their old roads, courtyards, the first well | Old Moy | L1 | L2 | next | (design: `moy_tower_house.md`) |
