@@ -1265,6 +1265,7 @@ var _ice_skates := IceSkateMode.new()
 var _crystal := CrystalSkateMode.new()
 var _swim := SwimMode.new()
 var _flight := FlightMode.new()
+var _crouch := CrouchMode.new()
 var _penguin := PenguinMode.new()
 var _lava := LavaMode.new()
 ## Matched Ice legs automatically extend these runners. They remain visible
@@ -2026,6 +2027,7 @@ func _physics_process(delta: float) -> void:
 	# while still airborne, and would otherwise be silently dropped.
 	# A modal owns the controller: movement/jump must not leak through while
 	# the same stick and face buttons are navigating dialog responses.
+	_crouch.prepare(_traversal_context(delta))
 	var jump_pressed := Input.is_action_just_pressed("jump") and not UIState.modal_open
 	if jump_pressed:
 		_jump_buffer_timer = BLORB_SUPER_JUMP_BUFFER
@@ -2064,6 +2066,9 @@ func _physics_process(delta: float) -> void:
 		)
 	_was_in_water = in_water_now
 	_update_air_flight()
+	if _flight.toggle_consumed:
+		jump_pressed = false
+		_jump_buffer_timer = 0.0
 	_update_dirtbike_state(delta)
 	_update_snowboard_state()
 	_update_penguin_state()
@@ -2180,6 +2185,12 @@ func _physics_process(delta: float) -> void:
 	) or on_cloud or on_canopy or on_ice_support) and not _jumping
 	if suit_flight or powered_hover:
 		grounded = false
+	var crouch_ctx := _traversal_context(delta)
+	_crouch.step(crouch_ctx, Input.is_action_just_pressed("crouch") and not UIState.modal_open,
+		not buoyant and not _dirtbike_wheel_active and not _snowboard_active and not _ice_skating_active and not _blorb_suit.penguin_form_active())
+	if _crouch.amount > 0.0:
+		jump_pressed = false
+		_jump_buffer_timer = 0.0
 	# grounded is fixed at the top of the frame, before the jump decision
 	# below -- so on the exact frame a jump starts, it's still stale-true
 	# and would otherwise let the step-up/snap calls further down cancel
@@ -2272,6 +2283,8 @@ func _physics_process(delta: float) -> void:
 	# Only the dirt-bike ballistic carve-out freezes the launch speed.
 	var speed_sprinting := _is_sprinting() and not dirtbike_ballistic and not _snowboard_active
 	var current_speed := HumanoidLocomotion.ground_speed(_playable_profile, speed_sprinting)
+	if _crouch.amount > 0.0:
+		current_speed = _playable_profile.move_speed * _crouch.speed_factor()
 	if skating:
 		current_speed *= skate_speed_multiplier
 	# Per direct correction ("speed of the wheel should be pretty fast, not
@@ -5066,6 +5079,8 @@ func _update_vine_swing(delta: float, jump_pressed: bool) -> bool:
 	ctx.left_arm_busy = _throw_aim_active
 	ctx.right_arm_busy = _throw_aim_active or _held_item_is_weapon()
 	var aim: Vector3 = -camera.global_transform.basis.z
+	if jump_pressed and _crouch.amount > 0.0 and not _crouch.can_stand(ctx):
+		return false
 	var was_swinging := _vine_swing.swinging
 	if not _vine_swing.swing(ctx, aim, jump_pressed and not UIState.modal_open):
 		if was_swinging and _vine_swing.exit_velocity != Vector3.ZERO:
@@ -5080,6 +5095,7 @@ func _update_vine_swing(delta: float, jump_pressed: bool) -> bool:
 		if _vine_airborne and (is_on_floor() or _is_near_ground()) and velocity.y <= 0.1:
 			_vine_airborne = false
 		return false
+	_crouch.leave(ctx)
 	_animate_walk(delta, false)
 	_pose_body_vine_swing(delta)
 	_vine_swing.pose(ctx)
@@ -6719,6 +6735,7 @@ func _compose_body_pose(delta: float, grounded: bool, on_soft_aerial_support: bo
 				# The slope tilt persists through its own heading, the same
 				# Euler yaw the next frame's ground pose starts from.
 				_body_yaw = visuals.rotation.y
+	_crouch.pose(_traversal_context(delta))
 	_dirtbike_visual_base_y = base_y
 	_body_yaw_steered = false
 
@@ -6799,7 +6816,8 @@ func _traversal_context(delta: float) -> TraversalContext:
 	ctx.grounded = is_on_floor() or _is_near_ground()
 	ctx.visuals = visuals
 	ctx.leg_speed_multiplier = worn_leg_speed_multiplier()
-	ctx.right_arm_busy = _throw_aim_active or _held_item_is_weapon()
+	ctx.left_arm_busy = _throw_aim_active or _left_arm_power_blend > 0.001
+	ctx.right_arm_busy = _throw_aim_active or _held_item_is_weapon() or _right_arm_power_blend > 0.001
 	ctx.standing_collision = _collision_shape
 	ctx.standing_collision_transform = _standing_collision_transform
 	return ctx
@@ -7140,6 +7158,7 @@ func _update_zero_gravity_movement(delta: float) -> bool:
 	var atmosphere := AtmosphereLayer.active(get_tree())
 	if atmosphere == null or atmosphere.gravity_factor_at(global_position) > ZERO_G_CONTROL_GRAVITY_THRESHOLD:
 		return false
+	_crouch.leave(_traversal_context(delta))
 	var input := _get_move_input()
 	var basis := camera.global_transform.basis
 	var thrust_direction := basis.x * input.x + basis.z * input.y
@@ -7364,7 +7383,7 @@ func _update_lake_buoyancy(delta: float) -> void:
 ## into underwater propulsion. Ordinary buoyancy keeps its wearer swimming
 ## at the surface until a real Diving Helmet is present.
 func _update_air_flight() -> void:
-	_air_flight_active = _blorb_suit.has_chest_air_blorb() and not _lake_buoyancy_active
+	_air_flight_active = _flight.toggle(_traversal_context(0.0), Input.is_action_just_pressed("jump") and not UIState.modal_open, not _lake_buoyancy_active and not _vine_swing.swinging and _crouch.amount <= 0.0)
 	if _air_flight_active:
 		_jumping = false
 		if not _was_air_flight_active and not _lake_diving_active:
@@ -7479,7 +7498,7 @@ func _update_crystal_riding(delta: float, jump_pressed: bool) -> bool:
 	var ctx := _traversal_context(delta)
 	ctx.aim_basis = camera.global_transform.basis
 	ctx.grounded = (is_on_floor() or _is_near_ground()) and not _jumping and velocity.y <= 0.1
-	var blocked := not _can_crystal_ride()
+	var blocked := not _can_crystal_ride() or _crouch.amount > 0.0
 	var was_riding := _crystal.riding
 	# The camera's own frame resolves the stick into the world direction the
 	# track is aimed along, including its pitch.

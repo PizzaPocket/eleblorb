@@ -1,38 +1,11 @@
 class_name MonkeyFigure
 extends RefCounted
 
-## First-draft procedural rig for Xiao Hou Zi, the jungle biome's resident
-## monkey (see docs/world_bible.md) -- 20cm tall, built per exact spec:
-## SuperEgg head/ears (reusing figure_ears.gd directly, since it's already
-## generic off head semi_axes), eyes bigger/closer-together than the human
-## figure's own subtle oval marks (more like the blorb suit's own round
-## "goggle" eyes, per direct instruction), no mouth, no neck (head sits
-## straight on the body), a pear-shaped body that is deliberately NOT a
-## SuperEgg, invisible bone-pivot arms/legs whose only visible trace is a
-## blorb-suit-noodle-style tube mesh (see blorb_suit.gd's build_limb_tube())
-## with no separate hand/foot segment, and a tail.
-##
-## Explicitly a first draft, per direct instruction -- proportions below are
-## reasoned out to hit the 20cm total height target and read as a plausible
-## small-monkey silhouette, but none of this has been seen in-engine yet
-## (no Godot CLI/editor available while writing this -- see the figure-rig
-## skill's own guidance on flagging unverified guesses rather than
-## presenting them as settled).
-##
-## build()'s return dict deliberately mirrors procedural_figure.gd's own
-## build() key-for-key (spine/head/eyes/hips/arm_left/arm_right/elbow_left/
-## elbow_right/leg_left/leg_right/knee_left/knee_right/ankle_left/
-## ankle_right/toe_left/toe_right/hand_left/hand_right/palm_left/palm_right/
-## back_left/back_right/wrist_left/wrist_right/fingertip_left/
-## fingertip_right) so player.gd's existing movement/camera/walk-cycle/
-## blorb-suit code can drive this rig completely unmodified (see player.gd's
-## own TEMP_PLAY_AS_XIAO_HOU_ZI flag) -- this rig just doesn't build a
-## separate mesh for the hand/foot-equivalent nodes, only a plain Node3D
-## marker, since the spec calls for no hand/foot segments. Since none of
-## those markers have a real hand/foot mesh to derive a palm/back-of-hand
-## facing from, palm_X/back_X/wrist_X/fingertip_X (and ankle_X/toe_X) are
-## the SAME node reused under multiple keys rather than fabricated separate
-## anatomy -- a deliberate simplification, not an oversight.
+## Shared stuffed-animal body for Xiao Hou Zi and the Plant Kingdom's
+## procedural monkeys. Invisible articulated joints deform continuous soft
+## limbs; a wrist or ankle never adds a separate visible segment or length.
+## Body proportions and appearance are resolved once at build time, and the
+## same live limb profiles dress the bare body and its outer suit shell.
 
 const MONKEY_FUR_COLOR := Color(0.62, 0.46, 0.30)  # light brown, per spec
 
@@ -44,13 +17,9 @@ const MONKEY_FUR_COLOR := Color(0.62, 0.46, 0.30)  # light brown, per spec
 ## ground-contact marker and anything that reasoned about the joint -- a
 ## suit shell, a skate, a jet -- was reasoning about his toes.
 ##
-## The knee sits halfway between this and the hip, and the hip does not move,
-## so his standing height and his silhouette are unchanged.
+## The knee divides the full embedded-hip-to-ankle span equally. Moving a
+## hidden knee does not move the endpoints or change the standing silhouette.
 const ANKLE_HEIGHT := 0.0212
-## The stations his foot passes through, as heights above the floor he stands
-## on. Absolute rather than offsets from the ankle, so moving the ankle to
-## where it belongs does not drag the foot along with it.
-const FOOT_TRANSITION_HEIGHT := 0.023
 const LEG_LOWER_LEN := 0.0144
 const LEG_UPPER_LEN := 0.0144
 # Set the legs broadly beneath the pear body's lower left/right flanks. At
@@ -181,7 +150,10 @@ const DEFAULT_ELBOW_BEND := deg_to_rad(25.0)
 # noodle, with no intermediate narrowing.
 const ARM_RADIUS_SHOULDER := 0.0055
 const ARM_RADIUS_ELBOW := 0.009
-const ARM_RADIUS_WRIST := 0.0135
+# A plump, swept end rather than a ball, with a smaller rounded tip.
+# Keep the cross-section round and preserve the authored fingertip reach.
+const ARM_RADIUS_WRIST := 0.0095
+const HAND_TIP_SWEEP := 0.35
 ## What share of the whole arm is hand, taken from the human figure so the
 ## two rigs agree on where a hand begins: its hand is 0.116 of a 0.706 arm.
 ## Nothing is added to this rig for it; the tube's own last stretch becomes
@@ -195,16 +167,12 @@ const NECK_DROP := 0.02
 # The leg widens continuously from its top into the foot bulb. Keeping each
 # successive control radius larger prevents a sudden bell at the ankle.
 const LEG_RADIUS_HIP := 0.013
-const LEG_RADIUS_KNEE := 0.016
-const FOOT_BULB_RADIUS := 0.022
-const FOOT_BULB_FORWARD := 0.010
-const FOOT_BULB_CENTER_Y := 0.020
-const FOOT_BOTTOM_RADIUS := 0.013
-## How far past the sole the toe reaches, and how far it pinches in doing so,
-## both as fractions of the sole's own radius: the foot ends in a rounded toe
-## rather than tapering to a point on the floor.
-const FOOT_TOE_REACH := 1.15
-const FOOT_TOE_PINCH := 0.62
+const LEG_RADIUS_KNEE := 0.0155
+# Let the stuffing settle lower rather than inflating a separate-looking
+# foot. Less forward sweep also keeps the inside of the heel curve from
+# folding as the tube turns into its rounded sole.
+const FOOT_BULB_RADIUS := 0.020
+const FOOT_BULB_FORWARD := 0.006
 const HAND_DOME_STEPS := BlorbSuit.CAPSULE_DOME_STEPS
 const FOOT_DOME_STEPS := BlorbSuit.CAPSULE_DOME_STEPS
 
@@ -352,30 +320,10 @@ const TAIL_ANIM_YAW_HOLD_MAX := 3.8
 ##   face/muzzle (like a real-world colobus or mandrill), so this can be set
 ##   noticeably darker than fur_color for that look instead of always
 ##   matching it
-## MEASURED, not derived (headless probe, both rigs built and each joint
-## rotated in turn to see where the limb's far end actually went). This rig is
-## deliberately simpler than ProceduralFigure's and several of its returned
-## keys ALIAS ONE NODE, which silently makes some poses no-ops:
-##
-##   arm:   MonkeyShoulderPivot > MonkeyElbowPivot > MonkeyWristPivot >
-##          MonkeyFingertipMarker. No hand was modelled and none was added:
-##          the tube's own last stretch IS the hand, taking the same share of
-##          the arm the human figure's hand takes (HAND_FRACTION), with a
-##          joint at that point. "hand_left" and "wrist_left" are that joint,
-##          which turns the hand; "fingertip_left" rides on its end.
-##   leg:   MonkeyHipPivot > MonkeyKneePivot > MonkeyAnkleMarker >
-##          MonkeyToeMarker. "ankle_left" and "toe_left" used to be that one
-##          marker, and nothing is
-##          parented to it: the leg and foot are one procedural tube rebuilt
-##          each frame under the rig root. The ankle nonetheless articulates
-##          the foot now, because _rebuild_footed_leg() builds the foot's
-##          frame from that marker's basis (see its own comment for the
-##          decision it reverses). The human rig instead runs
-##          hip > LegTilt > KneePivot > AnklePivot > foot mesh > ToeAttach.
-##   spine: SpinePivot > MonkeyThoraxPivot > MonkeyNeckPivot > HeadPivot.
-##          The thorax and neck were added later (they carry no rotation at
-##          rest, so the rig is unchanged by their presence); there is still
-##          no abdomen or chest pivot.
+## Invisible arm chain: shoulder > elbow > wrist/hand > fingertip.
+## Invisible leg chain: hip > knee > ankle > toe and sole surface markers.
+## Wrist and ankle drive the continuous mesh through RigAdapter metadata;
+## thorax and neck provide the same posing vocabulary as the human rig.
 ##
 ## Rotation directions, where a joint does exist, match the human rig exactly,
 ## so a pose's SIGNS port across unchanged even though its reachable joints do
@@ -407,10 +355,10 @@ static func build(
 	var hip_y := knee_y + leg_upper_len
 
 	var leg_left := _build_leg(
-		rig, hip_y, 1.0, fur_color, hip_scale, leg_upper_len, leg_lower_len, hip_attach_raise
+		rig, hip_y, 1.0, fur_color, hip_scale, leg_upper_len, leg_lower_len, hip_attach_raise, variant
 	)
 	var leg_right := _build_leg(
-		rig, hip_y, -1.0, fur_color, hip_scale, leg_upper_len, leg_lower_len, hip_attach_raise
+		rig, hip_y, -1.0, fur_color, hip_scale, leg_upper_len, leg_lower_len, hip_attach_raise, variant
 	)
 
 	# Everything above the hips (body, head, arms) hangs off spine_pivot,
@@ -488,12 +436,15 @@ static func build(
 	var shoulder_height_fraction: float = variant.get("shoulder_height_fraction", 0.72)
 	var arm_left := _build_arm(
 		rig, spine_pivot, 1.0, fur_color, limb_length_scale, body_height, body_radius,
-		spine_forward_bend, variant.get("arm_forward_relax_factor", 0.0), shoulder_height_fraction
+		spine_forward_bend, variant.get("arm_forward_relax_factor", 0.0), shoulder_height_fraction, variant.get("body_taper_blend", 1.0)
 	)
 	var arm_right := _build_arm(
 		rig, spine_pivot, -1.0, fur_color, limb_length_scale, body_height, body_radius,
-		spine_forward_bend, variant.get("arm_forward_relax_factor", 0.0), shoulder_height_fraction
+		spine_forward_bend, variant.get("arm_forward_relax_factor", 0.0), shoulder_height_fraction, variant.get("body_taper_blend", 1.0)
 	)
+
+	for arm in [arm_left, arm_right]:
+		(arm["pivot"] as Node3D).set_meta("soft_arm", {"tip_radius": lerpf(ARM_RADIUS_ELBOW, ARM_RADIUS_WRIST, float(variant.get("limb_taper_scale", 1.0)))})
 
 	var tail := _build_tail(
 		spine_pivot, fur_color, variant.get("tail_length_scale", 1.0), body_height, body_radius
@@ -525,6 +476,7 @@ static func build(
 		# for exactly these numbers, which meant only this one rig ever got a
 		# shell that followed its foot -- see suit_leg_profile().
 		"suit_leg_profile": suit_leg_profile,
+		"suit_arm_profile": suit_arm_profile,
 		"hand_left": arm_left["wrist"],
 		"hand_right": arm_right["wrist"],
 		"palm_left": arm_left["end"],
@@ -545,71 +497,77 @@ static func build(
 		"_sole_right": leg_right["sole"],
 		"_tail": tail,
 		"_rig": rig,
-		"_taper_scale": variant.get("limb_taper_scale", 1.0),
 		"_has_foot_pads": variant.get("has_foot_pads", false),
-		"_leg_radius_scale": variant.get("leg_radius_scale", 1.0),
 	}
+	var rest_rotations := {}
+	for name in ["spine", "thorax", "neck", "head", "arm_left", "arm_right", "elbow_left", "elbow_right", "hand_left", "hand_right", "leg_left", "leg_right", "knee_left", "knee_right", "ankle_left", "ankle_right"]:
+		rest_rotations[name] = (pivots[name] as Node3D).rotation
+	pivots["_rest_rotations"] = rest_rotations
 	rebuild_limbs(pivots, rig, 0.0)
 	return pivots
 
 
-## hip_attach_raise (default HIP_ATTACH_RAISE, Xiao Hou Zi's own value)
-## controls how far the leg's own top mesh point tucks upward into the
-## body -- per direct feedback that the leg was visibly starting below the
-## body's own hip bulge (BlorbBodyShape's profile peaks around t=BULGE_T=
-## 0.3 of body_height, well above hip_y, while the un-raised leg top sat
-## almost exactly at hip_y, the body's narrow bottom point). Raising this
-## only moves the hip_pivot's own attachment point -- see the cancellation
-## below -- so the knee/ankle stay exactly where limb_length_scale already
-## puts them, and the visible leg tube simply reads as longer, spanning
-## from higher in the body down to the same ankle.
+## The embedded hip follows the resolved torso's cross-section, and the
+## hidden knee divides the hip-to-ankle span. Feet stay at their authored
+## ground height even when torso height, taper or leaning posture varies.
 static func _build_leg(
 	rig: Node3D, hip_y: float, side: float, fur_color: Color,
 	hip_scale: float = 1.0, leg_upper_len: float = LEG_UPPER_LEN, leg_lower_len: float = LEG_LOWER_LEN,
-	hip_attach_raise: float = HIP_ATTACH_RAISE
+	hip_attach_raise: float = HIP_ATTACH_RAISE, variant: Dictionary = {}
 ) -> Dictionary:
 	var hip_pivot := Node3D.new()
 	hip_pivot.name = "MonkeyHipPivot"
-	hip_pivot.position = Vector3(side * HIP_X * hip_scale, hip_y + hip_attach_raise, 0)
+	var body_height := BODY_HEIGHT * float(variant.get("body_height_scale", 1.0))
+	var body_radius := BODY_RADIUS * float(variant.get("body_radius_scale", 1.0))
+	var lean := float(variant.get("spine_forward_bend", 0.0))
+	# The visible torso leans while the legs remain under independent hip
+	# pivots. Follow its cross-section at this height, including the forward
+	# shift, so tall variants cannot expose a flat leg root behind the body.
+	var section_t := hip_attach_raise / (body_height * cos(lean))
+	var section_radius := body_radius * BlorbBodyShape.profile_radius(section_t, float(variant.get("body_taper_blend", 1.0)))
+	var hip_radius := LEG_RADIUS_HIP * float(variant.get("leg_radius_scale", 1.0))
+	var hip_x := minf(HIP_X * hip_scale, maxf(section_radius - hip_radius * 1.2, 0.0))
+	hip_pivot.position = Vector3(side * hip_x, hip_y + hip_attach_raise, hip_attach_raise * tan(lean))
 	rig.add_child(hip_pivot)
 
 	var knee_pivot := Node3D.new()
 	knee_pivot.name = "MonkeyKneePivot"
-	# Counter the raised attachment in the segment length so knee and ankle
-	# retain their established ground-relative positions.
-	knee_pivot.position = Vector3(0, -(leg_upper_len + hip_attach_raise), 0)
+	# Distribute the skeleton inside the existing soft leg: embedding the hip
+	# must not leave a long thigh and a tiny shin. Endpoints stay unchanged.
+	var ankle_target := Vector3(side * hip_x, ANKLE_HEIGHT, 0)
+	var half_span := (ankle_target - hip_pivot.position) * 0.5
+	knee_pivot.position = half_span
 	hip_pivot.add_child(knee_pivot)
 
 	var ankle_marker := Node3D.new()
 	ankle_marker.name = "MonkeyAnkleMarker"
-	ankle_marker.position = Vector3(0, -leg_lower_len, 0)
-	# Nothing is parented to this marker, yet the foot does follow it: the leg
-	# is one tube rebuilt each frame from the marker's basis (see
+	ankle_marker.position = half_span
+	# Surface markers follow this pivot; geometry follows its basis through
+	# the continuous limb rebuilt every frame (see
 	# _rebuild_footed_leg()). Declare that, because nothing about the scene
 	# graph reveals it and a pose needs to know the ankle is worth writing to.
 	ankle_marker.set_meta(RigAdapter.DRIVES_GEOMETRY_META, true)
 	knee_pivot.add_child(ankle_marker)
 
-	# The toe, where his rendered foot actually reaches: forward of the ankle
-	# and down at the sole (see _rebuild_footed_leg()'s own bulb placement).
-	# This rig used to return the ankle marker itself as the toe, so anything
-	# reading both got the same point twice. The blorb suit takes the pair as
-	# the direction the foot points -- (toe - ankle).normalized() -- which
-	# with two identical points is a zero vector, and its leg then ended in a
-	# degenerate cap: stray bulbs under the feet, with the core and eyes
-	# thrown onto the back of the heel instead of the front of the toes.
+	var radius_scale: float = variant.get("leg_radius_scale", 1.0)
+	var taper: float = variant.get("limb_taper_scale", 1.0)
+	var foot_radius := lerpf(LEG_RADIUS_KNEE, FOOT_BULB_RADIUS, taper) * radius_scale
+	ankle_marker.set_meta("soft_leg", {
+		"hip_radius": LEG_RADIUS_HIP * radius_scale,
+		"knee_radius": LEG_RADIUS_KNEE * radius_scale,
+		"foot_radius": foot_radius,
+	})
+	# The equator is one radius above the sole; the limb rounds downward
+	# into one soft foot, with its toe on the front surface. No separate toe
+	# bulb is appended underneath. Markers are actual surface
+	# endpoints, derived from these same dimensions for every variant.
 	var toe_marker := Node3D.new()
 	toe_marker.name = "MonkeyToeMarker"
-	toe_marker.position = Vector3(0, -ANKLE_HEIGHT, FOOT_BULB_FORWARD)
+	toe_marker.position = Vector3(0, foot_radius - ANKLE_HEIGHT, FOOT_BULB_FORWARD + foot_radius)
 	ankle_marker.add_child(toe_marker)
-
-	# The underside of his foot, where it meets the ground: directly below
-	# the ankle rather than forward at the toe. Whatever a body wears or
-	# emits from the bottom of its foot attaches here, and this rig answers
-	# with its own foot depth instead of anyone assuming one.
 	var sole_marker := Node3D.new()
 	sole_marker.name = "MonkeySoleMarker"
-	sole_marker.position = Vector3(0, -ANKLE_HEIGHT, 0)
+	sole_marker.position = Vector3(0, -ANKLE_HEIGHT, FOOT_BULB_FORWARD)
 	ankle_marker.add_child(sole_marker)
 
 	var mesh_instance := MeshInstance3D.new()
@@ -629,51 +587,49 @@ static func _build_leg(
 	}
 
 
-## The stations this rig's own lower leg passes through, in `root`'s local
-## space, with the radius of the bare limb at each: knee, then the curve
-## forward and down into the soft foot, ending under the toes.
-##
-## Published so anything wrapping this leg follows the leg it is actually
-## wrapping. A shell built from another figure's foot dimensions and scaled
-## down gives a compact pipe-leg a human foot's relative thickness, which is
-## where the stray bulbs under his feet came from.
+## Canonical live profiles: bare limb and shell use identical centre-lines
+## and endpoint frames. Transform lengths through the actual node basis;
+## neither a fixed display scale nor human proportions belong in this path.
 static func suit_leg_profile(root: Node3D, knee: Node3D, ankle: Node3D) -> Dictionary:
+	var dimensions: Dictionary = ankle.get_meta("soft_leg")
+	var relative_basis := root.global_basis.inverse() * ankle.global_basis
+	var scale_factor := relative_basis.x.length()
+	var up := relative_basis.y.normalized()
+	var forward := relative_basis.z.normalized()
 	var ankle_pos := root.to_local(ankle.global_position)
-	var root_basis_inverse := root.global_transform.basis.inverse()
-	var lower_up := (root_basis_inverse * (ankle.global_transform.basis * Vector3.UP)).normalized()
-	var lower_forward := (
-		root_basis_inverse * (ankle.global_transform.basis * Vector3(0, 0, 1))
-	).normalized()
-	var scale_factor := REFERENCE_BUILD_SCALE
-	var transition := (
-		ankle_pos - lower_up * (ANKLE_HEIGHT - FOOT_TRANSITION_HEIGHT) * scale_factor
-		+ lower_forward * FOOT_BULB_FORWARD * 0.3 * scale_factor
-	)
-	var bulb := (
-		ankle_pos - lower_up * (ANKLE_HEIGHT - FOOT_BULB_CENTER_Y) * scale_factor
-		+ lower_forward * FOOT_BULB_FORWARD * scale_factor
-	)
-	var sole_radius := FOOT_BOTTOM_RADIUS * scale_factor
-	var sole := (
-		ankle_pos - lower_up * (ANKLE_HEIGHT * scale_factor - sole_radius)
-		+ lower_forward * FOOT_BULB_FORWARD * scale_factor
-	)
-	var toe_radius := sole_radius * FOOT_TOE_PINCH
-	var toe := (
-		ankle_pos - lower_up * (ANKLE_HEIGHT * scale_factor - toe_radius)
-		+ lower_forward * (FOOT_BULB_FORWARD * scale_factor + sole_radius * FOOT_TOE_REACH)
-	)
+	var knee_pos := root.to_local(knee.global_position)
+	var radius := float(dimensions["foot_radius"]) * scale_factor
+	var equator := ankle_pos + up * (radius - ANKLE_HEIGHT * scale_factor) + forward * FOOT_BULB_FORWARD * scale_factor
 	return {
-		"knee_radius": LEG_RADIUS_KNEE * scale_factor,
-		"hip_radius": LEG_RADIUS_HIP * scale_factor,
-		"stations": [transition, bulb, sole, toe],
-		"radii": [
-			lerpf(LEG_RADIUS_KNEE, FOOT_BULB_RADIUS, 0.45) * scale_factor,
-			FOOT_BULB_RADIUS * scale_factor,
-			sole_radius, toe_radius,
-		],
-		"tip_direction": lower_forward,
+		"hip_radius": float(dimensions["hip_radius"]) * scale_factor,
+		"knee_radius": float(dimensions["knee_radius"]) * scale_factor,
+		"stations": [equator],
+		"radii": [radius],
+		"tip_direction": -up,
+		"end_dome_steps": FOOT_DOME_STEPS,
+		"tip": equator - up * radius,
 	}
+
+
+static func suit_arm_profile(root: Node3D, shoulder: Node3D, elbow: Node3D, wrist: Node3D, fingertip: Node3D) -> Dictionary:
+	var dimensions: Dictionary = shoulder.get_meta("soft_arm")
+	var scale_factor := (root.global_basis.inverse() * shoulder.global_basis).x.length()
+	var start := root.to_local(shoulder.global_position)
+	var middle := root.to_local(elbow.global_position)
+	var tip := root.to_local(fingertip.global_position)
+	var wrist_pos := root.to_local(wrist.global_position)
+	var hand_direction := (tip - wrist_pos).normalized()
+	var hand_side := (root.global_basis.inverse() * wrist.global_basis).x.normalized() * signf(start.x)
+	var direction := (hand_direction + hand_side * HAND_TIP_SWEEP).normalized()
+	var radius := float(dimensions["tip_radius"]) * scale_factor
+	var equator := tip - direction * radius
+	var root_radius := ARM_RADIUS_SHOULDER * scale_factor
+	# The narrow root closes inside the torso, rather than growing a pointed
+	# extension above a shoulder already near the body's narrowing surface.
+	var inward := -Vector3.RIGHT * signf(start.x)
+	var points: Array[Vector3] = [start + inward * root_radius * 2.2, start, middle, equator]
+	var radii: Array[float] = [0.0, root_radius, ARM_RADIUS_ELBOW * scale_factor, radius]
+	return {"points": points, "radii": radii, "tip_direction": direction, "end_dome_steps": HAND_DOME_STEPS, "tip": tip}
 
 
 ## spine_forward_bend/arm_forward_relax_factor together fix the arm's rest
@@ -694,17 +650,25 @@ static func _build_arm(
 	rig: Node3D, spine_pivot: Node3D, side: float, fur_color: Color,
 	limb_length_scale: float = 1.0, body_height: float = BODY_HEIGHT, body_radius: float = BODY_RADIUS,
 	spine_forward_bend: float = 0.0, arm_forward_relax_factor: float = 0.0,
-	shoulder_height_fraction: float = 0.72
+	shoulder_height_fraction: float = 0.72, body_taper: float = 1.0
 ) -> Dictionary:
 	var shoulder_pivot := Node3D.new()
 	shoulder_pivot.name = "MonkeyShoulderPivot"
-	# Same 0.78 fraction SHOULDER_X uses for its own X, just off the
-	# caller's own (possibly variant-scaled) body_radius rather than the
-	# fixed BODY_RADIUS const. Y uses the caller's own
-	# shoulder_height_fraction (default 0.72, SHOULDER_Y_LOCAL's own value)
-	# off body_height.
-	shoulder_pivot.position = Vector3(side * body_radius * 0.78, body_height * shoulder_height_fraction, 0)
-	shoulder_pivot.rotation.z = side * ARM_OUTWARD_ANGLE
+	# Fit the socket against the actual pear at this height. Overall body
+	# width is not shoulder width, especially on Xiao's strongly tapered toy.
+	var surface_radius := body_radius * BlorbBodyShape.profile_radius(shoulder_height_fraction, body_taper)
+	var shoulder_x := minf(body_radius * 0.78, maxf(surface_radius - ARM_RADIUS_SHOULDER * 1.6, 0.0))
+	shoulder_pivot.position = Vector3(side * shoulder_x, body_height * shoulder_height_fraction, 0)
+	# Follow the local widening of the torso down toward the elbow. This
+	# derivative gives an outward rest angle on a pear and a smaller angle
+	# on a long, nearly straight villager torso. +Z rotation sends local -Y
+	# toward +X on the positive side, matching the confirmed rig convention.
+	var above := BlorbBodyShape.profile_radius(shoulder_height_fraction + 0.005, body_taper)
+	var below := BlorbBodyShape.profile_radius(shoulder_height_fraction - 0.005, body_taper)
+	var slope := (above - below) * body_radius / (body_height * 0.01)
+	var outward_angle := maxf(ARM_OUTWARD_ANGLE, atan(-slope))
+	shoulder_pivot.rotation.z = side * outward_angle
+	shoulder_pivot.set_meta("soft_arm", {"tip_radius": ARM_RADIUS_WRIST})
 	shoulder_pivot.rotation.x = -spine_forward_bend * (1.0 + arm_forward_relax_factor)
 	spine_pivot.add_child(shoulder_pivot)
 
@@ -1483,162 +1447,62 @@ static func rebuild_limbs(pivots: Dictionary, root: Node3D, delta: float = 0.0) 
 	# shared local space or the rig scale gets baked into vertices and applied
 	# a second time by the scene tree.
 	root = pivots["_rig"] as Node3D
-	var taper_scale: float = pivots.get("_taper_scale", 1.0)
 	var has_pads: bool = pivots.get("_has_foot_pads", false)
-	var leg_radius_scale: float = pivots.get("_leg_radius_scale", 1.0)
-	var wrist_radius := lerpf(ARM_RADIUS_ELBOW, ARM_RADIUS_WRIST, taper_scale)
-	# Through the wrist and on to the fingertip: the hand is the tube's own
-	# last stretch, so it bends when the wrist turns. The radius at the wrist
-	# is the old profile's value at that point, which keeps the silhouette.
-	var hand_start_radius := lerpf(ARM_RADIUS_ELBOW, wrist_radius, 1.0 - HAND_FRACTION * 2.0)
 	_rebuild_arm(
 		pivots["_limb_mesh_arm_left"] as MeshInstance3D, root,
 		pivots["arm_left"] as Node3D, pivots["elbow_left"] as Node3D,
-		pivots["wrist_left"] as Node3D, pivots["fingertip_left"] as Node3D,
-		hand_start_radius, wrist_radius
+		pivots["wrist_left"] as Node3D, pivots["fingertip_left"] as Node3D
 	)
 	_rebuild_arm(
 		pivots["_limb_mesh_arm_right"] as MeshInstance3D, root,
 		pivots["arm_right"] as Node3D, pivots["elbow_right"] as Node3D,
-		pivots["wrist_right"] as Node3D, pivots["fingertip_right"] as Node3D,
-		hand_start_radius, wrist_radius
+		pivots["wrist_right"] as Node3D, pivots["fingertip_right"] as Node3D
 	)
 	_rebuild_footed_leg(
 		pivots["_limb_mesh_leg_left"] as MeshInstance3D, root,
 		pivots["leg_left"] as Node3D, pivots["knee_left"] as Node3D,
 		pivots["ankle_left"] as Node3D, pivots["_sole_left"] as MeshInstance3D,
-		taper_scale, has_pads, leg_radius_scale
+		has_pads
 	)
 	_rebuild_footed_leg(
 		pivots["_limb_mesh_leg_right"] as MeshInstance3D, root,
 		pivots["leg_right"] as Node3D, pivots["knee_right"] as Node3D,
 		pivots["ankle_right"] as Node3D, pivots["_sole_right"] as MeshInstance3D,
-		taper_scale, has_pads, leg_radius_scale
+		has_pads
 	)
 	_rebuild_tail(pivots["_tail"] as Dictionary, delta)
 
 
 static func _rebuild_arm(
 	mesh_instance: MeshInstance3D, root: Node3D,
-	shoulder: Node3D, elbow: Node3D, wrist: Node3D, fingertip: Node3D,
-	hand_start_radius: float, wrist_radius: float
+	shoulder: Node3D, elbow: Node3D, wrist: Node3D, fingertip: Node3D
 ) -> void:
-	var shoulder_pos := root.to_local(shoulder.global_position)
-	var elbow_pos := root.to_local(elbow.global_position)
-	var wrist_pos := root.to_local(wrist.global_position)
-	var fingertip_pos := root.to_local(fingertip.global_position)
-	var hand_axis := fingertip_pos - wrist_pos
-	if hand_axis.length_squared() < 0.000001:
-		hand_axis = (wrist_pos - elbow_pos).normalized() * 0.001
-	var hand_length := hand_axis.length()
-	hand_axis = hand_axis.normalized()
-	# The actual shoulder joint sits slightly beyond the pear body's surface.
-	# Begin this same loft at a zero-radius point buried toward the torso, then
-	# reach full arm radius at the joint.  The old generic cap instead shrank
-	# to a visible point exactly at the joint; simply disabling it would expose
-	# a flat circular cut.  This hidden shoulder dome gives the arm a smooth,
-	# continuous emergence from the body.
-	var shoulder_side := signf(shoulder_pos.x)
-	var shoulder_inner := shoulder_pos - Vector3.RIGHT * shoulder_side * ARM_RADIUS_SHOULDER * 2.2
-	# The hand remains the same continuous noodle as the arm. Its final body
-	# station is the fingertip marker at a restrained radius; the shared tube
-	# builder adds a true hemisphere beyond it. Previously a full-width dome
-	# was compressed into the last 24% of this very short hand marker, making
-	# the end several times wider than it was long (the reported UFO bell).
-	var points: Array[Vector3] = [
-		shoulder_inner, shoulder_pos, elbow_pos, wrist_pos, fingertip_pos,
-	]
-	var radii: Array[float] = [
-		0.0, ARM_RADIUS_SHOULDER, ARM_RADIUS_ELBOW, hand_start_radius,
-		wrist_radius * 1.04,
-	]
+	var profile := suit_arm_profile(root, shoulder, elbow, wrist, fingertip)
 	mesh_instance.mesh = BlorbSuit.build_limb_tube(
-		points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, 0.0,
-		[], false, Vector3.ZERO, 1.0, false, [], HAND_DOME_STEPS
+		profile["points"], profile["radii"], LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, 0.0,
+		[], false, Vector3.ZERO, 1.0, false, [], HAND_DOME_STEPS, profile["tip_direction"], true
 	)
 
 
 static func _rebuild_footed_leg(
 	mesh_instance: MeshInstance3D, root: Node3D,
 	hip: Node3D, knee: Node3D, ankle: Node3D, sole: MeshInstance3D,
-	taper_scale: float = 1.0, has_pad: bool = true, leg_radius_scale: float = 1.0
+	has_pad: bool = false
 ) -> void:
 	var hip_pos := root.to_local(hip.global_position)
 	var knee_pos := root.to_local(knee.global_position)
 	var ankle_pos := root.to_local(ankle.global_position)
-	# The foot follows the ankle. This REVERSES an earlier decision, recorded
-	# here so the reversal is not mistaken for drift: the lower frame used to
-	# be built from the knee's basis and the ankle's POSITION only, ignoring
-	# ankle.global_transform.basis, to keep the leg one continuous knee-driven
-	# pear rather than reading as a leg followed by a foot bend.
-	#
-	# That kept his silhouette intact, but it also silently discarded every
-	# ankle angle written to him -- his walk settle, his skating, his swimming
-	# and his dirt bike all write one -- which is why four foot poses looked
-	# stiff on him and no amount of tuning them changed anything. Powers are
-	# becoming shared across characters (see
-	# docs/traversal_powers_architecture.md), so his foot has to be able to
-	# articulate like the human's.
-	#
-	# At rest the ankle marker carries no rotation of its own, so its basis
-	# IS the knee's and the geometry is unchanged: verified by rebuilding the
-	# leg both ways and comparing the mesh, which is identical to the vertex.
-	# Only a pose that actually turns the ankle now bends the foot.
-	var root_basis_inverse := root.global_transform.basis.inverse()
-	var lower_up := (root_basis_inverse * (ankle.global_transform.basis * Vector3.UP)).normalized()
-	var lower_forward := (
-		root_basis_inverse * (ankle.global_transform.basis * Vector3(0, 0, 1))
-	).normalized()
-	# A strictly descending sequence with small progressive forward shifts:
-	# this is one continuous pear profile, not a leg followed by a foot bend.
-	var transition_pos := (
-		ankle_pos - lower_up * (ANKLE_HEIGHT - FOOT_TRANSITION_HEIGHT)
-		+ lower_forward * (FOOT_BULB_FORWARD * 0.3)
-	)
-	var bulb_pos := (
-		ankle_pos - lower_up * (ANKLE_HEIGHT - FOOT_BULB_CENTER_Y)
-		+ lower_forward * FOOT_BULB_FORWARD
-	)
-	# The sole, then the toe. The sole's centre rides one of its own radii
-	# above the ground so the tube's SURFACE rests on it, giving the foot a
-	# rounded underside with real area; the toe carries on forward and is
-	# where the tube tapers away to nothing.
-	#
-	# Both used to be the same point, a single station at ground level that
-	# the cap taper shrank to zero. The foot therefore ended in a cone with
-	# no sole at all, which is why a shell wrapped around it read as having
-	# been lopped off flat underneath.
-	var sole_radius := FOOT_BOTTOM_RADIUS * leg_radius_scale
-	var sole_pos := (
-		ankle_pos - lower_up * (ANKLE_HEIGHT - sole_radius)
-		+ lower_forward * FOOT_BULB_FORWARD
-	)
-	# The toe rides its own radius above the floor for the same reason the
-	# sole does, so the whole underside rests on the ground rather than
-	# sinking through it.
-	var toe_radius := sole_radius * FOOT_TOE_PINCH
-	var toe_tip_pos := (
-		ankle_pos - lower_up * (ANKLE_HEIGHT - toe_radius)
-		+ lower_forward * (FOOT_BULB_FORWARD + sole_radius * FOOT_TOE_REACH)
-	)
-	# The final body station is the dome's equator. The shared tube builder
-	# appends its exact hemisphere after the Catmull-Rom body has finished, so
-	# the cap cannot be re-curved into the small protruding spike seen before.
-	var toe_dome_start := toe_tip_pos - lower_forward * toe_radius
-	var points: Array[Vector3] = [hip_pos, knee_pos, transition_pos, bulb_pos, sole_pos, toe_dome_start]
-	# taper_scale eases the bulge itself (and the point partway toward it)
-	# back toward the knee's own radius -- FOOT_BOTTOM_RADIUS is left alone
-	# since the toe tip's own pinch is a separate detail, not the "widens
-	# out at the end" flare per direct feedback this exists to soften.
-	var radii: Array[float] = [
-		LEG_RADIUS_HIP * leg_radius_scale, LEG_RADIUS_KNEE * leg_radius_scale,
-		lerpf(LEG_RADIUS_KNEE, 0.019, taper_scale) * leg_radius_scale,
-		lerpf(LEG_RADIUS_KNEE, FOOT_BULB_RADIUS, taper_scale) * leg_radius_scale,
-		sole_radius, toe_radius,
-	]
+	var relative_basis := root.global_basis.inverse() * ankle.global_basis
+	var lower_up := relative_basis.y.normalized()
+	var lower_forward := relative_basis.z.normalized()
+	var profile := suit_leg_profile(root, knee, ankle)
+	var points: Array[Vector3] = [hip_pos, knee_pos]
+	var radii: Array[float] = [profile["hip_radius"], profile["knee_radius"]]
+	points.append_array(profile["stations"])
+	radii.append_array(profile["radii"])
 	mesh_instance.mesh = BlorbSuit.build_limb_tube(
 		points, radii, LIMB_RADIAL_SEGMENTS, LIMB_RINGS_PER_SEGMENT, 0.0,
-		[], false, Vector3.ZERO, 1.0, false, [], FOOT_DOME_STEPS
+		[], false, Vector3.ZERO, 1.0, false, [], FOOT_DOME_STEPS, profile["tip_direction"], true
 	)
 	if has_pad:
 		_rebuild_sole_from_leg_mesh(

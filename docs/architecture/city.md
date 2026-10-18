@@ -350,8 +350,10 @@ A desert city needs a reason to exist. This one has **the wind.**
 5. **The everyday city.** Markets, the hawker centre, shops, the clinic, the
    school and the upkeep crews: the residents serving each other.
 
-**Moy feeds itself (proposed).** No road leads out (user), so nothing is
-imported or exported. The wind and the wells make a desert city able to
+**Moy feeds itself (proposed).** No public through-road serves Moy (user);
+the controlled ASAN service track from the North Gate to the launch site is
+the one exception (user, 2026-10-18; section 12). It carries no trade, and
+nothing is imported or exported. The wind and the wells make a desert city able to
 grow its own food:
 - the **vertical farm**, a windowless tower of lit growing racks in the
   market lanes, run by Sora Ishida: greens, herbs, vegetables, grain and
@@ -2290,7 +2292,7 @@ is redesigned in the manner of Portman's atrium hotels. The 3D drawing is
 
 ### 8.1 People and purposes
 
-**Why a grand hotel in a city no road reaches.** Moy has almost no outside
+**Why a grand hotel in a city with no public road.** Moy has almost no outside
 visitors, so the hotel lives on the city itself, the way grand hotels in
 real cities do. Portman called his atria "people space": a public room so
 big and so full of light that the city comes in to sit in it. That is what
@@ -3440,10 +3442,12 @@ lit crowns.
 
 The Space Kingdom is on the roadmap. Unlike the other kingdoms it has no
 gate: the hero goes by rocket. Its entry point is a launch complex in the
-open desert outside Moy, where the ship from the Demo World (the **ASAN
-launch vehicle**, `scripts/demo_spaceship.gd`) stands upright, ready to fly.
-This first step only places and plans the site; nothing is built in the game
-yet. Data: `LAUNCH_SITE` in `tools/city_layout.py` (exported to
+open desert outside Moy, built and operated by the **ASAN space agency**.
+The world starts with the launch mount, flame trench and service access road;
+the ship from the Demo World (the **ASAN launch vehicle**,
+`scripts/demo_spaceship.gd`) is a later addition. The launch tower, hangar,
+erector rails, firing room, fence and landing zones remain in the full site
+design. Data: `LAUNCH_SITE` in `tools/city_layout.py` (exported to
 `scripts/city_plan.gd`); drawings: the plan's *The launch site* (site plan and
 section) and the city model's *The launch site* view.
 
@@ -3468,7 +3472,7 @@ times the stack's height (the fall zone).
 | Firing room | (−205, −430) | 24 × 16 m, 6 m, behind an earth blast bank, its windows on the pad |
 | LZ-1, LZ-2 | (−150, −720), (−345, −705) | 25 m radius each |
 | Fence and gate | round all of it; the gate at (−200, −320) | |
-| Service track | North Gate → site gate | 8 m, unpaved |
+| Service track | North Gate → site gate | 8 m, unpaved; the prototype adds a short 8 m gravel spur from the site gate to the mount |
 
 ### 12.2 Standing the ship up
 
@@ -3541,6 +3545,6 @@ fly-back boosters give the site a visible before and after.
 
 - the boarding condition and how the world shows it;
 - whether the raise is ever seen (a cutscene) or only implied;
-- who runs the site (ASAN's own crew, or Moy's), and whether anyone is there;
+- whether ASAN crew are present at the site when the world begins;
 - how the hero comes back, and whether the ship returns to the pad;
 - the Space Kingdom itself.

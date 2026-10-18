@@ -92,12 +92,6 @@ const HIP_BACK_OFFSET := (HIP_FRONT_DEPTH - HIP_BACK_DEPTH) * 0.5
 # lower, which reads more natural than shoulders sitting high on a tall
 # chest.
 const CHEST_SIZE := Vector3(0.205, 0.15, 0.12)
-## How far the abdomen's front can protrude past the chest's own front depth
-## at the top of abdomen_width_scale's range -- per direct instruction, a
-## broad abdomen should be allowed a slight belly out front even once its
-## width and back depth are capped flush with the chest above it (see
-## build()'s abdomen_front_depth/abdomen_back_depth).
-const ABDOMEN_FRONT_OVERHANG_MAX := 1.12
 ## How much of abdomen_width_scale's broadness carries over into arm/leg
 ## thickness -- see build()'s limb_build_scale derivation for the full
 ## reasoning. A fraction, not 1:1: at abdomen_width_scale's own top of
@@ -367,8 +361,22 @@ static func build(
 	leg_thickness_scale: float = 1.0,
 	has_ears: bool = true,
 	hand_color_override: Color = Color(0.0, 0.0, 0.0, 0.0),
-	feminine_torso: bool = false
+	_feminine_torso: bool = false,
+	child_proportions: bool = false
 ) -> Dictionary:
+	var head_multiplier := 1.0
+	if child_proportions:
+		# Child is an explicit age category, never inferred from short stature.
+		# Keep individual fullness, but remove adult shoulder/hip exaggeration
+		# and the broad-thorax/narrow-waist silhouette from adult build rolls.
+		chest_build_scale = clampf(1.0 + (chest_build_scale - 1.0) * 0.2, 0.96, 1.08)
+		hip_build_scale = clampf(1.0 + (hip_build_scale - 1.0) * 0.2, 0.98, 1.08)
+		var waist_floor := CHEST_SIZE.x * chest_build_scale * 0.96 / ABDOMEN_SIZE.x
+		abdomen_width_scale = maxf(waist_floor, 1.28 + maxf(abdomen_width_scale - 1.0, 0.0) * 0.12)
+		# Absolute head size varies with height^0.35 rather than height^1.
+		# Smaller children therefore have a larger head/body ratio, while
+		# their complete face, hair, glasses and headwear remain one fitted unit.
+		head_multiplier = pow(clampf(scale, 0.55, 0.95), -0.65)
 	var arm_color := shirt_color if sleeve_style == SLEEVE_STYLE_LONG else skin_color
 	var hand_color: Color = skin_color if is_zero_approx(hand_color_override.a) else hand_color_override
 	var resolved_shoe_color := pants_color if is_zero_approx(shoe_color.a) else shoe_color
@@ -396,22 +404,12 @@ static func build(
 	)
 	var chest_z_offset := (chest_front_depth - chest_back_depth) * 0.5
 
-	# Abdomen: width and back depth are both capped at the chest's own
-	# dimensions (computed above) so the broadest abdomen still reads as
-	# flush with the chest above it, never bulging past it -- per direct
-	# correction, the top of NPC_ABDOMEN_WIDTH_SCALES was visibly wider and
-	# deeper-in-back than the chest. Front depth is allowed a small overhang
-	# past the chest's own front (ABDOMEN_FRONT_OVERHANG_MAX) -- a slight
-	# belly, not a flat match -- since only the back and sides need to stay
-	# flush.
+	# All bodies share one torso envelope. Compare the actual asymmetric
+	# chest extents, not its averaged half-depth: the abdomen must never
+	# protrude beyond the chest's front, back or sides, including children.
 	var abdomen_x := minf(ABDOMEN_SIZE.x * abdomen_width_scale, chest_size.x)
-	var abdomen_back_depth := minf(ABDOMEN_SIZE.z * abdomen_width_scale, chest_size.z)
-	# Only men's abdomens may stand proud of the chest. Women's stay flush
-	# with the thorax's own front, whatever the width scale.
-	var abdomen_overhang := 1.0 if feminine_torso else ABDOMEN_FRONT_OVERHANG_MAX
-	var abdomen_front_depth := minf(
-		ABDOMEN_SIZE.z * abdomen_width_scale, chest_size.z * abdomen_overhang
-	)
+	var abdomen_back_depth := minf(ABDOMEN_SIZE.z * abdomen_width_scale, chest_back_depth)
+	var abdomen_front_depth := minf(ABDOMEN_SIZE.z * abdomen_width_scale, chest_front_depth)
 	var abdomen_size := Vector3(
 		abdomen_x, ABDOMEN_SIZE.y, (abdomen_front_depth + abdomen_back_depth) * 0.5
 	)
@@ -422,6 +420,9 @@ static func build(
 	# -- same asymmetric-depth derivation HIP_SIZE/HIP_BACK_OFFSET use, just
 	# computed per-instance now that the abdomen's own front depth isn't a
 	# fixed const either.
+	# Widen the hip base when a softened waist reaches beyond its original
+	# build roll. Clothing and leg sockets consume this resolved scale too.
+	hip_build_scale = maxf(hip_build_scale, abdomen_x / HIP_SIZE.x)
 	var hip_front_depth := abdomen_front_depth
 	var hip_back_depth := HIP_BACK_DEPTH * hip_build_scale
 	var hip_size := Vector3(
@@ -561,6 +562,7 @@ static func build(
 
 	var head_pivot := Node3D.new()
 	head_pivot.name = "HeadPivot"
+	head_pivot.scale = Vector3.ONE * head_multiplier
 	# Raised HEAD_RAISE above where it used to sit flush with the chest top
 	# (see the neck above, built to exactly fill this same gap), but Z is
 	# back to the original 0 (front-to-back rig-center, not the neck's own
@@ -646,6 +648,8 @@ static func build(
 		"neck_mesh": neck,
 		"head": head_pivot,
 		"head_mesh": head_mesh,
+		"hip_build_scale": hip_build_scale,
+		"standing_height": (neck_y + HEAD_RAISE + HEAD_SIZE.y * 2.0 * head_multiplier) * scale,
 		"eyes": eyes,
 		"hips": hips,
 		"arm_left": arm_left["pivot"],

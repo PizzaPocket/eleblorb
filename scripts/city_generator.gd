@@ -94,6 +94,9 @@ const MOY_HOTEL_CENTER := Vector2(-457.0, -68.0)
 const MOY_SILHOUETTE_PATH := "res://assets/generated/moy_city/silhouette.tscn"
 var _moy_paths: Array[String] = []
 var _moy_hotel_paths: Array[String] = []
+var _moy_launch_path := ""
+var _moy_launch_requested := false
+var _moy_launch_active: Node3D
 var _moy_active: Dictionary = {}
 var _moy_requested := {}
 var _moy_unload_queue: Array[String] = []
@@ -142,12 +145,18 @@ func _load_moy_manifest() -> void:
 		_moy_paths.append(String(path))
 	for path in data.get("hotel_packs", []):
 		_moy_hotel_paths.append(String(path))
+	_moy_launch_path = String(data.get("launch_site", ""))
+	if not _moy_launch_path.is_empty() and not FileAccess.file_exists(_moy_launch_path):
+		push_error("Moy launch approach bake is missing: %s. Re-run tools/bake_moy_city.tscn" % _moy_launch_path)
+		_moy_launch_path = ""
 	_moy_paths.sort()
 
 
 func _stream_moy_city() -> void:
 	var player := get_node_or_null("../Player") as Node3D
-	if player == null or _moy_paths.is_empty(): return
+	if player == null: return
+	_stream_moy_launch_site(player)
+	if _moy_paths.is_empty(): return
 	var distance := Vector2(player.global_position.x, player.global_position.z).distance_to(CITY_CENTER)
 	var hotel_distance := Vector2(player.global_position.x, player.global_position.z).distance_to(MOY_HOTEL_CENTER)
 	var force_hotel := bool(get_meta("moy_force_hotel_pack", false))
@@ -210,6 +219,48 @@ func _stream_moy_city() -> void:
 		_add_moy_helmsmith()
 	elif _moy_actors_added and _moy_resident_index < CITY_NAMES.size():
 		_spawn_moy_resident()
+
+
+func _stream_moy_launch_site(player: Node3D) -> void:
+	if _moy_launch_path.is_empty(): return
+	var point := Vector2(player.global_position.x, player.global_position.z)
+	var route: Array[Vector2] = []
+	for raw_point in MOY_PLAN.LAUNCH_SITE.track.pts:
+		route.append(Vector2(float(raw_point[0]), float(raw_point[1])))
+	var gate: Array = MOY_PLAN.LAUNCH_SITE.fence.gate
+	var pad: Array = MOY_PLAN.LAUNCH_SITE.pad
+	var half: Array = MOY_PLAN.LAUNCH_SITE.mount.half
+	var gate_point := Vector2(float(gate[0]), float(gate[1]))
+	var pad_approach := Vector2(float(pad[0]), float(pad[1]) + float(half[1]))
+	if route.back().distance_to(gate_point) > 0.1: route.append(gate_point)
+	route.append(pad_approach)
+	var distance := INF
+	for i in range(route.size() - 1):
+		var nearest := Geometry2D.get_closest_point_to_segment(point, route[i], route[i + 1])
+		distance = minf(distance, point.distance_to(nearest))
+	if distance <= 260.0 and not _moy_launch_requested and _moy_launch_active == null:
+		var err := ResourceLoader.load_threaded_request(_moy_launch_path, "", false, ResourceLoader.CACHE_MODE_REUSE)
+		if err == OK or err == ERR_BUSY:
+			_moy_launch_requested = true
+		else:
+			push_warning("Moy launch approach request failed: %s (%s)" % [_moy_launch_path, error_string(err)])
+	if distance <= 140.0 and _moy_launch_active == null and _moy_launch_requested:
+		var state := ResourceLoader.load_threaded_get_status(_moy_launch_path)
+		if state == ResourceLoader.THREAD_LOAD_LOADED:
+			var packed := ResourceLoader.load_threaded_get(_moy_launch_path) as PackedScene
+			if packed != null:
+				var started := Time.get_ticks_usec()
+				_moy_launch_active = packed.instantiate() as Node3D
+				add_child(_moy_launch_active)
+				print("MOY_LAUNCH_ACTIVATE instantiate_add_ms=", (Time.get_ticks_usec() - started) / 1000.0, " bodies=", _count_physics_bodies(_moy_launch_active))
+			_moy_launch_requested = false
+		elif state == ResourceLoader.THREAD_LOAD_FAILED:
+			push_error("Moy launch approach failed to load: %s" % _moy_launch_path)
+			_moy_launch_requested = false
+	elif distance >= 180.0 and _moy_launch_active != null:
+		_moy_launch_active.queue_free()
+		_moy_launch_active = null
+		print("MOY_LAUNCH_RELEASE distance_m=", snappedf(distance, 0.1))
 
 
 func _count_physics_bodies(node: Node) -> int:

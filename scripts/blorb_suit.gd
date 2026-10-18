@@ -807,8 +807,22 @@ static func rebuild_arm(
 		points.resize(3)
 		radii.resize(3)
 		_append_round_cap(points, radii, wrist_bulged, reach_dir, r_wrist)
+	var arm_profile: Dictionary = {}
+	var arm_source: Variant = limb_fit.get("arm_profile")
+	if arm_source is Callable and not penguin:
+		arm_profile = (arm_source as Callable).call(root, shoulder, elbow, wrist, fingertip)
+		points = arm_profile["points"].duplicate()
+		radii = arm_profile["radii"].duplicate()
+		var inflate := float(limb_fit.get("arm_profile_inflate", 1.14)) * sealed_lava_radius
+		for index in radii.size():
+			radii[index] *= inflate
+		round_arm_tip = true
+		wrist_bulged = wrist_pos
+		tip_bulged = raw_tip_pos
+		r_wrist = radii.back()
+		r_tip = r_wrist
 	var formed := sealed_lava or penguin
-	if formed:
+	if formed and arm_profile.is_empty():
 		# A round shoulder cap: a true hemisphere continuing the shell past the
 		# shoulder, so the top of the shoulder is a smooth dome rather than a
 		# tube end squeezed shut over a few centimetres.
@@ -821,7 +835,8 @@ static func rebuild_arm(
 	var flatten_axis := outward_dir if penguin else Vector3.ZERO
 	mesh_instance.mesh = build_limb_tube(
 		points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION,
-		[] as Array[Color], not formed, flatten_axis, PENGUIN_FLIPPER_FLATTEN, not round_arm_tip
+		[] as Array[Color], not formed and arm_profile.is_empty(), flatten_axis, PENGUIN_FLIPPER_FLATTEN, not round_arm_tip,
+		[], int(arm_profile.get("end_dome_steps", 0)), arm_profile.get("tip_direction", Vector3.ZERO), not arm_profile.is_empty(), true
 	)
 	mesh_instance.set_surface_override_material(0, _build_goo_material(vis))
 
@@ -841,6 +856,11 @@ static func rebuild_arm(
 	# sizing/submersion below key off (ref_size), so both get proportioned
 	# to the tube's real local thickness here, not the wrist's bigger one.
 	var r_local := lerpf(r_wrist, r_tip, HAND_EYE_T)
+	if not arm_profile.is_empty():
+		# Place features on the shared hemisphere, rather than estimating a
+		# human hand bulge outside a stuffed limb's actual surface.
+		hand_center = points.back() + (arm_profile["tip_direction"] as Vector3) * r_wrist * 0.25
+		r_local = r_wrist * sqrt(1.0 - 0.25 * 0.25)
 	var hand_surface := hand_center + outward_dir * r_local * (PENGUIN_FLIPPER_FLATTEN if penguin else 1.0)
 
 	# Ground truth for the eye frame, straight off the hand's own CURRENT
@@ -857,7 +877,7 @@ static func rebuild_arm(
 	_update_face(
 		mesh_instance, hand_surface, outward_dir, r_local, vis,
 		ARM_EYE_RADIUS_FRACTION, CORE_RADIUS_FRACTION, ARM_EYE_FLATTEN, EYE_SPACING, ARM_EYE_OUTWARD_TILT,
-		right_hint, Vector3.ZERO, Vector3(0, ARM_EYE_RAISE * rig_scale, 0)
+		right_hint, Vector3.ZERO, Vector3(0, ARM_EYE_RAISE * rig_scale, 0), wrist_bulged.lerp(tip_bulged, HAND_EYE_T)
 	)
 
 	_update_boxing_glove(mesh_instance, blorb, wrist_bulged, tip_bulged, reach_dir, outward_dir, rig_scale, limb_fit, signf(shoulder_pos.x), r_wrist)
@@ -1070,17 +1090,8 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 			radii.append(float(station_radii[index]) * fit)
 		r_ankle = radii[radii.size() - 2]
 		r_toe = radii[radii.size() - 1]
-		# The shell closes exactly the way the leg itself closes, at the same
-		# point: build_limb_tube() tapers its last control point to nothing, so
-		# the boot rounds off where the foot rounds off.
-		#
-		# Two earlier attempts are recorded here because each looked like the
-		# fix for the other. Appending a rounded cap past that point hung a
-		# ball of the toe's full radius below the sole, which read as an extra
-		# length of leg under his feet. Pushing the point forward instead
-		# closed the taper forward and left the underside cut flat, as if the
-		# sole had been lopped off. Leaving the point where the rig put it
-		# does neither.
+		# Use the bare limb's exact rounded endpoint and ankle frame. Only
+		# thickness grows; a separate guessed toe curve cannot grow a bulb.
 		var hip_overlap := float(limb_fit.get("leg_hip_overlap", 0.0))
 		if hip_overlap > 0.0:
 			var hip_outward := -(knee_pos - hip_pos).normalized()
@@ -1116,7 +1127,8 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 	else:
 		mesh_instance.mesh = build_limb_tube(
 			points, radii, LIMB_RADIAL_SEGMENTS, RINGS_PER_SEGMENT, TUBE_CAP_FRACTION,
-			[] as Array[Color], not penguin, flatten_axis, foot_flatten, not monkey_foot_curve
+			[] as Array[Color], not penguin and not monkey_foot_curve, flatten_axis, foot_flatten, not monkey_foot_curve,
+			[], int(leg_profile.get("end_dome_steps", 0)), leg_profile.get("tip_direction", Vector3.ZERO), monkey_foot_curve, true
 		)
 		mesh_instance.set_surface_override_material(0, _build_goo_material(vis))
 
@@ -1164,6 +1176,9 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 	var foot_length := maxf(raw_toe_pos.distance_to(ankle_pos), 0.0001)
 	var boot_centerline := raw_toe_pos - toe_forward * (BOOT_EYE_BACK_FRACTION * foot_length)
 	var r_local := lerpf(r_ankle, r_toe, BOOT_EYE_T)
+	if monkey_foot_curve and not penguin:
+		boot_centerline = (leg_profile["stations"] as Array).back() + toe_forward * r_toe * 0.25
+		r_local = r_toe * sqrt(1.0 - 0.25 * 0.25)
 	if mermaid:
 		r_local = MERMAID_FACE_DEPTH * rig_scale
 
@@ -1197,10 +1212,19 @@ static func rebuild_leg(mesh_instance: MeshInstance3D, root: Node3D, hip: Node3D
 	# ankle/shin (the leg itself), same live-orientation source as the eye
 	# frame above rather than a fixed axis.
 	var core_offset := Vector3(0, -FOOT_CORE_EXTRA_LOWER * rig_scale, 0) - toe_forward * (LEG_CORE_BACK_SHIFT * rig_scale)
+	# Core belongs above the wearer's foot, inside the boot. The eye-facing
+	# angle is independent; its old downward/backward offsets could push a
+	# compact monkey core right out through the sole.
+	var foot_span := raw_toe_pos - ankle_pos
+	foot_span -= toe_up * foot_span.dot(toe_up)
+	var core_hint := ankle_pos + foot_span * 0.45 + toe_up * r_local * 0.3
+	if monkey_foot_curve:
+		var equator: Vector3 = (leg_profile["stations"] as Array).back()
+		core_hint = equator + toe_up * (maxf((ankle_pos - equator).dot(toe_up), 0.0) + r_toe * 0.2)
 	_update_face(
 		mesh_instance, eye_anchor, eye_facing, r_local, vis,
 		LEG_EYE_RADIUS_FRACTION, LEG_CORE_RADIUS_FRACTION, LEG_EYE_FLATTEN, EYE_SPACING, LEG_EYE_OUTWARD_TILT,
-		right_hint, core_offset
+		right_hint, core_offset, Vector3.ZERO, core_hint, toe_up
 	)
 
 
@@ -1845,12 +1869,53 @@ static func _build_leaf_hat(
 	var half_width := width * 0.72
 	var half_length := depth * 0.82
 	var curl := height * 0.16
+	var center := contents.get_center()
+	var origin := Vector3(center.x, contents.end.y + height * 0.025, center.z - depth * 0.04)
+	var samples: Dictionary = {}
+	for descendant in head_pivot.find_children("*", "MeshInstance3D", true, false):
+		var part := descendant as MeshInstance3D
+		if part.mesh == null or _is_suit_geometry(part, head_pivot):
+			continue
+		var faces := part.mesh.get_faces()
+		for index in range(0, faces.size(), 3):
+			var a := head_pivot.to_local(part.to_global(faces[index]))
+			var b := head_pivot.to_local(part.to_global(faces[index + 1]))
+			var c := head_pivot.to_local(part.to_global(faces[index + 2]))
+			for point in [a, b, c, (a + b + c) / 3.0]:
+				samples[point] = true
+	# Fit a hat to the crown, rather than roofing over low ears and muzzles.
+	# Everything below this band is below even the lowest draped leaf edge.
+	var crown_floor := contents.end.y - height * 0.30
+	var crown := AABB(Vector3(center.x, contents.end.y, center.z), Vector3.ZERO)
+	for point: Vector3 in samples:
+		if point.y >= crown_floor:
+			crown = crown.expand(point)
+	half_width = maxf(crown.size.x * 0.62, head_size.x * 1.08)
+	half_length = maxf(crown.size.z * 0.75, head_size.z * 1.20)
+	origin.x = crown.get_center().x
+	origin.z = crown.get_center().z - crown.size.z * 0.025
+	for point: Vector3 in samples:
+		if point.y < crown_floor:
+			continue
+		# Keep every potentially intersecting upper-head point inside the
+		# tapered outline; lower ears are free to extend outside its brim.
+		half_length = maxf(half_length, absf(point.z - origin.z) * 1.45)
+	for point: Vector3 in samples:
+		if point.y < crown_floor:
+			continue
+		var v := ((point.z - origin.z) / half_length + 1.0) * 0.5
+		var profile := maxf(LeafHat.width_profile(v), 0.001)
+		half_width = maxf(half_width, absf(point.x - origin.x) / profile * 1.04)
+	for point: Vector3 in samples:
+		var surface := LeafHat.surface_point(point.x - origin.x, point.z - origin.z, half_width, half_length, curl)
+		origin.y = maxf(origin.y, point.y - surface.y + height * 0.025)
 	var albedo := vis["albedo"] as Color
 	var root := LeafHat.build_fitted(
-		half_width, half_length, curl, height * 1.05, albedo
+		half_width, half_length, curl, origin.y - contents.position.y + height * 0.01, albedo
 	)
 	root.name = "LivingLeafHat"
-	root.position = Vector3(0.0, contents.end.y + height * 0.045, -depth * 0.04)
+	root.position = origin
+	root.set_meta("leaf_dimensions", Vector3(half_width, half_length, curl))
 	head_pivot.add_child(root)
 
 	# Sample the actual curved leaf for each eye, then align its flattened face
@@ -2177,6 +2242,66 @@ static func _is_suit_geometry(node: Node, boundary: Node) -> bool:
 	return false
 
 
+## Uniformly tighten the existing silhouette around the actual head and
+## hair, rather than the empty corners of their combined bounding box.
+## Radial queries use the committed shell, including its repaired rear bend.
+static func _fitted_lava_helm_contents(head_pivot: Node3D, contents: AABB) -> AABB:
+	if head_pivot.has_meta("lava_helm_fitted_contents"):
+		return head_pivot.get_meta("lava_helm_fitted_contents") as AABB
+	var center := contents.get_center()
+	# Query at a unit scale: tiny monkey triangles otherwise fall below the
+	# engine's intersection tolerances and can produce false misses.
+	var query_scale := contents.size.length() * 0.5
+	var reference_size := contents.size / query_scale
+	var reference := AABB(-reference_size * 0.5, reference_size)
+	var shell := BlorbBodyShape.build_mesh_from_rings(_build_lava_helm_rings(reference))
+	var triangles := shell.generate_triangle_mesh()
+	var points: Dictionary = {}
+	for descendant in head_pivot.find_children("*", "MeshInstance3D", true, false):
+		var part := descendant as MeshInstance3D
+		if part.mesh == null or part.name.begins_with("HeadBlorb") or _is_suit_geometry(part, head_pivot):
+			continue
+		var faces := part.mesh.get_faces()
+		for index in range(0, faces.size(), 3):
+			var a := head_pivot.to_local(part.to_global(faces[index])) - center
+			var b := head_pivot.to_local(part.to_global(faces[index + 1])) - center
+			var c := head_pivot.to_local(part.to_global(faces[index + 2])) - center
+			for point in [a, b, c, (a + b) * 0.5, (b + c) * 0.5, (c + a) * 0.5, (a + b + c) / 3.0]:
+				points[point] = true
+	var fit := 0.0
+	for point: Vector3 in points:
+		if point.length_squared() < 1e-12:
+			continue
+		var reach := _lava_helm_ray_reach(triangles, point.normalized())
+		if reach <= 0.0:
+			# Preserve the conservative fit if a malformed shell cannot be queried.
+			return contents
+		fit = maxf(fit, point.length() / query_scale / reach)
+	if fit <= 0.0:
+		return contents
+	# A small real surface clearance remains, including between sample points.
+	fit *= 1.025
+	var fitted := AABB(center - contents.size * fit * 0.5, contents.size * fit)
+	head_pivot.set_meta("lava_helm_fitted_contents", fitted)
+	return fitted
+
+
+# Exact midline rays can land on a shared triangle edge and be rejected
+# by floating-point barycentric tests. Two tiny parallel offsets query both
+# neighbouring faces; use the shorter reach conservatively.
+static func _lava_helm_ray_reach(triangles: TriangleMesh, direction: Vector3) -> float:
+	var hit := triangles.intersect_ray(Vector3.ZERO, direction)
+	if not hit.is_empty():
+		return (hit["position"] as Vector3).length()
+	var reach := INF
+	for side in [-1.0, 1.0]:
+		hit = triangles.intersect_ray(Vector3.RIGHT * side * 0.00001, direction)
+		if hit.is_empty():
+			return -1.0
+		reach = minf(reach, (hit["position"] as Vector3).length())
+	return reach
+
+
 static func _build_lava_helm(head_pivot: Node3D, contents: AABB, vis: Dictionary) -> Node3D:
 	# Per direct correction, the real head stays visible underneath -- a
 	# translucent goo overlay over the real body part is how every other
@@ -2200,6 +2325,7 @@ static func _build_lava_helm(head_pivot: Node3D, contents: AABB, vis: Dictionary
 				"visual": original_visual,
 				"scale": original_visual.scale,
 			})
+	contents = _fitted_lava_helm_contents(head_pivot, contents)
 	var root := Node3D.new()
 	root.name = "HeadBlorbLavaHelm"
 	root.set_meta("protected_visual_scales", protected_visual_scales)
@@ -2297,21 +2423,11 @@ static func release_piece(piece: Node3D) -> void:
 ## of a fixed authored size, since it has to actually enclose an arbitrary
 ## wearer's head rather than just look like one.
 ##
-## Sizing: BULB_RADIUS is set to (at least) `contents`' own half-diagonal,
-## so a sphere of that radius centered on `contents`' own center always
-## contains the whole box, whatever its proportions -- and the face cross
-## section at s=0 is approximately exactly that sphere (radius stays within
-## cos(small angle) of BULB_RADIUS for s near 0, and the pipe's other two
-## span/back/lift dimensions move so little near s=0 that this reads as a
-## true sphere there, not just "close enough"). Every other shape constant
-## is expressed as a ratio against BULB_RADIUS, copied directly from Lava
-## Slide's own tuned proportions (each of his HEAD_* constants divided by
-## his own HEAD_PIPE_RADIUS), so this reads as the same cashew silhouette
-## uniformly rescaled to whatever this wearer's head needs -- not a
-## differently-shaped helm that merely shares the technique.
-## Cut from 1.15 per direct correction ("massively big") -- 1.04 is a much
-## tighter fit, a 4% safety buffer over the mathematically exact minimum
-## enclosing sphere rather than 15% of headroom to spare.
+## The bounding-box half-diagonal provides the initial conservative scale.
+## _fitted_lava_helm_contents() then uniformly tightens it against the actual
+## head/hair/accessory surface, retaining clearance instead of enclosing
+## unoccupied box corners. All silhouette ratios stay fixed. The inside of
+## the rear bend is locally faired to remove its former self-intersection.
 const LAVA_HELM_ENCLOSE_MARGIN := 1.04
 const LAVA_HELM_SPAN_RATIO := 0.16 / 0.09
 ## Cut from Lava Slide's own 0.13/0.09 ratio per direct correction ("shorten
@@ -2321,7 +2437,9 @@ const LAVA_HELM_SPAN_RATIO := 0.16 / 0.09
 ## so this one is a much larger cut rather than another small increment.
 const LAVA_HELM_BACK_RATIO := 0.12
 const LAVA_HELM_LIFT_RATIO := 0.11 / 0.09
-const LAVA_HELM_FACE_FORWARD_RATIO := 0.17 / 0.09
+# A restrained backward sweep gives the lobes a gradual boomerang-tip
+# profile instead of long horns pointing behind the wearer.
+const LAVA_HELM_FACE_FORWARD_RATIO := 1.35
 ## Past this |s|, an extra shrink factor (on top of the ordinary cos(phi)
 ## taper every ring already gets) ramps in -- see _lava_helm_radius_at().
 ## Per direct correction (twice now), pushed down again from 0.1 to
@@ -2331,13 +2449,9 @@ const LAVA_HELM_FACE_FORWARD_RATIO := 0.17 / 0.09
 ## start shrinking well before the shell has fully "cleared" the head and
 ## still enclose it.
 const LAVA_HELM_CLEAR_S := 0.04
-## How much extra shrink (beyond the ordinary cos(phi) taper) has fully
-## ramped in by the very tip (|s|=1). Per direct correction (twice now),
-## raised again from 0.35 for a more pronounced shrink overall, spread
-## smoothly (smoothstep, not a hard cutoff) across nearly this whole
-## s=0.04..1.0 span. The actual point-free cashew closing at the tip still
-## comes from cos(phi) alone hitting zero there regardless of this value.
-const LAVA_HELM_EXTRA_TAPER := 0.6
+## A restrained extra taper leaves the lobe ends full and softly rounded.
+## cos(phi) still closes them continuously, without a separately joined cap.
+const LAVA_HELM_EXTRA_TAPER := 0.35
 
 
 ## Every shape constant this pipe needs, derived once from `contents` so
@@ -2397,8 +2511,8 @@ static func _build_lava_helm_rings(contents: AABB) -> Array:
 	var lift: float = shape["lift"]
 	var face_forward: float = shape["face_forward"]
 	var bulb_radius: float = shape["bulb_radius"]
-	const RING_COUNT := 32
-	const RADIAL_SEGMENTS := 16
+	const RING_COUNT := 48
+	const RADIAL_SEGMENTS := 32
 	var rings: Array = []
 	for ring_index in RING_COUNT + 1:
 		var phi: float = -PI * 0.5 + PI * float(ring_index) / float(RING_COUNT)
@@ -2412,9 +2526,21 @@ static func _build_lava_helm_rings(contents: AABB) -> Array:
 		var ring: Array[Vector3] = []
 		for segment in RADIAL_SEGMENTS:
 			var angle: float = TAU * float(segment) / float(RADIAL_SEGMENTS)
-			# Negated sin term -- see lava_slide.gd's identical fix; this
-			# builder shares the same winding otherwise.
-			ring.append(center + (right * cos(angle) - up * sin(angle)) * radius)
+			# Match build_mesh_from_rings()'s clockwise exterior winding.
+			# The old negated sine exposed the pipe's inner faces instead.
+			var offset := (right * cos(angle) + up * sin(angle)) * radius
+			# The inside bend of this thick pipe used to double back through
+			# itself at the rear midline. Fair only its lateral displacement:
+			# the front, side silhouette and swept tip endpoints stay intact.
+			var rear := smoothstep(0.0, 0.4, -cos(angle))
+			var middle := 1.0 - smoothstep(0.2, 1.0, absf(s))
+			offset.x *= 1.0 - rear * middle
+			# The old circular section left a third, tiny peak at the crown's
+			# midline. Ease that central rise into the cashew's shallow saddle.
+			var crown := smoothstep(0.4, 1.0, sin(angle))
+			var crown_middle := 1.0 - smoothstep(0.0, 0.4, absf(s))
+			offset.y -= bulb_radius * 0.07 * crown * crown_middle
+			ring.append(center + offset)
 		rings.append(ring)
 	return rings
 
@@ -2794,11 +2920,16 @@ static func build_limb_tube(
 	radial_segments: int, rings_per_segment: int, cap_fraction: float,
 	control_colors: Array[Color] = [], taper_start: bool = true,
 	flatten_axis: Vector3 = Vector3.ZERO, flatten: float = 1.0, taper_end: bool = true,
-	control_cross_scales: Array[Vector2] = [], end_dome_steps: int = 0
+	control_cross_scales: Array[Vector2] = [], end_dome_steps: int = 0,
+	end_direction: Vector3 = Vector3.ZERO, smooth_radii: bool = false, cache_surface: bool = false
 ) -> ArrayMesh:
 	var n := control_points.size()
 	var p_start: Vector3 = control_points[0] * 2.0 - control_points[1]
 	var p_end: Vector3 = control_points[n - 1] * 2.0 - control_points[n - 2]
+	if end_direction.length_squared() > 0.000001:
+		# The final Catmull-Rom derivative is (p_end - previous) / 2.
+		# Match a real wrist/ankle frame so the cap ends at its declared tip.
+		p_end = control_points[n - 2] + end_direction.normalized() * control_points[n - 1].distance_to(control_points[n - 2]) * 2.0
 	var ext_points: Array[Vector3] = [p_start]
 	ext_points.append_array(control_points)
 	ext_points.append(p_end)
@@ -2831,7 +2962,7 @@ static func build_limb_tube(
 			var tangent := _catmull_rom_tangent(
 				ext_points[seg], ext_points[seg + 1], ext_points[seg + 2], ext_points[seg + 3], t
 			)
-			var radius := lerpf(control_radii[seg], control_radii[seg + 1], t)
+			var radius := lerpf(control_radii[seg], control_radii[seg + 1], smoothstep(0.0, 1.0, t) if smooth_radii else t)
 			var u := float(ring_index) / float(total_rings - 1)
 			radius *= _cap_taper(u, cap_fraction, taper_start, taper_end)
 
@@ -2912,7 +3043,10 @@ static func build_limb_tube(
 			if has_colors:
 				ring_colors.append(control_colors[n - 1])
 
-	return BlorbBodyShape.build_mesh_from_rings(rings, ring_colors)
+	var mesh := BlorbBodyShape.build_mesh_from_rings(rings, ring_colors)
+	if cache_surface:
+		SuitSurface.cache(mesh, rings)
+	return mesh
 
 
 static func _catmull_rom(p0: Vector3, p1: Vector3, p2: Vector3, p3: Vector3, t: float) -> Vector3:
@@ -3058,7 +3192,8 @@ static func _update_face(
 	piece: Node3D, center: Vector3, facing: Vector3, ref_size: float, vis: Dictionary,
 	eye_fraction: float = EYE_RADIUS_FRACTION, core_fraction: float = CORE_RADIUS_FRACTION,
 	flatten: float = EYE_FLATTEN, spacing: float = EYE_SPACING, outward_tilt: float = 0.0,
-	right_hint: Vector3 = Vector3.ZERO, core_offset: Vector3 = Vector3.ZERO, eye_offset: Vector3 = Vector3.ZERO
+	right_hint: Vector3 = Vector3.ZERO, core_offset: Vector3 = Vector3.ZERO, eye_offset: Vector3 = Vector3.ZERO,
+	core_hint: Vector3 = Vector3(INF, INF, INF), core_direction: Vector3 = Vector3.ZERO
 ) -> void:
 	var albedo := vis["albedo"] as Color
 	# Matches blorb_face.gd/figure_eyes.gd's own darkened(0.25) -- an
@@ -3066,6 +3201,8 @@ static func _update_face(
 	# fixed project-wide) read as near-black against light body colors.
 	var eye_color := albedo.darkened(0.25)
 	var eye_radius := ref_size * eye_fraction
+	var skin: Mesh = (piece as MeshInstance3D).mesh if piece is MeshInstance3D else null
+	var follows_skin := SuitSurface.available(skin)
 
 	# right/up used to be carried forward (parallel-transported) from the
 	# PREVIOUS call on this same `piece`, the same technique
@@ -3142,9 +3279,30 @@ static func _update_face(
 		# not independently confirmed in-engine, so if this reads as
 		# splaying the eyes INWARD (toward each other) instead, negate the
 		# sign on `side` below.
-		eye.basis = Basis.looking_at(-facing, up).rotated(up, -side * outward_tilt)
-		eye.scale = Vector3(1.0, 1.0, flatten)
-		eye.position = center + right * (side * eye_radius * spacing) - facing * (eye_radius * EYE_EMBED_FRACTION) + eye_offset
+		var eye_surface: Vector3 = center + right * (float(side) * eye_radius * spacing) + eye_offset
+		var eye_normal := facing
+		var embed := eye_radius * EYE_EMBED_FRACTION
+		if follows_skin:
+			var hit := SuitSurface.project(skin, eye_surface, facing, ref_size * 8.0)
+			eye.visible = not hit.is_empty()
+			if not hit.is_empty():
+				eye_surface = hit["point"]
+				eye_normal = hit["normal"]
+				embed = eye_radius * flatten * 0.85
+				eye.set_meta("skin_point", eye_surface)
+				eye.set_meta("skin_normal", eye_normal)
+				eye.set_meta("skin_embed", embed)
+		var eye_up := right.cross(eye_normal).normalized()
+		if eye_up.length_squared() < 0.001:
+			eye_up = up
+		eye.basis = Basis.looking_at(-eye_normal, eye_up)
+		if not follows_skin:
+			eye.basis = eye.basis.rotated(up, -side * outward_tilt)
+		if not eye.has_meta("authored_radius"):
+			eye.set_meta("authored_radius", eye_radius)
+		var eye_scale := eye_radius / maxf(float(eye.get_meta("authored_radius")), 0.000001)
+		eye.scale = Vector3(eye_scale, eye_scale, eye_scale * flatten)
+		eye.position = eye_surface - eye_normal * embed
 
 	# The core's own position/size is fully independent of the eyes' own
 	# (much smaller) radius now -- an earlier version anchored it at
@@ -3160,10 +3318,24 @@ static func _update_face(
 	var core_emissive := vis["core_emissive"] as bool
 	var core_color := vis["core_color"] as Color
 	var core_radius := minf(ref_size * core_fraction, ref_size * CORE_MAX_REF_FRACTION)
+	var authored_core_radius := core_radius
 	var core_inset := core_radius * CORE_SUBMERGE_MARGIN
+	var core_position := center - facing * core_inset + core_offset
+	if follows_skin:
+		var aim := facing if core_direction == Vector3.ZERO else core_direction.normalized()
+		var hint := core_hint if core_hint.is_finite() else core_position
+		var front := SuitSurface.project(skin, hint, aim, ref_size * 8.0)
+		var back := SuitSurface.project(skin, hint, -aim, ref_size * 8.0)
+		if not front.is_empty() and not back.is_empty():
+			core_position = hint
+			if ((front["point"] as Vector3) - hint).dot(aim) < 0.0 or ((back["point"] as Vector3) - hint).dot(aim) > 0.0:
+				core_position = ((front["point"] as Vector3) + (back["point"] as Vector3)) * 0.5
+			core_radius = minf(core_radius, SuitSurface.clearance(skin, core_position, core_radius * CORE_SUBMERGE_MARGIN) / CORE_SUBMERGE_MARGIN)
+		else:
+			core_radius = 0.0
 	var core: MeshInstance3D = piece.get_node_or_null("Core")
 	if core == null:
-		core = BlorbCore.build(core_radius, core_color, core_emissive)
+		core = BlorbCore.build(authored_core_radius, core_color, core_emissive)
 		core.name = "Core"
 		piece.add_child(core)
 	else:
@@ -3174,7 +3346,12 @@ static func _update_face(
 		var emissive_material: StandardMaterial3D = core.get_meta("material")
 		emissive_material.emission = vis["core_emission"] as Color
 		emissive_material.emission_energy_multiplier = vis["core_emission_energy"] as float
-	core.position = center - facing * core_inset + core_offset
+	if not core.has_meta("authored_radius"):
+		core.set_meta("authored_radius", maxf(core.mesh.get_aabb().size.y * 0.5, 0.000001))
+	core.scale = Vector3.ONE * (core_radius / float(core.get_meta("authored_radius")))
+	core.visible = core_radius > 0.000001
+	core.position = core_position
+	core.set_meta("fitted_radius", core_radius)
 
 	var light: OmniLight3D = core.get_node_or_null("Light")
 	if vis["has_light"] as bool:

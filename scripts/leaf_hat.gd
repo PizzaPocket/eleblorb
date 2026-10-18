@@ -1,16 +1,14 @@
 class_name LeafHat
 extends RefCounted
 
-## A broad living leaf worn crosswise over the crown. Its width curls upward
-## at both sides (a shallow taco section) while its stem-to-tip axis follows
-## the head front-to-back. The vine is a separate soft band which physically
-## wraps beneath the leaf rather than a painted stripe.
+## A broad living leaf draped over the crown, with a rounded forward tip,
+## tapered rear stem, seated veins and one continuous closed securing vine.
 
 const LEAF_COLOR := Color(0.18, 0.62, 0.22)
 const VEIN_COLOR := Color(0.11, 0.42, 0.14)
 const VINE_COLOR := Color(0.15, 0.36, 0.10)
-const WIDTH_SEGMENTS := 14
-const LENGTH_SEGMENTS := 20
+const WIDTH_SEGMENTS := 24
+const LENGTH_SEGMENTS := 36
 
 
 static func build_visual(item_scale: float = 1.0) -> Node3D:
@@ -32,44 +30,65 @@ static func build_fitted(
 	leaf.material_override = _material(body_color, 0.78)
 	root.add_child(leaf)
 
-	# Raised midrib makes the object read as a leaf from above and in profile.
-	var midrib := MeshInstance3D.new()
-	midrib.name = "Midrib"
-	var rib_mesh := CylinderMesh.new()
-	rib_mesh.top_radius = half_width * 0.025
-	rib_mesh.bottom_radius = half_width * 0.04
-	rib_mesh.height = half_length * 1.72
-	rib_mesh.radial_segments = 8
-	midrib.mesh = rib_mesh
-	midrib.rotation.x = PI * 0.5
-	midrib.position = Vector3(0.0, curl * 0.16 + half_width * 0.025, 0.04 * half_length)
-	midrib.material_override = _material(body_color, 0.85)
-	root.add_child(midrib)
-
-	# One continuous tie crosses the leaf, drops down both sides of the head,
-	# and meets beneath the chin. This is a hat strap, not a halo sitting above
-	# the crown.
-	var drop := maxf(chin_drop, half_width * 1.2)
-	var strap_points: Array[Vector3] = [
-		Vector3(-half_width * 0.82, -curl * 0.66, 0.0),
-		Vector3(-half_width * 0.92, -drop * 0.48, half_length * 0.12),
-		Vector3(-half_width * 0.38, -drop, half_length * 0.22),
-		Vector3(0.0, -drop * 1.08, half_length * 0.24),
-		Vector3(half_width * 0.38, -drop, half_length * 0.22),
-		Vector3(half_width * 0.92, -drop * 0.48, half_length * 0.12),
-		Vector3(half_width * 0.82, -curl * 0.66, 0.0),
+	# The midrib follows the actual leaf surface, half embedded in the skin.
+	# Its rear extension is the same continuous stem, with a natural bend.
+	var rib_points: Array[Vector3] = [
+		Vector3(-half_width * 0.09, -curl * 0.62, -half_length * 1.22),
+		Vector3(-half_width * 0.035, -curl * 0.48, -half_length * 1.08),
 	]
-	var tie_color := body_color
-	_add_vine_path(root, strap_points, half_width * 0.035, tie_color)
-	# The section crossing the leaf follows its downward crown rather than
-	# floating above it.
-	_add_vine_path(root, [
-		Vector3(-half_width * 0.82, -curl * 0.66, 0.0),
-		Vector3(-half_width * 0.42, -curl * 0.17, 0.0),
-		Vector3(0.0, half_width * 0.018, 0.0),
-		Vector3(half_width * 0.42, -curl * 0.17, 0.0),
-		Vector3(half_width * 0.82, -curl * 0.66, 0.0),
-	], half_width * 0.035, tie_color)
+	var rib_radii: Array[float] = [half_width * 0.012, half_width * 0.023]
+	for step in 31:
+		var v := lerpf(0.015, 0.985, step / 30.0)
+		var point := _leaf_point(0.5, v, half_width, half_length, curl)
+		var radius := half_width * lerpf(0.028, 0.005, v)
+		point.y += radius * 0.25
+		rib_points.append(point)
+		rib_radii.append(radius)
+	_add_tube(root, "MidribAndStem", rib_points, rib_radii, body_color.darkened(0.12))
+	# Paired curved veins give the blade a leafy structure rather than the
+	# appearance of a cut sheet. Each one is seated in that same skin.
+	for station in [0.22, 0.36, 0.50, 0.64, 0.76]:
+		for side in [-1.0, 1.0]:
+			var points: Array[Vector3] = []
+			var radii: Array[float] = []
+			for step in 9:
+				var t := step / 8.0
+				var v: float = station + 0.12 * t
+				var point := _leaf_point(0.5 + side * 0.43 * t, v, half_width, half_length, curl)
+				var radius := half_width * lerpf(0.009, 0.002, t)
+				point.y += radius * 0.25
+				points.append(point)
+				radii.append(radius)
+			_add_tube(root, "LeafVein", points, radii, body_color.darkened(0.08))
+
+	var radius := half_width * 0.035
+	var drop := maxf(chin_drop, half_width * 1.2)
+	var controls: Array[Vector3] = []
+	# Walk clockwise over the crown, around the cheek and under the chin,
+	# then back up the other side. Periodic interpolation joins everything
+	# into one smooth closed loop, including the two former strap junctions.
+	for fraction in [0.0, 0.35, 0.70, 0.88]:
+		var point := surface_point(half_width * fraction, 0.0, half_width, half_length, curl)
+		point.y += radius * 0.35
+		controls.append(point)
+	controls.append_array([
+		Vector3(half_width * 0.96, -drop * 0.34, half_length * 0.08),
+		Vector3(half_width * 0.77, -drop * 0.74, half_length * 0.17),
+		Vector3(half_width * 0.40, -drop * 0.96, half_length * 0.21),
+		Vector3(0.0, -drop * 1.02, half_length * 0.22),
+		Vector3(-half_width * 0.40, -drop * 0.96, half_length * 0.21),
+		Vector3(-half_width * 0.77, -drop * 0.74, half_length * 0.17),
+		Vector3(-half_width * 0.96, -drop * 0.34, half_length * 0.08),
+	])
+	for fraction in [-0.88, -0.70, -0.35]:
+		var point := surface_point(half_width * fraction, 0.0, half_width, half_length, curl)
+		point.y += radius * 0.35
+		controls.append(point)
+	var vine := MeshInstance3D.new()
+	vine.name = "SecuringVine"
+	vine.mesh = _closed_vine_mesh(controls, radius)
+	vine.material_override = _material(body_color.darkened(0.18), 0.92)
+	root.add_child(vine)
 	return root
 
 
@@ -94,17 +113,22 @@ static func _leaf_mesh(half_width: float, half_length: float, curl: float) -> Ar
 
 static func _leaf_point(u: float, v: float, half_width: float, half_length: float, curl: float) -> Vector3:
 	var z := lerpf(-half_length, half_length, v)
-	# Elliptical leaf outline tapering cleanly to its stem and tip.
-	var longitudinal := sqrt(maxf(0.0, 1.0 - pow((z / half_length), 2.0)))
+	var longitudinal := width_profile(v)
 	var x := lerpf(-1.0, 1.0, u) * half_width * longitudinal
-	var local_width := maxf(half_width * longitudinal, 0.001)
-	var across := x / local_width
-	# The centre rides over the crown while both side margins wrap DOWN around
-	# it—the inverse of the original bowl/halo curve.
-	var y := -curl * across * across
-	# A very small front-to-back crown drape keeps it from reading as a tray.
-	y -= curl * 0.18 * pow(z / half_length, 2.0)
+	var across := lerpf(-1.0, 1.0, u)
+	# A soft crown and gently drooping tip, with a little natural twist.
+	var along := z / half_length
+	var y := -curl * across * across - curl * 0.35 * along * along
+	y += curl * 0.08 * sin(PI * v) + curl * 0.10 * across * sin(PI * along)
 	return Vector3(x, y, z)
+
+
+## Narrow at the rear stem, broad through the blade, with a rounded banana-
+## leaf tip at the front. Both ends close rather than ending in cut edges.
+static func width_profile(v: float) -> float:
+	var peak := 0.7 / (0.7 + 0.45)
+	var normalization := pow(peak, 0.7) * pow(1.0 - peak, 0.45)
+	return pow(clampf(v, 0.0, 1.0), 0.7) * pow(clampf(1.0 - v, 0.0, 1.0), 0.45) / normalization
 
 
 ## Exact authored leaf surface and numerical normal used to seat the living
@@ -114,7 +138,7 @@ static func surface_point(
 	x: float, z: float, half_width: float, half_length: float, curl: float
 ) -> Vector3:
 	var v := clampf((z / half_length + 1.0) * 0.5, 0.001, 0.999)
-	var longitudinal := sqrt(maxf(0.0001, 1.0 - pow(z / half_length, 2.0)))
+	var longitudinal := maxf(width_profile(v), 0.0001)
 	var local_half_width := half_width * longitudinal
 	var u := clampf((x / local_half_width + 1.0) * 0.5, 0.001, 0.999)
 	return _leaf_point(u, v, half_width, half_length, curl)
@@ -136,26 +160,33 @@ static func surface_normal(
 	return normal if normal.y >= 0.0 else -normal
 
 
-static func _add_vine_path(
-	root: Node3D, points: Array[Vector3], radius: float, color: Color
-) -> void:
-	var material := _material(color, 0.92)
-	for index in points.size() - 1:
-		var from := points[index]
-		var to := points[index + 1]
-		var direction := to - from
-		var segment := MeshInstance3D.new()
-		segment.name = "SecuringVine"
-		var cylinder := CylinderMesh.new()
-		cylinder.top_radius = radius
-		cylinder.bottom_radius = radius
-		cylinder.height = direction.length()
-		cylinder.radial_segments = 7
-		segment.mesh = cylinder
-		segment.position = (from + to) * 0.5
-		segment.basis = Basis(Quaternion(Vector3.UP, direction.normalized()))
-		segment.material_override = material
-		root.add_child(segment)
+static func _add_tube(root: Node3D, name: String, points: Array[Vector3], radii: Array[float], color: Color) -> void:
+	var tube := MeshInstance3D.new()
+	tube.name = name
+	tube.mesh = BlorbSuit.build_limb_tube(points, radii, 10, 3, 0.0, [], false, Vector3.ZERO, 1.0, false)
+	tube.material_override = _material(color, 0.92)
+	root.add_child(tube)
+
+
+static func _closed_vine_mesh(controls: Array[Vector3], radius: float) -> ArrayMesh:
+	var rings: Array = []
+	var count := controls.size()
+	for segment in count:
+		for step in 8:
+			var t := step / 8.0
+			var a := controls[(segment + count - 1) % count]
+			var b := controls[segment]
+			var c := controls[(segment + 1) % count]
+			var d := controls[(segment + 2) % count]
+			var center := BlorbSuit._catmull_rom(a, b, c, d, t)
+			var tangent := BlorbSuit._catmull_rom_tangent(a, b, c, d, t)
+			# This loop runs around the head in XY, so FORWARD never becomes
+			# parallel to its tangent. A fresh frame closes without roll drift.
+			var right := tangent.cross(Vector3.FORWARD).normalized()
+			var up := right.cross(tangent).normalized()
+			rings.append(BlorbSuit._build_ring(center, right, up, radius, 10))
+	rings.append(rings[0])
+	return BlorbBodyShape.build_mesh_from_rings(rings, [], false)
 
 
 static func _add_triangle(surface: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -> void:

@@ -6,13 +6,11 @@ extends RefCounted
 ## (player.gd, xiao_hou_zi.gd): "arm_left_shoulder", "leg_right_ankle",
 ## "spine", "head" and so on. One vocabulary, several skeletons.
 ##
-## Rigs differ in what they actually have, and MEASURED, not assumed (see the
-## comment above MonkeyFigure.build()): on Xiao Hou Zi's rig "hand", "wrist"
-## and "fingertip" are all one marker, "ankle" and "toe" are one marker with
-## no children, and there is no thorax or neck at all. A pose that writes to
-## an aliased or absent joint does nothing, silently, which is exactly how
-## the skate, penguin, snowboard and mermaid foot poses came to be no-ops on
-## him without anyone noticing.
+## Rigs differ in how they realise a joint. Stuffed limbs are continuous
+## meshes rebuilt from live pivots: their wrist/hand is one articulation,
+## while fingertips and toes are distinct surface markers. A joint can drive
+## geometry without parenting that geometry directly; the metadata below
+## makes that relationship explicit to every shared pose.
 ##
 ## So this reports the truth about each joint instead of hiding it. A mode
 ## asks what it has and supplies its own fallback once, rather than every

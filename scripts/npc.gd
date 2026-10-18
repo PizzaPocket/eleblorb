@@ -15,6 +15,9 @@ extends StaticBody3D
 ## NPC_*_HIP_BUILD_SCALES/NPC_ABDOMEN_WIDTH_SCALES/
 ## NPC_SLEEVELESS_CHANCE/NPC_SHORT_SLEEVE_CHANCE.
 @export var body_scale: float = 1.0
+## Explicitly authored by population data; a short adult stays an adult.
+@export var is_child: bool = false
+var _figure_standing_height := 1.9
 @export var skin_color: Color = ProceduralFigure.SKIN_COLOR
 ## Safe authored clothing defaults. Any caller that does not provide an
 ## appearance profile must still produce a dressed person; using SKIN_COLOR
@@ -352,7 +355,7 @@ func head_bounce_surface_height_at(world_x: float, world_z: float) -> Variant:
 	var radius := 0.34 * body_scale
 	if Vector2(world_x - global_position.x, world_z - global_position.z).length() > radius:
 		return null
-	return global_position.y + 1.9 * body_scale
+	return global_position.y + _figure_standing_height
 
 
 func _build_figure() -> void:
@@ -369,8 +372,18 @@ func _build_figure() -> void:
 		0.72 if wears_dress else 1.0,
 		true,
 		glove_color,
-		is_female
+		is_female, is_child
 	)
+	_figure_standing_height = float(pivots["standing_height"]) if is_child else 1.9 * body_scale
+	if is_child:
+		# Fit the child's real height, including the independently sized head.
+		for child in get_children():
+			if child is CollisionShape3D and child.shape is CapsuleShape3D:
+				var capsule := child.shape.duplicate() as CapsuleShape3D
+				capsule.radius = 0.42 * body_scale
+				capsule.height = _figure_standing_height
+				child.shape = capsule
+				child.position.y = _figure_standing_height * 0.5
 	_leg_left = pivots["leg_left"]
 	_leg_right = pivots["leg_right"]
 	_arm_left = pivots["arm_left"]
@@ -392,7 +405,7 @@ func _build_figure() -> void:
 	if wears_dress:
 		var resolved_dress_color: Color = pants_color if is_zero_approx(dress_color.a) else dress_color
 		var dress_parts := FigureDress.add_to_figure(
-			pivots["root"] if pivots.has("root") else visuals, _hips, resolved_dress_color, hip_build_scale
+			pivots["root"] if pivots.has("root") else visuals, _hips, resolved_dress_color, float(pivots["hip_build_scale"])
 		)
 		_skirt = dress_parts["skirt"]
 		_skirt_pivot = dress_parts["pivot"]

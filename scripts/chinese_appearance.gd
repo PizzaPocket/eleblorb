@@ -31,6 +31,7 @@ static func apply(npc: Node, identity: String) -> void:
 	npc.shirt_color=p.shirt
 	npc.pants_color=p.pants
 	npc.shoe_color=Color(0.065,0.075,0.085)
+	npc.is_child=bool(p.get("child",false))
 	npc.body_scale=p.scale
 	npc.chest_build_scale=p.chest
 	npc.hip_build_scale=p.hip

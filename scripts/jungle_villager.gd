@@ -174,35 +174,21 @@ var _eye_blink := EyeBlink.new_state()
 var _look_target: Node3D = null
 var _rng := RandomNumberGenerator.new()
 var _terrain: Node
-## Captured from the freshly-built rig, not hardcoded to 0.0 -- MonkeyFigure.
-## build() gives the shoulder its own rest rotation.x to counter (and
-## relax past) SPINE_FORWARD_BEND (see that function's own doc comment on
-## arm_forward_relax_factor); _animate_walk() below must idle/swing around
-## THIS rest value, not world-vertical, or its own idle lerp toward a
-## hardcoded 0.0 would slowly undo that rest pose back to "pulled back
-## toward the hips" every time the villager stops moving.
-var _arm_rest_x := 0.0
-
 var _wander_target: Vector2
 var _has_wander_target := false
 var _pause_timer := 0.0
 var _walk_phase := 0.0
 
 
-func _ready() -> void:
-	_rng.randomize()
-	var fur_color: Color = FUR_COLORS[_rng.randi() % FUR_COLORS.size()]
-	var marking_color: Color = MonkeyFigure.MARKING_COLOR_PALETTE[
-		_rng.randi() % MonkeyFigure.MARKING_COLOR_PALETTE.size()
-	]
-	var display_scale := _rng.randf_range(DISPLAY_SCALE_MIN, DISPLAY_SCALE_MAX)
-	var variant := {
+## Shared by live generation and the rig's min/max regression gallery.
+static func body_variant(limb_length: float, tail_length: float, marking_color: Color = MonkeyFigure.MARKING_COLOR) -> Dictionary:
+	return {
 		"has_cheek_dots": false,
 		"has_face_marking": true,
 		"face_marking_notch_strength": FACE_MARKING_NOTCH_STRENGTH,
 		"marking_color": marking_color,
 		"hip_scale": HIP_SCALE,
-		"limb_length_scale": _rng.randf_range(LIMB_LENGTH_SCALE_MIN, LIMB_LENGTH_SCALE_MAX),
+		"limb_length_scale": limb_length,
 		"limb_taper_scale": LIMB_TAPER_SCALE,
 		"leg_radius_scale": LEG_RADIUS_SCALE,
 		"has_foot_pads": false,
@@ -214,13 +200,25 @@ func _ready() -> void:
 		"shoulder_height_fraction": SHOULDER_HEIGHT_FRACTION,
 		"hip_attach_raise_fraction": HIP_ATTACH_RAISE_FRACTION,
 		"body_taper_blend": BODY_TAPER_BLEND,
-		"tail_length_scale": _rng.randf_range(TAIL_LENGTH_SCALE_MIN, TAIL_LENGTH_SCALE_MAX),
+		"tail_length_scale": tail_length,
 		"head_size_scale": HEAD_SIZE_SCALE,
 		"eye_shape": EYE_SHAPE,
 	}
+
+
+func _ready() -> void:
+	_rng.randomize()
+	var fur_color: Color = FUR_COLORS[_rng.randi() % FUR_COLORS.size()]
+	var marking_color: Color = MonkeyFigure.MARKING_COLOR_PALETTE[
+		_rng.randi() % MonkeyFigure.MARKING_COLOR_PALETTE.size()
+	]
+	var display_scale := _rng.randf_range(DISPLAY_SCALE_MIN, DISPLAY_SCALE_MAX)
+	var variant := body_variant(
+		_rng.randf_range(LIMB_LENGTH_SCALE_MIN, LIMB_LENGTH_SCALE_MAX),
+		_rng.randf_range(TAIL_LENGTH_SCALE_MIN, TAIL_LENGTH_SCALE_MAX), marking_color
+	)
 	_pivots = MonkeyFigure.build(self, fur_color, display_scale, variant)
 	_eyes = _pivots["eyes"]
-	_arm_rest_x = (_pivots["arm_left"] as Node3D).rotation.x
 	if _terrain == null:
 		_terrain = get_node_or_null("../../Terrain")
 	if roams and _terrain != null and _terrain.has_method("get_mesh_height"):
@@ -320,20 +318,6 @@ func _pick_new_wander_target() -> void:
 
 
 func _animate_walk(delta: float, moving: bool) -> void:
-	var leg_left: Node3D = _pivots["leg_left"]
-	var leg_right: Node3D = _pivots["leg_right"]
-	var arm_left: Node3D = _pivots["arm_left"]
-	var arm_right: Node3D = _pivots["arm_right"]
 	if moving:
 		_walk_phase += delta * WALK_SWING_SPEED
-		var swing := sin(_walk_phase) * WALK_SWING_AMOUNT
-		leg_left.rotation.x = swing
-		leg_right.rotation.x = -swing
-		# Swings around _arm_rest_x, not 0.0 -- see that var's own comment.
-		arm_left.rotation.x = _arm_rest_x - swing
-		arm_right.rotation.x = _arm_rest_x + swing
-	else:
-		leg_left.rotation.x = lerp_angle(leg_left.rotation.x, 0.0, POSE_SETTLE_SPEED * delta)
-		leg_right.rotation.x = lerp_angle(leg_right.rotation.x, 0.0, POSE_SETTLE_SPEED * delta)
-		arm_left.rotation.x = lerp_angle(arm_left.rotation.x, _arm_rest_x, POSE_SETTLE_SPEED * delta)
-		arm_right.rotation.x = lerp_angle(arm_right.rotation.x, _arm_rest_x, POSE_SETTLE_SPEED * delta)
+	MonkeyGait.pose(_pivots, _walk_phase, moving, delta, WALK_SWING_AMOUNT, POSE_SETTLE_SPEED)

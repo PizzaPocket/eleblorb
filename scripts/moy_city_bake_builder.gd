@@ -5,6 +5,7 @@ class_name MoyCityBakeBuilder
 ## Offline-only geometry authoring helper. The live city loads the saved packs;
 ## it never calls this builder or creates massing at Crossroads startup.
 const PLAN := preload("res://scripts/city_plan.gd")
+const TERRAIN_SCRIPT := preload("res://scripts/terrain_generator.gd")
 const DATUM := -60.0
 const CELL := 64.0
 static var _soft_block_unit: ArrayMesh
@@ -71,6 +72,124 @@ static func build_packs() -> Dictionary:
 	_add_turbines(packs)
 	for template in tree_templates.values(): (template as StaticBody3D).free()
 	return packs
+
+
+## The launch approach sits well outside Moy's core streaming radius, so it is
+## baked as one small, separately streamed scene. All positions and widths
+## come from LAUNCH_SITE; the one short internal approach joins the planned
+## site gate to the south edge of the planned mount for the requested first
+## playable access.
+static func build_launch_site_pack() -> Node3D:
+	var site: Dictionary = PLAN.LAUNCH_SITE
+	var terrain = TERRAIN_SCRIPT.new()
+	terrain.call("_build_chinese_rim_profile")
+	var root := Node3D.new()
+	root.name = "MoyLaunchApproach"
+	var road_points: Array[Vector2] = []
+	for point in site.track.pts:
+		road_points.append(Vector2(float(point[0]), float(point[1])))
+	var gate := Vector2(float(site.fence.gate[0]), float(site.fence.gate[1]))
+	var pad := Vector2(float(site.pad[0]), float(site.pad[1]))
+	var mount_half: Array = site.mount.half
+	var pad_approach := Vector2(pad.x, pad.y + float(mount_half[1]))
+	if road_points.back().distance_to(gate) > 0.1:
+		road_points.append(gate)
+	_add_ground_hugging_road(root, "ASAN_ServiceTrack", road_points, float(site.track.w), terrain)
+	_add_ground_hugging_road(root, "ASAN_PadAccessRoad", [gate, pad_approach], float(site.track.w), terrain)
+
+	var ground_y: float = terrain.get_mesh_height(pad.x, pad.y)
+	var mount_size := Vector3(float(mount_half[0]) * 2.0, float(site.mount.deck), float(mount_half[1]) * 2.0)
+	var mount := _box_body("ASAN_LaunchMount", mount_size, Vector3(pad.x, ground_y + mount_size.y * 0.5, pad.y), Color("#77766f"))
+	_add_visual_box(mount, "LaunchDeck", Vector3(mount_size.x, 0.22, mount_size.z), Vector3(0.0, mount_size.y * 0.5 + 0.04, 0.0), Color("#9b978c"))
+	root.add_child(mount)
+
+	# Keep the model's north-running flame trench at its authored width and
+	# endpoint, with a dark, solid floor at the real terrain surface.
+	var trench: Dictionary = site.mount.trench
+	var trench_to := Vector2(float(trench.to[0]), float(trench.to[1]))
+	var trench_from := Vector2(pad.x, pad.y - float(mount_half[1]))
+	var trench_points: Array[Vector2] = [trench_from, trench_to]
+	_add_ground_hugging_surface(root, "ASAN_FlameTrench", trench_points, float(trench.w), terrain, Color("#493b30"), true)
+	terrain.free()
+	return root
+
+
+static func _add_visual_box(parent: Node3D, label: String, size: Vector3, offset: Vector3, color: Color) -> void:
+	var mesh := BoxMesh.new(); mesh.size = size
+	var visual := MeshInstance3D.new(); visual.name = label; visual.mesh = mesh
+	visual.position = offset; visual.material_override = _material(color); parent.add_child(visual)
+
+
+static func _add_ground_hugging_road(parent: Node3D, label: String, points: Array[Vector2], width: float, terrain: Object) -> void:
+	_add_ground_hugging_surface(parent, label, points, width, terrain, Color("#a58a65"), true)
+
+
+static func _add_ground_hugging_surface(parent: Node3D, label: String, points: Array[Vector2], width: float, terrain: Object, color: Color, with_collision: bool) -> void:
+	var tool := SurfaceTool.new()
+	tool.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var half := width * 0.5
+	var left_edges: Array[Vector2] = []
+	var right_edges: Array[Vector2] = []
+	for point_index in points.size():
+		var normal_before: Vector2
+		var normal_after: Vector2
+		if point_index == 0:
+			var first_tangent: Vector2 = (points[1] - points[0]).normalized()
+			normal_before = Vector2(-first_tangent.y, first_tangent.x)
+			normal_after = normal_before
+		elif point_index == points.size() - 1:
+			var last_tangent: Vector2 = (points[-1] - points[-2]).normalized()
+			normal_before = Vector2(-last_tangent.y, last_tangent.x)
+			normal_after = normal_before
+		else:
+			var tangent_before: Vector2 = (points[point_index] - points[point_index - 1]).normalized()
+			var tangent_after: Vector2 = (points[point_index + 1] - points[point_index]).normalized()
+			normal_before = Vector2(-tangent_before.y, tangent_before.x)
+			normal_after = Vector2(-tangent_after.y, tangent_after.x)
+		var miter := (normal_before + normal_after).normalized()
+		var denominator := maxf(absf(miter.dot(normal_after)), 0.25)
+		var offset := miter * minf(half / denominator, width * 2.0)
+		left_edges.append(points[point_index] + offset)
+		right_edges.append(points[point_index] - offset)
+	for segment_index in range(points.size() - 1):
+		var a: Vector2 = points[segment_index]
+		var b: Vector2 = points[segment_index + 1]
+		var delta := b - a
+		var length := delta.length()
+		if length < 0.01: continue
+		var samples := maxi(1, ceili(length / 2.0))
+		for sample in samples:
+			var t0 := float(sample) / float(samples)
+			var t1 := float(sample + 1) / float(samples)
+			var p00 := _terrain_surface_point(left_edges[segment_index].lerp(left_edges[segment_index + 1], t0), terrain)
+			var p01 := _terrain_surface_point(right_edges[segment_index].lerp(right_edges[segment_index + 1], t0), terrain)
+			var p10 := _terrain_surface_point(left_edges[segment_index].lerp(left_edges[segment_index + 1], t1), terrain)
+			var p11 := _terrain_surface_point(right_edges[segment_index].lerp(right_edges[segment_index + 1], t1), terrain)
+			for point in [p00, p01, p10, p10, p01, p11]:
+				tool.set_normal(Vector3.UP)
+				tool.add_vertex(point)
+	var mesh := tool.commit()
+	var body := StaticBody3D.new()
+	body.name = label
+	body.collision_layer = 1
+	body.collision_mask = 1
+	var visual := MeshInstance3D.new()
+	visual.name = label + "Surface"
+	visual.mesh = mesh
+	visual.material_override = _material(color)
+	body.add_child(visual)
+	if with_collision:
+		var shape := ConcavePolygonShape3D.new()
+		shape.set_faces(mesh.get_faces())
+		var collision := CollisionShape3D.new()
+		collision.name = label + "Collision"
+		collision.shape = shape
+		body.add_child(collision)
+	parent.add_child(body)
+
+
+static func _terrain_surface_point(point: Vector2, terrain: Object) -> Vector3:
+	return Vector3(point.x, float(terrain.call("get_mesh_height", point.x, point.y)) + 0.10, point.y)
 
 
 static func build_silhouette() -> Node3D:

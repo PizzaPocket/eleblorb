@@ -81,7 +81,7 @@ static func build_rings(radius: float, height: float, upper_taper_blend: float =
 ## no COLOR array whatsoever -- identical to this function's behavior
 ## before this param existed, since a material with vertex_color_use_as_
 ## albedo left off (every existing material) just ignores it anyway.
-static func build_mesh_from_rings(rings: Array, ring_colors: Array[Color] = []) -> ArrayMesh:
+static func build_mesh_from_rings(rings: Array, ring_colors: Array[Color] = [], cap_ends: bool = true) -> ArrayMesh:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var has_colors := not ring_colors.is_empty()
@@ -113,7 +113,7 @@ static func build_mesh_from_rings(rings: Array, ring_colors: Array[Color] = []) 
 	# shaped forms (the knight helm's flat crown/guard) terminate in a real
 	# ring instead; cap only those rings so they remain a single closed mesh
 	# rather than needing a visually separate lid piece.
-	if not rings.is_empty():
+	if cap_ends and not rings.is_empty():
 		var cap_color_a: Color = ring_colors[0] if has_colors else Color.WHITE
 		var cap_color_b: Color = ring_colors[ring_colors.size() - 1] if has_colors else Color.WHITE
 		_add_ring_cap(st, rings[0] as Array, true, cap_color_a, has_colors)

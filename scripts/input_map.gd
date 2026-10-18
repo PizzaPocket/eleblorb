@@ -53,6 +53,7 @@ const ACTIONS := {
 	"look_up": {"joy_axis": JOY_AXIS_RIGHT_Y, "joy_sign": -1.0},
 	"look_down": {"joy_axis": JOY_AXIS_RIGHT_Y, "joy_sign": 1.0},
 	"jump": {"keys": [KEY_SPACE], "joy_buttons": [JOY_BUTTON_Y]},
+	"crouch": {"keys": [KEY_CTRL], "joy_buttons": [JOY_BUTTON_LEFT_STICK]},
 	"run": {"keys": [KEY_ALT], "joy_buttons": [JOY_BUTTON_A]},
 	"interact": {"keys": [KEY_F], "joy_buttons": [JOY_BUTTON_X]},
 	# Leaving a mount is a "back out" gesture, so it shares B with ui_cancel

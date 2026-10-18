@@ -21,6 +21,9 @@ for rel, expected in manifest.get("sources", {}).items():
 for pack in manifest.get("packs", []):
     if not (root / pack.removeprefix("res://")).is_file():
         bad.append(pack)
+launch_site = manifest.get("launch_site")
+if not launch_site or not (root / launch_site.removeprefix("res://")).is_file():
+    bad.append(launch_site or "launch site bake missing")
 silhouette = manifest.get("silhouette")
 if silhouette and not (root / silhouette.removeprefix("res://")).is_file():
     bad.append(silhouette)

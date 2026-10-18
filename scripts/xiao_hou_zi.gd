@@ -179,6 +179,8 @@ var _crystal := CrystalSkateMode.new()
 var _swim := SwimMode.new()
 var _penguin := PenguinMode.new()
 var _flight := FlightMode.new()
+var _crouch := CrouchMode.new()
+var _standing_collision: CollisionShape3D
 var _powers := SuitPowers.new()
 ## The liquid under him, read fresh each frame.
 var _liquid := LiquidEnvironment.new()
@@ -341,6 +343,7 @@ func _ready() -> void:
 	collision_shape.shape = collider
 	collision_shape.position = Vector3(0, 0.09 * DISPLAY_SCALE, 0)
 	add_child(collision_shape)
+	_standing_collision = collision_shape
 	collision_layer = 1
 	collision_mask = 1
 
@@ -410,6 +413,10 @@ func _rig_joint_map() -> Dictionary:
 func _traversal_context(delta: float) -> TraversalContext:
 	var ctx := TraversalContext.new(self, _playable_profile, _rig, _blorb_suit, _terrain())
 	ctx.delta = delta
+	ctx.standing_collision = _standing_collision
+	ctx.standing_collision_transform = Transform3D(Basis.IDENTITY, Vector3(0, 0.09 * DISPLAY_SCALE, 0))
+	ctx.left_arm_busy = _direct_left_arm_power_blend > 0.001
+	ctx.right_arm_busy = _direct_right_arm_power_blend > 0.001
 	ctx.sprinting = Input.is_action_pressed("run")
 	ctx.grounded = is_on_floor()
 	ctx.visuals = _pivots.get("_rig") as Node3D
@@ -618,40 +625,9 @@ func _apply_player_push(pos: Vector2, delta: float) -> Vector2:
 
 
 func _animate_walk(delta: float, moving: bool, cadence_scale: float = 1.0) -> void:
-	var leg_left: Node3D = _pivots["leg_left"]
-	var leg_right: Node3D = _pivots["leg_right"]
-	var arm_left: Node3D = _pivots["arm_left"]
-	var arm_right: Node3D = _pivots["arm_right"]
 	if moving:
 		_walk_phase += delta * WALK_SWING_SPEED * cadence_scale
-		var swing := sin(_walk_phase) * WALK_SWING_AMOUNT
-		leg_left.rotation.x = swing
-		leg_right.rotation.x = -swing
-		arm_left.rotation.x = -swing
-		arm_right.rotation.x = swing
-	else:
-		leg_left.rotation.x = lerp_angle(leg_left.rotation.x, 0.0, POSE_SETTLE_SPEED * delta)
-		leg_right.rotation.x = lerp_angle(leg_right.rotation.x, 0.0, POSE_SETTLE_SPEED * delta)
-		arm_left.rotation.x = lerp_angle(arm_left.rotation.x, 0.0, POSE_SETTLE_SPEED * delta)
-		arm_right.rotation.x = lerp_angle(arm_right.rotation.x, 0.0, POSE_SETTLE_SPEED * delta)
-	# Direct skating additionally owns toe yaw, lateral hip roll, knees,
-	# ankles, elbows, spine lean, and the compensating head pitch. Ordinary
-	# Xiao locomotion must explicitly reclaim every one of those properties;
-	# otherwise leaving ice preserves whichever stroke pose happened to be
-	# active on the last supported frame.
-	var settle:=minf(POSE_SETTLE_SPEED*delta,1.0)
-	leg_left.rotation.y=lerp_angle(leg_left.rotation.y,0.0,settle)
-	leg_right.rotation.y=lerp_angle(leg_right.rotation.y,0.0,settle)
-	leg_left.rotation.z=lerp_angle(leg_left.rotation.z,0.0,settle)
-	leg_right.rotation.z=lerp_angle(leg_right.rotation.z,0.0,settle)
-	(_pivots["knee_left"] as Node3D).rotation.x=lerp_angle((_pivots["knee_left"] as Node3D).rotation.x,0.0,settle)
-	(_pivots["knee_right"] as Node3D).rotation.x=lerp_angle((_pivots["knee_right"] as Node3D).rotation.x,0.0,settle)
-	(_pivots["ankle_left"] as Node3D).rotation.x=lerp_angle((_pivots["ankle_left"] as Node3D).rotation.x,0.0,settle)
-	(_pivots["ankle_right"] as Node3D).rotation.x=lerp_angle((_pivots["ankle_right"] as Node3D).rotation.x,0.0,settle)
-	(_pivots["elbow_left"] as Node3D).rotation.x=lerp_angle((_pivots["elbow_left"] as Node3D).rotation.x,0.0,settle)
-	(_pivots["elbow_right"] as Node3D).rotation.x=lerp_angle((_pivots["elbow_right"] as Node3D).rotation.x,0.0,settle)
-	(_pivots["spine"] as Node3D).rotation.x=lerp_angle((_pivots["spine"] as Node3D).rotation.x,0.0,settle)
-	(_pivots["head"] as Node3D).rotation.x=lerp_angle((_pivots["head"] as Node3D).rotation.x,0.0,settle)
+	MonkeyGait.pose(_pivots, _walk_phase, moving, delta, WALK_SWING_AMOUNT, POSE_SETTLE_SPEED)
 
 
 ## Called by player.gd's _try_start_xiao_hou_zi_control(). Reskins THIS body
@@ -774,7 +750,7 @@ func prepare_direct_control_environment(delta: float, aim_direction: Vector3 = V
 		# depends on the helmet, which he does not need at all.
 		_direct_diving = true
 	if not _direct_diving and not _direct_lava_surface:
-		_direct_flying = _blorb_suit.has_chest_air_blorb()
+		_direct_flying = _flight.enabled and _blorb_suit.has_chest_air_blorb()
 		_direct_air_feet = _blorb_suit.has_air_hover_legs()
 	_update_direct_powered_movement(delta)
 	# The tail forms while its wearer is actually swimming, and the suit only
@@ -856,6 +832,10 @@ func _direct_swim_jets() -> int:
 func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_pressed: bool) -> void:
 	if not is_player_controlled or _mounted:
 		return
+	_crouch.prepare(_traversal_context(delta))
+	_direct_flying = _flight.toggle(_traversal_context(delta), jump_pressed and not UIState.modal_open, not _direct_diving and not _direct_lava_surface and not _vine_swing.swinging and _crouch.amount <= 0.0)
+	if _flight.toggle_consumed:
+		jump_pressed = false
 	if _update_direct_vine_swing(direction, delta, jump_pressed):
 		return
 	if _update_direct_crystal_riding(direction, delta, sprinting, jump_pressed):
@@ -868,7 +848,13 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	var dirtbike_ballistic:=_direct_dirtbike_active and (
 		_direct_dirtbike_airborne or (not is_on_floor()) or jump_pressed
 	)
+	_crouch.step(_traversal_context(delta), Input.is_action_just_pressed("crouch") and not UIState.modal_open,
+		not uses_pitched_movement_input() and not _powers.powered_hover_active() and not _direct_dirtbike_active and not _direct_snowboard_active and not _direct_ice_skates_active and not _blorb_suit.penguin_form_active())
+	if _crouch.amount > 0.0:
+		jump_pressed = false
 	var speed := HumanoidLocomotion.ground_speed(_playable_profile, sprinting)
+	if _crouch.amount > 0.0:
+		speed = _playable_profile.move_speed * _crouch.speed_factor()
 	if _direct_dirtbike_active:
 		speed *= Player.DIRTBIKE_SPEED_MULTIPLIER
 		if _direct_dirtbike_front_active:
@@ -1088,6 +1074,7 @@ func drive_from_player(direction: Vector3, delta: float, sprinting: bool, jump_p
 	_apply_direct_dirtbike_pose(delta)
 	_apply_direct_swim_attitude(delta)
 	_apply_direct_snowboard(delta)
+	_crouch.pose(_traversal_context(delta))
 	_update_direct_dirtbike_wheels(delta)
 	_update_direct_power_fx()
 
@@ -1377,7 +1364,7 @@ func _apply_direct_power_pose(delta: float) -> void:
 			# chain absolutely, exactly like the human's established pose.
 			PlayableArmPose.apply_forward_raise(
 				arm, elbow, signf(arm.position.x), blend,
-				MonkeyFigure.ARM_OUTWARD_ANGLE, Player.ARM_POWER_POSE_ANGLE
+				absf((_pivots["_rest_rotations"]["arm_" + side] as Vector3).z), Player.ARM_POWER_POSE_ANGLE
 			)
 			# MonkeyFigure follows the same local-axis convention as the human:
 			# this quarter turn presents the palm forward with fingertips vertical.
@@ -1409,6 +1396,8 @@ func _update_direct_vine_swing(direction: Vector3, delta: float, jump_pressed: b
 		ctx.aim_basis = view.global_basis
 		aim = -view.global_basis.z
 	var was_swinging := _vine_swing.swinging
+	if jump_pressed and _crouch.amount > 0.0 and not _crouch.can_stand(ctx):
+		return false
 	if not _vine_swing.swing(ctx, aim, jump_pressed and not UIState.modal_open):
 		if was_swinging and _vine_swing.exit_velocity != Vector3.ZERO:
 			# The arc's momentum carries on past the release, as it does for the
@@ -1430,6 +1419,7 @@ func _update_direct_vine_swing(direction: Vector3, delta: float, jump_pressed: b
 			rotation.y, atan2(facing.x, facing.z), minf(ROTATION_SPEED * delta, 1.0)
 		)
 	_animate_walk(delta, false)
+	_crouch.leave(ctx)
 	_vine_swing.pose(ctx)
 	return true
 
@@ -1446,7 +1436,7 @@ func _update_direct_crystal_riding(
 	var blocked := (
 		_direct_diving or _direct_flying or _direct_air_feet
 		or _powers.fire_limb_flight or _direct_lava_surface or _direct_dirtbike_active
-		or _direct_snowboard_active
+		or _direct_snowboard_active or _crouch.amount > 0.0
 	)
 	var was_riding := _crystal.riding
 	var owned := _crystal.ride(ctx, aim, jump_pressed and not UIState.modal_open, blocked, 0.0)

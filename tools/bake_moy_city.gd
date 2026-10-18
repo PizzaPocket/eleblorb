@@ -25,6 +25,17 @@ func _ready() -> void:
 			get_tree().quit(1); return
 		files.append("res://assets/generated/moy_city/cell_%s.tscn" % key)
 		packs[key].free()
+	var launch_scene := PackedScene.new()
+	var launch_root: Node3D = BUILDER.build_launch_site_pack()
+	_set_scene_owners(launch_root, launch_root)
+	var launch_err := launch_scene.pack(launch_root)
+	if launch_err != OK:
+		push_error("Moy launch site bake failed: %s" % error_string(launch_err)); get_tree().quit(1); return
+	var launch_path := OUTPUT + "/launch_approach.tscn"
+	launch_err = ResourceSaver.save(launch_scene, launch_path)
+	if launch_err != OK:
+		push_error("Moy launch site save failed: %s" % error_string(launch_err)); get_tree().quit(1); return
+	launch_root.free()
 	var silhouette_scene := PackedScene.new()
 	var silhouette_root: Node3D = BUILDER.build_silhouette()
 	_set_scene_owners(silhouette_root, silhouette_root)
@@ -51,7 +62,7 @@ func _ready() -> void:
 	for path in files:
 		if path.get_file().begins_with("cell_hotel_interior"):
 			hotel_packs.append(path)
-	var manifest := {"format":4,"datum":BUILDER.DATUM,"cell_size":BUILDER.CELL,"counts":{"streets":BUILDER.PLAN.STREETS.size(),"buildings":BUILDER.PLAN.BUILDINGS.size(),"lots":BUILDER.PLAN.LOTS.size(),"old_houses":BUILDER.PLAN.OLD_HOUSES.size()},"prototype_counts":{"crossing_towers":BUILDER.PLAN.CROSSING.towers.size(),"deck_columns":BUILDER.PLAN.DECK.columns.size(),"deck_parapets":BUILDER.PLAN.DECK.parapets.size(),"deck_beds":BUILDER.PLAN.DECK.beds.size(),"deck_trees":BUILDER.PLAN.DECK.trees.size(),"park_trees":BUILDER.PLAN.PARK.trees.size(),"shrubs":BUILDER.PLAN.PARK.shrubs.size(),"reed_clumps":BUILDER.PLAN.PARK.reeds.size(),"rocks":BUILDER.PLAN.PARK.rocks.size(),"agave":BUILDER.PLAN.PARK.agave.size(),"climber_panels":BUILDER.PLAN.CROSSING.climbers.size(),"meridian_piers":meridian.piers.size(),"spine_frames":spine.frames.size(),"station_escalator_sets":access_count,"trains_per_service":int(first_timetable_line.trains),"service_lines":BUILDER.PLAN.TIMETABLE.lines.size(),"deck_escalator_pairs":BUILDER.PLAN.DECK.escalators.size(),"deck_ramp_towers":BUILDER.PLAN.DECK.ramps.size(),"city_clocks":4,"city_bells":1,"timekeepers":0},"sources":hashes,"silhouette":"res://assets/generated/moy_city/silhouette.tscn","packs":files,"hotel_packs":hotel_packs}
+	var manifest := {"format":4,"datum":BUILDER.DATUM,"cell_size":BUILDER.CELL,"counts":{"streets":BUILDER.PLAN.STREETS.size(),"buildings":BUILDER.PLAN.BUILDINGS.size(),"lots":BUILDER.PLAN.LOTS.size(),"old_houses":BUILDER.PLAN.OLD_HOUSES.size()},"prototype_counts":{"crossing_towers":BUILDER.PLAN.CROSSING.towers.size(),"deck_columns":BUILDER.PLAN.DECK.columns.size(),"deck_parapets":BUILDER.PLAN.DECK.parapets.size(),"deck_beds":BUILDER.PLAN.DECK.beds.size(),"deck_trees":BUILDER.PLAN.DECK.trees.size(),"park_trees":BUILDER.PLAN.PARK.trees.size(),"shrubs":BUILDER.PLAN.PARK.shrubs.size(),"reed_clumps":BUILDER.PLAN.PARK.reeds.size(),"rocks":BUILDER.PLAN.PARK.rocks.size(),"agave":BUILDER.PLAN.PARK.agave.size(),"climber_panels":BUILDER.PLAN.CROSSING.climbers.size(),"meridian_piers":meridian.piers.size(),"spine_frames":spine.frames.size(),"station_escalator_sets":access_count,"trains_per_service":int(first_timetable_line.trains),"service_lines":BUILDER.PLAN.TIMETABLE.lines.size(),"deck_escalator_pairs":BUILDER.PLAN.DECK.escalators.size(),"deck_ramp_towers":BUILDER.PLAN.DECK.ramps.size(),"city_clocks":4,"city_bells":1,"timekeepers":0},"sources":hashes,"silhouette":"res://assets/generated/moy_city/silhouette.tscn","packs":files,"hotel_packs":hotel_packs,"launch_site":"res://assets/generated/moy_city/launch_approach.tscn"}
 	var coverage := _coverage_ledger()
 	manifest["coverage"] = "res://assets/generated/moy_city/coverage.json"
 	var f := FileAccess.open(OUTPUT + "/manifest.json", FileAccess.WRITE)
@@ -149,4 +160,5 @@ func _coverage_ledger() -> Array[Dictionary]:
 	for o in BUILDER.PLAN.OPENS: rows.append({"key":"open:%s"%String(o.name),"source":"OPENS","footprint":[o.rect.position.x,o.rect.position.y,o.rect.size.x,o.rect.size.y],"top_y":BUILDER.DATUM,"collision_owner":"Open_%s"%String(o.name)})
 	for i in BUILDER.PLAN.OLD_TOWN.lanes.size(): rows.append({"key":"infrastructure:old_lane:%d"%i,"source":"OLD_TOWN.lanes[%d]"%i,"footprint":BUILDER.PLAN.OLD_TOWN.lanes[i].pts,"top_y":BUILDER.DATUM,"collision_owner":"OldLane_%d"%i})
 	for key in ["DECK","WALL","CROSS","CROSSING","PARK","ESTATE","HOTEL","CROSSING.dome","TURBINES"]: rows.append({"key":"infrastructure:%s"%key.to_lower(),"source":key,"collision_owner":"Moy infrastructure geometry","composite":true})
+	rows.append({"key":"infrastructure:asan_launch_approach","source":"LAUNCH_SITE.track + mount + trench","collision_owner":"ASAN launch road, trench and mount","composite":true})
 	return rows

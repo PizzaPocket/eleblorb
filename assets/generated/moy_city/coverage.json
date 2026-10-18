@@ -2907,18 +2907,6 @@
 		"composite": false,
 		"footprint": [
 			[
-				-708.0,
-				-42.0
-			],
-			[
-				-708.0,
-				-40.0
-			],
-			[
-				-701.0,
-				-40.0
-			],
-			[
 				-694.98,
 				-46.02
 			],
@@ -2933,6 +2921,18 @@
 			[
 				-707.0,
 				-42.0
+			],
+			[
+				-708.0,
+				-42.0
+			],
+			[
+				-708.0,
+				-40.0
+			],
+			[
+				-701.0,
+				-40.0
 			]
 		],
 		"key": "old_house:12",
@@ -3953,10 +3953,6 @@
 			[
 				-700.0,
 				7.0
-			],
-			[
-				-700.0,
-				11.47
 			]
 		],
 		"key": "old_house:42",
@@ -3988,7 +3984,7 @@
 		"key": "old_house:43",
 		"rotation_deg": 0.0,
 		"source": "OLD_HOUSES[43]",
-		"top_y": -47.0
+		"top_y": -43.75
 	},
 	{
 		"collision_owner": "OldHouse_44",
@@ -5015,5 +5011,11 @@
 		"composite": true,
 		"key": "infrastructure:turbines",
 		"source": "TURBINES"
+	},
+	{
+		"collision_owner": "ASAN launch road, trench and mount",
+		"composite": true,
+		"key": "infrastructure:asan_launch_approach",
+		"source": "LAUNCH_SITE.track + mount + trench"
 	}
 ]

@@ -228,3 +228,27 @@ the scratch copy and compare numbers before and after.
 Changing how any power feels for the human, redesigning the suit visuals, or
 unifying the characters' distinct gaits and silhouettes. Each character keeps
 its own movement character; only the powers become common.
+
+## Crouch and deliberate air flight
+
+`FlightMode` owns a per-body jump toggle for the air chest. Equipping it starts
+with flight off; Jump toggles flight, and removing the chest clears the latch.
+The press is consumed so switching flight off cannot also jump or catch a vine.
+An existing vine swing keeps Jump for releasing the vine.
+
+`CrouchMode` is a shared ordinary-locomotion layer, driven by both playable
+rigs. Left-stick click / keyboard Ctrl toggles it. It overrides Run with a
+40-percent walking speed, bends hips, knees and ankles, solves each leg back
+to its planted ankle, lowers the pelvis and spine, and tucks unoccupied arms.
+Firing and held-item poses retain ownership of busy arms. Its reduced collider
+keeps the standing footprint and bottom; round bodies use a short cylinder
+while crouched. Standing and unfolding into a vine swing require overhead
+clearance. A successful swing or entry into swimming clears crouch; shallow
+wading and ordinary arm powers retain it. Lift/vehicle poses replace crouch
+when the standing volume is clear. Crystal track riding waits until crouch
+has ended. Jumping is suppressed while crouched; toggle upright first.
+
+`tools/probe_crouch.tscn` checks both rigs' planted feet, mesh/collider fit,
+low-ceiling movement and standing clearance, power-arm ownership, swimming
+transitions, and the flight latch. Run with Godot headless after closing the
+editor, as with the other rig probes.

@@ -270,6 +270,7 @@ const VILLAGER_IDENTITIES := [
 	},
 	{
 		"name": "Pip",
+		"child": true,
 		"female": false,
 		"body_scale": 0.76,
 		"lines": [
@@ -279,6 +280,7 @@ const VILLAGER_IDENTITIES := [
 	},
 	{
 		"name": "Tess",
+		"child": true,
 		"female": true,
 		"body_scale": 0.70,
 		"lines": [
@@ -288,6 +290,7 @@ const VILLAGER_IDENTITIES := [
 	},
 	{
 		"name": "Wick",
+		"child": true,
 		"female": false,
 		"body_scale": 0.80,
 		"lines": [
@@ -968,6 +971,7 @@ func _assign_villager_identity(npc_inst: Node3D) -> void:
 	_next_villager_identity += 1
 	npc_inst.display_name = identity["name"]
 	npc_inst.is_female = identity["female"]
+	npc_inst.is_child = bool(identity.get("child", false))
 	npc_inst.set_meta("ohio_body_scale_override", float(identity.get("body_scale", 0.0)))
 	# identity["lines"] is a plain untyped Array (Dictionary values can't be
 	# declared Array[String] in a literal), but npc.gd's talk_lines is --

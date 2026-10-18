@@ -21,6 +21,21 @@ const MOTION_BLEND_RATE := 2.2
 const CRUISE_LEAN := deg_to_rad(78.0)
 const PITCH_LIMIT := deg_to_rad(80.0)
 
+## Deliberate jump toggle; wearing the chest alone leaves ordinary locomotion.
+var enabled := false
+var toggle_consumed := false
+
+
+func toggle(ctx: TraversalContext, pressed: bool, allowed: bool = true) -> bool:
+	toggle_consumed = false
+	if ctx.suit == null or not ctx.suit.has_chest_air_blorb():
+		enabled = false
+	elif pressed and allowed:
+		enabled = not enabled
+		toggle_consumed = true
+	return enabled and allowed
+
+
 var motion := 0.0
 var liquid_exit_active := false
 
