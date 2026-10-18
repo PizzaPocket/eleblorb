@@ -148,29 +148,40 @@ pocket, not a floor.
 - **shoulder pads** (user): a broad flattened SuperEgg over each shoulder
   (0.10 × 0.055 × 0.10, ε 5.5 / 2), for a stronger look.
 - **the blue light** (user) is the city blorbs' own colour: the city
-  blorb's exported albedo and glow, not a chosen azure. A lit core behind
-  the spine segments, rings at the shoulders, knees and neck, and a vertical
+  blorb's exported albedo and glow, not a chosen azure. A recessed band
+  round the abdomen, rings at the shoulders, knees and neck, and a vertical
   slit on the chest plate, echoing the tower's eye.
+- **a robot abdomen** (user: no spine column or rods, which read fragile):
+  two stacked armoured plates in the hero's abdomen proportions, ε 5.5 / 5.5,
+  the band of light between them.
 - **a neck** (user), for the movement cycles: a slim column on the hero's
   neck joint. No collar.
 - **hands and feet are the hero's own** (user): his solid hand, digits
   implied, no fingers; his foot. Both at the mech's scale, in black steel.
 - **the head** (user): the hero's own head shape (ε 2.5), squarish, at the
   mech's scale, in two parts split by **one clean curve**:
-  - the **glass visor**: the chin's front, the face, round the temples and
-    back over the front half of the crown;
-  - the **steel shell**: the back half and the underside, black steel;
+  - the **glass visor**: the face, round the temples and back over the
+    front half of the crown, down to a **chin line** (user);
+  - the **steel shell**: the back half, the jaw and the whole underside of
+    the chin, black;
   - the cut, in the head's own frame normalized to its half-sizes, puts
-    glass where `z > 0.02 + 0.62 × max(0, −y − 0.05)^1.6`;
+    glass where `z > 0.02 + 0.55 × max(0, −y − 0.05)^1.6` and
+    `y > −0.6 + 0.32 x²` (the chin line, rising a little toward the jaw's
+    sides);
   - the visor **hinges at the crown** and swings up and forward to let a
     blorb climb in, then shuts over it.
 - **the pilot fills the helmet** (user): it takes the shape of the shell's
-  inside (the head's own SuperEgg, just within the shell), with its core
-  inside and **its eyes on its face**: opaque, about 0.04 by 0.05 m (a
-  little larger than the hero's, user), and coloured as every blorb's are
+  inside (the head's own SuperEgg, inset from the shell), with its core
+  inside and **a blorb's own eyes on its skin** (the game's blorb eye mesh,
+  user): opaque, about 0.04 m wide (a little larger than the hero's, user),
+  and coloured as every blorb's are
   (`blorb.gd`: the body darkened by a quarter, or lightened on a very dark
   body), so they read through the visor. A city blorb pilot glows; Blorbus
-  does not. Azure for a city blorb; brain pink (`BLORBUS_BODY_COLOR`) for
+  does not.
+- **everything stays inside the shell** (user): the pilot is inset from the
+  shell far enough that its eyes, standing proud of its skin as on any
+  blorb, keep a millimetre inside the shell. In the model that inset comes
+  to 0.87 of the head; the build measures its own the same way. Azure for a city blorb; brain pink (`BLORBUS_BODY_COLOR`) for
   Blorbus.
 
 **Rig:**
@@ -361,3 +372,7 @@ the arena from the gallery and from its floor.
   shoulders, with lapels, a collar and sleeves.
 - 2026-10-18 (user): the pilot's eyes are a blorb's eye colour and a little
   larger than the hero's.
+- 2026-10-18 (user): a robot abdomen (two plates and a band of light) in
+  place of the spine column and rods; the visor stops at a chin line, the
+  chin's underside steel; the pilot wears a blorb's own eyes and sits inset
+  so it and its eyes stay inside the shell.

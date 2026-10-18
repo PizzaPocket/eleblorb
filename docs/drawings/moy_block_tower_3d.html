@@ -111,7 +111,7 @@ code { font-family: var(--mono); font-size: .9em; }
   <header>
     <div class="eyebrow">round P17a · a third playable rig, on the hero's own joints</div>
     <h2>The blorb mech</h2>
-    <p class="lede">Built on the hero's own rig: every joint is his, scaled by <span id="ms"></span>, so the blorb suit fits it through the suit's existing rig scale. Thin limbs and body in one matte black metal, with bright steel only on the chest plate; shoulder pads; a neck; the hero's solid hands and feet in black steel; and the hero's head shape split into a glass visor, which hinges open at the top for a blorb to climb in, and a steel shell behind and under it. A thread of the city blorbs' own blue runs through its spine, joints and chest. Beside it stand the hero and Moy's door, exported from the game.</p>
+    <p class="lede">Built on the hero's own rig: every joint is his, scaled by <span id="ms"></span>, so the blorb suit fits it through the suit's existing rig scale. Thin limbs and body in one matte black metal, with bright steel only on the chest plate; shoulder pads; a neck; the hero's solid hands and feet in black steel; and the hero's head shape split into a glass visor, which hinges open at the top for a blorb to climb in, and a steel shell behind and under it. A thread of the city blorbs' own blue runs through its abdomen, joints and chest. Beside it stand the hero and Moy's door, exported from the game.</p>
   </header>
 
   <div class="explore">
@@ -213,11 +213,13 @@ const HEAD_SLOT = F.suit.filter(p => bbox(p).c[1] > 1.62), HEAD_BLOB = HEAD_SLOT
 const BLORBUS = [0.82, 0.60, 0.62, 0.85];   // BLORBUS_BODY_COLOR in blorb.gd
 // the visor's one cut: in the head's own normalized frame, glass where z > cut(y): the front half of the
 // crown, down past the temples, curving forward under the jaw so the chin's front is glass and its underside steel
-const CUT = "0.02 + 0.62 * pow(max(0.0, -vN.y - 0.05), 1.6)";
+// glass where the head's front lies ahead of a curve that sweeps forward toward the jaw, and above a chin line that rises
+// a little toward the jaw's sides: the crown's front half, the face and the temples are glass; the chin and jaw are steel
+const GLASS = "(vN.z > 0.02 + 0.55 * pow(max(0.0, -vN.y - 0.05), 1.6) && vN.y > -0.6 + 0.32 * vN.x * vN.x)";
 function cutMat(m, side) {
   m.onBeforeCompile = sh => { sh.uniforms.uC = { value: HC }; sh.uniforms.uS = { value: HS }; sh.uniforms.uSide = { value: side };
     sh.vertexShader = "uniform vec3 uC; uniform vec3 uS; varying vec3 vN;\n" + sh.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\n vN = (position - uC) / uS;");
-    sh.fragmentShader = "uniform float uSide; varying vec3 vN;\n" + sh.fragmentShader.replace("void main() {", "void main() {\n if (uSide * (vN.z - (" + CUT + ")) < 0.0) discard;"); };
+    sh.fragmentShader = "uniform float uSide; varying vec3 vN;\n" + sh.fragmentShader.replace("void main() {", "void main() {\n if (uSide * (" + GLASS + " ? 1.0 : -1.0) < 0.0) discard;"); };
   m.customProgramCacheKey = () => "cut" + side; return m;
 }
 function mechMats(clip) {
@@ -253,10 +255,11 @@ function buildMech(M) {
   // torso
   const hipY = J("hips").y, chestY = near(F.hero, HJ.chest, p => bbox(p).s[0] > 0.18 && bbox(p).c[1] > 1.3)[1].c[1] * MS, chestH = 0.15;
   egg("pelvis", [0.15, 0.07, 0.095], [0, hipY + 0.01, 0], [5.5, 5.5], "black");
-  const s0 = hipY + 0.08, s1 = chestY - chestH;
-  for (let i = 0; i < 3; i++) egg("spine segment", [0.046, 0.03, 0.042], [0, s0 + (i + 0.5) * (s1 - s0) / 3, -0.01], [3, 3], "black");
-  egg("spine light", [0.016, (s1 - s0) / 2 + 0.01, 0.016], [0, (s0 + s1) / 2, -0.01], [3, 3], "light");
-  seg("side rod", new THREE.Vector3(0.085, s0 - 0.01, -0.02), new THREE.Vector3(0.105, s1 + 0.01, -0.02), 0.011, "black", true);
+  // the abdomen: two armoured plates in the hero's abdomen proportions, a recessed band of light between them
+  const s0 = hipY + 0.08, s1 = chestY - chestH, seam = 0.014, ay = (s1 - s0 - seam) / 4 + 0.004;
+  egg("lower abdomen plate", [0.14, ay, 0.095], [0, s0 + ay - 0.004, 0], [5.5, 5.5], "black");
+  egg("upper abdomen plate", [0.155, ay, 0.1], [0, s1 - ay + 0.004, 0], [5.5, 5.5], "black");
+  egg("abdomen light", [0.128, seam / 2 + 0.003, 0.086], [0, s0 + 2 * ay - 0.004 + seam / 2, 0], [5.5, 5.5], "light");
   egg("chest", [0.18, chestH, 0.105], [0, chestY, 0], [3, 5.5], "black");
   egg("chest plate", [0.13, 0.1, 0.02], [0, chestY + 0.01, 0.092], [5.5, 5.5], "steel");
   egg("chest slit", [0.008, 0.07, 0.005], [0, chestY + 0.01, 0.113], [5.5, 5.5], "light");
@@ -280,23 +283,34 @@ function buildMech(M) {
 }
 // the pilot fills the helmet: it takes the shape of the inside of the shell (the head's own SuperEgg, a little in),
 // and carries the head-slot blorb's own eyes and core, moved from that blorb's front onto its own
-const PILOT_IN = 0.94;
+// The pilot fills the helmet: the head's own SuperEgg, inset from the shell, with the game's own blorb eyes (a free blorb's
+// eye meshes) on its skin, a little larger than the hero's eyes (his are about 0.03 by 0.04 m). The inset starts at
+// 0.92 and steps in until every eye sits inside the shell with a millimetre to spare, measured by rays against the shell.
+const EYE_W = 0.04;
 function buildPilot() {
-  const g = new THREE.Group(), ps = HS.clone().multiplyScalar(PILOT_IN), pc = HC.clone(), parts = {};
-  const body = new THREE.Mesh(figGeo(HERO_HEAD_PART, 1, p => [pc.x + (p[0] * MS - HC.x) * PILOT_IN, pc.y + (p[1] * MS - HC.y) * PILOT_IN, pc.z + (p[2] * MS - HC.z) * PILOT_IN]), figMat(HEAD_BLOB.c));
+  const g = new THREE.Group(), pc = HC.clone(), parts = {}, ray = new THREE.Raycaster(), Z = new THREE.Vector3(0, 0, -1);
+  const shell = new THREE.Mesh(figGeo(HERO_HEAD_PART, MS)); shell.updateMatrixWorld();
+  const eyes = F.blorb.filter(p => p.name.startsWith("Eye")).map(p => [p, bbox(p)]);   // a free blorb's eyes: the canonical shape
+  let inset = 0.92, body, placed;
+  for (; inset > 0.7; inset -= 0.01) {
+    body = new THREE.Mesh(figGeo(HERO_HEAD_PART, 1, p => [pc.x + (p[0] * MS - HC.x) * inset, pc.y + (p[1] * MS - HC.y) * inset, pc.z + (p[2] * MS - HC.z) * inset]), figMat(HEAD_BLOB.c));
+    body.updateMatrixWorld(); placed = []; let fits = true;
+    for (const [p, b] of eyes) { const sx = Math.sign(b.c[0]), k = EYE_W / (2 * b.s[0]);
+      ray.set(new THREE.Vector3(sx * 0.045, pc.y + 0.018, pc.z + 1), Z); const skin = ray.intersectObject(body)[0].point, wall = ray.intersectObject(shell)[0].point;
+      // the eye's own centre goes to the skin, its front standing proud of it as on a blorb; the front must stay inside the wall
+      if (skin.z + b.s[2] * k > wall.z - 0.001) { fits = false; break; }
+      placed.push([p, skin, k]); }
+    if (fits) break; }
   body.material.envMapIntensity = 0.25; body.renderOrder = 2; g.add(body); parts.body = body;   // the scene's reflections would wash its colour out
-  const map = p => [pc.x + (p[0] - BB.c[0]) * ps.x / BB.s[0], pc.y + (p[1] - BB.c[1]) * ps.y / BB.s[1], pc.z + (p[2] - BB.c[2]) * ps.z / BB.s[2]];
+  for (const [p, skin, k] of placed) { const b = bbox(p), e = new THREE.Mesh(figGeo(p, 1, q => [skin.x + (q[0] - b.c[0]) * k, skin.y + (q[1] - b.c[1]) * k, skin.z + (q[2] - b.c[2]) * k]), mat(0x000000, { roughness: 0.35, envMapIntensity: 0.25 }));
+    e.renderOrder = 4; g.add(e); parts["eye" + (b.c[0] < 0 ? "L" : "R")] = e; }
+  const ps = HS.clone().multiplyScalar(inset), map = p => [pc.x + (p[0] - BB.c[0]) * ps.x / BB.s[0], pc.y + (p[1] - BB.c[1]) * ps.y / BB.s[1], pc.z + (p[2] - BB.c[2]) * ps.z / BB.s[2]];
   // the glowing core (its node name varies by slot)
   const core = HEAD_SLOT.find(p => p !== HEAD_BLOB && p.c[4] + p.c[5] + p.c[6] > 1.0); parts.core = new THREE.Mesh(figGeo(core, 1, map), figMat(core.c)); parts.core.renderOrder = 3; g.add(parts.core);
-  // its eyes sit on its face, found by a ray against the pilot's own surface: a blorb's eyes, a little larger than the hero's
-  // (his are about 0.03 by 0.04 m), opaque, and coloured by the game's own rule (blorbEyeColour below)
-  body.updateMatrixWorld(); const ray = new THREE.Raycaster();
-  for (const [k, sx] of [["eyeL", -1], ["eyeR", 1]]) {
-    ray.set(new THREE.Vector3(sx * 0.045, pc.y + 0.018, pc.z + 1), new THREE.Vector3(0, 0, -1)); const hit = ray.intersectObject(body)[0];
-    const n = hit.face.normal.clone().transformDirection(body.matrixWorld), e = new THREE.Mesh(eggGeo([0.021, 0.025, 0.01], [2, 2], 12, 16), mat(0x000000, { roughness: 0.35, envMapIntensity: 0.25 }));
-    e.position.copy(hit.point).addScaledVector(n, 0.002); e.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), n); e.renderOrder = 4; g.add(e); parts[k] = e; }
+  PILOT_FIT.inset = inset;
   return { g, parts };
 }
+const PILOT_FIT = {};
 // blorb.gd: eye_color := body_rgb.lightened(0.62) if luminance < 0.24 else body_rgb.darkened(0.25)
 function blorbEyeColour(c) { const col = new THREE.Color(c[0], c[1], c[2]), lum = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
   return lum < 0.24 ? col.lerp(new THREE.Color(1, 1, 1), 0.62) : col.multiplyScalar(0.75); }
