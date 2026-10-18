@@ -107,7 +107,7 @@ diagnostic replaces this column.
 
 | ID | Package | Area | Now | Target | Status | Brief |
 |---|---|---|---|---|---|---|
-| P0 | **The check suite and the screenshot rig** | the whole city (and reused by every kingdom) | none | n/a | **ready** | `moy_pkg_P0.md` |
+| P0 | **The check suite and the screenshot rig** | the whole city (and reused by every kingdom) | none | n/a | **fix** (reviewed 2026-10-18: the suite's frame is built; its checks are proxies and the fixtures are missing; section 7 of the brief) | `moy_pkg_P0.md` |
 | P1 | Prototype pass 4: grand square, City Hall's front, the clock dome, the Clock Room, tower ribs, closed escalators, the pond | civic core, Crossing | L1 to L3 | L2 | **fix** (reviewed 2026-10-18: head beams, City Hall's bands, two checks; section 4 of the brief) | `moy_prototype_pass_4.md` |
 | P2 | Bake and performance: the rendered probe, budgets, streaming | the whole city | owed | budgets met | planned | |
 | P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane; the Helmsmith moves off Civic Plaza to his shop on Lamp Lane | market lanes | L1 | L2 | **ready** | `moy_pkg_P3.md` |
@@ -124,7 +124,7 @@ diagnostic replaces this column.
 | P14 | People: the residents' looks, schedules, dialogue, the night market | city | ? | L3 | planned | |
 | P15 | Outside the wall: turbines, the battery, water and recycling works, the launch site, city blorbs | desert | L1 to L2 | L3 | planned | |
 | P16 | Final polish and performance | city | n/a | L4 | planned | |
-| P17 | **The BLOCK tower**, one playable build: its outside and climb, the way in, the lift, the crown arena, the blorb mech (playable, carried or piloted as Humongous), the boss fight, Kask and Pinestein | BLOCK tower | L1 | L3 | **ready** | `moy_pkg_P17.md` |
+| P17 | **The BLOCK tower**, one playable build: its outside and climb, the way in, the lift, the crown arena, the blorb mech (playable, carried or piloted as Humongous), the boss fight, Kask and Pinestein | BLOCK tower | L1 | L3 | **fix** (reviewed 2026-10-18: the mech is boxes, a second mech appears, the fight does not reset; not yet played; section 11) | `moy_pkg_P17.md` |
 | P18 | **The Arches**: the old goods store in the wall's arches; the fight club (Tuesday, Friday) and the rave (Saturday night) | the wall by the South Gate | L0 | L3 | planned | |
 
 **Order.**

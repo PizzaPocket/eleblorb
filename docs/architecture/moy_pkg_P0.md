@@ -167,3 +167,43 @@ Write `docs/diagnostics/<date>-moy-P0.md` with:
 - the fixtures' results;
 - the screenshot set;
 - anything in this brief that could not be built as written, and why.
+
+## 7. Review of the first build, and fixes (2026-10-18)
+
+Reviewed: `3ca6156`, diagnostic `docs/diagnostics/2026-10-18-moy-P0.md`.
+**Result: fix.** The diagnostic is honest: this is the suite's frame, not
+the suite. Keep the command, the check ids, the timings, the JSON and
+Markdown reports, the wait for Moy's packs, the exit code, and the rendered
+screenshot rig.
+
+**Fix these, in order:**
+1. **One walk grid under every check.** Cast rays down on a grid over
+   `--area` (0.5 m; 0.25 m for `overlap` only), keeping every hit whose
+   normal is within the floor angle: each hit is a walk cell, with its
+   height and its collider. Stack cells at one (x, z) by height. This
+   replaces the AABB proxies in `overlap`, `buried`, `reach`, `trap`,
+   `headroom` and `guard`.
+2. **`reach` and `trap` as flood fills** over that grid, as section 2 says
+   (step height, slope, 0.45 m radius, 2.0 m headroom), with lifts,
+   escalators and trains as links. `trap` is the reverse fill from the
+   spawn's region, plus reached cells inside untagged shells.
+3. **`underside`:** an upward ray from 1 m under each walk deck and flight
+   must hit a collider, and a face must be visible from below. Ignore
+   meshes that are not walk decks (clouds, foliage).
+4. **`overlap`:** only two *different* bodies' walk cells within 2 cm, one
+   finding per cluster. The 2,252 findings today are mostly rails and track
+   segments meeting end to end: exclude pieces of one run.
+5. **`headroom`:** cast from walk cells only, not collider centres. The 295
+   findings today are the Rim Walk's own wall.
+6. **The fixtures** (section 4): all nine, each caught, then removed.
+7. **Builder tags:** `reach_target` on every door, landing, lift stop and
+   platform the builders place; `enterable`; `CollisionPolicy` decorative
+   marks where missing. Tags only: change no geometry.
+8. **The rig reads places:** `--package=P4` takes the brief's viewpoint ids
+   from `moy_city_3d.html`'s `PLACES` (mapping in section 3), plus the
+   standard set. Render the pass 4 places.
+9. **Time:** under 5 minutes on all of Moy. If a 0.5 m grid is too slow on
+   the whole city, run per package `--area` and say so.
+
+**Report:** `docs/diagnostics/<date>-moy-P0-fixes.md`: each check's method,
+its fixture result, the Moy baseline counts, the times, and the place shots.

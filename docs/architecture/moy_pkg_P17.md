@@ -277,3 +277,58 @@ data and this brief disagreed.
   lab, Kask's floors and the glimpses leave this build. One lift: lobby,
   way in, crown; out by the one door. P17 builds the tower's outside, so it
   leaves P6's scope.
+
+## 11. Review of the first build, and fixes (2026-10-18)
+
+Reviewed: `3ca6156`, diagnostic `docs/diagnostics/2026-10-18-moy-P17.md`.
+**Result: fix.** A source-and-smoke pass: nothing was played or
+screenshotted, as the diagnostic says. Keep the tower's outside in its own
+pack, the streamed inside, the lift with Up and Down, the lines (all
+correct), the three `WorldState` flags, `MechState`'s three modes, the boss's
+400 HP and 300 XP, the seven joinable blorbs, `FigureHair.STYLE_WILD`, the
+lab coat and the pin, and parity with three drivers.
+
+**Fix these:**
+1. **The mech is boxes on top of a figure.** `block_mech.gd` builds a dark
+   `ProceduralFigure` and then lays 30-odd `BoxMesh`es over it on the
+   `Visuals` root, not on the joints, so when the figure walks the boxes
+   stay still. Build it from the model's parts list (section 5): SuperEgg
+   tubes joint to joint, actuators, shoulder pads, the two abdomen plates,
+   the hero's own hands, feet and head shape, each parented to its pivot.
+   No boxes, and no second body under them.
+2. **The head:** the hero's head shape split by the brief's one curve into
+   the glass visor and the black shell; the visor **hinges at the crown**.
+   Today a box rotates about its own middle.
+3. **The pilot and the suit:** the pilot is the head's shape inset in the
+   helmet, with the game's blorb eyes (section 5). The six blorbs are
+   **worn through the suit system** on the mech's pivot map, not six
+   quarter-size blorbs placed on its body.
+4. **A second mech appears.** Leaving by the door frees the inside, but the
+   hero is still within 36 m, so `city_generator.gd` instances it again at
+   once, and `_ready()` spawns an empty mech because the fight is won. The
+   same happens on every later visit, even while the mech is carried or
+   parked elsewhere. Spawn the empty mech only while `MechState` is
+   `released` with no world body; and do not re-instance the inside until
+   the hero has left the tower's bounds.
+5. **The fight does not reset.** If the hero faints, the boss keeps its
+   damage. Reset it in full when he returns (section 6).
+6. **The way in misses the louvre.** The trigger tests `|z| < 3` about the
+   shaft's middle, but the louvre is at `inside.louvre.at` (z 55, local
+   −4). Read its place from `CityPlan.BLOCK_TOWER` and centre the trigger
+   on the open hood.
+7. **Read the plan, don't copy it.** The inside hard-codes its floors,
+   lift and gallery. The gallery is built at local z 5.5 to 11.5 with its
+   glass at the back; the data puts it at z 2 to 7 (world 61 to 66) with
+   the glass facing the arena. Read every place from
+   `CityPlan.BLOCK_TOWER.inside`.
+8. **No text:** remove `Hud.show_message("The mech kneels, empty.")`. The
+   kneel and the open visor show it.
+9. **Piloted speed:** with no traversal mode running, the mech walks at
+   `MOVE_SPEED` 2.4 instead of its profile's 6.0.
+
+**Then the checks section 9 asks for, played:** the climb with both
+characters, the play-through screenshots, the mech's pose screenshots,
+and frame times. If the machine cannot run the game rendered, say so; that
+is the one thing this pass cannot do without.
+
+**Report:** `docs/diagnostics/<date>-moy-P17-fixes.md`.
