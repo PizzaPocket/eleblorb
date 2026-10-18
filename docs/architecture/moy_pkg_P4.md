@@ -68,20 +68,15 @@ From `TOWER_HOUSE` and the house's `kit`, bottom to top:
   pale ashlar bands; a white frieze where the brick begins.
 - **Earth base** (`base_kind: earth`): rammed earth in `lift` courses,
   battered `batter`° (the outer face steps in as it rises, the inner face
-  plumb); each free corner listed in the kit's `round` (vertex, radius)
-  rounded by a superellipse quarter of that radius (`corner_r` at most,
-  exponent `corner_exp`), the faces between them straight; lift ends turned
-  up `horn` at the rounded corners; a gypsum `cornice` ring following the
-  rounded top.
-- **Corbels** (user, 2026-10-18): above the cornice the brick is square at the
-  outline. `corbel.courses` brick courses of `corbel.h` carry it out: each
-  course's corner radius steps down (`corner_r × (1 − k/courses)`) until the
-  last is square and the brick rises flush from it; no course steps out more
-  than `corbel.step_max` (the plan checks it).
-- **On a leaning or rounded face** (`on_surface`): every light, window, sill,
+  plumb); its plan one superellipse (exponent `corner_exp`); lift ends
+  turned up `horn` at its corners; the white gypsum band (`cornice`) on top,
+  square like the brick above it. No corbels or squinches (user, 2026-10-18:
+  it is a game; it must look clean).
+- **On a leaning or curved face** (`on_surface`): every light, window, sill,
   door, shopfront, kishk and spout sits on the wall's real surface at its
-  height (the earth steps in by the batter), turned to its normal, and only on
-  the straight part of a face, never on a rounded corner.
+  height (the earth's superellipse, stepped in by the batter), turned to that
+  surface's normal, and only where the surface is flat to 3 cm across it. A
+  door or shopfront moves toward the middle of its face until it is.
 - **Brick storeys** to the roof, plumb, on the outline.
 - **Friezes** at every brick floor, from `frieze.kinds` by `kit.frieze`;
   `polite` houses carry a second band and relief panels between windows.
@@ -160,8 +155,8 @@ From `OLD_TOWN.squares[0].first_well`:
 
 ### 2.7 Parts and joins (binding)
 
-**Build every piece from the schedule:** `CityPlan.TOWER_HOUSE.parts` (52
-parts) and `.joins` (12 joins). The model's kit sheet draws the same schedule:
+**Build every piece from the schedule:** `CityPlan.TOWER_HOUSE.parts` (51
+parts) and `.joins` (11 joins). The model's kit sheet draws the same schedule:
 match it piece for piece. Nothing in the house is left to choose. If a piece
 seems missing or wrong, say so in the diagnostic; do not invent one.
 
@@ -272,10 +267,10 @@ Write `docs/diagnostics/<date>-moy-P4.md` with:
 
 ## Decisions log
 
-- 2026-10-18 (user): over a rounded earth base the brick storeys are square,
-  carried out over each rounded corner by corbel courses (option B); the
-  rounding is a fixed radius at each free corner, not the whole plan, so the
-  corbels can reach it.
+- 2026-10-18 (user): the earth base keeps its whole-plan superellipse; the
+  white band and the square brick sit on it as before; no corbels or
+  squinches. It must look clean, not argue its structure. Openings and trim
+  go on the curved surface (`on_surface`).
 - 2026-10-18 (user): every piece and every join is decided in the plan
   (`TOWER_HOUSE.parts`, `.joins`), not left to the build; the model draws
   the same schedule; the diagnostic reports it part by part.

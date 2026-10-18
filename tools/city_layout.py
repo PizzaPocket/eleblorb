@@ -2726,10 +2726,8 @@ for i,ki in enumerate(LOT_KITS):
 TOWER_HOUSE=dict(
   storey=3.25, plinth=0.9,
   wall=dict(earth=0.9,earth_top_min=0.5,stone=0.7,brick=0.45),
-  lift=0.65, batter=1.5, corner_exp=4.0, corner_r=1.5, horn=0.08,   # earth: zabur lifts, the batter in degrees, free corners rounded
-  # (a superellipse quarter of radius corner_r); over them the square brick is carried out on corbel courses (user, 2026-10-18)
-  corbel=dict(courses=3,h=0.25,step_max=0.12),
-  cornice=dict(h=0.5,out=0.3),                               # over an earth base; the corbel courses above it square the brick
+  lift=0.65, batter=1.5, corner_exp=4.0, horn=0.08,         # earth: zabur lifts, the batter in degrees; the base's plan one superellipse
+  cornice=dict(h=0.5,out=0.3),                               # the white band over an earth base
   frieze=dict(h=0.35,out=0.08,kinds=['zigzag','chevron chain','roundels','dentils']),
   parapet=dict(h=1.2,merlon=(0.6,0.5),horn=0.5,patterns=3),
   kiosk=dict(w=3.4,d=3.0,h=2.6), wind_tower=dict(w=2.2,d=1.4,h=4.5,mouth='w'),
@@ -2755,10 +2753,9 @@ TH_PARTS=[
  dict(id='plinth',what='basalt courses at the street',shape='profile',n=4.0,semi='fit',h=0.9,out=0.05,mat='basalt',col='landing',role='course'),
  dict(id='stone_wall',what='the stone base, plumb',shape='wall',semi='fit',mat='stone',col='solid',role='wall'),
  dict(id='ashlar_band',what='pale ashlar bands across the stone base',shape='clipped',semi=('fit',0.11,0.04),eps=(5.5,5.5),mat='ashlar',col='landing',role='band',join='band_chain'),
- dict(id='earth_lift',what='one rammed-earth lift; the outer face steps in by the batter, each free corner rounded to corner_r',shape='profile',n=4.0,semi='fit',h=0.65,mat='earth',col='solid',role='course',join='lift_stack'),
+ dict(id='earth_lift',what='one rammed-earth lift; its plan one superellipse (exponent corner_exp), stepping in by the batter',shape='profile',n=4.0,semi='fit',h=0.65,mat='earth',col='solid',role='course',join='lift_stack'),
  dict(id='lift_horn',what='a lift end turned up at a rounded corner (the climbable corner)',shape='clipped',semi=(0.18,0.08,0.14),eps=(3.0,5.5),mat='earth',col='landing',role='trim',join='seated'),
- dict(id='cornice',what='gypsum cornice over an earth base, one ring following its rounded top, out by cornice.out',shape='profile',n=4.0,semi='fit',h=0.5,out=0.3,mat='gypsum',col='landing',role='course',join='corbel_stack'),
- dict(id='corbel_course',what='a brick corbel course over the cornice: its rounded corners tighten course by course until the brick above is square',shape='profile',n=4.0,semi='fit',h=0.25,mat='brick',col='solid',role='course',join='corbel_stack'),
+ dict(id='cornice',what='the white gypsum band over an earth base, square like the brick above it',shape='clipped',semi=('fit',0.25,0.3),eps=(5.5,5.5),mat='gypsum',col='landing',role='band',join='band_chain'),
  dict(id='brick_wall',what='the brick storeys, plumb on the outline',shape='wall',semi='fit',mat='brick',col='solid',role='wall'),
  dict(id='frieze',what='gypsum frieze at each brick floor (pattern in relief, decorative)',shape='clipped',semi=('fit',0.175,0.08),eps=(5.5,5.5),mat='gypsum',col='landing',role='band',join='band_chain'),
  dict(id='latrine_shaft',what='the plastered service chute on a side or back face',shape='clipped',semi=(0.55,'fit',0.45),eps=(3.0,3.0),mat='gypsum',col='solid',role='shaft',join='against_wall'),
@@ -2819,9 +2816,8 @@ TH_JOINS=[
  dict(id='kiosk_door_pair',kind='split',parts=['kiosk_door'],parent=(0.45,1.0,0.04),eps=(5.5,5.5),cuts=[],hinge='left',rule='a single leaf: the parent itself, hinged at one side'),
  dict(id='shutter_set',kind='split',parts=['shutter_leaf'],parent=(1.4,1.35,0.03),eps=(5.5,5.5),cuts=[(1,0,0,-0.7),(1,0,0,0.0),(1,0,0,0.7)],hinge='outer',rule='four leaves from one parent; they fold back in pairs to each jamb'),
  dict(id='cap_ridge',kind='meet',parts=['wind_cap','wind_cap'],plane='the vertical plane through the ridge',rule='both slabs run past the ridge and are cut at it; their cut faces meet on one line, the profile the same both sides'),
- dict(id='band_chain',kind='chain',parts=['ashlar_band','frieze'],plane='the bisector of each corner of the outline',rule='each face\'s run is cut at both corners\' bisectors; neighbouring runs meet on one mitre line, same height and same profile'),
- dict(id='corbel_stack',kind='chain',parts=['cornice','corbel_course'],plane='each course\'s top',rule='the cornice follows the earth\'s rounded top; each corbel course stands on the one below with its corner radius stepped down (corner_r x (1 - k/courses)), never more than corbel.step_max past it; the last is square and the brick rises flush from it'),
- dict(id='on_surface',kind='placed',parts=['light','window','surround','qamariya','mafraj_window','sill','door_opening','shop_opening','kishk','kishk_bracket','mizab','lintel'],plane='the face as it is at that height',rule='on the wall\'s real surface at its height (the earth steps in by the batter), turned to its normal, and only on the straight part of a face: never on a rounded corner'),
+ dict(id='band_chain',kind='chain',parts=['ashlar_band','cornice','frieze'],plane='the bisector of each corner of the outline',rule='each face\'s run is cut at both corners\' bisectors; neighbouring runs meet on one mitre line, same height and same profile'),
+ dict(id='on_surface',kind='placed',parts=['light','window','surround','qamariya','mafraj_window','sill','door_opening','shop_opening','kishk','kishk_bracket','mizab','lintel'],plane='the face as it is at that height',rule='on the wall\'s real surface at its height (the earth\'s superellipse, stepped in by the batter), turned to that surface\'s normal, and only where the surface is flat to 3 cm across the piece'),
  dict(id='lift_stack',kind='chain',parts=['earth_lift'],plane='each lift\'s top',rule='each lift stands on the one below on one horizontal plane; the batter shows as a step of tan(batter) x lift'),
  dict(id='ramp_ends',kind='chain',parts=['ramp','ramp_rail'],plane='the lower roof\'s top at the foot; the higher roof\'s top at the head, through the parapet gap',rule='cut at both roofs\' planes from the same datum (the storey): flush at both ends, no ledge'),
  dict(id='seated',kind='seated',parts=['lift_horn','merlon','horn','parapet_post','bench_leg','pot','gate_post','well_head','well_lid','trough','ghaf_trunk','wind_shaft'],plane='the top of what it stands on',rule='cut flat at that plane and capped; the cut face sits on it, no gap, no buried half'),
@@ -2840,8 +2836,6 @@ def _th_parts_checks():
         if p['shape']=='clipped' and not any(p['id'] in j['parts'] for j in TH_JOINS): problems.append(('tower parts: a clipped part with no join to cut it',p['id']))
         if p['shape']=='punched' and p['n']<2.0: problems.append(('tower parts: an opening below exponent 2',p['id']))
         if p['col'] not in ('solid','landing','decorative','open'): problems.append(('tower parts: no collision class',p['id']))
-    st_=TOWER_HOUSE['corner_r']*(1-0.7071**(2/TOWER_HOUSE['corner_exp']))/TOWER_HOUSE['corbel']['courses']
-    if st_>TOWER_HOUSE['corbel']['step_max']: problems.append(('tower house: a corbel course steps out too far',round(st_,3)))
     for j in TH_JOINS:
         if j['kind'] not in ('split','meet','chain','seated','punched','placed'): problems.append(('tower joins: unknown kind',j['id']))
         for q in j['parts']:
@@ -2961,29 +2955,6 @@ def _p4():
         polite=old_road or kind.get(fr) in ('main','shop')
         if msides(g)[0]<TH['infill_below']: h['kit']=infill(h['storeys'],'lane',shop,hh)
         else: h['kit'].update(shop=shop,polite=polite)
-    # the free corners an earth base rounds (user, 2026-10-18): a real corner (turning 10 degrees or more) with no
-    # neighbour within 0.3 m, rounded to corner_r or less where its edges are short
-    def free_corners(cs,others):
-        n_=len(cs); out=[]
-        for k_ in range(n_):
-            a_,v_,b_=cs[k_-1],cs[k_],cs[(k_+1)%n_]
-            d1=(v_[0]-a_[0],v_[1]-a_[1]); d2=(b_[0]-v_[0],b_[1]-v_[1]); l1=math.hypot(*d1); l2=math.hypot(*d2)
-            if l1<0.5 or l2<0.5: continue
-            turn=math.degrees(math.acos(max(-1,min(1,(d1[0]*d2[0]+d1[1]*d2[1])/(l1*l2)))))
-            if turn<10: continue
-            if any(o.distance(Point(v_))<0.3 for o in others): continue
-            out.append([k_,round(min(TH['corner_r'],0.35*l1,0.35*l2),2)])
-        return out
-    every=[Polygon(h_['corners']) for h_ in OLD_HOUSES]+[sbox(*l_[:4]) for l_ in lots]+[sbox(*b_['r']) for b_ in named]
-    for i_,h_ in enumerate(OLD_HOUSES):
-        if h_['kit'].get('base_kind')=='earth': h_['kit']['round']=free_corners(h_['corners'],[g for j_,g in enumerate(every) if j_!=i_])
-    for i_,l_ in enumerate(lots):
-        k_=LOT_KITS[i_]
-        if k_ and k_.get('base_kind')=='earth':
-            g0=sbox(*l_[:4]); k_['round']=free_corners([(l_[0],l_[1]),(l_[2],l_[1]),(l_[2],l_[3]),(l_[0],l_[3])],[g for g in every if not g.equals(g0)])
-    for n_,k_ in BUILDING_KITS.items():
-        if k_.get('base_kind')=='earth':
-            r_=[b_ for b_ in named if b_['n']==n_][0]['r']; g0=sbox(*r_); k_['round']=free_corners([(r_[0],r_[1]),(r_[2],r_[1]),(r_[2],r_[3]),(r_[0],r_[3])],[g for g in every if not g.equals(g0)])
     # every tower house is at least the core's width inside its walls
     for i,h in enumerate(OLD_HOUSES):
         if h['kit']['kit']=='tower' and msides(Polygon(h['corners']))[0]<TH['infill_below']-0.01: problems.append(('old town: a tower house too narrow for its core',i))
