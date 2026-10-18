@@ -118,6 +118,8 @@ diagnostic replaces this column.
 | P14 | People: the residents' looks, schedules, dialogue, the night market | city | ? | L3 | planned | |
 | P15 | Outside the wall: turbines, the battery, water and recycling works, the launch site, city blorbs | desert | L1 to L2 | L3 | planned | |
 | P16 | Final polish and performance | city | n/a | L4 | planned | |
+| P17 | **The BLOCK tower, a story project** (iterative): its scenes, rooms and levels, Pinestein's sealed lab in its base, the lift to the climax near the top | BLOCK tower | L1 | L4 | planned | |
+| P18 | **The Arches**: the old goods store in the wall's arches; the fight club (Tuesday, Friday) and the rave (Saturday night) | the wall by the South Gate | L0 | L3 | planned | |
 
 **Order.**
 1. P0 and P1 first.
@@ -125,7 +127,9 @@ diagnostic replaces this column.
    and make the most visible difference.
 3. Then the landmarks P7 to P11.
 4. Then P12 to P15.
-5. P2 runs alongside: re-measure performance after each district package.
+5. P17 and P18 are story places: each runs as several planning and build
+   rounds of its own, once their districts (P6, P3 and P11) are at L2.
+6. P2 runs alongside: re-measure performance after each district package.
 
 **P13, the enterable interiors.** Each is its own sub-package:
 
@@ -139,9 +143,31 @@ diagnostic replaces this column.
 | P13f | the hawker centre |
 | P13g | Old Fu's tea house |
 | P13h | the Reese–Miller house |
-| P13i | Pinestein's laboratory, sealed in the BLOCK tower's base (decided 2026-10-18: his lab is in BLOCK; his Old Moy flat is not entered) |
+| P13i | (moved into P17) Pinestein's laboratory, sealed in the BLOCK tower's base; his Old Moy flat is not entered |
 | P13j | Hiro's all-night store |
 | P13k | the Helmsmith |
+
+**P17, the BLOCK tower.** One of the big projects, and iterative by design.
+- **What it is:** narrative scenes spanning several rooms and levels of the
+  tower; Pinestein's sealed laboratory in its base; a lift that rises to
+  the top or near it for a climactic scene.
+- **How it runs:** first a planning round that writes the tower's story
+  beats and a section through it (which floors are entered, and what
+  happens on each); then build rounds floor group by floor group, each to
+  L3; the climax last.
+- **Keep:** BLOCK is the city's plain bad guy, with no elaborate backstory
+  (user, 2026-10-18). Its outside stays as P6 builds it.
+
+**P18, the Arches.** One long vaulted hall in five bays of the wall
+(`CityPlan.WALL.venue`, `city.md` section 6c), dug 10 m into the fill.
+- **Program:** a ring in the middle bay (struck on rave nights), a bar in
+  the east bay, a booth in the west; shutters on the Rim Corridor.
+- **Nights:** the fight club on Tuesday and Friday nights, where the
+  fighting blorbs fight; the rave on Saturday night, late till dawn, with
+  lights and music; shut on other days. It hangs on the game's day and
+  week clock and P14's schedules (the crowd walks there).
+- **No text:** nothing names the nights; the player finds them by being
+  there, or by following the crowd.
 
 Each interior gets an architecture and interior brief (the `architecture` and
 `interior-design` skills) before its build.

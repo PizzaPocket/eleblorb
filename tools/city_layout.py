@@ -930,6 +930,8 @@ def _site_checks():
 _site_checks()
 ## The wall and the Wall Line (city.md 6c, proposed 2026-10-14). The Ring Line
 ## came first: a double-track viaduct round the city's edge, built in the boom.
+def market_lane_xy(x,z):   # the market lanes' extent, out to the wall (market_lane() stops at the Rim Walk)
+    return x<=-487 and (z>=114 or (z>62 and x>-641))
 ## As the NMEs rose, the city filled its arches with rammed earth and concrete,
 ## and the railway became the wall: a plain circle just outside the Rim Walk,
 ## carrying the trains on its top. Gatehouses, watch posts and the Line House
@@ -954,6 +956,12 @@ WALL={
  # the Ring Line's arches, after Tokyo's gado-shita: only the outer half of each was filled, so the inner half opens on the
  # Rim Walk as a room 5 m deep under a 6.5 m arch; bays of 9 m, the arches kept clear of the gates and the Line House
  'arches':dict(bay=9.0,span=6.5,rise=5.5,depth=5.0),
+ # the Arches: the reopened run on the market lanes' south edge (the venue for the fight club and the rave)
+ 'venue':dict(name='the Arches',s=(254.0,300.0),min_bays=5,depth=10.0,
+              nights=dict(fight='Tuesday and Friday: the fight club, a ring in the middle bay, a crowd standing round it; the fighting blorbs fight here',
+                          rave='Saturday: the rave, from late till dawn, lights and music through the whole run'),
+              program='one long vaulted hall: a ring that is struck on rave nights, a bar in the east bay, a booth in the west; on other days shut, its shutters down',
+              after='the railway-arch clubs and boxing gyms under London\'s viaducts; Tokyo\'s gado-shita'),
  # the gate towers: Jiayuguan's tiered towers on the gatehouse's outer corners, in Moy's tile
  'gate_tower':dict(base=7.0,tiers=3,tier=3.2),
  'rail':13.2,  # the Wall Line's rail head: the wall's top (12 m) and its 1.2 m trackbed
@@ -1026,6 +1034,21 @@ def _build_wall():
         if all(Point(g['p']).distance(q)>g.get('along',W_['gatehouse']['along'])/2+4 for g in W_['gates']) and shed.distance(q)>W_['thick']/2+4:
             arches.append(round(s_,1))
     W_['arch_s']=arches
+    # the Arches (proposed 2026-10-18, at the user's direction: a rundown space for an underground fight club and a night
+    # rave). A run of the Ring Line's old arches on the market lanes' south edge, between Market Lane's foot and the South
+    # Gate, reopened right through: the rammed earth dug out of the outer halves and the party walls between bays broken
+    # through, so the arches make one long vaulted hall under the Wall Line, 10 m deep, its outer skin left whole. The
+    # Wall Line's trains, the night Watch train among them, rumble overhead. Its door opens on the Rim Walk. Fight
+    # nights and rave nights are different nights of the week; on other days it is shut and looks it.
+    V_=W_['venue']; vb=[a_ for a_ in arches if V_['s'][0]<=a_<=V_['s'][1]]
+    V_['bays']=vb; V_['door']=[round(C.interpolate(vb[len(vb)//2]).x,2),round(C.interpolate(vb[len(vb)//2]).y,2)]
+    if len(vb)<V_['min_bays']: problems.append(('wall: the Arches lose bays to a gate or the Line House',len(vb)))
+    for a_ in vb:
+        q=C.interpolate(a_)
+        if any(Point(p_).distance(q)<W_['post']['along']/2+V_['depth'] for p_ in posts): problems.append(('wall: the Arches against a watch post',a_))
+        if any(min(abs(a_-st['s']),L-abs(a_-st['s']))<W_['gatehouse']['along']/2+6 for st in stations): problems.append(('wall: the Arches in a station\'s gatehouse',a_))
+        if not market_lane_xy(q.x,q.y): problems.append(('wall: the Arches outside the market lanes',a_))
+    if V_['depth']>W_['thick']-1.5: problems.append(('wall: the Arches dug through the wall\'s outer skin',))
     # the line's curves: radius from three points 10 m apart
     worst=1e9
     for i in range(0,int(L),5):

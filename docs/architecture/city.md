@@ -441,8 +441,8 @@ in character and pointing nowhere:
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Palbert Pinestein** | a top-floor flat in Old Moy, the roof bristling with antennas and coils, where he watches BLOCK | none, officially; dismissed from BLOCK. His laboratory, where he made the city blorbs, is sealed in the BLOCK tower's base (user, 2026-10-18): the one lab of his the hero enters | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
-| **Dr. Vera Kask** | the top floors of the BLOCK tower | director of BLOCK | Pinestein's oldest colleague, and the one who dismissed Pinestein after the Blackout. Still keeps Pinestein's old notebooks locked in her office. She lives where she works, and is rarely seen at street level. |
+| **Palbert Pinestein** | a top-floor flat in Old Moy, the roof bristling with antennas and coils, where he watches BLOCK | none; he used to work at BLOCK. His laboratory, where he made the city blorbs, is sealed in the BLOCK tower's base (user, 2026-10-18): the one lab of his the hero enters | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
+| **Dr. Vera Kask** | the top floors of the BLOCK tower | director of BLOCK | Runs BLOCK, the city's bad guy. She lives where she works, and is rarely seen at street level. |
 | **Omar Haddad** | a flat at the battery works | chief engineer of the Windworks wind farm | Climbs ninety-five metres to a nacelle before breakfast and calls it his commute. |
 | **Rafael Ortiz** | the keeper's house at the water works | keeper of the wells and the water works | Counts every litre the city uses twice, and has never once let the park's pond run dry. |
 
@@ -481,40 +481,27 @@ dialogue pass (Juno's second, Mara's first and Dax's second).
 in an experiment. They have since been outcast and are not allowed inside the
 city's bounds. **The rest is proposed.**
 
-- **The experiment.** Pinestein was BLOCK's brightest
-  researcher in "living current", and wanted a creature that could live on
-  the city's own light, so the city would never go dark again. The
-  experiment made the city blorbs, saturated glassy azure, crackling and
-  hungry for power: the only blorbs known to have been made rather than
-  born. How it was done is left open.
-- **The Blackout.** They loved the city too much. They fed on the signs, the
-  lifts and the grid, and one summer night the whole city went dark:
-  - lifts stopped between floors, and the Grand Hotel's glass capsule
-    lifts stopped halfway up its atrium with guests inside, in sight of
-    every gallery;
-  - the Deck's glass lifts stopped, and its lamps went out;
-  - the Ring Line's trains stopped where they stood, round the city's
-    edge (this was before its arches were filled);
-  - the Grand Hotel's chandelier went out for the first time in its history.
-- **The ordinance.** The city council, under Mayor Teodora Vance, banned city
-  blorbs from inside the bounds. The Institute, under Dr. Vera Kask,
-  dismissed Pinestein.
+**Kept simple** (user, 2026-10-18: no elaborate backstory, no disgrace, no
+trial). It is part of the plain atmosphere of the city: BLOCK is the bad guy.
+- **The experiment.** Pinestein experimented on blorbs at BLOCK, and the
+  experiments made the city blorbs: saturated glassy azure, crackling and
+  hungry for power, the only blorbs known to have been made rather than
+  born. His laboratory is sealed in the BLOCK tower's base.
 - **Now:**
-  - The city blorbs stay outside the city's outskirts, out in the desert
-    beyond the Rim Walk.
-  - Pinestein still lives in Old Moy and goes out to them at night,
+  - The city blorbs are banished outside the city, out in the desert beyond
+    the Rim Walk.
+  - Everyone in Moy is still afraid of all blorbs, not only the city ones.
+  - Pinestein lives in a flat in Old Moy and goes out to them at night,
     with batteries bought from Hiro at 3 a.m.
 - **How the city feels about them:**
   - Teodora: defensive.
   - Kate: dutiful but gentle.
-  - Lucinda: bitter (her chandelier).
+  - Lucinda: wary; she keeps them away from her hotel.
   - Lily and Kofi: they sneak out to see them.
 - **Draft lines** (in character, explaining nothing):
   - Pinestein: "They're not pests. They're the first thing this city ever
     made that wanted to live here."
   - Kate: "Back out you go. Past the palms. Go on."
-  - Lucinda: "Three thousand crystals, and every one of them dark. I was
-    standing right there."
 - **In play (proposed):**
   - Wild city blorbs spawn only in the desert just outside the outskirts,
     and their roaming stays outside the Rim Walk.
@@ -877,6 +864,33 @@ the picture-sign colours at night).
   stays open to the Rim Walk as small rooms (the Watch's posts, stores,
   noodle counters, the lines' staff rooms), so the wall is lived in on the
   city side and blank on the desert side.
+- **The Arches: the city's rundown warehouse** (proposed 2026-10-18, at the
+  user's request for an abandoned warehouse venue). Five bays of the wall on
+  the market lanes' south edge, between Market Lane's foot and the South
+  Gate (`WALL.venue`: s 254 to 300 m, bays at 257 to 293, the door on the
+  Rim Corridor at the middle bay), knocked through into **one long vaulted
+  hall** and dug back 10 m into the old fill. It was a goods store when the
+  Ring Line carried the city's freight; since the arches were filled it has
+  stood empty, its shutters down, its brick black with old soot. The Wall
+  Line's trains still rumble across its roof.
+  - **Why here, and not Old Moy or a market-lane lot.** Old Moy is family
+    tower houses round wells, with no building big or anonymous enough. A
+    market-lane lot is about 23 by 12 m and lived in on every floor. The
+    railway arches are where real cities put this (London's viaduct clubs and
+    boxing gyms, Tokyo's *gādo-shita*): a long, loud, forgotten room at the
+    edge of the night market's nightlife, with nobody living over it.
+  - **The nights** (no timetable is announced; the player finds out):
+    - **Tuesday and Friday: the fight club.** A ring in the middle bay, a
+      crowd standing round it, a bar in the east bay. The fighting blorbs
+      (Fighting Type, boxing gloves) fight here.
+    - **Saturday: the rave**, from late till dawn: the ring struck, a booth
+      in the west bay, lights and music through the whole run of vaults.
+      On a Saturday night the people of the city drift toward it; follow
+      them and you find it.
+    - **Other days and nights:** shut, its shutters down, a light under one
+      door.
+  - Its build is roadmap package P18 (`moy_build_roadmap.md`). Its in-game text follows the rule:
+    nothing names the nights or says what happens there.
 - **The Deck under the train: Bangkok's Skytrain and Ratchaprasong
   Skywalk.** In Bangkok the elevated BTS line runs over the main roads on
   single concrete viaducts, and a pedestrian skywalk is slung beneath it on
@@ -1967,8 +1981,7 @@ estate on 2026-10-16; everything of BLOCK's is in the tower now.)
 
 **What happens at BLOCK** (proposed 2026-10-14, in review; the user asked
 for the evil activities and people to be concentrated there).
-- **One person.** After the Blackout the city's scientists left BLOCK. Dr.
-  Kask kept it running with machines: the tower's labs work through the night with
+- **One person.** Dr. Kask keeps BLOCK running with machines: the tower's labs work through the night with
   no one in them, and she is the only person the hero ever sees go in. It
   is the one building in Moy without named people inside, and that is
   what is wrong with it.
@@ -2296,9 +2309,7 @@ itself, the library and city hall, in limestone and bronze. He built what
 the boom thought the future looked like: a white concrete tower with glass
 lifts running up its face, and a room 44 m high where the whole city could
 sit indoors out of the sun. It is still the oldest tower downtown, and the
-one that taught Moy to build tall. The Blackout is the night its glass
-lifts stopped halfway up the atrium and its chandelier went dark for the
-first time.
+one that taught Moy to build tall.
 
 **Who works here** (the people the hero meets):
 
@@ -2528,15 +2539,12 @@ At night the four lit capsules moving up the white tower are the hotel's sign.
     inspected from inside the arm, which is a crawlway, without scaffolding
     and without going onto the glass.
   - **Power:** the winch runs on the hotel's supply with the Windworks'
-    batteries behind it, and a handwheel lowers it by hand if both fail. On
-    the night of the Blackout the chandelier went dark but stayed where it
-    hung.
+    batteries behind it, and a handwheel lowers it by hand if both fail.
   - `tools/city_layout.py` checks that the arm's tip is over the chandelier,
     that it stands at least 0.6 m under the glass and clear of the slots, and
     that there are at least 6 m of rope above the chandelier.
 - **Three thousand crystals** in strands round the rings, lit from within.
-  Lucinda knows them by their faults. During the Blackout they went dark
-  for the first time in the hotel's history.
+  Lucinda knows them by their faults.
 - **Lowered once a year** for cleaning: the winch lets it down 10 m
   through the void until its lowest tier hangs just over the pavilion's
   roof, and it is cleaned from the atrium floor. The city fills the
@@ -2749,8 +2757,7 @@ arrives to do so. City hall is where the city:
 **The council** (proposed): seven residents elected by the city, who meet
 in the council chamber. Teodora chairs. The other six are drawn from the
 census: Priya Raman, Dr. Arjun Mehta, Rafael Ortiz, Juno Rell, Sol Brant and
-Ada Fong. It was this council that voted the city blorbs out after the
-Blackout.
+Ada Fong. It was this council that banished the city blorbs.
 
 **History.** The third of the boom's civic buildings, with the Grand Hotel
 and the library, built to face the park down the civic axis from the head
@@ -3355,7 +3362,7 @@ lit crowns.
   Windspire;
 - (fifth revision) the wind farm's size, number and placement; the
   Windworks and the Windspire (renamed from the Sunwell and the Sunspire);
-- the five added residents; the Blackout;
+- the five added residents;
 - (2026-10-13) the Grand Hotel's design after Portman (section 8): the
   atrium block and cylinder tower, the leaning front, the capsule lifts
   up the outside of the tower, the chandelier hung down the void, the
