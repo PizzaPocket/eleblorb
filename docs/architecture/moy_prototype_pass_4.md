@@ -234,3 +234,64 @@ Good, keep it:
 **Report:** a short follow-up diagnostic,
 `docs/diagnostics/<date>-moy-P1-fixes.md`: each fix, the new checks' output
 (and that check 3 failed before fix 1), and the bake and validator counts.
+
+## 5. Second review, and fixes (2026-10-18)
+
+Reviewed: `948e1bf` (builder), `802cb65` (validator, shader), diagnostic
+`docs/diagnostics/2026-10-18-moy-P1-fixes.md`. No screenshots.
+**Result: fix.** The galleries and the shader are done. The head beams are
+still wrong, and the new checks were never run.
+
+Good, keep it:
+- City Hall's galleries over their own bands (A, B, AB), tops at `y`;
+- the gallery band check in the validator;
+- `moy_pond_water.gdshader` and its `.uid` deleted;
+- the honest report that the runtime validator did not finish.
+
+**Our error first.** Section 4, fix 1 said "nothing between the drums". That
+was wrong, and it contradicts the numbers in the same line. The plan
+(`city_layout.py`, the head-beam check and `_beam_clear`) puts each beam's
+ends at ±7.4 m from the Crossing's centre line: 0.4 m into the inner edge of
+each drum (drum r 6.0 round a tower at offset 13). The beam spans *between*
+the drums and carries the line there. Nothing of it is inside a drum
+beyond its ring girder.
+
+**Fix these:**
+1. **The head beams.** Each of the four is one piece, 14.8 m long, from −7.4
+   to +7.4 about the centre line (Spine: along x at each `_beams.spine.z`;
+   high line: along z at each `_beams.high.x`). Today each half runs from
+   7.4 to 13.0, into the tower's centre: through the helix band (r 1.4 to
+   4.0, so 9.0 to 11.6 from the centre line), on all four towers. Fix the
+   builder's comment too.
+2. **The band check follows the treads.** Today it samples a box only for
+   2.6 m above each *level*, so a beam between levels is never seen. Walk
+   every hand's `profile` (`[a0, a1, y0, y1]`, degrees and heights) in steps
+   of at most 5°. At each step, test the band (r 1.4 to 4.0) from the tread's
+   height + 0.05 to + 2.6. Exempt only `CrossingHand_*`. Use slices no wider
+   than 0.4 m at r = 4.0.
+3. **The way-out check tests the right box.** Today the box runs from the
+   tower's centre to r = 5.0. So it starts in the trunk and the helix (it
+   can never pass) and stops short of the ribs (r 6.0), the thing it is for.
+   Test from the band's outer edge, r 4.0, to the drum + 1.0 (r 7.0), 2.4 m
+   wide, from the floor + 0.05 to + 2.8.
+4. **No hard-coded results.** `MOY_PASS4_CLEARANCE` prints `collider_hits=0`
+   and `MOY_CITY_HALL_GALLERIES` prints `surface_y=PASS` whatever happened.
+   Print the real counts.
+5. **The validator must finish.** A check that never runs proves nothing.
+   If the full stream crashes (signal 11 in terrain and pack streaming), add
+   a mode that loads only the Crossing's and civic core's cells and the
+   collision, and run the P1 checks there. Report the crash's cause, or hand
+   it to P2 with its backtrace.
+6. **Show it failing, then passing.** Run checks 2 and 3 on `948e1bf`: the
+   band check must fail on all four towers (the half beams). Then on the fix:
+   both pass.
+7. **Label commits by package.** P1's builder fixes went out under "Add P0
+   Moy world-check fixes". Name the package each commit serves.
+
+**Report:** `docs/diagnostics/<date>-moy-P1-fixes-2.md`:
+- each fix;
+- the checks' output before and after;
+- the bake and validator counts;
+- three screenshots: under the Spine's head beam from a tower's gallery,
+  looking along the line; looking up the helix band past it; and City Hall's
+  L37o and G37 from the forecourt.
