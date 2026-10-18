@@ -124,7 +124,7 @@ diagnostic replaces this column.
 | P14 | People: the residents' looks, schedules, dialogue, the night market | city | ? | L3 | planned | |
 | P15 | Outside the wall: turbines, the battery, water and recycling works, the launch site, city blorbs | desert | L1 to L2 | L3 | planned | |
 | P16 | Final polish and performance | city | n/a | L4 | planned | |
-| P17 | **The BLOCK tower, a story project** (iterative): its scenes, rooms and levels, Pinestein's sealed lab in its base, the lift to the climax near the top | BLOCK tower | L1 | L4 | planned | |
+| P17 | **The BLOCK tower, a story project** (iterative): its scenes, rooms and levels, Pinestein's sealed lab in its base, the lift to the climax near the top | BLOCK tower | L1 | L4 | **story set**; round P17a (the blorb mech) **ready** | `moy_pkg_P17.md` |
 | P18 | **The Arches**: the old goods store in the wall's arches; the fight club (Tuesday, Friday) and the rave (Saturday night) | the wall by the South Gate | L0 | L3 | planned | |
 
 **Order.**
@@ -163,6 +163,10 @@ diagnostic replaces this column.
   L3; the climax last.
 - **Keep:** BLOCK is the city's plain bad guy, with no elaborate backstory
   (user, 2026-10-18). Its outside stays as P6 builds it.
+- **Story round done** (2026-10-18): the vent-hood climb in, Pinestein's lab
+  (he and Kask still work together), the lift, and a boss fight against the
+  blorb mech, which Blorbus then mounts. Rounds P17a to P17f are in the
+  brief; P17a, the mech, needs no tower and can be built now.
 
 **P18, the Arches.** One long vaulted hall in five bays of the wall
 (`CityPlan.WALL.venue`, `city.md` section 6c), dug 10 m into the fill.

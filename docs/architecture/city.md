@@ -441,7 +441,7 @@ in character and pointing nowhere:
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Palbert Pinestein** | a top-floor flat in Old Moy, the roof bristling with antennas and coils, where he watches BLOCK | none; he used to work at BLOCK. His laboratory, where he made the city blorbs, is sealed in the BLOCK tower's base (user, 2026-10-18): the one lab of his the hero enters | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
+| **Palbert Pinestein** | a top-floor flat in Old Moy, the roof bristling with antennas and coils, where he watches BLOCK | none, as far as the city knows: he still works with Kask in secret (user, 2026-10-18). His laboratory, where he made the city blorbs, is sealed in the BLOCK tower's base (user, 2026-10-18): the one lab of his the hero enters | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless; the city takes him for BLOCK's outcast. Goes out past the Rim Walk most nights with a pocketful of charged batteries (proposed: bait, to bring city blorbs in to BLOCK). |
 | **Dr. Vera Kask** | the top floors of the BLOCK tower | director of BLOCK | Runs BLOCK, the city's bad guy. She lives where she works, and is rarely seen at street level. |
 | **Omar Haddad** | a flat at the battery works | chief engineer of the Windworks wind farm | Climbs ninety-five metres to a nacelle before breakfast and calls it his commute. |
 | **Rafael Ortiz** | the keeper's house at the water works | keeper of the wells and the water works | Counts every litre the city uses twice, and has never once let the park's pond run dry. |
@@ -1931,7 +1931,10 @@ Central or Tokyo's Marunouchi.
   gravel, raked every morning, that no one walks on. It is the only tower
   without a life at its foot, and that is the point. It stays off the Deck.
 - **Who:** Dr. Vera Kask, the director, lives on the top floors and is rarely
-  seen at street level. No one else the hero knows works there (below).
+  seen at street level. No one else the hero knows works there, except Pinestein, in secret (user, 2026-10-18).
+- **Story:** the hero climbs the vent hoods to get in; inside are Pinestein's
+  lab and the climax, a boss fight against the blorb mech (package P17,
+  `moy_pkg_P17.md`).
 - **Play:** the vent hoods are the only holds; the ridge is an anchor no one
   should swing from.
 
