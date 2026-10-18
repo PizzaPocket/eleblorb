@@ -447,8 +447,9 @@ static func _add(packs: Dictionary, cell: Vector2i, node: Node3D) -> void:
 	if "door" in label or "landing" in label or "liftstop" in label or "platform" in label:
 		node.set_meta("reach_target", true)
 	if "platform" in label: node.set_meta("station_platform", true)
-	if "landing" in label or "platform" in label or "flight" in label or "ramp" in label or "walkway" in label or "deck" in label:
+	if _is_walk_deck_name(label):
 		node.set_meta("walk_deck", true)
+	_tag_walk_run_ids(node)
 	if "enterable" in label:
 		node.set_meta("enterable", true)
 	if "clockroom" in label: node.set_meta("enterable", true)
@@ -462,6 +463,40 @@ static func _add(packs: Dictionary, cell: Vector2i, node: Node3D) -> void:
 	if not packs.has(key):
 		var root := Node3D.new(); root.name = "MoyCell_%s" % key; packs[key] = root
 	packs[key].add_child(node)
+
+
+static func _is_walk_deck_name(label: String) -> bool:
+	if "landing" in label or "platform" in label or "flight" in label or "ramp" in label or "walkway" in label:
+		return true
+	return label.begins_with("deck_") and not label.begins_with("deck_gardenbed_") and not label.begins_with("deck_parapet_")
+
+
+static func _tag_walk_run_ids(root: Node) -> void:
+	for node in [root] + root.find_children("*", "CollisionObject3D", true, false):
+		if not node is CollisionObject3D: continue
+		var label := String(node.name)
+		var run_id := ""
+		if label.begins_with("DeckGardenBed_"):
+			var bed_parts := label.split("_")
+			if bed_parts.size() >= 3: run_id = "DeckGardenBed_%s_%s" % [bed_parts[2], bed_parts[3] if bed_parts.size() > 3 and bed_parts[3].is_valid_int() else ""]
+			if "_Segment_" in label: run_id = "DeckGardenBed_%s" % bed_parts[2]
+		elif label.begins_with("Deck_"):
+			var last_separator := label.rfind("_")
+			if last_separator > 0 and label.substr(last_separator + 1).is_valid_int(): run_id = label.substr(0, last_separator)
+		elif label.begins_with("RimWall_"):
+			run_id = "RimWall"
+		elif label.begins_with("OldLane_"):
+			var lane_parts := label.split("_")
+			if lane_parts.size() >= 3: run_id = "OldLane_%s" % lane_parts[1]
+		elif label.begins_with("Street_"):
+			run_id = label
+		elif label.begins_with("Lot_"):
+			run_id = label
+		elif label.begins_with("WallLine_Track_"):
+			run_id = "WallLine_Track"
+		elif label.begins_with("WallLine_Rail_"):
+			run_id = "WallLine_Rail"
+		if not run_id.is_empty(): node.set_meta("walk_run_id", run_id)
 
 
 static func _material(color: Color) -> StandardMaterial3D:
@@ -1158,6 +1193,9 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 				var seg: Array=hand.profile[pi]; var a0:=deg_to_rad(float(seg[0])); var a1:=deg_to_rad(float(seg[1])); var y0:=float(seg[2]); var y1:=float(seg[3])
 				var mesh:=_helix_closed_section_mesh(a0,a1,y0,y1,1.4,4.0,float(PLAN.ESCALATORS.section.depth),4.0)
 				var body:=StaticBody3D.new(); body.name="CrossingHand_%02d_%s_%d"%[ti,String(hand.hand),pi]; body.collision_layer=1; body.collision_mask=1
+				body.set_meta("walk_deck", true)
+				body.set_meta("walk_run_id", "CrossingHelix_%02d_%s" % [ti, String(hand.hand)])
+				if not is_equal_approx(y0,y1): body.set_meta("flight", true)
 				var visual:=MeshInstance3D.new(); visual.mesh=mesh; visual.material_override=_material(Color("#aaa58f" if y1!=y0 else "#b5a783")); body.add_child(visual)
 				var shape:=ConcavePolygonShape3D.new(); shape.set_faces(mesh.get_faces()); var collision:=CollisionShape3D.new(); collision.shape=shape; body.add_child(collision)
 				if not is_equal_approx(y0,y1):
@@ -1269,15 +1307,11 @@ static func _add_crossing_towers(packs: Dictionary) -> void:
 	var roof:=_polygon_building("CrossingRoof",roof_pts,float(roof_cfg.th),Color("#d2c7a7")); roof.position.y=DATUM+float(roof_cfg.y); _add(packs,_cell(Vector2(cfg.c[0],cfg.c[1])),roof)
 	for beam_index in cfg._beams.spine.z.size():
 		var z: float=cfg._beams.spine.z[beam_index]; var beam_y0:=float(cfg._beams.spine.y[0]); var beam_y1:=float(cfg._beams.spine.y[1])
-		# Stop at each drum's inner edge. The empty span between drums protects both helix bands.
-		for side in [-1.0,1.0]:
-			var inner_end: float=-560.0+side*7.4; var outer_end: float=-560.0+side*13.0
-			var beam:=_box_body("CrossingSpineHeadBeam_%d_%s"%[beam_index,"E" if side>0.0 else "W"],Vector3(absf(outer_end-inner_end),beam_y1-beam_y0,1.6),Vector3((outer_end+inner_end)*0.5,DATUM+(beam_y0+beam_y1)*0.5,z),Color("#8d948b")); _add(packs,_cell(Vector2((outer_end+inner_end)*0.5,z)),beam)
+		# One central span joins both ring girders and stays outside every helix band.
+		var beam:=_box_body("CrossingSpineHeadBeam_%d"%beam_index,Vector3(14.8,beam_y1-beam_y0,1.6),Vector3(-560.0,DATUM+(beam_y0+beam_y1)*0.5,z),Color("#8d948b")); _add(packs,_cell(Vector2(-560.0,z)),beam)
 	for beam_index in cfg._beams.high.x.size():
 		var x: float=cfg._beams.high.x[beam_index]; var beam_y0:=float(cfg._beams.high.y[0]); var beam_y1:=float(cfg._beams.high.y[1])
-		for side in [-1.0,1.0]:
-			var inner_end: float=side*7.4; var outer_end: float=side*13.0
-			var beam:=_box_body("CrossingMeridianHeadBeam_%d_%s"%[beam_index,"N" if side>0.0 else "S"],Vector3(1.6,beam_y1-beam_y0,absf(outer_end-inner_end)),Vector3(x,DATUM+(beam_y0+beam_y1)*0.5,(outer_end+inner_end)*0.5),Color("#8d948b")); _add(packs,_cell(Vector2(x,(outer_end+inner_end)*0.5)),beam)
+		var beam:=_box_body("CrossingMeridianHeadBeam_%d"%beam_index,Vector3(1.6,beam_y1-beam_y0,14.8),Vector3(x,DATUM+(beam_y0+beam_y1)*0.5,0.0),Color("#8d948b")); _add(packs,_cell(Vector2(x,0.0)),beam)
 	for garden_index in cfg.rain_gardens.size():
 		var garden: Dictionary=cfg.rain_gardens[garden_index]; var gc:=Vector2(float(garden.c[0]),float(garden.c[1])); var disc:=_round_column("CrossingRainGarden_%02d"%garden_index,float(garden.r),0.22,Vector3(gc.x,DATUM+0.11,gc.y),Color("#648350")); _add(packs,_cell(gc),disc)
 		for reed in garden.reeds:
@@ -1484,6 +1518,7 @@ static func _add_escalator_pair(packs: Dictionary, label: String, foot: Vector3,
 	var belt_width:=minf(1.2,total_width*0.46)
 	var a:=foot-lateral*belt_width*0.5; var b:=head-lateral*belt_width*0.5
 	var up:=_ramp_body("%s_Up"%label,a,b,belt_width,float(PLAN.ESCALATORS.section.depth),Color("#b3a27e"))
+	up.set_meta("flight", true); up.set_meta("walk_deck", true); up.set_meta("walk_run_id", "Escalator:%s" % label)
 	up.set_script(load("res://scripts/moy_escalator.gd")); up.set("travel_direction",(b-a).normalized()); up.set("travel_speed",0.35)
 	up.set("belt_length",(b-a).length()); up.set("belt_width",belt_width); up.set("belt_thickness",float(PLAN.ESCALATORS.section.depth))
 	_add_escalator_belt_visuals(up, (b-a).length(), belt_width, float(PLAN.ESCALATORS.section.depth))
@@ -1491,6 +1526,7 @@ static func _add_escalator_pair(packs: Dictionary, label: String, foot: Vector3,
 	_add(packs,_cell(Vector2((a.x+b.x)*0.5,(a.z+b.z)*0.5)),up)
 	var c:=foot+lateral*belt_width*0.5; var d:=head+lateral*belt_width*0.5
 	var down:=_ramp_body("%s_Down"%label,d,c,belt_width,float(PLAN.ESCALATORS.section.depth),Color("#a49372"))
+	down.set_meta("flight", true); down.set_meta("walk_deck", true); down.set_meta("walk_run_id", "Escalator:%s" % label)
 	down.set_script(load("res://scripts/moy_escalator.gd")); down.set("travel_direction",(c-d).normalized()); down.set("travel_speed",0.35)
 	down.set("belt_length",(c-d).length()); down.set("belt_width",belt_width); down.set("belt_thickness",float(PLAN.ESCALATORS.section.depth))
 	_add_escalator_belt_visuals(down, (c-d).length(), belt_width, float(PLAN.ESCALATORS.section.depth))
@@ -1501,6 +1537,7 @@ static func _add_escalator_pair(packs: Dictionary, label: String, foot: Vector3,
 	for endpoint_i in 2:
 		var endpoint: Vector3=foot if endpoint_i==0 else head
 		var landing:=_box_body("%s_Landing_%d"%[label,endpoint_i],landing_size,endpoint-Vector3.UP*0.15,Color("#b6a17b"))
+		landing.set_meta("walk_deck", true); landing.set_meta("walk_run_id", "Escalator:%s" % label); landing.set_meta("reach_link_id", "Escalator:%s" % label)
 		_add(packs,_cell(Vector2(endpoint.x,endpoint.z)),landing)
 
 
@@ -1661,6 +1698,11 @@ static func _add_civic_square(packs: Dictionary, tree_templates: Dictionary) -> 
 	var data: Dictionary = PLAN.CIVIC_SQUARE
 	var r: Array = data.rect
 	var mr: Array=data.mirror.rect
+	var reach_start := Node3D.new()
+	reach_start.name = "CivicPlazaReachStart"
+	reach_start.position = Vector3(-380.0, DATUM + 0.13, 0.0)
+	reach_start.set_meta("reach_start", true)
+	_add(packs, _cell(Vector2(reach_start.position.x, reach_start.position.z)), reach_start)
 	var pave_rects: Array=[Rect2(float(r[0]),float(r[1]),float(mr[0])-float(r[0]),float(r[3])-float(r[1])),Rect2(float(mr[2]),float(r[1]),float(r[2])-float(mr[2]),float(r[3])-float(r[1])),Rect2(float(mr[0]),float(r[1]),float(mr[2])-float(mr[0]),float(mr[1])-float(r[1])),Rect2(float(mr[0]),float(mr[3]),float(mr[2])-float(mr[0]),float(r[3])-float(mr[3]))]
 	for i in pave_rects.size():
 		var pr: Rect2=pave_rects[i]; var paving := _box_body("CivicPlazaPaving_%02d"%i,Vector3(pr.size.x,0.18,pr.size.y),Vector3(pr.get_center().x,DATUM+0.04,pr.get_center().y),Color("#c7b99d")); _add(packs,_cell(pr.get_center()),paving)

@@ -8,6 +8,10 @@ var lot_count := 0
 
 
 func _ready() -> void:
+	var cli_options := _parse_cli_options(OS.get_cmdline_user_args())
+	if cli_options.has("p1-only"):
+		await _run_p1_subset(cli_options.has("shots"))
+		return
 	WorldState.opening_wake_completed = true
 	var qa := QA.instantiate()
 	add_child(qa)
@@ -56,6 +60,88 @@ func _ready() -> void:
 	_test_vine_handover_search(qa)
 	print("MOY_RUNTIME packs=",city.get_child_count(),"coverage=",counts,"numbered_bodies=",building_bodies.size(),"old_house_bodies=",old_house_count,"lot_bodies=",lot_count,"frames_to_ready=",frames,"failures=",failures)
 	_finish()
+
+
+func _parse_cli_options(args: PackedStringArray) -> Dictionary:
+	var options: Dictionary = {}
+	for arg in args:
+		var value:=String(arg)
+		if value.begins_with("--") and value.contains("="):
+			var parts:=value.trim_prefix("--").split("=",false,1)
+			options[parts[0]]=parts[1]
+		elif value.begins_with("--"):
+			options[value.trim_prefix("--")]=true
+	return options
+
+
+func _run_p1_subset(make_shots: bool) -> void:
+	var city:=Node3D.new(); city.name="P1CollisionPacks"; add_child(city)
+	var loaded:=0
+	var wanted:=PackedStringArray(["cell_03_03", "cell_06_03", "cell_06_04"])
+	var directory:=DirAccess.open("res://assets/generated/moy_city")
+	if directory==null:
+		_fail("could not open baked Moy cell directory"); _finish(); return
+	var files:=directory.get_files()
+	files.sort()
+	for file in files:
+		if not String(file).ends_with(".tscn"): continue
+		var stem:=String(file).get_basename()
+		var selected:=false
+		for prefix in wanted:
+			if stem==prefix or stem.begins_with(prefix+"_"): selected=true
+		if not selected: continue
+		var path: String="res://assets/generated/moy_city/%s"%file
+		var packed:=load(path) as PackedScene
+		if packed==null:
+			_fail("failed to load P1 collision pack: %s"%file); continue
+		city.add_child(packed.instantiate()); loaded+=1
+	for frame in 3: await get_tree().physics_frame
+	var all_nodes: Array[Node]=[]; var names: Dictionary={}; var stack: Array[Node]=[city]
+	while not stack.is_empty():
+		var node: Node=stack.pop_back(); all_nodes.append(node); names[String(node.name)]=node
+		for child in node.get_children(): stack.append(child)
+	print("MOY_P1_SUBSET packs=",loaded," bodies=",_count_p1_bodies(city)," nodes=",all_nodes.size())
+	_test_p1_beam_spans(names)
+	_test_crossing_clear_volumes(city)
+	_test_tower_ways_out(city)
+	_test_city_hall_gallery_bands(names)
+	print("MOY_P1_SUBSET_RESULT failures=",failures)
+	if make_shots and failures==0: await _capture_p1_fix_shots(city,names)
+	_finish()
+
+
+func _count_p1_bodies(node: Node) -> int:
+	var total:=1 if node is CollisionObject3D else 0
+	for child in node.get_children(): total+=_count_p1_bodies(child)
+	return total
+
+
+func _capture_p1_fix_shots(city: Node, names: Dictionary) -> void:
+	var output: String="res://docs/diagnostics/images/2026-10-18-P1-fixes-2"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output))
+	var world_env:=WorldEnvironment.new(); var environment:=Environment.new()
+	environment.background_mode=Environment.BG_COLOR; environment.background_color=Color("#8293a5"); environment.ambient_light_source=Environment.AMBIENT_SOURCE_COLOR; environment.ambient_light_color=Color("#8b929c"); environment.ambient_light_energy=0.65; world_env.environment=environment; add_child(world_env)
+	var light:=DirectionalLight3D.new(); light.rotation_degrees=Vector3(-46.0,-31.0,0.0); light.light_energy=1.1; add_child(light)
+	var camera:=Camera3D.new(); camera.current=true; camera.fov=58.0; add_child(camera); get_viewport().size=Vector2i(1440,900)
+	var tower: Dictionary=PLAN.CROSSING.towers[0]; var c:=Vector2(float(tower.c[0]),float(tower.c[1])); var center_dir:=1.0 if c.x< -560.0 else -1.0
+	var l37:=names.get("CityHallGallery_south_L37o") as Node3D; var g37:=names.get("CityHallGallery_south_G37") as Node3D
+	var targets: Array[Dictionary]=[
+		{"name":"under_spine_head_beam","camera":Vector3(c.x+center_dir*5.5,-53.0,c.y),"at":Vector3(c.x+center_dir*22.0,-49.0,c.y)},
+		{"name":"looking_up_helix_band","camera":Vector3(c.x,-58.0,c.y+8.5),"at":Vector3(c.x,-28.0,c.y)},
+	]
+	if l37!=null and g37!=null:
+		var focal: Vector3=(l37.global_position+g37.global_position)*0.5
+		targets.append({"name":"city_hall_L37o_G37_forecourt","camera":focal+Vector3(-26.0,-30.0,24.0),"at":focal})
+	else:
+		_fail("could not frame City Hall L37o and G37 screenshot")
+	for shot in targets:
+		camera.global_position=shot.camera; camera.look_at(shot.at,Vector3.UP)
+		for frame in 3: await get_tree().process_frame
+		await RenderingServer.frame_post_draw
+		var path: String="%s/%s.png"%[output,shot.name]
+		var error:=get_viewport().get_texture().get_image().save_png(ProjectSettings.globalize_path(path))
+		if error!=OK: _fail("could not save P1 screenshot %s: %s"%[path,error_string(error)])
+		else: print("MOY_P1_SHOT ",path)
 
 
 func _test_qa_air_party(qa: Node) -> void:
@@ -175,7 +261,8 @@ func _test_pass4_geometry(city: Node) -> void:
 	for node in all_nodes:
 		if node is AnimatableBody3D and node.name=="CrossingTowerLift" and node.has_method("go_to") and float(PLAN.CROSSING.dome.base) in (node.get("stop_levels") as PackedFloat32Array): lift_ok+=1
 	if lift_ok!=4: _fail("all four Crossing lifts must include the Clock Room stop")
-	_test_crossing_clear_volumes(city, all_nodes)
+	_test_crossing_clear_volumes(city)
+	_test_tower_ways_out(city)
 	_test_city_hall_gallery_bands(names)
 	var eye_y:=float(PLAN.CROSSING.dome.clocks.eye.sill_y)+float(PLAN.CROSSING.dome.clocks.eye.r)
 	for bearing_degrees in PLAN.CROSSING.dome.clocks.bearings:
@@ -184,66 +271,113 @@ func _test_pass4_geometry(city: Node) -> void:
 	print("MOY_PASS4 civic_tree_rows=",square_trees," CityHall_lanes=",city_hall_lanes," ClockRoom_arrival_lanes=",room_arrivals," tower_lifts_with_room_stop=",lift_ok," eyes=4_ray_clearance dome_grid=",names.get("DomeTriangulatedWhiteSteelGrid")!=null)
 
 
-func _test_crossing_clear_volumes(city: Node, all_nodes: Array[Node]) -> void:
+func _test_p1_beam_spans(names: Dictionary) -> void:
+	var beam_count:=0; var beam_errors:=0
+	for index in 2:
+		var spine:=names.get("CrossingSpineHeadBeam_%d"%index) as StaticBody3D
+		if spine==null:
+			_fail("Spine head beam %d missing or split into pieces"%index); beam_errors+=1; continue
+		var spine_shape:=_first_collision_shape(spine)
+		if spine_shape==null or not spine_shape.shape is BoxShape3D:
+			_fail("Spine head beam %d lacks its box collider"%index); beam_errors+=1; continue
+		var ss: Vector3=(spine_shape.shape as BoxShape3D).size
+		if absf(ss.x-14.8)>0.05 or absf(spine.global_position.x+560.0)>0.05 or absf(absf(spine.global_position.z)-13.0)>0.05:
+			_fail("Spine head beam %d does not span centreline -7.4..+7.4"%index); beam_errors+=1
+		beam_count+=1
+		var high:=names.get("CrossingMeridianHeadBeam_%d"%index) as StaticBody3D
+		if high==null:
+			_fail("Meridian head beam %d missing or split into pieces"%index); beam_errors+=1; continue
+		var high_shape:=_first_collision_shape(high)
+		if high_shape==null or not high_shape.shape is BoxShape3D:
+			_fail("Meridian head beam %d lacks its box collider"%index); beam_errors+=1; continue
+		var hs: Vector3=(high_shape.shape as BoxShape3D).size
+		if absf(hs.z-14.8)>0.05 or absf(high.global_position.z)>0.05 or absf(high.global_position.x-float(PLAN.CROSSING._beams.high.x[index]))>0.05:
+			_fail("Meridian head beam %d does not span centreline -7.4..+7.4"%index); beam_errors+=1
+		beam_count+=1
+	print("MOY_P1_HEAD_BEAMS checked=",beam_count," failures=",beam_errors," span_m=14.8 ends_m=+/-7.4")
+
+
+func _first_collision_shape(body: Node) -> CollisionShape3D:
+	for child in body.get_children():
+		if child is CollisionShape3D:
+			return child as CollisionShape3D
+	return null
+
+
+func _test_crossing_clear_volumes(city: Node) -> void:
 	var state: PhysicsDirectSpaceState3D=city.get_world_3d().direct_space_state
-	var band_hits:=0
-	var band_samples:=0
-	for tower_index in PLAN.CROSSING.towers.size():
-		var tower: Dictionary=PLAN.CROSSING.towers[tower_index]
-		var center:=Vector2(float(tower.c[0]),float(tower.c[1]))
-		# Small rotated boxes approximate the annular rider band (r=1.4..4.0).
-		# Their vertical span starts at each tread level and reaches 2.6 m above it.
-		for level in tower.levels:
-			for step in 6:
-				var slice_height:=0.1 if step==5 else 0.5
-				var y:=float(level)+float(step)*0.5+slice_height*0.5-60.0
-				for slice in 32:
-					var angle:=TAU*(float(slice)+0.5)/32.0
+	var band_samples:=0; var hit_samples:=0; var unique_colliders: Dictionary={}; var towers_with_hits: Dictionary={}
+	var shape:=BoxShape3D.new(); shape.size=Vector3(0.4,2.55,2.6)
+	var query:=PhysicsShapeQueryParameters3D.new(); query.shape=shape; query.collision_mask=1; query.collide_with_areas=false
+	for tower in PLAN.CROSSING.towers:
+		var center:=Vector2(float(tower.c[0]),float(tower.c[1])); var tower_hits: Dictionary={}
+		for hand in tower.hands:
+			for segment in hand.profile:
+				var a0:=float(segment[0]); var a1:=float(segment[1]); var count:=maxi(1,ceili(absf(a1-a0)/5.0))
+				for sample in count:
+					var t: float=(float(sample)+0.5)/float(count)
+					var angle:=deg_to_rad(lerpf(a0,a1,t))
+					var tread_y:=lerpf(float(segment[2]),float(segment[3]),t)
+					var vertical_center: float=-60.0+tread_y+1.325
 					var radial:=Vector3(cos(angle),0.0,sin(angle))
-					var shape:=BoxShape3D.new(); shape.size=Vector3(0.52,slice_height,2.6)
-					var transform:=Transform3D(Basis.looking_at(radial,Vector3.UP),Vector3(center.x, y, center.y)+radial*2.7)
-					var query:=PhysicsShapeQueryParameters3D.new(); query.shape=shape; query.transform=transform; query.collision_mask=1; query.collide_with_areas=false
+					query.transform=Transform3D(Basis.looking_at(radial,Vector3.UP),Vector3(center.x,vertical_center,center.y)+radial*2.7)
 					band_samples+=1
-					for result in state.intersect_shape(query,32):
+					var results:=state.intersect_shape(query,32)
+					var sample_hit:=false
+					for result in results:
 						var collider:=result.collider as Node
 						if collider==null or String(collider.name).begins_with("CrossingHand_"): continue
-						band_hits+=1
-						_fail("non-escalator collider enters Crossing helix band: tower=%s node=%s level=%.1f"%[tower.name,collider.name,float(level)])
-						break
-		# Test each authored way-out as a 2.4 x 2.8 m clear box extending past the drum.
+						sample_hit=true; tower_hits[String(collider.name)]=true; unique_colliders[String(collider.name)]=true
+					if sample_hit: hit_samples+=1
+		if not tower_hits.is_empty():
+			towers_with_hits[String(tower.name)]=tower_hits.size()
+			_fail("helix band blocked on %s by %d non-hand colliders"%[tower.name,tower_hits.size()])
+	var collider_examples: Array=unique_colliders.keys(); collider_examples.sort()
+	print("MOY_P1_HELIX_BAND towers_with_hits=",towers_with_hits.size()," hit_samples=",hit_samples," unique_non_hand_colliders=",unique_colliders.size()," volume_samples=",band_samples," examples=",collider_examples.slice(0,24))
+
+
+func _test_tower_ways_out(city: Node) -> void:
+	var state: PhysicsDirectSpaceState3D=city.get_world_3d().direct_space_state
+	var checked:=0; var hit_samples:=0; var blocked: Dictionary={}; var shape:=BoxShape3D.new()
+	var query:=PhysicsShapeQueryParameters3D.new(); query.shape=shape; query.collision_mask=1; query.collide_with_areas=false
+	for tower in PLAN.CROSSING.towers:
+		var center:=Vector2(float(tower.c[0]),float(tower.c[1]))
 		for way in tower.ways_out:
 			var angle:=deg_to_rad(float(way.bearing)); var radial:=Vector3(cos(angle),0.0,sin(angle))
-			var shape:=BoxShape3D.new(); shape.size=Vector3(float(way.width),float(way.clear),5.0)
-			var origin:=Vector3(center.x,-60.0+float(way.y)+float(way.clear)*0.5,center.y)+radial*2.5
-			var query:=PhysicsShapeQueryParameters3D.new(); query.shape=shape; query.transform=Transform3D(Basis.looking_at(radial,Vector3.UP),origin); query.collision_mask=1; query.collide_with_areas=false
-			for result in state.intersect_shape(query,32):
+			shape.size=Vector3(float(way.width),float(way.clear)-0.05,3.0)
+			var origin:=Vector3(center.x,-60.0+float(way.y)+1.425,center.y)+radial*5.5
+			query.transform=Transform3D(Basis.looking_at(radial,Vector3.UP),origin)
+			checked+=1
+			for result in state.intersect_shape(query,64):
 				var collider:=result.collider as Node
 				if collider==null: continue
-				_fail("collider blocks Crossing tower way out: tower=%s y=%.1f bearing=%.1f node=%s"%[tower.name,float(way.y),float(way.bearing),collider.name])
-				break
-	var ways_out_count:=0
-	for tower in PLAN.CROSSING.towers: ways_out_count+=tower.ways_out.size()
-	print("MOY_PASS4_CLEARANCE helix_band_samples=",band_samples," helix_band_hits=",band_hits," ways_out_checked=",ways_out_count," collider_hits=0")
+				hit_samples+=1; blocked[String(tower.name)+"/"+str(way.y)+"/"+str(way.bearing)]=String(collider.name)
+		for key in blocked:
+			if String(key).begins_with(String(tower.name)+"/"):
+				_fail("Crossing way out blocked at %s by %s"%[key,blocked[key]])
+	print("MOY_P1_WAYS_OUT checked=",checked," hit_samples=",hit_samples," blocked_boxes=",blocked.size())
 
 
 func _test_city_hall_gallery_bands(names: Dictionary) -> void:
-	var checked:=0
+	var checked:=0; var errors:=0
 	for leg in PLAN.ARCH.front.legs:
 		for gallery in leg.galleries:
 			var node:=names.get("CityHallGallery_%s_%s"%[String(leg.side),String(gallery.name)]) as Node3D
 			if node==null:
-				_fail("City Hall gallery missing: %s/%s"%[leg.side,gallery.name]); continue
+				_fail("City Hall gallery missing: %s/%s"%[leg.side,gallery.name]); errors+=1; continue
 			var band: Array
 			if String(gallery.band)=="AB": band=[minf(float(PLAN.ARCH.front.bands.A[0]),float(PLAN.ARCH.front.bands.B[0])),maxf(float(PLAN.ARCH.front.bands.A[1]),float(PLAN.ARCH.front.bands.B[1]))]
 			else: band=PLAN.ARCH.front.bands[String(gallery.band)]
-			var collision:=node.get_node_or_null("CollisionShape3D") as CollisionShape3D
+			var collision: CollisionShape3D
+			for child in node.get_children():
+				if child is CollisionShape3D: collision=child as CollisionShape3D; break
 			if collision==null or not collision.shape is BoxShape3D:
-				_fail("City Hall gallery lacks box deck collision: %s"%node.name); continue
+				_fail("City Hall gallery lacks box deck collision: %s"%node.name); errors+=1; continue
 			var half: Vector3=(collision.shape as BoxShape3D).size*0.5
 			if absf(node.global_position.x-(float(band[0])+float(band[1]))*0.5)>0.05 or absf(node.global_position.z-(float(gallery.z[0])+float(gallery.z[1]))*0.5)>0.05 or absf((node.global_position.y+half.y)-(-60.0+float(gallery.y)))>0.05:
-				_fail("City Hall gallery misses band or authored deck top: %s band=%s"%[node.name,gallery.band])
+				_fail("City Hall gallery misses band or authored deck top: %s band=%s"%[node.name,gallery.band]); errors+=1
 			checked+=1
-	print("MOY_CITY_HALL_GALLERIES checked=",checked," authored_bands=A/B/AB surface_y=PASS")
+	print("MOY_CITY_HALL_GALLERIES checked=",checked," failures=",errors)
 
 
 func _test_pass3_counts(city: Node) -> void:
