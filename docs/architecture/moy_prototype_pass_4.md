@@ -154,7 +154,7 @@ To settle:
     - **The water's surface** is `surface` (0.3 m) below the park's ground.
     - **The bank** shelves down from the ground at `bank_top` (× r) to the
       waterline at r.
-    - **The bed** follows `bed`, a reed shelf round the edge and 2.1 m deep at
+    - **The bed** follows `bed`, a reed shelf round the edge and 2.1 m below the ground at
       the middle. Set `terrain_generator.gd`'s `MOY_POND_SURFACE` and
       `_moy_pond_bed` from these values. The paving and lawn stop at the bank's
       top.
@@ -182,3 +182,55 @@ To settle:
   back, both legs. Then do the same on each helix and look up the whole way.
 - Walk from the square to each platform by the steps and the scissors, and
   again by the lifts.
+
+## 4. Review of the build, and fixes (2026-10-18)
+
+Reviewed: `03a9d7a`, diagnostic `docs/diagnostics/2026-10-18-moy-prototype-pass-4.md`.
+**Result: fix.** Most of the pass is good; three faults in the geometry stop it.
+
+Good, keep it:
+- the grand square, the reflecting pool, lawns, trees and flagstaffs;
+- the closed helix sections, the handrails and the glass balustrades;
+- the dome shell and lattice with open eyes, the bell, the Clock Room floor,
+  arrivals, wells and lantern lifts;
+- the eight towers' ribs at 22.5° + 45k, and hoops only at `hoops`;
+- the pond on the world's water, with its liquid queries;
+- the clock-angle checks, and the honest list of what was not verified.
+
+**Fix these:**
+1. **The head beams still cross the helices** (section 2, item 4).
+   `CrossingSpineHeadBeam_*` and `CrossingMeridianHeadBeam_*` are 26 m long,
+   so they run from tower centre to tower centre, through both drums and
+   both helix bands. Build each beam as two pieces, one from each tower's
+   ring girder towards the middle: each end at
+   `offset − drum + 0.4` (7.4 m) from the Crossing's centre line, as
+   `city_layout.py` checks. Nothing between the drums.
+2. **City Hall's galleries and landings ignore their band.** Every entry in
+   `leg.galleries` is built over band A at 2.8 m wide. Build each over the
+   band its data names: `A`, `B`, or `AB` (both bands and the gap between).
+   So G37 and G43 move to band B, and L37o, L37i and L43 span both bands.
+   Put each deck's top surface at its `y` (today the box is centred on it).
+3. **The band check in the validator.** Add the check item 4 asked for: no
+   collider other than the helix's own section may enter a helix band
+   (radius 1.4 to 4.0) up to 2.6 m above the treads. Fix 1 must make it
+   pass; it must have failed on `03a9d7a`.
+4. **The ways out, checked.** Add a validator check over every tower's
+   `ways_out`: a 2.4 m wide, 2.8 m high clear box from the gallery out past
+   the drum, with no collider in it.
+5. **Delete `moy_pond_water.gdshader`** and its `.uid`. Nothing uses it.
+
+**Settled from the diagnostic:**
+- **Pond depth:** the data wins. The bed is 2.1 m below the park's ground
+  and the water 0.3 m below it, so 1.8 m of water at the middle. Item 11
+  now says so.
+- **Generated plan drift:** regenerating with Shapely 2.x here gives the
+  committed `scripts/city_plan.gd` exactly. No change.
+- **Rendered performance** and the engine's RID errors go to P2.
+- **The hotel's gaps** (revolving door, the Windrose, the chandelier's
+  crystals) go to P13a.
+- **Walking and riding by hand** is owed at milestone M1. Until P0's rig
+  lands, the scripted checks above stand in for it.
+
+**Report:** a short follow-up diagnostic,
+`docs/diagnostics/<date>-moy-P1-fixes.md`: each fix, the new checks' output
+(and that check 3 failed before fix 1), and the bake and validator counts.
