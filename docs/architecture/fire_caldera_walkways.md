@@ -113,31 +113,97 @@ own offsets.
 
 | Element | Material |
 |---|---|
-| Raised civic decks: the Highline, porches, gallery, bridges, stairs, Renewal deck | laminated refractory glass in 0.22 m cassettes, in a blackened-steel frame; a slim steel edge channel the same 0.22 m deep |
-| Ground-borne surfaces: Gate Terrace, promenade, forecourts, yards, lanes, refuge shelves | cast basalt pavers on socketed plinths; a 0.22 m basalt kerb where unguarded |
-| Supports | blackened-steel columns with a paired fork (the Highline's frames), the concave service piers of the docked platforms, steel stringers under every stair |
-| Stairs | glass treads with a fritted, slip-resistant band at each nosing, on twin steel stringers. The horseshoe flights' undersides are closed where they are lower than 2.1 m |
-| Guard | as 2.3, everywhere |
+| Raised civic decks: the Highline, porches, gallery, bridges, ramps | one clear sheet of laminated refractory glass, 0.22 m deep, in a blackened-steel frame; a slim opaque steel edge channel |
+| Ground-borne surfaces: Gate Terrace, promenade, forecourts, yards, lanes, refuge shelves, the funicular's stations | cast basalt pavers on socketed plinths; a 0.22 m basalt kerb where unguarded |
+| Supports | blackened-steel columns with a paired fork (the Highline's frames), the funicular's SuperEgg piers, steel stringers under every stair |
+| Guard | glass panels between posts; posts and handrail in Renewal's blued steel (revised 2026-10-18) |
+
+**The glass reads as glass** (2026-10-18). From above it read as an opaque pale
+blue: every deck was drawn as two translucent layers, both seen at once, with
+its normals facing down.
+- A glass deck is now one clear sheet: its top face faces up and its bottom
+  face faces down, each culled from behind, so no view looks through two
+  layers.
+- It has alpha 0.2, roughness 0.05 and no metallic.
+- The values are in `SITE.materials`.
+
+**Winding.** Every face of every deck, guard pane, post and handrail faces out
+(Godot's front faces are clockwise seen from outside). The first build had the
+decks, guard panes, posts and the handrail tube inside out.
+
+**The guards are blued steel.** Their posts and handrail are Renewal's blued
+steel (`CalderaShell.STEEL_BLUED`, metallic 0.9, roughness 0.2), everywhere,
+after the user's walkthrough.
 
 The rule of thumb is short: what steel carries is glass; what the ground
 carries is basalt; one guard on both.
 
+### 2.5 Joins and the ground (2026-10-18)
+
+**One surface at one height.** A flight's landings are part of its levels'
+surfaces, and are built only with them.
+- A flight's deck is its slope alone, mouth to mouth: `FLIGHTS[...].deck`. The
+  full centreline `profile` is kept only for reference.
+- In the first build, every landing was built twice, by the level and by the
+  flight, at the same height. The surfaces fought on screen at the gate
+  ramp's head, the ring and the Renewal ramps' tops.
+- The same rule applies to any piece at a level's height:
+  - the Renewal deck's glass finish is gone;
+  - the immersion tongue starts at the deck's lava edge, not on the deck;
+  - the house's own floors are never covered by a walkway (below).
+
+**A building's own floors are the building's.**
+- Oren's roof terrace is the house's own, with its paving, parapet and lift
+  stop. The walkway level `oren-roof` is marked `owner` and `build: false`. It
+  exists so the spiral can land on it.
+- The first build laid a glass deck and a second guard over the house's
+  terrace, which sealed its lift.
+- Oren's yard stops at the house's own ramp-foot landings instead of lying
+  over them.
+
+**Walks on the ground are cut into it.**
+- The promenade's datum, 30.0, is the bowl's lowest point. The bowl rises
+  outward, up to 1.4 m above the walk, so in the first build the promenade
+  lay buried.
+- Every walk that sits on the ground (the promenade, the yards, the foot of
+  the funicular's ramp) now cuts the ground under it to its underside
+  (`SITE.beds[...].cut_to`).
+- A low basalt retaining edge holds back the ground beyond its edge wherever
+  that ground stands higher (`retaining` runs, with the ground's height).
+- Each refuge pad meets the rising bowl at its outer end and is cut in the
+  same way.
+- A flight is cut into the ground where it runs within 0.6 m of it
+  (`SITE.flight_cuts`).
+- Raised walks are checked to clear the ground.
+
 ## 3. The network
 
-### 3.1 The Gate Terrace and the arrival gallery
+### 3.1 The Gate Terrace and the arrival gallery (revised 2026-10-18)
 
 - **The Gate Terrace** is a superelliptic basalt terrace on the crater lip,
-  28 × 10 m, at 48.5. It sits on its own plinth, socketed down to 45.3 into the
-  rim (1.5 m below the lowest ground under it), so nothing hovers.
-- **The Tempering Gate** stands on it across the gate-to-Civic axis. Its
-  pylons are 6.8 m apart and 10 m high, with mineral glass in the lintel.
-- **The inn's porch** drops 1 m to 48.5 (it was 49.5). A 3 m level bridge
-  joins it to the terrace, so the gate and the inn share one level.
-- **The funicular's top station** meets the terrace's outer edge.
+  28 × 10 m, at 48.5. It sits on its own plinth, socketed into the lowest live
+  ground under it and under its station wing (down to 41.7), so nothing hovers.
+- **The guards.** The terrace is guarded all round, however small the drop.
+  Its two ends used to stand open onto nothing: the kit left a kerb wherever
+  the drop was under 1 m. Its only openings are designed ones:
+  - the arrival gallery's mouth;
+  - the inn's bridge;
+  - the funicular's platform gates;
+  - the head of the track-side stair.
+- **The Tempering Gate** keeps its new size: 6.8 m clear, 10 m high. It
+  returns to the language of the first arrival threshold:
+  - a squarish superellipse arch (exponent 6) of three ember-glazed refractory
+    tubes, 0.42 m thick, one behind another at 0.48 m;
+  - basalt SuperEgg feet;
+  - a veil of four stained-glass SuperEgg fins hanging under the crown (teal,
+    magenta, lime, cobalt), lit from within at night, their lowest tip 3.4 m
+    or more above the terrace;
+  - it is never boxes. Data: `SITE.tempering_gate`.
+- **The inn's porch** is at 48.5, joined to the terrace by a 3 m level bridge.
+- **The funicular's top station is part of the terrace** (section 4).
 - **The arrival gallery (H0)**, 3.8 m wide, leaves the terrace's inner edge
-  square, on the axis. It runs straight down to the Highline's outer edge, 34 m
-  at 17.6%, with level landings at both ends. Nothing stands on the
-  arrival-to-Civic sightline.
+  on the axis and runs straight down to the Highline's outer edge, 34 m at
+  17.6%.
 
 ### 3.2 The Highline
 
@@ -153,27 +219,31 @@ carries is basalt; one guard on both.
   21.5° + 30k, turned so each is clear of every walk, building and pier on the
   ground.
 
-### 3.3 The Renewal horseshoe stair
+### 3.3 The Renewal grand ramps (revised 2026-10-18)
 
-The classic double grand staircase:
+The user's double grand stair: two smooth ramps coming down either side of
+Renewal and heading back up to the Highline.
 
+- **Before.** The flights were 34° stairs, built as slopes. Near the bottom
+  they straightened and aimed at the deck's front corners, an odd place to
+  arrive.
 - **The shared head.** A landing 8 m wide juts from the Highline's inner edge
-  directly behind the canopy.
-- **The two flights.** From its two ends, two flights 2.2 m wide sweep
-  outward. Each turns a quarter circle of 6 m radius round the canopy's back
-  corner, then runs straight toward the lava. They pass over the canopy with
-  room to spare and land on the deck's two sides, facing the reservoir.
-- **Why a stair.** The drop is 12.5 m, so the flights are stairs at 34°, each
-  18.4 m long. A ramp of the same shape would be 68% steep. A ramp at a
-  walkable grade needs about 70 m per arm: the switchbacks this replaces.
+  behind the canopy.
+- **The ramps.** Two ramps 2.2 m wide each leave the landing outward, along
+  the back of the canopy. Each then sweeps round a wide half-turn (radius 4.6
+  m) toward the lava, outside the deck's side.
+- **The landing.** Each straightens only for its last few metres, and enters
+  the deck at the middle of its side, square to it.
+- **The grade.** Each is 25.2 m long at 50% (27°). The grand ramps are the
+  one exception to the 18% public-ramp limit, and the plan checks them at 55%.
+- **Their guards** are blued steel, as every guard's now are.
 
 The Renewal deck:
-- **Its level:** 30.0, level with the promenade. The promenade passes across
-  it as part of one surface.
-- **Its size:** it grows slightly, to 23.2 × 18.4 m, so the flights' feet land
-  on it.
-- **The immersion tongue:** 8 m wide, it leaves the deck's lava edge and
-  slopes 2.4 m down into the lava.
+- **Its level:** 30.0, level with the promenade, and part of the same surface.
+- **Its size:** 23.2 × 18.4 m.
+- **The ground:** cut under it (section 2.5).
+- **The immersion tongue:** 8 m wide, from the deck's lava edge 2.4 m down
+  into the lava.
 - **Its edges:** kerbed, not railed.
 
 ### 3.4 Oren's spiral stair
@@ -216,30 +286,55 @@ A small spiral stair:
 - **The retired orbit:** the rear service orbit (G2) is retired. It served
   only these two doors and ran through the docked buildings' piers.
 
-## 4. The funicular
+## 4. The funicular (revised 2026-10-18, at the user's direction)
 
-The funicular brings people from the volcano's foot up to the Gate Terrace.
+In the first build:
+- the track clipped into the flank;
+- no car ran;
+- the top station was a slab half-sunk in the terrace;
+- the model's cars travelled sideways.
 
-- **The line.** From a lower station at the kingdom's level (local 92, −181),
-  where the flank meets the plain, a straight line runs 113 m at 48% (25°) up
-  to the Gate Terrace's outer edge (9, −122).
-- **The track bed.** The line runs on a basalt bed:
-  - a low viaduct on paired piers where the flank dips below it (up to 4 m);
-  - a short cutting with retaining walls where the flank stands above it (up
-    to 1.2 m).
-- **Tracks and cars.** Two parallel 1 m-gauge tracks, 3.4 m apart, carry two
-  counterbalanced cars, one going up as the other comes down.
-- **The cars.** After Lisbon's Glória and Budapest's Sikló, each car is
-  stepped: three cabins in a row on an inclined chassis.
-  - Each cabin has a level floor.
-  - Each cabin is a SuperEgg body: a superellipsoid 3.1 × 2.7 × 2.5 m,
-    epsilon 0.28, in amber enamel, with a band of smoked glass.
-  - Each cabin sits 1.5 m above the next.
-- **Stations.** At each end, a stepped basalt platform runs beside the tracks
-  under a glass roof.
-- **Terrain.** The live kingdom's terrain is coarse. The track's corridor must
-  be socketed like a foundation: the ground below the bed cut where it is
-  higher, and the piers founded where it is lower.
+The flank was the cause. The plan assumed the smooth flank, but the live
+ground there is the coarse mesh, with noise of up to ±6 m, and a straight
+chord cuts through its shoulder. Data: `SITE.funicular`.
+
+- **The graded corridor.** The terrain fades the flank's noise out within 25 m
+  of the line, and back to full by 50 m (`corridor`; FireKingdomTerrain's
+  height, as the gate's blend does). The ground under the track is then the
+  smooth flank exactly, on the same coarse grid.
+  - `tools/fire_kingdom_terrain_bounds.py` reproduces that ground in Python,
+    so the plan sets the track over it to the centimetre.
+  - Away from the corridor it bounds the live ground by the noise's ±6 m.
+- **The line.** The line is unchanged in plan, from the terrace's south edge
+  (7, −118) down the flank toward the south-east. It is 119 m long, ending at
+  a lower station near the volcano's foot (about 95, −181).
+- **The profile.** The flank is gentle at the lip, about 33° in the middle and
+  flat at the foot. The track follows it at a constant clearance:
+  - the bed's underside is 0.6 m or more over the ground;
+  - it rides a basalt viaduct on SuperEgg piers socketed 1 m into the ground;
+  - its vertical curves are eased (12 m or wider);
+  - it is steepest at 65%.
+  - Within the two stations the bed rests on their socketed plinths.
+- **The cars.** After Lisbon's Glória:
+  - two cars, counterbalanced on two tracks 3.4 m apart, one going up as the
+    other comes down;
+  - each is one SuperEgg cabin, 7 × 2.9 × 2.5 m, with a band of smoked glass:
+    the ember car (red) and the ash car (white);
+  - each cabin hangs level in a ring frame that tilts with the grade, as the
+    Stoosbahn's do, so its floor stays flat all the way;
+  - the cars ride along the track, never across it.
+- **The top station is a wing of the Gate Terrace.** A superellipse along the
+  track, unioned with the terrace, with a notch the two cars dock in.
+  - Their floors are level with the terrace (48.5).
+  - Riders board through a platform gate on each car's outer side.
+  - A glass hood shelters the platforms.
+- **The lower station is raised.** The track clears the ground right into it
+  (the user's suggestion), so its plaza stands on a plinth at 3.84. A 14 m
+  ramp at 16% runs down to a landing on the graded ground (1.59).
+- **The track-side stair.** As Lisbon's Bica has stairs beside its track, a
+  1.8 m stair is cantilevered off the viaduct on the south-west side, guarded
+  both sides. It runs from the top station's platform down to the lower
+  station: the way up for a walker.
 
 ## 5. What changes in the built city
 
@@ -277,7 +372,16 @@ The funicular brings people from the volcano's foot up to the Gate Terrace.
 - **the Renewal stair hits the canopy:** a flight comes within 0.4 m of it;
 - **a Highline frame crowds something:** it stands within 0.6 m of a walk, a
   building or a pier;
-- **the funicular misses:** it does not reach the Gate Terrace.
+- **the funicular misses:** it does not reach into the Gate Terrace;
+- **the funicular touches the ground:** its bed comes within 0.6 m of the
+  graded flank between its stations;
+- **the funicular is too steep or kinked:** steeper than 68%, or a vertical
+  curve tighter than 12 m;
+- **the gate's veil hangs into the walk:** less than 3.4 m clear under it;
+- **the Renewal ramps are too steep:** over 55%;
+- **Oren's spiral lands on the lift's landing;**
+- **a raised walk is in the ground:** the Highline (outside its refuges) comes
+  within 0.3 m of the live ground.
 
 It reports every flight's length and grade, and every level's guard runs.
 
@@ -287,6 +391,5 @@ It reports every flight's length and grade, and every level's guard runs.
    stay as shelves?
 2. Is the inn's 1 m drop to the Gate Terrace's level acceptable, or should the
    terrace rise to 49.5 instead?
-3. Where exactly is the funicular's foot? It is placed where the flank meets
-   the plain south-east of the gate. A probe of the live terrain should
-   confirm the lava rivers stay clear of it.
+3. The walk from the arrival portal to the funicular's foot is about 95 m.
+   Should a paved path be laid along it?

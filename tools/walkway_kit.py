@@ -143,8 +143,11 @@ class Network:
         self.notes = []
         self.below = None     # (x, y, level) -> the height of whatever lies under a level's edge
 
-    def level(self, id, datum, material='glass', note=''):
-        self.levels[id] = dict(id=id, datum=datum, material=material, pieces=[], walls=[], open=[], note=note, tags=[])
+    def level(self, id, datum, material='glass', note='', owner=None, kerbs=True):
+        # owner: the building whose own floor this level is (its roof terrace, its yard). The walkway builder never
+        # draws an owned level; it is here so flights can land on it and the checks can see it.
+        self.levels[id] = dict(id=id, datum=datum, material=material, pieces=[], walls=[], open=[], note=note, tags=[], owner=owner, kerbs=kerbs)
+        # kerbs=False: guard every edge of the level, however small the drop (a public terrace's edge is never left open)
         return self.levels[id]
 
     def add(self, level, geom, tag=''):
@@ -190,7 +193,7 @@ class Network:
                     mouth = band(list(cut_line(f.slope, *part).coords), f.width).buffer(0.02, join_style=2).union(cap)
                     edge = edge.difference(mouth)
             # a kerb, not a guard, where the drop beside the edge is under KERB_DROP
-            if self.below is not None:
+            if self.below is not None and lv['kerbs']:
                 kept = []
                 for g in lines(linemerge(lines(edge)) if lines(edge) else edge):
                     run, runs = [], []
@@ -216,7 +219,7 @@ class Network:
             f.guard_lines = [f.side(s) for s in sides]
 
     # ------------------------------------------------------------ checks
-    def check(self, max_grade=None, stair_grade=0.70):
+    def check(self, max_grade=None, stair_grade=0.70, exempt=None):
         ends = []   # (point, level datum or flight id, owner)
         for lv in self.levels.values():
             for g in lv['guards']:
@@ -243,13 +246,15 @@ class Network:
                 if lid in opens and opens[lid].distance(Point(p)) < 0.1: ok = True
                 # a flight that lands inside a level (not on its edge) ends its guards in the open floor
                 if lv['surface'].buffer(-0.02).contains(Point(p)): ok = True
+                # a flight's guard may end on a level's kerbed edge (the drop there is too small to guard)
+                if lv['surface'].boundary.distance(Point(p)) < 0.06 and all(g.distance(Point(p)) > 0.3 for g in lv['guards']): ok = True
             if not ok:
                 bad += 1
                 if bad <= 8: self.fail('%s: a guard ends in mid-air at (%.2f, %.2f), height %.2f' % (self.name, p[0], p[1], y))
         for f in self.flights:
             up, lo = self.levels[f.upper], self.levels[f.lower]
             g = f.grade(up['datum'], lo['datum'])
-            limit = stair_grade if f.kind in ('stair', 'spiral') else max_grade
+            limit = (exempt or {}).get(f.id) or (stair_grade if f.kind in ('stair', 'spiral') else max_grade)
             if limit and g > limit + 1e-6: self.fail('%s: %s %s is %.0f%% steep' % (self.name, f.kind, f.id, g * 100))
             sl = band(list(cut_line(f.slope, 0, min(2.0, f.slope.length)).coords), f.width).buffer(-0.05)
             for lv in (up,):
@@ -266,7 +271,7 @@ class Network:
         def ring(c): return [[round(x, 3), round(y, 3)] for x, y in c]
         out = dict(levels=[], flights=[])
         for lv in self.levels.values():
-            out['levels'].append(dict(id=lv['id'], datum=lv['datum'], material=lv['material'], note=lv['note'],
+            out['levels'].append(dict(id=lv['id'], datum=lv['datum'], material=lv['material'], note=lv['note'], owner=lv['owner'] or '', build=lv['owner'] is None,
                                       surface=[dict(outer=ring(q.exterior.coords), holes=[ring(h.coords) for h in q.interiors]) for q in (orient(p.simplify(0.02)) for p in polys(lv['surface']) if p.area > 0.5) if not q.is_empty],
                                       guards=[ring(g.coords) for g in lv['guards']]))
         for f in self.flights:
@@ -282,6 +287,11 @@ class Network:
                     s = f.line.project(p)
                     res.append([round(p.x, 3), round(f.height(s, top, bottom) + GUARD, 3), round(p.y, 3)])
                 return res
+            # the deck to build: the slope alone, mouth to mouth. Its landings are part of its levels' surfaces and are
+            # built with them, never again with the flight: two decks at one height fight on screen (user, 2026-10-18).
+            a, b = f.landing[0], L - f.landing[1]; m = max(4, int((b - a) / 0.5)); deck = []
+            for i in range(m + 1):
+                s_ = a + (b - a) * i / m; p = f.line.interpolate(s_); deck.append([round(p.x, 3), round(f.height(s_, top, bottom), 3), round(p.y, 3)])
             out['flights'].append(dict(id=f.id, kind=f.kind, upper=f.upper, lower=f.lower, width=f.width, material=f.material, note=f.note,
-                                       profile=prof, guards=[lift(s) for s in f.guard_lines], grade=round(f.grade(top, bottom), 4), length=round(L, 2)))
+                                       profile=prof, deck=deck, guards=[lift(s) for s in f.guard_lines], grade=round(f.grade(top, bottom), 4), length=round(L, 2)))
         return out

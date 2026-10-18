@@ -104,6 +104,39 @@ lava swimmer can step in.
   - the cascade lights the chamber from within;
   - the pool glows at the bottom.
 
+## 4a. Lava and air (2026-10-18, at the user's direction)
+
+**The fault.** In the first build the whole chamber read as swimmable lava,
+red-tinted, its open air included. The lava test looked only at plan
+position. Anything inside the reservoir's outline and below its surface was
+"in lava", which is the whole chamber.
+
+**Lava is three volumes, and everything else is air,** however deep under the
+reservoir it lies (`SECTION.lava_volumes`):
+
+| Volume | Shape | Top | Bottom |
+|---|---|---:|---|
+| the reservoir | its outline (the bank) | 29.2 | its bed: inside the chamber's rim (r 48), the dome's glass; over the oculus (r 7), open into the cascade |
+| the cascade | a frustum, r 6.0 at the oculus narrowing to r 4.2 at the pool | 22.2 | −29.6 |
+| the pool | a cylinder r 10.5 | −29.6 | −32.8 |
+
+**A swimmer's surface:**
+- in the reservoir and the cascade, it is 29.2, so a swimmer can rise up the
+  cascade to the reservoir;
+- in the pool, it is the pool's own surface (−29.6), so stepping out onto the
+  gallery is stepping into air.
+
+**What the plan checks:**
+- every level and ramp, with 2.4 m of air over it, lies outside the lava;
+- there is lava just over the dome and none just under it;
+- the cascade and the pool are lava and the Floor is not.
+
+The game's API follows in the next pass's brief:
+- a 3D test, `is_lava_at(point)`, built from these volumes;
+- a surface query by position;
+- swimming, the camera's red tint and the muffled audio read the 3D test, not
+  the plan-position one.
+
 ## 5. To build it
 
 - **Read every number from `FireCalderaHeartworksPlan`;** never edit it by

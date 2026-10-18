@@ -19,7 +19,7 @@ import json, math, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from shapely.geometry import Polygon, LineString, Point
 from walkway_kit import Network, Flight, annulus, band, circle_pts, superellipse
-from fire_caldera_frame import LAVA_Y, LOBES, RESERVOIR_MEAN, pol, brg
+from fire_caldera_frame import LAVA_Y, LOBES, RESERVOIR_MEAN, pol, brg, bank
 from gd_plan import write_plan
 
 
@@ -194,6 +194,54 @@ for f in net.flights:
     ok('%-5s %5.1f m at %4.1f%%  %s' % (f.id, f.slope.length, f.grade(net.levels[f.upper]['datum'], net.levels[f.lower]['datum']) * 100, f.note))
 for lv in net.levels.values():
     ok('level %-2s %-15s Y %6.2f  %d guard runs' % (lv['id'], lv['note'], lv['datum'], len(lv['guards'])))
+# ---------------------------------------------------------------- the lava volumes (2026-10-18, at the user's direction)
+# In the game the whole chamber read as lava: the lava test looked only at plan position, so everything inside the
+# reservoir's outline and below its surface was "in lava", the chamber's air included. Lava is three volumes, and
+# everything else is air, however deep under the reservoir it lies:
+#   reservoir: from its surface down to its bed; inside the chamber the bed is the dome's glass, and over the oculus
+#              the reservoir opens into the cascade;
+#   cascade:   the falling column, a frustum from the oculus to the pool, narrowing as it falls;
+#   pool:      the collection pool, from its surface down to the chamber's bottom.
+# A point is in lava only inside one of them. A swimmer's surface is the reservoir's (29.2) in the reservoir and the
+# cascade, and the pool's in the pool: stepping out of the pool onto the gallery is stepping into air.
+LAVA_VOLUMES = [
+    dict(id='reservoir', kind='layer', top=LAVA_Y,
+         outline=[[round(x, 3), round(y, 3)] for x, y in (pol(bank(b / 2.0), b / 2.0) for b in range(720))],
+         floor=dict(inside=C['radius'], dome=dict(centre_y=wy(DOME_CENTRE_DEPTH), radius=DOME_RADIUS),
+                    open_over=C['oculus'], outside='the bank and bed: FireCalderaGround.height')),
+    dict(id='cascade', kind='frustum', centre=[0.0, 0.0], top=wy(CASCADE['top_depth']), bottom=wy(CASCADE['bottom_depth']),
+         top_radius=CASCADE['top_radius'], bottom_radius=CASCADE['bottom_radius'], surface=LAVA_Y),
+    dict(id='pool', kind='cylinder', centre=[0.0, 0.0], top=wy(C['pool_surface']), bottom=wy(C['bottom']), radius=C['pool_radius'],
+         surface=wy(C['pool_surface'])),
+]
+def dome_y(r): return wy(dome_depth(r))
+def in_lava(x, y, z):
+    r = math.hypot(x, y)
+    for V_ in LAVA_VOLUMES:
+        if V_['id'] == 'reservoir':
+            if z > LAVA_Y or Polygon(V_['outline']).distance(Point(x, y)) > 0: continue
+            if r <= C['oculus'] and z < wy(C['oculus_depth']): continue      # below the lip: the cascade's, not the reservoir's
+            if C['oculus'] < r <= C['radius'] and z < dome_y(r): continue    # under the glass: the chamber's air
+            return True
+        if V_['id'] == 'cascade' and V_['bottom'] <= z <= V_['top'] and r <= cascade_r(z): return True
+        if V_['id'] == 'pool' and V_['bottom'] <= z <= V_['top'] and r <= V_['radius']: return True
+    return False
+# every walk, and 2.4 m of air over it, lies outside the lava; the dome's glass is 2.4 m or more over every level
+for lv in net.levels.values():
+    for pt in [Point(c) for c in list(lv['surface'].exterior.coords)[::9]] if hasattr(lv['surface'], 'exterior') else []:
+        for dz in (0.1, 1.2, 2.4):
+            if in_lava(pt.x, pt.y, lv['datum'] + dz): F.append('%s lies in lava at %.1f m over its floor' % (lv['id'], dz)); break
+for f in net.flights:
+    L_ = f.line.length
+    for k in range(0, 41):
+        q = f.line.interpolate(L_ * k / 40); y_ = f.height(L_ * k / 40, net.levels[f.upper]['datum'], net.levels[f.lower]['datum'])
+        if in_lava(q.x, q.y, y_ + 0.1) or in_lava(q.x, q.y, y_ + 2.4): F.append('%s runs through lava' % f.id); break
+for r_, nm in ((C['oculus'] + 0.5, 'the oculus'), (C['radius'] - 0.5, 'the rim')):
+    if not in_lava(*pol(r_, 30), dome_y(r_) + 0.2): F.append('no lava over the dome at %s' % nm)
+    if in_lava(*pol(r_, 30), dome_y(r_) - 0.2): F.append('lava under the dome at %s' % nm)
+if not (in_lava(0, 0, wy(20)) and in_lava(0, 0, wy(C['pool_surface']) - 1) and not in_lava(C['opening'] + 2, 0, wy(C['floor']) + 1.5)):
+    F.append('the cascade or the pool is not lava, or the Floor is')
+ok('lava is three volumes (reservoir to the dome, the cascade, the pool); every walk and its headroom is air')
 if F:
     print('\n'.join('FAIL ' + m for m in F)); sys.exit(1)
 
@@ -201,7 +249,8 @@ if F:
 data = net.data()
 SECTION = dict(lava_y=LAVA_Y, chamber=CHAMBER, dome=dict(centre_depth=DOME_CENTRE_DEPTH, radius=DOME_RADIUS), cascade=CASCADE,
                levels=[{k: v for k, v in L.items()} for L in LEVELS], crossings=CROSSINGS,
-               double_ramps=[{k: v for k, v in K.items()} for K in DOUBLE_RAMPS], helix=HELIX, ramp_grade=round(RAMP_GRADE, 4))
+               double_ramps=[{k: v for k, v in K.items()} for K in DOUBLE_RAMPS], helix=HELIX, ramp_grade=round(RAMP_GRADE, 4),
+               lava_volumes=LAVA_VOLUMES)
 HEADER = ['The Caldera Heartworks (docs/architecture/fire_caldera_heartworks.md): one lava cascade from an oculus in',
           'the reservoir\'s floor, a glass dome, stepped rim terraces, two crossings, ramps between every level, the',
           'Floor round the cascade and the pool gallery under it. Its only way in is through the lava.',

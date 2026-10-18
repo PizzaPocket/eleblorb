@@ -752,3 +752,48 @@ metal and glass craft on named elements.
 **Open:**
 - the final shop stock;
 - the submerged story encounters.
+
+
+## Walkthrough fixes (2026-10-18, at the user's direction)
+
+The user walked the built caldera. Each fix below is a rule for every building
+in it, not only the one where it was seen.
+
+- **The inn's sign** keeps its cobalt and amber stained-glass leaves and adds
+  the shared inn symbol: the bed under the crescent moon
+  (`VillageInn.build_bed_and_moon_sign`, as every other inn has), leaded into
+  the leaves in stained glass. It carries no lettering.
+- **Skylights are clean cuts.** A SuperEgg roof slab is cut by its skylights
+  the way the spaceship's hull is cut by its windows:
+  - a high-resolution slab (56 rings, 76 segments, not 12);
+  - closed cutter profiles, subtracted;
+  - the result baked (`SolidModel.bake_when_ready`, crease normals rebuilt);
+  - each glass dome built from the same cutter, intersected with the slab's
+    outer shell, as `_glaze_windows` does.
+  The glass is never a child of the roof's CSG, and never shares its
+  collision. The roofs were left live and unbaked, so they shaded smeared and
+  slivered.
+- **A building's own terrace is the building's.** Oren's roof keeps only its
+  own paving, its parapet with the lift's gap, and the spiral stair landing on
+  it. The glass terrace and second guard laid over it are removed; they
+  blocked the lift.
+- **No two surfaces at one height.** Oren's yard and his ramp's foot landing
+  overlapped, and so did others. A surface stops at the edge of another at
+  its height, or is cut out of it.
+- **City Hall:**
+  - **The terrarium** cannot be entered. Its glass is a solid convex collider
+    (its hull), not a trimesh shell the player can pass through and be
+    trapped inside.
+  - **The way up.** The glass switchback ramp ran under the solid west
+    gallery slab, so its upper half had no headroom. The ramp now rises in the
+    open hall, clear of every slab overhead by 2.4 m, and arrives on the
+    gallery through the opening already left in the gallery's guard
+    (x −5.4, z 0.85 to 3.25 in its frame). Alternatively, the gallery slab
+    above it is cut open as a well. The council's chairs stay clear of the
+    ramp.
+- **Raised buildings' supports are solid.** The supertoroidal pier under each
+  raised building collides as it looks, stacked convex shapes following its
+  waist and flare, so the player can never walk inside it. Its four vertical
+  orange poles are removed: they carried nothing.
+- **The rule for the player:** no part of the caldera can be entered that is
+  not meant to be. Every closed visual has the collision of its outside.
