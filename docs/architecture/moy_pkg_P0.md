@@ -288,3 +288,39 @@ the new baseline by check; the times; the pass 4 shots.
 Pass 4's places, from `moy_city_3d.html` `PLACES`, plus the standard set:
 `civic`, `clock`, `clockroom`, `eye`, `arch`, `court`, `park`, `spirals`,
 `towertop`, `transfer`.
+
+## 10. Review of the second fix build (2026-10-18)
+
+Reviewed: `b828930`, diagnostic `docs/diagnostics/2026-10-18-moy-P0-fixes-2.md`,
+`checks/moy-2026-10-18.json`, the P0 shots.
+**Result: done.** Section 5 holds: 3 min 43 s on all of Moy; 9/9 fixtures,
+each asserting its own finding, with clean twins; pass 4's ten places
+render at noon and dusk.
+
+Checked:
+- The fills start at Civic Plaza (−380, −59.87, 0); 847,754 cells reached,
+  1 trapped (an East Gate platform cell). The trap count is now a measure.
+- The winding is Godot's: `(c − a) × (b − a)`, in both places.
+- `overlap` suppresses by `walk_run_id` only; 97 slabs flush with terrain
+  are their own kind.
+- `solid` now fires: 219, mostly trees (park, Civic Plaza, Deck), lots and
+  buildings without collision. Trees are physical by `CLAUDE.md`: real.
+
+**Follow-ups (P0.1; small, before the suite gates a package):**
+1. **`underside` is a warning until this lands.** 559 of its 891 findings
+   are the Crossing's handrails, hoops, galleries and ring links: meshes
+   that inherit the tower's `flight` meta and sit over a walk cell.
+   - Test only the visuals of the cell's own body.
+   - Look for the down face under the cell (within the deck's thickness),
+     not at the mesh's lowest y: a helix's lowest y is metres away.
+2. **Blank under-flight shots.** About 20 of the 54 generated views are one
+   flat colour (the camera inside a body): the escalators at CityHallOuter,
+   Estate Square, Market Square, Civic Plaza, SpineAccess `_0`, WestGateCore
+   flights `_00`, `_01`, `_03`, two Crossing helices. Put the camera on a
+   reached walk cell under the flight, with a clear ray to its underside;
+   skip and log a run that has none.
+
+**Decisions:**
+- 2026-10-18: P0 done; `underside` reports as a warning until P0.1.
+- 2026-10-18: `checks/moy-2026-10-18.*` is the measured "now" for the
+  roadmap's levels.
