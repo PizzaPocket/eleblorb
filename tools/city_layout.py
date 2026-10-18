@@ -506,7 +506,17 @@ PARK={
  'rect':(-625,-50,-495,50),
  'walks':[(-625,-3,-495,3),(-563,-50,-557,50)],
  'dry_garden':(-620,-45,-583,-6),
- 'pond':{'c':(-516,-28),'r':(19,13)},
+ # the reed pond (revised 2026-10-18, at the user's direction: in the third pass its water stood 0.4 m above the park's
+ # ground, on a bespoke near-opaque shader, so it hovered over its banks and could not be seen into). Water lies below
+ # the ground, as water does: its surface 0.3 m under the park, its edge the ellipse r, a shelving bank rising from the
+ # waterline to the park's ground at bank_top (times r), a reed shelf round the edge, the bed falling to depth at the
+ # middle (bed: [fraction of r, height over the park's ground], from the bank's top to the middle). Built with the
+ # world's one water: VillageWorks.water_material() (two-sided, translucent, the same as every village pond), marked a
+ # hazard, its surface and depth on the liquid queries; the paving stops at the bank's top.
+ 'pond':{'c':(-516,-28),'r':(19,13),'surface':-0.3,'bank_top':1.15,
+         'bed':[[1.15,0.0],[1.0,-0.3],[0.86,-0.65],[0.6,-1.5],[0.3,-2.0],[0.0,-2.1]],
+         'water':'VillageWorks.water_material(): the shared two-sided translucent water; CollisionPolicy hazard; meta water_surface_y and water_depth; terrain liquid queries from this surface and bed',
+         'bank':'shelving earth under reeds and flat stones, no wall; the paving and the lawn stop at the bank\'s top'},
  'lawn':(-551,22,-535,38),
  'parasols':[(-612,12),(-598,14),(-586,22),(-596,32),(-584,40),(-612,44)],
  'playground':{'c':PG_C,'scale':PG_K,'track':(round(24*PG_K,2),round(28*PG_K,2)),
@@ -1700,6 +1710,16 @@ def _cross_checks():
     if not sbox(*PARK['rect']).contains(ring): problems.append(('crossing: the ring leaves the park',))
     from shapely import affinity
     pc=PARK['pond']['c']; pond=affinity.scale(Point(pc).buffer(1,64),*PARK['pond']['r'])
+    PD=PARK['pond']; bed_=PD['bed']
+    if abs(bed_[0][0]-PD['bank_top'])>1e-6 or abs(bed_[0][1])>1e-6: problems.append(('park: the pond\'s bank does not meet the ground at its top',))
+    if not any(abs(f-1.0)<1e-6 and abs(y-PD['surface'])<1e-6 for f,y in bed_): problems.append(('park: the pond\'s waterline is not at its edge',))
+    if PD['surface']>-0.15: problems.append(('park: the pond\'s water stands at or above its banks',PD['surface']))
+    if any(b_[1]<a_[1]-1e-6 or b_[0]>a_[0] for a_,b_ in zip(bed_,bed_[1:])) and any(b_[1]>a_[1] for a_,b_ in zip(bed_,bed_[1:])): problems.append(('park: the pond\'s bed rises toward its middle',))
+    bank_g=affinity.scale(Point(pc).buffer(1,64),PD['r'][0]*PD['bank_top'],PD['r'][1]*PD['bank_top'])
+    for w_ in PARK['walks']:
+        if sbox(*w_).intersects(bank_g): problems.append(('park: a walk on the pond\'s bank',w_))
+    for t_ in PARK.get('trees',[]):
+        if bank_g.contains(Point(t_['c'])): problems.append(('park: a tree in the pond or on its bank',t_['c']))
     pg=PARK['playground']; play=Point(pg['c']).buffer(pg['track'][1],64)
     for nm,g in [('pond',pond),('playground',play)]+[('park building',sbox(*[b_ for b_ in named if b_['n']==n_][0]['r'])) for n_ in (9,10)]:
         if ring.intersection(g).area>0: problems.append(('crossing: the ring over the',nm))

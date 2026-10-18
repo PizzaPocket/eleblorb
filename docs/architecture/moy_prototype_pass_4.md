@@ -146,6 +146,31 @@ To settle:
     hotel from `HOTEL` and the detailed model, as in pass 3; nothing about it
     changes in this pass.
 
+11. **The reed pond is real water** (`PARK.pond`).
+    - **The fault.** In the third pass its water stood 0.4 m above the park's
+      ground (`MOY_POND_SURFACE` −59.6 over a datum of −60), on a bespoke,
+      nearly opaque shader (`moy_pond_water.gdshader`, alpha 0.88), so it
+      hovered over its banks and could not be seen into.
+    - **The water's surface** is `surface` (0.3 m) below the park's ground.
+    - **The bank** shelves down from the ground at `bank_top` (× r) to the
+      waterline at r.
+    - **The bed** follows `bed`, a reed shelf round the edge and 2.1 m deep at
+      the middle. Set `terrain_generator.gd`'s `MOY_POND_SURFACE` and
+      `_moy_pond_bed` from these values. The paving and lawn stop at the bank's
+      top.
+    - **The water** is the world's one water, as every village pond is:
+      - `VillageWorks.water_material()` on a flat disc at the surface;
+      - marked with `CollisionPolicy.mark_hazard`;
+      - meta `water_surface_y` and `water_depth`.
+      Delete the bespoke shader. The liquid queries (`is_water_area`,
+      `get_water_surface_height`, `get_water_floor_height`) read the same
+      surface and bed.
+    - **Check:**
+      - stand on the bank and look in: the water is translucent, below the
+        ground;
+      - wade in from the shelf and swim at the middle with both characters;
+      - from underwater, look up through the surface.
+
 ## 3. Checks
 
 - The building count drops from 50 to 47 (buildings 54 to 56 are gone).

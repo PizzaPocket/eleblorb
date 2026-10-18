@@ -1634,6 +1634,19 @@ high line's piers rising through it. It is redesigned from its purpose:
     - the bell hangs clear over the room.
 
   Data: `CROSSING.dome.room`.
+- **The reed pond is real water (revised 2026-10-18, at the user's direction).**
+  In the third pass it hovered: its water stood 0.4 m above the park on a
+  bespoke near-opaque shader.
+  - **The water.** Its surface lies 0.3 m below the park's ground, its edge the
+    plan's ellipse.
+  - **The banks.** They shelve from the ground (at 1.15 × its radii) down to
+    the waterline, under reeds and flat stones, with no wall.
+  - **The bed.** A reed shelf round the edge, then down to 2.1 m in the middle.
+  - **The material.** It is built with the world's one water,
+    `VillageWorks.water_material()`, as every village pond is: translucent and
+    two-sided, a hazard on the liquid queries.
+  - Data: `PARK.pond` (checked: the water below its banks, nothing on the
+    banks).
 - **The towers' ways out (revised 2026-10-18, at the user's direction).** In
   the third pass, the ring every 4.1 m round each tower crossed the ways out at
   head height, and with twelve ribs a rib stood in each diagonal way out to the
