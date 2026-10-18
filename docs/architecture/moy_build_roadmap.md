@@ -151,7 +151,7 @@ diagnostic replaces this column.
 | P13h | the Reese–Miller house |
 | P13i | (moved into P17) Pinestein's laboratory, sealed in the BLOCK tower's base; his Old Moy flat is not entered |
 | P13j | Hiro's all-night store |
-| P13k | the Helmsmith (his shop front and the move off Civic Plaza are in P3) |
+| P13k | the Helmsmith (his walk-in shop floor and the move off Civic Plaza are in P3; P13k finishes the shop and the workshop) |
 
 **P17, the BLOCK tower.** One build, handed off whole so it can be played
 through (user, 2026-10-18).

@@ -37,7 +37,7 @@ Today every lot is a plain block (L1). Replace each market-lane lot's block
 with its kit house, from its `LOT_KITS` entry. Build no house by hand.
 
 **80 houses:** 15 boom houses (5 with a veranda), 55 tile houses (9 on
-corners), 10 lock-ups. 22 pairs share a door and a core; 11 houses have a
+corners), 10 lock-ups; and the Helmsmith's shop (section 2a). 22 pairs share a door and a core; 11 houses have a
 lift for a core; 15 have a core of their own.
 
 **The kit is exterior only.** These houses are not entered.
@@ -84,33 +84,52 @@ lift for a core; 15 have a core of their own.
 - **The market flats** (`BUILDING_KITS[34]`): four tile houses built as one
   terrace, rounded at the corner, with laundry on the shared roof.
 
-## 2a. The Helmsmith moves home
+## 2a. The Helmsmith's shop (revised 2026-10-18, at the user's direction)
 
-The live game still has the old Helmsmith stall standing in the middle of
+The live game still has the Helmsmith's old shop standing in the middle of
 Civic Plaza (`_add_moy_helmsmith()` in `scripts/city_generator.gd`, at world
-(−470, −18)). It was kept there as a stopgap when the city was replaced. Its
-real home is building 38, on Lamp Lane's south side (`CityPlan.BUILDINGS`
-38, x −600 to −590, z 174 to 186; `CityPlan.BUILDING_KITS[38]`).
+(−470, −18)): a walk-in room with wide entrances, a counter, and the real
+helms from `ShopCatalog` on a back-wall display, in teal, coral and gold
+(`_build_helmsmith_storefront()` and `_build_helmsmith_room()`). It was kept
+there as a stopgap when the city was replaced. Its real home is building 38,
+on Lamp Lane's south side (`CityPlan.BUILDINGS` 38, x −600 to −590, z 174 to
+186; `CityPlan.BUILDING_KITS[38]`, `kit: shop`).
 
-- **Build 38** as a lock-up (two storeys) facing north onto Lamp Lane: its
-  shutter rolled up by day, a counter across the open front, helms on the
-  back wall's racks and on stands either side of the opening (dressed at L2
-  in plain shapes), one picture sign of a helm. His home is behind and above,
-  not entered.
-- **Move the vendor:** the same NPC, with the same name, looks, `shop_category`
-  `"city"` and stock, standing behind the counter, facing the lane, on
-  tested ground. Keep him stationary.
-- **Remove the legacy stall from Civic Plaza** and its storefront node
+**It stays a proper shop, not a lock-up.** The earlier brief made it a
+shutter with a counter across the open front, a stall served from the lane.
+That was a downgrade. Build it as a shop you walk into:
+- **The house:** two storeys facing north onto Lamp Lane, in the lanes'
+  render (`colour`), with a parapet.
+- **The shopfront:** a glazed front the full width, with the wide open
+  entrance (`shop_floor.entrance`) in the middle; one picture sign of a
+  helm above it (no lettering); warm light spilling out at dusk.
+- **The shop floor** (`shop_floor`: `h` high, `depth` deep, the house's full
+  width) is **entered**, built at L2:
+  - the counter across the room, Gideon behind it, facing the entrance;
+  - his helms on the back wall's display, the catalogue's own models, as
+    the old shop shows them (`ShopCatalog.get_items_for_shop("city")` and
+    each item's `build_visual`); more on stands either side of the room;
+  - the old shop's teal, coral and gold, carried over;
+  - lit inside;
+  - collision as built; the entrance has no threshold.
+- **The workshop** behind (the rest of the depth): a doorway behind the
+  counter shows his bench, a grinder and helms half made. Seen, not entered.
+- **His home** upstairs: windows, not entered.
+- **Move the vendor:** the same NPC, with the same name, looks,
+  `shop_category` `"city"` and stock, behind the counter on tested ground.
+  Keep him stationary.
+- **Remove the old shop from Civic Plaza** and its storefront node
   (`MoyHelmsmithShop`), and update `_remove_moy_actors()` to match. Nothing
   of the shop is left on the plaza.
-- **Check:** the shop UI opens from Lamp Lane with both characters; the
-  plaza is clear; `reach` finds the counter from the lane.
+- **Reuse** the old shop's room and display code (moved into a shared place
+  the bake or the city generator both can call) rather than writing a third.
+- **Check:** walk in from Lamp Lane with both characters; the shop UI opens
+  at the counter; the plaza is clear; `reach` finds the counter.
 - **His lines.** His second line ("A core takes one head-shape at a time…")
   explains a mechanic, which the in-game text rule forbids. Replace it with
   an in-character remark that explains nothing, and flag the change in the
   diagnostic.
-- Building 38 is still the Helmsmith's interior package (P13k) later; this
-  move needs only its front.
+- P13k finishes the shop (dressing, lighting, the workshop) to L3 later.
 
 **The streets they make:**
 - **Arcade Street's roof** (`ARCADE_ROOF`): steel arches at each `arches`
@@ -204,6 +223,9 @@ Write `docs/diagnostics/<date>-moy-P3.md` with:
   deep; no core or flat is built.
 - 2026-10-18: the Helmsmith's legacy stall leaves Civic Plaza for building
   38 on Lamp Lane in this package (section 2a).
+- 2026-10-18 (user): the Helmsmith keeps a proper walk-in shop, not a
+  lock-up: the shop floor is built and entered in P3; his workshop is seen,
+  his home upstairs is not entered.
 - 2026-10-18 (data review): every house faces a street, a square or the
   Rim Walk; the twelve at the south edge face the Rim Walk.
 - 2026-10-18: a pair shares one door, so pairs need fronts on one line; a

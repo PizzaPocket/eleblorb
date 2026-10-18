@@ -2473,10 +2473,13 @@ BUILDING_KITS[27].update(polite=True); BUILDING_KITS[25].update(polite=True)
 # corner of Market Street and Museum Lane (moy_market_lanes.md 4)
 BUILDING_KITS[34]={'kit':'tong_lau','storeys':8,'front':'s','shop':True,'gen':'tile','veranda':False,
                    'corner':True,'colour':1,'signs':3,'roof':'laundry','core':'own','pair':-1,'lift':True,'units':4}
-# the Helmsmith (38): Gideon Hale's two-storey lock-up shop on Lamp Lane's
-# south side, the counter in its open front and his home behind; the live
-# game's legacy stall on Civic Plaza moves here in P3 (moy_pkg_P3.md 2a)
-BUILDING_KITS[38]={'kit':'lockup','storeys':2,'front':'n','shop':True,'colour':3,'signs':1,'counter':True,'home':'behind'}
+# the Helmsmith (38): Gideon Hale's shop on Lamp Lane's south side (revised 2026-10-18, at the user's direction: a
+# proper shop, not a lock-up). A walk-in shop floor the full width of the house, its wide entrance on the lane, the
+# counter across the room and his helms on the back wall; his workshop behind, seen through the doorway; his home
+# upstairs. The live game's legacy shop on Civic Plaza moves here in P3 (moy_pkg_P3.md 2a); P13k finishes it.
+BUILDING_KITS[38]={'kit':'shop','storeys':2,'front':'n','shop':True,'colour':3,'signs':1,'counter':True,
+                   'shop_floor':{'h':4.0,'depth':8.0,'entrance':3.0},'workshop':'back','home':'above',
+                   'accents':['teal','coral','gold'],'display':'catalogue'}
 # two neighbours never share both parapet pattern and base height
 def touching(a,b_): return a[0]<=b_[2] and b_[0]<=a[2] and a[1]<=b_[3] and b_[1]<=a[3]
 for i,ki in enumerate(LOT_KITS):
@@ -2987,6 +2990,15 @@ def _p3():
         if built_at(side_n,x,lz0) and built_at(side_s,x,lz1): lanterns.append(round(x,2))
         x+=LP['lantern_every']
     doors=[LOT_KITS[i]['door'] for i in ML if LOT_KITS[i].get('door')]
+    for n_,k_ in BUILDING_KITS.items():
+        if k_.get('kit')=='shop':
+            b_=[x_ for x_ in named if x_['n']==n_][0]['r']; a_,e_=front_line(b_,k_['front'])
+            # a shop's whole front is its window and its entrance: no stall stands before it
+            L_=math.dist(a_,e_)
+            for t_ in range(int(L_)+1): doors.append((a_[0]+(e_[0]-a_[0])*t_/L_,a_[1]+(e_[1]-a_[1])*t_/L_))
+    hm=BUILDING_KITS[38]; hb=[x_ for x_ in named if x_['n']==38][0]['r']
+    if hm['shop_floor']['depth']+3.0>hb[3]-hb[1]: problems.append(('the Helmsmith: no room for the workshop behind the shop floor',))
+    if hm['shop_floor']['entrance']>hb[2]-hb[0]-2.0: problems.append(('the Helmsmith: the entrance leaves no shopfront',))
     stalls=[]; x=lx0+LP['stall']['w']/2+1.0; sd=0
     while x<lx1-LP['stall']['w']/2:
         for side in ((sd,1-sd)):
