@@ -79,7 +79,7 @@ b(23,'Hawker centre',(-554,-82,-516,-62),'civic','1 storey, open-sided, on the P
 b(24,'Garden Row',(-660,40,-637,58),'home','3 townhouses, 3 storeys, facing the Park Ring','Teodora Vance; Ada Fong and Sora Ishida; Priya Raman')
 b(25,"Sol's café",(-752,34,-737,44),'shop','old tower house, 5 storeys; flat above','Sol Brant')
 b(26,'Bakery',(-730,-22,-720,-6),'shop','old tower house, 6 storeys; flats above','Felix Tanaka (above)')
-b(27,"Pinestein's building",(-716,-118,-707,-102),'shop','old tower house, 9 storeys; laboratory on the roof beside its wind tower','Palbert Pinestein (top floor)')
+b(27,"Pinestein's building",(-716,-118,-707,-102),'shop','old tower house, 9 storeys; his top-floor flat, antennas and coils on the roof beside its wind tower, where he watches BLOCK (his laboratory is in BLOCK\'s base, 2026-10-18)','Palbert Pinestein (top floor)')
 b(28,"Mara's building",(-716,-58,-707,-42),'shop','8 storeys; rooftop studio','Mara Quill')
 b(29,"Benji's building",(-686,40,-678,56),'shop','6 storeys','Benji Okoro')
 b(30,"Theo's building",(-730,62,-722,78),'shop','6 storeys','Theo Park')

@@ -441,7 +441,7 @@ in character and pointing nowhere:
 
 | Resident | Home | Work | Backstory |
 |---|---|---|---|
-| **Palbert Pinestein** | a top-floor flat and laboratory in Old Moy, the roof bristling with antennas and coils | none, officially; dismissed from BLOCK | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
+| **Palbert Pinestein** | a top-floor flat in Old Moy, the roof bristling with antennas and coils, where he watches BLOCK | none, officially; dismissed from BLOCK. His laboratory, where he made the city blorbs, is sealed in the BLOCK tower's base (user, 2026-10-18): the one lab of his the hero enters | The mad scientist who made the city blorbs (section 3b). Wild-haired, brilliant, tactless, and loyal to the creatures the city threw out. Goes out past the Rim Walk most nights with a pocketful of charged batteries. |
 | **Dr. Vera Kask** | the top floors of the BLOCK tower | director of BLOCK | Pinestein's oldest colleague, and the one who dismissed Pinestein after the Blackout. Still keeps Pinestein's old notebooks locked in her office. She lives where she works, and is rarely seen at street level. |
 | **Omar Haddad** | a flat at the battery works | chief engineer of the Windworks wind farm | Climbs ninety-five metres to a nacelle before breakfast and calls it his commute. |
 | **Rafael Ortiz** | the keeper's house at the water works | keeper of the wells and the water works | Counts every litre the city uses twice, and has never once let the park's pond run dry. |

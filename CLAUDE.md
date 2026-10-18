@@ -80,3 +80,10 @@ collider. Prefer boxes, cylinders, capsules, or a small set of convex shapes;
 reserve close mesh collision for silhouettes where platforming accuracy truly
 depends on it. Never omit collision from substantial geometry merely as an
 implicit performance optimization.
+
+## The Moy build
+
+Moy's plan is locked (version 1) and the city is being built package by package.
+Any session about Moy starts at `docs/architecture/moy_build_roadmap.md`: its
+quick start, how the planning and build sessions split the work, the levels of
+finish, and every package's status and brief.
