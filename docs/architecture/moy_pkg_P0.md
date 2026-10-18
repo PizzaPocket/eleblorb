@@ -207,3 +207,84 @@ screenshot rig.
 
 **Report:** `docs/diagnostics/<date>-moy-P0-fixes.md`: each check's method,
 its fixture result, the Moy baseline counts, the times, and the place shots.
+
+## 8. Review of the fix build, and fixes (2026-10-18)
+
+Reviewed: `948e1bf`, diagnostic `docs/diagnostics/2026-10-18-moy-P0-fixes.md`,
+`checks/moy-2026-10-18.json`, and the P4 shots.
+**Result: fix.** Much closer. Keep the walk grid (rays down, stacked cells),
+the flood fill and its reverse, the `--fixtures` suite built in code, the
+link ids on lifts and trains, the head-beam split, the rig reading `PLACES`,
+and the time (3 min 21 s on all of Moy).
+
+Not yet a measurement: four checks are wrong in method, so their counts
+(trap 975, underside 777, overlap 936, solid 0) do not describe Moy.
+
+**Fix these, in order:**
+1. **A real start for the fills.** The spawn is the area's centre,
+   (−560, −58, 0): the Crossing's middle, a cell that fails its own
+   headroom. From it, 681,210 of 1,233,770 walk cells read as trapped.
+   - The builder tags a `reach_start` marker on Civic Plaza's ground
+     (in front of the East Gate); the suite seeds the fills there, and
+     from the platforms, as section 2 says.
+   - The summary prints the start, the reached cells and the trapped cells
+     (count and share).
+2. **Escalators are links.** Fix 2 asked for it; only lifts and trains got
+   link ids. Give each escalator pair's foot and head landings one shared
+   `reach_link_id`. Today the SpineAccess, DeckEscalator and ClockRoomArrival
+   landings sit 0.6 to 1 m from reached cells and read as disconnected.
+   - A link whose end finds no walk cell within 3 m is a `reach` finding,
+     not dropped silently (the Deck lift calls).
+3. **`underside`: the winding is upside down.** Godot's front faces are
+   clockwise, so `(b − a) × (c − a)` is the *back* normal. Every box's bottom
+   reads as facing up: 776 of the 777 findings say "no underside-facing
+   face". The fixture's one triangle in fact faces down, and passes by
+   accident.
+   - Fix the sign here and in `_check_inward_winding`.
+   - A walk deck is a body with the `walk_deck` or `flight` meta, set by
+     the builder; drop the name match. "Deck" in `DeckGardenBed` made 511 of
+     the 777 findings garden beds.
+4. **`overlap`: pieces of one run, by tag.** The name rule only knows rails,
+   tracks, escalators and walkways. 411 of the 936 findings are one garden
+   bed's own segments meeting end to end; more are `RimWall_`, `Street_`,
+   `Deck_`, `OldLane_`, `Lot_`.
+   - The builder sets `walk_run_id` on every segment family it emits; the
+     suite suppresses pairs with one run id.
+   - Keep a slab flush with the terrain (Old Moy's houses, the helix hands
+     at −60) as a finding, reported as its own kind: "flush with terrain".
+5. **`solid` cannot fire.** The terrain is one concave shape, and its
+   bounds touch every mesh, so every mesh has "nearby collision".
+   - Test each substantial mesh with a shape query (its own box, grown
+     5 cm) against the colliders, not against shapes' bounds; or skip
+     shapes larger than 64 m.
+   - Its fixture gets a 3 m box without collision standing on terrain.
+6. **Fixtures prove the right thing.**
+   - Each asserts its own finding (the detail it expects), not any finding
+     of the check id.
+   - Each gets a clean twin that must give no finding: a boxed deck for
+     `underside`, a railed pad with a gap for `guard`, a pond 0.1 m under
+     its bank for `water`. This is what would have caught fix 3.
+   - `water`: 0.4 m over its bank, as section 4 says (it is 1.0 m); name it
+     so in the report (the diagnostic calls it "shader mismatch").
+   - `trap`: two cases, as section 2 has two halves: a closed box with a
+     hole in its top and no shell tag (the one-way pocket), and a tagged,
+     closed shell reached through a gap (inside, not enterable).
+7. **The rig renders pass 4's places.** Section 5 asks for them; the P4
+   set was rendered instead.
+   - `--package=P0` reads this brief's viewpoints (section 9), which are
+     pass 4's.
+   - `under_high_line`'s camera is at y −61, under the ground: its shot is
+     the terrain from below. Put it on the street, under a flight, looking
+     up; and do so for the standard "under each flight" views.
+8. **Re-run on Moy** and replace `checks/moy-<date>.*`. That run is the
+   roadmap's measured "now".
+
+**Report:** `docs/diagnostics/<date>-moy-P0-fixes-2.md`: for each fix,
+what changed; the fixtures with their twins; the start and reach numbers;
+the new baseline by check; the times; the pass 4 shots.
+
+## 9. Viewpoints
+
+Pass 4's places, from `moy_city_3d.html` `PLACES`, plus the standard set:
+`civic`, `clock`, `clockroom`, `eye`, `arch`, `court`, `park`, `spirals`,
+`towertop`, `transfer`.
