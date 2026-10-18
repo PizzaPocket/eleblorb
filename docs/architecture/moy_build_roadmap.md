@@ -110,10 +110,10 @@ diagnostic replaces this column.
 | P0 | **The check suite and the screenshot rig** | the whole city (and reused by every kingdom) | none | n/a | **fix** (reviewed 2026-10-18: the suite's frame is built; its checks are proxies and the fixtures are missing; section 7 of the brief) | `moy_pkg_P0.md` |
 | P1 | Prototype pass 4: grand square, City Hall's front, the clock dome, the Clock Room, tower ribs, closed escalators, the pond | civic core, Crossing | L1 to L3 | L2 | **fix** (reviewed 2026-10-18: head beams, City Hall's bands, two checks; section 4 of the brief) | `moy_prototype_pass_4.md` |
 | P2 | Bake and performance: the rendered probe, budgets, streaming | the whole city | owed | budgets met | planned | |
-| P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane; the Helmsmith moves off Civic Plaza to his shop on Lamp Lane | market lanes | L1 | L2 | **ready** | `moy_pkg_P3.md` |
+| P3 | **The market lanes kit**: boom houses, tile houses, lock-ups, the market flats, Arcade Street's roof, Lamp Lane; the Helmsmith moves off Civic Plaza to his shop on Lamp Lane | market lanes | L1 | L2 | **ready** (revised 2026-10-18: data review, model) | `moy_pkg_P3.md` |
 | P4 | **The Old Moy tower-house kit**: 99 houses (60 on the old roads, 39 on the grid), the courts and their passages, the roof ramps, the first well | Old Moy | L1 | L2 | **ready** | `moy_pkg_P4.md` |
 | P5 | The North Estate: slab and point blocks, void decks, linkways, courts, the neighbourhood centre, the hawker centre | North Estate | L1 | L2 | planned | |
-| P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L1 | L2 | planned | |
+| P6 | Downtown: the mid-rise podium kit, and three towers' exteriors (the Windspire, north, south; BLOCK's is P17's) | downtown | L1 | L2 | planned (note: the BLOCK block's court has a passage in `COURT_WAYS`) | |
 | P7 | **The Crossing to shippable**: towers, helices, galleries, roof, the dome and the Clock Room, the ring, bridges, platforms, planting | Crossing | mixed L2 to L3 | L4 | planned (after P1) | |
 | P8 | **The park**: the four quarters, the dry garden, the reed pond, the tea house and chess terrace, the lawn, the wind trees, walks, benches | park | L2 | L4 | planned | |
 | P9 | **The giant playground**: climbing towers, nets, slides, perches, hoops, the pump track | park, south-east | L1 | L4 | planned | |
@@ -200,7 +200,7 @@ Each interior gets an architecture and interior brief (the `architecture` and
 | The city's design | `docs/architecture/city.md` (sections by district and landmark) |
 | Kits | `moy_market_lanes.md`, `moy_tower_house.md` |
 | Plan data and checks | `tools/city_layout.py`, which writes `scripts/city_plan.gd` (never edited by hand) |
-| Models | `docs/drawings/moy_city_3d.html`, `moy_plan.html`, `moy_grand_hotel_3d.html`, `moy_block_tower_3d.html`, `moy_old_moy_3d.html`, `moy_train_3d.html` (published: the city model https://claude.ai/artifact/YJq2qoeR9thJ67M5Xr23yd, the plan https://claude.ai/artifact/9qeXfC1J9oGNUT8pFmLWi1, the hotel https://claude.ai/artifact/HQ3yrpKk7SSaapbkDzmTWy, the BLOCK tower and the mech https://claude.ai/artifact/Cghz59HZajwK7RoZmrubpH, Old Moy's tower houses https://claude.ai/artifact/53om5eQsd5KvwUirnxrc7z) |
+| Models | `docs/drawings/moy_city_3d.html`, `moy_plan.html`, `moy_grand_hotel_3d.html`, `moy_block_tower_3d.html`, `moy_old_moy_3d.html`, `moy_market_lanes_3d.html`, `moy_train_3d.html` (published: the city model https://claude.ai/artifact/YJq2qoeR9thJ67M5Xr23yd, the plan https://claude.ai/artifact/9qeXfC1J9oGNUT8pFmLWi1, the hotel https://claude.ai/artifact/HQ3yrpKk7SSaapbkDzmTWy, the BLOCK tower and the mech https://claude.ai/artifact/Cghz59HZajwK7RoZmrubpH, Old Moy's tower houses https://claude.ai/artifact/53om5eQsd5KvwUirnxrc7z, the market lanes https://claude.ai/artifact/B4d92cjYsy6TMBUCar7gRT) |
 | Lore | `docs/world_bible.md` |
 | Past build briefs | `moy_playable_prototype.md`, `moy_prototype_pass_2.md` to `_4.md` |
 | Diagnostics | `docs/diagnostics/*moy*` |

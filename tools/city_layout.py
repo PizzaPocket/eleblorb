@@ -2440,7 +2440,11 @@ def front_of(r):
         if kinds:
             k_=min(kinds,key=lambda t: rank[t]); cand=(rank[k_],-len(kinds),side,k_)
             if best is None or cand<best: best=cand
-    return (best[2],best[3]) if best else (None,None)
+    if best: return (best[2],best[3])
+    # a lot that touches no street faces the Rim Walk when it stands at the city's edge (P3 review, 2026-10-18)
+    sides={'n':((x0+x1)/2,z0),'s':((x0+x1)/2,z1),'w':(x0,(z0+z1)/2),'e':(x1,(z0+z1)/2)}
+    d_,sd=min((abs(math.hypot(px-CX,pz)-200.0),k) for k,(px,pz) in sides.items())
+    return (sd,'rim') if d_<=6.0 else (None,None)
 def kit_for(r,storeys,named_n=None):
     x0,z0,x1,z1=r
     h=(abs(x0)*73856093 ^ abs(z0)*19349663 ^ abs(x1)*83492791) & 0xffff
@@ -2670,25 +2674,35 @@ def party_wall(a,b_,front):
     return 0
 TL=[i for i,k_ in enumerate(LOT_KITS) if k_ and k_['kit']=='tong_lau']
 narrow=lambda i: min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<9
+# (P3 review, 2026-10-18) a pair shares one door, so their fronts must lie on one line; a house under 4 m across is
+# too narrow even for half a core, and one shallower than the core (5.8 m) plus a 4 m room has no space for a ramp
+# core at all: it takes a lift on its back face instead, as Old Moy's pencil infill does (SMALL_DEPTH; MARKET_HOUSE)
+SMALL_DEPTH=5.8+4.0
+dims=lambda i: (min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1]),max(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1]))
+fline=lambda i,f: {'n':lots[i][1],'s':lots[i][3],'w':lots[i][0],'e':lots[i][2]}[f]
+pairable=lambda i: dims(i)[0]>=4.0 and dims(i)[1]>=SMALL_DEPTH
 for i in sorted(TL,key=lambda i: min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])):
     ki=LOT_KITS[i]
-    if ki['pair']>=0 or not narrow(i): continue
+    if ki['pair']>=0 or not narrow(i) or not pairable(i): continue
     best=None
     for j in TL:
         kj=LOT_KITS[j]
-        if j==i or kj['pair']>=0 or kj['front']!=ki['front']: continue
+        if j==i or kj['pair']>=0 or kj['front']!=ki['front'] or not pairable(j) or fline(i,ki['front'])!=fline(j,kj['front']): continue
         w_=party_wall(lots[i],lots[j],ki['front'])
         if w_>=5 and (best is None or w_>best[0]): best=(w_,j)
     if best:
         j=best[1]; ki['pair']=j; LOT_KITS[j]['pair']=i; ki['core']=LOT_KITS[j]['core']='shared'
-# a sliver with no neighbour to share a core becomes a two-storey lock-up
-# shop: a shop below and its store or a small flat above, reached by the
-# shop's own ladder ramp (moy_market_lanes.md 3)
+# a sliver under 4 m, or one under 6 m with no neighbour to share a core, becomes a two-storey lock-up shop: a shop
+# below and its store or a small flat above, reached by the shop's own ladder ramp (moy_market_lanes.md 3); a
+# house too shallow for a ramp core keeps its height and takes a lift
 for i in TL:
-    ki=LOT_KITS[i]
-    if min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<6 and ki['core']!='shared':
+    ki=LOT_KITS[i]; w_,d_=dims(i)
+    if ki['core']=='shared': continue
+    if w_<4.0 or (w_<6.0 and d_>=SMALL_DEPTH):
         LOT_KITS[i]={'kit':'lockup','storeys':2,'front':ki['front'],'shop':True,'colour':ki['colour'],'signs':ki['signs']}
         lots[i]=lots[i][:4]+(2,)+lots[i][5:]
+    elif d_<SMALL_DEPTH:
+        ki['core']='lift'; ki['lift']=True
 TL=[i for i in TL if LOT_KITS[i]['kit']=='tong_lau']
 # neighbours differ in colour
 for i in TL:
@@ -2700,7 +2714,7 @@ for i in TL:
     if (ki['gen']=='boom')!=(ki['storeys']<=5): problems.append(('tong lau generation does not fit its storeys',i))
     if ki['veranda'] and ki['gen']!='boom': problems.append(('veranda on a tile house',i))
     if ki['pair']>=0 and LOT_KITS[ki['pair']]['pair']!=i: problems.append(('core pair not mutual',i))
-    if min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<6 and ki['core']!='shared': problems.append(('narrow tong lau without a shared core',i,lots[i]))
+    if min(lots[i][2]-lots[i][0],lots[i][3]-lots[i][1])<6 and ki['core']=='own': problems.append(('narrow tong lau with a core of its own',i,lots[i]))
 for i,ki in enumerate(LOT_KITS):
     if ki and ki['kit']=='lockup' and lots[i][4]!=2: problems.append(('lock-up shop not two storeys',i))
 ## Old Moy, package P4 (docs/architecture/moy_pkg_P4.md, 2026-10-18). The tower house kit's
@@ -2847,6 +2861,147 @@ def _p4():
     if math.dist(fw['tree']['c'],fw['head']['c'])>TREE_KIT['round']['crown']*fw['tree']['h']+1: problems.append(('the first well: its tree does not shade it',))
     OLD_TOWN['_courts']=courts; OLD_TOWN['_wells']=wells; OLD_TOWN['_roof_links']=links
 _p4()
+## The market lanes, package P3 (docs/architecture/moy_pkg_P3.md, revised 2026-10-18). The tong lau kit's
+## numbers (moy_market_lanes.md 3), each house's door, the ways into every walled court in the city, Arcade
+## Street's roof, and Lamp Lane's lanterns and night-market stalls.
+MARKET_HOUSE=dict(
+  storey=3.25, plinth=0.6, parapet=1.1, wall=0.25,
+  palette=['jade','ochre','coral','cornflower','cream'],
+  boom=dict(veranda=dict(col=0.5,out=2.4,rail=1.0),balcony=dict(d=0.6,rail=1.0),window=dict(w=1.0,h=2.2),shutter=0.5),
+  tile=dict(canopy=dict(d=1.5,y=3.6,t=0.2),balcony=dict(d=1.2,rail=1.05),window=dict(w=2.0,h=1.4,sill=0.9),corner_exp=4.0,lift=dict(w=1.9,d=1.9)),
+  lockup=dict(shutter_h=2.8),
+  core=dict(w=3.4,l=5.8,room=4.0), door=dict(w=1.2,h=2.4), shop=dict(h=3.0,depth=1.5), fanlight=0.4,
+  sign=dict(w=0.9,h=0.7,gap=0.25,y=4.2,out=1.3), holds_max=2.4,
+  passage=dict(w=2.4,h=3.0),
+  arcade=dict(h=9.0,arch_every=6.0,arch=dict(w=0.3,d=0.25),panel=0.04,end_clear=3.0),
+  lamp=dict(lantern_every=4.0,lantern_y=4.6,stall=dict(w=2.4,d=1.0,h=2.2),stall_every=7.5,door_clear=1.5,walk_min=2.6),
+)
+def _p3():
+    from shapely.geometry import LineString, Point, Polygon, box as sbox
+    from shapely.ops import unary_union
+    MH=MARKET_HOUSE; S_=MH['storey']
+    # the kit's own numbers hold together
+    for nm,step in (('boom veranda',MH['boom']['veranda']['rail']),('boom balcony',MH['boom']['balcony']['rail']),('tile balcony',MH['tile']['balcony']['rail'])):
+        if max(step,S_-step)>MH['holds_max']: problems.append(('market house: holds too far apart up a %s'%nm,))
+    if MH['tile']['canopy']['y']>MH['holds_max']+1.5: problems.append(('market house: the canopy beyond a bounce from the street',))
+    if MH['sign']['y']<MH['tile']['canopy']['y']+MH['tile']['canopy']['t']+0.3: problems.append(('market house: blade signs foul the canopy',))
+    ML=[i for i,k in enumerate(LOT_KITS) if k and k['kit'] in ('tong_lau','lockup')]
+    hsh=lambda a,b: (int(abs(a)*2654435761) ^ int(abs(b)*40503)) & 0xffff
+    def front_line(r,f):
+        x0,z0,x1,z1=r
+        return {'n':((x0,z0),(x1,z0)),'s':((x1,z1),(x0,z1)),'w':((x0,z1),(x0,z0)),'e':((x1,z0),(x1,z1))}[f]
+    # every house has a front on a street, a square or the Rim Walk
+    for i in ML:
+        if LOT_KITS[i]['front'] is None or front_of(tuple(int(v) for v in lots[i][:4]))[0] is None: problems.append(('market house: no street to face',i))
+    # each house's door: a pair's one shared door straddles the party wall at the front; a house with its own core
+    # has its door at one end of its front, the shop filling the rest; a lock-up is all shutter, no house door
+    for i in ML:
+        k=LOT_KITS[i]; r=tuple(lots[i][:4]); a,b_=front_line(r,k['front']); L_=math.dist(a,b_); ux,uz=(b_[0]-a[0])/L_,(b_[1]-a[1])/L_
+        if k['kit']=='lockup': k['door']=None; continue
+        if k['core']=='shared':
+            j=k['pair']; rj=lots[j][:4]
+            if k['front'] in 'ns': px=r[2] if abs(r[2]-rj[0])<0.01 else r[0]; pt=(px,a[1])
+            else: pz=r[3] if abs(r[3]-rj[1])<0.01 else r[1]; pt=(a[0],pz)
+        else:
+            t=MH['door']['w']/2+0.5; t=t if hsh(*a)%2 else L_-t; pt=(a[0]+ux*t,a[1]+uz*t)
+        k['door']=(round(pt[0],2),round(pt[1],2))
+    for i in ML:
+        k=LOT_KITS[i]
+        if k.get('core')=='shared' and LOT_KITS[k['pair']]['door']!=k['door']: problems.append(('market house: a core pair without one shared door',i))
+        w_,d_=dims(i)
+        if k.get('core') in ('shared','own') and d_<MH['core']['l']+MH['core']['room']: problems.append(('market house: too shallow for its ramp core',i))
+        if k.get('core')=='shared' and w_<4.0: problems.append(('market house: too narrow for half a core',i))
+        if k['kit']=='tong_lau' and w_<6.0 and k.get('core')=='own': problems.append(('market house: under 6 m with a core of its own',i))
+    if abs(SMALL_DEPTH-(MH['core']['l']+MH['core']['room']))>0.01: problems.append(('market house: SMALL_DEPTH out of step with MARKET_HOUSE',))
+    # blade signs on the lanes: some houses hang one sign out over the lane, never two within 4 m
+    lanes={s_[0]:s_ for s_ in STREETS if s_[1]=='lane'}
+    blades=[]
+    for i in ML:
+        k=LOT_KITS[i]
+        if k['kit']!='tong_lau' or not k['signs']: continue
+        a,b_=front_line(tuple(lots[i][:4]),k['front']); mid=((a[0]+b_[0])/2,(a[1]+b_[1])/2)
+        on_lane=any(sbox(*s_[2:]).distance(Point(mid))<0.6 for s_ in lanes.values())
+        if on_lane and hsh(*mid)%2==0 and all(math.dist(mid,q)>=4.0 for q in blades): k['blade']=True; blades.append(mid)
+        else: k['blade']=False
+    # the courts as they really stand: COURTS are the blocks' middles from the first grid layout, drawn before the
+    # landmarks; what is open is each one less the buildings and lots on it. Every piece of at least court_min is a
+    # court: open to a road, or reached by a covered passage through one house's ground floor (a landmark's own
+    # ground is its package's to open); a smaller piece is a light well, built up solid to its lowest neighbour
+    streets_=unary_union([sbox(*s_[2:]) for s_ in STREETS]+[sbox(*o_[1:]) for o_ in OPENS])
+    solids=[(('bldg',b_['n']),sbox(*b_['r']),HEIGHTS.get(b_['n'],8)) for b_ in named]+[(('lot',i),sbox(*l[:4]),l[4]*STOREY.get(l[5],3.25)) for i,l in enumerate(lots)]
+    solid_u=unary_union([g for _,g,_ in solids])
+    ways=[]
+    for ci,c in enumerate(courts):
+        left=sbox(*c).difference(solid_u)
+        for g in [q for q in (left.geoms if hasattr(left,'geoms') else [left]) if q.geom_type=='Polygon' and q.area>0.5]:
+            pts=[(round(x,2),round(z,2)) for x,z in list(g.exterior.coords)[:-1]]
+            nb=[(key,pg,ht) for key,pg,ht in solids if pg.distance(g)<0.3]
+            if g.area<TOWER_HOUSE['court_min']:
+                ways.append(dict(court=ci,pts=pts,area=round(g.area,1),well=True,fill_to=round(min([ht for _,_,ht in nb] or [S_]),2))); continue
+            w=dict(court=ci,pts=pts,area=round(g.area,1))
+            if g.exterior.intersection(streets_.buffer(0.6)).length>=MH['passage']['w']: w['open']=True; ways.append(w); continue
+            best=None
+            for key,lg,ht in nb:
+                if key[0]!='lot': continue
+                i=key[1]; l=lots[i]; k=LOT_KITS[i]
+                if l[4]<2 or (k and k['kit']=='lockup'): continue
+                f=(k['front'] if k else None) or front_of(tuple(int(v) for v in l[:4]))[0]
+                if not f: continue
+                a,b_=front_line(tuple(l[:4]),f); fe=LineString([a,b_])
+                wall=g.buffer(0.3).intersection(lg.exterior)
+                if wall.length<MH['passage']['w']+1.0: continue
+                p0=wall.interpolate(0.5,normalized=True) if wall.geom_type=='LineString' else max(wall.geoms,key=lambda q:q.length).interpolate(0.5,normalized=True)
+                p1=fe.interpolate(fe.project(p0)); ln=LineString([p0,p1])
+                if ln.buffer(MH['passage']['w']/2,cap_style=2).difference(lg.buffer(0.05)).area>0.3: continue
+                door=k.get('door') if k else None
+                if door and Point(door).distance(p1)<MH['passage']['w']/2+MH['door']['w']/2+0.3: continue
+                if best is None or ln.length<best[0]: best=(ln.length,i,p0,p1)
+            if best: w['passage']=dict(lot=best[1],court_end=(round(best[2].x,2),round(best[2].y,2)),road_end=(round(best[3].x,2),round(best[3].y,2)),w=MH['passage']['w'],h=MH['passage']['h'])
+            else:
+                own=[key[1] for key,_,_ in nb if key[0]=='bldg']
+                if own: w['within']=own
+                else: problems.append(('a court with no way in',c,round(g.area)))
+            ways.append(w)
+    # Arcade Street's roof: the full width of the street from Market Street to the Rim Walk, square-ended clear of it
+    asx=[s_ for s_ in STREETS if s_[0]=='Arcade Street'][0]; ms=[s_ for s_ in STREETS if s_[0]=='Market Street'][0]
+    x0,x1=asx[2],asx[4]; z0=ms[5]
+    z1=min(math.sqrt(197.0**2-(x-CX)**2) for x in (x0,x1))-MH['arcade']['end_clear']
+    n_=max(2,round((z1-z0)/MH['arcade']['arch_every'])); arches=[round(z0+(z1-z0)*t/n_,2) for t in range(n_+1)]
+    ARC=dict(x=(x0,x1),z=(round(z0,2),round(z1,2)),h=MH['arcade']['h'],arches=arches)
+    roof=sbox(x0,z0,x1,z1)
+    for b_ in named:
+        if sbox(*b_['r']).intersection(roof).area>0.01: problems.append(('arcade roof over a building',b_['n']))
+    for l in lots:
+        if sbox(*l[:4]).intersection(roof).area>0.01: problems.append(('arcade roof over a lot',l[:4]))
+    for run in DECK['runs']:
+        if LineString(run['pts']).buffer(run['w']/2).intersects(roof): problems.append(('arcade roof under the Deck',run['name']))
+    # Lamp Lane: lantern strings across it wherever both sides are built, and the night market's stalls, one side at a
+    # time, never in front of a door and always leaving walk_min clear
+    LL=[s_ for s_ in STREETS if s_[0]=='Lamp Lane'][0]; lz0,lz1=LL[3],LL[5]; zc=(lz0+lz1)/2; LP=MH['lamp']
+    lim=math.sqrt(197.0**2-(zc)**2); lx0,lx1=max(LL[2],CX-lim+2),min(LL[4],CX+lim-2)
+    side_n=[(sbox(*l[:4]),l[4]) for l in lots if abs(l[3]-lz0)<0.01]+[(sbox(*b_['r']),HEIGHTS.get(b_['n'],8)) for b_ in named if abs(b_['r'][3]-lz0)<0.01]
+    side_s=[(sbox(*l[:4]),l[4]) for l in lots if abs(l[1]-lz1)<0.01]+[(sbox(*b_['r']),HEIGHTS.get(b_['n'],8)) for b_ in named if abs(b_['r'][1]-lz1)<0.01]
+    built_at=lambda side,x,z: any(g.distance(Point(x,z))<0.2 for g,_ in side)
+    lanterns=[]; x=lx0+LP['lantern_every']/2
+    while x<lx1:
+        if built_at(side_n,x,lz0) and built_at(side_s,x,lz1): lanterns.append(round(x,2))
+        x+=LP['lantern_every']
+    doors=[LOT_KITS[i]['door'] for i in ML if LOT_KITS[i].get('door')]
+    stalls=[]; x=lx0+LP['stall']['w']/2+1.0; sd=0
+    while x<lx1-LP['stall']['w']/2:
+        for side in ((sd,1-sd)):
+            zf=lz0 if side==0 else lz1; ok_=built_at(side_n if side==0 else side_s,x,zf)
+            near_door=any(abs(d_[1]-zf)<0.5 and abs(d_[0]-x)<LP['stall']['w']/2+LP['door_clear'] for d_ in doors)
+            if ok_ and not near_door:
+                zc_=zf+(LP['stall']['d']/2 if side==0 else -LP['stall']['d']/2)
+                stalls.append(dict(c=(round(x,2),round(zc_,2)),side='n' if side==0 else 's')); sd=1-sd; break
+        x+=LP['stall_every']
+    if (lz1-lz0)-LP['stall']['d']<LP['walk_min']: problems.append(('Lamp Lane: a stall leaves too narrow a walk',))
+    for a_ in stalls:
+        for b2 in stalls:
+            if a_ is not b2 and abs(a_['c'][0]-b2['c'][0])<LP['stall']['w'] and a_['side']!=b2['side']: problems.append(('Lamp Lane: stalls face each other across it',a_['c']))
+    globals().update(ARCADE_ROOF=ARC,LAMP_LANE=dict(x=(round(lx0,2),round(lx1,2)),z=(lz0,lz1),lanterns=lanterns,lantern_y=LP['lantern_y'],stalls=stalls,stall=LP['stall']),COURT_WAYS=ways)
+_p3()
 JUNGLE=(-500,464); ICE=(-450,-480)
 assert len(RESIDENT_HOMES)==45, len(RESIDENT_HOMES)
 nums={b['n'] for b in B}
@@ -2920,7 +3075,7 @@ for l in lots: w("\t[%s, %d, %s]," % (v2r(l[:4]),l[4],q(l[5])))
 w("]")
 def kit_gd(k):
     if k is None: return "null"
-    return "{" + ", ".join("%s: %s" % (q(a_), ("true" if v is True else "false" if v is False else q(v) if isinstance(v,str) else str(v))) for a_,v in k.items()) + "}"
+    return "{" + ", ".join("%s: %s" % (q(a_), ("true" if v is True else "false" if v is False else q(v) if isinstance(v,str) else str(v) if isinstance(v,(int,float)) else lit(v))) for a_,v in k.items()) + "}"
 w("")
 w("## Kits, one per lot, in the same order as LOTS (null outside Old Moy and")
 w("## the market lanes). Old Moy (moy_tower_house.md): kit (tower or infill),")
@@ -3015,6 +3170,13 @@ w("## their outlines); squares: polygons; houses: outline corners (world x, z), 
 w("## lane or square they front, and their tower house kit. yards: the families' back yards.")
 w("const OLD_TOWN := %s" % lit(dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'],courts=OLD_TOWN['_courts'],wells=OLD_TOWN['_wells'],roof_links=OLD_TOWN['_roof_links'])))
 w("const OLD_HOUSES := %s" % lit(OLD_HOUSES))
+w("## The market lanes' kit (moy_market_lanes.md 3; package P3): metres. ARCADE_ROOF: Arcade Street's roof, its arches' z.")
+w("## LAMP_LANE: lantern strings' x and the night market's stalls. COURT_WAYS: the open ground of each of COURTS (pts), as a court")
+w("## (open to a road, a passage through a lot, or within: landmarks round it, theirs to open) or a light well (well, fill_to).")
+w("const MARKET_HOUSE := %s" % lit(MARKET_HOUSE))
+w("const ARCADE_ROOF := %s" % lit(ARCADE_ROOF))
+w("const LAMP_LANE := %s" % lit(LAMP_LANE))
+w("const COURT_WAYS := %s" % lit(COURT_WAYS))
 w("## The tower house kit's numbers (moy_tower_house.md 3; package P4): metres, the batter in degrees.")
 w("const TOWER_HOUSE := %s" % lit(TOWER_HOUSE))
 w("const TURBINE_HUB_HEIGHT := 95.0")
@@ -3036,5 +3198,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,civic_square=CIVIC_SQUARE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'],courts=OLD_TOWN['_courts'],wells=OLD_TOWN['_wells'],roof_links=OLD_TOWN['_roof_links']),old_houses=OLD_HOUSES,tower_house=TOWER_HOUSE,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,civic_square=CIVIC_SQUARE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'],courts=OLD_TOWN['_courts'],wells=OLD_TOWN['_wells'],roof_links=OLD_TOWN['_roof_links']),old_houses=OLD_HOUSES,tower_house=TOWER_HOUSE,market_house=MARKET_HOUSE,arcade_roof=ARCADE_ROOF,lamp_lane=LAMP_LANE,court_ways=COURT_WAYS,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

@@ -355,15 +355,18 @@ func _check_tower_kits() -> void:
 
 ## Market lanes (docs/architecture/moy_market_lanes.md): boom houses are 4 or
 ## 5 storeys and only they have verandas; tile houses are 6 to 9; a house
-## under 6 m across shares its ramp core, and core pairs are mutual.
+## under 6 m across shares its ramp core or, too shallow for one, has a lift;
+## core pairs are mutual.
 func _check_tong_lau(label: String, kit: Dictionary, r: Rect2) -> void:
 	var storeys := int(kit["storeys"])
 	if (kit["gen"] == "boom") != (storeys <= 5):
 		_fail("%s is a %s house of %d storeys" % [label, kit["gen"], storeys])
 	if kit["veranda"] and kit["gen"] != "boom":
 		_fail("%s has a veranda on a tile house" % label)
-	if minf(r.size.x, r.size.y) < 6.0 and kit["core"] != "shared" and not kit.has("units"):
-		_fail("%s is under 6 m across without a shared ramp core" % label)
+	if minf(r.size.x, r.size.y) < 6.0 and kit["core"] == "own" and not kit.has("units"):
+		_fail("%s is under 6 m across with a ramp core of its own" % label)
+	if kit["core"] == "lift" and not kit["lift"]:
+		_fail("%s has a lift for a core but no lift" % label)
 	var pair := int(kit["pair"])
 	if pair >= 0:
 		var other = CityPlan.LOT_KITS[pair]

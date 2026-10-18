@@ -115,6 +115,10 @@ The middle of each block is open ground left by the houses
   `passage.court` to `passage.road`, with an arched opening at each end and
   a lamp inside. Cut it through the house's collision.
 - A court marked `open` meets its road directly; leave that side open.
+- **The grid blocks' courts** (`COURT_WAYS`, added in P3's data review): two
+  courts behind Old Moy's grid lots, reached by passages through `LOTS[5]`
+  (from West Street) and `LOTS[17]` (from Clinic Lane). Build them the same
+  way.
 - **Light wells** (44 slots under `court_min`): build each up solid to
   `fill_to`, its lowest neighbour's roof, finished as roof terrace. None is
   left as a pit.
