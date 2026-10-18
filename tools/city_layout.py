@@ -2736,6 +2736,7 @@ TOWER_HOUSE=dict(
   door=dict(w=1.2,h=2.4), shopfront=dict(w=(2.4,3.2),h=2.8), kishk=dict(w=1.2,h=1.6,d=0.6),
   core=dict(w=3.4,l=5.8), holds_max=2.4, infill_below=6.0,
   passage=dict(w=2.4,h=3.0), court_min=25.0, ramp=dict(w=1.2,max_deg=32.0,min_wall=6.5),
+  pocket=dict(open_min=4.0,gate=1.4,wall=2.4,tree_area=12.0),
 )
 def _p4():
     from shapely.geometry import LineString, Polygon, Point, box as sbox
@@ -2763,6 +2764,55 @@ def _p4():
     fronts={q['name']:g for q,g in _ot_sqs}; fronts.update({l['name']:g for l,g in _ot_lanes})
     fronts.update({s_[0]:sbox(*s_[2:]) for s_ in STREETS}); fronts['Rim Walk']=Point(CX,0).buffer(203,128).difference(Point(CX,0).buffer(197,128))
     kind={s_[0]:s_[1] for s_ in STREETS}
+    # the small slots between houses (revised 2026-10-18, at the user's direction: no blank blocks). A yard under
+    # court_min is: a sliver under 1 m (left by rounding the plots), folded into the house beside it, or into the
+    # paving where it meets a road and no old house; a slot with no real opening on a road, folded into the
+    # neighbouring house, which grows by it; a slot open to a road, kept open as a pocket off the lane (a bench, pots,
+    # a small tree) or, where its opening is narrow, a family's walled yard with an open gateway. Nothing is filled.
+    roads0=unary_union(list(fronts.values()))
+    def msides0(g):
+        r=g.minimum_rotated_rectangle; c=list(r.exterior.coords)
+        return min(math.dist(c[0],c[1]),math.dist(c[1],c[2]))
+    def fold(g):
+        best=None
+        for i,h in enumerate(OLD_HOUSES):
+            hg=Polygon(h['corners'])
+            if hg.distance(g)>0.3: continue
+            wall=g.buffer(0.3).intersection(hg.exterior).length
+            if wall<0.5: continue
+            u=unary_union([hg.buffer(0.02,join_style=2),g.buffer(0.02,join_style=2)]).buffer(-0.02,join_style=2).simplify(0.05)
+            if u.geom_type!='Polygon': continue
+            if any(Polygon(o['corners']).intersection(u).area>0.05 for j,o in enumerate(OLD_HOUSES) if j!=i): continue
+            if best is None or wall>best[0]: best=(wall,i,u)
+        if not best: return False
+        h=OLD_HOUSES[best[1]]; h['corners']=[(round(x,2),round(z,2)) for x,z in list(best[2].exterior.coords)[:-1]]; h['area']=round(best[2].area,1)
+        return True
+    pockets=[]; small=[]
+    for y in OLD_TOWN['_yards']:
+        g=Polygon(y)
+        if not g.is_valid: g=g.buffer(0)   # a few yards' outlines touch themselves; mend them rather than skip them
+        for q in (g.geoms if hasattr(g,'geoms') else [g]):
+            if 0.5<=q.area<TH['court_min']: small.append(q)
+    for g in sorted(small,key=lambda q:q.area):
+        on_road=g.exterior.intersection(roads0.buffer(0.4)); rl=on_road.length; wd=msides0(g)
+        pts=[(round(x,2),round(z,2)) for x,z in list(g.exterior.coords)[:-1]]
+        if wd<1.0:
+            if fold(g): continue
+            if rl>0: pockets.append(dict(kind='paving',pts=pts,area=round(g.area,1))); continue
+        elif rl<TH['pocket']['gate']+0.2:
+            if fold(g): continue
+            # no house to take it: a narrow alcove off the road, open, paved, a few pots
+            if rl>=1.0: pockets.append(dict(kind='alcove',pts=pts,area=round(g.area,1),road=round(rl,1))); continue
+        else:
+            seg=on_road if on_road.geom_type=='LineString' else max(on_road.geoms,key=lambda q:q.length)
+            m=seg.interpolate(0.5,normalized=True)
+            k_='pocket' if rl>=TH['pocket']['open_min'] else 'yard'
+            pk=dict(kind=k_,pts=pts,area=round(g.area,1),road=round(rl,1),gate=(round(m.x,2),round(m.y,2)))
+            if k_=='pocket': pk['tree']=g.area>=TH['pocket']['tree_area'] and wd>=3.0
+            else: pk['gate_w']=TH['pocket']['gate']
+            pockets.append(pk); continue
+        problems.append(('old town: a slot left as a blank block',round(g.area,1),pts[0]))
+    OLD_TOWN['_pockets']=pockets
     def face(cs,fg):
         n=len(cs); out=[]
         for k in range(n):
@@ -2800,10 +2850,10 @@ def _p4():
     courts=[]; wells=[]
     for y in OLD_TOWN['_yards']:
         g=Polygon(y)
-        if not g.is_valid or g.area<0.5: continue
+        if not g.is_valid: g=max((g.buffer(0).geoms if hasattr(g.buffer(0),'geoms') else [g.buffer(0)]),key=lambda q:q.area); y=[(round(x,2),round(z,2)) for x,z in list(g.exterior.coords)[:-1]]
+        if g.area<0.5: continue
         nb=[(key,pg,ht) for key,pg,ht in built if pg.distance(g)<0.3]
-        if g.area<TH['court_min']:
-            wells.append(dict(pts=y,area=round(g.area,1),fill_to=round(min([ht for _,_,ht in nb] or [S_]),2))); continue
+        if g.area<TH['court_min']: continue
         c=dict(pts=y,area=round(g.area,1))
         if g.exterior.intersection(roads.buffer(0.6)).length>=TH['passage']['w']: c['open']=True; courts.append(c); continue
         best=None
@@ -2862,7 +2912,7 @@ def _p4():
         if not sg.buffer(-clear).contains(Point(px,pz)): problems.append(('the first well: the %s too near the square\'s edge'%nm,))
         if lanes_.distance(Point(px,pz))<clear: problems.append(('the first well: the %s in the Old High Street'%nm,))
     if math.dist(fw['tree']['c'],fw['head']['c'])>TREE_KIT['round']['crown']*fw['tree']['h']+1: problems.append(('the first well: its tree does not shade it',))
-    OLD_TOWN['_courts']=courts; OLD_TOWN['_wells']=wells; OLD_TOWN['_roof_links']=links
+    OLD_TOWN['_courts']=courts; OLD_TOWN['_roof_links']=links
 _p4()
 ## The market lanes, package P3 (docs/architecture/moy_pkg_P3.md, revised 2026-10-18). The tong lau kit's
 ## numbers (moy_market_lanes.md 3), each house's door, the ways into every walled court in the city, Arcade
@@ -3180,7 +3230,7 @@ w("## The Well Quarter (city.md 7, Old Moy): the old town's organic lanes and sq
 w("## and its tower houses turned to their lanes. lanes: centrelines with widths (lane_polys:")
 w("## their outlines); squares: polygons; houses: outline corners (world x, z), storeys, the")
 w("## lane or square they front, and their tower house kit. yards: the families' back yards.")
-w("const OLD_TOWN := %s" % lit(dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'],courts=OLD_TOWN['_courts'],wells=OLD_TOWN['_wells'],roof_links=OLD_TOWN['_roof_links'])))
+w("const OLD_TOWN := %s" % lit(dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'],courts=OLD_TOWN['_courts'],pockets=OLD_TOWN['_pockets'],roof_links=OLD_TOWN['_roof_links'])))
 w("const OLD_HOUSES := %s" % lit(OLD_HOUSES))
 w("## The market lanes' kit (moy_market_lanes.md 3; package P3): metres. ARCADE_ROOF: Arcade Street's roof, its arches' z.")
 w("## LAMP_LANE: lantern strings' x and the night market's stalls. COURT_WAYS: the open ground of each of COURTS (pts), as a court")
@@ -3210,5 +3260,5 @@ root=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')
 open(os.path.join(root,'scripts','city_plan.gd'),'w').write("\n".join(out)+"\n")
 if '--json' in sys.argv:
     path=sys.argv[sys.argv.index('--json')+1]
-    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,civic_square=CIVIC_SQUARE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'],courts=OLD_TOWN['_courts'],wells=OLD_TOWN['_wells'],roof_links=OLD_TOWN['_roof_links']),old_houses=OLD_HOUSES,tower_house=TOWER_HOUSE,market_house=MARKET_HOUSE,arcade_roof=ARCADE_ROOF,lamp_lane=LAMP_LANE,court_ways=COURT_WAYS,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
+    json.dump(dict(streets=STREETS,omitted_streets=OMITTED_STREETS,opens=OPENS,lots=lots,courts=courts,buildings=[dict(b,angle=ANGLE.get(b['n'],0),corners=corners_of(b) if b['r'] else None,height=HEIGHTS.get(b['n'],0),crown=CROWNS.get(b['n']),form=FORMS.get(b['n'],'block'),part=TOWER_PART.get(b['n']),podium=PODIUM_HEIGHT.get(b['n']),site=TOWER_SITE.get(b['n'])) for b in B],hotel=HOTEL,storey=STOREY,park=PARK,turbines=TURBINES,precincts=PRECINCTS,estate=ESTATE,deck={k:v for k,v in DECK.items() if not k.startswith('_')},wall=WALL,cross=CROSS,crossing=CROSSING,arch=ARCH,west_gate=WEST_GATE,green=GREEN,train=TRAIN,platforms=PLATFORMS,escalators=ESCALATORS,timetable=TIMETABLE,launch_site=LAUNCH_SITE,civic_square=CIVIC_SQUARE,tree_kit=TREE_KIT,old_town=dict(interiors=OLD_TOWN['interiors'],lanes=OLD_TOWN['lanes'],squares=OLD_TOWN['squares'],lane_polys=OLD_TOWN['_lane_polys'],yards=OLD_TOWN['_yards'],cover=OLD_TOWN['_cover'],courts=OLD_TOWN['_courts'],pockets=OLD_TOWN['_pockets'],roof_links=OLD_TOWN['_roof_links']),old_houses=OLD_HOUSES,tower_house=TOWER_HOUSE,market_house=MARKET_HOUSE,arcade_roof=ARCADE_ROOF,lamp_lane=LAMP_LANE,court_ways=COURT_WAYS,block_tower=BLOCK_TOWER,lot_kits=LOT_KITS,building_kits=BUILDING_KITS),open(path,'w'))
 print('wrote scripts/city_plan.gd:',len(STREETS),'streets,',len(B),'buildings,',len(lots),'lots,',len(courts),'courts')

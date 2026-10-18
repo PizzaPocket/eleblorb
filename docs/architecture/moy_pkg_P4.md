@@ -32,7 +32,7 @@
    - `CityPlan.LOT_KITS`: the 30 Old Moy grid lots (27 tower, 3 infill),
      `front` as `n`, `s`, `e` or `w`.
    - `CityPlan.BUILDING_KITS` 25 to 32 and 52: the numbered tower houses.
-   - `CityPlan.OLD_TOWN`: `courts` (7), `wells` (44), `roof_links` (15),
+   - `CityPlan.OLD_TOWN`: `courts` (8), `pockets` (38), `roof_links` (15),
      and `squares[0].first_well`.
 6. The model: `docs/drawings/moy_old_moy_3d.html` (published:
    https://claude.ai/artifact/53om5eQsd5KvwUirnxrc7z). The kit sheet shows the three
@@ -55,7 +55,7 @@ kit house, from its data. Build no house by hand.
 
 | Where | Tower, stone base | Tower, earth base | Pencil infill |
 |---|---|---|---|
-| Well Quarter (`OLD_HOUSES`) | 39 | 12 | 9 |
+| Well Quarter (`OLD_HOUSES`) | 40 | 13 | 7 |
 | Grid lots (`LOT_KITS`) | 25 | 2 | 3 |
 | Numbered (`BUILDING_KITS`) | 6 | 3 | 0 |
 
@@ -103,11 +103,11 @@ P3's tile house, built from the infill kit's `gen: tile`, `colour`, `lift`,
 `signs` and `roof` fields: plumb, mosaic-tiled, a glass lift shaft on its back
 face, no ramp core. These are the narrowest plots (under `infill_below`).
 
-### 2.4 The courts, the passages and the light wells
+### 2.4 The courts, the passages and the pockets
 
 The middle of each block is open ground left by the houses
-(`OLD_TOWN.courts` and `OLD_TOWN.wells`).
-- **Courts** (7, from 36 to 327 m²): paved, open to the sky, with a bench,
+(`OLD_TOWN.courts` and `OLD_TOWN.pockets`).
+- **Courts** (8, from 36 to 327 m²): paved, open to the sky, with a bench,
   a few pots and a washing line each (L2 plain shapes). The Reese–Miller
   court has the old capped well head and the bicycles of its section 4.
 - **Passages:** a court with a `passage` is reached from its road through
@@ -119,9 +119,17 @@ The middle of each block is open ground left by the houses
   courts behind Old Moy's grid lots, reached by passages through `LOTS[5]`
   (from West Street) and `LOTS[17]` (from Clinic Lane). Build them the same
   way.
-- **Light wells** (44 slots under `court_min`): build each up solid to
-  `fill_to`, its lowest neighbour's roof, finished as roof terrace. None is
-  left as a pit.
+- **The small slots** (`OLD_TOWN.pockets`, revised 2026-10-18, at the
+  user's direction: **no blank blocks**). Nothing is filled solid:
+  - `pocket` (25): a little open space off the lane, paved, with a bench,
+    pots, and a small tree (kind `round`) where `tree` is true (15 of them);
+  - `yard` (1): a family's yard, walled `pocket.wall` high along its open
+    sides, with an open gateway `gate_w` wide at `gate`;
+  - `alcove` (1): a narrow paved recess off the road, a few pots;
+  - `paving` (11): slivers under 1 m between a house and the street: lay the
+    street's paving over them, flush;
+  - the slots with no opening on a road were folded into the houses beside
+    them in the data (9 houses grew a little): nothing to build.
 
 ### 2.5 The roof route
 
@@ -152,7 +160,8 @@ From `OLD_TOWN.squares[0].first_well`:
 
 - **Solid** (`CollisionPolicy` blocking): every house to its outline; the
   earth base's batter as its stepped lifts; kiosks, wind towers, manzars,
-  parapets; the well head, trough and tree trunk; the filled light wells.
+  parapets; the well head, trough and tree trunk; the pockets' benches and
+  tree trunks; the yard's wall.
 - **Parkour landings:** plinths, cornices, string courses, sills, kishk tops,
   parapets, roofs, kiosk and manzar roofs, wind tower caps, roof ramps, the
   trough.
@@ -168,7 +177,7 @@ From `OLD_TOWN.squares[0].first_well`:
    level; the first well stands clear in its square, under its tree.
 2. **The check suite** (P0) on Old Moy's bounds, `x −790 to −637`:
    - `overlap`, `buried`, `underside`, `solid`, `guard`;
-   - `trap`: no court, light well or roof you can get into and not out of;
+   - `trap`: no court, pocket, yard or roof you can get into and not out of;
    - `reach`: every street door, every passage end and every roof ramp foot.
    If P0 is not yet built, say so and list what you checked by hand.
 3. **Parkour**, with both characters:
@@ -214,10 +223,13 @@ Write `docs/diagnostics/<date>-moy-P4.md` with:
   corner touches that road, on its longest face on another road. Four back
   houses touch no road: two open on their court, two are reached through a
   neighbour.
-- 2026-10-18: every slot under 25 m² between houses is built up solid as a
-  light well, so nothing in the quarter is a pit with no way out. Every
-  larger court has a ground-level way out: a passage (sabat) through a house
-  or an open side on a road.
+- 2026-10-18: every larger court has a ground-level way out: a passage
+  (sabat) through a house or an open side on a road.
+- 2026-10-18 (user): no blank blocks. The first pass filled every slot under
+  25 m² solid; most open onto a road and were no trap. Slivers under 1 m are
+  folded into the house beside them or paved; slots with no opening are
+  folded into a neighbour; the rest stay open as pockets off the lanes, one
+  walled yard and one alcove.
 - 2026-10-18: the roof route gets timber ramps where touching neighbours are
   one storey apart. Shibam's bridges wait for a later round.
 - 2026-10-18: the first well's tree is an old ghaf, the desert's shade tree.
